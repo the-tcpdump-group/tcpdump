@@ -451,8 +451,9 @@ AC_DEFUN(AC_LBL_C_INLINE,
 dnl
 dnl Use pfopen.c if available and pfopen() not in standard libraries
 dnl Require libpcap
-dnl Look for libpcap in ..
-dnl Use the installed libpcap if there is no local version
+dnl Look for libpcap in directories under ..; those are local versions.
+dnl Look for an installed libpcap if there is no local version or if
+dnl the user said not to look for a local version.
 dnl
 dnl usage:
 dnl
@@ -480,35 +481,57 @@ AC_DEFUN(AC_LBL_LIBPCAP,
         fi
     fi
     libpcap=FAIL
-    AC_MSG_CHECKING(for local pcap library)
     AC_ARG_WITH([system-libpcap],
-        [AS_HELP_STRING([--with-system-libpcap], [don't use local pcap library])])
-    if test "x$with_system_libpcap" != xyes ; then
-        lastdir=FAIL
-        places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
-            egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT)?$'`
-        places2=`ls .. | sed -e 's,/$,,' -e "s,^,../," | \
-            egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT)?$'`
-        for dir in $places $srcdir/../libpcap ../libpcap $srcdir/libpcap $places2 ; do
-            basedir=`echo $dir | sed -e 's/[[ab]][[0-9]]*$//' | \
-                sed -e 's/-PRE-GIT$//' `
-            if test $lastdir = $basedir ; then
-                dnl skip alphas when an actual release is present
-                continue;
+        [AS_HELP_STRING([--with-system-libpcap], [don't use local pcap library])],
+        [
+            #
+            # Don't look for a local libpcap.
+            #
+            using_local_libpcap=no
+        ],
+        [
+            #
+            # Look for a local pcap library.
+            #
+            AC_MSG_CHECKING(for local pcap library)
+            lastdir=FAIL
+            places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
+                egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT)?$'`
+            places2=`ls .. | sed -e 's,/$,,' -e "s,^,../," | \
+                egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT)?$'`
+            for dir in $places $srcdir/../libpcap ../libpcap $srcdir/libpcap $places2 ; do
+                basedir=`echo $dir | sed -e 's/[[ab]][[0-9]]*$//' | \
+                    sed -e 's/-PRE-GIT$//' `
+                if test $lastdir = $basedir ; then
+                    dnl skip alphas when an actual release is present
+                    continue;
+                fi
+                lastdir=$dir
+                if test -r $dir/libpcap.a ; then
+                    libpcap=$dir/libpcap.a
+                    local_pcap_dir=$dir
+                    dnl continue and select the last one that exists
+                fi
+            done
+            if test $libpcap = FAIL ; then
+                #
+                # We didn't find a local libpcap.
+                #
+                AC_MSG_RESULT(not found)
+                using_local_libpcap=no;
+            else
+                #
+                # We found a local libpcap.
+                #
+                AC_MSG_RESULT($libpcap)
+                using_local_libpcap=yes
             fi
-            lastdir=$dir
-            if test -r $dir/libpcap.a ; then
-                libpcap=$dir/libpcap.a
-                d=$dir
-                dnl continue and select the last one that exists
-            fi
-        done
-    fi
-    if test $libpcap = FAIL ; then
-        AC_MSG_RESULT(not found)
+        ])
 
+    if test $using_local_libpcap = no ; then
         #
-        # Look for pcap-config.
+        # We didn't find a local libpcap.
+        # Look for an installed pcap-config.
         #
         AC_PATH_TOOL(PCAP_CONFIG, pcap-config)
         if test -n "$PCAP_CONFIG" ; then
@@ -528,7 +551,7 @@ AC_DEFUN(AC_LBL_LIBPCAP,
             libpcap=`"$PCAP_CONFIG" --libs`
         else
             #
-            # Not found; look for pcap.
+            # Not found; look for an installed pcap.
             #
             AC_CHECK_LIB(pcap, main, libpcap="-lpcap")
             if test $libpcap = FAIL ; then
@@ -570,47 +593,60 @@ AC_DEFUN(AC_LBL_LIBPCAP,
             fi
         fi
     else
-        $1=$libpcap
-        places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
-                 egrep '/libpcap-[[0-9]]*.[[0-9]]*(.[[0-9]]*)?([[ab]][[0-9]]*)?$'`
-        places2=`ls .. | sed -e 's,/$,,' -e "s,^,../," | \
-                 egrep '/libpcap-[[0-9]]*.[[0-9]]*(.[[0-9]]*)?([[ab]][[0-9]]*)?$'`
-        pcapH=FAIL
-        if test -r $d/pcap.h; then
-            pcapH=$d
-        else
-            for dir in $places $srcdir/../libpcap ../libpcap $srcdir/libpcap $places2 ; do
-               if test -r $dir/pcap.h ; then
-                   pcapH=$dir
-               fi
-            done
-        fi
+        #
+        # We found a local libpcap.
+        # Look for its pcap-config script.
+        #
+        AC_PATH_PROG(PCAP_CONFIG, pcap-config,, $local_pcap_dir)
 
-        if test $pcapH = FAIL ; then
-            AC_MSG_ERROR(cannot find pcap.h: see INSTALL)
+        if test -n "$PCAP_CONFIG"; then
+            #
+            # We don't want its --cflags or --libs output, because
+            # those presume it's installed.  For the C compiler flags,
+            # we add the source directory for the local libpcap, so
+            # we pick up its header files.
+            #
+            # We do, however, want its additional libraries, because
+            # it makes calls to routines in those libraries, so we'll
+            # need to link with them.
+            #
+            $2="-I$local_pcap_dir $$2"
+            additional_libs=`"$PCAP_CONFIG" --additinoal-libs`
+            libpcap="$libpcap $additional_libs"
+        else
+            #
+            # It doesn't have a pcap-config script.
+            # Make sure it has a pcap.h file.
+            #
+            $1=$libpcap
+            places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
+                egrep '/libpcap-[[0-9]]*.[[0-9]]*(.[[0-9]]*)?([[ab]][[0-9]]*)?$'`
+            places2=`ls .. | sed -e 's,/$,,' -e "s,^,../," | \
+                egrep '/libpcap-[[0-9]]*.[[0-9]]*(.[[0-9]]*)?([[ab]][[0-9]]*)?$'`
+            pcapH=FAIL
+            if test -r $local_pcap_dir/pcap.h; then
+                pcapH=$local_pcap_dir
+            else
+                for dir in $places $srcdir/../libpcap ../libpcap $srcdir/libpcap $places2 ; do
+                    if test -r $dir/pcap.h ; then
+                        pcapH=$dir
+                    fi
+                done
+            fi
+
+            if test $pcapH = FAIL ; then
+                AC_MSG_ERROR(cannot find pcap.h: see INSTALL)
+            fi
+
+            #
+            # Force the compiler to look for header files in the
+            # directory containing pcap.h.
+            #
+            $2="-I$pcapH $$2"
         fi
-        $2="-I$pcapH $$2"
-        AC_MSG_RESULT($libpcap)
-        AC_PATH_PROG(PCAP_CONFIG, pcap-config,, $d)
     fi
 
-    if test -n "$PCAP_CONFIG"; then
-        #
-        # The libpcap directory has a pcap-config script.
-        # Use it to get any additional libraries needed
-        # to link with the libpcap archive library in
-        # that directory.
-        #
-        # Please read section 11.6 "Shell Substitutions"
-        # in the autoconf manual before doing anything
-        # to this that involves quoting.  Especially note
-        # the statement "There is just no portable way to use
-        # double-quoted strings inside double-quoted back-quoted
-        # expressions (pfew!)."
-        #
-        additional_libs=`"$PCAP_CONFIG" --additional-libs --static`
-        libpcap="$libpcap $additional_libs"
-    else
+    if test -z "$PCAP_CONFIG"; then
         #
         # We don't have pcap-config; find out any additional link flags
         # we need.  (If we have pcap-config, we assume it tells us what
@@ -639,6 +675,11 @@ AC_DEFUN(AC_LBL_LIBPCAP,
             # (XXX - true only if we're linking with a static libpcap?)
             #
             LIBS="$LIBS -lodm -lcfg"
+            ;;
+
+	solaris*)
+            # libdlpi is needed for Solaris 11 and later.
+            AC_CHECK_LIB(dlpi, dlpi_walk, LIBS="$LIBS -ldlpi" LDFLAGS="-L/lib $LDFLAGS", ,-L/lib)
             ;;
         esac
     fi
