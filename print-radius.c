@@ -633,7 +633,7 @@ print_attr_string(netdissect_options *ndo,
    }
 
    for (i=0; i < length && EXTRACT_U_1(data); i++, data++)
-       ND_PRINT((ndo, "%c", (EXTRACT_U_1(data) < 32 || EXTRACT_U_1(data) > 126) ? '.' : EXTRACT_U_1(data)));
+       ND_PRINT((ndo, "%c", ND_ISPRINT(EXTRACT_U_1(data)) ? EXTRACT_U_1(data) : '.'));
 
    return;
 
@@ -693,7 +693,7 @@ print_vendor_attr(netdissect_options *ndo,
                vendor_type,
                vendor_length));
         for (idx = 0; idx < vendor_length ; idx++, data++)
-            ND_PRINT((ndo, "%c", (EXTRACT_U_1(data) < 32 || EXTRACT_U_1(data) > 126) ? '.' : EXTRACT_U_1(data)));
+            ND_PRINT((ndo, "%c", ND_ISPRINT(EXTRACT_U_1(data)) ? EXTRACT_U_1(data) : '.'));
         length-=vendor_length;
     }
     return;
