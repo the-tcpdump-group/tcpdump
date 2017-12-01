@@ -282,7 +282,7 @@ smb_print_data(netdissect_options *ndo, const unsigned char *buf, int len)
     ND_PRINT((ndo, "[%03X] ", i));
     for (i = 0; i < len; /*nothing*/) {
         ND_TCHECK(buf[i]);
-	ND_PRINT((ndo, "%02X ", buf[i] & 0xff));
+	ND_PRINT((ndo, "%02X ", EXTRACT_U_1(buf + i) & 0xff));
 	i++;
 	if (i%8 == 0)
 	    ND_PRINT((ndo, " "));

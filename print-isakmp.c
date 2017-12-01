@@ -2262,7 +2262,7 @@ ikev2_ID_print(netdissect_options *ndo, u_char tpay,
 		ND_TCHECK2(*typedata, idtype_len);
 		for(i=0; i<idtype_len; i++) {
 			if(ND_ISPRINT(EXTRACT_U_1(typedata + i))) {
-				ND_PRINT((ndo, "%c", typedata[i]));
+				ND_PRINT((ndo, "%c", EXTRACT_U_1(typedata + i)));
 			} else {
 				ND_PRINT((ndo, "."));
 			}
