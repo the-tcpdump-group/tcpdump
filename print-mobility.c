@@ -133,7 +133,7 @@ mobility_opt_print(netdissect_options *ndo,
 			goto trunc;
 		ND_TCHECK(bp[i + optlen]);
 
-		switch (bp[i]) {
+		switch (EXTRACT_U_1(bp + i)) {
 		case IP6MOPT_PAD1:
 			ND_PRINT((ndo, "(pad1)"));
 			break;

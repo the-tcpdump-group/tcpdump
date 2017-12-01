@@ -567,7 +567,7 @@ pimv2_addr_print(netdissect_options *ndo,
 		if (len < 2)
 			goto trunc;
 		ND_TCHECK(bp[1]);
-		switch (bp[0]) {
+		switch (EXTRACT_U_1(bp)) {
 		case 1:
 			af = AF_INET;
 			addr_len = (u_int)sizeof(struct in_addr);

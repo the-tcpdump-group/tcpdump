@@ -1589,7 +1589,7 @@ handle_action(netdissect_options *ndo,
 	} else {
 		ND_PRINT((ndo, " (%s): ", etheraddr_string(ndo, src)));
 	}
-	switch (p[0]) {
+	switch (EXTRACT_U_1(p)) {
 	case 0: ND_PRINT((ndo, "Spectrum Management Act#%d", EXTRACT_U_1(p + 1))); break;
 	case 1: ND_PRINT((ndo, "QoS Act#%d", EXTRACT_U_1(p + 1))); break;
 	case 2: ND_PRINT((ndo, "DLS Act#%d", EXTRACT_U_1(p + 1))); break;

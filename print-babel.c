@@ -60,7 +60,7 @@ babel_print(netdissect_options *ndo,
         ND_PRINT((ndo, " %d", EXTRACT_U_1(cp + 1)));
     }
 
-    switch(cp[1]) {
+    switch(EXTRACT_U_1(cp + 1)) {
     case 2:
         babel_print_v2(ndo, cp, length);
         break;

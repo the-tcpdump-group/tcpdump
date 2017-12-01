@@ -1089,7 +1089,7 @@ static int
 ip_heuristic_guess(netdissect_options *ndo,
                    register const u_char *p, u_int length)
 {
-    switch(p[0]) {
+    switch(EXTRACT_U_1(p)) {
     case 0x45:
     case 0x46:
     case 0x47:
@@ -1323,7 +1323,7 @@ juniper_parse_header(netdissect_options *ndo,
 
             l2info->cookie_len += lp->cookie_len;
 
-            switch (p[0]) {
+            switch (EXTRACT_U_1(p)) {
             case LS_COOKIE_ID:
                 l2info->cookie_type = LS_COOKIE_ID;
                 l2info->cookie_len += 2;

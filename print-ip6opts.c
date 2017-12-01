@@ -59,7 +59,7 @@ ip6_sopt_print(netdissect_options *ndo, const u_char *bp, int len)
 	if (i + optlen > len)
 	    goto trunc;
 
-	switch (bp[i]) {
+	switch (EXTRACT_U_1(bp + i)) {
 	case IP6OPT_PAD1:
             ND_PRINT((ndo, ", pad1"));
 	    break;
@@ -105,7 +105,7 @@ ip6_opt_print(netdissect_options *ndo, const u_char *bp, int len)
 	if (i + optlen > len)
 	    goto trunc;
 
-	switch (bp[i]) {
+	switch (EXTRACT_U_1(bp + i)) {
 	case IP6OPT_PAD1:
             ND_PRINT((ndo, "(pad1)"));
 	    break;
