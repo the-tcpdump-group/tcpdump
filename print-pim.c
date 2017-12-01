@@ -827,7 +827,8 @@ pimv2_print(netdissect_options *ndo,
 					ND_PRINT((ndo, "v%d", EXTRACT_U_1(bp)));
 					if (*(bp+1) != 0) {
 						ND_PRINT((ndo, ", interval "));
-						unsigned_relts_print(ndo, *(bp+1));
+						unsigned_relts_print(ndo,
+								     EXTRACT_U_1(bp + 1));
 					}
 					if (EXTRACT_BE_U_2(bp + 2) != 0) {
 						ND_PRINT((ndo, " ?0x%04x?", EXTRACT_BE_U_2(bp + 2)));
