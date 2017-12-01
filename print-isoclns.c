@@ -1666,17 +1666,19 @@ isis_print_id(const uint8_t *cp, int id_len)
     if (sysid_len > id_len)
         sysid_len = id_len;
     for (i = 1; i <= sysid_len; i++) {
-        snprintf(pos, sizeof(id) - (pos - id), "%02x", *cp++);
+        snprintf(pos, sizeof(id) - (pos - id), "%02x", EXTRACT_U_1(cp));
+	cp++;
 	pos += strlen(pos);
 	if (i == 2 || i == 4)
 	    *pos++ = '.';
 	}
     if (id_len >= NODE_ID_LEN) {
-        snprintf(pos, sizeof(id) - (pos - id), ".%02x", *cp++);
+        snprintf(pos, sizeof(id) - (pos - id), ".%02x", EXTRACT_U_1(cp));
+	cp++;
 	pos += strlen(pos);
     }
     if (id_len == LSP_ID_LEN)
-        snprintf(pos, sizeof(id) - (pos - id), "-%02x", *cp);
+        snprintf(pos, sizeof(id) - (pos - id), "-%02x", EXTRACT_U_1(cp));
     return (id);
 }
 
