@@ -701,7 +701,7 @@ asn1_print_string(netdissect_options *ndo, struct be *elem)
 	p = elem->data.str;
 	ND_TCHECK2(*p, asnlen);
 	for (i = asnlen; printable && i-- > 0; p++)
-		printable = ND_ISPRINT(*p);
+		printable = ND_ISPRINT(EXTRACT_U_1(p));
 	p = elem->data.str;
 	if (printable) {
 		ND_PRINT((ndo, "\""));
