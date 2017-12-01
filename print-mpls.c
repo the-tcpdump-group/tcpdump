@@ -134,7 +134,7 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			/* nothing to print */
 			return;
 		}
-		switch(*p) {
+		switch(EXTRACT_U_1(p)) {
 
 		case 0x45:
 		case 0x46:

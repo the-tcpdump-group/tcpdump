@@ -576,7 +576,7 @@ static int dccp_print_option(netdissect_options *ndo, const u_char *option, u_in
 		}
 	} else {
 		ND_PRINT((ndo, "%s", tok2str(dccp_option_values, "Option %u", EXTRACT_U_1(option))));
-		switch (*option) {
+		switch (EXTRACT_U_1(option)) {
 		case 32:
 		case 33:
 		case 34:

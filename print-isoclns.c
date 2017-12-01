@@ -680,7 +680,7 @@ isoclns_print(netdissect_options *ndo, const uint8_t *p, u_int length)
 	if (ndo->ndo_eflag)
 		ND_PRINT((ndo, "OSI NLPID %s (0x%02x): ", tok2str(nlpid_values, "Unknown", EXTRACT_U_1(p)), EXTRACT_U_1(p)));
 
-	switch (*p) {
+	switch (EXTRACT_U_1(p)) {
 
 	case NLPID_CLNP:
 		if (!clnp_print(ndo, p, length))
