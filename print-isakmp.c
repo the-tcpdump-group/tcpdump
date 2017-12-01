@@ -1408,7 +1408,7 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 			int i;
 			ND_PRINT((ndo," len=%d ", len));
 			for (i = 0; i < len; i++)
-				safeputchar(ndo, data[i]);
+				safeputchar(ndo, EXTRACT_U_1(data + i));
 			len = 0;
 			break;
 		    }
@@ -2261,7 +2261,7 @@ ikev2_ID_print(netdissect_options *ndo, u_char tpay,
 	if(dumpascii) {
 		ND_TCHECK2(*typedata, idtype_len);
 		for(i=0; i<idtype_len; i++) {
-			if(ND_ISPRINT(typedata[i])) {
+			if(ND_ISPRINT(EXTRACT_U_1(typedata + i))) {
 				ND_PRINT((ndo, "%c", typedata[i]));
 			} else {
 				ND_PRINT((ndo, "."));
@@ -2604,7 +2604,8 @@ ikev2_vid_print(netdissect_options *ndo, u_char tpay,
 	len = ntohs(e.len) - 4;
 	ND_TCHECK2(*vid, len);
 	for(i=0; i<len; i++) {
-		if(ND_ISPRINT(vid[i])) ND_PRINT((ndo, "%c", EXTRACT_U_1(vid + i)));
+		if(ND_ISPRINT(EXTRACT_U_1(vid + i)))
+			ND_PRINT((ndo, "%c", EXTRACT_U_1(vid + i)));
 		else ND_PRINT((ndo, "."));
 	}
 	if (2 < ndo->ndo_vflag && 4 < len) {

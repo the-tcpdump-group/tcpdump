@@ -252,7 +252,7 @@ print_asc(netdissect_options *ndo,
 {
     int i;
     for (i = 0; i < len; i++)
-        safeputchar(ndo, buf[i]);
+        safeputchar(ndo, EXTRACT_U_1(buf + i));
 }
 
 static const char *
@@ -393,7 +393,7 @@ unistr(netdissect_options *ndo,
           ND_TCHECK(s[0]);
 	    if (l >= MAX_UNISTR_SIZE)
 		break;
-	    if (ND_ISPRINT(s[0]))
+	    if (ND_ISPRINT(EXTRACT_U_1(s)))
 		buf[l] = s[0];
 	    else {
 		if (s[0] == 0)
@@ -409,7 +409,7 @@ unistr(netdissect_options *ndo,
 	    ND_TCHECK_2(s);
 	    if (l >= MAX_UNISTR_SIZE)
 		break;
-	    if (s[1] == 0 && ND_ISPRINT(s[0])) {
+	    if (s[1] == 0 && ND_ISPRINT(EXTRACT_U_1(s))) {
 		/* It's a printable ASCII character */
 		buf[l] = s[0];
 	    } else {
@@ -444,7 +444,7 @@ smb_fdata1(netdissect_options *ndo,
 	switch (*fmt) {
 	case 'a':
 	    ND_TCHECK(buf[0]);
-	    write_bits(ndo, buf[0], attrib_fmt);
+	    write_bits(ndo, EXTRACT_U_1(buf), attrib_fmt);
 	    buf++;
 	    fmt++;
 	    break;
@@ -472,7 +472,7 @@ smb_fdata1(netdissect_options *ndo,
 	    bitfmt[l] = '\0';
 	    fmt = p + 1;
 	    ND_TCHECK(buf[0]);
-	    write_bits(ndo, buf[0], bitfmt);
+	    write_bits(ndo, EXTRACT_U_1(buf), bitfmt);
 	    buf++;
 	    break;
 	  }
