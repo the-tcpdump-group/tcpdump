@@ -439,7 +439,7 @@ telnet_parse(netdissect_options *ndo, const u_char *sp, u_int length, int print)
 		p = sp;
 		while (length > (u_int)(p + 1 - sp)) {
 			ND_TCHECK_2(p);
-			if (p[0] == IAC && p[1] == SE)
+			if (EXTRACT_U_1(p) == IAC && EXTRACT_U_1(p + 1) == SE)
 				break;
 			p++;
 		}

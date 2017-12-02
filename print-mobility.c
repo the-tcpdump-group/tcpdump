@@ -282,15 +282,15 @@ mobility_print(netdissect_options *ndo,
 		ND_PRINT((ndo, " seq#=%u", EXTRACT_BE_U_2(&mh->ip6m_data16[0])));
 		hlen = IP6M_MINLEN;
 		ND_TCHECK_2(bp + hlen);
-		if (bp[hlen] & 0xf0) {
+		if (EXTRACT_U_1(bp + hlen) & 0xf0) {
 			ND_PRINT((ndo, " "));
-			if (bp[hlen] & 0x80)
+			if (EXTRACT_U_1(bp + hlen) & 0x80)
 				ND_PRINT((ndo, "A"));
-			if (bp[hlen] & 0x40)
+			if (EXTRACT_U_1(bp + hlen) & 0x40)
 				ND_PRINT((ndo, "H"));
-			if (bp[hlen] & 0x20)
+			if (EXTRACT_U_1(bp + hlen) & 0x20)
 				ND_PRINT((ndo, "L"));
-			if (bp[hlen] & 0x10)
+			if (EXTRACT_U_1(bp + hlen) & 0x10)
 				ND_PRINT((ndo, "K"));
 		}
 		/* Reserved (4bits) */

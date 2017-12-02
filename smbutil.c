@@ -145,7 +145,8 @@ name_interpret(netdissect_options *ndo,
 	ND_TCHECK_2(in);
 	if (in + 1 >= maxbuf)
 	    return(-1);	/* name goes past the end of the buffer */
-	if (in[0] < 'A' || in[0] > 'P' || in[1] < 'A' || in[1] > 'P') {
+	if (EXTRACT_U_1(in) < 'A' || EXTRACT_U_1(in) > 'P' ||
+	    EXTRACT_U_1(in + 1) < 'A' || EXTRACT_U_1(in + 1) > 'P') {
 	    *out = 0;
 	    return(0);
 	}
@@ -367,7 +368,7 @@ unistr(netdissect_options *ndo,
 	    for (;;) {
 		ND_TCHECK(sp[0]);
 		*len += 1;
-		if (sp[0] == 0)
+		if (EXTRACT_U_1(sp) == 0)
 		    break;
 		sp++;
 	    }
@@ -376,7 +377,7 @@ unistr(netdissect_options *ndo,
 	    for (;;) {
 		ND_TCHECK_2(sp);
 		*len += 2;
-		if (sp[0] == 0 && sp[1] == 0)
+		if (EXTRACT_U_1(sp) == 0 && EXTRACT_U_1(sp + 1) == 0)
 		    break;
 		sp += 2;
 	    }
@@ -396,7 +397,7 @@ unistr(netdissect_options *ndo,
 	    if (ND_ISPRINT(EXTRACT_U_1(s)))
 		buf[l] = s[0];
 	    else {
-		if (s[0] == 0)
+		if (EXTRACT_U_1(s) == 0)
 		    break;
 		buf[l] = '.';
 	    }
@@ -414,7 +415,7 @@ unistr(netdissect_options *ndo,
 		buf[l] = s[0];
 	    } else {
 		/* It's a non-ASCII character or a non-printable ASCII character */
-		if (s[0] == 0 && s[1] == 0)
+		if (EXTRACT_U_1(s) == 0 && EXTRACT_U_1(s + 1) == 0)
 		    break;
 		buf[l] = '.';
 	    }

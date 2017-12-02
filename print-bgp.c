@@ -1347,7 +1347,7 @@ bgp_attr_get_as_size(netdissect_options *ndo,
         /*
          * If we do not find a valid segment type, our guess might be wrong.
          */
-        if (tptr[0] < BGP_AS_SEG_TYPE_MIN || tptr[0] > BGP_AS_SEG_TYPE_MAX) {
+        if (EXTRACT_U_1(tptr) < BGP_AS_SEG_TYPE_MIN || EXTRACT_U_1(tptr) > BGP_AS_SEG_TYPE_MAX) {
             goto trunc;
         }
         ND_TCHECK(tptr[1]);
@@ -2860,7 +2860,7 @@ bgp_print(netdissect_options *ndo,
 	while (p < ep) {
 		if (!ND_TTEST_1(p))
 			break;
-		if (p[0] != 0xff) {
+		if (EXTRACT_U_1(p) != 0xff) {
 			p++;
 			continue;
 		}

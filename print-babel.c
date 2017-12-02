@@ -367,7 +367,7 @@ babel_print_v2(netdissect_options *ndo,
         message = cp + 4 + i;
 
         ND_TCHECK_1(message);
-        if((type = message[0]) == MESSAGE_PAD1) {
+        if((type = EXTRACT_U_1(message)) == MESSAGE_PAD1) {
             ND_PRINT((ndo, ndo->ndo_vflag ? "\n\tPad 1" : " pad1"));
             i += 1;
             continue;
@@ -518,7 +518,7 @@ babel_print_v2(netdissect_options *ndo,
                        (EXTRACT_U_1(message + 3) & 0x3f) ? "/unknown" : "",
                        format_prefix(ndo, prefix, plen),
                        metric, seqno, format_interval_update(interval)));
-                if(message[3] & 0x80) {
+                if(EXTRACT_U_1(message + 3) & 0x80) {
                     if(message[2] == 1)
                         memcpy(v4_prefix, prefix, 16);
                     else

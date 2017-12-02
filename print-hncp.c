@@ -614,7 +614,7 @@ hncp_print_rec(netdissect_options *ndo,
 
         case HNCP_DELEGATED_PREFIX: {
             int l;
-            if (bodylen < 9 || bodylen < 9 + (value[8] + 7) / 8) {
+            if (bodylen < 9 || bodylen < 9 + (EXTRACT_U_1(value + 8) + 7) / 8) {
                 ND_PRINT((ndo, " %s", istr));
                 break;
             }
@@ -725,7 +725,7 @@ hncp_print_rec(netdissect_options *ndo,
         case HNCP_ASSIGNED_PREFIX: {
             uint8_t prty;
             int l;
-            if (bodylen < 6 || bodylen < 6 + (value[5] + 7) / 8) {
+            if (bodylen < 6 || bodylen < 6 + (EXTRACT_U_1(value + 5) + 7) / 8) {
                 ND_PRINT((ndo, " %s", istr));
                 break;
             }

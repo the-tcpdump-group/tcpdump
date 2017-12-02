@@ -1491,10 +1491,10 @@ mldv2_query_print(netdissect_options *ndo, const u_char *bp, u_int len)
 
     if (ndo->ndo_vflag) {
         ND_TCHECK(bp[25]);
-	if (bp[24] & 0x08) {
+	if (EXTRACT_U_1(bp + 24) & 0x08) {
 		ND_PRINT((ndo," sflag"));
 	}
-	if (bp[24] & 0x07) {
+	if (EXTRACT_U_1(bp + 24) & 0x07) {
 		ND_PRINT((ndo," robustness=%d", EXTRACT_U_1(bp + 24) & 0x07));
 	}
 	if (bp[25] < 128) {

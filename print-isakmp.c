@@ -3096,7 +3096,7 @@ isakmp_rfc3948_print(netdissect_options *ndo,
 		     const u_char *bp2)
 {
 	ND_TCHECK(bp[0]);
-	if(length == 1 && bp[0]==0xff) {
+	if(length == 1 && EXTRACT_U_1(bp)==0xff) {
 		ND_PRINT((ndo, "isakmp-nat-keep-alive"));
 		return;
 	}
@@ -3109,7 +3109,8 @@ isakmp_rfc3948_print(netdissect_options *ndo,
 	/*
 	 * see if this is an IKE packet
 	 */
-	if(bp[0]==0 && bp[1]==0 && bp[2]==0 && bp[3]==0) {
+	if (EXTRACT_U_1(bp) == 0 && EXTRACT_U_1(bp + 1) == 0 &&
+	    EXTRACT_U_1(bp + 2) == 0 && EXTRACT_U_1(bp + 3) == 0) {
 		ND_PRINT((ndo, "NONESP-encap: "));
 		isakmp_print(ndo, bp+4, length-4, bp2);
 		return;

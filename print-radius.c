@@ -907,7 +907,7 @@ print_attr_netmask6(netdissect_options *ndo,
        return;
    }
    ND_TCHECK2(data[0], length);
-   if (data[1] > 128)
+   if (EXTRACT_U_1(data + 1) > 128)
    {
       ND_PRINT((ndo, "ERROR: netmask %u not in range (0..128)", EXTRACT_U_1(data + 1)));
       return;
@@ -919,7 +919,7 @@ print_attr_netmask6(netdissect_options *ndo,
 
    ND_PRINT((ndo, "%s/%u", ip6addr_string(ndo, data2), EXTRACT_U_1(data + 1)));
 
-   if (data[1] > 8 * (length - 2))
+   if (EXTRACT_U_1(data + 1) > 8 * (length - 2))
       ND_PRINT((ndo, " (inconsistent prefix length)"));
 
    return;

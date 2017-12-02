@@ -177,11 +177,11 @@ print_report(netdissect_options *ndo,
 		ND_TCHECK_3(bp);
 		mask = (uint32_t)0xff << 24 | bp[0] << 16 | bp[1] << 8 | bp[2];
 		width = 1;
-		if (bp[0])
+		if (EXTRACT_U_1(bp))
 			width = 2;
-		if (bp[1])
+		if (EXTRACT_U_1(bp + 1))
 			width = 3;
-		if (bp[2])
+		if (EXTRACT_U_1(bp + 2))
 			width = 4;
 
 		ND_PRINT((ndo, "\n\tMask %s", intoa(htonl(mask))));

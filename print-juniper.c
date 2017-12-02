@@ -974,7 +974,7 @@ juniper_atm1_if_print(netdissect_options *ndo,
                 return l2info.header_len;
         }
 
-        if (p[0] == 0x03) { /* Cisco style NLPID encaps ? */
+        if (EXTRACT_U_1(p) == 0x03) { /* Cisco style NLPID encaps ? */
             isoclns_print(ndo, p + 1, l2info.length - 1);
             /* FIXME check if frame was recognized */
             return l2info.header_len;
@@ -1034,7 +1034,7 @@ juniper_atm2_if_print(netdissect_options *ndo,
             return l2info.header_len;
         }
 
-        if (p[0] == 0x03) { /* Cisco style NLPID encaps ? */
+        if (EXTRACT_U_1(p) == 0x03) { /* Cisco style NLPID encaps ? */
             isoclns_print(ndo, p + 1, l2info.length - 1);
             /* FIXME check if frame was recognized */
             return l2info.header_len;
@@ -1342,7 +1342,7 @@ juniper_parse_header(netdissect_options *ndo,
 #ifdef DLT_JUNIPER_MFR
             /* MFR child links don't carry cookies */
             if (l2info->pictype == DLT_JUNIPER_MFR &&
-                (p[0] & MFR_BE_MASK) == MFR_BE_MASK) {
+                (EXTRACT_U_1(p) & MFR_BE_MASK) == MFR_BE_MASK) {
                 l2info->cookie_len = 0;
             }
 #endif

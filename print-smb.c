@@ -188,7 +188,7 @@ print_trans2(netdissect_options *ndo,
 	data = buf + EXTRACT_LE_U_2(w + 12 * 2);
 	fn = smbfindint(EXTRACT_LE_U_2(w + 14 * 2), trans2_fns);
     } else {
-	if (words[0] == 0) {
+	if (EXTRACT_U_1(words) == 0) {
 	    ND_PRINT((ndo, "%s\n", fn->name));
 	    ND_PRINT((ndo, "Trans2Interim\n"));
 	    return;
@@ -836,7 +836,7 @@ print_smb(netdissect_options *ndo,
 	if (nterror)
 	    ND_PRINT((ndo, "NTError = %s\n", nt_errstr(nterror)));
     } else {
-	if (buf[5])
+	if (EXTRACT_U_1(buf + 5))
 	    ND_PRINT((ndo, "SMBError = %s\n", smb_errstr(EXTRACT_U_1(buf + 5),
 		      EXTRACT_LE_U_2(buf + 7))));
     }
@@ -1198,7 +1198,7 @@ nbt_udp137_print(netdissect_options *ndo,
 			if (p == NULL)
 			    goto out;
 			ND_TCHECK(*p);
-			if (p[0] & 0x80)
+			if (EXTRACT_U_1(p) & 0x80)
 			    ND_PRINT((ndo, "<GROUP> "));
 			switch (p[0] & 0x60) {
 			case 0x00: ND_PRINT((ndo, "B ")); break;
@@ -1206,13 +1206,13 @@ nbt_udp137_print(netdissect_options *ndo,
 			case 0x40: ND_PRINT((ndo, "M ")); break;
 			case 0x60: ND_PRINT((ndo, "_ ")); break;
 			}
-			if (p[0] & 0x10)
+			if (EXTRACT_U_1(p) & 0x10)
 			    ND_PRINT((ndo, "<DEREGISTERING> "));
-			if (p[0] & 0x08)
+			if (EXTRACT_U_1(p) & 0x08)
 			    ND_PRINT((ndo, "<CONFLICT> "));
-			if (p[0] & 0x04)
+			if (EXTRACT_U_1(p) & 0x04)
 			    ND_PRINT((ndo, "<ACTIVE> "));
-			if (p[0] & 0x02)
+			if (EXTRACT_U_1(p) & 0x02)
 			    ND_PRINT((ndo, "<PERMANENT> "));
 			ND_PRINT((ndo, "\n"));
 			p += 2;
