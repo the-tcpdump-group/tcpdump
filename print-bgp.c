@@ -549,7 +549,7 @@ decode_prefix4(netdissect_options *ndo,
 	plenbytes = (plen + 7) / 8;
 	ND_TCHECK2(pptr[1], plenbytes);
 	ITEMCHECK(plenbytes);
-	memcpy(&addr, &pptr[1], plenbytes);
+	memcpy(&addr, pptr + 1, plenbytes);
 	if (plen % 8) {
 		((u_char *)&addr)[plenbytes - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
@@ -597,7 +597,7 @@ decode_labeled_prefix4(netdissect_options *ndo,
 	plenbytes = (plen + 7) / 8;
 	ND_TCHECK2(pptr[4], plenbytes);
 	ITEMCHECK(plenbytes);
-	memcpy(&addr, &pptr[4], plenbytes);
+	memcpy(&addr, pptr + 4, plenbytes);
 	if (plen % 8) {
 		((u_char *)&addr)[plenbytes - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
@@ -801,7 +801,7 @@ decode_rt_routing_info(netdissect_options *ndo,
 	 */
 	memset(&route_target, 0, sizeof(route_target));
 	ND_TCHECK2(pptr[5], (plen + 7) / 8);
-	memcpy(&route_target, &pptr[5], (plen + 7) / 8);
+	memcpy(&route_target, pptr + 5, (plen + 7) / 8);
 	/* Which specification says to do this? */
 	if (plen % 8) {
 		((u_char *)&route_target)[(plen + 7) / 8 - 1] &=
@@ -837,7 +837,7 @@ decode_labeled_vpn_prefix4(netdissect_options *ndo,
 
 	memset(&addr, 0, sizeof(addr));
 	ND_TCHECK2(pptr[12], (plen + 7) / 8);
-	memcpy(&addr, &pptr[12], (plen + 7) / 8);
+	memcpy(&addr, pptr + 12, (plen + 7) / 8);
 	if (plen % 8) {
 		((u_char *)&addr)[(plen + 7) / 8 - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
@@ -1147,7 +1147,7 @@ decode_prefix6(netdissect_options *ndo,
 	plenbytes = (plen + 7) / 8;
 	ND_TCHECK2(pd[1], plenbytes);
 	ITEMCHECK(plenbytes);
-	memcpy(&addr, &pd[1], plenbytes);
+	memcpy(&addr, pd + 1, plenbytes);
 	if (plen % 8) {
 		addr.s6_addr[plenbytes - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
@@ -1186,7 +1186,7 @@ decode_labeled_prefix6(netdissect_options *ndo,
 	memset(&addr, 0, sizeof(addr));
 	plenbytes = (plen + 7) / 8;
 	ND_TCHECK2(pptr[4], plenbytes);
-	memcpy(&addr, &pptr[4], plenbytes);
+	memcpy(&addr, pptr + 4, plenbytes);
 	if (plen % 8) {
 		addr.s6_addr[plenbytes - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
@@ -1227,7 +1227,7 @@ decode_labeled_vpn_prefix6(netdissect_options *ndo,
 
 	memset(&addr, 0, sizeof(addr));
 	ND_TCHECK2(pptr[12], (plen + 7) / 8);
-	memcpy(&addr, &pptr[12], (plen + 7) / 8);
+	memcpy(&addr, pptr + 12, (plen + 7) / 8);
 	if (plen % 8) {
 		addr.s6_addr[(plen + 7) / 8 - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
@@ -1261,7 +1261,7 @@ decode_clnp_prefix(netdissect_options *ndo,
 
 	memset(&addr, 0, sizeof(addr));
 	ND_TCHECK2(pptr[4], (plen + 7) / 8);
-	memcpy(&addr, &pptr[4], (plen + 7) / 8);
+	memcpy(&addr, pptr + 4, (plen + 7) / 8);
 	if (plen % 8) {
 		addr[(plen + 7) / 8 - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
@@ -1296,7 +1296,7 @@ decode_labeled_vpn_clnp_prefix(netdissect_options *ndo,
 
 	memset(&addr, 0, sizeof(addr));
 	ND_TCHECK2(pptr[12], (plen + 7) / 8);
-	memcpy(&addr, &pptr[12], (plen + 7) / 8);
+	memcpy(&addr, pptr + 12, (plen + 7) / 8);
 	if (plen % 8) {
 		addr[(plen + 7) / 8 - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
@@ -2425,11 +2425,12 @@ bgp_capabilities_print(netdissect_options *ndo,
                     ND_PRINT((ndo, "\n\t\tno decoder for Capability %u",
                            cap_type));
                     if (ndo->ndo_vflag <= 1)
-                        print_unknown_data(ndo, &opt[i+2], "\n\t\t", cap_len);
+                        print_unknown_data(ndo, opt + i + 2, "\n\t\t",
+					   cap_len);
                     break;
                 }
                 if (ndo->ndo_vflag > 1 && cap_len > 0) {
-                    print_unknown_data(ndo, &opt[i+2], "\n\t\t", cap_len);
+                    print_unknown_data(ndo, opt + i + 2, "\n\t\t", cap_len);
                 }
                 i += BGP_CAP_HEADER_SIZE + cap_len;
         }
@@ -2469,7 +2470,7 @@ bgp_open_print(netdissect_options *ndo,
 	i = 0;
 	while (i < bgpo.bgpo_optlen) {
 		ND_TCHECK2(opt[i], BGP_OPT_SIZE);
-		memcpy(&bgpopt, &opt[i], BGP_OPT_SIZE);
+		memcpy(&bgpopt, opt + i, BGP_OPT_SIZE);
 		if (i + 2 + bgpopt.bgpopt_len > bgpo.bgpo_optlen) {
 			ND_PRINT((ndo, "\n\t     Option %d, length: %u", bgpopt.bgpopt_type, bgpopt.bgpopt_len));
 			break;
@@ -2485,8 +2486,8 @@ bgp_open_print(netdissect_options *ndo,
 		switch(bgpopt.bgpopt_type) {
 
 		case BGP_OPT_CAP:
-			bgp_capabilities_print(ndo, &opt[i+BGP_OPT_SIZE],
-			    bgpopt.bgpopt_len);
+			bgp_capabilities_print(ndo, opt + i + BGP_OPT_SIZE,
+					       bgpopt.bgpopt_len);
 			break;
 
 		case BGP_OPT_AUTH:

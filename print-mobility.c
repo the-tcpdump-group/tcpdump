@@ -333,7 +333,7 @@ mobility_print(netdissect_options *ndo,
 		break;
 	}
 	if (ndo->ndo_vflag)
-		if (mobility_opt_print(ndo, &bp[hlen], mhlen - hlen))
+		if (mobility_opt_print(ndo, bp + hlen, mhlen - hlen))
 			goto trunc;
 
 	return(mhlen);

@@ -1452,9 +1452,9 @@ netbeui_print(netdissect_options *ndo,
 	for (i = 0; i < 128; i++) {
 	    if (&data2[i + 3] >= maxbuf)
 		break;
-	    if (memcmp(&data2[i], "\377SMB", 4) == 0) {
+	    if (memcmp(data2 + i, "\377SMB", 4) == 0) {
 		ND_PRINT((ndo, "found SMB packet at %d\n", i));
-		print_smb(ndo, &data2[i], maxbuf);
+		print_smb(ndo, data2 + i, maxbuf);
 		break;
 	    }
 	}
@@ -1490,9 +1490,9 @@ ipx_netbios_print(netdissect_options *ndo,
     for (i = 0; i < 128; i++) {
 	if (&data[i + 4] > maxbuf)
 	    break;
-	if (memcmp(&data[i], "\377SMB", 4) == 0) {
-	    smb_fdata(ndo, data, "\n>>> IPX transport ", &data[i], 0);
-	    print_smb(ndo, &data[i], maxbuf);
+	if (memcmp(data + i, "\377SMB", 4) == 0) {
+	    smb_fdata(ndo, data, "\n>>> IPX transport ", data + i, 0);
+	    print_smb(ndo, data + i, maxbuf);
 	    ND_PRINT((ndo, "\n"));
 	    break;
 	}

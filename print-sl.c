@@ -184,8 +184,8 @@ sliplink_print(netdissect_options *ndo,
 			return;
 		}
 		if (p[SLX_CHDR] & TYPE_COMPRESSED_TCP) {
-			compressed_sl_print(ndo, &p[SLX_CHDR], ip,
-			    length, dir);
+			compressed_sl_print(ndo, p + SLX_CHDR, ip,
+					    length, dir);
 			ND_PRINT((ndo, ": "));
 		} else
 			ND_PRINT((ndo, "slip-%d!: ", EXTRACT_U_1(p + SLX_CHDR)));

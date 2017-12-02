@@ -106,7 +106,7 @@ vjc_print(netdissect_options *ndo, register const u_char *bp, u_short proto _U_)
 		if (bp[1])
 			ND_PRINT((ndo, " "));
 		ND_PRINT((ndo, "C=0x%02x ", bp[2]));
-		ND_PRINT((ndo, "sum=0x%04x ", *(const u_short *)&bp[3]));
+		ND_PRINT((ndo, "sum=0x%04x ", *(const u_short *)(bp + 3)));
 		return -1;
 	case TYPE_ERROR:
 		if (ndo->ndo_eflag)

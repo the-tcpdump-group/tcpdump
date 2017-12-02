@@ -287,9 +287,9 @@ smb_print_data(netdissect_options *ndo, const unsigned char *buf, int len)
 	if (i%8 == 0)
 	    ND_PRINT((ndo, " "));
 	if (i % 16 == 0) {
-	    print_asc(ndo, &buf[i - 16], 8);
+	    print_asc(ndo, buf + i - 16, 8);
 	    ND_PRINT((ndo, " "));
-	    print_asc(ndo, &buf[i - 8], 8);
+	    print_asc(ndo, buf + i - 8, 8);
 	    ND_PRINT((ndo, "\n"));
 	    if (i < len)
 		ND_PRINT((ndo, "[%03X] ", i));
@@ -306,11 +306,11 @@ smb_print_data(netdissect_options *ndo, const unsigned char *buf, int len)
 	    ND_PRINT((ndo, "   "));
 
 	n = min(8, i % 16);
-	print_asc(ndo, &buf[i - (i % 16)], n);
+	print_asc(ndo, buf + i - (i % 16), n);
 	ND_PRINT((ndo, " "));
 	n = (i % 16) - n;
 	if (n > 0)
-	    print_asc(ndo, &buf[i - n], n);
+	    print_asc(ndo, buf + i - n, n);
 	ND_PRINT((ndo, "\n"));
     }
     return;

@@ -321,7 +321,7 @@ pimv1_print(netdissect_options *ndo,
 		if (ndo->ndo_vflag) {
 			if (len < 8)
 				goto trunc;
-			pimv1_join_prune_print(ndo, &bp[8], len - 8);
+			pimv1_join_prune_print(ndo, bp + 8, len - 8);
 		}
 		break;
 	}

@@ -149,8 +149,8 @@ ip6_opt_print(netdissect_options *ndo, const u_char *bp, int len)
 	    }
 	    ND_PRINT((ndo, "(homeaddr: %s", ip6addr_string(ndo, bp + i + 2)));
             if (bp[i + 1] > IP6OPT_HOMEADDR_MINLEN - 2) {
-		ip6_sopt_print(ndo, &bp[i + IP6OPT_HOMEADDR_MINLEN],
-		    (optlen - IP6OPT_HOMEADDR_MINLEN));
+		ip6_sopt_print(ndo, bp + i + IP6OPT_HOMEADDR_MINLEN,
+                               (optlen - IP6OPT_HOMEADDR_MINLEN));
 	    }
             ND_PRINT((ndo, ")"));
 	    break;

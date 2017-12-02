@@ -221,7 +221,7 @@ print_prefix(netdissect_options *ndo, const u_char *prefix, u_int max_length)
         plenbytes = (plen + 7) / 8;
         if (max_length < (u_int)plenbytes + IPV4_MAPPED_HEADING_LEN)
             return -3;
-        memcpy(&addr, &prefix[1 + IPV4_MAPPED_HEADING_LEN], plenbytes);
+        memcpy(&addr, prefix + IPV4_MAPPED_HEADING_LEN + 1, plenbytes);
         if (plen % 8) {
 		((u_char *)&addr)[plenbytes - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
