@@ -83,7 +83,7 @@
  * to the packet capture mechanism.
  */
 int
-vjc_print(netdissect_options *ndo, register const char *bp, u_short proto _U_)
+vjc_print(netdissect_options *ndo, register const u_char *bp, u_short proto _U_)
 {
 	int i;
 
