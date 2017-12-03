@@ -350,7 +350,7 @@ sig_print(netdissect_options *ndo,
 	uint32_t call_ref;
 
 	ND_TCHECK(p[PROTO_POS]);
-	if (p[PROTO_POS] == Q2931) {
+	if (EXTRACT_U_1(p + PROTO_POS) == Q2931) {
 		/*
 		 * protocol:Q.2931 for User to Network Interface
 		 * (UNI 3.1) signalling

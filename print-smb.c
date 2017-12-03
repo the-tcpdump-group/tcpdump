@@ -203,7 +203,7 @@ print_trans2(netdissect_options *ndo,
     ND_PRINT((ndo, "%s param_length=%d data_length=%d\n", fn->name, pcnt, dcnt));
 
     if (request) {
-	if (words[0] == 8) {
+	if (EXTRACT_U_1(words) == 8) {
 	    smb_fdata(ndo, words + 1,
 		"Trans2Secondary\nTotParam=[d]\nTotData=[d]\nParamCnt=[d]\nParamOff=[d]\nParamDisp=[d]\nDataCnt=[d]\nDataOff=[d]\nDataDisp=[d]\nHandle=[d]\n",
 		maxbuf, unicodestr);
@@ -493,7 +493,7 @@ print_lockingandx(netdissect_options *ndo,
     if (request) {
 	f1 = "Com2=[w]\nOff2=[d]\nHandle=[d]\nLockType=[w]\nTimeOut=[D]\nUnlockCount=[d]\nLockCount=[d]\n";
 	ND_TCHECK(words[7]);
-	if (words[7] & 0x10)
+	if (EXTRACT_U_1(words + 7) & 0x10)
 	    f2 = "*Process=[d]\n[P2]Offset=[M]\nLength=[M]\n";
 	else
 	    f2 = "*Process=[d]\nOffset=[D]\nLength=[D]\n";

@@ -228,7 +228,7 @@ ip_printts(netdissect_options *ndo,
 done:
 	ND_PRINT((ndo, "%s", ptr == len ? " ^ " : ""));
 
-	if (cp[3]>>4)
+	if (EXTRACT_U_1(cp + 3) >> 4)
 		ND_PRINT((ndo, " [%d hops not recorded]} ", EXTRACT_U_1(cp + 3)>>4));
 	else
 		ND_PRINT((ndo, "}"));

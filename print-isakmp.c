@@ -919,7 +919,7 @@ ikev1_attrmap_print(netdissect_options *ndo,
 	uint32_t t, v;
 
 	ND_TCHECK(p[0]);
-	if (p[0] & 0x80)
+	if (EXTRACT_U_1(p) & 0x80)
 		totlen = 4;
 	else {
 		ND_TCHECK_2(p + 2);
@@ -937,7 +937,7 @@ ikev1_attrmap_print(netdissect_options *ndo,
 		ND_PRINT((ndo,"type=%s ", map[t].type));
 	else
 		ND_PRINT((ndo,"type=#%d ", t));
-	if (p[0] & 0x80) {
+	if (EXTRACT_U_1(p) & 0x80) {
 		ND_PRINT((ndo,"value="));
 		ND_TCHECK_2(p + 2);
 		v = EXTRACT_BE_U_2(p + 2);
@@ -970,7 +970,7 @@ ikev1_attr_print(netdissect_options *ndo, const u_char *p, const u_char *ep2)
 	uint32_t t;
 
 	ND_TCHECK(p[0]);
-	if (p[0] & 0x80)
+	if (EXTRACT_U_1(p) & 0x80)
 		totlen = 4;
 	else {
 		ND_TCHECK_2(p + 2);
@@ -985,7 +985,7 @@ ikev1_attr_print(netdissect_options *ndo, const u_char *p, const u_char *ep2)
 	ND_PRINT((ndo,"("));
 	t = EXTRACT_BE_U_2(p) & 0x7fff;
 	ND_PRINT((ndo,"type=#%d ", t));
-	if (p[0] & 0x80) {
+	if (EXTRACT_U_1(p) & 0x80) {
 		ND_PRINT((ndo,"value="));
 		t = p[2];
 		if (!rawprint(ndo, (const uint8_t *)(p + 2), 2)) {

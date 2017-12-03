@@ -119,7 +119,7 @@ mobility_opt_print(netdissect_options *ndo,
 
 	for (i = 0; i < len; i += optlen) {
 		ND_TCHECK(bp[i]);
-		if (bp[i] == IP6MOPT_PAD1)
+		if (EXTRACT_U_1(bp + i) == IP6MOPT_PAD1)
 			optlen = 1;
 		else {
 			if (i + 1 < len) {

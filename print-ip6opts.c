@@ -48,7 +48,7 @@ ip6_sopt_print(netdissect_options *ndo, const u_char *bp, int len)
     int optlen;
 
     for (i = 0; i < len; i += optlen) {
-	if (bp[i] == IP6OPT_PAD1)
+	if (EXTRACT_U_1(bp + i) == IP6OPT_PAD1)
 	    optlen = 1;
 	else {
 	    if (i + 1 < len)
@@ -94,7 +94,7 @@ ip6_opt_print(netdissect_options *ndo, const u_char *bp, int len)
     if (len == 0)
         return;
     for (i = 0; i < len; i += optlen) {
-	if (bp[i] == IP6OPT_PAD1)
+	if (EXTRACT_U_1(bp + i) == IP6OPT_PAD1)
 	    optlen = 1;
 	else {
 	    if (i + 1 < len)

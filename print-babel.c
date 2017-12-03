@@ -53,7 +53,7 @@ babel_print(netdissect_options *ndo,
 
     ND_TCHECK_4(cp);
 
-    if(cp[0] != 42) {
+    if(EXTRACT_U_1(cp) != 42) {
         ND_PRINT((ndo, " invalid header"));
         return;
     } else {

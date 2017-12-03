@@ -410,7 +410,7 @@ unistr(netdissect_options *ndo,
 	    ND_TCHECK_2(s);
 	    if (l >= MAX_UNISTR_SIZE)
 		break;
-	    if (s[1] == 0 && ND_ISPRINT(EXTRACT_U_1(s))) {
+	    if (EXTRACT_U_1(s + 1) == 0 && ND_ISPRINT(EXTRACT_U_1(s))) {
 		/* It's a printable ASCII character */
 		buf[l] = s[0];
 	    } else {
