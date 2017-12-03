@@ -1304,7 +1304,7 @@ nbt_udp138_print(netdissect_options *ndo,
 
     if (data != NULL) {
 	/* If there isn't enough data for "\377SMB", don't check for it. */
-	if (&data[3] >= maxbuf)
+	if ((data + 3) >= maxbuf)
 	    goto out;
 
 	if (memcmp(data, "\377SMB",4) == 0)
@@ -1442,7 +1442,7 @@ netbeui_print(netdissect_options *ndo,
 	goto out;
 
     /* If there isn't enough data for "\377SMB", don't look for it. */
-    if (&data2[3] >= maxbuf)
+    if ((data2 + 3) >= maxbuf)
 	goto out;
 
     if (memcmp(data2, "\377SMB",4) == 0)
@@ -1450,7 +1450,7 @@ netbeui_print(netdissect_options *ndo,
     else {
 	int i;
 	for (i = 0; i < 128; i++) {
-	    if (&data2[i + 3] >= maxbuf)
+	    if ((data2 + i + 3) >= maxbuf)
 		break;
 	    if (memcmp(data2 + i, "\377SMB", 4) == 0) {
 		ND_PRINT((ndo, "found SMB packet at %d\n", i));
@@ -1488,7 +1488,7 @@ ipx_netbios_print(netdissect_options *ndo,
 	maxbuf = ndo->ndo_snapend;
     startbuf = data;
     for (i = 0; i < 128; i++) {
-	if (&data[i + 4] > maxbuf)
+	if ((data + i + 4) > maxbuf)
 	    break;
 	if (memcmp(data + i, "\377SMB", 4) == 0) {
 	    smb_fdata(ndo, data, "\n>>> IPX transport ", data + i, 0);

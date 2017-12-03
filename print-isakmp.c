@@ -944,14 +944,14 @@ ikev1_attrmap_print(netdissect_options *ndo,
 		if (map && t < nmap && v < map[t].nvalue && map[t].value[v])
 			ND_PRINT((ndo,"%s", map[t].value[v]));
 		else {
-			if (!rawprint(ndo, (const uint8_t *)&p[2], 2)) {
+			if (!rawprint(ndo, (const uint8_t *)(p + 2), 2)) {
 				ND_PRINT((ndo,")"));
 				goto trunc;
 			}
 		}
 	} else {
 		ND_PRINT((ndo,"len=%d value=", totlen - 4));
-		if (!rawprint(ndo, (const uint8_t *)&p[4], totlen - 4)) {
+		if (!rawprint(ndo, (const uint8_t *)(p + 4), totlen - 4)) {
 			ND_PRINT((ndo,")"));
 			goto trunc;
 		}
@@ -988,13 +988,13 @@ ikev1_attr_print(netdissect_options *ndo, const u_char *p, const u_char *ep2)
 	if (p[0] & 0x80) {
 		ND_PRINT((ndo,"value="));
 		t = p[2];
-		if (!rawprint(ndo, (const uint8_t *)&p[2], 2)) {
+		if (!rawprint(ndo, (const uint8_t *)(p + 2), 2)) {
 			ND_PRINT((ndo,")"));
 			goto trunc;
 		}
 	} else {
 		ND_PRINT((ndo,"len=%d value=", totlen - 4));
-		if (!rawprint(ndo, (const uint8_t *)&p[4], totlen - 4)) {
+		if (!rawprint(ndo, (const uint8_t *)(p + 4), totlen - 4)) {
 			ND_PRINT((ndo,")"));
 			goto trunc;
 		}
