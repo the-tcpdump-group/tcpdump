@@ -106,7 +106,7 @@ vjc_print(netdissect_options *ndo, register const u_char *bp, u_short proto _U_)
 		}
 		if (EXTRACT_U_1(bp + 1))
 			ND_PRINT((ndo, " "));
-		ND_PRINT((ndo, "C=0x%02x ", bp[2]));
+		ND_PRINT((ndo, "C=0x%02x ", EXTRACT_U_1(bp + 2)));
 		ND_PRINT((ndo, "sum=0x%04x ", *(const u_short *)(bp + 3)));
 		return -1;
 	case TYPE_ERROR:
@@ -115,7 +115,7 @@ vjc_print(netdissect_options *ndo, register const u_char *bp, u_short proto _U_)
 		return -1;
 	default:
 		if (ndo->ndo_eflag)
-			ND_PRINT((ndo, "(vjc type=0x%02x) ", bp[0] & 0xf0));
+			ND_PRINT((ndo, "(vjc type=0x%02x) ", EXTRACT_U_1(bp) & 0xf0));
 		return -1;
 	}
 }
