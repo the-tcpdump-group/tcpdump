@@ -260,7 +260,7 @@ pimv1_print(netdissect_options *ndo,
 	switch (type) {
 	case PIMV1_TYPE_QUERY:
 		if (ND_TTEST(bp[8])) {
-			switch (bp[8] >> 4) {
+			switch (EXTRACT_U_1(bp + 8) >> 4) {
 			case 0:
 				ND_PRINT((ndo, " Dense-mode"));
 				break;
@@ -407,7 +407,7 @@ cisco_autorp_print(netdissect_options *ndo,
 		if (len < 1)
 			goto trunc;
 		ND_TCHECK(bp[0]);
-		switch (bp[0] & 0x3) {
+		switch (EXTRACT_U_1(bp) & 0x3) {
 		case 0: ND_PRINT((ndo, " PIMv?"));
 			break;
 		case 1:	ND_PRINT((ndo, " PIMv1"));

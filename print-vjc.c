@@ -88,7 +88,7 @@ vjc_print(netdissect_options *ndo, register const u_char *bp, u_short proto _U_)
 {
 	int i;
 
-	switch (bp[0] & 0xf0) {
+	switch (EXTRACT_U_1(bp) & 0xf0) {
 	case TYPE_IP:
 		if (ndo->ndo_eflag)
 			ND_PRINT((ndo, "(vjc type=IP) "));

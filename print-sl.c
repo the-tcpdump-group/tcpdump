@@ -155,7 +155,7 @@ sliplink_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "%02x: ", EXTRACT_U_1(p + SLX_CHDR + CHDR_LEN - 1)));
 		return;
 	}
-	switch (p[SLX_CHDR] & 0xf0) {
+	switch (EXTRACT_U_1(p + SLX_CHDR) & 0xf0) {
 
 	case TYPE_IP:
 		ND_PRINT((ndo, "ip %d: ", length + SLIP_HDRLEN));

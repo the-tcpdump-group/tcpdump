@@ -1200,7 +1200,7 @@ nbt_udp137_print(netdissect_options *ndo,
 			ND_TCHECK(*p);
 			if (EXTRACT_U_1(p) & 0x80)
 			    ND_PRINT((ndo, "<GROUP> "));
-			switch (p[0] & 0x60) {
+			switch (EXTRACT_U_1(p) & 0x60) {
 			case 0x00: ND_PRINT((ndo, "B ")); break;
 			case 0x20: ND_PRINT((ndo, "P ")); break;
 			case 0x40: ND_PRINT((ndo, "M ")); break;

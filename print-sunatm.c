@@ -81,7 +81,7 @@ sunatm_if_print(netdissect_options *ndo,
 		ND_PRINT((ndo, EXTRACT_U_1(p + DIR_POS) & 0x80 ? "Tx: " : "Rx: "));
 	}
 
-	switch (p[DIR_POS] & 0x0f) {
+	switch (EXTRACT_U_1(p + DIR_POS) & 0x0f) {
 
 	case PT_LANE:
 		traftype = ATM_LANE;

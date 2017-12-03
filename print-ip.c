@@ -191,7 +191,7 @@ ip_printts(netdissect_options *ndo,
 	if (ptr < 4 || ((ptr - 4) & (hoplen-1)) || ptr > length + 1)
 		ND_PRINT((ndo, "[bad ptr %u]", EXTRACT_U_1(cp + 2)));
 	ND_TCHECK(cp[3]);
-	switch (cp[3]&0xF) {
+	switch (EXTRACT_U_1(cp + 3)&0xF) {
 	case IPOPT_TS_TSONLY:
 		ND_PRINT((ndo, "TSONLY"));
 		break;
