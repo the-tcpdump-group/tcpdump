@@ -538,7 +538,7 @@ decode_prefix4(netdissect_options *ndo,
 	struct in_addr addr;
 	u_int plen, plenbytes;
 
-	ND_TCHECK(pptr[0]);
+	ND_TCHECK_1(pptr);
 	ITEMCHECK(1);
 	plen = pptr[0];
 	if (32 < plen)
@@ -770,7 +770,7 @@ decode_rt_routing_info(netdissect_options *ndo,
 	char asbuf[sizeof(astostr)]; /* bgp_vpn_rd_print() overwrites astostr */
 
 	/* NLRI "prefix length" from RFC 2858 Section 4. */
-	ND_TCHECK(pptr[0]);
+	ND_TCHECK_1(pptr);
 	plen = pptr[0];   /* get prefix length */
 
 	/* NLRI "prefix" (ibid), valid lengths are { 0, 32, 33, ..., 96 } bits.
@@ -824,7 +824,7 @@ decode_labeled_vpn_prefix4(netdissect_options *ndo,
 	struct in_addr addr;
 	u_int plen;
 
-	ND_TCHECK(pptr[0]);
+	ND_TCHECK_1(pptr);
 	plen = pptr[0];   /* get prefix length */
 
 	if ((24+64) > plen)
@@ -876,7 +876,7 @@ decode_mdt_vpn_nlri(netdissect_options *ndo,
     const u_char *rd;
     const u_char *vpn_ip;
 
-    ND_TCHECK(pptr[0]);
+    ND_TCHECK_1(pptr);
 
     /* if the NLRI is not predefined length, quit.*/
     if (EXTRACT_U_1(pptr) != MDT_VPN_NLRI_LEN * 8)
@@ -1096,7 +1096,7 @@ decode_labeled_vpn_l2(netdissect_options *ndo,
 		    }
 		    ttlv_len=ttlv_len/8+1; /* how many bytes do we need to read ? */
 		    while (ttlv_len>0) {
-			ND_TCHECK(pptr[0]);
+			ND_TCHECK_1(pptr);
 			if (buflen!=0) {
 			    stringlen=snprintf(buf,buflen, "%02x",
                                                EXTRACT_U_1(pptr));
@@ -1136,7 +1136,7 @@ decode_prefix6(netdissect_options *ndo,
 	struct in6_addr addr;
 	u_int plen, plenbytes;
 
-	ND_TCHECK(pd[0]);
+	ND_TCHECK_1(pd);
 	ITEMCHECK(1);
 	plen = pd[0];
 	if (128 < plen)
@@ -1214,7 +1214,7 @@ decode_labeled_vpn_prefix6(netdissect_options *ndo,
 	struct in6_addr addr;
 	u_int plen;
 
-	ND_TCHECK(pptr[0]);
+	ND_TCHECK_1(pptr);
 	plen = pptr[0];   /* get prefix length */
 
 	if ((24+64) > plen)
@@ -1253,7 +1253,7 @@ decode_clnp_prefix(netdissect_options *ndo,
         uint8_t addr[19];
 	u_int plen;
 
-	ND_TCHECK(pptr[0]);
+	ND_TCHECK_1(pptr);
 	plen = pptr[0]; /* get prefix length */
 
 	if (152 < plen)
@@ -1283,7 +1283,7 @@ decode_labeled_vpn_clnp_prefix(netdissect_options *ndo,
         uint8_t addr[19];
 	u_int plen;
 
-	ND_TCHECK(pptr[0]);
+	ND_TCHECK_1(pptr);
 	plen = pptr[0];   /* get prefix length */
 
 	if ((24+64) > plen)
@@ -1342,7 +1342,7 @@ bgp_attr_get_as_size(netdissect_options *ndo,
      * each.
      */
     while (tptr < pptr + len) {
-        ND_TCHECK(tptr[0]);
+        ND_TCHECK_1(tptr);
 
         /*
          * If we do not find a valid segment type, our guess might be wrong.
@@ -1350,7 +1350,7 @@ bgp_attr_get_as_size(netdissect_options *ndo,
         if (EXTRACT_U_1(tptr) < BGP_AS_SEG_TYPE_MIN || EXTRACT_U_1(tptr) > BGP_AS_SEG_TYPE_MAX) {
             goto trunc;
         }
-        ND_TCHECK(tptr[1]);
+        ND_TCHECK_1(tptr + 1);
         tptr += 2 + tptr[1] * 2;
     }
 
@@ -1430,10 +1430,10 @@ bgp_attr_print(netdissect_options *ndo,
                 as_size = bgp_attr_get_as_size(ndo, atype, pptr, len);
 
 		while (tptr < pptr + len) {
-			ND_TCHECK(tptr[0]);
+			ND_TCHECK_1(tptr);
                         ND_PRINT((ndo, "%s", tok2str(bgp_as_path_segment_open_values,
 						"?", EXTRACT_U_1(tptr))));
-			ND_TCHECK(tptr[1]);
+			ND_TCHECK_1(tptr + 1);
                         for (i = 0; i < tptr[1] * as_size; i += as_size) {
                             ND_TCHECK2(tptr[2 + i], as_size);
 			    ND_PRINT((ndo, "%s ",
@@ -1442,10 +1442,10 @@ bgp_attr_print(netdissect_options *ndo,
 				EXTRACT_BE_U_2(tptr + i + 2) :
 				EXTRACT_BE_U_4(tptr + i + 2))));
                         }
-			ND_TCHECK(tptr[0]);
+			ND_TCHECK_1(tptr);
                         ND_PRINT((ndo, "%s", tok2str(bgp_as_path_segment_close_values,
 						"?", EXTRACT_U_1(tptr))));
-                        ND_TCHECK(tptr[1]);
+                        ND_TCHECK_1(tptr + 1);
                         tptr += 2 + tptr[1] * as_size;
 		}
 		break;
@@ -1605,7 +1605,7 @@ bgp_attr_print(netdissect_options *ndo,
 
                 tptr +=3;
 
-		ND_TCHECK(tptr[0]);
+		ND_TCHECK_1(tptr);
 		nhlen = tptr[0];
                 tlen = nhlen;
                 tptr++;
@@ -1738,14 +1738,14 @@ bgp_attr_print(netdissect_options *ndo,
 		ND_PRINT((ndo, ", nh-length: %u", nhlen));
 		tptr += tlen;
 
-		ND_TCHECK(tptr[0]);
+		ND_TCHECK_1(tptr);
 		snpa = tptr[0];
 		tptr++;
 
 		if (snpa) {
 			ND_PRINT((ndo, "\n\t    %u SNPA", snpa));
 			for (/*nothing*/; snpa > 0; snpa--) {
-				ND_TCHECK(tptr[0]);
+				ND_TCHECK_1(tptr);
 				ND_PRINT((ndo, "\n\t      %d bytes", EXTRACT_U_1(tptr)));
 				tptr += tptr[0] + 1;
 			}

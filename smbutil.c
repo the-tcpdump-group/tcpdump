@@ -282,7 +282,7 @@ smb_print_data(netdissect_options *ndo, const unsigned char *buf, int len)
 	return;
     ND_PRINT((ndo, "[%03X] ", i));
     for (i = 0; i < len; /*nothing*/) {
-        ND_TCHECK(buf[i]);
+        ND_TCHECK_1(buf + i);
 	ND_PRINT((ndo, "%02X ", EXTRACT_U_1(buf + i) & 0xff));
 	i++;
 	if (i%8 == 0)
@@ -354,7 +354,7 @@ unistr(netdissect_options *ndo,
 	 * Skip padding that puts the string on an even boundary.
 	 */
 	if (((s - startbuf) % 2) != 0) {
-	    ND_TCHECK(s[0]);
+	    ND_TCHECK_1(s);
 	    s++;
 	}
     }
@@ -366,7 +366,7 @@ unistr(netdissect_options *ndo,
 	sp = s;
 	if (!use_unicode) {
 	    for (;;) {
-		ND_TCHECK(sp[0]);
+		ND_TCHECK_1(sp);
 		*len += 1;
 		if (EXTRACT_U_1(sp) == 0)
 		    break;
@@ -391,7 +391,7 @@ unistr(netdissect_options *ndo,
     }
     if (!use_unicode) {
     	while (strsize != 0) {
-          ND_TCHECK(s[0]);
+          ND_TCHECK_1(s);
 	    if (l >= MAX_UNISTR_SIZE)
 		break;
 	    if (ND_ISPRINT(EXTRACT_U_1(s)))
@@ -444,7 +444,7 @@ smb_fdata1(netdissect_options *ndo,
     while (*fmt && buf<maxbuf) {
 	switch (*fmt) {
 	case 'a':
-	    ND_TCHECK(buf[0]);
+	    ND_TCHECK_1(buf);
 	    write_bits(ndo, EXTRACT_U_1(buf), attrib_fmt);
 	    buf++;
 	    fmt++;
@@ -472,7 +472,7 @@ smb_fdata1(netdissect_options *ndo,
 	    strncpy(bitfmt, fmt, l);
 	    bitfmt[l] = '\0';
 	    fmt = p + 1;
-	    ND_TCHECK(buf[0]);
+	    ND_TCHECK_1(buf);
 	    write_bits(ndo, EXTRACT_U_1(buf), bitfmt);
 	    buf++;
 	    break;
@@ -495,7 +495,7 @@ smb_fdata1(netdissect_options *ndo,
 	case 'b':
 	  {
 	    unsigned int x;
-	    ND_TCHECK(buf[0]);
+	    ND_TCHECK_1(buf);
 	    x = buf[0];
 	    ND_PRINT((ndo, "%u (0x%x)", x, x));
 	    buf += 1;
@@ -554,7 +554,7 @@ smb_fdata1(netdissect_options *ndo,
 	case 'B':
 	  {
 	    unsigned int x;
-	    ND_TCHECK(buf[0]);
+	    ND_TCHECK_1(buf);
 	    x = buf[0];
 	    ND_PRINT((ndo, "0x%X", x));
 	    buf += 1;
@@ -589,7 +589,7 @@ smb_fdata1(netdissect_options *ndo,
 	    switch (*fmt) {
 
 	    case 'b':
-		ND_TCHECK(buf[0]);
+		ND_TCHECK_1(buf);
 		stringlen = buf[0];
 		ND_PRINT((ndo, "%u", stringlen));
 		buf += 1;
@@ -716,7 +716,7 @@ smb_fdata1(netdissect_options *ndo,
 		    name_type_str(name_type)));
 		break;
 	    case 2:
-		ND_TCHECK(buf[15]);
+		ND_TCHECK_1(buf + 15);
 		name_type = buf[15];
 		ND_PRINT((ndo, "%-15.15s NameType=0x%02X (%s)", buf, name_type,
 		    name_type_str(name_type)));

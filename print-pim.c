@@ -253,7 +253,7 @@ pimv1_print(netdissect_options *ndo,
 {
 	register u_char type;
 
-	ND_TCHECK(bp[1]);
+	ND_TCHECK_1(bp + 1);
 	type = bp[1];
 
 	ND_PRINT((ndo, " %s", tok2str(pimv1_type_str, "[type %u]", type)));
@@ -325,7 +325,7 @@ pimv1_print(netdissect_options *ndo,
 		}
 		break;
 	}
-	ND_TCHECK(bp[4]);
+	ND_TCHECK_1(bp + 4);
 	if ((EXTRACT_U_1(bp + 4) >> 4) != 1)
 		ND_PRINT((ndo, " [v%d]", EXTRACT_U_1(bp + 4) >> 4));
 	return;
@@ -351,7 +351,7 @@ cisco_autorp_print(netdissect_options *ndo,
 
 	if (len < 8)
 		goto trunc;
-	ND_TCHECK(bp[0]);
+	ND_TCHECK_1(bp);
 	ND_PRINT((ndo, " auto-rp "));
 	type = bp[0];
 	switch (type) {
@@ -366,7 +366,7 @@ cisco_autorp_print(netdissect_options *ndo,
 		break;
 	}
 
-	ND_TCHECK(bp[1]);
+	ND_TCHECK_1(bp + 1);
 	numrps = bp[1];
 
 	ND_TCHECK_2(bp + 2);
@@ -406,7 +406,7 @@ cisco_autorp_print(netdissect_options *ndo,
 		len -= 4;
 		if (len < 1)
 			goto trunc;
-		ND_TCHECK(bp[0]);
+		ND_TCHECK_1(bp);
 		switch (EXTRACT_U_1(bp) & 0x3) {
 		case 0: ND_PRINT((ndo, " PIMv?"));
 			break;
@@ -423,7 +423,7 @@ cisco_autorp_print(netdissect_options *ndo,
 		len -= 1;
 		if (len < 1)
 			goto trunc;
-		ND_TCHECK(bp[0]);
+		ND_TCHECK_1(bp);
 		nentries = bp[0];
 		bp += 1;
 		len -= 1;
@@ -566,7 +566,7 @@ pimv2_addr_print(netdissect_options *ndo,
 	if (addr_len == 0) {
 		if (len < 2)
 			goto trunc;
-		ND_TCHECK(bp[1]);
+		ND_TCHECK_1(bp + 1);
 		switch (EXTRACT_U_1(bp)) {
 		case 1:
 			af = AF_INET;
@@ -1029,11 +1029,11 @@ pimv2_print(netdissect_options *ndo,
 		len -= 2;
 		if (len < 1)
 			goto trunc;
-		ND_TCHECK(bp[0]);
+		ND_TCHECK_1(bp);
 		ND_PRINT((ndo, " hashmlen=%d", EXTRACT_U_1(bp)));
 		if (len < 2)
 			goto trunc;
-		ND_TCHECK(bp[2]);
+		ND_TCHECK_1(bp + 2);
 		ND_PRINT((ndo, " BSRprio=%d", EXTRACT_U_1(bp + 1)));
 		bp += 2;
 		len -= 2;
@@ -1056,11 +1056,11 @@ pimv2_print(netdissect_options *ndo,
 			/* RP-Count, Frag RP-Cnt, and rsvd */
 			if (len < 1)
 				goto trunc;
-			ND_TCHECK(bp[0]);
+			ND_TCHECK_1(bp);
 			ND_PRINT((ndo, " RPcnt=%d", EXTRACT_U_1(bp)));
 			if (len < 2)
 				goto trunc;
-			ND_TCHECK(bp[1]);
+			ND_TCHECK_1(bp + 1);
 			ND_PRINT((ndo, " FRPcnt=%d", frpcnt = EXTRACT_U_1(bp + 1)));
 			if (len < 4)
 				goto trunc;
@@ -1086,7 +1086,7 @@ pimv2_print(netdissect_options *ndo,
 						     EXTRACT_BE_U_2(bp));
 				if (len < 3)
 					goto trunc;
-				ND_TCHECK(bp[2]);
+				ND_TCHECK_1(bp + 2);
 				ND_PRINT((ndo, ",prio=%d", EXTRACT_U_1(bp + 2)));
 				if (len < 4)
 					goto trunc;
@@ -1122,12 +1122,12 @@ pimv2_print(netdissect_options *ndo,
 		/* Prefix-Cnt, Priority, and Holdtime */
 		if (len < 1)
 			goto trunc;
-		ND_TCHECK(bp[0]);
+		ND_TCHECK_1(bp);
 		ND_PRINT((ndo, " prefix-cnt=%d", EXTRACT_U_1(bp)));
 		pfxcnt = bp[0];
 		if (len < 2)
 			goto trunc;
-		ND_TCHECK(bp[1]);
+		ND_TCHECK_1(bp + 1);
 		ND_PRINT((ndo, " prio=%d", EXTRACT_U_1(bp + 1)));
 		if (len < 4)
 			goto trunc;

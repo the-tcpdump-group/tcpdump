@@ -305,7 +305,7 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
     ND_PRINT((ndo, "\n\tCIST bridge-id %s, ",
            stp_print_bridge_id(ptr + MST_BPDU_CIST_BRIDGE_ID_OFFSET)));
 
-    ND_TCHECK(ptr[MST_BPDU_CIST_REMAIN_HOPS_OFFSET]);
+    ND_TCHECK_1(ptr + MST_BPDU_CIST_REMAIN_HOPS_OFFSET);
     ND_PRINT((ndo, "CIST remaining-hops %d", EXTRACT_U_1(ptr + MST_BPDU_CIST_REMAIN_HOPS_OFFSET)));
 
     /* Dump all MSTI's */

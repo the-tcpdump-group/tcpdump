@@ -51,7 +51,7 @@ carp_print(netdissect_options *ndo, register const u_char *bp, register u_int le
 	int version, type;
 	const char *type_s;
 
-	ND_TCHECK(bp[0]);
+	ND_TCHECK_1(bp);
 	version = (bp[0] & 0xf0) >> 4;
 	type = bp[0] & 0x0f;
 	if (type == 1)
@@ -63,8 +63,8 @@ carp_print(netdissect_options *ndo, register const u_char *bp, register u_int le
 		ND_PRINT((ndo, "[ttl=%d!] ", ttl));
 	if (version != 2 || type != 1)
 		return;
-	ND_TCHECK(bp[2]);
-	ND_TCHECK(bp[5]);
+	ND_TCHECK_1(bp + 2);
+	ND_TCHECK_1(bp + 5);
 	ND_PRINT((ndo, "vhid=%d advbase=%d advskew=%d authlen=%d ",
 	    EXTRACT_U_1(bp + 1), EXTRACT_U_1(bp + 5), EXTRACT_U_1(bp + 2), EXTRACT_U_1(bp + 3)));
 	if (ndo->ndo_vflag) {

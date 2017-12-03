@@ -1317,7 +1317,7 @@ juniper_parse_header(netdissect_options *ndo,
     l2info->caplen -= l2info->header_len;
 
     /* search through the cookie table and copy values matching for our PIC type */
-    ND_TCHECK(p[0]);
+    ND_TCHECK_1(p);
     while (lp->s != NULL) {
         if (lp->pictype == l2info->pictype) {
 

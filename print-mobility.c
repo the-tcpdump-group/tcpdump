@@ -118,12 +118,12 @@ mobility_opt_print(netdissect_options *ndo,
 	unsigned i, optlen;
 
 	for (i = 0; i < len; i += optlen) {
-		ND_TCHECK(bp[i]);
+		ND_TCHECK_1(bp + i);
 		if (EXTRACT_U_1(bp + i) == IP6MOPT_PAD1)
 			optlen = 1;
 		else {
 			if (i + 1 < len) {
-				ND_TCHECK(bp[i + 1]);
+				ND_TCHECK_1(bp + i + 1);
 				optlen = bp[i + 1] + 2;
 			}
 			else
@@ -131,7 +131,7 @@ mobility_opt_print(netdissect_options *ndo,
 		}
 		if (i + optlen > len)
 			goto trunc;
-		ND_TCHECK(bp[i + optlen]);
+		ND_TCHECK_1(bp + i + optlen);
 
 		switch (EXTRACT_U_1(bp + i)) {
 		case IP6MOPT_PAD1:

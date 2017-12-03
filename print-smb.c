@@ -179,7 +179,7 @@ print_trans2(netdissect_options *ndo,
     const char *f1 = NULL, *f2 = NULL;
     int pcnt, dcnt;
 
-    ND_TCHECK(words[0]);
+    ND_TCHECK_1(words);
     if (request) {
 	ND_TCHECK_2(w + (14 * 2));
 	pcnt = EXTRACT_LE_U_2(w + 9 * 2);
@@ -244,7 +244,7 @@ print_browse(netdissect_options *ndo,
     const u_char *maxbuf = data + datalen;
     int command;
 
-    ND_TCHECK(data[0]);
+    ND_TCHECK_1(data);
     command = data[0];
 
     smb_fdata(ndo, param, "BROWSE PACKET\n|Param ", param+paramlen, unicodestr);
@@ -400,7 +400,7 @@ print_negprot(netdissect_options *ndo,
     u_int wct, bcc;
     const char *f1 = NULL, *f2 = NULL;
 
-    ND_TCHECK(words[0]);
+    ND_TCHECK_1(words);
     wct = words[0];
     if (request)
 	f2 = "*|Dialect=[Y]\n";
@@ -442,7 +442,7 @@ print_sesssetup(netdissect_options *ndo,
     u_int wct, bcc;
     const char *f1 = NULL, *f2 = NULL;
 
-    ND_TCHECK(words[0]);
+    ND_TCHECK_1(words);
     wct = words[0];
     if (request) {
 	if (wct == 10)
@@ -488,11 +488,11 @@ print_lockingandx(netdissect_options *ndo,
     const u_char *maxwords;
     const char *f1 = NULL, *f2 = NULL;
 
-    ND_TCHECK(words[0]);
+    ND_TCHECK_1(words);
     wct = words[0];
     if (request) {
 	f1 = "Com2=[w]\nOff2=[d]\nHandle=[d]\nLockType=[w]\nTimeOut=[D]\nUnlockCount=[d]\nLockCount=[d]\n";
-	ND_TCHECK(words[7]);
+	ND_TCHECK_1(words + 7);
 	if (EXTRACT_U_1(words + 7) & 0x10)
 	    f2 = "*Process=[d]\n[P2]Offset=[M]\nLength=[M]\n";
 	else
@@ -807,7 +807,7 @@ print_smb(netdissect_options *ndo,
         "[P4]SMB Command   =  [B]\nError class   =  [BP1]\nError code    =  [d]\nFlags1        =  [B]\nFlags2        =  [B][P13]\nTree ID       =  [d]\nProc ID       =  [d]\nUID           =  [d]\nMID           =  [d]\nWord Count    =  [b]\n";
     int smboffset;
 
-    ND_TCHECK(buf[9]);
+    ND_TCHECK_1(buf + 9);
     request = (buf[9] & 0x80) ? 0 : 1;
     startbuf = buf;
 
@@ -850,7 +850,7 @@ print_smb(netdissect_options *ndo,
 	int newsmboffset;
 
 	words = buf + smboffset;
-	ND_TCHECK(words[0]);
+	ND_TCHECK_1(words);
 	wct = words[0];
 	data = words + 1 + wct * 2;
 	maxwords = min(data, maxbuf);
@@ -899,7 +899,7 @@ print_smb(netdissect_options *ndo,
 	    break;
 	if (wct == 0)
 	    break;
-	ND_TCHECK(words[1]);
+	ND_TCHECK_1(words + 1);
 	command = words[1];
 	if (command == 0xFF)
 	    break;
@@ -1385,7 +1385,7 @@ netbeui_print(netdissect_options *ndo,
 
     if (maxbuf > ndo->ndo_snapend)
 	maxbuf = ndo->ndo_snapend;
-    ND_TCHECK(data[4]);
+    ND_TCHECK_1(data + 4);
     len = EXTRACT_LE_U_2(data);
     command = data[4];
     data2 = data + len;

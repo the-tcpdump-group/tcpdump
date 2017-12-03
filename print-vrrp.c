@@ -110,7 +110,7 @@ vrrp_print(netdissect_options *ndo,
 	int version, type, auth_type = VRRP_AUTH_NONE; /* keep compiler happy */
 	const char *type_s;
 
-	ND_TCHECK(bp[0]);
+	ND_TCHECK_1(bp);
 	version = (bp[0] & 0xf0) >> 4;
 	type = bp[0] & 0x0f;
 	type_s = tok2str(type2str, "unknown type (%u)", type);
@@ -119,9 +119,9 @@ vrrp_print(netdissect_options *ndo,
 		ND_PRINT((ndo, ", (ttl %u)", ttl));
 	if (version < 2 || version > 3 || type != VRRP_TYPE_ADVERTISEMENT)
 		return;
-	ND_TCHECK(bp[2]);
+	ND_TCHECK_1(bp + 2);
 	ND_PRINT((ndo, ", vrid %u, prio %u", EXTRACT_U_1(bp + 1), EXTRACT_U_1(bp + 2)));
-	ND_TCHECK(bp[5]);
+	ND_TCHECK_1(bp + 5);
 
 	if (version == 2) {
 		auth_type = bp[4];
@@ -162,13 +162,13 @@ vrrp_print(netdissect_options *ndo,
 		c = ' ';
 		bp += 8;
 		for (i = 0; i < naddrs; i++) {
-			ND_TCHECK(bp[3]);
+			ND_TCHECK_1(bp + 3);
 			ND_PRINT((ndo, "%c%s", c, ipaddr_string(ndo, bp)));
 			c = ',';
 			bp += 4;
 		}
 		if (version == 2 && auth_type == VRRP_AUTH_SIMPLE) { /* simple text password */
-			ND_TCHECK(bp[7]);
+			ND_TCHECK_1(bp + 7);
 			ND_PRINT((ndo, " auth \""));
 			if (fn_printn(ndo, bp, 8, ndo->ndo_snapend)) {
 				ND_PRINT((ndo, "\""));

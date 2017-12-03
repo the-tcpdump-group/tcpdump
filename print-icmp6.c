@@ -1490,7 +1490,7 @@ mldv2_query_print(netdissect_options *ndo, const u_char *bp, u_int len)
     ND_PRINT((ndo," [gaddr %s", ip6addr_string(ndo, bp + 8)));
 
     if (ndo->ndo_vflag) {
-        ND_TCHECK(bp[25]);
+        ND_TCHECK_1(bp + 25);
 	if (EXTRACT_U_1(bp + 24) & 0x08) {
 		ND_PRINT((ndo," sflag"));
 	}
@@ -1756,7 +1756,7 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 				ND_PRINT((ndo,", "));
 			ND_PRINT((ndo,"DNS name"));
 			cp = (const u_char *)(ni6 + 1) + 4;
-			ND_TCHECK(cp[0]);
+			ND_TCHECK_1(cp);
 			if (EXTRACT_U_1(cp) == ep - cp - 1) {
 				/* icmp-name-lookup-03, pascal string */
 				if (ndo->ndo_vflag)
