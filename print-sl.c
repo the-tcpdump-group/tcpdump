@@ -198,7 +198,8 @@ print_sl_change(netdissect_options *ndo,
 {
 	register u_int i;
 
-	if ((i = *cp++) == 0) {
+	if ((i = EXTRACT_U_1(cp)) == 0) {
+		cp++;
 		i = EXTRACT_BE_U_2(cp);
 		cp += 2;
 	}
@@ -212,7 +213,8 @@ print_sl_winchange(netdissect_options *ndo,
 {
 	register short i;
 
-	if ((i = *cp++) == 0) {
+	if ((i = EXTRACT_U_1(cp)) == 0) {
+		cp++;
 		i = EXTRACT_BE_U_2(cp);
 		cp += 2;
 	}

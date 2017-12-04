@@ -609,7 +609,7 @@ print_attr_string(netdissect_options *ndo,
       case TUNNEL_ASSIGN_ID:
       case TUNNEL_CLIENT_AUTH:
       case TUNNEL_SERVER_AUTH:
-           if (*data <= 0x1F)
+           if (EXTRACT_U_1(data) <= 0x1F)
            {
               if (length < 1)
                  goto trunc;

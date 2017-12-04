@@ -355,7 +355,7 @@ ahcp_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 		goto invalid;
 	/* Magic */
 	ND_TCHECK_1(cp);
-	if (*cp != AHCP_MAGIC_NUMBER)
+	if (EXTRACT_U_1(cp) != AHCP_MAGIC_NUMBER)
 		goto invalid;
 	cp += 1;
 	/* Version */

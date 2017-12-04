@@ -259,7 +259,7 @@ atm_if_print(netdissect_options *ndo,
 	}
 
         /* Cisco Style NLPID ? */
-        if (*p == LLC_UI) {
+        if (EXTRACT_U_1(p) == LLC_UI) {
             if (ndo->ndo_eflag)
                 ND_PRINT((ndo, "CNLPID "));
             isoclns_print(ndo, p + 1, length - 1);

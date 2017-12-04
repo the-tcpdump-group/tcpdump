@@ -183,7 +183,7 @@ rpki_rtr_pdu_print (netdissect_options *ndo, const u_char *tptr, const u_int len
 
     /* Protocol Version */
     ND_TCHECK_1(tptr);
-    if (*tptr != 0) {
+    if (EXTRACT_U_1(tptr) != 0) {
 	/* Skip the rest of the input buffer because even if this is
 	 * a well-formed PDU of a future RPKI-Router protocol version
 	 * followed by a well-formed PDU of RPKI-Router protocol

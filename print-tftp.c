@@ -140,7 +140,7 @@ tftp_print(netdissect_options *ndo,
 		/* Print options, if any */
 		while (length != 0) {
 			ND_TCHECK_1(bp);
-			if (*bp != '\0')
+			if (EXTRACT_U_1(bp) != '\0')
 				ND_PRINT((ndo, " "));
 			ui = fn_printztn(ndo, bp, length, ndo->ndo_snapend);
 			if (ui == 0)
@@ -154,7 +154,7 @@ tftp_print(netdissect_options *ndo,
 		/* Print options */
 		while (length != 0) {
 			ND_TCHECK_1(bp);
-			if (*bp != '\0')
+			if (EXTRACT_U_1(bp) != '\0')
 				ND_PRINT((ndo, " "));
 			ui = fn_printztn(ndo, bp, length, ndo->ndo_snapend);
 			if (ui == 0)

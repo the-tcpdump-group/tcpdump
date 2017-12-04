@@ -467,7 +467,7 @@ resp_get_length(netdissect_options *ndo, register const u_char *bp, int len, con
     ND_TCHECK_1(bp);
     too_large = 0;
     neg = 0;
-    if (*bp == '-') {
+    if (EXTRACT_U_1(bp) == '-') {
         neg = 1;
         bp++;
         len--;
@@ -508,7 +508,7 @@ resp_get_length(netdissect_options *ndo, register const u_char *bp, int len, con
      * OK, we found a non-digit character.  It should be a \r, followed
      * by a \n.
      */
-    if (*bp != '\r') {
+    if (EXTRACT_U_1(bp) != '\r') {
         bp++;
         goto invalid;
     }
@@ -517,7 +517,7 @@ resp_get_length(netdissect_options *ndo, register const u_char *bp, int len, con
     if (len == 0)
         goto trunc;
     ND_TCHECK_1(bp);
-    if (*bp != '\n') {
+    if (EXTRACT_U_1(bp) != '\n') {
         bp++;
         goto invalid;
     }

@@ -372,7 +372,7 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 					ND_DEFAULTPRINT((const u_char *)p, caplen);
 				return (hdrlen);
 			}
-			if (*p == LLC_XID_FI) {
+			if (EXTRACT_U_1(p) == LLC_XID_FI) {
 				if (caplen < 3 || length < 3) {
 					ND_PRINT((ndo, "[|llc]"));
 					if (caplen > 0)

@@ -46,6 +46,7 @@
 #include <stdio.h>
 
 #include "netdissect.h"
+#include "extract.h"
 
 #define ASCII_LINELENGTH 300
 #define HEXDUMP_BYTES_PER_LINE 16
@@ -78,7 +79,7 @@ ascii_print(netdissect_options *ndo,
 			 *
 			 * In the middle of a line, just print a '.'.
 			 */
-			if (length > 1 && *cp != '\n')
+			if (length > 1 && EXTRACT_U_1(cp) != '\n')
 				ND_PRINT((ndo, "."));
 		} else {
 			if (!ND_ISGRAPH(s) &&

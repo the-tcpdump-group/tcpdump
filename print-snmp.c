@@ -543,7 +543,7 @@ asn1_parse(netdissect_options *ndo,
 					ND_PRINT((ndo, "[asnlen=0]"));
 					return -1;
 				}
-				if (*p & ASN_BIT8)	/* negative */
+				if (EXTRACT_U_1(p) & ASN_BIT8)	/* negative */
 					data = -1;
 				for (i = elem->asnlen; i-- > 0; p++)
 					data = (data << ASN_SHIFT8) | EXTRACT_U_1(p);
@@ -772,7 +772,7 @@ asn1_print(netdissect_options *ndo,
 		for (; i-- > 0; p++) {
 			ND_TCHECK_1(p);
 			o = (o << ASN_SHIFT7) + (*p & ~ASN_BIT8);
-			if (*p & ASN_LONGLEN)
+			if (EXTRACT_U_1(p) & ASN_LONGLEN)
 			        continue;
 
 			/*
@@ -924,7 +924,7 @@ smi_decode_oid(netdissect_options *ndo,
 	for (*oidlen = 0; i-- > 0; p++) {
 		ND_TCHECK_1(p);
 	        o = (o << ASN_SHIFT7) + (*p & ~ASN_BIT8);
-		if (*p & ASN_LONGLEN)
+		if (EXTRACT_U_1(p) & ASN_LONGLEN)
 		    continue;
 
 		/*
