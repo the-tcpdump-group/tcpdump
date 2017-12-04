@@ -1398,7 +1398,7 @@ bgp_attr_print(netdissect_options *ndo,
 		if (len != 1)
 			ND_PRINT((ndo, "invalid len"));
 		else {
-			ND_TCHECK(*tptr);
+			ND_TCHECK_1(tptr);
 			ND_PRINT((ndo, "%s", tok2str(bgp_origin_values,
 						"Unknown Origin Typecode",
 						EXTRACT_U_1(tptr))));

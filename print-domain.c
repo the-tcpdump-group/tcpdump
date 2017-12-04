@@ -104,16 +104,16 @@ blabel_print(netdissect_options *ndo,
 	/* print the bit string as a hex string */
 	ND_PRINT((ndo, "\\[x"));
 	for (bitp = cp + 1, b = bitlen; bitp < lim && b > 7; b -= 8, bitp++) {
-		ND_TCHECK(*bitp);
+		ND_TCHECK_1(bitp);
 		ND_PRINT((ndo, "%02x", EXTRACT_U_1(bitp)));
 	}
 	if (b > 4) {
-		ND_TCHECK(*bitp);
+		ND_TCHECK_1(bitp);
 		tc = EXTRACT_U_1(bitp);
 		bitp++;
 		ND_PRINT((ndo, "%02x", tc & (0xff << (8 - b))));
 	} else if (b > 0) {
-		ND_TCHECK(*bitp);
+		ND_TCHECK_1(bitp);
 		tc = EXTRACT_U_1(bitp);
 		bitp++;
 		ND_PRINT((ndo, "%1x", ((tc >> 4) & 0x0f) & (0x0f << (4 - b))));

@@ -1188,7 +1188,7 @@ nbt_udp137_print(netdissect_options *ndo,
 		if (restype == 0x21) {
 		    int numnames;
 
-		    ND_TCHECK(*p);
+		    ND_TCHECK_1(p);
 		    numnames = p[0];
 		    p = smb_fdata(ndo, p, "NumNames=[B]\n", p + 1, 0);
 		    if (p == NULL)
@@ -1197,7 +1197,7 @@ nbt_udp137_print(netdissect_options *ndo,
 			p = smb_fdata(ndo, p, "Name=[n2]\t#", maxbuf, 0);
 			if (p == NULL)
 			    goto out;
-			ND_TCHECK(*p);
+			ND_TCHECK_1(p);
 			if (EXTRACT_U_1(p) & 0x80)
 			    ND_PRINT((ndo, "<GROUP> "));
 			switch (EXTRACT_U_1(p) & 0x60) {

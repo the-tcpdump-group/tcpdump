@@ -139,7 +139,7 @@ tftp_print(netdissect_options *ndo,
 
 		/* Print options, if any */
 		while (length != 0) {
-			ND_TCHECK(*bp);
+			ND_TCHECK_1(bp);
 			if (*bp != '\0')
 				ND_PRINT((ndo, " "));
 			ui = fn_printztn(ndo, bp, length, ndo->ndo_snapend);
@@ -153,7 +153,7 @@ tftp_print(netdissect_options *ndo,
 	case OACK:
 		/* Print options */
 		while (length != 0) {
-			ND_TCHECK(*bp);
+			ND_TCHECK_1(bp);
 			if (*bp != '\0')
 				ND_PRINT((ndo, " "));
 			ui = fn_printztn(ndo, bp, length, ndo->ndo_snapend);

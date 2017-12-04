@@ -428,13 +428,13 @@ tcp_print(netdissect_options *ndo,
                 while (hlen > 0) {
                         if (ch != '\0')
                                 ND_PRINT((ndo, "%c", ch));
-                        ND_TCHECK(*cp);
+                        ND_TCHECK_1(cp);
                         opt = EXTRACT_U_1(cp);
                         cp++;
                         if (ZEROLENOPT(opt))
                                 len = 1;
                         else {
-                                ND_TCHECK(*cp);
+                                ND_TCHECK_1(cp);
                                 len = EXTRACT_U_1(cp);
                                 cp++;	/* total including type, len */
                                 if (len < 2 || len > hlen)

@@ -97,9 +97,9 @@ rrcp_print(netdissect_options *ndo,
 	uint8_t rrcp_proto;
 	uint8_t rrcp_opcode;
 
-	ND_TCHECK(*(cp + RRCP_PROTO_OFFSET));
+	ND_TCHECK_1(cp + RRCP_PROTO_OFFSET);
 	rrcp_proto = EXTRACT_U_1(cp + RRCP_PROTO_OFFSET);
-	ND_TCHECK(*(cp + RRCP_OPCODE_ISREPLY_OFFSET));
+	ND_TCHECK_1(cp + RRCP_OPCODE_ISREPLY_OFFSET);
 	rrcp_opcode = EXTRACT_U_1((cp + RRCP_OPCODE_ISREPLY_OFFSET)) & RRCP_OPCODE_MASK;
 	if (src != NULL && dst != NULL) {
 		ND_PRINT((ndo, "%s > %s, ",

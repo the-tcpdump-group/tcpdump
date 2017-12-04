@@ -193,7 +193,7 @@ krb4_print(netdissect_options *ndo,
 		if ((cp = krb4_print_hdr(ndo, cp)) == NULL)
 			return;
 		cp += 4;	/* ctime */
-		ND_TCHECK(*cp);
+		ND_TCHECK_1(cp);
 		ND_PRINT((ndo, " %dmin ", EXTRACT_U_1(cp) * 5));
 		cp++;
 		PRINT;
@@ -203,14 +203,14 @@ krb4_print(netdissect_options *ndo,
 
 	case AUTH_MSG_APPL_REQUEST:
 		cp += 2;
-		ND_TCHECK(*cp);
+		ND_TCHECK_1(cp);
 		ND_PRINT((ndo, "v%d ", EXTRACT_U_1(cp)));
 		cp++;
 		PRINT;
-		ND_TCHECK(*cp);
+		ND_TCHECK_1(cp);
 		ND_PRINT((ndo, " (%d)", EXTRACT_U_1(cp)));
 		cp++;
-		ND_TCHECK(*cp);
+		ND_TCHECK_1(cp);
 		ND_PRINT((ndo, " (%d)", EXTRACT_U_1(cp)));
 		break;
 

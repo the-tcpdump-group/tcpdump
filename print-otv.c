@@ -49,7 +49,7 @@ otv_print(netdissect_options *ndo, const u_char *bp, u_int len)
     if (len < OTV_HDR_LEN)
         goto trunc;
 
-    ND_TCHECK(*bp);
+    ND_TCHECK_1(bp);
     flags = *bp;
     ND_PRINT((ndo, "flags [%s] (0x%02x), ", flags & 0x08 ? "I" : ".", flags));
     bp += 1;
@@ -63,7 +63,7 @@ otv_print(netdissect_options *ndo, const u_char *bp, u_int len)
     bp += 3;
 
     /* Reserved */
-    ND_TCHECK(*bp);
+    ND_TCHECK_1(bp);
     bp += 1;
 
     ether_print(ndo, bp, len - OTV_HDR_LEN, ndo->ndo_snapend - bp, NULL, NULL);

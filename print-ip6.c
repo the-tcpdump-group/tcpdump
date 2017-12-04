@@ -329,7 +329,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			nh = EXTRACT_U_1(cp);
 			return;
 		case IPPROTO_ROUTING:
-			ND_TCHECK(*cp);
+			ND_TCHECK_1(cp);
 			advance = rt6_print(ndo, cp, (const u_char *)ip6);
 			if (advance < 0)
 				return;

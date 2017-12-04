@@ -443,7 +443,7 @@ telnet_parse(netdissect_options *ndo, const u_char *sp, u_int length, int print)
 				break;
 			p++;
 		}
-		ND_TCHECK(*p);
+		ND_TCHECK_1(p);
 		if (*p != IAC)
 			goto pktend;
 
@@ -515,7 +515,7 @@ telnet_print(netdissect_options *ndo, const u_char *sp, u_int length)
 
 	osp = sp;
 
-	ND_TCHECK(*sp);
+	ND_TCHECK_1(sp);
 	while (length > 0 && EXTRACT_U_1(sp) == IAC) {
 		/*
 		 * Parse the Telnet command without printing it,
@@ -544,7 +544,7 @@ telnet_print(netdissect_options *ndo, const u_char *sp, u_int length)
 
 		sp += l;
 		length -= l;
-		ND_TCHECK(*sp);
+		ND_TCHECK_1(sp);
 	}
 	if (!first) {
 		if (ndo->ndo_Xflag && 2 < ndo->ndo_vflag)

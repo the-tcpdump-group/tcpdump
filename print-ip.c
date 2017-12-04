@@ -106,7 +106,7 @@ ip_finddst(netdissect_options *ndo,
 	for (; length > 0; cp += len, length -= len) {
 		int tt;
 
-		ND_TCHECK(*cp);
+		ND_TCHECK_1(cp);
 		tt = *cp;
 		if (tt == IPOPT_EOL)
 			break;
@@ -254,7 +254,7 @@ ip_optprint(netdissect_options *ndo,
 		ND_PRINT((ndo, "%s", sep));
 		sep = ",";
 
-		ND_TCHECK(*cp);
+		ND_TCHECK_1(cp);
 		option_code = *cp;
 
 		ND_PRINT((ndo, "%s",
@@ -706,7 +706,7 @@ ipN_print(netdissect_options *ndo, register const u_char *bp, register u_int len
 		return;
 	}
 
-	ND_TCHECK(*bp);
+	ND_TCHECK_1(bp);
 	switch (*bp & 0xF0) {
 	case 0x40:
 		ip_print (ndo, bp, length);

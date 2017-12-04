@@ -931,7 +931,7 @@ ospf_decode_lls(netdissect_options *ndo,
     ND_PRINT((ndo, ", length: %u", length2));
 
     dptr += 2;
-    ND_TCHECK(*dptr);
+    ND_TCHECK_1(dptr);
     while (dptr < dataend) {
         ND_TCHECK_2(dptr);
         lls_type = EXTRACT_BE_U_2(dptr);

@@ -482,7 +482,7 @@ aodv_print(netdissect_options *ndo,
 	 * The message type is the first byte; make sure we have it
 	 * and then fetch it.
 	 */
-	ND_TCHECK(*dat);
+	ND_TCHECK_1(dat);
 	msg_type = *dat;
 	ND_PRINT((ndo, " aodv"));
 
