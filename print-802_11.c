@@ -1031,7 +1031,7 @@ parse_elements(netdissect_options *ndo,
 		if (length < elementlen + 2)
 			return 0;
 
-		switch (*(p + offset)) {
+		switch (EXTRACT_U_1(p + offset)) {
 		case E_SSID:
 			memcpy(&ssid, p + offset, 2);
 			offset += 2;

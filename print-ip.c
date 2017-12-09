@@ -707,7 +707,7 @@ ipN_print(netdissect_options *ndo, register const u_char *bp, register u_int len
 	}
 
 	ND_TCHECK_1(bp);
-	switch (*bp & 0xF0) {
+	switch (EXTRACT_U_1(bp) & 0xF0) {
 	case 0x40:
 		ip_print (ndo, bp, length);
 		break;
