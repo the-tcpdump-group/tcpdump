@@ -1137,7 +1137,7 @@ juniper_read_tlv_value(const u_char *p, u_int tlv_type, u_int tlv_len)
    if (tlv_type < 128) {
        switch (tlv_len) {
        case 1:
-           tlv_value = *p;
+           tlv_value = EXTRACT_U_1(p);
            break;
        case 2:
            tlv_value = EXTRACT_LE_U_2(p);
@@ -1156,7 +1156,7 @@ juniper_read_tlv_value(const u_char *p, u_int tlv_type, u_int tlv_len)
        /* TLVs >= 128 are big endian encoded */
        switch (tlv_len) {
        case 1:
-           tlv_value = *p;
+           tlv_value = EXTRACT_U_1(p);
            break;
        case 2:
            tlv_value = EXTRACT_BE_U_2(p);
