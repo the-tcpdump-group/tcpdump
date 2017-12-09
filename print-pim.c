@@ -825,7 +825,7 @@ pimv2_print(netdissect_options *ndo,
 					ND_PRINT((ndo, "ERROR: Option Length != 4 Bytes (%u)", olen));
 				} else {
 					ND_PRINT((ndo, "v%d", EXTRACT_U_1(bp)));
-					if (*(bp+1) != 0) {
+					if (EXTRACT_U_1(bp + 1) != 0) {
 						ND_PRINT((ndo, ", interval "));
 						unsigned_relts_print(ndo,
 								     EXTRACT_U_1(bp + 1));

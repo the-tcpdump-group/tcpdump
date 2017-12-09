@@ -1553,7 +1553,7 @@ dnsname_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 			if (cp == ep) {
 				/* FQDN */
 				ND_PRINT((ndo,"."));
-			} else if (cp + 1 == ep && *cp == '\0') {
+			} else if (cp + 1 == ep && EXTRACT_U_1(cp) == '\0') {
 				/* truncated */
 			} else {
 				/* invalid */

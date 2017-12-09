@@ -304,7 +304,8 @@ cdp_print_addr(netdissect_options *ndo,
 			goto trunc;
 		al = EXTRACT_BE_U_2(p + pl);	/* address length */
 
-		if (pt == PT_NLPID && pl == 1 && *p == NLPID_IP && al == 4) {
+		if (pt == PT_NLPID && pl == 1 && EXTRACT_U_1(p) == NLPID_IP &&
+		    al == 4) {
 			/*
 			 * IPv4: protocol type = NLPID, protocol length = 1
 			 * (1-byte NLPID), protocol = 0xcc (NLPID for IPv4),

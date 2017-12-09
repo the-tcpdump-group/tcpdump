@@ -156,7 +156,7 @@ pppoe_print(netdissect_options *ndo, register const u_char *bp, u_int length)
 				/* TODO print UTF-8 decoded text */
 				ND_TCHECK2(*p, tag_len);
 				for (v = p; v < p + tag_len && tag_str_len < MAXTAGPRINT-1; v++)
-					if (*v >= 32 && *v < 127) {
+					if (ND_ISPRINT(EXTRACT_U_1(v))) {
 						tag_str[tag_str_len++] = EXTRACT_U_1(v);
 						ascii_count++;
 					} else {

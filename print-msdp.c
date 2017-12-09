@@ -65,8 +65,9 @@ msdp_print(netdissect_options *ndo, const u_char *sp, u_int length)
 				ND_PRINT((ndo, " [w/data]"));
 				if (ndo->ndo_vflag > 1) {
 					ND_PRINT((ndo, " "));
-					ip_print(ndo, sp + *sp * 12 + 8 - 3,
-					         len - (*sp * 12 + 8));
+					ip_print(ndo, sp +
+						 EXTRACT_U_1(sp) * 12 + 8 - 3,
+					         len - (EXTRACT_U_1(sp) * 12 + 8));
 				}
 			}
 			break;

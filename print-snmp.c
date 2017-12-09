@@ -444,8 +444,8 @@ asn1_parse(netdissect_options *ndo,
 	class = form >> 1;		/* bits 7&6 -> bits 1&0, range 0-3 */
 	form &= 0x1;			/* bit 5 -> bit 0, range 0-1 */
 #else
-	form = (u_char)(*p & ASN_FORM_BITS) >> ASN_FORM_SHIFT;
-	class = (u_char)(*p & ASN_CLASS_BITS) >> ASN_CLASS_SHIFT;
+	form = (u_char)(EXTRACT_U_1(p) & ASN_FORM_BITS) >> ASN_FORM_SHIFT;
+	class = (u_char)(EXTRACT_U_1(p) & ASN_CLASS_BITS) >> ASN_CLASS_SHIFT;
 #endif
 	elem->form = form;
 	elem->class = class;
@@ -470,7 +470,7 @@ asn1_parse(netdissect_options *ndo,
 				ND_PRINT((ndo, "[Xtagfield?]"));
 				return -1;
 			}
-			id = (id << 7) | (*p & ~ASN_BIT8);
+			id = (id << 7) | (EXTRACT_U_1(p) & ~ASN_BIT8);
 			len--;
 			hdr++;
 			p++;
@@ -771,7 +771,7 @@ asn1_print(netdissect_options *ndo,
 
 		for (; i-- > 0; p++) {
 			ND_TCHECK_1(p);
-			o = (o << ASN_SHIFT7) + (*p & ~ASN_BIT8);
+			o = (o << ASN_SHIFT7) + (EXTRACT_U_1(p) & ~ASN_BIT8);
 			if (EXTRACT_U_1(p) & ASN_LONGLEN)
 			        continue;
 
@@ -923,7 +923,7 @@ smi_decode_oid(netdissect_options *ndo,
 
 	for (*oidlen = 0; i-- > 0; p++) {
 		ND_TCHECK_1(p);
-	        o = (o << ASN_SHIFT7) + (*p & ~ASN_BIT8);
+	        o = (o << ASN_SHIFT7) + (EXTRACT_U_1(p) & ~ASN_BIT8);
 		if (EXTRACT_U_1(p) & ASN_LONGLEN)
 		    continue;
 
