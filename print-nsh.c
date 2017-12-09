@@ -68,18 +68,18 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
 
     ND_TCHECK2(*bp, NSH_BASE_HDR_LEN + NSH_SERVICE_PATH_HDR_LEN);
 
-    ver = (uint8_t)(*bp >> 6);
-    flags = *bp;
+    ver = (uint8_t)(EXTRACT_U_1(bp) >> 6);
+    flags = EXTRACT_U_1(bp);
     bp += 1;
-    length = *bp;
+    length = EXTRACT_U_1(bp);
     bp += 1;
-    md_type = *bp;
+    md_type = EXTRACT_U_1(bp);
     bp += 1;
-    next_protocol = *bp;
+    next_protocol = EXTRACT_U_1(bp);
     bp += 1;
     service_path_id = EXTRACT_BE_U_3(bp);
     bp += 3;
-    service_index = *bp;
+    service_index = EXTRACT_U_1(bp);
     bp += 1;
 
     ND_PRINT((ndo, "NSH, "));
@@ -127,9 +127,9 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
             while (n < length - 2) {
                 tlv_class = EXTRACT_BE_U_2(bp);
                 bp += 2;
-                tlv_type  = *bp;
+                tlv_type  = EXTRACT_U_1(bp);
                 bp += 1;
-                tlv_len   = *bp;
+                tlv_len   = EXTRACT_U_1(bp);
                 bp += 1;
 
                 ND_PRINT((ndo, "\n        TLV Class %d, Type %d, Len %d",

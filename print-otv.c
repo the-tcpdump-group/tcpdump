@@ -50,7 +50,7 @@ otv_print(netdissect_options *ndo, const u_char *bp, u_int len)
         goto trunc;
 
     ND_TCHECK_1(bp);
-    flags = *bp;
+    flags = EXTRACT_U_1(bp);
     ND_PRINT((ndo, "flags [%s] (0x%02x), ", flags & 0x08 ? "I" : ".", flags));
     bp += 1;
 
