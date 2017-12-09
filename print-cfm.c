@@ -370,11 +370,11 @@ cfm_print(netdissect_options *ndo,
         /*
          * Resolve the MD fields.
          */
-        md_nameformat = *namesp;
+        md_nameformat = EXTRACT_U_1(namesp);
         namesp++;
         names_data_remaining--;  /* We know this is != 0 */
         if (md_nameformat != CFM_CCM_MD_FORMAT_NONE) {
-            md_namelength = *namesp;
+            md_namelength = EXTRACT_U_1(namesp);
             namesp++;
             names_data_remaining--; /* We know this is !=0 */
             ND_PRINT((ndo, "\n\t  MD Name Format %s (%u), MD Name length %u",
@@ -428,10 +428,10 @@ cfm_print(netdissect_options *ndo,
         /*
          * Resolve the MA fields.
          */
-        ma_nameformat = *namesp;
+        ma_nameformat = EXTRACT_U_1(namesp);
         namesp++;
         names_data_remaining--; /* We know this is != 0 */
-        ma_namelength = *namesp;
+        ma_namelength = EXTRACT_U_1(namesp);
         namesp++;
         names_data_remaining--; /* We know this is != 0 */
         ND_PRINT((ndo, "\n\t  MA Name-Format %s (%u), MA name length %u",

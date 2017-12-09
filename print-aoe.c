@@ -274,7 +274,7 @@ aoev1_mac_print(netdissect_options *ndo,
 	cp += 1;
 	/* Dir Count */
 	ND_TCHECK_1(cp);
-	dircount = *cp;
+	dircount = EXTRACT_U_1(cp);
 	cp += 1;
 	ND_PRINT((ndo, ", Dir Count: %u", dircount));
 	if (AOEV1_MAC_ARG_LEN + dircount * 8 > len)
@@ -318,7 +318,7 @@ aoev1_reserve_print(netdissect_options *ndo,
 	cp += 1;
 	/* NMacs (correlated with the length) */
 	ND_TCHECK_1(cp);
-	nmacs = *cp;
+	nmacs = EXTRACT_U_1(cp);
 	cp += 1;
 	ND_PRINT((ndo, ", NMacs: %u", nmacs));
 	if (AOEV1_RESERVE_ARG_LEN + nmacs * ETHER_ADDR_LEN != len)
@@ -370,7 +370,7 @@ aoev1_print(netdissect_options *ndo,
 	cp += 1;
 	/* Command */
 	ND_TCHECK_1(cp);
-	command = *cp;
+	command = EXTRACT_U_1(cp);
 	cp += 1;
 	ND_PRINT((ndo, ", Command: %s", tok2str(cmdcode_str, "Unknown (0x%02x)", command)));
 	/* Tag */

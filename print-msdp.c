@@ -37,14 +37,14 @@ msdp_print(netdissect_options *ndo, const u_char *sp, u_int length)
 
 	ND_TCHECK_3(sp);
 	/* See if we think we're at the beginning of a compound packet */
-	type = *sp;
+	type = EXTRACT_U_1(sp);
 	len = EXTRACT_BE_U_2(sp + 1);
 	if (len > 1500 || len < 3 || type == 0 || type > MSDP_TYPE_MAX)
 		goto trunc;	/* not really truncated, but still not decodable */
 	ND_PRINT((ndo, " msdp:"));
 	while (length > 0) {
 		ND_TCHECK_3(sp);
-		type = *sp;
+		type = EXTRACT_U_1(sp);
 		len = EXTRACT_BE_U_2(sp + 1);
 		if (len > 1400 || ndo->ndo_vflag)
 			ND_PRINT((ndo, " [len %u]", len));

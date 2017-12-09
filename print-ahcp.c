@@ -266,7 +266,7 @@ ahcp1_options_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 	while (cp < ep) {
 		/* Option no */
 		ND_TCHECK_1(cp);
-		option_no = *cp;
+		option_no = EXTRACT_U_1(cp);
 		cp += 1;
 		ND_PRINT((ndo, "\n\t %s", tok2str(ahcp1_opt_str, "Unknown-%u", option_no)));
 		if (option_no == AHCP1_OPT_PAD || option_no == AHCP1_OPT_MANDATORY)
@@ -275,7 +275,7 @@ ahcp1_options_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 		if (cp + 1 > ep)
 			goto invalid;
 		ND_TCHECK_1(cp);
-		option_len = *cp;
+		option_len = EXTRACT_U_1(cp);
 		cp += 1;
 		if (cp + option_len > ep)
 			goto invalid;
@@ -309,11 +309,11 @@ ahcp1_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 		goto invalid;
 	/* Type */
 	ND_TCHECK_1(cp);
-	type = *cp;
+	type = EXTRACT_U_1(cp);
 	cp += 1;
 	/* MBZ */
 	ND_TCHECK_1(cp);
-	mbz = *cp;
+	mbz = EXTRACT_U_1(cp);
 	cp += 1;
 	/* Length */
 	ND_TCHECK_2(cp);
@@ -360,7 +360,7 @@ ahcp_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 	cp += 1;
 	/* Version */
 	ND_TCHECK_1(cp);
-	version = *cp;
+	version = EXTRACT_U_1(cp);
 	cp += 1;
 	switch (version) {
 		case AHCP_VERSION_1: {

@@ -251,7 +251,7 @@ slow_print(netdissect_options *ndo,
     if (len < 1)
         goto tooshort;
     ND_TCHECK_1(pptr);
-    subtype = *pptr;
+    subtype = EXTRACT_U_1(pptr);
 
     /*
      * Sanity checking of the header.

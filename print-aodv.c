@@ -483,7 +483,7 @@ aodv_print(netdissect_options *ndo,
 	 * and then fetch it.
 	 */
 	ND_TCHECK_1(dat);
-	msg_type = *dat;
+	msg_type = EXTRACT_U_1(dat);
 	ND_PRINT((ndo, " aodv"));
 
 	switch (msg_type) {

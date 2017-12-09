@@ -107,7 +107,7 @@ ip_finddst(netdissect_options *ndo,
 		int tt;
 
 		ND_TCHECK_1(cp);
-		tt = *cp;
+		tt = EXTRACT_U_1(cp);
 		if (tt == IPOPT_EOL)
 			break;
 		else if (tt == IPOPT_NOP)
@@ -255,7 +255,7 @@ ip_optprint(netdissect_options *ndo,
 		sep = ",";
 
 		ND_TCHECK_1(cp);
-		option_code = *cp;
+		option_code = EXTRACT_U_1(cp);
 
 		ND_PRINT((ndo, "%s",
 		          tok2str(ip_option_values,"unknown %u",option_code)));
@@ -349,7 +349,7 @@ again:
 			ND_PRINT((ndo, "[|AH]"));
 			break;
 		}
-		ipds->nh = *ipds->cp;
+		ipds->nh = EXTRACT_U_1(ipds->cp);
 		ipds->advance = ah_print(ndo, ipds->cp);
 		if (ipds->advance <= 0)
 			break;

@@ -491,7 +491,7 @@ asn1_parse(netdissect_options *ndo,
 		return -1;
 	}
 	ND_TCHECK_1(p);
-	elem->asnlen = *p;
+	elem->asnlen = EXTRACT_U_1(p);
 	p++; len--; hdr++;
 	if (elem->asnlen & ASN_BIT8) {
 		uint32_t noct = elem->asnlen % ASN_BIT8;

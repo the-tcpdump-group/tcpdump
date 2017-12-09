@@ -78,7 +78,7 @@ ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
 			 */
 			ND_TCHECK_2(cp);
 			advance = (EXTRACT_U_1(cp + 1) + 1) << 3;
-			nh = *cp;
+			nh = EXTRACT_U_1(cp);
 			break;
 
 		case IPPROTO_FRAGMENT:
@@ -89,7 +89,7 @@ ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
 			 */
 			ND_TCHECK_1(cp);
 			advance = sizeof(struct ip6_frag);
-			nh = *cp;
+			nh = EXTRACT_U_1(cp);
 			break;
 
 		case IPPROTO_ROUTING:

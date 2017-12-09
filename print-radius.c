@@ -667,7 +667,7 @@ print_vendor_attr(netdissect_options *ndo,
     while (length >= 2) {
 	ND_TCHECK_2(data);
 
-        vendor_type = *(data);
+        vendor_type = EXTRACT_U_1(data);
         vendor_length = EXTRACT_U_1(data + 1);
 
         if (vendor_length < 2)

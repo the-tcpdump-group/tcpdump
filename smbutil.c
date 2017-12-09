@@ -178,7 +178,7 @@ name_ptr(netdissect_options *ndo,
 	return(NULL);	/* name goes past the end of the buffer */
     ND_TCHECK_1(p);
 
-    c = *p;
+    c = EXTRACT_U_1(p);
 
     /* XXX - this should use the same code that the DNS dissector does */
     if ((c & 0xC0) == 0xC0) {
@@ -231,7 +231,7 @@ name_len(netdissect_options *ndo,
     if (s >= maxbuf)
 	return(-1);	/* name goes past the end of the buffer */
     ND_TCHECK_1(s);
-    c = *s;
+    c = EXTRACT_U_1(s);
     if ((c & 0xC0) == 0xC0)
 	return(2);
     while (*s) {

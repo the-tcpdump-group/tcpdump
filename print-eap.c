@@ -183,7 +183,7 @@ eap_print(netdissect_options *ndo,
     switch (eap->type) {
     case EAP_FRAME_TYPE_PACKET:
         ND_TCHECK_1(tptr);
-        type = *(tptr);
+        type = EXTRACT_U_1(tptr);
         ND_TCHECK_2(tptr + 2);
         len = EXTRACT_BE_U_2(tptr + 2);
         ND_PRINT((ndo, ", %s (%u), id %u, len %u",

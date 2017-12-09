@@ -1400,7 +1400,7 @@ of10_match_print(netdissect_options *ndo,
 	cp += 1;
 	/* nw_proto */
 	ND_TCHECK_1(cp);
-	nw_proto = *cp;
+	nw_proto = EXTRACT_U_1(cp);
 	cp += 1;
 	if (! (wildcards & OFPFW_NW_PROTO)) {
 		field_name = ! (wildcards & OFPFW_DL_TYPE) && dl_type == ETHERTYPE_ARP

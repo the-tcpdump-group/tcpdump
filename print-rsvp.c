@@ -499,7 +499,7 @@ rsvp_intserv_print(netdissect_options *ndo,
 
     if (obj_tlen < 4)
         return 0;
-    parameter_id = *(tptr);
+    parameter_id = EXTRACT_U_1(tptr);
     ND_TCHECK_2(tptr + 2);
     parameter_length = EXTRACT_BE_U_2(tptr + 2)<<2; /* convert wordcount to bytecount */
 
