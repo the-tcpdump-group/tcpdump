@@ -192,7 +192,7 @@ pimv1_join_prune_print(netdissect_options *ndo,
 	if (len < 4)
 		goto trunc;
 	ND_TCHECK_4(bp);
-	ngroups = bp[3];
+	ngroups = EXTRACT_U_1(bp + 3);
 	bp += 4;
 	len -= 4;
 	while (ngroups--) {
@@ -254,7 +254,7 @@ pimv1_print(netdissect_options *ndo,
 	register u_char type;
 
 	ND_TCHECK_1(bp + 1);
-	type = bp[1];
+	type = EXTRACT_U_1(bp + 1);
 
 	ND_PRINT((ndo, " %s", tok2str(pimv1_type_str, "[type %u]", type)));
 	switch (type) {
@@ -353,7 +353,7 @@ cisco_autorp_print(netdissect_options *ndo,
 		goto trunc;
 	ND_TCHECK_1(bp);
 	ND_PRINT((ndo, " auto-rp "));
-	type = bp[0];
+	type = EXTRACT_U_1(bp);
 	switch (type) {
 	case 0x11:
 		ND_PRINT((ndo, "candidate-advert"));
@@ -367,7 +367,7 @@ cisco_autorp_print(netdissect_options *ndo,
 	}
 
 	ND_TCHECK_1(bp + 1);
-	numrps = bp[1];
+	numrps = EXTRACT_U_1(bp + 1);
 
 	ND_TCHECK_2(bp + 2);
 	ND_PRINT((ndo, " Hold "));
@@ -424,7 +424,7 @@ cisco_autorp_print(netdissect_options *ndo,
 		if (len < 1)
 			goto trunc;
 		ND_TCHECK_1(bp);
-		nentries = bp[0];
+		nentries = EXTRACT_U_1(bp);
 		bp += 1;
 		len -= 1;
 		s = ' ';
@@ -977,7 +977,7 @@ pimv2_print(netdissect_options *ndo,
 		if (len < 4)
 			goto trunc;
 		ND_TCHECK_4(bp);
-		ngroup = bp[1];
+		ngroup = EXTRACT_U_1(bp + 1);
 		holdtime = EXTRACT_BE_U_2(bp + 2);
 		ND_PRINT((ndo, "\n\t  %u group(s)", ngroup));
 		if (PIM_TYPE(pim->pim_typever) != 7) {	/*not for Graft-ACK*/
@@ -1124,7 +1124,7 @@ pimv2_print(netdissect_options *ndo,
 			goto trunc;
 		ND_TCHECK_1(bp);
 		ND_PRINT((ndo, " prefix-cnt=%d", EXTRACT_U_1(bp)));
-		pfxcnt = bp[0];
+		pfxcnt = EXTRACT_U_1(bp);
 		if (len < 2)
 			goto trunc;
 		ND_TCHECK_1(bp + 1);

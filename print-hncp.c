@@ -242,7 +242,8 @@ print_dns_label(netdissect_options *ndo,
 {
     u_int length = 0;
     while (length < max_length) {
-        u_int lab_length = cp[length++];
+        u_int lab_length = EXTRACT_U_1(cp + length);
+        length++;
         if (lab_length == 0)
             return (int)length;
         if (length > 1 && print)
@@ -274,8 +275,8 @@ dhcpv4_print(netdissect_options *ndo,
         if (i + 2 > length)
             return -1;
         tlv = cp + i;
-        type = tlv[0];
-        optlen = tlv[1];
+        type = EXTRACT_U_1(tlv);
+        optlen = EXTRACT_U_1(tlv + 1);
         value = tlv + 2;
 
         ND_PRINT((ndo, "\n"));
@@ -654,7 +655,7 @@ hncp_print_rec(netdissect_options *ndo,
                 ND_PRINT((ndo, " %s", istr));
                 break;
             }
-            policy = value[0];
+            policy = EXTRACT_U_1(value);
             ND_PRINT((ndo, " type: "));
             if (policy == 0) {
                 if (bodylen != 1) {
@@ -807,7 +808,7 @@ hncp_print_rec(netdissect_options *ndo,
                 ND_PRINT((ndo, " %s", istr));
                 break;
             }
-            l = value[16];
+            l = EXTRACT_U_1(value + 16);
             if (bodylen < 17 + l) {
                 ND_PRINT((ndo, " %s", istr));
                 break;

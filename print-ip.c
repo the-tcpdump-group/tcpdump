@@ -114,7 +114,7 @@ ip_finddst(netdissect_options *ndo,
 			len = 1;
 		else {
 			ND_TCHECK_1(cp + 1);
-			len = cp[1];
+			len = EXTRACT_U_1(cp + 1);
 			if (len < 2)
 				break;
 		}
@@ -266,7 +266,7 @@ ip_optprint(netdissect_options *ndo,
 
 		else {
 			ND_TCHECK_1(cp + 1);
-			option_len = cp[1];
+			option_len = EXTRACT_U_1(cp + 1);
 			if (option_len < 2) {
 				ND_PRINT((ndo, " [bad length %u]", option_len));
 				return;

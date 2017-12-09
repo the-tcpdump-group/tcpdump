@@ -1798,7 +1798,7 @@ v3msg_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "[msgFlags size %d]", elem.asnlen));
 		return;
 	}
-	flags = elem.data.str[0];
+	flags = EXTRACT_U_1(elem.data.str);
 	if (flags != 0x00 && flags != 0x01 && flags != 0x03
 	    && flags != 0x04 && flags != 0x05 && flags != 0x07) {
 		ND_PRINT((ndo, "[msgFlags=0x%02X]", flags));

@@ -295,8 +295,8 @@ cdp_print_addr(netdissect_options *ndo,
 		ND_TCHECK_2(p);
 		if (p + 2 > endp)
 			goto trunc;
-		pt = p[0];		/* type of "protocol" field */
-		pl = p[1];		/* length of "protocol" field */
+		pt = EXTRACT_U_1(p);		/* type of "protocol" field */
+		pl = EXTRACT_U_1(p + 1);		/* length of "protocol" field */
 		p += 2;
 
 		ND_TCHECK_2(p + pl);

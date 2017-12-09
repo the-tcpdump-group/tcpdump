@@ -472,8 +472,8 @@ mfr_print(netdissect_options *ndo,
 
         while (tlen>sizeof(struct ie_tlv_header_t)) {
             ND_TCHECK2(*tptr, sizeof(struct ie_tlv_header_t));
-            ie_type=tptr[0];
-            ie_len=tptr[1];
+            ie_type=EXTRACT_U_1(tptr);
+            ie_len=EXTRACT_U_1(tptr + 1);
 
             ND_PRINT((ndo, "\n\tIE %s (%u), length %u: ",
                    tok2str(mfr_ctrl_ie_values,"Unknown",ie_type),

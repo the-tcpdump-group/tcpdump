@@ -124,7 +124,7 @@ vrrp_print(netdissect_options *ndo,
 	ND_TCHECK_1(bp + 5);
 
 	if (version == 2) {
-		auth_type = bp[4];
+		auth_type = EXTRACT_U_1(bp + 4);
 		ND_PRINT((ndo, ", authtype %s", tok2str(auth2str, NULL, auth_type)));
 		ND_PRINT((ndo, ", intvl %us, length %u", EXTRACT_U_1(bp + 5), len));
 	} else { /* version == 3 */
@@ -133,7 +133,7 @@ vrrp_print(netdissect_options *ndo,
 	}
 
 	if (ndo->ndo_vflag) {
-		int naddrs = bp[3];
+		int naddrs = EXTRACT_U_1(bp + 3);
 		int i;
 		char c;
 

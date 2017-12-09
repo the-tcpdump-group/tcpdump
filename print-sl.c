@@ -130,7 +130,7 @@ sliplink_print(netdissect_options *ndo,
 	int dir;
 	u_int hlen;
 
-	dir = p[SLX_DIR];
+	dir = EXTRACT_U_1(p + SLX_DIR);
 	switch (dir) {
 
 	case SLIPDIR_IN:

@@ -375,7 +375,7 @@ babel_print_v2(netdissect_options *ndo,
 
         ND_TCHECK_2(message);
         ICHECK(i, 2);
-        len = message[1];
+        len = EXTRACT_U_1(message + 1);
 
         ND_TCHECK2(*message, 2 + len);
         ICHECK(i, 2 + len);
@@ -606,10 +606,10 @@ babel_print_v2(netdissect_options *ndo,
                 int parsed_len = 10;
                 ND_PRINT((ndo, "\n\tSS-Update"));
                 if(len < 10) goto invalid;
-                ae = message[2];
-                src_plen = message[3];
-                plen = message[4];
-                omitted = message[5];
+                ae = EXTRACT_U_1(message + 2);
+                src_plen = EXTRACT_U_1(message + 3);
+                plen = EXTRACT_U_1(message + 4);
+                omitted = EXTRACT_U_1(message + 5);
                 interval = EXTRACT_BE_U_2(message + 6);
                 seqno = EXTRACT_BE_U_2(message + 8);
                 metric = EXTRACT_BE_U_2(message + 10);
@@ -647,9 +647,9 @@ babel_print_v2(netdissect_options *ndo,
                 u_char ae, plen, src_plen, prefix[16], src_prefix[16];
                 ND_PRINT((ndo, "\n\tSS-Request "));
                 if(len < 3) goto invalid;
-                ae = message[2];
-                plen = message[3];
-                src_plen = message[4];
+                ae = EXTRACT_U_1(message + 2);
+                plen = EXTRACT_U_1(message + 3);
+                src_plen = EXTRACT_U_1(message + 4);
                 rc = network_prefix(ae, plen, 0, message + 2 + parsed_len,
                                     NULL, len - parsed_len, prefix);
                 if(rc < 0) goto invalid;
@@ -682,11 +682,11 @@ babel_print_v2(netdissect_options *ndo,
                 const u_char *router_id = NULL;
                 ND_PRINT((ndo, "\n\tSS-MH-Request "));
                 if(len < 14) goto invalid;
-                ae = message[2];
-                plen = message[3];
+                ae = EXTRACT_U_1(message + 2);
+                plen = EXTRACT_U_1(message + 3);
                 seqno = EXTRACT_BE_U_2(message + 4);
-                hopc = message[6];
-                src_plen = message[7];
+                hopc = EXTRACT_U_1(message + 6);
+                src_plen = EXTRACT_U_1(message + 7);
                 router_id = message + 8;
                 rc = network_prefix(ae, plen, 0, message + 2 + parsed_len,
                                     NULL, len - parsed_len, prefix);

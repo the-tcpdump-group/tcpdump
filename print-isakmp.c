@@ -987,7 +987,7 @@ ikev1_attr_print(netdissect_options *ndo, const u_char *p, const u_char *ep2)
 	ND_PRINT((ndo,"type=#%d ", t));
 	if (EXTRACT_U_1(p) & 0x80) {
 		ND_PRINT((ndo,"value="));
-		t = p[2];
+		t = EXTRACT_U_1(p + 2);
 		if (!rawprint(ndo, (const uint8_t *)(p + 2), 2)) {
 			ND_PRINT((ndo,")"));
 			goto trunc;

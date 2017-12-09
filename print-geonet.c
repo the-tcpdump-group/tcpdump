@@ -64,8 +64,8 @@ print_btp_body(netdissect_options *ndo,
 	const char *msg_type_str;
 
 	/* Assuming ItsDpuHeader */
-	version = bp[0];
-	msg_type = bp[1];
+	version = EXTRACT_U_1(bp);
+	msg_type = EXTRACT_U_1(bp + 1);
 	msg_type_str = tok2str(msg_type_values, "unknown (%u)", msg_type);
 
 	ND_PRINT((ndo, "; ItsPduHeader v:%d t:%d-%s", version, msg_type, msg_type_str));
@@ -133,7 +133,7 @@ geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	hdr_type = bp[1] >> 4;
 	hdr_subtype = bp[1] & 0x0f;
 	payload_length = EXTRACT_BE_U_2(bp + 4);
-	hop_limit = bp[7];
+	hop_limit = EXTRACT_U_1(bp + 7);
 
 	switch (next_hdr) {
 		case 0: next_hdr_txt = "Any"; break;

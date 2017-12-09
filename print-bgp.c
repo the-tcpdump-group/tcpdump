@@ -540,7 +540,7 @@ decode_prefix4(netdissect_options *ndo,
 
 	ND_TCHECK_1(pptr);
 	ITEMCHECK(1);
-	plen = pptr[0];
+	plen = EXTRACT_U_1(pptr);
 	if (32 < plen)
 		return -1;
 	itemlen -= 1;
@@ -574,7 +574,7 @@ decode_labeled_prefix4(netdissect_options *ndo,
 	/* prefix length and label = 4 bytes */
 	ND_TCHECK_4(pptr);
 	ITEMCHECK(4);
-	plen = pptr[0];   /* get prefix length */
+	plen = EXTRACT_U_1(pptr);   /* get prefix length */
 
         /* this is one of the weirdnesses of rfc3107
            the label length (actually the label + COS bits)
@@ -771,7 +771,7 @@ decode_rt_routing_info(netdissect_options *ndo,
 
 	/* NLRI "prefix length" from RFC 2858 Section 4. */
 	ND_TCHECK_1(pptr);
-	plen = pptr[0];   /* get prefix length */
+	plen = EXTRACT_U_1(pptr);   /* get prefix length */
 
 	/* NLRI "prefix" (ibid), valid lengths are { 0, 32, 33, ..., 96 } bits.
 	 * RFC 4684 Section 4 defines the layout of "origin AS" and "route
@@ -825,7 +825,7 @@ decode_labeled_vpn_prefix4(netdissect_options *ndo,
 	u_int plen;
 
 	ND_TCHECK_1(pptr);
-	plen = pptr[0];   /* get prefix length */
+	plen = EXTRACT_U_1(pptr);   /* get prefix length */
 
 	if ((24+64) > plen)
 		return -1;
@@ -1138,7 +1138,7 @@ decode_prefix6(netdissect_options *ndo,
 
 	ND_TCHECK_1(pd);
 	ITEMCHECK(1);
-	plen = pd[0];
+	plen = EXTRACT_U_1(pd);
 	if (128 < plen)
 		return -1;
 	itemlen -= 1;
@@ -1172,7 +1172,7 @@ decode_labeled_prefix6(netdissect_options *ndo,
 	/* prefix length and label = 4 bytes */
 	ND_TCHECK_4(pptr);
 	ITEMCHECK(4);
-	plen = pptr[0]; /* get prefix length */
+	plen = EXTRACT_U_1(pptr); /* get prefix length */
 
 	if (24 > plen)
 		return -1;
@@ -1215,7 +1215,7 @@ decode_labeled_vpn_prefix6(netdissect_options *ndo,
 	u_int plen;
 
 	ND_TCHECK_1(pptr);
-	plen = pptr[0];   /* get prefix length */
+	plen = EXTRACT_U_1(pptr);   /* get prefix length */
 
 	if ((24+64) > plen)
 		return -1;
@@ -1254,7 +1254,7 @@ decode_clnp_prefix(netdissect_options *ndo,
 	u_int plen;
 
 	ND_TCHECK_1(pptr);
-	plen = pptr[0]; /* get prefix length */
+	plen = EXTRACT_U_1(pptr); /* get prefix length */
 
 	if (152 < plen)
 		return -1;
@@ -1284,7 +1284,7 @@ decode_labeled_vpn_clnp_prefix(netdissect_options *ndo,
 	u_int plen;
 
 	ND_TCHECK_1(pptr);
-	plen = pptr[0];   /* get prefix length */
+	plen = EXTRACT_U_1(pptr);   /* get prefix length */
 
 	if ((24+64) > plen)
 		return -1;
@@ -1606,7 +1606,7 @@ bgp_attr_print(netdissect_options *ndo,
                 tptr +=3;
 
 		ND_TCHECK_1(tptr);
-		nhlen = tptr[0];
+		nhlen = EXTRACT_U_1(tptr);
                 tlen = nhlen;
                 tptr++;
 
@@ -1739,7 +1739,7 @@ bgp_attr_print(netdissect_options *ndo,
 		tptr += tlen;
 
 		ND_TCHECK_1(tptr);
-		snpa = tptr[0];
+		snpa = EXTRACT_U_1(tptr);
 		tptr++;
 
 		if (snpa) {
@@ -1907,7 +1907,7 @@ bgp_attr_print(netdissect_options *ndo,
 	case BGPTYPE_MP_UNREACH_NLRI:
 		ND_TCHECK2(tptr[0], BGP_MP_NLRI_MINSIZE);
 		af = EXTRACT_BE_U_2(tptr);
-		safi = tptr[2];
+		safi = EXTRACT_U_1(tptr + 2);
 
                 ND_PRINT((ndo, "\n\t    AFI: %s (%u), %sSAFI: %s (%u)",
                        tok2str(af_values, "Unknown AFI", af),
@@ -2347,8 +2347,8 @@ bgp_capabilities_print(netdissect_options *ndo,
 
         while (i < caps_len) {
                 ND_TCHECK2(opt[i], BGP_CAP_HEADER_SIZE);
-                cap_type=opt[i];
-                cap_len=opt[i+1];
+                cap_type=EXTRACT_U_1(opt + i);
+                cap_len=EXTRACT_U_1(opt + i + 1);
                 tcap_len=cap_len;
                 ND_PRINT((ndo, "\n\t      %s (%u), length: %u",
                        tok2str(bgp_capcode_values, "Unknown",

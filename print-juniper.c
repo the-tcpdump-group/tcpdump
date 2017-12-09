@@ -1195,7 +1195,7 @@ juniper_parse_header(netdissect_options *ndo,
     l2info->length = h->len;
     l2info->caplen = h->caplen;
     ND_TCHECK_4(p);
-    l2info->flags = p[3];
+    l2info->flags = EXTRACT_U_1(p + 3);
     l2info->direction = p[3]&JUNIPER_BPF_PKT_IN;
 
     if (EXTRACT_BE_U_3(p) != JUNIPER_MGC_NUMBER) { /* magic number found ? */
@@ -1361,7 +1361,7 @@ juniper_parse_header(netdissect_options *ndo,
                 if (ndo->ndo_eflag)
                     ND_PRINT((ndo, ", cookie 0x"));
                 for (idx = 0; idx < l2info->cookie_len; idx++) {
-                    l2info->cookie[idx] = p[idx]; /* copy cookie data */
+                    l2info->cookie[idx] = EXTRACT_U_1(p + idx); /* copy cookie data */
                     if (ndo->ndo_eflag) ND_PRINT((ndo, "%02x", EXTRACT_U_1(p + idx)));
                 }
             }

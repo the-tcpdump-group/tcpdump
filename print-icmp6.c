@@ -1498,7 +1498,7 @@ mldv2_query_print(netdissect_options *ndo, const u_char *bp, u_int len)
 		ND_PRINT((ndo," robustness=%d", EXTRACT_U_1(bp + 24) & 0x07));
 	}
 	if (EXTRACT_U_1(bp + 25) < 128) {
-		qqi = bp[25];
+		qqi = EXTRACT_U_1(bp + 25);
 	} else {
 		qqi = ((bp[25] & 0x0f) | 0x10) << (((bp[25] & 0x70) >> 4) + 3);
 	}

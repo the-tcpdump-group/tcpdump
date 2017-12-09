@@ -395,7 +395,7 @@ unistr(netdissect_options *ndo,
 	    if (l >= MAX_UNISTR_SIZE)
 		break;
 	    if (ND_ISPRINT(EXTRACT_U_1(s)))
-		buf[l] = s[0];
+		buf[l] = EXTRACT_U_1(s);
 	    else {
 		if (EXTRACT_U_1(s) == 0)
 		    break;
@@ -412,7 +412,7 @@ unistr(netdissect_options *ndo,
 		break;
 	    if (EXTRACT_U_1(s + 1) == 0 && ND_ISPRINT(EXTRACT_U_1(s))) {
 		/* It's a printable ASCII character */
-		buf[l] = s[0];
+		buf[l] = EXTRACT_U_1(s);
 	    } else {
 		/* It's a non-ASCII character or a non-printable ASCII character */
 		if (EXTRACT_U_1(s) == 0 && EXTRACT_U_1(s + 1) == 0)
@@ -496,7 +496,7 @@ smb_fdata1(netdissect_options *ndo,
 	  {
 	    unsigned int x;
 	    ND_TCHECK_1(buf);
-	    x = buf[0];
+	    x = EXTRACT_U_1(buf);
 	    ND_PRINT((ndo, "%u (0x%x)", x, x));
 	    buf += 1;
 	    fmt++;
@@ -555,7 +555,7 @@ smb_fdata1(netdissect_options *ndo,
 	  {
 	    unsigned int x;
 	    ND_TCHECK_1(buf);
-	    x = buf[0];
+	    x = EXTRACT_U_1(buf);
 	    ND_PRINT((ndo, "0x%X", x));
 	    buf += 1;
 	    fmt++;
@@ -590,7 +590,7 @@ smb_fdata1(netdissect_options *ndo,
 
 	    case 'b':
 		ND_TCHECK_1(buf);
-		stringlen = buf[0];
+		stringlen = EXTRACT_U_1(buf);
 		ND_PRINT((ndo, "%u", stringlen));
 		buf += 1;
 		break;
@@ -717,7 +717,7 @@ smb_fdata1(netdissect_options *ndo,
 		break;
 	    case 2:
 		ND_TCHECK_1(buf + 15);
-		name_type = buf[15];
+		name_type = EXTRACT_U_1(buf + 15);
 		ND_PRINT((ndo, "%-15.15s NameType=0x%02X (%s)", buf, name_type,
 		    name_type_str(name_type)));
 		buf += 16;
