@@ -166,7 +166,7 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		return (length);
 	}
 
-	dsap_field = *p;
+	dsap_field = EXTRACT_U_1(p);
 	ssap_field = EXTRACT_U_1(p + 1);
 
 	/*
