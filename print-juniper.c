@@ -1196,7 +1196,7 @@ juniper_parse_header(netdissect_options *ndo,
     l2info->caplen = h->caplen;
     ND_TCHECK_4(p);
     l2info->flags = EXTRACT_U_1(p + 3);
-    l2info->direction = p[3]&JUNIPER_BPF_PKT_IN;
+    l2info->direction = EXTRACT_U_1(p + 3) & JUNIPER_BPF_PKT_IN;
 
     if (EXTRACT_BE_U_3(p) != JUNIPER_MGC_NUMBER) { /* magic number found ? */
         ND_PRINT((ndo, "no magic-number found!"));

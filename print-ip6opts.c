@@ -52,7 +52,7 @@ ip6_sopt_print(netdissect_options *ndo, const u_char *bp, int len)
 	    optlen = 1;
 	else {
 	    if (i + 1 < len)
-		optlen = bp[i + 1] + 2;
+		optlen = EXTRACT_U_1(bp + i + 1) + 2;
 	    else
 		goto trunc;
 	}
@@ -98,7 +98,7 @@ ip6_opt_print(netdissect_options *ndo, const u_char *bp, int len)
 	    optlen = 1;
 	else {
 	    if (i + 1 < len)
-		optlen = bp[i + 1] + 2;
+		optlen = EXTRACT_U_1(bp + i + 1) + 2;
 	    else
 		goto trunc;
 	}

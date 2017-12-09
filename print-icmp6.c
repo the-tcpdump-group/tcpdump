@@ -1433,7 +1433,8 @@ mldv2_report_print(netdissect_options *ndo, const u_char *bp, u_int len)
             ND_PRINT((ndo," [gaddr %s", ip6addr_string(ndo, bp + group + 4)));
 	    ND_PRINT((ndo," %s", tok2str(mldv2report2str, " [v2-report-#%d]",
                                          EXTRACT_U_1(bp + group))));
-            nsrcs = (bp[group + 2] << 8) + bp[group + 3];
+            nsrcs = (EXTRACT_U_1(bp + group + 2) << 8) +
+		     EXTRACT_U_1(bp + group + 3);
 	    /* Check the number of sources and print them */
 	    if (len < group + 20 + (nsrcs * sizeof(struct in6_addr))) {
                     ND_PRINT((ndo," [invalid number of sources %d]", nsrcs));
@@ -1500,7 +1501,8 @@ mldv2_query_print(netdissect_options *ndo, const u_char *bp, u_int len)
 	if (EXTRACT_U_1(bp + 25) < 128) {
 		qqi = EXTRACT_U_1(bp + 25);
 	} else {
-		qqi = ((bp[25] & 0x0f) | 0x10) << (((bp[25] & 0x70) >> 4) + 3);
+		qqi = ((EXTRACT_U_1(bp + 25) & 0x0f) | 0x10) <<
+		       (((EXTRACT_U_1(bp + 25) & 0x70) >> 4) + 3);
 	}
 	ND_PRINT((ndo," qqi=%d", qqi));
     }

@@ -111,8 +111,8 @@ vrrp_print(netdissect_options *ndo,
 	const char *type_s;
 
 	ND_TCHECK_1(bp);
-	version = (bp[0] & 0xf0) >> 4;
-	type = bp[0] & 0x0f;
+	version = (EXTRACT_U_1(bp) & 0xf0) >> 4;
+	type = EXTRACT_U_1(bp) & 0x0f;
 	type_s = tok2str(type2str, "unknown type (%u)", type);
 	ND_PRINT((ndo, "VRRPv%u, %s", version, type_s));
 	if (ttl != 255)
@@ -128,7 +128,7 @@ vrrp_print(netdissect_options *ndo,
 		ND_PRINT((ndo, ", authtype %s", tok2str(auth2str, NULL, auth_type)));
 		ND_PRINT((ndo, ", intvl %us, length %u", EXTRACT_U_1(bp + 5), len));
 	} else { /* version == 3 */
-		uint16_t intvl = (bp[4] & 0x0f) << 8 | bp[5];
+		uint16_t intvl = (EXTRACT_U_1(bp + 4) & 0x0f) << 8 | EXTRACT_U_1(bp + 5);
 		ND_PRINT((ndo, ", intvl %ucs, length %u", intvl, len));
 	}
 

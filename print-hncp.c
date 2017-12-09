@@ -212,7 +212,7 @@ print_prefix(netdissect_options *ndo, const u_char *prefix, u_int max_length)
         struct in_addr addr;
         u_int plen;
 
-        plen = prefix[0]-96;
+        plen = EXTRACT_U_1(prefix) - 96;
         if (32 < plen)
             return -1;
         max_length -= 1;
@@ -730,7 +730,7 @@ hncp_print_rec(netdissect_options *ndo,
                 ND_PRINT((ndo, " %s", istr));
                 break;
             }
-            prty = value[4] & 0xf;
+            prty = EXTRACT_U_1(value + 4) & 0xf;
             ND_PRINT((ndo, " EPID: %08x Prty: %u",
                 EXTRACT_BE_U_4(value),
                 prty

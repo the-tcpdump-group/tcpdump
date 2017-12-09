@@ -128,10 +128,10 @@ geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		goto invalid;
 
 	ND_TCHECK_8(bp);
-	version = bp[0] >> 4;
-	next_hdr = bp[0] & 0x0f;
-	hdr_type = bp[1] >> 4;
-	hdr_subtype = bp[1] & 0x0f;
+	version = EXTRACT_U_1(bp) >> 4;
+	next_hdr = EXTRACT_U_1(bp) & 0x0f;
+	hdr_type = EXTRACT_U_1(bp + 1) >> 4;
+	hdr_subtype = EXTRACT_U_1(bp + 1) & 0x0f;
 	payload_length = EXTRACT_BE_U_2(bp + 4);
 	hop_limit = EXTRACT_U_1(bp + 7);
 

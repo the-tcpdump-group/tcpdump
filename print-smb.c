@@ -808,7 +808,7 @@ print_smb(netdissect_options *ndo,
     int smboffset;
 
     ND_TCHECK_1(buf + 9);
-    request = (buf[9] & 0x80) ? 0 : 1;
+    request = (EXTRACT_U_1(buf + 9) & 0x80) ? 0 : 1;
     startbuf = buf;
 
     command = EXTRACT_U_1(buf + 4);
@@ -1112,10 +1112,10 @@ nbt_udp137_print(netdissect_options *ndo,
 
     ND_TCHECK_2(data + 10);
     name_trn_id = EXTRACT_BE_U_2(data);
-    response = (data[2] >> 7);
-    opcode = (data[2] >> 3) & 0xF;
-    nm_flags = ((data[2] & 0x7) << 4) + (data[3] >> 4);
-    rcode = data[3] & 0xF;
+    response = (EXTRACT_U_1(data + 2) >> 7);
+    opcode = (EXTRACT_U_1(data + 2) >> 3) & 0xF;
+    nm_flags = ((EXTRACT_U_1(data + 2) & 0x7) << 4) + (EXTRACT_U_1(data + 3) >> 4);
+    rcode = EXTRACT_U_1(data + 3) & 0xF;
     qdcount = EXTRACT_BE_U_2(data + 4);
     ancount = EXTRACT_BE_U_2(data + 6);
     nscount = EXTRACT_BE_U_2(data + 8);

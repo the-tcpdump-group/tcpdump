@@ -52,8 +52,8 @@ carp_print(netdissect_options *ndo, register const u_char *bp, register u_int le
 	const char *type_s;
 
 	ND_TCHECK_1(bp);
-	version = (bp[0] & 0xf0) >> 4;
-	type = bp[0] & 0x0f;
+	version = (EXTRACT_U_1(bp) & 0xf0) >> 4;
+	type = EXTRACT_U_1(bp) & 0x0f;
 	if (type == 1)
 		type_s = "advertise";
 	else

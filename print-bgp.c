@@ -1351,7 +1351,7 @@ bgp_attr_get_as_size(netdissect_options *ndo,
             goto trunc;
         }
         ND_TCHECK_1(tptr + 1);
-        tptr += 2 + tptr[1] * 2;
+        tptr += 2 + EXTRACT_U_1(tptr + 1) * 2;
     }
 
     /*
@@ -1446,7 +1446,7 @@ bgp_attr_print(netdissect_options *ndo,
                         ND_PRINT((ndo, "%s", tok2str(bgp_as_path_segment_close_values,
 						"?", EXTRACT_U_1(tptr))));
                         ND_TCHECK_1(tptr + 1);
-                        tptr += 2 + tptr[1] * as_size;
+                        tptr += 2 + EXTRACT_U_1(tptr + 1) * as_size;
 		}
 		break;
 	case BGPTYPE_NEXT_HOP:
@@ -1747,7 +1747,7 @@ bgp_attr_print(netdissect_options *ndo,
 			for (/*nothing*/; snpa > 0; snpa--) {
 				ND_TCHECK_1(tptr);
 				ND_PRINT((ndo, "\n\t      %d bytes", EXTRACT_U_1(tptr)));
-				tptr += tptr[0] + 1;
+				tptr += EXTRACT_U_1(tptr) + 1;
 			}
 		} else {
 			ND_PRINT((ndo, ", no SNPA"));

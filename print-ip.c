@@ -68,7 +68,7 @@ ip_printroute(netdissect_options *ndo,
 	if ((length + 1) & 3)
 		ND_PRINT((ndo, " [bad length %u]", length));
 	ND_TCHECK_1(cp + 2);
-	ptr = cp[2] - 1;
+	ptr = EXTRACT_U_1(cp + 2) - 1;
 	if (ptr < 3 || ((ptr + 1) & 3) || ptr > length + 1)
 		ND_PRINT((ndo, " [bad ptr %u]", EXTRACT_U_1(cp + 2)));
 
@@ -182,11 +182,12 @@ ip_printts(netdissect_options *ndo,
 		return (0);
 	}
 	ND_PRINT((ndo, " TS{"));
-	hoplen = ((cp[3]&0xF) != IPOPT_TS_TSONLY) ? 8 : 4;
+	ND_TCHECK_1(cp + 3);
+	hoplen = ((EXTRACT_U_1(cp + 3) & 0xF) != IPOPT_TS_TSONLY) ? 8 : 4;
 	if ((length - 4) & (hoplen-1))
 		ND_PRINT((ndo, "[bad length %u]", length));
 	ND_TCHECK_1(cp + 2);
-	ptr = cp[2] - 1;
+	ptr = EXTRACT_U_1(cp + 2) - 1;
 	len = 0;
 	if (ptr < 4 || ((ptr - 4) & (hoplen-1)) || ptr > length + 1)
 		ND_PRINT((ndo, "[bad ptr %u]", EXTRACT_U_1(cp + 2)));

@@ -124,7 +124,7 @@ mobility_opt_print(netdissect_options *ndo,
 		else {
 			if (i + 1 < len) {
 				ND_TCHECK_1(bp + i + 1);
-				optlen = bp[i + 1] + 2;
+				optlen = EXTRACT_U_1(bp + i + 1) + 2;
 			}
 			else
 				goto trunc;

@@ -501,12 +501,12 @@ babel_print_v2(netdissect_options *ndo,
                 u_char prefix[16];
                 ND_PRINT((ndo, "\n\tUpdate"));
                 if(len < 10) goto invalid;
-                plen = message[4] + (message[2] == 1 ? 96 : 0);
+                plen = EXTRACT_U_1(message + 4) + (EXTRACT_U_1(message + 2) == 1 ? 96 : 0);
                 rc = network_prefix(EXTRACT_U_1(message + 2),
                                     EXTRACT_U_1(message + 4),
                                     EXTRACT_U_1(message + 5),
                                     message + 12,
-                                    message[2] == 1 ? v4_prefix : v6_prefix,
+                                    EXTRACT_U_1(message + 2) == 1 ? v4_prefix : v6_prefix,
                                     len - 10, prefix);
                 if(rc < 0) goto invalid;
                 interval = EXTRACT_BE_U_2(message + 6);
@@ -539,7 +539,7 @@ babel_print_v2(netdissect_options *ndo,
                 u_char prefix[16], plen;
                 ND_PRINT((ndo, "\n\tRequest "));
                 if(len < 2) goto invalid;
-                plen = message[3] + (message[2] == 1 ? 96 : 0);
+                plen = EXTRACT_U_1(message + 3) + (EXTRACT_U_1(message + 2) == 1 ? 96 : 0);
                 rc = network_prefix(EXTRACT_U_1(message + 2),
                                     EXTRACT_U_1(message + 3), 0,
                                     message + 4, NULL, len - 2, prefix);
@@ -564,7 +564,7 @@ babel_print_v2(netdissect_options *ndo,
                                     EXTRACT_U_1(message + 3), 0,
                                     message + 16, NULL, len - 14, prefix);
                 if(rc < 0) goto invalid;
-                plen = message[3] + (message[2] == 1 ? 96 : 0);
+                plen = EXTRACT_U_1(message + 3) + (EXTRACT_U_1(message + 2) == 1 ? 96 : 0);
                 ND_PRINT((ndo, "(%u hops) for %s seqno %u id %s",
                        EXTRACT_U_1(message + 6), format_prefix(ndo, prefix, plen),
                        seqno, format_id(message + 8)));

@@ -103,7 +103,7 @@ interpret_long_date(const u_char *p)
     time_t ret;
 
     /* this gives us seconds since jan 1st 1601 (approx) */
-    d = (EXTRACT_LE_U_4(p + 4) * 256.0 + p[3]) * (1.0e-7 * (1 << 24));
+    d = (EXTRACT_LE_U_4(p + 4) * 256.0 + EXTRACT_U_1(p + 3)) * (1.0e-7 * (1 << 24));
 
     /* now adjust by 369 years to make the secs since 1970 */
     d -= 369.0 * 365.25 * 24 * 60 * 60;
@@ -150,7 +150,7 @@ name_interpret(netdissect_options *ndo,
 	    *out = 0;
 	    return(0);
 	}
-	*out = ((in[0] - 'A') << 4) + (in[1] - 'A');
+	*out = ((EXTRACT_U_1(in) - 'A') << 4) + (EXTRACT_U_1(in + 1) - 'A');
 	in += 2;
 	out++;
     }
