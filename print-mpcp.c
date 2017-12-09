@@ -184,13 +184,13 @@ mpcp_print(netdissect_options *ndo, register const u_char *pptr, register u_int 
 
     case MPCP_OPCODE_REPORT:
         ND_TCHECK2(*tptr, MPCP_REPORT_QUEUESETS_LEN);
-        queue_sets = *tptr;
+        queue_sets = EXTRACT_U_1(tptr);
         tptr+=MPCP_REPORT_QUEUESETS_LEN;
         ND_PRINT((ndo, "\n\tTotal Queue-Sets %u", queue_sets));
 
         for (queue_set = 1; queue_set < queue_sets; queue_set++) {
             ND_TCHECK2(*tptr, MPCP_REPORT_REPORTBITMAP_LEN);
-            report_bitmap = *(tptr);
+            report_bitmap = EXTRACT_U_1(tptr);
             ND_PRINT((ndo, "\n\t  Queue-Set #%u, Report-Bitmap [ %s ]",
                    queue_sets,
                    bittok2str(mpcp_report_bitmap_values, "Unknown", report_bitmap)));
