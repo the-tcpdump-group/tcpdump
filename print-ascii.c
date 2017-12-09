@@ -67,7 +67,8 @@ ascii_print(netdissect_options *ndo,
 		length = caplength;
 	ND_PRINT((ndo, "\n"));
 	while (length > 0) {
-		s = *cp++;
+		s = EXTRACT_U_1(cp);
+		cp++;
 		length--;
 		if (s == '\r') {
 			/*
