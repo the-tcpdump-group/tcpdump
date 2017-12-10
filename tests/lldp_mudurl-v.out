@@ -17,15 +17,15 @@
 	  Management Address length 17, AFI IPv6 (2): 2001:8a8:1006:4:223:54ff:fec2:5702
 	  Interface Index Interface Numbering (2): 2
 	Port Description TLV (4), length 4: eth0
-	Organization specific TLV (127), length 9: OUI IEEE 802.3 Private (0x00120f)
+	Organization specific TLV (127), length 9: OUI IEEE 802.3 (0x00120f)
 	  Link aggregation Subtype (3)
 	    aggregation status [supported], aggregation port ID 0
-	Organization specific TLV (127), length 9: OUI IEEE 802.3 Private (0x00120f)
+	Organization specific TLV (127), length 9: OUI IEEE 802.3 (0x00120f)
 	  MAC/PHY configuration/status Subtype (1)
 	    autonegotiation [supported, enabled] (0x03)
 	    PMD autoneg capability [10BASE-T hdx, 10BASE-T fdx, 100BASE-TX hdx, 100BASE-TX fdx, Pause for fdx links, Asym PAUSE for fdx, 1000BASE-T hdx, 1000BASE-T fdx] (0xecc3)
 	    MAU type 100BASETX fdx (0x0010)
-	Organization specific TLV (127), length 64: OUI IANA (0x00005e)
+	Organization specific TLV (127), length 64: OUI ICANN, IANA Department (0x00005e)
 	  MUD-URL Subtype (1)
 	  MUD-URL=https://imright.mud.example.com/.well-known/mud/v1/vomitv2.0
 	End TLV (0), length 0
@@ -48,15 +48,15 @@
 	  Management Address length 17, AFI IPv6 (2): 2001:8a8:1006:4:223:54ff:fec2:5702
 	  Interface Index Interface Numbering (2): 2
 	Port Description TLV (4), length 4: eth0
-	Organization specific TLV (127), length 9: OUI IEEE 802.3 Private (0x00120f)
+	Organization specific TLV (127), length 9: OUI IEEE 802.3 (0x00120f)
 	  Link aggregation Subtype (3)
 	    aggregation status [supported], aggregation port ID 0
-	Organization specific TLV (127), length 9: OUI IEEE 802.3 Private (0x00120f)
+	Organization specific TLV (127), length 9: OUI IEEE 802.3 (0x00120f)
 	  MAC/PHY configuration/status Subtype (1)
 	    autonegotiation [supported, enabled] (0x03)
 	    PMD autoneg capability [10BASE-T hdx, 10BASE-T fdx, 100BASE-TX hdx, 100BASE-TX fdx, Pause for fdx links, Asym PAUSE for fdx, 1000BASE-T hdx, 1000BASE-T fdx] (0xecc3)
 	    MAU type 100BASETX fdx (0x0010)
-	Organization specific TLV (127), length 64: OUI IANA (0x00005e)
+	Organization specific TLV (127), length 64: OUI ICANN, IANA Department (0x00005e)
 	  MUD-URL Subtype (1)
 	  MUD-URL=https://imright.mud.example.com/.well-known/mud/v1/vomitv2.0
 	End TLV (0), length 0

@@ -456,7 +456,7 @@ IP (tos 0x0, ttl 64, id 783, offset 0, flags [DF], proto TCP (6), length 1500)
 	version 1.0, type FLOW_MOD, length 144, xid 0x00000010
 	 match in_port 4
 	 cookie 0x000000000000000b, command ADD, priority 54311, buffer_id NONE, flags 0x0001 (SEND_FLOW_REM)
-	 action type VENDOR, len 72, vendor 0x00001234 (unknown)
+	 action type VENDOR, len 72, vendor 0x00001234 (Camille Bauer)
 	 data (64 octets)
 	  0x0000:  4469 6420 796f 7520 6b6e 6f77 2076 656e  Did.you.know.ven
 	  0x0010:  646f 7220 6163 7469 6f6e 2064 6174 6120  dor.action.data.

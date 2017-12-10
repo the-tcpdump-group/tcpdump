@@ -358,6 +358,7 @@ EXTRA_DIST = \
 	smbutil.c \
 	stime.awk \
 	tcpdump.1.in \
+	update-oui-database.sh \
 	vfprintf.c \
 	win32/prj/GNUmakefile \
 	win32/prj/WinDump.dsp \

@@ -19,24 +19,24 @@ LLDP, length 87
 	  0x0000:  0308 0027 42ba 59
 	Time to Live TLV (3), length 2: TTL 120s
 	  0x0000:  0078
-	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 6: OUI IEEE 802.1 Working Group (0x0080c2)
 	  Port VLAN Id Subtype (1)
 	    port vlan id (PVID): 1
 	  0x0000:  0080 c201 0001
-	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 7: OUI IEEE 802.1 Working Group (0x0080c2)
 	  Port and Protocol VLAN ID Subtype (2)
 	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
 	  0x0000:  0080 c202 0200 00
-	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 14: OUI IEEE 802.1 Working Group (0x0080c2)
 	  VLAN name Subtype (3)
 	    vlan id (VID): 1
 	    vlan name: default
 	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
-	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 13: OUI IEEE 802.1 Working Group (0x0080c2)
 	  Protocol Identity Subtype (4)
 	    protocol identity: 
 	  0x0000:  0080 c204 0800 0042 4203 0000 00
-	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 6: OUI IEEE 802.1 Working Group (0x0080c2)
 	  Priority Flow Control Configuration Subtype (11)
 	    Willing: 0, MBC: 0, RES: 0, PFC cap:4 
 	    PFC Enable
@@ -53,24 +53,24 @@ LLDP, length 87
 	  0x0000:  0308 0027 42ba 59
 	Time to Live TLV (3), length 2: TTL 120s
 	  0x0000:  0078
-	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 6: OUI IEEE 802.1 Working Group (0x0080c2)
 	  Port VLAN Id Subtype (1)
 	    port vlan id (PVID): 1
 	  0x0000:  0080 c201 0001
-	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 7: OUI IEEE 802.1 Working Group (0x0080c2)
 	  Port and Protocol VLAN ID Subtype (2)
 	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
 	  0x0000:  0080 c202 0200 00
-	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 14: OUI IEEE 802.1 Working Group (0x0080c2)
 	  VLAN name Subtype (3)
 	    vlan id (VID): 1
 	    vlan name: default
 	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
-	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 13: OUI IEEE 802.1 Working Group (0x0080c2)
 	  Protocol Identity Subtype (4)
 	    protocol identity: 
 	  0x0000:  0080 c204 0800 0042 4203 0000 00
-	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 6: OUI IEEE 802.1 Working Group (0x0080c2)
 	  Priority Flow Control Configuration Subtype (11)
 	    Willing: 0, MBC: 0, RES: 0, PFC cap:4 
 	    PFC Enable
@@ -87,24 +87,24 @@ LLDP, length 87
 	  0x0000:  0308 0027 0df1 3c
 	Time to Live TLV (3), length 2: TTL 120s
 	  0x0000:  0078
-	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 6: OUI IEEE 802.1 Working Group (0x0080c2)
 	  Port VLAN Id Subtype (1)
 	    port vlan id (PVID): 1
 	  0x0000:  0080 c201 0001
-	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 7: OUI IEEE 802.1 Working Group (0x0080c2)
 	  Port and Protocol VLAN ID Subtype (2)
 	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
 	  0x0000:  0080 c202 0200 00
-	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 14: OUI IEEE 802.1 Working Group (0x0080c2)
 	  VLAN name Subtype (3)
 	    vlan id (VID): 1
 	    vlan name: default
 	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
-	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 13: OUI IEEE 802.1 Working Group (0x0080c2)
 	  Protocol Identity Subtype (4)
 	    protocol identity: 
 	  0x0000:  0080 c204 0800 0042 4203 0000 00
-	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 6: OUI IEEE 802.1 Working Group (0x0080c2)
 	  Priority Flow Control Configuration Subtype (11)
 	    Willing: 0, MBC: 0, RES: 0, PFC cap:4 
 	    PFC Enable
@@ -121,24 +121,24 @@ LLDP, length 87
 	  0x0000:  0308 0027 0df1 3c
 	Time to Live TLV (3), length 2: TTL 120s
 	  0x0000:  0078
-	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 6: OUI IEEE 802.1 Working Group (0x0080c2)
 	  Port VLAN Id Subtype (1)
 	    port vlan id (PVID): 1
 	  0x0000:  0080 c201 0001
-	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 7: OUI IEEE 802.1 Working Group (0x0080c2)
 	  Port and Protocol VLAN ID Subtype (2)
 	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
 	  0x0000:  0080 c202 0200 00
-	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 14: OUI IEEE 802.1 Working Group (0x0080c2)
 	  VLAN name Subtype (3)
 	    vlan id (VID): 1
 	    vlan name: default
 	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
-	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 13: OUI IEEE 802.1 Working Group (0x0080c2)
 	  Protocol Identity Subtype (4)
 	    protocol identity: 
 	  0x0000:  0080 c204 0800 0042 4203 0000 00
-	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 6: OUI IEEE 802.1 Working Group (0x0080c2)
 	  Priority Flow Control Configuration Subtype (11)
 	    Willing: 0, MBC: 0, RES: 0, PFC cap:4 
 	    PFC Enable
