@@ -48,7 +48,7 @@ ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
             const struct ip6_hdr *ip6)
 {
 	const u_char *cp;
-	int advance;
+	u_int advance;
 	u_int nh;
 	const void *dst_addr;
 	const struct ip6_rthdr *dp;
@@ -76,9 +76,9 @@ ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
 			 * the header, in units of 8 octets, excluding
 			 * the first 8 octets.
 			 */
-			ND_TCHECK2(*cp, 2);
-			advance = (int)((*(cp + 1) + 1) << 3);
-			nh = *cp;
+			ND_TCHECK_2(cp);
+			advance = (EXTRACT_U_1(cp + 1) + 1) << 3;
+			nh = EXTRACT_U_1(cp);
 			break;
 
 		case IPPROTO_FRAGMENT:
@@ -87,9 +87,9 @@ ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
 			 * marked as reserved, and the header is always
 			 * the same size.
 			 */
-			ND_TCHECK2(*cp, 1);
+			ND_TCHECK_1(cp);
 			advance = sizeof(struct ip6_frag);
-			nh = *cp;
+			nh = EXTRACT_U_1(cp);
 			break;
 
 		case IPPROTO_ROUTING:
@@ -219,7 +219,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	const u_char *ipend;
 	register const u_char *cp;
 	register u_int payload_len;
-	int nh;
+	u_int nh;
 	int fragmented = 0;
 	u_int flow;
 
@@ -239,14 +239,14 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
           return;
 	}
 
-	payload_len = EXTRACT_16BITS(&ip6->ip6_plen);
+	payload_len = EXTRACT_BE_U_2(&ip6->ip6_plen);
 	len = payload_len + sizeof(struct ip6_hdr);
 	if (length < len)
 		ND_PRINT((ndo, "truncated-ip6 - %u bytes missing!",
 			len - length));
 
         if (ndo->ndo_vflag) {
-            flow = EXTRACT_32BITS(&ip6->ip6_flow);
+            flow = EXTRACT_BE_U_4(&ip6->ip6_flow);
             ND_PRINT((ndo, "("));
 #if 0
             /* rfc1883 */
@@ -297,19 +297,19 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			advance = hbhopt_print(ndo, cp);
 			if (advance < 0)
 				return;
-			nh = *cp;
+			nh = EXTRACT_U_1(cp);
 			break;
 		case IPPROTO_DSTOPTS:
 			advance = dstopt_print(ndo, cp);
 			if (advance < 0)
 				return;
-			nh = *cp;
+			nh = EXTRACT_U_1(cp);
 			break;
 		case IPPROTO_FRAGMENT:
 			advance = frag6_print(ndo, cp, (const u_char *)ip6);
 			if (advance < 0 || ndo->ndo_snapend <= cp + advance)
 				return;
-			nh = *cp;
+			nh = EXTRACT_U_1(cp);
 			fragmented = 1;
 			break;
 
@@ -326,14 +326,14 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			advance = mobility_print(ndo, cp, (const u_char *)ip6);
 			if (advance < 0)
 				return;
-			nh = *cp;
+			nh = EXTRACT_U_1(cp);
 			return;
 		case IPPROTO_ROUTING:
-			ND_TCHECK(*cp);
+			ND_TCHECK_1(cp);
 			advance = rt6_print(ndo, cp, (const u_char *)ip6);
 			if (advance < 0)
 				return;
-			nh = *cp;
+			nh = EXTRACT_U_1(cp);
 			break;
 		case IPPROTO_SCTP:
 			sctp_print(ndo, cp, (const u_char *)ip6, len);
@@ -354,11 +354,11 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			advance = ah_print(ndo, cp);
 			if (advance < 0)
 				return;
-			nh = *cp;
+			nh = EXTRACT_U_1(cp);
 			break;
 		case IPPROTO_ESP:
 		    {
-			int enh, padlen;
+			u_int enh, padlen;
 			advance = esp_print(ndo, cp, len, (const u_char *)ip6, &enh, &padlen);
 			if (advance < 0)
 				return;

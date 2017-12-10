@@ -157,7 +157,7 @@ medsa_print(netdissect_options *ndo,
 	length -= 8;
 	caplen -= 8;
 
-	ether_type = EXTRACT_16BITS(&medsa->ether_type);
+	ether_type = EXTRACT_BE_U_2(&medsa->ether_type);
 	if (ether_type <= ETHERMTU) {
 		/* Try to print the LLC-layer header & higher layers */
 		if (llc_print(ndo, bp, length, caplen, src, dst) < 0) {

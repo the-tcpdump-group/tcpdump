@@ -225,9 +225,9 @@ static uint64_t dccp_seqno(const u_char *bp)
 
 	if (DCCPH_X(dh) != 0) {
 		const struct dccp_hdr_ext *dhx = (const struct dccp_hdr_ext *)bp;
-		seqno = EXTRACT_48BITS(dhx->dccph_seq);
+		seqno = EXTRACT_BE_U_6(dhx->dccph_seq);
 	} else {
-		seqno = EXTRACT_24BITS(dh->dccph_seq);
+		seqno = EXTRACT_BE_U_3(dh->dccph_seq);
 	}
 
 	return seqno;
@@ -245,11 +245,11 @@ static void dccp_print_ack_no(netdissect_options *ndo, const u_char *bp)
 	uint64_t ackno;
 
 	if (DCCPH_X(dh) != 0) {
-		ND_TCHECK2(*ackp, 8);
-		ackno = EXTRACT_48BITS(ackp + 2);
+		ND_TCHECK_8(ackp);
+		ackno = EXTRACT_BE_U_6(ackp + 2);
 	} else {
-		ND_TCHECK2(*ackp, 4);
-		ackno = EXTRACT_24BITS(ackp + 1);
+		ND_TCHECK_4(ackp);
+		ackno = EXTRACT_BE_U_3(ackp + 1);
 	}
 
 	ND_PRINT((ndo, "(ack=%" PRIu64 ") ", ackno));
@@ -307,8 +307,8 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 	}
 	ND_TCHECK2(*dh, fixed_hdrlen);
 
-	sport = EXTRACT_16BITS(&dh->dccph_sport);
-	dport = EXTRACT_16BITS(&dh->dccph_dport);
+	sport = EXTRACT_BE_U_2(&dh->dccph_sport);
+	dport = EXTRACT_BE_U_2(&dh->dccph_dport);
 	hlen = dh->dccph_doff * 4;
 
 	if (ip6) {
@@ -341,7 +341,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 	if (ndo->ndo_vflag && ND_TTEST2(bp[0], len)) {
 		uint16_t sum = 0, dccp_sum;
 
-		dccp_sum = EXTRACT_16BITS(&dh->dccph_checksum);
+		dccp_sum = EXTRACT_BE_U_2(&dh->dccph_checksum);
 		ND_PRINT((ndo, "cksum 0x%04x ", dccp_sum));
 		if (IP_V(ip) == 4)
 			sum = dccp_cksum(ndo, ip, dh, len);
@@ -372,7 +372,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 		ND_TCHECK(*dhr);
 		ND_PRINT((ndo, "%s (service=%d) ",
 			  tok2str(dccp_pkt_type_str, "", dccph_type),
-			  EXTRACT_32BITS(&dhr->dccph_req_service)));
+			  EXTRACT_BE_U_4(&dhr->dccph_req_service)));
 		break;
 	}
 	case DCCP_PKT_RESPONSE: {
@@ -388,7 +388,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 		ND_TCHECK(*dhr);
 		ND_PRINT((ndo, "%s (service=%d) ",
 			  tok2str(dccp_pkt_type_str, "", dccph_type),
-			  EXTRACT_32BITS(&dhr->dccph_resp_service)));
+			  EXTRACT_BE_U_4(&dhr->dccph_resp_service)));
 		break;
 	}
 	case DCCP_PKT_DATA:
@@ -535,48 +535,48 @@ static int dccp_print_option(netdissect_options *ndo, const u_char *option, u_in
 {
 	uint8_t optlen, i;
 
-	ND_TCHECK(*option);
+	ND_TCHECK_1(option);
 
-	if (*option >= 32) {
-		ND_TCHECK(*(option+1));
-		optlen = *(option +1);
+	if (EXTRACT_U_1(option) >= 32) {
+		ND_TCHECK_1(option + 1);
+		optlen = EXTRACT_U_1(option + 1);
 		if (optlen < 2) {
-			if (*option >= 128)
-				ND_PRINT((ndo, "CCID option %u optlen too short", *option));
+			if (EXTRACT_U_1(option) >= 128)
+				ND_PRINT((ndo, "CCID option %u optlen too short", EXTRACT_U_1(option)));
 			else
 				ND_PRINT((ndo, "%s optlen too short",
-					  tok2str(dccp_option_values, "Option %u", *option)));
+					  tok2str(dccp_option_values, "Option %u", EXTRACT_U_1(option))));
 			return 0;
 		}
 	} else
 		optlen = 1;
 
 	if (hlen < optlen) {
-		if (*option >= 128)
+		if (EXTRACT_U_1(option) >= 128)
 			ND_PRINT((ndo, "CCID option %u optlen goes past header length",
-				  *option));
+				  EXTRACT_U_1(option)));
 		else
 			ND_PRINT((ndo, "%s optlen goes past header length",
-				  tok2str(dccp_option_values, "Option %u", *option)));
+				  tok2str(dccp_option_values, "Option %u", EXTRACT_U_1(option))));
 		return 0;
 	}
 	ND_TCHECK2(*option, optlen);
 
-	if (*option >= 128) {
-		ND_PRINT((ndo, "CCID option %d", *option));
+	if (EXTRACT_U_1(option) >= 128) {
+		ND_PRINT((ndo, "CCID option %d", EXTRACT_U_1(option)));
 		switch (optlen) {
 			case 4:
-				ND_PRINT((ndo, " %u", EXTRACT_16BITS(option + 2)));
+				ND_PRINT((ndo, " %u", EXTRACT_BE_U_2(option + 2)));
 				break;
 			case 6:
-				ND_PRINT((ndo, " %u", EXTRACT_32BITS(option + 2)));
+				ND_PRINT((ndo, " %u", EXTRACT_BE_U_4(option + 2)));
 				break;
 			default:
 				break;
 		}
 	} else {
-		ND_PRINT((ndo, "%s", tok2str(dccp_option_values, "Option %u", *option)));
-		switch (*option) {
+		ND_PRINT((ndo, "%s", tok2str(dccp_option_values, "Option %u", EXTRACT_U_1(option))));
+		switch (EXTRACT_U_1(option)) {
 		case 32:
 		case 33:
 		case 34:
@@ -585,61 +585,61 @@ static int dccp_print_option(netdissect_options *ndo, const u_char *option, u_in
 				ND_PRINT((ndo, " optlen too short"));
 				return optlen;
 			}
-			if (*(option + 2) < 10){
-				ND_PRINT((ndo, " %s", dccp_feature_nums[*(option + 2)]));
+			if (EXTRACT_U_1(option + 2) < 10){
+				ND_PRINT((ndo, " %s", dccp_feature_nums[EXTRACT_U_1(option + 2)]));
 				for (i = 0; i < optlen - 3; i++)
-					ND_PRINT((ndo, " %d", *(option + 3 + i)));
+					ND_PRINT((ndo, " %d", EXTRACT_U_1(option + 3 + i)));
 			}
 			break;
 		case 36:
 			if (optlen > 2) {
 				ND_PRINT((ndo, " 0x"));
 				for (i = 0; i < optlen - 2; i++)
-					ND_PRINT((ndo, "%02x", *(option + 2 + i)));
+					ND_PRINT((ndo, "%02x", EXTRACT_U_1(option + 2 + i)));
 			}
 			break;
 		case 37:
 			for (i = 0; i < optlen - 2; i++)
-				ND_PRINT((ndo, " %d", *(option + 2 + i)));
+				ND_PRINT((ndo, " %d", EXTRACT_U_1(option + 2 + i)));
 			break;
 		case 38:
 			if (optlen > 2) {
 				ND_PRINT((ndo, " 0x"));
 				for (i = 0; i < optlen - 2; i++)
-					ND_PRINT((ndo, "%02x", *(option + 2 + i)));
+					ND_PRINT((ndo, "%02x", EXTRACT_U_1(option + 2 + i)));
 			}
 			break;
 		case 39:
 			if (optlen > 2) {
 				ND_PRINT((ndo, " 0x"));
 				for (i = 0; i < optlen - 2; i++)
-					ND_PRINT((ndo, "%02x", *(option + 2 + i)));
+					ND_PRINT((ndo, "%02x", EXTRACT_U_1(option + 2 + i)));
 			}
 			break;
 		case 40:
 			if (optlen > 2) {
 				ND_PRINT((ndo, " 0x"));
 				for (i = 0; i < optlen - 2; i++)
-					ND_PRINT((ndo, "%02x", *(option + 2 + i)));
+					ND_PRINT((ndo, "%02x", EXTRACT_U_1(option + 2 + i)));
 			}
 			break;
 		case 41:
 			if (optlen == 4)
-				ND_PRINT((ndo, " %u", EXTRACT_32BITS(option + 2)));
+				ND_PRINT((ndo, " %u", EXTRACT_BE_U_4(option + 2)));
 			else
 				ND_PRINT((ndo, " optlen != 4"));
 			break;
 		case 42:
 			if (optlen == 4)
-				ND_PRINT((ndo, " %u", EXTRACT_32BITS(option + 2)));
+				ND_PRINT((ndo, " %u", EXTRACT_BE_U_4(option + 2)));
 			else
 				ND_PRINT((ndo, " optlen != 4"));
 			break;
 		case 43:
 			if (optlen == 6)
-				ND_PRINT((ndo, " %u", EXTRACT_32BITS(option + 2)));
+				ND_PRINT((ndo, " %u", EXTRACT_BE_U_4(option + 2)));
 			else if (optlen == 4)
-				ND_PRINT((ndo, " %u", EXTRACT_16BITS(option + 2)));
+				ND_PRINT((ndo, " %u", EXTRACT_BE_U_2(option + 2)));
 			else
 				ND_PRINT((ndo, " optlen != 4 or 6"));
 			break;
@@ -647,7 +647,7 @@ static int dccp_print_option(netdissect_options *ndo, const u_char *option, u_in
 			if (optlen > 2) {
 				ND_PRINT((ndo, " "));
 				for (i = 0; i < optlen - 2; i++)
-					ND_PRINT((ndo, "%02x", *(option + 2 + i)));
+					ND_PRINT((ndo, "%02x", EXTRACT_U_1(option + 2 + i)));
 			}
 			break;
 		}

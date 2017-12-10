@@ -64,8 +64,8 @@ print_btp_body(netdissect_options *ndo,
 	const char *msg_type_str;
 
 	/* Assuming ItsDpuHeader */
-	version = bp[0];
-	msg_type = bp[1];
+	version = EXTRACT_U_1(bp);
+	msg_type = EXTRACT_U_1(bp + 1);
 	msg_type_str = tok2str(msg_type_values, "unknown (%u)", msg_type);
 
 	ND_PRINT((ndo, "; ItsPduHeader v:%d t:%d-%s", version, msg_type, msg_type_str));
@@ -75,8 +75,8 @@ static void
 print_btp(netdissect_options *ndo,
           const u_char *bp)
 {
-	uint16_t dest = EXTRACT_16BITS(bp+0);
-	uint16_t src = EXTRACT_16BITS(bp+2);
+	uint16_t dest = EXTRACT_BE_U_2(bp + 0);
+	uint16_t src = EXTRACT_BE_U_2(bp + 2);
 	ND_PRINT((ndo, "; BTP Dst:%u Src:%u", dest, src));
 }
 
@@ -90,11 +90,11 @@ print_long_pos_vector(netdissect_options *ndo,
 		return (-1);
 	ND_PRINT((ndo, "GN_ADDR:%s ", linkaddr_string (ndo, bp, 0, GEONET_ADDR_LEN)));
 
-	if (!ND_TTEST2(*(bp+12), 8))
+	if (!ND_TTEST_8(bp + 12))
 		return (-1);
-	lat = EXTRACT_32BITS(bp+12);
+	lat = EXTRACT_BE_U_4(bp + 12);
 	ND_PRINT((ndo, "lat:%d ", lat));
-	lon = EXTRACT_32BITS(bp+16);
+	lon = EXTRACT_BE_U_4(bp + 16);
 	ND_PRINT((ndo, "lon:%d", lon));
 	return (0);
 }
@@ -127,13 +127,13 @@ geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	if (length < 36)
 		goto invalid;
 
-	ND_TCHECK2(*bp, 8);
+	ND_TCHECK_8(bp);
 	version = bp[0] >> 4;
 	next_hdr = bp[0] & 0x0f;
 	hdr_type = bp[1] >> 4;
 	hdr_subtype = bp[1] & 0x0f;
-	payload_length = EXTRACT_16BITS(bp+4);
-	hop_limit = bp[7];
+	payload_length = EXTRACT_BE_U_2(bp + 4);
+	hop_limit = EXTRACT_U_1(bp + 7);
 
 	switch (next_hdr) {
 		case 0: next_hdr_txt = "Any"; break;
@@ -242,7 +242,7 @@ geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			case 2: /* BTP A/B */
 				if (length < 4)
 					goto invalid;
-				ND_TCHECK2(*bp, 4);
+				ND_TCHECK_4(bp);
 				print_btp(ndo, bp);
 				length -= 4;
 				bp += 4;
@@ -254,7 +254,7 @@ geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 					 * or was that just not
 					 * reporting genuine errors?
 					 */
-					ND_TCHECK2(*bp, 2);
+					ND_TCHECK_2(bp);
 					print_btp_body(ndo, bp);
 				}
 				break;

@@ -359,8 +359,8 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		(void)snprintf(buf, sizeof(buf), "echo %s, id %u, seq %u",
                                dp->icmp_type == ICMP_ECHO ?
                                "request" : "reply",
-                               EXTRACT_16BITS(&dp->icmp_id),
-                               EXTRACT_16BITS(&dp->icmp_seq));
+                               EXTRACT_BE_U_2(&dp->icmp_id),
+                               EXTRACT_BE_U_2(&dp->icmp_seq));
 		break;
 
 	case ICMP_UNREACH:
@@ -381,7 +381,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			hlen = IP_HL(oip) * 4;
 			ouh = (const struct udphdr *)(((const u_char *)oip) + hlen);
 			ND_TCHECK(ouh->uh_dport);
-			dport = EXTRACT_16BITS(&ouh->uh_dport);
+			dport = EXTRACT_BE_U_2(&ouh->uh_dport);
 			switch (oip->ip_p) {
 
 			case IPPROTO_TCP:
@@ -411,7 +411,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		    {
 			register const struct mtu_discovery *mp;
 			mp = (const struct mtu_discovery *)(const u_char *)&dp->icmp_void;
-			mtu = EXTRACT_16BITS(&mp->nexthopmtu);
+			mtu = EXTRACT_BE_U_2(&mp->nexthopmtu);
 			if (mtu) {
 				(void)snprintf(buf, sizeof(buf),
 				    "%s unreachable - need to frag (mtu %d)",
@@ -455,7 +455,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		ND_TCHECK(*ihp);
 		(void)strncpy(cp, " lifetime ", sizeof(buf) - (cp - buf));
 		cp = buf + strlen(buf);
-		lifetime = EXTRACT_16BITS(&ihp->ird_lifetime);
+		lifetime = EXTRACT_BE_U_2(&ihp->ird_lifetime);
 		if (lifetime < 60) {
 			(void)snprintf(cp, sizeof(buf) - (cp - buf), "%u",
 			    lifetime);
@@ -486,7 +486,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			ND_TCHECK(*idp);
 			(void)snprintf(cp, sizeof(buf) - (cp - buf), " {%s %u}",
 			    ipaddr_string(ndo, &idp->ird_addr),
-			    EXTRACT_32BITS(&idp->ird_pref));
+			    EXTRACT_BE_U_4(&idp->ird_pref));
 			cp = buf + strlen(buf);
 			++idp;
 		}
@@ -526,29 +526,29 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 	case ICMP_MASKREPLY:
 		ND_TCHECK(dp->icmp_mask);
 		(void)snprintf(buf, sizeof(buf), "address mask is 0x%08x",
-		    EXTRACT_32BITS(&dp->icmp_mask));
+		    EXTRACT_BE_U_4(&dp->icmp_mask));
 		break;
 
 	case ICMP_TSTAMP:
 		ND_TCHECK(dp->icmp_seq);
 		(void)snprintf(buf, sizeof(buf),
 		    "time stamp query id %u seq %u",
-		    EXTRACT_16BITS(&dp->icmp_id),
-		    EXTRACT_16BITS(&dp->icmp_seq));
+		    EXTRACT_BE_U_2(&dp->icmp_id),
+		    EXTRACT_BE_U_2(&dp->icmp_seq));
 		break;
 
 	case ICMP_TSTAMPREPLY:
 		ND_TCHECK(dp->icmp_ttime);
 		(void)snprintf(buf, sizeof(buf),
 		    "time stamp reply id %u seq %u: org %s",
-                               EXTRACT_16BITS(&dp->icmp_id),
-                               EXTRACT_16BITS(&dp->icmp_seq),
-                               icmp_tstamp_print(EXTRACT_32BITS(&dp->icmp_otime)));
+                               EXTRACT_BE_U_2(&dp->icmp_id),
+                               EXTRACT_BE_U_2(&dp->icmp_seq),
+                               icmp_tstamp_print(EXTRACT_BE_U_4(&dp->icmp_otime)));
 
                 (void)snprintf(buf+strlen(buf),sizeof(buf)-strlen(buf),", recv %s",
-                         icmp_tstamp_print(EXTRACT_32BITS(&dp->icmp_rtime)));
+                         icmp_tstamp_print(EXTRACT_BE_U_4(&dp->icmp_rtime)));
                 (void)snprintf(buf+strlen(buf),sizeof(buf)-strlen(buf),", xmit %s",
-                         icmp_tstamp_print(EXTRACT_32BITS(&dp->icmp_ttime)));
+                         icmp_tstamp_print(EXTRACT_BE_U_4(&dp->icmp_ttime)));
                 break;
 
 	default:
@@ -564,7 +564,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			vec[0].len = plen;
 			sum = in_cksum(vec, 1);
 			if (sum != 0) {
-				uint16_t icmp_sum = EXTRACT_16BITS(&dp->icmp_cksum);
+				uint16_t icmp_sum = EXTRACT_BE_U_2(&dp->icmp_cksum);
 				ND_PRINT((ndo, " (wrong icmp cksum %x (->%x)!)",
 					     icmp_sum,
 					     in_cksum_shouldbe(icmp_sum, sum)));
@@ -581,8 +581,8 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		ND_PRINT((ndo, "\n\t"));
 		ip = (const struct ip *)bp;
                 snapend_save = ndo->ndo_snapend;
-		ND_TCHECK_16BITS(&ip->ip_len);
-		ip_print(ndo, bp, EXTRACT_16BITS(&ip->ip_len));
+		ND_TCHECK_2(&ip->ip_len);
+		ip_print(ndo, bp, EXTRACT_BE_U_2(&ip->ip_len));
                 ndo->ndo_snapend = snapend_save;
 	}
 
@@ -625,7 +625,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                 vec[0].ptr = (const uint8_t *)(const void *)&ext_dp->icmp_ext_version_res;
                 vec[0].len = hlen;
                 ND_PRINT((ndo, ", checksum 0x%04x (%scorrect), length %u",
-                       EXTRACT_16BITS(ext_dp->icmp_ext_checksum),
+                       EXTRACT_BE_U_2(ext_dp->icmp_ext_checksum),
                        in_cksum(vec, 1) ? "in" : "",
                        hlen));
             }
@@ -637,7 +637,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 
                 icmp_mpls_ext_object_header = (const struct icmp_mpls_ext_object_header_t *)obj_tptr;
                 ND_TCHECK(*icmp_mpls_ext_object_header);
-                obj_tlen = EXTRACT_16BITS(icmp_mpls_ext_object_header->length);
+                obj_tlen = EXTRACT_BE_U_2(icmp_mpls_ext_object_header->length);
                 obj_class_num = icmp_mpls_ext_object_header->class_num;
                 obj_ctype = icmp_mpls_ext_object_header->ctype;
                 obj_tptr += sizeof(struct icmp_mpls_ext_object_header_t);
@@ -661,8 +661,8 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                 case 1:
                     switch(obj_ctype) {
                     case 1:
-                        ND_TCHECK2(*obj_tptr, 4);
-                        raw_label = EXTRACT_32BITS(obj_tptr);
+                        ND_TCHECK_4(obj_tptr);
+                        raw_label = EXTRACT_BE_U_4(obj_tptr);
                         ND_PRINT((ndo, "\n\t    label %u, exp %u", MPLS_LABEL(raw_label), MPLS_EXP(raw_label)));
                         if (MPLS_STACK(raw_label))
                             ND_PRINT((ndo, ", [S]"));

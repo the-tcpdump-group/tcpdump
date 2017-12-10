@@ -44,7 +44,7 @@ ipcomp_print(netdissect_options *ndo, register const u_char *bp)
 
 	ipcomp = (const struct ipcomp *)bp;
 	ND_TCHECK(*ipcomp);
-	cpi = EXTRACT_16BITS(&ipcomp->comp_cpi);
+	cpi = EXTRACT_BE_U_2(&ipcomp->comp_cpi);
 
 	ND_PRINT((ndo, "IPComp(cpi=0x%04x)", cpi));
 

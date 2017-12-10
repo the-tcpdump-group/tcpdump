@@ -130,7 +130,7 @@ sliplink_print(netdissect_options *ndo,
 	int dir;
 	u_int hlen;
 
-	dir = p[SLX_DIR];
+	dir = EXTRACT_U_1(p + SLX_DIR);
 	switch (dir) {
 
 	case SLIPDIR_IN:
@@ -151,11 +151,11 @@ sliplink_print(netdissect_options *ndo,
 		register int i;
 
 		for (i = SLX_CHDR; i < SLX_CHDR + CHDR_LEN - 1; ++i)
-			ND_PRINT((ndo, "%02x.", p[i]));
-		ND_PRINT((ndo, "%02x: ", p[SLX_CHDR + CHDR_LEN - 1]));
+			ND_PRINT((ndo, "%02x.", EXTRACT_U_1(p + i)));
+		ND_PRINT((ndo, "%02x: ", EXTRACT_U_1(p + SLX_CHDR + CHDR_LEN - 1)));
 		return;
 	}
-	switch (p[SLX_CHDR] & 0xf0) {
+	switch (EXTRACT_U_1(p + SLX_CHDR) & 0xf0) {
 
 	case TYPE_IP:
 		ND_PRINT((ndo, "ip %d: ", length + SLIP_HDRLEN));
@@ -183,12 +183,12 @@ sliplink_print(netdissect_options *ndo,
 			/* Direction is bogus, don't use it */
 			return;
 		}
-		if (p[SLX_CHDR] & TYPE_COMPRESSED_TCP) {
-			compressed_sl_print(ndo, &p[SLX_CHDR], ip,
-			    length, dir);
+		if (EXTRACT_U_1(p + SLX_CHDR) & TYPE_COMPRESSED_TCP) {
+			compressed_sl_print(ndo, p + SLX_CHDR, ip,
+					    length, dir);
 			ND_PRINT((ndo, ": "));
 		} else
-			ND_PRINT((ndo, "slip-%d!: ", p[SLX_CHDR]));
+			ND_PRINT((ndo, "slip-%d!: ", EXTRACT_U_1(p + SLX_CHDR)));
 	}
 }
 
@@ -198,8 +198,9 @@ print_sl_change(netdissect_options *ndo,
 {
 	register u_int i;
 
-	if ((i = *cp++) == 0) {
-		i = EXTRACT_16BITS(cp);
+	if ((i = EXTRACT_U_1(cp)) == 0) {
+		cp++;
+		i = EXTRACT_BE_U_2(cp);
 		cp += 2;
 	}
 	ND_PRINT((ndo, " %s%d", str, i));
@@ -212,8 +213,9 @@ print_sl_winchange(netdissect_options *ndo,
 {
 	register short i;
 
-	if ((i = *cp++) == 0) {
-		i = EXTRACT_16BITS(cp);
+	if ((i = EXTRACT_U_1(cp)) == 0) {
+		cp++;
+		i = EXTRACT_BE_U_2(cp);
 		cp += 2;
 	}
 	if (i >= 0)
@@ -231,9 +233,11 @@ compressed_sl_print(netdissect_options *ndo,
 	register const u_char *cp = chdr;
 	register u_int flags, hlen;
 
-	flags = *cp++;
+	flags = EXTRACT_U_1(cp);
+	cp++;
 	if (flags & NEW_C) {
-		lastconn = *cp++;
+		lastconn = EXTRACT_U_1(cp);
+		cp++;
 		ND_PRINT((ndo, "ctcp %d", lastconn));
 	} else
 		ND_PRINT((ndo, "ctcp *"));

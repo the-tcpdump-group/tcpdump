@@ -51,7 +51,7 @@ carp_print(netdissect_options *ndo, register const u_char *bp, register u_int le
 	int version, type;
 	const char *type_s;
 
-	ND_TCHECK(bp[0]);
+	ND_TCHECK_1(bp);
 	version = (bp[0] & 0xf0) >> 4;
 	type = bp[0] & 0x0f;
 	if (type == 1)
@@ -63,19 +63,19 @@ carp_print(netdissect_options *ndo, register const u_char *bp, register u_int le
 		ND_PRINT((ndo, "[ttl=%d!] ", ttl));
 	if (version != 2 || type != 1)
 		return;
-	ND_TCHECK(bp[2]);
-	ND_TCHECK(bp[5]);
+	ND_TCHECK_1(bp + 2);
+	ND_TCHECK_1(bp + 5);
 	ND_PRINT((ndo, "vhid=%d advbase=%d advskew=%d authlen=%d ",
-	    bp[1], bp[5], bp[2], bp[3]));
+	    EXTRACT_U_1(bp + 1), EXTRACT_U_1(bp + 5), EXTRACT_U_1(bp + 2), EXTRACT_U_1(bp + 3)));
 	if (ndo->ndo_vflag) {
 		struct cksum_vec vec[1];
 		vec[0].ptr = (const uint8_t *)bp;
 		vec[0].len = len;
 		if (ND_TTEST2(bp[0], len) && in_cksum(vec, 1))
 			ND_PRINT((ndo, " (bad carp cksum %x!)",
-				EXTRACT_16BITS(&bp[6])));
+				EXTRACT_BE_U_2(bp + 6)));
 	}
-	ND_PRINT((ndo, "counter=%" PRIu64, EXTRACT_64BITS(&bp[8])));
+	ND_PRINT((ndo, "counter=%" PRIu64, EXTRACT_BE_U_8(bp + 8)));
 
 	return;
 trunc:

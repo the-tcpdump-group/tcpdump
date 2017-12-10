@@ -74,12 +74,12 @@
 #define FRAME_TYPE(trp)		(((trp)->token_fc & 0xC0) >> 6)
 #define TOKEN_FC_LLC		1
 
-#define BROADCAST(trp)		((EXTRACT_16BITS(&(trp)->token_rcf) & 0xE000) >> 13)
-#define RIF_LENGTH(trp)		((EXTRACT_16BITS(&(trp)->token_rcf) & 0x1f00) >> 8)
-#define DIRECTION(trp)		((EXTRACT_16BITS(&(trp)->token_rcf) & 0x0080) >> 7)
-#define LARGEST_FRAME(trp)	((EXTRACT_16BITS(&(trp)->token_rcf) & 0x0070) >> 4)
-#define RING_NUMBER(trp, x)	((EXTRACT_16BITS(&(trp)->token_rseg[x]) & 0xfff0) >> 4)
-#define BRIDGE_NUMBER(trp, x)	((EXTRACT_16BITS(&(trp)->token_rseg[x]) & 0x000f))
+#define BROADCAST(trp)		((EXTRACT_BE_U_2(&(trp)->token_rcf) & 0xE000) >> 13)
+#define RIF_LENGTH(trp)		((EXTRACT_BE_U_2(&(trp)->token_rcf) & 0x1f00) >> 8)
+#define DIRECTION(trp)		((EXTRACT_BE_U_2(&(trp)->token_rcf) & 0x0080) >> 7)
+#define LARGEST_FRAME(trp)	((EXTRACT_BE_U_2(&(trp)->token_rcf) & 0x0070) >> 4)
+#define RING_NUMBER(trp, x)	((EXTRACT_BE_U_2(&(trp)->token_rseg[x]) & 0xfff0) >> 4)
+#define BRIDGE_NUMBER(trp, x)	((EXTRACT_BE_U_2(&(trp)->token_rseg[x]) & 0x000f))
 #define SEGMENT_COUNT(trp)	((int)((RIF_LENGTH(trp) - 2) / 2))
 
 struct token_header {
@@ -193,10 +193,10 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 				ND_PRINT((ndo, " [%d:%d]", RING_NUMBER(trp, seg),
 				    BRIDGE_NUMBER(trp, seg)));
 		} else {
-			ND_PRINT((ndo, "rt = %x", EXTRACT_16BITS(&trp->token_rcf)));
+			ND_PRINT((ndo, "rt = %x", EXTRACT_BE_U_2(&trp->token_rcf)));
 
 			for (seg = 0; seg < SEGMENT_COUNT(trp); seg++)
-				ND_PRINT((ndo, ":%x", EXTRACT_16BITS(&trp->token_rseg[seg])));
+				ND_PRINT((ndo, ":%x", EXTRACT_BE_U_2(&trp->token_rseg[seg])));
 		}
 		ND_PRINT((ndo, " (%s) ", largest_frame[LARGEST_FRAME(trp)]));
 	} else {

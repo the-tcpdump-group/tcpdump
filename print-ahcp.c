@@ -106,8 +106,8 @@ ahcp_time_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 
 	if (cp + 4 != ep)
 		goto invalid;
-	ND_TCHECK2(*cp, 4);
-	t = EXTRACT_32BITS(cp);
+	ND_TCHECK_4(cp);
+	t = EXTRACT_BE_U_4(cp);
 	if (NULL == (tm = gmtime(&t)))
 		ND_PRINT((ndo, ": gmtime() error"));
 	else if (0 == strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", tm))
@@ -130,8 +130,8 @@ ahcp_seconds_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 {
 	if (cp + 4 != ep)
 		goto invalid;
-	ND_TCHECK2(*cp, 4);
-	ND_PRINT((ndo, ": %us", EXTRACT_32BITS(cp)));
+	ND_TCHECK_4(cp);
+	ND_PRINT((ndo, ": %us", EXTRACT_BE_U_4(cp)));
 	return 0;
 
 invalid:
@@ -151,7 +151,7 @@ ahcp_ipv6_addresses_print(netdissect_options *ndo, const u_char *cp, const u_cha
 	while (cp < ep) {
 		if (cp + 16 > ep)
 			goto invalid;
-		ND_TCHECK2(*cp, 16);
+		ND_TCHECK_16(cp);
 		ND_PRINT((ndo, "%s%s", sep, ip6addr_string(ndo, cp)));
 		cp += 16;
 		sep = ", ";
@@ -175,7 +175,7 @@ ahcp_ipv4_addresses_print(netdissect_options *ndo, const u_char *cp, const u_cha
 	while (cp < ep) {
 		if (cp + 4 > ep)
 			goto invalid;
-		ND_TCHECK2(*cp, 4);
+		ND_TCHECK_4(cp);
 		ND_PRINT((ndo, "%s%s", sep, ipaddr_string(ndo, cp)));
 		cp += 4;
 		sep = ", ";
@@ -200,7 +200,7 @@ ahcp_ipv6_prefixes_print(netdissect_options *ndo, const u_char *cp, const u_char
 		if (cp + 17 > ep)
 			goto invalid;
 		ND_TCHECK2(*cp, 17);
-		ND_PRINT((ndo, "%s%s/%u", sep, ip6addr_string(ndo, cp), *(cp + 16)));
+		ND_PRINT((ndo, "%s%s/%u", sep, ip6addr_string(ndo, cp), EXTRACT_U_1(cp + 16)));
 		cp += 17;
 		sep = ", ";
 	}
@@ -223,8 +223,8 @@ ahcp_ipv4_prefixes_print(netdissect_options *ndo, const u_char *cp, const u_char
 	while (cp < ep) {
 		if (cp + 5 > ep)
 			goto invalid;
-		ND_TCHECK2(*cp, 5);
-		ND_PRINT((ndo, "%s%s/%u", sep, ipaddr_string(ndo, cp), *(cp + 4)));
+		ND_TCHECK_5(cp);
+		ND_PRINT((ndo, "%s%s/%u", sep, ipaddr_string(ndo, cp), EXTRACT_U_1(cp + 4)));
 		cp += 5;
 		sep = ", ";
 	}
@@ -265,8 +265,8 @@ ahcp1_options_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 
 	while (cp < ep) {
 		/* Option no */
-		ND_TCHECK2(*cp, 1);
-		option_no = *cp;
+		ND_TCHECK_1(cp);
+		option_no = EXTRACT_U_1(cp);
 		cp += 1;
 		ND_PRINT((ndo, "\n\t %s", tok2str(ahcp1_opt_str, "Unknown-%u", option_no)));
 		if (option_no == AHCP1_OPT_PAD || option_no == AHCP1_OPT_MANDATORY)
@@ -274,8 +274,8 @@ ahcp1_options_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 		/* Length */
 		if (cp + 1 > ep)
 			goto invalid;
-		ND_TCHECK2(*cp, 1);
-		option_len = *cp;
+		ND_TCHECK_1(cp);
+		option_len = EXTRACT_U_1(cp);
 		cp += 1;
 		if (cp + option_len > ep)
 			goto invalid;
@@ -308,16 +308,16 @@ ahcp1_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 	if (cp + AHCP1_BODY_MIN_LEN > ep)
 		goto invalid;
 	/* Type */
-	ND_TCHECK2(*cp, 1);
-	type = *cp;
+	ND_TCHECK_1(cp);
+	type = EXTRACT_U_1(cp);
 	cp += 1;
 	/* MBZ */
-	ND_TCHECK2(*cp, 1);
-	mbz = *cp;
+	ND_TCHECK_1(cp);
+	mbz = EXTRACT_U_1(cp);
 	cp += 1;
 	/* Length */
-	ND_TCHECK2(*cp, 2);
-	body_len = EXTRACT_16BITS(cp);
+	ND_TCHECK_2(cp);
+	body_len = EXTRACT_BE_U_2(cp);
 	cp += 2;
 
 	if (ndo->ndo_vflag) {
@@ -354,13 +354,13 @@ ahcp_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 	if (len < 2)
 		goto invalid;
 	/* Magic */
-	ND_TCHECK2(*cp, 1);
-	if (*cp != AHCP_MAGIC_NUMBER)
+	ND_TCHECK_1(cp);
+	if (EXTRACT_U_1(cp) != AHCP_MAGIC_NUMBER)
 		goto invalid;
 	cp += 1;
 	/* Version */
-	ND_TCHECK2(*cp, 1);
-	version = *cp;
+	ND_TCHECK_1(cp);
+	version = EXTRACT_U_1(cp);
 	cp += 1;
 	switch (version) {
 		case AHCP_VERSION_1: {
@@ -372,23 +372,23 @@ ahcp_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 				cp += AHCP1_HEADER_FIX_LEN - 2;
 			} else {
 				/* Hopcount */
-				ND_TCHECK2(*cp, 1);
-				ND_PRINT((ndo, "\n\tHopcount %u", *cp));
+				ND_TCHECK_1(cp);
+				ND_PRINT((ndo, "\n\tHopcount %u", EXTRACT_U_1(cp)));
 				cp += 1;
 				/* Original Hopcount */
-				ND_TCHECK2(*cp, 1);
-				ND_PRINT((ndo, ", Original Hopcount %u", *cp));
+				ND_TCHECK_1(cp);
+				ND_PRINT((ndo, ", Original Hopcount %u", EXTRACT_U_1(cp)));
 				cp += 1;
 				/* Nonce */
-				ND_TCHECK2(*cp, 4);
-				ND_PRINT((ndo, ", Nonce 0x%08x", EXTRACT_32BITS(cp)));
+				ND_TCHECK_4(cp);
+				ND_PRINT((ndo, ", Nonce 0x%08x", EXTRACT_BE_U_4(cp)));
 				cp += 4;
 				/* Source Id */
-				ND_TCHECK2(*cp, 8);
+				ND_TCHECK_8(cp);
 				ND_PRINT((ndo, ", Source Id %s", linkaddr_string(ndo, cp, 0, 8)));
 				cp += 8;
 				/* Destination Id */
-				ND_TCHECK2(*cp, 8);
+				ND_TCHECK_8(cp);
 				ND_PRINT((ndo, ", Destination Id %s", linkaddr_string(ndo, cp, 0, 8)));
 				cp += 8;
 			}

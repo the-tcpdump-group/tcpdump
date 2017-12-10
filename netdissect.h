@@ -54,9 +54,19 @@ typedef unsigned char nd_uint64_t[8];
  * Use this for IPv4 addresses.  It's defined as an array of octets, so
  * that it's not aligned on its "natural" boundary, and it's defined as
  * a structure in the hopes that this makes it harder to naively use
- * EXTRACT_32BITS() to extract the value - in many cases you just want
+ * EXTRACT_BE_U_4() to extract the value - in many cases you just want
  * to use UNALIGNED_MEMCPY() to copy its value, so that it remains in
  * network byte order.
+ *
+ * (Among other things, we don't want somebody thinking "IPv4 addresses,
+ * they're in network byte order, so we want EXTRACT_BE_U_4(), right?"
+ * and then handing the result to system APIs that expect network-order
+ * IPv4 addresses, such as inet_ntop(), on their little-endian PCs, getting
+ * the wrong behavior, and concluding "oh, it must be in *little*-endian
+ * order" and "fixing" it to use EXTRACT_LE_U_4().  Yes, people do this;
+ * that's why Wireshark has tvb_get_ipv4(), to extract an IPv4 address from
+ * a packet data buffer; it was introduced in reaction to somebody who
+ * *had* done that.)
  */
 typedef struct {
 	unsigned char bytes[4];
@@ -305,7 +315,7 @@ struct netdissect_options {
 /* Bail if "var" was not captured */
 #define ND_TCHECK(var) ND_TCHECK2(var, sizeof(var))
 
-#define ND_PRINT(STUFF) (*ndo->ndo_printf)STUFF
+#define ND_PRINT(STUFF) (ndo->ndo_printf)STUFF
 #define ND_DEFAULTPRINT(ap, length) (*ndo->ndo_default_print)(ndo, ap, length)
 
 extern void ts_print(netdissect_options *, const struct timeval *);
@@ -496,7 +506,7 @@ extern void dvmrp_print(netdissect_options *, const u_char *, u_int);
 extern void eap_print(netdissect_options *, const u_char *, u_int);
 extern void egp_print(netdissect_options *, const u_char *, u_int);
 extern void eigrp_print(netdissect_options *, const u_char *, u_int);
-extern int esp_print(netdissect_options *, const u_char *, const int, const u_char *, int *, int *);
+extern int esp_print(netdissect_options *, const u_char *, const int, const u_char *, u_int *, u_int *);
 extern u_int ether_print(netdissect_options *, const u_char *, u_int, u_int, void (*)(netdissect_options *, const u_char *), const u_char *);
 extern int ethertype_print(netdissect_options *, u_short, const u_char *, u_int, u_int, const struct lladdr_info *, const struct lladdr_info *);
 extern u_int fddi_print(netdissect_options *, const u_char *, u_int, u_int);
@@ -590,7 +600,7 @@ extern void rrcp_print(netdissect_options *, const u_char *, u_int, const struct
 extern void rsvp_print(netdissect_options *, const u_char *, u_int);
 extern int rt6_print(netdissect_options *, const u_char *, const u_char *);
 extern void rtsp_print(netdissect_options *, const u_char *, u_int);
-extern void rx_print(netdissect_options *, register const u_char *, int, int, int, const u_char *);
+extern void rx_print(netdissect_options *, register const u_char *, u_int, u_int, u_int, const u_char *);
 extern void sctp_print(netdissect_options *, const u_char *, const u_char *, u_int);
 extern void sflow_print(netdissect_options *, const u_char *, u_int);
 extern void sip_print(netdissect_options *, const u_char *, u_int);
@@ -611,7 +621,7 @@ extern void tipc_print(netdissect_options *, const u_char *, u_int, u_int);
 extern u_int token_print(netdissect_options *, const u_char *, u_int, u_int);
 extern void udld_print(netdissect_options *, const u_char *, u_int);
 extern void udp_print(netdissect_options *, const u_char *, u_int, const u_char *, int);
-extern int vjc_print(netdissect_options *, register const char *, u_short);
+extern int vjc_print(netdissect_options *, register const u_char *, u_short);
 extern void vqp_print(netdissect_options *, register const u_char *, register u_int);
 extern void vrrp_print(netdissect_options *, const u_char *, u_int, const u_char *, int);
 extern void vtp_print(netdissect_options *, const u_char *, u_int);

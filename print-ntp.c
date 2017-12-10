@@ -306,7 +306,7 @@ ntp_time_print(netdissect_options *ndo,
 	default:
 		/* In NTPv4 (RFC 5905) refid is an IPv4 address or first 32 bits of
 		   MD5 sum of IPv6 address */
-		ND_PRINT((ndo, "0x%08x", EXTRACT_32BITS(&bp->refid)));
+		ND_PRINT((ndo, "0x%08x", EXTRACT_BE_U_4(&bp->refid)));
 		break;
 	}
 
@@ -335,26 +335,26 @@ ntp_time_print(netdissect_options *ndo,
 	/* FIXME: this code is not aware of any extension fields */
 	if (length == NTP_TIMEMSG_MINLEN + 4) { 	/* Optional: key-id (crypto-NAK) */
 		ND_TCHECK(bp->key_id);
-		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_32BITS(&bp->key_id)));
+		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_BE_U_4(&bp->key_id)));
 	} else if (length == NTP_TIMEMSG_MINLEN + 4 + 16) { 	/* Optional: key-id + 128-bit digest */
 		ND_TCHECK(bp->key_id);
-		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_32BITS(&bp->key_id)));
+		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_BE_U_4(&bp->key_id)));
 		ND_TCHECK2(bp->message_digest, 16);
                 ND_PRINT((ndo, "\n\tAuthentication: %08x%08x%08x%08x",
-        		       EXTRACT_32BITS(bp->message_digest),
-		               EXTRACT_32BITS(bp->message_digest + 4),
-		               EXTRACT_32BITS(bp->message_digest + 8),
-		               EXTRACT_32BITS(bp->message_digest + 12)));
+        		       EXTRACT_BE_U_4(bp->message_digest),
+        		       EXTRACT_BE_U_4(bp->message_digest + 4),
+        		       EXTRACT_BE_U_4(bp->message_digest + 8),
+        		       EXTRACT_BE_U_4(bp->message_digest + 12)));
 	} else if (length == NTP_TIMEMSG_MINLEN + 4 + 20) { 	/* Optional: key-id + 160-bit digest */
 		ND_TCHECK(bp->key_id);
-		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_32BITS(&bp->key_id)));
+		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_BE_U_4(&bp->key_id)));
 		ND_TCHECK2(bp->message_digest, 20);
 		ND_PRINT((ndo, "\n\tAuthentication: %08x%08x%08x%08x%08x",
-		               EXTRACT_32BITS(bp->message_digest),
-		               EXTRACT_32BITS(bp->message_digest + 4),
-		               EXTRACT_32BITS(bp->message_digest + 8),
-		               EXTRACT_32BITS(bp->message_digest + 12),
-		               EXTRACT_32BITS(bp->message_digest + 16)));
+		               EXTRACT_BE_U_4(bp->message_digest),
+		               EXTRACT_BE_U_4(bp->message_digest + 4),
+		               EXTRACT_BE_U_4(bp->message_digest + 8),
+		               EXTRACT_BE_U_4(bp->message_digest + 12),
+		               EXTRACT_BE_U_4(bp->message_digest + 16)));
 	} else if (length > NTP_TIMEMSG_MINLEN) {
 		ND_PRINT((ndo, "\n\t(%u more bytes after the header)", length - NTP_TIMEMSG_MINLEN));
 	}
@@ -392,23 +392,23 @@ ntp_control_print(netdissect_options *ndo,
 		  M ? "More" : "Last", (unsigned)opcode));
 
 	ND_TCHECK(cd->sequence);
-	sequence = EXTRACT_16BITS(&cd->sequence);
+	sequence = EXTRACT_BE_U_2(&cd->sequence);
 	ND_PRINT((ndo, "\tSequence=%hu", sequence));
 
 	ND_TCHECK(cd->status);
-	status = EXTRACT_16BITS(&cd->status);
+	status = EXTRACT_BE_U_2(&cd->status);
 	ND_PRINT((ndo, ", Status=%#hx", status));
 
 	ND_TCHECK(cd->assoc);
-	assoc = EXTRACT_16BITS(&cd->assoc);
+	assoc = EXTRACT_BE_U_2(&cd->assoc);
 	ND_PRINT((ndo, ", Assoc.=%hu", assoc));
 
 	ND_TCHECK(cd->offset);
-	offset = EXTRACT_16BITS(&cd->offset);
+	offset = EXTRACT_BE_U_2(&cd->offset);
 	ND_PRINT((ndo, ", Offset=%hu", offset));
 
 	ND_TCHECK(cd->count);
-	count = EXTRACT_16BITS(&cd->count);
+	count = EXTRACT_BE_U_2(&cd->count);
 	ND_PRINT((ndo, ", Count=%hu", count));
 
 	if (NTP_CTRLMSG_MINLEN + count > length)
@@ -485,8 +485,8 @@ p_sfix(netdissect_options *ndo,
 	register int f;
 	register double ff;
 
-	i = EXTRACT_16BITS(&sfp->int_part);
-	f = EXTRACT_16BITS(&sfp->fraction);
+	i = EXTRACT_BE_U_2(&sfp->int_part);
+	f = EXTRACT_BE_U_2(&sfp->fraction);
 	ff = f / 65536.0;		/* shift radix point by 16 bits */
 	f = (int)(ff * 1000000.0);	/* Treat fraction as parts per million */
 	ND_PRINT((ndo, "%d.%06d", i, f));
@@ -503,8 +503,8 @@ p_ntp_time(netdissect_options *ndo,
 	register uint32_t f;
 	register double ff;
 
-	i = EXTRACT_32BITS(&lfp->int_part);
-	uf = EXTRACT_32BITS(&lfp->fraction);
+	i = EXTRACT_BE_U_4(&lfp->int_part);
+	uf = EXTRACT_BE_U_4(&lfp->fraction);
 	ff = uf;
 	if (ff < 0.0)		/* some compilers are buggy */
 		ff += FMAXINT;
@@ -561,10 +561,10 @@ p_ntp_delta(netdissect_options *ndo,
 	register double ff;
 	int signbit;
 
-	u = EXTRACT_32BITS(&lfp->int_part);
-	ou = EXTRACT_32BITS(&olfp->int_part);
-	uf = EXTRACT_32BITS(&lfp->fraction);
-	ouf = EXTRACT_32BITS(&olfp->fraction);
+	u = EXTRACT_BE_U_4(&lfp->int_part);
+	ou = EXTRACT_BE_U_4(&olfp->int_part);
+	uf = EXTRACT_BE_U_4(&lfp->fraction);
+	ouf = EXTRACT_BE_U_4(&olfp->fraction);
 	if (ou == 0 && ouf == 0) {
 		p_ntp_time(ndo, lfp);
 		return;

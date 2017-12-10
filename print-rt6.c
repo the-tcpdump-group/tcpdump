@@ -62,9 +62,9 @@ rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 
 		dp0 = (const struct ip6_rthdr0 *)dp;
 
 		ND_TCHECK(dp0->ip6r0_reserved);
-		if (EXTRACT_32BITS(dp0->ip6r0_reserved) || ndo->ndo_vflag) {
+		if (EXTRACT_BE_U_4(dp0->ip6r0_reserved) || ndo->ndo_vflag) {
 			ND_PRINT((ndo, ", rsv=0x%0x",
-			    EXTRACT_32BITS(&dp0->ip6r0_reserved)));
+			    EXTRACT_BE_U_4(&dp0->ip6r0_reserved)));
 		}
 
 		if (len % 2 == 1)

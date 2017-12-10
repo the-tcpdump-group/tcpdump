@@ -168,21 +168,21 @@ cnfp_v1_print(netdissect_options *ndo, const u_char *cp)
 	nh = (const struct nfhdr_v1 *)cp;
 	ND_TCHECK(*nh);
 
-	ver = EXTRACT_16BITS(&nh->version);
-	nrecs = EXTRACT_32BITS(&nh->count);
+	ver = EXTRACT_BE_U_2(&nh->version);
+	nrecs = EXTRACT_BE_U_4(&nh->count);
 #if 0
 	/*
 	 * This is seconds since the UN*X epoch, and is followed by
 	 * nanoseconds.  XXX - format it, rather than just dumping the
 	 * raw seconds-since-the-Epoch.
 	 */
-	t = EXTRACT_32BITS(&nh->utc_sec);
+	t = EXTRACT_BE_U_4(&nh->utc_sec);
 #endif
 
 	ND_PRINT((ndo, "NetFlow v%x, %u.%03u uptime, %u.%09u, ", ver,
-	       EXTRACT_32BITS(&nh->msys_uptime)/1000,
-	       EXTRACT_32BITS(&nh->msys_uptime)%1000,
-	       EXTRACT_32BITS(&nh->utc_sec), EXTRACT_32BITS(&nh->utc_nsec)));
+	       EXTRACT_BE_U_4(&nh->msys_uptime)/1000,
+	       EXTRACT_BE_U_4(&nh->msys_uptime)%1000,
+	       EXTRACT_BE_U_4(&nh->utc_sec), EXTRACT_BE_U_4(&nh->utc_nsec)));
 
 	nr = (const struct nfrec_v1 *)&nh[1];
 
@@ -197,17 +197,17 @@ cnfp_v1_print(netdissect_options *ndo, const u_char *cp)
 		 */
 		ND_TCHECK(*nr);
 		ND_PRINT((ndo, "\n  started %u.%03u, last %u.%03u",
-		       EXTRACT_32BITS(&nr->start_time)/1000,
-		       EXTRACT_32BITS(&nr->start_time)%1000,
-		       EXTRACT_32BITS(&nr->last_time)/1000,
-		       EXTRACT_32BITS(&nr->last_time)%1000));
+		       EXTRACT_BE_U_4(&nr->start_time)/1000,
+		       EXTRACT_BE_U_4(&nr->start_time)%1000,
+		       EXTRACT_BE_U_4(&nr->last_time)/1000,
+		       EXTRACT_BE_U_4(&nr->last_time)%1000));
 
 		asbuf[0] = buf[0] = '\0';
 		ND_PRINT((ndo, "\n    %s%s%s:%u ", intoa(nr->src_ina.s_addr), buf, asbuf,
-			EXTRACT_16BITS(&nr->srcport)));
+			EXTRACT_BE_U_2(&nr->srcport)));
 
 		ND_PRINT((ndo, "> %s%s%s:%u ", intoa(nr->dst_ina.s_addr), buf, asbuf,
-			EXTRACT_16BITS(&nr->dstport)));
+			EXTRACT_BE_U_2(&nr->dstport)));
 
 		ND_PRINT((ndo, ">> %s\n    ", intoa(nr->nhop_ina.s_addr)));
 
@@ -233,8 +233,8 @@ cnfp_v1_print(netdissect_options *ndo, const u_char *cp)
 		buf[0]='\0';
 		ND_PRINT((ndo, "tos %u, %u (%u octets) %s",
 		       nr->tos,
-		       EXTRACT_32BITS(&nr->packets),
-		       EXTRACT_32BITS(&nr->octets), buf));
+		       EXTRACT_BE_U_4(&nr->packets),
+		       EXTRACT_BE_U_4(&nr->octets), buf));
 	}
 	return;
 
@@ -257,23 +257,23 @@ cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 	nh = (const struct nfhdr_v5 *)cp;
 	ND_TCHECK(*nh);
 
-	ver = EXTRACT_16BITS(&nh->version);
-	nrecs = EXTRACT_32BITS(&nh->count);
+	ver = EXTRACT_BE_U_2(&nh->version);
+	nrecs = EXTRACT_BE_U_4(&nh->count);
 #if 0
 	/*
 	 * This is seconds since the UN*X epoch, and is followed by
 	 * nanoseconds.  XXX - format it, rather than just dumping the
 	 * raw seconds-since-the-Epoch.
 	 */
-	t = EXTRACT_32BITS(&nh->utc_sec);
+	t = EXTRACT_BE_U_4(&nh->utc_sec);
 #endif
 
 	ND_PRINT((ndo, "NetFlow v%x, %u.%03u uptime, %u.%09u, ", ver,
-	       EXTRACT_32BITS(&nh->msys_uptime)/1000,
-	       EXTRACT_32BITS(&nh->msys_uptime)%1000,
-	       EXTRACT_32BITS(&nh->utc_sec), EXTRACT_32BITS(&nh->utc_nsec)));
+	       EXTRACT_BE_U_4(&nh->msys_uptime)/1000,
+	       EXTRACT_BE_U_4(&nh->msys_uptime)%1000,
+	       EXTRACT_BE_U_4(&nh->utc_sec), EXTRACT_BE_U_4(&nh->utc_nsec)));
 
-	ND_PRINT((ndo, "#%u, ", EXTRACT_32BITS(&nh->sequence)));
+	ND_PRINT((ndo, "#%u, ", EXTRACT_BE_U_4(&nh->sequence)));
 	nr = (const struct nfrec_v5 *)&nh[1];
 
 	ND_PRINT((ndo, "%2u recs", nrecs));
@@ -287,23 +287,23 @@ cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 		 */
 		ND_TCHECK(*nr);
 		ND_PRINT((ndo, "\n  started %u.%03u, last %u.%03u",
-		       EXTRACT_32BITS(&nr->start_time)/1000,
-		       EXTRACT_32BITS(&nr->start_time)%1000,
-		       EXTRACT_32BITS(&nr->last_time)/1000,
-		       EXTRACT_32BITS(&nr->last_time)%1000));
+		       EXTRACT_BE_U_4(&nr->start_time)/1000,
+		       EXTRACT_BE_U_4(&nr->start_time)%1000,
+		       EXTRACT_BE_U_4(&nr->last_time)/1000,
+		       EXTRACT_BE_U_4(&nr->last_time)%1000));
 
 		asbuf[0] = buf[0] = '\0';
 		snprintf(buf, sizeof(buf), "/%u", nr->src_mask);
 		snprintf(asbuf, sizeof(asbuf), ":%u",
-			EXTRACT_16BITS(&nr->src_as));
+			EXTRACT_BE_U_2(&nr->src_as));
 		ND_PRINT((ndo, "\n    %s%s%s:%u ", intoa(nr->src_ina.s_addr), buf, asbuf,
-			EXTRACT_16BITS(&nr->srcport)));
+			EXTRACT_BE_U_2(&nr->srcport)));
 
 		snprintf(buf, sizeof(buf), "/%d", nr->dst_mask);
 		snprintf(asbuf, sizeof(asbuf), ":%u",
-			 EXTRACT_16BITS(&nr->dst_as));
+			 EXTRACT_BE_U_2(&nr->dst_as));
 		ND_PRINT((ndo, "> %s%s%s:%u ", intoa(nr->dst_ina.s_addr), buf, asbuf,
-			EXTRACT_16BITS(&nr->dstport)));
+			EXTRACT_BE_U_2(&nr->dstport)));
 
 		ND_PRINT((ndo, ">> %s\n    ", intoa(nr->nhop_ina.s_addr)));
 
@@ -329,8 +329,8 @@ cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 		buf[0]='\0';
 		ND_PRINT((ndo, "tos %u, %u (%u octets) %s",
 		       nr->tos,
-		       EXTRACT_32BITS(&nr->packets),
-		       EXTRACT_32BITS(&nr->octets), buf));
+		       EXTRACT_BE_U_4(&nr->packets),
+		       EXTRACT_BE_U_4(&nr->octets), buf));
 	}
 	return;
 
@@ -353,23 +353,23 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 	nh = (const struct nfhdr_v6 *)cp;
 	ND_TCHECK(*nh);
 
-	ver = EXTRACT_16BITS(&nh->version);
-	nrecs = EXTRACT_32BITS(&nh->count);
+	ver = EXTRACT_BE_U_2(&nh->version);
+	nrecs = EXTRACT_BE_U_4(&nh->count);
 #if 0
 	/*
 	 * This is seconds since the UN*X epoch, and is followed by
 	 * nanoseconds.  XXX - format it, rather than just dumping the
 	 * raw seconds-since-the-Epoch.
 	 */
-	t = EXTRACT_32BITS(&nh->utc_sec);
+	t = EXTRACT_BE_U_4(&nh->utc_sec);
 #endif
 
 	ND_PRINT((ndo, "NetFlow v%x, %u.%03u uptime, %u.%09u, ", ver,
-	       EXTRACT_32BITS(&nh->msys_uptime)/1000,
-	       EXTRACT_32BITS(&nh->msys_uptime)%1000,
-	       EXTRACT_32BITS(&nh->utc_sec), EXTRACT_32BITS(&nh->utc_nsec)));
+	       EXTRACT_BE_U_4(&nh->msys_uptime)/1000,
+	       EXTRACT_BE_U_4(&nh->msys_uptime)%1000,
+	       EXTRACT_BE_U_4(&nh->utc_sec), EXTRACT_BE_U_4(&nh->utc_nsec)));
 
-	ND_PRINT((ndo, "#%u, ", EXTRACT_32BITS(&nh->sequence)));
+	ND_PRINT((ndo, "#%u, ", EXTRACT_BE_U_4(&nh->sequence)));
 	nr = (const struct nfrec_v6 *)&nh[1];
 
 	ND_PRINT((ndo, "%2u recs", nrecs));
@@ -383,23 +383,23 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 		 */
 		ND_TCHECK(*nr);
 		ND_PRINT((ndo, "\n  started %u.%03u, last %u.%03u",
-		       EXTRACT_32BITS(&nr->start_time)/1000,
-		       EXTRACT_32BITS(&nr->start_time)%1000,
-		       EXTRACT_32BITS(&nr->last_time)/1000,
-		       EXTRACT_32BITS(&nr->last_time)%1000));
+		       EXTRACT_BE_U_4(&nr->start_time)/1000,
+		       EXTRACT_BE_U_4(&nr->start_time)%1000,
+		       EXTRACT_BE_U_4(&nr->last_time)/1000,
+		       EXTRACT_BE_U_4(&nr->last_time)%1000));
 
 		asbuf[0] = buf[0] = '\0';
 		snprintf(buf, sizeof(buf), "/%u", nr->src_mask);
 		snprintf(asbuf, sizeof(asbuf), ":%u",
-			EXTRACT_16BITS(&nr->src_as));
+			EXTRACT_BE_U_2(&nr->src_as));
 		ND_PRINT((ndo, "\n    %s%s%s:%u ", intoa(nr->src_ina.s_addr), buf, asbuf,
-			EXTRACT_16BITS(&nr->srcport)));
+			EXTRACT_BE_U_2(&nr->srcport)));
 
 		snprintf(buf, sizeof(buf), "/%d", nr->dst_mask);
 		snprintf(asbuf, sizeof(asbuf), ":%u",
-			 EXTRACT_16BITS(&nr->dst_as));
+			 EXTRACT_BE_U_2(&nr->dst_as));
 		ND_PRINT((ndo, "> %s%s%s:%u ", intoa(nr->dst_ina.s_addr), buf, asbuf,
-			EXTRACT_16BITS(&nr->dstport)));
+			EXTRACT_BE_U_2(&nr->dstport)));
 
 		ND_PRINT((ndo, ">> %s\n    ", intoa(nr->nhop_ina.s_addr)));
 
@@ -424,12 +424,12 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 
 		buf[0]='\0';
 		snprintf(buf, sizeof(buf), "(%u<>%u encaps)",
-			 (EXTRACT_16BITS(&nr->flags) >> 8) & 0xff,
-			 (EXTRACT_16BITS(&nr->flags)) & 0xff);
+			 (EXTRACT_BE_U_2(&nr->flags) >> 8) & 0xff,
+			 (EXTRACT_BE_U_2(&nr->flags)) & 0xff);
 		ND_PRINT((ndo, "tos %u, %u (%u octets) %s",
 		       nr->tos,
-		       EXTRACT_32BITS(&nr->packets),
-		       EXTRACT_32BITS(&nr->octets), buf));
+		       EXTRACT_BE_U_4(&nr->packets),
+		       EXTRACT_BE_U_4(&nr->octets), buf));
 	}
 	return;
 
@@ -446,8 +446,8 @@ cnfp_print(netdissect_options *ndo, const u_char *cp)
 	/*
 	 * First 2 bytes are the version number.
 	 */
-	ND_TCHECK2(*cp, 2);
-	ver = EXTRACT_16BITS(cp);
+	ND_TCHECK_2(cp);
+	ver = EXTRACT_BE_U_2(cp);
 	switch (ver) {
 
 	case 1:

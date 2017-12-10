@@ -123,8 +123,8 @@ timed_print(netdissect_options *ndo,
 	case TSP_SETDATE:
 	case TSP_SETDATEREQ:
 		ND_TCHECK(tsp->tsp_time);
-		sec = EXTRACT_32BITS(&tsp->tsp_time.tv_sec);
-		usec = EXTRACT_32BITS(&tsp->tsp_time.tv_usec);
+		sec = EXTRACT_BE_U_4(&tsp->tsp_time.tv_sec);
+		usec = EXTRACT_BE_U_4(&tsp->tsp_time.tv_usec);
 		/* XXX The comparison below is always false? */
 		if (usec < 0)
 			/* invalid, skip the rest of the packet */

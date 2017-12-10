@@ -333,7 +333,7 @@ EXTRA_DIST = \
 	config.h.in \
 	config.sub \
 	configure \
-	configure.in \
+	configure.ac \
 	install-sh \
 	lbl/os-osf4.h \
 	lbl/os-solaris2.h \
@@ -449,4 +449,4 @@ testlist:
 	echo $(TEST_DIST)
 
 depend: $(GENSRC)
-	$(MKDEP) -c $(CC) -m $(DEPENDENCY_CFLAG) $(DEFS) $(INCLS) $(SRC)
+	$(MKDEP) -c "$(CC)" -m "$(DEPENDENCY_CFLAG)" $(DEFS) $(INCLS) $(SRC)

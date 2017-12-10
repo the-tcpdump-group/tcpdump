@@ -46,11 +46,11 @@ ah_print(netdissect_options *ndo, register const u_char *bp)
 
 	sumlen = ah->ah_len << 2;
 
-	ND_PRINT((ndo, "AH(spi=0x%08x", EXTRACT_32BITS(&ah->ah_spi)));
+	ND_PRINT((ndo, "AH(spi=0x%08x", EXTRACT_BE_U_4(&ah->ah_spi)));
 	if (ndo->ndo_vflag)
 		ND_PRINT((ndo, ",sumlen=%d", sumlen));
-	ND_TCHECK_32BITS(ah + 1);
-	ND_PRINT((ndo, ",seq=0x%x", EXTRACT_32BITS(ah + 1)));
+	ND_TCHECK_4(ah + 1);
+	ND_PRINT((ndo, ",seq=0x%x", EXTRACT_BE_U_4(ah + 1)));
 	if (!ND_TTEST2(*bp, sizeof(struct ah) + sumlen)) {
 		ND_PRINT((ndo, "[truncated]):"));
 		return -1;

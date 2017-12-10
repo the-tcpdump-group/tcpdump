@@ -89,10 +89,10 @@ gre_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	u_int len = length, vers;
 
-	ND_TCHECK2(*bp, 2);
+	ND_TCHECK_2(bp);
 	if (len < 2)
 		goto trunc;
-	vers = EXTRACT_16BITS(bp) & GRE_VERS_MASK;
+	vers = EXTRACT_BE_U_2(bp) & GRE_VERS_MASK;
         ND_PRINT((ndo, "GREv%u",vers));
 
         switch(vers) {
@@ -120,7 +120,7 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 	uint16_t flags, prot;
 
 	/* 16 bits ND_TCHECKed in gre_print() */
-	flags = EXTRACT_16BITS(bp);
+	flags = EXTRACT_BE_U_2(bp);
         if (ndo->ndo_vflag)
             ND_PRINT((ndo, ", Flags [%s]",
                    bittok2str(gre_flag_values,"none",flags)));
@@ -128,44 +128,44 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 	len -= 2;
 	bp += 2;
 
-	ND_TCHECK2(*bp, 2);
+	ND_TCHECK_2(bp);
 	if (len < 2)
 		goto trunc;
-	prot = EXTRACT_16BITS(bp);
+	prot = EXTRACT_BE_U_2(bp);
 	len -= 2;
 	bp += 2;
 
 	if ((flags & GRE_CP) | (flags & GRE_RP)) {
-		ND_TCHECK2(*bp, 2);
+		ND_TCHECK_2(bp);
 		if (len < 2)
 			goto trunc;
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo, ", sum 0x%x", EXTRACT_16BITS(bp)));
+			ND_PRINT((ndo, ", sum 0x%x", EXTRACT_BE_U_2(bp)));
 		bp += 2;
 		len -= 2;
 
-		ND_TCHECK2(*bp, 2);
+		ND_TCHECK_2(bp);
 		if (len < 2)
 			goto trunc;
-		ND_PRINT((ndo, ", off 0x%x", EXTRACT_16BITS(bp)));
+		ND_PRINT((ndo, ", off 0x%x", EXTRACT_BE_U_2(bp)));
 		bp += 2;
 		len -= 2;
 	}
 
 	if (flags & GRE_KP) {
-		ND_TCHECK2(*bp, 4);
+		ND_TCHECK_4(bp);
 		if (len < 4)
 			goto trunc;
-		ND_PRINT((ndo, ", key=0x%x", EXTRACT_32BITS(bp)));
+		ND_PRINT((ndo, ", key=0x%x", EXTRACT_BE_U_4(bp)));
 		bp += 4;
 		len -= 4;
 	}
 
 	if (flags & GRE_SP) {
-		ND_TCHECK2(*bp, 4);
+		ND_TCHECK_4(bp);
 		if (len < 4)
 			goto trunc;
-		ND_PRINT((ndo, ", seq %u", EXTRACT_32BITS(bp)));
+		ND_PRINT((ndo, ", seq %u", EXTRACT_BE_U_4(bp)));
 		bp += 4;
 		len -= 4;
 	}
@@ -176,12 +176,12 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 			uint8_t sreoff;
 			uint8_t srelen;
 
-			ND_TCHECK2(*bp, 4);
+			ND_TCHECK_4(bp);
 			if (len < 4)
 				goto trunc;
-			af = EXTRACT_16BITS(bp);
-			sreoff = *(bp + 2);
-			srelen = *(bp + 3);
+			af = EXTRACT_BE_U_2(bp);
+			sreoff = EXTRACT_U_1(bp + 2);
+			srelen = EXTRACT_U_1(bp + 3);
 			bp += 4;
 			len -= 4;
 
@@ -248,7 +248,7 @@ gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 	uint16_t flags, prot;
 
 	/* 16 bits ND_TCHECKed in gre_print() */
-	flags = EXTRACT_16BITS(bp);
+	flags = EXTRACT_BE_U_2(bp);
 	len -= 2;
 	bp += 2;
 
@@ -256,10 +256,10 @@ gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
             ND_PRINT((ndo, ", Flags [%s]",
                    bittok2str(gre_flag_values,"none",flags)));
 
-	ND_TCHECK2(*bp, 2);
+	ND_TCHECK_2(bp);
 	if (len < 2)
 		goto trunc;
-	prot = EXTRACT_16BITS(bp);
+	prot = EXTRACT_BE_U_2(bp);
 	len -= 2;
 	bp += 2;
 
@@ -267,29 +267,29 @@ gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 	if (flags & GRE_KP) {
 		uint32_t k;
 
-		ND_TCHECK2(*bp, 4);
+		ND_TCHECK_4(bp);
 		if (len < 4)
 			goto trunc;
-		k = EXTRACT_32BITS(bp);
+		k = EXTRACT_BE_U_4(bp);
 		ND_PRINT((ndo, ", call %d", k & 0xffff));
 		len -= 4;
 		bp += 4;
 	}
 
 	if (flags & GRE_SP) {
-		ND_TCHECK2(*bp, 4);
+		ND_TCHECK_4(bp);
 		if (len < 4)
 			goto trunc;
-		ND_PRINT((ndo, ", seq %u", EXTRACT_32BITS(bp)));
+		ND_PRINT((ndo, ", seq %u", EXTRACT_BE_U_4(bp)));
 		bp += 4;
 		len -= 4;
 	}
 
 	if (flags & GRE_AP) {
-		ND_TCHECK2(*bp, 4);
+		ND_TCHECK_4(bp);
 		if (len < 4)
 			goto trunc;
-		ND_PRINT((ndo, ", ack %u", EXTRACT_32BITS(bp)));
+		ND_PRINT((ndo, ", ack %u", EXTRACT_BE_U_4(bp)));
 		bp += 4;
 		len -= 4;
 	}
@@ -371,7 +371,7 @@ gre_sre_ip_print(netdissect_options *ndo, uint8_t sreoff, uint8_t srelen,
 	}
 
 	while (srelen != 0) {
-		if (!ND_TTEST2(*bp, 4))
+		if (!ND_TTEST_4(bp))
 			return (0);
 		if (len < 4)
 			return (0);
@@ -407,14 +407,14 @@ gre_sre_asn_print(netdissect_options *ndo, uint8_t sreoff, uint8_t srelen,
 	}
 
 	while (srelen != 0) {
-		if (!ND_TTEST2(*bp, 2))
+		if (!ND_TTEST_2(bp))
 			return (0);
 		if (len < 2)
 			return (0);
 
 		ND_PRINT((ndo, " %s%x",
 		    ((bp - up) == sreoff) ? "*" : "",
-		    EXTRACT_16BITS(bp)));
+		    EXTRACT_BE_U_2(bp)));
 
 		bp += 2;
 		len -= 2;

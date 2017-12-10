@@ -216,7 +216,7 @@ lwres_printnamelen(netdissect_options *ndo,
 
 	if (p + 2 > (const char *)ndo->ndo_snapend)
 		goto trunc;
-	l = EXTRACT_16BITS(p);
+	l = EXTRACT_BE_U_2(p);
 	advance = lwres_printname(ndo, l, p + 2);
 	if (advance < 0)
 		goto trunc;
@@ -237,7 +237,7 @@ lwres_printbinlen(netdissect_options *ndo,
 	p = p0;
 	if (p + 2 > (const char *)ndo->ndo_snapend)
 		goto trunc;
-	l = EXTRACT_16BITS(p);
+	l = EXTRACT_BE_U_2(p);
 	if (p + 2 + l > (const char *)ndo->ndo_snapend)
 		goto trunc;
 	p += 2;
@@ -258,12 +258,12 @@ lwres_printaddr(netdissect_options *ndo,
 	int i;
 
 	ND_TCHECK(ap->length);
-	l = EXTRACT_16BITS(&ap->length);
+	l = EXTRACT_BE_U_2(&ap->length);
 	/* XXX ap points to packed struct */
 	p = (const char *)&ap->length + sizeof(ap->length);
 	ND_TCHECK2(*p, l);
 
-	switch (EXTRACT_32BITS(&ap->family)) {
+	switch (EXTRACT_BE_U_4(&ap->family)) {
 	case 1:	/* IPv4 */
 		if (l < 4)
 			return -1;
@@ -277,7 +277,7 @@ lwres_printaddr(netdissect_options *ndo,
 		p += sizeof(struct in6_addr);
 		break;
 	default:
-		ND_PRINT((ndo, " %u/", EXTRACT_32BITS(&ap->family)));
+		ND_PRINT((ndo, " %u/", EXTRACT_BE_U_4(&ap->family)));
 		for (i = 0; i < l; i++)
 			ND_PRINT((ndo, "%02x", *p++));
 	}
@@ -303,35 +303,35 @@ lwres_print(netdissect_options *ndo,
 	ND_TCHECK(np->authlength);
 
 	ND_PRINT((ndo, " lwres"));
-	v = EXTRACT_16BITS(&np->version);
+	v = EXTRACT_BE_U_2(&np->version);
 	if (ndo->ndo_vflag || v != LWRES_LWPACKETVERSION_0)
 		ND_PRINT((ndo, " v%u", v));
 	if (v != LWRES_LWPACKETVERSION_0) {
-		s = (const char *)np + EXTRACT_32BITS(&np->length);
+		s = (const char *)np + EXTRACT_BE_U_4(&np->length);
 		goto tail;
 	}
 
-	response = EXTRACT_16BITS(&np->pktflags) & LWRES_LWPACKETFLAG_RESPONSE;
+	response = EXTRACT_BE_U_2(&np->pktflags) & LWRES_LWPACKETFLAG_RESPONSE;
 
 	/* opcode and pktflags */
-	v = EXTRACT_32BITS(&np->opcode);
+	v = EXTRACT_BE_U_4(&np->opcode);
 	s = tok2str(opcode, "#0x%x", v);
 	ND_PRINT((ndo, " %s%s", s, response ? "" : "?"));
 
 	/* pktflags */
-	v = EXTRACT_16BITS(&np->pktflags);
+	v = EXTRACT_BE_U_2(&np->pktflags);
 	if (v & ~LWRES_LWPACKETFLAG_RESPONSE)
 		ND_PRINT((ndo, "[0x%x]", v));
 
 	if (ndo->ndo_vflag > 1) {
 		ND_PRINT((ndo, " ("));	/*)*/
-		ND_PRINT((ndo, "serial:0x%x", EXTRACT_32BITS(&np->serial)));
-		ND_PRINT((ndo, " result:0x%x", EXTRACT_32BITS(&np->result)));
-		ND_PRINT((ndo, " recvlen:%u", EXTRACT_32BITS(&np->recvlength)));
+		ND_PRINT((ndo, "serial:0x%x", EXTRACT_BE_U_4(&np->serial)));
+		ND_PRINT((ndo, " result:0x%x", EXTRACT_BE_U_4(&np->result)));
+		ND_PRINT((ndo, " recvlen:%u", EXTRACT_BE_U_4(&np->recvlength)));
 		/* BIND910: not used */
 		if (ndo->ndo_vflag > 2) {
-			ND_PRINT((ndo, " authtype:0x%x", EXTRACT_16BITS(&np->authtype)));
-			ND_PRINT((ndo, " authlen:%u", EXTRACT_16BITS(&np->authlength)));
+			ND_PRINT((ndo, " authtype:0x%x", EXTRACT_BE_U_2(&np->authtype)));
+			ND_PRINT((ndo, " authlen:%u", EXTRACT_BE_U_2(&np->authlength)));
 		}
 		/*(*/
 		ND_PRINT((ndo, ")"));
@@ -351,7 +351,7 @@ lwres_print(netdissect_options *ndo,
 		gnba = NULL;
 		grbn = NULL;
 
-		switch (EXTRACT_32BITS(&np->opcode)) {
+		switch (EXTRACT_BE_U_4(&np->opcode)) {
 		case LWRES_OPCODE_NOOP:
 			break;
 		case LWRES_OPCODE_GETADDRSBYNAME:
@@ -360,15 +360,15 @@ lwres_print(netdissect_options *ndo,
 			/* XXX gabn points to packed struct */
 			s = (const char *)&gabn->namelen +
 			    sizeof(gabn->namelen);
-			l = EXTRACT_16BITS(&gabn->namelen);
+			l = EXTRACT_BE_U_2(&gabn->namelen);
 
 			/* BIND910: not used */
 			if (ndo->ndo_vflag > 2) {
 				ND_PRINT((ndo, " flags:0x%x",
-				    EXTRACT_32BITS(&gabn->flags)));
+				    EXTRACT_BE_U_4(&gabn->flags)));
 			}
 
-			v = EXTRACT_32BITS(&gabn->addrtypes);
+			v = EXTRACT_BE_U_4(&gabn->addrtypes);
 			switch (v & (LWRES_ADDRTYPE_V4 | LWRES_ADDRTYPE_V6)) {
 			case LWRES_ADDRTYPE_V4:
 				ND_PRINT((ndo, " IPv4"));
@@ -395,7 +395,7 @@ lwres_print(netdissect_options *ndo,
 			/* BIND910: not used */
 			if (ndo->ndo_vflag > 2) {
 				ND_PRINT((ndo, " flags:0x%x",
-				    EXTRACT_32BITS(&gnba->flags)));
+				    EXTRACT_BE_U_4(&gnba->flags)));
 			}
 
 			s = (const char *)&gnba->addr;
@@ -413,20 +413,20 @@ lwres_print(netdissect_options *ndo,
 			/* BIND910: not used */
 			if (ndo->ndo_vflag > 2) {
 				ND_PRINT((ndo, " flags:0x%x",
-				    EXTRACT_32BITS(&grbn->flags)));
+				    EXTRACT_BE_U_4(&grbn->flags)));
 			}
 
 			ND_PRINT((ndo, " %s", tok2str(ns_type2str, "Type%d",
-			    EXTRACT_16BITS(&grbn->rdtype))));
-			if (EXTRACT_16BITS(&grbn->rdclass) != C_IN) {
+			    EXTRACT_BE_U_2(&grbn->rdtype))));
+			if (EXTRACT_BE_U_2(&grbn->rdclass) != C_IN) {
 				ND_PRINT((ndo, " %s", tok2str(ns_class2str, "Class%d",
-				    EXTRACT_16BITS(&grbn->rdclass))));
+				    EXTRACT_BE_U_2(&grbn->rdclass))));
 			}
 
 			/* XXX grbn points to packed struct */
 			s = (const char *)&grbn->namelen +
 			    sizeof(grbn->namelen);
-			l = EXTRACT_16BITS(&grbn->namelen);
+			l = EXTRACT_BE_U_2(&grbn->namelen);
 
 			advance = lwres_printname(ndo, l, s);
 			if (advance < 0)
@@ -451,7 +451,7 @@ lwres_print(netdissect_options *ndo,
 		gnba = NULL;
 		grbn = NULL;
 
-		switch (EXTRACT_32BITS(&np->opcode)) {
+		switch (EXTRACT_BE_U_4(&np->opcode)) {
 		case LWRES_OPCODE_NOOP:
 			break;
 		case LWRES_OPCODE_GETADDRSBYNAME:
@@ -460,16 +460,16 @@ lwres_print(netdissect_options *ndo,
 			/* XXX gabn points to packed struct */
 			s = (const char *)&gabn->realnamelen +
 			    sizeof(gabn->realnamelen);
-			l = EXTRACT_16BITS(&gabn->realnamelen);
+			l = EXTRACT_BE_U_2(&gabn->realnamelen);
 
 			/* BIND910: not used */
 			if (ndo->ndo_vflag > 2) {
 				ND_PRINT((ndo, " flags:0x%x",
-				    EXTRACT_32BITS(&gabn->flags)));
+				    EXTRACT_BE_U_4(&gabn->flags)));
 			}
 
-			ND_PRINT((ndo, " %u/%u", EXTRACT_16BITS(&gabn->naliases),
-			    EXTRACT_16BITS(&gabn->naddrs)));
+			ND_PRINT((ndo, " %u/%u", EXTRACT_BE_U_2(&gabn->naliases),
+				  EXTRACT_BE_U_2(&gabn->naddrs)));
 
 			advance = lwres_printname(ndo, l, s);
 			if (advance < 0)
@@ -477,7 +477,7 @@ lwres_print(netdissect_options *ndo,
 			s += advance;
 
 			/* aliases */
-			na = EXTRACT_16BITS(&gabn->naliases);
+			na = EXTRACT_BE_U_2(&gabn->naliases);
 			for (i = 0; i < na; i++) {
 				advance = lwres_printnamelen(ndo, s);
 				if (advance < 0)
@@ -486,7 +486,7 @@ lwres_print(netdissect_options *ndo,
 			}
 
 			/* addrs */
-			na = EXTRACT_16BITS(&gabn->naddrs);
+			na = EXTRACT_BE_U_2(&gabn->naddrs);
 			for (i = 0; i < na; i++) {
 				advance = lwres_printaddr(ndo, (const lwres_addr_t *)s);
 				if (advance < 0)
@@ -500,15 +500,15 @@ lwres_print(netdissect_options *ndo,
 			/* XXX gnba points to packed struct */
 			s = (const char *)&gnba->realnamelen +
 			    sizeof(gnba->realnamelen);
-			l = EXTRACT_16BITS(&gnba->realnamelen);
+			l = EXTRACT_BE_U_2(&gnba->realnamelen);
 
 			/* BIND910: not used */
 			if (ndo->ndo_vflag > 2) {
 				ND_PRINT((ndo, " flags:0x%x",
-				    EXTRACT_32BITS(&gnba->flags)));
+				    EXTRACT_BE_U_4(&gnba->flags)));
 			}
 
-			ND_PRINT((ndo, " %u", EXTRACT_16BITS(&gnba->naliases)));
+			ND_PRINT((ndo, " %u", EXTRACT_BE_U_2(&gnba->naliases)));
 
 			advance = lwres_printname(ndo, l, s);
 			if (advance < 0)
@@ -516,7 +516,7 @@ lwres_print(netdissect_options *ndo,
 			s += advance;
 
 			/* aliases */
-			na = EXTRACT_16BITS(&gnba->naliases);
+			na = EXTRACT_BE_U_2(&gnba->naliases);
 			for (i = 0; i < na; i++) {
 				advance = lwres_printnamelen(ndo, s);
 				if (advance < 0)
@@ -532,19 +532,20 @@ lwres_print(netdissect_options *ndo,
 			/* BIND910: not used */
 			if (ndo->ndo_vflag > 2) {
 				ND_PRINT((ndo, " flags:0x%x",
-				    EXTRACT_32BITS(&grbn->flags)));
+				    EXTRACT_BE_U_4(&grbn->flags)));
 			}
 
 			ND_PRINT((ndo, " %s", tok2str(ns_type2str, "Type%d",
-			    EXTRACT_16BITS(&grbn->rdtype))));
-			if (EXTRACT_16BITS(&grbn->rdclass) != C_IN) {
+			    EXTRACT_BE_U_2(&grbn->rdtype))));
+			if (EXTRACT_BE_U_2(&grbn->rdclass) != C_IN) {
 				ND_PRINT((ndo, " %s", tok2str(ns_class2str, "Class%d",
-				    EXTRACT_16BITS(&grbn->rdclass))));
+				    EXTRACT_BE_U_2(&grbn->rdclass))));
 			}
 			ND_PRINT((ndo, " TTL "));
-			unsigned_relts_print(ndo, EXTRACT_32BITS(&grbn->ttl));
-			ND_PRINT((ndo, " %u/%u", EXTRACT_16BITS(&grbn->nrdatas),
-			    EXTRACT_16BITS(&grbn->nsigs)));
+			unsigned_relts_print(ndo,
+					     EXTRACT_BE_U_4(&grbn->ttl));
+			ND_PRINT((ndo, " %u/%u", EXTRACT_BE_U_2(&grbn->nrdatas),
+				  EXTRACT_BE_U_2(&grbn->nsigs)));
 
 			/* XXX grbn points to packed struct */
 			s = (const char *)&grbn->nsigs+ sizeof(grbn->nsigs);
@@ -555,7 +556,7 @@ lwres_print(netdissect_options *ndo,
 			s += advance;
 
 			/* rdatas */
-			na = EXTRACT_16BITS(&grbn->nrdatas);
+			na = EXTRACT_BE_U_2(&grbn->nrdatas);
 			for (i = 0; i < na; i++) {
 				/* XXX should decode resource data */
 				advance = lwres_printbinlen(ndo, s);
@@ -565,7 +566,7 @@ lwres_print(netdissect_options *ndo,
 			}
 
 			/* sigs */
-			na = EXTRACT_16BITS(&grbn->nsigs);
+			na = EXTRACT_BE_U_2(&grbn->nsigs);
 			for (i = 0; i < na; i++) {
 				/* XXX how should we print it? */
 				advance = lwres_printbinlen(ndo, s);
@@ -582,11 +583,11 @@ lwres_print(netdissect_options *ndo,
 
   tail:
 	/* length mismatch */
-	if (EXTRACT_32BITS(&np->length) != length) {
-		ND_PRINT((ndo, " [len: %u != %u]", EXTRACT_32BITS(&np->length),
-		    length));
+	if (EXTRACT_BE_U_4(&np->length) != length) {
+		ND_PRINT((ndo, " [len: %u != %u]", EXTRACT_BE_U_4(&np->length),
+			  length));
 	}
-	if (!unsupported && s < (const char *)np + EXTRACT_32BITS(&np->length))
+	if (!unsupported && s < (const char *)np + EXTRACT_BE_U_4(&np->length))
 		ND_PRINT((ndo, "[extra]"));
 	return;
 

@@ -68,18 +68,18 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
 
     ND_TCHECK2(*bp, NSH_BASE_HDR_LEN + NSH_SERVICE_PATH_HDR_LEN);
 
-    ver = (uint8_t)(*bp >> 6);
-    flags = *bp;
+    ver = (uint8_t)(EXTRACT_U_1(bp) >> 6);
+    flags = EXTRACT_U_1(bp);
     bp += 1;
-    length = *bp;
+    length = EXTRACT_U_1(bp);
     bp += 1;
-    md_type = *bp;
+    md_type = EXTRACT_U_1(bp);
     bp += 1;
-    next_protocol = *bp;
+    next_protocol = EXTRACT_U_1(bp);
     bp += 1;
-    service_path_id = EXTRACT_24BITS(bp);
+    service_path_id = EXTRACT_BE_U_3(bp);
     bp += 3;
-    service_index = *bp;
+    service_index = EXTRACT_U_1(bp);
     bp += 1;
 
     ND_PRINT((ndo, "NSH, "));
@@ -117,7 +117,7 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
     if (ndo->ndo_vflag > 2) {
         if (md_type == 0x01) {
             for (n = 0; n < length - 2; n++) {
-                ctx = EXTRACT_32BITS(bp);
+                ctx = EXTRACT_BE_U_4(bp);
                 bp += NSH_HDR_WORD_SIZE;
                 ND_PRINT((ndo, "\n        Context[%02d]: 0x%08x", n, ctx));
             }
@@ -125,11 +125,11 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
         else if (md_type == 0x02) {
             n = 0;
             while (n < length - 2) {
-                tlv_class = EXTRACT_16BITS(bp);
+                tlv_class = EXTRACT_BE_U_2(bp);
                 bp += 2;
-                tlv_type  = *bp;
+                tlv_type  = EXTRACT_U_1(bp);
                 bp += 1;
-                tlv_len   = *bp;
+                tlv_len   = EXTRACT_U_1(bp);
                 bp += 1;
 
                 ND_PRINT((ndo, "\n        TLV Class %d, Type %d, Len %d",
@@ -143,7 +143,7 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
                 }
 
                 for (vn = 0; vn < tlv_len; vn++) {
-                    ctx = EXTRACT_32BITS(bp);
+                    ctx = EXTRACT_BE_U_4(bp);
                     bp += NSH_HDR_WORD_SIZE;
                     ND_PRINT((ndo, "\n            Value[%02d]: 0x%08x", vn, ctx));
                 }

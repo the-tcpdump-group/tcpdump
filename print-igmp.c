@@ -21,6 +21,14 @@
 
 /* \summary: Internet Group Management Protocol (IGMP) printer */
 
+/*
+ * specification:
+ *
+ *	RFC 2236 for IGMPv2
+ *	RFC 3376 for IGMPv3
+ *	draft-asaeda-mboned-mtrace-v2 for the mtrace message
+ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -43,14 +51,12 @@ static const char tstr[] = "[|igmp]";
  * The packet format for a traceroute request.
  */
 struct tr_query {
-    uint32_t  tr_src;          /* traceroute source */
-    uint32_t  tr_dst;          /* traceroute destination */
-    uint32_t  tr_raddr;        /* traceroute response address */
-    uint32_t  tr_rttlqid;      /* response ttl and qid */
+    nd_uint32_t  tr_src;        /* traceroute source */
+    nd_uint32_t  tr_dst;        /* traceroute destination */
+    nd_uint32_t  tr_raddr;      /* traceroute response address */
+    nd_uint8_t   tr_rttl;       /* response ttl */
+    nd_uint24_t  tr_qid;        /* qid */
 };
-
-#define TR_GETTTL(x)        (int)(((x) >> 24) & 0xff)
-#define TR_GETQID(x)        ((x) & 0x00ffffff)
 
 /*
  * Traceroute response format.  A traceroute response has a tr_query at the
@@ -114,11 +120,11 @@ print_mtrace(netdissect_options *ndo,
 	return;
     }
     ND_PRINT((ndo, "mtrace %u: %s to %s reply-to %s",
-        TR_GETQID(EXTRACT_32BITS(&tr->tr_rttlqid)),
-        ipaddr_string(ndo, &tr->tr_src), ipaddr_string(ndo, &tr->tr_dst),
-        ipaddr_string(ndo, &tr->tr_raddr)));
-    if (IN_CLASSD(EXTRACT_32BITS(&tr->tr_raddr)))
-        ND_PRINT((ndo, " with-ttl %d", TR_GETTTL(EXTRACT_32BITS(&tr->tr_rttlqid))));
+        EXTRACT_BE_U_3(tr->tr_qid),
+        ipaddr_string(ndo, tr->tr_src), ipaddr_string(ndo, tr->tr_dst),
+        ipaddr_string(ndo, tr->tr_raddr)));
+    if (IN_CLASSD(EXTRACT_BE_U_4(tr->tr_raddr)))
+        ND_PRINT((ndo, " with-ttl %u", EXTRACT_U_1(&tr->tr_rttl)));
     return;
 trunc:
     ND_PRINT((ndo, "%s", tstr));
@@ -135,12 +141,12 @@ print_mresp(netdissect_options *ndo,
 	ND_PRINT((ndo, " [invalid len %d]", len));
 	return;
     }
-    ND_PRINT((ndo, "mresp %lu: %s to %s reply-to %s",
-        (u_long)TR_GETQID(EXTRACT_32BITS(&tr->tr_rttlqid)),
-        ipaddr_string(ndo, &tr->tr_src), ipaddr_string(ndo, &tr->tr_dst),
-        ipaddr_string(ndo, &tr->tr_raddr)));
-    if (IN_CLASSD(EXTRACT_32BITS(&tr->tr_raddr)))
-        ND_PRINT((ndo, " with-ttl %d", TR_GETTTL(EXTRACT_32BITS(&tr->tr_rttlqid))));
+    ND_PRINT((ndo, "mresp %u: %s to %s reply-to %s",
+        EXTRACT_BE_U_3(tr->tr_qid),
+        ipaddr_string(ndo, tr->tr_src), ipaddr_string(ndo, tr->tr_dst),
+        ipaddr_string(ndo, tr->tr_raddr)));
+    if (IN_CLASSD(EXTRACT_BE_U_4(tr->tr_raddr)))
+        ND_PRINT((ndo, " with-ttl %u", EXTRACT_U_1(&tr->tr_rttl)));
     return;
 trunc:
     ND_PRINT((ndo, "%s", tstr));
@@ -158,8 +164,8 @@ print_igmpv3_report(netdissect_options *ndo,
 	ND_PRINT((ndo, " [invalid len %d]", len));
 	return;
     }
-    ND_TCHECK2(bp[6], 2);
-    ngroups = EXTRACT_16BITS(&bp[6]);
+    ND_TCHECK_2(bp + 6);
+    ngroups = EXTRACT_BE_U_2(bp + 6);
     ND_PRINT((ndo, ", %d group record(s)", ngroups));
     if (ndo->ndo_vflag > 0) {
 	/* Print the group records */
@@ -169,11 +175,11 @@ print_igmpv3_report(netdissect_options *ndo,
 		ND_PRINT((ndo, " [invalid number of groups]"));
 		return;
 	    }
-	    ND_TCHECK2(bp[group+4], 4);
-            ND_PRINT((ndo, " [gaddr %s", ipaddr_string(ndo, &bp[group+4])));
+	    ND_TCHECK_4(bp + (group + 4));
+            ND_PRINT((ndo, " [gaddr %s", ipaddr_string(ndo, bp + group + 4)));
 	    ND_PRINT((ndo, " %s", tok2str(igmpv3report2str, " [v3-report-#%d]",
-								bp[group])));
-            nsrcs = EXTRACT_16BITS(&bp[group+2]);
+								EXTRACT_U_1(bp + group))));
+            nsrcs = EXTRACT_BE_U_2(bp + group + 2);
 	    /* Check the number of sources and print them */
 	    if (len < group+8+(nsrcs<<2)) {
 		ND_PRINT((ndo, " [invalid number of sources %d]", nsrcs));
@@ -185,8 +191,8 @@ print_igmpv3_report(netdissect_options *ndo,
 		/* Print the sources */
                 ND_PRINT((ndo, " {"));
                 for (j=0; j<nsrcs; j++) {
-		    ND_TCHECK2(bp[group+8+(j<<2)], 4);
-		    ND_PRINT((ndo, " %s", ipaddr_string(ndo, &bp[group+8+(j<<2)])));
+		    ND_TCHECK_4(bp + (group + 8 + (j << 2)));
+		    ND_PRINT((ndo, " %s", ipaddr_string(ndo, bp + group + 8 + (j << 2))));
 		}
                 ND_PRINT((ndo, " }"));
             }
@@ -215,8 +221,8 @@ print_igmpv3_query(netdissect_options *ndo,
 	ND_PRINT((ndo, " [invalid len %d]", len));
 	return;
     }
-    ND_TCHECK(bp[1]);
-    mrc = bp[1];
+    ND_TCHECK_1(bp + 1);
+    mrc = EXTRACT_U_1(bp + 1);
     if (mrc < 128) {
 	mrt = mrc;
     } else {
@@ -231,20 +237,20 @@ print_igmpv3_query(netdissect_options *ndo,
         }
 	ND_PRINT((ndo, "]"));
     }
-    ND_TCHECK2(bp[4], 4);
-    if (EXTRACT_32BITS(&bp[4]) == 0)
+    ND_TCHECK_4(bp + 4);
+    if (EXTRACT_BE_U_4(bp + 4) == 0)
 	return;
-    ND_PRINT((ndo, " [gaddr %s", ipaddr_string(ndo, &bp[4])));
-    ND_TCHECK2(bp[10], 2);
-    nsrcs = EXTRACT_16BITS(&bp[10]);
+    ND_PRINT((ndo, " [gaddr %s", ipaddr_string(ndo, bp + 4)));
+    ND_TCHECK_2(bp + 10);
+    nsrcs = EXTRACT_BE_U_2(bp + 10);
     if (nsrcs > 0) {
 	if (len < 12 + (nsrcs << 2))
 	    ND_PRINT((ndo, " [invalid number of sources]"));
 	else if (ndo->ndo_vflag > 1) {
 	    ND_PRINT((ndo, " {"));
 	    for (i=0; i<nsrcs; i++) {
-		ND_TCHECK2(bp[12+(i<<2)], 4);
-		ND_PRINT((ndo, " %s", ipaddr_string(ndo, &bp[12+(i<<2)])));
+		ND_TCHECK_4(bp + (12 + (i << 2)));
+		ND_PRINT((ndo, " %s", ipaddr_string(ndo, bp + 12 + (i << 2))));
 	    }
 	    ND_PRINT((ndo, " }"));
 	} else
@@ -267,44 +273,44 @@ igmp_print(netdissect_options *ndo,
         return;
     }
 
-    ND_TCHECK(bp[0]);
-    switch (bp[0]) {
+    ND_TCHECK_1(bp);
+    switch (EXTRACT_U_1(bp)) {
     case 0x11:
         ND_PRINT((ndo, "igmp query"));
 	if (len >= 12)
 	    print_igmpv3_query(ndo, bp, len);
 	else {
-            ND_TCHECK(bp[1]);
-	    if (bp[1]) {
+            ND_TCHECK_1(bp + 1);
+	    if (EXTRACT_U_1(bp + 1)) {
 		ND_PRINT((ndo, " v2"));
-		if (bp[1] != 100)
-		    ND_PRINT((ndo, " [max resp time %d]", bp[1]));
+		if (EXTRACT_U_1(bp + 1) != 100)
+		    ND_PRINT((ndo, " [max resp time %u]", EXTRACT_U_1(bp + 1)));
 	    } else
 		ND_PRINT((ndo, " v1"));
-            ND_TCHECK2(bp[4], 4);
-	    if (EXTRACT_32BITS(&bp[4]))
-                ND_PRINT((ndo, " [gaddr %s]", ipaddr_string(ndo, &bp[4])));
+            ND_TCHECK_4(bp + 4);
+	    if (EXTRACT_BE_U_4(bp + 4))
+                ND_PRINT((ndo, " [gaddr %s]", ipaddr_string(ndo, bp + 4)));
             if (len != 8)
                 ND_PRINT((ndo, " [len %d]", len));
 	}
         break;
     case 0x12:
-        ND_TCHECK2(bp[4], 4);
-        ND_PRINT((ndo, "igmp v1 report %s", ipaddr_string(ndo, &bp[4])));
+        ND_TCHECK_4(bp + 4);
+        ND_PRINT((ndo, "igmp v1 report %s", ipaddr_string(ndo, bp + 4)));
         if (len != 8)
             ND_PRINT((ndo, " [len %d]", len));
         break;
     case 0x16:
-        ND_TCHECK2(bp[4], 4);
-        ND_PRINT((ndo, "igmp v2 report %s", ipaddr_string(ndo, &bp[4])));
+        ND_TCHECK_4(bp + 4);
+        ND_PRINT((ndo, "igmp v2 report %s", ipaddr_string(ndo, bp + 4)));
         break;
     case 0x22:
         ND_PRINT((ndo, "igmp v3 report"));
 	print_igmpv3_report(ndo, bp, len);
         break;
     case 0x17:
-        ND_TCHECK2(bp[4], 4);
-        ND_PRINT((ndo, "igmp leave %s", ipaddr_string(ndo, &bp[4])));
+        ND_TCHECK_4(bp + 4);
+        ND_PRINT((ndo, "igmp leave %s", ipaddr_string(ndo, bp + 4)));
         break;
     case 0x13:
         ND_PRINT((ndo, "igmp dvmrp"));
@@ -324,7 +330,7 @@ igmp_print(netdissect_options *ndo,
         print_mtrace(ndo, bp, len);
         break;
     default:
-        ND_PRINT((ndo, "igmp-%d", bp[0]));
+        ND_PRINT((ndo, "igmp-%d", EXTRACT_U_1(bp)));
         break;
     }
 
@@ -333,7 +339,7 @@ igmp_print(netdissect_options *ndo,
         vec[0].ptr = bp;
         vec[0].len = len;
         if (in_cksum(vec, 1))
-            ND_PRINT((ndo, " bad igmp cksum %x!", EXTRACT_16BITS(&bp[2])));
+            ND_PRINT((ndo, " bad igmp cksum %x!", EXTRACT_BE_U_2(bp + 2)));
     }
     return;
 trunc:

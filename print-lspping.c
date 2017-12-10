@@ -530,18 +530,18 @@ lspping_print(netdissect_options *ndo,
     /*
      * Sanity checking of the header.
      */
-    if (EXTRACT_16BITS(&lspping_com_header->version[0]) != LSPPING_VERSION) {
+    if (EXTRACT_BE_U_2(&lspping_com_header->version[0]) != LSPPING_VERSION) {
 	ND_PRINT((ndo, "LSP-PING version %u packet not supported",
-               EXTRACT_16BITS(&lspping_com_header->version[0])));
+               EXTRACT_BE_U_2(&lspping_com_header->version[0])));
 	return;
     }
 
     /* in non-verbose mode just lets print the basic Message Type*/
     if (ndo->ndo_vflag < 1) {
         ND_PRINT((ndo, "LSP-PINGv%u, %s, seq %u, length: %u",
-               EXTRACT_16BITS(&lspping_com_header->version[0]),
+               EXTRACT_BE_U_2(&lspping_com_header->version[0]),
                tok2str(lspping_msg_type_values, "unknown (%u)",lspping_com_header->msg_type),
-               EXTRACT_32BITS(lspping_com_header->seq_number),
+               EXTRACT_BE_U_4(lspping_com_header->seq_number),
                len));
         return;
     }
@@ -551,7 +551,7 @@ lspping_print(netdissect_options *ndo,
     tlen=len;
 
     ND_PRINT((ndo, "\n\tLSP-PINGv%u, msg-type: %s (%u), length: %u\n\t  reply-mode: %s (%u)",
-           EXTRACT_16BITS(&lspping_com_header->version[0]),
+           EXTRACT_BE_U_2(&lspping_com_header->version[0]),
            tok2str(lspping_msg_type_values, "unknown",lspping_com_header->msg_type),
            lspping_com_header->msg_type,
            len,
@@ -580,16 +580,16 @@ lspping_print(netdissect_options *ndo,
                lspping_com_header->return_subcode));
 
     ND_PRINT((ndo, "\n\t  Sender Handle: 0x%08x, Sequence: %u",
-           EXTRACT_32BITS(lspping_com_header->sender_handle),
-           EXTRACT_32BITS(lspping_com_header->seq_number)));
+           EXTRACT_BE_U_4(lspping_com_header->sender_handle),
+           EXTRACT_BE_U_4(lspping_com_header->seq_number)));
 
-    timestamp.tv_sec=EXTRACT_32BITS(lspping_com_header->ts_sent_sec);
-    timestamp.tv_usec=EXTRACT_32BITS(lspping_com_header->ts_sent_usec);
+    timestamp.tv_sec=EXTRACT_BE_U_4(lspping_com_header->ts_sent_sec);
+    timestamp.tv_usec=EXTRACT_BE_U_4(lspping_com_header->ts_sent_usec);
     ND_PRINT((ndo, "\n\t  Sender Timestamp: "));
     ts_print(ndo, &timestamp);
 
-    timestamp.tv_sec=EXTRACT_32BITS(lspping_com_header->ts_rcvd_sec);
-    timestamp.tv_usec=EXTRACT_32BITS(lspping_com_header->ts_rcvd_usec);
+    timestamp.tv_sec=EXTRACT_BE_U_4(lspping_com_header->ts_rcvd_sec);
+    timestamp.tv_usec=EXTRACT_BE_U_4(lspping_com_header->ts_rcvd_usec);
     ND_PRINT((ndo, "Receiver Timestamp: "));
     if ((timestamp.tv_sec != 0) && (timestamp.tv_usec != 0))
         ts_print(ndo, &timestamp);
@@ -608,8 +608,8 @@ lspping_print(netdissect_options *ndo,
         ND_TCHECK2(*tptr, sizeof(struct lspping_tlv_header));
 
         lspping_tlv_header = (const struct lspping_tlv_header *)tptr;
-        lspping_tlv_type=EXTRACT_16BITS(lspping_tlv_header->type);
-        lspping_tlv_len=EXTRACT_16BITS(lspping_tlv_header->length);
+        lspping_tlv_type=EXTRACT_BE_U_2(lspping_tlv_header->type);
+        lspping_tlv_len=EXTRACT_BE_U_2(lspping_tlv_header->length);
 
         ND_PRINT((ndo, "\n\t  %s TLV (%u), length: %u",
                tok2str(lspping_tlv_values,
@@ -649,8 +649,8 @@ lspping_print(netdissect_options *ndo,
                 subtlv_hexdump=FALSE;
 
                 lspping_subtlv_header = (const struct lspping_tlv_header *)tlv_tptr;
-                lspping_subtlv_type=EXTRACT_16BITS(lspping_subtlv_header->type);
-                lspping_subtlv_len=EXTRACT_16BITS(lspping_subtlv_header->length);
+                lspping_subtlv_type=EXTRACT_BE_U_2(lspping_subtlv_header->type);
+                lspping_subtlv_len=EXTRACT_BE_U_2(lspping_subtlv_header->length);
                 subtlv_tptr=tlv_tptr+sizeof(struct lspping_tlv_header);
 
                 /* Does the subTLV go past the end of the TLV? */
@@ -740,8 +740,8 @@ lspping_print(netdissect_options *ndo,
                                "\n\t      tunnel-id 0x%04x, extended tunnel-id %s",
                                ipaddr_string(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv4->tunnel_endpoint),
                                ipaddr_string(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv4->tunnel_sender),
-                               EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv4->lsp_id),
-                               EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv4->tunnel_id),
+                               EXTRACT_BE_U_2(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv4->lsp_id),
+                               EXTRACT_BE_U_2(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv4->tunnel_id),
                                ipaddr_string(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv4->extended_tunnel_id)));
                     }
                     break;
@@ -758,8 +758,8 @@ lspping_print(netdissect_options *ndo,
                                "\n\t      tunnel-id 0x%04x, extended tunnel-id %s",
                                ip6addr_string(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv6->tunnel_endpoint),
                                ip6addr_string(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv6->tunnel_sender),
-                               EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv6->lsp_id),
-                               EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv6->tunnel_id),
+                               EXTRACT_BE_U_2(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv6->lsp_id),
+                               EXTRACT_BE_U_2(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv6->tunnel_id),
                                ip6addr_string(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv6->extended_tunnel_id)));
                     }
                     break;
@@ -805,12 +805,12 @@ lspping_print(netdissect_options *ndo,
                         ND_PRINT((ndo, "\n\t      RD: %s, Sender VE ID: %u, Receiver VE ID: %u" \
                                "\n\t      Encapsulation Type: %s (%u)",
                                bgp_vpn_rd_print(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->rd),
-                               EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->sender_ve_id),
-                               EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->receiver_ve_id),
+                               EXTRACT_BE_U_2(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->sender_ve_id),
+                               EXTRACT_BE_U_2(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->receiver_ve_id),
                                tok2str(mpls_pw_types_values,
                                        "unknown",
-                                       EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->encapsulation)),
-                               EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->encapsulation)));
+                                       EXTRACT_BE_U_2(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->encapsulation)),
+                               EXTRACT_BE_U_2(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->encapsulation)));
                     }
                     break;
 
@@ -826,11 +826,11 @@ lspping_print(netdissect_options *ndo,
                         ND_PRINT((ndo, "\n\t      Remote PE: %s" \
                                "\n\t      PW ID: 0x%08x, PW Type: %s (%u)",
                                ipaddr_string(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid_old->remote_pe_address),
-                               EXTRACT_32BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid_old->pw_id),
+                               EXTRACT_BE_U_4(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid_old->pw_id),
                                tok2str(mpls_pw_types_values,
                                        "unknown",
-                                       EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid_old->pw_type)),
-                               EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid_old->pw_type)));
+                                       EXTRACT_BE_U_2(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid_old->pw_type)),
+                               EXTRACT_BE_U_2(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid_old->pw_type)));
                     }
                     break;
 
@@ -846,11 +846,11 @@ lspping_print(netdissect_options *ndo,
                                "\n\t      PW ID: 0x%08x, PW Type: %s (%u)",
                                ipaddr_string(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid->sender_pe_address),
                                ipaddr_string(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid->remote_pe_address),
-                               EXTRACT_32BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid->pw_id),
+                               EXTRACT_BE_U_4(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid->pw_id),
                                tok2str(mpls_pw_types_values,
                                        "unknown",
-                                       EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid->pw_type)),
-                               EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid->pw_type)));
+                                       EXTRACT_BE_U_2(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid->pw_type)),
+                               EXTRACT_BE_U_2(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid->pw_type)));
                     }
                     break;
 
@@ -896,7 +896,7 @@ lspping_print(netdissect_options *ndo,
              * we find the address-type, we recast the tlv_tptr and move on. */
 
             ND_PRINT((ndo, "\n\t    MTU: %u, Address-Type: %s (%u)",
-                   EXTRACT_16BITS(tlv_ptr.lspping_tlv_downstream_map->mtu),
+                   EXTRACT_BE_U_2(tlv_ptr.lspping_tlv_downstream_map->mtu),
                    tok2str(lspping_tlv_downstream_addr_values,
                            "unknown",
                            tlv_ptr.lspping_tlv_downstream_map->address_type),
@@ -938,7 +938,7 @@ lspping_print(netdissect_options *ndo,
                 ND_PRINT((ndo, "\n\t    Downstream IP: %s" \
                        "\n\t    Downstream Interface Index: 0x%08x",
                        ipaddr_string(ndo, tlv_ptr.lspping_tlv_downstream_map_ipv4_unmb->downstream_ip),
-                       EXTRACT_32BITS(tlv_ptr.lspping_tlv_downstream_map_ipv4_unmb->downstream_interface)));
+                       EXTRACT_BE_U_4(tlv_ptr.lspping_tlv_downstream_map_ipv4_unmb->downstream_interface)));
                 tlv_tptr+=sizeof(struct lspping_tlv_downstream_map_ipv4_unmb_t);
                 tlv_tlen-=sizeof(struct lspping_tlv_downstream_map_ipv4_unmb_t);
                 break;
@@ -976,7 +976,7 @@ lspping_print(netdissect_options *ndo,
                 ND_PRINT((ndo, "\n\t    Downstream IP: %s" \
                        "\n\t    Downstream Interface Index: 0x%08x",
                        ip6addr_string(ndo, tlv_ptr.lspping_tlv_downstream_map_ipv6_unmb->downstream_ip),
-                       EXTRACT_32BITS(tlv_ptr.lspping_tlv_downstream_map_ipv6_unmb->downstream_interface)));
+                       EXTRACT_BE_U_4(tlv_ptr.lspping_tlv_downstream_map_ipv6_unmb->downstream_interface)));
                 tlv_tptr+=sizeof(struct lspping_tlv_downstream_map_ipv6_unmb_t);
                 tlv_tlen-=sizeof(struct lspping_tlv_downstream_map_ipv6_unmb_t);
                 break;
@@ -1016,7 +1016,7 @@ lspping_print(netdissect_options *ndo,
                 goto tlv_tooshort;
             } else {
                 ND_TCHECK2(*tptr, LSPPING_TLV_BFD_DISCRIMINATOR_LEN);
-                ND_PRINT((ndo, "\n\t    BFD Discriminator 0x%08x", EXTRACT_32BITS(tptr)));
+                ND_PRINT((ndo, "\n\t    BFD Discriminator 0x%08x", EXTRACT_BE_U_4(tptr)));
             }
             break;
 
@@ -1030,7 +1030,7 @@ lspping_print(netdissect_options *ndo,
                 goto tlv_tooshort;
             } else {
                 ND_TCHECK2(*tptr, LSPPING_TLV_VENDOR_ENTERPRISE_LEN);
-                vendor_id = EXTRACT_32BITS(tlv_tptr);
+                vendor_id = EXTRACT_BE_U_4(tlv_tptr);
                 ND_PRINT((ndo, "\n\t    Vendor: %s (0x%04x)",
                        tok2str(smi_values, "Unknown", vendor_id),
                        vendor_id));

@@ -32,6 +32,23 @@
 #include "netdissect.h"
 #include "extract.h"
 
+/*
+ * Kerberos 4:
+ *
+ * Athena Technical Plan
+ * Section E.2.1
+ * Kerberos Authentication and Authorization System
+ * by S. P. Miller, B. C. Neuman, J. I. Schiller, and J. H. Saltzer
+ *
+ * http://web.mit.edu/Saltzer/www/publications/athenaplan/e.2.1.pdf
+ *
+ * 7. Appendix I Design Specifications
+ *
+ * Kerberos 5:
+ *
+ * RFC 1510, RFC 2630, etc.
+ */
+
 static const char tstr[] = " [|kerberos]";
 
 static const u_char *c_print(netdissect_options *, register const u_char *, register const u_char *);
@@ -102,7 +119,8 @@ c_print(netdissect_options *ndo,
 
 	flag = 1;
 	while (s < ep) {
-		c = *s++;
+		c = EXTRACT_U_1(s);
+		s++;
 		if (c == '\0') {
 			flag = 0;
 			break;
@@ -155,7 +173,7 @@ krb4_print(netdissect_options *ndo,
 #define PRINT		if ((cp = c_print(ndo, cp, ndo->ndo_snapend)) == NULL) goto trunc
 /*  True if struct krb is little endian */
 #define IS_LENDIAN(kp)	(((kp)->type & 0x01) != 0)
-#define KTOHSP(kp, cp)	(IS_LENDIAN(kp) ? EXTRACT_LE_16BITS(cp) : EXTRACT_16BITS(cp))
+#define KTOHSP(kp, cp)	(IS_LENDIAN(kp) ? EXTRACT_LE_U_2(cp) : EXTRACT_BE_U_2(cp))
 
 	kp = (const struct krb *)cp;
 
@@ -175,8 +193,9 @@ krb4_print(netdissect_options *ndo,
 		if ((cp = krb4_print_hdr(ndo, cp)) == NULL)
 			return;
 		cp += 4;	/* ctime */
-		ND_TCHECK(*cp);
-		ND_PRINT((ndo, " %dmin ", *cp++ * 5));
+		ND_TCHECK_1(cp);
+		ND_PRINT((ndo, " %dmin ", EXTRACT_U_1(cp) * 5));
+		cp++;
 		PRINT;
 		ND_PRINT((ndo, "."));
 		PRINT;
@@ -184,13 +203,15 @@ krb4_print(netdissect_options *ndo,
 
 	case AUTH_MSG_APPL_REQUEST:
 		cp += 2;
-		ND_TCHECK(*cp);
-		ND_PRINT((ndo, "v%d ", *cp++));
+		ND_TCHECK_1(cp);
+		ND_PRINT((ndo, "v%d ", EXTRACT_U_1(cp)));
+		cp++;
 		PRINT;
-		ND_TCHECK(*cp);
-		ND_PRINT((ndo, " (%d)", *cp++));
-		ND_TCHECK(*cp);
-		ND_PRINT((ndo, " (%d)", *cp));
+		ND_TCHECK_1(cp);
+		ND_PRINT((ndo, " (%d)", EXTRACT_U_1(cp)));
+		cp++;
+		ND_TCHECK_1(cp);
+		ND_PRINT((ndo, " (%d)", EXTRACT_U_1(cp)));
 		break;
 
 	case AUTH_MSG_KDC_REPLY:

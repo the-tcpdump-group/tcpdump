@@ -67,7 +67,7 @@ ap1394_hdr_print(netdissect_options *ndo, register const u_char *bp, u_int lengt
 		     fwaddr_string(ndo, fp->firewire_shost),
 		     fwaddr_string(ndo, fp->firewire_dhost)));
 
-	firewire_type = EXTRACT_16BITS(&fp->firewire_type);
+	firewire_type = EXTRACT_BE_U_2(&fp->firewire_type);
 	if (!ndo->ndo_qflag) {
 		ND_PRINT((ndo, ", ethertype %s (0x%04x)",
 			       tok2str(ethertype_values,"Unknown", firewire_type),
@@ -107,7 +107,7 @@ ap1394_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 	fp = (const struct firewire_header *)p;
 	p += FIREWIRE_HDRLEN;
 
-	ether_type = EXTRACT_16BITS(&fp->firewire_type);
+	ether_type = EXTRACT_BE_U_2(&fp->firewire_type);
 	src.addr = fp->firewire_shost;
 	src.addr_string = fwaddr_string;
 	dst.addr = fp->firewire_dhost;

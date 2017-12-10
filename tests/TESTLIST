@@ -84,6 +84,9 @@ daoack01        rpl-26-senddaoack.pcap      rpl-26-senddaovv.out -v -v -v
 # IPNET encapsulated site
 e1000g		e1000g.pcap		e1000g.out
 
+# IPX/Netware packets
+ipx		ipx.pcap		ipx.out
+
 # IETF FORCES WG packets and printer
 forces01        forces1.pcap            forces1.out
 forces01vvv     forces1.pcap            forces1vvv.out  -v -v -v

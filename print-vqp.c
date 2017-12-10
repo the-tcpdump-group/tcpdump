@@ -143,7 +143,7 @@ vqp_print(netdissect_options *ndo, register const u_char *pptr, register u_int l
 	   tok2str(vqp_msg_type_values, "unknown (%u)",vqp_common_header->msg_type),
 	   tok2str(vqp_error_code_values, "unknown (%u)",vqp_common_header->error_code),
 	   vqp_common_header->error_code,
-           EXTRACT_32BITS(&vqp_common_header->sequence),
+           EXTRACT_BE_U_4(&vqp_common_header->sequence),
            nitems,
            len));
 
@@ -157,8 +157,8 @@ vqp_print(netdissect_options *ndo, register const u_char *pptr, register u_int l
         ND_TCHECK(*vqp_obj_tlv);
         if (sizeof(struct vqp_obj_tlv_t) > tlen)
             goto trunc;
-        vqp_obj_type = EXTRACT_32BITS(vqp_obj_tlv->obj_type);
-        vqp_obj_len = EXTRACT_16BITS(vqp_obj_tlv->obj_length);
+        vqp_obj_type = EXTRACT_BE_U_4(vqp_obj_tlv->obj_type);
+        vqp_obj_len = EXTRACT_BE_U_2(vqp_obj_tlv->obj_length);
         tptr+=sizeof(struct vqp_obj_tlv_t);
         tlen-=sizeof(struct vqp_obj_tlv_t);
 
@@ -180,7 +180,7 @@ vqp_print(netdissect_options *ndo, register const u_char *pptr, register u_int l
 	case VQP_OBJ_IP_ADDRESS:
             if (vqp_obj_len != 4)
                 goto trunc;
-            ND_PRINT((ndo, "%s (0x%08x)", ipaddr_string(ndo, tptr), EXTRACT_32BITS(tptr)));
+            ND_PRINT((ndo, "%s (0x%08x)", ipaddr_string(ndo, tptr), EXTRACT_BE_U_4(tptr)));
             break;
             /* those objects have similar semantics - fall through */
         case VQP_OBJ_PORT_NAME:

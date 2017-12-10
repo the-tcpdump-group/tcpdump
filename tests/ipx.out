@@ -1,0 +1,112 @@
+IPX a8f87967.00:00:00:00:00:01.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
+IPX a8f87967.00:00:00:00:00:01.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
+IPX a8f87967.00:00:00:00:00:01.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
+IPX a8f87967.00:00:00:00:00:01.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 162
+>>> IPX transport Data: (34 bytes)
+[000] 00 0B 41 44 4D 49 4E 54  45 53 54 20 20 20 20 20  \0x00\0x0bADMINT EST     
+[010] 20 00 01 02 5F 5F 4D 53  42 52 4F 57 53 45 5F 5F   \0x00\0x01\0x02__MS BROWSE__
+[020] 02 01                                             \0x02\0x01 
+SMB PACKET: SMBtrans (REQUEST)
+
+
+IPX 00000000.00:03:47:1b:c1:a8.0453 > 00000000.ff:ff:ff:ff:ff:ff.0453: ipx-rip-resp a8f87967/1.2
+IPX 00000000.00:30:c1:bf:57:55.0452 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 030c '0030C1BF575580D0NPIBF5755' addr 00000000.00:30:c1:bf:57:55
+IPX 00000000.00:14:85:ac:cd:ad.4008 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 064e 'EKTA!!!!!!!!!!!A5569B20ABE511CE9CA400004C762832' addr 00000000.00:14:85:ac:cd:ad
+IPX 00000000.00:13:20:61:83:a3.4008 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 064e 'AVESH!!!!!!!!!!A5569B20ABE511CE9CA400004C762832' addr 00000000.00:13:20:61:83:a3
+IPX 00000000.00:03:47:1b:c1:a8.0453 > 00000000.ff:ff:ff:ff:ff:ff.0453: ipx-rip-resp a8f87967/1.2
+IPX 00000000.00:30:c1:bf:57:55.0452 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 030c '0030C1BF575580D0NPIBF5755' addr 00000000.00:30:c1:bf:57:55
+IPX 00000000.00:14:85:ac:cd:ad.4008 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 064e 'EKTA!!!!!!!!!!!A5569B20ABE511CE9CA400004C762832' addr 00000000.00:14:85:ac:cd:ad
+IPX 00000000.00:13:20:61:83:a3.4008 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 064e 'AVESH!!!!!!!!!!A5569B20ABE511CE9CA400004C762832' addr 00000000.00:13:20:61:83:a3
+IPX 00000000.00:03:47:1b:c1:a8.0453 > 00000000.ff:ff:ff:ff:ff:ff.0453: ipx-rip-resp a8f87967/1.2
+IPX 00000000.00:13:20:61:83:a3.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
+IPX 00000000.00:13:20:61:83:a3.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
+IPX 00000000.00:13:20:61:83:a3.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
+IPX 00000000.00:30:c1:bf:57:55.0452 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 030c '0030C1BF575580D0NPIBF5755' addr 00000000.00:30:c1:bf:57:55
+IPX 00000000.00:14:85:ac:cd:ad.4008 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 064e 'EKTA!!!!!!!!!!!A5569B20ABE511CE9CA400004C762832' addr 00000000.00:14:85:ac:cd:ad
+IPX 00000000.00:13:20:61:83:a3.4008 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 064e 'AVESH!!!!!!!!!!A5569B20ABE511CE9CA400004C762832' addr 00000000.00:13:20:61:83:a3
+IPX 00000000.00:03:47:1b:c1:a8.0453 > 00000000.ff:ff:ff:ff:ff:ff.0453: ipx-rip-resp a8f87967/1.2
+IPX 00000000.00:30:c1:bf:57:55.0452 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 030c '0030C1BF575580D0NPIBF5755' addr 00000000.00:30:c1:bf:57:55
+IPX 00000000.00:14:85:ac:cd:ad.4008 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 064e 'EKTA!!!!!!!!!!!A5569B20ABE511CE9CA400004C762832' addr 00000000.00:14:85:ac:cd:ad
+IPX 00000000.00:13:20:61:83:a3.4008 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 064e 'AVESH!!!!!!!!!!A5569B20ABE511CE9CA400004C762832' addr 00000000.00:13:20:61:83:a3
+IPX 00000000.00:03:47:1b:c1:a8.0453 > 00000000.ff:ff:ff:ff:ff:ff.0453: ipx-rip-resp a8f87967/1.2
+IPX 00000000.00:30:c1:bf:57:55.0452 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 030c '0030C1BF575580D0NPIBF5755' addr 00000000.00:30:c1:bf:57:55
+IPX 00000000.00:14:85:ac:cd:ad.4008 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 064e 'EKTA!!!!!!!!!!!A5569B20ABE511CE9CA400004C762832' addr 00000000.00:14:85:ac:cd:ad
+IPX 00000000.00:13:20:61:83:a3.4008 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 064e 'AVESH!!!!!!!!!!A5569B20ABE511CE9CA400004C762832' addr 00000000.00:13:20:61:83:a3
+IPX 00000000.00:13:20:61:83:a3.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
+IPX 00000000.00:13:20:61:83:a3.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
+IPX 00000000.00:13:20:61:83:a3.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
+IPX 00000000.00:13:20:61:83:a3.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 158
+>>> IPX transport Data: (34 bytes)
+[000] 00 0B 41 56 45 53 48 20  20 20 20 20 20 20 20 20  \0x00\0x0bAVESH          
+[010] 20 00 01 02 5F 5F 4D 53  42 52 4F 57 53 45 5F 5F   \0x00\0x01\0x02__MS BROWSE__
+[020] 02 01                                             \0x02\0x01 
+SMB PACKET: SMBtrans (REQUEST)
+
+
+IPX 00000000.00:13:20:61:83:a3.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
+IPX 00000000.00:03:47:1b:c1:a8.0453 > 00000000.ff:ff:ff:ff:ff:ff.0453: ipx-rip-resp a8f87967/1.2
+IPX 00000000.00:13:20:61:83:a3.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
+IPX 00000000.00:13:20:61:83:a3.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
+IPX 00000000.00:13:20:61:83:a3.0553 > 00000000.ff:ff:ff:ff:ff:ff.0553: ipx-nwlink-dgm 187
+>>> IPX transport Data: (68 bytes)
+[000] 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  \0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00 \0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00
+[010] 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  \0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00 \0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00
+[020] FC 02 00 00 49 4E 44 49  41 2D 49 54 20 20 20 20  \0xfc\0x02\0x00\0x00INDI A-IT    
+[030] 20 20 20 00 41 56 45 53  48 20 20 20 20 20 20 20     \0x00AVES H       
+[040] 20 20 20 00                                          \0x00 
+SMB PACKET: SMBtrans (REQUEST)
+
+
+IPX 00000000.00:30:c1:bf:57:55.0452 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 030c '0030C1BF575580D0NPIBF5755' addr 00000000.00:30:c1:bf:57:55
+IPX 00000000.00:14:85:ac:cd:ad.4008 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 064e 'EKTA!!!!!!!!!!!A5569B20ABE511CE9CA400004C762832' addr 00000000.00:14:85:ac:cd:ad
+IPX 00000000.00:13:20:61:83:a3.4008 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 064e 'AVESH!!!!!!!!!!A5569B20ABE511CE9CA400004C762832' addr 00000000.00:13:20:61:83:a3
+IPX 00000000.00:14:85:ac:cd:ad.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
+IPX 00000000.00:03:47:1b:c1:a8.0453 > 00000000.ff:ff:ff:ff:ff:ff.0453: ipx-rip-resp a8f87967/1.2
+IPX 00000000.00:14:85:ac:cd:ad.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
+IPX 00000000.00:14:85:ac:cd:ad.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
+IPX 00000000.00:14:85:ac:cd:ad.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 157
+>>> IPX transport Data: (34 bytes)
+[000] 00 0B 45 4B 54 41 20 20  20 20 20 20 20 20 20 20  \0x00\0x0bEKTA           
+[010] 20 00 01 02 5F 5F 4D 53  42 52 4F 57 53 45 5F 5F   \0x00\0x01\0x02__MS BROWSE__
+[020] 02 01                                             \0x02\0x01 
+SMB PACKET: SMBtrans (REQUEST)
+
+
+IPX 00000000.00:14:85:ac:cd:ad.0553 > 00000000.ff:ff:ff:ff:ff:ff.0553: ipx-nwlink-dgm 187
+>>> IPX transport Data: (68 bytes)
+[000] 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  \0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00 \0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00
+[010] 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  \0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00 \0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00
+[020] FC 02 00 00 57 4F 52 4B  47 52 4F 55 50 20 20 20  \0xfc\0x02\0x00\0x00WORK GROUP   
+[030] 20 20 20 00 45 4B 54 41  20 20 20 20 20 20 20 20     \0x00EKTA         
+[040] 20 20 20 00                                          \0x00 
+SMB PACKET: SMBtrans (REQUEST)
+
+
+IPX 00000000.00:14:85:ac:cd:ad.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
+IPX 00000000.00:14:85:ac:cd:ad.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
+IPX 00000000.00:14:85:ac:cd:ad.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
+IPX 00000000.00:30:c1:bf:57:55.0452 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 030c '0030C1BF575580D0NPIBF5755' addr 00000000.00:30:c1:bf:57:55
+IPX 00000000.00:14:85:ac:cd:ad.4008 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 064e 'EKTA!!!!!!!!!!!A5569B20ABE511CE9CA400004C762832' addr 00000000.00:14:85:ac:cd:ad
+IPX 00000000.00:13:20:61:83:a3.4008 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 064e 'AVESH!!!!!!!!!!A5569B20ABE511CE9CA400004C762832' addr 00000000.00:13:20:61:83:a3
+IPX 00000000.00:03:47:1b:c1:a8.0453 > 00000000.ff:ff:ff:ff:ff:ff.0453: ipx-rip-resp a8f87967/1.2
+IPX a8f87967.00:00:00:00:00:01.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
+IPX a8f87967.00:00:00:00:00:01.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
+IPX a8f87967.00:00:00:00:00:01.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
+IPX a8f87967.00:00:00:00:00:01.0553 > 00000000.ff:ff:ff:ff:ff:ff.0553: ipx-nwlink-dgm 187
+>>> IPX transport Data: (68 bytes)
+[000] 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  \0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00 \0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00
+[010] 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  \0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00 \0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00
+[020] FC 03 00 00 52 41 44 49  55 53 20 20 20 20 20 20  \0xfc\0x03\0x00\0x00RADI US      
+[030] 20 20 20 00 41 44 4D 49  4E 54 45 53 54 20 20 20     \0x00ADMI NTEST   
+[040] 20 20 20 00                                          \0x00 
+SMB PACKET: SMBtrans (REQUEST)
+
+
+IPX 00000000.00:30:c1:bf:57:55.0452 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 030c '0030C1BF575580D0NPIBF5755' addr 00000000.00:30:c1:bf:57:55
+IPX 00000000.00:14:85:ac:cd:ad.4008 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 064e 'EKTA!!!!!!!!!!!A5569B20ABE511CE9CA400004C762832' addr 00000000.00:14:85:ac:cd:ad
+IPX 00000000.00:13:20:61:83:a3.4008 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 064e 'AVESH!!!!!!!!!!A5569B20ABE511CE9CA400004C762832' addr 00000000.00:13:20:61:83:a3
+IPX 00000000.00:03:47:1b:c1:a8.0453 > 00000000.ff:ff:ff:ff:ff:ff.0453: ipx-rip-resp a8f87967/1.2
+IPX 00000000.00:30:c1:bf:57:55.0452 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 030c '0030C1BF575580D0NPIBF5755' addr 00000000.00:30:c1:bf:57:55
+IPX 00000000.00:14:85:ac:cd:ad.4008 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 064e 'EKTA!!!!!!!!!!!A5569B20ABE511CE9CA400004C762832' addr 00000000.00:14:85:ac:cd:ad
+IPX 00000000.00:13:20:61:83:a3.4008 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 064e 'AVESH!!!!!!!!!!A5569B20ABE511CE9CA400004C762832' addr 00000000.00:13:20:61:83:a3
+IPX 00000000.00:03:47:1b:c1:a8.0453 > 00000000.ff:ff:ff:ff:ff:ff.0453: ipx-rip-resp a8f87967/1.2

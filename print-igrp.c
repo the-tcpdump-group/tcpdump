@@ -82,12 +82,12 @@ igrp_entry_print(netdissect_options *ndo, register const struct igrprte *igr,
 		ND_PRINT((ndo, " %d.%d.%d.0", igr->igr_net[0],
 		    igr->igr_net[1], igr->igr_net[2]));
 
-	delay = EXTRACT_24BITS(igr->igr_dly);
-	bandwidth = EXTRACT_24BITS(igr->igr_bw);
+	delay = EXTRACT_BE_U_3(igr->igr_dly);
+	bandwidth = EXTRACT_BE_U_3(igr->igr_bw);
 	metric = bandwidth + delay;
 	if (metric > 0xffffff)
 		metric = 0xffffff;
-	mtu = EXTRACT_16BITS(igr->igr_mtu);
+	mtu = EXTRACT_BE_U_2(igr->igr_mtu);
 
 	ND_PRINT((ndo, " d=%d b=%d r=%d l=%d M=%d mtu=%d in %d hops",
 	    10 * delay, bandwidth == 0 ? 0 : 10000000 / bandwidth,
@@ -114,15 +114,15 @@ igrp_print(netdissect_options *ndo, register const u_char *bp, u_int length)
 
 	/* Header */
 	ND_TCHECK(*hdr);
-	nint = EXTRACT_16BITS(&hdr->ig_ni);
-	nsys = EXTRACT_16BITS(&hdr->ig_ns);
-	next = EXTRACT_16BITS(&hdr->ig_nx);
+	nint = EXTRACT_BE_U_2(&hdr->ig_ni);
+	nsys = EXTRACT_BE_U_2(&hdr->ig_ns);
+	next = EXTRACT_BE_U_2(&hdr->ig_nx);
 
 	ND_PRINT((ndo, " %s V%d edit=%d AS=%d (%d/%d/%d)",
 	    tok2str(op2str, "op-#%d", IGRP_OP(hdr->ig_vop)),
 	    IGRP_V(hdr->ig_vop),
 	    hdr->ig_ed,
-	    EXTRACT_16BITS(&hdr->ig_as),
+	    EXTRACT_BE_U_2(&hdr->ig_as),
 	    nint,
 	    nsys,
 	    next));

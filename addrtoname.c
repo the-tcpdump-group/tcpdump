@@ -539,7 +539,7 @@ etheraddr_string(netdissect_options *ndo, register const u_char *ep)
 	}
 #endif
 	cp = buf;
-	oui = EXTRACT_24BITS(ep);
+	oui = EXTRACT_BE_U_3(ep);
 	*cp++ = hex[*ep >> 4 ];
 	*cp++ = hex[*ep++ & 0xf];
 	for (i = 5; --i >= 0;) {
@@ -650,35 +650,6 @@ etherproto_string(netdissect_options *ndo, u_short port)
 	if (tp->name == NULL)
 		(*ndo->ndo_error)(ndo, "etherproto_string: strdup(buf)");
 	return (tp->name);
-}
-
-const char *
-protoid_string(netdissect_options *ndo, register const u_char *pi)
-{
-	register u_int i, j;
-	register char *cp;
-	register struct protoidmem *tp;
-	char buf[sizeof("00:00:00:00:00")];
-
-	tp = lookup_protoid(ndo, pi);
-	if (tp->p_name)
-		return tp->p_name;
-
-	cp = buf;
-	if ((j = *pi >> 4) != 0)
-		*cp++ = hex[j];
-	*cp++ = hex[*pi++ & 0xf];
-	for (i = 4; (int)--i >= 0;) {
-		*cp++ = ':';
-		if ((j = *pi >> 4) != 0)
-			*cp++ = hex[j];
-		*cp++ = hex[*pi++ & 0xf];
-	}
-	*cp = '\0';
-	tp->p_name = strdup(buf);
-	if (tp->p_name == NULL)
-		(*ndo->ndo_error)(ndo, "protoid_string: strdup(buf)");
-	return (tp->p_name);
 }
 
 #define ISONSAP_MAX_LENGTH 20

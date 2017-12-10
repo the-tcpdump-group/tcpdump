@@ -76,8 +76,8 @@ pktap_header_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	hdr = (const pktap_header_t *)bp;
 
-	dlt = EXTRACT_LE_32BITS(&hdr->pkt_dlt);
-	hdrlen = EXTRACT_LE_32BITS(&hdr->pkt_len);
+	dlt = EXTRACT_LE_U_4(&hdr->pkt_dlt);
+	hdrlen = EXTRACT_LE_U_4(&hdr->pkt_len);
 	dltname = pcap_datalink_val_to_name(dlt);
 	if (!ndo->ndo_qflag) {
 		ND_PRINT((ndo,"DLT %s (%d) len %d",
@@ -111,8 +111,8 @@ pktap_if_print(netdissect_options *ndo,
 		return (0);
 	}
 	hdr = (const pktap_header_t *)p;
-	dlt = EXTRACT_LE_32BITS(&hdr->pkt_dlt);
-	hdrlen = EXTRACT_LE_32BITS(&hdr->pkt_len);
+	dlt = EXTRACT_LE_U_4(&hdr->pkt_dlt);
+	hdrlen = EXTRACT_LE_U_4(&hdr->pkt_len);
 	if (hdrlen < sizeof(pktap_header_t)) {
 		/*
 		 * Claimed header length < structure length.
@@ -136,7 +136,7 @@ pktap_if_print(netdissect_options *ndo,
 	caplen -= hdrlen;
 	p += hdrlen;
 
-	rectype = EXTRACT_LE_32BITS(&hdr->pkt_rectype);
+	rectype = EXTRACT_LE_U_4(&hdr->pkt_rectype);
 	switch (rectype) {
 
 	case PKT_REC_NONE:

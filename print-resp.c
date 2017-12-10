@@ -90,7 +90,7 @@ static int resp_get_length(netdissect_options *, register const u_char *, int, c
 #define FIND_CRLF(_ptr, _len)                   \
     for (;;) {                                  \
         LCHECK2(_len, 2);                       \
-        ND_TCHECK2(*_ptr, 2);                   \
+        ND_TCHECK_2(_ptr);                   \
         if (*_ptr == '\r' && *(_ptr+1) == '\n') \
             break;                              \
         _ptr++;                                 \
@@ -247,8 +247,8 @@ resp_parse(netdissect_options *ndo, register const u_char *bp, int length)
     int ret_len;
 
     LCHECK2(length, 1);
-    ND_TCHECK(*bp);
-    op = *bp;
+    ND_TCHECK_1(bp);
+    op = EXTRACT_U_1(bp);
 
     /* bp now points to the op, so these routines must skip it */
     switch(op) {
@@ -464,10 +464,10 @@ resp_get_length(netdissect_options *ndo, register const u_char *bp, int len, con
 
     if (len == 0)
         goto trunc;
-    ND_TCHECK(*bp);
+    ND_TCHECK_1(bp);
     too_large = 0;
     neg = 0;
-    if (*bp == '-') {
+    if (EXTRACT_U_1(bp) == '-') {
         neg = 1;
         bp++;
         len--;
@@ -478,8 +478,8 @@ resp_get_length(netdissect_options *ndo, register const u_char *bp, int len, con
     for (;;) {
         if (len == 0)
             goto trunc;
-        ND_TCHECK(*bp);
-        c = *bp;
+        ND_TCHECK_1(bp);
+        c = EXTRACT_U_1(bp);
         if (!(c >= '0' && c <= '9')) {
             if (!saw_digit) {
                 bp++;
@@ -508,7 +508,7 @@ resp_get_length(netdissect_options *ndo, register const u_char *bp, int len, con
      * OK, we found a non-digit character.  It should be a \r, followed
      * by a \n.
      */
-    if (*bp != '\r') {
+    if (EXTRACT_U_1(bp) != '\r') {
         bp++;
         goto invalid;
     }
@@ -516,8 +516,8 @@ resp_get_length(netdissect_options *ndo, register const u_char *bp, int len, con
     len--;
     if (len == 0)
         goto trunc;
-    ND_TCHECK(*bp);
-    if (*bp != '\n') {
+    ND_TCHECK_1(bp);
+    if (EXTRACT_U_1(bp) != '\n') {
         bp++;
         goto invalid;
     }
