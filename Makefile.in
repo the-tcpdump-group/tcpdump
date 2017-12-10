@@ -60,6 +60,7 @@ INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 RANLIB = @RANLIB@
+WINDRES = @WINDRES@
 
 DEPENDENCY_CFLAG = @DEPENDENCY_CFLAG@
 
@@ -69,6 +70,16 @@ DEPENDENCY_CFLAG = @DEPENDENCY_CFLAG@
 .c.o:
 	@rm -f $@
 	$(CC) $(FULL_CFLAGS) -c $(srcdir)/$*.c
+
+# Teaching plain make what to do with .rc files...
+# Simply saying '.rc.o:' only works if .rc files would be part of make's
+# known suffixes.
+# This could be done with '.SUFFIXES: .rc' but that would mean adding yet
+# another line (he thought while typing a five-line long comment).
+
+%.o : %.rc
+	$(WINDRES) -DPACKAGE_VERSION_WIN="`egrep -o '([0-9]{1,}\.)+[0-9]{1,}' \
+        $(srcdir)/VERSION | tr '.' ','`,0" $^ -o $@
 
 CSRC =	tcpdump.c
 
@@ -357,7 +368,9 @@ EXTRA_DIST = \
 	send-ack.awk \
 	smbutil.c \
 	stime.awk \
+	tcpdump.ico \
 	tcpdump.1.in \
+	tcpdump-rc.rc \
 	vfprintf.c \
 	win32/prj/GNUmakefile \
 	win32/prj/WinDump.dsp \

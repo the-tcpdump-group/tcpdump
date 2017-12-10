@@ -90,6 +90,10 @@ darwin*)
 		esac
 	fi
 	;;
+*mingw*)
+	AC_CHECK_TOOL(WINDRES, windres, :)
+	AC_LIBOBJ([tcpdump-rc])
+	;;
 esac
 
 
