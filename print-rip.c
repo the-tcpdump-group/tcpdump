@@ -143,8 +143,8 @@ rip_entry_print_v2(netdissect_options *ndo,
 		} else if (auth_type == 3) {
 			ND_PRINT((ndo, "\n\t  Auth header:"));
 			ND_PRINT((ndo, " Packet Len %u,", EXTRACT_BE_U_2((const uint8_t *)ni + 4)));
-			ND_PRINT((ndo, " Key-ID %u,", *((const uint8_t *)ni + 6)));
-			ND_PRINT((ndo, " Auth Data Len %u,", *((const uint8_t *)ni + 7)));
+			ND_PRINT((ndo, " Key-ID %u,", EXTRACT_U_1((const uint8_t *)ni + 6)));
+			ND_PRINT((ndo, " Auth Data Len %u,", EXTRACT_U_1((const uint8_t *)ni + 7)));
 			ND_PRINT((ndo, " SeqNo %u,", EXTRACT_BE_U_4(&ni->rip_dest_mask)));
 			ND_PRINT((ndo, " MBZ %u,", EXTRACT_BE_U_4(&ni->rip_router)));
 			ND_PRINT((ndo, " MBZ %u", EXTRACT_BE_U_4(&ni->rip_metric)));
