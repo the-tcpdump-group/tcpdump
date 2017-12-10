@@ -325,7 +325,7 @@ dhcp6opt_print(netdissect_options *ndo,
 					    EXTRACT_BE_U_2(tp + 2),
 					    EXTRACT_BE_U_4(tp + 4)));
 					for (i = 8; i < optlen; i++)
-						ND_PRINT((ndo, "%02x", tp[i]));
+						ND_PRINT((ndo, "%02x", EXTRACT_U_1(tp + i)));
 					/*(*/
 					ND_PRINT((ndo, ")"));
 				} else {
@@ -337,7 +337,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				if (optlen >= 2 + 8) {
 					ND_PRINT((ndo, " vid "));
 					for (i = 2; i < 2 + 8; i++)
-						ND_PRINT((ndo, "%02x", tp[i]));
+						ND_PRINT((ndo, "%02x", EXTRACT_U_1(tp + i)));
 					/*(*/
 					ND_PRINT((ndo, ")"));
 				} else {
@@ -350,7 +350,7 @@ dhcp6opt_print(netdissect_options *ndo,
 					ND_PRINT((ndo, " hwaddr type %u ",
 					    EXTRACT_BE_U_2(tp + 2)));
 					for (i = 4; i < optlen; i++)
-						ND_PRINT((ndo, "%02x", tp[i]));
+						ND_PRINT((ndo, "%02x", EXTRACT_U_1(tp + i)));
 					/*(*/
 					ND_PRINT((ndo, ")"));
 				} else {
@@ -521,7 +521,7 @@ dhcp6opt_print(netdissect_options *ndo,
 			tp = (const u_char *)(dh6o + 1);
 			ND_PRINT((ndo, " "));
 			for (i = 0; i < optlen && i < 10; i++)
-				ND_PRINT((ndo, "%02x", tp[i]));
+				ND_PRINT((ndo, "%02x", EXTRACT_U_1(tp + i)));
 			ND_PRINT((ndo, "...)"));
 			break;
 		case DH6OPT_RECONF_MSG:
@@ -617,7 +617,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			ND_PRINT((ndo, " %s/%d", ip6addr_string(ndo, tp + 9), tp[8]));
+			ND_PRINT((ndo, " %s/%d", ip6addr_string(ndo, tp + 9), EXTRACT_U_1(tp + 8)));
 			ND_PRINT((ndo, " pltime:%u vltime:%u",
 			    EXTRACT_BE_U_4(tp),
 			    EXTRACT_BE_U_4(tp + 4)));
@@ -647,7 +647,7 @@ dhcp6opt_print(netdissect_options *ndo,
 			 * Print hex dump first 10 characters.
 			 */
 			for (i = 4; i < optlen && i < 14; i++)
-				ND_PRINT((ndo, "%02x", tp[i]));
+				ND_PRINT((ndo, "%02x", EXTRACT_U_1(tp + i)));
 			ND_PRINT((ndo, "...)"));
 			break;
 		case DH6OPT_LQ_QUERY:
@@ -694,7 +694,7 @@ dhcp6opt_print(netdissect_options *ndo,
 			 * Print hex dump first 10 characters.
 			 */
 			for (i = 16; i < optlen && i < 26; i++)
-				ND_PRINT((ndo, "%02x", tp[i]));
+				ND_PRINT((ndo, "%02x", EXTRACT_U_1(tp + i)));
 			ND_PRINT((ndo, "...)"));
 			break;
 		case DH6OPT_NTP_SERVER:

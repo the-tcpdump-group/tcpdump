@@ -259,7 +259,7 @@ atm_if_print(netdissect_options *ndo,
 	}
 
         /* Cisco Style NLPID ? */
-        if (*p == LLC_UI) {
+        if (EXTRACT_U_1(p) == LLC_UI) {
             if (ndo->ndo_eflag)
                 ND_PRINT((ndo, "CNLPID "));
             isoclns_print(ndo, p + 1, length - 1);
@@ -349,14 +349,14 @@ sig_print(netdissect_options *ndo,
 {
 	uint32_t call_ref;
 
-	ND_TCHECK(p[PROTO_POS]);
-	if (p[PROTO_POS] == Q2931) {
+	ND_TCHECK_1(p + PROTO_POS);
+	if (EXTRACT_U_1(p + PROTO_POS) == Q2931) {
 		/*
 		 * protocol:Q.2931 for User to Network Interface
 		 * (UNI 3.1) signalling
 		 */
 		ND_PRINT((ndo, "Q.2931"));
-		ND_TCHECK(p[MSG_TYPE_POS]);
+		ND_TCHECK_1(p + MSG_TYPE_POS);
 		ND_PRINT((ndo, ":%s ",
 		    tok2str(msgtype2str, "msgtype#%d", EXTRACT_U_1(p + MSG_TYPE_POS))));
 
@@ -370,7 +370,7 @@ sig_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "CALL_REF:0x%06x", call_ref));
 	} else {
 		/* SSCOP with some unknown protocol atop it */
-		ND_PRINT((ndo, "SSCOP, proto %d ", p[PROTO_POS]));
+		ND_PRINT((ndo, "SSCOP, proto %d ", EXTRACT_U_1(p + PROTO_POS)));
 	}
 	return;
 
@@ -460,7 +460,7 @@ oam_print (netdissect_options *ndo,
     } oam_ptr;
 
 
-    ND_TCHECK(*(p+ATM_HDR_LEN_NOHEC+hec));
+    ND_TCHECK_1(p + ATM_HDR_LEN_NOHEC + hec);
     cell_header = EXTRACT_BE_U_4(p + hec);
     cell_type = (EXTRACT_U_1((p + ATM_HDR_LEN_NOHEC + hec)) >> 4) & 0x0f;
     func_type = EXTRACT_U_1((p + ATM_HDR_LEN_NOHEC + hec)) & 0x0f;

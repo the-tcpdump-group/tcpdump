@@ -132,7 +132,7 @@ vtp_print (netdissect_options *ndo,
 
     type = EXTRACT_U_1(tptr + 1);
     ND_PRINT((ndo, "VTPv%u, Message %s (0x%02x), length %u",
-	   *tptr,
+	   EXTRACT_U_1(tptr),
 	   tok2str(vtp_message_type_values,"Unknown message type", type),
 	   type,
 	   length));
@@ -152,7 +152,7 @@ vtp_print (netdissect_options *ndo,
     fn_printzp(ndo, tptr + 4, mgmtd_len, NULL);
     ND_PRINT((ndo, ", %s: %u",
 	   tok2str(vtp_header_values, "Unknown", type),
-	   *(tptr+2)));
+	   EXTRACT_U_1(tptr + 2)));
 
     tptr += VTP_HEADER_LEN;
 
@@ -244,7 +244,7 @@ vtp_print (netdissect_options *ndo,
 	while (tptr < (pptr+length)) {
 
 	    ND_TCHECK_1(tptr);
-	    len = *tptr;
+	    len = EXTRACT_U_1(tptr);
 	    if (len == 0)
 		break;
 
@@ -287,7 +287,7 @@ vtp_print (netdissect_options *ndo,
                 if (len < 2)
                     goto trunc;
                 ND_TCHECK_2(tptr);
-                type = *tptr;
+                type = EXTRACT_U_1(tptr);
                 tlv_len = EXTRACT_U_1(tptr + 1);
 
                 ND_PRINT((ndo, "\n\t\t%s (0x%04x) TLV",

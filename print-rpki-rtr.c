@@ -183,14 +183,14 @@ rpki_rtr_pdu_print (netdissect_options *ndo, const u_char *tptr, const u_int len
 
     /* Protocol Version */
     ND_TCHECK_1(tptr);
-    if (*tptr != 0) {
+    if (EXTRACT_U_1(tptr) != 0) {
 	/* Skip the rest of the input buffer because even if this is
 	 * a well-formed PDU of a future RPKI-Router protocol version
 	 * followed by a well-formed PDU of RPKI-Router protocol
 	 * version 0, there is no way to know exactly how to skip the
 	 * current PDU.
 	 */
-	ND_PRINT((ndo, "%sRPKI-RTRv%u (unknown)", indent_string(8), *tptr));
+	ND_PRINT((ndo, "%sRPKI-RTRv%u (unknown)", indent_string(8), EXTRACT_U_1(tptr)));
 	return len;
     }
     if (len < sizeof(rpki_rtr_pdu)) {

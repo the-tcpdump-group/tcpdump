@@ -129,12 +129,12 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		 * Cisco sends control-plane traffic MPLS-encapsulated in
 		 * this fashion.
 		 */
-		ND_TCHECK(*p);
+		ND_TCHECK_1(p);
 		if (length < 1) {
 			/* nothing to print */
 			return;
 		}
-		switch(*p) {
+		switch(EXTRACT_U_1(p)) {
 
 		case 0x45:
 		case 0x46:

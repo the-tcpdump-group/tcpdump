@@ -231,7 +231,7 @@ ospf_print_grace_lsa(netdissect_options *ndo,
             }
             ND_PRINT((ndo, "%s (%u)",
                    tok2str(lsa_opaque_grace_tlv_reason_values, "Unknown", EXTRACT_U_1(tptr)),
-                   *tptr));
+                   EXTRACT_U_1(tptr)));
             break;
 
         case LS_OPAQUE_GRACE_TLV_INT_ADDRESS:
@@ -383,7 +383,7 @@ ospf_print_te_lsa(netdissect_options *ndo,
 		    /* BC Model Id (1 octet) + Reserved (3 octets) */
                     ND_PRINT((ndo, "\n\t\tBandwidth Constraints Model ID: %s (%u)",
                            tok2str(diffserv_te_bc_values, "unknown", EXTRACT_U_1(tptr)),
-                           *tptr));
+                           EXTRACT_U_1(tptr)));
 		    if (subtlv_length % 4 != 0) {
 			ND_PRINT((ndo, "\n\t\tlength %u != N x 4", subtlv_length));
 			goto invalid;
@@ -440,7 +440,7 @@ ospf_print_te_lsa(netdissect_options *ndo,
 		    }
                     ND_PRINT((ndo, ", %s (%u)",
                            tok2str(lsa_opaque_te_tlv_link_type_sub_tlv_values,"unknown",EXTRACT_U_1(tptr)),
-                           *tptr));
+                           EXTRACT_U_1(tptr)));
                     break;
 
                 case LS_OPAQUE_TE_LINK_SUBTLV_SHARED_RISK_GROUP:
@@ -931,7 +931,7 @@ ospf_decode_lls(netdissect_options *ndo,
     ND_PRINT((ndo, ", length: %u", length2));
 
     dptr += 2;
-    ND_TCHECK(*dptr);
+    ND_TCHECK_1(dptr);
     while (dptr < dataend) {
         ND_TCHECK_2(dptr);
         lls_type = EXTRACT_BE_U_2(dptr);

@@ -86,11 +86,11 @@ of_header_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep
 		goto invalid;
 	/* version */
 	ND_TCHECK_1(cp);
-	version = *cp;
+	version = EXTRACT_U_1(cp);
 	cp += 1;
 	/* type */
 	ND_TCHECK_1(cp);
-	type = *cp;
+	type = EXTRACT_U_1(cp);
 	cp += 1;
 	/* length */
 	ND_TCHECK_2(cp);

@@ -1322,7 +1322,7 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			ND_PRINT((ndo," lifetime %us, domain(s):",
                                   EXTRACT_BE_U_4(&opds->nd_opt_dnssl_lifetime)));
 			domp = cp + 8; /* domain names, variable-sized, RFC1035-encoded */
-			while (domp < cp + (op->nd_opt_len << 3) && *domp != '\0')
+			while (domp < cp + (op->nd_opt_len << 3) && EXTRACT_U_1(domp) != '\0')
 			{
 				ND_PRINT((ndo, " "));
 				if ((domp = ns_nprint (ndo, domp, bp)) == NULL)
@@ -1350,7 +1350,7 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			case 1:
 				break;
 			case 2:
-				ND_TCHECK2(*in6p, 8);
+				ND_TCHECK_8(in6p);
 				memcpy(&in6, opri + 1, 8);
 				break;
 			case 3:
@@ -1490,15 +1490,15 @@ mldv2_query_print(netdissect_options *ndo, const u_char *bp, u_int len)
     ND_PRINT((ndo," [gaddr %s", ip6addr_string(ndo, bp + 8)));
 
     if (ndo->ndo_vflag) {
-        ND_TCHECK(bp[25]);
-	if (bp[24] & 0x08) {
+        ND_TCHECK_1(bp + 25);
+	if (EXTRACT_U_1(bp + 24) & 0x08) {
 		ND_PRINT((ndo," sflag"));
 	}
-	if (bp[24] & 0x07) {
-		ND_PRINT((ndo," robustness=%d", bp[24] & 0x07));
+	if (EXTRACT_U_1(bp + 24) & 0x07) {
+		ND_PRINT((ndo," robustness=%d", EXTRACT_U_1(bp + 24) & 0x07));
 	}
-	if (bp[25] < 128) {
-		qqi = bp[25];
+	if (EXTRACT_U_1(bp + 25) < 128) {
+		qqi = EXTRACT_U_1(bp + 25);
 	} else {
 		qqi = ((bp[25] & 0x0f) | 0x10) << (((bp[25] & 0x70) >> 4) + 3);
 	}
@@ -1544,7 +1544,7 @@ dnsname_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 				break;
 			}
 			while (i-- && cp < ep) {
-				safeputchar(ndo, *cp);
+				safeputchar(ndo, EXTRACT_U_1(cp));
 				cp++;
 			}
 			if (cp + 1 < ep && EXTRACT_U_1(cp))
@@ -1553,7 +1553,7 @@ dnsname_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 			if (cp == ep) {
 				/* FQDN */
 				ND_PRINT((ndo,"."));
-			} else if (cp + 1 == ep && *cp == '\0') {
+			} else if (cp + 1 == ep && EXTRACT_U_1(cp) == '\0') {
 				/* truncated */
 			} else {
 				/* invalid */
@@ -1659,14 +1659,14 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 		case ICMP6_NI_SUBJ_FQDN:
 			ND_PRINT((ndo,", subject=DNS name"));
 			cp = (const u_char *)(ni6 + 1);
-			if (cp[0] == ep - cp - 1) {
+			if (EXTRACT_U_1(cp) == ep - cp - 1) {
 				/* icmp-name-lookup-03, pascal string */
 				if (ndo->ndo_vflag)
 					ND_PRINT((ndo,", 03 draft"));
 				cp++;
 				ND_PRINT((ndo,", \""));
 				while (cp < ep) {
-					safeputchar(ndo, *cp);
+					safeputchar(ndo, EXTRACT_U_1(cp));
 					cp++;
 				}
 				ND_PRINT((ndo,"\""));
@@ -1756,15 +1756,15 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 				ND_PRINT((ndo,", "));
 			ND_PRINT((ndo,"DNS name"));
 			cp = (const u_char *)(ni6 + 1) + 4;
-			ND_TCHECK(cp[0]);
-			if (cp[0] == ep - cp - 1) {
+			ND_TCHECK_1(cp);
+			if (EXTRACT_U_1(cp) == ep - cp - 1) {
 				/* icmp-name-lookup-03, pascal string */
 				if (ndo->ndo_vflag)
 					ND_PRINT((ndo,", 03 draft"));
 				cp++;
 				ND_PRINT((ndo,", \""));
 				while (cp < ep) {
-					safeputchar(ndo, *cp);
+					safeputchar(ndo, EXTRACT_U_1(cp));
 					cp++;
 				}
 				ND_PRINT((ndo,"\""));

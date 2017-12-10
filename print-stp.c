@@ -84,7 +84,7 @@ static const struct tok rstp_obj_port_role_values[] = {
     { 0, NULL}
 };
 
-#define ND_TCHECK_BRIDGE_ID(p) ND_TCHECK2(*(p), 8)
+#define ND_TCHECK_BRIDGE_ID(p) ND_TCHECK_8(p)
 
 static char *
 stp_print_bridge_id(const u_char *p)
@@ -93,7 +93,9 @@ stp_print_bridge_id(const u_char *p)
 
     snprintf(bridge_id_str, sizeof(bridge_id_str),
              "%.2x%.2x.%.2x:%.2x:%.2x:%.2x:%.2x:%.2x",
-             p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
+             EXTRACT_U_1(p), EXTRACT_U_1(p + 1), EXTRACT_U_1(p + 2),
+             EXTRACT_U_1(p + 3), EXTRACT_U_1(p + 4), EXTRACT_U_1(p + 5),
+             EXTRACT_U_1(p + 6), EXTRACT_U_1(p + 7));
 
     return bridge_id_str;
 }
@@ -303,8 +305,8 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
     ND_PRINT((ndo, "\n\tCIST bridge-id %s, ",
            stp_print_bridge_id(ptr + MST_BPDU_CIST_BRIDGE_ID_OFFSET)));
 
-    ND_TCHECK(ptr[MST_BPDU_CIST_REMAIN_HOPS_OFFSET]);
-    ND_PRINT((ndo, "CIST remaining-hops %d", ptr[MST_BPDU_CIST_REMAIN_HOPS_OFFSET]));
+    ND_TCHECK_1(ptr + MST_BPDU_CIST_REMAIN_HOPS_OFFSET);
+    ND_PRINT((ndo, "CIST remaining-hops %d", EXTRACT_U_1(ptr + MST_BPDU_CIST_REMAIN_HOPS_OFFSET)));
 
     /* Dump all MSTI's */
     ND_TCHECK_2(ptr + MST_BPDU_VER3_LEN_OFFSET);
@@ -321,15 +323,15 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
             ND_PRINT((ndo, "\n\tMSTI %d, Flags [%s], port-role %s",
                    msti, bittok2str(stp_bpdu_flag_values, "none", EXTRACT_U_1(ptr + offset)),
                    tok2str(rstp_obj_port_role_values, "Unknown",
-                           RSTP_EXTRACT_PORT_ROLE(ptr[offset]))));
+                           RSTP_EXTRACT_PORT_ROLE(EXTRACT_U_1(ptr + offset)))));
             ND_PRINT((ndo, "\n\t\tMSTI regional-root-id %s, pathcost %u",
                    stp_print_bridge_id(ptr + offset +
                                        MST_BPDU_MSTI_ROOT_PRIO_OFFSET),
                    EXTRACT_BE_U_4(ptr + offset + MST_BPDU_MSTI_ROOT_PATH_COST_OFFSET)));
             ND_PRINT((ndo, "\n\t\tMSTI bridge-prio %d, port-prio %d, hops %d",
-                   ptr[offset + MST_BPDU_MSTI_BRIDGE_PRIO_OFFSET] >> 4,
-                   ptr[offset + MST_BPDU_MSTI_PORT_PRIO_OFFSET] >> 4,
-                   ptr[offset + MST_BPDU_MSTI_REMAIN_HOPS_OFFSET]));
+                   EXTRACT_U_1(ptr + offset + MST_BPDU_MSTI_BRIDGE_PRIO_OFFSET) >> 4,
+                   EXTRACT_U_1(ptr + offset + MST_BPDU_MSTI_PORT_PRIO_OFFSET) >> 4,
+                   EXTRACT_U_1(ptr + offset + MST_BPDU_MSTI_REMAIN_HOPS_OFFSET)));
 
             len -= MST_BPDU_MSTI_LENGTH;
             offset += MST_BPDU_MSTI_LENGTH;
@@ -373,14 +375,14 @@ stp_print_spb_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
             "flag %d,\n\tRestricted role-flag: %d, Format id %d cap %d, "
             "Convention id %d cap %d,\n\tEdge count %d, "
             "Agreement digest %08x%08x%08x%08x%08x\n",
-            ptr[offset + SPB_BPDU_AGREEMENT_OFFSET]>>6,
-            ptr[offset + SPB_BPDU_AGREEMENT_OFFSET]>>4 & 0x3,
-            ptr[offset + SPB_BPDU_AGREEMENT_OFFSET]>>3 & 0x1,
-            ptr[offset + SPB_BPDU_AGREEMENT_OFFSET]>>2 & 0x1,
-            ptr[offset + SPB_BPDU_AGREEMENT_FORMAT_OFFSET]>>4,
-            ptr[offset + SPB_BPDU_AGREEMENT_FORMAT_OFFSET]&0x00ff,
-            ptr[offset + SPB_BPDU_AGREEMENT_CON_OFFSET]>>4,
-            ptr[offset + SPB_BPDU_AGREEMENT_CON_OFFSET]&0x00ff,
+            EXTRACT_U_1(ptr + offset + SPB_BPDU_AGREEMENT_OFFSET)>>6,
+            EXTRACT_U_1(ptr + offset + SPB_BPDU_AGREEMENT_OFFSET)>>4 & 0x3,
+            EXTRACT_U_1(ptr + offset + SPB_BPDU_AGREEMENT_OFFSET)>>3 & 0x1,
+            EXTRACT_U_1(ptr + offset + SPB_BPDU_AGREEMENT_OFFSET)>>2 & 0x1,
+            EXTRACT_U_1(ptr + offset + SPB_BPDU_AGREEMENT_FORMAT_OFFSET)>>4,
+            EXTRACT_U_1(ptr + offset + SPB_BPDU_AGREEMENT_FORMAT_OFFSET)&0x00ff,
+            EXTRACT_U_1(ptr + offset + SPB_BPDU_AGREEMENT_CON_OFFSET)>>4,
+            EXTRACT_U_1(ptr + offset + SPB_BPDU_AGREEMENT_CON_OFFSET)&0x00ff,
             EXTRACT_BE_U_2(ptr + offset + SPB_BPDU_AGREEMENT_EDGE_OFFSET),
             EXTRACT_BE_U_4(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET),
             EXTRACT_BE_U_4(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET + 4),

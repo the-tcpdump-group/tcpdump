@@ -191,7 +191,7 @@ auth_print(netdissect_options *ndo, register const u_char *pptr)
                  bfd_auth_header->auth_type,
                  bfd_auth_header->auth_len));
                 pptr += 2;
-                ND_PRINT((ndo, "\n\t  Auth Key ID: %d", *pptr));
+                ND_PRINT((ndo, "\n\t  Auth Key ID: %d", EXTRACT_U_1(pptr)));
 
         switch(bfd_auth_header->auth_type) {
             case AUTH_PASSWORD:
@@ -248,7 +248,7 @@ auth_print(netdissect_options *ndo, register const u_char *pptr)
                 ND_TCHECK2(*pptr, AUTH_MD5_HASH_LEN);
                 ND_PRINT((ndo, "\n\t  Digest: "));
                 for(i = 0; i < AUTH_MD5_HASH_LEN; i++)
-                    ND_PRINT((ndo, "%02x", pptr[i]));
+                    ND_PRINT((ndo, "%02x", EXTRACT_U_1(pptr + i)));
                 break;
             case AUTH_SHA1:
             case AUTH_MET_SHA1:
@@ -279,7 +279,7 @@ auth_print(netdissect_options *ndo, register const u_char *pptr)
                 ND_TCHECK2(*pptr, AUTH_SHA1_HASH_LEN);
                 ND_PRINT((ndo, "\n\t  Hash: "));
                 for(i = 0; i < AUTH_SHA1_HASH_LEN; i++)
-                    ND_PRINT((ndo, "%02x", pptr[i]));
+                    ND_PRINT((ndo, "%02x", EXTRACT_U_1(pptr + i)));
                 break;
         }
         return 0;

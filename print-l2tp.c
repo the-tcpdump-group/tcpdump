@@ -396,7 +396,7 @@ l2tp_q931_cc_print(netdissect_options *ndo, const u_char *dat, u_int length)
 		return;
 	}
 	print_16bits_val(ndo, (const uint16_t *)dat);
-	ND_PRINT((ndo, ", %02x", dat[2]));
+	ND_PRINT((ndo, ", %02x", EXTRACT_U_1(dat + 2)));
 	dat += 3;
 	length -= 3;
 	if (length != 0) {

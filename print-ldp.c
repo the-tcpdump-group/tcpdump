@@ -335,7 +335,7 @@ ldp_tlv_print(netdissect_options *ndo,
 
     case LDP_TLV_FEC:
         TLV_TCHECK(1);
-        fec_type = *tptr;
+        fec_type = EXTRACT_U_1(tptr);
 	ND_PRINT((ndo, "\n\t      %s FEC (0x%02x)",
 	       tok2str(ldp_fec_values, "Unknown", fec_type),
 	       fec_type));
@@ -421,7 +421,7 @@ ldp_tlv_print(netdissect_options *ndo,
             TLV_TCHECK(vc_info_len);
 
             while (vc_info_len > 2) {
-                vc_info_tlv_type = *tptr;
+                vc_info_tlv_type = EXTRACT_U_1(tptr);
                 vc_info_tlv_len = EXTRACT_U_1(tptr + 1);
                 if (vc_info_tlv_len < 2)
                     break;
@@ -441,7 +441,7 @@ ldp_tlv_print(netdissect_options *ndo,
                 case LDP_FEC_MARTINI_IFPARM_DESC:
                     ND_PRINT((ndo, ": "));
                     for (idx = 2; idx < vc_info_tlv_len; idx++)
-                        safeputchar(ndo, *(tptr + idx));
+                        safeputchar(ndo, EXTRACT_U_1(tptr + idx));
                     break;
 
                 case LDP_FEC_MARTINI_IFPARM_VCCV:

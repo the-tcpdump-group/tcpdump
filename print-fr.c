@@ -472,8 +472,8 @@ mfr_print(netdissect_options *ndo,
 
         while (tlen>sizeof(struct ie_tlv_header_t)) {
             ND_TCHECK2(*tptr, sizeof(struct ie_tlv_header_t));
-            ie_type=tptr[0];
-            ie_len=tptr[1];
+            ie_type=EXTRACT_U_1(tptr);
+            ie_len=EXTRACT_U_1(tptr + 1);
 
             ND_PRINT((ndo, "\n\tIE %s (%u), length %u: ",
                    tok2str(mfr_ctrl_ie_values,"Unknown",ie_type),
@@ -499,8 +499,8 @@ mfr_print(netdissect_options *ndo,
             case MFR_CTRL_IE_BUNDLE_ID: /* same message format */
             case MFR_CTRL_IE_LINK_ID:
                 for (idx = 0; idx < ie_len && idx < MFR_ID_STRING_MAXLEN; idx++) {
-                    if (*(tptr+idx) != 0) /* don't print null termination */
-                        safeputchar(ndo, *(tptr + idx));
+                    if (EXTRACT_U_1(tptr + idx) != 0) /* don't print null termination */
+                        safeputchar(ndo, EXTRACT_U_1(tptr + idx));
                     else
                         break;
                 }

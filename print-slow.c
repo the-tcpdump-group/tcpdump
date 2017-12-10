@@ -250,8 +250,8 @@ slow_print(netdissect_options *ndo,
 
     if (len < 1)
         goto tooshort;
-    ND_TCHECK(*pptr);
-    subtype = *pptr;
+    ND_TCHECK_1(pptr);
+    subtype = EXTRACT_U_1(pptr);
 
     /*
      * Sanity checking of the header.
@@ -260,9 +260,9 @@ slow_print(netdissect_options *ndo,
     case SLOW_PROTO_LACP:
         if (len < 2)
             goto tooshort;
-        ND_TCHECK(*(pptr+1));
-        if (*(pptr+1) != LACP_VERSION) {
-            ND_PRINT((ndo, "LACP version %u packet not supported", *(pptr+1)));
+        ND_TCHECK_1(pptr + 1);
+        if (EXTRACT_U_1(pptr + 1) != LACP_VERSION) {
+            ND_PRINT((ndo, "LACP version %u packet not supported", EXTRACT_U_1(pptr + 1)));
             return;
         }
         print_version = 1;
@@ -271,9 +271,9 @@ slow_print(netdissect_options *ndo,
     case SLOW_PROTO_MARKER:
         if (len < 2)
             goto tooshort;
-        ND_TCHECK(*(pptr+1));
-        if (*(pptr+1) != MARKER_VERSION) {
-            ND_PRINT((ndo, "MARKER version %u packet not supported", *(pptr+1)));
+        ND_TCHECK_1(pptr + 1);
+        if (EXTRACT_U_1(pptr + 1) != MARKER_VERSION) {
+            ND_PRINT((ndo, "MARKER version %u packet not supported", EXTRACT_U_1(pptr + 1)));
             return;
         }
         print_version = 1;

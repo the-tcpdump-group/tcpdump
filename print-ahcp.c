@@ -200,7 +200,7 @@ ahcp_ipv6_prefixes_print(netdissect_options *ndo, const u_char *cp, const u_char
 		if (cp + 17 > ep)
 			goto invalid;
 		ND_TCHECK2(*cp, 17);
-		ND_PRINT((ndo, "%s%s/%u", sep, ip6addr_string(ndo, cp), *(cp + 16)));
+		ND_PRINT((ndo, "%s%s/%u", sep, ip6addr_string(ndo, cp), EXTRACT_U_1(cp + 16)));
 		cp += 17;
 		sep = ", ";
 	}
@@ -224,7 +224,7 @@ ahcp_ipv4_prefixes_print(netdissect_options *ndo, const u_char *cp, const u_char
 		if (cp + 5 > ep)
 			goto invalid;
 		ND_TCHECK_5(cp);
-		ND_PRINT((ndo, "%s%s/%u", sep, ipaddr_string(ndo, cp), *(cp + 4)));
+		ND_PRINT((ndo, "%s%s/%u", sep, ipaddr_string(ndo, cp), EXTRACT_U_1(cp + 4)));
 		cp += 5;
 		sep = ", ";
 	}
@@ -266,7 +266,7 @@ ahcp1_options_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 	while (cp < ep) {
 		/* Option no */
 		ND_TCHECK_1(cp);
-		option_no = *cp;
+		option_no = EXTRACT_U_1(cp);
 		cp += 1;
 		ND_PRINT((ndo, "\n\t %s", tok2str(ahcp1_opt_str, "Unknown-%u", option_no)));
 		if (option_no == AHCP1_OPT_PAD || option_no == AHCP1_OPT_MANDATORY)
@@ -275,7 +275,7 @@ ahcp1_options_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 		if (cp + 1 > ep)
 			goto invalid;
 		ND_TCHECK_1(cp);
-		option_len = *cp;
+		option_len = EXTRACT_U_1(cp);
 		cp += 1;
 		if (cp + option_len > ep)
 			goto invalid;
@@ -309,11 +309,11 @@ ahcp1_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 		goto invalid;
 	/* Type */
 	ND_TCHECK_1(cp);
-	type = *cp;
+	type = EXTRACT_U_1(cp);
 	cp += 1;
 	/* MBZ */
 	ND_TCHECK_1(cp);
-	mbz = *cp;
+	mbz = EXTRACT_U_1(cp);
 	cp += 1;
 	/* Length */
 	ND_TCHECK_2(cp);
@@ -355,12 +355,12 @@ ahcp_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 		goto invalid;
 	/* Magic */
 	ND_TCHECK_1(cp);
-	if (*cp != AHCP_MAGIC_NUMBER)
+	if (EXTRACT_U_1(cp) != AHCP_MAGIC_NUMBER)
 		goto invalid;
 	cp += 1;
 	/* Version */
 	ND_TCHECK_1(cp);
-	version = *cp;
+	version = EXTRACT_U_1(cp);
 	cp += 1;
 	switch (version) {
 		case AHCP_VERSION_1: {
@@ -373,11 +373,11 @@ ahcp_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 			} else {
 				/* Hopcount */
 				ND_TCHECK_1(cp);
-				ND_PRINT((ndo, "\n\tHopcount %u", *cp));
+				ND_PRINT((ndo, "\n\tHopcount %u", EXTRACT_U_1(cp)));
 				cp += 1;
 				/* Original Hopcount */
 				ND_TCHECK_1(cp);
-				ND_PRINT((ndo, ", Original Hopcount %u", *cp));
+				ND_PRINT((ndo, ", Original Hopcount %u", EXTRACT_U_1(cp)));
 				cp += 1;
 				/* Nonce */
 				ND_TCHECK_4(cp);

@@ -162,7 +162,8 @@ format_nid(const u_char *data)
     static int i = 0;
     i = (i + 1) % 4;
     snprintf(buf[i], sizeof(buf[i]), "%02x:%02x:%02x:%02x",
-             data[0], data[1], data[2], data[3]);
+             EXTRACT_U_1(data), EXTRACT_U_1(data + 1), EXTRACT_U_1(data + 2),
+             EXTRACT_U_1(data + 3));
     return buf[i];
 }
 
@@ -206,7 +207,7 @@ print_prefix(netdissect_options *ndo, const u_char *prefix, u_int max_length)
     int plenbytes;
     char buf[sizeof("xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx::/128")];
 
-    if (prefix[0] >= 96 && max_length >= IPV4_MAPPED_HEADING_LEN + 1 &&
+    if (EXTRACT_U_1(prefix) >= 96 && max_length >= IPV4_MAPPED_HEADING_LEN + 1 &&
         is_ipv4_mapped_address(prefix + 1)) {
         struct in_addr addr;
         u_int plen;
@@ -220,7 +221,7 @@ print_prefix(netdissect_options *ndo, const u_char *prefix, u_int max_length)
         plenbytes = (plen + 7) / 8;
         if (max_length < (u_int)plenbytes + IPV4_MAPPED_HEADING_LEN)
             return -3;
-        memcpy(&addr, &prefix[1 + IPV4_MAPPED_HEADING_LEN], plenbytes);
+        memcpy(&addr, prefix + IPV4_MAPPED_HEADING_LEN + 1, plenbytes);
         if (plen % 8) {
 		((u_char *)&addr)[plenbytes - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
@@ -241,7 +242,8 @@ print_dns_label(netdissect_options *ndo,
 {
     u_int length = 0;
     while (length < max_length) {
-        u_int lab_length = cp[length++];
+        u_int lab_length = EXTRACT_U_1(cp + length);
+        length++;
         if (lab_length == 0)
             return (int)length;
         if (length > 1 && print)
@@ -273,8 +275,8 @@ dhcpv4_print(netdissect_options *ndo,
         if (i + 2 > length)
             return -1;
         tlv = cp + i;
-        type = tlv[0];
-        optlen = tlv[1];
+        type = EXTRACT_U_1(tlv);
+        optlen = EXTRACT_U_1(tlv + 1);
         value = tlv + 2;
 
         ND_PRINT((ndo, "\n"));
@@ -613,7 +615,7 @@ hncp_print_rec(netdissect_options *ndo,
 
         case HNCP_DELEGATED_PREFIX: {
             int l;
-            if (bodylen < 9 || bodylen < 9 + (value[8] + 7) / 8) {
+            if (bodylen < 9 || bodylen < 9 + (EXTRACT_U_1(value + 8) + 7) / 8) {
                 ND_PRINT((ndo, " %s", istr));
                 break;
             }
@@ -653,7 +655,7 @@ hncp_print_rec(netdissect_options *ndo,
                 ND_PRINT((ndo, " %s", istr));
                 break;
             }
-            policy = value[0];
+            policy = EXTRACT_U_1(value);
             ND_PRINT((ndo, " type: "));
             if (policy == 0) {
                 if (bodylen != 1) {
@@ -724,7 +726,7 @@ hncp_print_rec(netdissect_options *ndo,
         case HNCP_ASSIGNED_PREFIX: {
             uint8_t prty;
             int l;
-            if (bodylen < 6 || bodylen < 6 + (value[5] + 7) / 8) {
+            if (bodylen < 6 || bodylen < 6 + (EXTRACT_U_1(value + 5) + 7) / 8) {
                 ND_PRINT((ndo, " %s", istr));
                 break;
             }
@@ -774,9 +776,9 @@ hncp_print_rec(netdissect_options *ndo,
             ip_address = format_ip6addr(ndo, value);
             ND_PRINT((ndo, " IP-Address: %s %c%c%c ",
                 ip_address,
-                (value[16] & 4) ? 'l' : '-',
-                (value[16] & 2) ? 'b' : '-',
-                (value[16] & 1) ? 's' : '-'
+                (EXTRACT_U_1(value + 16) & 4) ? 'l' : '-',
+                (EXTRACT_U_1(value + 16) & 2) ? 'b' : '-',
+                (EXTRACT_U_1(value + 16) & 1) ? 's' : '-'
             ));
             len = print_dns_label(ndo, value+17, bodylen-17, 1);
             if (len < 0) {
@@ -806,7 +808,7 @@ hncp_print_rec(netdissect_options *ndo,
                 ND_PRINT((ndo, " %s", istr));
                 break;
             }
-            l = value[16];
+            l = EXTRACT_U_1(value + 16);
             if (bodylen < 17 + l) {
                 ND_PRINT((ndo, " %s", istr));
                 break;

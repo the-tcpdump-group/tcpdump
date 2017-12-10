@@ -67,10 +67,10 @@ ip_printroute(netdissect_options *ndo,
 	}
 	if ((length + 1) & 3)
 		ND_PRINT((ndo, " [bad length %u]", length));
-	ND_TCHECK(cp[2]);
+	ND_TCHECK_1(cp + 2);
 	ptr = cp[2] - 1;
 	if (ptr < 3 || ((ptr + 1) & 3) || ptr > length + 1)
-		ND_PRINT((ndo, " [bad ptr %u]", cp[2]));
+		ND_PRINT((ndo, " [bad ptr %u]", EXTRACT_U_1(cp + 2)));
 
 	for (len = 3; len < length; len += 4) {
 		ND_TCHECK_4(cp + len);
@@ -106,15 +106,15 @@ ip_finddst(netdissect_options *ndo,
 	for (; length > 0; cp += len, length -= len) {
 		int tt;
 
-		ND_TCHECK(*cp);
-		tt = *cp;
+		ND_TCHECK_1(cp);
+		tt = EXTRACT_U_1(cp);
 		if (tt == IPOPT_EOL)
 			break;
 		else if (tt == IPOPT_NOP)
 			len = 1;
 		else {
-			ND_TCHECK(cp[1]);
-			len = cp[1];
+			ND_TCHECK_1(cp + 1);
+			len = EXTRACT_U_1(cp + 1);
 			if (len < 2)
 				break;
 		}
@@ -185,13 +185,13 @@ ip_printts(netdissect_options *ndo,
 	hoplen = ((cp[3]&0xF) != IPOPT_TS_TSONLY) ? 8 : 4;
 	if ((length - 4) & (hoplen-1))
 		ND_PRINT((ndo, "[bad length %u]", length));
-	ND_TCHECK(cp[2]);
+	ND_TCHECK_1(cp + 2);
 	ptr = cp[2] - 1;
 	len = 0;
 	if (ptr < 4 || ((ptr - 4) & (hoplen-1)) || ptr > length + 1)
-		ND_PRINT((ndo, "[bad ptr %u]", cp[2]));
-	ND_TCHECK(cp[3]);
-	switch (cp[3]&0xF) {
+		ND_PRINT((ndo, "[bad ptr %u]", EXTRACT_U_1(cp + 2)));
+	ND_TCHECK_1(cp + 3);
+	switch (EXTRACT_U_1(cp + 3)&0xF) {
 	case IPOPT_TS_TSONLY:
 		ND_PRINT((ndo, "TSONLY"));
 		break;
@@ -211,7 +211,7 @@ ip_printts(netdissect_options *ndo,
 		ND_PRINT((ndo, "PRESPEC"));
 		break;
 	default:
-		ND_PRINT((ndo, "[bad ts type %d]", cp[3]&0xF));
+		ND_PRINT((ndo, "[bad ts type %d]", EXTRACT_U_1(cp + 3)&0xF));
 		goto done;
 	}
 
@@ -228,8 +228,8 @@ ip_printts(netdissect_options *ndo,
 done:
 	ND_PRINT((ndo, "%s", ptr == len ? " ^ " : ""));
 
-	if (cp[3]>>4)
-		ND_PRINT((ndo, " [%d hops not recorded]} ", cp[3]>>4));
+	if (EXTRACT_U_1(cp + 3) >> 4)
+		ND_PRINT((ndo, " [%d hops not recorded]} ", EXTRACT_U_1(cp + 3)>>4));
 	else
 		ND_PRINT((ndo, "}"));
 	return (0);
@@ -254,8 +254,8 @@ ip_optprint(netdissect_options *ndo,
 		ND_PRINT((ndo, "%s", sep));
 		sep = ",";
 
-		ND_TCHECK(*cp);
-		option_code = *cp;
+		ND_TCHECK_1(cp);
+		option_code = EXTRACT_U_1(cp);
 
 		ND_PRINT((ndo, "%s",
 		          tok2str(ip_option_values,"unknown %u",option_code)));
@@ -265,8 +265,8 @@ ip_optprint(netdissect_options *ndo,
 			option_len = 1;
 
 		else {
-			ND_TCHECK(cp[1]);
-			option_len = cp[1];
+			ND_TCHECK_1(cp + 1);
+			option_len = EXTRACT_U_1(cp + 1);
 			if (option_len < 2) {
 				ND_PRINT((ndo, " [bad length %u]", option_len));
 				return;
@@ -301,7 +301,7 @@ ip_optprint(netdissect_options *ndo,
 				ND_PRINT((ndo, " [bad length %u]", option_len));
 				break;
 			}
-			ND_TCHECK(cp[3]);
+			ND_TCHECK_1(cp + 3);
 			if (EXTRACT_BE_U_2(cp + 2) != 0)
 				ND_PRINT((ndo, " value %u", EXTRACT_BE_U_2(cp + 2)));
 			break;
@@ -349,7 +349,7 @@ again:
 			ND_PRINT((ndo, "[|AH]"));
 			break;
 		}
-		ipds->nh = *ipds->cp;
+		ipds->nh = EXTRACT_U_1(ipds->cp);
 		ipds->advance = ah_print(ndo, ipds->cp);
 		if (ipds->advance <= 0)
 			break;
@@ -706,8 +706,8 @@ ipN_print(netdissect_options *ndo, register const u_char *bp, register u_int len
 		return;
 	}
 
-	ND_TCHECK(*bp);
-	switch (*bp & 0xF0) {
+	ND_TCHECK_1(bp);
+	switch (EXTRACT_U_1(bp) & 0xF0) {
 	case 0x40:
 		ip_print (ndo, bp, length);
 		break;

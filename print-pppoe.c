@@ -106,7 +106,7 @@ pppoe_print(netdissect_options *ndo, register const u_char *bp, u_int length)
 	ND_TCHECK2(*pppoe_packet, PPPOE_HDRLEN);
 	pppoe_ver  = (pppoe_packet[0] & 0xF0) >> 4;
 	pppoe_type  = (pppoe_packet[0] & 0x0F);
-	pppoe_code = pppoe_packet[1];
+	pppoe_code = EXTRACT_U_1(pppoe_packet + 1);
 	pppoe_sessionid = EXTRACT_BE_U_2(pppoe_packet + 2);
 	pppoe_length    = EXTRACT_BE_U_2(pppoe_packet + 4);
 	pppoe_payload = pppoe_packet + PPPOE_HDRLEN;
@@ -156,8 +156,8 @@ pppoe_print(netdissect_options *ndo, register const u_char *bp, u_int length)
 				/* TODO print UTF-8 decoded text */
 				ND_TCHECK2(*p, tag_len);
 				for (v = p; v < p + tag_len && tag_str_len < MAXTAGPRINT-1; v++)
-					if (*v >= 32 && *v < 127) {
-						tag_str[tag_str_len++] = *v;
+					if (ND_ISPRINT(EXTRACT_U_1(v))) {
+						tag_str[tag_str_len++] = EXTRACT_U_1(v);
 						ascii_count++;
 					} else {
 						tag_str[tag_str_len++] = '.';
@@ -175,7 +175,7 @@ pppoe_print(netdissect_options *ndo, register const u_char *bp, u_int length)
 					/* Print hex, not fast to abuse printf but this doesn't get used much */
 					ND_PRINT((ndo, " [%s 0x", tok2str(pppoetag2str, "TAG-0x%x", tag_type)));
 					for (v=p; v<p+tag_len; v++) {
-						ND_PRINT((ndo, "%02X", *v));
+						ND_PRINT((ndo, "%02X", EXTRACT_U_1(v)));
 					}
 					ND_PRINT((ndo, "]"));
 				}

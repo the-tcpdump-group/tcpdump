@@ -106,7 +106,7 @@ cdp_print(netdissect_options *ndo,
 
 	ND_TCHECK2(*tptr, CDP_HEADER_LEN);
 	ND_PRINT((ndo, "CDPv%u, ttl: %us", EXTRACT_U_1((tptr + CDP_HEADER_VERSION_OFFSET)),
-					   *(tptr + CDP_HEADER_TTL_OFFSET)));
+					   EXTRACT_U_1(tptr + CDP_HEADER_TTL_OFFSET)));
 	if (ndo->ndo_vflag)
 		ND_PRINT((ndo, ", checksum: 0x%04x (unverified), length %u", EXTRACT_BE_U_2(tptr + CDP_HEADER_CHECKSUM_OFFSET), length));
 	tptr += CDP_HEADER_LEN;
@@ -202,7 +202,7 @@ cdp_print(netdissect_options *ndo,
 		    case 0x0b: /* Duplex - CDPv2 */
 			if (len < 1)
 			    goto trunc;
-			ND_PRINT((ndo, "%s", *(tptr) ? "full": "half"));
+			ND_PRINT((ndo, "%s", EXTRACT_U_1(tptr) ? "full": "half"));
 			break;
 
 		    /* http://www.cisco.com/c/en/us/td/docs/voice_ip_comm/cata/186/2_12_m/english/release/notes/186rn21m.html
@@ -224,12 +224,12 @@ cdp_print(netdissect_options *ndo,
 		    case 0x12: /* AVVID trust bitmap - not documented */
 			if (len < 1)
 			    goto trunc;
-			ND_PRINT((ndo, "0x%02x", *(tptr)));
+			ND_PRINT((ndo, "0x%02x", EXTRACT_U_1(tptr)));
 			break;
 		    case 0x13: /* AVVID untrusted port CoS - not documented */
 			if (len < 1)
 			    goto trunc;
-			ND_PRINT((ndo, "0x%02x", *(tptr)));
+			ND_PRINT((ndo, "0x%02x", EXTRACT_U_1(tptr)));
 			break;
 		    case 0x14: /* System Name - not documented */
 			ND_PRINT((ndo, "'"));
@@ -243,7 +243,7 @@ cdp_print(netdissect_options *ndo,
 		    case 0x17: /* Physical Location - not documented */
 			if (len < 1)
 			    goto trunc;
-			ND_PRINT((ndo, "0x%02x", *(tptr)));
+			ND_PRINT((ndo, "0x%02x", EXTRACT_U_1(tptr)));
 			if (len > 1) {
 				ND_PRINT((ndo, "/"));
 				(void)fn_printn(ndo, tptr + 1, len - 1, NULL);
@@ -295,8 +295,8 @@ cdp_print_addr(netdissect_options *ndo,
 		ND_TCHECK_2(p);
 		if (p + 2 > endp)
 			goto trunc;
-		pt = p[0];		/* type of "protocol" field */
-		pl = p[1];		/* length of "protocol" field */
+		pt = EXTRACT_U_1(p);		/* type of "protocol" field */
+		pl = EXTRACT_U_1(p + 1);		/* length of "protocol" field */
 		p += 2;
 
 		ND_TCHECK_2(p + pl);
@@ -304,7 +304,8 @@ cdp_print_addr(netdissect_options *ndo,
 			goto trunc;
 		al = EXTRACT_BE_U_2(p + pl);	/* address length */
 
-		if (pt == PT_NLPID && pl == 1 && *p == NLPID_IP && al == 4) {
+		if (pt == PT_NLPID && pl == 1 && EXTRACT_U_1(p) == NLPID_IP &&
+		    al == 4) {
 			/*
 			 * IPv4: protocol type = NLPID, protocol length = 1
 			 * (1-byte NLPID), protocol = 0xcc (NLPID for IPv4),
@@ -381,7 +382,9 @@ cdp_print_prefixes(netdissect_options *ndo,
 	ND_PRINT((ndo, " IPv4 Prefixes (%d):", l / 5));
 
 	while (l > 0) {
-		ND_PRINT((ndo, " %u.%u.%u.%u/%u", p[0], p[1], p[2], p[3], p[4]));
+		ND_PRINT((ndo, " %u.%u.%u.%u/%u",
+			  EXTRACT_U_1(p), EXTRACT_U_1(p + 1), EXTRACT_U_1(p + 2),
+			  EXTRACT_U_1(p + 3), EXTRACT_U_1(p + 4)));
 		l -= 5;
 		p += 5;
 	}

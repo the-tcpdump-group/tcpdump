@@ -91,17 +91,17 @@ syslog_print(netdissect_options *ndo,
      */
 
     ND_TCHECK_1(pptr);
-    if (*(pptr+msg_off) == '<') {
+    if (EXTRACT_U_1(pptr + msg_off) == '<') {
         msg_off++;
         ND_TCHECK_1(pptr + msg_off);
         while (msg_off <= SYSLOG_MAX_DIGITS &&
-               *(pptr+msg_off) >= '0' &&
-               *(pptr+msg_off) <= '9') {
-            pri = pri * 10 + (*(pptr+msg_off) - '0');
+               EXTRACT_U_1(pptr + msg_off) >= '0' &&
+               EXTRACT_U_1(pptr + msg_off) <= '9') {
+            pri = pri * 10 + (EXTRACT_U_1(pptr + msg_off) - '0');
             msg_off++;
             ND_TCHECK_1(pptr + msg_off);
         }
-        if (*(pptr+msg_off) != '>') {
+        if (EXTRACT_U_1(pptr + msg_off) != '>') {
             ND_PRINT((ndo, "%s", tstr));
             return;
         }
@@ -133,7 +133,7 @@ syslog_print(netdissect_options *ndo,
     /* print the syslog text in verbose mode */
     for (; msg_off < len; msg_off++) {
         ND_TCHECK_1(pptr + msg_off);
-        safeputchar(ndo, *(pptr + msg_off));
+        safeputchar(ndo, EXTRACT_U_1(pptr + msg_off));
     }
 
     if (ndo->ndo_vflag > 1)

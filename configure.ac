@@ -545,9 +545,6 @@ don't.])
 	fi
 fi
 
-# libdlpi is needed for Solaris 11 and later.
-AC_CHECK_LIB(dlpi, dlpi_walk, LIBS="$LIBS -ldlpi" LDFLAGS="-L/lib $LDFLAGS", ,-L/lib)
-
 dnl
 dnl Check for "pcap_list_datalinks()", "pcap_set_datalink()",
 dnl and "pcap_datalink_name_to_val()", and use substitute versions

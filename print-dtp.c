@@ -96,7 +96,7 @@ dtp_print (netdissect_options *ndo, const u_char *pptr, u_int length)
 	case DTP_DTP_TYPE_TLV:
                 if (len < 5)
                     goto invalid;
-                ND_PRINT((ndo, ", 0x%x", *(tptr+4)));
+                ND_PRINT((ndo, ", 0x%x", EXTRACT_U_1(tptr + 4)));
                 break;
 
 	case DTP_NEIGHBOR_TLV:

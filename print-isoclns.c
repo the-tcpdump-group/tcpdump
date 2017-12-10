@@ -678,9 +678,9 @@ isoclns_print(netdissect_options *ndo, const uint8_t *p, u_int length)
 	}
 
 	if (ndo->ndo_eflag)
-		ND_PRINT((ndo, "OSI NLPID %s (0x%02x): ", tok2str(nlpid_values, "Unknown", EXTRACT_U_1(p)), *p));
+		ND_PRINT((ndo, "OSI NLPID %s (0x%02x): ", tok2str(nlpid_values, "Unknown", EXTRACT_U_1(p)), EXTRACT_U_1(p)));
 
-	switch (*p) {
+	switch (EXTRACT_U_1(p)) {
 
 	case NLPID_CLNP:
 		if (!clnp_print(ndo, p, length))
@@ -718,7 +718,7 @@ isoclns_print(netdissect_options *ndo, const uint8_t *p, u_int length)
 
 	default:
 		if (!ndo->ndo_eflag)
-			ND_PRINT((ndo, "OSI NLPID 0x%02x unknown", *p));
+			ND_PRINT((ndo, "OSI NLPID 0x%02x unknown", EXTRACT_U_1(p)));
 		ND_PRINT((ndo, "%slength: %u", ndo->ndo_eflag ? "" : ", ", length));
 		if (length > 1)
 			print_unknown_data(ndo, p, "\n\t", length);
@@ -816,7 +816,7 @@ clnp_print(netdissect_options *ndo,
             ND_PRINT((ndo, "li < size of fixed part of CLNP header and addresses"));
             return (0);
         }
-	ND_TCHECK(*pptr);
+	ND_TCHECK_1(pptr);
         dest_address_length = EXTRACT_U_1(pptr);
         pptr += 1;
         li -= 1;
@@ -833,7 +833,7 @@ clnp_print(netdissect_options *ndo,
             ND_PRINT((ndo, "li < size of fixed part of CLNP header and addresses"));
             return (0);
         }
-	ND_TCHECK(*pptr);
+	ND_TCHECK_1(pptr);
         source_address_length = EXTRACT_U_1(pptr);
         pptr += 1;
         li -= 1;
@@ -1040,7 +1040,7 @@ clnp_print(netdissect_options *ndo,
 
         case    CLNP_PDU_ER: /* fall through */
         case 	CLNP_PDU_ERP:
-            ND_TCHECK(*pptr);
+            ND_TCHECK_1(pptr);
             if (EXTRACT_U_1(pptr) == NLPID_CLNP) {
                 ND_PRINT((ndo, "\n\t-----original packet-----\n\t"));
                 /* FIXME recursion protection */
@@ -1174,7 +1174,7 @@ esis_print(netdissect_options *ndo,
 		const uint8_t *dst, *snpa, *neta;
 		u_int dstl, snpal, netal;
 
-		ND_TCHECK(*pptr);
+		ND_TCHECK_1(pptr);
 		if (li < 1) {
 			ND_PRINT((ndo, ", bad redirect/li"));
 			return;
@@ -1192,7 +1192,7 @@ esis_print(netdissect_options *ndo,
                 li -= dstl;
 		ND_PRINT((ndo, "\n\t  %s", isonsap_string(ndo, dst, dstl)));
 
-		ND_TCHECK(*pptr);
+		ND_TCHECK_1(pptr);
 		if (li < 1) {
 			ND_PRINT((ndo, ", bad redirect/li"));
 			return;
@@ -1208,7 +1208,7 @@ esis_print(netdissect_options *ndo,
 		snpa = pptr;
 		pptr += snpal;
                 li -= snpal;
-		ND_TCHECK(*pptr);
+		ND_TCHECK_1(pptr);
 		if (li < 1) {
 			ND_PRINT((ndo, ", bad redirect/li"));
 			return;
@@ -1240,7 +1240,7 @@ esis_print(netdissect_options *ndo,
 	}
 
 	case ESIS_PDU_ESH:
-            ND_TCHECK(*pptr);
+            ND_TCHECK_1(pptr);
             if (li < 1) {
                 ND_PRINT((ndo, ", bad esh/li"));
                 return;
@@ -1252,7 +1252,7 @@ esis_print(netdissect_options *ndo,
             ND_PRINT((ndo, "\n\t  Number of Source Addresses: %u", source_address_number));
 
             while (source_address_number > 0) {
-                ND_TCHECK(*pptr);
+                ND_TCHECK_1(pptr);
             	if (li < 1) {
                     ND_PRINT((ndo, ", bad esh/li"));
             	    return;
@@ -1277,7 +1277,7 @@ esis_print(netdissect_options *ndo,
             break;
 
 	case ESIS_PDU_ISH: {
-            ND_TCHECK(*pptr);
+            ND_TCHECK_1(pptr);
             if (li < 1) {
                 ND_PRINT((ndo, ", bad ish/li"));
                 return;
@@ -1666,17 +1666,19 @@ isis_print_id(const uint8_t *cp, int id_len)
     if (sysid_len > id_len)
         sysid_len = id_len;
     for (i = 1; i <= sysid_len; i++) {
-        snprintf(pos, sizeof(id) - (pos - id), "%02x", *cp++);
+        snprintf(pos, sizeof(id) - (pos - id), "%02x", EXTRACT_U_1(cp));
+	cp++;
 	pos += strlen(pos);
 	if (i == 2 || i == 4)
 	    *pos++ = '.';
 	}
     if (id_len >= NODE_ID_LEN) {
-        snprintf(pos, sizeof(id) - (pos - id), ".%02x", *cp++);
+        snprintf(pos, sizeof(id) - (pos - id), ".%02x", EXTRACT_U_1(cp));
+	cp++;
 	pos += strlen(pos);
     }
     if (id_len == LSP_ID_LEN)
-        snprintf(pos, sizeof(id) - (pos - id), "-%02x", *cp);
+        snprintf(pos, sizeof(id) - (pos - id), "-%02x", EXTRACT_U_1(cp));
     return (id);
 }
 

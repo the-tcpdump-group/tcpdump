@@ -166,7 +166,7 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		return (length);
 	}
 
-	dsap_field = *p;
+	dsap_field = EXTRACT_U_1(p);
 	ssap_field = EXTRACT_U_1(p + 1);
 
 	/*
@@ -372,13 +372,15 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 					ND_DEFAULTPRINT((const u_char *)p, caplen);
 				return (hdrlen);
 			}
-			if (*p == LLC_XID_FI) {
+			if (EXTRACT_U_1(p) == LLC_XID_FI) {
 				if (caplen < 3 || length < 3) {
 					ND_PRINT((ndo, "[|llc]"));
 					if (caplen > 0)
 						ND_DEFAULTPRINT((const u_char *)p, caplen);
 				} else
-					ND_PRINT((ndo, ": %02x %02x", p[1], p[2]));
+					ND_PRINT((ndo, ": %02x %02x",
+						  EXTRACT_U_1(p + 1),
+						  EXTRACT_U_1(p + 2)));
 				return (hdrlen);
 			}
 		}

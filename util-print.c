@@ -53,6 +53,7 @@
 #include <string.h>
 
 #include "netdissect.h"
+#include "extract.h"
 #include "ascii_strcasecmp.h"
 #include "timeval-operations.h"
 
@@ -759,7 +760,7 @@ print_txt_line(netdissect_options *ndo, const char *protoname,
 
 	startidx = idx;
 	while (idx < len) {
-		ND_TCHECK(*(pptr+idx));
+		ND_TCHECK_1(pptr + idx);
 		if (*(pptr+idx) == '\n') {
 			/*
 			 * LF without CR; end of line.
@@ -775,7 +776,7 @@ print_txt_line(netdissect_options *ndo, const char *protoname,
 				/* not in this packet */
 				return (0);
 			}
-			ND_TCHECK(*(pptr+idx+1));
+			ND_TCHECK_1(pptr + idx + 1);
 			if (*(pptr+idx+1) == '\n') {
 				/*
 				 * CR-LF; end of line.

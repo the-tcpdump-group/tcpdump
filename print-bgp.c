@@ -538,9 +538,9 @@ decode_prefix4(netdissect_options *ndo,
 	struct in_addr addr;
 	u_int plen, plenbytes;
 
-	ND_TCHECK(pptr[0]);
+	ND_TCHECK_1(pptr);
 	ITEMCHECK(1);
-	plen = pptr[0];
+	plen = EXTRACT_U_1(pptr);
 	if (32 < plen)
 		return -1;
 	itemlen -= 1;
@@ -549,7 +549,7 @@ decode_prefix4(netdissect_options *ndo,
 	plenbytes = (plen + 7) / 8;
 	ND_TCHECK2(pptr[1], plenbytes);
 	ITEMCHECK(plenbytes);
-	memcpy(&addr, &pptr[1], plenbytes);
+	memcpy(&addr, pptr + 1, plenbytes);
 	if (plen % 8) {
 		((u_char *)&addr)[plenbytes - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
@@ -574,7 +574,7 @@ decode_labeled_prefix4(netdissect_options *ndo,
 	/* prefix length and label = 4 bytes */
 	ND_TCHECK_4(pptr);
 	ITEMCHECK(4);
-	plen = pptr[0];   /* get prefix length */
+	plen = EXTRACT_U_1(pptr);   /* get prefix length */
 
         /* this is one of the weirdnesses of rfc3107
            the label length (actually the label + COS bits)
@@ -597,7 +597,7 @@ decode_labeled_prefix4(netdissect_options *ndo,
 	plenbytes = (plen + 7) / 8;
 	ND_TCHECK2(pptr[4], plenbytes);
 	ITEMCHECK(plenbytes);
-	memcpy(&addr, &pptr[4], plenbytes);
+	memcpy(&addr, pptr + 4, plenbytes);
 	if (plen % 8) {
 		((u_char *)&addr)[plenbytes - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
@@ -732,13 +732,15 @@ bgp_vpn_rd_print(netdissect_options *ndo,
         snprintf(pos, sizeof(rd) - (pos - rd), "%u:%u (= %u.%u.%u.%u)",
                  EXTRACT_BE_U_2(pptr + 2),
                  EXTRACT_BE_U_4(pptr + 4),
-                 *(pptr+4), *(pptr+5), *(pptr+6), *(pptr+7));
+                 EXTRACT_U_1(pptr + 4), EXTRACT_U_1(pptr + 5),
+                 EXTRACT_U_1(pptr + 6), EXTRACT_U_1(pptr + 7));
         break;
         /* IP-address:AS fmt*/
 
     case 1:
         snprintf(pos, sizeof(rd) - (pos - rd), "%u.%u.%u.%u:%u",
-            *(pptr+2), *(pptr+3), *(pptr+4), *(pptr+5),
+            EXTRACT_U_1(pptr + 2), EXTRACT_U_1(pptr + 3),
+            EXTRACT_U_1(pptr + 4), EXTRACT_U_1(pptr + 5),
             EXTRACT_BE_U_2(pptr + 6));
         break;
 
@@ -746,8 +748,9 @@ bgp_vpn_rd_print(netdissect_options *ndo,
     case 2:
 	snprintf(pos, sizeof(rd) - (pos - rd), "%s:%u (%u.%u.%u.%u:%u)",
 	    as_printf(ndo, astostr, sizeof(astostr), EXTRACT_BE_U_4(pptr + 2)),
-	    EXTRACT_BE_U_2(pptr + 6), *(pptr+2), *(pptr+3), *(pptr+4),
-	    *(pptr+5), EXTRACT_BE_U_2(pptr + 6));
+	    EXTRACT_BE_U_2(pptr + 6), EXTRACT_U_1(pptr + 2),
+	    EXTRACT_U_1(pptr + 3), EXTRACT_U_1(pptr + 4),
+	    EXTRACT_U_1(pptr + 5), EXTRACT_BE_U_2(pptr + 6));
         break;
     default:
         snprintf(pos, sizeof(rd) - (pos - rd), "unknown RD format");
@@ -767,8 +770,8 @@ decode_rt_routing_info(netdissect_options *ndo,
 	char asbuf[sizeof(astostr)]; /* bgp_vpn_rd_print() overwrites astostr */
 
 	/* NLRI "prefix length" from RFC 2858 Section 4. */
-	ND_TCHECK(pptr[0]);
-	plen = pptr[0];   /* get prefix length */
+	ND_TCHECK_1(pptr);
+	plen = EXTRACT_U_1(pptr);   /* get prefix length */
 
 	/* NLRI "prefix" (ibid), valid lengths are { 0, 32, 33, ..., 96 } bits.
 	 * RFC 4684 Section 4 defines the layout of "origin AS" and "route
@@ -798,7 +801,7 @@ decode_rt_routing_info(netdissect_options *ndo,
 	 */
 	memset(&route_target, 0, sizeof(route_target));
 	ND_TCHECK2(pptr[5], (plen + 7) / 8);
-	memcpy(&route_target, &pptr[5], (plen + 7) / 8);
+	memcpy(&route_target, pptr + 5, (plen + 7) / 8);
 	/* Which specification says to do this? */
 	if (plen % 8) {
 		((u_char *)&route_target)[(plen + 7) / 8 - 1] &=
@@ -821,8 +824,8 @@ decode_labeled_vpn_prefix4(netdissect_options *ndo,
 	struct in_addr addr;
 	u_int plen;
 
-	ND_TCHECK(pptr[0]);
-	plen = pptr[0];   /* get prefix length */
+	ND_TCHECK_1(pptr);
+	plen = EXTRACT_U_1(pptr);   /* get prefix length */
 
 	if ((24+64) > plen)
 		return -1;
@@ -834,7 +837,7 @@ decode_labeled_vpn_prefix4(netdissect_options *ndo,
 
 	memset(&addr, 0, sizeof(addr));
 	ND_TCHECK2(pptr[12], (plen + 7) / 8);
-	memcpy(&addr, &pptr[12], (plen + 7) / 8);
+	memcpy(&addr, pptr + 12, (plen + 7) / 8);
 	if (plen % 8) {
 		((u_char *)&addr)[(plen + 7) / 8 - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
@@ -873,7 +876,7 @@ decode_mdt_vpn_nlri(netdissect_options *ndo,
     const u_char *rd;
     const u_char *vpn_ip;
 
-    ND_TCHECK(pptr[0]);
+    ND_TCHECK_1(pptr);
 
     /* if the NLRI is not predefined length, quit.*/
     if (EXTRACT_U_1(pptr) != MDT_VPN_NLRI_LEN * 8)
@@ -1093,7 +1096,7 @@ decode_labeled_vpn_l2(netdissect_options *ndo,
 		    }
 		    ttlv_len=ttlv_len/8+1; /* how many bytes do we need to read ? */
 		    while (ttlv_len>0) {
-			ND_TCHECK(pptr[0]);
+			ND_TCHECK_1(pptr);
 			if (buflen!=0) {
 			    stringlen=snprintf(buf,buflen, "%02x",
                                                EXTRACT_U_1(pptr));
@@ -1133,9 +1136,9 @@ decode_prefix6(netdissect_options *ndo,
 	struct in6_addr addr;
 	u_int plen, plenbytes;
 
-	ND_TCHECK(pd[0]);
+	ND_TCHECK_1(pd);
 	ITEMCHECK(1);
-	plen = pd[0];
+	plen = EXTRACT_U_1(pd);
 	if (128 < plen)
 		return -1;
 	itemlen -= 1;
@@ -1144,7 +1147,7 @@ decode_prefix6(netdissect_options *ndo,
 	plenbytes = (plen + 7) / 8;
 	ND_TCHECK2(pd[1], plenbytes);
 	ITEMCHECK(plenbytes);
-	memcpy(&addr, &pd[1], plenbytes);
+	memcpy(&addr, pd + 1, plenbytes);
 	if (plen % 8) {
 		addr.s6_addr[plenbytes - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
@@ -1169,7 +1172,7 @@ decode_labeled_prefix6(netdissect_options *ndo,
 	/* prefix length and label = 4 bytes */
 	ND_TCHECK_4(pptr);
 	ITEMCHECK(4);
-	plen = pptr[0]; /* get prefix length */
+	plen = EXTRACT_U_1(pptr); /* get prefix length */
 
 	if (24 > plen)
 		return -1;
@@ -1183,7 +1186,7 @@ decode_labeled_prefix6(netdissect_options *ndo,
 	memset(&addr, 0, sizeof(addr));
 	plenbytes = (plen + 7) / 8;
 	ND_TCHECK2(pptr[4], plenbytes);
-	memcpy(&addr, &pptr[4], plenbytes);
+	memcpy(&addr, pptr + 4, plenbytes);
 	if (plen % 8) {
 		addr.s6_addr[plenbytes - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
@@ -1211,8 +1214,8 @@ decode_labeled_vpn_prefix6(netdissect_options *ndo,
 	struct in6_addr addr;
 	u_int plen;
 
-	ND_TCHECK(pptr[0]);
-	plen = pptr[0];   /* get prefix length */
+	ND_TCHECK_1(pptr);
+	plen = EXTRACT_U_1(pptr);   /* get prefix length */
 
 	if ((24+64) > plen)
 		return -1;
@@ -1224,7 +1227,7 @@ decode_labeled_vpn_prefix6(netdissect_options *ndo,
 
 	memset(&addr, 0, sizeof(addr));
 	ND_TCHECK2(pptr[12], (plen + 7) / 8);
-	memcpy(&addr, &pptr[12], (plen + 7) / 8);
+	memcpy(&addr, pptr + 12, (plen + 7) / 8);
 	if (plen % 8) {
 		addr.s6_addr[(plen + 7) / 8 - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
@@ -1250,15 +1253,15 @@ decode_clnp_prefix(netdissect_options *ndo,
         uint8_t addr[19];
 	u_int plen;
 
-	ND_TCHECK(pptr[0]);
-	plen = pptr[0]; /* get prefix length */
+	ND_TCHECK_1(pptr);
+	plen = EXTRACT_U_1(pptr); /* get prefix length */
 
 	if (152 < plen)
 		return -1;
 
 	memset(&addr, 0, sizeof(addr));
 	ND_TCHECK2(pptr[4], (plen + 7) / 8);
-	memcpy(&addr, &pptr[4], (plen + 7) / 8);
+	memcpy(&addr, pptr + 4, (plen + 7) / 8);
 	if (plen % 8) {
 		addr[(plen + 7) / 8 - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
@@ -1280,8 +1283,8 @@ decode_labeled_vpn_clnp_prefix(netdissect_options *ndo,
         uint8_t addr[19];
 	u_int plen;
 
-	ND_TCHECK(pptr[0]);
-	plen = pptr[0];   /* get prefix length */
+	ND_TCHECK_1(pptr);
+	plen = EXTRACT_U_1(pptr);   /* get prefix length */
 
 	if ((24+64) > plen)
 		return -1;
@@ -1293,7 +1296,7 @@ decode_labeled_vpn_clnp_prefix(netdissect_options *ndo,
 
 	memset(&addr, 0, sizeof(addr));
 	ND_TCHECK2(pptr[12], (plen + 7) / 8);
-	memcpy(&addr, &pptr[12], (plen + 7) / 8);
+	memcpy(&addr, pptr + 12, (plen + 7) / 8);
 	if (plen % 8) {
 		addr[(plen + 7) / 8 - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
@@ -1339,15 +1342,15 @@ bgp_attr_get_as_size(netdissect_options *ndo,
      * each.
      */
     while (tptr < pptr + len) {
-        ND_TCHECK(tptr[0]);
+        ND_TCHECK_1(tptr);
 
         /*
          * If we do not find a valid segment type, our guess might be wrong.
          */
-        if (tptr[0] < BGP_AS_SEG_TYPE_MIN || tptr[0] > BGP_AS_SEG_TYPE_MAX) {
+        if (EXTRACT_U_1(tptr) < BGP_AS_SEG_TYPE_MIN || EXTRACT_U_1(tptr) > BGP_AS_SEG_TYPE_MAX) {
             goto trunc;
         }
-        ND_TCHECK(tptr[1]);
+        ND_TCHECK_1(tptr + 1);
         tptr += 2 + tptr[1] * 2;
     }
 
@@ -1395,7 +1398,7 @@ bgp_attr_print(netdissect_options *ndo,
 		if (len != 1)
 			ND_PRINT((ndo, "invalid len"));
 		else {
-			ND_TCHECK(*tptr);
+			ND_TCHECK_1(tptr);
 			ND_PRINT((ndo, "%s", tok2str(bgp_origin_values,
 						"Unknown Origin Typecode",
 						EXTRACT_U_1(tptr))));
@@ -1427,10 +1430,10 @@ bgp_attr_print(netdissect_options *ndo,
                 as_size = bgp_attr_get_as_size(ndo, atype, pptr, len);
 
 		while (tptr < pptr + len) {
-			ND_TCHECK(tptr[0]);
+			ND_TCHECK_1(tptr);
                         ND_PRINT((ndo, "%s", tok2str(bgp_as_path_segment_open_values,
 						"?", EXTRACT_U_1(tptr))));
-			ND_TCHECK(tptr[1]);
+			ND_TCHECK_1(tptr + 1);
                         for (i = 0; i < tptr[1] * as_size; i += as_size) {
                             ND_TCHECK2(tptr[2 + i], as_size);
 			    ND_PRINT((ndo, "%s ",
@@ -1439,10 +1442,10 @@ bgp_attr_print(netdissect_options *ndo,
 				EXTRACT_BE_U_2(tptr + i + 2) :
 				EXTRACT_BE_U_4(tptr + i + 2))));
                         }
-			ND_TCHECK(tptr[0]);
+			ND_TCHECK_1(tptr);
                         ND_PRINT((ndo, "%s", tok2str(bgp_as_path_segment_close_values,
 						"?", EXTRACT_U_1(tptr))));
-                        ND_TCHECK(tptr[1]);
+                        ND_TCHECK_1(tptr + 1);
                         tptr += 2 + tptr[1] * as_size;
 		}
 		break;
@@ -1602,8 +1605,8 @@ bgp_attr_print(netdissect_options *ndo,
 
                 tptr +=3;
 
-		ND_TCHECK(tptr[0]);
-		nhlen = tptr[0];
+		ND_TCHECK_1(tptr);
+		nhlen = EXTRACT_U_1(tptr);
                 tlen = nhlen;
                 tptr++;
 
@@ -1735,15 +1738,15 @@ bgp_attr_print(netdissect_options *ndo,
 		ND_PRINT((ndo, ", nh-length: %u", nhlen));
 		tptr += tlen;
 
-		ND_TCHECK(tptr[0]);
-		snpa = tptr[0];
+		ND_TCHECK_1(tptr);
+		snpa = EXTRACT_U_1(tptr);
 		tptr++;
 
 		if (snpa) {
 			ND_PRINT((ndo, "\n\t    %u SNPA", snpa));
 			for (/*nothing*/; snpa > 0; snpa--) {
-				ND_TCHECK(tptr[0]);
-				ND_PRINT((ndo, "\n\t      %d bytes", tptr[0]));
+				ND_TCHECK_1(tptr);
+				ND_PRINT((ndo, "\n\t      %d bytes", EXTRACT_U_1(tptr)));
 				tptr += tptr[0] + 1;
 			}
 		} else {
@@ -1904,7 +1907,7 @@ bgp_attr_print(netdissect_options *ndo,
 	case BGPTYPE_MP_UNREACH_NLRI:
 		ND_TCHECK2(tptr[0], BGP_MP_NLRI_MINSIZE);
 		af = EXTRACT_BE_U_2(tptr);
-		safi = tptr[2];
+		safi = EXTRACT_U_1(tptr + 2);
 
                 ND_PRINT((ndo, "\n\t    AFI: %s (%u), %sSAFI: %s (%u)",
                        tok2str(af_values, "Unknown AFI", af),
@@ -2119,8 +2122,8 @@ bgp_attr_print(netdissect_options *ndo,
                                tok2str(bgp_extd_comm_ospf_rtype_values,
 					  "unknown (0x%02x)",
 					  EXTRACT_U_1((tptr + 6))),
-                               (*(tptr+7) &  BGP_OSPF_RTYPE_METRIC_TYPE) ? "E2" : "",
-                               ((*(tptr+6) == BGP_OSPF_RTYPE_EXT) || (*(tptr+6) == BGP_OSPF_RTYPE_NSSA)) ? "E1" : ""));
+                               (EXTRACT_U_1(tptr + 7) &  BGP_OSPF_RTYPE_METRIC_TYPE) ? "E2" : "",
+                               ((EXTRACT_U_1(tptr + 6) == BGP_OSPF_RTYPE_EXT) || (EXTRACT_U_1(tptr + 6) == BGP_OSPF_RTYPE_NSSA)) ? "E1" : ""));
                         break;
                     case BGP_EXT_COM_L2INFO:
                         ND_PRINT((ndo, ": %s Control Flags [0x%02x]:MTU %u",
@@ -2344,8 +2347,8 @@ bgp_capabilities_print(netdissect_options *ndo,
 
         while (i < caps_len) {
                 ND_TCHECK2(opt[i], BGP_CAP_HEADER_SIZE);
-                cap_type=opt[i];
-                cap_len=opt[i+1];
+                cap_type=EXTRACT_U_1(opt + i);
+                cap_len=EXTRACT_U_1(opt + i + 1);
                 tcap_len=cap_len;
                 ND_PRINT((ndo, "\n\t      %s (%u), length: %u",
                        tok2str(bgp_capcode_values, "Unknown",
@@ -2361,11 +2364,11 @@ bgp_capabilities_print(netdissect_options *ndo,
                            EXTRACT_BE_U_2(opt + i + 2),
                            tok2str(bgp_safi_values, "Unknown",
                                       EXTRACT_U_1(opt + i + 5)),
-                           opt[i+5]));
+                           EXTRACT_U_1(opt + i + 5)));
                     break;
                 case BGP_CAPCODE_RESTART:
                     ND_PRINT((ndo, "\n\t\tRestart Flags: [%s], Restart Time %us",
-                           ((opt[i+2])&0x80) ? "R" : "none",
+                           ((EXTRACT_U_1(opt + i + 2))&0x80) ? "R" : "none",
                            EXTRACT_BE_U_2(opt + i + 2)&0xfff));
                     tcap_len-=2;
                     cap_offset=4;
@@ -2376,8 +2379,8 @@ bgp_capabilities_print(netdissect_options *ndo,
                                EXTRACT_BE_U_2(opt + i + cap_offset),
                                tok2str(bgp_safi_values,"Unknown",
                                           EXTRACT_U_1(opt + i + cap_offset + 2)),
-                               opt[i+cap_offset+2],
-                               ((opt[i+cap_offset+3])&0x80) ? "yes" : "no" ));
+                               EXTRACT_U_1(opt + (i + cap_offset + 2)),
+                               ((EXTRACT_U_1(opt + (i + cap_offset + 3)))&0x80) ? "yes" : "no" ));
                         tcap_len-=4;
                         cap_offset+=4;
                     }
@@ -2411,7 +2414,7 @@ bgp_capabilities_print(netdissect_options *ndo,
                                   tok2str(af_values,"Unknown",EXTRACT_BE_U_2(opt + i + cap_offset)),
                                   EXTRACT_BE_U_2(opt + i + cap_offset),
                                   tok2str(bgp_safi_values,"Unknown",EXTRACT_U_1(opt + i + cap_offset + 2)),
-                                  opt[i+cap_offset+2],
+                                  EXTRACT_U_1(opt + (i + cap_offset + 2)),
                                   tok2str(bgp_add_path_recvsend,"Bogus (0x%02x)",EXTRACT_U_1(opt + i + cap_offset + 3))
                         ));
                         tcap_len-=4;
@@ -2422,11 +2425,12 @@ bgp_capabilities_print(netdissect_options *ndo,
                     ND_PRINT((ndo, "\n\t\tno decoder for Capability %u",
                            cap_type));
                     if (ndo->ndo_vflag <= 1)
-                        print_unknown_data(ndo, &opt[i+2], "\n\t\t", cap_len);
+                        print_unknown_data(ndo, opt + i + 2, "\n\t\t",
+					   cap_len);
                     break;
                 }
                 if (ndo->ndo_vflag > 1 && cap_len > 0) {
-                    print_unknown_data(ndo, &opt[i+2], "\n\t\t", cap_len);
+                    print_unknown_data(ndo, opt + i + 2, "\n\t\t", cap_len);
                 }
                 i += BGP_CAP_HEADER_SIZE + cap_len;
         }
@@ -2466,7 +2470,7 @@ bgp_open_print(netdissect_options *ndo,
 	i = 0;
 	while (i < bgpo.bgpo_optlen) {
 		ND_TCHECK2(opt[i], BGP_OPT_SIZE);
-		memcpy(&bgpopt, &opt[i], BGP_OPT_SIZE);
+		memcpy(&bgpopt, opt + i, BGP_OPT_SIZE);
 		if (i + 2 + bgpopt.bgpopt_len > bgpo.bgpo_optlen) {
 			ND_PRINT((ndo, "\n\t     Option %d, length: %u", bgpopt.bgpopt_type, bgpopt.bgpopt_len));
 			break;
@@ -2482,8 +2486,8 @@ bgp_open_print(netdissect_options *ndo,
 		switch(bgpopt.bgpopt_type) {
 
 		case BGP_OPT_CAP:
-			bgp_capabilities_print(ndo, &opt[i+BGP_OPT_SIZE],
-			    bgpopt.bgpopt_len);
+			bgp_capabilities_print(ndo, opt + i + BGP_OPT_SIZE,
+					       bgpopt.bgpopt_len);
 			break;
 
 		case BGP_OPT_AUTH:
@@ -2856,7 +2860,7 @@ bgp_print(netdissect_options *ndo,
 	while (p < ep) {
 		if (!ND_TTEST_1(p))
 			break;
-		if (p[0] != 0xff) {
+		if (EXTRACT_U_1(p) != 0xff) {
 			p++;
 			continue;
 		}

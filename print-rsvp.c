@@ -499,7 +499,8 @@ rsvp_intserv_print(netdissect_options *ndo,
 
     if (obj_tlen < 4)
         return 0;
-    parameter_id = *(tptr);
+    ND_TCHECK_1(tptr);
+    parameter_id = EXTRACT_U_1(tptr);
     ND_TCHECK_2(tptr + 2);
     parameter_length = EXTRACT_BE_U_2(tptr + 2)<<2; /* convert wordcount to bytecount */
 
@@ -507,7 +508,7 @@ rsvp_intserv_print(netdissect_options *ndo,
            tok2str(rsvp_intserv_parameter_id_values,"unknown",parameter_id),
            parameter_id,
            parameter_length,
-           *(tptr + 1)));
+           EXTRACT_U_1(tptr + 1)));
 
     if (obj_tlen < parameter_length+4)
         return 0;

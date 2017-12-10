@@ -428,13 +428,13 @@ tcp_print(netdissect_options *ndo,
                 while (hlen > 0) {
                         if (ch != '\0')
                                 ND_PRINT((ndo, "%c", ch));
-                        ND_TCHECK(*cp);
+                        ND_TCHECK_1(cp);
                         opt = EXTRACT_U_1(cp);
                         cp++;
                         if (ZEROLENOPT(opt))
                                 len = 1;
                         else {
-                                ND_TCHECK(*cp);
+                                ND_TCHECK_1(cp);
                                 len = EXTRACT_U_1(cp);
                                 cp++;	/* total including type, len */
                                 if (len < 2 || len > hlen)
@@ -461,7 +461,7 @@ tcp_print(netdissect_options *ndo,
                         case TCPOPT_WSCALE:
                                 datalen = 1;
                                 LENCHECK(datalen);
-                                ND_PRINT((ndo, " %u", *cp));
+                                ND_PRINT((ndo, " %u", EXTRACT_U_1(cp)));
                                 break;
 
                         case TCPOPT_SACK:
@@ -531,19 +531,19 @@ tcp_print(netdissect_options *ndo,
                                 case CANT_CHECK_SIGNATURE:
                                         ND_PRINT((ndo, "can't check - "));
                                         for (i = 0; i < TCP_SIGLEN; ++i)
-                                                ND_PRINT((ndo, "%02x", cp[i]));
+                                                ND_PRINT((ndo, "%02x", EXTRACT_U_1(cp + i)));
                                         break;
                                 }
 #else
                                 for (i = 0; i < TCP_SIGLEN; ++i)
-                                        ND_PRINT((ndo, "%02x", cp[i]));
+                                        ND_PRINT((ndo, "%02x", EXTRACT_U_1(cp + i)));
 #endif
                                 break;
 
                         case TCPOPT_SCPS:
                                 datalen = 2;
                                 LENCHECK(datalen);
-                                ND_PRINT((ndo, " cap %02x id %u", cp[0], cp[1]));
+                                ND_PRINT((ndo, " cap %02x id %u", EXTRACT_U_1(cp), EXTRACT_U_1(cp + 1)));
                                 break;
 
                         case TCPOPT_TCPAO:
@@ -557,14 +557,14 @@ tcp_print(netdissect_options *ndo,
                                         ND_PRINT((ndo, " invalid"));
                                 } else {
                                         LENCHECK(1);
-                                        ND_PRINT((ndo, " keyid %u", cp[0]));
+                                        ND_PRINT((ndo, " keyid %u", EXTRACT_U_1(cp)));
                                         LENCHECK(2);
-                                        ND_PRINT((ndo, " rnextkeyid %u", cp[1]));
+                                        ND_PRINT((ndo, " rnextkeyid %u", EXTRACT_U_1(cp + 1)));
                                         if (datalen > 2) {
                                                 ND_PRINT((ndo, " mac 0x"));
                                                 for (i = 2; i < datalen; i++) {
                                                         LENCHECK(i + 1);
-                                                        ND_PRINT((ndo, "%02x", cp[i]));
+                                                        ND_PRINT((ndo, "%02x", EXTRACT_U_1(cp + i)));
                                                 }
                                         }
                                 }
@@ -633,7 +633,7 @@ tcp_print(netdissect_options *ndo,
                                         ND_PRINT((ndo, " 0x"));
                                 for (i = 0; i < datalen; ++i) {
                                         LENCHECK(i + 1);
-                                        ND_PRINT((ndo, "%02x", cp[i]));
+                                        ND_PRINT((ndo, "%02x", EXTRACT_U_1(cp + i)));
                                 }
                                 break;
                         }
@@ -829,7 +829,7 @@ print_tcp_fastopen_option(netdissect_options *ndo, register const u_char *cp,
                 } else {
                         ND_PRINT((ndo, " cookie "));
                         for (i = 0; i < datalen; ++i)
-                                ND_PRINT((ndo, "%02x", cp[i]));
+                                ND_PRINT((ndo, "%02x", EXTRACT_U_1(cp + i)));
                 }
         }
 }

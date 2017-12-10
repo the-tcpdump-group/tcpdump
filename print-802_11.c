@@ -1031,7 +1031,7 @@ parse_elements(netdissect_options *ndo,
 		if (length < elementlen + 2)
 			return 0;
 
-		switch (*(p + offset)) {
+		switch (EXTRACT_U_1(p + offset)) {
 		case E_SSID:
 			memcpy(&ssid, p + offset, 2);
 			offset += 2;
@@ -1589,22 +1589,22 @@ handle_action(netdissect_options *ndo,
 	} else {
 		ND_PRINT((ndo, " (%s): ", etheraddr_string(ndo, src)));
 	}
-	switch (p[0]) {
-	case 0: ND_PRINT((ndo, "Spectrum Management Act#%d", p[1])); break;
-	case 1: ND_PRINT((ndo, "QoS Act#%d", p[1])); break;
-	case 2: ND_PRINT((ndo, "DLS Act#%d", p[1])); break;
-	case 3: ND_PRINT((ndo, "BA ")); PRINT_BA_ACTION(p[1]); break;
-	case 7: ND_PRINT((ndo, "HT ")); PRINT_HT_ACTION(p[1]); break;
-	case 13: ND_PRINT((ndo, "MeshAction ")); PRINT_MESH_ACTION(p[1]); break;
+	switch (EXTRACT_U_1(p)) {
+	case 0: ND_PRINT((ndo, "Spectrum Management Act#%d", EXTRACT_U_1(p + 1))); break;
+	case 1: ND_PRINT((ndo, "QoS Act#%d", EXTRACT_U_1(p + 1))); break;
+	case 2: ND_PRINT((ndo, "DLS Act#%d", EXTRACT_U_1(p + 1))); break;
+	case 3: ND_PRINT((ndo, "BA ")); PRINT_BA_ACTION(EXTRACT_U_1(p + 1)); break;
+	case 7: ND_PRINT((ndo, "HT ")); PRINT_HT_ACTION(EXTRACT_U_1(p + 1)); break;
+	case 13: ND_PRINT((ndo, "MeshAction ")); PRINT_MESH_ACTION(EXTRACT_U_1(p + 1)); break;
 	case 14:
 		ND_PRINT((ndo, "MultiohopAction "));
-		PRINT_MULTIHOP_ACTION(p[1]); break;
+		PRINT_MULTIHOP_ACTION(EXTRACT_U_1(p + 1)); break;
 	case 15:
 		ND_PRINT((ndo, "SelfprotectAction "));
-		PRINT_SELFPROT_ACTION(p[1]); break;
-	case 127: ND_PRINT((ndo, "Vendor Act#%d", p[1])); break;
+		PRINT_SELFPROT_ACTION(EXTRACT_U_1(p + 1)); break;
+	case 127: ND_PRINT((ndo, "Vendor Act#%d", EXTRACT_U_1(p + 1))); break;
 	default:
-		ND_PRINT((ndo, "Reserved(%d) Act#%d", p[0], p[1]));
+		ND_PRINT((ndo, "Reserved(%d) Act#%d", EXTRACT_U_1(p), EXTRACT_U_1(p + 1)));
 		break;
 	}
 	return 1;

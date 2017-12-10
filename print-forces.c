@@ -801,7 +801,7 @@ pkeyitlv_print(netdissect_options *ndo,
 	uint16_t type, tll;
 	u_int invtlv;
 
-	ND_TCHECK(*tdp);
+	ND_TCHECK_1(tdp);
 	id = EXTRACT_BE_U_4(tdp);
 	ND_PRINT((ndo, "%sKeyinfo: Key 0x%x\n", ib, id));
 	ND_TCHECK(*kdtlv);

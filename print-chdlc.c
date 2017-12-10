@@ -95,9 +95,9 @@ chdlc_print(netdissect_options *ndo, register const u_char *p, u_int length)
                 if (length < 2)
                     goto trunc;
                 ND_TCHECK_2(p);
-                if (*(p+1) == NLPID_CLNP ||
-                    *(p+1) == NLPID_ESIS ||
-                    *(p+1) == NLPID_ISIS)
+                if (EXTRACT_U_1(p + 1) == NLPID_CLNP ||
+                    EXTRACT_U_1(p + 1) == NLPID_ESIS ||
+                    EXTRACT_U_1(p + 1) == NLPID_ISIS)
                     isoclns_print(ndo, p + 1, length - 1);
                 else
                     isoclns_print(ndo, p, length);

@@ -28,24 +28,24 @@ LLDP, length 103
 	  0x0000:  0308 0027 0df1 3c
 	Time to Live TLV (3), length 2: TTL 120s
 	  0x0000:  0078
-	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 6: OUI IEEE 802.1 Working Group (0x0080c2)
 	  Port VLAN Id Subtype (1)
 	    port vlan id (PVID): 1
 	  0x0000:  0080 c201 0001
-	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 7: OUI IEEE 802.1 Working Group (0x0080c2)
 	  Port and Protocol VLAN ID Subtype (2)
 	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
 	  0x0000:  0080 c202 0200 00
-	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 14: OUI IEEE 802.1 Working Group (0x0080c2)
 	  VLAN name Subtype (3)
 	    vlan id (VID): 1
 	    vlan name: default
 	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
-	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 13: OUI IEEE 802.1 Working Group (0x0080c2)
 	  Protocol Identity Subtype (4)
 	    protocol identity: 
 	  0x0000:  0080 c204 0800 0042 4203 0000 03
-	Organization specific TLV (127), length 9: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 9: OUI IEEE 802.1 Working Group (0x0080c2)
 	  EVB Subtype (13)
 	    EVB Bridge Status
 	      RES: 0, BGID: 0, RRCAP: 1, RRCTR: 0
@@ -54,7 +54,7 @@ LLDP, length 103
 	    R: 7, RTE: 20, EVB Mode: EVB Bridge [1]
 	    ROL: 0, RWD: 31, RES: 0, ROL: 0, RKA: 31
 	  0x0000:  0080 c20d 0200 f45f 1f
-	Organization specific TLV (127), length 11: OUI Ethernet bridged (0x0080c2)
+	Organization specific TLV (127), length 11: OUI IEEE 802.1 Working Group (0x0080c2)
 	  CDCP Subtype (14)
 	    Role: 0, RES: 0, Scomp: 0 ChnCap: 167
 	    SCID: 1, SVID: 1
