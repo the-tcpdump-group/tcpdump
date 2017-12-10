@@ -252,49 +252,4 @@ struct rrec {
 	char	*r_data;		/* pointer to data */
 };
 
-/*
- * Inline versions of get/put short/long.  Pointer is advanced.
- * We also assume that a "uint16_t" holds 2 "chars"
- * and that a "uint32_t" holds 4 "chars".
- *
- * These macros demonstrate the property of C whereby it can be
- * portable or it can be elegant but never both.
- */
-#define GETSHORT(s, cp) { \
-	register u_char *t_cp = (u_char *)(cp); \
-	(s) = ((uint16_t)t_cp[0] << 8) | (uint16_t)t_cp[1]; \
-	(cp) += 2; \
-}
-
-#define GETLONG(l, cp) { \
-	register u_char *t_cp = (u_char *)(cp); \
-	(l) = (((uint32_t)t_cp[0]) << 24) \
-	    | (((uint32_t)t_cp[1]) << 16) \
-	    | (((uint32_t)t_cp[2]) << 8) \
-	    | (((uint32_t)t_cp[3])); \
-	(cp) += 4; \
-}
-
-#define PUTSHORT(s, cp) { \
-	register uint16_t t_s = (uint16_t)(s); \
-	register u_char *t_cp = (u_char *)(cp); \
-	*t_cp++ = t_s >> 8; \
-	*t_cp   = t_s; \
-	(cp) += 2; \
-}
-
-/*
- * Warning: PUTLONG --no-longer-- destroys its first argument.  if you
- * were depending on this "feature", you will lose.
- */
-#define PUTLONG(l, cp) { \
-	register uint32_t t_l = (uint32_t)(l); \
-	register u_char *t_cp = (u_char *)(cp); \
-	*t_cp++ = t_l >> 24; \
-	*t_cp++ = t_l >> 16; \
-	*t_cp++ = t_l >> 8; \
-	*t_cp   = t_l; \
-	(cp) += 4; \
-}
-
 #endif /* !_NAMESER_H_ */
