@@ -519,7 +519,7 @@ babel_print_v2(netdissect_options *ndo,
                        format_prefix(ndo, prefix, plen),
                        metric, seqno, format_interval_update(interval)));
                 if(EXTRACT_U_1(message + 3) & 0x80) {
-                    if(message[2] == 1)
+                    if(EXTRACT_U_1(message + 2) == 1)
                         memcpy(v4_prefix, prefix, 16);
                     else
                         memcpy(v6_prefix, prefix, 16);

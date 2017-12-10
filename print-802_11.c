@@ -1953,7 +1953,7 @@ extract_header_length(netdissect_options *ndo,
 static int
 extract_mesh_header_length(const u_char *p)
 {
-	return (p[0] &~ 3) ? 0 : 6*(1 + (p[0] & 3));
+	return (EXTRACT_U_1(p) &~ 3) ? 0 : 6*(1 + (EXTRACT_U_1(p) & 3));
 }
 
 /*
