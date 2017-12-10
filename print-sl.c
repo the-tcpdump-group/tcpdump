@@ -167,7 +167,7 @@ sliplink_print(netdissect_options *ndo,
 		 * Get it from the link layer since sl_uncompress_tcp()
 		 * has restored the IP header copy to IPPROTO_TCP.
 		 */
-		lastconn = ((const struct ip *)&p[SLX_CHDR])->ip_p;
+		lastconn = ((const struct ip *)(p + SLX_CHDR))->ip_p;
 		ND_PRINT((ndo, "utcp %d: ", lastconn));
 		if (dir == -1) {
 			/* Direction is bogus, don't use it */

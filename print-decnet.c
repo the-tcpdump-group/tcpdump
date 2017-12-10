@@ -524,7 +524,7 @@ decnet_print(netdissect_options *ndo,
 	}
 	length = pktlen;
 
-	rhp = (const union routehdr *)&(ap[sizeof(short)]);
+	rhp = (const union routehdr *)(ap + sizeof(short));
 	ND_TCHECK(rhp->rh_short.sh_flags);
 	mflags = EXTRACT_U_1(rhp->rh_short.sh_flags);
 
@@ -541,7 +541,7 @@ decnet_print(netdissect_options *ndo,
 	    ap += padlen;
 	    length -= padlen;
 	    caplen -= padlen;
-	    rhp = (const union routehdr *)&(ap[sizeof(short)]);
+	    rhp = (const union routehdr *)(ap + sizeof(short));
 	    ND_TCHECK(rhp->rh_short.sh_flags);
 	    mflags = EXTRACT_U_1(rhp->rh_short.sh_flags);
 	}
@@ -571,7 +571,7 @@ decnet_print(netdissect_options *ndo,
 	    src =
 		EXTRACT_LE_U_2(rhp->rh_long.lg_src.dne_remote.dne_nodeaddr);
 	    hops = EXTRACT_U_1(rhp->rh_long.lg_visits);
-	    nspp = &(ap[sizeof(short) + sizeof(struct longhdr)]);
+	    nspp = ap + sizeof(short) + sizeof(struct longhdr);
 	    nsplen = length - sizeof(struct longhdr);
 	    break;
 	case RMF_SHORT:
@@ -579,7 +579,7 @@ decnet_print(netdissect_options *ndo,
 	    dst = EXTRACT_LE_U_2(rhp->rh_short.sh_dst);
 	    src = EXTRACT_LE_U_2(rhp->rh_short.sh_src);
 	    hops = (EXTRACT_U_1(rhp->rh_short.sh_visits) & VIS_MASK)+1;
-	    nspp = &(ap[sizeof(short) + sizeof(struct shorthdr)]);
+	    nspp = ap + sizeof(short) + sizeof(struct shorthdr);
 	    nsplen = length - sizeof(struct shorthdr);
 	    break;
 	default:
@@ -947,7 +947,7 @@ print_nsp(netdissect_options *ndo,
 		{
 		    const struct seghdr *shp = (const struct seghdr *)nspp;
 		    const struct lsmsg *lsmp =
-			(const struct lsmsg *)&(nspp[sizeof(struct seghdr)]);
+			(const struct lsmsg *)(nspp + sizeof(struct seghdr));
 		    int ack;
 		    int lsflags, fcval;
 

@@ -1983,7 +1983,7 @@ ieee_802_11_hdr_print(netdissect_options *ndo,
 	}
 	if (meshdrlen != 0) {
 		const struct meshcntl_t *mc =
-		    (const struct meshcntl_t *)&p[hdrlen - meshdrlen];
+		    (const struct meshcntl_t *)(p + hdrlen - meshdrlen);
 		int ae = mc->flags & 3;
 
 		ND_PRINT((ndo, "MeshData (AE %d TTL %u seq %u", ae, mc->ttl,
