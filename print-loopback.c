@@ -78,28 +78,28 @@ loopback_message_print(netdissect_options *ndo, const u_char *cp, const u_int le
 			cp += 2;
 			/* data */
 			ND_PRINT((ndo, ", data (%u octets)", len - 4));
-			ND_TCHECK2(*cp, len - 4);
+			ND_TCHECK_LEN(cp, len - 4);
 			break;
 		case LOOPBACK_FWDDATA:
 			if (len < 8)
 				goto invalid;
 			/* forwarding address */
-			ND_TCHECK2(*cp, ETHER_ADDR_LEN);
+			ND_TCHECK_LEN(cp, ETHER_ADDR_LEN);
 			ND_PRINT((ndo, ", forwarding address %s", etheraddr_string(ndo, cp)));
 			cp += ETHER_ADDR_LEN;
 			/* data */
 			ND_PRINT((ndo, ", data (%u octets)", len - 8));
-			ND_TCHECK2(*cp, len - 8);
+			ND_TCHECK_LEN(cp, len - 8);
 			break;
 		default:
-			ND_TCHECK2(*cp, len - 2);
+			ND_TCHECK_LEN(cp, len - 2);
 			break;
 	}
 	return;
 
 invalid:
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, ep - cp);
+	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
@@ -128,7 +128,7 @@ loopback_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 
 invalid:
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, ep - cp);
+	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));

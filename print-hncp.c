@@ -431,7 +431,7 @@ hncp_print_rec(netdissect_options *ndo,
         type = EXTRACT_BE_U_2(tlv);
         bodylen = EXTRACT_BE_U_2(tlv + 2);
         value = tlv + 4;
-        ND_TCHECK2(*value, bodylen);
+        ND_TCHECK_LEN(value, bodylen);
         if (i + bodylen + 4 > length)
             goto invalid;
 

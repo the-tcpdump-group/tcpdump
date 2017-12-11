@@ -89,13 +89,13 @@ zmtp1_print_frame(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 	} else {
 		header_len = 1 + 8; /* 0xFF, length */
 		ND_PRINT((ndo, " frame flags+body (64-bit) length"));
-		ND_TCHECK2(*cp, header_len); /* 0xFF, length */
+		ND_TCHECK_LEN(cp, header_len); /* 0xFF, length */
 		body_len_declared = EXTRACT_BE_U_8(cp + 1);
 		ND_PRINT((ndo, " %" PRIu64, body_len_declared));
 	}
 	if (body_len_declared == 0)
 		return cp + header_len; /* skip to the next frame */
-	ND_TCHECK2(*cp, header_len + 1); /* ..., flags */
+	ND_TCHECK_LEN(cp, header_len + 1); /* ..., flags */
 	flags = EXTRACT_U_1(cp + header_len);
 
 	body_len_captured = ep - cp - header_len;
@@ -127,12 +127,12 @@ zmtp1_print_frame(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 
 	/*
 	 * Do not advance cp by the sum of header_len and body_len_declared
-	 * before each offset has successfully passed ND_TCHECK2() as the
+	 * before each offset has successfully passed ND_TCHECK_LEN() as the
 	 * sum can roll over (9 + 0xfffffffffffffff7 = 0) and cause an
 	 * infinite loop.
 	 */
 	cp += header_len;
-	ND_TCHECK2(*cp, body_len_declared); /* Next frame within the buffer ? */
+	ND_TCHECK_LEN(cp, body_len_declared); /* Next frame within the buffer ? */
 	return cp + body_len_declared;
 
 trunc:

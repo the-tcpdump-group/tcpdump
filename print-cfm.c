@@ -544,7 +544,7 @@ cfm_print(netdissect_options *ndo,
         /* do we have the full tlv header ? */
         if (tlen < sizeof(struct cfm_tlv_header_t))
             goto tooshort;
-        ND_TCHECK2(*tptr, sizeof(struct cfm_tlv_header_t));
+        ND_TCHECK_LEN(tptr, sizeof(struct cfm_tlv_header_t));
         cfm_tlv_len=EXTRACT_BE_U_2(&cfm_tlv_header->length);
 
         ND_PRINT((ndo, ", length %u", cfm_tlv_len));
@@ -556,7 +556,7 @@ cfm_print(netdissect_options *ndo,
         /* do we have the full tlv ? */
         if (tlen < cfm_tlv_len)
             goto tooshort;
-        ND_TCHECK2(*tptr, cfm_tlv_len);
+        ND_TCHECK_LEN(tptr, cfm_tlv_len);
         hexdump = FALSE;
 
         switch(cfm_tlv_type) {

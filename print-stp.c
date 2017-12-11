@@ -315,7 +315,7 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
         len = v3len - MST_BPDU_CONFIG_INFO_LENGTH;
         offset = MST_BPDU_MSTI_OFFSET;
         while (len >= MST_BPDU_MSTI_LENGTH) {
-            ND_TCHECK2(*(ptr + offset), MST_BPDU_MSTI_LENGTH);
+            ND_TCHECK_LEN(ptr + offset, MST_BPDU_MSTI_LENGTH);
 
             msti = EXTRACT_BE_U_2(ptr + offset + MST_BPDU_MSTI_ROOT_PRIO_OFFSET);
             msti = msti & 0x0FFF;

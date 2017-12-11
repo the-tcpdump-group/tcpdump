@@ -104,7 +104,7 @@ udld_print (netdissect_options *ndo, const u_char *pptr, u_int length)
 
     tptr = pptr;
 
-    ND_TCHECK2(*tptr, UDLD_HEADER_LEN);
+    ND_TCHECK_LEN(tptr, UDLD_HEADER_LEN);
 
     code = UDLD_EXTRACT_OPCODE(EXTRACT_U_1(tptr));
 
@@ -147,7 +147,7 @@ udld_print (netdissect_options *ndo, const u_char *pptr, u_int length)
         len -= 4;
         tptr += 4;
 
-        ND_TCHECK2(*tptr, len);
+        ND_TCHECK_LEN(tptr, len);
 
         switch (type) {
         case UDLD_DEVICE_ID_TLV:

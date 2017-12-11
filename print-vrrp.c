@@ -137,7 +137,7 @@ vrrp_print(netdissect_options *ndo,
 		int i;
 		char c;
 
-		if (version == 2 && ND_TTEST2(bp[0], len)) {
+		if (version == 2 && ND_TTEST_LEN(bp, len)) {
 			struct cksum_vec vec[1];
 
 			vec[0].ptr = bp;
@@ -147,7 +147,7 @@ vrrp_print(netdissect_options *ndo,
 					EXTRACT_BE_U_2(bp + 6)));
 		}
 
-		if (version == 3 && ND_TTEST2(bp[0], len)) {
+		if (version == 3 && ND_TTEST_LEN(bp, len)) {
 			uint16_t cksum = nextproto4_cksum(ndo, (const struct ip *)bp2, bp,
 				len, len, IPPROTO_VRRP);
 			if (cksum)

@@ -251,7 +251,7 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	const lisp_map_register_loc *lisp_loc;
 
 	/* Check if enough bytes for header are available */
-	ND_TCHECK2(*bp, MAP_REGISTER_HDR_LEN);
+	ND_TCHECK_LEN(bp, MAP_REGISTER_HDR_LEN);
 	lisp_hdr = (const lisp_map_register_hdr *) bp;
 	lisp_hdr_flag(ndo, lisp_hdr);
 	/* Supporting only MAP NOTIFY and MAP REGISTER LISP packets */
@@ -287,7 +287,8 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	/* Print all the EID records */
 	while ((length > packet_offset) && (record_count--)) {
 
-		ND_TCHECK2(*(packet_iterator + packet_offset), MAP_REGISTER_EID_LEN);
+		ND_TCHECK_LEN(packet_iterator + packet_offset,
+			      MAP_REGISTER_EID_LEN);
 		ND_PRINT((ndo, "\n"));
 		lisp_eid = (const lisp_map_register_eid *)
 				((const u_char *)lisp_hdr + packet_offset);
@@ -328,7 +329,8 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		ND_PRINT((ndo, " %u locator(s)", loc_count));
 
 		while (loc_count--) {
-			ND_TCHECK2(*(packet_iterator + packet_offset), MAP_REGISTER_LOC_LEN);
+			ND_TCHECK_LEN(packet_iterator + packet_offset,
+				      MAP_REGISTER_LOC_LEN);
 			lisp_loc = (const lisp_map_register_loc *) (packet_iterator + packet_offset);
 			loc_ip_pointer = (const u_char *) (lisp_loc + 1);
 			packet_offset += MAP_REGISTER_LOC_LEN;
@@ -370,7 +372,7 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	 * show it as hex data.
 	 */
 	if (xtr_present) {
-		if (!ND_TTEST2(*(packet_iterator + packet_offset), 24))
+		if (!ND_TTEST_LEN(packet_iterator + packet_offset, 24))
 			goto invalid;
 		hex_print_with_offset(ndo, "\n    xTR-ID: ", packet_iterator + packet_offset, 16, 0);
 		ND_PRINT((ndo, "\n    SITE-ID: %" PRIu64,

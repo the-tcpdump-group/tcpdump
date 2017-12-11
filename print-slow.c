@@ -366,7 +366,7 @@ slow_marker_lacp_print(netdissect_options *ndo,
         if (tlen < sizeof(struct tlv_header_t))
             goto tooshort;
         /* did we capture enough for fully decoding the tlv header ? */
-        ND_TCHECK2(*tptr, sizeof(struct tlv_header_t));
+        ND_TCHECK_LEN(tptr, sizeof(struct tlv_header_t));
         tlv_header = (const struct tlv_header_t *)tptr;
         tlv_len = tlv_header->length;
 
@@ -396,7 +396,7 @@ slow_marker_lacp_print(netdissect_options *ndo,
         if (tlen < tlv_len)
             goto tooshort;
         /* did we capture enough for fully decoding the tlv ? */
-        ND_TCHECK2(*tptr, tlv_len);
+        ND_TCHECK_LEN(tptr, tlv_len);
 
         tlv_tptr=tptr+sizeof(struct tlv_header_t);
         tlv_tlen=tlv_len-sizeof(struct tlv_header_t);
@@ -564,7 +564,7 @@ slow_oam_print(netdissect_options *ndo,
 
             if (tlen < length)
                 goto tooshort;
-            ND_TCHECK2(*tptr, length);
+            ND_TCHECK_LEN(tptr, length);
 
             hexdump = FALSE;
             switch (type) {
@@ -663,7 +663,7 @@ slow_oam_print(netdissect_options *ndo,
 
             if (tlen < length)
                 goto tooshort;
-            ND_TCHECK2(*tptr, length);
+            ND_TCHECK_LEN(tptr, length);
 
             hexdump = FALSE;
             switch (type) {

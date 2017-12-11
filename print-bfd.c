@@ -245,7 +245,7 @@ auth_print(netdissect_options *ndo, register const u_char *pptr)
                 ND_TCHECK_4(pptr);
                 ND_PRINT((ndo, ", Sequence Number: 0x%08x", EXTRACT_BE_U_4(pptr)));
                 pptr += 4;
-                ND_TCHECK2(*pptr, AUTH_MD5_HASH_LEN);
+                ND_TCHECK_LEN(pptr, AUTH_MD5_HASH_LEN);
                 ND_PRINT((ndo, "\n\t  Digest: "));
                 for(i = 0; i < AUTH_MD5_HASH_LEN; i++)
                     ND_PRINT((ndo, "%02x", EXTRACT_U_1(pptr + i)));
@@ -276,7 +276,7 @@ auth_print(netdissect_options *ndo, register const u_char *pptr)
                 ND_TCHECK_4(pptr);
                 ND_PRINT((ndo, ", Sequence Number: 0x%08x", EXTRACT_BE_U_4(pptr)));
                 pptr += 4;
-                ND_TCHECK2(*pptr, AUTH_SHA1_HASH_LEN);
+                ND_TCHECK_LEN(pptr, AUTH_SHA1_HASH_LEN);
                 ND_PRINT((ndo, "\n\t  Hash: "));
                 for(i = 0; i < AUTH_SHA1_HASH_LEN; i++)
                     ND_PRINT((ndo, "%02x", EXTRACT_U_1(pptr + i)));

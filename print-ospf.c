@@ -213,7 +213,7 @@ ospf_print_grace_lsa(netdissect_options *ndo,
             return -1;
         }
 
-        ND_TCHECK2(*tptr, tlv_length);
+        ND_TCHECK_LEN(tptr, tlv_length);
         switch(tlv_type) {
 
         case LS_OPAQUE_GRACE_TLV_PERIOD:
@@ -323,7 +323,7 @@ ospf_print_te_lsa(netdissect_options *ndo,
                        subtlv_type,
                        subtlv_length));
 
-                ND_TCHECK2(*tptr, subtlv_length);
+                ND_TCHECK_LEN(tptr, subtlv_length);
                 switch(subtlv_type) {
                 case LS_OPAQUE_TE_LINK_SUBTLV_ADMIN_GROUP:
 		    if (subtlv_length != 4) {
@@ -823,7 +823,7 @@ ospf_print_lsa(netdissect_options *ndo,
                             ls_length));
                         return(ls_end);
                     }
-                    ND_TCHECK2(*tptr, tlv_length);
+                    ND_TCHECK_LEN(tptr, tlv_length);
                     switch(tlv_type) {
 
                     case LS_OPAQUE_RI_TLV_CAP:
@@ -1150,7 +1150,7 @@ ospf_print(netdissect_options *ndo,
 
 	if (ndo->ndo_vflag) {
 		/* Print authentication data (should we really do this?) */
-		ND_TCHECK2(op->ospf_authdata[0], sizeof(op->ospf_authdata));
+		ND_TCHECK_LEN(op->ospf_authdata, sizeof(op->ospf_authdata));
 
 		ND_PRINT((ndo, ", Authentication Type: %s (%u)",
 		          tok2str(ospf_authtype_values, "unknown", EXTRACT_BE_U_2(&op->ospf_authtype)),

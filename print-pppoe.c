@@ -103,7 +103,7 @@ pppoe_print(netdissect_options *ndo, register const u_char *bp, u_int length)
 	}
 	length -= PPPOE_HDRLEN;
 	pppoe_packet = bp;
-	ND_TCHECK2(*pppoe_packet, PPPOE_HDRLEN);
+	ND_TCHECK_LEN(pppoe_packet, PPPOE_HDRLEN);
 	pppoe_ver  = (EXTRACT_U_1(pppoe_packet) & 0xF0) >> 4;
 	pppoe_type  = (EXTRACT_U_1(pppoe_packet) & 0x0F);
 	pppoe_code = EXTRACT_U_1(pppoe_packet + 1);
@@ -154,7 +154,7 @@ pppoe_print(netdissect_options *ndo, register const u_char *bp, u_int length)
 				unsigned tag_str_len = 0;
 
 				/* TODO print UTF-8 decoded text */
-				ND_TCHECK2(*p, tag_len);
+				ND_TCHECK_LEN(p, tag_len);
 				for (v = p; v < p + tag_len && tag_str_len < MAXTAGPRINT-1; v++)
 					if (ND_ISPRINT(EXTRACT_U_1(v))) {
 						tag_str[tag_str_len++] = EXTRACT_U_1(v);

@@ -295,7 +295,7 @@ bootp_print(netdissect_options *ndo,
 
 	ND_TCHECK(bp->bp_hlen);
 	if (bp->bp_htype == 1 && bp->bp_hlen == 6 && bp->bp_op == BOOTPREQUEST) {
-		ND_TCHECK2(bp->bp_chaddr[0], 6);
+		ND_TCHECK_LEN(bp->bp_chaddr, 6);
 		ND_PRINT((ndo, " from %s", etheraddr_string(ndo, bp->bp_chaddr)));
 	}
 
@@ -350,7 +350,7 @@ bootp_print(netdissect_options *ndo,
 
 	/* Client's Ethernet address */
 	if (bp->bp_htype == 1 && bp->bp_hlen == 6) {
-		ND_TCHECK2(bp->bp_chaddr[0], 6);
+		ND_TCHECK_LEN(bp->bp_chaddr, 6);
 		ND_PRINT((ndo, "\n\t  Client-Ethernet-Address %s", etheraddr_string(ndo, bp->bp_chaddr)));
 	}
 
@@ -653,7 +653,7 @@ rfc1048_print(netdissect_options *ndo,
 				ND_PRINT((ndo, ", occurs %u", ntag));
 		}
 
-		if (!ND_TTEST2(*bp, len)) {
+		if (!ND_TTEST_LEN(bp, len)) {
 			ND_PRINT((ndo, "[|rfc1048 %u]", len));
 			return;
 		}

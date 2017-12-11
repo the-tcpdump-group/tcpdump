@@ -130,15 +130,15 @@ igrp_print(netdissect_options *ndo, register const u_char *bp, u_int length)
 	length -= sizeof(*hdr);
 	while (length >= IGRP_RTE_SIZE) {
 		if (nint > 0) {
-			ND_TCHECK2(*cp, IGRP_RTE_SIZE);
+			ND_TCHECK_LEN(cp, IGRP_RTE_SIZE);
 			igrp_entry_print(ndo, (const struct igrprte *)cp, 1, 0);
 			--nint;
 		} else if (nsys > 0) {
-			ND_TCHECK2(*cp, IGRP_RTE_SIZE);
+			ND_TCHECK_LEN(cp, IGRP_RTE_SIZE);
 			igrp_entry_print(ndo, (const struct igrprte *)cp, 0, 0);
 			--nsys;
 		} else if (next > 0) {
-			ND_TCHECK2(*cp, IGRP_RTE_SIZE);
+			ND_TCHECK_LEN(cp, IGRP_RTE_SIZE);
 			igrp_entry_print(ndo, (const struct igrprte *)cp, 0, 1);
 			--next;
 		} else {

@@ -433,7 +433,7 @@ parsereq(netdissect_options *ndo,
 		len = EXTRACT_BE_U_4(dp + 1);
 		if (len < length) {
 			dp += (len + (2 * sizeof(*dp) + 3)) / sizeof(*dp);
-			ND_TCHECK2(dp[0], 0);
+			ND_TCHECK_LEN(dp, 0);
 			return (dp);
 		}
 	}
@@ -458,7 +458,7 @@ parsefh(netdissect_options *ndo,
 	} else
 		len = NFSX_V2FH / 4;
 
-	if (ND_TTEST2(*dp, len * sizeof(*dp))) {
+	if (ND_TTEST_LEN(dp, len * sizeof(*dp))) {
 		nfs_printfh(ndo, dp, len);
 		return (dp + len);
 	}
@@ -484,7 +484,7 @@ parsefn(netdissect_options *ndo,
 	len = *dp++;
 	NTOHL(len);
 
-	ND_TCHECK2(*dp, ((len + 3) & ~3));
+	ND_TCHECK_LEN(dp, ((len + 3) & ~3));
 
 	cp = (const u_char *)dp;
 	/* Update 32-bit pointer (NFS filenames padded to 32-bit boundaries) */
@@ -1016,7 +1016,7 @@ parserep(netdissect_options *ndo,
 		return (NULL);
 	}
 	/* successful return */
-	ND_TCHECK2(*dp, sizeof(astat));
+	ND_TCHECK_LEN(dp, sizeof(astat));
 	return ((const uint32_t *) (sizeof(astat) + ((const char *)dp)));
 trunc:
 	return (0);
@@ -1186,7 +1186,7 @@ parsestatfs(netdissect_options *ndo,
 			return (0);
 	}
 
-	ND_TCHECK2(*dp, (v3 ? NFSX_V3STATFS : NFSX_V2STATFS));
+	ND_TCHECK_LEN(dp, (v3 ? NFSX_V3STATFS : NFSX_V2STATFS));
 
 	sfsp = (const struct nfs_statfs *)dp;
 
@@ -1264,7 +1264,7 @@ parse_pre_op_attr(netdissect_options *ndo,
 	if (!EXTRACT_BE_U_4(dp))
 		return (dp + 1);
 	dp++;
-	ND_TCHECK2(*dp, 24);
+	ND_TCHECK_LEN(dp, 24);
 	if (verbose > 1) {
 		return parse_wcc_attr(ndo, dp);
 	} else {

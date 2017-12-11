@@ -742,7 +742,7 @@ of10_data_print(netdissect_options *ndo,
 		return cp;
 	/* data */
 	ND_PRINT((ndo, "\n\t data (%u octets)", len));
-	ND_TCHECK2(*cp, len);
+	ND_TCHECK_LEN(cp, len);
 	if (ndo->ndo_vflag >= 2)
 		hex_and_ascii_print(ndo, "\n\t  ", cp, len);
 	return cp + len;
@@ -943,14 +943,14 @@ of10_bsn_message_print(netdissect_options *ndo,
 		cp += 4;
 		break;
 	default:
-		ND_TCHECK2(*cp, len - 4);
+		ND_TCHECK_LEN(cp, len - 4);
 		cp += len - 4;
 	}
 	return cp;
 
 invalid: /* skip the undersized data */
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp0, len);
+	ND_TCHECK_LEN(cp0, len);
 	return cp0 + len;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
@@ -1016,7 +1016,7 @@ of10_bsn_actions_print(netdissect_options *ndo,
 		cp += 3;
 		break;
 	default:
-		ND_TCHECK2(*cp, len - 4);
+		ND_TCHECK_LEN(cp, len - 4);
 		cp += len - 4;
 	}
 
@@ -1024,7 +1024,7 @@ of10_bsn_actions_print(netdissect_options *ndo,
 
 invalid:
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp0, len);
+	ND_TCHECK_LEN(cp0, len);
 	return cp0 + len;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
@@ -1053,7 +1053,7 @@ of10_vendor_action_print(netdissect_options *ndo,
 
 invalid: /* skip the undersized data */
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, len);
+	ND_TCHECK_LEN(cp, len);
 	return cp + len;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
@@ -1082,7 +1082,7 @@ of10_vendor_message_print(netdissect_options *ndo,
 
 invalid: /* skip the undersized data */
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, len);
+	ND_TCHECK_LEN(cp, len);
 	return cp + len;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
@@ -1108,7 +1108,7 @@ of10_vendor_data_print(netdissect_options *ndo,
 
 invalid: /* skip the undersized data */
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, len);
+	ND_TCHECK_LEN(cp, len);
 	return cp + len;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
@@ -1125,7 +1125,7 @@ of10_packet_data_print(netdissect_options *ndo,
 	ND_PRINT((ndo, "\n\t data (%u octets)", len));
 	if (ndo->ndo_vflag < 3)
 		return cp + len;
-	ND_TCHECK2(*cp, len);
+	ND_TCHECK_LEN(cp, len);
 	ndo->ndo_vflag -= 3;
 	ND_PRINT((ndo, ", frame decoding below\n"));
 	ether_print(ndo, cp, len, ndo->ndo_snapend - cp, NULL, NULL);
@@ -1153,18 +1153,18 @@ of10_phy_ports_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "\n\t  port_no %s", tok2str(ofpp_str, "%u", EXTRACT_BE_U_2(cp))));
 		cp += 2;
 		/* hw_addr */
-		ND_TCHECK2(*cp, ETHER_ADDR_LEN);
+		ND_TCHECK_LEN(cp, ETHER_ADDR_LEN);
 		ND_PRINT((ndo, ", hw_addr %s", etheraddr_string(ndo, cp)));
 		cp += ETHER_ADDR_LEN;
 		/* name */
-		ND_TCHECK2(*cp, OFP_MAX_PORT_NAME_LEN);
+		ND_TCHECK_LEN(cp, OFP_MAX_PORT_NAME_LEN);
 		ND_PRINT((ndo, ", name '"));
 		fn_print(ndo, cp, cp + OFP_MAX_PORT_NAME_LEN);
 		ND_PRINT((ndo, "'"));
 		cp += OFP_MAX_PORT_NAME_LEN;
 
 		if (ndo->ndo_vflag < 2) {
-			ND_TCHECK2(*cp, 24);
+			ND_TCHECK_LEN(cp, 24);
 			cp += 24;
 			goto next_port;
 		}
@@ -1211,7 +1211,7 @@ next_port:
 
 invalid: /* skip the undersized trailing data */
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp0, len0);
+	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
@@ -1263,7 +1263,7 @@ of10_queue_props_print(netdissect_options *ndo,
 			skip = 1;
 		}
 		if (skip) {
-			ND_TCHECK2(*cp, plen - 4);
+			ND_TCHECK_LEN(cp, plen - 4);
 			cp += plen - 4;
 			goto next_property;
 		}
@@ -1287,7 +1287,7 @@ next_property:
 
 invalid: /* skip the rest of queue properties */
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp0, len0);
+	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
@@ -1322,7 +1322,7 @@ of10_queues_print(netdissect_options *ndo,
 		cp += 2;
 		/* properties */
 		if (ndo->ndo_vflag < 2) {
-			ND_TCHECK2(*cp, desclen - OF_PACKET_QUEUE_LEN);
+			ND_TCHECK_LEN(cp, desclen - OF_PACKET_QUEUE_LEN);
 			cp += desclen - OF_PACKET_QUEUE_LEN;
 			goto next_queue;
 		}
@@ -1335,7 +1335,7 @@ next_queue:
 
 invalid: /* skip the rest of queues */
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp0, len0);
+	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
@@ -1365,12 +1365,12 @@ of10_match_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "%smatch in_port %s", pfx, tok2str(ofpp_str, "%u", EXTRACT_BE_U_2(cp))));
 	cp += 2;
 	/* dl_src */
-	ND_TCHECK2(*cp, ETHER_ADDR_LEN);
+	ND_TCHECK_LEN(cp, ETHER_ADDR_LEN);
 	if (! (wildcards & OFPFW_DL_SRC))
 		ND_PRINT((ndo, "%smatch dl_src %s", pfx, etheraddr_string(ndo, cp)));
 	cp += ETHER_ADDR_LEN;
 	/* dl_dst */
-	ND_TCHECK2(*cp, ETHER_ADDR_LEN);
+	ND_TCHECK_LEN(cp, ETHER_ADDR_LEN);
 	if (! (wildcards & OFPFW_DL_DST))
 		ND_PRINT((ndo, "%smatch dl_dst %s", pfx, etheraddr_string(ndo, cp)));
 	cp += ETHER_ADDR_LEN;
@@ -1504,7 +1504,7 @@ of10_actions_print(netdissect_options *ndo,
 			skip = 1;
 		}
 		if (skip) {
-			ND_TCHECK2(*cp, alen - 4);
+			ND_TCHECK_LEN(cp, alen - 4);
 			cp += alen - 4;
 			goto next_action;
 		}
@@ -1543,7 +1543,7 @@ of10_actions_print(netdissect_options *ndo,
 		case OFPAT_SET_DL_SRC:
 		case OFPAT_SET_DL_DST:
 			/* dl_addr */
-			ND_TCHECK2(*cp, ETHER_ADDR_LEN);
+			ND_TCHECK_LEN(cp, ETHER_ADDR_LEN);
 			ND_PRINT((ndo, ", dl_addr %s", etheraddr_string(ndo, cp)));
 			cp += ETHER_ADDR_LEN;
 			/* pad */
@@ -1606,7 +1606,7 @@ next_action:
 
 invalid: /* skip the rest of actions */
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp0, len0);
+	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
@@ -1720,7 +1720,7 @@ of10_port_mod_print(netdissect_options *ndo,
 	ND_PRINT((ndo, "\n\t port_no %s", tok2str(ofpp_str, "%u", EXTRACT_BE_U_2(cp))));
 	cp += 2;
 	/* hw_addr */
-	ND_TCHECK2(*cp, ETHER_ADDR_LEN);
+	ND_TCHECK_LEN(cp, ETHER_ADDR_LEN);
 	ND_PRINT((ndo, ", hw_addr %s", etheraddr_string(ndo, cp)));
 	cp += ETHER_ADDR_LEN;
 	/* config */
@@ -1824,7 +1824,7 @@ of10_stats_request_print(netdissect_options *ndo,
 
 invalid: /* skip the message body */
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp0, len0);
+	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
@@ -1839,31 +1839,31 @@ of10_desc_stats_reply_print(netdissect_options *ndo,
 	if (len != OF_DESC_STATS_LEN)
 		goto invalid;
 	/* mfr_desc */
-	ND_TCHECK2(*cp, DESC_STR_LEN);
+	ND_TCHECK_LEN(cp, DESC_STR_LEN);
 	ND_PRINT((ndo, "\n\t  mfr_desc '"));
 	fn_print(ndo, cp, cp + DESC_STR_LEN);
 	ND_PRINT((ndo, "'"));
 	cp += DESC_STR_LEN;
 	/* hw_desc */
-	ND_TCHECK2(*cp, DESC_STR_LEN);
+	ND_TCHECK_LEN(cp, DESC_STR_LEN);
 	ND_PRINT((ndo, "\n\t  hw_desc '"));
 	fn_print(ndo, cp, cp + DESC_STR_LEN);
 	ND_PRINT((ndo, "'"));
 	cp += DESC_STR_LEN;
 	/* sw_desc */
-	ND_TCHECK2(*cp, DESC_STR_LEN);
+	ND_TCHECK_LEN(cp, DESC_STR_LEN);
 	ND_PRINT((ndo, "\n\t  sw_desc '"));
 	fn_print(ndo, cp, cp + DESC_STR_LEN);
 	ND_PRINT((ndo, "'"));
 	cp += DESC_STR_LEN;
 	/* serial_num */
-	ND_TCHECK2(*cp, SERIAL_NUM_LEN);
+	ND_TCHECK_LEN(cp, SERIAL_NUM_LEN);
 	ND_PRINT((ndo, "\n\t  serial_num '"));
 	fn_print(ndo, cp, cp + SERIAL_NUM_LEN);
 	ND_PRINT((ndo, "'"));
 	cp += SERIAL_NUM_LEN;
 	/* dp_desc */
-	ND_TCHECK2(*cp, DESC_STR_LEN);
+	ND_TCHECK_LEN(cp, DESC_STR_LEN);
 	ND_PRINT((ndo, "\n\t  dp_desc '"));
 	fn_print(ndo, cp, cp + DESC_STR_LEN);
 	ND_PRINT((ndo, "'"));
@@ -1871,7 +1871,7 @@ of10_desc_stats_reply_print(netdissect_options *ndo,
 
 invalid: /* skip the message body */
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, len);
+	ND_TCHECK_LEN(cp, len);
 	return cp + len;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
@@ -1952,7 +1952,7 @@ of10_flow_stats_reply_print(netdissect_options *ndo,
 
 invalid: /* skip the rest of flow statistics entries */
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp0, len0);
+	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
@@ -1985,7 +1985,7 @@ of10_aggregate_stats_reply_print(netdissect_options *ndo,
 
 invalid: /* skip the message body */
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, len);
+	ND_TCHECK_LEN(cp, len);
 	return cp + len;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
@@ -2011,7 +2011,7 @@ of10_table_stats_reply_print(netdissect_options *ndo,
 		ND_TCHECK_3(cp);
 		cp += 3;
 		/* name */
-		ND_TCHECK2(*cp, OFP_MAX_TABLE_NAME_LEN);
+		ND_TCHECK_LEN(cp, OFP_MAX_TABLE_NAME_LEN);
 		ND_PRINT((ndo, ", name '"));
 		fn_print(ndo, cp, cp + OFP_MAX_TABLE_NAME_LEN);
 		ND_PRINT((ndo, "'"));
@@ -2045,7 +2045,7 @@ of10_table_stats_reply_print(netdissect_options *ndo,
 
 invalid: /* skip the undersized trailing data */
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp0, len0);
+	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
@@ -2068,7 +2068,7 @@ of10_port_stats_reply_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "\n\t  port_no %s", tok2str(ofpp_str, "%u", EXTRACT_BE_U_2(cp))));
 		cp += 2;
 		if (ndo->ndo_vflag < 2) {
-			ND_TCHECK2(*cp, OF_PORT_STATS_LEN - 2);
+			ND_TCHECK_LEN(cp, OF_PORT_STATS_LEN - 2);
 			cp += OF_PORT_STATS_LEN - 2;
 			goto next_port;
 		}
@@ -2130,7 +2130,7 @@ next_port:
 
 invalid: /* skip the undersized trailing data */
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp0, len0);
+	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
@@ -2178,7 +2178,7 @@ of10_queue_stats_reply_print(netdissect_options *ndo,
 
 invalid: /* skip the undersized trailing data */
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp0, len0);
+	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
@@ -2218,7 +2218,7 @@ of10_stats_reply_print(netdissect_options *ndo,
 		if (decoder != NULL)
 			return decoder(ndo, cp, ep, len - OF_STATS_REPLY_LEN);
 	}
-	ND_TCHECK2(*cp0, len);
+	ND_TCHECK_LEN(cp0, len);
 	return cp0 + len;
 
 trunc:
@@ -2257,7 +2257,7 @@ of10_packet_out_print(netdissect_options *ndo,
 
 invalid: /* skip the rest of the message body */
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp0, len0);
+	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
@@ -2561,7 +2561,7 @@ of10_header_body_print(netdissect_options *ndo,
 invalid: /* skip the message body */
 	ND_PRINT((ndo, "%s", istr));
 next_message:
-	ND_TCHECK2(*cp0, len0 - OF_HEADER_LEN);
+	ND_TCHECK_LEN(cp0, len0 - OF_HEADER_LEN);
 	return cp0 + len0 - OF_HEADER_LEN;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));

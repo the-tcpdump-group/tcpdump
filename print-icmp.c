@@ -559,7 +559,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 	}
 	ND_PRINT((ndo, "ICMP %s, length %u", str, plen));
 	if (ndo->ndo_vflag && !fragmented) { /* don't attempt checksumming if this is a frag */
-		if (ND_TTEST2(*bp, plen)) {
+		if (ND_TTEST_LEN(bp, plen)) {
 			uint16_t sum;
 
 			vec[0].ptr = (const uint8_t *)(const void *)dp;

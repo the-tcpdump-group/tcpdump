@@ -222,7 +222,7 @@ lwapp_control_print(netdissect_options *ndo,
     while(tlen>0) {
 
         /* did we capture enough for fully decoding the object header ? */
-        ND_TCHECK2(*tptr, sizeof(struct lwapp_control_header));
+        ND_TCHECK_LEN(tptr, sizeof(struct lwapp_control_header));
 
         lwapp_control_header = (const struct lwapp_control_header *)tptr;
 	msg_tlen = EXTRACT_BE_U_2(lwapp_control_header->len);
@@ -236,7 +236,7 @@ lwapp_control_print(netdissect_options *ndo,
                EXTRACT_BE_U_4(lwapp_control_header->session_id)));
 
         /* did we capture enough for fully decoding the message */
-        ND_TCHECK2(*tptr, msg_tlen);
+        ND_TCHECK_LEN(tptr, msg_tlen);
 
 	/* XXX - Decode sub messages for each message */
         switch(lwapp_control_header->msg_type) {

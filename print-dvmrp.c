@@ -345,7 +345,7 @@ static int
 print_prune(netdissect_options *ndo,
             register const u_char *bp)
 {
-	ND_TCHECK2(bp[0], 12);
+	ND_TCHECK_LEN(bp, 12);
 	ND_PRINT((ndo, " src %s grp %s", ipaddr_string(ndo, bp), ipaddr_string(ndo, bp + 4)));
 	bp += 8;
 	ND_PRINT((ndo, " timer "));

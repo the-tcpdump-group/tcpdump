@@ -483,7 +483,7 @@ lmp_print(netdissect_options *ndo,
 
     while(tlen>0) {
         /* did we capture enough for fully decoding the object header ? */
-        ND_TCHECK2(*tptr, sizeof(struct lmp_object_header));
+        ND_TCHECK_LEN(tptr, sizeof(struct lmp_object_header));
 
         lmp_obj_header = (const struct lmp_object_header *)tptr;
         lmp_obj_len=EXTRACT_BE_U_2(lmp_obj_header->length);
@@ -514,7 +514,7 @@ lmp_print(netdissect_options *ndo,
         obj_tlen=lmp_obj_len-sizeof(struct lmp_object_header);
 
         /* did we capture enough for fully decoding the object ? */
-        ND_TCHECK2(*tptr, lmp_obj_len);
+        ND_TCHECK_LEN(tptr, lmp_obj_len);
         hexdump=FALSE;
 
         switch(lmp_obj_header->class_num) {

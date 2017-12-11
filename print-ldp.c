@@ -230,7 +230,7 @@ static int ldp_pdu_print(netdissect_options *, register const u_char *);
  */
 
 #define TLV_TCHECK(minlen) \
-    ND_TCHECK2(*tptr, minlen); if (tlv_tlen < minlen) goto badtlv;
+    ND_TCHECK_LEN(tptr, minlen); if (tlv_tlen < minlen) goto badtlv;
 
 static int
 ldp_tlv_print(netdissect_options *ndo,
@@ -304,7 +304,7 @@ ldp_tlv_print(netdissect_options *ndo,
         switch (af) {
         case AFNUM_INET:
 	    while(tlv_tlen >= sizeof(struct in_addr)) {
-		ND_TCHECK2(*tptr, sizeof(struct in_addr));
+		ND_TCHECK_LEN(tptr, sizeof(struct in_addr));
 		ND_PRINT((ndo, " %s", ipaddr_string(ndo, tptr)));
 		tlv_tlen-=sizeof(struct in_addr);
 		tptr+=sizeof(struct in_addr);
@@ -312,7 +312,7 @@ ldp_tlv_print(netdissect_options *ndo,
             break;
         case AFNUM_INET6:
 	    while(tlv_tlen >= sizeof(struct in6_addr)) {
-		ND_TCHECK2(*tptr, sizeof(struct in6_addr));
+		ND_TCHECK_LEN(tptr, sizeof(struct in6_addr));
 		ND_PRINT((ndo, " %s", ip6addr_string(ndo, tptr)));
 		tlv_tlen-=sizeof(struct in6_addr);
 		tptr+=sizeof(struct in6_addr);
@@ -607,7 +607,7 @@ ldp_pdu_print(netdissect_options *ndo,
 
     while(tlen>0) {
         /* did we capture enough for fully decoding the msg header ? */
-        ND_TCHECK2(*tptr, sizeof(struct ldp_msg_header));
+        ND_TCHECK_LEN(tptr, sizeof(struct ldp_msg_header));
 
         ldp_msg_header = (const struct ldp_msg_header *)tptr;
         msg_len=EXTRACT_BE_U_2(ldp_msg_header->length);
@@ -640,7 +640,7 @@ ldp_pdu_print(netdissect_options *ndo,
         msg_tlen=msg_len-(sizeof(struct ldp_msg_header)-4); /* Type & Length fields not included */
 
         /* did we capture enough for fully decoding the message ? */
-        ND_TCHECK2(*tptr, msg_len);
+        ND_TCHECK_LEN(tptr, msg_len);
         hexdump=FALSE;
 
         switch(msg_type) {

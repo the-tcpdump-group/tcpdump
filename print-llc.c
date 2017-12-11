@@ -515,7 +515,7 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 			/*
 			 * Skip the padding.
 			 */
-			ND_TCHECK2(*p, bridge_pad);
+			ND_TCHECK_LEN(p, bridge_pad);
 			caplen -= bridge_pad;
 			length -= bridge_pad;
 			p += bridge_pad;
@@ -536,7 +536,7 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 			 * Skip the padding, but not the Access
 			 * Control field.
 			 */
-			ND_TCHECK2(*p, bridge_pad);
+			ND_TCHECK_LEN(p, bridge_pad);
 			caplen -= bridge_pad;
 			length -= bridge_pad;
 			p += bridge_pad;
@@ -557,7 +557,7 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 			/*
 			 * Skip the padding.
 			 */
-			ND_TCHECK2(*p, bridge_pad + 1);
+			ND_TCHECK_LEN(p, bridge_pad + 1);
 			caplen -= bridge_pad + 1;
 			length -= bridge_pad + 1;
 			p += bridge_pad + 1;

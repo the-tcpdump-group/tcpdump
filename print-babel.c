@@ -377,7 +377,7 @@ babel_print_v2(netdissect_options *ndo,
         ICHECK(i, 2);
         len = EXTRACT_U_1(message + 1);
 
-        ND_TCHECK2(*message, 2 + len);
+        ND_TCHECK_LEN(message, 2 + len);
         ICHECK(i, 2 + len);
 
         switch(type) {

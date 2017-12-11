@@ -162,7 +162,7 @@ egpnrprint(netdissect_options *ndo,
 		addr = 0;
 		if (length < 4 - netlen)
 			goto trunc;
-		ND_TCHECK2(cp[0], 4 - netlen);
+		ND_TCHECK_LEN(cp, 4 - netlen);
 		switch (netlen) {
 
 		case 1:

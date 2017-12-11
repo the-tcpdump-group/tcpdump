@@ -379,7 +379,7 @@ ns_rprint(netdissect_options *ndo,
 	} else
 		cp = ns_nskip(ndo, cp);
 
-	if (cp == NULL || !ND_TTEST2(*cp, 10))
+	if (cp == NULL || !ND_TTEST_LEN(cp, 10))
 		return (ndo->ndo_snapend);
 
 	/* print the type/qtype */
@@ -427,7 +427,7 @@ ns_rprint(netdissect_options *ndo,
 
 	switch (typ) {
 	case T_A:
-		if (!ND_TTEST2(*cp, sizeof(struct in_addr)))
+		if (!ND_TTEST_LEN(cp, sizeof(struct in_addr)))
 			return(NULL);
 		ND_PRINT((ndo, " %s", intoa(htonl(EXTRACT_BE_U_4(cp)))));
 		break;
@@ -452,7 +452,7 @@ ns_rprint(netdissect_options *ndo,
 		ND_PRINT((ndo, " "));
 		if ((cp = ns_nprint(ndo, cp, bp)) == NULL)
 			return(NULL);
-		if (!ND_TTEST2(*cp, 5 * 4))
+		if (!ND_TTEST_LEN(cp, 5 * 4))
 			return(NULL);
 		ND_PRINT((ndo, " %u", EXTRACT_BE_U_4(cp)));
 		cp += 4;
@@ -498,7 +498,7 @@ ns_rprint(netdissect_options *ndo,
 	    {
 		char ntop_buf[INET6_ADDRSTRLEN];
 
-		if (!ND_TTEST2(*cp, sizeof(struct in6_addr)))
+		if (!ND_TTEST_LEN(cp, sizeof(struct in6_addr)))
 			return(NULL);
 		ND_PRINT((ndo, " %s",
 		    addrtostr6(cp, ntop_buf, sizeof(ntop_buf))));
@@ -520,7 +520,7 @@ ns_rprint(netdissect_options *ndo,
 			ND_PRINT((ndo, " %u(bad plen)", pbit));
 			break;
 		} else if (pbit < 128) {
-			if (!ND_TTEST2(*(cp + 1), sizeof(a) - pbyte))
+			if (!ND_TTEST_LEN(cp + 1, sizeof(a) - pbyte))
 				return(NULL);
 			memset(&a, 0, sizeof(a));
 			memcpy(&a.s6_addr[pbyte], cp + 1, sizeof(a) - pbyte);
@@ -542,7 +542,7 @@ ns_rprint(netdissect_options *ndo,
 		break;
 
 	case T_UNSPECA:		/* One long string */
-		if (!ND_TTEST2(*cp, len))
+		if (!ND_TTEST_LEN(cp, len))
 			return(NULL);
 		if (fn_printn(ndo, cp, len, ndo->ndo_snapend))
 			return(NULL);

@@ -619,7 +619,7 @@ l2tp_avp_print(netdissect_options *ndo, const u_char *dat, int length)
 
 	/* If it goes past the end of the remaining length of the captured
 	   data, we'll give up. */
-	ND_TCHECK2(*ptr, len);
+	ND_TCHECK_LEN(ptr, len);
 
 	/*
 	 * After this point, we don't need to check whether we go past

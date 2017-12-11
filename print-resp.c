@@ -337,7 +337,7 @@ resp_print_bulk_string(netdissect_options *ndo, register const u_char *bp, int l
             resp_print_empty(ndo);
         else {
             LCHECK2(length_cur, string_len);
-            ND_TCHECK2(*bp, string_len);
+            ND_TCHECK_LEN(bp, string_len);
             RESP_PRINT_SEGMENT(ndo, bp, string_len);
             bp += string_len;
             length_cur -= string_len;

@@ -104,7 +104,7 @@ llap_print(netdissect_options *ndo,
 		ND_PRINT((ndo, " [|llap %u]", length));
 		return (length);
 	}
-	if (!ND_TTEST2(*bp, sizeof(*lp))) {
+	if (!ND_TTEST_LEN(bp, sizeof(*lp))) {
 		ND_PRINT((ndo, " [|llap]"));
 		return (0);	/* cut short by the snapshot length */
 	}
@@ -119,7 +119,7 @@ llap_print(netdissect_options *ndo,
 			ND_PRINT((ndo, " [|sddp %u]", length));
 			return (length);
 		}
-		if (!ND_TTEST2(*bp, ddpSSize)) {
+		if (!ND_TTEST_LEN(bp, ddpSSize)) {
 			ND_PRINT((ndo, " [|sddp]"));
 			return (0);	/* cut short by the snapshot length */
 		}
@@ -139,7 +139,7 @@ llap_print(netdissect_options *ndo,
 			ND_PRINT((ndo, " [|ddp %u]", length));
 			return (length);
 		}
-		if (!ND_TTEST2(*bp, ddpSize)) {
+		if (!ND_TTEST_LEN(bp, ddpSize)) {
 			ND_PRINT((ndo, " [|ddp]"));
 			return (0);	/* cut short by the snapshot length */
 		}
@@ -189,7 +189,7 @@ atalk_print(netdissect_options *ndo,
 		ND_PRINT((ndo, " [|ddp %u]", length));
 		return;
 	}
-	if (!ND_TTEST2(*bp, ddpSize)) {
+	if (!ND_TTEST_LEN(bp, ddpSize)) {
 		ND_PRINT((ndo, " [|ddp]"));
 		return;
 	}

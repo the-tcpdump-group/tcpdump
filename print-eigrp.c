@@ -273,7 +273,7 @@ eigrp_print(netdissect_options *ndo, register const u_char *pptr, register u_int
 
     while(tlen>0) {
         /* did we capture enough for fully decoding the object header ? */
-        ND_TCHECK2(*tptr, sizeof(struct eigrp_tlv_header));
+        ND_TCHECK_LEN(tptr, sizeof(struct eigrp_tlv_header));
 
         eigrp_tlv_header = (const struct eigrp_tlv_header *)tptr;
         eigrp_tlv_len=EXTRACT_BE_U_2(&eigrp_tlv_header->length);
@@ -302,7 +302,7 @@ eigrp_print(netdissect_options *ndo, register const u_char *pptr, register u_int
         tlv_tlen=eigrp_tlv_len-sizeof(struct eigrp_tlv_header);
 
         /* did we capture enough for fully decoding the object ? */
-        ND_TCHECK2(*tptr, eigrp_tlv_len);
+        ND_TCHECK_LEN(tptr, eigrp_tlv_len);
 
         switch(eigrp_tlv_type) {
 

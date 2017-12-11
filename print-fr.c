@@ -471,7 +471,7 @@ mfr_print(netdissect_options *ndo,
             return hdr_len;
 
         while (tlen>sizeof(struct ie_tlv_header_t)) {
-            ND_TCHECK2(*tptr, sizeof(struct ie_tlv_header_t));
+            ND_TCHECK_LEN(tptr, sizeof(struct ie_tlv_header_t));
             ie_type=EXTRACT_U_1(tptr);
             ie_len=EXTRACT_U_1(tptr + 1);
 
@@ -484,7 +484,7 @@ mfr_print(netdissect_options *ndo,
             if (ie_type == 0 || ie_len <= sizeof(struct ie_tlv_header_t))
                 return hdr_len;
 
-            ND_TCHECK2(*tptr, ie_len);
+            ND_TCHECK_LEN(tptr, ie_len);
             tptr+=sizeof(struct ie_tlv_header_t);
             /* tlv len includes header */
             ie_len-=sizeof(struct ie_tlv_header_t);
@@ -1020,7 +1020,7 @@ q933_print(netdissect_options *ndo,
 			if (iecode == 0 || ielength == 0) {
 				return;
 			}
-			if (length < ielength || !ND_TTEST2(*p, ielength)) {
+			if (length < ielength || !ND_TTEST_LEN(p, ielength)) {
 				if (!ndo->ndo_vflag) {
 					ND_PRINT((ndo, ", length %u", olen));
 				}

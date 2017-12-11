@@ -305,7 +305,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 			  len - fixed_hdrlen));
 		return;
 	}
-	ND_TCHECK2(*dh, fixed_hdrlen);
+	ND_TCHECK_LEN(dh, fixed_hdrlen);
 
 	sport = EXTRACT_BE_U_2(&dh->dccph_sport);
 	dport = EXTRACT_BE_U_2(&dh->dccph_dport);
@@ -338,7 +338,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 	}
 
 	/* checksum calculation */
-	if (ndo->ndo_vflag && ND_TTEST2(bp[0], len)) {
+	if (ndo->ndo_vflag && ND_TTEST_LEN(bp, len)) {
 		uint16_t sum = 0, dccp_sum;
 
 		dccp_sum = EXTRACT_BE_U_2(&dh->dccph_checksum);
@@ -560,7 +560,7 @@ static int dccp_print_option(netdissect_options *ndo, const u_char *option, u_in
 				  tok2str(dccp_option_values, "Option %u", EXTRACT_U_1(option))));
 		return 0;
 	}
-	ND_TCHECK2(*option, optlen);
+	ND_TCHECK_LEN(option, optlen);
 
 	if (EXTRACT_U_1(option) >= 128) {
 		ND_PRINT((ndo, "CCID option %d", EXTRACT_U_1(option)));

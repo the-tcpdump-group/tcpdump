@@ -192,7 +192,7 @@ eap_print(netdissect_options *ndo,
                EXTRACT_U_1((tptr + 1)),
                len));
 
-        ND_TCHECK2(*tptr, len);
+        ND_TCHECK_LEN(tptr, len);
 
         if (type <= 2) { /* For EAP_REQUEST and EAP_RESPONSE only */
             ND_TCHECK_1(tptr + 4);

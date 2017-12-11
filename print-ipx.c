@@ -198,7 +198,7 @@ ipx_sap_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	    /*
 	     * 10 bytes of IPX address.
 	     */
-	    ND_TCHECK2(*ipx, 10);
+	    ND_TCHECK_LEN(ipx, 10);
 	    if (length < 10)
 		goto trunc;
 	    ND_PRINT((ndo, " addr %s",
@@ -209,7 +209,7 @@ ipx_sap_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	     * 2 bytes of socket and 2 bytes of number of intermediate
 	     * networks.
 	     */
-	    ND_TCHECK2(*ipx, 4);
+	    ND_TCHECK_LEN(ipx, 4);
 	    if (length < 4)
 		goto trunc;
 	    ipx += 4;
@@ -241,7 +241,7 @@ ipx_rip_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	if (length != 0) {
 	    if (length < 8)
 		goto trunc;
-	    ND_TCHECK2(*ipx, 8);
+	    ND_TCHECK_LEN(ipx, 8);
 	    ND_PRINT((ndo, " %08x/%d.%d", EXTRACT_BE_U_4(ipx),
 			 EXTRACT_BE_U_2(ipx + 4), EXTRACT_BE_U_2(ipx + 6)));
 	}
@@ -251,7 +251,7 @@ ipx_rip_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	for (i = 0; i < 50 && length != 0; i++) {
 	    if (length < 8)
 		goto trunc;
-	    ND_TCHECK2(*ipx, 8);
+	    ND_TCHECK_LEN(ipx, 8);
 	    ND_PRINT((ndo, " %08x/%d.%d", EXTRACT_BE_U_4(ipx),
 			 EXTRACT_BE_U_2(ipx + 4), EXTRACT_BE_U_2(ipx + 6)));
 

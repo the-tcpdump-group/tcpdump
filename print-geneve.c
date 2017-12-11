@@ -202,7 +202,7 @@ geneve_print(netdissect_options *ndo, const u_char *bp, u_int len)
         return;
     }
 
-    ND_TCHECK2(*bp, opts_len);
+    ND_TCHECK_LEN(bp, opts_len);
 
     if (opts_len > 0) {
         ND_PRINT((ndo, ", options ["));

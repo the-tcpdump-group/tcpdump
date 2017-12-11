@@ -549,7 +549,7 @@ handle_ctrl_proto(netdissect_options *ndo,
 		/* XXX: need to decode Data? - hexdump for now */
 		if (len > 8) {
 			ND_PRINT((ndo, "\n\t  -----trailing data-----"));
-			ND_TCHECK2(tptr[4], len - 8);
+			ND_TCHECK_LEN(tptr + 4, len - 8);
 			print_unknown_data(ndo, tptr + 4, "\n\t  ", len - 8);
 		}
 		break;
@@ -1100,7 +1100,7 @@ print_ipcp_config_options(netdissect_options *ndo,
                         	return 0;
                         }
 
-                        ND_TCHECK2(*(p + 2), IPCPOPT_IPCOMP_MINLEN);
+                        ND_TCHECK_LEN(p + 2, IPCPOPT_IPCOMP_MINLEN);
                         ND_PRINT((ndo, "\n\t    TCP Space %u, non-TCP Space %u" \
                                ", maxPeriod %u, maxTime %u, maxHdr %u",
                                EXTRACT_BE_U_2(p + 4),

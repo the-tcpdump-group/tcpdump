@@ -67,7 +67,7 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	p = bp;
 	ND_PRINT((ndo, "MPLS"));
 	do {
-		ND_TCHECK2(*p, sizeof(label_entry));
+		ND_TCHECK_LEN(p, sizeof(label_entry));
 		if (length < sizeof(label_entry)) {
 			ND_PRINT((ndo, "[|MPLS], length %u", length));
 			return;

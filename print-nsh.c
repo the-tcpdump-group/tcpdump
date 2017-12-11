@@ -66,7 +66,7 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
     if (len < NSH_BASE_HDR_LEN + NSH_SERVICE_PATH_HDR_LEN)
         goto trunc;
 
-    ND_TCHECK2(*bp, NSH_BASE_HDR_LEN + NSH_SERVICE_PATH_HDR_LEN);
+    ND_TCHECK_LEN(bp, NSH_BASE_HDR_LEN + NSH_SERVICE_PATH_HDR_LEN);
 
     ver = (uint8_t)(EXTRACT_U_1(bp) >> 6);
     flags = EXTRACT_U_1(bp);
@@ -101,7 +101,7 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
     if (len < length * NSH_HDR_WORD_SIZE)
         goto trunc;
 
-    ND_TCHECK2(*bp, length * NSH_HDR_WORD_SIZE);
+    ND_TCHECK_LEN(bp, length * NSH_HDR_WORD_SIZE);
 
     /*
      * length includes the lengths of the Base and Service Path headers.

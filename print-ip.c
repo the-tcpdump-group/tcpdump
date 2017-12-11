@@ -118,7 +118,7 @@ ip_finddst(netdissect_options *ndo,
 			if (len < 2)
 				break;
 		}
-		ND_TCHECK2(*cp, len);
+		ND_TCHECK_LEN(cp, len);
 		switch (tt) {
 
 		case IPOPT_SSRR:
@@ -220,7 +220,7 @@ ip_printts(netdissect_options *ndo,
 	for (len = 4; len < length; len += hoplen) {
 		if (ptr == len)
 			type = " ^ ";
-		ND_TCHECK2(cp[len], hoplen);
+		ND_TCHECK_LEN(cp + len, hoplen);
 		ND_PRINT((ndo, "%s%d@%s", type, EXTRACT_BE_U_4(cp + len + hoplen - 4),
 			  hoplen!=8 ? "" : ipaddr_string(ndo, cp + len)));
 		type = " ";
@@ -279,7 +279,7 @@ ip_optprint(netdissect_options *ndo,
 			return;
 		}
 
-		ND_TCHECK2(*cp, option_len);
+		ND_TCHECK_LEN(cp, option_len);
 
 		switch (option_code) {
 		case IPOPT_EOL:

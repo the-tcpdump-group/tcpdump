@@ -104,7 +104,7 @@ cdp_print(netdissect_options *ndo,
 
 	tptr = pptr; /* temporary pointer */
 
-	ND_TCHECK2(*tptr, CDP_HEADER_LEN);
+	ND_TCHECK_LEN(tptr, CDP_HEADER_LEN);
 	ND_PRINT((ndo, "CDPv%u, ttl: %us", EXTRACT_U_1((tptr + CDP_HEADER_VERSION_OFFSET)),
 					   EXTRACT_U_1(tptr + CDP_HEADER_TTL_OFFSET)));
 	if (ndo->ndo_vflag)
@@ -112,7 +112,7 @@ cdp_print(netdissect_options *ndo,
 	tptr += CDP_HEADER_LEN;
 
 	while (tptr < (pptr+length)) {
-		ND_TCHECK2(*tptr, CDP_TLV_HEADER_LEN); /* read out Type and Length */
+		ND_TCHECK_LEN(tptr, CDP_TLV_HEADER_LEN); /* read out Type and Length */
 		type = EXTRACT_BE_U_2(tptr + CDP_TLV_TYPE_OFFSET);
 		len  = EXTRACT_BE_U_2(tptr + CDP_TLV_LEN_OFFSET); /* object length includes the 4 bytes header length */
 		if (len < CDP_TLV_HEADER_LEN) {
@@ -131,7 +131,7 @@ cdp_print(netdissect_options *ndo,
 		tptr += CDP_TLV_HEADER_LEN;
 		len -= CDP_TLV_HEADER_LEN;
 
-		ND_TCHECK2(*tptr, len);
+		ND_TCHECK_LEN(tptr, len);
 
 		if (ndo->ndo_vflag || type == 1) { /* in non-verbose mode just print Device-ID */
 
@@ -328,7 +328,7 @@ cdp_print_addr(netdissect_options *ndo,
 			 * Ethertype, address length = 16
 			 */
 			p += 10;
-			ND_TCHECK2(*p, al);
+			ND_TCHECK_LEN(p, al);
 			if (p + al > endp)
 				goto trunc;
 
@@ -339,7 +339,7 @@ cdp_print_addr(netdissect_options *ndo,
 			/*
 			 * Generic case: just print raw data
 			 */
-			ND_TCHECK2(*p, pl);
+			ND_TCHECK_LEN(p, pl);
 			if (p + pl > endp)
 				goto trunc;
 			ND_PRINT((ndo, "pt=0x%02x, pl=%d, pb=", EXTRACT_U_1((p - 2)), pl));
@@ -352,7 +352,7 @@ cdp_print_addr(netdissect_options *ndo,
 				goto trunc;
 			ND_PRINT((ndo, ", al=%d, a=", al));
 			p += 2;
-			ND_TCHECK2(*p, al);
+			ND_TCHECK_LEN(p, al);
 			if (p + al > endp)
 				goto trunc;
 			while (al-- > 0) {

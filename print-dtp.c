@@ -54,7 +54,7 @@ dtp_print (netdissect_options *ndo, const u_char *pptr, u_int length)
 
     tptr = pptr;
 
-    ND_TCHECK2(*tptr, DTP_HEADER_LEN);
+    ND_TCHECK_LEN(tptr, DTP_HEADER_LEN);
 
     ND_PRINT((ndo, "DTPv%u, length %u",
            EXTRACT_U_1(tptr),
@@ -84,7 +84,7 @@ dtp_print (netdissect_options *ndo, const u_char *pptr, u_int length)
         /* infinite loop check */
         if (len < 4)
             goto invalid;
-        ND_TCHECK2(*tptr, len);
+        ND_TCHECK_LEN(tptr, len);
 
         switch (type) {
 	case DTP_DOMAIN_TLV:

@@ -86,7 +86,7 @@ print_long_pos_vector(netdissect_options *ndo,
 {
 	uint32_t lat, lon;
 
-	if (!ND_TTEST2(*bp, GEONET_ADDR_LEN))
+	if (!ND_TTEST_LEN(bp, GEONET_ADDR_LEN))
 		return (-1);
 	ND_PRINT((ndo, "GN_ADDR:%s ", linkaddr_string (ndo, bp, 0, GEONET_ADDR_LEN)));
 
@@ -232,7 +232,7 @@ geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	if (hdr_size >= 0) {
 		if (length < (u_int)hdr_size)
 			goto invalid;
-		ND_TCHECK2(*bp, hdr_size);
+		ND_TCHECK_LEN(bp, hdr_size);
 		length -= hdr_size;
 		bp += hdr_size;
 		switch (next_hdr) {

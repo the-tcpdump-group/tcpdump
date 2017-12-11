@@ -197,7 +197,7 @@ aoev1_issue_print(netdissect_options *ndo,
 
 invalid:
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, ep - cp);
+	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
@@ -236,7 +236,7 @@ aoev1_query_print(netdissect_options *ndo,
 	if (cslen > AOEV1_MAX_CONFSTR_LEN || AOEV1_QUERY_ARG_LEN + cslen > len)
 		goto invalid;
 	/* Config String */
-	ND_TCHECK2(*cp, cslen);
+	ND_TCHECK_LEN(cp, cslen);
 	if (cslen) {
 		ND_PRINT((ndo, "\n\tConfig String (length %u): ", cslen));
 		if (fn_printn(ndo, cp, cslen, ndo->ndo_snapend))
@@ -246,7 +246,7 @@ aoev1_query_print(netdissect_options *ndo,
 
 invalid:
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, ep - cp);
+	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
@@ -289,7 +289,7 @@ aoev1_mac_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "\n\t DCmd: %s", tok2str(aoev1_dcmd_str, "Unknown (0x%02x)", EXTRACT_U_1(cp))));
 		cp += 1;
 		/* Ethernet Address */
-		ND_TCHECK2(*cp, ETHER_ADDR_LEN);
+		ND_TCHECK_LEN(cp, ETHER_ADDR_LEN);
 		ND_PRINT((ndo, ", Ethernet Address: %s", etheraddr_string(ndo, cp)));
 		cp += ETHER_ADDR_LEN;
 	}
@@ -297,7 +297,7 @@ aoev1_mac_print(netdissect_options *ndo,
 
 invalid:
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, ep - cp);
+	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
@@ -332,7 +332,7 @@ aoev1_reserve_print(netdissect_options *ndo,
 
 invalid:
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, ep - cp);
+	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
@@ -390,7 +390,7 @@ aoev1_print(netdissect_options *ndo,
 
 invalid:
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, ep - cp);
+	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
@@ -422,7 +422,7 @@ aoe_print(netdissect_options *ndo,
 
 invalid:
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, ep - cp);
+	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));

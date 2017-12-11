@@ -481,7 +481,7 @@ smb_fdata1(netdissect_options *ndo,
 	case 'P':
 	  {
 	    int l = atoi(fmt + 1);
-	    ND_TCHECK2(buf[0], l);
+	    ND_TCHECK_LEN(buf, l);
 	    buf += l;
 	    fmt++;
 	    while (isdigit((unsigned char)*fmt))
@@ -653,7 +653,7 @@ smb_fdata1(netdissect_options *ndo,
 	case 's':
 	  {
 	    int l = atoi(fmt + 1);
-	    ND_TCHECK2(*buf, l);
+	    ND_TCHECK_LEN(buf, l);
 	    ND_PRINT((ndo, "%-*.*s", l, l, buf));
 	    buf += l;
 	    fmt++;
@@ -663,7 +663,7 @@ smb_fdata1(netdissect_options *ndo,
 	  }
 	case 'c':
 	  {
-	    ND_TCHECK2(*buf, stringlen);
+	    ND_TCHECK_LEN(buf, stringlen);
 	    ND_PRINT((ndo, "%-*.*s", (int)stringlen, (int)stringlen, buf));
 	    buf += stringlen;
 	    fmt++;
@@ -685,7 +685,7 @@ smb_fdata1(netdissect_options *ndo,
 	case 'h':
 	  {
 	    int l = atoi(fmt + 1);
-	    ND_TCHECK2(*buf, l);
+	    ND_TCHECK_LEN(buf, l);
 	    while (l--) {
 		ND_PRINT((ndo, "%02x", EXTRACT_U_1(buf)));
 		buf++;

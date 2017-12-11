@@ -586,7 +586,7 @@ sctp_print(netdissect_options *ndo,
         break;
       }
 
-      ND_TCHECK2(*bp, chunkLength);
+      ND_TCHECK_LEN(bp, chunkLength);
 
       bp += sizeof(*chunkDescPtr);
       sctpPacketLengthRemaining -= sizeof(*chunkDescPtr);
@@ -806,7 +806,7 @@ sctp_print(netdissect_options *ndo,
 	 * Fail if the alignment padding isn't in the captured data.
 	 * Otherwise, skip it.
 	 */
-	ND_TCHECK2(*bp, align);
+	ND_TCHECK_LEN(bp, align);
 	bp += align;
 	sctpPacketLengthRemaining -= align;
       }

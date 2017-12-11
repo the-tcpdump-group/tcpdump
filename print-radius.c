@@ -586,7 +586,7 @@ print_attr_string(netdissect_options *ndo,
 {
    register u_int i;
 
-   ND_TCHECK2(data[0],length);
+   ND_TCHECK_LEN(data, length);
 
    switch(attr_code)
    {
@@ -687,7 +687,7 @@ print_vendor_attr(netdissect_options *ndo,
         data+=2;
         vendor_length-=2;
         length-=2;
-	ND_TCHECK2(*data, vendor_length);
+	ND_TCHECK_LEN(data, vendor_length);
 
         ND_PRINT((ndo, "\n\t    Vendor Attribute: %u, Length: %u, Value: ",
                vendor_type,
@@ -906,7 +906,7 @@ print_attr_netmask6(netdissect_options *ndo,
        ND_PRINT((ndo, "ERROR: length %u not in range (2..18)", length));
        return;
    }
-   ND_TCHECK2(data[0], length);
+   ND_TCHECK_LEN(data, length);
    if (EXTRACT_U_1(data + 1) > 128)
    {
       ND_PRINT((ndo, "ERROR: netmask %u not in range (0..128)", EXTRACT_U_1(data + 1)));
@@ -1121,7 +1121,7 @@ radius_print(netdissect_options *ndo,
    register const struct radius_hdr *rad;
    u_int len, auth_idx;
 
-   ND_TCHECK2(*dat, MIN_RADIUS_LEN);
+   ND_TCHECK_LEN(dat, MIN_RADIUS_LEN);
    rad = (const struct radius_hdr *)dat;
    len = EXTRACT_BE_U_2(&rad->len);
 

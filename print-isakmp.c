@@ -862,7 +862,7 @@ hexprint(netdissect_options *ndo, const uint8_t *loc, size_t len)
 static int
 rawprint(netdissect_options *ndo, const uint8_t *loc, size_t len)
 {
-	ND_TCHECK2(*loc, len);
+	ND_TCHECK_LEN(loc, len);
 
 	hexprint(ndo, loc, len);
 	return 1;
@@ -1048,7 +1048,7 @@ ikev1_sa_print(netdissect_options *ndo, u_char tpay _U_,
 
 	np = (const u_char *)ext + sizeof(sa);
 	if (sit != 0x01) {
-		ND_TCHECK2(*(ext + 1), sizeof(ident));
+		ND_TCHECK_LEN(ext + 1, sizeof(ident));
 		UNALIGNED_MEMCPY(&ident, ext + 1, sizeof(ident));
 		ND_PRINT((ndo," ident=%u", (uint32_t)ntohl(ident)));
 		np += sizeof(ident);
@@ -1393,7 +1393,7 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 			break;
 		if (data == NULL)
 			goto trunc;
-		ND_TCHECK2(*data, len);
+		ND_TCHECK_LEN(data, len);
 		switch (doi_id.type) {
 		case IPSECDOI_ID_IPV4_ADDR:
 			if (len < 4)
@@ -2044,7 +2044,7 @@ ikev2_p_print(netdissect_options *ndo, u_char tpay _U_, int pcount _U_,
 
 		if (prop_length < item_len)
 			goto toolong;
-		ND_TCHECK2(*cp, item_len);
+		ND_TCHECK_LEN(cp, item_len);
 
 		depth++;
 		ND_PRINT((ndo,"\n"));
@@ -2130,7 +2130,7 @@ ikev2_sa_print(netdissect_options *ndo, u_char tpay,
 
 		if (sa_length < item_len)
 			goto toolong;
-		ND_TCHECK2(*cp, item_len);
+		ND_TCHECK_LEN(cp, item_len);
 
 		depth++;
 		ND_PRINT((ndo,"\n"));
@@ -2259,7 +2259,7 @@ ikev2_ID_print(netdissect_options *ndo, u_char tpay,
 	}
 
 	if(dumpascii) {
-		ND_TCHECK2(*typedata, idtype_len);
+		ND_TCHECK_LEN(typedata, idtype_len);
 		for(i=0; i<idtype_len; i++) {
 			if(ND_ISPRINT(EXTRACT_U_1(typedata + i))) {
 				ND_PRINT((ndo, "%c", EXTRACT_U_1(typedata + i)));
@@ -2312,7 +2312,7 @@ ikev2_auth_print(netdissect_options *ndo, u_char tpay,
 	const u_char *authdata = (const u_char*)ext + sizeof(a);
 	unsigned int len;
 
-	ND_TCHECK2(*ext, sizeof(a));
+	ND_TCHECK_LEN(ext, sizeof(a));
 	UNALIGNED_MEMCPY(&a, ext, sizeof(a));
 	ikev2_pay_print(ndo, NPSTR(tpay), a.h.critical);
 	len = ntohs(a.h.len);
@@ -2602,7 +2602,7 @@ ikev2_vid_print(netdissect_options *ndo, u_char tpay,
 
 	vid = (const u_char *)(ext+1);
 	len = ntohs(e.len) - 4;
-	ND_TCHECK2(*vid, len);
+	ND_TCHECK_LEN(vid, len);
 	for(i=0; i<len; i++) {
 		if(ND_ISPRINT(EXTRACT_U_1(vid + i)))
 			ND_PRINT((ndo, "%c", EXTRACT_U_1(vid + i)));
@@ -2674,7 +2674,7 @@ ikev2_e_print(netdissect_options *ndo,
 	}
 
 	dat = (const u_char *)(ext+1);
-	ND_TCHECK2(*dat, dlen);
+	ND_TCHECK_LEN(dat, dlen);
 
 #ifdef HAVE_LIBCRYPTO
 	/* try to decypt it! */
@@ -2777,7 +2777,7 @@ ikev1_sub_print(netdissect_options *ndo,
 		ND_TCHECK(*ext);
 		UNALIGNED_MEMCPY(&e, ext, sizeof(e));
 
-		ND_TCHECK2(*ext, ntohs(e.len));
+		ND_TCHECK_LEN(ext, ntohs(e.len));
 
 		depth++;
 		ND_PRINT((ndo,"\n"));
@@ -2944,7 +2944,7 @@ ikev2_sub_print(netdissect_options *ndo,
 		ND_TCHECK(*ext);
 		UNALIGNED_MEMCPY(&e, ext, sizeof(e));
 
-		ND_TCHECK2(*ext, ntohs(e.len));
+		ND_TCHECK_LEN(ext, ntohs(e.len));
 
 		depth++;
 		ND_PRINT((ndo,"\n"));

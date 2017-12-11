@@ -542,7 +542,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			udp_sum = EXTRACT_BE_U_2(up->uh_sum);
 			if (udp_sum == 0) {
 				ND_PRINT((ndo, "[no cksum] "));
-			} else if (ND_TTEST2(cp[0], length)) {
+			} else if (ND_TTEST_LEN(cp, length)) {
 				sum = udp_cksum(ndo, ip, up, length + sizeof(struct udphdr));
 
 	                        if (sum != 0) {
@@ -555,7 +555,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		}
 		else if (IP_V(ip) == 6 && ip6->ip6_plen) {
 			/* for IPv6, UDP checksum is mandatory */
-			if (ND_TTEST2(cp[0], length)) {
+			if (ND_TTEST_LEN(cp, length)) {
 				sum = udp6_cksum(ndo, ip6, up, length + sizeof(struct udphdr));
 				udp_sum = EXTRACT_BE_U_2(up->uh_sum);
 

@@ -116,13 +116,13 @@ of_header_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep
 		return of10_header_body_print(ndo, cp, ep, type, length, xid);
 	default:
 		of_header_print(ndo, version, type, length, xid);
-		ND_TCHECK2(*cp, length - OF_HEADER_LEN);
+		ND_TCHECK_LEN(cp, length - OF_HEADER_LEN);
 		return cp + length - OF_HEADER_LEN; /* done with current message */
 	}
 
 invalid: /* fail current packet */
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, ep - cp);
+	ND_TCHECK_LEN(cp, ep - cp);
 	return ep;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));

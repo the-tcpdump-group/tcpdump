@@ -512,7 +512,7 @@ decnet_print(netdissect_options *ndo,
 		return;
 	}
 
-	ND_TCHECK2(*ap, sizeof(short));
+	ND_TCHECK_LEN(ap, sizeof(short));
 	pktlen = EXTRACT_LE_U_2(ap);
 	if (pktlen < sizeof(struct shorthdr)) {
 		ND_PRINT((ndo, "%s", tstr));
@@ -537,7 +537,7 @@ decnet_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "%s", tstr));
 		return;
 	    }
-	    ND_TCHECK2(ap[sizeof(short)], padlen);
+	    ND_TCHECK_LEN(ap + sizeof(short), padlen);
 	    ap += padlen;
 	    length -= padlen;
 	    caplen -= padlen;
@@ -772,7 +772,7 @@ print_l1_routes(netdissect_options *ndo,
 
 	/* The last short is a checksum */
 	while (len > (3 * sizeof(short))) {
-	    ND_TCHECK2(*rp, 3 * sizeof(short));
+	    ND_TCHECK_LEN(rp, 3 * sizeof(short));
 	    count = EXTRACT_LE_U_2(rp);
 	    if (count > 1024)
 		return (1);	/* seems to be bogus from here on */
@@ -803,7 +803,7 @@ print_l2_routes(netdissect_options *ndo,
 
 	/* The last short is a checksum */
 	while (len > (3 * sizeof(short))) {
-	    ND_TCHECK2(*rp, 3 * sizeof(short));
+	    ND_TCHECK_LEN(rp, 3 * sizeof(short));
 	    count = EXTRACT_LE_U_2(rp);
 	    if (count > 1024)
 		return (1);	/* seems to be bogus from here on */

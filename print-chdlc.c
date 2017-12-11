@@ -58,7 +58,7 @@ chdlc_print(netdissect_options *ndo, register const u_char *p, u_int length)
 
 	if (length < CHDLC_HDRLEN)
 		goto trunc;
-	ND_TCHECK2(*p, CHDLC_HDRLEN);
+	ND_TCHECK_LEN(p, CHDLC_HDRLEN);
 	proto = EXTRACT_BE_U_2(p + 2);
 	if (ndo->ndo_eflag) {
                 ND_PRINT((ndo, "%s, ethertype %s (0x%04x), length %u: ",
@@ -150,7 +150,7 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
 		goto trunc;
 
 	slarp = (const struct cisco_slarp *)cp;
-	ND_TCHECK2(*slarp, SLARP_MIN_LEN);
+	ND_TCHECK_LEN(slarp, SLARP_MIN_LEN);
 	switch (EXTRACT_BE_U_4(&slarp->code)) {
 	case SLARP_REQUEST:
 		ND_PRINT((ndo, "request"));

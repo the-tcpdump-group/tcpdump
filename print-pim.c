@@ -147,7 +147,7 @@ pimv1_join_prune_print(netdissect_options *ndo,
 	int njp;
 
 	/* If it's a single group and a single source, use 1-line output. */
-	if (ND_TTEST2(bp[0], 30) && EXTRACT_U_1(bp + 11) == 1 &&
+	if (ND_TTEST_LEN(bp, 30) && EXTRACT_U_1(bp + 11) == 1 &&
 	    ((njoin = EXTRACT_BE_U_2(bp + 20)) + EXTRACT_BE_U_2(bp + 22)) == 1) {
 		int hold;
 
@@ -171,7 +171,7 @@ pimv1_join_prune_print(netdissect_options *ndo,
 
 	if (len < sizeof(struct in_addr))
 		goto trunc;
-	ND_TCHECK2(bp[0], sizeof(struct in_addr));
+	ND_TCHECK_LEN(bp, sizeof(struct in_addr));
 	if (ndo->ndo_vflag > 1)
 		ND_PRINT((ndo, "\n"));
 	ND_PRINT((ndo, " Upstream Nbr: %s", ipaddr_string(ndo, bp)));
@@ -202,13 +202,13 @@ pimv1_join_prune_print(netdissect_options *ndo,
 		 */
 		if (len < 4)
 			goto trunc;
-		ND_TCHECK2(bp[0], sizeof(struct in_addr));
+		ND_TCHECK_LEN(bp, sizeof(struct in_addr));
 		ND_PRINT((ndo, "\n\tGroup: %s", ipaddr_string(ndo, bp)));
 		bp += 4;
 		len -= 4;
 		if (len < 4)
 			goto trunc;
-		ND_TCHECK2(bp[0], sizeof(struct in_addr));
+		ND_TCHECK_LEN(bp, sizeof(struct in_addr));
 		if (EXTRACT_BE_U_4(bp) != 0xffffffff)
 			ND_PRINT((ndo, "/%s", ipaddr_string(ndo, bp)));
 		bp += 4;
@@ -284,12 +284,12 @@ pimv1_print(netdissect_options *ndo,
 		break;
 
 	case PIMV1_TYPE_REGISTER:
-		ND_TCHECK2(bp[8], 20);			/* ip header */
+		ND_TCHECK_LEN(bp + 8, 20);			/* ip header */
 		ND_PRINT((ndo, " for %s > %s", ipaddr_string(ndo, bp + 20),
 			  ipaddr_string(ndo, bp + 24)));
 		break;
 	case PIMV1_TYPE_REGISTER_STOP:
-		ND_TCHECK2(bp[12], sizeof(struct in_addr));
+		ND_TCHECK_LEN(bp + 12, sizeof(struct in_addr));
 		ND_PRINT((ndo, " for %s > %s", ipaddr_string(ndo, bp + 8),
 			  ipaddr_string(ndo, bp + 12)));
 		break;
@@ -304,7 +304,7 @@ pimv1_print(netdissect_options *ndo,
 		}
 		break;
 	case PIMV1_TYPE_ASSERT:
-		ND_TCHECK2(bp[16], sizeof(struct in_addr));
+		ND_TCHECK_LEN(bp + 16, sizeof(struct in_addr));
 		ND_PRINT((ndo, " for %s > %s", ipaddr_string(ndo, bp + 16),
 			  ipaddr_string(ndo, bp + 8)));
 		if (EXTRACT_BE_U_4(bp + 12) != 0xffffffff)
@@ -603,7 +603,7 @@ pimv2_addr_print(netdissect_options *ndo,
 	case pimv2_unicast:
 		if (len < addr_len)
 			goto trunc;
-		ND_TCHECK2(bp[0], addr_len);
+		ND_TCHECK_LEN(bp, addr_len);
 		if (af == AF_INET) {
 			if (!silent)
 				ND_PRINT((ndo, "%s", ipaddr_string(ndo, bp)));
@@ -617,7 +617,7 @@ pimv2_addr_print(netdissect_options *ndo,
 	case pimv2_source:
 		if (len < addr_len + 2)
 			goto trunc;
-		ND_TCHECK2(bp[0], addr_len + 2);
+		ND_TCHECK_LEN(bp, addr_len + 2);
 		if (af == AF_INET) {
 			if (!silent) {
 				ND_PRINT((ndo, "%s", ipaddr_string(ndo, bp + 2)));
@@ -667,7 +667,7 @@ pimv2_check_checksum(netdissect_options *ndo, const u_char *bp,
 	const struct ip *ip;
 	u_int cksum;
 
-	if (!ND_TTEST2(bp[0], len)) {
+	if (!ND_TTEST_LEN(bp, len)) {
 		/* We don't have all the data. */
 		return (UNVERIFIED);
 	}
@@ -771,7 +771,7 @@ pimv2_print(netdissect_options *ndo,
 
 			if (len < olen)
 				goto trunc;
-			ND_TCHECK2(bp[0], olen);
+			ND_TCHECK_LEN(bp, olen);
 			switch (otype) {
 			case PIMV2_HELLO_OPTION_HOLDTIME:
 				if (olen != 2) {
@@ -874,7 +874,7 @@ pimv2_print(netdissect_options *ndo,
 
 		if (len < 4)
 			goto trunc;
-		ND_TCHECK2(*bp, PIMV2_REGISTER_FLAG_LEN);
+		ND_TCHECK_LEN(bp, PIMV2_REGISTER_FLAG_LEN);
 
 		ND_PRINT((ndo, ", Flags [ %s ]\n\t",
 		          tok2str(pimv2_register_flag_values,

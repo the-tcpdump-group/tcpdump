@@ -945,7 +945,7 @@ sflow_print(netdissect_options *ndo,
 	    goto trunc;
 
         /* did we capture enough for fully decoding the sample ? */
-        ND_TCHECK2(*tptr, sflow_sample_len);
+        ND_TCHECK_LEN(tptr, sflow_sample_len);
 
 	switch(sflow_sample_type) {
         case SFLOW_FLOW_SAMPLE:

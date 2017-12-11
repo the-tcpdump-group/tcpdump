@@ -445,7 +445,7 @@ tcp_print(netdissect_options *ndo,
                         datalen = 0;
 
 /* Bail if "l" bytes of data are not left or were not captured  */
-#define LENCHECK(l) { if ((l) > hlen) goto bad; ND_TCHECK2(*cp, l); }
+#define LENCHECK(l) { if ((l) > hlen) goto bad; ND_TCHECK_LEN(cp, l); }
 
 
                         ND_PRINT((ndo, "%s", tok2str(tcp_option_values, "unknown-%u", opt)));
@@ -796,7 +796,7 @@ print_tcp_rst_data(netdissect_options *ndo,
 {
         int c;
 
-        ND_PRINT((ndo, ND_TTEST2(*sp, length) ? " [RST" : " [!RST"));
+        ND_PRINT((ndo, ND_TTEST_LEN(sp, length) ? " [RST" : " [!RST"));
         if (length > MAX_RST_DATA_LEN) {
                 length = MAX_RST_DATA_LEN;	/* can use -X for longer */
                 ND_PRINT((ndo, "+"));			/* indicate we truncate */

@@ -534,7 +534,7 @@ rx_print(netdissect_options *ndo,
 	uint8_t type, flags;
 	uint32_t opcode;
 
-	if (!ND_TTEST2(*bp, sizeof (struct rx_header))) {
+	if (!ND_TTEST_LEN(bp, sizeof(struct rx_header))) {
 		ND_PRINT((ndo, " [|rx] (%u)", length));
 		return;
 	}
@@ -753,7 +753,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, u_int sport,
  */
 
 #define FIDOUT() { uint32_t n1, n2, n3; \
-			ND_TCHECK2(bp[0], sizeof(uint32_t) * 3); \
+			ND_TCHECK_LEN(bp, sizeof(uint32_t) * 3); \
 			n1 = EXTRACT_BE_U_4(bp); \
 			bp += sizeof(uint32_t); \
 			n2 = EXTRACT_BE_U_4(bp); \
@@ -764,7 +764,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, u_int sport,
 		}
 
 #define STROUT(MAX) { uint32_t _i; \
-			ND_TCHECK2(bp[0], sizeof(uint32_t)); \
+			ND_TCHECK_LEN(bp, sizeof(uint32_t)); \
 			_i = EXTRACT_BE_U_4(bp); \
 			if (_i > (MAX)) \
 				goto trunc; \
@@ -791,7 +791,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, u_int sport,
 		}
 
 #define UINT64OUT() { uint64_t _i; \
-			ND_TCHECK2(bp[0], sizeof(uint64_t)); \
+			ND_TCHECK_LEN(bp, sizeof(uint64_t)); \
 			_i = EXTRACT_BE_U_8(bp); \
 			bp += sizeof(uint64_t); \
 			ND_PRINT((ndo, " %" PRIu64, _i)); \
@@ -807,7 +807,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, u_int sport,
 		}
 
 #define STOREATTROUT() { uint32_t mask, _i; \
-			ND_TCHECK2(bp[0], (sizeof(uint32_t)*6)); \
+			ND_TCHECK_LEN(bp, (sizeof(uint32_t) * 6)); \
 			mask = EXTRACT_BE_U_4(bp); bp += sizeof(uint32_t); \
 			if (mask) ND_PRINT((ndo, " StoreStatus")); \
 		        if (mask & 1) { ND_PRINT((ndo, " date")); DATEOUT(); } \
@@ -825,7 +825,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, u_int sport,
 		}
 
 #define UBIK_VERSIONOUT() {uint32_t epoch; uint32_t counter; \
-			ND_TCHECK2(bp[0], sizeof(uint32_t) * 2); \
+			ND_TCHECK_LEN(bp, sizeof(uint32_t) * 2); \
 			epoch = EXTRACT_BE_U_4(bp); \
 			bp += sizeof(uint32_t); \
 			counter = EXTRACT_BE_U_4(bp); \
@@ -834,7 +834,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, u_int sport,
 		}
 
 #define AFSUUIDOUT() {uint32_t temp; int _i; \
-			ND_TCHECK2(bp[0], 11*sizeof(uint32_t)); \
+			ND_TCHECK_LEN(bp, 11 * sizeof(uint32_t)); \
 			temp = EXTRACT_BE_U_4(bp); \
 			bp += sizeof(uint32_t); \
 			ND_PRINT((ndo, " %08x", temp)); \
@@ -860,7 +860,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, u_int sport,
 			uint32_t k; \
 			if ((MAX) + 1 > sizeof(s)) \
 				goto trunc; \
-			ND_TCHECK2(bp[0], (MAX) * sizeof(uint32_t)); \
+			ND_TCHECK_LEN(bp, (MAX) * sizeof(uint32_t)); \
 			sp = s; \
 			for (k = 0; k < (MAX); k++) { \
 				*sp++ = (u_char) EXTRACT_BE_U_4(bp); \
@@ -873,7 +873,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, u_int sport,
 		}
 
 #define DESTSERVEROUT() { uint32_t n1, n2, n3; \
-			ND_TCHECK2(bp[0], sizeof(uint32_t) * 3); \
+			ND_TCHECK_LEN(bp, sizeof(uint32_t) * 3); \
 			n1 = EXTRACT_BE_U_4(bp); \
 			bp += sizeof(uint32_t); \
 			n2 = EXTRACT_BE_U_4(bp); \
@@ -957,7 +957,7 @@ fs_print(netdissect_options *ndo,
 			ND_TCHECK_4(bp);
 			i = EXTRACT_BE_U_4(bp);
 			bp += sizeof(uint32_t);
-			ND_TCHECK2(bp[0], i);
+			ND_TCHECK_LEN(bp, i);
 			i = min(AFSOPAQUEMAX, i);
 			strncpy(a, (const char *) bp, i);
 			a[i] = '\0';
@@ -1092,7 +1092,7 @@ fs_reply_print(netdissect_options *ndo,
 			ND_TCHECK_4(bp);
 			i = EXTRACT_BE_U_4(bp);
 			bp += sizeof(uint32_t);
-			ND_TCHECK2(bp[0], i);
+			ND_TCHECK_LEN(bp, i);
 			i = min(AFSOPAQUEMAX, i);
 			strncpy(a, (const char *) bp, i);
 			a[i] = '\0';
@@ -1773,7 +1773,7 @@ vldb_reply_print(netdissect_options *ndo,
 					ND_PRINT((ndo, " %u", j));
 				bp += sizeof(uint32_t);
 			}
-			ND_TCHECK2(bp[0], 8 * sizeof(uint32_t));
+			ND_TCHECK_LEN(bp, 8 * sizeof(uint32_t));
 			bp += 8 * sizeof(uint32_t);
 			ND_PRINT((ndo, " rwvol"));
 			UINTOUT();
@@ -1820,7 +1820,7 @@ vldb_reply_print(netdissect_options *ndo,
 					ND_PRINT((ndo, " %u", j));
 				bp += sizeof(uint32_t);
 			}
-			ND_TCHECK2(bp[0], 13 * sizeof(uint32_t));
+			ND_TCHECK_LEN(bp, 13 * sizeof(uint32_t));
 			bp += 13 * sizeof(uint32_t);
 			ND_PRINT((ndo, " rwvol"));
 			UINTOUT();
@@ -1845,11 +1845,11 @@ vldb_reply_print(netdissect_options *ndo,
 					ND_PRINT((ndo, " afsuuid"));
 					AFSUUIDOUT();
 				} else {
-					ND_TCHECK2(bp[0], 44);
+					ND_TCHECK_LEN(bp, 44);
 					bp += 44;
 				}
 			}
-			ND_TCHECK2(bp[0], 4 * 13);
+			ND_TCHECK_LEN(bp, 4 * 13);
 			bp += 4 * 13;
 			ND_PRINT((ndo, " partitions"));
 			for (i = 0; i < 13; i++) {
@@ -1861,7 +1861,7 @@ vldb_reply_print(netdissect_options *ndo,
 					ND_PRINT((ndo, " %u", j));
 				bp += sizeof(uint32_t);
 			}
-			ND_TCHECK2(bp[0], 13 * sizeof(uint32_t));
+			ND_TCHECK_LEN(bp, 13 * sizeof(uint32_t));
 			bp += 13 * sizeof(uint32_t);
 			ND_PRINT((ndo, " rwvol"));
 			UINTOUT();
@@ -1951,7 +1951,7 @@ kauth_print(netdissect_options *ndo,
 			ND_TCHECK_4(bp);
 			i = EXTRACT_BE_U_4(bp);
 			bp += sizeof(uint32_t);
-			ND_TCHECK2(bp[0], i);
+			ND_TCHECK_LEN(bp, i);
 			bp += i;
 			ND_PRINT((ndo, " principal"));
 			STROUT(KANAMEMAX);
@@ -2718,7 +2718,7 @@ rx_ack_print(netdissect_options *ndo,
 
 	bp += sizeof(struct rx_header);
 
-	ND_TCHECK2(bp[0], sizeof(struct rx_ackPacket));
+	ND_TCHECK_LEN(bp, sizeof(struct rx_ackPacket));
 
 	rxa = (const struct rx_ackPacket *) bp;
 	bp += sizeof(struct rx_ackPacket);
@@ -2759,7 +2759,7 @@ rx_ack_print(netdissect_options *ndo,
 	nAcks = EXTRACT_U_1(rxa->nAcks);
 	if (nAcks != 0) {
 
-		ND_TCHECK2(bp[0], nAcks);
+		ND_TCHECK_LEN(bp, nAcks);
 
 		/*
 		 * Sigh, this is gross, but it seems to work to collapse

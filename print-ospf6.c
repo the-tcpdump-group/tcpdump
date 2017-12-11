@@ -417,7 +417,7 @@ ospf6_print_lsaprefix(netdissect_options *ndo,
 	if (lsa_length < sizeof (*lsapp) - IPV6_ADDR_LEN_BYTES)
 		goto trunc;
 	lsa_length -= sizeof (*lsapp) - IPV6_ADDR_LEN_BYTES;
-	ND_TCHECK2(*lsapp, sizeof (*lsapp) - IPV6_ADDR_LEN_BYTES);
+	ND_TCHECK_LEN(lsapp, sizeof(*lsapp) - IPV6_ADDR_LEN_BYTES);
 	wordlen = (lsapp->lsa_p_len + 31) / 32;
 	if (wordlen * 4 > sizeof(struct in6_addr)) {
 		ND_PRINT((ndo, " bogus prefixlen /%d", lsapp->lsa_p_len));
@@ -867,7 +867,7 @@ ospf6_print_lls(netdissect_options *ndo,
 		goto trunc;
 	cp += 2;
 	/* LLS TLVs */
-	ND_TCHECK2(*cp, llsdatalen - OSPF_LLS_HDRLEN);
+	ND_TCHECK_LEN(cp, llsdatalen - OSPF_LLS_HDRLEN);
 	/* FIXME: code in print-ospf.c can be reused to decode the TLVs */
 
 	return llsdatalen;
@@ -913,7 +913,7 @@ ospf6_decode_at(netdissect_options *ndo,
 	ND_PRINT((ndo, ":%08x", EXTRACT_BE_U_4(cp)));
 	cp += 4;
 	/* Authentication Data */
-	ND_TCHECK2(*cp, authdatalen - OSPF6_AT_HDRLEN);
+	ND_TCHECK_LEN(cp, authdatalen - OSPF6_AT_HDRLEN);
 	if (ndo->ndo_vflag > 1)
 		print_unknown_data(ndo,cp, "\n\tAuthentication Data ", authdatalen - OSPF6_AT_HDRLEN);
 	return 0;

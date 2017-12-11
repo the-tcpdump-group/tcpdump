@@ -605,7 +605,7 @@ lspping_print(netdissect_options *ndo,
             goto tooshort;
 
         /* did we capture enough for fully decoding the tlv header ? */
-        ND_TCHECK2(*tptr, sizeof(struct lspping_tlv_header));
+        ND_TCHECK_LEN(tptr, sizeof(struct lspping_tlv_header));
 
         lspping_tlv_header = (const struct lspping_tlv_header *)tptr;
         lspping_tlv_type=EXTRACT_BE_U_2(lspping_tlv_header->type);
@@ -632,7 +632,7 @@ lspping_print(netdissect_options *ndo,
         if (tlen < lspping_tlv_len+sizeof(struct lspping_tlv_header))
             goto tooshort;
         /* did we capture enough for fully decoding the tlv ? */
-        ND_TCHECK2(*tlv_tptr, lspping_tlv_len);
+        ND_TCHECK_LEN(tlv_tptr, lspping_tlv_len);
         tlv_hexdump=FALSE;
 
         switch(lspping_tlv_type) {
@@ -645,7 +645,7 @@ lspping_print(netdissect_options *ndo,
                     goto tlv_tooshort;
                 }
                 /* did we capture enough for fully decoding the subtlv header ? */
-                ND_TCHECK2(*tlv_tptr, sizeof(struct lspping_tlv_header));
+                ND_TCHECK_LEN(tlv_tptr, sizeof(struct lspping_tlv_header));
                 subtlv_hexdump=FALSE;
 
                 lspping_subtlv_header = (const struct lspping_tlv_header *)tlv_tptr;
@@ -661,7 +661,7 @@ lspping_print(netdissect_options *ndo,
                 }
 
                 /* Did we capture enough for fully decoding the subTLV? */
-                ND_TCHECK2(*subtlv_tptr, lspping_subtlv_len);
+                ND_TCHECK_LEN(subtlv_tptr, lspping_subtlv_len);
 
                 ND_PRINT((ndo, "\n\t    %s subTLV (%u), length: %u",
                        tok2str(lspping_tlvtargetfec_subtlv_values,
@@ -886,7 +886,8 @@ lspping_print(netdissect_options *ndo,
                 goto tlv_tooshort;
             }
             /* Did we capture enough to get the address family? */
-            ND_TCHECK2(*tlv_tptr, sizeof(struct lspping_tlv_downstream_map_t));
+            ND_TCHECK_LEN(tlv_tptr,
+                          sizeof(struct lspping_tlv_downstream_map_t));
 
             tlv_ptr.lspping_tlv_downstream_map= \
                 (const struct lspping_tlv_downstream_map_t *)tlv_tptr;
@@ -912,7 +913,8 @@ lspping_print(netdissect_options *ndo,
                     goto tlv_tooshort;
                 }
                 /* Did we capture enough for this part of the TLV? */
-                ND_TCHECK2(*tlv_tptr, sizeof(struct lspping_tlv_downstream_map_ipv4_t));
+                ND_TCHECK_LEN(tlv_tptr,
+                              sizeof(struct lspping_tlv_downstream_map_ipv4_t));
 
                 tlv_ptr.lspping_tlv_downstream_map_ipv4= \
                     (const struct lspping_tlv_downstream_map_ipv4_t *)tlv_tptr;
@@ -931,7 +933,8 @@ lspping_print(netdissect_options *ndo,
                     goto tlv_tooshort;
                 }
                 /* Did we capture enough for this part of the TLV? */
-                ND_TCHECK2(*tlv_tptr, sizeof(struct lspping_tlv_downstream_map_ipv4_unmb_t));
+                ND_TCHECK_LEN(tlv_tptr,
+                              sizeof(struct lspping_tlv_downstream_map_ipv4_unmb_t));
 
                 tlv_ptr.lspping_tlv_downstream_map_ipv4_unmb= \
                     (const struct lspping_tlv_downstream_map_ipv4_unmb_t *)tlv_tptr;
@@ -950,7 +953,8 @@ lspping_print(netdissect_options *ndo,
                     goto tlv_tooshort;
                 }
                 /* Did we capture enough for this part of the TLV? */
-                ND_TCHECK2(*tlv_tptr, sizeof(struct lspping_tlv_downstream_map_ipv6_t));
+                ND_TCHECK_LEN(tlv_tptr,
+                              sizeof(struct lspping_tlv_downstream_map_ipv6_t));
 
                 tlv_ptr.lspping_tlv_downstream_map_ipv6= \
                     (const struct lspping_tlv_downstream_map_ipv6_t *)tlv_tptr;
@@ -969,7 +973,8 @@ lspping_print(netdissect_options *ndo,
                     goto tlv_tooshort;
                 }
                 /* Did we capture enough for this part of the TLV? */
-                ND_TCHECK2(*tlv_tptr, sizeof(struct lspping_tlv_downstream_map_ipv6_unmb_t));
+                ND_TCHECK_LEN(tlv_tptr,
+                              sizeof(struct lspping_tlv_downstream_map_ipv6_unmb_t));
 
                 tlv_ptr.lspping_tlv_downstream_map_ipv6_unmb= \
                    (const struct lspping_tlv_downstream_map_ipv6_unmb_t *)tlv_tptr;
@@ -993,7 +998,8 @@ lspping_print(netdissect_options *ndo,
                 goto tlv_tooshort;
             }
             /* Did we capture enough for this part of the TLV? */
-            ND_TCHECK2(*tlv_tptr, sizeof(struct lspping_tlv_downstream_map_info_t));
+            ND_TCHECK_LEN(tlv_tptr,
+                          sizeof(struct lspping_tlv_downstream_map_info_t));
 
             tlv_ptr.lspping_tlv_downstream_map_info= \
                 (const struct lspping_tlv_downstream_map_info_t *)tlv_tptr;
@@ -1015,7 +1021,7 @@ lspping_print(netdissect_options *ndo,
                 tlv_hexdump = TRUE;
                 goto tlv_tooshort;
             } else {
-                ND_TCHECK2(*tptr, LSPPING_TLV_BFD_DISCRIMINATOR_LEN);
+                ND_TCHECK_LEN(tptr, LSPPING_TLV_BFD_DISCRIMINATOR_LEN);
                 ND_PRINT((ndo, "\n\t    BFD Discriminator 0x%08x", EXTRACT_BE_U_4(tptr)));
             }
             break;
@@ -1029,7 +1035,7 @@ lspping_print(netdissect_options *ndo,
                 tlv_hexdump = TRUE;
                 goto tlv_tooshort;
             } else {
-                ND_TCHECK2(*tptr, LSPPING_TLV_VENDOR_ENTERPRISE_LEN);
+                ND_TCHECK_LEN(tptr, LSPPING_TLV_VENDOR_ENTERPRISE_LEN);
                 vendor_id = EXTRACT_BE_U_4(tlv_tptr);
                 ND_PRINT((ndo, "\n\t    Vendor: %s (0x%04x)",
                        tok2str(smi_values, "Unknown", vendor_id),

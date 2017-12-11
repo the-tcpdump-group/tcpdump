@@ -261,7 +261,7 @@ lwres_printaddr(netdissect_options *ndo,
 	l = EXTRACT_BE_U_2(&ap->length);
 	/* XXX ap points to packed struct */
 	p = (const char *)&ap->length + sizeof(ap->length);
-	ND_TCHECK2(*p, l);
+	ND_TCHECK_LEN(p, l);
 
 	switch (EXTRACT_BE_U_4(&ap->family)) {
 	case 1:	/* IPv4 */

@@ -128,7 +128,7 @@ vtp_print (netdissect_options *ndo,
 
     tptr = pptr;
 
-    ND_TCHECK2(*tptr, VTP_HEADER_LEN);
+    ND_TCHECK_LEN(tptr, VTP_HEADER_LEN);
 
     type = EXTRACT_U_1(tptr + 1);
     ND_PRINT((ndo, "VTPv%u, Message %s (0x%02x), length %u",
@@ -185,13 +185,13 @@ vtp_print (netdissect_options *ndo,
 	       EXTRACT_BE_U_4(tptr),
 	       ipaddr_string(ndo, tptr+4)));
 	tptr += 8;
-	ND_TCHECK2(*tptr, VTP_UPDATE_TIMESTAMP_LEN);
+	ND_TCHECK_LEN(tptr, VTP_UPDATE_TIMESTAMP_LEN);
 	ND_PRINT((ndo, ", Timestamp 0x%08x 0x%08x 0x%08x",
 	       EXTRACT_BE_U_4(tptr),
 	       EXTRACT_BE_U_4(tptr + 4),
 	       EXTRACT_BE_U_4(tptr + 8)));
 	tptr += VTP_UPDATE_TIMESTAMP_LEN;
-	ND_TCHECK2(*tptr, VTP_MD5_DIGEST_LEN);
+	ND_TCHECK_LEN(tptr, VTP_MD5_DIGEST_LEN);
 	ND_PRINT((ndo, ", MD5 digest: %08x%08x%08x%08x",
 	       EXTRACT_BE_U_4(tptr),
 	       EXTRACT_BE_U_4(tptr + 4),
@@ -248,7 +248,7 @@ vtp_print (netdissect_options *ndo,
 	    if (len == 0)
 		break;
 
-	    ND_TCHECK2(*tptr, len);
+	    ND_TCHECK_LEN(tptr, len);
 
 	    vtp_vlan = (const struct vtp_vlan_*)tptr;
 	    if (len < VTP_VLAN_INFO_FIXED_PART_LEN)
@@ -264,7 +264,7 @@ vtp_print (netdissect_options *ndo,
 	    tptr += VTP_VLAN_INFO_FIXED_PART_LEN;
 	    if (len < 4*((vtp_vlan->name_len + 3)/4))
 		goto trunc;
-	    ND_TCHECK2(*tptr, vtp_vlan->name_len);
+	    ND_TCHECK_LEN(tptr, vtp_vlan->name_len);
 	    fn_printzp(ndo, tptr, vtp_vlan->name_len, NULL);
 
 	    /*
@@ -298,7 +298,7 @@ vtp_print (netdissect_options *ndo,
                     ND_PRINT((ndo, " (TLV goes past the end of the packet)"));
                     return;
                 }
-                ND_TCHECK2(*tptr, tlv_len * 2 +2);
+                ND_TCHECK_LEN(tptr, tlv_len * 2 + 2);
 
                 /*
                  * We assume the value is a 2-byte integer; the length is

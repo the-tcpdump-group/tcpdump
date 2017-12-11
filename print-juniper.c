@@ -1232,7 +1232,7 @@ juniper_parse_header(netdissect_options *ndo,
         if (ndo->ndo_vflag > 1)
             ND_PRINT((ndo, ", PCAP Extension(s) total length %u", jnx_ext_len));
 
-        ND_TCHECK2(tptr[0], jnx_ext_len);
+        ND_TCHECK_LEN(tptr, jnx_ext_len);
         while (jnx_ext_len > JUNIPER_EXT_TLV_OVERHEAD) {
             tlv_type = EXTRACT_U_1(tptr);
             tptr++;
@@ -1357,7 +1357,7 @@ juniper_parse_header(netdissect_options *ndo,
                        l2info->cookie_len));
 
             if (l2info->cookie_len > 0) {
-                ND_TCHECK2(p[0], l2info->cookie_len);
+                ND_TCHECK_LEN(p, l2info->cookie_len);
                 if (ndo->ndo_eflag)
                     ND_PRINT((ndo, ", cookie 0x"));
                 for (idx = 0; idx < l2info->cookie_len; idx++) {

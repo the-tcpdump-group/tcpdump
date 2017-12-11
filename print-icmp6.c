@@ -663,7 +663,7 @@ rpl_dio_printopt(netdissect_options *ndo,
 
         while((opt->rpl_dio_type == RPL_OPT_PAD0 &&
                (const u_char *)opt < ndo->ndo_snapend) ||
-              ND_TTEST2(*opt,(opt->rpl_dio_len+2))) {
+              ND_TTEST_LEN(opt, (opt->rpl_dio_len + 2))) {
 
                 unsigned int optlen = opt->rpl_dio_len+2;
                 if(opt->rpl_dio_type == RPL_OPT_PAD0) {
@@ -772,7 +772,7 @@ rpl_daoack_print(netdissect_options *ndo,
         const struct nd_rpl_daoack *daoack = (const struct nd_rpl_daoack *)bp;
         const char *dagid_str = "<elided>";
 
-        ND_TCHECK2(*daoack, ND_RPL_DAOACK_MIN_LEN);
+        ND_TCHECK_LEN(daoack, ND_RPL_DAOACK_MIN_LEN);
         if (length < ND_RPL_DAOACK_MIN_LEN)
         	goto tooshort;
 
@@ -890,7 +890,7 @@ icmp6_print(netdissect_options *ndo,
 	if (ndo->ndo_vflag && !fragmented) {
 		uint16_t sum, udp_sum;
 
-		if (ND_TTEST2(bp[0], length)) {
+		if (ND_TTEST_LEN(bp, length)) {
 			udp_sum = EXTRACT_BE_U_2(&dp->icmp6_cksum);
 			sum = icmp6_cksum(ndo, ip, dp, length);
 			if (sum != 0)
@@ -1432,7 +1432,7 @@ mldv2_report_print(netdissect_options *ndo, const u_char *bp, u_int len)
                     ND_PRINT((ndo," [invalid number of groups]"));
                     return;
 	    }
-            ND_TCHECK2(bp[group + 4], sizeof(struct in6_addr));
+            ND_TCHECK_LEN(bp + 4 + group, sizeof(struct in6_addr));
             ND_PRINT((ndo," [gaddr %s", ip6addr_string(ndo, bp + group + 4)));
 	    ND_PRINT((ndo," %s", tok2str(mldv2report2str, " [v2-report-#%d]",
                                          EXTRACT_U_1(bp + group))));
@@ -1449,8 +1449,8 @@ mldv2_report_print(netdissect_options *ndo, const u_char *bp, u_int len)
 		/* Print the sources */
                     ND_PRINT((ndo," {"));
                 for (j = 0; j < nsrcs; j++) {
-                    ND_TCHECK2(bp[group + 20 + j * sizeof(struct in6_addr)],
-                            sizeof(struct in6_addr));
+                    ND_TCHECK_LEN(bp + group + 20 + (j * sizeof(struct in6_addr)),
+                                  sizeof(struct in6_addr));
 		    ND_PRINT((ndo," %s", ip6addr_string(ndo, bp + group + 20 + (j * sizeof(struct in6_addr)))));
 		}
                 ND_PRINT((ndo," }"));
@@ -1490,7 +1490,7 @@ mldv2_query_print(netdissect_options *ndo, const u_char *bp, u_int len)
     if (ndo->ndo_vflag) {
             ND_PRINT((ndo," [max resp delay=%d]", mrt));
     }
-    ND_TCHECK2(bp[8], sizeof(struct in6_addr));
+    ND_TCHECK_LEN(bp + 8, sizeof(struct in6_addr));
     ND_PRINT((ndo," [gaddr %s", ip6addr_string(ndo, bp + 8)));
 
     if (ndo->ndo_vflag) {
@@ -1518,8 +1518,8 @@ mldv2_query_print(netdissect_options *ndo, const u_char *bp, u_int len)
 	else if (ndo->ndo_vflag > 1) {
 	    ND_PRINT((ndo," {"));
 	    for (i = 0; i < nsrcs; i++) {
-		ND_TCHECK2(bp[28 + i * sizeof(struct in6_addr)],
-                        sizeof(struct in6_addr));
+		ND_TCHECK_LEN(bp + 28 + (i * sizeof(struct in6_addr)),
+                              sizeof(struct in6_addr));
 		ND_PRINT((ndo," %s", ip6addr_string(ndo, bp + 28 + (i * sizeof(struct in6_addr)))));
 	    }
 	    ND_PRINT((ndo," }"));
@@ -1594,7 +1594,7 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 		}
 		ND_PRINT((ndo," node information query"));
 
-		ND_TCHECK2(*dp, sizeof(*ni6));
+		ND_TCHECK_LEN(dp, sizeof(*ni6));
 		ni6 = (const struct icmp6_nodeinfo *)dp;
 		ND_PRINT((ndo," ("));	/*)*/
 		switch (EXTRACT_BE_U_2(&ni6->ni_qtype)) {
@@ -1650,8 +1650,7 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 
 		switch (ni6->ni_code) {
 		case ICMP6_NI_SUBJ_IPV6:
-			if (!ND_TTEST2(*dp,
-			    sizeof(*ni6) + sizeof(struct in6_addr)))
+			if (!ND_TTEST_LEN(dp, sizeof(*ni6) + sizeof(struct in6_addr)))
 				break;
 			if (siz != sizeof(*ni6) + sizeof(struct in6_addr)) {
 				if (ndo->ndo_vflag)
@@ -1679,7 +1678,7 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 				dnsname_print(ndo, cp, ep);
 			break;
 		case ICMP6_NI_SUBJ_IPV4:
-			if (!ND_TTEST2(*dp, sizeof(*ni6) + sizeof(struct in_addr)))
+			if (!ND_TTEST_LEN(dp, sizeof(*ni6) + sizeof(struct in_addr)))
 				break;
 			if (siz != sizeof(*ni6) + sizeof(struct in_addr)) {
 				if (ndo->ndo_vflag)
@@ -1706,7 +1705,7 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 
 		needcomma = 0;
 
-		ND_TCHECK2(*dp, sizeof(*ni6));
+		ND_TCHECK_LEN(dp, sizeof(*ni6));
 		ni6 = (const struct icmp6_nodeinfo *)dp;
 		ND_PRINT((ndo," node information reply"));
 		ND_PRINT((ndo," ("));	/*)*/
