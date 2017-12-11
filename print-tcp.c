@@ -76,8 +76,8 @@ struct tha {
 struct tcp_seq_hash {
         struct tcp_seq_hash *nxt;
         struct tha addr;
-        tcp_seq seq;
-        tcp_seq ack;
+        uint32_t seq;
+        uint32_t ack;
 };
 
 struct tha6 {
@@ -89,8 +89,8 @@ struct tha6 {
 struct tcp_seq_hash6 {
         struct tcp_seq_hash6 *nxt;
         struct tha6 addr;
-        tcp_seq seq;
-        tcp_seq ack;
+        uint32_t seq;
+        uint32_t ack;
 };
 
 #define TSEQ_HASHSIZE 919
@@ -238,7 +238,7 @@ tcp_print(netdissect_options *ndo,
                 return;
         }
 
-        flags = tp->th_flags;
+        flags = EXTRACT_U_1(tp->th_flags);
         ND_PRINT((ndo, "Flags [%s]", bittok2str_nosep(tcp_flag_values, "none", flags)));
 
         if (!ndo->ndo_Sflag && (flags & TH_ACK)) {
