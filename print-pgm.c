@@ -192,7 +192,7 @@ pgm_print(netdissect_options *ndo,
 				tcpport_string(ndo, sport), tcpport_string(ndo, dport)));
 		}
 	} else {
-		if (ip->ip_p == IPPROTO_PGM) {
+		if (EXTRACT_U_1(ip->ip_p) == IPPROTO_PGM) {
 			ND_PRINT((ndo, "%s.%s > %s.%s: ",
 				ipaddr_string(ndo, &ip->ip_src),
 				tcpport_string(ndo, sport),
@@ -446,11 +446,11 @@ pgm_print(netdissect_options *ndo,
 		return;
 	    }
 	    opts_len = EXTRACT_BE_U_2(bp);
+	    bp += sizeof(uint16_t);
 	    if (opts_len < 4) {
 		ND_PRINT((ndo, "[Bad total option length %u < 4]", opts_len));
 		return;
 	    }
-	    bp += sizeof(uint16_t);
 	    ND_PRINT((ndo, " OPTS LEN %d", opts_len));
 	    opts_len -= 4;
 

@@ -205,8 +205,7 @@ typedef struct map_register_eid {
 	nd_uint8_t eid_prefix_mask_length;
 	nd_uint8_t act_auth_inc_res;
 	nd_uint8_t reserved;
-	nd_uint8_t reserved_version_hi;
-	nd_uint8_t version_low;
+	nd_uint16_t reserved_and_version;
 	nd_uint16_t eid_prefix_afi;
 } lisp_map_register_eid;
 
@@ -232,6 +231,7 @@ static void loc_hdr_flag(netdissect_options *, uint16_t);
 void
 lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
+	uint8_t type_and_flag;
 	uint8_t type;
 	uint8_t mask_len;
 	uint8_t loc_count;
@@ -255,21 +255,22 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	lisp_hdr = (const lisp_map_register_hdr *) bp;
 	lisp_hdr_flag(ndo, lisp_hdr);
 	/* Supporting only MAP NOTIFY and MAP REGISTER LISP packets */
-	type = extract_lisp_type(lisp_hdr->type_and_flag);
+	type_and_flag = EXTRACT_U_1(lisp_hdr->type_and_flag);
+	type = extract_lisp_type(type_and_flag);
 	if ((type != LISP_MAP_REGISTER) && (type != LISP_MAP_NOTIFY))
 		return;
 
 	/* Find if the packet contains xTR and Site-ID data */
-	xtr_present = is_xtr_data_present(type, lisp_hdr->type_and_flag);
+	xtr_present = is_xtr_data_present(type, type_and_flag);
 
 	/* Extract the number of EID records present */
-	auth_data_len = EXTRACT_BE_U_2(&lisp_hdr->auth_data_len);
+	auth_data_len = EXTRACT_BE_U_2(lisp_hdr->auth_data_len);
 	packet_iterator = (const u_char *)(lisp_hdr);
 	packet_offset = MAP_REGISTER_HDR_LEN;
-	record_count = lisp_hdr->record_count;
+	record_count = EXTRACT_U_1(lisp_hdr->record_count);
 
 	if (ndo->ndo_vflag) {
-		key_id = EXTRACT_BE_U_2(&lisp_hdr->key_id);
+		key_id = EXTRACT_BE_U_2(lisp_hdr->key_id);
 		ND_PRINT((ndo, "\n    %u record(s), ", record_count));
 		ND_PRINT((ndo, "Authentication %s,",
 			tok2str(auth_type, "unknown-type", key_id)));
@@ -291,16 +292,15 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		lisp_eid = (const lisp_map_register_eid *)
 				((const u_char *)lisp_hdr + packet_offset);
 		packet_offset += MAP_REGISTER_EID_LEN;
-		mask_len = lisp_eid->eid_prefix_mask_length;
-		eid_afi = EXTRACT_BE_U_2(&lisp_eid->eid_prefix_afi);
-		loc_count = lisp_eid->locator_count;
+		mask_len = EXTRACT_U_1(lisp_eid->eid_prefix_mask_length);
+		eid_afi = EXTRACT_BE_U_2(lisp_eid->eid_prefix_afi);
+		loc_count = EXTRACT_U_1(lisp_eid->locator_count);
 
 		if (ndo->ndo_vflag) {
-			ttl = EXTRACT_BE_U_4(&lisp_eid->ttl);
+			ttl = EXTRACT_BE_U_4(lisp_eid->ttl);
 			ND_PRINT((ndo, "      Record TTL %u,", ttl));
-			action_flag(ndo, lisp_eid->act_auth_inc_res);
-			map_version = (((lisp_eid->reserved_version_hi) & 15 ) * 255) +
-					lisp_eid->version_low;
+			action_flag(ndo, EXTRACT_U_1(lisp_eid->act_auth_inc_res));
+			map_version = EXTRACT_BE_U_2(lisp_eid->reserved_and_version) & 0x0FFF;
 			ND_PRINT((ndo, " Map Version: %u,", map_version));
 		}
 
@@ -332,7 +332,7 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			lisp_loc = (const lisp_map_register_loc *) (packet_iterator + packet_offset);
 			loc_ip_pointer = (const u_char *) (lisp_loc + 1);
 			packet_offset += MAP_REGISTER_LOC_LEN;
-			loc_afi = EXTRACT_BE_U_2(&lisp_loc->locator_afi);
+			loc_afi = EXTRACT_BE_U_2(lisp_loc->locator_afi);
 
 			if (ndo->ndo_vflag)
 				ND_PRINT((ndo, "\n       "));
@@ -354,10 +354,12 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			if (ndo->ndo_vflag) {
 				ND_PRINT((ndo, "\n          Priority/Weight %u/%u,"
 						" Multicast Priority/Weight %u/%u,",
-						lisp_loc->priority, lisp_loc->weight,
-						lisp_loc->m_priority, lisp_loc->m_weight));
+						EXTRACT_U_1(lisp_loc->priority),
+						EXTRACT_U_1(lisp_loc->weight),
+						EXTRACT_U_1(lisp_loc->m_priority),
+						EXTRACT_U_1(lisp_loc->m_weight)));
 				loc_hdr_flag(ndo,
-					     EXTRACT_BE_U_2(&lisp_loc->unused_and_flag));
+					     EXTRACT_BE_U_2(lisp_loc->unused_and_flag));
 			}
 		}
 	}
@@ -408,7 +410,7 @@ static inline uint8_t is_xtr_data_present(uint8_t type, uint8_t lisp_hdr_flags)
 
 static void lisp_hdr_flag(netdissect_options *ndo, const lisp_map_register_hdr *lisp_hdr)
 {
-	uint8_t type = extract_lisp_type(lisp_hdr->type_and_flag);
+	uint8_t type = extract_lisp_type(EXTRACT_U_1(lisp_hdr->type_and_flag));
 
 	if (!ndo->ndo_vflag) {
 		ND_PRINT((ndo, "%s,", tok2str(lisp_type, "unknown-type-%u", type)));

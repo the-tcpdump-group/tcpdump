@@ -24,6 +24,14 @@
 
 /* \summary: Network Time Protocol (NTP) printer */
 
+/*
+ * specification:
+ *
+ * RFC 1119 - NTPv2
+ * RFC 1305 - NTPv3
+ * RFC 5905 - NTPv4
+ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -256,20 +264,23 @@ static void
 ntp_time_print(netdissect_options *ndo,
 	       register const struct ntp_time_data *bp, u_int length)
 {
+	uint8_t stratum;
+
 	if (length < NTP_TIMEMSG_MINLEN)
 		goto invalid;
 
-	ND_TCHECK(bp->stratum);
+	ND_TCHECK_1(bp->stratum);
+	stratum = EXTRACT_U_1(bp->stratum);
 	ND_PRINT((ndo, ", Stratum %u (%s)",
-		bp->stratum,
-		tok2str(ntp_stratum_values, (bp->stratum >=2 && bp->stratum<=15) ? "secondary reference" : "reserved", bp->stratum)));
+		stratum,
+		tok2str(ntp_stratum_values, (stratum >=2 && stratum<=15) ? "secondary reference" : "reserved", stratum)));
 
-	ND_TCHECK(bp->ppoll);
-	ND_PRINT((ndo, ", poll %d", bp->ppoll));
-	p_poll(ndo, bp->ppoll);
+	ND_TCHECK_1(bp->ppoll);
+	ND_PRINT((ndo, ", poll %d", EXTRACT_S_1(bp->ppoll)));
+	p_poll(ndo, EXTRACT_U_1(bp->ppoll));
 
-	ND_TCHECK(bp->precision);
-	ND_PRINT((ndo, ", precision %d", bp->precision));
+	ND_TCHECK_1(bp->precision);
+	ND_PRINT((ndo, ", precision %d", EXTRACT_S_1(bp->precision)));
 
 	ND_TCHECK(bp->root_delay);
 	ND_PRINT((ndo, "\n\tRoot Delay: "));
@@ -282,7 +293,7 @@ ntp_time_print(netdissect_options *ndo,
 	ND_TCHECK(bp->refid);
 	ND_PRINT((ndo, ", Reference-ID: "));
 	/* Interpretation depends on stratum */
-	switch (bp->stratum) {
+	switch (stratum) {
 
 	case UNSPECIFIED:
 		ND_PRINT((ndo, "(unspec)"));
@@ -334,11 +345,11 @@ ntp_time_print(netdissect_options *ndo,
 
 	/* FIXME: this code is not aware of any extension fields */
 	if (length == NTP_TIMEMSG_MINLEN + 4) { 	/* Optional: key-id (crypto-NAK) */
-		ND_TCHECK(bp->key_id);
-		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_BE_U_4(&bp->key_id)));
+		ND_TCHECK_4(bp->key_id);
+		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_BE_U_4(bp->key_id)));
 	} else if (length == NTP_TIMEMSG_MINLEN + 4 + 16) { 	/* Optional: key-id + 128-bit digest */
-		ND_TCHECK(bp->key_id);
-		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_BE_U_4(&bp->key_id)));
+		ND_TCHECK_4(bp->key_id);
+		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_BE_U_4(bp->key_id)));
 		ND_TCHECK2(bp->message_digest, 16);
                 ND_PRINT((ndo, "\n\tAuthentication: %08x%08x%08x%08x",
         		       EXTRACT_BE_U_4(bp->message_digest),
@@ -346,8 +357,8 @@ ntp_time_print(netdissect_options *ndo,
         		       EXTRACT_BE_U_4(bp->message_digest + 8),
         		       EXTRACT_BE_U_4(bp->message_digest + 12)));
 	} else if (length == NTP_TIMEMSG_MINLEN + 4 + 20) { 	/* Optional: key-id + 160-bit digest */
-		ND_TCHECK(bp->key_id);
-		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_BE_U_4(&bp->key_id)));
+		ND_TCHECK_4(bp->key_id);
+		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_BE_U_4(bp->key_id)));
 		ND_TCHECK2(bp->message_digest, 20);
 		ND_PRINT((ndo, "\n\tAuthentication: %08x%08x%08x%08x%08x",
 		               EXTRACT_BE_U_4(bp->message_digest),
@@ -376,39 +387,40 @@ static void
 ntp_control_print(netdissect_options *ndo,
 		  register const struct ntp_control_data *cd, u_int length)
 {
-	u_char R, E, M, opcode;
+	u_int8_t control, R, E, M, opcode;
 	uint16_t sequence, status, assoc, offset, count;
 
 	if (length < NTP_CTRLMSG_MINLEN)
 		goto invalid;
 
-	ND_TCHECK(cd->control);
-	R = (cd->control & 0x80) != 0;
-	E = (cd->control & 0x40) != 0;
-	M = (cd->control & 0x20) != 0;
-	opcode = cd->control & 0x1f;
+	ND_TCHECK_1(cd->control);
+	control = EXTRACT_U_1(cd->control);
+	R = (control & 0x80) != 0;
+	E = (control & 0x40) != 0;
+	M = (control & 0x20) != 0;
+	opcode = control & 0x1f;
 	ND_PRINT((ndo, ", %s, %s, %s, OpCode=%u\n",
 		  R ? "Response" : "Request", E ? "Error" : "OK",
-		  M ? "More" : "Last", (unsigned)opcode));
+		  M ? "More" : "Last", opcode));
 
-	ND_TCHECK(cd->sequence);
-	sequence = EXTRACT_BE_U_2(&cd->sequence);
+	ND_TCHECK_2(cd->sequence);
+	sequence = EXTRACT_BE_U_2(cd->sequence);
 	ND_PRINT((ndo, "\tSequence=%hu", sequence));
 
-	ND_TCHECK(cd->status);
-	status = EXTRACT_BE_U_2(&cd->status);
+	ND_TCHECK_2(cd->status);
+	status = EXTRACT_BE_U_2(cd->status);
 	ND_PRINT((ndo, ", Status=%#hx", status));
 
-	ND_TCHECK(cd->assoc);
-	assoc = EXTRACT_BE_U_2(&cd->assoc);
+	ND_TCHECK_2(cd->assoc);
+	assoc = EXTRACT_BE_U_2(cd->assoc);
 	ND_PRINT((ndo, ", Assoc.=%hu", assoc));
 
-	ND_TCHECK(cd->offset);
-	offset = EXTRACT_BE_U_2(&cd->offset);
+	ND_TCHECK_2(cd->offset);
+	offset = EXTRACT_BE_U_2(cd->offset);
 	ND_PRINT((ndo, ", Offset=%hu", offset));
 
-	ND_TCHECK(cd->count);
-	count = EXTRACT_BE_U_2(&cd->count);
+	ND_TCHECK_2(cd->count);
+	count = EXTRACT_BE_U_2(cd->count);
 	ND_PRINT((ndo, ", Count=%hu", count));
 
 	if (NTP_CTRLMSG_MINLEN + count > length)
@@ -442,13 +454,15 @@ ntp_print(netdissect_options *ndo,
 {
 	register const union ntpdata *bp = (const union ntpdata *)cp;
 	int mode, version, leapind;
+	uint8_t status;
 
 	ND_TCHECK(bp->td.status);
+	status = EXTRACT_U_1(bp->td.status);
 
-	version = (bp->td.status & VERSIONMASK) >> VERSIONSHIFT;
+	version = (status & VERSIONMASK) >> VERSIONSHIFT;
 	ND_PRINT((ndo, "NTPv%d", version));
 
-	mode = (bp->td.status & MODEMASK) >> MODESHIFT;
+	mode = (status & MODEMASK) >> MODESHIFT;
 	if (!ndo->ndo_vflag) {
 		ND_PRINT((ndo, ", %s, length %u",
 		          tok2str(ntp_mode_values, "Unknown mode", mode),
@@ -459,8 +473,8 @@ ntp_print(netdissect_options *ndo,
 	ND_PRINT((ndo, ", %s, length %u\n",
 	          tok2str(ntp_mode_values, "Unknown mode", mode), length));
 
-	/* leapind = (bp->td.status & LEAPMASK) >> LEAPSHIFT; */
-	leapind = (bp->td.status & LEAPMASK);
+	/* leapind = (status & LEAPMASK) >> LEAPSHIFT; */
+	leapind = (status & LEAPMASK);
 	ND_PRINT((ndo, "\tLeap indicator: %s (%u)",
 	          tok2str(ntp_leapind_values, "Unknown", leapind),
 	          leapind));

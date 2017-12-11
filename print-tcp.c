@@ -202,7 +202,7 @@ tcp_print(netdissect_options *ndo,
                                      tcpport_string(ndo, sport), tcpport_string(ndo, dport)));
                 }
         } else {
-                if (ip->ip_p == IPPROTO_TCP) {
+                if (EXTRACT_U_1(ip->ip_p) == IPPROTO_TCP) {
                         ND_PRINT((ndo, "%s.%s > %s.%s: ",
                                      ipaddr_string(ndo, &ip->ip_src),
                                      tcpport_string(ndo, sport),

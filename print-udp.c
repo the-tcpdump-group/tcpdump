@@ -344,7 +344,7 @@ udpipaddr_print(netdissect_options *ndo, const struct ip *ip, int sport, int dpo
 			}
 		}
 	} else {
-		if (ip->ip_p == IPPROTO_UDP) {
+		if (EXTRACT_U_1(ip->ip_p) == IPPROTO_UDP) {
 			if (sport == -1) {
 				ND_PRINT((ndo, "%s > %s: ",
 					ipaddr_string(ndo, &ip->ip_src),

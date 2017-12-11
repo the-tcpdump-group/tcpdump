@@ -64,7 +64,7 @@ rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 
 		ND_TCHECK(dp0->ip6r0_reserved);
 		if (EXTRACT_BE_U_4(dp0->ip6r0_reserved) || ndo->ndo_vflag) {
 			ND_PRINT((ndo, ", rsv=0x%0x",
-			    EXTRACT_BE_U_4(&dp0->ip6r0_reserved)));
+			    EXTRACT_BE_U_4(dp0->ip6r0_reserved)));
 		}
 
 		if (len % 2 == 1)
@@ -80,7 +80,7 @@ rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 
 		}
 		/*(*/
 		ND_PRINT((ndo, ") "));
-		return((dp0->ip6r0_len + 1) << 3);
+		return((EXTRACT_U_1(dp0->ip6r0_len) + 1) << 3);
 		break;
 	default:
 		goto trunc;

@@ -792,6 +792,7 @@ dhcp6_print(netdissect_options *ndo,
 {
 	const struct dhcp6 *dh6;
 	const struct dhcp6_relay *dh6relay;
+	uint8_t msgtype;
 	const u_char *ep;
 	const u_char *extp;
 	const char *name;
@@ -805,7 +806,8 @@ dhcp6_print(netdissect_options *ndo,
 	dh6 = (const struct dhcp6 *)cp;
 	dh6relay = (const struct dhcp6_relay *)cp;
 	ND_TCHECK(dh6->dh6_xid);
-	name = tok2str(dh6_msgtype_str, "msgtype-%u", dh6->dh6_msgtype);
+	msgtype = EXTRACT_U_1(dh6->dh6_msgtype);
+	name = tok2str(dh6_msgtype_str, "msgtype-%u", msgtype);
 
 	if (!ndo->ndo_vflag) {
 		ND_PRINT((ndo, " %s", name));
@@ -815,9 +817,8 @@ dhcp6_print(netdissect_options *ndo,
 	/* XXX relay agent messages have to be handled differently */
 
 	ND_PRINT((ndo, " %s (", name));	/*)*/
-	if (dh6->dh6_msgtype != DH6_RELAY_FORW &&
-	    dh6->dh6_msgtype != DH6_RELAY_REPLY) {
-		ND_PRINT((ndo, "xid=%x", EXTRACT_BE_U_4(&dh6->dh6_xid) & DH6_XIDMASK));
+	if (msgtype != DH6_RELAY_FORW && msgtype != DH6_RELAY_REPLY) {
+		ND_PRINT((ndo, "xid=%x", EXTRACT_BE_U_4(dh6->dh6_xid) & DH6_XIDMASK));
 		extp = (const u_char *)(dh6 + 1);
 		dhcp6opt_print(ndo, extp, ep);
 	} else {		/* relay messages */

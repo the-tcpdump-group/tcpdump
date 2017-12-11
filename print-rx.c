@@ -112,15 +112,18 @@ struct rx_header {
 #define RX_MAXACKS 255
 
 struct rx_ackPacket {
-	uint16_t bufferSpace;		/* Number of packet buffers available */
-	uint16_t maxSkew;		/* Max diff between ack'd packet and */
+	nd_uint16_t bufferSpace;	/* Number of packet buffers available */
+	nd_uint16_t maxSkew;		/* Max diff between ack'd packet and */
 					/* highest packet received */
-	uint32_t firstPacket;		/* The first packet in ack list */
-	uint32_t previousPacket;	/* Previous packet recv'd (obsolete) */
-	uint32_t serial;		/* # of packet that prompted the ack */
-	uint8_t reason;		/* Reason for acknowledgement */
-	uint8_t nAcks;			/* Number of acknowledgements */
+	nd_uint32_t firstPacket;	/* The first packet in ack list */
+	nd_uint32_t previousPacket;	/* Previous packet recv'd (obsolete) */
+	nd_uint32_t serial;		/* # of packet that prompted the ack */
+	nd_uint8_t reason;		/* Reason for acknowledgement */
+	nd_uint8_t nAcks;		/* Number of acknowledgements */
+	/* Followed by nAcks acknowledgments */
+#if 0
 	uint8_t acks[RX_MAXACKS];	/* Up to RX_MAXACKS acknowledgements */
+#endif
 };
 
 /*
@@ -528,6 +531,7 @@ rx_print(netdissect_options *ndo,
 {
 	register const struct rx_header *rxh;
 	uint32_t i;
+	uint8_t type, flags;
 	uint32_t opcode;
 
 	if (!ND_TTEST2(*bp, sizeof (struct rx_header))) {
@@ -537,30 +541,32 @@ rx_print(netdissect_options *ndo,
 
 	rxh = (const struct rx_header *) bp;
 
-	ND_PRINT((ndo, " rx %s", tok2str(rx_types, "type %u", rxh->type)));
+	type = EXTRACT_U_1(rxh->type);
+	ND_PRINT((ndo, " rx %s", tok2str(rx_types, "type %u", type)));
 
+	flags = EXTRACT_U_1(rxh->flags);
 	if (ndo->ndo_vflag) {
 		int firstflag = 0;
 
 		if (ndo->ndo_vflag > 1)
 			ND_PRINT((ndo, " cid %08x call# %u",
-			       EXTRACT_BE_U_4(&rxh->cid),
-			       EXTRACT_BE_U_4(&rxh->callNumber)));
+			       EXTRACT_BE_U_4(rxh->cid),
+			       EXTRACT_BE_U_4(rxh->callNumber)));
 
 		ND_PRINT((ndo, " seq %u ser %u",
-		       EXTRACT_BE_U_4(&rxh->seq),
-		       EXTRACT_BE_U_4(&rxh->serial)));
+		       EXTRACT_BE_U_4(rxh->seq),
+		       EXTRACT_BE_U_4(rxh->serial)));
 
 		if (ndo->ndo_vflag > 2)
 			ND_PRINT((ndo, " secindex %u serviceid %hu",
-				rxh->securityIndex,
-				EXTRACT_BE_U_2(&rxh->serviceId)));
+				EXTRACT_U_1(rxh->securityIndex),
+				EXTRACT_BE_U_2(rxh->serviceId)));
 
 		if (ndo->ndo_vflag > 1)
 			for (i = 0; i < NUM_RX_FLAGS; i++) {
-				if (rxh->flags & rx_flags[i].flag &&
+				if (flags & rx_flags[i].flag &&
 				    (!rx_flags[i].packetType ||
-				     rxh->type == rx_flags[i].packetType)) {
+				     type == rx_flags[i].packetType)) {
 					if (!firstflag) {
 						firstflag = 1;
 						ND_PRINT((ndo, " "));
@@ -581,9 +587,9 @@ rx_print(netdissect_options *ndo,
 	 * as well.
 	 */
 
-	if (rxh->type == RX_PACKET_TYPE_DATA &&
-	    EXTRACT_BE_U_4(&rxh->seq) == 1 &&
-	    rxh->flags & RX_CLIENT_INITIATED) {
+	if (type == RX_PACKET_TYPE_DATA &&
+	    EXTRACT_BE_U_4(rxh->seq) == 1 &&
+	    flags & RX_CLIENT_INITIATED) {
 
 		/*
 		 * Insert this call into the call cache table, so we
@@ -625,10 +631,10 @@ rx_print(netdissect_options *ndo,
 	 * because printing out the return code can be useful at times.
 	 */
 
-	} else if (((rxh->type == RX_PACKET_TYPE_DATA &&
-					EXTRACT_BE_U_4(&rxh->seq) == 1) ||
-		    rxh->type == RX_PACKET_TYPE_ABORT) &&
-		   (rxh->flags & RX_CLIENT_INITIATED) == 0 &&
+	} else if (((type == RX_PACKET_TYPE_DATA &&
+					EXTRACT_BE_U_4(rxh->seq) == 1) ||
+		    type == RX_PACKET_TYPE_ABORT) &&
+		   (flags & RX_CLIENT_INITIATED) == 0 &&
 		   rx_cache_find(rxh, (const struct ip *) bp2,
 				 sport, &opcode)) {
 
@@ -664,7 +670,7 @@ rx_print(netdissect_options *ndo,
 	 * ack packet, so we can use one for all AFS services)
 	 */
 
-	} else if (rxh->type == RX_PACKET_TYPE_ACK)
+	} else if (type == RX_PACKET_TYPE_ACK)
 		rx_ack_print(ndo, bp, length);
 
 
@@ -690,11 +696,11 @@ rx_cache_insert(netdissect_options *ndo,
 	if (++rx_cache_next >= RX_CACHE_SIZE)
 		rx_cache_next = 0;
 
-	rxent->callnum = EXTRACT_BE_U_4(&rxh->callNumber);
+	rxent->callnum = EXTRACT_BE_U_4(rxh->callNumber);
 	UNALIGNED_MEMCPY(&rxent->client, &ip->ip_src, sizeof(uint32_t));
 	UNALIGNED_MEMCPY(&rxent->server, &ip->ip_dst, sizeof(uint32_t));
 	rxent->dport = dport;
-	rxent->serviceId = EXTRACT_BE_U_4(&rxh->serviceId);
+	rxent->serviceId = EXTRACT_BE_U_4(rxh->serviceId);
 	rxent->opcode = EXTRACT_BE_U_4(bp + sizeof(struct rx_header));
 }
 
@@ -722,10 +728,10 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, u_int sport,
 	i = rx_cache_hint;
 	do {
 		rxent = &rx_cache[i];
-		if (rxent->callnum == EXTRACT_BE_U_4(&rxh->callNumber) &&
+		if (rxent->callnum == EXTRACT_BE_U_4(rxh->callNumber) &&
 		    rxent->client.s_addr == clip &&
 		    rxent->server.s_addr == sip &&
-		    rxent->serviceId == EXTRACT_BE_U_4(&rxh->serviceId) &&
+		    rxent->serviceId == EXTRACT_BE_U_4(rxh->serviceId) &&
 		    rxent->dport == sport) {
 
 			/* We got a match! */
@@ -1057,6 +1063,7 @@ fs_reply_print(netdissect_options *ndo,
 {
 	uint32_t i;
 	const struct rx_header *rxh;
+	uint8_t type;
 
 	if (length <= sizeof(struct rx_header))
 		return;
@@ -1070,13 +1077,14 @@ fs_reply_print(netdissect_options *ndo,
 
 	ND_PRINT((ndo, " fs reply %s", tok2str(fs_req, "op#%u", opcode)));
 
+	type = EXTRACT_U_1(rxh->type);
 	bp += sizeof(struct rx_header);
 
 	/*
 	 * If it was a data packet, interpret the response
 	 */
 
-	if (rxh->type == RX_PACKET_TYPE_DATA) {
+	if (type == RX_PACKET_TYPE_DATA) {
 		switch (opcode) {
 		case 131:	/* Fetch ACL */
 		{
@@ -1106,7 +1114,7 @@ fs_reply_print(netdissect_options *ndo,
 		default:
 			;
 		}
-	} else if (rxh->type == RX_PACKET_TYPE_ABORT) {
+	} else if (type == RX_PACKET_TYPE_ABORT) {
 		/*
 		 * Otherwise, just print out the return code
 		 */
@@ -1118,7 +1126,7 @@ fs_reply_print(netdissect_options *ndo,
 
 		ND_PRINT((ndo, " error %s", tok2str(afs_fs_errors, "#%d", errcode)));
 	} else {
-		ND_PRINT((ndo, " strange fs reply of type %u", rxh->type));
+		ND_PRINT((ndo, " strange fs reply of type %u", type));
 	}
 
 	return;
@@ -1300,6 +1308,7 @@ cb_reply_print(netdissect_options *ndo,
                register const u_char *bp, u_int length, uint32_t opcode)
 {
 	const struct rx_header *rxh;
+	uint8_t type;
 
 	if (length <= sizeof(struct rx_header))
 		return;
@@ -1313,13 +1322,14 @@ cb_reply_print(netdissect_options *ndo,
 
 	ND_PRINT((ndo, " cb reply %s", tok2str(cb_req, "op#%u", opcode)));
 
+	type = EXTRACT_U_1(rxh->type);
 	bp += sizeof(struct rx_header);
 
 	/*
 	 * If it was a data packet, interpret the response.
 	 */
 
-	if (rxh->type == RX_PACKET_TYPE_DATA)
+	if (type == RX_PACKET_TYPE_DATA)
 		switch (opcode) {
 		case 213:	/* InitCallBackState3 */
 			AFSUUIDOUT();
@@ -1491,6 +1501,7 @@ prot_reply_print(netdissect_options *ndo,
                  register const u_char *bp, u_int length, uint32_t opcode)
 {
 	const struct rx_header *rxh;
+	uint8_t type;
 	uint32_t i;
 
 	if (length < sizeof(struct rx_header))
@@ -1513,13 +1524,14 @@ prot_reply_print(netdissect_options *ndo,
 
 	ND_PRINT((ndo, " reply %s", tok2str(pt_req, "op#%u", opcode)));
 
+	type = EXTRACT_U_1(rxh->type);
 	bp += sizeof(struct rx_header);
 
 	/*
 	 * If it was a data packet, interpret the response
 	 */
 
-	if (rxh->type == RX_PACKET_TYPE_DATA)
+	if (type == RX_PACKET_TYPE_DATA)
 		switch (opcode) {
 		case 504:		/* Name to ID */
 		{
@@ -1695,6 +1707,7 @@ vldb_reply_print(netdissect_options *ndo,
                  register const u_char *bp, u_int length, uint32_t opcode)
 {
 	const struct rx_header *rxh;
+	uint8_t type;
 	uint32_t i;
 
 	if (length < sizeof(struct rx_header))
@@ -1717,13 +1730,14 @@ vldb_reply_print(netdissect_options *ndo,
 
 	ND_PRINT((ndo, " reply %s", tok2str(vldb_req, "op#%u", opcode)));
 
+	type = EXTRACT_U_1(rxh->type);
 	bp += sizeof(struct rx_header);
 
 	/*
 	 * If it was a data packet, interpret the response
 	 */
 
-	if (rxh->type == RX_PACKET_TYPE_DATA)
+	if (type == RX_PACKET_TYPE_DATA)
 		switch (opcode) {
 		case 510:	/* List entry */
 			ND_PRINT((ndo, " count"));
@@ -1974,6 +1988,7 @@ kauth_reply_print(netdissect_options *ndo,
                   register const u_char *bp, u_int length, uint32_t opcode)
 {
 	const struct rx_header *rxh;
+	uint8_t type;
 
 	if (length <= sizeof(struct rx_header))
 		return;
@@ -1994,13 +2009,14 @@ kauth_reply_print(netdissect_options *ndo,
 
 	ND_PRINT((ndo, " reply %s", tok2str(kauth_req, "op#%u", opcode)));
 
+	type = EXTRACT_U_1(rxh->type);
 	bp += sizeof(struct rx_header);
 
 	/*
 	 * If it was a data packet, interpret the response.
 	 */
 
-	if (rxh->type == RX_PACKET_TYPE_DATA)
+	if (type == RX_PACKET_TYPE_DATA)
 		/* Well, no, not really.  Leave this for later */
 		;
 	else {
@@ -2225,6 +2241,7 @@ vol_reply_print(netdissect_options *ndo,
                 register const u_char *bp, u_int length, uint32_t opcode)
 {
 	const struct rx_header *rxh;
+	uint8_t type;
 
 	if (length <= sizeof(struct rx_header))
 		return;
@@ -2238,13 +2255,14 @@ vol_reply_print(netdissect_options *ndo,
 
 	ND_PRINT((ndo, " vol reply %s", tok2str(vol_req, "op#%u", opcode)));
 
+	type = EXTRACT_U_1(rxh->type);
 	bp += sizeof(struct rx_header);
 
 	/*
 	 * If it was a data packet, interpret the response.
 	 */
 
-	if (rxh->type == RX_PACKET_TYPE_DATA) {
+	if (type == RX_PACKET_TYPE_DATA) {
 		switch (opcode) {
 			case 100:	/* Create volume */
 				ND_PRINT((ndo, " volid"));
@@ -2449,6 +2467,7 @@ bos_reply_print(netdissect_options *ndo,
                 register const u_char *bp, u_int length, uint32_t opcode)
 {
 	const struct rx_header *rxh;
+	uint8_t type;
 
 	if (length <= sizeof(struct rx_header))
 		return;
@@ -2462,13 +2481,14 @@ bos_reply_print(netdissect_options *ndo,
 
 	ND_PRINT((ndo, " bos reply %s", tok2str(bos_req, "op#%u", opcode)));
 
+	type = EXTRACT_U_1(rxh->type);
 	bp += sizeof(struct rx_header);
 
 	/*
 	 * If it was a data packet, interpret the response.
 	 */
 
-	if (rxh->type == RX_PACKET_TYPE_DATA)
+	if (type == RX_PACKET_TYPE_DATA)
 		/* Well, no, not really.  Leave this for later */
 		;
 	else {
@@ -2623,6 +2643,7 @@ ubik_reply_print(netdissect_options *ndo,
                  register const u_char *bp, u_int length, uint32_t opcode)
 {
 	const struct rx_header *rxh;
+	uint8_t type;
 
 	if (length < sizeof(struct rx_header))
 		return;
@@ -2636,13 +2657,14 @@ ubik_reply_print(netdissect_options *ndo,
 
 	ND_PRINT((ndo, " ubik reply %s", tok2str(ubik_req, "op#%u", opcode)));
 
+	type = EXTRACT_U_1(rxh->type);
 	bp += sizeof(struct rx_header);
 
 	/*
 	 * If it was a data packet, print out the arguments to the Ubik calls
 	 */
 
-	if (rxh->type == RX_PACKET_TYPE_DATA)
+	if (type == RX_PACKET_TYPE_DATA)
 		switch (opcode) {
 		case 10000:		/* Beacon */
 			ND_PRINT((ndo, " vote no"));
@@ -2687,6 +2709,7 @@ rx_ack_print(netdissect_options *ndo,
              register const u_char *bp, u_int length)
 {
 	const struct rx_ackPacket *rxa;
+	uint8_t nAcks;
 	int i, start, last;
 	uint32_t firstPacket;
 
@@ -2695,18 +2718,10 @@ rx_ack_print(netdissect_options *ndo,
 
 	bp += sizeof(struct rx_header);
 
-	/*
-	 * This may seem a little odd .... the rx_ackPacket structure
-	 * contains an array of individual packet acknowledgements
-	 * (used for selective ack/nack), but since it's variable in size,
-	 * we don't want to truncate based on the size of the whole
-	 * rx_ackPacket structure.
-	 */
-
-	ND_TCHECK2(bp[0], sizeof(struct rx_ackPacket) - RX_MAXACKS);
+	ND_TCHECK2(bp[0], sizeof(struct rx_ackPacket));
 
 	rxa = (const struct rx_ackPacket *) bp;
-	bp += (sizeof(struct rx_ackPacket) - RX_MAXACKS);
+	bp += sizeof(struct rx_ackPacket);
 
 	/*
 	 * Print out a few useful things from the ack packet structure
@@ -2714,13 +2729,13 @@ rx_ack_print(netdissect_options *ndo,
 
 	if (ndo->ndo_vflag > 2)
 		ND_PRINT((ndo, " bufspace %u maxskew %d",
-		       EXTRACT_BE_U_2(&rxa->bufferSpace),
-		       EXTRACT_BE_U_2(&rxa->maxSkew)));
+		       EXTRACT_BE_U_2(rxa->bufferSpace),
+		       EXTRACT_BE_U_2(rxa->maxSkew)));
 
-	firstPacket = EXTRACT_BE_U_4(&rxa->firstPacket);
+	firstPacket = EXTRACT_BE_U_4(rxa->firstPacket);
 	ND_PRINT((ndo, " first %u serial %u reason %s",
-	       firstPacket, EXTRACT_BE_U_4(&rxa->serial),
-	       tok2str(rx_ack_reasons, "#%u", rxa->reason)));
+	       firstPacket, EXTRACT_BE_U_4(rxa->serial),
+	       tok2str(rx_ack_reasons, "#%u", EXTRACT_U_1(rxa->reason))));
 
 	/*
 	 * Okay, now we print out the ack array.  The way _this_ works
@@ -2741,17 +2756,18 @@ rx_ack_print(netdissect_options *ndo,
 	 * to bp after this, so bp ends up at the right spot.  Go figure.
 	 */
 
-	if (rxa->nAcks != 0) {
+	nAcks = EXTRACT_U_1(rxa->nAcks);
+	if (nAcks != 0) {
 
-		ND_TCHECK2(bp[0], rxa->nAcks);
+		ND_TCHECK2(bp[0], nAcks);
 
 		/*
 		 * Sigh, this is gross, but it seems to work to collapse
 		 * ranges correctly.
 		 */
 
-		for (i = 0, start = last = -2; i < rxa->nAcks; i++)
-			if (rxa->acks[i] == RX_ACK_TYPE_ACK) {
+		for (i = 0, start = last = -2; i < nAcks; i++)
+			if (EXTRACT_U_1(bp + i) == RX_ACK_TYPE_ACK) {
 
 				/*
 				 * I figured this deserved _some_ explanation.
@@ -2821,8 +2837,8 @@ rx_ack_print(netdissect_options *ndo,
 		 * Same as above, just without comments
 		 */
 
-		for (i = 0, start = last = -2; i < rxa->nAcks; i++)
-			if (rxa->acks[i] == RX_ACK_TYPE_NACK) {
+		for (i = 0, start = last = -2; i < nAcks; i++)
+			if (EXTRACT_U_1(bp + i) == RX_ACK_TYPE_NACK) {
 				if (last == -2) {
 					ND_PRINT((ndo, " nacked %u", firstPacket + i));
 					start = i;
@@ -2837,9 +2853,11 @@ rx_ack_print(netdissect_options *ndo,
 		if (last == i - 1 && start != last)
 			ND_PRINT((ndo, "-%u", firstPacket + i - 1));
 
-		bp += rxa->nAcks;
+		bp += nAcks;
 	}
 
+	/* Padding. */
+	bp += 3;
 
 	/*
 	 * These are optional fields; depending on your version of AFS,
@@ -2851,19 +2869,19 @@ rx_ack_print(netdissect_options *ndo,
 	if (ndo->ndo_vflag > 1) {
 		TRUNCRET(4);
 		ND_PRINT((ndo, " ifmtu"));
-		INTOUT();
+		UINTOUT();
 
 		TRUNCRET(4);
 		ND_PRINT((ndo, " maxmtu"));
-		INTOUT();
+		UINTOUT();
 
 		TRUNCRET(4);
 		ND_PRINT((ndo, " rwind"));
-		INTOUT();
+		UINTOUT();
 
 		TRUNCRET(4);
 		ND_PRINT((ndo, " maxpackets"));
-		INTOUT();
+		UINTOUT();
 	}
 
 	return;

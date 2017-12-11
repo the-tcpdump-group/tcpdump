@@ -484,14 +484,16 @@ again:
 				ND_PRINT((ndo, "carp %s > %s: ",
 					     ipaddr_string(ndo, &ipds->ip->ip_src),
 					     ipaddr_string(ndo, &ipds->ip->ip_dst)));
-			carp_print(ndo, ipds->cp, ipds->len, ipds->ip->ip_ttl);
+			carp_print(ndo, ipds->cp, ipds->len,
+				EXTRACT_U_1(ipds->ip->ip_ttl));
 		} else {
 			if (ndo->ndo_vflag)
 				ND_PRINT((ndo, "vrrp %s > %s: ",
 					     ipaddr_string(ndo, &ipds->ip->ip_src),
 					     ipaddr_string(ndo, &ipds->ip->ip_dst)));
 			vrrp_print(ndo, ipds->cp, ipds->len,
-				(const u_char *)ipds->ip, ipds->ip->ip_ttl);
+				(const u_char *)ipds->ip,
+				EXTRACT_U_1(ipds->ip->ip_ttl));
 		}
 		break;
 
@@ -541,6 +543,7 @@ ip_print(netdissect_options *ndo,
 	const u_char *ipend;
 	u_int hlen;
 	struct cksum_vec vec[1];
+	uint8_t ip_tos, ip_ttl, ip_proto;
 	uint16_t sum, ip_sum;
 	const char *p_name;
 
@@ -598,10 +601,13 @@ ip_print(netdissect_options *ndo,
 
 	ipds->off = EXTRACT_BE_U_2(&ipds->ip->ip_off);
 
+        ip_proto = EXTRACT_U_1(ipds->ip->ip_p);
+
         if (ndo->ndo_vflag) {
-            ND_PRINT((ndo, "(tos 0x%x", ipds->ip->ip_tos));
+            ip_tos = EXTRACT_U_1(ipds->ip->ip_tos);
+            ND_PRINT((ndo, "(tos 0x%x", ip_tos));
             /* ECN bits */
-            switch (ipds->ip->ip_tos & 0x03) {
+            switch (ip_tos & 0x03) {
 
             case 0:
                 break;
@@ -619,23 +625,23 @@ ip_print(netdissect_options *ndo,
                 break;
             }
 
-            if (ipds->ip->ip_ttl >= 1)
-                ND_PRINT((ndo, ", ttl %u", ipds->ip->ip_ttl));
+            ip_ttl = EXTRACT_U_1(ipds->ip->ip_ttl);
+            if (ip_ttl >= 1)
+                ND_PRINT((ndo, ", ttl %u", ip_ttl));
 
 	    /*
 	     * for the firewall guys, print id, offset.
              * On all but the last stick a "+" in the flags portion.
 	     * For unfragmented datagrams, note the don't fragment flag.
 	     */
-
 	    ND_PRINT((ndo, ", id %u, offset %u, flags [%s], proto %s (%u)",
                          EXTRACT_BE_U_2(&ipds->ip->ip_id),
                          (ipds->off & 0x1fff) * 8,
                          bittok2str(ip_frag_values, "none", ipds->off&0xe000),
-                         tok2str(ipproto_values,"unknown",ipds->ip->ip_p),
-                         ipds->ip->ip_p));
+                         tok2str(ipproto_values, "unknown", ip_proto),
+                         ip_proto));
 
-            ND_PRINT((ndo, ", length %u", EXTRACT_BE_U_2(&ipds->ip->ip_len)));
+            ND_PRINT((ndo, ", length %u", EXTRACT_BE_U_2(ipds->ip->ip_len)));
 
             if ((hlen - sizeof(struct ip)) > 0) {
                 ND_PRINT((ndo, ", options ("));
@@ -648,13 +654,13 @@ ip_print(netdissect_options *ndo,
 	        vec[0].len = hlen;
 	        sum = in_cksum(vec, 1);
 		if (sum != 0) {
-		    ip_sum = EXTRACT_BE_U_2(&ipds->ip->ip_sum);
+		    ip_sum = EXTRACT_BE_U_2(ipds->ip->ip_sum);
 		    ND_PRINT((ndo, ", bad cksum %x (->%x)!", ip_sum,
 			     in_cksum_shouldbe(ip_sum, sum)));
 		}
 	    }
 
-		ND_PRINT((ndo, ")\n    "));
+	    ND_PRINT((ndo, ")\n    "));
 	}
 
 	/*
@@ -663,7 +669,7 @@ ip_print(netdissect_options *ndo,
 	 */
 	if ((ipds->off & 0x1fff) == 0) {
 		ipds->cp = (const u_char *)ipds->ip + hlen;
-		ipds->nh = ipds->ip->ip_p;
+		ipds->nh = EXTRACT_U_1(ipds->ip->ip_p);
 
 		if (ipds->nh != IPPROTO_TCP && ipds->nh != IPPROTO_UDP &&
 		    ipds->nh != IPPROTO_SCTP && ipds->nh != IPPROTO_DCCP) {
@@ -687,10 +693,10 @@ ip_print(netdissect_options *ndo,
 		 */
 		ND_PRINT((ndo, "%s > %s:", ipaddr_string(ndo, &ipds->ip->ip_src),
 		          ipaddr_string(ndo, &ipds->ip->ip_dst)));
-		if (!ndo->ndo_nflag && (p_name = netdb_protoname(ipds->ip->ip_p)) != NULL)
+		if (!ndo->ndo_nflag && (p_name = netdb_protoname(ip_proto)) != NULL)
 			ND_PRINT((ndo, " %s", p_name));
 		else
-			ND_PRINT((ndo, " ip-proto-%d", ipds->ip->ip_p));
+			ND_PRINT((ndo, " ip-proto-%u", ip_proto));
 	}
 	return;
 
@@ -716,7 +722,7 @@ ipN_print(netdissect_options *ndo, register const u_char *bp, register u_int len
 		ip6_print (ndo, bp, length);
 		break;
 	default:
-		ND_PRINT((ndo, "unknown ip %d", (EXTRACT_U_1(bp) & 0xF0) >> 4));
+		ND_PRINT((ndo, "unknown ip %u", (EXTRACT_U_1(bp) & 0xF0) >> 4));
 		break;
 	}
 	return;

@@ -961,7 +961,7 @@ handle_pap(netdissect_options *ndo,
 		return;
 	}
 	length = len;
-	if (length < (p - p0)) {
+	if (length < (size_t)(p - p0)) {
 		ND_PRINT((ndo, ", length %u < PAP header length", length));
 		return;
 	}

@@ -267,8 +267,8 @@ struct nd_redirect {		/* redirect */
 #define nd_rd_reserved		nd_rd_hdr.icmp6_data32[0]
 
 struct nd_opt_hdr {		/* Neighbor discovery option header */
-	uint8_t		nd_opt_type;
-	uint8_t		nd_opt_len;
+	nd_uint8_t	nd_opt_type;
+	nd_uint8_t	nd_opt_len;
 	/* followed by option specific data*/
 };
 
@@ -1239,6 +1239,7 @@ static void
 icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 {
 	const struct nd_opt_hdr *op;
+	uint8_t opt_type, opt_len;
 	const struct nd_opt_prefix_info *opp;
 	const struct nd_opt_mtu *opm;
 	const struct nd_opt_rdnss *oprd;
@@ -1264,24 +1265,26 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 		ECHECK(op->nd_opt_len);
 		if (resid <= 0)
 			return;
-		if (op->nd_opt_len == 0)
+		opt_type = EXTRACT_U_1(op->nd_opt_type);
+		opt_len = EXTRACT_U_1(op->nd_opt_len);
+		if (opt_len == 0)
 			goto trunc;
-		if (cp + (op->nd_opt_len << 3) > ep)
+		if (cp + (opt_len << 3) > ep)
 			goto trunc;
 
                 ND_PRINT((ndo,"\n\t  %s option (%u), length %u (%u): ",
-                          tok2str(icmp6_opt_values, "unknown", op->nd_opt_type),
-                          op->nd_opt_type,
-                          op->nd_opt_len << 3,
-                          op->nd_opt_len));
+                          tok2str(icmp6_opt_values, "unknown", opt_type),
+                          opt_type,
+                          opt_len << 3,
+                          opt_len));
 
-		switch (op->nd_opt_type) {
+		switch (opt_type) {
 		case ND_OPT_SOURCE_LINKADDR:
-			l = (op->nd_opt_len << 3) - 2;
+			l = (opt_len << 3) - 2;
 			print_lladdr(ndo, cp + 2, l);
 			break;
 		case ND_OPT_TARGET_LINKADDR:
-			l = (op->nd_opt_len << 3) - 2;
+			l = (opt_len << 3) - 2;
 			print_lladdr(ndo, cp + 2, l);
 			break;
 		case ND_OPT_PREFIX_INFORMATION:
@@ -1289,14 +1292,14 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			ND_TCHECK(opp->nd_opt_pi_prefix);
                         ND_PRINT((ndo,"%s/%u%s, Flags [%s], valid time %s",
                                   ip6addr_string(ndo, &opp->nd_opt_pi_prefix),
-                                  opp->nd_opt_pi_prefix_len,
-                                  (op->nd_opt_len != 4) ? "badlen" : "",
-                                  bittok2str(icmp6_opt_pi_flag_values, "none", opp->nd_opt_pi_flags_reserved),
-                                  get_lifetime(EXTRACT_BE_U_4(&opp->nd_opt_pi_valid_time))));
-                        ND_PRINT((ndo,", pref. time %s", get_lifetime(EXTRACT_BE_U_4(&opp->nd_opt_pi_preferred_time))));
+                                  EXTRACT_U_1(opp->nd_opt_pi_prefix_len),
+                                  (opt_len != 4) ? "badlen" : "",
+                                  bittok2str(icmp6_opt_pi_flag_values, "none", EXTRACT_U_1(opp->nd_opt_pi_flags_reserved)),
+                                  get_lifetime(EXTRACT_BE_U_4(opp->nd_opt_pi_valid_time))));
+                        ND_PRINT((ndo,", pref. time %s", get_lifetime(EXTRACT_BE_U_4(opp->nd_opt_pi_preferred_time))));
 			break;
 		case ND_OPT_REDIRECTED_HEADER:
-                        print_unknown_data(ndo, bp,"\n\t    ",op->nd_opt_len<<3);
+                        print_unknown_data(ndo, bp,"\n\t    ",opt_len<<3);
 			/* xxx */
 			break;
 		case ND_OPT_MTU:
@@ -1304,11 +1307,11 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			ND_TCHECK(opm->nd_opt_mtu_mtu);
 			ND_PRINT((ndo," %u%s",
                                EXTRACT_BE_U_4(&opm->nd_opt_mtu_mtu),
-                               (op->nd_opt_len != 1) ? "bad option length" : "" ));
+                               (opt_len != 1) ? "bad option length" : "" ));
                         break;
 		case ND_OPT_RDNSS:
 			oprd = (const struct nd_opt_rdnss *)op;
-			l = (op->nd_opt_len - 1) / 2;
+			l = (opt_len - 1) / 2;
 			ND_PRINT((ndo," lifetime %us,",
                                   EXTRACT_BE_U_4(&oprd->nd_opt_rdnss_lifetime)));
 			for (i = 0; i < l; i++) {
@@ -1322,7 +1325,7 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			ND_PRINT((ndo," lifetime %us, domain(s):",
                                   EXTRACT_BE_U_4(&opds->nd_opt_dnssl_lifetime)));
 			domp = cp + 8; /* domain names, variable-sized, RFC1035-encoded */
-			while (domp < cp + (op->nd_opt_len << 3) && EXTRACT_U_1(domp) != '\0')
+			while (domp < cp + (opt_len << 3) && EXTRACT_U_1(domp) != '\0')
 			{
 				ND_PRINT((ndo, " "));
 				if ((domp = ns_nprint (ndo, domp, bp)) == NULL)
@@ -1346,7 +1349,7 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			ND_TCHECK(opri->nd_opt_rti_lifetime);
 			memset(&in6, 0, sizeof(in6));
 			in6p = (const struct in6_addr *)(opri + 1);
-			switch (op->nd_opt_len) {
+			switch (opt_len) {
 			case 1:
 				break;
 			case 2:
@@ -1368,17 +1371,17 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			break;
 		default:
                         if (ndo->ndo_vflag <= 1) {
-                                print_unknown_data(ndo,cp+2,"\n\t  ", (op->nd_opt_len << 3) - 2); /* skip option header */
+                                print_unknown_data(ndo,cp+2,"\n\t  ", (opt_len << 3) - 2); /* skip option header */
                             return;
                         }
                         break;
 		}
                 /* do we want to see an additional hexdump ? */
                 if (ndo->ndo_vflag> 1)
-                        print_unknown_data(ndo, cp+2,"\n\t    ", (op->nd_opt_len << 3) - 2); /* skip option header */
+                        print_unknown_data(ndo, cp+2,"\n\t    ", (opt_len << 3) - 2); /* skip option header */
 
-		cp += op->nd_opt_len << 3;
-		resid -= op->nd_opt_len << 3;
+		cp += opt_len << 3;
+		resid -= opt_len << 3;
 	}
 	return;
 

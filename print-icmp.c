@@ -336,6 +336,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 	const struct ip *ip;
 	const char *str, *fmt;
 	const struct ip *oip;
+	uint8_t ip_proto;
 	const struct udphdr *ouh;
         const uint8_t *obj_tptr;
         uint32_t raw_label;
@@ -368,11 +369,11 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		switch (dp->icmp_code) {
 
 		case ICMP_UNREACH_PROTOCOL:
-			ND_TCHECK(dp->icmp_ip.ip_p);
+			ND_TCHECK_1(dp->icmp_ip.ip_p);
 			(void)snprintf(buf, sizeof(buf),
 			    "%s protocol %d unreachable",
 			    ipaddr_string(ndo, &dp->icmp_ip.ip_dst),
-			    dp->icmp_ip.ip_p);
+			    EXTRACT_U_1(dp->icmp_ip.ip_p));
 			break;
 
 		case ICMP_UNREACH_PORT:
@@ -382,7 +383,8 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			ouh = (const struct udphdr *)(((const u_char *)oip) + hlen);
 			ND_TCHECK(ouh->uh_dport);
 			dport = EXTRACT_BE_U_2(&ouh->uh_dport);
-			switch (oip->ip_p) {
+			ip_proto = EXTRACT_U_1(oip->ip_p);
+			switch (ip_proto) {
 
 			case IPPROTO_TCP:
 				(void)snprintf(buf, sizeof(buf),
@@ -402,7 +404,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 				(void)snprintf(buf, sizeof(buf),
 					"%s protocol %u port %u unreachable",
 					ipaddr_string(ndo, &oip->ip_dst),
-					oip->ip_p, dport);
+					ip_proto, dport);
 				break;
 			}
 			break;

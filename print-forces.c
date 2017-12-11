@@ -154,23 +154,23 @@ static const struct tok ForCES_TPs[] = {
  */
 struct forcesh {
 	nd_uint8_t fm_vrsvd;	/* version and reserved */
-#define ForCES_V(forcesh)	((forcesh)->fm_vrsvd >> 4)
+#define ForCES_V(forcesh)	(EXTRACT_U_1((forcesh)->fm_vrsvd) >> 4)
 	nd_uint8_t fm_tom;	/* type of message */
 	nd_uint16_t fm_len;	/* total length * 4 bytes */
-#define ForCES_BLN(forcesh)	((uint32_t)(EXTRACT_BE_U_2(&(forcesh)->fm_len) << 2))
+#define ForCES_BLN(forcesh)	((uint32_t)(EXTRACT_BE_U_2((forcesh)->fm_len) << 2))
 	nd_uint32_t fm_sid;	/* Source ID */
-#define ForCES_SID(forcesh)	EXTRACT_BE_U_4(&(forcesh)->fm_sid)
+#define ForCES_SID(forcesh)	EXTRACT_BE_U_4((forcesh)->fm_sid)
 	nd_uint32_t fm_did;	/* Destination ID */
-#define ForCES_DID(forcesh)	EXTRACT_BE_U_4(&(forcesh)->fm_did)
+#define ForCES_DID(forcesh)	EXTRACT_BE_U_4((forcesh)->fm_did)
 	nd_uint8_t fm_cor[8];	/* correlator */
 	nd_uint32_t fm_flags;	/* flags */
-#define ForCES_ACK(forcesh)	((EXTRACT_BE_U_4(&(forcesh)->fm_flags)&0xC0000000) >> 30)
-#define ForCES_PRI(forcesh)	((EXTRACT_BE_U_4(&(forcesh)->fm_flags)&0x38000000) >> 27)
-#define ForCES_RS1(forcesh)	((EXTRACT_BE_U_4(&(forcesh)->fm_flags)&0x07000000) >> 24)
-#define ForCES_EM(forcesh)	((EXTRACT_BE_U_4(&(forcesh)->fm_flags)&0x00C00000) >> 22)
-#define ForCES_AT(forcesh)	((EXTRACT_BE_U_4(&(forcesh)->fm_flags)&0x00200000) >> 21)
-#define ForCES_TP(forcesh)	((EXTRACT_BE_U_4(&(forcesh)->fm_flags)&0x00180000) >> 19)
-#define ForCES_RS2(forcesh)	((EXTRACT_BE_U_4(&(forcesh)->fm_flags)&0x0007FFFF) >> 0)
+#define ForCES_ACK(forcesh)	((EXTRACT_BE_U_4((forcesh)->fm_flags)&0xC0000000) >> 30)
+#define ForCES_PRI(forcesh)	((EXTRACT_BE_U_4((forcesh)->fm_flags)&0x38000000) >> 27)
+#define ForCES_RS1(forcesh)	((EXTRACT_BE_U_4((forcesh)->fm_flags)&0x07000000) >> 24)
+#define ForCES_EM(forcesh)	((EXTRACT_BE_U_4((forcesh)->fm_flags)&0x00C00000) >> 22)
+#define ForCES_AT(forcesh)	((EXTRACT_BE_U_4((forcesh)->fm_flags)&0x00200000) >> 21)
+#define ForCES_TP(forcesh)	((EXTRACT_BE_U_4((forcesh)->fm_flags)&0x00180000) >> 19)
+#define ForCES_RS2(forcesh)	((EXTRACT_BE_U_4((forcesh)->fm_flags)&0x0007FFFF) >> 0)
 };
 
 #define ForCES_HLN_VALID(fhl,tlen) ((tlen) >= ForCES_HDRL && \
@@ -648,6 +648,7 @@ prestlv_print(netdissect_options *ndo,
 	register const u_char *tdp = (const u_char *) TLV_DATA(tlv);
 	const struct res_val *r = (const struct res_val *)tdp;
 	u_int dlen;
+	uint8_t result;
 
 	/*
 	 * pdatacnt_print() has ensured that len (the TLV length)
@@ -660,15 +661,16 @@ prestlv_print(netdissect_options *ndo,
 	}
 
 	ND_TCHECK(*r);
-	if (r->result >= 0x18 && r->result <= 0xFE) {
-		ND_PRINT((ndo, "illegal reserved result code: 0x%x!\n", r->result));
+	result = EXTRACT_U_1(r->result);
+	if (result >= 0x18 && result <= 0xFE) {
+		ND_PRINT((ndo, "illegal reserved result code: 0x%x!\n", result));
 		return -1;
 	}
 
 	if (ndo->ndo_vflag >= 3) {
 		char *ib = indent_pr(indent, 0);
 		ND_PRINT((ndo, "%s  Result: %s (code 0x%x)\n", ib,
-		       tok2str(ForCES_errs, NULL, r->result), r->result));
+		       tok2str(ForCES_errs, NULL, result), result));
 	}
 	return 0;
 
@@ -1680,21 +1682,23 @@ forces_print(netdissect_options *ndo,
 	const struct forcesh *fhdr;
 	u_int mlen;
 	uint32_t flg_raw;
+	uint8_t tom;
 	const struct tom_h *tops;
 	int rc = 0;
 
 	fhdr = (const struct forcesh *)pptr;
 	ND_TCHECK(*fhdr);
-	if (!tom_valid(fhdr->fm_tom)) {
-		ND_PRINT((ndo, "Invalid ForCES message type %d\n", fhdr->fm_tom));
+	tom = EXTRACT_U_1(fhdr->fm_tom);
+	if (!tom_valid(tom)) {
+		ND_PRINT((ndo, "Invalid ForCES message type %d\n", tom));
 		goto error;
 	}
 
 	mlen = ForCES_BLN(fhdr);
 
-	tops = get_forces_tom(fhdr->fm_tom);
+	tops = get_forces_tom(tom);
 	if (tops->v == TOM_RSVD) {
-		ND_PRINT((ndo, "\n\tUnknown ForCES message type=0x%x", fhdr->fm_tom));
+		ND_PRINT((ndo, "\n\tUnknown ForCES message type=0x%x", tom));
 		goto error;
 	}
 

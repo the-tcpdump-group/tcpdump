@@ -41,7 +41,11 @@
  * use the EXTRACT_ macros to extract them (which you should be doing
  * *anyway*, so as not to assume a particular byte order or alignment
  * in your code).
+ *
+ * We even want EXTRACT_U_1 used for 8-bit integral values, so we
+ * define nd_uint8_t and nd_int8_t as arrays as well.
  */
+typedef unsigned char nd_uint8_t[1];
 typedef unsigned char nd_uint16_t[2];
 typedef unsigned char nd_uint24_t[3];
 typedef unsigned char nd_uint32_t[4];
@@ -49,6 +53,8 @@ typedef unsigned char nd_uint40_t[5];
 typedef unsigned char nd_uint48_t[6];
 typedef unsigned char nd_uint56_t[7];
 typedef unsigned char nd_uint64_t[8];
+
+typedef signed char nd_int8_t[1];
 
 /*
  * Use this for IPv4 addresses.  It's defined as an array of octets, so
@@ -71,13 +77,6 @@ typedef unsigned char nd_uint64_t[8];
 typedef struct {
 	unsigned char bytes[4];
 } nd_ipv4;
-
-/*
- * Data types corresponding to single-byte integral values, for
- * completeness.
- */
-typedef unsigned char nd_uint8_t;
-typedef signed char nd_int8_t;
 
 /* snprintf et al */
 
