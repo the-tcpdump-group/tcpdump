@@ -240,16 +240,4 @@ typedef struct {
 #define EDNS0_MASK	0x40	/* 01.... */
 #  define EDNS0_ELT_BITLABEL 0x01
 
-/*
- * Structure for passing resource records around.
- */
-struct rrec {
-	int16_t	r_zone;			/* zone number */
-	int16_t	r_class;		/* class number */
-	int16_t	r_type;			/* type number */
-	uint32_t	r_ttl;			/* time to live */
-	int	r_size;			/* size of data area */
-	char	*r_data;		/* pointer to data */
-};
-
 #endif /* !_NAMESER_H_ */
