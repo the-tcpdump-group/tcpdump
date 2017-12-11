@@ -895,10 +895,10 @@ tcp_verify_signature(netdissect_options *ndo,
          * Step 2: Update MD5 hash with TCP header, excluding options.
          * The TCP checksum must be set to zero.
          */
-        savecsum = tp1.th_sum;
-        tp1.th_sum = 0;
+        memcpy(&savecsum, tp1.th_sum, sizeof(savecsum));
+        memset(tp1.th_sum, 0, sizeof(tp1.th_sum));
         MD5_Update(&ctx, (const char *)&tp1, sizeof(struct tcphdr));
-        tp1.th_sum = savecsum;
+        memcpy(tp1.th_sum, &savecsum, sizeof(tp1.th_sum));
         /*
          * Step 3: Update MD5 hash with TCP segment data, if present.
          */
