@@ -410,29 +410,29 @@ EXTRACT_BE_S_8(const void *p)
 /*
  * Macros to check the presence of the values in question.
  */
-#define ND_TTEST_1(p) ND_TTEST2(*(p), 1)
-#define ND_TCHECK_1(p) ND_TCHECK2(*(p), 1)
+#define ND_TTEST_1(p) ND_TTEST_LEN((p), 1)
+#define ND_TCHECK_1(p) ND_TCHECK_LEN((p), 1)
 
-#define ND_TTEST_2(p) ND_TTEST2(*(p), 2)
-#define ND_TCHECK_2(p) ND_TCHECK2(*(p), 2)
+#define ND_TTEST_2(p) ND_TTEST_LEN((p), 2)
+#define ND_TCHECK_2(p) ND_TCHECK_LEN((p), 2)
 
-#define ND_TTEST_3(p) ND_TTEST2(*(p), 3)
-#define ND_TCHECK_3(p) ND_TCHECK2(*(p), 3)
+#define ND_TTEST_3(p) ND_TTEST_LEN((p), 3)
+#define ND_TCHECK_3(p) ND_TCHECK_LEN((p), 3)
 
-#define ND_TTEST_4(p) ND_TTEST2(*(p), 4)
-#define ND_TCHECK_4(p) ND_TCHECK2(*(p), 4)
+#define ND_TTEST_4(p) ND_TTEST_LEN((p), 4)
+#define ND_TCHECK_4(p) ND_TCHECK_LEN((p), 4)
 
-#define ND_TTEST_5(p) ND_TTEST2(*(p), 5)
-#define ND_TCHECK_5(p) ND_TCHECK2(*(p), 5)
+#define ND_TTEST_5(p) ND_TTEST_LEN((p), 5)
+#define ND_TCHECK_5(p) ND_TCHECK_LEN((p), 5)
 
-#define ND_TTEST_6(p) ND_TTEST2(*(p), 6)
-#define ND_TCHECK_6(p) ND_TCHECK2(*(p), 6)
+#define ND_TTEST_6(p) ND_TTEST_LEN((p), 6)
+#define ND_TCHECK_6(p) ND_TCHECK_LEN((p), 6)
 
-#define ND_TTEST_7(p) ND_TTEST2(*(p), 7)
-#define ND_TCHECK_7(p) ND_TCHECK2(*(p), 7)
+#define ND_TTEST_7(p) ND_TTEST_LEN((p), 7)
+#define ND_TCHECK_7(p) ND_TCHECK_LEN((p), 7)
 
-#define ND_TTEST_8(p) ND_TTEST2(*(p), 8)
-#define ND_TCHECK_8(p) ND_TCHECK2(*(p), 8)
+#define ND_TTEST_8(p) ND_TTEST_LEN((p), 8)
+#define ND_TCHECK_8(p) ND_TCHECK_LEN((p), 8)
 
-#define ND_TTEST_16(p) ND_TTEST2(*(p), 16)
-#define ND_TCHECK_16(p) ND_TCHECK2(*(p), 16)
+#define ND_TTEST_16(p) ND_TTEST_LEN((p), 16)
+#define ND_TCHECK_16(p) ND_TCHECK_LEN((p), 16)
