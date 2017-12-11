@@ -57,12 +57,14 @@ typedef unsigned char nd_uint64_t[8];
 typedef signed char nd_int8_t[1];
 
 /*
- * Use this for IPv4 addresses.  It's defined as an array of octets, so
- * that it's not aligned on its "natural" boundary, and it's defined as
- * a structure in the hopes that this makes it harder to naively use
- * EXTRACT_BE_U_4() to extract the value - in many cases you just want
- * to use UNALIGNED_MEMCPY() to copy its value, so that it remains in
- * network byte order.
+ * Use this for IPv4 addresses and netmasks.
+ *
+ * It's defined as an array of octets, so that it's not guaranteed to
+ * be aligned on its "natural" boundary (in some packet formats, it
+ * *isn't* so aligned), and it's defined as a structure in the hopes
+ * that this makes it harder to naively use EXTRACT_BE_U_4() to extract
+ * the value - in many cases you just want to use UNALIGNED_MEMCPY() to
+ * copy its value, so that it remains in network byte order.
  *
  * (Among other things, we don't want somebody thinking "IPv4 addresses,
  * they're in network byte order, so we want EXTRACT_BE_U_4(), right?"
@@ -77,6 +79,25 @@ typedef signed char nd_int8_t[1];
 typedef struct {
 	unsigned char bytes[4];
 } nd_ipv4;
+
+/*
+ * Use this for IPv6 addresses and netmasks.
+ */
+typedef struct {
+	unsigned char bytes[16];
+} nd_ipv6;
+
+/*
+ * Use this for MAC addresses.
+ */
+typedef struct {
+	unsigned char bytes[6];
+} nd_mac_addr;
+
+/*
+ * Use this for blobs of bytes; make them arrays of nd_byte.
+ */
+typedef unsigned char nd_byte;
 
 /* snprintf et al */
 
