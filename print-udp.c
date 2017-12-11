@@ -62,7 +62,7 @@ typedef struct {
  * Sender report.
  */
 struct rtcp_sr {
-	ntp64 sr_ntp;		/* 64-bit ntp timestamp */
+	ntp64       sr_ntp;	/* 64-bit ntp timestamp */
 	nd_uint32_t sr_ts;	/* reference media timestamp */
 	nd_uint32_t sr_np;	/* no. packets sent */
 	nd_uint32_t sr_nb;	/* no. bytes sent */
