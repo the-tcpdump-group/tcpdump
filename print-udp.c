@@ -324,7 +324,7 @@ udpipaddr_print(netdissect_options *ndo, const struct ip *ip, int sport, int dpo
 		ip6 = NULL;
 
 	if (ip6) {
-		if (ip6->ip6_nxt == IPPROTO_UDP) {
+		if (EXTRACT_U_1(ip6->ip6_nxt) == IPPROTO_UDP) {
 			if (sport == -1) {
 				ND_PRINT((ndo, "%s > %s: ",
 					ip6addr_string(ndo, &ip6->ip6_src),

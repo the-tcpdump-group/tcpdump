@@ -58,7 +58,7 @@ ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
 
 	cp = (const u_char *)ip6;
 	advance = sizeof(struct ip6_hdr);
-	nh = ip6->ip6_nxt;
+	nh = EXTRACT_U_1(ip6->ip6_nxt);
 	dst_addr = (const void *)&ip6->ip6_dst;
 
 	while (cp < ndo->ndo_snapend) {
@@ -98,8 +98,8 @@ ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
 			 */
 			dp = (const struct ip6_rthdr *)cp;
 			ND_TCHECK(*dp);
-			len = dp->ip6r_len;
-			switch (dp->ip6r_type) {
+			len = EXTRACT_U_1(dp->ip6r_len);
+			switch (EXTRACT_U_1(dp->ip6r_type)) {
 
 			case IPV6_RTHDR_TYPE_0:
 			case IPV6_RTHDR_TYPE_2:		/* Mobile IPv6 ID-20 */
@@ -172,11 +172,13 @@ nextproto6_cksum(netdissect_options *ndo,
                 uint8_t        ph_nxt;
         } ph;
         struct cksum_vec vec[2];
+        u_int nh;
 
         /* pseudo-header */
         memset(&ph, 0, sizeof(ph));
         UNALIGNED_MEMCPY(&ph.ph_src, &ip6->ip6_src, sizeof (struct in6_addr));
-        switch (ip6->ip6_nxt) {
+        nh = EXTRACT_U_1(ip6->ip6_nxt);
+        switch (nh) {
 
         case IPPROTO_HOPOPTS:
         case IPPROTO_DSTOPTS:
@@ -239,14 +241,15 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
           return;
 	}
 
-	payload_len = EXTRACT_BE_U_2(&ip6->ip6_plen);
+	payload_len = EXTRACT_BE_U_2(ip6->ip6_plen);
 	len = payload_len + sizeof(struct ip6_hdr);
 	if (length < len)
 		ND_PRINT((ndo, "truncated-ip6 - %u bytes missing!",
 			len - length));
 
+        nh = EXTRACT_U_1(ip6->ip6_nxt);
         if (ndo->ndo_vflag) {
-            flow = EXTRACT_BE_U_4(&ip6->ip6_flow);
+            flow = EXTRACT_BE_U_4(ip6->ip6_flow);
             ND_PRINT((ndo, "("));
 #if 0
             /* rfc1883 */
@@ -263,9 +266,9 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 #endif
 
             ND_PRINT((ndo, "hlim %u, next-header %s (%u) payload length: %u) ",
-                         ip6->ip6_hlim,
-                         tok2str(ipproto_values,"unknown",ip6->ip6_nxt),
-                         ip6->ip6_nxt,
+                         EXTRACT_U_1(ip6->ip6_hlim),
+                         tok2str(ipproto_values,"unknown",nh),
+                         nh,
                          payload_len));
         }
 
@@ -278,7 +281,6 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	cp = (const u_char *)ip6;
 	advance = sizeof(struct ip6_hdr);
-	nh = ip6->ip6_nxt;
 	while (cp < ndo->ndo_snapend && advance > 0) {
 		if (len < (u_int)advance)
 			goto trunc;

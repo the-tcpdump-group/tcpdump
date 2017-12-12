@@ -41,7 +41,7 @@ rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 
 	register const struct ip6_rthdr *dp;
 	register const struct ip6_rthdr0 *dp0;
 	register const u_char *ep;
-	int i, len;
+	u_int i, len, type;
 	register const struct in6_addr *addr;
 
 	dp = (const struct ip6_rthdr *)bp;
@@ -51,12 +51,13 @@ rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 
 
 	ND_TCHECK(dp->ip6r_segleft);
 
-	len = dp->ip6r_len;
-	ND_PRINT((ndo, "srcrt (len=%d", dp->ip6r_len));	/*)*/
-	ND_PRINT((ndo, ", type=%d", dp->ip6r_type));
-	ND_PRINT((ndo, ", segleft=%d", dp->ip6r_segleft));
+	len = EXTRACT_U_1(dp->ip6r_len);
+	ND_PRINT((ndo, "srcrt (len=%u", len));	/*)*/
+	type = EXTRACT_U_1(dp->ip6r_type);
+	ND_PRINT((ndo, ", type=%u", type));
+	ND_PRINT((ndo, ", segleft=%u", EXTRACT_U_1(dp->ip6r_segleft)));
 
-	switch (dp->ip6r_type) {
+	switch (type) {
 	case IPV6_RTHDR_TYPE_0:
 	case IPV6_RTHDR_TYPE_2:			/* Mobile IPv6 ID-20 */
 		dp0 = (const struct ip6_rthdr0 *)dp;

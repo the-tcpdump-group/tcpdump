@@ -875,7 +875,7 @@ icmp6_print(netdissect_options *ndo,
 	const struct ip6_hdr *ip;
 	const struct ip6_hdr *oip;
 	const struct udphdr *ouh;
-	int dport;
+	u_int dport;
 	const u_char *ep;
 	u_int prot;
 
@@ -935,7 +935,7 @@ icmp6_print(netdissect_options *ndo,
 			    == NULL)
 				goto trunc;
 
-			dport = EXTRACT_BE_U_2(&ouh->uh_dport);
+			dport = EXTRACT_BE_U_2(ouh->uh_dport);
 			switch (prot) {
 			case IPPROTO_TCP:
 				ND_PRINT((ndo,", %s tcp port %s",
@@ -948,9 +948,9 @@ icmp6_print(netdissect_options *ndo,
                                           udpport_string(ndo, dport)));
 				break;
 			default:
-				ND_PRINT((ndo,", %s protocol %d port %d unreachable",
+				ND_PRINT((ndo,", %s protocol %u port %u unreachable",
 					ip6addr_string(ndo, &oip->ip6_dst),
-                                          oip->ip6_nxt, dport));
+                                          prot, dport));
 				break;
 			}
 			break;
@@ -1179,7 +1179,7 @@ get_upperlayer(netdissect_options *ndo, const u_char *bp, u_int *prot)
 	if (!ND_TTEST(ip6->ip6_nxt))
 		return NULL;
 
-	nh = ip6->ip6_nxt;
+	nh = EXTRACT_U_1(ip6->ip6_nxt);
 	hlen = sizeof(struct ip6_hdr);
 
 	while (bp < ep) {
@@ -1203,8 +1203,8 @@ get_upperlayer(netdissect_options *ndo, const u_char *bp, u_int *prot)
 			hbh = (const struct ip6_hbh *)bp;
 			if (!ND_TTEST(hbh->ip6h_len))
 				return(NULL);
-			nh = hbh->ip6h_nxt;
-			hlen = (hbh->ip6h_len + 1) << 3;
+			nh = EXTRACT_U_1(hbh->ip6h_nxt);
+			hlen = (EXTRACT_U_1(hbh->ip6h_len) + 1) << 3;
 			break;
 
 		case IPPROTO_FRAGMENT: /* this should be odd, but try anyway */
@@ -1212,9 +1212,9 @@ get_upperlayer(netdissect_options *ndo, const u_char *bp, u_int *prot)
 			if (!ND_TTEST(fragh->ip6f_offlg))
 				return(NULL);
 			/* fragments with non-zero offset are meaningless */
-			if ((EXTRACT_BE_U_2(&fragh->ip6f_offlg) & IP6F_OFF_MASK) != 0)
+			if ((EXTRACT_BE_U_2(fragh->ip6f_offlg) & IP6F_OFF_MASK) != 0)
 				return(NULL);
-			nh = fragh->ip6f_nxt;
+			nh = EXTRACT_U_1(fragh->ip6f_nxt);
 			hlen = sizeof(struct ip6_frag);
 			break;
 

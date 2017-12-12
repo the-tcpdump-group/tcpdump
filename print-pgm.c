@@ -181,7 +181,7 @@ pgm_print(netdissect_options *ndo,
 	dport = EXTRACT_BE_U_2(&pgm->pgm_dport);
 
 	if (ip6) {
-		if (ip6->ip6_nxt == IPPROTO_PGM) {
+		if (EXTRACT_U_1(ip6->ip6_nxt) == IPPROTO_PGM) {
 			ND_PRINT((ndo, "%s.%s > %s.%s: ",
 				ip6addr_string(ndo, &ip6->ip6_src),
 				tcpport_string(ndo, sport),
