@@ -60,10 +60,6 @@ tcpdump \- dump traffic on a network
 .B \-i
 .I interface
 ]
-.ti +8
-[
-.B \-\-immediate\-mode
-]
 [
 .B \-j
 .I tstamp_type
@@ -74,12 +70,20 @@ tcpdump \- dump traffic on a network
 ]
 .ti +8
 [
+.B \-\-mask\-external\-address
+.I mask_ip
+]
+[
 .B \-M
 .I secret
 ]
 [
+.B \-\-no\-tcpudp\-payload
+]
+[
 .B \-\-number
 ]
+.ti +8
 [
 .B \-\-print
 ]
@@ -87,7 +91,6 @@ tcpdump \- dump traffic on a network
 .B \-Q
 .I in|out|inout
 ]
-.ti +8
 [
 .B \-r
 .I file
@@ -132,6 +135,16 @@ tcpdump \- dump traffic on a network
 .ti +8
 [
 .BI \-\-time\-stamp\-precision= tstamp_precision
+]
+.ti +8
+[
+.B \-\-immediate\-mode
+]
+[
+.B \-\-version
+]
+[
+.B \-\-zero\-tcpudp\-payload
 ]
 .ti +8
 [
@@ -550,6 +563,9 @@ E.g.,
 if you give this flag then \fItcpdump\fP will print ``nic''
 instead of ``nic.ddn.mil''.
 .TP
+.B \-\-no\-tcpudp\-payload
+Remove payload bytes beyond TCP or UDP headers. Currently works only with IPv4.
+.TP
 .B \-#
 .PD 0
 .TP
@@ -631,6 +647,11 @@ Setting
 \fIsnaplen\fP to 0 sets it to the default of 262144,
 for backwards compatibility with recent older versions of
 .IR tcpdump .
+.TP
+.BI \-\-mask\-external\-address " mask_ip"
+.PD
+Mask external IPv4 addresses (non-RFC 1918, plus other reserved spaces)
+to the designated IP.
 .TP
 .BI \-T " type"
 Force packets selected by "\fIexpression\fP" to be interpreted the
@@ -867,6 +888,9 @@ and the group ID to the primary group of
 .IR user .
 .IP
 This behavior can also be enabled by default at compile time.
+.TP
+.B \-\-zero\-tcpudp\-payload
+Zero out payload bytes beyond TCP or UDP headers. Currently works only with IPv4.
 .IP "\fI expression\fP"
 .RS
 selects which packets will be dumped.

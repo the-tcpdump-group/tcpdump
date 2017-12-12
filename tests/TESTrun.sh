@@ -41,14 +41,42 @@ runSimpleTests()
   failed=`cat .failed`
 }
 
+runOutfileTests() {
+    passed=`cat .passed`
+    failed=`cat .failed`
+    only=$1
+    cat TESTOUTLIST | while read name input output outfile options
+    do
+        case $name in
+            \#*) continue;;
+            '') continue;;
+        esac
+        rm -f core
+        [ "$only" != "" -a "$name" != "only" ] && continue
+        if ./TESToutfile $name $input $output $outfile "$options"
+        then
+            passed=`expr $passed + 1`
+            echo $passed > .passed
+        else
+            failed=`expr $failed + 1`
+            echo $failed > .failed
+        fi
+        [ "$only" != "" -a "$name" = "$only" ] && break
+    done
+    passed=`cat .passed`
+    failed=`cat .failed`
+}
+
 passed=0
 failed=0
+
 echo $passed >.passed
 echo $failed >.failed
 if [ $# -eq 0 ]
 then
   runComplexTests
   runSimpleTests
+  runOutfileTests
 elif [ $# -eq 1 ]
 then
   runSimpleTests $1
