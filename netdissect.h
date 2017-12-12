@@ -90,9 +90,8 @@ typedef struct {
 /*
  * Use this for MAC addresses.
  */
-typedef struct {
-	unsigned char bytes[6];
-} nd_mac_addr;
+#define MAC_ADDR_LEN	6		/* length of MAC addresses */
+typedef unsigned char nd_mac_addr[MAC_ADDR_LEN];
 
 /*
  * Use this for blobs of bytes; make them arrays of nd_byte.

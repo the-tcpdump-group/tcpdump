@@ -40,7 +40,6 @@
 
 #include "netdissect.h"
 #include "extract.h"
-#include "ether.h"
 #include "addrtoname.h"
 
 static const char tstr[] = " [|loopback]";
@@ -84,9 +83,9 @@ loopback_message_print(netdissect_options *ndo, const u_char *cp, const u_int le
 			if (len < 8)
 				goto invalid;
 			/* forwarding address */
-			ND_TCHECK_LEN(cp, ETHER_ADDR_LEN);
+			ND_TCHECK_LEN(cp, MAC_ADDR_LEN);
 			ND_PRINT((ndo, ", forwarding address %s", etheraddr_string(ndo, cp)));
-			cp += ETHER_ADDR_LEN;
+			cp += MAC_ADDR_LEN;
 			/* data */
 			ND_PRINT((ndo, ", data (%u octets)", len - 8));
 			ND_TCHECK_LEN(cp, len - 8);

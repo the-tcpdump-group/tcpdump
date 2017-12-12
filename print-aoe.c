@@ -38,7 +38,6 @@
 #include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
-#include "ether.h"
 
 static const char tstr[] = " [|aoe]";
 
@@ -289,9 +288,9 @@ aoev1_mac_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "\n\t DCmd: %s", tok2str(aoev1_dcmd_str, "Unknown (0x%02x)", EXTRACT_U_1(cp))));
 		cp += 1;
 		/* Ethernet Address */
-		ND_TCHECK_LEN(cp, ETHER_ADDR_LEN);
+		ND_TCHECK_LEN(cp, MAC_ADDR_LEN);
 		ND_PRINT((ndo, ", Ethernet Address: %s", etheraddr_string(ndo, cp)));
-		cp += ETHER_ADDR_LEN;
+		cp += MAC_ADDR_LEN;
 	}
 	return;
 
@@ -310,7 +309,7 @@ aoev1_reserve_print(netdissect_options *ndo,
 	const u_char *ep = cp + len;
 	uint8_t nmacs, i;
 
-	if (len < AOEV1_RESERVE_ARG_LEN || (len - AOEV1_RESERVE_ARG_LEN) % ETHER_ADDR_LEN)
+	if (len < AOEV1_RESERVE_ARG_LEN || (len - AOEV1_RESERVE_ARG_LEN) % MAC_ADDR_LEN)
 		goto invalid;
 	/* RCmd */
 	ND_TCHECK_1(cp);
@@ -321,12 +320,12 @@ aoev1_reserve_print(netdissect_options *ndo,
 	nmacs = EXTRACT_U_1(cp);
 	cp += 1;
 	ND_PRINT((ndo, ", NMacs: %u", nmacs));
-	if (AOEV1_RESERVE_ARG_LEN + nmacs * ETHER_ADDR_LEN != len)
+	if (AOEV1_RESERVE_ARG_LEN + nmacs * MAC_ADDR_LEN != len)
 		goto invalid;
 	/* addresses */
 	for (i = 0; i < nmacs; i++) {
 		ND_PRINT((ndo, "\n\tEthernet Address %u: %s", i, etheraddr_string(ndo, cp)));
-		cp += ETHER_ADDR_LEN;
+		cp += MAC_ADDR_LEN;
 	}
 	return;
 

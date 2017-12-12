@@ -210,11 +210,11 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		/*
 		 * This is an Ethernet_802.3 IPX frame; it has an
 		 * 802.3 header (i.e., an Ethernet header where the
-		 * type/length field is <= ETHERMTU, i.e. it's a length
-		 * field, not a type field), but has no 802.2 header -
-		 * the IPX packet starts right after the Ethernet header,
-		 * with a signature of two bytes of 0xFF (which is
-		 * LLCSAP_GLOBAL).
+		 * type/length field is <= MAX_ETHERNET_LENGTH_VAL,
+		 * i.e. it's a length field, not a type field), but
+		 * has no 802.2 header - the IPX packet starts right
+		 * after the Ethernet header, with a signature of two
+		 * bytes of 0xFF (which is LLCSAP_GLOBAL).
 		 *
 		 * (It might also have been an Ethernet_802.3 IPX at
 		 * one time, but got bridged onto another network,

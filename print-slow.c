@@ -29,7 +29,6 @@
 #include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
-#include "ether.h"
 #include "oui.h"
 
 #define	SLOW_PROTO_LACP                     1
@@ -202,7 +201,7 @@ static const struct tok slow_tlv_values[] = {
 
 struct lacp_tlv_actor_partner_info_t {
     nd_uint16_t sys_pri;
-    uint8_t sys[ETHER_ADDR_LEN];
+    nd_mac_addr sys;
     nd_uint16_t key;
     nd_uint16_t port_pri;
     nd_uint16_t port;
@@ -229,7 +228,7 @@ struct lacp_tlv_collector_info_t {
 
 struct marker_tlv_marker_info_t {
     nd_uint16_t req_port;
-    uint8_t req_sys[ETHER_ADDR_LEN];
+    nd_mac_addr req_sys;
     nd_uint32_t req_trans_id;
     uint8_t pad[2];
 };

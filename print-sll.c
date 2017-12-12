@@ -32,8 +32,6 @@
 #include "ethertype.h"
 #include "extract.h"
 
-#include "ether.h"
-
 /*
  * For captures on Linux cooked sockets, we construct a fake header
  * that includes:
@@ -149,7 +147,7 @@ sll_print(netdissect_options *ndo, register const struct sll_header *sllp, u_int
 	if (!ndo->ndo_qflag) {
 		ether_type = EXTRACT_BE_U_2(&sllp->sll_protocol);
 
-		if (ether_type <= ETHERMTU) {
+		if (ether_type <= MAX_ETHERNET_LENGTH_VAL) {
 			/*
 			 * Not an Ethernet type; what type is it?
 			 */
@@ -232,7 +230,7 @@ recurse:
 	 * Is it (gag) an 802.3 encapsulation, or some non-Ethernet
 	 * packet type?
 	 */
-	if (ether_type <= ETHERMTU) {
+	if (ether_type <= MAX_ETHERNET_LENGTH_VAL) {
 		/*
 		 * Yes - what type is it?
 		 */
@@ -285,7 +283,7 @@ recurse:
 		}
 
 		ether_type = EXTRACT_BE_U_2(p + 2);
-		if (ether_type <= ETHERMTU)
+		if (ether_type <= MAX_ETHERNET_LENGTH_VAL)
 			ether_type = LINUX_SLL_P_802_2;
 		if (!ndo->ndo_qflag) {
 			ND_PRINT((ndo, "ethertype %s, ",

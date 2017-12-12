@@ -73,10 +73,6 @@ extern int ether_ntohost(char *, const struct ether_addr *);
 #include "extract.h"
 #include "oui.h"
 
-#ifndef ETHER_ADDR_LEN
-#define ETHER_ADDR_LEN	6
-#endif
-
 /*
  * hash tables for whatever-to-name translations
  *
@@ -600,7 +596,7 @@ linkaddr_string(netdissect_options *ndo, const u_char *ep,
 	if (len == 0)
 		return ("<empty>");
 
-	if (type == LINKADDR_ETHER && len == ETHER_ADDR_LEN)
+	if (type == LINKADDR_ETHER && len == MAC_ADDR_LEN)
 		return (etheraddr_string(ndo, ep));
 
 	if (type == LINKADDR_FRELAY)

@@ -36,7 +36,6 @@
 
 #include "netdissect.h"
 #include "addrtoname.h"
-#include "ether.h"
 #include "nlpid.h"
 #include "extract.h"
 #include "gmpls.h"
@@ -49,7 +48,7 @@ static const char tstr[] = " [|isis]";
  * IS-IS is defined in ISO 10589.  Look there for protocol definitions.
  */
 
-#define SYSTEM_ID_LEN	ETHER_ADDR_LEN
+#define SYSTEM_ID_LEN	MAC_ADDR_LEN
 #define NODE_ID_LEN     (SYSTEM_ID_LEN+1)
 #define LSP_ID_LEN      (SYSTEM_ID_LEN+2)
 
@@ -2609,11 +2608,11 @@ isis_print(netdissect_options *ndo,
 	    }
 	    break;
 	case ISIS_TLV_ISNEIGH:
-	    while (tmp >= ETHER_ADDR_LEN) {
-                ND_TCHECK_LEN(tptr, ETHER_ADDR_LEN);
-                ND_PRINT((ndo, "\n\t      SNPA: %s", isis_print_id(tptr, ETHER_ADDR_LEN)));
-                tmp -= ETHER_ADDR_LEN;
-                tptr += ETHER_ADDR_LEN;
+	    while (tmp >= MAC_ADDR_LEN) {
+                ND_TCHECK_LEN(tptr, MAC_ADDR_LEN);
+                ND_PRINT((ndo, "\n\t      SNPA: %s", isis_print_id(tptr, MAC_ADDR_LEN)));
+                tmp -= MAC_ADDR_LEN;
+                tptr += MAC_ADDR_LEN;
 	    }
 	    break;
 

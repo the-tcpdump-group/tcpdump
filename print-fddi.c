@@ -30,17 +30,17 @@
 #include <string.h>
 
 #include "netdissect.h"
+#include "extract.h"
 #include "addrtoname.h"
-#include "ether.h"
 
 /*
  * Based on Ultrix if_fddi.h
  */
 
 struct fddi_header {
-	u_char  fddi_fc;		/* frame control */
-	u_char  fddi_dhost[6];
-	u_char  fddi_shost[6];
+	nd_uint8_t  fddi_fc;		/* frame control */
+	nd_mac_addr fddi_dhost;
+	nd_mac_addr fddi_shost;
 };
 
 /*
@@ -261,7 +261,7 @@ fddi_hdr_print(netdissect_options *ndo,
 	dstname = etheraddr_string(ndo, fdst);
 
 	if (!ndo->ndo_qflag)
-		print_fddi_fc(ndo, fddip->fddi_fc);
+		print_fddi_fc(ndo, EXTRACT_U_1(fddip->fddi_fc));
 	ND_PRINT((ndo, "%s > %s, length %u: ",
 	       srcname, dstname,
 	       length));
@@ -277,7 +277,8 @@ u_int
 fddi_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 {
 	const struct fddi_header *fddip = (const struct fddi_header *)p;
-	struct ether_header ehdr;
+	uint8_t fc;
+	nd_mac_addr srcmac, dstmac;
 	struct lladdr_info src, dst;
 	int llc_hdrlen;
 
@@ -286,17 +287,19 @@ fddi_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 		return (caplen);
 	}
 
+	fc = EXTRACT_U_1(fddip->fddi_fc);
+
 	/*
 	 * Get the FDDI addresses into a canonical form
 	 */
-	extract_fddi_addrs(fddip, (char *)ESRC(&ehdr), (char *)EDST(&ehdr));
+	extract_fddi_addrs(fddip, (char *)srcmac, (char *)dstmac);
 
 	if (ndo->ndo_eflag)
-		fddi_hdr_print(ndo, fddip, length, ESRC(&ehdr), EDST(&ehdr));
+		fddi_hdr_print(ndo, fddip, length, srcmac, dstmac);
 
-	src.addr = ESRC(&ehdr);
+	src.addr = srcmac;
 	src.addr_string = etheraddr_string;
-	dst.addr = EDST(&ehdr);
+	dst.addr = dstmac;
 	dst.addr_string = etheraddr_string;
 
 	/* Skip over FDDI MAC header */
@@ -305,7 +308,7 @@ fddi_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 	caplen -= FDDI_HDRLEN;
 
 	/* Frame Control field determines interpretation of packet */
-	if ((fddip->fddi_fc & FDDIFC_CLFF) == FDDIFC_LLC_ASYNC) {
+	if ((fc & FDDIFC_CLFF) == FDDIFC_LLC_ASYNC) {
 		/* Try to print the LLC-layer header & higher layers */
 		llc_hdrlen = llc_print(ndo, p, length, caplen, &src, &dst);
 		if (llc_hdrlen < 0) {
@@ -317,14 +320,14 @@ fddi_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 				ND_DEFAULTPRINT(p, caplen);
 			llc_hdrlen = -llc_hdrlen;
 		}
-	} else if ((fddip->fddi_fc & FDDIFC_CLFF) == FDDIFC_SMT) {
+	} else if ((fc & FDDIFC_CLFF) == FDDIFC_SMT) {
 		fddi_smt_print(ndo, p, caplen);
 		llc_hdrlen = 0;
 	} else {
 		/* Some kinds of FDDI packet we cannot handle intelligently */
 		if (!ndo->ndo_eflag)
-			fddi_hdr_print(ndo, fddip, length + FDDI_HDRLEN, ESRC(&ehdr),
-			    EDST(&ehdr));
+			fddi_hdr_print(ndo, fddip, length + FDDI_HDRLEN, srcmac,
+			    dstmac);
 		if (!ndo->ndo_suppress_default_print)
 			ND_DEFAULTPRINT(p, caplen);
 		llc_hdrlen = 0;

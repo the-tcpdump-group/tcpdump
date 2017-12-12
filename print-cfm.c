@@ -27,7 +27,6 @@
 
 #include "netdissect.h"
 #include "extract.h"
-#include "ether.h"
 #include "addrtoname.h"
 #include "oui.h"
 #include "af.h"
@@ -116,8 +115,8 @@ struct cfm_lbm_t {
 struct cfm_ltm_t {
     uint8_t transaction_id[4];
     uint8_t ttl;
-    uint8_t original_mac[ETHER_ADDR_LEN];
-    uint8_t target_mac[ETHER_ADDR_LEN];
+    nd_mac_addr original_mac;
+    nd_mac_addr target_mac;
 };
 
 static const struct tok cfm_ltm_flag_values[] = {
@@ -638,7 +637,7 @@ cfm_print(netdissect_options *ndo,
                 /* IEEE 802.1Q-2014 Section 21.5.3.3: Chassis ID */
                 switch (chassis_id_type) {
                 case CFM_CHASSIS_ID_MAC_ADDRESS:
-                    if (chassis_id_length != ETHER_ADDR_LEN) {
+                    if (chassis_id_length != MAC_ADDR_LEN) {
                         ND_PRINT((ndo, " (invalid MAC address length)"));
                         hexdump = TRUE;
                         break;

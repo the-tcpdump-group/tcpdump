@@ -26,7 +26,6 @@
 #include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
-#include "ether.h"
 
 #define VQP_VERSION            		1
 #define VQP_EXTRACT_VERSION(x) ((x)&0xFF)
@@ -192,7 +191,7 @@ vqp_print(netdissect_options *ndo, register const u_char *pptr, register u_int l
             /* those objects have similar semantics - fall through */
 	case VQP_OBJ_MAC_ADDRESS:
 	case VQP_OBJ_MAC_NULL:
-            if (vqp_obj_len != ETHER_ADDR_LEN)
+            if (vqp_obj_len != MAC_ADDR_LEN)
                 goto trunc;
 	      ND_PRINT((ndo, "%s", etheraddr_string(ndo, tptr)));
               break;

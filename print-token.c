@@ -37,7 +37,6 @@
 #include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
-#include "ether.h"
 
 /*
  * Copyright (c) 1998, Larry Lile
@@ -68,27 +67,26 @@
  */
 
 #define TOKEN_HDRLEN		14
-#define TOKEN_RING_MAC_LEN	6
 #define ROUTING_SEGMENT_MAX	16
 #define IS_SOURCE_ROUTED(trp)	((trp)->token_shost[0] & 0x80)
-#define FRAME_TYPE(trp)		(((trp)->token_fc & 0xC0) >> 6)
+#define FRAME_TYPE(trp)		((EXTRACT_U_1((trp)->token_fc) & 0xC0) >> 6)
 #define TOKEN_FC_LLC		1
 
-#define BROADCAST(trp)		((EXTRACT_BE_U_2(&(trp)->token_rcf) & 0xE000) >> 13)
-#define RIF_LENGTH(trp)		((EXTRACT_BE_U_2(&(trp)->token_rcf) & 0x1f00) >> 8)
-#define DIRECTION(trp)		((EXTRACT_BE_U_2(&(trp)->token_rcf) & 0x0080) >> 7)
-#define LARGEST_FRAME(trp)	((EXTRACT_BE_U_2(&(trp)->token_rcf) & 0x0070) >> 4)
-#define RING_NUMBER(trp, x)	((EXTRACT_BE_U_2(&(trp)->token_rseg[x]) & 0xfff0) >> 4)
-#define BRIDGE_NUMBER(trp, x)	((EXTRACT_BE_U_2(&(trp)->token_rseg[x]) & 0x000f))
+#define BROADCAST(trp)		((EXTRACT_BE_U_2((trp)->token_rcf) & 0xE000) >> 13)
+#define RIF_LENGTH(trp)		((EXTRACT_BE_U_2((trp)->token_rcf) & 0x1f00) >> 8)
+#define DIRECTION(trp)		((EXTRACT_BE_U_2((trp)->token_rcf) & 0x0080) >> 7)
+#define LARGEST_FRAME(trp)	((EXTRACT_BE_U_2((trp)->token_rcf) & 0x0070) >> 4)
+#define RING_NUMBER(trp, x)	((EXTRACT_BE_U_2((trp)->token_rseg[x]) & 0xfff0) >> 4)
+#define BRIDGE_NUMBER(trp, x)	((EXTRACT_BE_U_2((trp)->token_rseg[x]) & 0x000f))
 #define SEGMENT_COUNT(trp)	((int)((RIF_LENGTH(trp) - 2) / 2))
 
 struct token_header {
-	uint8_t  token_ac;
-	uint8_t  token_fc;
-	uint8_t  token_dhost[TOKEN_RING_MAC_LEN];
-	uint8_t  token_shost[TOKEN_RING_MAC_LEN];
-	uint16_t token_rcf;
-	uint16_t token_rseg[ROUTING_SEGMENT_MAX];
+	nd_uint8_t   token_ac;
+	nd_uint8_t   token_fc;
+	nd_mac_addr  token_dhost;
+	nd_mac_addr  token_shost;
+	nd_uint16_t  token_rcf;
+	nd_uint16_t  token_rseg[ROUTING_SEGMENT_MAX];
 };
 
 static const char tstr[] = "[|token-ring]";
@@ -116,8 +114,8 @@ token_hdr_print(netdissect_options *ndo,
 
 	if (!ndo->ndo_qflag)
 		ND_PRINT((ndo, "%02x %02x ",
-		       trp->token_ac,
-		       trp->token_fc));
+		       EXTRACT_U_1(trp->token_ac),
+		       EXTRACT_U_1(trp->token_fc)));
 	ND_PRINT((ndo, "%s > %s, length %u: ",
 	       srcname, dstname,
 	       length));
@@ -150,7 +148,7 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 {
 	const struct token_header *trp;
 	int llc_hdrlen;
-	struct ether_header ehdr;
+	nd_mac_addr srcmac, dstmac;
 	struct lladdr_info src, dst;
 	u_int route_len = 0, hdr_len = TOKEN_HDRLEN;
 	int seg;
@@ -165,15 +163,15 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 	/*
 	 * Get the TR addresses into a canonical form
 	 */
-	extract_token_addrs(trp, (char*)ESRC(&ehdr), (char*)EDST(&ehdr));
+	extract_token_addrs(trp, (char*)srcmac, (char*)dstmac);
 
 	/* Adjust for source routing information in the MAC header */
 	if (IS_SOURCE_ROUTED(trp)) {
 		/* Clear source-routed bit */
-		*ESRC(&ehdr) &= 0x7f;
+		srcmac[0] &= 0x7f;
 
 		if (ndo->ndo_eflag)
-			token_hdr_print(ndo, trp, length, ESRC(&ehdr), EDST(&ehdr));
+			token_hdr_print(ndo, trp, length, srcmac, dstmac);
 
 		if (caplen < TOKEN_HDRLEN + 2) {
 			ND_PRINT((ndo, "%s", tstr));
@@ -193,20 +191,20 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 				ND_PRINT((ndo, " [%d:%d]", RING_NUMBER(trp, seg),
 				    BRIDGE_NUMBER(trp, seg)));
 		} else {
-			ND_PRINT((ndo, "rt = %x", EXTRACT_BE_U_2(&trp->token_rcf)));
+			ND_PRINT((ndo, "rt = %x", EXTRACT_BE_U_2(trp->token_rcf)));
 
 			for (seg = 0; seg < SEGMENT_COUNT(trp); seg++)
-				ND_PRINT((ndo, ":%x", EXTRACT_BE_U_2(&trp->token_rseg[seg])));
+				ND_PRINT((ndo, ":%x", EXTRACT_BE_U_2(trp->token_rseg[seg])));
 		}
 		ND_PRINT((ndo, " (%s) ", largest_frame[LARGEST_FRAME(trp)]));
 	} else {
 		if (ndo->ndo_eflag)
-			token_hdr_print(ndo, trp, length, ESRC(&ehdr), EDST(&ehdr));
+			token_hdr_print(ndo, trp, length, srcmac, dstmac);
 	}
 
-	src.addr = ESRC(&ehdr);
+	src.addr = srcmac;
 	src.addr_string = etheraddr_string;
-	dst.addr = EDST(&ehdr);
+	dst.addr = dstmac;
 	dst.addr_string = etheraddr_string;
 
 	/* Skip over token ring MAC header and routing information */
@@ -230,7 +228,7 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 		/* XXX - dissect MAC packets if frame type is 0 */
 		if (!ndo->ndo_eflag)
 			token_hdr_print(ndo, trp, length + TOKEN_HDRLEN + route_len,
-			    ESRC(&ehdr), EDST(&ehdr));
+			    srcmac, dstmac);
 		if (!ndo->ndo_suppress_default_print)
 			ND_DEFAULTPRINT(p, caplen);
 	}

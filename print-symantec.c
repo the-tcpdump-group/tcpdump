@@ -31,8 +31,6 @@
 #include "extract.h"
 #include "ethertype.h"
 
-#include "ether.h"
-
 struct symantec_header {
 	uint8_t  stuff1[6];
 	uint16_t ether_type;
@@ -49,14 +47,14 @@ symantec_hdr_print(netdissect_options *ndo, register const u_char *bp, u_int len
 
 	etype = EXTRACT_BE_U_2(&sp->ether_type);
 	if (!ndo->ndo_qflag) {
-	        if (etype <= ETHERMTU)
+	        if (etype <= MAX_ETHERNET_LENGTH_VAL)
 		          ND_PRINT((ndo, "invalid ethertype %u", etype));
                 else
 		          ND_PRINT((ndo, "ethertype %s (0x%04x)",
 				       tok2str(ethertype_values,"Unknown", etype),
                                        etype));
         } else {
-                if (etype <= ETHERMTU)
+                if (etype <= MAX_ETHERNET_LENGTH_VAL)
                           ND_PRINT((ndo, "invalid ethertype %u", etype));
                 else
                           ND_PRINT((ndo, "%s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", etype)));
@@ -94,7 +92,7 @@ symantec_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_
 
 	ether_type = EXTRACT_BE_U_2(&sp->ether_type);
 
-	if (ether_type <= ETHERMTU) {
+	if (ether_type <= MAX_ETHERNET_LENGTH_VAL) {
 		/* ether_type not known, print raw packet */
 		if (!ndo->ndo_eflag)
 			symantec_hdr_print(ndo, (const u_char *)sp, length + sizeof (struct symantec_header));

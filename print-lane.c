@@ -30,12 +30,11 @@
 
 #include "netdissect.h"
 #include "extract.h"
-#include "ether.h"
 
 struct lecdatahdr_8023 {
   uint16_t le_header;
-  uint8_t h_dest[ETHER_ADDR_LEN];
-  uint8_t h_source[ETHER_ADDR_LEN];
+  nd_mac_addr h_dest;
+  nd_mac_addr h_source;
   uint16_t h_type;
 };
 

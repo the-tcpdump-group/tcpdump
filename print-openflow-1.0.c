@@ -67,7 +67,6 @@
 #include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
-#include "ether.h"
 #include "ethertype.h"
 #include "ipproto.h"
 #include "oui.h"
@@ -1153,9 +1152,9 @@ of10_phy_ports_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "\n\t  port_no %s", tok2str(ofpp_str, "%u", EXTRACT_BE_U_2(cp))));
 		cp += 2;
 		/* hw_addr */
-		ND_TCHECK_LEN(cp, ETHER_ADDR_LEN);
+		ND_TCHECK_LEN(cp, MAC_ADDR_LEN);
 		ND_PRINT((ndo, ", hw_addr %s", etheraddr_string(ndo, cp)));
-		cp += ETHER_ADDR_LEN;
+		cp += MAC_ADDR_LEN;
 		/* name */
 		ND_TCHECK_LEN(cp, OFP_MAX_PORT_NAME_LEN);
 		ND_PRINT((ndo, ", name '"));
@@ -1365,15 +1364,15 @@ of10_match_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "%smatch in_port %s", pfx, tok2str(ofpp_str, "%u", EXTRACT_BE_U_2(cp))));
 	cp += 2;
 	/* dl_src */
-	ND_TCHECK_LEN(cp, ETHER_ADDR_LEN);
+	ND_TCHECK_LEN(cp, MAC_ADDR_LEN);
 	if (! (wildcards & OFPFW_DL_SRC))
 		ND_PRINT((ndo, "%smatch dl_src %s", pfx, etheraddr_string(ndo, cp)));
-	cp += ETHER_ADDR_LEN;
+	cp += MAC_ADDR_LEN;
 	/* dl_dst */
-	ND_TCHECK_LEN(cp, ETHER_ADDR_LEN);
+	ND_TCHECK_LEN(cp, MAC_ADDR_LEN);
 	if (! (wildcards & OFPFW_DL_DST))
 		ND_PRINT((ndo, "%smatch dl_dst %s", pfx, etheraddr_string(ndo, cp)));
-	cp += ETHER_ADDR_LEN;
+	cp += MAC_ADDR_LEN;
 	/* dl_vlan */
 	ND_TCHECK_2(cp);
 	if (! (wildcards & OFPFW_DL_VLAN))
@@ -1543,9 +1542,9 @@ of10_actions_print(netdissect_options *ndo,
 		case OFPAT_SET_DL_SRC:
 		case OFPAT_SET_DL_DST:
 			/* dl_addr */
-			ND_TCHECK_LEN(cp, ETHER_ADDR_LEN);
+			ND_TCHECK_LEN(cp, MAC_ADDR_LEN);
 			ND_PRINT((ndo, ", dl_addr %s", etheraddr_string(ndo, cp)));
-			cp += ETHER_ADDR_LEN;
+			cp += MAC_ADDR_LEN;
 			/* pad */
 			ND_TCHECK_6(cp);
 			cp += 6;
@@ -1720,9 +1719,9 @@ of10_port_mod_print(netdissect_options *ndo,
 	ND_PRINT((ndo, "\n\t port_no %s", tok2str(ofpp_str, "%u", EXTRACT_BE_U_2(cp))));
 	cp += 2;
 	/* hw_addr */
-	ND_TCHECK_LEN(cp, ETHER_ADDR_LEN);
+	ND_TCHECK_LEN(cp, MAC_ADDR_LEN);
 	ND_PRINT((ndo, ", hw_addr %s", etheraddr_string(ndo, cp)));
-	cp += ETHER_ADDR_LEN;
+	cp += MAC_ADDR_LEN;
 	/* config */
 	ND_TCHECK_4(cp);
 	ND_PRINT((ndo, "\n\t config 0x%08x", EXTRACT_BE_U_4(cp)));

@@ -31,7 +31,22 @@
 #include "extract.h"
 #include "addrtoname.h"
 #include "ethertype.h"
-#include "ether.h"
+
+/*
+ * Structure of an Ethernet header.
+ */
+struct	ether_header {
+	nd_mac_addr	ether_dhost;
+	nd_mac_addr	ether_shost;
+	nd_uint16_t	ether_length_type;
+};
+
+/*
+ * Length of an Ethernet header; note that some compilers may pad
+ * "struct ether_header" to a multiple of 4 bytes, for example, so
+ * "sizeof (struct ether_header)" may not give the right answer.
+ */
+#define ETHER_HDRLEN		14
 
 const struct tok ethertype_values[] = {
     { ETHERTYPE_IP,		"IPv4" },
@@ -102,9 +117,9 @@ ether_hdr_print(netdissect_options *ndo,
 		     etheraddr_string(ndo, ESRC(ep)),
 		     etheraddr_string(ndo, EDST(ep))));
 
-	length_type = EXTRACT_BE_U_2(&ep->ether_length_type);
+	length_type = EXTRACT_BE_U_2(ep->ether_length_type);
 	if (!ndo->ndo_qflag) {
-	        if (length_type <= ETHERMTU) {
+	        if (length_type <= MAX_ETHERNET_LENGTH_VAL) {
 		        ND_PRINT((ndo, ", 802.3"));
 			length = length_type;
 		} else
@@ -112,7 +127,7 @@ ether_hdr_print(netdissect_options *ndo,
 				       tok2str(ethertype_values,"Unknown", length_type),
                                        length_type));
         } else {
-                if (length_type <= ETHERMTU) {
+                if (length_type <= MAX_ETHERNET_LENGTH_VAL) {
                         ND_PRINT((ndo, ", 802.3"));
 			length = length_type;
 		} else
@@ -168,13 +183,13 @@ ether_print(netdissect_options *ndo,
 	src.addr_string = etheraddr_string;
 	dst.addr = EDST(ep);
 	dst.addr_string = etheraddr_string;
-	length_type = EXTRACT_BE_U_2(&ep->ether_length_type);
+	length_type = EXTRACT_BE_U_2(ep->ether_length_type);
 
 recurse:
 	/*
 	 * Is it (gag) an 802.3 encapsulation?
 	 */
-	if (length_type <= ETHERMTU) {
+	if (length_type <= MAX_ETHERNET_LENGTH_VAL) {
 		/* Try to print the LLC-layer header & higher layers */
 		llc_hdrlen = llc_print(ndo, p, length, caplen, &src, &dst);
 		if (llc_hdrlen < 0) {
@@ -207,7 +222,7 @@ recurse:
 		}
 
 		length_type = EXTRACT_BE_U_2(p + 2);
-		if (ndo->ndo_eflag && length_type > ETHERMTU)
+		if (ndo->ndo_eflag && length_type > MAX_ETHERNET_LENGTH_VAL)
 			ND_PRINT((ndo, "ethertype %s, ", tok2str(ethertype_values,"0x%04x", length_type)));
 		p += 4;
 		length -= 4;
