@@ -35,14 +35,14 @@
 
 #include <netdissect-stdinc.h>
 
-#include "nameser.h"
-
 #include <stdio.h>
 #include <string.h>
 
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
+
+#include "nameser.h"
 
 /* BIND9 lib/lwres/include/lwres */
 typedef uint32_t lwres_uint32_t;

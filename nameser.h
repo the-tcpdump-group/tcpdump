@@ -210,28 +210,26 @@
  * Structure for query header.
  */
 typedef struct {
-	uint16_t id;		/* query identification number */
-	uint8_t  flags1;	/* first byte of flags */
-	uint8_t  flags2;	/* second byte of flags */
-	uint16_t qdcount;	/* number of question entries */
-	uint16_t ancount;	/* number of answer entries */
-	uint16_t nscount;	/* number of authority entries */
-	uint16_t arcount;	/* number of resource entries */
+	nd_uint16_t id;		/* query identification number */
+	nd_uint16_t flags;	/* QR, Opcode, AA, TC, RD, RA, RCODE */
+	nd_uint16_t qdcount;	/* number of question entries */
+	nd_uint16_t ancount;	/* number of answer entries */
+	nd_uint16_t nscount;	/* number of authority entries */
+	nd_uint16_t arcount;	/* number of resource entries */
 } HEADER;
 
 /*
  * Macros for subfields of flag fields.
  */
-#define DNS_QR(np)	((np)->flags1 & 0x80)		/* response flag */
-#define DNS_OPCODE(np)	((((np)->flags1) >> 3) & 0xF)	/* purpose of message */
-#define DNS_AA(np)	((np)->flags1 & 0x04)		/* authoritative answer */
-#define DNS_TC(np)	((np)->flags1 & 0x02)		/* truncated message */
-#define DNS_RD(np)	((np)->flags1 & 0x01)		/* recursion desired */
-
-#define DNS_RA(np)	((np)->flags2 & 0x80)	/* recursion available */
-#define DNS_AD(np)	((np)->flags2 & 0x20)	/* authentic data from named */
-#define DNS_CD(np)	((np)->flags2 & 0x10)	/* checking disabled by resolver */
-#define DNS_RCODE(np)	((np)->flags2 & 0xF)	/* response code */
+#define DNS_QR(flags)		((flags) & 0x8000)	/* response flag */
+#define DNS_OPCODE(flags)	(((flags) >> 11) & 0xF)	/* purpose of message */
+#define DNS_AA(flags)		(flags & 0x0400)	/* authoritative answer */
+#define DNS_TC(flags)		(flags & 0x0200)	/* truncated message */
+#define DNS_RD(flags)		(flags & 0x0100)	/* recursion desired */
+#define DNS_RA(flags)		(flags & 0x0080)	/* recursion available */
+#define DNS_AD(flags)		(flags & 0x0020)	/* authentic data from named */
+#define DNS_CD(flags)		(flags & 0x0010)	/* checking disabled by resolver */
+#define DNS_RCODE(flags)	(flags & 0x000F)	/* response code */
 
 /*
  * Defines for handling compressed domain names, EDNS0 labels, etc.

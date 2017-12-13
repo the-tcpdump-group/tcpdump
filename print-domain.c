@@ -27,14 +27,14 @@
 
 #include <netdissect-stdinc.h>
 
-#include "nameser.h"
-
 #include <string.h>
 
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "addrtostr.h"
 #include "extract.h"
+
+#include "nameser.h"
 
 static const char *ns_ops[] = {
 	"", " inv_q", " stat", " op3", " notify", " update", " op6", " op7",
@@ -588,35 +588,38 @@ domain_print(netdissect_options *ndo,
          register const u_char *bp, u_int length, int is_mdns)
 {
 	register const HEADER *np;
-	register int qdcount, ancount, nscount, arcount;
+	u_int16_t flags;
+	u_int qdcount, ancount, nscount, arcount;
+	u_int i;
 	register const u_char *cp;
 	uint16_t b2;
 
 	np = (const HEADER *)bp;
 	ND_TCHECK(*np);
+	flags = EXTRACT_BE_U_2(np->flags);
 	/* get the byte-order right */
-	qdcount = EXTRACT_BE_U_2(&np->qdcount);
-	ancount = EXTRACT_BE_U_2(&np->ancount);
-	nscount = EXTRACT_BE_U_2(&np->nscount);
-	arcount = EXTRACT_BE_U_2(&np->arcount);
+	qdcount = EXTRACT_BE_U_2(np->qdcount);
+	ancount = EXTRACT_BE_U_2(np->ancount);
+	nscount = EXTRACT_BE_U_2(np->nscount);
+	arcount = EXTRACT_BE_U_2(np->arcount);
 
-	if (DNS_QR(np)) {
+	if (DNS_QR(flags)) {
 		/* this is a response */
 		ND_PRINT((ndo, "%d%s%s%s%s%s%s",
-			EXTRACT_BE_U_2(&np->id),
-			ns_ops[DNS_OPCODE(np)],
-			ns_resp[DNS_RCODE(np)],
-			DNS_AA(np)? "*" : "",
-			DNS_RA(np)? "" : "-",
-			DNS_TC(np)? "|" : "",
-			DNS_AD(np)? "$" : ""));
+			EXTRACT_BE_U_2(np->id),
+			ns_ops[DNS_OPCODE(flags)],
+			ns_resp[DNS_RCODE(flags)],
+			DNS_AA(flags)? "*" : "",
+			DNS_RA(flags)? "" : "-",
+			DNS_TC(flags)? "|" : "",
+			DNS_AD(flags)? "$" : ""));
 
 		if (qdcount != 1)
-			ND_PRINT((ndo, " [%dq]", qdcount));
+			ND_PRINT((ndo, " [%uq]", qdcount));
 		/* Print QUESTION section on -vv */
 		cp = (const u_char *)(np + 1);
-		while (qdcount--) {
-			if (qdcount < EXTRACT_BE_U_2(&np->qdcount) - 1)
+		for (i = 0; i < qdcount; i++) {
+			if (i != 0)
 				ND_PRINT((ndo, ","));
 			if (ndo->ndo_vflag > 1) {
 				ND_PRINT((ndo, " q:"));
@@ -628,126 +631,140 @@ domain_print(netdissect_options *ndo,
 				cp += 4;	/* skip QTYPE and QCLASS */
 			}
 		}
-		ND_PRINT((ndo, " %d/%d/%d", ancount, nscount, arcount));
-		if (ancount--) {
+		ND_PRINT((ndo, " %u/%u/%u", ancount, nscount, arcount));
+		if (ancount) {
 			if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
 				goto trunc;
-			while (cp < ndo->ndo_snapend && ancount--) {
+			ancount--;
+			while (cp < ndo->ndo_snapend && ancount) {
 				ND_PRINT((ndo, ","));
 				if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
 					goto trunc;
+				ancount--;
 			}
 		}
-		if (ancount > 0)
+		if (ancount)
 			goto trunc;
 		/* Print NS and AR sections on -vv */
 		if (ndo->ndo_vflag > 1) {
-			if (cp < ndo->ndo_snapend && nscount--) {
+			if (cp < ndo->ndo_snapend && nscount) {
 				ND_PRINT((ndo, " ns:"));
 				if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
 					goto trunc;
-				while (cp < ndo->ndo_snapend && nscount--) {
+				nscount--;
+				while (cp < ndo->ndo_snapend && nscount) {
 					ND_PRINT((ndo, ","));
 					if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
 						goto trunc;
+					nscount--;
 				}
 			}
-			if (nscount > 0)
+			if (nscount)
 				goto trunc;
-			if (cp < ndo->ndo_snapend && arcount--) {
+			if (cp < ndo->ndo_snapend && arcount) {
 				ND_PRINT((ndo, " ar:"));
 				if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
 					goto trunc;
-				while (cp < ndo->ndo_snapend && arcount--) {
+				arcount--;
+				while (cp < ndo->ndo_snapend && arcount) {
 					ND_PRINT((ndo, ","));
 					if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
 						goto trunc;
+					arcount--;
 				}
 			}
-			if (arcount > 0)
+			if (arcount)
 				goto trunc;
 		}
 	}
 	else {
 		/* this is a request */
-		ND_PRINT((ndo, "%d%s%s%s", EXTRACT_BE_U_2(&np->id), ns_ops[DNS_OPCODE(np)],
-			  DNS_RD(np) ? "+" : "",
-			  DNS_CD(np) ? "%" : ""));
+		ND_PRINT((ndo, "%d%s%s%s", EXTRACT_BE_U_2(np->id), ns_ops[DNS_OPCODE(flags)],
+			  DNS_RD(flags) ? "+" : "",
+			  DNS_CD(flags) ? "%" : ""));
 
 		/* any weirdness? */
 		b2 = EXTRACT_BE_U_2(((const u_short *)np) + 1);
 		if (b2 & 0x6cf)
 			ND_PRINT((ndo, " [b2&3=0x%x]", b2));
 
-		if (DNS_OPCODE(np) == IQUERY) {
+		if (DNS_OPCODE(flags) == IQUERY) {
 			if (qdcount)
-				ND_PRINT((ndo, " [%dq]", qdcount));
+				ND_PRINT((ndo, " [%uq]", qdcount));
 			if (ancount != 1)
-				ND_PRINT((ndo, " [%da]", ancount));
+				ND_PRINT((ndo, " [%ua]", ancount));
 		}
 		else {
 			if (ancount)
-				ND_PRINT((ndo, " [%da]", ancount));
+				ND_PRINT((ndo, " [%ua]", ancount));
 			if (qdcount != 1)
-				ND_PRINT((ndo, " [%dq]", qdcount));
+				ND_PRINT((ndo, " [%uq]", qdcount));
 		}
 		if (nscount)
-			ND_PRINT((ndo, " [%dn]", nscount));
+			ND_PRINT((ndo, " [%un]", nscount));
 		if (arcount)
-			ND_PRINT((ndo, " [%dau]", arcount));
+			ND_PRINT((ndo, " [%uau]", arcount));
 
 		cp = (const u_char *)(np + 1);
-		if (qdcount--) {
+		if (qdcount) {
 			cp = ns_qprint(ndo, cp, (const u_char *)np, is_mdns);
 			if (!cp)
 				goto trunc;
-			while (cp < ndo->ndo_snapend && qdcount--) {
+			qdcount--;
+			while (cp < ndo->ndo_snapend && qdcount) {
 				cp = ns_qprint(ndo, (const u_char *)cp,
 					       (const u_char *)np,
 					       is_mdns);
 				if (!cp)
 					goto trunc;
+				qdcount--;
 			}
 		}
-		if (qdcount > 0)
+		if (qdcount)
 			goto trunc;
 
 		/* Print remaining sections on -vv */
 		if (ndo->ndo_vflag > 1) {
-			if (ancount--) {
+			if (ancount) {
 				if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
 					goto trunc;
-				while (cp < ndo->ndo_snapend && ancount--) {
+				ancount--;
+				while (cp < ndo->ndo_snapend && ancount) {
 					ND_PRINT((ndo, ","));
 					if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
 						goto trunc;
+					ancount--;
 				}
 			}
-			if (ancount > 0)
+			if (ancount)
 				goto trunc;
-			if (cp < ndo->ndo_snapend && nscount--) {
+			if (cp < ndo->ndo_snapend && nscount) {
 				ND_PRINT((ndo, " ns:"));
 				if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
 					goto trunc;
-				while (nscount-- && cp < ndo->ndo_snapend) {
+				nscount--;
+				while (cp < ndo->ndo_snapend && nscount) {
 					ND_PRINT((ndo, ","));
 					if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
 						goto trunc;
+					nscount--;
 				}
 			}
 			if (nscount > 0)
 				goto trunc;
-			if (cp < ndo->ndo_snapend && arcount--) {
+			if (cp < ndo->ndo_snapend && arcount) {
 				ND_PRINT((ndo, " ar:"));
 				if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
 					goto trunc;
-				while (cp < ndo->ndo_snapend && arcount--) {
+				arcount--;
+				while (cp < ndo->ndo_snapend && arcount) {
 					ND_PRINT((ndo, ","));
 					if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
 						goto trunc;
+					arcount--;
 				}
 			}
-			if (arcount > 0)
+			if (arcount)
 				goto trunc;
 		}
 	}
