@@ -29,12 +29,11 @@
 
 #include <netdissect-stdinc.h>
 
-#include "ether.h"
 #include "netdissect.h"
 #include "addrtoname.h"
 
 typedef struct ether_addr {
-        unsigned char octet[ETHER_ADDR_LEN];
+        unsigned char octet[MAC_ADDR_LEN];
       } ether_address;
 
 typedef struct ether_entry {
@@ -125,7 +124,7 @@ int parse_ether_buf (const char *buf, char **result, struct ether_addr *e)
   else
     fmt = "%02x-%02x-%02x-%02x-%02x-%02x";
 
-  if (sscanf(str, fmt, &eth[0], &eth[1], &eth[2], &eth[3], &eth[4], &eth[5]) != ETHER_ADDR_LEN)
+  if (sscanf(str, fmt, &eth[0], &eth[1], &eth[2], &eth[3], &eth[4], &eth[5]) != MAC_ADDR_LEN)
      return (0);
 
   str  = strtok (str, " \t");
@@ -136,7 +135,7 @@ int parse_ether_buf (const char *buf, char **result, struct ether_addr *e)
 
   *result = name;
 
-  for (i = 0; i < ETHER_ADDR_LEN; i++)
+  for (i = 0; i < MAC_ADDR_LEN; i++)
       e->octet[i] = eth[i];
 
   return (1);
@@ -175,7 +174,7 @@ static int init_ethers (void)
     if (!e)
        break;
 
-    memcpy(&e->eth_addr, &eth, ETHER_ADDR_LEN);
+    memcpy(&e->eth_addr, &eth, MAC_ADDR_LEN);
     e->name = strdup(name);
     if (!e->name) {
       free(e);
@@ -210,7 +209,7 @@ int ether_ntohost (char *name, struct ether_addr *e)
   }
 
   for (cache = eth0; cache; cache = cache->next)
-     if (!memcmp(&e->octet, &cache->eth_addr, ETHER_ADDR_LEN)) {
+     if (!memcmp(&e->octet, &cache->eth_addr, MAC_ADDR_LEN)) {
        strcpy (name,cache->name);
        return (0);
      }
