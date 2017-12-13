@@ -56,9 +56,9 @@
 uint16_t
 in_cksum(const struct cksum_vec *vec, int veclen)
 {
-	register const uint16_t *w;
-	register int sum = 0;
-	register int mlen = 0;
+	const uint16_t *w;
+	int sum = 0;
+	int mlen = 0;
 	int byte_swapped = 0;
 
 	union {

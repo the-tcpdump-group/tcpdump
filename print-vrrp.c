@@ -104,8 +104,8 @@ static const struct tok auth2str[] = {
 
 void
 vrrp_print(netdissect_options *ndo,
-           register const u_char *bp, register u_int len,
-           register const u_char *bp2, int ttl)
+           const u_char *bp, u_int len,
+           const u_char *bp2, int ttl)
 {
 	int version, type, auth_type = VRRP_AUTH_NONE; /* keep compiler happy */
 	const char *type_s;

@@ -1473,7 +1473,7 @@ mldv2_query_print(netdissect_options *ndo, const u_char *bp, u_int len)
     u_int mrc;
     int mrt, qqi;
     u_int nsrcs;
-    register u_int i;
+    u_int i;
 
     /* Minimum len is 28 */
     if (len < 28) {

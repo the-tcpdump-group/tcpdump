@@ -137,11 +137,11 @@ struct pim {
 	u_short	pim_cksum;	/* IP style check sum */
 };
 
-static void pimv2_print(netdissect_options *, register const u_char *bp, register u_int len, const u_char *);
+static void pimv2_print(netdissect_options *, const u_char *bp, u_int len, const u_char *);
 
 static void
 pimv1_join_prune_print(netdissect_options *ndo,
-                       register const u_char *bp, register u_int len)
+                       const u_char *bp, u_int len)
 {
 	int ngroups, njoin, nprune;
 	int njp;
@@ -249,9 +249,9 @@ trunc:
 
 void
 pimv1_print(netdissect_options *ndo,
-            register const u_char *bp, register u_int len)
+            const u_char *bp, u_int len)
 {
-	register u_char type;
+	u_char type;
 
 	ND_TCHECK_1(bp + 1);
 	type = EXTRACT_U_1(bp + 1);
@@ -343,7 +343,7 @@ trunc:
  */
 void
 cisco_autorp_print(netdissect_options *ndo,
-                   register const u_char *bp, register u_int len)
+                   const u_char *bp, u_int len)
 {
 	int type;
 	int numrps;
@@ -453,9 +453,9 @@ trunc:
 
 void
 pim_print(netdissect_options *ndo,
-          register const u_char *bp, register u_int len, const u_char *bp2)
+          const u_char *bp, u_int len, const u_char *bp2)
 {
-	register const struct pim *pim = (const struct pim *)bp;
+	const struct pim *pim = (const struct pim *)bp;
 
 #ifdef notyet			/* currently we see only version and type */
 	ND_TCHECK(pim->pim_rsv);
@@ -692,9 +692,9 @@ pimv2_check_checksum(netdissect_options *ndo, const u_char *bp,
 
 static void
 pimv2_print(netdissect_options *ndo,
-            register const u_char *bp, register u_int len, const u_char *bp2)
+            const u_char *bp, u_int len, const u_char *bp2)
 {
-	register const struct pim *pim = (const struct pim *)bp;
+	const struct pim *pim = (const struct pim *)bp;
 	int advance;
 	enum checksum_status cksum_status;
 	int pimv2_addr_len;

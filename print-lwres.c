@@ -290,7 +290,7 @@ lwres_printaddr(netdissect_options *ndo,
 
 void
 lwres_print(netdissect_options *ndo,
-            register const u_char *bp, u_int length)
+            const u_char *bp, u_int length)
 {
 	const struct lwres_lwpacket *np;
 	uint32_t v;

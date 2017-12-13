@@ -51,7 +51,7 @@
 
 static const char tstr[] = " [|kerberos]";
 
-static const u_char *c_print(netdissect_options *, register const u_char *, register const u_char *);
+static const u_char *c_print(netdissect_options *, const u_char *, const u_char *);
 static const u_char *krb4_print_hdr(netdissect_options *, const u_char *);
 static void krb4_print(netdissect_options *, const u_char *);
 
@@ -112,10 +112,10 @@ static const struct tok kerr2str[] = {
 
 static const u_char *
 c_print(netdissect_options *ndo,
-        register const u_char *s, register const u_char *ep)
+        const u_char *s, const u_char *ep)
 {
-	register u_char c;
-	register int flag;
+	u_char c;
+	int flag;
 
 	flag = 1;
 	while (s < ep) {
@@ -166,7 +166,7 @@ static void
 krb4_print(netdissect_options *ndo,
            const u_char *cp)
 {
-	register const struct krb *kp;
+	const struct krb *kp;
 	u_char type;
 	u_short len;
 
@@ -247,7 +247,7 @@ void
 krb_print(netdissect_options *ndo,
           const u_char *dat)
 {
-	register const struct krb *kp;
+	const struct krb *kp;
 
 	kp = (const struct krb *)dat;
 

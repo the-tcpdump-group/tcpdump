@@ -178,7 +178,7 @@ static const struct tok bfd_v1_state_values[] = {
 };
 
 static int
-auth_print(netdissect_options *ndo, register const u_char *pptr)
+auth_print(netdissect_options *ndo, const u_char *pptr)
 {
         const struct bfd_auth_header_t *bfd_auth_header;
         int i;
@@ -289,8 +289,8 @@ trunc:
 }
 
 void
-bfd_print(netdissect_options *ndo, register const u_char *pptr,
-          register u_int len, register u_int port)
+bfd_print(netdissect_options *ndo, const u_char *pptr,
+          u_int len, u_int port)
 {
         const struct bfd_header_t *bfd_header;
         uint8_t version = 0;

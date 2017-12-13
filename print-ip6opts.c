@@ -171,7 +171,7 @@ trunc:
 }
 
 int
-hbhopt_print(netdissect_options *ndo, register const u_char *bp)
+hbhopt_print(netdissect_options *ndo, const u_char *bp)
 {
     const struct ip6_hbh *dp = (const struct ip6_hbh *)bp;
     u_int hbhlen = 0;
@@ -191,7 +191,7 @@ hbhopt_print(netdissect_options *ndo, register const u_char *bp)
 }
 
 int
-dstopt_print(netdissect_options *ndo, register const u_char *bp)
+dstopt_print(netdissect_options *ndo, const u_char *bp)
 {
     const struct ip6_dest *dp = (const struct ip6_dest *)bp;
     u_int dstoptlen = 0;

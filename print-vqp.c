@@ -97,7 +97,7 @@ static const struct tok vqp_obj_values[] = {
 };
 
 void
-vqp_print(netdissect_options *ndo, register const u_char *pptr, register u_int len)
+vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 {
     const struct vqp_common_header_t *vqp_common_header;
     const struct vqp_obj_tlv_t *vqp_obj_tlv;

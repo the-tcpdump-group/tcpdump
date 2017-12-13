@@ -526,10 +526,10 @@ static int is_ubik(uint32_t);
 
 void
 rx_print(netdissect_options *ndo,
-         register const u_char *bp, u_int length, u_int sport, u_int dport,
+         const u_char *bp, u_int length, u_int sport, u_int dport,
          const u_char *bp2)
 {
-	register const struct rx_header *rxh;
+	const struct rx_header *rxh;
 	uint32_t i;
 	uint8_t type, flags;
 	uint32_t opcode;
@@ -889,7 +889,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, u_int sport,
 
 static void
 fs_print(netdissect_options *ndo,
-         register const u_char *bp, u_int length)
+         const u_char *bp, u_int length)
 {
 	uint32_t fs_op;
 	uint32_t i;
@@ -1059,7 +1059,7 @@ trunc:
 
 static void
 fs_reply_print(netdissect_options *ndo,
-               register const u_char *bp, u_int length, uint32_t opcode)
+               const u_char *bp, u_int length, uint32_t opcode)
 {
 	uint32_t i;
 	const struct rx_header *rxh;
@@ -1224,7 +1224,7 @@ finish:
 
 static void
 cb_print(netdissect_options *ndo,
-         register const u_char *bp, u_int length)
+         const u_char *bp, u_int length)
 {
 	uint32_t cb_op;
 	uint32_t i;
@@ -1305,7 +1305,7 @@ trunc:
 
 static void
 cb_reply_print(netdissect_options *ndo,
-               register const u_char *bp, u_int length, uint32_t opcode)
+               const u_char *bp, u_int length, uint32_t opcode)
 {
 	const struct rx_header *rxh;
 	uint8_t type;
@@ -1357,7 +1357,7 @@ trunc:
 
 static void
 prot_print(netdissect_options *ndo,
-           register const u_char *bp, u_int length)
+           const u_char *bp, u_int length)
 {
 	uint32_t i;
 	uint32_t pt_op;
@@ -1498,7 +1498,7 @@ trunc:
 
 static void
 prot_reply_print(netdissect_options *ndo,
-                 register const u_char *bp, u_int length, uint32_t opcode)
+                 const u_char *bp, u_int length, uint32_t opcode)
 {
 	const struct rx_header *rxh;
 	uint8_t type;
@@ -1613,7 +1613,7 @@ trunc:
 
 static void
 vldb_print(netdissect_options *ndo,
-           register const u_char *bp, u_int length)
+           const u_char *bp, u_int length)
 {
 	uint32_t vldb_op;
 	uint32_t i;
@@ -1704,7 +1704,7 @@ trunc:
 
 static void
 vldb_reply_print(netdissect_options *ndo,
-                 register const u_char *bp, u_int length, uint32_t opcode)
+                 const u_char *bp, u_int length, uint32_t opcode)
 {
 	const struct rx_header *rxh;
 	uint8_t type;
@@ -1894,7 +1894,7 @@ trunc:
 
 static void
 kauth_print(netdissect_options *ndo,
-            register const u_char *bp, u_int length)
+            const u_char *bp, u_int length)
 {
 	uint32_t kauth_op;
 
@@ -1985,7 +1985,7 @@ trunc:
 
 static void
 kauth_reply_print(netdissect_options *ndo,
-                  register const u_char *bp, u_int length, uint32_t opcode)
+                  const u_char *bp, u_int length, uint32_t opcode)
 {
 	const struct rx_header *rxh;
 	uint8_t type;
@@ -2039,7 +2039,7 @@ trunc:
 
 static void
 vol_print(netdissect_options *ndo,
-          register const u_char *bp, u_int length)
+          const u_char *bp, u_int length)
 {
 	uint32_t vol_op;
 
@@ -2238,7 +2238,7 @@ trunc:
 
 static void
 vol_reply_print(netdissect_options *ndo,
-                register const u_char *bp, u_int length, uint32_t opcode)
+                const u_char *bp, u_int length, uint32_t opcode)
 {
 	const struct rx_header *rxh;
 	uint8_t type;
@@ -2375,7 +2375,7 @@ trunc:
 
 static void
 bos_print(netdissect_options *ndo,
-          register const u_char *bp, u_int length)
+          const u_char *bp, u_int length)
 {
 	uint32_t bos_op;
 
@@ -2464,7 +2464,7 @@ trunc:
 
 static void
 bos_reply_print(netdissect_options *ndo,
-                register const u_char *bp, u_int length, uint32_t opcode)
+                const u_char *bp, u_int length, uint32_t opcode)
 {
 	const struct rx_header *rxh;
 	uint8_t type;
@@ -2525,7 +2525,7 @@ is_ubik(uint32_t opcode)
 
 static void
 ubik_print(netdissect_options *ndo,
-           register const u_char *bp)
+           const u_char *bp)
 {
 	uint32_t ubik_op;
 	uint32_t temp;
@@ -2640,7 +2640,7 @@ trunc:
 
 static void
 ubik_reply_print(netdissect_options *ndo,
-                 register const u_char *bp, u_int length, uint32_t opcode)
+                 const u_char *bp, u_int length, uint32_t opcode)
 {
 	const struct rx_header *rxh;
 	uint8_t type;
@@ -2706,7 +2706,7 @@ trunc:
 
 static void
 rx_ack_print(netdissect_options *ndo,
-             register const u_char *bp, u_int length)
+             const u_char *bp, u_int length)
 {
 	const struct rx_ackPacket *rxa;
 	uint8_t nAcks;

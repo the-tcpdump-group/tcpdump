@@ -45,13 +45,13 @@ static const struct tok chdlc_cast_values[] = {
 
 /* Standard CHDLC printer */
 u_int
-chdlc_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, register const u_char *p)
+chdlc_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
 	return chdlc_print(ndo, p, h->len);
 }
 
 u_int
-chdlc_print(netdissect_options *ndo, register const u_char *p, u_int length)
+chdlc_print(netdissect_options *ndo, const u_char *p, u_int length)
 {
 	u_int proto;
 	const u_char *bp = p;

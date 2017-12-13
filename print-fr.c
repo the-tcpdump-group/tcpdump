@@ -217,10 +217,10 @@ fr_hdr_print(netdissect_options *ndo,
 
 u_int
 fr_if_print(netdissect_options *ndo,
-            const struct pcap_pkthdr *h, register const u_char *p)
+            const struct pcap_pkthdr *h, const u_char *p)
 {
-	register u_int length = h->len;
-	register u_int caplen = h->caplen;
+	u_int length = h->len;
+	u_int caplen = h->caplen;
 
         ND_TCHECK_4(p); /* minimum frame header length */
 
@@ -235,7 +235,7 @@ fr_if_print(netdissect_options *ndo,
 
 u_int
 fr_print(netdissect_options *ndo,
-         register const u_char *p, u_int length)
+         const u_char *p, u_int length)
 {
 	int ret;
 	uint16_t extracted_ethertype;
@@ -373,10 +373,10 @@ fr_print(netdissect_options *ndo,
 
 u_int
 mfr_if_print(netdissect_options *ndo,
-             const struct pcap_pkthdr *h, register const u_char *p)
+             const struct pcap_pkthdr *h, const u_char *p)
 {
-	register u_int length = h->len;
-	register u_int caplen = h->caplen;
+	u_int length = h->len;
+	u_int caplen = h->caplen;
 
         ND_TCHECK_2(p); /* minimum frame header length */
 
@@ -435,7 +435,7 @@ struct ie_tlv_header_t {
 
 u_int
 mfr_print(netdissect_options *ndo,
-          register const u_char *p, u_int length)
+          const u_char *p, u_int length)
 {
     u_int tlen,idx,hdr_len = 0;
     uint16_t sequence_num;

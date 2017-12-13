@@ -445,14 +445,14 @@ static const struct tok juniper_protocol_values[] = {
     { 0, NULL}
 };
 
-static int ip_heuristic_guess(netdissect_options *, register const u_char *, u_int);
-static int juniper_ppp_heuristic_guess(netdissect_options *, register const u_char *, u_int);
+static int ip_heuristic_guess(netdissect_options *, const u_char *, u_int);
+static int juniper_ppp_heuristic_guess(netdissect_options *, const u_char *, u_int);
 static int juniper_parse_header(netdissect_options *, const u_char *, const struct pcap_pkthdr *, struct juniper_l2info_t *);
 
 #ifdef DLT_JUNIPER_GGSN
 u_int
 juniper_ggsn_if_print(netdissect_options *ndo,
-                      const struct pcap_pkthdr *h, register const u_char *p)
+                      const struct pcap_pkthdr *h, const u_char *p)
 {
         struct juniper_l2info_t l2info;
         struct juniper_ggsn_header {
@@ -503,7 +503,7 @@ trunc:
 #ifdef DLT_JUNIPER_ES
 u_int
 juniper_es_if_print(netdissect_options *ndo,
-                    const struct pcap_pkthdr *h, register const u_char *p)
+                    const struct pcap_pkthdr *h, const u_char *p)
 {
         struct juniper_l2info_t l2info;
         struct juniper_ipsec_header {
@@ -580,7 +580,7 @@ trunc:
 #ifdef DLT_JUNIPER_MONITOR
 u_int
 juniper_monitor_if_print(netdissect_options *ndo,
-                         const struct pcap_pkthdr *h, register const u_char *p)
+                         const struct pcap_pkthdr *h, const u_char *p)
 {
         struct juniper_l2info_t l2info;
         struct juniper_monitor_header {
@@ -619,7 +619,7 @@ trunc:
 #ifdef DLT_JUNIPER_SERVICES
 u_int
 juniper_services_if_print(netdissect_options *ndo,
-                          const struct pcap_pkthdr *h, register const u_char *p)
+                          const struct pcap_pkthdr *h, const u_char *p)
 {
         struct juniper_l2info_t l2info;
         struct juniper_services_header {
@@ -659,7 +659,7 @@ trunc:
 #ifdef DLT_JUNIPER_PPPOE
 u_int
 juniper_pppoe_if_print(netdissect_options *ndo,
-                       const struct pcap_pkthdr *h, register const u_char *p)
+                       const struct pcap_pkthdr *h, const u_char *p)
 {
         struct juniper_l2info_t l2info;
 
@@ -677,7 +677,7 @@ juniper_pppoe_if_print(netdissect_options *ndo,
 #ifdef DLT_JUNIPER_ETHER
 u_int
 juniper_ether_if_print(netdissect_options *ndo,
-                       const struct pcap_pkthdr *h, register const u_char *p)
+                       const struct pcap_pkthdr *h, const u_char *p)
 {
         struct juniper_l2info_t l2info;
 
@@ -695,7 +695,7 @@ juniper_ether_if_print(netdissect_options *ndo,
 #ifdef DLT_JUNIPER_PPP
 u_int
 juniper_ppp_if_print(netdissect_options *ndo,
-                     const struct pcap_pkthdr *h, register const u_char *p)
+                     const struct pcap_pkthdr *h, const u_char *p)
 {
         struct juniper_l2info_t l2info;
 
@@ -713,7 +713,7 @@ juniper_ppp_if_print(netdissect_options *ndo,
 #ifdef DLT_JUNIPER_FRELAY
 u_int
 juniper_frelay_if_print(netdissect_options *ndo,
-                        const struct pcap_pkthdr *h, register const u_char *p)
+                        const struct pcap_pkthdr *h, const u_char *p)
 {
         struct juniper_l2info_t l2info;
 
@@ -731,7 +731,7 @@ juniper_frelay_if_print(netdissect_options *ndo,
 #ifdef DLT_JUNIPER_CHDLC
 u_int
 juniper_chdlc_if_print(netdissect_options *ndo,
-                       const struct pcap_pkthdr *h, register const u_char *p)
+                       const struct pcap_pkthdr *h, const u_char *p)
 {
         struct juniper_l2info_t l2info;
 
@@ -749,7 +749,7 @@ juniper_chdlc_if_print(netdissect_options *ndo,
 #ifdef DLT_JUNIPER_PPPOE_ATM
 u_int
 juniper_pppoe_atm_if_print(netdissect_options *ndo,
-                           const struct pcap_pkthdr *h, register const u_char *p)
+                           const struct pcap_pkthdr *h, const u_char *p)
 {
         struct juniper_l2info_t l2info;
 	uint16_t extracted_ethertype;
@@ -783,7 +783,7 @@ trunc:
 #ifdef DLT_JUNIPER_MLPPP
 u_int
 juniper_mlppp_if_print(netdissect_options *ndo,
-                       const struct pcap_pkthdr *h, register const u_char *p)
+                       const struct pcap_pkthdr *h, const u_char *p)
 {
         struct juniper_l2info_t l2info;
 
@@ -843,7 +843,7 @@ juniper_mlppp_if_print(netdissect_options *ndo,
 #ifdef DLT_JUNIPER_MFR
 u_int
 juniper_mfr_if_print(netdissect_options *ndo,
-                     const struct pcap_pkthdr *h, register const u_char *p)
+                     const struct pcap_pkthdr *h, const u_char *p)
 {
         struct juniper_l2info_t l2info;
 
@@ -905,7 +905,7 @@ juniper_mfr_if_print(netdissect_options *ndo,
 #ifdef DLT_JUNIPER_MLFR
 u_int
 juniper_mlfr_if_print(netdissect_options *ndo,
-                      const struct pcap_pkthdr *h, register const u_char *p)
+                      const struct pcap_pkthdr *h, const u_char *p)
 {
         struct juniper_l2info_t l2info;
 
@@ -948,7 +948,7 @@ juniper_mlfr_if_print(netdissect_options *ndo,
 #ifdef DLT_JUNIPER_ATM1
 u_int
 juniper_atm1_if_print(netdissect_options *ndo,
-                      const struct pcap_pkthdr *h, register const u_char *p)
+                      const struct pcap_pkthdr *h, const u_char *p)
 {
         int llc_hdrlen;
 
@@ -1002,7 +1002,7 @@ trunc:
 #ifdef DLT_JUNIPER_ATM2
 u_int
 juniper_atm2_if_print(netdissect_options *ndo,
-                      const struct pcap_pkthdr *h, register const u_char *p)
+                      const struct pcap_pkthdr *h, const u_char *p)
 {
         int llc_hdrlen;
 
@@ -1059,7 +1059,7 @@ trunc:
  * a juniper router if the payload data is encapsulated using PPP */
 static int
 juniper_ppp_heuristic_guess(netdissect_options *ndo,
-                            register const u_char *p, u_int length)
+                            const u_char *p, u_int length)
 {
     switch(EXTRACT_BE_U_2(p)) {
     case PPP_IP :
@@ -1087,7 +1087,7 @@ juniper_ppp_heuristic_guess(netdissect_options *ndo,
 
 static int
 ip_heuristic_guess(netdissect_options *ndo,
-                   register const u_char *p, u_int length)
+                   const u_char *p, u_int length)
 {
     switch(EXTRACT_U_1(p)) {
     case 0x45:

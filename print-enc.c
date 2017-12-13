@@ -87,10 +87,10 @@ struct enchdr {
 
 u_int
 enc_if_print(netdissect_options *ndo,
-             const struct pcap_pkthdr *h, register const u_char *p)
+             const struct pcap_pkthdr *h, const u_char *p)
 {
-	register u_int length = h->len;
-	register u_int caplen = h->caplen;
+	u_int length = h->len;
+	u_int caplen = h->caplen;
 	int flags;
 	const struct enchdr *hdr;
 

@@ -38,9 +38,9 @@ struct symantec_header {
 };
 
 static inline void
-symantec_hdr_print(netdissect_options *ndo, register const u_char *bp, u_int length)
+symantec_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
-	register const struct symantec_header *sp;
+	const struct symantec_header *sp;
 	uint16_t etype;
 
 	sp = (const struct symantec_header *)bp;

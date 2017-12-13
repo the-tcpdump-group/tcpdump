@@ -1425,7 +1425,7 @@ lldp_mgmt_addr_tlv_print(netdissect_options *ndo,
 
 void
 lldp_print(netdissect_options *ndo,
-           register const u_char *pptr, register u_int len)
+           const u_char *pptr, u_int len)
 {
     uint8_t subtype;
     uint16_t tlv, cap, ena_cap;

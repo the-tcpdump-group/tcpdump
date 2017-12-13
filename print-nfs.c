@@ -320,10 +320,10 @@ print_sattr3(netdissect_options *ndo,
 
 void
 nfsreply_print(netdissect_options *ndo,
-               register const u_char *bp, u_int length,
-               register const u_char *bp2)
+               const u_char *bp, u_int length,
+               const u_char *bp2)
 {
-	register const struct sunrpc_msg *rp;
+	const struct sunrpc_msg *rp;
 	char srcid[20], dstid[20];	/*fits 32bit*/
 
 	nfserr = 0;		/* assume no error */
@@ -351,10 +351,10 @@ trunc:
 
 void
 nfsreply_noaddr_print(netdissect_options *ndo,
-                      register const u_char *bp, u_int length,
-                      register const u_char *bp2)
+                      const u_char *bp, u_int length,
+                      const u_char *bp2)
 {
-	register const struct sunrpc_msg *rp;
+	const struct sunrpc_msg *rp;
 	uint32_t proc, vers, reply_stat;
 	enum sunrpc_reject_stat rstat;
 	uint32_t rlow;
@@ -416,10 +416,10 @@ trunc:
  */
 static const uint32_t *
 parsereq(netdissect_options *ndo,
-         register const struct sunrpc_msg *rp, register u_int length)
+         const struct sunrpc_msg *rp, u_int length)
 {
-	register const uint32_t *dp;
-	register u_int len;
+	const uint32_t *dp;
+	u_int len;
 
 	/*
 	 * find the start of the req data (if we captured it)
@@ -447,7 +447,7 @@ trunc:
  */
 static const uint32_t *
 parsefh(netdissect_options *ndo,
-        register const uint32_t *dp, int v3)
+        const uint32_t *dp, int v3)
 {
 	u_int len;
 
@@ -472,10 +472,10 @@ trunc:
  */
 static const uint32_t *
 parsefn(netdissect_options *ndo,
-        register const uint32_t *dp)
+        const uint32_t *dp)
 {
-	register uint32_t len;
-	register const u_char *cp;
+	uint32_t len;
+	const u_char *cp;
 
 	/* Bail if we don't have the string length */
 	ND_TCHECK(*dp);
@@ -508,7 +508,7 @@ trunc:
  */
 static const uint32_t *
 parsefhn(netdissect_options *ndo,
-         register const uint32_t *dp, int v3)
+         const uint32_t *dp, int v3)
 {
 	dp = parsefh(ndo, dp, v3);
 	if (dp == NULL)
@@ -519,11 +519,11 @@ parsefhn(netdissect_options *ndo,
 
 void
 nfsreq_noaddr_print(netdissect_options *ndo,
-                    register const u_char *bp, u_int length,
-                    register const u_char *bp2)
+                    const u_char *bp, u_int length,
+                    const u_char *bp2)
 {
-	register const struct sunrpc_msg *rp;
-	register const uint32_t *dp;
+	const struct sunrpc_msg *rp;
+	const uint32_t *dp;
 	nfs_type type;
 	int v3;
 	uint32_t proc;
@@ -783,7 +783,7 @@ trunc:
  */
 static void
 nfs_printfh(netdissect_options *ndo,
-            register const uint32_t *dp, const u_int len)
+            const uint32_t *dp, const u_int len)
 {
 	my_fsid fsid;
 	uint32_t ino;
@@ -974,9 +974,9 @@ xid_map_find(const struct sunrpc_msg *rp, const u_char *bp, uint32_t *proc,
  */
 static const uint32_t *
 parserep(netdissect_options *ndo,
-         register const struct sunrpc_msg *rp, register u_int length)
+         const struct sunrpc_msg *rp, u_int length)
 {
-	register const uint32_t *dp;
+	const uint32_t *dp;
 	u_int len;
 	enum sunrpc_accept_stat astat;
 
@@ -1447,8 +1447,8 @@ static void
 interp_reply(netdissect_options *ndo,
              const struct sunrpc_msg *rp, uint32_t proc, uint32_t vers, int length)
 {
-	register const uint32_t *dp;
-	register int v3;
+	const uint32_t *dp;
+	int v3;
 	int er;
 
 	v3 = (vers == NFS_VER3);

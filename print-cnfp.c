@@ -157,8 +157,8 @@ struct nfrec_v6 {
 static void
 cnfp_v1_print(netdissect_options *ndo, const u_char *cp)
 {
-	register const struct nfhdr_v1 *nh;
-	register const struct nfrec_v1 *nr;
+	const struct nfhdr_v1 *nh;
+	const struct nfrec_v1 *nr;
 	const char *p_name;
 	int nrecs, ver;
 #if 0
@@ -246,8 +246,8 @@ trunc:
 static void
 cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 {
-	register const struct nfhdr_v5 *nh;
-	register const struct nfrec_v5 *nr;
+	const struct nfhdr_v5 *nh;
+	const struct nfrec_v5 *nr;
 	const char *p_name;
 	int nrecs, ver;
 #if 0
@@ -342,8 +342,8 @@ trunc:
 static void
 cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 {
-	register const struct nfhdr_v6 *nh;
-	register const struct nfrec_v6 *nr;
+	const struct nfhdr_v6 *nh;
+	const struct nfrec_v6 *nr;
 	const char *p_name;
 	int nrecs, ver;
 #if 0

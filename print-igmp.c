@@ -110,9 +110,9 @@ static const struct tok igmpv3report2str[] = {
 
 static void
 print_mtrace(netdissect_options *ndo,
-             register const u_char *bp, register u_int len)
+             const u_char *bp, u_int len)
 {
-    register const struct tr_query *tr = (const struct tr_query *)(bp + 8);
+    const struct tr_query *tr = (const struct tr_query *)(bp + 8);
 
     ND_TCHECK(*tr);
     if (len < 8 + sizeof (struct tr_query)) {
@@ -132,9 +132,9 @@ trunc:
 
 static void
 print_mresp(netdissect_options *ndo,
-            register const u_char *bp, register u_int len)
+            const u_char *bp, u_int len)
 {
-    register const struct tr_query *tr = (const struct tr_query *)(bp + 8);
+    const struct tr_query *tr = (const struct tr_query *)(bp + 8);
 
     ND_TCHECK(*tr);
     if (len < 8 + sizeof (struct tr_query)) {
@@ -154,10 +154,10 @@ trunc:
 
 static void
 print_igmpv3_report(netdissect_options *ndo,
-                    register const u_char *bp, register u_int len)
+                    const u_char *bp, u_int len)
 {
     u_int group, nsrcs, ngroups;
-    register u_int i, j;
+    u_int i, j;
 
     /* Minimum len is 16, and should be a multiple of 4 */
     if (len < 16 || len & 0x03) {
@@ -208,12 +208,12 @@ trunc:
 
 static void
 print_igmpv3_query(netdissect_options *ndo,
-                   register const u_char *bp, register u_int len)
+                   const u_char *bp, u_int len)
 {
     u_int mrc;
     u_int mrt;
     u_int nsrcs;
-    register u_int i;
+    u_int i;
 
     ND_PRINT((ndo, " v3"));
     /* Minimum len is 12, and should be a multiple of 4 */
@@ -264,7 +264,7 @@ trunc:
 
 void
 igmp_print(netdissect_options *ndo,
-           register const u_char *bp, register u_int len)
+           const u_char *bp, u_int len)
 {
     struct cksum_vec vec[1];
 

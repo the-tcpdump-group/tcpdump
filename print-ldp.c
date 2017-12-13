@@ -210,7 +210,7 @@ static const struct tok ldp_fec_martini_ifparm_vccv_cv_values[] = {
     { 0, NULL}
 };
 
-static int ldp_pdu_print(netdissect_options *, register const u_char *);
+static int ldp_pdu_print(netdissect_options *, const u_char *);
 
 /*
  * ldp tlv header
@@ -234,7 +234,7 @@ static int ldp_pdu_print(netdissect_options *, register const u_char *);
 
 static int
 ldp_tlv_print(netdissect_options *ndo,
-              register const u_char *tptr,
+              const u_char *tptr,
               u_short msg_tlen)
 {
     struct ldp_tlv_header {
@@ -544,7 +544,7 @@ badtlv:
 
 void
 ldp_print(netdissect_options *ndo,
-          register const u_char *pptr, register u_int len)
+          const u_char *pptr, u_int len)
 {
     int processed;
     while (len > (sizeof(struct ldp_common_header) + sizeof(struct ldp_msg_header))) {
@@ -558,7 +558,7 @@ ldp_print(netdissect_options *ndo,
 
 static int
 ldp_pdu_print(netdissect_options *ndo,
-              register const u_char *pptr)
+              const u_char *pptr)
 {
     const struct ldp_common_header *ldp_com_header;
     const struct ldp_msg_header *ldp_msg_header;

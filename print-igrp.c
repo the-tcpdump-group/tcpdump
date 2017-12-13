@@ -66,10 +66,10 @@ struct igrprte {
 #define IGRP_RTE_SIZE	14	/* don't believe sizeof ! */
 
 static void
-igrp_entry_print(netdissect_options *ndo, register const struct igrprte *igr,
-    register int is_interior, register int is_exterior)
+igrp_entry_print(netdissect_options *ndo, const struct igrprte *igr,
+    int is_interior, int is_exterior)
 {
-	register u_int delay, bandwidth;
+	u_int delay, bandwidth;
 	u_int metric, mtu;
 
 	if (is_interior)
@@ -102,10 +102,10 @@ static const struct tok op2str[] = {
 };
 
 void
-igrp_print(netdissect_options *ndo, register const u_char *bp, u_int length)
+igrp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
-	register const struct igrphdr *hdr;
-	register const u_char *cp;
+	const struct igrphdr *hdr;
+	const u_char *cp;
 	u_int nint, nsys, next;
 
 	hdr = (const struct igrphdr *)bp;

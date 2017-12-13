@@ -95,9 +95,9 @@ struct rip_netinfo {
 
 static void
 rip_entry_print_v1(netdissect_options *ndo,
-                   register const struct rip_netinfo *ni)
+                   const struct rip_netinfo *ni)
 {
-	register u_short family;
+	u_short family;
 
 	/* RFC 1058 */
 	family = EXTRACT_BE_U_2(&ni->rip_family);
@@ -126,15 +126,15 @@ rip_entry_print_v1(netdissect_options *ndo,
 
 static unsigned
 rip_entry_print_v2(netdissect_options *ndo,
-                   register const struct rip_netinfo *ni, const unsigned remaining)
+                   const struct rip_netinfo *ni, const unsigned remaining)
 {
-	register u_short family;
+	u_short family;
 
 	family = EXTRACT_BE_U_2(&ni->rip_family);
 	if (family == 0xFFFF) { /* variable-sized authentication structures */
 		uint16_t auth_type = EXTRACT_BE_U_2(&ni->rip_tag);
 		if (auth_type == 2) {
-			register const u_char *p = (const u_char *)&ni->rip_dest;
+			const u_char *p = (const u_char *)&ni->rip_dest;
 			u_int i = 0;
 			ND_PRINT((ndo, "\n\t  Simple Text Authentication data: "));
 			for (; i < RIP_AUTHLEN; p++, i++)
@@ -179,9 +179,9 @@ void
 rip_print(netdissect_options *ndo,
           const u_char *dat, u_int length)
 {
-	register const struct rip *rp;
-	register const struct rip_netinfo *ni;
-	register u_int i, j;
+	const struct rip *rp;
+	const struct rip_netinfo *ni;
+	u_int i, j;
 
 	if (ndo->ndo_snapend < dat) {
 		ND_PRINT((ndo, " %s", tstr));

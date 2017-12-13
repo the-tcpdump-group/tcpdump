@@ -106,7 +106,7 @@ pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
 
 u_int
 pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
-               register const u_char *p)
+               const u_char *p)
 {
 	u_int length = h->len;
 	u_int hdrlen;

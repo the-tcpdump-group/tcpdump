@@ -165,12 +165,12 @@ static const struct tok proc2str[] = {
 static char *progstr(uint32_t);
 
 void
-sunrpc_print(netdissect_options *ndo, register const u_char *bp,
-                    register u_int length, register const u_char *bp2)
+sunrpc_print(netdissect_options *ndo, const u_char *bp,
+                    u_int length, const u_char *bp2)
 {
-	register const struct sunrpc_msg *rp;
-	register const struct ip *ip;
-	register const struct ip6_hdr *ip6;
+	const struct sunrpc_msg *rp;
+	const struct ip *ip;
+	const struct ip6_hdr *ip6;
 	uint32_t x;
 	char srcid[20], dstid[20];	/*fits 32bit*/
 
@@ -230,7 +230,7 @@ static char *
 progstr(uint32_t prog)
 {
 #if defined(HAVE_GETRPCBYNUMBER) && defined(HAVE_RPC_RPC_H)
-	register struct rpcent *rp;
+	struct rpcent *rp;
 #endif
 	static char buf[32];
 	static uint32_t lastprog = 0;

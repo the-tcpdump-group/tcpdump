@@ -1849,7 +1849,7 @@ trunc:
 
 void
 rsvp_print(netdissect_options *ndo,
-           register const u_char *pptr, register u_int len)
+           const u_char *pptr, u_int len)
 {
     const struct rsvp_common_header *rsvp_com_header;
     const u_char *tptr;

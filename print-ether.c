@@ -108,7 +108,7 @@ static inline void
 ether_hdr_print(netdissect_options *ndo,
                 const u_char *bp, u_int length)
 {
-	register const struct ether_header *ep;
+	const struct ether_header *ep;
 	uint16_t length_type;
 
 	ep = (const struct ether_header *)bp;

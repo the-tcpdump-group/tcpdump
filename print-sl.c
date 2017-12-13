@@ -59,9 +59,9 @@ u_int
 sl_if_print(netdissect_options *ndo,
             const struct pcap_pkthdr *h, const u_char *p)
 {
-	register u_int caplen = h->caplen;
-	register u_int length = h->len;
-	register const struct ip *ip;
+	u_int caplen = h->caplen;
+	u_int length = h->len;
+	const struct ip *ip;
 
 	if (caplen < SLIP_HDRLEN || length < SLIP_HDRLEN) {
 		ND_PRINT((ndo, "%s", tstr));
@@ -99,9 +99,9 @@ u_int
 sl_bsdos_if_print(netdissect_options *ndo,
                   const struct pcap_pkthdr *h, const u_char *p)
 {
-	register u_int caplen = h->caplen;
-	register u_int length = h->len;
-	register const struct ip *ip;
+	u_int caplen = h->caplen;
+	u_int length = h->len;
+	const struct ip *ip;
 
 	if (caplen < SLIP_HDRLEN) {
 		ND_PRINT((ndo, "%s", tstr));
@@ -124,8 +124,8 @@ sl_bsdos_if_print(netdissect_options *ndo,
 
 static void
 sliplink_print(netdissect_options *ndo,
-               register const u_char *p, register const struct ip *ip,
-               register u_int length)
+               const u_char *p, const struct ip *ip,
+               u_int length)
 {
 	int dir;
 	u_int hlen;
@@ -148,7 +148,7 @@ sliplink_print(netdissect_options *ndo,
 	}
 	if (ndo->ndo_nflag) {
 		/* XXX just dump the header */
-		register int i;
+		int i;
 
 		for (i = SLX_CHDR; i < SLX_CHDR + CHDR_LEN - 1; ++i)
 			ND_PRINT((ndo, "%02x.", EXTRACT_U_1(p + i)));
@@ -194,9 +194,9 @@ sliplink_print(netdissect_options *ndo,
 
 static const u_char *
 print_sl_change(netdissect_options *ndo,
-                const char *str, register const u_char *cp)
+                const char *str, const u_char *cp)
 {
-	register u_int i;
+	u_int i;
 
 	if ((i = EXTRACT_U_1(cp)) == 0) {
 		cp++;
@@ -209,9 +209,9 @@ print_sl_change(netdissect_options *ndo,
 
 static const u_char *
 print_sl_winchange(netdissect_options *ndo,
-                   register const u_char *cp)
+                   const u_char *cp)
 {
-	register short i;
+	short i;
 
 	if ((i = EXTRACT_U_1(cp)) == 0) {
 		cp++;
@@ -230,8 +230,8 @@ compressed_sl_print(netdissect_options *ndo,
                     const u_char *chdr, const struct ip *ip,
                     u_int length, int dir)
 {
-	register const u_char *cp = chdr;
-	register u_int flags, hlen;
+	const u_char *cp = chdr;
+	u_int flags, hlen;
 
 	flags = EXTRACT_U_1(cp);
 	cp++;

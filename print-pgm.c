@@ -144,16 +144,16 @@ typedef enum _pgm_type {
 
 void
 pgm_print(netdissect_options *ndo,
-          register const u_char *bp, register u_int length,
-          register const u_char *bp2)
+          const u_char *bp, u_int length,
+          const u_char *bp2)
 {
-	register const struct pgm_header *pgm;
-	register const struct ip *ip;
-	register char ch;
+	const struct pgm_header *pgm;
+	const struct ip *ip;
+	char ch;
 	uint16_t sport, dport;
 	u_int nla_afnum;
 	char nla_buf[INET6_ADDRSTRLEN];
-	register const struct ip6_hdr *ip6;
+	const struct ip6_hdr *ip6;
 	uint8_t opt_type, opt_len;
 	uint32_t seq, opts_len, len, offset;
 

@@ -97,7 +97,7 @@ struct rtcp_rr {
 #define RTCP_PT_APP	204
 
 static void
-vat_print(netdissect_options *ndo, const void *hdr, register const struct udphdr *up)
+vat_print(netdissect_options *ndo, const void *hdr, const struct udphdr *up)
 {
 	/* vat/vt audio */
 	u_int ts;
@@ -136,7 +136,7 @@ trunc:
 
 static void
 rtp_print(netdissect_options *ndo, const void *hdr, u_int len,
-          register const struct udphdr *up)
+          const struct udphdr *up)
 {
 	/* rtp v1 or v2 */
 	const u_int *ip = (const u_int *)hdr;
@@ -298,9 +298,9 @@ trunc:
 	return ep;
 }
 
-static int udp_cksum(netdissect_options *ndo, register const struct ip *ip,
-		     register const struct udphdr *up,
-		     register u_int len)
+static int udp_cksum(netdissect_options *ndo, const struct ip *ip,
+		     const struct udphdr *up,
+		     u_int len)
 {
 	return nextproto4_cksum(ndo, ip, (const uint8_t *)(const void *)up, len, len,
 				IPPROTO_UDP);
@@ -367,15 +367,15 @@ udpipaddr_print(netdissect_options *ndo, const struct ip *ip, int sport, int dpo
 }
 
 void
-udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
-	  register const u_char *bp2, int fragmented)
+udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
+	  const u_char *bp2, int fragmented)
 {
-	register const struct udphdr *up;
-	register const struct ip *ip;
-	register const u_char *cp;
-	register const u_char *ep = bp + length;
+	const struct udphdr *up;
+	const struct ip *ip;
+	const u_char *cp;
+	const u_char *ep = bp + length;
 	uint16_t sport, dport, ulen;
-	register const struct ip6_hdr *ip6;
+	const struct ip6_hdr *ip6;
 
 	if (ep > ndo->ndo_snapend)
 		ep = ndo->ndo_snapend;
@@ -420,7 +420,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 	}
 
 	if (ndo->ndo_packettype) {
-		register const struct sunrpc_msg *rp;
+		const struct sunrpc_msg *rp;
 		enum sunrpc_msg_type direction;
 
 		switch (ndo->ndo_packettype) {
@@ -503,7 +503,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 
 	udpipaddr_print(ndo, ip, sport, dport);
 	if (!ndo->ndo_qflag) {
-		register const struct sunrpc_msg *rp;
+		const struct sunrpc_msg *rp;
 		enum sunrpc_msg_type direction;
 
 		rp = (const struct sunrpc_msg *)(up + 1);

@@ -418,7 +418,7 @@ static const char *SnmpVersion[] = {
  */
 static int
 asn1_parse(netdissect_options *ndo,
-           register const u_char *p, u_int len, struct be *elem)
+           const u_char *p, u_int len, struct be *elem)
 {
 	u_char form, class, id;
 	int i, hdr;
@@ -535,7 +535,7 @@ asn1_parse(netdissect_options *ndo,
 				break;
 
 			case INTEGER: {
-				register int32_t data;
+				int32_t data;
 				elem->type = BE_INT;
 				data = 0;
 
@@ -579,7 +579,7 @@ asn1_parse(netdissect_options *ndo,
 			case COUNTER:
 			case GAUGE:
 			case TIMETICKS: {
-				register uint32_t data;
+				uint32_t data;
 				elem->type = BE_UNS;
 				data = 0;
 				for (i = elem->asnlen; i-- > 0; p++)
@@ -589,7 +589,7 @@ asn1_parse(netdissect_options *ndo,
 			}
 
 			case COUNTER64: {
-				register uint64_t data64;
+				uint64_t data64;
 			        elem->type = BE_UNS64;
 				data64 = 0;
 				for (i = elem->asnlen; i-- > 0; p++)
@@ -693,7 +693,7 @@ trunc:
 static int
 asn1_print_string(netdissect_options *ndo, struct be *elem)
 {
-	register int printable = 1, first = 1;
+	int printable = 1, first = 1;
 	const u_char *p;
 	uint32_t asnlen = elem->asnlen;
 	uint32_t i;

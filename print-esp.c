@@ -647,8 +647,8 @@ esp_print(netdissect_options *ndo,
 #endif
 	)
 {
-	register const struct newesp *esp;
-	register const u_char *ep;
+	const struct newesp *esp;
+	const u_char *ep;
 #ifdef HAVE_LIBCRYPTO
 	const struct ip *ip;
 	struct sa_list *sa = NULL;

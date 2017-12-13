@@ -386,7 +386,7 @@ trunc:
 }
 
 void
-rpki_rtr_print(netdissect_options *ndo, register const u_char *pptr, register u_int len)
+rpki_rtr_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 {
     if (!ndo->ndo_vflag) {
 	ND_PRINT((ndo, ", RPKI-RTR"));

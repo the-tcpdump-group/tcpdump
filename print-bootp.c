@@ -281,9 +281,9 @@ static const struct tok bootp_op_values[] = {
  */
 void
 bootp_print(netdissect_options *ndo,
-	    register const u_char *cp, u_int length)
+	    const u_char *cp, u_int length)
 {
-	register const struct bootp *bp;
+	const struct bootp *bp;
 	static const u_char vm_cmu[4] = VM_CMU;
 	static const u_char vm_rfc1048[4] = VM_RFC1048;
 
@@ -593,12 +593,12 @@ static const struct tok agent_suboption_values[] = {
 
 static void
 rfc1048_print(netdissect_options *ndo,
-	      register const u_char *bp)
+	      const u_char *bp)
 {
-	register uint16_t tag;
-	register u_int len;
-	register const char *cp;
-	register char c;
+	uint16_t tag;
+	u_int len;
+	const char *cp;
+	char c;
 	int first, idx;
 	uint32_t ul;
 	uint16_t us;
@@ -1060,9 +1060,9 @@ trunc:
 
 static void
 cmu_print(netdissect_options *ndo,
-	  register const u_char *bp)
+	  const u_char *bp)
 {
-	register const struct cmu_vend *cmu;
+	const struct cmu_vend *cmu;
 
 #define PRINTCMUADDR(m, s) { ND_TCHECK(cmu->m); \
     if (cmu->m.s_addr != 0) \

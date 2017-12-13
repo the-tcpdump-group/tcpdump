@@ -89,10 +89,10 @@ static const struct tok err2str[] = {
  */
 void
 tftp_print(netdissect_options *ndo,
-           register const u_char *bp, u_int length)
+           const u_char *bp, u_int length)
 {
-	register const char *cp;
-	register int opcode;
+	const char *cp;
+	int opcode;
 	u_int ui;
 
 	/* Print length */

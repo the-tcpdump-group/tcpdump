@@ -60,8 +60,8 @@ static int tcp_verify_signature(netdissect_options *ndo,
                                 const u_char *data, int length, const u_char *rcvsig);
 #endif
 
-static void print_tcp_rst_data(netdissect_options *, register const u_char *sp, u_int length);
-static void print_tcp_fastopen_option(netdissect_options *ndo, register const u_char *cp,
+static void print_tcp_rst_data(netdissect_options *, const u_char *sp, u_int length);
+static void print_tcp_fastopen_option(netdissect_options *ndo, const u_char *cp,
                                       u_int datalen, int exp);
 
 #define MAX_RST_DATA_LEN	30
@@ -138,9 +138,9 @@ static const struct tok tcp_option_values[] = {
 
 static int
 tcp_cksum(netdissect_options *ndo,
-          register const struct ip *ip,
-          register const struct tcphdr *tp,
-          register u_int len)
+          const struct ip *ip,
+          const struct tcphdr *tp,
+          u_int len)
 {
 	return nextproto4_cksum(ndo, ip, (const uint8_t *)tp, len, len,
 				IPPROTO_TCP);
@@ -148,9 +148,9 @@ tcp_cksum(netdissect_options *ndo,
 
 static int
 tcp6_cksum(netdissect_options *ndo,
-           register const struct ip6_hdr *ip6,
-           register const struct tcphdr *tp,
-           register u_int len)
+           const struct ip6_hdr *ip6,
+           const struct tcphdr *tp,
+           u_int len)
 {
 	return nextproto6_cksum(ndo, ip6, (const uint8_t *)tp, len, len,
 				IPPROTO_TCP);
@@ -158,20 +158,20 @@ tcp6_cksum(netdissect_options *ndo,
 
 void
 tcp_print(netdissect_options *ndo,
-          register const u_char *bp, register u_int length,
-          register const u_char *bp2, int fragmented)
+          const u_char *bp, u_int length,
+          const u_char *bp2, int fragmented)
 {
-        register const struct tcphdr *tp;
-        register const struct ip *ip;
-        register u_char flags;
-        register u_int hlen;
-        register char ch;
+        const struct tcphdr *tp;
+        const struct ip *ip;
+        u_char flags;
+        u_int hlen;
+        char ch;
         uint16_t sport, dport, win, urp;
         uint32_t seq, ack, thseq, thack;
         u_int utoval;
         uint16_t magic;
-        register int rev;
-        register const struct ip6_hdr *ip6;
+        int rev;
+        const struct ip6_hdr *ip6;
 
         tp = (const struct tcphdr *)bp;
         ip = (const struct ip *)bp2;
@@ -250,7 +250,7 @@ tcp_print(netdissect_options *ndo,
                  */
                 rev = 0;
                 if (ip6) {
-                        register struct tcp_seq_hash6 *th;
+                        struct tcp_seq_hash6 *th;
                         struct tcp_seq_hash6 *tcp_seq_hash;
                         const void *src, *dst;
                         struct tha6 tha;
@@ -304,7 +304,7 @@ tcp_print(netdissect_options *ndo,
                         thseq = th->seq;
                         thack = th->ack;
                 } else {
-                        register struct tcp_seq_hash *th;
+                        struct tcp_seq_hash *th;
                         struct tcp_seq_hash *tcp_seq_hash;
                         struct tha tha;
 
@@ -418,9 +418,9 @@ tcp_print(netdissect_options *ndo,
          * Handle any options.
          */
         if (hlen > sizeof(*tp)) {
-                register const u_char *cp;
-                register u_int i, opt, datalen;
-                register u_int len;
+                const u_char *cp;
+                u_int i, opt, datalen;
+                u_int len;
 
                 hlen -= sizeof(*tp);
                 cp = (const u_char *)tp + sizeof(*tp);
@@ -741,7 +741,7 @@ tcp_print(netdissect_options *ndo,
                  * to NFS print routines.
                  */
                 uint32_t fraglen;
-                register const struct sunrpc_msg *rp;
+                const struct sunrpc_msg *rp;
                 enum sunrpc_msg_type direction;
 
                 fraglen = EXTRACT_BE_U_4(bp) & 0x7FFFFFFF;
@@ -792,7 +792,7 @@ tcp_print(netdissect_options *ndo,
 
 static void
 print_tcp_rst_data(netdissect_options *ndo,
-                   register const u_char *sp, u_int length)
+                   const u_char *sp, u_int length)
 {
         int c;
 
@@ -811,7 +811,7 @@ print_tcp_rst_data(netdissect_options *ndo,
 }
 
 static void
-print_tcp_fastopen_option(netdissect_options *ndo, register const u_char *cp,
+print_tcp_fastopen_option(netdissect_options *ndo, const u_char *cp,
                           u_int datalen, int exp)
 {
         u_int i;

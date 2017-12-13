@@ -229,7 +229,7 @@ print_fddi_fc(netdissect_options *ndo, u_char fc)
 static inline void
 extract_fddi_addrs(const struct fddi_header *fddip, char *fsrc, char *fdst)
 {
-	register int i;
+	int i;
 
 	if (fddi_bitswap) {
 		/*
@@ -252,8 +252,8 @@ extract_fddi_addrs(const struct fddi_header *fddip, char *fsrc, char *fdst)
  */
 static inline void
 fddi_hdr_print(netdissect_options *ndo,
-               register const struct fddi_header *fddip, register u_int length,
-               register const u_char *fsrc, register const u_char *fdst)
+               const struct fddi_header *fddip, u_int length,
+               const u_char *fsrc, const u_char *fdst)
 {
 	const char *srcname, *dstname;
 
@@ -342,7 +342,7 @@ fddi_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
  * is the number of bytes actually captured.
  */
 u_int
-fddi_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, register const u_char *p)
+fddi_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
 	return (fddi_print(ndo, p, h->len, h->caplen));
 }

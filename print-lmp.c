@@ -423,7 +423,7 @@ lmp_print_data_link_subobjs(netdissect_options *ndo, const u_char *obj_tptr,
 
 void
 lmp_print(netdissect_options *ndo,
-          register const u_char *pptr, register u_int len)
+          const u_char *pptr, u_int len)
 {
     const struct lmp_common_header *lmp_com_header;
     const struct lmp_object_header *lmp_obj_header;

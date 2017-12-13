@@ -59,9 +59,9 @@ extract_ipfc_addrs(const struct ipfc_header *ipfcp, char *ipfcsrc,
  */
 static inline void
 ipfc_hdr_print(netdissect_options *ndo,
-	   register const struct ipfc_header *ipfcp _U_,
-	   register u_int length, register const u_char *ipfcsrc,
-	   register const u_char *ipfcdst)
+	   const struct ipfc_header *ipfcp _U_,
+	   u_int length, const u_char *ipfcsrc,
+	   const u_char *ipfcdst)
 {
 	const char *srcname, *dstname;
 
@@ -137,7 +137,7 @@ ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
  * is the number of bytes actually captured.
  */
 u_int
-ipfc_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, register const u_char *p)
+ipfc_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
 	return (ipfc_print(ndo, p, h->len, h->caplen));
 }

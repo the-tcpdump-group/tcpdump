@@ -510,7 +510,7 @@ invalid:
 
 static int
 ospf_print_lshdr(netdissect_options *ndo,
-                 register const struct lsa_hdr *lshp)
+                 const struct lsa_hdr *lshp)
 {
         u_int ls_length;
 
@@ -612,16 +612,16 @@ trunc:
  */
 static const uint8_t *
 ospf_print_lsa(netdissect_options *ndo,
-               register const struct lsa *lsap)
+               const struct lsa *lsap)
 {
-	register const uint8_t *ls_end;
-	register const struct rlalink *rlp;
-	register const struct in_addr *ap;
-	register const struct aslametric *almp;
-	register const struct mcla *mcp;
-	register const uint32_t *lp;
-	register int j, tlv_type, tlv_length, topology;
-	register int ls_length;
+	const uint8_t *ls_end;
+	const struct rlalink *rlp;
+	const struct in_addr *ap;
+	const struct aslametric *almp;
+	const struct mcla *mcp;
+	const uint32_t *lp;
+	int j, tlv_type, tlv_length, topology;
+	int ls_length;
 	const uint8_t *tptr;
 
 	tptr = (const uint8_t *)lsap->lsa_un.un_unknown; /* squelch compiler warnings */
@@ -703,7 +703,7 @@ ospf_print_lsa(netdissect_options *ndo,
 		ND_TCHECK(lsap->lsa_un.un_sla.sla_tosmetric);
 		lp = lsap->lsa_un.un_sla.sla_tosmetric;
 		while ((const u_char *)lp < ls_end) {
-			register uint32_t ul;
+			uint32_t ul;
 
 			ND_TCHECK(*lp);
 			ul = EXTRACT_BE_U_4(lp);
@@ -720,7 +720,7 @@ ospf_print_lsa(netdissect_options *ndo,
 		ND_TCHECK(lsap->lsa_un.un_sla.sla_tosmetric);
 		lp = lsap->lsa_un.un_sla.sla_tosmetric;
 		while ((const u_char *)lp < ls_end) {
-			register uint32_t ul;
+			uint32_t ul;
 
 			ND_TCHECK(*lp);
 			ul = EXTRACT_BE_U_4(lp);
@@ -742,7 +742,7 @@ ospf_print_lsa(netdissect_options *ndo,
 		ND_TCHECK(lsap->lsa_un.un_sla.sla_tosmetric);
 		almp = lsap->lsa_un.un_asla.asla_metric;
 		while ((const u_char *)almp < ls_end) {
-			register uint32_t ul;
+			uint32_t ul;
 
 			ND_TCHECK(almp->asla_tosmetric);
 			ul = EXTRACT_BE_U_4(&almp->asla_tosmetric);
@@ -885,13 +885,13 @@ trunc:
 
 static int
 ospf_decode_lls(netdissect_options *ndo,
-                register const struct ospfhdr *op, register u_int length)
+                const struct ospfhdr *op, u_int length)
 {
-    register const u_char *dptr;
-    register const u_char *dataend;
-    register u_int length2;
-    register uint16_t lls_type, lls_len;
-    register uint32_t lls_flags;
+    const u_char *dptr;
+    const u_char *dataend;
+    u_int length2;
+    uint16_t lls_type, lls_len;
+    uint32_t lls_flags;
 
     switch (op->ospf_type) {
 
@@ -977,13 +977,13 @@ trunc:
 
 static int
 ospf_decode_v2(netdissect_options *ndo,
-               register const struct ospfhdr *op, register const u_char *dataend)
+               const struct ospfhdr *op, const u_char *dataend)
 {
-	register const struct in_addr *ap;
-	register const struct lsr *lsrp;
-	register const struct lsa_hdr *lshp;
-	register const struct lsa *lsap;
-	register uint32_t lsa_count,lsa_count_max;
+	const struct in_addr *ap;
+	const struct lsr *lsrp;
+	const struct lsa_hdr *lshp;
+	const struct lsa *lsap;
+	uint32_t lsa_count,lsa_count_max;
 
 	switch (op->ospf_type) {
 
@@ -1100,12 +1100,12 @@ trunc:
 
 void
 ospf_print(netdissect_options *ndo,
-           register const u_char *bp, register u_int length,
+           const u_char *bp, u_int length,
            const u_char *bp2 _U_)
 {
-	register const struct ospfhdr *op;
-	register const u_char *dataend;
-	register const char *cp;
+	const struct ospfhdr *op;
+	const u_char *dataend;
+	const char *cp;
 
 	op = (const struct ospfhdr *)bp;
 

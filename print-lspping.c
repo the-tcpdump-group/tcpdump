@@ -487,7 +487,7 @@ static const struct tok lspping_tlv_downstream_addr_values[] = {
 
 void
 lspping_print(netdissect_options *ndo,
-              register const u_char *pptr, register u_int len)
+              const u_char *pptr, u_int len)
 {
     const struct lspping_common_header *lspping_com_header;
     const struct lspping_tlv_header *lspping_tlv_header;

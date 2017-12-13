@@ -85,13 +85,13 @@ static const struct tok pppoetag2str[] = {
 #define MAXTAGPRINT 80
 
 u_int
-pppoe_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, register const u_char *p)
+pppoe_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
 	return (pppoe_print(ndo, p, h->len));
 }
 
 u_int
-pppoe_print(netdissect_options *ndo, register const u_char *bp, u_int length)
+pppoe_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	uint16_t pppoe_ver, pppoe_type, pppoe_code, pppoe_sessionid;
 	u_int pppoe_length;

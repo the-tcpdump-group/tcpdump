@@ -424,8 +424,8 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 	u_int bridge_pad)
 {
 	uint32_t orgcode;
-	register u_short et;
-	register int ret;
+	u_short et;
+	int ret;
 
 	ND_TCHECK_5(p);
 	if (caplen < 5 || length < 5)

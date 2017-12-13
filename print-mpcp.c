@@ -121,7 +121,7 @@ static const struct tok mpcp_reg_ack_flag_values[] = {
 };
 
 void
-mpcp_print(netdissect_options *ndo, register const u_char *pptr, register u_int length)
+mpcp_print(netdissect_options *ndo, const u_char *pptr, u_int length)
 {
     union {
         const struct mpcp_common_header_t *common_header;

@@ -396,9 +396,9 @@ wb_drawop(netdissect_options *ndo,
  */
 void
 wb_print(netdissect_options *ndo,
-         register const void *hdr, register u_int len)
+         const void *hdr, u_int len)
 {
-	register const struct pkt_hdr *ph;
+	const struct pkt_hdr *ph;
 
 	ph = (const struct pkt_hdr *)hdr;
 	if (len < sizeof(*ph) || !ND_TTEST(*ph)) {

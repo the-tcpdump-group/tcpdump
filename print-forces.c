@@ -66,7 +66,7 @@ struct tom_h {
 	uint16_t flags;
 	uint16_t op_msk;
 	const char *s;
-	int (*print) (netdissect_options *ndo, register const u_char * pptr, register u_int len,
+	int (*print) (netdissect_options *ndo, const u_char * pptr, u_int len,
 		      uint16_t op_msk, int indent);
 };
 
@@ -230,15 +230,15 @@ struct optlv_h {
 	uint16_t flags;
 	uint16_t op_msk;
 	const char *s;
-	int (*print) (netdissect_options *ndo, register const u_char * pptr, register u_int len,
+	int (*print) (netdissect_options *ndo, const u_char * pptr, u_int len,
 		      uint16_t op_msk, int indent);
 };
 
-static int genoptlv_print(netdissect_options *, register const u_char * pptr, register u_int len,
+static int genoptlv_print(netdissect_options *, const u_char * pptr, u_int len,
 			 uint16_t op_msk, int indent);
-static int recpdoptlv_print(netdissect_options *, register const u_char * pptr, register u_int len,
+static int recpdoptlv_print(netdissect_options *, const u_char * pptr, u_int len,
 			    uint16_t op_msk, int indent);
-static int invoptlv_print(netdissect_options *, register const u_char * pptr, register u_int len,
+static int invoptlv_print(netdissect_options *, const u_char * pptr, u_int len,
 			  uint16_t op_msk, int indent);
 
 #define OP_MIN_SIZ 8
@@ -440,13 +440,13 @@ static inline int ilv_valid(const struct forces_ilv *ilv, u_int rlen)
 	return 0;
 }
 
-static int lfbselect_print(netdissect_options *, register const u_char * pptr, register u_int len,
+static int lfbselect_print(netdissect_options *, const u_char * pptr, u_int len,
 			   uint16_t op_msk, int indent);
-static int redirect_print(netdissect_options *, register const u_char * pptr, register u_int len,
+static int redirect_print(netdissect_options *, const u_char * pptr, u_int len,
 			  uint16_t op_msk, int indent);
-static int asrtlv_print(netdissect_options *, register const u_char * pptr, register u_int len,
+static int asrtlv_print(netdissect_options *, const u_char * pptr, u_int len,
 			uint16_t op_msk, int indent);
-static int asttlv_print(netdissect_options *, register const u_char * pptr, register u_int len,
+static int asttlv_print(netdissect_options *, const u_char * pptr, u_int len,
 			uint16_t op_msk, int indent);
 
 struct forces_lfbsh {
@@ -498,7 +498,7 @@ struct pdata_ops {
 	uint16_t flags;
 	uint16_t op_msk;
 	const char *s;
-	int (*print) (netdissect_options *, register const u_char * pptr, register u_int len,
+	int (*print) (netdissect_options *, const u_char * pptr, u_int len,
 		      uint16_t op_msk, int indent);
 };
 
@@ -549,13 +549,13 @@ struct res_val {
 	nd_uint16_t resv2;
 };
 
-static int prestlv_print(netdissect_options *, register const u_char * pptr, register u_int len,
+static int prestlv_print(netdissect_options *, const u_char * pptr, u_int len,
 			 uint16_t op_msk, int indent);
-static int pkeyitlv_print(netdissect_options *, register const u_char * pptr, register u_int len,
+static int pkeyitlv_print(netdissect_options *, const u_char * pptr, u_int len,
 			  uint16_t op_msk, int indent);
-static int fdatatlv_print(netdissect_options *, register const u_char * pptr, register u_int len,
+static int fdatatlv_print(netdissect_options *, const u_char * pptr, u_int len,
 			  uint16_t op_msk, int indent);
-static int sdatatlv_print(netdissect_options *, register const u_char * pptr, register u_int len,
+static int sdatatlv_print(netdissect_options *, const u_char * pptr, u_int len,
 			  uint16_t op_msk, int indent);
 
 static const struct pdata_ops ForCES_pdata[PD_MAX_IND + 1] = {
@@ -641,11 +641,11 @@ static const struct tok ForCES_errs[] = {
 
 static int
 prestlv_print(netdissect_options *ndo,
-              register const u_char * pptr, register u_int len,
+              const u_char * pptr, u_int len,
               uint16_t op_msk _U_, int indent)
 {
 	const struct forces_tlv *tlv = (const struct forces_tlv *)pptr;
-	register const u_char *tdp = (const u_char *) TLV_DATA(tlv);
+	const u_char *tdp = (const u_char *) TLV_DATA(tlv);
 	const struct res_val *r = (const struct res_val *)tdp;
 	u_int dlen;
 	uint8_t result;
@@ -681,12 +681,12 @@ trunc:
 
 static int
 fdatatlv_print(netdissect_options *ndo,
-               register const u_char * pptr, register u_int len,
+               const u_char * pptr, u_int len,
                uint16_t op_msk _U_, int indent)
 {
 	const struct forces_tlv *tlv = (const struct forces_tlv *)pptr;
 	u_int rlen;
-	register const u_char *tdp = (const u_char *) TLV_DATA(tlv);
+	const u_char *tdp = (const u_char *) TLV_DATA(tlv);
 	uint16_t type;
 
 	/*
@@ -716,7 +716,7 @@ trunc:
 
 static int
 sdatailv_print(netdissect_options *ndo,
-               register const u_char * pptr, register u_int len,
+               const u_char * pptr, u_int len,
                uint16_t op_msk _U_, int indent)
 {
 	u_int rlen;
@@ -734,7 +734,7 @@ sdatailv_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "Jamal - outstanding length <%d>\n", rlen));
 #endif
 		char *ib = indent_pr(indent, 1);
-		register const u_char *tdp = (const u_char *) ILV_DATA(ilv);
+		const u_char *tdp = (const u_char *) ILV_DATA(ilv);
 		ND_TCHECK(*ilv);
 		invilv = ilv_valid(ilv, rlen);
 		if (invilv) {
@@ -762,12 +762,12 @@ trunc:
 
 static int
 sdatatlv_print(netdissect_options *ndo,
-               register const u_char * pptr, register u_int len,
+               const u_char * pptr, u_int len,
                uint16_t op_msk, int indent)
 {
 	const struct forces_tlv *tlv = (const struct forces_tlv *)pptr;
 	u_int rlen;
-	register const u_char *tdp = (const u_char *) TLV_DATA(tlv);
+	const u_char *tdp = (const u_char *) TLV_DATA(tlv);
 	uint16_t type;
 
 	/*
@@ -791,12 +791,12 @@ trunc:
 
 static int
 pkeyitlv_print(netdissect_options *ndo,
-               register const u_char * pptr, register u_int len,
+               const u_char * pptr, u_int len,
                uint16_t op_msk, int indent)
 {
 	const struct forces_tlv *tlv = (const struct forces_tlv *)pptr;
-	register const u_char *tdp = (const u_char *) TLV_DATA(tlv);
-	register const u_char *dp = tdp + 4;
+	const u_char *tdp = (const u_char *) TLV_DATA(tlv);
+	const u_char *dp = tdp + 4;
 	const struct forces_tlv *kdtlv = (const struct forces_tlv *)dp;
 	uint32_t id;
 	char *ib = indent_pr(indent, 0);
@@ -834,7 +834,7 @@ trunc:
 
 static int
 pdatacnt_print(netdissect_options *ndo,
-               register const u_char * pptr, register u_int len,
+               const u_char * pptr, u_int len,
                uint16_t IDcnt, uint16_t op_msk, int indent)
 {
 	u_int i;
@@ -989,7 +989,7 @@ trunc:
 
 static int
 pdata_print(netdissect_options *ndo,
-            register const u_char * pptr, register u_int len,
+            const u_char * pptr, u_int len,
             uint16_t op_msk, int indent)
 {
 	const struct pathdata_h *pdh = (const struct pathdata_h *)pptr;
@@ -1053,7 +1053,7 @@ trunc:
 
 static int
 genoptlv_print(netdissect_options *ndo,
-               register const u_char * pptr, register u_int len,
+               const u_char * pptr, u_int len,
                uint16_t op_msk, int indent)
 {
 	const struct forces_tlv *pdtlv = (const struct forces_tlv *)pptr;
@@ -1074,7 +1074,7 @@ genoptlv_print(netdissect_options *ndo,
 		 * length is large enough but not too large (it doesn't
 		 * go past the end of the containing TLV).
 		 */
-		register const u_char *dp = (const u_char *) TLV_DATA(pdtlv);
+		const u_char *dp = (const u_char *) TLV_DATA(pdtlv);
 		if (!ttlv_valid(type)) {
 			ND_PRINT((ndo, "%s TLV type 0x%x len %d\n",
 			       tok2str(ForCES_TLV_err, NULL, invtlv), type,
@@ -1099,14 +1099,14 @@ trunc:
 
 static int
 recpdoptlv_print(netdissect_options *ndo,
-                 register const u_char * pptr, register u_int len,
+                 const u_char * pptr, u_int len,
                  uint16_t op_msk, int indent)
 {
 	const struct forces_tlv *pdtlv = (const struct forces_tlv *)pptr;
 	int tll;
 	u_int invtlv;
 	uint16_t type;
-	register const u_char *dp;
+	const u_char *dp;
 	char *ib;
 
 	while (len != 0) {
@@ -1153,7 +1153,7 @@ trunc:
 
 static int
 invoptlv_print(netdissect_options *ndo,
-               register const u_char * pptr, register u_int len,
+               const u_char * pptr, u_int len,
                uint16_t op_msk _U_, int indent)
 {
 	char *ib = indent_pr(indent, 1);
@@ -1171,7 +1171,7 @@ otlv_print(netdissect_options *ndo,
            const struct forces_tlv *otlv, uint16_t op_msk _U_, int indent)
 {
 	int rc = 0;
-	register const u_char *dp = (const u_char *) TLV_DATA(otlv);
+	const u_char *dp = (const u_char *) TLV_DATA(otlv);
 	uint16_t type;
 	int tll;
 	char *ib = indent_pr(indent, 0);
@@ -1214,7 +1214,7 @@ trunc:
 #define ASTMCD	255
 static int
 asttlv_print(netdissect_options *ndo,
-             register const u_char * pptr, register u_int len,
+             const u_char * pptr, u_int len,
              uint16_t op_msk _U_, int indent)
 {
 	uint32_t rescode;
@@ -1272,7 +1272,7 @@ trunc:
 #define ASRMCD	3
 static int
 asrtlv_print(netdissect_options *ndo,
-             register const u_char * pptr, register u_int len,
+             const u_char * pptr, u_int len,
              uint16_t op_msk _U_, int indent)
 {
 	uint32_t rescode;
@@ -1327,7 +1327,7 @@ trunc:
  */
 static int
 gentltlv_print(netdissect_options *ndo,
-               register const u_char * pptr _U_, register u_int len,
+               const u_char * pptr _U_, u_int len,
                uint16_t op_msk _U_, int indent _U_)
 {
 	u_int dlen = len - TLV_HDRL;
@@ -1344,7 +1344,7 @@ gentltlv_print(netdissect_options *ndo,
 
 static int
 print_metailv(netdissect_options *ndo,
-              register const u_char * pptr, uint16_t op_msk _U_, int indent)
+              const u_char * pptr, uint16_t op_msk _U_, int indent)
 {
 	u_int rlen;
 	char *ib = indent_pr(indent, 0);
@@ -1372,7 +1372,7 @@ trunc:
 
 static int
 print_metatlv(netdissect_options *ndo,
-              register const u_char * pptr, register u_int len,
+              const u_char * pptr, u_int len,
               uint16_t op_msk _U_, int indent)
 {
 	u_int dlen;
@@ -1414,7 +1414,7 @@ trunc:
 
 static int
 print_reddata(netdissect_options *ndo,
-              register const u_char * pptr, register u_int len,
+              const u_char * pptr, u_int len,
               uint16_t op_msk _U_, int indent)
 {
 	u_int dlen;
@@ -1436,7 +1436,7 @@ print_reddata(netdissect_options *ndo,
 
 static int
 redirect_print(netdissect_options *ndo,
-               register const u_char * pptr, register u_int len,
+               const u_char * pptr, u_int len,
                uint16_t op_msk _U_, int indent)
 {
 	const struct forces_tlv *tlv = (const struct forces_tlv *)pptr;
@@ -1507,7 +1507,7 @@ trunc:
 
 static int
 lfbselect_print(netdissect_options *ndo,
-                register const u_char * pptr, register u_int len,
+                const u_char * pptr, u_int len,
                 uint16_t op_msk, int indent)
 {
 	const struct forces_lfbsh *lfbs;
@@ -1586,8 +1586,8 @@ trunc:
 
 static int
 forces_type_print(netdissect_options *ndo,
-                  register const u_char * pptr, const struct forcesh *fhdr _U_,
-                  register u_int mlen, const struct tom_h *tops)
+                  const u_char * pptr, const struct forcesh *fhdr _U_,
+                  u_int mlen, const struct tom_h *tops)
 {
 	const struct forces_tlv *tltlv;
 	u_int rlen;
@@ -1677,7 +1677,7 @@ trunc:
 
 void
 forces_print(netdissect_options *ndo,
-             register const u_char * pptr, register u_int len)
+             const u_char * pptr, u_int len)
 {
 	const struct forcesh *fhdr;
 	u_int mlen;

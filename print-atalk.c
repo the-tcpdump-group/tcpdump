@@ -92,11 +92,11 @@ ltalk_if_print(netdissect_options *ndo,
  */
 u_int
 llap_print(netdissect_options *ndo,
-           register const u_char *bp, u_int length)
+           const u_char *bp, u_int length)
 {
-	register const struct LAP *lp;
-	register const struct atDDP *dp;
-	register const struct atShortDDP *sdp;
+	const struct LAP *lp;
+	const struct atDDP *dp;
+	const struct atShortDDP *sdp;
 	u_short snet;
 	u_int hdrlen;
 
@@ -177,9 +177,9 @@ llap_print(netdissect_options *ndo,
  */
 void
 atalk_print(netdissect_options *ndo,
-            register const u_char *bp, u_int length)
+            const u_char *bp, u_int length)
 {
-	register const struct atDDP *dp;
+	const struct atDDP *dp;
 	u_short snet;
 
         if(!ndo->ndo_eflag)
@@ -208,9 +208,9 @@ atalk_print(netdissect_options *ndo,
 /* XXX should probably pass in the snap header and do checks like arp_print() */
 void
 aarp_print(netdissect_options *ndo,
-           register const u_char *bp, u_int length)
+           const u_char *bp, u_int length)
 {
-	register const struct aarp *ap;
+	const struct aarp *ap;
 
 #define AT(member) ataddr_string(ndo, (ap->member[1]<<8)|ap->member[2],ap->member[3])
 
@@ -252,8 +252,8 @@ aarp_print(netdissect_options *ndo,
  */
 static void
 ddp_print(netdissect_options *ndo,
-          register const u_char *bp, register u_int length, register int t,
-          register u_short snet, register u_char snode, u_char skt)
+          const u_char *bp, u_int length, int t,
+          u_short snet, u_char snode, u_char skt)
 {
 
 	switch (t) {
@@ -278,7 +278,7 @@ ddp_print(netdissect_options *ndo,
 
 static void
 atp_print(netdissect_options *ndo,
-          register const struct atATP *ap, u_int length)
+          const struct atATP *ap, u_int length)
 {
 	uint32_t data;
 
@@ -373,9 +373,9 @@ atp_print(netdissect_options *ndo,
 
 static void
 atp_bitmap_print(netdissect_options *ndo,
-                 register u_char bm)
+                 u_char bm)
 {
-	register int i;
+	int i;
 
 	/*
 	 * The '& 0xff' below is needed for compilers that want to sign
@@ -383,7 +383,7 @@ atp_bitmap_print(netdissect_options *ndo,
 	 * (gcc is smart enough to eliminate it, at least on the Sparc).
 	 */
 	if ((bm + 1) & (bm & 0xff)) {
-		register char c = '<';
+		char c = '<';
 		for (i = 0; bm; ++i) {
 			if (bm & 1) {
 				ND_PRINT((ndo, "%c%d", c, i));
@@ -404,10 +404,10 @@ atp_bitmap_print(netdissect_options *ndo,
 
 static void
 nbp_print(netdissect_options *ndo,
-          register const struct atNBP *np, u_int length, register u_short snet,
-          register u_char snode, register u_char skt)
+          const struct atNBP *np, u_int length, u_short snet,
+          u_char snode, u_char skt)
 {
-	register const struct atNBPtuple *tp =
+	const struct atNBPtuple *tp =
 		(const struct atNBPtuple *)((const u_char *)np + nbpHeaderSize);
 	int i;
 	const u_char *ep;
@@ -472,9 +472,9 @@ nbp_print(netdissect_options *ndo,
 /* print a counted string */
 static const char *
 print_cstring(netdissect_options *ndo,
-              register const char *cp, register const u_char *ep)
+              const char *cp, const u_char *ep)
 {
-	register u_int length;
+	u_int length;
 
 	if (cp >= (const char *)ep) {
 		ND_PRINT((ndo, "%s", tstr));
@@ -502,10 +502,10 @@ print_cstring(netdissect_options *ndo,
 
 static const struct atNBPtuple *
 nbp_tuple_print(netdissect_options *ndo,
-                register const struct atNBPtuple *tp, register const u_char *ep,
-                register u_short snet, register u_char snode, register u_char skt)
+                const struct atNBPtuple *tp, const u_char *ep,
+                u_short snet, u_char snode, u_char skt)
 {
-	register const struct atNBPtuple *tpn;
+	const struct atNBPtuple *tpn;
 
 	if ((const u_char *)(tp + 1) > ep) {
 		ND_PRINT((ndo, "%s", tstr));
@@ -531,9 +531,9 @@ nbp_tuple_print(netdissect_options *ndo,
 
 static const struct atNBPtuple *
 nbp_name_print(netdissect_options *ndo,
-               const struct atNBPtuple *tp, register const u_char *ep)
+               const struct atNBPtuple *tp, const u_char *ep)
 {
-	register const char *cp = (const char *)tp + nbpTupleSize;
+	const char *cp = (const char *)tp + nbpTupleSize;
 
 	ND_PRINT((ndo, " "));
 
@@ -567,8 +567,8 @@ static const char *
 ataddr_string(netdissect_options *ndo,
               u_short atnet, u_char athost)
 {
-	register struct hnamemem *tp, *tp2;
-	register int i = (atnet << 8) | athost;
+	struct hnamemem *tp, *tp2;
+	int i = (atnet << 8) | athost;
 	char nambuf[256+1];
 	static int first = 1;
 	FILE *fp;
@@ -649,7 +649,7 @@ static const struct tok skt2str[] = {
 
 static const char *
 ddpskt_string(netdissect_options *ndo,
-              register int skt)
+              int skt)
 {
 	static char buf[8];
 

@@ -93,7 +93,7 @@ struct hsrp {
 };
 
 void
-hsrp_print(netdissect_options *ndo, register const uint8_t *bp, register u_int len)
+hsrp_print(netdissect_options *ndo, const uint8_t *bp, u_int len)
 {
 	const struct hsrp *hp = (const struct hsrp *) bp;
 

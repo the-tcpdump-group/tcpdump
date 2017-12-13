@@ -61,15 +61,15 @@ static const char tstr[] = " [|RESP]";
 #define resp_print_invalid(ndo)          ND_PRINT((ndo, " invalid"))
 
 void       resp_print(netdissect_options *, const u_char *, u_int);
-static int resp_parse(netdissect_options *, register const u_char *, int);
-static int resp_print_string_error_integer(netdissect_options *, register const u_char *, int);
-static int resp_print_simple_string(netdissect_options *, register const u_char *, int);
-static int resp_print_integer(netdissect_options *, register const u_char *, int);
-static int resp_print_error(netdissect_options *, register const u_char *, int);
-static int resp_print_bulk_string(netdissect_options *, register const u_char *, int);
-static int resp_print_bulk_array(netdissect_options *, register const u_char *, int);
-static int resp_print_inline(netdissect_options *, register const u_char *, int);
-static int resp_get_length(netdissect_options *, register const u_char *, int, const u_char **);
+static int resp_parse(netdissect_options *, const u_char *, int);
+static int resp_print_string_error_integer(netdissect_options *, const u_char *, int);
+static int resp_print_simple_string(netdissect_options *, const u_char *, int);
+static int resp_print_integer(netdissect_options *, const u_char *, int);
+static int resp_print_error(netdissect_options *, const u_char *, int);
+static int resp_print_bulk_string(netdissect_options *, const u_char *, int);
+static int resp_print_bulk_array(netdissect_options *, const u_char *, int);
+static int resp_print_inline(netdissect_options *, const u_char *, int);
+static int resp_get_length(netdissect_options *, const u_char *, int, const u_char **);
 
 #define LCHECK2(_tot_len, _len) \
     {                           \
@@ -241,7 +241,7 @@ trunc:
 }
 
 static int
-resp_parse(netdissect_options *ndo, register const u_char *bp, int length)
+resp_parse(netdissect_options *ndo, const u_char *bp, int length)
 {
     u_char op;
     int ret_len;
@@ -272,22 +272,22 @@ trunc:
 }
 
 static int
-resp_print_simple_string(netdissect_options *ndo, register const u_char *bp, int length) {
+resp_print_simple_string(netdissect_options *ndo, const u_char *bp, int length) {
     return resp_print_string_error_integer(ndo, bp, length);
 }
 
 static int
-resp_print_integer(netdissect_options *ndo, register const u_char *bp, int length) {
+resp_print_integer(netdissect_options *ndo, const u_char *bp, int length) {
     return resp_print_string_error_integer(ndo, bp, length);
 }
 
 static int
-resp_print_error(netdissect_options *ndo, register const u_char *bp, int length) {
+resp_print_error(netdissect_options *ndo, const u_char *bp, int length) {
     return resp_print_string_error_integer(ndo, bp, length);
 }
 
 static int
-resp_print_string_error_integer(netdissect_options *ndo, register const u_char *bp, int length) {
+resp_print_string_error_integer(netdissect_options *ndo, const u_char *bp, int length) {
     int length_cur = length, len, ret_len;
     const u_char *bp_ptr;
 
@@ -322,7 +322,7 @@ trunc:
 }
 
 static int
-resp_print_bulk_string(netdissect_options *ndo, register const u_char *bp, int length) {
+resp_print_bulk_string(netdissect_options *ndo, const u_char *bp, int length) {
     int length_cur = length, string_len;
 
     /* bp points to the op; skip it */
@@ -368,7 +368,7 @@ trunc:
 }
 
 static int
-resp_print_bulk_array(netdissect_options *ndo, register const u_char *bp, int length) {
+resp_print_bulk_array(netdissect_options *ndo, const u_char *bp, int length) {
     u_int length_cur = length;
     int array_len, i, ret_len;
 
@@ -407,7 +407,7 @@ trunc:
 }
 
 static int
-resp_print_inline(netdissect_options *ndo, register const u_char *bp, int length) {
+resp_print_inline(netdissect_options *ndo, const u_char *bp, int length) {
     int length_cur = length;
     int len;
     const u_char *bp_ptr;
@@ -454,7 +454,7 @@ trunc:
 }
 
 static int
-resp_get_length(netdissect_options *ndo, register const u_char *bp, int len, const u_char **endp)
+resp_get_length(netdissect_options *ndo, const u_char *bp, int len, const u_char **endp)
 {
     int result;
     u_char c;

@@ -498,11 +498,11 @@ extern char *dnet_htoa(struct dn_naddr *);
 
 void
 decnet_print(netdissect_options *ndo,
-             register const u_char *ap, register u_int length,
-             register u_int caplen)
+             const u_char *ap, u_int length,
+             u_int caplen)
 {
-	register const union routehdr *rhp;
-	register int mflags;
+	const union routehdr *rhp;
+	int mflags;
 	int dst, src, hops;
 	u_int nsplen, pktlen;
 	const u_char *nspp;
@@ -611,12 +611,12 @@ trunc:
 
 static int
 print_decnet_ctlmsg(netdissect_options *ndo,
-                    register const union routehdr *rhp, u_int length,
+                    const union routehdr *rhp, u_int length,
                     u_int caplen)
 {
 	/* Our caller has already checked for mflags */
 	int mflags = EXTRACT_U_1(rhp->rh_short.sh_flags);
-	register const union controlmsg *cmp = (const union controlmsg *)rhp;
+	const union controlmsg *cmp = (const union controlmsg *)rhp;
 	int src, dst, info, blksize, eco, ueco, hello, other, vers;
 	etheraddr srcea, rtea;
 	int priority;
@@ -1233,7 +1233,7 @@ static const struct tok reason2str[] = {
 
 static void
 print_reason(netdissect_options *ndo,
-             register int reason)
+             int reason)
 {
 	ND_PRINT((ndo, "%s ", tok2str(reason2str, "reason-%d", reason)));
 }

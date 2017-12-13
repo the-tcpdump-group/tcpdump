@@ -46,7 +46,7 @@
 #include "extract.h"
 
 void
-carp_print(netdissect_options *ndo, register const u_char *bp, register u_int len, int ttl)
+carp_print(netdissect_options *ndo, const u_char *bp, u_int len, int ttl)
 {
 	int version, type;
 	const char *type_s;

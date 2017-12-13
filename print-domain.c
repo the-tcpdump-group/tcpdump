@@ -52,9 +52,9 @@ static const char *ns_resp[] = {
 /* skip over a domain name */
 static const u_char *
 ns_nskip(netdissect_options *ndo,
-         register const u_char *cp)
+         const u_char *cp)
 {
-	register u_char i;
+	u_char i;
 
 	if (!ND_TTEST_1(cp))
 		return (NULL);
@@ -129,7 +129,7 @@ static int
 labellen(netdissect_options *ndo,
          const u_char *cp)
 {
-	register u_int i;
+	u_int i;
 
 	if (!ND_TTEST_1(cp))
 		return(-1);
@@ -151,11 +151,11 @@ labellen(netdissect_options *ndo,
 
 const u_char *
 ns_nprint(netdissect_options *ndo,
-          register const u_char *cp, register const u_char *bp)
+          const u_char *cp, const u_char *bp)
 {
-	register u_int i, l;
-	register const u_char *rp = NULL;
-	register int compress = 0;
+	u_int i, l;
+	const u_char *rp = NULL;
+	int compress = 0;
 	int elt;
 	u_int offset, max_offset;
 
@@ -241,9 +241,9 @@ ns_nprint(netdissect_options *ndo,
 /* print a <character-string> */
 static const u_char *
 ns_cprint(netdissect_options *ndo,
-          register const u_char *cp)
+          const u_char *cp)
 {
-	register u_int i;
+	u_int i;
 
 	if (!ND_TTEST_1(cp))
 		return (NULL);
@@ -331,10 +331,10 @@ const struct tok ns_class2str[] = {
 /* print a query */
 static const u_char *
 ns_qprint(netdissect_options *ndo,
-          register const u_char *cp, register const u_char *bp, int is_mdns)
+          const u_char *cp, const u_char *bp, int is_mdns)
 {
-	register const u_char *np = cp;
-	register u_int i, class;
+	const u_char *np = cp;
+	u_int i, class;
 
 	cp = ns_nskip(ndo, cp);
 
@@ -366,11 +366,11 @@ ns_qprint(netdissect_options *ndo,
 /* print a reply */
 static const u_char *
 ns_rprint(netdissect_options *ndo,
-          register const u_char *cp, register const u_char *bp, int is_mdns)
+          const u_char *cp, const u_char *bp, int is_mdns)
 {
-	register u_int i, class, opt_flags = 0;
-	register u_short typ, len;
-	register const u_char *rp;
+	u_int i, class, opt_flags = 0;
+	u_short typ, len;
+	const u_char *rp;
 
 	if (ndo->ndo_vflag) {
 		ND_PRINT((ndo, " "));
@@ -585,13 +585,13 @@ ns_rprint(netdissect_options *ndo,
 
 void
 domain_print(netdissect_options *ndo,
-         register const u_char *bp, u_int length, int is_mdns)
+         const u_char *bp, u_int length, int is_mdns)
 {
-	register const HEADER *np;
+	const HEADER *np;
 	u_int16_t flags;
 	u_int qdcount, ancount, nscount, arcount;
 	u_int i;
-	register const u_char *cp;
+	const u_char *cp;
 	uint16_t b2;
 
 	np = (const HEADER *)bp;

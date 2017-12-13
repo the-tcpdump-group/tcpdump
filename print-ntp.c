@@ -189,7 +189,7 @@ struct ntp_time_data {
 static void p_sfix(netdissect_options *ndo, const struct s_fixedpt *);
 static void p_ntp_time(netdissect_options *, const struct l_fixedpt *);
 static void p_ntp_delta(netdissect_options *, const struct l_fixedpt *, const struct l_fixedpt *);
-static void p_poll(netdissect_options *, register const int);
+static void p_poll(netdissect_options *, const int);
 
 static const struct tok ntp_mode_values[] = {
     { MODE_UNSPEC,    "unspecified" },
@@ -262,7 +262,7 @@ struct ntp_control_data {
  */
 static void
 ntp_time_print(netdissect_options *ndo,
-	       register const struct ntp_time_data *bp, u_int length)
+	       const struct ntp_time_data *bp, u_int length)
 {
 	uint8_t stratum;
 
@@ -385,7 +385,7 @@ trunc:
  */
 static void
 ntp_control_print(netdissect_options *ndo,
-		  register const struct ntp_control_data *cd, u_int length)
+		  const struct ntp_control_data *cd, u_int length)
 {
 	uint8_t control, R, E, M, opcode;
 	uint16_t sequence, status, assoc, offset, count;
@@ -450,9 +450,9 @@ union ntpdata {
  */
 void
 ntp_print(netdissect_options *ndo,
-          register const u_char *cp, u_int length)
+          const u_char *cp, u_int length)
 {
-	register const union ntpdata *bp = (const union ntpdata *)cp;
+	const union ntpdata *bp = (const union ntpdata *)cp;
 	int mode, version, leapind;
 	uint8_t status;
 
@@ -493,11 +493,11 @@ trunc:
 
 static void
 p_sfix(netdissect_options *ndo,
-       register const struct s_fixedpt *sfp)
+       const struct s_fixedpt *sfp)
 {
-	register int i;
-	register int f;
-	register double ff;
+	int i;
+	int f;
+	double ff;
 
 	i = EXTRACT_BE_U_2(&sfp->int_part);
 	f = EXTRACT_BE_U_2(&sfp->fraction);
@@ -510,12 +510,12 @@ p_sfix(netdissect_options *ndo,
 
 static void
 p_ntp_time(netdissect_options *ndo,
-           register const struct l_fixedpt *lfp)
+           const struct l_fixedpt *lfp)
 {
-	register uint32_t i;
-	register uint32_t uf;
-	register uint32_t f;
-	register double ff;
+	uint32_t i;
+	uint32_t uf;
+	uint32_t f;
+	double ff;
 
 	i = EXTRACT_BE_U_4(&lfp->int_part);
 	uf = EXTRACT_BE_U_4(&lfp->fraction);
@@ -565,14 +565,14 @@ p_ntp_time(netdissect_options *ndo,
 /* Prints time difference between *lfp and *olfp */
 static void
 p_ntp_delta(netdissect_options *ndo,
-            register const struct l_fixedpt *olfp,
-            register const struct l_fixedpt *lfp)
+            const struct l_fixedpt *olfp,
+            const struct l_fixedpt *lfp)
 {
-	register int32_t i;
-	register uint32_t u, uf;
-	register uint32_t ou, ouf;
-	register uint32_t f;
-	register double ff;
+	int32_t i;
+	uint32_t u, uf;
+	uint32_t ou, ouf;
+	uint32_t f;
+	double ff;
 	int signbit;
 
 	u = EXTRACT_BE_U_4(&lfp->int_part);
@@ -618,7 +618,7 @@ p_ntp_delta(netdissect_options *ndo,
 /* Prints polling interval in log2 as seconds or fraction of second */
 static void
 p_poll(netdissect_options *ndo,
-       register const int poll_interval)
+       const int poll_interval)
 {
 	if (poll_interval <= -32 || poll_interval >= 32)
 		return;

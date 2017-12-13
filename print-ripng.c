@@ -94,7 +94,7 @@ static int IN6_IS_ADDR_UNSPECIFIED(const struct in6_addr *addr)
 #endif
 
 static int
-rip6_entry_print(netdissect_options *ndo, register const struct netinfo6 *ni, int metric)
+rip6_entry_print(netdissect_options *ndo, const struct netinfo6 *ni, int metric)
 {
 	int l;
 	l = ND_PRINT((ndo, "%s/%d", ip6addr_string(ndo, &ni->rip6_dest), ni->rip6_plen));
@@ -108,8 +108,8 @@ rip6_entry_print(netdissect_options *ndo, register const struct netinfo6 *ni, in
 void
 ripng_print(netdissect_options *ndo, const u_char *dat, unsigned int length)
 {
-	register const struct rip6 *rp = (const struct rip6 *)dat;
-	register const struct netinfo6 *ni;
+	const struct rip6 *rp = (const struct rip6 *)dat;
+	const struct netinfo6 *ni;
 	unsigned int length_left;
 	u_int j;
 

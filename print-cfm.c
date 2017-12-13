@@ -216,7 +216,7 @@ static const struct tok cfm_tlv_senderid_chassisid_values[] = {
 
 static int
 cfm_network_addr_print(netdissect_options *ndo,
-                       register const u_char *tptr, const u_int length)
+                       const u_char *tptr, const u_int length)
 {
     u_int network_addr_type;
     u_int hexdump =  FALSE;
@@ -268,7 +268,7 @@ cfm_network_addr_print(netdissect_options *ndo,
 
 void
 cfm_print(netdissect_options *ndo,
-          register const u_char *pptr, register u_int length)
+          const u_char *pptr, u_int length)
 {
     const struct cfm_common_header_t *cfm_common_header;
     const struct cfm_tlv_header_t *cfm_tlv_header;

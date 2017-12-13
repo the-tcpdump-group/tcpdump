@@ -96,7 +96,7 @@ static const char *tsptype[TSPTYPENUMBER] =
 
 void
 timed_print(netdissect_options *ndo,
-            register const u_char *bp)
+            const u_char *bp)
 {
 	const struct tsp *tsp = (const struct tsp *)bp;
 	long sec, usec;

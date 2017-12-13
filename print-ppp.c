@@ -1539,7 +1539,7 @@ handle_ppp(netdissect_options *ndo,
 /* Standard PPP printer */
 u_int
 ppp_print(netdissect_options *ndo,
-          register const u_char *p, u_int length)
+          const u_char *p, u_int length)
 {
 	u_int proto,ppp_header;
         u_int olen = length; /* _o_riginal length */
@@ -1610,10 +1610,10 @@ trunc:
 /* PPP I/F printer */
 u_int
 ppp_if_print(netdissect_options *ndo,
-             const struct pcap_pkthdr *h, register const u_char *p)
+             const struct pcap_pkthdr *h, const u_char *p)
 {
-	register u_int length = h->len;
-	register u_int caplen = h->caplen;
+	u_int length = h->len;
+	u_int caplen = h->caplen;
 
 	if (caplen < PPP_HDRLEN) {
 		ND_PRINT((ndo, "[|ppp]"));
@@ -1678,10 +1678,10 @@ ppp_if_print(netdissect_options *ndo,
  */
 u_int
 ppp_hdlc_if_print(netdissect_options *ndo,
-                  const struct pcap_pkthdr *h, register const u_char *p)
+                  const struct pcap_pkthdr *h, const u_char *p)
 {
-	register u_int length = h->len;
-	register u_int caplen = h->caplen;
+	u_int length = h->len;
+	u_int caplen = h->caplen;
 	u_int proto;
 	u_int hdrlen = 0;
 
@@ -1748,12 +1748,12 @@ ppp_hdlc_if_print(netdissect_options *ndo,
 /* BSD/OS specific PPP printer */
 u_int
 ppp_bsdos_if_print(netdissect_options *ndo _U_,
-                   const struct pcap_pkthdr *h _U_, register const u_char *p _U_)
+                   const struct pcap_pkthdr *h _U_, const u_char *p _U_)
 {
-	register u_int hdrlength;
+	u_int hdrlength;
 #ifdef __bsdi__
-	register u_int length = h->len;
-	register u_int caplen = h->caplen;
+	u_int length = h->len;
+	u_int caplen = h->caplen;
 	uint16_t ptype;
 	uint8_t llhl;
 	const u_char *q;

@@ -37,9 +37,9 @@ struct ipcomp {
 #include "extract.h"
 
 void
-ipcomp_print(netdissect_options *ndo, register const u_char *bp)
+ipcomp_print(netdissect_options *ndo, const u_char *bp)
 {
-	register const struct ipcomp *ipcomp;
+	const struct ipcomp *ipcomp;
 	uint16_t cpi;
 
 	ipcomp = (const struct ipcomp *)bp;

@@ -411,7 +411,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 
 		case ICMP_UNREACH_NEEDFRAG:
 		    {
-			register const struct mtu_discovery *mp;
+			const struct mtu_discovery *mp;
 			mp = (const struct mtu_discovery *)(const u_char *)&dp->icmp_void;
 			mtu = EXTRACT_BE_U_2(&mp->nexthopmtu);
 			if (mtu) {
@@ -446,8 +446,8 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 
 	case ICMP_ROUTERADVERT:
 	    {
-		register const struct ih_rdiscovery *ihp;
-		register const struct id_rdiscovery *idp;
+		const struct ih_rdiscovery *ihp;
+		const struct id_rdiscovery *idp;
 		u_int lifetime, num, size;
 
 		(void)snprintf(buf, sizeof(buf), "router advertisement");

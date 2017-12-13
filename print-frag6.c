@@ -33,10 +33,10 @@
 #include "ip6.h"
 
 int
-frag6_print(netdissect_options *ndo, register const u_char *bp, register const u_char *bp2)
+frag6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2)
 {
-	register const struct ip6_frag *dp;
-	register const struct ip6_hdr *ip6;
+	const struct ip6_frag *dp;
+	const struct ip6_hdr *ip6;
 
 	dp = (const struct ip6_frag *)bp;
 	ip6 = (const struct ip6_hdr *)bp2;

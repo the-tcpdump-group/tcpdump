@@ -136,7 +136,7 @@ usb_header_print(netdissect_options *ndo, const pcap_usb_header *uh)
  */
 u_int
 usb_linux_48_byte_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
-                           register const u_char *p)
+                           const u_char *p)
 {
 	if (h->caplen < sizeof(pcap_usb_header)) {
 		ND_PRINT((ndo, "%s", tstr));
@@ -159,7 +159,7 @@ usb_linux_48_byte_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
  */
 u_int
 usb_linux_64_byte_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
-                           register const u_char *p)
+                           const u_char *p)
 {
 	if (h->caplen < sizeof(pcap_usb_header_mmapped)) {
 		ND_PRINT((ndo, "%s", tstr));

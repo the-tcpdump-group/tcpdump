@@ -215,12 +215,12 @@ nextproto6_cksum(netdissect_options *ndo,
 void
 ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
-	register const struct ip6_hdr *ip6;
-	register int advance;
+	const struct ip6_hdr *ip6;
+	int advance;
 	u_int len;
 	const u_char *ipend;
-	register const u_char *cp;
-	register u_int payload_len;
+	const u_char *cp;
+	u_int payload_len;
 	u_int nh;
 	int fragmented = 0;
 	u_int flow;

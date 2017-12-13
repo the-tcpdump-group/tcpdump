@@ -96,7 +96,7 @@ struct servent *
 getservent(void)
 {
     char *p;
-    register char *cp, **q;
+    char *cp, **q;
 
     if (servf == NULL && (servf = fopen(etc_path(__PATH_SERVICES), "r")) == NULL)
         return (NULL);

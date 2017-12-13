@@ -35,9 +35,9 @@
 #include "extract.h"
 
 int
-ah_print(netdissect_options *ndo, register const u_char *bp)
+ah_print(netdissect_options *ndo, const u_char *bp)
 {
-	register const struct ah *ah;
+	const struct ah *ah;
 	int sumlen;
 
 	ah = (const struct ah *)bp;

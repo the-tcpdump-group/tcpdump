@@ -88,7 +88,7 @@ static const struct tok opcode_values[] = {
  */
 void
 rrcp_print(netdissect_options *ndo,
-	  register const u_char *cp,
+	  const u_char *cp,
 	  u_int length _U_,
 	  const struct lladdr_info *src,
 	  const struct lladdr_info *dst)

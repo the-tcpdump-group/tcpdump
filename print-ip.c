@@ -56,10 +56,10 @@ static const struct tok ip_option_values[] = {
  */
 static int
 ip_printroute(netdissect_options *ndo,
-              register const u_char *cp, u_int length)
+              const u_char *cp, u_int length)
 {
-	register u_int ptr;
-	register u_int len;
+	u_int ptr;
+	u_int len;
 
 	if (length < 3) {
 		ND_PRINT((ndo, " [bad length %u]", length));
@@ -170,10 +170,10 @@ nextproto4_cksum(netdissect_options *ndo,
 
 static int
 ip_printts(netdissect_options *ndo,
-           register const u_char *cp, u_int length)
+           const u_char *cp, u_int length)
 {
-	register u_int ptr;
-	register u_int len;
+	u_int ptr;
+	u_int len;
 	int hoplen;
 	const char *type;
 
@@ -244,9 +244,9 @@ trunc:
  */
 static void
 ip_optprint(netdissect_options *ndo,
-            register const u_char *cp, u_int length)
+            const u_char *cp, u_int length)
 {
-	register u_int option_len;
+	u_int option_len;
 	const char *sep = "";
 
 	for (; length > 0; cp += option_len, length -= option_len) {
@@ -706,7 +706,7 @@ trunc:
 }
 
 void
-ipN_print(netdissect_options *ndo, register const u_char *bp, register u_int length)
+ipN_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	if (length < 1) {
 		ND_PRINT((ndo, "truncated-ip %d", length));

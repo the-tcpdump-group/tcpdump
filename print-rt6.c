@@ -36,13 +36,13 @@
 #include "ip6.h"
 
 int
-rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 _U_)
+rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 {
-	register const struct ip6_rthdr *dp;
-	register const struct ip6_rthdr0 *dp0;
-	register const u_char *ep;
+	const struct ip6_rthdr *dp;
+	const struct ip6_rthdr0 *dp0;
+	const u_char *ep;
 	u_int i, len, type;
-	register const struct in6_addr *addr;
+	const struct in6_addr *addr;
 
 	dp = (const struct ip6_rthdr *)bp;
 

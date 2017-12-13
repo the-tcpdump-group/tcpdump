@@ -105,13 +105,13 @@
 static int is_UCX(const unsigned char *, u_int);
 
 void
-Parse_fh(register const unsigned char *fh, u_int len, my_fsid *fsidp,
+Parse_fh(const unsigned char *fh, u_int len, my_fsid *fsidp,
 	 uint32_t *inop,
 	 const char **osnamep, /* if non-NULL, return OS name here */
 	 const char **fsnamep, /* if non-NULL, return server fs name here (for VMS) */
 	 int ourself)	/* true if file handle was generated on this host */
 {
-	register const unsigned char *fhp = fh;
+	const unsigned char *fhp = fh;
 	uint32_t temp;
 	int fhtype = FHT_UNKNOWN;
 	u_int i;
@@ -453,7 +453,7 @@ Parse_fh(register const unsigned char *fh, u_int len, my_fsid *fsidp,
 static int
 is_UCX(const unsigned char *fhp, u_int len)
 {
-	register u_int i;
+	u_int i;
 	int seen_null = 0;
 
 	/*

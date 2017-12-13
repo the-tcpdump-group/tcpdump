@@ -67,10 +67,10 @@ static int print_graft_ack(netdissect_options *, const u_char *);
 
 void
 dvmrp_print(netdissect_options *ndo,
-            register const u_char *bp, register u_int len)
+            const u_char *bp, u_int len)
 {
-	register const u_char *ep;
-	register u_char type;
+	const u_char *ep;
+	u_char type;
 	uint8_t major_version, minor_version;
 
 	ep = (const u_char *)ndo->ndo_snapend;
@@ -162,12 +162,12 @@ trunc:
 
 static int
 print_report(netdissect_options *ndo,
-             register const u_char *bp, register const u_char *ep,
-             register u_int len)
+             const u_char *bp, const u_char *ep,
+             u_int len)
 {
-	register uint32_t mask, origin;
-	register int metric, done;
-	register u_int i, width;
+	uint32_t mask, origin;
+	int metric, done;
+	u_int i, width;
 
 	while (len > 0) {
 		if (len < 3) {
@@ -223,10 +223,10 @@ trunc:
 
 static int
 print_probe(netdissect_options *ndo,
-            register const u_char *bp, register const u_char *ep,
-            register u_int len)
+            const u_char *bp, const u_char *ep,
+            u_int len)
 {
-	register uint32_t genid;
+	uint32_t genid;
 
 	ND_TCHECK_4(bp);
 	if ((len < 4) || ((bp + 4) > ep)) {
@@ -255,13 +255,13 @@ trunc:
 
 static int
 print_neighbors(netdissect_options *ndo,
-                register const u_char *bp, register const u_char *ep,
-                register u_int len)
+                const u_char *bp, const u_char *ep,
+                u_int len)
 {
 	const u_char *laddr;
-	register u_char metric;
-	register u_char thresh;
-	register int ncount;
+	u_char metric;
+	u_char thresh;
+	int ncount;
 
 	while (len > 0 && bp < ep) {
 		ND_TCHECK_7(bp);
@@ -290,13 +290,13 @@ trunc:
 
 static int
 print_neighbors2(netdissect_options *ndo,
-                 register const u_char *bp, register const u_char *ep,
-                 register u_int len, uint8_t major_version,
+                 const u_char *bp, const u_char *ep,
+                 u_int len, uint8_t major_version,
                  uint8_t minor_version)
 {
 	const u_char *laddr;
-	register u_char metric, thresh, flags;
-	register int ncount;
+	u_char metric, thresh, flags;
+	int ncount;
 
 	ND_PRINT((ndo, " (v %u.%u):", major_version, minor_version));
 
@@ -343,7 +343,7 @@ trunc:
 
 static int
 print_prune(netdissect_options *ndo,
-            register const u_char *bp)
+            const u_char *bp)
 {
 	ND_TCHECK_LEN(bp, 12);
 	ND_PRINT((ndo, " src %s grp %s", ipaddr_string(ndo, bp), ipaddr_string(ndo, bp + 4)));
@@ -357,7 +357,7 @@ trunc:
 
 static int
 print_graft(netdissect_options *ndo,
-            register const u_char *bp)
+            const u_char *bp)
 {
 	ND_TCHECK_8(bp);
 	ND_PRINT((ndo, " src %s grp %s", ipaddr_string(ndo, bp), ipaddr_string(ndo, bp + 4)));
@@ -368,7 +368,7 @@ trunc:
 
 static int
 print_graft_ack(netdissect_options *ndo,
-                register const u_char *bp)
+                const u_char *bp)
 {
 	ND_TCHECK_8(bp);
 	ND_PRINT((ndo, " src %s grp %s", ipaddr_string(ndo, bp), ipaddr_string(ndo, bp + 4)));

@@ -130,7 +130,7 @@ static const struct tok sll_pkttype_values[] = {
 };
 
 static inline void
-sll_print(netdissect_options *ndo, register const struct sll_header *sllp, u_int length)
+sll_print(netdissect_options *ndo, const struct sll_header *sllp, u_int length)
 {
 	u_short ether_type;
 
@@ -195,7 +195,7 @@ sll_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
-	register const struct sll_header *sllp;
+	const struct sll_header *sllp;
 	u_short ether_type;
 	int llc_hdrlen;
 	u_int hdrlen;

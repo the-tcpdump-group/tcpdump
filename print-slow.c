@@ -237,12 +237,12 @@ struct lacp_marker_tlv_terminator_t {
     uint8_t pad[50];
 };
 
-static void slow_marker_lacp_print(netdissect_options *, register const u_char *, register u_int, u_int);
-static void slow_oam_print(netdissect_options *, register const u_char *, register u_int);
+static void slow_marker_lacp_print(netdissect_options *, const u_char *, u_int, u_int);
+static void slow_oam_print(netdissect_options *, const u_char *, u_int);
 
 void
 slow_print(netdissect_options *ndo,
-           register const u_char *pptr, register u_int len)
+           const u_char *pptr, u_int len)
 {
     int print_version;
     u_int subtype;
@@ -346,7 +346,7 @@ trunc:
 
 static void
 slow_marker_lacp_print(netdissect_options *ndo,
-                       register const u_char *tptr, register u_int tlen,
+                       const u_char *tptr, u_int tlen,
                        u_int proto_subtype)
 {
     const struct tlv_header_t *tlv_header;
@@ -487,7 +487,7 @@ trunc:
 
 static void
 slow_oam_print(netdissect_options *ndo,
-               register const u_char *tptr, register u_int tlen)
+               const u_char *tptr, u_int tlen)
 {
     uint8_t code;
     uint8_t type, length;

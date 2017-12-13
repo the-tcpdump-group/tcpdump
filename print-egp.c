@@ -129,12 +129,12 @@ static const char *egp_reasons[] = {
 
 static void
 egpnrprint(netdissect_options *ndo,
-           register const struct egp_packet *egp, u_int length)
+           const struct egp_packet *egp, u_int length)
 {
-	register const uint8_t *cp;
+	const uint8_t *cp;
 	uint32_t addr;
-	register uint32_t net;
-	register u_int netlen;
+	uint32_t net;
+	u_int netlen;
 	u_int gateways, distances, networks;
 	u_int t_gateways;
 	const char *comma;
@@ -241,12 +241,12 @@ trunc:
 
 void
 egp_print(netdissect_options *ndo,
-          register const uint8_t *bp, register u_int length)
+          const uint8_t *bp, u_int length)
 {
-	register const struct egp_packet *egp;
-	register int status;
-	register int code;
-	register int type;
+	const struct egp_packet *egp;
+	int status;
+	int code;
+	int type;
 
 	egp = (const struct egp_packet *)bp;
 	if (length < sizeof(*egp) || !ND_TTEST(*egp)) {

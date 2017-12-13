@@ -148,7 +148,7 @@ static const struct tok eap_aka_subtype_values[] = {
  */
 void
 eap_print(netdissect_options *ndo,
-          register const u_char *cp,
+          const u_char *cp,
           u_int length)
 {
     const struct eap_frame_t *eap;

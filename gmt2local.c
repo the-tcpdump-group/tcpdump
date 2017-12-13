@@ -40,8 +40,8 @@
 int32_t
 gmt2local(time_t t)
 {
-	register int dt, dir;
-	register struct tm *gmt, *loc;
+	int dt, dir;
+	struct tm *gmt, *loc;
 	struct tm sgmt;
 
 	if (t == 0)

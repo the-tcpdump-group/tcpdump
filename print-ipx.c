@@ -111,7 +111,7 @@ ipxaddr_string(uint32_t net, const u_char *node)
 static void
 ipx_decode(netdissect_options *ndo, const struct ipxHdr *ipx, const u_char *datap, u_int length)
 {
-    register u_short dstSkt;
+    u_short dstSkt;
 
     dstSkt = EXTRACT_BE_U_2(&ipx->dstSkt);
     switch (dstSkt) {

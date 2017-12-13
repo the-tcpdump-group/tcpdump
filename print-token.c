@@ -104,8 +104,8 @@ extract_token_addrs(const struct token_header *trp, char *fsrc, char *fdst)
  */
 static inline void
 token_hdr_print(netdissect_options *ndo,
-                register const struct token_header *trp, register u_int length,
-                register const u_char *fsrc, register const u_char *fdst)
+                const struct token_header *trp, u_int length,
+                const u_char *fsrc, const u_char *fdst)
 {
 	const char *srcname, *dstname;
 

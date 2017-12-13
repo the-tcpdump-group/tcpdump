@@ -373,7 +373,7 @@ static const struct tok ospf6_auth_type_str[] = {
 
 static void
 ospf6_print_ls_type(netdissect_options *ndo,
-                    register u_int ls_type, register const rtrid_t *ls_stateid)
+                    u_int ls_type, const rtrid_t *ls_stateid)
 {
         ND_PRINT((ndo, "\n\t    %s LSA (%d), %s Scope%s, LSA-ID %s",
                tok2str(ospf6_lsa_values, "Unknown", ls_type & LS_TYPE_MASK),
@@ -385,7 +385,7 @@ ospf6_print_ls_type(netdissect_options *ndo,
 
 static int
 ospf6_print_lshdr(netdissect_options *ndo,
-                  register const struct lsa6_hdr *lshp, const u_char *dataend)
+                  const struct lsa6_hdr *lshp, const u_char *dataend)
 {
 	if ((const u_char *)(lshp + 1) > dataend)
 		goto trunc;
@@ -449,25 +449,25 @@ trunc:
  */
 static int
 ospf6_print_lsa(netdissect_options *ndo,
-                register const struct lsa6 *lsap, const u_char *dataend)
+                const struct lsa6 *lsap, const u_char *dataend)
 {
-	register const struct rlalink6 *rlp;
+	const struct rlalink6 *rlp;
 #if 0
-	register const struct tos_metric *tosp;
+	const struct tos_metric *tosp;
 #endif
-	register const rtrid_t *ap;
+	const rtrid_t *ap;
 #if 0
-	register const struct aslametric *almp;
-	register const struct mcla *mcp;
+	const struct aslametric *almp;
+	const struct mcla *mcp;
 #endif
-	register const struct llsa *llsap;
-	register const struct lsa6_prefix *lsapp;
+	const struct llsa *llsap;
+	const struct lsa6_prefix *lsapp;
 #if 0
-	register const uint32_t *lp;
+	const uint32_t *lp;
 #endif
-	register u_int prefixes;
-	register int bytelen;
-	register u_int length, lsa_length;
+	u_int prefixes;
+	int bytelen;
+	u_int length, lsa_length;
 	uint32_t flags32;
 	const uint8_t *tptr;
 
@@ -723,19 +723,19 @@ trunc:
 
 static int
 ospf6_decode_v3(netdissect_options *ndo,
-                register const struct ospf6hdr *op,
-                register const u_char *dataend)
+                const struct ospf6hdr *op,
+                const u_char *dataend)
 {
-	register const rtrid_t *ap;
-	register const struct lsr6 *lsrp;
-	register const struct lsa6_hdr *lshp;
-	register const struct lsa6 *lsap;
-	register int i;
+	const rtrid_t *ap;
+	const struct lsr6 *lsrp;
+	const struct lsa6_hdr *lshp;
+	const struct lsa6 *lsap;
+	int i;
 
 	switch (op->ospf6_type) {
 
 	case OSPF_TYPE_HELLO: {
-		register const struct hello6 *hellop = (const struct hello6 *)((const uint8_t *)op + OSPF6HDR_LEN);
+		const struct hello6 *hellop = (const struct hello6 *)((const uint8_t *)op + OSPF6HDR_LEN);
 
 		ND_TCHECK_4(&hellop->hello_options);
 		ND_PRINT((ndo, "\n\tOptions [%s]",
@@ -770,7 +770,7 @@ ospf6_decode_v3(netdissect_options *ndo,
 	}
 
 	case OSPF_TYPE_DD: {
-		register const struct dd6 *ddp = (const struct dd6 *)((const uint8_t *)op + OSPF6HDR_LEN);
+		const struct dd6 *ddp = (const struct dd6 *)((const uint8_t *)op + OSPF6HDR_LEN);
 
 		ND_TCHECK(ddp->db_options);
 		ND_PRINT((ndo, "\n\tOptions [%s]",
@@ -812,7 +812,7 @@ ospf6_decode_v3(netdissect_options *ndo,
 
 	case OSPF_TYPE_LS_UPDATE:
 		if (ndo->ndo_vflag > 1) {
-			register const struct lsu6 *lsup = (const struct lsu6 *)((const uint8_t *)op + OSPF6HDR_LEN);
+			const struct lsu6 *lsup = (const struct lsu6 *)((const uint8_t *)op + OSPF6HDR_LEN);
 
 			ND_TCHECK(lsup->lsu_count);
 			i = EXTRACT_BE_U_4(&lsup->lsu_count);
@@ -956,11 +956,11 @@ trunc:
 
 void
 ospf6_print(netdissect_options *ndo,
-            register const u_char *bp, register u_int length)
+            const u_char *bp, u_int length)
 {
-	register const struct ospf6hdr *op;
-	register const u_char *dataend;
-	register const char *cp;
+	const struct ospf6hdr *op;
+	const u_char *dataend;
+	const char *cp;
 	uint16_t datalen;
 
 	op = (const struct ospf6hdr *)bp;

@@ -191,14 +191,14 @@ static const struct tok rfc4675_tagged[] = {
 };
 
 
-static void print_attr_string(netdissect_options *, register const u_char *, u_int, u_short );
-static void print_attr_num(netdissect_options *, register const u_char *, u_int, u_short );
-static void print_vendor_attr(netdissect_options *, register const u_char *, u_int, u_short );
-static void print_attr_address(netdissect_options *, register const u_char *, u_int, u_short);
-static void print_attr_address6(netdissect_options *, register const u_char *, u_int, u_short);
-static void print_attr_netmask6(netdissect_options *, register const u_char *, u_int, u_short);
-static void print_attr_time(netdissect_options *, register const u_char *, u_int, u_short);
-static void print_attr_strange(netdissect_options *, register const u_char *, u_int, u_short);
+static void print_attr_string(netdissect_options *, const u_char *, u_int, u_short );
+static void print_attr_num(netdissect_options *, const u_char *, u_int, u_short );
+static void print_vendor_attr(netdissect_options *, const u_char *, u_int, u_short );
+static void print_attr_address(netdissect_options *, const u_char *, u_int, u_short);
+static void print_attr_address6(netdissect_options *, const u_char *, u_int, u_short);
+static void print_attr_netmask6(netdissect_options *, const u_char *, u_int, u_short);
+static void print_attr_time(netdissect_options *, const u_char *, u_int, u_short);
+static void print_attr_strange(netdissect_options *, const u_char *, u_int, u_short);
 
 
 struct radius_hdr { uint8_t  code; /* Radius packet code  */
@@ -443,7 +443,7 @@ static struct attrtype {
                   const char **subtypes; /* Standard Values (if any)       */
                   u_char siz_subtypes;   /* Size of total standard values  */
                   u_char first_subtype;  /* First standard value is 0 or 1 */
-                  void (*print_func)(netdissect_options *, register const u_char *, u_int, u_short);
+                  void (*print_func)(netdissect_options *, const u_char *, u_int, u_short);
                 } attr_type[]=
   {
      { NULL,                              NULL, 0, 0, NULL               },
@@ -582,9 +582,9 @@ static struct attrtype {
 /*****************************/
 static void
 print_attr_string(netdissect_options *ndo,
-                  register const u_char *data, u_int length, u_short attr_code)
+                  const u_char *data, u_int length, u_short attr_code)
 {
-   register u_int i;
+   u_int i;
 
    ND_TCHECK_LEN(data, length);
 
@@ -646,7 +646,7 @@ print_attr_string(netdissect_options *ndo,
  */
 static void
 print_vendor_attr(netdissect_options *ndo,
-                  register const u_char *data, u_int length, u_short attr_code _U_)
+                  const u_char *data, u_int length, u_short attr_code _U_)
 {
     u_int idx;
     u_int vendor_id;
@@ -711,7 +711,7 @@ print_vendor_attr(netdissect_options *ndo,
 /******************************/
 static void
 print_attr_num(netdissect_options *ndo,
-               register const u_char *data, u_int length, u_short attr_code)
+               const u_char *data, u_int length, u_short attr_code)
 {
    uint32_t timeout;
 
@@ -834,7 +834,7 @@ print_attr_num(netdissect_options *ndo,
 /*****************************/
 static void
 print_attr_address(netdissect_options *ndo,
-                   register const u_char *data, u_int length, u_short attr_code)
+                   const u_char *data, u_int length, u_short attr_code)
 {
    if (length != 4)
    {
@@ -877,7 +877,7 @@ print_attr_address(netdissect_options *ndo,
 /*****************************/
 static void
 print_attr_address6(netdissect_options *ndo,
-                   register const u_char *data, u_int length, u_short attr_code _U_)
+                   const u_char *data, u_int length, u_short attr_code _U_)
 {
    if (length != 16)
    {
@@ -897,7 +897,7 @@ print_attr_address6(netdissect_options *ndo,
 
 static void
 print_attr_netmask6(netdissect_options *ndo,
-                    register const u_char *data, u_int length, u_short attr_code _U_)
+                    const u_char *data, u_int length, u_short attr_code _U_)
 {
    u_char data2[16];
 
@@ -938,7 +938,7 @@ print_attr_netmask6(netdissect_options *ndo,
 /*************************************/
 static void
 print_attr_time(netdissect_options *ndo,
-                register const u_char *data, u_int length, u_short attr_code _U_)
+                const u_char *data, u_int length, u_short attr_code _U_)
 {
    time_t attr_time;
    char string[26];
@@ -971,7 +971,7 @@ print_attr_time(netdissect_options *ndo,
 /***********************************/
 static void
 print_attr_strange(netdissect_options *ndo,
-                   register const u_char *data, u_int length, u_short attr_code)
+                   const u_char *data, u_int length, u_short attr_code)
 {
    u_short len_data;
    u_int error_cause_value;
@@ -1055,9 +1055,9 @@ print_attr_strange(netdissect_options *ndo,
 
 static void
 radius_attrs_print(netdissect_options *ndo,
-                   register const u_char *attr, u_int length)
+                   const u_char *attr, u_int length)
 {
-   register const struct radius_attr *rad_attr = (const struct radius_attr *)attr;
+   const struct radius_attr *rad_attr = (const struct radius_attr *)attr;
    const char *attr_string;
 
    while (length > 0)
@@ -1118,7 +1118,7 @@ void
 radius_print(netdissect_options *ndo,
              const u_char *dat, u_int length)
 {
-   register const struct radius_hdr *rad;
+   const struct radius_hdr *rad;
    u_int len, auth_idx;
 
    ND_TCHECK_LEN(dat, MIN_RADIUS_LEN);

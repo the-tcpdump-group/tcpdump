@@ -929,10 +929,10 @@ set_dumper_capsicum_rights(pcap_dumper_t *p)
  * Copy arg vector into a new buffer, concatenating arguments with spaces.
  */
 static char *
-copy_argv(register char **argv)
+copy_argv(char **argv)
 {
-	register char **p;
-	register u_int len = 0;
+	char **p;
+	u_int len = 0;
 	char *buf;
 	char *src, *dst;
 
@@ -972,8 +972,8 @@ copy_argv(register char **argv)
 static char *
 read_infile(char *fname)
 {
-	register int i, fd, cc;
-	register char *cp;
+	int i, fd, cc;
+	char *cp;
 	struct stat buf;
 
 	fd = open(fname, O_RDONLY|O_BINARY);
@@ -1282,10 +1282,10 @@ fprintf(stderr, "Opening %s\n", device);
 int
 main(int argc, char **argv)
 {
-	register int cnt, op, i;
+	int cnt, op, i;
 	bpf_u_int32 localnet = 0, netmask = 0;
 	int timezone_offset = 0;
-	register char *cp, *infile, *cmdbuf, *device, *RFileName, *VFileName, *WFileName;
+	char *cp, *infile, *cmdbuf, *device, *RFileName, *VFileName, *WFileName;
 	char *endp;
 	pcap_handler callback;
 	int dlt;
@@ -2471,7 +2471,7 @@ child_cleanup(int signo _U_)
 #endif /* HAVE_FORK && HAVE_VFORK */
 
 static void
-info(register int verbose)
+info(int verbose)
 {
 	struct pcap_stat stats;
 

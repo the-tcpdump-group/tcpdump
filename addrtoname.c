@@ -181,9 +181,9 @@ static struct protoidmem protoidtable[HASHNAMESIZE];
 const char *
 intoa(uint32_t addr)
 {
-	register char *cp;
-	register u_int byte;
-	register int n;
+	char *cp;
+	u_int byte;
+	int n;
 	static char buf[sizeof(".xxx.xxx.xxx.xxx")];
 
 	NTOHL(addr);
@@ -236,7 +236,7 @@ extern cap_channel_t *capdns;
 const char *
 getname(netdissect_options *ndo, const u_char *ap)
 {
-	register struct hostent *hp;
+	struct hostent *hp;
 	uint32_t addr;
 	struct hnamemem *p;
 
@@ -294,7 +294,7 @@ getname(netdissect_options *ndo, const u_char *ap)
 const char *
 getname6(netdissect_options *ndo, const u_char *ap)
 {
-	register struct hostent *hp;
+	struct hostent *hp;
 	union {
 		struct in6_addr addr;
 		struct for_hash_addr {
@@ -303,7 +303,7 @@ getname6(netdissect_options *ndo, const u_char *ap)
 		} addra;
 	} addr;
 	struct h6namemem *p;
-	register const char *cp;
+	const char *cp;
 	char ntop_buf[INET6_ADDRSTRLEN];
 
 	memcpy(&addr, ap, sizeof(addr));
@@ -360,7 +360,7 @@ static const char hex[16] = {
 static inline struct enamemem *
 lookup_emem(netdissect_options *ndo, const u_char *ep)
 {
-	register u_int i, j, k;
+	u_int i, j, k;
 	struct enamemem *tp;
 
 	k = (ep[0] << 8) | ep[1];
@@ -391,11 +391,11 @@ lookup_emem(netdissect_options *ndo, const u_char *ep)
  */
 
 static inline struct bsnamemem *
-lookup_bytestring(netdissect_options *ndo, register const u_char *bs,
+lookup_bytestring(netdissect_options *ndo, const u_char *bs,
 		  const unsigned int nlen)
 {
 	struct bsnamemem *tp;
-	register u_int i, j, k;
+	u_int i, j, k;
 
 	if (nlen >= 6) {
 		k = (bs[0] << 8) | bs[1];
@@ -439,10 +439,10 @@ lookup_bytestring(netdissect_options *ndo, register const u_char *bs,
 /* Find the hash node that corresponds the NSAP 'nsap' */
 
 static inline struct enamemem *
-lookup_nsap(netdissect_options *ndo, register const u_char *nsap,
-	    register u_int nsap_length)
+lookup_nsap(netdissect_options *ndo, const u_char *nsap,
+	    u_int nsap_length)
 {
-	register u_int i, j, k;
+	u_int i, j, k;
 	struct enamemem *tp;
 	const u_char *ensap;
 
@@ -486,7 +486,7 @@ lookup_nsap(netdissect_options *ndo, register const u_char *nsap,
 static inline struct protoidmem *
 lookup_protoid(netdissect_options *ndo, const u_char *pi)
 {
-	register u_int i, j;
+	u_int i, j;
 	struct protoidmem *tp;
 
 	/* 5 octets won't be aligned */
@@ -510,11 +510,11 @@ lookup_protoid(netdissect_options *ndo, const u_char *pi)
 }
 
 const char *
-etheraddr_string(netdissect_options *ndo, register const u_char *ep)
+etheraddr_string(netdissect_options *ndo, const u_char *ep)
 {
-	register int i;
-	register char *cp;
-	register struct enamemem *tp;
+	int i;
+	char *cp;
+	struct enamemem *tp;
 	int oui;
 	char buf[BUFSIZE];
 
@@ -559,9 +559,9 @@ const char *
 le64addr_string(netdissect_options *ndo, const u_char *ep)
 {
 	const unsigned int len = 8;
-	register u_int i;
-	register char *cp;
-	register struct bsnamemem *tp;
+	u_int i;
+	char *cp;
+	struct bsnamemem *tp;
 	char buf[BUFSIZE];
 
 	tp = lookup_bytestring(ndo, ep, len);
@@ -589,9 +589,9 @@ const char *
 linkaddr_string(netdissect_options *ndo, const u_char *ep,
 		const unsigned int type, const unsigned int len)
 {
-	register u_int i;
-	register char *cp;
-	register struct bsnamemem *tp;
+	u_int i;
+	char *cp;
+	struct bsnamemem *tp;
 
 	if (len == 0)
 		return ("<empty>");
@@ -623,9 +623,9 @@ linkaddr_string(netdissect_options *ndo, const u_char *ep,
 const char *
 etherproto_string(netdissect_options *ndo, u_short port)
 {
-	register char *cp;
-	register struct hnamemem *tp;
-	register uint32_t i = port;
+	char *cp;
+	struct hnamemem *tp;
+	uint32_t i = port;
 	char buf[sizeof("0000")];
 
 	for (tp = &eprototable[i & (HASHNAMESIZE-1)]; tp->nxt; tp = tp->nxt)
@@ -651,11 +651,11 @@ etherproto_string(netdissect_options *ndo, u_short port)
 #define ISONSAP_MAX_LENGTH 20
 const char *
 isonsap_string(netdissect_options *ndo, const u_char *nsap,
-	       register u_int nsap_length)
+	       u_int nsap_length)
 {
-	register u_int nsap_idx;
-	register char *cp;
-	register struct enamemem *tp;
+	u_int nsap_idx;
+	char *cp;
+	struct enamemem *tp;
 
 	if (nsap_length < 1 || nsap_length > ISONSAP_MAX_LENGTH)
 		return ("isonsap_string: illegal length");
@@ -683,8 +683,8 @@ isonsap_string(netdissect_options *ndo, const u_char *nsap,
 const char *
 tcpport_string(netdissect_options *ndo, u_short port)
 {
-	register struct hnamemem *tp;
-	register uint32_t i = port;
+	struct hnamemem *tp;
+	uint32_t i = port;
 	char buf[sizeof("00000")];
 
 	for (tp = &tporttable[i & (HASHNAMESIZE-1)]; tp->nxt; tp = tp->nxt)
@@ -702,10 +702,10 @@ tcpport_string(netdissect_options *ndo, u_short port)
 }
 
 const char *
-udpport_string(netdissect_options *ndo, register u_short port)
+udpport_string(netdissect_options *ndo, u_short port)
 {
-	register struct hnamemem *tp;
-	register uint32_t i = port;
+	struct hnamemem *tp;
+	uint32_t i = port;
 	char buf[sizeof("00000")];
 
 	for (tp = &uporttable[i & (HASHNAMESIZE-1)]; tp->nxt; tp = tp->nxt)
@@ -725,9 +725,9 @@ udpport_string(netdissect_options *ndo, register u_short port)
 const char *
 ipxsap_string(netdissect_options *ndo, u_short port)
 {
-	register char *cp;
-	register struct hnamemem *tp;
-	register uint32_t i = port;
+	char *cp;
+	struct hnamemem *tp;
+	uint32_t i = port;
 	char buf[sizeof("0000")];
 
 	for (tp = &ipxsaptable[i & (HASHNAMESIZE-1)]; tp->nxt; tp = tp->nxt)
@@ -754,8 +754,8 @@ static void
 init_servarray(netdissect_options *ndo)
 {
 	struct servent *sv;
-	register struct hnamemem *table;
-	register int i;
+	struct hnamemem *table;
+	int i;
 	char buf[sizeof("0000000000")];
 
 	while ((sv = getservent()) != NULL) {
@@ -814,8 +814,8 @@ static const struct eproto {
 static void
 init_eprotoarray(netdissect_options *ndo)
 {
-	register int i;
-	register struct hnamemem *table;
+	int i;
+	struct hnamemem *table;
 
 	for (i = 0; eproto_db[i].s; i++) {
 		int j = htons(eproto_db[i].p) & (HASHNAMESIZE-1);
@@ -847,8 +847,8 @@ static const struct protoidlist {
 static void
 init_protoidarray(netdissect_options *ndo)
 {
-	register int i;
-	register struct protoidmem *tp;
+	int i;
+	struct protoidmem *tp;
 	const struct protoidlist *pl;
 	u_char protoid[5];
 
@@ -901,13 +901,13 @@ static const struct etherlist {
 static void
 init_etherarray(netdissect_options *ndo)
 {
-	register const struct etherlist *el;
-	register struct enamemem *tp;
+	const struct etherlist *el;
+	struct enamemem *tp;
 #ifdef USE_ETHER_NTOHOST
 	char name[256];
 #else
-	register struct pcap_etherent *ep;
-	register FILE *fp;
+	struct pcap_etherent *ep;
+	FILE *fp;
 
 	/* Suck in entire ethers file */
 	fp = fopen(PCAP_ETHERS_FILE, "r");
@@ -1166,8 +1166,8 @@ static const struct tok ipxsap_db[] = {
 static void
 init_ipxsaparray(netdissect_options *ndo)
 {
-	register int i;
-	register struct hnamemem *table;
+	int i;
+	struct hnamemem *table;
 
 	for (i = 0; ipxsap_db[i].s != NULL; i++) {
 		int j = htons(ipxsap_db[i].v) & (HASHNAMESIZE-1);
@@ -1209,7 +1209,7 @@ init_addrtoname(netdissect_options *ndo, uint32_t localnet, uint32_t mask)
 const char *
 dnaddr_string(netdissect_options *ndo, u_short dnaddr)
 {
-	register struct hnamemem *tp;
+	struct hnamemem *tp;
 
 	for (tp = &dnaddrtable[dnaddr & (HASHNAMESIZE-1)]; tp->nxt != NULL;
 	     tp = tp->nxt)
@@ -1230,7 +1230,7 @@ dnaddr_string(netdissect_options *ndo, u_short dnaddr)
 struct hnamemem *
 newhnamemem(netdissect_options *ndo)
 {
-	register struct hnamemem *p;
+	struct hnamemem *p;
 	static struct hnamemem *ptr = NULL;
 	static u_int num = 0;
 
@@ -1249,7 +1249,7 @@ newhnamemem(netdissect_options *ndo)
 struct h6namemem *
 newh6namemem(netdissect_options *ndo)
 {
-	register struct h6namemem *p;
+	struct h6namemem *p;
 	static struct h6namemem *ptr = NULL;
 	static u_int num = 0;
 
