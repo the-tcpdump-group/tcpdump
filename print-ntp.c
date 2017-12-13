@@ -387,7 +387,7 @@ static void
 ntp_control_print(netdissect_options *ndo,
 		  register const struct ntp_control_data *cd, u_int length)
 {
-	u_int8_t control, R, E, M, opcode;
+	uint8_t control, R, E, M, opcode;
 	uint16_t sequence, status, assoc, offset, count;
 
 	if (length < NTP_CTRLMSG_MINLEN)
