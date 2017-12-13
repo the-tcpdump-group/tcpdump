@@ -588,7 +588,7 @@ domain_print(netdissect_options *ndo,
          const u_char *bp, u_int length, int is_mdns)
 {
 	const HEADER *np;
-	u_int16_t flags;
+	uint16_t flags;
 	u_int qdcount, ancount, nscount, arcount;
 	u_int i;
 	const u_char *cp;
