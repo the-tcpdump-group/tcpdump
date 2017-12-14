@@ -1222,8 +1222,8 @@ get_upperlayer(netdissect_options *ndo, const u_char *bp, u_int *prot)
 			ah = (const struct ah *)bp;
 			if (!ND_TTEST(ah->ah_len))
 				return(NULL);
-			nh = ah->ah_nxt;
-			hlen = (ah->ah_len + 2) << 2;
+			nh = EXTRACT_U_1(ah->ah_nxt);
+			hlen = (EXTRACT_U_1(ah->ah_len) + 2) << 2;
 			break;
 
 		default:	/* unknown or undecodable header */

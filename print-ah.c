@@ -29,10 +29,10 @@
 
 #include <netdissect-stdinc.h>
 
-#include "ah.h"
-
 #include "netdissect.h"
 #include "extract.h"
+
+#include "ah.h"
 
 int
 ah_print(netdissect_options *ndo, const u_char *bp)
@@ -44,9 +44,9 @@ ah_print(netdissect_options *ndo, const u_char *bp)
 
 	ND_TCHECK(*ah);
 
-	sumlen = ah->ah_len << 2;
+	sumlen = EXTRACT_U_1(ah->ah_len) << 2;
 
-	ND_PRINT((ndo, "AH(spi=0x%08x", EXTRACT_BE_U_4(&ah->ah_spi)));
+	ND_PRINT((ndo, "AH(spi=0x%08x", EXTRACT_BE_U_4(ah->ah_spi)));
 	if (ndo->ndo_vflag)
 		ND_PRINT((ndo, ",sumlen=%d", sumlen));
 	ND_TCHECK_4(ah + 1);
