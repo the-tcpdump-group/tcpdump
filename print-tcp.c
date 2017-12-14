@@ -370,7 +370,7 @@ tcp_print(netdissect_options *ndo,
                 uint16_t sum, tcp_sum;
 
                 if (IP_V(ip) == 4) {
-                        if (ND_TTEST2(tp->th_sport, length)) {
+                        if (ND_TTEST_LEN(tp->th_sport, length)) {
                                 sum = tcp_cksum(ndo, ip, tp, length);
                                 tcp_sum = EXTRACT_BE_U_2(tp->th_sum);
 
@@ -382,7 +382,7 @@ tcp_print(netdissect_options *ndo,
                                         ND_PRINT((ndo, " (correct)"));
                         }
                 } else if (IP_V(ip) == 6 && ip6->ip6_plen) {
-                        if (ND_TTEST2(tp->th_sport, length)) {
+                        if (ND_TTEST_LEN(tp->th_sport, length)) {
                                 sum = tcp6_cksum(ndo, ip6, tp, length);
                                 tcp_sum = EXTRACT_BE_U_2(tp->th_sum);
 
