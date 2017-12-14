@@ -118,27 +118,27 @@
 #define OSPF6_AT_HDRLEN             16U
 #define OSPF6_AUTH_TYPE_HMAC        0x0001
 
-typedef uint32_t rtrid_t;
+typedef nd_uint32_t rtrid_t;
 
 /* link state advertisement header */
 struct lsa6_hdr {
-    uint16_t ls_age;
-    uint16_t ls_type;
+    nd_uint16_t ls_age;
+    nd_uint16_t ls_type;
     rtrid_t ls_stateid;
     rtrid_t ls_router;
-    uint32_t ls_seq;
-    uint16_t ls_chksum;
-    uint16_t ls_length;
+    nd_uint32_t ls_seq;
+    nd_uint16_t ls_chksum;
+    nd_uint16_t ls_length;
 };
 
 /* Length of an IPv6 address, in bytes. */
 #define IPV6_ADDR_LEN_BYTES (128/8)
 
 struct lsa6_prefix {
-    uint8_t lsa_p_len;
-    uint8_t lsa_p_opt;
-    uint16_t lsa_p_metric;
-    uint8_t lsa_p_prefix[IPV6_ADDR_LEN_BYTES]; /* maximum length */
+    nd_uint8_t lsa_p_len;
+    nd_uint8_t lsa_p_opt;
+    nd_uint16_t lsa_p_metric;
+    nd_byte lsa_p_prefix[IPV6_ADDR_LEN_BYTES]; /* maximum length */
 };
 
 /* link state advertisement */
@@ -150,36 +150,36 @@ struct lsa6 {
 	/* Router links advertisements */
 	struct {
 	    union {
-		uint8_t flg;
-		uint32_t opt;
+		nd_uint8_t flg;
+		nd_uint32_t opt;
 	    } rla_flgandopt;
 #define rla_flags	rla_flgandopt.flg
 #define rla_options	rla_flgandopt.opt
 	    struct rlalink6 {
-		uint8_t link_type;
-		uint8_t link_zero[1];
-		uint16_t link_metric;
-		uint32_t link_ifid;
-		uint32_t link_nifid;
+		nd_uint8_t link_type;
+		nd_byte link_zero;
+		nd_uint16_t link_metric;
+		nd_uint32_t link_ifid;
+		nd_uint32_t link_nifid;
 		rtrid_t link_nrtid;
 	    } rla_link[1];		/* may repeat	*/
 	} un_rla;
 
 	/* Network links advertisements */
 	struct {
-	    uint32_t nla_options;
+	    nd_uint32_t nla_options;
 	    rtrid_t nla_router[1];	/* may repeat	*/
 	} un_nla;
 
 	/* Inter Area Prefix LSA */
 	struct {
-	    uint32_t inter_ap_metric;
+	    nd_uint32_t inter_ap_metric;
 	    struct lsa6_prefix inter_ap_prefix[1];
 	} un_inter_ap;
 
 	/* AS external links advertisements */
 	struct {
-	    uint32_t asla_metric;
+	    nd_uint32_t asla_metric;
 	    struct lsa6_prefix asla_prefix[1];
 	    /* some optional fields follow */
 	} un_asla;
@@ -188,12 +188,12 @@ struct lsa6 {
 	/* Summary links advertisements */
 	struct {
 	    struct in_addr sla_mask;
-	    uint32_t sla_tosmetric[1];	/* may repeat	*/
+	    nd_uint32_t sla_tosmetric[1];	/* may repeat	*/
 	} un_sla;
 
 	/* Multicast group membership */
 	struct mcla {
-	    uint32_t mcla_vtype;
+	    nd_uint32_t mcla_vtype;
 	    struct in_addr mcla_vid;
 	} un_mcla[1];
 #endif
@@ -203,20 +203,20 @@ struct lsa6 {
 	/* Link LSA */
 	struct llsa {
 	    union {
-		uint8_t pri;
-		uint32_t opt;
+		nd_uint8_t pri;
+		nd_uint32_t opt;
 	    } llsa_priandopt;
 #define llsa_priority	llsa_priandopt.pri
 #define llsa_options	llsa_priandopt.opt
 	    struct in6_addr llsa_lladdr;
-	    uint32_t llsa_nprefix;
+	    nd_uint32_t llsa_nprefix;
 	    struct lsa6_prefix llsa_prefix[1];
 	} un_llsa;
 
 	/* Intra-Area-Prefix */
 	struct {
-	    uint16_t intra_ap_nprefix;
-	    uint16_t intra_ap_lstype;
+	    nd_uint16_t intra_ap_nprefix;
+	    nd_uint16_t intra_ap_lstype;
 	    rtrid_t intra_ap_lsid;
 	    rtrid_t intra_ap_rtid;
 	    struct lsa6_prefix intra_ap_prefix[1];
@@ -228,14 +228,14 @@ struct lsa6 {
  * the main header
  */
 struct ospf6hdr {
-    uint8_t ospf6_version;
-    uint8_t ospf6_type;
-    uint16_t ospf6_len;
+    nd_uint8_t ospf6_version;
+    nd_uint8_t ospf6_type;
+    nd_uint16_t ospf6_len;
     rtrid_t ospf6_routerid;
     rtrid_t ospf6_areaid;
-    uint16_t ospf6_chksum;
-    uint8_t ospf6_instanceid;
-    uint8_t ospf6_rsvd;
+    nd_uint16_t ospf6_chksum;
+    nd_uint8_t ospf6_instanceid;
+    nd_uint8_t ospf6_rsvd;
 };
 
 /*
@@ -246,15 +246,15 @@ struct ospf6hdr {
 
 /* Hello packet */
 struct hello6 {
-    uint32_t hello_ifid;
+    nd_uint32_t hello_ifid;
     union {
-	uint8_t pri;
-	uint32_t opt;
+	nd_uint8_t pri;
+	nd_uint32_t opt;
     } hello_priandopt;
 #define hello_priority	hello_priandopt.pri
 #define hello_options	hello_priandopt.opt
-    uint16_t hello_helloint;
-    uint16_t hello_deadint;
+    nd_uint16_t hello_helloint;
+    nd_uint16_t hello_deadint;
     rtrid_t hello_dr;
     rtrid_t hello_bdr;
     rtrid_t hello_neighbor[1]; /* may repeat	*/
@@ -262,25 +262,25 @@ struct hello6 {
 
 /* Database Description packet */
 struct dd6 {
-    uint32_t db_options;
-    uint16_t db_mtu;
-    uint8_t db_mbz;
-    uint8_t db_flags;
-    uint32_t db_seq;
+    nd_uint32_t db_options;
+    nd_uint16_t db_mtu;
+    nd_uint8_t db_mbz;
+    nd_uint8_t db_flags;
+    nd_uint32_t db_seq;
     struct lsa6_hdr db_lshdr[1]; /* may repeat	*/
 };
 
 /* Link State Request */
 struct lsr6 {
-    uint16_t ls_mbz;
-    uint16_t ls_type;
+    nd_uint16_t ls_mbz;
+    nd_uint16_t ls_type;
     rtrid_t ls_stateid;
     rtrid_t ls_router;
 };
 
 /* Link State Update */
 struct lsu6 {
-    uint32_t lsu_count;
+    nd_uint32_t lsu_count;
     struct lsa6 lsu_lsa[1]; /* may repeat	*/
 };
 
@@ -394,11 +394,11 @@ ospf6_print_lshdr(netdissect_options *ndo,
 
 	ND_PRINT((ndo, "\n\t  Advertising Router %s, seq 0x%08x, age %us, length %u",
                ipaddr_string(ndo, &lshp->ls_router),
-               EXTRACT_BE_U_4(&lshp->ls_seq),
-               EXTRACT_BE_U_2(&lshp->ls_age),
-               EXTRACT_BE_U_2(&lshp->ls_length)-(u_int)sizeof(struct lsa6_hdr)));
+               EXTRACT_BE_U_4(lshp->ls_seq),
+               EXTRACT_BE_U_2(lshp->ls_age),
+               EXTRACT_BE_U_2(lshp->ls_length)-(u_int)sizeof(struct lsa6_hdr)));
 
-	ospf6_print_ls_type(ndo, EXTRACT_BE_U_2(&lshp->ls_type),
+	ospf6_print_ls_type(ndo, EXTRACT_BE_U_2(lshp->ls_type),
 			    &lshp->ls_stateid);
 
 	return (0);
@@ -418,9 +418,9 @@ ospf6_print_lsaprefix(netdissect_options *ndo,
 		goto trunc;
 	lsa_length -= sizeof (*lsapp) - IPV6_ADDR_LEN_BYTES;
 	ND_TCHECK_LEN(lsapp, sizeof(*lsapp) - IPV6_ADDR_LEN_BYTES);
-	wordlen = (lsapp->lsa_p_len + 31) / 32;
+	wordlen = (EXTRACT_U_1(lsapp->lsa_p_len) + 31) / 32;
 	if (wordlen * 4 > sizeof(struct in6_addr)) {
-		ND_PRINT((ndo, " bogus prefixlen /%d", lsapp->lsa_p_len));
+		ND_PRINT((ndo, " bogus prefixlen /%u", EXTRACT_U_1(lsapp->lsa_p_len)));
 		goto trunc;
 	}
 	if (lsa_length < wordlen * 4)
@@ -429,14 +429,14 @@ ospf6_print_lsaprefix(netdissect_options *ndo,
 	ND_TCHECK2(lsapp->lsa_p_prefix, wordlen * 4);
 	memset(&prefix, 0, sizeof(prefix));
 	memcpy(&prefix, lsapp->lsa_p_prefix, wordlen * 4);
-	ND_PRINT((ndo, "\n\t\t%s/%d", ip6addr_string(ndo, &prefix),
-		lsapp->lsa_p_len));
-        if (lsapp->lsa_p_opt) {
+	ND_PRINT((ndo, "\n\t\t%s/%u", ip6addr_string(ndo, &prefix),
+		EXTRACT_U_1(lsapp->lsa_p_len)));
+        if (EXTRACT_U_1(lsapp->lsa_p_opt)) {
             ND_PRINT((ndo, ", Options [%s]",
                    bittok2str(ospf6_lsa_prefix_option_values,
-                              "none", lsapp->lsa_p_opt)));
+                              "none", EXTRACT_U_1(lsapp->lsa_p_opt))));
         }
-        ND_PRINT((ndo, ", metric %u", EXTRACT_BE_U_2(&lsapp->lsa_p_metric)));
+        ND_PRINT((ndo, ", metric %u", EXTRACT_BE_U_2(lsapp->lsa_p_metric)));
 	return sizeof(*lsapp) - IPV6_ADDR_LEN_BYTES + wordlen * 4;
 
 trunc:
@@ -474,7 +474,7 @@ ospf6_print_lsa(netdissect_options *ndo,
 	if (ospf6_print_lshdr(ndo, &lsap->ls_hdr, dataend))
 		return (1);
 	ND_TCHECK(lsap->ls_hdr.ls_length);
-        length = EXTRACT_BE_U_2(&lsap->ls_hdr.ls_length);
+        length = EXTRACT_BE_U_2(lsap->ls_hdr.ls_length);
 
 	/*
 	 * The LSA length includes the length of the header;
@@ -487,7 +487,7 @@ ospf6_print_lsa(netdissect_options *ndo,
         lsa_length = length - sizeof(struct lsa6_hdr);
         tptr = (const uint8_t *)lsap+sizeof(struct lsa6_hdr);
 
-	switch (EXTRACT_BE_U_2(&lsap->ls_hdr.ls_type)) {
+	switch (EXTRACT_BE_U_2(lsap->ls_hdr.ls_type)) {
 	case LS_TYPE_ROUTER | LS_SCOPE_AREA:
 		if (lsa_length < sizeof (lsap->lsa_un.un_rla.rla_options))
 			return (1);
@@ -495,10 +495,10 @@ ospf6_print_lsa(netdissect_options *ndo,
 		ND_TCHECK(lsap->lsa_un.un_rla.rla_options);
 		ND_PRINT((ndo, "\n\t      Options [%s]",
 		          bittok2str(ospf6_option_values, "none",
-		          EXTRACT_BE_U_4(&lsap->lsa_un.un_rla.rla_options))));
+		          EXTRACT_BE_U_4(lsap->lsa_un.un_rla.rla_options))));
 		ND_PRINT((ndo, ", RLA-Flags [%s]",
 		          bittok2str(ospf6_rla_flag_values, "none",
-		          lsap->lsa_un.un_rla.rla_flags)));
+		          EXTRACT_U_1(lsap->lsa_un.un_rla.rla_flags))));
 
 		rlp = lsap->lsa_un.un_rla.rla_link;
 		while (lsa_length != 0) {
@@ -506,7 +506,7 @@ ospf6_print_lsa(netdissect_options *ndo,
 				return (1);
 			lsa_length -= sizeof (*rlp);
 			ND_TCHECK(*rlp);
-			switch (rlp->link_type) {
+			switch (EXTRACT_U_1(rlp->link_type)) {
 
 			case RLA_TYPE_VIRTUAL:
 				ND_PRINT((ndo, "\n\t      Virtual Link: Neighbor Router-ID %s"
@@ -534,10 +534,10 @@ ospf6_print_lsa(netdissect_options *ndo,
 
 			default:
 				ND_PRINT((ndo, "\n\t      Unknown Router Links Type 0x%02x",
-				    rlp->link_type));
+				    EXTRACT_U_1(rlp->link_type)));
 				return (0);
 			}
-			ND_PRINT((ndo, ", metric %d", EXTRACT_BE_U_2(&rlp->link_metric)));
+			ND_PRINT((ndo, ", metric %d", EXTRACT_BE_U_2(rlp->link_metric)));
 			rlp++;
 		}
 		break;
@@ -549,7 +549,7 @@ ospf6_print_lsa(netdissect_options *ndo,
 		ND_TCHECK(lsap->lsa_un.un_nla.nla_options);
 		ND_PRINT((ndo, "\n\t      Options [%s]",
 		          bittok2str(ospf6_option_values, "none",
-		          EXTRACT_BE_U_4(&lsap->lsa_un.un_nla.nla_options))));
+		          EXTRACT_BE_U_4(lsap->lsa_un.un_nla.nla_options))));
 
 		ND_PRINT((ndo, "\n\t      Connected Routers:"));
 		ap = lsap->lsa_un.un_nla.nla_router;
@@ -569,7 +569,7 @@ ospf6_print_lsa(netdissect_options *ndo,
 		lsa_length -= sizeof (lsap->lsa_un.un_inter_ap.inter_ap_metric);
 		ND_TCHECK(lsap->lsa_un.un_inter_ap.inter_ap_metric);
 		ND_PRINT((ndo, ", metric %u",
-			EXTRACT_BE_U_4(&lsap->lsa_un.un_inter_ap.inter_ap_metric) & SLA_MASK_METRIC));
+			EXTRACT_BE_U_4(lsap->lsa_un.un_inter_ap.inter_ap_metric) & SLA_MASK_METRIC));
 
 		tptr = (const uint8_t *)lsap->lsa_un.un_inter_ap.inter_ap_prefix;
 		while (lsa_length != 0) {
@@ -586,11 +586,11 @@ ospf6_print_lsa(netdissect_options *ndo,
 			return (1);
 		lsa_length -= sizeof (lsap->lsa_un.un_asla.asla_metric);
 		ND_TCHECK(lsap->lsa_un.un_asla.asla_metric);
-		flags32 = EXTRACT_BE_U_4(&lsap->lsa_un.un_asla.asla_metric);
+		flags32 = EXTRACT_BE_U_4(lsap->lsa_un.un_asla.asla_metric);
 		ND_PRINT((ndo, "\n\t     Flags [%s]",
 		          bittok2str(ospf6_asla_flag_values, "none", flags32)));
 		ND_PRINT((ndo, " metric %u",
-		       EXTRACT_BE_U_4(&lsap->lsa_un.un_asla.asla_metric) &
+		       EXTRACT_BE_U_4(lsap->lsa_un.un_asla.asla_metric) &
 		       ASLA_MASK_METRIC));
 
 		tptr = (const uint8_t *)lsap->lsa_un.un_asla.asla_prefix;
@@ -624,7 +624,7 @@ ospf6_print_lsa(netdissect_options *ndo,
 			tptr += sizeof(uint32_t);
 		}
 
-		if (lsapp->lsa_p_metric) {
+		if (EXTRACT_U_1(lsapp->lsa_p_metric)) {
 			if (lsa_length < sizeof (uint32_t))
 				return (1);
 			lsa_length -= sizeof (uint32_t);
@@ -644,15 +644,15 @@ ospf6_print_lsa(netdissect_options *ndo,
 		ND_TCHECK(llsap->llsa_priandopt);
 		ND_PRINT((ndo, "\n\t      Options [%s]",
 		          bittok2str(ospf6_option_values, "none",
-		          EXTRACT_BE_U_4(&llsap->llsa_options))));
+		          EXTRACT_BE_U_4(llsap->llsa_options))));
 
 		if (lsa_length < sizeof (llsap->llsa_lladdr) + sizeof (llsap->llsa_nprefix))
 			return (1);
 		lsa_length -= sizeof (llsap->llsa_lladdr) + sizeof (llsap->llsa_nprefix);
                 ND_TCHECK(llsap->llsa_nprefix);
-                prefixes = EXTRACT_BE_U_4(&llsap->llsa_nprefix);
+                prefixes = EXTRACT_BE_U_4(llsap->llsa_nprefix);
 		ND_PRINT((ndo, "\n\t      Priority %d, Link-local address %s, Prefixes %d:",
-                       llsap->llsa_priority,
+                       EXTRACT_U_1(llsap->llsa_priority),
                        ip6addr_string(ndo, &llsap->llsa_lladdr),
                        prefixes));
 
@@ -674,14 +674,14 @@ ospf6_print_lsa(netdissect_options *ndo,
 		lsa_length -= sizeof (lsap->lsa_un.un_intra_ap.intra_ap_rtid);
 		ND_TCHECK(lsap->lsa_un.un_intra_ap.intra_ap_rtid);
 		ospf6_print_ls_type(ndo,
-			EXTRACT_BE_U_2(&lsap->lsa_un.un_intra_ap.intra_ap_lstype),
+			EXTRACT_BE_U_2(lsap->lsa_un.un_intra_ap.intra_ap_lstype),
 			&lsap->lsa_un.un_intra_ap.intra_ap_lsid);
 
 		if (lsa_length < sizeof (lsap->lsa_un.un_intra_ap.intra_ap_nprefix))
 			return (1);
 		lsa_length -= sizeof (lsap->lsa_un.un_intra_ap.intra_ap_nprefix);
 		ND_TCHECK(lsap->lsa_un.un_intra_ap.intra_ap_nprefix);
-                prefixes = EXTRACT_BE_U_2(&lsap->lsa_un.un_intra_ap.intra_ap_nprefix);
+                prefixes = EXTRACT_BE_U_2(lsap->lsa_un.un_intra_ap.intra_ap_nprefix);
 		ND_PRINT((ndo, "\n\t      Prefixes %d:", prefixes));
 
 		tptr = (const uint8_t *)lsap->lsa_un.un_intra_ap.intra_ap_prefix;
@@ -732,29 +732,29 @@ ospf6_decode_v3(netdissect_options *ndo,
 	const struct lsa6 *lsap;
 	int i;
 
-	switch (op->ospf6_type) {
+	switch (EXTRACT_U_1(op->ospf6_type)) {
 
 	case OSPF_TYPE_HELLO: {
 		const struct hello6 *hellop = (const struct hello6 *)((const uint8_t *)op + OSPF6HDR_LEN);
 
-		ND_TCHECK_4(&hellop->hello_options);
+		ND_TCHECK_4(hellop->hello_options);
 		ND_PRINT((ndo, "\n\tOptions [%s]",
 		          bittok2str(ospf6_option_values, "none",
-		          EXTRACT_BE_U_4(&hellop->hello_options))));
+		          EXTRACT_BE_U_4(hellop->hello_options))));
 
 		ND_TCHECK(hellop->hello_deadint);
 		ND_PRINT((ndo, "\n\t  Hello Timer %us, Dead Timer %us, Interface-ID %s, Priority %u",
-		          EXTRACT_BE_U_2(&hellop->hello_helloint),
-		          EXTRACT_BE_U_2(&hellop->hello_deadint),
+		          EXTRACT_BE_U_2(hellop->hello_helloint),
+		          EXTRACT_BE_U_2(hellop->hello_deadint),
 		          ipaddr_string(ndo, &hellop->hello_ifid),
-		          hellop->hello_priority));
+		          EXTRACT_U_1(hellop->hello_priority)));
 
 		ND_TCHECK(hellop->hello_dr);
-		if (EXTRACT_BE_U_4(&hellop->hello_dr) != 0)
+		if (EXTRACT_BE_U_4(hellop->hello_dr) != 0)
 			ND_PRINT((ndo, "\n\t  Designated Router %s",
 			    ipaddr_string(ndo, &hellop->hello_dr)));
 		ND_TCHECK(hellop->hello_bdr);
-		if (EXTRACT_BE_U_4(&hellop->hello_bdr) != 0)
+		if (EXTRACT_BE_U_4(hellop->hello_bdr) != 0)
 			ND_PRINT((ndo, ", Backup Designated Router %s",
 			    ipaddr_string(ndo, &hellop->hello_bdr)));
 		if (ndo->ndo_vflag > 1) {
@@ -775,15 +775,15 @@ ospf6_decode_v3(netdissect_options *ndo,
 		ND_TCHECK(ddp->db_options);
 		ND_PRINT((ndo, "\n\tOptions [%s]",
 		          bittok2str(ospf6_option_values, "none",
-		          EXTRACT_BE_U_4(&ddp->db_options))));
+		          EXTRACT_BE_U_4(ddp->db_options))));
 		ND_TCHECK(ddp->db_flags);
 		ND_PRINT((ndo, ", DD Flags [%s]",
-		          bittok2str(ospf6_dd_flag_values,"none",ddp->db_flags)));
+		          bittok2str(ospf6_dd_flag_values,"none",EXTRACT_U_1(ddp->db_flags))));
 
 		ND_TCHECK(ddp->db_seq);
 		ND_PRINT((ndo, ", MTU %u, DD-Sequence 0x%08x",
-                       EXTRACT_BE_U_2(&ddp->db_mtu),
-                       EXTRACT_BE_U_4(&ddp->db_seq)));
+                       EXTRACT_BE_U_2(ddp->db_mtu),
+                       EXTRACT_BE_U_4(ddp->db_seq)));
 		if (ndo->ndo_vflag > 1) {
 			/* Print all the LS adv's */
 			lshp = ddp->db_lshdr;
@@ -803,7 +803,7 @@ ospf6_decode_v3(netdissect_options *ndo,
 				ND_PRINT((ndo, "\n\t  Advertising Router %s",
 				          ipaddr_string(ndo, &lsrp->ls_router)));
 				ospf6_print_ls_type(ndo,
-                                                    EXTRACT_BE_U_2(&lsrp->ls_type),
+                                                    EXTRACT_BE_U_2(lsrp->ls_type),
                                                     &lsrp->ls_stateid);
 				++lsrp;
 			}
@@ -815,13 +815,13 @@ ospf6_decode_v3(netdissect_options *ndo,
 			const struct lsu6 *lsup = (const struct lsu6 *)((const uint8_t *)op + OSPF6HDR_LEN);
 
 			ND_TCHECK(lsup->lsu_count);
-			i = EXTRACT_BE_U_4(&lsup->lsu_count);
+			i = EXTRACT_BE_U_4(lsup->lsu_count);
 			lsap = lsup->lsu_lsa;
 			while ((const u_char *)lsap < dataend && i--) {
 				if (ospf6_print_lsa(ndo, lsap, dataend))
 					goto trunc;
 				lsap = (const struct lsa6 *)((const u_char *)lsap +
-				    EXTRACT_BE_U_2(&lsap->ls_hdr.ls_length));
+				    EXTRACT_BE_U_2(lsap->ls_hdr.ls_length));
 			}
 		}
 		break;
@@ -931,19 +931,21 @@ static int
 ospf6_decode_v3_trailer(netdissect_options *ndo,
                         const struct ospf6hdr *op, const u_char *cp, const unsigned len)
 {
+	uint8_t type;
 	int llslen = 0;
 	int lls_hello = 0;
 	int lls_dd = 0;
 
-	if (op->ospf6_type == OSPF_TYPE_HELLO) {
+	type = EXTRACT_U_1(op->ospf6_type);
+	if (type == OSPF_TYPE_HELLO) {
 		const struct hello6 *hellop = (const struct hello6 *)((const uint8_t *)op + OSPF6HDR_LEN);
 		ND_TCHECK(hellop->hello_options);
-		if (EXTRACT_BE_U_4(&hellop->hello_options) & OSPF6_OPTION_L)
+		if (EXTRACT_BE_U_4(hellop->hello_options) & OSPF6_OPTION_L)
 			lls_hello = 1;
-	} else if (op->ospf6_type == OSPF_TYPE_DD) {
+	} else if (type == OSPF_TYPE_DD) {
 		const struct dd6 *ddp = (const struct dd6 *)((const uint8_t *)op + OSPF6HDR_LEN);
 		ND_TCHECK(ddp->db_options);
-		if (EXTRACT_BE_U_4(&ddp->db_options) & OSPF6_OPTION_L)
+		if (EXTRACT_BE_U_4(ddp->db_options) & OSPF6_OPTION_L)
 			lls_dd = 1;
 	}
 	if ((lls_hello || lls_dd) && (llslen = ospf6_print_lls(ndo, cp, len)) < 0)
@@ -968,8 +970,8 @@ ospf6_print(netdissect_options *ndo,
 	/* If the type is valid translate it, or just print the type */
 	/* value.  If it's not valid, say so and return */
 	ND_TCHECK(op->ospf6_type);
-	cp = tok2str(ospf6_type_values, "unknown packet type (%u)", op->ospf6_type);
-	ND_PRINT((ndo, "OSPFv%u, %s, length %d", op->ospf6_version, cp, length));
+	cp = tok2str(ospf6_type_values, "unknown packet type (%u)", EXTRACT_U_1(op->ospf6_type));
+	ND_PRINT((ndo, "OSPFv%u, %s, length %u", EXTRACT_U_1(op->ospf6_version), cp, length));
 	if (*cp == 'u') {
 		return;
 	}
@@ -980,7 +982,7 @@ ospf6_print(netdissect_options *ndo,
 
 	/* OSPFv3 data always comes first and optional trailing data may follow. */
 	ND_TCHECK(op->ospf6_len);
-	datalen = EXTRACT_BE_U_2(&op->ospf6_len);
+	datalen = EXTRACT_BE_U_2(op->ospf6_len);
 	if (datalen > length) {
 		ND_PRINT((ndo, " [len %d]", datalen));
 		return;
@@ -991,16 +993,16 @@ ospf6_print(netdissect_options *ndo,
 	ND_PRINT((ndo, "\n\tRouter-ID %s", ipaddr_string(ndo, &op->ospf6_routerid)));
 
 	ND_TCHECK(op->ospf6_areaid);
-	if (EXTRACT_BE_U_4(&op->ospf6_areaid) != 0)
+	if (EXTRACT_BE_U_4(op->ospf6_areaid) != 0)
 		ND_PRINT((ndo, ", Area %s", ipaddr_string(ndo, &op->ospf6_areaid)));
 	else
 		ND_PRINT((ndo, ", Backbone Area"));
 	ND_TCHECK(op->ospf6_instanceid);
-	if (op->ospf6_instanceid)
-		ND_PRINT((ndo, ", Instance %u", op->ospf6_instanceid));
+	if (EXTRACT_U_1(op->ospf6_instanceid))
+		ND_PRINT((ndo, ", Instance %u", EXTRACT_U_1(op->ospf6_instanceid)));
 
 	/* Do rest according to version.	 */
-	switch (op->ospf6_version) {
+	switch (EXTRACT_U_1(op->ospf6_version)) {
 
 	case 3:
 		/* ospf version 3 */
