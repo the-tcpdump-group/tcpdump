@@ -426,7 +426,7 @@ ospf6_print_lsaprefix(netdissect_options *ndo,
 	if (lsa_length < wordlen * 4)
 		goto trunc;
 	lsa_length -= wordlen * 4;
-	ND_TCHECK2(lsapp->lsa_p_prefix, wordlen * 4);
+	ND_TCHECK_LEN(lsapp->lsa_p_prefix, wordlen * 4);
 	memset(&prefix, 0, sizeof(prefix));
 	memcpy(&prefix, lsapp->lsa_p_prefix, wordlen * 4);
 	ND_PRINT((ndo, "\n\t\t%s/%u", ip6addr_string(ndo, &prefix),
