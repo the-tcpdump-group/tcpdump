@@ -350,7 +350,7 @@ ntp_time_print(netdissect_options *ndo,
 	} else if (length == NTP_TIMEMSG_MINLEN + 4 + 16) { 	/* Optional: key-id + 128-bit digest */
 		ND_TCHECK_4(bp->key_id);
 		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_BE_U_4(bp->key_id)));
-		ND_TCHECK2(bp->message_digest, 16);
+		ND_TCHECK_LEN(bp->message_digest, 16);
                 ND_PRINT((ndo, "\n\tAuthentication: %08x%08x%08x%08x",
         		       EXTRACT_BE_U_4(bp->message_digest),
         		       EXTRACT_BE_U_4(bp->message_digest + 4),
@@ -359,7 +359,7 @@ ntp_time_print(netdissect_options *ndo,
 	} else if (length == NTP_TIMEMSG_MINLEN + 4 + 20) { 	/* Optional: key-id + 160-bit digest */
 		ND_TCHECK_4(bp->key_id);
 		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_BE_U_4(bp->key_id)));
-		ND_TCHECK2(bp->message_digest, 20);
+		ND_TCHECK_LEN(bp->message_digest, 20);
 		ND_PRINT((ndo, "\n\tAuthentication: %08x%08x%08x%08x%08x",
 		               EXTRACT_BE_U_4(bp->message_digest),
 		               EXTRACT_BE_U_4(bp->message_digest + 4),
@@ -426,7 +426,7 @@ ntp_control_print(netdissect_options *ndo,
 	if (NTP_CTRLMSG_MINLEN + count > length)
 		goto invalid;
 	if (count != 0) {
-		ND_TCHECK2(cd->data, count);
+		ND_TCHECK_LEN(cd->data, count);
 		ND_PRINT((ndo, "\n\tTO-BE-DONE: data not interpreted"));
 	}
 	return;
