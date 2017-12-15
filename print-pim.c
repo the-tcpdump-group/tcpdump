@@ -259,7 +259,7 @@ pimv1_print(netdissect_options *ndo,
 	ND_PRINT((ndo, " %s", tok2str(pimv1_type_str, "[type %u]", type)));
 	switch (type) {
 	case PIMV1_TYPE_QUERY:
-		if (ND_TTEST(bp[8])) {
+		if (ND_TTEST_1(bp + 8)) {
 			switch (EXTRACT_U_1(bp + 8) >> 4) {
 			case 0:
 				ND_PRINT((ndo, " Dense-mode"));

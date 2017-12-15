@@ -691,7 +691,7 @@ fetch_token(netdissect_options *ndo, const u_char *pptr, u_int idx, u_int len,
 	size_t toklen = 0;
 
 	for (; idx < len; idx++) {
-		if (!ND_TTEST(*(pptr + idx))) {
+		if (!ND_TTEST_1(pptr + idx)) {
 			/* ran past end of captured data */
 			return (0);
 		}
@@ -725,7 +725,7 @@ fetch_token(netdissect_options *ndo, const u_char *pptr, u_int idx, u_int len,
 	 * an end-of-line (CR or LF).
 	 */
 	for (; idx < len; idx++) {
-		if (!ND_TTEST(*(pptr + idx))) {
+		if (!ND_TTEST_1(pptr + idx)) {
 			/* ran past end of captured data */
 			break;
 		}

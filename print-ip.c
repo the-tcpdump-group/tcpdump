@@ -346,7 +346,7 @@ again:
 	switch (ipds->nh) {
 
 	case IPPROTO_AH:
-		if (!ND_TTEST(*ipds->cp)) {
+		if (!ND_TTEST_1(ipds->cp)) {
 			ND_PRINT((ndo, "[|AH]"));
 			break;
 		}

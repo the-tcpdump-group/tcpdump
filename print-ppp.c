@@ -1410,7 +1410,7 @@ ppp_hdlc(netdissect_options *ndo,
 	 * Do this so that we dont overwrite the original packet
 	 * contents.
 	 */
-	for (s = p, t = b, i = length; i != 0 && ND_TTEST(*s); i--) {
+	for (s = p, t = b, i = length; i != 0 && ND_TTEST_1(s); i--) {
 		c = EXTRACT_U_1(s);
 		s++;
 		if (c == 0x7d) {

@@ -802,7 +802,7 @@ q933_print(netdissect_options *ndo,
 
 	ND_PRINT((ndo, "%s", ndo->ndo_eflag ? "" : "Q.933"));
 
-	if (length == 0 || !ND_TTEST(*p)) {
+	if (length == 0 || !ND_TTEST_1(p)) {
 		if (!ndo->ndo_eflag)
 			ND_PRINT((ndo, ", "));
 		ND_PRINT((ndo, "length %u", length));
@@ -821,7 +821,7 @@ q933_print(netdissect_options *ndo,
 	 * Get the call reference value.
 	 */
 	for (i = 0; i < call_ref_length; i++) {
-		if (length == 0 || !ND_TTEST(*p)) {
+		if (length == 0 || !ND_TTEST_1(p)) {
 			if (!ndo->ndo_eflag)
 				ND_PRINT((ndo, ", "));
 			ND_PRINT((ndo, "length %u", olen));
@@ -835,7 +835,7 @@ q933_print(netdissect_options *ndo,
 	/*
 	 * Get the message type.
 	 */
-	if (length == 0 || !ND_TTEST(*p)) {
+	if (length == 0 || !ND_TTEST_1(p)) {
 		if (!ndo->ndo_eflag)
 			ND_PRINT((ndo, ", "));
 		ND_PRINT((ndo, "length %u", olen));
@@ -851,7 +851,7 @@ q933_print(netdissect_options *ndo,
 	non_locking_shift = 0;
 	unshift_codeset = codeset;
 	if (length != 0) {
-		if (!ND_TTEST(*p)) {
+		if (!ND_TTEST_1(p)) {
 			if (!ndo->ndo_eflag)
 				ND_PRINT((ndo, ", "));
 			ND_PRINT((ndo, "length %u", olen));
@@ -952,7 +952,7 @@ q933_print(netdissect_options *ndo,
 		/*
 		 * Get the first octet of the IE.
 		 */
-		if (!ND_TTEST(*p)) {
+		if (!ND_TTEST_1(p)) {
 			if (!ndo->ndo_vflag) {
 				ND_PRINT((ndo, ", length %u", olen));
 			}
@@ -995,7 +995,7 @@ q933_print(netdissect_options *ndo,
 			/*
 			 * No.  Get the IE length.
 			 */
-			if (length == 0 || !ND_TTEST(*p)) {
+			if (length == 0 || !ND_TTEST_1(p)) {
 				if (!ndo->ndo_vflag) {
 					ND_PRINT((ndo, ", length %u", olen));
 				}
