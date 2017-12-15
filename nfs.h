@@ -248,7 +248,15 @@
 typedef enum { NFNON=0, NFREG=1, NFDIR=2, NFBLK=3, NFCHR=4, NFLNK=5,
 	NFSOCK=6, NFFIFO=7 } nfs_type;
 
-/* Structs for common parts of the rpc's */
+/*
+ * Structs for common parts of the rpc's
+ *
+ * NOTE: these structures are not always overlaid directly on the
+ * packet data - sometimes we declare a local variable of that type,
+ * and fill it up with fields extracted using byte pointers - so we
+ * don't use nd_ types for their members.
+ */
+
 /*
  * File Handle (32 bytes for version 2), variable up to 64 for version 3.
  * File Handles of up to NFS_SMALLFH in size are stored directly in the
