@@ -682,7 +682,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		else if (IS_SRC_OR_DST_PORT(VXLAN_GPE_PORT))
 			vxlan_gpe_print(ndo, (const u_char *)(up + 1), length);
 		else if (ND_TTEST(((const struct LAP *)cp)->type) &&
-		    ((const struct LAP *)cp)->type == lapDDP &&
+		    EXTRACT_U_1(((const struct LAP *)cp)->type) == lapDDP &&
 		    (atalk_port(sport) || atalk_port(dport))) {
 			if (ndo->ndo_vflag)
 				ND_PRINT((ndo, "kip "));
