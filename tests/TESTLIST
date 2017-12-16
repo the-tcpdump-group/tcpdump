@@ -26,6 +26,7 @@ bgp_infloop-v		bgp-infinite-loop.pcap		bgp_infloop-v.out	-v
 bgp-aigp	bgp-aigp.pcap	bgp-aigp.out	-v
 bgp-large-community bgp-large-community.pcap bgp-large-community.out -v
 bgp-shutdown-communication bgp-shutdown-communication.pcap bgp-shutdown-communication.out -v
+bgp-addpath bgp-addpath.pcap bgp-addpath.out -v
 
 # EAP tests
 eapon1		eapon1.pcap		eapon1.out
