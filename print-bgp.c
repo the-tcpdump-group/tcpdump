@@ -48,9 +48,9 @@
 #include "l2vpn.h"
 
 struct bgp {
-	uint8_t bgp_marker[16];
-	uint16_t bgp_len;
-	uint8_t bgp_type;
+	nd_byte     bgp_marker[16];
+	nd_uint16_t bgp_len;
+	nd_uint8_t  bgp_type;
 };
 #define BGP_SIZE		19	/* unaligned */
 
@@ -70,49 +70,49 @@ static const struct tok bgp_msg_values[] = {
 };
 
 struct bgp_open {
-	uint8_t bgpo_marker[16];
-	uint16_t bgpo_len;
-	uint8_t bgpo_type;
-	uint8_t bgpo_version;
-	uint16_t bgpo_myas;
-	uint16_t bgpo_holdtime;
-	uint32_t bgpo_id;
-	uint8_t bgpo_optlen;
+	nd_byte     bgpo_marker[16];
+	nd_uint16_t bgpo_len;
+	nd_uint8_t  bgpo_type;
+	nd_uint8_t  bgpo_version;
+	nd_uint16_t bgpo_myas;
+	nd_uint16_t bgpo_holdtime;
+	nd_uint32_t bgpo_id;
+	nd_uint8_t  bgpo_optlen;
 	/* options should follow */
 };
 #define BGP_OPEN_SIZE		29	/* unaligned */
 
 struct bgp_opt {
-	uint8_t bgpopt_type;
-	uint8_t bgpopt_len;
+	nd_uint8_t bgpopt_type;
+	nd_uint8_t bgpopt_len;
 	/* variable length */
 };
 #define BGP_OPT_SIZE		2	/* some compilers may pad to 4 bytes */
 #define BGP_CAP_HEADER_SIZE	2	/* some compilers may pad to 4 bytes */
 
 struct bgp_notification {
-	uint8_t bgpn_marker[16];
-	uint16_t bgpn_len;
-	uint8_t bgpn_type;
-	uint8_t bgpn_major;
-	uint8_t bgpn_minor;
+	nd_byte     bgpn_marker[16];
+	nd_uint16_t bgpn_len;
+	nd_uint8_t  bgpn_type;
+	nd_uint8_t  bgpn_major;
+	nd_uint8_t  bgpn_minor;
 };
 #define BGP_NOTIFICATION_SIZE		21	/* unaligned */
 
 struct bgp_route_refresh {
-    uint8_t  bgp_marker[16];
-    uint16_t len;
-    uint8_t  type;
-    uint8_t  afi[2]; /* the compiler messes this structure up               */
-    uint8_t  res;    /* when doing misaligned sequences of int8 and int16   */
-    uint8_t  safi;   /* afi should be int16 - so we have to access it using */
-};                    /* EXTRACT_BE_U_2(&bgp_route_refresh->afi) (sigh)      */
+	nd_byte     bgp_marker[16];
+	nd_uint16_t len;
+	nd_uint8_t  type;   /* No padding after this; afi is, in fact, not aligned */
+	nd_uint16_t afi;
+	nd_uint8_t  res;
+	nd_uint8_t  safi;
+};
 #define BGP_ROUTE_REFRESH_SIZE          23
 
 #define bgp_attr_lenlen(flags, p) \
 	(((flags) & 0x10) ? 2 : 1)
 #define bgp_attr_len(flags, p) \
-	(((flags) & 0x10) ? EXTRACT_BE_U_2(p) : *(p))
+	(((flags) & 0x10) ? EXTRACT_BE_U_2(p) : EXTRACT_U_1(p))
 
 #define BGPTYPE_ORIGIN			1
 #define BGPTYPE_AS_PATH			2
@@ -2342,10 +2342,10 @@ trunc:
 
 static void
 bgp_capabilities_print(netdissect_options *ndo,
-                       const u_char *opt, int caps_len)
+                       const u_char *opt, u_int caps_len)
 {
-	int cap_type, cap_len, tcap_len, cap_offset;
-        int i = 0;
+	u_int cap_type, cap_len, tcap_len, cap_offset;
+        u_int i = 0;
 
         while (i < caps_len) {
                 ND_TCHECK_LEN(opt + i, BGP_CAP_HEADER_SIZE);
@@ -2444,61 +2444,69 @@ trunc:
 
 static void
 bgp_open_print(netdissect_options *ndo,
-               const u_char *dat, int length)
+               const u_char *dat, u_int length)
 {
-	struct bgp_open bgpo;
-	struct bgp_opt bgpopt;
+	const struct bgp_open *bgp_open_header;
+	u_int optslen;
+	const struct bgp_opt *bgpopt;
 	const u_char *opt;
-	int i;
+	u_int i;
 
 	ND_TCHECK_LEN(dat, BGP_OPEN_SIZE);
-	memcpy(&bgpo, dat, BGP_OPEN_SIZE);
+	if (length < BGP_OPEN_SIZE)
+		goto trunc;
 
-	ND_PRINT((ndo, "\n\t  Version %d, ", bgpo.bgpo_version));
+	bgp_open_header = (const struct bgp_open *)dat;
+
+	ND_PRINT((ndo, "\n\t  Version %u, ",
+	    EXTRACT_U_1(bgp_open_header->bgpo_version)));
 	ND_PRINT((ndo, "my AS %s, ",
-	    as_printf(ndo, astostr, sizeof(astostr), ntohs(bgpo.bgpo_myas))));
-	ND_PRINT((ndo, "Holdtime %us, ", ntohs(bgpo.bgpo_holdtime)));
-	ND_PRINT((ndo, "ID %s", ipaddr_string(ndo, &bgpo.bgpo_id)));
-	ND_PRINT((ndo, "\n\t  Optional parameters, length: %u", bgpo.bgpo_optlen));
+	    as_printf(ndo, astostr, sizeof(astostr), EXTRACT_BE_U_2(bgp_open_header->bgpo_myas))));
+	ND_PRINT((ndo, "Holdtime %us, ",
+	    EXTRACT_BE_U_2(bgp_open_header->bgpo_holdtime)));
+	ND_PRINT((ndo, "ID %s", ipaddr_string(ndo, &bgp_open_header->bgpo_id)));
+	optslen = EXTRACT_U_1(bgp_open_header->bgpo_optlen);
+	ND_PRINT((ndo, "\n\t  Optional parameters, length: %u", optslen));
 
-        /* some little sanity checking */
-        if (length < bgpo.bgpo_optlen+BGP_OPEN_SIZE)
-            return;
-
-	/* ugly! */
-	opt = &((const struct bgp_open *)dat)->bgpo_optlen;
-	opt++;
+	opt = dat + BGP_OPEN_SIZE;
+	length -= BGP_OPEN_SIZE;
 
 	i = 0;
-	while (i < bgpo.bgpo_optlen) {
+	while (i < optslen) {
+		uint8_t opt_type, opt_len;
+
 		ND_TCHECK_LEN(opt + i, BGP_OPT_SIZE);
-		memcpy(&bgpopt, opt + i, BGP_OPT_SIZE);
-		if (i + 2 + bgpopt.bgpopt_len > bgpo.bgpo_optlen) {
-			ND_PRINT((ndo, "\n\t     Option %d, length: %u", bgpopt.bgpopt_type, bgpopt.bgpopt_len));
+		if (length < BGP_OPT_SIZE + i)
+			goto trunc;
+		bgpopt = (const struct bgp_opt *)(opt + i);
+		opt_type = EXTRACT_U_1(bgpopt->bgpopt_type);
+		opt_len = EXTRACT_U_1(bgpopt->bgpopt_len);
+		if (BGP_OPT_SIZE + i + opt_len > optslen) {
+			ND_PRINT((ndo, "\n\t     Option %u, length: %u, goes past the end of the options",
+			    opt_type, opt_len));
 			break;
 		}
 
 		ND_PRINT((ndo, "\n\t    Option %s (%u), length: %u",
-		       tok2str(bgp_opt_values,"Unknown",
-				  bgpopt.bgpopt_type),
-		       bgpopt.bgpopt_type,
-		       bgpopt.bgpopt_len));
+		       tok2str(bgp_opt_values,"Unknown",opt_type),
+		       opt_type,
+		       opt_len));
 
 		/* now let's decode the options we know*/
-		switch(bgpopt.bgpopt_type) {
+		switch(opt_type) {
 
 		case BGP_OPT_CAP:
-			bgp_capabilities_print(ndo, opt + i + BGP_OPT_SIZE,
-					       bgpopt.bgpopt_len);
+			bgp_capabilities_print(ndo, opt + BGP_OPT_SIZE + i,
+					       opt_len);
 			break;
 
 		case BGP_OPT_AUTH:
 		default:
 		       ND_PRINT((ndo, "\n\t      no decoder for option %u",
-			   bgpopt.bgpopt_type));
+			   opt_type));
 		       break;
 		}
-		i += BGP_OPT_SIZE + bgpopt.bgpopt_len;
+		i += BGP_OPT_SIZE + opt_len;
 	}
 	return;
 trunc:
@@ -2509,7 +2517,7 @@ static void
 bgp_update_print(netdissect_options *ndo,
                  const u_char *dat, int length)
 {
-	struct bgp bgp;
+	const struct bgp *bgp_header;
 	const u_char *p;
 	int withdrawn_routes_len;
 	int len;
@@ -2518,8 +2526,8 @@ bgp_update_print(netdissect_options *ndo,
 	ND_TCHECK_LEN(dat, BGP_SIZE);
 	if (length < BGP_SIZE)
 		goto trunc;
-	memcpy(&bgp, dat, BGP_SIZE);
-	p = dat + BGP_SIZE;	/*XXX*/
+	bgp_header = (const struct bgp *)dat;
+	p = dat + BGP_SIZE;
 	length -= BGP_SIZE;
 
 	/* Unfeasible routes */
@@ -2646,65 +2654,67 @@ static void
 bgp_notification_print(netdissect_options *ndo,
                        const u_char *dat, int length)
 {
-	struct bgp_notification bgpn;
+	const struct bgp_notification *bgp_notification_header;
 	const u_char *tptr;
+	uint8_t bgpn_major, bgpn_minor;
 	uint8_t shutdown_comm_length;
 	uint8_t remainder_offset;
 
 	ND_TCHECK_LEN(dat, BGP_NOTIFICATION_SIZE);
-	memcpy(&bgpn, dat, BGP_NOTIFICATION_SIZE);
-
-        /* some little sanity checking */
         if (length<BGP_NOTIFICATION_SIZE)
             return;
 
+	bgp_notification_header = (const struct bgp_notification *)dat;
+	bgpn_major = EXTRACT_U_1(bgp_notification_header->bgpn_major);
+	bgpn_minor = EXTRACT_U_1(bgp_notification_header->bgpn_minor);
+
 	ND_PRINT((ndo, ", %s (%u)",
 	       tok2str(bgp_notify_major_values, "Unknown Error",
-			  bgpn.bgpn_major),
-	       bgpn.bgpn_major));
+			  bgpn_major),
+	       bgpn_major));
 
-        switch (bgpn.bgpn_major) {
+        switch (bgpn_major) {
 
         case BGP_NOTIFY_MAJOR_MSG:
             ND_PRINT((ndo, ", subcode %s (%u)",
 		   tok2str(bgp_notify_minor_msg_values, "Unknown",
-			      bgpn.bgpn_minor),
-		   bgpn.bgpn_minor));
+			      bgpn_minor),
+		   bgpn_minor));
             break;
         case BGP_NOTIFY_MAJOR_OPEN:
             ND_PRINT((ndo, ", subcode %s (%u)",
 		   tok2str(bgp_notify_minor_open_values, "Unknown",
-			      bgpn.bgpn_minor),
-		   bgpn.bgpn_minor));
+			      bgpn_minor),
+		   bgpn_minor));
             break;
         case BGP_NOTIFY_MAJOR_UPDATE:
             ND_PRINT((ndo, ", subcode %s (%u)",
 		   tok2str(bgp_notify_minor_update_values, "Unknown",
-			      bgpn.bgpn_minor),
-		   bgpn.bgpn_minor));
+			      bgpn_minor),
+		   bgpn_minor));
             break;
         case BGP_NOTIFY_MAJOR_FSM:
             ND_PRINT((ndo, " subcode %s (%u)",
 		   tok2str(bgp_notify_minor_fsm_values, "Unknown",
-			      bgpn.bgpn_minor),
-		   bgpn.bgpn_minor));
+			      bgpn_minor),
+		   bgpn_minor));
             break;
         case BGP_NOTIFY_MAJOR_CAP:
             ND_PRINT((ndo, " subcode %s (%u)",
 		   tok2str(bgp_notify_minor_cap_values, "Unknown",
-			      bgpn.bgpn_minor),
-		   bgpn.bgpn_minor));
+			      bgpn_minor),
+		   bgpn_minor));
             break;
         case BGP_NOTIFY_MAJOR_CEASE:
             ND_PRINT((ndo, ", subcode %s (%u)",
 		   tok2str(bgp_notify_minor_cease_values, "Unknown",
-			      bgpn.bgpn_minor),
-		   bgpn.bgpn_minor));
+			      bgpn_minor),
+		   bgpn_minor));
 
 	    /* draft-ietf-idr-cease-subcode-02 mentions optionally 7 bytes
              * for the maxprefix subtype, which may contain AFI, SAFI and MAXPREFIXES
              */
-	    if(bgpn.bgpn_minor == BGP_NOTIFY_MINOR_CEASE_MAXPRFX && length >= BGP_NOTIFICATION_SIZE + 7) {
+	    if(bgpn_minor == BGP_NOTIFY_MINOR_CEASE_MAXPRFX && length >= BGP_NOTIFICATION_SIZE + 7) {
 		tptr = dat + BGP_NOTIFICATION_SIZE;
 		ND_TCHECK_7(tptr);
 		ND_PRINT((ndo, ", AFI %s (%u), SAFI %s (%u), Max Prefixes: %u",
@@ -2719,8 +2729,8 @@ bgp_notification_print(netdissect_options *ndo,
 	     * draft-ietf-idr-shutdown describes a method to send a communication
 	     * intended for human consumption regarding the Administrative Shutdown
 	     */
-	    if ((bgpn.bgpn_minor == BGP_NOTIFY_MINOR_CEASE_SHUT ||
-		bgpn.bgpn_minor == BGP_NOTIFY_MINOR_CEASE_RESET) &&
+	    if ((bgpn_minor == BGP_NOTIFY_MINOR_CEASE_SHUT ||
+		bgpn_minor == BGP_NOTIFY_MINOR_CEASE_RESET) &&
 		length >= BGP_NOTIFICATION_SIZE + 1) {
 		    tptr = dat + BGP_NOTIFICATION_SIZE;
 		    ND_TCHECK_1(tptr);
@@ -2775,13 +2785,11 @@ bgp_route_refresh_print(netdissect_options *ndo,
 
         ND_PRINT((ndo, "\n\t  AFI %s (%u), SAFI %s (%u)",
                tok2str(af_values,"Unknown",
-			  /* this stinks but the compiler pads the structure
-			   * weird */
-			  EXTRACT_BE_U_2(&bgp_route_refresh_header->afi)),
-               EXTRACT_BE_U_2(&bgp_route_refresh_header->afi),
+			  EXTRACT_BE_U_2(bgp_route_refresh_header->afi)),
+               EXTRACT_BE_U_2(bgp_route_refresh_header->afi),
                tok2str(bgp_safi_values,"Unknown",
-			  bgp_route_refresh_header->safi),
-               bgp_route_refresh_header->safi));
+			  EXTRACT_U_1(bgp_route_refresh_header->safi)),
+               EXTRACT_U_1(bgp_route_refresh_header->safi)));
 
         if (ndo->ndo_vflag > 1) {
             ND_TCHECK_LEN(pptr, len);
@@ -2794,19 +2802,22 @@ trunc:
 }
 
 static int
-bgp_header_print(netdissect_options *ndo,
-                 const u_char *dat, int length)
+bgp_pdu_print(netdissect_options *ndo,
+                 const u_char *dat, u_int length)
 {
-	struct bgp bgp;
+	const struct bgp *bgp_header;
+	uint8_t bgp_type;
 
 	ND_TCHECK_LEN(dat, BGP_SIZE);
-	memcpy(&bgp, dat, BGP_SIZE);
+	bgp_header = (const struct bgp *)dat;
+	bgp_type = EXTRACT_U_1(bgp_header->bgp_type);
+
 	ND_PRINT((ndo, "\n\t%s Message (%u), length: %u",
-               tok2str(bgp_msg_values, "Unknown", bgp.bgp_type),
-               bgp.bgp_type,
+               tok2str(bgp_msg_values, "Unknown", bgp_type),
+               bgp_type,
                length));
 
-	switch (bgp.bgp_type) {
+	switch (bgp_type) {
 	case BGP_OPEN:
 		bgp_open_print(ndo, dat, length);
 		break;
@@ -2824,7 +2835,7 @@ bgp_header_print(netdissect_options *ndo,
         default:
                 /* we have no decoder for the BGP message */
                 ND_TCHECK_LEN(dat, length);
-                ND_PRINT((ndo, "\n\t  no Message %u decoder", bgp.bgp_type));
+                ND_PRINT((ndo, "\n\t  no Message %u decoder", bgp_type));
                 print_unknown_data(ndo, dat, "\n\t  ", length);
                 break;
 	}
@@ -2845,7 +2856,7 @@ bgp_print(netdissect_options *ndo,
 		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 	};
-	struct bgp bgp;
+	const struct bgp *bgp_header;
 	uint16_t hlen;
 
 	ep = dat + length;
@@ -2875,13 +2886,13 @@ bgp_print(netdissect_options *ndo,
 		}
 
 		/* found BGP header */
-		ND_TCHECK_LEN(p, BGP_SIZE);	/*XXX*/
-		memcpy(&bgp, p, BGP_SIZE);
+		ND_TCHECK_LEN(p, BGP_SIZE);
+		bgp_header = (const struct bgp *)p;
 
 		if (start != p)
 			ND_PRINT((ndo, " [|BGP]"));
 
-		hlen = ntohs(bgp.bgp_len);
+		hlen = EXTRACT_BE_U_2(bgp_header->bgp_len);
 		if (hlen < BGP_SIZE) {
 			ND_PRINT((ndo, "\n[|BGP Bogus header length %u < %u]", hlen,
 			    BGP_SIZE));
@@ -2889,7 +2900,7 @@ bgp_print(netdissect_options *ndo,
 		}
 
 		if (ND_TTEST_LEN(p, hlen)) {
-			if (!bgp_header_print(ndo, p, hlen))
+			if (!bgp_pdu_print(ndo, p, hlen))
 				return;
 			p += hlen;
 			start = p;
@@ -2897,7 +2908,7 @@ bgp_print(netdissect_options *ndo,
 			ND_PRINT((ndo, "\n[|BGP %s]",
 			       tok2str(bgp_msg_values,
 					  "Unknown Message Type",
-					  bgp.bgp_type)));
+					  EXTRACT_U_1(bgp_header->bgp_type))));
 			break;
 		}
 	}
