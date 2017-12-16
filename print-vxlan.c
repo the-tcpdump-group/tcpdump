@@ -53,12 +53,12 @@ vxlan_print(netdissect_options *ndo, const u_char *bp, u_int len)
     if (len < VXLAN_HDR_LEN)
         goto trunc;
 
-    ND_TCHECK2(*bp, VXLAN_HDR_LEN);
+    ND_TCHECK_LEN(bp, VXLAN_HDR_LEN);
 
-    flags = *bp;
+    flags = EXTRACT_U_1(bp);
     bp += 4;
 
-    vni = EXTRACT_24BITS(bp);
+    vni = EXTRACT_BE_U_3(bp);
     bp += 4;
 
     ND_PRINT((ndo, "VXLAN, "));

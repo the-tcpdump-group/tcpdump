@@ -259,7 +259,6 @@ HDR = \
 	atm.h \
 	chdlc.h \
 	cpack.h \
-	ether.h \
 	ethertype.h \
 	extract.h \
 	funcattrs.h \
@@ -289,7 +288,6 @@ HDR = \
 	print.h \
 	rpc_auth.h \
 	rpc_msg.h \
-	rpl.h \
 	signature.h \
 	slcompress.h \
 	smb.h \
@@ -333,7 +331,7 @@ EXTRA_DIST = \
 	config.h.in \
 	config.sub \
 	configure \
-	configure.in \
+	configure.ac \
 	install-sh \
 	lbl/os-osf4.h \
 	lbl/os-solaris2.h \
@@ -449,4 +447,4 @@ testlist:
 	echo $(TEST_DIST)
 
 depend: $(GENSRC)
-	$(MKDEP) -c $(CC) -m $(DEPENDENCY_CFLAG) $(DEFS) $(INCLS) $(SRC)
+	$(MKDEP) -c "$(CC)" -m "$(DEPENDENCY_CFLAG)" $(DEFS) $(INCLS) $(SRC)

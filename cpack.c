@@ -100,9 +100,25 @@ cpack_uint64(struct cpack_state *cs, uint64_t *u)
 	if ((next = cpack_align_and_reserve(cs, sizeof(*u))) == NULL)
 		return -1;
 
-	*u = EXTRACT_LE_64BITS(next);
+	*u = EXTRACT_LE_U_8(next);
 
 	/* Move pointer past the uint64_t. */
+	cs->c_next = next + sizeof(*u);
+	return 0;
+}
+
+/* Unpack a 64-bit signed integer. */
+int
+cpack_int64(struct cpack_state *cs, int64_t *u)
+{
+	const uint8_t *next;
+
+	if ((next = cpack_align_and_reserve(cs, sizeof(*u))) == NULL)
+		return -1;
+
+	*u = EXTRACT_LE_S_8(next);
+
+	/* Move pointer past the int64_t. */
 	cs->c_next = next + sizeof(*u);
 	return 0;
 }
@@ -116,9 +132,25 @@ cpack_uint32(struct cpack_state *cs, uint32_t *u)
 	if ((next = cpack_align_and_reserve(cs, sizeof(*u))) == NULL)
 		return -1;
 
-	*u = EXTRACT_LE_32BITS(next);
+	*u = EXTRACT_LE_U_4(next);
 
 	/* Move pointer past the uint32_t. */
+	cs->c_next = next + sizeof(*u);
+	return 0;
+}
+
+/* Unpack a 32-bit signed integer. */
+int
+cpack_int32(struct cpack_state *cs, int32_t *u)
+{
+	const uint8_t *next;
+
+	if ((next = cpack_align_and_reserve(cs, sizeof(*u))) == NULL)
+		return -1;
+
+	*u = EXTRACT_LE_S_4(next);
+
+	/* Move pointer past the int32_t. */
 	cs->c_next = next + sizeof(*u);
 	return 0;
 }
@@ -132,9 +164,25 @@ cpack_uint16(struct cpack_state *cs, uint16_t *u)
 	if ((next = cpack_align_and_reserve(cs, sizeof(*u))) == NULL)
 		return -1;
 
-	*u = EXTRACT_LE_16BITS(next);
+	*u = EXTRACT_LE_U_2(next);
 
 	/* Move pointer past the uint16_t. */
+	cs->c_next = next + sizeof(*u);
+	return 0;
+}
+
+/* Unpack a 16-bit signed integer. */
+int
+cpack_int16(struct cpack_state *cs, int16_t *u)
+{
+	const uint8_t *next;
+
+	if ((next = cpack_align_and_reserve(cs, sizeof(*u))) == NULL)
+		return -1;
+
+	*u = EXTRACT_LE_S_2(next);
+
+	/* Move pointer past the int16_t. */
 	cs->c_next = next + sizeof(*u);
 	return 0;
 }
@@ -147,9 +195,24 @@ cpack_uint8(struct cpack_state *cs, uint8_t *u)
 	if ((size_t)(cs->c_next - cs->c_buf) >= cs->c_len)
 		return -1;
 
-	*u = *cs->c_next;
+	*u = EXTRACT_U_1(cs->c_next);
 
 	/* Move pointer past the uint8_t. */
+	cs->c_next++;
+	return 0;
+}
+
+/* Unpack an 8-bit signed integer. */
+int
+cpack_int8(struct cpack_state *cs, int8_t *u)
+{
+	/* No space left? */
+	if ((size_t)(cs->c_next - cs->c_buf) >= cs->c_len)
+		return -1;
+
+	*u = EXTRACT_S_1(cs->c_next);
+
+	/* Move pointer past the int8_t. */
 	cs->c_next++;
 	return 0;
 }

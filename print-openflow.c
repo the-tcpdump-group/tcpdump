@@ -85,20 +85,20 @@ of_header_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep
 	if (ep < cp + OF_HEADER_LEN)
 		goto invalid;
 	/* version */
-	ND_TCHECK2(*cp, 1);
-	version = *cp;
+	ND_TCHECK_1(cp);
+	version = EXTRACT_U_1(cp);
 	cp += 1;
 	/* type */
-	ND_TCHECK2(*cp, 1);
-	type = *cp;
+	ND_TCHECK_1(cp);
+	type = EXTRACT_U_1(cp);
 	cp += 1;
 	/* length */
-	ND_TCHECK2(*cp, 2);
-	length = EXTRACT_16BITS(cp);
+	ND_TCHECK_2(cp);
+	length = EXTRACT_BE_U_2(cp);
 	cp += 2;
 	/* xid */
-	ND_TCHECK2(*cp, 4);
-	xid = EXTRACT_32BITS(cp);
+	ND_TCHECK_4(cp);
+	xid = EXTRACT_BE_U_4(cp);
 	cp += 4;
 	/* Message length includes the header length and a message always includes
 	 * the basic header. A message length underrun fails decoding of the rest of
@@ -116,13 +116,13 @@ of_header_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep
 		return of10_header_body_print(ndo, cp, ep, type, length, xid);
 	default:
 		of_header_print(ndo, version, type, length, xid);
-		ND_TCHECK2(*cp, length - OF_HEADER_LEN);
+		ND_TCHECK_LEN(cp, length - OF_HEADER_LEN);
 		return cp + length - OF_HEADER_LEN; /* done with current message */
 	}
 
 invalid: /* fail current packet */
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, ep - cp);
+	ND_TCHECK_LEN(cp, ep - cp);
 	return ep;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));

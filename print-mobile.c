@@ -78,8 +78,8 @@ mobile_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	}
 	ND_PRINT((ndo, "mobile: "));
 
-	proto = EXTRACT_16BITS(&mob->proto);
-	crc =  EXTRACT_16BITS(&mob->hcheck);
+	proto = EXTRACT_BE_U_2(&mob->proto);
+	crc =  EXTRACT_BE_U_2(&mob->hcheck);
 	if (proto & OSRC_PRES) {
 		osp=1;
 	}

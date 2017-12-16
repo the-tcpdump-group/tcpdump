@@ -66,10 +66,10 @@ struct igrprte {
 #define IGRP_RTE_SIZE	14	/* don't believe sizeof ! */
 
 static void
-igrp_entry_print(netdissect_options *ndo, register const struct igrprte *igr,
-    register int is_interior, register int is_exterior)
+igrp_entry_print(netdissect_options *ndo, const struct igrprte *igr,
+    int is_interior, int is_exterior)
 {
-	register u_int delay, bandwidth;
+	u_int delay, bandwidth;
 	u_int metric, mtu;
 
 	if (is_interior)
@@ -82,12 +82,12 @@ igrp_entry_print(netdissect_options *ndo, register const struct igrprte *igr,
 		ND_PRINT((ndo, " %d.%d.%d.0", igr->igr_net[0],
 		    igr->igr_net[1], igr->igr_net[2]));
 
-	delay = EXTRACT_24BITS(igr->igr_dly);
-	bandwidth = EXTRACT_24BITS(igr->igr_bw);
+	delay = EXTRACT_BE_U_3(igr->igr_dly);
+	bandwidth = EXTRACT_BE_U_3(igr->igr_bw);
 	metric = bandwidth + delay;
 	if (metric > 0xffffff)
 		metric = 0xffffff;
-	mtu = EXTRACT_16BITS(igr->igr_mtu);
+	mtu = EXTRACT_BE_U_2(igr->igr_mtu);
 
 	ND_PRINT((ndo, " d=%d b=%d r=%d l=%d M=%d mtu=%d in %d hops",
 	    10 * delay, bandwidth == 0 ? 0 : 10000000 / bandwidth,
@@ -102,10 +102,10 @@ static const struct tok op2str[] = {
 };
 
 void
-igrp_print(netdissect_options *ndo, register const u_char *bp, u_int length)
+igrp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
-	register const struct igrphdr *hdr;
-	register const u_char *cp;
+	const struct igrphdr *hdr;
+	const u_char *cp;
 	u_int nint, nsys, next;
 
 	hdr = (const struct igrphdr *)bp;
@@ -114,15 +114,15 @@ igrp_print(netdissect_options *ndo, register const u_char *bp, u_int length)
 
 	/* Header */
 	ND_TCHECK(*hdr);
-	nint = EXTRACT_16BITS(&hdr->ig_ni);
-	nsys = EXTRACT_16BITS(&hdr->ig_ns);
-	next = EXTRACT_16BITS(&hdr->ig_nx);
+	nint = EXTRACT_BE_U_2(&hdr->ig_ni);
+	nsys = EXTRACT_BE_U_2(&hdr->ig_ns);
+	next = EXTRACT_BE_U_2(&hdr->ig_nx);
 
 	ND_PRINT((ndo, " %s V%d edit=%d AS=%d (%d/%d/%d)",
 	    tok2str(op2str, "op-#%d", IGRP_OP(hdr->ig_vop)),
 	    IGRP_V(hdr->ig_vop),
 	    hdr->ig_ed,
-	    EXTRACT_16BITS(&hdr->ig_as),
+	    EXTRACT_BE_U_2(&hdr->ig_as),
 	    nint,
 	    nsys,
 	    next));
@@ -130,15 +130,15 @@ igrp_print(netdissect_options *ndo, register const u_char *bp, u_int length)
 	length -= sizeof(*hdr);
 	while (length >= IGRP_RTE_SIZE) {
 		if (nint > 0) {
-			ND_TCHECK2(*cp, IGRP_RTE_SIZE);
+			ND_TCHECK_LEN(cp, IGRP_RTE_SIZE);
 			igrp_entry_print(ndo, (const struct igrprte *)cp, 1, 0);
 			--nint;
 		} else if (nsys > 0) {
-			ND_TCHECK2(*cp, IGRP_RTE_SIZE);
+			ND_TCHECK_LEN(cp, IGRP_RTE_SIZE);
 			igrp_entry_print(ndo, (const struct igrprte *)cp, 0, 0);
 			--nsys;
 		} else if (next > 0) {
-			ND_TCHECK2(*cp, IGRP_RTE_SIZE);
+			ND_TCHECK_LEN(cp, IGRP_RTE_SIZE);
 			igrp_entry_print(ndo, (const struct igrprte *)cp, 0, 1);
 			--next;
 		} else {

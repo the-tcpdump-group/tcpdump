@@ -38,10 +38,10 @@
  * Per RFC 768, September, 1981.
  */
 struct udphdr {
-	uint16_t	uh_sport;		/* source port */
-	uint16_t	uh_dport;		/* destination port */
-	uint16_t	uh_ulen;		/* udp length */
-	uint16_t	uh_sum;			/* udp checksum */
+	nd_uint16_t	uh_sport;		/* source port */
+	nd_uint16_t	uh_dport;		/* destination port */
+	nd_uint16_t	uh_ulen;		/* udp length */
+	nd_uint16_t	uh_sum;			/* udp checksum */
 };
 
 #ifndef NAMESERVER_PORT

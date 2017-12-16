@@ -101,10 +101,10 @@ static const struct printer printers[] = {
 #endif
 #ifdef HAVE_PCAP_USB_H
 #ifdef DLT_USB_LINUX
-	{ usb_linux_48_byte_print, DLT_USB_LINUX},
+	{ usb_linux_48_byte_if_print, DLT_USB_LINUX},
 #endif /* DLT_USB_LINUX */
 #ifdef DLT_USB_LINUX_MMAPPED
-	{ usb_linux_64_byte_print, DLT_USB_LINUX_MMAPPED},
+	{ usb_linux_64_byte_if_print, DLT_USB_LINUX_MMAPPED},
 #endif /* DLT_USB_LINUX_MMAPPED */
 #endif /* HAVE_PCAP_USB_H */
 #ifdef DLT_SYMANTEC_FIREWALL
@@ -151,49 +151,49 @@ static const struct printer printers[] = {
 	{ ltalk_if_print,	DLT_LTALK },
 #endif
 #ifdef DLT_JUNIPER_ATM1
-	{ juniper_atm1_print,	DLT_JUNIPER_ATM1 },
+	{ juniper_atm1_if_print, DLT_JUNIPER_ATM1 },
 #endif
 #ifdef DLT_JUNIPER_ATM2
-	{ juniper_atm2_print,	DLT_JUNIPER_ATM2 },
+	{ juniper_atm2_if_print, DLT_JUNIPER_ATM2 },
 #endif
 #ifdef DLT_JUNIPER_MFR
-	{ juniper_mfr_print,	DLT_JUNIPER_MFR },
+	{ juniper_mfr_if_print,	DLT_JUNIPER_MFR },
 #endif
 #ifdef DLT_JUNIPER_MLFR
-	{ juniper_mlfr_print,	DLT_JUNIPER_MLFR },
+	{ juniper_mlfr_if_print, DLT_JUNIPER_MLFR },
 #endif
 #ifdef DLT_JUNIPER_MLPPP
-	{ juniper_mlppp_print,	DLT_JUNIPER_MLPPP },
+	{ juniper_mlppp_if_print, DLT_JUNIPER_MLPPP },
 #endif
 #ifdef DLT_JUNIPER_PPPOE
-	{ juniper_pppoe_print,	DLT_JUNIPER_PPPOE },
+	{ juniper_pppoe_if_print, DLT_JUNIPER_PPPOE },
 #endif
 #ifdef DLT_JUNIPER_PPPOE_ATM
-	{ juniper_pppoe_atm_print, DLT_JUNIPER_PPPOE_ATM },
+	{ juniper_pppoe_atm_if_print, DLT_JUNIPER_PPPOE_ATM },
 #endif
 #ifdef DLT_JUNIPER_GGSN
-	{ juniper_ggsn_print,	DLT_JUNIPER_GGSN },
+	{ juniper_ggsn_if_print, DLT_JUNIPER_GGSN },
 #endif
 #ifdef DLT_JUNIPER_ES
-	{ juniper_es_print,	DLT_JUNIPER_ES },
+	{ juniper_es_if_print,	DLT_JUNIPER_ES },
 #endif
 #ifdef DLT_JUNIPER_MONITOR
-	{ juniper_monitor_print, DLT_JUNIPER_MONITOR },
+	{ juniper_monitor_if_print, DLT_JUNIPER_MONITOR },
 #endif
 #ifdef DLT_JUNIPER_SERVICES
-	{ juniper_services_print, DLT_JUNIPER_SERVICES },
+	{ juniper_services_if_print, DLT_JUNIPER_SERVICES },
 #endif
 #ifdef DLT_JUNIPER_ETHER
-	{ juniper_ether_print,	DLT_JUNIPER_ETHER },
+	{ juniper_ether_if_print,	DLT_JUNIPER_ETHER },
 #endif
 #ifdef DLT_JUNIPER_PPP
-	{ juniper_ppp_print,	DLT_JUNIPER_PPP },
+	{ juniper_ppp_if_print,	DLT_JUNIPER_PPP },
 #endif
 #ifdef DLT_JUNIPER_FRELAY
-	{ juniper_frelay_print,	DLT_JUNIPER_FRELAY },
+	{ juniper_frelay_if_print,	DLT_JUNIPER_FRELAY },
 #endif
 #ifdef DLT_JUNIPER_CHDLC
-	{ juniper_chdlc_print,	DLT_JUNIPER_CHDLC },
+	{ juniper_chdlc_if_print,	DLT_JUNIPER_CHDLC },
 #endif
 #ifdef DLT_PKTAP
 	{ pktap_if_print,	DLT_PKTAP },

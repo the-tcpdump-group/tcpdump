@@ -210,28 +210,26 @@
  * Structure for query header.
  */
 typedef struct {
-	uint16_t id;		/* query identification number */
-	uint8_t  flags1;	/* first byte of flags */
-	uint8_t  flags2;	/* second byte of flags */
-	uint16_t qdcount;	/* number of question entries */
-	uint16_t ancount;	/* number of answer entries */
-	uint16_t nscount;	/* number of authority entries */
-	uint16_t arcount;	/* number of resource entries */
+	nd_uint16_t id;		/* query identification number */
+	nd_uint16_t flags;	/* QR, Opcode, AA, TC, RD, RA, RCODE */
+	nd_uint16_t qdcount;	/* number of question entries */
+	nd_uint16_t ancount;	/* number of answer entries */
+	nd_uint16_t nscount;	/* number of authority entries */
+	nd_uint16_t arcount;	/* number of resource entries */
 } HEADER;
 
 /*
  * Macros for subfields of flag fields.
  */
-#define DNS_QR(np)	((np)->flags1 & 0x80)		/* response flag */
-#define DNS_OPCODE(np)	((((np)->flags1) >> 3) & 0xF)	/* purpose of message */
-#define DNS_AA(np)	((np)->flags1 & 0x04)		/* authoritative answer */
-#define DNS_TC(np)	((np)->flags1 & 0x02)		/* truncated message */
-#define DNS_RD(np)	((np)->flags1 & 0x01)		/* recursion desired */
-
-#define DNS_RA(np)	((np)->flags2 & 0x80)	/* recursion available */
-#define DNS_AD(np)	((np)->flags2 & 0x20)	/* authentic data from named */
-#define DNS_CD(np)	((np)->flags2 & 0x10)	/* checking disabled by resolver */
-#define DNS_RCODE(np)	((np)->flags2 & 0xF)	/* response code */
+#define DNS_QR(flags)		((flags) & 0x8000)	/* response flag */
+#define DNS_OPCODE(flags)	(((flags) >> 11) & 0xF)	/* purpose of message */
+#define DNS_AA(flags)		(flags & 0x0400)	/* authoritative answer */
+#define DNS_TC(flags)		(flags & 0x0200)	/* truncated message */
+#define DNS_RD(flags)		(flags & 0x0100)	/* recursion desired */
+#define DNS_RA(flags)		(flags & 0x0080)	/* recursion available */
+#define DNS_AD(flags)		(flags & 0x0020)	/* authentic data from named */
+#define DNS_CD(flags)		(flags & 0x0010)	/* checking disabled by resolver */
+#define DNS_RCODE(flags)	(flags & 0x000F)	/* response code */
 
 /*
  * Defines for handling compressed domain names, EDNS0 labels, etc.
@@ -239,62 +237,5 @@ typedef struct {
 #define INDIR_MASK	0xc0	/* 11.... */
 #define EDNS0_MASK	0x40	/* 01.... */
 #  define EDNS0_ELT_BITLABEL 0x01
-
-/*
- * Structure for passing resource records around.
- */
-struct rrec {
-	int16_t	r_zone;			/* zone number */
-	int16_t	r_class;		/* class number */
-	int16_t	r_type;			/* type number */
-	uint32_t	r_ttl;			/* time to live */
-	int	r_size;			/* size of data area */
-	char	*r_data;		/* pointer to data */
-};
-
-/*
- * Inline versions of get/put short/long.  Pointer is advanced.
- * We also assume that a "uint16_t" holds 2 "chars"
- * and that a "uint32_t" holds 4 "chars".
- *
- * These macros demonstrate the property of C whereby it can be
- * portable or it can be elegant but never both.
- */
-#define GETSHORT(s, cp) { \
-	register u_char *t_cp = (u_char *)(cp); \
-	(s) = ((uint16_t)t_cp[0] << 8) | (uint16_t)t_cp[1]; \
-	(cp) += 2; \
-}
-
-#define GETLONG(l, cp) { \
-	register u_char *t_cp = (u_char *)(cp); \
-	(l) = (((uint32_t)t_cp[0]) << 24) \
-	    | (((uint32_t)t_cp[1]) << 16) \
-	    | (((uint32_t)t_cp[2]) << 8) \
-	    | (((uint32_t)t_cp[3])); \
-	(cp) += 4; \
-}
-
-#define PUTSHORT(s, cp) { \
-	register uint16_t t_s = (uint16_t)(s); \
-	register u_char *t_cp = (u_char *)(cp); \
-	*t_cp++ = t_s >> 8; \
-	*t_cp   = t_s; \
-	(cp) += 2; \
-}
-
-/*
- * Warning: PUTLONG --no-longer-- destroys its first argument.  if you
- * were depending on this "feature", you will lose.
- */
-#define PUTLONG(l, cp) { \
-	register uint32_t t_l = (uint32_t)(l); \
-	register u_char *t_cp = (u_char *)(cp); \
-	*t_cp++ = t_l >> 24; \
-	*t_cp++ = t_l >> 16; \
-	*t_cp++ = t_l >> 8; \
-	*t_cp   = t_l; \
-	(cp) += 4; \
-}
 
 #endif /* !_NAMESER_H_ */

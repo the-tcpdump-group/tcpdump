@@ -49,26 +49,26 @@ int _serv_stayopen;
 const char *etc_path(const char *file);
 
 /*
-* Return either "%SYSTEMROOT%\System32\drivers\etc\<file>",
-* $PREFIX/etc/<file> or simply "<file>" if those failed.
+* Check if <file> exists in the current directory and, if so, return it.
+* Else return either "%SYSTEMROOT%\System32\drivers\etc\<file>"
+* or $PREFIX/etc/<file>.
 * "<file>" is aka __PATH_SERVICES (aka "services" on Windows and
-* "/etc/services" on other platforms that would need this)
+* "/etc/services" on other platforms that would need this).
 */
 const char *etc_path(const char *file)
 {
     const char *env = getenv(__PATH_SYSROOT);
     static char path[_MAX_PATH];
 
-    if (!env)
-/*
-* #ifdef _DEBUG
-*   printf("Warning: Environment Variable \"%s\" invalid\nResorting to [CurrentDirectory]/%s\n",
-*       __PATH_SYSROOT, file);
-* #endif
-*/
+    /* see if "<file>" exists locally or whether __PATH_SYSROOT is valid */
+    if (fopen(file, "r") || !env)
         return (file);
-
+    else
+#ifdef _WIN32
     snprintf(path, sizeof(path), "%s%s%s", env, __PATH_ETC_INET, file);
+#else
+    snprintf(path, sizeof(path), "%s%s", env, file);
+#endif
     return (path);
 }
 
@@ -96,7 +96,7 @@ struct servent *
 getservent(void)
 {
     char *p;
-    register char *cp, **q;
+    char *cp, **q;
 
     if (servf == NULL && (servf = fopen(etc_path(__PATH_SERVICES), "r")) == NULL)
         return (NULL);

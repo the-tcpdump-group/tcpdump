@@ -166,8 +166,8 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		return (length);
 	}
 
-	dsap_field = *p;
-	ssap_field = *(p + 1);
+	dsap_field = EXTRACT_U_1(p);
+	ssap_field = EXTRACT_U_1(p + 1);
 
 	/*
 	 * OK, what type of LLC frame is this?  The length
@@ -175,7 +175,7 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 	 * have a two-byte control field, and U frames have
 	 * a one-byte control field.
 	 */
-	control = *(p + 2);
+	control = EXTRACT_U_1(p + 2);
 	if ((control & LLC_U_FMT) == LLC_U_FMT) {
 		/*
 		 * U frame.
@@ -201,7 +201,7 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		/*
 		 * ...and is little-endian.
 		 */
-		control = EXTRACT_LE_16BITS(p + 2);
+		control = EXTRACT_LE_U_2(p + 2);
 		is_u = 0;
 		hdrlen = 4;	/* DSAP, SSAP, 2-byte control field */
 	}
@@ -210,11 +210,11 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		/*
 		 * This is an Ethernet_802.3 IPX frame; it has an
 		 * 802.3 header (i.e., an Ethernet header where the
-		 * type/length field is <= ETHERMTU, i.e. it's a length
-		 * field, not a type field), but has no 802.2 header -
-		 * the IPX packet starts right after the Ethernet header,
-		 * with a signature of two bytes of 0xFF (which is
-		 * LLCSAP_GLOBAL).
+		 * type/length field is <= MAX_ETHERNET_LENGTH_VAL,
+		 * i.e. it's a length field, not a type field), but
+		 * has no 802.2 header - the IPX packet starts right
+		 * after the Ethernet header, with a signature of two
+		 * bytes of 0xFF (which is LLCSAP_GLOBAL).
 		 *
 		 * (It might also have been an Ethernet_802.3 IPX at
 		 * one time, but got bridged onto another network,
@@ -372,13 +372,15 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 					ND_DEFAULTPRINT((const u_char *)p, caplen);
 				return (hdrlen);
 			}
-			if (*p == LLC_XID_FI) {
+			if (EXTRACT_U_1(p) == LLC_XID_FI) {
 				if (caplen < 3 || length < 3) {
 					ND_PRINT((ndo, "[|llc]"));
 					if (caplen > 0)
 						ND_DEFAULTPRINT((const u_char *)p, caplen);
 				} else
-					ND_PRINT((ndo, ": %02x %02x", p[1], p[2]));
+					ND_PRINT((ndo, ": %02x %02x",
+						  EXTRACT_U_1(p + 1),
+						  EXTRACT_U_1(p + 2)));
 				return (hdrlen);
 			}
 		}
@@ -422,14 +424,14 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 	u_int bridge_pad)
 {
 	uint32_t orgcode;
-	register u_short et;
-	register int ret;
+	u_short et;
+	int ret;
 
-	ND_TCHECK2(*p, 5);
+	ND_TCHECK_5(p);
 	if (caplen < 5 || length < 5)
 		goto trunc;
-	orgcode = EXTRACT_24BITS(p);
-	et = EXTRACT_16BITS(p + 3);
+	orgcode = EXTRACT_BE_U_3(p);
+	et = EXTRACT_BE_U_2(p + 3);
 
 	if (ndo->ndo_eflag) {
 		/*
@@ -513,7 +515,7 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 			/*
 			 * Skip the padding.
 			 */
-			ND_TCHECK2(*p, bridge_pad);
+			ND_TCHECK_LEN(p, bridge_pad);
 			caplen -= bridge_pad;
 			length -= bridge_pad;
 			p += bridge_pad;
@@ -534,7 +536,7 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 			 * Skip the padding, but not the Access
 			 * Control field.
 			 */
-			ND_TCHECK2(*p, bridge_pad);
+			ND_TCHECK_LEN(p, bridge_pad);
 			caplen -= bridge_pad;
 			length -= bridge_pad;
 			p += bridge_pad;
@@ -555,7 +557,7 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 			/*
 			 * Skip the padding.
 			 */
-			ND_TCHECK2(*p, bridge_pad + 1);
+			ND_TCHECK_LEN(p, bridge_pad + 1);
 			caplen -= bridge_pad + 1;
 			length -= bridge_pad + 1;
 			p += bridge_pad + 1;

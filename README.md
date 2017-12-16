@@ -11,7 +11,7 @@ CONTRIBUTING in the tcpdump source tree root.
 
 TCPDUMP 4.x.y
 Now maintained by "The Tcpdump Group"
-See 		www.tcpdump.org
+See 		https://www.tcpdump.org
 
 Anonymous Git is available via:
 
@@ -26,12 +26,12 @@ monitoring and data acquisition.  This software was originally
 developed by the Network Research Group at the Lawrence Berkeley
 National Laboratory.  The original distribution is available via
 anonymous ftp to `ftp.ee.lbl.gov`, in `tcpdump.tar.Z`.  More recent
-development is performed at tcpdump.org, http://www.tcpdump.org/
+development is performed at tcpdump.org, https://www.tcpdump.org/.
 
 Tcpdump uses libpcap, a system-independent interface for user-level
 packet capture.  Before building tcpdump, you must first retrieve and
 build libpcap, also originally from LBL and now being maintained by
-tcpdump.org; see http://www.tcpdump.org/ .
+tcpdump.org; see https://www.tcpdump.org/.
 
 Once libpcap is built (either install it or make sure it's in
 `../libpcap`), you can build tcpdump using the procedure in the `INSTALL.txt`
@@ -67,7 +67,7 @@ It is a program that can be used to extract portions of tcpdump binary
 trace files. See the above distribution for further details and
 documentation.
 
-Current versions can be found at www.tcpdump.org.
+Current versions can be found at https://www.tcpdump.org.
 
  - The TCPdump group
 

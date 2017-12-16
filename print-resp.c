@@ -61,15 +61,15 @@ static const char tstr[] = " [|RESP]";
 #define resp_print_invalid(ndo)          ND_PRINT((ndo, " invalid"))
 
 void       resp_print(netdissect_options *, const u_char *, u_int);
-static int resp_parse(netdissect_options *, register const u_char *, int);
-static int resp_print_string_error_integer(netdissect_options *, register const u_char *, int);
-static int resp_print_simple_string(netdissect_options *, register const u_char *, int);
-static int resp_print_integer(netdissect_options *, register const u_char *, int);
-static int resp_print_error(netdissect_options *, register const u_char *, int);
-static int resp_print_bulk_string(netdissect_options *, register const u_char *, int);
-static int resp_print_bulk_array(netdissect_options *, register const u_char *, int);
-static int resp_print_inline(netdissect_options *, register const u_char *, int);
-static int resp_get_length(netdissect_options *, register const u_char *, int, const u_char **);
+static int resp_parse(netdissect_options *, const u_char *, int);
+static int resp_print_string_error_integer(netdissect_options *, const u_char *, int);
+static int resp_print_simple_string(netdissect_options *, const u_char *, int);
+static int resp_print_integer(netdissect_options *, const u_char *, int);
+static int resp_print_error(netdissect_options *, const u_char *, int);
+static int resp_print_bulk_string(netdissect_options *, const u_char *, int);
+static int resp_print_bulk_array(netdissect_options *, const u_char *, int);
+static int resp_print_inline(netdissect_options *, const u_char *, int);
+static int resp_get_length(netdissect_options *, const u_char *, int, const u_char **);
 
 #define LCHECK2(_tot_len, _len) \
     {                           \
@@ -90,7 +90,7 @@ static int resp_get_length(netdissect_options *, register const u_char *, int, c
 #define FIND_CRLF(_ptr, _len)                   \
     for (;;) {                                  \
         LCHECK2(_len, 2);                       \
-        ND_TCHECK2(*_ptr, 2);                   \
+        ND_TCHECK_2(_ptr);                   \
         if (*_ptr == '\r' && *(_ptr+1) == '\n') \
             break;                              \
         _ptr++;                                 \
@@ -241,14 +241,14 @@ trunc:
 }
 
 static int
-resp_parse(netdissect_options *ndo, register const u_char *bp, int length)
+resp_parse(netdissect_options *ndo, const u_char *bp, int length)
 {
     u_char op;
     int ret_len;
 
     LCHECK2(length, 1);
-    ND_TCHECK(*bp);
-    op = *bp;
+    ND_TCHECK_1(bp);
+    op = EXTRACT_U_1(bp);
 
     /* bp now points to the op, so these routines must skip it */
     switch(op) {
@@ -272,22 +272,22 @@ trunc:
 }
 
 static int
-resp_print_simple_string(netdissect_options *ndo, register const u_char *bp, int length) {
+resp_print_simple_string(netdissect_options *ndo, const u_char *bp, int length) {
     return resp_print_string_error_integer(ndo, bp, length);
 }
 
 static int
-resp_print_integer(netdissect_options *ndo, register const u_char *bp, int length) {
+resp_print_integer(netdissect_options *ndo, const u_char *bp, int length) {
     return resp_print_string_error_integer(ndo, bp, length);
 }
 
 static int
-resp_print_error(netdissect_options *ndo, register const u_char *bp, int length) {
+resp_print_error(netdissect_options *ndo, const u_char *bp, int length) {
     return resp_print_string_error_integer(ndo, bp, length);
 }
 
 static int
-resp_print_string_error_integer(netdissect_options *ndo, register const u_char *bp, int length) {
+resp_print_string_error_integer(netdissect_options *ndo, const u_char *bp, int length) {
     int length_cur = length, len, ret_len;
     const u_char *bp_ptr;
 
@@ -322,7 +322,7 @@ trunc:
 }
 
 static int
-resp_print_bulk_string(netdissect_options *ndo, register const u_char *bp, int length) {
+resp_print_bulk_string(netdissect_options *ndo, const u_char *bp, int length) {
     int length_cur = length, string_len;
 
     /* bp points to the op; skip it */
@@ -337,7 +337,7 @@ resp_print_bulk_string(netdissect_options *ndo, register const u_char *bp, int l
             resp_print_empty(ndo);
         else {
             LCHECK2(length_cur, string_len);
-            ND_TCHECK2(*bp, string_len);
+            ND_TCHECK_LEN(bp, string_len);
             RESP_PRINT_SEGMENT(ndo, bp, string_len);
             bp += string_len;
             length_cur -= string_len;
@@ -368,7 +368,7 @@ trunc:
 }
 
 static int
-resp_print_bulk_array(netdissect_options *ndo, register const u_char *bp, int length) {
+resp_print_bulk_array(netdissect_options *ndo, const u_char *bp, int length) {
     u_int length_cur = length;
     int array_len, i, ret_len;
 
@@ -407,7 +407,7 @@ trunc:
 }
 
 static int
-resp_print_inline(netdissect_options *ndo, register const u_char *bp, int length) {
+resp_print_inline(netdissect_options *ndo, const u_char *bp, int length) {
     int length_cur = length;
     int len;
     const u_char *bp_ptr;
@@ -454,7 +454,7 @@ trunc:
 }
 
 static int
-resp_get_length(netdissect_options *ndo, register const u_char *bp, int len, const u_char **endp)
+resp_get_length(netdissect_options *ndo, const u_char *bp, int len, const u_char **endp)
 {
     int result;
     u_char c;
@@ -464,10 +464,10 @@ resp_get_length(netdissect_options *ndo, register const u_char *bp, int len, con
 
     if (len == 0)
         goto trunc;
-    ND_TCHECK(*bp);
+    ND_TCHECK_1(bp);
     too_large = 0;
     neg = 0;
-    if (*bp == '-') {
+    if (EXTRACT_U_1(bp) == '-') {
         neg = 1;
         bp++;
         len--;
@@ -478,8 +478,8 @@ resp_get_length(netdissect_options *ndo, register const u_char *bp, int len, con
     for (;;) {
         if (len == 0)
             goto trunc;
-        ND_TCHECK(*bp);
-        c = *bp;
+        ND_TCHECK_1(bp);
+        c = EXTRACT_U_1(bp);
         if (!(c >= '0' && c <= '9')) {
             if (!saw_digit) {
                 bp++;
@@ -508,7 +508,7 @@ resp_get_length(netdissect_options *ndo, register const u_char *bp, int len, con
      * OK, we found a non-digit character.  It should be a \r, followed
      * by a \n.
      */
-    if (*bp != '\r') {
+    if (EXTRACT_U_1(bp) != '\r') {
         bp++;
         goto invalid;
     }
@@ -516,8 +516,8 @@ resp_get_length(netdissect_options *ndo, register const u_char *bp, int len, con
     len--;
     if (len == 0)
         goto trunc;
-    ND_TCHECK(*bp);
-    if (*bp != '\n') {
+    ND_TCHECK_1(bp);
+    if (EXTRACT_U_1(bp) != '\n') {
         bp++;
         goto invalid;
     }

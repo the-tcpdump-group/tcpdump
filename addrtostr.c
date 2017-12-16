@@ -127,7 +127,7 @@ addrtostr6 (const void *src, char *dst, size_t size)
   best.base = -1;
   cur.len = 0;
   cur.base  = -1;
-  for (i = 0; i < (int)(IN6ADDRSZ / INT16SZ); i++)
+  for (i = 0; i < (IN6ADDRSZ / INT16SZ); i++)
   {
     if (words[i] == 0)
     {
@@ -160,7 +160,7 @@ addrtostr6 (const void *src, char *dst, size_t size)
         *dp++ = c; \
         space_left--; \
     }
-  for (i = 0; i < (int)(IN6ADDRSZ / INT16SZ); i++)
+  for (i = 0; i < (IN6ADDRSZ / INT16SZ); i++)
   {
     /* Are we inside the best run of 0x00's?
      */

@@ -216,11 +216,11 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 				return (caplen);
 			}
 			flag = ap->arc_flag2;
-			seqid = EXTRACT_16BITS(&ap->arc_seqid2);
+			seqid = EXTRACT_BE_U_2(&ap->arc_seqid2);
 			archdrlen = ARC_HDRNEWLEN_EXC;
 		} else {
 			flag = ap->arc_flag;
-			seqid = EXTRACT_16BITS(&ap->arc_seqid);
+			seqid = EXTRACT_BE_U_2(&ap->arc_seqid);
 			archdrlen = ARC_HDRNEWLEN;
 		}
 	}

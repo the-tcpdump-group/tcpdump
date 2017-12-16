@@ -165,12 +165,12 @@ static const struct tok proc2str[] = {
 static char *progstr(uint32_t);
 
 void
-sunrpcrequest_print(netdissect_options *ndo, register const u_char *bp,
-                    register u_int length, register const u_char *bp2)
+sunrpc_print(netdissect_options *ndo, const u_char *bp,
+                    u_int length, const u_char *bp2)
 {
-	register const struct sunrpc_msg *rp;
-	register const struct ip *ip;
-	register const struct ip6_hdr *ip6;
+	const struct sunrpc_msg *rp;
+	const struct ip *ip;
+	const struct ip6_hdr *ip6;
 	uint32_t x;
 	char srcid[20], dstid[20];	/*fits 32bit*/
 
@@ -178,11 +178,11 @@ sunrpcrequest_print(netdissect_options *ndo, register const u_char *bp,
 
 	if (!ndo->ndo_nflag) {
 		snprintf(srcid, sizeof(srcid), "0x%x",
-		    EXTRACT_32BITS(&rp->rm_xid));
+		    EXTRACT_BE_U_4(&rp->rm_xid));
 		strlcpy(dstid, "sunrpc", sizeof(dstid));
 	} else {
 		snprintf(srcid, sizeof(srcid), "0x%x",
-		    EXTRACT_32BITS(&rp->rm_xid));
+		    EXTRACT_BE_U_4(&rp->rm_xid));
 		snprintf(dstid, sizeof(dstid), "0x%x", SUNRPC_PMAPPORT);
 	}
 
@@ -205,23 +205,23 @@ sunrpcrequest_print(netdissect_options *ndo, register const u_char *bp,
 	}
 
 	ND_PRINT((ndo, " %s", tok2str(proc2str, " proc #%u",
-	    EXTRACT_32BITS(&rp->rm_call.cb_proc))));
-	x = EXTRACT_32BITS(&rp->rm_call.cb_rpcvers);
+	    EXTRACT_BE_U_4(&rp->rm_call.cb_proc))));
+	x = EXTRACT_BE_U_4(&rp->rm_call.cb_rpcvers);
 	if (x != 2)
 		ND_PRINT((ndo, " [rpcver %u]", x));
 
-	switch (EXTRACT_32BITS(&rp->rm_call.cb_proc)) {
+	switch (EXTRACT_BE_U_4(&rp->rm_call.cb_proc)) {
 
 	case SUNRPC_PMAPPROC_SET:
 	case SUNRPC_PMAPPROC_UNSET:
 	case SUNRPC_PMAPPROC_GETPORT:
 	case SUNRPC_PMAPPROC_CALLIT:
-		x = EXTRACT_32BITS(&rp->rm_call.cb_prog);
+		x = EXTRACT_BE_U_4(&rp->rm_call.cb_prog);
 		if (!ndo->ndo_nflag)
 			ND_PRINT((ndo, " %s", progstr(x)));
 		else
 			ND_PRINT((ndo, " %u", x));
-		ND_PRINT((ndo, ".%u", EXTRACT_32BITS(&rp->rm_call.cb_vers)));
+		ND_PRINT((ndo, ".%u", EXTRACT_BE_U_4(&rp->rm_call.cb_vers)));
 		break;
 	}
 }
@@ -230,7 +230,7 @@ static char *
 progstr(uint32_t prog)
 {
 #if defined(HAVE_GETRPCBYNUMBER) && defined(HAVE_RPC_RPC_H)
-	register struct rpcent *rp;
+	struct rpcent *rp;
 #endif
 	static char buf[32];
 	static uint32_t lastprog = 0;

@@ -26,7 +26,6 @@
 #include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
-#include "ether.h"
 
 #define VQP_VERSION            		1
 #define VQP_EXTRACT_VERSION(x) ((x)&0xFF)
@@ -98,7 +97,7 @@ static const struct tok vqp_obj_values[] = {
 };
 
 void
-vqp_print(netdissect_options *ndo, register const u_char *pptr, register u_int len)
+vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 {
     const struct vqp_common_header_t *vqp_common_header;
     const struct vqp_obj_tlv_t *vqp_obj_tlv;
@@ -143,7 +142,7 @@ vqp_print(netdissect_options *ndo, register const u_char *pptr, register u_int l
 	   tok2str(vqp_msg_type_values, "unknown (%u)",vqp_common_header->msg_type),
 	   tok2str(vqp_error_code_values, "unknown (%u)",vqp_common_header->error_code),
 	   vqp_common_header->error_code,
-           EXTRACT_32BITS(&vqp_common_header->sequence),
+           EXTRACT_BE_U_4(&vqp_common_header->sequence),
            nitems,
            len));
 
@@ -157,8 +156,8 @@ vqp_print(netdissect_options *ndo, register const u_char *pptr, register u_int l
         ND_TCHECK(*vqp_obj_tlv);
         if (sizeof(struct vqp_obj_tlv_t) > tlen)
             goto trunc;
-        vqp_obj_type = EXTRACT_32BITS(vqp_obj_tlv->obj_type);
-        vqp_obj_len = EXTRACT_16BITS(vqp_obj_tlv->obj_length);
+        vqp_obj_type = EXTRACT_BE_U_4(vqp_obj_tlv->obj_type);
+        vqp_obj_len = EXTRACT_BE_U_2(vqp_obj_tlv->obj_length);
         tptr+=sizeof(struct vqp_obj_tlv_t);
         tlen-=sizeof(struct vqp_obj_tlv_t);
 
@@ -172,7 +171,7 @@ vqp_print(netdissect_options *ndo, register const u_char *pptr, register u_int l
         }
 
         /* did we capture enough for fully decoding the object ? */
-        ND_TCHECK2(*tptr, vqp_obj_len);
+        ND_TCHECK_LEN(tptr, vqp_obj_len);
         if (vqp_obj_len > tlen)
             goto trunc;
 
@@ -180,7 +179,7 @@ vqp_print(netdissect_options *ndo, register const u_char *pptr, register u_int l
 	case VQP_OBJ_IP_ADDRESS:
             if (vqp_obj_len != 4)
                 goto trunc;
-            ND_PRINT((ndo, "%s (0x%08x)", ipaddr_string(ndo, tptr), EXTRACT_32BITS(tptr)));
+            ND_PRINT((ndo, "%s (0x%08x)", ipaddr_string(ndo, tptr), EXTRACT_BE_U_4(tptr)));
             break;
             /* those objects have similar semantics - fall through */
         case VQP_OBJ_PORT_NAME:
@@ -192,7 +191,7 @@ vqp_print(netdissect_options *ndo, register const u_char *pptr, register u_int l
             /* those objects have similar semantics - fall through */
 	case VQP_OBJ_MAC_ADDRESS:
 	case VQP_OBJ_MAC_NULL:
-            if (vqp_obj_len != ETHER_ADDR_LEN)
+            if (vqp_obj_len != MAC_ADDR_LEN)
                 goto trunc;
 	      ND_PRINT((ndo, "%s", etheraddr_string(ndo, tptr)));
               break;

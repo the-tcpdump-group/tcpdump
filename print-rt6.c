@@ -36,13 +36,13 @@
 #include "ip6.h"
 
 int
-rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 _U_)
+rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 {
-	register const struct ip6_rthdr *dp;
-	register const struct ip6_rthdr0 *dp0;
-	register const u_char *ep;
-	int i, len;
-	register const struct in6_addr *addr;
+	const struct ip6_rthdr *dp;
+	const struct ip6_rthdr0 *dp0;
+	const u_char *ep;
+	u_int i, len, type;
+	const struct in6_addr *addr;
 
 	dp = (const struct ip6_rthdr *)bp;
 
@@ -51,20 +51,21 @@ rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 
 
 	ND_TCHECK(dp->ip6r_segleft);
 
-	len = dp->ip6r_len;
-	ND_PRINT((ndo, "srcrt (len=%d", dp->ip6r_len));	/*)*/
-	ND_PRINT((ndo, ", type=%d", dp->ip6r_type));
-	ND_PRINT((ndo, ", segleft=%d", dp->ip6r_segleft));
+	len = EXTRACT_U_1(dp->ip6r_len);
+	ND_PRINT((ndo, "srcrt (len=%u", len));	/*)*/
+	type = EXTRACT_U_1(dp->ip6r_type);
+	ND_PRINT((ndo, ", type=%u", type));
+	ND_PRINT((ndo, ", segleft=%u", EXTRACT_U_1(dp->ip6r_segleft)));
 
-	switch (dp->ip6r_type) {
+	switch (type) {
 	case IPV6_RTHDR_TYPE_0:
 	case IPV6_RTHDR_TYPE_2:			/* Mobile IPv6 ID-20 */
 		dp0 = (const struct ip6_rthdr0 *)dp;
 
 		ND_TCHECK(dp0->ip6r0_reserved);
-		if (EXTRACT_32BITS(dp0->ip6r0_reserved) || ndo->ndo_vflag) {
+		if (EXTRACT_BE_U_4(dp0->ip6r0_reserved) || ndo->ndo_vflag) {
 			ND_PRINT((ndo, ", rsv=0x%0x",
-			    EXTRACT_32BITS(&dp0->ip6r0_reserved)));
+			    EXTRACT_BE_U_4(dp0->ip6r0_reserved)));
 		}
 
 		if (len % 2 == 1)
@@ -80,7 +81,7 @@ rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 
 		}
 		/*(*/
 		ND_PRINT((ndo, ") "));
-		return((dp0->ip6r0_len + 1) << 3);
+		return((EXTRACT_U_1(dp0->ip6r0_len) + 1) << 3);
 		break;
 	default:
 		goto trunc;

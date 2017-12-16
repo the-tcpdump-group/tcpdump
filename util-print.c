@@ -53,6 +53,7 @@
 #include <string.h>
 
 #include "netdissect.h"
+#include "extract.h"
 #include "ascii_strcasecmp.h"
 #include "timeval-operations.h"
 
@@ -93,10 +94,10 @@ fn_print_char(netdissect_options *ndo, u_char c)
  */
 int
 fn_print(netdissect_options *ndo,
-         register const u_char *s, register const u_char *ep)
+         const u_char *s, const u_char *ep)
 {
-	register int ret;
-	register u_char c;
+	int ret;
+	u_char c;
 
 	ret = 1;			/* assume truncated */
 	while (ep == NULL || s < ep) {
@@ -127,10 +128,10 @@ fn_print(netdissect_options *ndo,
  */
 u_int
 fn_printztn(netdissect_options *ndo,
-         register const u_char *s, register u_int n, register const u_char *ep)
+         const u_char *s, u_int n, const u_char *ep)
 {
-	register u_int bytes;
-	register u_char c;
+	u_int bytes;
+	u_char c;
 
 	bytes = 0;
 	for (;;) {
@@ -176,9 +177,9 @@ fn_printztn(netdissect_options *ndo,
  */
 int
 fn_printn(netdissect_options *ndo,
-          register const u_char *s, register u_int n, register const u_char *ep)
+          const u_char *s, u_int n, const u_char *ep)
 {
-	register u_char c;
+	u_char c;
 
 	while (n > 0 && (ep == NULL || s < ep)) {
 		n--;
@@ -205,11 +206,11 @@ fn_printn(netdissect_options *ndo,
  */
 int
 fn_printzp(netdissect_options *ndo,
-           register const u_char *s, register u_int n,
-           register const u_char *ep)
+           const u_char *s, u_int n,
+           const u_char *ep)
 {
-	register int ret;
-	register u_char c;
+	int ret;
+	u_char c;
 
 	ret = 1;			/* assume truncated */
 	while (n > 0 && (ep == NULL || s < ep)) {
@@ -311,9 +312,9 @@ _U_
  */
 void
 ts_print(netdissect_options *ndo,
-         register const struct timeval *tvp)
+         const struct timeval *tvp)
 {
-	register int s;
+	int s;
 	struct tm *tm;
 	time_t Time;
 	char buf[TS_BUF_SIZE];
@@ -479,8 +480,8 @@ print_unknown_data(netdissect_options *ndo, const u_char *cp,const char *ident,i
  * Convert a token value to a string; use "fmt" if not found.
  */
 const char *
-tok2strbuf(register const struct tok *lp, register const char *fmt,
-	   register u_int v, char *buf, size_t bufsize)
+tok2strbuf(const struct tok *lp, const char *fmt,
+	   u_int v, char *buf, size_t bufsize)
 {
 	if (lp != NULL) {
 		while (lp->s != NULL) {
@@ -502,8 +503,8 @@ tok2strbuf(register const struct tok *lp, register const char *fmt,
  * in round-robin fashion.
  */
 const char *
-tok2str(register const struct tok *lp, register const char *fmt,
-	register u_int v)
+tok2str(const struct tok *lp, const char *fmt,
+	u_int v)
 {
 	static char buf[4][TOKBUFSIZE];
 	static int idx = 0;
@@ -520,14 +521,14 @@ tok2str(register const struct tok *lp, register const char *fmt,
  * if the s field is positive.
  */
 static char *
-bittok2str_internal(register const struct tok *lp, register const char *fmt,
-	   register u_int v, const char *sep)
+bittok2str_internal(const struct tok *lp, const char *fmt,
+	   u_int v, const char *sep)
 {
         static char buf[1024+1]; /* our string buffer */
         char *bufp = buf;
         size_t space_left = sizeof(buf), string_size;
-        register u_int rotbit; /* this is the bit we rotate through all bitpositions */
-        register u_int tokval;
+        u_int rotbit; /* this is the bit we rotate through all bitpositions */
+        u_int tokval;
         const char * sepstr = "";
 
 	while (lp != NULL && lp->s != NULL) {
@@ -573,8 +574,8 @@ bittok2str_internal(register const struct tok *lp, register const char *fmt,
  * this is useful for parsing bitfields, the output strings are not seperated.
  */
 char *
-bittok2str_nosep(register const struct tok *lp, register const char *fmt,
-	   register u_int v)
+bittok2str_nosep(const struct tok *lp, const char *fmt,
+	   u_int v)
 {
     return (bittok2str_internal(lp, fmt, v, ""));
 }
@@ -584,8 +585,8 @@ bittok2str_nosep(register const struct tok *lp, register const char *fmt,
  * this is useful for parsing bitfields, the output strings are comma seperated.
  */
 char *
-bittok2str(register const struct tok *lp, register const char *fmt,
-	   register u_int v)
+bittok2str(const struct tok *lp, const char *fmt,
+	   u_int v)
 {
     return (bittok2str_internal(lp, fmt, v, ", "));
 }
@@ -597,8 +598,8 @@ bittok2str(register const struct tok *lp, register const char *fmt,
  * correct for bounds-checking.
  */
 const char *
-tok2strary_internal(register const char **lp, int n, register const char *fmt,
-	register int v)
+tok2strary_internal(const char **lp, int n, const char *fmt,
+	int v)
 {
 	static char buf[TOKBUFSIZE];
 
@@ -690,7 +691,7 @@ fetch_token(netdissect_options *ndo, const u_char *pptr, u_int idx, u_int len,
 	size_t toklen = 0;
 
 	for (; idx < len; idx++) {
-		if (!ND_TTEST(*(pptr + idx))) {
+		if (!ND_TTEST_1(pptr + idx)) {
 			/* ran past end of captured data */
 			return (0);
 		}
@@ -724,7 +725,7 @@ fetch_token(netdissect_options *ndo, const u_char *pptr, u_int idx, u_int len,
 	 * an end-of-line (CR or LF).
 	 */
 	for (; idx < len; idx++) {
-		if (!ND_TTEST(*(pptr + idx))) {
+		if (!ND_TTEST_1(pptr + idx)) {
 			/* ran past end of captured data */
 			break;
 		}
@@ -759,7 +760,7 @@ print_txt_line(netdissect_options *ndo, const char *protoname,
 
 	startidx = idx;
 	while (idx < len) {
-		ND_TCHECK(*(pptr+idx));
+		ND_TCHECK_1(pptr + idx);
 		if (*(pptr+idx) == '\n') {
 			/*
 			 * LF without CR; end of line.
@@ -775,7 +776,7 @@ print_txt_line(netdissect_options *ndo, const char *protoname,
 				/* not in this packet */
 				return (0);
 			}
-			ND_TCHECK(*(pptr+idx+1));
+			ND_TCHECK_1(pptr + idx + 1);
 			if (*(pptr+idx+1) == '\n') {
 				/*
 				 * CR-LF; end of line.

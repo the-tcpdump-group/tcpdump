@@ -34,11 +34,9 @@
 #include "netdissect.h"
 #include "addrtoname.h"
 
-#include "ether.h"
-
 struct ipfc_header {
-	u_char  ipfc_dhost[8];
-	u_char  ipfc_shost[8];
+	nd_byte ipfc_dhost[2+MAC_ADDR_LEN];
+	nd_byte ipfc_shost[2+MAC_ADDR_LEN];
 };
 
 #define IPFC_HDRLEN 16
@@ -52,8 +50,8 @@ extract_ipfc_addrs(const struct ipfc_header *ipfcp, char *ipfcsrc,
 	 * We assume that, as per RFC 2625, the lower 48 bits of the
 	 * source and destination addresses are MAC addresses.
 	 */
-	memcpy(ipfcdst, (const char *)&ipfcp->ipfc_dhost[2], 6);
-	memcpy(ipfcsrc, (const char *)&ipfcp->ipfc_shost[2], 6);
+	memcpy(ipfcdst, (const char *)&ipfcp->ipfc_dhost[2], MAC_ADDR_LEN);
+	memcpy(ipfcsrc, (const char *)&ipfcp->ipfc_shost[2], MAC_ADDR_LEN);
 }
 
 /*
@@ -61,9 +59,9 @@ extract_ipfc_addrs(const struct ipfc_header *ipfcp, char *ipfcsrc,
  */
 static inline void
 ipfc_hdr_print(netdissect_options *ndo,
-	   register const struct ipfc_header *ipfcp _U_,
-	   register u_int length, register const u_char *ipfcsrc,
-	   register const u_char *ipfcdst)
+	   const struct ipfc_header *ipfcp _U_,
+	   u_int length, const u_char *ipfcsrc,
+	   const u_char *ipfcdst)
 {
 	const char *srcname, *dstname;
 
@@ -92,7 +90,7 @@ static u_int
 ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 {
 	const struct ipfc_header *ipfcp = (const struct ipfc_header *)p;
-	struct ether_header ehdr;
+	nd_mac_addr srcmac, dstmac;
 	struct lladdr_info src, dst;
 	int llc_hdrlen;
 
@@ -103,14 +101,14 @@ ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 	/*
 	 * Get the network addresses into a canonical form
 	 */
-	extract_ipfc_addrs(ipfcp, (char *)ESRC(&ehdr), (char *)EDST(&ehdr));
+	extract_ipfc_addrs(ipfcp, (char *)srcmac, (char *)dstmac);
 
 	if (ndo->ndo_eflag)
-		ipfc_hdr_print(ndo, ipfcp, length, ESRC(&ehdr), EDST(&ehdr));
+		ipfc_hdr_print(ndo, ipfcp, length, srcmac, dstmac);
 
-	src.addr = ESRC(&ehdr);
+	src.addr = srcmac;
 	src.addr_string = etheraddr_string;
-	dst.addr = EDST(&ehdr);
+	dst.addr = dstmac;
 	dst.addr_string = etheraddr_string;
 
 	/* Skip over Network_Header */
@@ -139,7 +137,7 @@ ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
  * is the number of bytes actually captured.
  */
 u_int
-ipfc_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, register const u_char *p)
+ipfc_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
 	return (ipfc_print(ndo, p, h->len, h->caplen));
 }

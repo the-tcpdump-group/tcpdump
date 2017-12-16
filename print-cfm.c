@@ -27,7 +27,6 @@
 
 #include "netdissect.h"
 #include "extract.h"
-#include "ether.h"
 #include "addrtoname.h"
 #include "oui.h"
 #include "af.h"
@@ -116,8 +115,8 @@ struct cfm_lbm_t {
 struct cfm_ltm_t {
     uint8_t transaction_id[4];
     uint8_t ttl;
-    uint8_t original_mac[ETHER_ADDR_LEN];
-    uint8_t target_mac[ETHER_ADDR_LEN];
+    nd_mac_addr original_mac;
+    nd_mac_addr target_mac;
 };
 
 static const struct tok cfm_ltm_flag_values[] = {
@@ -217,7 +216,7 @@ static const struct tok cfm_tlv_senderid_chassisid_values[] = {
 
 static int
 cfm_network_addr_print(netdissect_options *ndo,
-                       register const u_char *tptr, const u_int length)
+                       const u_char *tptr, const u_int length)
 {
     u_int network_addr_type;
     u_int hexdump =  FALSE;
@@ -232,7 +231,7 @@ cfm_network_addr_print(netdissect_options *ndo,
         return hexdump;
     }
     /* The calling function must make any due ND_TCHECK calls. */
-    network_addr_type = *tptr;
+    network_addr_type = EXTRACT_U_1(tptr);
     ND_PRINT((ndo, "\n\t  Network Address Type %s (%u)",
            tok2str(af_values, "Unknown", network_addr_type),
            network_addr_type));
@@ -269,7 +268,7 @@ cfm_network_addr_print(netdissect_options *ndo,
 
 void
 cfm_print(netdissect_options *ndo,
-          register const u_char *pptr, register u_int length)
+          const u_char *pptr, u_int length)
 {
     const struct cfm_common_header_t *cfm_common_header;
     const struct cfm_tlv_header_t *cfm_tlv_header;
@@ -361,8 +360,8 @@ cfm_print(netdissect_options *ndo,
         }
 
         ND_PRINT((ndo, "\n\t  Sequence Number 0x%08x, MA-End-Point-ID 0x%04x",
-               EXTRACT_32BITS(msg_ptr.cfm_ccm->sequence),
-               EXTRACT_16BITS(msg_ptr.cfm_ccm->ma_epi)));
+               EXTRACT_BE_U_4(msg_ptr.cfm_ccm->sequence),
+               EXTRACT_BE_U_2(msg_ptr.cfm_ccm->ma_epi)));
 
         namesp = msg_ptr.cfm_ccm->names;
         names_data_remaining = sizeof(msg_ptr.cfm_ccm->names);
@@ -370,11 +369,11 @@ cfm_print(netdissect_options *ndo,
         /*
          * Resolve the MD fields.
          */
-        md_nameformat = *namesp;
+        md_nameformat = EXTRACT_U_1(namesp);
         namesp++;
         names_data_remaining--;  /* We know this is != 0 */
         if (md_nameformat != CFM_CCM_MD_FORMAT_NONE) {
-            md_namelength = *namesp;
+            md_namelength = EXTRACT_U_1(namesp);
             namesp++;
             names_data_remaining--; /* We know this is !=0 */
             ND_PRINT((ndo, "\n\t  MD Name Format %s (%u), MD Name length %u",
@@ -428,10 +427,10 @@ cfm_print(netdissect_options *ndo,
         /*
          * Resolve the MA fields.
          */
-        ma_nameformat = *namesp;
+        ma_nameformat = EXTRACT_U_1(namesp);
         namesp++;
         names_data_remaining--; /* We know this is != 0 */
-        ma_namelength = *namesp;
+        ma_namelength = EXTRACT_U_1(namesp);
         namesp++;
         names_data_remaining--; /* We know this is != 0 */
         ND_PRINT((ndo, "\n\t  MA Name-Format %s (%u), MA name length %u",
@@ -477,7 +476,7 @@ cfm_print(netdissect_options *ndo,
                bittok2str(cfm_ltm_flag_values, "none", cfm_common_header->flags)));
 
         ND_PRINT((ndo, "\n\t  Transaction-ID 0x%08x, ttl %u",
-               EXTRACT_32BITS(msg_ptr.cfm_ltm->transaction_id),
+               EXTRACT_BE_U_4(msg_ptr.cfm_ltm->transaction_id),
                msg_ptr.cfm_ltm->ttl));
 
         ND_PRINT((ndo, "\n\t  Original-MAC %s, Target-MAC %s",
@@ -500,7 +499,7 @@ cfm_print(netdissect_options *ndo,
                bittok2str(cfm_ltr_flag_values, "none", cfm_common_header->flags)));
 
         ND_PRINT((ndo, "\n\t  Transaction-ID 0x%08x, ttl %u",
-               EXTRACT_32BITS(msg_ptr.cfm_ltr->transaction_id),
+               EXTRACT_BE_U_4(msg_ptr.cfm_ltr->transaction_id),
                msg_ptr.cfm_ltr->ttl));
 
         ND_PRINT((ndo, "\n\t  Replay-Action %s (%u)",
@@ -529,7 +528,7 @@ cfm_print(netdissect_options *ndo,
         cfm_tlv_header = (const struct cfm_tlv_header_t *)tptr;
 
         /* Enough to read the tlv type ? */
-        ND_TCHECK2(*tptr, 1);
+        ND_TCHECK_1(tptr);
         cfm_tlv_type=cfm_tlv_header->type;
 
         ND_PRINT((ndo, "\n\t%s TLV (0x%02x)",
@@ -544,8 +543,8 @@ cfm_print(netdissect_options *ndo,
         /* do we have the full tlv header ? */
         if (tlen < sizeof(struct cfm_tlv_header_t))
             goto tooshort;
-        ND_TCHECK2(*tptr, sizeof(struct cfm_tlv_header_t));
-        cfm_tlv_len=EXTRACT_16BITS(&cfm_tlv_header->length);
+        ND_TCHECK_LEN(tptr, sizeof(struct cfm_tlv_header_t));
+        cfm_tlv_len=EXTRACT_BE_U_2(&cfm_tlv_header->length);
 
         ND_PRINT((ndo, ", length %u", cfm_tlv_len));
 
@@ -556,7 +555,7 @@ cfm_print(netdissect_options *ndo,
         /* do we have the full tlv ? */
         if (tlen < cfm_tlv_len)
             goto tooshort;
-        ND_TCHECK2(*tptr, cfm_tlv_len);
+        ND_TCHECK_LEN(tptr, cfm_tlv_len);
         hexdump = FALSE;
 
         switch(cfm_tlv_type) {
@@ -566,8 +565,8 @@ cfm_print(netdissect_options *ndo,
                 return;
             }
             ND_PRINT((ndo, ", Status: %s (%u)",
-                   tok2str(cfm_tlv_port_status_values, "Unknown", *tptr),
-                   *tptr));
+                   tok2str(cfm_tlv_port_status_values, "Unknown", EXTRACT_U_1(tptr)),
+                   EXTRACT_U_1(tptr)));
             break;
 
         case CFM_TLV_INTERFACE_STATUS:
@@ -576,8 +575,8 @@ cfm_print(netdissect_options *ndo,
                 return;
             }
             ND_PRINT((ndo, ", Status: %s (%u)",
-                   tok2str(cfm_tlv_interface_status_values, "Unknown", *tptr),
-                   *tptr));
+                   tok2str(cfm_tlv_interface_status_values, "Unknown", EXTRACT_U_1(tptr)),
+                   EXTRACT_U_1(tptr)));
             break;
 
         case CFM_TLV_PRIVATE:
@@ -586,9 +585,9 @@ cfm_print(netdissect_options *ndo,
                 return;
             }
             ND_PRINT((ndo, ", Vendor: %s (%u), Sub-Type %u",
-                   tok2str(oui_values,"Unknown", EXTRACT_24BITS(tptr)),
-                   EXTRACT_24BITS(tptr),
-                   *(tptr + 3)));
+                   tok2str(oui_values,"Unknown", EXTRACT_BE_U_3(tptr)),
+                   EXTRACT_BE_U_3(tptr),
+                   EXTRACT_U_1(tptr + 3)));
             hexdump = TRUE;
             break;
 
@@ -606,7 +605,7 @@ cfm_print(netdissect_options *ndo,
              * Get the Chassis ID length and check it.
              * IEEE 802.1Q-2014 Section 21.5.3.1
              */
-            chassis_id_length = *tptr;
+            chassis_id_length = EXTRACT_U_1(tptr);
             tptr++;
             tlen--;
             cfm_tlv_len--;
@@ -621,7 +620,7 @@ cfm_print(netdissect_options *ndo,
                     ND_PRINT((ndo, "\n\t  (TLV too short)"));
                     goto next_tlv;
                 }
-                chassis_id_type = *tptr;
+                chassis_id_type = EXTRACT_U_1(tptr);
                 cfm_tlv_len--;
                 ND_PRINT((ndo, "\n\t  Chassis-ID Type %s (%u), Chassis-ID length %u",
                        tok2str(cfm_tlv_senderid_chassisid_values,
@@ -638,7 +637,7 @@ cfm_print(netdissect_options *ndo,
                 /* IEEE 802.1Q-2014 Section 21.5.3.3: Chassis ID */
                 switch (chassis_id_type) {
                 case CFM_CHASSIS_ID_MAC_ADDRESS:
-                    if (chassis_id_length != ETHER_ADDR_LEN) {
+                    if (chassis_id_length != MAC_ADDR_LEN) {
                         ND_PRINT((ndo, " (invalid MAC address length)"));
                         hexdump = TRUE;
                         break;
@@ -680,7 +679,7 @@ cfm_print(netdissect_options *ndo,
             }
 
             /* Here mgmt_addr_length stands for the management domain length. */
-            mgmt_addr_length = *tptr;
+            mgmt_addr_length = EXTRACT_U_1(tptr);
             tptr++;
             tlen--;
             cfm_tlv_len--;
@@ -710,7 +709,7 @@ cfm_print(netdissect_options *ndo,
                 }
 
                 /* Here mgmt_addr_length stands for the management address length. */
-                mgmt_addr_length = *tptr;
+                mgmt_addr_length = EXTRACT_U_1(tptr);
                 tptr++;
                 tlen--;
                 cfm_tlv_len--;

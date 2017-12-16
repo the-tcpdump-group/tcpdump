@@ -31,7 +31,6 @@
 
 #include "netdissect.h"
 #include "addrtoname.h"
-#include "ether.h"
 #include "ethertype.h"
 #include "extract.h"
 
@@ -86,11 +85,11 @@ struct  arp_pkthdr {
 
 #define ARP_HDRLEN	8
 
-#define HRD(ap) EXTRACT_16BITS(&(ap)->ar_hrd)
+#define HRD(ap) EXTRACT_BE_U_2(&(ap)->ar_hrd)
 #define HRD_LEN(ap) ((ap)->ar_hln)
 #define PROTO_LEN(ap) ((ap)->ar_pln)
-#define OP(ap)  EXTRACT_16BITS(&(ap)->ar_op)
-#define PRO(ap) EXTRACT_16BITS(&(ap)->ar_pro)
+#define OP(ap)  EXTRACT_BE_U_2(&(ap)->ar_op)
+#define PRO(ap) EXTRACT_BE_U_2(&(ap)->ar_pro)
 #define SHA(ap) (ar_sha(ap))
 #define SPA(ap) (ar_spa(ap))
 #define THA(ap) (ar_tha(ap))
@@ -153,12 +152,12 @@ struct  atmarp_pkthdr {
 	u_char	aar_tpa[];	/* target protocol address */
 #endif
 
-#define ATMHRD(ap)  EXTRACT_16BITS(&(ap)->aar_hrd)
+#define ATMHRD(ap)  EXTRACT_BE_U_2(&(ap)->aar_hrd)
 #define ATMSHRD_LEN(ap) ((ap)->aar_shtl & ATMARP_LEN_MASK)
 #define ATMSSLN(ap) ((ap)->aar_sstl & ATMARP_LEN_MASK)
 #define ATMSPROTO_LEN(ap) ((ap)->aar_spln)
-#define ATMOP(ap)   EXTRACT_16BITS(&(ap)->aar_op)
-#define ATMPRO(ap)  EXTRACT_16BITS(&(ap)->aar_pro)
+#define ATMOP(ap)   EXTRACT_BE_U_2(&(ap)->aar_op)
+#define ATMPRO(ap)  EXTRACT_BE_U_2(&(ap)->aar_pro)
 #define ATMTHRD_LEN(ap) ((ap)->aar_thtl & ATMARP_LEN_MASK)
 #define ATMTSLN(ap) ((ap)->aar_tstl & ATMARP_LEN_MASK)
 #define ATMTPROTO_LEN(ap) ((ap)->aar_tpln)
@@ -181,7 +180,7 @@ static int
 isnonzero(const u_char *a, size_t len)
 {
 	while (len > 0) {
-		if (*a != 0)
+		if (EXTRACT_U_1(a) != 0)
 			return (1);
 		a++;
 		len--;
@@ -266,7 +265,7 @@ atmarp_print(netdissect_options *ndo,
 	pro = ATMPRO(ap);
 	op = ATMOP(ap);
 
-	if (!ND_TTEST2(*aar_tpa(ap), ATMTPROTO_LEN(ap))) {
+	if (!ND_TTEST_LEN(aar_tpa(ap), ATMTPROTO_LEN(ap))) {
 		ND_PRINT((ndo, "%s", tstr));
 		ND_DEFAULTPRINT((const u_char *)ap, length);
 		return;
@@ -385,7 +384,7 @@ arp_print(netdissect_options *ndo,
             break;
 	}
 
-	if (!ND_TTEST2(*TPA(ap), PROTO_LEN(ap))) {
+	if (!ND_TTEST_LEN(TPA(ap), PROTO_LEN(ap))) {
 		ND_PRINT((ndo, "%s", tstr));
 		ND_DEFAULTPRINT((const u_char *)ap, length);
 		return;

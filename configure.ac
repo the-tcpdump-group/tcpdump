@@ -406,7 +406,7 @@ fi
 
 AC_REPLACE_FUNCS(vfprintf strlcat strlcpy strdup strsep getservent getopt_long)
 AC_CHECK_FUNCS(fork vfork strftime)
-AC_CHECK_FUNCS(setlinebuf alarm)
+AC_CHECK_FUNCS(setlinebuf)
 
 needsnprintf=no
 AC_CHECK_FUNCS(vsnprintf snprintf,,
@@ -544,9 +544,6 @@ don't.])
 don't.])
 	fi
 fi
-
-# libdlpi is needed for Solaris 11 and later.
-AC_CHECK_LIB(dlpi, dlpi_walk, LIBS="$LIBS -ldlpi" LDFLAGS="-L/lib $LDFLAGS", ,-L/lib)
 
 dnl
 dnl Check for "pcap_list_datalinks()", "pcap_set_datalink()",

@@ -40,7 +40,6 @@
 
 #include "netdissect.h"
 #include "extract.h"
-#include "ether.h"
 #include "addrtoname.h"
 
 static const char tstr[] = " [|loopback]";
@@ -63,8 +62,8 @@ loopback_message_print(netdissect_options *ndo, const u_char *cp, const u_int le
 	if (len < 2)
 		goto invalid;
 	/* function */
-	ND_TCHECK2(*cp, 2);
-	function = EXTRACT_LE_16BITS(cp);
+	ND_TCHECK_2(cp);
+	function = EXTRACT_LE_U_2(cp);
 	cp += 2;
 	ND_PRINT((ndo, ", %s", tok2str(fcode_str, " invalid (%u)", function)));
 
@@ -73,33 +72,33 @@ loopback_message_print(netdissect_options *ndo, const u_char *cp, const u_int le
 			if (len < 4)
 				goto invalid;
 			/* receipt number */
-			ND_TCHECK2(*cp, 2);
-			ND_PRINT((ndo, ", receipt number %u", EXTRACT_LE_16BITS(cp)));
+			ND_TCHECK_2(cp);
+			ND_PRINT((ndo, ", receipt number %u", EXTRACT_LE_U_2(cp)));
 			cp += 2;
 			/* data */
 			ND_PRINT((ndo, ", data (%u octets)", len - 4));
-			ND_TCHECK2(*cp, len - 4);
+			ND_TCHECK_LEN(cp, len - 4);
 			break;
 		case LOOPBACK_FWDDATA:
 			if (len < 8)
 				goto invalid;
 			/* forwarding address */
-			ND_TCHECK2(*cp, ETHER_ADDR_LEN);
+			ND_TCHECK_LEN(cp, MAC_ADDR_LEN);
 			ND_PRINT((ndo, ", forwarding address %s", etheraddr_string(ndo, cp)));
-			cp += ETHER_ADDR_LEN;
+			cp += MAC_ADDR_LEN;
 			/* data */
 			ND_PRINT((ndo, ", data (%u octets)", len - 8));
-			ND_TCHECK2(*cp, len - 8);
+			ND_TCHECK_LEN(cp, len - 8);
 			break;
 		default:
-			ND_TCHECK2(*cp, len - 2);
+			ND_TCHECK_LEN(cp, len - 2);
 			break;
 	}
 	return;
 
 invalid:
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, ep - cp);
+	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
@@ -115,8 +114,8 @@ loopback_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 	if (len < 2)
 		goto invalid;
 	/* skipCount */
-	ND_TCHECK2(*cp, 2);
-	skipCount = EXTRACT_LE_16BITS(cp);
+	ND_TCHECK_2(cp);
+	skipCount = EXTRACT_LE_U_2(cp);
 	cp += 2;
 	ND_PRINT((ndo, ", skipCount %u", skipCount));
 	if (skipCount % 8)
@@ -128,7 +127,7 @@ loopback_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 
 invalid:
 	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, ep - cp);
+	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));

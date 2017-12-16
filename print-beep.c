@@ -31,7 +31,7 @@ static int
 l_strnstart(netdissect_options *ndo, const char *tstr1, u_int tl1,
     const char *str2, u_int l2)
 {
-	if (!ND_TTEST2(*str2, tl1)) {
+	if (!ND_TTEST_LEN(str2, tl1)) {
 		/*
 		 * We don't have tl1 bytes worth of captured data
 		 * for the string, so we can't check for this

@@ -51,16 +51,16 @@ babel_print(netdissect_options *ndo,
 {
     ND_PRINT((ndo, "babel"));
 
-    ND_TCHECK2(*cp, 4);
+    ND_TCHECK_4(cp);
 
-    if(cp[0] != 42) {
+    if(EXTRACT_U_1(cp) != 42) {
         ND_PRINT((ndo, " invalid header"));
         return;
     } else {
-        ND_PRINT((ndo, " %d", cp[1]));
+        ND_PRINT((ndo, " %d", EXTRACT_U_1(cp + 1)));
     }
 
-    switch(cp[1]) {
+    switch(EXTRACT_U_1(cp + 1)) {
     case 2:
         babel_print_v2(ndo, cp, length);
         break;
@@ -112,7 +112,9 @@ format_id(const u_char *id)
 {
     static char buf[25];
     snprintf(buf, 25, "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
-             id[0], id[1], id[2], id[3], id[4], id[5], id[6], id[7]);
+             EXTRACT_U_1(id), EXTRACT_U_1(id + 1), EXTRACT_U_1(id + 2),
+             EXTRACT_U_1(id + 3), EXTRACT_U_1(id + 4), EXTRACT_U_1(id + 5),
+             EXTRACT_U_1(id + 6), EXTRACT_U_1(id + 7));
     buf[24] = '\0';
     return buf;
 }
@@ -274,14 +276,16 @@ subtlvs_print(netdissect_options *ndo,
     uint32_t t1, t2;
 
     while (cp < ep) {
-        subtype = *cp++;
+        subtype = EXTRACT_U_1(cp);
+        cp++;
         if(subtype == MESSAGE_SUB_PAD1) {
             ND_PRINT((ndo, " sub-pad1"));
             continue;
         }
         if(cp == ep)
             goto invalid;
-        sublen = *cp++;
+        sublen = EXTRACT_U_1(cp);
+        cp++;
         if(cp + sublen > ep)
             goto invalid;
 
@@ -298,7 +302,8 @@ subtlvs_print(netdissect_options *ndo,
             }
             sep = " ";
             while(sublen--) {
-                ND_PRINT((ndo, "%s%s", sep, tok2str(diversity_str, "%u", *cp++)));
+                ND_PRINT((ndo, "%s%s", sep, tok2str(diversity_str, "%u", EXTRACT_U_1(cp))));
+                cp++;
                 sep = "-";
             }
             if(tlv_type != MESSAGE_UPDATE &&
@@ -310,14 +315,14 @@ subtlvs_print(netdissect_options *ndo,
             if(tlv_type == MESSAGE_HELLO) {
                 if(sublen < 4)
                     goto invalid;
-                t1 = EXTRACT_32BITS(cp);
+                t1 = EXTRACT_BE_U_4(cp);
                 ND_PRINT((ndo, " %s", format_timestamp(t1)));
             } else if(tlv_type == MESSAGE_IHU) {
                 if(sublen < 8)
                     goto invalid;
-                t1 = EXTRACT_32BITS(cp);
+                t1 = EXTRACT_BE_U_4(cp);
                 ND_PRINT((ndo, " %s", format_timestamp(t1)));
-                t2 = EXTRACT_32BITS(cp + 4);
+                t2 = EXTRACT_BE_U_4(cp + 4);
                 ND_PRINT((ndo, "|%s", format_timestamp(t2)));
             } else
                 ND_PRINT((ndo, " (bogus)"));
@@ -347,10 +352,10 @@ babel_print_v2(netdissect_options *ndo,
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF, 0, 0, 0, 0 };
     u_char v6_prefix[16] = {0};
 
-    ND_TCHECK2(*cp, 4);
+    ND_TCHECK_4(cp);
     if (length < 4)
         goto invalid;
-    bodylen = EXTRACT_16BITS(cp + 2);
+    bodylen = EXTRACT_BE_U_2(cp + 2);
     ND_PRINT((ndo, " (%u)", bodylen));
 
     /* Process the TLVs in the body */
@@ -361,18 +366,18 @@ babel_print_v2(netdissect_options *ndo,
 
         message = cp + 4 + i;
 
-        ND_TCHECK2(*message, 1);
-        if((type = message[0]) == MESSAGE_PAD1) {
+        ND_TCHECK_1(message);
+        if((type = EXTRACT_U_1(message)) == MESSAGE_PAD1) {
             ND_PRINT((ndo, ndo->ndo_vflag ? "\n\tPad 1" : " pad1"));
             i += 1;
             continue;
         }
 
-        ND_TCHECK2(*message, 2);
+        ND_TCHECK_2(message);
         ICHECK(i, 2);
-        len = message[1];
+        len = EXTRACT_U_1(message + 1);
 
-        ND_TCHECK2(*message, 2 + len);
+        ND_TCHECK_LEN(message, 2 + len);
         ICHECK(i, 2 + len);
 
         switch(type) {
@@ -391,8 +396,8 @@ babel_print_v2(netdissect_options *ndo,
             else {
                 ND_PRINT((ndo, "\n\tAcknowledgment Request "));
                 if(len < 6) goto invalid;
-                nonce = EXTRACT_16BITS(message + 4);
-                interval = EXTRACT_16BITS(message + 6);
+                nonce = EXTRACT_BE_U_2(message + 4);
+                interval = EXTRACT_BE_U_2(message + 6);
                 ND_PRINT((ndo, "%04x %s", nonce, format_interval(interval)));
             }
         }
@@ -405,7 +410,7 @@ babel_print_v2(netdissect_options *ndo,
             else {
                 ND_PRINT((ndo, "\n\tAcknowledgment "));
                 if(len < 2) goto invalid;
-                nonce = EXTRACT_16BITS(message + 2);
+                nonce = EXTRACT_BE_U_2(message + 2);
                 ND_PRINT((ndo, "%04x", nonce));
             }
         }
@@ -418,8 +423,8 @@ babel_print_v2(netdissect_options *ndo,
             else {
                 ND_PRINT((ndo, "\n\tHello "));
                 if(len < 6) goto invalid;
-                seqno = EXTRACT_16BITS(message + 4);
-                interval = EXTRACT_16BITS(message + 6);
+                seqno = EXTRACT_BE_U_2(message + 4);
+                interval = EXTRACT_BE_U_2(message + 6);
                 ND_PRINT((ndo, "seqno %u interval %s", seqno, format_interval(interval)));
                 /* Extra data. */
                 if(len > 6)
@@ -437,9 +442,10 @@ babel_print_v2(netdissect_options *ndo,
                 int rc;
                 ND_PRINT((ndo, "\n\tIHU "));
                 if(len < 6) goto invalid;
-                txcost = EXTRACT_16BITS(message + 4);
-                interval = EXTRACT_16BITS(message + 6);
-                rc = network_address(message[2], message + 8, len - 6, address);
+                txcost = EXTRACT_BE_U_2(message + 4);
+                interval = EXTRACT_BE_U_2(message + 6);
+                rc = network_address(EXTRACT_U_1(message + 2), message + 8,
+                                     len - 6, address);
                 if(rc < 0) { ND_PRINT((ndo, "%s", tstr)); break; }
                 ND_PRINT((ndo, "%s txcost %u interval %s",
                        format_address(ndo, address), txcost, format_interval(interval)));
@@ -470,7 +476,8 @@ babel_print_v2(netdissect_options *ndo,
                 u_char nh[16];
                 ND_PRINT((ndo, "\n\tNext Hop"));
                 if(len < 2) goto invalid;
-                rc = network_address(message[2], message + 4, len - 2, nh);
+                rc = network_address(EXTRACT_U_1(message + 2), message + 4,
+                                     len - 2, nh);
                 if(rc < 0) goto invalid;
                 ND_PRINT((ndo, " %s", format_address(ndo, nh)));
             }
@@ -484,9 +491,9 @@ babel_print_v2(netdissect_options *ndo,
                     ND_PRINT((ndo, "/truncated"));
                 else
                     ND_PRINT((ndo, "%s%s%s",
-                           (message[3] & 0x80) ? "/prefix": "",
-                           (message[3] & 0x40) ? "/id" : "",
-                           (message[3] & 0x3f) ? "/unknown" : ""));
+                           (EXTRACT_U_1(message + 3) & 0x80) ? "/prefix": "",
+                           (EXTRACT_U_1(message + 3) & 0x40) ? "/id" : "",
+                           (EXTRACT_U_1(message + 3) & 0x3f) ? "/unknown" : ""));
             } else {
                 u_short interval, seqno, metric;
                 u_char plen;
@@ -494,23 +501,25 @@ babel_print_v2(netdissect_options *ndo,
                 u_char prefix[16];
                 ND_PRINT((ndo, "\n\tUpdate"));
                 if(len < 10) goto invalid;
-                plen = message[4] + (message[2] == 1 ? 96 : 0);
-                rc = network_prefix(message[2], message[4], message[5],
+                plen = EXTRACT_U_1(message + 4) + (EXTRACT_U_1(message + 2) == 1 ? 96 : 0);
+                rc = network_prefix(EXTRACT_U_1(message + 2),
+                                    EXTRACT_U_1(message + 4),
+                                    EXTRACT_U_1(message + 5),
                                     message + 12,
-                                    message[2] == 1 ? v4_prefix : v6_prefix,
+                                    EXTRACT_U_1(message + 2) == 1 ? v4_prefix : v6_prefix,
                                     len - 10, prefix);
                 if(rc < 0) goto invalid;
-                interval = EXTRACT_16BITS(message + 6);
-                seqno = EXTRACT_16BITS(message + 8);
-                metric = EXTRACT_16BITS(message + 10);
+                interval = EXTRACT_BE_U_2(message + 6);
+                seqno = EXTRACT_BE_U_2(message + 8);
+                metric = EXTRACT_BE_U_2(message + 10);
                 ND_PRINT((ndo, "%s%s%s %s metric %u seqno %u interval %s",
-                       (message[3] & 0x80) ? "/prefix": "",
-                       (message[3] & 0x40) ? "/id" : "",
-                       (message[3] & 0x3f) ? "/unknown" : "",
+                       (EXTRACT_U_1(message + 3) & 0x80) ? "/prefix": "",
+                       (EXTRACT_U_1(message + 3) & 0x40) ? "/id" : "",
+                       (EXTRACT_U_1(message + 3) & 0x3f) ? "/unknown" : "",
                        format_prefix(ndo, prefix, plen),
                        metric, seqno, format_interval_update(interval)));
-                if(message[3] & 0x80) {
-                    if(message[2] == 1)
+                if(EXTRACT_U_1(message + 3) & 0x80) {
+                    if(EXTRACT_U_1(message + 2) == 1)
                         memcpy(v4_prefix, prefix, 16);
                     else
                         memcpy(v6_prefix, prefix, 16);
@@ -530,12 +539,13 @@ babel_print_v2(netdissect_options *ndo,
                 u_char prefix[16], plen;
                 ND_PRINT((ndo, "\n\tRequest "));
                 if(len < 2) goto invalid;
-                plen = message[3] + (message[2] == 1 ? 96 : 0);
-                rc = network_prefix(message[2], message[3], 0,
+                plen = EXTRACT_U_1(message + 3) + (EXTRACT_U_1(message + 2) == 1 ? 96 : 0);
+                rc = network_prefix(EXTRACT_U_1(message + 2),
+                                    EXTRACT_U_1(message + 3), 0,
                                     message + 4, NULL, len - 2, prefix);
                 if(rc < 0) goto invalid;
                 ND_PRINT((ndo, "for %s",
-                       message[2] == 0 ? "any" : format_prefix(ndo, prefix, plen)));
+                       EXTRACT_U_1(message + 2) == 0 ? "any" : format_prefix(ndo, prefix, plen)));
             }
         }
             break;
@@ -549,13 +559,14 @@ babel_print_v2(netdissect_options *ndo,
                 u_char prefix[16], plen;
                 ND_PRINT((ndo, "\n\tMH-Request "));
                 if(len < 14) goto invalid;
-                seqno = EXTRACT_16BITS(message + 4);
-                rc = network_prefix(message[2], message[3], 0,
+                seqno = EXTRACT_BE_U_2(message + 4);
+                rc = network_prefix(EXTRACT_U_1(message + 2),
+                                    EXTRACT_U_1(message + 3), 0,
                                     message + 16, NULL, len - 14, prefix);
                 if(rc < 0) goto invalid;
-                plen = message[3] + (message[2] == 1 ? 96 : 0);
+                plen = EXTRACT_U_1(message + 3) + (EXTRACT_U_1(message + 2) == 1 ? 96 : 0);
                 ND_PRINT((ndo, "(%u hops) for %s seqno %u id %s",
-                       message[6], format_prefix(ndo, prefix, plen),
+                       EXTRACT_U_1(message + 6), format_prefix(ndo, prefix, plen),
                        seqno, format_id(message + 8)));
             }
         }
@@ -566,8 +577,8 @@ babel_print_v2(netdissect_options *ndo,
             else {
                 ND_PRINT((ndo, "\n\tTS/PC "));
                 if(len < 6) goto invalid;
-                ND_PRINT((ndo, "timestamp %u packetcounter %u", EXTRACT_32BITS (message + 4),
-                       EXTRACT_16BITS(message + 2)));
+                ND_PRINT((ndo, "timestamp %u packetcounter %u", EXTRACT_BE_U_4(message + 4),
+                          EXTRACT_BE_U_2(message + 2)));
             }
             break;
         case MESSAGE_HMAC : {
@@ -577,9 +588,9 @@ babel_print_v2(netdissect_options *ndo,
                 unsigned j;
                 ND_PRINT((ndo, "\n\tHMAC "));
                 if(len < 18) goto invalid;
-                ND_PRINT((ndo, "key-id %u digest-%u ", EXTRACT_16BITS(message + 2), len - 2));
+                ND_PRINT((ndo, "key-id %u digest-%u ", EXTRACT_BE_U_2(message + 2), len - 2));
                 for (j = 0; j < len - 2; j++)
-                    ND_PRINT((ndo, "%02X", message[4 + j]));
+                    ND_PRINT((ndo, "%02X", EXTRACT_U_1(message + j + 4)));
             }
         }
             break;
@@ -595,13 +606,13 @@ babel_print_v2(netdissect_options *ndo,
                 int parsed_len = 10;
                 ND_PRINT((ndo, "\n\tSS-Update"));
                 if(len < 10) goto invalid;
-                ae = message[2];
-                src_plen = message[3];
-                plen = message[4];
-                omitted = message[5];
-                interval = EXTRACT_16BITS(message + 6);
-                seqno = EXTRACT_16BITS(message + 8);
-                metric = EXTRACT_16BITS(message + 10);
+                ae = EXTRACT_U_1(message + 2);
+                src_plen = EXTRACT_U_1(message + 3);
+                plen = EXTRACT_U_1(message + 4);
+                omitted = EXTRACT_U_1(message + 5);
+                interval = EXTRACT_BE_U_2(message + 6);
+                seqno = EXTRACT_BE_U_2(message + 8);
+                metric = EXTRACT_BE_U_2(message + 10);
                 rc = network_prefix(ae, plen, omitted, message + 2 + parsed_len,
                                     ae == 1 ? v4_prefix : v6_prefix,
                                     len - parsed_len, prefix);
@@ -636,9 +647,9 @@ babel_print_v2(netdissect_options *ndo,
                 u_char ae, plen, src_plen, prefix[16], src_prefix[16];
                 ND_PRINT((ndo, "\n\tSS-Request "));
                 if(len < 3) goto invalid;
-                ae = message[2];
-                plen = message[3];
-                src_plen = message[4];
+                ae = EXTRACT_U_1(message + 2);
+                plen = EXTRACT_U_1(message + 3);
+                src_plen = EXTRACT_U_1(message + 4);
                 rc = network_prefix(ae, plen, 0, message + 2 + parsed_len,
                                     NULL, len - parsed_len, prefix);
                 if(rc < 0) goto invalid;
@@ -671,11 +682,11 @@ babel_print_v2(netdissect_options *ndo,
                 const u_char *router_id = NULL;
                 ND_PRINT((ndo, "\n\tSS-MH-Request "));
                 if(len < 14) goto invalid;
-                ae = message[2];
-                plen = message[3];
-                seqno = EXTRACT_16BITS(message + 4);
-                hopc = message[6];
-                src_plen = message[7];
+                ae = EXTRACT_U_1(message + 2);
+                plen = EXTRACT_U_1(message + 3);
+                seqno = EXTRACT_BE_U_2(message + 4);
+                hopc = EXTRACT_U_1(message + 6);
+                src_plen = EXTRACT_U_1(message + 7);
                 router_id = message + 8;
                 rc = network_prefix(ae, plen, 0, message + 2 + parsed_len,
                                     NULL, len - parsed_len, prefix);

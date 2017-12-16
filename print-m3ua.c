@@ -219,19 +219,19 @@ tag_value_print(netdissect_options *ndo,
     /* buf and size don't include the header */
     if (size < 4)
       goto invalid;
-    ND_TCHECK2(*buf, size);
-    ND_PRINT((ndo, "0x%08x", EXTRACT_32BITS(buf)));
+    ND_TCHECK_LEN(buf, size);
+    ND_PRINT((ndo, "0x%08x", EXTRACT_BE_U_4(buf)));
     break;
   /* ... */
   default:
     ND_PRINT((ndo, "(length %u)", size + (u_int)sizeof(struct m3ua_param_header)));
-    ND_TCHECK2(*buf, size);
+    ND_TCHECK_LEN(buf, size);
   }
   return;
 
 invalid:
   ND_PRINT((ndo, "%s", istr));
-  ND_TCHECK2(*buf, size);
+  ND_TCHECK_LEN(buf, size);
   return;
 trunc:
   ND_PRINT((ndo, "%s", tstr));
@@ -260,18 +260,18 @@ m3ua_tags_print(netdissect_options *ndo,
   while (p < buf + size) {
     if (p + sizeof(struct m3ua_param_header) > buf + size)
       goto invalid;
-    ND_TCHECK2(*p, sizeof(struct m3ua_param_header));
+    ND_TCHECK_LEN(p, sizeof(struct m3ua_param_header));
     /* Parameter Tag */
-    hdr_tag = EXTRACT_16BITS(p);
+    hdr_tag = EXTRACT_BE_U_2(p);
     ND_PRINT((ndo, "\n\t\t\t%s: ", tok2str(ParamName, "Unknown Parameter (0x%04x)", hdr_tag)));
     /* Parameter Length */
-    hdr_len = EXTRACT_16BITS(p + 2);
+    hdr_len = EXTRACT_BE_U_2(p + 2);
     if (hdr_len < sizeof(struct m3ua_param_header))
       goto invalid;
     /* Parameter Value */
     align = (p + hdr_len - buf) % 4;
     align = align ? 4 - align : 0;
-    ND_TCHECK2(*p, hdr_len + align);
+    ND_TCHECK_LEN(p, hdr_len + align);
     tag_value_print(ndo, p, hdr_tag, hdr_len - sizeof(struct m3ua_param_header));
     p += hdr_len + align;
   }
@@ -279,7 +279,7 @@ m3ua_tags_print(netdissect_options *ndo,
 
 invalid:
   ND_PRINT((ndo, "%s", istr));
-  ND_TCHECK2(*buf, size);
+  ND_TCHECK_LEN(buf, size);
   return;
 trunc:
   ND_PRINT((ndo, "%s", tstr));
@@ -323,15 +323,16 @@ m3ua_print(netdissect_options *ndo,
   if (dict != NULL)
     ND_PRINT((ndo, " %s Message", tok2str(dict, "Unknown (0x%02x)", hdr->msg_type)));
 
-  if (size != EXTRACT_32BITS(&hdr->len))
-    ND_PRINT((ndo, "\n\t\t\t@@@@@@ Corrupted length %u of message @@@@@@", EXTRACT_32BITS(&hdr->len)));
+  if (size != EXTRACT_BE_U_4(&hdr->len))
+    ND_PRINT((ndo, "\n\t\t\t@@@@@@ Corrupted length %u of message @@@@@@", EXTRACT_BE_U_4(&hdr->len)));
   else
-    m3ua_tags_print(ndo, buf + sizeof(struct m3ua_common_header), EXTRACT_32BITS(&hdr->len) - sizeof(struct m3ua_common_header));
+    m3ua_tags_print(ndo, buf + sizeof(struct m3ua_common_header),
+                    EXTRACT_BE_U_4(&hdr->len) - sizeof(struct m3ua_common_header));
   return;
 
 invalid:
   ND_PRINT((ndo, "%s", istr));
-  ND_TCHECK2(*buf, size);
+  ND_TCHECK_LEN(buf, size);
   return;
 trunc:
   ND_PRINT((ndo, "%s", tstr));

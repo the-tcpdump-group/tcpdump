@@ -87,10 +87,10 @@ struct enchdr {
 
 u_int
 enc_if_print(netdissect_options *ndo,
-             const struct pcap_pkthdr *h, register const u_char *p)
+             const struct pcap_pkthdr *h, const u_char *p)
 {
-	register u_int length = h->len;
-	register u_int caplen = h->caplen;
+	u_int length = h->len;
+	u_int caplen = h->caplen;
 	int flags;
 	const struct enchdr *hdr;
 
@@ -108,7 +108,7 @@ enc_if_print(netdissect_options *ndo,
 	ENC_PRINT_TYPE(flags, M_AUTH, "authentic");
 	ENC_PRINT_TYPE(flags, M_CONF, "confidential");
 	/* ENC_PRINT_TYPE(flags, M_TUNNEL, "tunnel"); */
-	ND_PRINT((ndo, "SPI 0x%08x: ", EXTRACT_32BITS(&hdr->spi)));
+	ND_PRINT((ndo, "SPI 0x%08x: ", EXTRACT_BE_U_4(&hdr->spi)));
 
 	length -= ENC_HDRLEN;
 	caplen -= ENC_HDRLEN;

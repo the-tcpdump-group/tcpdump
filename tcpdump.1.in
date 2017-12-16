@@ -620,14 +620,21 @@ default of 262144 bytes.
 Packets truncated because of a limited snapshot
 are indicated in the output with ``[|\fIproto\fP]'', where \fIproto\fP
 is the name of the protocol level at which the truncation has occurred.
+.IP
 Note that taking larger snapshots both increases
 the amount of time it takes to process packets and, effectively,
 decreases the amount of packet buffering.
 This may cause packets to be
 lost.
-You should limit \fIsnaplen\fP to the smallest number that will
-capture the protocol information you're interested in.
-Setting
+Note also that taking smaller snapshots will discard data from protocols
+above the transport layer, which loses information that may be
+important.  NFS and AFS requests and replies, for example, are very
+large, and much of the detail won't be available if a too-short snapshot
+length is selected.
+.IP
+If you need to reduce the snapshot size below the default, you should
+limit \fIsnaplen\fP to the smallest number that will capture the
+protocol information you're interested in.  Setting
 \fIsnaplen\fP to 0 sets it to the default of 262144,
 for backwards compatibility with recent older versions of
 .IR tcpdump .
@@ -1675,11 +1682,6 @@ the file mode (in octal), the uid and gid, and the file size.
 .LP
 If the \-v flag is given more than once, even more details are printed.
 .LP
-Note that NFS requests are very large and much of the detail won't be printed
-unless \fIsnaplen\fP is increased.
-Try using `\fB\-s 192\fP' to watch
-NFS traffic.
-.LP
 NFS reply packets do not explicitly identify the RPC operation.
 Instead,
 \fItcpdump\fP keeps track of ``recent'' requests, and matches them to the
@@ -1742,11 +1744,6 @@ are printed.
 Error codes are printed for abort packets, with the exception of Ubik
 beacon packets (because abort packets are used to signify a yes vote
 for the Ubik protocol).
-.LP
-Note that AFS requests are very large and many of the arguments won't
-be printed unless \fIsnaplen\fP is increased.
-Try using `\fB-s 256\fP'
-to watch AFS traffic.
 .LP
 AFS reply packets do not explicitly identify the RPC operation.
 Instead,

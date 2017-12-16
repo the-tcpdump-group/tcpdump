@@ -97,7 +97,10 @@ The Regents of the University of California.  All rights reserved.\n";
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
-#ifndef _WIN32
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <sys/time.h>
 #include <sys/wait.h>
 #include <sys/resource.h>
 #include <pwd.h>
@@ -223,13 +226,12 @@ static void droproot(const char *, const char *);
 void requestinfo(int);
 #endif
 
-#if defined(USE_WIN32_MM_TIMER)
-  #include <MMsystem.h>
-  static UINT timer_id;
-  static void CALLBACK verbose_stats_dump(UINT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR);
-#elif defined(HAVE_ALARM)
+#ifdef _WIN32
+    static HANDLE timer_handle = INVALID_HANDLE_VALUE;
+    static void CALLBACK verbose_stats_dump(PVOID param, BOOLEAN timer_fired);
+#else /* _WIN32 */
   static void verbose_stats_dump(int sig);
-#endif
+#endif /* _WIN32 */
 
 static void info(int);
 static u_int packets_captured;
@@ -927,10 +929,10 @@ set_dumper_capsicum_rights(pcap_dumper_t *p)
  * Copy arg vector into a new buffer, concatenating arguments with spaces.
  */
 static char *
-copy_argv(register char **argv)
+copy_argv(char **argv)
 {
-	register char **p;
-	register u_int len = 0;
+	char **p;
+	u_int len = 0;
 	char *buf;
 	char *src, *dst;
 
@@ -970,8 +972,8 @@ copy_argv(register char **argv)
 static char *
 read_infile(char *fname)
 {
-	register int i, fd, cc;
-	register char *cp;
+	int i, fd, cc;
+	char *cp;
 	struct stat buf;
 
 	fd = open(fname, O_RDONLY|O_BINARY);
@@ -1280,10 +1282,10 @@ fprintf(stderr, "Opening %s\n", device);
 int
 main(int argc, char **argv)
 {
-	register int cnt, op, i;
+	int cnt, op, i;
 	bpf_u_int32 localnet = 0, netmask = 0;
 	int timezone_offset = 0;
-	register char *cp, *infile, *cmdbuf, *device, *RFileName, *VFileName, *WFileName;
+	char *cp, *infile, *cmdbuf, *device, *RFileName, *VFileName, *WFileName;
 	char *endp;
 	pcap_handler callback;
 	int dlt;
@@ -2202,14 +2204,32 @@ DIAG_ON_CLANG(assign-enum)
 		 *"-v" means tcpdump should, once per second,
 		 * "v"erbosely report the number of packets captured.
 		 */
-#ifdef USE_WIN32_MM_TIMER
-		/* call verbose_stats_dump() each 1000 +/-100msec */
-		timer_id = timeSetEvent(1000, 100, verbose_stats_dump, 0, TIME_PERIODIC);
+#ifdef _WIN32
+		/*
+		 * https://blogs.msdn.microsoft.com/oldnewthing/20151230-00/?p=92741
+		 *
+		 * suggests that this dates back to W2K.
+		 *
+		 * I don't know what a "long wait" is, but we'll assume
+		 * that printing the stats could be a "long wait".
+		 */
+		CreateTimerQueueTimer(&timer_handle, NULL,
+		    verbose_stats_dump, NULL, 1000, 1000,
+		    WT_EXECUTEDEFAULT|WT_EXECUTELONGFUNCTION);
 		setvbuf(stderr, NULL, _IONBF, 0);
-#elif defined(HAVE_ALARM)
+#else /* _WIN32 */
+		/*
+		 * Assume this is UN*X, and that it has setitimer(); that
+		 * dates back to UNIX 95.
+		 */
+		struct itimerval timer;
 		(void)setsignal(SIGALRM, verbose_stats_dump);
-		alarm(1);
-#endif
+		timer.it_interval.tv_sec = 1;
+		timer.it_interval.tv_usec = 0;
+		timer.it_value.tv_sec = 1;
+		timer.it_value.tv_usec = 1;
+		setitimer(ITIMER_REAL, &timer, NULL);
+#endif /* _WIN32 */
 	}
 
 	if (RFileName == NULL) {
@@ -2393,13 +2413,21 @@ static void
 static void
 cleanup(int signo _U_)
 {
-#ifdef USE_WIN32_MM_TIMER
-	if (timer_id)
-		timeKillEvent(timer_id);
-	timer_id = 0;
-#elif defined(HAVE_ALARM)
-	alarm(0);
-#endif
+#ifdef _WIN32
+	if (timer_handle != INVALID_HANDLE_VALUE) {
+		DeleteTimerQueueTimer(NULL, timer_handle, NULL);
+		CloseHandle(timer_handle);
+		timer_handle = INVALID_HANDLE_VALUE;
+        }
+#else /* _WIN32 */
+	struct itimerval timer;
+
+	timer.it_interval.tv_sec = 0;
+	timer.it_interval.tv_usec = 0;
+	timer.it_value.tv_sec = 0;
+	timer.it_value.tv_usec = 0;
+	setitimer(ITIMER_REAL, &timer, NULL);
+#endif /* _WIN32 */
 
 #ifdef HAVE_PCAP_BREAKLOOP
 	/*
@@ -2443,7 +2471,7 @@ child_cleanup(int signo _U_)
 #endif /* HAVE_FORK && HAVE_VFORK */
 
 static void
-info(register int verbose)
+info(int verbose)
 {
 	struct pcap_stat stats;
 
@@ -2794,33 +2822,6 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 		info(0);
 }
 
-#ifdef _WIN32
-	/*
-	 * XXX - there should really be libpcap calls to get the version
-	 * number as a string (the string would be generated from #defines
-	 * at run time, so that it's not generated from string constants
-	 * in the library, as, on many UNIX systems, those constants would
-	 * be statically linked into the application executable image, and
-	 * would thus reflect the version of libpcap on the system on
-	 * which the application was *linked*, not the system on which it's
-	 * *running*.
-	 *
-	 * That routine should be documented, unlike the "version[]"
-	 * string, so that UNIX vendors providing their own libpcaps
-	 * don't omit it (as a couple of vendors have...).
-	 *
-	 * Packet.dll should perhaps also export a routine to return the
-	 * version number of the Packet.dll code, to supply the
-	 * "Wpcap_version" information on Windows.
-	 */
-	char WDversion[]="current-git.tcpdump.org";
-#if !defined(HAVE_GENERATED_VERSION)
-	char version[]="current-git.tcpdump.org";
-#endif
-	char pcap_version[]="current-git.tcpdump.org";
-	char Wpcap_version[]="3.1";
-#endif
-
 #ifdef SIGNAL_REQ_INFO
 void requestinfo(int signo _U_)
 {
@@ -2846,36 +2847,35 @@ print_packets_captured (void)
 /*
  * Called once each second in verbose mode while dumping to file
  */
-#ifdef USE_WIN32_MM_TIMER
-void CALLBACK verbose_stats_dump (UINT timer_id _U_, UINT msg _U_, DWORD_PTR arg _U_,
-				  DWORD_PTR dw1 _U_, DWORD_PTR dw2 _U_)
+#ifdef _WIN32
+static void CALLBACK verbose_stats_dump(PVOID param _U_,
+    BOOLEAN timer_fired _U_)
 {
 	print_packets_captured();
 }
-#elif defined(HAVE_ALARM)
+#else /* _WIN32 */
 static void verbose_stats_dump(int sig _U_)
 {
 	print_packets_captured();
-	alarm(1);
 }
-#endif
+#endif /* _WIN32 */
 
 USES_APPLE_DEPRECATED_API
 static void
 print_version(void)
 {
 #ifndef HAVE_PCAP_LIB_VERSION
-#if defined(_WIN32) || defined(HAVE_PCAP_VERSION)
+  #ifdef HAVE_PCAP_VERSION
 	extern char pcap_version[];
-#else /* defined(_WIN32) || defined(HAVE_PCAP_VERSION) */
+  #else /* HAVE_PCAP_VERSION */
 	static char pcap_version[] = "unknown";
-#endif /* defined(_WIN32) || defined(HAVE_PCAP_VERSION) */
+  #endif /* HAVE_PCAP_VERSION */
 #endif /* HAVE_PCAP_LIB_VERSION */
 	const char *smi_version_string;
 
 	(void)fprintf(stderr, "%s version " PACKAGE_VERSION "\n", program_name);
 #ifdef HAVE_PCAP_LIB_VERSION
-	(void)fprintf(stderr, "%s\n",pcap_lib_version());
+	(void)fprintf(stderr, "%s\n", pcap_lib_version());
 #else /* HAVE_PCAP_LIB_VERSION */
 	(void)fprintf(stderr, "libpcap version %s\n", pcap_version);
 #endif /* HAVE_PCAP_LIB_VERSION */

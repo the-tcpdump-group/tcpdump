@@ -77,8 +77,8 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 	}
 	hdrlen = 3;
 
-	fc = EXTRACT_LE_16BITS(p);
-	seq = EXTRACT_LE_8BITS(p + 2);
+	fc = EXTRACT_LE_U_2(p);
+	seq = EXTRACT_U_1(p + 2);
 
 	p += 3;
 	caplen -= 3;
@@ -113,7 +113,7 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 			ND_PRINT((ndo, "[|802.15.4]"));
 			return hdrlen;
 		}
-		panid = EXTRACT_LE_16BITS(p);
+		panid = EXTRACT_LE_U_2(p);
 		p += 2;
 		caplen -= 2;
 		hdrlen += 2;
@@ -122,7 +122,7 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 			return hdrlen;
 		}
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo,"%04x:%04x ", panid, EXTRACT_LE_16BITS(p)));
+			ND_PRINT((ndo,"%04x:%04x ", panid, EXTRACT_LE_U_2(p)));
 		p += 2;
 		caplen -= 2;
 		hdrlen += 2;
@@ -132,7 +132,7 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 			ND_PRINT((ndo, "[|802.15.4]"));
 			return hdrlen;
 		}
-		panid = EXTRACT_LE_16BITS(p);
+		panid = EXTRACT_LE_U_2(p);
 		p += 2;
 		caplen -= 2;
 		hdrlen += 2;
@@ -173,7 +173,7 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 				ND_PRINT((ndo, "[|802.15.4]"));
 				return hdrlen;
 			}
-			panid = EXTRACT_LE_16BITS(p);
+			panid = EXTRACT_LE_U_2(p);
 			p += 2;
 			caplen -= 2;
 			hdrlen += 2;
@@ -183,7 +183,7 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 			return hdrlen;
 		}
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo,"%04x:%04x ", panid, EXTRACT_LE_16BITS(p)));
+			ND_PRINT((ndo,"%04x:%04x ", panid, EXTRACT_LE_U_2(p)));
 		p += 2;
 		caplen -= 2;
 		hdrlen += 2;
@@ -199,7 +199,7 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 				ND_PRINT((ndo, "[|802.15.4]"));
 				return hdrlen;
 			}
-			panid = EXTRACT_LE_16BITS(p);
+			panid = EXTRACT_LE_U_2(p);
 			p += 2;
 			caplen -= 2;
 			hdrlen += 2;

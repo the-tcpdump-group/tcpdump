@@ -48,24 +48,24 @@ static const char rtcp_tstr[] = " [|rtcp]";
 static const char udp_tstr[] = " [|udp]";
 
 struct rtcphdr {
-	uint16_t rh_flags;	/* T:2 P:1 CNT:5 PT:8 */
-	uint16_t rh_len;	/* length of message (in words) */
-	uint32_t rh_ssrc;	/* synchronization src id */
+	nd_uint16_t rh_flags;	/* T:2 P:1 CNT:5 PT:8 */
+	nd_uint16_t rh_len;	/* length of message (in words) */
+	nd_uint32_t rh_ssrc;	/* synchronization src id */
 };
 
 typedef struct {
-	uint32_t upper;	/* more significant 32 bits */
-	uint32_t lower;	/* less significant 32 bits */
+	nd_uint32_t upper;	/* more significant 32 bits */
+	nd_uint32_t lower;	/* less significant 32 bits */
 } ntp64;
 
 /*
  * Sender report.
  */
 struct rtcp_sr {
-	ntp64 sr_ntp;		/* 64-bit ntp timestamp */
-	uint32_t sr_ts;	/* reference media timestamp */
-	uint32_t sr_np;	/* no. packets sent */
-	uint32_t sr_nb;	/* no. bytes sent */
+	ntp64       sr_ntp;	/* 64-bit ntp timestamp */
+	nd_uint32_t sr_ts;	/* reference media timestamp */
+	nd_uint32_t sr_np;	/* no. packets sent */
+	nd_uint32_t sr_nb;	/* no. bytes sent */
 };
 
 /*
@@ -73,12 +73,12 @@ struct rtcp_sr {
  * Time stamps are middle 32-bits of ntp timestamp.
  */
 struct rtcp_rr {
-	uint32_t rr_srcid;	/* sender being reported */
-	uint32_t rr_nl;	/* no. packets lost */
-	uint32_t rr_ls;	/* extended last seq number received */
-	uint32_t rr_dv;	/* jitter (delay variance) */
-	uint32_t rr_lsr;	/* orig. ts from last rr from this src  */
-	uint32_t rr_dlsr;	/* time from recpt of last rr to xmit time */
+	nd_uint32_t rr_srcid;	/* sender being reported */
+	nd_uint32_t rr_nl;	/* no. packets lost */
+	nd_uint32_t rr_ls;	/* extended last seq number received */
+	nd_uint32_t rr_dv;	/* jitter (delay variance) */
+	nd_uint32_t rr_lsr;	/* orig. ts from last rr from this src  */
+	nd_uint32_t rr_dlsr;	/* time from recpt of last rr to xmit time */
 };
 
 /*XXX*/
@@ -97,30 +97,30 @@ struct rtcp_rr {
 #define RTCP_PT_APP	204
 
 static void
-vat_print(netdissect_options *ndo, const void *hdr, register const struct udphdr *up)
+vat_print(netdissect_options *ndo, const void *hdr, const struct udphdr *up)
 {
 	/* vat/vt audio */
 	u_int ts;
 
-	ND_TCHECK_16BITS((const u_int *)hdr);
-	ts = EXTRACT_16BITS(hdr);
+	ND_TCHECK_2((const u_int *)hdr);
+	ts = EXTRACT_BE_U_2(hdr);
 	if ((ts & 0xf060) != 0) {
 		/* probably vt */
-		ND_TCHECK_16BITS(&up->uh_ulen);
+		ND_TCHECK_2(up->uh_ulen);
 		ND_PRINT((ndo, "udp/vt %u %d / %d",
-			     (uint32_t)(EXTRACT_16BITS(&up->uh_ulen) - sizeof(*up)),
+			     (uint32_t)(EXTRACT_BE_U_2(up->uh_ulen) - sizeof(*up)),
 			     ts & 0x3ff, ts >> 10));
 	} else {
 		/* probably vat */
 		uint32_t i0, i1;
 
-		ND_TCHECK_32BITS(&((const u_int *)hdr)[0]);
-		i0 = EXTRACT_32BITS(&((const u_int *)hdr)[0]);
-		ND_TCHECK_32BITS(&((const u_int *)hdr)[1]);
-		i1 = EXTRACT_32BITS(&((const u_int *)hdr)[1]);
-		ND_TCHECK_16BITS(&up->uh_ulen);
+		ND_TCHECK_4(&((const u_int *)hdr)[0]);
+		i0 = EXTRACT_BE_U_4(&((const u_int *)hdr)[0]);
+		ND_TCHECK_4(&((const u_int *)hdr)[1]);
+		i1 = EXTRACT_BE_U_4(&((const u_int *)hdr)[1]);
+		ND_TCHECK_2(up->uh_ulen);
 		ND_PRINT((ndo, "udp/vat %u c%d %u%s",
-			(uint32_t)(EXTRACT_16BITS(&up->uh_ulen) - sizeof(*up) - 8),
+			(uint32_t)(EXTRACT_BE_U_2(up->uh_ulen) - sizeof(*up) - 8),
 			i0 & 0xffff,
 			i1, i0 & 0x800000? "*" : ""));
 		/* audio format */
@@ -136,7 +136,7 @@ trunc:
 
 static void
 rtp_print(netdissect_options *ndo, const void *hdr, u_int len,
-          register const struct udphdr *up)
+          const struct udphdr *up)
 {
 	/* rtp v1 or v2 */
 	const u_int *ip = (const u_int *)hdr;
@@ -144,12 +144,12 @@ rtp_print(netdissect_options *ndo, const void *hdr, u_int len,
 	uint32_t i0, i1;
 	const char * ptype;
 
-	ND_TCHECK_32BITS(&((const u_int *)hdr)[0]);
-	i0 = EXTRACT_32BITS(&((const u_int *)hdr)[0]);
-	ND_TCHECK_32BITS(&((const u_int *)hdr)[1]);
-	i1 = EXTRACT_32BITS(&((const u_int *)hdr)[1]);
-	ND_TCHECK_16BITS(&up->uh_ulen);
-	dlen = EXTRACT_16BITS(&up->uh_ulen) - sizeof(*up) - 8;
+	ND_TCHECK_4(&((const u_int *)hdr)[0]);
+	i0 = EXTRACT_BE_U_4(&((const u_int *)hdr)[0]);
+	ND_TCHECK_4(&((const u_int *)hdr)[1]);
+	i1 = EXTRACT_BE_U_4(&((const u_int *)hdr)[1]);
+	ND_TCHECK_2(up->uh_ulen);
+	dlen = EXTRACT_BE_U_2(up->uh_ulen) - sizeof(*up) - 8;
 	ip += 2;
 	len >>= 2;
 	len -= 2;
@@ -180,13 +180,13 @@ rtp_print(netdissect_options *ndo, const void *hdr, u_int len,
 		i0 & 0xffff,
 		i1));
 	if (ndo->ndo_vflag) {
-		ND_TCHECK_32BITS(&((const u_int *)hdr)[2]);
-		ND_PRINT((ndo, " %u", EXTRACT_32BITS(&((const u_int *)hdr)[2])));
+		ND_TCHECK_4(&((const u_int *)hdr)[2]);
+		ND_PRINT((ndo, " %u", EXTRACT_BE_U_4(&((const u_int *)hdr)[2])));
 		if (hasopt) {
 			u_int i2, optlen;
 			do {
-				ND_TCHECK_32BITS(ip);
-				i2 = EXTRACT_32BITS(ip);
+				ND_TCHECK_4(ip);
+				i2 = EXTRACT_BE_U_4(ip);
 				optlen = (i2 >> 16) & 0xff;
 				if (optlen == 0 || optlen > len) {
 					ND_PRINT((ndo, " !opt"));
@@ -198,8 +198,8 @@ rtp_print(netdissect_options *ndo, const void *hdr, u_int len,
 		}
 		if (hasext) {
 			u_int i2, extlen;
-			ND_TCHECK_32BITS(ip);
-			i2 = EXTRACT_32BITS(ip);
+			ND_TCHECK_4(ip);
+			i2 = EXTRACT_BE_U_4(ip);
 			extlen = (i2 & 0xffff) + 1;
 			if (extlen > len) {
 				ND_PRINT((ndo, " !ext"));
@@ -207,9 +207,9 @@ rtp_print(netdissect_options *ndo, const void *hdr, u_int len,
 			}
 			ip += extlen;
 		}
-		ND_TCHECK_32BITS(ip);
+		ND_TCHECK_4(ip);
 		if (contype == 0x1f) /*XXX H.261 */
-			ND_PRINT((ndo, " 0x%04x", EXTRACT_32BITS(ip) >> 16));
+			ND_PRINT((ndo, " 0x%04x", EXTRACT_BE_U_4(ip) >> 16));
 	}
 
 trunc:
@@ -230,8 +230,8 @@ rtcp_print(netdissect_options *ndo, const u_char *hdr, const u_char *ep)
 	if ((const u_char *)(rh + 1) > ep)
 		goto trunc;
 	ND_TCHECK(*rh);
-	len = (EXTRACT_16BITS(&rh->rh_len) + 1) * 4;
-	flags = EXTRACT_16BITS(&rh->rh_flags);
+	len = (EXTRACT_BE_U_2(rh->rh_len) + 1) * 4;
+	flags = EXTRACT_BE_U_2(rh->rh_flags);
 	cnt = (flags >> 8) & 0x1f;
 	switch (flags & 0xff) {
 	case RTCP_PT_SR:
@@ -240,15 +240,15 @@ rtcp_print(netdissect_options *ndo, const u_char *hdr, const u_char *ep)
 		if (len != cnt * sizeof(*rr) + sizeof(*sr) + sizeof(*rh))
 			ND_PRINT((ndo, " [%d]", len));
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo, " %u", EXTRACT_32BITS(&rh->rh_ssrc)));
+			ND_PRINT((ndo, " %u", EXTRACT_BE_U_4(rh->rh_ssrc)));
 		if ((const u_char *)(sr + 1) > ep)
 			goto trunc;
 		ND_TCHECK(*sr);
-		ts = (double)(EXTRACT_32BITS(&sr->sr_ntp.upper)) +
-		    ((double)(EXTRACT_32BITS(&sr->sr_ntp.lower)) /
-		    4294967296.0);
-		ND_PRINT((ndo, " @%.2f %u %up %ub", ts, EXTRACT_32BITS(&sr->sr_ts),
-		    EXTRACT_32BITS(&sr->sr_np), EXTRACT_32BITS(&sr->sr_nb)));
+		ts = (double)(EXTRACT_BE_U_4(sr->sr_ntp.upper)) +
+		    ((double)(EXTRACT_BE_U_4(sr->sr_ntp.lower)) /
+		     4294967296.0);
+		ND_PRINT((ndo, " @%.2f %u %up %ub", ts, EXTRACT_BE_U_4(sr->sr_ts),
+			  EXTRACT_BE_U_4(sr->sr_np), EXTRACT_BE_U_4(sr->sr_nb)));
 		rr = (const struct rtcp_rr *)(sr + 1);
 		break;
 	case RTCP_PT_RR:
@@ -257,18 +257,18 @@ rtcp_print(netdissect_options *ndo, const u_char *hdr, const u_char *ep)
 			ND_PRINT((ndo, " [%d]", len));
 		rr = (const struct rtcp_rr *)(rh + 1);
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo, " %u", EXTRACT_32BITS(&rh->rh_ssrc)));
+			ND_PRINT((ndo, " %u", EXTRACT_BE_U_4(rh->rh_ssrc)));
 		break;
 	case RTCP_PT_SDES:
 		ND_PRINT((ndo, " sdes %d", len));
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo, " %u", EXTRACT_32BITS(&rh->rh_ssrc)));
+			ND_PRINT((ndo, " %u", EXTRACT_BE_U_4(rh->rh_ssrc)));
 		cnt = 0;
 		break;
 	case RTCP_PT_BYE:
 		ND_PRINT((ndo, " bye %d", len));
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo, " %u", EXTRACT_32BITS(&rh->rh_ssrc)));
+			ND_PRINT((ndo, " %u", EXTRACT_BE_U_4(rh->rh_ssrc)));
 		cnt = 0;
 		break;
 	default:
@@ -283,13 +283,13 @@ rtcp_print(netdissect_options *ndo, const u_char *hdr, const u_char *ep)
 			goto trunc;
 		ND_TCHECK(*rr);
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo, " %u", EXTRACT_32BITS(&rr->rr_srcid)));
-		ts = (double)(EXTRACT_32BITS(&rr->rr_lsr)) / 65536.;
-		dts = (double)(EXTRACT_32BITS(&rr->rr_dlsr)) / 65536.;
+			ND_PRINT((ndo, " %u", EXTRACT_BE_U_4(rr->rr_srcid)));
+		ts = (double)(EXTRACT_BE_U_4(rr->rr_lsr)) / 65536.;
+		dts = (double)(EXTRACT_BE_U_4(rr->rr_dlsr)) / 65536.;
 		ND_PRINT((ndo, " %ul %us %uj @%.2f+%.2f",
-		    EXTRACT_32BITS(&rr->rr_nl) & 0x00ffffff,
-		    EXTRACT_32BITS(&rr->rr_ls),
-		    EXTRACT_32BITS(&rr->rr_dv), ts, dts));
+		    EXTRACT_BE_U_4(rr->rr_nl) & 0x00ffffff,
+		    EXTRACT_BE_U_4(rr->rr_ls),
+		    EXTRACT_BE_U_4(rr->rr_dv), ts, dts));
 	}
 	return (hdr + len);
 
@@ -298,9 +298,9 @@ trunc:
 	return ep;
 }
 
-static int udp_cksum(netdissect_options *ndo, register const struct ip *ip,
-		     register const struct udphdr *up,
-		     register u_int len)
+static int udp_cksum(netdissect_options *ndo, const struct ip *ip,
+		     const struct udphdr *up,
+		     u_int len)
 {
 	return nextproto4_cksum(ndo, ip, (const uint8_t *)(const void *)up, len, len,
 				IPPROTO_UDP);
@@ -324,7 +324,7 @@ udpipaddr_print(netdissect_options *ndo, const struct ip *ip, int sport, int dpo
 		ip6 = NULL;
 
 	if (ip6) {
-		if (ip6->ip6_nxt == IPPROTO_UDP) {
+		if (EXTRACT_U_1(ip6->ip6_nxt) == IPPROTO_UDP) {
 			if (sport == -1) {
 				ND_PRINT((ndo, "%s > %s: ",
 					ip6addr_string(ndo, &ip6->ip6_src),
@@ -344,7 +344,7 @@ udpipaddr_print(netdissect_options *ndo, const struct ip *ip, int sport, int dpo
 			}
 		}
 	} else {
-		if (ip->ip_p == IPPROTO_UDP) {
+		if (EXTRACT_U_1(ip->ip_p) == IPPROTO_UDP) {
 			if (sport == -1) {
 				ND_PRINT((ndo, "%s > %s: ",
 					ipaddr_string(ndo, &ip->ip_src),
@@ -367,15 +367,15 @@ udpipaddr_print(netdissect_options *ndo, const struct ip *ip, int sport, int dpo
 }
 
 void
-udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
-	  register const u_char *bp2, int fragmented)
+udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
+	  const u_char *bp2, int fragmented)
 {
-	register const struct udphdr *up;
-	register const struct ip *ip;
-	register const u_char *cp;
-	register const u_char *ep = bp + length;
+	const struct udphdr *up;
+	const struct ip *ip;
+	const u_char *cp;
+	const u_char *ep = bp + length;
 	uint16_t sport, dport, ulen;
-	register const struct ip6_hdr *ip6;
+	const struct ip6_hdr *ip6;
 
 	if (ep > ndo->ndo_snapend)
 		ep = ndo->ndo_snapend;
@@ -390,8 +390,8 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		goto trunc;
 	}
 
-	sport = EXTRACT_16BITS(&up->uh_sport);
-	dport = EXTRACT_16BITS(&up->uh_dport);
+	sport = EXTRACT_BE_U_2(up->uh_sport);
+	dport = EXTRACT_BE_U_2(up->uh_dport);
 
 	if (length < sizeof(struct udphdr)) {
 		udpipaddr_print(ndo, ip, sport, dport);
@@ -402,7 +402,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		udpipaddr_print(ndo, ip, sport, dport);
 		goto trunc;
 	}
-	ulen = EXTRACT_16BITS(&up->uh_ulen);
+	ulen = EXTRACT_BE_U_2(up->uh_ulen);
 	if (ulen < sizeof(struct udphdr)) {
 		udpipaddr_print(ndo, ip, sport, dport);
 		ND_PRINT((ndo, "truncated-udplength %d", ulen));
@@ -420,7 +420,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 	}
 
 	if (ndo->ndo_packettype) {
-		register const struct sunrpc_msg *rp;
+		const struct sunrpc_msg *rp;
 		enum sunrpc_msg_type direction;
 
 		switch (ndo->ndo_packettype) {
@@ -437,9 +437,9 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 
 		case PT_RPC:
 			rp = (const struct sunrpc_msg *)(up + 1);
-			direction = (enum sunrpc_msg_type)EXTRACT_32BITS(&rp->rm_direction);
+			direction = (enum sunrpc_msg_type) EXTRACT_BE_U_4(&rp->rm_direction);
 			if (direction == SUNRPC_CALL)
-				sunrpcrequest_print(ndo, (const u_char *)rp, length,
+				sunrpc_print(ndo, (const u_char *)rp, length,
 				    (const u_char *)ip);
 			else
 				nfsreply_print(ndo, (const u_char *)rp, length,
@@ -503,27 +503,27 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 
 	udpipaddr_print(ndo, ip, sport, dport);
 	if (!ndo->ndo_qflag) {
-		register const struct sunrpc_msg *rp;
+		const struct sunrpc_msg *rp;
 		enum sunrpc_msg_type direction;
 
 		rp = (const struct sunrpc_msg *)(up + 1);
 		if (ND_TTEST(rp->rm_direction)) {
-			direction = (enum sunrpc_msg_type)EXTRACT_32BITS(&rp->rm_direction);
+			direction = (enum sunrpc_msg_type) EXTRACT_BE_U_4(&rp->rm_direction);
 			if (dport == NFS_PORT && direction == SUNRPC_CALL) {
-				ND_PRINT((ndo, "NFS request xid %u ", EXTRACT_32BITS(&rp->rm_xid)));
-				nfsreq_print_noaddr(ndo, (const u_char *)rp, length,
+				ND_PRINT((ndo, "NFS request xid %u ", EXTRACT_BE_U_4(&rp->rm_xid)));
+				nfsreq_noaddr_print(ndo, (const u_char *)rp, length,
 				    (const u_char *)ip);
 				return;
 			}
 			if (sport == NFS_PORT && direction == SUNRPC_REPLY) {
-				ND_PRINT((ndo, "NFS reply xid %u ", EXTRACT_32BITS(&rp->rm_xid)));
-				nfsreply_print_noaddr(ndo, (const u_char *)rp, length,
+				ND_PRINT((ndo, "NFS reply xid %u ", EXTRACT_BE_U_4(&rp->rm_xid)));
+				nfsreply_noaddr_print(ndo, (const u_char *)rp, length,
 				    (const u_char *)ip);
 				return;
 			}
 #ifdef notdef
 			if (dport == SUNRPC_PORT && direction == SUNRPC_CALL) {
-				sunrpcrequest_print((const u_char *)rp, length, (const u_char *)ip);
+				sunrpc_print((const u_char *)rp, length, (const u_char *)ip);
 				return;
 			}
 #endif
@@ -539,10 +539,10 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		 * TCP does, and we do so for UDP-over-IPv6.
 		 */
 	        if (IP_V(ip) == 4 && (ndo->ndo_vflag > 1)) {
-			udp_sum = EXTRACT_16BITS(&up->uh_sum);
+			udp_sum = EXTRACT_BE_U_2(up->uh_sum);
 			if (udp_sum == 0) {
 				ND_PRINT((ndo, "[no cksum] "));
-			} else if (ND_TTEST2(cp[0], length)) {
+			} else if (ND_TTEST_LEN(cp, length)) {
 				sum = udp_cksum(ndo, ip, up, length + sizeof(struct udphdr));
 
 	                        if (sum != 0) {
@@ -555,9 +555,9 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		}
 		else if (IP_V(ip) == 6 && ip6->ip6_plen) {
 			/* for IPv6, UDP checksum is mandatory */
-			if (ND_TTEST2(cp[0], length)) {
+			if (ND_TTEST_LEN(cp, length)) {
 				sum = udp6_cksum(ndo, ip6, up, length + sizeof(struct udphdr));
-				udp_sum = EXTRACT_16BITS(&up->uh_sum);
+				udp_sum = EXTRACT_BE_U_2(up->uh_sum);
 
 	                        if (sum != 0) {
 					ND_PRINT((ndo, "[bad udp cksum 0x%04x -> 0x%04x!] ",
@@ -571,9 +571,9 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 
 	if (!ndo->ndo_qflag) {
 		if (IS_SRC_OR_DST_PORT(NAMESERVER_PORT))
-			ns_print(ndo, (const u_char *)(up + 1), length, 0);
+			domain_print(ndo, (const u_char *)(up + 1), length, 0);
 		else if (IS_SRC_OR_DST_PORT(MULTICASTDNS_PORT))
-			ns_print(ndo, (const u_char *)(up + 1), length, 1);
+			domain_print(ndo, (const u_char *)(up + 1), length, 1);
 		else if (IS_SRC_OR_DST_PORT(TIMED_PORT))
 			timed_print(ndo, (const u_char *)(up + 1));
 		else if (IS_SRC_OR_DST_PORT(TFTP_PORT))
@@ -682,7 +682,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		else if (IS_SRC_OR_DST_PORT(VXLAN_GPE_PORT))
 			vxlan_gpe_print(ndo, (const u_char *)(up + 1), length);
 		else if (ND_TTEST(((const struct LAP *)cp)->type) &&
-		    ((const struct LAP *)cp)->type == lapDDP &&
+		    EXTRACT_U_1(((const struct LAP *)cp)->type) == lapDDP &&
 		    (atalk_port(sport) || atalk_port(dport))) {
 			if (ndo->ndo_vflag)
 				ND_PRINT((ndo, "kip "));
