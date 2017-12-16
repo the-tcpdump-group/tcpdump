@@ -92,16 +92,6 @@
 #define	make_uint16(msb,lsb)\
 	(XFF(lsb) + (XFF(msb)<<8))
 
-#ifdef	__alpha
-	/* or other 64-bit systems */
-#define	make_uint48(msb,b,c,d,e,lsb)\
-	((lsb) + ((e)<<8) + ((d)<<16) + ((c)<<24) + ((b)<<32) + ((msb)<<40))
-#else
-	/* on 32-bit systems ignore high-order bits */
-#define	make_uint48(msb,b,c,d,e,lsb)\
-	((lsb) + ((e)<<8) + ((d)<<16) + ((c)<<24))
-#endif
-
 static int is_UCX(const unsigned char *, u_int);
 
 void
