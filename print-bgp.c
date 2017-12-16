@@ -1376,8 +1376,7 @@ trunc:
  * and if so it checks that standard BGP doesn't make sense.
  */
 static int
-check_add_path(const u_char *pptr, u_int length, u_int
-max_prefix_length)
+check_add_path(const u_char *pptr, u_int length, u_int max_prefix_length)
 {
     u_int offset, prefix_length;
     if (length < 5) {
@@ -2765,7 +2764,7 @@ trunc:
 
 static void
 bgp_notification_print(netdissect_options *ndo,
-               const u_char *dat, int length)
+                       const u_char *dat, int length)
 {
     const struct bgp_notification *bgp_notification_header;
     const u_char *tptr;
@@ -2883,7 +2882,7 @@ trunc:
 
 static void
 bgp_route_refresh_print(netdissect_options *ndo,
-            const u_char *pptr, int len)
+                        const u_char *pptr, int len)
 {
     const struct bgp_route_refresh *bgp_route_refresh_header;
 
@@ -2915,7 +2914,7 @@ trunc:
 
 static int
 bgp_pdu_print(netdissect_options *ndo,
-         const u_char *dat, u_int length)
+              const u_char *dat, u_int length)
 {
     const struct bgp *bgp_header;
     uint8_t bgp_type;
@@ -2959,7 +2958,7 @@ trunc:
 
 void
 bgp_print(netdissect_options *ndo,
-      const u_char *dat, int length)
+          const u_char *dat, int length)
 {
     const u_char *p;
     const u_char *ep;
