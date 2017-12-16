@@ -873,8 +873,8 @@ print_smb(netdissect_options *ndo,
 		    int i;
 		    int v;
 
-		    for (i = 0; &words[1 + 2 * i] < maxwords; i++) {
-			ND_TCHECK_2(words + (1 + 2 * i));
+		    for (i = 0; words + 1 + 2 * i < maxwords; i++) {
+			ND_TCHECK_2(words + 1 + 2 * i);
 			v = EXTRACT_LE_U_2(words + 1 + 2 * i);
 			ND_PRINT((ndo, "smb_vwv[%d]=%d (0x%X)\n", i, v, v));
 		    }
