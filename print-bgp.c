@@ -605,7 +605,7 @@ decode_labeled_prefix4(netdissect_options *ndo,
              ipaddr_string(ndo, &addr),
              plen,
              EXTRACT_BE_U_3(pptr + 1)>>4,
-             ((pptr[3]&1)==0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
+             ((EXTRACT_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
 
     return 4 + plenbytes;
 
@@ -846,7 +846,7 @@ decode_labeled_vpn_prefix4(netdissect_options *ndo,
              ipaddr_string(ndo, &addr),
              plen,
              EXTRACT_BE_U_3(pptr + 1)>>4,
-             ((pptr[3]&1)==0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
+             ((EXTRACT_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
 
     return 12 + (plen + 7) / 8;
 
@@ -1192,7 +1192,7 @@ decode_labeled_prefix6(netdissect_options *ndo,
              ip6addr_string(ndo, &addr),
              plen,
              EXTRACT_BE_U_3(pptr + 1)>>4,
-             ((pptr[3]&1)==0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
+             ((EXTRACT_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
 
     return 4 + plenbytes;
 
@@ -1234,7 +1234,7 @@ decode_labeled_vpn_prefix6(netdissect_options *ndo,
              ip6addr_string(ndo, &addr),
              plen,
              EXTRACT_BE_U_3(pptr + 1)>>4,
-              ((pptr[3]&1)==0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
+             ((EXTRACT_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
 
     return 12 + (plen + 7) / 8;
 
@@ -1303,7 +1303,7 @@ decode_labeled_vpn_clnp_prefix(netdissect_options *ndo,
              isonsap_string(ndo, addr,(plen + 7) / 8),
              plen,
              EXTRACT_BE_U_3(pptr + 1)>>4,
-             ((pptr[3]&1)==0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
+             ((EXTRACT_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
 
     return 12 + (plen + 7) / 8;
 
@@ -1386,7 +1386,7 @@ check_add_path(const u_char *pptr, u_int length, u_int max_prefix_length)
     /* check if it could be add path */
     for (offset = 0; offset < length;) {
         offset += 4;
-        prefix_length = pptr[offset];
+        prefix_length = EXTRACT_U_1(pptr + offset);
         /*
          * Add 4 to cover the path id
          * and check the prefix length isn't greater than 32/128.
@@ -1404,7 +1404,7 @@ check_add_path(const u_char *pptr, u_int length, u_int max_prefix_length)
 
     /* check it's not standard BGP */
     for (offset = 0; offset < length; ) {
-        prefix_length = pptr[offset];
+        prefix_length = EXTRACT_U_1(pptr + offset);
         /*
          * If the prefix_length is zero (0.0.0.0/0)
          * and since it's not the only address (length >= 5)
@@ -1485,7 +1485,7 @@ bgp_attr_print(netdissect_options *ndo,
             ND_PRINT((ndo, "%s", tok2str(bgp_as_path_segment_open_values,
                       "?", EXTRACT_U_1(tptr))));
             ND_TCHECK_1(tptr + 1);
-            for (i = 0; i < tptr[1] * as_size; i += as_size) {
+            for (i = 0; i < EXTRACT_U_1(tptr + 1) * as_size; i += as_size) {
                 ND_TCHECK_LEN(tptr + 2 + i, as_size);
                 ND_PRINT((ndo, "%s ",
                           as_printf(ndo, astostr, sizeof(astostr),
