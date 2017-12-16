@@ -32,6 +32,8 @@
 
 /* \summary: Border Gateway Protocol (BGP) printer */
 
+/* specification: RFC 4771 */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -110,7 +112,7 @@ struct bgp_route_refresh {
 #define BGP_ROUTE_REFRESH_SIZE          23
 
 #define bgp_attr_lenlen(flags, p) \
-    (((flags) & 0x10) ? 2 : 1)
+    (((flags) & 0x10) ? 2U : 1U)
 #define bgp_attr_len(flags, p) \
     (((flags) & 0x10) ? EXTRACT_BE_U_2(p) : EXTRACT_U_1(p))
 
@@ -519,7 +521,7 @@ static char astostr[20];
  */
 static char *
 as_printf(netdissect_options *ndo,
-          char *str, int size, u_int asnum)
+          char *str, size_t size, u_int asnum)
 {
     if (!ndo->ndo_bflag || asnum <= 0xFFFF) {
         snprintf(str, size, "%u", asnum);
@@ -668,7 +670,7 @@ trunc:
  *
  * return the number of bytes read from the wire.
  */
-static int
+static u_int
 bgp_vpn_sg_print(netdissect_options *ndo,
                  const u_char *pptr, char *buf, u_int buflen)
 {
@@ -868,7 +870,7 @@ trunc:
 
 static int
 decode_mdt_vpn_nlri(netdissect_options *ndo,
-            const u_char *pptr, char *buf, u_int buflen)
+                    const u_char *pptr, char *buf, u_int buflen)
 {
     const u_char *rd;
     const u_char *vpn_ip;
@@ -923,9 +925,10 @@ static const struct tok bgp_multicast_vpn_route_type_values[] = {
 
 static int
 decode_multicast_vpn(netdissect_options *ndo,
-             const u_char *pptr, char *buf, u_int buflen)
+                     const u_char *pptr, char *buf, size_t buflen)
 {
-    uint8_t route_type, route_length, addr_length, sg_length;
+    uint8_t route_type, route_length, addr_length;
+    u_int sg_length;
     u_int offset;
 
     ND_TCHECK_2(pptr);
@@ -988,9 +991,9 @@ decode_multicast_vpn(netdissect_options *ndo,
         ND_TCHECK_LEN(pptr, BGP_VPN_RD_LEN + 4);
         offset = strlen(buf);
         snprintf(buf + offset, buflen - offset, ", RD: %s, Source-AS %s",
-        bgp_vpn_rd_print(ndo, pptr),
-        as_printf(ndo, astostr, sizeof(astostr),
-        EXTRACT_BE_U_4(pptr + BGP_VPN_RD_LEN)));
+                 bgp_vpn_rd_print(ndo, pptr),
+                 as_printf(ndo, astostr, sizeof(astostr),
+                 EXTRACT_BE_U_4(pptr + BGP_VPN_RD_LEN)));
         pptr += BGP_VPN_RD_LEN + 4;
 
         bgp_vpn_sg_print(ndo, pptr, buf, buflen);
@@ -1032,68 +1035,67 @@ trunc:
 
 static int
 decode_labeled_vpn_l2(netdissect_options *ndo,
-              const u_char *pptr, char *buf, u_int buflen)
+                      const u_char *pptr, char *buf, u_int buflen)
 {
-    int plen,tlen,stringlen,tlv_type,tlv_len,ttlv_len;
+    int plen, tlen, stringlen, tlv_type, tlv_len, ttlv_len;
 
     ND_TCHECK_2(pptr);
-    plen=EXTRACT_BE_U_2(pptr);
-    tlen=plen;
+    plen = EXTRACT_BE_U_2(pptr);
+    tlen = plen;
     pptr += 2;
     /* Old and new L2VPN NLRI share AFI/SAFI
      *   -> Assume a 12 Byte-length NLRI is auto-discovery-only
      *      and > 17 as old format. Complain for the middle case
      */
-    if (plen==12) {
+    if (plen == 12) {
         /* assume AD-only with RD, BGPNH */
         ND_TCHECK_LEN(pptr, 12);
-        buf[0]='\0';
-        stringlen=snprintf(buf, buflen, "RD: %s, BGPNH: %s",
-                           bgp_vpn_rd_print(ndo, pptr),
-                           ipaddr_string(ndo, pptr+8)
-                   );
+        buf[0] = '\0';
+        stringlen = snprintf(buf, buflen, "RD: %s, BGPNH: %s",
+                             bgp_vpn_rd_print(ndo, pptr),
+                             ipaddr_string(ndo, pptr+8));
         UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
-        pptr+=12;
-        tlen-=12;
+        pptr += 12;
+        tlen -= 12;
         return plen;
-    } else if (plen>17) {
+    } else if (plen > 17) {
         /* assume old format */
         /* RD, ID, LBLKOFF, LBLBASE */
 
         ND_TCHECK_LEN(pptr, 15);
-        buf[0]='\0';
-        stringlen=snprintf(buf, buflen, "RD: %s, CE-ID: %u, Label-Block Offset: %u, Label Base %u",
-                           bgp_vpn_rd_print(ndo, pptr),
-                           EXTRACT_BE_U_2(pptr + 8),
-                           EXTRACT_BE_U_2(pptr + 10),
-                           EXTRACT_BE_U_3(pptr + 12)>>4); /* the label is offsetted by 4 bits so lets shift it right */
+        buf[0] = '\0';
+        stringlen = snprintf(buf, buflen, "RD: %s, CE-ID: %u, Label-Block Offset: %u, Label Base %u",
+                             bgp_vpn_rd_print(ndo, pptr),
+                             EXTRACT_BE_U_2(pptr + 8),
+                             EXTRACT_BE_U_2(pptr + 10),
+                             EXTRACT_BE_U_3(pptr + 12)>>4); /* the label is offsetted by 4 bits so lets shift it right */
         UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
-        pptr+=15;
-        tlen-=15;
+        pptr += 15;
+        tlen -= 15;
 
         /* ok now the variable part - lets read out TLVs*/
         while (tlen>0) {
             if (tlen < 3)
                 return -1;
             ND_TCHECK_3(pptr);
-            tlv_type=EXTRACT_U_1(pptr);
+            tlv_type = EXTRACT_U_1(pptr);
             pptr++;
-            tlv_len=EXTRACT_BE_U_2(pptr);
-            ttlv_len=tlv_len;
-            pptr+=2;
+            tlv_len = EXTRACT_BE_U_2(pptr);
+            ttlv_len = tlv_len;
+            pptr += 2;
 
             switch(tlv_type) {
             case 1:
-                if (buflen!=0) {
+                if (buflen != 0) {
                     stringlen=snprintf(buf,buflen, "\n\t\tcircuit status vector (%u) length: %u: 0x",
                                        tlv_type,
                                        tlv_len);
                     UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
                 }
-                ttlv_len=ttlv_len/8+1; /* how many bytes do we need to read ? */
-                while (ttlv_len>0) {
+                ttlv_len = ttlv_len/8+1; /* how many bytes do we need to read ? */
+                while (ttlv_len > 0) {
                     ND_TCHECK_1(pptr);
-                    if (buflen!=0) {
+                    if (buflen != 0) {
                         stringlen=snprintf(buf,buflen, "%02x",
                                            EXTRACT_U_1(pptr));
                         pptr++;
@@ -1103,7 +1105,7 @@ decode_labeled_vpn_l2(netdissect_options *ndo,
                 }
                 break;
             default:
-                if (buflen!=0) {
+                if (buflen != 0) {
                     stringlen=snprintf(buf,buflen, "\n\t\tunknown TLV #%u, length: %u",
                                        tlv_type,
                                        tlv_len);
@@ -1111,10 +1113,9 @@ decode_labeled_vpn_l2(netdissect_options *ndo,
                 }
                 break;
             }
-            tlen-=(tlv_len<<3); /* the tlv-length is expressed in bits so lets shift it right */
+            tlen -= (tlv_len<<3); /* the tlv-length is expressed in bits so lets shift it right */
         }
-        return plen+2;
-
+        return plen + 2;
     } else {
         /* complain bitterly ? */
         /* fall through */
@@ -1274,7 +1275,7 @@ trunc:
 
 static int
 decode_labeled_vpn_clnp_prefix(netdissect_options *ndo,
-                   const u_char *pptr, char *buf, u_int buflen)
+                               const u_char *pptr, char *buf, u_int buflen)
 {
     uint8_t addr[19];
     u_int plen;
@@ -1294,8 +1295,7 @@ decode_labeled_vpn_clnp_prefix(netdissect_options *ndo,
     ND_TCHECK_LEN(pptr + 12, (plen + 7) / 8);
     memcpy(&addr, pptr + 12, (plen + 7) / 8);
     if (plen % 8) {
-        addr[(plen + 7) / 8 - 1] &=
-            ((0xff00 >> (plen % 8)) & 0xff);
+        addr[(plen + 7) / 8 - 1] &= ((0xff00 >> (plen % 8)) & 0xff);
     }
     /* the label may get offsetted by 4 bits so lets shift it right */
     snprintf(buf, buflen, "RD: %s, %s/%d, label:%u %s",
@@ -1318,9 +1318,9 @@ trunc:
  * both Old speakers that do not support 4 byte AS, and the new speakers that do
  * support, exchange AS-Path with the same path-attribute type value 0x02.
  */
-static int
+static u_int
 bgp_attr_get_as_size(netdissect_options *ndo,
-                     uint8_t bgpa_type, const u_char *pptr, int len)
+                     uint8_t bgpa_type, const u_char *pptr, u_int len)
 {
     const u_char *tptr = pptr;
 
@@ -1379,6 +1379,7 @@ static int
 check_add_path(const u_char *pptr, u_int length, u_int max_prefix_length)
 {
     u_int offset, prefix_length;
+
     if (length < 5) {
         return 0;
     }
@@ -1427,7 +1428,7 @@ static int
 bgp_attr_print(netdissect_options *ndo,
                u_int atype, const u_char *pptr, u_int len)
 {
-    int i;
+    u_int i;
     uint16_t af;
     uint8_t safi, snpa, nhlen;
     union { /* copy buffer for bandwidth values */
@@ -1438,8 +1439,9 @@ bgp_attr_print(netdissect_options *ndo,
     u_int tlen;
     const u_char *tptr;
     char buf[MAXHOSTNAMELEN + 100];
-    int as_size;
-    int add_path4, add_path6, path_id;
+    u_int as_size;
+    int add_path4, add_path6;
+    u_int path_id;
 
     tptr = pptr;
     tlen = len;
@@ -1489,9 +1491,9 @@ bgp_attr_print(netdissect_options *ndo,
                 ND_TCHECK_LEN(tptr + 2 + i, as_size);
                 ND_PRINT((ndo, "%s ",
                           as_printf(ndo, astostr, sizeof(astostr),
-                as_size == 2 ?
-                    EXTRACT_BE_U_2(tptr + i + 2) :
-                    EXTRACT_BE_U_4(tptr + i + 2))));
+                          as_size == 2 ?
+                              EXTRACT_BE_U_2(tptr + i + 2) :
+                              EXTRACT_BE_U_4(tptr + i + 2))));
             }
             ND_TCHECK_1(tptr);
             ND_PRINT((ndo, "%s", tok2str(bgp_as_path_segment_close_values,
@@ -2385,7 +2387,7 @@ bgp_attr_print(netdissect_options *ndo,
             }
             /* FIXME check for recursion */
             if (!bgp_attr_print(ndo, atype, tptr, alen))
-            return 0;
+                return 0;
             tptr += alen;
             len -= alen;
         }
@@ -2597,14 +2599,14 @@ trunc:
 
 static void
 bgp_update_print(netdissect_options *ndo,
-                 const u_char *dat, int length)
+                 const u_char *dat, u_int length)
 {
     const struct bgp *bgp_header;
     const u_char *p;
-    int withdrawn_routes_len;
+    u_int withdrawn_routes_len;
     char buf[MAXHOSTNAMELEN + 100];
     int wpfx;
-    int len;
+    u_int len;
     int i;
     int add_path;
     int path_id;
@@ -2680,7 +2682,7 @@ bgp_update_print(netdissect_options *ndo,
     if (len) {
         /* do something more useful!*/
         while (len) {
-            int aflags, atype, alenlen, alen;
+            u_int aflags, atype, alenlen, alen;
 
             ND_TCHECK_2(p);
             if (len < 2)
@@ -2764,7 +2766,7 @@ trunc:
 
 static void
 bgp_notification_print(netdissect_options *ndo,
-                       const u_char *dat, int length)
+                       const u_char *dat, u_int length)
 {
     const struct bgp_notification *bgp_notification_header;
     const u_char *tptr;
@@ -2882,7 +2884,7 @@ trunc:
 
 static void
 bgp_route_refresh_print(netdissect_options *ndo,
-                        const u_char *pptr, int len)
+                        const u_char *pptr, u_int len)
 {
     const struct bgp_route_refresh *bgp_route_refresh_header;
 
@@ -2958,7 +2960,7 @@ trunc:
 
 void
 bgp_print(netdissect_options *ndo,
-          const u_char *dat, int length)
+          const u_char *dat, u_int length)
 {
     const u_char *p;
     const u_char *ep;

@@ -513,7 +513,7 @@ extern void atm_print(netdissect_options *, u_int, u_int, u_int, const u_char *,
 extern void babel_print(netdissect_options *, const u_char *, u_int);
 extern void beep_print(netdissect_options *, const u_char *, u_int);
 extern void bfd_print(netdissect_options *, const u_char *, u_int, u_int);
-extern void bgp_print(netdissect_options *, const u_char *, int);
+extern void bgp_print(netdissect_options *, const u_char *, u_int);
 extern char *bgp_vpn_rd_print (netdissect_options *, const u_char *);
 extern void bootp_print(netdissect_options *, const u_char *, u_int);
 extern void calm_fast_print(netdissect_options *, const u_char *, u_int, const struct lladdr_info *);
