@@ -363,8 +363,9 @@ print_trans(netdissect_options *ndo,
 	f4 = "|Data ";
     }
 
-    smb_fdata(ndo, words + 1, f1, min(words + 1 + 2 * words[0], maxbuf),
-        unicodestr);
+    smb_fdata(ndo, words + 1, f1,
+              min(words + 1 + 2 * EXTRACT_U_1(words), maxbuf),
+              unicodestr);
 
     ND_TCHECK_2(data1);
     bcc = EXTRACT_LE_U_2(data1);
