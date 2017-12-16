@@ -480,9 +480,9 @@ parsefn(netdissect_options *ndo,
 	/* Bail if we don't have the string length */
 	ND_TCHECK(*dp);
 
-	/* Fetch string length; convert to host order */
-	len = *dp++;
-	NTOHL(len);
+	/* Fetch big-endian string length */
+	len = EXTRACT_BE_U_4(dp);
+	dp++;
 
 	ND_TCHECK_LEN(dp, ((len + 3) & ~3));
 
