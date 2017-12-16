@@ -1821,7 +1821,7 @@ bgp_attr_print(netdissect_options *ndo,
                     case (AFNUM_INET<<8 | SAFNUM_MULTICAST):
                     case (AFNUM_INET<<8 | SAFNUM_UNIMULTICAST):
                         if (add_path4) {
-                            path_id = EXTRACT_32BITS(tptr);
+                            path_id = EXTRACT_BE_U_4(tptr);
                             tptr += 4;
                         }
                         advance = decode_prefix4(ndo, tptr, len, buf, sizeof(buf));
@@ -1892,7 +1892,7 @@ bgp_attr_print(netdissect_options *ndo,
                     case (AFNUM_INET6<<8 | SAFNUM_MULTICAST):
                     case (AFNUM_INET6<<8 | SAFNUM_UNIMULTICAST):
                         if (add_path6) {
-                            path_id = EXTRACT_32BITS(tptr);
+                            path_id = EXTRACT_BE_U_4(tptr);
                             tptr += 4;
                         }
                         advance = decode_prefix6(ndo, tptr, len, buf, sizeof(buf));
@@ -2006,7 +2006,7 @@ bgp_attr_print(netdissect_options *ndo,
                     case (AFNUM_INET<<8 | SAFNUM_MULTICAST):
                     case (AFNUM_INET<<8 | SAFNUM_UNIMULTICAST):
                         if (add_path4) {
-                            path_id = EXTRACT_32BITS(tptr);
+                            path_id = EXTRACT_BE_U_4(tptr);
                             tptr += 4;
                         }
                         advance = decode_prefix4(ndo, tptr, len, buf, sizeof(buf));
@@ -2048,7 +2048,7 @@ bgp_attr_print(netdissect_options *ndo,
                     case (AFNUM_INET6<<8 | SAFNUM_MULTICAST):
                     case (AFNUM_INET6<<8 | SAFNUM_UNIMULTICAST):
                         if (add_path6) {
-                            path_id = EXTRACT_32BITS(tptr);
+                            path_id = EXTRACT_BE_U_4(tptr);
                             tptr += 4;
                         }
                         advance = decode_prefix6(ndo, tptr, len, buf, sizeof(buf));
@@ -2646,7 +2646,7 @@ bgp_update_print(netdissect_options *ndo,
                 add_path = check_add_path(p, withdrawn_routes_len, 32);
                 while(withdrawn_routes_len > 0) {
                         if (add_path) {
-                                path_id = EXTRACT_32BITS(p);
+                                path_id = EXTRACT_BE_U_4(p);
                                 p += 4;
                                 length -= 4;
                                 withdrawn_routes_len -= 4;
@@ -2746,7 +2746,7 @@ bgp_update_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "\n\t  Updated routes:"));
 		while (length > 0) {
 		        if (add_path) {
-                                path_id = EXTRACT_32BITS(p);
+                                path_id = EXTRACT_BE_U_4(p);
                                 p += 4;
                                 length -= 4;
                         }
