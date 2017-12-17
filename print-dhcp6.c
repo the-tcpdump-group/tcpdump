@@ -118,8 +118,8 @@ struct dhcp6 {
 struct dhcp6_relay {
 	nd_uint8_t dh6relay_msgtype;
 	nd_uint8_t dh6relay_hcnt;
-	nd_uint8_t dh6relay_linkaddr[16];	/* XXX: badly aligned */
-	nd_uint8_t dh6relay_peeraddr[16];
+	nd_ipv6    dh6relay_linkaddr;	/* XXX: badly aligned */
+	nd_ipv6    dh6relay_peeraddr;
 	/* options follow */
 };
 
@@ -826,10 +826,10 @@ dhcp6_print(netdissect_options *ndo,
 
 		ND_TCHECK(dh6relay->dh6relay_peeraddr);
 
-		memcpy(&addr6, dh6relay->dh6relay_linkaddr, sizeof (addr6));
+		memcpy(&addr6, &dh6relay->dh6relay_linkaddr, sizeof (addr6));
 		ND_PRINT((ndo, "linkaddr=%s", ip6addr_string(ndo, &addr6)));
 
-		memcpy(&addr6, dh6relay->dh6relay_peeraddr, sizeof (addr6));
+		memcpy(&addr6, &dh6relay->dh6relay_peeraddr, sizeof (addr6));
 		ND_PRINT((ndo, " peeraddr=%s", ip6addr_string(ndo, &addr6)));
 
 		dhcp6opt_print(ndo, (const u_char *)(dh6relay + 1), ep);
