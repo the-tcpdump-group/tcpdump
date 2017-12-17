@@ -113,7 +113,7 @@ static int parse_q922_addr(netdissect_options *ndo,
 	*dlci = ((EXTRACT_U_1(p) & 0xFC) << 2) | ((EXTRACT_U_1(p + 1) & 0xF0) >> 4);
 
         flags[0] = EXTRACT_U_1(p) & 0x02; /* populate the first flag fields */
-        flags[1] = EXTRACT_U_1(p + 1) & 0x0c;
+        flags[1] = EXTRACT_U_1(p + 1) & 0x0e;
         flags[2] = 0;           /* clear the rest of the flags */
         flags[3] = 0;
 
