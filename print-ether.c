@@ -114,8 +114,8 @@ ether_hdr_print(netdissect_options *ndo,
 	ep = (const struct ether_header *)bp;
 
 	ND_PRINT((ndo, "%s > %s",
-		     etheraddr_string(ndo, ESRC(ep)),
-		     etheraddr_string(ndo, EDST(ep))));
+		     etheraddr_string(ndo, ep->ether_shost),
+		     etheraddr_string(ndo, ep->ether_dhost)));
 
 	length_type = EXTRACT_BE_U_2(ep->ether_length_type);
 	if (!ndo->ndo_qflag) {
@@ -179,9 +179,9 @@ ether_print(netdissect_options *ndo,
 	p += ETHER_HDRLEN;
 	hdrlen = ETHER_HDRLEN;
 
-	src.addr = ESRC(ep);
+	src.addr = ep->ether_shost;
 	src.addr_string = etheraddr_string;
-	dst.addr = EDST(ep);
+	dst.addr = ep->ether_dhost;
 	dst.addr_string = etheraddr_string;
 	length_type = EXTRACT_BE_U_2(ep->ether_length_type);
 

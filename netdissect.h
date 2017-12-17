@@ -283,9 +283,6 @@ struct netdissect_options {
  */
 #define MAXIMUM_SNAPLEN	262144
 
-#define ESRC(ep) ((ep)->ether_shost)
-#define EDST(ep) ((ep)->ether_dhost)
-
 /*
  * True if "l" bytes of "var" were captured.
  *
