@@ -286,13 +286,6 @@ struct netdissect_options {
 #define ESRC(ep) ((ep)->ether_shost)
 #define EDST(ep) ((ep)->ether_dhost)
 
-#ifndef NTOHL
-#define NTOHL(x)	(x) = ntohl(x)
-#define NTOHS(x)	(x) = ntohs(x)
-#define HTONL(x)	(x) = htonl(x)
-#define HTONS(x)	(x) = htons(x)
-#endif
-
 /*
  * True if "l" bytes of "var" were captured.
  *

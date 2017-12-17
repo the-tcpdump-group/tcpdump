@@ -33,6 +33,13 @@
 
 #include <netdissect-stdinc.h>
 
+#ifndef NTOHL
+#define NTOHL(x)	(x) = ntohl(x)
+#define NTOHS(x)	(x) = ntohs(x)
+#define HTONL(x)	(x) = htonl(x)
+#define HTONS(x)	(x) = htons(x)
+#endif
+
 #ifdef USE_ETHER_NTOHOST
 #ifdef HAVE_NETINET_IF_ETHER_H
 struct mbuf;		/* Squelch compiler warnings on some platforms for */
