@@ -98,9 +98,9 @@ static const struct tok frf_flag_values[] = {
  * 0 on invalid address, -1 on truncated packet
  * save the flags dep. on address length
  */
-static int parse_q922_addr(netdissect_options *ndo,
+static int parse_q922_header(netdissect_options *ndo,
                            const u_char *p, u_int *dlci,
-                           u_int *addr_len, uint8_t *flags, u_int length)
+                           u_int *addr_len, uint32_t *flags, u_int length)
 {
 	if (!ND_TTEST_1(p) || length < 1)
 		return -1;
@@ -112,10 +112,8 @@ static int parse_q922_addr(netdissect_options *ndo,
 	*addr_len = 2;
 	*dlci = ((EXTRACT_U_1(p) & 0xFC) << 2) | ((EXTRACT_U_1(p + 1) & 0xF0) >> 4);
 
-        flags[0] = EXTRACT_U_1(p) & 0x02; /* populate the first flag fields */
-        flags[1] = EXTRACT_U_1(p + 1) & 0x0e;
-        flags[2] = 0;           /* clear the rest of the flags */
-        flags[3] = 0;
+	*flags = (EXTRACT_U_1(p) & 0x02 << 24) |	/* CR flag */
+		 (EXTRACT_U_1(p + 1) & 0x0e) << 16;	/* FECN,BECN,DE flags */
 
 	if (EXTRACT_U_1(p + 1) & FR_EA_BIT)
 		return 1;	/* 2-byte Q.922 address */
@@ -137,7 +135,7 @@ static int parse_q922_addr(netdissect_options *ndo,
 	if ((EXTRACT_U_1(p) & FR_EA_BIT) == 0)
 		return 0; /* more than 4 bytes of Q.922 address? */
 
-        flags[3] = EXTRACT_U_1(p) & 0x02;
+	*flags = *flags | (EXTRACT_U_1(p) & 0x02);	/* SDLC flag */
 
         *dlci = (*dlci << 6) | (EXTRACT_U_1(p) >> 2);
 
@@ -149,11 +147,11 @@ q922_string(netdissect_options *ndo, const u_char *p, u_int length)
 {
 
     static u_int dlci, addr_len;
-    static uint8_t flags[4];
+    static uint32_t flags;
     static char buffer[sizeof("DLCI xxxxxxxxxx")];
     memset(buffer, 0, sizeof(buffer));
 
-    if (parse_q922_addr(ndo, p, &dlci, &addr_len, flags, length) == 1){
+    if (parse_q922_header(ndo, p, &dlci, &addr_len, &flags, length) == 1){
         snprintf(buffer, sizeof(buffer), "DLCI %u", dlci);
     }
 
@@ -188,8 +186,8 @@ q922_string(netdissect_options *ndo, const u_char *p, u_int length)
 */
 
 static void
-fr_hdr_print(netdissect_options *ndo,
-             int length, u_int addr_len, u_int dlci, uint8_t *flags, uint16_t nlpid)
+fr_hdr_print(netdissect_options *ndo, int length, u_int addr_len,
+	     u_int dlci, uint32_t flags, uint16_t nlpid)
 {
     if (ndo->ndo_qflag) {
         ND_PRINT((ndo, "Q.922, DLCI %u, length %u: ",
@@ -200,7 +198,7 @@ fr_hdr_print(netdissect_options *ndo,
             ND_PRINT((ndo, "Q.922, hdr-len %u, DLCI %u, Flags [%s], NLPID %s (0x%02x), length %u: ",
                          addr_len,
                          dlci,
-                         bittok2str(fr_header_flag_values, "none", EXTRACT_BE_U_4(flags)),
+                         bittok2str(fr_header_flag_values, "none", flags),
                          tok2str(nlpid_values,"unknown", nlpid),
                          nlpid,
                          length));
@@ -208,7 +206,7 @@ fr_hdr_print(netdissect_options *ndo,
             ND_PRINT((ndo, "Q.922, hdr-len %u, DLCI %u, Flags [%s], cisco-ethertype %s (0x%04x), length %u: ",
                          addr_len,
                          dlci,
-                         bittok2str(fr_header_flag_values, "none", EXTRACT_BE_U_4(flags)),
+                         bittok2str(fr_header_flag_values, "none", flags),
                          tok2str(ethertype_values, "unknown", nlpid),
                          nlpid,
                          length));
@@ -243,9 +241,9 @@ fr_print(netdissect_options *ndo,
 	u_int addr_len;
 	uint16_t nlpid;
 	u_int hdr_len;
-	uint8_t flags[4];
+	uint32_t flags;
 
-	ret = parse_q922_addr(ndo, p, &dlci, &addr_len, flags, length);
+	ret = parse_q922_header(ndo, p, &dlci, &addr_len, &flags, length);
 	if (ret == -1)
 		goto trunc;
 	if (ret == 0) {
