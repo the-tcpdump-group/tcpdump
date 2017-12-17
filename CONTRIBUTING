@@ -114,8 +114,8 @@ c) Put the format of packets/headers/options as comments if there is no
 
 d) The printer may receive incomplete packet in the buffer, truncated at any
    random position, for example by capturing with '-s size' option.
-   Thus use ND_TTEST, ND_TTEST2, ND_TCHECK or ND_TCHECK2 for bound checking.
-   For ND_TCHECK2:
+   Thus use ND_TTEST, ND_TTEST_LEN, ND_TCHECK or ND_TCHECK_LEN for bound checking.
+   For ND_TCHECK_LEN:
      Define : static const char tstr[] = " [|protocol]";
      Define a label: trunc
      Print with: ND_PRINT((ndo, "%s", tstr));
