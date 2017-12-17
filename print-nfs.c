@@ -717,7 +717,9 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 				    EXTRACT_BE_U_4(dp + 4),
 				    EXTRACT_BE_U_8(dp)));
 				if (ndo->ndo_vflag)
-					ND_PRINT((ndo, " verf %08x%08x", dp[2], dp[3]));
+					ND_PRINT((ndo, " verf %08x%08x",
+						  EXTRACT_BE_U_4(dp + 2),
+						  EXTRACT_BE_U_4(dp + 3)));
 			} else {
 				ND_TCHECK(dp[1]);
 				/*
@@ -746,7 +748,9 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 			if (ndo->ndo_vflag) {
 				ND_TCHECK(dp[5]);
 				ND_PRINT((ndo, " max %u verf %08x%08x",
-				       EXTRACT_BE_U_4(dp + 5), dp[2], dp[3]));
+				          EXTRACT_BE_U_4(dp + 5),
+					  EXTRACT_BE_U_4(dp + 2),
+					  EXTRACT_BE_U_4(dp + 3)));
 			}
 			return;
 		}
@@ -796,7 +800,7 @@ nfs_printfh(netdissect_options *ndo,
 
 		ND_PRINT((ndo, " fh["));
 		for (i=0; i<len; i++) {
-			ND_PRINT((ndo, "%s%x", sep, dp[i]));
+			ND_PRINT((ndo, "%s%x", sep, EXTRACT_BE_U_4(dp + i)));
 			sep = ":";
 		}
 		ND_PRINT((ndo, "]"));
@@ -1233,7 +1237,7 @@ parserddires(netdissect_options *ndo,
 	ND_TCHECK(dp[2]);
 	ND_PRINT((ndo, " offset 0x%x size %d ",
 	       EXTRACT_BE_U_4(dp), EXTRACT_BE_U_4(dp + 1)));
-	if (dp[2] != 0)
+	if (EXTRACT_BE_U_4(dp + 2) != 0)
 		ND_PRINT((ndo, " eof"));
 
 	return (1);
@@ -1366,7 +1370,8 @@ parsev3rddirres(netdissect_options *ndo,
 		return dp;
 	if (ndo->ndo_vflag) {
 		ND_TCHECK(dp[1]);
-		ND_PRINT((ndo, " verf %08x%08x", dp[0], dp[1]));
+		ND_PRINT((ndo, " verf %08x%08x",
+			  EXTRACT_BE_U_4(dp), EXTRACT_BE_U_4(dp + 1)));
 		dp += 2;
 	}
 	return dp;
