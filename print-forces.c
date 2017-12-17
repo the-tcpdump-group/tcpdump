@@ -703,9 +703,9 @@ fdatatlv_print(netdissect_options *ndo,
 
 	if (ndo->ndo_vflag >= 3) {
 		char *ib = indent_pr(indent + 2, 1);
-		ND_PRINT((ndo, "%s[", &ib[1]));
+		ND_PRINT((ndo, "%s[", ib + 1));
 		hex_print_with_offset(ndo, ib, tdp, rlen, 0);
-		ND_PRINT((ndo, "\n%s]\n", &ib[1]));
+		ND_PRINT((ndo, "\n%s]\n", ib + 1));
 	}
 	return 0;
 
@@ -738,15 +738,15 @@ sdatailv_print(netdissect_options *ndo,
 		ND_TCHECK(*ilv);
 		invilv = ilv_valid(ilv, rlen);
 		if (invilv) {
-			ND_PRINT((ndo, "%s[", &ib[1]));
+			ND_PRINT((ndo, "%s[", ib + 1));
 			hex_print_with_offset(ndo, ib, tdp, rlen, 0);
-			ND_PRINT((ndo, "\n%s]\n", &ib[1]));
+			ND_PRINT((ndo, "\n%s]\n", ib + 1));
 			return -1;
 		}
 		if (ndo->ndo_vflag >= 3) {
 			int ilvl = EXTRACT_BE_U_4(&ilv->length);
-			ND_PRINT((ndo, "\n%s ILV: type %x length %d\n", &ib[1],
-			       EXTRACT_BE_U_4(&ilv->type), ilvl));
+			ND_PRINT((ndo, "\n%s ILV: type %x length %d\n", ib + 1,
+				  EXTRACT_BE_U_4(&ilv->type), ilvl));
 			hex_print_with_offset(ndo, "\t\t[", tdp, ilvl-ILV_HDRL, 0);
 		}
 
@@ -1159,7 +1159,7 @@ invoptlv_print(netdissect_options *ndo,
 	char *ib = indent_pr(indent, 1);
 
 	if (ndo->ndo_vflag >= 3) {
-		ND_PRINT((ndo, "%sData[", &ib[1]));
+		ND_PRINT((ndo, "%sData[", ib + 1));
 		hex_print_with_offset(ndo, ib, pptr, len, 0);
 		ND_PRINT((ndo, "%s]\n", ib));
 	}
