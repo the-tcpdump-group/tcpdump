@@ -940,7 +940,9 @@ nbt_tcp_print(netdissect_options *ndo,
     if (caplen < 4)
 	goto trunc;
     maxbuf = data + caplen;
+    ND_TCHECK_8BITS(data);
     type = data[0];
+    ND_TCHECK_16BITS(data + 2);
     nbt_len = EXTRACT_16BITS(data + 2);
     length -= 4;
     caplen -= 4;
