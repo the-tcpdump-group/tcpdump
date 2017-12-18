@@ -2601,7 +2601,6 @@ static void
 bgp_update_print(netdissect_options *ndo,
                  const u_char *dat, u_int length)
 {
-    const struct bgp *bgp_header;
     const u_char *p;
     u_int withdrawn_routes_len;
     char buf[MAXHOSTNAMELEN + 100];
@@ -2614,7 +2613,6 @@ bgp_update_print(netdissect_options *ndo,
     ND_TCHECK_LEN(dat, BGP_SIZE);
     if (length < BGP_SIZE)
         goto trunc;
-    bgp_header = (const struct bgp *)dat;
     p = dat + BGP_SIZE;
     length -= BGP_SIZE;
 
