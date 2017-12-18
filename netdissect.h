@@ -680,7 +680,8 @@ extern int decode_prefix6(netdissect_options *, const u_char *, u_int, char *, u
 
 extern void esp_print_decodesecret(netdissect_options *);
 extern int esp_print_decrypt_buffer_by_ikev2(netdissect_options *, int,
-					     u_char spii[8], u_char spir[8],
+					     const u_char spii[8],
+					     const u_char spir[8],
 					     const u_char *, const u_char *);
 
 #endif  /* netdissect_h */

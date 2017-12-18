@@ -184,7 +184,8 @@ set_cipher_parameters(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher,
 USES_APPLE_DEPRECATED_API
 int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 				      int initiator,
-				      u_char spii[8], u_char spir[8],
+				      const u_char spii[8],
+				      const u_char spir[8],
 				      const u_char *buf, const u_char *end)
 {
 	struct sa_list *sa;
