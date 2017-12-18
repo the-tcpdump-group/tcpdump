@@ -716,10 +716,17 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 				ND_PRINT((ndo, " %u bytes @ %" PRId64,
 				    EXTRACT_BE_U_4(dp + 4),
 				    EXTRACT_BE_U_8(dp)));
-				if (ndo->ndo_vflag)
+				if (ndo->ndo_vflag) {
+					/*
+					 * This displays the 8 bytes
+					 * of the verifier in order,
+					 * from the low-order byte
+					 * to the high-order byte.
+					 */
 					ND_PRINT((ndo, " verf %08x%08x",
 						  EXTRACT_BE_U_4(dp + 2),
 						  EXTRACT_BE_U_4(dp + 3)));
+				}
 			} else {
 				ND_TCHECK(dp[1]);
 				/*
@@ -747,6 +754,12 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 				EXTRACT_BE_U_8(dp)));
 			if (ndo->ndo_vflag) {
 				ND_TCHECK(dp[5]);
+				/*
+				 * This displays the 8 bytes
+				 * of the verifier in order,
+				 * from the low-order byte
+				 * to the high-order byte.
+				 */
 				ND_PRINT((ndo, " max %u verf %08x%08x",
 				          EXTRACT_BE_U_4(dp + 5),
 					  EXTRACT_BE_U_4(dp + 2),
@@ -800,6 +813,18 @@ nfs_printfh(netdissect_options *ndo,
 
 		ND_PRINT((ndo, " fh["));
 		for (i=0; i<len; i++) {
+			/*
+			 * This displays 4 bytes in big-endian byte
+			 * order.  That's as good a choice as little-
+			 * endian, as there's no guarantee that the
+			 * server is big-endian or little-endian or
+			 * that the file handle contains 4-byte
+			 * integral fields, and is better than "the
+			 * byte order of the host running tcpdump", as
+			 * the latter means that different hosts
+			 * running tcpdump may show the same file
+			 * handle in different ways.
+			 */
 			ND_PRINT((ndo, "%s%x", sep, EXTRACT_BE_U_4(dp + i)));
 			sep = ":";
 		}
@@ -1370,6 +1395,10 @@ parsev3rddirres(netdissect_options *ndo,
 		return dp;
 	if (ndo->ndo_vflag) {
 		ND_TCHECK(dp[1]);
+		/*
+		 * This displays the 8 bytes of the verifier in order,
+		 * from the low-order byte to the high-order byte.
+		 */
 		ND_PRINT((ndo, " verf %08x%08x",
 			  EXTRACT_BE_U_4(dp), EXTRACT_BE_U_4(dp + 1)));
 		dp += 2;
