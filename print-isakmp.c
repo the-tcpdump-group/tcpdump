@@ -2645,6 +2645,7 @@ ikev2_e_print(netdissect_options *ndo,
 {
 	const u_char *dat;
 	volatile u_int dlen;
+	uint8_t np;
 
 	ND_TCHECK(*ext);
 	ikev2_pay_print(ndo, NPSTR(tpay), EXTRACT_U_1(ext->critical));
@@ -2662,6 +2663,8 @@ ikev2_e_print(netdissect_options *ndo,
 	ND_TCHECK_LEN(dat, dlen);
 
 #ifdef HAVE_LIBCRYPTO
+	np = EXTRACT_U_1(ext->np);
+
 	/* try to decypt it! */
 	if(esp_print_decrypt_buffer_by_ikev2(ndo,
 					     EXTRACT_U_1(base->flags) & ISAKMP_FLAG_I,
@@ -2671,7 +2674,7 @@ ikev2_e_print(netdissect_options *ndo,
 		ext = (const struct isakmp_gen *)ndo->ndo_packetp;
 
 		/* got it decrypted, print stuff inside. */
-		ikev2_sub_print(ndo, base, EXTRACT_U_1(ext->np), ext,
+		ikev2_sub_print(ndo, base, np, ext,
 				ndo->ndo_snapend, phase, doi, proto, depth+1);
 	}
 #endif
