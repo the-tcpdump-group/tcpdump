@@ -42,13 +42,13 @@
  * @dccph_seq - 24-bit sequence number
  */
 struct dccp_hdr {
-	uint16_t	dccph_sport,
+	nd_uint16_t	dccph_sport,
 			dccph_dport;
-	uint8_t		dccph_doff;
-	uint8_t		dccph_ccval_cscov;
-	uint16_t	dccph_checksum;
-	uint8_t		dccph_xtr;
-	uint8_t		dccph_seq[3];
+	nd_uint8_t	dccph_doff;
+	nd_uint8_t	dccph_ccval_cscov;
+	nd_uint16_t	dccph_checksum;
+	nd_uint8_t	dccph_xtr;
+	nd_uint8_t	dccph_seq[3];
 } UNALIGNED;
 
 /**
@@ -66,21 +66,21 @@ struct dccp_hdr {
  * @dccph_seq - 48-bit sequence number
  */
 struct dccp_hdr_ext {
-	uint16_t	dccph_sport,
+	nd_uint16_t	dccph_sport,
 			dccph_dport;
-	uint8_t		dccph_doff;
-	uint8_t		dccph_ccval_cscov;
-	uint16_t	dccph_checksum;
-	uint8_t		dccph_xtr;
-	uint8_t		reserved;
-	uint8_t		dccph_seq[6];
+	nd_uint8_t	dccph_doff;
+	nd_uint8_t	dccph_ccval_cscov;
+	nd_uint16_t	dccph_checksum;
+	nd_uint8_t	dccph_xtr;
+	nd_uint8_t	reserved;
+	nd_uint8_t	dccph_seq[6];
 } UNALIGNED;
 
-#define DCCPH_CCVAL(dh)	(((dh)->dccph_ccval_cscov >> 4) & 0xF)
-#define DCCPH_CSCOV(dh)	(((dh)->dccph_ccval_cscov) & 0xF)
+#define DCCPH_CCVAL(dh)	((EXTRACT_U_1((dh)->dccph_ccval_cscov) >> 4) & 0xF)
+#define DCCPH_CSCOV(dh)	(EXTRACT_U_1((dh)->dccph_ccval_cscov) & 0xF)
 
-#define DCCPH_X(dh)	((dh)->dccph_xtr & 1)
-#define DCCPH_TYPE(dh)	(((dh)->dccph_xtr >> 1) & 0xF)
+#define DCCPH_X(dh)	(EXTRACT_U_1((dh)->dccph_xtr) & 1)
+#define DCCPH_TYPE(dh)	((EXTRACT_U_1((dh)->dccph_xtr) >> 1) & 0xF)
 
 /**
  * struct dccp_hdr_request - Conection initiation request header
@@ -88,7 +88,7 @@ struct dccp_hdr_ext {
  * @dccph_req_service - Service to which the client app wants to connect
  */
 struct dccp_hdr_request {
-	uint32_t	dccph_req_service;
+	nd_uint32_t	dccph_req_service;
 } UNALIGNED;
 
 /**
@@ -98,8 +98,8 @@ struct dccp_hdr_request {
  * @dccph_resp_service - Echoes the Service Code on a received DCCP-Request
  */
 struct dccp_hdr_response {
-	uint8_t				dccph_resp_ack[8];	/* always 8 bytes */
-	uint32_t			dccph_resp_service;
+	nd_uint8_t	dccph_resp_ack[8];	/* always 8 bytes */
+	nd_uint32_t	dccph_resp_service;
 } UNALIGNED;
 
 /**
@@ -109,9 +109,9 @@ struct dccp_hdr_response {
  * @dccph_reset_service - Echoes the Service Code on a received DCCP-Request
  */
 struct dccp_hdr_reset {
-	uint8_t				dccph_reset_ack[8];	/* always 8 bytes */
-	uint8_t				dccph_reset_code,
-					dccph_reset_data[3];
+	nd_uint8_t	dccph_reset_ack[8];	/* always 8 bytes */
+	nd_uint8_t	dccph_reset_code,
+			dccph_reset_data[3];
 } UNALIGNED;
 
 enum dccp_pkt_type {
@@ -193,7 +193,7 @@ static inline u_int dccp_csum_coverage(const struct dccp_hdr* dh, u_int len)
 
 	if (DCCPH_CSCOV(dh) == 0)
 		return len;
-	cov = (dh->dccph_doff + DCCPH_CSCOV(dh) - 1) * sizeof(uint32_t);
+	cov = (EXTRACT_U_1(dh->dccph_doff) + DCCPH_CSCOV(dh) - 1) * sizeof(uint32_t);
 	return (cov > len)? len : cov;
 }
 
@@ -307,9 +307,9 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 	}
 	ND_TCHECK_LEN(dh, fixed_hdrlen);
 
-	sport = EXTRACT_BE_U_2(&dh->dccph_sport);
-	dport = EXTRACT_BE_U_2(&dh->dccph_dport);
-	hlen = dh->dccph_doff * 4;
+	sport = EXTRACT_BE_U_2(dh->dccph_sport);
+	dport = EXTRACT_BE_U_2(dh->dccph_dport);
+	hlen = EXTRACT_U_1(dh->dccph_doff) * 4;
 
 	if (ip6) {
 		ND_PRINT((ndo, "%s.%d > %s.%d: ",
@@ -341,7 +341,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 	if (ndo->ndo_vflag && ND_TTEST_LEN(bp, len)) {
 		uint16_t sum = 0, dccp_sum;
 
-		dccp_sum = EXTRACT_BE_U_2(&dh->dccph_checksum);
+		dccp_sum = EXTRACT_BE_U_2(dh->dccph_checksum);
 		ND_PRINT((ndo, "cksum 0x%04x ", dccp_sum));
 		if (IP_V(ip) == 4)
 			sum = dccp_cksum(ndo, ip, dh, len);
@@ -372,7 +372,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 		ND_TCHECK(*dhr);
 		ND_PRINT((ndo, "%s (service=%d) ",
 			  tok2str(dccp_pkt_type_str, "", dccph_type),
-			  EXTRACT_BE_U_4(&dhr->dccph_req_service)));
+			  EXTRACT_BE_U_4(dhr->dccph_req_service)));
 		break;
 	}
 	case DCCP_PKT_RESPONSE: {
@@ -388,7 +388,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 		ND_TCHECK(*dhr);
 		ND_PRINT((ndo, "%s (service=%d) ",
 			  tok2str(dccp_pkt_type_str, "", dccph_type),
-			  EXTRACT_BE_U_4(&dhr->dccph_resp_service)));
+			  EXTRACT_BE_U_4(dhr->dccph_resp_service)));
 		break;
 	}
 	case DCCP_PKT_DATA:
@@ -449,7 +449,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 		ND_TCHECK(*dhr);
 		ND_PRINT((ndo, "%s (code=%s) ",
 			  tok2str(dccp_pkt_type_str, "", dccph_type),
-			  dccp_reset_code(dhr->dccph_reset_code)));
+			  dccp_reset_code(EXTRACT_U_1(dhr->dccph_reset_code))));
 		break;
 	}
 	case DCCP_PKT_SYNC:
