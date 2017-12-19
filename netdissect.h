@@ -57,6 +57,12 @@ typedef unsigned char nd_uint64_t[8];
 typedef signed char nd_int8_t[1];
 
 /*
+ * "unsigned char" so that sign extension isn't done on the
+ * individual bytes while they're being assembled.
+ */
+typedef unsigned char nd_int32_t[4];
+
+/*
  * Use this for IPv4 addresses and netmasks.
  *
  * It's defined as an array of octets, so that it's not guaranteed to
