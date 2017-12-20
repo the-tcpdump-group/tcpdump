@@ -98,7 +98,6 @@ ip_finddst(netdissect_options *ndo,
 	int length;
 	int len;
 	const u_char *cp;
-	uint32_t retval;
 
 	cp = (const u_char *)(ip + 1);
 	length = (IP_HL(ip) << 2) - sizeof(struct ip);
@@ -125,13 +124,11 @@ ip_finddst(netdissect_options *ndo,
 		case IPOPT_LSRR:
 			if (len < 7)
 				break;
-			UNALIGNED_MEMCPY(&retval, cp + len - 4, 4);
-			return retval;
+			return (EXTRACT_IPV4_TO_NETWORK_ORDER(cp + len - 4));
 		}
 	}
 trunc:
-	UNALIGNED_MEMCPY(&retval, &ip->ip_dst, sizeof(uint32_t));
-	return retval;
+	return (EXTRACT_IPV4_TO_NETWORK_ORDER(ip->ip_dst));
 }
 
 /*
@@ -155,9 +152,9 @@ nextproto4_cksum(netdissect_options *ndo,
 	ph.len = htons((uint16_t)len);
 	ph.mbz = 0;
 	ph.proto = next_proto;
-	UNALIGNED_MEMCPY(&ph.src, &ip->ip_src, sizeof(uint32_t));
+	ph.src = EXTRACT_IPV4_TO_NETWORK_ORDER(ip->ip_src);
 	if (IP_HL(ip) == 5)
-		UNALIGNED_MEMCPY(&ph.dst, &ip->ip_dst, sizeof(uint32_t));
+		ph.dst = EXTRACT_IPV4_TO_NETWORK_ORDER(ip->ip_dst);
 	else
 		ph.dst = ip_finddst(ndo, ip);
 

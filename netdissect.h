@@ -67,31 +67,33 @@ typedef unsigned char nd_int32_t[4];
  *
  * It's defined as an array of octets, so that it's not guaranteed to
  * be aligned on its "natural" boundary (in some packet formats, it
- * *isn't* so aligned), and it's defined as a structure in the hopes
- * that this makes it harder to naively use EXTRACT_BE_U_4() to extract
- * the value - in many cases you just want to use UNALIGNED_MEMCPY() to
- * copy its value, so that it remains in network byte order.
+ * *isn't* so aligned).  We have separate EXTRACT_ calls for them;
+ * sometimes you want the host-byte-order value, other times you want
+ * the network-byte-order value.
  *
- * (Among other things, we don't want somebody thinking "IPv4 addresses,
- * they're in network byte order, so we want EXTRACT_BE_U_4(), right?"
- * and then handing the result to system APIs that expect network-order
- * IPv4 addresses, such as inet_ntop(), on their little-endian PCs, getting
- * the wrong behavior, and concluding "oh, it must be in *little*-endian
- * order" and "fixing" it to use EXTRACT_LE_U_4().  Yes, people do this;
- * that's why Wireshark has tvb_get_ipv4(), to extract an IPv4 address from
- * a packet data buffer; it was introduced in reaction to somebody who
- * *had* done that.)
+ * Don't use EXTRACT_BE_U_4() on them, use EXTRACT_IPV4_TO_HOST_ORDER()
+ * if you want them in host byte order and EXTRACT_IPV4_TO_NETWORK_ORDER()
+ * if you want them in network byte order (which you want with system APIs
+ * that expect network-order IPv4 addresses, such as inet_ntop()).
+ *
+ * If, on your little-endian machine (e.g., an "IBM-compatible PC", no matter
+ * what the OS, or an Intel Mac, no matter what the OS), you get the wrong
+ * answer, and you've used EXTRACT_BE_U_4(), do *N*O*T* "fix" this by using
+ * EXTRACT_LE_U_4(), fix it by using EXTRACT_IPV4_TO_NETWORK_ORDER(),
+ * otherwise you're breaking the result on big-endian machines (e.g.,
+ * most PowerPC/Power ISA machines, System/390 and z/Architecture, SPARC,
+ * etc.).
+ *
+ * Yes, people do this; that's why Wireshark has tvb_get_ipv4(), to extract
+ * an IPv4 address from a packet data buffer; it was introduced in reaction
+ * to somebody who *had* done that.
  */
-typedef struct {
-	unsigned char bytes[4];
-} nd_ipv4;
+typedef unsigned char nd_ipv4[4];
 
 /*
  * Use this for IPv6 addresses and netmasks.
  */
-typedef struct {
-	unsigned char bytes[16];
-} nd_ipv6;
+typedef unsigned char nd_ipv6[16];
 
 /*
  * Use this for MAC addresses.

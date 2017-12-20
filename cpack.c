@@ -35,8 +35,10 @@
 #include <string.h>
 #include <netdissect-stdinc.h>
 
-#include "cpack.h"
+#include "netdissect.h"
 #include "extract.h"
+
+#include "cpack.h"
 
 const uint8_t *
 cpack_next_boundary(const uint8_t *buf, const uint8_t *p, size_t alignment)

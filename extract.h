@@ -19,6 +19,8 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#include <string.h>
+
 /*
  * For 8-bit values; needed to fetch a one-byte value.  Byte order
  * isn't relevant, and alignment isn't an issue.
@@ -120,6 +122,16 @@ EXTRACT_BE_S_8(const void *p)
 	return ((int64_t)(((int64_t)ntohl(*((const uint32_t *)(p) + 0))) << 32 |
 		((uint64_t)ntohl(*((const uint32_t *)(p) + 1))) << 0));
 
+}
+
+/*
+ * Extract an IPv4 address, which is in network byte order, and not
+ * necessarily aligned, and provide the result in host byte order.
+ */
+static inline uint32_t UNALIGNED_OK
+EXTRACT_IPV4_TO_HOST_ORDER(const void *p)
+{
+	return ((uint32_t)ntohl(*(const uint32_t *)(p)));
 }
 #elif defined(__GNUC__) && defined(HAVE___ATTRIBUTE__) && \
     (defined(__alpha) || defined(__alpha__) || \
@@ -228,6 +240,16 @@ EXTRACT_BE_S_8(const void *p)
 	return ((int64_t)(((uint64_t)ntohl(((const unaligned_uint32_t *)(p) + 0)->val)) << 32 |
 		((uint64_t)ntohl(((const unaligned_uint32_t *)(p) + 1)->val)) << 0));
 }
+
+/*
+ * Extract an IPv4 address, which is in network byte order, and not
+ * necessarily aligned, and provide the result in host byte order.
+ */
+UNALIGNED_OK static inline uint32_t
+EXTRACT_IPV4_TO_HOST_ORDER(const void *p)
+{
+	return ((uint32_t)ntohl(((const unaligned_uint32_t *)(p))->val));
+}
 #else
 /*
  * This architecture doesn't natively support unaligned loads, and either
@@ -271,8 +293,37 @@ EXTRACT_BE_S_8(const void *p)
 	           ((uint64_t)(*((const uint8_t *)(p) + 5)) << 16) | \
 	           ((uint64_t)(*((const uint8_t *)(p) + 6)) << 8) | \
 	           ((uint64_t)(*((const uint8_t *)(p) + 7)) << 0)))
+
+/*
+ * Extract an IPv4 address, which is in network byte order, and not
+ * necessarily aligned, and provide the result in host byte order.
+ */
+#define EXTRACT_IPV4_TO_HOST_ORDER(p) \
+	((uint32_t)(((uint32_t)(*((const uint8_t *)(p) + 0)) << 24) | \
+	            ((uint32_t)(*((const uint8_t *)(p) + 1)) << 16) | \
+	            ((uint32_t)(*((const uint8_t *)(p) + 2)) << 8) | \
+	            ((uint32_t)(*((const uint8_t *)(p) + 3)) << 0)))
 #endif /* unaligned access checks */
 
+/*
+ * Extract an IPv4 address, which is in network byte order, and which
+ * is not necessarily aligned on a 4-byte boundary, and provide the
+ * result in network byte order.
+ *
+ * This works the same way regardless of the host's byte order.
+ */
+static inline uint32_t
+EXTRACT_IPV4_TO_NETWORK_ORDER(const void *p)
+{
+	uint32_t addr;
+
+	UNALIGNED_MEMCPY(&addr, p, sizeof(uint32_t));
+	return addr;
+}
+
+/*
+ * Non-power-of-2 sizes.
+ */
 #define EXTRACT_BE_U_3(p) \
 	((uint32_t)(((uint32_t)(*((const uint8_t *)(p) + 0)) << 16) | \
 	            ((uint32_t)(*((const uint8_t *)(p) + 1)) << 8) | \

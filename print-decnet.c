@@ -38,8 +38,8 @@ struct rtentry;
 #include <stdlib.h>
 #include <string.h>
 
-#include "extract.h"
 #include "netdissect.h"
+#include "extract.h"
 #include "addrtoname.h"
 
 static const char tstr[] = "[|decnet]";
