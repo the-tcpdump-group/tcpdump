@@ -9,6 +9,8 @@
 
 /* \summary: Datagram Congestion Control Protocol (DCCP) printer */
 
+/* specification: RFC 4340 */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -48,7 +50,7 @@ struct dccp_hdr {
 	nd_uint8_t	dccph_ccval_cscov;
 	nd_uint16_t	dccph_checksum;
 	nd_uint8_t	dccph_xtr;
-	nd_uint8_t	dccph_seq[3];
+	nd_uint24_t	dccph_seq;
 } UNALIGNED;
 
 /**
@@ -73,7 +75,7 @@ struct dccp_hdr_ext {
 	nd_uint16_t	dccph_checksum;
 	nd_uint8_t	dccph_xtr;
 	nd_uint8_t	reserved;
-	nd_uint8_t	dccph_seq[6];
+	nd_uint48_t	dccph_seq;
 } UNALIGNED;
 
 #define DCCPH_CCVAL(dh)	((EXTRACT_U_1((dh)->dccph_ccval_cscov) >> 4) & 0xF)
@@ -98,7 +100,7 @@ struct dccp_hdr_request {
  * @dccph_resp_service - Echoes the Service Code on a received DCCP-Request
  */
 struct dccp_hdr_response {
-	nd_uint8_t	dccph_resp_ack[8];	/* always 8 bytes */
+	nd_uint64_t	dccph_resp_ack;	/* always 8 bytes, first 2 reserved */
 	nd_uint32_t	dccph_resp_service;
 } UNALIGNED;
 
@@ -109,9 +111,11 @@ struct dccp_hdr_response {
  * @dccph_reset_service - Echoes the Service Code on a received DCCP-Request
  */
 struct dccp_hdr_reset {
-	nd_uint8_t	dccph_reset_ack[8];	/* always 8 bytes */
-	nd_uint8_t	dccph_reset_code,
-			dccph_reset_data[3];
+	nd_uint64_t	dccph_reset_ack;	/* always 8 bytes, first 2 reserved */
+	nd_uint8_t	dccph_reset_code;
+	nd_uint8_t	dccph_reset_data1;
+	nd_uint8_t	dccph_reset_data2;
+	nd_uint8_t	dccph_reset_data3;
 } UNALIGNED;
 
 enum dccp_pkt_type {
