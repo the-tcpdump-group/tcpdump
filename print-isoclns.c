@@ -117,7 +117,7 @@ static const struct tok isis_pdu_values[] = {
 #define ISIS_TLV_LSP_BUFFERSIZE      14  /* iso10589 rev2 */
 #define ISIS_TLV_LSP_BUFFERSIZE_MINLEN 2
 #define ISIS_TLV_EXT_IS_REACH        22  /* rfc5305 */
-#define ISIS_TLV_IS_ALIAS_ID         24  /* draft-ietf-isis-ext-lsp-frags-02 */
+#define ISIS_TLV_IS_ALIAS_ID         24  /* rfc5311 */
 #define ISIS_TLV_DECNET_PHASE4       42
 #define ISIS_TLV_LUCENT_PRIVATE      66
 #define ISIS_TLV_INT_IP_REACH        128 /* rfc1195, rfc2966 */
@@ -1829,219 +1829,240 @@ trunc:
 }
 
 /*
- * this is the common IS-REACH subTLV decoder it is called
- * from isis_print_ext_is_reach()
- */
-
-static int
-isis_print_is_reach_subtlv(netdissect_options *ndo,
-                           const uint8_t *tptr, u_int subt, u_int subl,
-                           const char *ident)
-{
-        u_int te_class,priority_level,gmpls_switch_cap;
-        union { /* int to float conversion buffer for several subTLVs */
-            float f;
-            uint32_t i;
-        } bw;
-
-        /* first lets see if we know the subTLVs name*/
-	ND_PRINT((ndo, "%s%s subTLV #%u, length: %u",
-	          ident, tok2str(isis_ext_is_reach_subtlv_values, "unknown", subt),
-	          subt, subl));
-
-	ND_TCHECK_LEN(tptr, subl);
-
-        switch(subt) {
-        case ISIS_SUBTLV_EXT_IS_REACH_ADMIN_GROUP:
-        case ISIS_SUBTLV_EXT_IS_REACH_LINK_LOCAL_REMOTE_ID:
-        case ISIS_SUBTLV_EXT_IS_REACH_LINK_REMOTE_ID:
-	    if (subl >= 4) {
-	      ND_PRINT((ndo, ", 0x%08x", EXTRACT_BE_U_4(tptr)));
-	      if (subl == 8) /* rfc4205 */
-	        ND_PRINT((ndo, ", 0x%08x", EXTRACT_BE_U_4(tptr + 4)));
-	    }
-	    break;
-        case ISIS_SUBTLV_EXT_IS_REACH_IPV4_INTF_ADDR:
-        case ISIS_SUBTLV_EXT_IS_REACH_IPV4_NEIGHBOR_ADDR:
-            if (subl >= sizeof(struct in_addr))
-              ND_PRINT((ndo, ", %s", ipaddr_string(ndo, tptr)));
-            break;
-        case ISIS_SUBTLV_EXT_IS_REACH_MAX_LINK_BW :
-	case ISIS_SUBTLV_EXT_IS_REACH_RESERVABLE_BW:
-            if (subl >= 4) {
-              bw.i = EXTRACT_BE_U_4(tptr);
-              ND_PRINT((ndo, ", %.3f Mbps", bw.f * 8 / 1000000));
-            }
-            break;
-        case ISIS_SUBTLV_EXT_IS_REACH_UNRESERVED_BW :
-            if (subl >= 32) {
-              for (te_class = 0; te_class < 8; te_class++) {
-                bw.i = EXTRACT_BE_U_4(tptr);
-                ND_PRINT((ndo, "%s  TE-Class %u: %.3f Mbps",
-                       ident,
-                       te_class,
-                       bw.f * 8 / 1000000));
-		tptr+=4;
-	      }
-            }
-            break;
-        case ISIS_SUBTLV_EXT_IS_REACH_BW_CONSTRAINTS: /* fall through */
-        case ISIS_SUBTLV_EXT_IS_REACH_BW_CONSTRAINTS_OLD:
-            if (subl == 0)
-                break;
-            ND_PRINT((ndo, "%sBandwidth Constraints Model ID: %s (%u)",
-                   ident,
-                   tok2str(diffserv_te_bc_values, "unknown", EXTRACT_U_1(tptr)),
-                   EXTRACT_U_1(tptr)));
-            tptr++;
-            /* decode BCs until the subTLV ends */
-            for (te_class = 0; te_class < (subl-1)/4; te_class++) {
-                bw.i = EXTRACT_BE_U_4(tptr);
-                ND_PRINT((ndo, "%s  Bandwidth constraint CT%u: %.3f Mbps",
-                       ident,
-                       te_class,
-                       bw.f * 8 / 1000000));
-		tptr+=4;
-            }
-            break;
-        case ISIS_SUBTLV_EXT_IS_REACH_TE_METRIC:
-            if (subl >= 3)
-              ND_PRINT((ndo, ", %u", EXTRACT_BE_U_3(tptr)));
-            break;
-        case ISIS_SUBTLV_EXT_IS_REACH_LINK_ATTRIBUTE:
-            if (subl == 2) {
-               ND_PRINT((ndo, ", [ %s ] (0x%04x)",
-                      bittok2str(isis_subtlv_link_attribute_values,
-                                 "Unknown",
-                                 EXTRACT_BE_U_2(tptr)),
-                      EXTRACT_BE_U_2(tptr)));
-            }
-            break;
-        case ISIS_SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE:
-            if (subl >= 2) {
-              ND_PRINT((ndo, ", %s, Priority %u",
-		   bittok2str(gmpls_link_prot_values, "none", EXTRACT_U_1(tptr)),
-		   EXTRACT_U_1(tptr + 1)));
-            }
-            break;
-        case ISIS_SUBTLV_SPB_METRIC:
-            if (subl >= 6) {
-              ND_PRINT((ndo, ", LM: %u", EXTRACT_BE_U_3(tptr)));
-              tptr=tptr+3;
-              ND_PRINT((ndo, ", P: %u", EXTRACT_U_1(tptr)));
-              tptr++;
-              ND_PRINT((ndo, ", P-ID: %u", EXTRACT_BE_U_2(tptr)));
-            }
-            break;
-        case ISIS_SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR:
-            if (subl >= 36) {
-              gmpls_switch_cap = EXTRACT_U_1(tptr);
-              ND_PRINT((ndo, "%s  Interface Switching Capability:%s",
-                   ident,
-                   tok2str(gmpls_switch_cap_values, "Unknown", gmpls_switch_cap)));
-              ND_PRINT((ndo, ", LSP Encoding: %s",
-                   tok2str(gmpls_encoding_values, "Unknown", EXTRACT_U_1((tptr + 1)))));
-	      tptr+=4;
-              ND_PRINT((ndo, "%s  Max LSP Bandwidth:", ident));
-              for (priority_level = 0; priority_level < 8; priority_level++) {
-                bw.i = EXTRACT_BE_U_4(tptr);
-                ND_PRINT((ndo, "%s    priority level %u: %.3f Mbps",
-                       ident,
-                       priority_level,
-                       bw.f * 8 / 1000000));
-		tptr+=4;
-              }
-              subl-=36;
-              switch (gmpls_switch_cap) {
-              case GMPLS_PSC1:
-              case GMPLS_PSC2:
-              case GMPLS_PSC3:
-              case GMPLS_PSC4:
-                if (subl < 6)
-                    break;
-                bw.i = EXTRACT_BE_U_4(tptr);
-                ND_PRINT((ndo, "%s  Min LSP Bandwidth: %.3f Mbps", ident, bw.f * 8 / 1000000));
-                ND_PRINT((ndo, "%s  Interface MTU: %u", ident, EXTRACT_BE_U_2(tptr + 4)));
-                break;
-              case GMPLS_TSC:
-                if (subl < 8)
-                    break;
-                bw.i = EXTRACT_BE_U_4(tptr);
-                ND_PRINT((ndo, "%s  Min LSP Bandwidth: %.3f Mbps", ident, bw.f * 8 / 1000000));
-                ND_PRINT((ndo, "%s  Indication %s", ident,
-                       tok2str(gmpls_switch_cap_tsc_indication_values, "Unknown (%u)", EXTRACT_U_1((tptr + 4)))));
-                break;
-              default:
-                /* there is some optional stuff left to decode but this is as of yet
-                   not specified so just lets hexdump what is left */
-                if(subl>0){
-                  if (!print_unknown_data(ndo, tptr, "\n\t\t    ", subl))
-                    return(0);
-                }
-              }
-            }
-            break;
-        default:
-            if (!print_unknown_data(ndo, tptr, "\n\t\t    ", subl))
-                return(0);
-            break;
-        }
-        return(1);
-
-trunc:
-    return(0);
-}
-
-/*
  * this is the common IS-REACH decoder it is called
  * from various EXTD-IS REACH style TLVs (22,24,222)
  */
 
 static int
 isis_print_ext_is_reach(netdissect_options *ndo,
-                        const uint8_t *tptr, const char *ident, u_int tlv_type)
+                        const uint8_t *tptr, const char *ident, u_int tlv_type,
+                        u_int tlv_remaining)
 {
     char ident_buffer[20];
     u_int subtlv_type,subtlv_len,subtlv_sum_len;
     int proc_bytes = 0; /* how many bytes did we process ? */
+    u_int te_class,priority_level,gmpls_switch_cap;
+    union { /* int to float conversion buffer for several subTLVs */
+        float f;
+        uint32_t i;
+    } bw;
 
     if (!ND_TTEST_LEN(tptr, NODE_ID_LEN))
+        return(0);
+    if (tlv_remaining < NODE_ID_LEN)
         return(0);
 
     ND_PRINT((ndo, "%sIS Neighbor: %s", ident, isis_print_id(tptr, NODE_ID_LEN)));
     tptr+=NODE_ID_LEN;
+    tlv_remaining-=NODE_ID_LEN;
 
     if (tlv_type != ISIS_TLV_IS_ALIAS_ID) { /* the Alias TLV Metric field is implicit 0 */
         if (!ND_TTEST_3(tptr))    /* and is therefore skipped */
 	    return(0);
+	if (tlv_remaining < 3)
+	    return(0);
 	ND_PRINT((ndo, ", Metric: %u", EXTRACT_BE_U_3(tptr)));
 	tptr+=3;
+	tlv_remaining-=3;
     }
 
     if (!ND_TTEST_1(tptr))
         return(0);
+    if (tlv_remaining < 1)
+        return(0);
     subtlv_sum_len=EXTRACT_U_1(tptr); /* read out subTLV length */
     tptr++;
+    tlv_remaining--;
     proc_bytes=NODE_ID_LEN+3+1;
     ND_PRINT((ndo, ", %ssub-TLVs present",subtlv_sum_len ? "" : "no "));
     if (subtlv_sum_len) {
         ND_PRINT((ndo, " (%u)", subtlv_sum_len));
-        while (subtlv_sum_len>0) {
+        /* prepend the indent string */
+        snprintf(ident_buffer, sizeof(ident_buffer), "%s  ",ident);
+        ident = ident_buffer;
+        while (subtlv_sum_len != 0) {
             if (!ND_TTEST_2(tptr))
                 return(0);
+            if (tlv_remaining < 2) {
+                ND_PRINT((ndo, "%sRemaining data in TLV shorter than a subTLV header",ident));
+                proc_bytes += tlv_remaining;
+                break;
+            }
+            if (subtlv_sum_len < 2) {
+                ND_PRINT((ndo, "%sRemaining data in subTLVs shorter than a subTLV header",ident));
+                proc_bytes += subtlv_sum_len;
+                break;
+            }
             subtlv_type=EXTRACT_U_1(tptr);
             subtlv_len=EXTRACT_U_1(tptr + 1);
-            tptr+=2;
-            /* prepend the indent string */
-            snprintf(ident_buffer, sizeof(ident_buffer), "%s  ",ident);
-            if (!isis_print_is_reach_subtlv(ndo, tptr, subtlv_type, subtlv_len, ident_buffer))
-                return(0);
-            tptr+=subtlv_len;
-            subtlv_sum_len-=(subtlv_len+2);
-            proc_bytes+=(subtlv_len+2);
+            tptr += 2;
+            tlv_remaining -= 2;
+            subtlv_sum_len -= 2;
+            proc_bytes += 2;
+            ND_PRINT((ndo, "%s%s subTLV #%u, length: %u",
+                      ident, tok2str(isis_ext_is_reach_subtlv_values, "unknown", subtlv_type),
+                      subtlv_type, subtlv_len));
+
+            if (subtlv_sum_len < subtlv_len) {
+                ND_PRINT((ndo, " (remaining data in subTLVs shorter than the current subTLV)"));
+                proc_bytes += subtlv_sum_len;
+                break;
+            }
+
+            if (tlv_remaining < subtlv_len) {
+                ND_PRINT((ndo, " (> remaining tlv length)"));
+                proc_bytes += tlv_remaining;
+                break;
+            }
+
+            ND_TCHECK_LEN(tptr, subtlv_len);
+
+            switch(subtlv_type) {
+            case ISIS_SUBTLV_EXT_IS_REACH_ADMIN_GROUP:
+            case ISIS_SUBTLV_EXT_IS_REACH_LINK_LOCAL_REMOTE_ID:
+            case ISIS_SUBTLV_EXT_IS_REACH_LINK_REMOTE_ID:
+                if (subtlv_len >= 4) {
+                    ND_PRINT((ndo, ", 0x%08x", EXTRACT_BE_U_4(tptr)));
+                    if (subtlv_len == 8) /* rfc4205 */
+                        ND_PRINT((ndo, ", 0x%08x", EXTRACT_BE_U_4(tptr + 4)));
+                }
+                break;
+            case ISIS_SUBTLV_EXT_IS_REACH_IPV4_INTF_ADDR:
+            case ISIS_SUBTLV_EXT_IS_REACH_IPV4_NEIGHBOR_ADDR:
+                if (subtlv_len >= sizeof(struct in_addr))
+                    ND_PRINT((ndo, ", %s", ipaddr_string(ndo, tptr)));
+                break;
+            case ISIS_SUBTLV_EXT_IS_REACH_MAX_LINK_BW :
+            case ISIS_SUBTLV_EXT_IS_REACH_RESERVABLE_BW:
+                if (subtlv_len >= 4) {
+                    bw.i = EXTRACT_BE_U_4(tptr);
+                    ND_PRINT((ndo, ", %.3f Mbps", bw.f * 8 / 1000000));
+                }
+                break;
+            case ISIS_SUBTLV_EXT_IS_REACH_UNRESERVED_BW :
+                if (subtlv_len >= 32) {
+                    for (te_class = 0; te_class < 8; te_class++) {
+                        bw.i = EXTRACT_BE_U_4(tptr);
+                        ND_PRINT((ndo, "%s  TE-Class %u: %.3f Mbps",
+                                  ident,
+                                  te_class,
+                                  bw.f * 8 / 1000000));
+                        tptr += 4;
+                    }
+                }
+                break;
+            case ISIS_SUBTLV_EXT_IS_REACH_BW_CONSTRAINTS: /* fall through */
+            case ISIS_SUBTLV_EXT_IS_REACH_BW_CONSTRAINTS_OLD:
+                if (subtlv_len == 0)
+                    break;
+                ND_PRINT((ndo, "%sBandwidth Constraints Model ID: %s (%u)",
+                          ident,
+                          tok2str(diffserv_te_bc_values, "unknown", EXTRACT_U_1(tptr)),
+                          EXTRACT_U_1(tptr)));
+                tptr++;
+                /* decode BCs until the subTLV ends */
+                for (te_class = 0; te_class < (subtlv_len-1)/4; te_class++) {
+                    bw.i = EXTRACT_BE_U_4(tptr);
+                    ND_PRINT((ndo, "%s  Bandwidth constraint CT%u: %.3f Mbps",
+                              ident,
+                              te_class,
+                              bw.f * 8 / 1000000));
+                    tptr += 4;
+                }
+                break;
+            case ISIS_SUBTLV_EXT_IS_REACH_TE_METRIC:
+                if (subtlv_len >= 3)
+                    ND_PRINT((ndo, ", %u", EXTRACT_BE_U_3(tptr)));
+                break;
+            case ISIS_SUBTLV_EXT_IS_REACH_LINK_ATTRIBUTE:
+                if (subtlv_len == 2) {
+                    ND_PRINT((ndo, ", [ %s ] (0x%04x)",
+                              bittok2str(isis_subtlv_link_attribute_values,
+                                         "Unknown",
+                                         EXTRACT_BE_U_2(tptr)),
+                              EXTRACT_BE_U_2(tptr)));
+                }
+                break;
+            case ISIS_SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE:
+                if (subtlv_len >= 2) {
+                    ND_PRINT((ndo, ", %s, Priority %u",
+                              bittok2str(gmpls_link_prot_values, "none", EXTRACT_U_1(tptr)),
+                              EXTRACT_U_1(tptr + 1)));
+                }
+                break;
+            case ISIS_SUBTLV_SPB_METRIC:
+                if (subtlv_len >= 6) {
+                    ND_PRINT((ndo, ", LM: %u", EXTRACT_BE_U_3(tptr)));
+                    tptr += 3;
+                    ND_PRINT((ndo, ", P: %u", EXTRACT_U_1(tptr)));
+                    tptr++;
+                    ND_PRINT((ndo, ", P-ID: %u", EXTRACT_BE_U_2(tptr)));
+                }
+                break;
+            case ISIS_SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR:
+                if (subtlv_len >= 36) {
+                    gmpls_switch_cap = EXTRACT_U_1(tptr);
+                    ND_PRINT((ndo, "%s  Interface Switching Capability:%s",
+                              ident,
+                              tok2str(gmpls_switch_cap_values, "Unknown", gmpls_switch_cap)));
+                    ND_PRINT((ndo, ", LSP Encoding: %s",
+                              tok2str(gmpls_encoding_values, "Unknown", EXTRACT_U_1((tptr + 1)))));
+                    tptr += 4;
+                    ND_PRINT((ndo, "%s  Max LSP Bandwidth:", ident));
+                    for (priority_level = 0; priority_level < 8; priority_level++) {
+                        bw.i = EXTRACT_BE_U_4(tptr);
+                        ND_PRINT((ndo, "%s    priority level %u: %.3f Mbps",
+                                  ident,
+                                  priority_level,
+                                  bw.f * 8 / 1000000));
+                        tptr += 4;
+                    }
+                    subtlv_len -= 36;
+                    switch (gmpls_switch_cap) {
+                    case GMPLS_PSC1:
+                    case GMPLS_PSC2:
+                    case GMPLS_PSC3:
+                    case GMPLS_PSC4:
+                        if (subtlv_len < 6)
+                            break;
+                        bw.i = EXTRACT_BE_U_4(tptr);
+                        ND_PRINT((ndo, "%s  Min LSP Bandwidth: %.3f Mbps", ident, bw.f * 8 / 1000000));
+                        ND_PRINT((ndo, "%s  Interface MTU: %u", ident, EXTRACT_BE_U_2(tptr + 4)));
+                        break;
+                    case GMPLS_TSC:
+                        if (subtlv_len < 8)
+                            break;
+                        bw.i = EXTRACT_BE_U_4(tptr);
+                        ND_PRINT((ndo, "%s  Min LSP Bandwidth: %.3f Mbps", ident, bw.f * 8 / 1000000));
+                        ND_PRINT((ndo, "%s  Indication %s", ident,
+                                  tok2str(gmpls_switch_cap_tsc_indication_values, "Unknown (%u)", EXTRACT_U_1((tptr + 4)))));
+                        break;
+                    default:
+                        /* there is some optional stuff left to decode but this is as of yet
+                           not specified so just lets hexdump what is left */
+                        if (subtlv_len != 0) {
+                            if (!print_unknown_data(ndo, tptr, "\n\t\t    ", subtlv_len))
+                                return(0);
+                        }
+                    }
+                }
+                break;
+            default:
+                if (!print_unknown_data(ndo, tptr, "\n\t\t    ", subtlv_len))
+                    return(0);
+                break;
+            }
+
+            tptr += subtlv_len;
+            tlv_remaining -= subtlv_len;
+            subtlv_sum_len -= subtlv_len;
+            proc_bytes += subtlv_len;
         }
     }
     return(proc_bytes);
+
+trunc:
+    return(0);
 }
 
 /*
@@ -2152,7 +2173,7 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
 
     if ((afi == AF_INET  && ISIS_MASK_TLV_EXTD_IP_SUBTLV(status_byte))
      || (afi == AF_INET6 && ISIS_MASK_TLV_EXTD_IP6_SUBTLV(status_byte))
-	) {
+            ) {
         /* assume that one prefix can hold more
            than one subTLV - therefore the first byte must reflect
            the aggregate bytecount of the subTLVs for this prefix
@@ -2662,7 +2683,7 @@ isis_print(netdissect_options *ndo,
             tptr+=mt_len;
             tmp-=mt_len;
             while (tmp >= 2+NODE_ID_LEN+3+1) {
-                ext_is_len = isis_print_ext_is_reach(ndo, tptr, "\n\t      ", tlv_type);
+                ext_is_len = isis_print_ext_is_reach(ndo, tptr, "\n\t      ", tlv_type, tmp);
                 if (ext_is_len == 0) /* did something go wrong ? */
                     goto trunctlv;
 
@@ -2673,7 +2694,7 @@ isis_print(netdissect_options *ndo,
 
         case ISIS_TLV_IS_ALIAS_ID:
 	    while (tmp >= NODE_ID_LEN+1) { /* is it worth attempting a decode ? */
-	        ext_is_len = isis_print_ext_is_reach(ndo, tptr, "\n\t      ", tlv_type);
+	        ext_is_len = isis_print_ext_is_reach(ndo, tptr, "\n\t      ", tlv_type, tmp);
 		if (ext_is_len == 0) /* did something go wrong ? */
 	            goto trunctlv;
 		tmp-=ext_is_len;
@@ -2683,7 +2704,7 @@ isis_print(netdissect_options *ndo,
 
         case ISIS_TLV_EXT_IS_REACH:
             while (tmp >= NODE_ID_LEN+3+1) { /* is it worth attempting a decode ? */
-                ext_is_len = isis_print_ext_is_reach(ndo, tptr, "\n\t      ", tlv_type);
+                ext_is_len = isis_print_ext_is_reach(ndo, tptr, "\n\t      ", tlv_type, tmp);
                 if (ext_is_len == 0) /* did something go wrong ? */
                     goto trunctlv;
                 tmp-=ext_is_len;
