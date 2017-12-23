@@ -112,8 +112,8 @@ static int parse_q922_header(netdissect_options *ndo,
 	*addr_len = 2;
 	*dlci = ((EXTRACT_U_1(p) & 0xFC) << 2) | ((EXTRACT_U_1(p + 1) & 0xF0) >> 4);
 
-	*flags = (EXTRACT_U_1(p) & 0x02 << 24) |	/* CR flag */
-		 (EXTRACT_U_1(p + 1) & 0x0e) << 16;	/* FECN,BECN,DE flags */
+	*flags = ((EXTRACT_U_1(p) & 0x02) << 24) |	/* CR flag */
+		 ((EXTRACT_U_1(p + 1) & 0x0e) << 16);	/* FECN,BECN,DE flags */
 
 	if (EXTRACT_U_1(p + 1) & FR_EA_BIT)
 		return 1;	/* 2-byte Q.922 address */
