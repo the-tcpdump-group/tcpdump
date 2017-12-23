@@ -555,7 +555,7 @@ decode_prefix4(netdissect_options *ndo,
     if (plen % 8) {
         ((u_char *)&addr)[plenbytes - 1] &= ((0xff00 >> (plen % 8)) & 0xff);
     }
-    snprintf(buf, buflen, "%s/%d", ipaddr_string(ndo, &addr), plen);
+    snprintf(buf, buflen, "%s/%u", ipaddr_string(ndo, &addr), plen);
     return 1 + plenbytes;
 
 trunc:
@@ -603,7 +603,7 @@ decode_labeled_prefix4(netdissect_options *ndo,
         ((u_char *)&addr)[plenbytes - 1] &= ((0xff00 >> (plen % 8)) & 0xff);
     }
     /* the label may get offsetted by 4 bits so lets shift it right */
-    snprintf(buf, buflen, "%s/%d, label:%u %s",
+    snprintf(buf, buflen, "%s/%u, label:%u %s",
              ipaddr_string(ndo, &addr),
              plen,
              EXTRACT_BE_U_3(pptr + 1)>>4,
@@ -843,7 +843,7 @@ decode_labeled_vpn_prefix4(netdissect_options *ndo,
             ((0xff00 >> (plen % 8)) & 0xff);
     }
     /* the label may get offsetted by 4 bits so lets shift it right */
-    snprintf(buf, buflen, "RD: %s, %s/%d, label:%u %s",
+    snprintf(buf, buflen, "RD: %s, %s/%u, label:%u %s",
              bgp_vpn_rd_print(ndo, pptr+4),
              ipaddr_string(ndo, &addr),
              plen,
@@ -1037,7 +1037,8 @@ static int
 decode_labeled_vpn_l2(netdissect_options *ndo,
                       const u_char *pptr, char *buf, u_int buflen)
 {
-    int plen, tlen, stringlen, tlv_type, tlv_len, ttlv_len;
+    u_int plen, tlen, tlv_type, tlv_len, ttlv_len;
+    int stringlen;
 
     ND_TCHECK_2(pptr);
     plen = EXTRACT_BE_U_2(pptr);
@@ -1074,7 +1075,7 @@ decode_labeled_vpn_l2(netdissect_options *ndo,
         tlen -= 15;
 
         /* ok now the variable part - lets read out TLVs*/
-        while (tlen>0) {
+        while (tlen != 00) {
             if (tlen < 3)
                 return -1;
             ND_TCHECK_3(pptr);
@@ -1149,7 +1150,7 @@ decode_prefix6(netdissect_options *ndo,
         addr.s6_addr[plenbytes - 1] &=
             ((0xff00 >> (plen % 8)) & 0xff);
     }
-    snprintf(buf, buflen, "%s/%d", ip6addr_string(ndo, &addr), plen);
+    snprintf(buf, buflen, "%s/%u", ip6addr_string(ndo, &addr), plen);
     return 1 + plenbytes;
 
 trunc:
@@ -1189,7 +1190,7 @@ decode_labeled_prefix6(netdissect_options *ndo,
             ((0xff00 >> (plen % 8)) & 0xff);
     }
     /* the label may get offsetted by 4 bits so lets shift it right */
-    snprintf(buf, buflen, "%s/%d, label:%u %s",
+    snprintf(buf, buflen, "%s/%u, label:%u %s",
              ip6addr_string(ndo, &addr),
              plen,
              EXTRACT_BE_U_3(pptr + 1)>>4,
@@ -1230,7 +1231,7 @@ decode_labeled_vpn_prefix6(netdissect_options *ndo,
             ((0xff00 >> (plen % 8)) & 0xff);
     }
     /* the label may get offsetted by 4 bits so lets shift it right */
-    snprintf(buf, buflen, "RD: %s, %s/%d, label:%u %s",
+    snprintf(buf, buflen, "RD: %s, %s/%u, label:%u %s",
              bgp_vpn_rd_print(ndo, pptr+4),
              ip6addr_string(ndo, &addr),
              plen,
@@ -1263,7 +1264,7 @@ decode_clnp_prefix(netdissect_options *ndo,
         addr[(plen + 7) / 8 - 1] &=
             ((0xff00 >> (plen % 8)) & 0xff);
     }
-    snprintf(buf, buflen, "%s/%d",
+    snprintf(buf, buflen, "%s/%u",
              isonsap_string(ndo, addr,(plen + 7) / 8),
              plen);
 
@@ -1298,7 +1299,7 @@ decode_labeled_vpn_clnp_prefix(netdissect_options *ndo,
         addr[(plen + 7) / 8 - 1] &= ((0xff00 >> (plen % 8)) & 0xff);
     }
     /* the label may get offsetted by 4 bits so lets shift it right */
-    snprintf(buf, buflen, "RD: %s, %s/%d, label:%u %s",
+    snprintf(buf, buflen, "RD: %s, %s/%u, label:%u %s",
              bgp_vpn_rd_print(ndo, pptr+4),
              isonsap_string(ndo, addr,(plen + 7) / 8),
              plen,
@@ -1441,7 +1442,7 @@ bgp_attr_print(netdissect_options *ndo,
     char buf[MAXHOSTNAMELEN + 100];
     u_int as_size;
     int add_path4, add_path6;
-    u_int path_id;
+    u_int path_id = 0;
 
     tptr = pptr;
     tlen = len;
@@ -1664,9 +1665,9 @@ bgp_attr_print(netdissect_options *ndo,
         tptr++;
 
         if (tlen) {
-            int nnh = 0;
+            u_int nnh = 0;
             ND_PRINT((ndo, "\n\t    nexthop: "));
-            while (tlen > 0) {
+            while (tlen != 0) {
                 if (nnh++ > 0) {
                     ND_PRINT((ndo,  ", " ));
                 }
@@ -1801,7 +1802,7 @@ bgp_attr_print(netdissect_options *ndo,
             ND_PRINT((ndo, "\n\t    %u SNPA", snpa));
             for (/*nothing*/; snpa > 0; snpa--) {
                 ND_TCHECK_1(tptr);
-                ND_PRINT((ndo, "\n\t      %d bytes", EXTRACT_U_1(tptr)));
+                ND_PRINT((ndo, "\n\t      %u bytes", EXTRACT_U_1(tptr)));
                 tptr += EXTRACT_U_1(tptr) + 1;
             }
         } else {
@@ -1830,7 +1831,7 @@ bgp_attr_print(netdissect_options *ndo,
                 else
                     ND_PRINT((ndo, "\n\t      %s", buf));
                 if (add_path4) {
-                    ND_PRINT((ndo, "   Path Id: %d", path_id));
+                    ND_PRINT((ndo, "   Path Id: %u", path_id));
                 }
                 break;
             case (AFNUM_INET<<8 | SAFNUM_LABUNICAST):
@@ -1901,7 +1902,7 @@ bgp_attr_print(netdissect_options *ndo,
                 else
                     ND_PRINT((ndo, "\n\t      %s", buf));
                 if (add_path6) {
-                    ND_PRINT((ndo, "   Path Id: %d", path_id));
+                    ND_PRINT((ndo, "   Path Id: %u", path_id));
                 }
                 break;
             case (AFNUM_INET6<<8 | SAFNUM_LABUNICAST):
@@ -2015,7 +2016,7 @@ bgp_attr_print(netdissect_options *ndo,
                 else
                     ND_PRINT((ndo, "\n\t      %s", buf));
                 if (add_path4) {
-                    ND_PRINT((ndo, "   Path Id: %d", path_id));
+                    ND_PRINT((ndo, "   Path Id: %u", path_id));
                 }
                 break;
             case (AFNUM_INET<<8 | SAFNUM_LABUNICAST):
@@ -2057,7 +2058,7 @@ bgp_attr_print(netdissect_options *ndo,
                 else
                     ND_PRINT((ndo, "\n\t      %s", buf));
                 if (add_path6) {
-                    ND_PRINT((ndo, "   Path Id: %d", path_id));
+                    ND_PRINT((ndo, "   Path Id: %u", path_id));
                 }
                 break;
             case (AFNUM_INET6<<8 | SAFNUM_LABUNICAST):
@@ -2608,7 +2609,7 @@ bgp_update_print(netdissect_options *ndo,
     u_int len;
     int i;
     int add_path;
-    int path_id;
+    u_int path_id = 0;
 
     ND_TCHECK_LEN(dat, BGP_SIZE);
     if (length < BGP_SIZE)
@@ -2652,7 +2653,7 @@ bgp_update_print(netdissect_options *ndo,
             else {
                 ND_PRINT((ndo, "\n\t    %s", buf));
                 if (add_path) {
-                    ND_PRINT((ndo, "   Path Id: %d", path_id));
+                    ND_PRINT((ndo, "   Path Id: %u", path_id));
                 }
                 p += wpfx;
                 length -= wpfx;
@@ -2750,7 +2751,7 @@ bgp_update_print(netdissect_options *ndo,
             else {
                 ND_PRINT((ndo, "\n\t    %s", buf));
                 if (add_path) {
-                    ND_PRINT((ndo, "   Path Id: %d", path_id));
+                    ND_PRINT((ndo, "   Path Id: %u", path_id));
                 }
                 p += i;
                 length -= i;
