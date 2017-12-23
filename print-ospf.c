@@ -804,7 +804,7 @@ ospf_print_lsa(netdissect_options *ndo,
 
 	    switch (EXTRACT_U_1(lsap->ls_hdr.un_lsa_id.opaque_field.opaque_type)) {
             case LS_OPAQUE_TYPE_RI:
-		tptr = (const uint8_t *)(&lsap->lsa_un.un_ri_tlv.type);
+		tptr = (const uint8_t *)(lsap->lsa_un.un_ri_tlv);
 
 		while (ls_length != 0) {
                     ND_TCHECK_4(tptr);
@@ -852,14 +852,14 @@ ospf_print_lsa(netdissect_options *ndo,
                 break;
 
             case LS_OPAQUE_TYPE_GRACE:
-                if (ospf_print_grace_lsa(ndo, (const uint8_t *)(&lsap->lsa_un.un_grace_tlv.type),
+                if (ospf_print_grace_lsa(ndo, (const uint8_t *)(lsap->lsa_un.un_grace_tlv),
                                          ls_length) == -1) {
                     return(ls_end);
                 }
                 break;
 
 	    case LS_OPAQUE_TYPE_TE:
-                if (ospf_print_te_lsa(ndo, (const uint8_t *)(&lsap->lsa_un.un_te_lsa_tlv.type),
+                if (ospf_print_te_lsa(ndo, (const uint8_t *)(lsap->lsa_un.un_te_lsa_tlv),
                                       ls_length) == -1) {
                     return(ls_end);
                 }

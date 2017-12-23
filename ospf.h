@@ -230,21 +230,21 @@ struct lsa {
 	    nd_uint16_t type;
 	    nd_uint16_t length;
 	    nd_byte     data[1]; /* may repeat   */
-	} un_te_lsa_tlv;
+	} un_te_lsa_tlv[1]; /* may repeat */
 
         /* Opaque Grace LSA */
         struct {
 	    nd_uint16_t type;
 	    nd_uint16_t length;
 	    nd_byte     data[1]; /* may repeat   */
-	} un_grace_tlv;
+	} un_grace_tlv[1]; /* may repeat */
 
         /* Opaque Router information LSA */
         struct {
 	    nd_uint16_t type;
 	    nd_uint16_t length;
 	    nd_byte     data[1]; /* may repeat   */
-	} un_ri_tlv;
+	} un_ri_tlv[1]; /* may repeat */
 
         /* Unknown LSA */
         struct unknown {
