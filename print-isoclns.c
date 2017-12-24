@@ -1948,6 +1948,9 @@ isis_print_ext_is_reach(netdissect_options *ndo,
                                   te_class,
                                   bw.f * 8 / 1000000));
                         tptr += 4;
+                        subtlv_len -= 4;
+                        subtlv_sum_len -= 4;
+                        proc_bytes += 4;
                     }
                 }
                 break;
@@ -1960,14 +1963,22 @@ isis_print_ext_is_reach(netdissect_options *ndo,
                           tok2str(diffserv_te_bc_values, "unknown", EXTRACT_U_1(tptr)),
                           EXTRACT_U_1(tptr)));
                 tptr++;
+                subtlv_len--;
+                subtlv_sum_len--;
+                proc_bytes++;
                 /* decode BCs until the subTLV ends */
-                for (te_class = 0; te_class < (subtlv_len-1)/4; te_class++) {
+                for (te_class = 0; subtlv_len != 0; te_class++) {
+                    if (subtlv_len < 4)
+                        break;
                     bw.i = EXTRACT_BE_U_4(tptr);
                     ND_PRINT((ndo, "%s  Bandwidth constraint CT%u: %.3f Mbps",
                               ident,
                               te_class,
                               bw.f * 8 / 1000000));
                     tptr += 4;
+                    subtlv_len -= 4;
+                    subtlv_sum_len -= 4;
+                    proc_bytes += 4;
                 }
                 break;
             case ISIS_SUBTLV_EXT_IS_REACH_TE_METRIC:
@@ -1994,8 +2005,14 @@ isis_print_ext_is_reach(netdissect_options *ndo,
                 if (subtlv_len >= 6) {
                     ND_PRINT((ndo, ", LM: %u", EXTRACT_BE_U_3(tptr)));
                     tptr += 3;
+                    subtlv_len -= 3;
+                    subtlv_sum_len -= 3;
+                    proc_bytes += 3;
                     ND_PRINT((ndo, ", P: %u", EXTRACT_U_1(tptr)));
                     tptr++;
+                    subtlv_len--;
+                    subtlv_sum_len--;
+                    proc_bytes++;
                     ND_PRINT((ndo, ", P-ID: %u", EXTRACT_BE_U_2(tptr)));
                 }
                 break;
@@ -2008,6 +2025,9 @@ isis_print_ext_is_reach(netdissect_options *ndo,
                     ND_PRINT((ndo, ", LSP Encoding: %s",
                               tok2str(gmpls_encoding_values, "Unknown", EXTRACT_U_1((tptr + 1)))));
                     tptr += 4;
+                    subtlv_len -= 4;
+                    subtlv_sum_len -= 4;
+                    proc_bytes += 4;
                     ND_PRINT((ndo, "%s  Max LSP Bandwidth:", ident));
                     for (priority_level = 0; priority_level < 8; priority_level++) {
                         bw.i = EXTRACT_BE_U_4(tptr);
@@ -2016,8 +2036,10 @@ isis_print_ext_is_reach(netdissect_options *ndo,
                                   priority_level,
                                   bw.f * 8 / 1000000));
                         tptr += 4;
+                        subtlv_len -= 4;
+                        subtlv_sum_len -= 4;
+                        proc_bytes += 4;
                     }
-                    subtlv_len -= 36;
                     switch (gmpls_switch_cap) {
                     case GMPLS_PSC1:
                     case GMPLS_PSC2:
