@@ -605,7 +605,7 @@ l2tp_avp_print(netdissect_options *ndo, const u_char *dat, int length)
 
 	ND_PRINT((ndo, " "));
 
-	ND_TCHECK(*ptr);	/* Flags & Length */
+	ND_TCHECK_2(ptr);	/* Flags & Length */
 	len = EXTRACT_BE_U_2(ptr) & L2TP_AVP_HDR_LEN_MASK;
 
 	/* If it is not long enough to contain the header, we'll give up. */
