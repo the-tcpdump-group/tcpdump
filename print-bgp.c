@@ -1058,7 +1058,7 @@ decode_labeled_vpn_l2(netdissect_options *ndo,
         UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
         pptr += 12;
         tlen -= 12;
-        return plen;
+        return plen + 2;
     } else if (plen > 17) {
         /* assume old format */
         /* RD, ID, LBLKOFF, LBLBASE */
@@ -1075,14 +1075,19 @@ decode_labeled_vpn_l2(netdissect_options *ndo,
         tlen -= 15;
 
         /* ok now the variable part - lets read out TLVs*/
-        while (tlen != 00) {
-            if (tlen < 3)
-                return -1;
+        while (tlen != 0) {
+            if (tlen < 3) {
+                if (buflen != 0) {
+                    stringlen=snprintf(buf,buflen, "\n\t\tran past the end");
+                    UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
+                }
+                return plen + 2;
+            }
             ND_TCHECK_3(pptr);
             tlv_type = EXTRACT_U_1(pptr);
             pptr++;
-            tlv_len = EXTRACT_BE_U_2(pptr);
-            ttlv_len = tlv_len;
+            tlv_len = EXTRACT_BE_U_2(pptr);  /* length, in *bits* */
+            ttlv_len = (tlv_len + 7)/8;      /* length, in *bytes* */
             pptr += 2;
 
             switch(tlv_type) {
@@ -1093,8 +1098,14 @@ decode_labeled_vpn_l2(netdissect_options *ndo,
                                        tlv_len);
                     UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
                 }
-                ttlv_len = ttlv_len/8+1; /* how many bytes do we need to read ? */
-                while (ttlv_len > 0) {
+                while (ttlv_len != 0) {
+                    if (tlen < 1) {
+                        if (buflen != 0) {
+                            stringlen=snprintf(buf,buflen, " (ran past the end)");
+                            UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
+                        }
+                        return plen + 2;
+                    }
                     ND_TCHECK_1(pptr);
                     if (buflen != 0) {
                         stringlen=snprintf(buf,buflen, "%02x",
@@ -1103,6 +1114,7 @@ decode_labeled_vpn_l2(netdissect_options *ndo,
                         UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
                     }
                     ttlv_len--;
+                    tlen--;
                 }
                 break;
             default:
@@ -1112,9 +1124,16 @@ decode_labeled_vpn_l2(netdissect_options *ndo,
                                        tlv_len);
                     UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
                 }
+                if (tlen < ttlv_len) {
+                    if (buflen != 0) {
+                        stringlen=snprintf(buf,buflen, " (ran past the end)");
+                        UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
+                    }
+                    return plen + 2;
+                }
+                tlen -= ttlv_len;
                 break;
             }
-            tlen -= (tlv_len<<3); /* the tlv-length is expressed in bits so lets shift it right */
         }
         return plen + 2;
     } else {
@@ -1560,9 +1579,11 @@ bgp_attr_print(netdissect_options *ndo,
             ND_PRINT((ndo, "invalid len"));
             break;
         }
-        while (tlen>0) {
+        while (tlen != 0) {
             uint32_t comm;
             ND_TCHECK_4(tptr);
+            if (tlen < 4)
+                goto trunc;
             comm = EXTRACT_BE_U_4(tptr);
             switch (comm) {
             case BGP_COMMUNITY_NO_EXPORT:
@@ -1598,8 +1619,10 @@ bgp_attr_print(netdissect_options *ndo,
             ND_PRINT((ndo, "invalid len"));
             break;
         }
-        while (tlen>0) {
+        while (tlen != 0) {
             ND_TCHECK_4(tptr);
+            if (tlen < 4)
+                goto trunc;
             ND_PRINT((ndo, "%s%s",
                       ipaddr_string(ndo, tptr),
                       (tlen>4) ? ", " : ""));
@@ -1800,7 +1823,7 @@ bgp_attr_print(netdissect_options *ndo,
 
         if (snpa) {
             ND_PRINT((ndo, "\n\t    %u SNPA", snpa));
-            for (/*nothing*/; snpa > 0; snpa--) {
+            for (/*nothing*/; snpa != 0; snpa--) {
                 ND_TCHECK_1(tptr);
                 ND_PRINT((ndo, "\n\t      %u bytes", EXTRACT_U_1(tptr)));
                 tptr += EXTRACT_U_1(tptr) + 1;
@@ -2155,10 +2178,12 @@ bgp_attr_print(netdissect_options *ndo,
             ND_PRINT((ndo, "invalid len"));
             break;
         }
-        while (tlen>0) {
+        while (tlen != 0) {
             uint16_t extd_comm;
 
             ND_TCHECK_2(tptr);
+            if (tlen < 2)
+                goto trunc;
             extd_comm=EXTRACT_BE_U_2(tptr);
 
             ND_PRINT((ndo, "\n\t    %s (0x%04x), Flags [%s]",
@@ -2169,6 +2194,8 @@ bgp_attr_print(netdissect_options *ndo,
                       bittok2str(bgp_extd_comm_flag_values, "none", extd_comm)));
 
             ND_TCHECK_6(tptr + 2);
+            if (tlen < 8)
+                goto trunc;
             switch(extd_comm) {
             case BGP_EXT_COM_RT_0:
             case BGP_EXT_COM_RO_0:
@@ -2400,7 +2427,7 @@ bgp_attr_print(netdissect_options *ndo,
             break;
         }
         ND_PRINT((ndo, "\n\t    "));
-        while (len > 0) {
+        while (len != 0) {
             ND_TCHECK_LEN(tptr, 12);
             ND_PRINT((ndo, "%u:%u:%u%s",
                       EXTRACT_BE_U_4(tptr),
@@ -2408,6 +2435,10 @@ bgp_attr_print(netdissect_options *ndo,
                       EXTRACT_BE_U_4(tptr + 8),
                       (len > 12) ? ", " : ""));
             tptr += 12;
+            /*
+             * len will always be a multiple of 12, as per the above,
+             * so this will never underflow.
+             */
             len -= 12;
         }
         break;
@@ -2492,7 +2523,7 @@ bgp_capabilities_print(netdissect_options *ndo,
                 ND_PRINT((ndo, " (bogus)")); /* length */
                 break;
             }
-            while (tcap_len > 0) {
+            while (tcap_len != 0) {
                 if (tcap_len < 4) {
                     ND_PRINT((ndo, "\n\t\t(invalid)"));
                     break;
@@ -2516,7 +2547,7 @@ bgp_capabilities_print(netdissect_options *ndo,
                                    cap_len);
             break;
         }
-        if (ndo->ndo_vflag > 1 && cap_len > 0) {
+        if (ndo->ndo_vflag > 1 && cap_len != 0) {
             print_unknown_data(ndo, opt + i + 2, "\n\t\t", cap_len);
         }
         i += BGP_CAP_HEADER_SIZE + cap_len;
@@ -2635,8 +2666,13 @@ bgp_update_print(netdissect_options *ndo,
             goto trunc;
         ND_PRINT((ndo, "\n\t  Withdrawn routes:"));
         add_path = check_add_path(p, withdrawn_routes_len, 32);
-        while (withdrawn_routes_len > 0) {
+        while (withdrawn_routes_len != 0) {
             if (add_path) {
+            	if (withdrawn_routes_len < 4) {
+            	    p += withdrawn_routes_len;
+            	    length -= withdrawn_routes_len;
+            	    break;
+            	}
                 path_id = EXTRACT_BE_U_4(p);
                 p += 4;
                 length -= 4;
@@ -2734,7 +2770,7 @@ bgp_update_print(netdissect_options *ndo,
     if (length) {
         add_path = check_add_path(p, length, 32);
         ND_PRINT((ndo, "\n\t  Updated routes:"));
-        while (length > 0) {
+        while (length != 0) {
             if (add_path) {
                 path_id = EXTRACT_BE_U_4(p);
                 p += 4;
