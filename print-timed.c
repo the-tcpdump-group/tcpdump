@@ -19,7 +19,9 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-/* \summary: BSD time daemon protocol printer */
+/* \summary: Berkeley UNIX Time Synchronization Protocol */
+
+/* specification: http://docs.freebsd.org/44doc/smm/12.timed/paper.pdf */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -30,26 +32,20 @@
 #include "netdissect.h"
 #include "extract.h"
 
-/*
- * Time Synchronization Protocol
- *
- * http://docs.freebsd.org/44doc/smm/12.timed/paper.pdf
- */
-
 struct tsp_timeval {
-	uint32_t	tv_sec;
-	uint32_t	tv_usec;
+	nd_int32_t	tv_sec;
+	nd_int32_t	tv_usec;
 };
 
 struct tsp {
-	uint8_t		tsp_type;
-	uint8_t		tsp_vers;
-	uint16_t	tsp_seq;
+	nd_uint8_t	tsp_type;
+	nd_uint8_t	tsp_vers;
+	nd_uint16_t	tsp_seq;
 	union {
 		struct tsp_timeval tspu_time;
-		int8_t tspu_hopcnt;
+		nd_int8_t tspu_hopcnt;
 	} tsp_u;
-	int8_t tsp_name[256];
+	nd_byte		tsp_name[256];
 };
 
 #define	tsp_time	tsp_u.tspu_time
@@ -99,32 +95,34 @@ timed_print(netdissect_options *ndo,
             const u_char *bp)
 {
 	const struct tsp *tsp = (const struct tsp *)bp;
-	long sec, usec;
+	uint8_t tsp_type;
+	int sec, usec;
 
 	ND_TCHECK(tsp->tsp_type);
-	if (tsp->tsp_type < TSPTYPENUMBER)
-		ND_PRINT((ndo, "TSP_%s", tsptype[tsp->tsp_type]));
+	tsp_type = EXTRACT_U_1(tsp->tsp_type);
+	if (tsp_type < TSPTYPENUMBER)
+		ND_PRINT((ndo, "TSP_%s", tsptype[tsp_type]));
 	else
-		ND_PRINT((ndo, "(tsp_type %#x)", tsp->tsp_type));
+		ND_PRINT((ndo, "(tsp_type %#x)", tsp_type));
 
 	ND_TCHECK(tsp->tsp_vers);
-	ND_PRINT((ndo, " vers %u", tsp->tsp_vers));
+	ND_PRINT((ndo, " vers %u", EXTRACT_U_1(tsp->tsp_vers)));
 
 	ND_TCHECK(tsp->tsp_seq);
-	ND_PRINT((ndo, " seq %u", tsp->tsp_seq));
+	ND_PRINT((ndo, " seq %u", EXTRACT_BE_U_2(tsp->tsp_seq)));
 
-	switch (tsp->tsp_type) {
+	switch (tsp_type) {
 	case TSP_LOOP:
 		ND_TCHECK(tsp->tsp_hopcnt);
-		ND_PRINT((ndo, " hopcnt %u", tsp->tsp_hopcnt));
+		ND_PRINT((ndo, " hopcnt %u", EXTRACT_U_1(tsp->tsp_hopcnt)));
 		break;
 	case TSP_SETTIME:
 	case TSP_ADJTIME:
 	case TSP_SETDATE:
 	case TSP_SETDATEREQ:
 		ND_TCHECK(tsp->tsp_time);
-		sec = EXTRACT_BE_U_4(&tsp->tsp_time.tv_sec);
-		usec = EXTRACT_BE_U_4(&tsp->tsp_time.tv_usec);
+		sec = EXTRACT_BE_S_4(tsp->tsp_time.tv_sec);
+		usec = EXTRACT_BE_S_4(tsp->tsp_time.tv_usec);
 		/* XXX The comparison below is always false? */
 		if (usec < 0)
 			/* invalid, skip the rest of the packet */
@@ -136,10 +134,9 @@ timed_print(netdissect_options *ndo,
 				ND_PRINT((ndo, "-"));
 			usec = 1000000 - usec;
 		}
-		ND_PRINT((ndo, "%ld.%06ld", sec, usec));
+		ND_PRINT((ndo, "%d.%06d", sec, usec));
 		break;
 	}
-	ND_TCHECK(tsp->tsp_name);
 	ND_PRINT((ndo, " name "));
 	if (fn_print(ndo, (const u_char *)tsp->tsp_name, (const u_char *)tsp->tsp_name + sizeof(tsp->tsp_name)))
 		goto trunc;
