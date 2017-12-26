@@ -20,26 +20,4 @@ IP (tos 0xc, ttl 254, id 21263, offset 0, flags [rsvd], proto TCP (6), length 60
 	    Origin AS: 0
 	      Multi-Protocol Reach NLRI (14), length: 227, Flags [T+6]: 
 	    AFI: IPv4 (1), vendor specific SAFI: Route Target Routing Information (132)
-	    nexthop: invalid len, nh-length: 1, no SNPA
-	      origin AS: 0, route target 0:0 (= 0.0.0.0)
-	      default route target
-	      default route target
-	      default route target
-	      default route target
-	      default route target
-	      default route target
-	      default route target
-	      default route target
-	      default route target
-	      default route target
-	      default route target
-	      default route target
-	      default route target
-	      default route target
-	      default route target
-	      default route target
-	      default route target
-	      default route target
-	      default route target
-	      default route target
-	      default route target[|BGP]
+	    nexthop: invalid len, nh-length: 1, no SNPA[|BGP]
