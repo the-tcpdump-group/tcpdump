@@ -487,11 +487,11 @@ static const struct tok rsvp_obj_generalized_uni_values[] = {
  * it is called from various rsvp objects;
  * returns the amount of bytes being processed
  */
-static int
+static u_int
 rsvp_intserv_print(netdissect_options *ndo,
                    const u_char *tptr, u_short obj_tlen)
 {
-    int parameter_id,parameter_length;
+    u_int parameter_id,parameter_length;
     union {
 	float f;
 	uint32_t i;
@@ -670,7 +670,8 @@ rsvp_obj_print(netdissect_options *ndo,
         const struct rsvp_obj_frr_t *rsvp_obj_frr;
     } obj_ptr;
 
-    u_short rsvp_obj_len,rsvp_obj_ctype,obj_tlen,intserv_serv_tlen;
+    u_short rsvp_obj_len,rsvp_obj_ctype,obj_tlen;
+    u_int intserv_serv_tlen;
     int hexdump,processed,padbytes,error_code,error_value,i,sigcheck;
     union {
 	float f;
