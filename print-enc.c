@@ -75,9 +75,9 @@
 #define M_AUTH		0x0800  /* packet was authenticated (AH) */
 
 struct enchdr {
-	uint32_t af;
-	uint32_t spi;
-	uint32_t flags;
+	nd_uint32_t af;
+	nd_uint32_t spi;
+	nd_uint32_t flags;
 };
 
 #define ENC_PRINT_TYPE(wh, xf, nam) \
@@ -141,7 +141,7 @@ enc_if_print(netdissect_options *ndo,
 	ENC_PRINT_TYPE(flags, M_AUTH, "authentic");
 	ENC_PRINT_TYPE(flags, M_CONF, "confidential");
 	/* ENC_PRINT_TYPE(flags, M_TUNNEL, "tunnel"); */
-	ND_PRINT((ndo, "SPI 0x%08x: ", EXTRACT_BE_U_4(&hdr->spi)));
+	ND_PRINT((ndo, "SPI 0x%08x: ", EXTRACT_BE_U_4(hdr->spi)));
 
 	length -= ENC_HDRLEN;
 	caplen -= ENC_HDRLEN;
