@@ -1378,11 +1378,11 @@ rsvp_obj_print(netdissect_options *ndo,
 
                 while (obj_tlen >= 4) {
                     intserv_serv_tlen=EXTRACT_BE_U_2(obj_tptr + 2)<<2;
-                    ND_PRINT((ndo, "%s  Service Type: %s (%u), break bit %s set, Service length: %u",
+                    ND_PRINT((ndo, "%s  Service Type: %s (%u), break bit %sset, Service length: %u",
                            indent,
                            tok2str(rsvp_intserv_service_type_values,"unknown",EXTRACT_U_1((obj_tptr))),
                            EXTRACT_U_1(obj_tptr),
-                           (EXTRACT_U_1(obj_tptr + 1)&0x80) ? "" : "not",
+                           (EXTRACT_U_1(obj_tptr + 1)&0x80) ? "" : "not ",
                            intserv_serv_tlen));
 
                     obj_tptr+=4; /* get to the start of the parameter list */
