@@ -31,6 +31,7 @@
 
 #include "netdissect.h"
 #include "extract.h"
+#include "af.h"
 
 /* From $OpenBSD: if_enc.h,v 1.8 2001/06/25 05:14:00 angelos Exp $ */
 /*
@@ -85,13 +86,21 @@ struct enchdr {
 		(wh) &= ~(xf); \
 	}
 
+/*
+ * Byte-swap a 32-bit number.
+ * ("htonl()" or "ntohl()" won't work - we want to byte-swap even on
+ * big-endian platforms.)
+ */
+#define	SWAPLONG(y) \
+((((y)&0xff)<<24) | (((y)&0xff00)<<8) | (((y)&0xff0000)>>8) | (((y)>>24)&0xff))
+
 u_int
 enc_if_print(netdissect_options *ndo,
              const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int length = h->len;
 	u_int caplen = h->caplen;
-	int flags;
+	u_int af, flags;
 	const struct enchdr *hdr;
 
 	if (caplen < ENC_HDRLEN) {
@@ -100,7 +109,31 @@ enc_if_print(netdissect_options *ndo,
 	}
 
 	hdr = (const struct enchdr *)p;
-	flags = hdr->flags;
+	/*
+	 * The address family and flags fields are in the byte order
+	 * of the host that originally captured the traffic.
+	 *
+	 * To determine that, look at the address family.  It's 32-bit,
+	 * it is not likely ever to be > 65535 (I doubt there will
+	 * ever be > 65535 address families and, so far, AF_ values have
+	 * not been allocated very sparsely) so it should not have the
+	 * upper 16 bits set, and it is not likely ever to be AF_UNSPEC,
+	 * i.e. it's not likely ever to be 0, so if it's byte-swapped,
+	 * it should have at least one of the upper 16 bits set.
+	 *
+	 * So if any of the upper 16 bits are set, we assume it, and
+	 * the flags field, are byte-swapped.
+	 *
+	 * The SPI field is always in network byte order, i.e. big-
+	 * endian.
+	 */
+	UNALIGNED_MEMCPY(&af, &hdr->af, sizeof af);
+	UNALIGNED_MEMCPY(&flags, &hdr->flags, sizeof flags);
+	if ((af & 0xFFFF0000) != 0) {
+		af = SWAPLONG(af);
+		flags = SWAPLONG(hdr->flags);
+	}
+
 	if (flags == 0)
 		ND_PRINT((ndo, "(unprotected): "));
 	else
@@ -114,15 +147,15 @@ enc_if_print(netdissect_options *ndo,
 	caplen -= ENC_HDRLEN;
 	p += ENC_HDRLEN;
 
-	switch (hdr->af) {
-	case AF_INET:
+	switch (af) {
+	case BSD_AFNUM_INET:
 		ip_print(ndo, p, length);
 		break;
-#ifdef AF_INET6
-	case AF_INET6:
+	case BSD_AFNUM_INET6_BSD:
+	case BSD_AFNUM_INET6_FREEBSD:
+	case BSD_AFNUM_INET6_DARWIN:
 		ip6_print(ndo, p, length);
 		break;
-#endif
 	}
 
 out:
