@@ -127,11 +127,11 @@ enc_if_print(netdissect_options *ndo,
 	 * The SPI field is always in network byte order, i.e. big-
 	 * endian.
 	 */
-	UNALIGNED_MEMCPY(&af, &hdr->af, sizeof af);
-	UNALIGNED_MEMCPY(&flags, &hdr->flags, sizeof flags);
+	UNALIGNED_MEMCPY(&af, &hdr->af, sizeof (af));
+	UNALIGNED_MEMCPY(&flags, &hdr->flags, sizeof (flags));
 	if ((af & 0xFFFF0000) != 0) {
 		af = SWAPLONG(af);
-		flags = SWAPLONG(hdr->flags);
+		flags = SWAPLONG(flags);
 	}
 
 	if (flags == 0)
