@@ -78,8 +78,8 @@ static void krb4_print(netdissect_options *, const u_char *);
 #define KERB_ERR_NULL_KEY			10
 
 struct krb {
-	uint8_t pvno;		/* Protocol Version */
-	uint8_t type;		/* Type+B */
+	nd_uint8_t pvno;	/* Protocol Version */
+	nd_uint8_t type;	/* Type+B */
 };
 
 static const struct tok type2str[] = {
@@ -172,17 +172,17 @@ krb4_print(netdissect_options *ndo,
 
 #define PRINT		if ((cp = c_print(ndo, cp, ndo->ndo_snapend)) == NULL) goto trunc
 /*  True if struct krb is little endian */
-#define IS_LENDIAN(kp)	(((kp)->type & 0x01) != 0)
+#define IS_LENDIAN(kp)	((EXTRACT_U_1((kp)->type) & 0x01) != 0)
 #define KTOHSP(kp, cp)	(IS_LENDIAN(kp) ? EXTRACT_LE_U_2(cp) : EXTRACT_BE_U_2(cp))
 
 	kp = (const struct krb *)cp;
 
-	if ((&kp->type) >= ndo->ndo_snapend) {
+	if (!ND_TTEST_1(kp->type)) {
 		ND_PRINT((ndo, "%s", tstr));
 		return;
 	}
 
-	type = kp->type & (0xFF << 1);
+	type = EXTRACT_U_1(kp->type) & (0xFF << 1);
 
 	ND_PRINT((ndo, " %s %s: ",
 	    IS_LENDIAN(kp) ? "le" : "be", tok2str(type2str, NULL, type)));
@@ -194,7 +194,7 @@ krb4_print(netdissect_options *ndo,
 			return;
 		cp += 4;	/* ctime */
 		ND_TCHECK_1(cp);
-		ND_PRINT((ndo, " %dmin ", EXTRACT_U_1(cp) * 5));
+		ND_PRINT((ndo, " %umin ", EXTRACT_U_1(cp) * 5));
 		cp++;
 		PRINT;
 		ND_PRINT((ndo, "."));
@@ -204,14 +204,14 @@ krb4_print(netdissect_options *ndo,
 	case AUTH_MSG_APPL_REQUEST:
 		cp += 2;
 		ND_TCHECK_1(cp);
-		ND_PRINT((ndo, "v%d ", EXTRACT_U_1(cp)));
+		ND_PRINT((ndo, "v%u ", EXTRACT_U_1(cp)));
 		cp++;
 		PRINT;
 		ND_TCHECK_1(cp);
-		ND_PRINT((ndo, " (%d)", EXTRACT_U_1(cp)));
+		ND_PRINT((ndo, " (%u)", EXTRACT_U_1(cp)));
 		cp++;
 		ND_TCHECK_1(cp);
-		ND_PRINT((ndo, " (%d)", EXTRACT_U_1(cp)));
+		ND_PRINT((ndo, " (%u)", EXTRACT_U_1(cp)));
 		break;
 
 	case AUTH_MSG_KDC_REPLY:
@@ -220,7 +220,7 @@ krb4_print(netdissect_options *ndo,
 		cp += 10;	/* timestamp + n + exp + kvno */
 		ND_TCHECK_LEN(cp, sizeof(short));
 		len = KTOHSP(kp, cp);
-		ND_PRINT((ndo, " (%d)", len));
+		ND_PRINT((ndo, " (%u)", len));
 		break;
 
 	case AUTH_MSG_ERR_REPLY:
@@ -256,16 +256,16 @@ krb_print(netdissect_options *ndo,
 		return;
 	}
 
-	switch (kp->pvno) {
+	switch (EXTRACT_U_1(kp->pvno)) {
 
 	case 1:
 	case 2:
 	case 3:
-		ND_PRINT((ndo, " v%d", kp->pvno));
+		ND_PRINT((ndo, " v%u", EXTRACT_U_1(kp->pvno)));
 		break;
 
 	case 4:
-		ND_PRINT((ndo, " v%d", kp->pvno));
+		ND_PRINT((ndo, " v%u", EXTRACT_U_1(kp->pvno)));
 		krb4_print(ndo, (const u_char *)kp);
 		break;
 
