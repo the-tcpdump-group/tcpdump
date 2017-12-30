@@ -36,9 +36,9 @@
 #define	EAP_FRAME_TYPE_ENCAP_ASF_ALERT	4
 
 struct eap_frame_t {
-    unsigned char   version;
-    unsigned char   type;
-    unsigned char   length[2];
+    nd_uint8_t  version;
+    nd_uint8_t  type;
+    nd_uint16_t length;
 };
 
 static const struct tok eap_frame_type_values[] = {
@@ -52,9 +52,9 @@ static const struct tok eap_frame_type_values[] = {
 
 /* RFC 3748 */
 struct eap_packet_t {
-    unsigned char	code;
-    unsigned char	id;
-    unsigned char	length[2];
+    nd_uint8_t  code;
+    nd_uint8_t  id;
+    nd_uint16_t length;
 };
 
 #define		EAP_REQUEST	1
@@ -153,34 +153,35 @@ eap_print(netdissect_options *ndo,
 {
     const struct eap_frame_t *eap;
     const u_char *tptr;
-    u_int tlen, type, subtype;
+    u_int eap_type, tlen, type, subtype;
     int count=0, len;
 
     tptr = cp;
     tlen = length;
     eap = (const struct eap_frame_t *)cp;
     ND_TCHECK(*eap);
+    eap_type = EXTRACT_U_1(eap->type);
 
     /* in non-verbose mode just lets print the basic info */
     if (ndo->ndo_vflag < 1) {
 	ND_PRINT((ndo, "%s (%u) v%u, len %u",
-               tok2str(eap_frame_type_values, "unknown", eap->type),
-               eap->type,
-               eap->version,
+               tok2str(eap_frame_type_values, "unknown", eap_type),
+               eap_type,
+               EXTRACT_U_1(eap->version),
                EXTRACT_BE_U_2(eap->length)));
 	return;
     }
 
     ND_PRINT((ndo, "%s (%u) v%u, len %u",
-           tok2str(eap_frame_type_values, "unknown", eap->type),
-           eap->type,
-           eap->version,
+           tok2str(eap_frame_type_values, "unknown", eap_type),
+           eap_type,
+           EXTRACT_U_1(eap->version),
            EXTRACT_BE_U_2(eap->length)));
 
     tptr += sizeof(struct eap_frame_t);
     tlen -= sizeof(struct eap_frame_t);
 
-    switch (eap->type) {
+    switch (eap_type) {
     case EAP_FRAME_TYPE_PACKET:
         ND_TCHECK_1(tptr);
         type = EXTRACT_U_1(tptr);
