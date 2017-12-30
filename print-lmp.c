@@ -44,15 +44,15 @@
  */
 
 struct lmp_common_header {
-    uint8_t version_res[2];
-    uint8_t flags;
-    uint8_t msg_type;
-    uint8_t length[2];
-    uint8_t reserved[2];
+    nd_uint16_t version_res;
+    nd_uint8_t  flags;
+    nd_uint8_t  msg_type;
+    nd_uint16_t length;
+    nd_byte     reserved[2];
 };
 
 #define LMP_VERSION            1
-#define	LMP_EXTRACT_VERSION(x) (((x)&0xf0)>>4)
+#define	LMP_EXTRACT_VERSION(x) (((x)&0xf000)>>12)
 
 static const struct tok lmp_header_flag_values[] = {
     { 0x01, "Control Channel Down"},
@@ -214,9 +214,9 @@ static const struct tok lmp_msg_type_values[] = {
  */
 
 struct lmp_object_header {
-    uint8_t ctype;
-    uint8_t class_num;
-    uint8_t length[2];
+    nd_uint8_t  ctype;
+    nd_uint8_t  class_num;
+    nd_uint16_t length;
 };
 
 #define	LMP_OBJ_CC_ID                 1
@@ -428,7 +428,7 @@ lmp_print(netdissect_options *ndo,
     const struct lmp_common_header *lmp_com_header;
     const struct lmp_object_header *lmp_obj_header;
     const u_char *tptr,*obj_tptr;
-    u_int tlen,lmp_obj_len,lmp_obj_ctype,obj_tlen;
+    u_int version_res, tlen, lmp_obj_len, lmp_obj_ctype, obj_tlen;
     int hexdump;
     u_int offset;
     u_int link_type;
@@ -442,20 +442,22 @@ lmp_print(netdissect_options *ndo,
     lmp_com_header = (const struct lmp_common_header *)pptr;
     ND_TCHECK(*lmp_com_header);
 
+    version_res = EXTRACT_BE_U_2(lmp_com_header->version_res);
+
     /*
      * Sanity checking of the header.
      */
-    if (LMP_EXTRACT_VERSION(lmp_com_header->version_res[0]) != LMP_VERSION) {
+    if (LMP_EXTRACT_VERSION(version_res) != LMP_VERSION) {
 	ND_PRINT((ndo, "LMP version %u packet not supported",
-               LMP_EXTRACT_VERSION(lmp_com_header->version_res[0])));
+               LMP_EXTRACT_VERSION(version_res)));
 	return;
     }
 
     /* in non-verbose mode just lets print the basic Message Type*/
     if (ndo->ndo_vflag < 1) {
         ND_PRINT((ndo, "LMPv%u %s Message, length: %u",
-               LMP_EXTRACT_VERSION(lmp_com_header->version_res[0]),
-               tok2str(lmp_msg_type_values, "unknown (%u)",lmp_com_header->msg_type),
+               LMP_EXTRACT_VERSION(version_res),
+               tok2str(lmp_msg_type_values, "unknown (%u)",EXTRACT_U_1(lmp_com_header->msg_type)),
                len));
         return;
     }
@@ -465,9 +467,9 @@ lmp_print(netdissect_options *ndo,
     tlen=EXTRACT_BE_U_2(lmp_com_header->length);
 
     ND_PRINT((ndo, "\n\tLMPv%u, msg-type: %s, Flags: [%s], length: %u",
-           LMP_EXTRACT_VERSION(lmp_com_header->version_res[0]),
-           tok2str(lmp_msg_type_values, "unknown, type: %u",lmp_com_header->msg_type),
-           bittok2str(lmp_header_flag_values,"none",lmp_com_header->flags),
+           LMP_EXTRACT_VERSION(version_res),
+           tok2str(lmp_msg_type_values, "unknown, type: %u",EXTRACT_U_1(lmp_com_header->msg_type)),
+           bittok2str(lmp_header_flag_values,"none",EXTRACT_U_1(lmp_com_header->flags)),
            tlen));
     if (tlen < sizeof(struct lmp_common_header)) {
         ND_PRINT((ndo, " (too short)"));
@@ -487,18 +489,18 @@ lmp_print(netdissect_options *ndo,
 
         lmp_obj_header = (const struct lmp_object_header *)tptr;
         lmp_obj_len=EXTRACT_BE_U_2(lmp_obj_header->length);
-        lmp_obj_ctype=(lmp_obj_header->ctype)&0x7f;
+        lmp_obj_ctype=EXTRACT_U_1(lmp_obj_header->ctype)&0x7f;
 
         ND_PRINT((ndo, "\n\t  %s Object (%u), Class-Type: %s (%u) Flags: [%snegotiable], length: %u",
                tok2str(lmp_obj_values,
                        "Unknown",
-                       lmp_obj_header->class_num),
-               lmp_obj_header->class_num,
+                       EXTRACT_U_1(lmp_obj_header->class_num)),
+               EXTRACT_U_1(lmp_obj_header->class_num),
                tok2str(lmp_ctype_values,
                        "Unknown",
-                       ((lmp_obj_header->class_num)<<8)+lmp_obj_ctype),
+                       (EXTRACT_U_1(lmp_obj_header->class_num)<<8)+lmp_obj_ctype),
                lmp_obj_ctype,
-               (lmp_obj_header->ctype)&0x80 ? "" : "non-",
+               EXTRACT_U_1(lmp_obj_header->ctype)&0x80 ? "" : "non-",
                lmp_obj_len));
 
         if (lmp_obj_len < 4) {
@@ -517,7 +519,7 @@ lmp_print(netdissect_options *ndo,
         ND_TCHECK_LEN(tptr, lmp_obj_len);
         hexdump=FALSE;
 
-        switch(lmp_obj_header->class_num) {
+        switch(EXTRACT_U_1(lmp_obj_header->class_num)) {
 
         case LMP_OBJ_CC_ID:
             switch(lmp_obj_ctype) {
