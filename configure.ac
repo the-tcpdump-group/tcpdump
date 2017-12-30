@@ -29,7 +29,7 @@ if test "$ac_cv___attribute__" = "yes"; then
 	AC_C___ATTRIBUTE___FALLTHROUGH
 fi
 
-AC_CHECK_HEADERS(fcntl.h rpc/rpc.h rpc/rpcent.h netdnet/dnetdb.h)
+AC_CHECK_HEADERS(fcntl.h rpc/rpc.h rpc/rpcent.h)
 AC_CHECK_HEADERS(net/pfvar.h, , , [#include <sys/types.h>
 #include <sys/socket.h>
 #include <net/if.h>])
@@ -394,15 +394,44 @@ if test "$ipv6" = "yes" -a "$ipv6lib" != "none"; then
 	fi
 fi
 
-AC_CACHE_CHECK([for dnet_htoa declaration in netdnet/dnetdb.h],
-[td_cv_decl_netdnet_dnetdb_h_dnet_htoa],
-[AC_EGREP_HEADER(dnet_htoa, netdnet/dnetdb.h,
-	td_cv_decl_netdnet_dnetdb_h_dnet_htoa=yes,
-	td_cv_decl_netdnet_dnetdb_h_dnet_htoa=no)])
-if test "$td_cv_decl_netdnet_dnetdb_h_dnet_htoa" = yes; then
-	AC_DEFINE(HAVE_NETDNET_DNETDB_H_DNET_HTOA, 1,
-	    [define if you have a dnet_htoa declaration in <netdnet/dnetdb.h>])
-fi
+AC_SEARCH_LIBS(dnet_htoa, dnet,
+[
+	AC_DEFINE(HAVE_DNET_HTOA, 1,
+	    [define if you have the dnet_htoa function])
+	#
+	# OK, we have dnet_htoa().  Do we have netdnet/dnetdb.h?
+	#
+	AC_CHECK_HEADERS(netdnet/dnetdb.h)
+	if test "$ac_cv_header_netdnet_dnetdb_h" = "yes"; then
+		#
+		# Yes.  Does it declare dnet_htoa()?
+		#
+		AC_CHECK_DECL(dnet_htoa,
+		[
+			# Yes.
+			AC_DEFINE(NETDNET_DNETDB_H_DECLARES_DNET_HTOA,,
+			    [Define to 1 if netenet/dnetdb.h declares `dnet_htoa'])
+		],,
+		[
+AC_INCLUDES_DEFAULT
+#include <netdnet/dnetdb.h>
+		])
+	fi
+
+	#
+	# Do we have netdnet/dn.h?
+	#
+	AC_CHECK_HEADERS(netdnet/dn.h)
+	if test "$ac_cv_header_netdnet_dn_h" = "yes"; then
+		#
+		# Yes.  Does it declare struct dn_naddr?
+		#
+		AC_CHECK_TYPES(struct dn_naddr,,,
+		[
+#include <netdnet/dn.h>
+		])
+	fi
+])
 
 AC_REPLACE_FUNCS(vfprintf strlcat strlcpy strdup strsep getservent getopt_long)
 AC_CHECK_FUNCS(fork vfork strftime)
@@ -414,9 +443,6 @@ AC_CHECK_FUNCS(vsnprintf snprintf,,
 if test $needsnprintf = yes; then
 	AC_LIBOBJ(snprintf)
 fi
-
-AC_SEARCH_LIBS(dnet_htoa, dnet,
-    AC_DEFINE(HAVE_DNET_HTOA, 1, [define if you have the dnet_htoa function]))
 
 AC_CHECK_LIB(rpc, main)		dnl It's unclear why we might need -lrpc
 

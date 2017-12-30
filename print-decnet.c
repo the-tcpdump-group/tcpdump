@@ -27,16 +27,31 @@
 
 #include <netdissect-stdinc.h>
 
-struct mbuf;
-struct rtentry;
-
-#ifdef HAVE_NETDNET_DNETDB_H
-#include <netdnet/dnetdb.h>
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+struct mbuf;
+struct rtentry;
+
+#ifdef HAVE_DNET_HTOA
+  #ifdef HAVE_NETDNET_DN_H
+    #include <netdnet/dn.h>
+  #endif
+  #ifndef HAVE_STRUCT_DN_NADDR
+#define DN_MAXADDL	20		/* max size of DECnet address */
+struct dn_naddr {
+	unsigned short	a_len;		/* length of address */
+	unsigned char	a_addr[DN_MAXADDL]; /* address as bytes */
+};
+  #endif /* HAVE_STRUCT_DN_NADDR */
+  #ifdef HAVE_NETDNET_DNETDB_H
+    #include <netdnet/dnetdb.h>
+  #endif
+  #ifndef NETDNET_DNETDB_H_DECLARES_DNET_HTOA
+    extern char *dnet_htoa(struct dn_naddr *);
+  #endif
+#endif
 
 #include "netdissect.h"
 #include "extract.h"
@@ -59,27 +74,19 @@ typedef nd_uint32_t longword;		/* 4 bytes field */
 /*
  * Definitions for DECNET Phase IV protocol headers
  */
-union etheraddress {
+typedef union {
 	nd_byte   dne_addr[6];		/* full ethernet address */
 	struct {
 		nd_byte dne_hiord[4];	/* DECnet HIORD prefix */
 		nd_byte dne_nodeaddr[2]; /* DECnet node address */
 	} dne_remote;
-};
-
-typedef union etheraddress etheraddr;	/* Ethernet address */
+} etheraddr;	/* Ethernet address */
 
 #define HIORD 0x000400aa		/* high 32-bits of address (swapped) */
 
 #define AREAMASK	0176000		/* mask for area field */
 #define	AREASHIFT	10		/* bit-offset for area field */
 #define NODEMASK	01777		/* mask for node address field */
-
-#define DN_MAXADDL	20		/* max size of DECnet address */
-struct dn_naddr {
-	uint16_t	a_len;		/* length of address */
-	uint8_t		a_addr[DN_MAXADDL]; /* address as bytes */
-};
 
 /*
  * Define long and short header formats.
@@ -491,10 +498,6 @@ static void print_i_info(netdissect_options *, u_int);
 static int print_elist(const char *, u_int);
 static int print_nsp(netdissect_options *, const u_char *, u_int);
 static void print_reason(netdissect_options *, u_int);
-
-#ifndef HAVE_NETDNET_DNETDB_H_DNET_HTOA
-extern char *dnet_htoa(struct dn_naddr *);
-#endif
 
 void
 decnet_print(netdissect_options *ndo,

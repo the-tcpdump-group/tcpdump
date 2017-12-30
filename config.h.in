@@ -73,8 +73,8 @@
 /* Define to 1 if you have the <netdnet/dnetdb.h> header file. */
 #undef HAVE_NETDNET_DNETDB_H
 
-/* define if you have a dnet_htoa declaration in <netdnet/dnetdb.h> */
-#undef HAVE_NETDNET_DNETDB_H_DNET_HTOA
+/* Define to 1 if you have the <netdnet/dn.h> header file. */
+#undef HAVE_NETDNET_DN_H
 
 /* Define to 1 if you have the <netinet/ether.h> header file. */
 #undef HAVE_NETINET_ETHER_H
@@ -223,6 +223,9 @@
 /* Define to 1 if you have the `strsep' function. */
 #undef HAVE_STRSEP
 
+/* Define to 1 if the system has the type `struct dn_naddr'. */
+#undef HAVE_STRUCT_DN_NADDR
+
 /* Define to 1 if the system has the type `struct ether_addr'. */
 #undef HAVE_STRUCT_ETHER_ADDR
 
@@ -252,6 +255,9 @@
 
 /* define if your compiler has __attribute__ */
 #undef HAVE___ATTRIBUTE__
+
+/* Define to 1 if netenet/dnetdb.h declares `dnet_htoa' */
+#undef NETDNET_DNETDB_H_DECLARES_DNET_HTOA
 
 /* Define to 1 if netinet/ether.h declares `ether_ntohost' */
 #undef NETINET_ETHER_H_DECLARES_ETHER_NTOHOST
