@@ -32,10 +32,10 @@
 #include "af.h"
 
 struct cfm_common_header_t {
-    uint8_t mdlevel_version;
-    uint8_t opcode;
-    uint8_t flags;
-    uint8_t first_tlv_offset;
+    nd_uint8_t mdlevel_version;
+    nd_uint8_t opcode;
+    nd_uint8_t flags;
+    nd_uint8_t first_tlv_offset;
 };
 
 #define	CFM_VERSION 0
@@ -61,10 +61,10 @@ static const struct tok cfm_opcode_values[] = {
  * Message Formats.
  */
 struct cfm_ccm_t {
-    uint8_t sequence[4];
-    uint8_t ma_epi[2];
-    uint8_t names[48];
-    uint8_t itu_t_y_1731[16];
+    nd_uint32_t sequence;
+    nd_uint16_t ma_epi;
+    nd_byte     names[48];
+    nd_byte     itu_t_y_1731[16];
 };
 
 /*
@@ -109,12 +109,12 @@ static const struct tok cfm_ma_nameformat_values[] = {
 };
 
 struct cfm_lbm_t {
-    uint8_t transaction_id[4];
+    nd_uint32_t transaction_id;
 };
 
 struct cfm_ltm_t {
-    uint8_t transaction_id[4];
-    uint8_t ttl;
+    nd_uint32_t transaction_id;
+    nd_uint8_t  ttl;
     nd_mac_addr original_mac;
     nd_mac_addr target_mac;
 };
@@ -125,9 +125,9 @@ static const struct tok cfm_ltm_flag_values[] = {
 };
 
 struct cfm_ltr_t {
-    uint8_t transaction_id[4];
-    uint8_t ttl;
-    uint8_t replay_action;
+    nd_uint32_t transaction_id;
+    nd_uint8_t  ttl;
+    nd_uint8_t  replay_action;
 };
 
 static const struct tok cfm_ltr_flag_values[] = {
@@ -171,8 +171,8 @@ static const struct tok cfm_tlv_values[] = {
  */
 
 struct cfm_tlv_header_t {
-    uint8_t type;
-    uint8_t length[2];
+    nd_uint8_t  type;
+    nd_uint16_t length;
 };
 
 /* FIXME define TLV formats */
@@ -271,6 +271,7 @@ cfm_print(netdissect_options *ndo,
           const u_char *pptr, u_int length)
 {
     const struct cfm_common_header_t *cfm_common_header;
+    uint8_t mdlevel_version, opcode, flags, first_tlv_offset;
     const struct cfm_tlv_header_t *cfm_tlv_header;
     const uint8_t *tptr, *tlv_ptr;
     const uint8_t *namesp;
@@ -298,16 +299,18 @@ cfm_print(netdissect_options *ndo,
     /*
      * Sanity checking of the header.
      */
-    if (CFM_EXTRACT_VERSION(cfm_common_header->mdlevel_version) != CFM_VERSION) {
+    mdlevel_version = EXTRACT_U_1(cfm_common_header->mdlevel_version);
+    if (CFM_EXTRACT_VERSION(mdlevel_version) != CFM_VERSION) {
 	ND_PRINT((ndo, "CFMv%u not supported, length %u",
-               CFM_EXTRACT_VERSION(cfm_common_header->mdlevel_version), length));
+               CFM_EXTRACT_VERSION(mdlevel_version), length));
 	return;
     }
 
+    opcode = EXTRACT_U_1(cfm_common_header->opcode);
     ND_PRINT((ndo, "CFMv%u %s, MD Level %u, length %u",
-           CFM_EXTRACT_VERSION(cfm_common_header->mdlevel_version),
-           tok2str(cfm_opcode_values, "unknown (%u)", cfm_common_header->opcode),
-           CFM_EXTRACT_MD_LEVEL(cfm_common_header->mdlevel_version),
+           CFM_EXTRACT_VERSION(mdlevel_version),
+           tok2str(cfm_opcode_values, "unknown (%u)", opcode),
+           CFM_EXTRACT_MD_LEVEL(mdlevel_version),
            length));
 
     /*
@@ -317,7 +320,9 @@ cfm_print(netdissect_options *ndo,
         return;
     }
 
-    ND_PRINT((ndo, "\n\tFirst TLV offset %u", cfm_common_header->first_tlv_offset));
+    flags = EXTRACT_U_1(cfm_common_header->flags);
+    first_tlv_offset = EXTRACT_U_1(cfm_common_header->first_tlv_offset);
+    ND_PRINT((ndo, "\n\tFirst TLV offset %u", first_tlv_offset));
 
     tptr += sizeof(struct cfm_common_header_t);
     tlen = length - sizeof(struct cfm_common_header_t);
@@ -325,15 +330,15 @@ cfm_print(netdissect_options *ndo,
     /*
      * Sanity check the first TLV offset.
      */
-    if (cfm_common_header->first_tlv_offset > tlen) {
+    if (first_tlv_offset > tlen) {
         ND_PRINT((ndo, " (too large, must be <= %u)", tlen));
         return;
     }
 
-    switch (cfm_common_header->opcode) {
+    switch (opcode) {
     case CFM_OPCODE_CCM:
         msg_ptr.cfm_ccm = (const struct cfm_ccm_t *)tptr;
-        if (cfm_common_header->first_tlv_offset < sizeof(*msg_ptr.cfm_ccm)) {
+        if (first_tlv_offset < sizeof(*msg_ptr.cfm_ccm)) {
             ND_PRINT((ndo, " (too small 1, must be >= %lu)",
                      (unsigned long) sizeof(*msg_ptr.cfm_ccm)));
             return;
@@ -342,10 +347,10 @@ cfm_print(netdissect_options *ndo,
             goto tooshort;
         ND_TCHECK(*msg_ptr.cfm_ccm);
 
-        ccm_interval = CFM_EXTRACT_CCM_INTERVAL(cfm_common_header->flags);
+        ccm_interval = CFM_EXTRACT_CCM_INTERVAL(flags);
         ND_PRINT((ndo, ", Flags [CCM Interval %u%s]",
                ccm_interval,
-               cfm_common_header->flags & CFM_CCM_RDI_FLAG ?
+               flags & CFM_CCM_RDI_FLAG ?
                ", RDI" : ""));
 
         /*
@@ -463,7 +468,7 @@ cfm_print(netdissect_options *ndo,
 
     case CFM_OPCODE_LTM:
         msg_ptr.cfm_ltm = (const struct cfm_ltm_t *)tptr;
-        if (cfm_common_header->first_tlv_offset < sizeof(*msg_ptr.cfm_ltm)) {
+        if (first_tlv_offset < sizeof(*msg_ptr.cfm_ltm)) {
             ND_PRINT((ndo, " (too small 4, must be >= %lu)",
                      (unsigned long) sizeof(*msg_ptr.cfm_ltm)));
             return;
@@ -473,11 +478,11 @@ cfm_print(netdissect_options *ndo,
         ND_TCHECK(*msg_ptr.cfm_ltm);
 
         ND_PRINT((ndo, ", Flags [%s]",
-               bittok2str(cfm_ltm_flag_values, "none", cfm_common_header->flags)));
+               bittok2str(cfm_ltm_flag_values, "none", flags)));
 
         ND_PRINT((ndo, "\n\t  Transaction-ID 0x%08x, ttl %u",
                EXTRACT_BE_U_4(msg_ptr.cfm_ltm->transaction_id),
-               msg_ptr.cfm_ltm->ttl));
+               EXTRACT_U_1(msg_ptr.cfm_ltm->ttl)));
 
         ND_PRINT((ndo, "\n\t  Original-MAC %s, Target-MAC %s",
                etheraddr_string(ndo, msg_ptr.cfm_ltm->original_mac),
@@ -486,7 +491,7 @@ cfm_print(netdissect_options *ndo,
 
     case CFM_OPCODE_LTR:
         msg_ptr.cfm_ltr = (const struct cfm_ltr_t *)tptr;
-        if (cfm_common_header->first_tlv_offset < sizeof(*msg_ptr.cfm_ltr)) {
+        if (first_tlv_offset < sizeof(*msg_ptr.cfm_ltr)) {
             ND_PRINT((ndo, " (too small 5, must be >= %lu)",
                      (unsigned long) sizeof(*msg_ptr.cfm_ltr)));
             return;
@@ -496,17 +501,17 @@ cfm_print(netdissect_options *ndo,
         ND_TCHECK(*msg_ptr.cfm_ltr);
 
         ND_PRINT((ndo, ", Flags [%s]",
-               bittok2str(cfm_ltr_flag_values, "none", cfm_common_header->flags)));
+               bittok2str(cfm_ltr_flag_values, "none", flags)));
 
         ND_PRINT((ndo, "\n\t  Transaction-ID 0x%08x, ttl %u",
                EXTRACT_BE_U_4(msg_ptr.cfm_ltr->transaction_id),
-               msg_ptr.cfm_ltr->ttl));
+               EXTRACT_U_1(msg_ptr.cfm_ltr->ttl)));
 
         ND_PRINT((ndo, "\n\t  Replay-Action %s (%u)",
                tok2str(cfm_ltr_replay_action_values,
                        "Unknown",
-                       msg_ptr.cfm_ltr->replay_action),
-               msg_ptr.cfm_ltr->replay_action));
+                       EXTRACT_U_1(msg_ptr.cfm_ltr->replay_action)),
+               EXTRACT_U_1(msg_ptr.cfm_ltr->replay_action)));
         break;
 
         /*
@@ -517,19 +522,19 @@ cfm_print(netdissect_options *ndo,
     case CFM_OPCODE_LBM:
     default:
         print_unknown_data(ndo, tptr, "\n\t  ",
-                           tlen -  cfm_common_header->first_tlv_offset);
+                           tlen -  first_tlv_offset);
         break;
     }
 
-    tptr += cfm_common_header->first_tlv_offset;
-    tlen -= cfm_common_header->first_tlv_offset;
+    tptr += first_tlv_offset;
+    tlen -= first_tlv_offset;
 
     while (tlen > 0) {
         cfm_tlv_header = (const struct cfm_tlv_header_t *)tptr;
 
         /* Enough to read the tlv type ? */
-        ND_TCHECK_1(tptr);
-        cfm_tlv_type=cfm_tlv_header->type;
+        ND_TCHECK_1(cfm_tlv_header->type);
+        cfm_tlv_type = EXTRACT_U_1(cfm_tlv_header->type);
 
         ND_PRINT((ndo, "\n\t%s TLV (0x%02x)",
                tok2str(cfm_tlv_values, "Unknown", cfm_tlv_type),
@@ -544,7 +549,7 @@ cfm_print(netdissect_options *ndo,
         if (tlen < sizeof(struct cfm_tlv_header_t))
             goto tooshort;
         ND_TCHECK_LEN(tptr, sizeof(struct cfm_tlv_header_t));
-        cfm_tlv_len=EXTRACT_BE_U_2(&cfm_tlv_header->length);
+        cfm_tlv_len=EXTRACT_BE_U_2(cfm_tlv_header->length);
 
         ND_PRINT((ndo, ", length %u", cfm_tlv_len));
 
