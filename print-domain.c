@@ -254,6 +254,8 @@ ns_cprint(netdissect_options *ndo,
 	return (cp + i);
 }
 
+extern const struct tok ns_type2str[];
+
 /* http://www.iana.org/assignments/dns-parameters */
 const struct tok ns_type2str[] = {
 	{ T_A,		"A" },			/* RFC 1035 */
@@ -319,6 +321,8 @@ const struct tok ns_type2str[] = {
 	{ T_ANY,	"ANY" },
 	{ 0,		NULL }
 };
+
+extern const struct tok ns_class2str[];
 
 const struct tok ns_class2str[] = {
 	{ C_IN,		"IN" },		/* Not used */
