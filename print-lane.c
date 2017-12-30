@@ -32,17 +32,17 @@
 #include "extract.h"
 
 struct lecdatahdr_8023 {
-  uint16_t le_header;
+  nd_uint16_t le_header;
   nd_mac_addr h_dest;
   nd_mac_addr h_source;
-  uint16_t h_type;
+  nd_uint16_t h_type;
 };
 
 struct lane_controlhdr {
-  uint16_t lec_header;
-  uint8_t lec_proto;
-  uint8_t lec_vers;
-  uint16_t lec_opcode;
+  nd_uint16_t lec_header;
+  nd_uint8_t  lec_proto;
+  nd_uint8_t  lec_vers;
+  nd_uint16_t lec_opcode;
 };
 
 static const struct tok lecop2str[] = {
@@ -90,13 +90,14 @@ lane_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 	}
 
 	lec = (const struct lane_controlhdr *)p;
-	if (EXTRACT_BE_U_2(&lec->lec_header) == 0xff00) {
+	if (EXTRACT_BE_U_2(lec->lec_header) == 0xff00) {
 		/*
 		 * LE Control.
 		 */
 		ND_PRINT((ndo, "lec: proto %x vers %x %s",
-		    lec->lec_proto, lec->lec_vers,
-		    tok2str(lecop2str, "opcode-#%u", EXTRACT_BE_U_2(&lec->lec_opcode))));
+		    EXTRACT_U_1(lec->lec_proto),
+		    EXTRACT_U_1(lec->lec_vers),
+		    tok2str(lecop2str, "opcode-#%u", EXTRACT_BE_U_2(lec->lec_opcode))));
 		return;
 	}
 
