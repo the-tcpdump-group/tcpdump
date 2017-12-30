@@ -47,7 +47,7 @@ static const char tstr[] = "[|ARP]";
  * specified.  Field names used correspond to RFC 826.
  */
 struct  arp_pkthdr {
-        u_short ar_hrd;         /* format of hardware address */
+        nd_uint16_t ar_hrd;     /* format of hardware address */
 #define ARPHRD_ETHER    1       /* ethernet hardware format */
 #define ARPHRD_IEEE802  6       /* token-ring hardware format */
 #define ARPHRD_ARCNET   7       /* arcnet hardware format */
@@ -55,10 +55,10 @@ struct  arp_pkthdr {
 #define ARPHRD_ATM2225  19      /* ATM (RFC 2225) */
 #define ARPHRD_STRIP    23      /* Ricochet Starmode Radio hardware format */
 #define ARPHRD_IEEE1394 24      /* IEEE 1394 (FireWire) hardware format */
-        u_short ar_pro;         /* format of protocol address */
-        u_char  ar_hln;         /* length of hardware address */
-        u_char  ar_pln;         /* length of protocol address */
-        u_short ar_op;          /* one of: */
+        nd_uint16_t ar_pro;     /* format of protocol address */
+        nd_uint8_t  ar_hln;     /* length of hardware address */
+        nd_uint8_t  ar_pln;     /* length of protocol address */
+        nd_uint16_t ar_op;      /* one of: */
 #define ARPOP_REQUEST   1       /* request to resolve address */
 #define ARPOP_REPLY     2       /* response to previous request */
 #define ARPOP_REVREQUEST 3      /* request protocol address given hardware */
@@ -72,24 +72,24 @@ struct  arp_pkthdr {
  * according to the sizes above.
  */
 #ifdef COMMENT_ONLY
-	u_char	ar_sha[];	/* sender hardware address */
-	u_char	ar_spa[];	/* sender protocol address */
-	u_char	ar_tha[];	/* target hardware address */
-	u_char	ar_tpa[];	/* target protocol address */
+	nd_byte		ar_sha[];	/* sender hardware address */
+	nd_byte		ar_spa[];	/* sender protocol address */
+	nd_byte		ar_tha[];	/* target hardware address */
+	nd_byte		ar_tpa[];	/* target protocol address */
 #endif
 #define ar_sha(ap)	(((const u_char *)((ap)+1))+  0)
-#define ar_spa(ap)	(((const u_char *)((ap)+1))+  (ap)->ar_hln)
-#define ar_tha(ap)	(((const u_char *)((ap)+1))+  (ap)->ar_hln+(ap)->ar_pln)
-#define ar_tpa(ap)	(((const u_char *)((ap)+1))+2*(ap)->ar_hln+(ap)->ar_pln)
+#define ar_spa(ap)	(((const u_char *)((ap)+1))+  EXTRACT_U_1((ap)->ar_hln))
+#define ar_tha(ap)	(((const u_char *)((ap)+1))+  EXTRACT_U_1((ap)->ar_hln)+EXTRACT_U_1((ap)->ar_pln))
+#define ar_tpa(ap)	(((const u_char *)((ap)+1))+2*EXTRACT_U_1((ap)->ar_hln)+EXTRACT_U_1((ap)->ar_pln))
 };
 
 #define ARP_HDRLEN	8
 
-#define HRD(ap) EXTRACT_BE_U_2(&(ap)->ar_hrd)
-#define HRD_LEN(ap) ((ap)->ar_hln)
-#define PROTO_LEN(ap) ((ap)->ar_pln)
-#define OP(ap)  EXTRACT_BE_U_2(&(ap)->ar_op)
-#define PRO(ap) EXTRACT_BE_U_2(&(ap)->ar_pro)
+#define HRD(ap) EXTRACT_BE_U_2((ap)->ar_hrd)
+#define HRD_LEN(ap) EXTRACT_U_1((ap)->ar_hln)
+#define PROTO_LEN(ap) EXTRACT_U_1((ap)->ar_pln)
+#define OP(ap)  EXTRACT_BE_U_2((ap)->ar_op)
+#define PRO(ap) EXTRACT_BE_U_2((ap)->ar_pro)
 #define SHA(ap) (ar_sha(ap))
 #define SPA(ap) (ar_spa(ap))
 #define THA(ap) (ar_tha(ap))
@@ -128,39 +128,39 @@ static const struct tok arphrd_values[] = {
  * of an ATM number and an ATM subaddress.
  */
 struct  atmarp_pkthdr {
-        u_short aar_hrd;        /* format of hardware address */
-        u_short aar_pro;        /* format of protocol address */
-        u_char  aar_shtl;       /* length of source ATM number */
-        u_char  aar_sstl;       /* length of source ATM subaddress */
+        nd_uint16_t aar_hrd;    /* format of hardware address */
+        nd_uint16_t aar_pro;    /* format of protocol address */
+        nd_uint8_t  aar_shtl;   /* length of source ATM number */
+        nd_uint8_t  aar_sstl;   /* length of source ATM subaddress */
 #define ATMARP_IS_E164  0x40    /* bit in type/length for E.164 format */
 #define ATMARP_LEN_MASK 0x3F    /* length of {sub}address in type/length */
-        u_short aar_op;         /* same as regular ARP */
-        u_char  aar_spln;       /* length of source protocol address */
-        u_char  aar_thtl;       /* length of target ATM number */
-        u_char  aar_tstl;       /* length of target ATM subaddress */
-        u_char  aar_tpln;       /* length of target protocol address */
+        nd_uint16_t aar_op;     /* same as regular ARP */
+        nd_uint8_t  aar_spln;   /* length of source protocol address */
+        nd_uint8_t  aar_thtl;   /* length of target ATM number */
+        nd_uint8_t  aar_tstl;   /* length of target ATM subaddress */
+        nd_uint8_t  aar_tpln;   /* length of target protocol address */
 /*
  * The remaining fields are variable in size,
  * according to the sizes above.
  */
 #ifdef COMMENT_ONLY
-	u_char	aar_sha[];	/* source ATM number */
-	u_char	aar_ssa[];	/* source ATM subaddress */
-	u_char	aar_spa[];	/* sender protocol address */
-	u_char	aar_tha[];	/* target ATM number */
-	u_char	aar_tsa[];	/* target ATM subaddress */
-	u_char	aar_tpa[];	/* target protocol address */
+	nd_byte		aar_sha[];	/* source ATM number */
+	nd_byte		aar_ssa[];	/* source ATM subaddress */
+	nd_byte		aar_spa[];	/* sender protocol address */
+	nd_byte		aar_tha[];	/* target ATM number */
+	nd_byte		aar_tsa[];	/* target ATM subaddress */
+	nd_byte		aar_tpa[];	/* target protocol address */
 #endif
 
-#define ATMHRD(ap)  EXTRACT_BE_U_2(&(ap)->aar_hrd)
-#define ATMSHRD_LEN(ap) ((ap)->aar_shtl & ATMARP_LEN_MASK)
-#define ATMSSLN(ap) ((ap)->aar_sstl & ATMARP_LEN_MASK)
-#define ATMSPROTO_LEN(ap) ((ap)->aar_spln)
-#define ATMOP(ap)   EXTRACT_BE_U_2(&(ap)->aar_op)
-#define ATMPRO(ap)  EXTRACT_BE_U_2(&(ap)->aar_pro)
-#define ATMTHRD_LEN(ap) ((ap)->aar_thtl & ATMARP_LEN_MASK)
-#define ATMTSLN(ap) ((ap)->aar_tstl & ATMARP_LEN_MASK)
-#define ATMTPROTO_LEN(ap) ((ap)->aar_tpln)
+#define ATMHRD(ap)  EXTRACT_BE_U_2((ap)->aar_hrd)
+#define ATMSHRD_LEN(ap) (EXTRACT_U_1((ap)->aar_shtl) & ATMARP_LEN_MASK)
+#define ATMSSLN(ap) (EXTRACT_U_1((ap)->aar_sstl) & ATMARP_LEN_MASK)
+#define ATMSPROTO_LEN(ap) EXTRACT_U_1((ap)->aar_spln)
+#define ATMOP(ap)   EXTRACT_BE_U_2((ap)->aar_op)
+#define ATMPRO(ap)  EXTRACT_BE_U_2((ap)->aar_pro)
+#define ATMTHRD_LEN(ap) (EXTRACT_U_1((ap)->aar_thtl) & ATMARP_LEN_MASK)
+#define ATMTSLN(ap) (EXTRACT_U_1((ap)->aar_tstl) & ATMARP_LEN_MASK)
+#define ATMTPROTO_LEN(ap) EXTRACT_U_1((ap)->aar_tpln)
 #define aar_sha(ap)	((const u_char *)((ap)+1))
 #define aar_ssa(ap)	(aar_sha(ap) + ATMSHRD_LEN(ap))
 #define aar_spa(ap)	(aar_ssa(ap) + ATMSSLN(ap))
