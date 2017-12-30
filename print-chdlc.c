@@ -119,7 +119,7 @@ trunc:
  * The fixed-length portion of a SLARP packet.
  */
 struct cisco_slarp {
-	uint8_t code[4];
+	nd_uint32_t code;
 #define SLARP_REQUEST	0
 #define SLARP_REPLY	1
 #define SLARP_KEEPALIVE	2
@@ -129,9 +129,9 @@ struct cisco_slarp {
 			uint8_t mask[4];
 		} addr;
 		struct {
-			uint8_t myseq[4];
-			uint8_t yourseq[4];
-			uint8_t rel[2];
+			nd_uint32_t myseq;
+			nd_uint32_t yourseq;
+			nd_uint16_t rel;
 		} keep;
 	} un;
 };
@@ -151,7 +151,7 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
 
 	slarp = (const struct cisco_slarp *)cp;
 	ND_TCHECK_LEN(slarp, SLARP_MIN_LEN);
-	switch (EXTRACT_BE_U_4(&slarp->code)) {
+	switch (EXTRACT_BE_U_4(slarp->code)) {
 	case SLARP_REQUEST:
 		ND_PRINT((ndo, "request"));
 		/*
@@ -171,9 +171,9 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
 		break;
 	case SLARP_KEEPALIVE:
 		ND_PRINT((ndo, "keepalive: mineseen=0x%08x, yourseen=0x%08x, reliability=0x%04x",
-                       EXTRACT_BE_U_4(&slarp->un.keep.myseq),
-                       EXTRACT_BE_U_4(&slarp->un.keep.yourseq),
-                       EXTRACT_BE_U_2(&slarp->un.keep.rel)));
+                       EXTRACT_BE_U_4(slarp->un.keep.myseq),
+                       EXTRACT_BE_U_4(slarp->un.keep.yourseq),
+                       EXTRACT_BE_U_2(slarp->un.keep.rel)));
 
                 if (length >= SLARP_MAX_LEN) { /* uptime-stamp is optional */
                         cp += SLARP_MIN_LEN;
@@ -186,14 +186,14 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
                 }
 		break;
 	default:
-		ND_PRINT((ndo, "0x%02x unknown", EXTRACT_BE_U_4(&slarp->code)));
+		ND_PRINT((ndo, "0x%02x unknown", EXTRACT_BE_U_4(slarp->code)));
                 if (ndo->ndo_vflag <= 1)
                     print_unknown_data(ndo,cp+4,"\n\t",length-4);
 		break;
 	}
 
 	if (SLARP_MAX_LEN < length && ndo->ndo_vflag)
-		ND_PRINT((ndo, ", (trailing junk: %d bytes)", length - SLARP_MAX_LEN));
+		ND_PRINT((ndo, ", (trailing junk: %u bytes)", length - SLARP_MAX_LEN));
         if (ndo->ndo_vflag > 1)
             print_unknown_data(ndo,cp+4,"\n\t",length-4);
 	return;
