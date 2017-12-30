@@ -57,100 +57,100 @@
 #include "ipproto.h"
 
 struct nfhdr_v1 {
-	uint16_t	version;	/* version number */
-	uint16_t	count;		/* # of records */
-	uint32_t	msys_uptime;
-	uint32_t	utc_sec;
-	uint32_t	utc_nsec;
+	nd_uint16_t	version;	/* version number */
+	nd_uint16_t	count;		/* # of records */
+	nd_uint32_t	msys_uptime;
+	nd_uint32_t	utc_sec;
+	nd_uint32_t	utc_nsec;
 };
 
 struct nfrec_v1 {
 	struct in_addr	src_ina;
 	struct in_addr	dst_ina;
 	struct in_addr	nhop_ina;
-	uint16_t	input;		/* SNMP index of input interface */
-	uint16_t	output;		/* SNMP index of output interface */
-	uint32_t	packets;	/* packets in the flow */
-	uint32_t	octets;		/* layer 3 octets in the packets of the flow */
-	uint32_t	start_time;	/* sys_uptime value at start of flow */
-	uint32_t	last_time;	/* sys_uptime value when last packet of flow was received */
-	uint16_t	srcport;	/* TCP/UDP source port or equivalent */
-	uint16_t	dstport;	/* TCP/UDP source port or equivalent */
-	uint16_t	pad1;		/* pad */
-	uint8_t		proto;		/* IP protocol type */
-	uint8_t		tos;		/* IP type of service */
-	uint8_t		tcp_flags;	/* cumulative OR of TCP flags */
-	uint8_t		pad[3];		/* padding */
-	uint32_t	reserved;	/* unused */
+	nd_uint16_t	input;		/* SNMP index of input interface */
+	nd_uint16_t	output;		/* SNMP index of output interface */
+	nd_uint32_t	packets;	/* packets in the flow */
+	nd_uint32_t	octets;		/* layer 3 octets in the packets of the flow */
+	nd_uint32_t	start_time;	/* sys_uptime value at start of flow */
+	nd_uint32_t	last_time;	/* sys_uptime value when last packet of flow was received */
+	nd_uint16_t	srcport;	/* TCP/UDP source port or equivalent */
+	nd_uint16_t	dstport;	/* TCP/UDP source port or equivalent */
+	nd_byte		pad1[2];	/* pad */
+	nd_uint8_t	proto;		/* IP protocol type */
+	nd_uint8_t	tos;		/* IP type of service */
+	nd_uint8_t	tcp_flags;	/* cumulative OR of TCP flags */
+	nd_byte		pad[3];		/* padding */
+	nd_uint32_t	reserved;	/* unused */
 };
 
 struct nfhdr_v5 {
-	uint16_t	version;	/* version number */
-	uint16_t	count;		/* # of records */
-	uint32_t	msys_uptime;
-	uint32_t	utc_sec;
-	uint32_t	utc_nsec;
-	uint32_t	sequence;	/* flow sequence number */
-	uint8_t		engine_type;	/* type of flow-switching engine */
-	uint8_t		engine_id;	/* slot number of the flow-switching engine */
-	uint16_t	sampling_interval; /* sampling mode and interval */
+	nd_uint16_t	version;	/* version number */
+	nd_uint16_t	count;		/* # of records */
+	nd_uint32_t	msys_uptime;
+	nd_uint32_t	utc_sec;
+	nd_uint32_t	utc_nsec;
+	nd_uint32_t	sequence;	/* flow sequence number */
+	nd_uint8_t	engine_type;	/* type of flow-switching engine */
+	nd_uint8_t	engine_id;	/* slot number of the flow-switching engine */
+	nd_uint16_t	sampling_interval; /* sampling mode and interval */
 };
 
 struct nfrec_v5 {
 	struct in_addr	src_ina;
 	struct in_addr	dst_ina;
 	struct in_addr	nhop_ina;
-	uint16_t	input;		/* SNMP index of input interface */
-	uint16_t	output;		/* SNMP index of output interface */
-	uint32_t	packets;	/* packets in the flow */
-	uint32_t	octets;		/* layer 3 octets in the packets of the flow */
-	uint32_t	start_time;	/* sys_uptime value at start of flow */
-	uint32_t	last_time;	/* sys_uptime value when last packet of flow was received */
-	uint16_t	srcport;	/* TCP/UDP source port or equivalent */
-	uint16_t	dstport;	/* TCP/UDP source port or equivalent */
-	uint8_t		pad1;		/* pad */
-	uint8_t		tcp_flags;	/* cumulative OR of TCP flags */
-	uint8_t		proto;		/* IP protocol type */
-	uint8_t		tos;		/* IP type of service */
-	uint16_t	src_as;		/* AS number of the source */
-	uint16_t	dst_as;		/* AS number of the destination */
-	uint8_t		src_mask;	/* source address mask bits */
-	uint8_t		dst_mask;	/* destination address prefix mask bits */
-	uint16_t	pad2;
+	nd_uint16_t	input;		/* SNMP index of input interface */
+	nd_uint16_t	output;		/* SNMP index of output interface */
+	nd_uint32_t	packets;	/* packets in the flow */
+	nd_uint32_t	octets;		/* layer 3 octets in the packets of the flow */
+	nd_uint32_t	start_time;	/* sys_uptime value at start of flow */
+	nd_uint32_t	last_time;	/* sys_uptime value when last packet of flow was received */
+	nd_uint16_t	srcport;	/* TCP/UDP source port or equivalent */
+	nd_uint16_t	dstport;	/* TCP/UDP source port or equivalent */
+	nd_byte		pad1;		/* pad */
+	nd_uint8_t	tcp_flags;	/* cumulative OR of TCP flags */
+	nd_uint8_t	proto;		/* IP protocol type */
+	nd_uint8_t	tos;		/* IP type of service */
+	nd_uint16_t	src_as;		/* AS number of the source */
+	nd_uint16_t	dst_as;		/* AS number of the destination */
+	nd_uint8_t	src_mask;	/* source address mask bits */
+	nd_uint8_t	dst_mask;	/* destination address prefix mask bits */
+	nd_byte		pad2[2];
 	struct in_addr	peer_nexthop;	/* v6: IP address of the nexthop within the peer (FIB)*/
 };
 
 struct nfhdr_v6 {
-	uint16_t	version;	/* version number */
-	uint16_t	count;		/* # of records */
-	uint32_t	msys_uptime;
-	uint32_t	utc_sec;
-	uint32_t	utc_nsec;
-	uint32_t	sequence;	/* v5 flow sequence number */
-	uint32_t	reserved;	/* v5 only */
+	nd_uint16_t	version;	/* version number */
+	nd_uint16_t	count;		/* # of records */
+	nd_uint32_t	msys_uptime;
+	nd_uint32_t	utc_sec;
+	nd_uint32_t	utc_nsec;
+	nd_uint32_t	sequence;	/* v5 flow sequence number */
+	nd_uint32_t	reserved;	/* v5 only */
 };
 
 struct nfrec_v6 {
 	struct in_addr	src_ina;
 	struct in_addr	dst_ina;
 	struct in_addr	nhop_ina;
-	uint16_t	input;		/* SNMP index of input interface */
-	uint16_t	output;		/* SNMP index of output interface */
-	uint32_t	packets;	/* packets in the flow */
-	uint32_t	octets;		/* layer 3 octets in the packets of the flow */
-	uint32_t	start_time;	/* sys_uptime value at start of flow */
-	uint32_t	last_time;	/* sys_uptime value when last packet of flow was received */
-	uint16_t	srcport;	/* TCP/UDP source port or equivalent */
-	uint16_t	dstport;	/* TCP/UDP source port or equivalent */
-	uint8_t		pad1;		/* pad */
-	uint8_t		tcp_flags;	/* cumulative OR of TCP flags */
-	uint8_t		proto;		/* IP protocol type */
-	uint8_t		tos;		/* IP type of service */
-	uint16_t	src_as;		/* AS number of the source */
-	uint16_t	dst_as;		/* AS number of the destination */
-	uint8_t		src_mask;	/* source address mask bits */
-	uint8_t		dst_mask;	/* destination address prefix mask bits */
-	uint16_t	flags;
+	nd_uint16_t	input;		/* SNMP index of input interface */
+	nd_uint16_t	output;		/* SNMP index of output interface */
+	nd_uint32_t	packets;	/* packets in the flow */
+	nd_uint32_t	octets;		/* layer 3 octets in the packets of the flow */
+	nd_uint32_t	start_time;	/* sys_uptime value at start of flow */
+	nd_uint32_t	last_time;	/* sys_uptime value when last packet of flow was received */
+	nd_uint16_t	srcport;	/* TCP/UDP source port or equivalent */
+	nd_uint16_t	dstport;	/* TCP/UDP source port or equivalent */
+	nd_byte		pad1;		/* pad */
+	nd_uint8_t	tcp_flags;	/* cumulative OR of TCP flags */
+	nd_uint8_t	proto;		/* IP protocol type */
+	nd_uint8_t	tos;		/* IP type of service */
+	nd_uint16_t	src_as;		/* AS number of the source */
+	nd_uint16_t	dst_as;		/* AS number of the destination */
+	nd_uint8_t	src_mask;	/* source address mask bits */
+	nd_uint8_t	dst_mask;	/* destination address prefix mask bits */
+	nd_uint16_t	flags;
 	struct in_addr	peer_nexthop;	/* v6: IP address of the nexthop within the peer (FIB)*/
 };
 
@@ -160,7 +160,8 @@ cnfp_v1_print(netdissect_options *ndo, const u_char *cp)
 	const struct nfhdr_v1 *nh;
 	const struct nfrec_v1 *nr;
 	const char *p_name;
-	int nrecs, ver;
+	uint8_t proto;
+	u_int nrecs, ver;
 #if 0
 	time_t t;
 #endif
@@ -168,21 +169,21 @@ cnfp_v1_print(netdissect_options *ndo, const u_char *cp)
 	nh = (const struct nfhdr_v1 *)cp;
 	ND_TCHECK(*nh);
 
-	ver = EXTRACT_BE_U_2(&nh->version);
-	nrecs = EXTRACT_BE_U_4(&nh->count);
+	ver = EXTRACT_BE_U_2(nh->version);
+	nrecs = EXTRACT_BE_U_4(nh->count);
 #if 0
 	/*
 	 * This is seconds since the UN*X epoch, and is followed by
 	 * nanoseconds.  XXX - format it, rather than just dumping the
 	 * raw seconds-since-the-Epoch.
 	 */
-	t = EXTRACT_BE_U_4(&nh->utc_sec);
+	t = EXTRACT_BE_U_4(nh->utc_sec);
 #endif
 
 	ND_PRINT((ndo, "NetFlow v%x, %u.%03u uptime, %u.%09u, ", ver,
-	       EXTRACT_BE_U_4(&nh->msys_uptime)/1000,
-	       EXTRACT_BE_U_4(&nh->msys_uptime)%1000,
-	       EXTRACT_BE_U_4(&nh->utc_sec), EXTRACT_BE_U_4(&nh->utc_nsec)));
+	       EXTRACT_BE_U_4(nh->msys_uptime)/1000,
+	       EXTRACT_BE_U_4(nh->msys_uptime)%1000,
+	       EXTRACT_BE_U_4(nh->utc_sec), EXTRACT_BE_U_4(nh->utc_nsec)));
 
 	nr = (const struct nfrec_v1 *)&nh[1];
 
@@ -197,29 +198,30 @@ cnfp_v1_print(netdissect_options *ndo, const u_char *cp)
 		 */
 		ND_TCHECK(*nr);
 		ND_PRINT((ndo, "\n  started %u.%03u, last %u.%03u",
-		       EXTRACT_BE_U_4(&nr->start_time)/1000,
-		       EXTRACT_BE_U_4(&nr->start_time)%1000,
-		       EXTRACT_BE_U_4(&nr->last_time)/1000,
-		       EXTRACT_BE_U_4(&nr->last_time)%1000));
+		       EXTRACT_BE_U_4(nr->start_time)/1000,
+		       EXTRACT_BE_U_4(nr->start_time)%1000,
+		       EXTRACT_BE_U_4(nr->last_time)/1000,
+		       EXTRACT_BE_U_4(nr->last_time)%1000));
 
 		asbuf[0] = buf[0] = '\0';
 		ND_PRINT((ndo, "\n    %s%s%s:%u ", intoa(nr->src_ina.s_addr), buf, asbuf,
-			EXTRACT_BE_U_2(&nr->srcport)));
+			EXTRACT_BE_U_2(nr->srcport)));
 
 		ND_PRINT((ndo, "> %s%s%s:%u ", intoa(nr->dst_ina.s_addr), buf, asbuf,
-			EXTRACT_BE_U_2(&nr->dstport)));
+			EXTRACT_BE_U_2(nr->dstport)));
 
 		ND_PRINT((ndo, ">> %s\n    ", intoa(nr->nhop_ina.s_addr)));
 
-		if (!ndo->ndo_nflag && (p_name = netdb_protoname(nr->proto)) != NULL)
+		proto = EXTRACT_U_1(nr->proto);
+		if (!ndo->ndo_nflag && (p_name = netdb_protoname(proto)) != NULL)
 			ND_PRINT((ndo, "%s ", p_name));
 		else
-			ND_PRINT((ndo, "%u ", nr->proto));
+			ND_PRINT((ndo, "%u ", proto));
 
 		/* tcp flags for tcp only */
-		if (nr->proto == IPPROTO_TCP) {
-			int flags;
-			flags = nr->tcp_flags;
+		if (proto == IPPROTO_TCP) {
+			u_int flags;
+			flags = EXTRACT_U_1(nr->tcp_flags);
 			ND_PRINT((ndo, "%s%s%s%s%s%s%s",
 				flags & TH_FIN  ? "F" : "",
 				flags & TH_SYN  ? "S" : "",
@@ -232,9 +234,9 @@ cnfp_v1_print(netdissect_options *ndo, const u_char *cp)
 
 		buf[0]='\0';
 		ND_PRINT((ndo, "tos %u, %u (%u octets) %s",
-		       nr->tos,
-		       EXTRACT_BE_U_4(&nr->packets),
-		       EXTRACT_BE_U_4(&nr->octets), buf));
+		       EXTRACT_U_1(nr->tos),
+		       EXTRACT_BE_U_4(nr->packets),
+		       EXTRACT_BE_U_4(nr->octets), buf));
 	}
 	return;
 
@@ -249,7 +251,8 @@ cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 	const struct nfhdr_v5 *nh;
 	const struct nfrec_v5 *nr;
 	const char *p_name;
-	int nrecs, ver;
+	uint8_t proto;
+	u_int nrecs, ver;
 #if 0
 	time_t t;
 #endif
@@ -257,23 +260,23 @@ cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 	nh = (const struct nfhdr_v5 *)cp;
 	ND_TCHECK(*nh);
 
-	ver = EXTRACT_BE_U_2(&nh->version);
-	nrecs = EXTRACT_BE_U_4(&nh->count);
+	ver = EXTRACT_BE_U_2(nh->version);
+	nrecs = EXTRACT_BE_U_4(nh->count);
 #if 0
 	/*
 	 * This is seconds since the UN*X epoch, and is followed by
 	 * nanoseconds.  XXX - format it, rather than just dumping the
 	 * raw seconds-since-the-Epoch.
 	 */
-	t = EXTRACT_BE_U_4(&nh->utc_sec);
+	t = EXTRACT_BE_U_4(nh->utc_sec);
 #endif
 
 	ND_PRINT((ndo, "NetFlow v%x, %u.%03u uptime, %u.%09u, ", ver,
-	       EXTRACT_BE_U_4(&nh->msys_uptime)/1000,
-	       EXTRACT_BE_U_4(&nh->msys_uptime)%1000,
-	       EXTRACT_BE_U_4(&nh->utc_sec), EXTRACT_BE_U_4(&nh->utc_nsec)));
+	       EXTRACT_BE_U_4(nh->msys_uptime)/1000,
+	       EXTRACT_BE_U_4(nh->msys_uptime)%1000,
+	       EXTRACT_BE_U_4(nh->utc_sec), EXTRACT_BE_U_4(nh->utc_nsec)));
 
-	ND_PRINT((ndo, "#%u, ", EXTRACT_BE_U_4(&nh->sequence)));
+	ND_PRINT((ndo, "#%u, ", EXTRACT_BE_U_4(nh->sequence)));
 	nr = (const struct nfrec_v5 *)&nh[1];
 
 	ND_PRINT((ndo, "%2u recs", nrecs));
@@ -287,35 +290,36 @@ cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 		 */
 		ND_TCHECK(*nr);
 		ND_PRINT((ndo, "\n  started %u.%03u, last %u.%03u",
-		       EXTRACT_BE_U_4(&nr->start_time)/1000,
-		       EXTRACT_BE_U_4(&nr->start_time)%1000,
-		       EXTRACT_BE_U_4(&nr->last_time)/1000,
-		       EXTRACT_BE_U_4(&nr->last_time)%1000));
+		       EXTRACT_BE_U_4(nr->start_time)/1000,
+		       EXTRACT_BE_U_4(nr->start_time)%1000,
+		       EXTRACT_BE_U_4(nr->last_time)/1000,
+		       EXTRACT_BE_U_4(nr->last_time)%1000));
 
 		asbuf[0] = buf[0] = '\0';
-		snprintf(buf, sizeof(buf), "/%u", nr->src_mask);
+		snprintf(buf, sizeof(buf), "/%u", EXTRACT_U_1(nr->src_mask));
 		snprintf(asbuf, sizeof(asbuf), ":%u",
-			EXTRACT_BE_U_2(&nr->src_as));
+			EXTRACT_BE_U_2(nr->src_as));
 		ND_PRINT((ndo, "\n    %s%s%s:%u ", intoa(nr->src_ina.s_addr), buf, asbuf,
-			EXTRACT_BE_U_2(&nr->srcport)));
+			EXTRACT_BE_U_2(nr->srcport)));
 
-		snprintf(buf, sizeof(buf), "/%d", nr->dst_mask);
+		snprintf(buf, sizeof(buf), "/%u", EXTRACT_U_1(nr->dst_mask));
 		snprintf(asbuf, sizeof(asbuf), ":%u",
-			 EXTRACT_BE_U_2(&nr->dst_as));
+			 EXTRACT_BE_U_2(nr->dst_as));
 		ND_PRINT((ndo, "> %s%s%s:%u ", intoa(nr->dst_ina.s_addr), buf, asbuf,
-			EXTRACT_BE_U_2(&nr->dstport)));
+			EXTRACT_BE_U_2(nr->dstport)));
 
 		ND_PRINT((ndo, ">> %s\n    ", intoa(nr->nhop_ina.s_addr)));
 
-		if (!ndo->ndo_nflag && (p_name = netdb_protoname(nr->proto)) != NULL)
+		proto = EXTRACT_U_1(nr->proto);
+		if (!ndo->ndo_nflag && (p_name = netdb_protoname(proto)) != NULL)
 			ND_PRINT((ndo, "%s ", p_name));
 		else
-			ND_PRINT((ndo, "%u ", nr->proto));
+			ND_PRINT((ndo, "%u ", proto));
 
 		/* tcp flags for tcp only */
-		if (nr->proto == IPPROTO_TCP) {
-			int flags;
-			flags = nr->tcp_flags;
+		if (proto == IPPROTO_TCP) {
+			u_int flags;
+			flags = EXTRACT_U_1(nr->tcp_flags);
 			ND_PRINT((ndo, "%s%s%s%s%s%s%s",
 				flags & TH_FIN  ? "F" : "",
 				flags & TH_SYN  ? "S" : "",
@@ -328,9 +332,9 @@ cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 
 		buf[0]='\0';
 		ND_PRINT((ndo, "tos %u, %u (%u octets) %s",
-		       nr->tos,
-		       EXTRACT_BE_U_4(&nr->packets),
-		       EXTRACT_BE_U_4(&nr->octets), buf));
+		       EXTRACT_U_1(nr->tos),
+		       EXTRACT_BE_U_4(nr->packets),
+		       EXTRACT_BE_U_4(nr->octets), buf));
 	}
 	return;
 
@@ -345,7 +349,8 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 	const struct nfhdr_v6 *nh;
 	const struct nfrec_v6 *nr;
 	const char *p_name;
-	int nrecs, ver;
+	uint8_t proto;
+	u_int nrecs, ver;
 #if 0
 	time_t t;
 #endif
@@ -353,23 +358,23 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 	nh = (const struct nfhdr_v6 *)cp;
 	ND_TCHECK(*nh);
 
-	ver = EXTRACT_BE_U_2(&nh->version);
-	nrecs = EXTRACT_BE_U_4(&nh->count);
+	ver = EXTRACT_BE_U_2(nh->version);
+	nrecs = EXTRACT_BE_U_4(nh->count);
 #if 0
 	/*
 	 * This is seconds since the UN*X epoch, and is followed by
 	 * nanoseconds.  XXX - format it, rather than just dumping the
 	 * raw seconds-since-the-Epoch.
 	 */
-	t = EXTRACT_BE_U_4(&nh->utc_sec);
+	t = EXTRACT_BE_U_4(nh->utc_sec);
 #endif
 
 	ND_PRINT((ndo, "NetFlow v%x, %u.%03u uptime, %u.%09u, ", ver,
-	       EXTRACT_BE_U_4(&nh->msys_uptime)/1000,
-	       EXTRACT_BE_U_4(&nh->msys_uptime)%1000,
-	       EXTRACT_BE_U_4(&nh->utc_sec), EXTRACT_BE_U_4(&nh->utc_nsec)));
+	       EXTRACT_BE_U_4(nh->msys_uptime)/1000,
+	       EXTRACT_BE_U_4(nh->msys_uptime)%1000,
+	       EXTRACT_BE_U_4(nh->utc_sec), EXTRACT_BE_U_4(nh->utc_nsec)));
 
-	ND_PRINT((ndo, "#%u, ", EXTRACT_BE_U_4(&nh->sequence)));
+	ND_PRINT((ndo, "#%u, ", EXTRACT_BE_U_4(nh->sequence)));
 	nr = (const struct nfrec_v6 *)&nh[1];
 
 	ND_PRINT((ndo, "%2u recs", nrecs));
@@ -383,35 +388,36 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 		 */
 		ND_TCHECK(*nr);
 		ND_PRINT((ndo, "\n  started %u.%03u, last %u.%03u",
-		       EXTRACT_BE_U_4(&nr->start_time)/1000,
-		       EXTRACT_BE_U_4(&nr->start_time)%1000,
-		       EXTRACT_BE_U_4(&nr->last_time)/1000,
-		       EXTRACT_BE_U_4(&nr->last_time)%1000));
+		       EXTRACT_BE_U_4(nr->start_time)/1000,
+		       EXTRACT_BE_U_4(nr->start_time)%1000,
+		       EXTRACT_BE_U_4(nr->last_time)/1000,
+		       EXTRACT_BE_U_4(nr->last_time)%1000));
 
 		asbuf[0] = buf[0] = '\0';
-		snprintf(buf, sizeof(buf), "/%u", nr->src_mask);
+		snprintf(buf, sizeof(buf), "/%u", EXTRACT_U_1(nr->src_mask));
 		snprintf(asbuf, sizeof(asbuf), ":%u",
-			EXTRACT_BE_U_2(&nr->src_as));
+			EXTRACT_BE_U_2(nr->src_as));
 		ND_PRINT((ndo, "\n    %s%s%s:%u ", intoa(nr->src_ina.s_addr), buf, asbuf,
-			EXTRACT_BE_U_2(&nr->srcport)));
+			EXTRACT_BE_U_2(nr->srcport)));
 
-		snprintf(buf, sizeof(buf), "/%d", nr->dst_mask);
+		snprintf(buf, sizeof(buf), "/%u", EXTRACT_U_1(nr->dst_mask));
 		snprintf(asbuf, sizeof(asbuf), ":%u",
-			 EXTRACT_BE_U_2(&nr->dst_as));
+			 EXTRACT_BE_U_2(nr->dst_as));
 		ND_PRINT((ndo, "> %s%s%s:%u ", intoa(nr->dst_ina.s_addr), buf, asbuf,
-			EXTRACT_BE_U_2(&nr->dstport)));
+			EXTRACT_BE_U_2(nr->dstport)));
 
 		ND_PRINT((ndo, ">> %s\n    ", intoa(nr->nhop_ina.s_addr)));
 
-		if (!ndo->ndo_nflag && (p_name = netdb_protoname(nr->proto)) != NULL)
+		proto = EXTRACT_U_1(nr->proto);
+		if (!ndo->ndo_nflag && (p_name = netdb_protoname(proto)) != NULL)
 			ND_PRINT((ndo, "%s ", p_name));
 		else
-			ND_PRINT((ndo, "%u ", nr->proto));
+			ND_PRINT((ndo, "%u ", proto));
 
 		/* tcp flags for tcp only */
-		if (nr->proto == IPPROTO_TCP) {
-			int flags;
-			flags = nr->tcp_flags;
+		if (proto == IPPROTO_TCP) {
+			u_int flags;
+			flags = EXTRACT_U_1(nr->tcp_flags);
 			ND_PRINT((ndo, "%s%s%s%s%s%s%s",
 				flags & TH_FIN  ? "F" : "",
 				flags & TH_SYN  ? "S" : "",
@@ -424,12 +430,12 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 
 		buf[0]='\0';
 		snprintf(buf, sizeof(buf), "(%u<>%u encaps)",
-			 (EXTRACT_BE_U_2(&nr->flags) >> 8) & 0xff,
-			 (EXTRACT_BE_U_2(&nr->flags)) & 0xff);
+			 (EXTRACT_BE_U_2(nr->flags) >> 8) & 0xff,
+			 (EXTRACT_BE_U_2(nr->flags)) & 0xff);
 		ND_PRINT((ndo, "tos %u, %u (%u octets) %s",
-		       nr->tos,
-		       EXTRACT_BE_U_4(&nr->packets),
-		       EXTRACT_BE_U_4(&nr->octets), buf));
+		       EXTRACT_U_1(nr->tos),
+		       EXTRACT_BE_U_4(nr->packets),
+		       EXTRACT_BE_U_4(nr->octets), buf));
 	}
 	return;
 
