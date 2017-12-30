@@ -16,6 +16,13 @@
 
 /* \summary: Enhanced Interior Gateway Routing Protocol (EIGRP) printer */
 
+/*
+ * specification:
+ *
+ * http://www.rhyshaden.com/eigrp.htm
+ * RFC 7868
+ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -28,20 +35,14 @@
 #include "extract.h"
 #include "addrtoname.h"
 
-/*
- * packet format documented at
- * http://www.rhyshaden.com/eigrp.htm
- * RFC 7868
- */
-
 struct eigrp_common_header {
-    uint8_t version;
-    uint8_t opcode;
-    uint8_t checksum[2];
-    uint8_t flags[4];
-    uint8_t seq[4];
-    uint8_t ack[4];
-    uint8_t asn[4];
+    nd_uint8_t  version;
+    nd_uint8_t  opcode;
+    nd_uint16_t checksum;
+    nd_uint32_t flags;
+    nd_uint32_t seq;
+    nd_uint32_t ack;
+    nd_uint32_t asn;
 };
 
 #define	EIGRP_VERSION                        2
@@ -70,8 +71,8 @@ static const struct tok eigrp_common_header_flag_values[] = {
 };
 
 struct eigrp_tlv_header {
-    uint8_t type[2];
-    uint8_t length[2];
+    nd_uint16_t type;
+    nd_uint16_t length;
 };
 
 #define EIGRP_TLV_GENERAL_PARM   0x0001
@@ -104,91 +105,91 @@ static const struct tok eigrp_tlv_values[] = {
 };
 
 struct eigrp_tlv_general_parm_t {
-    uint8_t k1;
-    uint8_t k2;
-    uint8_t k3;
-    uint8_t k4;
-    uint8_t k5;
-    uint8_t res;
-    uint8_t holdtime[2];
+    nd_uint8_t  k1;
+    nd_uint8_t  k2;
+    nd_uint8_t  k3;
+    nd_uint8_t  k4;
+    nd_uint8_t  k5;
+    nd_uint8_t  res;
+    nd_uint16_t holdtime;
 };
 
 struct eigrp_tlv_sw_version_t {
-    uint8_t ios_major;
-    uint8_t ios_minor;
-    uint8_t eigrp_major;
-    uint8_t eigrp_minor;
+    nd_uint8_t ios_major;
+    nd_uint8_t ios_minor;
+    nd_uint8_t eigrp_major;
+    nd_uint8_t eigrp_minor;
 };
 
 struct eigrp_tlv_ip_int_t {
-    uint8_t nexthop[4];
-    uint8_t delay[4];
-    uint8_t bandwidth[4];
-    uint8_t mtu[3];
-    uint8_t hopcount;
-    uint8_t reliability;
-    uint8_t load;
-    uint8_t reserved[2];
-    uint8_t plen;
-    uint8_t destination; /* variable length [1-4] bytes encoding */
+    nd_ipv4     nexthop;
+    nd_uint32_t delay;
+    nd_uint32_t bandwidth;
+    nd_uint24_t mtu;
+    nd_uint8_t  hopcount;
+    nd_uint8_t  reliability;
+    nd_uint8_t  load;
+    nd_byte     reserved[2];
+    nd_uint8_t  plen;
+    nd_uint8_t  destination; /* variable length [1-4] bytes encoding */
 };
 
 struct eigrp_tlv_ip_ext_t {
-    uint8_t nexthop[4];
-    uint8_t origin_router[4];
-    uint8_t origin_as[4];
-    uint8_t tag[4];
-    uint8_t metric[4];
-    uint8_t reserved[2];
-    uint8_t proto_id;
-    uint8_t flags;
-    uint8_t delay[4];
-    uint8_t bandwidth[4];
-    uint8_t mtu[3];
-    uint8_t hopcount;
-    uint8_t reliability;
-    uint8_t load;
-    uint8_t reserved2[2];
-    uint8_t plen;
-    uint8_t destination; /* variable length [1-4] bytes encoding */
+    nd_ipv4     nexthop;
+    nd_ipv4     origin_router;
+    nd_uint32_t origin_as;
+    nd_uint32_t tag;
+    nd_uint32_t metric;
+    nd_byte     reserved[2];
+    nd_uint8_t  proto_id;
+    nd_uint8_t  flags;
+    nd_uint32_t delay;
+    nd_uint32_t bandwidth;
+    nd_uint24_t mtu;
+    nd_uint8_t  hopcount;
+    nd_uint8_t  reliability;
+    nd_uint8_t  load;
+    nd_byte     reserved2[2];
+    nd_uint8_t  plen;
+    nd_uint8_t  destination; /* variable length [1-4] bytes encoding */
 };
 
 struct eigrp_tlv_at_cable_setup_t {
-    uint8_t cable_start[2];
-    uint8_t cable_end[2];
-    uint8_t router_id[4];
+    nd_uint16_t cable_start;
+    nd_uint16_t cable_end;
+    nd_uint32_t router_id;
 };
 
 struct eigrp_tlv_at_int_t {
-    uint8_t nexthop[4];
-    uint8_t delay[4];
-    uint8_t bandwidth[4];
-    uint8_t mtu[3];
-    uint8_t hopcount;
-    uint8_t reliability;
-    uint8_t load;
-    uint8_t reserved[2];
-    uint8_t cable_start[2];
-    uint8_t cable_end[2];
+    nd_byte     nexthop[4];
+    nd_uint32_t delay;
+    nd_uint32_t bandwidth;
+    nd_uint24_t mtu;
+    nd_uint8_t  hopcount;
+    nd_uint8_t  reliability;
+    nd_uint8_t  load;
+    nd_byte     reserved[2];
+    nd_uint16_t cable_start;
+    nd_uint16_t cable_end;
 };
 
 struct eigrp_tlv_at_ext_t {
-    uint8_t nexthop[4];
-    uint8_t origin_router[4];
-    uint8_t origin_as[4];
-    uint8_t tag[4];
-    uint8_t proto_id;
-    uint8_t flags;
-    uint8_t metric[2];
-    uint8_t delay[4];
-    uint8_t bandwidth[4];
-    uint8_t mtu[3];
-    uint8_t hopcount;
-    uint8_t reliability;
-    uint8_t load;
-    uint8_t reserved2[2];
-    uint8_t cable_start[2];
-    uint8_t cable_end[2];
+    nd_byte     nexthop[4];
+    nd_uint32_t origin_router;
+    nd_uint32_t origin_as;
+    nd_uint32_t tag;
+    nd_uint8_t  proto_id;
+    nd_uint8_t  flags;
+    nd_uint16_t metric;
+    nd_uint32_t delay;
+    nd_uint32_t bandwidth;
+    nd_uint24_t mtu;
+    nd_uint8_t  hopcount;
+    nd_uint8_t  reliability;
+    nd_uint8_t  load;
+    nd_byte     reserved2[2];
+    nd_uint16_t cable_start;
+    nd_uint16_t cable_end;
 };
 
 static const struct tok eigrp_ext_proto_id_values[] = {
@@ -232,15 +233,15 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
     /*
      * Sanity checking of the header.
      */
-    if (eigrp_com_header->version != EIGRP_VERSION) {
-	ND_PRINT((ndo, "EIGRP version %u packet not supported",eigrp_com_header->version));
+    if (EXTRACT_U_1(eigrp_com_header->version) != EIGRP_VERSION) {
+	ND_PRINT((ndo, "EIGRP version %u packet not supported",EXTRACT_U_1(eigrp_com_header->version)));
 	return;
     }
 
     /* in non-verbose mode just lets print the basic Message Type*/
     if (ndo->ndo_vflag < 1) {
         ND_PRINT((ndo, "EIGRP %s, length: %u",
-               tok2str(eigrp_opcode_values, "unknown (%u)",eigrp_com_header->opcode),
+               tok2str(eigrp_opcode_values, "unknown (%u)",EXTRACT_U_1(eigrp_com_header->opcode)),
                len));
         return;
     }
@@ -249,7 +250,7 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 
     if (len < sizeof(struct eigrp_common_header)) {
         ND_PRINT((ndo, "EIGRP %s, length: %u (too short, < %u)",
-               tok2str(eigrp_opcode_values, "unknown (%u)",eigrp_com_header->opcode),
+               tok2str(eigrp_opcode_values, "unknown (%u)",EXTRACT_U_1(eigrp_com_header->opcode)),
                len, (u_int) sizeof(struct eigrp_common_header)));
         return;
     }
@@ -257,16 +258,16 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 
     /* FIXME print other header info */
     ND_PRINT((ndo, "\n\tEIGRP v%u, opcode: %s (%u), chksum: 0x%04x, Flags: [%s]\n\tseq: 0x%08x, ack: 0x%08x, AS: %u, length: %u",
-           eigrp_com_header->version,
-           tok2str(eigrp_opcode_values, "unknown, type: %u",eigrp_com_header->opcode),
-           eigrp_com_header->opcode,
-           EXTRACT_BE_U_2(&eigrp_com_header->checksum),
+           EXTRACT_U_1(eigrp_com_header->version),
+           tok2str(eigrp_opcode_values, "unknown, type: %u",EXTRACT_U_1(eigrp_com_header->opcode)),
+           EXTRACT_U_1(eigrp_com_header->opcode),
+           EXTRACT_BE_U_2(eigrp_com_header->checksum),
            tok2str(eigrp_common_header_flag_values,
                    "none",
-                   EXTRACT_BE_U_4(&eigrp_com_header->flags)),
-           EXTRACT_BE_U_4(&eigrp_com_header->seq),
-           EXTRACT_BE_U_4(&eigrp_com_header->ack),
-           EXTRACT_BE_U_4(&eigrp_com_header->asn),
+                   EXTRACT_BE_U_4(eigrp_com_header->flags)),
+           EXTRACT_BE_U_4(eigrp_com_header->seq),
+           EXTRACT_BE_U_4(eigrp_com_header->ack),
+           EXTRACT_BE_U_4(eigrp_com_header->asn),
            tlen));
 
     tptr+=sizeof(struct eigrp_common_header);
@@ -276,8 +277,8 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
         ND_TCHECK_LEN(tptr, sizeof(struct eigrp_tlv_header));
 
         eigrp_tlv_header = (const struct eigrp_tlv_header *)tptr;
-        eigrp_tlv_len=EXTRACT_BE_U_2(&eigrp_tlv_header->length);
-        eigrp_tlv_type=EXTRACT_BE_U_2(&eigrp_tlv_header->type);
+        eigrp_tlv_len=EXTRACT_BE_U_2(eigrp_tlv_header->length);
+        eigrp_tlv_type=EXTRACT_BE_U_2(eigrp_tlv_header->type);
 
 
         if (eigrp_tlv_len < sizeof(struct eigrp_tlv_header) ||
@@ -316,11 +317,11 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 
             ND_PRINT((ndo, "\n\t    holdtime: %us, k1 %u, k2 %u, k3 %u, k4 %u, k5 %u",
                    EXTRACT_BE_U_2(tlv_ptr.eigrp_tlv_general_parm->holdtime),
-                   tlv_ptr.eigrp_tlv_general_parm->k1,
-                   tlv_ptr.eigrp_tlv_general_parm->k2,
-                   tlv_ptr.eigrp_tlv_general_parm->k3,
-                   tlv_ptr.eigrp_tlv_general_parm->k4,
-                   tlv_ptr.eigrp_tlv_general_parm->k5));
+                   EXTRACT_U_1(tlv_ptr.eigrp_tlv_general_parm->k1),
+                   EXTRACT_U_1(tlv_ptr.eigrp_tlv_general_parm->k2),
+                   EXTRACT_U_1(tlv_ptr.eigrp_tlv_general_parm->k3),
+                   EXTRACT_U_1(tlv_ptr.eigrp_tlv_general_parm->k4),
+                   EXTRACT_U_1(tlv_ptr.eigrp_tlv_general_parm->k5)));
             break;
 
         case EIGRP_TLV_SW_VERSION:
@@ -332,10 +333,10 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
             }
 
             ND_PRINT((ndo, "\n\t    IOS version: %u.%u, EIGRP version %u.%u",
-                   tlv_ptr.eigrp_tlv_sw_version->ios_major,
-                   tlv_ptr.eigrp_tlv_sw_version->ios_minor,
-                   tlv_ptr.eigrp_tlv_sw_version->eigrp_major,
-                   tlv_ptr.eigrp_tlv_sw_version->eigrp_minor));
+                   EXTRACT_U_1(tlv_ptr.eigrp_tlv_sw_version->ios_major),
+                   EXTRACT_U_1(tlv_ptr.eigrp_tlv_sw_version->ios_minor),
+                   EXTRACT_U_1(tlv_ptr.eigrp_tlv_sw_version->eigrp_major),
+                   EXTRACT_U_1(tlv_ptr.eigrp_tlv_sw_version->eigrp_minor)));
             break;
 
         case EIGRP_TLV_IP_INT:
@@ -346,30 +347,30 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
                 break;
             }
 
-            bit_length = tlv_ptr.eigrp_tlv_ip_int->plen;
+            bit_length = EXTRACT_U_1(tlv_ptr.eigrp_tlv_ip_int->plen);
             if (bit_length > 32) {
                 ND_PRINT((ndo, "\n\t    illegal prefix length %u",bit_length));
                 break;
             }
             byte_length = (bit_length + 7) / 8; /* variable length encoding */
             memset(prefix, 0, 4);
-            memcpy(prefix,&tlv_ptr.eigrp_tlv_ip_int->destination,byte_length);
+            memcpy(prefix, tlv_ptr.eigrp_tlv_ip_int->destination, byte_length);
 
             ND_PRINT((ndo, "\n\t    IPv4 prefix: %15s/%u, nexthop: ",
                    ipaddr_string(ndo, prefix),
                    bit_length));
-            if (EXTRACT_BE_U_4(&tlv_ptr.eigrp_tlv_ip_int->nexthop) == 0)
+            if (EXTRACT_BE_U_4(tlv_ptr.eigrp_tlv_ip_int->nexthop) == 0)
                 ND_PRINT((ndo, "self"));
             else
                 ND_PRINT((ndo, "%s",ipaddr_string(ndo, &tlv_ptr.eigrp_tlv_ip_int->nexthop)));
 
             ND_PRINT((ndo, "\n\t      delay %u ms, bandwidth %u Kbps, mtu %u, hop %u, reliability %u, load %u",
-                   (EXTRACT_BE_U_4(&tlv_ptr.eigrp_tlv_ip_int->delay)/100),
-                   EXTRACT_BE_U_4(&tlv_ptr.eigrp_tlv_ip_int->bandwidth),
-                   EXTRACT_BE_U_3(&tlv_ptr.eigrp_tlv_ip_int->mtu),
-                   tlv_ptr.eigrp_tlv_ip_int->hopcount,
-                   tlv_ptr.eigrp_tlv_ip_int->reliability,
-                   tlv_ptr.eigrp_tlv_ip_int->load));
+                   (EXTRACT_BE_U_4(tlv_ptr.eigrp_tlv_ip_int->delay)/100),
+                   EXTRACT_BE_U_4(tlv_ptr.eigrp_tlv_ip_int->bandwidth),
+                   EXTRACT_BE_U_3(tlv_ptr.eigrp_tlv_ip_int->mtu),
+                   EXTRACT_U_1(tlv_ptr.eigrp_tlv_ip_int->hopcount),
+                   EXTRACT_U_1(tlv_ptr.eigrp_tlv_ip_int->reliability),
+                   EXTRACT_U_1(tlv_ptr.eigrp_tlv_ip_int->load)));
             break;
 
         case EIGRP_TLV_IP_EXT:
@@ -380,38 +381,38 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
                 break;
             }
 
-            bit_length = tlv_ptr.eigrp_tlv_ip_ext->plen;
+            bit_length = EXTRACT_U_1(tlv_ptr.eigrp_tlv_ip_ext->plen);
             if (bit_length > 32) {
                 ND_PRINT((ndo, "\n\t    illegal prefix length %u",bit_length));
                 break;
             }
             byte_length = (bit_length + 7) / 8; /* variable length encoding */
             memset(prefix, 0, 4);
-            memcpy(prefix,&tlv_ptr.eigrp_tlv_ip_ext->destination,byte_length);
+            memcpy(prefix, tlv_ptr.eigrp_tlv_ip_ext->destination, byte_length);
 
             ND_PRINT((ndo, "\n\t    IPv4 prefix: %15s/%u, nexthop: ",
                    ipaddr_string(ndo, prefix),
                    bit_length));
-            if (EXTRACT_BE_U_4(&tlv_ptr.eigrp_tlv_ip_ext->nexthop) == 0)
+            if (EXTRACT_BE_U_4(tlv_ptr.eigrp_tlv_ip_ext->nexthop) == 0)
                 ND_PRINT((ndo, "self"));
             else
                 ND_PRINT((ndo, "%s",ipaddr_string(ndo, &tlv_ptr.eigrp_tlv_ip_ext->nexthop)));
 
             ND_PRINT((ndo, "\n\t      origin-router %s, origin-as %u, origin-proto %s, flags [0x%02x], tag 0x%08x, metric %u",
-                   ipaddr_string(ndo, tlv_ptr.eigrp_tlv_ip_ext->origin_router),
+                   ipaddr_string(ndo, &tlv_ptr.eigrp_tlv_ip_ext->origin_router),
                    EXTRACT_BE_U_4(tlv_ptr.eigrp_tlv_ip_ext->origin_as),
-                   tok2str(eigrp_ext_proto_id_values,"unknown",tlv_ptr.eigrp_tlv_ip_ext->proto_id),
-                   tlv_ptr.eigrp_tlv_ip_ext->flags,
+                   tok2str(eigrp_ext_proto_id_values,"unknown",EXTRACT_U_1(tlv_ptr.eigrp_tlv_ip_ext->proto_id)),
+                   EXTRACT_U_1(tlv_ptr.eigrp_tlv_ip_ext->flags),
                    EXTRACT_BE_U_4(tlv_ptr.eigrp_tlv_ip_ext->tag),
                    EXTRACT_BE_U_4(tlv_ptr.eigrp_tlv_ip_ext->metric)));
 
             ND_PRINT((ndo, "\n\t      delay %u ms, bandwidth %u Kbps, mtu %u, hop %u, reliability %u, load %u",
-                   (EXTRACT_BE_U_4(&tlv_ptr.eigrp_tlv_ip_ext->delay)/100),
-                   EXTRACT_BE_U_4(&tlv_ptr.eigrp_tlv_ip_ext->bandwidth),
-                   EXTRACT_BE_U_3(&tlv_ptr.eigrp_tlv_ip_ext->mtu),
-                   tlv_ptr.eigrp_tlv_ip_ext->hopcount,
-                   tlv_ptr.eigrp_tlv_ip_ext->reliability,
-                   tlv_ptr.eigrp_tlv_ip_ext->load));
+                   (EXTRACT_BE_U_4(tlv_ptr.eigrp_tlv_ip_ext->delay)/100),
+                   EXTRACT_BE_U_4(tlv_ptr.eigrp_tlv_ip_ext->bandwidth),
+                   EXTRACT_BE_U_3(tlv_ptr.eigrp_tlv_ip_ext->mtu),
+                   EXTRACT_U_1(tlv_ptr.eigrp_tlv_ip_ext->hopcount),
+                   EXTRACT_U_1(tlv_ptr.eigrp_tlv_ip_ext->reliability),
+                   EXTRACT_U_1(tlv_ptr.eigrp_tlv_ip_ext->load)));
             break;
 
         case EIGRP_TLV_AT_CABLE_SETUP:
@@ -423,9 +424,9 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
             }
 
             ND_PRINT((ndo, "\n\t    Cable-range: %u-%u, Router-ID %u",
-                   EXTRACT_BE_U_2(&tlv_ptr.eigrp_tlv_at_cable_setup->cable_start),
-                   EXTRACT_BE_U_2(&tlv_ptr.eigrp_tlv_at_cable_setup->cable_end),
-                   EXTRACT_BE_U_4(&tlv_ptr.eigrp_tlv_at_cable_setup->router_id)));
+                   EXTRACT_BE_U_2(tlv_ptr.eigrp_tlv_at_cable_setup->cable_start),
+                   EXTRACT_BE_U_2(tlv_ptr.eigrp_tlv_at_cable_setup->cable_end),
+                   EXTRACT_BE_U_4(tlv_ptr.eigrp_tlv_at_cable_setup->router_id)));
             break;
 
         case EIGRP_TLV_AT_INT:
@@ -437,23 +438,23 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
             }
 
             ND_PRINT((ndo, "\n\t     Cable-Range: %u-%u, nexthop: ",
-                   EXTRACT_BE_U_2(&tlv_ptr.eigrp_tlv_at_int->cable_start),
-                   EXTRACT_BE_U_2(&tlv_ptr.eigrp_tlv_at_int->cable_end)));
+                   EXTRACT_BE_U_2(tlv_ptr.eigrp_tlv_at_int->cable_start),
+                   EXTRACT_BE_U_2(tlv_ptr.eigrp_tlv_at_int->cable_end)));
 
-            if (EXTRACT_BE_U_4(&tlv_ptr.eigrp_tlv_at_int->nexthop) == 0)
+            if (EXTRACT_BE_U_4(tlv_ptr.eigrp_tlv_at_int->nexthop) == 0)
                 ND_PRINT((ndo, "self"));
             else
                 ND_PRINT((ndo, "%u.%u",
-                       EXTRACT_BE_U_2(&tlv_ptr.eigrp_tlv_at_int->nexthop),
+                       EXTRACT_BE_U_2(&tlv_ptr.eigrp_tlv_at_int->nexthop[0]),
                        EXTRACT_BE_U_2(&tlv_ptr.eigrp_tlv_at_int->nexthop[2])));
 
             ND_PRINT((ndo, "\n\t      delay %u ms, bandwidth %u Kbps, mtu %u, hop %u, reliability %u, load %u",
-                   (EXTRACT_BE_U_4(&tlv_ptr.eigrp_tlv_at_int->delay)/100),
-                   EXTRACT_BE_U_4(&tlv_ptr.eigrp_tlv_at_int->bandwidth),
-                   EXTRACT_BE_U_3(&tlv_ptr.eigrp_tlv_at_int->mtu),
-                   tlv_ptr.eigrp_tlv_at_int->hopcount,
-                   tlv_ptr.eigrp_tlv_at_int->reliability,
-                   tlv_ptr.eigrp_tlv_at_int->load));
+                   (EXTRACT_BE_U_4(tlv_ptr.eigrp_tlv_at_int->delay)/100),
+                   EXTRACT_BE_U_4(tlv_ptr.eigrp_tlv_at_int->bandwidth),
+                   EXTRACT_BE_U_3(tlv_ptr.eigrp_tlv_at_int->mtu),
+                   EXTRACT_U_1(tlv_ptr.eigrp_tlv_at_int->hopcount),
+                   EXTRACT_U_1(tlv_ptr.eigrp_tlv_at_int->reliability),
+                   EXTRACT_U_1(tlv_ptr.eigrp_tlv_at_int->load)));
             break;
 
         case EIGRP_TLV_AT_EXT:
@@ -465,31 +466,31 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
             }
 
             ND_PRINT((ndo, "\n\t     Cable-Range: %u-%u, nexthop: ",
-                   EXTRACT_BE_U_2(&tlv_ptr.eigrp_tlv_at_ext->cable_start),
-                   EXTRACT_BE_U_2(&tlv_ptr.eigrp_tlv_at_ext->cable_end)));
+                   EXTRACT_BE_U_2(tlv_ptr.eigrp_tlv_at_ext->cable_start),
+                   EXTRACT_BE_U_2(tlv_ptr.eigrp_tlv_at_ext->cable_end)));
 
-            if (EXTRACT_BE_U_4(&tlv_ptr.eigrp_tlv_at_ext->nexthop) == 0)
+            if (EXTRACT_BE_U_4(tlv_ptr.eigrp_tlv_at_ext->nexthop) == 0)
                 ND_PRINT((ndo, "self"));
             else
                 ND_PRINT((ndo, "%u.%u",
-                       EXTRACT_BE_U_2(&tlv_ptr.eigrp_tlv_at_ext->nexthop),
+                       EXTRACT_BE_U_2(&tlv_ptr.eigrp_tlv_at_ext->nexthop[0]),
                        EXTRACT_BE_U_2(&tlv_ptr.eigrp_tlv_at_ext->nexthop[2])));
 
             ND_PRINT((ndo, "\n\t      origin-router %u, origin-as %u, origin-proto %s, flags [0x%02x], tag 0x%08x, metric %u",
                    EXTRACT_BE_U_4(tlv_ptr.eigrp_tlv_at_ext->origin_router),
                    EXTRACT_BE_U_4(tlv_ptr.eigrp_tlv_at_ext->origin_as),
-                   tok2str(eigrp_ext_proto_id_values,"unknown",tlv_ptr.eigrp_tlv_at_ext->proto_id),
-                   tlv_ptr.eigrp_tlv_at_ext->flags,
+                   tok2str(eigrp_ext_proto_id_values,"unknown",EXTRACT_U_1(tlv_ptr.eigrp_tlv_at_ext->proto_id)),
+                   EXTRACT_U_1(tlv_ptr.eigrp_tlv_at_ext->flags),
                    EXTRACT_BE_U_4(tlv_ptr.eigrp_tlv_at_ext->tag),
                    EXTRACT_BE_U_2(tlv_ptr.eigrp_tlv_at_ext->metric)));
 
             ND_PRINT((ndo, "\n\t      delay %u ms, bandwidth %u Kbps, mtu %u, hop %u, reliability %u, load %u",
-                   (EXTRACT_BE_U_4(&tlv_ptr.eigrp_tlv_at_ext->delay)/100),
-                   EXTRACT_BE_U_4(&tlv_ptr.eigrp_tlv_at_ext->bandwidth),
-                   EXTRACT_BE_U_3(&tlv_ptr.eigrp_tlv_at_ext->mtu),
-                   tlv_ptr.eigrp_tlv_at_ext->hopcount,
-                   tlv_ptr.eigrp_tlv_at_ext->reliability,
-                   tlv_ptr.eigrp_tlv_at_ext->load));
+                   (EXTRACT_BE_U_4(tlv_ptr.eigrp_tlv_at_ext->delay)/100),
+                   EXTRACT_BE_U_4(tlv_ptr.eigrp_tlv_at_ext->bandwidth),
+                   EXTRACT_BE_U_3(tlv_ptr.eigrp_tlv_at_ext->mtu),
+                   EXTRACT_U_1(tlv_ptr.eigrp_tlv_at_ext->hopcount),
+                   EXTRACT_U_1(tlv_ptr.eigrp_tlv_at_ext->reliability),
+                   EXTRACT_U_1(tlv_ptr.eigrp_tlv_at_ext->load)));
             break;
 
             /*
