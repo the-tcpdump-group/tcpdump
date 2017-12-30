@@ -46,16 +46,16 @@
 
 /* IPX transport header */
 struct ipxHdr {
-    uint16_t	cksum;		/* Checksum */
-    uint16_t	length;		/* Length, in bytes, including header */
-    uint8_t	tCtl;		/* Transport Control (i.e. hop count) */
-    uint8_t	pType;		/* Packet Type (i.e. level 2 protocol) */
+    nd_uint16_t	cksum;		/* Checksum */
+    nd_uint16_t	length;		/* Length, in bytes, including header */
+    nd_uint8_t	tCtl;		/* Transport Control (i.e. hop count) */
+    nd_uint8_t	pType;		/* Packet Type (i.e. level 2 protocol) */
     uint16_t	dstNet[2];	/* destination net */
-    uint8_t	dstNode[6];	/* destination node */
-    uint16_t	dstSkt;		/* destination socket */
+    nd_byte	dstNode[6];	/* destination node */
+    nd_uint16_t	dstSkt;		/* destination socket */
     uint16_t	srcNet[2];	/* source net */
-    uint8_t	srcNode[6];	/* source node */
-    uint16_t	srcSkt;		/* source socket */
+    nd_byte	srcNode[6];	/* source node */
+    nd_uint16_t	srcSkt;		/* source socket */
 };
 
 #define ipxSize	30
@@ -79,20 +79,20 @@ ipx_print(netdissect_options *ndo, const u_char *p, u_int length)
 	ND_TCHECK(ipx->srcSkt);
 	ND_PRINT((ndo, "%s.%04x > ",
 		     ipxaddr_string(EXTRACT_BE_U_4(ipx->srcNet), ipx->srcNode),
-		     EXTRACT_BE_U_2(&ipx->srcSkt)));
+		     EXTRACT_BE_U_2(ipx->srcSkt)));
 
 	ND_PRINT((ndo, "%s.%04x: ",
 		     ipxaddr_string(EXTRACT_BE_U_4(ipx->dstNet), ipx->dstNode),
-		     EXTRACT_BE_U_2(&ipx->dstSkt)));
+		     EXTRACT_BE_U_2(ipx->dstSkt)));
 
 	/* take length from ipx header */
 	ND_TCHECK(ipx->length);
-	length = EXTRACT_BE_U_2(&ipx->length);
+	length = EXTRACT_BE_U_2(ipx->length);
 
 	ipx_decode(ndo, ipx, p + ipxSize, length - ipxSize);
 	return;
 trunc:
-	ND_PRINT((ndo, "[|ipx %d]", length));
+	ND_PRINT((ndo, "[|ipx %u]", length));
 }
 
 static const char *
@@ -113,10 +113,10 @@ ipx_decode(netdissect_options *ndo, const struct ipxHdr *ipx, const u_char *data
 {
     u_short dstSkt;
 
-    dstSkt = EXTRACT_BE_U_2(&ipx->dstSkt);
+    dstSkt = EXTRACT_BE_U_2(ipx->dstSkt);
     switch (dstSkt) {
       case IPX_SKT_NCP:
-	ND_PRINT((ndo, "ipx-ncp %d", length));
+	ND_PRINT((ndo, "ipx-ncp %u", length));
 	break;
       case IPX_SKT_SAP:
 	ipx_sap_print(ndo, datap, length);
@@ -125,16 +125,16 @@ ipx_decode(netdissect_options *ndo, const struct ipxHdr *ipx, const u_char *data
 	ipx_rip_print(ndo, datap, length);
 	break;
       case IPX_SKT_NETBIOS:
-	ND_PRINT((ndo, "ipx-netbios %d", length));
+	ND_PRINT((ndo, "ipx-netbios %u", length));
 #ifdef ENABLE_SMB
 	ipx_netbios_print(ndo, datap, length);
 #endif
 	break;
       case IPX_SKT_DIAGNOSTICS:
-	ND_PRINT((ndo, "ipx-diags %d", length));
+	ND_PRINT((ndo, "ipx-diags %u", length));
 	break;
       case IPX_SKT_NWLINK_DGM:
-	ND_PRINT((ndo, "ipx-nwlink-dgm %d", length));
+	ND_PRINT((ndo, "ipx-nwlink-dgm %u", length));
 #ifdef ENABLE_SMB
 	ipx_netbios_print(ndo, datap, length);
 #endif
@@ -143,7 +143,7 @@ ipx_decode(netdissect_options *ndo, const struct ipxHdr *ipx, const u_char *data
 	eigrp_print(ndo, datap, length);
 	break;
       default:
-	ND_PRINT((ndo, "ipx-#%x %d", dstSkt, length));
+	ND_PRINT((ndo, "ipx-#%x %u", dstSkt, length));
 	break;
     }
 }
@@ -242,7 +242,7 @@ ipx_rip_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	    if (length < 8)
 		goto trunc;
 	    ND_TCHECK_LEN(ipx, 8);
-	    ND_PRINT((ndo, " %08x/%d.%d", EXTRACT_BE_U_4(ipx),
+	    ND_PRINT((ndo, " %08x/%u.%u", EXTRACT_BE_U_4(ipx),
 			 EXTRACT_BE_U_2(ipx + 4), EXTRACT_BE_U_2(ipx + 6)));
 	}
 	break;
@@ -252,7 +252,7 @@ ipx_rip_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	    if (length < 8)
 		goto trunc;
 	    ND_TCHECK_LEN(ipx, 8);
-	    ND_PRINT((ndo, " %08x/%d.%d", EXTRACT_BE_U_4(ipx),
+	    ND_PRINT((ndo, " %08x/%u.%u", EXTRACT_BE_U_4(ipx),
 			 EXTRACT_BE_U_2(ipx + 4), EXTRACT_BE_U_2(ipx + 6)));
 
 	    ipx += 8;
