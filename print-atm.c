@@ -433,17 +433,17 @@ atm_print(netdissect_options *ndo,
 }
 
 struct oam_fm_loopback_t {
-    uint8_t loopback_indicator;
-    uint8_t correlation_tag[4];
-    uint8_t loopback_id[12];
-    uint8_t source_id[12];
-    uint8_t unused[16];
+    nd_uint8_t  loopback_indicator;
+    nd_uint32_t correlation_tag;
+    nd_byte     loopback_id[12];
+    nd_byte     source_id[12];
+    nd_byte     unused[16];
 };
 
 struct oam_fm_ais_rdi_t {
-    uint8_t failure_type;
-    uint8_t failure_location[16];
-    uint8_t unused[28];
+    nd_uint8_t  failure_type;
+    nd_byte     failure_location[16];
+    nd_byte     unused[28];
 };
 
 void
@@ -500,8 +500,8 @@ oam_print (netdissect_options *ndo,
         ND_PRINT((ndo, "\n\tLoopback-Indicator %s, Correlation-Tag 0x%08x",
                tok2str(oam_fm_loopback_indicator_values,
                        "Unknown",
-                       oam_ptr.oam_fm_loopback->loopback_indicator & OAM_FM_LOOPBACK_INDICATOR_MASK),
-               EXTRACT_BE_U_4(&oam_ptr.oam_fm_loopback->correlation_tag)));
+                       EXTRACT_U_1(oam_ptr.oam_fm_loopback->loopback_indicator) & OAM_FM_LOOPBACK_INDICATOR_MASK),
+               EXTRACT_BE_U_4(oam_ptr.oam_fm_loopback->correlation_tag)));
         ND_PRINT((ndo, "\n\tLocation-ID "));
         for (idx = 0; idx < sizeof(oam_ptr.oam_fm_loopback->loopback_id); idx++) {
             if (idx % 2) {
@@ -520,7 +520,7 @@ oam_print (netdissect_options *ndo,
     case (OAM_CELLTYPE_FM << 4 | OAM_FM_FUNCTYPE_RDI):
         oam_ptr.oam_fm_ais_rdi = (const struct oam_fm_ais_rdi_t *)(p + OAM_CELLTYPE_FUNCTYPE_LEN);
         ND_TCHECK(*oam_ptr.oam_fm_ais_rdi);
-        ND_PRINT((ndo, "\n\tFailure-type 0x%02x", oam_ptr.oam_fm_ais_rdi->failure_type));
+        ND_PRINT((ndo, "\n\tFailure-type 0x%02x", EXTRACT_U_1(oam_ptr.oam_fm_ais_rdi->failure_type)));
         ND_PRINT((ndo, "\n\tLocation-ID "));
         for (idx = 0; idx < sizeof(oam_ptr.oam_fm_ais_rdi->failure_location); idx++) {
             if (idx % 2) {
