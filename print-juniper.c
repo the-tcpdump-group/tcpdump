@@ -366,7 +366,7 @@ static const struct tok juniper_ifle_values[] = {
 
 struct juniper_cookie_table_t {
     uint32_t pictype;		/* pic type */
-    uint8_t  cookie_len;       /* cookie len */
+    uint8_t  cookie_len;	/* cookie len */
     const char *s;		/* pic name */
 };
 
@@ -456,14 +456,15 @@ juniper_ggsn_if_print(netdissect_options *ndo,
 {
         struct juniper_l2info_t l2info;
         struct juniper_ggsn_header {
-            uint8_t svc_id;
-            uint8_t flags_len;
-            uint8_t proto;
-            uint8_t flags;
-            uint8_t vlan_id[2];
-            uint8_t res[2];
+            nd_uint8_t  svc_id;
+            nd_uint8_t  flags_len;
+            nd_uint8_t  proto;
+            nd_uint8_t  flags;
+            nd_uint16_t vlan_id;
+            nd_byte     res[2];
         };
         const struct juniper_ggsn_header *gh;
+        uint8_t proto;
 
         l2info.pictype = DLT_JUNIPER_GGSN;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0)
@@ -473,14 +474,15 @@ juniper_ggsn_if_print(netdissect_options *ndo,
         gh = (struct juniper_ggsn_header *)&l2info.cookie;
 
         ND_TCHECK(*gh);
+        proto = EXTRACT_U_1(gh->proto);
         if (ndo->ndo_eflag) {
             ND_PRINT((ndo, "proto %s (%u), vlan %u: ",
-                   tok2str(juniper_protocol_values,"Unknown",gh->proto),
-                   gh->proto,
-                   EXTRACT_BE_U_2(&gh->vlan_id[0])));
+                   tok2str(juniper_protocol_values,"Unknown",proto),
+                   proto,
+                   EXTRACT_BE_U_2(gh->vlan_id)));
         }
 
-        switch (gh->proto) {
+        switch (proto) {
         case JUNIPER_PROTO_IPV4:
             ip_print(ndo, p, l2info.length);
             break;
@@ -489,7 +491,7 @@ juniper_ggsn_if_print(netdissect_options *ndo,
             break;
         default:
             if (!ndo->ndo_eflag)
-                ND_PRINT((ndo, "unknown GGSN proto (%u)", gh->proto));
+                ND_PRINT((ndo, "unknown GGSN proto (%u)", proto));
         }
 
         return l2info.header_len;
@@ -507,12 +509,12 @@ juniper_es_if_print(netdissect_options *ndo,
 {
         struct juniper_l2info_t l2info;
         struct juniper_ipsec_header {
-            uint8_t sa_index[2];
-            uint8_t ttl;
-            uint8_t type;
-            uint8_t spi[4];
-            uint8_t src_ip[4];
-            uint8_t dst_ip[4];
+            nd_uint16_t sa_index;
+            nd_uint8_t  ttl;
+            nd_uint8_t  type;
+            nd_uint32_t spi;
+            nd_ipv4     src_ip;
+            nd_ipv4     dst_ip;
         };
         u_int rewrite_len,es_type_bundle;
         const struct juniper_ipsec_header *ih;
@@ -525,7 +527,7 @@ juniper_es_if_print(netdissect_options *ndo,
         ih = (const struct juniper_ipsec_header *)p;
 
         ND_TCHECK(*ih);
-        switch (ih->type) {
+        switch (EXTRACT_U_1(ih->type)) {
         case JUNIPER_IPSEC_O_ESP_ENCRYPT_ESP_AUTHEN_TYPE:
         case JUNIPER_IPSEC_O_ESP_ENCRYPT_AH_AUTHEN_TYPE:
             rewrite_len = 0;
@@ -539,7 +541,7 @@ juniper_es_if_print(netdissect_options *ndo,
             break;
         default:
             ND_PRINT((ndo, "ES Invalid type %u, length %u",
-                   ih->type,
+                   EXTRACT_U_1(ih->type),
                    l2info.length));
             return l2info.header_len;
         }
@@ -550,20 +552,20 @@ juniper_es_if_print(netdissect_options *ndo,
         if (ndo->ndo_eflag) {
             if (!es_type_bundle) {
                 ND_PRINT((ndo, "ES SA, index %u, ttl %u type %s (%u), spi %u, Tunnel %s > %s, length %u\n",
-                       EXTRACT_BE_U_2(&ih->sa_index),
-                       ih->ttl,
-                       tok2str(juniper_ipsec_type_values,"Unknown",ih->type),
-                       ih->type,
-                       EXTRACT_BE_U_4(&ih->spi),
+                       EXTRACT_BE_U_2(ih->sa_index),
+                       EXTRACT_U_1(ih->ttl),
+                       tok2str(juniper_ipsec_type_values,"Unknown",EXTRACT_U_1(ih->type)),
+                       EXTRACT_U_1(ih->type),
+                       EXTRACT_BE_U_4(ih->spi),
                        ipaddr_string(ndo, &ih->src_ip),
                        ipaddr_string(ndo, &ih->dst_ip),
                        l2info.length));
             } else {
                 ND_PRINT((ndo, "ES SA, index %u, ttl %u type %s (%u), length %u\n",
-                       EXTRACT_BE_U_2(&ih->sa_index),
-                       ih->ttl,
-                       tok2str(juniper_ipsec_type_values,"Unknown",ih->type),
-                       ih->type,
+                       EXTRACT_BE_U_2(ih->sa_index),
+                       EXTRACT_U_1(ih->ttl),
+                       tok2str(juniper_ipsec_type_values,"Unknown",EXTRACT_U_1(ih->type)),
+                       EXTRACT_U_1(ih->type),
                        l2info.length));
             }
         }
@@ -584,10 +586,10 @@ juniper_monitor_if_print(netdissect_options *ndo,
 {
         struct juniper_l2info_t l2info;
         struct juniper_monitor_header {
-            uint8_t pkt_type;
-            uint8_t padding;
-            uint8_t iif[2];
-            uint8_t service_id[4];
+            nd_uint8_t  pkt_type;
+            nd_byte     padding;
+            nd_uint16_t iif;
+            nd_uint32_t service_id;
         };
         const struct juniper_monitor_header *mh;
 
@@ -601,9 +603,9 @@ juniper_monitor_if_print(netdissect_options *ndo,
         ND_TCHECK(*mh);
         if (ndo->ndo_eflag)
             ND_PRINT((ndo, "service-id %u, iif %u, pkt-type %u: ",
-                   EXTRACT_BE_U_4(&mh->service_id),
-                   EXTRACT_BE_U_2(&mh->iif),
-                   mh->pkt_type));
+                   EXTRACT_BE_U_4(mh->service_id),
+                   EXTRACT_BE_U_2(mh->iif),
+                   EXTRACT_U_1(mh->pkt_type)));
 
         /* no proto field - lets guess by first byte of IP header*/
         ip_heuristic_guess (ndo, p, l2info.length);
@@ -623,10 +625,11 @@ juniper_services_if_print(netdissect_options *ndo,
 {
         struct juniper_l2info_t l2info;
         struct juniper_services_header {
-            uint8_t svc_id;
-            uint8_t flags_len;
-            uint8_t svc_set_id[2];
-            uint8_t dir_iif[4];
+            nd_uint8_t  svc_id;
+            nd_uint8_t  flags_len;
+            nd_uint16_t svc_set_id;
+            nd_byte     pad;
+            nd_uint24_t dir_iif;
         };
         const struct juniper_services_header *sh;
 
@@ -640,10 +643,10 @@ juniper_services_if_print(netdissect_options *ndo,
         ND_TCHECK(*sh);
         if (ndo->ndo_eflag)
             ND_PRINT((ndo, "service-id %u flags 0x%02x service-set-id 0x%04x iif %u: ",
-                   sh->svc_id,
-                   sh->flags_len,
-                   EXTRACT_BE_U_2(&sh->svc_set_id),
-                   EXTRACT_BE_U_3(&sh->dir_iif[1])));
+                   EXTRACT_U_1(sh->svc_id),
+                   EXTRACT_U_1(sh->flags_len),
+                   EXTRACT_BE_U_2(sh->svc_set_id),
+                   EXTRACT_BE_U_3(sh->dir_iif)));
 
         /* no proto field - lets guess by first byte of IP header*/
         ip_heuristic_guess (ndo, p, l2info.length);
