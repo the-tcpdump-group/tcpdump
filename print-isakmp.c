@@ -2645,7 +2645,9 @@ ikev2_e_print(netdissect_options *ndo,
 {
 	const u_char *dat;
 	volatile u_int dlen;
+#ifdef HAVE_LIBCRYPTO
 	uint8_t np;
+#endif
 
 	ND_TCHECK(*ext);
 	ikev2_pay_print(ndo, NPSTR(tpay), EXTRACT_U_1(ext->critical));
