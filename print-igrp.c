@@ -37,15 +37,15 @@
 /* IGRP Header */
 
 struct igrphdr {
-	uint8_t ig_vop;	/* protocol version number / opcode */
+	nd_uint8_t ig_vop;	/* protocol version number / opcode */
 #define IGRP_V(x)	(((x) & 0xf0) >> 4)
 #define IGRP_OP(x)	((x) & 0x0f)
-	uint8_t ig_ed;		/* edition number */
-	uint16_t ig_as;	/* autonomous system number */
-	uint16_t ig_ni;	/* number of subnet in local net */
-	uint16_t ig_ns;	/* number of networks in AS */
-	uint16_t ig_nx;	/* number of networks ouside AS */
-	uint16_t ig_sum;	/* checksum of IGRP header & data */
+	nd_uint8_t ig_ed;	/* edition number */
+	nd_uint16_t ig_as;	/* autonomous system number */
+	nd_uint16_t ig_ni;	/* number of subnet in local net */
+	nd_uint16_t ig_ns;	/* number of networks in AS */
+	nd_uint16_t ig_nx;	/* number of networks ouside AS */
+	nd_uint16_t ig_sum;	/* checksum of IGRP header & data */
 };
 
 #define IGRP_UPDATE	1
@@ -54,13 +54,13 @@ struct igrphdr {
 /* IGRP routing entry */
 
 struct igrprte {
-	uint8_t igr_net[3];	/* 3 significant octets of IP address */
-	uint8_t igr_dly[3];	/* delay in tens of microseconds */
-	uint8_t igr_bw[3];	/* bandwidth in units of 1 kb/s */
-	uint8_t igr_mtu[2];	/* MTU in octets */
-	uint8_t igr_rel;	/* percent packets successfully tx/rx */
-	uint8_t igr_ld;	/* percent of channel occupied */
-	uint8_t igr_hct;	/* hop count */
+	nd_byte igr_net[3];	/* 3 significant octets of IP address */
+	nd_uint24_t igr_dly;	/* delay in tens of microseconds */
+	nd_uint24_t igr_bw;	/* bandwidth in units of 1 kb/s */
+	nd_uint16_t igr_mtu;	/* MTU in octets */
+	nd_uint8_t igr_rel;	/* percent packets successfully tx/rx */
+	nd_uint8_t igr_ld;	/* percent of channel occupied */
+	nd_uint8_t igr_hct;	/* hop count */
 };
 
 #define IGRP_RTE_SIZE	14	/* don't believe sizeof ! */
@@ -73,13 +73,13 @@ igrp_entry_print(netdissect_options *ndo, const struct igrprte *igr,
 	u_int metric, mtu;
 
 	if (is_interior)
-		ND_PRINT((ndo, " *.%d.%d.%d", igr->igr_net[0],
+		ND_PRINT((ndo, " *.%u.%u.%u", igr->igr_net[0],
 		    igr->igr_net[1], igr->igr_net[2]));
 	else if (is_exterior)
-		ND_PRINT((ndo, " X%d.%d.%d.0", igr->igr_net[0],
+		ND_PRINT((ndo, " X%u.%u.%u.0", igr->igr_net[0],
 		    igr->igr_net[1], igr->igr_net[2]));
 	else
-		ND_PRINT((ndo, " %d.%d.%d.0", igr->igr_net[0],
+		ND_PRINT((ndo, " %u.%u.%u.0", igr->igr_net[0],
 		    igr->igr_net[1], igr->igr_net[2]));
 
 	delay = EXTRACT_BE_U_3(igr->igr_dly);
@@ -89,10 +89,10 @@ igrp_entry_print(netdissect_options *ndo, const struct igrprte *igr,
 		metric = 0xffffff;
 	mtu = EXTRACT_BE_U_2(igr->igr_mtu);
 
-	ND_PRINT((ndo, " d=%d b=%d r=%d l=%d M=%d mtu=%d in %d hops",
+	ND_PRINT((ndo, " d=%u b=%u r=%u l=%u M=%u mtu=%u in %u hops",
 	    10 * delay, bandwidth == 0 ? 0 : 10000000 / bandwidth,
-	    igr->igr_rel, igr->igr_ld, metric,
-	    mtu, igr->igr_hct));
+	    EXTRACT_U_1(igr->igr_rel), EXTRACT_U_1(igr->igr_ld), metric,
+	    mtu, EXTRACT_U_1(igr->igr_hct)));
 }
 
 static const struct tok op2str[] = {
@@ -114,15 +114,15 @@ igrp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	/* Header */
 	ND_TCHECK(*hdr);
-	nint = EXTRACT_BE_U_2(&hdr->ig_ni);
-	nsys = EXTRACT_BE_U_2(&hdr->ig_ns);
-	next = EXTRACT_BE_U_2(&hdr->ig_nx);
+	nint = EXTRACT_BE_U_2(hdr->ig_ni);
+	nsys = EXTRACT_BE_U_2(hdr->ig_ns);
+	next = EXTRACT_BE_U_2(hdr->ig_nx);
 
-	ND_PRINT((ndo, " %s V%d edit=%d AS=%d (%d/%d/%d)",
-	    tok2str(op2str, "op-#%d", IGRP_OP(hdr->ig_vop)),
-	    IGRP_V(hdr->ig_vop),
-	    hdr->ig_ed,
-	    EXTRACT_BE_U_2(&hdr->ig_as),
+	ND_PRINT((ndo, " %s V%u edit=%u AS=%u (%u/%u/%u)",
+	    tok2str(op2str, "op-#%u", IGRP_OP(EXTRACT_U_1(hdr->ig_vop))),
+	    IGRP_V(EXTRACT_U_1(hdr->ig_vop)),
+	    EXTRACT_U_1(hdr->ig_ed),
+	    EXTRACT_BE_U_2(hdr->ig_as),
 	    nint,
 	    nsys,
 	    next));
@@ -142,7 +142,7 @@ igrp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			igrp_entry_print(ndo, (const struct igrprte *)cp, 0, 1);
 			--next;
 		} else {
-			ND_PRINT((ndo, " [extra bytes %d]", length));
+			ND_PRINT((ndo, " [extra bytes %u]", length));
 			break;
 		}
 		cp += IGRP_RTE_SIZE;
