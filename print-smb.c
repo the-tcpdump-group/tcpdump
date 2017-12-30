@@ -25,6 +25,8 @@ static const char tstr[] = "[|SMB]";
 static int request = 0;
 static int unicodestr = 0;
 
+extern const u_char *startbuf;
+
 const u_char *startbuf = NULL;
 
 struct smbdescript {
