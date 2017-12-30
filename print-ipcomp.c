@@ -27,14 +27,14 @@
 
 #include <netdissect-stdinc.h>
 
-struct ipcomp {
-	uint8_t comp_nxt;	/* Next Header */
-	uint8_t comp_flags;	/* Length of data, in 32bit */
-	uint16_t comp_cpi;	/* Compression parameter index */
-};
-
 #include "netdissect.h"
 #include "extract.h"
+
+struct ipcomp {
+	nd_uint8_t  comp_nxt;	/* Next Header */
+	nd_uint8_t  comp_flags;	/* Length of data, in 32bit */
+	nd_uint16_t comp_cpi;	/* Compression parameter index */
+};
 
 void
 ipcomp_print(netdissect_options *ndo, const u_char *bp)
@@ -44,7 +44,7 @@ ipcomp_print(netdissect_options *ndo, const u_char *bp)
 
 	ipcomp = (const struct ipcomp *)bp;
 	ND_TCHECK(*ipcomp);
-	cpi = EXTRACT_BE_U_2(&ipcomp->comp_cpi);
+	cpi = EXTRACT_BE_U_2(ipcomp->comp_cpi);
 
 	ND_PRINT((ndo, "IPComp(cpi=0x%04x)", cpi));
 
