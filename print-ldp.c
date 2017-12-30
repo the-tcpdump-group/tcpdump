@@ -45,10 +45,10 @@
  */
 
 struct ldp_common_header {
-    uint8_t version[2];
-    uint8_t pdu_length[2];
-    uint8_t lsr_id[4];
-    uint8_t label_space[2];
+    nd_uint16_t version;
+    nd_uint16_t pdu_length;
+    nd_ipv4     lsr_id;
+    nd_uint16_t label_space;
 };
 
 #define LDP_VERSION 1
@@ -78,9 +78,9 @@ struct ldp_common_header {
  */
 
 struct ldp_msg_header {
-    uint8_t type[2];
-    uint8_t length[2];
-    uint8_t id[4];
+    nd_uint16_t type;
+    nd_uint16_t length;
+    nd_uint32_t id;
 };
 
 #define	LDP_MASK_MSG_TYPE(x)  ((x)&0x7fff)
@@ -238,8 +238,8 @@ ldp_tlv_print(netdissect_options *ndo,
               u_short msg_tlen)
 {
     struct ldp_tlv_header {
-        uint8_t type[2];
-        uint8_t length[2];
+        nd_uint16_t type;
+        nd_uint16_t length;
     };
 
     const struct ldp_tlv_header *ldp_tlv_header;
@@ -266,8 +266,8 @@ ldp_tlv_print(netdissect_options *ndo,
                    tlv_type),
            tlv_type,
            tlv_len,
-           LDP_MASK_U_BIT(EXTRACT_BE_U_2(&ldp_tlv_header->type)) ? "continue processing" : "ignore",
-           LDP_MASK_F_BIT(EXTRACT_BE_U_2(&ldp_tlv_header->type)) ? "do" : "don't"));
+           LDP_MASK_U_BIT(EXTRACT_BE_U_2(ldp_tlv_header->type)) ? "continue processing" : "ignore",
+           LDP_MASK_F_BIT(EXTRACT_BE_U_2(ldp_tlv_header->type)) ? "do" : "don't"));
 
     tptr+=sizeof(struct ldp_tlv_header);
 
@@ -573,14 +573,14 @@ ldp_pdu_print(netdissect_options *ndo,
     /*
      * Sanity checking of the header.
      */
-    if (EXTRACT_BE_U_2(&ldp_com_header->version) != LDP_VERSION) {
+    if (EXTRACT_BE_U_2(ldp_com_header->version) != LDP_VERSION) {
 	ND_PRINT((ndo, "%sLDP version %u packet not supported",
                (ndo->ndo_vflag < 1) ? "" : "\n\t",
-               EXTRACT_BE_U_2(&ldp_com_header->version)));
+               EXTRACT_BE_U_2(ldp_com_header->version)));
 	return 0;
     }
 
-    pdu_len = EXTRACT_BE_U_2(&ldp_com_header->pdu_length);
+    pdu_len = EXTRACT_BE_U_2(ldp_com_header->pdu_length);
     if (pdu_len < sizeof(struct ldp_common_header)-4) {
         /* length too short */
         ND_PRINT((ndo, "%sLDP, pdu-length: %u (too short, < %u)",
@@ -594,7 +594,7 @@ ldp_pdu_print(netdissect_options *ndo,
     ND_PRINT((ndo, "%sLDP, Label-Space-ID: %s:%u, pdu-length: %u",
            (ndo->ndo_vflag < 1) ? "" : "\n\t",
            ipaddr_string(ndo, &ldp_com_header->lsr_id),
-           EXTRACT_BE_U_2(&ldp_com_header->label_space),
+           EXTRACT_BE_U_2(ldp_com_header->label_space),
            pdu_len));
 
     /* bail out if non-verbose */
@@ -633,8 +633,8 @@ ldp_pdu_print(netdissect_options *ndo,
                        msg_type),
                msg_type,
                msg_len,
-               EXTRACT_BE_U_4(&ldp_msg_header->id),
-               LDP_MASK_U_BIT(EXTRACT_BE_U_2(&ldp_msg_header->type)) ? "continue processing" : "ignore"));
+               EXTRACT_BE_U_4(ldp_msg_header->id),
+               LDP_MASK_U_BIT(EXTRACT_BE_U_2(ldp_msg_header->type)) ? "continue processing" : "ignore"));
 
         msg_tptr=tptr+sizeof(struct ldp_msg_header);
         msg_tlen=msg_len-(sizeof(struct ldp_msg_header)-4); /* Type & Length fields not included */
