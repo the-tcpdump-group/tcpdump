@@ -174,6 +174,7 @@ struct ip6_rthdr {
 
 #define IPV6_RTHDR_TYPE_0 0
 #define IPV6_RTHDR_TYPE_2 2
+#define IPV6_RTHDR_TYPE_4 4
 
 /* Type 0 Routing header */
 /* Also used for Type 2 */
@@ -184,6 +185,21 @@ struct ip6_rthdr0 {
 	nd_uint8_t  ip6r0_segleft;	/* segments left */
 	nd_uint32_t ip6r0_reserved;	/* reserved field */
 	struct in6_addr ip6r0_addr[1];	/* up to 23 addresses */
+};
+
+/**
+ * Type 4 Routing header
+ * known as Segment Routing Header 'SRH'
+ */
+struct ip6_srh {
+	nd_uint8_t	srh_nxt;		/* next header */
+	nd_uint8_t	srh_len;		/* length in units of 8 octets */
+	nd_uint8_t	srh_type;		/* Routing Type 4 */
+	nd_uint8_t	srh_segleft;		/* segments left */
+	nd_uint8_t	srh_last_ent;		/* Last Entry*/
+	nd_uint8_t	srh_flags;		/* Flags */
+	nd_uint16_t	srh_tag;		/* Tag */
+	struct in6_addr	srh_segments[1];	/* SRH segments list*/
 };
 
 /* Fragment header */
