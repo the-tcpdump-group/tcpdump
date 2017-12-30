@@ -56,22 +56,22 @@ static const char tstr[] = " [|bootp]";
  */
 
 struct bootp {
-	uint8_t		bp_op;		/* packet opcode type */
-	uint8_t		bp_htype;	/* hardware addr type */
-	uint8_t		bp_hlen;	/* hardware addr length */
-	uint8_t		bp_hops;	/* gateway hops */
-	uint32_t	bp_xid;		/* transaction ID */
-	uint16_t	bp_secs;	/* seconds since boot began */
-	uint16_t	bp_flags;	/* flags - see bootp_flag_values[]
+	nd_uint8_t	bp_op;		/* packet opcode type */
+	nd_uint8_t	bp_htype;	/* hardware addr type */
+	nd_uint8_t	bp_hlen;	/* hardware addr length */
+	nd_uint8_t	bp_hops;	/* gateway hops */
+	nd_uint32_t	bp_xid;		/* transaction ID */
+	nd_uint16_t	bp_secs;	/* seconds since boot began */
+	nd_uint16_t	bp_flags;	/* flags - see bootp_flag_values[]
 					   in print-bootp.c */
 	struct in_addr	bp_ciaddr;	/* client IP address */
 	struct in_addr	bp_yiaddr;	/* 'your' IP address */
 	struct in_addr	bp_siaddr;	/* server IP address */
 	struct in_addr	bp_giaddr;	/* gateway IP address */
-	uint8_t		bp_chaddr[16];	/* client hardware address */
-	uint8_t		bp_sname[64];	/* server host name */
-	uint8_t		bp_file[128];	/* boot file name */
-	uint8_t		bp_vend[64];	/* vendor-specific area */
+	nd_byte		bp_chaddr[16];	/* client hardware address */
+	nd_byte		bp_sname[64];	/* server host name */
+	nd_byte		bp_file[128];	/* boot file name */
+	nd_byte		bp_vend[64];	/* vendor-specific area */
 } UNALIGNED;
 
 #define BOOTPREPLY	2
@@ -239,14 +239,14 @@ struct bootp {
  */
 
 struct cmu_vend {
-	uint8_t		v_magic[4];	/* magic number */
-	uint32_t	v_flags;	/* flags/opcodes, etc. */
+	nd_byte		v_magic[4];	/* magic number */
+	nd_uint32_t	v_flags;	/* flags/opcodes, etc. */
 	struct in_addr	v_smask;	/* Subnet mask */
 	struct in_addr	v_dgate;	/* Default gateway */
 	struct in_addr	v_dns1, v_dns2; /* Domain name servers */
 	struct in_addr	v_ins1, v_ins2; /* IEN-116 name servers */
 	struct in_addr	v_ts1, v_ts2;	/* Time servers */
-	uint8_t		v_unused[24];	/* currently unused */
+	nd_byte		v_unused[24];	/* currently unused */
 } UNALIGNED;
 
 
@@ -286,17 +286,20 @@ bootp_print(netdissect_options *ndo,
 	const struct bootp *bp;
 	static const u_char vm_cmu[4] = VM_CMU;
 	static const u_char vm_rfc1048[4] = VM_RFC1048;
+	uint8_t bp_op, bp_htype, bp_hlen;
 
 	bp = (const struct bootp *)cp;
 	ND_TCHECK(bp->bp_op);
-
+	bp_op = EXTRACT_U_1(bp->bp_op);
 	ND_PRINT((ndo, "BOOTP/DHCP, %s",
-		  tok2str(bootp_op_values, "unknown (0x%02x)", bp->bp_op)));
+		  tok2str(bootp_op_values, "unknown (0x%02x)", bp_op)));
 
 	ND_TCHECK(bp->bp_hlen);
-	if (bp->bp_htype == 1 && bp->bp_hlen == 6 && bp->bp_op == BOOTPREQUEST) {
+	bp_htype = EXTRACT_U_1(bp->bp_htype);
+	bp_hlen = EXTRACT_U_1(bp->bp_hlen);
+	if (bp_htype == 1 && bp_hlen == 6 && bp_op == BOOTPREQUEST) {
 		ND_TCHECK_LEN(bp->bp_chaddr, 6);
-		ND_PRINT((ndo, " from %s", etheraddr_string(ndo, bp->bp_chaddr)));
+		ND_PRINT((ndo, " from %s", etheraddr_string(ndo, bp->bp_chaddr));
 	}
 
 	ND_PRINT((ndo, ", length %u", length));
@@ -307,49 +310,49 @@ bootp_print(netdissect_options *ndo,
 	ND_TCHECK(bp->bp_secs);
 
 	/* The usual hardware address type is 1 (10Mb Ethernet) */
-	if (bp->bp_htype != 1)
-		ND_PRINT((ndo, ", htype %d", bp->bp_htype));
+	if (bp_htype != 1)
+		ND_PRINT((ndo, ", htype %d", bp_htype));
 
 	/* The usual length for 10Mb Ethernet address is 6 bytes */
-	if (bp->bp_htype != 1 || bp->bp_hlen != 6)
-		ND_PRINT((ndo, ", hlen %d", bp->bp_hlen));
+	if (bp_htype != 1 || bp_hlen != 6)
+		ND_PRINT((ndo, ", hlen %d", bp_hlen));
 
 	/* Only print interesting fields */
-	if (bp->bp_hops)
-		ND_PRINT((ndo, ", hops %d", bp->bp_hops));
-	if (EXTRACT_BE_U_4(&bp->bp_xid))
-		ND_PRINT((ndo, ", xid 0x%x", EXTRACT_BE_U_4(&bp->bp_xid)));
-	if (EXTRACT_BE_U_2(&bp->bp_secs))
-		ND_PRINT((ndo, ", secs %d", EXTRACT_BE_U_2(&bp->bp_secs)));
+	if (EXTRACT_U_1(bp->bp_hops))
+		ND_PRINT((ndo, ", hops %d", EXTRACT_U_1(bp->bp_hops))));
+	if (EXTRACT_BE_U_4(bp->bp_xid))
+		ND_PRINT((ndo, ", xid 0x%x", EXTRACT_BE_U_4(bp->bp_xid)));
+	if (EXTRACT_BE_U_2(bp->bp_secs))
+		ND_PRINT((ndo, ", secs %d", EXTRACT_BE_U_2(bp->bp_secs)));
 
 	ND_TCHECK(bp->bp_flags);
 	ND_PRINT((ndo, ", Flags [%s]",
-		  bittok2str(bootp_flag_values, "none", EXTRACT_BE_U_2(&bp->bp_flags))));
+		  bittok2str(bootp_flag_values, "none", EXTRACT_BE_U_2(bp->bp_flags))));
 	if (ndo->ndo_vflag > 1)
-		ND_PRINT((ndo, " (0x%04x)", EXTRACT_BE_U_2(&bp->bp_flags)));
+		ND_PRINT((ndo, " (0x%04x)", EXTRACT_BE_U_2(bp->bp_flags)));
 
 	/* Client's ip address */
 	ND_TCHECK(bp->bp_ciaddr);
-	if (EXTRACT_BE_U_4(&bp->bp_ciaddr.s_addr))
+	if (EXTRACT_IPV4_TO_HOST_ORDER(&bp->bp_ciaddr.s_addr))
 		ND_PRINT((ndo, "\n\t  Client-IP %s", ipaddr_string(ndo, &bp->bp_ciaddr)));
 
 	/* 'your' ip address (bootp client) */
 	ND_TCHECK(bp->bp_yiaddr);
-	if (EXTRACT_BE_U_4(&bp->bp_yiaddr.s_addr))
+	if (EXTRACT_IPV4_TO_HOST_ORDER(&bp->bp_yiaddr.s_addr))
 		ND_PRINT((ndo, "\n\t  Your-IP %s", ipaddr_string(ndo, &bp->bp_yiaddr)));
 
 	/* Server's ip address */
 	ND_TCHECK(bp->bp_siaddr);
-	if (EXTRACT_BE_U_4(&bp->bp_siaddr.s_addr))
+	if (EXTRACT_IPV4_TO_HOST_ORDER(&bp->bp_siaddr.s_addr))
 		ND_PRINT((ndo, "\n\t  Server-IP %s", ipaddr_string(ndo, &bp->bp_siaddr)));
 
 	/* Gateway's ip address */
 	ND_TCHECK(bp->bp_giaddr);
-	if (EXTRACT_BE_U_4(&bp->bp_giaddr.s_addr))
+	if (EXTRACT_IPV4_TO_HOST_ORDER(&bp->bp_giaddr.s_addr))
 		ND_PRINT((ndo, "\n\t  Gateway-IP %s", ipaddr_string(ndo, &bp->bp_giaddr)));
 
 	/* Client's Ethernet address */
-	if (bp->bp_htype == 1 && bp->bp_hlen == 6) {
+	if (bp_htype == 1 && bp_hlen == 6) {
 		ND_TCHECK_LEN(bp->bp_chaddr, 6);
 		ND_PRINT((ndo, "\n\t  Client-Ethernet-Address %s", etheraddr_string(ndo, bp->bp_chaddr)));
 	}
@@ -378,7 +381,7 @@ bootp_print(netdissect_options *ndo,
 	}
 
 	/* Decode the vendor buffer */
-	ND_TCHECK(bp->bp_vend[0]);
+	ND_TCHECK_LEN(bp->bp_vend, 4);
 	if (memcmp((const char *)bp->bp_vend, vm_rfc1048,
 		    sizeof(uint32_t)) == 0)
 		rfc1048_print(ndo, bp->bp_vend);
@@ -388,7 +391,7 @@ bootp_print(netdissect_options *ndo,
 	else {
 		uint32_t ul;
 
-		ul = EXTRACT_BE_U_4(&bp->bp_vend);
+		ul = EXTRACT_BE_U_4(bp->bp_vend);
 		if (ul != 0)
 			ND_PRINT((ndo, "\n\t  Vendor-#0x%x", ul));
 	}
@@ -1063,6 +1066,7 @@ cmu_print(netdissect_options *ndo,
 	  const u_char *bp)
 {
 	const struct cmu_vend *cmu;
+	uint8_t v_flags;
 
 #define PRINTCMUADDR(m, s) { ND_TCHECK(cmu->m); \
     if (cmu->m.s_addr != 0) \
@@ -1073,10 +1077,11 @@ cmu_print(netdissect_options *ndo,
 
 	/* Only print if there are unknown bits */
 	ND_TCHECK(cmu->v_flags);
-	if ((cmu->v_flags & ~(VF_SMASK)) != 0)
-		ND_PRINT((ndo, " F:0x%x", cmu->v_flags));
+	v_flags = EXTRACT_U_1(cmu->v_flags);
+	if ((v_flags & ~(VF_SMASK)) != 0)
+		ND_PRINT((ndo, " F:0x%x", v_flags));
 	PRINTCMUADDR(v_dgate, "DG");
-	PRINTCMUADDR(v_smask, cmu->v_flags & VF_SMASK ? "SM" : "SM*");
+	PRINTCMUADDR(v_smask, v_flags & VF_SMASK ? "SM" : "SM*");
 	PRINTCMUADDR(v_dns1, "NS1");
 	PRINTCMUADDR(v_dns2, "NS2");
 	PRINTCMUADDR(v_ins1, "IEN1");
