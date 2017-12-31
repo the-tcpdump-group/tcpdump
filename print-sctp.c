@@ -153,36 +153,36 @@ static const struct tok sctp_chunkid_str[] = {
 /* the sctp common header */
 
 struct sctpHeader{
-  uint16_t source;
-  uint16_t destination;
-  uint32_t verificationTag;
-  uint32_t adler32;
+  nd_uint16_t source;
+  nd_uint16_t destination;
+  nd_uint32_t verificationTag;
+  nd_uint32_t adler32;
 };
 
 /* various descriptor parsers */
 
 struct sctpChunkDesc{
-  uint8_t chunkID;
-  uint8_t chunkFlg;
-  uint16_t chunkLength;
+  nd_uint8_t  chunkID;
+  nd_uint8_t  chunkFlg;
+  nd_uint16_t chunkLength;
 };
 
 struct sctpParamDesc{
-  uint16_t paramType;
-  uint16_t paramLength;
+  nd_uint16_t paramType;
+  nd_uint16_t paramLength;
 };
 
 
 struct sctpRelChunkDesc{
   struct sctpChunkDesc chk;
-  uint32_t serialNumber;
+  nd_uint32_t serialNumber;
 };
 
 struct sctpVendorSpecificParam {
   struct sctpParamDesc p;  /* type must be 0xfffe */
-  uint32_t vendorId;	   /* vendor ID from RFC 1700 */
-  uint16_t vendorSpecificType;
-  uint16_t vendorSpecificLen;
+  nd_uint32_t vendorId;	   /* vendor ID from RFC 1700 */
+  nd_uint16_t vendorSpecificType;
+  nd_uint16_t vendorSpecificLen;
 };
 
 
@@ -194,57 +194,40 @@ struct sctpVendorSpecificParam {
 
 /* this is used for init ack, too */
 struct sctpInitiation{
-  uint32_t initTag;		/* tag of mine */
-  uint32_t rcvWindowCredit;	/* rwnd */
-  uint16_t NumPreopenStreams;	/* OS */
-  uint16_t MaxInboundStreams;     /* MIS */
-  uint32_t initialTSN;
+  nd_uint32_t initTag;			/* tag of mine */
+  nd_uint32_t rcvWindowCredit;		/* rwnd */
+  nd_uint16_t NumPreopenStreams;	/* OS */
+  nd_uint16_t MaxInboundStreams;	/* MIS */
+  nd_uint32_t initialTSN;
   /* optional param's follow in sctpParamDesc form */
 };
 
 struct sctpV4IpAddress{
   struct sctpParamDesc p;	/* type is set to SCTP_IPV4_PARAM_TYPE, len=10 */
-  uint32_t  ipAddress;
+  nd_ipv4  ipAddress;
 };
 
 
 struct sctpV6IpAddress{
   struct sctpParamDesc p;	/* type is set to SCTP_IPV6_PARAM_TYPE, len=22 */
-  uint8_t  ipAddress[16];
+  nd_ipv6  ipAddress;
 };
 
 struct sctpDNSName{
   struct sctpParamDesc param;
-  uint8_t name[1];
+  nd_byte name[1];
 };
 
 
 struct sctpCookiePreserve{
   struct sctpParamDesc p;	/* type is set to SCTP_COOKIE_PRESERVE, len=8 */
-  uint32_t extraTime;
+  nd_uint32_t extraTime;
 };
 
 
 struct sctpTimeStamp{
-  uint32_t ts_sec;
-  uint32_t ts_usec;
-};
-
-/* wire structure of my cookie */
-struct cookieMessage{
-  uint32_t TieTag_curTag;		/* copied from assoc if present */
-  uint32_t TieTag_hisTag; 		/* copied from assoc if present */
-  int32_t cookieLife;			/* life I will award this cookie */
-  struct sctpTimeStamp timeEnteringState; /* the time I built cookie */
-  struct sctpInitiation initAckISent;	/* the INIT-ACK that I sent to my peer */
-  uint32_t addressWhereISent[4];	/* I make this 4 ints so I get 128bits for future */
-  int32_t addrtype;			/* address type */
-  uint16_t locScope;			/* V6 local scope flag */
-  uint16_t siteScope;			/* V6 site scope flag */
-  /* at the end is tacked on the INIT chunk sent in
-   * its entirety and of course our
-   * signature.
-   */
+  nd_uint32_t ts_sec;
+  nd_uint32_t ts_usec;
 };
 
 
@@ -272,15 +255,15 @@ struct sctpSendableInit{
  */
 
 struct sctpSelectiveAck{
-  uint32_t highestConseqTSN;
-  uint32_t updatedRwnd;
-  uint16_t numberOfdesc;
-  uint16_t numDupTsns;
+  nd_uint32_t highestConseqTSN;
+  nd_uint32_t updatedRwnd;
+  nd_uint16_t numberOfdesc;
+  nd_uint16_t numDupTsns;
 };
 
 struct sctpSelectiveFrag{
-  uint16_t fragmentStart;
-  uint16_t fragmentEnd;
+  nd_uint16_t fragmentStart;
+  nd_uint16_t fragmentEnd;
 };
 
 
@@ -288,33 +271,6 @@ struct sctpUnifiedSack{
   struct sctpChunkDesc uh;
   struct sctpSelectiveAck sack;
 };
-
-/* for both RTT request/response the
- * following is sent
- */
-
-struct sctpHBrequest {
-  uint32_t time_value_1;
-  uint32_t time_value_2;
-};
-
-/* here is what I read and respond with to. */
-struct sctpHBunified{
-  struct sctpChunkDesc hdr;
-  struct sctpParamDesc hb;
-};
-
-
-/* here is what I send */
-struct sctpHBsender{
-  struct sctpChunkDesc hdr;
-  struct sctpParamDesc hb;
-  struct sctpHBrequest rtt;
-  int8_t addrFmt[SCTP_ADDRMAX];
-  uint16_t userreq;
-};
-
-
 
 /* for the abort and shutdown ACK
  * we must carry the init tag in the common header. Just the
@@ -332,15 +288,15 @@ struct sctpUnifiedAbortLight{
 struct sctpUnifiedAbortHeavy{
   struct sctpHeader mh;
   struct sctpChunkDesc uh;
-  uint16_t causeCode;
-  uint16_t causeLen;
+  nd_uint16_t causeCode;
+  nd_uint16_t causeLen;
 };
 
 /* For the graceful shutdown we must carry
  * the tag (in common header)  and the highest consequitive acking value
  */
 struct sctpShutdown {
-  uint32_t TSN_Seen;
+  nd_uint32_t TSN_Seen;
 };
 
 struct sctpUnifiedShutdown{
@@ -353,8 +309,8 @@ struct sctpUnifiedShutdown{
  * that is defined as a operation error.
  */
 struct sctpOpErrorCause{
-  uint16_t cause;
-  uint16_t causeLen;
+  nd_uint16_t cause;
+  nd_uint16_t causeLen;
 };
 
 struct sctpUnifiedOpError{
@@ -366,15 +322,15 @@ struct sctpUnifiedStreamError{
   struct sctpHeader mh;
   struct sctpChunkDesc uh;
   struct sctpOpErrorCause c;
-  uint16_t strmNum;
-  uint16_t reserved;
+  nd_uint16_t strmNum;
+  nd_uint16_t reserved;
 };
 
 struct staleCookieMsg{
   struct sctpHeader mh;
   struct sctpChunkDesc uh;
   struct sctpOpErrorCause c;
-  uint32_t moretime;
+  nd_uint32_t moretime;
 };
 
 /* the following is used in all sends
@@ -387,10 +343,10 @@ struct sctpUnifiedSingleMsg{
 };
 
 struct sctpDataPart{
-  uint32_t TSN;
-  uint16_t streamId;
-  uint16_t sequence;
-  uint32_t payloadtype;
+  nd_uint32_t TSN;
+  nd_uint16_t streamId;
+  nd_uint16_t sequence;
+  nd_uint32_t payloadtype;
 };
 
 struct sctpUnifiedDatagram{
@@ -400,13 +356,13 @@ struct sctpUnifiedDatagram{
 
 struct sctpECN_echo{
   struct sctpChunkDesc uh;
-  uint32_t Lowest_TSN;
+  nd_uint32_t Lowest_TSN;
 };
 
 
 struct sctpCWR{
   struct sctpChunkDesc uh;
-  uint32_t TSN_reduced_at;
+  nd_uint32_t TSN_reduced_at;
 };
 
 static const struct tok ForCES_channels[] = {
@@ -500,8 +456,9 @@ sctp_print(netdissect_options *ndo,
   const struct sctpHeader *sctpPktHdr;
   const struct ip *ip;
   const struct ip6_hdr *ip6;
+  uint8_t chunkID;
   u_short sourcePort, destPort;
-  int chunkCount;
+  u_int chunkCount;
   const struct sctpChunkDesc *chunkDescPtr;
   const char *sep;
   int isforces = 0;
@@ -526,14 +483,14 @@ sctp_print(netdissect_options *ndo,
     ip6 = NULL;
 
   if (ip6) {
-    ND_PRINT((ndo, "%s.%d > %s.%d: sctp",
+    ND_PRINT((ndo, "%s.%u > %s.%u: sctp",
       ip6addr_string(ndo, &ip6->ip6_src),
       sourcePort,
       ip6addr_string(ndo, &ip6->ip6_dst),
       destPort));
   } else
   {
-    ND_PRINT((ndo, "%s.%d > %s.%d: sctp",
+    ND_PRINT((ndo, "%s.%u > %s.%u: sctp",
       ipaddr_string(ndo, &ip->ip_src),
       sourcePort,
       ipaddr_string(ndo, &ip->ip_dst),
@@ -566,13 +523,13 @@ sctp_print(netdissect_options *ndo,
 
       chunkDescPtr = (const struct sctpChunkDesc *)bp;
       if (sctpPacketLengthRemaining < sizeof(*chunkDescPtr)) {
-        ND_PRINT((ndo, "%s%d) [chunk descriptor cut off at end of packet]", sep, chunkCount+1));
+        ND_PRINT((ndo, "%s%u) [chunk descriptor cut off at end of packet]", sep, chunkCount+1));
         break;
       }
       ND_TCHECK(*chunkDescPtr);
       chunkLength = EXTRACT_BE_U_2(&chunkDescPtr->chunkLength);
       if (chunkLength < sizeof(*chunkDescPtr)) {
-        ND_PRINT((ndo, "%s%d) [Bad chunk length %u, < size of chunk descriptor]", sep, chunkCount+1, chunkLength));
+        ND_PRINT((ndo, "%s%u) [Bad chunk length %u, < size of chunk descriptor]", sep, chunkCount+1, chunkLength));
         break;
       }
       chunkLengthRemaining = chunkLength;
@@ -582,7 +539,7 @@ sctp_print(netdissect_options *ndo,
 	align = 4 - align;
 
       if (sctpPacketLengthRemaining < align) {
-        ND_PRINT((ndo, "%s%d) [Bad chunk length %u, > remaining data in packet]", sep, chunkCount+1, chunkLength));
+        ND_PRINT((ndo, "%s%u) [Bad chunk length %u, > remaining data in packet]", sep, chunkCount+1, chunkLength));
         break;
       }
 
@@ -592,37 +549,32 @@ sctp_print(netdissect_options *ndo,
       sctpPacketLengthRemaining -= sizeof(*chunkDescPtr);
       chunkLengthRemaining -= sizeof(*chunkDescPtr);
 
-      ND_PRINT((ndo, "%s%d) ", sep, chunkCount+1));
+      ND_PRINT((ndo, "%s%u) ", sep, chunkCount+1));
+      chunkID = EXTRACT_U_1(chunkDescPtr->chunkID);
       ND_PRINT((ndo, "[%s] ", tok2str(sctp_chunkid_str, "Unknown chunk type: 0x%x",
-                                      chunkDescPtr->chunkID)));
-      switch (chunkDescPtr->chunkID)
+                                      chunkID)));
+      switch (chunkID)
 	{
 	case SCTP_DATA :
 	  {
 	    const struct sctpDataPart *dataHdrPtr;
+	    uint8_t chunkFlg;
 	    uint32_t ppid;
 	    u_int payload_size;
 
-	    if ((chunkDescPtr->chunkFlg & SCTP_DATA_UNORDERED)
-		== SCTP_DATA_UNORDERED)
+	    chunkFlg = EXTRACT_U_1(chunkDescPtr->chunkFlg);
+	    if ((chunkFlg & SCTP_DATA_UNORDERED) == SCTP_DATA_UNORDERED)
 	      ND_PRINT((ndo, "(U)"));
 
-	    if ((chunkDescPtr->chunkFlg & SCTP_DATA_FIRST_FRAG)
-		== SCTP_DATA_FIRST_FRAG)
+	    if ((chunkFlg & SCTP_DATA_FIRST_FRAG) == SCTP_DATA_FIRST_FRAG)
 	      ND_PRINT((ndo, "(B)"));
 
-	    if ((chunkDescPtr->chunkFlg & SCTP_DATA_LAST_FRAG)
-		== SCTP_DATA_LAST_FRAG)
+	    if ((chunkFlg & SCTP_DATA_LAST_FRAG) == SCTP_DATA_LAST_FRAG)
 	      ND_PRINT((ndo, "(E)"));
 
-	    if( ((chunkDescPtr->chunkFlg & SCTP_DATA_UNORDERED)
-		 == SCTP_DATA_UNORDERED)
-		||
-		((chunkDescPtr->chunkFlg & SCTP_DATA_FIRST_FRAG)
-		 == SCTP_DATA_FIRST_FRAG)
-		||
-		((chunkDescPtr->chunkFlg & SCTP_DATA_LAST_FRAG)
-		 == SCTP_DATA_LAST_FRAG) )
+	    if( ((chunkFlg & SCTP_DATA_UNORDERED) == SCTP_DATA_UNORDERED) ||
+	        ((chunkFlg & SCTP_DATA_FIRST_FRAG) == SCTP_DATA_FIRST_FRAG) ||
+		((chunkFlg & SCTP_DATA_LAST_FRAG) == SCTP_DATA_LAST_FRAG) )
 	      ND_PRINT((ndo, " "));
 
 	    if (chunkLengthRemaining < sizeof(*dataHdrPtr)) {
@@ -736,7 +688,7 @@ sctp_print(netdissect_options *ndo,
 	  {
 	    const struct sctpSelectiveAck *sack;
 	    const struct sctpSelectiveFrag *frag;
-	    int fragNo, tsnNo;
+	    u_int fragNo, tsnNo;
 	    const u_char *dupTSN;
 
 	    if (chunkLengthRemaining < sizeof(*sack)) {
@@ -762,7 +714,7 @@ sctp_print(netdissect_options *ndo,
 		return;
 	      }
 	      frag = (const struct sctpSelectiveFrag *)bp;
-	      ND_PRINT((ndo, "\n\t\t[gap ack block #%d: start = %u, end = %u] ",
+	      ND_PRINT((ndo, "\n\t\t[gap ack block #%u: start = %u, end = %u] ",
 		     fragNo+1,
 		     EXTRACT_BE_U_4(&sack->highestConseqTSN) + EXTRACT_BE_U_2(&frag->fragmentStart),
 		     EXTRACT_BE_U_4(&sack->highestConseqTSN) + EXTRACT_BE_U_2(&frag->fragmentEnd)));
