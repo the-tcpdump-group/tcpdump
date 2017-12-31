@@ -84,7 +84,8 @@ static const struct tok sflow_format_values[] = {
 
 struct sflow_flow_sample_t {
     nd_uint32_t seqnum;
-    nd_uint32_t typesource;
+    nd_uint8_t  type;
+    nd_uint24_t index;
     nd_uint32_t rate;
     nd_uint32_t pool;
     nd_uint32_t drops;
@@ -189,7 +190,8 @@ struct sflow_flow_record_t {
 
 struct sflow_counter_sample_t {
     nd_uint32_t    seqnum;
-    nd_uint32_t    typesource;
+    nd_uint8_t     type;
+    nd_uint24_t    index;
     nd_uint32_t    records;
 };
 
@@ -573,9 +575,6 @@ sflow_print_counter_sample(netdissect_options *ndo,
 {
     const struct sflow_counter_sample_t *sflow_counter_sample;
     u_int           nrecords;
-    u_int           typesource;
-    u_int           type;
-    u_int           index;
 
     if (len < sizeof(struct sflow_counter_sample_t))
 	return 1;
@@ -583,15 +582,12 @@ sflow_print_counter_sample(netdissect_options *ndo,
     sflow_counter_sample = (const struct sflow_counter_sample_t *)pointer;
     ND_TCHECK(*sflow_counter_sample);
 
-    typesource = EXTRACT_BE_U_4(sflow_counter_sample->typesource);
     nrecords   = EXTRACT_BE_U_4(sflow_counter_sample->records);
-    type = typesource >> 24;
-    index = typesource & 0x0FFF;
 
     ND_PRINT((ndo, " seqnum %u, type %u, idx %u, records %u",
 	   EXTRACT_BE_U_4(sflow_counter_sample->seqnum),
-	   type,
-	   index,
+	   EXTRACT_U_1(sflow_counter_sample->type),
+	   EXTRACT_BE_U_3(sflow_counter_sample->index),
 	   nrecords));
 
     return sflow_print_counter_records(ndo, pointer + sizeof(struct sflow_counter_sample_t),
@@ -800,9 +796,6 @@ sflow_print_flow_sample(netdissect_options *ndo,
 {
     const struct sflow_flow_sample_t *sflow_flow_sample;
     u_int          nrecords;
-    u_int          typesource;
-    u_int          type;
-    u_int          index;
 
     if (len < sizeof(struct sflow_flow_sample_t))
 	return 1;
@@ -810,15 +803,12 @@ sflow_print_flow_sample(netdissect_options *ndo,
     sflow_flow_sample = (const struct sflow_flow_sample_t *)pointer;
     ND_TCHECK(*sflow_flow_sample);
 
-    typesource = EXTRACT_BE_U_4(sflow_flow_sample->typesource);
     nrecords = EXTRACT_BE_U_4(sflow_flow_sample->records);
-    type = typesource >> 24;
-    index = typesource & 0x0FFF;
 
     ND_PRINT((ndo, " seqnum %u, type %u, idx %u, rate %u, pool %u, drops %u, input %u output %u records %u",
 	   EXTRACT_BE_U_4(sflow_flow_sample->seqnum),
-	   type,
-	   index,
+	   EXTRACT_U_1(sflow_flow_sample->type),
+	   EXTRACT_BE_U_3(sflow_flow_sample->index),
 	   EXTRACT_BE_U_4(sflow_flow_sample->rate),
 	   EXTRACT_BE_U_4(sflow_flow_sample->pool),
 	   EXTRACT_BE_U_4(sflow_flow_sample->drops),
