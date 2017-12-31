@@ -27,19 +27,19 @@
 #define STP_BPDU_MSTP_MIN_LEN 102
 
 struct stp_bpdu_ {
-    uint8_t protocol_id[2];
-    uint8_t protocol_version;
-    uint8_t bpdu_type;
-    uint8_t flags;
-    uint8_t root_id[8];
-    uint8_t root_path_cost[4];
-    uint8_t bridge_id[8];
-    uint8_t port_id[2];
-    uint8_t message_age[2];
-    uint8_t max_age[2];
-    uint8_t hello_time[2];
-    uint8_t forward_delay[2];
-    uint8_t v1_length;
+    nd_uint16_t protocol_id;
+    nd_uint8_t  protocol_version;
+    nd_uint8_t  bpdu_type;
+    nd_uint8_t  flags;
+    nd_byte     root_id[8];
+    nd_uint32_t root_path_cost;
+    nd_byte     bridge_id[8];
+    nd_uint16_t port_id;
+    nd_uint16_t message_age;
+    nd_uint16_t max_age;
+    nd_uint16_t hello_time;
+    nd_uint16_t forward_delay;
+    nd_uint8_t  v1_length;
 };
 
 #define STP_PROTO_REGULAR 0x00
@@ -104,14 +104,17 @@ static int
 stp_print_config_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
                       u_int length)
 {
+    uint8_t bpdu_flags;
+
     ND_TCHECK(stp_bpdu->flags);
+    bpdu_flags = EXTRACT_U_1(stp_bpdu->flags);
     ND_PRINT((ndo, ", Flags [%s]",
-           bittok2str(stp_bpdu_flag_values, "none", stp_bpdu->flags)));
+           bittok2str(stp_bpdu_flag_values, "none", bpdu_flags)));
 
     ND_TCHECK(stp_bpdu->port_id);
     ND_PRINT((ndo, ", bridge-id %s.%04x, length %u",
            stp_print_bridge_id((const u_char *)&stp_bpdu->bridge_id),
-           EXTRACT_BE_U_2(&stp_bpdu->port_id), length));
+           EXTRACT_BE_U_2(stp_bpdu->port_id), length));
 
     /* in non-verbose mode just print the bridge-id */
     if (!ndo->ndo_vflag) {
@@ -121,20 +124,20 @@ stp_print_config_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
     ND_TCHECK(stp_bpdu->forward_delay);
     ND_PRINT((ndo, "\n\tmessage-age %.2fs, max-age %.2fs"
            ", hello-time %.2fs, forwarding-delay %.2fs",
-           (float) EXTRACT_BE_U_2(&stp_bpdu->message_age) / STP_TIME_BASE,
-           (float) EXTRACT_BE_U_2(&stp_bpdu->max_age) / STP_TIME_BASE,
-           (float) EXTRACT_BE_U_2(&stp_bpdu->hello_time) / STP_TIME_BASE,
-           (float) EXTRACT_BE_U_2(&stp_bpdu->forward_delay) / STP_TIME_BASE));
+           (float) EXTRACT_BE_U_2(stp_bpdu->message_age) / STP_TIME_BASE,
+           (float) EXTRACT_BE_U_2(stp_bpdu->max_age) / STP_TIME_BASE,
+           (float) EXTRACT_BE_U_2(stp_bpdu->hello_time) / STP_TIME_BASE,
+           (float) EXTRACT_BE_U_2(stp_bpdu->forward_delay) / STP_TIME_BASE));
 
     ND_PRINT((ndo, "\n\troot-id %s, root-pathcost %u",
            stp_print_bridge_id((const u_char *)&stp_bpdu->root_id),
-           EXTRACT_BE_U_4(&stp_bpdu->root_path_cost)));
+           EXTRACT_BE_U_4(stp_bpdu->root_path_cost)));
 
     /* Port role is only valid for 802.1w */
-    if (stp_bpdu->protocol_version == STP_PROTO_RAPID) {
+    if (EXTRACT_U_1(stp_bpdu->protocol_version) == STP_PROTO_RAPID) {
         ND_PRINT((ndo, ", port-role %s",
                tok2str(rstp_obj_port_role_values, "Unknown",
-                       RSTP_EXTRACT_PORT_ROLE(stp_bpdu->flags))));
+                       RSTP_EXTRACT_PORT_ROLE(bpdu_flags))));
     }
     return 1;
 
@@ -242,14 +245,17 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
                     u_int length)
 {
     const u_char *ptr;
+    uint8_t	    bpdu_flags;
     uint16_t	    v3len;
     uint16_t	    len;
     uint16_t	    msti;
     u_int	    offset;
 
     ptr = (const u_char *)stp_bpdu;
+    ND_TCHECK(stp_bpdu->flags);
+    bpdu_flags = EXTRACT_U_1(stp_bpdu->flags);
     ND_PRINT((ndo, ", CIST Flags [%s], length %u",
-           bittok2str(stp_bpdu_flag_values, "none", stp_bpdu->flags), length));
+           bittok2str(stp_bpdu_flag_values, "none", bpdu_flags), length));
 
     /*
      * in non-verbose mode just print the flags.
@@ -258,33 +264,32 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
         return 1;
     }
 
-    ND_TCHECK(stp_bpdu->flags);
     ND_PRINT((ndo, "\n\tport-role %s, ",
            tok2str(rstp_obj_port_role_values, "Unknown",
-                   RSTP_EXTRACT_PORT_ROLE(stp_bpdu->flags))));
+                   RSTP_EXTRACT_PORT_ROLE(bpdu_flags))));
 
     ND_TCHECK(stp_bpdu->root_path_cost);
     ND_PRINT((ndo, "CIST root-id %s, CIST ext-pathcost %u",
            stp_print_bridge_id((const u_char *)&stp_bpdu->root_id),
-           EXTRACT_BE_U_4(&stp_bpdu->root_path_cost)));
+           EXTRACT_BE_U_4(stp_bpdu->root_path_cost)));
 
     ND_TCHECK(stp_bpdu->bridge_id);
     ND_PRINT((ndo, "\n\tCIST regional-root-id %s, ",
            stp_print_bridge_id((const u_char *)&stp_bpdu->bridge_id)));
 
     ND_TCHECK(stp_bpdu->port_id);
-    ND_PRINT((ndo, "CIST port-id %04x,", EXTRACT_BE_U_2(&stp_bpdu->port_id)));
+    ND_PRINT((ndo, "CIST port-id %04x,", EXTRACT_BE_U_2(stp_bpdu->port_id)));
 
     ND_TCHECK(stp_bpdu->forward_delay);
     ND_PRINT((ndo, "\n\tmessage-age %.2fs, max-age %.2fs"
            ", hello-time %.2fs, forwarding-delay %.2fs",
-           (float) EXTRACT_BE_U_2(&stp_bpdu->message_age) / STP_TIME_BASE,
-           (float) EXTRACT_BE_U_2(&stp_bpdu->max_age) / STP_TIME_BASE,
-           (float) EXTRACT_BE_U_2(&stp_bpdu->hello_time) / STP_TIME_BASE,
-           (float) EXTRACT_BE_U_2(&stp_bpdu->forward_delay) / STP_TIME_BASE));
+           (float) EXTRACT_BE_U_2(stp_bpdu->message_age) / STP_TIME_BASE,
+           (float) EXTRACT_BE_U_2(stp_bpdu->max_age) / STP_TIME_BASE,
+           (float) EXTRACT_BE_U_2(stp_bpdu->hello_time) / STP_TIME_BASE,
+           (float) EXTRACT_BE_U_2(stp_bpdu->forward_delay) / STP_TIME_BASE));
 
     ND_TCHECK_2(ptr + MST_BPDU_VER3_LEN_OFFSET);
-    ND_PRINT((ndo, "\n\tv3len %d, ", EXTRACT_BE_U_2(ptr + MST_BPDU_VER3_LEN_OFFSET)));
+    ND_PRINT((ndo, "\n\tv3len %u, ", EXTRACT_BE_U_2(ptr + MST_BPDU_VER3_LEN_OFFSET)));
     ND_TCHECK_4(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 12);
     ND_PRINT((ndo, "MCID Name "));
     if (fn_printzp(ndo, ptr + MST_BPDU_CONFIG_NAME_OFFSET, 32, ndo->ndo_snapend))
@@ -306,7 +311,7 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
            stp_print_bridge_id(ptr + MST_BPDU_CIST_BRIDGE_ID_OFFSET)));
 
     ND_TCHECK_1(ptr + MST_BPDU_CIST_REMAIN_HOPS_OFFSET);
-    ND_PRINT((ndo, "CIST remaining-hops %d", EXTRACT_U_1(ptr + MST_BPDU_CIST_REMAIN_HOPS_OFFSET)));
+    ND_PRINT((ndo, "CIST remaining-hops %u", EXTRACT_U_1(ptr + MST_BPDU_CIST_REMAIN_HOPS_OFFSET)));
 
     /* Dump all MSTI's */
     ND_TCHECK_2(ptr + MST_BPDU_VER3_LEN_OFFSET);
@@ -320,7 +325,7 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
             msti = EXTRACT_BE_U_2(ptr + offset + MST_BPDU_MSTI_ROOT_PRIO_OFFSET);
             msti = msti & 0x0FFF;
 
-            ND_PRINT((ndo, "\n\tMSTI %d, Flags [%s], port-role %s",
+            ND_PRINT((ndo, "\n\tMSTI %u, Flags [%s], port-role %s",
                    msti, bittok2str(stp_bpdu_flag_values, "none", EXTRACT_U_1(ptr + offset)),
                    tok2str(rstp_obj_port_role_values, "Unknown",
                            RSTP_EXTRACT_PORT_ROLE(EXTRACT_U_1(ptr + offset)))));
@@ -328,7 +333,7 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
                    stp_print_bridge_id(ptr + offset +
                                        MST_BPDU_MSTI_ROOT_PRIO_OFFSET),
                    EXTRACT_BE_U_4(ptr + offset + MST_BPDU_MSTI_ROOT_PATH_COST_OFFSET)));
-            ND_PRINT((ndo, "\n\t\tMSTI bridge-prio %d, port-prio %d, hops %d",
+            ND_PRINT((ndo, "\n\t\tMSTI bridge-prio %u, port-prio %u, hops %u",
                    EXTRACT_U_1(ptr + offset + MST_BPDU_MSTI_BRIDGE_PRIO_OFFSET) >> 4,
                    EXTRACT_U_1(ptr + offset + MST_BPDU_MSTI_PORT_PRIO_OFFSET) >> 4,
                    EXTRACT_U_1(ptr + offset + MST_BPDU_MSTI_REMAIN_HOPS_OFFSET)));
@@ -359,7 +364,7 @@ stp_print_spb_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
     ptr = (const u_char *)stp_bpdu;
     ND_TCHECK_4(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET + 16);
 
-    ND_PRINT((ndo, "\n\tv4len %d, ", EXTRACT_BE_U_2(ptr + offset)));
+    ND_PRINT((ndo, "\n\tv4len %u, ", EXTRACT_BE_U_2(ptr + offset)));
     ND_PRINT((ndo, "AUXMCID Name "));
     if (fn_printzp(ndo, ptr + offset + SPB_BPDU_CONFIG_NAME_OFFSET, 32,
 		   ndo->ndo_snapend))
@@ -371,9 +376,9 @@ stp_print_spb_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
             EXTRACT_BE_U_4(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 8),
             EXTRACT_BE_U_4(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 12)));
 
-    ND_PRINT((ndo, "\n\tAgreement num %d, Discarded Agreement num %d, Agreement valid-"
-            "flag %d,\n\tRestricted role-flag: %d, Format id %d cap %d, "
-            "Convention id %d cap %d,\n\tEdge count %d, "
+    ND_PRINT((ndo, "\n\tAgreement num %u, Discarded Agreement num %u, Agreement valid-"
+            "flag %u,\n\tRestricted role-flag: %u, Format id %u cap %u, "
+            "Convention id %u cap %u,\n\tEdge count %u, "
             "Agreement digest %08x%08x%08x%08x%08x\n",
             EXTRACT_U_1(ptr + offset + SPB_BPDU_AGREEMENT_OFFSET)>>6,
             EXTRACT_U_1(ptr + offset + SPB_BPDU_AGREEMENT_OFFSET)>>4 & 0x3,
@@ -402,6 +407,8 @@ void
 stp_print(netdissect_options *ndo, const u_char *p, u_int length)
 {
     const struct stp_bpdu_ *stp_bpdu;
+    u_int                  protocol_version;
+    u_int                  bpdu_type;
     u_int                  mstp_len;
     u_int                  spb_len;
 
@@ -412,16 +419,17 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
         goto trunc;
 
     ND_TCHECK(stp_bpdu->protocol_id);
-    if (EXTRACT_BE_U_2(&stp_bpdu->protocol_id)) {
+    if (EXTRACT_BE_U_2(stp_bpdu->protocol_id)) {
         ND_PRINT((ndo, "unknown STP version, length %u", length));
         return;
     }
 
     ND_TCHECK(stp_bpdu->protocol_version);
+    protocol_version = EXTRACT_U_1(stp_bpdu->protocol_version);
     ND_PRINT((ndo, "STP %s", tok2str(stp_proto_values, "Unknown STP protocol (0x%02x)",
-                         stp_bpdu->protocol_version)));
+                         protocol_version)));
 
-    switch (stp_bpdu->protocol_version) {
+    switch (protocol_version) {
     case STP_PROTO_REGULAR:
     case STP_PROTO_RAPID:
     case STP_PROTO_MSTP:
@@ -432,10 +440,11 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
     }
 
     ND_TCHECK(stp_bpdu->bpdu_type);
+    bpdu_type = EXTRACT_U_1(stp_bpdu->bpdu_type);
     ND_PRINT((ndo, ", %s", tok2str(stp_bpdu_type_values, "Unknown BPDU Type (0x%02x)",
-                           stp_bpdu->bpdu_type)));
+                           bpdu_type)));
 
-    switch (stp_bpdu->bpdu_type) {
+    switch (bpdu_type) {
     case STP_BPDU_TYPE_CONFIG:
         if (length < sizeof(struct stp_bpdu_) - 1) {
             goto trunc;
@@ -445,20 +454,20 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
         break;
 
     case STP_BPDU_TYPE_RSTP:
-        if (stp_bpdu->protocol_version == STP_PROTO_RAPID) {
+        if (protocol_version == STP_PROTO_RAPID) {
             if (length < sizeof(struct stp_bpdu_)) {
                 goto trunc;
             }
             if (!stp_print_config_bpdu(ndo, stp_bpdu, length))
                 goto trunc;
-        } else if (stp_bpdu->protocol_version == STP_PROTO_MSTP ||
-                   stp_bpdu->protocol_version == STP_PROTO_SPB) {
+        } else if (protocol_version == STP_PROTO_MSTP ||
+                   protocol_version == STP_PROTO_SPB) {
             if (length < STP_BPDU_MSTP_MIN_LEN) {
                 goto trunc;
             }
 
             ND_TCHECK(stp_bpdu->v1_length);
-            if (stp_bpdu->v1_length != 0) {
+            if (EXTRACT_U_1(stp_bpdu->v1_length) != 0) {
                 /* FIX ME: Emit a message here ? */
                 goto trunc;
             }
@@ -473,7 +482,7 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
             if (!stp_print_mstp_bpdu(ndo, stp_bpdu, length))
                 goto trunc;
 
-            if (stp_bpdu->protocol_version == STP_PROTO_SPB)
+            if (protocol_version == STP_PROTO_SPB)
             {
               /* Validate v4 length */
               ND_TCHECK_2(p + MST_BPDU_VER3_LEN_OFFSET + mstp_len);
@@ -499,7 +508,7 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
 
     return;
 trunc:
-    ND_PRINT((ndo, "[|stp %d]", length));
+    ND_PRINT((ndo, "[|stp %u]", length));
 }
 
 /*
