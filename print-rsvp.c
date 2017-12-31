@@ -17,6 +17,8 @@
 
 /* \summary: Resource ReSerVation Protocol (RSVP) printer */
 
+/* specification: RFC 2205 */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -46,12 +48,12 @@ static const char tstr[] = " [|rsvp]";
  */
 
 struct rsvp_common_header {
-    uint8_t version_flags;
-    uint8_t msg_type;
-    uint8_t checksum[2];
-    uint8_t ttl;
-    uint8_t reserved;
-    uint8_t length[2];
+    nd_uint8_t  version_flags;
+    nd_uint8_t  msg_type;
+    nd_uint16_t checksum;
+    nd_uint8_t  ttl;
+    nd_byte     reserved[1];
+    nd_uint16_t length;
 };
 
 /*
@@ -69,9 +71,9 @@ struct rsvp_common_header {
  */
 
 struct rsvp_object_header {
-    uint8_t length[2];
-    uint8_t class_num;
-    uint8_t ctype;
+    nd_uint16_t length;
+    nd_uint8_t  class_num;
+    nd_uint8_t  ctype;
 };
 
 #define RSVP_VERSION            1
@@ -670,9 +672,10 @@ rsvp_obj_print(netdissect_options *ndo,
         const struct rsvp_obj_frr_t *rsvp_obj_frr;
     } obj_ptr;
 
-    u_short rsvp_obj_len,rsvp_obj_ctype,obj_tlen;
+    u_short rsvp_obj_len,rsvp_obj_ctype,rsvp_obj_class_num,obj_tlen;
     u_int intserv_serv_tlen;
-    int hexdump,processed,padbytes,error_code,error_value,i,sigcheck;
+    int hexdump;
+    u_int processed,padbytes,error_code,error_value,i,sigcheck;
     union {
 	float f;
 	uint32_t i;
@@ -687,7 +690,7 @@ rsvp_obj_print(netdissect_options *ndo,
 
         rsvp_obj_header = (const struct rsvp_object_header *)tptr;
         rsvp_obj_len=EXTRACT_BE_U_2(rsvp_obj_header->length);
-        rsvp_obj_ctype=rsvp_obj_header->ctype;
+        rsvp_obj_ctype=EXTRACT_U_1(rsvp_obj_header->ctype);
 
         if(rsvp_obj_len % 4) {
             ND_PRINT((ndo, "%sERROR: object header size %u not a multiple of 4", indent, rsvp_obj_len));
@@ -699,22 +702,22 @@ rsvp_obj_print(netdissect_options *ndo,
             return -1;
         }
 
+        rsvp_obj_class_num = EXTRACT_U_1(rsvp_obj_header->class_num);
         ND_PRINT((ndo, "%s%s Object (%u) Flags: [%s",
                indent,
                tok2str(rsvp_obj_values,
                        "Unknown",
-                       rsvp_obj_header->class_num),
-               rsvp_obj_header->class_num,
-               ((rsvp_obj_header->class_num) & 0x80) ? "ignore" : "reject"));
-
-        if (rsvp_obj_header->class_num > 128)
-            ND_PRINT((ndo, " %s",
-                   ((rsvp_obj_header->class_num) & 0x40) ? "and forward" : "silently"));
+                       rsvp_obj_class_num),
+               rsvp_obj_class_num,
+               (rsvp_obj_class_num & 0x80) ?
+                   ((rsvp_obj_class_num & 0x40) ? "ignore and forward" :
+                                         "ignore silently") :
+                   "reject"));
 
         ND_PRINT((ndo, " if unknown], Class-Type: %s (%u), length: %u",
                tok2str(rsvp_ctype_values,
                        "Unknown",
-                       ((rsvp_obj_header->class_num)<<8)+rsvp_obj_ctype),
+                       (rsvp_obj_class_num<<8)+rsvp_obj_ctype),
                rsvp_obj_ctype,
                rsvp_obj_len));
 
@@ -731,7 +734,7 @@ rsvp_obj_print(netdissect_options *ndo,
             return -1;
         hexdump=FALSE;
 
-        switch(rsvp_obj_header->class_num) {
+        switch(rsvp_obj_class_num) {
         case RSVP_OBJ_SESSION:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_IPV4:
@@ -1078,6 +1081,10 @@ rsvp_obj_print(netdissect_options *ndo,
                                    "Unknown %u",
                                    RSVP_OBJ_XRO_MASK_SUBOBJ(EXTRACT_U_1(obj_tptr))),
                            length));
+                    if (obj_tlen < length) {
+                        ND_PRINT((ndo, "%s  ERROR: ERO subobject length > object length", indent));
+                        break;
+                    };
 
                     if (length == 0) { /* prevent infinite loops */
                         ND_PRINT((ndo, "%s  ERROR: zero length ERO subtype", indent));
@@ -1124,8 +1131,8 @@ rsvp_obj_print(netdissect_options *ndo,
                                EXTRACT_U_1((obj_tptr + 3)),
                                EXTRACT_BE_U_4(obj_tptr + 4)));
                     }
-                    obj_tlen-=EXTRACT_U_1(obj_tptr + 1);
-                    obj_tptr+=EXTRACT_U_1(obj_tptr + 1);
+                    obj_tlen-=length;
+                    obj_tptr+=length;
                 }
                 break;
             default:
@@ -1187,8 +1194,8 @@ rsvp_obj_print(netdissect_options *ndo,
                                   "none",
                                   EXTRACT_U_1((obj_tptr + 2))),
                        EXTRACT_U_1(obj_tptr + 2)));
-                obj_tlen-=4+EXTRACT_U_1((obj_tptr + 3));
-                obj_tptr+=4+EXTRACT_U_1((obj_tptr + 3));
+                obj_tlen-=4+namelen;
+                obj_tptr+=4+namelen;
                 break;
             default:
                 hexdump=TRUE;
@@ -1197,7 +1204,7 @@ rsvp_obj_print(netdissect_options *ndo,
 
 	case RSVP_OBJ_GENERALIZED_UNI:
             switch(rsvp_obj_ctype) {
-		int subobj_type,af,subobj_len,total_subobj_len;
+		u_int subobj_type,af,subobj_len,total_subobj_len;
 
             case RSVP_CTYPE_1:
 
@@ -1234,8 +1241,29 @@ rsvp_obj_print(netdissect_options *ndo,
                      * sub-object header, but as long as this while loop implements it
                      * as it does include, let's keep the check below consistent with
                      * the rest of the code.
+                     *
+                     * XXX - RFC 3476 Section 3.1 says "The contents of these
+                     * sub-objects are described in [8]", where [8] is
+                     * UNI 1.0 Signaling Specification, The Optical
+                     * Internetworking Forum.  The URL they give for that
+                     * document is
+                     *
+                     *    http://www.oiforum.com/public/UNI_1.0_ia.html
+                     *
+                     * but that doesn't work; the new URL appears to be
+                     *
+                     *    http://www.oiforum.com/public/documents/OIF-UNI-01.0.pdf
+                     *
+                     * and *that* document, in section 12.5.2.3
+                     * "GENERALIZED_UNI Object (Class-Num=11bbbbbb (TBA))",
+                     * says nothing about the length field in general, but
+                     * some of the examples it gives in subsections have
+                     * length field values that clearly includes the length
+                     * of the sub-object header as well as the length of the
+                     * value.
                      */
-                    if(subobj_len < 4 || subobj_len > total_subobj_len)
+                    if(subobj_len < 4 || subobj_len > total_subobj_len ||
+                       obj_tlen < subobj_len)
                         goto invalid;
 
                     switch(subobj_type) {
@@ -1265,7 +1293,7 @@ rsvp_obj_print(netdissect_options *ndo,
                         break;
 
                     case RSVP_GEN_UNI_SUBOBJ_DIVERSITY:
-                        if (subobj_len) {
+                        if (subobj_len > 4) {
                             /* unless we have a TLV parser lets just hexdump */
                             hexdump=TRUE;
                         }
@@ -1651,7 +1679,7 @@ rsvp_obj_print(netdissect_options *ndo,
                            tok2str(rsvp_obj_prop_tlv_values,"unknown",EXTRACT_U_1(obj_tptr)),
                            EXTRACT_U_1(obj_tptr),
                            EXTRACT_U_1(obj_tptr + 1)));
-                    if (obj_tlen < EXTRACT_U_1((obj_tptr + 1)))
+                    if (obj_tlen < EXTRACT_U_1(obj_tptr + 1))
                         return-1;
                     if (EXTRACT_U_1(obj_tptr + 1) < 2)
                         return -1;
@@ -1853,6 +1881,7 @@ rsvp_print(netdissect_options *ndo,
            const u_char *pptr, u_int len)
 {
     const struct rsvp_common_header *rsvp_com_header;
+    uint8_t version_flags, msg_type;
     const u_char *tptr;
     u_short plen, tlen;
 
@@ -1860,21 +1889,24 @@ rsvp_print(netdissect_options *ndo,
 
     rsvp_com_header = (const struct rsvp_common_header *)pptr;
     ND_TCHECK(*rsvp_com_header);
+    version_flags = EXTRACT_U_1(rsvp_com_header->version_flags);
 
     /*
      * Sanity checking of the header.
      */
-    if (RSVP_EXTRACT_VERSION(rsvp_com_header->version_flags) != RSVP_VERSION) {
+    if (RSVP_EXTRACT_VERSION(version_flags) != RSVP_VERSION) {
 	ND_PRINT((ndo, "ERROR: RSVP version %u packet not supported",
-               RSVP_EXTRACT_VERSION(rsvp_com_header->version_flags)));
+               RSVP_EXTRACT_VERSION(version_flags)));
 	return;
     }
+
+    msg_type = EXTRACT_U_1(rsvp_com_header->msg_type);
 
     /* in non-verbose mode just lets print the basic Message Type*/
     if (ndo->ndo_vflag < 1) {
         ND_PRINT((ndo, "RSVPv%u %s Message, length: %u",
-               RSVP_EXTRACT_VERSION(rsvp_com_header->version_flags),
-               tok2str(rsvp_msg_type_values, "unknown (%u)",rsvp_com_header->msg_type),
+               RSVP_EXTRACT_VERSION(version_flags),
+               tok2str(rsvp_msg_type_values, "unknown (%u)",msg_type),
                len));
         return;
     }
@@ -1884,12 +1916,12 @@ rsvp_print(netdissect_options *ndo,
     plen = tlen = EXTRACT_BE_U_2(rsvp_com_header->length);
 
     ND_PRINT((ndo, "\n\tRSVPv%u %s Message (%u), Flags: [%s], length: %u, ttl: %u, checksum: 0x%04x",
-           RSVP_EXTRACT_VERSION(rsvp_com_header->version_flags),
-           tok2str(rsvp_msg_type_values, "unknown, type: %u",rsvp_com_header->msg_type),
-           rsvp_com_header->msg_type,
-           bittok2str(rsvp_header_flag_values,"none",RSVP_EXTRACT_FLAGS(rsvp_com_header->version_flags)),
+           RSVP_EXTRACT_VERSION(version_flags),
+           tok2str(rsvp_msg_type_values, "unknown, type: %u",msg_type),
+           msg_type,
+           bittok2str(rsvp_header_flag_values,"none",RSVP_EXTRACT_FLAGS(version_flags)),
            tlen,
-           rsvp_com_header->ttl,
+           EXTRACT_U_1(rsvp_com_header->ttl),
            EXTRACT_BE_U_2(rsvp_com_header->checksum)));
 
     if (tlen < sizeof(struct rsvp_common_header)) {
@@ -1901,7 +1933,7 @@ rsvp_print(netdissect_options *ndo,
     tptr+=sizeof(struct rsvp_common_header);
     tlen-=sizeof(struct rsvp_common_header);
 
-    switch(rsvp_com_header->msg_type) {
+    switch(msg_type) {
 
     case RSVP_MSGTYPE_BUNDLE:
         /*
@@ -1917,25 +1949,27 @@ rsvp_print(netdissect_options *ndo,
 
             rsvp_com_header = (const struct rsvp_common_header *)subpptr;
             ND_TCHECK(*rsvp_com_header);
+            version_flags = EXTRACT_U_1(rsvp_com_header->version_flags);
 
             /*
              * Sanity checking of the header.
              */
-            if (RSVP_EXTRACT_VERSION(rsvp_com_header->version_flags) != RSVP_VERSION) {
+            if (RSVP_EXTRACT_VERSION(version_flags) != RSVP_VERSION) {
                 ND_PRINT((ndo, "ERROR: RSVP version %u packet not supported",
-                       RSVP_EXTRACT_VERSION(rsvp_com_header->version_flags)));
+                       RSVP_EXTRACT_VERSION(version_flags)));
                 return;
             }
 
             subplen = subtlen = EXTRACT_BE_U_2(rsvp_com_header->length);
 
+            msg_type = EXTRACT_U_1(rsvp_com_header->msg_type);
             ND_PRINT((ndo, "\n\t  RSVPv%u %s Message (%u), Flags: [%s], length: %u, ttl: %u, checksum: 0x%04x",
-                   RSVP_EXTRACT_VERSION(rsvp_com_header->version_flags),
-                   tok2str(rsvp_msg_type_values, "unknown, type: %u",rsvp_com_header->msg_type),
-                   rsvp_com_header->msg_type,
-                   bittok2str(rsvp_header_flag_values,"none",RSVP_EXTRACT_FLAGS(rsvp_com_header->version_flags)),
+                   RSVP_EXTRACT_VERSION(version_flags),
+                   tok2str(rsvp_msg_type_values, "unknown, type: %u",msg_type),
+                   msg_type,
+                   bittok2str(rsvp_header_flag_values,"none",RSVP_EXTRACT_FLAGS(version_flags)),
                    subtlen,
-                   rsvp_com_header->ttl,
+                   EXTRACT_U_1(rsvp_com_header->ttl),
                    EXTRACT_BE_U_2(rsvp_com_header->checksum)));
 
             if (subtlen < sizeof(struct rsvp_common_header)) {
