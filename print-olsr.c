@@ -63,8 +63,8 @@
  */
 
 struct olsr_common {
-    uint8_t packet_len[2];
-    uint8_t packet_seq[2];
+    nd_uint16_t packet_len;
+    nd_uint16_t packet_seq;
 };
 
 #define OLSR_HELLO_MSG         1 /* rfc3626 */
@@ -89,50 +89,50 @@ static const struct tok olsr_msg_values[] = {
 };
 
 struct olsr_msg4 {
-    uint8_t msg_type;
-    uint8_t vtime;
-    uint8_t msg_len[2];
-    uint8_t originator[4];
-    uint8_t ttl;
-    uint8_t hopcount;
-    uint8_t msg_seq[2];
+    nd_uint8_t  msg_type;
+    nd_uint8_t  vtime;
+    nd_uint16_t msg_len;
+    nd_ipv4     originator;
+    nd_uint8_t  ttl;
+    nd_uint8_t  hopcount;
+    nd_uint16_t msg_seq;
 };
 
 struct olsr_msg6 {
-    uint8_t msg_type;
-    uint8_t vtime;
-    uint8_t msg_len[2];
-    uint8_t originator[16];
-    uint8_t ttl;
-    uint8_t hopcount;
-    uint8_t msg_seq[2];
+    nd_uint8_t  msg_type;
+    nd_uint8_t  vtime;
+    nd_uint16_t msg_len;
+    nd_ipv6     originator;
+    nd_uint8_t  ttl;
+    nd_uint8_t  hopcount;
+    nd_uint16_t msg_seq;
 };
 
 struct olsr_hello {
-    uint8_t res[2];
-    uint8_t htime;
-    uint8_t will;
+    nd_byte     res[2];
+    nd_uint8_t  htime;
+    nd_uint8_t  will;
 };
 
 struct olsr_hello_link {
-    uint8_t link_code;
-    uint8_t res;
-    uint8_t len[2];
+    nd_uint8_t  link_code;
+    nd_byte     res;
+    nd_uint16_t len;
 };
 
 struct olsr_tc {
-    uint8_t ans_seq[2];
-    uint8_t res[2];
+    nd_uint16_t ans_seq;
+    nd_byte     res[2];
 };
 
 struct olsr_hna4 {
-    uint8_t network[4];
-    uint8_t mask[4];
+    nd_ipv4 network;
+    nd_ipv4 mask;
 };
 
 struct olsr_hna6 {
-    uint8_t network[16];
-    uint8_t mask[16];
+    nd_ipv6 network;
+    nd_ipv6 mask;
 };
 
 
@@ -175,17 +175,17 @@ static const struct tok olsr_neighbor_type_values[] = {
 };
 
 struct olsr_lq_neighbor4 {
-    uint8_t neighbor[4];
-    uint8_t link_quality;
-    uint8_t neighbor_link_quality;
-    uint8_t res[2];
+    nd_ipv4     neighbor;
+    nd_uint8_t  link_quality;
+    nd_uint8_t  neighbor_link_quality;
+    nd_byte     res[2];
 };
 
 struct olsr_lq_neighbor6 {
-    uint8_t neighbor[16];
-    uint8_t link_quality;
-    uint8_t neighbor_link_quality;
-    uint8_t res[2];
+    nd_ipv6     neighbor;
+    nd_uint8_t  link_quality;
+    nd_uint8_t  neighbor_link_quality;
+    nd_byte     res[2];
 };
 
 #define MAX_SMARTGW_SPEED    320000000
@@ -245,8 +245,8 @@ olsr_print_lq_neighbor4(netdissect_options *ndo,
         ND_PRINT((ndo, "\n\t      neighbor %s, link-quality %.2f%%"
                ", neighbor-link-quality %.2f%%",
                ipaddr_string(ndo, lq_neighbor->neighbor),
-               ((double)lq_neighbor->link_quality/2.55),
-               ((double)lq_neighbor->neighbor_link_quality/2.55)));
+               ((double)EXTRACT_U_1(lq_neighbor->link_quality)/2.55),
+               ((double)EXTRACT_U_1(lq_neighbor->neighbor_link_quality)/2.55)));
 
         msg_data += sizeof(struct olsr_lq_neighbor4);
         hello_len -= sizeof(struct olsr_lq_neighbor4);
@@ -269,8 +269,8 @@ olsr_print_lq_neighbor6(netdissect_options *ndo,
         ND_PRINT((ndo, "\n\t      neighbor %s, link-quality %.2f%%"
                ", neighbor-link-quality %.2f%%",
                ip6addr_string(ndo, lq_neighbor->neighbor),
-               ((double)lq_neighbor->link_quality/2.55),
-               ((double)lq_neighbor->neighbor_link_quality/2.55)));
+               ((double)EXTRACT_U_1(lq_neighbor->link_quality)/2.55),
+               ((double)EXTRACT_U_1(lq_neighbor->neighbor_link_quality)/2.55)));
 
         msg_data += sizeof(struct olsr_lq_neighbor6);
         hello_len -= sizeof(struct olsr_lq_neighbor6);
@@ -363,7 +363,7 @@ olsr_print(netdissect_options *ndo,
         {
             ND_TCHECK_LEN(tptr, sizeof(struct olsr_msg6));
             msgptr.v6 = (const struct olsr_msg6 *) tptr;
-            msg_type = msgptr.v6->msg_type;
+            msg_type = EXTRACT_U_1(msgptr.v6->msg_type);
             msg_len = EXTRACT_BE_U_2(msgptr.v6->msg_len);
             if ((msg_len >= sizeof (struct olsr_msg6))
                     && (msg_len <= length))
@@ -378,9 +378,9 @@ olsr_print(netdissect_options *ndo,
                     "\n\t  vtime %.3fs, msg-seq 0x%04x, length %u%s",
                     tok2str(olsr_msg_values, "Unknown", msg_type),
                     msg_type, ip6addr_string(ndo, msgptr.v6->originator),
-                    msgptr.v6->ttl,
-                    msgptr.v6->hopcount,
-                    ME_TO_DOUBLE(msgptr.v6->vtime),
+                    EXTRACT_U_1(msgptr.v6->ttl),
+                    EXTRACT_U_1(msgptr.v6->hopcount),
+                    ME_TO_DOUBLE(EXTRACT_U_1(msgptr.v6->vtime)),
                     EXTRACT_BE_U_2(msgptr.v6->msg_seq),
                     msg_len, (msg_len_valid == 0) ? " (invalid)" : ""));
             if (!msg_len_valid) {
@@ -394,7 +394,7 @@ olsr_print(netdissect_options *ndo,
         {
             ND_TCHECK_LEN(tptr, sizeof(struct olsr_msg4));
             msgptr.v4 = (const struct olsr_msg4 *) tptr;
-            msg_type = msgptr.v4->msg_type;
+            msg_type = EXTRACT_U_1(msgptr.v4->msg_type);
             msg_len = EXTRACT_BE_U_2(msgptr.v4->msg_len);
             if ((msg_len >= sizeof (struct olsr_msg4))
                     && (msg_len <= length))
@@ -409,9 +409,9 @@ olsr_print(netdissect_options *ndo,
                     "\n\t  vtime %.3fs, msg-seq 0x%04x, length %u%s",
                     tok2str(olsr_msg_values, "Unknown", msg_type),
                     msg_type, ipaddr_string(ndo, msgptr.v4->originator),
-                    msgptr.v4->ttl,
-                    msgptr.v4->hopcount,
-                    ME_TO_DOUBLE(msgptr.v4->vtime),
+                    EXTRACT_U_1(msgptr.v4->ttl),
+                    EXTRACT_U_1(msgptr.v4->hopcount),
+                    ME_TO_DOUBLE(EXTRACT_U_1(msgptr.v4->vtime)),
                     EXTRACT_BE_U_2(msgptr.v4->msg_seq),
                     msg_len, (msg_len_valid == 0) ? " (invalid)" : ""));
             if (!msg_len_valid) {
@@ -431,7 +431,8 @@ olsr_print(netdissect_options *ndo,
 
             ptr.hello = (const struct olsr_hello *)msg_data;
             ND_PRINT((ndo, "\n\t  hello-time %.3fs, MPR willingness %u",
-                   ME_TO_DOUBLE(ptr.hello->htime), ptr.hello->will));
+                   ME_TO_DOUBLE(EXTRACT_U_1(ptr.hello->htime)),
+                   EXTRACT_U_1(ptr.hello->will)));
             msg_data += sizeof(struct olsr_hello);
             msg_tlen -= sizeof(struct olsr_hello);
 
@@ -446,8 +447,8 @@ olsr_print(netdissect_options *ndo,
                 ptr.hello_link = (const struct olsr_hello_link *)msg_data;
 
                 hello_len = EXTRACT_BE_U_2(ptr.hello_link->len);
-                link_type = OLSR_EXTRACT_LINK_TYPE(ptr.hello_link->link_code);
-                neighbor_type = OLSR_EXTRACT_NEIGHBOR_TYPE(ptr.hello_link->link_code);
+                link_type = OLSR_EXTRACT_LINK_TYPE(EXTRACT_U_1(ptr.hello_link->link_code));
+                neighbor_type = OLSR_EXTRACT_NEIGHBOR_TYPE(EXTRACT_U_1(ptr.hello_link->link_code));
 
                 if ((hello_len <= msg_tlen)
                         && (hello_len >= sizeof(struct olsr_hello_link)))
