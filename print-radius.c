@@ -201,16 +201,16 @@ static void print_attr_time(netdissect_options *, const u_char *, u_int, u_short
 static void print_attr_strange(netdissect_options *, const u_char *, u_int, u_short);
 
 
-struct radius_hdr { uint8_t  code; /* Radius packet code  */
-                    uint8_t  id;   /* Radius packet id    */
-                    uint16_t len;  /* Radius total length */
-                    uint8_t  auth[16]; /* Authenticator   */
+struct radius_hdr { nd_uint8_t  code;     /* Radius packet code  */
+                    nd_uint8_t  id;       /* Radius packet id    */
+                    nd_uint16_t len;      /* Radius total length */
+                    nd_byte     auth[16]; /* Authenticator   */
                   };
 
 #define MIN_RADIUS_LEN	20
 
-struct radius_attr { uint8_t type; /* Attribute type   */
-                     uint8_t len;  /* Attribute length */
+struct radius_attr { nd_uint8_t type; /* Attribute type   */
+                     nd_uint8_t len;  /* Attribute length */
                    };
 
 
@@ -734,7 +734,7 @@ print_attr_num(netdissect_options *ndo,
          if (!EXTRACT_U_1(data))
             ND_PRINT((ndo, "Tag[Unused] "));
          else
-            ND_PRINT((ndo, "Tag[%d] ", EXTRACT_U_1(data)));
+            ND_PRINT((ndo, "Tag[%u] ", EXTRACT_U_1(data)));
          data++;
          data_value = EXTRACT_BE_U_3(data);
       }
@@ -757,7 +757,7 @@ print_attr_num(netdissect_options *ndo,
              if (EXTRACT_BE_U_4(data) == 0xFFFFFFFE )
                 ND_PRINT((ndo, "NAS Select"));
              else
-                ND_PRINT((ndo, "%d", EXTRACT_BE_U_4(data)));
+                ND_PRINT((ndo, "%u", EXTRACT_BE_U_4(data)));
           break;
 
         case SESSION_TIMEOUT:
@@ -782,25 +782,25 @@ print_attr_num(netdissect_options *ndo,
 
         case FRM_ATALK_LINK:
              if (EXTRACT_BE_U_4(data))
-                ND_PRINT((ndo, "%d", EXTRACT_BE_U_4(data)));
+                ND_PRINT((ndo, "%u", EXTRACT_BE_U_4(data)));
              else
                 ND_PRINT((ndo, "Unnumbered"));
           break;
 
         case FRM_ATALK_NETWORK:
              if (EXTRACT_BE_U_4(data))
-                ND_PRINT((ndo, "%d", EXTRACT_BE_U_4(data)));
+                ND_PRINT((ndo, "%u", EXTRACT_BE_U_4(data)));
              else
                 ND_PRINT((ndo, "NAS assigned"));
           break;
 
         case TUNNEL_PREFERENCE:
             if (EXTRACT_U_1(data))
-               ND_PRINT((ndo, "Tag[%d] ", EXTRACT_U_1(data)));
+               ND_PRINT((ndo, "Tag[%u] ", EXTRACT_U_1(data)));
             else
                ND_PRINT((ndo, "Tag[Unused] "));
             data++;
-            ND_PRINT((ndo, "%d", EXTRACT_BE_U_3(data)));
+            ND_PRINT((ndo, "%u", EXTRACT_BE_U_3(data)));
           break;
 
         case EGRESS_VLAN_ID:
@@ -808,11 +808,11 @@ print_attr_num(netdissect_options *ndo,
                    tok2str(rfc4675_tagged,"Unknown tag",EXTRACT_U_1(data)),
                    EXTRACT_U_1(data)));
             data++;
-            ND_PRINT((ndo, "%d", EXTRACT_BE_U_3(data)));
+            ND_PRINT((ndo, "%u", EXTRACT_BE_U_3(data)));
           break;
 
         default:
-             ND_PRINT((ndo, "%d", EXTRACT_BE_U_4(data)));
+             ND_PRINT((ndo, "%u", EXTRACT_BE_U_4(data)));
           break;
 
       } /* switch */
@@ -1008,7 +1008,7 @@ print_attr_strange(netdissect_options *ndo,
               ND_PRINT((ndo, "User cannot change password"));
            data++;
            ND_TCHECK_1(data);
-           ND_PRINT((ndo, ", Min password length: %d", EXTRACT_U_1(data)));
+           ND_PRINT((ndo, ", Min password length: %u", EXTRACT_U_1(data)));
            data++;
            ND_PRINT((ndo, ", created at: "));
            ND_TCHECK_4(data);
@@ -1059,6 +1059,7 @@ radius_attrs_print(netdissect_options *ndo,
 {
    const struct radius_attr *rad_attr = (const struct radius_attr *)attr;
    const char *attr_string;
+   uint8_t type, len;
 
    while (length > 0)
    {
@@ -1066,47 +1067,49 @@ radius_attrs_print(netdissect_options *ndo,
         goto trunc;
      ND_TCHECK(*rad_attr);
 
-     if (rad_attr->type > 0 && rad_attr->type < TAM_SIZE(attr_type))
-	attr_string = attr_type[rad_attr->type].name;
+     type = EXTRACT_U_1(rad_attr->type);
+     len = EXTRACT_U_1(rad_attr->len);
+     if (type != 0 && type < TAM_SIZE(attr_type))
+	attr_string = attr_type[type].name;
      else
 	attr_string = "Unknown";
-     if (rad_attr->len < 2)
+     if (len < 2)
      {
 	ND_PRINT((ndo, "\n\t  %s Attribute (%u), length: %u (bogus, must be >= 2)",
                attr_string,
-               rad_attr->type,
-               rad_attr->len));
+               type,
+               len));
 	return;
      }
-     if (rad_attr->len > length)
+     if (len > length)
      {
 	ND_PRINT((ndo, "\n\t  %s Attribute (%u), length: %u (bogus, goes past end of packet)",
                attr_string,
-               rad_attr->type,
-               rad_attr->len));
+               type,
+               len));
         return;
      }
      ND_PRINT((ndo, "\n\t  %s Attribute (%u), length: %u, Value: ",
             attr_string,
-            rad_attr->type,
-            rad_attr->len));
+            type,
+            len));
 
-     if (rad_attr->type < TAM_SIZE(attr_type))
+     if (type < TAM_SIZE(attr_type))
      {
-         if (rad_attr->len > 2)
+         if (len > 2)
          {
-             if ( attr_type[rad_attr->type].print_func )
-                 (*attr_type[rad_attr->type].print_func)(
+             if ( attr_type[type].print_func )
+                 (*attr_type[type].print_func)(
                      ndo, ((const u_char *)(rad_attr+1)),
-                     rad_attr->len - 2, rad_attr->type);
+                     len - 2, type);
          }
      }
      /* do we also want to see a hex dump ? */
      if (ndo->ndo_vflag> 1)
-         print_unknown_data(ndo, (const u_char *)rad_attr+2, "\n\t    ", (rad_attr->len)-2);
+         print_unknown_data(ndo, (const u_char *)rad_attr+2, "\n\t    ", (len)-2);
 
-     length-=(rad_attr->len);
-     rad_attr = (const struct radius_attr *)( ((const char *)(rad_attr))+rad_attr->len);
+     length-=(len);
+     rad_attr = (const struct radius_attr *)( ((const char *)(rad_attr))+len);
    }
    return;
 
@@ -1123,7 +1126,7 @@ radius_print(netdissect_options *ndo,
 
    ND_TCHECK_LEN(dat, MIN_RADIUS_LEN);
    rad = (const struct radius_hdr *)dat;
-   len = EXTRACT_BE_U_2(&rad->len);
+   len = EXTRACT_BE_U_2(rad->len);
 
    if (len < MIN_RADIUS_LEN)
    {
@@ -1136,18 +1139,18 @@ radius_print(netdissect_options *ndo,
 
    if (ndo->ndo_vflag < 1) {
        ND_PRINT((ndo, "RADIUS, %s (%u), id: 0x%02x length: %u",
-              tok2str(radius_command_values,"Unknown Command",rad->code),
-              rad->code,
-              rad->id,
+              tok2str(radius_command_values,"Unknown Command",EXTRACT_U_1(rad->code)),
+              EXTRACT_U_1(rad->code),
+              EXTRACT_U_1(rad->id),
               len));
        return;
    }
    else {
        ND_PRINT((ndo, "RADIUS, length: %u\n\t%s (%u), id: 0x%02x, Authenticator: ",
               len,
-              tok2str(radius_command_values,"Unknown Command",rad->code),
-              rad->code,
-              rad->id));
+              tok2str(radius_command_values,"Unknown Command",EXTRACT_U_1(rad->code)),
+              EXTRACT_U_1(rad->code),
+              EXTRACT_U_1(rad->id)));
 
        for(auth_idx=0; auth_idx < 16; auth_idx++)
             ND_PRINT((ndo, "%02x", rad->auth[auth_idx]));
