@@ -51,10 +51,10 @@
 #define MOBILE_SIZE (8)
 
 struct mobile_ip {
-	uint16_t proto;
-	uint16_t hcheck;
-	uint32_t odst;
-	uint32_t osrc;
+	nd_uint16_t proto;
+	nd_uint16_t hcheck;
+	nd_uint32_t odst;
+	nd_uint32_t osrc;
 };
 
 #define OSRC_PRES	0x0080	/* old source is present */
@@ -78,8 +78,8 @@ mobile_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	}
 	ND_PRINT((ndo, "mobile: "));
 
-	proto = EXTRACT_BE_U_2(&mob->proto);
-	crc =  EXTRACT_BE_U_2(&mob->hcheck);
+	proto = EXTRACT_BE_U_2(mob->proto);
+	crc =  EXTRACT_BE_U_2(mob->hcheck);
 	if (proto & OSRC_PRES) {
 		osp=1;
 	}
@@ -93,11 +93,11 @@ mobile_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	}
 	if (ndo->ndo_vflag) {
 		ND_PRINT((ndo, "> %s ", ipaddr_string(ndo, &mob->odst)));
-		ND_PRINT((ndo, "(oproto=%d)", proto>>8));
+		ND_PRINT((ndo, "(oproto=%u)", proto>>8));
 	}
 	vec[0].ptr = (const uint8_t *)(const void *)mob;
 	vec[0].len = osp ? 12 : 8;
 	if (in_cksum(vec, 1)!=0) {
-		ND_PRINT((ndo, " (bad checksum %d)", crc));
+		ND_PRINT((ndo, " (bad checksum %u)", crc));
 	}
 }
