@@ -55,18 +55,18 @@
  */
 
 struct sflow_datagram_t {
-    uint8_t 	version[4];
-    uint8_t 	ip_version[4];
-    uint8_t 	agent[4];
-    uint8_t 	agent_id[4];
-    uint8_t 	seqnum[4];
-    uint8_t 	uptime[4];
-    uint8_t 	samples[4];
+    nd_uint32_t version;
+    nd_uint32_t ip_version;
+    nd_ipv4	agent;
+    nd_uint32_t	agent_id;
+    nd_uint32_t	seqnum;
+    nd_uint32_t	uptime;
+    nd_uint32_t	samples;
 };
 
 struct sflow_sample_header {
-    uint8_t	format[4];
-    uint8_t	len[4];
+    nd_uint32_t	format;
+    nd_uint32_t	len;
 };
 
 #define		SFLOW_FLOW_SAMPLE		1
@@ -83,29 +83,29 @@ static const struct tok sflow_format_values[] = {
 };
 
 struct sflow_flow_sample_t {
-    uint8_t    seqnum[4];
-    uint8_t    typesource[4];
-    uint8_t    rate[4];
-    uint8_t    pool[4];
-    uint8_t    drops[4];
-    uint8_t    in_interface[4];
-    uint8_t    out_interface[4];
-    uint8_t    records[4];
+    nd_uint32_t seqnum;
+    nd_uint32_t typesource;
+    nd_uint32_t rate;
+    nd_uint32_t pool;
+    nd_uint32_t drops;
+    nd_uint32_t in_interface;
+    nd_uint32_t out_interface;
+    nd_uint32_t records;
 
 };
 
 struct sflow_expanded_flow_sample_t {
-    uint8_t    seqnum[4];
-    uint8_t    type[4];
-    uint8_t    index[4];
-    uint8_t    rate[4];
-    uint8_t    pool[4];
-    uint8_t    drops[4];
-    uint8_t    in_interface_format[4];
-    uint8_t    in_interface_value[4];
-    uint8_t    out_interface_format[4];
-    uint8_t    out_interface_value[4];
-    uint8_t    records[4];
+    nd_uint32_t seqnum;
+    nd_uint32_t type;
+    nd_uint32_t index;
+    nd_uint32_t rate;
+    nd_uint32_t pool;
+    nd_uint32_t drops;
+    nd_uint32_t in_interface_format;
+    nd_uint32_t in_interface_value;
+    nd_uint32_t out_interface_format;
+    nd_uint32_t out_interface_value;
+    nd_uint32_t records;
 };
 
 #define 	SFLOW_FLOW_RAW_PACKET			1
@@ -157,47 +157,47 @@ static const struct tok sflow_flow_raw_protocol_values[] = {
 };
 
 struct sflow_expanded_flow_raw_t {
-    uint8_t    protocol[4];
-    uint8_t    length[4];
-    uint8_t    stripped_bytes[4];
-    uint8_t    header_size[4];
+    nd_uint32_t protocol;
+    nd_uint32_t length;
+    nd_uint32_t stripped_bytes;
+    nd_uint32_t header_size;
 };
 
 struct sflow_ethernet_frame_t {
-    uint8_t length[4];
-    uint8_t src_mac[8];
-    uint8_t dst_mac[8];
-    uint8_t type[4];
+    nd_uint32_t length;
+    nd_byte     src_mac[8];
+    nd_byte     dst_mac[8];
+    nd_uint32_t type;
 };
 
 struct sflow_extended_switch_data_t {
-    uint8_t src_vlan[4];
-    uint8_t src_pri[4];
-    uint8_t dst_vlan[4];
-    uint8_t dst_pri[4];
+    nd_uint32_t src_vlan;
+    nd_uint32_t src_pri;
+    nd_uint32_t dst_vlan;
+    nd_uint32_t dst_pri;
 };
 
 struct sflow_counter_record_t {
-    uint8_t    format[4];
-    uint8_t    length[4];
+    nd_uint32_t    format;
+    nd_uint32_t    length;
 };
 
 struct sflow_flow_record_t {
-    uint8_t    format[4];
-    uint8_t    length[4];
+    nd_uint32_t    format;
+    nd_uint32_t    length;
 };
 
 struct sflow_counter_sample_t {
-    uint8_t    seqnum[4];
-    uint8_t    typesource[4];
-    uint8_t    records[4];
+    nd_uint32_t    seqnum;
+    nd_uint32_t    typesource;
+    nd_uint32_t    records;
 };
 
 struct sflow_expanded_counter_sample_t {
-    uint8_t    seqnum[4];
-    uint8_t    type[4];
-    uint8_t    index[4];
-    uint8_t    records[4];
+    nd_uint32_t    seqnum;
+    nd_uint32_t    type;
+    nd_uint32_t    index;
+    nd_uint32_t    records;
 };
 
 #define         SFLOW_COUNTER_GENERIC           1
@@ -233,67 +233,67 @@ static const struct tok sflow_iface_direction_values[] = {
 };
 
 struct sflow_generic_counter_t {
-    uint8_t    ifindex[4];
-    uint8_t    iftype[4];
-    uint8_t    ifspeed[8];
-    uint8_t    ifdirection[4];
-    uint8_t    ifstatus[4];
-    uint8_t    ifinoctets[8];
-    uint8_t    ifinunicastpkts[4];
-    uint8_t    ifinmulticastpkts[4];
-    uint8_t    ifinbroadcastpkts[4];
-    uint8_t    ifindiscards[4];
-    uint8_t    ifinerrors[4];
-    uint8_t    ifinunkownprotos[4];
-    uint8_t    ifoutoctets[8];
-    uint8_t    ifoutunicastpkts[4];
-    uint8_t    ifoutmulticastpkts[4];
-    uint8_t    ifoutbroadcastpkts[4];
-    uint8_t    ifoutdiscards[4];
-    uint8_t    ifouterrors[4];
-    uint8_t    ifpromiscmode[4];
+    nd_uint32_t    ifindex;
+    nd_uint32_t    iftype;
+    nd_uint64_t    ifspeed;
+    nd_uint32_t    ifdirection;
+    nd_uint32_t    ifstatus;
+    nd_uint64_t    ifinoctets;
+    nd_uint32_t    ifinunicastpkts;
+    nd_uint32_t    ifinmulticastpkts;
+    nd_uint32_t    ifinbroadcastpkts;
+    nd_uint32_t    ifindiscards;
+    nd_uint32_t    ifinerrors;
+    nd_uint32_t    ifinunkownprotos;
+    nd_uint64_t    ifoutoctets;
+    nd_uint32_t    ifoutunicastpkts;
+    nd_uint32_t    ifoutmulticastpkts;
+    nd_uint32_t    ifoutbroadcastpkts;
+    nd_uint32_t    ifoutdiscards;
+    nd_uint32_t    ifouterrors;
+    nd_uint32_t    ifpromiscmode;
 };
 
 struct sflow_ethernet_counter_t {
-    uint8_t    alignerrors[4];
-    uint8_t    fcserrors[4];
-    uint8_t    single_collision_frames[4];
-    uint8_t    multiple_collision_frames[4];
-    uint8_t    test_errors[4];
-    uint8_t    deferred_transmissions[4];
-    uint8_t    late_collisions[4];
-    uint8_t    excessive_collisions[4];
-    uint8_t    mac_transmit_errors[4];
-    uint8_t    carrier_sense_errors[4];
-    uint8_t    frame_too_longs[4];
-    uint8_t    mac_receive_errors[4];
-    uint8_t    symbol_errors[4];
+    nd_uint32_t    alignerrors;
+    nd_uint32_t    fcserrors;
+    nd_uint32_t    single_collision_frames;
+    nd_uint32_t    multiple_collision_frames;
+    nd_uint32_t    test_errors;
+    nd_uint32_t    deferred_transmissions;
+    nd_uint32_t    late_collisions;
+    nd_uint32_t    excessive_collisions;
+    nd_uint32_t    mac_transmit_errors;
+    nd_uint32_t    carrier_sense_errors;
+    nd_uint32_t    frame_too_longs;
+    nd_uint32_t    mac_receive_errors;
+    nd_uint32_t    symbol_errors;
 };
 
 struct sflow_100basevg_counter_t {
-    uint8_t    in_highpriority_frames[4];
-    uint8_t    in_highpriority_octets[8];
-    uint8_t    in_normpriority_frames[4];
-    uint8_t    in_normpriority_octets[8];
-    uint8_t    in_ipmerrors[4];
-    uint8_t    in_oversized[4];
-    uint8_t    in_data_errors[4];
-    uint8_t    in_null_addressed_frames[4];
-    uint8_t    out_highpriority_frames[4];
-    uint8_t    out_highpriority_octets[8];
-    uint8_t    transitioninto_frames[4];
-    uint8_t    hc_in_highpriority_octets[8];
-    uint8_t    hc_in_normpriority_octets[8];
-    uint8_t    hc_out_highpriority_octets[8];
+    nd_uint32_t    in_highpriority_frames;
+    nd_uint64_t    in_highpriority_octets;
+    nd_uint32_t    in_normpriority_frames;
+    nd_uint64_t    in_normpriority_octets;
+    nd_uint32_t    in_ipmerrors;
+    nd_uint32_t    in_oversized;
+    nd_uint32_t    in_data_errors;
+    nd_uint32_t    in_null_addressed_frames;
+    nd_uint32_t    out_highpriority_frames;
+    nd_uint64_t    out_highpriority_octets;
+    nd_uint32_t    transitioninto_frames;
+    nd_uint64_t    hc_in_highpriority_octets;
+    nd_uint64_t    hc_in_normpriority_octets;
+    nd_uint64_t    hc_out_highpriority_octets;
 };
 
 struct sflow_vlan_counter_t {
-    uint8_t    vlan_id[4];
-    uint8_t    octets[8];
-    uint8_t    unicast_pkt[4];
-    uint8_t    multicast_pkt[4];
-    uint8_t    broadcast_pkt[4];
-    uint8_t    discards[4];
+    nd_uint32_t    vlan_id;
+    nd_uint64_t    octets;
+    nd_uint32_t    unicast_pkt;
+    nd_uint32_t    multicast_pkt;
+    nd_uint32_t    broadcast_pkt;
+    nd_uint32_t    discards;
 };
 
 static int
@@ -453,11 +453,11 @@ trunc:
 }
 
 struct sflow_processor_counter_t {
-    uint8_t five_sec_util[4];
-    uint8_t one_min_util[4];
-    uint8_t five_min_util[4];
-    uint8_t total_memory[8];
-    uint8_t free_memory[8];
+    nd_uint32_t five_sec_util;
+    nd_uint32_t one_min_util;
+    nd_uint32_t five_min_util;
+    nd_uint64_t total_memory;
+    nd_uint64_t free_memory;
 };
 
 static int
