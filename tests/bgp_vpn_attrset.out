@@ -15,4 +15,5 @@ IP (tos 0xc0, ttl 62, id 58628, offset 0, flags [none], proto TCP (6), length 17
 	      Cluster List (10), length: 4, Flags [O]: 22.5.5.5
 	  Multi-Protocol Reach NLRI (14), length: 30, Flags [OE]: 
 	    AFI: IPv4 (1), SAFI: labeled VPN Unicast (128)
-	    nexthop: RD: 0:0 (= 0.0.0.0), 12.4.4.4, nh-length: 12, no SNPA[|BGP]
+	    nexthop: RD: 0:0 (= 0.0.0.0), 12.4.4.4, nh-length: 12, no SNPA
+	      RD: 500:500 (= 0.0.1.244), 133.0.0.0/8, label:100208 (bottom)

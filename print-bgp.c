@@ -32,7 +32,7 @@
 
 /* \summary: Border Gateway Protocol (BGP) printer */
 
-/* specification: RFC 4771 */
+/* specification: RFC 4271 */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1405,10 +1405,16 @@ check_add_path(netdissect_options *ndo, const u_char *pptr, u_int length,
         return 0;
     }
 
-    /* check if it could be add path */
+    /*
+     * Scan through the NLRI information under the assumpetion that
+     * it doesn't have path IDs.
+     */
     for (offset = 0; offset < length;) {
         offset += 4;
-        ND_TCHECK_1(pptr + offset);
+        if (!ND_TTEST_1(pptr + offset)) {
+            /* We ran out of captured data; quit scanning. */
+            break;
+        }
         prefix_length = EXTRACT_U_1(pptr + offset);
         /*
          * Add 4 to cover the path id
@@ -1427,7 +1433,10 @@ check_add_path(netdissect_options *ndo, const u_char *pptr, u_int length,
 
     /* check it's not standard BGP */
     for (offset = 0; offset < length; ) {
-        ND_TCHECK_1(pptr + offset);
+        if (!ND_TTEST_1(pptr + offset)) {
+            /* We ran out of captured data; quit scanning. */
+            break;
+        }
         prefix_length = EXTRACT_U_1(pptr + offset);
         /*
          * If the prefix_length is zero (0.0.0.0/0)
@@ -1445,8 +1454,6 @@ check_add_path(netdissect_options *ndo, const u_char *pptr, u_int length,
 
     /* assume not add-path by default */
     return 0;
-trunc:
-    return -1;
 }
 
 static int
@@ -1838,11 +1845,7 @@ bgp_attr_print(netdissect_options *ndo,
         }
 
         add_path4 = check_add_path(ndo, tptr, (len-(tptr - pptr)), 32);
-        if (add_path4 == -1)
-            goto trunc;
         add_path6 = check_add_path(ndo, tptr, (len-(tptr - pptr)), 128);
-        if (add_path6 == -1)
-            goto trunc;
 
         while (tptr < pptr + len) {
             switch (af<<8 | safi) {
@@ -2027,11 +2030,7 @@ bgp_attr_print(netdissect_options *ndo,
         tptr += 3;
 
         add_path4 = check_add_path(ndo, tptr, (len-(tptr - pptr)), 32);
-        if (add_path4 == -1)
-            goto trunc;
         add_path6 = check_add_path(ndo, tptr, (len-(tptr - pptr)), 128);
-        if (add_path6 == -1)
-            goto trunc;
 
         while (tptr < pptr + len) {
             switch (af<<8 | safi) {
@@ -2679,8 +2678,6 @@ bgp_update_print(netdissect_options *ndo,
             goto trunc;
         ND_PRINT((ndo, "\n\t  Withdrawn routes:"));
         add_path = check_add_path(ndo, p, withdrawn_routes_len, 32);
-        if (add_path == -1)
-            goto trunc;
         while (withdrawn_routes_len != 0) {
             if (add_path) {
             	if (withdrawn_routes_len < 4) {
@@ -2784,8 +2781,6 @@ bgp_update_print(netdissect_options *ndo,
 
     if (length) {
         add_path = check_add_path(ndo, p, length, 32);
-        if (add_path == -1)
-            goto trunc;
         ND_PRINT((ndo, "\n\t  Updated routes:"));
         while (length != 0) {
             if (add_path) {

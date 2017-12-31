@@ -6,4 +6,5 @@ IP (tos 0xc0, ttl 64, id 22725, offset 0, flags [DF], proto TCP (6), length 142)
 	  Next Hop (3), length: 4, Flags [T]: 0.0.0.0
 	  Multi-Protocol Reach NLRI (14), length: 46, Flags [O]: 
 	    AFI: IPv6 (2), SAFI: Unicast (1)
-	    nexthop: dead:beef::1, fe80::1ff:fe01:0, nh-length: 32, no SNPA[|BGP]
+	    nexthop: dead:beef::1, fe80::1ff:fe01:0, nh-length: 32, no SNPA
+	      4:5::/64
