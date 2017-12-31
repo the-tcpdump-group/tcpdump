@@ -46,14 +46,14 @@ static const char tstr[] = "[|MOBILITY]";
 
 /* Mobility header */
 struct ip6_mobility {
-	uint8_t ip6m_pproto;	/* following payload protocol (for PG) */
-	uint8_t ip6m_len;	/* length in units of 8 octets */
-	uint8_t ip6m_type;	/* message type */
-	uint8_t reserved;	/* reserved */
-	uint16_t ip6m_cksum;	/* sum of IPv6 pseudo-header and MH */
+	nd_uint8_t ip6m_pproto;	/* following payload protocol (for PG) */
+	nd_uint8_t ip6m_len;	/* length in units of 8 octets */
+	nd_uint8_t ip6m_type;	/* message type */
+	nd_uint8_t reserved;	/* reserved */
+	nd_uint16_t ip6m_cksum;	/* sum of IPv6 pseudo-header and MH */
 	union {
-		uint16_t	ip6m_un_data16[1]; /* type-specific field */
-		uint8_t		ip6m_un_data8[2];  /* type-specific field */
+		nd_uint16_t	ip6m_un_data16[1]; /* type-specific field */
+		nd_uint8_t	ip6m_un_data8[2];  /* type-specific field */
 	} ip6m_dataun;
 };
 
@@ -228,12 +228,12 @@ mobility_print(netdissect_options *ndo,
 		mhlen = ep - bp;
 		goto trunc;
 	}
-	mhlen = (mh->ip6m_len + 1) << 3;
+	mhlen = (EXTRACT_U_1(mh->ip6m_len) + 1) << 3;
 
 	/* XXX ip6m_cksum */
 
-	ND_TCHECK(mh->ip6m_type);
-	type = mh->ip6m_type;
+	ND_TCHECK_1(mh->ip6m_type);
+	type = EXTRACT_U_1(mh->ip6m_type);
 	if (type <= IP6M_MAX && mhlen < ip6m_hdrlen[type]) {
 		ND_PRINT((ndo, "(header length %u is too small for type %u)", mhlen, type));
 		goto trunc;
@@ -257,8 +257,8 @@ mobility_print(netdissect_options *ndo,
 		break;
 	case IP6M_HOME_TEST:
 	case IP6M_CAREOF_TEST:
-		ND_TCHECK(mh->ip6m_data16[0]);
-		ND_PRINT((ndo, " nonce id=0x%x", EXTRACT_BE_U_2(&mh->ip6m_data16[0])));
+		ND_TCHECK_2(mh->ip6m_data16[0]);
+		ND_PRINT((ndo, " nonce id=0x%x", EXTRACT_BE_U_2(mh->ip6m_data16[0])));
 		hlen = IP6M_MINLEN;
 		if (ndo->ndo_vflag) {
 			ND_TCHECK_4(bp + hlen + 4);
@@ -278,8 +278,8 @@ mobility_print(netdissect_options *ndo,
 		hlen += 8;
 		break;
 	case IP6M_BINDING_UPDATE:
-		ND_TCHECK(mh->ip6m_data16[0]);
-		ND_PRINT((ndo, " seq#=%u", EXTRACT_BE_U_2(&mh->ip6m_data16[0])));
+		ND_TCHECK_2(mh->ip6m_data16[0]);
+		ND_PRINT((ndo, " seq#=%u", EXTRACT_BE_U_2(mh->ip6m_data16[0])));
 		hlen = IP6M_MINLEN;
 		ND_TCHECK_2(bp + hlen);
 		if (EXTRACT_U_1(bp + hlen) & 0xf0) {
@@ -303,10 +303,10 @@ mobility_print(netdissect_options *ndo,
 		hlen += 2;
 		break;
 	case IP6M_BINDING_ACK:
-		ND_TCHECK(mh->ip6m_data8[0]);
-		ND_PRINT((ndo, " status=%u", mh->ip6m_data8[0]));
-		ND_TCHECK(mh->ip6m_data8[1]);
-		if (mh->ip6m_data8[1] & 0x80)
+		ND_TCHECK_1(mh->ip6m_data8[0]);
+		ND_PRINT((ndo, " status=%u", EXTRACT_U_1(mh->ip6m_data8[0])));
+		ND_TCHECK_1(mh->ip6m_data8[1]);
+		if (EXTRACT_U_1(mh->ip6m_data8[1]) & 0x80)
 			ND_PRINT((ndo, " K"));
 		/* Reserved (7bits) */
 		hlen = IP6M_MINLEN;
@@ -319,8 +319,8 @@ mobility_print(netdissect_options *ndo,
 		hlen += 2;
 		break;
 	case IP6M_BINDING_ERROR:
-		ND_TCHECK(mh->ip6m_data8[0]);
-		ND_PRINT((ndo, " status=%u", mh->ip6m_data8[0]));
+		ND_TCHECK_1(mh->ip6m_data8[0]);
+		ND_PRINT((ndo, " status=%u", EXTRACT_U_1(mh->ip6m_data8[0])));
 		/* Reserved */
 		hlen = IP6M_MINLEN;
 		ND_TCHECK_16(bp + hlen);
@@ -328,7 +328,7 @@ mobility_print(netdissect_options *ndo,
 		hlen += 16;
 		break;
 	default:
-		ND_PRINT((ndo, " len=%u", mh->ip6m_len));
+		ND_PRINT((ndo, " len=%u", EXTRACT_U_1(mh->ip6m_len)));
 		return(mhlen);
 		break;
 	}
