@@ -150,7 +150,7 @@ pgm_print(netdissect_options *ndo,
 	const struct pgm_header *pgm;
 	const struct ip *ip;
 	char ch;
-	uint8_t pgm_type;
+	uint8_t pgm_type_val;
 	uint16_t sport, dport;
 	u_int nla_afnum;
 	char nla_buf[INET6_ADDRSTRLEN];
@@ -212,7 +212,7 @@ pgm_print(netdissect_options *ndo,
         if (!ndo->ndo_vflag)
             return;
 
-	pgm_type = EXTRACT_U_1(pgm->pgm_type);
+	pgm_type_val = EXTRACT_U_1(pgm->pgm_type);
 	ND_PRINT((ndo, " 0x%02x%02x%02x%02x%02x%02x ",
 		     pgm->pgm_gsid[0],
                      pgm->pgm_gsid[1],
@@ -220,7 +220,7 @@ pgm_print(netdissect_options *ndo,
 		     pgm->pgm_gsid[3],
                      pgm->pgm_gsid[4],
                      pgm->pgm_gsid[5]));
-	switch (pgm_type) {
+	switch (pgm_type_val) {
 	case PGM_SPM: {
 	    const struct pgm_spm *spm;
 
@@ -383,7 +383,7 @@ pgm_print(netdissect_options *ndo,
 	    /*
 	     * Options decoding can go here.
 	     */
-	    switch (pgm_type) {
+	    switch (pgm_type_val) {
 		case PGM_NAK:
 		    ND_PRINT((ndo, "NAK "));
 		    break;
@@ -417,7 +417,7 @@ pgm_print(netdissect_options *ndo,
 	    break;
 
 	default:
-	    ND_PRINT((ndo, "UNKNOWN type 0x%02x", pgm_type));
+	    ND_PRINT((ndo, "UNKNOWN type 0x%02x", pgm_type_val));
 	    break;
 
 	}
@@ -832,7 +832,7 @@ pgm_print(netdissect_options *ndo,
 
 	ND_PRINT((ndo, " [%u]", length));
 	if (ndo->ndo_packettype == PT_PGM_ZMTP1 &&
-	    (pgm_type == PGM_ODATA || pgm_type == PGM_RDATA))
+	    (pgm_type_val == PGM_ODATA || pgm_type_val == PGM_RDATA))
 		zmtp1_datagram_print(ndo, bp,
 				     EXTRACT_BE_U_2(pgm->pgm_length));
 
