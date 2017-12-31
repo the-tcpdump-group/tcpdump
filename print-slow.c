@@ -176,8 +176,8 @@ static const struct tok slow_oam_loopbackctrl_cmd_values[] = {
 };
 
 struct tlv_header_t {
-    uint8_t type;
-    uint8_t length;
+    nd_uint8_t type;
+    nd_uint8_t length;
 };
 
 #define LACP_MARKER_TLV_TERMINATOR     0x00  /* same code for LACP and Marker */
@@ -206,7 +206,7 @@ struct lacp_tlv_actor_partner_info_t {
     nd_uint16_t port_pri;
     nd_uint16_t port;
     nd_uint8_t state;
-    uint8_t pad[3];
+    nd_byte    pad[3];
 };
 
 static const struct tok lacp_tlv_actor_partner_info_state_values[] = {
@@ -223,18 +223,18 @@ static const struct tok lacp_tlv_actor_partner_info_state_values[] = {
 
 struct lacp_tlv_collector_info_t {
     nd_uint16_t max_delay;
-    uint8_t pad[12];
+    nd_byte     pad[12];
 };
 
 struct marker_tlv_marker_info_t {
     nd_uint16_t req_port;
     nd_mac_addr req_sys;
     nd_uint32_t req_trans_id;
-    uint8_t pad[2];
+    nd_byte     pad[2];
 };
 
 struct lacp_marker_tlv_terminator_t {
-    uint8_t pad[50];
+    nd_byte     pad[50];
 };
 
 static void slow_marker_lacp_print(netdissect_options *, const u_char *, u_int, u_int);
@@ -351,7 +351,7 @@ slow_marker_lacp_print(netdissect_options *ndo,
 {
     const struct tlv_header_t *tlv_header;
     const u_char *tlv_tptr;
-    u_int tlv_len, tlv_tlen;
+    u_int tlv_type, tlv_len, tlv_tlen;
 
     union {
         const struct lacp_marker_tlv_terminator_t *lacp_marker_tlv_terminator;
@@ -367,16 +367,17 @@ slow_marker_lacp_print(netdissect_options *ndo,
         /* did we capture enough for fully decoding the tlv header ? */
         ND_TCHECK_LEN(tptr, sizeof(struct tlv_header_t));
         tlv_header = (const struct tlv_header_t *)tptr;
-        tlv_len = tlv_header->length;
+        tlv_type = EXTRACT_U_1(tlv_header->type);
+        tlv_len = EXTRACT_U_1(tlv_header->length);
 
         ND_PRINT((ndo, "\n\t%s TLV (0x%02x), length %u",
                tok2str(slow_tlv_values,
                        "Unknown",
-                       (proto_subtype << 8) + tlv_header->type),
-               tlv_header->type,
+                       (proto_subtype << 8) + tlv_type),
+               tlv_type,
                tlv_len));
 
-        if (tlv_header->type == LACP_MARKER_TLV_TERMINATOR) {
+        if (tlv_type == LACP_MARKER_TLV_TERMINATOR) {
             /*
              * This TLV has a length of zero, and means there are no
              * more TLVs to process.
@@ -400,7 +401,7 @@ slow_marker_lacp_print(netdissect_options *ndo,
         tlv_tptr=tptr+sizeof(struct tlv_header_t);
         tlv_tlen=tlv_len-sizeof(struct tlv_header_t);
 
-        switch((proto_subtype << 8) + tlv_header->type) {
+        switch((proto_subtype << 8) + tlv_type) {
 
             /* those two TLVs have the same structure -> fall through */
         case ((SLOW_PROTO_LACP << 8) + LACP_TLV_ACTOR_INFO):
