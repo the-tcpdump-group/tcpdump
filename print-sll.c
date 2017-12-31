@@ -77,11 +77,11 @@
 #define SLL_ADDRLEN	8		/* length of address field */
 
 struct sll_header {
-	uint16_t	sll_pkttype;	/* packet type */
-	uint16_t	sll_hatype;	/* link-layer address type */
-	uint16_t	sll_halen;	/* link-layer address length */
-	uint8_t		sll_addr[SLL_ADDRLEN];	/* link-layer address */
-	uint16_t	sll_protocol;	/* protocol */
+	nd_uint16_t	sll_pkttype;	/* packet type */
+	nd_uint16_t	sll_hatype;	/* link-layer address type */
+	nd_uint16_t	sll_halen;	/* link-layer address length */
+	nd_byte		sll_addr[SLL_ADDRLEN];	/* link-layer address */
+	nd_uint16_t	sll_protocol;	/* protocol */
 };
 
 /*
@@ -134,18 +134,18 @@ sll_print(netdissect_options *ndo, const struct sll_header *sllp, u_int length)
 {
 	u_short ether_type;
 
-        ND_PRINT((ndo, "%3s ",tok2str(sll_pkttype_values,"?",EXTRACT_BE_U_2(&sllp->sll_pkttype))));
+        ND_PRINT((ndo, "%3s ",tok2str(sll_pkttype_values,"?",EXTRACT_BE_U_2(sllp->sll_pkttype))));
 
 	/*
 	 * XXX - check the link-layer address type value?
 	 * For now, we just assume 6 means Ethernet.
 	 * XXX - print others as strings of hex?
 	 */
-	if (EXTRACT_BE_U_2(&sllp->sll_halen) == 6)
+	if (EXTRACT_BE_U_2(sllp->sll_halen) == 6)
 		ND_PRINT((ndo, "%s ", etheraddr_string(ndo, sllp->sll_addr)));
 
 	if (!ndo->ndo_qflag) {
-		ether_type = EXTRACT_BE_U_2(&sllp->sll_protocol);
+		ether_type = EXTRACT_BE_U_2(sllp->sll_protocol);
 
 		if (ether_type <= MAX_ETHERNET_LENGTH_VAL) {
 			/*
@@ -223,7 +223,7 @@ sll_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 	p += SLL_HDR_LEN;
 	hdrlen = SLL_HDR_LEN;
 
-	ether_type = EXTRACT_BE_U_2(&sllp->sll_protocol);
+	ether_type = EXTRACT_BE_U_2(sllp->sll_protocol);
 
 recurse:
 	/*
