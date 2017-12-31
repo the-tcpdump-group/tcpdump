@@ -35,29 +35,29 @@
  * PGM header (RFC 3208)
  */
 struct pgm_header {
-    uint16_t	pgm_sport;
-    uint16_t	pgm_dport;
-    uint8_t	pgm_type;
-    uint8_t	pgm_options;
-    uint16_t	pgm_sum;
-    uint8_t	pgm_gsid[6];
-    uint16_t	pgm_length;
+    nd_uint16_t	pgm_sport;
+    nd_uint16_t	pgm_dport;
+    nd_uint8_t	pgm_type;
+    nd_uint8_t	pgm_options;
+    nd_uint16_t	pgm_sum;
+    nd_byte	pgm_gsid[6];
+    nd_uint16_t	pgm_length;
 };
 
 struct pgm_spm {
-    uint32_t	pgms_seq;
-    uint32_t	pgms_trailseq;
-    uint32_t	pgms_leadseq;
-    uint16_t	pgms_nla_afi;
-    uint16_t	pgms_reserved;
+    nd_uint32_t	pgms_seq;
+    nd_uint32_t	pgms_trailseq;
+    nd_uint32_t	pgms_leadseq;
+    nd_uint16_t	pgms_nla_afi;
+    nd_uint16_t	pgms_reserved;
     /* ... uint8_t	pgms_nla[0]; */
     /* ... options */
 };
 
 struct pgm_nak {
-    uint32_t	pgmn_seq;
-    uint16_t	pgmn_source_afi;
-    uint16_t	pgmn_reserved;
+    nd_uint32_t	pgmn_seq;
+    nd_uint16_t	pgmn_source_afi;
+    nd_uint16_t	pgmn_reserved;
     /* ... uint8_t	pgmn_source[0]; */
     /* ... uint16_t	pgmn_group_afi */
     /* ... uint16_t	pgmn_reserved2; */
@@ -66,31 +66,31 @@ struct pgm_nak {
 };
 
 struct pgm_ack {
-    uint32_t	pgma_rx_max_seq;
-    uint32_t	pgma_bitmap;
+    nd_uint32_t	pgma_rx_max_seq;
+    nd_uint32_t	pgma_bitmap;
     /* ... options */
 };
 
 struct pgm_poll {
-    uint32_t	pgmp_seq;
-    uint16_t	pgmp_round;
-    uint16_t	pgmp_reserved;
+    nd_uint32_t	pgmp_seq;
+    nd_uint16_t	pgmp_round;
+    nd_uint16_t	pgmp_reserved;
     /* ... options */
 };
 
 struct pgm_polr {
-    uint32_t	pgmp_seq;
-    uint16_t	pgmp_round;
-    uint16_t	pgmp_subtype;
-    uint16_t	pgmp_nla_afi;
-    uint16_t	pgmp_reserved;
+    nd_uint32_t	pgmp_seq;
+    nd_uint16_t	pgmp_round;
+    nd_uint16_t	pgmp_subtype;
+    nd_uint16_t	pgmp_nla_afi;
+    nd_uint16_t	pgmp_reserved;
     /* ... uint8_t	pgmp_nla[0]; */
     /* ... options */
 };
 
 struct pgm_data {
-    uint32_t	pgmd_seq;
-    uint32_t	pgmd_trailseq;
+    nd_uint32_t	pgmd_seq;
+    nd_uint32_t	pgmd_trailseq;
     /* ... options */
 };
 
@@ -150,6 +150,7 @@ pgm_print(netdissect_options *ndo,
 	const struct pgm_header *pgm;
 	const struct ip *ip;
 	char ch;
+	uint8_t pgm_type;
 	uint16_t sport, dport;
 	u_int nla_afnum;
 	char nla_buf[INET6_ADDRSTRLEN];
@@ -164,7 +165,7 @@ pgm_print(netdissect_options *ndo,
 	else
 		ip6 = NULL;
 	ch = '\0';
-	if (!ND_TTEST(pgm->pgm_dport)) {
+	if (!ND_TTEST_2(pgm->pgm_dport)) {
 		if (ip6) {
 			ND_PRINT((ndo, "%s > %s: [|pgm]",
 				ip6addr_string(ndo, &ip6->ip6_src),
@@ -177,8 +178,8 @@ pgm_print(netdissect_options *ndo,
 		return;
 	}
 
-	sport = EXTRACT_BE_U_2(&pgm->pgm_sport);
-	dport = EXTRACT_BE_U_2(&pgm->pgm_dport);
+	sport = EXTRACT_BE_U_2(pgm->pgm_sport);
+	dport = EXTRACT_BE_U_2(pgm->pgm_dport);
 
 	if (ip6) {
 		if (EXTRACT_U_1(ip6->ip6_nxt) == IPPROTO_PGM) {
@@ -206,11 +207,12 @@ pgm_print(netdissect_options *ndo,
 
 	ND_TCHECK(*pgm);
 
-        ND_PRINT((ndo, "PGM, length %u", EXTRACT_BE_U_2(&pgm->pgm_length)));
+        ND_PRINT((ndo, "PGM, length %u", EXTRACT_BE_U_2(pgm->pgm_length)));
 
         if (!ndo->ndo_vflag)
             return;
 
+	pgm_type = EXTRACT_U_1(pgm->pgm_type);
 	ND_PRINT((ndo, " 0x%02x%02x%02x%02x%02x%02x ",
 		     pgm->pgm_gsid[0],
                      pgm->pgm_gsid[1],
@@ -218,7 +220,7 @@ pgm_print(netdissect_options *ndo,
 		     pgm->pgm_gsid[3],
                      pgm->pgm_gsid[4],
                      pgm->pgm_gsid[5]));
-	switch (pgm->pgm_type) {
+	switch (pgm_type) {
 	case PGM_SPM: {
 	    const struct pgm_spm *spm;
 
@@ -226,7 +228,7 @@ pgm_print(netdissect_options *ndo,
 	    ND_TCHECK(*spm);
 	    bp = (const u_char *) (spm + 1);
 
-	    switch (EXTRACT_BE_U_2(&spm->pgms_nla_afi)) {
+	    switch (EXTRACT_BE_U_2(spm->pgms_nla_afi)) {
 	    case AFNUM_INET:
 		ND_TCHECK_LEN(bp, sizeof(struct in_addr));
 		addrtostr(bp, nla_buf, sizeof(nla_buf));
@@ -243,9 +245,9 @@ pgm_print(netdissect_options *ndo,
 	    }
 
 	    ND_PRINT((ndo, "SPM seq %u trail %u lead %u nla %s",
-			 EXTRACT_BE_U_4(&spm->pgms_seq),
-			 EXTRACT_BE_U_4(&spm->pgms_trailseq),
-			 EXTRACT_BE_U_4(&spm->pgms_leadseq),
+			 EXTRACT_BE_U_4(spm->pgms_seq),
+			 EXTRACT_BE_U_4(spm->pgms_trailseq),
+			 EXTRACT_BE_U_4(spm->pgms_leadseq),
 			 nla_buf));
 	    break;
 	}
@@ -256,8 +258,8 @@ pgm_print(netdissect_options *ndo,
 	    poll_msg = (const struct pgm_poll *)(pgm + 1);
 	    ND_TCHECK(*poll_msg);
 	    ND_PRINT((ndo, "POLL seq %u round %u",
-			 EXTRACT_BE_U_4(&poll_msg->pgmp_seq),
-			 EXTRACT_BE_U_2(&poll_msg->pgmp_round)));
+			 EXTRACT_BE_U_4(poll_msg->pgmp_seq),
+			 EXTRACT_BE_U_2(poll_msg->pgmp_round)));
 	    bp = (const u_char *) (poll_msg + 1);
 	    break;
 	}
@@ -269,7 +271,7 @@ pgm_print(netdissect_options *ndo,
 	    ND_TCHECK(*polr);
 	    bp = (const u_char *) (polr + 1);
 
-	    switch (EXTRACT_BE_U_2(&polr->pgmp_nla_afi)) {
+	    switch (EXTRACT_BE_U_2(polr->pgmp_nla_afi)) {
 	    case AFNUM_INET:
 		ND_TCHECK_LEN(bp, sizeof(struct in_addr));
 		addrtostr(bp, nla_buf, sizeof(nla_buf));
@@ -298,8 +300,8 @@ pgm_print(netdissect_options *ndo,
 	    bp += sizeof(uint32_t);
 
 	    ND_PRINT((ndo, "POLR seq %u round %u nla %s ivl %u rnd 0x%08x "
-			 "mask 0x%08x", EXTRACT_BE_U_4(&polr->pgmp_seq),
-			 EXTRACT_BE_U_2(&polr->pgmp_round), nla_buf, ivl, rnd, mask));
+			 "mask 0x%08x", EXTRACT_BE_U_4(polr->pgmp_seq),
+			 EXTRACT_BE_U_2(polr->pgmp_round), nla_buf, ivl, rnd, mask));
 	    break;
 	}
 	case PGM_ODATA: {
@@ -308,8 +310,8 @@ pgm_print(netdissect_options *ndo,
 	    odata = (const struct pgm_data *)(pgm + 1);
 	    ND_TCHECK(*odata);
 	    ND_PRINT((ndo, "ODATA trail %u seq %u",
-			 EXTRACT_BE_U_4(&odata->pgmd_trailseq),
-			 EXTRACT_BE_U_4(&odata->pgmd_seq)));
+			 EXTRACT_BE_U_4(odata->pgmd_trailseq),
+			 EXTRACT_BE_U_4(odata->pgmd_seq)));
 	    bp = (const u_char *) (odata + 1);
 	    break;
 	}
@@ -320,8 +322,8 @@ pgm_print(netdissect_options *ndo,
 	    rdata = (const struct pgm_data *)(pgm + 1);
 	    ND_TCHECK(*rdata);
 	    ND_PRINT((ndo, "RDATA trail %u seq %u",
-			 EXTRACT_BE_U_4(&rdata->pgmd_trailseq),
-			 EXTRACT_BE_U_4(&rdata->pgmd_seq)));
+			 EXTRACT_BE_U_4(rdata->pgmd_trailseq),
+			 EXTRACT_BE_U_4(rdata->pgmd_seq)));
 	    bp = (const u_char *) (rdata + 1);
 	    break;
 	}
@@ -340,7 +342,7 @@ pgm_print(netdissect_options *ndo,
 	     * Skip past the source, saving info along the way
 	     * and stopping if we don't have enough.
 	     */
-	    switch (EXTRACT_BE_U_2(&nak->pgmn_source_afi)) {
+	    switch (EXTRACT_BE_U_2(nak->pgmn_source_afi)) {
 	    case AFNUM_INET:
 		ND_TCHECK_LEN(bp, sizeof(struct in_addr));
 		addrtostr(bp, source_buf, sizeof(source_buf));
@@ -381,7 +383,7 @@ pgm_print(netdissect_options *ndo,
 	    /*
 	     * Options decoding can go here.
 	     */
-	    switch (pgm->pgm_type) {
+	    switch (pgm_type) {
 		case PGM_NAK:
 		    ND_PRINT((ndo, "NAK "));
 		    break;
@@ -395,7 +397,7 @@ pgm_print(netdissect_options *ndo,
                     break;
 	    }
 	    ND_PRINT((ndo, "(%s -> %s), seq %u",
-			 source_buf, group_buf, EXTRACT_BE_U_4(&nak->pgmn_seq)));
+			 source_buf, group_buf, EXTRACT_BE_U_4(nak->pgmn_seq)));
 	    break;
 	}
 
@@ -405,7 +407,7 @@ pgm_print(netdissect_options *ndo,
 	    ack = (const struct pgm_ack *)(pgm + 1);
 	    ND_TCHECK(*ack);
 	    ND_PRINT((ndo, "ACK seq %u",
-			 EXTRACT_BE_U_4(&ack->pgma_rx_max_seq)));
+			 EXTRACT_BE_U_4(ack->pgma_rx_max_seq)));
 	    bp = (const u_char *) (ack + 1);
 	    break;
 	}
@@ -415,11 +417,11 @@ pgm_print(netdissect_options *ndo,
 	    break;
 
 	default:
-	    ND_PRINT((ndo, "UNKNOWN type 0x%02x", pgm->pgm_type));
+	    ND_PRINT((ndo, "UNKNOWN type 0x%02x", pgm_type));
 	    break;
 
 	}
-	if (pgm->pgm_options & PGM_OPT_BIT_PRESENT) {
+	if (EXTRACT_U_1(pgm->pgm_options) & PGM_OPT_BIT_PRESENT) {
 
 	    /*
 	     * make sure there's enough for the first option header
@@ -451,7 +453,7 @@ pgm_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "[Bad total option length %u < 4]", opts_len));
 		return;
 	    }
-	    ND_PRINT((ndo, " OPTS LEN %d", opts_len));
+	    ND_PRINT((ndo, " OPTS LEN %u", opts_len));
 	    opts_len -= 4;
 
 	    while (opts_len) {
@@ -489,7 +491,7 @@ pgm_print(netdissect_options *ndo,
 			    opt_len, PGM_OPT_LENGTH_LEN));
 			return;
 		    }
-		    ND_PRINT((ndo, " OPTS LEN (extra?) %d", EXTRACT_BE_U_2(bp)));
+		    ND_PRINT((ndo, " OPTS LEN (extra?) %u", EXTRACT_BE_U_2(bp)));
 		    bp += 2;
 		    opts_len -= PGM_OPT_LENGTH_LEN;
 		    break;
@@ -671,7 +673,7 @@ pgm_print(netdissect_options *ndo,
 		    break;
 
 		case PGM_OPT_PATH_NLA:
-		    ND_PRINT((ndo, " PATH_NLA [%d]", opt_len));
+		    ND_PRINT((ndo, " PATH_NLA [%u]", opt_len));
 		    bp += opt_len;
 		    opts_len -= opt_len;
 		    break;
@@ -817,7 +819,7 @@ pgm_print(netdissect_options *ndo,
 		    break;
 
 		default:
-		    ND_PRINT((ndo, " OPT_%02X [%d] ", opt_type, opt_len));
+		    ND_PRINT((ndo, " OPT_%02X [%u] ", opt_type, opt_len));
 		    bp += opt_len;
 		    opts_len -= opt_len;
 		    break;
@@ -830,9 +832,9 @@ pgm_print(netdissect_options *ndo,
 
 	ND_PRINT((ndo, " [%u]", length));
 	if (ndo->ndo_packettype == PT_PGM_ZMTP1 &&
-	    (pgm->pgm_type == PGM_ODATA || pgm->pgm_type == PGM_RDATA))
+	    (pgm_type == PGM_ODATA || pgm_type == PGM_RDATA))
 		zmtp1_datagram_print(ndo, bp,
-				     EXTRACT_BE_U_2(&pgm->pgm_length));
+				     EXTRACT_BE_U_2(pgm->pgm_length));
 
 	return;
 
