@@ -50,18 +50,18 @@ static const char tstr[] = "[|wb]";
 #define DOP_ROUNDUP(x)	((((int)(x)) + (DOP_ALIGN - 1)) & ~(DOP_ALIGN - 1))
 #define DOP_NEXT(d)\
 	((const struct dophdr *)((const u_char *)(d) + \
-				DOP_ROUNDUP(EXTRACT_BE_U_2(&(d)->dh_len) + sizeof(*(d)))))
+				DOP_ROUNDUP(EXTRACT_BE_U_2((d)->dh_len) + sizeof(*(d)))))
 
 /*
  * Format of the whiteboard packet header.
  * The transport level header.
  */
 struct pkt_hdr {
-	uint32_t ph_src;		/* site id of source */
-	uint32_t ph_ts;		/* time stamp (for skew computation) */
-	uint16_t ph_version;	/* version number */
-	u_char ph_type;		/* message type */
-	u_char ph_flags;	/* message flags */
+	nd_uint32_t ph_src;	/* site id of source */
+	nd_uint32_t ph_ts;	/* time stamp (for skew computation) */
+	nd_uint16_t ph_version;	/* version number */
+	nd_uint8_t ph_type;	/* message type */
+	nd_uint8_t ph_flags;	/* message flags */
 };
 
 /* Packet types */
@@ -82,15 +82,15 @@ struct pkt_hdr {
 #define PF_VIS		0x02	/* only visible ops wanted */
 
 struct PageID {
-	uint32_t p_sid;		/* session id of initiator */
-	uint32_t p_uid;		/* page number */
+	nd_uint32_t p_sid;		/* session id of initiator */
+	nd_uint32_t p_uid;		/* page number */
 };
 
 struct dophdr {
-	uint32_t  dh_ts;		/* sender's timestamp */
-	uint16_t	dh_len;		/* body length */
-	u_char	dh_flags;
-	u_char	dh_type;	/* body type */
+	nd_uint32_t	dh_ts;		/* sender's timestamp */
+	nd_uint16_t	dh_len;		/* body length */
+	nd_uint8_t	dh_flags;
+	nd_uint8_t	dh_type;	/* body type */
 	/* body follows */
 };
 /*
@@ -117,8 +117,8 @@ struct dophdr {
  */
 struct pkt_dop {
 	struct PageID pd_page;	/* page that operations apply to */
-	uint32_t	pd_sseq;	/* start sequence number */
-	uint32_t	pd_eseq;	/* end sequence number */
+	nd_uint32_t	pd_sseq;	/* start sequence number */
+	nd_uint32_t	pd_eseq;	/* end sequence number */
 	/* drawing ops follow */
 };
 
@@ -126,31 +126,31 @@ struct pkt_dop {
  * A repair request.
  */
 struct pkt_rreq {
-        uint32_t pr_id;           /* source id of drawops to be repaired */
-        struct PageID pr_page;           /* page of drawops */
-        uint32_t pr_sseq;         /* start seqno */
-        uint32_t pr_eseq;         /* end seqno */
+        nd_uint32_t pr_id;        /* source id of drawops to be repaired */
+        struct PageID pr_page;    /* page of drawops */
+        nd_uint32_t pr_sseq;      /* start seqno */
+        nd_uint32_t pr_eseq;      /* end seqno */
 };
 
 /*
  * A repair reply.
  */
 struct pkt_rrep {
-	uint32_t pr_id;	/* original site id of ops  */
+	nd_uint32_t pr_id;	/* original site id of ops  */
 	struct pkt_dop pr_dop;
 	/* drawing ops follow */
 };
 
 struct id_off {
-        uint32_t id;
-        uint32_t off;
+        nd_uint32_t id;
+        nd_uint32_t off;
 };
 
 struct pgstate {
-	uint32_t slot;
+	nd_uint32_t slot;
 	struct PageID page;
-	uint16_t nid;
-	uint16_t rsvd;
+	nd_uint16_t nid;
+	nd_uint16_t rsvd;
         /* seqptr's */
 };
 
@@ -158,7 +158,7 @@ struct pgstate {
  * An announcement packet.
  */
 struct pkt_id {
-	uint32_t pi_mslot;
+	nd_uint32_t pi_mslot;
         struct PageID    pi_mpage;        /* current page */
 	struct pgstate pi_ps;
         /* seqptr's */
@@ -167,12 +167,12 @@ struct pkt_id {
 
 struct pkt_preq {
         struct PageID  pp_page;
-        uint32_t  pp_low;
-        uint32_t  pp_high;
+        nd_uint32_t  pp_low;
+        nd_uint32_t  pp_high;
 };
 
 struct pkt_prep {
-        uint32_t  pp_n;           /* size of pageid array */
+        nd_uint32_t  pp_n;           /* size of pageid array */
         /* pgstate's follow */
 };
 
@@ -180,11 +180,11 @@ static int
 wb_id(netdissect_options *ndo,
       const struct pkt_id *id, u_int len)
 {
-	int i;
+	u_int i;
 	const char *cp;
 	const struct id_off *io;
 	char c;
-	int nid;
+	u_int nid;
 
 	ND_PRINT((ndo, " wb-id:"));
 	if (len < sizeof(*id) || !ND_TTEST(*id))
@@ -192,14 +192,14 @@ wb_id(netdissect_options *ndo,
 	len -= sizeof(*id);
 
 	ND_PRINT((ndo, " %u/%s:%u (max %u/%s:%u) ",
-	       EXTRACT_BE_U_4(&id->pi_ps.slot),
+	       EXTRACT_BE_U_4(id->pi_ps.slot),
 	       ipaddr_string(ndo, &id->pi_ps.page.p_sid),
-	       EXTRACT_BE_U_4(&id->pi_ps.page.p_uid),
-	       EXTRACT_BE_U_4(&id->pi_mslot),
+	       EXTRACT_BE_U_4(id->pi_ps.page.p_uid),
+	       EXTRACT_BE_U_4(id->pi_mslot),
 	       ipaddr_string(ndo, &id->pi_mpage.p_sid),
-	       EXTRACT_BE_U_4(&id->pi_mpage.p_uid)));
+	       EXTRACT_BE_U_4(id->pi_mpage.p_uid)));
 
-	nid = EXTRACT_BE_U_2(&id->pi_ps.nid);
+	nid = EXTRACT_BE_U_2(id->pi_ps.nid);
 	len -= sizeof(*io) * nid;
 	io = (const struct id_off *)(id + 1);
 	cp = (const char *)(io + nid);
@@ -212,7 +212,7 @@ wb_id(netdissect_options *ndo,
 	c = '<';
 	for (i = 0; i < nid && ND_TTEST(*io); ++io, ++i) {
 		ND_PRINT((ndo, "%c%s:%u",
-		    c, ipaddr_string(ndo, &io->id), EXTRACT_BE_U_4(&io->off)));
+		    c, ipaddr_string(ndo, &io->id), EXTRACT_BE_U_4(io->off)));
 		c = ',';
 	}
 	if (i >= nid) {
@@ -233,9 +233,9 @@ wb_rreq(netdissect_options *ndo,
 	ND_PRINT((ndo, " please repair %s %s:%u<%u:%u>",
 	       ipaddr_string(ndo, &rreq->pr_id),
 	       ipaddr_string(ndo, &rreq->pr_page.p_sid),
-	       EXTRACT_BE_U_4(&rreq->pr_page.p_uid),
-	       EXTRACT_BE_U_4(&rreq->pr_sseq),
-	       EXTRACT_BE_U_4(&rreq->pr_eseq)));
+	       EXTRACT_BE_U_4(rreq->pr_page.p_uid),
+	       EXTRACT_BE_U_4(rreq->pr_sseq),
+	       EXTRACT_BE_U_4(rreq->pr_eseq)));
 	return (0);
 }
 
@@ -248,9 +248,9 @@ wb_preq(netdissect_options *ndo,
 		return (-1);
 
 	ND_PRINT((ndo, " need %u/%s:%u",
-	       EXTRACT_BE_U_4(&preq->pp_low),
+	       EXTRACT_BE_U_4(preq->pp_low),
 	       ipaddr_string(ndo, &preq->pp_page.p_sid),
-	       EXTRACT_BE_U_4(&preq->pp_page.p_uid)));
+	       EXTRACT_BE_U_4(preq->pp_page.p_uid)));
 	return (0);
 }
 
@@ -258,31 +258,32 @@ static int
 wb_prep(netdissect_options *ndo,
         const struct pkt_prep *prep, u_int len)
 {
-	int n;
+	u_int n;
 	const struct pgstate *ps;
 	const u_char *ep = ndo->ndo_snapend;
 
 	ND_PRINT((ndo, " wb-prep:"));
 	if (len < sizeof(*prep) || !ND_TTEST(*prep))
 		return (-1);
-	n = EXTRACT_BE_U_4(&prep->pp_n);
+	n = EXTRACT_BE_U_4(prep->pp_n);
 	ps = (const struct pgstate *)(prep + 1);
-	while (--n >= 0 && ND_TTEST(*ps)) {
+	while (n != 0 && ND_TTEST(*ps)) {
 		const struct id_off *io, *ie;
 		char c = '<';
 
 		ND_PRINT((ndo, " %u/%s:%u",
-		    EXTRACT_BE_U_4(&ps->slot),
+		    EXTRACT_BE_U_4(ps->slot),
 		    ipaddr_string(ndo, &ps->page.p_sid),
-		    EXTRACT_BE_U_4(&ps->page.p_uid)));
+		    EXTRACT_BE_U_4(ps->page.p_uid)));
 		io = (const struct id_off *)(ps + 1);
-		for (ie = io + ps->nid; io < ie && ND_TTEST(*io); ++io) {
+		for (ie = io + EXTRACT_U_1(ps->nid); io < ie && ND_TTEST(*io); ++io) {
 			ND_PRINT((ndo, "%c%s:%u", c, ipaddr_string(ndo, &io->id),
-			    EXTRACT_BE_U_4(&io->off)));
+			    EXTRACT_BE_U_4(io->off)));
 			c = ',';
 		}
 		ND_PRINT((ndo, ">"));
 		ps = (const struct pgstate *)io;
+		n--;
 	}
 	return ((const u_char *)ps <= ep? 0 : -1);
 }
@@ -315,21 +316,21 @@ wb_dops(netdissect_options *ndo, const struct pkt_dop *dop,
 
 	ND_PRINT((ndo, " <"));
 	for ( ; ss <= es; ++ss) {
-		int t;
+		u_int t;
 
 		if (!ND_TTEST(*dh)) {
 			ND_PRINT((ndo, "%s", tstr));
 			break;
 		}
-		t = dh->dh_type;
+		t = EXTRACT_U_1(dh->dh_type);
 
 		if (t > DT_MAXTYPE)
-			ND_PRINT((ndo, " dop-%d!", t));
+			ND_PRINT((ndo, " dop-%u!", t));
 		else {
 			ND_PRINT((ndo, " %s", dopstr[t]));
 			if (t == DT_SKIP || t == DT_HOLE) {
-				uint32_t ts = EXTRACT_BE_U_4(&dh->dh_ts);
-				ND_PRINT((ndo, "%d", ts - ss + 1));
+				uint32_t ts = EXTRACT_BE_U_4(dh->dh_ts);
+				ND_PRINT((ndo, "%u", ts - ss + 1));
 				if (ss > ts || ts > es) {
 					ND_PRINT((ndo, "[|]"));
 					if (ts < ss)
@@ -358,14 +359,14 @@ wb_rrep(netdissect_options *ndo,
 	ND_PRINT((ndo, " for %s %s:%u<%u:%u>",
 	    ipaddr_string(ndo, &rrep->pr_id),
 	    ipaddr_string(ndo, &dop->pd_page.p_sid),
-	    EXTRACT_BE_U_4(&dop->pd_page.p_uid),
-	    EXTRACT_BE_U_4(&dop->pd_sseq),
-	    EXTRACT_BE_U_4(&dop->pd_eseq)));
+	    EXTRACT_BE_U_4(dop->pd_page.p_uid),
+	    EXTRACT_BE_U_4(dop->pd_sseq),
+	    EXTRACT_BE_U_4(dop->pd_eseq)));
 
 	if (ndo->ndo_vflag)
 		return (wb_dops(ndo, dop,
-		    EXTRACT_BE_U_4(&dop->pd_sseq),
-		    EXTRACT_BE_U_4(&dop->pd_eseq)));
+		    EXTRACT_BE_U_4(dop->pd_sseq),
+		    EXTRACT_BE_U_4(dop->pd_eseq)));
 	return (0);
 }
 
@@ -380,14 +381,14 @@ wb_drawop(netdissect_options *ndo,
 
 	ND_PRINT((ndo, " %s:%u<%u:%u>",
 	    ipaddr_string(ndo, &dop->pd_page.p_sid),
-	    EXTRACT_BE_U_4(&dop->pd_page.p_uid),
-	    EXTRACT_BE_U_4(&dop->pd_sseq),
-	    EXTRACT_BE_U_4(&dop->pd_eseq)));
+	    EXTRACT_BE_U_4(dop->pd_page.p_uid),
+	    EXTRACT_BE_U_4(dop->pd_sseq),
+	    EXTRACT_BE_U_4(dop->pd_eseq)));
 
 	if (ndo->ndo_vflag)
 		return (wb_dops(ndo, dop,
-				EXTRACT_BE_U_4(&dop->pd_sseq),
-				EXTRACT_BE_U_4(&dop->pd_eseq)));
+				EXTRACT_BE_U_4(dop->pd_sseq),
+				EXTRACT_BE_U_4(dop->pd_eseq)));
 	return (0);
 }
 
@@ -399,6 +400,7 @@ wb_print(netdissect_options *ndo,
          const void *hdr, u_int len)
 {
 	const struct pkt_hdr *ph;
+	uint8_t type;
 
 	ph = (const struct pkt_hdr *)hdr;
 	if (len < sizeof(*ph) || !ND_TTEST(*ph)) {
@@ -407,9 +409,10 @@ wb_print(netdissect_options *ndo,
 	}
 	len -= sizeof(*ph);
 
-	if (ph->ph_flags)
+	if (EXTRACT_U_1(ph->ph_flags))
 		ND_PRINT((ndo, "*"));
-	switch (ph->ph_type) {
+	type = EXTRACT_U_1(ph->ph_type);
+	switch (type) {
 
 	case PT_KILL:
 		ND_PRINT((ndo, " wb-kill"));
@@ -452,7 +455,7 @@ wb_print(netdissect_options *ndo,
 		break;
 
 	default:
-		ND_PRINT((ndo, " wb-%d!", ph->ph_type));
+		ND_PRINT((ndo, " wb-%u!", type));
 		return;
 	}
 }
