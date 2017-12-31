@@ -26,12 +26,9 @@
 #include "netdissect.h"
 #include "extract.h"
 
-#define MPCP_TIMESTAMP_LEN        4
-#define MPCP_TIMESTAMP_DURATION_LEN 2
-
 struct mpcp_common_header_t {
-    uint8_t opcode[2];
-    uint8_t timestamp[MPCP_TIMESTAMP_LEN];
+    nd_uint16_t opcode;
+    nd_uint32_t timestamp;
 };
 
 #define	MPCP_OPCODE_PAUSE   0x0001
@@ -63,13 +60,13 @@ static const struct tok mpcp_grant_flag_values[] = {
 };
 
 struct mpcp_grant_t {
-    uint8_t starttime[MPCP_TIMESTAMP_LEN];
-    uint8_t duration[MPCP_TIMESTAMP_DURATION_LEN];
+    nd_uint32_t starttime;
+    nd_uint16_t duration;
 };
 
 struct mpcp_reg_req_t {
-    uint8_t flags;
-    uint8_t pending_grants;
+    nd_uint8_t flags;
+    nd_uint8_t pending_grants;
 };
 
 
@@ -80,10 +77,10 @@ static const struct tok mpcp_reg_req_flag_values[] = {
 };
 
 struct mpcp_reg_t {
-    uint8_t assigned_port[2];
-    uint8_t flags;
-    uint8_t sync_time[MPCP_TIMESTAMP_DURATION_LEN];
-    uint8_t echoed_pending_grants;
+    nd_uint16_t assigned_port;
+    nd_uint8_t  flags;
+    nd_uint16_t sync_time;
+    nd_uint8_t  echoed_pending_grants;
 };
 
 static const struct tok mpcp_reg_flag_values[] = {
@@ -109,9 +106,9 @@ static const struct tok mpcp_report_bitmap_values[] = {
 };
 
 struct mpcp_reg_ack_t {
-    uint8_t flags;
-    uint8_t echoed_assigned_port[2];
-    uint8_t echoed_sync_time[MPCP_TIMESTAMP_DURATION_LEN];
+    nd_uint8_t  flags;
+    nd_uint16_t echoed_assigned_port;
+    nd_uint16_t echoed_sync_time;
 };
 
 static const struct tok mpcp_reg_ack_flag_values[] = {
@@ -177,7 +174,7 @@ mpcp_print(netdissect_options *ndo, const u_char *pptr, u_int length)
             tptr += sizeof(struct mpcp_grant_t);
         }
 
-        ND_TCHECK_LEN(tptr, MPCP_TIMESTAMP_DURATION_LEN);
+        ND_TCHECK_2(tptr);
         ND_PRINT((ndo, "\n\tSync-Time %u ticks", EXTRACT_BE_U_2(tptr)));
         break;
 
@@ -199,11 +196,11 @@ mpcp_print(netdissect_options *ndo, const u_char *pptr, u_int length)
             report=1;
             while (report_bitmap != 0) {
                 if (report_bitmap & 1) {
-                    ND_TCHECK_LEN(tptr, MPCP_TIMESTAMP_DURATION_LEN);
+                    ND_TCHECK_2(tptr);
                     ND_PRINT((ndo, "\n\t    Q%u Report, Duration %u ticks",
                            report,
                            EXTRACT_BE_U_2(tptr)));
-                    tptr+=MPCP_TIMESTAMP_DURATION_LEN;
+                    tptr += 2;
                 }
                 report++;
                 report_bitmap = report_bitmap >> 1;
@@ -215,8 +212,8 @@ mpcp_print(netdissect_options *ndo, const u_char *pptr, u_int length)
         ND_TCHECK_LEN(tptr, sizeof(struct mpcp_reg_req_t));
         mpcp.reg_req = (const struct mpcp_reg_req_t *)tptr;
         ND_PRINT((ndo, "\n\tFlags [ %s ], Pending-Grants %u",
-               bittok2str(mpcp_reg_req_flag_values, "Reserved", mpcp.reg_req->flags),
-               mpcp.reg_req->pending_grants));
+               bittok2str(mpcp_reg_req_flag_values, "Reserved", EXTRACT_U_1(mpcp.reg_req->flags)),
+               EXTRACT_U_1(mpcp.reg_req->pending_grants)));
         break;
 
     case MPCP_OPCODE_REG:
@@ -225,9 +222,9 @@ mpcp_print(netdissect_options *ndo, const u_char *pptr, u_int length)
         ND_PRINT((ndo, "\n\tAssigned-Port %u, Flags [ %s ]" \
                "\n\tSync-Time %u ticks, Echoed-Pending-Grants %u",
                EXTRACT_BE_U_2(mpcp.reg->assigned_port),
-               bittok2str(mpcp_reg_flag_values, "Reserved", mpcp.reg->flags),
+               bittok2str(mpcp_reg_flag_values, "Reserved", EXTRACT_U_1(mpcp.reg->flags)),
                EXTRACT_BE_U_2(mpcp.reg->sync_time),
-               mpcp.reg->echoed_pending_grants));
+               EXTRACT_U_1(mpcp.reg->echoed_pending_grants)));
         break;
 
     case MPCP_OPCODE_REG_ACK:
@@ -236,7 +233,7 @@ mpcp_print(netdissect_options *ndo, const u_char *pptr, u_int length)
         ND_PRINT((ndo, "\n\tEchoed-Assigned-Port %u, Flags [ %s ]" \
                "\n\tEchoed-Sync-Time %u ticks",
                EXTRACT_BE_U_2(mpcp.reg_ack->echoed_assigned_port),
-               bittok2str(mpcp_reg_ack_flag_values, "Reserved", mpcp.reg_ack->flags),
+               bittok2str(mpcp_reg_ack_flag_values, "Reserved", EXTRACT_U_1(mpcp.reg_ack->flags)),
                EXTRACT_BE_U_2(mpcp.reg_ack->echoed_sync_time)));
         break;
 
