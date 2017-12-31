@@ -43,13 +43,13 @@
 #define VTP_JOIN_MESSAGE		0x04
 
 struct vtp_vlan_ {
-    uint8_t  len;
-    uint8_t  status;
-    uint8_t  type;
-    uint8_t  name_len;
-    uint16_t vlanid;
-    uint16_t mtu;
-    uint32_t index;
+    nd_uint8_t  len;
+    nd_uint8_t  status;
+    nd_uint8_t  type;
+    nd_uint8_t  name_len;
+    nd_uint16_t vlanid;
+    nd_uint16_t mtu;
+    nd_uint32_t index;
 };
 
 static const struct tok vtp_message_type_values[] = {
@@ -119,7 +119,7 @@ void
 vtp_print (netdissect_options *ndo,
            const u_char *pptr, u_int length)
 {
-    int type, len, tlv_len, tlv_value, mgmtd_len;
+    u_int type, len, name_len, tlv_len, tlv_value, mgmtd_len;
     const u_char *tptr;
     const struct vtp_vlan_ *vtp_vlan;
 
@@ -146,7 +146,7 @@ vtp_print (netdissect_options *ndo,
     ND_PRINT((ndo, "\n\tDomain name: "));
     mgmtd_len = EXTRACT_U_1(tptr + 3);
     if (mgmtd_len < 1 ||  mgmtd_len > 32) {
-	ND_PRINT((ndo, " [invalid MgmtD Len %d]", mgmtd_len));
+	ND_PRINT((ndo, " [invalid MgmtD Len %u]", mgmtd_len));
 	return;
     }
     fn_printzp(ndo, tptr + 4, mgmtd_len, NULL);
@@ -255,23 +255,24 @@ vtp_print (netdissect_options *ndo,
 		goto trunc;
 	    ND_TCHECK(*vtp_vlan);
 	    ND_PRINT((ndo, "\n\tVLAN info status %s, type %s, VLAN-id %u, MTU %u, SAID 0x%08x, Name ",
-		   tok2str(vtp_vlan_status,"Unknown",vtp_vlan->status),
-		   tok2str(vtp_vlan_type_values,"Unknown",vtp_vlan->type),
-		   EXTRACT_BE_U_2(&vtp_vlan->vlanid),
-		   EXTRACT_BE_U_2(&vtp_vlan->mtu),
-		   EXTRACT_BE_U_4(&vtp_vlan->index)));
+		   tok2str(vtp_vlan_status,"Unknown",EXTRACT_U_1(vtp_vlan->status)),
+		   tok2str(vtp_vlan_type_values,"Unknown",EXTRACT_U_1(vtp_vlan->type)),
+		   EXTRACT_BE_U_2(vtp_vlan->vlanid),
+		   EXTRACT_BE_U_2(vtp_vlan->mtu),
+		   EXTRACT_BE_U_4(vtp_vlan->index)));
 	    len  -= VTP_VLAN_INFO_FIXED_PART_LEN;
 	    tptr += VTP_VLAN_INFO_FIXED_PART_LEN;
-	    if (len < 4*((vtp_vlan->name_len + 3)/4))
+	    name_len = EXTRACT_U_1(vtp_vlan->name_len);
+	    if (len < 4*((name_len + 3)/4))
 		goto trunc;
-	    ND_TCHECK_LEN(tptr, vtp_vlan->name_len);
-	    fn_printzp(ndo, tptr, vtp_vlan->name_len, NULL);
+	    ND_TCHECK_LEN(tptr, name_len);
+	    fn_printzp(ndo, tptr, name_len, NULL);
 
 	    /*
 	     * Vlan names are aligned to 32-bit boundaries.
 	     */
-	    len  -= 4*((vtp_vlan->name_len + 3)/4);
-	    tptr += 4*((vtp_vlan->name_len + 3)/4);
+	    len  -= 4*((name_len + 3)/4);
+	    tptr += 4*((name_len + 3)/4);
 
             /* TLV information follows */
 
