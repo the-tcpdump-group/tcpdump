@@ -98,9 +98,9 @@ pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
 		ND_PRINT((ndo, "rule %u.%s.%u/", rulenr, hdr->ruleset, subrulenr));
 
 	ND_PRINT((ndo, "%s: %s %s on %s: ",
-	    tok2str(pf_reasons, "unkn(%u)", hdr->reason),
-	    tok2str(pf_actions, "unkn(%u)", hdr->action),
-	    tok2str(pf_directions, "unkn(%u)", hdr->dir),
+	    tok2str(pf_reasons, "unkn(%u)", EXTRACT_U_1(&hdr->reason)),
+	    tok2str(pf_actions, "unkn(%u)", EXTRACT_U_1(&hdr->action)),
+	    tok2str(pf_directions, "unkn(%u)", EXTRACT_U_1(&hdr->dir)),
 	    hdr->ifname));
 }
 
@@ -139,7 +139,7 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 		pflog_print(ndo, hdr);
 
 	/* skip to the real packet */
-	af = hdr->af;
+	af = EXTRACT_U_1(&hdr->af);
 	length -= hdrlen;
 	caplen -= hdrlen;
 	p += hdrlen;
