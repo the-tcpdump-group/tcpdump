@@ -28,7 +28,6 @@
 #include "addrtoname.h"
 
 #define VQP_VERSION            		1
-#define VQP_EXTRACT_VERSION(x) ((x)&0xFF)
 
 /*
  * VQP common header
@@ -43,16 +42,16 @@
  */
 
 struct vqp_common_header_t {
-    uint8_t version;
-    uint8_t msg_type;
-    uint8_t error_code;
-    uint8_t nitems;
-    uint8_t sequence[4];
+    nd_uint8_t  version;
+    nd_uint8_t  msg_type;
+    nd_uint8_t  error_code;
+    nd_uint8_t  nitems;
+    nd_uint32_t sequence;
 };
 
 struct vqp_obj_tlv_t {
-    uint8_t obj_type[4];
-    uint8_t obj_length[2];
+    nd_uint32_t obj_type;
+    nd_uint16_t obj_length;
 };
 
 #define VQP_OBJ_REQ_JOIN_PORT  0x01
@@ -103,6 +102,7 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
     const struct vqp_obj_tlv_t *vqp_obj_tlv;
 
     const u_char *tptr;
+    uint8_t version;
     uint16_t vqp_obj_len;
     uint32_t vqp_obj_type;
     u_int tlen;
@@ -114,35 +114,36 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
     ND_TCHECK(*vqp_common_header);
     if (sizeof(struct vqp_common_header_t) > tlen)
         goto trunc;
+    version = EXTRACT_U_1(vqp_common_header->version);
 
     /*
      * Sanity checking of the header.
      */
-    if (VQP_EXTRACT_VERSION(vqp_common_header->version) != VQP_VERSION) {
+    if (version != VQP_VERSION) {
 	ND_PRINT((ndo, "VQP version %u packet not supported",
-               VQP_EXTRACT_VERSION(vqp_common_header->version)));
+               version));
 	return;
     }
 
     /* in non-verbose mode just lets print the basic Message Type */
     if (ndo->ndo_vflag < 1) {
         ND_PRINT((ndo, "VQPv%u %s Message, error-code %s (%u), length %u",
-               VQP_EXTRACT_VERSION(vqp_common_header->version),
-               tok2str(vqp_msg_type_values, "unknown (%u)",vqp_common_header->msg_type),
-               tok2str(vqp_error_code_values, "unknown (%u)",vqp_common_header->error_code),
-	       vqp_common_header->error_code,
+               version,
+               tok2str(vqp_msg_type_values, "unknown (%u)",EXTRACT_U_1(vqp_common_header->msg_type)),
+               tok2str(vqp_error_code_values, "unknown (%u)",EXTRACT_U_1(vqp_common_header->error_code)),
+	       EXTRACT_U_1(vqp_common_header->error_code),
                len));
         return;
     }
 
     /* ok they seem to want to know everything - lets fully decode it */
-    nitems = vqp_common_header->nitems;
+    nitems = EXTRACT_U_1(vqp_common_header->nitems);
     ND_PRINT((ndo, "\n\tVQPv%u, %s Message, error-code %s (%u), seq 0x%08x, items %u, length %u",
-           VQP_EXTRACT_VERSION(vqp_common_header->version),
-	   tok2str(vqp_msg_type_values, "unknown (%u)",vqp_common_header->msg_type),
-	   tok2str(vqp_error_code_values, "unknown (%u)",vqp_common_header->error_code),
-	   vqp_common_header->error_code,
-           EXTRACT_BE_U_4(&vqp_common_header->sequence),
+           version,
+	   tok2str(vqp_msg_type_values, "unknown (%u)",EXTRACT_U_1(vqp_common_header->msg_type)),
+	   tok2str(vqp_error_code_values, "unknown (%u)",EXTRACT_U_1(vqp_common_header->error_code)),
+	   EXTRACT_U_1(vqp_common_header->error_code),
+           EXTRACT_BE_U_4(vqp_common_header->sequence),
            nitems,
            len));
 
@@ -150,7 +151,7 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
     tptr+=sizeof(struct vqp_common_header_t);
     tlen-=sizeof(struct vqp_common_header_t);
 
-    while (nitems > 0 && tlen > 0) {
+    while (nitems != 0 && tlen != 0) {
 
         vqp_obj_tlv = (const struct vqp_obj_tlv_t *)tptr;
         ND_TCHECK(*vqp_obj_tlv);
