@@ -223,7 +223,7 @@ name_extract(netdissect_options *ndo,
  */
 static int
 name_len(netdissect_options *ndo,
-         const unsigned char *s, const unsigned char *maxbuf)
+         const u_char *s, const unsigned char *maxbuf)
 {
     const unsigned char *s0 = s;
     unsigned char c;
