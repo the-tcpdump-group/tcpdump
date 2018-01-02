@@ -331,13 +331,20 @@ struct netdissect_options {
 /* True if "var" was captured */
 #define ND_TTEST(var) ND_TTEST2(var, sizeof(var))
 
+/* True if "*(p)" was captured */
+#define ND_TTEST_SIZE(p) ND_TTEST_LEN(p, sizeof(*(p)))
+
 /* Bail if "l" bytes of "var" were not captured */
 #define ND_TCHECK2(var, l) if (!ND_TTEST2(var, l)) goto trunc
 
+/* Bail out if "l" bytes from "p" were not captured */
 #define ND_TCHECK_LEN(p, l) if (!ND_TTEST_LEN(p, l)) goto trunc
 
 /* Bail if "var" was not captured */
 #define ND_TCHECK(var) ND_TCHECK2(var, sizeof(var))
+
+/* Bail out if "*(p)" was not captured */
+#define ND_TCHECK_SIZE(p) ND_TCHECK_LEN(p, sizeof(*(p)))
 
 #define ND_PRINT(STUFF) (ndo->ndo_printf)STUFF
 #define ND_DEFAULTPRINT(ap, length) (*ndo->ndo_default_print)(ndo, ap, length)
