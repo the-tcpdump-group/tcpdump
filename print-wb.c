@@ -397,7 +397,7 @@ wb_drawop(netdissect_options *ndo,
  */
 void
 wb_print(netdissect_options *ndo,
-         const void *hdr, u_int len)
+         const u_char *hdr, u_int len)
 {
 	const struct pkt_hdr *ph;
 	uint8_t type;

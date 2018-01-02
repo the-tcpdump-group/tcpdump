@@ -181,7 +181,7 @@ static const struct tok ospf_lls_eo_options[] = {
 
 int
 ospf_print_grace_lsa(netdissect_options *ndo,
-                     const uint8_t *tptr, u_int ls_length)
+                     const u_char *tptr, u_int ls_length)
 {
     u_int tlv_type, tlv_length;
 
@@ -264,7 +264,7 @@ trunc:
 
 int
 ospf_print_te_lsa(netdissect_options *ndo,
-                  const uint8_t *tptr, u_int ls_length)
+                  const u_char *tptr, u_int ls_length)
 {
     u_int tlv_type, tlv_length, subtlv_type, subtlv_length;
     u_int priority_level, te_class, count_srlg;
@@ -852,14 +852,14 @@ ospf_print_lsa(netdissect_options *ndo,
                 break;
 
             case LS_OPAQUE_TYPE_GRACE:
-                if (ospf_print_grace_lsa(ndo, (const uint8_t *)(lsap->lsa_un.un_grace_tlv),
+                if (ospf_print_grace_lsa(ndo, (const u_char *)(lsap->lsa_un.un_grace_tlv),
                                          ls_length) == -1) {
                     return(ls_end);
                 }
                 break;
 
 	    case LS_OPAQUE_TYPE_TE:
-                if (ospf_print_te_lsa(ndo, (const uint8_t *)(lsap->lsa_un.un_te_lsa_tlv),
+                if (ospf_print_te_lsa(ndo, (const u_char *)(lsap->lsa_un.un_te_lsa_tlv),
                                       ls_length) == -1) {
                     return(ls_end);
                 }

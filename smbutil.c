@@ -274,7 +274,7 @@ name_type_str(int name_type)
 }
 
 void
-smb_print_data(netdissect_options *ndo, const unsigned char *buf, int len)
+smb_print_data(netdissect_options *ndo, const u_char *buf, int len)
 {
     int i = 0;
 

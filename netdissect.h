@@ -603,8 +603,8 @@ extern void olsr_print(netdissect_options *, const u_char *, u_int, int);
 extern void openflow_print(netdissect_options *, const u_char *, const u_int);
 extern void ospf6_print(netdissect_options *, const u_char *, u_int);
 extern void ospf_print(netdissect_options *, const u_char *, u_int, const u_char *);
-extern int ospf_print_grace_lsa(netdissect_options *, const uint8_t *, u_int);
-extern int ospf_print_te_lsa(netdissect_options *, const uint8_t *, u_int);
+extern int ospf_print_grace_lsa(netdissect_options *, const u_char *, u_int);
+extern int ospf_print_te_lsa(netdissect_options *, const u_char *, u_int);
 extern void otv_print(netdissect_options *, const u_char *, u_int);
 extern void pgm_print(netdissect_options *, const u_char *, u_int, const u_char *);
 extern void pim_print(netdissect_options *, const u_char *, u_int, const u_char *);
@@ -629,7 +629,7 @@ extern void sctp_print(netdissect_options *, const u_char *, const u_char *, u_i
 extern void sflow_print(netdissect_options *, const u_char *, u_int);
 extern void sip_print(netdissect_options *, const u_char *, u_int);
 extern void slow_print(netdissect_options *, const u_char *, u_int);
-extern void smb_print_data(netdissect_options *, const unsigned char *, int);
+extern void smb_print_data(netdissect_options *, const u_char *, int);
 extern void smb_tcp_print(netdissect_options *, const u_char *, int);
 extern void smtp_print(netdissect_options *, const u_char *, u_int);
 extern int snap_print(netdissect_options *, const u_char *, u_int, u_int, const struct lladdr_info *, const struct lladdr_info *, u_int);
@@ -651,7 +651,7 @@ extern void vrrp_print(netdissect_options *, const u_char *, u_int, const u_char
 extern void vtp_print(netdissect_options *, const u_char *, u_int);
 extern void vxlan_gpe_print(netdissect_options *ndo, const u_char *bp, u_int len);
 extern void vxlan_print(netdissect_options *, const u_char *, u_int);
-extern void wb_print(netdissect_options *, const void *, u_int);
+extern void wb_print(netdissect_options *, const u_char *, u_int);
 extern void zephyr_print(netdissect_options *, const u_char *, int);
 extern void zmtp1_print(netdissect_options *, const u_char *, u_int);
 extern void zmtp1_datagram_print(netdissect_options *, const u_char *, const u_int);
