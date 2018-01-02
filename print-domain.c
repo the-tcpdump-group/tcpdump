@@ -591,14 +591,14 @@ void
 domain_print(netdissect_options *ndo,
          const u_char *bp, u_int length, int is_mdns)
 {
-	const HEADER *np;
+	const dns_header_t *np;
 	uint16_t flags;
 	u_int qdcount, ancount, nscount, arcount;
 	u_int i;
 	const u_char *cp;
 	uint16_t b2;
 
-	np = (const HEADER *)bp;
+	np = (const dns_header_t *)bp;
 	ND_TCHECK(*np);
 	flags = EXTRACT_BE_U_2(np->flags);
 	/* get the byte-order right */

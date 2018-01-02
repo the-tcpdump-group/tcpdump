@@ -216,7 +216,7 @@ typedef struct {
 	nd_uint16_t ancount;	/* number of answer entries */
 	nd_uint16_t nscount;	/* number of authority entries */
 	nd_uint16_t arcount;	/* number of resource entries */
-} HEADER;
+} dns_header_t;
 
 /*
  * Macros for subfields of flag fields.
