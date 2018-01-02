@@ -116,7 +116,7 @@ static int resp_get_length(netdissect_options *, const u_char *, int, const u_ch
 #define FIND_CR_OR_LF(_ptr, _len)           \
     for (;;) {                              \
         LCHECK(_len);                       \
-        ND_TCHECK(*_ptr);                   \
+        ND_TCHECK_1(_ptr);                  \
         if (*_ptr == '\r' || *_ptr == '\n') \
             break;                          \
         _ptr++;                             \

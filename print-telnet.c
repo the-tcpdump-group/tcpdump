@@ -397,7 +397,7 @@ telnet_parse(netdissect_options *ndo, const u_char *sp, u_int length, int print)
 	do { \
 		if (length < 1) \
 			goto pktend; \
-		ND_TCHECK(*sp); \
+		ND_TCHECK_1(sp); \
 		c = *sp++; \
 		length--; \
 	} while (0)
