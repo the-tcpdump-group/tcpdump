@@ -223,9 +223,9 @@ name_extract(netdissect_options *ndo,
  */
 static int
 name_len(netdissect_options *ndo,
-         const u_char *s, const unsigned char *maxbuf)
+         const u_char *s, const u_char *maxbuf)
 {
-    const unsigned char *s0 = s;
+    const u_char *s0 = s;
     unsigned char c;
 
     if (s >= maxbuf)
@@ -249,7 +249,7 @@ trunc:
 
 static void
 print_asc(netdissect_options *ndo,
-          const unsigned char *buf, int len)
+          const u_char *buf, int len)
 {
     int i;
     for (i = 0; i < len; i++)
