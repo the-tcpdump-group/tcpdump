@@ -593,7 +593,7 @@ ospf_print_tos_metrics(netdissect_options *ndo,
      * All but the first metric contain a valid topology id.
      */
     while (toscount != 0) {
-        ND_TCHECK(*tos);
+        ND_TCHECK_SIZE(tos);
         tos_type = EXTRACT_U_1(tos->metrics.tos_type);
         ND_PRINT((ndo, "\n\t\ttopology %s (%u), metric %u",
                tok2str(ospf_topology_values, "Unknown",
@@ -647,7 +647,7 @@ ospf_print_lsa(netdissect_options *ndo,
 		ND_TCHECK(lsap->lsa_un.un_rla.rla_link);
 		rlp = lsap->lsa_un.un_rla.rla_link;
 		while (j--) {
-			ND_TCHECK(*rlp);
+			ND_TCHECK_SIZE(rlp);
 			switch (EXTRACT_U_1(rlp->un_tos.link.link_type)) {
 
 			case RLA_TYPE_VIRTUAL:
@@ -694,7 +694,7 @@ ospf_print_lsa(netdissect_options *ndo,
 		    ipaddr_string(ndo, &lsap->lsa_un.un_nla.nla_mask)));
 		ap = lsap->lsa_un.un_nla.nla_router;
 		while ((const u_char *)ap < ls_end) {
-			ND_TCHECK(*ap);
+			ND_TCHECK_SIZE(ap);
 			ND_PRINT((ndo, "\n\t      %s", ipaddr_string(ndo, ap)));
 			++ap;
 		}
@@ -1017,7 +1017,7 @@ ospf_decode_v2(netdissect_options *ndo,
 		if ((const u_char *)ap < dataend)
 			ND_PRINT((ndo, "\n\t  Neighbor List:"));
 		while ((const u_char *)ap < dataend) {
-			ND_TCHECK(*ap);
+			ND_TCHECK_SIZE(ap);
 			ND_PRINT((ndo, "\n\t    %s", ipaddr_string(ndo, ap)));
 			++ap;
 		}
@@ -1047,7 +1047,7 @@ ospf_decode_v2(netdissect_options *ndo,
 	case OSPF_TYPE_LS_REQ:
                 lsrp = op->ospf_lsr;
                 while ((const u_char *)lsrp < dataend) {
-                    ND_TCHECK(*lsrp);
+                    ND_TCHECK_SIZE(lsrp);
 
                     ND_PRINT((ndo, "\n\t  Advertising Router: %s, %s LSA (%u)",
                            ipaddr_string(ndo, &lsrp->ls_router),

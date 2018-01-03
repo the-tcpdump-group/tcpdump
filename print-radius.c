@@ -1065,7 +1065,7 @@ radius_attrs_print(netdissect_options *ndo,
    {
      if (length < 2)
         goto trunc;
-     ND_TCHECK(*rad_attr);
+     ND_TCHECK_SIZE(rad_attr);
 
      type = EXTRACT_U_1(rad_attr->type);
      len = EXTRACT_U_1(rad_attr->len);

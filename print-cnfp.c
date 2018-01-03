@@ -167,7 +167,7 @@ cnfp_v1_print(netdissect_options *ndo, const u_char *cp)
 #endif
 
 	nh = (const struct nfhdr_v1 *)cp;
-	ND_TCHECK(*nh);
+	ND_TCHECK_SIZE(nh);
 
 	ver = EXTRACT_BE_U_2(nh->version);
 	nrecs = EXTRACT_BE_U_4(nh->count);
@@ -196,7 +196,7 @@ cnfp_v1_print(netdissect_options *ndo, const u_char *cp)
 		/*
 		 * Make sure we have the entire record.
 		 */
-		ND_TCHECK(*nr);
+		ND_TCHECK_SIZE(nr);
 		ND_PRINT((ndo, "\n  started %u.%03u, last %u.%03u",
 		       EXTRACT_BE_U_4(nr->start_time)/1000,
 		       EXTRACT_BE_U_4(nr->start_time)%1000,
@@ -258,7 +258,7 @@ cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 #endif
 
 	nh = (const struct nfhdr_v5 *)cp;
-	ND_TCHECK(*nh);
+	ND_TCHECK_SIZE(nh);
 
 	ver = EXTRACT_BE_U_2(nh->version);
 	nrecs = EXTRACT_BE_U_4(nh->count);
@@ -288,7 +288,7 @@ cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 		/*
 		 * Make sure we have the entire record.
 		 */
-		ND_TCHECK(*nr);
+		ND_TCHECK_SIZE(nr);
 		ND_PRINT((ndo, "\n  started %u.%03u, last %u.%03u",
 		       EXTRACT_BE_U_4(nr->start_time)/1000,
 		       EXTRACT_BE_U_4(nr->start_time)%1000,
@@ -356,7 +356,7 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 #endif
 
 	nh = (const struct nfhdr_v6 *)cp;
-	ND_TCHECK(*nh);
+	ND_TCHECK_SIZE(nh);
 
 	ver = EXTRACT_BE_U_2(nh->version);
 	nrecs = EXTRACT_BE_U_4(nh->count);
@@ -386,7 +386,7 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 		/*
 		 * Make sure we have the entire record.
 		 */
-		ND_TCHECK(*nr);
+		ND_TCHECK_SIZE(nr);
 		ND_PRINT((ndo, "\n  started %u.%03u, last %u.%03u",
 		       EXTRACT_BE_U_4(nr->start_time)/1000,
 		       EXTRACT_BE_U_4(nr->start_time)%1000,

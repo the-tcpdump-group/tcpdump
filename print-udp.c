@@ -229,7 +229,7 @@ rtcp_print(netdissect_options *ndo, const u_char *hdr, const u_char *ep)
 	double ts, dts;
 	if ((const u_char *)(rh + 1) > ep)
 		goto trunc;
-	ND_TCHECK(*rh);
+	ND_TCHECK_SIZE(rh);
 	len = (EXTRACT_BE_U_2(rh->rh_len) + 1) * 4;
 	flags = EXTRACT_BE_U_2(rh->rh_flags);
 	cnt = (flags >> 8) & 0x1f;
@@ -243,7 +243,7 @@ rtcp_print(netdissect_options *ndo, const u_char *hdr, const u_char *ep)
 			ND_PRINT((ndo, " %u", EXTRACT_BE_U_4(rh->rh_ssrc)));
 		if ((const u_char *)(sr + 1) > ep)
 			goto trunc;
-		ND_TCHECK(*sr);
+		ND_TCHECK_SIZE(sr);
 		ts = (double)(EXTRACT_BE_U_4(sr->sr_ntp.upper)) +
 		    ((double)(EXTRACT_BE_U_4(sr->sr_ntp.lower)) /
 		     4294967296.0);
@@ -281,7 +281,7 @@ rtcp_print(netdissect_options *ndo, const u_char *hdr, const u_char *ep)
 	while (--cnt >= 0) {
 		if ((const u_char *)(rr + 1) > ep)
 			goto trunc;
-		ND_TCHECK(*rr);
+		ND_TCHECK_SIZE(rr);
 		if (ndo->ndo_vflag)
 			ND_PRINT((ndo, " %u", EXTRACT_BE_U_4(rr->rr_srcid)));
 		ts = (double)(EXTRACT_BE_U_4(rr->rr_lsr)) / 65536.;

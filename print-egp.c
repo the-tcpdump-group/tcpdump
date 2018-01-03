@@ -256,7 +256,7 @@ egp_print(netdissect_options *ndo,
 	u_int status;
 
 	egp = (const struct egp_packet *)bp;
-	if (length < sizeof(*egp) || !ND_TTEST(*egp)) {
+	if (length < sizeof(*egp) || !ND_TTEST_SIZE(egp)) {
 		ND_PRINT((ndo, "[|egp]"));
 		return;
 	}

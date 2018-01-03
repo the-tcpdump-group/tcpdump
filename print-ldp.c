@@ -250,7 +250,7 @@ ldp_tlv_print(netdissect_options *ndo,
     int i;
 
     ldp_tlv_header = (const struct ldp_tlv_header *)tptr;
-    ND_TCHECK(*ldp_tlv_header);
+    ND_TCHECK_SIZE(ldp_tlv_header);
     tlv_len=EXTRACT_BE_U_2(ldp_tlv_header->length);
     if (tlv_len + 4 > msg_tlen) {
         ND_PRINT((ndo, "\n\t\t TLV contents go past end of message"));
@@ -568,7 +568,7 @@ ldp_pdu_print(netdissect_options *ndo,
     int hexdump,processed;
 
     ldp_com_header = (const struct ldp_common_header *)pptr;
-    ND_TCHECK(*ldp_com_header);
+    ND_TCHECK_SIZE(ldp_com_header);
 
     /*
      * Sanity checking of the header.

@@ -181,7 +181,7 @@ lwapp_control_print(netdissect_options *ndo,
     } else {
         lwapp_trans_header = (const struct lwapp_transport_header *)pptr;
     }
-    ND_TCHECK(*lwapp_trans_header);
+    ND_TCHECK_SIZE(lwapp_trans_header);
     version = EXTRACT_U_1(lwapp_trans_header->version);
 
     /*
@@ -309,7 +309,7 @@ lwapp_data_print(netdissect_options *ndo,
     /* check if enough bytes for AP identity */
     ND_TCHECK_6(tptr);
     lwapp_trans_header = (const struct lwapp_transport_header *)pptr;
-    ND_TCHECK(*lwapp_trans_header);
+    ND_TCHECK_SIZE(lwapp_trans_header);
     version = EXTRACT_U_1(lwapp_trans_header->version);
 
     /*

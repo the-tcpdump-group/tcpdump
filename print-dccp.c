@@ -373,7 +373,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 				  len - fixed_hdrlen));
 			return;
 		}
-		ND_TCHECK(*dhr);
+		ND_TCHECK_SIZE(dhr);
 		ND_PRINT((ndo, "%s (service=%d) ",
 			  tok2str(dccp_pkt_type_str, "", dccph_type),
 			  EXTRACT_BE_U_4(dhr->dccph_req_service)));
@@ -389,7 +389,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 				  len - fixed_hdrlen));
 			return;
 		}
-		ND_TCHECK(*dhr);
+		ND_TCHECK_SIZE(dhr);
 		ND_PRINT((ndo, "%s (service=%d) ",
 			  tok2str(dccp_pkt_type_str, "", dccph_type),
 			  EXTRACT_BE_U_4(dhr->dccph_resp_service)));
@@ -450,7 +450,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 				  len - fixed_hdrlen));
 			return;
 		}
-		ND_TCHECK(*dhr);
+		ND_TCHECK_SIZE(dhr);
 		ND_PRINT((ndo, "%s (code=%s) ",
 			  tok2str(dccp_pkt_type_str, "", dccph_type),
 			  dccp_reset_code(EXTRACT_U_1(dhr->dccph_reset_code))));

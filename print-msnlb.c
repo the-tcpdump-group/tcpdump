@@ -53,7 +53,7 @@ msnlb_print(netdissect_options *ndo, const u_char *bp)
 	const struct msnlb_heartbeat_pkt *hb;
 
 	hb = (const struct msnlb_heartbeat_pkt *)bp;
-	ND_TCHECK(*hb);
+	ND_TCHECK_SIZE(hb);
 
 	ND_PRINT((ndo, "MS NLB heartbeat, host priority: %u,",
 		EXTRACT_LE_U_4((hb->host_prio))));

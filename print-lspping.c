@@ -527,7 +527,7 @@ lspping_print(netdissect_options *ndo,
     lspping_com_header = (const struct lspping_common_header *)pptr;
     if (len < sizeof(struct lspping_common_header))
         goto tooshort;
-    ND_TCHECK(*lspping_com_header);
+    ND_TCHECK_SIZE(lspping_com_header);
 
     /*
      * Sanity checking of the header.

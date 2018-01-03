@@ -1425,7 +1425,7 @@ parsefsinfo(netdissect_options *ndo,
 		return (1);
 
 	sfp = (const struct nfsv3_fsinfo *)dp;
-	ND_TCHECK(*sfp);
+	ND_TCHECK_SIZE(sfp);
 	ND_PRINT((ndo, " rtmax %u rtpref %u wtmax %u wtpref %u dtpref %u",
 	       EXTRACT_BE_U_4(&sfp->fs_rtmax),
 	       EXTRACT_BE_U_4(&sfp->fs_rtpref),
@@ -1463,7 +1463,7 @@ parsepathconf(netdissect_options *ndo,
 		return (1);
 
 	spp = (const struct nfsv3_pathconf *)dp;
-	ND_TCHECK(*spp);
+	ND_TCHECK_SIZE(spp);
 
 	ND_PRINT((ndo, " linkmax %u namemax %u %s %s %s %s",
 	       EXTRACT_BE_U_4(&spp->pc_linkmax),

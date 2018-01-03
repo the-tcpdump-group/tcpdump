@@ -111,7 +111,7 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
     tptr=pptr;
     tlen = len;
     vqp_common_header = (const struct vqp_common_header_t *)pptr;
-    ND_TCHECK(*vqp_common_header);
+    ND_TCHECK_SIZE(vqp_common_header);
     if (sizeof(struct vqp_common_header_t) > tlen)
         goto trunc;
     version = EXTRACT_U_1(vqp_common_header->version);
@@ -154,7 +154,7 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
     while (nitems != 0 && tlen != 0) {
 
         vqp_obj_tlv = (const struct vqp_obj_tlv_t *)tptr;
-        ND_TCHECK(*vqp_obj_tlv);
+        ND_TCHECK_SIZE(vqp_obj_tlv);
         if (sizeof(struct vqp_obj_tlv_t) > tlen)
             goto trunc;
         vqp_obj_type = EXTRACT_BE_U_4(vqp_obj_tlv->obj_type);

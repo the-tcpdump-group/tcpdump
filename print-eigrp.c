@@ -228,7 +228,7 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 
     tptr=pptr;
     eigrp_com_header = (const struct eigrp_common_header *)pptr;
-    ND_TCHECK(*eigrp_com_header);
+    ND_TCHECK_SIZE(eigrp_com_header);
 
     /*
      * Sanity checking of the header.

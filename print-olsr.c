@@ -239,7 +239,7 @@ olsr_print_lq_neighbor4(netdissect_options *ndo,
     while (hello_len >= sizeof(struct olsr_lq_neighbor4)) {
 
         lq_neighbor = (const struct olsr_lq_neighbor4 *)msg_data;
-        if (!ND_TTEST(*lq_neighbor))
+        if (!ND_TTEST_SIZE(lq_neighbor))
             return (-1);
 
         ND_PRINT((ndo, "\n\t      neighbor %s, link-quality %.2f%%"
@@ -263,7 +263,7 @@ olsr_print_lq_neighbor6(netdissect_options *ndo,
     while (hello_len >= sizeof(struct olsr_lq_neighbor6)) {
 
         lq_neighbor = (const struct olsr_lq_neighbor6 *)msg_data;
-        if (!ND_TTEST(*lq_neighbor))
+        if (!ND_TTEST_SIZE(lq_neighbor))
             return (-1);
 
         ND_PRINT((ndo, "\n\t      neighbor %s, link-quality %.2f%%"

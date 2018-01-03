@@ -307,7 +307,7 @@ m3ua_print(netdissect_options *ndo,
   /* size includes the header */
   if (size < sizeof(struct m3ua_common_header))
     goto invalid;
-  ND_TCHECK(*hdr);
+  ND_TCHECK_SIZE(hdr);
   if (EXTRACT_U_1(hdr->v) != M3UA_REL_1_0)
     return;
 

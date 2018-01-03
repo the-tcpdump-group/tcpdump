@@ -134,7 +134,7 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	}
 
 	/* print what we know */
-	ND_TCHECK(*hdr);
+	ND_TCHECK_SIZE(hdr);
 	if (ndo->ndo_eflag)
 		pflog_print(ndo, hdr);
 

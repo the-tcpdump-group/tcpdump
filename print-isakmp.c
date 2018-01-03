@@ -1009,7 +1009,7 @@ ikev1_sa_print(netdissect_options *ndo, u_char tpay _U_,
 	ND_PRINT((ndo,"%s:", NPSTR(ISAKMP_NPTYPE_SA)));
 
 	p = (const struct ikev1_pl_sa *)ext;
-	ND_TCHECK(*p);
+	ND_TCHECK_SIZE(p);
 	doi = EXTRACT_BE_U_4(p->doi);
 	sit = EXTRACT_BE_U_4(p->sit);
 	if (doi != 1) {
@@ -1041,7 +1041,7 @@ ikev1_sa_print(netdissect_options *ndo, u_char tpay _U_,
 	}
 
 	ext = (const struct isakmp_gen *)np;
-	ND_TCHECK(*ext);
+	ND_TCHECK_SIZE(ext);
 
 	cp = ikev1_sub_print(ndo, ISAKMP_NPTYPE_P, ext, ep, phase, doi, proto0,
 		depth);
@@ -1065,7 +1065,7 @@ ikev1_p_print(netdissect_options *ndo, u_char tpay _U_,
 	ND_PRINT((ndo,"%s:", NPSTR(ISAKMP_NPTYPE_P)));
 
 	p = (const struct ikev1_pl_p *)ext;
-	ND_TCHECK(*p);
+	ND_TCHECK_SIZE(p);
 	ND_PRINT((ndo," #%u protoid=%s transform=%u",
 		  EXTRACT_U_1(p->p_no), PROTOIDSTR(EXTRACT_U_1(p->prot_id)),
 		  EXTRACT_U_1(p->num_t)));
@@ -1077,7 +1077,7 @@ ikev1_p_print(netdissect_options *ndo, u_char tpay _U_,
 	}
 
 	ext = (const struct isakmp_gen *)((const u_char *)(p + 1) + spi_size);
-	ND_TCHECK(*ext);
+	ND_TCHECK_SIZE(ext);
 
 	cp = ikev1_sub_print(ndo, ISAKMP_NPTYPE_T, ext, ep, phase, doi0,
 			     EXTRACT_U_1(p->prot_id), depth);
@@ -1232,7 +1232,7 @@ ikev1_t_print(netdissect_options *ndo, u_char tpay _U_,
 	ND_PRINT((ndo,"%s:", NPSTR(ISAKMP_NPTYPE_T)));
 
 	p = (const struct ikev1_pl_t *)ext;
-	ND_TCHECK(*p);
+	ND_TCHECK_SIZE(p);
 
 	switch (proto) {
 	case 1:
@@ -1292,7 +1292,7 @@ ikev1_ke_print(netdissect_options *ndo, u_char tpay _U_,
 {
 	ND_PRINT((ndo,"%s:", NPSTR(ISAKMP_NPTYPE_KE)));
 
-	ND_TCHECK(*ext);
+	ND_TCHECK_SIZE(ext);
 	/*
 	 * Our caller has ensured that the length is >= 4.
 	 */
@@ -1331,7 +1331,7 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 	ND_PRINT((ndo,"%s:", NPSTR(ISAKMP_NPTYPE_ID)));
 
 	p = (const struct ikev1_pl_id *)ext;
-	ND_TCHECK(*p);
+	ND_TCHECK_SIZE(p);
 	if (sizeof(*p) < item_len) {
 		data = (const u_char *)(p + 1);
 		len = item_len - sizeof(*p);
@@ -1363,7 +1363,7 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 		uint8_t type, proto_id;
 
 		doi_p = (const struct ipsecdoi_id *)ext;
-		ND_TCHECK(*doi_p);
+		ND_TCHECK_SIZE(doi_p);
 		type = EXTRACT_U_1(doi_p->type);
 		ND_PRINT((ndo," idtype=%s", STR_OR_ID(type, ipsecidtypestr)));
 		/* A protocol ID of 0 DOES NOT mean IPPROTO_IP! */
@@ -1495,7 +1495,7 @@ ikev1_cert_print(netdissect_options *ndo, u_char tpay _U_,
 	ND_PRINT((ndo,"%s:", NPSTR(ISAKMP_NPTYPE_CERT)));
 
 	p = (const struct ikev1_pl_cert *)ext;
-	ND_TCHECK(*p);
+	ND_TCHECK_SIZE(p);
 	/*
 	 * Our caller has ensured that the length is >= 4.
 	 */
@@ -1529,7 +1529,7 @@ ikev1_cr_print(netdissect_options *ndo, u_char tpay _U_,
 	ND_PRINT((ndo,"%s:", NPSTR(ISAKMP_NPTYPE_CR)));
 
 	p = (const struct ikev1_pl_cert *)ext;
-	ND_TCHECK(*p);
+	ND_TCHECK_SIZE(p);
 	/*
 	 * Our caller has ensured that the length is >= 4.
 	 */
@@ -1555,7 +1555,7 @@ ikev1_hash_print(netdissect_options *ndo, u_char tpay _U_,
 {
 	ND_PRINT((ndo,"%s:", NPSTR(ISAKMP_NPTYPE_HASH)));
 
-	ND_TCHECK(*ext);
+	ND_TCHECK_SIZE(ext);
 	/*
 	 * Our caller has ensured that the length is >= 4.
 	 */
@@ -1580,7 +1580,7 @@ ikev1_sig_print(netdissect_options *ndo, u_char tpay _U_,
 {
 	ND_PRINT((ndo,"%s:", NPSTR(ISAKMP_NPTYPE_SIG)));
 
-	ND_TCHECK(*ext);
+	ND_TCHECK_SIZE(ext);
 	/*
 	 * Our caller has ensured that the length is >= 4.
 	 */
@@ -1607,7 +1607,7 @@ ikev1_nonce_print(netdissect_options *ndo, u_char tpay _U_,
 {
 	ND_PRINT((ndo,"%s:", NPSTR(ISAKMP_NPTYPE_NONCE)));
 
-	ND_TCHECK(*ext);
+	ND_TCHECK_SIZE(ext);
 	/*
 	 * Our caller has ensured that the length is >= 4.
 	 */
@@ -1691,7 +1691,7 @@ ikev1_n_print(netdissect_options *ndo, u_char tpay _U_,
 	ND_PRINT((ndo,"%s:", NPSTR(ISAKMP_NPTYPE_N)));
 
 	p = (const struct ikev1_pl_n *)ext;
-	ND_TCHECK(*p);
+	ND_TCHECK_SIZE(p);
 	doi = EXTRACT_BE_U_4(p->doi);
 	proto = EXTRACT_U_1(p->prot_id);
 	if (doi != 1) {
@@ -1801,7 +1801,7 @@ ikev1_d_print(netdissect_options *ndo, u_char tpay _U_,
 	ND_PRINT((ndo,"%s:", NPSTR(ISAKMP_NPTYPE_D)));
 
 	p = (const struct ikev1_pl_d *)ext;
-	ND_TCHECK(*p);
+	ND_TCHECK_SIZE(p);
 	doi = EXTRACT_BE_U_4(p->doi);
 	proto = EXTRACT_U_1(p->prot_id);
 	if (doi != 1) {
@@ -1839,7 +1839,7 @@ ikev1_vid_print(netdissect_options *ndo, u_char tpay _U_,
 {
 	ND_PRINT((ndo,"%s:", NPSTR(ISAKMP_NPTYPE_VID)));
 
-	ND_TCHECK(*ext);
+	ND_TCHECK_SIZE(ext);
 	/*
 	 * Our caller has ensured that the length is >= 4.
 	 */
@@ -1874,7 +1874,7 @@ ikev2_gen_print(netdissect_options *ndo, u_char tpay,
 {
 	const struct isakmp_gen *p = (const struct isakmp_gen *)ext;
 
-	ND_TCHECK(*ext);
+	ND_TCHECK_SIZE(ext);
 	ikev2_pay_print(ndo, NPSTR(tpay), EXTRACT_U_1(p->critical));
 
 	/*
@@ -1908,7 +1908,7 @@ ikev2_t_print(netdissect_options *ndo, int tcount,
 	const u_char *ep2;
 
 	p = (const struct ikev2_t *)ext;
-	ND_TCHECK(*p);
+	ND_TCHECK_SIZE(p);
 	ikev2_pay_print(ndo, NPSTR(ISAKMP_NPTYPE_T), EXTRACT_U_1(p->h.critical));
 
 	t_id = EXTRACT_BE_U_2(p->t_id);
@@ -1986,7 +1986,7 @@ ikev2_p_print(netdissect_options *ndo, u_char tpay _U_, int pcount _U_,
 	u_int item_len;
 
 	p = (const struct ikev2_p *)ext;
-	ND_TCHECK(*p);
+	ND_TCHECK_SIZE(p);
 
 	ikev2_pay_print(ndo, NPSTR(ISAKMP_NPTYPE_P), EXTRACT_U_1(p->h.critical));
 
@@ -2019,7 +2019,7 @@ ikev2_p_print(netdissect_options *ndo, u_char tpay _U_, int pcount _U_,
 		ext = (const struct isakmp_gen *)cp;
 		if (prop_length < sizeof(*ext))
 			goto toolong;
-		ND_TCHECK(*ext);
+		ND_TCHECK_SIZE(ext);
 
 		/*
 		 * Since we can't have a payload length of less than 4 bytes,
@@ -2082,7 +2082,7 @@ ikev2_sa_print(netdissect_options *ndo, u_char tpay,
 	u_char np;
 	u_int item_len;
 
-	ND_TCHECK(*ext1);
+	ND_TCHECK_SIZE(ext1);
 	ikev2_pay_print(ndo, "sa", EXTRACT_U_1(ext1->critical));
 
 	/*
@@ -2102,7 +2102,7 @@ ikev2_sa_print(netdissect_options *ndo, u_char tpay,
 		ext = (const struct isakmp_gen *)cp;
 		if (sa_length < sizeof(*ext))
 			goto toolong;
-		ND_TCHECK(*ext);
+		ND_TCHECK_SIZE(ext);
 
 		/*
 		 * Since we can't have a payload length of less than 4 bytes,
@@ -2161,7 +2161,7 @@ ikev2_ke_print(netdissect_options *ndo, u_char tpay,
 	const struct ikev2_ke *k;
 
 	k = (const struct ikev2_ke *)ext;
-	ND_TCHECK(*k);
+	ND_TCHECK_SIZE(k);
 	ikev2_pay_print(ndo, NPSTR(tpay), EXTRACT_U_1(k->h.critical));
 
 	if (item_len < 8) {
@@ -2195,7 +2195,7 @@ ikev2_ID_print(netdissect_options *ndo, u_char tpay,
 	const unsigned char *typedata;
 
 	idp = (const struct ikev2_id *)ext;
-	ND_TCHECK(*idp);
+	ND_TCHECK_SIZE(idp);
 	ikev2_pay_print(ndo, NPSTR(tpay), EXTRACT_U_1(idp->h.critical));
 
 	/*
@@ -2332,7 +2332,7 @@ ikev2_nonce_print(netdissect_options *ndo, u_char tpay,
 		uint32_t phase _U_, uint32_t doi _U_,
 		uint32_t proto _U_, int depth _U_)
 {
-	ND_TCHECK(*ext);
+	ND_TCHECK_SIZE(ext);
 	ikev2_pay_print(ndo, "nonce", EXTRACT_U_1(ext->critical));
 
 	/*
@@ -2370,7 +2370,7 @@ ikev2_n_print(netdissect_options *ndo, u_char tpay _U_,
 	const char *notify_name;
 
 	p = (const struct ikev2_n *)ext;
-	ND_TCHECK(*p);
+	ND_TCHECK_SIZE(p);
 	ikev2_pay_print(ndo, NPSTR(ISAKMP_NPTYPE_N), EXTRACT_U_1(p->h.critical));
 
 	showspi = 1;
@@ -2579,7 +2579,7 @@ ikev2_vid_print(netdissect_options *ndo, u_char tpay,
 	const u_char *vid;
 	u_int i, len;
 
-	ND_TCHECK(*ext);
+	ND_TCHECK_SIZE(ext);
 	ikev2_pay_print(ndo, NPSTR(tpay), EXTRACT_U_1(ext->critical));
 
 	/*
@@ -2649,7 +2649,7 @@ ikev2_e_print(netdissect_options *ndo,
 	uint8_t np;
 #endif
 
-	ND_TCHECK(*ext);
+	ND_TCHECK_SIZE(ext);
 	ikev2_pay_print(ndo, NPSTR(tpay), EXTRACT_U_1(ext->critical));
 
 	dlen = item_len-4;
@@ -2721,7 +2721,7 @@ ike_sub0_print(netdissect_options *ndo,
 	u_int item_len;
 
 	cp = (const u_char *)ext;
-	ND_TCHECK(*ext);
+	ND_TCHECK_SIZE(ext);
 
 	/*
 	 * Since we can't have a payload length of less than 4 bytes,
@@ -2762,7 +2762,7 @@ ikev1_sub_print(netdissect_options *ndo,
 	cp = (const u_char *)ext;
 
 	while (np) {
-		ND_TCHECK(*ext);
+		ND_TCHECK_SIZE(ext);
 
 		item_len = EXTRACT_BE_U_2(ext->len);
 		ND_TCHECK_LEN(ext, item_len);
@@ -2885,7 +2885,7 @@ ikev2_sub0_print(netdissect_options *ndo, const struct isakmp *base,
 	u_int item_len;
 
 	cp = (const u_char *)ext;
-	ND_TCHECK(*ext);
+	ND_TCHECK_SIZE(ext);
 
 	/*
 	 * Since we can't have a payload length of less than 4 bytes,
@@ -2929,7 +2929,7 @@ ikev2_sub_print(netdissect_options *ndo,
 
 	cp = (const u_char *)ext;
 	while (np) {
-		ND_TCHECK(*ext);
+		ND_TCHECK_SIZE(ext);
 
 		ND_TCHECK_LEN(ext, EXTRACT_BE_U_2(ext->len));
 

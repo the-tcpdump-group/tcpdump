@@ -440,7 +440,7 @@ lmp_print(netdissect_options *ndo,
 
     tptr=pptr;
     lmp_com_header = (const struct lmp_common_header *)pptr;
-    ND_TCHECK(*lmp_com_header);
+    ND_TCHECK_SIZE(lmp_com_header);
 
     version_res = EXTRACT_BE_U_2(lmp_com_header->version_res);
 

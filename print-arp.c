@@ -259,7 +259,7 @@ atmarp_print(netdissect_options *ndo,
 	u_short pro, hrd, op;
 
 	ap = (const struct atmarp_pkthdr *)bp;
-	ND_TCHECK(*ap);
+	ND_TCHECK_SIZE(ap);
 
 	hrd = ATMHRD(ap);
 	pro = ATMPRO(ap);
@@ -360,7 +360,7 @@ arp_print(netdissect_options *ndo,
 	u_short pro, hrd, op, linkaddr;
 
 	ap = (const struct arp_pkthdr *)bp;
-	ND_TCHECK(*ap);
+	ND_TCHECK_SIZE(ap);
 
 	hrd = HRD(ap);
 	pro = PRO(ap);

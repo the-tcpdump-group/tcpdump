@@ -205,7 +205,7 @@ pgm_print(netdissect_options *ndo,
 		}
 	}
 
-	ND_TCHECK(*pgm);
+	ND_TCHECK_SIZE(pgm);
 
         ND_PRINT((ndo, "PGM, length %u", EXTRACT_BE_U_2(pgm->pgm_length)));
 
@@ -225,7 +225,7 @@ pgm_print(netdissect_options *ndo,
 	    const struct pgm_spm *spm;
 
 	    spm = (const struct pgm_spm *)(pgm + 1);
-	    ND_TCHECK(*spm);
+	    ND_TCHECK_SIZE(spm);
 	    bp = (const u_char *) (spm + 1);
 
 	    switch (EXTRACT_BE_U_2(spm->pgms_nla_afi)) {
@@ -256,7 +256,7 @@ pgm_print(netdissect_options *ndo,
 	    const struct pgm_poll *poll_msg;
 
 	    poll_msg = (const struct pgm_poll *)(pgm + 1);
-	    ND_TCHECK(*poll_msg);
+	    ND_TCHECK_SIZE(poll_msg);
 	    ND_PRINT((ndo, "POLL seq %u round %u",
 			 EXTRACT_BE_U_4(poll_msg->pgmp_seq),
 			 EXTRACT_BE_U_2(poll_msg->pgmp_round)));
@@ -268,7 +268,7 @@ pgm_print(netdissect_options *ndo,
 	    uint32_t ivl, rnd, mask;
 
 	    polr = (const struct pgm_polr *)(pgm + 1);
-	    ND_TCHECK(*polr);
+	    ND_TCHECK_SIZE(polr);
 	    bp = (const u_char *) (polr + 1);
 
 	    switch (EXTRACT_BE_U_2(polr->pgmp_nla_afi)) {
@@ -308,7 +308,7 @@ pgm_print(netdissect_options *ndo,
 	    const struct pgm_data *odata;
 
 	    odata = (const struct pgm_data *)(pgm + 1);
-	    ND_TCHECK(*odata);
+	    ND_TCHECK_SIZE(odata);
 	    ND_PRINT((ndo, "ODATA trail %u seq %u",
 			 EXTRACT_BE_U_4(odata->pgmd_trailseq),
 			 EXTRACT_BE_U_4(odata->pgmd_seq)));
@@ -320,7 +320,7 @@ pgm_print(netdissect_options *ndo,
 	    const struct pgm_data *rdata;
 
 	    rdata = (const struct pgm_data *)(pgm + 1);
-	    ND_TCHECK(*rdata);
+	    ND_TCHECK_SIZE(rdata);
 	    ND_PRINT((ndo, "RDATA trail %u seq %u",
 			 EXTRACT_BE_U_4(rdata->pgmd_trailseq),
 			 EXTRACT_BE_U_4(rdata->pgmd_seq)));
@@ -335,7 +335,7 @@ pgm_print(netdissect_options *ndo,
 	    char source_buf[INET6_ADDRSTRLEN], group_buf[INET6_ADDRSTRLEN];
 
 	    nak = (const struct pgm_nak *)(pgm + 1);
-	    ND_TCHECK(*nak);
+	    ND_TCHECK_SIZE(nak);
 	    bp = (const u_char *) (nak + 1);
 
 	    /*
@@ -405,7 +405,7 @@ pgm_print(netdissect_options *ndo,
 	    const struct pgm_ack *ack;
 
 	    ack = (const struct pgm_ack *)(pgm + 1);
-	    ND_TCHECK(*ack);
+	    ND_TCHECK_SIZE(ack);
 	    ND_PRINT((ndo, "ACK seq %u",
 			 EXTRACT_BE_U_4(ack->pgma_rx_max_seq)));
 	    bp = (const u_char *) (ack + 1);

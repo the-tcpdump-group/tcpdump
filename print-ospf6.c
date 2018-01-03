@@ -505,7 +505,7 @@ ospf6_print_lsa(netdissect_options *ndo,
 			if (lsa_length < sizeof (*rlp))
 				return (1);
 			lsa_length -= sizeof (*rlp);
-			ND_TCHECK(*rlp);
+			ND_TCHECK_SIZE(rlp);
 			switch (EXTRACT_U_1(rlp->link_type)) {
 
 			case RLA_TYPE_VIRTUAL:
@@ -557,7 +557,7 @@ ospf6_print_lsa(netdissect_options *ndo,
 			if (lsa_length < sizeof (*ap))
 				return (1);
 			lsa_length -= sizeof (*ap);
-			ND_TCHECK(*ap);
+			ND_TCHECK_SIZE(ap);
 			ND_PRINT((ndo, "\n\t\t%s", ipaddr_string(ndo, ap)));
 			++ap;
 		}
@@ -608,7 +608,7 @@ ospf6_print_lsa(netdissect_options *ndo,
 			if (lsa_length < sizeof (*fwdaddr6))
 				return (1);
 			lsa_length -= sizeof (*fwdaddr6);
-			ND_TCHECK(*fwdaddr6);
+			ND_TCHECK_SIZE(fwdaddr6);
 			ND_PRINT((ndo, " forward %s",
 			       ip6addr_string(ndo, fwdaddr6)));
 			tptr += sizeof(*fwdaddr6);
@@ -761,7 +761,7 @@ ospf6_decode_v3(netdissect_options *ndo,
 			ND_PRINT((ndo, "\n\t  Neighbor List:"));
 			ap = hellop->hello_neighbor;
 			while ((const u_char *)ap < dataend) {
-				ND_TCHECK(*ap);
+				ND_TCHECK_SIZE(ap);
 				ND_PRINT((ndo, "\n\t    %s", ipaddr_string(ndo, ap)));
 				++ap;
 			}
@@ -799,7 +799,7 @@ ospf6_decode_v3(netdissect_options *ndo,
 		if (ndo->ndo_vflag > 1) {
 			lsrp = (const struct lsr6 *)((const uint8_t *)op + OSPF6HDR_LEN);
 			while ((const u_char *)lsrp < dataend) {
-				ND_TCHECK(*lsrp);
+				ND_TCHECK_SIZE(lsrp);
 				ND_PRINT((ndo, "\n\t  Advertising Router %s",
 				          ipaddr_string(ndo, &lsrp->ls_router)));
 				ospf6_print_ls_type(ndo,

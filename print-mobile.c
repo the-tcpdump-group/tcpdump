@@ -72,7 +72,7 @@ mobile_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	mob = (const struct mobile_ip *)bp;
 
-	if (length < MOBILE_SIZE || !ND_TTEST(*mob)) {
+	if (length < MOBILE_SIZE || !ND_TTEST_SIZE(mob)) {
 		ND_PRINT((ndo, "[|mobile]"));
 		return;
 	}

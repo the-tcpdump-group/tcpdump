@@ -187,7 +187,7 @@ wb_id(netdissect_options *ndo,
 	u_int nid;
 
 	ND_PRINT((ndo, " wb-id:"));
-	if (len < sizeof(*id) || !ND_TTEST(*id))
+	if (len < sizeof(*id) || !ND_TTEST_SIZE(id))
 		return (-1);
 	len -= sizeof(*id);
 
@@ -210,7 +210,7 @@ wb_id(netdissect_options *ndo,
 	}
 
 	c = '<';
-	for (i = 0; i < nid && ND_TTEST(*io); ++io, ++i) {
+	for (i = 0; i < nid && ND_TTEST_SIZE(io); ++io, ++i) {
 		ND_PRINT((ndo, "%c%s:%u",
 		    c, ipaddr_string(ndo, &io->id), EXTRACT_BE_U_4(io->off)));
 		c = ',';
@@ -227,7 +227,7 @@ wb_rreq(netdissect_options *ndo,
         const struct pkt_rreq *rreq, u_int len)
 {
 	ND_PRINT((ndo, " wb-rreq:"));
-	if (len < sizeof(*rreq) || !ND_TTEST(*rreq))
+	if (len < sizeof(*rreq) || !ND_TTEST_SIZE(rreq))
 		return (-1);
 
 	ND_PRINT((ndo, " please repair %s %s:%u<%u:%u>",
@@ -244,7 +244,7 @@ wb_preq(netdissect_options *ndo,
         const struct pkt_preq *preq, u_int len)
 {
 	ND_PRINT((ndo, " wb-preq:"));
-	if (len < sizeof(*preq) || !ND_TTEST(*preq))
+	if (len < sizeof(*preq) || !ND_TTEST_SIZE(preq))
 		return (-1);
 
 	ND_PRINT((ndo, " need %u/%s:%u",
@@ -263,11 +263,11 @@ wb_prep(netdissect_options *ndo,
 	const u_char *ep = ndo->ndo_snapend;
 
 	ND_PRINT((ndo, " wb-prep:"));
-	if (len < sizeof(*prep) || !ND_TTEST(*prep))
+	if (len < sizeof(*prep) || !ND_TTEST_SIZE(prep))
 		return (-1);
 	n = EXTRACT_BE_U_4(prep->pp_n);
 	ps = (const struct pgstate *)(prep + 1);
-	while (n != 0 && ND_TTEST(*ps)) {
+	while (n != 0 && ND_TTEST_SIZE(ps)) {
 		const struct id_off *io, *ie;
 		char c = '<';
 
@@ -276,7 +276,7 @@ wb_prep(netdissect_options *ndo,
 		    ipaddr_string(ndo, &ps->page.p_sid),
 		    EXTRACT_BE_U_4(ps->page.p_uid)));
 		io = (const struct id_off *)(ps + 1);
-		for (ie = io + EXTRACT_U_1(ps->nid); io < ie && ND_TTEST(*io); ++io) {
+		for (ie = io + EXTRACT_U_1(ps->nid); io < ie && ND_TTEST_SIZE(io); ++io) {
 			ND_PRINT((ndo, "%c%s:%u", c, ipaddr_string(ndo, &io->id),
 			    EXTRACT_BE_U_4(io->off)));
 			c = ',';
@@ -318,7 +318,7 @@ wb_dops(netdissect_options *ndo, const struct pkt_dop *dop,
 	for ( ; ss <= es; ++ss) {
 		u_int t;
 
-		if (!ND_TTEST(*dh)) {
+		if (!ND_TTEST_SIZE(dh)) {
 			ND_PRINT((ndo, "%s", tstr));
 			break;
 		}
@@ -352,7 +352,7 @@ wb_rrep(netdissect_options *ndo,
 	const struct pkt_dop *dop = &rrep->pr_dop;
 
 	ND_PRINT((ndo, " wb-rrep:"));
-	if (len < sizeof(*rrep) || !ND_TTEST(*rrep))
+	if (len < sizeof(*rrep) || !ND_TTEST_SIZE(rrep))
 		return (-1);
 	len -= sizeof(*rrep);
 
@@ -375,7 +375,7 @@ wb_drawop(netdissect_options *ndo,
           const struct pkt_dop *dop, u_int len)
 {
 	ND_PRINT((ndo, " wb-dop:"));
-	if (len < sizeof(*dop) || !ND_TTEST(*dop))
+	if (len < sizeof(*dop) || !ND_TTEST_SIZE(dop))
 		return (-1);
 	len -= sizeof(*dop);
 
@@ -403,7 +403,7 @@ wb_print(netdissect_options *ndo,
 	uint8_t type;
 
 	ph = (const struct pkt_hdr *)hdr;
-	if (len < sizeof(*ph) || !ND_TTEST(*ph)) {
+	if (len < sizeof(*ph) || !ND_TTEST_SIZE(ph)) {
 		ND_PRINT((ndo, "%s", tstr));
 		return;
 	}

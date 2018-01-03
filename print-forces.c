@@ -660,7 +660,7 @@ prestlv_print(netdissect_options *ndo,
 		return -1;
 	}
 
-	ND_TCHECK(*r);
+	ND_TCHECK_SIZE(r);
 	result = EXTRACT_U_1(r->result);
 	if (result >= 0x18 && result <= 0xFE) {
 		ND_PRINT((ndo, "illegal reserved result code: 0x%x!\n", result));
@@ -694,7 +694,7 @@ fdatatlv_print(netdissect_options *ndo,
 	 * (the TLV length) >= TLV_HDRL.
 	 */
 	rlen = len - TLV_HDRL;
-	ND_TCHECK(*tlv);
+	ND_TCHECK_SIZE(tlv);
 	type = EXTRACT_BE_U_2(&tlv->type);
 	if (type != F_TLV_FULD) {
 		ND_PRINT((ndo, "Error: expecting FULLDATA!\n"));
@@ -735,7 +735,7 @@ sdatailv_print(netdissect_options *ndo,
 #endif
 		char *ib = indent_pr(indent, 1);
 		const u_char *tdp = (const u_char *) ILV_DATA(ilv);
-		ND_TCHECK(*ilv);
+		ND_TCHECK_SIZE(ilv);
 		invilv = ilv_valid(ilv, rlen);
 		if (invilv) {
 			ND_PRINT((ndo, "%s[", ib + 1));
@@ -775,7 +775,7 @@ sdatatlv_print(netdissect_options *ndo,
 	 * >= TLV_HDRL.
 	 */
 	rlen = len - TLV_HDRL;
-	ND_TCHECK(*tlv);
+	ND_TCHECK_SIZE(tlv);
 	type = EXTRACT_BE_U_2(&tlv->type);
 	if (type != F_TLV_SPAD) {
 		ND_PRINT((ndo, "Error: expecting SPARSEDATA!\n"));
@@ -806,7 +806,7 @@ pkeyitlv_print(netdissect_options *ndo,
 	ND_TCHECK_1(tdp);
 	id = EXTRACT_BE_U_4(tdp);
 	ND_PRINT((ndo, "%sKeyinfo: Key 0x%x\n", ib, id));
-	ND_TCHECK(*kdtlv);
+	ND_TCHECK_SIZE(kdtlv);
 	type = EXTRACT_BE_U_2(&kdtlv->type);
 	invtlv = tlv_valid(kdtlv, len);
 
@@ -923,7 +923,7 @@ pdatacnt_print(netdissect_options *ndo,
 		u_int aln;
 		u_int invtlv;
 
-		ND_TCHECK(*pdtlv);
+		ND_TCHECK_SIZE(pdtlv);
 		type = EXTRACT_BE_U_2(&pdtlv->type);
 		invtlv = tlv_valid(pdtlv, len);
 		if (invtlv) {
@@ -998,7 +998,7 @@ pdata_print(netdissect_options *ndo,
 	int more_pd = 0;
 	uint16_t idcnt = 0;
 
-	ND_TCHECK(*pdh);
+	ND_TCHECK_SIZE(pdh);
 	if (len < sizeof(struct pathdata_h))
 		goto trunc;
 	if (ndo->ndo_vflag >= 3) {
@@ -1062,7 +1062,7 @@ genoptlv_print(netdissect_options *ndo,
 	u_int invtlv;
 	char *ib = indent_pr(indent, 0);
 
-	ND_TCHECK(*pdtlv);
+	ND_TCHECK_SIZE(pdtlv);
 	type = EXTRACT_BE_U_2(&pdtlv->type);
 	tll = EXTRACT_BE_U_2(&pdtlv->length) - TLV_HDRL;
 	invtlv = tlv_valid(pdtlv, len);
@@ -1110,7 +1110,7 @@ recpdoptlv_print(netdissect_options *ndo,
 	char *ib;
 
 	while (len != 0) {
-		ND_TCHECK(*pdtlv);
+		ND_TCHECK_SIZE(pdtlv);
 		invtlv = tlv_valid(pdtlv, len);
 		if (invtlv) {
 			break;
@@ -1181,7 +1181,7 @@ otlv_print(netdissect_options *ndo,
 	 * lfbselect_print() has ensured that EXTRACT_BE_U_2(&otlv->length)
 	 * >= TLV_HDRL.
 	 */
-	ND_TCHECK(*otlv);
+	ND_TCHECK_SIZE(otlv);
 	type = EXTRACT_BE_U_2(&otlv->type);
 	tll = EXTRACT_BE_U_2(&otlv->length) - TLV_HDRL;
 	ops = get_forces_optlv_h(type);
@@ -1356,7 +1356,7 @@ print_metailv(netdissect_options *ndo,
 	 * ILV) >= ILV_HDRL.
 	 */
 	rlen = EXTRACT_BE_U_4(&ilv->length) - ILV_HDRL;
-	ND_TCHECK(*ilv);
+	ND_TCHECK_SIZE(ilv);
 	ND_PRINT((ndo, "%sMetaID 0x%x length %d\n", ib, EXTRACT_BE_U_4(&ilv->type),
 		  EXTRACT_BE_U_4(&ilv->length)));
 	if (ndo->ndo_vflag >= 3) {
@@ -1389,7 +1389,7 @@ print_metatlv(netdissect_options *ndo,
 	rlen = dlen;
 	ND_PRINT((ndo, "\n%s METADATA length %d \n", ib, rlen));
 	while (rlen != 0) {
-		ND_TCHECK(*ilv);
+		ND_TCHECK_SIZE(ilv);
 		invilv = ilv_valid(ilv, rlen);
 		if (invilv) {
 			break;
@@ -1458,7 +1458,7 @@ redirect_print(netdissect_options *ndo,
 	rlen = dlen;
 	indent += 1;
 	while (rlen != 0) {
-		ND_TCHECK(*tlv);
+		ND_TCHECK_SIZE(tlv);
 		invtlv = tlv_valid(tlv, rlen);
 		if (invtlv) {
 			ND_PRINT((ndo, "Bad Redirect data\n"));
@@ -1535,7 +1535,7 @@ lfbselect_print(netdissect_options *ndo,
 	rlen = dlen - OP_OFF;
 
 	lfbs = (const struct forces_lfbsh *)pptr;
-	ND_TCHECK(*lfbs);
+	ND_TCHECK_SIZE(lfbs);
 	if (ndo->ndo_vflag >= 3) {
 		ND_PRINT((ndo, "\n%s%s(Classid %x) instance %x\n",
 		       ib, tok2str(ForCES_LFBs, NULL, EXTRACT_BE_U_4(&lfbs->class)),
@@ -1547,7 +1547,7 @@ lfbselect_print(netdissect_options *ndo,
 
 	indent += 1;
 	while (rlen != 0) {
-		ND_TCHECK(*otlv);
+		ND_TCHECK_SIZE(otlv);
 		invtlv = tlv_valid(otlv, rlen);
 		if (invtlv)
 			break;
@@ -1625,7 +1625,7 @@ forces_type_print(netdissect_options *ndo,
 	/*XXX: 15 top level tlvs will probably be fine
 	   You are nuts if you send more ;-> */
 	while (rlen != 0) {
-		ND_TCHECK(*tltlv);
+		ND_TCHECK_SIZE(tltlv);
 		invtlv = tlv_valid(tltlv, rlen);
 		if (invtlv)
 			break;
@@ -1687,7 +1687,7 @@ forces_print(netdissect_options *ndo,
 	int rc = 0;
 
 	fhdr = (const struct forcesh *)pptr;
-	ND_TCHECK(*fhdr);
+	ND_TCHECK_SIZE(fhdr);
 	tom = EXTRACT_U_1(fhdr->fm_tom);
 	if (!tom_valid(tom)) {
 		ND_PRINT((ndo, "Invalid ForCES message type %d\n", tom));

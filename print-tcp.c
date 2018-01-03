@@ -214,7 +214,7 @@ tcp_print(netdissect_options *ndo,
                 }
         }
 
-        ND_TCHECK(*tp);
+        ND_TCHECK_SIZE(tp);
 
         hlen = TH_OFF(tp) * 4;
 

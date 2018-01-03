@@ -39,7 +39,7 @@ ipnet_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	const ipnet_hdr_t *hdr;
 	hdr = (const ipnet_hdr_t *)bp;
 
-	ND_TCHECK(*hdr);
+	ND_TCHECK_SIZE(hdr);
 	ND_PRINT((ndo, "%d > %d", EXTRACT_BE_U_4(hdr->iph_zsrc),
 		  EXTRACT_BE_U_4(hdr->iph_zdst)));
 

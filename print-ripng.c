@@ -141,7 +141,7 @@ ripng_print(netdissect_options *ndo, const u_char *dat, unsigned int length)
 			ND_PRINT((ndo, " ripng-req %u:", j));
 		for (ni = rp->rip6_nets; length_left >= sizeof(*ni);
 		    length_left -= sizeof(*ni), ++ni) {
-			ND_TCHECK(*ni);
+			ND_TCHECK_SIZE(ni);
 			if (ndo->ndo_vflag > 1)
 				ND_PRINT((ndo, "\n\t"));
 			else
@@ -163,7 +163,7 @@ ripng_print(netdissect_options *ndo, const u_char *dat, unsigned int length)
 			ND_PRINT((ndo, " ripng-resp %u:", j));
 		for (ni = rp->rip6_nets; length_left >= sizeof(*ni);
 		    length_left -= sizeof(*ni), ++ni) {
-			ND_TCHECK(*ni);
+			ND_TCHECK_SIZE(ni);
 			if (ndo->ndo_vflag > 1)
 				ND_PRINT((ndo, "\n\t"));
 			else

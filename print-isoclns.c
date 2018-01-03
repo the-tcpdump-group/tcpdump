@@ -780,7 +780,7 @@ clnp_print(netdissect_options *ndo,
         uint8_t rfd_error,rfd_error_major,rfd_error_minor;
 
 	clnp_header = (const struct clnp_header_t *) pptr;
-        ND_TCHECK(*clnp_header);
+        ND_TCHECK_SIZE(clnp_header);
 
         li = EXTRACT_U_1(clnp_header->length_indicator);
         li_remaining = li;
@@ -892,7 +892,7 @@ clnp_print(netdissect_options *ndo,
                     return (0);
                 }
             	clnp_segment_header = (const struct clnp_segment_header_t *) pptr;
-                ND_TCHECK(*clnp_segment_header);
+                ND_TCHECK_SIZE(clnp_segment_header);
                 ND_PRINT((ndo, "\n\tData Unit ID: 0x%04x, Segment Offset: %u, Total PDU Length: %u",
                        EXTRACT_BE_U_2(clnp_segment_header->data_unit_id),
                        EXTRACT_BE_U_2(clnp_segment_header->segment_offset),
@@ -1116,7 +1116,7 @@ esis_print(netdissect_options *ndo,
 	}
 
 	esis_header = (const struct esis_header_t *) pptr;
-        ND_TCHECK(*esis_header);
+        ND_TCHECK_SIZE(esis_header);
         li = EXTRACT_U_1(esis_header->length_indicator);
         optr = pptr;
 
@@ -1394,7 +1394,7 @@ isis_print_mcid(netdissect_options *ndo,
 {
   int i;
 
-  ND_TCHECK(*mcid);
+  ND_TCHECK_SIZE(mcid);
   ND_PRINT((ndo,  "ID: %u, Name: ", EXTRACT_U_1(mcid->format_id)));
 
   if (fn_printzp(ndo, mcid->name, 32, ndo->ndo_snapend))
@@ -1733,7 +1733,7 @@ isis_print_tlv_ip_reach(netdissect_options *ndo,
 			return (0);
 		}
 
-		if (!ND_TTEST(*tlv_ip_reach))
+		if (!ND_TTEST_SIZE(tlv_ip_reach))
 		    return (0);
 
 		prefix_len = mask2plen(EXTRACT_IPV4_TO_HOST_ORDER(tlv_ip_reach->mask));
@@ -2274,7 +2274,7 @@ isis_print(netdissect_options *ndo,
                  need it for parsing the checksum TLV and authentication
                  TLV verification */
     isis_header = (const struct isis_common_header *)p;
-    ND_TCHECK(*isis_header);
+    ND_TCHECK_SIZE(isis_header);
     if (length < ISIS_COMMON_HEADER_SIZE)
         goto trunc;
     pptr = p+(ISIS_COMMON_HEADER_SIZE);
@@ -2400,7 +2400,7 @@ isis_print(netdissect_options *ndo,
                      fixed_len, (unsigned long)(ISIS_COMMON_HEADER_SIZE+ISIS_IIH_LAN_HEADER_SIZE)));
             return (0);
         }
-        ND_TCHECK(*header_iih_lan);
+        ND_TCHECK_SIZE(header_iih_lan);
         if (length < ISIS_COMMON_HEADER_SIZE+ISIS_IIH_LAN_HEADER_SIZE)
             goto trunc;
         if (ndo->ndo_vflag == 0) {
@@ -2445,7 +2445,7 @@ isis_print(netdissect_options *ndo,
                       fixed_len, (unsigned long)(ISIS_COMMON_HEADER_SIZE+ISIS_IIH_PTP_HEADER_SIZE)));
             return (0);
         }
-        ND_TCHECK(*header_iih_ptp);
+        ND_TCHECK_SIZE(header_iih_ptp);
         if (length < ISIS_COMMON_HEADER_SIZE+ISIS_IIH_PTP_HEADER_SIZE)
             goto trunc;
         if (ndo->ndo_vflag == 0) {
@@ -2486,7 +2486,7 @@ isis_print(netdissect_options *ndo,
                    fixed_len, (unsigned long)ISIS_LSP_HEADER_SIZE));
             return (0);
         }
-        ND_TCHECK(*header_lsp);
+        ND_TCHECK_SIZE(header_lsp);
         if (length < ISIS_COMMON_HEADER_SIZE+ISIS_LSP_HEADER_SIZE)
             goto trunc;
         if (ndo->ndo_vflag == 0) {
@@ -2544,7 +2544,7 @@ isis_print(netdissect_options *ndo,
                       fixed_len, (unsigned long)(ISIS_COMMON_HEADER_SIZE+ISIS_CSNP_HEADER_SIZE)));
             return (0);
         }
-        ND_TCHECK(*header_csnp);
+        ND_TCHECK_SIZE(header_csnp);
         if (length < ISIS_COMMON_HEADER_SIZE+ISIS_CSNP_HEADER_SIZE)
             goto trunc;
         if (ndo->ndo_vflag == 0) {
@@ -2582,7 +2582,7 @@ isis_print(netdissect_options *ndo,
                    fixed_len, (unsigned long)(ISIS_COMMON_HEADER_SIZE+ISIS_PSNP_HEADER_SIZE)));
             return (0);
         }
-        ND_TCHECK(*header_psnp);
+        ND_TCHECK_SIZE(header_psnp);
         if (length < ISIS_COMMON_HEADER_SIZE+ISIS_PSNP_HEADER_SIZE)
             goto trunc;
         if (ndo->ndo_vflag == 0) {
@@ -2742,7 +2742,7 @@ isis_print(netdissect_options *ndo,
 	    tptr++;
 	    tlv_is_reach = (const struct isis_tlv_is_reach *)tptr;
             while (tmp >= sizeof(struct isis_tlv_is_reach)) {
-		ND_TCHECK(*tlv_is_reach);
+		ND_TCHECK_SIZE(tlv_is_reach);
 		ND_PRINT((ndo, "\n\t      IS Neighbor: %s",
 		       isis_print_id(tlv_is_reach->neighbor_nodeid, NODE_ID_LEN)));
 		isis_print_metric_block(ndo, &tlv_is_reach->isis_metric_block);
@@ -2754,7 +2754,7 @@ isis_print(netdissect_options *ndo,
         case ISIS_TLV_ESNEIGH:
 	    tlv_es_reach = (const struct isis_tlv_es_reach *)tptr;
             while (tmp >= sizeof(struct isis_tlv_es_reach)) {
-		ND_TCHECK(*tlv_es_reach);
+		ND_TCHECK_SIZE(tlv_es_reach);
 		ND_PRINT((ndo, "\n\t      ES Neighbor: %s",
                        isis_print_id(tlv_es_reach->neighbor_sysid, SYSTEM_ID_LEN)));
 		isis_print_metric_block(ndo, &tlv_es_reach->isis_metric_block);

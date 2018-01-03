@@ -113,7 +113,7 @@ igrp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	ND_PRINT((ndo, "igrp:"));
 
 	/* Header */
-	ND_TCHECK(*hdr);
+	ND_TCHECK_SIZE(hdr);
 	nint = EXTRACT_BE_U_2(hdr->ig_ni);
 	nsys = EXTRACT_BE_U_2(hdr->ig_ns);
 	next = EXTRACT_BE_U_2(hdr->ig_nx);

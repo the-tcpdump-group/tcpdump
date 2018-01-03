@@ -186,7 +186,7 @@ auth_print(netdissect_options *ndo, const u_char *pptr)
 
         pptr += sizeof (struct bfd_header_t);
         bfd_auth_header = (const struct bfd_auth_header_t *)pptr;
-        ND_TCHECK(*bfd_auth_header);
+        ND_TCHECK_SIZE(bfd_auth_header);
         auth_type = EXTRACT_U_1(bfd_auth_header->auth_type);
         auth_len = EXTRACT_U_1(bfd_auth_header->auth_len);
         ND_PRINT((ndo, "\n\tAuthentication: %s (%u), length: %u",
@@ -302,7 +302,7 @@ bfd_print(netdissect_options *ndo, const u_char *pptr,
         bfd_header = (const struct bfd_header_t *)pptr;
         version_diag = EXTRACT_U_1(bfd_header->version_diag);
         if (port == BFD_CONTROL_PORT) {
-            ND_TCHECK(*bfd_header);
+            ND_TCHECK_SIZE(bfd_header);
             version = BFD_EXTRACT_VERSION(version_diag);
         } else if (port == BFD_ECHO_PORT) {
             /* Echo is BFD v1 only */

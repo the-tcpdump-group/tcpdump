@@ -599,7 +599,7 @@ domain_print(netdissect_options *ndo,
 	uint16_t b2;
 
 	np = (const dns_header_t *)bp;
-	ND_TCHECK(*np);
+	ND_TCHECK_SIZE(np);
 	flags = EXTRACT_BE_U_2(np->flags);
 	/* get the byte-order right */
 	qdcount = EXTRACT_BE_U_2(np->qdcount);

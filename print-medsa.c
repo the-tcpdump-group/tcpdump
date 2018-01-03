@@ -148,7 +148,7 @@ medsa_print(netdissect_options *ndo,
 	u_short ether_type;
 
 	medsa = (const struct medsa_pkthdr *)bp;
-	ND_TCHECK(*medsa);
+	ND_TCHECK_SIZE(medsa);
 
 	if (!ndo->ndo_eflag)
 		ND_PRINT((ndo, "MEDSA %d.%d:%d: ",

@@ -42,7 +42,7 @@ ah_print(netdissect_options *ndo, const u_char *bp)
 
 	ah = (const struct ah *)bp;
 
-	ND_TCHECK(*ah);
+	ND_TCHECK_SIZE(ah);
 
 	sumlen = EXTRACT_U_1(ah->ah_len) << 2;
 

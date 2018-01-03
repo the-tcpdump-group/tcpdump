@@ -216,7 +216,7 @@ aarp_print(netdissect_options *ndo,
 
 	ND_PRINT((ndo, "aarp "));
 	ap = (const struct aarp *)bp;
-	if (!ND_TTEST(*ap)) {
+	if (!ND_TTEST_SIZE(ap)) {
 		/* Just bail if we don't have the whole chunk. */
 		ND_PRINT((ndo, " [|aarp]"));
 		return;

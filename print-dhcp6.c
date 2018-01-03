@@ -302,7 +302,7 @@ dhcp6opt_print(netdissect_options *ndo,
 		if (ep < cp + sizeof(*dh6o))
 			goto trunc;
 		dh6o = (const struct dhcp6opt *)cp;
-		ND_TCHECK(*dh6o);
+		ND_TCHECK_SIZE(dh6o);
 		optlen = EXTRACT_BE_U_2(&dh6o->dh6opt_len);
 		if (ep < cp + sizeof(*dh6o) + optlen)
 			goto trunc;

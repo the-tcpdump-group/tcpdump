@@ -457,7 +457,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		cp = buf + strlen(buf);
 
 		ihp = (const struct ih_rdiscovery *)&dp->icmp_void;
-		ND_TCHECK(*ihp);
+		ND_TCHECK_SIZE(ihp);
 		(void)strncpy(cp, " lifetime ", sizeof(buf) - (cp - buf));
 		cp = buf + strlen(buf);
 		lifetime = EXTRACT_BE_U_2(ihp->ird_lifetime);
@@ -488,7 +488,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		}
 		idp = (const struct id_rdiscovery *)&dp->icmp_data;
 		while (num-- > 0) {
-			ND_TCHECK(*idp);
+			ND_TCHECK_SIZE(idp);
 			(void)snprintf(cp, sizeof(buf) - (cp - buf), " {%s %u}",
 			    ipaddr_string(ndo, &idp->ird_addr),
 			    EXTRACT_BE_U_4(idp->ird_pref));
@@ -596,7 +596,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
          */
         if (ndo->ndo_vflag >= 1 && plen > ICMP_EXTD_MINLEN && ICMP_MPLS_EXT_TYPE(icmp_type)) {
 
-            ND_TCHECK(*ext_dp);
+            ND_TCHECK_SIZE(ext_dp);
 
             /*
              * Check first if the mpls extension header shows a non-zero length.
@@ -641,7 +641,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
             while (hlen > sizeof(struct icmp_mpls_ext_object_header_t)) {
 
                 icmp_mpls_ext_object_header = (const struct icmp_mpls_ext_object_header_t *)obj_tptr;
-                ND_TCHECK(*icmp_mpls_ext_object_header);
+                ND_TCHECK_SIZE(icmp_mpls_ext_object_header);
                 obj_tlen = EXTRACT_BE_U_2(icmp_mpls_ext_object_header->length);
                 obj_class_num = EXTRACT_U_1(icmp_mpls_ext_object_header->class_num);
                 obj_ctype = EXTRACT_U_1(icmp_mpls_ext_object_header->ctype);

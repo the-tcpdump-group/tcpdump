@@ -159,7 +159,7 @@ eap_print(netdissect_options *ndo,
     tptr = cp;
     tlen = length;
     eap = (const struct eap_frame_t *)cp;
-    ND_TCHECK(*eap);
+    ND_TCHECK_SIZE(eap);
     eap_type = EXTRACT_U_1(eap->type);
 
     /* in non-verbose mode just lets print the basic info */

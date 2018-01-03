@@ -294,7 +294,7 @@ cfm_print(netdissect_options *ndo,
     cfm_common_header = (const struct cfm_common_header_t *)pptr;
     if (length < sizeof(*cfm_common_header))
         goto tooshort;
-    ND_TCHECK(*cfm_common_header);
+    ND_TCHECK_SIZE(cfm_common_header);
 
     /*
      * Sanity checking of the header.

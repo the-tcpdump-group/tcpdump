@@ -473,7 +473,7 @@ juniper_ggsn_if_print(netdissect_options *ndo,
         p+=l2info.header_len;
         gh = (struct juniper_ggsn_header *)&l2info.cookie;
 
-        ND_TCHECK(*gh);
+        ND_TCHECK_SIZE(gh);
         proto = EXTRACT_U_1(gh->proto);
         if (ndo->ndo_eflag) {
             ND_PRINT((ndo, "proto %s (%u), vlan %u: ",
@@ -526,7 +526,7 @@ juniper_es_if_print(netdissect_options *ndo,
         p+=l2info.header_len;
         ih = (const struct juniper_ipsec_header *)p;
 
-        ND_TCHECK(*ih);
+        ND_TCHECK_SIZE(ih);
         switch (EXTRACT_U_1(ih->type)) {
         case JUNIPER_IPSEC_O_ESP_ENCRYPT_ESP_AUTHEN_TYPE:
         case JUNIPER_IPSEC_O_ESP_ENCRYPT_AH_AUTHEN_TYPE:
@@ -600,7 +600,7 @@ juniper_monitor_if_print(netdissect_options *ndo,
         p+=l2info.header_len;
         mh = (const struct juniper_monitor_header *)p;
 
-        ND_TCHECK(*mh);
+        ND_TCHECK_SIZE(mh);
         if (ndo->ndo_eflag)
             ND_PRINT((ndo, "service-id %u, iif %u, pkt-type %u: ",
                    EXTRACT_BE_U_4(mh->service_id),
@@ -640,7 +640,7 @@ juniper_services_if_print(netdissect_options *ndo,
         p+=l2info.header_len;
         sh = (const struct juniper_services_header *)p;
 
-        ND_TCHECK(*sh);
+        ND_TCHECK_SIZE(sh);
         if (ndo->ndo_eflag)
             ND_PRINT((ndo, "service-id %u flags 0x%02x service-set-id 0x%04x iif %u: ",
                    EXTRACT_U_1(sh->svc_id),

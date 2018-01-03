@@ -97,7 +97,7 @@ ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
 			 * OK, we found it.
 			 */
 			dp = (const struct ip6_rthdr *)cp;
-			ND_TCHECK(*dp);
+			ND_TCHECK_SIZE(dp);
 			len = EXTRACT_U_1(dp->ip6r_len);
 			switch (EXTRACT_U_1(dp->ip6r_type)) {
 
@@ -227,7 +227,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	ip6 = (const struct ip6_hdr *)bp;
 
-	ND_TCHECK(*ip6);
+	ND_TCHECK_SIZE(ip6);
 	if (length < sizeof (struct ip6_hdr)) {
 		ND_PRINT((ndo, "truncated-ip6 %u", length));
 		return;

@@ -851,7 +851,7 @@ rpl_dio_print(netdissect_options *ndo,
         const struct nd_rpl_dio *dio = (const struct nd_rpl_dio *)bp;
         const char *dagid_str;
 
-        ND_TCHECK(*dio);
+        ND_TCHECK_SIZE(dio);
         dagid_str = ip6addr_string (ndo, dio->rpl_dagid);
 
         ND_PRINT((ndo, " [dagid:%s,seq:%u,instance:%u,rank:%u,%smop:%s,prf:%u]",
@@ -881,7 +881,7 @@ rpl_dao_print(netdissect_options *ndo,
         const char *dagid_str = "<elided>";
         uint8_t rpl_flags;
 
-        ND_TCHECK(*dao);
+        ND_TCHECK_SIZE(dao);
         if (length < ND_RPL_DAO_MIN_LEN)
         	goto tooshort;
 
@@ -1281,7 +1281,7 @@ icmp6_print(netdissect_options *ndo,
 			cp = (const u_char *)dp + length;
 			in6 = (const struct in6_addr *)(dp + 1);
 			for (; (const u_char *)in6 < cp; in6++) {
-				ND_TCHECK(*in6);
+				ND_TCHECK_SIZE(in6);
 				ND_PRINT((ndo,", %s", ip6addr_string(ndo, in6)));
 			}
 		}
@@ -1518,7 +1518,7 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 				memcpy(&in6, opri + 1, 8);
 				break;
 			case 3:
-				ND_TCHECK(*in6p);
+				ND_TCHECK_SIZE(in6p);
 				memcpy(&in6, opri + 1, sizeof(in6));
 				break;
 			default:

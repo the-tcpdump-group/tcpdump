@@ -259,7 +259,7 @@ print_internal(netdissect_options *ndo, const struct internal_tipc_pkthdr *ap)
 	    tok2str(tipcmtype_values, "Unknown", mtype), w1));
 
 	if (ndo->ndo_vflag) {
-		ND_TCHECK(*ap);
+		ND_TCHECK_SIZE(ap);
 		seq_gap = TIPC_SEQ_GAP(w1);
 		broadcast_ack = TIPC_BROADCAST_ACK(w1);
 		w2 = EXTRACT_BE_U_4(ap->w2);

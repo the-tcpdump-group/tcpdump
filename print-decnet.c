@@ -862,7 +862,7 @@ print_nsp(netdissect_options *ndo,
 
 	if (nsplen < sizeof(struct nsphdr))
 		goto trunc;
-	ND_TCHECK(*nsphp);
+	ND_TCHECK_SIZE(nsphp);
 	flags = EXTRACT_U_1(nsphp->nh_flags);
 	dst = EXTRACT_LE_U_2(nsphp->nh_dst);
 	src = EXTRACT_LE_U_2(nsphp->nh_src);
@@ -975,7 +975,7 @@ print_nsp(netdissect_options *ndo,
 			}
 		    }
 		    ND_PRINT((ndo, "seg %u ", ack & SGQ_MASK));
-		    ND_TCHECK(*lsmp);
+		    ND_TCHECK_SIZE(lsmp);
 		    lsflags = EXTRACT_U_1(lsmp->ls_lsflags);
 		    fcval = EXTRACT_U_1(lsmp->ls_fcval);
 		    switch (lsflags & LSI_MASK) {
@@ -1019,7 +1019,7 @@ print_nsp(netdissect_options *ndo,
 
 		    if (nsplen < sizeof(struct ackmsg))
 			goto trunc;
-		    ND_TCHECK(*amp);
+		    ND_TCHECK_SIZE(amp);
 		    ack = EXTRACT_LE_U_2(amp->ak_acknum[0]);
 		    if (ack & SGQ_ACK) {	/* acknum field */
 			if ((ack & SGQ_NAK) == SGQ_NAK)
@@ -1044,7 +1044,7 @@ print_nsp(netdissect_options *ndo,
 
 		    if (nsplen < sizeof(struct ackmsg))
 			goto trunc;
-		    ND_TCHECK(*amp);
+		    ND_TCHECK_SIZE(amp);
 		    ack = EXTRACT_LE_U_2(amp->ak_acknum[0]);
 		    if (ack & SGQ_ACK) {	/* acknum field */
 			if ((ack & SGQ_NAK) == SGQ_NAK)
@@ -1085,7 +1085,7 @@ print_nsp(netdissect_options *ndo,
 
 		    if (nsplen < sizeof(struct cimsg))
 			goto trunc;
-		    ND_TCHECK(*cimp);
+		    ND_TCHECK_SIZE(cimp);
 		    services = EXTRACT_U_1(cimp->ci_services);
 		    info = EXTRACT_U_1(cimp->ci_info);
 		    segsize = EXTRACT_LE_U_2(cimp->ci_segsize);
@@ -1126,7 +1126,7 @@ print_nsp(netdissect_options *ndo,
 
 		    if (nsplen < sizeof(struct ccmsg))
 			goto trunc;
-		    ND_TCHECK(*ccmp);
+		    ND_TCHECK_SIZE(ccmp);
 		    services = EXTRACT_U_1(ccmp->cc_services);
 		    info = EXTRACT_U_1(ccmp->cc_info);
 		    segsize = EXTRACT_LE_U_2(ccmp->cc_segsize);
@@ -1171,7 +1171,7 @@ print_nsp(netdissect_options *ndo,
 
 		    if (nsplen < sizeof(struct dimsg))
 			goto trunc;
-		    ND_TCHECK(*dimp);
+		    ND_TCHECK_SIZE(dimp);
 		    reason = EXTRACT_LE_U_2(dimp->di_reason);
 		    optlen = EXTRACT_U_1(dimp->di_optlen);
 
@@ -1187,7 +1187,7 @@ print_nsp(netdissect_options *ndo,
 		    const struct dcmsg *dcmp = (const struct dcmsg *)nspp;
 		    u_int reason;
 
-		    ND_TCHECK(*dcmp);
+		    ND_TCHECK_SIZE(dcmp);
 		    reason = EXTRACT_LE_U_2(dcmp->dc_reason);
 
 		    print_reason(ndo, reason);

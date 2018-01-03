@@ -1888,7 +1888,7 @@ rsvp_print(netdissect_options *ndo,
     tptr=pptr;
 
     rsvp_com_header = (const struct rsvp_common_header *)pptr;
-    ND_TCHECK(*rsvp_com_header);
+    ND_TCHECK_SIZE(rsvp_com_header);
     version_flags = EXTRACT_U_1(rsvp_com_header->version_flags);
 
     /*
@@ -1948,7 +1948,7 @@ rsvp_print(netdissect_options *ndo,
             subtptr=subpptr;
 
             rsvp_com_header = (const struct rsvp_common_header *)subpptr;
-            ND_TCHECK(*rsvp_com_header);
+            ND_TCHECK_SIZE(rsvp_com_header);
             version_flags = EXTRACT_U_1(rsvp_com_header->version_flags);
 
             /*

@@ -470,7 +470,7 @@ sctp_print(netdissect_options *ndo,
       return;
     }
   sctpPktHdr = (const struct sctpHeader*) bp;
-  ND_TCHECK(*sctpPktHdr);
+  ND_TCHECK_SIZE(sctpPktHdr);
   sctpPacketLengthRemaining = sctpPacketLength;
 
   sourcePort = EXTRACT_BE_U_2(&sctpPktHdr->source);
@@ -526,7 +526,7 @@ sctp_print(netdissect_options *ndo,
         ND_PRINT((ndo, "%s%u) [chunk descriptor cut off at end of packet]", sep, chunkCount+1));
         break;
       }
-      ND_TCHECK(*chunkDescPtr);
+      ND_TCHECK_SIZE(chunkDescPtr);
       chunkLength = EXTRACT_BE_U_2(&chunkDescPtr->chunkLength);
       if (chunkLength < sizeof(*chunkDescPtr)) {
         ND_PRINT((ndo, "%s%u) [Bad chunk length %u, < size of chunk descriptor]", sep, chunkCount+1, chunkLength));

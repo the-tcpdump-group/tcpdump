@@ -114,7 +114,7 @@ print_mtrace(netdissect_options *ndo,
 {
     const struct tr_query *tr = (const struct tr_query *)(bp + 8);
 
-    ND_TCHECK(*tr);
+    ND_TCHECK_SIZE(tr);
     if (len < 8 + sizeof (struct tr_query)) {
 	ND_PRINT((ndo, " [invalid len %d]", len));
 	return;
@@ -136,7 +136,7 @@ print_mresp(netdissect_options *ndo,
 {
     const struct tr_query *tr = (const struct tr_query *)(bp + 8);
 
-    ND_TCHECK(*tr);
+    ND_TCHECK_SIZE(tr);
     if (len < 8 + sizeof (struct tr_query)) {
 	ND_PRINT((ndo, " [invalid len %d]", len));
 	return;
