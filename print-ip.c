@@ -556,7 +556,7 @@ ip_print(netdissect_options *ndo,
 	if (!ndo->ndo_eflag)
 		ND_PRINT((ndo, "IP "));
 
-	ND_TCHECK(*ipds->ip);
+	ND_TCHECK_SIZE(ipds->ip);
 	if (length < sizeof (struct ip)) {
 		ND_PRINT((ndo, "truncated-ip %u", length));
 		return;

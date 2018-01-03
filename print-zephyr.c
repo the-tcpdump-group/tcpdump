@@ -95,7 +95,7 @@ parse_field(netdissect_options *ndo, const char **pptr, int *len, int *truncated
 	    /* Ran out of packet data without finding it */
 	    return NULL;
 	}
-	if (!ND_TTEST(**pptr)) {
+	if (!ND_TTEST_SIZE(*pptr)) {
 	    /* Ran out of captured data without finding it */
 	    *truncated = 1;
 	    return NULL;

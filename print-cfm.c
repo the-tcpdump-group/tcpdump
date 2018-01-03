@@ -345,7 +345,7 @@ cfm_print(netdissect_options *ndo,
         }
         if (tlen < sizeof(*msg_ptr.cfm_ccm))
             goto tooshort;
-        ND_TCHECK(*msg_ptr.cfm_ccm);
+        ND_TCHECK_SIZE(msg_ptr.cfm_ccm);
 
         ccm_interval = CFM_EXTRACT_CCM_INTERVAL(flags);
         ND_PRINT((ndo, ", Flags [CCM Interval %u%s]",
@@ -475,7 +475,7 @@ cfm_print(netdissect_options *ndo,
         }
         if (tlen < sizeof(*msg_ptr.cfm_ltm))
             goto tooshort;
-        ND_TCHECK(*msg_ptr.cfm_ltm);
+        ND_TCHECK_SIZE(msg_ptr.cfm_ltm);
 
         ND_PRINT((ndo, ", Flags [%s]",
                bittok2str(cfm_ltm_flag_values, "none", flags)));
@@ -498,7 +498,7 @@ cfm_print(netdissect_options *ndo,
         }
         if (tlen < sizeof(*msg_ptr.cfm_ltr))
             goto tooshort;
-        ND_TCHECK(*msg_ptr.cfm_ltr);
+        ND_TCHECK_SIZE(msg_ptr.cfm_ltr);
 
         ND_PRINT((ndo, ", Flags [%s]",
                bittok2str(cfm_ltr_flag_values, "none", flags)));

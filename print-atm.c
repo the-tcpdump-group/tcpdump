@@ -496,7 +496,7 @@ oam_print (netdissect_options *ndo,
     switch (cell_type << 4 | func_type) {
     case (OAM_CELLTYPE_FM << 4 | OAM_FM_FUNCTYPE_LOOPBACK):
         oam_ptr.oam_fm_loopback = (const struct oam_fm_loopback_t *)(p + OAM_CELLTYPE_FUNCTYPE_LEN);
-        ND_TCHECK(*oam_ptr.oam_fm_loopback);
+        ND_TCHECK_SIZE(oam_ptr.oam_fm_loopback);
         ND_PRINT((ndo, "\n\tLoopback-Indicator %s, Correlation-Tag 0x%08x",
                tok2str(oam_fm_loopback_indicator_values,
                        "Unknown",
@@ -519,7 +519,7 @@ oam_print (netdissect_options *ndo,
     case (OAM_CELLTYPE_FM << 4 | OAM_FM_FUNCTYPE_AIS):
     case (OAM_CELLTYPE_FM << 4 | OAM_FM_FUNCTYPE_RDI):
         oam_ptr.oam_fm_ais_rdi = (const struct oam_fm_ais_rdi_t *)(p + OAM_CELLTYPE_FUNCTYPE_LEN);
-        ND_TCHECK(*oam_ptr.oam_fm_ais_rdi);
+        ND_TCHECK_SIZE(oam_ptr.oam_fm_ais_rdi);
         ND_PRINT((ndo, "\n\tFailure-type 0x%02x", EXTRACT_U_1(oam_ptr.oam_fm_ais_rdi->failure_type)));
         ND_PRINT((ndo, "\n\tLocation-ID "));
         for (idx = 0; idx < sizeof(oam_ptr.oam_fm_ais_rdi->failure_location); idx++) {

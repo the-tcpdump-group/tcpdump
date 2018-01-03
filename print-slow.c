@@ -522,7 +522,7 @@ slow_oam_print(netdissect_options *ndo,
     ptr.slow_oam_common_header = (const struct slow_oam_common_header_t *)tptr;
     if (tlen < sizeof(*ptr.slow_oam_common_header))
         goto tooshort;
-    ND_TCHECK(*ptr.slow_oam_common_header);
+    ND_TCHECK_SIZE(ptr.slow_oam_common_header);
     tptr += sizeof(struct slow_oam_common_header_t);
     tlen -= sizeof(struct slow_oam_common_header_t);
 
@@ -539,7 +539,7 @@ slow_oam_print(netdissect_options *ndo,
             ptr.slow_oam_tlv_header = (const struct slow_oam_tlv_header_t *)tptr;
             if (tlen < sizeof(*ptr.slow_oam_tlv_header))
                 goto tooshort;
-            ND_TCHECK(*ptr.slow_oam_tlv_header);
+            ND_TCHECK_SIZE(ptr.slow_oam_tlv_header);
             type = EXTRACT_U_1(ptr.slow_oam_tlv_header->type);
             length = EXTRACT_U_1(ptr.slow_oam_tlv_header->length);
             ND_PRINT((ndo, "\n\t  %s Information Type (%u), length %u",
@@ -637,7 +637,7 @@ slow_oam_print(netdissect_options *ndo,
             ptr.slow_oam_tlv_header = (const struct slow_oam_tlv_header_t *)tptr;
             if (tlen < sizeof(*ptr.slow_oam_tlv_header))
                 goto tooshort;
-            ND_TCHECK(*ptr.slow_oam_tlv_header);
+            ND_TCHECK_SIZE(ptr.slow_oam_tlv_header);
             type = EXTRACT_U_1(ptr.slow_oam_tlv_header->type);
             length = EXTRACT_U_1(ptr.slow_oam_tlv_header->length);
             ND_PRINT((ndo, "\n\t  %s Link Event Type (%u), length %u",
@@ -719,7 +719,7 @@ slow_oam_print(netdissect_options *ndo,
         tlv.slow_oam_loopbackctrl = (const struct slow_oam_loopbackctrl_t *)tptr;
         if (tlen < sizeof(*tlv.slow_oam_loopbackctrl))
             goto tooshort;
-        ND_TCHECK(*tlv.slow_oam_loopbackctrl);
+        ND_TCHECK_SIZE(tlv.slow_oam_loopbackctrl);
         command = EXTRACT_U_1(tlv.slow_oam_loopbackctrl->command);
         ND_PRINT((ndo, "\n\t  Command %s (%u)",
                tok2str(slow_oam_loopbackctrl_cmd_values,
