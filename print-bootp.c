@@ -1061,16 +1061,16 @@ trunc:
 	ND_PRINT((ndo, "|[rfc1048]"));
 }
 
+#define PRINTCMUADDR(m, s) { ND_TCHECK(cmu->m); \
+    if (cmu->m.s_addr != 0) \
+	ND_PRINT((ndo, " %s:%s", s, ipaddr_string(ndo, &cmu->m.s_addr))); }
+
 static void
 cmu_print(netdissect_options *ndo,
 	  const u_char *bp)
 {
 	const struct cmu_vend *cmu;
 	uint8_t v_flags;
-
-#define PRINTCMUADDR(m, s) { ND_TCHECK(cmu->m); \
-    if (cmu->m.s_addr != 0) \
-	ND_PRINT((ndo, " %s:%s", s, ipaddr_string(ndo, &cmu->m.s_addr))); }
 
 	ND_PRINT((ndo, " vend-cmu"));
 	cmu = (const struct cmu_vend *)bp;
@@ -1092,8 +1092,9 @@ cmu_print(netdissect_options *ndo,
 
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
-#undef PRINTCMUADDR
 }
+
+#undef PRINTCMUADDR
 
 static char *
 client_fqdn_flags(u_int flags)
