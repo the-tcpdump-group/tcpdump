@@ -415,7 +415,7 @@ slow_marker_lacp_print(netdissect_options *ndo,
 
             tlv_ptr.lacp_tlv_actor_partner_info = (const struct lacp_tlv_actor_partner_info_t *)tlv_tptr;
 
-            ND_PRINT((ndo, "\n\t  System %s, System Priority %u, Key %u" \
+            ND_PRINT((ndo, "\n\t  System %s, System Priority %u, Key %u"
                    ", Port %u, Port Priority %u\n\t  State Flags [%s]",
                    etheraddr_string(ndo, tlv_ptr.lacp_tlv_actor_partner_info->sys),
                    EXTRACT_BE_U_2(tlv_ptr.lacp_tlv_actor_partner_info->sys_pri),

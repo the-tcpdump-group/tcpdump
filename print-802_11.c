@@ -2830,9 +2830,9 @@ print_radiotap_field(netdissect_options *ndo,
 					 * up the rate.
 					 */
 					htrate =
-						ieee80211_float_htrates \
-							[mcs_index] \
-							[((flags & IEEE80211_RADIOTAP_MCS_BANDWIDTH_MASK) == IEEE80211_RADIOTAP_MCS_BANDWIDTH_40 ? 1 : 0)] \
+						ieee80211_float_htrates
+							[mcs_index]
+							[((flags & IEEE80211_RADIOTAP_MCS_BANDWIDTH_MASK) == IEEE80211_RADIOTAP_MCS_BANDWIDTH_40 ? 1 : 0)]
 							[((flags & IEEE80211_RADIOTAP_MCS_SHORT_GI) ? 1 : 0)];
 				} else {
 					/*

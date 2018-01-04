@@ -231,9 +231,9 @@ static char *l2tp_result_code_CDN[] = {
 	"Call disconnected due to loss of carrier",
 	"Call disconnected for the reason indicated in error code",
 	"Call disconnected for administrative reasons",
-	"Call failed due to lack of appropriate facilities being " \
+	"Call failed due to lack of appropriate facilities being "
 	"available (temporary condition)",
-	"Call failed due to lack of appropriate facilities being " \
+	"Call failed due to lack of appropriate facilities being "
 	"available (permanent condition)",
 	"Invalid destination",
 	"Call failed due to no carrier detected",
@@ -250,7 +250,7 @@ static char *l2tp_error_code_general[] = {
 	"No general error",
 	"No control connection exists yet for this LAC-LNS pair",
 	"Length is wrong",
-	"One of the field values was out of range or " \
+	"One of the field values was out of range or "
 	"reserved field was non-zero"
 	"Insufficient resources to handle this operation now",
 	"The Session ID is invalid in this context",

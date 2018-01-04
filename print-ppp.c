@@ -1101,7 +1101,7 @@ print_ipcp_config_options(netdissect_options *ndo,
                         }
 
                         ND_TCHECK_LEN(p + 2, IPCPOPT_IPCOMP_MINLEN);
-                        ND_PRINT((ndo, "\n\t    TCP Space %u, non-TCP Space %u" \
+                        ND_PRINT((ndo, "\n\t    TCP Space %u, non-TCP Space %u"
                                ", maxPeriod %u, maxTime %u, maxHdr %u",
                                EXTRACT_BE_U_2(p + 4),
                                EXTRACT_BE_U_2(p + 6),

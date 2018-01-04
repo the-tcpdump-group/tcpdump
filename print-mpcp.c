@@ -219,7 +219,7 @@ mpcp_print(netdissect_options *ndo, const u_char *pptr, u_int length)
     case MPCP_OPCODE_REG:
         ND_TCHECK_LEN(tptr, sizeof(struct mpcp_reg_t));
         mpcp.reg = (const struct mpcp_reg_t *)tptr;
-        ND_PRINT((ndo, "\n\tAssigned-Port %u, Flags [ %s ]" \
+        ND_PRINT((ndo, "\n\tAssigned-Port %u, Flags [ %s ]"
                "\n\tSync-Time %u ticks, Echoed-Pending-Grants %u",
                EXTRACT_BE_U_2(mpcp.reg->assigned_port),
                bittok2str(mpcp_reg_flag_values, "Reserved", EXTRACT_U_1(mpcp.reg->flags)),
@@ -230,7 +230,7 @@ mpcp_print(netdissect_options *ndo, const u_char *pptr, u_int length)
     case MPCP_OPCODE_REG_ACK:
         ND_TCHECK_LEN(tptr, sizeof(struct mpcp_reg_ack_t));
         mpcp.reg_ack = (const struct mpcp_reg_ack_t *)tptr;
-        ND_PRINT((ndo, "\n\tEchoed-Assigned-Port %u, Flags [ %s ]" \
+        ND_PRINT((ndo, "\n\tEchoed-Assigned-Port %u, Flags [ %s ]"
                "\n\tEchoed-Sync-Time %u ticks",
                EXTRACT_BE_U_2(mpcp.reg_ack->echoed_assigned_port),
                bittok2str(mpcp_reg_ack_flag_values, "Reserved", EXTRACT_U_1(mpcp.reg_ack->flags)),
