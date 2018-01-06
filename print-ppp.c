@@ -1761,7 +1761,7 @@ ppp_bsdos_if_print(netdissect_options *ndo _U_,
 
 	if (caplen < PPP_BSDI_HDRLEN) {
 		ND_PRINT((ndo, "[|ppp]"));
-		return (caplen)
+		return (caplen);
 	}
 
 	hdrlength = 0;
