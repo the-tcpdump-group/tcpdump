@@ -299,7 +299,7 @@ bootp_print(netdissect_options *ndo,
 	bp_hlen = EXTRACT_U_1(bp->bp_hlen);
 	if (bp_htype == 1 && bp_hlen == 6 && bp_op == BOOTPREQUEST) {
 		ND_TCHECK_LEN(bp->bp_chaddr, 6);
-		ND_PRINT((ndo, " from %s", etheraddr_string(ndo, bp->bp_chaddr));
+		ND_PRINT((ndo, " from %s", etheraddr_string(ndo, bp->bp_chaddr)));
 	}
 
 	ND_PRINT((ndo, ", length %u", length));
@@ -319,7 +319,7 @@ bootp_print(netdissect_options *ndo,
 
 	/* Only print interesting fields */
 	if (EXTRACT_U_1(bp->bp_hops))
-		ND_PRINT((ndo, ", hops %d", EXTRACT_U_1(bp->bp_hops))));
+		ND_PRINT((ndo, ", hops %d", EXTRACT_U_1(bp->bp_hops)));
 	if (EXTRACT_BE_U_4(bp->bp_xid))
 		ND_PRINT((ndo, ", xid 0x%x", EXTRACT_BE_U_4(bp->bp_xid)));
 	if (EXTRACT_BE_U_2(bp->bp_secs))
