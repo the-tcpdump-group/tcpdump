@@ -128,7 +128,7 @@ name_interpret(netdissect_options *ndo,
                const u_char *in, const u_char *maxbuf, char *out)
 {
     int ret;
-    int len;
+    u_int len;
 
     if (in >= maxbuf)
 	return(-1);	/* name goes past the end of the buffer */
@@ -138,10 +138,10 @@ name_interpret(netdissect_options *ndo,
 
     *out=0;
 
-    if (len > 30 || len < 1)
+    if (len > 30 || len == 0)
 	return(0);
 
-    while (len--) {
+    while (len) {
 	ND_TCHECK_2(in);
 	if (in + 1 >= maxbuf)
 	    return(-1);	/* name goes past the end of the buffer */
@@ -153,6 +153,7 @@ name_interpret(netdissect_options *ndo,
 	*out = ((EXTRACT_U_1(in) - 'A') << 4) + (EXTRACT_U_1(in + 1) - 'A');
 	in += 2;
 	out++;
+	len--;
     }
     *out = 0;
     ret = out[-1];
@@ -168,7 +169,7 @@ trunc:
  */
 static const u_char *
 name_ptr(netdissect_options *ndo,
-         const u_char *buf, int ofs, const u_char *maxbuf)
+         const u_char *buf, u_int ofs, const u_char *maxbuf)
 {
     const u_char *p;
     u_char c;
@@ -208,7 +209,7 @@ trunc:
  */
 static int
 name_extract(netdissect_options *ndo,
-             const u_char *buf, int ofs, const u_char *maxbuf, char *name)
+             const u_char *buf, u_int ofs, const u_char *maxbuf, char *name)
 {
     const u_char *p = name_ptr(ndo, buf, ofs, maxbuf);
     if (p == NULL)
@@ -249,9 +250,9 @@ trunc:
 
 static void
 print_asc(netdissect_options *ndo,
-          const u_char *buf, int len)
+          const u_char *buf, u_int len)
 {
-    int i;
+    u_int i;
     for (i = 0; i < len; i++)
         safeputchar(ndo, EXTRACT_U_1(buf + i));
 }
@@ -274,11 +275,11 @@ name_type_str(int name_type)
 }
 
 void
-smb_print_data(netdissect_options *ndo, const u_char *buf, int len)
+smb_print_data(netdissect_options *ndo, const u_char *buf, u_int len)
 {
-    int i = 0;
+    u_int i = 0;
 
-    if (len <= 0)
+    if (len == 0)
 	return;
     ND_PRINT((ndo, "[%03X] ", i));
     for (i = 0; i < len; /*nothing*/) {
@@ -327,7 +328,7 @@ write_bits(netdissect_options *ndo,
            unsigned int val, const char *fmt)
 {
     const char *p = fmt;
-    int i = 0;
+    u_int i = 0;
 
     while ((p = strchr(fmt, '|'))) {
 	size_t l = PTR_DIFF(p, fmt);
@@ -461,12 +462,12 @@ smb_fdata1(netdissect_options *ndo,
 	  {
 	    char bitfmt[128];
 	    char *p;
-	    int l;
+	    u_int l;
 
 	    p = strchr(++fmt, '}');
 	    l = PTR_DIFF(p, fmt);
 
-	    if ((unsigned int)l > sizeof(bitfmt) - 1)
+	    if (l > sizeof(bitfmt) - 1)
 		    l = sizeof(bitfmt)-1;
 
 	    strncpy(bitfmt, fmt, l);
@@ -504,10 +505,10 @@ smb_fdata1(netdissect_options *ndo,
 	  }
 	case 'd':
 	  {
-	    unsigned int x;
+	    int x;
 	    ND_TCHECK_2(buf);
-	    x = reverse ? EXTRACT_BE_U_2(buf) :
-			  EXTRACT_LE_U_2(buf);
+	    x = reverse ? EXTRACT_BE_S_2(buf) :
+			  EXTRACT_LE_S_2(buf);
 	    ND_PRINT((ndo, "%d (0x%x)", x, x));
 	    buf += 2;
 	    fmt++;
@@ -515,10 +516,10 @@ smb_fdata1(netdissect_options *ndo,
 	  }
 	case 'D':
 	  {
-	    unsigned int x;
+	    int x;
 	    ND_TCHECK_4(buf);
-	    x = reverse ? EXTRACT_BE_U_4(buf) :
-			  EXTRACT_LE_U_4(buf);
+	    x = reverse ? EXTRACT_BE_S_4(buf) :
+			  EXTRACT_LE_S_4(buf);
 	    ND_PRINT((ndo, "%d (0x%x)", x, x));
 	    buf += 4;
 	    fmt++;
@@ -532,6 +533,28 @@ smb_fdata1(netdissect_options *ndo,
 			  EXTRACT_LE_U_8(buf);
 	    ND_PRINT((ndo, "%" PRIu64 " (0x%" PRIx64 ")", x, x));
 	    buf += 8;
+	    fmt++;
+	    break;
+	  }
+	case 'u':
+	  {
+	    unsigned int x;
+	    ND_TCHECK_2(buf);
+	    x = reverse ? EXTRACT_BE_U_2(buf) :
+			  EXTRACT_LE_U_2(buf);
+	    ND_PRINT((ndo, "%u (0x%x)", x, x));
+	    buf += 2;
+	    fmt++;
+	    break;
+	  }
+	case 'U':
+	  {
+	    unsigned int x;
+	    ND_TCHECK_4(buf);
+	    x = reverse ? EXTRACT_BE_U_4(buf) :
+			  EXTRACT_LE_U_4(buf);
+	    ND_PRINT((ndo, "%u (0x%x)", x, x));
+	    buf += 4;
 	    fmt++;
 	    break;
 	  }
@@ -596,6 +619,7 @@ smb_fdata1(netdissect_options *ndo,
 		break;
 
 	    case 'd':
+	    case 'u':
 		ND_TCHECK_2(buf);
 		stringlen = reverse ? EXTRACT_BE_U_2(buf) :
 				      EXTRACT_LE_U_2(buf);
@@ -604,6 +628,7 @@ smb_fdata1(netdissect_options *ndo,
 		break;
 
 	    case 'D':
+	    case 'U':
 		ND_TCHECK_4(buf);
 		stringlen = reverse ? EXTRACT_BE_U_4(buf) :
 				      EXTRACT_LE_U_4(buf);
