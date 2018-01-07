@@ -99,20 +99,20 @@ hsrp_print(netdissect_options *ndo, const uint8_t *bp, u_int len)
 	const struct hsrp *hp = (const struct hsrp *) bp;
 	uint8_t version;
 
-	ND_TCHECK(hp->hsrp_version);
+	ND_TCHECK_1(hp->hsrp_version);
 	version = EXTRACT_U_1(hp->hsrp_version);
 	ND_PRINT("HSRPv%u", version);
 	if (version != 0)
 		return;
-	ND_TCHECK(hp->hsrp_op_code);
+	ND_TCHECK_1(hp->hsrp_op_code);
 	ND_PRINT("-");
 	ND_PRINT("%s ", tok2strary(op_code_str, "unknown (%u)", EXTRACT_U_1(hp->hsrp_op_code)));
 	ND_PRINT("%u: ", len);
-	ND_TCHECK(hp->hsrp_state);
+	ND_TCHECK_1(hp->hsrp_state);
 	ND_PRINT("state=%s ", tok2str(states, "Unknown (%u)", EXTRACT_U_1(hp->hsrp_state)));
-	ND_TCHECK(hp->hsrp_group);
+	ND_TCHECK_1(hp->hsrp_group);
 	ND_PRINT("group=%u ", EXTRACT_U_1(hp->hsrp_group));
-	ND_TCHECK(hp->hsrp_reserved);
+	ND_TCHECK_1(hp->hsrp_reserved);
 	if (EXTRACT_U_1(hp->hsrp_reserved) != 0) {
 		ND_PRINT("[reserved=%u!] ", EXTRACT_U_1(hp->hsrp_reserved));
 	}
