@@ -289,12 +289,12 @@ bootp_print(netdissect_options *ndo,
 	uint8_t bp_op, bp_htype, bp_hlen;
 
 	bp = (const struct bootp *)cp;
-	ND_TCHECK(bp->bp_op);
+	ND_TCHECK_1(bp->bp_op);
 	bp_op = EXTRACT_U_1(bp->bp_op);
 	ND_PRINT("BOOTP/DHCP, %s",
 		  tok2str(bootp_op_values, "unknown (0x%02x)", bp_op));
 
-	ND_TCHECK(bp->bp_hlen);
+	ND_TCHECK_1(bp->bp_hlen);
 	bp_htype = EXTRACT_U_1(bp->bp_htype);
 	bp_hlen = EXTRACT_U_1(bp->bp_hlen);
 	if (bp_htype == 1 && bp_hlen == 6 && bp_op == BOOTPREQUEST) {
@@ -307,7 +307,7 @@ bootp_print(netdissect_options *ndo,
 	if (!ndo->ndo_vflag)
 		return;
 
-	ND_TCHECK(bp->bp_secs);
+	ND_TCHECK_2(bp->bp_secs);
 
 	/* The usual hardware address type is 1 (10Mb Ethernet) */
 	if (bp_htype != 1)
@@ -325,7 +325,7 @@ bootp_print(netdissect_options *ndo,
 	if (EXTRACT_BE_U_2(bp->bp_secs))
 		ND_PRINT(", secs %d", EXTRACT_BE_U_2(bp->bp_secs));
 
-	ND_TCHECK(bp->bp_flags);
+	ND_TCHECK_2(bp->bp_flags);
 	ND_PRINT(", Flags [%s]",
 		  bittok2str(bootp_flag_values, "none", EXTRACT_BE_U_2(bp->bp_flags)));
 	if (ndo->ndo_vflag > 1)
@@ -1076,7 +1076,7 @@ cmu_print(netdissect_options *ndo,
 	cmu = (const struct cmu_vend *)bp;
 
 	/* Only print if there are unknown bits */
-	ND_TCHECK(cmu->v_flags);
+	ND_TCHECK_4(cmu->v_flags);
 	v_flags = EXTRACT_U_1(cmu->v_flags);
 	if ((v_flags & ~(VF_SMASK)) != 0)
 		ND_PRINT(" F:0x%x", v_flags);
