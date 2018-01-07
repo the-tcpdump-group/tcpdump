@@ -117,7 +117,7 @@ ripng_print(netdissect_options *ndo, const u_char *dat, unsigned int length)
 	unsigned int length_left;
 	u_int j;
 
-	ND_TCHECK(rp->rip6_cmd);
+	ND_TCHECK_1(rp->rip6_cmd);
 	cmd = EXTRACT_U_1(rp->rip6_cmd);
 	switch (cmd) {
 
@@ -177,7 +177,7 @@ ripng_print(netdissect_options *ndo, const u_char *dat, unsigned int length)
 		ND_PRINT(" ripng-%u ?? %u", cmd, length);
 		break;
 	}
-	ND_TCHECK(rp->rip6_vers);
+	ND_TCHECK_1(rp->rip6_vers);
 	if (EXTRACT_U_1(rp->rip6_vers) != RIP6_VERSION)
 		ND_PRINT(" [vers %u]", EXTRACT_U_1(rp->rip6_vers));
 	return;
