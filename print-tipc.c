@@ -171,7 +171,7 @@ print_payload(netdissect_options *ndo, const struct payload_tipc_pkthdr *ap)
 	u_int orig_node;
 	u_int dest_node;
 
-	ND_TCHECK(ap->dest_port);
+	ND_TCHECK_4(ap->dest_port);
 	w0 = EXTRACT_BE_U_4(ap->w0);
 	user = TIPC_USER(w0);
 	hsize = TIPC_HSIZE(w0);
@@ -190,7 +190,7 @@ print_payload(netdissect_options *ndo, const struct payload_tipc_pkthdr *ap)
 		    tok2str(tipcuser_values, "unknown", user),
 		    tok2str(tipcmtype_values, "Unknown", mtype));
 	} else {
-		ND_TCHECK(ap->dest_node);
+		ND_TCHECK_4(ap->dest_node);
 		orig_node = EXTRACT_BE_U_4(ap->orig_node);
 		dest_node = EXTRACT_BE_U_4(ap->dest_node);
 		ND_PRINT("TIPC v%u.0 %u.%u.%u:%u > %u.%u.%u:%u, headerlength %u bytes, MessageSize %u bytes, %s, messageType %s",
@@ -241,7 +241,7 @@ print_internal(netdissect_options *ndo, const struct internal_tipc_pkthdr *ap)
 	u_int msg_cnt;
 	u_int link_tol;
 
-	ND_TCHECK(ap->dest_node);
+	ND_TCHECK_4(ap->dest_node);
 	w0 = EXTRACT_BE_U_4(ap->w0);
 	user = TIPC_USER(w0);
 	hsize = TIPC_HSIZE(w0);
@@ -301,7 +301,7 @@ print_link_conf(netdissect_options *ndo, const struct link_conf_tipc_pkthdr *ap)
 	u_int ntwrk_id;
 	u_int media_id;
 
-	ND_TCHECK(ap->prev_node);
+	ND_TCHECK_4(ap->prev_node);
 	w0 = EXTRACT_BE_U_4(ap->w0);
 	user = TIPC_USER(w0);
 	hsize = TIPC_HSIZE(w0);
@@ -319,7 +319,7 @@ print_link_conf(netdissect_options *ndo, const struct link_conf_tipc_pkthdr *ap)
 	    tok2str(tipcuser_values, "unknown", user),
 	    tok2str(tipc_linkconf_mtype_values, "Unknown", mtype));
 	if (ndo->ndo_vflag) {
-		ND_TCHECK(ap->w5);
+		ND_TCHECK_4(ap->w5);
 		node_sig = TIPC_NODE_SIG(w1);
 		ntwrk_id = EXTRACT_BE_U_4(ap->ntwrk_id);
 		w5 = EXTRACT_BE_U_4(ap->w5);
@@ -342,7 +342,7 @@ tipc_print(netdissect_options *ndo, const u_char *bp, u_int length _U_,
 	u_int user;
 
 	ap = (const struct tipc_pkthdr *)bp;
-	ND_TCHECK(ap->w0);
+	ND_TCHECK_4(ap->w0);
 	w0 = EXTRACT_BE_U_4(ap->w0);
 	user = TIPC_USER(w0);
 
