@@ -545,7 +545,7 @@ ip_print(netdissect_options *ndo,
 	const char *p_name;
 
 	ipds->ip = (const struct ip *)bp;
-	ND_TCHECK(ipds->ip->ip_vhl);
+	ND_TCHECK_1(ipds->ip->ip_vhl);
 	if (IP_V(ipds->ip) != 4) { /* print version and fail if != 4 */
 	    if (IP_V(ipds->ip) == 6)
 	      ND_PRINT("IP6, wrong link-layer encapsulation ");
