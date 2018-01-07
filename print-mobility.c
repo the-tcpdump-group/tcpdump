@@ -212,7 +212,7 @@ mobility_print(netdissect_options *ndo,
 	/* 'ep' points to the end of available data. */
 	ep = ndo->ndo_snapend;
 
-	if (!ND_TTEST(mh->ip6m_len)) {
+	if (!ND_TTEST_1(mh->ip6m_len)) {
 		/*
 		 * There's not enough captured data to include the
 		 * mobility header length.
