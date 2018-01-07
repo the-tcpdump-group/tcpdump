@@ -176,7 +176,7 @@ hbhopt_print(netdissect_options *ndo, const u_char *bp)
     const struct ip6_hbh *dp = (const struct ip6_hbh *)bp;
     u_int hbhlen = 0;
 
-    ND_TCHECK(dp->ip6h_len);
+    ND_TCHECK_1(dp->ip6h_len);
     hbhlen = (EXTRACT_U_1(dp->ip6h_len) + 1) << 3;
     ND_TCHECK_LEN(dp, hbhlen);
     ND_PRINT("HBH ");
@@ -196,7 +196,7 @@ dstopt_print(netdissect_options *ndo, const u_char *bp)
     const struct ip6_dest *dp = (const struct ip6_dest *)bp;
     u_int dstoptlen = 0;
 
-    ND_TCHECK(dp->ip6d_len);
+    ND_TCHECK_1(dp->ip6d_len);
     dstoptlen = (EXTRACT_U_1(dp->ip6d_len) + 1) << 3;
     ND_TCHECK_LEN(dp, dstoptlen);
     ND_PRINT("DSTOPT ");
