@@ -290,7 +290,7 @@ ntp_time_print(netdissect_options *ndo,
 	ND_PRINT(", Root dispersion: ");
 	p_sfix(ndo, &bp->root_dispersion);
 
-	ND_TCHECK(bp->refid);
+	ND_TCHECK_4(bp->refid);
 	ND_PRINT(", Reference-ID: ");
 	/* Interpretation depends on stratum */
 	switch (stratum) {
@@ -456,7 +456,7 @@ ntp_print(netdissect_options *ndo,
 	int mode, version, leapind;
 	uint8_t status;
 
-	ND_TCHECK(bp->td.status);
+	ND_TCHECK_1(bp->td.status);
 	status = EXTRACT_U_1(bp->td.status);
 
 	version = (status & VERSIONMASK) >> VERSIONSHIFT;
