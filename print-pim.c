@@ -715,7 +715,7 @@ pimv2_print(netdissect_options *ndo,
 
 	if (len < 4)
 		goto trunc;
-	ND_TCHECK(pim->pim_cksum);
+	ND_TCHECK_2(pim->pim_cksum);
 	ND_PRINT(", cksum 0x%04x ", EXTRACT_BE_U_2(pim->pim_cksum));
 	if (EXTRACT_BE_U_2(pim->pim_cksum) == 0) {
 		ND_PRINT("(unverified)");
@@ -893,7 +893,7 @@ pimv2_print(netdissect_options *ndo,
 		if (len == 0)
 			goto trunc;
 		ip = (const struct ip *)bp;
-		ND_TCHECK(ip->ip_vhl);
+		ND_TCHECK_1(ip->ip_vhl);
 		switch (IP_V(ip)) {
                 case 0: /* Null header */
 			ND_TCHECK(ip->ip_dst);
