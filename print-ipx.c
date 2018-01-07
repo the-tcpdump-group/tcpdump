@@ -76,7 +76,7 @@ ipx_print(netdissect_options *ndo, const u_char *p, u_int length)
 	if (!ndo->ndo_eflag)
 		ND_PRINT("IPX ");
 
-	ND_TCHECK(ipx->srcSkt);
+	ND_TCHECK_2(ipx->srcSkt);
 	ND_PRINT("%s.%04x > ",
 		     ipxaddr_string(EXTRACT_BE_U_4(ipx->srcNet), ipx->srcNode),
 		     EXTRACT_BE_U_2(ipx->srcSkt));
@@ -86,7 +86,7 @@ ipx_print(netdissect_options *ndo, const u_char *p, u_int length)
 		     EXTRACT_BE_U_2(ipx->dstSkt));
 
 	/* take length from ipx header */
-	ND_TCHECK(ipx->length);
+	ND_TCHECK_2(ipx->length);
 	length = EXTRACT_BE_U_2(ipx->length);
 
 	ipx_decode(ndo, ipx, p + ipxSize, length - ipxSize);
