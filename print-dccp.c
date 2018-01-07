@@ -256,7 +256,7 @@ static void dccp_print_ack_no(netdissect_options *ndo, const u_char *bp)
 		ackno = EXTRACT_BE_U_3(ackp + 1);
 	}
 
-	ND_PRINT((ndo, "(ack=%" PRIu64 ") ", ackno));
+	ND_PRINT("(ack=%" PRIu64 ") ", ackno);
 trunc:
 	return;
 }
@@ -293,20 +293,20 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 	/* make sure we have enough data to look at the X bit */
 	cp = (const u_char *)(dh + 1);
 	if (cp > ndo->ndo_snapend) {
-		ND_PRINT((ndo, "[Invalid packet|dccp]"));
+		ND_PRINT("[Invalid packet|dccp]");
 		return;
 	}
 	if (len < sizeof(struct dccp_hdr)) {
-		ND_PRINT((ndo, "truncated-dccp - %u bytes missing!",
-			  len - (u_int)sizeof(struct dccp_hdr)));
+		ND_PRINT("truncated-dccp - %u bytes missing!",
+			  len - (u_int)sizeof(struct dccp_hdr));
 		return;
 	}
 
 	/* get the length of the generic header */
 	fixed_hdrlen = dccp_basic_hdr_len(dh);
 	if (len < fixed_hdrlen) {
-		ND_PRINT((ndo, "truncated-dccp - %u bytes missing!",
-			  len - fixed_hdrlen));
+		ND_PRINT("truncated-dccp - %u bytes missing!",
+			  len - fixed_hdrlen);
 		return;
 	}
 	ND_TCHECK_LEN(dh, fixed_hdrlen);
@@ -316,29 +316,29 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 	hlen = EXTRACT_U_1(dh->dccph_doff) * 4;
 
 	if (ip6) {
-		ND_PRINT((ndo, "%s.%d > %s.%d: ",
+		ND_PRINT("%s.%d > %s.%d: ",
 			  ip6addr_string(ndo, &ip6->ip6_src), sport,
-			  ip6addr_string(ndo, &ip6->ip6_dst), dport));
+			  ip6addr_string(ndo, &ip6->ip6_dst), dport);
 	} else {
-		ND_PRINT((ndo, "%s.%d > %s.%d: ",
+		ND_PRINT("%s.%d > %s.%d: ",
 			  ipaddr_string(ndo, &ip->ip_src), sport,
-			  ipaddr_string(ndo, &ip->ip_dst), dport));
+			  ipaddr_string(ndo, &ip->ip_dst), dport);
 	}
 
-	ND_PRINT((ndo, "DCCP"));
+	ND_PRINT("DCCP");
 
 	if (ndo->ndo_qflag) {
-		ND_PRINT((ndo, " %d", len - hlen));
+		ND_PRINT(" %d", len - hlen);
 		if (hlen > len) {
-			ND_PRINT((ndo, " [bad hdr length %u - too long, > %u]",
-				  hlen, len));
+			ND_PRINT(" [bad hdr length %u - too long, > %u]",
+				  hlen, len);
 		}
 		return;
 	}
 
 	/* other variables in generic header */
 	if (ndo->ndo_vflag) {
-		ND_PRINT((ndo, " (CCVal %d, CsCov %d, ", DCCPH_CCVAL(dh), DCCPH_CSCOV(dh)));
+		ND_PRINT(" (CCVal %d, CsCov %d, ", DCCPH_CCVAL(dh), DCCPH_CSCOV(dh));
 	}
 
 	/* checksum calculation */
@@ -346,20 +346,20 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 		uint16_t sum = 0, dccp_sum;
 
 		dccp_sum = EXTRACT_BE_U_2(dh->dccph_checksum);
-		ND_PRINT((ndo, "cksum 0x%04x ", dccp_sum));
+		ND_PRINT("cksum 0x%04x ", dccp_sum);
 		if (IP_V(ip) == 4)
 			sum = dccp_cksum(ndo, ip, dh, len);
 		else if (IP_V(ip) == 6)
 			sum = dccp6_cksum(ndo, ip6, dh, len);
 		if (sum != 0)
-			ND_PRINT((ndo, "(incorrect -> 0x%04x)",in_cksum_shouldbe(dccp_sum, sum)));
+			ND_PRINT("(incorrect -> 0x%04x)",in_cksum_shouldbe(dccp_sum, sum));
 		else
-			ND_PRINT((ndo, "(correct)"));
+			ND_PRINT("(correct)");
 	}
 
 	if (ndo->ndo_vflag)
-		ND_PRINT((ndo, ")"));
-	ND_PRINT((ndo, " "));
+		ND_PRINT(")");
+	ND_PRINT(" ");
 
 	dccph_type = DCCPH_TYPE(dh);
 	switch (dccph_type) {
@@ -368,15 +368,15 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 			(const struct dccp_hdr_request *)(bp + fixed_hdrlen);
 		fixed_hdrlen += 4;
 		if (len < fixed_hdrlen) {
-			ND_PRINT((ndo, "truncated-%s - %u bytes missing!",
+			ND_PRINT("truncated-%s - %u bytes missing!",
 				  tok2str(dccp_pkt_type_str, "", dccph_type),
-				  len - fixed_hdrlen));
+				  len - fixed_hdrlen);
 			return;
 		}
 		ND_TCHECK_SIZE(dhr);
-		ND_PRINT((ndo, "%s (service=%d) ",
+		ND_PRINT("%s (service=%d) ",
 			  tok2str(dccp_pkt_type_str, "", dccph_type),
-			  EXTRACT_BE_U_4(dhr->dccph_req_service)));
+			  EXTRACT_BE_U_4(dhr->dccph_req_service));
 		break;
 	}
 	case DCCP_PKT_RESPONSE: {
@@ -384,100 +384,100 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 			(const struct dccp_hdr_response *)(bp + fixed_hdrlen);
 		fixed_hdrlen += 12;
 		if (len < fixed_hdrlen) {
-			ND_PRINT((ndo, "truncated-%s - %u bytes missing!",
+			ND_PRINT("truncated-%s - %u bytes missing!",
 				  tok2str(dccp_pkt_type_str, "", dccph_type),
-				  len - fixed_hdrlen));
+				  len - fixed_hdrlen);
 			return;
 		}
 		ND_TCHECK_SIZE(dhr);
-		ND_PRINT((ndo, "%s (service=%d) ",
+		ND_PRINT("%s (service=%d) ",
 			  tok2str(dccp_pkt_type_str, "", dccph_type),
-			  EXTRACT_BE_U_4(dhr->dccph_resp_service)));
+			  EXTRACT_BE_U_4(dhr->dccph_resp_service));
 		break;
 	}
 	case DCCP_PKT_DATA:
-		ND_PRINT((ndo, "%s ", tok2str(dccp_pkt_type_str, "", dccph_type)));
+		ND_PRINT("%s ", tok2str(dccp_pkt_type_str, "", dccph_type));
 		break;
 	case DCCP_PKT_ACK: {
 		fixed_hdrlen += 8;
 		if (len < fixed_hdrlen) {
-			ND_PRINT((ndo, "truncated-%s - %u bytes missing!",
+			ND_PRINT("truncated-%s - %u bytes missing!",
 				  tok2str(dccp_pkt_type_str, "", dccph_type),
-				  len - fixed_hdrlen));
+				  len - fixed_hdrlen);
 			return;
 		}
-		ND_PRINT((ndo, "%s ", tok2str(dccp_pkt_type_str, "", dccph_type)));
+		ND_PRINT("%s ", tok2str(dccp_pkt_type_str, "", dccph_type));
 		break;
 	}
 	case DCCP_PKT_DATAACK: {
 		fixed_hdrlen += 8;
 		if (len < fixed_hdrlen) {
-			ND_PRINT((ndo, "truncated-%s - %u bytes missing!",
+			ND_PRINT("truncated-%s - %u bytes missing!",
 				  tok2str(dccp_pkt_type_str, "", dccph_type),
-				  len - fixed_hdrlen));
+				  len - fixed_hdrlen);
 			return;
 		}
-		ND_PRINT((ndo, "%s ", tok2str(dccp_pkt_type_str, "", dccph_type)));
+		ND_PRINT("%s ", tok2str(dccp_pkt_type_str, "", dccph_type));
 		break;
 	}
 	case DCCP_PKT_CLOSEREQ:
 		fixed_hdrlen += 8;
 		if (len < fixed_hdrlen) {
-			ND_PRINT((ndo, "truncated-%s - %u bytes missing!",
+			ND_PRINT("truncated-%s - %u bytes missing!",
 				  tok2str(dccp_pkt_type_str, "", dccph_type),
-				  len - fixed_hdrlen));
+				  len - fixed_hdrlen);
 			return;
 		}
-		ND_PRINT((ndo, "%s ", tok2str(dccp_pkt_type_str, "", dccph_type)));
+		ND_PRINT("%s ", tok2str(dccp_pkt_type_str, "", dccph_type));
 		break;
 	case DCCP_PKT_CLOSE:
 		fixed_hdrlen += 8;
 		if (len < fixed_hdrlen) {
-			ND_PRINT((ndo, "truncated-%s - %u bytes missing!",
+			ND_PRINT("truncated-%s - %u bytes missing!",
 				  tok2str(dccp_pkt_type_str, "", dccph_type),
-				  len - fixed_hdrlen));
+				  len - fixed_hdrlen);
 			return;
 		}
-		ND_PRINT((ndo, "%s ", tok2str(dccp_pkt_type_str, "", dccph_type)));
+		ND_PRINT("%s ", tok2str(dccp_pkt_type_str, "", dccph_type));
 		break;
 	case DCCP_PKT_RESET: {
 		const struct dccp_hdr_reset *dhr =
 			(const struct dccp_hdr_reset *)(bp + fixed_hdrlen);
 		fixed_hdrlen += 12;
 		if (len < fixed_hdrlen) {
-			ND_PRINT((ndo, "truncated-%s - %u bytes missing!",
+			ND_PRINT("truncated-%s - %u bytes missing!",
 				  tok2str(dccp_pkt_type_str, "", dccph_type),
-				  len - fixed_hdrlen));
+				  len - fixed_hdrlen);
 			return;
 		}
 		ND_TCHECK_SIZE(dhr);
-		ND_PRINT((ndo, "%s (code=%s) ",
+		ND_PRINT("%s (code=%s) ",
 			  tok2str(dccp_pkt_type_str, "", dccph_type),
-			  dccp_reset_code(EXTRACT_U_1(dhr->dccph_reset_code))));
+			  dccp_reset_code(EXTRACT_U_1(dhr->dccph_reset_code)));
 		break;
 	}
 	case DCCP_PKT_SYNC:
 		fixed_hdrlen += 8;
 		if (len < fixed_hdrlen) {
-			ND_PRINT((ndo, "truncated-%s - %u bytes missing!",
+			ND_PRINT("truncated-%s - %u bytes missing!",
 				  tok2str(dccp_pkt_type_str, "", dccph_type),
-				  len - fixed_hdrlen));
+				  len - fixed_hdrlen);
 			return;
 		}
-		ND_PRINT((ndo, "%s ", tok2str(dccp_pkt_type_str, "", dccph_type)));
+		ND_PRINT("%s ", tok2str(dccp_pkt_type_str, "", dccph_type));
 		break;
 	case DCCP_PKT_SYNCACK:
 		fixed_hdrlen += 8;
 		if (len < fixed_hdrlen) {
-			ND_PRINT((ndo, "truncated-%s - %u bytes missing!",
+			ND_PRINT("truncated-%s - %u bytes missing!",
 				  tok2str(dccp_pkt_type_str, "", dccph_type),
-				  len - fixed_hdrlen));
+				  len - fixed_hdrlen);
 			return;
 		}
-		ND_PRINT((ndo, "%s ", tok2str(dccp_pkt_type_str, "", dccph_type)));
+		ND_PRINT("%s ", tok2str(dccp_pkt_type_str, "", dccph_type));
 		break;
 	default:
-		ND_PRINT((ndo, "%s ", tok2str(dccp_pkt_type_str, "unknown-type-%u", dccph_type)));
+		ND_PRINT("%s ", tok2str(dccp_pkt_type_str, "unknown-type-%u", dccph_type));
 		break;
 	}
 
@@ -488,13 +488,13 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 	if (ndo->ndo_vflag < 2)
 		return;
 
-	ND_PRINT((ndo, "seq %" PRIu64, dccp_seqno(bp)));
+	ND_PRINT("seq %" PRIu64, dccp_seqno(bp));
 
 	/* process options */
 	if (hlen > fixed_hdrlen){
 		u_int optlen;
 		cp = bp + fixed_hdrlen;
-		ND_PRINT((ndo, " <"));
+		ND_PRINT(" <");
 
 		hlen -= fixed_hdrlen;
 		while(1){
@@ -505,13 +505,13 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 				break;
 			hlen -= optlen;
 			cp += optlen;
-			ND_PRINT((ndo, ", "));
+			ND_PRINT(", ");
 		}
-		ND_PRINT((ndo, ">"));
+		ND_PRINT(">");
 	}
 	return;
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	ND_PRINT("%s", tstr);
 	return;
 }
 
@@ -546,10 +546,10 @@ static int dccp_print_option(netdissect_options *ndo, const u_char *option, u_in
 		optlen = EXTRACT_U_1(option + 1);
 		if (optlen < 2) {
 			if (EXTRACT_U_1(option) >= 128)
-				ND_PRINT((ndo, "CCID option %u optlen too short", EXTRACT_U_1(option)));
+				ND_PRINT("CCID option %u optlen too short", EXTRACT_U_1(option));
 			else
-				ND_PRINT((ndo, "%s optlen too short",
-					  tok2str(dccp_option_values, "Option %u", EXTRACT_U_1(option))));
+				ND_PRINT("%s optlen too short",
+					  tok2str(dccp_option_values, "Option %u", EXTRACT_U_1(option)));
 			return 0;
 		}
 	} else
@@ -557,101 +557,101 @@ static int dccp_print_option(netdissect_options *ndo, const u_char *option, u_in
 
 	if (hlen < optlen) {
 		if (EXTRACT_U_1(option) >= 128)
-			ND_PRINT((ndo, "CCID option %u optlen goes past header length",
-				  EXTRACT_U_1(option)));
+			ND_PRINT("CCID option %u optlen goes past header length",
+				  EXTRACT_U_1(option));
 		else
-			ND_PRINT((ndo, "%s optlen goes past header length",
-				  tok2str(dccp_option_values, "Option %u", EXTRACT_U_1(option))));
+			ND_PRINT("%s optlen goes past header length",
+				  tok2str(dccp_option_values, "Option %u", EXTRACT_U_1(option)));
 		return 0;
 	}
 	ND_TCHECK_LEN(option, optlen);
 
 	if (EXTRACT_U_1(option) >= 128) {
-		ND_PRINT((ndo, "CCID option %d", EXTRACT_U_1(option)));
+		ND_PRINT("CCID option %d", EXTRACT_U_1(option));
 		switch (optlen) {
 			case 4:
-				ND_PRINT((ndo, " %u", EXTRACT_BE_U_2(option + 2)));
+				ND_PRINT(" %u", EXTRACT_BE_U_2(option + 2));
 				break;
 			case 6:
-				ND_PRINT((ndo, " %u", EXTRACT_BE_U_4(option + 2)));
+				ND_PRINT(" %u", EXTRACT_BE_U_4(option + 2));
 				break;
 			default:
 				break;
 		}
 	} else {
-		ND_PRINT((ndo, "%s", tok2str(dccp_option_values, "Option %u", EXTRACT_U_1(option))));
+		ND_PRINT("%s", tok2str(dccp_option_values, "Option %u", EXTRACT_U_1(option)));
 		switch (EXTRACT_U_1(option)) {
 		case 32:
 		case 33:
 		case 34:
 		case 35:
 			if (optlen < 3) {
-				ND_PRINT((ndo, " optlen too short"));
+				ND_PRINT(" optlen too short");
 				return optlen;
 			}
 			if (EXTRACT_U_1(option + 2) < 10){
-				ND_PRINT((ndo, " %s", dccp_feature_nums[EXTRACT_U_1(option + 2)]));
+				ND_PRINT(" %s", dccp_feature_nums[EXTRACT_U_1(option + 2)]);
 				for (i = 0; i < optlen - 3; i++)
-					ND_PRINT((ndo, " %d", EXTRACT_U_1(option + 3 + i)));
+					ND_PRINT(" %d", EXTRACT_U_1(option + 3 + i));
 			}
 			break;
 		case 36:
 			if (optlen > 2) {
-				ND_PRINT((ndo, " 0x"));
+				ND_PRINT(" 0x");
 				for (i = 0; i < optlen - 2; i++)
-					ND_PRINT((ndo, "%02x", EXTRACT_U_1(option + 2 + i)));
+					ND_PRINT("%02x", EXTRACT_U_1(option + 2 + i));
 			}
 			break;
 		case 37:
 			for (i = 0; i < optlen - 2; i++)
-				ND_PRINT((ndo, " %d", EXTRACT_U_1(option + 2 + i)));
+				ND_PRINT(" %d", EXTRACT_U_1(option + 2 + i));
 			break;
 		case 38:
 			if (optlen > 2) {
-				ND_PRINT((ndo, " 0x"));
+				ND_PRINT(" 0x");
 				for (i = 0; i < optlen - 2; i++)
-					ND_PRINT((ndo, "%02x", EXTRACT_U_1(option + 2 + i)));
+					ND_PRINT("%02x", EXTRACT_U_1(option + 2 + i));
 			}
 			break;
 		case 39:
 			if (optlen > 2) {
-				ND_PRINT((ndo, " 0x"));
+				ND_PRINT(" 0x");
 				for (i = 0; i < optlen - 2; i++)
-					ND_PRINT((ndo, "%02x", EXTRACT_U_1(option + 2 + i)));
+					ND_PRINT("%02x", EXTRACT_U_1(option + 2 + i));
 			}
 			break;
 		case 40:
 			if (optlen > 2) {
-				ND_PRINT((ndo, " 0x"));
+				ND_PRINT(" 0x");
 				for (i = 0; i < optlen - 2; i++)
-					ND_PRINT((ndo, "%02x", EXTRACT_U_1(option + 2 + i)));
+					ND_PRINT("%02x", EXTRACT_U_1(option + 2 + i));
 			}
 			break;
 		case 41:
 			if (optlen == 4)
-				ND_PRINT((ndo, " %u", EXTRACT_BE_U_4(option + 2)));
+				ND_PRINT(" %u", EXTRACT_BE_U_4(option + 2));
 			else
-				ND_PRINT((ndo, " optlen != 4"));
+				ND_PRINT(" optlen != 4");
 			break;
 		case 42:
 			if (optlen == 4)
-				ND_PRINT((ndo, " %u", EXTRACT_BE_U_4(option + 2)));
+				ND_PRINT(" %u", EXTRACT_BE_U_4(option + 2));
 			else
-				ND_PRINT((ndo, " optlen != 4"));
+				ND_PRINT(" optlen != 4");
 			break;
 		case 43:
 			if (optlen == 6)
-				ND_PRINT((ndo, " %u", EXTRACT_BE_U_4(option + 2)));
+				ND_PRINT(" %u", EXTRACT_BE_U_4(option + 2));
 			else if (optlen == 4)
-				ND_PRINT((ndo, " %u", EXTRACT_BE_U_2(option + 2)));
+				ND_PRINT(" %u", EXTRACT_BE_U_2(option + 2));
 			else
-				ND_PRINT((ndo, " optlen != 4 or 6"));
+				ND_PRINT(" optlen != 4 or 6");
 			break;
 		case 44:
 			if (optlen > 2) {
-				ND_PRINT((ndo, " "));
+				ND_PRINT(" ");
 				for (i = 0; i < optlen - 2; i++)
-					ND_PRINT((ndo, "%02x", EXTRACT_U_1(option + 2 + i)));
+					ND_PRINT("%02x", EXTRACT_U_1(option + 2 + i));
 			}
 			break;
 		}
@@ -659,6 +659,6 @@ static int dccp_print_option(netdissect_options *ndo, const u_char *option, u_in
 
 	return optlen;
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	ND_PRINT("%s", tstr);
 	return 0;
 }

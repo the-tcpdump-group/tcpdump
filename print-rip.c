@@ -104,7 +104,7 @@ rip_entry_print_v1(netdissect_options *ndo,
 	/* RFC 1058 */
 	family = EXTRACT_BE_U_2(ni->rip_family);
 	if (family != BSD_AFNUM_INET && family != 0) {
-		ND_PRINT((ndo, "\n\t AFI %s, ", tok2str(bsd_af_values, "Unknown (%u)", family)));
+		ND_PRINT("\n\t AFI %s, ", tok2str(bsd_af_values, "Unknown (%u)", family));
 		print_unknown_data(ndo, (const uint8_t *)&ni->rip_family, "\n\t  ", RIP_ROUTELEN);
 		return;
 	}
@@ -116,14 +116,14 @@ rip_entry_print_v1(netdissect_options *ndo,
 		return;
 	}
 	if (family == 0) {
-		ND_PRINT((ndo, "\n\t  AFI 0, %s, metric: %u",
+		ND_PRINT("\n\t  AFI 0, %s, metric: %u",
 			ipaddr_string(ndo, &ni->rip_dest),
-			EXTRACT_BE_U_4(ni->rip_metric)));
+			EXTRACT_BE_U_4(ni->rip_metric));
 		return;
 	} /* BSD_AFNUM_INET */
-	ND_PRINT((ndo, "\n\t  %s, metric: %u",
+	ND_PRINT("\n\t  %s, metric: %u",
                ipaddr_string(ndo, &ni->rip_dest),
-	       EXTRACT_BE_U_4(ni->rip_metric)));
+	       EXTRACT_BE_U_4(ni->rip_metric));
 }
 
 static unsigned
@@ -138,41 +138,41 @@ rip_entry_print_v2(netdissect_options *ndo,
 		if (auth_type == 2) {
 			const u_char *p = (const u_char *)&ni->rip_dest;
 			u_int i = 0;
-			ND_PRINT((ndo, "\n\t  Simple Text Authentication data: "));
+			ND_PRINT("\n\t  Simple Text Authentication data: ");
 			for (; i < RIP_AUTHLEN; p++, i++)
-				ND_PRINT((ndo, "%c",
-					 ND_ISPRINT(EXTRACT_U_1(p)) ? EXTRACT_U_1(p) : '.'));
+				ND_PRINT("%c",
+					 ND_ISPRINT(EXTRACT_U_1(p)) ? EXTRACT_U_1(p) : '.');
 		} else if (auth_type == 3) {
-			ND_PRINT((ndo, "\n\t  Auth header:"));
-			ND_PRINT((ndo, " Packet Len %u,", EXTRACT_BE_U_2((const uint8_t *)ni + 4)));
-			ND_PRINT((ndo, " Key-ID %u,", EXTRACT_U_1((const uint8_t *)ni + 6)));
-			ND_PRINT((ndo, " Auth Data Len %u,", EXTRACT_U_1((const uint8_t *)ni + 7)));
-			ND_PRINT((ndo, " SeqNo %u,", EXTRACT_BE_U_4(ni->rip_dest_mask)));
-			ND_PRINT((ndo, " MBZ %u,", EXTRACT_BE_U_4(ni->rip_router)));
-			ND_PRINT((ndo, " MBZ %u", EXTRACT_BE_U_4(ni->rip_metric)));
+			ND_PRINT("\n\t  Auth header:");
+			ND_PRINT(" Packet Len %u,", EXTRACT_BE_U_2((const uint8_t *)ni + 4));
+			ND_PRINT(" Key-ID %u,", EXTRACT_U_1((const uint8_t *)ni + 6));
+			ND_PRINT(" Auth Data Len %u,", EXTRACT_U_1((const uint8_t *)ni + 7));
+			ND_PRINT(" SeqNo %u,", EXTRACT_BE_U_4(ni->rip_dest_mask));
+			ND_PRINT(" MBZ %u,", EXTRACT_BE_U_4(ni->rip_router));
+			ND_PRINT(" MBZ %u", EXTRACT_BE_U_4(ni->rip_metric));
 		} else if (auth_type == 1) {
-			ND_PRINT((ndo, "\n\t  Auth trailer:"));
+			ND_PRINT("\n\t  Auth trailer:");
 			print_unknown_data(ndo, (const uint8_t *)&ni->rip_dest, "\n\t  ", remaining);
 			return remaining; /* AT spans till the packet end */
 		} else {
-			ND_PRINT((ndo, "\n\t  Unknown (%u) Authentication data:",
-			       EXTRACT_BE_U_2(ni->rip_tag)));
+			ND_PRINT("\n\t  Unknown (%u) Authentication data:",
+			       EXTRACT_BE_U_2(ni->rip_tag));
 			print_unknown_data(ndo, (const uint8_t *)&ni->rip_dest, "\n\t  ", remaining);
 		}
 	} else if (family != BSD_AFNUM_INET && family != 0) {
-		ND_PRINT((ndo, "\n\t  AFI %s", tok2str(bsd_af_values, "Unknown (%u)", family)));
+		ND_PRINT("\n\t  AFI %s", tok2str(bsd_af_values, "Unknown (%u)", family));
                 print_unknown_data(ndo, (const uint8_t *)&ni->rip_tag, "\n\t  ", RIP_ROUTELEN-2);
 	} else { /* BSD_AFNUM_INET or AFI 0 */
-		ND_PRINT((ndo, "\n\t  AFI %s, %15s/%-2d, tag 0x%04x, metric: %u, next-hop: ",
+		ND_PRINT("\n\t  AFI %s, %15s/%-2d, tag 0x%04x, metric: %u, next-hop: ",
                        tok2str(bsd_af_values, "%u", family),
                        ipaddr_string(ndo, &ni->rip_dest),
 		       mask2plen(EXTRACT_BE_U_4(ni->rip_dest_mask)),
 		       EXTRACT_BE_U_2(ni->rip_tag),
-		       EXTRACT_BE_U_4(ni->rip_metric)));
+		       EXTRACT_BE_U_4(ni->rip_metric));
 		if (EXTRACT_BE_U_4(ni->rip_router))
-			ND_PRINT((ndo, "%s", ipaddr_string(ndo, &ni->rip_router)));
+			ND_PRINT("%s", ipaddr_string(ndo, &ni->rip_router));
 		else
-			ND_PRINT((ndo, "self"));
+			ND_PRINT("self");
 	}
 	return sizeof (*ni);
 }
@@ -187,14 +187,14 @@ rip_print(netdissect_options *ndo,
 	u_int i, j;
 
 	if (ndo->ndo_snapend < dat) {
-		ND_PRINT((ndo, " %s", tstr));
+		ND_PRINT(" %s", tstr);
 		return;
 	}
 	i = ndo->ndo_snapend - dat;
 	if (i > length)
 		i = length;
 	if (i < sizeof(*rp)) {
-		ND_PRINT((ndo, " %s", tstr));
+		ND_PRINT(" %s", tstr);
 		return;
 	}
 	i -= sizeof(*rp);
@@ -202,9 +202,9 @@ rip_print(netdissect_options *ndo,
 	rp = (const struct rip *)dat;
 
 	vers = EXTRACT_U_1(rp->rip_vers);
-	ND_PRINT((ndo, "%sRIPv%u",
+	ND_PRINT("%sRIPv%u",
                (ndo->ndo_vflag >= 1) ? "\n\t" : "",
-               vers));
+               vers);
 
 	switch (vers) {
 	case 0:
@@ -224,11 +224,11 @@ rip_print(netdissect_options *ndo,
 	default:
                 /* dump version and lets see if we know the commands name*/
                 cmd = EXTRACT_U_1(rp->rip_cmd);
-                ND_PRINT((ndo, ", %s, length: %u",
+                ND_PRINT(", %s, length: %u",
                        tok2str(rip_cmd_values,
                                "unknown command (%u)",
                                cmd),
-                       length));
+                       length);
 
                 if (ndo->ndo_vflag < 1)
                     return;
@@ -237,7 +237,7 @@ rip_print(netdissect_options *ndo,
 		case RIPCMD_REQUEST:
 		case RIPCMD_RESPONSE:
 			j = length / sizeof(*ni);
-			ND_PRINT((ndo, ", routes: %u%s", j, vers == 2 ? " or less" : ""));
+			ND_PRINT(", routes: %u%s", j, vers == 2 ? " or less" : "");
 			ni = (const struct rip_netinfo *)(rp + 1);
 			for (; i >= sizeof(*ni); ++ni) {
 				if (vers == 1)
@@ -251,7 +251,7 @@ rip_print(netdissect_options *ndo,
                                     break;
 			}
 			if (i)
-				ND_PRINT((ndo, "%s", tstr));
+				ND_PRINT("%s", tstr);
 			break;
 
 		case RIPCMD_TRACEOFF:

@@ -229,47 +229,47 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	ND_TCHECK_SIZE(ip6);
 	if (length < sizeof (struct ip6_hdr)) {
-		ND_PRINT((ndo, "truncated-ip6 %u", length));
+		ND_PRINT("truncated-ip6 %u", length);
 		return;
 	}
 
         if (!ndo->ndo_eflag)
-            ND_PRINT((ndo, "IP6 "));
+            ND_PRINT("IP6 ");
 
 	if (IP6_VERSION(ip6) != 6) {
-          ND_PRINT((ndo,"version error: %u != 6", IP6_VERSION(ip6)));
+          ND_PRINT("version error: %u != 6", IP6_VERSION(ip6));
           return;
 	}
 
 	payload_len = EXTRACT_BE_U_2(ip6->ip6_plen);
 	len = payload_len + sizeof(struct ip6_hdr);
 	if (length < len)
-		ND_PRINT((ndo, "truncated-ip6 - %u bytes missing!",
-			len - length));
+		ND_PRINT("truncated-ip6 - %u bytes missing!",
+			len - length);
 
         nh = EXTRACT_U_1(ip6->ip6_nxt);
         if (ndo->ndo_vflag) {
             flow = EXTRACT_BE_U_4(ip6->ip6_flow);
-            ND_PRINT((ndo, "("));
+            ND_PRINT("(");
 #if 0
             /* rfc1883 */
             if (flow & 0x0f000000)
-		ND_PRINT((ndo, "pri 0x%02x, ", (flow & 0x0f000000) >> 24));
+		ND_PRINT("pri 0x%02x, ", (flow & 0x0f000000) >> 24);
             if (flow & 0x00ffffff)
-		ND_PRINT((ndo, "flowlabel 0x%06x, ", flow & 0x00ffffff));
+		ND_PRINT("flowlabel 0x%06x, ", flow & 0x00ffffff);
 #else
             /* RFC 2460 */
             if (flow & 0x0ff00000)
-		ND_PRINT((ndo, "class 0x%02x, ", (flow & 0x0ff00000) >> 20));
+		ND_PRINT("class 0x%02x, ", (flow & 0x0ff00000) >> 20);
             if (flow & 0x000fffff)
-		ND_PRINT((ndo, "flowlabel 0x%05x, ", flow & 0x000fffff));
+		ND_PRINT("flowlabel 0x%05x, ", flow & 0x000fffff);
 #endif
 
-            ND_PRINT((ndo, "hlim %u, next-header %s (%u) payload length: %u) ",
+            ND_PRINT("hlim %u, next-header %s (%u) payload length: %u) ",
                          EXTRACT_U_1(ip6->ip6_hlim),
                          tok2str(ipproto_values,"unknown",nh),
                          nh,
-                         payload_len));
+                         payload_len);
         }
 
 	/*
@@ -290,8 +290,8 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		if (cp == (const u_char *)(ip6 + 1) &&
 		    nh != IPPROTO_TCP && nh != IPPROTO_UDP &&
 		    nh != IPPROTO_DCCP && nh != IPPROTO_SCTP) {
-			ND_PRINT((ndo, "%s > %s: ", ip6addr_string(ndo, &ip6->ip6_src),
-				     ip6addr_string(ndo, &ip6->ip6_dst)));
+			ND_PRINT("%s > %s: ", ip6addr_string(ndo, &ip6->ip6_src),
+				     ip6addr_string(ndo, &ip6->ip6_dst));
 		}
 
 		switch (nh) {
@@ -414,16 +414,16 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			return;
 
 		case IPPROTO_NONE:
-			ND_PRINT((ndo, "no next header"));
+			ND_PRINT("no next header");
 			return;
 
 		default:
-			ND_PRINT((ndo, "ip-proto-%d %d", nh, len));
+			ND_PRINT("ip-proto-%d %d", nh, len);
 			return;
 		}
 	}
 
 	return;
 trunc:
-	ND_PRINT((ndo, "[|ip6]"));
+	ND_PRINT("[|ip6]");
 }

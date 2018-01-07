@@ -77,13 +77,13 @@ fn_print_char(netdissect_options *ndo, u_char c)
 {
 	if (!ND_ISASCII(c)) {
 		c = ND_TOASCII(c);
-		ND_PRINT((ndo, "M-"));
+		ND_PRINT("M-");
 	}
 	if (!ND_ISPRINT(c)) {
 		c ^= 0x40;	/* DEL to ?, others to alpha */
-		ND_PRINT((ndo, "^"));
+		ND_PRINT("^");
 	}
-	ND_PRINT((ndo, "%c", c));
+	ND_PRINT("%c", c);
 }
 
 /*
@@ -108,13 +108,13 @@ fn_print(netdissect_options *ndo,
 		}
 		if (!ND_ISASCII(c)) {
 			c = ND_TOASCII(c);
-			ND_PRINT((ndo, "M-"));
+			ND_PRINT("M-");
 		}
 		if (!ND_ISPRINT(c)) {
 			c ^= 0x40;	/* DEL to ?, others to alpha */
-			ND_PRINT((ndo, "^"));
+			ND_PRINT("^");
 		}
-		ND_PRINT((ndo, "%c", c));
+		ND_PRINT("%c", c);
 	}
 	return(ret);
 }
@@ -158,13 +158,13 @@ fn_printztn(netdissect_options *ndo,
 		}
 		if (!ND_ISASCII(c)) {
 			c = ND_TOASCII(c);
-			ND_PRINT((ndo, "M-"));
+			ND_PRINT("M-");
 		}
 		if (!ND_ISPRINT(c)) {
 			c ^= 0x40;	/* DEL to ?, others to alpha */
-			ND_PRINT((ndo, "^"));
+			ND_PRINT("^");
 		}
-		ND_PRINT((ndo, "%c", c));
+		ND_PRINT("%c", c);
 	}
 	return(bytes);
 }
@@ -186,13 +186,13 @@ fn_printn(netdissect_options *ndo,
 		c = *s++;
 		if (!ND_ISASCII(c)) {
 			c = ND_TOASCII(c);
-			ND_PRINT((ndo, "M-"));
+			ND_PRINT("M-");
 		}
 		if (!ND_ISPRINT(c)) {
 			c ^= 0x40;	/* DEL to ?, others to alpha */
-			ND_PRINT((ndo, "^"));
+			ND_PRINT("^");
 		}
-		ND_PRINT((ndo, "%c", c));
+		ND_PRINT("%c", c);
 	}
 	return (n == 0) ? 0 : 1;
 }
@@ -222,13 +222,13 @@ fn_printzp(netdissect_options *ndo,
 		}
 		if (!ND_ISASCII(c)) {
 			c = ND_TOASCII(c);
-			ND_PRINT((ndo, "M-"));
+			ND_PRINT("M-");
 		}
 		if (!ND_ISPRINT(c)) {
 			c ^= 0x40;	/* DEL to ?, others to alpha */
-			ND_PRINT((ndo, "^"));
+			ND_PRINT("^");
 		}
-		ND_PRINT((ndo, "%c", c));
+		ND_PRINT("%c", c);
 	}
 	return (n == 0) ? 0 : ret;
 }
@@ -327,15 +327,15 @@ ts_print(netdissect_options *ndo,
 
 	case 0: /* Default */
 		s = (tvp->tv_sec + thiszone) % 86400;
-		ND_PRINT((ndo, "%s ", ts_format(ndo, s, tvp->tv_usec, buf)));
+		ND_PRINT("%s ", ts_format(ndo, s, tvp->tv_usec, buf));
 		break;
 
 	case 1: /* No time stamp */
 		break;
 
 	case 2: /* Unix timeval style */
-		ND_PRINT((ndo, "%s ", ts_unix_format(ndo,
-			  tvp->tv_sec, tvp->tv_usec, buf)));
+		ND_PRINT("%s ", ts_unix_format(ndo,
+			  tvp->tv_sec, tvp->tv_usec, buf));
 		break;
 
 	case 3: /* Microseconds/nanoseconds since previous packet */
@@ -364,10 +364,10 @@ ts_print(netdissect_options *ndo,
 		else
 			netdissect_timevalsub(tvp, &tv_ref, &tv_result, nano_prec);
 
-		ND_PRINT((ndo, (negative_offset ? "-" : " ")));
+		ND_PRINT((negative_offset ? "-" : " "));
 
-		ND_PRINT((ndo, "%s ", ts_format(ndo,
-			  tv_result.tv_sec, tv_result.tv_usec, buf)));
+		ND_PRINT("%s ", ts_format(ndo,
+			  tv_result.tv_sec, tv_result.tv_usec, buf));
 
                 if (ndo->ndo_tflag == 3)
 			tv_ref = *tvp; /* set timestamp for previous packet */
@@ -378,11 +378,11 @@ ts_print(netdissect_options *ndo,
 		Time = (tvp->tv_sec + thiszone) - s;
 		tm = gmtime (&Time);
 		if (!tm)
-			ND_PRINT((ndo, "Date fail  "));
+			ND_PRINT("Date fail  ");
 		else
-			ND_PRINT((ndo, "%04d-%02d-%02d %s ",
+			ND_PRINT("%04d-%02d-%02d %s ",
                                tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday,
-                               ts_format(ndo, s, tvp->tv_usec, buf)));
+                               ts_format(ndo, s, tvp->tv_usec, buf));
 		break;
 	}
 }
@@ -402,12 +402,12 @@ unsigned_relts_print(netdissect_options *ndo,
 	const u_int *s = seconds;
 
 	if (secs == 0) {
-		ND_PRINT((ndo, "0s"));
+		ND_PRINT("0s");
 		return;
 	}
 	while (secs > 0) {
 		if (secs >= *s) {
-			ND_PRINT((ndo, "%d%s", secs / *s, *l));
+			ND_PRINT("%d%s", secs / *s, *l);
 			secs -= (secs / *s) * *s;
 		}
 		s++;
@@ -425,7 +425,7 @@ signed_relts_print(netdissect_options *ndo,
                    int32_t secs)
 {
 	if (secs < 0) {
-		ND_PRINT((ndo, "-"));
+		ND_PRINT("-");
 		if (secs == INT32_MIN) {
 			/*
 			 * -2^31; you can't fit its absolute value into
@@ -461,15 +461,15 @@ int
 print_unknown_data(netdissect_options *ndo, const u_char *cp,const char *ident,int len)
 {
 	if (len < 0) {
-          ND_PRINT((ndo,"%sDissector error: print_unknown_data called with negative length",
-		    ident));
+          ND_PRINT("%sDissector error: print_unknown_data called with negative length",
+		    ident);
 		return(0);
 	}
 	if (ndo->ndo_snapend - cp < len)
 		len = ndo->ndo_snapend - cp;
 	if (len < 0) {
-          ND_PRINT((ndo,"%sDissector error: print_unknown_data called with pointer past end of packet",
-		    ident));
+          ND_PRINT("%sDissector error: print_unknown_data called with pointer past end of packet",
+		    ident);
 		return(0);
 	}
         hex_print(ndo, ident,cp,len);
@@ -812,12 +812,12 @@ print_txt_line(netdissect_options *ndo, const char *protoname,
 	 */
 trunc:
 	linelen = idx - startidx;
-	ND_PRINT((ndo, "%s%.*s[!%s]", prefix, (int)linelen, pptr + startidx,
-	    protoname));
+	ND_PRINT("%s%.*s[!%s]", prefix, (int)linelen, pptr + startidx,
+	    protoname);
 	return (0);
 
 print:
-	ND_PRINT((ndo, "%s%.*s", prefix, (int)linelen, pptr + startidx));
+	ND_PRINT("%s%.*s", prefix, (int)linelen, pptr + startidx);
 	return (idx);
 }
 
@@ -896,7 +896,7 @@ txtproto_print(netdissect_options *ndo, const u_char *pptr, u_int len,
 
 	/* Capitalize the protocol name */
 	for (pnp = protoname; *pnp != '\0'; pnp++)
-		ND_PRINT((ndo, "%c", toupper((u_char)*pnp)));
+		ND_PRINT("%c", toupper((u_char)*pnp));
 
 	if (print_this) {
 		/*
@@ -913,7 +913,7 @@ txtproto_print(netdissect_options *ndo, const u_char *pptr, u_int len,
 			 * request or response; just print the length
 			 * on the first line of the output.
 			 */
-			ND_PRINT((ndo, ", length: %u", len));
+			ND_PRINT(", length: %u", len);
 			for (idx = 0;
 			    idx < len && (eol = print_txt_line(ndo, protoname, "\n\t", pptr, idx, len)) != 0;
 			    idx = eol)
@@ -944,7 +944,7 @@ void
 safeputchar(netdissect_options *ndo,
             const u_char c)
 {
-	ND_PRINT((ndo, (c < 0x80 && ND_ISPRINT(c)) ? "%c" : "\\0x%02x", c));
+	ND_PRINT((c < 0x80 && ND_ISPRINT(c)) ? "%c" : "\\0x%02x", c);
 }
 
 #if (defined(__i386__) || defined(_M_IX86) || defined(__X86__) || defined(__x86_64__) || defined(_M_X64)) || \

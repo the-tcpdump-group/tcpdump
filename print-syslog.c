@@ -102,12 +102,12 @@ syslog_print(netdissect_options *ndo,
             ND_TCHECK_1(pptr + msg_off);
         }
         if (EXTRACT_U_1(pptr + msg_off) != '>') {
-            ND_PRINT((ndo, "%s", tstr));
+            ND_PRINT("%s", tstr);
             return;
         }
         msg_off++;
     } else {
-        ND_PRINT((ndo, "%s", tstr));
+        ND_PRINT("%s", tstr);
         return;
     }
 
@@ -116,19 +116,19 @@ syslog_print(netdissect_options *ndo,
 
     if (ndo->ndo_vflag < 1 )
     {
-        ND_PRINT((ndo, "SYSLOG %s.%s, length: %u",
+        ND_PRINT("SYSLOG %s.%s, length: %u",
                tok2str(syslog_facility_values, "unknown (%u)", facility),
                tok2str(syslog_severity_values, "unknown (%u)", severity),
-               len));
+               len);
         return;
     }
 
-    ND_PRINT((ndo, "SYSLOG, length: %u\n\tFacility %s (%u), Severity %s (%u)\n\tMsg: ",
+    ND_PRINT("SYSLOG, length: %u\n\tFacility %s (%u), Severity %s (%u)\n\tMsg: ",
            len,
            tok2str(syslog_facility_values, "unknown (%u)", facility),
            facility,
            tok2str(syslog_severity_values, "unknown (%u)", severity),
-           severity));
+           severity);
 
     /* print the syslog text in verbose mode */
     for (; msg_off < len; msg_off++) {
@@ -142,5 +142,5 @@ syslog_print(netdissect_options *ndo,
     return;
 
 trunc:
-    ND_PRINT((ndo, "%s", tstr));
+    ND_PRINT("%s", tstr);
 }

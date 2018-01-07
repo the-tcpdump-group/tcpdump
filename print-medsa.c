@@ -93,45 +93,45 @@ medsa_print_full(netdissect_options *ndo,
 {
 	u_char tag = TAG(medsa);
 
-	ND_PRINT((ndo, "%s",
-		  tok2str(tag_values, "Unknown (%u)", tag)));
+	ND_PRINT("%s",
+		  tok2str(tag_values, "Unknown (%u)", tag));
 
 	switch (tag) {
 	case TAG_TO_CPU:
-		ND_PRINT((ndo, ", %stagged", SRC_TAG(medsa) ? "" : "un"));
-		ND_PRINT((ndo, ", dev.port:vlan %d.%d:%d",
-			  SRC_DEV(medsa), SRC_PORT(medsa), VID(medsa)));
+		ND_PRINT(", %stagged", SRC_TAG(medsa) ? "" : "un");
+		ND_PRINT(", dev.port:vlan %d.%d:%d",
+			  SRC_DEV(medsa), SRC_PORT(medsa), VID(medsa));
 
-		ND_PRINT((ndo, ", %s",
-			  tok2str(code_values, "Unknown (%u)", CODE(medsa))));
+		ND_PRINT(", %s",
+			  tok2str(code_values, "Unknown (%u)", CODE(medsa)));
 		if (CFI(medsa))
-			ND_PRINT((ndo, ", CFI"));
+			ND_PRINT(", CFI");
 
-		ND_PRINT((ndo, ", pri %d: ", PRI(medsa)));
+		ND_PRINT(", pri %d: ", PRI(medsa));
 		break;
 	case TAG_FROM_CPU:
-		ND_PRINT((ndo, ", %stagged", SRC_TAG(medsa) ? "" : "un"));
-		ND_PRINT((ndo, ", dev.port:vlan %d.%d:%d",
-			  SRC_DEV(medsa), SRC_PORT(medsa), VID(medsa)));
+		ND_PRINT(", %stagged", SRC_TAG(medsa) ? "" : "un");
+		ND_PRINT(", dev.port:vlan %d.%d:%d",
+			  SRC_DEV(medsa), SRC_PORT(medsa), VID(medsa));
 
 		if (CFI(medsa))
-			ND_PRINT((ndo, ", CFI"));
+			ND_PRINT(", CFI");
 
-		ND_PRINT((ndo, ", pri %d: ", PRI(medsa)));
+		ND_PRINT(", pri %d: ", PRI(medsa));
 		break;
 	case TAG_FORWARD:
-		ND_PRINT((ndo, ", %stagged", SRC_TAG(medsa) ? "" : "un"));
+		ND_PRINT(", %stagged", SRC_TAG(medsa) ? "" : "un");
 		if (TRUNK(medsa))
-			ND_PRINT((ndo, ", dev.trunk:vlan %d.%d:%d",
-				  SRC_DEV(medsa), SRC_PORT(medsa), VID(medsa)));
+			ND_PRINT(", dev.trunk:vlan %d.%d:%d",
+				  SRC_DEV(medsa), SRC_PORT(medsa), VID(medsa));
 		else
-			ND_PRINT((ndo, ", dev.port:vlan %d.%d:%d",
-				  SRC_DEV(medsa), SRC_PORT(medsa), VID(medsa)));
+			ND_PRINT(", dev.port:vlan %d.%d:%d",
+				  SRC_DEV(medsa), SRC_PORT(medsa), VID(medsa));
 
 		if (CFI(medsa))
-			ND_PRINT((ndo, ", CFI"));
+			ND_PRINT(", CFI");
 
-		ND_PRINT((ndo, ", pri %d: ", PRI(medsa)));
+		ND_PRINT(", pri %d: ", PRI(medsa));
 		break;
 	default:
 		ND_DEFAULTPRINT((const u_char *)medsa, caplen);
@@ -151,8 +151,8 @@ medsa_print(netdissect_options *ndo,
 	ND_TCHECK_SIZE(medsa);
 
 	if (!ndo->ndo_eflag)
-		ND_PRINT((ndo, "MEDSA %d.%d:%d: ",
-			  SRC_DEV(medsa), SRC_PORT(medsa), VID(medsa)));
+		ND_PRINT("MEDSA %d.%d:%d: ",
+			  SRC_DEV(medsa), SRC_PORT(medsa), VID(medsa));
 	else
 		medsa_print_full(ndo, medsa, caplen);
 
@@ -170,17 +170,17 @@ medsa_print(netdissect_options *ndo,
 		}
 	} else {
 		if (ndo->ndo_eflag)
-			ND_PRINT((ndo, "ethertype %s (0x%04x) ",
+			ND_PRINT("ethertype %s (0x%04x) ",
 				  tok2str(ethertype_values, "Unknown",
 					  ether_type),
-				  ether_type));
+				  ether_type);
 		if (ethertype_print(ndo, ether_type, bp, length, caplen, src, dst) == 0) {
 			/* ether_type not known, print raw packet */
 			if (!ndo->ndo_eflag)
-				ND_PRINT((ndo, "ethertype %s (0x%04x) ",
+				ND_PRINT("ethertype %s (0x%04x) ",
 					  tok2str(ethertype_values, "Unknown",
 						  ether_type),
-					  ether_type));
+					  ether_type);
 
 			if (!ndo->ndo_suppress_default_print)
 				ND_DEFAULTPRINT(bp, caplen);
@@ -188,7 +188,7 @@ medsa_print(netdissect_options *ndo,
 	}
 	return;
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	ND_PRINT("%s", tstr);
 }
 
 /*

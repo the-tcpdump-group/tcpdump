@@ -72,7 +72,7 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 	uint16_t panid = 0;
 
 	if (caplen < 3) {
-		ND_PRINT((ndo, "[|802.15.4]"));
+		ND_PRINT("[|802.15.4]");
 		return caplen;
 	}
 	hdrlen = 3;
@@ -83,9 +83,9 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 	p += 3;
 	caplen -= 3;
 
-	ND_PRINT((ndo,"IEEE 802.15.4 %s packet ", ftypes[FC_FRAME_TYPE(fc)]));
+	ND_PRINT("IEEE 802.15.4 %s packet ", ftypes[FC_FRAME_TYPE(fc)]);
 	if (ndo->ndo_vflag)
-		ND_PRINT((ndo,"seq %02x ", seq));
+		ND_PRINT("seq %02x ", seq);
 
 	/*
 	 * Destination address and PAN ID, if present.
@@ -98,19 +98,19 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 			 * the source and destination addresses be present,
 			 * but the destination address is missing.
 			 */
-			ND_PRINT((ndo, "[|802.15.4]"));
+			ND_PRINT("[|802.15.4]");
 			return hdrlen;
 		}
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo,"none "));
+			ND_PRINT("none ");
 		break;
 	case FC_ADDRESSING_MODE_RESERVED:
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo,"reserved destination addressing mode"));
+			ND_PRINT("reserved destination addressing mode");
 		return hdrlen;
 	case FC_ADDRESSING_MODE_SHORT:
 		if (caplen < 2) {
-			ND_PRINT((ndo, "[|802.15.4]"));
+			ND_PRINT("[|802.15.4]");
 			return hdrlen;
 		}
 		panid = EXTRACT_LE_U_2(p);
@@ -118,18 +118,18 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 		caplen -= 2;
 		hdrlen += 2;
 		if (caplen < 2) {
-			ND_PRINT((ndo, "[|802.15.4]"));
+			ND_PRINT("[|802.15.4]");
 			return hdrlen;
 		}
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo,"%04x:%04x ", panid, EXTRACT_LE_U_2(p)));
+			ND_PRINT("%04x:%04x ", panid, EXTRACT_LE_U_2(p));
 		p += 2;
 		caplen -= 2;
 		hdrlen += 2;
 		break;
 	case FC_ADDRESSING_MODE_LONG:
 		if (caplen < 2) {
-			ND_PRINT((ndo, "[|802.15.4]"));
+			ND_PRINT("[|802.15.4]");
 			return hdrlen;
 		}
 		panid = EXTRACT_LE_U_2(p);
@@ -137,18 +137,18 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 		caplen -= 2;
 		hdrlen += 2;
 		if (caplen < 8) {
-			ND_PRINT((ndo, "[|802.15.4]"));
+			ND_PRINT("[|802.15.4]");
 			return hdrlen;
 		}
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo,"%04x:%s ", panid, le64addr_string(ndo, p)));
+			ND_PRINT("%04x:%s ", panid, le64addr_string(ndo, p));
 		p += 8;
 		caplen -= 8;
 		hdrlen += 8;
 		break;
 	}
 	if (ndo->ndo_vflag)
-		ND_PRINT((ndo,"< "));
+		ND_PRINT("< ");
 
 	/*
 	 * Source address and PAN ID, if present.
@@ -156,11 +156,11 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 	switch (FC_SRC_ADDRESSING_MODE(fc)) {
 	case FC_ADDRESSING_MODE_NONE:
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo,"none "));
+			ND_PRINT("none ");
 		break;
 	case FC_ADDRESSING_MODE_RESERVED:
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo,"reserved source addressing mode"));
+			ND_PRINT("reserved source addressing mode");
 		return 0;
 	case FC_ADDRESSING_MODE_SHORT:
 		if (!(fc & FC_PAN_ID_COMPRESSION)) {
@@ -170,7 +170,7 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 			 * PAN ID, fetched above.)
 			 */
 			if (caplen < 2) {
-				ND_PRINT((ndo, "[|802.15.4]"));
+				ND_PRINT("[|802.15.4]");
 				return hdrlen;
 			}
 			panid = EXTRACT_LE_U_2(p);
@@ -179,11 +179,11 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 			hdrlen += 2;
 		}
 		if (caplen < 2) {
-			ND_PRINT((ndo, "[|802.15.4]"));
+			ND_PRINT("[|802.15.4]");
 			return hdrlen;
 		}
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo,"%04x:%04x ", panid, EXTRACT_LE_U_2(p)));
+			ND_PRINT("%04x:%04x ", panid, EXTRACT_LE_U_2(p));
 		p += 2;
 		caplen -= 2;
 		hdrlen += 2;
@@ -196,7 +196,7 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 			 * PAN ID, fetched above.)
 			 */
 			if (caplen < 2) {
-				ND_PRINT((ndo, "[|802.15.4]"));
+				ND_PRINT("[|802.15.4]");
 				return hdrlen;
 			}
 			panid = EXTRACT_LE_U_2(p);
@@ -205,11 +205,11 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 			hdrlen += 2;
 		}
 		if (caplen < 8) {
-			ND_PRINT((ndo, "[|802.15.4]"));
+			ND_PRINT("[|802.15.4]");
 			return hdrlen;
 		}
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo,"%04x:%s ", panid, le64addr_string(ndo, p)));
+			ND_PRINT("%04x:%s ", panid, le64addr_string(ndo, p));
 		p += 8;
 		caplen -= 8;
 		hdrlen += 8;

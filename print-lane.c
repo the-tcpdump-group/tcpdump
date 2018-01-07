@@ -68,7 +68,7 @@ static const struct tok lecop2str[] = {
 static void
 lane_hdr_print(netdissect_options *ndo, const u_char *bp)
 {
-	ND_PRINT((ndo, "lecid:%x ", EXTRACT_BE_U_2(bp)));
+	ND_PRINT("lecid:%x ", EXTRACT_BE_U_2(bp));
 }
 
 /*
@@ -85,7 +85,7 @@ lane_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 	const struct lane_controlhdr *lec;
 
 	if (caplen < sizeof(struct lane_controlhdr)) {
-		ND_PRINT((ndo, "[|lane]"));
+		ND_PRINT("[|lane]");
 		return;
 	}
 
@@ -94,10 +94,10 @@ lane_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 		/*
 		 * LE Control.
 		 */
-		ND_PRINT((ndo, "lec: proto %x vers %x %s",
+		ND_PRINT("lec: proto %x vers %x %s",
 		    EXTRACT_U_1(lec->lec_proto),
 		    EXTRACT_U_1(lec->lec_vers),
-		    tok2str(lecop2str, "opcode-#%u", EXTRACT_BE_U_2(lec->lec_opcode))));
+		    tok2str(lecop2str, "opcode-#%u", EXTRACT_BE_U_2(lec->lec_opcode)));
 		return;
 	}
 

@@ -317,7 +317,7 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	u_int hdrlen;
 
 	if(ndo->ndo_packet_number)
-		ND_PRINT((ndo, "%5u  ", packets_captured));
+		ND_PRINT("%5u  ", packets_captured);
 
 	ts_print(ndo, &h->ts);
 
@@ -394,7 +394,7 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 		}
 	}
 
-	ND_PRINT((ndo, "\n"));
+	ND_PRINT("\n");
 }
 
 /*

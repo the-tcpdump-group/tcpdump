@@ -56,9 +56,9 @@ dtp_print (netdissect_options *ndo, const u_char *pptr, u_int length)
 
     ND_TCHECK_LEN(tptr, DTP_HEADER_LEN);
 
-    ND_PRINT((ndo, "DTPv%u, length %u",
+    ND_PRINT("DTPv%u, length %u",
            EXTRACT_U_1(tptr),
-           length));
+           length);
 
     /*
      * In non-verbose mode, just print version.
@@ -77,9 +77,9 @@ dtp_print (netdissect_options *ndo, const u_char *pptr, u_int length)
        /* XXX: should not be but sometimes it is, see the test captures */
         if (type == 0)
             return;
-        ND_PRINT((ndo, "\n\t%s (0x%04x) TLV, length %u",
+        ND_PRINT("\n\t%s (0x%04x) TLV, length %u",
                tok2str(dtp_tlv_values, "Unknown", type),
-               type, len));
+               type, len);
 
         /* infinite loop check */
         if (len < 4)
@@ -88,7 +88,7 @@ dtp_print (netdissect_options *ndo, const u_char *pptr, u_int length)
 
         switch (type) {
 	case DTP_DOMAIN_TLV:
-		ND_PRINT((ndo, ", "));
+		ND_PRINT(", ");
 		fn_printzp(ndo, tptr+4, len-4, pptr+length);
 		break;
 
@@ -96,13 +96,13 @@ dtp_print (netdissect_options *ndo, const u_char *pptr, u_int length)
 	case DTP_DTP_TYPE_TLV:
                 if (len < 5)
                     goto invalid;
-                ND_PRINT((ndo, ", 0x%x", EXTRACT_U_1(tptr + 4)));
+                ND_PRINT(", 0x%x", EXTRACT_U_1(tptr + 4));
                 break;
 
 	case DTP_NEIGHBOR_TLV:
                 if (len < 10)
                     goto invalid;
-                ND_PRINT((ndo, ", %s", etheraddr_string(ndo, tptr+4)));
+                ND_PRINT(", %s", etheraddr_string(ndo, tptr+4));
                 break;
 
         default:
@@ -114,10 +114,10 @@ dtp_print (netdissect_options *ndo, const u_char *pptr, u_int length)
     return;
 
  invalid:
-    ND_PRINT((ndo, "%s", istr));
+    ND_PRINT("%s", istr);
     return;
  trunc:
-    ND_PRINT((ndo, "%s", tstr));
+    ND_PRINT("%s", tstr);
 }
 
 /*

@@ -114,22 +114,22 @@ vrrp_print(netdissect_options *ndo,
 	version = (EXTRACT_U_1(bp) & 0xf0) >> 4;
 	type = EXTRACT_U_1(bp) & 0x0f;
 	type_s = tok2str(type2str, "unknown type (%u)", type);
-	ND_PRINT((ndo, "VRRPv%u, %s", version, type_s));
+	ND_PRINT("VRRPv%u, %s", version, type_s);
 	if (ttl != 255)
-		ND_PRINT((ndo, ", (ttl %u)", ttl));
+		ND_PRINT(", (ttl %u)", ttl);
 	if (version < 2 || version > 3 || type != VRRP_TYPE_ADVERTISEMENT)
 		return;
 	ND_TCHECK_1(bp + 2);
-	ND_PRINT((ndo, ", vrid %u, prio %u", EXTRACT_U_1(bp + 1), EXTRACT_U_1(bp + 2)));
+	ND_PRINT(", vrid %u, prio %u", EXTRACT_U_1(bp + 1), EXTRACT_U_1(bp + 2));
 	ND_TCHECK_1(bp + 5);
 
 	if (version == 2) {
 		auth_type = EXTRACT_U_1(bp + 4);
-		ND_PRINT((ndo, ", authtype %s", tok2str(auth2str, NULL, auth_type)));
-		ND_PRINT((ndo, ", intvl %us, length %u", EXTRACT_U_1(bp + 5), len));
+		ND_PRINT(", authtype %s", tok2str(auth2str, NULL, auth_type));
+		ND_PRINT(", intvl %us, length %u", EXTRACT_U_1(bp + 5), len);
 	} else { /* version == 3 */
 		uint16_t intvl = (EXTRACT_U_1(bp + 4) & 0x0f) << 8 | EXTRACT_U_1(bp + 5);
-		ND_PRINT((ndo, ", intvl %ucs, length %u", intvl, len));
+		ND_PRINT(", intvl %ucs, length %u", intvl, len);
 	}
 
 	if (ndo->ndo_vflag) {
@@ -143,41 +143,41 @@ vrrp_print(netdissect_options *ndo,
 			vec[0].ptr = bp;
 			vec[0].len = len;
 			if (in_cksum(vec, 1))
-				ND_PRINT((ndo, ", (bad vrrp cksum %x)",
-					EXTRACT_BE_U_2(bp + 6)));
+				ND_PRINT(", (bad vrrp cksum %x)",
+					EXTRACT_BE_U_2(bp + 6));
 		}
 
 		if (version == 3 && ND_TTEST_LEN(bp, len)) {
 			uint16_t cksum = nextproto4_cksum(ndo, (const struct ip *)bp2, bp,
 				len, len, IPPROTO_VRRP);
 			if (cksum)
-				ND_PRINT((ndo, ", (bad vrrp cksum %x)",
-					EXTRACT_BE_U_2(bp + 6)));
+				ND_PRINT(", (bad vrrp cksum %x)",
+					EXTRACT_BE_U_2(bp + 6));
 		}
 
-		ND_PRINT((ndo, ", addrs"));
+		ND_PRINT(", addrs");
 		if (naddrs > 1)
-			ND_PRINT((ndo, "(%d)", naddrs));
-		ND_PRINT((ndo, ":"));
+			ND_PRINT("(%d)", naddrs);
+		ND_PRINT(":");
 		c = ' ';
 		bp += 8;
 		for (i = 0; i < naddrs; i++) {
 			ND_TCHECK_1(bp + 3);
-			ND_PRINT((ndo, "%c%s", c, ipaddr_string(ndo, bp)));
+			ND_PRINT("%c%s", c, ipaddr_string(ndo, bp));
 			c = ',';
 			bp += 4;
 		}
 		if (version == 2 && auth_type == VRRP_AUTH_SIMPLE) { /* simple text password */
 			ND_TCHECK_1(bp + 7);
-			ND_PRINT((ndo, " auth \""));
+			ND_PRINT(" auth \"");
 			if (fn_printn(ndo, bp, 8, ndo->ndo_snapend)) {
-				ND_PRINT((ndo, "\""));
+				ND_PRINT("\"");
 				goto trunc;
 			}
-			ND_PRINT((ndo, "\""));
+			ND_PRINT("\"");
 		}
 	}
 	return;
 trunc:
-	ND_PRINT((ndo, "[|vrrp]"));
+	ND_PRINT("[|vrrp]");
 }

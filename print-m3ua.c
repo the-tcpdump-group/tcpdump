@@ -220,21 +220,21 @@ tag_value_print(netdissect_options *ndo,
     if (size < 4)
       goto invalid;
     ND_TCHECK_LEN(buf, size);
-    ND_PRINT((ndo, "0x%08x", EXTRACT_BE_U_4(buf)));
+    ND_PRINT("0x%08x", EXTRACT_BE_U_4(buf));
     break;
   /* ... */
   default:
-    ND_PRINT((ndo, "(length %u)", size + (u_int)sizeof(struct m3ua_param_header)));
+    ND_PRINT("(length %u)", size + (u_int)sizeof(struct m3ua_param_header));
     ND_TCHECK_LEN(buf, size);
   }
   return;
 
 invalid:
-  ND_PRINT((ndo, "%s", istr));
+  ND_PRINT("%s", istr);
   ND_TCHECK_LEN(buf, size);
   return;
 trunc:
-  ND_PRINT((ndo, "%s", tstr));
+  ND_PRINT("%s", tstr);
 }
 
 /*
@@ -263,7 +263,7 @@ m3ua_tags_print(netdissect_options *ndo,
     ND_TCHECK_LEN(p, sizeof(struct m3ua_param_header));
     /* Parameter Tag */
     hdr_tag = EXTRACT_BE_U_2(p);
-    ND_PRINT((ndo, "\n\t\t\t%s: ", tok2str(ParamName, "Unknown Parameter (0x%04x)", hdr_tag)));
+    ND_PRINT("\n\t\t\t%s: ", tok2str(ParamName, "Unknown Parameter (0x%04x)", hdr_tag));
     /* Parameter Length */
     hdr_len = EXTRACT_BE_U_2(p + 2);
     if (hdr_len < sizeof(struct m3ua_param_header))
@@ -278,11 +278,11 @@ m3ua_tags_print(netdissect_options *ndo,
   return;
 
 invalid:
-  ND_PRINT((ndo, "%s", istr));
+  ND_PRINT("%s", istr);
   ND_TCHECK_LEN(buf, size);
   return;
 trunc:
-  ND_PRINT((ndo, "%s", tstr));
+  ND_PRINT("%s", tstr);
 }
 
 /*
@@ -321,22 +321,22 @@ m3ua_print(netdissect_options *ndo,
     msg_class == M3UA_MSGC_RKM      ? RoutingKeyMgmtMessages :
     NULL;
 
-  ND_PRINT((ndo, "\n\t\t%s", tok2str(MessageClasses, "Unknown message class %i", msg_class)));
+  ND_PRINT("\n\t\t%s", tok2str(MessageClasses, "Unknown message class %i", msg_class));
   if (dict != NULL)
-    ND_PRINT((ndo, " %s Message", tok2str(dict, "Unknown (0x%02x)", EXTRACT_U_1(hdr->msg_type))));
+    ND_PRINT(" %s Message", tok2str(dict, "Unknown (0x%02x)", EXTRACT_U_1(hdr->msg_type)));
 
   if (size != EXTRACT_BE_U_4(hdr->len))
-    ND_PRINT((ndo, "\n\t\t\t@@@@@@ Corrupted length %u of message @@@@@@", EXTRACT_BE_U_4(hdr->len)));
+    ND_PRINT("\n\t\t\t@@@@@@ Corrupted length %u of message @@@@@@", EXTRACT_BE_U_4(hdr->len));
   else
     m3ua_tags_print(ndo, buf + sizeof(struct m3ua_common_header),
                     EXTRACT_BE_U_4(hdr->len) - sizeof(struct m3ua_common_header));
   return;
 
 invalid:
-  ND_PRINT((ndo, "%s", istr));
+  ND_PRINT("%s", istr);
   ND_TCHECK_LEN(buf, size);
   return;
 trunc:
-  ND_PRINT((ndo, "%s", tstr));
+  ND_PRINT("%s", tstr);
 }
 

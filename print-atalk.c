@@ -101,11 +101,11 @@ llap_print(netdissect_options *ndo,
 	u_int hdrlen;
 
 	if (length < sizeof(*lp)) {
-		ND_PRINT((ndo, " [|llap %u]", length));
+		ND_PRINT(" [|llap %u]", length);
 		return (length);
 	}
 	if (!ND_TTEST_LEN(bp, sizeof(*lp))) {
-		ND_PRINT((ndo, " [|llap]"));
+		ND_PRINT(" [|llap]");
 		return (0);	/* cut short by the snapshot length */
 	}
 	lp = (const struct LAP *)bp;
@@ -116,18 +116,18 @@ llap_print(netdissect_options *ndo,
 
 	case lapShortDDP:
 		if (length < ddpSSize) {
-			ND_PRINT((ndo, " [|sddp %u]", length));
+			ND_PRINT(" [|sddp %u]", length);
 			return (length);
 		}
 		if (!ND_TTEST_LEN(bp, ddpSSize)) {
-			ND_PRINT((ndo, " [|sddp]"));
+			ND_PRINT(" [|sddp]");
 			return (0);	/* cut short by the snapshot length */
 		}
 		sdp = (const struct atShortDDP *)bp;
-		ND_PRINT((ndo, "%s.%s",
-		    ataddr_string(ndo, 0, EXTRACT_U_1(lp->src)), ddpskt_string(ndo, EXTRACT_U_1(sdp->srcSkt))));
-		ND_PRINT((ndo, " > %s.%s:",
-		    ataddr_string(ndo, 0, EXTRACT_U_1(lp->dst)), ddpskt_string(ndo, EXTRACT_U_1(sdp->dstSkt))));
+		ND_PRINT("%s.%s",
+		    ataddr_string(ndo, 0, EXTRACT_U_1(lp->src)), ddpskt_string(ndo, EXTRACT_U_1(sdp->srcSkt)));
+		ND_PRINT(" > %s.%s:",
+		    ataddr_string(ndo, 0, EXTRACT_U_1(lp->dst)), ddpskt_string(ndo, EXTRACT_U_1(sdp->dstSkt)));
 		bp += ddpSSize;
 		length -= ddpSSize;
 		hdrlen += ddpSSize;
@@ -136,20 +136,20 @@ llap_print(netdissect_options *ndo,
 
 	case lapDDP:
 		if (length < ddpSize) {
-			ND_PRINT((ndo, " [|ddp %u]", length));
+			ND_PRINT(" [|ddp %u]", length);
 			return (length);
 		}
 		if (!ND_TTEST_LEN(bp, ddpSize)) {
-			ND_PRINT((ndo, " [|ddp]"));
+			ND_PRINT(" [|ddp]");
 			return (0);	/* cut short by the snapshot length */
 		}
 		dp = (const struct atDDP *)bp;
 		snet = EXTRACT_BE_U_2(dp->srcNet);
-		ND_PRINT((ndo, "%s.%s", ataddr_string(ndo, snet, EXTRACT_U_1(dp->srcNode)),
-		    ddpskt_string(ndo, EXTRACT_U_1(dp->srcSkt))));
-		ND_PRINT((ndo, " > %s.%s:",
+		ND_PRINT("%s.%s", ataddr_string(ndo, snet, EXTRACT_U_1(dp->srcNode)),
+		    ddpskt_string(ndo, EXTRACT_U_1(dp->srcSkt)));
+		ND_PRINT(" > %s.%s:",
 		    ataddr_string(ndo, EXTRACT_BE_U_2(dp->dstNet), EXTRACT_U_1(dp->dstNode)),
-		    ddpskt_string(ndo, EXTRACT_U_1(dp->dstSkt))));
+		    ddpskt_string(ndo, EXTRACT_U_1(dp->dstSkt)));
 		bp += ddpSize;
 		length -= ddpSize;
 		hdrlen += ddpSize;
@@ -163,8 +163,8 @@ llap_print(netdissect_options *ndo,
 #endif
 
 	default:
-		ND_PRINT((ndo, "%u > %u at-lap#%u %u",
-		    EXTRACT_U_1(lp->src), EXTRACT_U_1(lp->dst), EXTRACT_U_1(lp->type), length));
+		ND_PRINT("%u > %u at-lap#%u %u",
+		    EXTRACT_U_1(lp->src), EXTRACT_U_1(lp->dst), EXTRACT_U_1(lp->type), length);
 		break;
 	}
 	return (hdrlen);
@@ -183,23 +183,23 @@ atalk_print(netdissect_options *ndo,
 	u_short snet;
 
         if(!ndo->ndo_eflag)
-            ND_PRINT((ndo, "AT "));
+            ND_PRINT("AT ");
 
 	if (length < ddpSize) {
-		ND_PRINT((ndo, " [|ddp %u]", length));
+		ND_PRINT(" [|ddp %u]", length);
 		return;
 	}
 	if (!ND_TTEST_LEN(bp, ddpSize)) {
-		ND_PRINT((ndo, " [|ddp]"));
+		ND_PRINT(" [|ddp]");
 		return;
 	}
 	dp = (const struct atDDP *)bp;
 	snet = EXTRACT_BE_U_2(dp->srcNet);
-	ND_PRINT((ndo, "%s.%s", ataddr_string(ndo, snet, EXTRACT_U_1(dp->srcNode)),
-	       ddpskt_string(ndo, EXTRACT_U_1(dp->srcSkt))));
-	ND_PRINT((ndo, " > %s.%s: ",
+	ND_PRINT("%s.%s", ataddr_string(ndo, snet, EXTRACT_U_1(dp->srcNode)),
+	       ddpskt_string(ndo, EXTRACT_U_1(dp->srcSkt)));
+	ND_PRINT(" > %s.%s: ",
 	       ataddr_string(ndo, EXTRACT_BE_U_2(dp->dstNet), EXTRACT_U_1(dp->dstNode)),
-	       ddpskt_string(ndo, EXTRACT_U_1(dp->dstSkt))));
+	       ddpskt_string(ndo, EXTRACT_U_1(dp->dstSkt)));
 	bp += ddpSize;
 	length -= ddpSize;
 	ddp_print(ndo, bp, length, EXTRACT_U_1(dp->type), snet, EXTRACT_U_1(dp->srcNode), EXTRACT_U_1(dp->srcSkt));
@@ -214,15 +214,15 @@ aarp_print(netdissect_options *ndo,
 
 #define AT(member) ataddr_string(ndo, (ap->member[1]<<8)|ap->member[2],ap->member[3])
 
-	ND_PRINT((ndo, "aarp "));
+	ND_PRINT("aarp ");
 	ap = (const struct aarp *)bp;
 	if (!ND_TTEST_SIZE(ap)) {
 		/* Just bail if we don't have the whole chunk. */
-		ND_PRINT((ndo, " [|aarp]"));
+		ND_PRINT(" [|aarp]");
 		return;
 	}
 	if (length < sizeof(*ap)) {
-		ND_PRINT((ndo, " [|aarp %u]", length));
+		ND_PRINT(" [|aarp %u]", length);
 		return;
 	}
 	if (EXTRACT_BE_U_2(ap->htype) == 1 &&
@@ -231,20 +231,20 @@ aarp_print(netdissect_options *ndo,
 		switch (EXTRACT_BE_U_2(ap->op)) {
 
 		case 1:				/* request */
-			ND_PRINT((ndo, "who-has %s tell %s", AT(pdaddr), AT(psaddr)));
+			ND_PRINT("who-has %s tell %s", AT(pdaddr), AT(psaddr));
 			return;
 
 		case 2:				/* response */
-			ND_PRINT((ndo, "reply %s is-at %s", AT(psaddr), etheraddr_string(ndo, ap->hsaddr)));
+			ND_PRINT("reply %s is-at %s", AT(psaddr), etheraddr_string(ndo, ap->hsaddr));
 			return;
 
 		case 3:				/* probe (oy!) */
-			ND_PRINT((ndo, "probe %s tell %s", AT(pdaddr), AT(psaddr)));
+			ND_PRINT("probe %s tell %s", AT(pdaddr), AT(psaddr));
 			return;
 		}
-	ND_PRINT((ndo, "len %u op %u htype %u ptype %#x halen %u palen %u",
+	ND_PRINT("len %u op %u htype %u ptype %#x halen %u palen %u",
 	    length, EXTRACT_BE_U_2(ap->op), EXTRACT_BE_U_2(ap->htype),
-	    EXTRACT_BE_U_2(ap->ptype), EXTRACT_U_1(ap->halen), EXTRACT_U_1(ap->palen)));
+	    EXTRACT_BE_U_2(ap->ptype), EXTRACT_U_1(ap->halen), EXTRACT_U_1(ap->palen));
 }
 
 /*
@@ -271,7 +271,7 @@ ddp_print(netdissect_options *ndo,
 		break;
 
 	default:
-		ND_PRINT((ndo, " at-%s %d", tok2str(type2str, NULL, t), length));
+		ND_PRINT(" at-%s %d", tok2str(type2str, NULL, t), length);
 		break;
 	}
 }
@@ -285,11 +285,11 @@ atp_print(netdissect_options *ndo,
 
 	if ((const u_char *)(ap + 1) > ndo->ndo_snapend) {
 		/* Just bail if we don't have the whole chunk. */
-		ND_PRINT((ndo, "%s", tstr));
+		ND_PRINT("%s", tstr);
 		return;
 	}
 	if (length < sizeof(*ap)) {
-		ND_PRINT((ndo, " [|atp %u]", length));
+		ND_PRINT(" [|atp %u]", length);
 		return;
 	}
 	length -= sizeof(*ap);
@@ -297,80 +297,80 @@ atp_print(netdissect_options *ndo,
 	switch (control & 0xc0) {
 
 	case atpReqCode:
-		ND_PRINT((ndo, " atp-req%s %u",
+		ND_PRINT(" atp-req%s %u",
 			     control & atpXO? " " : "*",
-			     EXTRACT_BE_U_2(ap->transID)));
+			     EXTRACT_BE_U_2(ap->transID));
 
 		atp_bitmap_print(ndo, EXTRACT_U_1(ap->bitmap));
 
 		if (length != 0)
-			ND_PRINT((ndo, " [len=%u]", length));
+			ND_PRINT(" [len=%u]", length);
 
 		switch (control & (atpEOM|atpSTS)) {
 		case atpEOM:
-			ND_PRINT((ndo, " [EOM]"));
+			ND_PRINT(" [EOM]");
 			break;
 		case atpSTS:
-			ND_PRINT((ndo, " [STS]"));
+			ND_PRINT(" [STS]");
 			break;
 		case atpEOM|atpSTS:
-			ND_PRINT((ndo, " [EOM,STS]"));
+			ND_PRINT(" [EOM,STS]");
 			break;
 		}
 		break;
 
 	case atpRspCode:
-		ND_PRINT((ndo, " atp-resp%s%d:%u (%u)",
+		ND_PRINT(" atp-resp%s%d:%u (%u)",
 			     control & atpEOM? "*" : " ",
-			     EXTRACT_BE_U_2(ap->transID), EXTRACT_U_1(ap->bitmap), length));
+			     EXTRACT_BE_U_2(ap->transID), EXTRACT_U_1(ap->bitmap), length);
 		switch (control & (atpXO|atpSTS)) {
 		case atpXO:
-			ND_PRINT((ndo, " [XO]"));
+			ND_PRINT(" [XO]");
 			break;
 		case atpSTS:
-			ND_PRINT((ndo, " [STS]"));
+			ND_PRINT(" [STS]");
 			break;
 		case atpXO|atpSTS:
-			ND_PRINT((ndo, " [XO,STS]"));
+			ND_PRINT(" [XO,STS]");
 			break;
 		}
 		break;
 
 	case atpRelCode:
-		ND_PRINT((ndo, " atp-rel  %u", EXTRACT_BE_U_2(ap->transID)));
+		ND_PRINT(" atp-rel  %u", EXTRACT_BE_U_2(ap->transID));
 
 		atp_bitmap_print(ndo, EXTRACT_U_1(ap->bitmap));
 
 		/* length should be zero */
 		if (length)
-			ND_PRINT((ndo, " [len=%u]", length));
+			ND_PRINT(" [len=%u]", length);
 
 		/* there shouldn't be any control flags */
 		if (control & (atpXO|atpEOM|atpSTS)) {
 			char c = '[';
 			if (control & atpXO) {
-				ND_PRINT((ndo, "%cXO", c));
+				ND_PRINT("%cXO", c);
 				c = ',';
 			}
 			if (control & atpEOM) {
-				ND_PRINT((ndo, "%cEOM", c));
+				ND_PRINT("%cEOM", c);
 				c = ',';
 			}
 			if (control & atpSTS) {
-				ND_PRINT((ndo, "%cSTS", c));
+				ND_PRINT("%cSTS", c);
 			}
-			ND_PRINT((ndo, "]"));
+			ND_PRINT("]");
 		}
 		break;
 
 	default:
-		ND_PRINT((ndo, " atp-0x%x  %d (%u)", control,
-			     EXTRACT_BE_U_2(ap->transID), length));
+		ND_PRINT(" atp-0x%x  %d (%u)", control,
+			     EXTRACT_BE_U_2(ap->transID), length);
 		break;
 	}
 	data = EXTRACT_BE_U_4(ap->userData);
 	if (data != 0)
-		ND_PRINT((ndo, " 0x%x", data));
+		ND_PRINT(" 0x%x", data);
 }
 
 static void
@@ -388,19 +388,19 @@ atp_bitmap_print(netdissect_options *ndo,
 		char c = '<';
 		for (i = 0; bm; ++i) {
 			if (bm & 1) {
-				ND_PRINT((ndo, "%c%d", c, i));
+				ND_PRINT("%c%d", c, i);
 				c = ',';
 			}
 			bm >>= 1;
 		}
-		ND_PRINT((ndo, ">"));
+		ND_PRINT(">");
 	} else {
 		for (i = 0; bm; ++i)
 			bm >>= 1;
 		if (i > 1)
-			ND_PRINT((ndo, "<0-%d>", i - 1));
+			ND_PRINT("<0-%d>", i - 1);
 		else
-			ND_PRINT((ndo, "<0>"));
+			ND_PRINT("<0>");
 	}
 }
 
@@ -416,20 +416,20 @@ nbp_print(netdissect_options *ndo,
 	const u_char *ep;
 
 	if (length < nbpHeaderSize) {
-		ND_PRINT((ndo, " truncated-nbp %u", length));
+		ND_PRINT(" truncated-nbp %u", length);
 		return;
 	}
 
 	length -= nbpHeaderSize;
 	if (length < 8) {
 		/* must be room for at least one tuple */
-		ND_PRINT((ndo, " truncated-nbp %u", length + nbpHeaderSize));
+		ND_PRINT(" truncated-nbp %u", length + nbpHeaderSize);
 		return;
 	}
 	/* ep points to end of available data */
 	ep = ndo->ndo_snapend;
 	if ((const u_char *)tp > ep) {
-		ND_PRINT((ndo, "%s", tstr));
+		ND_PRINT("%s", tstr);
 		return;
 	}
 	control = EXTRACT_U_1(np->control);
@@ -437,9 +437,9 @@ nbp_print(netdissect_options *ndo,
 
 	case nbpBrRq:
 	case nbpLkUp:
-		ND_PRINT((ndo, i == nbpLkUp? " nbp-lkup %u:":" nbp-brRq %u:", EXTRACT_U_1(np->id)));
+		ND_PRINT(i == nbpLkUp? " nbp-lkup %u:":" nbp-brRq %u:", EXTRACT_U_1(np->id));
 		if ((const u_char *)(tp + 1) > ep) {
-			ND_PRINT((ndo, "%s", tstr));
+			ND_PRINT("%s", tstr);
 			return;
 		}
 		(void)nbp_name_print(ndo, tp, ep);
@@ -449,20 +449,20 @@ nbp_print(netdissect_options *ndo,
 		 * address and the enumerator should be zero.
 		 */
 		if ((control & 0xf) != 1)
-			ND_PRINT((ndo, " [ntup=%u]", control & 0xf));
+			ND_PRINT(" [ntup=%u]", control & 0xf);
 		if (EXTRACT_U_1(tp->enumerator))
-			ND_PRINT((ndo, " [enum=%u]", EXTRACT_U_1(tp->enumerator)));
+			ND_PRINT(" [enum=%u]", EXTRACT_U_1(tp->enumerator));
 		if (EXTRACT_BE_U_2(tp->net) != snet ||
 		    EXTRACT_U_1(tp->node) != snode ||
 		    EXTRACT_U_1(tp->skt) != skt)
-			ND_PRINT((ndo, " [addr=%s.%d]",
+			ND_PRINT(" [addr=%s.%d]",
 			    ataddr_string(ndo, EXTRACT_BE_U_2(tp->net),
 					  EXTRACT_U_1(tp->node)),
-					  EXTRACT_U_1(tp->skt)));
+					  EXTRACT_U_1(tp->skt));
 		break;
 
 	case nbpLkUpReply:
-		ND_PRINT((ndo, " nbp-reply %u:", EXTRACT_U_1(np->id)));
+		ND_PRINT(" nbp-reply %u:", EXTRACT_U_1(np->id));
 
 		/* print each of the tuples in the reply */
 		for (i = control & 0xf; --i >= 0 && tp; )
@@ -470,7 +470,7 @@ nbp_print(netdissect_options *ndo,
 		break;
 
 	default:
-		ND_PRINT((ndo, " nbp-0x%x  %u (%u)", control, EXTRACT_U_1(np->id), length));
+		ND_PRINT(" nbp-0x%x  %u (%u)", control, EXTRACT_U_1(np->id), length);
 		break;
 	}
 }
@@ -483,7 +483,7 @@ print_cstring(netdissect_options *ndo,
 	u_int length;
 
 	if (cp >= (const char *)ep) {
-		ND_PRINT((ndo, "%s", tstr));
+		ND_PRINT("%s", tstr);
 		return (0);
 	}
 	length = EXTRACT_U_1(cp);
@@ -491,15 +491,15 @@ print_cstring(netdissect_options *ndo,
 
 	/* Spec says string can be at most 32 bytes long */
 	if (length > 32) {
-		ND_PRINT((ndo, "[len=%u]", length));
+		ND_PRINT("[len=%u]", length);
 		return (0);
 	}
 	while (length != 0) {
 		if (cp >= (const char *)ep) {
-			ND_PRINT((ndo, "%s", tstr));
+			ND_PRINT("%s", tstr);
 			return (0);
 		}
-		ND_PRINT((ndo, "%c", EXTRACT_U_1(cp)));
+		ND_PRINT("%c", EXTRACT_U_1(cp));
 		cp++;
 		length--;
 	}
@@ -514,24 +514,24 @@ nbp_tuple_print(netdissect_options *ndo,
 	const struct atNBPtuple *tpn;
 
 	if ((const u_char *)(tp + 1) > ep) {
-		ND_PRINT((ndo, "%s", tstr));
+		ND_PRINT("%s", tstr);
 		return 0;
 	}
 	tpn = nbp_name_print(ndo, tp, ep);
 
 	/* if the enumerator isn't 1, print it */
 	if (EXTRACT_U_1(tp->enumerator) != 1)
-		ND_PRINT((ndo, "(%u)", EXTRACT_U_1(tp->enumerator)));
+		ND_PRINT("(%u)", EXTRACT_U_1(tp->enumerator));
 
 	/* if the socket doesn't match the src socket, print it */
 	if (EXTRACT_U_1(tp->skt) != skt)
-		ND_PRINT((ndo, " %u", EXTRACT_U_1(tp->skt)));
+		ND_PRINT(" %u", EXTRACT_U_1(tp->skt));
 
 	/* if the address doesn't match the src address, it's an anomaly */
 	if (EXTRACT_BE_U_2(tp->net) != snet ||
 	    EXTRACT_U_1(tp->node) != snode)
-		ND_PRINT((ndo, " [addr=%s]",
-		    ataddr_string(ndo, EXTRACT_BE_U_2(tp->net), EXTRACT_U_1(tp->node))));
+		ND_PRINT(" [addr=%s]",
+		    ataddr_string(ndo, EXTRACT_BE_U_2(tp->net), EXTRACT_U_1(tp->node)));
 
 	return (tpn);
 }
@@ -542,18 +542,18 @@ nbp_name_print(netdissect_options *ndo,
 {
 	const char *cp = (const char *)tp + nbpTupleSize;
 
-	ND_PRINT((ndo, " "));
+	ND_PRINT(" ");
 
 	/* Object */
-	ND_PRINT((ndo, "\""));
+	ND_PRINT("\"");
 	if ((cp = print_cstring(ndo, cp, ep)) != NULL) {
 		/* Type */
-		ND_PRINT((ndo, ":"));
+		ND_PRINT(":");
 		if ((cp = print_cstring(ndo, cp, ep)) != NULL) {
 			/* Zone */
-			ND_PRINT((ndo, "@"));
+			ND_PRINT("@");
 			if ((cp = print_cstring(ndo, cp, ep)) != NULL)
-				ND_PRINT((ndo, "\""));
+				ND_PRINT("\"");
 		}
 	}
 	return ((const struct atNBPtuple *)cp);

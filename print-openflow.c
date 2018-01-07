@@ -70,8 +70,8 @@ static void
 of_header_print(netdissect_options *ndo, const uint8_t version, const uint8_t type,
                       const uint16_t length, const uint32_t xid)
 {
-	ND_PRINT((ndo, "\n\tversion unknown (0x%02x), type 0x%02x, length %u, xid 0x%08x",
-	       version, type, length, xid));
+	ND_PRINT("\n\tversion unknown (0x%02x), type 0x%02x, length %u, xid 0x%08x",
+	       version, type, length, xid);
 }
 
 /* Print a single OpenFlow message. */
@@ -121,11 +121,11 @@ of_header_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep
 	}
 
 invalid: /* fail current packet */
-	ND_PRINT((ndo, "%s", istr));
+	ND_PRINT("%s", istr);
 	ND_TCHECK_LEN(cp, ep - cp);
 	return ep;
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	ND_PRINT("%s", tstr);
 	return ep;
 }
 
@@ -136,7 +136,7 @@ openflow_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 {
 	const u_char *ep = cp + len;
 
-	ND_PRINT((ndo, ": OpenFlow"));
+	ND_PRINT(": OpenFlow");
 	while (cp < ep)
 		cp = of_header_body_print(ndo, cp, ep);
 }

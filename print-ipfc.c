@@ -83,7 +83,7 @@ ipfc_hdr_print(netdissect_options *ndo,
 	 * so, for captures following this specification, the upper 16
 	 * bits should be 0x1000, followed by a MAC address.
 	 */
-	ND_PRINT((ndo, "%s > %s, length %u: ", srcname, dstname, length));
+	ND_PRINT("%s > %s, length %u: ", srcname, dstname, length);
 }
 
 static u_int
@@ -95,7 +95,7 @@ ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 	int llc_hdrlen;
 
 	if (caplen < IPFC_HDRLEN) {
-		ND_PRINT((ndo, "[|ipfc]"));
+		ND_PRINT("[|ipfc]");
 		return (caplen);
 	}
 	/*

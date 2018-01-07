@@ -61,11 +61,11 @@ chdlc_print(netdissect_options *ndo, const u_char *p, u_int length)
 	ND_TCHECK_LEN(p, CHDLC_HDRLEN);
 	proto = EXTRACT_BE_U_2(p + 2);
 	if (ndo->ndo_eflag) {
-                ND_PRINT((ndo, "%s, ethertype %s (0x%04x), length %u: ",
+                ND_PRINT("%s, ethertype %s (0x%04x), length %u: ",
                        tok2str(chdlc_cast_values, "0x%02x", EXTRACT_U_1(p)),
                        tok2str(ethertype_values, "Unknown", proto),
                        proto,
-                       length));
+                       length);
 	}
 
 	length -= CHDLC_HDRLEN;
@@ -104,14 +104,14 @@ chdlc_print(netdissect_options *ndo, const u_char *p, u_int length)
                 break;
 	default:
                 if (!ndo->ndo_eflag)
-                        ND_PRINT((ndo, "unknown CHDLC protocol (0x%04x)", proto));
+                        ND_PRINT("unknown CHDLC protocol (0x%04x)", proto);
                 break;
 	}
 
 	return (CHDLC_HDRLEN);
 
 trunc:
-	ND_PRINT((ndo, "[|chdlc]"));
+	ND_PRINT("[|chdlc]");
 	return ndo->ndo_snapend - bp;
 }
 
@@ -145,7 +145,7 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
 	const struct cisco_slarp *slarp;
         u_int sec,min,hrs,days;
 
-	ND_PRINT((ndo, "SLARP (length: %u), ",length));
+	ND_PRINT("SLARP (length: %u), ",length);
 	if (length < SLARP_MIN_LEN)
 		goto trunc;
 
@@ -153,7 +153,7 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
 	ND_TCHECK_LEN(slarp, SLARP_MIN_LEN);
 	switch (EXTRACT_BE_U_4(slarp->code)) {
 	case SLARP_REQUEST:
-		ND_PRINT((ndo, "request"));
+		ND_PRINT("request");
 		/*
 		 * At least according to William "Chops" Westfield's
 		 * message in
@@ -165,15 +165,15 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
 		 */
 		break;
 	case SLARP_REPLY:
-		ND_PRINT((ndo, "reply %s/%s",
+		ND_PRINT("reply %s/%s",
 			ipaddr_string(ndo, &slarp->un.addr.addr),
-			ipaddr_string(ndo, &slarp->un.addr.mask)));
+			ipaddr_string(ndo, &slarp->un.addr.mask));
 		break;
 	case SLARP_KEEPALIVE:
-		ND_PRINT((ndo, "keepalive: mineseen=0x%08x, yourseen=0x%08x, reliability=0x%04x",
+		ND_PRINT("keepalive: mineseen=0x%08x, yourseen=0x%08x, reliability=0x%04x",
                        EXTRACT_BE_U_4(slarp->un.keep.myseq),
                        EXTRACT_BE_U_4(slarp->un.keep.yourseq),
-                       EXTRACT_BE_U_2(slarp->un.keep.rel)));
+                       EXTRACT_BE_U_2(slarp->un.keep.rel));
 
                 if (length >= SLARP_MAX_LEN) { /* uptime-stamp is optional */
                         cp += SLARP_MIN_LEN;
@@ -182,24 +182,24 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
                         min = sec / 60; sec -= min * 60;
                         hrs = min / 60; min -= hrs * 60;
                         days = hrs / 24; hrs -= days * 24;
-                        ND_PRINT((ndo, ", link uptime=%ud%uh%um%us",days,hrs,min,sec));
+                        ND_PRINT(", link uptime=%ud%uh%um%us",days,hrs,min,sec);
                 }
 		break;
 	default:
-		ND_PRINT((ndo, "0x%02x unknown", EXTRACT_BE_U_4(slarp->code)));
+		ND_PRINT("0x%02x unknown", EXTRACT_BE_U_4(slarp->code));
                 if (ndo->ndo_vflag <= 1)
                     print_unknown_data(ndo,cp+4,"\n\t",length-4);
 		break;
 	}
 
 	if (SLARP_MAX_LEN < length && ndo->ndo_vflag)
-		ND_PRINT((ndo, ", (trailing junk: %u bytes)", length - SLARP_MAX_LEN));
+		ND_PRINT(", (trailing junk: %u bytes)", length - SLARP_MAX_LEN);
         if (ndo->ndo_vflag > 1)
             print_unknown_data(ndo,cp+4,"\n\t",length-4);
 	return;
 
 trunc:
-	ND_PRINT((ndo, "[|slarp]"));
+	ND_PRINT("[|slarp]");
 }
 
 

@@ -53,10 +53,10 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 	ND_TCHECK(dp->ip6r_segleft);
 
 	len = EXTRACT_U_1(dp->ip6r_len);
-	ND_PRINT((ndo, "srcrt (len=%u", len));	/*)*/
+	ND_PRINT("srcrt (len=%u", len);	/*)*/
 	type = EXTRACT_U_1(dp->ip6r_type);
-	ND_PRINT((ndo, ", type=%u", type));
-	ND_PRINT((ndo, ", segleft=%u", EXTRACT_U_1(dp->ip6r_segleft)));
+	ND_PRINT(", type=%u", type);
+	ND_PRINT(", segleft=%u", EXTRACT_U_1(dp->ip6r_segleft));
 
 	switch (type) {
 	case IPV6_RTHDR_TYPE_0:
@@ -65,8 +65,8 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 
 		ND_TCHECK(dp0->ip6r0_reserved);
 		if (EXTRACT_BE_U_4(dp0->ip6r0_reserved) || ndo->ndo_vflag) {
-			ND_PRINT((ndo, ", rsv=0x%0x",
-			    EXTRACT_BE_U_4(dp0->ip6r0_reserved)));
+			ND_PRINT(", rsv=0x%0x",
+			    EXTRACT_BE_U_4(dp0->ip6r0_reserved));
 		}
 
 		if (len % 2 == 1)
@@ -77,24 +77,24 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 			if ((const u_char *)(addr + 1) > ep)
 				goto trunc;
 
-			ND_PRINT((ndo, ", [%d]%s", i, ip6addr_string(ndo, addr)));
+			ND_PRINT(", [%d]%s", i, ip6addr_string(ndo, addr));
 			addr++;
 		}
 		/*(*/
-		ND_PRINT((ndo, ") "));
+		ND_PRINT(") ");
 		return((EXTRACT_U_1(dp0->ip6r0_len) + 1) << 3);
 		break;
 	case IPV6_RTHDR_TYPE_4:
 		srh = (const struct ip6_srh *)dp;
-		ND_PRINT((ndo, ", last-entry=%u", EXTRACT_U_1(srh->srh_last_ent)));
+		ND_PRINT(", last-entry=%u", EXTRACT_U_1(srh->srh_last_ent));
 
 		ND_TCHECK(srh->srh_flags);
 		if (EXTRACT_U_1(srh->srh_flags) || ndo->ndo_vflag) {
-			ND_PRINT((ndo, ", flags=0x%0x",
-				EXTRACT_U_1(srh->srh_flags)));
+			ND_PRINT(", flags=0x%0x",
+				EXTRACT_U_1(srh->srh_flags));
 		}
 
-		ND_PRINT((ndo, ", tag=%x", EXTRACT_BE_U_2(srh->srh_tag)));
+		ND_PRINT(", tag=%x", EXTRACT_BE_U_2(srh->srh_tag));
 
 		if (len % 2 == 1)
 			goto trunc;
@@ -104,11 +104,11 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 			if ((const u_char *)(addr + 1) > ep)
 				goto trunc;
 
-			ND_PRINT((ndo, ", [%d]%s", i, ip6addr_string(ndo, addr)));
+			ND_PRINT(", [%d]%s", i, ip6addr_string(ndo, addr));
 			addr++;
 		}
 		/*(*/
-		ND_PRINT((ndo, ") "));
+		ND_PRINT(") ");
 		return((EXTRACT_U_1(srh->srh_len) + 1) << 3);
 		break;
 	default:
@@ -117,6 +117,6 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 	}
 
  trunc:
-	ND_PRINT((ndo, "[|srcrt]"));
+	ND_PRINT("[|srcrt]");
 	return -1;
 }

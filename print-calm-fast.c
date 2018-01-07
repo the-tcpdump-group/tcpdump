@@ -51,19 +51,19 @@ calm_fast_print(netdissect_options *ndo, const u_char *bp, u_int length, const s
 	length -= 2;
 	bp += 2;
 
-	ND_PRINT((ndo, "CALM FAST"));
+	ND_PRINT("CALM FAST");
 	if (src != NULL)
-		ND_PRINT((ndo, " src:%s", (src->addr_string)(ndo, src->addr)));
-	ND_PRINT((ndo, "; "));
-	ND_PRINT((ndo, "SrcNwref:%d; ", srcNwref));
-	ND_PRINT((ndo, "DstNwref:%d; ", dstNwref));
+		ND_PRINT(" src:%s", (src->addr_string)(ndo, src->addr));
+	ND_PRINT("; ");
+	ND_PRINT("SrcNwref:%d; ", srcNwref);
+	ND_PRINT("DstNwref:%d; ", dstNwref);
 
 	if (ndo->ndo_vflag)
 		ND_DEFAULTPRINT(bp, length);
 	return;
 
 trunc:
-	ND_PRINT((ndo, "[|calm fast]"));
+	ND_PRINT("[|calm fast]");
 	return;
 }
 

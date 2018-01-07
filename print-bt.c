@@ -46,14 +46,14 @@ bt_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *
 	const pcap_bluetooth_h4_header* hdr = (const pcap_bluetooth_h4_header*)p;
 
 	if (caplen < BT_HDRLEN) {
-		ND_PRINT((ndo, "[|bt]"));
+		ND_PRINT("[|bt]");
 		return (BT_HDRLEN);
 	}
 	caplen -= BT_HDRLEN;
 	length -= BT_HDRLEN;
 	p += BT_HDRLEN;
 	if (ndo->ndo_eflag)
-		ND_PRINT((ndo, "hci length %d, direction %s, ", length, (EXTRACT_BE_U_4(&hdr->direction)&0x1)?"in":"out"));
+		ND_PRINT("hci length %d, direction %s, ", length, (EXTRACT_BE_U_4(&hdr->direction)&0x1)?"in":"out");
 
 	if (!ndo->ndo_suppress_default_print)
 		ND_DEFAULTPRINT(p, caplen);

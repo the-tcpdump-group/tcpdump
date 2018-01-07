@@ -156,12 +156,12 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 	int is_u;
 
 	if (caplen < 3) {
-		ND_PRINT((ndo, "[|llc]"));
+		ND_PRINT("[|llc]");
 		ND_DEFAULTPRINT((const u_char *)p, caplen);
 		return (caplen);
 	}
 	if (length < 3) {
-		ND_PRINT((ndo, "[|llc]"));
+		ND_PRINT("[|llc]");
 		ND_DEFAULTPRINT((const u_char *)p, caplen);
 		return (length);
 	}
@@ -188,12 +188,12 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		 * 2 bytes...
 		 */
 		if (caplen < 4) {
-			ND_PRINT((ndo, "[|llc]"));
+			ND_PRINT("[|llc]");
 			ND_DEFAULTPRINT((const u_char *)p, caplen);
 			return (caplen);
 		}
 		if (length < 4) {
-			ND_PRINT((ndo, "[|llc]"));
+			ND_PRINT("[|llc]");
 			ND_DEFAULTPRINT((const u_char *)p, caplen);
 			return (length);
 		}
@@ -223,7 +223,7 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		 */
 
             if (ndo->ndo_eflag)
-		ND_PRINT((ndo, "IPX 802.3: "));
+		ND_PRINT("IPX 802.3: ");
 
             ipx_print(ndo, p, length);
             return (0);		/* no LLC header */
@@ -233,18 +233,18 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 	ssap = ssap_field & ~LLC_GSAP;
 
 	if (ndo->ndo_eflag) {
-                ND_PRINT((ndo, "LLC, dsap %s (0x%02x) %s, ssap %s (0x%02x) %s",
+                ND_PRINT("LLC, dsap %s (0x%02x) %s, ssap %s (0x%02x) %s",
                        tok2str(llc_values, "Unknown", dsap),
                        dsap,
                        tok2str(llc_ig_flag_values, "Unknown", dsap_field & LLC_IG),
                        tok2str(llc_values, "Unknown", ssap),
                        ssap,
-                       tok2str(llc_flag_values, "Unknown", ssap_field & LLC_GSAP)));
+                       tok2str(llc_flag_values, "Unknown", ssap_field & LLC_GSAP));
 
 		if (is_u) {
-			ND_PRINT((ndo, ", ctrl 0x%02x: ", control));
+			ND_PRINT(", ctrl 0x%02x: ", control);
 		} else {
-			ND_PRINT((ndo, ", ctrl 0x%04x: ", control));
+			ND_PRINT(", ctrl 0x%04x: ", control);
 		}
 	}
 
@@ -299,7 +299,7 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		 * destination SAPs being the IPX SAP.
 		 */
                 if (ndo->ndo_eflag)
-                        ND_PRINT((ndo, "IPX 802.2: "));
+                        ND_PRINT("IPX 802.2: ");
 
 		ipx_print(ndo, p, length);
 		return (hdrlen);
@@ -331,31 +331,31 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 	if (!ndo->ndo_eflag) {
 		if (ssap == dsap) {
 			if (src == NULL || dst == NULL)
-				ND_PRINT((ndo, "%s ", tok2str(llc_values, "Unknown DSAP 0x%02x", dsap)));
+				ND_PRINT("%s ", tok2str(llc_values, "Unknown DSAP 0x%02x", dsap));
 			else
-				ND_PRINT((ndo, "%s > %s %s ",
+				ND_PRINT("%s > %s %s ",
 						(src->addr_string)(ndo, src->addr),
 						(dst->addr_string)(ndo, dst->addr),
-						tok2str(llc_values, "Unknown DSAP 0x%02x", dsap)));
+						tok2str(llc_values, "Unknown DSAP 0x%02x", dsap));
 		} else {
 			if (src == NULL || dst == NULL)
-				ND_PRINT((ndo, "%s > %s ",
+				ND_PRINT("%s > %s ",
                                         tok2str(llc_values, "Unknown SSAP 0x%02x", ssap),
-					tok2str(llc_values, "Unknown DSAP 0x%02x", dsap)));
+					tok2str(llc_values, "Unknown DSAP 0x%02x", dsap));
 			else
-				ND_PRINT((ndo, "%s %s > %s %s ",
+				ND_PRINT("%s %s > %s %s ",
 					(src->addr_string)(ndo, src->addr),
                                         tok2str(llc_values, "Unknown SSAP 0x%02x", ssap),
 					(dst->addr_string)(ndo, dst->addr),
-					tok2str(llc_values, "Unknown DSAP 0x%02x", dsap)));
+					tok2str(llc_values, "Unknown DSAP 0x%02x", dsap));
 		}
 	}
 
 	if (is_u) {
-		ND_PRINT((ndo, "Unnumbered, %s, Flags [%s], length %u",
+		ND_PRINT("Unnumbered, %s, Flags [%s], length %u",
                        tok2str(llc_cmd_values, "%02x", LLC_U_CMD(control)),
                        tok2str(llc_flag_values,"?",(ssap_field & LLC_GSAP) | (control & LLC_U_POLL)),
-                       length + hdrlen));
+                       length + hdrlen);
 
 		if ((control & ~LLC_U_POLL) == LLC_XID) {
 			if (length == 0) {
@@ -367,37 +367,37 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 				return (hdrlen);
 			}
 			if (caplen < 1) {
-				ND_PRINT((ndo, "[|llc]"));
+				ND_PRINT("[|llc]");
 				if (caplen > 0)
 					ND_DEFAULTPRINT((const u_char *)p, caplen);
 				return (hdrlen);
 			}
 			if (EXTRACT_U_1(p) == LLC_XID_FI) {
 				if (caplen < 3 || length < 3) {
-					ND_PRINT((ndo, "[|llc]"));
+					ND_PRINT("[|llc]");
 					if (caplen > 0)
 						ND_DEFAULTPRINT((const u_char *)p, caplen);
 				} else
-					ND_PRINT((ndo, ": %02x %02x",
+					ND_PRINT(": %02x %02x",
 						  EXTRACT_U_1(p + 1),
-						  EXTRACT_U_1(p + 2)));
+						  EXTRACT_U_1(p + 2));
 				return (hdrlen);
 			}
 		}
 	} else {
 		if ((control & LLC_S_FMT) == LLC_S_FMT) {
-			ND_PRINT((ndo, "Supervisory, %s, rcv seq %u, Flags [%s], length %u",
+			ND_PRINT("Supervisory, %s, rcv seq %u, Flags [%s], length %u",
 				tok2str(llc_supervisory_values,"?",LLC_S_CMD(control)),
 				LLC_IS_NR(control),
 				tok2str(llc_flag_values,"?",(ssap_field & LLC_GSAP) | (control & LLC_IS_POLL)),
-                                length + hdrlen));
+                                length + hdrlen);
 			return (hdrlen);	/* no payload to print */
 		} else {
-			ND_PRINT((ndo, "Information, send seq %u, rcv seq %u, Flags [%s], length %u",
+			ND_PRINT("Information, send seq %u, rcv seq %u, Flags [%s], length %u",
 				LLC_I_NS(control),
 				LLC_IS_NR(control),
 				tok2str(llc_flag_values,"?",(ssap_field & LLC_GSAP) | (control & LLC_IS_POLL)),
-                                length + hdrlen));
+                                length + hdrlen);
 		}
 	}
 	return (-hdrlen);
@@ -439,12 +439,12 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		 * are any, so just print the SNAP header, not the MAC
 		 * addresses.
 		 */
-		ND_PRINT((ndo, "oui %s (0x%06x), %s %s (0x%04x), length %u: ",
+		ND_PRINT("oui %s (0x%06x), %s %s (0x%04x), length %u: ",
 		     tok2str(oui_values, "Unknown", orgcode),
 		     orgcode,
 		     (orgcode == 0x000000 ? "ethertype" : "pid"),
 		     tok2str(oui_to_struct_tok(orgcode), "Unknown", et),
-		     et, length - 5));
+		     et, length - 5);
 	}
 	p += 5;
 	length -= 5;
@@ -579,9 +579,9 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		 * we have any.
 		 */
 		if (src != NULL && dst != NULL) {
-			ND_PRINT((ndo, "%s > %s ",
+			ND_PRINT("%s > %s ",
 				(src->addr_string)(ndo, src->addr),
-				(dst->addr_string)(ndo, dst->addr)));
+				(dst->addr_string)(ndo, dst->addr));
 		}
 		/*
 		 * Print the SNAP header, but if the OUI is 000000, don't
@@ -589,21 +589,21 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		 * ethertype.
 		 */
 		if (orgcode == 0x000000) {
-			ND_PRINT((ndo, "SNAP, ethertype %s (0x%04x), length %u: ",
+			ND_PRINT("SNAP, ethertype %s (0x%04x), length %u: ",
 			     tok2str(ethertype_values, "Unknown", et),
-			     et, length));
+			     et, length);
 		} else {
-			ND_PRINT((ndo, "SNAP, oui %s (0x%06x), pid %s (0x%04x), length %u: ",
+			ND_PRINT("SNAP, oui %s (0x%06x), pid %s (0x%04x), length %u: ",
 			     tok2str(oui_values, "Unknown", orgcode),
 			     orgcode,
 			     tok2str(oui_to_struct_tok(orgcode), "Unknown", et),
-			     et, length));
+			     et, length);
 		}
 	}
 	return (0);
 
 trunc:
-	ND_PRINT((ndo, "[|snap]"));
+	ND_PRINT("[|snap]");
 	return (1);
 }
 

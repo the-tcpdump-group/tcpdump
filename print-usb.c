@@ -88,42 +88,42 @@ usb_header_print(netdissect_options *ndo, const pcap_usb_header *uh)
 	switch(uh->transfer_type)
 	{
 		case URB_ISOCHRONOUS:
-			ND_PRINT((ndo, "ISOCHRONOUS"));
+			ND_PRINT("ISOCHRONOUS");
 			break;
 		case URB_INTERRUPT:
-			ND_PRINT((ndo, "INTERRUPT"));
+			ND_PRINT("INTERRUPT");
 			break;
 		case URB_CONTROL:
-			ND_PRINT((ndo, "CONTROL"));
+			ND_PRINT("CONTROL");
 			break;
 		case URB_BULK:
-			ND_PRINT((ndo, "BULK"));
+			ND_PRINT("BULK");
 			break;
 		default:
-			ND_PRINT((ndo, " ?"));
+			ND_PRINT(" ?");
 	}
 
 	switch(uh->event_type)
 	{
 		case URB_SUBMIT:
-			ND_PRINT((ndo, " SUBMIT"));
+			ND_PRINT(" SUBMIT");
 			break;
 		case URB_COMPLETE:
-			ND_PRINT((ndo, " COMPLETE"));
+			ND_PRINT(" COMPLETE");
 			break;
 		case URB_ERROR:
-			ND_PRINT((ndo, " ERROR"));
+			ND_PRINT(" ERROR");
 			break;
 		default:
-			ND_PRINT((ndo, " ?"));
+			ND_PRINT(" ?");
 	}
 
 	direction = get_direction(uh->transfer_type, uh->event_type);
 	if(direction == 1)
-		ND_PRINT((ndo, " from"));
+		ND_PRINT(" from");
 	else if(direction == 2)
-		ND_PRINT((ndo, " to"));
-	ND_PRINT((ndo, " %d:%d:%d", uh->bus_id, uh->device_address, uh->endpoint_number & 0x7f));
+		ND_PRINT(" to");
+	ND_PRINT(" %d:%d:%d", uh->bus_id, uh->device_address, uh->endpoint_number & 0x7f);
 }
 
 /*
@@ -139,7 +139,7 @@ usb_linux_48_byte_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
                            const u_char *p)
 {
 	if (h->caplen < sizeof(pcap_usb_header)) {
-		ND_PRINT((ndo, "%s", tstr));
+		ND_PRINT("%s", tstr);
 		return(sizeof(pcap_usb_header));
 	}
 
@@ -162,7 +162,7 @@ usb_linux_64_byte_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
                            const u_char *p)
 {
 	if (h->caplen < sizeof(pcap_usb_header_mmapped)) {
-		ND_PRINT((ndo, "%s", tstr));
+		ND_PRINT("%s", tstr);
 		return(sizeof(pcap_usb_header_mmapped));
 	}
 

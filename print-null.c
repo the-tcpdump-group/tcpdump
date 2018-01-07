@@ -56,14 +56,14 @@ static inline void
 null_hdr_print(netdissect_options *ndo, u_int family, u_int length)
 {
 	if (!ndo->ndo_qflag) {
-		ND_PRINT((ndo, "AF %s (%u)",
-			tok2str(bsd_af_values,"Unknown",family),family));
+		ND_PRINT("AF %s (%u)",
+			tok2str(bsd_af_values,"Unknown",family),family);
 	} else {
-		ND_PRINT((ndo, "%s",
-			tok2str(bsd_af_values,"Unknown AF %u",family)));
+		ND_PRINT("%s",
+			tok2str(bsd_af_values,"Unknown AF %u",family));
 	}
 
-	ND_PRINT((ndo, ", length %u: ", length));
+	ND_PRINT(", length %u: ", length);
 }
 
 /*
@@ -80,7 +80,7 @@ null_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 	u_int family;
 
 	if (caplen < NULL_HDRLEN) {
-		ND_PRINT((ndo, "[|null]"));
+		ND_PRINT("[|null]");
 		return (NULL_HDRLEN);
 	}
 

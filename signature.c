@@ -190,7 +190,7 @@ signature_verify(netdissect_options *ndo, const u_char *pptr, u_int plen,
     } else {
         /* No - print the computed signature. */
         for (i = 0; i < sizeof(sig); ++i) {
-            ND_PRINT((ndo, "%02x", sig[i]));
+            ND_PRINT("%02x", sig[i]);
         }
 
         return (SIGNATURE_INVALID);

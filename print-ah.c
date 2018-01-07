@@ -46,19 +46,19 @@ ah_print(netdissect_options *ndo, const u_char *bp)
 
 	sumlen = EXTRACT_U_1(ah->ah_len) << 2;
 
-	ND_PRINT((ndo, "AH(spi=0x%08x", EXTRACT_BE_U_4(ah->ah_spi)));
+	ND_PRINT("AH(spi=0x%08x", EXTRACT_BE_U_4(ah->ah_spi));
 	if (ndo->ndo_vflag)
-		ND_PRINT((ndo, ",sumlen=%d", sumlen));
+		ND_PRINT(",sumlen=%d", sumlen);
 	ND_TCHECK_4(ah + 1);
-	ND_PRINT((ndo, ",seq=0x%x", EXTRACT_BE_U_4(ah + 1)));
+	ND_PRINT(",seq=0x%x", EXTRACT_BE_U_4(ah + 1));
 	if (!ND_TTEST_LEN(bp, sizeof(struct ah) + sumlen)) {
-		ND_PRINT((ndo, "[truncated]):"));
+		ND_PRINT("[truncated]):");
 		return -1;
 	}
-	ND_PRINT((ndo, "): "));
+	ND_PRINT("): ");
 
 	return sizeof(struct ah) + sumlen;
  trunc:
-	ND_PRINT((ndo, "[|AH]"));
+	ND_PRINT("[|AH]");
 	return -1;
 }

@@ -560,7 +560,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		str = tok2str(icmp2str, "type-#%d", icmp_type);
 		break;
 	}
-	ND_PRINT((ndo, "ICMP %s, length %u", str, plen));
+	ND_PRINT("ICMP %s, length %u", str, plen);
 	if (ndo->ndo_vflag && !fragmented) { /* don't attempt checksumming if this is a frag */
 		if (ND_TTEST_LEN(bp, plen)) {
 			uint16_t sum;
@@ -570,9 +570,9 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			sum = in_cksum(vec, 1);
 			if (sum != 0) {
 				uint16_t icmp_sum = EXTRACT_BE_U_2(dp->icmp_cksum);
-				ND_PRINT((ndo, " (wrong icmp cksum %x (->%x)!)",
+				ND_PRINT(" (wrong icmp cksum %x (->%x)!)",
 					     icmp_sum,
-					     in_cksum_shouldbe(icmp_sum, sum)));
+					     in_cksum_shouldbe(icmp_sum, sum));
 			}
 		}
 	}
@@ -583,7 +583,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
          */
 	if (ndo->ndo_vflag >= 1 && ICMP_ERRTYPE(icmp_type)) {
 		bp += 8;
-		ND_PRINT((ndo, "\n\t"));
+		ND_PRINT("\n\t");
 		ip = (const struct ip *)bp;
                 snapend_save = ndo->ndo_snapend;
 		ND_TCHECK_2(ip->ip_len);
@@ -613,15 +613,15 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                 }
             }
 
-            ND_PRINT((ndo, "\n\tMPLS extension v%u",
-                   ICMP_MPLS_EXT_EXTRACT_VERSION(*(ext_dp->icmp_ext_version_res))));
+            ND_PRINT("\n\tMPLS extension v%u",
+                   ICMP_MPLS_EXT_EXTRACT_VERSION(*(ext_dp->icmp_ext_version_res)));
 
             /*
              * Sanity checking of the header.
              */
             if (ICMP_MPLS_EXT_EXTRACT_VERSION(*(ext_dp->icmp_ext_version_res)) !=
                 ICMP_MPLS_EXT_VERSION) {
-                ND_PRINT((ndo, " packet not supported"));
+                ND_PRINT(" packet not supported");
                 return;
             }
 
@@ -629,10 +629,10 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
             if (ND_TTEST_LEN(ext_dp->icmp_ext_version_res, hlen)) {
                 vec[0].ptr = (const uint8_t *)(const void *)&ext_dp->icmp_ext_version_res;
                 vec[0].len = hlen;
-                ND_PRINT((ndo, ", checksum 0x%04x (%scorrect), length %u",
+                ND_PRINT(", checksum 0x%04x (%scorrect), length %u",
                        EXTRACT_BE_U_2(ext_dp->icmp_ext_checksum),
                        in_cksum(vec, 1) ? "in" : "",
-                       hlen));
+                       hlen);
             }
 
             hlen -= 4; /* subtract common header size */
@@ -647,11 +647,11 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                 obj_ctype = EXTRACT_U_1(icmp_mpls_ext_object_header->ctype);
                 obj_tptr += sizeof(struct icmp_mpls_ext_object_header_t);
 
-                ND_PRINT((ndo, "\n\t  %s Object (%u), Class-Type: %u, length %u",
+                ND_PRINT("\n\t  %s Object (%u), Class-Type: %u, length %u",
                        tok2str(icmp_mpls_ext_obj_values,"unknown",obj_class_num),
                        obj_class_num,
                        obj_ctype,
-                       obj_tlen));
+                       obj_tlen);
 
                 hlen-=sizeof(struct icmp_mpls_ext_object_header_t); /* length field includes tlv header */
 
@@ -668,10 +668,10 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                     case 1:
                         ND_TCHECK_4(obj_tptr);
                         raw_label = EXTRACT_BE_U_4(obj_tptr);
-                        ND_PRINT((ndo, "\n\t    label %u, exp %u", MPLS_LABEL(raw_label), MPLS_EXP(raw_label)));
+                        ND_PRINT("\n\t    label %u, exp %u", MPLS_LABEL(raw_label), MPLS_EXP(raw_label));
                         if (MPLS_STACK(raw_label))
-                            ND_PRINT((ndo, ", [S]"));
-                        ND_PRINT((ndo, ", ttl %u", MPLS_TTL(raw_label)));
+                            ND_PRINT(", [S]");
+                        ND_PRINT(", ttl %u", MPLS_TTL(raw_label));
                         break;
                     default:
                         print_unknown_data(ndo, obj_tptr, "\n\t    ", obj_tlen);
@@ -696,7 +696,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 
 	return;
 trunc:
-	ND_PRINT((ndo, "[|icmp]"));
+	ND_PRINT("[|icmp]");
 }
 /*
  * Local Variables:

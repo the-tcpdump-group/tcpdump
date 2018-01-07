@@ -40,25 +40,25 @@ ipnet_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	hdr = (const ipnet_hdr_t *)bp;
 
 	ND_TCHECK_SIZE(hdr);
-	ND_PRINT((ndo, "%d > %d", EXTRACT_BE_U_4(hdr->iph_zsrc),
-		  EXTRACT_BE_U_4(hdr->iph_zdst)));
+	ND_PRINT("%d > %d", EXTRACT_BE_U_4(hdr->iph_zsrc),
+		  EXTRACT_BE_U_4(hdr->iph_zdst));
 
 	if (!ndo->ndo_qflag) {
-		ND_PRINT((ndo,", family %s (%d)",
+		ND_PRINT(", family %s (%d)",
                           tok2str(ipnet_values, "Unknown",
                                   EXTRACT_U_1(hdr->iph_family)),
-                          EXTRACT_U_1(hdr->iph_family)));
+                          EXTRACT_U_1(hdr->iph_family));
         } else {
-		ND_PRINT((ndo,", %s",
+		ND_PRINT(", %s",
                           tok2str(ipnet_values,
                                   "Unknown Ethertype (0x%04x)",
-				  EXTRACT_U_1(hdr->iph_family))));
+				  EXTRACT_U_1(hdr->iph_family)));
         }
 
-	ND_PRINT((ndo, ", length %u: ", length));
+	ND_PRINT(", length %u: ", length);
 	return;
 trunc:
-	ND_PRINT((ndo, " %s", tstr));
+	ND_PRINT(" %s", tstr);
 }
 
 static void
@@ -99,7 +99,7 @@ ipnet_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 	}
 	return;
 trunc:
-	ND_PRINT((ndo, " %s", tstr));
+	ND_PRINT(" %s", tstr);
 }
 
 /*

@@ -80,13 +80,13 @@ pktap_header_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	hdrlen = EXTRACT_LE_U_4(&hdr->pkt_len);
 	dltname = pcap_datalink_val_to_name(dlt);
 	if (!ndo->ndo_qflag) {
-		ND_PRINT((ndo,"DLT %s (%d) len %d",
-			  (dltname != NULL ? dltname : "UNKNOWN"), dlt, hdrlen));
+		ND_PRINT("DLT %s (%d) len %d",
+			  (dltname != NULL ? dltname : "UNKNOWN"), dlt, hdrlen);
         } else {
-		ND_PRINT((ndo,"%s", (dltname != NULL ? dltname : "UNKNOWN")));
+		ND_PRINT("%s", (dltname != NULL ? dltname : "UNKNOWN"));
         }
 
-	ND_PRINT((ndo, ", length %u: ", length));
+	ND_PRINT(", length %u: ", length);
 }
 
 /*
@@ -107,7 +107,7 @@ pktap_if_print(netdissect_options *ndo,
 	struct pcap_pkthdr nhdr;
 
 	if (caplen < sizeof(pktap_header_t) || length < sizeof(pktap_header_t)) {
-		ND_PRINT((ndo, "[|pktap]"));
+		ND_PRINT("[|pktap]");
 		return (0);
 	}
 	hdr = (const pktap_header_t *)p;
@@ -121,11 +121,11 @@ pktap_if_print(netdissect_options *ndo,
 		 * is the length supplied so that the header can
 		 * be expanded in the future)?
 		 */
-		ND_PRINT((ndo, "[|pktap]"));
+		ND_PRINT("[|pktap]");
 		return (0);
 	}
 	if (caplen < hdrlen || length < hdrlen) {
-		ND_PRINT((ndo, "[|pktap]"));
+		ND_PRINT("[|pktap]");
 		return (hdrlen);
 	}
 
@@ -140,7 +140,7 @@ pktap_if_print(netdissect_options *ndo,
 	switch (rectype) {
 
 	case PKT_REC_NONE:
-		ND_PRINT((ndo, "no data"));
+		ND_PRINT("no data");
 		break;
 
 	case PKT_REC_PACKET:

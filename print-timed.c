@@ -101,20 +101,20 @@ timed_print(netdissect_options *ndo,
 	ND_TCHECK(tsp->tsp_type);
 	tsp_type = EXTRACT_U_1(tsp->tsp_type);
 	if (tsp_type < TSPTYPENUMBER)
-		ND_PRINT((ndo, "TSP_%s", tsptype[tsp_type]));
+		ND_PRINT("TSP_%s", tsptype[tsp_type]);
 	else
-		ND_PRINT((ndo, "(tsp_type %#x)", tsp_type));
+		ND_PRINT("(tsp_type %#x)", tsp_type);
 
 	ND_TCHECK(tsp->tsp_vers);
-	ND_PRINT((ndo, " vers %u", EXTRACT_U_1(tsp->tsp_vers)));
+	ND_PRINT(" vers %u", EXTRACT_U_1(tsp->tsp_vers));
 
 	ND_TCHECK(tsp->tsp_seq);
-	ND_PRINT((ndo, " seq %u", EXTRACT_BE_U_2(tsp->tsp_seq)));
+	ND_PRINT(" seq %u", EXTRACT_BE_U_2(tsp->tsp_seq));
 
 	switch (tsp_type) {
 	case TSP_LOOP:
 		ND_TCHECK(tsp->tsp_hopcnt);
-		ND_PRINT((ndo, " hopcnt %u", EXTRACT_U_1(tsp->tsp_hopcnt)));
+		ND_PRINT(" hopcnt %u", EXTRACT_U_1(tsp->tsp_hopcnt));
 		break;
 	case TSP_SETTIME:
 	case TSP_ADJTIME:
@@ -127,21 +127,21 @@ timed_print(netdissect_options *ndo,
 		if (usec < 0)
 			/* invalid, skip the rest of the packet */
 			return;
-		ND_PRINT((ndo, " time "));
+		ND_PRINT(" time ");
 		if (sec < 0 && usec != 0) {
 			sec++;
 			if (sec == 0)
-				ND_PRINT((ndo, "-"));
+				ND_PRINT("-");
 			usec = 1000000 - usec;
 		}
-		ND_PRINT((ndo, "%d.%06d", sec, usec));
+		ND_PRINT("%d.%06d", sec, usec);
 		break;
 	}
-	ND_PRINT((ndo, " name "));
+	ND_PRINT(" name ");
 	if (fn_print(ndo, (const u_char *)tsp->tsp_name, (const u_char *)tsp->tsp_name + sizeof(tsp->tsp_name)))
 		goto trunc;
 	return;
 
 trunc:
-	ND_PRINT((ndo, " %s", tstr));
+	ND_PRINT(" %s", tstr);
 }

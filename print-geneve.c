@@ -109,19 +109,19 @@ geneve_opts_print(netdissect_options *ndo, const u_char *bp, u_int len)
         uint8_t opt_type;
         uint8_t opt_len;
 
-        ND_PRINT((ndo, "%s", sep));
+        ND_PRINT("%s", sep);
         sep = ", ";
 
         opt_class = EXTRACT_BE_U_2(bp);
         opt_type = EXTRACT_U_1(bp + 2);
         opt_len = 4 + ((EXTRACT_U_1(bp + 3) & OPT_LEN_MASK) * 4);
 
-        ND_PRINT((ndo, "class %s (0x%x) type 0x%x%s len %u",
+        ND_PRINT("class %s (0x%x) type 0x%x%s len %u",
                   format_opt_class(opt_class), opt_class, opt_type,
-                  opt_type & OPT_TYPE_CRITICAL ? "(C)" : "", opt_len));
+                  opt_type & OPT_TYPE_CRITICAL ? "(C)" : "", opt_len);
 
         if (opt_len > len) {
-            ND_PRINT((ndo, " [bad length]"));
+            ND_PRINT(" [bad length]");
             return;
         }
 
@@ -129,10 +129,10 @@ geneve_opts_print(netdissect_options *ndo, const u_char *bp, u_int len)
             const uint32_t *data = (const uint32_t *)(bp + 4);
             int i;
 
-            ND_PRINT((ndo, " data"));
+            ND_PRINT(" data");
 
             for (i = 4; i < opt_len; i += 4) {
-                ND_PRINT((ndo, " %08x", EXTRACT_BE_U_4(data)));
+                ND_PRINT(" %08x", EXTRACT_BE_U_4(data));
                 data++;
             }
         }
@@ -153,7 +153,7 @@ geneve_print(netdissect_options *ndo, const u_char *bp, u_int len)
     uint8_t reserved;
     u_int opts_len;
 
-    ND_PRINT((ndo, "Geneve"));
+    ND_PRINT("Geneve");
 
     ND_TCHECK_8(bp);
 
@@ -163,7 +163,7 @@ geneve_print(netdissect_options *ndo, const u_char *bp, u_int len)
 
     version = ver_opt >> VER_SHIFT;
     if (version != 0) {
-        ND_PRINT((ndo, " ERROR: unknown-version %u", version));
+        ND_PRINT(" ERROR: unknown-version %u", version);
         return;
     }
 
@@ -183,55 +183,55 @@ geneve_print(netdissect_options *ndo, const u_char *bp, u_int len)
     bp += 1;
     len -= 1;
 
-    ND_PRINT((ndo, ", Flags [%s]",
-              bittok2str_nosep(geneve_flag_values, "none", flags)));
-    ND_PRINT((ndo, ", vni 0x%x", vni));
+    ND_PRINT(", Flags [%s]",
+              bittok2str_nosep(geneve_flag_values, "none", flags));
+    ND_PRINT(", vni 0x%x", vni);
 
     if (reserved)
-        ND_PRINT((ndo, ", rsvd 0x%x", reserved));
+        ND_PRINT(", rsvd 0x%x", reserved);
 
     if (ndo->ndo_eflag)
-        ND_PRINT((ndo, ", proto %s (0x%04x)",
-                  tok2str(ethertype_values, "unknown", prot), prot));
+        ND_PRINT(", proto %s (0x%04x)",
+                  tok2str(ethertype_values, "unknown", prot), prot);
 
     opts_len = (ver_opt & HDR_OPTS_LEN_MASK) * 4;
 
     if (len < opts_len) {
-        ND_PRINT((ndo, " truncated-geneve - %u bytes missing",
-                  opts_len - len));
+        ND_PRINT(" truncated-geneve - %u bytes missing",
+                  opts_len - len);
         return;
     }
 
     ND_TCHECK_LEN(bp, opts_len);
 
     if (opts_len > 0) {
-        ND_PRINT((ndo, ", options ["));
+        ND_PRINT(", options [");
 
         if (ndo->ndo_vflag)
             geneve_opts_print(ndo, bp, opts_len);
         else
-            ND_PRINT((ndo, "%u bytes", opts_len));
+            ND_PRINT("%u bytes", opts_len);
 
-        ND_PRINT((ndo, "]"));
+        ND_PRINT("]");
     }
 
     bp += opts_len;
     len -= opts_len;
 
     if (ndo->ndo_vflag < 1)
-        ND_PRINT((ndo, ": "));
+        ND_PRINT(": ");
     else
-        ND_PRINT((ndo, "\n\t"));
+        ND_PRINT("\n\t");
 
     if (ethertype_print(ndo, prot, bp, len, ndo->ndo_snapend - bp, NULL, NULL) == 0) {
         if (prot == ETHERTYPE_TEB)
             ether_print(ndo, bp, len, ndo->ndo_snapend - bp, NULL, NULL);
         else
-            ND_PRINT((ndo, "geneve-proto-0x%x", prot));
+            ND_PRINT("geneve-proto-0x%x", prot);
     }
 
     return;
 
 trunc:
-    ND_PRINT((ndo, " [|geneve]"));
+    ND_PRINT(" [|geneve]");
 }

@@ -183,16 +183,16 @@ mp_capable_print(netdissect_options *ndo,
                 return 0;
 
         if (MP_CAPABLE_OPT_VERSION(mpc->sub_ver) != 0) {
-                ND_PRINT((ndo, " Unknown Version (%u)", MP_CAPABLE_OPT_VERSION(mpc->sub_ver)));
+                ND_PRINT(" Unknown Version (%u)", MP_CAPABLE_OPT_VERSION(mpc->sub_ver));
                 return 1;
         }
 
         if (EXTRACT_U_1(mpc->flags) & MP_CAPABLE_C)
-                ND_PRINT((ndo, " csum"));
-        ND_PRINT((ndo, " {0x%" PRIx64, EXTRACT_BE_U_8(mpc->sender_key)));
+                ND_PRINT(" csum");
+        ND_PRINT(" {0x%" PRIx64, EXTRACT_BE_U_8(mpc->sender_key));
         if (opt_len == 20) /* ACK */
-                ND_PRINT((ndo, ",0x%" PRIx64, EXTRACT_BE_U_8(mpc->receiver_key)));
-        ND_PRINT((ndo, "}"));
+                ND_PRINT(",0x%" PRIx64, EXTRACT_BE_U_8(mpc->receiver_key));
+        ND_PRINT("}");
         return 1;
 }
 
@@ -209,26 +209,26 @@ mp_join_print(netdissect_options *ndo,
 
         if (opt_len != 24) {
                 if (EXTRACT_U_1(mpj->sub_b) & MP_JOIN_B)
-                        ND_PRINT((ndo, " backup"));
-                ND_PRINT((ndo, " id %u", EXTRACT_U_1(mpj->addr_id)));
+                        ND_PRINT(" backup");
+                ND_PRINT(" id %u", EXTRACT_U_1(mpj->addr_id));
         }
 
         switch (opt_len) {
         case 12: /* SYN */
-                ND_PRINT((ndo, " token 0x%x" " nonce 0x%x",
+                ND_PRINT(" token 0x%x" " nonce 0x%x",
                         EXTRACT_BE_U_4(mpj->u.syn.token),
-                        EXTRACT_BE_U_4(mpj->u.syn.nonce)));
+                        EXTRACT_BE_U_4(mpj->u.syn.nonce));
                 break;
         case 16: /* SYN/ACK */
-                ND_PRINT((ndo, " hmac 0x%" PRIx64 " nonce 0x%x",
+                ND_PRINT(" hmac 0x%" PRIx64 " nonce 0x%x",
                         EXTRACT_BE_U_8(mpj->u.synack.mac),
-                        EXTRACT_BE_U_4(mpj->u.synack.nonce)));
+                        EXTRACT_BE_U_4(mpj->u.synack.nonce));
                 break;
         case 24: {/* ACK */
                 size_t i;
-                ND_PRINT((ndo, " hmac 0x"));
+                ND_PRINT(" hmac 0x");
                 for (i = 0; i < sizeof(mpj->u.ack.mac); ++i)
-                        ND_PRINT((ndo, "%02x", mpj->u.ack.mac[i]));
+                        ND_PRINT("%02x", mpj->u.ack.mac[i]);
         }
         default:
                 break;
@@ -252,13 +252,13 @@ mp_dss_print(netdissect_options *ndo,
 
         mdss_flags = EXTRACT_U_1(mdss->flags);
         if (mdss_flags & MP_DSS_F)
-                ND_PRINT((ndo, " fin"));
+                ND_PRINT(" fin");
 
         opt += 4;
         opt_len -= 4;
         if (mdss_flags & MP_DSS_A) {
                 /* Ack present */
-                ND_PRINT((ndo, " ack "));
+                ND_PRINT(" ack ");
                 /*
                  * If the a flag is set, we have an 8-byte ack; if it's
                  * clear, we have a 4-byte ack.
@@ -266,13 +266,13 @@ mp_dss_print(netdissect_options *ndo,
                 if (mdss_flags & MP_DSS_a) {
                         if (opt_len < 8)
                                 return 0;
-                        ND_PRINT((ndo, "%" PRIu64, EXTRACT_BE_U_8(opt)));
+                        ND_PRINT("%" PRIu64, EXTRACT_BE_U_8(opt));
                         opt += 8;
                         opt_len -= 8;
                 } else {
                         if (opt_len < 4)
                                 return 0;
-                        ND_PRINT((ndo, "%u", EXTRACT_BE_U_4(opt)));
+                        ND_PRINT("%u", EXTRACT_BE_U_4(opt));
                         opt += 4;
                         opt_len -= 4;
                 }
@@ -283,7 +283,7 @@ mp_dss_print(netdissect_options *ndo,
                  * Data Sequence Number (DSN), Subflow Sequence Number (SSN),
                  * Data-Level Length present, and Checksum possibly present.
                  */
-                ND_PRINT((ndo, " seq "));
+                ND_PRINT(" seq ");
 		/*
                  * If the m flag is set, we have an 8-byte NDS; if it's clear,
                  * we have a 4-byte DSN.
@@ -291,24 +291,24 @@ mp_dss_print(netdissect_options *ndo,
                 if (mdss_flags & MP_DSS_m) {
                         if (opt_len < 8)
                                 return 0;
-                        ND_PRINT((ndo, "%" PRIu64, EXTRACT_BE_U_8(opt)));
+                        ND_PRINT("%" PRIu64, EXTRACT_BE_U_8(opt));
                         opt += 8;
                         opt_len -= 8;
                 } else {
                         if (opt_len < 4)
                                 return 0;
-                        ND_PRINT((ndo, "%u", EXTRACT_BE_U_4(opt)));
+                        ND_PRINT("%u", EXTRACT_BE_U_4(opt));
                         opt += 4;
                         opt_len -= 4;
                 }
                 if (opt_len < 4)
                         return 0;
-                ND_PRINT((ndo, " subseq %u", EXTRACT_BE_U_4(opt)));
+                ND_PRINT(" subseq %u", EXTRACT_BE_U_4(opt));
                 opt += 4;
                 opt_len -= 4;
                 if (opt_len < 2)
                         return 0;
-                ND_PRINT((ndo, " len %u", EXTRACT_BE_U_2(opt)));
+                ND_PRINT(" len %u", EXTRACT_BE_U_2(opt));
                 opt += 2;
                 opt_len -= 2;
 
@@ -318,7 +318,7 @@ mp_dss_print(netdissect_options *ndo,
                  * bytes as the Checksum.
                  */
                 if (opt_len >= 2) {
-                        ND_PRINT((ndo, " csum 0x%x", EXTRACT_BE_U_2(opt)));
+                        ND_PRINT(" csum 0x%x", EXTRACT_BE_U_2(opt));
                         opt_len -= 2;
                 }
         }
@@ -338,17 +338,17 @@ add_addr_print(netdissect_options *ndo,
             !((opt_len == 20 || opt_len == 22) && ipver == 6))
                 return 0;
 
-        ND_PRINT((ndo, " id %u", EXTRACT_U_1(add_addr->addr_id)));
+        ND_PRINT(" id %u", EXTRACT_U_1(add_addr->addr_id));
         switch (ipver) {
         case 4:
-                ND_PRINT((ndo, " %s", ipaddr_string(ndo, add_addr->u.v4.addr)));
+                ND_PRINT(" %s", ipaddr_string(ndo, add_addr->u.v4.addr));
                 if (opt_len == 10)
-                        ND_PRINT((ndo, ":%u", EXTRACT_BE_U_2(add_addr->u.v4.port)));
+                        ND_PRINT(":%u", EXTRACT_BE_U_2(add_addr->u.v4.port));
                 break;
         case 6:
-                ND_PRINT((ndo, " %s", ip6addr_string(ndo, add_addr->u.v6.addr)));
+                ND_PRINT(" %s", ip6addr_string(ndo, add_addr->u.v6.addr));
                 if (opt_len == 22)
-                        ND_PRINT((ndo, ":%u", EXTRACT_BE_U_2(add_addr->u.v6.port)));
+                        ND_PRINT(":%u", EXTRACT_BE_U_2(add_addr->u.v6.port));
                 break;
         default:
                 return 0;
@@ -368,9 +368,9 @@ remove_addr_print(netdissect_options *ndo,
                 return 0;
 
         opt_len -= 3;
-        ND_PRINT((ndo, " id"));
+        ND_PRINT(" id");
         for (i = 0; i < opt_len; i++)
-                ND_PRINT((ndo, " %u", EXTRACT_U_1(remove_addr->addrs_id[i])));
+                ND_PRINT(" %u", EXTRACT_U_1(remove_addr->addrs_id[i]));
         return 1;
 }
 
@@ -384,11 +384,11 @@ mp_prio_print(netdissect_options *ndo,
                 return 0;
 
         if (EXTRACT_U_1(mpp->sub_b) & MP_PRIO_B)
-                ND_PRINT((ndo, " backup"));
+                ND_PRINT(" backup");
         else
-                ND_PRINT((ndo, " non-backup"));
+                ND_PRINT(" non-backup");
         if (opt_len == 4)
-                ND_PRINT((ndo, " id %u", EXTRACT_U_1(mpp->addr_id)));
+                ND_PRINT(" id %u", EXTRACT_U_1(mpp->addr_id));
 
         return 1;
 }
@@ -400,7 +400,7 @@ mp_fail_print(netdissect_options *ndo,
         if (opt_len != 12)
                 return 0;
 
-        ND_PRINT((ndo, " seq %" PRIu64, EXTRACT_BE_U_8(opt + 4)));
+        ND_PRINT(" seq %" PRIu64, EXTRACT_BE_U_8(opt + 4));
         return 1;
 }
 
@@ -411,7 +411,7 @@ mp_fast_close_print(netdissect_options *ndo,
         if (opt_len != 12)
                 return 0;
 
-        ND_PRINT((ndo, " key 0x%" PRIx64, EXTRACT_BE_U_8(opt + 4)));
+        ND_PRINT(" key 0x%" PRIx64, EXTRACT_BE_U_8(opt + 4));
         return 1;
 }
 
@@ -443,6 +443,6 @@ mptcp_print(netdissect_options *ndo,
         opt = (const struct mptcp_option *) cp;
         subtype = min(MPTCP_OPT_SUBTYPE(opt->sub_etc), MPTCP_SUB_FCLOSE + 1);
 
-        ND_PRINT((ndo, " %s", mptcp_options[subtype].name));
+        ND_PRINT(" %s", mptcp_options[subtype].name);
         return mptcp_options[subtype].print(ndo, cp, len, flags);
 }

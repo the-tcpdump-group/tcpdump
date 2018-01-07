@@ -127,13 +127,13 @@ c_print(netdissect_options *ndo,
 		}
 		if (!ND_ISASCII(c)) {
 			c = ND_TOASCII(c);
-			ND_PRINT((ndo, "M-"));
+			ND_PRINT("M-");
 		}
 		if (!ND_ISPRINT(c)) {
 			c ^= 0x40;	/* DEL to ?, others to alpha */
-			ND_PRINT((ndo, "^"));
+			ND_PRINT("^");
 		}
-		ND_PRINT((ndo, "%c", c));
+		ND_PRINT("%c", c);
 	}
 	if (flag)
 		return NULL;
@@ -149,14 +149,14 @@ krb4_print_hdr(netdissect_options *ndo,
 #define PRINT		if ((cp = c_print(ndo, cp, ndo->ndo_snapend)) == NULL) goto trunc
 
 	PRINT;
-	ND_PRINT((ndo, "."));
+	ND_PRINT(".");
 	PRINT;
-	ND_PRINT((ndo, "@"));
+	ND_PRINT("@");
 	PRINT;
 	return (cp);
 
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	ND_PRINT("%s", tstr);
 	return (NULL);
 
 #undef PRINT
@@ -178,14 +178,14 @@ krb4_print(netdissect_options *ndo,
 	kp = (const struct krb *)cp;
 
 	if (!ND_TTEST_1(kp->type)) {
-		ND_PRINT((ndo, "%s", tstr));
+		ND_PRINT("%s", tstr);
 		return;
 	}
 
 	type = EXTRACT_U_1(kp->type) & (0xFF << 1);
 
-	ND_PRINT((ndo, " %s %s: ",
-	    IS_LENDIAN(kp) ? "le" : "be", tok2str(type2str, NULL, type)));
+	ND_PRINT(" %s %s: ",
+	    IS_LENDIAN(kp) ? "le" : "be", tok2str(type2str, NULL, type));
 
 	switch (type) {
 
@@ -194,24 +194,24 @@ krb4_print(netdissect_options *ndo,
 			return;
 		cp += 4;	/* ctime */
 		ND_TCHECK_1(cp);
-		ND_PRINT((ndo, " %umin ", EXTRACT_U_1(cp) * 5));
+		ND_PRINT(" %umin ", EXTRACT_U_1(cp) * 5);
 		cp++;
 		PRINT;
-		ND_PRINT((ndo, "."));
+		ND_PRINT(".");
 		PRINT;
 		break;
 
 	case AUTH_MSG_APPL_REQUEST:
 		cp += 2;
 		ND_TCHECK_1(cp);
-		ND_PRINT((ndo, "v%u ", EXTRACT_U_1(cp)));
+		ND_PRINT("v%u ", EXTRACT_U_1(cp));
 		cp++;
 		PRINT;
 		ND_TCHECK_1(cp);
-		ND_PRINT((ndo, " (%u)", EXTRACT_U_1(cp)));
+		ND_PRINT(" (%u)", EXTRACT_U_1(cp));
 		cp++;
 		ND_TCHECK_1(cp);
-		ND_PRINT((ndo, " (%u)", EXTRACT_U_1(cp)));
+		ND_PRINT(" (%u)", EXTRACT_U_1(cp));
 		break;
 
 	case AUTH_MSG_KDC_REPLY:
@@ -220,7 +220,7 @@ krb4_print(netdissect_options *ndo,
 		cp += 10;	/* timestamp + n + exp + kvno */
 		ND_TCHECK_LEN(cp, sizeof(short));
 		len = KTOHSP(kp, cp);
-		ND_PRINT((ndo, " (%u)", len));
+		ND_PRINT(" (%u)", len);
 		break;
 
 	case AUTH_MSG_ERR_REPLY:
@@ -228,19 +228,19 @@ krb4_print(netdissect_options *ndo,
 			return;
 		cp += 4; 	  /* timestamp */
 		ND_TCHECK_LEN(cp, sizeof(short));
-		ND_PRINT((ndo, " %s ", tok2str(kerr2str, NULL, KTOHSP(kp, cp))));
+		ND_PRINT(" %s ", tok2str(kerr2str, NULL, KTOHSP(kp, cp)));
 		cp += 4;
 		PRINT;
 		break;
 
 	default:
-		ND_PRINT((ndo, "(unknown)"));
+		ND_PRINT("(unknown)");
 		break;
 	}
 
 	return;
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	ND_PRINT("%s", tstr);
 }
 
 void
@@ -252,7 +252,7 @@ krb_print(netdissect_options *ndo,
 	kp = (const struct krb *)dat;
 
 	if (dat >= ndo->ndo_snapend) {
-		ND_PRINT((ndo, "%s", tstr));
+		ND_PRINT("%s", tstr);
 		return;
 	}
 
@@ -261,17 +261,17 @@ krb_print(netdissect_options *ndo,
 	case 1:
 	case 2:
 	case 3:
-		ND_PRINT((ndo, " v%u", EXTRACT_U_1(kp->pvno)));
+		ND_PRINT(" v%u", EXTRACT_U_1(kp->pvno));
 		break;
 
 	case 4:
-		ND_PRINT((ndo, " v%u", EXTRACT_U_1(kp->pvno)));
+		ND_PRINT(" v%u", EXTRACT_U_1(kp->pvno));
 		krb4_print(ndo, (const u_char *)kp);
 		break;
 
 	case 106:
 	case 107:
-		ND_PRINT((ndo, " v5"));
+		ND_PRINT(" v5");
 		/* Decode ASN.1 here "someday" */
 		break;
 	}

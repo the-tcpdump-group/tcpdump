@@ -82,7 +82,7 @@ struct enchdr {
 
 #define ENC_PRINT_TYPE(wh, xf, nam) \
 	if ((wh) & (xf)) { \
-		ND_PRINT((ndo, "%s%s", nam, (wh) == (xf) ? "): " : ",")); \
+		ND_PRINT("%s%s", nam, (wh) == (xf) ? "): " : ","); \
 		(wh) &= ~(xf); \
 	}
 
@@ -104,7 +104,7 @@ enc_if_print(netdissect_options *ndo,
 	const struct enchdr *hdr;
 
 	if (caplen < ENC_HDRLEN) {
-		ND_PRINT((ndo, "[|enc]"));
+		ND_PRINT("[|enc]");
 		goto out;
 	}
 
@@ -135,13 +135,13 @@ enc_if_print(netdissect_options *ndo,
 	}
 
 	if (flags == 0)
-		ND_PRINT((ndo, "(unprotected): "));
+		ND_PRINT("(unprotected): ");
 	else
-		ND_PRINT((ndo, "("));
+		ND_PRINT("(");
 	ENC_PRINT_TYPE(flags, M_AUTH, "authentic");
 	ENC_PRINT_TYPE(flags, M_CONF, "confidential");
 	/* ENC_PRINT_TYPE(flags, M_TUNNEL, "tunnel"); */
-	ND_PRINT((ndo, "SPI 0x%08x: ", EXTRACT_BE_U_4(hdr->spi)));
+	ND_PRINT("SPI 0x%08x: ", EXTRACT_BE_U_4(hdr->spi));
 
 	length -= ENC_HDRLEN;
 	caplen -= ENC_HDRLEN;

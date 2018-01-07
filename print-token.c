@@ -113,12 +113,12 @@ token_hdr_print(netdissect_options *ndo,
 	dstname = etheraddr_string(ndo, fdst);
 
 	if (!ndo->ndo_qflag)
-		ND_PRINT((ndo, "%02x %02x ",
+		ND_PRINT("%02x %02x ",
 		       EXTRACT_U_1(trp->token_ac),
-		       EXTRACT_U_1(trp->token_fc)));
-	ND_PRINT((ndo, "%s > %s, length %u: ",
+		       EXTRACT_U_1(trp->token_fc));
+	ND_PRINT("%s > %s, length %u: ",
 	       srcname, dstname,
-	       length));
+	       length);
 }
 
 static const char *broadcast_indicator[] = {
@@ -156,7 +156,7 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 	trp = (const struct token_header *)p;
 
 	if (caplen < TOKEN_HDRLEN) {
-		ND_PRINT((ndo, "%s", tstr));
+		ND_PRINT("%s", tstr);
 		return hdr_len;
 	}
 
@@ -174,29 +174,29 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 			token_hdr_print(ndo, trp, length, srcmac, dstmac);
 
 		if (caplen < TOKEN_HDRLEN + 2) {
-			ND_PRINT((ndo, "%s", tstr));
+			ND_PRINT("%s", tstr);
 			return hdr_len;
 		}
 		route_len = RIF_LENGTH(trp);
 		hdr_len += route_len;
 		if (caplen < hdr_len) {
-			ND_PRINT((ndo, "%s", tstr));
+			ND_PRINT("%s", tstr);
 			return hdr_len;
 		}
 		if (ndo->ndo_vflag) {
-			ND_PRINT((ndo, "%s ", broadcast_indicator[BROADCAST(trp)]));
-			ND_PRINT((ndo, "%s", direction[DIRECTION(trp)]));
+			ND_PRINT("%s ", broadcast_indicator[BROADCAST(trp)]);
+			ND_PRINT("%s", direction[DIRECTION(trp)]);
 
 			for (seg = 0; seg < SEGMENT_COUNT(trp); seg++)
-				ND_PRINT((ndo, " [%d:%d]", RING_NUMBER(trp, seg),
-				    BRIDGE_NUMBER(trp, seg)));
+				ND_PRINT(" [%d:%d]", RING_NUMBER(trp, seg),
+				    BRIDGE_NUMBER(trp, seg));
 		} else {
-			ND_PRINT((ndo, "rt = %x", EXTRACT_BE_U_2(trp->token_rcf)));
+			ND_PRINT("rt = %x", EXTRACT_BE_U_2(trp->token_rcf));
 
 			for (seg = 0; seg < SEGMENT_COUNT(trp); seg++)
-				ND_PRINT((ndo, ":%x", EXTRACT_BE_U_2(trp->token_rseg[seg])));
+				ND_PRINT(":%x", EXTRACT_BE_U_2(trp->token_rseg[seg]));
 		}
-		ND_PRINT((ndo, " (%s) ", largest_frame[LARGEST_FRAME(trp)]));
+		ND_PRINT(" (%s) ", largest_frame[LARGEST_FRAME(trp)]);
 	} else {
 		if (ndo->ndo_eflag)
 			token_hdr_print(ndo, trp, length, srcmac, dstmac);

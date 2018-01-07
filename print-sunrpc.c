@@ -189,26 +189,26 @@ sunrpc_print(netdissect_options *ndo, const u_char *bp,
 	switch (IP_V((const struct ip *)bp2)) {
 	case 4:
 		ip = (const struct ip *)bp2;
-		ND_PRINT((ndo, "%s.%s > %s.%s: %d",
+		ND_PRINT("%s.%s > %s.%s: %d",
 		    ipaddr_string(ndo, &ip->ip_src), srcid,
-		    ipaddr_string(ndo, &ip->ip_dst), dstid, length));
+		    ipaddr_string(ndo, &ip->ip_dst), dstid, length);
 		break;
 	case 6:
 		ip6 = (const struct ip6_hdr *)bp2;
-		ND_PRINT((ndo, "%s.%s > %s.%s: %d",
+		ND_PRINT("%s.%s > %s.%s: %d",
 		    ip6addr_string(ndo, &ip6->ip6_src), srcid,
-		    ip6addr_string(ndo, &ip6->ip6_dst), dstid, length));
+		    ip6addr_string(ndo, &ip6->ip6_dst), dstid, length);
 		break;
 	default:
-		ND_PRINT((ndo, "%s.%s > %s.%s: %d", "?", srcid, "?", dstid, length));
+		ND_PRINT("%s.%s > %s.%s: %d", "?", srcid, "?", dstid, length);
 		break;
 	}
 
-	ND_PRINT((ndo, " %s", tok2str(proc2str, " proc #%u",
-	    EXTRACT_BE_U_4(&rp->rm_call.cb_proc))));
+	ND_PRINT(" %s", tok2str(proc2str, " proc #%u",
+	    EXTRACT_BE_U_4(&rp->rm_call.cb_proc)));
 	x = EXTRACT_BE_U_4(&rp->rm_call.cb_rpcvers);
 	if (x != 2)
-		ND_PRINT((ndo, " [rpcver %u]", x));
+		ND_PRINT(" [rpcver %u]", x);
 
 	switch (EXTRACT_BE_U_4(&rp->rm_call.cb_proc)) {
 
@@ -218,10 +218,10 @@ sunrpc_print(netdissect_options *ndo, const u_char *bp,
 	case SUNRPC_PMAPPROC_CALLIT:
 		x = EXTRACT_BE_U_4(&rp->rm_call.cb_prog);
 		if (!ndo->ndo_nflag)
-			ND_PRINT((ndo, " %s", progstr(x)));
+			ND_PRINT(" %s", progstr(x));
 		else
-			ND_PRINT((ndo, " %u", x));
-		ND_PRINT((ndo, ".%u", EXTRACT_BE_U_4(&rp->rm_call.cb_vers)));
+			ND_PRINT(" %u", x);
+		ND_PRINT(".%u", EXTRACT_BE_U_4(&rp->rm_call.cb_vers));
 		break;
 	}
 }

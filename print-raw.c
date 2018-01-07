@@ -37,7 +37,7 @@ u_int
 raw_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
 	if (ndo->ndo_eflag)
-		ND_PRINT((ndo, "ip: "));
+		ND_PRINT("ip: ");
 
 	ipN_print(ndo, p, h->len);
 

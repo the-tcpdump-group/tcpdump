@@ -49,7 +49,7 @@ void
 hncp_print(netdissect_options *ndo,
            const u_char *cp, u_int length)
 {
-    ND_PRINT((ndo, "hncp (%d)", length));
+    ND_PRINT("hncp (%d)", length);
     hncp_print_rec(ndo, cp, length, 1);
 }
 
@@ -232,7 +232,7 @@ print_prefix(netdissect_options *ndo, const u_char *prefix, u_int max_length)
         plenbytes = decode_prefix6(ndo, prefix, max_length, buf, sizeof(buf));
     }
 
-    ND_PRINT((ndo, "%s", buf));
+    ND_PRINT("%s", buf);
     return plenbytes;
 }
 
@@ -258,7 +258,7 @@ print_dns_label(netdissect_options *ndo,
         length += lab_length;
     }
     if (print)
-        ND_PRINT((ndo, "[|DNS]"));
+        ND_PRINT("[|DNS]");
     return -1;
 }
 
@@ -279,12 +279,12 @@ dhcpv4_print(netdissect_options *ndo,
         optlen = EXTRACT_U_1(tlv + 1);
         value = tlv + 2;
 
-        ND_PRINT((ndo, "\n"));
+        ND_PRINT("\n");
         for (t = indent; t > 0; t--)
-            ND_PRINT((ndo, "\t"));
+            ND_PRINT("\t");
 
-        ND_PRINT((ndo, "%s", tok2str(dh4opt_str, "Unknown", type)));
-        ND_PRINT((ndo," (%u)", optlen + 2 ));
+        ND_PRINT("%s", tok2str(dh4opt_str, "Unknown", type));
+        ND_PRINT(" (%u)", optlen + 2 );
         if (i + 2 + optlen > length)
             return -1;
 
@@ -295,13 +295,13 @@ dhcpv4_print(netdissect_options *ndo,
                 return -1;
             }
             for (t = 0; t < optlen; t += 4)
-                ND_PRINT((ndo, " %s", ipaddr_string(ndo, value + t)));
+                ND_PRINT(" %s", ipaddr_string(ndo, value + t));
         }
             break;
         case DH4OPT_DOMAIN_SEARCH: {
             const u_char *tp = value;
             while (tp < value + optlen) {
-                ND_PRINT((ndo, " "));
+                ND_PRINT(" ");
                 if ((tp = ns_nprint(ndo, tp, value + optlen)) == NULL)
                     return -1;
             }
@@ -331,12 +331,12 @@ dhcpv6_print(netdissect_options *ndo,
         optlen = EXTRACT_BE_U_2(tlv + 2);
         value = tlv + 4;
 
-        ND_PRINT((ndo, "\n"));
+        ND_PRINT("\n");
         for (t = indent; t > 0; t--)
-            ND_PRINT((ndo, "\t"));
+            ND_PRINT("\t");
 
-        ND_PRINT((ndo, "%s", tok2str(dh6opt_str, "Unknown", type)));
-        ND_PRINT((ndo," (%u)", optlen + 4 ));
+        ND_PRINT("%s", tok2str(dh6opt_str, "Unknown", type));
+        ND_PRINT(" (%u)", optlen + 4 );
         if (i + 4 + optlen > length)
             return -1;
 
@@ -344,17 +344,17 @@ dhcpv6_print(netdissect_options *ndo,
             case DH6OPT_DNS_SERVERS:
             case DH6OPT_SNTP_SERVERS: {
                 if (optlen % 16 != 0) {
-                    ND_PRINT((ndo, " %s", istr));
+                    ND_PRINT(" %s", istr);
                     return -1;
                 }
                 for (t = 0; t < optlen; t += 16)
-                    ND_PRINT((ndo, " %s", ip6addr_string(ndo, value + t)));
+                    ND_PRINT(" %s", ip6addr_string(ndo, value + t));
             }
                 break;
             case DH6OPT_DOMAIN_LIST: {
                 const u_char *tp = value;
                 while (tp < value + optlen) {
-                    ND_PRINT((ndo, " "));
+                    ND_PRINT(" ");
                     if ((tp = ns_nprint(ndo, tp, value + optlen)) == NULL)
                         return -1;
                 }
@@ -383,18 +383,18 @@ print_type_in_line(netdissect_options *ndo,
             *first_one = 0;
             if (indent > 1) {
                 u_int t;
-                ND_PRINT((ndo, "\n"));
+                ND_PRINT("\n");
                 for (t = indent; t > 0; t--)
-                    ND_PRINT((ndo, "\t"));
+                    ND_PRINT("\t");
             } else {
-                ND_PRINT((ndo, " "));
+                ND_PRINT(" ");
             }
         } else {
-            ND_PRINT((ndo, ", "));
+            ND_PRINT(", ");
         }
-        ND_PRINT((ndo, "%s", tok2str(type_values, "Easter Egg", type)));
+        ND_PRINT("%s", tok2str(type_values, "Easter Egg", type));
         if (count > 1)
-            ND_PRINT((ndo, " (x%d)", count));
+            ND_PRINT(" (x%d)", count);
     }
 }
 
@@ -419,9 +419,9 @@ hncp_print_rec(netdissect_options *ndo,
         tlv = cp + i;
 
         if (!in_line) {
-            ND_PRINT((ndo, "\n"));
+            ND_PRINT("\n");
             for (t = indent; t > 0; t--)
-                ND_PRINT((ndo, "\t"));
+                ND_PRINT("\t");
         }
 
         ND_TCHECK_4(tlv);
@@ -469,27 +469,27 @@ hncp_print_rec(netdissect_options *ndo,
             goto skip_multiline;
         }
 
-        ND_PRINT((ndo,"%s", tok2str(type_values, "Easter Egg (42)", type_mask) ));
+        ND_PRINT("%s", tok2str(type_values, "Easter Egg (42)", type_mask) );
         if (type_mask > 0xffff)
-            ND_PRINT((ndo,": type=%u", type ));
-        ND_PRINT((ndo," (%u)", bodylen + 4 ));
+            ND_PRINT(": type=%u", type );
+        ND_PRINT(" (%u)", bodylen + 4 );
 
         switch (type_mask) {
 
         case DNCP_REQUEST_NETWORK_STATE: {
             if (bodylen != 0)
-                ND_PRINT((ndo, " %s", istr));
+                ND_PRINT(" %s", istr);
         }
             break;
 
         case DNCP_REQUEST_NODE_STATE: {
             const char *node_identifier;
             if (bodylen != 4) {
-                ND_PRINT((ndo, " %s", istr));
+                ND_PRINT(" %s", istr);
                 break;
             }
             node_identifier = format_nid(value);
-            ND_PRINT((ndo, " NID: %s", node_identifier));
+            ND_PRINT(" NID: %s", node_identifier);
         }
             break;
 
@@ -497,26 +497,26 @@ hncp_print_rec(netdissect_options *ndo,
             const char *node_identifier;
             uint32_t endpoint_identifier;
             if (bodylen != 8) {
-                ND_PRINT((ndo, " %s", istr));
+                ND_PRINT(" %s", istr);
                 break;
             }
             node_identifier = format_nid(value);
             endpoint_identifier = EXTRACT_BE_U_4(value + 4);
-            ND_PRINT((ndo, " NID: %s EPID: %08x",
+            ND_PRINT(" NID: %s EPID: %08x",
                 node_identifier,
                 endpoint_identifier
-            ));
+            );
         }
             break;
 
         case DNCP_NETWORK_STATE: {
             uint64_t hash;
             if (bodylen != 8) {
-                ND_PRINT((ndo, " %s", istr));
+                ND_PRINT(" %s", istr);
                 break;
             }
             hash = EXTRACT_BE_U_8(value);
-            ND_PRINT((ndo, " hash: %016" PRIx64, hash));
+            ND_PRINT(" hash: %016" PRIx64, hash);
         }
             break;
 
@@ -525,19 +525,19 @@ hncp_print_rec(netdissect_options *ndo,
             uint32_t sequence_number;
             uint64_t hash;
             if (bodylen < 20) {
-                ND_PRINT((ndo, " %s", istr));
+                ND_PRINT(" %s", istr);
                 break;
             }
             node_identifier = format_nid(value);
             sequence_number = EXTRACT_BE_U_4(value + 4);
             interval = format_interval(EXTRACT_BE_U_4(value + 8));
             hash = EXTRACT_BE_U_8(value + 12);
-            ND_PRINT((ndo, " NID: %s seqno: %u %s hash: %016" PRIx64,
+            ND_PRINT(" NID: %s seqno: %u %s hash: %016" PRIx64,
                 node_identifier,
                 sequence_number,
                 interval,
                 hash
-            ));
+            );
             hncp_print_rec(ndo, value+20, bodylen-20, indent+1);
         }
             break;
@@ -546,17 +546,17 @@ hncp_print_rec(netdissect_options *ndo,
             const char *peer_node_identifier;
             uint32_t peer_endpoint_identifier, endpoint_identifier;
             if (bodylen != 12) {
-                ND_PRINT((ndo, " %s", istr));
+                ND_PRINT(" %s", istr);
                 break;
             }
             peer_node_identifier = format_nid(value);
             peer_endpoint_identifier = EXTRACT_BE_U_4(value + 4);
             endpoint_identifier = EXTRACT_BE_U_4(value + 8);
-            ND_PRINT((ndo, " Peer-NID: %s Peer-EPID: %08x Local-EPID: %08x",
+            ND_PRINT(" Peer-NID: %s Peer-EPID: %08x Local-EPID: %08x",
                 peer_node_identifier,
                 peer_endpoint_identifier,
                 endpoint_identifier
-            ));
+            );
         }
             break;
 
@@ -564,26 +564,26 @@ hncp_print_rec(netdissect_options *ndo,
             uint32_t endpoint_identifier;
             const char *interval;
             if (bodylen < 8) {
-                ND_PRINT((ndo, " %s", istr));
+                ND_PRINT(" %s", istr);
                 break;
             }
             endpoint_identifier = EXTRACT_BE_U_4(value);
             interval = format_interval(EXTRACT_BE_U_4(value + 4));
-            ND_PRINT((ndo, " EPID: %08x Interval: %s",
+            ND_PRINT(" EPID: %08x Interval: %s",
                 endpoint_identifier,
                 interval
-            ));
+            );
         }
             break;
 
         case DNCP_TRUST_VERDICT: {
             if (bodylen <= 36) {
-                ND_PRINT((ndo, " %s", istr));
+                ND_PRINT(" %s", istr);
                 break;
             }
-            ND_PRINT((ndo, " Verdict: %u Fingerprint: %s Common Name: ",
+            ND_PRINT(" Verdict: %u Fingerprint: %s Common Name: ",
                 EXTRACT_U_1(value),
-                format_256(value + 4)));
+                format_256(value + 4));
             safeputs(ndo, value + 36, bodylen - 36);
         }
             break;
@@ -592,7 +592,7 @@ hncp_print_rec(netdissect_options *ndo,
             uint16_t capabilities;
             uint8_t M, P, H, L;
             if (bodylen < 5) {
-                ND_PRINT((ndo, " %s", istr));
+                ND_PRINT(" %s", istr);
                 break;
             }
             capabilities = EXTRACT_BE_U_2(value + 2);
@@ -600,9 +600,9 @@ hncp_print_rec(netdissect_options *ndo,
             P = (uint8_t)((capabilities >> 8) & 0xf);
             H = (uint8_t)((capabilities >> 4) & 0xf);
             L = (uint8_t)(capabilities & 0xf);
-            ND_PRINT((ndo, " M: %u P: %u H: %u L: %u User-agent: ",
+            ND_PRINT(" M: %u P: %u H: %u L: %u User-agent: ",
                 M, P, H, L
-            ));
+            );
             safeputs(ndo, value + 4, bodylen - 4);
         }
             break;
@@ -616,16 +616,16 @@ hncp_print_rec(netdissect_options *ndo,
         case HNCP_DELEGATED_PREFIX: {
             int l;
             if (bodylen < 9 || bodylen < 9 + (EXTRACT_U_1(value + 8) + 7) / 8) {
-                ND_PRINT((ndo, " %s", istr));
+                ND_PRINT(" %s", istr);
                 break;
             }
-            ND_PRINT((ndo, " VLSO: %s PLSO: %s Prefix: ",
+            ND_PRINT(" VLSO: %s PLSO: %s Prefix: ",
                 format_interval(EXTRACT_BE_U_4(value)),
                 format_interval(EXTRACT_BE_U_4(value + 4))
-            ));
+            );
             l = print_prefix(ndo, value + 8, bodylen - 8);
             if (l == -1) {
-                ND_PRINT((ndo, "(length is invalid)"));
+                ND_PRINT("(length is invalid)");
                 break;
             }
             if (l < 0) {
@@ -638,7 +638,7 @@ hncp_print_rec(netdissect_options *ndo,
                  * IPv6", or -3, meaning "the prefix runs past
                  * the end of the TLV".
                  */
-                ND_PRINT((ndo, " %s", istr));
+                ND_PRINT(" %s", istr);
                 break;
             }
             l += 8 + (-l & 3);
@@ -652,22 +652,22 @@ hncp_print_rec(netdissect_options *ndo,
             uint8_t policy;
             int l;
             if (bodylen < 1) {
-                ND_PRINT((ndo, " %s", istr));
+                ND_PRINT(" %s", istr);
                 break;
             }
             policy = EXTRACT_U_1(value);
-            ND_PRINT((ndo, " type: "));
+            ND_PRINT(" type: ");
             if (policy == 0) {
                 if (bodylen != 1) {
-                    ND_PRINT((ndo, " %s", istr));
+                    ND_PRINT(" %s", istr);
                     break;
                 }
-                ND_PRINT((ndo, "Internet connectivity"));
+                ND_PRINT("Internet connectivity");
             } else if (policy >= 1 && policy <= 128) {
-                ND_PRINT((ndo, "Dest-Prefix: "));
+                ND_PRINT("Dest-Prefix: ");
                 l = print_prefix(ndo, value, bodylen);
                 if (l == -1) {
-                    ND_PRINT((ndo, "(length is invalid)"));
+                    ND_PRINT("(length is invalid)");
                     break;
                 }
                 if (l < 0) {
@@ -680,30 +680,30 @@ hncp_print_rec(netdissect_options *ndo,
                      * IPv6", or -3, meaning "the prefix runs past
                      * the end of the TLV".
                      */
-                    ND_PRINT((ndo, " %s", istr));
+                    ND_PRINT(" %s", istr);
                     break;
                 }
             } else if (policy == 129) {
-                ND_PRINT((ndo, "DNS domain: "));
+                ND_PRINT("DNS domain: ");
                 print_dns_label(ndo, value+1, bodylen-1, 1);
             } else if (policy == 130) {
-                ND_PRINT((ndo, "Opaque UTF-8: "));
+                ND_PRINT("Opaque UTF-8: ");
                 safeputs(ndo, value + 1, bodylen - 1);
             } else if (policy == 131) {
                 if (bodylen != 1) {
-                    ND_PRINT((ndo, " %s", istr));
+                    ND_PRINT(" %s", istr);
                     break;
                 }
-                ND_PRINT((ndo, "Restrictive assignment"));
+                ND_PRINT("Restrictive assignment");
             } else if (policy >= 132) {
-                ND_PRINT((ndo, "Unknown (%u)", policy)); /* Reserved for future additions */
+                ND_PRINT("Unknown (%u)", policy); /* Reserved for future additions */
             }
         }
             break;
 
         case HNCP_DHCPV4_DATA: {
             if (bodylen == 0) {
-                ND_PRINT((ndo, " %s", istr));
+                ND_PRINT(" %s", istr);
                 break;
             }
             if (dhcpv4_print(ndo, value, bodylen, indent+1) != 0)
@@ -713,11 +713,11 @@ hncp_print_rec(netdissect_options *ndo,
 
         case HNCP_DHCPV6_DATA: {
             if (bodylen == 0) {
-                ND_PRINT((ndo, " %s", istr));
+                ND_PRINT(" %s", istr);
                 break;
             }
             if (dhcpv6_print(ndo, value, bodylen, indent+1) != 0) {
-                ND_PRINT((ndo, " %s", istr));
+                ND_PRINT(" %s", istr);
                 break;
             }
         }
@@ -727,17 +727,17 @@ hncp_print_rec(netdissect_options *ndo,
             uint8_t prty;
             int l;
             if (bodylen < 6 || bodylen < 6 + (EXTRACT_U_1(value + 5) + 7) / 8) {
-                ND_PRINT((ndo, " %s", istr));
+                ND_PRINT(" %s", istr);
                 break;
             }
             prty = EXTRACT_U_1(value + 4) & 0xf;
-            ND_PRINT((ndo, " EPID: %08x Prty: %u",
+            ND_PRINT(" EPID: %08x Prty: %u",
                 EXTRACT_BE_U_4(value),
                 prty
-            ));
-            ND_PRINT((ndo, " Prefix: "));
+            );
+            ND_PRINT(" Prefix: ");
             if ((l = print_prefix(ndo, value + 5, bodylen - 5)) < 0) {
-                ND_PRINT((ndo, " %s", istr));
+                ND_PRINT(" %s", istr);
                 break;
             }
             l += 5;
@@ -752,15 +752,15 @@ hncp_print_rec(netdissect_options *ndo,
             uint32_t endpoint_identifier;
             const char *ip_address;
             if (bodylen < 20) {
-                ND_PRINT((ndo, " %s", istr));
+                ND_PRINT(" %s", istr);
                 break;
             }
             endpoint_identifier = EXTRACT_BE_U_4(value);
             ip_address = format_ip6addr(ndo, value + 4);
-            ND_PRINT((ndo, " EPID: %08x IP Address: %s",
+            ND_PRINT(" EPID: %08x IP Address: %s",
                 endpoint_identifier,
                 ip_address
-            ));
+            );
 
             hncp_print_rec(ndo, value + 20, bodylen - 20, indent+1);
         }
@@ -770,19 +770,19 @@ hncp_print_rec(netdissect_options *ndo,
             const char *ip_address;
             int len;
             if (bodylen < 17) {
-                ND_PRINT((ndo, " %s", istr));
+                ND_PRINT(" %s", istr);
                 break;
             }
             ip_address = format_ip6addr(ndo, value);
-            ND_PRINT((ndo, " IP-Address: %s %c%c%c ",
+            ND_PRINT(" IP-Address: %s %c%c%c ",
                 ip_address,
                 (EXTRACT_U_1(value + 16) & 4) ? 'l' : '-',
                 (EXTRACT_U_1(value + 16) & 2) ? 'b' : '-',
                 (EXTRACT_U_1(value + 16) & 1) ? 's' : '-'
-            ));
+            );
             len = print_dns_label(ndo, value+17, bodylen-17, 1);
             if (len < 0) {
-                ND_PRINT((ndo, " %s", istr));
+                ND_PRINT(" %s", istr);
                 break;
             }
             len += 17;
@@ -794,10 +794,10 @@ hncp_print_rec(netdissect_options *ndo,
 
         case HNCP_DOMAIN_NAME: {
             if (bodylen == 0) {
-                ND_PRINT((ndo, " %s", istr));
+                ND_PRINT(" %s", istr);
                 break;
             }
-            ND_PRINT((ndo, " Domain: "));
+            ND_PRINT(" Domain: ");
             print_dns_label(ndo, value, bodylen, 1);
         }
             break;
@@ -805,23 +805,23 @@ hncp_print_rec(netdissect_options *ndo,
         case HNCP_NODE_NAME: {
             u_int l;
             if (bodylen < 17) {
-                ND_PRINT((ndo, " %s", istr));
+                ND_PRINT(" %s", istr);
                 break;
             }
             l = EXTRACT_U_1(value + 16);
             if (bodylen < 17 + l) {
-                ND_PRINT((ndo, " %s", istr));
+                ND_PRINT(" %s", istr);
                 break;
             }
-            ND_PRINT((ndo, " IP-Address: %s Name: ",
+            ND_PRINT(" IP-Address: %s Name: ",
                 format_ip6addr(ndo, value)
-            ));
+            );
             if (l < 64) {
                 safeputchar(ndo, '"');
                 safeputs(ndo, value + 17, l);
                 safeputchar(ndo, '"');
             } else {
-                ND_PRINT((ndo, "%s", istr));
+                ND_PRINT("%s", istr);
             }
             l += 17;
             l += -l & 3;
@@ -832,10 +832,10 @@ hncp_print_rec(netdissect_options *ndo,
 
         case HNCP_MANAGED_PSK: {
             if (bodylen < 32) {
-                ND_PRINT((ndo, " %s", istr));
+                ND_PRINT(" %s", istr);
                 break;
             }
-            ND_PRINT((ndo, " PSK: %s", format_256(value)));
+            ND_PRINT(" PSK: %s", format_256(value));
             hncp_print_rec(ndo, value + 32, bodylen - 32, indent+1);
         }
             break;
@@ -856,10 +856,10 @@ hncp_print_rec(netdissect_options *ndo,
     return;
 
  trunc:
-    ND_PRINT((ndo, "%s", "[|hncp]"));
+    ND_PRINT("%s", "[|hncp]");
     return;
 
  invalid:
-    ND_PRINT((ndo, "%s", istr));
+    ND_PRINT("%s", istr);
     return;
 }

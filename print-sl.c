@@ -64,7 +64,7 @@ sl_if_print(netdissect_options *ndo,
 	const struct ip *ip;
 
 	if (caplen < SLIP_HDRLEN || length < SLIP_HDRLEN) {
-		ND_PRINT((ndo, "%s", tstr));
+		ND_PRINT("%s", tstr);
 		return (caplen);
 	}
 
@@ -77,7 +77,7 @@ sl_if_print(netdissect_options *ndo,
 		sliplink_print(ndo, p, ip, length);
 
 	if (caplen < 1 || length < 1) {
-		ND_PRINT((ndo, "%s", tstr));
+		ND_PRINT("%s", tstr);
 		return (caplen + SLIP_HDRLEN);
 	}
 
@@ -89,7 +89,7 @@ sl_if_print(netdissect_options *ndo,
 		ip6_print(ndo, (const u_char *)ip, length);
 		break;
 	default:
-		ND_PRINT((ndo, "ip v%d", IP_V(ip)));
+		ND_PRINT("ip v%d", IP_V(ip));
 	}
 
 	return (SLIP_HDRLEN);
@@ -104,7 +104,7 @@ sl_bsdos_if_print(netdissect_options *ndo,
 	const struct ip *ip;
 
 	if (caplen < SLIP_HDRLEN) {
-		ND_PRINT((ndo, "%s", tstr));
+		ND_PRINT("%s", tstr);
 		return (caplen);
 	}
 
@@ -134,15 +134,15 @@ sliplink_print(netdissect_options *ndo,
 	switch (dir) {
 
 	case SLIPDIR_IN:
-		ND_PRINT((ndo, "I "));
+		ND_PRINT("I ");
 		break;
 
 	case SLIPDIR_OUT:
-		ND_PRINT((ndo, "O "));
+		ND_PRINT("O ");
 		break;
 
 	default:
-		ND_PRINT((ndo, "Invalid direction %d ", dir));
+		ND_PRINT("Invalid direction %d ", dir);
 		dir = -1;
 		break;
 	}
@@ -151,14 +151,14 @@ sliplink_print(netdissect_options *ndo,
 		int i;
 
 		for (i = SLX_CHDR; i < SLX_CHDR + CHDR_LEN - 1; ++i)
-			ND_PRINT((ndo, "%02x.", EXTRACT_U_1(p + i)));
-		ND_PRINT((ndo, "%02x: ", EXTRACT_U_1(p + SLX_CHDR + CHDR_LEN - 1)));
+			ND_PRINT("%02x.", EXTRACT_U_1(p + i));
+		ND_PRINT("%02x: ", EXTRACT_U_1(p + SLX_CHDR + CHDR_LEN - 1));
 		return;
 	}
 	switch (EXTRACT_U_1(p + SLX_CHDR) & 0xf0) {
 
 	case TYPE_IP:
-		ND_PRINT((ndo, "ip %d: ", length + SLIP_HDRLEN));
+		ND_PRINT("ip %d: ", length + SLIP_HDRLEN);
 		break;
 
 	case TYPE_UNCOMPRESSED_TCP:
@@ -168,7 +168,7 @@ sliplink_print(netdissect_options *ndo,
 		 * has restored the IP header copy to IPPROTO_TCP.
 		 */
 		lastconn = EXTRACT_U_1(((const struct ip *)(p + SLX_CHDR))->ip_p);
-		ND_PRINT((ndo, "utcp %d: ", lastconn));
+		ND_PRINT("utcp %d: ", lastconn);
 		if (dir == -1) {
 			/* Direction is bogus, don't use it */
 			return;
@@ -186,9 +186,9 @@ sliplink_print(netdissect_options *ndo,
 		if (EXTRACT_U_1(p + SLX_CHDR) & TYPE_COMPRESSED_TCP) {
 			compressed_sl_print(ndo, p + SLX_CHDR, ip,
 					    length, dir);
-			ND_PRINT((ndo, ": "));
+			ND_PRINT(": ");
 		} else
-			ND_PRINT((ndo, "slip-%d!: ", EXTRACT_U_1(p + SLX_CHDR)));
+			ND_PRINT("slip-%d!: ", EXTRACT_U_1(p + SLX_CHDR));
 	}
 }
 
@@ -203,7 +203,7 @@ print_sl_change(netdissect_options *ndo,
 		i = EXTRACT_BE_U_2(cp);
 		cp += 2;
 	}
-	ND_PRINT((ndo, " %s%d", str, i));
+	ND_PRINT(" %s%d", str, i);
 	return (cp);
 }
 
@@ -219,9 +219,9 @@ print_sl_winchange(netdissect_options *ndo,
 		cp += 2;
 	}
 	if (i >= 0)
-		ND_PRINT((ndo, " W+%d", i));
+		ND_PRINT(" W+%d", i);
 	else
-		ND_PRINT((ndo, " W%d", i));
+		ND_PRINT(" W%d", i);
 	return (cp);
 }
 
@@ -238,20 +238,20 @@ compressed_sl_print(netdissect_options *ndo,
 	if (flags & NEW_C) {
 		lastconn = EXTRACT_U_1(cp);
 		cp++;
-		ND_PRINT((ndo, "ctcp %d", lastconn));
+		ND_PRINT("ctcp %d", lastconn);
 	} else
-		ND_PRINT((ndo, "ctcp *"));
+		ND_PRINT("ctcp *");
 
 	/* skip tcp checksum */
 	cp += 2;
 
 	switch (flags & SPECIALS_MASK) {
 	case SPECIAL_I:
-		ND_PRINT((ndo, " *SA+%d", lastlen[dir][lastconn]));
+		ND_PRINT(" *SA+%d", lastlen[dir][lastconn]);
 		break;
 
 	case SPECIAL_D:
-		ND_PRINT((ndo, " *S+%d", lastlen[dir][lastconn]));
+		ND_PRINT(" *S+%d", lastlen[dir][lastconn]);
 		break;
 
 	default:
@@ -276,5 +276,5 @@ compressed_sl_print(netdissect_options *ndo,
 	hlen = IP_HL(ip);
 	hlen += TH_OFF((const struct tcphdr *)&((const int32_t *)ip)[hlen]);
 	lastlen[dir][lastconn] = length - (hlen << 2);
-	ND_PRINT((ndo, " %d (%ld)", lastlen[dir][lastconn], (long)(cp - chdr)));
+	ND_PRINT(" %d (%ld)", lastlen[dir][lastconn], (long)(cp - chdr));
 }

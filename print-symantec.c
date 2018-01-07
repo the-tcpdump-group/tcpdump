@@ -48,19 +48,19 @@ symantec_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	etype = EXTRACT_BE_U_2(sp->ether_type);
 	if (!ndo->ndo_qflag) {
 	        if (etype <= MAX_ETHERNET_LENGTH_VAL)
-		          ND_PRINT((ndo, "invalid ethertype %u", etype));
+		          ND_PRINT("invalid ethertype %u", etype);
                 else
-		          ND_PRINT((ndo, "ethertype %s (0x%04x)",
+		          ND_PRINT("ethertype %s (0x%04x)",
 				       tok2str(ethertype_values,"Unknown", etype),
-                                       etype));
+                                       etype);
         } else {
                 if (etype <= MAX_ETHERNET_LENGTH_VAL)
-                          ND_PRINT((ndo, "invalid ethertype %u", etype));
+                          ND_PRINT("invalid ethertype %u", etype);
                 else
-                          ND_PRINT((ndo, "%s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", etype)));
+                          ND_PRINT("%s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", etype));
         }
 
-	ND_PRINT((ndo, ", length %u: ", length));
+	ND_PRINT(", length %u: ", length);
 }
 
 /*
@@ -78,7 +78,7 @@ symantec_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_
 	u_short ether_type;
 
 	if (caplen < sizeof (struct symantec_header)) {
-		ND_PRINT((ndo, "[|symantec]"));
+		ND_PRINT("[|symantec]");
 		return caplen;
 	}
 

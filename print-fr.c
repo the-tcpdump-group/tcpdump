@@ -190,26 +190,26 @@ fr_hdr_print(netdissect_options *ndo, int length, u_int addr_len,
 	     u_int dlci, uint32_t flags, uint16_t nlpid)
 {
     if (ndo->ndo_qflag) {
-        ND_PRINT((ndo, "Q.922, DLCI %u, length %u: ",
+        ND_PRINT("Q.922, DLCI %u, length %u: ",
                      dlci,
-                     length));
+                     length);
     } else {
         if (nlpid <= 0xff) /* if its smaller than 256 then its a NLPID */
-            ND_PRINT((ndo, "Q.922, hdr-len %u, DLCI %u, Flags [%s], NLPID %s (0x%02x), length %u: ",
+            ND_PRINT("Q.922, hdr-len %u, DLCI %u, Flags [%s], NLPID %s (0x%02x), length %u: ",
                          addr_len,
                          dlci,
                          bittok2str(fr_header_flag_values, "none", flags),
                          tok2str(nlpid_values,"unknown", nlpid),
                          nlpid,
-                         length));
+                         length);
         else /* must be an ethertype */
-            ND_PRINT((ndo, "Q.922, hdr-len %u, DLCI %u, Flags [%s], cisco-ethertype %s (0x%04x), length %u: ",
+            ND_PRINT("Q.922, hdr-len %u, DLCI %u, Flags [%s], cisco-ethertype %s (0x%04x), length %u: ",
                          addr_len,
                          dlci,
                          bittok2str(fr_header_flag_values, "none", flags),
                          tok2str(ethertype_values, "unknown", nlpid),
                          nlpid,
-                         length));
+                         length);
     }
 }
 
@@ -227,7 +227,7 @@ fr_if_print(netdissect_options *ndo,
         else
             return length;
  trunc:
-        ND_PRINT((ndo, "[|fr]"));
+        ND_PRINT("[|fr]");
         return caplen;
 }
 
@@ -247,7 +247,7 @@ fr_print(netdissect_options *ndo,
 	if (ret == -1)
 		goto trunc;
 	if (ret == 0) {
-		ND_PRINT((ndo, "Q.922, invalid address"));
+		ND_PRINT("Q.922, invalid address");
 		return 0;
 	}
 
@@ -263,7 +263,7 @@ fr_print(netdissect_options *ndo,
                  */
 		if (!ND_TTEST_2(p + addr_len) || length < addr_len + 2) {
                         /* no Ethertype */
-                        ND_PRINT((ndo, "UI %02x! ", EXTRACT_U_1(p + addr_len)));
+                        ND_PRINT("UI %02x! ", EXTRACT_U_1(p + addr_len));
                 } else {
                         extracted_ethertype = EXTRACT_BE_U_2(p + addr_len);
 
@@ -277,7 +277,7 @@ fr_print(netdissect_options *ndo,
                                             ndo->ndo_snapend-p-addr_len-ETHERTYPE_LEN,
                                             NULL, NULL) == 0)
                                 /* ether_type not known, probably it wasn't one */
-                                ND_PRINT((ndo, "UI %02x! ", EXTRACT_U_1(p + addr_len)));
+                                ND_PRINT("UI %02x! ", EXTRACT_U_1(p + addr_len));
                         else
                                 return addr_len + 2;
                 }
@@ -293,7 +293,7 @@ fr_print(netdissect_options *ndo,
 		 * A pad byte should only be used with 3-byte Q.922.
 		 */
 		if (addr_len != 3)
-			ND_PRINT((ndo, "Pad! "));
+			ND_PRINT("Pad! ");
 		hdr_len = addr_len + 1 /* UI */ + 1 /* pad */ + 1 /* NLPID */;
 	} else {
 		/*
@@ -301,7 +301,7 @@ fr_print(netdissect_options *ndo,
 		 * A pad byte should be used with 3-byte Q.922.
 		 */
 		if (addr_len == 3)
-			ND_PRINT((ndo, "No pad! "));
+			ND_PRINT("No pad! ");
 		hdr_len = addr_len + 1 /* UI */ + 1 /* NLPID */;
 	}
 
@@ -364,7 +364,7 @@ fr_print(netdissect_options *ndo,
 	return hdr_len;
 
  trunc:
-        ND_PRINT((ndo, "[|fr]"));
+        ND_PRINT("[|fr]");
         return 0;
 
 }
@@ -383,7 +383,7 @@ mfr_if_print(netdissect_options *ndo,
         else
             return length;
  trunc:
-        ND_PRINT((ndo, "[|mfr]"));
+        ND_PRINT("[|mfr]");
         return caplen;
 }
 
@@ -457,10 +457,10 @@ mfr_print(netdissect_options *ndo,
     ND_TCHECK_4(p); /* minimum frame header length */
 
     if ((EXTRACT_U_1(p) & MFR_BEC_MASK) == MFR_CTRL_FRAME && EXTRACT_U_1(p + 1) == 0) {
-        ND_PRINT((ndo, "FRF.16 Control, Flags [%s], %s, length %u",
+        ND_PRINT("FRF.16 Control, Flags [%s], %s, length %u",
                bittok2str(frf_flag_values,"none",(EXTRACT_U_1(p) & MFR_BEC_MASK)),
                tok2str(mfr_ctrl_msg_values,"Unknown Message (0x%02x)",EXTRACT_U_1(p + 2)),
-               length));
+               length);
         tptr = p + 3;
         tlen = length -3;
         hdr_len = 3;
@@ -473,10 +473,10 @@ mfr_print(netdissect_options *ndo,
             ie_type=EXTRACT_U_1(tptr);
             ie_len=EXTRACT_U_1(tptr + 1);
 
-            ND_PRINT((ndo, "\n\tIE %s (%u), length %u: ",
+            ND_PRINT("\n\tIE %s (%u), length %u: ",
                    tok2str(mfr_ctrl_ie_values,"Unknown",ie_type),
                    ie_type,
-                   ie_len));
+                   ie_len);
 
             /* infinite loop check */
             if (ie_type == 0 || ie_len <= sizeof(struct ie_tlv_header_t))
@@ -491,7 +491,7 @@ mfr_print(netdissect_options *ndo,
             switch (ie_type) {
 
             case MFR_CTRL_IE_MAGIC_NUM:
-                ND_PRINT((ndo, "0x%08x", EXTRACT_BE_U_4(tptr)));
+                ND_PRINT("0x%08x", EXTRACT_BE_U_4(tptr));
                 break;
 
             case MFR_CTRL_IE_BUNDLE_ID: /* same message format */
@@ -554,24 +554,24 @@ mfr_print(netdissect_options *ndo,
     /* whole packet or first fragment ? */
     if ((EXTRACT_U_1(p) & MFR_BEC_MASK) == MFR_FRAG_FRAME ||
         (EXTRACT_U_1(p) & MFR_BEC_MASK) == MFR_B_BIT) {
-        ND_PRINT((ndo, "FRF.16 Frag, seq %u, Flags [%s], ",
+        ND_PRINT("FRF.16 Frag, seq %u, Flags [%s], ",
                sequence_num,
-               bittok2str(frf_flag_values,"none",(EXTRACT_U_1(p) & MFR_BEC_MASK))));
+               bittok2str(frf_flag_values,"none",(EXTRACT_U_1(p) & MFR_BEC_MASK)));
         hdr_len = 2;
         fr_print(ndo, p+hdr_len,length-hdr_len);
         return hdr_len;
     }
 
     /* must be a middle or the last fragment */
-    ND_PRINT((ndo, "FRF.16 Frag, seq %u, Flags [%s]",
+    ND_PRINT("FRF.16 Frag, seq %u, Flags [%s]",
            sequence_num,
-           bittok2str(frf_flag_values,"none",(EXTRACT_U_1(p) & MFR_BEC_MASK))));
+           bittok2str(frf_flag_values,"none",(EXTRACT_U_1(p) & MFR_BEC_MASK)));
     print_unknown_data(ndo, p, "\n\t", length);
 
     return hdr_len;
 
  trunc:
-    ND_PRINT((ndo, "[|mfr]"));
+    ND_PRINT("[|mfr]");
     return length;
 }
 
@@ -605,11 +605,11 @@ frf15_print(netdissect_options *ndo,
     flags = EXTRACT_U_1(p)&MFR_BEC_MASK;
     sequence_num = (EXTRACT_U_1(p)&0x1e)<<7 | EXTRACT_U_1(p + 1);
 
-    ND_PRINT((ndo, "FRF.15, seq 0x%03x, Flags [%s],%s Fragmentation, length %u",
+    ND_PRINT("FRF.15, seq 0x%03x, Flags [%s],%s Fragmentation, length %u",
            sequence_num,
            bittok2str(frf_flag_values,"none",flags),
            EXTRACT_U_1(p)&FR_FRF15_FRAGTYPE ? "Interface" : "End-to-End",
-           length));
+           length);
 
 /* TODO:
  * depending on all permutations of the B, E and C bit
@@ -622,7 +622,7 @@ frf15_print(netdissect_options *ndo,
     return;
 
 trunc:
-    ND_PRINT((ndo, "[|frf.15]"));
+    ND_PRINT("[|frf.15]");
 }
 
 /*
@@ -798,12 +798,12 @@ q933_print(netdissect_options *ndo,
 	u_int non_locking_shift;
 	u_int unshift_codeset;
 
-	ND_PRINT((ndo, "%s", ndo->ndo_eflag ? "" : "Q.933"));
+	ND_PRINT("%s", ndo->ndo_eflag ? "" : "Q.933");
 
 	if (length == 0 || !ND_TTEST_1(p)) {
 		if (!ndo->ndo_eflag)
-			ND_PRINT((ndo, ", "));
-		ND_PRINT((ndo, "length %u", length));
+			ND_PRINT(", ");
+		ND_PRINT("length %u", length);
 		goto trunc;
 	}
 
@@ -821,8 +821,8 @@ q933_print(netdissect_options *ndo,
 	for (i = 0; i < call_ref_length; i++) {
 		if (length == 0 || !ND_TTEST_1(p)) {
 			if (!ndo->ndo_eflag)
-				ND_PRINT((ndo, ", "));
-			ND_PRINT((ndo, "length %u", olen));
+				ND_PRINT(", ");
+			ND_PRINT("length %u", olen);
 			goto trunc;
 		}
 		call_ref[i] = EXTRACT_U_1(p);
@@ -835,8 +835,8 @@ q933_print(netdissect_options *ndo,
 	 */
 	if (length == 0 || !ND_TTEST_1(p)) {
 		if (!ndo->ndo_eflag)
-			ND_PRINT((ndo, ", "));
-		ND_PRINT((ndo, "length %u", olen));
+			ND_PRINT(", ");
+		ND_PRINT("length %u", olen);
 		goto trunc;
 	}
 	msgtype = EXTRACT_U_1(p);
@@ -851,8 +851,8 @@ q933_print(netdissect_options *ndo,
 	if (length != 0) {
 		if (!ND_TTEST_1(p)) {
 			if (!ndo->ndo_eflag)
-				ND_PRINT((ndo, ", "));
-			ND_PRINT((ndo, "length %u", olen));
+				ND_PRINT(", ");
+			ND_PRINT("length %u", olen);
 			goto trunc;
 		}
 		iecode = EXTRACT_U_1(p);
@@ -901,8 +901,8 @@ q933_print(netdissect_options *ndo,
 
 	/* printing out header part */
 	if (!ndo->ndo_eflag)
-		ND_PRINT((ndo, ", "));
-	ND_PRINT((ndo, "%s, codeset %u", is_ansi ? "ANSI" : "CCITT", codeset));
+		ND_PRINT(", ");
+	ND_PRINT("%s, codeset %u", is_ansi ? "ANSI" : "CCITT", codeset);
 
 	if (call_ref_length != 0) {
 		ND_TCHECK_1(p);
@@ -910,21 +910,21 @@ q933_print(netdissect_options *ndo,
 			/*
 			 * Not a dummy call reference.
 			 */
-			ND_PRINT((ndo, ", Call Ref: 0x"));
+			ND_PRINT(", Call Ref: 0x");
 			for (i = 0; i < call_ref_length; i++)
-				ND_PRINT((ndo, "%02x", call_ref[i]));
+				ND_PRINT("%02x", call_ref[i]);
 		}
 	}
 	if (ndo->ndo_vflag) {
-		ND_PRINT((ndo, ", %s (0x%02x), length %u",
+		ND_PRINT(", %s (0x%02x), length %u",
 		   tok2str(fr_q933_msg_values,
 			"unknown message", msgtype),
 		   msgtype,
-		   olen));
+		   olen);
 	} else {
-		ND_PRINT((ndo, ", %s",
+		ND_PRINT(", %s",
 		       tok2str(fr_q933_msg_values,
-			       "unknown message 0x%02x", msgtype)));
+			       "unknown message 0x%02x", msgtype));
 	}
 
 	/* Loop through the rest of the IEs */
@@ -952,7 +952,7 @@ q933_print(netdissect_options *ndo,
 		 */
 		if (!ND_TTEST_1(p)) {
 			if (!ndo->ndo_vflag) {
-				ND_PRINT((ndo, ", length %u", olen));
+				ND_PRINT(", length %u", olen);
 			}
 			goto trunc;
 		}
@@ -995,7 +995,7 @@ q933_print(netdissect_options *ndo,
 			 */
 			if (length == 0 || !ND_TTEST_1(p)) {
 				if (!ndo->ndo_vflag) {
-					ND_PRINT((ndo, ", length %u", olen));
+					ND_PRINT(", length %u", olen);
 				}
 				goto trunc;
 			}
@@ -1007,11 +1007,11 @@ q933_print(netdissect_options *ndo,
 			 * however some IEs (DLCI Status, Link Verify)
 			 * are also interesting in non-verbose mode */
 			if (ndo->ndo_vflag) {
-				ND_PRINT((ndo, "\n\t%s IE (0x%02x), length %u: ",
+				ND_PRINT("\n\t%s IE (0x%02x), length %u: ",
 				    tok2str(fr_q933_ie_codesets[codeset],
 					"unknown", iecode),
 				    iecode,
-				    ielength));
+				    ielength);
 			}
 
 			/* sanity checks */
@@ -1020,7 +1020,7 @@ q933_print(netdissect_options *ndo,
 			}
 			if (length < ielength || !ND_TTEST_LEN(p, ielength)) {
 				if (!ndo->ndo_vflag) {
-					ND_PRINT((ndo, ", length %u", olen));
+					ND_PRINT(", length %u", olen);
 				}
 				goto trunc;
 			}
@@ -1054,12 +1054,12 @@ q933_print(netdissect_options *ndo,
 		}
 	}
 	if (!ndo->ndo_vflag) {
-	    ND_PRINT((ndo, ", length %u", olen));
+	    ND_PRINT(", length %u", olen);
 	}
 	return;
 
 trunc:
-	ND_PRINT((ndo, "[|q.933]"));
+	ND_PRINT("[|q.933]");
 }
 
 static int
@@ -1074,15 +1074,15 @@ fr_q933_print_ie_codeset_0_5(netdissect_options *ndo, u_int iecode,
         case FR_LMI_CCITT_REPORT_TYPE_IE:
             if (ielength < 1) {
                 if (!ndo->ndo_vflag) {
-                    ND_PRINT((ndo, ", "));
+                    ND_PRINT(", ");
 	        }
-                ND_PRINT((ndo, "Invalid REPORT TYPE IE"));
+                ND_PRINT("Invalid REPORT TYPE IE");
                 return 1;
             }
             if (ndo->ndo_vflag) {
-                ND_PRINT((ndo, "%s (%u)",
+                ND_PRINT("%s (%u)",
                        tok2str(fr_lmi_report_type_ie_values,"unknown",EXTRACT_U_1(p)),
-                       EXTRACT_U_1(p)));
+                       EXTRACT_U_1(p));
 	    }
             return 1;
 
@@ -1090,19 +1090,19 @@ fr_q933_print_ie_codeset_0_5(netdissect_options *ndo, u_int iecode,
         case FR_LMI_CCITT_LINK_VERIFY_IE:
         case FR_LMI_ANSI_LINK_VERIFY_IE_91:
             if (!ndo->ndo_vflag) {
-                ND_PRINT((ndo, ", "));
+                ND_PRINT(", ");
 	    }
             if (ielength < 2) {
-                ND_PRINT((ndo, "Invalid LINK VERIFY IE"));
+                ND_PRINT("Invalid LINK VERIFY IE");
                 return 1;
             }
-            ND_PRINT((ndo, "TX Seq: %3d, RX Seq: %3d", EXTRACT_U_1(p), EXTRACT_U_1(p + 1)));
+            ND_PRINT("TX Seq: %3d, RX Seq: %3d", EXTRACT_U_1(p), EXTRACT_U_1(p + 1));
             return 1;
 
         case FR_LMI_ANSI_PVC_STATUS_IE: /* fall through */
         case FR_LMI_CCITT_PVC_STATUS_IE:
             if (!ndo->ndo_vflag) {
-                ND_PRINT((ndo, ", "));
+                ND_PRINT(", ");
 	    }
             /* now parse the DLCI information element. */
             if ((ielength < 3) ||
@@ -1115,7 +1115,7 @@ fr_q933_print_ie_codeset_0_5(netdissect_options *ndo, u_int iecode,
                    !(EXTRACT_U_1(p + 3) & 0x80))) ||
                 (ielength > 5) ||
                 !(EXTRACT_U_1(p + ielength - 1) & 0x80)) {
-                ND_PRINT((ndo, "Invalid DLCI in PVC STATUS IE"));
+                ND_PRINT("Invalid DLCI in PVC STATUS IE");
                 return 1;
 	    }
 
@@ -1127,9 +1127,9 @@ fr_q933_print_ie_codeset_0_5(netdissect_options *ndo, u_int iecode,
                 dlci = (dlci << 13) | (EXTRACT_U_1(p + 2) & 0x7F) | ((EXTRACT_U_1(p + 3) & 0x7E) >> 1);
 	    }
 
-            ND_PRINT((ndo, "DLCI %u: status %s%s", dlci,
+            ND_PRINT("DLCI %u: status %s%s", dlci,
                     EXTRACT_U_1(p + ielength - 1) & 0x8 ? "New, " : "",
-                    EXTRACT_U_1(p + ielength - 1) & 0x2 ? "Active" : "Inactive"));
+                    EXTRACT_U_1(p + ielength - 1) & 0x2 ? "Active" : "Inactive");
             return 1;
 	}
 

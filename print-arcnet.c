@@ -130,47 +130,47 @@ arcnet_print(netdissect_options *ndo, const u_char *bp, u_int length, int phds,
 
 
 	if (ndo->ndo_qflag) {
-		ND_PRINT((ndo, "%02x %02x %u: ",
+		ND_PRINT("%02x %02x %u: ",
 			     EXTRACT_U_1(ap->arc_shost),
 			     EXTRACT_U_1(ap->arc_dhost),
-			     length));
+			     length);
 		return;
 	}
 
 	arctypename = tok2str(arctypemap, "%02x", EXTRACT_U_1(ap->arc_type));
 
 	if (!phds) {
-		ND_PRINT((ndo, "%02x %02x %s %d: ",
+		ND_PRINT("%02x %02x %s %d: ",
 			     EXTRACT_U_1(ap->arc_shost),
 			     EXTRACT_U_1(ap->arc_dhost),
 			     arctypename,
-			     length));
+			     length);
 		return;
 	}
 
 	if (flag == 0) {
-		ND_PRINT((ndo, "%02x %02x %s seqid %04x %d: ",
+		ND_PRINT("%02x %02x %s seqid %04x %d: ",
 			EXTRACT_U_1(ap->arc_shost),
 			EXTRACT_U_1(ap->arc_dhost),
 			arctypename, seqid,
-			length));
+			length);
 		return;
 	}
 
 	if (flag & 1)
-		ND_PRINT((ndo, "%02x %02x %s seqid %04x "
+		ND_PRINT("%02x %02x %s seqid %04x "
 			"(first of %d fragments) %d: ",
 			EXTRACT_U_1(ap->arc_shost),
 			EXTRACT_U_1(ap->arc_dhost),
 			arctypename, seqid,
-			(flag + 3) / 2, length));
+			(flag + 3) / 2, length);
 	else
-		ND_PRINT((ndo, "%02x %02x %s seqid %04x "
+		ND_PRINT("%02x %02x %s seqid %04x "
 			"(fragment %d) %d: ",
 			EXTRACT_U_1(ap->arc_shost),
 			EXTRACT_U_1(ap->arc_dhost),
 			arctypename, seqid,
-			flag/2 + 1, length));
+			flag/2 + 1, length);
 }
 
 /*
@@ -191,7 +191,7 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 	u_char arc_type;
 
 	if (caplen < ARC_HDRLEN || length < ARC_HDRLEN) {
-		ND_PRINT((ndo, "[|arcnet]"));
+		ND_PRINT("[|arcnet]");
 		return (caplen);
 	}
 
@@ -213,7 +213,7 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 	if (phds) {
 		if (caplen < ARC_HDRNEWLEN || length < ARC_HDRNEWLEN) {
 			arcnet_print(ndo, p, length, 0, 0, 0);
-			ND_PRINT((ndo, "[|phds]"));
+			ND_PRINT("[|phds]");
 			return (caplen);
 		}
 
@@ -221,7 +221,7 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 		if (flag == 0xff) {
 			if (caplen < ARC_HDRNEWLEN_EXC || length < ARC_HDRNEWLEN_EXC) {
 				arcnet_print(ndo, p, length, 0, 0, 0);
-				ND_PRINT((ndo, "[|phds extended]"));
+				ND_PRINT("[|phds extended]");
 				return (caplen);
 			}
 			flag = EXTRACT_U_1(ap->arc_flag2);
@@ -278,7 +278,7 @@ arcnet_linux_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, cons
 	u_char arc_type;
 
 	if (caplen < ARC_LINUX_HDRLEN || length < ARC_LINUX_HDRLEN) {
-		ND_PRINT((ndo, "[|arcnet]"));
+		ND_PRINT("[|arcnet]");
 		return (caplen);
 	}
 
@@ -289,7 +289,7 @@ arcnet_linux_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, cons
 	default:
 		archdrlen = ARC_LINUX_HDRNEWLEN;
 		if (caplen < ARC_LINUX_HDRNEWLEN || length < ARC_LINUX_HDRNEWLEN) {
-			ND_PRINT((ndo, "[|arcnet]"));
+			ND_PRINT("[|arcnet]");
 			return (caplen);
 		}
 		break;
@@ -347,7 +347,7 @@ arcnet_encap_print(netdissect_options *ndo, u_char arctype, const u_char *p,
 
 	case ARCTYPE_ATALK:	/* XXX was this ever used? */
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo, "et1 "));
+			ND_PRINT("et1 ");
 		atalk_print(ndo, p, length);
 		return (1);
 

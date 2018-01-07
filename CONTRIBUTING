@@ -118,7 +118,7 @@ d) The printer may receive incomplete packet in the buffer, truncated at any
    For ND_TCHECK_LEN:
      Define : static const char tstr[] = " [|protocol]";
      Define a label: trunc
-     Print with: ND_PRINT((ndo, "%s", tstr));
+     Print with: ND_PRINT("%s", tstr);
    You can test the code via:
      sudo ./tcpdump -s snaplen [-v][v][...] -i lo # in a terminal
      sudo tcpreplay -i lo sample.pcap             # in another terminal
@@ -128,7 +128,7 @@ e) Do invalid packet checks in code: Think that your code can receive in input
    not only a valid packet but any arbitrary random sequence of octets (packet
    - built malformed originally by the sender or by a fuzz tester,
    - became corrupted in transit).
-   Print with: ND_PRINT((ndo, "%s", istr));	/* to print " (invalid)" */
+   Print with: ND_PRINT("%s", istr);	/* to print " (invalid)" */
 
 f) Use 'struct tok' for indexed strings and print them with
    tok2str() or bittok2str() (for flags).

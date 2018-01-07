@@ -73,12 +73,12 @@ sunatm_if_print(netdissect_options *ndo,
 	u_int traftype;
 
 	if (caplen < PKT_BEGIN_POS) {
-		ND_PRINT((ndo, "[|atm]"));
+		ND_PRINT("[|atm]");
 		return (caplen);
 	}
 
 	if (ndo->ndo_eflag) {
-		ND_PRINT((ndo, EXTRACT_U_1(p + DIR_POS) & 0x80 ? "Tx: " : "Rx: "));
+		ND_PRINT(EXTRACT_U_1(p + DIR_POS) & 0x80 ? "Tx: " : "Rx: ");
 	}
 
 	switch (EXTRACT_U_1(p + DIR_POS) & 0x0f) {

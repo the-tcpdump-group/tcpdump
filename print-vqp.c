@@ -120,32 +120,32 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
      * Sanity checking of the header.
      */
     if (version != VQP_VERSION) {
-	ND_PRINT((ndo, "VQP version %u packet not supported",
-               version));
+	ND_PRINT("VQP version %u packet not supported",
+               version);
 	return;
     }
 
     /* in non-verbose mode just lets print the basic Message Type */
     if (ndo->ndo_vflag < 1) {
-        ND_PRINT((ndo, "VQPv%u %s Message, error-code %s (%u), length %u",
+        ND_PRINT("VQPv%u %s Message, error-code %s (%u), length %u",
                version,
                tok2str(vqp_msg_type_values, "unknown (%u)",EXTRACT_U_1(vqp_common_header->msg_type)),
                tok2str(vqp_error_code_values, "unknown (%u)",EXTRACT_U_1(vqp_common_header->error_code)),
 	       EXTRACT_U_1(vqp_common_header->error_code),
-               len));
+               len);
         return;
     }
 
     /* ok they seem to want to know everything - lets fully decode it */
     nitems = EXTRACT_U_1(vqp_common_header->nitems);
-    ND_PRINT((ndo, "\n\tVQPv%u, %s Message, error-code %s (%u), seq 0x%08x, items %u, length %u",
+    ND_PRINT("\n\tVQPv%u, %s Message, error-code %s (%u), seq 0x%08x, items %u, length %u",
            version,
 	   tok2str(vqp_msg_type_values, "unknown (%u)",EXTRACT_U_1(vqp_common_header->msg_type)),
 	   tok2str(vqp_error_code_values, "unknown (%u)",EXTRACT_U_1(vqp_common_header->error_code)),
 	   EXTRACT_U_1(vqp_common_header->error_code),
            EXTRACT_BE_U_4(vqp_common_header->sequence),
            nitems,
-           len));
+           len);
 
     /* skip VQP Common header */
     tptr+=sizeof(struct vqp_common_header_t);
@@ -162,9 +162,9 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
         tptr+=sizeof(struct vqp_obj_tlv_t);
         tlen-=sizeof(struct vqp_obj_tlv_t);
 
-        ND_PRINT((ndo, "\n\t  %s Object (0x%08x), length %u, value: ",
+        ND_PRINT("\n\t  %s Object (0x%08x), length %u, value: ",
                tok2str(vqp_obj_values, "Unknown", vqp_obj_type),
-               vqp_obj_type, vqp_obj_len));
+               vqp_obj_type, vqp_obj_len);
 
         /* basic sanity check */
         if (vqp_obj_type == 0 || vqp_obj_len ==0) {
@@ -180,7 +180,7 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 	case VQP_OBJ_IP_ADDRESS:
             if (vqp_obj_len != 4)
                 goto trunc;
-            ND_PRINT((ndo, "%s (0x%08x)", ipaddr_string(ndo, tptr), EXTRACT_BE_U_4(tptr)));
+            ND_PRINT("%s (0x%08x)", ipaddr_string(ndo, tptr), EXTRACT_BE_U_4(tptr));
             break;
             /* those objects have similar semantics - fall through */
         case VQP_OBJ_PORT_NAME:
@@ -194,7 +194,7 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 	case VQP_OBJ_MAC_NULL:
             if (vqp_obj_len != MAC_ADDR_LEN)
                 goto trunc;
-	      ND_PRINT((ndo, "%s", etheraddr_string(ndo, tptr)));
+	      ND_PRINT("%s", etheraddr_string(ndo, tptr));
               break;
         default:
             if (ndo->ndo_vflag <= 1)
@@ -207,5 +207,5 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
     }
     return;
 trunc:
-    ND_PRINT((ndo, "\n\t[|VQP]"));
+    ND_PRINT("\n\t[|VQP]");
 }

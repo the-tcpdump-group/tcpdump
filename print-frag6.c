@@ -44,16 +44,16 @@ frag6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2)
 	ND_TCHECK_SIZE(dp);
 
 	if (ndo->ndo_vflag) {
-		ND_PRINT((ndo, "frag (0x%08x:%d|%ld)",
+		ND_PRINT("frag (0x%08x:%d|%ld)",
 		       EXTRACT_BE_U_4(&dp->ip6f_ident),
 		       EXTRACT_BE_U_2(&dp->ip6f_offlg) & IP6F_OFF_MASK,
 		       sizeof(struct ip6_hdr) + EXTRACT_BE_U_2(&ip6->ip6_plen) -
-		       (long)(bp - bp2) - sizeof(struct ip6_frag)));
+		       (long)(bp - bp2) - sizeof(struct ip6_frag));
 	} else {
-		ND_PRINT((ndo, "frag (%d|%ld)",
+		ND_PRINT("frag (%d|%ld)",
 		       EXTRACT_BE_U_2(&dp->ip6f_offlg) & IP6F_OFF_MASK,
 		       sizeof(struct ip6_hdr) + EXTRACT_BE_U_2(&ip6->ip6_plen) -
-		       (long)(bp - bp2) - sizeof(struct ip6_frag)));
+		       (long)(bp - bp2) - sizeof(struct ip6_frag));
 	}
 
 	/* it is meaningless to decode non-first fragment */
@@ -61,10 +61,10 @@ frag6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2)
 		return -1;
 	else
 	{
-		ND_PRINT((ndo, " "));
+		ND_PRINT(" ");
 		return sizeof(struct ip6_frag);
 	}
 trunc:
-	ND_PRINT((ndo, "[|frag]"));
+	ND_PRINT("[|frag]");
 	return -1;
 }

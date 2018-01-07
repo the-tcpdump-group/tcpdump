@@ -254,14 +254,14 @@ atm_if_print(netdissect_options *ndo,
 	u_int hdrlen = 0;
 
 	if (caplen < 1 || length < 1) {
-		ND_PRINT((ndo, "%s", tstr));
+		ND_PRINT("%s", tstr);
 		return (caplen);
 	}
 
         /* Cisco Style NLPID ? */
         if (EXTRACT_U_1(p) == LLC_UI) {
             if (ndo->ndo_eflag)
-                ND_PRINT((ndo, "CNLPID "));
+                ND_PRINT("CNLPID ");
             isoclns_print(ndo, p + 1, length - 1);
             return hdrlen;
         }
@@ -271,7 +271,7 @@ atm_if_print(netdissect_options *ndo,
 	 * control field.
 	 */
 	if (caplen < 3 || length < 3) {
-		ND_PRINT((ndo, "%s", tstr));
+		ND_PRINT("%s", tstr);
 		return (caplen);
 	}
 
@@ -303,15 +303,15 @@ atm_if_print(netdissect_options *ndo,
 		 * new DLT_IEEE802_6 value if we added it?
 		 */
 		if (caplen < 20 || length < 20) {
-			ND_PRINT((ndo, "%s", tstr));
+			ND_PRINT("%s", tstr);
 			return (caplen);
 		}
 		if (ndo->ndo_eflag)
-			ND_PRINT((ndo, "%08x%08x %08x%08x ",
+			ND_PRINT("%08x%08x %08x%08x ",
 			       EXTRACT_BE_U_4(p),
 			       EXTRACT_BE_U_4(p + 4),
 			       EXTRACT_BE_U_4(p + 8),
-			       EXTRACT_BE_U_4(p + 12)));
+			       EXTRACT_BE_U_4(p + 12));
 		p += 20;
 		length -= 20;
 		caplen -= 20;
@@ -355,10 +355,10 @@ sig_print(netdissect_options *ndo,
 		 * protocol:Q.2931 for User to Network Interface
 		 * (UNI 3.1) signalling
 		 */
-		ND_PRINT((ndo, "Q.2931"));
+		ND_PRINT("Q.2931");
 		ND_TCHECK_1(p + MSG_TYPE_POS);
-		ND_PRINT((ndo, ":%s ",
-		    tok2str(msgtype2str, "msgtype#%d", EXTRACT_U_1(p + MSG_TYPE_POS))));
+		ND_PRINT(":%s ",
+		    tok2str(msgtype2str, "msgtype#%d", EXTRACT_U_1(p + MSG_TYPE_POS)));
 
 		/*
 		 * The call reference comes before the message type,
@@ -367,15 +367,15 @@ sig_print(netdissect_options *ndo,
 		 * the call reference.
 		 */
 		call_ref = EXTRACT_BE_U_3(p + CALL_REF_POS);
-		ND_PRINT((ndo, "CALL_REF:0x%06x", call_ref));
+		ND_PRINT("CALL_REF:0x%06x", call_ref);
 	} else {
 		/* SSCOP with some unknown protocol atop it */
-		ND_PRINT((ndo, "SSCOP, proto %d ", EXTRACT_U_1(p + PROTO_POS)));
+		ND_PRINT("SSCOP, proto %d ", EXTRACT_U_1(p + PROTO_POS));
 	}
 	return;
 
 trunc:
-	ND_PRINT((ndo, " %s", tstr));
+	ND_PRINT(" %s", tstr);
 }
 
 /*
@@ -387,7 +387,7 @@ atm_print(netdissect_options *ndo,
           u_int caplen)
 {
 	if (ndo->ndo_eflag)
-		ND_PRINT((ndo, "VPI:%u VCI:%u ", vpi, vci));
+		ND_PRINT("VPI:%u VCI:%u ", vpi, vci);
 
 	if (vpi == 0) {
 		switch (vci) {
@@ -397,7 +397,7 @@ atm_print(netdissect_options *ndo,
 			return;
 
 		case VCI_BCC:
-			ND_PRINT((ndo, "broadcast sig: "));
+			ND_PRINT("broadcast sig: ");
 			return;
 
 		case VCI_OAMF4SC: /* fall through */
@@ -406,11 +406,11 @@ atm_print(netdissect_options *ndo,
 			return;
 
 		case VCI_METAC:
-			ND_PRINT((ndo, "meta: "));
+			ND_PRINT("meta: ");
 			return;
 
 		case VCI_ILMIC:
-			ND_PRINT((ndo, "ilmi: "));
+			ND_PRINT("ilmi: ");
 			snmp_print(ndo, p, length);
 			return;
 		}
@@ -470,26 +470,26 @@ oam_print (netdissect_options *ndo,
     payload = (cell_header>>1)&0x7;
     clp = cell_header&0x1;
 
-    ND_PRINT((ndo, "%s, vpi %u, vci %u, payload [ %s ], clp %u, length %u",
+    ND_PRINT("%s, vpi %u, vci %u, payload [ %s ], clp %u, length %u",
            tok2str(oam_f_values, "OAM F5", vci),
            vpi, vci,
            tok2str(atm_pty_values, "Unknown", payload),
-           clp, length));
+           clp, length);
 
     if (!ndo->ndo_vflag) {
         return;
     }
 
-    ND_PRINT((ndo, "\n\tcell-type %s (%u)",
+    ND_PRINT("\n\tcell-type %s (%u)",
            tok2str(oam_celltype_values, "unknown", cell_type),
-           cell_type));
+           cell_type);
 
     if (oam_functype_values[cell_type] == NULL)
-        ND_PRINT((ndo, ", func-type unknown (%u)", func_type));
+        ND_PRINT(", func-type unknown (%u)", func_type);
     else
-        ND_PRINT((ndo, ", func-type %s (%u)",
+        ND_PRINT(", func-type %s (%u)",
                tok2str(oam_functype_values[cell_type],"none",func_type),
-               func_type));
+               func_type);
 
     p += ATM_HDR_LEN_NOHEC + hec;
 
@@ -497,21 +497,21 @@ oam_print (netdissect_options *ndo,
     case (OAM_CELLTYPE_FM << 4 | OAM_FM_FUNCTYPE_LOOPBACK):
         oam_ptr.oam_fm_loopback = (const struct oam_fm_loopback_t *)(p + OAM_CELLTYPE_FUNCTYPE_LEN);
         ND_TCHECK_SIZE(oam_ptr.oam_fm_loopback);
-        ND_PRINT((ndo, "\n\tLoopback-Indicator %s, Correlation-Tag 0x%08x",
+        ND_PRINT("\n\tLoopback-Indicator %s, Correlation-Tag 0x%08x",
                tok2str(oam_fm_loopback_indicator_values,
                        "Unknown",
                        EXTRACT_U_1(oam_ptr.oam_fm_loopback->loopback_indicator) & OAM_FM_LOOPBACK_INDICATOR_MASK),
-               EXTRACT_BE_U_4(oam_ptr.oam_fm_loopback->correlation_tag)));
-        ND_PRINT((ndo, "\n\tLocation-ID "));
+               EXTRACT_BE_U_4(oam_ptr.oam_fm_loopback->correlation_tag));
+        ND_PRINT("\n\tLocation-ID ");
         for (idx = 0; idx < sizeof(oam_ptr.oam_fm_loopback->loopback_id); idx++) {
             if (idx % 2) {
-                ND_PRINT((ndo, "%04x ", EXTRACT_BE_U_2(&oam_ptr.oam_fm_loopback->loopback_id[idx])));
+                ND_PRINT("%04x ", EXTRACT_BE_U_2(&oam_ptr.oam_fm_loopback->loopback_id[idx]));
             }
         }
-        ND_PRINT((ndo, "\n\tSource-ID   "));
+        ND_PRINT("\n\tSource-ID   ");
         for (idx = 0; idx < sizeof(oam_ptr.oam_fm_loopback->source_id); idx++) {
             if (idx % 2) {
-                ND_PRINT((ndo, "%04x ", EXTRACT_BE_U_2(&oam_ptr.oam_fm_loopback->source_id[idx])));
+                ND_PRINT("%04x ", EXTRACT_BE_U_2(&oam_ptr.oam_fm_loopback->source_id[idx]));
             }
         }
         break;
@@ -520,11 +520,11 @@ oam_print (netdissect_options *ndo,
     case (OAM_CELLTYPE_FM << 4 | OAM_FM_FUNCTYPE_RDI):
         oam_ptr.oam_fm_ais_rdi = (const struct oam_fm_ais_rdi_t *)(p + OAM_CELLTYPE_FUNCTYPE_LEN);
         ND_TCHECK_SIZE(oam_ptr.oam_fm_ais_rdi);
-        ND_PRINT((ndo, "\n\tFailure-type 0x%02x", EXTRACT_U_1(oam_ptr.oam_fm_ais_rdi->failure_type)));
-        ND_PRINT((ndo, "\n\tLocation-ID "));
+        ND_PRINT("\n\tFailure-type 0x%02x", EXTRACT_U_1(oam_ptr.oam_fm_ais_rdi->failure_type));
+        ND_PRINT("\n\tLocation-ID ");
         for (idx = 0; idx < sizeof(oam_ptr.oam_fm_ais_rdi->failure_location); idx++) {
             if (idx % 2) {
-                ND_PRINT((ndo, "%04x ", EXTRACT_BE_U_2(&oam_ptr.oam_fm_ais_rdi->failure_location[idx])));
+                ND_PRINT("%04x ", EXTRACT_BE_U_2(&oam_ptr.oam_fm_ais_rdi->failure_location[idx]));
             }
         }
         break;
@@ -543,13 +543,13 @@ oam_print (netdissect_options *ndo,
         & OAM_CRC10_MASK;
     cksum_shouldbe = verify_crc10_cksum(0, p, OAM_PAYLOAD_LEN);
 
-    ND_PRINT((ndo, "\n\tcksum 0x%03x (%scorrect)",
+    ND_PRINT("\n\tcksum 0x%03x (%scorrect)",
            cksum,
-           cksum_shouldbe == 0 ? "" : "in"));
+           cksum_shouldbe == 0 ? "" : "in");
 
     return;
 
 trunc:
-    ND_PRINT((ndo, "[|oam]"));
+    ND_PRINT("[|oam]");
     return;
 }

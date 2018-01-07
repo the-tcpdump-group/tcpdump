@@ -41,13 +41,13 @@ msdp_print(netdissect_options *ndo, const u_char *sp, u_int length)
 	len = EXTRACT_BE_U_2(sp + 1);
 	if (len > 1500 || len < 3 || type == 0 || type > MSDP_TYPE_MAX)
 		goto trunc;	/* not really truncated, but still not decodable */
-	ND_PRINT((ndo, " msdp:"));
+	ND_PRINT(" msdp:");
 	while (length > 0) {
 		ND_TCHECK_3(sp);
 		type = EXTRACT_U_1(sp);
 		len = EXTRACT_BE_U_2(sp + 1);
 		if (len > 1400 || ndo->ndo_vflag)
-			ND_PRINT((ndo, " [len %u]", len));
+			ND_PRINT(" [len %u]", len);
 		if (len < 3)
 			goto trunc;
 		sp += 3;
@@ -56,15 +56,15 @@ msdp_print(netdissect_options *ndo, const u_char *sp, u_int length)
 		case 1:	/* IPv4 Source-Active */
 		case 3: /* IPv4 Source-Active Response */
 			if (type == 1)
-				ND_PRINT((ndo, " SA"));
+				ND_PRINT(" SA");
 			else
-				ND_PRINT((ndo, " SA-Response"));
+				ND_PRINT(" SA-Response");
 			ND_TCHECK_1(sp);
-			ND_PRINT((ndo, " %u entries", EXTRACT_U_1(sp)));
+			ND_PRINT(" %u entries", EXTRACT_U_1(sp));
 			if ((u_int)((EXTRACT_U_1(sp) * 12) + 8) < len) {
-				ND_PRINT((ndo, " [w/data]"));
+				ND_PRINT(" [w/data]");
 				if (ndo->ndo_vflag > 1) {
-					ND_PRINT((ndo, " "));
+					ND_PRINT(" ");
 					ip_print(ndo, sp +
 						 EXTRACT_U_1(sp) * 12 + 8 - 3,
 					         len - (EXTRACT_U_1(sp) * 12 + 8));
@@ -72,20 +72,20 @@ msdp_print(netdissect_options *ndo, const u_char *sp, u_int length)
 			}
 			break;
 		case 2:
-			ND_PRINT((ndo, " SA-Request"));
+			ND_PRINT(" SA-Request");
 			ND_TCHECK_5(sp);
-			ND_PRINT((ndo, " for %s", ipaddr_string(ndo, sp + 1)));
+			ND_PRINT(" for %s", ipaddr_string(ndo, sp + 1));
 			break;
 		case 4:
-			ND_PRINT((ndo, " Keepalive"));
+			ND_PRINT(" Keepalive");
 			if (len != 3)
-				ND_PRINT((ndo, "[len=%d] ", len));
+				ND_PRINT("[len=%d] ", len);
 			break;
 		case 5:
-			ND_PRINT((ndo, " Notification"));
+			ND_PRINT(" Notification");
 			break;
 		default:
-			ND_PRINT((ndo, " [type=%d len=%d]", type, len));
+			ND_PRINT(" [type=%d len=%d]", type, len);
 			break;
 		}
 		sp += (len - 3);
@@ -93,7 +93,7 @@ msdp_print(netdissect_options *ndo, const u_char *sp, u_int length)
 	}
 	return;
 trunc:
-	ND_PRINT((ndo, " [|msdp]"));
+	ND_PRINT(" [|msdp]");
 }
 
 /*

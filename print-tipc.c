@@ -182,18 +182,18 @@ print_payload(netdissect_options *ndo, const struct payload_tipc_pkthdr *ap)
 	orig_port = EXTRACT_BE_U_4(ap->orig_port);
 	dest_port = EXTRACT_BE_U_4(ap->dest_port);
 	if (hsize <= 6) {
-		ND_PRINT((ndo, "TIPC v%u.0 %u.%u.%u:%u > %u, headerlength %u bytes, MessageSize %u bytes, %s, messageType %s",
+		ND_PRINT("TIPC v%u.0 %u.%u.%u:%u > %u, headerlength %u bytes, MessageSize %u bytes, %s, messageType %s",
 		    TIPC_VER(w0),
 		    TIPC_ZONE(prev_node), TIPC_CLUSTER(prev_node), TIPC_NODE(prev_node),
 		    orig_port, dest_port,
 		    hsize*4, msize,
 		    tok2str(tipcuser_values, "unknown", user),
-		    tok2str(tipcmtype_values, "Unknown", mtype)));
+		    tok2str(tipcmtype_values, "Unknown", mtype));
 	} else {
 		ND_TCHECK(ap->dest_node);
 		orig_node = EXTRACT_BE_U_4(ap->orig_node);
 		dest_node = EXTRACT_BE_U_4(ap->dest_node);
-		ND_PRINT((ndo, "TIPC v%u.0 %u.%u.%u:%u > %u.%u.%u:%u, headerlength %u bytes, MessageSize %u bytes, %s, messageType %s",
+		ND_PRINT("TIPC v%u.0 %u.%u.%u:%u > %u.%u.%u:%u, headerlength %u bytes, MessageSize %u bytes, %s, messageType %s",
 		    TIPC_VER(w0),
 		    TIPC_ZONE(orig_node), TIPC_CLUSTER(orig_node), TIPC_NODE(orig_node),
 		    orig_port,
@@ -201,22 +201,22 @@ print_payload(netdissect_options *ndo, const struct payload_tipc_pkthdr *ap)
 		    dest_port,
 		    hsize*4, msize,
 		    tok2str(tipcuser_values, "unknown", user),
-		    tok2str(tipcmtype_values, "Unknown", mtype)));
+		    tok2str(tipcmtype_values, "Unknown", mtype));
 
 		if (ndo->ndo_vflag) {
 			broadcast_ack = TIPC_BROADCAST_ACK(w1);
 			w2 = EXTRACT_BE_U_4(ap->w2);
 			link_ack = TIPC_LINK_ACK(w2);
 			link_seq = TIPC_LINK_SEQ(w2);
-			ND_PRINT((ndo, "\n\tPrevious Node %u.%u.%u, Broadcast Ack %u, Link Ack %u, Link Sequence %u",
+			ND_PRINT("\n\tPrevious Node %u.%u.%u, Broadcast Ack %u, Link Ack %u, Link Sequence %u",
 			    TIPC_ZONE(prev_node), TIPC_CLUSTER(prev_node), TIPC_NODE(prev_node),
-			    broadcast_ack, link_ack, link_seq));
+			    broadcast_ack, link_ack, link_seq);
 		}
 	}
 	return;
 
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	ND_PRINT("%s", tstr);
 }
 
 static void
@@ -250,13 +250,13 @@ print_internal(netdissect_options *ndo, const struct internal_tipc_pkthdr *ap)
 	mtype = TIPC_MTYPE(w1);
 	orig_node = EXTRACT_BE_U_4(ap->orig_node);
 	dest_node = EXTRACT_BE_U_4(ap->dest_node);
-	ND_PRINT((ndo, "TIPC v%u.0 %u.%u.%u > %u.%u.%u, headerlength %u bytes, MessageSize %u bytes, %s, messageType %s (0x%08x)",
+	ND_PRINT("TIPC v%u.0 %u.%u.%u > %u.%u.%u, headerlength %u bytes, MessageSize %u bytes, %s, messageType %s (0x%08x)",
 	    TIPC_VER(w0),
 	    TIPC_ZONE(orig_node), TIPC_CLUSTER(orig_node), TIPC_NODE(orig_node),
 	    TIPC_ZONE(dest_node), TIPC_CLUSTER(dest_node), TIPC_NODE(dest_node),
 	    hsize*4, msize,
 	    tok2str(tipcuser_values, "unknown", user),
-	    tok2str(tipcmtype_values, "Unknown", mtype), w1));
+	    tok2str(tipcmtype_values, "Unknown", mtype), w1);
 
 	if (ndo->ndo_vflag) {
 		ND_TCHECK_SIZE(ap);
@@ -275,16 +275,16 @@ print_internal(netdissect_options *ndo, const struct internal_tipc_pkthdr *ap)
 		w9 = EXTRACT_BE_U_4(ap->w9);
 		msg_cnt = TIPC_MSG_CNT(w9);
 		link_tol = TIPC_LINK_TOL(w9);
-		ND_PRINT((ndo, "\n\tPrevious Node %u.%u.%u, Session No. %u, Broadcast Ack %u, Sequence Gap %u,  Broadcast Gap After %u, Broadcast Gap To %u, Last Sent Packet No. %u, Next sent Packet No. %u, Transport Sequence %u, msg_count %u, Link Tolerance %u",
+		ND_PRINT("\n\tPrevious Node %u.%u.%u, Session No. %u, Broadcast Ack %u, Sequence Gap %u,  Broadcast Gap After %u, Broadcast Gap To %u, Last Sent Packet No. %u, Next sent Packet No. %u, Transport Sequence %u, msg_count %u, Link Tolerance %u",
 		    TIPC_ZONE(prev_node), TIPC_CLUSTER(prev_node), TIPC_NODE(prev_node),
 		    sess_no, broadcast_ack, seq_gap, bc_gap_after, bc_gap_to,
 		    last_sent_frag, next_sent_frag, trans_seq, msg_cnt,
-		    link_tol));
+		    link_tol);
 	}
 	return;
 
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	ND_PRINT("%s", tstr);
 }
 
 static void
@@ -311,26 +311,26 @@ print_link_conf(netdissect_options *ndo, const struct link_conf_tipc_pkthdr *ap)
 	dest_domain = EXTRACT_BE_U_4(ap->dest_domain);
 	prev_node = EXTRACT_BE_U_4(ap->prev_node);
 
-	ND_PRINT((ndo, "TIPC v%u.0 %u.%u.%u > %u.%u.%u, headerlength %u bytes, MessageSize %u bytes, %s, messageType %s",
+	ND_PRINT("TIPC v%u.0 %u.%u.%u > %u.%u.%u, headerlength %u bytes, MessageSize %u bytes, %s, messageType %s",
 	    TIPC_VER(w0),
 	    TIPC_ZONE(prev_node), TIPC_CLUSTER(prev_node), TIPC_NODE(prev_node),
 	    TIPC_ZONE(dest_domain), TIPC_CLUSTER(dest_domain), TIPC_NODE(dest_domain),
 	    hsize*4, msize,
 	    tok2str(tipcuser_values, "unknown", user),
-	    tok2str(tipc_linkconf_mtype_values, "Unknown", mtype)));
+	    tok2str(tipc_linkconf_mtype_values, "Unknown", mtype));
 	if (ndo->ndo_vflag) {
 		ND_TCHECK(ap->w5);
 		node_sig = TIPC_NODE_SIG(w1);
 		ntwrk_id = EXTRACT_BE_U_4(ap->ntwrk_id);
 		w5 = EXTRACT_BE_U_4(ap->w5);
 		media_id = TIPC_MEDIA_ID(w5);
-		ND_PRINT((ndo, "\n\tNodeSignature %u, network_id %u, media_id %u",
-		    node_sig, ntwrk_id, media_id));
+		ND_PRINT("\n\tNodeSignature %u, network_id %u, media_id %u",
+		    node_sig, ntwrk_id, media_id);
 	}
 	return;
 
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	ND_PRINT("%s", tstr);
 }
 
 void
@@ -373,7 +373,7 @@ tipc_print(netdissect_options *ndo, const u_char *bp, u_int length _U_,
 	return;
 
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	ND_PRINT("%s", tstr);
 }
 
 /*

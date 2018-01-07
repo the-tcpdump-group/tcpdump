@@ -65,7 +65,7 @@ ascii_print(netdissect_options *ndo,
 	caplength = (ndo->ndo_snapend >= cp) ? ndo->ndo_snapend - cp : 0;
 	if (length > caplength)
 		length = caplength;
-	ND_PRINT((ndo, "\n"));
+	ND_PRINT("\n");
 	while (length > 0) {
 		s = EXTRACT_U_1(cp);
 		cp++;
@@ -81,13 +81,13 @@ ascii_print(netdissect_options *ndo,
 			 * In the middle of a line, just print a '.'.
 			 */
 			if (length > 1 && EXTRACT_U_1(cp) != '\n')
-				ND_PRINT((ndo, "."));
+				ND_PRINT(".");
 		} else {
 			if (!ND_ISGRAPH(s) &&
 			    (s != '\t' && s != ' ' && s != '\n'))
-				ND_PRINT((ndo, "."));
+				ND_PRINT(".");
 			else
-				ND_PRINT((ndo, "%c", s));
+				ND_PRINT("%c", s);
 		}
 	}
 }
@@ -120,9 +120,9 @@ hex_and_ascii_print_with_offset(netdissect_options *ndo, const char *ident,
 		i++;
 		if (i >= HEXDUMP_SHORTS_PER_LINE) {
 			*hsp = *asp = '\0';
-			ND_PRINT((ndo, "%s0x%04x: %-*s  %s",
+			ND_PRINT("%s0x%04x: %-*s  %s",
 			    ident, oset, HEXDUMP_HEXSTUFF_PER_LINE,
-			    hexstuff, asciistuff));
+			    hexstuff, asciistuff);
 			i = 0; hsp = hexstuff; asp = asciistuff;
 			oset += HEXDUMP_BYTES_PER_LINE;
 		}
@@ -137,9 +137,9 @@ hex_and_ascii_print_with_offset(netdissect_options *ndo, const char *ident,
 	}
 	if (i > 0) {
 		*hsp = *asp = '\0';
-		ND_PRINT((ndo, "%s0x%04x: %-*s  %s",
+		ND_PRINT("%s0x%04x: %-*s  %s",
 		     ident, oset, HEXDUMP_HEXSTUFF_PER_LINE,
-		     hexstuff, asciistuff));
+		     hexstuff, asciistuff);
 	}
 }
 
@@ -169,16 +169,16 @@ hex_print_with_offset(netdissect_options *ndo,
 	i = 0;
 	while (--nshorts >= 0) {
 		if ((i++ % 8) == 0) {
-			ND_PRINT((ndo,"%s0x%04x: ", ident, oset));
+			ND_PRINT("%s0x%04x: ", ident, oset);
 			oset += HEXDUMP_BYTES_PER_LINE;
 		}
 		s = *cp++;
-		ND_PRINT((ndo," %02x%02x", s, *cp++));
+		ND_PRINT(" %02x%02x", s, *cp++);
 	}
 	if (length & 1) {
 		if ((i % 8) == 0)
-			ND_PRINT((ndo,"%s0x%04x: ", ident, oset));
-		ND_PRINT((ndo," %02x", *cp));
+			ND_PRINT("%s0x%04x: ", ident, oset);
+		ND_PRINT(" %02x", *cp);
 	}
 }
 

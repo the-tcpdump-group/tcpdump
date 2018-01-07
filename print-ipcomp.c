@@ -46,7 +46,7 @@ ipcomp_print(netdissect_options *ndo, const u_char *bp)
 	ND_TCHECK_SIZE(ipcomp);
 	cpi = EXTRACT_BE_U_2(ipcomp->comp_cpi);
 
-	ND_PRINT((ndo, "IPComp(cpi=0x%04x)", cpi));
+	ND_PRINT("IPComp(cpi=0x%04x)", cpi);
 
 	/*
 	 * XXX - based on the CPI, we could decompress the packet here.
@@ -64,6 +64,6 @@ ipcomp_print(netdissect_options *ndo, const u_char *bp)
 	return;
 
 trunc:
-	ND_PRINT((ndo, "[|IPCOMP]"));
+	ND_PRINT("[|IPCOMP]");
 	return;
 }

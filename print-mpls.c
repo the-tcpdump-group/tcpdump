@@ -65,25 +65,25 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	enum mpls_packet_type pt = PT_UNKNOWN;
 
 	p = bp;
-	ND_PRINT((ndo, "MPLS"));
+	ND_PRINT("MPLS");
 	do {
 		ND_TCHECK_LEN(p, sizeof(label_entry));
 		if (length < sizeof(label_entry)) {
-			ND_PRINT((ndo, "[|MPLS], length %u", length));
+			ND_PRINT("[|MPLS], length %u", length);
 			return;
 		}
 		label_entry = EXTRACT_BE_U_4(p);
-		ND_PRINT((ndo, "%s(label %u",
+		ND_PRINT("%s(label %u",
 		       (label_stack_depth && ndo->ndo_vflag) ? "\n\t" : " ",
-       		       MPLS_LABEL(label_entry)));
+       		       MPLS_LABEL(label_entry));
 		label_stack_depth++;
 		if (ndo->ndo_vflag &&
 		    MPLS_LABEL(label_entry) < sizeof(mpls_labelname) / sizeof(mpls_labelname[0]))
-			ND_PRINT((ndo, " (%s)", mpls_labelname[MPLS_LABEL(label_entry)]));
-		ND_PRINT((ndo, ", exp %u", MPLS_EXP(label_entry)));
+			ND_PRINT(" (%s)", mpls_labelname[MPLS_LABEL(label_entry)]);
+		ND_PRINT(", exp %u", MPLS_EXP(label_entry));
 		if (MPLS_STACK(label_entry))
-			ND_PRINT((ndo, ", [S]"));
-		ND_PRINT((ndo, ", ttl %u)", MPLS_TTL(label_entry)));
+			ND_PRINT(", [S]");
+		ND_PRINT(", ttl %u)", MPLS_TTL(label_entry));
 
 		p += sizeof(label_entry);
 		length -= sizeof(label_entry);
@@ -189,7 +189,7 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			ND_DEFAULTPRINT(p, length);
 		return;
 	}
-	ND_PRINT((ndo, ndo->ndo_vflag ? "\n\t" : " "));
+	ND_PRINT(ndo->ndo_vflag ? "\n\t" : " ");
 	switch (pt) {
 
 	case PT_IPV4:
@@ -210,7 +210,7 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	return;
 
 trunc:
-	ND_PRINT((ndo, "[|MPLS]"));
+	ND_PRINT("[|MPLS]");
 }
 
 

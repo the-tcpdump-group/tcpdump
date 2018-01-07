@@ -107,9 +107,9 @@ vat_print(netdissect_options *ndo, const void *hdr, const struct udphdr *up)
 	if ((ts & 0xf060) != 0) {
 		/* probably vt */
 		ND_TCHECK_2(up->uh_ulen);
-		ND_PRINT((ndo, "udp/vt %u %d / %d",
+		ND_PRINT("udp/vt %u %d / %d",
 			     (uint32_t)(EXTRACT_BE_U_2(up->uh_ulen) - sizeof(*up)),
-			     ts & 0x3ff, ts >> 10));
+			     ts & 0x3ff, ts >> 10);
 	} else {
 		/* probably vat */
 		uint32_t i0, i1;
@@ -119,19 +119,19 @@ vat_print(netdissect_options *ndo, const void *hdr, const struct udphdr *up)
 		ND_TCHECK_4(&((const u_int *)hdr)[1]);
 		i1 = EXTRACT_BE_U_4(&((const u_int *)hdr)[1]);
 		ND_TCHECK_2(up->uh_ulen);
-		ND_PRINT((ndo, "udp/vat %u c%d %u%s",
+		ND_PRINT("udp/vat %u c%d %u%s",
 			(uint32_t)(EXTRACT_BE_U_2(up->uh_ulen) - sizeof(*up) - 8),
 			i0 & 0xffff,
-			i1, i0 & 0x800000? "*" : ""));
+			i1, i0 & 0x800000? "*" : "");
 		/* audio format */
 		if (i0 & 0x1f0000)
-			ND_PRINT((ndo, " f%d", (i0 >> 16) & 0x1f));
+			ND_PRINT(" f%d", (i0 >> 16) & 0x1f);
 		if (i0 & 0x3f000000)
-			ND_PRINT((ndo, " s%d", (i0 >> 24) & 0x3f));
+			ND_PRINT(" s%d", (i0 >> 24) & 0x3f);
 	}
 
 trunc:
-	ND_PRINT((ndo, "%s", vat_tstr));
+	ND_PRINT("%s", vat_tstr);
 }
 
 static void
@@ -171,17 +171,17 @@ rtp_print(netdissect_options *ndo, const void *hdr, u_int len,
 		ip += 1;
 		len -= 1;
 	}
-	ND_PRINT((ndo, "udp/%s %d c%d %s%s %d %u",
+	ND_PRINT("udp/%s %d c%d %s%s %d %u",
 		ptype,
 		dlen,
 		contype,
 		(hasopt || hasext)? "+" : "",
 		hasmarker? "*" : "",
 		i0 & 0xffff,
-		i1));
+		i1);
 	if (ndo->ndo_vflag) {
 		ND_TCHECK_4(&((const u_int *)hdr)[2]);
-		ND_PRINT((ndo, " %u", EXTRACT_BE_U_4(&((const u_int *)hdr)[2])));
+		ND_PRINT(" %u", EXTRACT_BE_U_4(&((const u_int *)hdr)[2]));
 		if (hasopt) {
 			u_int i2, optlen;
 			do {
@@ -189,7 +189,7 @@ rtp_print(netdissect_options *ndo, const void *hdr, u_int len,
 				i2 = EXTRACT_BE_U_4(ip);
 				optlen = (i2 >> 16) & 0xff;
 				if (optlen == 0 || optlen > len) {
-					ND_PRINT((ndo, " !opt"));
+					ND_PRINT(" !opt");
 					return;
 				}
 				ip += optlen;
@@ -202,18 +202,18 @@ rtp_print(netdissect_options *ndo, const void *hdr, u_int len,
 			i2 = EXTRACT_BE_U_4(ip);
 			extlen = (i2 & 0xffff) + 1;
 			if (extlen > len) {
-				ND_PRINT((ndo, " !ext"));
+				ND_PRINT(" !ext");
 				return;
 			}
 			ip += extlen;
 		}
 		ND_TCHECK_4(ip);
 		if (contype == 0x1f) /*XXX H.261 */
-			ND_PRINT((ndo, " 0x%04x", EXTRACT_BE_U_4(ip) >> 16));
+			ND_PRINT(" 0x%04x", EXTRACT_BE_U_4(ip) >> 16);
 	}
 
 trunc:
-	ND_PRINT((ndo, "%s", rtp_tstr));
+	ND_PRINT("%s", rtp_tstr);
 }
 
 static const u_char *
@@ -236,65 +236,65 @@ rtcp_print(netdissect_options *ndo, const u_char *hdr, const u_char *ep)
 	switch (flags & 0xff) {
 	case RTCP_PT_SR:
 		sr = (const struct rtcp_sr *)(rh + 1);
-		ND_PRINT((ndo, " sr"));
+		ND_PRINT(" sr");
 		if (len != cnt * sizeof(*rr) + sizeof(*sr) + sizeof(*rh))
-			ND_PRINT((ndo, " [%d]", len));
+			ND_PRINT(" [%d]", len);
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo, " %u", EXTRACT_BE_U_4(rh->rh_ssrc)));
+			ND_PRINT(" %u", EXTRACT_BE_U_4(rh->rh_ssrc));
 		if ((const u_char *)(sr + 1) > ep)
 			goto trunc;
 		ND_TCHECK_SIZE(sr);
 		ts = (double)(EXTRACT_BE_U_4(sr->sr_ntp.upper)) +
 		    ((double)(EXTRACT_BE_U_4(sr->sr_ntp.lower)) /
 		     4294967296.0);
-		ND_PRINT((ndo, " @%.2f %u %up %ub", ts, EXTRACT_BE_U_4(sr->sr_ts),
-			  EXTRACT_BE_U_4(sr->sr_np), EXTRACT_BE_U_4(sr->sr_nb)));
+		ND_PRINT(" @%.2f %u %up %ub", ts, EXTRACT_BE_U_4(sr->sr_ts),
+			  EXTRACT_BE_U_4(sr->sr_np), EXTRACT_BE_U_4(sr->sr_nb));
 		rr = (const struct rtcp_rr *)(sr + 1);
 		break;
 	case RTCP_PT_RR:
-		ND_PRINT((ndo, " rr"));
+		ND_PRINT(" rr");
 		if (len != cnt * sizeof(*rr) + sizeof(*rh))
-			ND_PRINT((ndo, " [%d]", len));
+			ND_PRINT(" [%d]", len);
 		rr = (const struct rtcp_rr *)(rh + 1);
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo, " %u", EXTRACT_BE_U_4(rh->rh_ssrc)));
+			ND_PRINT(" %u", EXTRACT_BE_U_4(rh->rh_ssrc));
 		break;
 	case RTCP_PT_SDES:
-		ND_PRINT((ndo, " sdes %d", len));
+		ND_PRINT(" sdes %d", len);
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo, " %u", EXTRACT_BE_U_4(rh->rh_ssrc)));
+			ND_PRINT(" %u", EXTRACT_BE_U_4(rh->rh_ssrc));
 		cnt = 0;
 		break;
 	case RTCP_PT_BYE:
-		ND_PRINT((ndo, " bye %d", len));
+		ND_PRINT(" bye %d", len);
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo, " %u", EXTRACT_BE_U_4(rh->rh_ssrc)));
+			ND_PRINT(" %u", EXTRACT_BE_U_4(rh->rh_ssrc));
 		cnt = 0;
 		break;
 	default:
-		ND_PRINT((ndo, " type-0x%x %d", flags & 0xff, len));
+		ND_PRINT(" type-0x%x %d", flags & 0xff, len);
 		cnt = 0;
 		break;
 	}
 	if (cnt > 1)
-		ND_PRINT((ndo, " c%d", cnt));
+		ND_PRINT(" c%d", cnt);
 	while (--cnt >= 0) {
 		if ((const u_char *)(rr + 1) > ep)
 			goto trunc;
 		ND_TCHECK_SIZE(rr);
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo, " %u", EXTRACT_BE_U_4(rr->rr_srcid)));
+			ND_PRINT(" %u", EXTRACT_BE_U_4(rr->rr_srcid));
 		ts = (double)(EXTRACT_BE_U_4(rr->rr_lsr)) / 65536.;
 		dts = (double)(EXTRACT_BE_U_4(rr->rr_dlsr)) / 65536.;
-		ND_PRINT((ndo, " %ul %us %uj @%.2f+%.2f",
+		ND_PRINT(" %ul %us %uj @%.2f+%.2f",
 		    EXTRACT_BE_U_4(rr->rr_nl) & 0x00ffffff,
 		    EXTRACT_BE_U_4(rr->rr_ls),
-		    EXTRACT_BE_U_4(rr->rr_dv), ts, dts));
+		    EXTRACT_BE_U_4(rr->rr_dv), ts, dts);
 	}
 	return (hdr + len);
 
 trunc:
-	ND_PRINT((ndo, "%s", rtcp_tstr));
+	ND_PRINT("%s", rtcp_tstr);
 	return ep;
 }
 
@@ -326,41 +326,41 @@ udpipaddr_print(netdissect_options *ndo, const struct ip *ip, int sport, int dpo
 	if (ip6) {
 		if (EXTRACT_U_1(ip6->ip6_nxt) == IPPROTO_UDP) {
 			if (sport == -1) {
-				ND_PRINT((ndo, "%s > %s: ",
+				ND_PRINT("%s > %s: ",
 					ip6addr_string(ndo, &ip6->ip6_src),
-					ip6addr_string(ndo, &ip6->ip6_dst)));
+					ip6addr_string(ndo, &ip6->ip6_dst));
 			} else {
-				ND_PRINT((ndo, "%s.%s > %s.%s: ",
+				ND_PRINT("%s.%s > %s.%s: ",
 					ip6addr_string(ndo, &ip6->ip6_src),
 					udpport_string(ndo, sport),
 					ip6addr_string(ndo, &ip6->ip6_dst),
-					udpport_string(ndo, dport)));
+					udpport_string(ndo, dport));
 			}
 		} else {
 			if (sport != -1) {
-				ND_PRINT((ndo, "%s > %s: ",
+				ND_PRINT("%s > %s: ",
 					udpport_string(ndo, sport),
-					udpport_string(ndo, dport)));
+					udpport_string(ndo, dport));
 			}
 		}
 	} else {
 		if (EXTRACT_U_1(ip->ip_p) == IPPROTO_UDP) {
 			if (sport == -1) {
-				ND_PRINT((ndo, "%s > %s: ",
+				ND_PRINT("%s > %s: ",
 					ipaddr_string(ndo, &ip->ip_src),
-					ipaddr_string(ndo, &ip->ip_dst)));
+					ipaddr_string(ndo, &ip->ip_dst));
 			} else {
-				ND_PRINT((ndo, "%s.%s > %s.%s: ",
+				ND_PRINT("%s.%s > %s.%s: ",
 					ipaddr_string(ndo, &ip->ip_src),
 					udpport_string(ndo, sport),
 					ipaddr_string(ndo, &ip->ip_dst),
-					udpport_string(ndo, dport)));
+					udpport_string(ndo, dport));
 			}
 		} else {
 			if (sport != -1) {
-				ND_PRINT((ndo, "%s > %s: ",
+				ND_PRINT("%s > %s: ",
 					udpport_string(ndo, sport),
-					udpport_string(ndo, dport)));
+					udpport_string(ndo, dport));
 			}
 		}
 	}
@@ -395,7 +395,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 
 	if (length < sizeof(struct udphdr)) {
 		udpipaddr_print(ndo, ip, sport, dport);
-		ND_PRINT((ndo, "truncated-udp %d", length));
+		ND_PRINT("truncated-udp %d", length);
 		return;
 	}
 	if (!ND_TTEST(up->uh_ulen)) {
@@ -405,7 +405,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	ulen = EXTRACT_BE_U_2(up->uh_ulen);
 	if (ulen < sizeof(struct udphdr)) {
 		udpipaddr_print(ndo, ip, sport, dport);
-		ND_PRINT((ndo, "truncated-udplength %d", ulen));
+		ND_PRINT("truncated-udplength %d", ulen);
 		return;
 	}
 	ulen -= sizeof(struct udphdr);
@@ -510,13 +510,13 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		if (ND_TTEST(rp->rm_direction)) {
 			direction = (enum sunrpc_msg_type) EXTRACT_BE_U_4(&rp->rm_direction);
 			if (dport == NFS_PORT && direction == SUNRPC_CALL) {
-				ND_PRINT((ndo, "NFS request xid %u ", EXTRACT_BE_U_4(&rp->rm_xid)));
+				ND_PRINT("NFS request xid %u ", EXTRACT_BE_U_4(&rp->rm_xid));
 				nfsreq_noaddr_print(ndo, (const u_char *)rp, length,
 				    (const u_char *)ip);
 				return;
 			}
 			if (sport == NFS_PORT && direction == SUNRPC_REPLY) {
-				ND_PRINT((ndo, "NFS reply xid %u ", EXTRACT_BE_U_4(&rp->rm_xid)));
+				ND_PRINT("NFS reply xid %u ", EXTRACT_BE_U_4(&rp->rm_xid));
 				nfsreply_noaddr_print(ndo, (const u_char *)rp, length,
 				    (const u_char *)ip);
 				return;
@@ -541,16 +541,16 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	        if (IP_V(ip) == 4 && (ndo->ndo_vflag > 1)) {
 			udp_sum = EXTRACT_BE_U_2(up->uh_sum);
 			if (udp_sum == 0) {
-				ND_PRINT((ndo, "[no cksum] "));
+				ND_PRINT("[no cksum] ");
 			} else if (ND_TTEST_LEN(cp, length)) {
 				sum = udp_cksum(ndo, ip, up, length + sizeof(struct udphdr));
 
 	                        if (sum != 0) {
-					ND_PRINT((ndo, "[bad udp cksum 0x%04x -> 0x%04x!] ",
+					ND_PRINT("[bad udp cksum 0x%04x -> 0x%04x!] ",
 					    udp_sum,
-					    in_cksum_shouldbe(udp_sum, sum)));
+					    in_cksum_shouldbe(udp_sum, sum));
 				} else
-					ND_PRINT((ndo, "[udp sum ok] "));
+					ND_PRINT("[udp sum ok] ");
 			}
 		}
 		else if (IP_V(ip) == 6 && ip6->ip6_plen) {
@@ -560,11 +560,11 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 				udp_sum = EXTRACT_BE_U_2(up->uh_sum);
 
 	                        if (sum != 0) {
-					ND_PRINT((ndo, "[bad udp cksum 0x%04x -> 0x%04x!] ",
+					ND_PRINT("[bad udp cksum 0x%04x -> 0x%04x!] ",
 					    udp_sum,
-					    in_cksum_shouldbe(udp_sum, sum)));
+					    in_cksum_shouldbe(udp_sum, sum));
 				} else
-					ND_PRINT((ndo, "[udp sum ok] "));
+					ND_PRINT("[udp sum ok] ");
 			}
 		}
 	}
@@ -685,26 +685,26 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		    EXTRACT_U_1(((const struct LAP *)cp)->type) == lapDDP &&
 		    (atalk_port(sport) || atalk_port(dport))) {
 			if (ndo->ndo_vflag)
-				ND_PRINT((ndo, "kip "));
+				ND_PRINT("kip ");
 			llap_print(ndo, cp, length);
 		} else {
 			if (ulen > length)
-				ND_PRINT((ndo, "UDP, bad length %u > %u",
-				    ulen, length));
+				ND_PRINT("UDP, bad length %u > %u",
+				    ulen, length);
 			else
-				ND_PRINT((ndo, "UDP, length %u", ulen));
+				ND_PRINT("UDP, length %u", ulen);
 		}
 	} else {
 		if (ulen > length)
-			ND_PRINT((ndo, "UDP, bad length %u > %u",
-			    ulen, length));
+			ND_PRINT("UDP, bad length %u > %u",
+			    ulen, length);
 		else
-			ND_PRINT((ndo, "UDP, length %u", ulen));
+			ND_PRINT("UDP, length %u", ulen);
 	}
 	return;
 
 trunc:
-	ND_PRINT((ndo, "%s", udp_tstr));
+	ND_PRINT("%s", udp_tstr);
 }
 
 

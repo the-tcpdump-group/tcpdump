@@ -369,46 +369,46 @@ lmp_print_data_link_subobjs(netdissect_options *ndo, const u_char *obj_tptr,
     while (total_subobj_len > 0 && hexdump == FALSE ) {
 	subobj_type = EXTRACT_U_1(obj_tptr + offset);
 	subobj_len  = EXTRACT_U_1(obj_tptr + offset + 1);
-	ND_PRINT((ndo, "\n\t    Subobject, Type: %s (%u), Length: %u",
+	ND_PRINT("\n\t    Subobject, Type: %s (%u), Length: %u",
 		tok2str(lmp_data_link_subobj,
 			"Unknown",
 			subobj_type),
 			subobj_type,
-			subobj_len));
+			subobj_len);
 	if (subobj_len < 4) {
-	    ND_PRINT((ndo, " (too short)"));
+	    ND_PRINT(" (too short)");
 	    break;
 	}
 	if ((subobj_len % 4) != 0) {
-	    ND_PRINT((ndo, " (not a multiple of 4)"));
+	    ND_PRINT(" (not a multiple of 4)");
 	    break;
 	}
 	if (total_subobj_len < subobj_len) {
-	    ND_PRINT((ndo, " (goes past the end of the object)"));
+	    ND_PRINT(" (goes past the end of the object)");
 	    break;
 	}
 	switch(subobj_type) {
 	case INT_SWITCHING_TYPE_SUBOBJ:
-	    ND_PRINT((ndo, "\n\t      Switching Type: %s (%u)",
+	    ND_PRINT("\n\t      Switching Type: %s (%u)",
 		tok2str(gmpls_switch_cap_values,
 			"Unknown",
 			EXTRACT_U_1(obj_tptr + offset + 2)),
-		EXTRACT_U_1(obj_tptr + offset + 2)));
-	    ND_PRINT((ndo, "\n\t      Encoding Type: %s (%u)",
+		EXTRACT_U_1(obj_tptr + offset + 2));
+	    ND_PRINT("\n\t      Encoding Type: %s (%u)",
 		tok2str(gmpls_encoding_values,
 			"Unknown",
 			EXTRACT_U_1(obj_tptr + offset + 3)),
-		EXTRACT_U_1(obj_tptr + offset + 3)));
+		EXTRACT_U_1(obj_tptr + offset + 3));
 	    bw.i = EXTRACT_BE_U_4(obj_tptr + offset + 4);
-	    ND_PRINT((ndo, "\n\t      Min Reservable Bandwidth: %.3f Mbps",
-                bw.f*8/1000000));
+	    ND_PRINT("\n\t      Min Reservable Bandwidth: %.3f Mbps",
+                bw.f*8/1000000);
 	    bw.i = EXTRACT_BE_U_4(obj_tptr + offset + 8);
-	    ND_PRINT((ndo, "\n\t      Max Reservable Bandwidth: %.3f Mbps",
-                bw.f*8/1000000));
+	    ND_PRINT("\n\t      Max Reservable Bandwidth: %.3f Mbps",
+                bw.f*8/1000000);
 	    break;
 	case WAVELENGTH_SUBOBJ:
-	    ND_PRINT((ndo, "\n\t      Wavelength: %u",
-		EXTRACT_BE_U_4(obj_tptr + offset + 4)));
+	    ND_PRINT("\n\t      Wavelength: %u",
+		EXTRACT_BE_U_4(obj_tptr + offset + 4));
 	    break;
 	default:
 	    /* Any Unknown Subobject ==> Exit loop */
@@ -448,17 +448,17 @@ lmp_print(netdissect_options *ndo,
      * Sanity checking of the header.
      */
     if (LMP_EXTRACT_VERSION(version_res) != LMP_VERSION) {
-	ND_PRINT((ndo, "LMP version %u packet not supported",
-               LMP_EXTRACT_VERSION(version_res)));
+	ND_PRINT("LMP version %u packet not supported",
+               LMP_EXTRACT_VERSION(version_res));
 	return;
     }
 
     /* in non-verbose mode just lets print the basic Message Type*/
     if (ndo->ndo_vflag < 1) {
-        ND_PRINT((ndo, "LMPv%u %s Message, length: %u",
+        ND_PRINT("LMPv%u %s Message, length: %u",
                LMP_EXTRACT_VERSION(version_res),
                tok2str(lmp_msg_type_values, "unknown (%u)",EXTRACT_U_1(lmp_com_header->msg_type)),
-               len));
+               len);
         return;
     }
 
@@ -466,17 +466,17 @@ lmp_print(netdissect_options *ndo,
 
     tlen=EXTRACT_BE_U_2(lmp_com_header->length);
 
-    ND_PRINT((ndo, "\n\tLMPv%u, msg-type: %s, Flags: [%s], length: %u",
+    ND_PRINT("\n\tLMPv%u, msg-type: %s, Flags: [%s], length: %u",
            LMP_EXTRACT_VERSION(version_res),
            tok2str(lmp_msg_type_values, "unknown, type: %u",EXTRACT_U_1(lmp_com_header->msg_type)),
            bittok2str(lmp_header_flag_values,"none",EXTRACT_U_1(lmp_com_header->flags)),
-           tlen));
+           tlen);
     if (tlen < sizeof(struct lmp_common_header)) {
-        ND_PRINT((ndo, " (too short)"));
+        ND_PRINT(" (too short)");
         return;
     }
     if (tlen > len) {
-        ND_PRINT((ndo, " (too long)"));
+        ND_PRINT(" (too long)");
         tlen = len;
     }
 
@@ -491,7 +491,7 @@ lmp_print(netdissect_options *ndo,
         lmp_obj_len=EXTRACT_BE_U_2(lmp_obj_header->length);
         lmp_obj_ctype=EXTRACT_U_1(lmp_obj_header->ctype)&0x7f;
 
-        ND_PRINT((ndo, "\n\t  %s Object (%u), Class-Type: %s (%u) Flags: [%snegotiable], length: %u",
+        ND_PRINT("\n\t  %s Object (%u), Class-Type: %s (%u) Flags: [%snegotiable], length: %u",
                tok2str(lmp_obj_values,
                        "Unknown",
                        EXTRACT_U_1(lmp_obj_header->class_num)),
@@ -501,14 +501,14 @@ lmp_print(netdissect_options *ndo,
                        (EXTRACT_U_1(lmp_obj_header->class_num)<<8)+lmp_obj_ctype),
                lmp_obj_ctype,
                EXTRACT_U_1(lmp_obj_header->ctype)&0x80 ? "" : "non-",
-               lmp_obj_len));
+               lmp_obj_len);
 
         if (lmp_obj_len < 4) {
-            ND_PRINT((ndo, " (too short)"));
+            ND_PRINT(" (too short)");
             return;
         }
         if ((lmp_obj_len % 4) != 0) {
-            ND_PRINT((ndo, " (not a multiple of 4)"));
+            ND_PRINT(" (not a multiple of 4)");
             return;
         }
 
@@ -526,12 +526,12 @@ lmp_print(netdissect_options *ndo,
             case LMP_CTYPE_LOC:
             case LMP_CTYPE_RMT:
                 if (obj_tlen != 4) {
-                    ND_PRINT((ndo, " (not correct for object)"));
+                    ND_PRINT(" (not correct for object)");
                     break;
                 }
-                ND_PRINT((ndo, "\n\t    Control Channel ID: %u (0x%08x)",
+                ND_PRINT("\n\t    Control Channel ID: %u (0x%08x)",
                        EXTRACT_BE_U_4(obj_tptr),
-                       EXTRACT_BE_U_4(obj_tptr)));
+                       EXTRACT_BE_U_4(obj_tptr));
                 break;
 
             default:
@@ -545,32 +545,32 @@ lmp_print(netdissect_options *ndo,
             case LMP_CTYPE_IPV4_LOC:
             case LMP_CTYPE_IPV4_RMT:
                 if (obj_tlen != 4) {
-                    ND_PRINT((ndo, " (not correct for object)"));
+                    ND_PRINT(" (not correct for object)");
                     break;
                 }
-                ND_PRINT((ndo, "\n\t    IPv4 Link ID: %s (0x%08x)",
+                ND_PRINT("\n\t    IPv4 Link ID: %s (0x%08x)",
                        ipaddr_string(ndo, obj_tptr),
-                       EXTRACT_BE_U_4(obj_tptr)));
+                       EXTRACT_BE_U_4(obj_tptr));
                 break;
             case LMP_CTYPE_IPV6_LOC:
             case LMP_CTYPE_IPV6_RMT:
                 if (obj_tlen != 16) {
-                    ND_PRINT((ndo, " (not correct for object)"));
+                    ND_PRINT(" (not correct for object)");
                     break;
                 }
-                ND_PRINT((ndo, "\n\t    IPv6 Link ID: %s (0x%08x)",
+                ND_PRINT("\n\t    IPv6 Link ID: %s (0x%08x)",
                        ip6addr_string(ndo, obj_tptr),
-                       EXTRACT_BE_U_4(obj_tptr)));
+                       EXTRACT_BE_U_4(obj_tptr));
                 break;
             case LMP_CTYPE_UNMD_LOC:
             case LMP_CTYPE_UNMD_RMT:
                 if (obj_tlen != 4) {
-                    ND_PRINT((ndo, " (not correct for object)"));
+                    ND_PRINT(" (not correct for object)");
                     break;
                 }
-                ND_PRINT((ndo, "\n\t    Link ID: %u (0x%08x)",
+                ND_PRINT("\n\t    Link ID: %u (0x%08x)",
                        EXTRACT_BE_U_4(obj_tptr),
-                       EXTRACT_BE_U_4(obj_tptr)));
+                       EXTRACT_BE_U_4(obj_tptr));
                 break;
             default:
                 hexdump=TRUE;
@@ -581,21 +581,21 @@ lmp_print(netdissect_options *ndo,
             switch(lmp_obj_ctype) {
             case LMP_CTYPE_1:
                 if (obj_tlen != 4) {
-                    ND_PRINT((ndo, " (not correct for object)"));
+                    ND_PRINT(" (not correct for object)");
                     break;
                 }
-                ND_PRINT((ndo, "\n\t    Message ID: %u (0x%08x)",
+                ND_PRINT("\n\t    Message ID: %u (0x%08x)",
                        EXTRACT_BE_U_4(obj_tptr),
-                       EXTRACT_BE_U_4(obj_tptr)));
+                       EXTRACT_BE_U_4(obj_tptr));
                 break;
             case LMP_CTYPE_2:
                 if (obj_tlen != 4) {
-                    ND_PRINT((ndo, " (not correct for object)"));
+                    ND_PRINT(" (not correct for object)");
                     break;
                 }
-                ND_PRINT((ndo, "\n\t    Message ID Ack: %u (0x%08x)",
+                ND_PRINT("\n\t    Message ID Ack: %u (0x%08x)",
                        EXTRACT_BE_U_4(obj_tptr),
-                       EXTRACT_BE_U_4(obj_tptr)));
+                       EXTRACT_BE_U_4(obj_tptr));
                 break;
             default:
                 hexdump=TRUE;
@@ -607,12 +607,12 @@ lmp_print(netdissect_options *ndo,
             case LMP_CTYPE_LOC:
             case LMP_CTYPE_RMT:
                 if (obj_tlen != 4) {
-                    ND_PRINT((ndo, " (not correct for object)"));
+                    ND_PRINT(" (not correct for object)");
                     break;
                 }
-                ND_PRINT((ndo, "\n\t    Node ID: %s (0x%08x)",
+                ND_PRINT("\n\t    Node ID: %s (0x%08x)",
                        ipaddr_string(ndo, obj_tptr),
-                       EXTRACT_BE_U_4(obj_tptr)));
+                       EXTRACT_BE_U_4(obj_tptr));
                 break;
 
             default:
@@ -624,12 +624,12 @@ lmp_print(netdissect_options *ndo,
             switch(lmp_obj_ctype) {
             case LMP_CTYPE_HELLO_CONFIG:
                 if (obj_tlen != 4) {
-                    ND_PRINT((ndo, " (not correct for object)"));
+                    ND_PRINT(" (not correct for object)");
                     break;
                 }
-                ND_PRINT((ndo, "\n\t    Hello Interval: %u\n\t    Hello Dead Interval: %u",
+                ND_PRINT("\n\t    Hello Interval: %u\n\t    Hello Dead Interval: %u",
                        EXTRACT_BE_U_2(obj_tptr),
-                       EXTRACT_BE_U_2(obj_tptr + 2)));
+                       EXTRACT_BE_U_2(obj_tptr + 2));
                 break;
 
             default:
@@ -641,12 +641,12 @@ lmp_print(netdissect_options *ndo,
             switch(lmp_obj_ctype) {
 	    case LMP_CTYPE_HELLO:
                 if (obj_tlen != 8) {
-                    ND_PRINT((ndo, " (not correct for object)"));
+                    ND_PRINT(" (not correct for object)");
                     break;
                 }
-                ND_PRINT((ndo, "\n\t    Tx Seq: %u, Rx Seq: %u",
+                ND_PRINT("\n\t    Tx Seq: %u, Rx Seq: %u",
                        EXTRACT_BE_U_4(obj_tptr),
-                       EXTRACT_BE_U_4(obj_tptr + 4)));
+                       EXTRACT_BE_U_4(obj_tptr + 4));
                 break;
 
             default:
@@ -658,56 +658,56 @@ lmp_print(netdissect_options *ndo,
 	    switch(lmp_obj_ctype) {
 	    case LMP_CTYPE_IPV4:
                 if (obj_tlen != 12) {
-                    ND_PRINT((ndo, " (not correct for object)"));
+                    ND_PRINT(" (not correct for object)");
                     break;
                 }
-		ND_PRINT((ndo, "\n\t    Flags: [%s]",
+		ND_PRINT("\n\t    Flags: [%s]",
 		    bittok2str(lmp_obj_te_link_flag_values,
 			"none",
-			EXTRACT_U_1(obj_tptr))));
+			EXTRACT_U_1(obj_tptr)));
 
-		ND_PRINT((ndo, "\n\t    Local Link-ID: %s (0x%08x)"
+		ND_PRINT("\n\t    Local Link-ID: %s (0x%08x)"
 		       "\n\t    Remote Link-ID: %s (0x%08x)",
                        ipaddr_string(ndo, obj_tptr+4),
                        EXTRACT_BE_U_4(obj_tptr + 4),
                        ipaddr_string(ndo, obj_tptr+8),
-                       EXTRACT_BE_U_4(obj_tptr + 8)));
+                       EXTRACT_BE_U_4(obj_tptr + 8));
 		break;
 
 	    case LMP_CTYPE_IPV6:
                 if (obj_tlen != 36) {
-                    ND_PRINT((ndo, " (not correct for object)"));
+                    ND_PRINT(" (not correct for object)");
                     break;
                 }
-		ND_PRINT((ndo, "\n\t    Flags: [%s]",
+		ND_PRINT("\n\t    Flags: [%s]",
 		    bittok2str(lmp_obj_te_link_flag_values,
 			"none",
-			EXTRACT_U_1(obj_tptr))));
+			EXTRACT_U_1(obj_tptr)));
 
-		ND_PRINT((ndo, "\n\t    Local Link-ID: %s (0x%08x)"
+		ND_PRINT("\n\t    Local Link-ID: %s (0x%08x)"
 		       "\n\t    Remote Link-ID: %s (0x%08x)",
                        ip6addr_string(ndo, obj_tptr+4),
                        EXTRACT_BE_U_4(obj_tptr + 4),
                        ip6addr_string(ndo, obj_tptr+20),
-                       EXTRACT_BE_U_4(obj_tptr + 20)));
+                       EXTRACT_BE_U_4(obj_tptr + 20));
                 break;
 
 	    case LMP_CTYPE_UNMD:
                 if (obj_tlen != 12) {
-                    ND_PRINT((ndo, " (not correct for object)"));
+                    ND_PRINT(" (not correct for object)");
                     break;
                 }
-		ND_PRINT((ndo, "\n\t    Flags: [%s]",
+		ND_PRINT("\n\t    Flags: [%s]",
 		    bittok2str(lmp_obj_te_link_flag_values,
 			"none",
-			EXTRACT_U_1(obj_tptr))));
+			EXTRACT_U_1(obj_tptr)));
 
-		ND_PRINT((ndo, "\n\t    Local Link-ID: %u (0x%08x)"
+		ND_PRINT("\n\t    Local Link-ID: %u (0x%08x)"
 		       "\n\t    Remote Link-ID: %u (0x%08x)",
                        EXTRACT_BE_U_4(obj_tptr + 4),
                        EXTRACT_BE_U_4(obj_tptr + 4),
                        EXTRACT_BE_U_4(obj_tptr + 8),
-                       EXTRACT_BE_U_4(obj_tptr + 8)));
+                       EXTRACT_BE_U_4(obj_tptr + 8));
 		break;
 
             default:
@@ -719,19 +719,19 @@ lmp_print(netdissect_options *ndo,
 	    switch(lmp_obj_ctype) {
 	    case LMP_CTYPE_IPV4:
                 if (obj_tlen < 12) {
-                    ND_PRINT((ndo, " (not correct for object)"));
+                    ND_PRINT(" (not correct for object)");
                     break;
                 }
-	        ND_PRINT((ndo, "\n\t    Flags: [%s]",
+	        ND_PRINT("\n\t    Flags: [%s]",
 		    bittok2str(lmp_obj_data_link_flag_values,
 			"none",
-			EXTRACT_U_1(obj_tptr))));
-                ND_PRINT((ndo, "\n\t    Local Interface ID: %s (0x%08x)"
+			EXTRACT_U_1(obj_tptr)));
+                ND_PRINT("\n\t    Local Interface ID: %s (0x%08x)"
                        "\n\t    Remote Interface ID: %s (0x%08x)",
                        ipaddr_string(ndo, obj_tptr+4),
                        EXTRACT_BE_U_4(obj_tptr + 4),
                        ipaddr_string(ndo, obj_tptr+8),
-                       EXTRACT_BE_U_4(obj_tptr + 8)));
+                       EXTRACT_BE_U_4(obj_tptr + 8));
 
 		if (lmp_print_data_link_subobjs(ndo, obj_tptr, obj_tlen - 12, 12))
 		    hexdump=TRUE;
@@ -739,19 +739,19 @@ lmp_print(netdissect_options *ndo,
 
 	    case LMP_CTYPE_IPV6:
                 if (obj_tlen < 36) {
-                    ND_PRINT((ndo, " (not correct for object)"));
+                    ND_PRINT(" (not correct for object)");
                     break;
                 }
-	        ND_PRINT((ndo, "\n\t    Flags: [%s]",
+	        ND_PRINT("\n\t    Flags: [%s]",
 		    bittok2str(lmp_obj_data_link_flag_values,
 			"none",
-			EXTRACT_U_1(obj_tptr))));
-                ND_PRINT((ndo, "\n\t    Local Interface ID: %s (0x%08x)"
+			EXTRACT_U_1(obj_tptr)));
+                ND_PRINT("\n\t    Local Interface ID: %s (0x%08x)"
                        "\n\t    Remote Interface ID: %s (0x%08x)",
                        ip6addr_string(ndo, obj_tptr+4),
                        EXTRACT_BE_U_4(obj_tptr + 4),
                        ip6addr_string(ndo, obj_tptr+20),
-                       EXTRACT_BE_U_4(obj_tptr + 20)));
+                       EXTRACT_BE_U_4(obj_tptr + 20));
 
 		if (lmp_print_data_link_subobjs(ndo, obj_tptr, obj_tlen - 36, 36))
 		    hexdump=TRUE;
@@ -759,19 +759,19 @@ lmp_print(netdissect_options *ndo,
 
 	    case LMP_CTYPE_UNMD:
                 if (obj_tlen < 12) {
-                    ND_PRINT((ndo, " (not correct for object)"));
+                    ND_PRINT(" (not correct for object)");
                     break;
                 }
-	        ND_PRINT((ndo, "\n\t    Flags: [%s]",
+	        ND_PRINT("\n\t    Flags: [%s]",
 		    bittok2str(lmp_obj_data_link_flag_values,
 			"none",
-			EXTRACT_U_1(obj_tptr))));
-                ND_PRINT((ndo, "\n\t    Local Interface ID: %u (0x%08x)"
+			EXTRACT_U_1(obj_tptr)));
+                ND_PRINT("\n\t    Local Interface ID: %u (0x%08x)"
                        "\n\t    Remote Interface ID: %u (0x%08x)",
                        EXTRACT_BE_U_4(obj_tptr + 4),
                        EXTRACT_BE_U_4(obj_tptr + 4),
                        EXTRACT_BE_U_4(obj_tptr + 8),
-                       EXTRACT_BE_U_4(obj_tptr + 8)));
+                       EXTRACT_BE_U_4(obj_tptr + 8));
 
 		if (lmp_print_data_link_subobjs(ndo, obj_tptr, obj_tlen - 12, 12))
 		    hexdump=TRUE;
@@ -786,27 +786,27 @@ lmp_print(netdissect_options *ndo,
 	    switch(lmp_obj_ctype) {
             case LMP_CTYPE_1:
                 if (obj_tlen != 20) {
-                    ND_PRINT((ndo, " (not correct for object)"));
+                    ND_PRINT(" (not correct for object)");
                     break;
                 }
-		ND_PRINT((ndo, "\n\t    Flags: %s",
+		ND_PRINT("\n\t    Flags: %s",
 		bittok2str(lmp_obj_begin_verify_flag_values,
 			"none",
-			EXTRACT_BE_U_2(obj_tptr))));
-		ND_PRINT((ndo, "\n\t    Verify Interval: %u",
-			EXTRACT_BE_U_2(obj_tptr + 2)));
-		ND_PRINT((ndo, "\n\t    Data links: %u",
-			EXTRACT_BE_U_4(obj_tptr + 4)));
-                ND_PRINT((ndo, "\n\t    Encoding type: %s",
-			tok2str(gmpls_encoding_values, "Unknown", EXTRACT_U_1((obj_tptr + 8)))));
-                ND_PRINT((ndo, "\n\t    Verify Transport Mechanism: %u (0x%x)%s",
+			EXTRACT_BE_U_2(obj_tptr)));
+		ND_PRINT("\n\t    Verify Interval: %u",
+			EXTRACT_BE_U_2(obj_tptr + 2));
+		ND_PRINT("\n\t    Data links: %u",
+			EXTRACT_BE_U_4(obj_tptr + 4));
+                ND_PRINT("\n\t    Encoding type: %s",
+			tok2str(gmpls_encoding_values, "Unknown", EXTRACT_U_1((obj_tptr + 8))));
+                ND_PRINT("\n\t    Verify Transport Mechanism: %u (0x%x)%s",
 			EXTRACT_BE_U_2(obj_tptr + 10),
 			EXTRACT_BE_U_2(obj_tptr + 10),
-			EXTRACT_BE_U_2(obj_tptr + 10)&8000 ? " (Payload test messages capable)" : ""));
+			EXTRACT_BE_U_2(obj_tptr + 10)&8000 ? " (Payload test messages capable)" : "");
                 bw.i = EXTRACT_BE_U_4(obj_tptr + 12);
-		ND_PRINT((ndo, "\n\t    Transmission Rate: %.3f Mbps",bw.f*8/1000000));
-		ND_PRINT((ndo, "\n\t    Wavelength: %u",
-			EXTRACT_BE_U_4(obj_tptr + 16)));
+		ND_PRINT("\n\t    Transmission Rate: %.3f Mbps",bw.f*8/1000000);
+		ND_PRINT("\n\t    Wavelength: %u",
+			EXTRACT_BE_U_4(obj_tptr + 16));
 		break;
 
             default:
@@ -818,13 +818,13 @@ lmp_print(netdissect_options *ndo,
 	    switch(lmp_obj_ctype) {
             case LMP_CTYPE_1:
                 if (obj_tlen != 4) {
-                    ND_PRINT((ndo, " (not correct for object)"));
+                    ND_PRINT(" (not correct for object)");
                     break;
                 }
-                ND_PRINT((ndo, "\n\t    Verify Dead Interval: %u"
+                ND_PRINT("\n\t    Verify Dead Interval: %u"
                        "\n\t    Verify Transport Response: %u",
                        EXTRACT_BE_U_2(obj_tptr),
-                       EXTRACT_BE_U_2(obj_tptr + 2)));
+                       EXTRACT_BE_U_2(obj_tptr + 2));
                 break;
 
             default:
@@ -836,11 +836,11 @@ lmp_print(netdissect_options *ndo,
 	    switch(lmp_obj_ctype) {
             case LMP_CTYPE_1:
                 if (obj_tlen != 4) {
-                    ND_PRINT((ndo, " (not correct for object)"));
+                    ND_PRINT(" (not correct for object)");
                     break;
                 }
-                ND_PRINT((ndo, "\n\t    Verify ID: %u",
-                       EXTRACT_BE_U_4(obj_tptr)));
+                ND_PRINT("\n\t    Verify ID: %u",
+                       EXTRACT_BE_U_4(obj_tptr));
                 break;
 
             default:
@@ -854,25 +854,25 @@ lmp_print(netdissect_options *ndo,
 		offset = 0;
 		/* Decode pairs: <Interface_ID (4 bytes), Channel_status (4 bytes)> */
 		while (offset+8 <= obj_tlen) {
-			ND_PRINT((ndo, "\n\t    Interface ID: %s (0x%08x)",
+			ND_PRINT("\n\t    Interface ID: %s (0x%08x)",
 			ipaddr_string(ndo, obj_tptr+offset),
-			EXTRACT_BE_U_4(obj_tptr + offset)));
+			EXTRACT_BE_U_4(obj_tptr + offset));
 
-			ND_PRINT((ndo, "\n\t\t    Active: %s (%u)",
+			ND_PRINT("\n\t\t    Active: %s (%u)",
 				(EXTRACT_BE_U_4(obj_tptr + offset + 4)>>31) ?
 				"Allocated" : "Non-allocated",
-				(EXTRACT_BE_U_4(obj_tptr + offset + 4)>>31)));
+				(EXTRACT_BE_U_4(obj_tptr + offset + 4)>>31));
 
-			ND_PRINT((ndo, "\n\t\t    Direction: %s (%u)",
+			ND_PRINT("\n\t\t    Direction: %s (%u)",
 				(EXTRACT_BE_U_4(obj_tptr + offset + 4)>>30)&0x1 ?
 				"Transmit" : "Receive",
-				(EXTRACT_BE_U_4(obj_tptr + offset + 4)>>30)&0x1));
+				(EXTRACT_BE_U_4(obj_tptr + offset + 4)>>30)&0x1);
 
-			ND_PRINT((ndo, "\n\t\t    Channel Status: %s (%u)",
+			ND_PRINT("\n\t\t    Channel Status: %s (%u)",
 					tok2str(lmp_obj_channel_status_values,
 			 		"Unknown",
 					EXTRACT_BE_U_4(obj_tptr + offset + 4)&0x3FFFFFF),
-					EXTRACT_BE_U_4(obj_tptr + offset + 4)&0x3FFFFFF));
+					EXTRACT_BE_U_4(obj_tptr + offset + 4)&0x3FFFFFF);
 			offset+=8;
 		}
                 break;
@@ -881,25 +881,25 @@ lmp_print(netdissect_options *ndo,
 		offset = 0;
 		/* Decode pairs: <Interface_ID (16 bytes), Channel_status (4 bytes)> */
 		while (offset+20 <= obj_tlen) {
-			ND_PRINT((ndo, "\n\t    Interface ID: %s (0x%08x)",
+			ND_PRINT("\n\t    Interface ID: %s (0x%08x)",
 			ip6addr_string(ndo, obj_tptr+offset),
-			EXTRACT_BE_U_4(obj_tptr + offset)));
+			EXTRACT_BE_U_4(obj_tptr + offset));
 
-			ND_PRINT((ndo, "\n\t\t    Active: %s (%u)",
+			ND_PRINT("\n\t\t    Active: %s (%u)",
 				(EXTRACT_BE_U_4(obj_tptr + offset + 16)>>31) ?
 				"Allocated" : "Non-allocated",
-				(EXTRACT_BE_U_4(obj_tptr + offset + 16)>>31)));
+				(EXTRACT_BE_U_4(obj_tptr + offset + 16)>>31));
 
-			ND_PRINT((ndo, "\n\t\t    Direction: %s (%u)",
+			ND_PRINT("\n\t\t    Direction: %s (%u)",
 				(EXTRACT_BE_U_4(obj_tptr + offset + 16)>>30)&0x1 ?
 				"Transmit" : "Receive",
-				(EXTRACT_BE_U_4(obj_tptr + offset + 16)>>30)&0x1));
+				(EXTRACT_BE_U_4(obj_tptr + offset + 16)>>30)&0x1);
 
-			ND_PRINT((ndo, "\n\t\t    Channel Status: %s (%u)",
+			ND_PRINT("\n\t\t    Channel Status: %s (%u)",
 					tok2str(lmp_obj_channel_status_values,
 					"Unknown",
 					EXTRACT_BE_U_4(obj_tptr + offset + 16)&0x3FFFFFF),
-					EXTRACT_BE_U_4(obj_tptr + offset + 16)&0x3FFFFFF));
+					EXTRACT_BE_U_4(obj_tptr + offset + 16)&0x3FFFFFF);
 			offset+=20;
 		}
                 break;
@@ -908,25 +908,25 @@ lmp_print(netdissect_options *ndo,
 		offset = 0;
 		/* Decode pairs: <Interface_ID (4 bytes), Channel_status (4 bytes)> */
 		while (offset+8 <= obj_tlen) {
-			ND_PRINT((ndo, "\n\t    Interface ID: %u (0x%08x)",
+			ND_PRINT("\n\t    Interface ID: %u (0x%08x)",
 			EXTRACT_BE_U_4(obj_tptr + offset),
-			EXTRACT_BE_U_4(obj_tptr + offset)));
+			EXTRACT_BE_U_4(obj_tptr + offset));
 
-			ND_PRINT((ndo, "\n\t\t    Active: %s (%u)",
+			ND_PRINT("\n\t\t    Active: %s (%u)",
 				(EXTRACT_BE_U_4(obj_tptr + offset + 4)>>31) ?
 				"Allocated" : "Non-allocated",
-				(EXTRACT_BE_U_4(obj_tptr + offset + 4)>>31)));
+				(EXTRACT_BE_U_4(obj_tptr + offset + 4)>>31));
 
-			ND_PRINT((ndo, "\n\t\t    Direction: %s (%u)",
+			ND_PRINT("\n\t\t    Direction: %s (%u)",
 				(EXTRACT_BE_U_4(obj_tptr + offset + 4)>>30)&0x1 ?
 				"Transmit" : "Receive",
-				(EXTRACT_BE_U_4(obj_tptr + offset + 4)>>30)&0x1));
+				(EXTRACT_BE_U_4(obj_tptr + offset + 4)>>30)&0x1);
 
-			ND_PRINT((ndo, "\n\t\t    Channel Status: %s (%u)",
+			ND_PRINT("\n\t\t    Channel Status: %s (%u)",
 					tok2str(lmp_obj_channel_status_values,
 					"Unknown",
 					EXTRACT_BE_U_4(obj_tptr + offset + 4)&0x3FFFFFF),
-					EXTRACT_BE_U_4(obj_tptr + offset + 4)&0x3FFFFFF));
+					EXTRACT_BE_U_4(obj_tptr + offset + 4)&0x3FFFFFF);
 			offset+=8;
 		}
                 break;
@@ -941,9 +941,9 @@ lmp_print(netdissect_options *ndo,
 	    case LMP_CTYPE_IPV4:
 		offset = 0;
 		while (offset+4 <= obj_tlen) {
-			ND_PRINT((ndo, "\n\t    Interface ID: %s (0x%08x)",
+			ND_PRINT("\n\t    Interface ID: %s (0x%08x)",
 			ipaddr_string(ndo, obj_tptr+offset),
-			EXTRACT_BE_U_4(obj_tptr + offset)));
+			EXTRACT_BE_U_4(obj_tptr + offset));
 			offset+=4;
 		}
                 break;
@@ -951,9 +951,9 @@ lmp_print(netdissect_options *ndo,
 	    case LMP_CTYPE_IPV6:
 		offset = 0;
 		while (offset+16 <= obj_tlen) {
-			ND_PRINT((ndo, "\n\t    Interface ID: %s (0x%08x)",
+			ND_PRINT("\n\t    Interface ID: %s (0x%08x)",
 			ip6addr_string(ndo, obj_tptr+offset),
-			EXTRACT_BE_U_4(obj_tptr + offset)));
+			EXTRACT_BE_U_4(obj_tptr + offset));
 			offset+=16;
 		}
                 break;
@@ -961,9 +961,9 @@ lmp_print(netdissect_options *ndo,
 	    case LMP_CTYPE_UNMD:
 		offset = 0;
 		while (offset+4 <= obj_tlen) {
-			ND_PRINT((ndo, "\n\t    Interface ID: %u (0x%08x)",
+			ND_PRINT("\n\t    Interface ID: %u (0x%08x)",
 			EXTRACT_BE_U_4(obj_tptr + offset),
-			EXTRACT_BE_U_4(obj_tptr + offset)));
+			EXTRACT_BE_U_4(obj_tptr + offset));
 			offset+=4;
 		}
                 break;
@@ -977,24 +977,24 @@ lmp_print(netdissect_options *ndo,
 	    switch(lmp_obj_ctype) {
             case LMP_CTYPE_BEGIN_VERIFY_ERROR:
                 if (obj_tlen != 4) {
-                    ND_PRINT((ndo, " (not correct for object)"));
+                    ND_PRINT(" (not correct for object)");
                     break;
                 }
-		ND_PRINT((ndo, "\n\t    Error Code: %s",
+		ND_PRINT("\n\t    Error Code: %s",
 		bittok2str(lmp_obj_begin_verify_error_values,
 			"none",
-			EXTRACT_BE_U_4(obj_tptr))));
+			EXTRACT_BE_U_4(obj_tptr)));
                 break;
 
             case LMP_CTYPE_LINK_SUMMARY_ERROR:
                 if (obj_tlen != 4) {
-                    ND_PRINT((ndo, " (not correct for object)"));
+                    ND_PRINT(" (not correct for object)");
                     break;
                 }
-		ND_PRINT((ndo, "\n\t    Error Code: %s",
+		ND_PRINT("\n\t    Error Code: %s",
 		bittok2str(lmp_obj_link_summary_error_values,
 			"none",
-			EXTRACT_BE_U_4(obj_tptr))));
+			EXTRACT_BE_U_4(obj_tptr)));
                 break;
             default:
                 hexdump=TRUE;
@@ -1005,109 +1005,109 @@ lmp_print(netdissect_options *ndo,
 	    switch (lmp_obj_ctype) {
 	    case LMP_CTYPE_SERVICE_CONFIG_SP:
                 if (obj_tlen != 4) {
-                    ND_PRINT((ndo, " (not correct for object)"));
+                    ND_PRINT(" (not correct for object)");
                     break;
                 }
-		ND_PRINT((ndo, "\n\t Flags: %s",
+		ND_PRINT("\n\t Flags: %s",
 		       bittok2str(lmp_obj_service_config_sp_flag_values,
 				  "none",
-				  EXTRACT_U_1(obj_tptr))));
+				  EXTRACT_U_1(obj_tptr)));
 
-		ND_PRINT((ndo, "\n\t  UNI Version: %u",
-		       EXTRACT_U_1(obj_tptr + 1)));
+		ND_PRINT("\n\t  UNI Version: %u",
+		       EXTRACT_U_1(obj_tptr + 1));
 
 		break;
 
             case LMP_CTYPE_SERVICE_CONFIG_CPSA:
                 if (obj_tlen != 16) {
-                    ND_PRINT((ndo, " (not correct for object)"));
+                    ND_PRINT(" (not correct for object)");
                     break;
                 }
 
 		link_type = EXTRACT_U_1(obj_tptr);
 
-		ND_PRINT((ndo, "\n\t Link Type: %s (%u)",
+		ND_PRINT("\n\t Link Type: %s (%u)",
 		       tok2str(lmp_sd_service_config_cpsa_link_type_values,
 			       "Unknown", link_type),
-		       link_type));
+		       link_type);
 
 		switch (link_type) {
 		case LMP_SD_SERVICE_CONFIG_CPSA_LINK_TYPE_SDH:
-		    ND_PRINT((ndo, "\n\t Signal Type: %s (%u)",
+		    ND_PRINT("\n\t Signal Type: %s (%u)",
 			   tok2str(lmp_sd_service_config_cpsa_signal_type_sdh_values,
 				   "Unknown",
 				   EXTRACT_U_1(obj_tptr + 1)),
-			   EXTRACT_U_1(obj_tptr + 1)));
+			   EXTRACT_U_1(obj_tptr + 1));
 		    break;
 
 		case LMP_SD_SERVICE_CONFIG_CPSA_LINK_TYPE_SONET:
-		    ND_PRINT((ndo, "\n\t Signal Type: %s (%u)",
+		    ND_PRINT("\n\t Signal Type: %s (%u)",
 			   tok2str(lmp_sd_service_config_cpsa_signal_type_sonet_values,
 				   "Unknown",
 				   EXTRACT_U_1(obj_tptr + 1)),
-			   EXTRACT_U_1(obj_tptr + 1)));
+			   EXTRACT_U_1(obj_tptr + 1));
 		    break;
 		}
 
-		ND_PRINT((ndo, "\n\t Transparency: %s",
+		ND_PRINT("\n\t Transparency: %s",
 		       bittok2str(lmp_obj_service_config_cpsa_tp_flag_values,
 				  "none",
-				  EXTRACT_U_1(obj_tptr + 2))));
+				  EXTRACT_U_1(obj_tptr + 2)));
 
-		ND_PRINT((ndo, "\n\t Contiguous Concatenation Types: %s",
+		ND_PRINT("\n\t Contiguous Concatenation Types: %s",
 		       bittok2str(lmp_obj_service_config_cpsa_cct_flag_values,
 				  "none",
-				  EXTRACT_U_1(obj_tptr + 3))));
+				  EXTRACT_U_1(obj_tptr + 3)));
 
-		ND_PRINT((ndo, "\n\t Minimum NCC: %u",
-		       EXTRACT_BE_U_2(obj_tptr + 4)));
+		ND_PRINT("\n\t Minimum NCC: %u",
+		       EXTRACT_BE_U_2(obj_tptr + 4));
 
-		ND_PRINT((ndo, "\n\t Maximum NCC: %u",
-		       EXTRACT_BE_U_2(obj_tptr + 6)));
+		ND_PRINT("\n\t Maximum NCC: %u",
+		       EXTRACT_BE_U_2(obj_tptr + 6));
 
-		ND_PRINT((ndo, "\n\t Minimum NVC:%u",
-		       EXTRACT_BE_U_2(obj_tptr + 8)));
+		ND_PRINT("\n\t Minimum NVC:%u",
+		       EXTRACT_BE_U_2(obj_tptr + 8));
 
-		ND_PRINT((ndo, "\n\t Maximum NVC:%u",
-		       EXTRACT_BE_U_2(obj_tptr + 10)));
+		ND_PRINT("\n\t Maximum NVC:%u",
+		       EXTRACT_BE_U_2(obj_tptr + 10));
 
-		ND_PRINT((ndo, "\n\t    Local Interface ID: %s (0x%08x)",
+		ND_PRINT("\n\t    Local Interface ID: %s (0x%08x)",
 		       ipaddr_string(ndo, obj_tptr+12),
-		       EXTRACT_BE_U_4(obj_tptr + 12)));
+		       EXTRACT_BE_U_4(obj_tptr + 12));
 
 		break;
 
 	    case LMP_CTYPE_SERVICE_CONFIG_TRANSPARENCY_TCM:
                 if (obj_tlen != 8) {
-                    ND_PRINT((ndo, " (not correct for object)"));
+                    ND_PRINT(" (not correct for object)");
                     break;
                 }
 
-		ND_PRINT((ndo, "\n\t Transparency Flags: %s",
+		ND_PRINT("\n\t Transparency Flags: %s",
 		       bittok2str(
 			   lmp_obj_service_config_nsa_transparency_flag_values,
 			   "none",
-			   EXTRACT_BE_U_4(obj_tptr))));
+			   EXTRACT_BE_U_4(obj_tptr)));
 
-		ND_PRINT((ndo, "\n\t TCM Monitoring Flags: %s",
+		ND_PRINT("\n\t TCM Monitoring Flags: %s",
 		       bittok2str(
 			   lmp_obj_service_config_nsa_tcm_flag_values,
 			   "none",
-			   EXTRACT_U_1(obj_tptr + 7))));
+			   EXTRACT_U_1(obj_tptr + 7)));
 
 		break;
 
 	    case LMP_CTYPE_SERVICE_CONFIG_NETWORK_DIVERSITY:
                 if (obj_tlen != 4) {
-                    ND_PRINT((ndo, " (not correct for object)"));
+                    ND_PRINT(" (not correct for object)");
                     break;
                 }
 
-		ND_PRINT((ndo, "\n\t Diversity: Flags: %s",
+		ND_PRINT("\n\t Diversity: Flags: %s",
 		       bittok2str(
 			   lmp_obj_service_config_nsa_network_diversity_flag_values,
 			   "none",
-			   EXTRACT_U_1(obj_tptr + 3))));
+			   EXTRACT_U_1(obj_tptr + 3)));
 		break;
 
 	    default:
@@ -1131,7 +1131,7 @@ lmp_print(netdissect_options *ndo,
     }
     return;
 trunc:
-    ND_PRINT((ndo, "\n\t\t packet exceeded snapshot"));
+    ND_PRINT("\n\t\t packet exceeded snapshot");
 }
 /*
  * Local Variables:

@@ -99,12 +99,12 @@ rip6_entry_print(netdissect_options *ndo, const struct netinfo6 *ni, u_int metri
 	int l;
 	uint16_t tag;
 
-	l = ND_PRINT((ndo, "%s/%u", ip6addr_string(ndo, &ni->rip6_dest), EXTRACT_U_1(ni->rip6_plen)));
+	l = ND_PRINT("%s/%u", ip6addr_string(ndo, &ni->rip6_dest), EXTRACT_U_1(ni->rip6_plen));
 	tag = EXTRACT_BE_U_2(ni->rip6_tag);
 	if (tag)
-		l += ND_PRINT((ndo, " [%u]", tag));
+		l += ND_PRINT(" [%u]", tag);
 	if (metric)
-		l += ND_PRINT((ndo, " (%u)", metric));
+		l += ND_PRINT(" (%u)", metric);
 	return l;
 }
 
@@ -131,21 +131,21 @@ ripng_print(netdissect_options *ndo, const u_char *dat, unsigned int length)
 			ND_TCHECK(rp->rip6_nets);
 			if (EXTRACT_U_1(rp->rip6_nets->rip6_metric) == HOPCNT_INFINITY6
 			    &&  IN6_IS_ADDR_UNSPECIFIED(&rp->rip6_nets->rip6_dest)) {
-				ND_PRINT((ndo, " ripng-req dump"));
+				ND_PRINT(" ripng-req dump");
 				break;
 			}
 		}
 		if (j * sizeof(*ni) != length_left)
-			ND_PRINT((ndo, " ripng-req %u[%u]:", j, length));
+			ND_PRINT(" ripng-req %u[%u]:", j, length);
 		else
-			ND_PRINT((ndo, " ripng-req %u:", j));
+			ND_PRINT(" ripng-req %u:", j);
 		for (ni = rp->rip6_nets; length_left >= sizeof(*ni);
 		    length_left -= sizeof(*ni), ++ni) {
 			ND_TCHECK_SIZE(ni);
 			if (ndo->ndo_vflag > 1)
-				ND_PRINT((ndo, "\n\t"));
+				ND_PRINT("\n\t");
 			else
-				ND_PRINT((ndo, " "));
+				ND_PRINT(" ");
 			rip6_entry_print(ndo, ni, 0);
 		}
 		if (length_left != 0)
@@ -158,31 +158,31 @@ ripng_print(netdissect_options *ndo, const u_char *dat, unsigned int length)
 		length_left -= (sizeof(struct rip6) - sizeof(struct netinfo6));
 		j = length_left / sizeof(*ni);
 		if (j * sizeof(*ni) != length_left)
-			ND_PRINT((ndo, " ripng-resp %u[%u]:", j, length));
+			ND_PRINT(" ripng-resp %u[%u]:", j, length);
 		else
-			ND_PRINT((ndo, " ripng-resp %u:", j));
+			ND_PRINT(" ripng-resp %u:", j);
 		for (ni = rp->rip6_nets; length_left >= sizeof(*ni);
 		    length_left -= sizeof(*ni), ++ni) {
 			ND_TCHECK_SIZE(ni);
 			if (ndo->ndo_vflag > 1)
-				ND_PRINT((ndo, "\n\t"));
+				ND_PRINT("\n\t");
 			else
-				ND_PRINT((ndo, " "));
+				ND_PRINT(" ");
 			rip6_entry_print(ndo, ni, EXTRACT_U_1(ni->rip6_metric));
 		}
 		if (length_left != 0)
 			goto trunc;
 		break;
 	default:
-		ND_PRINT((ndo, " ripng-%u ?? %u", cmd, length));
+		ND_PRINT(" ripng-%u ?? %u", cmd, length);
 		break;
 	}
 	ND_TCHECK(rp->rip6_vers);
 	if (EXTRACT_U_1(rp->rip6_vers) != RIP6_VERSION)
-		ND_PRINT((ndo, " [vers %u]", EXTRACT_U_1(rp->rip6_vers)));
+		ND_PRINT(" [vers %u]", EXTRACT_U_1(rp->rip6_vers));
 	return;
 
 trunc:
-	ND_PRINT((ndo, "[|ripng]"));
+	ND_PRINT("[|ripng]");
 	return;
 }

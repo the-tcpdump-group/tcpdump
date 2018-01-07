@@ -68,7 +68,7 @@ print_btp_body(netdissect_options *ndo,
 	msg_type = EXTRACT_U_1(bp + 1);
 	msg_type_str = tok2str(msg_type_values, "unknown (%u)", msg_type);
 
-	ND_PRINT((ndo, "; ItsPduHeader v:%d t:%d-%s", version, msg_type, msg_type_str));
+	ND_PRINT("; ItsPduHeader v:%d t:%d-%s", version, msg_type, msg_type_str);
 }
 
 static void
@@ -77,7 +77,7 @@ print_btp(netdissect_options *ndo,
 {
 	uint16_t dest = EXTRACT_BE_U_2(bp + 0);
 	uint16_t src = EXTRACT_BE_U_2(bp + 2);
-	ND_PRINT((ndo, "; BTP Dst:%u Src:%u", dest, src));
+	ND_PRINT("; BTP Dst:%u Src:%u", dest, src);
 }
 
 static int
@@ -88,14 +88,14 @@ print_long_pos_vector(netdissect_options *ndo,
 
 	if (!ND_TTEST_LEN(bp, GEONET_ADDR_LEN))
 		return (-1);
-	ND_PRINT((ndo, "GN_ADDR:%s ", linkaddr_string (ndo, bp, 0, GEONET_ADDR_LEN)));
+	ND_PRINT("GN_ADDR:%s ", linkaddr_string (ndo, bp, 0, GEONET_ADDR_LEN));
 
 	if (!ND_TTEST_8(bp + 12))
 		return (-1);
 	lat = EXTRACT_BE_U_4(bp + 12);
-	ND_PRINT((ndo, "lat:%d ", lat));
+	ND_PRINT("lat:%d ", lat);
 	lon = EXTRACT_BE_U_4(bp + 16);
-	ND_PRINT((ndo, "lon:%d", lon));
+	ND_PRINT("lon:%d", lon);
 	return (0);
 }
 
@@ -118,10 +118,10 @@ geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	const char *hdr_type_txt = "Unknown";
 	int hdr_size = -1;
 
-	ND_PRINT((ndo, "GeoNet "));
+	ND_PRINT("GeoNet ");
 	if (src != NULL)
-		ND_PRINT((ndo, "src:%s", (src->addr_string)(ndo, src->addr)));
-	ND_PRINT((ndo, "; "));
+		ND_PRINT("src:%s", (src->addr_string)(ndo, src->addr));
+	ND_PRINT("; ");
 
 	/* Process Common Header */
 	if (length < 36)
@@ -170,11 +170,11 @@ geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			break;
 	}
 
-	ND_PRINT((ndo, "v:%d ", version));
-	ND_PRINT((ndo, "NH:%d-%s ", next_hdr, next_hdr_txt));
-	ND_PRINT((ndo, "HT:%d-%d-%s ", hdr_type, hdr_subtype, hdr_type_txt));
-	ND_PRINT((ndo, "HopLim:%d ", hop_limit));
-	ND_PRINT((ndo, "Payload:%d ", payload_length));
+	ND_PRINT("v:%d ", version);
+	ND_PRINT("NH:%d-%s ", next_hdr, next_hdr_txt);
+	ND_PRINT("HT:%d-%d-%s ", hdr_type, hdr_subtype, hdr_type_txt);
+	ND_PRINT("HopLim:%d ", hop_limit);
+	ND_PRINT("Payload:%d ", payload_length);
 	if (print_long_pos_vector(ndo, bp + 8) == -1)
 		goto trunc;
 
@@ -269,12 +269,12 @@ geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	return;
 
 invalid:
-	ND_PRINT((ndo, " Malformed (small) "));
+	ND_PRINT(" Malformed (small) ");
 	/* XXX - print the remaining data as hex? */
 	return;
 
 trunc:
-	ND_PRINT((ndo, "[|geonet]"));
+	ND_PRINT("[|geonet]");
 }
 
 
