@@ -180,7 +180,7 @@ tcp_print(netdissect_options *ndo,
         else
                 ip6 = NULL;
         ch = '\0';
-        if (!ND_TTEST(tp->th_dport)) {
+        if (!ND_TTEST_2(tp->th_dport)) {
                 ND_PRINT("%s > %s: [|tcp]",
                              ipaddr_string(ndo, &ip->ip_src),
                              ipaddr_string(ndo, &ip->ip_dst));
@@ -748,7 +748,7 @@ tcp_print(netdissect_options *ndo,
                 if (fraglen > (length) - 4)
                         fraglen = (length) - 4;
                 rp = (const struct sunrpc_msg *)(bp + 4);
-                if (ND_TTEST(rp->rm_direction)) {
+                if (ND_TTEST_4(rp->rm_direction)) {
                         direction = (enum sunrpc_msg_type) EXTRACT_BE_U_4(rp->rm_direction);
                         if (dport == NFS_PORT && direction == SUNRPC_CALL) {
                                 ND_PRINT(": NFS request xid %u ",
