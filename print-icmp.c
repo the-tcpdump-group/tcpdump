@@ -352,14 +352,14 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 	ip = (const struct ip *)bp2;
 	str = buf;
 
-	ND_TCHECK(dp->icmp_code);
+	ND_TCHECK_1(dp->icmp_code);
 	icmp_type = EXTRACT_U_1(dp->icmp_type);
 	icmp_code = EXTRACT_U_1(dp->icmp_code);
 	switch (icmp_type) {
 
 	case ICMP_ECHO:
 	case ICMP_ECHOREPLY:
-		ND_TCHECK(dp->icmp_seq);
+		ND_TCHECK_2(dp->icmp_seq);
 		(void)snprintf(buf, sizeof(buf), "echo %s, id %u, seq %u",
                                icmp_type == ICMP_ECHO ?
                                "request" : "reply",
@@ -380,11 +380,11 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			break;
 
 		case ICMP_UNREACH_PORT:
-			ND_TCHECK(dp->icmp_ip.ip_p);
+			ND_TCHECK_1(dp->icmp_ip.ip_p);
 			oip = &dp->icmp_ip;
 			hlen = IP_HL(oip) * 4;
 			ouh = (const struct udphdr *)(((const u_char *)oip) + hlen);
-			ND_TCHECK(ouh->uh_dport);
+			ND_TCHECK_2(ouh->uh_dport);
 			dport = EXTRACT_BE_U_2(ouh->uh_dport);
 			ip_proto = EXTRACT_U_1(oip->ip_p);
 			switch (ip_proto) {
@@ -522,20 +522,20 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			(void)snprintf(buf, sizeof(buf),
 			    "parameter problem - code %u", icmp_code);
 		else {
-			ND_TCHECK(dp->icmp_pptr);
+			ND_TCHECK_1(dp->icmp_pptr);
 			(void)snprintf(buf, sizeof(buf),
 			    "parameter problem - octet %u", EXTRACT_U_1(dp->icmp_pptr));
 		}
 		break;
 
 	case ICMP_MASKREPLY:
-		ND_TCHECK(dp->icmp_mask);
+		ND_TCHECK_4(dp->icmp_mask);
 		(void)snprintf(buf, sizeof(buf), "address mask is 0x%08x",
 		    EXTRACT_BE_U_4(dp->icmp_mask));
 		break;
 
 	case ICMP_TSTAMP:
-		ND_TCHECK(dp->icmp_seq);
+		ND_TCHECK_2(dp->icmp_seq);
 		(void)snprintf(buf, sizeof(buf),
 		    "time stamp query id %u seq %u",
 		    EXTRACT_BE_U_2(dp->icmp_id),
@@ -543,7 +543,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		break;
 
 	case ICMP_TSTAMPREPLY:
-		ND_TCHECK(dp->icmp_ttime);
+		ND_TCHECK_4(dp->icmp_ttime);
 		(void)snprintf(buf, sizeof(buf),
 		    "time stamp reply id %u seq %u: org %s",
                                EXTRACT_BE_U_2(dp->icmp_id),
