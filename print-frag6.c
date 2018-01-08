@@ -45,19 +45,19 @@ frag6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2)
 
 	if (ndo->ndo_vflag) {
 		ND_PRINT("frag (0x%08x:%d|%ld)",
-		       EXTRACT_BE_U_4(&dp->ip6f_ident),
-		       EXTRACT_BE_U_2(&dp->ip6f_offlg) & IP6F_OFF_MASK,
-		       sizeof(struct ip6_hdr) + EXTRACT_BE_U_2(&ip6->ip6_plen) -
+		       EXTRACT_BE_U_4(dp->ip6f_ident),
+		       EXTRACT_BE_U_2(dp->ip6f_offlg) & IP6F_OFF_MASK,
+		       sizeof(struct ip6_hdr) + EXTRACT_BE_U_2(ip6->ip6_plen) -
 		       (long)(bp - bp2) - sizeof(struct ip6_frag));
 	} else {
 		ND_PRINT("frag (%d|%ld)",
-		       EXTRACT_BE_U_2(&dp->ip6f_offlg) & IP6F_OFF_MASK,
-		       sizeof(struct ip6_hdr) + EXTRACT_BE_U_2(&ip6->ip6_plen) -
+		       EXTRACT_BE_U_2(dp->ip6f_offlg) & IP6F_OFF_MASK,
+		       sizeof(struct ip6_hdr) + EXTRACT_BE_U_2(ip6->ip6_plen) -
 		       (long)(bp - bp2) - sizeof(struct ip6_frag));
 	}
 
 	/* it is meaningless to decode non-first fragment */
-	if ((EXTRACT_BE_U_2(&dp->ip6f_offlg) & IP6F_OFF_MASK) != 0)
+	if ((EXTRACT_BE_U_2(dp->ip6f_offlg) & IP6F_OFF_MASK) != 0)
 		return -1;
 	else
 	{

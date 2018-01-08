@@ -567,7 +567,7 @@ ip_print(netdissect_options *ndo,
 		return;
 	}
 
-	ipds->len = EXTRACT_BE_U_2(&ipds->ip->ip_len);
+	ipds->len = EXTRACT_BE_U_2(ipds->ip->ip_len);
 	if (length < ipds->len)
 		ND_PRINT("truncated-ip - %u bytes missing! ",
 			ipds->len - length);
@@ -596,7 +596,7 @@ ip_print(netdissect_options *ndo,
 
 	ipds->len -= hlen;
 
-	ipds->off = EXTRACT_BE_U_2(&ipds->ip->ip_off);
+	ipds->off = EXTRACT_BE_U_2(ipds->ip->ip_off);
 
         ip_proto = EXTRACT_U_1(ipds->ip->ip_p);
 
@@ -632,7 +632,7 @@ ip_print(netdissect_options *ndo,
 	     * For unfragmented datagrams, note the don't fragment flag.
 	     */
 	    ND_PRINT(", id %u, offset %u, flags [%s], proto %s (%u)",
-                         EXTRACT_BE_U_2(&ipds->ip->ip_id),
+                         EXTRACT_BE_U_2(ipds->ip->ip_id),
                          (ipds->off & 0x1fff) * 8,
                          bittok2str(ip_frag_values, "none", ipds->off&0xe000),
                          tok2str(ipproto_values, "unknown", ip_proto),

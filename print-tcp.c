@@ -749,14 +749,16 @@ tcp_print(netdissect_options *ndo,
                         fraglen = (length) - 4;
                 rp = (const struct sunrpc_msg *)(bp + 4);
                 if (ND_TTEST(rp->rm_direction)) {
-                        direction = (enum sunrpc_msg_type) EXTRACT_BE_U_4(&rp->rm_direction);
+                        direction = (enum sunrpc_msg_type) EXTRACT_BE_U_4(rp->rm_direction);
                         if (dport == NFS_PORT && direction == SUNRPC_CALL) {
-                                ND_PRINT(": NFS request xid %u ", EXTRACT_BE_U_4(&rp->rm_xid));
+                                ND_PRINT(": NFS request xid %u ",
+                                         EXTRACT_BE_U_4(rp->rm_xid));
                                 nfsreq_noaddr_print(ndo, (const u_char *)rp, fraglen, (const u_char *)ip);
                                 return;
                         }
                         if (sport == NFS_PORT && direction == SUNRPC_REPLY) {
-                                ND_PRINT(": NFS reply xid %u ", EXTRACT_BE_U_4(&rp->rm_xid));
+                                ND_PRINT(": NFS reply xid %u ",
+                                         EXTRACT_BE_U_4(rp->rm_xid));
                                 nfsreply_noaddr_print(ndo, (const u_char *)rp, fraglen, (const u_char *)ip);
                                 return;
                         }

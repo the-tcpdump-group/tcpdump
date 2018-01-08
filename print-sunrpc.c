@@ -178,11 +178,11 @@ sunrpc_print(netdissect_options *ndo, const u_char *bp,
 
 	if (!ndo->ndo_nflag) {
 		snprintf(srcid, sizeof(srcid), "0x%x",
-		    EXTRACT_BE_U_4(&rp->rm_xid));
+		    EXTRACT_BE_U_4(rp->rm_xid));
 		strlcpy(dstid, "sunrpc", sizeof(dstid));
 	} else {
 		snprintf(srcid, sizeof(srcid), "0x%x",
-		    EXTRACT_BE_U_4(&rp->rm_xid));
+		    EXTRACT_BE_U_4(rp->rm_xid));
 		snprintf(dstid, sizeof(dstid), "0x%x", SUNRPC_PMAPPORT);
 	}
 
@@ -205,23 +205,23 @@ sunrpc_print(netdissect_options *ndo, const u_char *bp,
 	}
 
 	ND_PRINT(" %s", tok2str(proc2str, " proc #%u",
-	    EXTRACT_BE_U_4(&rp->rm_call.cb_proc)));
-	x = EXTRACT_BE_U_4(&rp->rm_call.cb_rpcvers);
+	    EXTRACT_BE_U_4(rp->rm_call.cb_proc)));
+	x = EXTRACT_BE_U_4(rp->rm_call.cb_rpcvers);
 	if (x != 2)
 		ND_PRINT(" [rpcver %u]", x);
 
-	switch (EXTRACT_BE_U_4(&rp->rm_call.cb_proc)) {
+	switch (EXTRACT_BE_U_4(rp->rm_call.cb_proc)) {
 
 	case SUNRPC_PMAPPROC_SET:
 	case SUNRPC_PMAPPROC_UNSET:
 	case SUNRPC_PMAPPROC_GETPORT:
 	case SUNRPC_PMAPPROC_CALLIT:
-		x = EXTRACT_BE_U_4(&rp->rm_call.cb_prog);
+		x = EXTRACT_BE_U_4(rp->rm_call.cb_prog);
 		if (!ndo->ndo_nflag)
 			ND_PRINT(" %s", progstr(x));
 		else
 			ND_PRINT(" %u", x);
-		ND_PRINT(".%u", EXTRACT_BE_U_4(&rp->rm_call.cb_vers));
+		ND_PRINT(".%u", EXTRACT_BE_U_4(rp->rm_call.cb_vers));
 		break;
 	}
 }
