@@ -317,7 +317,7 @@ ntp_time_print(netdissect_options *ndo,
 	default:
 		/* In NTPv4 (RFC 5905) refid is an IPv4 address or first 32 bits of
 		   MD5 sum of IPv6 address */
-		ND_PRINT("0x%08x", EXTRACT_BE_U_4(&bp->refid));
+		ND_PRINT("0x%08x", EXTRACT_BE_U_4(bp->refid));
 		break;
 	}
 
@@ -499,8 +499,8 @@ p_sfix(netdissect_options *ndo,
 	int f;
 	double ff;
 
-	i = EXTRACT_BE_U_2(&sfp->int_part);
-	f = EXTRACT_BE_U_2(&sfp->fraction);
+	i = EXTRACT_BE_U_2(sfp->int_part);
+	f = EXTRACT_BE_U_2(sfp->fraction);
 	ff = f / 65536.0;		/* shift radix point by 16 bits */
 	f = (int)(ff * 1000000.0);	/* Treat fraction as parts per million */
 	ND_PRINT("%d.%06d", i, f);
@@ -517,8 +517,8 @@ p_ntp_time(netdissect_options *ndo,
 	uint32_t f;
 	double ff;
 
-	i = EXTRACT_BE_U_4(&lfp->int_part);
-	uf = EXTRACT_BE_U_4(&lfp->fraction);
+	i = EXTRACT_BE_U_4(lfp->int_part);
+	uf = EXTRACT_BE_U_4(lfp->fraction);
 	ff = uf;
 	if (ff < 0.0)		/* some compilers are buggy */
 		ff += FMAXINT;
@@ -575,10 +575,10 @@ p_ntp_delta(netdissect_options *ndo,
 	double ff;
 	int signbit;
 
-	u = EXTRACT_BE_U_4(&lfp->int_part);
-	ou = EXTRACT_BE_U_4(&olfp->int_part);
-	uf = EXTRACT_BE_U_4(&lfp->fraction);
-	ouf = EXTRACT_BE_U_4(&olfp->fraction);
+	u = EXTRACT_BE_U_4(lfp->int_part);
+	ou = EXTRACT_BE_U_4(olfp->int_part);
+	uf = EXTRACT_BE_U_4(lfp->fraction);
+	ouf = EXTRACT_BE_U_4(olfp->fraction);
 	if (ou == 0 && ouf == 0) {
 		p_ntp_time(ndo, lfp);
 		return;

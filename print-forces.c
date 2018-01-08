@@ -387,14 +387,14 @@ struct forces_tlv {
 #define	GET_TOP_TLV(fhdr) ((const struct forces_tlv *)((fhdr) + sizeof (struct forcesh)))
 #define TLV_SET_LEN(len)  (F_ALN_LEN(TLV_HDRL) + (len))
 #define TLV_DATA(tlvp)   ((const void*)(((const char*)(tlvp)) + TLV_SET_LEN(0)))
-#define GO_NXT_TLV(tlv,rlen) ((rlen) -= F_ALN_LEN(EXTRACT_BE_U_2(&(tlv)->length)), \
+#define GO_NXT_TLV(tlv,rlen) ((rlen) -= F_ALN_LEN(EXTRACT_BE_U_2((tlv)->length)), \
 		              (const struct forces_tlv*)(((const char*)(tlv)) \
-				      + F_ALN_LEN(EXTRACT_BE_U_2(&(tlv)->length))))
+				      + F_ALN_LEN(EXTRACT_BE_U_2((tlv)->length))))
 #define ILV_SET_LEN(len)  (F_ALN_LEN(ILV_HDRL) + (len))
 #define ILV_DATA(ilvp)   ((const void*)(((const char*)(ilvp)) + ILV_SET_LEN(0)))
-#define GO_NXT_ILV(ilv,rlen) ((rlen) -= F_ALN_LEN(EXTRACT_BE_U_4(&(ilv)->length)), \
+#define GO_NXT_ILV(ilv,rlen) ((rlen) -= F_ALN_LEN(EXTRACT_BE_U_4((ilv)->length)), \
 		              (const struct forces_ilv *)(((const char*)(ilv)) \
-				      + F_ALN_LEN(EXTRACT_BE_U_4(&(ilv)->length))))
+				      + F_ALN_LEN(EXTRACT_BE_U_4((ilv)->length))))
 #define INVALID_RLEN 1
 #define INVALID_STLN 2
 #define INVALID_LTLN 3
@@ -412,11 +412,11 @@ static inline u_int tlv_valid(const struct forces_tlv *tlv, u_int rlen)
 {
 	if (rlen < TLV_HDRL)
 		return INVALID_RLEN;
-	if (EXTRACT_BE_U_2(&tlv->length) < TLV_HDRL)
+	if (EXTRACT_BE_U_2(tlv->length) < TLV_HDRL)
 		return INVALID_STLN;
-	if (EXTRACT_BE_U_2(&tlv->length) > rlen)
+	if (EXTRACT_BE_U_2(tlv->length) > rlen)
 		return INVALID_LTLN;
-	if (rlen < F_ALN_LEN(EXTRACT_BE_U_2(&tlv->length)))
+	if (rlen < F_ALN_LEN(EXTRACT_BE_U_2(tlv->length)))
 		return INVALID_ALEN;
 
 	return 0;
@@ -426,11 +426,11 @@ static inline int ilv_valid(const struct forces_ilv *ilv, u_int rlen)
 {
 	if (rlen < ILV_HDRL)
 		return INVALID_RLEN;
-	if (EXTRACT_BE_U_4(&ilv->length) < ILV_HDRL)
+	if (EXTRACT_BE_U_4(ilv->length) < ILV_HDRL)
 		return INVALID_STLN;
-	if (EXTRACT_BE_U_4(&ilv->length) > rlen)
+	if (EXTRACT_BE_U_4(ilv->length) > rlen)
 		return INVALID_LTLN;
-	if (rlen < F_ALN_LEN(EXTRACT_BE_U_4(&ilv->length)))
+	if (rlen < F_ALN_LEN(EXTRACT_BE_U_4(ilv->length)))
 		return INVALID_ALEN;
 
 	return 0;
@@ -691,7 +691,7 @@ fdatatlv_print(netdissect_options *ndo,
 	 */
 	rlen = len - TLV_HDRL;
 	ND_TCHECK_SIZE(tlv);
-	type = EXTRACT_BE_U_2(&tlv->type);
+	type = EXTRACT_BE_U_2(tlv->type);
 	if (type != F_TLV_FULD) {
 		ND_PRINT("Error: expecting FULLDATA!\n");
 		return -1;
@@ -740,9 +740,9 @@ sdatailv_print(netdissect_options *ndo,
 			return -1;
 		}
 		if (ndo->ndo_vflag >= 3) {
-			int ilvl = EXTRACT_BE_U_4(&ilv->length);
+			int ilvl = EXTRACT_BE_U_4(ilv->length);
 			ND_PRINT("\n%s ILV: type %x length %d\n", ib + 1,
-				  EXTRACT_BE_U_4(&ilv->type), ilvl);
+				  EXTRACT_BE_U_4(ilv->type), ilvl);
 			hex_print_with_offset(ndo, "\t\t[", tdp, ilvl-ILV_HDRL, 0);
 		}
 
@@ -772,7 +772,7 @@ sdatatlv_print(netdissect_options *ndo,
 	 */
 	rlen = len - TLV_HDRL;
 	ND_TCHECK_SIZE(tlv);
-	type = EXTRACT_BE_U_2(&tlv->type);
+	type = EXTRACT_BE_U_2(tlv->type);
 	if (type != F_TLV_SPAD) {
 		ND_PRINT("Error: expecting SPARSEDATA!\n");
 		return -1;
@@ -803,13 +803,13 @@ pkeyitlv_print(netdissect_options *ndo,
 	id = EXTRACT_BE_U_4(tdp);
 	ND_PRINT("%sKeyinfo: Key 0x%x\n", ib, id);
 	ND_TCHECK_SIZE(kdtlv);
-	type = EXTRACT_BE_U_2(&kdtlv->type);
+	type = EXTRACT_BE_U_2(kdtlv->type);
 	invtlv = tlv_valid(kdtlv, len);
 
 	if (invtlv) {
 		ND_PRINT("%s TLV type 0x%x len %d\n",
 		       tok2str(ForCES_TLV_err, NULL, invtlv), type,
-		       EXTRACT_BE_U_2(&kdtlv->length));
+		       EXTRACT_BE_U_2(kdtlv->length));
 		return -1;
 	}
 	/*
@@ -817,7 +817,7 @@ pkeyitlv_print(netdissect_options *ndo,
 	 * length is large enough but not too large (it doesn't
 	 * go past the end of the containing TLV).
 	 */
-	tll = EXTRACT_BE_U_2(&kdtlv->length);
+	tll = EXTRACT_BE_U_2(kdtlv->length);
 	dp = (const u_char *) TLV_DATA(kdtlv);
 	return fdatatlv_print(ndo, dp, tll, op_msk, indent);
 
@@ -894,7 +894,7 @@ pdatacnt_print(netdissect_options *ndo,
 			pptr += sizeof(struct forces_tlv);
 			len -= sizeof(struct forces_tlv);
 			/* skip key content */
-			tll = EXTRACT_BE_U_2(&keytlv->length);
+			tll = EXTRACT_BE_U_2(keytlv->length);
 			if (tll < TLV_HDRL) {
 				ND_PRINT("key content length %u < %u\n",
 					tll, TLV_HDRL);
@@ -920,12 +920,12 @@ pdatacnt_print(netdissect_options *ndo,
 		u_int invtlv;
 
 		ND_TCHECK_SIZE(pdtlv);
-		type = EXTRACT_BE_U_2(&pdtlv->type);
+		type = EXTRACT_BE_U_2(pdtlv->type);
 		invtlv = tlv_valid(pdtlv, len);
 		if (invtlv) {
 			ND_PRINT("%s Outstanding bytes %d for TLV type 0x%x TLV len %d\n",
 			          tok2str(ForCES_TLV_err, NULL, invtlv), len, type,
-			          EXTRACT_BE_U_2(&pdtlv->length));
+			          EXTRACT_BE_U_2(pdtlv->length));
 			goto pd_err;
 		}
 		/*
@@ -933,14 +933,15 @@ pdatacnt_print(netdissect_options *ndo,
 		 * length is large enough but not too large (it doesn't
 		 * go past the end of the containing TLV).
 		 */
-		tll = EXTRACT_BE_U_2(&pdtlv->length) - TLV_HDRL;
-		aln = F_ALN_LEN(EXTRACT_BE_U_2(&pdtlv->length));
-		if (aln > EXTRACT_BE_U_2(&pdtlv->length)) {
+		tll = EXTRACT_BE_U_2(pdtlv->length) - TLV_HDRL;
+		aln = F_ALN_LEN(EXTRACT_BE_U_2(pdtlv->length));
+		if (aln > EXTRACT_BE_U_2(pdtlv->length)) {
 			if (aln > len) {
 				ND_PRINT("Invalid padded pathdata TLV type 0x%x len %d missing %d pad bytes\n",
-				          type, EXTRACT_BE_U_2(&pdtlv->length), aln - len);
+				          type, EXTRACT_BE_U_2(pdtlv->length),
+				          aln - len);
 			} else {
-				pad = aln - EXTRACT_BE_U_2(&pdtlv->length);
+				pad = aln - EXTRACT_BE_U_2(pdtlv->length);
 			}
 		}
 		if (pd_valid(type)) {
@@ -949,10 +950,14 @@ pdatacnt_print(netdissect_options *ndo,
 			if (ndo->ndo_vflag >= 3 && ops->v != F_TLV_PDAT) {
 				if (pad)
 					ND_PRINT("%s  %s (Length %d DataLen %d pad %d Bytes)\n",
-					          ib, ops->s, EXTRACT_BE_U_2(&pdtlv->length), tll, pad);
+					          ib, ops->s,
+					          EXTRACT_BE_U_2(pdtlv->length),
+					          tll, pad);
 				else
 					ND_PRINT("%s  %s (Length %d DataLen %d Bytes)\n",
-					          ib, ops->s, EXTRACT_BE_U_2(&pdtlv->length), tll);
+					          ib, ops->s,
+					          EXTRACT_BE_U_2(pdtlv->length),
+					          tll);
 			}
 
 			chk_op_type(ndo, type, op_msk, ops->op_msk);
@@ -964,9 +969,9 @@ pdatacnt_print(netdissect_options *ndo,
 			len -= (TLV_HDRL + pad + tll);
 		} else {
 			ND_PRINT("Invalid path data content type 0x%x len %d\n",
-			       type, EXTRACT_BE_U_2(&pdtlv->length));
+			       type, EXTRACT_BE_U_2(pdtlv->length));
 pd_err:
-			if (EXTRACT_BE_U_2(&pdtlv->length)) {
+			if (EXTRACT_BE_U_2(pdtlv->length)) {
                                 hex_print_with_offset(ndo, "Bad Data val\n\t  [",
 						      pptr, len, 0);
 				ND_PRINT("]\n");
@@ -998,25 +1003,26 @@ pdata_print(netdissect_options *ndo,
 		goto trunc;
 	if (ndo->ndo_vflag >= 3) {
 		ND_PRINT("\n%sPathdata: Flags 0x%x ID count %d\n",
-		       ib, EXTRACT_BE_U_2(&pdh->pflags), EXTRACT_BE_U_2(&pdh->pIDcnt));
+		       ib, EXTRACT_BE_U_2(pdh->pflags),
+		       EXTRACT_BE_U_2(pdh->pIDcnt));
 	}
 
-	if (EXTRACT_BE_U_2(&pdh->pflags) & F_SELKEY) {
+	if (EXTRACT_BE_U_2(pdh->pflags) & F_SELKEY) {
 		op_msk |= B_KEYIN;
 	}
 
 	/* Table GET Range operation */
-	if (EXTRACT_BE_U_2(&pdh->pflags) & F_SELTABRANGE) {
+	if (EXTRACT_BE_U_2(pdh->pflags) & F_SELTABRANGE) {
 		op_msk |= B_TRNG;
 	}
 	/* Table SET append operation */
-	if (EXTRACT_BE_U_2(&pdh->pflags) & F_TABAPPEND) {
+	if (EXTRACT_BE_U_2(pdh->pflags) & F_TABAPPEND) {
 		op_msk |= B_APPND;
 	}
 
 	pptr += sizeof(struct pathdata_h);
 	len -= sizeof(struct pathdata_h);
-	idcnt = EXTRACT_BE_U_2(&pdh->pIDcnt);
+	idcnt = EXTRACT_BE_U_2(pdh->pIDcnt);
 	minsize = idcnt * 4;
 	if (len < minsize) {
 		ND_PRINT("\t\t\ttruncated IDs expected %uB got %uB\n", minsize,
@@ -1058,11 +1064,12 @@ genoptlv_print(netdissect_options *ndo,
 	char *ib = indent_pr(indent, 0);
 
 	ND_TCHECK_SIZE(pdtlv);
-	type = EXTRACT_BE_U_2(&pdtlv->type);
-	tll = EXTRACT_BE_U_2(&pdtlv->length) - TLV_HDRL;
+	type = EXTRACT_BE_U_2(pdtlv->type);
+	tll = EXTRACT_BE_U_2(pdtlv->length) - TLV_HDRL;
 	invtlv = tlv_valid(pdtlv, len);
 	ND_PRINT("genoptlvprint - %s TLV type 0x%x len %d\n",
-	       tok2str(ForCES_TLV, NULL, type), type, EXTRACT_BE_U_2(&pdtlv->length));
+	       tok2str(ForCES_TLV, NULL, type), type,
+	       EXTRACT_BE_U_2(pdtlv->length));
 	if (!invtlv) {
 		/*
 		 * At this point, tlv_valid() has ensured that the TLV
@@ -1073,13 +1080,13 @@ genoptlv_print(netdissect_options *ndo,
 		if (!ttlv_valid(type)) {
 			ND_PRINT("%s TLV type 0x%x len %d\n",
 			       tok2str(ForCES_TLV_err, NULL, invtlv), type,
-			       EXTRACT_BE_U_2(&pdtlv->length));
+			       EXTRACT_BE_U_2(pdtlv->length));
 			return -1;
 		}
 		if (ndo->ndo_vflag >= 3)
 			ND_PRINT("%s%s, length %d (data length %d Bytes)",
 			       ib, tok2str(ForCES_TLV, NULL, type),
-			       EXTRACT_BE_U_2(&pdtlv->length), tll);
+			       EXTRACT_BE_U_2(pdtlv->length), tll);
 
 		return pdata_print(ndo, dp, tll, op_msk, indent + 1);
 	} else {
@@ -1117,15 +1124,15 @@ recpdoptlv_print(netdissect_options *ndo,
 		 * go past the end of the containing TLV).
 		 */
 		ib = indent_pr(indent, 0);
-		type = EXTRACT_BE_U_2(&pdtlv->type);
+		type = EXTRACT_BE_U_2(pdtlv->type);
 		dp = (const u_char *) TLV_DATA(pdtlv);
-		tll = EXTRACT_BE_U_2(&pdtlv->length) - TLV_HDRL;
+		tll = EXTRACT_BE_U_2(pdtlv->length) - TLV_HDRL;
 
 		if (ndo->ndo_vflag >= 3)
 			ND_PRINT("%s%s, length %d (data encapsulated %d Bytes)",
 			          ib, tok2str(ForCES_TLV, NULL, type),
-			          EXTRACT_BE_U_2(&pdtlv->length),
-			          EXTRACT_BE_U_2(&pdtlv->length) - TLV_HDRL);
+			          EXTRACT_BE_U_2(pdtlv->length),
+			          EXTRACT_BE_U_2(pdtlv->length) - TLV_HDRL);
 
 		if (pdata_print(ndo, dp, tll, op_msk, indent + 1) == -1)
 			return -1;
@@ -1134,7 +1141,8 @@ recpdoptlv_print(netdissect_options *ndo,
 
 	if (len) {
 		ND_PRINT("\n\t\tMessy PATHDATA TLV header, type (0x%x)\n\t\texcess of %d Bytes ",
-		          EXTRACT_BE_U_2(&pdtlv->type), len - EXTRACT_BE_U_2(&pdtlv->length));
+		          EXTRACT_BE_U_2(pdtlv->type),
+		          len - EXTRACT_BE_U_2(pdtlv->length));
 		return -1;
 	}
 
@@ -1172,21 +1180,21 @@ otlv_print(netdissect_options *ndo,
 	const struct optlv_h *ops;
 
 	/*
-	 * lfbselect_print() has ensured that EXTRACT_BE_U_2(&otlv->length)
+	 * lfbselect_print() has ensured that EXTRACT_BE_U_2(otlv->length)
 	 * >= TLV_HDRL.
 	 */
 	ND_TCHECK_SIZE(otlv);
-	type = EXTRACT_BE_U_2(&otlv->type);
-	tll = EXTRACT_BE_U_2(&otlv->length) - TLV_HDRL;
+	type = EXTRACT_BE_U_2(otlv->type);
+	tll = EXTRACT_BE_U_2(otlv->length) - TLV_HDRL;
 	ops = get_forces_optlv_h(type);
 	if (ndo->ndo_vflag >= 3) {
 		ND_PRINT("%sOper TLV %s(0x%x) length %d\n", ib, ops->s, type,
-		       EXTRACT_BE_U_2(&otlv->length));
+		       EXTRACT_BE_U_2(otlv->length));
 	}
 	/* rest of ops must at least have 12B {pathinfo} */
 	if (tll < OP_MIN_SIZ) {
 		ND_PRINT("\t\tOper TLV %s(0x%x) length %d\n", ops->s, type,
-		       EXTRACT_BE_U_2(&otlv->length));
+		       EXTRACT_BE_U_2(otlv->length));
 		ND_PRINT("\t\tTruncated data size %d minimum required %d\n", tll,
 		       OP_MIN_SIZ);
 		return invoptlv_print(ndo, dp, tll, ops->op_msk, indent);
@@ -1349,10 +1357,10 @@ print_metailv(netdissect_options *ndo,
 	 * print_metatlv() has ensured that len (what remains in the
 	 * ILV) >= ILV_HDRL.
 	 */
-	rlen = EXTRACT_BE_U_4(&ilv->length) - ILV_HDRL;
+	rlen = EXTRACT_BE_U_4(ilv->length) - ILV_HDRL;
 	ND_TCHECK_SIZE(ilv);
-	ND_PRINT("%sMetaID 0x%x length %d\n", ib, EXTRACT_BE_U_4(&ilv->type),
-		  EXTRACT_BE_U_4(&ilv->length));
+	ND_PRINT("%sMetaID 0x%x length %d\n", ib, EXTRACT_BE_U_4(ilv->type),
+		  EXTRACT_BE_U_4(ilv->length));
 	if (ndo->ndo_vflag >= 3) {
 		hex_print_with_offset(ndo, "\t\t[", ILV_DATA(ilv), rlen, 0);
 		ND_PRINT(" ]\n");
@@ -1464,18 +1472,18 @@ redirect_print(netdissect_options *ndo,
 		 * length is large enough but not too large (it doesn't
 		 * go past the end of the containing TLV).
 		 */
-		if (EXTRACT_BE_U_2(&tlv->type) == F_TLV_METD) {
+		if (EXTRACT_BE_U_2(tlv->type) == F_TLV_METD) {
 			print_metatlv(ndo, (const u_char *) TLV_DATA(tlv),
-				      EXTRACT_BE_U_2(&tlv->length), 0,
+				      EXTRACT_BE_U_2(tlv->length), 0,
 				      indent);
-		} else if ((EXTRACT_BE_U_2(&tlv->type) == F_TLV_REDD)) {
+		} else if ((EXTRACT_BE_U_2(tlv->type) == F_TLV_REDD)) {
 			print_reddata(ndo, (const u_char *) TLV_DATA(tlv),
-				      EXTRACT_BE_U_2(&tlv->length), 0,
+				      EXTRACT_BE_U_2(tlv->length), 0,
 				      indent);
 		} else {
 			ND_PRINT("Unknown REDIRECT TLV 0x%x len %d\n",
-			       EXTRACT_BE_U_2(&tlv->type),
-			       EXTRACT_BE_U_2(&tlv->length));
+			       EXTRACT_BE_U_2(tlv->type),
+			       EXTRACT_BE_U_2(tlv->length));
 		}
 
 		tlv = GO_NXT_TLV(tlv, rlen);
@@ -1483,8 +1491,8 @@ redirect_print(netdissect_options *ndo,
 
 	if (rlen) {
 		ND_PRINT("\n\t\tMessy Redirect TLV header, type (0x%x)\n\t\texcess of %d Bytes ",
-		          EXTRACT_BE_U_2(&tlv->type),
-		          rlen - EXTRACT_BE_U_2(&tlv->length));
+		          EXTRACT_BE_U_2(tlv->type),
+		          rlen - EXTRACT_BE_U_2(tlv->length));
 		return -1;
 	}
 
@@ -1531,9 +1539,10 @@ lfbselect_print(netdissect_options *ndo,
 	ND_TCHECK_SIZE(lfbs);
 	if (ndo->ndo_vflag >= 3) {
 		ND_PRINT("\n%s%s(Classid %x) instance %x\n",
-		       ib, tok2str(ForCES_LFBs, NULL, EXTRACT_BE_U_4(&lfbs->class)),
-		       EXTRACT_BE_U_4(&lfbs->class),
-		       EXTRACT_BE_U_4(&lfbs->instance));
+		       ib,
+		       tok2str(ForCES_LFBs, NULL, EXTRACT_BE_U_4(lfbs->class)),
+		       EXTRACT_BE_U_4(lfbs->class),
+		       EXTRACT_BE_U_4(lfbs->instance));
 	}
 
 	otlv = (const struct forces_tlv *)(lfbs + 1);
@@ -1550,13 +1559,14 @@ lfbselect_print(netdissect_options *ndo,
 		 * length is large enough but not too large (it doesn't
 		 * go past the end of the containing TLV).
 		 */
-		if (op_valid(EXTRACT_BE_U_2(&otlv->type), op_msk)) {
+		if (op_valid(EXTRACT_BE_U_2(otlv->type), op_msk)) {
 			otlv_print(ndo, otlv, 0, indent);
 		} else {
 			if (ndo->ndo_vflag < 3)
 				ND_PRINT("\n");
 			ND_PRINT("\t\tINValid oper-TLV type 0x%x length %d for this ForCES message\n",
-			          EXTRACT_BE_U_2(&otlv->type), EXTRACT_BE_U_2(&otlv->length));
+			          EXTRACT_BE_U_2(otlv->type),
+			          EXTRACT_BE_U_2(otlv->length));
 			invoptlv_print(ndo, (const u_char *)otlv, rlen, 0, indent);
 		}
 		otlv = GO_NXT_TLV(otlv, rlen);
@@ -1564,7 +1574,8 @@ lfbselect_print(netdissect_options *ndo,
 
 	if (rlen) {
 		ND_PRINT("\n\t\tMessy oper TLV header, type (0x%x)\n\t\texcess of %d Bytes ",
-		          EXTRACT_BE_U_2(&otlv->type), rlen - EXTRACT_BE_U_2(&otlv->length));
+		          EXTRACT_BE_U_2(otlv->type),
+		          rlen - EXTRACT_BE_U_2(otlv->length));
 		return -1;
 	}
 
@@ -1626,20 +1637,20 @@ forces_type_print(netdissect_options *ndo,
 		 * length is large enough but not too large (it doesn't
 		 * go past the end of the packet).
 		 */
-		if (!ttlv_valid(EXTRACT_BE_U_2(&tltlv->type))) {
+		if (!ttlv_valid(EXTRACT_BE_U_2(tltlv->type))) {
 			ND_PRINT("\n\tInvalid ForCES Top TLV type=0x%x",
-			       EXTRACT_BE_U_2(&tltlv->type));
+			       EXTRACT_BE_U_2(tltlv->type));
 			return -1;
 		}
 
 		if (ndo->ndo_vflag >= 3)
 			ND_PRINT("\t%s, length %d (data length %d Bytes)",
-			       tok2str(ForCES_TLV, NULL, EXTRACT_BE_U_2(&tltlv->type)),
-			       EXTRACT_BE_U_2(&tltlv->length),
-			       EXTRACT_BE_U_2(&tltlv->length) - TLV_HDRL);
+			       tok2str(ForCES_TLV, NULL, EXTRACT_BE_U_2(tltlv->type)),
+			       EXTRACT_BE_U_2(tltlv->length),
+			       EXTRACT_BE_U_2(tltlv->length) - TLV_HDRL);
 
 		rc = tops->print(ndo, (const u_char *) TLV_DATA(tltlv),
-				 EXTRACT_BE_U_2(&tltlv->length),
+				 EXTRACT_BE_U_2(tltlv->length),
 				 tops->op_msk, 9);
 		if (rc < 0) {
 			return -1;
@@ -1655,7 +1666,7 @@ forces_type_print(netdissect_options *ndo,
 	 */
 	if (rlen) {
 		ND_PRINT("\tMess TopTLV header: min %u, total %d advertised %d ",
-		       TLV_HDRL, rlen, EXTRACT_BE_U_2(&tltlv->length));
+		       TLV_HDRL, rlen, EXTRACT_BE_U_2(tltlv->length));
 		return -1;
 	}
 

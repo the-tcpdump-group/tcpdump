@@ -303,10 +303,10 @@ dhcp6opt_print(netdissect_options *ndo,
 			goto trunc;
 		dh6o = (const struct dhcp6opt *)cp;
 		ND_TCHECK_SIZE(dh6o);
-		optlen = EXTRACT_BE_U_2(&dh6o->dh6opt_len);
+		optlen = EXTRACT_BE_U_2(dh6o->dh6opt_len);
 		if (ep < cp + sizeof(*dh6o) + optlen)
 			goto trunc;
-		opttype = EXTRACT_BE_U_2(&dh6o->dh6opt_type);
+		opttype = EXTRACT_BE_U_2(dh6o->dh6opt_type);
 		ND_PRINT(" (%s", tok2str(dh6opt_str, "opt_%u", opttype));
 		ND_TCHECK_LEN(cp + sizeof(*dh6o), optlen);
 		switch (opttype) {
