@@ -473,8 +473,8 @@ sctp_print(netdissect_options *ndo,
   ND_TCHECK_SIZE(sctpPktHdr);
   sctpPacketLengthRemaining = sctpPacketLength;
 
-  sourcePort = EXTRACT_BE_U_2(&sctpPktHdr->source);
-  destPort = EXTRACT_BE_U_2(&sctpPktHdr->destination);
+  sourcePort = EXTRACT_BE_U_2(sctpPktHdr->source);
+  destPort = EXTRACT_BE_U_2(sctpPktHdr->destination);
 
   ip = (const struct ip *)bp2;
   if (IP_V(ip) == 6)
@@ -527,7 +527,7 @@ sctp_print(netdissect_options *ndo,
         break;
       }
       ND_TCHECK_SIZE(chunkDescPtr);
-      chunkLength = EXTRACT_BE_U_2(&chunkDescPtr->chunkLength);
+      chunkLength = EXTRACT_BE_U_2(chunkDescPtr->chunkLength);
       if (chunkLength < sizeof(*chunkDescPtr)) {
         ND_PRINT("%s%u) [Bad chunk length %u, < size of chunk descriptor]", sep, chunkCount+1, chunkLength);
         break;
@@ -583,10 +583,10 @@ sctp_print(netdissect_options *ndo,
 	    }
 	    dataHdrPtr=(const struct sctpDataPart*)bp;
 
-	    ppid = EXTRACT_BE_U_4(&dataHdrPtr->payloadtype);
-	    ND_PRINT("[TSN: %u] ", EXTRACT_BE_U_4(&dataHdrPtr->TSN));
-	    ND_PRINT("[SID: %u] ", EXTRACT_BE_U_2(&dataHdrPtr->streamId));
-	    ND_PRINT("[SSEQ %u] ", EXTRACT_BE_U_2(&dataHdrPtr->sequence));
+	    ppid = EXTRACT_BE_U_4(dataHdrPtr->payloadtype);
+	    ND_PRINT("[TSN: %u] ", EXTRACT_BE_U_4(dataHdrPtr->TSN));
+	    ND_PRINT("[SID: %u] ", EXTRACT_BE_U_2(dataHdrPtr->streamId));
+	    ND_PRINT("[SSEQ %u] ", EXTRACT_BE_U_2(dataHdrPtr->sequence));
 	    ND_PRINT("[PPID %s] ",
 		    tok2str(PayloadProto_idents, "0x%x", ppid));
 
@@ -637,11 +637,11 @@ sctp_print(netdissect_options *ndo,
 		return;
 	    }
 	    init=(const struct sctpInitiation*)bp;
-	    ND_PRINT("[init tag: %u] ", EXTRACT_BE_U_4(&init->initTag));
-	    ND_PRINT("[rwnd: %u] ", EXTRACT_BE_U_4(&init->rcvWindowCredit));
-	    ND_PRINT("[OS: %u] ", EXTRACT_BE_U_2(&init->NumPreopenStreams));
-	    ND_PRINT("[MIS: %u] ", EXTRACT_BE_U_2(&init->MaxInboundStreams));
-	    ND_PRINT("[init TSN: %u] ", EXTRACT_BE_U_4(&init->initialTSN));
+	    ND_PRINT("[init tag: %u] ", EXTRACT_BE_U_4(init->initTag));
+	    ND_PRINT("[rwnd: %u] ", EXTRACT_BE_U_4(init->rcvWindowCredit));
+	    ND_PRINT("[OS: %u] ", EXTRACT_BE_U_2(init->NumPreopenStreams));
+	    ND_PRINT("[MIS: %u] ", EXTRACT_BE_U_2(init->MaxInboundStreams));
+	    ND_PRINT("[init TSN: %u] ", EXTRACT_BE_U_4(init->initialTSN));
 	    bp += sizeof(*init);
  	    sctpPacketLengthRemaining -= sizeof(*init);
 	    chunkLengthRemaining -= sizeof(*init);
@@ -665,11 +665,11 @@ sctp_print(netdissect_options *ndo,
 		return;
 	    }
 	    init=(const struct sctpInitiation*)bp;
-	    ND_PRINT("[init tag: %u] ", EXTRACT_BE_U_4(&init->initTag));
-	    ND_PRINT("[rwnd: %u] ", EXTRACT_BE_U_4(&init->rcvWindowCredit));
-	    ND_PRINT("[OS: %u] ", EXTRACT_BE_U_2(&init->NumPreopenStreams));
-	    ND_PRINT("[MIS: %u] ", EXTRACT_BE_U_2(&init->MaxInboundStreams));
-	    ND_PRINT("[init TSN: %u] ", EXTRACT_BE_U_4(&init->initialTSN));
+	    ND_PRINT("[init tag: %u] ", EXTRACT_BE_U_4(init->initTag));
+	    ND_PRINT("[rwnd: %u] ", EXTRACT_BE_U_4(init->rcvWindowCredit));
+	    ND_PRINT("[OS: %u] ", EXTRACT_BE_U_2(init->NumPreopenStreams));
+	    ND_PRINT("[MIS: %u] ", EXTRACT_BE_U_2(init->MaxInboundStreams));
+	    ND_PRINT("[init TSN: %u] ", EXTRACT_BE_U_4(init->initialTSN));
             bp += sizeof(*init);
             sctpPacketLengthRemaining -= sizeof(*init);
             chunkLengthRemaining -= sizeof(*init);
@@ -696,10 +696,10 @@ sctp_print(netdissect_options *ndo,
 	      return;
 	    }
 	    sack=(const struct sctpSelectiveAck*)bp;
-	    ND_PRINT("[cum ack %u] ", EXTRACT_BE_U_4(&sack->highestConseqTSN));
-	    ND_PRINT("[a_rwnd %u] ", EXTRACT_BE_U_4(&sack->updatedRwnd));
-	    ND_PRINT("[#gap acks %u] ", EXTRACT_BE_U_2(&sack->numberOfdesc));
-	    ND_PRINT("[#dup tsns %u] ", EXTRACT_BE_U_2(&sack->numDupTsns));
+	    ND_PRINT("[cum ack %u] ", EXTRACT_BE_U_4(sack->highestConseqTSN));
+	    ND_PRINT("[a_rwnd %u] ", EXTRACT_BE_U_4(sack->updatedRwnd));
+	    ND_PRINT("[#gap acks %u] ", EXTRACT_BE_U_2(sack->numberOfdesc));
+	    ND_PRINT("[#dup tsns %u] ", EXTRACT_BE_U_2(sack->numDupTsns));
             bp += sizeof(*sack);
 	    sctpPacketLengthRemaining -= sizeof(*sack);
             chunkLengthRemaining -= sizeof(*sack);
@@ -707,7 +707,7 @@ sctp_print(netdissect_options *ndo,
 
 	    /* print gaps */
 	    for (fragNo=0;
-		 chunkLengthRemaining != 0 && fragNo < EXTRACT_BE_U_2(&sack->numberOfdesc);
+		 chunkLengthRemaining != 0 && fragNo < EXTRACT_BE_U_2(sack->numberOfdesc);
 		 bp += sizeof(*frag), sctpPacketLengthRemaining -= sizeof(*frag), chunkLengthRemaining -= sizeof(*frag), fragNo++) {
 	      if (chunkLengthRemaining < sizeof(*frag)) {
 		ND_PRINT("bogus chunk length %u]", chunkLength);
@@ -716,13 +716,13 @@ sctp_print(netdissect_options *ndo,
 	      frag = (const struct sctpSelectiveFrag *)bp;
 	      ND_PRINT("\n\t\t[gap ack block #%u: start = %u, end = %u] ",
 		     fragNo+1,
-		     EXTRACT_BE_U_4(&sack->highestConseqTSN) + EXTRACT_BE_U_2(&frag->fragmentStart),
-		     EXTRACT_BE_U_4(&sack->highestConseqTSN) + EXTRACT_BE_U_2(&frag->fragmentEnd));
+		     EXTRACT_BE_U_4(sack->highestConseqTSN) + EXTRACT_BE_U_2(frag->fragmentStart),
+		     EXTRACT_BE_U_4(sack->highestConseqTSN) + EXTRACT_BE_U_2(frag->fragmentEnd));
 	    }
 
 	    /* print duplicate TSNs */
 	    for (tsnNo=0;
-		 chunkLengthRemaining != 0 && tsnNo<EXTRACT_BE_U_2(&sack->numDupTsns);
+		 chunkLengthRemaining != 0 && tsnNo<EXTRACT_BE_U_2(sack->numDupTsns);
 		 bp += 4, sctpPacketLengthRemaining -= 4, chunkLengthRemaining -= 4, tsnNo++) {
 	      if (chunkLengthRemaining < 4) {
 		ND_PRINT("bogus chunk length %u]", chunkLength);

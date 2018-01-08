@@ -724,9 +724,9 @@ esp_print(netdissect_options *ndo,
 		break;
 	case 4:
 		/* nexthdr & padding are in the last fragment */
-		if (EXTRACT_BE_U_2(&ip->ip_off) & IP_MF)
+		if (EXTRACT_BE_U_2(ip->ip_off) & IP_MF)
 			goto fail;
-		len = EXTRACT_BE_U_2(&ip->ip_len);
+		len = EXTRACT_BE_U_2(ip->ip_len);
 
 		/* see if we can find the SA, and if so, decode it */
 		for (sa = ndo->ndo_sa_list_head; sa != NULL; sa = sa->next) {
