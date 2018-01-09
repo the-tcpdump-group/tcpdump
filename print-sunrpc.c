@@ -144,13 +144,6 @@
 #define SUNRPC_PMAPPROC_DUMP	((uint32_t)4)
 #define SUNRPC_PMAPPROC_CALLIT	((uint32_t)5)
 
-struct sunrpc_pmap {
-	uint32_t pm_prog;
-	uint32_t pm_vers;
-	uint32_t pm_prot;
-	uint32_t pm_port;
-};
-
 static const struct tok proc2str[] = {
 	{ SUNRPC_PMAPPROC_NULL,		"null" },
 	{ SUNRPC_PMAPPROC_SET,		"set" },
