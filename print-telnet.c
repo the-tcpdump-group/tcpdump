@@ -398,7 +398,8 @@ telnet_parse(netdissect_options *ndo, const u_char *sp, u_int length, int print)
 		if (length < 1) \
 			goto pktend; \
 		ND_TCHECK_1(sp); \
-		c = *sp++; \
+		c = EXTRACT_U_1(sp); \
+		sp++; \
 		length--; \
 	} while (0)
 
