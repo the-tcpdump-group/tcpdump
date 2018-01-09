@@ -53,14 +53,14 @@ nflog_hdr_print(netdissect_options *ndo, const nflog_hdr_t *hdr, u_int length)
 
 	if (!ndo->ndo_qflag) {
 		ND_PRINT(", family %s (%d)",
-						  tok2str(nflog_values, "Unknown",
-								  hdr->nflog_family),
-						  hdr->nflog_family);
+			 tok2str(nflog_values, "Unknown",
+				 hdr->nflog_family),
+			 hdr->nflog_family);
 		} else {
 		ND_PRINT(", %s",
-						  tok2str(nflog_values,
-								  "Unknown NFLOG (0x%02x)",
-								  hdr->nflog_family));
+			 tok2str(nflog_values,
+				 "Unknown NFLOG (0x%02x)",
+			 hdr->nflog_family));
 		}
 
 	ND_PRINT(", length %u: ", length);
