@@ -1330,7 +1330,7 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --disable-universal     don't build universal on OS X
+  --disable-universal     don't build universal on macOS
   --enable-smb            enable possibly-buggy SMB printer default=yes
   --disable-smb           disable possibly-buggy SMB printer
 
@@ -7654,7 +7654,7 @@ if test "$want_libcrypto" != "no"; then
 	# El Capitan, probably because they don't want you writing
 	# nasty portable code that could run on other UN*Xes, they
 	# want you writing code that uses their Shiny New Crypto
-	# Library and that only runs on OS X.
+	# Library and that only runs on macOS.
 	#
 	ac_fn_c_check_header_mongrel "$LINENO" "openssl/crypto.h" "ac_cv_header_openssl_crypto_h" "$ac_includes_default"
 if test "x$ac_cv_header_openssl_crypto_h" = xyes; then :

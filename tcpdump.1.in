@@ -202,10 +202,10 @@ is running, if the OS reports that information to applications; if not,
 it will be reported as 0).
 .LP
 On platforms that support the SIGINFO signal, such as most BSDs
-(including Mac OS X) and Digital/Tru64 UNIX, it will report those counts
+(including macOS) and Digital/Tru64 UNIX, it will report those counts
 when it receives a SIGINFO signal (generated, for example, by typing
 your ``status'' character, typically control-T, although on some
-platforms, such as Mac OS X, the ``status'' character is not set by
+platforms, such as macOS, the ``status'' character is not set by
 default, so you must set it with
 .BR stty (1)
 in order to use it) and will continue capturing packets. On platforms that
@@ -600,7 +600,7 @@ lines are shorter.
 .BI \-r " file"
 Read packets from \fIfile\fR (which was created with the
 .B \-w
-option or by other tools that write pcap or pcap-ng files).
+option or by other tools that write pcap or pcapng files).
 Standard input is used if \fIfile\fR is ``-''.
 .TP
 .B \-S

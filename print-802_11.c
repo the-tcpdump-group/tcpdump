@@ -2589,7 +2589,7 @@ print_radiotap_field(netdissect_options *ndo,
 		/*
 		 * XXX On FreeBSD rate & 0x80 means we have an MCS. On
 		 * Linux and AirPcap it does not.  (What about
-		 * Mac OS X, NetBSD, OpenBSD, and DragonFly BSD?)
+		 * macOS, NetBSD, OpenBSD, and DragonFly BSD?)
 		 *
 		 * This is an issue either for proprietary extensions
 		 * to 11a or 11g, which do exist, or for 11n

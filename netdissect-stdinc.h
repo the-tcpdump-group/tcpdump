@@ -335,8 +335,8 @@ typedef char* caddr_t;
  * an 80386, so, for example, it avoids the bswap instruction added in
  * the 80486.
  *
- * (We don't use them on OS X; Apple provides their own, which *doesn't*
- * avoid the bswap instruction, as OS X only supports machines that
+ * (We don't use them on macOS; Apple provides their own, which *doesn't*
+ * avoid the bswap instruction, as macOS only supports machines that
  * have it.)
  */
 #if defined(__GNUC__) && defined(__i386__) && !defined(__APPLE__) && !defined(__ntohl)

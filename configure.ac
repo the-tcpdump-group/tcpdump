@@ -66,7 +66,7 @@ case "$host_os" in
 
 darwin*)
 	AC_ARG_ENABLE(universal,
-	AC_HELP_STRING([--disable-universal],[don't build universal on OS X]))
+	AC_HELP_STRING([--disable-universal],[don't build universal on macOS]))
 	if test "$enable_universal" != "no"; then
 		case "$host_os" in
 
@@ -644,9 +644,10 @@ fi
 #
 AC_CHECK_FUNCS(pcap_findalldevs)
 if test $ac_cv_func_pcap_findalldevs = "yes" ; then
-dnl Check for Mac OS X, which may ship pcap.h from 0.6 but libpcap may
-dnl be 0.8; this means that lib has pcap_findalldevs but header doesn't
-dnl have pcap_if_t.
+dnl Check for libpcap having pcap_findalldevs() but the pcap.h header
+dnl not having pcap_if_t; some versions of Mac OS X shipped with pcap.h
+dnl from 0.6 and libpcap 0.8, so that libpcap had pcap_findalldevs but
+dnl pcap.h didn't have pcap_if_t.
     savedcppflags="$CPPFLAGS"
     CPPFLAGS="$CPPFLAGS $V_INCLS"
     AC_CHECK_TYPES(pcap_if_t, , , [#include <pcap.h>])
@@ -891,7 +892,7 @@ if test "$want_libcrypto" != "no"; then
 	# El Capitan, probably because they don't want you writing
 	# nasty portable code that could run on other UN*Xes, they
 	# want you writing code that uses their Shiny New Crypto
-	# Library and that only runs on OS X.
+	# Library and that only runs on macOS.
 	#
 	AC_CHECK_HEADER(openssl/crypto.h,
 	[

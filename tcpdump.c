@@ -503,22 +503,22 @@ show_remote_devices_and_exit(void)
  * only use them for the same purposes that the other versions of tcpdump
  * use them:
  *
- * OS X tcpdump uses -g to force non--v output for IP to be on one
+ * macOS tcpdump uses -g to force non--v output for IP to be on one
  * line, making it more "g"repable;
  *
- * OS X tcpdump uses -k to specify that packet comments in pcap-ng files
+ * macOS tcpdump uses -k to specify that packet comments in pcapng files
  * should be printed;
  *
  * OpenBSD tcpdump uses -o to indicate that OS fingerprinting should be done
  * for hosts sending TCP SYN packets;
  *
- * OS X tcpdump uses -P to indicate that -w should write pcap-ng rather
+ * macOS tcpdump uses -P to indicate that -w should write pcapng rather
  * than pcap files.
  *
- * OS X tcpdump also uses -Q to specify expressions that match packet
+ * macOS tcpdump also uses -Q to specify expressions that match packet
  * metadata, including but not limited to the packet direction.
  * The expression syntax is different from a simple "in|out|inout",
- * and those expressions aren't accepted by OS X tcpdump, but the
+ * and those expressions aren't accepted by macOS tcpdump, but the
  * equivalents would be "in" = "dir=in", "out" = "dir=out", and
  * "inout" = "dir=in or dir=out", and the parser could conceivably
  * special-case "in", "out", and "inout" as expressions for backwards
