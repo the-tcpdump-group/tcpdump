@@ -62,8 +62,8 @@ static const struct tok cdp_tlv_values[] = {
     { 0x09,             "VTP Management Domain"},
     { 0x0a,             "Native VLAN ID"},
     { 0x0b,             "Duplex"},
-    { 0x0e,             "ATA-186 VoIP VLAN request"},
-    { 0x0f,             "ATA-186 VoIP VLAN assignment"},
+    { 0x0e,             "ATA-186 VoIP VLAN assignment"},
+    { 0x0f,             "ATA-186 VoIP VLAN request"},
     { 0x10,             "power consumption"},
     { 0x11,             "MTU"},
     { 0x12,             "AVVID trust bitmap"},
@@ -86,15 +86,15 @@ static const struct tok cdp_capability_values[] = {
     { 0, NULL }
 };
 
-static int cdp_print_addr(netdissect_options *, const u_char *, int);
-static int cdp_print_prefixes(netdissect_options *, const u_char *, int);
-static unsigned long cdp_get_number(const u_char *, int);
+static int cdp_print_addr(netdissect_options *, const u_char *, u_int);
+static int cdp_print_prefixes(netdissect_options *, const u_char *, u_int);
+static unsigned int cdp_get_number(const u_char *, u_int);
 
 void
 cdp_print(netdissect_options *ndo,
           const u_char *pptr, u_int length, u_int caplen)
 {
-	int type, len, i, j;
+	u_int type, len, i, j;
 	const u_char *tptr;
 
 	if (caplen < CDP_HEADER_LEN) {
@@ -197,7 +197,7 @@ cdp_print(netdissect_options *ndo,
 		    case 0x0a: /* Native VLAN ID - CDPv2 */
 			if (len < 2)
 			    goto trunc;
-			ND_PRINT("%d", EXTRACT_BE_U_2(tptr));
+			ND_PRINT("%u", EXTRACT_BE_U_2(tptr));
 			break;
 		    case 0x0b: /* Duplex - CDPv2 */
 			if (len < 1)
@@ -207,13 +207,30 @@ cdp_print(netdissect_options *ndo,
 
 		    /* http://www.cisco.com/c/en/us/td/docs/voice_ip_comm/cata/186/2_12_m/english/release/notes/186rn21m.html
 		     * plus more details from other sources
+		     *
+		     * There are apparently versions of the request with both
+		     * 2 bytes and 3 bytes of value.  The 3 bytes of value
+		     * appear to be a 1-byte application type followed by a
+		     * 2-byte VLAN ID; the 2 bytes of value are unknown
+		     * (they're 0x20 0x00 in some captures I've seen; that
+		     * is not a valid VLAN ID, as VLAN IDs are 12 bits).
+		     *
+		     * The replies all appear to be 3 bytes long.
 		     */
-		    case 0x0e: /* ATA-186 VoIP VLAN request - incomplete doc. */
+		    case 0x0e: /* ATA-186 VoIP VLAN assignment - incomplete doc. */
 			if (len < 3)
 			    goto trunc;
-			ND_PRINT("app %d, vlan %d", EXTRACT_U_1((tptr)), EXTRACT_BE_U_2(tptr + 1));
+			ND_PRINT("app %u, vlan %u", EXTRACT_U_1(tptr), EXTRACT_BE_U_2(tptr + 1));
 			break;
-		    case 0x10: /* ATA-186 VoIP VLAN assignment - incomplete doc. */
+		    case 0x0f: /* ATA-186 VoIP VLAN request - incomplete doc. */
+			if (len < 2)
+			    goto trunc;
+			if (len == 2)
+			    ND_PRINT("unknown 0x%04x", EXTRACT_BE_U_2(tptr));
+			else
+			    ND_PRINT("app %u, vlan %u", EXTRACT_U_1(tptr), EXTRACT_BE_U_2(tptr + 1));
+			break;
+		    case 0x10: /* Power - not documented */
 			ND_PRINT("%1.2fW", cdp_get_number(tptr, len) / 1000.0);
 			break;
 		    case 0x11: /* MTU - not documented */
@@ -277,9 +294,9 @@ trunc:
 
 static int
 cdp_print_addr(netdissect_options *ndo,
-	       const u_char * p, int l)
+	       const u_char * p, u_int l)
 {
-	int pt, pl, al, num;
+	u_int pt, pl, al, num;
 	const u_char *endp = p + l;
 	static const u_char prot_ipv6[] = {
 		0xaa, 0xaa, 0x03, 0x00, 0x00, 0x00, 0x86, 0xdd
@@ -291,12 +308,12 @@ cdp_print_addr(netdissect_options *ndo,
 	num = EXTRACT_BE_U_4(p);
 	p += 4;
 
-	while (p < endp && num >= 0) {
+	while (p < endp && num != 0) {
 		ND_TCHECK_2(p);
 		if (p + 2 > endp)
 			goto trunc;
 		pt = EXTRACT_U_1(p);		/* type of "protocol" field */
-		pl = EXTRACT_U_1(p + 1);		/* length of "protocol" field */
+		pl = EXTRACT_U_1(p + 1);	/* length of "protocol" field */
 		p += 2;
 
 		ND_TCHECK_2(p + pl);
@@ -342,7 +359,7 @@ cdp_print_addr(netdissect_options *ndo,
 			ND_TCHECK_LEN(p, pl);
 			if (p + pl > endp)
 				goto trunc;
-			ND_PRINT("pt=0x%02x, pl=%d, pb=", EXTRACT_U_1((p - 2)), pl);
+			ND_PRINT("pt=0x%02x, pl=%u, pb=", EXTRACT_U_1((p - 2)), pl);
 			while (pl-- > 0) {
 				ND_PRINT(" %02x", EXTRACT_U_1(p));
 				p++;
@@ -350,7 +367,7 @@ cdp_print_addr(netdissect_options *ndo,
 			ND_TCHECK_2(p);
 			if (p + 2 > endp)
 				goto trunc;
-			ND_PRINT(", al=%d, a=", al);
+			ND_PRINT(", al=%u, a=", al);
 			p += 2;
 			ND_TCHECK_LEN(p, al);
 			if (p + al > endp)
@@ -374,12 +391,12 @@ trunc:
 
 static int
 cdp_print_prefixes(netdissect_options *ndo,
-		   const u_char * p, int l)
+		   const u_char * p, u_int l)
 {
 	if (l % 5)
 		goto trunc;
 
-	ND_PRINT(" IPv4 Prefixes (%d):", l / 5);
+	ND_PRINT(" IPv4 Prefixes (%u):", l / 5);
 
 	while (l > 0) {
 		ND_PRINT(" %u.%u.%u.%u/%u",
@@ -396,11 +413,11 @@ trunc:
 }
 
 /* read in a <n>-byte number, MSB first
- * (of course this can handle max sizeof(long))
+ * (of course this can handle max sizeof(int))
  */
-static unsigned long cdp_get_number(const u_char * p, int l)
+static unsigned int cdp_get_number(const u_char * p, u_int l)
 {
-    unsigned long res=0;
+    unsigned int res=0;
     while( l>0 )
     {
 	res = (res<<8) + EXTRACT_U_1(p);
