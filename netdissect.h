@@ -61,6 +61,7 @@ typedef signed char nd_int8_t[1];
  * individual bytes while they're being assembled.
  */
 typedef unsigned char nd_int32_t[4];
+typedef unsigned char nd_int64_t[8];
 
 /*
  * Use this for IPv4 addresses and netmasks.

@@ -99,14 +99,12 @@ static const struct printer printers[] = {
 #ifdef DLT_IPV6
 	{ raw_if_print,		DLT_IPV6 },
 #endif
-#ifdef HAVE_PCAP_USB_H
 #ifdef DLT_USB_LINUX
 	{ usb_linux_48_byte_if_print, DLT_USB_LINUX},
 #endif /* DLT_USB_LINUX */
 #ifdef DLT_USB_LINUX_MMAPPED
 	{ usb_linux_64_byte_if_print, DLT_USB_LINUX_MMAPPED},
 #endif /* DLT_USB_LINUX_MMAPPED */
-#endif /* HAVE_PCAP_USB_H */
 #ifdef DLT_SYMANTEC_FIREWALL
 	{ symantec_if_print,	DLT_SYMANTEC_FIREWALL },
 #endif

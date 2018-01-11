@@ -306,6 +306,56 @@ EXTRACT_IPV4_TO_HOST_ORDER(const void *p)
 #endif /* unaligned access checks */
 
 /*
+ * Extract numerical values in *host* byte order.  (Some metadata
+ * headers are in the byte order of the host that wrote the file,
+ * and libpcap translate them to the byte order of the host
+ * reading the file.  This means that if a program on that host
+ * reads with libpcap and writes to a new file, the new file will
+ * be written in the byte order of the host writing the file.  Thus,
+ * the magic number in pcap files and byte-order magic in pcapng
+ * files can be used to determine the byte order in those metadata
+ * headers.)
+ *
+ * XXX - on platforms that can do unaligned accesses, just cast and
+ * dereference the pointer.
+ */
+static inline uint16_t
+EXTRACT_HE_U_2(const void *p)
+{
+	uint16_t val;
+
+	UNALIGNED_MEMCPY(&val, p, sizeof(uint16_t));
+	return val;
+}
+
+static inline uint16_t
+EXTRACT_HE_S_2(const void *p)
+{
+	int16_t val;
+
+	UNALIGNED_MEMCPY(&val, p, sizeof(int16_t));
+	return val;
+}
+
+static inline uint16_t
+EXTRACT_HE_U_4(const void *p)
+{
+	uint32_t val;
+
+	UNALIGNED_MEMCPY(&val, p, sizeof(uint32_t));
+	return val;
+}
+
+static inline uint16_t
+EXTRACT_HE_S_4(const void *p)
+{
+	int32_t val;
+
+	UNALIGNED_MEMCPY(&val, p, sizeof(int32_t));
+	return val;
+}
+
+/*
  * Extract an IPv4 address, which is in network byte order, and which
  * is not necessarily aligned on a 4-byte boundary, and provide the
  * result in network byte order.

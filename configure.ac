@@ -835,7 +835,6 @@ savedcppflags="$CPPFLAGS"
 CPPFLAGS="$CPPFLAGS $V_INCLS"
 AC_CHECK_HEADERS(pcap/bluetooth.h,,,[#include "netdissect-stdinc.h"])
 AC_CHECK_HEADERS(pcap/nflog.h,,,[#include "netdissect-stdinc.h"])
-AC_CHECK_HEADERS(pcap/usb.h,,,[#include "netdissect-stdinc.h"])
 CPPFLAGS="$savedcppflags"
 
 AC_PROG_RANLIB

@@ -6671,19 +6671,6 @@ fi
 
 done
 
-for ac_header in pcap/usb.h
-do :
-  ac_fn_c_check_header_compile "$LINENO" "pcap/usb.h" "ac_cv_header_pcap_usb_h" "#include \"netdissect-stdinc.h\"
-"
-if test "x$ac_cv_header_pcap_usb_h" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_PCAP_USB_H 1
-_ACEOF
-
-fi
-
-done
-
 CPPFLAGS="$savedcppflags"
 
 if test -n "$ac_tool_prefix"; then
