@@ -97,37 +97,43 @@ struct rtcp_rr {
 #define RTCP_PT_APP	204
 
 static void
-vat_print(netdissect_options *ndo, const void *hdr, const struct udphdr *up)
+vat_print(netdissect_options *ndo, const void *hdr, u_int length)
 {
 	/* vat/vt audio */
 	u_int ts;
 
+	if (length < 2) {
+		ND_PRINT("udp/va/vat, length %u < 2", length);
+		return;
+	}
 	ND_TCHECK_2((const u_int *)hdr);
 	ts = EXTRACT_BE_U_2(hdr);
 	if ((ts & 0xf060) != 0) {
 		/* probably vt */
-		ND_TCHECK_2(up->uh_ulen);
-		ND_PRINT("udp/vt %u %d / %d",
-			     (uint32_t)(EXTRACT_BE_U_2(up->uh_ulen) - sizeof(*up)),
+		ND_PRINT("udp/vt %u %u / %u",
+			     length,
 			     ts & 0x3ff, ts >> 10);
 	} else {
 		/* probably vat */
 		uint32_t i0, i1;
 
+		if (length < 8) {
+			ND_PRINT("udp/vat, length %u < 8", length);
+			return;
+		}
 		ND_TCHECK_4(&((const u_int *)hdr)[0]);
 		i0 = EXTRACT_BE_U_4(&((const u_int *)hdr)[0]);
 		ND_TCHECK_4(&((const u_int *)hdr)[1]);
 		i1 = EXTRACT_BE_U_4(&((const u_int *)hdr)[1]);
-		ND_TCHECK_2(up->uh_ulen);
-		ND_PRINT("udp/vat %u c%d %u%s",
-			(uint32_t)(EXTRACT_BE_U_2(up->uh_ulen) - sizeof(*up) - 8),
+		ND_PRINT("udp/vat %u c%u %u%s",
+			length - 8,
 			i0 & 0xffff,
 			i1, i0 & 0x800000? "*" : "");
 		/* audio format */
 		if (i0 & 0x1f0000)
-			ND_PRINT(" f%d", (i0 >> 16) & 0x1f);
+			ND_PRINT(" f%u", (i0 >> 16) & 0x1f);
 		if (i0 & 0x3f000000)
-			ND_PRINT(" s%d", (i0 >> 24) & 0x3f);
+			ND_PRINT(" s%u", (i0 >> 24) & 0x3f);
 	}
 
 trunc:
@@ -135,8 +141,7 @@ trunc:
 }
 
 static void
-rtp_print(netdissect_options *ndo, const void *hdr, u_int len,
-          const struct udphdr *up)
+rtp_print(netdissect_options *ndo, const void *hdr, u_int len)
 {
 	/* rtp v1 or v2 */
 	const u_int *ip = (const u_int *)hdr;
@@ -144,12 +149,15 @@ rtp_print(netdissect_options *ndo, const void *hdr, u_int len,
 	uint32_t i0, i1;
 	const char * ptype;
 
+	if (len < 8) {
+		ND_PRINT("udp/rtp, length %u < 8", len);
+		return;
+	}
 	ND_TCHECK_4(&((const u_int *)hdr)[0]);
 	i0 = EXTRACT_BE_U_4(&((const u_int *)hdr)[0]);
 	ND_TCHECK_4(&((const u_int *)hdr)[1]);
 	i1 = EXTRACT_BE_U_4(&((const u_int *)hdr)[1]);
-	ND_TCHECK_2(up->uh_ulen);
-	dlen = EXTRACT_BE_U_2(up->uh_ulen) - sizeof(*up) - 8;
+	dlen = len - 8;
 	ip += 2;
 	len >>= 2;
 	len -= 2;
@@ -163,6 +171,10 @@ rtp_print(netdissect_options *ndo, const void *hdr, u_int len,
 		ptype = "rtpv1";
 	} else {
 		/* rtp v2 - RFC 3550 */
+		if (dlen < 4) {
+			ND_PRINT("udp/rtp, length %u < 12", dlen + 8);
+			return;
+		}
 		hasext = i0 & 0x10000000;
 		contype = (i0 >> 16) & 0x7f;
 		hasmarker = i0 & 0x800000;
@@ -171,7 +183,7 @@ rtp_print(netdissect_options *ndo, const void *hdr, u_int len,
 		ip += 1;
 		len -= 1;
 	}
-	ND_PRINT("udp/%s %d c%d %s%s %d %u",
+	ND_PRINT("udp/%s %u c%u %s%s %u %u",
 		ptype,
 		dlen,
 		contype,
@@ -225,7 +237,7 @@ rtcp_print(netdissect_options *ndo, const u_char *hdr, const u_char *ep)
 	const struct rtcphdr *rh = (const struct rtcphdr *)hdr;
 	u_int len;
 	uint16_t flags;
-	int cnt;
+	u_int cnt;
 	double ts, dts;
 	if ((const u_char *)(rh + 1) > ep)
 		goto trunc;
@@ -238,7 +250,7 @@ rtcp_print(netdissect_options *ndo, const u_char *hdr, const u_char *ep)
 		sr = (const struct rtcp_sr *)(rh + 1);
 		ND_PRINT(" sr");
 		if (len != cnt * sizeof(*rr) + sizeof(*sr) + sizeof(*rh))
-			ND_PRINT(" [%d]", len);
+			ND_PRINT(" [%u]", len);
 		if (ndo->ndo_vflag)
 			ND_PRINT(" %u", EXTRACT_BE_U_4(rh->rh_ssrc));
 		if ((const u_char *)(sr + 1) > ep)
@@ -254,31 +266,31 @@ rtcp_print(netdissect_options *ndo, const u_char *hdr, const u_char *ep)
 	case RTCP_PT_RR:
 		ND_PRINT(" rr");
 		if (len != cnt * sizeof(*rr) + sizeof(*rh))
-			ND_PRINT(" [%d]", len);
+			ND_PRINT(" [%u]", len);
 		rr = (const struct rtcp_rr *)(rh + 1);
 		if (ndo->ndo_vflag)
 			ND_PRINT(" %u", EXTRACT_BE_U_4(rh->rh_ssrc));
 		break;
 	case RTCP_PT_SDES:
-		ND_PRINT(" sdes %d", len);
+		ND_PRINT(" sdes %u", len);
 		if (ndo->ndo_vflag)
 			ND_PRINT(" %u", EXTRACT_BE_U_4(rh->rh_ssrc));
 		cnt = 0;
 		break;
 	case RTCP_PT_BYE:
-		ND_PRINT(" bye %d", len);
+		ND_PRINT(" bye %u", len);
 		if (ndo->ndo_vflag)
 			ND_PRINT(" %u", EXTRACT_BE_U_4(rh->rh_ssrc));
 		cnt = 0;
 		break;
 	default:
-		ND_PRINT(" type-0x%x %d", flags & 0xff, len);
+		ND_PRINT(" type-0x%x %u", flags & 0xff, len);
 		cnt = 0;
 		break;
 	}
 	if (cnt > 1)
-		ND_PRINT(" c%d", cnt);
-	while (--cnt >= 0) {
+		ND_PRINT(" c%u", cnt);
+	while (cnt != 0) {
 		if ((const u_char *)(rr + 1) > ep)
 			goto trunc;
 		ND_TCHECK_SIZE(rr);
@@ -290,6 +302,7 @@ rtcp_print(netdissect_options *ndo, const u_char *hdr, const u_char *ep)
 		    EXTRACT_BE_U_4(rr->rr_nl) & 0x00ffffff,
 		    EXTRACT_BE_U_4(rr->rr_ls),
 		    EXTRACT_BE_U_4(rr->rr_dv), ts, dts);
+		cnt--;
 	}
 	return (hdr + len);
 
@@ -395,7 +408,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 
 	if (length < sizeof(struct udphdr)) {
 		udpipaddr_print(ndo, ip, sport, dport);
-		ND_PRINT("truncated-udp %d", length);
+		ND_PRINT("truncated-udp %u", length);
 		return;
 	}
 	if (!ND_TTEST(up->uh_ulen)) {
@@ -405,7 +418,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	ulen = EXTRACT_BE_U_2(up->uh_ulen);
 	if (ulen < sizeof(struct udphdr)) {
 		udpipaddr_print(ndo, ip, sport, dport);
-		ND_PRINT("truncated-udplength %d", ulen);
+		ND_PRINT("truncated-udplength %u", ulen);
 		return;
 	}
 	ulen -= sizeof(struct udphdr);
@@ -427,7 +440,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 
 		case PT_VAT:
 			udpipaddr_print(ndo, ip, sport, dport);
-			vat_print(ndo, (const void *)(up + 1), up);
+			vat_print(ndo, (const void *)(up + 1), length);
 			break;
 
 		case PT_WB:
@@ -448,7 +461,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 
 		case PT_RTP:
 			udpipaddr_print(ndo, ip, sport, dport);
-			rtp_print(ndo, (const void *)(up + 1), length, up);
+			rtp_print(ndo, (const void *)(up + 1), length);
 			break;
 
 		case PT_RTCP:
@@ -606,7 +619,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			nbt_udp138_print(ndo, (const u_char *)(up + 1), length);
 #endif
 		else if (dport == VAT_PORT)
-			vat_print(ndo, (const void *)(up + 1), up);
+			vat_print(ndo, (const void *)(up + 1), length);
 		else if (IS_SRC_OR_DST_PORT(ZEPHYR_SRV_PORT) || IS_SRC_OR_DST_PORT(ZEPHYR_CLT_PORT))
 			zephyr_print(ndo, (const void *)(up + 1), length);
 		/*
