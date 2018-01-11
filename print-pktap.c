@@ -44,20 +44,20 @@
  * to host byte order in libpcap.
  */
 typedef struct pktap_header {
-	uint32_t	pkt_len;	/* length of pktap header */
-	uint32_t	pkt_rectype;	/* type of record */
-	uint32_t	pkt_dlt;	/* DLT type of this packet */
+	nd_uint32_t	pkt_len;	/* length of pktap header */
+	nd_uint32_t	pkt_rectype;	/* type of record */
+	nd_uint32_t	pkt_dlt;	/* DLT type of this packet */
 	char		pkt_ifname[24];	/* interface name */
-	uint32_t	pkt_flags;
-	uint32_t	pkt_pfamily;	/* "protocol family" */
-	uint32_t	pkt_llhdrlen;	/* link-layer header length? */
-	uint32_t	pkt_lltrlrlen;	/* link-layer trailer length? */
-	uint32_t	pkt_pid;	/* process ID */
+	nd_uint32_t	pkt_flags;
+	nd_uint32_t	pkt_pfamily;	/* "protocol family" */
+	nd_uint32_t	pkt_llhdrlen;	/* link-layer header length? */
+	nd_uint32_t	pkt_lltrlrlen;	/* link-layer trailer length? */
+	nd_uint32_t	pkt_pid;	/* process ID */
 	char		pkt_cmdname[20]; /* command name */
-	uint32_t	pkt_svc_class;	/* "service class" */
-	uint16_t	pkt_iftype;	/* "interface type" */
-	uint16_t	pkt_ifunit;	/* unit number of interface? */
-	uint32_t	pkt_epid;	/* "effective process ID" */
+	nd_uint32_t	pkt_svc_class;	/* "service class" */
+	nd_uint16_t	pkt_iftype;	/* "interface type" */
+	nd_uint16_t	pkt_ifunit;	/* unit number of interface? */
+	nd_uint32_t	pkt_epid;	/* "effective process ID" */
 	char		pkt_ecmdname[20]; /* "effective command name" */
 } pktap_header_t;
 
@@ -76,11 +76,11 @@ pktap_header_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	hdr = (const pktap_header_t *)bp;
 
-	dlt = EXTRACT_LE_U_4(&hdr->pkt_dlt);
-	hdrlen = EXTRACT_LE_U_4(&hdr->pkt_len);
+	dlt = EXTRACT_LE_U_4(hdr->pkt_dlt);
+	hdrlen = EXTRACT_LE_U_4(hdr->pkt_len);
 	dltname = pcap_datalink_val_to_name(dlt);
 	if (!ndo->ndo_qflag) {
-		ND_PRINT("DLT %s (%d) len %d",
+		ND_PRINT("DLT %s (%u) len %u",
 			  (dltname != NULL ? dltname : "UNKNOWN"), dlt, hdrlen);
         } else {
 		ND_PRINT("%s", (dltname != NULL ? dltname : "UNKNOWN"));
@@ -111,8 +111,8 @@ pktap_if_print(netdissect_options *ndo,
 		return (0);
 	}
 	hdr = (const pktap_header_t *)p;
-	dlt = EXTRACT_LE_U_4(&hdr->pkt_dlt);
-	hdrlen = EXTRACT_LE_U_4(&hdr->pkt_len);
+	dlt = EXTRACT_LE_U_4(hdr->pkt_dlt);
+	hdrlen = EXTRACT_LE_U_4(hdr->pkt_len);
 	if (hdrlen < sizeof(pktap_header_t)) {
 		/*
 		 * Claimed header length < structure length.
@@ -136,7 +136,7 @@ pktap_if_print(netdissect_options *ndo,
 	caplen -= hdrlen;
 	p += hdrlen;
 
-	rectype = EXTRACT_LE_U_4(&hdr->pkt_rectype);
+	rectype = EXTRACT_LE_U_4(hdr->pkt_rectype);
 	switch (rectype) {
 
 	case PKT_REC_NONE:
