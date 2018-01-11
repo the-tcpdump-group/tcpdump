@@ -89,7 +89,7 @@ sl_if_print(netdissect_options *ndo,
 		ip6_print(ndo, (const u_char *)ip, length);
 		break;
 	default:
-		ND_PRINT("ip v%d", IP_V(ip));
+		ND_PRINT("ip v%u", IP_V(ip));
 	}
 
 	return (SLIP_HDRLEN);
@@ -158,7 +158,7 @@ sliplink_print(netdissect_options *ndo,
 	switch (EXTRACT_U_1(p + SLX_CHDR) & 0xf0) {
 
 	case TYPE_IP:
-		ND_PRINT("ip %d: ", length + SLIP_HDRLEN);
+		ND_PRINT("ip %u: ", length + SLIP_HDRLEN);
 		break;
 
 	case TYPE_UNCOMPRESSED_TCP:
@@ -168,7 +168,7 @@ sliplink_print(netdissect_options *ndo,
 		 * has restored the IP header copy to IPPROTO_TCP.
 		 */
 		lastconn = EXTRACT_U_1(((const struct ip *)(p + SLX_CHDR))->ip_p);
-		ND_PRINT("utcp %d: ", lastconn);
+		ND_PRINT("utcp %u: ", lastconn);
 		if (dir == -1) {
 			/* Direction is bogus, don't use it */
 			return;
@@ -188,7 +188,7 @@ sliplink_print(netdissect_options *ndo,
 					    length, dir);
 			ND_PRINT(": ");
 		} else
-			ND_PRINT("slip-%d!: ", EXTRACT_U_1(p + SLX_CHDR));
+			ND_PRINT("slip-%u!: ", EXTRACT_U_1(p + SLX_CHDR));
 	}
 }
 
@@ -203,7 +203,7 @@ print_sl_change(netdissect_options *ndo,
 		i = EXTRACT_BE_U_2(cp);
 		cp += 2;
 	}
-	ND_PRINT(" %s%d", str, i);
+	ND_PRINT(" %s%u", str, i);
 	return (cp);
 }
 
@@ -211,7 +211,7 @@ static const u_char *
 print_sl_winchange(netdissect_options *ndo,
                    const u_char *cp)
 {
-	short i;
+	u_short i;
 
 	if ((i = EXTRACT_U_1(cp)) == 0) {
 		cp++;
@@ -219,9 +219,9 @@ print_sl_winchange(netdissect_options *ndo,
 		cp += 2;
 	}
 	if (i >= 0)
-		ND_PRINT(" W+%d", i);
+		ND_PRINT(" W+%u", i);
 	else
-		ND_PRINT(" W%d", i);
+		ND_PRINT(" W%u", i);
 	return (cp);
 }
 
@@ -238,7 +238,7 @@ compressed_sl_print(netdissect_options *ndo,
 	if (flags & NEW_C) {
 		lastconn = EXTRACT_U_1(cp);
 		cp++;
-		ND_PRINT("ctcp %d", lastconn);
+		ND_PRINT("ctcp %u", lastconn);
 	} else
 		ND_PRINT("ctcp *");
 
@@ -247,11 +247,11 @@ compressed_sl_print(netdissect_options *ndo,
 
 	switch (flags & SPECIALS_MASK) {
 	case SPECIAL_I:
-		ND_PRINT(" *SA+%d", lastlen[dir][lastconn]);
+		ND_PRINT(" *SA+%u", lastlen[dir][lastconn]);
 		break;
 
 	case SPECIAL_D:
-		ND_PRINT(" *S+%d", lastlen[dir][lastconn]);
+		ND_PRINT(" *S+%u", lastlen[dir][lastconn]);
 		break;
 
 	default:
@@ -276,5 +276,5 @@ compressed_sl_print(netdissect_options *ndo,
 	hlen = IP_HL(ip);
 	hlen += TH_OFF((const struct tcphdr *)&((const int32_t *)ip)[hlen]);
 	lastlen[dir][lastconn] = length - (hlen << 2);
-	ND_PRINT(" %d (%ld)", lastlen[dir][lastconn], (long)(cp - chdr));
+	ND_PRINT(" %u (%ld)", lastlen[dir][lastconn], (long)(cp - chdr));
 }

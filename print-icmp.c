@@ -374,7 +374,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		case ICMP_UNREACH_PROTOCOL:
 			ND_TCHECK_1(dp->icmp_ip.ip_p);
 			(void)snprintf(buf, sizeof(buf),
-			    "%s protocol %d unreachable",
+			    "%s protocol %u unreachable",
 			    ipaddr_string(ndo, &dp->icmp_ip.ip_dst),
 			    EXTRACT_U_1(dp->icmp_ip.ip_p));
 			break;
@@ -419,7 +419,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			mtu = EXTRACT_BE_U_2(mp->nexthopmtu);
 			if (mtu) {
 				(void)snprintf(buf, sizeof(buf),
-				    "%s unreachable - need to frag (mtu %d)",
+				    "%s unreachable - need to frag (mtu %u)",
 				    ipaddr_string(ndo, &dp->icmp_ip.ip_dst), mtu);
 			} else {
 				(void)snprintf(buf, sizeof(buf),
@@ -430,7 +430,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			break;
 
 		default:
-			fmt = tok2str(unreach2str, "#%d %%s unreachable",
+			fmt = tok2str(unreach2str, "#%u %%s unreachable",
 			    icmp_code);
 			(void)snprintf(buf, sizeof(buf), fmt,
 			    ipaddr_string(ndo, &dp->icmp_ip.ip_dst));
@@ -440,7 +440,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 
 	case ICMP_REDIRECT:
 		ND_TCHECK(dp->icmp_ip.ip_dst);
-		fmt = tok2str(type2str, "redirect-#%d %%s to net %%s",
+		fmt = tok2str(type2str, "redirect-#%u %%s to net %%s",
 		    icmp_code);
 		(void)snprintf(buf, sizeof(buf), fmt,
 		    ipaddr_string(ndo, &dp->icmp_ip.ip_dst),
@@ -477,13 +477,13 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		cp = buf + strlen(buf);
 
 		num = EXTRACT_U_1(ihp->ird_addrnum);
-		(void)snprintf(cp, sizeof(buf) - (cp - buf), " %d:", num);
+		(void)snprintf(cp, sizeof(buf) - (cp - buf), " %u:", num);
 		cp = buf + strlen(buf);
 
 		size = EXTRACT_U_1(ihp->ird_addrsiz);
 		if (size != 2) {
 			(void)snprintf(cp, sizeof(buf) - (cp - buf),
-			    " [size %d]", size);
+			    " [size %u]", size);
 			break;
 		}
 		idp = (const struct id_rdiscovery *)&dp->icmp_data;
@@ -557,7 +557,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                 break;
 
 	default:
-		str = tok2str(icmp2str, "type-#%d", icmp_type);
+		str = tok2str(icmp2str, "type-#%u", icmp_type);
 		break;
 	}
 	ND_PRINT("ICMP %s, length %u", str, plen);

@@ -57,7 +57,7 @@ __RCSID("$NetBSD: print-tcp.c,v 1.8 2007/07/24 11:53:48 drochner Exp $");
 
 static int tcp_verify_signature(netdissect_options *ndo,
                                 const struct ip *ip, const struct tcphdr *tp,
-                                const u_char *data, int length, const u_char *rcvsig);
+                                const u_char *data, u_int length, const u_char *rcvsig);
 #endif
 
 static void print_tcp_rst_data(netdissect_options *, const u_char *sp, u_int length);
@@ -219,7 +219,7 @@ tcp_print(netdissect_options *ndo,
         hlen = TH_OFF(tp) * 4;
 
         if (hlen < sizeof(*tp)) {
-                ND_PRINT(" tcp %d [bad hdr length %u - too short, < %lu]",
+                ND_PRINT(" tcp %u [bad hdr length %u - too short, < %lu]",
                              length - hlen, hlen, (unsigned long)sizeof(*tp));
                 return;
         }
@@ -230,7 +230,7 @@ tcp_print(netdissect_options *ndo,
         urp = EXTRACT_BE_U_2(tp->th_urp);
 
         if (ndo->ndo_qflag) {
-                ND_PRINT("tcp %d", length - hlen);
+                ND_PRINT("tcp %u", length - hlen);
                 if (hlen > length) {
                         ND_PRINT(" [bad hdr length %u - too long, > %u]",
                                      hlen, length);
@@ -410,10 +410,10 @@ tcp_print(netdissect_options *ndo,
                 ND_PRINT(", ack %u", ack);
         }
 
-        ND_PRINT(", win %d", win);
+        ND_PRINT(", win %u", win);
 
         if (flags & TH_URG)
-                ND_PRINT(", urg %d", urp);
+                ND_PRINT(", urg %u", urp);
         /*
          * Handle any options.
          */
@@ -471,7 +471,7 @@ tcp_print(netdissect_options *ndo,
                                 } else {
                                         uint32_t s, e;
 
-                                        ND_PRINT(" %d ", datalen / 8);
+                                        ND_PRINT(" %u ", datalen / 8);
                                         for (i = 0; i < datalen; i += 8) {
                                                 LENCHECK(i + 4);
                                                 s = EXTRACT_BE_U_4(cp + i);
@@ -647,7 +647,7 @@ tcp_print(netdissect_options *ndo,
                         if (!ZEROLENOPT(opt))
                                 ++datalen;		/* size octet */
                         if (datalen != len)
-                                ND_PRINT("[len %d]", len);
+                                ND_PRINT("[len %u]", len);
                         ch = ',';
                         if (opt == TCPOPT_EOL)
                                 break;
@@ -841,7 +841,7 @@ USES_APPLE_DEPRECATED_API
 static int
 tcp_verify_signature(netdissect_options *ndo,
                      const struct ip *ip, const struct tcphdr *tp,
-                     const u_char *data, int length, const u_char *rcvsig)
+                     const u_char *data, u_int length, const u_char *rcvsig)
 {
         struct tcphdr tp1;
         u_char sig[TCP_SIGLEN];

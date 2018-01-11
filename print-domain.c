@@ -90,9 +90,9 @@ static const u_char *
 blabel_print(netdissect_options *ndo,
              const u_char *cp)
 {
-	int bitlen, slen, b;
+	u_int bitlen, slen, b;
 	const u_char *bitp, *lim;
-	char tc;
+	uint8_t tc;
 
 	if (!ND_TTEST_1(cp))
 		return(NULL);
@@ -118,10 +118,10 @@ blabel_print(netdissect_options *ndo,
 		bitp++;
 		ND_PRINT("%1x", ((tc >> 4) & 0x0f) & (0x0f << (4 - b)));
 	}
-	ND_PRINT("/%d]", bitlen);
+	ND_PRINT("/%u]", bitlen);
 	return lim;
 trunc:
-	ND_PRINT(".../%d]", bitlen);
+	ND_PRINT(".../%u]", bitlen);
 	return NULL;
 }
 
@@ -135,7 +135,7 @@ labellen(netdissect_options *ndo,
 		return(-1);
 	i = EXTRACT_U_1(cp);
 	if ((i & INDIR_MASK) == EDNS0_MASK) {
-		int bitlen, elt;
+		u_int bitlen, elt;
 		if ((elt = (i & ~INDIR_MASK)) != EDNS0_ELT_BITLABEL) {
 			ND_PRINT("<ELT %d>", elt);
 			return(-1);
@@ -156,7 +156,7 @@ ns_nprint(netdissect_options *ndo,
 	u_int i, l;
 	const u_char *rp = NULL;
 	int compress = 0;
-	int elt;
+	u_int elt;
 	u_int offset, max_offset;
 
 	if ((l = labellen(ndo, cp)) == (u_int)-1)
@@ -214,7 +214,7 @@ ns_nprint(netdissect_options *ndo,
 					break;
 				default:
 					/* unknown ELT */
-					ND_PRINT("<ELT %d>", elt);
+					ND_PRINT("<ELT %u>", elt);
 					return(NULL);
 				}
 			} else {
@@ -348,7 +348,7 @@ ns_qprint(netdissect_options *ndo,
 	/* print the qtype */
 	i = EXTRACT_BE_U_2(cp);
 	cp += 2;
-	ND_PRINT(" %s", tok2str(ns_type2str, "Type%d", i));
+	ND_PRINT(" %s", tok2str(ns_type2str, "Type%u", i));
 	/* print the qclass (if it's not IN) */
 	i = EXTRACT_BE_U_2(cp);
 	cp += 2;
@@ -357,7 +357,7 @@ ns_qprint(netdissect_options *ndo,
 	else
 		class = i;
 	if (class != C_IN)
-		ND_PRINT(" %s", tok2str(ns_class2str, "(Class %d)", class));
+		ND_PRINT(" %s", tok2str(ns_class2str, "(Class %u)", class));
 	if (is_mdns) {
 		ND_PRINT(i & C_QU ? " (QU)" : " (QM)");
 	}
@@ -397,7 +397,7 @@ ns_rprint(netdissect_options *ndo,
 	else
 		class = i;
 	if (class != C_IN && typ != T_OPT)
-		ND_PRINT(" %s", tok2str(ns_class2str, "(Class %d)", class));
+		ND_PRINT(" %s", tok2str(ns_class2str, "(Class %u)", class));
 	if (is_mdns) {
 		if (i & C_CACHE_FLUSH)
 			ND_PRINT(" (Cache flush)");
@@ -425,7 +425,7 @@ ns_rprint(netdissect_options *ndo,
 
 	rp = cp + len;
 
-	ND_PRINT(" %s", tok2str(ns_type2str, "Type%d", typ));
+	ND_PRINT(" %s", tok2str(ns_type2str, "Type%u", typ));
 	if (rp > ndo->ndo_snapend)
 		return(NULL);
 
@@ -433,7 +433,7 @@ ns_rprint(netdissect_options *ndo,
 	case T_A:
 		if (!ND_TTEST_LEN(cp, sizeof(struct in_addr)))
 			return(NULL);
-		ND_PRINT(" %s", intoa(htonl(EXTRACT_BE_U_4(cp))));
+		ND_PRINT(" %s", intoa(EXTRACT_IPV4_TO_NETWORK_ORDER(cp)));
 		break;
 
 	case T_NS:
@@ -475,7 +475,7 @@ ns_rprint(netdissect_options *ndo,
 			return(NULL);
 		if (ns_nprint(ndo, cp + 2, bp) == NULL)
 			return(NULL);
-		ND_PRINT(" %d", EXTRACT_BE_U_2(cp));
+		ND_PRINT(" %u", EXTRACT_BE_U_2(cp));
 		break;
 
 	case T_TXT:
@@ -494,7 +494,7 @@ ns_rprint(netdissect_options *ndo,
 			return(NULL);
 		if (ns_nprint(ndo, cp + 6, bp) == NULL)
 			return(NULL);
-		ND_PRINT(":%d %d %d", EXTRACT_BE_U_2(cp + 4),
+		ND_PRINT(":%u %u %u", EXTRACT_BE_U_2(cp + 4),
 			  EXTRACT_BE_U_2(cp), EXTRACT_BE_U_2(cp + 2));
 		break;
 
@@ -609,7 +609,7 @@ domain_print(netdissect_options *ndo,
 
 	if (DNS_QR(flags)) {
 		/* this is a response */
-		ND_PRINT("%d%s%s%s%s%s%s",
+		ND_PRINT("%u%s%s%s%s%s%s",
 			EXTRACT_BE_U_2(np->id),
 			ns_ops[DNS_OPCODE(flags)],
 			ns_resp[DNS_RCODE(flags)],
@@ -683,7 +683,7 @@ domain_print(netdissect_options *ndo,
 	}
 	else {
 		/* this is a request */
-		ND_PRINT("%d%s%s%s", EXTRACT_BE_U_2(np->id), ns_ops[DNS_OPCODE(flags)],
+		ND_PRINT("%u%s%s%s", EXTRACT_BE_U_2(np->id), ns_ops[DNS_OPCODE(flags)],
 			  DNS_RD(flags) ? "+" : "",
 			  DNS_CD(flags) ? "%" : "");
 
@@ -772,7 +772,7 @@ domain_print(netdissect_options *ndo,
 				goto trunc;
 		}
 	}
-	ND_PRINT(" (%d)", length);
+	ND_PRINT(" (%u)", length);
 	return;
 
   trunc:

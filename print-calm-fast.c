@@ -40,8 +40,8 @@
 void
 calm_fast_print(netdissect_options *ndo, const u_char *bp, u_int length, const struct lladdr_info *src)
 {
-	int srcNwref;
-	int dstNwref;
+	u_int srcNwref;
+	u_int dstNwref;
 
 	ND_TCHECK_2(bp);
 	if (length < 2)
@@ -55,8 +55,8 @@ calm_fast_print(netdissect_options *ndo, const u_char *bp, u_int length, const s
 	if (src != NULL)
 		ND_PRINT(" src:%s", (src->addr_string)(ndo, src->addr));
 	ND_PRINT("; ");
-	ND_PRINT("SrcNwref:%d; ", srcNwref);
-	ND_PRINT("DstNwref:%d; ", dstNwref);
+	ND_PRINT("SrcNwref:%u; ", srcNwref);
+	ND_PRINT("DstNwref:%u; ", dstNwref);
 
 	if (ndo->ndo_vflag)
 		ND_DEFAULTPRINT(bp, length);

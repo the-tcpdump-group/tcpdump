@@ -150,7 +150,7 @@ dvmrp_print(netdissect_options *ndo,
 		break;
 
 	default:
-		ND_PRINT(" [type %d]", type);
+		ND_PRINT(" [type %u]", type);
 		break;
 	}
 	return;
@@ -166,7 +166,7 @@ print_report(netdissect_options *ndo,
              u_int len)
 {
 	uint32_t mask, origin;
-	int metric, done;
+	u_int metric, done;
 	u_int i, width;
 
 	while (len > 0) {
@@ -211,7 +211,7 @@ print_report(netdissect_options *ndo,
 			bp++;
 			done = metric & 0x80;
 			metric &= 0x7f;
-			ND_PRINT("\n\t  %s metric %d", intoa(htonl(origin)),
+			ND_PRINT("\n\t  %s metric %u", intoa(htonl(origin)),
 				metric);
 			len -= width + 1;
 		} while (!done);
@@ -277,7 +277,7 @@ print_neighbors(netdissect_options *ndo,
 		while (--ncount >= 0) {
 			ND_TCHECK_4(bp);
 			ND_PRINT(" [%s ->", ipaddr_string(ndo, laddr));
-			ND_PRINT(" %s, (%d/%d)]",
+			ND_PRINT(" %s, (%u/%u)]",
 				   ipaddr_string(ndo, bp), metric, thresh);
 			bp += 4;
 			len -= 4;
@@ -315,7 +315,7 @@ print_neighbors2(netdissect_options *ndo,
 		len -= 8;
 		while (--ncount >= 0 && (len >= 4) && (bp + 4) <= ep) {
 			ND_PRINT(" [%s -> ", ipaddr_string(ndo, laddr));
-			ND_PRINT("%s (%d/%d", ipaddr_string(ndo, bp),
+			ND_PRINT("%s (%u/%u", ipaddr_string(ndo, bp),
 				     metric, thresh);
 			if (flags & DVMRP_NF_TUNNEL)
 				ND_PRINT("/tunnel");

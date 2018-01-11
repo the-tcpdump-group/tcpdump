@@ -39,7 +39,7 @@ ppi_header_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	dltname = pcap_datalink_val_to_name(dlt);
 
 	if (!ndo->ndo_qflag) {
-		ND_PRINT("V.%d DLT %s (%d) len %d", hdr->ppi_ver,
+		ND_PRINT("V.%u DLT %s (%u) len %u", hdr->ppi_ver,
 			  (dltname != NULL ? dltname : "UNKNOWN"), dlt,
                           len);
         } else {

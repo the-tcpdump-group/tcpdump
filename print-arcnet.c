@@ -120,7 +120,7 @@ static const struct tok arctypemap[] = {
 
 static inline void
 arcnet_print(netdissect_options *ndo, const u_char *bp, u_int length, int phds,
-             int flag, u_int seqid)
+             u_int flag, u_int seqid)
 {
 	const struct arc_header *ap;
 	const char *arctypename;
@@ -140,7 +140,7 @@ arcnet_print(netdissect_options *ndo, const u_char *bp, u_int length, int phds,
 	arctypename = tok2str(arctypemap, "%02x", EXTRACT_U_1(ap->arc_type));
 
 	if (!phds) {
-		ND_PRINT("%02x %02x %s %d: ",
+		ND_PRINT("%02x %02x %s %u: ",
 			     EXTRACT_U_1(ap->arc_shost),
 			     EXTRACT_U_1(ap->arc_dhost),
 			     arctypename,
@@ -149,7 +149,7 @@ arcnet_print(netdissect_options *ndo, const u_char *bp, u_int length, int phds,
 	}
 
 	if (flag == 0) {
-		ND_PRINT("%02x %02x %s seqid %04x %d: ",
+		ND_PRINT("%02x %02x %s seqid %04x %u: ",
 			EXTRACT_U_1(ap->arc_shost),
 			EXTRACT_U_1(ap->arc_dhost),
 			arctypename, seqid,
@@ -159,14 +159,14 @@ arcnet_print(netdissect_options *ndo, const u_char *bp, u_int length, int phds,
 
 	if (flag & 1)
 		ND_PRINT("%02x %02x %s seqid %04x "
-			"(first of %d fragments) %d: ",
+			"(first of %u fragments) %u: ",
 			EXTRACT_U_1(ap->arc_shost),
 			EXTRACT_U_1(ap->arc_dhost),
 			arctypename, seqid,
 			(flag + 3) / 2, length);
 	else
 		ND_PRINT("%02x %02x %s seqid %04x "
-			"(fragment %d) %d: ",
+			"(fragment %u) %u: ",
 			EXTRACT_U_1(ap->arc_shost),
 			EXTRACT_U_1(ap->arc_dhost),
 			arctypename, seqid,
@@ -186,7 +186,8 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 	u_int length = h->len;
 	const struct arc_header *ap;
 
-	int phds, flag = 0, archdrlen = 0;
+	int phds;
+	u_int flag = 0, archdrlen = 0;
 	u_int seqid = 0;
 	u_char arc_type;
 

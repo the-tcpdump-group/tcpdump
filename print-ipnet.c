@@ -40,11 +40,11 @@ ipnet_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	hdr = (const ipnet_hdr_t *)bp;
 
 	ND_TCHECK_SIZE(hdr);
-	ND_PRINT("%d > %d", EXTRACT_BE_U_4(hdr->iph_zsrc),
+	ND_PRINT("%u > %u", EXTRACT_BE_U_4(hdr->iph_zsrc),
 		  EXTRACT_BE_U_4(hdr->iph_zdst));
 
 	if (!ndo->ndo_qflag) {
-		ND_PRINT(", family %s (%d)",
+		ND_PRINT(", family %s (%u)",
                           tok2str(ipnet_values, "Unknown",
                                   EXTRACT_U_1(hdr->iph_family)),
                           EXTRACT_U_1(hdr->iph_family));

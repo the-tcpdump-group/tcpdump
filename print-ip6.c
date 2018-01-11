@@ -418,7 +418,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			return;
 
 		default:
-			ND_PRINT("ip-proto-%d %d", nh, len);
+			ND_PRINT("ip-proto-%u %u", nh, len);
 			return;
 		}
 	}

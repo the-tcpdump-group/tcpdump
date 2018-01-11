@@ -2728,7 +2728,7 @@ rx_ack_print(netdissect_options *ndo,
 	 */
 
 	if (ndo->ndo_vflag > 2)
-		ND_PRINT(" bufspace %u maxskew %d",
+		ND_PRINT(" bufspace %u maxskew %u",
 		       EXTRACT_BE_U_2(rxa->bufferSpace),
 		       EXTRACT_BE_U_2(rxa->maxSkew));
 

@@ -99,7 +99,7 @@ medsa_print_full(netdissect_options *ndo,
 	switch (tag) {
 	case TAG_TO_CPU:
 		ND_PRINT(", %stagged", SRC_TAG(medsa) ? "" : "un");
-		ND_PRINT(", dev.port:vlan %d.%d:%d",
+		ND_PRINT(", dev.port:vlan %u.%u:%u",
 			  SRC_DEV(medsa), SRC_PORT(medsa), VID(medsa));
 
 		ND_PRINT(", %s",
@@ -107,31 +107,31 @@ medsa_print_full(netdissect_options *ndo,
 		if (CFI(medsa))
 			ND_PRINT(", CFI");
 
-		ND_PRINT(", pri %d: ", PRI(medsa));
+		ND_PRINT(", pri %u: ", PRI(medsa));
 		break;
 	case TAG_FROM_CPU:
 		ND_PRINT(", %stagged", SRC_TAG(medsa) ? "" : "un");
-		ND_PRINT(", dev.port:vlan %d.%d:%d",
+		ND_PRINT(", dev.port:vlan %u.%u:%u",
 			  SRC_DEV(medsa), SRC_PORT(medsa), VID(medsa));
 
 		if (CFI(medsa))
 			ND_PRINT(", CFI");
 
-		ND_PRINT(", pri %d: ", PRI(medsa));
+		ND_PRINT(", pri %u: ", PRI(medsa));
 		break;
 	case TAG_FORWARD:
 		ND_PRINT(", %stagged", SRC_TAG(medsa) ? "" : "un");
 		if (TRUNK(medsa))
-			ND_PRINT(", dev.trunk:vlan %d.%d:%d",
+			ND_PRINT(", dev.trunk:vlan %u.%u:%u",
 				  SRC_DEV(medsa), SRC_PORT(medsa), VID(medsa));
 		else
-			ND_PRINT(", dev.port:vlan %d.%d:%d",
+			ND_PRINT(", dev.port:vlan %u.%u:%u",
 				  SRC_DEV(medsa), SRC_PORT(medsa), VID(medsa));
 
 		if (CFI(medsa))
 			ND_PRINT(", CFI");
 
-		ND_PRINT(", pri %d: ", PRI(medsa));
+		ND_PRINT(", pri %u: ", PRI(medsa));
 		break;
 	default:
 		ND_DEFAULTPRINT((const u_char *)medsa, caplen);
@@ -151,7 +151,7 @@ medsa_print(netdissect_options *ndo,
 	ND_TCHECK_SIZE(medsa);
 
 	if (!ndo->ndo_eflag)
-		ND_PRINT("MEDSA %d.%d:%d: ",
+		ND_PRINT("MEDSA %u.%u:%u: ",
 			  SRC_DEV(medsa), SRC_PORT(medsa), VID(medsa));
 	else
 		medsa_print_full(ndo, medsa, caplen);

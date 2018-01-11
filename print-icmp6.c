@@ -1564,7 +1564,7 @@ mld6_print(netdissect_options *ndo, const u_char *bp)
 	if ((const u_char *)mp + sizeof(*mp) > ep)
 		return;
 
-	ND_PRINT("max resp delay: %d ", EXTRACT_BE_U_2(mp->mld6_maxdelay));
+	ND_PRINT("max resp delay: %u ", EXTRACT_BE_U_2(mp->mld6_maxdelay));
 	ND_PRINT("addr: %s", ip6addr_string(ndo, &mp->mld6_addr));
 }
 

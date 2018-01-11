@@ -48,7 +48,7 @@ static const struct tok nsh_flags [] = {
 void
 nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
 {
-    int n, vn;
+    u_int n, vn;
     uint8_t ver;
     uint8_t flags;
     uint8_t length;
@@ -84,11 +84,11 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
 
     ND_PRINT("NSH, ");
     if (ndo->ndo_vflag > 1) {
-        ND_PRINT("ver %d, ", ver);
+        ND_PRINT("ver %u, ", ver);
     }
     ND_PRINT("flags [%s], ", bittok2str_nosep(nsh_flags, "none", flags));
     if (ndo->ndo_vflag > 2) {
-        ND_PRINT("length %d, ", length);
+        ND_PRINT("length %u, ", length);
         ND_PRINT("md type 0x%x, ", md_type);
     }
     if (ndo->ndo_vflag > 1) {
@@ -119,7 +119,7 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
             for (n = 0; n < length - 2; n++) {
                 ctx = EXTRACT_BE_U_4(bp);
                 bp += NSH_HDR_WORD_SIZE;
-                ND_PRINT("\n        Context[%02d]: 0x%08x", n, ctx);
+                ND_PRINT("\n        Context[%02u]: 0x%08x", n, ctx);
             }
         }
         else if (md_type == 0x02) {
@@ -132,7 +132,7 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
                 tlv_len   = EXTRACT_U_1(bp);
                 bp += 1;
 
-                ND_PRINT("\n        TLV Class %d, Type %d, Len %d",
+                ND_PRINT("\n        TLV Class %u, Type %u, Len %u",
                           tlv_class, tlv_type, tlv_len);
 
                 n += 1;
@@ -145,7 +145,7 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
                 for (vn = 0; vn < tlv_len; vn++) {
                     ctx = EXTRACT_BE_U_4(bp);
                     bp += NSH_HDR_WORD_SIZE;
-                    ND_PRINT("\n            Value[%02d]: 0x%08x", vn, ctx);
+                    ND_PRINT("\n            Value[%02u]: 0x%08x", vn, ctx);
                 }
                 n += tlv_len;
             }

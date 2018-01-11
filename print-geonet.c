@@ -59,8 +59,8 @@ static void
 print_btp_body(netdissect_options *ndo,
                const u_char *bp)
 {
-	int version;
-	int msg_type;
+	u_int version;
+	u_int msg_type;
 	const char *msg_type_str;
 
 	/* Assuming ItsDpuHeader */
@@ -68,7 +68,7 @@ print_btp_body(netdissect_options *ndo,
 	msg_type = EXTRACT_U_1(bp + 1);
 	msg_type_str = tok2str(msg_type_values, "unknown (%u)", msg_type);
 
-	ND_PRINT("; ItsPduHeader v:%d t:%d-%s", version, msg_type, msg_type_str);
+	ND_PRINT("; ItsPduHeader v:%u t:%u-%s", version, msg_type, msg_type_str);
 }
 
 static void
@@ -93,9 +93,9 @@ print_long_pos_vector(netdissect_options *ndo,
 	if (!ND_TTEST_8(bp + 12))
 		return (-1);
 	lat = EXTRACT_BE_U_4(bp + 12);
-	ND_PRINT("lat:%d ", lat);
+	ND_PRINT("lat:%u ", lat);
 	lon = EXTRACT_BE_U_4(bp + 16);
-	ND_PRINT("lon:%d", lon);
+	ND_PRINT("lon:%u", lon);
 	return (0);
 }
 
@@ -108,12 +108,12 @@ void
 geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	     const struct lladdr_info *src)
 {
-	int version;
-	int next_hdr;
-	int hdr_type;
-	int hdr_subtype;
+	u_int version;
+	u_int next_hdr;
+	u_int hdr_type;
+	u_int hdr_subtype;
 	uint16_t payload_length;
-	int hop_limit;
+	u_int hop_limit;
 	const char *next_hdr_txt = "Unknown";
 	const char *hdr_type_txt = "Unknown";
 	int hdr_size = -1;
@@ -170,11 +170,11 @@ geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			break;
 	}
 
-	ND_PRINT("v:%d ", version);
-	ND_PRINT("NH:%d-%s ", next_hdr, next_hdr_txt);
-	ND_PRINT("HT:%d-%d-%s ", hdr_type, hdr_subtype, hdr_type_txt);
-	ND_PRINT("HopLim:%d ", hop_limit);
-	ND_PRINT("Payload:%d ", payload_length);
+	ND_PRINT("v:%u ", version);
+	ND_PRINT("NH:%u-%s ", next_hdr, next_hdr_txt);
+	ND_PRINT("HT:%u-%u-%s ", hdr_type, hdr_subtype, hdr_type_txt);
+	ND_PRINT("HopLim:%u ", hop_limit);
+	ND_PRINT("Payload:%u ", payload_length);
 	if (print_long_pos_vector(ndo, bp + 8) == -1)
 		goto trunc;
 

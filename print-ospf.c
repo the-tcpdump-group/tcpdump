@@ -428,7 +428,7 @@ ospf_print_te_lsa(netdissect_options *ndo,
                            tok2str(gmpls_encoding_values, "Unknown", EXTRACT_U_1((tptr + 1))));
                     for (priority_level = 0; priority_level < 8; priority_level++) {
                         bw.i = EXTRACT_BE_U_4(tptr + 4 + (priority_level * 4));
-                        ND_PRINT("\n\t\t  priority level %d: %.3f Mbps",
+                        ND_PRINT("\n\t\t  priority level %u: %.3f Mbps",
                                priority_level,
                                bw.f * 8 / 1000000);
                     }
@@ -453,7 +453,7 @@ ospf_print_te_lsa(netdissect_options *ndo,
                         ND_PRINT("\n\t\t  Shared risk group: ");
                     while (count_srlg > 0) {
                         bw.i = EXTRACT_BE_U_4(tptr);
-                        ND_PRINT("%d", bw.i);
+                        ND_PRINT("%u", bw.i);
                         tptr+=4;
                         count_srlg--;
                         if (count_srlg > 0)
@@ -537,7 +537,7 @@ ospf_print_lshdr(netdissect_options *ndo,
         case LS_TYPE_OPAQUE_LL:
         case LS_TYPE_OPAQUE_AL:
         case LS_TYPE_OPAQUE_DW:
-            ND_PRINT("\n\t    %s LSA (%d), Opaque-Type %s LSA (%u), Opaque-ID %u",
+            ND_PRINT("\n\t    %s LSA (%u), Opaque-Type %s LSA (%u), Opaque-ID %u",
                    tok2str(lsa_values,"unknown",ls_type),
                    ls_type,
 
@@ -552,7 +552,7 @@ ospf_print_lshdr(netdissect_options *ndo,
 
         /* all other LSA types use regular style LSA headers */
         default:
-            ND_PRINT("\n\t    %s LSA (%d), LSA-ID: %s",
+            ND_PRINT("\n\t    %s LSA (%u), LSA-ID: %s",
                    tok2str(lsa_values,"unknown",ls_type),
                    ls_type,
                    ipaddr_string(ndo, &lshp->un_lsa_id.lsa_id));
@@ -712,7 +712,7 @@ ospf_print_lsa(netdissect_options *ndo,
 			ND_TCHECK_4(lp);
 			ul = EXTRACT_BE_U_4(lp);
                         topology = (ul & SLA_MASK_TOS) >> SLA_SHIFT_TOS;
-			ND_PRINT("\n\t\ttopology %s (%u) metric %d",
+			ND_PRINT("\n\t\ttopology %s (%u) metric %u",
                                tok2str(ospf_topology_values, "Unknown", topology),
                                topology,
                                ul & SLA_MASK_METRIC);
@@ -729,7 +729,7 @@ ospf_print_lsa(netdissect_options *ndo,
 			ND_TCHECK_4(lp);
 			ul = EXTRACT_BE_U_4(lp);
                         topology = (ul & SLA_MASK_TOS) >> SLA_SHIFT_TOS;
-			ND_PRINT("\n\t\ttopology %s (%u) metric %d",
+			ND_PRINT("\n\t\ttopology %s (%u) metric %u",
                                tok2str(ospf_topology_values, "Unknown", topology),
                                topology,
                                ul & SLA_MASK_METRIC);
@@ -751,14 +751,14 @@ ospf_print_lsa(netdissect_options *ndo,
 			ND_TCHECK(almp->asla_tosmetric);
 			ul = EXTRACT_BE_U_4(almp->asla_tosmetric);
                         topology = ((ul & ASLA_MASK_TOS) >> ASLA_SHIFT_TOS);
-			ND_PRINT("\n\t\ttopology %s (%u), type %d, metric",
+			ND_PRINT("\n\t\ttopology %s (%u), type %u, metric",
                                tok2str(ospf_topology_values, "Unknown", topology),
                                topology,
                                (ul & ASLA_FLAG_EXTERNAL) ? 2 : 1);
 			if ((ul & ASLA_MASK_METRIC) == 0xffffff)
 				ND_PRINT(" infinite");
 			else
-				ND_PRINT(" %d", (ul & ASLA_MASK_METRIC));
+				ND_PRINT(" %u", (ul & ASLA_MASK_METRIC));
 
 			ND_TCHECK(almp->asla_forward);
 			if (almp->asla_forward.s_addr) {
@@ -1078,7 +1078,7 @@ ospf_decode_v2(netdissect_options *ndo,
                 lsap = op->ospf_lsu.lsu_lsa;
                 ND_TCHECK(op->ospf_lsu.lsu_count);
                 lsa_count_max = EXTRACT_BE_U_4(op->ospf_lsu.lsu_count);
-                ND_PRINT(", %d LSA%s", lsa_count_max, PLURAL_SUFFIX(lsa_count_max));
+                ND_PRINT(", %u LSA%s", lsa_count_max, PLURAL_SUFFIX(lsa_count_max));
                 for (lsa_count=1;lsa_count <= lsa_count_max;lsa_count++) {
                     ND_PRINT("\n\t  LSA #%u", lsa_count);
                         lsap = (const struct lsa *)ospf_print_lsa(ndo, lsap);
@@ -1134,7 +1134,7 @@ ospf_print(netdissect_options *ndo,
 
 	ND_TCHECK(op->ospf_len);
 	if (length != EXTRACT_BE_U_2(op->ospf_len)) {
-		ND_PRINT(" [len %d]", EXTRACT_BE_U_2(op->ospf_len));
+		ND_PRINT(" [len %u]", EXTRACT_BE_U_2(op->ospf_len));
 	}
 
 	if (length > EXTRACT_BE_U_2(op->ospf_len)) {

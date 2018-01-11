@@ -453,14 +453,14 @@ ntp_print(netdissect_options *ndo,
           const u_char *cp, u_int length)
 {
 	const union ntpdata *bp = (const union ntpdata *)cp;
-	int mode, version, leapind;
+	u_int mode, version, leapind;
 	uint8_t status;
 
 	ND_TCHECK_1(bp->td.status);
 	status = EXTRACT_U_1(bp->td.status);
 
 	version = (status & VERSIONMASK) >> VERSIONSHIFT;
-	ND_PRINT("NTPv%d", version);
+	ND_PRINT("NTPv%u", version);
 
 	mode = (status & MODEMASK) >> MODESHIFT;
 	if (!ndo->ndo_vflag) {

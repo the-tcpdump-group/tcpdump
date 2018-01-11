@@ -92,18 +92,18 @@ tftp_print(netdissect_options *ndo,
            const u_char *bp, u_int length)
 {
 	const char *cp;
-	int opcode;
+	u_int opcode;
 	u_int ui;
 
 	/* Print length */
-	ND_PRINT(" %d", length);
+	ND_PRINT(" %u", length);
 
 	/* Print tftp request type */
 	if (length < 2)
 		goto trunc;
 	ND_TCHECK_2(bp);
 	opcode = EXTRACT_BE_U_2(bp);
-	cp = tok2str(op2str, "tftp-#%d", opcode);
+	cp = tok2str(op2str, "tftp-#%u", opcode);
 	ND_PRINT(" %s", cp);
 	/* Bail if bogus opcode */
 	if (*cp == 't')
@@ -169,7 +169,7 @@ tftp_print(netdissect_options *ndo,
 		if (length < 2)
 			goto trunc;	/* no block number */
 		ND_TCHECK_2(bp);
-		ND_PRINT(" block %d", EXTRACT_BE_U_2(bp));
+		ND_PRINT(" block %u", EXTRACT_BE_U_2(bp));
 		break;
 
 	case TFTP_ERROR:
@@ -177,7 +177,7 @@ tftp_print(netdissect_options *ndo,
 		if (length < 2)
 			goto trunc;	/* no error code */
 		ND_TCHECK_2(bp);
-		ND_PRINT(" %s", tok2str(err2str, "tftp-err-#%d \"",
+		ND_PRINT(" %s", tok2str(err2str, "tftp-err-#%u \"",
 				       EXTRACT_BE_U_2(bp)));
 		bp += 2;
 		length -= 2;
@@ -193,7 +193,7 @@ tftp_print(netdissect_options *ndo,
 
 	default:
 		/* We shouldn't get here */
-		ND_PRINT("(unknown #%d)", opcode);
+		ND_PRINT("(unknown #%u)", opcode);
 		break;
 	}
 	return;

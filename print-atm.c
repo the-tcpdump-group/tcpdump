@@ -358,7 +358,7 @@ sig_print(netdissect_options *ndo,
 		ND_PRINT("Q.2931");
 		ND_TCHECK_1(p + MSG_TYPE_POS);
 		ND_PRINT(":%s ",
-		    tok2str(msgtype2str, "msgtype#%d", EXTRACT_U_1(p + MSG_TYPE_POS)));
+		    tok2str(msgtype2str, "msgtype#%u", EXTRACT_U_1(p + MSG_TYPE_POS)));
 
 		/*
 		 * The call reference comes before the message type,
@@ -370,7 +370,7 @@ sig_print(netdissect_options *ndo,
 		ND_PRINT("CALL_REF:0x%06x", call_ref);
 	} else {
 		/* SSCOP with some unknown protocol atop it */
-		ND_PRINT("SSCOP, proto %d ", EXTRACT_U_1(p + PROTO_POS));
+		ND_PRINT("SSCOP, proto %u ", EXTRACT_U_1(p + PROTO_POS));
 	}
 	return;
 

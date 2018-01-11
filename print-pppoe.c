@@ -112,10 +112,10 @@ pppoe_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	pppoe_payload = pppoe_packet + PPPOE_HDRLEN;
 
 	if (pppoe_ver != 1) {
-		ND_PRINT(" [ver %d]",pppoe_ver);
+		ND_PRINT(" [ver %u]",pppoe_ver);
 	}
 	if (pppoe_type != 1) {
-		ND_PRINT(" [type %d]",pppoe_type);
+		ND_PRINT(" [type %u]",pppoe_type);
 	}
 
 	ND_PRINT("PPPoE %s", tok2str(pppoecode2str, "PAD-%x", pppoe_code));

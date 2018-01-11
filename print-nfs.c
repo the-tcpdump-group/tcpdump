@@ -530,7 +530,7 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 	uint32_t access_flags;
 	struct nfsv3_sattr sa3;
 
-	ND_PRINT("%d", length);
+	ND_PRINT("%u", length);
 	nfserr = 0;		/* assume no error */
 	rp = (const struct sunrpc_msg *)bp;
 
@@ -672,7 +672,7 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 			dp++;
 			if ((dp = parse_sattr3(ndo, dp, &sa3)) == NULL)
 				break;
-			ND_PRINT(" %s", tok2str(type2str, "unk-ft %d", type));
+			ND_PRINT(" %s", tok2str(type2str, "unk-ft %u", type));
 			if (ndo->ndo_vflag && (type == NFCHR || type == NFBLK)) {
 				ND_TCHECK_4(dp + 1);
 				ND_PRINT(" %u/%u",
@@ -733,7 +733,7 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 				 * Print the offset as signed, since -1 is
 				 * common, but offsets > 2^31 aren't.
 				 */
-				ND_PRINT(" %u bytes @ %d",
+				ND_PRINT(" %u bytes @ %u",
 				    EXTRACT_BE_U_4(dp + 1),
 				    EXTRACT_BE_U_4(dp));
 			}
@@ -852,7 +852,7 @@ nfs_printfh(netdissect_options *ndo,
 
 		ND_PRINT(" fh %s/", temp);
 	} else {
-		ND_PRINT(" fh %d,%d/",
+		ND_PRINT(" fh %u,%u/",
 			     fsid.Fsid_dev.Major, fsid.Fsid_dev.Minor);
 	}
 
@@ -1040,7 +1040,7 @@ parserep(netdissect_options *ndo,
 	ND_TCHECK_4(dp);
 	astat = (enum sunrpc_accept_stat) EXTRACT_BE_U_4(dp);
 	if (astat != SUNRPC_SUCCESS) {
-		ND_PRINT(" %s", tok2str(sunrpc_str, "ar_stat %d", astat));
+		ND_PRINT(" %s", tok2str(sunrpc_str, "ar_stat %u", astat));
 		nfserr = 1;		/* suppress trunc string */
 		return (NULL);
 	}
@@ -1053,9 +1053,9 @@ trunc:
 
 static const uint32_t *
 parsestatus(netdissect_options *ndo,
-            const uint32_t *dp, int *er)
+            const uint32_t *dp, u_int *er)
 {
-	int errnum;
+	u_int errnum;
 
 	ND_TCHECK_4(dp);
 
@@ -1065,7 +1065,7 @@ parsestatus(netdissect_options *ndo,
 	if (errnum != 0) {
 		if (!ndo->ndo_qflag)
 			ND_PRINT(" ERROR: %s",
-			    tok2str(status2str, "unk %d", errnum));
+			    tok2str(status2str, "unk %u", errnum));
 		nfserr = 1;
 	}
 	return (dp + 1);
@@ -1082,26 +1082,32 @@ parsefattr(netdissect_options *ndo,
 	fap = (const struct nfs_fattr *)dp;
 	ND_TCHECK(fap->fa_gid);
 	if (verbose) {
+		/*
+		 * XXX - UIDs and GIDs are unsigned in NFS and in
+		 * at least some UN*Xes, but we'll show them as
+		 * signed because -2 has traditionally been the
+		 * UID for "nobody", rather than 4294967294.
+		 */
 		ND_PRINT(" %s %o ids %d/%d",
-		    tok2str(type2str, "unk-ft %d ",
+		    tok2str(type2str, "unk-ft %u ",
 		    EXTRACT_BE_U_4(&fap->fa_type)),
 		    EXTRACT_BE_U_4(&fap->fa_mode),
-		    EXTRACT_BE_U_4(&fap->fa_uid),
-		    EXTRACT_BE_U_4(&fap->fa_gid));
+		    EXTRACT_BE_S_4(&fap->fa_uid),
+		    EXTRACT_BE_S_4(&fap->fa_gid));
 		if (v3) {
 			ND_TCHECK(fap->fa3_size);
 			ND_PRINT(" sz %" PRIu64,
 				EXTRACT_BE_U_8((const uint32_t *)&fap->fa3_size));
 		} else {
 			ND_TCHECK(fap->fa2_size);
-			ND_PRINT(" sz %d", EXTRACT_BE_U_4(&fap->fa2_size));
+			ND_PRINT(" sz %u", EXTRACT_BE_U_4(&fap->fa2_size));
 		}
 	}
 	/* print lots more stuff */
 	if (verbose > 1) {
 		if (v3) {
 			ND_TCHECK(fap->fa3_ctime);
-			ND_PRINT(" nlink %d rdev %d/%d",
+			ND_PRINT(" nlink %u rdev %u/%u",
 			       EXTRACT_BE_U_4(&fap->fa_nlink),
 			       EXTRACT_BE_U_4(&fap->fa3_rdev.specdata1),
 			       EXTRACT_BE_U_4(&fap->fa3_rdev.specdata2));
@@ -1120,7 +1126,7 @@ parsefattr(netdissect_options *ndo,
 			       EXTRACT_BE_U_4(&fap->fa3_ctime.nfsv3_nsec));
 		} else {
 			ND_TCHECK(fap->fa2_ctime);
-			ND_PRINT(" nlink %d rdev 0x%x fsid 0x%x nodeid 0x%x a/m/ctime",
+			ND_PRINT(" nlink %u rdev 0x%x fsid 0x%x nodeid 0x%x a/m/ctime",
 			       EXTRACT_BE_U_4(&fap->fa_nlink),
 			       EXTRACT_BE_U_4(&fap->fa2_rdev),
 			       EXTRACT_BE_U_4(&fap->fa2_fsid),
@@ -1146,7 +1152,7 @@ static int
 parseattrstat(netdissect_options *ndo,
               const uint32_t *dp, int verbose, int v3)
 {
-	int er;
+	u_int er;
 
 	dp = parsestatus(ndo, dp, &er);
 	if (dp == NULL)
@@ -1161,7 +1167,7 @@ static int
 parsediropres(netdissect_options *ndo,
               const uint32_t *dp)
 {
-	int er;
+	u_int er;
 
 	if (!(dp = parsestatus(ndo, dp, &er)))
 		return (0);
@@ -1179,7 +1185,7 @@ static int
 parselinkres(netdissect_options *ndo,
              const uint32_t *dp, int v3)
 {
-	int er;
+	u_int er;
 
 	dp = parsestatus(ndo, dp, &er);
 	if (dp == NULL)
@@ -1197,7 +1203,7 @@ parsestatfs(netdissect_options *ndo,
             const uint32_t *dp, int v3)
 {
 	const struct nfs_statfs *sfsp;
-	int er;
+	u_int er;
 
 	dp = parsestatus(ndo, dp, &er);
 	if (dp == NULL)
@@ -1232,7 +1238,7 @@ parsestatfs(netdissect_options *ndo,
 			       EXTRACT_BE_U_4(&sfsp->sf_invarsec));
 		}
 	} else {
-		ND_PRINT(" tsize %d bsize %d blocks %d bfree %d bavail %d",
+		ND_PRINT(" tsize %u bsize %u blocks %u bfree %u bavail %u",
 			EXTRACT_BE_U_4(&sfsp->sf_tsize),
 			EXTRACT_BE_U_4(&sfsp->sf_bsize),
 			EXTRACT_BE_U_4(&sfsp->sf_blocks),
@@ -1249,7 +1255,7 @@ static int
 parserddires(netdissect_options *ndo,
              const uint32_t *dp)
 {
-	int er;
+	u_int er;
 
 	dp = parsestatus(ndo, dp, &er);
 	if (dp == NULL)
@@ -1260,7 +1266,7 @@ parserddires(netdissect_options *ndo,
 		return (1);
 
 	ND_TCHECK_4(dp + 2);
-	ND_PRINT(" offset 0x%x size %d ",
+	ND_PRINT(" offset 0x%x size %u ",
 	       EXTRACT_BE_U_4(dp), EXTRACT_BE_U_4(dp + 1));
 	if (EXTRACT_BE_U_4(dp + 2) != 0)
 		ND_PRINT(" eof");
@@ -1341,7 +1347,7 @@ static const uint32_t *
 parsecreateopres(netdissect_options *ndo,
                  const uint32_t *dp, int verbose)
 {
-	int er;
+	u_int er;
 
 	if (!(dp = parsestatus(ndo, dp, &er)))
 		return (0);
@@ -1372,7 +1378,7 @@ static int
 parsewccres(netdissect_options *ndo,
             const uint32_t *dp, int verbose)
 {
-	int er;
+	u_int er;
 
 	if (!(dp = parsestatus(ndo, dp, &er)))
 		return (0);
@@ -1383,7 +1389,7 @@ static const uint32_t *
 parsev3rddirres(netdissect_options *ndo,
                 const uint32_t *dp, int verbose)
 {
-	int er;
+	u_int er;
 
 	if (!(dp = parsestatus(ndo, dp, &er)))
 		return (0);
@@ -1413,7 +1419,7 @@ parsefsinfo(netdissect_options *ndo,
             const uint32_t *dp)
 {
 	const struct nfsv3_fsinfo *sfp;
-	int er;
+	u_int er;
 
 	if (!(dp = parsestatus(ndo, dp, &er)))
 		return (0);
@@ -1450,7 +1456,7 @@ static int
 parsepathconf(netdissect_options *ndo,
               const uint32_t *dp)
 {
-	int er;
+	u_int er;
 	const struct nfsv3_pathconf *spp;
 
 	if (!(dp = parsestatus(ndo, dp, &er)))
@@ -1483,7 +1489,7 @@ interp_reply(netdissect_options *ndo,
 {
 	const uint32_t *dp;
 	int v3;
-	int er;
+	u_int er;
 
 	v3 = (vers == NFS_VER3);
 

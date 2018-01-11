@@ -188,7 +188,7 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 			ND_PRINT("%s", direction[DIRECTION(trp)]);
 
 			for (seg = 0; seg < SEGMENT_COUNT(trp); seg++)
-				ND_PRINT(" [%d:%d]", RING_NUMBER(trp, seg),
+				ND_PRINT(" [%u:%u]", RING_NUMBER(trp, seg),
 				    BRIDGE_NUMBER(trp, seg));
 		} else {
 			ND_PRINT("rt = %x", EXTRACT_BE_U_2(trp->token_rcf));

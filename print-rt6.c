@@ -77,7 +77,7 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 			if ((const u_char *)(addr + 1) > ep)
 				goto trunc;
 
-			ND_PRINT(", [%d]%s", i, ip6addr_string(ndo, addr));
+			ND_PRINT(", [%u]%s", i, ip6addr_string(ndo, addr));
 			addr++;
 		}
 		/*(*/
@@ -106,7 +106,7 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 			if ((const u_char *)(addr + 1) > ep)
 				goto trunc;
 
-			ND_PRINT(", [%d]%s", i, ip6addr_string(ndo, addr));
+			ND_PRINT(", [%u]%s", i, ip6addr_string(ndo, addr));
 			addr++;
 		}
 		/*(*/

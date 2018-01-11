@@ -46,9 +46,9 @@
 #include "extract.h"
 
 void
-carp_print(netdissect_options *ndo, const u_char *bp, u_int len, int ttl)
+carp_print(netdissect_options *ndo, const u_char *bp, u_int len, u_int ttl)
 {
-	int version, type;
+	u_int version, type;
 	const char *type_s;
 
 	ND_TCHECK_1(bp);
@@ -58,14 +58,14 @@ carp_print(netdissect_options *ndo, const u_char *bp, u_int len, int ttl)
 		type_s = "advertise";
 	else
 		type_s = "unknown";
-	ND_PRINT("CARPv%d-%s %d: ", version, type_s, len);
+	ND_PRINT("CARPv%u-%s %u: ", version, type_s, len);
 	if (ttl != 255)
-		ND_PRINT("[ttl=%d!] ", ttl);
+		ND_PRINT("[ttl=%u!] ", ttl);
 	if (version != 2 || type != 1)
 		return;
 	ND_TCHECK_1(bp + 2);
 	ND_TCHECK_1(bp + 5);
-	ND_PRINT("vhid=%d advbase=%d advskew=%d authlen=%d ",
+	ND_PRINT("vhid=%u advbase=%u advskew=%u authlen=%u ",
 	    EXTRACT_U_1(bp + 1), EXTRACT_U_1(bp + 5), EXTRACT_U_1(bp + 2), EXTRACT_U_1(bp + 3));
 	if (ndo->ndo_vflag) {
 		struct cksum_vec vec[1];

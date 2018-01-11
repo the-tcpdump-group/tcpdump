@@ -407,7 +407,7 @@ unsigned_relts_print(netdissect_options *ndo,
 	}
 	while (secs > 0) {
 		if (secs >= *s) {
-			ND_PRINT("%d%s", secs / *s, *l);
+			ND_PRINT("%u%s", secs / *s, *l);
 			secs -= (secs / *s) * *s;
 		}
 		s++;

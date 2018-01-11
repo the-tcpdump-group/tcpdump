@@ -49,7 +49,7 @@ void
 hncp_print(netdissect_options *ndo,
            const u_char *cp, u_int length)
 {
-    ND_PRINT("hncp (%d)", length);
+    ND_PRINT("hncp (%u)", length);
     hncp_print_rec(ndo, cp, length, 1);
 }
 
@@ -226,7 +226,7 @@ print_prefix(netdissect_options *ndo, const u_char *prefix, u_int max_length)
 		((u_char *)&addr)[plenbytes - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
 	}
-	snprintf(buf, sizeof(buf), "%s/%d", ipaddr_string(ndo, &addr), plen);
+	snprintf(buf, sizeof(buf), "%s/%u", ipaddr_string(ndo, &addr), plen);
         plenbytes += 1 + IPV4_MAPPED_HEADING_LEN;
     } else {
         plenbytes = decode_prefix6(ndo, prefix, max_length, buf, sizeof(buf));

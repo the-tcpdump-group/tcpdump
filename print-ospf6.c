@@ -375,7 +375,7 @@ static void
 ospf6_print_ls_type(netdissect_options *ndo,
                     u_int ls_type, const rtrid_t *ls_stateid)
 {
-        ND_PRINT("\n\t    %s LSA (%d), %s Scope%s, LSA-ID %s",
+        ND_PRINT("\n\t    %s LSA (%u), %s Scope%s, LSA-ID %s",
                tok2str(ospf6_lsa_values, "Unknown", ls_type & LS_TYPE_MASK),
                ls_type & LS_TYPE_MASK,
                tok2str(ospf6_ls_scope_values, "Unknown", ls_type & LS_SCOPE_MASK),
@@ -537,7 +537,7 @@ ospf6_print_lsa(netdissect_options *ndo,
 				    EXTRACT_U_1(rlp->link_type));
 				return (0);
 			}
-			ND_PRINT(", metric %d", EXTRACT_BE_U_2(rlp->link_metric));
+			ND_PRINT(", metric %u", EXTRACT_BE_U_2(rlp->link_metric));
 			rlp++;
 		}
 		break;
@@ -651,7 +651,7 @@ ospf6_print_lsa(netdissect_options *ndo,
 		lsa_length -= sizeof (llsap->llsa_lladdr) + sizeof (llsap->llsa_nprefix);
                 ND_TCHECK(llsap->llsa_nprefix);
                 prefixes = EXTRACT_BE_U_4(llsap->llsa_nprefix);
-		ND_PRINT("\n\t      Priority %d, Link-local address %s, Prefixes %d:",
+		ND_PRINT("\n\t      Priority %u, Link-local address %s, Prefixes %u:",
                        EXTRACT_U_1(llsap->llsa_priority),
                        ip6addr_string(ndo, &llsap->llsa_lladdr),
                        prefixes);
@@ -682,7 +682,7 @@ ospf6_print_lsa(netdissect_options *ndo,
 		lsa_length -= sizeof (lsap->lsa_un.un_intra_ap.intra_ap_nprefix);
 		ND_TCHECK(lsap->lsa_un.un_intra_ap.intra_ap_nprefix);
                 prefixes = EXTRACT_BE_U_2(lsap->lsa_un.un_intra_ap.intra_ap_nprefix);
-		ND_PRINT("\n\t      Prefixes %d:", prefixes);
+		ND_PRINT("\n\t      Prefixes %u:", prefixes);
 
 		tptr = (const uint8_t *)lsap->lsa_un.un_intra_ap.intra_ap_prefix;
 		while (prefixes > 0) {
@@ -984,7 +984,7 @@ ospf6_print(netdissect_options *ndo,
 	ND_TCHECK(op->ospf6_len);
 	datalen = EXTRACT_BE_U_2(op->ospf6_len);
 	if (datalen > length) {
-		ND_PRINT(" [len %d]", datalen);
+		ND_PRINT(" [len %u]", datalen);
 		return;
 	}
 	dataend = bp + datalen;

@@ -42,13 +42,15 @@ msdp_print(netdissect_options *ndo, const u_char *sp, u_int length)
 	if (len > 1500 || len < 3 || type == 0 || type > MSDP_TYPE_MAX)
 		goto trunc;	/* not really truncated, but still not decodable */
 	ND_PRINT(" msdp:");
-	while (length > 0) {
+	while (length != 0) {
 		ND_TCHECK_3(sp);
 		type = EXTRACT_U_1(sp);
 		len = EXTRACT_BE_U_2(sp + 1);
 		if (len > 1400 || ndo->ndo_vflag)
 			ND_PRINT(" [len %u]", len);
 		if (len < 3)
+			goto trunc;
+		if (length < len)
 			goto trunc;
 		sp += 3;
 		length -= 3;
@@ -79,13 +81,13 @@ msdp_print(netdissect_options *ndo, const u_char *sp, u_int length)
 		case 4:
 			ND_PRINT(" Keepalive");
 			if (len != 3)
-				ND_PRINT("[len=%d] ", len);
+				ND_PRINT("[len=%u] ", len);
 			break;
 		case 5:
 			ND_PRINT(" Notification");
 			break;
 		default:
-			ND_PRINT(" [type=%d len=%d]", type, len);
+			ND_PRINT(" [type=%u len=%u]", type, len);
 			break;
 		}
 		sp += (len - 3);

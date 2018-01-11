@@ -1725,7 +1725,7 @@ ppp_hdlc_if_print(netdissect_options *ndo,
 		}
 
 		if (ndo->ndo_eflag)
-			ND_PRINT("%02x %02x %d ", EXTRACT_U_1(p),
+			ND_PRINT("%02x %02x %u ", EXTRACT_U_1(p),
 			    EXTRACT_U_1(p + 1), length);
 		p += 2;
 		hdrlen += 2;
@@ -1777,7 +1777,7 @@ ppp_bsdos_if_print(netdissect_options *ndo _U_,
 	}
 
 	if (ndo->ndo_eflag)
-		ND_PRINT("%d ", length);
+		ND_PRINT("%u ", length);
 	/* Retrieve the protocol type */
 	if (EXTRACT_U_1(p) & 01) {
 		/* Compressed protocol field */
@@ -1813,7 +1813,7 @@ ppp_bsdos_if_print(netdissect_options *ndo _U_,
 			ptype = EXTRACT_BE_U_2(&ph->phdr_type);
 			if (ndo->ndo_eflag && (ptype == PPP_VJC || ptype == PPP_VJNC)) {
 				ND_PRINT("%s ", tok2str(ppptype2str,
-						"proto-#%d", ptype));
+						"proto-#%u", ptype));
 			}
 		} else {
 			if (ndo->ndo_eflag) {
@@ -1825,7 +1825,7 @@ ppp_bsdos_if_print(netdissect_options *ndo _U_,
 		}
 	}
 	if (ndo->ndo_eflag)
-		ND_PRINT("%d ", length);
+		ND_PRINT("%u ", length);
 	if (EXTRACT_U_1(p + SLC_CHL)) {
 		q = p + SLC_BPFHDRLEN + llhl;
 

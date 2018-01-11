@@ -67,8 +67,8 @@ static const struct atNBPtuple *nbp_tuple_print(netdissect_options *ndo, const s
 static const struct atNBPtuple *nbp_name_print(netdissect_options *, const struct atNBPtuple *,
 					       const u_char *);
 static const char *ataddr_string(netdissect_options *, u_short, u_char);
-static void ddp_print(netdissect_options *, const u_char *, u_int, int, u_short, u_char, u_char);
-static const char *ddpskt_string(netdissect_options *, int);
+static void ddp_print(netdissect_options *, const u_char *, u_int, u_int, u_short, u_char, u_char);
+static const char *ddpskt_string(netdissect_options *, u_int);
 
 /*
  * Print LLAP packets received on a physical LocalTalk interface.
@@ -252,7 +252,7 @@ aarp_print(netdissect_options *ndo,
  */
 static void
 ddp_print(netdissect_options *ndo,
-          const u_char *bp, u_int length, int t,
+          const u_char *bp, u_int length, u_int t,
           u_short snet, u_char snode, u_char skt)
 {
 
@@ -271,7 +271,7 @@ ddp_print(netdissect_options *ndo,
 		break;
 
 	default:
-		ND_PRINT(" at-%s %d", tok2str(type2str, NULL, t), length);
+		ND_PRINT(" at-%s %u", tok2str(type2str, NULL, t), length);
 		break;
 	}
 }
@@ -320,7 +320,7 @@ atp_print(netdissect_options *ndo,
 		break;
 
 	case atpRspCode:
-		ND_PRINT(" atp-resp%s%d:%u (%u)",
+		ND_PRINT(" atp-resp%s%u:%u (%u)",
 			     control & atpEOM? "*" : " ",
 			     EXTRACT_BE_U_2(ap->transID), EXTRACT_U_1(ap->bitmap), length);
 		switch (control & (atpXO|atpSTS)) {
@@ -364,7 +364,7 @@ atp_print(netdissect_options *ndo,
 		break;
 
 	default:
-		ND_PRINT(" atp-0x%x  %d (%u)", control,
+		ND_PRINT(" atp-0x%x  %u (%u)", control,
 			     EXTRACT_BE_U_2(ap->transID), length);
 		break;
 	}
@@ -377,7 +377,7 @@ static void
 atp_bitmap_print(netdissect_options *ndo,
                  u_char bm)
 {
-	int i;
+	u_int i;
 
 	/*
 	 * The '& 0xff' below is needed for compilers that want to sign
@@ -388,7 +388,7 @@ atp_bitmap_print(netdissect_options *ndo,
 		char c = '<';
 		for (i = 0; bm; ++i) {
 			if (bm & 1) {
-				ND_PRINT("%c%d", c, i);
+				ND_PRINT("%c%u", c, i);
 				c = ',';
 			}
 			bm >>= 1;
@@ -398,7 +398,7 @@ atp_bitmap_print(netdissect_options *ndo,
 		for (i = 0; bm; ++i)
 			bm >>= 1;
 		if (i > 1)
-			ND_PRINT("<0-%d>", i - 1);
+			ND_PRINT("<0-%u>", i - 1);
 		else
 			ND_PRINT("<0>");
 	}
@@ -412,7 +412,7 @@ nbp_print(netdissect_options *ndo,
 	const struct atNBPtuple *tp =
 		(const struct atNBPtuple *)((const u_char *)np + nbpHeaderSize);
 	uint8_t control;
-	int i;
+	u_int i;
 	const u_char *ep;
 
 	if (length < nbpHeaderSize) {
@@ -455,17 +455,17 @@ nbp_print(netdissect_options *ndo,
 		if (EXTRACT_BE_U_2(tp->net) != snet ||
 		    EXTRACT_U_1(tp->node) != snode ||
 		    EXTRACT_U_1(tp->skt) != skt)
-			ND_PRINT(" [addr=%s.%d]",
+			ND_PRINT(" [addr=%s.%u]",
 			    ataddr_string(ndo, EXTRACT_BE_U_2(tp->net),
 					  EXTRACT_U_1(tp->node)),
-					  EXTRACT_U_1(tp->skt));
+			    EXTRACT_U_1(tp->skt));
 		break;
 
 	case nbpLkUpReply:
 		ND_PRINT(" nbp-reply %u:", EXTRACT_U_1(np->id));
 
 		/* print each of the tuples in the reply */
-		for (i = control & 0xf; --i >= 0 && tp; )
+		for (i = control & 0xf; i != 0 && tp; i--)
 			tp = nbp_tuple_print(ndo, tp, ep, snet, snode, skt);
 		break;
 
@@ -563,7 +563,7 @@ nbp_name_print(netdissect_options *ndo,
 #define HASHNAMESIZE 4096
 
 struct hnamemem {
-	int addr;
+	u_int addr;
 	char *name;
 	struct hnamemem *nxt;
 };
@@ -575,7 +575,7 @@ ataddr_string(netdissect_options *ndo,
               u_short atnet, u_char athost)
 {
 	struct hnamemem *tp, *tp2;
-	int i = (atnet << 8) | athost;
+	u_int i = (atnet << 8) | athost;
 	char nambuf[256+1];
 	static int first = 1;
 	FILE *fp;
@@ -587,15 +587,15 @@ ataddr_string(netdissect_options *ndo,
 	if (first && (first = 0, !ndo->ndo_nflag)
 	    && (fp = fopen("/etc/atalk.names", "r"))) {
 		char line[256];
-		int i1, i2;
+		u_int i1, i2;
 
 		while (fgets(line, sizeof(line), fp)) {
 			if (line[0] == '\n' || line[0] == 0 || line[0] == '#')
 				continue;
-			if (sscanf(line, "%d.%d %256s", &i1, &i2, nambuf) == 3)
+			if (sscanf(line, "%u.%u %256s", &i1, &i2, nambuf) == 3)
 				/* got a hostname. */
 				i2 |= (i1 << 8);
-			else if (sscanf(line, "%d %256s", &i1, nambuf) == 2)
+			else if (sscanf(line, "%u %256s", &i1, nambuf) == 2)
 				/* got a net name */
 				i2 = (i1 << 8) | 255;
 			else
@@ -624,7 +624,7 @@ ataddr_string(netdissect_options *ndo,
 		if (tp2->addr == i) {
 			tp->addr = (atnet << 8) | athost;
 			tp->nxt = newhnamemem(ndo);
-			(void)snprintf(nambuf, sizeof(nambuf), "%s.%d",
+			(void)snprintf(nambuf, sizeof(nambuf), "%s.%u",
 			    tp2->name, athost);
 			tp->name = strdup(nambuf);
 			if (tp->name == NULL)
@@ -636,9 +636,9 @@ ataddr_string(netdissect_options *ndo,
 	tp->addr = (atnet << 8) | athost;
 	tp->nxt = newhnamemem(ndo);
 	if (athost != 255)
-		(void)snprintf(nambuf, sizeof(nambuf), "%d.%d", atnet, athost);
+		(void)snprintf(nambuf, sizeof(nambuf), "%u.%u", atnet, athost);
 	else
-		(void)snprintf(nambuf, sizeof(nambuf), "%d", atnet);
+		(void)snprintf(nambuf, sizeof(nambuf), "%u", atnet);
 	tp->name = strdup(nambuf);
 	if (tp->name == NULL)
 		(*ndo->ndo_error)(ndo, "ataddr_string: strdup(nambuf)");
@@ -656,13 +656,13 @@ static const struct tok skt2str[] = {
 
 static const char *
 ddpskt_string(netdissect_options *ndo,
-              int skt)
+              u_int skt)
 {
 	static char buf[8];
 
 	if (ndo->ndo_nflag) {
-		(void)snprintf(buf, sizeof(buf), "%d", skt);
+		(void)snprintf(buf, sizeof(buf), "%u", skt);
 		return (buf);
 	}
-	return (tok2str(skt2str, "%d", skt));
+	return (tok2str(skt2str, "%u", skt));
 }

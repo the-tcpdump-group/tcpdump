@@ -314,7 +314,7 @@ int espprint_decode_hex(netdissect_options *ndo,
 	len = strlen(hex) / 2;
 
 	if (len > binbuf_len) {
-		(*ndo->ndo_warning)(ndo, "secret is too big: %d\n", len);
+		(*ndo->ndo_warning)(ndo, "secret is too big: %u\n", len);
 		return 0;
 	}
 

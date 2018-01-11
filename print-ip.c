@@ -95,14 +95,17 @@ static uint32_t
 ip_finddst(netdissect_options *ndo,
            const struct ip *ip)
 {
-	int length;
-	int len;
+	u_int length;
+	u_int len;
 	const u_char *cp;
 
 	cp = (const u_char *)(ip + 1);
-	length = (IP_HL(ip) << 2) - sizeof(struct ip);
+	length = (IP_HL(ip) << 2);
+	if (length < sizeof(struct ip))
+		goto trunc; 
+	length -= sizeof(struct ip);
 
-	for (; length > 0; cp += len, length -= len) {
+	for (; length != 0; cp += len, length -= len) {
 		int tt;
 
 		ND_TCHECK_1(cp);
@@ -117,6 +120,8 @@ ip_finddst(netdissect_options *ndo,
 			if (len < 2)
 				break;
 		}
+		if (length < len)
+			goto trunc;
 		ND_TCHECK_LEN(cp, len);
 		switch (tt) {
 
@@ -171,7 +176,7 @@ ip_printts(netdissect_options *ndo,
 {
 	u_int ptr;
 	u_int len;
-	int hoplen;
+	u_int hoplen;
 	const char *type;
 
 	if (length < 4) {
@@ -209,7 +214,7 @@ ip_printts(netdissect_options *ndo,
 		ND_PRINT("PRESPEC");
 		break;
 	default:
-		ND_PRINT("[bad ts type %d]", EXTRACT_U_1(cp + 3)&0xF);
+		ND_PRINT("[bad ts type %u]", EXTRACT_U_1(cp + 3)&0xF);
 		goto done;
 	}
 
@@ -218,7 +223,7 @@ ip_printts(netdissect_options *ndo,
 		if (ptr == len)
 			type = " ^ ";
 		ND_TCHECK_LEN(cp + len, hoplen);
-		ND_PRINT("%s%d@%s", type, EXTRACT_BE_U_4(cp + len + hoplen - 4),
+		ND_PRINT("%s%u@%s", type, EXTRACT_BE_U_4(cp + len + hoplen - 4),
 			  hoplen!=8 ? "" : ipaddr_string(ndo, cp + len));
 		type = " ";
 	}
@@ -227,7 +232,7 @@ done:
 	ND_PRINT("%s", ptr == len ? " ^ " : "");
 
 	if (EXTRACT_U_1(cp + 3) >> 4)
-		ND_PRINT(" [%d hops not recorded]} ", EXTRACT_U_1(cp + 3)>>4);
+		ND_PRINT(" [%u hops not recorded]} ", EXTRACT_U_1(cp + 3)>>4);
 	else
 		ND_PRINT("}");
 	return (0);
@@ -429,7 +434,7 @@ again:
 		break;
 
 	case IPPROTO_ND:
-		ND_PRINT(" nd %d", ipds->len);
+		ND_PRINT(" nd %u", ipds->len);
 		break;
 
 	case IPPROTO_EGP:
@@ -502,8 +507,8 @@ again:
 		if (ndo->ndo_nflag==0 && (p_name = netdb_protoname(ipds->nh)) != NULL)
 			ND_PRINT(" %s", p_name);
 		else
-			ND_PRINT(" ip-proto-%d", ipds->nh);
-		ND_PRINT(" %d", ipds->len);
+			ND_PRINT(" ip-proto-%u", ipds->nh);
+		ND_PRINT(" %u", ipds->len);
 		break;
 	}
 }
@@ -706,7 +711,7 @@ void
 ipN_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	if (length < 1) {
-		ND_PRINT("truncated-ip %d", length);
+		ND_PRINT("truncated-ip %u", length);
 		return;
 	}
 

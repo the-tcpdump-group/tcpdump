@@ -133,8 +133,8 @@ vrrp_print(netdissect_options *ndo,
 	}
 
 	if (ndo->ndo_vflag) {
-		int naddrs = EXTRACT_U_1(bp + 3);
-		int i;
+		u_int naddrs = EXTRACT_U_1(bp + 3);
+		u_int i;
 		char c;
 
 		if (version == 2 && ND_TTEST_LEN(bp, len)) {
@@ -157,7 +157,7 @@ vrrp_print(netdissect_options *ndo,
 
 		ND_PRINT(", addrs");
 		if (naddrs > 1)
-			ND_PRINT("(%d)", naddrs);
+			ND_PRINT("(%u)", naddrs);
 		ND_PRINT(":");
 		c = ' ';
 		bp += 8;

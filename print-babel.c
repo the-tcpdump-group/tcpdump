@@ -57,7 +57,7 @@ babel_print(netdissect_options *ndo,
         ND_PRINT(" invalid header");
         return;
     } else {
-        ND_PRINT(" %d", EXTRACT_U_1(cp + 1));
+        ND_PRINT(" %u", EXTRACT_U_1(cp + 1));
     }
 
     switch(EXTRACT_U_1(cp + 1)) {
@@ -385,7 +385,7 @@ babel_print_v2(netdissect_options *ndo,
             if (!ndo->ndo_vflag)
                 ND_PRINT(" padN");
             else
-                ND_PRINT("\n\tPad %d", len + 2);
+                ND_PRINT("\n\tPad %u", len + 2);
         }
             break;
 
@@ -712,7 +712,7 @@ babel_print_v2(netdissect_options *ndo,
             if (!ndo->ndo_vflag)
                 ND_PRINT(" unknown");
             else
-                ND_PRINT("\n\tUnknown message type %d", type);
+                ND_PRINT("\n\tUnknown message type %u", type);
         }
         i += len + 2;
     }

@@ -271,7 +271,7 @@ gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 		if (len < 4)
 			goto trunc;
 		k = EXTRACT_BE_U_4(bp);
-		ND_PRINT(", call %d", k & 0xffff);
+		ND_PRINT(", call %u", k & 0xffff);
 		len -= 4;
 		bp += 4;
 	}

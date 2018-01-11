@@ -72,10 +72,10 @@ ip6_sopt_print(netdissect_options *ndo, const u_char *bp, int len)
 	    break;
 	default:
 	    if (len - i < IP6OPT_MINLEN) {
-		ND_PRINT(", sopt_type %d: trunc)", EXTRACT_U_1(bp + i));
+		ND_PRINT(", sopt_type %u: trunc)", EXTRACT_U_1(bp + i));
 		goto trunc;
 	    }
-	    ND_PRINT(", sopt_type 0x%02x: len=%d", EXTRACT_U_1(bp + i), EXTRACT_U_1(bp + i + 1));
+	    ND_PRINT(", sopt_type 0x%02x: len=%u", EXTRACT_U_1(bp + i), EXTRACT_U_1(bp + i + 1));
 	    break;
 	}
     }
@@ -122,7 +122,7 @@ ip6_opt_print(netdissect_options *ndo, const u_char *bp, int len)
 		goto trunc;
 	    }
 	    if (EXTRACT_U_1(bp + i + 1) != IP6OPT_RTALERT_LEN - 2) {
-		ND_PRINT("(rtalert: invalid len %d)", EXTRACT_U_1(bp + i + 1));
+		ND_PRINT("(rtalert: invalid len %u)", EXTRACT_U_1(bp + i + 1));
 		goto trunc;
 	    }
 	    ND_PRINT("(rtalert: 0x%04x) ", EXTRACT_BE_U_2(bp + i + 2));
@@ -133,7 +133,7 @@ ip6_opt_print(netdissect_options *ndo, const u_char *bp, int len)
 		goto trunc;
 	    }
 	    if (EXTRACT_U_1(bp + i + 1) != IP6OPT_JUMBO_LEN - 2) {
-		ND_PRINT("(jumbo: invalid len %d)", EXTRACT_U_1(bp + i + 1));
+		ND_PRINT("(jumbo: invalid len %u)", EXTRACT_U_1(bp + i + 1));
 		goto trunc;
 	    }
 	    ND_PRINT("(jumbo: %u) ", EXTRACT_BE_U_4(bp + i + 2));
@@ -144,7 +144,7 @@ ip6_opt_print(netdissect_options *ndo, const u_char *bp, int len)
 		goto trunc;
 	    }
 	    if (EXTRACT_U_1(bp + i + 1) < IP6OPT_HOMEADDR_MINLEN - 2) {
-		ND_PRINT("(homeaddr: invalid len %d)", EXTRACT_U_1(bp + i + 1));
+		ND_PRINT("(homeaddr: invalid len %u)", EXTRACT_U_1(bp + i + 1));
 		goto trunc;
 	    }
 	    ND_PRINT("(homeaddr: %s", ip6addr_string(ndo, bp + i + 2));
@@ -156,10 +156,10 @@ ip6_opt_print(netdissect_options *ndo, const u_char *bp, int len)
 	    break;
 	default:
 	    if (len - i < IP6OPT_MINLEN) {
-		ND_PRINT("(type %d: trunc)", EXTRACT_U_1(bp + i));
+		ND_PRINT("(type %u: trunc)", EXTRACT_U_1(bp + i));
 		goto trunc;
 	    }
-	    ND_PRINT("(opt_type 0x%02x: len=%d)", EXTRACT_U_1(bp + i), EXTRACT_U_1(bp + i + 1));
+	    ND_PRINT("(opt_type 0x%02x: len=%u)", EXTRACT_U_1(bp + i), EXTRACT_U_1(bp + i + 1));
 	    break;
 	}
     }
