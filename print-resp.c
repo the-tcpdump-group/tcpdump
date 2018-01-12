@@ -136,7 +136,7 @@ static int resp_get_length(netdissect_options *, const u_char *, int, const u_ch
             /*                                   \
              * Have we hit the end of data?      \
              */                                  \
-            if (_len == 0 || !ND_TTEST(*_ptr)) { \
+            if (_len == 0 || !ND_TTEST_1(_ptr)) {\
                 /*                               \
                  * Yes.  Have we seen a \r       \
                  * or \n?                        \
