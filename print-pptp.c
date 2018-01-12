@@ -120,13 +120,13 @@ struct pptp_msg_sccrp {
 struct pptp_msg_stopccrq {
 	nd_uint8_t  reason;
 	nd_uint8_t  reserved1;
-	nd_uint16_t  reserved2;
+	nd_uint16_t reserved2;
 };
 
 struct pptp_msg_stopccrp {
 	nd_uint8_t  result_code;
 	nd_uint8_t  err_code;
-	nd_uint16_t  reserved1;
+	nd_uint16_t reserved1;
 };
 
 struct pptp_msg_echorq {
@@ -137,7 +137,7 @@ struct pptp_msg_echorp {
 	nd_uint32_t id;
 	nd_uint8_t  result_code;
 	nd_uint8_t  err_code;
-	nd_uint16_t  reserved1;
+	nd_uint16_t reserved1;
 };
 
 struct pptp_msg_ocrq {
@@ -186,7 +186,7 @@ struct pptp_msg_icrp {
 	nd_uint8_t  err_code;
 	nd_uint16_t recv_winsiz;
 	nd_uint16_t pkt_proc_delay;
-	nd_uint16_t  reserved1;
+	nd_uint16_t reserved1;
 };
 
 struct pptp_msg_iccn {
@@ -214,7 +214,7 @@ struct pptp_msg_cdn {
 
 struct pptp_msg_wen {
 	nd_uint16_t peer_call_id;
-	nd_uint16_t  reserved1;
+	nd_uint16_t reserved1;
 	nd_uint32_t crc_err;
 	nd_uint32_t framing_err;
 	nd_uint32_t hardware_overrun;
@@ -262,6 +262,16 @@ struct pptp_msg_sli {
   so I will prepare print out functions for these attributes (except for
   reserved*).
 */
+
+#define PRINT_RESERVED_IF_NOT_ZERO_1(reserved) \
+        if (EXTRACT_U_1(reserved)) \
+		ND_PRINT(" [ERROR: reserved=%u must be zero]", \
+			 EXTRACT_U_1(reserved));
+
+#define PRINT_RESERVED_IF_NOT_ZERO_2(reserved) \
+        if (EXTRACT_BE_U_2(reserved)) \
+		ND_PRINT(" [ERROR: reserved=%u must be zero]", \
+			 EXTRACT_BE_U_2(reserved));
 
 /******************************************/
 /* Attribute-specific print out functions */
@@ -526,6 +536,7 @@ pptp_sccrq_print(netdissect_options *ndo,
 	ND_TCHECK_2(ptr->proto_ver);
 	pptp_proto_ver_print(ndo, &ptr->proto_ver);
 	ND_TCHECK_2(ptr->reserved1);
+	PRINT_RESERVED_IF_NOT_ZERO_2(ptr->reserved1);
 	ND_TCHECK_4(ptr->framing_cap);
 	pptp_framing_cap_print(ndo, &ptr->framing_cap);
 	ND_TCHECK_4(ptr->bearer_cap);
@@ -602,7 +613,9 @@ pptp_stopccrq_print(netdissect_options *ndo,
 	}
 	ND_PRINT(")");
 	ND_TCHECK_1(ptr->reserved1);
+	PRINT_RESERVED_IF_NOT_ZERO_1(ptr->reserved1);
 	ND_TCHECK_2(ptr->reserved2);
+	PRINT_RESERVED_IF_NOT_ZERO_2(ptr->reserved2);
 
 	return;
 
@@ -621,6 +634,7 @@ pptp_stopccrp_print(netdissect_options *ndo,
 	ND_TCHECK_1(ptr->err_code);
 	pptp_err_code_print(ndo, &ptr->err_code);
 	ND_TCHECK_2(ptr->reserved1);
+	PRINT_RESERVED_IF_NOT_ZERO_2(ptr->reserved1);
 
 	return;
 
@@ -656,6 +670,7 @@ pptp_echorp_print(netdissect_options *ndo,
 	ND_TCHECK_1(ptr->err_code);
 	pptp_err_code_print(ndo, &ptr->err_code);
 	ND_TCHECK_2(ptr->reserved1);
+	PRINT_RESERVED_IF_NOT_ZERO_2(ptr->reserved1);
 
 	return;
 
@@ -688,6 +703,7 @@ pptp_ocrq_print(netdissect_options *ndo,
 	ND_TCHECK_2(ptr->phone_no_len);
 	ND_PRINT(" PHONE_NO_LEN(%u)", EXTRACT_BE_U_2(ptr->phone_no_len));
 	ND_TCHECK_2(ptr->reserved1);
+	PRINT_RESERVED_IF_NOT_ZERO_2(ptr->reserved1);
 	ND_TCHECK(ptr->phone_no);
 	ND_PRINT(" PHONE_NO(%.64s)", ptr->phone_no);
 	ND_TCHECK(ptr->subaddr);
@@ -780,6 +796,7 @@ pptp_icrp_print(netdissect_options *ndo,
 	ND_TCHECK_2(ptr->pkt_proc_delay);
 	pptp_pkt_proc_delay_print(ndo, &ptr->pkt_proc_delay);
 	ND_TCHECK_2(ptr->reserved1);
+	PRINT_RESERVED_IF_NOT_ZERO_2(ptr->reserved1);
 
 	return;
 
@@ -796,6 +813,7 @@ pptp_iccn_print(netdissect_options *ndo,
 	ND_TCHECK_2(ptr->peer_call_id);
 	pptp_peer_call_id_print(ndo, &ptr->peer_call_id);
 	ND_TCHECK_2(ptr->reserved1);
+	PRINT_RESERVED_IF_NOT_ZERO_2(ptr->reserved1);
 	ND_TCHECK_4(ptr->conn_speed);
 	pptp_conn_speed_print(ndo, &ptr->conn_speed);
 	ND_TCHECK_2(ptr->recv_winsiz);
@@ -820,6 +838,7 @@ pptp_ccrq_print(netdissect_options *ndo,
 	ND_TCHECK_2(ptr->call_id);
 	pptp_call_id_print(ndo, &ptr->call_id);
 	ND_TCHECK_2(ptr->reserved1);
+	PRINT_RESERVED_IF_NOT_ZERO_2(ptr->reserved1);
 
 	return;
 
@@ -842,6 +861,7 @@ pptp_cdn_print(netdissect_options *ndo,
 	ND_TCHECK_2(ptr->cause_code);
 	pptp_cause_code_print(ndo, &ptr->cause_code);
 	ND_TCHECK_2(ptr->reserved1);
+	PRINT_RESERVED_IF_NOT_ZERO_2(ptr->reserved1);
 	ND_TCHECK(ptr->call_stats);
 	ND_PRINT(" CALL_STATS(%.128s)", ptr->call_stats);
 
@@ -860,6 +880,7 @@ pptp_wen_print(netdissect_options *ndo,
 	ND_TCHECK_2(ptr->peer_call_id);
 	pptp_peer_call_id_print(ndo, &ptr->peer_call_id);
 	ND_TCHECK_2(ptr->reserved1);
+	PRINT_RESERVED_IF_NOT_ZERO_2(ptr->reserved1);
 	ND_TCHECK_4(ptr->crc_err);
 	ND_PRINT(" CRC_ERR(%u)", EXTRACT_BE_U_4(ptr->crc_err));
 	ND_TCHECK_4(ptr->framing_err);
@@ -888,6 +909,7 @@ pptp_sli_print(netdissect_options *ndo,
 	ND_TCHECK_2(ptr->peer_call_id);
 	pptp_peer_call_id_print(ndo, &ptr->peer_call_id);
 	ND_TCHECK_2(ptr->reserved1);
+	PRINT_RESERVED_IF_NOT_ZERO_2(ptr->reserved1);
 	ND_TCHECK_4(ptr->send_accm);
 	ND_PRINT(" SEND_ACCM(0x%08x)", EXTRACT_BE_U_4(ptr->send_accm));
 	ND_TCHECK_4(ptr->recv_accm);
@@ -947,6 +969,7 @@ pptp_print(netdissect_options *ndo,
 		ND_PRINT(" UNKNOWN_CTRL_MSGTYPE(%u)", ctrl_msg_type);
 	}
 	ND_TCHECK_2(hdr->reserved0);
+	PRINT_RESERVED_IF_NOT_ZERO_2(hdr->reserved0);
 
 	dat += 12;
 
