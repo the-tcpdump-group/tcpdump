@@ -545,9 +545,9 @@ pptp_sccrq_print(netdissect_options *ndo,
 	pptp_max_channel_print(ndo, &ptr->max_channel);
 	ND_TCHECK_2(ptr->firm_rev);
 	pptp_firm_rev_print(ndo, &ptr->firm_rev);
-	ND_TCHECK(ptr->hostname);
+	ND_TCHECK_SIZE(&ptr->hostname);
 	pptp_hostname_print(ndo, &ptr->hostname[0]);
-	ND_TCHECK(ptr->vendor);
+	ND_TCHECK_SIZE(&ptr->vendor);
 	pptp_vendor_print(ndo, &ptr->vendor[0]);
 
 	return;
@@ -576,9 +576,9 @@ pptp_sccrp_print(netdissect_options *ndo,
 	pptp_max_channel_print(ndo, &ptr->max_channel);
 	ND_TCHECK_2(ptr->firm_rev);
 	pptp_firm_rev_print(ndo, &ptr->firm_rev);
-	ND_TCHECK(ptr->hostname);
+	ND_TCHECK_SIZE(&ptr->hostname);
 	pptp_hostname_print(ndo, &ptr->hostname[0]);
-	ND_TCHECK(ptr->vendor);
+	ND_TCHECK_SIZE(&ptr->vendor);
 	pptp_vendor_print(ndo, &ptr->vendor[0]);
 
 	return;
@@ -704,9 +704,9 @@ pptp_ocrq_print(netdissect_options *ndo,
 	ND_PRINT(" PHONE_NO_LEN(%u)", EXTRACT_BE_U_2(ptr->phone_no_len));
 	ND_TCHECK_2(ptr->reserved1);
 	PRINT_RESERVED_IF_NOT_ZERO_2(ptr->reserved1);
-	ND_TCHECK(ptr->phone_no);
+	ND_TCHECK_SIZE(&ptr->phone_no);
 	ND_PRINT(" PHONE_NO(%.64s)", ptr->phone_no);
-	ND_TCHECK(ptr->subaddr);
+	ND_TCHECK_SIZE(&ptr->subaddr);
 	pptp_subaddr_print(ndo, &ptr->subaddr[0]);
 
 	return;
@@ -764,11 +764,11 @@ pptp_icrq_print(netdissect_options *ndo,
 	ND_PRINT(" DIALED_NO_LEN(%u)", EXTRACT_BE_U_2(ptr->dialed_no_len));
 	ND_TCHECK_2(ptr->dialing_no_len);
 	ND_PRINT(" DIALING_NO_LEN(%u)", EXTRACT_BE_U_2(ptr->dialing_no_len));
-	ND_TCHECK(ptr->dialed_no);
+	ND_TCHECK_SIZE(&ptr->dialed_no);
 	ND_PRINT(" DIALED_NO(%.64s)", ptr->dialed_no);
-	ND_TCHECK(ptr->dialing_no);
+	ND_TCHECK_SIZE(&ptr->dialing_no);
 	ND_PRINT(" DIALING_NO(%.64s)", ptr->dialing_no);
-	ND_TCHECK(ptr->subaddr);
+	ND_TCHECK_SIZE(&ptr->subaddr);
 	pptp_subaddr_print(ndo, &ptr->subaddr[0]);
 
 	return;
@@ -862,7 +862,7 @@ pptp_cdn_print(netdissect_options *ndo,
 	pptp_cause_code_print(ndo, &ptr->cause_code);
 	ND_TCHECK_2(ptr->reserved1);
 	PRINT_RESERVED_IF_NOT_ZERO_2(ptr->reserved1);
-	ND_TCHECK(ptr->call_stats);
+	ND_TCHECK_SIZE(&ptr->call_stats);
 	ND_PRINT(" CALL_STATS(%.128s)", ptr->call_stats);
 
 	return;
