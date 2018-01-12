@@ -91,7 +91,7 @@ struct pptp_hdr {
 	nd_uint16_t msg_type;
 	nd_uint32_t magic_cookie;
 	nd_uint16_t ctrl_msg_type;
-	nd_uint8_t reserved0[2];
+	nd_uint16_t reserved0;
 };
 
 struct pptp_msg_sccrq {
@@ -119,14 +119,14 @@ struct pptp_msg_sccrp {
 
 struct pptp_msg_stopccrq {
 	nd_uint8_t  reason;
-	nd_byte     reserved1[1];
-	nd_byte     reserved2[2];
+	nd_uint8_t  reserved1;
+	nd_uint16_t  reserved2;
 };
 
 struct pptp_msg_stopccrp {
 	nd_uint8_t  result_code;
 	nd_uint8_t  err_code;
-	nd_byte     reserved1[2];
+	nd_uint16_t  reserved1;
 };
 
 struct pptp_msg_echorq {
@@ -137,7 +137,7 @@ struct pptp_msg_echorp {
 	nd_uint32_t id;
 	nd_uint8_t  result_code;
 	nd_uint8_t  err_code;
-	nd_byte     reserved1[2];
+	nd_uint16_t  reserved1;
 };
 
 struct pptp_msg_ocrq {
@@ -186,7 +186,7 @@ struct pptp_msg_icrp {
 	nd_uint8_t  err_code;
 	nd_uint16_t recv_winsiz;
 	nd_uint16_t pkt_proc_delay;
-	nd_byte     reserved1[2];
+	nd_uint16_t  reserved1;
 };
 
 struct pptp_msg_iccn {
@@ -214,7 +214,7 @@ struct pptp_msg_cdn {
 
 struct pptp_msg_wen {
 	nd_uint16_t peer_call_id;
-	nd_byte     reserved1[2];
+	nd_uint16_t  reserved1;
 	nd_uint32_t crc_err;
 	nd_uint32_t framing_err;
 	nd_uint32_t hardware_overrun;
@@ -523,16 +523,16 @@ pptp_sccrq_print(netdissect_options *ndo,
 {
 	const struct pptp_msg_sccrq *ptr = (const struct pptp_msg_sccrq *)dat;
 
-	ND_TCHECK(ptr->proto_ver);
+	ND_TCHECK_2(ptr->proto_ver);
 	pptp_proto_ver_print(ndo, &ptr->proto_ver);
-	ND_TCHECK(ptr->reserved1);
-	ND_TCHECK(ptr->framing_cap);
+	ND_TCHECK_2(ptr->reserved1);
+	ND_TCHECK_4(ptr->framing_cap);
 	pptp_framing_cap_print(ndo, &ptr->framing_cap);
-	ND_TCHECK(ptr->bearer_cap);
+	ND_TCHECK_4(ptr->bearer_cap);
 	pptp_bearer_cap_print(ndo, &ptr->bearer_cap);
-	ND_TCHECK(ptr->max_channel);
+	ND_TCHECK_2(ptr->max_channel);
 	pptp_max_channel_print(ndo, &ptr->max_channel);
-	ND_TCHECK(ptr->firm_rev);
+	ND_TCHECK_2(ptr->firm_rev);
 	pptp_firm_rev_print(ndo, &ptr->firm_rev);
 	ND_TCHECK(ptr->hostname);
 	pptp_hostname_print(ndo, &ptr->hostname[0]);
@@ -551,19 +551,19 @@ pptp_sccrp_print(netdissect_options *ndo,
 {
 	const struct pptp_msg_sccrp *ptr = (const struct pptp_msg_sccrp *)dat;
 
-	ND_TCHECK(ptr->proto_ver);
+	ND_TCHECK_2(ptr->proto_ver);
 	pptp_proto_ver_print(ndo, &ptr->proto_ver);
-	ND_TCHECK(ptr->result_code);
+	ND_TCHECK_1(ptr->result_code);
 	pptp_result_code_print(ndo, &ptr->result_code, PPTP_CTRL_MSG_TYPE_SCCRP);
-	ND_TCHECK(ptr->err_code);
+	ND_TCHECK_1(ptr->err_code);
 	pptp_err_code_print(ndo, &ptr->err_code);
-	ND_TCHECK(ptr->framing_cap);
+	ND_TCHECK_4(ptr->framing_cap);
 	pptp_framing_cap_print(ndo, &ptr->framing_cap);
-	ND_TCHECK(ptr->bearer_cap);
+	ND_TCHECK_4(ptr->bearer_cap);
 	pptp_bearer_cap_print(ndo, &ptr->bearer_cap);
-	ND_TCHECK(ptr->max_channel);
+	ND_TCHECK_2(ptr->max_channel);
 	pptp_max_channel_print(ndo, &ptr->max_channel);
-	ND_TCHECK(ptr->firm_rev);
+	ND_TCHECK_2(ptr->firm_rev);
 	pptp_firm_rev_print(ndo, &ptr->firm_rev);
 	ND_TCHECK(ptr->hostname);
 	pptp_hostname_print(ndo, &ptr->hostname[0]);
@@ -582,7 +582,7 @@ pptp_stopccrq_print(netdissect_options *ndo,
 {
 	const struct pptp_msg_stopccrq *ptr = (const struct pptp_msg_stopccrq *)dat;
 
-	ND_TCHECK(ptr->reason);
+	ND_TCHECK_1(ptr->reason);
 	ND_PRINT(" REASON(%u", EXTRACT_U_1(ptr->reason));
 	if (ndo->ndo_vflag) {
 		switch (EXTRACT_U_1(ptr->reason)) {
@@ -601,8 +601,8 @@ pptp_stopccrq_print(netdissect_options *ndo,
 		}
 	}
 	ND_PRINT(")");
-	ND_TCHECK(ptr->reserved1);
-	ND_TCHECK(ptr->reserved2);
+	ND_TCHECK_1(ptr->reserved1);
+	ND_TCHECK_2(ptr->reserved2);
 
 	return;
 
@@ -616,11 +616,11 @@ pptp_stopccrp_print(netdissect_options *ndo,
 {
 	const struct pptp_msg_stopccrp *ptr = (const struct pptp_msg_stopccrp *)dat;
 
-	ND_TCHECK(ptr->result_code);
+	ND_TCHECK_1(ptr->result_code);
 	pptp_result_code_print(ndo, &ptr->result_code, PPTP_CTRL_MSG_TYPE_StopCCRP);
-	ND_TCHECK(ptr->err_code);
+	ND_TCHECK_1(ptr->err_code);
 	pptp_err_code_print(ndo, &ptr->err_code);
-	ND_TCHECK(ptr->reserved1);
+	ND_TCHECK_2(ptr->reserved1);
 
 	return;
 
@@ -634,7 +634,7 @@ pptp_echorq_print(netdissect_options *ndo,
 {
 	const struct pptp_msg_echorq *ptr = (const struct pptp_msg_echorq *)dat;
 
-	ND_TCHECK(ptr->id);
+	ND_TCHECK_4(ptr->id);
 	pptp_id_print(ndo, &ptr->id);
 
 	return;
@@ -649,13 +649,13 @@ pptp_echorp_print(netdissect_options *ndo,
 {
 	const struct pptp_msg_echorp *ptr = (const struct pptp_msg_echorp *)dat;
 
-	ND_TCHECK(ptr->id);
+	ND_TCHECK_4(ptr->id);
 	pptp_id_print(ndo, &ptr->id);
-	ND_TCHECK(ptr->result_code);
+	ND_TCHECK_1(ptr->result_code);
 	pptp_result_code_print(ndo, &ptr->result_code, PPTP_CTRL_MSG_TYPE_ECHORP);
-	ND_TCHECK(ptr->err_code);
+	ND_TCHECK_1(ptr->err_code);
 	pptp_err_code_print(ndo, &ptr->err_code);
-	ND_TCHECK(ptr->reserved1);
+	ND_TCHECK_2(ptr->reserved1);
 
 	return;
 
@@ -669,25 +669,25 @@ pptp_ocrq_print(netdissect_options *ndo,
 {
 	const struct pptp_msg_ocrq *ptr = (const struct pptp_msg_ocrq *)dat;
 
-	ND_TCHECK(ptr->call_id);
+	ND_TCHECK_2(ptr->call_id);
 	pptp_call_id_print(ndo, &ptr->call_id);
-	ND_TCHECK(ptr->call_ser);
+	ND_TCHECK_2(ptr->call_ser);
 	pptp_call_ser_print(ndo, &ptr->call_ser);
-	ND_TCHECK(ptr->min_bps);
+	ND_TCHECK_4(ptr->min_bps);
 	ND_PRINT(" MIN_BPS(%u)", EXTRACT_BE_U_4(ptr->min_bps));
-	ND_TCHECK(ptr->max_bps);
+	ND_TCHECK_4(ptr->max_bps);
 	ND_PRINT(" MAX_BPS(%u)", EXTRACT_BE_U_4(ptr->max_bps));
-	ND_TCHECK(ptr->bearer_type);
+	ND_TCHECK_4(ptr->bearer_type);
 	pptp_bearer_type_print(ndo, &ptr->bearer_type);
-	ND_TCHECK(ptr->framing_type);
+	ND_TCHECK_4(ptr->framing_type);
 	pptp_framing_type_print(ndo, &ptr->framing_type);
-	ND_TCHECK(ptr->recv_winsiz);
+	ND_TCHECK_2(ptr->recv_winsiz);
 	pptp_recv_winsiz_print(ndo, &ptr->recv_winsiz);
-	ND_TCHECK(ptr->pkt_proc_delay);
+	ND_TCHECK_2(ptr->pkt_proc_delay);
 	pptp_pkt_proc_delay_print(ndo, &ptr->pkt_proc_delay);
-	ND_TCHECK(ptr->phone_no_len);
+	ND_TCHECK_2(ptr->phone_no_len);
 	ND_PRINT(" PHONE_NO_LEN(%u)", EXTRACT_BE_U_2(ptr->phone_no_len));
-	ND_TCHECK(ptr->reserved1);
+	ND_TCHECK_2(ptr->reserved1);
 	ND_TCHECK(ptr->phone_no);
 	ND_PRINT(" PHONE_NO(%.64s)", ptr->phone_no);
 	ND_TCHECK(ptr->subaddr);
@@ -705,23 +705,23 @@ pptp_ocrp_print(netdissect_options *ndo,
 {
 	const struct pptp_msg_ocrp *ptr = (const struct pptp_msg_ocrp *)dat;
 
-	ND_TCHECK(ptr->call_id);
+	ND_TCHECK_2(ptr->call_id);
 	pptp_call_id_print(ndo, &ptr->call_id);
-	ND_TCHECK(ptr->peer_call_id);
+	ND_TCHECK_2(ptr->peer_call_id);
 	pptp_peer_call_id_print(ndo, &ptr->peer_call_id);
-	ND_TCHECK(ptr->result_code);
+	ND_TCHECK_1(ptr->result_code);
 	pptp_result_code_print(ndo, &ptr->result_code, PPTP_CTRL_MSG_TYPE_OCRP);
-	ND_TCHECK(ptr->err_code);
+	ND_TCHECK_1(ptr->err_code);
 	pptp_err_code_print(ndo, &ptr->err_code);
-	ND_TCHECK(ptr->cause_code);
+	ND_TCHECK_2(ptr->cause_code);
 	pptp_cause_code_print(ndo, &ptr->cause_code);
-	ND_TCHECK(ptr->conn_speed);
+	ND_TCHECK_4(ptr->conn_speed);
 	pptp_conn_speed_print(ndo, &ptr->conn_speed);
-	ND_TCHECK(ptr->recv_winsiz);
+	ND_TCHECK_2(ptr->recv_winsiz);
 	pptp_recv_winsiz_print(ndo, &ptr->recv_winsiz);
-	ND_TCHECK(ptr->pkt_proc_delay);
+	ND_TCHECK_2(ptr->pkt_proc_delay);
 	pptp_pkt_proc_delay_print(ndo, &ptr->pkt_proc_delay);
-	ND_TCHECK(ptr->phy_chan_id);
+	ND_TCHECK_4(ptr->phy_chan_id);
 	pptp_phy_chan_id_print(ndo, &ptr->phy_chan_id);
 
 	return;
@@ -736,17 +736,17 @@ pptp_icrq_print(netdissect_options *ndo,
 {
 	const struct pptp_msg_icrq *ptr = (const struct pptp_msg_icrq *)dat;
 
-	ND_TCHECK(ptr->call_id);
+	ND_TCHECK_2(ptr->call_id);
 	pptp_call_id_print(ndo, &ptr->call_id);
-	ND_TCHECK(ptr->call_ser);
+	ND_TCHECK_2(ptr->call_ser);
 	pptp_call_ser_print(ndo, &ptr->call_ser);
-	ND_TCHECK(ptr->bearer_type);
+	ND_TCHECK_4(ptr->bearer_type);
 	pptp_bearer_type_print(ndo, &ptr->bearer_type);
-	ND_TCHECK(ptr->phy_chan_id);
+	ND_TCHECK_4(ptr->phy_chan_id);
 	pptp_phy_chan_id_print(ndo, &ptr->phy_chan_id);
-	ND_TCHECK(ptr->dialed_no_len);
+	ND_TCHECK_2(ptr->dialed_no_len);
 	ND_PRINT(" DIALED_NO_LEN(%u)", EXTRACT_BE_U_2(ptr->dialed_no_len));
-	ND_TCHECK(ptr->dialing_no_len);
+	ND_TCHECK_2(ptr->dialing_no_len);
 	ND_PRINT(" DIALING_NO_LEN(%u)", EXTRACT_BE_U_2(ptr->dialing_no_len));
 	ND_TCHECK(ptr->dialed_no);
 	ND_PRINT(" DIALED_NO(%.64s)", ptr->dialed_no);
@@ -767,19 +767,19 @@ pptp_icrp_print(netdissect_options *ndo,
 {
 	const struct pptp_msg_icrp *ptr = (const struct pptp_msg_icrp *)dat;
 
-	ND_TCHECK(ptr->call_id);
+	ND_TCHECK_2(ptr->call_id);
 	pptp_call_id_print(ndo, &ptr->call_id);
-	ND_TCHECK(ptr->peer_call_id);
+	ND_TCHECK_2(ptr->peer_call_id);
 	pptp_peer_call_id_print(ndo, &ptr->peer_call_id);
-	ND_TCHECK(ptr->result_code);
+	ND_TCHECK_1(ptr->result_code);
 	pptp_result_code_print(ndo, &ptr->result_code, PPTP_CTRL_MSG_TYPE_ICRP);
-	ND_TCHECK(ptr->err_code);
+	ND_TCHECK_1(ptr->err_code);
 	pptp_err_code_print(ndo, &ptr->err_code);
-	ND_TCHECK(ptr->recv_winsiz);
+	ND_TCHECK_2(ptr->recv_winsiz);
 	pptp_recv_winsiz_print(ndo, &ptr->recv_winsiz);
-	ND_TCHECK(ptr->pkt_proc_delay);
+	ND_TCHECK_2(ptr->pkt_proc_delay);
 	pptp_pkt_proc_delay_print(ndo, &ptr->pkt_proc_delay);
-	ND_TCHECK(ptr->reserved1);
+	ND_TCHECK_2(ptr->reserved1);
 
 	return;
 
@@ -793,16 +793,16 @@ pptp_iccn_print(netdissect_options *ndo,
 {
 	const struct pptp_msg_iccn *ptr = (const struct pptp_msg_iccn *)dat;
 
-	ND_TCHECK(ptr->peer_call_id);
+	ND_TCHECK_2(ptr->peer_call_id);
 	pptp_peer_call_id_print(ndo, &ptr->peer_call_id);
-	ND_TCHECK(ptr->reserved1);
-	ND_TCHECK(ptr->conn_speed);
+	ND_TCHECK_2(ptr->reserved1);
+	ND_TCHECK_4(ptr->conn_speed);
 	pptp_conn_speed_print(ndo, &ptr->conn_speed);
-	ND_TCHECK(ptr->recv_winsiz);
+	ND_TCHECK_2(ptr->recv_winsiz);
 	pptp_recv_winsiz_print(ndo, &ptr->recv_winsiz);
-	ND_TCHECK(ptr->pkt_proc_delay);
+	ND_TCHECK_2(ptr->pkt_proc_delay);
 	pptp_pkt_proc_delay_print(ndo, &ptr->pkt_proc_delay);
-	ND_TCHECK(ptr->framing_type);
+	ND_TCHECK_4(ptr->framing_type);
 	pptp_framing_type_print(ndo, &ptr->framing_type);
 
 	return;
@@ -817,9 +817,9 @@ pptp_ccrq_print(netdissect_options *ndo,
 {
 	const struct pptp_msg_ccrq *ptr = (const struct pptp_msg_ccrq *)dat;
 
-	ND_TCHECK(ptr->call_id);
+	ND_TCHECK_2(ptr->call_id);
 	pptp_call_id_print(ndo, &ptr->call_id);
-	ND_TCHECK(ptr->reserved1);
+	ND_TCHECK_2(ptr->reserved1);
 
 	return;
 
@@ -833,15 +833,15 @@ pptp_cdn_print(netdissect_options *ndo,
 {
 	const struct pptp_msg_cdn *ptr = (const struct pptp_msg_cdn *)dat;
 
-	ND_TCHECK(ptr->call_id);
+	ND_TCHECK_2(ptr->call_id);
 	pptp_call_id_print(ndo, &ptr->call_id);
-	ND_TCHECK(ptr->result_code);
+	ND_TCHECK_1(ptr->result_code);
 	pptp_result_code_print(ndo, &ptr->result_code, PPTP_CTRL_MSG_TYPE_CDN);
-	ND_TCHECK(ptr->err_code);
+	ND_TCHECK_1(ptr->err_code);
 	pptp_err_code_print(ndo, &ptr->err_code);
-	ND_TCHECK(ptr->cause_code);
+	ND_TCHECK_2(ptr->cause_code);
 	pptp_cause_code_print(ndo, &ptr->cause_code);
-	ND_TCHECK(ptr->reserved1);
+	ND_TCHECK_2(ptr->reserved1);
 	ND_TCHECK(ptr->call_stats);
 	ND_PRINT(" CALL_STATS(%.128s)", ptr->call_stats);
 
@@ -857,20 +857,20 @@ pptp_wen_print(netdissect_options *ndo,
 {
 	const struct pptp_msg_wen *ptr = (const struct pptp_msg_wen *)dat;
 
-	ND_TCHECK(ptr->peer_call_id);
+	ND_TCHECK_2(ptr->peer_call_id);
 	pptp_peer_call_id_print(ndo, &ptr->peer_call_id);
-	ND_TCHECK(ptr->reserved1);
-	ND_TCHECK(ptr->crc_err);
+	ND_TCHECK_2(ptr->reserved1);
+	ND_TCHECK_4(ptr->crc_err);
 	ND_PRINT(" CRC_ERR(%u)", EXTRACT_BE_U_4(ptr->crc_err));
-	ND_TCHECK(ptr->framing_err);
+	ND_TCHECK_4(ptr->framing_err);
 	ND_PRINT(" FRAMING_ERR(%u)", EXTRACT_BE_U_4(ptr->framing_err));
-	ND_TCHECK(ptr->hardware_overrun);
+	ND_TCHECK_4(ptr->hardware_overrun);
 	ND_PRINT(" HARDWARE_OVERRUN(%u)", EXTRACT_BE_U_4(ptr->hardware_overrun));
-	ND_TCHECK(ptr->buffer_overrun);
+	ND_TCHECK_4(ptr->buffer_overrun);
 	ND_PRINT(" BUFFER_OVERRUN(%u)", EXTRACT_BE_U_4(ptr->buffer_overrun));
-	ND_TCHECK(ptr->timeout_err);
+	ND_TCHECK_4(ptr->timeout_err);
 	ND_PRINT(" TIMEOUT_ERR(%u)", EXTRACT_BE_U_4(ptr->timeout_err));
-	ND_TCHECK(ptr->align_err);
+	ND_TCHECK_4(ptr->align_err);
 	ND_PRINT(" ALIGN_ERR(%u)", EXTRACT_BE_U_4(ptr->align_err));
 
 	return;
@@ -885,12 +885,12 @@ pptp_sli_print(netdissect_options *ndo,
 {
 	const struct pptp_msg_sli *ptr = (const struct pptp_msg_sli *)dat;
 
-	ND_TCHECK(ptr->peer_call_id);
+	ND_TCHECK_2(ptr->peer_call_id);
 	pptp_peer_call_id_print(ndo, &ptr->peer_call_id);
-	ND_TCHECK(ptr->reserved1);
-	ND_TCHECK(ptr->send_accm);
+	ND_TCHECK_2(ptr->reserved1);
+	ND_TCHECK_4(ptr->send_accm);
 	ND_PRINT(" SEND_ACCM(0x%08x)", EXTRACT_BE_U_4(ptr->send_accm));
-	ND_TCHECK(ptr->recv_accm);
+	ND_TCHECK_4(ptr->recv_accm);
 	ND_PRINT(" RECV_ACCM(0x%08x)", EXTRACT_BE_U_4(ptr->recv_accm));
 
 	return;
@@ -911,11 +911,11 @@ pptp_print(netdissect_options *ndo,
 
 	hdr = (const struct pptp_hdr *)dat;
 
-	ND_TCHECK(hdr->length);
+	ND_TCHECK_2(hdr->length);
 	if (ndo->ndo_vflag) {
 		ND_PRINT(" Length=%u", EXTRACT_BE_U_2(hdr->length));
 	}
-	ND_TCHECK(hdr->msg_type);
+	ND_TCHECK_2(hdr->msg_type);
 	if (ndo->ndo_vflag) {
 		switch(EXTRACT_BE_U_2(hdr->msg_type)) {
 		case PPTP_MSG_TYPE_CTRL:
@@ -930,7 +930,7 @@ pptp_print(netdissect_options *ndo,
 		}
 	}
 
-	ND_TCHECK(hdr->magic_cookie);
+	ND_TCHECK_4(hdr->magic_cookie);
 	mc = EXTRACT_BE_U_4(hdr->magic_cookie);
 	if (mc != PPTP_MAGIC_COOKIE) {
 		ND_PRINT(" UNEXPECTED Magic-Cookie!!(%08x)", mc);
@@ -938,7 +938,7 @@ pptp_print(netdissect_options *ndo,
 	if (ndo->ndo_vflag || mc != PPTP_MAGIC_COOKIE) {
 		ND_PRINT(" Magic-Cookie=%08x", mc);
 	}
-	ND_TCHECK(hdr->ctrl_msg_type);
+	ND_TCHECK_2(hdr->ctrl_msg_type);
 	ctrl_msg_type = EXTRACT_BE_U_2(hdr->ctrl_msg_type);
 	if (ctrl_msg_type < PPTP_MAX_MSGTYPE_INDEX) {
 		ND_PRINT(" CTRL_MSGTYPE=%s",
@@ -946,7 +946,7 @@ pptp_print(netdissect_options *ndo,
 	} else {
 		ND_PRINT(" UNKNOWN_CTRL_MSGTYPE(%u)", ctrl_msg_type);
 	}
-	ND_TCHECK(hdr->reserved0);
+	ND_TCHECK_2(hdr->reserved0);
 
 	dat += 12;
 
