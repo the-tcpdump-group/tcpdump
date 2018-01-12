@@ -98,22 +98,22 @@ timed_print(netdissect_options *ndo,
 	uint8_t tsp_type;
 	int sec, usec;
 
-	ND_TCHECK(tsp->tsp_type);
+	ND_TCHECK_1(tsp->tsp_type);
 	tsp_type = EXTRACT_U_1(tsp->tsp_type);
 	if (tsp_type < TSPTYPENUMBER)
 		ND_PRINT("TSP_%s", tsptype[tsp_type]);
 	else
 		ND_PRINT("(tsp_type %#x)", tsp_type);
 
-	ND_TCHECK(tsp->tsp_vers);
+	ND_TCHECK_1(tsp->tsp_vers);
 	ND_PRINT(" vers %u", EXTRACT_U_1(tsp->tsp_vers));
 
-	ND_TCHECK(tsp->tsp_seq);
+	ND_TCHECK_2(tsp->tsp_seq);
 	ND_PRINT(" seq %u", EXTRACT_BE_U_2(tsp->tsp_seq));
 
 	switch (tsp_type) {
 	case TSP_LOOP:
-		ND_TCHECK(tsp->tsp_hopcnt);
+		ND_TCHECK_1(tsp->tsp_hopcnt);
 		ND_PRINT(" hopcnt %u", EXTRACT_U_1(tsp->tsp_hopcnt));
 		break;
 	case TSP_SETTIME:

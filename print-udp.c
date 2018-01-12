@@ -398,7 +398,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		ip6 = (const struct ip6_hdr *)bp2;
 	else
 		ip6 = NULL;
-	if (!ND_TTEST(up->uh_dport)) {
+	if (!ND_TTEST_2(up->uh_dport)) {
 		udpipaddr_print(ndo, ip, -1, -1);
 		goto trunc;
 	}
@@ -411,7 +411,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		ND_PRINT("truncated-udp %u", length);
 		return;
 	}
-	if (!ND_TTEST(up->uh_ulen)) {
+	if (!ND_TTEST_2(up->uh_ulen)) {
 		udpipaddr_print(ndo, ip, sport, dport);
 		goto trunc;
 	}
@@ -520,7 +520,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		enum sunrpc_msg_type direction;
 
 		rp = (const struct sunrpc_msg *)(up + 1);
-		if (ND_TTEST(rp->rm_direction)) {
+		if (ND_TTEST_4(rp->rm_direction)) {
 			direction = (enum sunrpc_msg_type) EXTRACT_BE_U_4(rp->rm_direction);
 			if (dport == NFS_PORT && direction == SUNRPC_CALL) {
 				ND_PRINT("NFS request xid %u ",
@@ -696,9 +696,9 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			lisp_print(ndo, (const u_char *)(up + 1), length);
 		else if (IS_SRC_OR_DST_PORT(VXLAN_GPE_PORT))
 			vxlan_gpe_print(ndo, (const u_char *)(up + 1), length);
-		else if (ND_TTEST(((const struct LAP *)cp)->type) &&
-		    EXTRACT_U_1(((const struct LAP *)cp)->type) == lapDDP &&
-		    (atalk_port(sport) || atalk_port(dport))) {
+		else if (ND_TTEST_1(((const struct LAP *)cp)->type) &&
+			 EXTRACT_U_1(((const struct LAP *)cp)->type) == lapDDP &&
+			 (atalk_port(sport) || atalk_port(dport))) {
 			if (ndo->ndo_vflag)
 				ND_PRINT("kip ");
 			llap_print(ndo, cp, length);
