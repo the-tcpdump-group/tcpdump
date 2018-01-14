@@ -144,7 +144,7 @@ str_to_lower(const char *string)
 void
 zephyr_print(netdissect_options *ndo, const u_char *cp, int length)
 {
-    struct z_packet z;
+    struct z_packet z = {0};
     const char *parse = (const char *) cp;
     int parselen = length;
     const char *s;
@@ -152,13 +152,6 @@ zephyr_print(netdissect_options *ndo, const u_char *cp, int length)
     int truncated = 0;
 
     /* squelch compiler warnings */
-
-    z.kind = 0;
-    z.class = 0;
-    z.inst = 0;
-    z.opcode = 0;
-    z.sender = 0;
-    z.recipient = 0;
 
 #define PARSE_STRING						\
 	s = parse_field(ndo, &parse, &parselen, &truncated);	\
