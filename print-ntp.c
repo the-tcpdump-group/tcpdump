@@ -479,12 +479,24 @@ ntp_print(netdissect_options *ndo,
 	          tok2str(ntp_leapind_values, "Unknown", leapind),
 	          leapind);
 
-	if (mode >= MODE_UNSPEC && mode <= MODE_BROADCAST)
+	switch (mode) {
+
+	case MODE_UNSPEC:
+	case MODE_SYM_ACT:
+	case MODE_SYM_PAS:
+	case MODE_CLIENT:
+	case MODE_SERVER:
+	case MODE_BROADCAST:
 		ntp_time_print(ndo, &bp->td, length);
-	else if (mode == MODE_CONTROL)
+		break;
+
+	case MODE_CONTROL:
 		ntp_control_print(ndo, &bp->cd, length);
-	else
-		{;}			/* XXX: not implemented! */
+		break;
+
+	default:
+		break;			/* XXX: not implemented! */
+	}
 	return;
 
 trunc:
