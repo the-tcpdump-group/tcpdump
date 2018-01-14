@@ -144,7 +144,25 @@ str_to_lower(const char *string)
 void
 zephyr_print(netdissect_options *ndo, const u_char *cp, int length)
 {
-    struct z_packet z = {0};
+    struct z_packet z = {
+        NULL,	/* version */
+        0,	/* numfields */
+        0,	/* kind */
+        NULL,	/* uid */
+        0,	/* port */
+        0,	/* auth */
+        0,	/* authlen */
+        NULL,	/* authdata */
+        NULL,	/* class */
+        NULL,	/* inst */
+        NULL,	/* opcode */
+        NULL,	/* sender */
+        NULL,	/* recipient */
+        NULL,	/* format */
+        0,	/* cksum */
+        0,	/* multi */
+        NULL	/* multi_uid */
+    };
     const char *parse = (const char *) cp;
     int parselen = length;
     const char *s;
