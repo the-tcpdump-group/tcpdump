@@ -51,7 +51,7 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
     u_int n, vn;
     uint8_t ver;
     uint8_t flags;
-    uint8_t length;
+    u_int length;
     uint8_t md_type;
     uint8_t next_protocol;
     uint32_t service_path_id;
