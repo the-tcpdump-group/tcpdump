@@ -211,17 +211,17 @@ static const u_char *
 print_sl_winchange(netdissect_options *ndo,
                    const u_char *cp)
 {
-	u_short i;
+	int16_t i;
 
 	if ((i = EXTRACT_U_1(cp)) == 0) {
 		cp++;
-		i = EXTRACT_BE_U_2(cp);
+		i = EXTRACT_BE_S_2(cp);
 		cp += 2;
 	}
 	if (i >= 0)
-		ND_PRINT(" W+%u", i);
+		ND_PRINT(" W+%d", i);
 	else
-		ND_PRINT(" W%u", i);
+		ND_PRINT(" W%d", i);
 	return (cp);
 }
 
