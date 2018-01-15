@@ -21,7 +21,7 @@
 
 /* \summary: Routing Information Protocol (RIP) printer */
 
-/* specification: RFC 1058, RFC 2453 */
+/* specification: RFC 1058, RFC 2453, RFC 4822 */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -39,6 +39,15 @@
 
 static const char tstr[] = "[|rip]";
 
+/*
+ * RFC 1058 and RFC 2453 header of packet.
+ *
+ *  0                   1                   2                   3 3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * | Command (1)   | Version (1)   |           unused              |
+ * +---------------+---------------+-------------------------------+
+ */
 struct rip {
 	nd_uint8_t rip_cmd;		/* request/response */
 	nd_uint8_t rip_vers;		/* protocol version # */
@@ -66,13 +75,46 @@ static const struct tok rip_cmd_values[] = {
 #define RIP_ROUTELEN 20
 
 /*
- * rfc 1723
+ * First 4 bytes of all RIPv1/RIPv2 entries.
+ */
+struct rip_entry_header {
+	nd_uint16_t rip_family;
+	nd_uint16_t rip_tag;
+};
+
+/*
+ * RFC 1058 entry.
  *
  *  0                   1                   2                   3 3
  *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * | Command (1)   | Version (1)   |           unused              |
- * +---------------+---------------+-------------------------------+
+ * | Address Family Identifier (2) |       must be zero (2)        |
+ * +-------------------------------+-------------------------------+
+ * |                         IP Address (4)                        |
+ * +---------------------------------------------------------------+
+ * |                        must be zero (4)                       |
+ * +---------------------------------------------------------------+
+ * |                        must be zero (4)                       |
+ * +---------------------------------------------------------------+
+ * |                         Metric (4)                            |
+ * +---------------------------------------------------------------+
+ */
+struct rip_netinfo_v1 {
+	nd_uint16_t rip_family;
+	nd_byte     rip_mbz1[2];
+	nd_ipv4     rip_dest;
+	nd_byte     rip_mbz2[4];
+	nd_byte     rip_mbz3[4];
+	nd_uint32_t rip_metric;		/* cost of route */
+};
+
+
+/*
+ * RFC 2453 route entry
+ *
+ *  0                   1                   2                   3 3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * | Address Family Identifier (2) |        Route Tag (2)          |
  * +-------------------------------+-------------------------------+
  * |                         IP Address (4)                        |
@@ -86,83 +128,143 @@ static const struct tok rip_cmd_values[] = {
  *
  */
 
-struct rip_netinfo {
+struct rip_netinfo_v2 {
 	nd_uint16_t rip_family;
 	nd_uint16_t rip_tag;
-	nd_uint32_t rip_dest;
+	nd_ipv4     rip_dest;
 	nd_uint32_t rip_dest_mask;
-	nd_uint32_t rip_router;
+	nd_ipv4     rip_router;
 	nd_uint32_t rip_metric;		/* cost of route */
 };
 
-static void
-rip_entry_print_v1(netdissect_options *ndo,
-                   const struct rip_netinfo *ni)
+/*
+ * RFC 2453 authentication entry
+ *
+ *  0                   1                   2                   3 3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |            0xFFFF             |    Authentication Type (2)    |
+ * +-------------------------------+-------------------------------+
+ * -                      Authentication (16)                      -
+ * +---------------------------------------------------------------+
+ */
+
+struct rip_auth_v2 {
+	nd_uint16_t rip_family;
+	nd_uint16_t rip_tag;
+	nd_byte     rip_auth[16];
+};
+
+/*
+ * RFC 4822 Cryptographic Authentication entry.
+ *
+ *  0                   1                   2                   3 3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |     RIPv2 Packet Length       |   Key ID      | Auth Data Len |
+ * +---------------+---------------+---------------+---------------+
+ * |               Sequence Number (non-decreasing)                |
+ * +---------------+---------------+---------------+---------------+
+ * |                      reserved must be zero                    |
+ * +---------------+---------------+---------------+---------------+
+ * |                      reserved must be zero                    |
+ * +---------------+---------------+---------------+---------------+
+ */
+struct rip_auth_crypto_v2 {
+	nd_uint16_t rip_packet_len;
+	nd_uint8_t  rip_key_id;
+	nd_uint8_t  rip_auth_data_len;
+	nd_uint32_t rip_seq_num;
+	nd_byte     rip_mbz1[4];
+	nd_byte     rip_mbz2[4];
+};
+
+static unsigned
+rip_entry_print_v1(netdissect_options *ndo, const u_char *p,
+                   unsigned remaining)
 {
+	const struct rip_entry_header *eh = (const struct rip_entry_header *)p;
 	u_short family;
+	const struct rip_netinfo_v1 *ni = (const struct rip_netinfo_v1 *)p;
 
 	/* RFC 1058 */
+	if (remaining < RIP_ROUTELEN)
+		return (0);
 	family = EXTRACT_BE_U_2(ni->rip_family);
 	if (family != BSD_AFNUM_INET && family != 0) {
 		ND_PRINT("\n\t AFI %s, ", tok2str(bsd_af_values, "Unknown (%u)", family));
-		print_unknown_data(ndo, (const uint8_t *)&ni->rip_family, "\n\t  ", RIP_ROUTELEN);
-		return;
+                print_unknown_data(ndo, p + sizeof(*eh), "\n\t  ", RIP_ROUTELEN - sizeof(*eh));
+		return (RIP_ROUTELEN);
 	}
-	if (EXTRACT_BE_U_2(ni->rip_tag) ||
-	    EXTRACT_BE_U_4(ni->rip_dest_mask) ||
-	    EXTRACT_BE_U_4(ni->rip_router)) {
+	if (EXTRACT_BE_U_2(ni->rip_mbz1) ||
+	    EXTRACT_BE_U_4(ni->rip_mbz2) ||
+	    EXTRACT_BE_U_4(ni->rip_mbz3)) {
 		/* MBZ fields not zero */
-                print_unknown_data(ndo, (const uint8_t *)&ni->rip_family, "\n\t  ", RIP_ROUTELEN);
-		return;
+                print_unknown_data(ndo, p, "\n\t  ", RIP_ROUTELEN);
+		return (RIP_ROUTELEN);
 	}
 	if (family == 0) {
 		ND_PRINT("\n\t  AFI 0, %s, metric: %u",
 			ipaddr_string(ndo, &ni->rip_dest),
 			EXTRACT_BE_U_4(ni->rip_metric));
-		return;
+		return (RIP_ROUTELEN);
 	} /* BSD_AFNUM_INET */
 	ND_PRINT("\n\t  %s, metric: %u",
                ipaddr_string(ndo, &ni->rip_dest),
 	       EXTRACT_BE_U_4(ni->rip_metric));
+	return (RIP_ROUTELEN);
 }
 
 static unsigned
-rip_entry_print_v2(netdissect_options *ndo,
-                   const struct rip_netinfo *ni, const unsigned remaining)
+rip_entry_print_v2(netdissect_options *ndo, const u_char *p,
+                   unsigned remaining)
 {
+	const struct rip_entry_header *eh = (const struct rip_entry_header *)p;
 	u_short family;
+	const struct rip_netinfo_v2 *ni;
 
-	family = EXTRACT_BE_U_2(ni->rip_family);
+	if (remaining < sizeof(*eh))
+		return (0);
+	family = EXTRACT_BE_U_2(eh->rip_family);
 	if (family == 0xFFFF) { /* variable-sized authentication structures */
-		uint16_t auth_type = EXTRACT_BE_U_2(ni->rip_tag);
+		uint16_t auth_type = EXTRACT_BE_U_2(eh->rip_tag);
+
+		p += sizeof(*eh);
+		remaining -= sizeof(*eh);
 		if (auth_type == 2) {
-			const u_char *p = (const u_char *)&ni->rip_dest;
-			u_int i = 0;
 			ND_PRINT("\n\t  Simple Text Authentication data: ");
-			for (; i < RIP_AUTHLEN; p++, i++)
-				ND_PRINT("%c",
-					 ND_ISPRINT(EXTRACT_U_1(p)) ? EXTRACT_U_1(p) : '.');
+			if (fn_printzp(ndo, p, RIP_AUTHLEN, p + remaining))
+				return (0);
 		} else if (auth_type == 3) {
+			const struct rip_auth_crypto_v2 *ch;
+
+			ch = (const struct rip_auth_crypto_v2 *)p;
+			if (remaining < sizeof(*ch))
+				return (0);
 			ND_PRINT("\n\t  Auth header:");
-			ND_PRINT(" Packet Len %u,", EXTRACT_BE_U_2((const uint8_t *)ni + 4));
-			ND_PRINT(" Key-ID %u,", EXTRACT_U_1((const uint8_t *)ni + 6));
-			ND_PRINT(" Auth Data Len %u,", EXTRACT_U_1((const uint8_t *)ni + 7));
-			ND_PRINT(" SeqNo %u,", EXTRACT_BE_U_4(ni->rip_dest_mask));
-			ND_PRINT(" MBZ %u,", EXTRACT_BE_U_4(ni->rip_router));
-			ND_PRINT(" MBZ %u", EXTRACT_BE_U_4(ni->rip_metric));
+			ND_PRINT(" Packet Len %u,", EXTRACT_BE_U_2(ch->rip_packet_len));
+			ND_PRINT(" Key-ID %u,", EXTRACT_U_1(ch->rip_key_id));
+			ND_PRINT(" Auth Data Len %u,", EXTRACT_U_1(ch->rip_auth_data_len));
+			ND_PRINT(" SeqNo %u,", EXTRACT_BE_U_4(ch->rip_seq_num));
+			ND_PRINT(" MBZ %u,", EXTRACT_BE_U_4(ch->rip_mbz1));
+			ND_PRINT(" MBZ %u", EXTRACT_BE_U_4(ch->rip_mbz2));
 		} else if (auth_type == 1) {
 			ND_PRINT("\n\t  Auth trailer:");
-			print_unknown_data(ndo, (const uint8_t *)&ni->rip_dest, "\n\t  ", remaining);
-			return remaining; /* AT spans till the packet end */
+			print_unknown_data(ndo, p, "\n\t  ", remaining);
+			return (sizeof(*eh) + remaining); /* AT spans till the packet end */
 		} else {
 			ND_PRINT("\n\t  Unknown (%u) Authentication data:",
-			       EXTRACT_BE_U_2(ni->rip_tag));
-			print_unknown_data(ndo, (const uint8_t *)&ni->rip_dest, "\n\t  ", remaining);
+			       auth_type);
+			print_unknown_data(ndo, p, "\n\t  ", remaining);
+			return (sizeof(*eh) + remaining); /* we don't know how long this is, so we go to the packet end */
 		}
 	} else if (family != BSD_AFNUM_INET && family != 0) {
 		ND_PRINT("\n\t  AFI %s", tok2str(bsd_af_values, "Unknown (%u)", family));
-                print_unknown_data(ndo, (const uint8_t *)&ni->rip_tag, "\n\t  ", RIP_ROUTELEN-2);
+                print_unknown_data(ndo, p + sizeof(*eh), "\n\t  ", RIP_ROUTELEN - sizeof(*eh));
 	} else { /* BSD_AFNUM_INET or AFI 0 */
+		ni = (const struct rip_netinfo_v2 *)p;
+		if (remaining < sizeof(*ni))
+			return (0);
 		ND_PRINT("\n\t  AFI %s, %15s/%-2d, tag 0x%04x, metric: %u, next-hop: ",
                        tok2str(bsd_af_values, "%u", family),
                        ipaddr_string(ndo, &ni->rip_dest),
@@ -174,7 +276,7 @@ rip_entry_print_v2(netdissect_options *ndo,
 		else
 			ND_PRINT("self");
 	}
-	return sizeof (*ni);
+	return (RIP_ROUTELEN);
 }
 
 void
@@ -183,8 +285,9 @@ rip_print(netdissect_options *ndo,
 {
 	const struct rip *rp;
 	uint8_t vers, cmd;
-	const struct rip_netinfo *ni;
+	const u_char *p;
 	u_int i, j;
+	unsigned entry_size;
 
 	if (ndo->ndo_snapend < dat) {
 		ND_PRINT(" %s", tstr);
@@ -206,8 +309,7 @@ rip_print(netdissect_options *ndo,
                (ndo->ndo_vflag >= 1) ? "\n\t" : "",
                vers);
 
-	switch (vers) {
-	case 0:
+	if (vers == 0) {
 		/*
 		 * RFC 1058.
 		 *
@@ -219,61 +321,86 @@ rip_print(netdissect_options *ndo,
 		 *
 		 * so perhaps we should just dump the packet, in hex.
 		 */
-                print_unknown_data(ndo, (const uint8_t *)&rp->rip_cmd, "\n\t", length);
-		break;
-	default:
-                /* dump version and lets see if we know the commands name*/
-                cmd = EXTRACT_U_1(rp->rip_cmd);
-                ND_PRINT(", %s, length: %u",
-                       tok2str(rip_cmd_values,
-                               "unknown command (%u)",
-                               cmd),
-                       length);
+		print_unknown_data(ndo, (const uint8_t *)&rp->rip_cmd, "\n\t", length);
+		return;
+	}
 
-                if (ndo->ndo_vflag < 1)
-                    return;
+	/* dump version and lets see if we know the commands name*/
+	cmd = EXTRACT_U_1(rp->rip_cmd);
+	ND_PRINT(", %s, length: %u",
+		tok2str(rip_cmd_values, "unknown command (%u)", cmd),
+		length);
 
-		switch (cmd) {
-		case RIPCMD_REQUEST:
-		case RIPCMD_RESPONSE:
-			j = length / sizeof(*ni);
-			ND_PRINT(", routes: %u%s", j, vers == 2 ? " or less" : "");
-			ni = (const struct rip_netinfo *)(rp + 1);
-			for (; i >= sizeof(*ni); ++ni) {
-				if (vers == 1)
-				{
-					rip_entry_print_v1(ndo, ni);
-					i -= sizeof(*ni);
+	if (ndo->ndo_vflag < 1)
+		return;
+
+	switch (cmd) {
+
+	case RIPCMD_REQUEST:
+	case RIPCMD_RESPONSE:
+		switch (vers) {
+
+		case 1:
+			j = length / RIP_ROUTELEN;
+			ND_PRINT(", routes: %u", j);
+			p = (const u_char *)(rp + 1);
+			while (i != 0) {
+				entry_size = rip_entry_print_v1(ndo, p, i);
+				if (entry_size == 0) {
+					/* Error */
+					ND_PRINT("%s", tstr);
+					break;
 				}
-				else if (vers == 2)
-					i -= rip_entry_print_v2(ndo, ni, i);
-                                else
-                                    break;
+				p += entry_size;
+				i -= entry_size;
 			}
-			if (i)
-				ND_PRINT("%s", tstr);
 			break;
 
-		case RIPCMD_TRACEOFF:
-		case RIPCMD_POLL:
-		case RIPCMD_POLLENTRY:
+		case 2:
+			j = length / RIP_ROUTELEN;
+			ND_PRINT(", routes: %u or less", j);
+			p = (const u_char *)(rp + 1);
+			while (i != 0) {
+				entry_size = rip_entry_print_v2(ndo, p, i);
+				if (entry_size == 0) {
+					/* Error */
+					ND_PRINT("%s", tstr);
+					break;
+				}
+#if 0
+				if (i < entry_size) {
+					ND_PRINT("WTF?");
+					break;
+				}
+#endif
+				p += entry_size;
+				i -= entry_size;
+			}
 			break;
 
-		case RIPCMD_TRACEON:
-                    /* fall through */
-	        default:
-                    if (ndo->ndo_vflag <= 1) {
-                        if(!print_unknown_data(ndo, (const uint8_t *)rp, "\n\t", length))
-                            return;
-                    }
-                    break;
-                }
-                /* do we want to see an additionally hexdump ? */
-                if (ndo->ndo_vflag> 1) {
-                    if(!print_unknown_data(ndo, (const uint8_t *)rp, "\n\t", length))
-                        return;
-                }
-        }
+		default:
+			ND_PRINT(", unknown version");
+			break;
+		}
+		break;
+
+	case RIPCMD_TRACEOFF:
+	case RIPCMD_POLL:
+	case RIPCMD_POLLENTRY:
+		break;
+
+	case RIPCMD_TRACEON:
+		/* fall through */
+	default:
+		if (ndo->ndo_vflag <= 1) {
+			if (!print_unknown_data(ndo, (const uint8_t *)rp, "\n\t", length))
+				return;
+		}
+		break;
+	}
+	/* do we want to see an additionally hexdump ? */
+	if (ndo->ndo_vflag> 1) {
+		if (!print_unknown_data(ndo, (const uint8_t *)rp, "\n\t", length))
+			return;
+	}
 }
-
-
