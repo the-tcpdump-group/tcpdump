@@ -317,6 +317,30 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	if(ndo->ndo_packet_number)
 		ND_PRINT("%5u  ", packets_captured);
 
+	/* Sanity checks on packet length / capture length */
+	ndo->ndo_invalid_header = 0;
+	if(h->caplen == 0) {
+		ndo->ndo_invalid_header = 1;
+		ND_PRINT("[Invalid header: caplen==0");
+	}
+	if (h->len == 0) {
+		if (!ndo->ndo_invalid_header) {
+			ndo->ndo_invalid_header = 1;
+			ND_PRINT("[Invalid header:");
+		} else
+			ND_PRINT(",");
+		ND_PRINT(" len==0");
+	} else if (h->len < h->caplen) {
+		if (!ndo->ndo_invalid_header) {
+			ndo->ndo_invalid_header = 1;
+			ND_PRINT("[Invalid header:");
+		} else
+			ND_PRINT(",");
+		ND_PRINT(" len(%u) < caplen(%u)", h->len, h->caplen);
+	}
+	if (ndo->ndo_invalid_header)
+		ND_PRINT("] ");
+
 	ts_print(ndo, &h->ts);
 
 	/*
