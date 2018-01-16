@@ -362,6 +362,7 @@ lwres_print(netdissect_options *ndo,
 		p = (const u_char *)(np + 1);
 		switch (EXTRACT_BE_U_4(np->opcode)) {
 		case LWRES_OPCODE_NOOP:
+			s = p;
 			break;
 		case LWRES_OPCODE_GETADDRSBYNAME:
 			gabn = (const lwres_gabnrequest_t *)p;
@@ -437,6 +438,7 @@ lwres_print(netdissect_options *ndo,
 			s += advance;
 			break;
 		default:
+			s = p;
 			unsupported++;
 			break;
 		}
@@ -457,6 +459,7 @@ lwres_print(netdissect_options *ndo,
 		p = (const u_char *)(np + 1);
 		switch (EXTRACT_BE_U_4(np->opcode)) {
 		case LWRES_OPCODE_NOOP:
+			s = p;
 			break;
 		case LWRES_OPCODE_GETADDRSBYNAME:
 			gabn = (const lwres_gabnresponse_t *)p;
@@ -574,6 +577,7 @@ lwres_print(netdissect_options *ndo,
 			}
 			break;
 		default:
+			s = p;
 			unsupported++;
 			break;
 		}
