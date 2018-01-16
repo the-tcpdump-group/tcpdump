@@ -1329,11 +1329,6 @@ rsvp_obj_print(netdissect_options *ndo,
                     obj_tptr+=subobj_len;
                     obj_tlen+=subobj_len;
 		}
-
-                if (total_subobj_len) {
-                    /* unless we have a TLV parser lets just hexdump */
-                    hexdump=TRUE;
-                }
                 break;
 
             default:
