@@ -799,7 +799,7 @@ dhcp6_print(netdissect_options *ndo,
 
 	ND_PRINT("dhcp6");
 
-	ep = (const u_char *)ndo->ndo_snapend;
+	ep = ndo->ndo_snapend;
 	if (cp + length < ep)
 		ep = cp + length;
 
