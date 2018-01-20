@@ -477,13 +477,6 @@ struct in6_addr {
  */
 #include "funcattrs.h"
 
-#ifndef min
-#define min(a,b) ((a)>(b)?(b):(a))
-#endif
-#ifndef max
-#define max(a,b) ((b)>(a)?(b):(a))
-#endif
-
 #ifdef __ATTRIBUTE___FALLTHROUGH_OK
 #  define ND_FALL_THROUGH __attribute__ ((fallthrough))
 #else
