@@ -36,7 +36,7 @@
 #include "config.h"
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #ifdef HAVE_STRFTIME
 #include <time.h>

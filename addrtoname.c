@@ -31,7 +31,7 @@
 #include <casper/cap_dns.h>
 #endif /* HAVE_CASPER */
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #ifndef NTOHL
 #define NTOHL(x)	(x) = ntohl(x)

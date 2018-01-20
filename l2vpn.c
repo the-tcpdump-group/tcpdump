@@ -17,7 +17,7 @@
 #include "config.h"
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 #include "netdissect.h"
 #include "l2vpn.h"
 

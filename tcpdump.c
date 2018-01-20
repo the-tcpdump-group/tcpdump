@@ -55,7 +55,7 @@ The Regents of the University of California.  All rights reserved.\n";
 #endif
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include <sys/stat.h>
 

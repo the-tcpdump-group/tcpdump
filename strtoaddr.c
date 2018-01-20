@@ -19,7 +19,7 @@
 #include "config.h"
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 #include <stddef.h>
 #include <string.h>
 

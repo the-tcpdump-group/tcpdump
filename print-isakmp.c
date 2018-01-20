@@ -43,7 +43,7 @@
 #undef HAVE_LIBCRYPTO
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include <string.h>
 

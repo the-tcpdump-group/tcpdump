@@ -40,7 +40,7 @@
  */
 #undef _XOPEN_SOURCE_EXTENDED
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #if defined(HAVE_GETRPCBYNUMBER) && defined(HAVE_RPC_RPC_H)
 #include <rpc/rpc.h>

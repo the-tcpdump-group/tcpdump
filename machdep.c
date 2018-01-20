@@ -29,7 +29,7 @@
  * need to do to get it defined?  This is clearly wrong, as we shouldn't
  * have to include UNIX or Windows system header files to get it.
  */
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #ifdef __osf__
 #include <sys/sysinfo.h>

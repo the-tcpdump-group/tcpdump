@@ -40,7 +40,7 @@
 #include "config.h"
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include "netdissect.h" /* for checksum structure and functions */
 #include "extract.h"
