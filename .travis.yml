@@ -23,9 +23,9 @@ env:
     - coverity_scan_script_test_mode=false
   matrix:
     - REMOTE=disable CMAKE=no
-    - ENABLE_REMOTE="" CMAKE=yes
+    - REMOTE=disable CMAKE=yes
     - REMOTE=enable CMAKE=no
-    - ENABLE_REMOTE="-DENABLE_REMOTE=ON" CMAKE=yes
+    - REMOTE=enable CMAKE=yes
 
 matrix:
   fast_finish: true
