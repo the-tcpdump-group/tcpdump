@@ -805,7 +805,7 @@ dhcp6_print(netdissect_options *ndo,
 
 	dh6 = (const struct dhcp6 *)cp;
 	dh6relay = (const struct dhcp6_relay *)cp;
-	ND_TCHECK(dh6->dh6_xid);
+	ND_TCHECK_4(dh6->dh6_xid);
 	msgtype = EXTRACT_U_1(dh6->dh6_msgtype);
 	name = tok2str(dh6_msgtype_str, "msgtype-%u", msgtype);
 
@@ -824,7 +824,7 @@ dhcp6_print(netdissect_options *ndo,
 	} else {		/* relay messages */
 		struct in6_addr addr6;
 
-		ND_TCHECK(dh6relay->dh6relay_peeraddr);
+		ND_TCHECK_16(dh6relay->dh6relay_peeraddr);
 
 		memcpy(&addr6, &dh6relay->dh6relay_linkaddr, sizeof (addr6));
 		ND_PRINT("linkaddr=%s", ip6addr_string(ndo, &addr6));
