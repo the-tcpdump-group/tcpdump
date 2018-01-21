@@ -330,9 +330,6 @@ struct netdissect_options {
 	((uintptr_t)ndo->ndo_snapend - (l) <= (uintptr_t)ndo->ndo_snapend && \
          (uintptr_t)(p) <= (uintptr_t)ndo->ndo_snapend - (l)))
 
-/* True if "var" was captured */
-#define ND_TTEST(var) ND_TTEST2(var, sizeof(var))
-
 /* True if "*(p)" was captured */
 #define ND_TTEST_SIZE(p) ND_TTEST_LEN(p, sizeof(*(p)))
 
