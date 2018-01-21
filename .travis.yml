@@ -22,6 +22,8 @@ env:
     # usual processing: false.
     - coverity_scan_script_test_mode=false
   matrix:
+    # NOTE: REMOTE= is for the libpcap build, which is done with autotools
+    # even if we're building tcpdump with CMake.
     - REMOTE=disable CMAKE=no
     - REMOTE=disable CMAKE=yes
     - REMOTE=enable CMAKE=no
