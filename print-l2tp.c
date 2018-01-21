@@ -24,7 +24,7 @@
 /* \summary: Layer Two Tunneling Protocol (L2TP) printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include "netdissect-stdinc.h"

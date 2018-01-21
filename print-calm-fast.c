@@ -18,7 +18,7 @@
 /* \summary: Communication access for land mobiles (CALM) printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include "netdissect-stdinc.h"

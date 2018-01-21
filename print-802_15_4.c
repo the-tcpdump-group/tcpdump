@@ -23,7 +23,7 @@
 /* \summary: IEEE 802.15.4 printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include "netdissect-stdinc.h"

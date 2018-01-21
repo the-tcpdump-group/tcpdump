@@ -22,7 +22,7 @@
 /* \summary: Internet Control Message Protocol (ICMP) printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include "netdissect-stdinc.h"

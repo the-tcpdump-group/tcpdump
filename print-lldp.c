@@ -20,7 +20,7 @@
 /* \summary: IEEE 802.1ab Link Layer Discovery Protocol (LLDP) printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include "netdissect-stdinc.h"

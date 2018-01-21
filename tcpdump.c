@@ -40,7 +40,7 @@ The Regents of the University of California.  All rights reserved.\n";
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 /*

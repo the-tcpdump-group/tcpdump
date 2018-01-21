@@ -18,7 +18,7 @@
 /* specification: RFC 5880 (for version 1) and RFC 5881 */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include "netdissect-stdinc.h"

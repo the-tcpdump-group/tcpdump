@@ -23,7 +23,7 @@
 /* specification: RFC 827 */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include <string.h>

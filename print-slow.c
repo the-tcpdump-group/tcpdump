@@ -21,7 +21,7 @@
 /* \summary: IEEE "slow protocols" (802.3ad/802.3ah) printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include "netdissect-stdinc.h"

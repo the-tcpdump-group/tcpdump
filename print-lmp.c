@@ -21,7 +21,7 @@
 /* OIF UNI 1.0: http://www.oiforum.com/public/documents/OIF-UNI-01.0.pdf */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include "netdissect-stdinc.h"

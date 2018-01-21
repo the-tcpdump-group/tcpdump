@@ -30,7 +30,7 @@
 /* specification: http://brantleycoilecompany.com/AoEr11.pdf */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include "netdissect-stdinc.h"

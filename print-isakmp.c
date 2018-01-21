@@ -33,7 +33,7 @@
 /* specification: RFC 2407, RFC 2408, RFC 5996 */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 /* The functions from print-esp.c used in this file are only defined when both

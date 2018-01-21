@@ -22,7 +22,7 @@
 /* \summary: Sun Remote Procedure Call printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 /*

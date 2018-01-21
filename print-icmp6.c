@@ -22,7 +22,7 @@
 /* \summary: IPv6 Internet Control Message Protocol (ICMPv6) printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include "netdissect-stdinc.h"

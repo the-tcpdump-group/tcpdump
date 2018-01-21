@@ -32,7 +32,7 @@
 /* specification: RFC 2281 for version 1 */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include "netdissect-stdinc.h"

@@ -22,7 +22,7 @@
 /* specification: http://www.sflow.org/developers/specifications.php */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include "netdissect-stdinc.h"

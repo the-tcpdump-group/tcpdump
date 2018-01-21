@@ -18,7 +18,7 @@
 /* \summary: IEEE 802.3ah Multi-Point Control Protocol (MPCP) printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include "netdissect-stdinc.h"

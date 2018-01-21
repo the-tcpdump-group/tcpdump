@@ -22,7 +22,7 @@
 /* \summary: Apple IP-over-IEEE 1394 printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include "netdissect-stdinc.h"
