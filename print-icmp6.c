@@ -1337,7 +1337,7 @@ get_upperlayer(netdissect_options *ndo, const u_char *bp, u_int *prot)
 	/* 'ep' points to the end of available data. */
 	ep = ndo->ndo_snapend;
 
-	if (!ND_TTEST(ip6->ip6_nxt))
+	if (!ND_TTEST_1(ip6->ip6_nxt))
 		return NULL;
 
 	nh = EXTRACT_U_1(ip6->ip6_nxt);
@@ -1350,7 +1350,7 @@ get_upperlayer(netdissect_options *ndo, const u_char *bp, u_int *prot)
 		case IPPROTO_UDP:
 		case IPPROTO_TCP:
 			uh = (const struct udphdr *)bp;
-			if (ND_TTEST(uh->uh_dport)) {
+			if (ND_TTEST_2(uh->uh_dport)) {
 				*prot = nh;
 				return(uh);
 			}
@@ -1362,7 +1362,7 @@ get_upperlayer(netdissect_options *ndo, const u_char *bp, u_int *prot)
 		case IPPROTO_DSTOPTS:
 		case IPPROTO_ROUTING:
 			hbh = (const struct ip6_hbh *)bp;
-			if (!ND_TTEST(hbh->ip6h_len))
+			if (!ND_TTEST_1(hbh->ip6h_len))
 				return(NULL);
 			nh = EXTRACT_U_1(hbh->ip6h_nxt);
 			hlen = (EXTRACT_U_1(hbh->ip6h_len) + 1) << 3;
@@ -1370,7 +1370,7 @@ get_upperlayer(netdissect_options *ndo, const u_char *bp, u_int *prot)
 
 		case IPPROTO_FRAGMENT: /* this should be odd, but try anyway */
 			fragh = (const struct ip6_frag *)bp;
-			if (!ND_TTEST(fragh->ip6f_offlg))
+			if (!ND_TTEST_2(fragh->ip6f_offlg))
 				return(NULL);
 			/* fragments with non-zero offset are meaningless */
 			if ((EXTRACT_BE_U_2(fragh->ip6f_offlg) & IP6F_OFF_MASK) != 0)
@@ -1381,7 +1381,7 @@ get_upperlayer(netdissect_options *ndo, const u_char *bp, u_int *prot)
 
 		case IPPROTO_AH:
 			ah = (const struct ah *)bp;
-			if (!ND_TTEST(ah->ah_len))
+			if (!ND_TTEST_1(ah->ah_len))
 				return(NULL);
 			nh = EXTRACT_U_1(ah->ah_nxt);
 			hlen = (EXTRACT_U_1(ah->ah_len) + 2) << 2;
