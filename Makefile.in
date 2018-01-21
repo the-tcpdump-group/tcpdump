@@ -330,7 +330,7 @@ EXTRA_DIST = \
 	bpf_dump.c \
 	cmakeconfig.h.in \
 	cmake/Modules/FindPCAP.cmake \
-	cmake/Moduled/FindSMI.cmake \
+	cmake/Modules/FindSMI.cmake \
 	config.guess \
 	config.h.in \
 	config.sub \
