@@ -899,7 +899,7 @@ xid_map_enter(netdissect_options *ndo,
 	const struct ip6_hdr *ip6 = NULL;
 	struct xid_map_entry *xmep;
 
-	if (!ND_TTEST(rp->rm_call.cb_proc))
+	if (!ND_TTEST_4(rp->rm_call.cb_proc))
 		return (0);
 	switch (IP_V((const struct ip *)bp)) {
 	case 4:
