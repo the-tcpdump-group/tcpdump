@@ -275,6 +275,24 @@ check_type_size("socklen_t" SOCKLEN_T)
 set(CMAKE_EXTRA_INCLUDE_FILES unistd.h)
 
 #
+# Check for IPv6 support.
+# We just check for AF_INET6 and struct in6_addr.
+#
+cmake_push_check_state()
+if(WIN32)
+    set(CMAKE_EXTRA_INCLUDE_FILES sys/types.h ws2tcpip.h)
+    check_symbol_exists(AF_INET6 "sys/types.h;ws2tcpip.h" HAVE_AF_INET6)
+else(WIN32)
+    set(CMAKE_EXTRA_INCLUDE_FILES sys/types.h sys/socket.h netinet/in.h)
+    check_symbol_exists(AF_INET6 "sys/types.h;sys/socket.h;netinet/in.h" HAVE_AF_INET6)
+endif(WIN32)
+check_type_size("struct in6_addr" HAVE_STRUCT_IN6_ADDR)
+cmake_pop_check_state()
+if(HAVE_AF_INET6 AND HAVE_STRUCT_IN6_ADDR)
+    set(HAVE_OS_IPV6_SUPPORT TRUE)
+endif(HAVE_AF_INET6 AND HAVE_STRUCT_IN6_ADDR)
+
+#
 # Structure fields.
 #
 check_struct_has_member("struct sockaddr" sa_len sys/socket.h HAVE_SOCKADDR_SA_LEN)
