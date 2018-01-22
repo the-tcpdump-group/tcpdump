@@ -10,6 +10,7 @@ set(LIBRARY_NAME netdissect)
 ###################################################################
 
 option(WITH_SMI "Build with libsmi, if available" ON)
+option(ENABLE_SMB "Build with the SMB dissector" ON)
 
 #
 # By default, build universal with the appropriate set of architectures
@@ -569,6 +570,15 @@ set(NETDISSECT_SOURCE_LIST_C
     strtoaddr.c
     util-print.c
 )
+
+if(ENABLE_SMB)
+    #
+    # We allow the SMB dissector to be omitted.
+    #
+    set(NETDISSECT_SOURCE_LIST_C ${NETDISSECT_SOURCE_LIST_C}
+        print-smb.c
+        smbutil.c)
+endif(ENABLE_SMB)
 
 #
 # Replace missing functions
