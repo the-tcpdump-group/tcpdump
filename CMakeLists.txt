@@ -396,6 +396,7 @@ if(NOT HAVE_PCAP_SET_PARSER_DEBUG)
 endif(NOT HAVE_PCAP_SET_PARSER_DEBUG)
 
 check_function_exists(pcap_set_optimizer_debug HAVE_PCAP_SET_OPTIMIZER_DEBUG)
+check_function_exists(bpf_dump HAVE_BPF_DUMP)
 
 cmake_pop_check_state()
 
@@ -597,6 +598,10 @@ add_library(netdissect STATIC
 )
 
 set(TCPDUMP_SOURCE_LIST_C tcpdump.c)
+
+if(NOT HAVE_BPF_DUMP)
+    set(TCPDUMP_SOURCE_LIST_C ${TCPDUMP_SOURCE_LIST_C} bpf_dump.c)
+endif(NOT HAVE_BPF_DUMP)
 
 set(PROJECT_SOURCE_LIST_C ${NETDISSECT_SOURCE_LIST_C} ${TCPDUMP_SOURCE_LIST_C})
 
