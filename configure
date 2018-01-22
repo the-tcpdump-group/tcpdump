@@ -4074,50 +4074,6 @@ done
 		LOCALSRC="print-pflog.c $LOCALSRC"
 	fi
 fi
-for ac_header in netinet/if_ether.h
-do :
-  ac_fn_c_check_header_compile "$LINENO" "netinet/if_ether.h" "ac_cv_header_netinet_if_ether_h" "#include <sys/types.h>
-#include <sys/socket.h>
-"
-if test "x$ac_cv_header_netinet_if_ether_h" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_NETINET_IF_ETHER_H 1
-_ACEOF
-
-fi
-
-done
-
-if test "$ac_cv_header_netinet_if_ether_h" != yes; then
-	#
-	# The simple test didn't work.
-	# Do we need to include <net/if.h> first?
-	# Unset ac_cv_header_netinet_if_ether_h so we don't
-	# treat the previous failure as a cached value and
-	# suppress the next test.
-	#
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: Rechecking with some additional includes" >&5
-$as_echo "$as_me: Rechecking with some additional includes" >&6;}
-	unset ac_cv_header_netinet_if_ether_h
-	for ac_header in netinet/if_ether.h
-do :
-  ac_fn_c_check_header_compile "$LINENO" "netinet/if_ether.h" "ac_cv_header_netinet_if_ether_h" "#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-struct mbuf;
-struct rtentry;
-#include <net/if.h>
-"
-if test "x$ac_cv_header_netinet_if_ether_h" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_NETINET_IF_ETHER_H 1
-_ACEOF
-
-fi
-
-done
-
-fi
 
 case "$host_os" in
 
@@ -5827,6 +5783,25 @@ if test "$ac_cv_func_ether_ntohost" = yes -a \
 	#
 	# OK, we have ether_ntohost().  Do we have <netinet/if_ether.h>?
 	#
+	for ac_header in netinet/if_ether.h
+do :
+  ac_fn_c_check_header_compile "$LINENO" "netinet/if_ether.h" "ac_cv_header_netinet_if_ether_h" "
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+struct mbuf;
+struct rtentry;
+#include <net/if.h>
+"
+if test "x$ac_cv_header_netinet_if_ether_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_NETINET_IF_ETHER_H 1
+_ACEOF
+
+fi
+
+done
+
 	if test "$ac_cv_header_netinet_if_ether_h" = yes; then
 		#
 		# Yes.  Does it declare ether_ntohost()?

@@ -120,7 +120,6 @@ if(HAVE_NET_PFVAR_H)
         set(LOCALSRC print-pflog.c ${LOCALSRC})
     endif(HAVE_NET_IF_PFLOG_H)
 endif(HAVE_NET_PFVAR_H)
-check_include_file(netinet/if_ether.h HAVE_NETINET_IF_ETHER_H)
 
 #
 # You are in a twisty little maze of UN*Xes, all different.

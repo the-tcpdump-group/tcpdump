@@ -37,25 +37,6 @@ if test "$ac_cv_header_net_pfvar_h" = yes; then
 		LOCALSRC="print-pflog.c $LOCALSRC"
 	fi
 fi
-AC_CHECK_HEADERS(netinet/if_ether.h, , , [#include <sys/types.h>
-#include <sys/socket.h>])
-if test "$ac_cv_header_netinet_if_ether_h" != yes; then
-	#
-	# The simple test didn't work.
-	# Do we need to include <net/if.h> first?
-	# Unset ac_cv_header_netinet_if_ether_h so we don't
-	# treat the previous failure as a cached value and
-	# suppress the next test.
-	#
-	AC_MSG_NOTICE([Rechecking with some additional includes])
-	unset ac_cv_header_netinet_if_ether_h
-	AC_CHECK_HEADERS(netinet/if_ether.h, , , [#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-struct mbuf;
-struct rtentry;
-#include <net/if.h>])
-fi
 
 case "$host_os" in
 
@@ -491,6 +472,13 @@ if test "$ac_cv_func_ether_ntohost" = yes -a \
 	#
 	# OK, we have ether_ntohost().  Do we have <netinet/if_ether.h>?
 	#
+	AC_CHECK_HEADERS(netinet/if_ether.h, , , [
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+struct mbuf;
+struct rtentry;
+#include <net/if.h>])
 	if test "$ac_cv_header_netinet_if_ether_h" = yes; then
 		#
 		# Yes.  Does it declare ether_ntohost()?
