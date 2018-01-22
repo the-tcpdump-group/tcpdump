@@ -78,7 +78,7 @@ install:
   - if [ "$TRAVIS_OS_NAME" = osx ]; then brew install libsmi | grep -v '%'; fi
 
 before_script:
-  - if [ "$BUILD_LIBPCAP" = true ]; then (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth=50 --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure "--${REMOTE}-remote" && make); fi
+  - if [ "$BUILD_LIBPCAP" = true ]; then (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth=50 --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure "--${REMOTE}-remote" && make && make install); fi
 
 script:
   - if [ "$COVERITY_SCAN_BRANCH" != 1 -a "$CMAKE" = no ]; then touch .devel configure; fi
