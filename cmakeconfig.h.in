@@ -27,8 +27,7 @@
 /* Casper support available */
 #cmakedefine HAVE_CASPER 1
 
-/* Define to 1 if you have the declaration of `ether_ntohost', and to 0 if you
-   don't. */
+/* Define to 1 if you have the declaration of `ether_ntohost' */
 #cmakedefine HAVE_DECL_ETHER_NTOHOST 1
 
 /* define if you have the dnet_htoa function */
