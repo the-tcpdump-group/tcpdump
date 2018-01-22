@@ -278,6 +278,14 @@ check_function_exists(vfork HAVE_VFORK)
 check_function_exists(strftime HAVE_STRFTIME)
 check_function_exists(setlinebuf HAVE_SETLINEBUF)
 
+check_function_exists(getrpcbynumber HAVE_GETRPCBYNUMBER)
+if(NOT HAVE_GETRPCBYNUMBER)
+    cmake_push_check_state()
+    set(CMAKE_REQUIRED_LIBRARIES nsl)
+    check_function_exists(getrpcbynumber HAVE_GETRPCBYNUMBER)
+    cmake_pop_check_state()
+endif(NOT HAVE_GETRPCBYNUMBER)
+
 #
 # Data types.
 #
