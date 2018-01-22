@@ -95,7 +95,7 @@
        */
       extern int ether_ntohost(char *, const struct ether_addr *);
     #endif /* !defined(HAVE_DECL_ETHER_NTOHOST) */
-  #endif /* USER_ETHER_NTOHOST */
+  #endif /* USE_ETHER_NTOHOST */
 #endif /* _WIN32 */
 
 #include <pcap.h>
