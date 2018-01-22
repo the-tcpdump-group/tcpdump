@@ -282,11 +282,11 @@ ntp_time_print(netdissect_options *ndo,
 	ND_TCHECK_1(bp->precision);
 	ND_PRINT(", precision %d", EXTRACT_S_1(bp->precision));
 
-	ND_TCHECK(bp->root_delay);
+	ND_TCHECK_SIZE(&bp->root_delay);
 	ND_PRINT("\n\tRoot Delay: ");
 	p_sfix(ndo, &bp->root_delay);
 
-	ND_TCHECK(bp->root_dispersion);
+	ND_TCHECK_SIZE(&bp->root_dispersion);
 	ND_PRINT(", Root dispersion: ");
 	p_sfix(ndo, &bp->root_dispersion);
 
@@ -321,19 +321,19 @@ ntp_time_print(netdissect_options *ndo,
 		break;
 	}
 
-	ND_TCHECK(bp->ref_timestamp);
+	ND_TCHECK_SIZE(&bp->ref_timestamp);
 	ND_PRINT("\n\t  Reference Timestamp:  ");
 	p_ntp_time(ndo, &(bp->ref_timestamp));
 
-	ND_TCHECK(bp->org_timestamp);
+	ND_TCHECK_SIZE(&bp->org_timestamp);
 	ND_PRINT("\n\t  Originator Timestamp: ");
 	p_ntp_time(ndo, &(bp->org_timestamp));
 
-	ND_TCHECK(bp->rec_timestamp);
+	ND_TCHECK_SIZE(&bp->rec_timestamp);
 	ND_PRINT("\n\t  Receive Timestamp:    ");
 	p_ntp_time(ndo, &(bp->rec_timestamp));
 
-	ND_TCHECK(bp->xmt_timestamp);
+	ND_TCHECK_SIZE(&bp->xmt_timestamp);
 	ND_PRINT("\n\t  Transmit Timestamp:   ");
 	p_ntp_time(ndo, &(bp->xmt_timestamp));
 
