@@ -40,27 +40,63 @@
 #define HTONS(x)	(x) = htons(x)
 #endif
 
-#ifdef USE_ETHER_NTOHOST
-#ifdef HAVE_NETINET_IF_ETHER_H
-struct mbuf;		/* Squelch compiler warnings on some platforms for */
-struct rtentry;		/* declarations in <net/if.h> */
-#include <net/if.h>	/* for "struct ifnet" in "struct arpcom" on Solaris */
-#include <netinet/if_ether.h>
-#endif /* HAVE_NETINET_IF_ETHER_H */
-#ifdef NETINET_ETHER_H_DECLARES_ETHER_NTOHOST
-#include <netinet/ether.h>
-#endif /* NETINET_ETHER_H_DECLARES_ETHER_NTOHOST */
+#ifndef _WIN32
+  #ifdef USE_ETHER_NTOHOST
+    #if defined(NET_ETHERNET_H_DECLARES_ETHER_NTOHOST)
+      /*
+       * OK, just include <net/ethernet.h>.
+       */
+      #include <net/ethernet.h>
+    #elif defined(NETINET_ETHER_H_DECLARES_ETHER_NTOHOST)
+      /*
+       * OK, just include <netinet/ether.h>
+       */
+      #include <netinet/ether.h>
+    #elif defined(SYS_ETHERNET_H_DECLARES_ETHER_NTOHOST)
+      /*
+       * OK, just include <sys/ethernet.h>
+       */
+      #include <sys/ethernet.h>
+    #elif defined(ARPA_INET_H_DECLARES_ETHER_NTOHOST)
+      /*
+       * OK, just include <arpa/inet.h>
+       */
+      #include <arpa/inet.h>
+    #elif defined(NETINET_IF_ETHER_H_DECLARES_ETHER_NTOHOST)
+      /*
+       * OK, include <netinet/if_ether.h>, after all the other stuff we
+       * need to include or define for its benefit.
+       */
+      #define NEED_NETINET_IF_ETHER_H
+    #else
+      /*
+       * We'll have to declare it ourselves.
+       * If <netinet/if_ether.h> defines struct ether_addr, include
+       * it.  Otherwise, define it ourselves.
+       */
+      #ifdef HAVE_STRUCT_ETHER_ADDR
+        #define NEED_NETINET_IF_ETHER_H
+      #else /* HAVE_STRUCT_ETHER_ADDR */
+	struct ether_addr {
+		unsigned char ether_addr_octet[6];
+	};
+      #endif /* HAVE_STRUCT_ETHER_ADDR */
+    #endif /* what declares ether_ntohost() */
 
-#if !defined(HAVE_DECL_ETHER_NTOHOST) || !HAVE_DECL_ETHER_NTOHOST
-#ifndef HAVE_STRUCT_ETHER_ADDR
-struct ether_addr {
-	unsigned char ether_addr_octet[6];
-};
-#endif
-extern int ether_ntohost(char *, const struct ether_addr *);
-#endif
+    #ifdef NEED_NETINET_IF_ETHER_H
+      #include <net/if.h>	/* Needed on some platforms */
+      #include <netinet/in.h>	/* Needed on some platforms */
+      #include <netinet/if_ether.h>
+    #endif /* NEED_NETINET_IF_ETHER_H */
 
-#endif /* USE_ETHER_NTOHOST */
+    #ifndef HAVE_DECL_ETHER_NTOHOST
+      /*
+       * No header declares it, so declare it ourselves.
+       */
+      extern int ether_ntohost(char *, const struct ether_addr *);
+    #endif /* !defined(HAVE_DECL_ETHER_NTOHOST) */
+  #endif /* USER_ETHER_NTOHOST */
+#endif /* _WIN32 */
 
 #include <pcap.h>
 #include <pcap-namedb.h>

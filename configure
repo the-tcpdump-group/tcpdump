@@ -5713,11 +5713,12 @@ fi
 #
 # You are in a twisty little maze of UN*Xes, all different.
 # Some might not have ether_ntohost().
-# Some might have it, but not declare it in any header file.
-# Some might have it, but declare it in <netinet/if_ether.h>.
-# Some might have it, but declare it in <netinet/ether.h>
-# (And some might have it but document it as something declared in
-# <netinet/ethernet.h>, although <netinet/if_ether.h> appears to work.)
+# Some might have it and declare it in <net/ethernet.h>.
+# Some might have it and declare it in <netinet/ether.h>
+# Some might have it and declare it in <sys/ethernet.h>.
+# Some might have it and declare it in <arpa/inet.h>.
+# Some might have it and declare it in <netinet/if_ether.h>.
+# Some might have it and not declare it in any header file.
 #
 # Before you is a C compiler.
 #
@@ -5781,39 +5782,135 @@ done
 if test "$ac_cv_func_ether_ntohost" = yes -a \
     "$ac_cv_buggy_ether_ntohost" = "no"; then
 	#
-	# OK, we have ether_ntohost().  Do we have <netinet/if_ether.h>?
+	# OK, we have ether_ntohost().  Is it declared in <net/ethernet.h>?
 	#
-	for ac_header in netinet/if_ether.h
-do :
-  ac_fn_c_check_header_compile "$LINENO" "netinet/if_ether.h" "ac_cv_header_netinet_if_ether_h" "
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-struct mbuf;
-struct rtentry;
-#include <net/if.h>
+	# This test fails if we don't have <net/ethernet.h> or if we do
+	# but it doesn't declare ether_ntohost().
+	#
+	ac_fn_c_check_decl "$LINENO" "ether_ntohost" "ac_cv_have_decl_ether_ntohost" "
+#include <net/ethernet.h>
+
 "
-if test "x$ac_cv_header_netinet_if_ether_h" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_NETINET_IF_ETHER_H 1
-_ACEOF
+if test "x$ac_cv_have_decl_ether_ntohost" = xyes; then :
+
+
+$as_echo "#define NET_ETHERNET_H_DECLARES_ETHER_NTOHOST /**/" >>confdefs.h
+
 
 fi
 
-done
+	#
+	# Did that succeed?
+	#
+	if test "$ac_cv_have_decl_ether_ntohost" != yes; then
+		#
+		# No, how about <netinet/ether.h>, as on Linux?
+		#
+		# This test fails if we don't have <netinet/ether.h>
+		# or if we do but it doesn't declare ether_ntohost().
+		#
+		# Unset ac_cv_have_decl_ether_ntohost so we don't
+		# treat the previous failure as a cached value and
+		# suppress the next test.
+		#
+		unset ac_cv_have_decl_ether_ntohost
+		ac_fn_c_check_decl "$LINENO" "ether_ntohost" "ac_cv_have_decl_ether_ntohost" "
+#include <netinet/ether.h>
 
-	if test "$ac_cv_header_netinet_if_ether_h" = yes; then
+"
+if test "x$ac_cv_have_decl_ether_ntohost" = xyes; then :
+
+
+$as_echo "#define NETINET_ETHER_H_DECLARES_ETHER_NTOHOST /**/" >>confdefs.h
+
+
+fi
+
+	fi
+	#
+	# Did that succeed?
+	#
+	if test "$ac_cv_have_decl_ether_ntohost" != yes; then
 		#
-		# Yes.  Does it declare ether_ntohost()?
+		# No, how about <sys/ethernet.h>, as on Solaris 10
+		# and later?
 		#
+		# This test fails if we don't have <sys/ethernet.h>
+		# or if we do but it doesn't declare ether_ntohost().
+		#
+		# Unset ac_cv_have_decl_ether_ntohost so we don't
+		# treat the previous failure as a cached value and
+		# suppress the next test.
+		#
+		unset ac_cv_have_decl_ether_ntohost
+		ac_fn_c_check_decl "$LINENO" "ether_ntohost" "ac_cv_have_decl_ether_ntohost" "
+#include <sys/ethernet.h>
+
+"
+if test "x$ac_cv_have_decl_ether_ntohost" = xyes; then :
+
+
+$as_echo "#define SYS_ETHERNET_H_DECLARES_ETHER_NTOHOST /**/" >>confdefs.h
+
+
+fi
+
+	fi
+	#
+	# Did that succeed?
+	#
+	if test "$ac_cv_have_decl_ether_ntohost" != yes; then
+		#
+		# No, how about <arpa/inet.h>, as in AIX?
+		#
+		# This test fails if we don't have <arpa/inet.h>
+		# (if we have ether_ntohost(), we should have
+		# networking, and if we have networking, we should
+		# have <arapa/inet.h>) or if we do but it doesn't
+		# declare ether_ntohost().
+		#
+		# Unset ac_cv_have_decl_ether_ntohost so we don't
+		# treat the previous failure as a cached value and
+		# suppress the next test.
+		#
+		unset ac_cv_have_decl_ether_ntohost
+		ac_fn_c_check_decl "$LINENO" "ether_ntohost" "ac_cv_have_decl_ether_ntohost" "
+#include <arpa/inet.h>
+
+"
+if test "x$ac_cv_have_decl_ether_ntohost" = xyes; then :
+
+
+$as_echo "#define ARPA_INET_H_DECLARES_ETHER_NTOHOST /**/" >>confdefs.h
+
+
+fi
+
+	fi
+	#
+	# Did that succeed?
+	#
+	if test "$ac_cv_have_decl_ether_ntohost" != yes; then
+		#
+		# No, how about <netinet/if_ether.h>?
+		# On some platforms, it requires <net/if.h> and
+		# <netinet/in.h>, and we always include it with
+		# both of them, so test it with both of them.
+		#
+		# This test fails if we don't have <netinet/if_ether.h>
+		# and the headers we include before it, or if we do but
+		# <netinet/if_ether.h> doesn't declare ether_hostton().
+		#
+		# Unset ac_cv_have_decl_ether_ntohost so we don't
+		# treat the previous failure as a cached value and
+		# suppress the next test.
+		#
+		unset ac_cv_have_decl_ether_ntohost
 		ac_fn_c_check_decl "$LINENO" "ether_ntohost" "ac_cv_have_decl_ether_ntohost" "
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-struct mbuf;
-struct rtentry;
 #include <net/if.h>
+#include <netinet/in.h>
 #include <netinet/if_ether.h>
 
 "
@@ -5827,63 +5924,27 @@ fi
 
 	fi
 	#
-	# Did that succeed?
+	# After all that, is ether_ntohost() declared?
 	#
-	if test "$ac_cv_have_decl_ether_ntohost" != yes; then
+	if test "$ac_cv_have_decl_ether_ntohost" = yes; then
 		#
-		# No, how about <netinet/ether.h>, as on Linux?
+		# Yes.
 		#
-		for ac_header in netinet/ether.h
-do :
-  ac_fn_c_check_header_mongrel "$LINENO" "netinet/ether.h" "ac_cv_header_netinet_ether_h" "$ac_includes_default"
-if test "x$ac_cv_header_netinet_ether_h" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_NETINET_ETHER_H 1
-_ACEOF
 
-fi
+$as_echo "#define HAVE_DECL_ETHER_NTOHOST 1" >>confdefs.h
 
-done
-
-		if test "$ac_cv_header_netinet_ether_h" = yes; then
-			#
-			# We have it - does it declare ether_ntohost()?
-			# Unset ac_cv_have_decl_ether_ntohost so we don't
-			# treat the previous failure as a cached value and
-			# suppress the next test.
-			#
-			unset ac_cv_have_decl_ether_ntohost
-			ac_fn_c_check_decl "$LINENO" "ether_ntohost" "ac_cv_have_decl_ether_ntohost" "
-#include <netinet/ether.h>
-
-"
-if test "x$ac_cv_have_decl_ether_ntohost" = xyes; then :
-
-
-$as_echo "#define NETINET_ETHER_H_DECLARES_ETHER_NTOHOST /**/" >>confdefs.h
-
-
-fi
-
-		fi
-	fi
-	#
-	# Is ether_ntohost() declared?
-	#
-	if test "$ac_cv_have_decl_ether_ntohost" != yes; then
+	else
 		#
 		# No, we'll have to declare it ourselves.
-		# Do we have "struct ether_addr"?
+		# Do we have "struct ether_addr" if we include
+		# <netinet/if_ether.h>?
 		#
 		ac_fn_c_check_type "$LINENO" "struct ether_addr" "ac_cv_type_struct_ether_addr" "
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-struct mbuf;
-struct rtentry;
-#include <net/if.h>
-#include <netinet/if_ether.h>
+			#include <sys/types.h>
+			#include <sys/socket.h>
+			#include <net/if.h>
+			#include <netinet/in.h>
+			#include <netinet/if_ether.h>
 
 "
 if test "x$ac_cv_type_struct_ether_addr" = xyes; then :
@@ -5894,13 +5955,6 @@ _ACEOF
 
 
 fi
-
-
-$as_echo "#define HAVE_DECL_ETHER_NTOHOST 0" >>confdefs.h
-
-	else
-
-$as_echo "#define HAVE_DECL_ETHER_NTOHOST 1" >>confdefs.h
 
 	fi
 fi

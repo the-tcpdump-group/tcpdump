@@ -1,5 +1,8 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Define to 1 if arpa/inet.h declares `ether_ntohost' */
+#undef ARPA_INET_H_DECLARES_ETHER_NTOHOST
+
 /* define if you want to build the possibly-buggy SMB printer */
 #undef ENABLE_SMB
 
@@ -24,8 +27,7 @@
 /* Casper support available */
 #undef HAVE_CASPER
 
-/* Define to 1 if you have the declaration of `ether_ntohost', and to 0 if you
-   don't. */
+/* Define to 1 if you have the declaration of `ether_ntohost' */
 #undef HAVE_DECL_ETHER_NTOHOST
 
 /* define if you have the dnet_htoa function */
@@ -75,12 +77,6 @@
 
 /* Define to 1 if you have the <netdnet/dn.h> header file. */
 #undef HAVE_NETDNET_DN_H
-
-/* Define to 1 if you have the <netinet/ether.h> header file. */
-#undef HAVE_NETINET_ETHER_H
-
-/* Define to 1 if you have the <netinet/if_ether.h> header file. */
-#undef HAVE_NETINET_IF_ETHER_H
 
 /* Define to 1 if you have the <net/if_pflog.h> header file. */
 #undef HAVE_NET_IF_PFLOG_H
@@ -256,6 +252,9 @@
 /* Define to 1 if netinet/if_ether.h declares `ether_ntohost' */
 #undef NETINET_IF_ETHER_H_DECLARES_ETHER_NTOHOST
 
+/* Define to 1 if net/ethernet.h declares `ether_ntohost' */
+#undef NET_ETHERNET_H_DECLARES_ETHER_NTOHOST
+
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT
 
@@ -276,6 +275,9 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
+
+/* Define to 1 if sys/ethernet.h declares `ether_ntohost' */
+#undef SYS_ETHERNET_H_DECLARES_ETHER_NTOHOST
 
 /* define if you have ether_ntohost() and it works */
 #undef USE_ETHER_NTOHOST

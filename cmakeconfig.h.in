@@ -1,5 +1,8 @@
 /* cmakeconfig.h.in */
 
+/* Define to 1 if arpa/inet.h declares `ether_ntohost' */
+#cmakedefine ARPA_INET_H_DECLARES_ETHER_NTOHOST 1
+
 /* define if you want to build the possibly-buggy SMB printer */
 #cmakedefine ENABLE_SMB 1
 
@@ -75,12 +78,6 @@
 
 /* Define to 1 if you have the <netdnet/dn.h> header file. */
 #cmakedefine HAVE_NETDNET_DN_H 1
-
-/* Define to 1 if you have the <netinet/ether.h> header file. */
-#cmakedefine HAVE_NETINET_ETHER_H 1
-
-/* Define to 1 if you have the <netinet/if_ether.h> header file. */
-#cmakedefine HAVE_NETINET_IF_ETHER_H 1
 
 /* Define to 1 if you have the <net/if_pflog.h> header file. */
 #cmakedefine HAVE_NET_IF_PFLOG_H 1
@@ -256,6 +253,9 @@
 /* Define to 1 if netinet/if_ether.h declares `ether_ntohost' */
 #cmakedefine NETINET_IF_ETHER_H_DECLARES_ETHER_NTOHOST 1
 
+/* Define to 1 if net/ethernet.h declares `ether_ntohost' */
+#cmakedefine NET_ETHERNET_H_DECLARES_ETHER_NTOHOST 1
+
 /* Define to the address where bug reports for this package should be sent. */
 #cmakedefine PACKAGE_BUGREPORT ""
 
@@ -276,6 +276,9 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #cmakedefine STDC_HEADERS 1
+
+/* Define to 1 if sys/ethernet.h declares `ether_ntohost' */
+#cmakedefine SYS_ETHERNET_H_DECLARES_ETHER_NTOHOST 1
 
 /* define if you have ether_ntohost() and it works */
 #cmakedefine USE_ETHER_NTOHOST 1
