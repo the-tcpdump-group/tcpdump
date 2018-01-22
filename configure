@@ -5080,19 +5080,6 @@ fi
 fi
 
 
-ac_fn_c_check_func "$LINENO" "vfprintf" "ac_cv_func_vfprintf"
-if test "x$ac_cv_func_vfprintf" = xyes; then :
-  $as_echo "#define HAVE_VFPRINTF 1" >>confdefs.h
-
-else
-  case " $LIBOBJS " in
-  *" vfprintf.$ac_objext "* ) ;;
-  *) LIBOBJS="$LIBOBJS vfprintf.$ac_objext"
- ;;
-esac
-
-fi
-
 ac_fn_c_check_func "$LINENO" "strlcat" "ac_cv_func_strlcat"
 if test "x$ac_cv_func_strlcat" = xyes; then :
   $as_echo "#define HAVE_STRLCAT 1" >>confdefs.h

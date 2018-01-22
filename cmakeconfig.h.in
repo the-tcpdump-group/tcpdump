@@ -241,9 +241,6 @@
 /* Define to 1 if you have the `vfork' function. */
 #cmakedefine HAVE_VFORK 1
 
-/* Define to 1 if you have the `vfprintf' function. */
-#cmakedefine HAVE_VFPRINTF 1
-
 /* Define to 1 if you have the `vsnprintf' function. */
 #cmakedefine HAVE_VSNPRINTF 1
 
