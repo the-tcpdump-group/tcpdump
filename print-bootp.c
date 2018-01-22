@@ -332,22 +332,22 @@ bootp_print(netdissect_options *ndo,
 		ND_PRINT(" (0x%04x)", EXTRACT_BE_U_2(bp->bp_flags));
 
 	/* Client's ip address */
-	ND_TCHECK(bp->bp_ciaddr);
+	ND_TCHECK_4(&bp->bp_ciaddr);
 	if (EXTRACT_IPV4_TO_HOST_ORDER(&bp->bp_ciaddr.s_addr))
 		ND_PRINT("\n\t  Client-IP %s", ipaddr_string(ndo, &bp->bp_ciaddr));
 
 	/* 'your' ip address (bootp client) */
-	ND_TCHECK(bp->bp_yiaddr);
+	ND_TCHECK_4(&bp->bp_yiaddr);
 	if (EXTRACT_IPV4_TO_HOST_ORDER(&bp->bp_yiaddr.s_addr))
 		ND_PRINT("\n\t  Your-IP %s", ipaddr_string(ndo, &bp->bp_yiaddr));
 
 	/* Server's ip address */
-	ND_TCHECK(bp->bp_siaddr);
+	ND_TCHECK_4(&bp->bp_siaddr);
 	if (EXTRACT_IPV4_TO_HOST_ORDER(&bp->bp_siaddr.s_addr))
 		ND_PRINT("\n\t  Server-IP %s", ipaddr_string(ndo, &bp->bp_siaddr));
 
 	/* Gateway's ip address */
-	ND_TCHECK(bp->bp_giaddr);
+	ND_TCHECK_4(&bp->bp_giaddr);
 	if (EXTRACT_IPV4_TO_HOST_ORDER(&bp->bp_giaddr.s_addr))
 		ND_PRINT("\n\t  Gateway-IP %s", ipaddr_string(ndo, &bp->bp_giaddr));
 
@@ -1052,7 +1052,7 @@ trunc:
 	ND_PRINT("|[rfc1048]");
 }
 
-#define PRINTCMUADDR(m, s) { ND_TCHECK(cmu->m); \
+#define PRINTCMUADDR(m, s) { ND_TCHECK_4(&cmu->m); \
     if (cmu->m.s_addr != 0) \
 	ND_PRINT(" %s:%s", s, ipaddr_string(ndo, &cmu->m.s_addr)); }
 
