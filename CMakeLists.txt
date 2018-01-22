@@ -248,7 +248,6 @@ check_include_file(limits.h HAVE_LIMITS_H)
 
 #
 # Functions.
-# XXX TODO - all from vfprintf to getopt_long have replacements
 #
 check_function_exists(vfprintf HAVE_VFPRINTF)
 check_function_exists(strlcat HAVE_STRLCAT)
@@ -583,7 +582,7 @@ endif(ENABLE_SMB)
 #
 # Replace missing functions
 #
-foreach(FUNC vfprintf strlcat strlcpy strdup strsep getopt_long)
+foreach(FUNC vfprintf strlcat strlcpy strdup strsep getservent getopt_long)
     string(TOUPPER ${FUNC} FUNC_UPPERCASE)
     set(HAVE_FUNC_UPPERCASE HAVE_${FUNC_UPPERCASE})
     if(NOT ${HAVE_FUNC_UPPERCASE})
