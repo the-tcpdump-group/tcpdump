@@ -136,7 +136,15 @@ endif(HAVE_NET_PFVAR_H)
 check_function_exists(ether_ntohost HAVE_ETHER_NTOHOST)
 if(HAVE_ETHER_NTOHOST)
     #
-    # OK, we have ether_ntohost().  Is it declared in <net/ethernet.h>?
+    # OK, we have ether_ntohost().  We don't check whether it's buggy,
+    # as we assume any system that has CMake is likely to be new enough
+    # that, if it has ether_ntohost(), it's not buggy; we just decide
+    # to use it.
+    #
+    set(USE_ETHER_NTOHOST TRUE)
+
+    #
+    # Is it declared in <net/ethernet.h>?
     #
     # This test fails if we don't have <net/ethernet.h> or if we do
     # but it doesn't declare ether_ntohost().
