@@ -697,3 +697,40 @@ target_link_libraries(tcpdump netdissect ${PCAP_LIBRARY} ${SMI_LIBRARY})
 ######################################
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmakeconfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+
+######################################
+# Install tcpdump and man pages
+######################################
+
+#
+# "Define GNU standard installation directories", which actually
+# are also defined, to some degree, by autotools, and at least
+# some of which are general UN*X conventions.
+#
+include(GNUInstallDirs)
+
+set(MAN1 tcpdump.1)
+
+if(WIN32)
+    # XXX TODO where to install on Windows?
+else(WIN32)
+    install(TARGETS tcpdump DESTINATION sbin)
+endif(WIN32)
+
+# On UN*X, and on Windows when not using MSVC, process man pages and
+# arrange that they be installed.
+if(NOT MSVC)
+    #
+    # Man pages.
+    #
+    install(FILES ${MAN1} DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+endif(NOT MSVC)
+
+# uninstall target
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+    IMMEDIATE @ONLY)
+
+add_custom_target(uninstall
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)

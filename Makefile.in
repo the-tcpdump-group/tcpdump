@@ -330,6 +330,7 @@ EXTRA_DIST = \
 	aclocal.m4 \
 	atime.awk \
 	bpf_dump.c \
+	cmake_uninstall.cmake.in \
 	cmakeconfig.h.in \
 	cmake/Modules/FindPCAP.cmake \
 	cmake/Modules/FindSMI.cmake \
