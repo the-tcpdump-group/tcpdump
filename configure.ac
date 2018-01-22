@@ -567,8 +567,13 @@ don't.])
 fi
 
 dnl
-dnl Check for "pcap_list_datalinks()" and use a substitute version
-dnl if it's not present.
+dnl Check for "pcap_list_datalinks()" and use a substitute version if
+dnl it's not present.  If it is present, check for "pcap_free_datalinks()";
+dnl if it's not present, we don't replace it for now.  (We could do so
+dnl on UN*X, but not on Windows, where hilarity ensues if a program
+dnl built with one version of the MSVC support library tries to free
+dnl something allocated by a library built with another version of
+dnl the MSVC support library.)
 dnl
 AC_CHECK_FUNC(pcap_list_datalinks,
 	[
@@ -581,8 +586,10 @@ AC_CHECK_FUNC(pcap_list_datalinks,
 	])
 
 dnl
-dnl Check for "pcap_datalink_name_to_val()", and use a substitute version
-dnl if it's not present.
+dnl Check for "pcap_datalink_name_to_val()", and use a substitute
+dnl version if it's not present.  If it is present, check for
+dnl "pcap_datalink_val_to_description()", and if we don't have it,
+dnl use a substitute version.
 dnl
 AC_CHECK_FUNC(pcap_datalink_name_to_val,
 	[

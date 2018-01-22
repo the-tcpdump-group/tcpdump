@@ -343,22 +343,37 @@ include_directories(${PCAP_INCLUDE_DIR})
 cmake_push_check_state()
 set(CMAKE_REQUIRED_LIBRARIES ${PCAP_LIBRARY})
 
+#
+# Check for "pcap_list_datalinks()" and use a substitute version if
+# it's not present.  If it is present, check for "pcap_free_datalinks()";
+# if it's not present, we don't replace it for now.  (We could do so
+# on UN*X, but not on Windows, where hilarity ensues if a program
+# built with one version of the MSVC support library tries to free
+# something allocated by a library built with another version of
+# the MSVC support library.)
+#
 check_function_exists(pcap_list_datalinks HAVE_PCAP_LIST_DATALINKS)
 if(HAVE_PCAP_LIST_DATALINKS)
     check_function_exists(pcap_free_datalinks HAVE_PCAP_FREE_DATALINKS)
-else(HAVE_PCAP_LIST_DATALINKS)
-    # XXX TODO - get our version of pcap_list_datalinks() and pcap_free_datalinks
 endif(HAVE_PCAP_LIST_DATALINKS)
-check_function_exists(pcap_set_datalink HAVE_PCAP_SET_DATALINK)
+
+#
+# Check for "pcap_datalink_name_to_val()", and use a substitute
+# version if it's not present.  If it is present, check for
+# "pcap_datalink_val_to_description()", and if we don't have it,
+# use a substitute version.
+#
 check_function_exists(pcap_datalink_name_to_val HAVE_PCAP_DATALINK_NAME_TO_VAL)
 if(HAVE_PCAP_DATALINK_NAME_TO_VAL)
     check_function_exists(pcap_datalink_val_to_description HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION)
-    if(NOT HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION)
-        # XXX TODO - get our version of pcap_datalink_val_to_description()
-    endif(NOT HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION)
-else(HAVE_PCAP_DATALINK_NAME_TO_VAL)
-    # XXX TODO - get our version of pcap_datalink_name_to_val() etc.
 endif(HAVE_PCAP_DATALINK_NAME_TO_VAL)
+
+#
+# Check for "pcap_set_datalink()"; you can't substitute for it if
+# it's absent (it has hooks into libpcap), so just define the
+# HAVE_ value if it's there.
+#
+check_function_exists(pcap_set_datalink HAVE_PCAP_SET_DATALINK)
 
 #
 # Check for "pcap_breakloop()"; you can't substitute for it if
@@ -639,6 +654,14 @@ endif(NOT HAVE_BPF_DUMP)
 if(NOT HAVE_PCAP_DUMP_FTELL)
     set(TCPDUMP_SOURCE_LIST_C ${TCPDUMP_SOURCE_LIST_C} missing/pcap_dump_ftell.c)
 endif(NOT HAVE_PCAP_DUMP_FTELL)
+
+if(NOT HAVE_PCAP_LIST_DATALINKS)
+    set(TCPDUMP_SOURCE_LIST_C ${TCPDUMP_SOURCE_LIST_C} missing/datalinks.c)
+endif(NOT HAVE_PCAP_LIST_DATALINKS)
+
+if((NOT HAVE_PCAP_DATALINK_NAME_TO_VAL) OR (NOT HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION))
+    set(TCPDUMP_SOURCE_LIST_C ${TCPDUMP_SOURCE_LIST_C} missing/dlnames.c)
+endif((NOT HAVE_PCAP_DATALINK_NAME_TO_VAL) OR (NOT HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION))
 
 set(PROJECT_SOURCE_LIST_C ${NETDISSECT_SOURCE_LIST_C} ${TCPDUMP_SOURCE_LIST_C})
 
