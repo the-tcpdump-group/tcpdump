@@ -5959,16 +5959,6 @@ esac
 
 fi
 
-for ac_func in pcap_set_datalink
-do :
-  ac_fn_c_check_func "$LINENO" "pcap_set_datalink" "ac_cv_func_pcap_set_datalink"
-if test "x$ac_cv_func_pcap_set_datalink" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_PCAP_SET_DATALINK 1
-_ACEOF
-
-fi
-done
 
 ac_fn_c_check_func "$LINENO" "pcap_datalink_name_to_val" "ac_cv_func_pcap_datalink_name_to_val"
 if test "x$ac_cv_func_pcap_datalink_name_to_val" = xyes; then :
@@ -6003,6 +5993,18 @@ esac
 
 
 fi
+
+
+for ac_func in pcap_set_datalink
+do :
+  ac_fn_c_check_func "$LINENO" "pcap_set_datalink" "ac_cv_func_pcap_set_datalink"
+if test "x$ac_cv_func_pcap_set_datalink" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PCAP_SET_DATALINK 1
+_ACEOF
+
+fi
+done
 
 
 for ac_func in pcap_breakloop

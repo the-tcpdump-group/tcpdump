@@ -567,9 +567,8 @@ don't.])
 fi
 
 dnl
-dnl Check for "pcap_list_datalinks()", "pcap_set_datalink()",
-dnl and "pcap_datalink_name_to_val()", and use substitute versions
-dnl if they're not present.
+dnl Check for "pcap_list_datalinks()" and use a substitute version
+dnl if it's not present.
 dnl
 AC_CHECK_FUNC(pcap_list_datalinks,
 	[
@@ -580,7 +579,11 @@ AC_CHECK_FUNC(pcap_list_datalinks,
 	[
 	    AC_LIBOBJ(datalinks)
 	])
-AC_CHECK_FUNCS(pcap_set_datalink)
+
+dnl
+dnl Check for "pcap_datalink_name_to_val()", and use a substitute version
+dnl if it's not present.
+dnl
 AC_CHECK_FUNC(pcap_datalink_name_to_val,
 	[
 	    AC_DEFINE(HAVE_PCAP_DATALINK_NAME_TO_VAL, 1,
@@ -595,6 +598,13 @@ AC_CHECK_FUNC(pcap_datalink_name_to_val,
 	[
 	    AC_LIBOBJ(dlnames)
 	])
+
+dnl
+dnl Check for "pcap_set_datalink()"; you can't substitute for it if
+dnl it's absent (it has hooks into libpcap), so just define the
+dnl HAVE_ value if it's there.
+dnl
+AC_CHECK_FUNCS(pcap_set_datalink)
 
 dnl
 dnl Check for "pcap_breakloop()"; you can't substitute for it if
