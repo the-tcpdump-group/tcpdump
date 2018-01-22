@@ -515,7 +515,7 @@ ospf_print_lshdr(netdissect_options *ndo,
         u_int ls_type;
         u_int ls_length;
 
-        ND_TCHECK(lshp->ls_length);
+        ND_TCHECK_2(lshp->ls_length);
         ls_length = EXTRACT_BE_U_2(lshp->ls_length);
         if (ls_length < sizeof(struct lsa_hdr)) {
                 ND_PRINT("\n\t    Bogus length %u < header (%lu)", ls_length,
@@ -523,14 +523,14 @@ ospf_print_lshdr(netdissect_options *ndo,
                 return(-1);
         }
 
-        ND_TCHECK(lshp->ls_seq); /* XXX - ls_length check checked this */
+        ND_TCHECK_4(lshp->ls_seq); /* XXX - ls_length check checked this */
         ND_PRINT("\n\t  Advertising Router %s, seq 0x%08x, age %us, length %u",
                   ipaddr_string(ndo, &lshp->ls_router),
                   EXTRACT_BE_U_4(lshp->ls_seq),
                   EXTRACT_BE_U_2(lshp->ls_age),
                   ls_length - (u_int)sizeof(struct lsa_hdr));
 
-        ND_TCHECK(lshp->ls_type); /* XXX - ls_length check checked this */
+        ND_TCHECK_1(lshp->ls_type); /* XXX - ls_length check checked this */
         ls_type = EXTRACT_U_1(lshp->ls_type);
         switch (ls_type) {
         /* the LSA header for opaque LSAs was slightly changed */
@@ -559,7 +559,7 @@ ospf_print_lshdr(netdissect_options *ndo,
             break;
         }
 
-        ND_TCHECK(lshp->ls_options); /* XXX - ls_length check checked this */
+        ND_TCHECK_1(lshp->ls_options); /* XXX - ls_length check checked this */
         ND_PRINT("\n\t    Options: [%s]", bittok2str(ospf_option_values, "none", EXTRACT_U_1(lshp->ls_options)));
 
         return (ls_length);
@@ -638,11 +638,11 @@ ospf_print_lsa(netdissect_options *ndo,
 	switch (EXTRACT_U_1(lsap->ls_hdr.ls_type)) {
 
 	case LS_TYPE_ROUTER:
-		ND_TCHECK(lsap->lsa_un.un_rla.rla_flags);
+		ND_TCHECK_1(lsap->lsa_un.un_rla.rla_flags);
 		ND_PRINT("\n\t    Router LSA Options: [%s]",
 		          bittok2str(ospf_rla_flag_values, "none", EXTRACT_U_1(lsap->lsa_un.un_rla.rla_flags)));
 
-		ND_TCHECK(lsap->lsa_un.un_rla.rla_count);
+		ND_TCHECK_2(lsap->lsa_un.un_rla.rla_count);
 		j = EXTRACT_BE_U_2(lsap->lsa_un.un_rla.rla_count);
 		ND_TCHECK(lsap->lsa_un.un_rla.rla_link);
 		rlp = lsap->lsa_un.un_rla.rla_link;
@@ -689,7 +689,7 @@ ospf_print_lsa(netdissect_options *ndo,
 		break;
 
 	case LS_TYPE_NETWORK:
-		ND_TCHECK(lsap->lsa_un.un_nla.nla_mask);
+		ND_TCHECK_4(&lsap->lsa_un.un_nla.nla_mask);
 		ND_PRINT("\n\t    Mask %s\n\t    Connected Routers:",
 		    ipaddr_string(ndo, &lsap->lsa_un.un_nla.nla_mask));
 		ap = lsap->lsa_un.un_nla.nla_router;
@@ -701,7 +701,7 @@ ospf_print_lsa(netdissect_options *ndo,
 		break;
 
 	case LS_TYPE_SUM_IP:
-		ND_TCHECK(lsap->lsa_un.un_nla.nla_mask);
+		ND_TCHECK_4(&lsap->lsa_un.un_nla.nla_mask);
 		ND_PRINT("\n\t    Mask %s",
 		    ipaddr_string(ndo, &lsap->lsa_un.un_sla.sla_mask));
 		ND_TCHECK(lsap->lsa_un.un_sla.sla_tosmetric);
@@ -739,7 +739,7 @@ ospf_print_lsa(netdissect_options *ndo,
 
 	case LS_TYPE_ASE:
         case LS_TYPE_NSSA: /* fall through - those LSAs share the same format */
-		ND_TCHECK(lsap->lsa_un.un_nla.nla_mask);
+		ND_TCHECK_4(&lsap->lsa_un.un_nla.nla_mask);
 		ND_PRINT("\n\t    Mask %s",
 		    ipaddr_string(ndo, &lsap->lsa_un.un_asla.asla_mask));
 
@@ -748,7 +748,7 @@ ospf_print_lsa(netdissect_options *ndo,
 		while ((const u_char *)almp < ls_end) {
 			uint32_t ul;
 
-			ND_TCHECK(almp->asla_tosmetric);
+			ND_TCHECK_4(almp->asla_tosmetric);
 			ul = EXTRACT_BE_U_4(almp->asla_tosmetric);
                         topology = ((ul & ASLA_MASK_TOS) >> ASLA_SHIFT_TOS);
 			ND_PRINT("\n\t\ttopology %s (%u), type %u, metric",
@@ -760,11 +760,11 @@ ospf_print_lsa(netdissect_options *ndo,
 			else
 				ND_PRINT(" %u", (ul & ASLA_MASK_METRIC));
 
-			ND_TCHECK(almp->asla_forward);
+			ND_TCHECK_4(&almp->asla_forward);
 			if (almp->asla_forward.s_addr) {
 				ND_PRINT(", forward %s", ipaddr_string(ndo, &almp->asla_forward));
 			}
-			ND_TCHECK(almp->asla_tag);
+			ND_TCHECK_4(&almp->asla_tag);
 			if (almp->asla_tag.s_addr) {
 				ND_PRINT(", tag %s", ipaddr_string(ndo, &almp->asla_tag));
 			}
@@ -776,7 +776,7 @@ ospf_print_lsa(netdissect_options *ndo,
 		/* Multicast extensions as of 23 July 1991 */
 		mcp = lsap->lsa_un.un_mcla;
 		while ((const u_char *)mcp < ls_end) {
-			ND_TCHECK(mcp->mcla_vid);
+			ND_TCHECK_4(&mcp->mcla_vid);
 			switch (EXTRACT_BE_U_4(mcp->mcla_vtype)) {
 
 			case MCLA_VERTEX_ROUTER:
@@ -1114,7 +1114,7 @@ ospf_print(netdissect_options *ndo,
 	op = (const struct ospfhdr *)bp;
 
 	/* XXX Before we do anything else, strip off the MD5 trailer */
-	ND_TCHECK(op->ospf_authtype);
+	ND_TCHECK_2(op->ospf_authtype);
 	if (EXTRACT_BE_U_2(op->ospf_authtype) == OSPF_AUTH_MD5) {
 		length -= OSPF_AUTH_MD5_LEN;
 		ndo->ndo_snapend -= OSPF_AUTH_MD5_LEN;
@@ -1122,7 +1122,7 @@ ospf_print(netdissect_options *ndo,
 
 	/* If the type is valid translate it, or just print the type */
 	/* value.  If it's not valid, say so and return */
-	ND_TCHECK(op->ospf_type);
+	ND_TCHECK_1(op->ospf_type);
 	cp = tok2str(type2str, "unknown LS-type %u", EXTRACT_U_1(op->ospf_type));
 	ND_PRINT("OSPFv%u, %s, length %u", EXTRACT_U_1(op->ospf_version), cp, length);
 	if (*cp == 'u')
@@ -1132,7 +1132,7 @@ ospf_print(netdissect_options *ndo,
 		return;
 	}
 
-	ND_TCHECK(op->ospf_len);
+	ND_TCHECK_2(op->ospf_len);
 	if (length != EXTRACT_BE_U_2(op->ospf_len)) {
 		ND_PRINT(" [len %u]", EXTRACT_BE_U_2(op->ospf_len));
 	}
@@ -1143,10 +1143,10 @@ ospf_print(netdissect_options *ndo,
 		dataend = bp + length;
 	}
 
-	ND_TCHECK(op->ospf_routerid);
+	ND_TCHECK_4(&op->ospf_routerid);
 	ND_PRINT("\n\tRouter-ID %s", ipaddr_string(ndo, &op->ospf_routerid));
 
-	ND_TCHECK(op->ospf_areaid);
+	ND_TCHECK_4(&op->ospf_areaid);
 	if (op->ospf_areaid.s_addr != 0)
 		ND_PRINT(", Area %s", ipaddr_string(ndo, &op->ospf_areaid));
 	else

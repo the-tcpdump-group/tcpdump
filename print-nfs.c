@@ -329,7 +329,7 @@ nfsreply_print(netdissect_options *ndo,
 	nfserr = 0;		/* assume no error */
 	rp = (const struct sunrpc_msg *)bp;
 
-	ND_TCHECK(rp->rm_xid);
+	ND_TCHECK_4(rp->rm_xid);
 	if (!ndo->ndo_nflag) {
 		strlcpy(srcid, "nfs", sizeof(srcid));
 		snprintf(dstid, sizeof(dstid), "%u",

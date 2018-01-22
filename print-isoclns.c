@@ -2889,7 +2889,7 @@ isis_print(netdissect_options *ndo,
 		tmp--;
 	    }
 	    if(tmp>sizeof(tlv_ptp_adj->extd_local_circuit_id)) {
-		ND_TCHECK(tlv_ptp_adj->extd_local_circuit_id);
+		ND_TCHECK_4(tlv_ptp_adj->extd_local_circuit_id);
 		ND_PRINT("\n\t      Extended Local circuit-ID: 0x%08x",
 		       EXTRACT_BE_U_4(tlv_ptp_adj->extd_local_circuit_id));
 		tmp-=sizeof(tlv_ptp_adj->extd_local_circuit_id);
@@ -2901,7 +2901,7 @@ isis_print(netdissect_options *ndo,
 		tmp-=SYSTEM_ID_LEN;
 	    }
 	    if(tmp>=sizeof(tlv_ptp_adj->neighbor_extd_local_circuit_id)) {
-		ND_TCHECK(tlv_ptp_adj->neighbor_extd_local_circuit_id);
+		ND_TCHECK_4(tlv_ptp_adj->neighbor_extd_local_circuit_id);
 		ND_PRINT("\n\t      Neighbor Extended Local circuit-ID: 0x%08x",
 		       EXTRACT_BE_U_4(tlv_ptp_adj->neighbor_extd_local_circuit_id));
 	    }

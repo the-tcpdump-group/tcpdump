@@ -1043,7 +1043,7 @@ icmp6_print(netdissect_options *ndo,
 		uint16_t sum, udp_sum;
 
 		if (ND_TTEST_LEN(bp, length)) {
-			ND_TCHECK(dp->icmp6_cksum);
+			ND_TCHECK_2(dp->icmp6_cksum);
 			udp_sum = EXTRACT_BE_U_2(dp->icmp6_cksum);
 			sum = icmp6_cksum(ndo, ip, dp, length);
 			if (sum != 0)
@@ -1074,7 +1074,7 @@ icmp6_print(netdissect_options *ndo,
 
 	switch (icmp6_type) {
 	case ICMP6_DST_UNREACH:
-		ND_TCHECK(oip->ip6_dst);
+		ND_TCHECK_16(&oip->ip6_dst);
                 ND_PRINT(", %s", tok2str(icmp6_dst_unreach_code_values,"unknown unreach code (%u)",icmp6_code));
 		switch (icmp6_code) {
 
@@ -1125,7 +1125,7 @@ icmp6_print(netdissect_options *ndo,
 		ND_PRINT(", mtu %u", EXTRACT_BE_U_4(dp->icmp6_mtu));
 		break;
 	case ICMP6_TIME_EXCEEDED:
-		ND_TCHECK(oip->ip6_dst);
+		ND_TCHECK_16(&oip->ip6_dst);
 		switch (icmp6_code) {
 		case ICMP6_TIME_EXCEED_TRANSIT:
 			ND_PRINT(" for %s",
@@ -1140,7 +1140,7 @@ icmp6_print(netdissect_options *ndo,
 		}
 		break;
 	case ICMP6_PARAM_PROB:
-		ND_TCHECK(oip->ip6_dst);
+		ND_TCHECK_16(&oip->ip6_dst);
 		switch (icmp6_code) {
 		case ICMP6_PARAMPROB_HEADER:
                         ND_PRINT(", erroneous - octet %u", EXTRACT_BE_U_4(dp->icmp6_pptr));
@@ -1191,7 +1191,7 @@ icmp6_print(netdissect_options *ndo,
 			const struct nd_router_advert *p;
 
 			p = (const struct nd_router_advert *)dp;
-			ND_TCHECK(p->nd_ra_retransmit);
+			ND_TCHECK_4(p->nd_ra_retransmit);
 			ND_PRINT("\n\thop limit %u, Flags [%s]"
                                   ", pref %s, router lifetime %us, reachable time %us, retrans time %us",
                                   EXTRACT_U_1(p->nd_ra_curhoplimit),
@@ -1209,7 +1209,7 @@ icmp6_print(netdissect_options *ndo,
 	    {
 		const struct nd_neighbor_solicit *p;
 		p = (const struct nd_neighbor_solicit *)dp;
-		ND_TCHECK(p->nd_ns_target);
+		ND_TCHECK_16(&p->nd_ns_target);
 		ND_PRINT(", who has %s", ip6addr_string(ndo, &p->nd_ns_target));
 		if (ndo->ndo_vflag) {
 #define NDSOLLEN 24
@@ -1223,7 +1223,7 @@ icmp6_print(netdissect_options *ndo,
 		const struct nd_neighbor_advert *p;
 
 		p = (const struct nd_neighbor_advert *)dp;
-		ND_TCHECK(p->nd_na_target);
+		ND_TCHECK_16(&p->nd_na_target);
 		ND_PRINT(", tgt is %s",
                           ip6addr_string(ndo, &p->nd_na_target));
 		if (ndo->ndo_vflag) {
@@ -1450,7 +1450,7 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			break;
 		case ND_OPT_PREFIX_INFORMATION:
 			opp = (const struct nd_opt_prefix_info *)op;
-			ND_TCHECK(opp->nd_opt_pi_prefix);
+			ND_TCHECK_16(&opp->nd_opt_pi_prefix);
                         ND_PRINT("%s/%u%s, Flags [%s], valid time %s",
                                   ip6addr_string(ndo, &opp->nd_opt_pi_prefix),
                                   EXTRACT_U_1(opp->nd_opt_pi_prefix_len),
@@ -1465,7 +1465,7 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			break;
 		case ND_OPT_MTU:
 			opm = (const struct nd_opt_mtu *)op;
-			ND_TCHECK(opm->nd_opt_mtu_mtu);
+			ND_TCHECK_4(opm->nd_opt_mtu_mtu);
 			ND_PRINT(" %u%s",
                                EXTRACT_BE_U_4(opm->nd_opt_mtu_mtu),
                                (opt_len != 1) ? "bad option length" : "" );
@@ -1476,7 +1476,7 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			ND_PRINT(" lifetime %us,",
                                   EXTRACT_BE_U_4(oprd->nd_opt_rdnss_lifetime));
 			for (i = 0; i < l; i++) {
-				ND_TCHECK(oprd->nd_opt_rdnss_addr[i]);
+				ND_TCHECK_16(&oprd->nd_opt_rdnss_addr[i]);
 				ND_PRINT(" addr: %s",
                                           ip6addr_string(ndo, &oprd->nd_opt_rdnss_addr[i]));
 			}
@@ -1495,19 +1495,19 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			break;
 		case ND_OPT_ADVINTERVAL:
 			opa = (const struct nd_opt_advinterval *)op;
-			ND_TCHECK(opa->nd_opt_adv_interval);
+			ND_TCHECK_4(opa->nd_opt_adv_interval);
 			ND_PRINT(" %ums", EXTRACT_BE_U_4(opa->nd_opt_adv_interval));
 			break;
                 case ND_OPT_HOMEAGENT_INFO:
 			oph = (const struct nd_opt_homeagent_info *)op;
-			ND_TCHECK(oph->nd_opt_hai_lifetime);
+			ND_TCHECK_2(oph->nd_opt_hai_lifetime);
 			ND_PRINT(" preference %u, lifetime %u",
                                   EXTRACT_BE_U_2(oph->nd_opt_hai_preference),
                                   EXTRACT_BE_U_2(oph->nd_opt_hai_lifetime));
 			break;
 		case ND_OPT_ROUTE_INFO:
 			opri = (const struct nd_opt_route_info *)op;
-			ND_TCHECK(opri->nd_opt_rti_lifetime);
+			ND_TCHECK_4(opri->nd_opt_rti_lifetime);
 			memset(&in6, 0, sizeof(in6));
 			in6p = (const struct in6_addr *)(opri + 1);
 			switch (opt_len) {
@@ -1994,7 +1994,7 @@ icmp6_rrenum_print(netdissect_options *ndo, const u_char *bp, const u_char *ep)
 	rr6 = (const struct icmp6_router_renum *)bp;
 	cp = (const char *)(rr6 + 1);
 
-	ND_TCHECK(rr6->rr_reserved);
+	ND_TCHECK_4(rr6->rr_reserved);
 	switch (EXTRACT_U_1(rr6->rr_code)) {
 	case ICMP6_ROUTER_RENUMBERING_COMMAND:
 		ND_PRINT("router renum: command");
@@ -2036,7 +2036,7 @@ icmp6_rrenum_print(netdissect_options *ndo, const u_char *bp, const u_char *ep)
 		match = (const struct rr_pco_match *)cp;
 		cp = (const char *)(match + 1);
 
-		ND_TCHECK(match->rpm_prefix);
+		ND_TCHECK_16(&match->rpm_prefix);
 
 		if (ndo->ndo_vflag > 1)
 			ND_PRINT("\n\t");
@@ -2070,7 +2070,7 @@ icmp6_rrenum_print(netdissect_options *ndo, const u_char *bp, const u_char *ep)
 			use = (const struct rr_pco_use *)cp;
 			cp = (const char *)(use + 1);
 
-			ND_TCHECK(use->rpu_prefix);
+			ND_TCHECK_16(&use->rpu_prefix);
 
 			if (ndo->ndo_vflag > 1)
 				ND_PRINT("\n\t");
