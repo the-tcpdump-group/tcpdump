@@ -92,7 +92,7 @@ script:
   - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then echo '$ make install [...]' && echo -n travis_fold:start:script.make_install; fi
   - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then PATH=$PATH make install; fi
   - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then echo -n travis_fold:end:script.make_install; fi
-  - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then make check; fi
+  - if [ "$COVERITY_SCAN_BRANCH" != 1 -a "$CMAKE" = no ]; then make check; fi
   - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then ./tcpdump -D; fi
   - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then ./tcpdump -J; fi
   - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then ./tcpdump --version; fi
