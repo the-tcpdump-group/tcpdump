@@ -247,6 +247,12 @@ check_include_file(bitypes.h HAVE_SYS_BITYPES_H)
 check_include_file(limits.h HAVE_LIMITS_H)
 
 #
+# Check whether we have pcap/pcap-inttypes.h.
+# If we do, we use that to get the C99 types defined.
+#
+check_include_file(pcap/pcap-inttypes.h HAVE_PCAP_PCAP_INTTYPES_H)
+
+#
 # Check for some headers introduced in later versions of libpcap
 # and used by some printers.
 #
