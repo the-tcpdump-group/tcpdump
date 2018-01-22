@@ -85,7 +85,7 @@ struct ip6_hdr {
 	} ip6_ctlun;
 	struct in6_addr ip6_src;	/* source address */
 	struct in6_addr ip6_dst;	/* destination address */
-} UNALIGNED;
+} ND_UNALIGNED;
 
 #define ip6_vfc		ip6_ctlun.ip6_un2_vfc
 #define IP6_VERSION(ip6_hdr)	((EXTRACT_U_1((ip6_hdr)->ip6_vfc) & 0xf0) >> 4)
@@ -111,21 +111,21 @@ struct ip6_hdr {
 struct	ip6_ext {
 	nd_uint8_t ip6e_nxt;
 	nd_uint8_t ip6e_len;
-} UNALIGNED;
+} ND_UNALIGNED;
 
 /* Hop-by-Hop options header */
 struct ip6_hbh {
 	nd_uint8_t ip6h_nxt;	/* next header */
 	nd_uint8_t ip6h_len;	/* length in units of 8 octets */
 	/* followed by options */
-} UNALIGNED;
+} ND_UNALIGNED;
 
 /* Destination options header */
 struct ip6_dest {
 	nd_uint8_t ip6d_nxt;	/* next header */
 	nd_uint8_t ip6d_len;	/* length in units of 8 octets */
 	/* followed by options */
-} UNALIGNED;
+} ND_UNALIGNED;
 
 /* http://www.iana.org/assignments/ipv6-parameters/ipv6-parameters.xhtml */
 
@@ -170,7 +170,7 @@ struct ip6_rthdr {
 	nd_uint8_t  ip6r_type;		/* routing type */
 	nd_uint8_t  ip6r_segleft;	/* segments left */
 	/* followed by routing type specific data */
-} UNALIGNED;
+} ND_UNALIGNED;
 
 #define IPV6_RTHDR_TYPE_0 0
 #define IPV6_RTHDR_TYPE_2 2
@@ -208,7 +208,7 @@ struct ip6_frag {
 	nd_uint8_t  ip6f_reserved;	/* reserved field */
 	nd_uint16_t ip6f_offlg;		/* offset, reserved, and flag */
 	nd_uint32_t ip6f_ident;		/* identification */
-} UNALIGNED;
+} ND_UNALIGNED;
 
 #define IP6F_OFF_MASK		0xfff8	/* mask out offset from ip6f_offlg */
 #define IP6F_RESERVED_MASK	0x0006	/* reserved bits in ip6f_offlg */

@@ -30,10 +30,6 @@
 #endif
 #include <sys/types.h>
 
-#ifndef HAVE___ATTRIBUTE__
-#define __attribute__(x)
-#endif
-
 /*
  * Data types corresponding to multi-byte integral values within data
  * structures.  These are defined as arrays of octets, so that they're

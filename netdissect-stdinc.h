@@ -41,6 +41,10 @@
 
 #include <errno.h>
 
+#include "compiler-tests.h"
+
+#include "varattrs.h"
+
 /*
  * Get the C99 types, and the PRI[doux]64 format strings, defined.
  */
@@ -273,25 +277,16 @@ typedef char* caddr_t;
 
 #endif /* _WIN32 */
 
-#ifndef HAVE___ATTRIBUTE__
-#define __attribute__(x)
-#endif
-
 /*
  * Used to declare a structure unaligned, so that the C compiler,
  * if necessary, generates code that doesn't assume alignment.
  * This is required because there is no guarantee that the packet
  * data we get from libpcap/WinPcap is properly aligned.
  *
- * This assumes that, for all compilers that support __attribute__:
- *
- *	1) they support __attribute__((packed));
- *
- *	2) for all instruction set architectures requiring strict
- *	   alignment, declaring a structure with that attribute
- *	   causes the compiler to generate code that handles
- *	   misaligned 2-byte, 4-byte, and 8-byte integral
- *	   quantities.
+ * This assumes that, for all compilers that support __attribute__((packed)),
+ * for all instruction set architectures requiring strict alignment, declaring
+ * a structure with that attribute causes the compiler to generate code that
+ * handles misaligned 2-byte, 4-byte, and 8-byte integral quantities.
  *
  * It does not (yet) handle compilers where you can get the compiler
  * to generate code of that sort by some other means.
@@ -307,11 +302,28 @@ typedef char* caddr_t;
  *
  * Note: this also requires that padding be put into the structure,
  * at least for compilers where it's implemented as __attribute__((packed)).
+ *
+ * XXX - now that we're using nd_ types that are just arrays of bytes, is
+ * this still necessary?  Are there any compilers that align structures,
+ * none of whose members require more than byte alignment, on more than
+ * one-byte boundaries, and assume a structure is aligned on such a
+ * boundary?  (I have vague memories of either m68k or ARM compilers
+ * aligning on at least 2-byte boundaries.)
  */
-#if !(defined(_MSC_VER) && defined(UNALIGNED))
-/* MSVC may have its own macro defined with the same name and purpose. */
-#undef UNALIGNED
-#define UNALIGNED	__attribute__((packed))
+#if ND_IS_AT_LEAST_GNUC_VERSION(2,0) || \
+    ND_IS_AT_LEAST_XL_C_VERSION(6,0)
+  /*
+   * GCC 2.0 or later, or a compiler that claims to be GCC 2.0 or later,
+   * or IBM XL C 6.0 or later.
+   *
+   * Use __attribute__((packed)).
+   */
+  #define ND_UNALIGNED	__attribute__((packed))
+#else
+  /*
+   * Nothing.
+   */
+  #define ND_UNALIGNED
 #endif
 
 /*
@@ -477,10 +489,18 @@ struct in6_addr {
  */
 #include "funcattrs.h"
 
-#ifdef __ATTRIBUTE___FALLTHROUGH_OK
+/*
+ * Statement attributes, for various compilers.
+ *
+ * This was introduced sufficiently recently that compilers implementing
+ * it also implement __has_attribute() (for example, GCC 5.0 and later
+ * have __has_attribute(), and the "fallthrough" attribute was introduced
+ * in GCC 7).
+ */
+#if __has_attribute(fallthrough)
 #  define ND_FALL_THROUGH __attribute__ ((fallthrough))
 #else
 #  define ND_FALL_THROUGH
-#endif /* __ATTRIBUTE___FALLTHROUGH_OK */
+#endif /*  __has_attribute(fallthrough) */
 
 #endif /* netdissect_stdinc_h */

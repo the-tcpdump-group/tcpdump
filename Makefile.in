@@ -258,6 +258,7 @@ HDR = \
 	ascii_strcasecmp.h \
 	atm.h \
 	chdlc.h \
+	compiler-tests.h \
 	cpack.h \
 	ethertype.h \
 	extract.h \
@@ -277,6 +278,7 @@ HDR = \
 	mpls.h \
 	nameser.h \
 	netdissect.h \
+	netdissect-stdinc.h \
 	nfs.h \
 	nfsfh.h \
 	nlpid.h \
@@ -293,9 +295,9 @@ HDR = \
 	smb.h \
 	strtoaddr.h \
 	tcp.h \
-	netdissect-stdinc.h \
 	timeval-operations.h \
-	udp.h
+	udp.h \
+	varattrs.h
 
 TAGHDR = \
 	/usr/include/arpa/tftp.h \

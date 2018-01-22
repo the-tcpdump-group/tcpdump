@@ -250,9 +250,6 @@
 /* define if libpcap has yydebug */
 #undef HAVE_YYDEBUG
 
-/* define if your compiler has __attribute__ */
-#undef HAVE___ATTRIBUTE__
-
 /* Define to 1 if netenet/dnetdb.h declares `dnet_htoa' */
 #undef NETDNET_DNETDB_H_DECLARES_DNET_HTOA
 
@@ -297,10 +294,6 @@
 
 /* define on AIX to get certain functions */
 #undef _SUN
-
-/* define if your compiler allows __attribute__((fallthrough)) without a
-   warning */
-#undef __ATTRIBUTE___FALLTHROUGH_OK
 
 /* to handle Ultrix compilers that don't support const in prototypes */
 #undef const

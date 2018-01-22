@@ -23,11 +23,6 @@ AC_LBL_C_INIT_BEFORE_CC(V_INCLS)
 AC_PROG_CC_C99
 AC_LBL_C_INIT(V_CCOPT, V_INCLS)
 AC_LBL_C_INLINE
-AC_C___ATTRIBUTE__
-if test "$ac_cv___attribute__" = "yes"; then
-	AC_C___ATTRIBUTE___UNUSED
-	AC_C___ATTRIBUTE___FALLTHROUGH
-fi
 
 AC_CHECK_HEADERS(fcntl.h rpc/rpc.h rpc/rpcent.h)
 AC_CHECK_HEADERS(net/pfvar.h, , , [#include <sys/types.h>

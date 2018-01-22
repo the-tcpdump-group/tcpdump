@@ -47,7 +47,7 @@ struct tcphdr {
 	nd_uint16_t	th_win;			/* window */
 	nd_uint16_t	th_sum;			/* checksum */
 	nd_uint16_t	th_urp;			/* urgent pointer */
-} UNALIGNED;
+} ND_UNALIGNED;
 
 #define TH_OFF(th)	((EXTRACT_U_1((th)->th_offx2) & 0xf0) >> 4)
 

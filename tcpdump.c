@@ -25,12 +25,6 @@
  *	Seth Webster <swebster@sst.ll.mit.edu>
  */
 
-#ifndef lint
-static const char copyright[] _U_ =
-    "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
-The Regents of the University of California.  All rights reserved.\n";
-#endif
-
 /*
  * tcpdump - dump traffic on a network
  *
@@ -56,6 +50,16 @@ The Regents of the University of California.  All rights reserved.\n";
 #endif
 
 #include "netdissect-stdinc.h"
+
+/*
+ * This must appear after including netdissect-stdinc.h, so that _U_ is
+ * defined.
+ */
+#ifndef lint
+static const char copyright[] _U_ =
+    "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
+The Regents of the University of California.  All rights reserved.\n";
+#endif
 
 #include <sys/stat.h>
 

@@ -133,15 +133,16 @@ EXTRACT_IPV4_TO_HOST_ORDER(const void *p)
 {
 	return ((uint32_t)ntohl(*(const uint32_t *)(p)));
 }
-#elif defined(__GNUC__) && defined(HAVE___ATTRIBUTE__) && \
+#elif ND_IS_AT_LEAST_GNUC_VERSION(2,0) && \
     (defined(__alpha) || defined(__alpha__) || \
      defined(__mips) || defined(__mips__))
 /*
  * This is MIPS or Alpha, which don't natively handle unaligned loads,
  * but which have instructions that can help when doing unaligned
- * loads, and this is a GCC-compatible compiler and we have __attribute__,
- * which we assume that mean we have __attribute__((packed)), which
- * we can use to convince the compiler to generate those instructions.
+ * loads, and this is GCC 2.0 or later or a compiler that claims to
+ * be GCC 2.0 or later, which we assume that mean we have
+ * __attribute__((packed)), which we can use to convince the compiler
+ * to generate those instructions.
  *
  * Declare packed structures containing a uint16_t and a uint32_t,
  * cast the pointer to point to one of those, and fetch through it;

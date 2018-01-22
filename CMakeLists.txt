@@ -63,11 +63,6 @@ include_directories(
 if(MSVC)
     add_definitions(-D__STDC__)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-    add_definitions("-D_U_=")
-elseif(CMAKE_COMPILER_IS_GNUCXX)
-    add_definitions("-D_U_=__attribute__((unused))")
-else(MSVC)
-    add_definitions("-D_U_=")
 endif(MSVC)
 
 if(MSVC)

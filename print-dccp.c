@@ -51,7 +51,7 @@ struct dccp_hdr {
 	nd_uint16_t	dccph_checksum;
 	nd_uint8_t	dccph_xtr;
 	nd_uint24_t	dccph_seq;
-} UNALIGNED;
+} ND_UNALIGNED;
 
 /**
  * struct dccp_hdr_ext - generic part of DCCP packet header, with a 48-bit
@@ -76,7 +76,7 @@ struct dccp_hdr_ext {
 	nd_uint8_t	dccph_xtr;
 	nd_uint8_t	reserved;
 	nd_uint48_t	dccph_seq;
-} UNALIGNED;
+} ND_UNALIGNED;
 
 #define DCCPH_CCVAL(dh)	((EXTRACT_U_1((dh)->dccph_ccval_cscov) >> 4) & 0xF)
 #define DCCPH_CSCOV(dh)	(EXTRACT_U_1((dh)->dccph_ccval_cscov) & 0xF)
@@ -91,7 +91,7 @@ struct dccp_hdr_ext {
  */
 struct dccp_hdr_request {
 	nd_uint32_t	dccph_req_service;
-} UNALIGNED;
+} ND_UNALIGNED;
 
 /**
  * struct dccp_hdr_response - Conection initiation response header
@@ -102,7 +102,7 @@ struct dccp_hdr_request {
 struct dccp_hdr_response {
 	nd_uint64_t	dccph_resp_ack;	/* always 8 bytes, first 2 reserved */
 	nd_uint32_t	dccph_resp_service;
-} UNALIGNED;
+} ND_UNALIGNED;
 
 /**
  * struct dccp_hdr_reset - Unconditionally shut down a connection
@@ -116,7 +116,7 @@ struct dccp_hdr_reset {
 	nd_uint8_t	dccph_reset_data1;
 	nd_uint8_t	dccph_reset_data2;
 	nd_uint8_t	dccph_reset_data3;
-} UNALIGNED;
+} ND_UNALIGNED;
 
 enum dccp_pkt_type {
 	DCCP_PKT_REQUEST = 0,

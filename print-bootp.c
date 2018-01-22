@@ -72,7 +72,7 @@ struct bootp {
 	nd_byte		bp_sname[64];	/* server host name */
 	nd_byte		bp_file[128];	/* boot file name */
 	nd_byte		bp_vend[64];	/* vendor-specific area */
-} UNALIGNED;
+} ND_UNALIGNED;
 
 #define BOOTPREPLY	2
 #define BOOTPREQUEST	1
@@ -247,7 +247,7 @@ struct cmu_vend {
 	struct in_addr	v_ins1, v_ins2; /* IEN-116 name servers */
 	struct in_addr	v_ts1, v_ts2;	/* Time servers */
 	nd_byte		v_unused[24];	/* currently unused */
-} UNALIGNED;
+} ND_UNALIGNED;
 
 
 /* v_flags values */
