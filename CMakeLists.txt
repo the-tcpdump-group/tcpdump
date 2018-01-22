@@ -336,10 +336,10 @@ check_function_exists(pcap_breakloop HAVE_PCAP_BREAKLOOP)
 # Check for "pcap_dump_ftell()" and use a substitute version
 # if it's not present.
 #
-check_function_exists(pcap_dump_ftell HAVE_PCAP_DUMPFTELL)
-if(NOT HAVE_PCAP_DUMPFTELL)
+check_function_exists(pcap_dump_ftell HAVE_PCAP_DUMP_FTELL)
+if(NOT HAVE_PCAP_DUMP_FTELL)
     # XXX TODO - get our version of pcap_dump_ftell()
-endif(NOT HAVE_PCAP_DUMPFTELL)
+endif(NOT HAVE_PCAP_DUMP_FTELL)
 
 #
 # Do we have the new open API?  Check for pcap_create, and assume that,
