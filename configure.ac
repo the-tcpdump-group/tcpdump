@@ -428,7 +428,7 @@ AC_INCLUDES_DEFAULT
 	fi
 ])
 
-AC_REPLACE_FUNCS(vfprintf strlcat strlcpy strdup strsep getservent getopt_long)
+AC_REPLACE_FUNCS(strlcat strlcpy strdup strsep getservent getopt_long)
 AC_CHECK_FUNCS(fork vfork strftime)
 AC_CHECK_FUNCS(setlinebuf)
 

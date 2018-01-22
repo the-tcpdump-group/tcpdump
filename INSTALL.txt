@@ -119,5 +119,4 @@ tcpdump.c	- main program
 timeval-operations.h - timeval operations macros
 udp.h		- UDP definitions
 util-print.c	- utility routines for protocol printers
-vfprintf.c	- emulation routine
 win32		- headers and routines for building on Win32 systems
