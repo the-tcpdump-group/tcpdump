@@ -368,13 +368,10 @@ endif(HAVE_PCAP_DATALINK_NAME_TO_VAL)
 check_function_exists(pcap_breakloop HAVE_PCAP_BREAKLOOP)
 
 #
-# Check for "pcap_dump_ftell()" and use a substitute version
+# Check for "pcap_dump_ftell()"; we use a substitute version
 # if it's not present.
 #
 check_function_exists(pcap_dump_ftell HAVE_PCAP_DUMP_FTELL)
-if(NOT HAVE_PCAP_DUMP_FTELL)
-    # XXX TODO - get our version of pcap_dump_ftell()
-endif(NOT HAVE_PCAP_DUMP_FTELL)
 
 #
 # Do we have the new open API?  Check for pcap_create, and assume that,
@@ -639,6 +636,9 @@ set(TCPDUMP_SOURCE_LIST_C tcpdump.c)
 if(NOT HAVE_BPF_DUMP)
     set(TCPDUMP_SOURCE_LIST_C ${TCPDUMP_SOURCE_LIST_C} bpf_dump.c)
 endif(NOT HAVE_BPF_DUMP)
+if(NOT HAVE_PCAP_DUMP_FTELL)
+    set(TCPDUMP_SOURCE_LIST_C ${TCPDUMP_SOURCE_LIST_C} missing/pcap_dump_ftell.c)
+endif(NOT HAVE_PCAP_DUMP_FTELL)
 
 set(PROJECT_SOURCE_LIST_C ${NETDISSECT_SOURCE_LIST_C} ${TCPDUMP_SOURCE_LIST_C})
 
