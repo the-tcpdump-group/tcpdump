@@ -138,8 +138,8 @@ if(HAVE_ETHER_NTOHOST)
     #
     # OK, we have ether_ntohost().  We don't check whether it's buggy,
     # as we assume any system that has CMake is likely to be new enough
-    # that, if it has ether_ntohost(), it's not buggy; we just decide
-    # to use it.
+    # that, if it has ether_ntohost(), whatever bug is checked for in
+    # autotools is fixed; we just decide to use it.
     #
     set(USE_ETHER_NTOHOST TRUE)
 
