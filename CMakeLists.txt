@@ -247,6 +247,19 @@ check_include_file(bitypes.h HAVE_SYS_BITYPES_H)
 check_include_file(limits.h HAVE_LIMITS_H)
 
 #
+# Check for some headers introduced in later versions of libpcap
+# and used by some printers.
+#
+# Those headers might use the {u_}intN_t types, so we must include
+# netdissect-stdinc.h first.
+#
+cmake_push_check_state()
+set(CMAKE_EXTRA_INCLUDE_FILES netdissect-stdinc.h)
+check_include_file(pcap/bluetooth.h HAVE_PCAP_BLUETOOTH_H)
+check_include_file(pcap/nflog.h HAVE_PCAP_NFLOG_H)
+cmake_pop_check_state()
+
+#
 # Functions.
 #
 check_function_exists(strlcat HAVE_STRLCAT)
