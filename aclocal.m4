@@ -593,7 +593,12 @@ AC_DEFUN(AC_LBL_LIBPCAP,
         fi
     else
         #
-        # We found a local libpcap.
+        # We found a local libpcap.  Add it to the dependencies for
+        # tcpdump.
+        #
+        $1=$libpcap
+
+        #
         # Look for its pcap-config script.
         #
         AC_PATH_PROG(PCAP_CONFIG, pcap-config,, $local_pcap_dir)
@@ -618,7 +623,6 @@ AC_DEFUN(AC_LBL_LIBPCAP,
             # It doesn't have a pcap-config script.
             # Make sure it has a pcap.h file.
             #
-            $1=$libpcap
             places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
                 egrep '/libpcap-[[0-9]]*.[[0-9]]*(.[[0-9]]*)?([[ab]][[0-9]]*)?$'`
             places2=`ls .. | sed -e 's,/$,,' -e "s,^,../," | \
