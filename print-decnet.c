@@ -568,7 +568,7 @@ decnet_print(netdissect_options *ndo,
 		ND_PRINT("%s", tstr);
 		return;
 	    }
-	    ND_TCHECK(rhp->rh_long);
+	    ND_TCHECK_SIZE(&rhp->rh_long);
 	    dst =
 		EXTRACT_LE_U_2(rhp->rh_long.lg_dst.dne_remote.dne_nodeaddr);
 	    src =
@@ -578,7 +578,7 @@ decnet_print(netdissect_options *ndo,
 	    nsplen = length - sizeof(struct longhdr);
 	    break;
 	case RMF_SHORT:
-	    ND_TCHECK(rhp->rh_short);
+	    ND_TCHECK_SIZE(&rhp->rh_short);
 	    dst = EXTRACT_LE_U_2(rhp->rh_short.sh_dst);
 	    src = EXTRACT_LE_U_2(rhp->rh_short.sh_src);
 	    hops = (EXTRACT_U_1(rhp->rh_short.sh_visits) & VIS_MASK)+1;
@@ -631,7 +631,7 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 	    ND_PRINT("init ");
 	    if (length < sizeof(struct initmsg))
 		goto trunc;
-	    ND_TCHECK(cmp->cm_init);
+	    ND_TCHECK_SIZE(&cmp->cm_init);
 	    src = EXTRACT_LE_U_2(cmp->cm_init.in_src);
 	    info = EXTRACT_U_1(cmp->cm_init.in_info);
 	    blksize = EXTRACT_LE_U_2(cmp->cm_init.in_blksize);
@@ -649,7 +649,7 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 	    ND_PRINT("verification ");
 	    if (length < sizeof(struct verifmsg))
 		goto trunc;
-	    ND_TCHECK(cmp->cm_ver);
+	    ND_TCHECK_SIZE(&cmp->cm_ver);
 	    src = EXTRACT_LE_U_2(cmp->cm_ver.ve_src);
 	    other = EXTRACT_U_1(cmp->cm_ver.ve_fcnval);
 	    ND_PRINT("src %s fcnval %o", dnaddr_string(ndo, src), other);
@@ -659,7 +659,7 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 	    ND_PRINT("test ");
 	    if (length < sizeof(struct testmsg))
 		goto trunc;
-	    ND_TCHECK(cmp->cm_test);
+	    ND_TCHECK_SIZE(&cmp->cm_test);
 	    src = EXTRACT_LE_U_2(cmp->cm_test.te_src);
 	    other = EXTRACT_U_1(cmp->cm_test.te_data);
 	    ND_PRINT("src %s data %o", dnaddr_string(ndo, src), other);
@@ -669,7 +669,7 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 	    ND_PRINT("lev-1-routing ");
 	    if (length < sizeof(struct l1rout))
 		goto trunc;
-	    ND_TCHECK(cmp->cm_l1rou);
+	    ND_TCHECK_SIZE(&cmp->cm_l1rou);
 	    src = EXTRACT_LE_U_2(cmp->cm_l1rou.r1_src);
 	    ND_PRINT("src %s ", dnaddr_string(ndo, src));
 	    ret = print_l1_routes(ndo, &(rhpx[sizeof(struct l1rout)]),
@@ -679,7 +679,7 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 	    ND_PRINT("lev-2-routing ");
 	    if (length < sizeof(struct l2rout))
 		goto trunc;
-	    ND_TCHECK(cmp->cm_l2rout);
+	    ND_TCHECK_SIZE(&cmp->cm_l2rout);
 	    src = EXTRACT_LE_U_2(cmp->cm_l2rout.r2_src);
 	    ND_PRINT("src %s ", dnaddr_string(ndo, src));
 	    ret = print_l2_routes(ndo, &(rhpx[sizeof(struct l2rout)]),
@@ -689,7 +689,7 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 	    ND_PRINT("router-hello ");
 	    if (length < sizeof(struct rhellomsg))
 		goto trunc;
-	    ND_TCHECK(cmp->cm_rhello);
+	    ND_TCHECK_SIZE(&cmp->cm_rhello);
 	    vers = EXTRACT_U_1(cmp->cm_rhello.rh_vers);
 	    eco = EXTRACT_U_1(cmp->cm_rhello.rh_eco);
 	    ueco = EXTRACT_U_1(cmp->cm_rhello.rh_ueco);
@@ -711,7 +711,7 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 	    ND_PRINT("endnode-hello ");
 	    if (length < sizeof(struct ehellomsg))
 		goto trunc;
-	    ND_TCHECK(cmp->cm_ehello);
+	    ND_TCHECK_SIZE(&cmp->cm_ehello);
 	    vers = EXTRACT_U_1(cmp->cm_ehello.eh_vers);
 	    eco = EXTRACT_U_1(cmp->cm_ehello.eh_eco);
 	    ueco = EXTRACT_U_1(cmp->cm_ehello.eh_ueco);
