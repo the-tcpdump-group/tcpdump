@@ -11,6 +11,7 @@ set(LIBRARY_NAME netdissect)
 
 option(WITH_SMI "Build with libsmi, if available" ON)
 option(WITH_CRYPTO "Build with OpenSSL/libressl libcrypto, if available" ON)
+option(WITH_CAPSICUM "Build with Capsicum security functions, if available" ON)
 option(ENABLE_SMB "Build with the SMB dissector" ON)
 
 #
@@ -514,6 +515,35 @@ if(WITH_CRYPTO)
         set(HAVE_LIBCRYPTO ON)
     endif(CRYPTO_FOUND)
 endif(WITH_CRYPTO)
+
+#
+# Capsicum sandboxing.
+# Some of this is in the system library, some of it is in other libraries.
+#
+if(WITH_CAPSICUM)
+    check_function_exists(cap_enter HAVE_CAP_ENTER)
+    check_function_exists(cap_rights_limit HAVE_CAP_RIGHTS_LIMIT)
+    check_function_exists(cap_ioctls_limit HAVE_CAP_IOCTLS_LIMIT)
+    check_function_exists(openat HAVE_OPENAT)
+    if(HAVE_CAP_ENTER AND HAVE_CAP_RIGHTS_LIMIT AND
+       HAVE_CAP_IOCTLS_LIMIT AND HAVE_OPENAT)
+        #
+        # OK, we have the functions we need to support Capsicum.
+        #
+        set(HAVE_CAPSICUM TRUE)
+
+        #
+        # OK, can we use Casper?
+        #
+        check_library_exists(casper cap_init blahblahblah HAVE_CAP_INIT)
+        check_library_exists(cap_dns cap_gethostbyaddr blahblahblah HAVE_CAP_GETHOSTBYADDR)
+        if(HAVE_CAP_INIT AND HAVE_CAP_GETHOSTBYADDR)
+            set(HAVE_CASPER TRUE)
+            set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} casper cap_dns)
+        endif(HAVE_CAP_INIT)
+    endif(HAVE_CAP_ENTER AND HAVE_CAP_RIGHTS_LIMIT AND
+          HAVE_CAP_IOCTLS_LIMIT AND HAVE_OPENAT)
+endif(WITH_CAPSICUM)
 
 ######################################
 # Input files
