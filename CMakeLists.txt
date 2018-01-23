@@ -588,6 +588,15 @@ endif(WITH_CAP_NG)
 # Input files
 ######################################
 
+if(ENABLE_SMB)
+    #
+    # We allow the SMB dissector to be omitted.
+    #
+    set(LOCALSRC ${LOCALSRC}
+        print-smb.c
+        smbutil.c)
+endif(ENABLE_SMB)
+
 set(NETDISSECT_SOURCE_LIST_C
     addrtoname.c
     addrtostr.c
@@ -748,20 +757,12 @@ set(NETDISSECT_SOURCE_LIST_C
     print-wb.c
     print-zephyr.c
     print-zeromq.c
+    ${LOCALSRC}
     netdissect.c
     signature.c
     strtoaddr.c
     util-print.c
 )
-
-if(ENABLE_SMB)
-    #
-    # We allow the SMB dissector to be omitted.
-    #
-    set(NETDISSECT_SOURCE_LIST_C ${NETDISSECT_SOURCE_LIST_C}
-        print-smb.c
-        smbutil.c)
-endif(ENABLE_SMB)
 
 #
 # Replace missing functions
