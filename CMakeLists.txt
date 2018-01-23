@@ -535,6 +535,8 @@ if(WITH_CRYPTO)
         #
         check_function_exists(EVP_CipherInit_ex HAVE_EVP_CIPHERINIT_EX)
 
+        cmake_pop_check_state()
+
         #
         # We have libcrypto.
         #
