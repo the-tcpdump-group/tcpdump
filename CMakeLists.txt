@@ -16,6 +16,18 @@ option(WITH_CAP_NG "Use libcap-ng, if available" ON)
 option(ENABLE_SMB "Build with the SMB dissector" ON)
 
 #
+# String parameters.  Neither of them are set, initially; only if the
+# user explicitly configures them are they set.
+#
+# WITH_CHROOT is STRING, not PATH, as the directory need not exist
+# when CMake is run.
+#
+set(WITH_CHROOT CACHE STRING
+    "Directory to which to chroot when dropping privileges")
+set(WITH_USER CACHE STRING
+    "User to whom to set the UID when dropping privileges")
+
+#
 # By default, build universal with the appropriate set of architectures
 # for the OS on which we're doing the build.
 #
