@@ -12,6 +12,7 @@ set(LIBRARY_NAME netdissect)
 option(WITH_SMI "Build with libsmi, if available" ON)
 option(WITH_CRYPTO "Build with OpenSSL/libressl libcrypto, if available" ON)
 option(WITH_CAPSICUM "Build with Capsicum security functions, if available" ON)
+option(WITH_CAP_NG "Use libcap-ng, if available" ON)
 option(ENABLE_SMB "Build with the SMB dissector" ON)
 
 #
@@ -290,6 +291,9 @@ check_function_exists(setlinebuf HAVE_SETLINEBUF)
 
 check_function_exists(getrpcbynumber HAVE_GETRPCBYNUMBER)
 if(NOT HAVE_GETRPCBYNUMBER)
+    #
+    # Some platforms may need -lnsl for getrpcbynumber.
+    #
     cmake_push_check_state()
     set(CMAKE_REQUIRED_LIBRARIES nsl)
     check_function_exists(getrpcbynumber HAVE_GETRPCBYNUMBER)
@@ -334,6 +338,8 @@ check_struct_has_member("struct sockaddr" sa_len sys/socket.h HAVE_SOCKADDR_SA_L
 ######################################
 # External dependencies
 ######################################
+
+include(CheckLibraryExists)
 
 #
 # libpcap/WinPcap.
@@ -535,8 +541,8 @@ if(WITH_CAPSICUM)
         #
         # OK, can we use Casper?
         #
-        check_library_exists(casper cap_init blahblahblah HAVE_CAP_INIT)
-        check_library_exists(cap_dns cap_gethostbyaddr blahblahblah HAVE_CAP_GETHOSTBYADDR)
+        check_library_exists(casper cap_init "" HAVE_CAP_INIT)
+        check_library_exists(cap_dns cap_gethostbyaddr "" HAVE_CAP_GETHOSTBYADDR)
         if(HAVE_CAP_INIT AND HAVE_CAP_GETHOSTBYADDR)
             set(HAVE_CASPER TRUE)
             set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} casper cap_dns)
@@ -544,6 +550,17 @@ if(WITH_CAPSICUM)
     endif(HAVE_CAP_ENTER AND HAVE_CAP_RIGHTS_LIMIT AND
           HAVE_CAP_IOCTLS_LIMIT AND HAVE_OPENAT)
 endif(WITH_CAPSICUM)
+
+#
+# libcap-ng.
+#
+if(WITH_CAP_NG)
+    check_include_file(cap-ng.h HAVE_CAP_NG_H)
+    check_library_exists(cap-ng capng_change_id "" HAVE_LIBCAP_NG)
+    if(HAVE_LIBCAP_NG)
+        set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} cap-ng)
+    endif(HAVE_LIBCAP_NG)
+endif(WITH_CAP_NG)
 
 ######################################
 # Input files
