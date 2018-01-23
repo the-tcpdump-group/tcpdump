@@ -371,8 +371,7 @@ AC_DEFUN(AC_LBL_CHECK_DEPENDENCY_GENERATION_OPT,
 	if test ! -z "$ac_lbl_dependency_flag"; then
 		AC_LANG_CONFTEST(
 		    [AC_LANG_SOURCE([[int main(void) { return 0; }]])])
-		echo "$CC" $ac_lbl_dependency_flag conftest.c >&5
-		if "$CC" $ac_lbl_dependency_flag conftest.c >/dev/null 2>&1; then
+		if AC_RUN_LOG([eval "$CC $ac_lbl_dependency_flag conftest.c >/dev/null 2>&1"]); then
 			AC_MSG_RESULT([yes, with $ac_lbl_dependency_flag])
 			DEPENDENCY_CFLAG="$ac_lbl_dependency_flag"
 			MKDEP='${srcdir}/mkdep'
