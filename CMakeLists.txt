@@ -10,6 +10,7 @@ set(LIBRARY_NAME netdissect)
 ###################################################################
 
 option(WITH_SMI "Build with libsmi, if available" ON)
+option(WITH_CRYPTO "Build with OpenSSL/libressl libcrypto, if available" ON)
 option(ENABLE_SMB "Build with the SMB dissector" ON)
 
 #
@@ -334,16 +335,6 @@ check_struct_has_member("struct sockaddr" sa_len sys/socket.h HAVE_SOCKADDR_SA_L
 ######################################
 
 #
-# libsmi.
-#
-if(WITH_SMI)
-    find_package(SMI)
-    if(SMI_FOUND)
-        set(USE_LIBSMI ON)
-    endif(SMI_FOUND)
-endif(WITH_SMI)
-
-#
 # libpcap/WinPcap.
 # First find it, then check for functions in it.
 #
@@ -461,6 +452,55 @@ check_function_exists(pcap_set_optimizer_debug HAVE_PCAP_SET_OPTIMIZER_DEBUG)
 check_function_exists(bpf_dump HAVE_BPF_DUMP)
 
 cmake_pop_check_state()
+
+#
+# libsmi.
+#
+if(WITH_SMI)
+    find_package(SMI)
+    if(SMI_FOUND)
+        set(USE_LIBSMI ON)
+    endif(SMI_FOUND)
+endif(WITH_SMI)
+
+#
+# OpenSSL/libressl libcrypto.
+#
+if(WITH_CRYPTO)
+    find_package(CRYPTO)
+    if(CRYPTO_FOUND)
+        #
+        # Check for some functions.
+        #
+        cmake_push_check_state()
+        set(CMAKE_REQUIRED_LIBRARIES crypto)
+
+        #
+      	# 1) do we have EVP_CIPHER_CTX_new?
+        # If so, we use it to allocate an EVP_CIPHER_CTX, as
+        # EVP_CIPHER_CTX may be opaque; otherwise, we allocate
+        # it ourselves.
+        #
+        check_function_exists(EVP_CIPHER_CTX_new HAVE_EVP_CIPHER_CTX_NEW)
+
+        #
+        # 2) do we have EVP_CipherInit_ex()?
+        # If so, we use it, because we need to be able to make two
+        # "initialize the cipher" calls, one with the cipher and key,
+        # and one with the IV, and, as of OpenSSL 1.1, You Can't Do That
+        # with EVP_CipherInit(), because a call to EVP_CipherInit() will
+        # unconditionally clear the context, and if you don't supply a
+        # cipher, it'll clear the cipher, rendering the context unusable
+        # and causing a crash.
+        #
+        check_function_exists(EVP_CipherInit_ex HAVE_EVP_CIPHERINIT_EX)
+
+        #
+        # We have libcrypto.
+        #
+        set(HAVE_LIBCRYPTO ON)
+    endif(CRYPTO_FOUND)
+endif(WITH_CRYPTO)
 
 ######################################
 # Input files
@@ -690,7 +730,11 @@ source_group("Header Files" FILES ${PROJECT_SOURCE_LIST_H})
 ######################################
 
 add_executable(tcpdump ${TCPDUMP_SOURCE_LIST_C})
-target_link_libraries(tcpdump netdissect ${PCAP_LIBRARY} ${SMI_LIBRARY})
+target_link_libraries(tcpdump netdissect
+    ${PCAP_LIBRARY}
+    ${CRYPTO_LIBRARY}
+    ${SMI_LIBRARY}
+)
 
 ######################################
 # Write out the config.h file

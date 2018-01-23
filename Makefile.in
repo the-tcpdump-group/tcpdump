@@ -332,6 +332,7 @@ EXTRA_DIST = \
 	bpf_dump.c \
 	cmake_uninstall.cmake.in \
 	cmakeconfig.h.in \
+	cmake/Modules/FindCRYPTO.cmake \
 	cmake/Modules/FindPCAP.cmake \
 	cmake/Modules/FindSMI.cmake \
 	config.guess \
