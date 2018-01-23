@@ -486,7 +486,7 @@ cmake_pop_check_state()
 # We have libpcap.
 #
 include_directories(SYSTEM ${PCAP_INCLUDE_DIRS})
-set(TCPDUMP_LINK_LIBRARIES ${PCAP_LINK_LIBRARY})
+set(TCPDUMP_LINK_LIBRARIES ${PCAP_LIBRARY})
 
 #
 # Optional libraries.
