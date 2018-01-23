@@ -3,6 +3,14 @@ cmake_minimum_required(VERSION 2.8.6)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
 project(tcpdump)
+
+#
+# Try to enable as many C99 features as we can.
+# At minimum, we want C++/C99-style // comments.
+# (Sadly, this won't work with CMake prior to 3.1.)
+#
+set(CMAKE_C_STANDARD 99)
+
 set(LIBRARY_NAME netdissect)
 
 ###################################################################
