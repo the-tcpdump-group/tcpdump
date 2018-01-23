@@ -709,7 +709,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmakeconfig.h.in ${CMAKE_CURRENT_BINA
 #
 include(GNUInstallDirs)
 
-set(MAN1 ${CMAKE_SOURCE_DIR}/tcpdump.1)
+set(MAN1_EXPAND tcpdump.1)
 
 if(WIN32)
     # XXX TODO where to install on Windows?
@@ -723,6 +723,15 @@ if(NOT MSVC)
     #
     # Man pages.
     #
+    # For each section of the manual for which we have man pages
+    # that require macro expansion, do the expansion.
+    #
+    set(MAN1 "")
+    foreach(TEMPLATE_MANPAGE ${MAN1_EXPAND})
+        string(REPLACE ".in" "" MANPAGE ${TEMPLATE_MANPAGE})
+        configure_file(${CMAKE_SOURCE_DIR}/${TEMPLATE_MANPAGE} ${CMAKE_CURRENT_BINARY_DIR}/${MANPAGE} @ONLY)
+        set(MAN1 ${MAN1} ${CMAKE_CURRENT_BINARY_DIR}/${MANPAGE})
+    endforeach(TEMPLATE_MANPAGE)
     install(FILES ${MAN1} DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
 endif(NOT MSVC)
 
