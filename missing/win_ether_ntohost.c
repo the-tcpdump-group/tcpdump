@@ -29,12 +29,10 @@
 
 #include <netdissect-stdinc.h>
 
+#include "missing/win_ether_ntohost.h"
+
 #include "netdissect.h"
 #include "addrtoname.h"
-
-typedef struct ether_addr {
-        unsigned char octet[MAC_ADDR_LEN];
-      } ether_address;
 
 typedef struct ether_entry {
         ether_address      eth_addr;  /* MAC address */

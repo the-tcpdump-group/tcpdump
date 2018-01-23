@@ -741,7 +741,7 @@ SOURCE=..\..\tcpdump.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\Src\ether_ntohost.c
+SOURCE=..\..\missing\win_ether_ntohost.c
 # End Source File
 # Begin Source File
 

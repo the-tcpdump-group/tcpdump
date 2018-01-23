@@ -40,7 +40,13 @@
 #define HTONS(x)	(x) = htons(x)
 #endif
 
-#ifndef _WIN32
+#ifdef _WIN32
+  /*
+   * We have our own ether_ntohost(), reading from the system's
+   * Ethernet address file.
+   */
+  #include "missing/win_ether_ntohost.h"
+#else
   #ifdef USE_ETHER_NTOHOST
     #if defined(NET_ETHERNET_H_DECLARES_ETHER_NTOHOST)
       /*

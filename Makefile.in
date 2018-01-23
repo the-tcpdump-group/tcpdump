@@ -355,6 +355,8 @@ EXTRA_DIST = \
 	missing/strlcat.c \
 	missing/strlcpy.c \
 	missing/strsep.c \
+	missing/win_ether_ntohost.c \
+	missing/win_ether_ntohost.h \
 	mkdep \
 	packetdat.awk \
 	pcap_dump_ftell.c \
@@ -368,8 +370,7 @@ EXTRA_DIST = \
 	win32/prj/WinDump.dsp \
 	win32/prj/WinDump.dsw \
 	win32/prj/WinDump.sln \
-	win32/prj/WinDump.vcproj \
-	win32/src/ether_ntohost.c
+	win32/prj/WinDump.vcproj
 
 TEST_DIST= `find tests \( -name 'DIFF' -prune \) -o \( -name NEW -prune \) -o -type f \! -name '.*' \! -name '*~' -print`
 
