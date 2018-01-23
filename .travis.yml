@@ -96,3 +96,4 @@ script:
   - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then ./tcpdump -D; fi
   - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then ./tcpdump -J; fi
   - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then ./tcpdump --version; fi
+  - if [ "$COVERITY_SCAN_BRANCH" != 1 -a "$CMAKE" = no ]; then make releasetar; fi
