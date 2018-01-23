@@ -86,7 +86,7 @@ script:
   - if [ "$COVERITY_SCAN_BRANCH" != 1 -a "$CMAKE" = no ]; then ./configure CPPFLAGS="-I/usr/local/Cellar/openssl/1.0.2l/include/" --prefix=/tmp; fi
   - if [ "$COVERITY_SCAN_BRANCH" != 1 -a "$CMAKE" = yes ]; then mkdir build; fi
   - if [ "$COVERITY_SCAN_BRANCH" != 1 -a "$CMAKE" = yes ]; then cd build; fi
-  - if [ "$COVERITY_SCAN_BRANCH" != 1 -a "$CMAKE" = yes ]; then cmake -DCMAKE_PREFIX_PATH=/tmp $ENABLE_REMOTE ..; fi
+  - if [ "$COVERITY_SCAN_BRANCH" != 1 -a "$CMAKE" = yes ]; then cmake -DCMAKE_PREFIX_PATH=/tmp -DCMAKE_INSTALL_PREFIX=/tmp $ENABLE_REMOTE ..; fi
   - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then echo -n travis_fold:end:script.configure; fi
   - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then make -s; fi
   - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then echo '$ make install [...]' && echo -n travis_fold:start:script.make_install; fi
