@@ -286,10 +286,10 @@
 #cmakedefine USE_LIBSMI 1
 
 /* define if should chroot when dropping privileges */
-#cmakedefine WITH_CHROOT 1
+#cmakedefine WITH_CHROOT "@WITH_CHROOT@"
 
 /* define if should drop privileges by default */
-#cmakedefine WITH_USER 1
+#cmakedefine WITH_USER "@WITH_USER@"
 
 /* define on AIX to get certain functions */
 #cmakedefine _SUN 1
