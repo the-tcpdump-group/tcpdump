@@ -454,11 +454,22 @@ check_function_exists(bpf_dump HAVE_BPF_DUMP)
 cmake_pop_check_state()
 
 #
+# We have libpcap.
+#
+include_directories(SYSTEM ${PCAP_INCLUDE_DIRS})
+set(TCPDUMP_LINK_LIBRARIES ${PCAP_LINK_LIBRARY})
+
+#
+# Optional libraries.
+#
+#
 # libsmi.
 #
 if(WITH_SMI)
     find_package(SMI)
     if(SMI_FOUND)
+        include_directories(SYSTEM ${SMI_INCLUDE_DIRS})
+        set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} ${SMI_LIBRARY})
         set(USE_LIBSMI ON)
     endif(SMI_FOUND)
 endif(WITH_SMI)
@@ -498,6 +509,8 @@ if(WITH_CRYPTO)
         #
         # We have libcrypto.
         #
+        include_directories(SYSTEM ${CRYPTO_INCLUDE_DIRS})
+        set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} ${CRYPTO_LIBRARY})
         set(HAVE_LIBCRYPTO ON)
     endif(CRYPTO_FOUND)
 endif(WITH_CRYPTO)
@@ -730,11 +743,7 @@ source_group("Header Files" FILES ${PROJECT_SOURCE_LIST_H})
 ######################################
 
 add_executable(tcpdump ${TCPDUMP_SOURCE_LIST_C})
-target_link_libraries(tcpdump netdissect
-    ${PCAP_LIBRARY}
-    ${CRYPTO_LIBRARY}
-    ${SMI_LIBRARY}
-)
+target_link_libraries(tcpdump netdissect ${TCPDUMP_LINK_LIBRARIES})
 
 ######################################
 # Write out the config.h file
