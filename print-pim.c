@@ -896,7 +896,7 @@ pimv2_print(netdissect_options *ndo,
 		ND_TCHECK_1(ip->ip_vhl);
 		switch (IP_V(ip)) {
                 case 0: /* Null header */
-			ND_TCHECK(ip->ip_dst);
+			ND_TCHECK_4(ip->ip_dst);
 			ND_PRINT("IP-Null-header %s > %s",
 			          ipaddr_string(ndo, &ip->ip_src),
 			          ipaddr_string(ndo, &ip->ip_dst));
