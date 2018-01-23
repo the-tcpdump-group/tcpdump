@@ -45,20 +45,21 @@
 #include "nameser.h"
 
 /* BIND9 lib/lwres/include/lwres */
-typedef nd_uint32_t lwres_uint32_t;
-typedef nd_uint16_t lwres_uint16_t;
-typedef nd_uint8_t lwres_uint8_t;
+/*
+ * Use nd_uint16_t for lwres_uint16_t
+ * Use nd_uint32_t for lwres_uint32_t
+*/
 
 struct lwres_lwpacket {
-	lwres_uint32_t		length;
-	lwres_uint16_t		version;
-	lwres_uint16_t		pktflags;
-	lwres_uint32_t		serial;
-	lwres_uint32_t		opcode;
-	lwres_uint32_t		result;
-	lwres_uint32_t		recvlength;
-	lwres_uint16_t		authtype;
-	lwres_uint16_t		authlength;
+	nd_uint32_t		length;
+	nd_uint16_t		version;
+	nd_uint16_t		pktflags;
+	nd_uint32_t		serial;
+	nd_uint32_t		opcode;
+	nd_uint32_t		result;
+	nd_uint32_t		recvlength;
+	nd_uint16_t		authtype;
+	nd_uint16_t		authlength;
 };
 
 #define LWRES_LWPACKETFLAG_RESPONSE	0x0001U	/* if set, pkt is a response */
@@ -75,13 +76,13 @@ struct lwres_lwpacket {
 
 typedef struct {
 	/* public */
-	lwres_uint16_t			datalength;
+	nd_uint16_t			datalength;
 	/* data follows */
 } lwres_nooprequest_t;
 
 typedef struct {
 	/* public */
-	lwres_uint16_t			datalength;
+	nd_uint16_t			datalength;
 	/* data follows */
 } lwres_noopresponse_t;
 
@@ -93,27 +94,27 @@ typedef struct {
 typedef struct lwres_addr lwres_addr_t;
 
 struct lwres_addr {
-	lwres_uint32_t			family;
-	lwres_uint16_t			length;
+	nd_uint32_t			family;
+	nd_uint16_t			length;
 	/* address folows */
 };
 #define LWRES_ADDR_LEN			6
 
 typedef struct {
 	/* public */
-	lwres_uint32_t			flags;
-	lwres_uint32_t			addrtypes;
-	lwres_uint16_t			namelen;
+	nd_uint32_t			flags;
+	nd_uint32_t			addrtypes;
+	nd_uint16_t			namelen;
 	/* name follows */
 } lwres_gabnrequest_t;
 #define LWRES_GABNREQUEST_LEN		10
 
 typedef struct {
 	/* public */
-	lwres_uint32_t			flags;
-	lwres_uint16_t			naliases;
-	lwres_uint16_t			naddrs;
-	lwres_uint16_t			realnamelen;
+	nd_uint32_t			flags;
+	nd_uint16_t			naliases;
+	nd_uint16_t			naddrs;
+	nd_uint16_t			realnamelen;
 	/* aliases follows */
 	/* addrs follows */
 	/* realname follows */
@@ -126,16 +127,16 @@ typedef struct {
 #define LWRES_OPCODE_GETNAMEBYADDR	0x00010002U
 typedef struct {
 	/* public */
-	lwres_uint32_t			flags;
+	nd_uint32_t			flags;
 	/* addr follows */
 } lwres_gnbarequest_t;
 #define LWRES_GNBAREQUEST_LEN		4
 
 typedef struct {
 	/* public */
-	lwres_uint32_t			flags;
-	lwres_uint16_t			naliases;
-	lwres_uint16_t			realnamelen;
+	nd_uint32_t			flags;
+	nd_uint16_t			naliases;
+	nd_uint16_t			realnamelen;
 	/* aliases follows */
 	/* realname follows */
 } lwres_gnbaresponse_t;
@@ -148,22 +149,22 @@ typedef struct {
 
 typedef struct {
 	/* public */
-	lwres_uint32_t			flags;
-	lwres_uint16_t			rdclass;
-	lwres_uint16_t			rdtype;
-	lwres_uint16_t			namelen;
+	nd_uint32_t			flags;
+	nd_uint16_t			rdclass;
+	nd_uint16_t			rdtype;
+	nd_uint16_t			namelen;
 	/* name follows */
 } lwres_grbnrequest_t;
 #define LWRES_GRBNREQUEST_LEN		10
 
 typedef struct {
 	/* public */
-	lwres_uint32_t			flags;
-	lwres_uint16_t			rdclass;
-	lwres_uint16_t			rdtype;
-	lwres_uint32_t			ttl;
-	lwres_uint16_t			nrdatas;
-	lwres_uint16_t			nsigs;
+	nd_uint32_t			flags;
+	nd_uint16_t			rdclass;
+	nd_uint16_t			rdtype;
+	nd_uint32_t			ttl;
+	nd_uint16_t			nrdatas;
+	nd_uint16_t			nsigs;
 	/* realname here (len + name) */
 	/* rdata here (len + name) */
 	/* signatures here (len + name) */
@@ -266,7 +267,7 @@ lwres_printaddr(netdissect_options *ndo,
 
 	p = p0;
 	ap = (const lwres_addr_t *)p;
-	ND_TCHECK(ap->length);
+	ND_TCHECK_2(ap->length);
 	l = EXTRACT_BE_U_2(ap->length);
 	p += LWRES_ADDR_LEN;
 	ND_TCHECK_LEN(p, l);
@@ -309,7 +310,7 @@ lwres_print(netdissect_options *ndo,
 	int unsupported = 0;
 
 	np = (const struct lwres_lwpacket *)bp;
-	ND_TCHECK(np->authlength);
+	ND_TCHECK_2(np->authlength);
 
 	ND_PRINT(" lwres");
 	v = EXTRACT_BE_U_2(np->version);
@@ -366,7 +367,7 @@ lwres_print(netdissect_options *ndo,
 			break;
 		case LWRES_OPCODE_GETADDRSBYNAME:
 			gabn = (const lwres_gabnrequest_t *)p;
-			ND_TCHECK(gabn->namelen);
+			ND_TCHECK_2(gabn->namelen);
 
 			/* BIND910: not used */
 			if (ndo->ndo_vflag > 2) {
@@ -398,7 +399,7 @@ lwres_print(netdissect_options *ndo,
 			break;
 		case LWRES_OPCODE_GETNAMEBYADDR:
 			gnba = (const lwres_gnbarequest_t *)p;
-			ND_TCHECK(gnba->flags);
+			ND_TCHECK_4(gnba->flags);
 
 			/* BIND910: not used */
 			if (ndo->ndo_vflag > 2) {
@@ -415,7 +416,7 @@ lwres_print(netdissect_options *ndo,
 		case LWRES_OPCODE_GETRDATABYNAME:
 			/* XXX no trace, not tested */
 			grbn = (const lwres_grbnrequest_t *)p;
-			ND_TCHECK(grbn->namelen);
+			ND_TCHECK_2(grbn->namelen);
 
 			/* BIND910: not used */
 			if (ndo->ndo_vflag > 2) {
@@ -463,7 +464,7 @@ lwres_print(netdissect_options *ndo,
 			break;
 		case LWRES_OPCODE_GETADDRSBYNAME:
 			gabn = (const lwres_gabnresponse_t *)p;
-			ND_TCHECK(gabn->realnamelen);
+			ND_TCHECK_2(gabn->realnamelen);
 
 			/* BIND910: not used */
 			if (ndo->ndo_vflag > 2) {
@@ -501,7 +502,7 @@ lwres_print(netdissect_options *ndo,
 			break;
 		case LWRES_OPCODE_GETNAMEBYADDR:
 			gnba = (const lwres_gnbaresponse_t *)p;
-			ND_TCHECK(gnba->realnamelen);
+			ND_TCHECK_2(gnba->realnamelen);
 
 			/* BIND910: not used */
 			if (ndo->ndo_vflag > 2) {
@@ -530,7 +531,7 @@ lwres_print(netdissect_options *ndo,
 		case LWRES_OPCODE_GETRDATABYNAME:
 			/* XXX no trace, not tested */
 			grbn = (const lwres_grbnresponse_t *)p;
-			ND_TCHECK(grbn->nsigs);
+			ND_TCHECK_2(grbn->nsigs);
 
 			/* BIND910: not used */
 			if (ndo->ndo_vflag > 2) {
