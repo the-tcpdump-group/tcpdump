@@ -709,7 +709,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmakeconfig.h.in ${CMAKE_CURRENT_BINA
 #
 include(GNUInstallDirs)
 
-set(MAN1_EXPAND tcpdump.1)
+set(MAN1_EXPAND tcpdump.1.in)
 
 if(WIN32)
     # XXX TODO where to install on Windows?
