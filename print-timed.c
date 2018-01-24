@@ -120,7 +120,7 @@ timed_print(netdissect_options *ndo,
 	case TSP_ADJTIME:
 	case TSP_SETDATE:
 	case TSP_SETDATEREQ:
-		ND_TCHECK(tsp->tsp_time);
+		ND_TCHECK_8(&tsp->tsp_time);
 		sec = EXTRACT_BE_S_4(tsp->tsp_time.tv_sec);
 		usec = EXTRACT_BE_S_4(tsp->tsp_time.tv_usec);
 		/* XXX The comparison below is always false? */
