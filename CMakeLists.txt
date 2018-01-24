@@ -302,7 +302,48 @@ check_function_exists(strlcat HAVE_STRLCAT)
 check_function_exists(strlcpy HAVE_STRLCPY)
 check_function_exists(strdup HAVE_STRDUP)
 check_function_exists(strsep HAVE_STRSEP)
-check_function_exists(getservent HAVE_GETSERVENT)
+
+#
+# Find library needed for gethostbyaddr.
+# NOTE: if you hand check_library_exists as its last argument a variable
+# that's been set, it skips the test, so we need different variables.
+#
+set(TCPDUMP_LINK_LIBRARIES "")
+include(CheckLibraryExists)
+check_function_exists(gethostbyaddr STDLIBS_HAVE_GETHOSTBYADDR)
+if(NOT STDLIBS_HAVE_GETHOSTBYADDR)
+    check_library_exists(xnet gethostbyaddr "" LIBXNET_HAS_GETHOSTBYADDR)
+    if(LIBXNET_HAS_GETHOSTBYADDR)
+        set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} xnet)
+    else()
+        check_library_exists(nsl gethostbyaddr "" LIBNSL_HAS_GETHOSTBYADDR)
+        if(LIBNSL_HAS_GETHOSTBYADDR)
+            set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} nsl)
+        endif()
+    endif()
+endif()
+
+#
+# This may require additional libraries.
+#
+cmake_push_check_state()
+set(CMAKE_REQUIRED_LIBRARIES ${TCPDUMP_LINK_LIBRARIES})
+check_function_exists(getservent STDLIBS_HAVE_GETSERVENT)
+if(STDLIBS_HAVE_GETSERVENT)
+    set(HAVE_GETSERVENT TRUE)
+else(STDLIBS_HAVE_GETSERVENT)
+    #
+    # Some platforms may need -lsocket for getservent.
+    #
+    set(CMAKE_REQUIRED_LIBRARIES socket ${TCPDUMP_LINK_LIBRARIES})
+    check_function_exists(getservent LIBSOCKET_HAS_GETSERVENT)
+    if(LIBSOCKET_HAS_GETSERVENT)
+        set(HAVE_GETSERVENT TRUE)
+        set(TCPDUMP_LINK_LIBRARIES socket ${TCPDUMP_LINK_LIBRARIES})
+    endif(LIBSOCKET_HAS_GETSERVENT)
+endif(STDLIBS_HAVE_GETSERVENT)
+cmake_pop_check_state()
+
 check_function_exists(getopt_long HAVE_GETOPT_LONG)
 check_function_exists(vsnprintf HAVE_VSNPRINTF)
 check_function_exists(snprintf HAVE_SNPRINTF)
@@ -311,18 +352,13 @@ check_function_exists(vfork HAVE_VFORK)
 check_function_exists(strftime HAVE_STRFTIME)
 check_function_exists(setlinebuf HAVE_SETLINEBUF)
 
-check_function_exists(getrpcbynumber HAVE_GETRPCBYNUMBER_STDLIBS)
-if(HAVE_GETRPCBYNUMBER_STDLIBS)
-    set(HAVE_GETRPCBYNUMBER TRUE)
-else(HAVE_GETRPCBYNUMBER_STDLIBS)
-    #
-    # Some platforms may need -lnsl for getrpcbynumber.
-    #
-    cmake_push_check_state()
-    set(CMAKE_REQUIRED_LIBRARIES nsl)
-    check_function_exists(getrpcbynumber HAVE_GETRPCBYNUMBER)
-    cmake_pop_check_state()
-endif(HAVE_GETRPCBYNUMBER_STDLIBS)
+#
+# This may require additional libraries.
+#
+cmake_push_check_state()
+set(CMAKE_REQUIRED_LIBRARIES ${TCPDUMP_LINK_LIBRARIES})
+check_function_exists(getrpcbynumber HAVE_GETRPCBYNUMBER)
+cmake_pop_check_state()
 
 #
 # Data types.
@@ -376,7 +412,7 @@ find_package(PCAP REQUIRED)
 #
 include_directories(${PCAP_INCLUDE_DIR})
 cmake_push_check_state()
-set(CMAKE_REQUIRED_LIBRARIES ${PCAP_LIBRARY})
+set(CMAKE_REQUIRED_LIBRARIES ${PCAP_LIBRARIES})
 
 #
 # Check for "pcap_list_datalinks()" and use a substitute version if
@@ -488,7 +524,7 @@ cmake_pop_check_state()
 # We have libpcap.
 #
 include_directories(SYSTEM ${PCAP_INCLUDE_DIRS})
-set(TCPDUMP_LINK_LIBRARIES ${PCAP_LIBRARY})
+set(TCPDUMP_LINK_LIBRARIES ${PCAP_LIBRARIES} ${TCPDUMP_LINK_LIBRARIES})
 
 #
 # Optional libraries.
@@ -500,7 +536,7 @@ if(WITH_SMI)
     find_package(SMI)
     if(SMI_FOUND)
         include_directories(SYSTEM ${SMI_INCLUDE_DIRS})
-        set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} ${SMI_LIBRARY})
+        set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} ${SMI_LIBRARIES})
         set(USE_LIBSMI ON)
     endif(SMI_FOUND)
 endif(WITH_SMI)
@@ -543,7 +579,7 @@ if(WITH_CRYPTO)
         # We have libcrypto.
         #
         include_directories(SYSTEM ${CRYPTO_INCLUDE_DIRS})
-        set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} ${CRYPTO_LIBRARY})
+        set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} ${CRYPTO_LIBRARIES})
         set(HAVE_LIBCRYPTO ON)
     endif(CRYPTO_FOUND)
 endif(WITH_CRYPTO)
