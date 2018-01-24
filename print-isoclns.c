@@ -3017,7 +3017,7 @@ isis_print(netdissect_options *ndo,
 	case ISIS_TLV_LSP:
 	    tlv_lsp = (const struct isis_tlv_lsp *)tptr;
 	    while(tmp>=sizeof(struct isis_tlv_lsp)) {
-		ND_TCHECK((tlv_lsp->lsp_id)[LSP_ID_LEN-1]);
+		ND_TCHECK_1(tlv_lsp->lsp_id + LSP_ID_LEN - 1);
 		ND_PRINT("\n\t      lsp-id: %s",
                        isis_print_id(tlv_lsp->lsp_id, LSP_ID_LEN));
 		ND_TCHECK_LEN(tlv_lsp->sequence_number, 4);
