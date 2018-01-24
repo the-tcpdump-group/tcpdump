@@ -311,8 +311,10 @@ check_function_exists(vfork HAVE_VFORK)
 check_function_exists(strftime HAVE_STRFTIME)
 check_function_exists(setlinebuf HAVE_SETLINEBUF)
 
-check_function_exists(getrpcbynumber HAVE_GETRPCBYNUMBER)
-if(NOT HAVE_GETRPCBYNUMBER)
+check_function_exists(getrpcbynumber HAVE_GETRPCBYNUMBER_STDLIBS)
+if(HAVE_GETRPCBYNUMBER_STDLIBS)
+    set(HAVE_GETRPCBYNUMBER TRUE)
+else(HAVE_GETRPCBYNUMBER_STDLIBS)
     #
     # Some platforms may need -lnsl for getrpcbynumber.
     #
@@ -320,7 +322,7 @@ if(NOT HAVE_GETRPCBYNUMBER)
     set(CMAKE_REQUIRED_LIBRARIES nsl)
     check_function_exists(getrpcbynumber HAVE_GETRPCBYNUMBER)
     cmake_pop_check_state()
-endif(NOT HAVE_GETRPCBYNUMBER)
+endif(HAVE_GETRPCBYNUMBER_STDLIBS)
 
 #
 # Data types.
