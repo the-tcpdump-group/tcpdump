@@ -1243,9 +1243,9 @@ icmp6_print(netdissect_options *ndo,
 		const struct nd_redirect *p;
 
 		p = (const struct nd_redirect *)dp;
-		ND_TCHECK(p->nd_rd_dst);
+		ND_TCHECK_16(&p->nd_rd_dst);
 		ND_PRINT(", %s", ip6addr_string(ndo, &p->nd_rd_dst));
-		ND_TCHECK(p->nd_rd_target);
+		ND_TCHECK_16(&p->nd_rd_target);
 		ND_PRINT(" to %s", ip6addr_string(ndo, &p->nd_rd_target));
 #define REDIRECTLEN 40
 		if (ndo->ndo_vflag) {
@@ -1270,16 +1270,16 @@ icmp6_print(netdissect_options *ndo,
 		break;
 	case ICMP6_MOBILEPREFIX_SOLICIT: /* fall through */
 	case ICMP6_HADISCOV_REQUEST:
-                ND_TCHECK(dp->icmp6_data16[0]);
-                ND_PRINT(", id 0x%04x", EXTRACT_BE_U_2(&dp->icmp6_data16[0]));
+                ND_TCHECK_2(dp->icmp6_data16[0]);
+                ND_PRINT(", id 0x%04x", EXTRACT_BE_U_2(dp->icmp6_data16[0]));
                 break;
 	case ICMP6_HADISCOV_REPLY:
 		if (ndo->ndo_vflag) {
 			const struct in6_addr *in6;
 			const u_char *cp;
 
-			ND_TCHECK(dp->icmp6_data16[0]);
-			ND_PRINT(", id 0x%04x", EXTRACT_BE_U_2(&dp->icmp6_data16[0]));
+			ND_TCHECK_2(dp->icmp6_data16[0]);
+			ND_PRINT(", id 0x%04x", EXTRACT_BE_U_2(dp->icmp6_data16[0]));
 			cp = (const u_char *)dp + length;
 			in6 = (const struct in6_addr *)(dp + 1);
 			for (; (const u_char *)in6 < cp; in6++) {
@@ -1583,8 +1583,8 @@ mldv2_report_print(netdissect_options *ndo, const u_char *bp, u_int len)
             return;
     }
 
-    ND_TCHECK(icp->icmp6_data16[1]);
-    ngroups = EXTRACT_BE_U_2(&icp->icmp6_data16[1]);
+    ND_TCHECK_2(icp->icmp6_data16[1]);
+    ngroups = EXTRACT_BE_U_2(icp->icmp6_data16[1]);
     ND_PRINT(", %u group record(s)", ngroups);
     if (ndo->ndo_vflag > 0) {
 	/* Print the group records */
@@ -1642,8 +1642,8 @@ mldv2_query_print(netdissect_options *ndo, const u_char *bp, u_int len)
         ND_PRINT(" [invalid len %u]", len);
 	return;
     }
-    ND_TCHECK(icp->icmp6_data16[0]);
-    mrc = EXTRACT_BE_U_2(&icp->icmp6_data16[0]);
+    ND_TCHECK_2(icp->icmp6_data16[0]);
+    mrc = EXTRACT_BE_U_2(icp->icmp6_data16[0]);
     if (mrc < 32768) {
 	mrt = mrc;
     } else {
