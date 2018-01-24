@@ -364,7 +364,7 @@ nfsreply_noaddr_print(netdissect_options *ndo,
 	nfserr = 0;		/* assume no error */
 	rp = (const struct sunrpc_msg *)bp;
 
-	ND_TCHECK(rp->rm_reply.rp_stat);
+	ND_TCHECK_4(rp->rm_reply.rp_stat);
 	reply_stat = EXTRACT_BE_U_4(&rp->rm_reply.rp_stat);
 	switch (reply_stat) {
 
@@ -376,19 +376,19 @@ nfsreply_noaddr_print(netdissect_options *ndo,
 
 	case SUNRPC_MSG_DENIED:
 		ND_PRINT("reply ERR %u: ", length);
-		ND_TCHECK(rp->rm_reply.rp_reject.rj_stat);
+		ND_TCHECK_4(rp->rm_reply.rp_reject.rj_stat);
 		rstat = EXTRACT_BE_U_4(&rp->rm_reply.rp_reject.rj_stat);
 		switch (rstat) {
 
 		case SUNRPC_RPC_MISMATCH:
-			ND_TCHECK(rp->rm_reply.rp_reject.rj_vers.high);
+			ND_TCHECK_4(rp->rm_reply.rp_reject.rj_vers.high);
 			rlow = EXTRACT_BE_U_4(&rp->rm_reply.rp_reject.rj_vers.low);
 			rhigh = EXTRACT_BE_U_4(&rp->rm_reply.rp_reject.rj_vers.high);
 			ND_PRINT("RPC Version mismatch (%u-%u)", rlow, rhigh);
 			break;
 
 		case SUNRPC_AUTH_ERROR:
-			ND_TCHECK(rp->rm_reply.rp_reject.rj_why);
+			ND_TCHECK_4(rp->rm_reply.rp_reject.rj_why);
 			rwhy = EXTRACT_BE_U_4(&rp->rm_reply.rp_reject.rj_why);
 			ND_PRINT("Auth %s", tok2str(sunrpc_auth_str, "Invalid failure code %u", rwhy));
 			break;
@@ -1080,7 +1080,7 @@ parsefattr(netdissect_options *ndo,
 	const struct nfs_fattr *fap;
 
 	fap = (const struct nfs_fattr *)dp;
-	ND_TCHECK(fap->fa_gid);
+	ND_TCHECK_4(&fap->fa_gid);
 	if (verbose) {
 		/*
 		 * XXX - UIDs and GIDs are unsigned in NFS and in
@@ -1095,18 +1095,18 @@ parsefattr(netdissect_options *ndo,
 		    EXTRACT_BE_S_4(&fap->fa_uid),
 		    EXTRACT_BE_S_4(&fap->fa_gid));
 		if (v3) {
-			ND_TCHECK(fap->fa3_size);
+			ND_TCHECK_8(&fap->fa3_size);
 			ND_PRINT(" sz %" PRIu64,
 				EXTRACT_BE_U_8((const uint32_t *)&fap->fa3_size));
 		} else {
-			ND_TCHECK(fap->fa2_size);
+			ND_TCHECK_4(&fap->fa2_size);
 			ND_PRINT(" sz %u", EXTRACT_BE_U_4(&fap->fa2_size));
 		}
 	}
 	/* print lots more stuff */
 	if (verbose > 1) {
 		if (v3) {
-			ND_TCHECK(fap->fa3_ctime);
+			ND_TCHECK_8(&fap->fa3_ctime);
 			ND_PRINT(" nlink %u rdev %u/%u",
 			       EXTRACT_BE_U_4(&fap->fa_nlink),
 			       EXTRACT_BE_U_4(&fap->fa3_rdev.specdata1),
@@ -1125,7 +1125,7 @@ parsefattr(netdissect_options *ndo,
 			       EXTRACT_BE_U_4(&fap->fa3_ctime.nfsv3_sec),
 			       EXTRACT_BE_U_4(&fap->fa3_ctime.nfsv3_nsec));
 		} else {
-			ND_TCHECK(fap->fa2_ctime);
+			ND_TCHECK_8(&fap->fa2_ctime);
 			ND_PRINT(" nlink %u rdev 0x%x fsid 0x%x nodeid 0x%x a/m/ctime",
 			       EXTRACT_BE_U_4(&fap->fa_nlink),
 			       EXTRACT_BE_U_4(&fap->fa2_rdev),
