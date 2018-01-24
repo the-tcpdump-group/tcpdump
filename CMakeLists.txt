@@ -354,10 +354,22 @@ check_function_exists(setlinebuf HAVE_SETLINEBUF)
 
 #
 # This may require additional libraries.
+# In particular, it may required -lnsl on Solaris, even if we've chosen
+# to use -lxnet above.
 #
 cmake_push_check_state()
 set(CMAKE_REQUIRED_LIBRARIES ${TCPDUMP_LINK_LIBRARIES})
-check_function_exists(getrpcbynumber HAVE_GETRPCBYNUMBER)
+check_function_exists(getrpcbynumber STDLIBS_HAVE_GETRPCBYNUMBER)
+if(STDLIBS_HAVE_GETRPCBYNUMBER)
+    set(HAVE_GETRPCBYNUMBER TRUE)
+else(STDLIBS_HAVE_GETRPCBYNUMBER)
+    set(CMAKE_REQUIRED_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} nsl)
+    check_function_exists(getrpcbynumber LIBNSL_HAS_GETRPCBYNUMBER)
+    if(LIBNSL_HAS_GETRPCBYNUMBER)
+        set(HAVE_GETRPCBYNUMBER TRUE)
+        set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES nsl)
+    endif(LIBNSL_HAS_GETRPCBYNUMBER)
+endif(STDLIBS_HAVE_GETRPCBYNUMBER)
 cmake_pop_check_state()
 
 #
