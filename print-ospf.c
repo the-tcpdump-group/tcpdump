@@ -644,7 +644,7 @@ ospf_print_lsa(netdissect_options *ndo,
 
 		ND_TCHECK_2(lsap->lsa_un.un_rla.rla_count);
 		j = EXTRACT_BE_U_2(lsap->lsa_un.un_rla.rla_count);
-		ND_TCHECK(lsap->lsa_un.un_rla.rla_link);
+		ND_TCHECK_SIZE(lsap->lsa_un.un_rla.rla_link);
 		rlp = lsap->lsa_un.un_rla.rla_link;
 		while (j--) {
 			ND_TCHECK_SIZE(rlp);
@@ -704,7 +704,7 @@ ospf_print_lsa(netdissect_options *ndo,
 		ND_TCHECK_4(&lsap->lsa_un.un_nla.nla_mask);
 		ND_PRINT("\n\t    Mask %s",
 		    ipaddr_string(ndo, &lsap->lsa_un.un_sla.sla_mask));
-		ND_TCHECK(lsap->lsa_un.un_sla.sla_tosmetric);
+		ND_TCHECK_SIZE(lsap->lsa_un.un_sla.sla_tosmetric);
 		lp = (const uint8_t *)lsap->lsa_un.un_sla.sla_tosmetric;
 		while (lp < ls_end) {
 			uint32_t ul;
@@ -721,7 +721,7 @@ ospf_print_lsa(netdissect_options *ndo,
 		break;
 
 	case LS_TYPE_SUM_ABR:
-		ND_TCHECK(lsap->lsa_un.un_sla.sla_tosmetric);
+		ND_TCHECK_SIZE(lsap->lsa_un.un_sla.sla_tosmetric);
 		lp = (const uint8_t *)lsap->lsa_un.un_sla.sla_tosmetric;
 		while (lp < ls_end) {
 			uint32_t ul;
@@ -743,7 +743,7 @@ ospf_print_lsa(netdissect_options *ndo,
 		ND_PRINT("\n\t    Mask %s",
 		    ipaddr_string(ndo, &lsap->lsa_un.un_asla.asla_mask));
 
-		ND_TCHECK(lsap->lsa_un.un_sla.sla_tosmetric);
+		ND_TCHECK_SIZE(lsap->lsa_un.un_sla.sla_tosmetric);
 		almp = lsap->lsa_un.un_asla.asla_metric;
 		while ((const u_char *)almp < ls_end) {
 			uint32_t ul;
