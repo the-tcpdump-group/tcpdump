@@ -38,9 +38,6 @@
 
 #include "netdissect-stdinc.h"
 
-struct mbuf;
-struct rtentry;
-
 #include "netdissect.h"
 #include "extract.h"
 

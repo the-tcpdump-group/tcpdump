@@ -31,9 +31,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct mbuf;
-struct rtentry;
-
 #ifdef HAVE_DNET_HTOA
   #ifdef HAVE_NETDNET_DN_H
     #include <netdnet/dn.h>
