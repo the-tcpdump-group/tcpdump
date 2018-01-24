@@ -492,7 +492,7 @@ ospf6_print_lsa(netdissect_options *ndo,
 		if (lsa_length < sizeof (lsap->lsa_un.un_rla.rla_options))
 			return (1);
 		lsa_length -= sizeof (lsap->lsa_un.un_rla.rla_options);
-		ND_TCHECK(lsap->lsa_un.un_rla.rla_options);
+		ND_TCHECK_4(lsap->lsa_un.un_rla.rla_options);
 		ND_PRINT("\n\t      Options [%s]",
 		          bittok2str(ospf6_option_values, "none",
 		          EXTRACT_BE_U_4(lsap->lsa_un.un_rla.rla_options)));
@@ -618,7 +618,7 @@ ospf6_print_lsa(netdissect_options *ndo,
 			if (lsa_length < sizeof (uint32_t))
 				return (1);
 			lsa_length -= sizeof (uint32_t);
-			ND_TCHECK(*(const uint32_t *)tptr);
+			ND_TCHECK_4(tptr);
 			ND_PRINT(" tag %s",
 			       ipaddr_string(ndo, (const uint32_t *)tptr));
 			tptr += sizeof(uint32_t);
@@ -628,7 +628,7 @@ ospf6_print_lsa(netdissect_options *ndo,
 			if (lsa_length < sizeof (uint32_t))
 				return (1);
 			lsa_length -= sizeof (uint32_t);
-			ND_TCHECK(*(const uint32_t *)tptr);
+			ND_TCHECK_4(tptr);
 			ND_PRINT(" RefLSID: %s",
 			       ipaddr_string(ndo, (const uint32_t *)tptr));
 			tptr += sizeof(uint32_t);
@@ -641,7 +641,7 @@ ospf6_print_lsa(netdissect_options *ndo,
 		if (lsa_length < sizeof (llsap->llsa_priandopt))
 			return (1);
 		lsa_length -= sizeof (llsap->llsa_priandopt);
-		ND_TCHECK(llsap->llsa_priandopt);
+		ND_TCHECK_SIZE(&llsap->llsa_priandopt);
 		ND_PRINT("\n\t      Options [%s]",
 		          bittok2str(ospf6_option_values, "none",
 		          EXTRACT_BE_U_4(llsap->llsa_options)));
@@ -672,7 +672,7 @@ ospf6_print_lsa(netdissect_options *ndo,
 		if (lsa_length < sizeof (lsap->lsa_un.un_intra_ap.intra_ap_rtid))
 			return (1);
 		lsa_length -= sizeof (lsap->lsa_un.un_intra_ap.intra_ap_rtid);
-		ND_TCHECK(lsap->lsa_un.un_intra_ap.intra_ap_rtid);
+		ND_TCHECK_4(lsap->lsa_un.un_intra_ap.intra_ap_rtid);
 		ospf6_print_ls_type(ndo,
 			EXTRACT_BE_U_2(lsap->lsa_un.un_intra_ap.intra_ap_lstype),
 			&lsap->lsa_un.un_intra_ap.intra_ap_lsid);
@@ -749,11 +749,11 @@ ospf6_decode_v3(netdissect_options *ndo,
 		          ipaddr_string(ndo, &hellop->hello_ifid),
 		          EXTRACT_U_1(hellop->hello_priority));
 
-		ND_TCHECK(hellop->hello_dr);
+		ND_TCHECK_4(hellop->hello_dr);
 		if (EXTRACT_BE_U_4(hellop->hello_dr) != 0)
 			ND_PRINT("\n\t  Designated Router %s",
 			    ipaddr_string(ndo, &hellop->hello_dr));
-		ND_TCHECK(hellop->hello_bdr);
+		ND_TCHECK_4(hellop->hello_bdr);
 		if (EXTRACT_BE_U_4(hellop->hello_bdr) != 0)
 			ND_PRINT(", Backup Designated Router %s",
 			    ipaddr_string(ndo, &hellop->hello_bdr));
@@ -939,7 +939,7 @@ ospf6_decode_v3_trailer(netdissect_options *ndo,
 	type = EXTRACT_U_1(op->ospf6_type);
 	if (type == OSPF_TYPE_HELLO) {
 		const struct hello6 *hellop = (const struct hello6 *)((const uint8_t *)op + OSPF6HDR_LEN);
-		ND_TCHECK(hellop->hello_options);
+		ND_TCHECK_4(hellop->hello_options);
 		if (EXTRACT_BE_U_4(hellop->hello_options) & OSPF6_OPTION_L)
 			lls_hello = 1;
 	} else if (type == OSPF_TYPE_DD) {
@@ -989,10 +989,10 @@ ospf6_print(netdissect_options *ndo,
 	}
 	dataend = bp + datalen;
 
-	ND_TCHECK(op->ospf6_routerid);
+	ND_TCHECK_4(op->ospf6_routerid);
 	ND_PRINT("\n\tRouter-ID %s", ipaddr_string(ndo, &op->ospf6_routerid));
 
-	ND_TCHECK(op->ospf6_areaid);
+	ND_TCHECK_4(op->ospf6_areaid);
 	if (EXTRACT_BE_U_4(op->ospf6_areaid) != 0)
 		ND_PRINT(", Area %s", ipaddr_string(ndo, &op->ospf6_areaid));
 	else
