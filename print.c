@@ -338,8 +338,10 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 			ND_PRINT(",");
 		ND_PRINT(" len(%u) < caplen(%u)", h->len, h->caplen);
 	}
-	if (ndo->ndo_invalid_header)
-		ND_PRINT("] ");
+	if (ndo->ndo_invalid_header) {
+		ND_PRINT("]\n");
+		return;
+	}
 
 	ts_print(ndo, &h->ts);
 
