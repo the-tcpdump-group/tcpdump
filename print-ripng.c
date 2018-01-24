@@ -128,7 +128,7 @@ ripng_print(netdissect_options *ndo, const u_char *dat, unsigned int length)
 		length_left -= (sizeof(struct rip6) - sizeof(struct netinfo6));
  		j = length_left / sizeof(*ni);
 		if (j == 1) {
-			ND_TCHECK(rp->rip6_nets);
+			ND_TCHECK_SIZE(rp->rip6_nets);
 			if (EXTRACT_U_1(rp->rip6_nets->rip6_metric) == HOPCNT_INFINITY6
 			    &&  IN6_IS_ADDR_UNSPECIFIED(&rp->rip6_nets->rip6_dest)) {
 				ND_PRINT(" ripng-req dump");
