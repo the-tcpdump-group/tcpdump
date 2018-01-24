@@ -1239,20 +1239,22 @@ icmp6_print(netdissect_options *ndo,
 	    }
 		break;
 	case ND_REDIRECT:
-#define RDR(i) ((const struct nd_redirect *)(i))
-                         ND_TCHECK(RDR(dp)->nd_rd_dst);
-                         ND_PRINT(", %s", ip6addr_string(ndo, &RDR(dp)->nd_rd_dst));
-		ND_TCHECK(RDR(dp)->nd_rd_target);
-		ND_PRINT(" to %s",
-                          ip6addr_string(ndo, &RDR(dp)->nd_rd_target));
+	    {
+		const struct nd_redirect *p;
+
+		p = (const struct nd_redirect *)dp;
+		ND_TCHECK(p->nd_rd_dst);
+		ND_PRINT(", %s", ip6addr_string(ndo, &p->nd_rd_dst));
+		ND_TCHECK(p->nd_rd_target);
+		ND_PRINT(" to %s", ip6addr_string(ndo, &p->nd_rd_target));
 #define REDIRECTLEN 40
 		if (ndo->ndo_vflag) {
 			icmp6_opt_print(ndo, (const u_char *)dp + REDIRECTLEN,
 					length - REDIRECTLEN);
-		}
-		break;
 #undef REDIRECTLEN
-#undef RDR
+		}
+	    }
+		break;
 	case ICMP6_ROUTER_RENUMBERING:
 		icmp6_rrenum_print(ndo, bp, ep);
 		break;
