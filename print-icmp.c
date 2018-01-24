@@ -368,7 +368,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		break;
 
 	case ICMP_UNREACH:
-		ND_TCHECK(dp->icmp_ip.ip_dst);
+		ND_TCHECK_4(dp->icmp_ip.ip_dst);
 		switch (icmp_code) {
 
 		case ICMP_UNREACH_PROTOCOL:
@@ -439,7 +439,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		break;
 
 	case ICMP_REDIRECT:
-		ND_TCHECK(dp->icmp_ip.ip_dst);
+		ND_TCHECK_4(dp->icmp_ip.ip_dst);
 		fmt = tok2str(type2str, "redirect-#%u %%s to net %%s",
 		    icmp_code);
 		(void)snprintf(buf, sizeof(buf), fmt,
@@ -499,7 +499,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		break;
 
 	case ICMP_TIMXCEED:
-		ND_TCHECK(dp->icmp_ip.ip_dst);
+		ND_TCHECK_4(dp->icmp_ip.ip_dst);
 		switch (icmp_code) {
 
 		case ICMP_TIMXCEED_INTRANS:
