@@ -992,23 +992,23 @@ ospf_decode_v2(netdissect_options *ndo,
 	switch (EXTRACT_U_1(op->ospf_type)) {
 
 	case OSPF_TYPE_HELLO:
-		ND_TCHECK(op->ospf_hello.hello_options);
+		ND_TCHECK_1(op->ospf_hello.hello_options);
 		ND_PRINT("\n\tOptions [%s]",
 		          bittok2str(ospf_option_values,"none",EXTRACT_U_1(op->ospf_hello.hello_options)));
 
-		ND_TCHECK(op->ospf_hello.hello_deadint);
+		ND_TCHECK_4(op->ospf_hello.hello_deadint);
 		ND_PRINT("\n\t  Hello Timer %us, Dead Timer %us, Mask %s, Priority %u",
 		          EXTRACT_BE_U_2(op->ospf_hello.hello_helloint),
 		          EXTRACT_BE_U_4(op->ospf_hello.hello_deadint),
 		          ipaddr_string(ndo, &op->ospf_hello.hello_mask),
 		          EXTRACT_U_1(op->ospf_hello.hello_priority));
 
-		ND_TCHECK(op->ospf_hello.hello_dr);
+		ND_TCHECK_4(&op->ospf_hello.hello_dr);
 		if (op->ospf_hello.hello_dr.s_addr != 0)
 			ND_PRINT("\n\t  Designated Router %s",
 			    ipaddr_string(ndo, &op->ospf_hello.hello_dr));
 
-		ND_TCHECK(op->ospf_hello.hello_bdr);
+		ND_TCHECK_4(&op->ospf_hello.hello_bdr);
 		if (op->ospf_hello.hello_bdr.s_addr != 0)
 			ND_PRINT(", Backup Designated Router %s",
 			          ipaddr_string(ndo, &op->ospf_hello.hello_bdr));
@@ -1024,17 +1024,17 @@ ospf_decode_v2(netdissect_options *ndo,
 		break;	/* HELLO */
 
 	case OSPF_TYPE_DD:
-		ND_TCHECK(op->ospf_db.db_options);
+		ND_TCHECK_1(op->ospf_db.db_options);
 		ND_PRINT("\n\tOptions [%s]",
 		          bittok2str(ospf_option_values, "none", EXTRACT_U_1(op->ospf_db.db_options)));
-		ND_TCHECK(op->ospf_db.db_flags);
+		ND_TCHECK_1(op->ospf_db.db_flags);
 		ND_PRINT(", DD Flags [%s]",
 		          bittok2str(ospf_dd_flag_values, "none", EXTRACT_U_1(op->ospf_db.db_flags)));
-		ND_TCHECK(op->ospf_db.db_ifmtu);
+		ND_TCHECK_2(op->ospf_db.db_ifmtu);
 		if (EXTRACT_BE_U_2(op->ospf_db.db_ifmtu)) {
 			ND_PRINT(", MTU: %u", EXTRACT_BE_U_2(op->ospf_db.db_ifmtu));
 		}
-		ND_TCHECK(op->ospf_db.db_seq);
+		ND_TCHECK_4(op->ospf_db.db_seq);
 		ND_PRINT(", Sequence: 0x%08x", EXTRACT_BE_U_4(op->ospf_db.db_seq));
 
 		/* Print all the LS adv's */
@@ -1076,7 +1076,7 @@ ospf_decode_v2(netdissect_options *ndo,
 
 	case OSPF_TYPE_LS_UPDATE:
                 lsap = op->ospf_lsu.lsu_lsa;
-                ND_TCHECK(op->ospf_lsu.lsu_count);
+                ND_TCHECK_4(op->ospf_lsu.lsu_count);
                 lsa_count_max = EXTRACT_BE_U_4(op->ospf_lsu.lsu_count);
                 ND_PRINT(", %u LSA%s", lsa_count_max, PLURAL_SUFFIX(lsa_count_max));
                 for (lsa_count=1;lsa_count <= lsa_count_max;lsa_count++) {
