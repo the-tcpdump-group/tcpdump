@@ -346,6 +346,14 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 			ND_PRINT(",");
 		ND_PRINT(" caplen(%u) > %u", h->caplen, MAXIMUM_SNAPLEN);
 	}
+	if (h->len > MAXIMUM_SNAPLEN) {
+		if (!invalid_header) {
+			invalid_header = 1;
+			ND_PRINT("[Invalid header:");
+		} else
+			ND_PRINT(",");
+		ND_PRINT(" len(%u) > %u", h->len, MAXIMUM_SNAPLEN);
+	}
 	if (invalid_header) {
 		ND_PRINT("]\n");
 		return;
@@ -356,7 +364,11 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	 *   capture length != 0,
 	 *   packet length != 0,
 	 *   capture length <= MAXIMUM_SNAPLEN,
+	 *   packet length <= MAXIMUM_SNAPLEN,
 	 *   packet length >= capture length.
+	 *
+	 * Currently, there is no D-Bus printer, thus no need for
+	 * bigger lengths.
 	 */
 
 	ts_print(ndo, &h->ts);
