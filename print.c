@@ -343,6 +343,13 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 		return;
 	}
 
+	/*
+	 * At this point:
+	 *   capture length != 0,
+	 *   packet length != 0,
+	 *   packet length >= capture length.
+	 */
+
 	ts_print(ndo, &h->ts);
 
 	/*
