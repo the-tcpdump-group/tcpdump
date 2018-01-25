@@ -191,7 +191,6 @@ struct netdissect_options {
 				 * LF, CR and SPACE as graphical chars
 				 */
   int ndo_Hflag;		/* dissect 802.11s draft mesh standard */
-  int ndo_invalid_header;
   int ndo_packet_number;	/* print a packet number in the beginning of line */
   int ndo_suppress_default_print; /* don't use default_print() for unknown packet types */
   int ndo_tstamp_precision;	/* requested time stamp precision */
