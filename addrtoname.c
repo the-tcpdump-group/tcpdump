@@ -172,7 +172,7 @@ win32_gethostbyaddr(const char *addr, int len, int type)
 		    hname, sizeof(hname), NULL, 0, 0)) {
 			return NULL;
 		} else {
-			strcpy(host.h_name, hname);
+			strlcpy(host.h_name, hname, NI_MAXHOST);
 			return &host;
 		}
 		break;
