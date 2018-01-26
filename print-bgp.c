@@ -1644,6 +1644,8 @@ bgp_attr_print(netdissect_options *ndo,
         break;
     case BGPTYPE_MP_REACH_NLRI:
         ND_TCHECK_3(tptr);
+        if (tlen < 3)
+            goto trunc;
         af = EXTRACT_BE_U_2(tptr);
         safi = EXTRACT_U_1(tptr + 2);
 
@@ -2280,6 +2282,8 @@ bgp_attr_print(netdissect_options *ndo,
         uint8_t tunnel_type, flags;
 
         ND_TCHECK_5(tptr);
+        if (tlen < 5)
+            goto trunc;
         flags = EXTRACT_U_1(tptr);
         tunnel_type = EXTRACT_U_1(tptr + 1);
         tlen = len;
@@ -2361,6 +2365,8 @@ bgp_attr_print(netdissect_options *ndo,
              * Check if we can read the TLV data.
              */
             ND_TCHECK_LEN(tptr + 3, length);
+            if (tlen < length)
+                goto trunc;
 
             switch (type) {
 
@@ -2395,16 +2401,22 @@ bgp_attr_print(netdissect_options *ndo,
             u_int aflags, alenlen, alen;
 
             ND_TCHECK_2(tptr);
-            if (len < 2)
-                goto trunc;
+            if (len < 2) {
+                ND_PRINT(" [path attr too short]");
+                tptr += len;
+                break;
+            }
             aflags = EXTRACT_U_1(tptr);
             atype = EXTRACT_U_1(tptr + 1);
             tptr += 2;
             len -= 2;
             alenlen = bgp_attr_lenlen(aflags, tptr);
             ND_TCHECK_LEN(tptr, alenlen);
-            if (len < alenlen)
-                goto trunc;
+            if (len < alenlen) {
+                ND_PRINT(" [path attr too short]");
+                tptr += len;
+                break;
+            }
             alen = bgp_attr_len(aflags, tptr);
             tptr += alenlen;
             len -= alenlen;
@@ -2423,7 +2435,13 @@ bgp_attr_print(netdissect_options *ndo,
                           aflags & 0x10 ? "E" : "");
                 if (aflags & 0xf)
                     ND_PRINT("+%x", aflags & 0xf);
-                ND_PRINT("]: ");
+                ND_PRINT("]");
+            }
+            ND_PRINT(": ");
+            if (len < alen) {
+                ND_PRINT(" [path attr too short]");
+                tptr += len;
+                break;
             }
             /* FIXME check for recursion */
             if (!bgp_attr_print(ndo, atype, tptr, alen))
@@ -2490,6 +2508,10 @@ bgp_capabilities_print(netdissect_options *ndo,
         ND_TCHECK_LEN(opt + 2 + i, cap_len);
         switch (cap_type) {
         case BGP_CAPCODE_MP:
+            if (tcap_len < 4) {
+                ND_PRINT(" (too short, < 4)");
+                return;
+            }
             ND_PRINT("\n\t\tAFI %s (%u), SAFI %s (%u)",
                tok2str(af_values, "Unknown", EXTRACT_BE_U_2(opt + i + 2)),
                EXTRACT_BE_U_2(opt + i + 2),
@@ -2497,6 +2519,10 @@ bgp_capabilities_print(netdissect_options *ndo,
                EXTRACT_U_1(opt + i + 5));
             break;
         case BGP_CAPCODE_RESTART:
+            if (tcap_len < 2) {
+                ND_PRINT(" (too short, < 2)");
+                return;
+            }
             ND_PRINT("\n\t\tRestart Flags: [%s], Restart Time %us",
                       ((EXTRACT_U_1(opt + i + 2))&0x80) ? "R" : "none",
                       EXTRACT_BE_U_2(opt + i + 2)&0xfff);
@@ -2523,11 +2549,13 @@ bgp_capabilities_print(netdissect_options *ndo,
             /*
              * Extract the 4 byte AS number encoded.
              */
-            if (cap_len == 4) {
+            if (cap_len < 4) {
+                ND_PRINT(" (too short, < 4)");
+                return;
+            }
             ND_PRINT("\n\t\t 4 Byte AS %s",
                       as_printf(ndo, astostr, sizeof(astostr),
                       EXTRACT_BE_U_4(opt + i + 2)));
-            }
             break;
         case BGP_CAPCODE_ADD_PATH:
             cap_offset=2;
@@ -2709,6 +2737,9 @@ bgp_update_print(netdissect_options *ndo,
             }
         }
     } else {
+        ND_TCHECK_LEN(p, withdrawn_routes_len);
+        if (length < withdrawn_routes_len)
+            goto trunc;
         p += withdrawn_routes_len;
         length -= withdrawn_routes_len;
     }
@@ -2732,10 +2763,14 @@ bgp_update_print(netdissect_options *ndo,
             u_int aflags, atype, alenlen, alen;
 
             ND_TCHECK_2(p);
-            if (len < 2)
-                goto trunc;
             if (length < 2)
                 goto trunc;
+            if (len < 2) {
+                ND_PRINT("\n\t  [path attrs too short]");
+                p += len;
+                length -= len;
+                break;
+            }
             aflags = EXTRACT_U_1(p);
             atype = EXTRACT_U_1(p + 1);
             p += 2;
@@ -2743,10 +2778,14 @@ bgp_update_print(netdissect_options *ndo,
             length -= 2;
             alenlen = bgp_attr_lenlen(aflags, p);
             ND_TCHECK_LEN(p, alenlen);
-            if (len < alenlen)
-                goto trunc;
             if (length < alenlen)
                 goto trunc;
+            if (len < alenlen) {
+                ND_PRINT("\n\t  [path attrs too short]");
+                p += len;
+                length -= len;
+                break;
+            }
             alen = bgp_attr_len(aflags, p);
             p += alenlen;
             len -= alenlen;
@@ -2767,8 +2806,12 @@ bgp_update_print(netdissect_options *ndo,
                     ND_PRINT("+%x", aflags & 0xf);
                 ND_PRINT("]: ");
             }
-            if (len < alen)
-                goto trunc;
+            if (len < alen) {
+                ND_PRINT(" [path attrs too short]");
+                p += len;
+                length -= len;
+                break;
+            }
             if (length < alen)
                 goto trunc;
             if (!bgp_attr_print(ndo, atype, p, alen))
@@ -2784,6 +2827,9 @@ bgp_update_print(netdissect_options *ndo,
         ND_PRINT("\n\t  Updated routes:");
         while (length != 0) {
             if (add_path) {
+                ND_TCHECK_4(p);
+                if (length < 4)
+                    goto trunc;
                 path_id = EXTRACT_BE_U_4(p);
                 p += 4;
                 length -= 4;
