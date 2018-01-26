@@ -158,7 +158,7 @@ static const u_char fddi_bit_swap[] = {
 /*
  * Print FDDI frame-control bits
  */
-static inline void
+static void
 print_fddi_fc(netdissect_options *ndo, u_char fc)
 {
 	switch (fc) {
@@ -226,7 +226,7 @@ print_fddi_fc(netdissect_options *ndo, u_char fc)
 }
 
 /* Extract src, dst addresses */
-static inline void
+static void
 extract_fddi_addrs(const struct fddi_header *fddip, char *fsrc, char *fdst)
 {
 	int i;
@@ -250,7 +250,7 @@ extract_fddi_addrs(const struct fddi_header *fddip, char *fsrc, char *fdst)
 /*
  * Print the FDDI MAC header
  */
-static inline void
+static void
 fddi_hdr_print(netdissect_options *ndo,
                const struct fddi_header *fddip, u_int length,
                const u_char *fsrc, const u_char *fdst)
@@ -267,7 +267,7 @@ fddi_hdr_print(netdissect_options *ndo,
 	       length);
 }
 
-static inline void
+static void
 fddi_smt_print(netdissect_options *ndo, const u_char *p _U_, u_int length _U_)
 {
 	ND_PRINT("<SMT printer not yet implemented>");

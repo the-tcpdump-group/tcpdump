@@ -222,8 +222,8 @@ typedef struct map_register_loc {
 
 #define MAP_REGISTER_LOC_LEN sizeof(lisp_map_register_loc)
 
-static inline uint8_t extract_lisp_type(uint8_t);
-static inline uint8_t is_xtr_data_present(uint8_t , uint8_t);
+static uint8_t extract_lisp_type(uint8_t);
+static uint8_t is_xtr_data_present(uint8_t, uint8_t);
 static void lisp_hdr_flag(netdissect_options *, const lisp_map_register_hdr *);
 static void action_flag(netdissect_options *, uint8_t);
 static void loc_hdr_flag(netdissect_options *, uint16_t);
@@ -393,12 +393,14 @@ invalid:
 	return;
 }
 
-static inline uint8_t extract_lisp_type(uint8_t lisp_hdr_flags)
+static uint8_t
+extract_lisp_type(uint8_t lisp_hdr_flags)
 {
 	return (lisp_hdr_flags) >> TYPE_INDEX;
 }
 
-static inline uint8_t is_xtr_data_present(uint8_t type, uint8_t lisp_hdr_flags)
+static uint8_t
+is_xtr_data_present(uint8_t type, uint8_t lisp_hdr_flags)
 {
 	uint8_t xtr_present = 0;
 

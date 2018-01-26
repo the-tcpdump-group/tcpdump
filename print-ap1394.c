@@ -55,7 +55,7 @@ fwaddr_string(netdissect_options *ndo, const u_char *addr)
 	return (linkaddr_string(ndo, addr, LINKADDR_IEEE1394, FIREWIRE_EUI64_LEN));
 }
 
-static inline void
+static void
 ap1394_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	const struct firewire_header *fp;

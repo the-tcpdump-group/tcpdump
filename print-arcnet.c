@@ -118,7 +118,7 @@ static const struct tok arctypemap[] = {
 	{ 0, 0 }
 };
 
-static inline void
+static void
 arcnet_print(netdissect_options *ndo, const u_char *bp, u_int length, int phds,
              u_int flag, u_int seqid)
 {

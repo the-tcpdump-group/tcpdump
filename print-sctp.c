@@ -434,7 +434,8 @@ static const struct tok PayloadProto_idents[] = {
 };
 
 
-static inline int isForCES_port(u_short Port)
+static int
+isForCES_port(u_short Port)
 {
 	if (Port == CHAN_HP)
 		return 1;

@@ -33,7 +33,7 @@ static const struct tok ipnet_values[] = {
 	{ 0,			NULL }
 };
 
-static inline void
+static void
 ipnet_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	const ipnet_hdr_t *hdr;

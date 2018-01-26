@@ -26,7 +26,7 @@ typedef struct ppi_header {
 
 #ifdef DLT_PPI
 
-static inline void
+static void
 ppi_header_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	const ppi_header_t *hdr;

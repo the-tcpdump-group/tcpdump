@@ -46,7 +46,7 @@ static const struct tok nflog_values[] = {
 	{ 0,			NULL }
 };
 
-static inline void
+static void
 nflog_hdr_print(netdissect_options *ndo, const nflog_hdr_t *hdr, u_int length)
 {
 	ND_PRINT("version %d, resource ID %d", hdr->nflog_version, ntohs(hdr->nflog_rid));

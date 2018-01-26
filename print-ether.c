@@ -104,7 +104,7 @@ const struct tok ethertype_values[] = {
     { 0, NULL}
 };
 
-static inline void
+static void
 ether_hdr_print(netdissect_options *ndo,
                 const u_char *bp, u_int length)
 {

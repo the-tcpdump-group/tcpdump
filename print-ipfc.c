@@ -42,7 +42,7 @@ struct ipfc_header {
 #define IPFC_HDRLEN 16
 
 /* Extract src, dst addresses */
-static inline void
+static void
 extract_ipfc_addrs(const struct ipfc_header *ipfcp, char *ipfcsrc,
     char *ipfcdst)
 {
@@ -57,7 +57,7 @@ extract_ipfc_addrs(const struct ipfc_header *ipfcp, char *ipfcsrc,
 /*
  * Print the Network_Header
  */
-static inline void
+static void
 ipfc_hdr_print(netdissect_options *ndo,
 	   const struct ipfc_header *ipfcp _U_,
 	   u_int length, const u_char *ipfcsrc,

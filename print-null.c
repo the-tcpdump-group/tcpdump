@@ -52,7 +52,7 @@
 #define	SWAPLONG(y) \
 ((((y)&0xff)<<24) | (((y)&0xff00)<<8) | (((y)&0xff0000)>>8) | (((y)>>24)&0xff))
 
-static inline void
+static void
 null_hdr_print(netdissect_options *ndo, u_int family, u_int length)
 {
 	if (!ndo->ndo_qflag) {

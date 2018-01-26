@@ -191,7 +191,8 @@ static const char *dccp_feature_nums[] = {
 	"check data checksum",
 };
 
-static inline u_int dccp_csum_coverage(const struct dccp_hdr* dh, u_int len)
+static u_int
+dccp_csum_coverage(const struct dccp_hdr* dh, u_int len)
 {
 	u_int cov;
 
@@ -237,7 +238,8 @@ static uint64_t dccp_seqno(const u_char *bp)
 	return seqno;
 }
 
-static inline unsigned int dccp_basic_hdr_len(const struct dccp_hdr *dh)
+static unsigned int
+dccp_basic_hdr_len(const struct dccp_hdr *dh)
 {
 	return DCCPH_X(dh) ? sizeof(struct dccp_hdr_ext) : sizeof(struct dccp_hdr);
 }

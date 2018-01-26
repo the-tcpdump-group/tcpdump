@@ -406,7 +406,7 @@ static const char hex[16] = {
 
 /* Find the hash node that corresponds the ether address 'ep' */
 
-static inline struct enamemem *
+static struct enamemem *
 lookup_emem(netdissect_options *ndo, const u_char *ep)
 {
 	u_int i, j, k;
@@ -439,7 +439,7 @@ lookup_emem(netdissect_options *ndo, const u_char *ep)
  * with length 'nlen'
  */
 
-static inline struct bsnamemem *
+static struct bsnamemem *
 lookup_bytestring(netdissect_options *ndo, const u_char *bs,
 		  const unsigned int nlen)
 {
@@ -487,7 +487,7 @@ lookup_bytestring(netdissect_options *ndo, const u_char *bs,
 
 /* Find the hash node that corresponds the NSAP 'nsap' */
 
-static inline struct enamemem *
+static struct enamemem *
 lookup_nsap(netdissect_options *ndo, const u_char *nsap,
 	    u_int nsap_length)
 {
@@ -532,7 +532,7 @@ lookup_nsap(netdissect_options *ndo, const u_char *nsap,
 
 /* Find the hash node that corresponds the protoid 'pi'. */
 
-static inline struct protoidmem *
+static struct protoidmem *
 lookup_protoid(netdissect_options *ndo, const u_char *pi)
 {
 	u_int i, j;

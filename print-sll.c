@@ -129,7 +129,7 @@ static const struct tok sll_pkttype_values[] = {
     { 0, NULL}
 };
 
-static inline void
+static void
 sll_print(netdissect_options *ndo, const struct sll_header *sllp, u_int length)
 {
 	u_short ether_type;

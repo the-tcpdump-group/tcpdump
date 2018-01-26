@@ -37,7 +37,7 @@ struct symantec_header {
 	nd_byte     stuff2[36];
 };
 
-static inline void
+static void
 symantec_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	const struct symantec_header *sp;

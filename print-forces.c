@@ -86,7 +86,8 @@ enum {
 };
 #define TOM_MAX_IND (_TOM_RSV_MAX - 1)
 
-static inline int tom_valid(uint8_t tom)
+static int
+tom_valid(uint8_t tom)
 {
 	if (tom > 0) {
 		if (tom >= 0x7 && tom <= 0xe)
@@ -100,7 +101,8 @@ static inline int tom_valid(uint8_t tom)
 		return 0;
 }
 
-static inline const char *ForCES_node(uint32_t node)
+static const char *
+ForCES_node(uint32_t node)
 {
 	if (node <= 0x3FFFFFFF)
 		return "FE";
@@ -276,7 +278,8 @@ static const struct optlv_h OPTLV_msg[F_OP_MAX + 1] = {
 	/* F_OP_RTRCOMP */ {ZERO_TTLV, 0, " RTRCOMP", NULL},
 };
 
-static inline const struct optlv_h *get_forces_optlv_h(uint16_t opt)
+static const struct optlv_h *
+get_forces_optlv_h(uint16_t opt)
 {
 	if (opt > F_OP_MAX || opt == F_OP_RSV)
 		return &OPTLV_msg[F_OP_RSV];
@@ -290,7 +293,8 @@ static inline const struct optlv_h *get_forces_optlv_h(uint16_t opt)
 #define IND_SUF 0x0
 static char ind_buf[IND_SIZE];
 
-static inline char *indent_pr(int indent, int nlpref)
+static char *
+indent_pr(int indent, int nlpref)
 {
 	int i = 0;
 	char *r = ind_buf;
@@ -311,7 +315,8 @@ static inline char *indent_pr(int indent, int nlpref)
 	return r;
 }
 
-static inline int op_valid(uint16_t op, uint16_t mask)
+static int
+op_valid(uint16_t op, uint16_t mask)
 {
 	if (op == 0)
 		return 0;
@@ -357,7 +362,8 @@ static const struct tok ForCES_TLV[] = {
 };
 
 #define TLV_HLN	4
-static inline int ttlv_valid(uint16_t ttlv)
+static int
+ttlv_valid(uint16_t ttlv)
 {
 	if (ttlv > 0) {
 		if (ttlv == 1 || ttlv == 0x1000)
@@ -408,7 +414,8 @@ static const struct tok ForCES_TLV_err[] = {
 	{0, NULL}
 };
 
-static inline u_int tlv_valid(u_int tlvl, u_int rlen)
+static u_int
+tlv_valid(u_int tlvl, u_int rlen)
 {
 	if (rlen < TLV_HDRL)
 		return INVALID_RLEN;
@@ -422,7 +429,8 @@ static inline u_int tlv_valid(u_int tlvl, u_int rlen)
 	return 0;
 }
 
-static inline int ilv_valid(const struct forces_ilv *ilv, u_int rlen)
+static int
+ilv_valid(const struct forces_ilv *ilv, u_int rlen)
 {
 	if (rlen < ILV_HDRL)
 		return INVALID_RLEN;
@@ -478,7 +486,8 @@ static const struct tom_h ForCES_msg[TOM_MAX_IND + 1] = {
 	    {TOM_QUERYREP, TTLV_T2, CFG_QYR, "Query Response", lfbselect_print},
 };
 
-static inline const struct tom_h *get_forces_tom(uint8_t tom)
+static const struct tom_h *
+get_forces_tom(uint8_t tom)
 {
 	int i;
 	for (i = TOM_RSV_I; i <= TOM_MAX_IND; i++) {
@@ -509,14 +518,15 @@ enum {
 };
 #define PD_MAX_IND (_TOM_RSV_MAX - 1)
 
-static inline int pd_valid(uint16_t pd)
+static int
+pd_valid(uint16_t pd)
 {
 	if (pd >= F_TLV_PDAT && pd <= F_TLV_REST)
 		return 1;
 	return 0;
 }
 
-static inline void
+static void
 chk_op_type(netdissect_options *ndo,
             uint16_t type, uint16_t msk, uint16_t omsk)
 {
@@ -564,7 +574,8 @@ static const struct pdata_ops ForCES_pdata[PD_MAX_IND + 1] = {
 	    {F_TLV_PDAT, 0, 0, "Inner PATH-DATA TLV", recpdoptlv_print},
 };
 
-static inline const struct pdata_ops *get_forces_pd(uint16_t pd)
+static const struct pdata_ops *
+get_forces_pd(uint16_t pd)
 {
 	int i;
 	for (i = PD_RSV_I + 1; i <= PD_MAX_IND; i++) {

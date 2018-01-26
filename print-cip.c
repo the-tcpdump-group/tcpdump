@@ -41,7 +41,7 @@ static const unsigned char rfcllc[] = {
 	0x00,
 	0x00 };
 
-static inline void
+static void
 cip_print(netdissect_options *ndo, u_int length)
 {
 	/*

@@ -67,7 +67,7 @@ typedef struct pktap_header {
 #define PKT_REC_NONE	0	/* nothing follows the header */
 #define PKT_REC_PACKET	1	/* a packet follows the header */
 
-static inline void
+static void
 pktap_header_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	const pktap_header_t *hdr;

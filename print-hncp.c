@@ -145,7 +145,7 @@ static const struct tok dh6opt_str[] = {
 /*
  * Is an IPv6 address an IPv4-mapped address?
  */
-static inline int
+static int
 is_ipv4_mapped_address(const u_char *addr)
 {
     /* The value of the prefix */
