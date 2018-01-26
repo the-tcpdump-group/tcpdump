@@ -1084,7 +1084,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     if (obj_tlen < length) {
                         ND_PRINT("%s  ERROR: ERO subobject length > object length", indent);
                         break;
-                    };
+                    }
 
                     if (length == 0) { /* prevent infinite loops */
                         ND_PRINT("%s  ERROR: zero length ERO subtype", indent);
