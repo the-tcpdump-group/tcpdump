@@ -350,6 +350,7 @@ EXTRA_DIST = \
 	missing/datalinks.c \
 	missing/getopt_long.c \
 	missing/getservent.c \
+	missing/pcap_dump_ftell.c \
 	missing/snprintf.c \
 	missing/strdup.c \
 	missing/strlcat.c \
