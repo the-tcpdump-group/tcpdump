@@ -277,25 +277,6 @@ check_include_file(bitypes.h HAVE_SYS_BITYPES_H)
 check_include_file(limits.h HAVE_LIMITS_H)
 
 #
-# Check whether we have pcap/pcap-inttypes.h.
-# If we do, we use that to get the C99 types defined.
-#
-check_include_file(pcap/pcap-inttypes.h HAVE_PCAP_PCAP_INTTYPES_H)
-
-#
-# Check for some headers introduced in later versions of libpcap
-# and used by some printers.
-#
-# Those headers might use the {u_}intN_t types, so we must include
-# netdissect-stdinc.h first.
-#
-cmake_push_check_state()
-set(CMAKE_EXTRA_INCLUDE_FILES netdissect-stdinc.h)
-check_include_file(pcap/bluetooth.h HAVE_PCAP_BLUETOOTH_H)
-check_include_file(pcap/nflog.h HAVE_PCAP_NFLOG_H)
-cmake_pop_check_state()
-
-#
 # Functions.
 #
 check_function_exists(strlcat HAVE_STRLCAT)
@@ -415,14 +396,34 @@ include(CheckLibraryExists)
 
 #
 # libpcap/WinPcap.
-# First find it, then check for functions in it.
+# First, find it.
 #
 find_package(PCAP REQUIRED)
 
 #
+# Check whether we have pcap/pcap-inttypes.h.
+# If we do, we use that to get the C99 types defined.
+#
+check_include_file(pcap/pcap-inttypes.h HAVE_PCAP_PCAP_INTTYPES_H)
+
+#
+# Check for some headers introduced in later versions of libpcap
+# and used by some printers.
+#
+# Those headers might use the {u_}intN_t types, so we must include
+# netdissect-stdinc.h first.
+#
+cmake_push_check_state()
+set(CMAKE_EXTRA_INCLUDE_FILES netdissect-stdinc.h)
+check_include_file(pcap/bluetooth.h HAVE_PCAP_BLUETOOTH_H)
+check_include_file(pcap/nflog.h HAVE_PCAP_NFLOG_H)
+cmake_pop_check_state()
+
+#
 # Check for various functions in libpcap/WinPcap.
 #
-include_directories(${PCAP_INCLUDE_DIR})
+include_directories(${PCAP_INCLUDE_DIRS})
+link_directories(${PCAP_LIBRARY_DIRS})
 cmake_push_check_state()
 set(CMAKE_REQUIRED_LIBRARIES ${PCAP_LIBRARIES})
 
