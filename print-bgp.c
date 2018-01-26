@@ -2500,7 +2500,6 @@ bgp_capabilities_print(netdissect_options *ndo,
         ND_TCHECK_LEN(opt + i, BGP_CAP_HEADER_SIZE);
         cap_type=EXTRACT_U_1(opt + i);
         cap_len=EXTRACT_U_1(opt + i + 1);
-        tcap_len=cap_len;
         ND_PRINT("\n\t      %s (%u), length: %u",
                   tok2str(bgp_capcode_values, "Unknown", cap_type),
                   cap_type,
@@ -2508,7 +2507,7 @@ bgp_capabilities_print(netdissect_options *ndo,
         ND_TCHECK_LEN(opt + 2 + i, cap_len);
         switch (cap_type) {
         case BGP_CAPCODE_MP:
-            if (tcap_len < 4) {
+            if (cap_len < 4) {
                 ND_PRINT(" (too short, < 4)");
                 return;
             }
@@ -2519,10 +2518,11 @@ bgp_capabilities_print(netdissect_options *ndo,
                EXTRACT_U_1(opt + i + 5));
             break;
         case BGP_CAPCODE_RESTART:
-            if (tcap_len < 2) {
+            if (cap_len < 2) {
                 ND_PRINT(" (too short, < 2)");
                 return;
             }
+            tcap_len=cap_len;
             ND_PRINT("\n\t\tRestart Flags: [%s], Restart Time %us",
                       ((EXTRACT_U_1(opt + i + 2))&0x80) ? "R" : "none",
                       EXTRACT_BE_U_2(opt + i + 2)&0xfff);
@@ -2545,7 +2545,6 @@ bgp_capabilities_print(netdissect_options *ndo,
         case BGP_CAPCODE_RR_CISCO:
             break;
         case BGP_CAPCODE_AS_NEW:
-
             /*
              * Extract the 4 byte AS number encoded.
              */
@@ -2558,11 +2557,12 @@ bgp_capabilities_print(netdissect_options *ndo,
                       EXTRACT_BE_U_4(opt + i + 2)));
             break;
         case BGP_CAPCODE_ADD_PATH:
-            cap_offset=2;
-            if (tcap_len == 0) {
+            if (cap_len == 0) {
                 ND_PRINT(" (bogus)"); /* length */
                 break;
             }
+            tcap_len=cap_len;
+            cap_offset=2;
             while (tcap_len != 0) {
                 if (tcap_len < 4) {
                     ND_PRINT("\n\t\t(invalid)");
