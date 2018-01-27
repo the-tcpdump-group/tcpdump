@@ -423,7 +423,6 @@ cmake_pop_check_state()
 # Check for various functions in libpcap/WinPcap.
 #
 include_directories(${PCAP_INCLUDE_DIRS})
-link_directories(${PCAP_LIBRARY_DIRS})
 cmake_push_check_state()
 set(CMAKE_REQUIRED_LIBRARIES ${PCAP_LIBRARIES})
 

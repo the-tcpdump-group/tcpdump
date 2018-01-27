@@ -16,7 +16,7 @@ if(PCAP_CONFIG)
   endif()
   string(REGEX REPLACE "-I" "" PCAP_INCLUDE_DIR ${PCAP_CONFIG_OUTPUT})
 
-  # Now, get the library directories and libraries.
+  # Now, get the libraries.
   execute_process(COMMAND "${PCAP_CONFIG}" "--libs"
     RESULT_VARIABLE PCAP_CONFIG_RESULT
     OUTPUT_VARIABLE PCAP_CONFIG_OUTPUT
@@ -26,16 +26,24 @@ if(PCAP_CONFIG)
     message(FATAL_ERROR "pcap-config --libs failed")
   endif()
   separate_arguments(LIBS_LIST UNIX_COMMAND ${PCAP_CONFIG_OUTPUT})
-  set(PCAP_LIBRARY_DIRS)
+  set(_pcap_library_dirs)
   set(PCAP_LIBRARIES)
-  foreach(arg IN LISTS LIBS_LIST)
-    if(arg MATCHES "^-L")
-      # Add this directory to PCAP_LIBRARY_DIRS
-      string(REGEX REPLACE "-L" "" dir ${arg})
-      list(APPEND PCAP_LIBRARY_DIRS ${dir})
-    elseif(arg MATCHES "^-l")
-      string(REGEX REPLACE "-l" "" lib ${arg})
-      list(APPEND PCAP_LIBRARIES ${lib})
+  foreach(_arg IN LISTS LIBS_LIST)
+    if(_arg MATCHES "^-L")
+      # Add this directory to _pcap_library_dirs
+      string(REGEX REPLACE "-L" "" _dir ${_arg})
+      list(APPEND _pcap_library_dirs ${_dir})
+    elseif(_arg MATCHES "^-l")
+      string(REGEX REPLACE "-l" "" _lib ${_arg})
+      #
+      # Try to find that library, so we get its full path.
+      # CMake *really* doesn't like the notion of specifying "here are
+      # the directories in which to look for libraries" except in
+      # find_library() calls; it *really* prefers using full paths to
+      # library files, rather than library names.
+      #
+      find_library(_libfullpath ${_lib} HINTS ${__pcap_library_dirs})
+      list(APPEND PCAP_LIBRARIES ${_libfullpath})
     endif()
   endforeach()
 
@@ -48,16 +56,21 @@ if(PCAP_CONFIG)
     message(FATAL_ERROR "pcap-config --libs --static failed")
   endif()
   separate_arguments(LIBS_LIST UNIX_COMMAND ${PCAP_CONFIG_OUTPUT})
-  set(PCAP_STATIC_LIBRARY_DIRS)
+  set(_pcap_static_library_dirs)
   set(PCAP_STATIC_LIBRARIES)
-  foreach(arg IN LISTS LIBS_LIST)
-    if(arg MATCHES "^-L")
-      # Add this directory to PCAP_STATIC_LIBRARY_DIRS
-      string(REGEX REPLACE "-L" "" dir ${arg})
-      list(APPEND PCAP_STATIC_LIBRARY_DIRS ${dir})
-    elseif(flag MATCHES "^-l")
-      string(REGEX REPLACE "-l" "" lib ${arg})
-      list(APPEND PCAP_STATIC_LIBRARIES ${lib})
+  foreach(_arg IN LISTS LIBS_LIST)
+    if(_arg MATCHES "^-L")
+      # Add this directory to _pcap_static_library_dirs
+      string(REGEX REPLACE "-L" "" _dir ${_arg})
+      list(APPEND _pcap_static_library_dirs ${_dir})
+    elseif(_arg MATCHES "^-l")
+      string(REGEX REPLACE "-l" "" _lib ${_arg})
+      #
+      # Try to find that library, so we get its full path, as
+      # we do with dynamic libraries.
+      #
+      find_library(_libfullpath ${_lib} HINTS ${__pcap_static_library_dirs})
+      list(APPEND PCAP_STATIC_LIBRARIES ${_libfullpath})
     endif()
   endforeach()
 
@@ -65,13 +78,13 @@ if(PCAP_CONFIG)
   find_path(PCAP_INCLUDE_DIR pcap.h HINTS ${PCAP_INCLUDE_DIRS})
 
   # Try to find the library
-  find_library(PCAP_LIBRARY pcap HINTS ${PCAP_LIBRARY_DIRS})
+  find_library(PCAP_LIBRARY pcap HINTS ${_pcap_library_dirs})
 
   # Try to find the static library (XXX - what about AIX?)
   include(CMakePushCheckState)
   cmake_push_check_state()
   set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-  find_library(PCAP_STATIC_LIBRARY pcap HINTS ${PCAP_STATIC_LIBRARY_DIRS})
+  find_library(PCAP_STATIC_LIBRARY pcap HINTS ${_pcap_static_library_dirs})
   cmake_pop_check_state()
 else(PCAP_CONFIG)
   # Try to find the header
@@ -89,6 +102,7 @@ else(PCAP_CONFIG)
 
   set(PCAP_INCLUDE_DIRS ${PCAP_INCLUDE_DIR})
   set(PCAP_LIBRARIES ${PCAP_LIBRARY})
+  set(PCAP_STATIC_LIBRARIES ${PCAP_STATIC_LIBRARY})
 endif(PCAP_CONFIG)
 
 include(FindPackageHandleStandardArgs)
