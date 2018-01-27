@@ -127,6 +127,7 @@ include(CheckIncludeFiles)
 include(CheckFunctionExists)
 include(CheckSymbolExists)
 include(CheckStructHasMember)
+include(CheckVariableExists)
 include(CheckTypeSize)
 
 #
@@ -531,6 +532,10 @@ check_function_exists(pcap_findalldevs_ex HAVE_PCAP_FINDALLDEVS_EX)
 check_function_exists(pcap_set_parser_debug HAVE_PCAP_SET_PARSER_DEBUG)
 if(NOT HAVE_PCAP_SET_PARSER_DEBUG)
     # Check whether libpcap defines pcap_debug or yydebug
+    check_variable_exists(pcap_debug HAVE_PCAP_DEBUG)
+    if(NOT HAVE_PCAP_DEBUG)
+        check_variable_exists(yydebug HAVE_YYDEBUG)
+    endif(NOT HAVE_PCAP_DEBUG)
 endif(NOT HAVE_PCAP_SET_PARSER_DEBUG)
 
 check_function_exists(pcap_set_optimizer_debug HAVE_PCAP_SET_OPTIMIZER_DEBUG)
