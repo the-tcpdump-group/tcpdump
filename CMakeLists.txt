@@ -399,6 +399,14 @@ include(CheckLibraryExists)
 # First, find it.
 #
 find_package(PCAP REQUIRED)
+include_directories(${PCAP_INCLUDE_DIRS})
+
+cmake_push_check_state()
+
+#
+# Now check headers.
+#
+set(CMAKE_REQUIRED_INCLUDES ${PCAP_INCLUDE_DIRS})
 
 #
 # Check whether we have pcap/pcap-inttypes.h.
@@ -413,7 +421,6 @@ check_include_file(pcap/pcap-inttypes.h HAVE_PCAP_PCAP_INTTYPES_H)
 # Those headers might use the {u_}intN_t types, so we must include
 # netdissect-stdinc.h first.
 #
-cmake_push_check_state()
 set(CMAKE_EXTRA_INCLUDE_FILES netdissect-stdinc.h)
 check_include_file(pcap/bluetooth.h HAVE_PCAP_BLUETOOTH_H)
 check_include_file(pcap/nflog.h HAVE_PCAP_NFLOG_H)
@@ -422,7 +429,6 @@ cmake_pop_check_state()
 #
 # Check for various functions in libpcap/WinPcap.
 #
-include_directories(${PCAP_INCLUDE_DIRS})
 cmake_push_check_state()
 set(CMAKE_REQUIRED_LIBRARIES ${PCAP_LIBRARIES})
 
