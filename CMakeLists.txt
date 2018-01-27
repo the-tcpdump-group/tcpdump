@@ -125,6 +125,7 @@ include(CMakePushCheckState)
 include(CheckIncludeFile)
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
+include(CheckLibraryExists)
 include(CheckSymbolExists)
 include(CheckStructHasMember)
 include(CheckVariableExists)
@@ -291,7 +292,6 @@ check_function_exists(strsep HAVE_STRSEP)
 # that's been set, it skips the test, so we need different variables.
 #
 set(TCPDUMP_LINK_LIBRARIES "")
-include(CheckLibraryExists)
 check_function_exists(gethostbyaddr STDLIBS_HAVE_GETHOSTBYADDR)
 if(NOT STDLIBS_HAVE_GETHOSTBYADDR)
     check_library_exists(xnet gethostbyaddr "" LIBXNET_HAS_GETHOSTBYADDR)
@@ -392,8 +392,6 @@ check_struct_has_member("struct sockaddr" sa_len sys/socket.h HAVE_SOCKADDR_SA_L
 ######################################
 # External dependencies
 ######################################
-
-include(CheckLibraryExists)
 
 #
 # libpcap/WinPcap.
