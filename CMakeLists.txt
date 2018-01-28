@@ -149,6 +149,9 @@ if(HAVE_NET_PFVAR_H)
 endif(HAVE_NET_PFVAR_H)
 
 #
+# This requires the libraries we require, as ether_ntohost might be
+# in one of those libraries.
+#
 # You are in a twisty little maze of UN*Xes, all different.
 # Some might not have ether_ntohost().
 # Some might have it and declare it in <net/ethernet.h>.
@@ -160,6 +163,8 @@ endif(HAVE_NET_PFVAR_H)
 #
 # Before you is a C compiler.
 #
+cmake_push_check_state()
+set(CMAKE_REQUIRED_LIBRARIES ${TCPDUMP_LINK_LIBRARIES})
 check_function_exists(ether_ntohost HAVE_ETHER_NTOHOST)
 if(HAVE_ETHER_NTOHOST)
     #
@@ -270,6 +275,7 @@ if(HAVE_ETHER_NTOHOST)
         check_struct_has_member("struct ether_addr" octet "sys/types.h;sys/socket.h;net/if.h;netinet/in.h;netinet/if_ether.h" HAVE_STRUCT_ETHER_ADDR)
     endif()
 endif()
+cmake_pop_check_state()
 
 #
 # As the autoconf manual says, AC_HEADER_TIME is obsolete, as all UN*Xes
