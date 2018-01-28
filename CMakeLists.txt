@@ -149,8 +149,92 @@ if(HAVE_NET_PFVAR_H)
 endif(HAVE_NET_PFVAR_H)
 
 #
+# As the autoconf manual says, AC_HEADER_TIME is obsolete, as all UN*Xes
+# let you include both time.h and sys/time.h, so just say we can.
+#
+check_include_file(bitypes.h HAVE_SYS_BITYPES_H)
+check_include_file(limits.h HAVE_LIMITS_H)
+
+#
+# Functions.
+#
+check_function_exists(strlcat HAVE_STRLCAT)
+check_function_exists(strlcpy HAVE_STRLCPY)
+check_function_exists(strdup HAVE_STRDUP)
+check_function_exists(strsep HAVE_STRSEP)
+
+#
+# Find library needed for gethostbyaddr.
+# NOTE: if you hand check_library_exists as its last argument a variable
+# that's been set, it skips the test, so we need different variables.
+#
+set(TCPDUMP_LINK_LIBRARIES "")
+check_function_exists(gethostbyaddr STDLIBS_HAVE_GETHOSTBYADDR)
+if(NOT STDLIBS_HAVE_GETHOSTBYADDR)
+    check_library_exists(xnet gethostbyaddr "" LIBXNET_HAS_GETHOSTBYADDR)
+    if(LIBXNET_HAS_GETHOSTBYADDR)
+        set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} xnet)
+    else()
+        check_library_exists(nsl gethostbyaddr "" LIBNSL_HAS_GETHOSTBYADDR)
+        if(LIBNSL_HAS_GETHOSTBYADDR)
+            set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} nsl)
+        endif()
+    endif()
+endif()
+
+#
+# This may require additional libraries.
+#
+cmake_push_check_state()
+set(CMAKE_REQUIRED_LIBRARIES ${TCPDUMP_LINK_LIBRARIES})
+check_function_exists(getservent STDLIBS_HAVE_GETSERVENT)
+if(STDLIBS_HAVE_GETSERVENT)
+    set(HAVE_GETSERVENT TRUE)
+else(STDLIBS_HAVE_GETSERVENT)
+    #
+    # Some platforms may need -lsocket for getservent.
+    #
+    set(CMAKE_REQUIRED_LIBRARIES socket ${TCPDUMP_LINK_LIBRARIES})
+    check_function_exists(getservent LIBSOCKET_HAS_GETSERVENT)
+    if(LIBSOCKET_HAS_GETSERVENT)
+        set(HAVE_GETSERVENT TRUE)
+        set(TCPDUMP_LINK_LIBRARIES socket ${TCPDUMP_LINK_LIBRARIES})
+    endif(LIBSOCKET_HAS_GETSERVENT)
+endif(STDLIBS_HAVE_GETSERVENT)
+cmake_pop_check_state()
+
+check_function_exists(getopt_long HAVE_GETOPT_LONG)
+check_function_exists(vsnprintf HAVE_VSNPRINTF)
+check_function_exists(snprintf HAVE_SNPRINTF)
+check_function_exists(fork HAVE_FORK)
+check_function_exists(vfork HAVE_VFORK)
+check_function_exists(strftime HAVE_STRFTIME)
+check_function_exists(setlinebuf HAVE_SETLINEBUF)
+
+#
+# This may require additional libraries.
+# In particular, it may required -lnsl on Solaris, even if we've chosen
+# to use -lxnet above.
+#
+cmake_push_check_state()
+set(CMAKE_REQUIRED_LIBRARIES ${TCPDUMP_LINK_LIBRARIES})
+check_function_exists(getrpcbynumber STDLIBS_HAVE_GETRPCBYNUMBER)
+if(STDLIBS_HAVE_GETRPCBYNUMBER)
+    set(HAVE_GETRPCBYNUMBER TRUE)
+else(STDLIBS_HAVE_GETRPCBYNUMBER)
+    set(CMAKE_REQUIRED_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} nsl)
+    check_function_exists(getrpcbynumber LIBNSL_HAS_GETRPCBYNUMBER)
+    if(LIBNSL_HAS_GETRPCBYNUMBER)
+        set(HAVE_GETRPCBYNUMBER TRUE)
+        set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} nsl)
+    endif(LIBNSL_HAS_GETRPCBYNUMBER)
+endif(STDLIBS_HAVE_GETRPCBYNUMBER)
+cmake_pop_check_state()
+
+#
 # This requires the libraries we require, as ether_ntohost might be
-# in one of those libraries.
+# in one of those libraries.  That means we have to do this after
+# we check for those libraries.
 #
 # You are in a twisty little maze of UN*Xes, all different.
 # Some might not have ether_ntohost().
@@ -275,89 +359,6 @@ if(HAVE_ETHER_NTOHOST)
         check_struct_has_member("struct ether_addr" octet "sys/types.h;sys/socket.h;net/if.h;netinet/in.h;netinet/if_ether.h" HAVE_STRUCT_ETHER_ADDR)
     endif()
 endif()
-cmake_pop_check_state()
-
-#
-# As the autoconf manual says, AC_HEADER_TIME is obsolete, as all UN*Xes
-# let you include both time.h and sys/time.h, so just say we can.
-#
-check_include_file(bitypes.h HAVE_SYS_BITYPES_H)
-check_include_file(limits.h HAVE_LIMITS_H)
-
-#
-# Functions.
-#
-check_function_exists(strlcat HAVE_STRLCAT)
-check_function_exists(strlcpy HAVE_STRLCPY)
-check_function_exists(strdup HAVE_STRDUP)
-check_function_exists(strsep HAVE_STRSEP)
-
-#
-# Find library needed for gethostbyaddr.
-# NOTE: if you hand check_library_exists as its last argument a variable
-# that's been set, it skips the test, so we need different variables.
-#
-set(TCPDUMP_LINK_LIBRARIES "")
-check_function_exists(gethostbyaddr STDLIBS_HAVE_GETHOSTBYADDR)
-if(NOT STDLIBS_HAVE_GETHOSTBYADDR)
-    check_library_exists(xnet gethostbyaddr "" LIBXNET_HAS_GETHOSTBYADDR)
-    if(LIBXNET_HAS_GETHOSTBYADDR)
-        set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} xnet)
-    else()
-        check_library_exists(nsl gethostbyaddr "" LIBNSL_HAS_GETHOSTBYADDR)
-        if(LIBNSL_HAS_GETHOSTBYADDR)
-            set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} nsl)
-        endif()
-    endif()
-endif()
-
-#
-# This may require additional libraries.
-#
-cmake_push_check_state()
-set(CMAKE_REQUIRED_LIBRARIES ${TCPDUMP_LINK_LIBRARIES})
-check_function_exists(getservent STDLIBS_HAVE_GETSERVENT)
-if(STDLIBS_HAVE_GETSERVENT)
-    set(HAVE_GETSERVENT TRUE)
-else(STDLIBS_HAVE_GETSERVENT)
-    #
-    # Some platforms may need -lsocket for getservent.
-    #
-    set(CMAKE_REQUIRED_LIBRARIES socket ${TCPDUMP_LINK_LIBRARIES})
-    check_function_exists(getservent LIBSOCKET_HAS_GETSERVENT)
-    if(LIBSOCKET_HAS_GETSERVENT)
-        set(HAVE_GETSERVENT TRUE)
-        set(TCPDUMP_LINK_LIBRARIES socket ${TCPDUMP_LINK_LIBRARIES})
-    endif(LIBSOCKET_HAS_GETSERVENT)
-endif(STDLIBS_HAVE_GETSERVENT)
-cmake_pop_check_state()
-
-check_function_exists(getopt_long HAVE_GETOPT_LONG)
-check_function_exists(vsnprintf HAVE_VSNPRINTF)
-check_function_exists(snprintf HAVE_SNPRINTF)
-check_function_exists(fork HAVE_FORK)
-check_function_exists(vfork HAVE_VFORK)
-check_function_exists(strftime HAVE_STRFTIME)
-check_function_exists(setlinebuf HAVE_SETLINEBUF)
-
-#
-# This may require additional libraries.
-# In particular, it may required -lnsl on Solaris, even if we've chosen
-# to use -lxnet above.
-#
-cmake_push_check_state()
-set(CMAKE_REQUIRED_LIBRARIES ${TCPDUMP_LINK_LIBRARIES})
-check_function_exists(getrpcbynumber STDLIBS_HAVE_GETRPCBYNUMBER)
-if(STDLIBS_HAVE_GETRPCBYNUMBER)
-    set(HAVE_GETRPCBYNUMBER TRUE)
-else(STDLIBS_HAVE_GETRPCBYNUMBER)
-    set(CMAKE_REQUIRED_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} nsl)
-    check_function_exists(getrpcbynumber LIBNSL_HAS_GETRPCBYNUMBER)
-    if(LIBNSL_HAS_GETRPCBYNUMBER)
-        set(HAVE_GETRPCBYNUMBER TRUE)
-        set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} nsl)
-    endif(LIBNSL_HAS_GETRPCBYNUMBER)
-endif(STDLIBS_HAVE_GETRPCBYNUMBER)
 cmake_pop_check_state()
 
 #
