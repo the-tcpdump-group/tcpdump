@@ -110,8 +110,10 @@ hex_and_ascii_print_with_offset(netdissect_options *ndo, const char *ident,
 	i = 0;
 	hsp = hexstuff; asp = asciistuff;
 	while (--nshorts >= 0) {
-		s1 = *cp++;
-		s2 = *cp++;
+		s1 = EXTRACT_U_1(cp);
+		cp++;
+		s2 = EXTRACT_U_1(cp);
+		cp++;
 		(void)snprintf(hsp, sizeof(hexstuff) - (hsp - hexstuff),
 		    " %02x%02x", s1, s2);
 		hsp += HEXDUMP_HEXSTUFF_PER_SHORT;
@@ -128,7 +130,8 @@ hex_and_ascii_print_with_offset(netdissect_options *ndo, const char *ident,
 		}
 	}
 	if (length & 1) {
-		s1 = *cp++;
+		s1 = EXTRACT_U_1(cp);
+		cp++;
 		(void)snprintf(hsp, sizeof(hexstuff) - (hsp - hexstuff),
 		    " %02x", s1);
 		hsp += 3;
@@ -172,13 +175,15 @@ hex_print_with_offset(netdissect_options *ndo,
 			ND_PRINT("%s0x%04x: ", ident, oset);
 			oset += HEXDUMP_BYTES_PER_LINE;
 		}
-		s = *cp++;
-		ND_PRINT(" %02x%02x", s, *cp++);
+		s = EXTRACT_U_1(cp);
+		cp++;
+		ND_PRINT(" %02x%02x", s, EXTRACT_U_1(cp));
+		cp++;
 	}
 	if (length & 1) {
 		if ((i % 8) == 0)
 			ND_PRINT("%s0x%04x: ", ident, oset);
-		ND_PRINT(" %02x", *cp);
+		ND_PRINT(" %02x", EXTRACT_U_1(cp));
 	}
 }
 

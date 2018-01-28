@@ -101,7 +101,8 @@ fn_print(netdissect_options *ndo,
 
 	ret = 1;			/* assume truncated */
 	while (ep == NULL || s < ep) {
-		c = *s++;
+		c = EXTRACT_U_1(s);
+		s++;
 		if (c == '\0') {
 			ret = 0;
 			break;
@@ -149,7 +150,8 @@ fn_printztn(netdissect_options *ndo,
 			break;
 		}
 
-		c = *s++;
+		c = EXTRACT_U_1(s);
+		s++;
 		bytes++;
 		n--;
 		if (c == '\0') {
@@ -183,7 +185,8 @@ fn_printn(netdissect_options *ndo,
 
 	while (n > 0 && (ep == NULL || s < ep)) {
 		n--;
-		c = *s++;
+		c = EXTRACT_U_1(s);
+		s++;
 		if (!ND_ISASCII(c)) {
 			c = ND_TOASCII(c);
 			ND_PRINT("M-");
@@ -215,7 +218,8 @@ fn_printzp(netdissect_options *ndo,
 	ret = 1;			/* assume truncated */
 	while (n > 0 && (ep == NULL || s < ep)) {
 		n--;
-		c = *s++;
+		c = EXTRACT_U_1(s);
+		s++;
 		if (c == '\0') {
 			ret = 0;
 			break;
@@ -933,8 +937,8 @@ safeputs(netdissect_options *ndo,
 {
 	u_int idx = 0;
 
-	while (idx < maxlen && *s) {
-		safeputchar(ndo, *s);
+	while (idx < maxlen && EXTRACT_U_1(s)) {
+		safeputchar(ndo, EXTRACT_U_1(s));
 		idx++;
 		s++;
 	}
