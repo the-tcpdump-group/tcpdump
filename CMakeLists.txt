@@ -171,9 +171,9 @@ check_function_exists(strsep HAVE_STRSEP)
 set(TCPDUMP_LINK_LIBRARIES "")
 check_function_exists(gethostbyaddr STDLIBS_HAVE_GETHOSTBYADDR)
 if(NOT STDLIBS_HAVE_GETHOSTBYADDR)
-    check_library_exists(xnet gethostbyaddr "" LIBXNET_HAS_GETHOSTBYADDR)
-    if(LIBXNET_HAS_GETHOSTBYADDR)
-        set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} xnet)
+    check_library_exists(socket gethostbyaddr "" LIBSOCKET_HAS_GETHOSTBYADDR)
+    if(LIBSOCKET_HAS_GETHOSTBYADDR)
+        set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} socket)
     else()
         check_library_exists(nsl gethostbyaddr "" LIBNSL_HAS_GETHOSTBYADDR)
         if(LIBNSL_HAS_GETHOSTBYADDR)
@@ -212,9 +212,7 @@ check_function_exists(strftime HAVE_STRFTIME)
 check_function_exists(setlinebuf HAVE_SETLINEBUF)
 
 #
-# This may require additional libraries.
-# In particular, it may required -lnsl on Solaris, even if we've chosen
-# to use -lxnet above.
+# Some platforms may need -lnsl for getrpcbynumber.
 #
 cmake_push_check_state()
 set(CMAKE_REQUIRED_LIBRARIES ${TCPDUMP_LINK_LIBRARIES})
