@@ -278,55 +278,6 @@ typedef char* caddr_t;
 #endif /* _WIN32 */
 
 /*
- * Used to declare a structure unaligned, so that the C compiler,
- * if necessary, generates code that doesn't assume alignment.
- * This is required because there is no guarantee that the packet
- * data we get from libpcap/WinPcap is properly aligned.
- *
- * This assumes that, for all compilers that support __attribute__((packed)),
- * for all instruction set architectures requiring strict alignment, declaring
- * a structure with that attribute causes the compiler to generate code that
- * handles misaligned 2-byte, 4-byte, and 8-byte integral quantities.
- *
- * It does not (yet) handle compilers where you can get the compiler
- * to generate code of that sort by some other means.
- *
- * This is required in order to, for example, keep the compiler from
- * generating, for
- *
- *	if (bp->bp_htype == 1 && bp->bp_hlen == 6 && bp->bp_op == BOOTPREQUEST) {
- *
- * in print-bootp.c, code that loads the first 4-byte word of a
- * "struct bootp", masking out the bp_hops field, and comparing the result
- * against 0x01010600.
- *
- * Note: this also requires that padding be put into the structure,
- * at least for compilers where it's implemented as __attribute__((packed)).
- *
- * XXX - now that we're using nd_ types that are just arrays of bytes, is
- * this still necessary?  Are there any compilers that align structures,
- * none of whose members require more than byte alignment, on more than
- * one-byte boundaries, and assume a structure is aligned on such a
- * boundary?  (I have vague memories of either m68k or ARM compilers
- * aligning on at least 2-byte boundaries.)
- */
-#if ND_IS_AT_LEAST_GNUC_VERSION(2,0) || \
-    ND_IS_AT_LEAST_XL_C_VERSION(6,0)
-  /*
-   * GCC 2.0 or later, or a compiler that claims to be GCC 2.0 or later,
-   * or IBM XL C 6.0 or later.
-   *
-   * Use __attribute__((packed)).
-   */
-  #define ND_UNALIGNED	__attribute__((packed))
-#else
-  /*
-   * Nothing.
-   */
-  #define ND_UNALIGNED
-#endif
-
-/*
  * fopen() read and write modes for text files and binary files.
  */
 #if defined(_WIN32) || defined(MSDOS)
