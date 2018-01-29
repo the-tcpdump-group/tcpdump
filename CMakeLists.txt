@@ -203,8 +203,13 @@ endif(STDLIBS_HAVE_GETSERVENT)
 cmake_pop_check_state()
 
 check_function_exists(getopt_long HAVE_GETOPT_LONG)
-check_function_exists(vsnprintf HAVE_VSNPRINTF)
-check_function_exists(snprintf HAVE_SNPRINTF)
+#
+# With MSVC 2015, stdio.h defines snprintf() and vsnprintf() as inline
+# functions, so you need to include stdio.h when testing for them -
+# check_function_exists() won't do it, you need check_symbol_exists().
+#
+check_symbol_exists(vsnprintf stdio.h HAVE_VSNPRINTF)
+check_symbol_exists(snprintf stdio.h HAVE_SNPRINTF)
 check_function_exists(fork HAVE_FORK)
 check_function_exists(vfork HAVE_VFORK)
 check_function_exists(strftime HAVE_STRFTIME)
