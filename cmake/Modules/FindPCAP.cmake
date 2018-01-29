@@ -4,8 +4,14 @@
 
 find_program(PCAP_CONFIG pcap-config)
 if(PCAP_CONFIG)
+  #
   # We have pcap-config; use it.
+  # XXX - what if this is on Windows?  If you're using, for example,
+  # MinGW, that might be the right thing to do, *if* pcap-config
+  # were made to work properly on Windows, but what about MSVC?
+  #
   # First, get the include directory.
+  #
   execute_process(COMMAND "${PCAP_CONFIG}" "--cflags"
     RESULT_VARIABLE PCAP_CONFIG_RESULT
     OUTPUT_VARIABLE PCAP_CONFIG_OUTPUT
@@ -92,18 +98,32 @@ if(PCAP_CONFIG)
   find_library(PCAP_STATIC_LIBRARY pcap HINTS ${_pcap_static_library_dirs})
   cmake_pop_check_state()
 else(PCAP_CONFIG)
-  # Try to find the header
-  find_path(PCAP_INCLUDE_DIR pcap.h)
+  if(WIN32)
+    #
+    # On Windows, we support PCAP_DLL_DIR being set to the path of
+    # a directory containing an SDK for {whatever}Pcap.
+    # XXX - is there a CMake convention for "look for package XXX
+    # here"?
+    #
+    # Try to find the header
+    find_path(PCAP_INCLUDE_DIR pcap.h HINTS ${PCAP_DLL_DIR})
 
-  # Try to find the library
-  find_library(PCAP_LIBRARY pcap)
+    # Try to find the library
+    find_library(PCAP_LIBRARY pcap HINTS ${PCAP_DLL_DIR})
+  else(WIN32)
+    # Try to find the header
+    find_path(PCAP_INCLUDE_DIR pcap.h)
 
-  # Try to find the static library (XXX - what about AIX?)
-  include(CMakePushCheckState)
-  cmake_push_check_state()
-  set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-  find_library(PCAP_STATIC_LIBRARY pcap)
-  cmake_pop_check_state()
+    # Try to find the library
+    find_library(PCAP_LIBRARY pcap)
+
+    # Try to find the static library (XXX - what about AIX?)
+    include(CMakePushCheckState)
+    cmake_push_check_state()
+    set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+    find_library(PCAP_STATIC_LIBRARY pcap)
+    cmake_pop_check_state()
+  endif(WIN32)
 
   set(PCAP_INCLUDE_DIRS ${PCAP_INCLUDE_DIR})
   set(PCAP_LIBRARIES ${PCAP_LIBRARY})
