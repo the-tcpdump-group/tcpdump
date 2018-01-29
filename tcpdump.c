@@ -1346,10 +1346,13 @@ main(int argc, char **argv)
 	else
 		ndo->program_name = program_name = argv[0];
 
-#ifdef _WIN32
+#if defined(HAVE_PCAP_WSOCKINIT)
 	if (pcap_wsockinit() != 0)
 		error("Attempting to initialize Winsock failed");
-#endif /* _WIN32 */
+#elif defined(HAVE_WSOCKINIT)
+	if (wsockinit() != 0)
+		error("Attempting to initialize Winsock failed");
+#endif
 
 	/*
 	 * On platforms where the CPU doesn't support unaligned loads,

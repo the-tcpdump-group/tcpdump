@@ -594,6 +594,17 @@ check_function_exists(pcap_open HAVE_PCAP_OPEN)
 check_function_exists(pcap_findalldevs_ex HAVE_PCAP_FINDALLDEVS_EX)
 
 #
+# On Windows, check for pcap_wsockinit(); if we don't have it, check for
+# wsockinit().
+#
+if(WIN32)
+    check_function_exists(pcap_wsockinit HAVE_PCAP_WSOCKINIT)
+    if(NOT HAVE_PCAP_WSOCKINIT)
+        check_function_exists(wsockinit HAVE_WSOCKINIT)
+    endif(NOT HAVE_PCAP_WSOCKINIT)
+endif(WIN32)
+
+#
 # Check for special debugging functions
 #
 check_function_exists(pcap_set_parser_debug HAVE_PCAP_SET_PARSER_DEBUG)
