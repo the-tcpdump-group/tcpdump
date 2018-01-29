@@ -170,13 +170,13 @@ sunrpc_print(netdissect_options *ndo, const u_char *bp,
 	rp = (const struct sunrpc_msg *)bp;
 
 	if (!ndo->ndo_nflag) {
-		snprintf(srcid, sizeof(srcid), "0x%x",
+		nd_snprintf(srcid, sizeof(srcid), "0x%x",
 		    EXTRACT_BE_U_4(rp->rm_xid));
 		strlcpy(dstid, "sunrpc", sizeof(dstid));
 	} else {
-		snprintf(srcid, sizeof(srcid), "0x%x",
+		nd_snprintf(srcid, sizeof(srcid), "0x%x",
 		    EXTRACT_BE_U_4(rp->rm_xid));
-		snprintf(dstid, sizeof(dstid), "0x%x", SUNRPC_PMAPPORT);
+		nd_snprintf(dstid, sizeof(dstid), "0x%x", SUNRPC_PMAPPORT);
 	}
 
 	switch (IP_V((const struct ip *)bp2)) {
@@ -234,7 +234,7 @@ progstr(uint32_t prog)
 	rp = getrpcbynumber(prog);
 	if (rp == NULL)
 #endif
-		(void) snprintf(buf, sizeof(buf), "#%u", prog);
+		(void) nd_snprintf(buf, sizeof(buf), "#%u", prog);
 #if defined(HAVE_GETRPCBYNUMBER) && defined(HAVE_RPC_RPC_H)
 	else
 		strlcpy(buf, rp->r_name, sizeof(buf));

@@ -755,7 +755,7 @@ get_lifetime(uint32_t v)
 	if (v == (uint32_t)~0UL)
 		return "infinity";
 	else {
-		snprintf(buf, sizeof(buf), "%us", v);
+		nd_snprintf(buf, sizeof(buf), "%us", v);
 		return buf;
 	}
 }

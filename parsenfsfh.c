@@ -450,7 +450,7 @@ Parse_fh(const unsigned char *fh, u_int len, my_fsid *fsidp,
 #endif
 	    /* Save the actual handle, so it can be display with -u */
 	    for (i = 0; i < len*4 && i*2 < sizeof(fsidp->Opaque_Handle) - 1; i++)
-		(void)snprintf(&(fsidp->Opaque_Handle[i*2]), 3, "%.2X",
+		(void)nd_snprintf(&(fsidp->Opaque_Handle[i*2]), 3, "%.2X",
 			       EXTRACT_U_1(fhp + i));
 	    fsidp->Opaque_Handle[i*2] = '\0';
 

@@ -204,14 +204,33 @@ cmake_pop_check_state()
 
 check_function_exists(getopt_long HAVE_GETOPT_LONG)
 #
-# With MSVC 2015, stdio.h defines snprintf() and vsnprintf() as inline
-# functions, so you need to include stdio.h when testing for them -
-# check_function_exists() won't do it, you need check_symbol_exists().
+# For Windows, either
 #
-check_symbol_exists(vsnprintf stdio.h HAVE_VSNPRINTF)
-check_symbol_exists(snprintf stdio.h HAVE_SNPRINTF)
-check_function_exists(fork HAVE_FORK)
-check_function_exists(vfork HAVE_VFORK)
+#   1) we're using VS 2015, in which case we have both snprintf()
+#      and vsnprintf(), and they behave in a C99-compliant fashion,
+#      so we use them
+#
+# or
+#
+#   2) we're not, and we don't have snprintf(), and we either don't
+#      have vsnprintf() or we have one that *doesn't* behave in a
+#      C99-compliant fashion, but we *do* have _snprintf_s() and
+#      _vsnprintf_s(), so we wrap them with #defines
+#
+# and we test for both of them at compile time, so we don't need to
+# check for snprintf() or vsnprintf() here.
+#
+# XXX - do we need to care about UN*Xes that don't have snprintf()
+# or vsnprintf() any more?
+#
+# We also don't need to waste time checking for fork() or vfork().
+#
+if(NOT WIN32)
+  check_function_exists(vsnprintf HAVE_VSNPRINTF)
+  check_function_exists(snprintf HAVE_SNPRINTF)
+  check_function_exists(fork HAVE_FORK)
+  check_function_exists(vfork HAVE_VFORK)
+endif(NOT WIN32)
 check_function_exists(strftime HAVE_STRFTIME)
 check_function_exists(setlinebuf HAVE_SETLINEBUF)
 
@@ -920,13 +939,11 @@ foreach(FUNC strlcat strlcpy strdup strsep getservent getopt_long)
         set(NETDISSECT_SOURCE_LIST_C ${NETDISSECT_SOURCE_LIST_C} missing/${FUNC}.c)
     endif()
 endforeach()
-if(NOT HAVE_VSNPRINTF OR NOT HAVE_SNPRINTF)
-    if(WIN32)
-        set(NETDISSECT_SOURCE_LIST_C ${NETDISSECT_SOURCE_LIST_C} missing/win_snprintf.c)
-    else(WIN32)
+if(NOT WIN32)
+    if(NOT HAVE_VSNPRINTF OR NOT HAVE_SNPRINTF)
         set(NETDISSECT_SOURCE_LIST_C ${NETDISSECT_SOURCE_LIST_C} missing/snprintf.c)
-    endif(WIN32)
-endif(NOT HAVE_VSNPRINTF OR NOT HAVE_SNPRINTF)
+    endif(NOT HAVE_VSNPRINTF OR NOT HAVE_SNPRINTF)
+endif(NOT WIN32)
 
 add_library(netdissect STATIC
     ${NETDISSECT_SOURCE_LIST_C}

@@ -1355,10 +1355,10 @@ lldp_network_addr_print(netdissect_options *ndo, const u_char *tptr, u_int len)
     }
 
     if (!pfunc) {
-        snprintf(buf, sizeof(buf), "AFI %s (%u), no AF printer !",
+        nd_snprintf(buf, sizeof(buf), "AFI %s (%u), no AF printer !",
                  tok2str(af_values, "Unknown", af), af);
     } else {
-        snprintf(buf, sizeof(buf), "AFI %s (%u): %s",
+        nd_snprintf(buf, sizeof(buf), "AFI %s (%u): %s",
                  tok2str(af_values, "Unknown", af), af, (*pfunc)(ndo, tptr+1));
     }
 

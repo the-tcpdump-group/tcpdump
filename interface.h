@@ -28,8 +28,6 @@
 
 #include "funcattrs.h"
 
-/* snprintf et al */
-
 #include <stdarg.h>
 
 #if HAVE_STDINT_H

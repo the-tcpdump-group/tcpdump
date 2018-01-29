@@ -1184,7 +1184,7 @@ acl_print(netdissect_options *ndo,
 	          acl & PRSFS_ADMINISTER ? "a" : "");
 
 	for (i = 0; i < pos; i++) {
-		snprintf(fmt, sizeof(fmt), "%%%ds %%d\n%%n", maxsize - 1);
+		nd_snprintf(fmt, sizeof(fmt), "%%%ds %%d\n%%n", maxsize - 1);
 		if (sscanf((char *) s, fmt, user, &acl, &n) != 2)
 			goto finish;
 		s += n;
@@ -1198,7 +1198,7 @@ acl_print(netdissect_options *ndo,
 	}
 
 	for (i = 0; i < neg; i++) {
-		snprintf(fmt, sizeof(fmt), "%%%ds %%d\n%%n", maxsize - 1);
+		nd_snprintf(fmt, sizeof(fmt), "%%%ds %%d\n%%n", maxsize - 1);
 		if (sscanf((char *) s, fmt, user, &acl, &n) != 2)
 			goto finish;
 		s += n;

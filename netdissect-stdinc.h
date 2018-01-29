@@ -307,22 +307,51 @@ typedef char* caddr_t;
  * and define vsnprintf to be _vsnprintf, as we're relying on null-
  * termination of strings in all cases.
  *
- * We also want to allow this to be built with versions of Visual Studio
- * prior to VS 2015, so we can't rely on snprintf() being present.
+ * Furthermore, some versions of Visual Studio prior to Visual
+ * Studio 2015 had vsnprintf() (but not snprintf()!), but those
+ * versions don't guarantee null termination, either.
  *
- * And, if there are any UN*Xes out there on which we can run that
- * don't have snprintf() or don't have vsnprintf(), we define our
- * own as well.
+ * We assume all UN*Xes that have snprintf() and vsnprintf() provide
+ * C99 behavior.
  */
-#if !defined(HAVE_SNPRINTF)
-int snprintf (char *str, size_t sz, FORMAT_STRING(const char *format), ...)
-     PRINTFLIKE(3, 4);
-#endif /* !defined(HAVE_SNPRINTF) */
+#if defined(_MSC_VER) || defined(__MINGW32__)
+  #if defined(_MSC_VER) && _MSC_VER >= 1900
+    /*
+     * VS 2015 or newer; just use the C runtime's snprintf() and
+     * vsnprintf().
+     */
+    #define nd_snprintf		snprintf
+    #define nd_vsnprintf	vsnprintf
+  #else /* defined(_MSC_VER) && _MSC_VER >= 1900 */
+    /*
+     * VS prior to 2015, or MingGW; assume we have _snprintf_s() and
+     * _vsnprintf_s(), which guarantee null termination.
+     */
+    #define nd_snprintf(buf, buflen, fmt, ...) \
+        _snprintf_s(buf, buflen, _TRUNCATE, fmt, __VA_ARGS__)
+    #define nd_vsnprintf(buf, buflen, fmt, ap) \
+        _vsnprintf_s(buf, buflen, _TRUNCATE, fmt, ap)
+  #endif /* defined(_MSC_VER) && _MSC_VER >= 1900 */
+#else /* defined(_MSC_VER) || defined(__MINGW32__) */
+  /*
+   * Some other compiler, which we assume to be a UN*X compiler.
+   * Use the system's snprintf() if we have it, otherwise use
+   * our own implementation
+   */
+  #ifdef HAVE_SNPRINTF
+    #define nd_snprintf		snprintf
+  #else /* HAVE_SNPRINTF */
+    int nd_snprintf (char *str, size_t sz, FORMAT_STRING(const char *format), ...)
+        PRINTFLIKE(3, 4);
+  #endif /* HAVE_SNPRINTF */
 
-#if !defined(HAVE_VSNPRINTF)
-int vsnprintf (char *str, size_t sz, FORMAT_STRING(const char *format),
-     va_list ap) PRINTFLIKE(3, 0);
-#endif /* !defined(HAVE_VSNPRINTF) */
+  #ifdef HAVE_VSNPRINTF
+    #define nd_vsnprintf	vsnprintf
+  #else /* HAVE_VSNPRINTF */
+    int nd_vsnprintf (char *str, size_t sz, FORMAT_STRING(const char *format),
+        va_list ap) PRINTFLIKE(3, 0);
+  #endif /* HAVE_VSNPRINTF */
+#endif /* defined(_MSC_VER) || defined(__MINGW32__) */
 
 /*
  * fopen() read and write modes for text files and binary files.

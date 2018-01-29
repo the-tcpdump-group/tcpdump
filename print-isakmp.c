@@ -2794,7 +2794,7 @@ static char *
 numstr(u_int x)
 {
 	static char buf[20];
-	snprintf(buf, sizeof(buf), "#%u", x);
+	nd_snprintf(buf, sizeof(buf), "#%u", x);
 	return buf;
 }
 

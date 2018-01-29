@@ -35,11 +35,6 @@
 #include <sys/sysinfo.h>
 #include <sys/proc.h>
 
-#if !defined(HAVE_SNPRINTF)
-int snprintf(char *, size_t, const char *, ...) PRINTFLIKE(3, 4);
-#endif /* !defined(HAVE_SNPRINTF) */
-#endif /* __osf__ */
-
 #include "machdep.h"
 
 /*

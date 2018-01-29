@@ -703,7 +703,7 @@ vlan_str(const uint16_t vid)
 	if (vid == OFP_VLAN_NONE)
 		return "NONE";
 	fmt = (vid > 0 && vid < 0x0fff) ? "%u" : "%u (bogus)";
-	snprintf(buf, sizeof(buf), fmt, vid);
+	nd_snprintf(buf, sizeof(buf), fmt, vid);
 	return buf;
 }
 
@@ -711,7 +711,7 @@ static const char *
 pcp_str(const uint8_t pcp)
 {
 	static char buf[sizeof("255 (bogus)")];
-	snprintf(buf, sizeof(buf), pcp <= 7 ? "%u" : "%u (bogus)", pcp);
+	nd_snprintf(buf, sizeof(buf), pcp <= 7 ? "%u" : "%u (bogus)", pcp);
 	return buf;
 }
 

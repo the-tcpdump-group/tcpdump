@@ -624,7 +624,7 @@ ataddr_string(netdissect_options *ndo,
 		if (tp2->addr == i) {
 			tp->addr = (atnet << 8) | athost;
 			tp->nxt = newhnamemem(ndo);
-			(void)snprintf(nambuf, sizeof(nambuf), "%s.%u",
+			(void)nd_snprintf(nambuf, sizeof(nambuf), "%s.%u",
 			    tp2->name, athost);
 			tp->name = strdup(nambuf);
 			if (tp->name == NULL)
@@ -636,9 +636,9 @@ ataddr_string(netdissect_options *ndo,
 	tp->addr = (atnet << 8) | athost;
 	tp->nxt = newhnamemem(ndo);
 	if (athost != 255)
-		(void)snprintf(nambuf, sizeof(nambuf), "%u.%u", atnet, athost);
+		(void)nd_snprintf(nambuf, sizeof(nambuf), "%u.%u", atnet, athost);
 	else
-		(void)snprintf(nambuf, sizeof(nambuf), "%u", atnet);
+		(void)nd_snprintf(nambuf, sizeof(nambuf), "%u", atnet);
 	tp->name = strdup(nambuf);
 	if (tp->name == NULL)
 		(*ndo->ndo_error)(ndo, "ataddr_string: strdup(nambuf)");
@@ -661,7 +661,7 @@ ddpskt_string(netdissect_options *ndo,
 	static char buf[8];
 
 	if (ndo->ndo_nflag) {
-		(void)snprintf(buf, sizeof(buf), "%u", skt);
+		(void)nd_snprintf(buf, sizeof(buf), "%u", skt);
 		return (buf);
 	}
 	return (tok2str(skt2str, "%u", skt));

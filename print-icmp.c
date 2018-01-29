@@ -322,7 +322,7 @@ icmp_tstamp_print(u_int tstamp)
     sec = tstamp / 1000;
     min = sec / 60; sec -= min * 60;
     hrs = min / 60; min -= hrs * 60;
-    snprintf(buf, sizeof(buf), "%02u:%02u:%02u.%03u",hrs,min,sec,msec);
+    nd_snprintf(buf, sizeof(buf), "%02u:%02u:%02u.%03u",hrs,min,sec,msec);
     return buf;
 }
 
@@ -360,7 +360,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 	case ICMP_ECHO:
 	case ICMP_ECHOREPLY:
 		ND_TCHECK_2(dp->icmp_seq);
-		(void)snprintf(buf, sizeof(buf), "echo %s, id %u, seq %u",
+		(void)nd_snprintf(buf, sizeof(buf), "echo %s, id %u, seq %u",
                                icmp_type == ICMP_ECHO ?
                                "request" : "reply",
                                EXTRACT_BE_U_2(dp->icmp_id),
@@ -373,7 +373,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 
 		case ICMP_UNREACH_PROTOCOL:
 			ND_TCHECK_1(dp->icmp_ip.ip_p);
-			(void)snprintf(buf, sizeof(buf),
+			(void)nd_snprintf(buf, sizeof(buf),
 			    "%s protocol %u unreachable",
 			    ipaddr_string(ndo, &dp->icmp_ip.ip_dst),
 			    EXTRACT_U_1(dp->icmp_ip.ip_p));
@@ -390,21 +390,21 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			switch (ip_proto) {
 
 			case IPPROTO_TCP:
-				(void)snprintf(buf, sizeof(buf),
+				(void)nd_snprintf(buf, sizeof(buf),
 					"%s tcp port %s unreachable",
 					ipaddr_string(ndo, &oip->ip_dst),
 					tcpport_string(ndo, dport));
 				break;
 
 			case IPPROTO_UDP:
-				(void)snprintf(buf, sizeof(buf),
+				(void)nd_snprintf(buf, sizeof(buf),
 					"%s udp port %s unreachable",
 					ipaddr_string(ndo, &oip->ip_dst),
 					udpport_string(ndo, dport));
 				break;
 
 			default:
-				(void)snprintf(buf, sizeof(buf),
+				(void)nd_snprintf(buf, sizeof(buf),
 					"%s protocol %u port %u unreachable",
 					ipaddr_string(ndo, &oip->ip_dst),
 					ip_proto, dport);
@@ -418,11 +418,11 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			mp = (const struct mtu_discovery *)(const u_char *)&dp->icmp_void;
 			mtu = EXTRACT_BE_U_2(mp->nexthopmtu);
 			if (mtu) {
-				(void)snprintf(buf, sizeof(buf),
+				(void)nd_snprintf(buf, sizeof(buf),
 				    "%s unreachable - need to frag (mtu %u)",
 				    ipaddr_string(ndo, &dp->icmp_ip.ip_dst), mtu);
 			} else {
-				(void)snprintf(buf, sizeof(buf),
+				(void)nd_snprintf(buf, sizeof(buf),
 				    "%s unreachable - need to frag",
 				    ipaddr_string(ndo, &dp->icmp_ip.ip_dst));
 			}
@@ -432,7 +432,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		default:
 			fmt = tok2str(unreach2str, "#%u %%s unreachable",
 			    icmp_code);
-			(void)snprintf(buf, sizeof(buf), fmt,
+			(void)nd_snprintf(buf, sizeof(buf), fmt,
 			    ipaddr_string(ndo, &dp->icmp_ip.ip_dst));
 			break;
 		}
@@ -442,7 +442,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		ND_TCHECK_4(dp->icmp_ip.ip_dst);
 		fmt = tok2str(type2str, "redirect-#%u %%s to net %%s",
 		    icmp_code);
-		(void)snprintf(buf, sizeof(buf), fmt,
+		(void)nd_snprintf(buf, sizeof(buf), fmt,
 		    ipaddr_string(ndo, &dp->icmp_ip.ip_dst),
 		    ipaddr_string(ndo, &dp->icmp_gwaddr));
 		break;
@@ -453,7 +453,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		const struct id_rdiscovery *idp;
 		u_int lifetime, num, size;
 
-		(void)snprintf(buf, sizeof(buf), "router advertisement");
+		(void)nd_snprintf(buf, sizeof(buf), "router advertisement");
 		cp = buf + strlen(buf);
 
 		ihp = (const struct ih_rdiscovery *)&dp->icmp_void;
@@ -462,13 +462,13 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		cp = buf + strlen(buf);
 		lifetime = EXTRACT_BE_U_2(ihp->ird_lifetime);
 		if (lifetime < 60) {
-			(void)snprintf(cp, sizeof(buf) - (cp - buf), "%u",
+			(void)nd_snprintf(cp, sizeof(buf) - (cp - buf), "%u",
 			    lifetime);
 		} else if (lifetime < 60 * 60) {
-			(void)snprintf(cp, sizeof(buf) - (cp - buf), "%u:%02u",
+			(void)nd_snprintf(cp, sizeof(buf) - (cp - buf), "%u:%02u",
 			    lifetime / 60, lifetime % 60);
 		} else {
-			(void)snprintf(cp, sizeof(buf) - (cp - buf),
+			(void)nd_snprintf(cp, sizeof(buf) - (cp - buf),
 			    "%u:%02u:%02u",
 			    lifetime / 3600,
 			    (lifetime % 3600) / 60,
@@ -477,19 +477,19 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		cp = buf + strlen(buf);
 
 		num = EXTRACT_U_1(ihp->ird_addrnum);
-		(void)snprintf(cp, sizeof(buf) - (cp - buf), " %u:", num);
+		(void)nd_snprintf(cp, sizeof(buf) - (cp - buf), " %u:", num);
 		cp = buf + strlen(buf);
 
 		size = EXTRACT_U_1(ihp->ird_addrsiz);
 		if (size != 2) {
-			(void)snprintf(cp, sizeof(buf) - (cp - buf),
+			(void)nd_snprintf(cp, sizeof(buf) - (cp - buf),
 			    " [size %u]", size);
 			break;
 		}
 		idp = (const struct id_rdiscovery *)&dp->icmp_data;
 		while (num-- > 0) {
 			ND_TCHECK_SIZE(idp);
-			(void)snprintf(cp, sizeof(buf) - (cp - buf), " {%s %u}",
+			(void)nd_snprintf(cp, sizeof(buf) - (cp - buf), " {%s %u}",
 			    ipaddr_string(ndo, &idp->ird_addr),
 			    EXTRACT_BE_U_4(idp->ird_pref));
 			cp = buf + strlen(buf);
@@ -511,7 +511,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			break;
 
 		default:
-			(void)snprintf(buf, sizeof(buf), "time exceeded-#%u",
+			(void)nd_snprintf(buf, sizeof(buf), "time exceeded-#%u",
 			    icmp_code);
 			break;
 		}
@@ -519,24 +519,24 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 
 	case ICMP_PARAMPROB:
 		if (icmp_code)
-			(void)snprintf(buf, sizeof(buf),
+			(void)nd_snprintf(buf, sizeof(buf),
 			    "parameter problem - code %u", icmp_code);
 		else {
 			ND_TCHECK_1(dp->icmp_pptr);
-			(void)snprintf(buf, sizeof(buf),
+			(void)nd_snprintf(buf, sizeof(buf),
 			    "parameter problem - octet %u", EXTRACT_U_1(dp->icmp_pptr));
 		}
 		break;
 
 	case ICMP_MASKREPLY:
 		ND_TCHECK_4(dp->icmp_mask);
-		(void)snprintf(buf, sizeof(buf), "address mask is 0x%08x",
+		(void)nd_snprintf(buf, sizeof(buf), "address mask is 0x%08x",
 		    EXTRACT_BE_U_4(dp->icmp_mask));
 		break;
 
 	case ICMP_TSTAMP:
 		ND_TCHECK_2(dp->icmp_seq);
-		(void)snprintf(buf, sizeof(buf),
+		(void)nd_snprintf(buf, sizeof(buf),
 		    "time stamp query id %u seq %u",
 		    EXTRACT_BE_U_2(dp->icmp_id),
 		    EXTRACT_BE_U_2(dp->icmp_seq));
@@ -544,15 +544,15 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 
 	case ICMP_TSTAMPREPLY:
 		ND_TCHECK_4(dp->icmp_ttime);
-		(void)snprintf(buf, sizeof(buf),
+		(void)nd_snprintf(buf, sizeof(buf),
 		    "time stamp reply id %u seq %u: org %s",
                                EXTRACT_BE_U_2(dp->icmp_id),
                                EXTRACT_BE_U_2(dp->icmp_seq),
                                icmp_tstamp_print(EXTRACT_BE_U_4(dp->icmp_otime)));
 
-                (void)snprintf(buf+strlen(buf),sizeof(buf)-strlen(buf),", recv %s",
+                (void)nd_snprintf(buf+strlen(buf),sizeof(buf)-strlen(buf),", recv %s",
                          icmp_tstamp_print(EXTRACT_BE_U_4(dp->icmp_rtime)));
-                (void)snprintf(buf+strlen(buf),sizeof(buf)-strlen(buf),", xmit %s",
+                (void)nd_snprintf(buf+strlen(buf),sizeof(buf)-strlen(buf),", xmit %s",
                          icmp_tstamp_print(EXTRACT_BE_U_4(dp->icmp_ttime)));
                 break;
 

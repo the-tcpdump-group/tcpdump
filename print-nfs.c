@@ -332,11 +332,11 @@ nfsreply_print(netdissect_options *ndo,
 	ND_TCHECK_4(rp->rm_xid);
 	if (!ndo->ndo_nflag) {
 		strlcpy(srcid, "nfs", sizeof(srcid));
-		snprintf(dstid, sizeof(dstid), "%u",
+		nd_snprintf(dstid, sizeof(dstid), "%u",
 		    EXTRACT_BE_U_4(rp->rm_xid));
 	} else {
-		snprintf(srcid, sizeof(srcid), "%u", NFS_PORT);
-		snprintf(dstid, sizeof(dstid), "%u",
+		nd_snprintf(srcid, sizeof(srcid), "%u", NFS_PORT);
+		nd_snprintf(dstid, sizeof(dstid), "%u",
 		    EXTRACT_BE_U_4(rp->rm_xid));
 	}
 	print_nfsaddr(ndo, bp2, srcid, dstid);

@@ -152,7 +152,7 @@ q922_string(netdissect_options *ndo, const u_char *p, u_int length)
     memset(buffer, 0, sizeof(buffer));
 
     if (parse_q922_header(ndo, p, &dlci, &addr_len, &flags, length) == 1){
-        snprintf(buffer, sizeof(buffer), "DLCI %u", dlci);
+        nd_snprintf(buffer, sizeof(buffer), "DLCI %u", dlci);
     }
 
     return buffer;

@@ -152,7 +152,7 @@ typedef unsigned char nd_mac_addr[MAC_ADDR_LEN];
  */
 typedef unsigned char nd_byte;
 
-/* snprintf et al */
+/* nd_snprintf et al */
 
 #include <stdarg.h>
 #include <pcap.h>

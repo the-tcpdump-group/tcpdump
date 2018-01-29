@@ -358,7 +358,6 @@ EXTRA_DIST = \
 	missing/strsep.c \
 	missing/win_ether_ntohost.c \
 	missing/win_ether_ntohost.h \
-	missing/win_snprintf.c \
 	mkdep \
 	packetdat.awk \
 	pcap_dump_ftell.c \

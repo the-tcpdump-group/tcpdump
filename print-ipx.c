@@ -100,7 +100,7 @@ ipxaddr_string(uint32_t net, const u_char *node)
 {
     static char line[256];
 
-    snprintf(line, sizeof(line), "%08x.%02x:%02x:%02x:%02x:%02x:%02x",
+    nd_snprintf(line, sizeof(line), "%08x.%02x:%02x:%02x:%02x:%02x:%02x",
 	    net, EXTRACT_U_1(node), EXTRACT_U_1(node + 1),
 	    EXTRACT_U_1(node + 2), EXTRACT_U_1(node + 3),
 	    EXTRACT_U_1(node + 4), EXTRACT_U_1(node + 5));

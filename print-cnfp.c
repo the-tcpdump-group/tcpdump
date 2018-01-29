@@ -296,14 +296,14 @@ cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 		       EXTRACT_BE_U_4(nr->last_time)%1000);
 
 		asbuf[0] = buf[0] = '\0';
-		snprintf(buf, sizeof(buf), "/%u", EXTRACT_U_1(nr->src_mask));
-		snprintf(asbuf, sizeof(asbuf), ":%u",
+		nd_snprintf(buf, sizeof(buf), "/%u", EXTRACT_U_1(nr->src_mask));
+		nd_snprintf(asbuf, sizeof(asbuf), ":%u",
 			EXTRACT_BE_U_2(nr->src_as));
 		ND_PRINT("\n    %s%s%s:%u ", intoa(nr->src_ina.s_addr), buf, asbuf,
 			EXTRACT_BE_U_2(nr->srcport));
 
-		snprintf(buf, sizeof(buf), "/%u", EXTRACT_U_1(nr->dst_mask));
-		snprintf(asbuf, sizeof(asbuf), ":%u",
+		nd_snprintf(buf, sizeof(buf), "/%u", EXTRACT_U_1(nr->dst_mask));
+		nd_snprintf(asbuf, sizeof(asbuf), ":%u",
 			 EXTRACT_BE_U_2(nr->dst_as));
 		ND_PRINT("> %s%s%s:%u ", intoa(nr->dst_ina.s_addr), buf, asbuf,
 			EXTRACT_BE_U_2(nr->dstport));
@@ -394,14 +394,14 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 		       EXTRACT_BE_U_4(nr->last_time)%1000);
 
 		asbuf[0] = buf[0] = '\0';
-		snprintf(buf, sizeof(buf), "/%u", EXTRACT_U_1(nr->src_mask));
-		snprintf(asbuf, sizeof(asbuf), ":%u",
+		nd_snprintf(buf, sizeof(buf), "/%u", EXTRACT_U_1(nr->src_mask));
+		nd_snprintf(asbuf, sizeof(asbuf), ":%u",
 			EXTRACT_BE_U_2(nr->src_as));
 		ND_PRINT("\n    %s%s%s:%u ", intoa(nr->src_ina.s_addr), buf, asbuf,
 			EXTRACT_BE_U_2(nr->srcport));
 
-		snprintf(buf, sizeof(buf), "/%u", EXTRACT_U_1(nr->dst_mask));
-		snprintf(asbuf, sizeof(asbuf), ":%u",
+		nd_snprintf(buf, sizeof(buf), "/%u", EXTRACT_U_1(nr->dst_mask));
+		nd_snprintf(asbuf, sizeof(asbuf), ":%u",
 			 EXTRACT_BE_U_2(nr->dst_as));
 		ND_PRINT("> %s%s%s:%u ", intoa(nr->dst_ina.s_addr), buf, asbuf,
 			EXTRACT_BE_U_2(nr->dstport));
@@ -429,7 +429,7 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 		}
 
 		buf[0]='\0';
-		snprintf(buf, sizeof(buf), "(%u<>%u encaps)",
+		nd_snprintf(buf, sizeof(buf), "(%u<>%u encaps)",
 			 (EXTRACT_BE_U_2(nr->flags) >> 8) & 0xff,
 			 (EXTRACT_BE_U_2(nr->flags)) & 0xff);
 		ND_PRINT("tos %u, %u (%u octets) %s",

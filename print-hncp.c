@@ -161,7 +161,7 @@ format_nid(const u_char *data)
     static char buf[4][sizeof("01:01:01:01")];
     static int i = 0;
     i = (i + 1) % 4;
-    snprintf(buf[i], sizeof(buf[i]), "%02x:%02x:%02x:%02x",
+    nd_snprintf(buf[i], sizeof(buf[i]), "%02x:%02x:%02x:%02x",
              EXTRACT_U_1(data), EXTRACT_U_1(data + 1), EXTRACT_U_1(data + 2),
              EXTRACT_U_1(data + 3));
     return buf[i];
@@ -173,7 +173,7 @@ format_256(const u_char *data)
     static char buf[4][sizeof("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")];
     static int i = 0;
     i = (i + 1) % 4;
-    snprintf(buf[i], sizeof(buf[i]), "%016" PRIx64 "%016" PRIx64 "%016" PRIx64 "%016" PRIx64,
+    nd_snprintf(buf[i], sizeof(buf[i]), "%016" PRIx64 "%016" PRIx64 "%016" PRIx64 "%016" PRIx64,
          EXTRACT_BE_U_8(data),
          EXTRACT_BE_U_8(data + 8),
          EXTRACT_BE_U_8(data + 16),
@@ -188,7 +188,7 @@ format_interval(const uint32_t n)
     static char buf[4][sizeof("0000000.000s")];
     static int i = 0;
     i = (i + 1) % 4;
-    snprintf(buf[i], sizeof(buf[i]), "%u.%03us", n / 1000, n % 1000);
+    nd_snprintf(buf[i], sizeof(buf[i]), "%u.%03us", n / 1000, n % 1000);
     return buf[i];
 }
 
@@ -226,7 +226,7 @@ print_prefix(netdissect_options *ndo, const u_char *prefix, u_int max_length)
 		((u_char *)&addr)[plenbytes - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
 	}
-	snprintf(buf, sizeof(buf), "%s/%u", ipaddr_string(ndo, &addr), plen);
+	nd_snprintf(buf, sizeof(buf), "%s/%u", ipaddr_string(ndo, &addr), plen);
         plenbytes += 1 + IPV4_MAPPED_HEADING_LEN;
     } else {
         plenbytes = decode_prefix6(ndo, prefix, max_length, buf, sizeof(buf));

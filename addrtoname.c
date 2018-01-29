@@ -594,7 +594,7 @@ etheraddr_string(netdissect_options *ndo, const u_char *ep)
 	}
 
 	if (!ndo->ndo_nflag) {
-		snprintf(cp, BUFSIZE - (2 + 5*3), " (oui %s)",
+		nd_snprintf(cp, BUFSIZE - (2 + 5*3), " (oui %s)",
 		    tok2str(oui_values, "Unknown", oui));
 	} else
 		*cp = '\0';
@@ -743,7 +743,7 @@ tcpport_string(netdissect_options *ndo, u_short port)
 	tp->addr = i;
 	tp->nxt = newhnamemem(ndo);
 
-	(void)snprintf(buf, sizeof(buf), "%u", i);
+	(void)nd_snprintf(buf, sizeof(buf), "%u", i);
 	tp->name = strdup(buf);
 	if (tp->name == NULL)
 		(*ndo->ndo_error)(ndo, "tcpport_string: strdup(buf)");
@@ -764,7 +764,7 @@ udpport_string(netdissect_options *ndo, u_short port)
 	tp->addr = i;
 	tp->nxt = newhnamemem(ndo);
 
-	(void)snprintf(buf, sizeof(buf), "%u", i);
+	(void)nd_snprintf(buf, sizeof(buf), "%u", i);
 	tp->name = strdup(buf);
 	if (tp->name == NULL)
 		(*ndo->ndo_error)(ndo, "udpport_string: strdup(buf)");
@@ -820,7 +820,7 @@ init_servarray(netdissect_options *ndo)
 		while (table->name)
 			table = table->nxt;
 		if (ndo->ndo_nflag) {
-			(void)snprintf(buf, sizeof(buf), "%d", port);
+			(void)nd_snprintf(buf, sizeof(buf), "%d", port);
 			table->name = strdup(buf);
 		} else
 			table->name = strdup(sv->s_name);
@@ -1318,7 +1318,7 @@ const char *
 ieee8021q_tci_string(const uint16_t tci)
 {
 	static char buf[128];
-	snprintf(buf, sizeof(buf), "vlan %u, p %u%s",
+	nd_snprintf(buf, sizeof(buf), "vlan %u, p %u%s",
 	         tci & 0xfff,
 	         tci >> 13,
 	         (tci & 0x1000) ? ", DEI" : "");

@@ -114,7 +114,7 @@ hex_and_ascii_print_with_offset(netdissect_options *ndo, const char *ident,
 		cp++;
 		s2 = EXTRACT_U_1(cp);
 		cp++;
-		(void)snprintf(hsp, sizeof(hexstuff) - (hsp - hexstuff),
+		(void)nd_snprintf(hsp, sizeof(hexstuff) - (hsp - hexstuff),
 		    " %02x%02x", s1, s2);
 		hsp += HEXDUMP_HEXSTUFF_PER_SHORT;
 		*(asp++) = (ND_ISGRAPH(s1) ? s1 : '.');
@@ -132,7 +132,7 @@ hex_and_ascii_print_with_offset(netdissect_options *ndo, const char *ident,
 	if (length & 1) {
 		s1 = EXTRACT_U_1(cp);
 		cp++;
-		(void)snprintf(hsp, sizeof(hexstuff) - (hsp - hexstuff),
+		(void)nd_snprintf(hsp, sizeof(hexstuff) - (hsp - hexstuff),
 		    " %02x", s1);
 		hsp += 3;
 		*(asp++) = (ND_ISGRAPH(s1) ? s1 : '.');

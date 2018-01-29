@@ -91,7 +91,7 @@ stp_print_bridge_id(const u_char *p)
 {
     static char bridge_id_str[sizeof("pppp.aa:bb:cc:dd:ee:ff")];
 
-    snprintf(bridge_id_str, sizeof(bridge_id_str),
+    nd_snprintf(bridge_id_str, sizeof(bridge_id_str),
              "%.2x%.2x.%.2x:%.2x:%.2x:%.2x:%.2x:%.2x",
              EXTRACT_U_1(p), EXTRACT_U_1(p + 1), EXTRACT_U_1(p + 2),
              EXTRACT_U_1(p + 3), EXTRACT_U_1(p + 4), EXTRACT_U_1(p + 5),
