@@ -288,18 +288,6 @@ typedef char* caddr_t;
 
 #endif /* _WIN32 */
 
-#ifdef _MSC_VER
-  /*
-   * MSVC.
-   */
-  #if _MSC_VER >= 1900
-    /*
-     * VS 2015 or newer; we have snprintf() function.
-     */
-    #define HAVE_SNPRINTF
-  #endif
-#endif
-
 /*
  * Function attributes, for various compilers.
  */
