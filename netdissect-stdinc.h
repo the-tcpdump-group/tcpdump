@@ -209,6 +209,12 @@
 #endif
 
 #ifdef _MSC_VER
+  /*
+   * Microsoft tries to avoid polluting the C namespace with UN*Xisms,
+   * by adding a preceding underscore; we *want* the UN*Xisms, so add
+   * #defines to let us use them.
+   */
+  #define isascii __isascii
   #define stat _stat
   #define strdup _strdup
   #define open _open
