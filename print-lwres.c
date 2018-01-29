@@ -204,8 +204,10 @@ lwres_printname(netdissect_options *ndo,
 		goto trunc;
 
 	ND_PRINT(" ");
-	for (i = 0; i < l; i++)
-		safeputchar(ndo, *p++);
+	for (i = 0; i < l; i++) {
+		safeputchar(ndo, EXTRACT_U_1(p));
+		p++;
+	}
 	p++;	/* skip terminating \0 */
 
 	return p - p0;
@@ -248,8 +250,10 @@ lwres_printbinlen(netdissect_options *ndo,
 	if (p + 2 + l > ndo->ndo_snapend)
 		goto trunc;
 	p += 2;
-	for (i = 0; i < l; i++)
-		ND_PRINT("%02x", *p++);
+	for (i = 0; i < l; i++) {
+		ND_PRINT("%02x", EXTRACT_U_1(p));
+		p++;
+	}
 	return p - p0;
 
   trunc:
@@ -287,8 +291,10 @@ lwres_printaddr(netdissect_options *ndo,
 		break;
 	default:
 		ND_PRINT(" %u/", EXTRACT_BE_U_4(ap->family));
-		for (i = 0; i < l; i++)
-			ND_PRINT("%02x", *p++);
+		for (i = 0; i < l; i++) {
+			ND_PRINT("%02x", EXTRACT_U_1(p));
+			p++;
+		}
 	}
 
 	return p - p0;
