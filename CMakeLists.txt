@@ -557,6 +557,7 @@ if(HAVE_PCAP_FINDALLDEVS)
     # pcap.h didn't have pcap_if_t.
     #
     cmake_push_check_state()
+    set(CMAKE_REQUIRED_INCLUDES ${PCAP_INCLUDE_DIRS})
     set(CMAKE_EXTRA_INCLUDE_FILES pcap.h)
     check_type_size(pcap_if_t PCAP_IF_T)
     cmake_pop_check_state()
