@@ -301,6 +301,11 @@ typedef char* caddr_t;
 #endif
 
 /*
+ * Function attributes, for various compilers.
+ */
+#include "funcattrs.h"
+
+/*
  * On Windows, snprintf(), with that name and with C99 behavior - i.e.,
  * guaranteeing that the formatted string is null-terminated - didn't
  * appear until Visual Studio 2015.  Prior to that, the C runtime had
@@ -484,11 +489,6 @@ struct in6_addr {
 /*
  * end of Apple deprecation workaround macros
  */
-
-/*
- * Function attributes, for various compilers.
- */
-#include "funcattrs.h"
 
 /*
  * Statement attributes, for various compilers.
