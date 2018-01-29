@@ -98,32 +98,27 @@ if(PCAP_CONFIG)
   find_library(PCAP_STATIC_LIBRARY pcap HINTS ${_pcap_static_library_dirs})
   cmake_pop_check_state()
 else(PCAP_CONFIG)
+  # Try to find the header
+  find_path(PCAP_INCLUDE_DIR pcap.h)
+
+  # Try to find the library
+  find_library(PCAP_LIBRARY pcap)
   if(WIN32)
-    #
-    # On Windows, we support PCAP_DLL_DIR being set to the path of
-    # a directory containing an SDK for {whatever}Pcap.
-    # XXX - is there a CMake convention for "look for package XXX
-    # here"?
-    #
-    # Try to find the header
-    find_path(PCAP_INCLUDE_DIR pcap.h HINTS ${PCAP_DLL_DIR})
-
-    # Try to find the library
-    find_library(PCAP_LIBRARY pcap HINTS ${PCAP_DLL_DIR})
-  else(WIN32)
-    # Try to find the header
-    find_path(PCAP_INCLUDE_DIR pcap.h)
-
-    # Try to find the library
-    find_library(PCAP_LIBRARY pcap)
-
+    if(NOT PCAP_LIBRARY)
+      #
+      # OK, look for it under the name wpcap.
+      #
+      find_library(PCAP_LIBRARY wpcap)
+    endif(NOT PCAP_LIBRARY)
+  endif(WIN32)
+  if(NOT WIN32)
     # Try to find the static library (XXX - what about AIX?)
     include(CMakePushCheckState)
     cmake_push_check_state()
     set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
     find_library(PCAP_STATIC_LIBRARY pcap)
     cmake_pop_check_state()
-  endif(WIN32)
+  endif(NOTWIN32)
 
   set(PCAP_INCLUDE_DIRS ${PCAP_INCLUDE_DIR})
   set(PCAP_LIBRARIES ${PCAP_LIBRARY})
