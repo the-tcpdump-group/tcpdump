@@ -371,7 +371,7 @@ if(HAVE_DNET_HTOA)
     #
     # OK, we have dnet_htoa().  Do we have netdnet/dnetdb.h?
     #
-    check_include_file("sys/types.h;netdnet/dnetdb.h" HAVE_NETDNET_DNETDB_H)
+    check_include_files("sys/types.h;netdnet/dnetdb.h" HAVE_NETDNET_DNETDB_H)
     if(HAVE_NETDNET_DNETDB_H)
         #
         # Yes.  Does it declare dnet_htoa()?
