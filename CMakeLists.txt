@@ -216,6 +216,13 @@ check_function_exists(strftime HAVE_STRFTIME)
 check_function_exists(setlinebuf HAVE_SETLINEBUF)
 
 #
+# On Windows, we'll need the Winsock 2 library.
+#
+if(WIN32)
+    set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} Ws2_32)
+endif(WIN32)
+
+#
 # Some platforms may need -lnsl for getrpcbynumber.
 #
 cmake_push_check_state()
