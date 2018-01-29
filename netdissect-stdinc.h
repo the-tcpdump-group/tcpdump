@@ -209,12 +209,23 @@
 #endif
 
 #ifdef _MSC_VER
-#define stat _stat
-#define open _open
-#define fstat _fstat
-#define read _read
-#define close _close
-#define O_RDONLY _O_RDONLY
+  #define stat _stat
+  #define strdup _strdup
+  #define open _open
+  #define fstat _fstat
+  #define read _read
+  #define close _close
+  #define O_RDONLY _O_RDONLY
+
+  /*
+   * If <crtdbg.h> has been included, and _DEBUG is defined, and
+   * __STDC__ is zero, <crtdbg.h> will define strdup() to call
+   * _strdup_dbg().  So if it's already defined, don't redefine
+   * it.
+   */
+  #ifndef strdup
+    #define strdup _strdup
+  #endif
 #endif  /* _MSC_VER */
 
 /*
@@ -276,6 +287,45 @@ typedef char* caddr_t;
 #define INT64_T_CONSTANT(constant)	(constant##LL)
 
 #endif /* _WIN32 */
+
+#ifdef _MSC_VER
+  /*
+   * MSVC.
+   */
+  #if _MSC_VER >= 1900
+    /*
+     * VS 2015 or newer; we have snprintf() function.
+     */
+    #define HAVE_SNPRINTF
+  #endif
+#endif
+
+/*
+ * On Windows, snprintf(), with that name and with C99 behavior - i.e.,
+ * guaranteeing that the formatted string is null-terminated - didn't
+ * appear until Visual Studio 2015.  Prior to that, the C runtime had
+ * only _snprintf(), which *doesn't* guarantee that the string is
+ * null-terminated if it is truncated due to the buffer being too
+ * small.  We therefore can't just define snprintf to be _snprintf
+ * and define vsnprintf to be _vsnprintf, as we're relying on null-
+ * termination of strings in all cases.
+ *
+ * We also want to allow this to be built with versions of Visual Studio
+ * prior to VS 2015, so we can't rely on snprintf() being present.
+ *
+ * And, if there are any UN*Xes out there on which we can run that
+ * don't have snprintf() or don't have vsnprintf(), we define our
+ * own as well.
+ */
+#if !defined(HAVE_SNPRINTF)
+int snprintf (char *str, size_t sz, FORMAT_STRING(const char *format), ...)
+     PRINTFLIKE(3, 4);
+#endif /* !defined(HAVE_SNPRINTF) */
+
+#if !defined(HAVE_VSNPRINTF)
+int vsnprintf (char *str, size_t sz, FORMAT_STRING(const char *format),
+     va_list ap) PRINTFLIKE(3, 0);
+#endif /* !defined(HAVE_VSNPRINTF) */
 
 /*
  * fopen() read and write modes for text files and binary files.

@@ -884,7 +884,11 @@ foreach(FUNC strlcat strlcpy strdup strsep getservent getopt_long)
     endif()
 endforeach()
 if(NOT HAVE_VSNPRINTF OR NOT HAVE_SNPRINTF)
-    set(NETDISSECT_SOURCE_LIST_C ${NETDISSECT_SOURCE_LIST_C} missing/snprintf.c)
+    if(WIN32)
+        set(NETDISSECT_SOURCE_LIST_C ${NETDISSECT_SOURCE_LIST_C} missing/win_snprintf.c)
+    else(WIN32)
+        set(NETDISSECT_SOURCE_LIST_C ${NETDISSECT_SOURCE_LIST_C} missing/snprintf.c)
+    endif(WIN32)
 endif(NOT HAVE_VSNPRINTF OR NOT HAVE_SNPRINTF)
 
 add_library(netdissect STATIC
