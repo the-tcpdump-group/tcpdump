@@ -84,31 +84,31 @@
  * XXX - do we need to test for both 32-bit and 64-bit versions of those
  * architectures in all cases?
  */
-static inline uint16_t UNALIGNED_OK
+UNALIGNED_OK static inline uint16_t
 EXTRACT_BE_U_2(const void *p)
 {
 	return ((uint16_t)ntohs(*(const uint16_t *)(p)));
 }
 
-static inline int16_t UNALIGNED_OK
+UNALIGNED_OK static inline int16_t
 EXTRACT_BE_S_2(const void *p)
 {
 	return ((int16_t)ntohs(*(const int16_t *)(p)));
 }
 
-static inline uint32_t UNALIGNED_OK
+UNALIGNED_OK static inline uint32_t
 EXTRACT_BE_U_4(const void *p)
 {
 	return ((uint32_t)ntohl(*(const uint32_t *)(p)));
 }
 
-static inline int32_t UNALIGNED_OK
+UNALIGNED_OK static inline int32_t
 EXTRACT_BE_S_4(const void *p)
 {
 	return ((int32_t)ntohl(*(const int32_t *)(p)));
 }
 
-static inline uint64_t UNALIGNED_OK
+UNALIGNED_OK static inline uint64_t
 EXTRACT_BE_U_8(const void *p)
 {
 	return ((uint64_t)(((uint64_t)ntohl(*((const uint32_t *)(p) + 0))) << 32 |
@@ -116,7 +116,7 @@ EXTRACT_BE_U_8(const void *p)
 
 }
 
-static inline int64_t UNALIGNED_OK
+UNALIGNED_OK static inline int64_t
 EXTRACT_BE_S_8(const void *p)
 {
 	return ((int64_t)(((int64_t)ntohl(*((const uint32_t *)(p) + 0))) << 32 |
@@ -128,7 +128,7 @@ EXTRACT_BE_S_8(const void *p)
  * Extract an IPv4 address, which is in network byte order, and not
  * necessarily aligned, and provide the result in host byte order.
  */
-static inline uint32_t UNALIGNED_OK
+UNALIGNED_OK static inline uint32_t
 EXTRACT_IPV4_TO_HOST_ORDER(const void *p)
 {
 	return ((uint32_t)ntohl(*(const uint32_t *)(p)));
