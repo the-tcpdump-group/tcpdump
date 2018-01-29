@@ -260,8 +260,6 @@ typedef char* caddr_t;
 #endif /* caddr_t */
 
 #define MAXHOSTNAMELEN	64
-#define snprintf _snprintf
-#define vsnprintf _vsnprintf
 
 #else /* _WIN32 */
 
