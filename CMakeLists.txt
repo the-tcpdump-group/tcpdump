@@ -532,11 +532,24 @@ check_function_exists(pcap_breakloop HAVE_PCAP_BREAKLOOP)
 check_function_exists(pcap_dump_ftell HAVE_PCAP_DUMP_FTELL)
 
 #
-# Do we have the new open API?  Check for pcap_create, and assume that,
-# if we do, we also have pcap_activate() and the other new routines
-# introduced in libpcap 1.0.0.
+# Do we have the new open API?  Check for pcap_create() and for
+# pcap_statustostr(), and assume that, if we have both of them,
+# we also have pcap_activate() and the other new routines
+# introduced in libpcap 1.0.0.  (We check for pcap_statustostr()
+# as well, because WinPcap 4.1.3 screwed up and exported pcap_create()
+# but not other routines such as pcap_statustostr(), even though it
+# defined them and even though you really want pcap_statustostr() to
+# get strings corresponding to some of the status returns from the
+# new routines.)
 #
-check_function_exists(pcap_create HAVE_PCAP_CREATE)
+check_function_exists(pcap_statustostr HAVE_PCAP_STATUSTOSTR)
+#
+# If we don't have pcap_statustostr(), don't check for pcap_create(),
+# so we pretend we don't have it.
+#
+if(HAVE_PCAP_STATUSTOSTR)
+    check_function_exists(pcap_create HAVE_PCAP_CREATE)
+endif(HAVE_PCAP_STATUSTOSTR)
 if(HAVE_PCAP_CREATE)
     #
     # OK, do we have pcap_set_tstamp_type?  If so, assume we have
