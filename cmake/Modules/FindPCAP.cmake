@@ -118,7 +118,7 @@ else(PCAP_CONFIG)
     set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
     find_library(PCAP_STATIC_LIBRARY pcap)
     cmake_pop_check_state()
-  endif(NOTWIN32)
+  endif(NOT WIN32)
 
   set(PCAP_INCLUDE_DIRS ${PCAP_INCLUDE_DIR})
   set(PCAP_LIBRARIES ${PCAP_LIBRARY})
