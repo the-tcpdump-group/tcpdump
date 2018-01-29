@@ -71,7 +71,7 @@ struct cfm_ccm_t {
  * Timer Bases for the CCM Interval field.
  * Expressed in units of seconds.
  */
-static const float ccm_interval_base[8] = {0, 0.003333, 0.01, 0.1, 1, 10, 60, 600};
+static const float ccm_interval_base[8] = {0.0f, 0.003333f, 0.01f, 0.1f, 1.0f, 10.0f, 60.0f, 600.0f};
 #define CCM_INTERVAL_MIN_MULTIPLIER 3.25
 #define CCM_INTERVAL_MAX_MULTIPLIER 3.5
 
