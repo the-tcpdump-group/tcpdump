@@ -139,13 +139,15 @@ check_include_file(rpc/rpc.h HAVE_RPC_RPC_H)
 if(HAVE_RPC_RPC_H)
     check_include_files("rpc/rpc.h;rpc/rpcent.h" HAVE_RPC_RPCENT_H)
 endif(HAVE_RPC_RPC_H)
-check_include_files("sys/types.h;sys/socket.h;net/if.h;net/pfvar.h" HAVE_NET_PFVAR_H)
-if(HAVE_NET_PFVAR_H)
-    check_include_files("sys/types.h;sys/socket.h;net/if.h;net/pfvar.h;net/if_pflog.h" HAVE_NET_IF_PFLOG_H)
-    if(HAVE_NET_IF_PFLOG_H)
-        set(LOCALSRC print-pflog.c ${LOCALSRC})
-    endif(HAVE_NET_IF_PFLOG_H)
-endif(HAVE_NET_PFVAR_H)
+if(NOT WIN32)
+    check_include_files("sys/types.h;sys/socket.h;net/if.h;net/pfvar.h" HAVE_NET_PFVAR_H)
+    if(HAVE_NET_PFVAR_H)
+        check_include_files("sys/types.h;sys/socket.h;net/if.h;net/pfvar.h;net/if_pflog.h" HAVE_NET_IF_PFLOG_H)
+        if(HAVE_NET_IF_PFLOG_H)
+            set(LOCALSRC print-pflog.c ${LOCALSRC})
+        endif(HAVE_NET_IF_PFLOG_H)
+    endif(HAVE_NET_PFVAR_H)
+endif(NOT WIN32)
 
 #
 # Functions.
@@ -161,18 +163,35 @@ check_function_exists(strsep HAVE_STRSEP)
 # that's been set, it skips the test, so we need different variables.
 #
 set(TCPDUMP_LINK_LIBRARIES "")
-check_function_exists(gethostbyaddr STDLIBS_HAVE_GETHOSTBYADDR)
-if(NOT STDLIBS_HAVE_GETHOSTBYADDR)
-    check_library_exists(socket gethostbyaddr "" LIBSOCKET_HAS_GETHOSTBYADDR)
-    if(LIBSOCKET_HAS_GETHOSTBYADDR)
-        set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} socket)
-    else()
-        check_library_exists(nsl gethostbyaddr "" LIBNSL_HAS_GETHOSTBYADDR)
-        if(LIBNSL_HAS_GETHOSTBYADDR)
-            set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} nsl)
-        endif()
-    endif()
-endif()
+if(WIN32)
+    #
+    # We need winsock2.h and ws2tcpip.h.
+    #
+    cmake_push_check_state()
+    set(CMAKE_REQUIRED_LIBRARIES ws2_32)
+    check_symbol_exists(gethostbyaddr "winsock2.h;ws2tcpip.h" LIBWS2_32_HAS_GETHOSTBYADDR)
+    cmake_pop_check_state()
+    if(LIBWS2_32_HAS_GETHOSTBYADDR)
+        set(TCPDUMP_LINK_LIBRARIES ws2_32 ${TCPDUMP_LINK_LIBRARIES})
+    else(LIBWS2_32_HAS_GETHOSTBYADDR)
+        message(FATAL_ERROR "gethostbyaddr is required, but wasn't found")
+    endif(LIBWS2_32_HAS_GETHOSTBYADDR)
+else(WIN32)
+    check_function_exists(gethostbyaddr STDLIBS_HAVE_GETHOSTBYADDR)
+    if(NOT STDLIBS_HAVE_GETHOSTBYADDR)
+        check_library_exists(socket gethostbyaddr "" LIBSOCKET_HAS_GETHOSTBYADDR)
+        if(LIBSOCKET_HAS_GETHOSTBYADDR)
+            set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} socket)
+        else(LIBSOCKET_HAS_GETHOSTBYADDR)
+            check_library_exists(nsl gethostbyaddr "" LIBNSL_HAS_GETHOSTBYADDR)
+            if(LIBNSL_HAS_GETHOSTBYADDR)
+                set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} nsl)
+            else(LIBNSL_HAS_GETHOSTBYADDR)
+                message(FATAL_ERROR "gethostbyaddr is required, but wasn't found")
+            endif(LIBNSL_HAS_GETHOSTBYADDR)
+        endif(LIBSOCKET_HAS_GETHOSTBYADDR)
+    endif(NOT STDLIBS_HAVE_GETHOSTBYADDR)
+endif(WIN32)
 
 #
 # This may require additional libraries.
@@ -226,13 +245,6 @@ if(NOT WIN32)
 endif(NOT WIN32)
 check_function_exists(strftime HAVE_STRFTIME)
 check_function_exists(setlinebuf HAVE_SETLINEBUF)
-
-#
-# On Windows, we'll need the Winsock 2 library.
-#
-if(WIN32)
-    set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} Ws2_32)
-endif(WIN32)
 
 #
 # Some platforms may need -lnsl for getrpcbynumber.
