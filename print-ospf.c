@@ -761,11 +761,11 @@ ospf_print_lsa(netdissect_options *ndo,
 				ND_PRINT(" %u", (ul & ASLA_MASK_METRIC));
 
 			ND_TCHECK_4(almp->asla_forward);
-			if (EXTRACT_IPV4_TO_HOST_ORDER(almp->asla_forward) != 0) {
+			if (EXTRACT_IPV4_TO_NETWORK_ORDER(almp->asla_forward) != 0) {
 				ND_PRINT(", forward %s", ipaddr_string(ndo, almp->asla_forward));
 			}
 			ND_TCHECK_4(almp->asla_tag);
-			if (EXTRACT_IPV4_TO_HOST_ORDER(almp->asla_tag) != 0) {
+			if (EXTRACT_IPV4_TO_NETWORK_ORDER(almp->asla_tag) != 0) {
 				ND_PRINT(", tag %s", ipaddr_string(ndo, almp->asla_tag));
 			}
 			++almp;
@@ -1147,7 +1147,7 @@ ospf_print(netdissect_options *ndo,
 	ND_PRINT("\n\tRouter-ID %s", ipaddr_string(ndo, op->ospf_routerid));
 
 	ND_TCHECK_4(op->ospf_areaid);
-	if (EXTRACT_IPV4_TO_HOST_ORDER(op->ospf_areaid) != 0)
+	if (EXTRACT_IPV4_TO_NETWORK_ORDER(op->ospf_areaid) != 0)
 		ND_PRINT(", Area %s", ipaddr_string(ndo, op->ospf_areaid));
 	else
 		ND_PRINT(", Backbone Area");
