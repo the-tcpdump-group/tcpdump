@@ -52,8 +52,8 @@ struct icmp {
 	nd_uint8_t  icmp_code;		/* type sub code */
 	nd_uint16_t icmp_cksum;		/* ones complement cksum of struct */
 	union {
-		nd_uint8_t ih_pptr;		/* ICMP_PARAMPROB */
-		struct in_addr ih_gwaddr;	/* ICMP_REDIRECT */
+		nd_uint8_t ih_pptr;	/* ICMP_PARAMPROB */
+		nd_ipv4 ih_gwaddr;	/* ICMP_REDIRECT */
 		struct ih_idseq {
 			nd_uint16_t icd_id;
 			nd_uint16_t icd_seq;
@@ -375,7 +375,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			ND_TCHECK_1(dp->icmp_ip.ip_p);
 			(void)nd_snprintf(buf, sizeof(buf),
 			    "%s protocol %u unreachable",
-			    ipaddr_string(ndo, &dp->icmp_ip.ip_dst),
+			    ipaddr_string(ndo, dp->icmp_ip.ip_dst),
 			    EXTRACT_U_1(dp->icmp_ip.ip_p));
 			break;
 
@@ -392,21 +392,21 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			case IPPROTO_TCP:
 				(void)nd_snprintf(buf, sizeof(buf),
 					"%s tcp port %s unreachable",
-					ipaddr_string(ndo, &oip->ip_dst),
+					ipaddr_string(ndo, oip->ip_dst),
 					tcpport_string(ndo, dport));
 				break;
 
 			case IPPROTO_UDP:
 				(void)nd_snprintf(buf, sizeof(buf),
 					"%s udp port %s unreachable",
-					ipaddr_string(ndo, &oip->ip_dst),
+					ipaddr_string(ndo, oip->ip_dst),
 					udpport_string(ndo, dport));
 				break;
 
 			default:
 				(void)nd_snprintf(buf, sizeof(buf),
 					"%s protocol %u port %u unreachable",
-					ipaddr_string(ndo, &oip->ip_dst),
+					ipaddr_string(ndo, oip->ip_dst),
 					ip_proto, dport);
 				break;
 			}
@@ -420,11 +420,11 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			if (mtu) {
 				(void)nd_snprintf(buf, sizeof(buf),
 				    "%s unreachable - need to frag (mtu %u)",
-				    ipaddr_string(ndo, &dp->icmp_ip.ip_dst), mtu);
+				    ipaddr_string(ndo, dp->icmp_ip.ip_dst), mtu);
 			} else {
 				(void)nd_snprintf(buf, sizeof(buf),
 				    "%s unreachable - need to frag",
-				    ipaddr_string(ndo, &dp->icmp_ip.ip_dst));
+				    ipaddr_string(ndo, dp->icmp_ip.ip_dst));
 			}
 		    }
 			break;
@@ -433,7 +433,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			fmt = tok2str(unreach2str, "#%u %%s unreachable",
 			    icmp_code);
 			(void)nd_snprintf(buf, sizeof(buf), fmt,
-			    ipaddr_string(ndo, &dp->icmp_ip.ip_dst));
+			    ipaddr_string(ndo, dp->icmp_ip.ip_dst));
 			break;
 		}
 		break;
@@ -443,8 +443,8 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		fmt = tok2str(type2str, "redirect-#%u %%s to net %%s",
 		    icmp_code);
 		(void)nd_snprintf(buf, sizeof(buf), fmt,
-		    ipaddr_string(ndo, &dp->icmp_ip.ip_dst),
-		    ipaddr_string(ndo, &dp->icmp_gwaddr));
+		    ipaddr_string(ndo, dp->icmp_ip.ip_dst),
+		    ipaddr_string(ndo, dp->icmp_gwaddr));
 		break;
 
 	case ICMP_ROUTERADVERT:
@@ -490,7 +490,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		while (num-- > 0) {
 			ND_TCHECK_SIZE(idp);
 			(void)nd_snprintf(cp, sizeof(buf) - (cp - buf), " {%s %u}",
-			    ipaddr_string(ndo, &idp->ird_addr),
+			    ipaddr_string(ndo, idp->ird_addr),
 			    EXTRACT_BE_U_4(idp->ird_pref));
 			cp = buf + strlen(buf);
 			++idp;
