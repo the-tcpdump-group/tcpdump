@@ -148,13 +148,6 @@ if(HAVE_NET_PFVAR_H)
 endif(HAVE_NET_PFVAR_H)
 
 #
-# As the autoconf manual says, AC_HEADER_TIME is obsolete, as all UN*Xes
-# let you include both time.h and sys/time.h, so just say we can.
-#
-check_include_file(bitypes.h HAVE_SYS_BITYPES_H)
-check_include_file(limits.h HAVE_LIMITS_H)
-
-#
 # Functions.
 #
 check_function_exists(strlcat HAVE_STRLCAT)
@@ -435,10 +428,6 @@ endif(HAVE_DNET_HTOA)
 # except that it only checks for the existence of the structure type,
 # so we use check_struct_has_member() and look for ss_family.
 #
-check_struct_has_member("struct sockaddr_storage" ss_family sys/socket.h  HAVE_SOCKADDR_STORAGE)
-set(CMAKE_EXTRA_INCLUDE_FILES unistd.h sys/socket.h)
-check_type_size("socklen_t" SOCKLEN_T)
-set(CMAKE_EXTRA_INCLUDE_FILES unistd.h)
 
 #
 # Check for IPv6 support.
@@ -457,11 +446,6 @@ cmake_pop_check_state()
 if(HAVE_AF_INET6 AND HAVE_STRUCT_IN6_ADDR)
     set(HAVE_OS_IPV6_SUPPORT TRUE)
 endif(HAVE_AF_INET6 AND HAVE_STRUCT_IN6_ADDR)
-
-#
-# Structure fields.
-#
-check_struct_has_member("struct sockaddr" sa_len sys/socket.h HAVE_SOCKADDR_SA_LEN)
 
 ######################################
 # External dependencies
