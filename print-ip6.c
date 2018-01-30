@@ -53,7 +53,7 @@ ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
 	const void *dst_addr;
 	const struct ip6_rthdr *dp;
 	const struct ip6_rthdr0 *dp0;
-	const struct in6_addr *addr;
+	const u_char *p;
 	int i, len;
 
 	cp = (const u_char *)ip6;
@@ -107,13 +107,11 @@ ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
 				if (len % 2 == 1)
 					goto trunc;
 				len >>= 1;
-				addr = &dp0->ip6r0_addr[0];
+				p = (const u_char *) dp0->ip6r0_addr;
 				for (i = 0; i < len; i++) {
-					if ((const u_char *)(addr + 1) > ndo->ndo_snapend)
-						goto trunc;
-
-					dst_addr = (const void *)addr;
-					addr++;
+					ND_TCHECK_16(p);
+					dst_addr = (const void *)p;
+					p += 16;
 				}
 				break;
 

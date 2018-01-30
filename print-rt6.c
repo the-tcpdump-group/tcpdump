@@ -41,14 +41,10 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 	const struct ip6_rthdr *dp;
 	const struct ip6_rthdr0 *dp0;
 	const struct ip6_srh *srh;
-	const u_char *ep;
 	u_int i, len, type;
-	const struct in6_addr *addr;
+	const u_char *p;
 
 	dp = (const struct ip6_rthdr *)bp;
-
-	/* 'ep' points to the end of available data. */
-	ep = ndo->ndo_snapend;
 
 	ND_TCHECK_1(dp->ip6r_segleft);
 
@@ -72,13 +68,11 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 		if (len % 2 == 1)
 			goto trunc;
 		len >>= 1;
-		addr = &dp0->ip6r0_addr[0];
+		p = (const u_char *) dp0->ip6r0_addr;
 		for (i = 0; i < len; i++) {
-			if ((const u_char *)(addr + 1) > ep)
-				goto trunc;
-
-			ND_PRINT(", [%u]%s", i, ip6addr_string(ndo, addr));
-			addr++;
+			ND_TCHECK_16(p);
+			ND_PRINT(", [%u]%s", i, ip6addr_string(ndo, p));
+			p += 16;
 		}
 		/*(*/
 		ND_PRINT(") ");
@@ -101,13 +95,11 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 		if (len % 2 == 1)
 			goto trunc;
 		len >>= 1;
-		addr = &srh->srh_segments[0];
+		p  = (const u_char *) srh->srh_segments;
 		for (i = 0; i < len; i++) {
-			if ((const u_char *)(addr + 1) > ep)
-				goto trunc;
-
-			ND_PRINT(", [%u]%s", i, ip6addr_string(ndo, addr));
-			addr++;
+			ND_TCHECK_16(p);
+			ND_PRINT(", [%u]%s", i, ip6addr_string(ndo, p));
+			p += 16;
 		}
 		/*(*/
 		ND_PRINT(") ");

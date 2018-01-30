@@ -83,8 +83,8 @@ struct ip6_hdr {
 		} ip6_un1;
 		nd_uint8_t ip6_un2_vfc;	/* 4 bits version, top 4 bits class */
 	} ip6_ctlun;
-	struct in6_addr ip6_src;	/* source address */
-	struct in6_addr ip6_dst;	/* destination address */
+	nd_ipv6 ip6_src;	/* source address */
+	nd_ipv6 ip6_dst;	/* destination address */
 } ND_UNALIGNED;
 
 #define ip6_vfc		ip6_ctlun.ip6_un2_vfc
@@ -184,7 +184,7 @@ struct ip6_rthdr0 {
 	nd_uint8_t  ip6r0_type;		/* always zero */
 	nd_uint8_t  ip6r0_segleft;	/* segments left */
 	nd_uint32_t ip6r0_reserved;	/* reserved field */
-	struct in6_addr ip6r0_addr[1];	/* up to 23 addresses */
+	nd_ipv6     ip6r0_addr[1];	/* up to 23 addresses */
 };
 
 /**
@@ -199,7 +199,7 @@ struct ip6_srh {
 	nd_uint8_t	srh_last_ent;		/* Last Entry*/
 	nd_uint8_t	srh_flags;		/* Flags */
 	nd_uint16_t	srh_tag;		/* Tag */
-	struct in6_addr	srh_segments[1];	/* SRH segments list*/
+	nd_ipv6		srh_segments[1];	/* SRH segments list*/
 };
 
 /* Fragment header */
