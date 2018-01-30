@@ -50,10 +50,10 @@ struct ipxHdr {
     nd_uint16_t	length;		/* Length, in bytes, including header */
     nd_uint8_t	tCtl;		/* Transport Control (i.e. hop count) */
     nd_uint8_t	pType;		/* Packet Type (i.e. level 2 protocol) */
-    uint16_t	dstNet[2];	/* destination net */
+    nd_uint32_t	dstNet;		/* destination net */
     nd_byte	dstNode[6];	/* destination node */
     nd_uint16_t	dstSkt;		/* destination socket */
-    uint16_t	srcNet[2];	/* source net */
+    nd_uint32_t	srcNet;		/* source net */
     nd_byte	srcNode[6];	/* source node */
     nd_uint16_t	srcSkt;		/* source socket */
 };
