@@ -1760,8 +1760,8 @@ vldb_reply_print(netdissect_options *ndo,
 				ND_TCHECK_4(bp);
 				if (i < nservers)
 					ND_PRINT(" %s",
-					   intoa(((const struct in_addr *) bp)->s_addr));
-				bp += sizeof(uint32_t);
+					   intoa(EXTRACT_IPV4_TO_NETWORK_ORDER(bp)));
+				bp += sizeof(nd_ipv4);
 			}
 			ND_PRINT(" partitions");
 			for (i = 0; i < 8; i++) {
@@ -1807,8 +1807,8 @@ vldb_reply_print(netdissect_options *ndo,
 				ND_TCHECK_4(bp);
 				if (i < nservers)
 					ND_PRINT(" %s",
-					   intoa(((const struct in_addr *) bp)->s_addr));
-				bp += sizeof(uint32_t);
+					   intoa(EXTRACT_IPV4_TO_NETWORK_ORDER(bp)));
+				bp += sizeof(nd_ipv4);
 			}
 			ND_PRINT(" partitions");
 			for (i = 0; i < 13; i++) {

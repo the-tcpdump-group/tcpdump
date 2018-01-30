@@ -65,9 +65,9 @@ struct nfhdr_v1 {
 };
 
 struct nfrec_v1 {
-	struct in_addr	src_ina;
-	struct in_addr	dst_ina;
-	struct in_addr	nhop_ina;
+	nd_ipv4		src_ina;
+	nd_ipv4		dst_ina;
+	nd_ipv4		nhop_ina;
 	nd_uint16_t	input;		/* SNMP index of input interface */
 	nd_uint16_t	output;		/* SNMP index of output interface */
 	nd_uint32_t	packets;	/* packets in the flow */
@@ -97,9 +97,9 @@ struct nfhdr_v5 {
 };
 
 struct nfrec_v5 {
-	struct in_addr	src_ina;
-	struct in_addr	dst_ina;
-	struct in_addr	nhop_ina;
+	nd_ipv4		src_ina;
+	nd_ipv4		dst_ina;
+	nd_ipv4		nhop_ina;
 	nd_uint16_t	input;		/* SNMP index of input interface */
 	nd_uint16_t	output;		/* SNMP index of output interface */
 	nd_uint32_t	packets;	/* packets in the flow */
@@ -117,7 +117,7 @@ struct nfrec_v5 {
 	nd_uint8_t	src_mask;	/* source address mask bits */
 	nd_uint8_t	dst_mask;	/* destination address prefix mask bits */
 	nd_byte		pad2[2];
-	struct in_addr	peer_nexthop;	/* v6: IP address of the nexthop within the peer (FIB)*/
+	nd_ipv4		peer_nexthop;	/* v6: IP address of the nexthop within the peer (FIB)*/
 };
 
 struct nfhdr_v6 {
@@ -131,9 +131,9 @@ struct nfhdr_v6 {
 };
 
 struct nfrec_v6 {
-	struct in_addr	src_ina;
-	struct in_addr	dst_ina;
-	struct in_addr	nhop_ina;
+	nd_ipv4		src_ina;
+	nd_ipv4		dst_ina;
+	nd_ipv4		nhop_ina;
 	nd_uint16_t	input;		/* SNMP index of input interface */
 	nd_uint16_t	output;		/* SNMP index of output interface */
 	nd_uint32_t	packets;	/* packets in the flow */
@@ -151,7 +151,7 @@ struct nfrec_v6 {
 	nd_uint8_t	src_mask;	/* source address mask bits */
 	nd_uint8_t	dst_mask;	/* destination address prefix mask bits */
 	nd_uint16_t	flags;
-	struct in_addr	peer_nexthop;	/* v6: IP address of the nexthop within the peer (FIB)*/
+	nd_ipv4		peer_nexthop;	/* v6: IP address of the nexthop within the peer (FIB)*/
 };
 
 static void
@@ -204,13 +204,18 @@ cnfp_v1_print(netdissect_options *ndo, const u_char *cp)
 		       EXTRACT_BE_U_4(nr->last_time)%1000);
 
 		asbuf[0] = buf[0] = '\0';
-		ND_PRINT("\n    %s%s%s:%u ", intoa(nr->src_ina.s_addr), buf, asbuf,
+		ND_PRINT("\n    %s%s%s:%u ",
+			intoa(EXTRACT_IPV4_TO_NETWORK_ORDER(nr->src_ina)),
+			buf, asbuf,
 			EXTRACT_BE_U_2(nr->srcport));
 
-		ND_PRINT("> %s%s%s:%u ", intoa(nr->dst_ina.s_addr), buf, asbuf,
+		ND_PRINT("> %s%s%s:%u ",
+			intoa(EXTRACT_IPV4_TO_NETWORK_ORDER(nr->dst_ina)),
+			buf, asbuf,
 			EXTRACT_BE_U_2(nr->dstport));
 
-		ND_PRINT(">> %s\n    ", intoa(nr->nhop_ina.s_addr));
+		ND_PRINT(">> %s\n    ",
+			intoa(EXTRACT_IPV4_TO_NETWORK_ORDER(nr->nhop_ina)));
 
 		proto = EXTRACT_U_1(nr->proto);
 		if (!ndo->ndo_nflag && (p_name = netdb_protoname(proto)) != NULL)
@@ -299,16 +304,21 @@ cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 		nd_snprintf(buf, sizeof(buf), "/%u", EXTRACT_U_1(nr->src_mask));
 		nd_snprintf(asbuf, sizeof(asbuf), ":%u",
 			EXTRACT_BE_U_2(nr->src_as));
-		ND_PRINT("\n    %s%s%s:%u ", intoa(nr->src_ina.s_addr), buf, asbuf,
+		ND_PRINT("\n    %s%s%s:%u ",
+			intoa(EXTRACT_IPV4_TO_NETWORK_ORDER(nr->src_ina)),
+			buf, asbuf,
 			EXTRACT_BE_U_2(nr->srcport));
 
 		nd_snprintf(buf, sizeof(buf), "/%u", EXTRACT_U_1(nr->dst_mask));
 		nd_snprintf(asbuf, sizeof(asbuf), ":%u",
 			 EXTRACT_BE_U_2(nr->dst_as));
-		ND_PRINT("> %s%s%s:%u ", intoa(nr->dst_ina.s_addr), buf, asbuf,
+		ND_PRINT("> %s%s%s:%u ",
+			intoa(EXTRACT_IPV4_TO_NETWORK_ORDER(nr->dst_ina)),
+			buf, asbuf,
 			EXTRACT_BE_U_2(nr->dstport));
 
-		ND_PRINT(">> %s\n    ", intoa(nr->nhop_ina.s_addr));
+		ND_PRINT(">> %s\n    ",
+			intoa(EXTRACT_IPV4_TO_NETWORK_ORDER(nr->nhop_ina)));
 
 		proto = EXTRACT_U_1(nr->proto);
 		if (!ndo->ndo_nflag && (p_name = netdb_protoname(proto)) != NULL)
@@ -397,16 +407,21 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 		nd_snprintf(buf, sizeof(buf), "/%u", EXTRACT_U_1(nr->src_mask));
 		nd_snprintf(asbuf, sizeof(asbuf), ":%u",
 			EXTRACT_BE_U_2(nr->src_as));
-		ND_PRINT("\n    %s%s%s:%u ", intoa(nr->src_ina.s_addr), buf, asbuf,
+		ND_PRINT("\n    %s%s%s:%u ",
+			intoa(EXTRACT_IPV4_TO_NETWORK_ORDER(nr->src_ina)),
+			buf, asbuf,
 			EXTRACT_BE_U_2(nr->srcport));
 
 		nd_snprintf(buf, sizeof(buf), "/%u", EXTRACT_U_1(nr->dst_mask));
 		nd_snprintf(asbuf, sizeof(asbuf), ":%u",
 			 EXTRACT_BE_U_2(nr->dst_as));
-		ND_PRINT("> %s%s%s:%u ", intoa(nr->dst_ina.s_addr), buf, asbuf,
+		ND_PRINT("> %s%s%s:%u ",
+			intoa(EXTRACT_IPV4_TO_NETWORK_ORDER(nr->dst_ina)),
+			buf, asbuf,
 			EXTRACT_BE_U_2(nr->dstport));
 
-		ND_PRINT(">> %s\n    ", intoa(nr->nhop_ina.s_addr));
+		ND_PRINT(">> %s\n    ",
+			intoa(EXTRACT_IPV4_TO_NETWORK_ORDER(nr->nhop_ina)));
 
 		proto = EXTRACT_U_1(nr->proto);
 		if (!ndo->ndo_nflag && (p_name = netdb_protoname(proto)) != NULL)

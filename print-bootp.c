@@ -64,10 +64,10 @@ struct bootp {
 	nd_uint16_t	bp_secs;	/* seconds since boot began */
 	nd_uint16_t	bp_flags;	/* flags - see bootp_flag_values[]
 					   in print-bootp.c */
-	struct in_addr	bp_ciaddr;	/* client IP address */
-	struct in_addr	bp_yiaddr;	/* 'your' IP address */
-	struct in_addr	bp_siaddr;	/* server IP address */
-	struct in_addr	bp_giaddr;	/* gateway IP address */
+	nd_ipv4		bp_ciaddr;	/* client IP address */
+	nd_ipv4		bp_yiaddr;	/* 'your' IP address */
+	nd_ipv4		bp_siaddr;	/* server IP address */
+	nd_ipv4		bp_giaddr;	/* gateway IP address */
 	nd_byte		bp_chaddr[16];	/* client hardware address */
 	nd_byte		bp_sname[64];	/* server host name */
 	nd_byte		bp_file[128];	/* boot file name */
@@ -241,11 +241,11 @@ struct bootp {
 struct cmu_vend {
 	nd_byte		v_magic[4];	/* magic number */
 	nd_uint32_t	v_flags;	/* flags/opcodes, etc. */
-	struct in_addr	v_smask;	/* Subnet mask */
-	struct in_addr	v_dgate;	/* Default gateway */
-	struct in_addr	v_dns1, v_dns2; /* Domain name servers */
-	struct in_addr	v_ins1, v_ins2; /* IEN-116 name servers */
-	struct in_addr	v_ts1, v_ts2;	/* Time servers */
+	nd_ipv4		v_smask;	/* Subnet mask */
+	nd_ipv4		v_dgate;	/* Default gateway */
+	nd_ipv4		v_dns1, v_dns2; /* Domain name servers */
+	nd_ipv4		v_ins1, v_ins2; /* IEN-116 name servers */
+	nd_ipv4		v_ts1, v_ts2;	/* Time servers */
 	nd_byte		v_unused[24];	/* currently unused */
 } ND_UNALIGNED;
 
@@ -332,24 +332,24 @@ bootp_print(netdissect_options *ndo,
 		ND_PRINT(" (0x%04x)", EXTRACT_BE_U_2(bp->bp_flags));
 
 	/* Client's ip address */
-	ND_TCHECK_4(&bp->bp_ciaddr);
-	if (EXTRACT_IPV4_TO_HOST_ORDER(&bp->bp_ciaddr.s_addr))
-		ND_PRINT("\n\t  Client-IP %s", ipaddr_string(ndo, &bp->bp_ciaddr));
+	ND_TCHECK_4(bp->bp_ciaddr);
+	if (EXTRACT_IPV4_TO_NETWORK_ORDER(bp->bp_ciaddr))
+		ND_PRINT("\n\t  Client-IP %s", ipaddr_string(ndo, bp->bp_ciaddr));
 
 	/* 'your' ip address (bootp client) */
-	ND_TCHECK_4(&bp->bp_yiaddr);
-	if (EXTRACT_IPV4_TO_HOST_ORDER(&bp->bp_yiaddr.s_addr))
-		ND_PRINT("\n\t  Your-IP %s", ipaddr_string(ndo, &bp->bp_yiaddr));
+	ND_TCHECK_4(bp->bp_yiaddr);
+	if (EXTRACT_IPV4_TO_NETWORK_ORDER(bp->bp_yiaddr))
+		ND_PRINT("\n\t  Your-IP %s", ipaddr_string(ndo, bp->bp_yiaddr));
 
 	/* Server's ip address */
-	ND_TCHECK_4(&bp->bp_siaddr);
-	if (EXTRACT_IPV4_TO_HOST_ORDER(&bp->bp_siaddr.s_addr))
-		ND_PRINT("\n\t  Server-IP %s", ipaddr_string(ndo, &bp->bp_siaddr));
+	ND_TCHECK_4(bp->bp_siaddr);
+	if (EXTRACT_IPV4_TO_NETWORK_ORDER(bp->bp_siaddr))
+		ND_PRINT("\n\t  Server-IP %s", ipaddr_string(ndo, bp->bp_siaddr));
 
 	/* Gateway's ip address */
-	ND_TCHECK_4(&bp->bp_giaddr);
-	if (EXTRACT_IPV4_TO_HOST_ORDER(&bp->bp_giaddr.s_addr))
-		ND_PRINT("\n\t  Gateway-IP %s", ipaddr_string(ndo, &bp->bp_giaddr));
+	ND_TCHECK_4(bp->bp_giaddr);
+	if (EXTRACT_IPV4_TO_NETWORK_ORDER(bp->bp_giaddr))
+		ND_PRINT("\n\t  Gateway-IP %s", ipaddr_string(ndo, bp->bp_giaddr));
 
 	/* Client's Ethernet address */
 	if (bp_htype == 1 && bp_hlen == 6) {
@@ -1053,8 +1053,8 @@ trunc:
 }
 
 #define PRINTCMUADDR(m, s) { ND_TCHECK_4(&cmu->m); \
-    if (cmu->m.s_addr != 0) \
-	ND_PRINT(" %s:%s", s, ipaddr_string(ndo, &cmu->m.s_addr)); }
+    if (EXTRACT_IPV4_TO_NETWORK_ORDER(cmu->m) != 0) \
+	ND_PRINT(" %s:%s", s, ipaddr_string(ndo, cmu->m)); }
 
 static void
 cmu_print(netdissect_options *ndo,
