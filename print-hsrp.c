@@ -90,7 +90,7 @@ struct hsrp {
 	nd_uint8_t	hsrp_group;
 	nd_uint8_t	hsrp_reserved;
 	nd_byte		hsrp_authdata[HSRP_AUTH_SIZE];
-	struct in_addr	hsrp_virtaddr;
+	nd_ipv4		hsrp_virtaddr;
 };
 
 void
@@ -116,8 +116,8 @@ hsrp_print(netdissect_options *ndo, const uint8_t *bp, u_int len)
 	if (EXTRACT_U_1(hp->hsrp_reserved) != 0) {
 		ND_PRINT("[reserved=%u!] ", EXTRACT_U_1(hp->hsrp_reserved));
 	}
-	ND_TCHECK_4(&hp->hsrp_virtaddr);
-	ND_PRINT("addr=%s", ipaddr_string(ndo, &hp->hsrp_virtaddr));
+	ND_TCHECK_4(hp->hsrp_virtaddr);
+	ND_PRINT("addr=%s", ipaddr_string(ndo, hp->hsrp_virtaddr));
 	if (ndo->ndo_vflag) {
 		ND_PRINT(" hellotime=");
 		unsigned_relts_print(ndo, EXTRACT_U_1(hp->hsrp_hellotime));
