@@ -32,8 +32,10 @@
 #include "netdissect-stdinc.h"
 
 #ifdef __osf__
+#include <stdio.h>
 #include <sys/sysinfo.h>
 #include <sys/proc.h>
+#endif /* __osf__ */
 
 #include "machdep.h"
 
