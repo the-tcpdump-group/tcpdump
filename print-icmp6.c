@@ -440,7 +440,7 @@ struct rr_pco_match {		/* match prefix part */
 	nd_uint8_t		rpm_minlen;
 	nd_uint8_t		rpm_maxlen;
 	nd_uint16_t		rpm_reserved;
-	struct	in6_addr	rpm_prefix;
+	nd_ipv6			rpm_prefix;
 };
 
 #define RPM_PCO_ADD		1
@@ -456,7 +456,7 @@ struct rr_pco_use {		/* use prefix part */
 	nd_uint32_t	rpu_vltime;
 	nd_uint32_t	rpu_pltime;
 	nd_uint32_t	rpu_flags;
-	struct	in6_addr rpu_prefix;
+	nd_ipv6		rpu_prefix;
 };
 #define ICMP6_RR_PCOUSE_RAFLAGS_ONLINK	0x80
 #define ICMP6_RR_PCOUSE_RAFLAGS_AUTO	0x40
@@ -470,7 +470,7 @@ struct rr_result {		/* router renumbering result message */
 	nd_uint8_t	rrr_ordinal;
 	nd_uint8_t	rrr_matchedlen;
 	nd_uint32_t	rrr_ifid;
-	struct	in6_addr rrr_prefix;
+	nd_ipv6		rrr_prefix;
 };
 /* network endian */
 #define ICMP6_RR_RESULT_FLAGS_OOB		((uint16_t)htons(0x0002))
@@ -1209,8 +1209,8 @@ icmp6_print(netdissect_options *ndo,
 	    {
 		const struct nd_neighbor_solicit *p;
 		p = (const struct nd_neighbor_solicit *)dp;
-		ND_TCHECK_16(&p->nd_ns_target);
-		ND_PRINT(", who has %s", ip6addr_string(ndo, &p->nd_ns_target));
+		ND_TCHECK_16(p->nd_ns_target);
+		ND_PRINT(", who has %s", ip6addr_string(ndo, p->nd_ns_target));
 		if (ndo->ndo_vflag) {
 #define NDSOLLEN 24
 			icmp6_opt_print(ndo, (const u_char *)dp + NDSOLLEN,
@@ -1223,9 +1223,9 @@ icmp6_print(netdissect_options *ndo,
 		const struct nd_neighbor_advert *p;
 
 		p = (const struct nd_neighbor_advert *)dp;
-		ND_TCHECK_16(&p->nd_na_target);
+		ND_TCHECK_16(p->nd_na_target);
 		ND_PRINT(", tgt is %s",
-                          ip6addr_string(ndo, &p->nd_na_target));
+                          ip6addr_string(ndo, p->nd_na_target));
 		if (ndo->ndo_vflag) {
                         ND_PRINT(", Flags [%s]",
                                   bittok2str(icmp6_nd_na_flag_values,
@@ -1243,10 +1243,10 @@ icmp6_print(netdissect_options *ndo,
 		const struct nd_redirect *p;
 
 		p = (const struct nd_redirect *)dp;
-		ND_TCHECK_16(&p->nd_rd_dst);
-		ND_PRINT(", %s", ip6addr_string(ndo, &p->nd_rd_dst));
-		ND_TCHECK_16(&p->nd_rd_target);
-		ND_PRINT(" to %s", ip6addr_string(ndo, &p->nd_rd_target));
+		ND_TCHECK_16(p->nd_rd_dst);
+		ND_PRINT(", %s", ip6addr_string(ndo, p->nd_rd_dst));
+		ND_TCHECK_16(p->nd_rd_target);
+		ND_PRINT(" to %s", ip6addr_string(ndo, p->nd_rd_target));
 #define REDIRECTLEN 40
 		if (ndo->ndo_vflag) {
 			icmp6_opt_print(ndo, (const u_char *)dp + REDIRECTLEN,
@@ -1412,7 +1412,6 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 	const struct nd_opt_route_info *opri;
 	const u_char *cp, *ep, *domp;
 	struct in6_addr in6;
-	const struct in6_addr *in6p;
 	size_t l;
 	u_int i;
 
@@ -1511,17 +1510,16 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			opri = (const struct nd_opt_route_info *)op;
 			ND_TCHECK_4(opri->nd_opt_rti_lifetime);
 			memset(&in6, 0, sizeof(in6));
-			in6p = (const nd_ipv6 *)(opri + 1);
 			switch (opt_len) {
 			case 1:
 				break;
 			case 2:
-				ND_TCHECK_8(in6p);
+				ND_TCHECK_8(opri + 1);
 				memcpy(&in6, opri + 1, 8);
 				break;
 			case 3:
-				ND_TCHECK_SIZE(in6p);
-				memcpy(&in6, opri + 1, sizeof(in6));
+				ND_TCHECK_16(opri + 1);
+				memcpy(&in6, opri + 1, 16);
 				break;
 			default:
 				goto trunc;
@@ -1567,7 +1565,7 @@ mld6_print(netdissect_options *ndo, const u_char *bp)
 		return;
 
 	ND_PRINT("max resp delay: %u ", EXTRACT_BE_U_2(mp->mld6_maxdelay));
-	ND_PRINT("addr: %s", ip6addr_string(ndo, &mp->mld6_addr));
+	ND_PRINT("addr: %s", ip6addr_string(ndo, mp->mld6_addr));
 }
 
 static void
@@ -2038,7 +2036,7 @@ icmp6_rrenum_print(netdissect_options *ndo, const u_char *bp, const u_char *ep)
 		match = (const struct rr_pco_match *)cp;
 		cp = (const char *)(match + 1);
 
-		ND_TCHECK_16(&match->rpm_prefix);
+		ND_TCHECK_16(match->rpm_prefix);
 
 		if (ndo->ndo_vflag > 1)
 			ND_PRINT("\n\t");
@@ -2072,7 +2070,7 @@ icmp6_rrenum_print(netdissect_options *ndo, const u_char *bp, const u_char *ep)
 			use = (const struct rr_pco_use *)cp;
 			cp = (const char *)(use + 1);
 
-			ND_TCHECK_16(&use->rpu_prefix);
+			ND_TCHECK_16(use->rpu_prefix);
 
 			if (ndo->ndo_vflag > 1)
 				ND_PRINT("\n\t");
