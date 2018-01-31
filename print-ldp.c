@@ -593,7 +593,7 @@ ldp_pdu_print(netdissect_options *ndo,
     /* print the LSR-ID, label-space & length */
     ND_PRINT("%sLDP, Label-Space-ID: %s:%u, pdu-length: %u",
            (ndo->ndo_vflag < 1) ? "" : "\n\t",
-           ipaddr_string(ndo, &ldp_com_header->lsr_id),
+           ipaddr_string(ndo, ldp_com_header->lsr_id),
            EXTRACT_BE_U_2(ldp_com_header->label_space),
            pdu_len);
 
