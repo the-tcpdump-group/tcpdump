@@ -283,7 +283,7 @@ extern cap_channel_t *capdns;
  * also needs to check whether they're present in the packet buffer.
  */
 const char *
-getname(netdissect_options *ndo, const u_char *ap)
+ipaddr_string(netdissect_options *ndo, const u_char *ap)
 {
 	struct hostent *hp;
 	uint32_t addr;
@@ -320,7 +320,7 @@ getname(netdissect_options *ndo, const u_char *ap)
 			p->name = strdup(hp->h_name);
 			if (p->name == NULL)
 				(*ndo->ndo_error)(ndo,
-						  "getname: strdup(hp->h_name)");
+						  "ipaddr_string: strdup(hp->h_name)");
 			if (ndo->ndo_Nflag) {
 				/* Remove domain qualifications */
 				dotp = strchr(p->name, '.');
@@ -332,7 +332,7 @@ getname(netdissect_options *ndo, const u_char *ap)
 	}
 	p->name = strdup(intoa(addr));
 	if (p->name == NULL)
-		(*ndo->ndo_error)(ndo, "getname: strdup(intoa(addr))");
+		(*ndo->ndo_error)(ndo, "ipaddr_string: strdup(intoa(addr))");
 	return (p->name);
 }
 
@@ -341,7 +341,7 @@ getname(netdissect_options *ndo, const u_char *ap)
  * is assumed to be in network byte order.
  */
 const char *
-getname6(netdissect_options *ndo, const u_char *ap)
+ip6addr_string(netdissect_options *ndo, const u_char *ap)
 {
 	struct hostent *hp;
 	union {
@@ -382,7 +382,7 @@ getname6(netdissect_options *ndo, const u_char *ap)
 			p->name = strdup(hp->h_name);
 			if (p->name == NULL)
 				(*ndo->ndo_error)(ndo,
-						  "getname6: strdup(hp->h_name)");
+						  "ip6addr_string: strdup(hp->h_name)");
 			if (ndo->ndo_Nflag) {
 				/* Remove domain qualifications */
 				dotp = strchr(p->name, '.');
@@ -395,7 +395,7 @@ getname6(netdissect_options *ndo, const u_char *ap)
 	cp = addrtostr6(ap, ntop_buf, sizeof(ntop_buf));
 	p->name = strdup(cp);
 	if (p->name == NULL)
-		(*ndo->ndo_error)(ndo, "getname6: strdup(cp)");
+		(*ndo->ndo_error)(ndo, "ip6addr_string: strdup(cp)");
 	return (p->name);
 }
 

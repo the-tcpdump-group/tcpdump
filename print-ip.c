@@ -484,15 +484,15 @@ again:
 		if (ndo->ndo_packettype == PT_CARP) {
 			if (ndo->ndo_vflag)
 				ND_PRINT("carp %s > %s: ",
-					     ipaddr_string(ndo, &ipds->ip->ip_src),
-					     ipaddr_string(ndo, &ipds->ip->ip_dst));
+					     ipaddr_string(ndo, ipds->ip->ip_src),
+					     ipaddr_string(ndo, ipds->ip->ip_dst));
 			carp_print(ndo, ipds->cp, ipds->len,
 				EXTRACT_U_1(ipds->ip->ip_ttl));
 		} else {
 			if (ndo->ndo_vflag)
 				ND_PRINT("vrrp %s > %s: ",
-					     ipaddr_string(ndo, &ipds->ip->ip_src),
-					     ipaddr_string(ndo, &ipds->ip->ip_dst));
+					     ipaddr_string(ndo, ipds->ip->ip_src),
+					     ipaddr_string(ndo, ipds->ip->ip_dst));
 			vrrp_print(ndo, ipds->cp, ipds->len,
 				(const u_char *)ipds->ip,
 				EXTRACT_U_1(ipds->ip->ip_ttl));
@@ -676,8 +676,8 @@ ip_print(netdissect_options *ndo,
 		if (ipds->nh != IPPROTO_TCP && ipds->nh != IPPROTO_UDP &&
 		    ipds->nh != IPPROTO_SCTP && ipds->nh != IPPROTO_DCCP) {
 			ND_PRINT("%s > %s: ",
-				     ipaddr_string(ndo, &ipds->ip->ip_src),
-				     ipaddr_string(ndo, &ipds->ip->ip_dst));
+				     ipaddr_string(ndo, ipds->ip->ip_src),
+				     ipaddr_string(ndo, ipds->ip->ip_dst));
 		}
 		ip_print_demux(ndo, ipds);
 	} else {
@@ -693,8 +693,8 @@ ip_print(netdissect_options *ndo,
 		 * next level protocol header.  print the ip addr
 		 * and the protocol.
 		 */
-		ND_PRINT("%s > %s:", ipaddr_string(ndo, &ipds->ip->ip_src),
-		          ipaddr_string(ndo, &ipds->ip->ip_dst));
+		ND_PRINT("%s > %s:", ipaddr_string(ndo, ipds->ip->ip_src),
+		          ipaddr_string(ndo, ipds->ip->ip_dst));
 		if (!ndo->ndo_nflag && (p_name = netdb_protoname(ip_proto)) != NULL)
 			ND_PRINT(" %s", p_name);
 		else

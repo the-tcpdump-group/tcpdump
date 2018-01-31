@@ -555,7 +555,7 @@ decode_prefix4(netdissect_options *ndo,
     if (plen % 8) {
         ((u_char *)&addr)[plenbytes - 1] &= ((0xff00 >> (plen % 8)) & 0xff);
     }
-    nd_snprintf(buf, buflen, "%s/%u", ipaddr_string(ndo, &addr), plen);
+    nd_snprintf(buf, buflen, "%s/%u", ipaddr_string(ndo, (const u_char *)&addr), plen);
     return 1 + plenbytes;
 
 trunc:
@@ -604,7 +604,7 @@ decode_labeled_prefix4(netdissect_options *ndo,
     }
     /* the label may get offsetted by 4 bits so lets shift it right */
     nd_snprintf(buf, buflen, "%s/%u, label:%u %s",
-             ipaddr_string(ndo, &addr),
+             ipaddr_string(ndo, (const u_char *)&addr),
              plen,
              EXTRACT_BE_U_3(pptr + 1)>>4,
              ((EXTRACT_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
@@ -845,7 +845,7 @@ decode_labeled_vpn_prefix4(netdissect_options *ndo,
     /* the label may get offsetted by 4 bits so lets shift it right */
     nd_snprintf(buf, buflen, "RD: %s, %s/%u, label:%u %s",
              bgp_vpn_rd_print(ndo, pptr+4),
-             ipaddr_string(ndo, &addr),
+             ipaddr_string(ndo, (const u_char *)&addr),
              plen,
              EXTRACT_BE_U_3(pptr + 1)>>4,
              ((EXTRACT_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
@@ -1169,7 +1169,7 @@ decode_prefix6(netdissect_options *ndo,
         addr.s6_addr[plenbytes - 1] &=
             ((0xff00 >> (plen % 8)) & 0xff);
     }
-    nd_snprintf(buf, buflen, "%s/%u", ip6addr_string(ndo, &addr), plen);
+    nd_snprintf(buf, buflen, "%s/%u", ip6addr_string(ndo, (const u_char *)&addr), plen);
     return 1 + plenbytes;
 
 trunc:
@@ -1210,7 +1210,7 @@ decode_labeled_prefix6(netdissect_options *ndo,
     }
     /* the label may get offsetted by 4 bits so lets shift it right */
     nd_snprintf(buf, buflen, "%s/%u, label:%u %s",
-             ip6addr_string(ndo, &addr),
+             ip6addr_string(ndo, (const u_char *)&addr),
              plen,
              EXTRACT_BE_U_3(pptr + 1)>>4,
              ((EXTRACT_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
@@ -1252,7 +1252,7 @@ decode_labeled_vpn_prefix6(netdissect_options *ndo,
     /* the label may get offsetted by 4 bits so lets shift it right */
     nd_snprintf(buf, buflen, "RD: %s, %s/%u, label:%u %s",
              bgp_vpn_rd_print(ndo, pptr+4),
-             ip6addr_string(ndo, &addr),
+             ip6addr_string(ndo, (const u_char *)&addr),
              plen,
              EXTRACT_BE_U_3(pptr + 1)>>4,
              ((EXTRACT_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
@@ -2620,7 +2620,7 @@ bgp_open_print(netdissect_options *ndo,
         as_printf(ndo, astostr, sizeof(astostr), EXTRACT_BE_U_2(bgp_open_header->bgpo_myas)));
     ND_PRINT("Holdtime %us, ",
         EXTRACT_BE_U_2(bgp_open_header->bgpo_holdtime));
-    ND_PRINT("ID %s", ipaddr_string(ndo, &bgp_open_header->bgpo_id));
+    ND_PRINT("ID %s", ipaddr_string(ndo, bgp_open_header->bgpo_id));
     optslen = EXTRACT_U_1(bgp_open_header->bgpo_optlen);
     ND_PRINT("\n\t  Optional parameters, length: %u", optslen);
 

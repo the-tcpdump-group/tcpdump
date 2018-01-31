@@ -181,9 +181,15 @@ tcp_print(netdissect_options *ndo,
                 ip6 = NULL;
         ch = '\0';
         if (!ND_TTEST_2(tp->th_dport)) {
-                ND_PRINT("%s > %s: [|tcp]",
-                             ipaddr_string(ndo, &ip->ip_src),
-                             ipaddr_string(ndo, &ip->ip_dst));
+	        if (ip6) {
+                        ND_PRINT("%s > %s: ",
+                                     ip6addr_string(ndo, ip6->ip6_src),
+                                     ip6addr_string(ndo, ip6->ip6_dst));
+	        } else {
+	                ND_PRINT("%s > %s: [|tcp]",
+        	                     ipaddr_string(ndo, ip->ip_src),
+                	             ipaddr_string(ndo, ip->ip_dst));
+                }
                 return;
         }
 
@@ -193,9 +199,9 @@ tcp_print(netdissect_options *ndo,
         if (ip6) {
                 if (EXTRACT_U_1(ip6->ip6_nxt) == IPPROTO_TCP) {
                         ND_PRINT("%s.%s > %s.%s: ",
-                                     ip6addr_string(ndo, &ip6->ip6_src),
+                                     ip6addr_string(ndo, ip6->ip6_src),
                                      tcpport_string(ndo, sport),
-                                     ip6addr_string(ndo, &ip6->ip6_dst),
+                                     ip6addr_string(ndo, ip6->ip6_dst),
                                      tcpport_string(ndo, dport));
                 } else {
                         ND_PRINT("%s > %s: ",
@@ -204,9 +210,9 @@ tcp_print(netdissect_options *ndo,
         } else {
                 if (EXTRACT_U_1(ip->ip_p) == IPPROTO_TCP) {
                         ND_PRINT("%s.%s > %s.%s: ",
-                                     ipaddr_string(ndo, &ip->ip_src),
+                                     ipaddr_string(ndo, ip->ip_src),
                                      tcpport_string(ndo, sport),
-                                     ipaddr_string(ndo, &ip->ip_dst),
+                                     ipaddr_string(ndo, ip->ip_dst),
                                      tcpport_string(ndo, dport));
                 } else {
                         ND_PRINT("%s > %s: ",

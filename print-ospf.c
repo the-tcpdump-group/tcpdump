@@ -525,7 +525,7 @@ ospf_print_lshdr(netdissect_options *ndo,
 
         ND_TCHECK_4(lshp->ls_seq); /* XXX - ls_length check checked this */
         ND_PRINT("\n\t  Advertising Router %s, seq 0x%08x, age %us, length %u",
-                  ipaddr_string(ndo, &lshp->ls_router),
+                  ipaddr_string(ndo, lshp->ls_router),
                   EXTRACT_BE_U_4(lshp->ls_seq),
                   EXTRACT_BE_U_2(lshp->ls_age),
                   ls_length - (u_int)sizeof(struct lsa_hdr));
@@ -555,7 +555,7 @@ ospf_print_lshdr(netdissect_options *ndo,
             ND_PRINT("\n\t    %s LSA (%u), LSA-ID: %s",
                    tok2str(lsa_values,"unknown",ls_type),
                    ls_type,
-                   ipaddr_string(ndo, &lshp->un_lsa_id.lsa_id));
+                   ipaddr_string(ndo, lshp->un_lsa_id.lsa_id));
             break;
         }
 
@@ -652,26 +652,26 @@ ospf_print_lsa(netdissect_options *ndo,
 
 			case RLA_TYPE_VIRTUAL:
 				ND_PRINT("\n\t      Virtual Link: Neighbor Router-ID: %s, Interface Address: %s",
-				    ipaddr_string(ndo, &rlp->link_id),
-				    ipaddr_string(ndo, &rlp->link_data));
+				    ipaddr_string(ndo, rlp->link_id),
+				    ipaddr_string(ndo, rlp->link_data));
 				break;
 
 			case RLA_TYPE_ROUTER:
 				ND_PRINT("\n\t      Neighbor Router-ID: %s, Interface Address: %s",
-				    ipaddr_string(ndo, &rlp->link_id),
-				    ipaddr_string(ndo, &rlp->link_data));
+				    ipaddr_string(ndo, rlp->link_id),
+				    ipaddr_string(ndo, rlp->link_data));
 				break;
 
 			case RLA_TYPE_TRANSIT:
 				ND_PRINT("\n\t      Neighbor Network-ID: %s, Interface Address: %s",
-				    ipaddr_string(ndo, &rlp->link_id),
-				    ipaddr_string(ndo, &rlp->link_data));
+				    ipaddr_string(ndo, rlp->link_id),
+				    ipaddr_string(ndo, rlp->link_data));
 				break;
 
 			case RLA_TYPE_STUB:
 				ND_PRINT("\n\t      Stub Network: %s, Mask: %s",
-				    ipaddr_string(ndo, &rlp->link_id),
-				    ipaddr_string(ndo, &rlp->link_data));
+				    ipaddr_string(ndo, rlp->link_id),
+				    ipaddr_string(ndo, rlp->link_data));
 				break;
 
 			default:
@@ -695,7 +695,7 @@ ospf_print_lsa(netdissect_options *ndo,
 		ap = &lsap->lsa_un.un_nla.nla_router[0];
 		while ((const u_char *)ap < ls_end) {
 			ND_TCHECK_SIZE(ap);
-			ND_PRINT("\n\t      %s", ipaddr_string(ndo, ap));
+			ND_PRINT("\n\t      %s", ipaddr_string(ndo, *ap));
 			++ap;
 		}
 		break;
@@ -741,7 +741,7 @@ ospf_print_lsa(netdissect_options *ndo,
         case LS_TYPE_NSSA: /* fall through - those LSAs share the same format */
 		ND_TCHECK_4(lsap->lsa_un.un_nla.nla_mask);
 		ND_PRINT("\n\t    Mask %s",
-		    ipaddr_string(ndo, &lsap->lsa_un.un_asla.asla_mask));
+		    ipaddr_string(ndo, lsap->lsa_un.un_asla.asla_mask));
 
 		ND_TCHECK_SIZE(lsap->lsa_un.un_sla.sla_tosmetric);
 		almp = lsap->lsa_un.un_asla.asla_metric;
@@ -1018,7 +1018,7 @@ ospf_decode_v2(netdissect_options *ndo,
 			ND_PRINT("\n\t  Neighbor List:");
 		while ((const u_char *)ap < dataend) {
 			ND_TCHECK_SIZE(ap);
-			ND_PRINT("\n\t    %s", ipaddr_string(ndo, ap));
+			ND_PRINT("\n\t    %s", ipaddr_string(ndo, *ap));
 			++ap;
 		}
 		break;	/* HELLO */
@@ -1050,7 +1050,7 @@ ospf_decode_v2(netdissect_options *ndo,
                     ND_TCHECK_SIZE(lsrp);
 
                     ND_PRINT("\n\t  Advertising Router: %s, %s LSA (%u)",
-                           ipaddr_string(ndo, &lsrp->ls_router),
+                           ipaddr_string(ndo, lsrp->ls_router),
                            tok2str(lsa_values,"unknown",EXTRACT_BE_U_4(lsrp->ls_type)),
                            EXTRACT_BE_U_4(lsrp->ls_type));
 
@@ -1066,7 +1066,7 @@ ospf_decode_v2(netdissect_options *ndo,
                         break;
                     default:
                         ND_PRINT(", LSA-ID: %s",
-                               ipaddr_string(ndo, &lsrp->un_ls_stateid.ls_stateid));
+                               ipaddr_string(ndo, lsrp->un_ls_stateid.ls_stateid));
                         break;
                     }
 

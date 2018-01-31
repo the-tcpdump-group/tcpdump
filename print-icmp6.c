@@ -1074,19 +1074,19 @@ icmp6_print(netdissect_options *ndo,
 
 	switch (icmp6_type) {
 	case ICMP6_DST_UNREACH:
-		ND_TCHECK_16(&oip->ip6_dst);
+		ND_TCHECK_16(oip->ip6_dst);
                 ND_PRINT(", %s", tok2str(icmp6_dst_unreach_code_values,"unknown unreach code (%u)",icmp6_code));
 		switch (icmp6_code) {
 
 		case ICMP6_DST_UNREACH_NOROUTE: /* fall through */
 		case ICMP6_DST_UNREACH_ADMIN:
 		case ICMP6_DST_UNREACH_ADDR:
-                        ND_PRINT(" %s",ip6addr_string(ndo, &oip->ip6_dst));
+                        ND_PRINT(" %s",ip6addr_string(ndo, oip->ip6_dst));
                         break;
 		case ICMP6_DST_UNREACH_BEYONDSCOPE:
 			ND_PRINT(" %s, source address %s",
-			       ip6addr_string(ndo, &oip->ip6_dst),
-                                  ip6addr_string(ndo, &oip->ip6_src));
+			       ip6addr_string(ndo, oip->ip6_dst),
+                                  ip6addr_string(ndo, oip->ip6_src));
 			break;
 		case ICMP6_DST_UNREACH_NOPORT:
 			if ((ouh = get_upperlayer(ndo, (const u_char *)oip, &prot))
@@ -1097,17 +1097,17 @@ icmp6_print(netdissect_options *ndo,
 			switch (prot) {
 			case IPPROTO_TCP:
 				ND_PRINT(", %s tcp port %s",
-					ip6addr_string(ndo, &oip->ip6_dst),
+					ip6addr_string(ndo, oip->ip6_dst),
                                           tcpport_string(ndo, dport));
 				break;
 			case IPPROTO_UDP:
 				ND_PRINT(", %s udp port %s",
-					ip6addr_string(ndo, &oip->ip6_dst),
+					ip6addr_string(ndo, oip->ip6_dst),
                                           udpport_string(ndo, dport));
 				break;
 			default:
 				ND_PRINT(", %s protocol %u port %u unreachable",
-					ip6addr_string(ndo, &oip->ip6_dst),
+					ip6addr_string(ndo, oip->ip6_dst),
                                           prot, dport);
 				break;
 			}
@@ -1125,11 +1125,11 @@ icmp6_print(netdissect_options *ndo,
 		ND_PRINT(", mtu %u", EXTRACT_BE_U_4(dp->icmp6_mtu));
 		break;
 	case ICMP6_TIME_EXCEEDED:
-		ND_TCHECK_16(&oip->ip6_dst);
+		ND_TCHECK_16(oip->ip6_dst);
 		switch (icmp6_code) {
 		case ICMP6_TIME_EXCEED_TRANSIT:
 			ND_PRINT(" for %s",
-                                  ip6addr_string(ndo, &oip->ip6_dst));
+                                  ip6addr_string(ndo, oip->ip6_dst));
 			break;
 		case ICMP6_TIME_EXCEED_REASSEMBLY:
 			ND_PRINT(" (reassembly)");
@@ -1140,7 +1140,7 @@ icmp6_print(netdissect_options *ndo,
 		}
 		break;
 	case ICMP6_PARAM_PROB:
-		ND_TCHECK_16(&oip->ip6_dst);
+		ND_TCHECK_16(oip->ip6_dst);
 		switch (icmp6_code) {
 		case ICMP6_PARAMPROB_HEADER:
                         ND_PRINT(", erroneous - octet %u", EXTRACT_BE_U_4(dp->icmp6_pptr));
@@ -1284,7 +1284,7 @@ icmp6_print(netdissect_options *ndo,
 			in6 = (const nd_ipv6 *)(dp + 1);
 			for (; (const u_char *)in6 < cp; in6++) {
 				ND_TCHECK_SIZE(in6);
-				ND_PRINT(", %s", ip6addr_string(ndo, in6));
+				ND_PRINT(", %s", ip6addr_string(ndo, (const u_char *)in6));
 			}
 		}
 		break;
@@ -1451,9 +1451,9 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			break;
 		case ND_OPT_PREFIX_INFORMATION:
 			opp = (const struct nd_opt_prefix_info *)op;
-			ND_TCHECK_16(&opp->nd_opt_pi_prefix);
+			ND_TCHECK_16(opp->nd_opt_pi_prefix);
                         ND_PRINT("%s/%u%s, Flags [%s], valid time %s",
-                                  ip6addr_string(ndo, &opp->nd_opt_pi_prefix),
+                                  ip6addr_string(ndo, opp->nd_opt_pi_prefix),
                                   EXTRACT_U_1(opp->nd_opt_pi_prefix_len),
                                   (opt_len != 4) ? "badlen" : "",
                                   bittok2str(icmp6_opt_pi_flag_values, "none", EXTRACT_U_1(opp->nd_opt_pi_flags_reserved)),
@@ -1477,9 +1477,9 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			ND_PRINT(" lifetime %us,",
                                   EXTRACT_BE_U_4(oprd->nd_opt_rdnss_lifetime));
 			for (i = 0; i < l; i++) {
-				ND_TCHECK_16(&oprd->nd_opt_rdnss_addr[i]);
+				ND_TCHECK_16(oprd->nd_opt_rdnss_addr[i]);
 				ND_PRINT(" addr: %s",
-                                          ip6addr_string(ndo, &oprd->nd_opt_rdnss_addr[i]));
+                                          ip6addr_string(ndo, oprd->nd_opt_rdnss_addr[i]));
 			}
 			break;
 		case ND_OPT_DNSSL:
@@ -1524,7 +1524,7 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			default:
 				goto trunc;
 			}
-			ND_PRINT(" %s/%u", ip6addr_string(ndo, &in6),
+			ND_PRINT(" %s/%u", ip6addr_string(ndo, (const u_char *)&in6),
                                   EXTRACT_U_1(opri->nd_opt_rti_prefixlen));
 			ND_PRINT(", pref=%s", get_rtpref(EXTRACT_U_1(opri->nd_opt_rti_flags)));
 			ND_PRINT(", lifetime=%s",
@@ -1808,6 +1808,7 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 			break;
 		}
 
+		cp = (const u_char *)(ni6 + 1);
 		switch (EXTRACT_U_1(ni6->ni_code)) {
 		case ICMP6_NI_SUBJ_IPV6:
 			if (!ND_TTEST_LEN(dp, sizeof(*ni6) + sizeof(nd_ipv6)))
@@ -1818,11 +1819,10 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 				break;
 			}
 			ND_PRINT(", subject=%s",
-                                  ip6addr_string(ndo, ni6 + 1));
+                                  ip6addr_string(ndo, cp));
 			break;
 		case ICMP6_NI_SUBJ_FQDN:
 			ND_PRINT(", subject=DNS name");
-			cp = (const u_char *)(ni6 + 1);
 			if (EXTRACT_U_1(cp) == ep - cp - 1) {
 				/* icmp-name-lookup-03, pascal string */
 				if (ndo->ndo_vflag)
@@ -1846,7 +1846,7 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 				break;
 			}
 			ND_PRINT(", subject=%s",
-                                  ipaddr_string(ndo, ni6 + 1));
+                                  ipaddr_string(ndo, cp));
 			break;
 		default:
 			ND_PRINT(", unknown subject");

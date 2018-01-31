@@ -898,8 +898,8 @@ pimv2_print(netdissect_options *ndo,
                 case 0: /* Null header */
 			ND_TCHECK_4(ip->ip_dst);
 			ND_PRINT("IP-Null-header %s > %s",
-			          ipaddr_string(ndo, &ip->ip_src),
-			          ipaddr_string(ndo, &ip->ip_dst));
+			          ipaddr_string(ndo, ip->ip_src),
+			          ipaddr_string(ndo, ip->ip_dst));
 			break;
 
 		case 4:	/* IPv4 */

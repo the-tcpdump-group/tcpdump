@@ -194,7 +194,7 @@ egpnrprint(netdissect_options *ndo,
 		length--;
 		ND_PRINT(" %s %s ",
 		       gateways < intgw ? "int" : "ext",
-		       ipaddr_string(ndo, &addr));
+		       ipaddr_string(ndo, (const u_char *)&addr));
 
 		comma = "";
 		ND_PRINT("(");
@@ -233,7 +233,7 @@ egpnrprint(netdissect_options *ndo,
 					cp++;
 					length -= 2;
 				}
-				ND_PRINT(" %s", ipaddr_string(ndo, &addr));
+				ND_PRINT(" %s", ipaddr_string(ndo, (const u_char *)&addr));
 				networks--;
 			}
 			distances--;
@@ -356,7 +356,7 @@ egp_print(netdissect_options *ndo,
 			ND_PRINT(" state:%s", egp_status_updown[status]);
 		else
 			ND_PRINT(" [status %u]", status);
-		ND_PRINT(" net:%s", ipaddr_string(ndo, &egp->egp_sourcenet));
+		ND_PRINT(" net:%s", ipaddr_string(ndo, egp->egp_sourcenet));
 		break;
 
 	case EGPT_UPDATE:
@@ -370,7 +370,7 @@ egp_print(netdissect_options *ndo,
 		else
 			ND_PRINT(" [status %u]", status);
 		ND_PRINT(" %s int %u ext %u",
-		       ipaddr_string(ndo, &egp->egp_sourcenet),
+		       ipaddr_string(ndo, egp->egp_sourcenet),
 		       EXTRACT_U_1(egp->egp_intgw),
 		       EXTRACT_U_1(egp->egp_extgw));
 		if (ndo->ndo_vflag)

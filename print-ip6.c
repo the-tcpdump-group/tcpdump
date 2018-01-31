@@ -288,8 +288,8 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		if (cp == (const u_char *)(ip6 + 1) &&
 		    nh != IPPROTO_TCP && nh != IPPROTO_UDP &&
 		    nh != IPPROTO_DCCP && nh != IPPROTO_SCTP) {
-			ND_PRINT("%s > %s: ", ip6addr_string(ndo, &ip6->ip6_src),
-				     ip6addr_string(ndo, &ip6->ip6_dst));
+			ND_PRINT("%s > %s: ", ip6addr_string(ndo, ip6->ip6_src),
+				     ip6addr_string(ndo, ip6->ip6_dst));
 		}
 
 		switch (nh) {

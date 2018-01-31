@@ -822,15 +822,11 @@ dhcp6_print(netdissect_options *ndo,
 		extp = (const u_char *)(dh6 + 1);
 		dhcp6opt_print(ndo, extp, ep);
 	} else {		/* relay messages */
-		struct in6_addr addr6;
-
 		ND_TCHECK_16(dh6relay->dh6relay_peeraddr);
 
-		memcpy(&addr6, &dh6relay->dh6relay_linkaddr, sizeof (addr6));
-		ND_PRINT("linkaddr=%s", ip6addr_string(ndo, &addr6));
+		ND_PRINT("linkaddr=%s", ip6addr_string(ndo, dh6relay->dh6relay_linkaddr));
 
-		memcpy(&addr6, &dh6relay->dh6relay_peeraddr, sizeof (addr6));
-		ND_PRINT(" peeraddr=%s", ip6addr_string(ndo, &addr6));
+		ND_PRINT(" peeraddr=%s", ip6addr_string(ndo, dh6relay->dh6relay_peeraddr));
 
 		dhcp6opt_print(ndo, (const u_char *)(dh6relay + 1), ep);
 	}
