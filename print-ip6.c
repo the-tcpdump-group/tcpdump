@@ -59,7 +59,7 @@ ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
 	cp = (const u_char *)ip6;
 	advance = sizeof(struct ip6_hdr);
 	nh = EXTRACT_U_1(ip6->ip6_nxt);
-	dst_addr = (const void *)&ip6->ip6_dst;
+	dst_addr = (const void *)ip6->ip6_dst;
 
 	while (cp < ndo->ndo_snapend) {
 		cp += advance;
@@ -174,7 +174,7 @@ nextproto6_cksum(netdissect_options *ndo,
 
         /* pseudo-header */
         memset(&ph, 0, sizeof(ph));
-        UNALIGNED_MEMCPY(&ph.ph_src, &ip6->ip6_src, sizeof (struct in6_addr));
+        UNALIGNED_MEMCPY(&ph.ph_src, ip6->ip6_src, sizeof (struct in6_addr));
         nh = EXTRACT_U_1(ip6->ip6_nxt);
         switch (nh) {
 
@@ -193,7 +193,8 @@ nextproto6_cksum(netdissect_options *ndo,
                 break;
 
         default:
-                UNALIGNED_MEMCPY(&ph.ph_dst, &ip6->ip6_dst, sizeof (struct in6_addr));
+                UNALIGNED_MEMCPY(&ph.ph_dst, ip6->ip6_dst,
+                                 sizeof (struct in6_addr));
                 break;
         }
         ph.ph_len = htonl(len);

@@ -788,8 +788,10 @@ cookie_record(const cookie_t *in, const u_char *bp2)
 	case 6:
 		ip6 = (const struct ip6_hdr *)bp2;
 		cookiecache[ninitiator].version = 6;
-		UNALIGNED_MEMCPY(&cookiecache[ninitiator].iaddr.in6, &ip6->ip6_src, sizeof(nd_ipv6));
-		UNALIGNED_MEMCPY(&cookiecache[ninitiator].raddr.in6, &ip6->ip6_dst, sizeof(nd_ipv6));
+		UNALIGNED_MEMCPY(&cookiecache[ninitiator].iaddr.in6,
+				 ip6->ip6_src, sizeof(nd_ipv6));
+		UNALIGNED_MEMCPY(&cookiecache[ninitiator].raddr.in6,
+				 ip6->ip6_dst, sizeof(nd_ipv6));
 		break;
 	default:
 		return;
@@ -824,10 +826,10 @@ cookie_sidecheck(int i, const u_char *bp2, int initiator)
 			return 0;
 		ip6 = (const struct ip6_hdr *)bp2;
 		if (initiator) {
-			if (UNALIGNED_MEMCMP(&ip6->ip6_src, &cookiecache[i].iaddr.in6, sizeof(nd_ipv6)) == 0)
+			if (UNALIGNED_MEMCMP(ip6->ip6_src, &cookiecache[i].iaddr.in6, sizeof(nd_ipv6)) == 0)
 				return 1;
 		} else {
-			if (UNALIGNED_MEMCMP(&ip6->ip6_src, &cookiecache[i].raddr.in6, sizeof(nd_ipv6)) == 0)
+			if (UNALIGNED_MEMCMP(ip6->ip6_src, &cookiecache[i].raddr.in6, sizeof(nd_ipv6)) == 0)
 				return 1;
 		}
 		break;

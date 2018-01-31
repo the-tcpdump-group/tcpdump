@@ -927,8 +927,10 @@ xid_map_enter(netdissect_options *ndo,
 	}
 	else if (ip6) {
 		xmep->ipver = 6;
-		UNALIGNED_MEMCPY(&xmep->client, &ip6->ip6_src, sizeof(ip6->ip6_src));
-		UNALIGNED_MEMCPY(&xmep->server, &ip6->ip6_dst, sizeof(ip6->ip6_dst));
+		UNALIGNED_MEMCPY(&xmep->client, ip6->ip6_src,
+				 sizeof(ip6->ip6_src));
+		UNALIGNED_MEMCPY(&xmep->server, ip6->ip6_dst,
+				 sizeof(ip6->ip6_dst));
 	}
 	xmep->proc = EXTRACT_BE_U_4(&rp->rm_call.cb_proc);
 	xmep->vers = EXTRACT_BE_U_4(&rp->rm_call.cb_vers);
@@ -968,10 +970,10 @@ xid_map_find(const struct sunrpc_msg *rp, const u_char *bp, uint32_t *proc,
 			}
 			break;
 		case 6:
-			if (UNALIGNED_MEMCMP(&ip6->ip6_src, &xmep->server,
-				   sizeof(ip6->ip6_src)) != 0 ||
-			    UNALIGNED_MEMCMP(&ip6->ip6_dst, &xmep->client,
-				   sizeof(ip6->ip6_dst)) != 0) {
+			if (UNALIGNED_MEMCMP(ip6->ip6_src, &xmep->server,
+					     sizeof(ip6->ip6_src)) != 0 ||
+			    UNALIGNED_MEMCMP(ip6->ip6_dst, &xmep->client,
+					     sizeof(ip6->ip6_dst)) != 0) {
 				cmp = 0;
 			}
 			break;
