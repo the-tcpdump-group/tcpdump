@@ -51,9 +51,9 @@ struct aodv_rreq {
 	nd_uint8_t	rreq_zero0;	/* reserved, set to zero */
 	nd_uint8_t	rreq_hops;	/* number of hops from originator */
 	nd_uint32_t	rreq_id;	/* request ID */
-	nd_uint32_t	rreq_da;	/* destination IPv4 address */
+	nd_ipv4		rreq_da;	/* destination IPv4 address */
 	nd_uint32_t	rreq_ds;	/* destination sequence number */
-	nd_uint32_t	rreq_oa;	/* originator IPv4 address */
+	nd_ipv4		rreq_oa;	/* originator IPv4 address */
 	nd_uint32_t	rreq_os;	/* originator sequence number */
 };
 struct aodv_rreq6 {
@@ -91,9 +91,9 @@ struct aodv_rrep {
 	nd_uint8_t	rrep_flags;	/* various flags */
 	nd_uint8_t	rrep_ps;	/* prefix size */
 	nd_uint8_t	rrep_hops;	/* number of hops from o to d */
-	nd_uint32_t	rrep_da;	/* destination IPv4 address */
+	nd_ipv4		rrep_da;	/* destination IPv4 address */
 	nd_uint32_t	rrep_ds;	/* destination sequence number */
-	nd_uint32_t	rrep_oa;	/* originator IPv4 address */
+	nd_ipv4		rrep_oa;	/* originator IPv4 address */
 	nd_uint32_t	rrep_life;	/* lifetime of this route */
 };
 struct aodv_rrep6 {
@@ -123,7 +123,7 @@ struct aodv_rrep6_draft_01 {
 #define	RREP_PREFIX_MASK	0x1F	/* mask for prefix size */
 
 struct rerr_unreach {
-	nd_uint32_t	u_da;	/* IPv4 address */
+	nd_ipv4		u_da;	/* IPv4 address */
 	nd_uint32_t	u_ds;	/* sequence number */
 };
 struct rerr_unreach6 {
