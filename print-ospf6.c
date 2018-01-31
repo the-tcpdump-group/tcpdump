@@ -412,7 +412,7 @@ ospf6_print_lsaprefix(netdissect_options *ndo,
 {
 	const struct lsa6_prefix *lsapp = (const struct lsa6_prefix *)tptr;
 	u_int wordlen;
-	struct in6_addr prefix;
+	nd_ipv6 prefix;
 
 	if (lsa_length < sizeof (*lsapp) - IPV6_ADDR_LEN_BYTES)
 		goto trunc;
@@ -427,10 +427,10 @@ ospf6_print_lsaprefix(netdissect_options *ndo,
 		goto trunc;
 	lsa_length -= wordlen * 4;
 	ND_TCHECK_LEN(lsapp->lsa_p_prefix, wordlen * 4);
-	memset(&prefix, 0, sizeof(prefix));
-	memcpy(&prefix, lsapp->lsa_p_prefix, wordlen * 4);
-	ND_PRINT("\n\t\t%s/%u", ip6addr_string(ndo, (const u_char *)&prefix),
-		EXTRACT_U_1(lsapp->lsa_p_len));
+	memset(prefix, 0, sizeof(prefix));
+	memcpy(prefix, lsapp->lsa_p_prefix, wordlen * 4);
+	ND_PRINT("\n\t\t%s/%u", ip6addr_string(ndo, prefix),
+		 EXTRACT_U_1(lsapp->lsa_p_len));
         if (EXTRACT_U_1(lsapp->lsa_p_opt)) {
             ND_PRINT(", Options [%s]",
                    bittok2str(ospf6_lsa_prefix_option_values,
