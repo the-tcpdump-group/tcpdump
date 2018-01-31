@@ -373,7 +373,7 @@ aodv_v6_rerr(netdissect_options *ndo, const u_char *dat, u_int length)
 		if (i < sizeof(*dp6))
 			goto trunc;
 		ND_PRINT(" {%s}(%u)", ip6addr_string(ndo, dp6->u_da),
-		    EXTRACT_BE_U_4(dp6->u_ds));
+			 EXTRACT_BE_U_4(dp6->u_ds));
 		dp6++;
 		i -= sizeof(*dp6);
 	}
@@ -462,7 +462,7 @@ aodv_v6_draft_01_rerr(netdissect_options *ndo, const u_char *dat, u_int length)
 		if (i < sizeof(*dp6))
 			goto trunc;
 		ND_PRINT(" {%s}(%u)", ip6addr_string(ndo, dp6->u_da),
-		    EXTRACT_BE_U_4(dp6->u_ds));
+			 EXTRACT_BE_U_4(dp6->u_ds));
 		dp6++;
 		i -= sizeof(*dp6);
 	}

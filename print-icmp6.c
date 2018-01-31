@@ -2055,7 +2055,7 @@ icmp6_rrenum_print(netdissect_options *ndo, const u_char *bp, const u_char *ep)
 			ND_PRINT(",min=%u", EXTRACT_U_1(match->rpm_minlen));
 			ND_PRINT(",max=%u", EXTRACT_U_1(match->rpm_maxlen));
 		}
-		if (addrtostr6(&match->rpm_prefix, hbuf, sizeof(hbuf)))
+		if (addrtostr6(match->rpm_prefix, hbuf, sizeof(hbuf)))
 			ND_PRINT(",%s/%u", hbuf, EXTRACT_U_1(match->rpm_matchlen));
 		else
 			ND_PRINT(",?/%u", EXTRACT_U_1(match->rpm_matchlen));
@@ -2098,7 +2098,7 @@ icmp6_rrenum_print(netdissect_options *ndo, const u_char *bp, const u_char *ep)
 					ND_PRINT("pltime=%u,",
                                                   EXTRACT_BE_U_4(use->rpu_pltime));
 			}
-			if (addrtostr6(&use->rpu_prefix, hbuf, sizeof(hbuf)))
+			if (addrtostr6(use->rpu_prefix, hbuf, sizeof(hbuf)))
 				ND_PRINT("%s/%u/%u", hbuf, EXTRACT_U_1(use->rpu_uselen),
                                           EXTRACT_U_1(use->rpu_keeplen));
 			else

@@ -362,7 +362,8 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
             if (EXTRACT_BE_U_4(tlv_ptr.eigrp_tlv_ip_int->nexthop) == 0)
                 ND_PRINT("self");
             else
-                ND_PRINT("%s",ipaddr_string(ndo, tlv_ptr.eigrp_tlv_ip_int->nexthop));
+                ND_PRINT("%s",
+                         ipaddr_string(ndo, tlv_ptr.eigrp_tlv_ip_int->nexthop));
 
             ND_PRINT("\n\t      delay %u ms, bandwidth %u Kbps, mtu %u, hop %u, reliability %u, load %u",
                    (EXTRACT_BE_U_4(tlv_ptr.eigrp_tlv_ip_int->delay)/100),
@@ -396,7 +397,8 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
             if (EXTRACT_BE_U_4(tlv_ptr.eigrp_tlv_ip_ext->nexthop) == 0)
                 ND_PRINT("self");
             else
-                ND_PRINT("%s",ipaddr_string(ndo, tlv_ptr.eigrp_tlv_ip_ext->nexthop));
+                ND_PRINT("%s",
+                         ipaddr_string(ndo, tlv_ptr.eigrp_tlv_ip_ext->nexthop));
 
             ND_PRINT("\n\t      origin-router %s, origin-as %u, origin-proto %s, flags [0x%02x], tag 0x%08x, metric %u",
                    ipaddr_string(ndo, tlv_ptr.eigrp_tlv_ip_ext->origin_router),
