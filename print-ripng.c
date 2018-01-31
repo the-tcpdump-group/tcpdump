@@ -65,7 +65,7 @@
 #define	RIP6_RESPONSE	2
 
 struct netinfo6 {
-	struct in6_addr	rip6_dest;
+	nd_ipv6		rip6_dest;
 	nd_uint16_t	rip6_tag;
 	nd_uint8_t	rip6_plen;
 	nd_uint8_t	rip6_metric;
@@ -85,13 +85,11 @@ struct	rip6 {
 
 #define	HOPCNT_INFINITY6	16
 
-#if !defined(IN6_IS_ADDR_UNSPECIFIED) && !defined(_MSC_VER) /* MSVC inline */
-static int IN6_IS_ADDR_UNSPECIFIED(const struct in6_addr *addr)
+static int ND_IN6_IS_ADDR_UNSPECIFIED(const nd_ipv6 *addr)
 {
     static const struct in6_addr in6addr_any;        /* :: */
     return (memcmp(addr, &in6addr_any, sizeof(*addr)) == 0);
 }
-#endif
 
 static int
 rip6_entry_print(netdissect_options *ndo, const struct netinfo6 *ni, u_int metric)
@@ -130,7 +128,7 @@ ripng_print(netdissect_options *ndo, const u_char *dat, unsigned int length)
 		if (j == 1) {
 			ND_TCHECK_SIZE(rp->rip6_nets);
 			if (EXTRACT_U_1(rp->rip6_nets->rip6_metric) == HOPCNT_INFINITY6
-			    &&  IN6_IS_ADDR_UNSPECIFIED(&rp->rip6_nets->rip6_dest)) {
+			    && ND_IN6_IS_ADDR_UNSPECIFIED(&rp->rip6_nets->rip6_dest)) {
 				ND_PRINT(" ripng-req dump");
 				break;
 			}

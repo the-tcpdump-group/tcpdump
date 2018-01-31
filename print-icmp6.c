@@ -175,7 +175,7 @@ struct icmp6_hdr {
  */
 struct mld6_hdr {
 	struct icmp6_hdr	mld6_hdr;
-	struct in6_addr		mld6_addr; /* multicast address */
+	nd_ipv6			mld6_addr; /* multicast address */
 };
 
 #define mld6_type	mld6_hdr.icmp6_type
@@ -232,7 +232,7 @@ struct nd_router_advert {	/* router advertisement */
 
 struct nd_neighbor_solicit {	/* neighbor solicitation */
 	struct icmp6_hdr	nd_ns_hdr;
-	struct in6_addr		nd_ns_target;	/*target address */
+	nd_ipv6			nd_ns_target;	/*target address */
 	/* could be followed by options */
 };
 
@@ -243,7 +243,7 @@ struct nd_neighbor_solicit {	/* neighbor solicitation */
 
 struct nd_neighbor_advert {	/* neighbor advertisement */
 	struct icmp6_hdr	nd_na_hdr;
-	struct in6_addr		nd_na_target;	/* target address */
+	nd_ipv6			nd_na_target;	/* target address */
 	/* could be followed by options */
 };
 
@@ -258,8 +258,8 @@ struct nd_neighbor_advert {	/* neighbor advertisement */
 
 struct nd_redirect {		/* redirect */
 	struct icmp6_hdr	nd_rd_hdr;
-	struct in6_addr		nd_rd_target;	/* target address */
-	struct in6_addr		nd_rd_dst;	/* destination address */
+	nd_ipv6			nd_rd_target;	/* target address */
+	nd_ipv6			nd_rd_dst;	/* destination address */
 	/* could be followed by options */
 };
 
@@ -286,14 +286,14 @@ struct nd_opt_hdr {		/* Neighbor discovery option header */
 #define ND_OPT_DNSSL			31
 
 struct nd_opt_prefix_info {	/* prefix information */
-	nd_uint8_t		nd_opt_pi_type;
-	nd_uint8_t		nd_opt_pi_len;
-	nd_uint8_t		nd_opt_pi_prefix_len;
-	nd_uint8_t		nd_opt_pi_flags_reserved;
-	nd_uint32_t		nd_opt_pi_valid_time;
-	nd_uint32_t		nd_opt_pi_preferred_time;
-	nd_uint32_t		nd_opt_pi_reserved2;
-	struct in6_addr	nd_opt_pi_prefix;
+	nd_uint8_t	nd_opt_pi_type;
+	nd_uint8_t	nd_opt_pi_len;
+	nd_uint8_t	nd_opt_pi_prefix_len;
+	nd_uint8_t	nd_opt_pi_flags_reserved;
+	nd_uint32_t	nd_opt_pi_valid_time;
+	nd_uint32_t	nd_opt_pi_preferred_time;
+	nd_uint32_t	nd_opt_pi_reserved2;
+	nd_ipv6		nd_opt_pi_prefix;
 };
 
 #define ND_OPT_PI_FLAG_ONLINK		0x80
@@ -320,7 +320,7 @@ struct nd_opt_rdnss {		/* RDNSS RFC 6106 5.1 */
 	nd_uint8_t	nd_opt_rdnss_len;
 	nd_uint16_t	nd_opt_rdnss_reserved;
 	nd_uint32_t	nd_opt_rdnss_lifetime;
-	struct in6_addr nd_opt_rdnss_addr[1];	/* variable-length */
+	nd_ipv6	 	nd_opt_rdnss_addr[1];	/* variable-length */
 };
 
 struct nd_opt_dnssl {		/* DNSSL RFC 6106 5.2 */
@@ -1275,13 +1275,13 @@ icmp6_print(netdissect_options *ndo,
                 break;
 	case ICMP6_HADISCOV_REPLY:
 		if (ndo->ndo_vflag) {
-			const struct in6_addr *in6;
+			const nd_ipv6 *in6;
 			const u_char *cp;
 
 			ND_TCHECK_2(dp->icmp6_data16[0]);
 			ND_PRINT(", id 0x%04x", EXTRACT_BE_U_2(dp->icmp6_data16[0]));
 			cp = (const u_char *)dp + length;
-			in6 = (const struct in6_addr *)(dp + 1);
+			in6 = (const nd_ipv6 *)(dp + 1);
 			for (; (const u_char *)in6 < cp; in6++) {
 				ND_TCHECK_SIZE(in6);
 				ND_PRINT(", %s", ip6addr_string(ndo, in6));
@@ -1511,7 +1511,7 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			opri = (const struct nd_opt_route_info *)op;
 			ND_TCHECK_4(opri->nd_opt_rti_lifetime);
 			memset(&in6, 0, sizeof(in6));
-			in6p = (const struct in6_addr *)(opri + 1);
+			in6p = (const nd_ipv6 *)(opri + 1);
 			switch (opt_len) {
 			case 1:
 				break;
@@ -1595,13 +1595,13 @@ mldv2_report_print(netdissect_options *ndo, const u_char *bp, u_int len)
                     ND_PRINT(" [invalid number of groups]");
                     return;
 	    }
-            ND_TCHECK_LEN(bp + 4 + group, sizeof(struct in6_addr));
+            ND_TCHECK_LEN(bp + 4 + group, sizeof(nd_ipv6));
             ND_PRINT(" [gaddr %s", ip6addr_string(ndo, bp + group + 4));
 	    ND_PRINT(" %s", tok2str(mldv2report2str, " [v2-report-#%u]",
                                          EXTRACT_U_1(bp + group)));
             nsrcs = EXTRACT_BE_U_2(bp + group + 2);
 	    /* Check the number of sources and print them */
-	    if (len < group + 20 + (nsrcs * sizeof(struct in6_addr))) {
+	    if (len < group + 20 + (nsrcs * sizeof(nd_ipv6))) {
                     ND_PRINT(" [invalid number of sources %u]", nsrcs);
                     return;
 	    }
@@ -1611,14 +1611,14 @@ mldv2_report_print(netdissect_options *ndo, const u_char *bp, u_int len)
 		/* Print the sources */
                     ND_PRINT(" {");
                 for (j = 0; j < nsrcs; j++) {
-                    ND_TCHECK_LEN(bp + group + 20 + (j * sizeof(struct in6_addr)),
-                                  sizeof(struct in6_addr));
-		    ND_PRINT(" %s", ip6addr_string(ndo, bp + group + 20 + (j * sizeof(struct in6_addr))));
+                    ND_TCHECK_LEN(bp + group + 20 + (j * sizeof(nd_ipv6)),
+                                  sizeof(nd_ipv6));
+		    ND_PRINT(" %s", ip6addr_string(ndo, bp + group + 20 + (j * sizeof(nd_ipv6))));
 		}
                 ND_PRINT(" }");
             }
 	    /* Next group record */
-            group += 20 + nsrcs * sizeof(struct in6_addr);
+            group += 20 + nsrcs * sizeof(nd_ipv6);
 	    ND_PRINT("]");
         }
     }
@@ -1652,7 +1652,7 @@ mldv2_query_print(netdissect_options *ndo, const u_char *bp, u_int len)
     if (ndo->ndo_vflag) {
             ND_PRINT(" [max resp delay=%u]", mrt);
     }
-    ND_TCHECK_LEN(bp + 8, sizeof(struct in6_addr));
+    ND_TCHECK_LEN(bp + 8, sizeof(nd_ipv6));
     ND_PRINT(" [gaddr %s", ip6addr_string(ndo, bp + 8));
 
     if (ndo->ndo_vflag) {
@@ -1675,14 +1675,14 @@ mldv2_query_print(netdissect_options *ndo, const u_char *bp, u_int len)
     ND_TCHECK_2(bp + 26);
     nsrcs = EXTRACT_BE_U_2(bp + 26);
     if (nsrcs > 0) {
-	if (len < 28 + nsrcs * sizeof(struct in6_addr))
+	if (len < 28 + nsrcs * sizeof(nd_ipv6))
 	    ND_PRINT(" [invalid number of sources]");
 	else if (ndo->ndo_vflag > 1) {
 	    ND_PRINT(" {");
 	    for (i = 0; i < nsrcs; i++) {
-		ND_TCHECK_LEN(bp + 28 + (i * sizeof(struct in6_addr)),
-                              sizeof(struct in6_addr));
-		ND_PRINT(" %s", ip6addr_string(ndo, bp + 28 + (i * sizeof(struct in6_addr))));
+		ND_TCHECK_LEN(bp + 28 + (i * sizeof(nd_ipv6)),
+                              sizeof(nd_ipv6));
+		ND_PRINT(" %s", ip6addr_string(ndo, bp + 28 + (i * sizeof(nd_ipv6))));
 	    }
 	    ND_PRINT(" }");
 	} else
@@ -1812,9 +1812,9 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 
 		switch (EXTRACT_U_1(ni6->ni_code)) {
 		case ICMP6_NI_SUBJ_IPV6:
-			if (!ND_TTEST_LEN(dp, sizeof(*ni6) + sizeof(struct in6_addr)))
+			if (!ND_TTEST_LEN(dp, sizeof(*ni6) + sizeof(nd_ipv6)))
 				break;
-			if (siz != sizeof(*ni6) + sizeof(struct in6_addr)) {
+			if (siz != sizeof(*ni6) + sizeof(nd_ipv6)) {
 				if (ndo->ndo_vflag)
 					ND_PRINT(", invalid subject len");
 				break;
@@ -1840,9 +1840,9 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 				dnsname_print(ndo, cp, ep);
 			break;
 		case ICMP6_NI_SUBJ_IPV4:
-			if (!ND_TTEST_LEN(dp, sizeof(*ni6) + sizeof(struct in_addr)))
+			if (!ND_TTEST_LEN(dp, sizeof(*ni6) + sizeof(nd_ipv4)))
 				break;
-			if (siz != sizeof(*ni6) + sizeof(struct in_addr)) {
+			if (siz != sizeof(*ni6) + sizeof(nd_ipv4)) {
 				if (ndo->ndo_vflag)
 					ND_PRINT(", invalid subject len");
 				break;
@@ -1945,12 +1945,12 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 			ND_PRINT("node addresses");
 			i = sizeof(*ni6);
 			while (i < siz) {
-				if (i + sizeof(uint32_t) + sizeof(struct in6_addr) > siz)
+				if (i + sizeof(uint32_t) + sizeof(nd_ipv6) > siz)
 					break;
 				ND_PRINT(" %s(%u)",
 				    ip6addr_string(ndo, bp + i + sizeof(uint32_t)),
 				    EXTRACT_BE_U_4(bp + i));
-				i += sizeof(uint32_t) + sizeof(struct in6_addr);
+				i += sizeof(uint32_t) + sizeof(nd_ipv6);
 			}
 			i = EXTRACT_BE_U_2(ni6->ni_flags);
 			if (!i)

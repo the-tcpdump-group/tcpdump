@@ -290,17 +290,17 @@ olsr_print_neighbor(netdissect_options *ndo,
     ND_PRINT("\n\t      neighbor\n\t\t");
     neighbor = 1;
 
-    while (hello_len >= sizeof(struct in_addr)) {
+    while (hello_len >= sizeof(nd_ipv4)) {
 
-        if (!ND_TTEST_LEN(msg_data, sizeof(struct in_addr)))
+        if (!ND_TTEST_LEN(msg_data, sizeof(nd_ipv4)))
             return (-1);
         /* print 4 neighbors per line */
 
         ND_PRINT("%s%s", ipaddr_string(ndo, msg_data),
                neighbor % 4 == 0 ? "\n\t\t" : " ");
 
-        msg_data += sizeof(struct in_addr);
-        hello_len -= sizeof(struct in_addr);
+        msg_data += sizeof(nd_ipv4);
+        hello_len -= sizeof(nd_ipv4);
     }
     return (0);
 }
@@ -514,10 +514,10 @@ olsr_print(netdissect_options *ndo,
 
         case OLSR_MID_MSG:
         {
-            size_t addr_size = sizeof(struct in_addr);
+            size_t addr_size = sizeof(nd_ipv4);
 
             if (is_ipv6)
-                addr_size = sizeof(struct in6_addr);
+                addr_size = sizeof(nd_ipv6);
 
             while (msg_tlen >= addr_size) {
                 ND_TCHECK_LEN(msg_data, addr_size);

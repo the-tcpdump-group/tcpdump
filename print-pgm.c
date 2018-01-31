@@ -230,14 +230,14 @@ pgm_print(netdissect_options *ndo,
 
 	    switch (EXTRACT_BE_U_2(spm->pgms_nla_afi)) {
 	    case AFNUM_INET:
-		ND_TCHECK_LEN(bp, sizeof(struct in_addr));
+		ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 		addrtostr(bp, nla_buf, sizeof(nla_buf));
-		bp += sizeof(struct in_addr);
+		bp += sizeof(nd_ipv4);
 		break;
 	    case AFNUM_INET6:
-		ND_TCHECK_LEN(bp, sizeof(struct in6_addr));
+		ND_TCHECK_LEN(bp, sizeof(nd_ipv6));
 		addrtostr6(bp, nla_buf, sizeof(nla_buf));
-		bp += sizeof(struct in6_addr);
+		bp += sizeof(nd_ipv6);
 		break;
 	    default:
 		goto trunc;
@@ -273,14 +273,14 @@ pgm_print(netdissect_options *ndo,
 
 	    switch (EXTRACT_BE_U_2(polr->pgmp_nla_afi)) {
 	    case AFNUM_INET:
-		ND_TCHECK_LEN(bp, sizeof(struct in_addr));
+		ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 		addrtostr(bp, nla_buf, sizeof(nla_buf));
-		bp += sizeof(struct in_addr);
+		bp += sizeof(nd_ipv4);
 		break;
 	    case AFNUM_INET6:
-		ND_TCHECK_LEN(bp, sizeof(struct in6_addr));
+		ND_TCHECK_LEN(bp, sizeof(nd_ipv6));
 		addrtostr6(bp, nla_buf, sizeof(nla_buf));
-		bp += sizeof(struct in6_addr);
+		bp += sizeof(nd_ipv6);
 		break;
 	    default:
 		goto trunc;
@@ -344,14 +344,14 @@ pgm_print(netdissect_options *ndo,
 	     */
 	    switch (EXTRACT_BE_U_2(nak->pgmn_source_afi)) {
 	    case AFNUM_INET:
-		ND_TCHECK_LEN(bp, sizeof(struct in_addr));
+		ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 		addrtostr(bp, source_buf, sizeof(source_buf));
-		bp += sizeof(struct in_addr);
+		bp += sizeof(nd_ipv4);
 		break;
 	    case AFNUM_INET6:
-		ND_TCHECK_LEN(bp, sizeof(struct in6_addr));
+		ND_TCHECK_LEN(bp, sizeof(nd_ipv6));
 		addrtostr6(bp, source_buf, sizeof(source_buf));
-		bp += sizeof(struct in6_addr);
+		bp += sizeof(nd_ipv6);
 		break;
 	    default:
 		goto trunc;
@@ -366,14 +366,14 @@ pgm_print(netdissect_options *ndo,
 	    ND_TCHECK_2(bp);
 	    switch (EXTRACT_BE_U_2(bp)) {
 	    case AFNUM_INET:
-		ND_TCHECK_LEN(bp, sizeof(struct in_addr));
+		ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 		addrtostr(bp, group_buf, sizeof(group_buf));
-		bp += sizeof(struct in_addr);
+		bp += sizeof(nd_ipv4);
 		break;
 	    case AFNUM_INET6:
-		ND_TCHECK_LEN(bp, sizeof(struct in6_addr));
+		ND_TCHECK_LEN(bp, sizeof(nd_ipv6));
 		addrtostr6(bp, group_buf, sizeof(group_buf));
-		bp += sizeof(struct in6_addr);
+		bp += sizeof(nd_ipv6);
 		break;
 	    default:
 		goto trunc;
@@ -589,26 +589,26 @@ pgm_print(netdissect_options *ndo,
 		    bp += 2+2;
 		    switch (nla_afnum) {
 		    case AFNUM_INET:
-			if (opt_len != PGM_OPT_REDIRECT_FIXED_LEN + sizeof(struct in_addr)) {
+			if (opt_len != PGM_OPT_REDIRECT_FIXED_LEN + sizeof(nd_ipv4)) {
 			    ND_PRINT("[Bad OPT_REDIRECT option, length %u != %u + address size]",
 			        opt_len, PGM_OPT_REDIRECT_FIXED_LEN);
 			    return;
 			}
-			ND_TCHECK_LEN(bp, sizeof(struct in_addr));
+			ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 			addrtostr(bp, nla_buf, sizeof(nla_buf));
-			bp += sizeof(struct in_addr);
-			opts_len -= PGM_OPT_REDIRECT_FIXED_LEN + sizeof(struct in_addr);
+			bp += sizeof(nd_ipv4);
+			opts_len -= PGM_OPT_REDIRECT_FIXED_LEN + sizeof(nd_ipv4);
 			break;
 		    case AFNUM_INET6:
-			if (opt_len != PGM_OPT_REDIRECT_FIXED_LEN + sizeof(struct in6_addr)) {
+			if (opt_len != PGM_OPT_REDIRECT_FIXED_LEN + sizeof(nd_ipv6)) {
 			    ND_PRINT("[Bad OPT_REDIRECT option, length %u != %u + address size]",
 			        PGM_OPT_REDIRECT_FIXED_LEN, opt_len);
 			    return;
 			}
-			ND_TCHECK_LEN(bp, sizeof(struct in6_addr));
+			ND_TCHECK_LEN(bp, sizeof(nd_ipv6));
 			addrtostr6(bp, nla_buf, sizeof(nla_buf));
-			bp += sizeof(struct in6_addr);
-			opts_len -= PGM_OPT_REDIRECT_FIXED_LEN + sizeof(struct in6_addr);
+			bp += sizeof(nd_ipv6);
+			opts_len -= PGM_OPT_REDIRECT_FIXED_LEN + sizeof(nd_ipv6);
 			break;
 		    default:
 			goto trunc;
@@ -746,26 +746,26 @@ pgm_print(netdissect_options *ndo,
 		    bp += 2+2;
 		    switch (nla_afnum) {
 		    case AFNUM_INET:
-			if (opt_len != PGM_OPT_PGMCC_DATA_FIXED_LEN + sizeof(struct in_addr)) {
+			if (opt_len != PGM_OPT_PGMCC_DATA_FIXED_LEN + sizeof(nd_ipv4)) {
 			    ND_PRINT("[Bad OPT_PGMCC_DATA option, length %u != %u + address size]",
 			        opt_len, PGM_OPT_PGMCC_DATA_FIXED_LEN);
 			    return;
 			}
-			ND_TCHECK_LEN(bp, sizeof(struct in_addr));
+			ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 			addrtostr(bp, nla_buf, sizeof(nla_buf));
-			bp += sizeof(struct in_addr);
-			opts_len -= PGM_OPT_PGMCC_DATA_FIXED_LEN + sizeof(struct in_addr);
+			bp += sizeof(nd_ipv4);
+			opts_len -= PGM_OPT_PGMCC_DATA_FIXED_LEN + sizeof(nd_ipv4);
 			break;
 		    case AFNUM_INET6:
-			if (opt_len != PGM_OPT_PGMCC_DATA_FIXED_LEN + sizeof(struct in6_addr)) {
+			if (opt_len != PGM_OPT_PGMCC_DATA_FIXED_LEN + sizeof(nd_ipv6)) {
 			    ND_PRINT("[Bad OPT_PGMCC_DATA option, length %u != %u + address size]",
 			        opt_len, PGM_OPT_PGMCC_DATA_FIXED_LEN);
 			    return;
 			}
-			ND_TCHECK_LEN(bp, sizeof(struct in6_addr));
+			ND_TCHECK_LEN(bp, sizeof(nd_ipv6));
 			addrtostr6(bp, nla_buf, sizeof(nla_buf));
-			bp += sizeof(struct in6_addr);
-			opts_len -= PGM_OPT_PGMCC_DATA_FIXED_LEN + sizeof(struct in6_addr);
+			bp += sizeof(nd_ipv6);
+			opts_len -= PGM_OPT_PGMCC_DATA_FIXED_LEN + sizeof(nd_ipv6);
 			break;
 		    default:
 			goto trunc;
@@ -789,26 +789,26 @@ pgm_print(netdissect_options *ndo,
 		    bp += 2+2;
 		    switch (nla_afnum) {
 		    case AFNUM_INET:
-			if (opt_len != PGM_OPT_PGMCC_FEEDBACK_FIXED_LEN + sizeof(struct in_addr)) {
+			if (opt_len != PGM_OPT_PGMCC_FEEDBACK_FIXED_LEN + sizeof(nd_ipv4)) {
 			    ND_PRINT("[Bad OPT_PGMCC_FEEDBACK option, length %u != %u + address size]",
 			        opt_len, PGM_OPT_PGMCC_FEEDBACK_FIXED_LEN);
 			    return;
 			}
-			ND_TCHECK_LEN(bp, sizeof(struct in_addr));
+			ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 			addrtostr(bp, nla_buf, sizeof(nla_buf));
-			bp += sizeof(struct in_addr);
-			opts_len -= PGM_OPT_PGMCC_FEEDBACK_FIXED_LEN + sizeof(struct in_addr);
+			bp += sizeof(nd_ipv4);
+			opts_len -= PGM_OPT_PGMCC_FEEDBACK_FIXED_LEN + sizeof(nd_ipv4);
 			break;
 		    case AFNUM_INET6:
-			if (opt_len != PGM_OPT_PGMCC_FEEDBACK_FIXED_LEN + sizeof(struct in6_addr)) {
+			if (opt_len != PGM_OPT_PGMCC_FEEDBACK_FIXED_LEN + sizeof(nd_ipv6)) {
 			    ND_PRINT("[Bad OPT_PGMCC_FEEDBACK option, length %u != %u + address size]",
 			        opt_len, PGM_OPT_PGMCC_FEEDBACK_FIXED_LEN);
 			    return;
 			}
-			ND_TCHECK_LEN(bp, sizeof(struct in6_addr));
+			ND_TCHECK_LEN(bp, sizeof(nd_ipv6));
 			addrtostr6(bp, nla_buf, sizeof(nla_buf));
-			bp += sizeof(struct in6_addr);
-			opts_len -= PGM_OPT_PGMCC_FEEDBACK_FIXED_LEN + sizeof(struct in6_addr);
+			bp += sizeof(nd_ipv6);
+			opts_len -= PGM_OPT_PGMCC_FEEDBACK_FIXED_LEN + sizeof(nd_ipv6);
 			break;
 		    default:
 			goto trunc;

@@ -62,9 +62,9 @@ struct aodv_rreq6 {
 	nd_uint8_t	rreq_zero0;	/* reserved, set to zero */
 	nd_uint8_t	rreq_hops;	/* number of hops from originator */
 	nd_uint32_t	rreq_id;	/* request ID */
-	struct in6_addr	rreq_da;	/* destination IPv6 address */
+	nd_ipv6		rreq_da;	/* destination IPv6 address */
 	nd_uint32_t	rreq_ds;	/* destination sequence number */
-	struct in6_addr	rreq_oa;	/* originator IPv6 address */
+	nd_ipv6		rreq_oa;	/* originator IPv6 address */
 	nd_uint32_t	rreq_os;	/* originator sequence number */
 };
 struct aodv_rreq6_draft_01 {
@@ -75,8 +75,8 @@ struct aodv_rreq6_draft_01 {
 	nd_uint32_t	rreq_id;	/* request ID */
 	nd_uint32_t	rreq_ds;	/* destination sequence number */
 	nd_uint32_t	rreq_os;	/* originator sequence number */
-	struct in6_addr	rreq_da;	/* destination IPv6 address */
-	struct in6_addr	rreq_oa;	/* originator IPv6 address */
+	nd_ipv6		rreq_da;	/* destination IPv6 address */
+	nd_ipv6		rreq_oa;	/* originator IPv6 address */
 };
 
 #define	RREQ_JOIN	0x80		/* join (reserved for multicast */
@@ -101,9 +101,9 @@ struct aodv_rrep6 {
 	nd_uint8_t	rrep_flags;	/* various flags */
 	nd_uint8_t	rrep_ps;	/* prefix size */
 	nd_uint8_t	rrep_hops;	/* number of hops from o to d */
-	struct in6_addr	rrep_da;	/* destination IPv6 address */
+	nd_ipv6		rrep_da;	/* destination IPv6 address */
 	nd_uint32_t	rrep_ds;	/* destination sequence number */
-	struct in6_addr	rrep_oa;	/* originator IPv6 address */
+	nd_ipv6		rrep_oa;	/* originator IPv6 address */
 	nd_uint32_t	rrep_life;	/* lifetime of this route */
 };
 struct aodv_rrep6_draft_01 {
@@ -112,8 +112,8 @@ struct aodv_rrep6_draft_01 {
 	nd_uint8_t	rrep_ps;	/* prefix size */
 	nd_uint8_t	rrep_hops;	/* number of hops from o to d */
 	nd_uint32_t	rrep_ds;	/* destination sequence number */
-	struct in6_addr	rrep_da;	/* destination IPv6 address */
-	struct in6_addr	rrep_oa;	/* originator IPv6 address */
+	nd_ipv6		rrep_da;	/* destination IPv6 address */
+	nd_ipv6		rrep_oa;	/* originator IPv6 address */
 	nd_uint32_t	rrep_life;	/* lifetime of this route */
 };
 
@@ -127,11 +127,11 @@ struct rerr_unreach {
 	nd_uint32_t	u_ds;	/* sequence number */
 };
 struct rerr_unreach6 {
-	struct in6_addr	u_da;	/* IPv6 address */
+	nd_ipv6		u_da;	/* IPv6 address */
 	nd_uint32_t	u_ds;	/* sequence number */
 };
 struct rerr_unreach6_draft_01 {
-	struct in6_addr	u_da;	/* IPv6 address */
+	nd_ipv6		u_da;	/* IPv6 address */
 	nd_uint32_t	u_ds;	/* sequence number */
 };
 

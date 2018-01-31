@@ -633,12 +633,12 @@ bgp_vpn_ip_print(netdissect_options *ndo,
     char *pos = addr;
 
     switch(addr_length) {
-    case (sizeof(struct in_addr) << 3): /* 32 */
-        ND_TCHECK_LEN(pptr, sizeof(struct in_addr));
+    case (sizeof(nd_ipv4) << 3): /* 32 */
+        ND_TCHECK_LEN(pptr, sizeof(nd_ipv4));
         nd_snprintf(pos, sizeof(addr), "%s", ipaddr_string(ndo, pptr));
         break;
-    case (sizeof(struct in6_addr) << 3): /* 128 */
-        ND_TCHECK_LEN(pptr, sizeof(struct in6_addr));
+    case (sizeof(nd_ipv6) << 3): /* 128 */
+        ND_TCHECK_LEN(pptr, sizeof(nd_ipv6));
         nd_snprintf(pos, sizeof(addr), "%s", ip6addr_string(ndo, pptr));
         break;
     default:
@@ -888,12 +888,12 @@ decode_mdt_vpn_nlri(netdissect_options *ndo,
     pptr += 8;
 
     /* IPv4 address */
-    ND_TCHECK_LEN(pptr, sizeof(struct in_addr));
+    ND_TCHECK_LEN(pptr, sizeof(nd_ipv4));
     vpn_ip = pptr;
-    pptr += sizeof(struct in_addr);
+    pptr += sizeof(nd_ipv4);
 
     /* MDT Group Address */
-    ND_TCHECK_LEN(pptr, sizeof(struct in_addr));
+    ND_TCHECK_LEN(pptr, sizeof(nd_ipv4));
 
     nd_snprintf(buf, buflen, "RD: %s, VPN IP Address: %s, MC Group Address: %s",
              bgp_vpn_rd_print(ndo, rd), ipaddr_string(ndo, vpn_ip), ipaddr_string(ndo, pptr));
@@ -1716,74 +1716,74 @@ bgp_attr_print(netdissect_options *ndo,
                 case (AFNUM_INET<<8 | SAFNUM_RT_ROUTING_INFO):
                 case (AFNUM_INET<<8 | SAFNUM_MULTICAST_VPN):
                 case (AFNUM_INET<<8 | SAFNUM_MDT):
-                    if (tlen < sizeof(struct in_addr)) {
+                    if (tlen < sizeof(nd_ipv4)) {
                         ND_PRINT("invalid len");
                         tlen = 0;
                     } else {
-                        ND_TCHECK_LEN(tptr, sizeof(struct in_addr));
+                        ND_TCHECK_LEN(tptr, sizeof(nd_ipv4));
                         ND_PRINT("%s",ipaddr_string(ndo, tptr));
-                        tlen -= sizeof(struct in_addr);
-                        tptr += sizeof(struct in_addr);
+                        tlen -= sizeof(nd_ipv4);
+                        tptr += sizeof(nd_ipv4);
                     }
                     break;
                 case (AFNUM_INET<<8 | SAFNUM_VPNUNICAST):
                 case (AFNUM_INET<<8 | SAFNUM_VPNMULTICAST):
                 case (AFNUM_INET<<8 | SAFNUM_VPNUNIMULTICAST):
-                    if (tlen < sizeof(struct in_addr)+BGP_VPN_RD_LEN) {
+                    if (tlen < sizeof(nd_ipv4)+BGP_VPN_RD_LEN) {
                         ND_PRINT("invalid len");
                         tlen = 0;
                     } else {
                         ND_TCHECK_LEN(tptr,
-                                      sizeof(struct in_addr) + BGP_VPN_RD_LEN);
+                                      sizeof(nd_ipv4) + BGP_VPN_RD_LEN);
                         ND_PRINT("RD: %s, %s",
                                   bgp_vpn_rd_print(ndo, tptr),
                                   ipaddr_string(ndo, tptr+BGP_VPN_RD_LEN));
-                        tlen -= (sizeof(struct in_addr)+BGP_VPN_RD_LEN);
-                        tptr += (sizeof(struct in_addr)+BGP_VPN_RD_LEN);
+                        tlen -= (sizeof(nd_ipv4)+BGP_VPN_RD_LEN);
+                        tptr += (sizeof(nd_ipv4)+BGP_VPN_RD_LEN);
                     }
                     break;
                 case (AFNUM_INET6<<8 | SAFNUM_UNICAST):
                 case (AFNUM_INET6<<8 | SAFNUM_MULTICAST):
                 case (AFNUM_INET6<<8 | SAFNUM_UNIMULTICAST):
                 case (AFNUM_INET6<<8 | SAFNUM_LABUNICAST):
-                    if (tlen < sizeof(struct in6_addr)) {
+                    if (tlen < sizeof(nd_ipv6)) {
                         ND_PRINT("invalid len");
                         tlen = 0;
                     } else {
-                        ND_TCHECK_LEN(tptr, sizeof(struct in6_addr));
+                        ND_TCHECK_LEN(tptr, sizeof(nd_ipv6));
                         ND_PRINT("%s", ip6addr_string(ndo, tptr));
-                        tlen -= sizeof(struct in6_addr);
-                        tptr += sizeof(struct in6_addr);
+                        tlen -= sizeof(nd_ipv6);
+                        tptr += sizeof(nd_ipv6);
                     }
                     break;
                 case (AFNUM_INET6<<8 | SAFNUM_VPNUNICAST):
                 case (AFNUM_INET6<<8 | SAFNUM_VPNMULTICAST):
                 case (AFNUM_INET6<<8 | SAFNUM_VPNUNIMULTICAST):
-                    if (tlen < sizeof(struct in6_addr)+BGP_VPN_RD_LEN) {
+                    if (tlen < sizeof(nd_ipv6)+BGP_VPN_RD_LEN) {
                         ND_PRINT("invalid len");
                         tlen = 0;
                     } else {
                         ND_TCHECK_LEN(tptr,
-                                      sizeof(struct in6_addr) + BGP_VPN_RD_LEN);
+                                      sizeof(nd_ipv6) + BGP_VPN_RD_LEN);
                         ND_PRINT("RD: %s, %s",
                                   bgp_vpn_rd_print(ndo, tptr),
                                   ip6addr_string(ndo, tptr+BGP_VPN_RD_LEN));
-                        tlen -= (sizeof(struct in6_addr)+BGP_VPN_RD_LEN);
-                        tptr += (sizeof(struct in6_addr)+BGP_VPN_RD_LEN);
+                        tlen -= (sizeof(nd_ipv6)+BGP_VPN_RD_LEN);
+                        tptr += (sizeof(nd_ipv6)+BGP_VPN_RD_LEN);
                     }
                     break;
                 case (AFNUM_VPLS<<8 | SAFNUM_VPLS):
                 case (AFNUM_L2VPN<<8 | SAFNUM_VPNUNICAST):
                 case (AFNUM_L2VPN<<8 | SAFNUM_VPNMULTICAST):
                 case (AFNUM_L2VPN<<8 | SAFNUM_VPNUNIMULTICAST):
-                    if (tlen < sizeof(struct in_addr)) {
+                    if (tlen < sizeof(nd_ipv4)) {
                         ND_PRINT("invalid len");
                         tlen = 0;
                     } else {
-                        ND_TCHECK_LEN(tptr, sizeof(struct in_addr));
+                        ND_TCHECK_LEN(tptr, sizeof(nd_ipv4));
                         ND_PRINT("%s", ipaddr_string(ndo, tptr));
-                        tlen -= (sizeof(struct in_addr));
-                        tptr += (sizeof(struct in_addr));
+                        tlen -= (sizeof(nd_ipv4));
+                        tptr += (sizeof(nd_ipv4));
                     }
                     break;
                 case (AFNUM_NSAP<<8 | SAFNUM_UNICAST):

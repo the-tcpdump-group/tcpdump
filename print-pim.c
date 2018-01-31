@@ -169,9 +169,9 @@ pimv1_join_prune_print(netdissect_options *ndo,
 		return;
 	}
 
-	if (len < sizeof(struct in_addr))
+	if (len < sizeof(nd_ipv4))
 		goto trunc;
-	ND_TCHECK_LEN(bp, sizeof(struct in_addr));
+	ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 	if (ndo->ndo_vflag > 1)
 		ND_PRINT("\n");
 	ND_PRINT(" Upstream Nbr: %s", ipaddr_string(ndo, bp));
@@ -202,13 +202,13 @@ pimv1_join_prune_print(netdissect_options *ndo,
 		 */
 		if (len < 4)
 			goto trunc;
-		ND_TCHECK_LEN(bp, sizeof(struct in_addr));
+		ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 		ND_PRINT("\n\tGroup: %s", ipaddr_string(ndo, bp));
 		bp += 4;
 		len -= 4;
 		if (len < 4)
 			goto trunc;
-		ND_TCHECK_LEN(bp, sizeof(struct in_addr));
+		ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 		if (EXTRACT_BE_U_4(bp) != 0xffffffff)
 			ND_PRINT("/%s", ipaddr_string(ndo, bp));
 		bp += 4;
@@ -290,7 +290,7 @@ pimv1_print(netdissect_options *ndo,
 			  ipaddr_string(ndo, bp + 24));
 		break;
 	case PIMV1_TYPE_REGISTER_STOP:
-		ND_TCHECK_LEN(bp + 12, sizeof(struct in_addr));
+		ND_TCHECK_LEN(bp + 12, sizeof(nd_ipv4));
 		ND_PRINT(" for %s > %s", ipaddr_string(ndo, bp + 8),
 			  ipaddr_string(ndo, bp + 12));
 		break;
@@ -305,7 +305,7 @@ pimv1_print(netdissect_options *ndo,
 		}
 		break;
 	case PIMV1_TYPE_ASSERT:
-		ND_TCHECK_LEN(bp + 16, sizeof(struct in_addr));
+		ND_TCHECK_LEN(bp + 16, sizeof(nd_ipv4));
 		ND_PRINT(" for %s > %s", ipaddr_string(ndo, bp + 16),
 			  ipaddr_string(ndo, bp + 8));
 		if (EXTRACT_BE_U_4(bp + 12) != 0xffffffff)
@@ -575,11 +575,11 @@ pimv2_addr_print(netdissect_options *ndo,
 		switch (EXTRACT_U_1(bp)) {
 		case 1:
 			af = AF_INET;
-			addr_len = (u_int)sizeof(struct in_addr);
+			addr_len = (u_int)sizeof(nd_ipv4);
 			break;
 		case 2:
 			af = AF_INET6;
-			addr_len = (u_int)sizeof(struct in6_addr);
+			addr_len = (u_int)sizeof(nd_ipv6);
 			break;
 		default:
 			return -1;
@@ -589,10 +589,10 @@ pimv2_addr_print(netdissect_options *ndo,
 		hdrlen = 2;
 	} else {
 		switch (addr_len) {
-		case sizeof(struct in_addr):
+		case sizeof(nd_ipv4):
 			af = AF_INET;
 			break;
-		case sizeof(struct in6_addr):
+		case sizeof(nd_ipv6):
 			af = AF_INET6;
 			break;
 		default:

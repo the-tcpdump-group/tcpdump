@@ -1929,7 +1929,7 @@ isis_print_ext_is_reach(netdissect_options *ndo,
                 break;
             case ISIS_SUBTLV_EXT_IS_REACH_IPV4_INTF_ADDR:
             case ISIS_SUBTLV_EXT_IS_REACH_IPV4_NEIGHBOR_ADDR:
-                if (subtlv_len >= sizeof(struct in_addr))
+                if (subtlv_len >= sizeof(nd_ipv4))
                     ND_PRINT(", %s", ipaddr_string(ndo, tptr));
                 break;
             case ISIS_SUBTLV_EXT_IS_REACH_MAX_LINK_BW :
@@ -2124,7 +2124,7 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
                          const uint8_t *tptr, const char *ident, uint16_t afi)
 {
     char ident_buffer[20];
-    uint8_t prefix[sizeof(struct in6_addr)]; /* shared copy buffer for IPv4 and IPv6 prefixes */
+    uint8_t prefix[sizeof(nd_ipv6)]; /* shared copy buffer for IPv4 and IPv6 prefixes */
     u_int metric, status_byte, bit_length, byte_length, sublen, processed, subtlvtype, subtlvlen;
 
     if (!ND_TTEST_4(tptr))
@@ -2825,14 +2825,14 @@ isis_print(netdissect_options *ndo,
 	    break;
 
 	case ISIS_TLV_IP6ADDR:
-	    while (tmp>=sizeof(struct in6_addr)) {
-		ND_TCHECK_LEN(tptr, sizeof(struct in6_addr));
+	    while (tmp>=sizeof(nd_ipv6)) {
+		ND_TCHECK_LEN(tptr, sizeof(nd_ipv6));
 
                 ND_PRINT("\n\t      IPv6 interface address: %s",
 		       ip6addr_string(ndo, tptr));
 
-		tptr += sizeof(struct in6_addr);
-		tmp -= sizeof(struct in6_addr);
+		tptr += sizeof(nd_ipv6);
+		tmp -= sizeof(nd_ipv6);
 	    }
 	    break;
 	case ISIS_TLV_AUTH:
@@ -2958,16 +2958,16 @@ isis_print(netdissect_options *ndo,
       break;
 
 	case ISIS_TLV_TE_ROUTER_ID:
-	    ND_TCHECK_LEN(pptr, sizeof(struct in_addr));
+	    ND_TCHECK_LEN(pptr, sizeof(nd_ipv4));
 	    ND_PRINT("\n\t      Traffic Engineering Router ID: %s", ipaddr_string(ndo, pptr));
 	    break;
 
 	case ISIS_TLV_IPADDR:
-	    while (tmp>=sizeof(struct in_addr)) {
-		ND_TCHECK_LEN(tptr, sizeof(struct in_addr));
+	    while (tmp>=sizeof(nd_ipv4)) {
+		ND_TCHECK_LEN(tptr, sizeof(nd_ipv4));
 		ND_PRINT("\n\t      IPv4 interface address: %s", ipaddr_string(ndo, tptr));
-		tptr += sizeof(struct in_addr);
-		tmp -= sizeof(struct in_addr);
+		tptr += sizeof(nd_ipv4);
+		tmp -= sizeof(nd_ipv4);
 	    }
 	    break;
 
@@ -2992,19 +2992,19 @@ isis_print(netdissect_options *ndo,
 	    tptr++;
 	    tmp--;
 
-	    if (tmp < sizeof(struct in_addr))
+	    if (tmp < sizeof(nd_ipv4))
 	        break;
-	    ND_TCHECK_LEN(tptr, sizeof(struct in_addr));
+	    ND_TCHECK_LEN(tptr, sizeof(nd_ipv4));
 	    ND_PRINT("\n\t      IPv4 interface address: %s", ipaddr_string(ndo, tptr));
-	    tptr+=sizeof(struct in_addr);
-	    tmp-=sizeof(struct in_addr);
+	    tptr+=sizeof(nd_ipv4);
+	    tmp-=sizeof(nd_ipv4);
 
-	    if (tmp < sizeof(struct in_addr))
+	    if (tmp < sizeof(nd_ipv4))
 	        break;
-	    ND_TCHECK_LEN(tptr, sizeof(struct in_addr));
+	    ND_TCHECK_LEN(tptr, sizeof(nd_ipv4));
 	    ND_PRINT("\n\t      IPv4 neighbor address: %s", ipaddr_string(ndo, tptr));
-	    tptr+=sizeof(struct in_addr);
-	    tmp-=sizeof(struct in_addr);
+	    tptr+=sizeof(nd_ipv4);
+	    tmp-=sizeof(nd_ipv4);
 
 	    while (tmp>=4) {
                 ND_TCHECK_4(tptr);

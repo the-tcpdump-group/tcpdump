@@ -303,19 +303,19 @@ ldp_tlv_print(netdissect_options *ndo,
                tok2str(af_values, "Unknown (%u)", af));
         switch (af) {
         case AFNUM_INET:
-	    while(tlv_tlen >= sizeof(struct in_addr)) {
-		ND_TCHECK_LEN(tptr, sizeof(struct in_addr));
+	    while(tlv_tlen >= sizeof(nd_ipv4)) {
+		ND_TCHECK_LEN(tptr, sizeof(nd_ipv4));
 		ND_PRINT(" %s", ipaddr_string(ndo, tptr));
-		tlv_tlen-=sizeof(struct in_addr);
-		tptr+=sizeof(struct in_addr);
+		tlv_tlen-=sizeof(nd_ipv4);
+		tptr+=sizeof(nd_ipv4);
 	    }
             break;
         case AFNUM_INET6:
-	    while(tlv_tlen >= sizeof(struct in6_addr)) {
-		ND_TCHECK_LEN(tptr, sizeof(struct in6_addr));
+	    while(tlv_tlen >= sizeof(nd_ipv6)) {
+		ND_TCHECK_LEN(tptr, sizeof(nd_ipv6));
 		ND_PRINT(" %s", ip6addr_string(ndo, tptr));
-		tlv_tlen-=sizeof(struct in6_addr);
-		tptr+=sizeof(struct in6_addr);
+		tlv_tlen-=sizeof(nd_ipv6);
+		tptr+=sizeof(nd_ipv6);
 	    }
             break;
         default:

@@ -743,7 +743,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 ND_PRINT("%s  IPv4 DestAddress: %s, Protocol ID: 0x%02x",
                        indent,
                        ipaddr_string(ndo, obj_tptr),
-                       EXTRACT_U_1(obj_tptr + sizeof(struct in_addr)));
+                       EXTRACT_U_1(obj_tptr + sizeof(nd_ipv4)));
                 ND_PRINT("%s  Flags: [0x%02x], DestPort %u",
                        indent,
                        EXTRACT_U_1((obj_tptr + 5)),
@@ -757,11 +757,11 @@ rsvp_obj_print(netdissect_options *ndo,
                 ND_PRINT("%s  IPv6 DestAddress: %s, Protocol ID: 0x%02x",
                        indent,
                        ip6addr_string(ndo, obj_tptr),
-                       EXTRACT_U_1(obj_tptr + sizeof(struct in6_addr)));
+                       EXTRACT_U_1(obj_tptr + sizeof(nd_ipv6)));
                 ND_PRINT("%s  Flags: [0x%02x], DestPort %u",
                        indent,
-                       EXTRACT_U_1((obj_tptr + sizeof(struct in6_addr) + 1)),
-                       EXTRACT_BE_U_2(obj_tptr + sizeof(struct in6_addr) + 2));
+                       EXTRACT_U_1((obj_tptr + sizeof(nd_ipv6) + 1)),
+                       EXTRACT_BE_U_2(obj_tptr + sizeof(nd_ipv6) + 2));
                 obj_tlen-=20;
                 obj_tptr+=20;
                 break;
@@ -820,22 +820,22 @@ rsvp_obj_print(netdissect_options *ndo,
         case RSVP_OBJ_CONFIRM:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_IPV4:
-                if (obj_tlen < sizeof(struct in_addr))
+                if (obj_tlen < sizeof(nd_ipv4))
                     return -1;
                 ND_PRINT("%s  IPv4 Receiver Address: %s",
                        indent,
                        ipaddr_string(ndo, obj_tptr));
-                obj_tlen-=sizeof(struct in_addr);
-                obj_tptr+=sizeof(struct in_addr);
+                obj_tlen-=sizeof(nd_ipv4);
+                obj_tptr+=sizeof(nd_ipv4);
                 break;
             case RSVP_CTYPE_IPV6:
-                if (obj_tlen < sizeof(struct in6_addr))
+                if (obj_tlen < sizeof(nd_ipv6))
                     return -1;
                 ND_PRINT("%s  IPv6 Receiver Address: %s",
                        indent,
                        ip6addr_string(ndo, obj_tptr));
-                obj_tlen-=sizeof(struct in6_addr);
-                obj_tptr+=sizeof(struct in6_addr);
+                obj_tlen-=sizeof(nd_ipv6);
+                obj_tptr+=sizeof(nd_ipv6);
                 break;
             default:
                 hexdump=TRUE;
@@ -845,22 +845,22 @@ rsvp_obj_print(netdissect_options *ndo,
         case RSVP_OBJ_NOTIFY_REQ:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_IPV4:
-                if (obj_tlen < sizeof(struct in_addr))
+                if (obj_tlen < sizeof(nd_ipv4))
                     return -1;
                 ND_PRINT("%s  IPv4 Notify Node Address: %s",
                        indent,
                        ipaddr_string(ndo, obj_tptr));
-                obj_tlen-=sizeof(struct in_addr);
-                obj_tptr+=sizeof(struct in_addr);
+                obj_tlen-=sizeof(nd_ipv4);
+                obj_tptr+=sizeof(nd_ipv4);
                 break;
             case RSVP_CTYPE_IPV6:
-                if (obj_tlen < sizeof(struct in6_addr))
+                if (obj_tlen < sizeof(nd_ipv6))
                     return-1;
                 ND_PRINT("%s  IPv6 Notify Node Address: %s",
                        indent,
                        ip6addr_string(ndo, obj_tptr));
-                obj_tlen-=sizeof(struct in6_addr);
-                obj_tptr+=sizeof(struct in6_addr);
+                obj_tlen-=sizeof(nd_ipv6);
+                obj_tptr+=sizeof(nd_ipv6);
                 break;
             default:
                 hexdump=TRUE;

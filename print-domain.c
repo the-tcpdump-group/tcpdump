@@ -431,7 +431,7 @@ ns_rprint(netdissect_options *ndo,
 
 	switch (typ) {
 	case T_A:
-		if (!ND_TTEST_LEN(cp, sizeof(struct in_addr)))
+		if (!ND_TTEST_LEN(cp, sizeof(nd_ipv4)))
 			return(NULL);
 		ND_PRINT(" %s", intoa(EXTRACT_IPV4_TO_NETWORK_ORDER(cp)));
 		break;
@@ -502,7 +502,7 @@ ns_rprint(netdissect_options *ndo,
 	    {
 		char ntop_buf[INET6_ADDRSTRLEN];
 
-		if (!ND_TTEST_LEN(cp, sizeof(struct in6_addr)))
+		if (!ND_TTEST_LEN(cp, sizeof(nd_ipv6)))
 			return(NULL);
 		ND_PRINT(" %s",
 		    addrtostr6(cp, ntop_buf, sizeof(ntop_buf)));

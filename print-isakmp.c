@@ -780,14 +780,14 @@ cookie_record(const cookie_t *in, const u_char *bp2)
 	switch (IP_V(ip)) {
 	case 4:
 		cookiecache[ninitiator].version = 4;
-		UNALIGNED_MEMCPY(&cookiecache[ninitiator].iaddr.in4, &ip->ip_src, sizeof(struct in_addr));
-		UNALIGNED_MEMCPY(&cookiecache[ninitiator].raddr.in4, &ip->ip_dst, sizeof(struct in_addr));
+		UNALIGNED_MEMCPY(&cookiecache[ninitiator].iaddr.in4, &ip->ip_src, sizeof(nd_ipv4));
+		UNALIGNED_MEMCPY(&cookiecache[ninitiator].raddr.in4, &ip->ip_dst, sizeof(nd_ipv4));
 		break;
 	case 6:
 		ip6 = (const struct ip6_hdr *)bp2;
 		cookiecache[ninitiator].version = 6;
-		UNALIGNED_MEMCPY(&cookiecache[ninitiator].iaddr.in6, &ip6->ip6_src, sizeof(struct in6_addr));
-		UNALIGNED_MEMCPY(&cookiecache[ninitiator].raddr.in6, &ip6->ip6_dst, sizeof(struct in6_addr));
+		UNALIGNED_MEMCPY(&cookiecache[ninitiator].iaddr.in6, &ip6->ip6_src, sizeof(nd_ipv6));
+		UNALIGNED_MEMCPY(&cookiecache[ninitiator].raddr.in6, &ip6->ip6_dst, sizeof(nd_ipv6));
 		break;
 	default:
 		return;
@@ -810,10 +810,10 @@ cookie_sidecheck(int i, const u_char *bp2, int initiator)
 		if (cookiecache[i].version != 4)
 			return 0;
 		if (initiator) {
-			if (UNALIGNED_MEMCMP(&ip->ip_src, &cookiecache[i].iaddr.in4, sizeof(struct in_addr)) == 0)
+			if (UNALIGNED_MEMCMP(&ip->ip_src, &cookiecache[i].iaddr.in4, sizeof(nd_ipv4)) == 0)
 				return 1;
 		} else {
-			if (UNALIGNED_MEMCMP(&ip->ip_src, &cookiecache[i].raddr.in4, sizeof(struct in_addr)) == 0)
+			if (UNALIGNED_MEMCMP(&ip->ip_src, &cookiecache[i].raddr.in4, sizeof(nd_ipv4)) == 0)
 				return 1;
 		}
 		break;
@@ -822,10 +822,10 @@ cookie_sidecheck(int i, const u_char *bp2, int initiator)
 			return 0;
 		ip6 = (const struct ip6_hdr *)bp2;
 		if (initiator) {
-			if (UNALIGNED_MEMCMP(&ip6->ip6_src, &cookiecache[i].iaddr.in6, sizeof(struct in6_addr)) == 0)
+			if (UNALIGNED_MEMCMP(&ip6->ip6_src, &cookiecache[i].iaddr.in6, sizeof(nd_ipv6)) == 0)
 				return 1;
 		} else {
-			if (UNALIGNED_MEMCMP(&ip6->ip6_src, &cookiecache[i].raddr.in6, sizeof(struct in6_addr)) == 0)
+			if (UNALIGNED_MEMCMP(&ip6->ip6_src, &cookiecache[i].raddr.in6, sizeof(nd_ipv6)) == 0)
 				return 1;
 		}
 		break;
@@ -1402,7 +1402,7 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 			if (len < 8)
 				ND_PRINT(" len=%u [bad: < 8]", len);
 			else {
-				mask = data + sizeof(struct in_addr);
+				mask = data + sizeof(nd_ipv4);
 				ND_PRINT(" len=%u %s/%u.%u.%u.%u", len,
 					  ipaddr_string(ndo, data),
 					  EXTRACT_U_1(mask), EXTRACT_U_1(mask + 1),
@@ -1424,7 +1424,7 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 			if (len < 32)
 				ND_PRINT(" len=%u [bad: < 32]", len);
 			else {
-				mask = (const u_char *)(data + sizeof(struct in6_addr));
+				mask = (const u_char *)(data + sizeof(nd_ipv6));
 				/*XXX*/
 				ND_PRINT(" len=%u %s/0x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x", len,
 					  ip6addr_string(ndo, data),
@@ -1442,7 +1442,7 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 			else {
 				ND_PRINT(" len=%u %s-%s", len,
 					  ipaddr_string(ndo, data),
-					  ipaddr_string(ndo, data + sizeof(struct in_addr)));
+					  ipaddr_string(ndo, data + sizeof(nd_ipv4)));
 			}
 			len = 0;
 			break;
@@ -1452,7 +1452,7 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 			else {
 				ND_PRINT(" len=%u %s-%s", len,
 					  ip6addr_string(ndo, data),
-					  ip6addr_string(ndo, data + sizeof(struct in6_addr)));
+					  ip6addr_string(ndo, data + sizeof(nd_ipv6)));
 			}
 			len = 0;
 			break;

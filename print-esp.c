@@ -717,7 +717,7 @@ esp_print(netdissect_options *ndo,
 			if (sa->spi == EXTRACT_BE_U_4(esp->esp_spi) &&
 			    sa->daddr_version == 6 &&
 			    UNALIGNED_MEMCMP(&sa->daddr.in6, &ip6->ip6_dst,
-				   sizeof(struct in6_addr)) == 0) {
+				   sizeof(nd_ipv6)) == 0) {
 				break;
 			}
 		}
@@ -733,7 +733,7 @@ esp_print(netdissect_options *ndo,
 			if (sa->spi == EXTRACT_BE_U_4(esp->esp_spi) &&
 			    sa->daddr_version == 4 &&
 			    UNALIGNED_MEMCMP(&sa->daddr.in4, &ip->ip_dst,
-				   sizeof(struct in_addr)) == 0) {
+				   sizeof(nd_ipv4)) == 0) {
 				break;
 			}
 		}

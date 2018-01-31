@@ -208,7 +208,7 @@ struct lsa6 {
 	    } llsa_priandopt;
 #define llsa_priority	llsa_priandopt.pri
 #define llsa_options	llsa_priandopt.opt
-	    struct in6_addr llsa_lladdr;
+	    nd_ipv6	llsa_lladdr;
 	    nd_uint32_t llsa_nprefix;
 	    struct lsa6_prefix llsa_prefix[1];
 	} un_llsa;
@@ -419,7 +419,7 @@ ospf6_print_lsaprefix(netdissect_options *ndo,
 	lsa_length -= sizeof (*lsapp) - IPV6_ADDR_LEN_BYTES;
 	ND_TCHECK_LEN(lsapp, sizeof(*lsapp) - IPV6_ADDR_LEN_BYTES);
 	wordlen = (EXTRACT_U_1(lsapp->lsa_p_len) + 31) / 32;
-	if (wordlen * 4 > sizeof(struct in6_addr)) {
+	if (wordlen * 4 > sizeof(nd_ipv6)) {
 		ND_PRINT(" bogus prefixlen /%u", EXTRACT_U_1(lsapp->lsa_p_len));
 		goto trunc;
 	}
@@ -602,9 +602,9 @@ ospf6_print_lsa(netdissect_options *ndo,
 		tptr += bytelen;
 
 		if ((flags32 & ASLA_FLAG_FWDADDR) != 0) {
-			const struct in6_addr *fwdaddr6;
+			const nd_ipv6 *fwdaddr6;
 
-			fwdaddr6 = (const struct in6_addr *)tptr;
+			fwdaddr6 = (const nd_ipv6 *)tptr;
 			if (lsa_length < sizeof (*fwdaddr6))
 				return (1);
 			lsa_length -= sizeof (*fwdaddr6);

@@ -151,7 +151,7 @@ ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
 
 done:
 trunc:
-	UNALIGNED_MEMCPY(dst, dst_addr, sizeof(struct in6_addr));
+	UNALIGNED_MEMCPY(dst, dst_addr, sizeof(nd_ipv6));
 }
 
 /*
