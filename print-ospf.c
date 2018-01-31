@@ -692,7 +692,7 @@ ospf_print_lsa(netdissect_options *ndo,
 		ND_TCHECK_4(lsap->lsa_un.un_nla.nla_mask);
 		ND_PRINT("\n\t    Mask %s\n\t    Connected Routers:",
 		    ipaddr_string(ndo, lsap->lsa_un.un_nla.nla_mask));
-		ap = &lsap->lsa_un.un_nla.nla_router[0];
+		ap = lsap->lsa_un.un_nla.nla_router;
 		while ((const u_char *)ap < ls_end) {
 			ND_TCHECK_SIZE(ap);
 			ND_PRINT("\n\t      %s", ipaddr_string(ndo, *ap));

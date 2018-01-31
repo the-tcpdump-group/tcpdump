@@ -318,16 +318,20 @@ tcp_print(netdissect_options *ndo,
                         if (sport > dport)
                                 rev = 1;
                         else if (sport == dport) {
-                                if (UNALIGNED_MEMCMP(&ip->ip_src, &ip->ip_dst, sizeof ip->ip_dst) > 0)
+                                if (UNALIGNED_MEMCMP(ip->ip_src, ip->ip_dst, sizeof ip->ip_dst) > 0)
                                         rev = 1;
                         }
                         if (rev) {
-                                UNALIGNED_MEMCPY(&tha.src, &ip->ip_dst, sizeof ip->ip_dst);
-                                UNALIGNED_MEMCPY(&tha.dst, &ip->ip_src, sizeof ip->ip_src);
+                                UNALIGNED_MEMCPY(&tha.src, ip->ip_dst,
+                                                 sizeof ip->ip_dst);
+                                UNALIGNED_MEMCPY(&tha.dst, ip->ip_src,
+                                                 sizeof ip->ip_src);
                                 tha.port = dport << 16 | sport;
                         } else {
-                                UNALIGNED_MEMCPY(&tha.dst, &ip->ip_dst, sizeof ip->ip_dst);
-                                UNALIGNED_MEMCPY(&tha.src, &ip->ip_src, sizeof ip->ip_src);
+                                UNALIGNED_MEMCPY(&tha.dst, ip->ip_dst,
+                                                 sizeof ip->ip_dst);
+                                UNALIGNED_MEMCPY(&tha.src, ip->ip_src,
+                                                 sizeof ip->ip_src);
                                 tha.port = sport << 16 | dport;
                         }
 
