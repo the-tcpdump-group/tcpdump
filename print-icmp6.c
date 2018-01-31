@@ -1451,9 +1451,9 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			break;
 		case ND_OPT_PREFIX_INFORMATION:
 			opp = (const struct nd_opt_prefix_info *)op;
-			ND_TCHECK_16(&opp->nd_opt_pi_prefix);
+			ND_TCHECK_16(opp->nd_opt_pi_prefix);
                         ND_PRINT("%s/%u%s, Flags [%s], valid time %s",
-                                  ip6addr_string(ndo, &opp->nd_opt_pi_prefix),
+                                  ip6addr_string(ndo, opp->nd_opt_pi_prefix),
                                   EXTRACT_U_1(opp->nd_opt_pi_prefix_len),
                                   (opt_len != 4) ? "badlen" : "",
                                   bittok2str(icmp6_opt_pi_flag_values, "none", EXTRACT_U_1(opp->nd_opt_pi_flags_reserved)),
@@ -1477,9 +1477,9 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			ND_PRINT(" lifetime %us,",
                                   EXTRACT_BE_U_4(oprd->nd_opt_rdnss_lifetime));
 			for (i = 0; i < l; i++) {
-				ND_TCHECK_16(&oprd->nd_opt_rdnss_addr[i]);
+				ND_TCHECK_16(oprd->nd_opt_rdnss_addr[i]);
 				ND_PRINT(" addr: %s",
-                                          ip6addr_string(ndo, &oprd->nd_opt_rdnss_addr[i]));
+                                          ip6addr_string(ndo, oprd->nd_opt_rdnss_addr[i]));
 			}
 			break;
 		case ND_OPT_DNSSL:
@@ -2055,7 +2055,7 @@ icmp6_rrenum_print(netdissect_options *ndo, const u_char *bp, const u_char *ep)
 			ND_PRINT(",min=%u", EXTRACT_U_1(match->rpm_minlen));
 			ND_PRINT(",max=%u", EXTRACT_U_1(match->rpm_maxlen));
 		}
-		if (addrtostr6(&match->rpm_prefix, hbuf, sizeof(hbuf)))
+		if (addrtostr6(match->rpm_prefix, hbuf, sizeof(hbuf)))
 			ND_PRINT(",%s/%u", hbuf, EXTRACT_U_1(match->rpm_matchlen));
 		else
 			ND_PRINT(",?/%u", EXTRACT_U_1(match->rpm_matchlen));
@@ -2098,7 +2098,7 @@ icmp6_rrenum_print(netdissect_options *ndo, const u_char *bp, const u_char *ep)
 					ND_PRINT("pltime=%u,",
                                                   EXTRACT_BE_U_4(use->rpu_pltime));
 			}
-			if (addrtostr6(&use->rpu_prefix, hbuf, sizeof(hbuf)))
+			if (addrtostr6(use->rpu_prefix, hbuf, sizeof(hbuf)))
 				ND_PRINT("%s/%u/%u", hbuf, EXTRACT_U_1(use->rpu_uselen),
                                           EXTRACT_U_1(use->rpu_keeplen));
 			else

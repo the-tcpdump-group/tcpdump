@@ -653,7 +653,7 @@ ospf6_print_lsa(netdissect_options *ndo,
                 prefixes = EXTRACT_BE_U_4(llsap->llsa_nprefix);
 		ND_PRINT("\n\t      Priority %u, Link-local address %s, Prefixes %u:",
                        EXTRACT_U_1(llsap->llsa_priority),
-                       ip6addr_string(ndo, &llsap->llsa_lladdr),
+                       ip6addr_string(ndo, llsap->llsa_lladdr),
                        prefixes);
 
 		tptr = (const uint8_t *)llsap->llsa_prefix;
