@@ -187,14 +187,14 @@ struct lsa6 {
 #if 0
 	/* Summary links advertisements */
 	struct {
-	    struct in_addr sla_mask;
+	    nd_ipv4     sla_mask;
 	    nd_uint32_t sla_tosmetric[1];	/* may repeat	*/
 	} un_sla;
 
 	/* Multicast group membership */
 	struct mcla {
 	    nd_uint32_t mcla_vtype;
-	    struct in_addr mcla_vid;
+	    nd_ipv4     mcla_vid;
 	} un_mcla[1];
 #endif
 
