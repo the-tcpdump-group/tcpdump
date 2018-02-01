@@ -86,13 +86,13 @@ babel_print(netdissect_options *ndo,
 #define MESSAGE_ROUTER_ID 6
 #define MESSAGE_NH 7
 #define MESSAGE_UPDATE 8
-#define MESSAGE_REQUEST 9
-#define MESSAGE_MH_REQUEST 10
+#define MESSAGE_ROUTE_REQUEST 9
+#define MESSAGE_SEQNO_REQUEST 10
 #define MESSAGE_TSPC 11
 #define MESSAGE_HMAC 12
-#define MESSAGE_UPDATE_SRC_SPECIFIC 13
-#define MESSAGE_REQUEST_SRC_SPECIFIC 14
-#define MESSAGE_MH_REQUEST_SRC_SPECIFIC 15
+#define MESSAGE_UPDATE_SRC_SPECIFIC 13 /* last appearance in draft-boutier-babel-source-specific-01 */
+#define MESSAGE_REQUEST_SRC_SPECIFIC 14 /* idem */
+#define MESSAGE_MH_REQUEST_SRC_SPECIFIC 15 /* idem */
 
 /* sub-TLVs */
 #define MESSAGE_SUB_PAD1 0
@@ -434,7 +434,7 @@ babel_print_v2(netdissect_options *ndo,
             break;
 
         case MESSAGE_IHU: {
-            unsigned short txcost, interval;
+            unsigned short rxcost, interval;
             if (!ndo->ndo_vflag)
                 ND_PRINT(" ihu");
             else {
@@ -443,15 +443,15 @@ babel_print_v2(netdissect_options *ndo,
                 int rc;
                 ND_PRINT("\n\tIHU ");
                 if(len < 6) goto invalid;
-                txcost = EXTRACT_BE_U_2(message + 4);
+                rxcost = EXTRACT_BE_U_2(message + 4);
                 interval = EXTRACT_BE_U_2(message + 6);
                 ae = EXTRACT_U_1(message + 2);
                 rc = network_address(ae, message + 8,
                                      len - 6, address);
                 if(rc < 0) { ND_PRINT("%s", tstr); break; }
-                ND_PRINT("%s txcost %u interval %s",
+                ND_PRINT("%s rxcost %u interval %s",
                        ae == 0 ? "any" : format_address(ndo, address),
-                       txcost, format_interval(interval));
+                       rxcost, format_interval(interval));
                 /* Extra data. */
                 if((u_int)rc < len - 6)
                     subtlvs_print(ndo, message + 8 + rc, message + 2 + len,
@@ -537,13 +537,13 @@ babel_print_v2(netdissect_options *ndo,
         }
             break;
 
-        case MESSAGE_REQUEST: {
+        case MESSAGE_ROUTE_REQUEST: {
             if (!ndo->ndo_vflag)
-                ND_PRINT(" request");
+                ND_PRINT(" route-request");
             else {
                 int rc;
                 u_char prefix[16], ae, plen;
-                ND_PRINT("\n\tRequest ");
+                ND_PRINT("\n\tRoute Request ");
                 if(len < 2) goto invalid;
                 ae = EXTRACT_U_1(message + 2);
                 plen = EXTRACT_U_1(message + 3) + (EXTRACT_U_1(message + 2) == 1 ? 96 : 0);
@@ -557,14 +557,14 @@ babel_print_v2(netdissect_options *ndo,
         }
             break;
 
-        case MESSAGE_MH_REQUEST : {
+        case MESSAGE_SEQNO_REQUEST : {
             if (!ndo->ndo_vflag)
-                ND_PRINT(" mh-request");
+                ND_PRINT(" seqno-request");
             else {
                 int rc;
                 u_short seqno;
                 u_char prefix[16], ae, plen;
-                ND_PRINT("\n\tMH-Request ");
+                ND_PRINT("\n\tSeqno Request ");
                 if(len < 14) goto invalid;
                 ae = EXTRACT_U_1(message + 2);
                 seqno = EXTRACT_BE_U_2(message + 4);
