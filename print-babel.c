@@ -476,13 +476,15 @@ babel_print_v2(netdissect_options *ndo,
                 ND_PRINT(" nh");
             else {
                 int rc;
+                u_char ae;
                 u_char nh[16];
                 ND_PRINT("\n\tNext Hop");
                 if(len < 2) goto invalid;
-                rc = network_address(EXTRACT_U_1(message + 2), message + 4,
+                ae = EXTRACT_U_1(message + 2);
+                rc = network_address(ae, message + 4,
                                      len - 2, nh);
                 if(rc < 0) goto invalid;
-                ND_PRINT(" %s", format_address(ndo, nh));
+                ND_PRINT(" %s", ae == 0 ? "invalid AE 0" : format_address(ndo, nh));
             }
         }
             break;
@@ -573,7 +575,7 @@ babel_print_v2(netdissect_options *ndo,
                 plen = EXTRACT_U_1(message + 3) + (EXTRACT_U_1(message + 2) == 1 ? 96 : 0);
                 ND_PRINT("(%u hops) for %s seqno %u id %s",
                        EXTRACT_U_1(message + 6),
-                       ae == 0 ? "invalid" : format_prefix(ndo, prefix, plen),
+                       ae == 0 ? "invalid AE 0" : format_prefix(ndo, prefix, plen),
                        seqno, format_id(message + 8));
             }
         }
