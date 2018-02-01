@@ -67,7 +67,7 @@ static const struct printer printers[] = {
 	{ nflog_if_print,	DLT_NFLOG},
 #endif
 #ifdef DLT_CIP
-	{ cip_if_print,         DLT_CIP },
+	{ cip_if_print,	 	DLT_CIP },
 #endif
 #ifdef DLT_ATM_CLIP
 	{ cip_if_print,		DLT_ATM_CLIP },
@@ -86,7 +86,7 @@ static const struct printer printers[] = {
 	{ bt_if_print,		DLT_BLUETOOTH_HCI_H4_WITH_PHDR},
 #endif
 #ifdef DLT_LANE8023
-	{ lane_if_print,        DLT_LANE8023 },
+	{ lane_if_print,	DLT_LANE8023 },
 #endif
 	{ arcnet_if_print,	DLT_ARCNET },
 #ifdef DLT_ARCNET_LINUX
@@ -237,7 +237,7 @@ static int	ndo_printf(netdissect_options *ndo,
 
 void
 init_print(netdissect_options *ndo, uint32_t localnet, uint32_t mask,
-    uint32_t timezone_offset)
+	   uint32_t timezone_offset)
 {
 
 	thiszone = timezone_offset;
@@ -310,7 +310,7 @@ get_if_printer(netdissect_options *ndo, int type)
 
 void
 pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
-    const u_char *sp, u_int packets_captured)
+		    const u_char *sp, u_int packets_captured)
 {
 	u_int hdrlen;
 	int invalid_header = 0;
@@ -338,6 +338,14 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 			ND_PRINT(",");
 		ND_PRINT(" len(%u) < caplen(%u)", h->len, h->caplen);
 	}
+	if (h->caplen > MAXIMUM_SNAPLEN) {
+		if (!invalid_header) {
+			invalid_header = 1;
+			ND_PRINT("[Invalid header:");
+		} else
+			ND_PRINT(",");
+		ND_PRINT(" caplen(%u) > %u", h->caplen, MAXIMUM_SNAPLEN);
+	}
 	if (invalid_header) {
 		ND_PRINT("]\n");
 		return;
@@ -347,6 +355,7 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	 * At this point:
 	 *   capture length != 0,
 	 *   packet length != 0,
+	 *   capture length <= MAXIMUM_SNAPLEN,
 	 *   packet length >= capture length.
 	 */
 
@@ -360,7 +369,7 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	 */
 	ndo->ndo_snapend = sp + h->caplen;
 
-        hdrlen = (ndo->ndo_if_printer)(ndo, h, sp);
+	hdrlen = (ndo->ndo_if_printer)(ndo, h, sp);
 
 	/*
 	 * Restore the original snapend, as a printer might have
@@ -384,7 +393,7 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 			 */
 			if (h->caplen > hdrlen)
 				hex_and_ascii_print(ndo, "\n\t", sp + hdrlen,
-				    h->caplen - hdrlen);
+						    h->caplen - hdrlen);
 		}
 	} else if (ndo->ndo_xflag) {
 		/*
@@ -394,7 +403,7 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 			/*
 			 * Include the link-layer header.
 			 */
-                        hex_print(ndo, "\n\t", sp, h->caplen);
+			hex_print(ndo, "\n\t", sp, h->caplen);
 		} else {
 			/*
 			 * Don't include the link-layer header - and if
@@ -403,7 +412,7 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 			 */
 			if (h->caplen > hdrlen)
 				hex_print(ndo, "\n\t", sp + hdrlen,
-                                          h->caplen - hdrlen);
+					  h->caplen - hdrlen);
 		}
 	} else if (ndo->ndo_Aflag) {
 		/*
