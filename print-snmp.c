@@ -421,7 +421,7 @@ asn1_parse(netdissect_options *ndo,
            const u_char *p, u_int len, struct be *elem)
 {
 	u_char form, class, id;
-	int i, hdr;
+	u_int i, hdr;
 
 	elem->asnlen = 0;
 	elem->type = BE_ANY;
@@ -545,7 +545,7 @@ asn1_parse(netdissect_options *ndo,
 				}
 				if (EXTRACT_U_1(p) & ASN_BIT8)	/* negative */
 					data = -1;
-				for (i = elem->asnlen; i-- > 0; p++)
+				for (i = elem->asnlen; i != 0; p++, i--)
 					data = (data << ASN_SHIFT8) | EXTRACT_U_1(p);
 				elem->data.integer = data;
 				break;
@@ -582,7 +582,7 @@ asn1_parse(netdissect_options *ndo,
 				uint32_t data;
 				elem->type = BE_UNS;
 				data = 0;
-				for (i = elem->asnlen; i-- > 0; p++)
+				for (i = elem->asnlen; i != 0; p++, i--)
 					data = (data << 8) + EXTRACT_U_1(p);
 				elem->data.uns = data;
 				break;
@@ -592,7 +592,7 @@ asn1_parse(netdissect_options *ndo,
 				uint64_t data64;
 			        elem->type = BE_UNS64;
 				data64 = 0;
-				for (i = elem->asnlen; i-- > 0; p++)
+				for (i = elem->asnlen; i != 0; p++, i--)
 					data64 = (data64 << 8) + EXTRACT_U_1(p);
 				elem->data.uns64 = data64;
 				break;
@@ -681,7 +681,7 @@ asn1_print_octets(netdissect_options *ndo, struct be *elem)
 	uint32_t i;
 
 	ND_TCHECK_LEN(p, asnlen);
-	for (i = asnlen; i-- > 0; p++)
+	for (i = asnlen; i != 0; p++, i--)
 		ND_PRINT("_%.2x", EXTRACT_U_1(p));
 	return 0;
 
@@ -700,7 +700,7 @@ asn1_print_string(netdissect_options *ndo, struct be *elem)
 
 	p = elem->data.str;
 	ND_TCHECK_LEN(p, asnlen);
-	for (i = asnlen; printable && i-- > 0; p++)
+	for (i = asnlen; printable && i != 0; p++, i--)
 		printable = ND_ISPRINT(EXTRACT_U_1(p));
 	p = elem->data.str;
 	if (printable) {
@@ -711,7 +711,7 @@ asn1_print_string(netdissect_options *ndo, struct be *elem)
 		}
 		ND_PRINT("\"");
 	} else {
-		for (i = asnlen; i-- > 0; p++) {
+		for (i = asnlen; i != 0; p++, i--) {
 			ND_PRINT(first ? "%.2x" : "_%.2x", EXTRACT_U_1(p));
 			first = 0;
 		}
@@ -769,7 +769,7 @@ asn1_print(netdissect_options *ndo,
 			}
 		}
 
-		for (; i-- > 0; p++) {
+		for (; i != 0; p++, i--) {
 			ND_TCHECK_1(p);
 			o = (o << ASN_SHIFT7) + (EXTRACT_U_1(p) & ~ASN_BIT8);
 			if (EXTRACT_U_1(p) & ASN_LONGLEN)
@@ -824,7 +824,7 @@ asn1_print(netdissect_options *ndo,
 			ND_PRINT("[inetaddr len!=%d]", ASNLEN_INETADDR);
 		p = (const u_char *)elem->data.raw;
 		ND_TCHECK_LEN(p, asnlen);
-		for (i = asnlen; i-- != 0; p++) {
+		for (i = asnlen; i != 0; p++, i--) {
 			ND_PRINT((i == asnlen-1) ? "%u" : ".%u", EXTRACT_U_1(p));
 		}
 		break;
@@ -918,10 +918,11 @@ smi_decode_oid(netdissect_options *ndo,
 {
 	const u_char *p = (const u_char *)elem->data.raw;
 	uint32_t asnlen = elem->asnlen;
-	int o = 0, first = -1, i = asnlen;
+	uint32_t i = asnlen;
+	int o = 0, first = -1;
 	unsigned int firstval;
 
-	for (*oidlen = 0; i-- > 0; p++) {
+	for (*oidlen = 0; i != 0; p++, i--) {
 		ND_TCHECK_1(p);
 	        o = (o << ASN_SHIFT7) + (EXTRACT_U_1(p) & ~ASN_BIT8);
 		if (EXTRACT_U_1(p) & ASN_LONGLEN)
