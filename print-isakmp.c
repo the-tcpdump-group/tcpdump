@@ -741,9 +741,11 @@ static const char *etypestr[] = {
 static int
 iszero(const u_char *p, size_t l)
 {
-	while (l--) {
-		if (*p++)
+	while (l != 0) {
+		if (*p)
 			return 0;
+		p++;
+		l--;
 	}
 	return 1;
 }
