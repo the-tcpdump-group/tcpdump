@@ -825,7 +825,7 @@ asn1_print(netdissect_options *ndo,
 		p = (const u_char *)elem->data.raw;
 		ND_TCHECK_LEN(p, asnlen);
 		for (i = asnlen; i != 0; p++, i--) {
-			ND_PRINT((i == asnlen-1) ? "%u" : ".%u", EXTRACT_U_1(p));
+			ND_PRINT((i == asnlen) ? "%u" : ".%u", EXTRACT_U_1(p));
 		}
 		break;
 
