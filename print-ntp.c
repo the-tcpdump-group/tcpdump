@@ -536,7 +536,7 @@ p_ntp_time(netdissect_options *ndo,
 		ff += FMAXINT;
 	ff = ff / FMAXINT;			/* shift radix point by 32 bits */
 	f = (uint32_t)(ff * 1000000000.0);	/* treat fraction as parts per billion */
-	ND_PRINT("%u.%09d", i, f);
+	ND_PRINT("%u.%09u", i, f);
 
 #ifdef HAVE_STRFTIME
 	/*
@@ -580,9 +580,9 @@ p_ntp_delta(netdissect_options *ndo,
             const struct l_fixedpt *olfp,
             const struct l_fixedpt *lfp)
 {
-	int32_t i;
 	uint32_t u, uf;
 	uint32_t ou, ouf;
+	uint32_t i;
 	uint32_t f;
 	double ff;
 	int signbit;
@@ -596,20 +596,20 @@ p_ntp_delta(netdissect_options *ndo,
 		return;
 	}
 
-	i = u - ou;
-
-	if (i > 0) {		/* new is definitely greater than old */
+	if (u > ou) {		/* new is definitely greater than old */
 		signbit = 0;
+		i = u - ou;
 		f = uf - ouf;
 		if (ouf > uf)	/* must borrow from high-order bits */
 			i -= 1;
-	} else if (i < 0) {	/* new is definitely less than old */
+	} else if (u < ou) {	/* new is definitely less than old */
 		signbit = 1;
+		i = ou - u;
 		f = ouf - uf;
-		if (uf > ouf)	/* must carry into the high-order bits */
-			i += 1;
-		i = -i;
+		if (uf > ouf)	/* must borrow from the high-order bits */
+			i -= 1;
 	} else {		/* int_part is zero */
+		i = 0;
 		if (uf > ouf) {
 			signbit = 0;
 			f = uf - ouf;
@@ -624,7 +624,7 @@ p_ntp_delta(netdissect_options *ndo,
 		ff += FMAXINT;
 	ff = ff / FMAXINT;			/* shift radix point by 32 bits */
 	f = (uint32_t)(ff * 1000000000.0);	/* treat fraction as parts per billion */
-	ND_PRINT("%s%d.%09d", signbit ? "-" : "+", i, f);
+	ND_PRINT("%s%u.%09u", signbit ? "-" : "+", i, f);
 }
 
 /* Prints polling interval in log2 as seconds or fraction of second */
