@@ -2166,7 +2166,7 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
 
     if (!ND_TTEST_LEN(tptr, byte_length))
         return (0);
-    memset(prefix, 0, sizeof prefix);   /* clear the copy buffer */
+    memset(prefix, 0, sizeof(prefix));   /* clear the copy buffer */
     memcpy(prefix,tptr,byte_length);    /* copy as much as is stored in the TLV */
     tptr+=byte_length;
     processed+=byte_length;

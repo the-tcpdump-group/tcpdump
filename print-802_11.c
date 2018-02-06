@@ -826,7 +826,7 @@ static const float ieee80211_float_htrates[MAX_MCS_INDEX+1][2][2] = {
 };
 
 static const char *auth_alg_text[]={"Open System","Shared Key","EAP"};
-#define NUM_AUTH_ALGS	(sizeof auth_alg_text / sizeof auth_alg_text[0])
+#define NUM_AUTH_ALGS	(sizeof(auth_alg_text) / sizeof(auth_alg_text[0]))
 
 static const char *status_text[] = {
 	"Successful",						/*  0 */
@@ -908,7 +908,7 @@ static const char *status_text[] = {
 	"The Destination STA is not a QSTA.",			/* 50 */
 
 };
-#define NUM_STATUSES	(sizeof status_text / sizeof status_text[0])
+#define NUM_STATUSES	(sizeof(status_text) / sizeof(status_text[0]))
 
 static const char *reason_text[] = {
 	"Reserved",						/* 0 */
@@ -976,7 +976,7 @@ static const char *reason_text[] = {
 	"Association denied due to requesting STA not supporting HT "
 	  "features",						/* 46 */
 };
-#define NUM_REASONS	(sizeof reason_text / sizeof reason_text[0])
+#define NUM_REASONS	(sizeof(reason_text) / sizeof(reason_text[0]))
 
 static int
 wep_print(netdissect_options *ndo,
@@ -1087,7 +1087,7 @@ parse_elements(netdissect_options *ndo,
 			offset += 2;
 			length -= 2;
 			if (rates.length != 0) {
-				if (rates.length > sizeof rates.rate)
+				if (rates.length > sizeof(rates.rate))
 					return 0;
 				memcpy(&rates.rate, p + offset, rates.length);
 				offset += rates.length;
@@ -1171,7 +1171,7 @@ parse_elements(netdissect_options *ndo,
 				length -= tim.length;
 				break;
 			}
-			if (tim.length - 3U > sizeof tim.bitmap)
+			if (tim.length - 3U > sizeof(tim.bitmap))
 				return 0;
 			memcpy(&tim.count, p + offset, 3);
 			offset += 3;

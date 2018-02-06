@@ -1327,7 +1327,7 @@ main(int argc, char **argv)
 	/*
 	 * Initialize the netdissect code.
 	 */
-	if (nd_init(ebuf, sizeof ebuf) == -1)
+	if (nd_init(ebuf, sizeof(ebuf)) == -1)
 		error("%s", ebuf);
 
 	memset(ndo, 0, sizeof(*ndo));
@@ -1528,7 +1528,7 @@ main(int argc, char **argv)
 
 		case 'm':
 			if (nd_have_smi_support()) {
-				if (nd_load_smi_module(optarg, ebuf, sizeof ebuf) == -1)
+				if (nd_load_smi_module(optarg, ebuf, sizeof(ebuf)) == -1)
 					error("%s", ebuf);
 			} else {
 				(void)fprintf(stderr, "%s: ignoring option `-m %s' ",

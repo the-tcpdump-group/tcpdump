@@ -213,7 +213,7 @@ static const char *lcpconfopts[] = {
 	"PPP-Muxing",		/* (30) */
 };
 
-#define NUM_LCPOPTS	(sizeof lcpconfopts / sizeof lcpconfopts[0])
+#define NUM_LCPOPTS	(sizeof(lcpconfopts) / sizeof(lcpconfopts[0]))
 
 /* ECP - to be supported */
 
