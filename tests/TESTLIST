@@ -430,7 +430,6 @@ stp-heapoverflow-1	stp-heapoverflow-1.pcap	stp-heapoverflow-1.out	-v
 stp-heapoverflow-2	stp-heapoverflow-2.pcap	stp-heapoverflow-2.out	-v
 stp-heapoverflow-3	stp-heapoverflow-3.pcap	stp-heapoverflow-3.out	-v
 stp-heapoverflow-4	stp-heapoverflow-4.pcap	stp-heapoverflow-4.out	-v
-stp-heapoverflow-5	stp-heapoverflow-5.pcap	stp-heapoverflow-5.out	-v
 arp-too-long-tha	arp-too-long-tha.pcap	arp-too-long-tha.out	-v
 juniper_header-heapoverflow	juniper_header-heapoverflow.pcap	juniper_header-heapoverflow.out	-v
 tftp-heapoverflow	tftp-heapoverflow.pcap	tftp-heapoverflow.out	-v
