@@ -28,6 +28,8 @@
 #include "netdissect.h"
 #include "extract.h"
 
+static const char tstr[] = " [|bt]";
+
 #if defined(DLT_BLUETOOTH_HCI_H4_WITH_PHDR) && defined(HAVE_PCAP_BLUETOOTH_H)
 #include <pcap/bluetooth.h>
 
@@ -45,19 +47,21 @@ bt_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *
 	u_int caplen = h->caplen;
 	const pcap_bluetooth_h4_header* hdr = (const pcap_bluetooth_h4_header*)p;
 
-	if (caplen < BT_HDRLEN) {
-		ND_PRINT("[|bt]");
-		return (BT_HDRLEN);
-	}
+	if (caplen < BT_HDRLEN || length < BT_HDRLEN)
+		goto trunc;
 	caplen -= BT_HDRLEN;
 	length -= BT_HDRLEN;
 	p += BT_HDRLEN;
+	ND_TCHECK_4(&hdr->direction);
 	if (ndo->ndo_eflag)
-		ND_PRINT("hci length %u, direction %s, ", length, (EXTRACT_BE_U_4(&hdr->direction)&0x1)?"in":"out");
+		ND_PRINT("hci length %u, direction %s, ", length,
+			 (EXTRACT_BE_U_4(&hdr->direction)&0x1) ? "in" : "out");
 
 	if (!ndo->ndo_suppress_default_print)
 		ND_DEFAULTPRINT(p, caplen);
 
+trunc:
+	ND_PRINT("%s", tstr);
 	return (BT_HDRLEN);
 }
 #endif
