@@ -34,6 +34,7 @@
 #include "netdissect-stdinc.h"
 
 #include "netdissect.h"
+static const char tstr[] = " [|nflog]";
 
 #if defined(DLT_NFLOG) && defined(HAVE_PCAP_NFLOG_H)
 #include <pcap/nflog.h>
@@ -71,17 +72,15 @@ nflog_if_print(netdissect_options *ndo,
 			   const struct pcap_pkthdr *h, const u_char *p)
 {
 	const nflog_hdr_t *hdr = (const nflog_hdr_t *)p;
-	const nflog_tlv_t *tlv;
 	uint16_t size;
 	uint16_t h_size = sizeof(nflog_hdr_t);
 	u_int caplen = h->caplen;
 	u_int length = h->len;
 
-	if (caplen < sizeof(nflog_hdr_t) || length < sizeof(nflog_hdr_t)) {
-		ND_PRINT("[|nflog]");
-		return h_size;
-	}
+	if (caplen < sizeof(nflog_hdr_t) || length < sizeof(nflog_hdr_t))
+		goto trunc;
 
+	ND_TCHECK_SIZE(hdr);
 	if (hdr->nflog_version != 0) {
 		ND_PRINT("version %u (unknown)", hdr->nflog_version);
 		return h_size;
@@ -95,31 +94,25 @@ nflog_if_print(netdissect_options *ndo,
 	caplen -= sizeof(nflog_hdr_t);
 
 	while (length > 0) {
+		const nflog_tlv_t *tlv;
+
 		/* We have some data.  Do we have enough for the TLV header? */
-		if (caplen < sizeof(nflog_tlv_t) || length < sizeof(nflog_tlv_t)) {
-			/* No. */
-			ND_PRINT("[|nflog]");
-			return h_size;
-		}
+		if (caplen < sizeof(nflog_tlv_t) || length < sizeof(nflog_tlv_t))
+			goto trunc;	/* No. */
 
 		tlv = (const nflog_tlv_t *) p;
+		ND_TCHECK_SIZE(tlv);
 		size = tlv->tlv_length;
 		if (size % 4 != 0)
 			size += 4 - size % 4;
 
 		/* Is the TLV's length less than the minimum? */
-		if (size < sizeof(nflog_tlv_t)) {
-			/* Yes. Give up now. */
-			ND_PRINT("[|nflog]");
-			return h_size;
-		}
+		if (size < sizeof(nflog_tlv_t))
+			goto trunc;	/* Yes. Give up now. */
 
 		/* Do we have enough data for the full TLV? */
-		if (caplen < size || length < size) {
-			/* No. */
-			ND_PRINT("[|nflog]");
-			return h_size;
-		}
+		if (caplen < size || length < size)
+			goto trunc;	/* No. */
 
 		if (tlv->tlv_type == NFULA_PAYLOAD) {
 			/*
@@ -162,6 +155,9 @@ nflog_if_print(netdissect_options *ndo,
 		break;
 	}
 
+	return h_size;
+trunc:
+	ND_PRINT("%s", tstr);
 	return h_size;
 }
 
