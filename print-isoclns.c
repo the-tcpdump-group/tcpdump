@@ -3020,11 +3020,11 @@ isis_print(netdissect_options *ndo,
 		ND_TCHECK_1(tlv_lsp->lsp_id + LSP_ID_LEN - 1);
 		ND_PRINT("\n\t      lsp-id: %s",
                        isis_print_id(tlv_lsp->lsp_id, LSP_ID_LEN));
-		ND_TCHECK_LEN(tlv_lsp->sequence_number, 4);
+		ND_TCHECK_4(tlv_lsp->sequence_number);
 		ND_PRINT(", seq: 0x%08x", EXTRACT_BE_U_4(tlv_lsp->sequence_number));
-		ND_TCHECK_LEN(tlv_lsp->remaining_lifetime, 2);
+		ND_TCHECK_2(tlv_lsp->remaining_lifetime);
 		ND_PRINT(", lifetime: %5ds", EXTRACT_BE_U_2(tlv_lsp->remaining_lifetime));
-		ND_TCHECK_LEN(tlv_lsp->checksum, 2);
+		ND_TCHECK_2(tlv_lsp->checksum);
 		ND_PRINT(", chksum: 0x%04x", EXTRACT_BE_U_2(tlv_lsp->checksum));
 		tmp-=sizeof(struct isis_tlv_lsp);
 		tlv_lsp++;
