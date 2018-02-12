@@ -298,7 +298,7 @@ bootp_print(netdissect_options *ndo,
 	bp_htype = EXTRACT_U_1(bp->bp_htype);
 	bp_hlen = EXTRACT_U_1(bp->bp_hlen);
 	if (bp_htype == 1 && bp_hlen == 6 && bp_op == BOOTPREQUEST) {
-		ND_TCHECK_LEN(bp->bp_chaddr, 6);
+		ND_TCHECK_6(bp->bp_chaddr);
 		ND_PRINT(" from %s", etheraddr_string(ndo, bp->bp_chaddr));
 	}
 
@@ -353,7 +353,7 @@ bootp_print(netdissect_options *ndo,
 
 	/* Client's Ethernet address */
 	if (bp_htype == 1 && bp_hlen == 6) {
-		ND_TCHECK_LEN(bp->bp_chaddr, 6);
+		ND_TCHECK_6(bp->bp_chaddr);
 		ND_PRINT("\n\t  Client-Ethernet-Address %s", etheraddr_string(ndo, bp->bp_chaddr));
 	}
 
@@ -381,7 +381,7 @@ bootp_print(netdissect_options *ndo,
 	}
 
 	/* Decode the vendor buffer */
-	ND_TCHECK_LEN(bp->bp_vend, 4);
+	ND_TCHECK_4(bp->bp_vend);
 	if (memcmp((const char *)bp->bp_vend, vm_rfc1048,
 		    sizeof(uint32_t)) == 0)
 		rfc1048_print(ndo, bp->bp_vend);
