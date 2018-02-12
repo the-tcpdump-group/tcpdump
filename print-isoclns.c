@@ -677,7 +677,7 @@ struct isis_tlv_lsp {
 #define ISIS_PSNP_HEADER_SIZE (sizeof(struct isis_psnp_header))
 
 void
-isoclns_print(netdissect_options *ndo, const uint8_t *p, u_int length)
+isoclns_print(netdissect_options *ndo, const u_char *p, u_int length)
 {
 	if (!ND_TTEST_1(p)) { /* enough bytes on the wire ? */
 		ND_PRINT("|OSI");
