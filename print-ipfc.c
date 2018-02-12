@@ -34,6 +34,8 @@
 #include "netdissect.h"
 #include "addrtoname.h"
 
+static const char tstr[] = " [|ipfc]";
+
 struct ipfc_header {
 	nd_byte ipfc_dhost[2+MAC_ADDR_LEN];
 	nd_byte ipfc_shost[2+MAC_ADDR_LEN];
@@ -44,7 +46,7 @@ struct ipfc_header {
 /* Extract src, dst addresses */
 static void
 extract_ipfc_addrs(const struct ipfc_header *ipfcp, char *ipfcsrc,
-    char *ipfcdst)
+		   char *ipfcdst)
 {
 	/*
 	 * We assume that, as per RFC 2625, the lower 48 bits of the
@@ -59,9 +61,8 @@ extract_ipfc_addrs(const struct ipfc_header *ipfcp, char *ipfcsrc,
  */
 static void
 ipfc_hdr_print(netdissect_options *ndo,
-	   const struct ipfc_header *ipfcp _U_,
-	   u_int length, const u_char *ipfcsrc,
-	   const u_char *ipfcdst)
+	       const struct ipfc_header *ipfcp _U_, u_int length,
+	       const u_char *ipfcsrc, const u_char *ipfcdst)
 {
 	const char *srcname, *dstname;
 
@@ -94,13 +95,12 @@ ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 	struct lladdr_info src, dst;
 	int llc_hdrlen;
 
-	if (caplen < IPFC_HDRLEN) {
-		ND_PRINT("[|ipfc]");
-		return (caplen);
-	}
+	if (caplen < IPFC_HDRLEN)
+		goto trunc;
 	/*
 	 * Get the network addresses into a canonical form
 	 */
+	ND_TCHECK_SIZE(ipfcp);
 	extract_ipfc_addrs(ipfcp, (char *)srcmac, (char *)dstmac);
 
 	if (ndo->ndo_eflag)
@@ -128,6 +128,9 @@ ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 		llc_hdrlen = -llc_hdrlen;
 	}
 	return (IPFC_HDRLEN + llc_hdrlen);
+trunc:
+	ND_PRINT("%s", tstr);
+	return caplen;
 }
 
 /*
