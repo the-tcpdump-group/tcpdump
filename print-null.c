@@ -30,7 +30,10 @@
 #include <string.h>
 
 #include "netdissect.h"
+#include "extract.h"
 #include "af.h"
+
+static const char tstr[] = " [|null]";
 
 /*
  * The DLT_NULL packet header is 4 bytes long. It contains a host-byte-order
@@ -77,13 +80,12 @@ null_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 {
 	u_int length = h->len;
 	u_int caplen = h->caplen;
-	u_int family;
+	uint32_t family;
 
-	if (caplen < NULL_HDRLEN) {
-		ND_PRINT("[|null]");
-		return (NULL_HDRLEN);
-	}
+	if (caplen < NULL_HDRLEN)
+		goto trunc;
 
+	ND_TCHECK_4(p);
 	memcpy((char *)&family, (const char *)p, sizeof(family));
 
 	/*
@@ -136,6 +138,9 @@ null_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 			ND_DEFAULTPRINT(p, caplen);
 	}
 
+	return (NULL_HDRLEN);
+trunc:
+	ND_PRINT("%s", tstr);
 	return (NULL_HDRLEN);
 }
 
