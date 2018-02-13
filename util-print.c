@@ -107,15 +107,7 @@ fn_print(netdissect_options *ndo,
 			ret = 0;
 			break;
 		}
-		if (!ND_ISASCII(c)) {
-			c = ND_TOASCII(c);
-			ND_PRINT("M-");
-		}
-		if (!ND_ISPRINT(c)) {
-			c ^= 0x40;	/* DEL to ?, others to alpha */
-			ND_PRINT("^");
-		}
-		ND_PRINT("%c", c);
+		fn_print_char(ndo, c);
 	}
 	return(ret);
 }
@@ -158,15 +150,7 @@ fn_printztn(netdissect_options *ndo,
 			/* End of string */
 			break;
 		}
-		if (!ND_ISASCII(c)) {
-			c = ND_TOASCII(c);
-			ND_PRINT("M-");
-		}
-		if (!ND_ISPRINT(c)) {
-			c ^= 0x40;	/* DEL to ?, others to alpha */
-			ND_PRINT("^");
-		}
-		ND_PRINT("%c", c);
+		fn_print_char(ndo, c);
 	}
 	return(bytes);
 }
@@ -187,15 +171,7 @@ fn_printn(netdissect_options *ndo,
 		n--;
 		c = EXTRACT_U_1(s);
 		s++;
-		if (!ND_ISASCII(c)) {
-			c = ND_TOASCII(c);
-			ND_PRINT("M-");
-		}
-		if (!ND_ISPRINT(c)) {
-			c ^= 0x40;	/* DEL to ?, others to alpha */
-			ND_PRINT("^");
-		}
-		ND_PRINT("%c", c);
+		fn_print_char(ndo, c);
 	}
 	return (n == 0) ? 0 : 1;
 }
@@ -224,15 +200,7 @@ fn_printzp(netdissect_options *ndo,
 			ret = 0;
 			break;
 		}
-		if (!ND_ISASCII(c)) {
-			c = ND_TOASCII(c);
-			ND_PRINT("M-");
-		}
-		if (!ND_ISPRINT(c)) {
-			c ^= 0x40;	/* DEL to ?, others to alpha */
-			ND_PRINT("^");
-		}
-		ND_PRINT("%c", c);
+		fn_print_char(ndo, c);
 	}
 	return (n == 0) ? 0 : ret;
 }
