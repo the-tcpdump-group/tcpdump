@@ -31,6 +31,8 @@
 #include "addrtoname.h"
 #include "oui.h"
 
+static const char tstr[] = " [|slow]";
+
 #define	SLOW_PROTO_LACP                     1
 #define	SLOW_PROTO_MARKER                   2
 #define SLOW_PROTO_OAM                      3
@@ -338,10 +340,7 @@ tooshort:
     return;
 
 trunc:
-    if (!ndo->ndo_vflag)
-        ND_PRINT(" (packet exceeded snapshot)");
-    else
-        ND_PRINT("\n\t\t packet exceeded snapshot");
+    ND_PRINT("%s", tstr);
 }
 
 static void
@@ -483,7 +482,7 @@ tooshort:
     return;
 
 trunc:
-    ND_PRINT("\n\t\t packet exceeded snapshot");
+    ND_PRINT("%s", tstr);
 }
 
 static void
@@ -750,5 +749,5 @@ tooshort:
     return;
 
 trunc:
-    ND_PRINT("\n\t\t packet exceeded snapshot");
+    ND_PRINT("%s", tstr);
 }

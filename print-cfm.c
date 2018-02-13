@@ -31,6 +31,8 @@
 #include "oui.h"
 #include "af.h"
 
+static const char tstr[] = " [|cfm]";
+
 struct cfm_common_header_t {
     nd_uint8_t mdlevel_version;
     nd_uint8_t opcode;
@@ -764,5 +766,5 @@ tooshort:
     return;
 
 trunc:
-    ND_PRINT("\n\t\t packet exceeded snapshot");
+    ND_PRINT("%s", tstr);
 }

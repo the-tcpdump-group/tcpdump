@@ -31,6 +31,8 @@
 #include "addrtoname.h"
 #include "gmpls.h"
 
+static const char tstr[] = " [|lmp]";
+
 /*
  * LMP common header
  *
@@ -1131,7 +1133,7 @@ lmp_print(netdissect_options *ndo,
     }
     return;
 trunc:
-    ND_PRINT("\n\t\t packet exceeded snapshot");
+    ND_PRINT("%s", tstr);
 }
 /*
  * Local Variables:

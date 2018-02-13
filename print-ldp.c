@@ -29,6 +29,8 @@
 #include "l2vpn.h"
 #include "af.h"
 
+static const char tstr[] = " [|ldp]";
+
 /*
  * ldp common header
  *
@@ -534,7 +536,7 @@ ldp_tlv_print(netdissect_options *ndo,
     return(tlv_len+4); /* Type & Length fields not included */
 
 trunc:
-    ND_PRINT("\n\t\t packet exceeded snapshot");
+    ND_PRINT("%s", tstr);
     return 0;
 
 badtlv:
@@ -686,7 +688,7 @@ ldp_pdu_print(netdissect_options *ndo,
     }
     return pdu_len+4;
 trunc:
-    ND_PRINT("\n\t\t packet exceeded snapshot");
+    ND_PRINT("%s", tstr);
     return 0;
 }
 

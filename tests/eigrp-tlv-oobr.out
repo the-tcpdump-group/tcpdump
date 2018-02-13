@@ -4132,5 +4132,4 @@ c2:02:73:fe:00:00 > 01:00:5e:00:00:0a, ethertype IPv4 (0x0800), length 65535: (t
 	  Software Version TLV (0x0004), length: 4 (too short, < 8)
 	  Software Version TLV (0x0004), length: 4 (too short, < 8)
 	  Software Version TLV (0x0004), length: 4 (too short, < 8)
-	  Software Version TLV (0x0004), length: 4 (too short, < 8)
-		 packet exceeded snapshot
+	  Software Version TLV (0x0004), length: 4 (too short, < 8) [|eigrp]

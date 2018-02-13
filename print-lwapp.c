@@ -29,6 +29,9 @@
 #include "extract.h"
 #include "addrtoname.h"
 
+static const char control_tstr[] = " [|lwapp_control]";
+static const char data_tstr[] = " [|lwapp_data]";
+
 /*
  * LWAPP transport (common) header
  *      0                   1                   2                   3
@@ -291,8 +294,8 @@ lwapp_control_print(netdissect_options *ndo,
     }
     return;
 
- trunc:
-    ND_PRINT("\n\t\t packet exceeded snapshot");
+trunc:
+    ND_PRINT("%s", control_tstr);
 }
 
 void
@@ -359,8 +362,8 @@ lwapp_data_print(netdissect_options *ndo,
 
     return;
 
- trunc:
-    ND_PRINT("\n\t\t packet exceeded snapshot");
+trunc:
+    ND_PRINT("%s", data_tstr);
 }
 
 /*
