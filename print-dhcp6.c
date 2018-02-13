@@ -105,13 +105,11 @@ static const struct tok dh6_msgtype_str[] = {
 /* DHCP6 base packet format */
 struct dhcp6 {
 	union {
-		nd_uint8_t m;
-		nd_uint32_t x;
+		nd_uint8_t msgtype;
+		nd_uint32_t xid;
 	} dh6_msgtypexid;
 	/* options follow */
 };
-#define dh6_msgtype	dh6_msgtypexid.m
-#define dh6_xid		dh6_msgtypexid.x
 #define DH6_XIDMASK	0x00ffffff
 
 /* DHCPv6 relay messages */
@@ -805,8 +803,8 @@ dhcp6_print(netdissect_options *ndo,
 
 	dh6 = (const struct dhcp6 *)cp;
 	dh6relay = (const struct dhcp6_relay *)cp;
-	ND_TCHECK_4(dh6->dh6_xid);
-	msgtype = EXTRACT_U_1(dh6->dh6_msgtype);
+	ND_TCHECK_4(dh6->dh6_msgtypexid.xid);
+	msgtype = EXTRACT_U_1(dh6->dh6_msgtypexid.msgtype);
 	name = tok2str(dh6_msgtype_str, "msgtype-%u", msgtype);
 
 	if (!ndo->ndo_vflag) {
@@ -818,7 +816,8 @@ dhcp6_print(netdissect_options *ndo,
 
 	ND_PRINT(" %s (", name);	/*)*/
 	if (msgtype != DH6_RELAY_FORW && msgtype != DH6_RELAY_REPLY) {
-		ND_PRINT("xid=%x", EXTRACT_BE_U_4(dh6->dh6_xid) & DH6_XIDMASK);
+		ND_PRINT("xid=%x",
+			 EXTRACT_BE_U_4(dh6->dh6_msgtypexid.xid) & DH6_XIDMASK);
 		extp = (const u_char *)(dh6 + 1);
 		dhcp6opt_print(ndo, extp, ep);
 	} else {		/* relay messages */
