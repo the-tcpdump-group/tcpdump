@@ -1281,7 +1281,7 @@ icmp6_print(netdissect_options *ndo,
 			ND_TCHECK_2(dp->icmp6_data16[0]);
 			ND_PRINT(", id 0x%04x", EXTRACT_BE_U_2(dp->icmp6_data16[0]));
 			cp = (const u_char *)dp + length;
-			in6 = (const nd_ipv6 *)(dp + 1);
+			in6 = (const nd_ipv6 *)(const u_char *)(dp + 1);
 			for (; (const u_char *)in6 < cp; in6++) {
 				ND_TCHECK_SIZE(in6);
 				ND_PRINT(", %s", ip6addr_string(ndo, (const u_char *)in6));
