@@ -87,8 +87,8 @@ struct	rip6 {
 
 static int ND_IN6_IS_ADDR_UNSPECIFIED(const nd_ipv6 *addr)
 {
-    static const struct in6_addr in6addr_any;        /* :: */
-    return (memcmp(addr, &in6addr_any, sizeof(*addr)) == 0);
+    static const struct in6_addr in6addr_any_val;        /* :: */
+    return (memcmp(addr, &in6addr_any_val, sizeof(*addr)) == 0);
 }
 
 static int
