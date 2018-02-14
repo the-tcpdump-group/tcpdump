@@ -125,15 +125,7 @@ c_print(netdissect_options *ndo,
 			flag = 0;
 			break;
 		}
-		if (!ND_ISASCII(c)) {
-			c = ND_TOASCII(c);
-			ND_PRINT("M-");
-		}
-		if (!ND_ISPRINT(c)) {
-			c ^= 0x40;	/* DEL to ?, others to alpha */
-			ND_PRINT("^");
-		}
-		ND_PRINT("%c", c);
+		fn_print_char(ndo, c);
 	}
 	if (flag)
 		return NULL;
