@@ -10875,5 +10875,4 @@
 	      IPv6 prefix: ::/0, Distribution: up, Metric: 0, Internal
 	      IPv6 prefix: ::/0, Distribution: up, Metric: 0, Internal
 	      IPv6 prefix: ::/0, Distribution: up, Metric: 0, Internal
-	      IPv6 prefix: ::/0, Distribution: up, Metric: 0, Internal
-		 [|isis]
+	      IPv6 prefix: ::/0, Distribution: up, Metric: 0, Internal [|isis]

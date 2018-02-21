@@ -2678,7 +2678,7 @@ isis_print(netdissect_options *ndo,
 
         case ISIS_TLV_ISNEIGH_VARLEN:
             if (!ND_TTEST_1(tptr) || tmp < 3) /* min. TLV length */
-		goto trunctlv;
+		goto trunc;
 	    lan_alen = EXTRACT_U_1(tptr); /* LAN address length */
 	    tptr++;
 	    if (lan_alen == 0) {
@@ -2701,13 +2701,13 @@ isis_print(netdissect_options *ndo,
         case ISIS_TLV_MT_IS_REACH:
             mt_len = isis_print_mtid(ndo, tptr, "\n\t      ");
             if (mt_len == 0) /* did something go wrong ? */
-                goto trunctlv;
+                goto trunc;
             tptr+=mt_len;
             tmp-=mt_len;
             while (tmp >= 2+NODE_ID_LEN+3+1) {
                 ext_is_len = isis_print_ext_is_reach(ndo, tptr, "\n\t      ", tlv_type, tmp);
                 if (ext_is_len == 0) /* did something go wrong ? */
-                    goto trunctlv;
+                    goto trunc;
 
                 tmp-=ext_is_len;
                 tptr+=ext_is_len;
@@ -2718,7 +2718,7 @@ isis_print(netdissect_options *ndo,
 	    while (tmp >= NODE_ID_LEN+1) { /* is it worth attempting a decode ? */
 	        ext_is_len = isis_print_ext_is_reach(ndo, tptr, "\n\t      ", tlv_type, tmp);
 		if (ext_is_len == 0) /* did something go wrong ? */
-	            goto trunctlv;
+	            goto trunc;
 		tmp-=ext_is_len;
 		tptr+=ext_is_len;
 	    }
@@ -2728,7 +2728,7 @@ isis_print(netdissect_options *ndo,
             while (tmp >= NODE_ID_LEN+3+1) { /* is it worth attempting a decode ? */
                 ext_is_len = isis_print_ext_is_reach(ndo, tptr, "\n\t      ", tlv_type, tmp);
                 if (ext_is_len == 0) /* did something go wrong ? */
-                    goto trunctlv;
+                    goto trunc;
                 tmp-=ext_is_len;
                 tptr+=ext_is_len;
             }
@@ -2774,7 +2774,7 @@ isis_print(netdissect_options *ndo,
 	    while (tmp>0) {
                 ext_ip_len = isis_print_extd_ip_reach(ndo, tptr, "\n\t      ", AF_INET);
                 if (ext_ip_len == 0) /* did something go wrong ? */
-                    goto trunctlv;
+                    goto trunc;
                 tptr+=ext_ip_len;
 		tmp-=ext_ip_len;
 	    }
@@ -2783,7 +2783,7 @@ isis_print(netdissect_options *ndo,
         case ISIS_TLV_MT_IP_REACH:
             mt_len = isis_print_mtid(ndo, tptr, "\n\t      ");
             if (mt_len == 0) { /* did something go wrong ? */
-                goto trunctlv;
+                goto trunc;
             }
             tptr+=mt_len;
             tmp-=mt_len;
@@ -2791,7 +2791,7 @@ isis_print(netdissect_options *ndo,
             while (tmp>0) {
                 ext_ip_len = isis_print_extd_ip_reach(ndo, tptr, "\n\t      ", AF_INET);
                 if (ext_ip_len == 0) /* did something go wrong ? */
-                    goto trunctlv;
+                    goto trunc;
                 tptr+=ext_ip_len;
 		tmp-=ext_ip_len;
 	    }
@@ -2801,7 +2801,7 @@ isis_print(netdissect_options *ndo,
 	    while (tmp>0) {
                 ext_ip_len = isis_print_extd_ip_reach(ndo, tptr, "\n\t      ", AF_INET6);
                 if (ext_ip_len == 0) /* did something go wrong ? */
-                    goto trunctlv;
+                    goto trunc;
                 tptr+=ext_ip_len;
 		tmp-=ext_ip_len;
 	    }
@@ -2810,7 +2810,7 @@ isis_print(netdissect_options *ndo,
 	case ISIS_TLV_MT_IP6_REACH:
             mt_len = isis_print_mtid(ndo, tptr, "\n\t      ");
             if (mt_len == 0) { /* did something go wrong ? */
-                goto trunctlv;
+                goto trunc;
             }
             tptr+=mt_len;
             tmp-=mt_len;
@@ -2818,7 +2818,7 @@ isis_print(netdissect_options *ndo,
 	    while (tmp>0) {
                 ext_ip_len = isis_print_extd_ip_reach(ndo, tptr, "\n\t      ", AF_INET6);
                 if (ext_ip_len == 0) /* did something go wrong ? */
-                    goto trunctlv;
+                    goto trunc;
                 tptr+=ext_ip_len;
 		tmp-=ext_ip_len;
 	    }
@@ -2846,7 +2846,7 @@ isis_print(netdissect_options *ndo,
 	    switch (EXTRACT_U_1(tptr)) {
 	    case ISIS_SUBTLV_AUTH_SIMPLE:
 		if (fn_printzp(ndo, tptr + 1, tlv_len - 1, ndo->ndo_snapend))
-		    goto trunctlv;
+		    goto trunc;
 		break;
 	    case ISIS_SUBTLV_AUTH_MD5:
 		for(i=1;i<tlv_len;i++) {
@@ -2974,7 +2974,7 @@ isis_print(netdissect_options *ndo,
 	case ISIS_TLV_HOSTNAME:
 	    ND_PRINT("\n\t      Hostname: ");
 	    if (fn_printzp(ndo, tptr, tmp, ndo->ndo_snapend))
-		goto trunctlv;
+		goto trunc;
 	    break;
 
 	case ISIS_TLV_SHARED_RISK_GROUP:
@@ -3068,7 +3068,7 @@ isis_print(netdissect_options *ndo,
 		if (tmp!=1) {
                     mt_len = isis_print_mtid(ndo, tptr, "\n\t      ");
                     if (mt_len == 0) /* did something go wrong ? */
-                        goto trunctlv;
+                        goto trunc;
                     tptr+=mt_len;
                     tmp-=mt_len;
 		} else {
@@ -3229,14 +3229,9 @@ isis_print(netdissect_options *ndo,
     }
     return (1);
 
- trunc:
+trunc:
     ND_PRINT("%s", tstr);
     return (1);
-
- trunctlv:
-    ND_PRINT("\n\t\t");
-    ND_PRINT("%s", tstr);
-    return(1);
 }
 
 static void
