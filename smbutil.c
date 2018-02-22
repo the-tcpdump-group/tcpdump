@@ -275,7 +275,7 @@ name_type_str(int name_type)
 }
 
 void
-smb_print_data(netdissect_options *ndo, const u_char *buf, u_int len)
+smb_data_print(netdissect_options *ndo, const u_char *buf, u_int len)
 {
     u_int i = 0;
 
@@ -889,7 +889,7 @@ smb_fdata(netdissect_options *ndo,
     if (!depth && buf < maxbuf) {
 	size_t len = PTR_DIFF(maxbuf, buf);
 	ND_PRINT("Data: (%lu bytes)\n", (unsigned long)len);
-	smb_print_data(ndo, buf, len);
+	smb_data_print(ndo, buf, len);
 	return(buf + len);
     }
     return(buf);

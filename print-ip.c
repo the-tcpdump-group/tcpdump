@@ -514,7 +514,7 @@ again:
 }
 
 void
-ip_print_inner(netdissect_options *ndo,
+ip_inner_print(netdissect_options *ndo,
 	       const u_char *bp,
 	       u_int length, u_int nh,
 	       const u_char *bp2)

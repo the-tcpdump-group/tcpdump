@@ -3123,7 +3123,7 @@ isakmp_rfc3948_print(netdissect_options *ndo,
 		length -= advance + padlen;
 		nh = enh & 0xff;
 
-		ip_print_inner(ndo, bp, length, nh, bp2);
+		ip_inner_print(ndo, bp, length, nh, bp2);
 		return;
 	}
 
