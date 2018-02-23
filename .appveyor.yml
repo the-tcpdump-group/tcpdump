@@ -12,6 +12,8 @@ matrix:
 install:
   - appveyor DownloadFile http://www.winpcap.org/install/bin/WpdPack_4_1_2.zip
   - 7z x .\WpdPack_4_1_2.zip -oc:\projects\libpcap\Win32
+  - appveyor DownloadFile https://www.winpcap.org/install/bin/WinPcap_4_1_3.exe
+  - .\WinPcap_4_1_3.exe
 
 build_script:
   - md build
