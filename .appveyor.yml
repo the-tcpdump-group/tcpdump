@@ -13,7 +13,7 @@ install:
   - appveyor DownloadFile https://nmap.org/npcap/dist/npcap-sdk-0.1.zip
   - 7z x .\npcap-sdk-0.1.zip -oc:\projects\libpcap\Win32
   - appveyor DownloadFile https://nmap.org/npcap/dist/npcap-0.98.exe
-  - .\npcap-0.98.exe /s /disable_restore_point=yes
+  - .\npcap-0.98.exe /S /disable_restore_point=yes
 
 build_script:
   - md build
