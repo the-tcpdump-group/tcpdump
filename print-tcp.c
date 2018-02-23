@@ -288,6 +288,8 @@ tcp_print(netdissect_options *ndo,
 
                         if (!th->nxt || (flags & TH_SYN)) {
                                 /* didn't find it or new conversation */
+				/* calloc() return used by the 'tcp_seq_hash6'
+				   hash table: do not free() */
                                 if (th->nxt == NULL) {
                                         th->nxt = (struct tcp_seq_hash6 *)
                                                 calloc(1, sizeof(*th));
@@ -343,6 +345,8 @@ tcp_print(netdissect_options *ndo,
 
                         if (!th->nxt || (flags & TH_SYN)) {
                                 /* didn't find it or new conversation */
+				/* calloc() return used by the 'tcp_seq_hash4'
+				   hash table: do not free() */
                                 if (th->nxt == NULL) {
                                         th->nxt = (struct tcp_seq_hash *)
                                                 calloc(1, sizeof(*th));

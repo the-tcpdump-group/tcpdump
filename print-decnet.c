@@ -1243,6 +1243,7 @@ dnnum_string(netdissect_options *ndo, u_short dnaddr)
 	u_int area = (u_short)(dnaddr & AREAMASK) >> AREASHIFT;
 	u_int node = dnaddr & NODEMASK;
 
+	/* malloc() return used by the 'dnaddrtable' hash table: do not free() */
 	str = (char *)malloc(siz = sizeof("00.0000"));
 	if (str == NULL)
 		(*ndo->ndo_error)(ndo, "dnnum_string: malloc");
