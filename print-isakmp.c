@@ -2650,7 +2650,7 @@ ikev2_e_print(netdissect_options *ndo,
 	      int depth)
 {
 	const u_char *dat;
-	volatile u_int dlen;
+	u_int dlen;
 #ifdef HAVE_LIBCRYPTO
 	uint8_t np;
 #endif
