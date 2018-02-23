@@ -10,11 +10,13 @@ matrix:
   fast_finish: true
 
 install:
-  - appveyor DownloadFile http://www.winpcap.org/install/bin/WpdPack_4_1_2.zip
-  - 7z x .\WpdPack_4_1_2.zip -oc:\projects\libpcap\Win32
+  - appveyor DownloadFile https://nmap.org/npcap/dist/npcap-sdk-0.1.zip
+  - 7z x .\npcap-sdk-0.1.zip -oc:\projects\libpcap\Win32
+  - appveyor DownloadFile https://nmap.org/npcap/dist/npcap-0.98.exe
+  - .\npcap-0.98.exe /s /disable_restore_point=yes
 
 build_script:
   - md build
   - cd build
-  - cmake -DCMAKE_PREFIX_PATH=c:\projects\libpcap\Win32\WpdPack -G"Visual Studio 12 2013" ..
+  - cmake -DCMAKE_PREFIX_PATH=c:\projects\libpcap\Win32\npcap-sdk-0.1 -G"Visual Studio 12 2013" ..
   - msbuild -nologo -p:Configuration=Release tcpdump.sln
