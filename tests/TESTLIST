@@ -321,6 +321,10 @@ dhcp-mud	dhcp-mud.pcap		dhcp-mud.out	-vv
 medsa		medsa.pcap		medsa.out
 medsa-e		medsa.pcap		medsa-e.out	-e
 
+# PTP tests
+ptp-ipv4	ptp-ipv4.pcap		ptp-ipv4.out
+ptp-l2		ptp-l2-e.pcap		ptp-l2-e.out	-e
+
 # VXLAN tests
 vxlan  vxlan.pcap  vxlan.out  -# -e
 

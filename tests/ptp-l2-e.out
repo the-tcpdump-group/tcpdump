@@ -1,0 +1,10 @@
+f0:ad:4e:03:69:9c > 01:1b:19:00:00:00, ethertype PTP (0x88f7), length 78: PTP 0, Announce, [TS], 17342604601458911644:1
+f0:ad:4e:03:69:9c > 01:1b:19:00:00:00, ethertype PTP (0x88f7), length 58: PTP 0, Sync, [2S], 17342604601458911644:1
+f0:ad:4e:03:69:9c > 01:1b:19:00:00:00, ethertype PTP (0x88f7), length 58: PTP 0, Follow Up, [none], 17342604601458911644:1
+f0:ad:4e:03:69:9c > 01:1b:19:00:00:00, ethertype PTP (0x88f7), length 58: PTP 1, Sync, [2S], 17342604601458911644:1
+f0:ad:4e:03:69:9c > 01:1b:19:00:00:00, ethertype PTP (0x88f7), length 58: PTP 1, Follow Up, [none], 17342604601458911644:1
+f0:ad:4e:03:69:9c > 01:1b:19:00:00:00, ethertype PTP (0x88f7), length 78: PTP 1, Announce, [TS], 17342604601458911644:1
+f0:ad:4e:03:69:9c > 01:1b:19:00:00:00, ethertype PTP (0x88f7), length 58: PTP 2, Sync, [2S], 17342604601458911644:1
+f0:ad:4e:03:69:9c > 01:1b:19:00:00:00, ethertype PTP (0x88f7), length 58: PTP 2, Follow Up, [none], 17342604601458911644:1
+f0:ad:4e:03:69:9c > 01:1b:19:00:00:00, ethertype PTP (0x88f7), length 58: PTP 3, Sync, [2S], 17342604601458911644:1
+f0:ad:4e:03:69:9c > 01:1b:19:00:00:00, ethertype PTP (0x88f7), length 58: PTP 3, Follow Up, [none], 17342604601458911644:1

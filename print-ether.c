@@ -101,6 +101,7 @@ const struct tok ethertype_values[] = {
     { ETHERTYPE_CALM_FAST,      "CALM FAST"},
     { ETHERTYPE_AOE,            "AoE" },
     { ETHERTYPE_MEDSA,          "MEDSA" },
+    { ETHERTYPE_PTP,		"PTP" },
     { 0, NULL}
 };
 
@@ -460,6 +461,10 @@ ethertype_print(netdissect_options *ndo,
 
 	case ETHERTYPE_AOE:
 		aoe_print(ndo, p, length);
+		return (1);
+
+	case ETHERTYPE_PTP:
+		ptp_print(ndo, p, length);
 		return (1);
 
 	case ETHERTYPE_MEDSA:

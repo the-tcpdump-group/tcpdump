@@ -101,6 +101,12 @@ struct udphdr {
 #ifndef APPLETALK_ZONE_INFO_PORT
 #define APPLETALK_ZONE_INFO_PORT	206	/*XXX*/
 #endif
+#ifndef PTP_EVENT_PORT
+#define PTP_EVENT_PORT			319	/*XXX*/
+#endif
+#ifndef PTP_MESSAGE_PORT
+#define PTP_MESSAGE_PORT		320	/*XXX*/
+#endif
 #ifndef LDAP_PORT
 #define LDAP_PORT			389	/*XXX*/
 #endif

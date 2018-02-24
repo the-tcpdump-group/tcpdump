@@ -553,6 +553,10 @@ SOURCE="..\..\print-pptp.c"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\print-ptp.c"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\print-radius.c"
 # End Source File
 # Begin Source File

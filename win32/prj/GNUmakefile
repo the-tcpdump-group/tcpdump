@@ -111,6 +111,7 @@ OBJS = \
 	../../print-ppp.o \
 	../../print-pppoe.o \
 	../../print-pptp.o \
+	../../print-ptp.o \
 	../../print-radius.o \
 	../../print-raw.o \
 	../../print-rrcp.o \

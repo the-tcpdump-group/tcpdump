@@ -611,6 +611,8 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			ntp_print(ndo, (const u_char *)(up + 1), length);
 		else if (IS_SRC_OR_DST_PORT(KERBEROS_PORT) || IS_SRC_OR_DST_PORT(KERBEROS_SEC_PORT))
 			krb_print(ndo, (const void *)(up + 1));
+		else if (IS_SRC_OR_DST_PORT(PTP_EVENT_PORT) || IS_SRC_OR_DST_PORT(PTP_MESSAGE_PORT))
+			ptp_print(ndo, (const u_char *)(up + 1), length);
 		else if (IS_SRC_OR_DST_PORT(L2TP_PORT))
 			l2tp_print(ndo, (const u_char *)(up + 1), length);
 #ifdef ENABLE_SMB
