@@ -29,6 +29,7 @@
 #include "os-proto.h"
 #endif
 #include <sys/types.h>
+#include "status-exit-codes.h"
 
 /*
  * Data types corresponding to multi-byte integral values within data
@@ -213,8 +214,9 @@ struct netdissect_options {
 		     PRINTFLIKE_FUNCPTR(2, 3);
   /* pointer to function to output errors */
   void NORETURN_FUNCPTR (*ndo_error)(netdissect_options *,
+				     status_exit_codes_t status,
 				     const char *fmt, ...)
-				     PRINTFLIKE_FUNCPTR(2, 3);
+				     PRINTFLIKE_FUNCPTR(3, 4);
   /* pointer to function to output warnings */
   void (*ndo_warning)(netdissect_options *,
 		      const char *fmt, ...)

@@ -125,7 +125,7 @@
 /*
  * hash tables for whatever-to-name translations
  *
- * ndo_error() called on strdup(3) failure
+ * ndo_error() called on strdup(3) failure with S_ERR_ND_MEM_ALLOC status
  */
 
 #define HASHNAMESIZE 4096
@@ -319,8 +319,8 @@ ipaddr_string(netdissect_options *ndo, const u_char *ap)
 
 			p->name = strdup(hp->h_name);
 			if (p->name == NULL)
-				(*ndo->ndo_error)(ndo,
-						  "ipaddr_string: strdup(hp->h_name)");
+				(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+					"ipaddr_string: strdup(hp->h_name)");
 			if (ndo->ndo_Nflag) {
 				/* Remove domain qualifications */
 				dotp = strchr(p->name, '.');
@@ -332,7 +332,8 @@ ipaddr_string(netdissect_options *ndo, const u_char *ap)
 	}
 	p->name = strdup(intoa(addr));
 	if (p->name == NULL)
-		(*ndo->ndo_error)(ndo, "ipaddr_string: strdup(intoa(addr))");
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+				  "ipaddr_string: strdup(intoa(addr))");
 	return (p->name);
 }
 
@@ -381,8 +382,8 @@ ip6addr_string(netdissect_options *ndo, const u_char *ap)
 
 			p->name = strdup(hp->h_name);
 			if (p->name == NULL)
-				(*ndo->ndo_error)(ndo,
-						  "ip6addr_string: strdup(hp->h_name)");
+				(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+					"ip6addr_string: strdup(hp->h_name)");
 			if (ndo->ndo_Nflag) {
 				/* Remove domain qualifications */
 				dotp = strchr(p->name, '.');
@@ -395,7 +396,8 @@ ip6addr_string(netdissect_options *ndo, const u_char *ap)
 	cp = addrtostr6(ap, ntop_buf, sizeof(ntop_buf));
 	p->name = strdup(cp);
 	if (p->name == NULL)
-		(*ndo->ndo_error)(ndo, "ip6addr_string: strdup(cp)");
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+				  "ip6addr_string: strdup(cp)");
 	return (p->name);
 }
 
@@ -429,7 +431,7 @@ lookup_emem(netdissect_options *ndo, const u_char *ep)
 	tp->e_addr2 = k;
 	tp->e_nxt = (struct enamemem *)calloc(1, sizeof(*tp));
 	if (tp->e_nxt == NULL)
-		(*ndo->ndo_error)(ndo, "lookup_emem: calloc");
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC, "lookup_emem: calloc");
 
 	return tp;
 }
@@ -474,13 +476,15 @@ lookup_bytestring(netdissect_options *ndo, const u_char *bs,
 
 	tp->bs_bytes = (u_char *) calloc(1, nlen);
 	if (tp->bs_bytes == NULL)
-		(*ndo->ndo_error)(ndo, "lookup_bytestring: calloc");
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+				  "lookup_bytestring: calloc");
 
 	memcpy(tp->bs_bytes, bs, nlen);
 	tp->bs_nbytes = nlen;
 	tp->bs_nxt = (struct bsnamemem *)calloc(1, sizeof(*tp));
 	if (tp->bs_nxt == NULL)
-		(*ndo->ndo_error)(ndo, "lookup_bytestring: calloc");
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+				  "lookup_bytestring: calloc");
 
 	return tp;
 }
@@ -520,12 +524,12 @@ lookup_nsap(netdissect_options *ndo, const u_char *nsap,
 	tp->e_addr2 = k;
 	tp->e_nsap = (u_char *)malloc(nsap_length + 1);
 	if (tp->e_nsap == NULL)
-		(*ndo->ndo_error)(ndo, "lookup_nsap: malloc");
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC, "lookup_nsap: malloc");
 	tp->e_nsap[0] = (u_char)nsap_length;	/* guaranteed < ISONSAP_MAX_LENGTH */
 	memcpy((char *)&tp->e_nsap[1], (const char *)nsap, nsap_length);
 	tp->e_nxt = (struct enamemem *)calloc(1, sizeof(*tp));
 	if (tp->e_nxt == NULL)
-		(*ndo->ndo_error)(ndo, "lookup_nsap: calloc");
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC, "lookup_nsap: calloc");
 
 	return tp;
 }
@@ -553,7 +557,7 @@ lookup_protoid(netdissect_options *ndo, const u_char *pi)
 	tp->p_proto = j;
 	tp->p_nxt = (struct protoidmem *)calloc(1, sizeof(*tp));
 	if (tp->p_nxt == NULL)
-		(*ndo->ndo_error)(ndo, "lookup_protoid: calloc");
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC, "lookup_protoid: calloc");
 
 	return tp;
 }
@@ -577,8 +581,8 @@ etheraddr_string(netdissect_options *ndo, const u_char *ep)
 		if (ether_ntohost(buf2, (const struct ether_addr *)ep) == 0) {
 			tp->e_name = strdup(buf2);
 			if (tp->e_name == NULL)
-				(*ndo->ndo_error)(ndo,
-						  "etheraddr_string: strdup(buf2)");
+				(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+					"etheraddr_string: strdup(buf2)");
 			return (tp->e_name);
 		}
 	}
@@ -600,7 +604,8 @@ etheraddr_string(netdissect_options *ndo, const u_char *ep)
 		*cp = '\0';
 	tp->e_name = strdup(buf);
 	if (tp->e_name == NULL)
-		(*ndo->ndo_error)(ndo, "etheraddr_string: strdup(buf)");
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+				  "etheraddr_string: strdup(buf)");
 	return (tp->e_name);
 }
 
@@ -629,7 +634,8 @@ le64addr_string(netdissect_options *ndo, const u_char *ep)
 
 	tp->bs_name = strdup(buf);
 	if (tp->bs_name == NULL)
-		(*ndo->ndo_error)(ndo, "le64addr_string: strdup(buf)");
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+				  "le64addr_string: strdup(buf)");
 
 	return (tp->bs_name);
 }
@@ -657,7 +663,8 @@ linkaddr_string(netdissect_options *ndo, const u_char *ep,
 
 	tp->bs_name = cp = (char *)malloc(len*3);
 	if (tp->bs_name == NULL)
-		(*ndo->ndo_error)(ndo, "linkaddr_string: malloc");
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+				  "linkaddr_string: malloc");
 	*cp++ = hex[*ep >> 4];
 	*cp++ = hex[*ep++ & 0xf];
 	for (i = len-1; i > 0 ; --i) {
@@ -693,7 +700,8 @@ etherproto_string(netdissect_options *ndo, u_short port)
 	*cp++ = '\0';
 	tp->name = strdup(buf);
 	if (tp->name == NULL)
-		(*ndo->ndo_error)(ndo, "etherproto_string: strdup(buf)");
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+				  "etherproto_string: strdup(buf)");
 	return (tp->name);
 }
 
@@ -715,7 +723,8 @@ isonsap_string(netdissect_options *ndo, const u_char *nsap,
 
 	tp->e_name = cp = (char *)malloc(sizeof("xx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xx"));
 	if (cp == NULL)
-		(*ndo->ndo_error)(ndo, "isonsap_string: malloc");
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+				  "isonsap_string: malloc");
 
 	for (nsap_idx = 0; nsap_idx < nsap_length; nsap_idx++) {
 		*cp++ = hex[*nsap >> 4];
@@ -746,7 +755,8 @@ tcpport_string(netdissect_options *ndo, u_short port)
 	(void)nd_snprintf(buf, sizeof(buf), "%u", i);
 	tp->name = strdup(buf);
 	if (tp->name == NULL)
-		(*ndo->ndo_error)(ndo, "tcpport_string: strdup(buf)");
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+				  "tcpport_string: strdup(buf)");
 	return (tp->name);
 }
 
@@ -767,7 +777,8 @@ udpport_string(netdissect_options *ndo, u_short port)
 	(void)nd_snprintf(buf, sizeof(buf), "%u", i);
 	tp->name = strdup(buf);
 	if (tp->name == NULL)
-		(*ndo->ndo_error)(ndo, "udpport_string: strdup(buf)");
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+				  "udpport_string: strdup(buf)");
 	return (tp->name);
 }
 
@@ -795,7 +806,8 @@ ipxsap_string(netdissect_options *ndo, u_short port)
 	*cp++ = '\0';
 	tp->name = strdup(buf);
 	if (tp->name == NULL)
-		(*ndo->ndo_error)(ndo, "ipxsap_string: strdup(buf)");
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+				  "ipxsap_string: strdup(buf)");
 	return (tp->name);
 }
 
@@ -825,7 +837,8 @@ init_servarray(netdissect_options *ndo)
 		} else
 			table->name = strdup(sv->s_name);
 		if (table->name == NULL)
-			(*ndo->ndo_error)(ndo, "init_servarray: strdup");
+			(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+					  "init_servarray: strdup");
 
 		table->addr = port;
 		table->nxt = newhnamemem(ndo);
@@ -911,8 +924,8 @@ init_protoidarray(netdissect_options *ndo)
 		tp = lookup_protoid(ndo, protoid);
 		tp->p_name = strdup(eproto_db[i].s);
 		if (tp->p_name == NULL)
-			(*ndo->ndo_error)(ndo,
-					  "init_protoidarray: strdup(eproto_db[i].s)");
+			(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+				"init_protoidarray: strdup(eproto_db[i].s)");
 	}
 	/* Hardwire some SNAP proto ID names */
 	for (pl = protoidlist; pl->name != NULL; ++pl) {
@@ -965,8 +978,8 @@ init_etherarray(netdissect_options *ndo)
 			tp = lookup_emem(ndo, ep->addr);
 			tp->e_name = strdup(ep->name);
 			if (tp->e_name == NULL)
-				(*ndo->ndo_error)(ndo,
-						  "init_etherarray: strdup(ep->addr)");
+				(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+					"init_etherarray: strdup(ep->addr)");
 		}
 		(void)fclose(fp);
 	}
@@ -986,8 +999,8 @@ init_etherarray(netdissect_options *ndo)
 		if (ether_ntohost(name, (const struct ether_addr *)el->addr) == 0) {
 			tp->e_name = strdup(name);
 			if (tp->e_name == NULL)
-				(*ndo->ndo_error)(ndo,
-						  "init_etherarray: strdup(name)");
+				(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+					"init_etherarray: strdup(name)");
 			continue;
 		}
 #endif
@@ -1287,7 +1300,8 @@ newhnamemem(netdissect_options *ndo)
 		num = 64;
 		ptr = (struct hnamemem *)calloc(num, sizeof (*ptr));
 		if (ptr == NULL)
-			(*ndo->ndo_error)(ndo, "newhnamemem: calloc");
+			(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+					  "newhnamemem: calloc");
 	}
 	--num;
 	p = ptr++;
@@ -1306,7 +1320,8 @@ newh6namemem(netdissect_options *ndo)
 		num = 64;
 		ptr = (struct h6namemem *)calloc(num, sizeof (*ptr));
 		if (ptr == NULL)
-			(*ndo->ndo_error)(ndo, "newh6namemem: calloc");
+			(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+					  "newh6namemem: calloc");
 	}
 	--num;
 	p = ptr++;

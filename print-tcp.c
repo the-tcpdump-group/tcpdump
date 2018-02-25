@@ -295,7 +295,8 @@ tcp_print(netdissect_options *ndo,
                                                 calloc(1, sizeof(*th));
                                         if (th->nxt == NULL)
                                                 (*ndo->ndo_error)(ndo,
-								  "tcp_print: calloc");
+							S_ERR_ND_MEM_ALLOC,
+							"tcp_print: calloc");
                                 }
                                 th->addr = tha;
                                 if (rev)
@@ -352,7 +353,8 @@ tcp_print(netdissect_options *ndo,
                                                 calloc(1, sizeof(*th));
                                         if (th->nxt == NULL)
                                                 (*ndo->ndo_error)(ndo,
-								  "tcp_print: calloc");
+							S_ERR_ND_MEM_ALLOC,
+							"tcp_print: calloc");
                                 }
                                 th->addr = tha;
                                 if (rev)

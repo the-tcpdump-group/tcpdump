@@ -225,8 +225,9 @@ static void	ndo_default_print(netdissect_options *ndo, const u_char *bp,
 		    u_int length);
 
 static void NORETURN ndo_error(netdissect_options *ndo,
+		     status_exit_codes_t status,
 		     FORMAT_STRING(const char *fmt), ...)
-		     PRINTFLIKE(2, 3);
+		     PRINTFLIKE(3, 4);
 static void	ndo_warning(netdissect_options *ndo,
 		    FORMAT_STRING(const char *fmt), ...)
 		    PRINTFLIKE(2, 3);
@@ -298,11 +299,11 @@ get_if_printer(netdissect_options *ndo, int type)
 	if (printer == NULL) {
 		dltname = pcap_datalink_val_to_name(type);
 		if (dltname != NULL)
-			(*ndo->ndo_error)(ndo,
+			(*ndo->ndo_error)(ndo, S_ERR_ND_NO_PRINTER,
 					  "packet printing is not supported for link type %s: use -w",
 					  dltname);
 		else
-			(*ndo->ndo_error)(ndo,
+			(*ndo->ndo_error)(ndo, S_ERR_ND_NO_PRINTER,
 					  "packet printing is not supported for link type %d: use -w", type);
 	}
 	return printer;
@@ -460,7 +461,8 @@ ndo_default_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 /* VARARGS */
 static void
-ndo_error(netdissect_options *ndo, const char *fmt, ...)
+ndo_error(netdissect_options *ndo, status_exit_codes_t status,
+	  const char *fmt, ...)
 {
 	va_list ap;
 
@@ -475,7 +477,7 @@ ndo_error(netdissect_options *ndo, const char *fmt, ...)
 			(void)fputc('\n', stderr);
 	}
 	nd_cleanup();
-	exit(1);
+	exit(status);
 	/* NOTREACHED */
 }
 
@@ -509,7 +511,8 @@ ndo_printf(netdissect_options *ndo, const char *fmt, ...)
 	va_end(args);
 
 	if (ret < 0)
-		ndo_error(ndo, "Unable to write output: %s", pcap_strerror(errno));
+		ndo_error(ndo, S_ERR_ND_WRITE_FILE,
+			  "Unable to write output: %s", pcap_strerror(errno));
 	return (ret);
 }
 

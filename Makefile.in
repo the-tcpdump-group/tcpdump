@@ -293,6 +293,7 @@ HDR = \
 	signature.h \
 	slcompress.h \
 	smb.h \
+	status-exit-codes.h \
 	strtoaddr.h \
 	tcp.h \
 	timeval-operations.h \

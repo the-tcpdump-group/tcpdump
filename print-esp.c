@@ -236,7 +236,8 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 	output_buffer_size = len + (block_size - len % block_size);
 	output_buffer = (u_char *)malloc(output_buffer_size);
 	if (output_buffer == NULL) {
-		(*ndo->ndo_warning)(ndo, "can't allocate memory for decryption buffer");
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+			"can't allocate memory for decryption buffer");
 		EVP_CIPHER_CTX_free(ctx);
 		return 0;
 	}
@@ -266,7 +267,8 @@ static void esp_print_addsa(netdissect_options *ndo,
 
 	nsa = (struct sa_list *)malloc(sizeof(struct sa_list));
 	if (nsa == NULL)
-		(*ndo->ndo_error)(ndo, "ran out of memory to allocate sa structure");
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+				  "esp_print_addsa: malloc");
 
 	*nsa = *sa;
 
@@ -287,7 +289,8 @@ static u_int hexdigit(netdissect_options *ndo, char hex)
 	else if (hex >= 'a' && hex <= 'f')
 		return (hex - 'a' + 10);
 	else {
-		(*ndo->ndo_error)(ndo, "invalid hex digit %c in espsecret\n", hex);
+		(*ndo->ndo_error)(ndo, S_ERR_ND_ESP_SECRET,
+				  "invalid hex digit %c in espsecret\n", hex);
 		return 0;
 	}
 }
@@ -520,8 +523,9 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 
 		secretfile = fopen(filename, FOPEN_READ_TXT);
 		if (secretfile == NULL) {
-			(*ndo->ndo_error)(ndo, "print_esp: can't open %s: %s\n",
-			    filename, strerror(errno));
+			(*ndo->ndo_error)(ndo, S_ERR_ND_OPEN_FILE,
+					  "print_esp: can't open %s: %s\n",
+					  filename, strerror(errno));
 			return;
 		}
 
@@ -787,7 +791,8 @@ esp_print(netdissect_options *ndo,
 			output_buffer_size = len + (block_size - len % block_size);
 			output_buffer = (u_char *)malloc(output_buffer_size);
 			if (output_buffer == NULL) {
-				(*ndo->ndo_warning)(ndo, "can't allocate memory for decryption buffer");
+				(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+					"esp_print: malloc decryption buffer");
 				EVP_CIPHER_CTX_free(ctx);
 				return -1;
 			}
