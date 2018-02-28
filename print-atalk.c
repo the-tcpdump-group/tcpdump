@@ -499,7 +499,7 @@ print_cstring(netdissect_options *ndo,
 			ND_PRINT("%s", tstr);
 			return (0);
 		}
-		ND_PRINT("%c", EXTRACT_U_1(cp));
+		fn_print_char(ndo, EXTRACT_U_1(cp));
 		cp++;
 		length--;
 	}
