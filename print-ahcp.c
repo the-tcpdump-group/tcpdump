@@ -347,7 +347,7 @@ trunc:
 void
 ahcp_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 {
-	const u_char *ep = cp + len;
+	const u_char *ep = ndo->ndo_snapend;
 	uint8_t version;
 
 	ND_PRINT("AHCP");
