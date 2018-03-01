@@ -3053,10 +3053,10 @@ trunc:
 
 void
 bgp_print(netdissect_options *ndo,
-          const u_char *dat, u_int length)
+          const u_char *dat, u_int length _U_)
 {
     const u_char *p;
-    const u_char *ep;
+    const u_char *ep = ndo->ndo_snapend;
     const u_char *start;
     const u_char marker[] = {
         0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -3064,10 +3064,6 @@ bgp_print(netdissect_options *ndo,
     };
     const struct bgp *bgp_header;
     uint16_t hlen;
-
-    ep = dat + length;
-    if (ndo->ndo_snapend < dat + length)
-        ep = ndo->ndo_snapend;
 
     ND_PRINT(": BGP");
 
