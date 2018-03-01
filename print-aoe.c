@@ -142,7 +142,7 @@ static void
 aoev1_issue_print(netdissect_options *ndo,
                   const u_char *cp, const u_int len)
 {
-	const u_char *ep = cp + len;
+	const u_char *ep = ndo->ndo_snapend;
 
 	if (len < AOEV1_ISSUE_ARG_LEN)
 		goto invalid;
@@ -206,7 +206,7 @@ static void
 aoev1_query_print(netdissect_options *ndo,
                   const u_char *cp, const u_int len)
 {
-	const u_char *ep = cp + len;
+	const u_char *ep = ndo->ndo_snapend;
 	uint16_t cslen;
 
 	if (len < AOEV1_QUERY_ARG_LEN)
@@ -255,7 +255,7 @@ static void
 aoev1_mac_print(netdissect_options *ndo,
                 const u_char *cp, const u_int len)
 {
-	const u_char *ep = cp + len;
+	const u_char *ep = ndo->ndo_snapend;
 	uint8_t dircount, i;
 
 	if (len < AOEV1_MAC_ARG_LEN)
@@ -306,7 +306,7 @@ static void
 aoev1_reserve_print(netdissect_options *ndo,
                     const u_char *cp, const u_int len)
 {
-	const u_char *ep = cp + len;
+	const u_char *ep = ndo->ndo_snapend;
 	uint8_t nmacs, i;
 
 	if (len < AOEV1_RESERVE_ARG_LEN || (len - AOEV1_RESERVE_ARG_LEN) % MAC_ADDR_LEN)
@@ -342,7 +342,7 @@ static void
 aoev1_print(netdissect_options *ndo,
             const u_char *cp, const u_int len)
 {
-	const u_char *ep = cp + len;
+	const u_char *ep = ndo->ndo_snapend;
 	uint8_t flags, command;
 	void (*cmd_decoder)(netdissect_options *, const u_char *, const u_int);
 
@@ -399,7 +399,7 @@ void
 aoe_print(netdissect_options *ndo,
           const u_char *cp, const u_int len)
 {
-	const u_char *ep = cp + len;
+	const u_char *ep = ndo->ndo_snapend;
 	uint8_t ver;
 
 	ND_PRINT("AoE length %u", len);
