@@ -108,16 +108,16 @@ static void
 ether_hdr_print(netdissect_options *ndo,
                 const u_char *bp, u_int length)
 {
-	const struct ether_header *ep;
+	const struct ether_header *ehp;
 	uint16_t length_type;
 
-	ep = (const struct ether_header *)bp;
+	ehp = (const struct ether_header *)bp;
 
 	ND_PRINT("%s > %s",
-		     etheraddr_string(ndo, ep->ether_shost),
-		     etheraddr_string(ndo, ep->ether_dhost));
+		     etheraddr_string(ndo, ehp->ether_shost),
+		     etheraddr_string(ndo, ehp->ether_dhost));
 
-	length_type = EXTRACT_BE_U_2(ep->ether_length_type);
+	length_type = EXTRACT_BE_U_2(ehp->ether_length_type);
 	if (!ndo->ndo_qflag) {
 	        if (length_type <= MAX_ETHERNET_LENGTH_VAL) {
 		        ND_PRINT(", 802.3");
@@ -150,7 +150,7 @@ ether_print(netdissect_options *ndo,
             const u_char *p, u_int length, u_int caplen,
             void (*print_encap_header)(netdissect_options *ndo, const u_char *), const u_char *encap_header_arg)
 {
-	const struct ether_header *ep;
+	const struct ether_header *ehp;
 	u_int orig_length;
 	u_short length_type;
 	u_int hdrlen;
@@ -175,15 +175,15 @@ ether_print(netdissect_options *ndo,
 
 	length -= ETHER_HDRLEN;
 	caplen -= ETHER_HDRLEN;
-	ep = (const struct ether_header *)p;
+	ehp = (const struct ether_header *)p;
 	p += ETHER_HDRLEN;
 	hdrlen = ETHER_HDRLEN;
 
-	src.addr = ep->ether_shost;
+	src.addr = ehp->ether_shost;
 	src.addr_string = etheraddr_string;
-	dst.addr = ep->ether_dhost;
+	dst.addr = ehp->ether_dhost;
 	dst.addr_string = etheraddr_string;
-	length_type = EXTRACT_BE_U_2(ep->ether_length_type);
+	length_type = EXTRACT_BE_U_2(ehp->ether_length_type);
 
 recurse:
 	/*
@@ -254,7 +254,7 @@ recurse:
 			if (!ndo->ndo_eflag) {
 				if (print_encap_header != NULL)
 					(*print_encap_header)(ndo, encap_header_arg);
-				ether_hdr_print(ndo, (const u_char *)ep, orig_length);
+				ether_hdr_print(ndo, (const u_char *)ehp, orig_length);
 			}
 
 			if (!ndo->ndo_suppress_default_print)
