@@ -56,7 +56,7 @@ static const struct tok fcode_str[] = {
 static void
 loopback_message_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 {
-	const u_char *ep = cp + len;
+	const u_char *ep = ndo->ndo_snapend;
 	uint16_t function;
 
 	if (len < 2)
@@ -107,7 +107,7 @@ trunc:
 void
 loopback_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 {
-	const u_char *ep = cp + len;
+	const u_char *ep = ndo->ndo_snapend;
 	uint16_t skipCount;
 
 	ND_PRINT("Loopback");
