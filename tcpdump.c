@@ -25,7 +25,7 @@
  *	Seth Webster <swebster@sst.ll.mit.edu>
  */
 
-#error THIS IS ANOTHER TEST
+#error THIS IS ANOTHER TEST, INCLUDING WINDOWS
 
 /*
  * tcpdump - dump traffic on a network
