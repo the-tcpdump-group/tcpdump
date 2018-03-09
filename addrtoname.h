@@ -42,7 +42,6 @@ enum {
 extern const char *linkaddr_string(netdissect_options *, const u_char *, const unsigned int, const unsigned int);
 extern const char *etheraddr_string(netdissect_options *, const u_char *);
 extern const char *le64addr_string(netdissect_options *, const u_char *);
-extern const char *etherproto_string(netdissect_options *, u_short);
 extern const char *tcpport_string(netdissect_options *, u_short);
 extern const char *udpport_string(netdissect_options *, u_short);
 extern const char *isonsap_string(netdissect_options *, const u_char *, u_int);
