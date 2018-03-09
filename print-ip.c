@@ -102,7 +102,7 @@ ip_finddst(netdissect_options *ndo,
 	cp = (const u_char *)(ip + 1);
 	length = (IP_HL(ip) << 2);
 	if (length < sizeof(struct ip))
-		goto trunc; 
+		goto trunc;
 	length -= sizeof(struct ip);
 
 	for (; length != 0; cp += len, length -= len) {
