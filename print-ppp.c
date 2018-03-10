@@ -53,7 +53,7 @@
 #include "oui.h"
 
 /*
- * The following constatns are defined by IANA. Please refer to
+ * The following constants are defined by IANA. Please refer to
  *    http://www.isi.edu/in-notes/iana/assignments/ppp-numbers
  * for the up-to-date information.
  */
