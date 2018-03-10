@@ -46,7 +46,7 @@ How to add new code and to update existing code
    (See https://help.github.com/articles/fork-a-repo/)
 
 2) Setup optional Travis CI build and AppVeyor builds
-   You can setup Travis CI and AppVeyor builds for your fork, soyou can
+   You can setup Travis CI and AppVeyor builds for your fork, so you can
    test your changes on Linux, macOS, and Windows before sending pull
    requests.
    (See http://docs.travis-ci.com/user/getting-started/ for information
