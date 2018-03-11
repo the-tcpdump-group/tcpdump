@@ -1159,7 +1159,7 @@ acl_print(netdissect_options *ndo,
 	char fmt[1024];
 
 	if ((user = (char *)malloc(maxsize)) == NULL)
-		return;
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC, "acl_print: malloc");
 
 	if (sscanf((char *) s, "%d %d\n%n", &pos, &neg, &n) != 2)
 		goto finish;
