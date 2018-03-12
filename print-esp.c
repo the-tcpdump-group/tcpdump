@@ -265,6 +265,7 @@ static void esp_print_addsa(netdissect_options *ndo,
 
 	struct sa_list *nsa;
 
+	/* malloc() return used in a 'struct sa_list': do not free() */
 	nsa = (struct sa_list *)malloc(sizeof(struct sa_list));
 	if (nsa == NULL)
 		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
