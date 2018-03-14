@@ -3252,7 +3252,7 @@ ieee802_11_radio_print(netdissect_options *ndo,
 }
 
 static u_int
-ieee802_11_avs_radio_print(netdissect_options *ndo,
+ieee802_11_radio_avs_print(netdissect_options *ndo,
                            const u_char *p, u_int length, u_int caplen)
 {
 	uint32_t caphdr_len;
@@ -3317,7 +3317,7 @@ prism_if_print(netdissect_options *ndo,
 	msgcode = EXTRACT_BE_U_4(p);
 	if (msgcode == WLANCAP_MAGIC_COOKIE_V1 ||
 	    msgcode == WLANCAP_MAGIC_COOKIE_V2)
-		return ieee802_11_avs_radio_print(ndo, p, length, caplen);
+		return ieee802_11_radio_avs_print(ndo, p, length, caplen);
 
 	if (caplen < PRISM_HDR_LEN) {
 		ND_PRINT("%s", tstr);
@@ -3348,5 +3348,5 @@ u_int
 ieee802_11_radio_avs_if_print(netdissect_options *ndo,
                               const struct pcap_pkthdr *h, const u_char *p)
 {
-	return ieee802_11_avs_radio_print(ndo, p, h->len, h->caplen);
+	return ieee802_11_radio_avs_print(ndo, p, h->len, h->caplen);
 }
