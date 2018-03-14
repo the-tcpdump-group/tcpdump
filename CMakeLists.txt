@@ -771,6 +771,8 @@ set(NETDISSECT_SOURCE_LIST_C
     ipproto.c
     l2vpn.c
     machdep.c
+    netdissect.c
+    netdissect-alloc.c
     nlpid.c
     oui.c
     parsenfsfh.c
@@ -919,7 +921,6 @@ set(NETDISSECT_SOURCE_LIST_C
     print-zephyr.c
     print-zeromq.c
     ${LOCALSRC}
-    netdissect.c
     signature.c
     strtoaddr.c
     util-print.c

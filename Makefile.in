@@ -85,6 +85,8 @@ LIBNETDISSECT_SRC=\
 	ipproto.c \
 	l2vpn.c \
 	machdep.c \
+	netdissect.c \
+	netdissect-alloc.c \
 	nlpid.c \
 	oui.c \
 	parsenfsfh.c \
@@ -232,7 +234,6 @@ LIBNETDISSECT_SRC=\
 	print-wb.c \
 	print-zephyr.c \
 	print-zeromq.c \
-	netdissect.c \
 	signature.c \
 	strtoaddr.c \
 	util-print.c
@@ -278,6 +279,7 @@ HDR = \
 	mpls.h \
 	nameser.h \
 	netdissect.h \
+	netdissect-alloc.h \
 	netdissect-stdinc.h \
 	nfs.h \
 	nfsfh.h \

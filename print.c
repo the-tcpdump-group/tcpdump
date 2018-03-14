@@ -37,6 +37,7 @@
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "print.h"
+#include "netdissect-alloc.h"
 
 struct printer {
 	if_printer f;
@@ -448,6 +449,7 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	}
 
 	ND_PRINT("\n");
+	nd_free_all(ndo);
 }
 
 /*

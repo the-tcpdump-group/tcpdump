@@ -51,6 +51,7 @@
 #include "chdlc.h"
 #include "ethertype.h"
 #include "oui.h"
+#include "netdissect-alloc.h"
 
 /*
  * The following constants are defined by IANA. Please refer to
@@ -1401,7 +1402,7 @@ ppp_hdlc(netdissect_options *ndo,
         if (length == 0)
                 return;
 
-	b = (u_char *)malloc(length);
+	b = (u_char *)nd_malloc(ndo, length);
 	if (b == NULL)
 		return;
 
@@ -1464,12 +1465,10 @@ ppp_hdlc(netdissect_options *ndo,
 
 cleanup:
 	ndo->ndo_snapend = se;
-	free(b);
         return;
 
 trunc:
 	ndo->ndo_snapend = se;
-	free(b);
 	ND_PRINT("[|ppp]");
 }
 
