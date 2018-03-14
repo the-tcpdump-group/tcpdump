@@ -679,6 +679,7 @@ struct isis_tlv_lsp {
 void
 isoclns_print(netdissect_options *ndo, const u_char *p, u_int length)
 {
+	ndo->ndo_protocol = "isoclns";
 	if (!ND_TTEST_1(p)) { /* enough bytes on the wire ? */
 		ND_PRINT("|OSI");
 		return;

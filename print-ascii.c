@@ -62,6 +62,7 @@ ascii_print(netdissect_options *ndo,
 	u_int caplength;
 	u_char s;
 
+	ndo->ndo_protocol = "ascii";
 	caplength = (ndo->ndo_snapend >= cp) ? ndo->ndo_snapend - cp : 0;
 	if (length > caplength)
 		length = caplength;

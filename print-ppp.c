@@ -1544,6 +1544,7 @@ ppp_print(netdissect_options *ndo,
         u_int olen = length; /* _o_riginal length */
 	u_int hdr_len = 0;
 
+	ndo->ndo_protocol = "ppp";
 	/*
 	 * Here, we assume that p points to the Address and Control
 	 * field (if they present).
@@ -1614,6 +1615,7 @@ ppp_if_print(netdissect_options *ndo,
 	u_int length = h->len;
 	u_int caplen = h->caplen;
 
+	ndo->ndo_protocol = "ppp_if";
 	if (caplen < PPP_HDRLEN) {
 		ND_PRINT("[|ppp]");
 		return (caplen);
@@ -1684,6 +1686,7 @@ ppp_hdlc_if_print(netdissect_options *ndo,
 	u_int proto;
 	u_int hdrlen = 0;
 
+	ndo->ndo_protocol = "ppp_hdlc_if";
 	if (caplen < 2) {
 		ND_PRINT("[|ppp]");
 		return (caplen);
@@ -1758,6 +1761,7 @@ ppp_bsdos_if_print(netdissect_options *ndo _U_,
 	const u_char *q;
 	u_int i;
 
+	ndo->ndo_protocol = "ppp_bsdos_if";
 	if (caplen < PPP_BSDI_HDRLEN) {
 		ND_PRINT("[|ppp]");
 		return (caplen);

@@ -123,6 +123,7 @@ vtp_print (netdissect_options *ndo,
     const u_char *tptr;
     const struct vtp_vlan_ *vtp_vlan;
 
+    ndo->ndo_protocol = "vtp";
     if (length < VTP_HEADER_LEN)
         goto trunc;
 

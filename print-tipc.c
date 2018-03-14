@@ -341,6 +341,7 @@ tipc_print(netdissect_options *ndo, const u_char *bp, u_int length _U_,
 	uint32_t w0;
 	u_int user;
 
+	ndo->ndo_protocol = "tipc";
 	ap = (const struct tipc_pkthdr *)bp;
 	ND_TCHECK_4(ap->w0);
 	w0 = EXTRACT_BE_U_4(ap->w0);

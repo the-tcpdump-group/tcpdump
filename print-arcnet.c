@@ -125,9 +125,8 @@ arcnet_print(netdissect_options *ndo, const u_char *bp, u_int length, int phds,
 	const struct arc_header *ap;
 	const char *arctypename;
 
-
+	ndo->ndo_protocol = "arcnet";
 	ap = (const struct arc_header *)bp;
-
 
 	if (ndo->ndo_qflag) {
 		ND_PRINT("%02x %02x %u: ",
@@ -191,6 +190,7 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 	u_int seqid = 0;
 	u_char arc_type;
 
+	ndo->ndo_protocol = "arcnet_if";
 	if (caplen < ARC_HDRLEN || length < ARC_HDRLEN) {
 		ND_PRINT("[|arcnet]");
 		return (caplen);
@@ -278,6 +278,7 @@ arcnet_linux_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, cons
 	int archdrlen = 0;
 	u_char arc_type;
 
+	ndo->ndo_protocol = "arcnet_linux_if";
 	if (caplen < ARC_LINUX_HDRLEN || length < ARC_LINUX_HDRLEN) {
 		ND_PRINT("[|arcnet]");
 		return (caplen);

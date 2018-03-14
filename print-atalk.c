@@ -79,6 +79,7 @@ ltalk_if_print(netdissect_options *ndo,
 {
 	u_int hdrlen;
 
+	ndo->ndo_protocol = "ltalk_if";
 	hdrlen = llap_print(ndo, p, h->len);
 	if (hdrlen == 0) {
 		/* Cut short by the snapshot length. */
@@ -100,6 +101,7 @@ llap_print(netdissect_options *ndo,
 	u_short snet;
 	u_int hdrlen;
 
+	ndo->ndo_protocol = "llap";
 	if (length < sizeof(*lp)) {
 		ND_PRINT(" [|llap %u]", length);
 		return (length);
@@ -182,6 +184,7 @@ atalk_print(netdissect_options *ndo,
 	const struct atDDP *dp;
 	u_short snet;
 
+	ndo->ndo_protocol = "atalk";
         if(!ndo->ndo_eflag)
             ND_PRINT("AT ");
 
@@ -214,6 +217,7 @@ aarp_print(netdissect_options *ndo,
 
 #define AT(member) ataddr_string(ndo, (ap->member[1]<<8)|ap->member[2],ap->member[3])
 
+	ndo->ndo_protocol = "aarp";
 	ND_PRINT("aarp ");
 	ap = (const struct aarp *)bp;
 	if (!ND_TTEST_SIZE(ap)) {

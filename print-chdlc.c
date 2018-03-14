@@ -47,6 +47,7 @@ static const struct tok chdlc_cast_values[] = {
 u_int
 chdlc_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
+	ndo->ndo_protocol = "chdlc_if";
 	return chdlc_print(ndo, p, h->len);
 }
 
@@ -56,6 +57,7 @@ chdlc_print(netdissect_options *ndo, const u_char *p, u_int length)
 	u_int proto;
 	const u_char *bp = p;
 
+	ndo->ndo_protocol = "chdlc";
 	if (length < CHDLC_HDRLEN)
 		goto trunc;
 	ND_TCHECK_LEN(p, CHDLC_HDRLEN);

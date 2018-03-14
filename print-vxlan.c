@@ -50,6 +50,7 @@ vxlan_print(netdissect_options *ndo, const u_char *bp, u_int len)
     uint8_t flags;
     uint32_t vni;
 
+    ndo->ndo_protocol = "vxlan";
     if (len < VXLAN_HDR_LEN)
         goto trunc;
 

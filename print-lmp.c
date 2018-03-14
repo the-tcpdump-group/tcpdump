@@ -440,6 +440,7 @@ lmp_print(netdissect_options *ndo,
         uint32_t i;
     } bw;
 
+    ndo->ndo_protocol = "lmp";
     tptr=pptr;
     lmp_com_header = (const struct lmp_common_header *)pptr;
     ND_TCHECK_SIZE(lmp_com_header);

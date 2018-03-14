@@ -95,6 +95,7 @@ ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 	struct lladdr_info src, dst;
 	int llc_hdrlen;
 
+	ndo->ndo_protocol = "ipfc";
 	if (caplen < IPFC_HDRLEN)
 		goto trunc;
 	/*
@@ -142,5 +143,6 @@ trunc:
 u_int
 ipfc_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
+	ndo->ndo_protocol = "ipfc_if";
 	return (ipfc_print(ndo, p, h->len, h->caplen));
 }

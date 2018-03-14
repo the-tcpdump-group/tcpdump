@@ -96,6 +96,7 @@ rrcp_print(netdissect_options *ndo,
 	uint8_t rrcp_proto;
 	uint8_t rrcp_opcode;
 
+	ndo->ndo_protocol = "rrcp";
 	ND_TCHECK_1(cp + RRCP_PROTO_OFFSET);
 	rrcp_proto = EXTRACT_U_1(cp + RRCP_PROTO_OFFSET);
 	ND_TCHECK_1(cp + RRCP_OPCODE_ISREPLY_OFFSET);

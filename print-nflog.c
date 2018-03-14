@@ -77,6 +77,7 @@ nflog_if_print(netdissect_options *ndo,
 	u_int caplen = h->caplen;
 	u_int length = h->len;
 
+	ndo->ndo_protocol = "nflog_if";
 	if (caplen < sizeof(nflog_hdr_t) || length < sizeof(nflog_hdr_t))
 		goto trunc;
 

@@ -289,6 +289,7 @@ rip_print(netdissect_options *ndo,
 	u_int i, j;
 	unsigned entry_size;
 
+	ndo->ndo_protocol = "rip";
 	if (ndo->ndo_snapend < dat) {
 		ND_PRINT(" %s", tstr);
 		return;

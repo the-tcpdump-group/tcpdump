@@ -549,6 +549,7 @@ ip_print(netdissect_options *ndo,
 	uint16_t sum, ip_sum;
 	const char *p_name;
 
+	ndo->ndo_protocol = "ip";
 	ipds->ip = (const struct ip *)bp;
 	ND_TCHECK_1(ipds->ip->ip_vhl);
 	if (IP_V(ipds->ip) != 4) { /* print version and fail if != 4 */
@@ -710,6 +711,7 @@ trunc:
 void
 ipN_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
+	ndo->ndo_protocol = "ipN";
 	if (length < 1) {
 		ND_PRINT("truncated-ip %u", length);
 		return;

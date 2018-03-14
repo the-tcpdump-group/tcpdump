@@ -249,6 +249,7 @@ slow_print(netdissect_options *ndo,
     int print_version;
     u_int subtype;
 
+    ndo->ndo_protocol = "slow";
     if (len < 1)
         goto tooshort;
     ND_TCHECK_1(pptr);

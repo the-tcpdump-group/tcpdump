@@ -182,6 +182,7 @@ struct netdissect_options {
 				 * LF, CR and SPACE as graphical chars
 				 */
   int ndo_Hflag;		/* dissect 802.11s draft mesh standard */
+  const char *ndo_protocol;	/* protocol */
   void *ndo_last_mem_p;		/* pointer to the last allocated memory chunk */
   int ndo_packet_number;	/* print a packet number in the beginning of line */
   int ndo_suppress_default_print; /* don't use default_print() for unknown packet types */

@@ -478,6 +478,7 @@ aodv_print(netdissect_options *ndo,
 {
 	uint8_t msg_type;
 
+	ndo->ndo_protocol = "aodv";
 	/*
 	 * The message type is the first byte; make sure we have it
 	 * and then fetch it.

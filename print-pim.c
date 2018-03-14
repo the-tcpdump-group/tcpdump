@@ -254,6 +254,7 @@ pimv1_print(netdissect_options *ndo,
 {
 	u_char type;
 
+	ndo->ndo_protocol = "pimv1";
 	ND_TCHECK_1(bp + 1);
 	type = EXTRACT_U_1(bp + 1);
 
@@ -350,6 +351,7 @@ cisco_autorp_print(netdissect_options *ndo,
 	u_int numrps;
 	u_int hold;
 
+	ndo->ndo_protocol = "cisco_autorp";
 	if (len < 8)
 		goto trunc;
 	ND_TCHECK_1(bp);
@@ -461,6 +463,7 @@ pim_print(netdissect_options *ndo,
 	const struct pim *pim = (const struct pim *)bp;
 	uint8_t pim_typever;
 
+	ndo->ndo_protocol = "pim";
 #ifdef notyet			/* currently we see only version and type */
 	ND_TCHECK_1(pim->pim_rsv);
 #endif

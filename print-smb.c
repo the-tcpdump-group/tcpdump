@@ -939,6 +939,7 @@ nbt_tcp_print(netdissect_options *ndo,
     u_int nbt_len;
     const u_char *maxbuf;
 
+    ndo->ndo_protocol = "nbt_tcp";
     if (length < 4)
 	goto trunc;
     if (ndo->ndo_snapend < data)
@@ -1115,6 +1116,7 @@ nbt_udp137_print(netdissect_options *ndo,
     const u_char *p;
     u_int total, i;
 
+    ndo->ndo_protocol = "nbt_udp137";
     ND_TCHECK_2(data + 10);
     name_trn_id = EXTRACT_BE_U_2(data);
     response = (EXTRACT_U_1(data + 2) >> 7);
@@ -1255,6 +1257,7 @@ smb_tcp_print(netdissect_options *ndo,
     u_int smb_len;
     const u_char *maxbuf;
 
+    ndo->ndo_protocol = "smb_tcp";
     if (length < 4)
 	goto trunc;
     if (ndo->ndo_snapend < data)
@@ -1296,6 +1299,7 @@ nbt_udp138_print(netdissect_options *ndo,
 {
     const u_char *maxbuf = data + length;
 
+    ndo->ndo_protocol = "nbt_udp138";
     if (maxbuf > ndo->ndo_snapend)
 	maxbuf = ndo->ndo_snapend;
     if (maxbuf <= data)
@@ -1392,6 +1396,7 @@ netbeui_print(netdissect_options *ndo,
     const u_char *data2;
     int is_truncated = 0;
 
+    ndo->ndo_protocol = "netbeui";
     if (maxbuf > ndo->ndo_snapend)
 	maxbuf = ndo->ndo_snapend;
     ND_TCHECK_1(data + 4);
@@ -1491,6 +1496,7 @@ ipx_netbios_print(netdissect_options *ndo,
     u_int i;
     const u_char *maxbuf;
 
+    ndo->ndo_protocol = "ipx_netbios";
     maxbuf = data + length;
     /* Don't go past the end of the captured data in the packet. */
     if (maxbuf > ndo->ndo_snapend)

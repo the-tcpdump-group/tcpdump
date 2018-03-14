@@ -437,6 +437,7 @@ mptcp_print(netdissect_options *ndo,
         const struct mptcp_option *opt;
         u_int subtype;
 
+	ndo->ndo_protocol = "mptcp";
         if (len < 3)
                 return 0;
 

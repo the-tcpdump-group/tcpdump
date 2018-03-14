@@ -84,6 +84,7 @@ lane_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 {
 	const struct lane_controlhdr *lec;
 
+	ndo->ndo_protocol = "lane";
 	if (caplen < sizeof(struct lane_controlhdr)) {
 		ND_PRINT("[|lane]");
 		return;
@@ -118,6 +119,7 @@ lane_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 u_int
 lane_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
+	ndo->ndo_protocol = "lane_if";
 	lane_print(ndo, p, h->len, h->caplen);
 
 	return (sizeof(struct lecdatahdr_8023));

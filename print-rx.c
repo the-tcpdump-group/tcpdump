@@ -534,6 +534,7 @@ rx_print(netdissect_options *ndo,
 	uint8_t type, flags;
 	uint32_t opcode;
 
+	ndo->ndo_protocol = "rx";
 	if (!ND_TTEST_LEN(bp, sizeof(struct rx_header))) {
 		ND_PRINT(" [|rx] (%u)", length);
 		return;

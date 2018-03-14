@@ -63,6 +63,7 @@ sl_if_print(netdissect_options *ndo,
 	u_int length = h->len;
 	const struct ip *ip;
 
+	ndo->ndo_protocol = "sl_if";
 	if (caplen < SLIP_HDRLEN || length < SLIP_HDRLEN) {
 		ND_PRINT("%s", tstr);
 		return (caplen);
@@ -103,6 +104,7 @@ sl_bsdos_if_print(netdissect_options *ndo,
 	u_int length = h->len;
 	const struct ip *ip;
 
+	ndo->ndo_protocol = "sl_bsdos_if";
 	if (caplen < SLIP_HDRLEN) {
 		ND_PRINT("%s", tstr);
 		return (caplen);

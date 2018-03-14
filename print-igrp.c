@@ -108,6 +108,7 @@ igrp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	const u_char *cp;
 	u_int nint, nsys, next;
 
+	ndo->ndo_protocol = "igrp";
 	hdr = (const struct igrphdr *)bp;
 	cp = (const u_char *)(hdr + 1);
 	ND_PRINT("igrp:");

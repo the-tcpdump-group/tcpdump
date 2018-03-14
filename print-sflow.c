@@ -868,6 +868,7 @@ sflow_print(netdissect_options *ndo,
     uint32_t sflow_sample_type, sflow_sample_len;
     uint32_t nsamples;
 
+    ndo->ndo_protocol = "sflow";
     tptr = pptr;
     tlen = len;
     sflow_datagram = (const struct sflow_datagram_t *)pptr;

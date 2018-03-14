@@ -253,6 +253,7 @@ atm_if_print(netdissect_options *ndo,
 	uint32_t llchdr;
 	u_int hdrlen = 0;
 
+	ndo->ndo_protocol = "atm_if";
 	if (caplen < 1 || length < 1) {
 		ND_PRINT("%s", tstr);
 		return (caplen);
@@ -386,6 +387,7 @@ atm_print(netdissect_options *ndo,
           u_int vpi, u_int vci, u_int traftype, const u_char *p, u_int length,
           u_int caplen)
 {
+	ndo->ndo_protocol = "atm";
 	if (ndo->ndo_eflag)
 		ND_PRINT("VPI:%u VCI:%u ", vpi, vci);
 
@@ -459,7 +461,7 @@ oam_print (netdissect_options *ndo,
         const struct oam_fm_ais_rdi_t *oam_fm_ais_rdi;
     } oam_ptr;
 
-
+    ndo->ndo_protocol = "oam";
     ND_TCHECK_1(p + ATM_HDR_LEN_NOHEC + hec);
     cell_header = EXTRACT_BE_U_4(p + hec);
     cell_type = (EXTRACT_U_1((p + ATM_HDR_LEN_NOHEC + hec)) >> 4) & 0x0f;

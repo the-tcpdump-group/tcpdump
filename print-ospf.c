@@ -1111,6 +1111,7 @@ ospf_print(netdissect_options *ndo,
 	const u_char *dataend;
 	const char *cp;
 
+	ndo->ndo_protocol = "ospf";
 	op = (const struct ospfhdr *)bp;
 
 	/* XXX Before we do anything else, strip off the MD5 trailer */

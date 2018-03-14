@@ -98,6 +98,7 @@ timed_print(netdissect_options *ndo,
 	uint8_t tsp_type;
 	int sec, usec;
 
+	ndo->ndo_protocol = "timed";
 	ND_TCHECK_1(tsp->tsp_type);
 	tsp_type = EXTRACT_U_1(tsp->tsp_type);
 	if (tsp_type < TSPTYPENUMBER)

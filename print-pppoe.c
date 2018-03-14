@@ -87,6 +87,7 @@ static const struct tok pppoetag2str[] = {
 u_int
 pppoe_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
+	ndo->ndo_protocol = "pppoe_if";
 	return (pppoe_print(ndo, p, h->len));
 }
 
@@ -97,6 +98,7 @@ pppoe_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	u_int pppoe_length;
 	const u_char *pppoe_packet, *pppoe_payload;
 
+	ndo->ndo_protocol = "pppoe";
 	if (length < PPPOE_HDRLEN) {
 		ND_PRINT("truncated-pppoe %u", length);
 		return (length);

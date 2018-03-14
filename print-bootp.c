@@ -288,6 +288,7 @@ bootp_print(netdissect_options *ndo,
 	static const u_char vm_rfc1048[4] = VM_RFC1048;
 	uint8_t bp_op, bp_htype, bp_hlen;
 
+	ndo->ndo_protocol = "bootp";
 	bp = (const struct bootp *)cp;
 	ND_TCHECK_1(bp->bp_op);
 	bp_op = EXTRACT_U_1(bp->bp_op);

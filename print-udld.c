@@ -99,6 +99,7 @@ udld_print (netdissect_options *ndo, const u_char *pptr, u_int length)
     int code, type, len;
     const u_char *tptr;
 
+    ndo->ndo_protocol = "udld";
     if (length < UDLD_HEADER_LEN)
         goto trunc;
 

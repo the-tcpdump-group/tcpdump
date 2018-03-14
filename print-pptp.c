@@ -929,6 +929,7 @@ pptp_print(netdissect_options *ndo,
 	uint32_t mc;
 	uint16_t ctrl_msg_type;
 
+	ndo->ndo_protocol = "pptp";
 	ND_PRINT(": pptp");
 
 	hdr = (const struct pptp_hdr *)dat;

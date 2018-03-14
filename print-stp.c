@@ -412,6 +412,7 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
     u_int                  mstp_len;
     u_int                  spb_len;
 
+    ndo->ndo_protocol = "stp";
     stp_bpdu = (const struct stp_bpdu_*)p;
 
     /* Minimum STP Frame size. */

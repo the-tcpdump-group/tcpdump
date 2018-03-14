@@ -525,6 +525,7 @@ lspping_print(netdissect_options *ndo,
         const struct lspping_tlv_targetfec_subtlv_bgp_ipv6_t *lspping_tlv_targetfec_subtlv_bgp_ipv6;
     } subtlv_ptr;
 
+    ndo->ndo_protocol = "lspping";
     tptr=pptr;
     lspping_com_header = (const struct lspping_common_header *)pptr;
     if (len < sizeof(struct lspping_common_header))

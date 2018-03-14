@@ -64,6 +64,7 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	uint16_t label_stack_depth = 0;
 	enum mpls_packet_type pt = PT_UNKNOWN;
 
+	ndo->ndo_protocol = "mpls";
 	p = bp;
 	ND_PRINT("MPLS");
 	do {

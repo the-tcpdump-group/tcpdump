@@ -292,6 +292,7 @@ cfm_print(netdissect_options *ndo,
         const struct cfm_ltr_t *cfm_ltr;
     } msg_ptr;
 
+    ndo->ndo_protocol = "cfm";
     tptr=pptr;
     cfm_common_header = (const struct cfm_common_header_t *)pptr;
     if (length < sizeof(*cfm_common_header))

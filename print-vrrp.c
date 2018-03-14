@@ -110,6 +110,7 @@ vrrp_print(netdissect_options *ndo,
 	int version, type, auth_type = VRRP_AUTH_NONE; /* keep compiler happy */
 	const char *type_s;
 
+	ndo->ndo_protocol = "vrrp";
 	ND_TCHECK_1(bp);
 	version = (EXTRACT_U_1(bp) & 0xf0) >> 4;
 	type = EXTRACT_U_1(bp) & 0x0f;

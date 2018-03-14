@@ -88,6 +88,7 @@ vjc_print(netdissect_options *ndo, const u_char *bp, u_short proto _U_)
 {
 	int i;
 
+	ndo->ndo_protocol = "vjc";
 	switch (EXTRACT_U_1(bp) & 0xf0) {
 	case TYPE_IP:
 		if (ndo->ndo_eflag)

@@ -220,6 +220,7 @@ fr_if_print(netdissect_options *ndo,
 	u_int length = h->len;
 	u_int caplen = h->caplen;
 
+	ndo->ndo_protocol = "fr_if";
         ND_TCHECK_4(p); /* minimum frame header length */
 
         if ((length = fr_print(ndo, p, length)) == 0)
@@ -243,6 +244,7 @@ fr_print(netdissect_options *ndo,
 	u_int hdr_len;
 	uint32_t flags;
 
+	ndo->ndo_protocol = "fr";
 	ret = parse_q922_header(ndo, p, &dlci, &addr_len, &flags, length);
 	if (ret == -1)
 		goto trunc;
@@ -376,6 +378,7 @@ mfr_if_print(netdissect_options *ndo,
 	u_int length = h->len;
 	u_int caplen = h->caplen;
 
+	ndo->ndo_protocol = "mfr_if";
         ND_TCHECK_2(p); /* minimum frame header length */
 
         if ((length = mfr_print(ndo, p, length)) == 0)
@@ -454,6 +457,7 @@ mfr_print(netdissect_options *ndo,
  *    +----+----+----+----+----+----+----+----+
  */
 
+    ndo->ndo_protocol = "mfr";
     ND_TCHECK_4(p); /* minimum frame header length */
 
     if ((EXTRACT_U_1(p) & MFR_BEC_MASK) == MFR_CTRL_FRAME && EXTRACT_U_1(p + 1) == 0) {
@@ -798,6 +802,7 @@ q933_print(netdissect_options *ndo,
 	u_int non_locking_shift;
 	u_int unshift_codeset;
 
+	ndo->ndo_protocol = "q933";
 	ND_PRINT("%s", ndo->ndo_eflag ? "" : "Q.933");
 
 	if (length == 0 || !ND_TTEST_1(p)) {

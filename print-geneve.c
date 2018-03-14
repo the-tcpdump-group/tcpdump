@@ -153,6 +153,7 @@ geneve_print(netdissect_options *ndo, const u_char *bp, u_int len)
     uint8_t reserved;
     u_int opts_len;
 
+    ndo->ndo_protocol = "geneve";
     ND_PRINT("Geneve");
 
     ND_TCHECK_8(bp);

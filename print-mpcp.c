@@ -134,6 +134,7 @@ mpcp_print(netdissect_options *ndo, const u_char *pptr, u_int length)
     uint8_t grant_numbers, grant;
     uint8_t queue_sets, queue_set, report_bitmap, report;
 
+    ndo->ndo_protocol = "mpcp";
     tptr=pptr;
     mpcp.common_header = (const struct mpcp_common_header_t *)pptr;
 

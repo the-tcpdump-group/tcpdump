@@ -282,6 +282,7 @@ fddi_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 	struct lladdr_info src, dst;
 	int llc_hdrlen;
 
+	ndo->ndo_protocol = "fddi";
 	if (caplen < FDDI_HDRLEN) {
 		ND_PRINT("[|fddi]");
 		return (caplen);
@@ -344,5 +345,6 @@ fddi_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 u_int
 fddi_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
+	ndo->ndo_protocol = "fddi_if";
 	return (fddi_print(ndo, p, h->len, h->caplen));
 }

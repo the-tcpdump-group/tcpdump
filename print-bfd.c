@@ -299,6 +299,7 @@ bfd_print(netdissect_options *ndo, const u_char *pptr,
         uint8_t version = 0;
         uint8_t flags;
 
+	ndo->ndo_protocol = "bfd";
         bfd_header = (const struct bfd_header_t *)pptr;
         version_diag = EXTRACT_U_1(bfd_header->version_diag);
         if (port == BFD_CONTROL_PORT) {

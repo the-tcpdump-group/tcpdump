@@ -38,6 +38,7 @@ frag6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2)
 	const struct ip6_frag *dp;
 	const struct ip6_hdr *ip6;
 
+	ndo->ndo_protocol = "frag6";
 	dp = (const struct ip6_frag *)bp;
 	ip6 = (const struct ip6_hdr *)bp2;
 

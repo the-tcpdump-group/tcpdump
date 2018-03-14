@@ -66,6 +66,7 @@ ipnet_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 {
 	const ipnet_hdr_t *hdr;
 
+	ndo->ndo_protocol = "ipnet";
 	if (caplen < sizeof(ipnet_hdr_t))
 		goto trunc;
 
@@ -112,6 +113,7 @@ u_int
 ipnet_if_print(netdissect_options *ndo,
                const struct pcap_pkthdr *h, const u_char *p)
 {
+	ndo->ndo_protocol = "ipnet_if";
 	ipnet_print(ndo, p, h->len, h->caplen);
 
 	return (sizeof(ipnet_hdr_t));

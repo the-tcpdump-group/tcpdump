@@ -73,6 +73,7 @@ dvmrp_print(netdissect_options *ndo,
 	u_char type;
 	uint8_t major_version, minor_version;
 
+	ndo->ndo_protocol = "dvmrp";
 	ep = ndo->ndo_snapend;
 	if (bp >= ep)
 		return;

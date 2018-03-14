@@ -1707,6 +1707,7 @@ forces_print(netdissect_options *ndo,
 	const struct tom_h *tops;
 	int rc = 0;
 
+	ndo->ndo_protocol = "forces";
 	fhdr = (const struct forcesh *)pptr;
 	ND_TCHECK_SIZE(fhdr);
 	tom = EXTRACT_U_1(fhdr->fm_tom);

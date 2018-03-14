@@ -241,6 +241,7 @@ krb_print(netdissect_options *ndo,
 {
 	const struct krb *kp;
 
+	ndo->ndo_protocol = "krb";
 	kp = (const struct krb *)dat;
 
 	if (dat >= ndo->ndo_snapend) {

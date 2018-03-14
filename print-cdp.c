@@ -97,6 +97,7 @@ cdp_print(netdissect_options *ndo,
 	u_int type, len, i, j;
 	const u_char *tptr;
 
+	ndo->ndo_protocol = "cdp";
 	if (caplen < CDP_HEADER_LEN) {
 		ND_PRINT("%s", tstr);
 		return;

@@ -514,6 +514,7 @@ telnet_print(netdissect_options *ndo, const u_char *sp, u_int length)
 	const u_char *osp;
 	int l;
 
+	ndo->ndo_protocol = "telnet";
 	osp = sp;
 
 	ND_TCHECK_1(sp);

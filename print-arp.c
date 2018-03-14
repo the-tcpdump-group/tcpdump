@@ -359,6 +359,7 @@ arp_print(netdissect_options *ndo,
 	const struct arp_pkthdr *ap;
 	u_short pro, hrd, op, linkaddr;
 
+	ndo->ndo_protocol = "arp";
 	ap = (const struct arp_pkthdr *)bp;
 	ND_TCHECK_SIZE(ap);
 

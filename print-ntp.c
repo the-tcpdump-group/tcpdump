@@ -456,6 +456,7 @@ ntp_print(netdissect_options *ndo,
 	u_int mode, version, leapind;
 	uint8_t status;
 
+	ndo->ndo_protocol = "ntp";
 	ND_TCHECK_1(bp->td.status);
 	status = EXTRACT_U_1(bp->td.status);
 

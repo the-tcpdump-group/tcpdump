@@ -45,6 +45,7 @@ otv_print(netdissect_options *ndo, const u_char *bp, u_int len)
 {
     uint8_t flags;
 
+    ndo->ndo_protocol = "otv";
     ND_PRINT("OTV, ");
     if (len < OTV_HDR_LEN)
         goto trunc;

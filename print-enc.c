@@ -103,6 +103,7 @@ enc_if_print(netdissect_options *ndo,
 	u_int af, flags;
 	const struct enchdr *hdr;
 
+	ndo->ndo_protocol = "enc_if";
 	if (caplen < ENC_HDRLEN) {
 		ND_PRINT("[|enc]");
 		goto out;

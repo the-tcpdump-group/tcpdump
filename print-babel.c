@@ -49,6 +49,7 @@ void
 babel_print(netdissect_options *ndo,
             const u_char *cp, u_int length)
 {
+    ndo->ndo_protocol = "babel";
     ND_PRINT("babel");
 
     ND_TCHECK_4(cp);

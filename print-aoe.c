@@ -402,6 +402,7 @@ aoe_print(netdissect_options *ndo,
 	const u_char *ep = ndo->ndo_snapend;
 	uint8_t ver;
 
+	ndo->ndo_protocol = "aoe";
 	ND_PRINT("AoE length %u", len);
 
 	if (len < 1)

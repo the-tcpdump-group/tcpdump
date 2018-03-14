@@ -214,6 +214,7 @@ resp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
     int ret_len = 0, length_cur = length;
 
+    ndo->ndo_protocol = "resp";
     if(!bp || length <= 0)
         return;
 

@@ -228,6 +228,7 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
         const struct eigrp_tlv_at_ext_t *eigrp_tlv_at_ext;
     } tlv_ptr;
 
+    ndo->ndo_protocol = "eigrp";
     tptr=pptr;
     eigrp_com_header = (const struct eigrp_common_header *)pptr;
     ND_TCHECK_SIZE(eigrp_com_header);

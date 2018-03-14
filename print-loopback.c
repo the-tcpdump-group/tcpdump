@@ -110,6 +110,7 @@ loopback_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 	const u_char *ep = ndo->ndo_snapend;
 	uint16_t skipCount;
 
+	ndo->ndo_protocol = "loopback";
 	ND_PRINT("Loopback");
 	if (len < 2)
 		goto invalid;

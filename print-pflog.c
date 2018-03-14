@@ -90,6 +90,7 @@ pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
 {
 	uint32_t rulenr, subrulenr;
 
+	ndo->ndo_protocol = "pflog";
 	rulenr = EXTRACT_BE_U_4(&hdr->rulenr);
 	subrulenr = EXTRACT_BE_U_4(&hdr->subrulenr);
 	if (subrulenr == (uint32_t)-1)
@@ -114,6 +115,7 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	const struct pfloghdr *hdr;
 	uint8_t af;
 
+	ndo->ndo_protocol = "pflog_if";
 	/* check length */
 	if (caplen < sizeof(uint8_t)) {
 		ND_PRINT("%s", tstr);

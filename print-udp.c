@@ -390,6 +390,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	uint16_t sport, dport, ulen;
 	const struct ip6_hdr *ip6;
 
+	ndo->ndo_protocol = "udp";
 	up = (const struct udphdr *)bp;
 	ip = (const struct ip *)bp2;
 	if (IP_V(ip) == 6)

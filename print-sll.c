@@ -134,6 +134,7 @@ sll_print(netdissect_options *ndo, const struct sll_header *sllp, u_int length)
 {
 	u_short ether_type;
 
+	ndo->ndo_protocol = "sll";
         ND_PRINT("%3s ",tok2str(sll_pkttype_values,"?",EXTRACT_BE_U_2(sllp->sll_pkttype)));
 
 	/*
@@ -200,6 +201,7 @@ sll_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 	int llc_hdrlen;
 	u_int hdrlen;
 
+	ndo->ndo_protocol = "sll_if";
 	if (caplen < SLL_HDR_LEN) {
 		/*
 		 * XXX - this "can't happen" because "pcap-linux.c" always

@@ -402,6 +402,7 @@ wb_print(netdissect_options *ndo,
 	const struct pkt_hdr *ph;
 	uint8_t type;
 
+	ndo->ndo_protocol = "wb";
 	ph = (const struct pkt_hdr *)hdr;
 	if (len < sizeof(*ph) || !ND_TTEST_SIZE(ph)) {
 		ND_PRINT("%s", tstr);

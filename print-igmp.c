@@ -268,6 +268,7 @@ igmp_print(netdissect_options *ndo,
 {
     struct cksum_vec vec[1];
 
+    ndo->ndo_protocol = "igmp";
     if (ndo->ndo_qflag) {
         ND_PRINT("igmp");
         return;

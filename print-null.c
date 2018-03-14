@@ -82,6 +82,7 @@ null_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 	u_int caplen = h->caplen;
 	uint32_t family;
 
+	ndo->ndo_protocol = "null_if";
 	if (caplen < NULL_HDRLEN)
 		goto trunc;
 

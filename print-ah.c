@@ -40,6 +40,7 @@ ah_print(netdissect_options *ndo, const u_char *bp)
 	const struct ah *ah;
 	u_int sumlen;
 
+	ndo->ndo_protocol = "ah";
 	ah = (const struct ah *)bp;
 
 	ND_TCHECK_SIZE(ah);

@@ -49,6 +49,7 @@ dtp_print (netdissect_options *ndo, const u_char *pptr, u_int length)
     int type, len;
     const u_char *tptr;
 
+    ndo->ndo_protocol = "dtp";
     if (length < DTP_HEADER_LEN)
         goto trunc;
 

@@ -99,6 +99,7 @@ hsrp_print(netdissect_options *ndo, const u_char *bp, u_int len)
 	const struct hsrp *hp = (const struct hsrp *) bp;
 	uint8_t version;
 
+	ndo->ndo_protocol = "hsrp";
 	ND_TCHECK_1(hp->hsrp_version);
 	version = EXTRACT_U_1(hp->hsrp_version);
 	ND_PRINT("HSRPv%u", version);

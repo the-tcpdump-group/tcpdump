@@ -3065,6 +3065,7 @@ bgp_print(netdissect_options *ndo,
     const struct bgp *bgp_header;
     uint16_t hlen;
 
+    ndo->ndo_protocol = "bgp";
     ND_PRINT(": BGP");
 
     if (ndo->ndo_vflag < 1) /* lets be less chatty */

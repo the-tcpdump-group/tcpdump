@@ -118,6 +118,7 @@ geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	const char *hdr_type_txt = "Unknown";
 	int hdr_size = -1;
 
+	ndo->ndo_protocol = "geonet";
 	ND_PRINT("GeoNet ");
 	if (src != NULL)
 		ND_PRINT("src:%s", (src->addr_string)(ndo, src->addr));

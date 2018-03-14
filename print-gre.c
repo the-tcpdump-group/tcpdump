@@ -89,6 +89,7 @@ gre_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	u_int len = length, vers;
 
+	ndo->ndo_protocol = "gre";
 	ND_TCHECK_2(bp);
 	if (len < 2)
 		goto trunc;

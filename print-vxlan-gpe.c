@@ -64,6 +64,7 @@ vxlan_gpe_print(netdissect_options *ndo, const u_char *bp, u_int len)
     uint8_t next_protocol;
     uint32_t vni;
 
+    ndo->ndo_protocol = "vxlan_gpe";
     if (len < VXLAN_GPE_HDR_LEN)
         goto trunc;
 

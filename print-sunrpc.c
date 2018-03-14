@@ -167,6 +167,7 @@ sunrpc_print(netdissect_options *ndo, const u_char *bp,
 	uint32_t x;
 	char srcid[20], dstid[20];	/*fits 32bit*/
 
+	ndo->ndo_protocol = "sunrpc";
 	rp = (const struct sunrpc_msg *)bp;
 
 	if (!ndo->ndo_nflag) {

@@ -775,6 +775,7 @@ l2tp_print(netdissect_options *ndo, const u_char *dat, u_int length)
 	int flag_t, flag_l, flag_s, flag_o;
 	uint16_t l2tp_len;
 
+	ndo->ndo_protocol = "l2tp";
 	flag_t = flag_l = flag_s = flag_o = FALSE;
 
 	ND_TCHECK_2(ptr);	/* Flags & Version */

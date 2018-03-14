@@ -507,6 +507,7 @@ decnet_print(netdissect_options *ndo,
 	u_int nsplen, pktlen;
 	const u_char *nspp;
 
+	ndo->ndo_protocol = "decnet";
 	if (length < sizeof(struct shorthdr)) {
 		ND_PRINT("%s", tstr);
 		return;

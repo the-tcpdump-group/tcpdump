@@ -156,6 +156,7 @@ eap_print(netdissect_options *ndo,
     u_int eap_type, tlen, type, subtype;
     int count=0, len;
 
+    ndo->ndo_protocol = "eap";
     tptr = cp;
     tlen = length;
     eap = (const struct eap_frame_t *)cp;

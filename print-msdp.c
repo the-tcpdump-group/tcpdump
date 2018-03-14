@@ -35,6 +35,7 @@ msdp_print(netdissect_options *ndo, const u_char *sp, u_int length)
 {
 	unsigned int type, len;
 
+	ndo->ndo_protocol = "msdp";
 	ND_TCHECK_3(sp);
 	/* See if we think we're at the beginning of a compound packet */
 	type = EXTRACT_U_1(sp);

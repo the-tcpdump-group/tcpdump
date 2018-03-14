@@ -467,6 +467,7 @@ cnfp_print(netdissect_options *ndo, const u_char *cp)
 	/*
 	 * First 2 bytes are the version number.
 	 */
+	ndo->ndo_protocol = "cnfp";
 	ND_TCHECK_2(cp);
 	ver = EXTRACT_BE_U_2(cp);
 	switch (ver) {

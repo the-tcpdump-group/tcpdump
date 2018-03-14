@@ -670,6 +670,7 @@ esp_print(netdissect_options *ndo,
 	u_char *output_buffer;
 #endif
 
+	ndo->ndo_protocol = "esp";
 	esp = (const struct newesp *)bp;
 
 #ifdef HAVE_LIBCRYPTO

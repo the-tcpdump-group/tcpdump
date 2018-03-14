@@ -44,6 +44,7 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 	u_int i, len, type;
 	const u_char *p;
 
+	ndo->ndo_protocol = "rt6";
 	dp = (const struct ip6_rthdr *)bp;
 
 	ND_TCHECK_1(dp->ip6r_segleft);

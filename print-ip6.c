@@ -224,6 +224,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	int fragmented = 0;
 	u_int flow;
 
+	ndo->ndo_protocol = "ip6";
 	ip6 = (const struct ip6_hdr *)bp;
 
 	ND_TCHECK_SIZE(ip6);

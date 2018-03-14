@@ -42,6 +42,7 @@ ipcomp_print(netdissect_options *ndo, const u_char *bp)
 	const struct ipcomp *ipcomp;
 	uint16_t cpi;
 
+	ndo->ndo_protocol = "ipcomp";
 	ipcomp = (const struct ipcomp *)bp;
 	ND_TCHECK_SIZE(ipcomp);
 	cpi = EXTRACT_BE_U_2(ipcomp->comp_cpi);

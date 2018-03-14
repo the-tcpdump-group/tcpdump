@@ -52,6 +52,7 @@ msnlb_print(netdissect_options *ndo, const u_char *bp)
 {
 	const struct msnlb_heartbeat_pkt *hb;
 
+	ndo->ndo_protocol = "msnlb";
 	hb = (const struct msnlb_heartbeat_pkt *)bp;
 	ND_TCHECK_SIZE(hb);
 

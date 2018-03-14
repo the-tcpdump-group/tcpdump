@@ -1438,6 +1438,7 @@ lldp_print(netdissect_options *ndo,
     const u_char *tptr;
     char *network_addr;
 
+    ndo->ndo_protocol = "lldp";
     tptr = pptr;
     tlen = len;
 

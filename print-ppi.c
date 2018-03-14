@@ -64,6 +64,7 @@ ppi_print(netdissect_options *ndo,
 	uint32_t hdrlen;
 	struct pcap_pkthdr nhdr;
 
+	ndo->ndo_protocol = "ppi";
 	if (caplen < sizeof(ppi_header_t)) {
 		ND_PRINT(" %s", tstr);
 		return (caplen);
@@ -122,6 +123,7 @@ u_int
 ppi_if_print(netdissect_options *ndo,
 	     const struct pcap_pkthdr *h, const u_char *p)
 {
+	ndo->ndo_protocol = "ppi_if";
 	return (ppi_print(ndo, h, p));
 }
 

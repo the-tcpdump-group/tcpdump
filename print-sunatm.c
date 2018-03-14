@@ -69,6 +69,7 @@ sunatm_if_print(netdissect_options *ndo,
 	u_char vpi;
 	u_int traftype;
 
+	ndo->ndo_protocol = "sunatm_if";
 	if (caplen < PKT_BEGIN_POS) {
 		ND_PRINT("[|atm]");
 		return (caplen);

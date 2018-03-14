@@ -326,6 +326,7 @@ nfsreply_print(netdissect_options *ndo,
 	const struct sunrpc_msg *rp;
 	char srcid[20], dstid[20];	/*fits 32bit*/
 
+	ndo->ndo_protocol = "nfsreply";
 	nfserr = 0;		/* assume no error */
 	rp = (const struct sunrpc_msg *)bp;
 
@@ -361,6 +362,7 @@ nfsreply_noaddr_print(netdissect_options *ndo,
 	uint32_t rhigh;
 	enum sunrpc_auth_stat rwhy;
 
+	ndo->ndo_protocol = "nfsreply_noaddr";
 	nfserr = 0;		/* assume no error */
 	rp = (const struct sunrpc_msg *)bp;
 
@@ -530,6 +532,7 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 	uint32_t access_flags;
 	struct nfsv3_sattr sa3;
 
+	ndo->ndo_protocol = "nfsreq_noaddr";
 	ND_PRINT("%u", length);
 	nfserr = 0;		/* assume no error */
 	rp = (const struct sunrpc_msg *)bp;

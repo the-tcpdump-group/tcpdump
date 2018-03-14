@@ -70,6 +70,7 @@ ieee802_15_4_print(netdissect_options *ndo,
 	uint8_t seq;
 	uint16_t panid = 0;
 
+	ndo->ndo_protocol = "802.15.4";
 	if (caplen < 3) {
 		ND_PRINT("[|802.15.4]");
 		return caplen;
@@ -226,5 +227,6 @@ u_int
 ieee802_15_4_if_print(netdissect_options *ndo,
                       const struct pcap_pkthdr *h, const u_char *p)
 {
+	ndo->ndo_protocol = "802.15.4_if";
 	return ieee802_15_4_print(ndo, p, h->caplen);
 }

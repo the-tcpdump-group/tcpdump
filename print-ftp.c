@@ -28,5 +28,6 @@
 void
 ftp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 {
+	ndo->ndo_protocol = "ftp";
 	txtproto_print(ndo, pptr, len, "ftp", NULL, 0);
 }

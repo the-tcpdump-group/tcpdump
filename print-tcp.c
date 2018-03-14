@@ -173,6 +173,7 @@ tcp_print(netdissect_options *ndo,
         int rev;
         const struct ip6_hdr *ip6;
 
+	ndo->ndo_protocol = "tcp";
         tp = (const struct tcphdr *)bp;
         ip = (const struct ip *)bp2;
         if (IP_V(ip) == 6)

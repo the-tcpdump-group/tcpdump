@@ -94,6 +94,7 @@ ap1394_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 	u_short ether_type;
 	struct lladdr_info src, dst;
 
+	ndo->ndo_protocol = "ap1394_if";
 	if (caplen < FIREWIRE_HDRLEN) {
 		ND_PRINT("[|ap1394]");
 		return FIREWIRE_HDRLEN;

@@ -62,6 +62,7 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
     uint8_t tlv_len;
     u_int next_len;
 
+    ndo->ndo_protocol = "nsh";
     /* print Base Header and Service Path Header */
     if (len < NSH_BASE_HDR_LEN + NSH_SERVICE_PATH_HDR_LEN)
         goto trunc;

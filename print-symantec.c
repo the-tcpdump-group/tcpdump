@@ -77,6 +77,7 @@ symantec_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_
 	const struct symantec_header *sp;
 	u_short ether_type;
 
+	ndo->ndo_protocol = "symantec_if";
 	if (caplen < sizeof (struct symantec_header)) {
 		ND_PRINT("[|symantec]");
 		return caplen;

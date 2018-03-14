@@ -175,6 +175,7 @@ lwapp_control_print(netdissect_options *ndo,
     u_int tlen;
     u_int msg_type, msg_tlen;
 
+    ndo->ndo_protocol = "lwapp_control";
     tptr=pptr;
 
     if (has_ap_ident) {
@@ -307,6 +308,7 @@ lwapp_data_print(netdissect_options *ndo,
     u_int tlen;
     u_int version;
 
+    ndo->ndo_protocol = "lwapp_data";
     tptr=pptr;
 
     /* check if enough bytes for AP identity */

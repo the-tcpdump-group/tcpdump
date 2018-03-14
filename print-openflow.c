@@ -134,6 +134,7 @@ trunc:
 void
 openflow_print(netdissect_options *ndo, const u_char *cp, const u_int len _U_)
 {
+	ndo->ndo_protocol = "openflow";
 	ND_PRINT(": OpenFlow");
 	while (cp < ndo->ndo_snapend)
 		cp = of_header_body_print(ndo, cp, ndo->ndo_snapend);

@@ -73,6 +73,7 @@ ipx_print(netdissect_options *ndo, const u_char *p, u_int length)
 {
 	const struct ipxHdr *ipx = (const struct ipxHdr *)p;
 
+	ndo->ndo_protocol = "ipx";
 	if (!ndo->ndo_eflag)
 		ND_PRINT("IPX ");
 

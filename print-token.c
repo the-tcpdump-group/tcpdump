@@ -153,6 +153,7 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 	u_int route_len = 0, hdr_len = TOKEN_HDRLEN;
 	int seg;
 
+	ndo->ndo_protocol = "token";
 	trp = (const struct token_header *)p;
 
 	if (caplen < TOKEN_HDRLEN) {
@@ -244,5 +245,6 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 u_int
 token_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
+	ndo->ndo_protocol = "token_if";
 	return (token_print(ndo, p, h->len, h->caplen));
 }

@@ -284,6 +284,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 	u_int fixed_hdrlen;
 	uint8_t	dccph_type;
 
+	ndo->ndo_protocol = "dccp";
 	dh = (const struct dccp_hdr *)bp;
 
 	ip = (const struct ip *)data2;

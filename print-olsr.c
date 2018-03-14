@@ -327,6 +327,7 @@ olsr_print(netdissect_options *ndo,
     uint8_t link_type, neighbor_type;
     const u_char *tptr, *msg_data;
 
+    ndo->ndo_protocol = "olsr";
     tptr = pptr;
 
     if (length < sizeof(struct olsr_common)) {
