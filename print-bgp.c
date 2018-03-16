@@ -716,7 +716,7 @@ trunc:
 /* RDs and RTs share the same semantics
  * we use bgp_vpn_rd_print for
  * printing route targets inside a NLRI */
-char *
+const char *
 bgp_vpn_rd_print(netdissect_options *ndo,
                  const u_char *pptr)
 {

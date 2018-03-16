@@ -142,7 +142,7 @@ static int parse_q922_header(netdissect_options *ndo,
 	return 1;
 }
 
-char *
+const char *
 q922_string(netdissect_options *ndo, const u_char *p, u_int length)
 {
 
