@@ -1012,7 +1012,7 @@ static const struct {
 /*
  * return a SMB error string from a SMB buffer
  */
-char *
+const char *
 smb_errstr(int class, int num)
 {
     static char ret[128];

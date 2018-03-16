@@ -663,9 +663,6 @@ extern int mask62plen(const u_char *);
 extern const char *dnname_string(netdissect_options *, u_short);
 extern const char *dnnum_string(netdissect_options *, u_short);
 
-extern char *smb_errstr(int, int);
-extern const char *nt_errstr(uint32_t);
-
 extern int decode_prefix4(netdissect_options *, const u_char *, u_int, char *, u_int);
 extern int decode_prefix6(netdissect_options *, const u_char *, u_int, char *, u_int);
 
