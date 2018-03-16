@@ -61,11 +61,10 @@ static const char *ftypes[] = {
 #define FC_ADDRESSING_MODE_SHORT	0x02
 #define FC_ADDRESSING_MODE_LONG		0x03
 
-u_int
-ieee802_15_4_if_print(netdissect_options *ndo,
-                      const struct pcap_pkthdr *h, const u_char *p)
+static u_int
+ieee802_15_4_print(netdissect_options *ndo,
+                   const u_char *p, u_int caplen)
 {
-	u_int caplen = h->caplen;
 	u_int hdrlen;
 	uint16_t fc;
 	uint8_t seq;
@@ -220,4 +219,12 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 		ND_DEFAULTPRINT(p, caplen);
 
 	return hdrlen;
+}
+
+/* For DLT_IEEE802_15_4 and DLT_IEEE802_15_4_NOFCS */
+u_int
+ieee802_15_4_if_print(netdissect_options *ndo,
+                      const struct pcap_pkthdr *h, const u_char *p)
+{
+	return ieee802_15_4_print(ndo, p, h->caplen);
 }
