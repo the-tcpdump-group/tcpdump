@@ -109,7 +109,7 @@ pktap_if_print(netdissect_options *ndo,
 	ndo->ndo_protocol = "pktap_if";
 	if (caplen < sizeof(pktap_header_t) || length < sizeof(pktap_header_t)) {
 		ND_PRINT("[|pktap]");
-		return (0);
+		return (caplen);
 	}
 	hdr = (const pktap_header_t *)p;
 	dlt = EXTRACT_LE_U_4(hdr->pkt_dlt);
@@ -123,11 +123,11 @@ pktap_if_print(netdissect_options *ndo,
 		 * be expanded in the future)?
 		 */
 		ND_PRINT("[|pktap]");
-		return (0);
+		return (caplen);
 	}
 	if (caplen < hdrlen || length < hdrlen) {
 		ND_PRINT("[|pktap]");
-		return (hdrlen);
+		return (caplen);
 	}
 
 	if (ndo->ndo_eflag)
