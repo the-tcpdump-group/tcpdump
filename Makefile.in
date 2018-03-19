@@ -236,7 +236,8 @@ LIBNETDISSECT_SRC=\
 	print-zeromq.c \
 	signature.c \
 	strtoaddr.c \
-	util-print.c
+	util-print.c \
+	clean_cap_dump.c
 
 LOCALSRC = @LOCALSRC@
 LIBOBJS = @LIBOBJS@
@@ -258,6 +259,7 @@ HDR = \
 	appletalk.h \
 	ascii_strcasecmp.h \
 	atm.h \
+	clean_cap_dump.h \
 	chdlc.h \
 	compiler-tests.h \
 	cpack.h \
