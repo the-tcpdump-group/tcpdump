@@ -936,10 +936,3 @@ tcp_verify_signature(netdissect_options *ndo,
 }
 USES_APPLE_RST
 #endif /* HAVE_LIBCRYPTO */
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

@@ -3263,10 +3263,3 @@ osi_print_cksum(netdissect_options *ndo, const uint8_t *pptr,
                 }
         }
 }
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

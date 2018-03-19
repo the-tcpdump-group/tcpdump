@@ -3133,10 +3133,3 @@ trunc:
 	ND_PRINT("[|isakmp]");
 	return;
 }
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

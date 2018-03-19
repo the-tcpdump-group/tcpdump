@@ -1906,11 +1906,3 @@ printx:
 #endif /* __bsdi__ */
 	return (hdrlength);
 }
-
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

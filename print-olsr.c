@@ -714,10 +714,3 @@ olsr_print(netdissect_options *ndo,
  trunc:
     ND_PRINT("[|olsr]");
 }
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 4
- * End:
- */

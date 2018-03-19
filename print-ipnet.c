@@ -118,12 +118,4 @@ ipnet_if_print(netdissect_options *ndo,
 
 	return (sizeof(ipnet_hdr_t));
 }
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */
-
 #endif /* DLT_IPNET */

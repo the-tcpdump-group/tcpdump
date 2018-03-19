@@ -361,10 +361,3 @@ arcnet_encap_print(netdissect_options *ndo, u_char arctype, const u_char *p,
 		return (0);
 	}
 }
-
-/*
- * Local Variables:
- * c-style: bsd
- * End:
- */
-

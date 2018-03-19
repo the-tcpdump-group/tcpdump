@@ -277,11 +277,3 @@ invalid:
 trunc:
 	ND_PRINT("[|geonet]");
 }
-
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

@@ -66,11 +66,3 @@ trunc:
 	return (BT_HDRLEN);
 }
 #endif
-
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

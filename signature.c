@@ -205,10 +205,3 @@ signature_verify(netdissect_options *ndo _U_, const u_char *pptr _U_,
     return (CANT_CHECK_SIGNATURE);
 }
 #endif
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 4
- * End:
- */

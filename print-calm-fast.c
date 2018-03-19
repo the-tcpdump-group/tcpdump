@@ -67,11 +67,3 @@ trunc:
 	ND_PRINT("[|calm fast]");
 	return;
 }
-
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

@@ -1200,10 +1200,3 @@ pimv2_print(netdissect_options *ndo,
 trunc:
 	ND_PRINT("[|pim]");
 }
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

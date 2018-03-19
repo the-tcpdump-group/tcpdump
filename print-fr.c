@@ -1140,9 +1140,3 @@ fr_q933_print_ie_codeset_0_5(netdissect_options *ndo, u_int iecode,
 
         return 0;
 }
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

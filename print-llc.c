@@ -608,11 +608,3 @@ trunc:
 	ND_PRINT("[|snap]");
 	return (1);
 }
-
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

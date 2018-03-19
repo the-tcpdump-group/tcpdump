@@ -178,10 +178,3 @@ trunc:
 	ND_PRINT("%s", tstr);
 	return (hdrlen);
 }
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

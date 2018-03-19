@@ -126,12 +126,4 @@ ppi_if_print(netdissect_options *ndo,
 	ndo->ndo_protocol = "ppi_if";
 	return (ppi_print(ndo, h, p));
 }
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */
-
 #endif /* DLT_PPI */

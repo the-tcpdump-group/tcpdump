@@ -973,10 +973,3 @@ sflow_print(netdissect_options *ndo,
  trunc:
     ND_PRINT("[|SFLOW]");
 }
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 4
- * End:
- */

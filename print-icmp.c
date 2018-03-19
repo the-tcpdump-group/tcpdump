@@ -699,9 +699,3 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 trunc:
 	ND_PRINT("[|icmp]");
 }
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

@@ -834,10 +834,3 @@ fail:
 #ifdef HAVE_LIBCRYPTO
 USES_APPLE_RST
 #endif
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

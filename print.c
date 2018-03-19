@@ -526,9 +526,3 @@ ndo_set_function_pointers(netdissect_options *ndo)
 	ndo->ndo_error=ndo_error;
 	ndo->ndo_warning=ndo_warning;
 }
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

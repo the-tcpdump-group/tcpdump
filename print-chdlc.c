@@ -203,11 +203,3 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
 trunc:
 	ND_PRINT("[|slarp]");
 }
-
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

@@ -511,10 +511,3 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
 trunc:
     ND_PRINT("[|stp %u]", length);
 }
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 4
- * End:
- */

@@ -191,10 +191,3 @@ medsa_print(netdissect_options *ndo,
 trunc:
 	ND_PRINT("%s", tstr);
 }
-
-/*
- * Local Variables:
- * c-style: bsd
- * End:
- */
-

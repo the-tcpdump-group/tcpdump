@@ -249,9 +249,3 @@ mpcp_print(netdissect_options *ndo, const u_char *pptr, u_int length)
 trunc:
     ND_PRINT("\n\t[|MPCP]");
 }
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

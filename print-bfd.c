@@ -405,9 +405,3 @@ bfd_print(netdissect_options *ndo, const u_char *pptr,
 trunc:
         ND_PRINT("[|BFD]");
 }
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

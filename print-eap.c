@@ -298,9 +298,3 @@ eap_print(netdissect_options *ndo,
  trunc:
     ND_PRINT("\n\t[|EAP]");
 }
-
-/*
- * Local Variables:
- * c-basic-offset: 4
- * End:
- */

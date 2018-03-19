@@ -376,10 +376,3 @@ tipc_print(netdissect_options *ndo, const u_char *bp, u_int length _U_,
 trunc:
 	ND_PRINT("%s", tstr);
 }
-
-/*
- * Local Variables:
- * c-style: bsd
- * End:
- */
-

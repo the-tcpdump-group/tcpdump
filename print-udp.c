@@ -720,11 +720,3 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 trunc:
 	ND_PRINT("%s", udp_tstr);
 }
-
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

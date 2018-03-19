@@ -1518,11 +1518,3 @@ juniper_parse_header(netdissect_options *ndo,
     ND_PRINT("[|juniper_hdr], length %u", h->len);
     return 0;
 }
-
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 4
- * End:
- */

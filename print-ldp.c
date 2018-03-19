@@ -693,10 +693,3 @@ trunc:
     ND_PRINT("%s", tstr);
     return 0;
 }
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

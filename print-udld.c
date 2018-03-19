@@ -190,10 +190,3 @@ invalid:
 trunc:
     ND_PRINT("%s", tstr);
 }
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 4
- * End:
- */

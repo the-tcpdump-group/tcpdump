@@ -163,12 +163,4 @@ pktap_if_print(netdissect_options *ndo,
 
 	return (hdrlen);
 }
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */
-
 #endif /* DLT_PKTAP */

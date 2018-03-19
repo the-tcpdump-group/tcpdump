@@ -367,10 +367,3 @@ lwapp_data_print(netdissect_options *ndo,
 trunc:
     ND_PRINT("%s", data_tstr);
 }
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

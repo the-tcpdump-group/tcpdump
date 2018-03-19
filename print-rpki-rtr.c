@@ -399,10 +399,3 @@ rpki_rtr_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 	pptr += pdu_len;
     }
 }
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 4
- * End:
- */

@@ -162,11 +162,3 @@ enc_if_print(netdissect_options *ndo,
 out:
 	return (ENC_HDRLEN);
 }
-
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

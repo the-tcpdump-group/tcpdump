@@ -120,10 +120,3 @@ dtp_print (netdissect_options *ndo, const u_char *pptr, u_int length)
  trunc:
     ND_PRINT("%s", tstr);
 }
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 4
- * End:
- */
