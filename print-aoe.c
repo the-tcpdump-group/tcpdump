@@ -30,15 +30,14 @@
 /* specification: http://brantleycoilecompany.com/AoEr11.pdf */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
-#include "ether.h"
 
 static const char tstr[] = " [|aoe]";
 
@@ -143,199 +142,199 @@ static void
 aoev1_issue_print(netdissect_options *ndo,
                   const u_char *cp, const u_int len)
 {
-	const u_char *ep = cp + len;
+	const u_char *ep = ndo->ndo_snapend;
 
 	if (len < AOEV1_ISSUE_ARG_LEN)
 		goto invalid;
 	/* AFlags */
-	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, "\n\tAFlags: [%s]", bittok2str(aoev1_aflag_str, "none", *cp)));
+	ND_TCHECK_1(cp);
+	ND_PRINT("\n\tAFlags: [%s]", bittok2str(aoev1_aflag_str, "none", EXTRACT_U_1(cp)));
 	cp += 1;
 	/* Err/Feature */
-	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, ", Err/Feature: %u", *cp));
+	ND_TCHECK_1(cp);
+	ND_PRINT(", Err/Feature: %u", EXTRACT_U_1(cp));
 	cp += 1;
 	/* Sector Count (not correlated with the length) */
-	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, ", Sector Count: %u", *cp));
+	ND_TCHECK_1(cp);
+	ND_PRINT(", Sector Count: %u", EXTRACT_U_1(cp));
 	cp += 1;
 	/* Cmd/Status */
-	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, ", Cmd/Status: %u", *cp));
+	ND_TCHECK_1(cp);
+	ND_PRINT(", Cmd/Status: %u", EXTRACT_U_1(cp));
 	cp += 1;
 	/* lba0 */
-	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, "\n\tlba0: %u", *cp));
+	ND_TCHECK_1(cp);
+	ND_PRINT("\n\tlba0: %u", EXTRACT_U_1(cp));
 	cp += 1;
 	/* lba1 */
-	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, ", lba1: %u", *cp));
+	ND_TCHECK_1(cp);
+	ND_PRINT(", lba1: %u", EXTRACT_U_1(cp));
 	cp += 1;
 	/* lba2 */
-	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, ", lba2: %u", *cp));
+	ND_TCHECK_1(cp);
+	ND_PRINT(", lba2: %u", EXTRACT_U_1(cp));
 	cp += 1;
 	/* lba3 */
-	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, ", lba3: %u", *cp));
+	ND_TCHECK_1(cp);
+	ND_PRINT(", lba3: %u", EXTRACT_U_1(cp));
 	cp += 1;
 	/* lba4 */
-	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, ", lba4: %u", *cp));
+	ND_TCHECK_1(cp);
+	ND_PRINT(", lba4: %u", EXTRACT_U_1(cp));
 	cp += 1;
 	/* lba5 */
-	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, ", lba5: %u", *cp));
+	ND_TCHECK_1(cp);
+	ND_PRINT(", lba5: %u", EXTRACT_U_1(cp));
 	cp += 1;
 	/* Reserved */
-	ND_TCHECK2(*cp, 2);
+	ND_TCHECK_2(cp);
 	cp += 2;
 	/* Data */
 	if (len > AOEV1_ISSUE_ARG_LEN)
-		ND_PRINT((ndo, "\n\tData: %u bytes", len - AOEV1_ISSUE_ARG_LEN));
+		ND_PRINT("\n\tData: %u bytes", len - AOEV1_ISSUE_ARG_LEN);
 	return;
 
 invalid:
-	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, ep - cp);
+	ND_PRINT("%s", istr);
+	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	ND_PRINT("%s", tstr);
 }
 
 static void
 aoev1_query_print(netdissect_options *ndo,
                   const u_char *cp, const u_int len)
 {
-	const u_char *ep = cp + len;
+	const u_char *ep = ndo->ndo_snapend;
 	uint16_t cslen;
 
 	if (len < AOEV1_QUERY_ARG_LEN)
 		goto invalid;
 	/* Buffer Count */
-	ND_TCHECK2(*cp, 2);
-	ND_PRINT((ndo, "\n\tBuffer Count: %u", EXTRACT_16BITS(cp)));
+	ND_TCHECK_2(cp);
+	ND_PRINT("\n\tBuffer Count: %u", EXTRACT_BE_U_2(cp));
 	cp += 2;
 	/* Firmware Version */
-	ND_TCHECK2(*cp, 2);
-	ND_PRINT((ndo, ", Firmware Version: %u", EXTRACT_16BITS(cp)));
+	ND_TCHECK_2(cp);
+	ND_PRINT(", Firmware Version: %u", EXTRACT_BE_U_2(cp));
 	cp += 2;
 	/* Sector Count */
-	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, ", Sector Count: %u", *cp));
+	ND_TCHECK_1(cp);
+	ND_PRINT(", Sector Count: %u", EXTRACT_U_1(cp));
 	cp += 1;
 	/* AoE/CCmd */
-	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, ", AoE: %u, CCmd: %s", (*cp & 0xF0) >> 4,
-	          tok2str(aoev1_ccmd_str, "Unknown (0x02x)", *cp & 0x0F)));
+	ND_TCHECK_1(cp);
+	ND_PRINT(", AoE: %u, CCmd: %s", (EXTRACT_U_1(cp) & 0xF0) >> 4,
+	          tok2str(aoev1_ccmd_str, "Unknown (0x02x)", EXTRACT_U_1(cp) & 0x0F));
 	cp += 1;
 	/* Config String Length */
-	ND_TCHECK2(*cp, 2);
-	cslen = EXTRACT_16BITS(cp);
+	ND_TCHECK_2(cp);
+	cslen = EXTRACT_BE_U_2(cp);
 	cp += 2;
 	if (cslen > AOEV1_MAX_CONFSTR_LEN || AOEV1_QUERY_ARG_LEN + cslen > len)
 		goto invalid;
 	/* Config String */
-	ND_TCHECK2(*cp, cslen);
+	ND_TCHECK_LEN(cp, cslen);
 	if (cslen) {
-		ND_PRINT((ndo, "\n\tConfig String (length %u): ", cslen));
+		ND_PRINT("\n\tConfig String (length %u): ", cslen);
 		if (fn_printn(ndo, cp, cslen, ndo->ndo_snapend))
 			goto trunc;
 	}
 	return;
 
 invalid:
-	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, ep - cp);
+	ND_PRINT("%s", istr);
+	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	ND_PRINT("%s", tstr);
 }
 
 static void
 aoev1_mac_print(netdissect_options *ndo,
                 const u_char *cp, const u_int len)
 {
-	const u_char *ep = cp + len;
+	const u_char *ep = ndo->ndo_snapend;
 	uint8_t dircount, i;
 
 	if (len < AOEV1_MAC_ARG_LEN)
 		goto invalid;
 	/* Reserved */
-	ND_TCHECK2(*cp, 1);
+	ND_TCHECK_1(cp);
 	cp += 1;
 	/* MCmd */
-	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, "\n\tMCmd: %s", tok2str(aoev1_mcmd_str, "Unknown (0x%02x)", *cp)));
+	ND_TCHECK_1(cp);
+	ND_PRINT("\n\tMCmd: %s", tok2str(aoev1_mcmd_str, "Unknown (0x%02x)", EXTRACT_U_1(cp)));
 	cp += 1;
 	/* MError */
-	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, ", MError: %s", tok2str(aoev1_merror_str, "Unknown (0x%02x)", *cp)));
+	ND_TCHECK_1(cp);
+	ND_PRINT(", MError: %s", tok2str(aoev1_merror_str, "Unknown (0x%02x)", EXTRACT_U_1(cp)));
 	cp += 1;
 	/* Dir Count */
-	ND_TCHECK2(*cp, 1);
-	dircount = *cp;
+	ND_TCHECK_1(cp);
+	dircount = EXTRACT_U_1(cp);
 	cp += 1;
-	ND_PRINT((ndo, ", Dir Count: %u", dircount));
+	ND_PRINT(", Dir Count: %u", dircount);
 	if (AOEV1_MAC_ARG_LEN + dircount * 8 > len)
 		goto invalid;
 	/* directives */
 	for (i = 0; i < dircount; i++) {
 		/* Reserved */
-		ND_TCHECK2(*cp, 1);
+		ND_TCHECK_1(cp);
 		cp += 1;
 		/* DCmd */
-		ND_TCHECK2(*cp, 1);
-		ND_PRINT((ndo, "\n\t DCmd: %s", tok2str(aoev1_dcmd_str, "Unknown (0x%02x)", *cp)));
+		ND_TCHECK_1(cp);
+		ND_PRINT("\n\t DCmd: %s", tok2str(aoev1_dcmd_str, "Unknown (0x%02x)", EXTRACT_U_1(cp)));
 		cp += 1;
 		/* Ethernet Address */
-		ND_TCHECK2(*cp, ETHER_ADDR_LEN);
-		ND_PRINT((ndo, ", Ethernet Address: %s", etheraddr_string(ndo, cp)));
-		cp += ETHER_ADDR_LEN;
+		ND_TCHECK_LEN(cp, MAC_ADDR_LEN);
+		ND_PRINT(", Ethernet Address: %s", etheraddr_string(ndo, cp));
+		cp += MAC_ADDR_LEN;
 	}
 	return;
 
 invalid:
-	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, ep - cp);
+	ND_PRINT("%s", istr);
+	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	ND_PRINT("%s", tstr);
 }
 
 static void
 aoev1_reserve_print(netdissect_options *ndo,
                     const u_char *cp, const u_int len)
 {
-	const u_char *ep = cp + len;
+	const u_char *ep = ndo->ndo_snapend;
 	uint8_t nmacs, i;
 
-	if (len < AOEV1_RESERVE_ARG_LEN || (len - AOEV1_RESERVE_ARG_LEN) % ETHER_ADDR_LEN)
+	if (len < AOEV1_RESERVE_ARG_LEN || (len - AOEV1_RESERVE_ARG_LEN) % MAC_ADDR_LEN)
 		goto invalid;
 	/* RCmd */
-	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, "\n\tRCmd: %s", tok2str(aoev1_rcmd_str, "Unknown (0x%02x)", *cp)));
+	ND_TCHECK_1(cp);
+	ND_PRINT("\n\tRCmd: %s", tok2str(aoev1_rcmd_str, "Unknown (0x%02x)", EXTRACT_U_1(cp)));
 	cp += 1;
 	/* NMacs (correlated with the length) */
-	ND_TCHECK2(*cp, 1);
-	nmacs = *cp;
+	ND_TCHECK_1(cp);
+	nmacs = EXTRACT_U_1(cp);
 	cp += 1;
-	ND_PRINT((ndo, ", NMacs: %u", nmacs));
-	if (AOEV1_RESERVE_ARG_LEN + nmacs * ETHER_ADDR_LEN != len)
+	ND_PRINT(", NMacs: %u", nmacs);
+	if (AOEV1_RESERVE_ARG_LEN + nmacs * MAC_ADDR_LEN != len)
 		goto invalid;
 	/* addresses */
 	for (i = 0; i < nmacs; i++) {
-		ND_PRINT((ndo, "\n\tEthernet Address %u: %s", i, etheraddr_string(ndo, cp)));
-		cp += ETHER_ADDR_LEN;
+		ND_PRINT("\n\tEthernet Address %u: %s", i, etheraddr_string(ndo, cp));
+		cp += MAC_ADDR_LEN;
 	}
 	return;
 
 invalid:
-	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, ep - cp);
+	ND_PRINT("%s", istr);
+	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	ND_PRINT("%s", tstr);
 }
 
 /* cp points to the Ver/Flags octet */
@@ -343,39 +342,39 @@ static void
 aoev1_print(netdissect_options *ndo,
             const u_char *cp, const u_int len)
 {
-	const u_char *ep = cp + len;
+	const u_char *ep = ndo->ndo_snapend;
 	uint8_t flags, command;
 	void (*cmd_decoder)(netdissect_options *, const u_char *, const u_int);
 
 	if (len < AOEV1_COMMON_HDR_LEN)
 		goto invalid;
 	/* Flags */
-	flags = *cp & 0x0F;
-	ND_PRINT((ndo, ", Flags: [%s]", bittok2str(aoev1_flag_str, "none", flags)));
+	flags = EXTRACT_U_1(cp) & 0x0F;
+	ND_PRINT(", Flags: [%s]", bittok2str(aoev1_flag_str, "none", flags));
 	cp += 1;
 	if (! ndo->ndo_vflag)
 		return;
 	/* Error */
-	ND_TCHECK2(*cp, 1);
+	ND_TCHECK_1(cp);
 	if (flags & AOEV1_FLAG_E)
-		ND_PRINT((ndo, "\n\tError: %s", tok2str(aoev1_errcode_str, "Invalid (%u)", *cp)));
+		ND_PRINT("\n\tError: %s", tok2str(aoev1_errcode_str, "Invalid (%u)", EXTRACT_U_1(cp)));
 	cp += 1;
 	/* Major */
-	ND_TCHECK2(*cp, 2);
-	ND_PRINT((ndo, "\n\tMajor: 0x%04x", EXTRACT_16BITS(cp)));
+	ND_TCHECK_2(cp);
+	ND_PRINT("\n\tMajor: 0x%04x", EXTRACT_BE_U_2(cp));
 	cp += 2;
 	/* Minor */
-	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, ", Minor: 0x%02x", *cp));
+	ND_TCHECK_1(cp);
+	ND_PRINT(", Minor: 0x%02x", EXTRACT_U_1(cp));
 	cp += 1;
 	/* Command */
-	ND_TCHECK2(*cp, 1);
-	command = *cp;
+	ND_TCHECK_1(cp);
+	command = EXTRACT_U_1(cp);
 	cp += 1;
-	ND_PRINT((ndo, ", Command: %s", tok2str(cmdcode_str, "Unknown (0x%02x)", command)));
+	ND_PRINT(", Command: %s", tok2str(cmdcode_str, "Unknown (0x%02x)", command));
 	/* Tag */
-	ND_TCHECK2(*cp, 4);
-	ND_PRINT((ndo, ", Tag: 0x%08x", EXTRACT_32BITS(cp)));
+	ND_TCHECK_4(cp);
+	ND_PRINT(", Tag: 0x%08x", EXTRACT_BE_U_4(cp));
 	cp += 4;
 	/* Arg */
 	cmd_decoder =
@@ -389,29 +388,30 @@ aoev1_print(netdissect_options *ndo,
 	return;
 
 invalid:
-	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, ep - cp);
+	ND_PRINT("%s", istr);
+	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	ND_PRINT("%s", tstr);
 }
 
 void
 aoe_print(netdissect_options *ndo,
           const u_char *cp, const u_int len)
 {
-	const u_char *ep = cp + len;
+	const u_char *ep = ndo->ndo_snapend;
 	uint8_t ver;
 
-	ND_PRINT((ndo, "AoE length %u", len));
+	ndo->ndo_protocol = "aoe";
+	ND_PRINT("AoE length %u", len);
 
 	if (len < 1)
 		goto invalid;
 	/* Ver/Flags */
-	ND_TCHECK2(*cp, 1);
-	ver = (*cp & 0xF0) >> 4;
+	ND_TCHECK_1(cp);
+	ver = (EXTRACT_U_1(cp) & 0xF0) >> 4;
 	/* Don't advance cp yet: low order 4 bits are version-specific. */
-	ND_PRINT((ndo, ", Ver %u", ver));
+	ND_PRINT(", Ver %u", ver);
 
 	switch (ver) {
 		case AOE_V1:
@@ -421,10 +421,10 @@ aoe_print(netdissect_options *ndo,
 	return;
 
 invalid:
-	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, ep - cp);
+	ND_PRINT("%s", istr);
+	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	ND_PRINT("%s", tstr);
 }
 

@@ -39,10 +39,10 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include <string.h>
 
@@ -67,19 +67,20 @@ gue_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	u_int len = length, vers;
 
+	ndo->ndo_protocol = "gue";
 	if (len < 2) {
-		ND_PRINT((ndo, "%s", tstr));
+		ND_PRINT("%s", tstr);
 		return;
 	}
-	vers = GUE_VERS(EXTRACT_16BITS(bp));
-	ND_PRINT((ndo, "GUEv%u", vers));
+	vers = GUE_VERS(EXTRACT_BE_U_2(bp));
+	ND_PRINT("GUEv%u", vers);
 
 	switch(vers) {
 	case 0:
 		gue_print_0(ndo, bp, len);
 		break;
 	default:
-		ND_PRINT((ndo, "%s", " (unknown)"));
+		ND_PRINT("%s", " (unknown)");
 		break;
 	}
 	return;
@@ -93,9 +94,9 @@ gue_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 	u_int hlen;
 
 	/* Boundary checking done above */
-	flags = EXTRACT_16BITS(bp);
+	flags = EXTRACT_BE_U_2(bp);
 	if (GUE_CONTROL(flags)) {
-		ND_PRINT((ndo, ", control packet %02x", GUE_CTYPE(flags)));
+		ND_PRINT(", control packet %02x", GUE_CTYPE(flags));
 		prot = 0;
 	} else {
 		prot = GUE_PROTO(flags);
@@ -110,10 +111,10 @@ gue_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	if (len < 2)
 		goto trunc;
-	flags = EXTRACT_16BITS(bp);
+	flags = EXTRACT_BE_U_2(bp);
 
 	if (flags) {
-		ND_PRINT((ndo, ", flags %04x", flags));
+		ND_PRINT(", flags %04x", flags);
 	}
 
 	/* (E)FLAGS field */
@@ -132,9 +133,9 @@ gue_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 	}
 
         if (ndo->ndo_vflag < 1)
-            ND_PRINT((ndo, ": ")); /* put in a colon as protocol demarc */
+            ND_PRINT(": "); /* put in a colon as protocol demarc */
         else
-            ND_PRINT((ndo, "\n\t")); /* if verbose go multiline */
+            ND_PRINT("\n\t"); /* if verbose go multiline */
 
 	switch (prot) {
  	case IPPROTO_IPV4:
@@ -148,14 +149,14 @@ gue_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 		ip6_print(ndo, bp, len);
 		break;
  	case IPPROTO_NONE:
-		ND_PRINT((ndo, "gue-fragment"));
+		ND_PRINT("gue-fragment");
 		break;
 	default:
-		ND_PRINT((ndo, "gue-proto-0x%02x", prot));
+		ND_PRINT("gue-proto-0x%02x", prot);
 	}
 
 	return;
 
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	ND_PRINT("%s", tstr);
 }

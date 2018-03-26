@@ -15,15 +15,15 @@ $options=$ARGV[3];
 my $r;
 
 if ($^O eq 'MSWin32') {
-    $r = system "..\\windump -n -r $input $options 2>NUL | sed 's/\\r//' | tee NEW/$output | diff $output - >DIFF/$output.diff";
+    $r = system "..\\windump -n -t -r $input $options 2>NUL | sed 's/\\r//' | tee NEW/$output | diff $output - >DIFF/$output.diff";
     # need to do same as below for Cygwin.
 }
 else {
     # we used to do this as a nice pipeline, but the problem is that $r fails to
     # to be set properly if the tcpdump core dumps.
-    $r = system "../tcpdump 2>/dev/null -n -r $input $options >NEW/$output";
-    if($r == 0x100) {
-        # this means tcpdump exited with code 1.
+    $r = system "../tcpdump 2>/dev/null -n -t -r $input $options >NEW/$output";
+    if($r != 0) {
+        # this means tcpdump failed.
         open(OUTPUT, ">>"."NEW/$output") || die "fail to open $output\n";
         printf OUTPUT "EXIT CODE %08x\n", $r;
         close(OUTPUT);
@@ -36,13 +36,13 @@ else {
 }
 
 if($r == 0) {
-  printf "    %-30s: passed\n", $name;
+  printf "    %-35s: passed\n", $name;
   unlink "DIFF/$output.diff";
   exit 0;
 }
-printf "    %-30s: TEST FAILED", $name;
+printf "    %-35s: TEST FAILED(%s)", $name, $r == -1 ? $! : "exit $?";
 open FOUT, '>>failure-outputs.txt';
-printf FOUT "Failed test: $name\n\n";
+printf FOUT "\nFailed test: $name\n\n";
 close FOUT;
 if(-f "DIFF/$output.diff") {
     system "cat DIFF/$output.diff >> failure-outputs.txt";
@@ -56,6 +56,8 @@ if($r == -1) {
 # this is not working right, $r == 0x8b00 when there is a core dump.
 # clearly, we need some platform specific perl magic to take this apart, so look for "core"
 # too.
+# In particular, on Solaris 10 SPARC an alignment problem results in SIGILL,
+# a core dump and $r set to 0x00008a00 ($? == 138 in the shell).
 if($r & 127 || -f "core") {
     my $with = ($r & 128) ? 'with' : 'without';
     if(-f "core") {

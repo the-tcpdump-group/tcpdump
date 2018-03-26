@@ -54,7 +54,7 @@ IP 127.0.0.1.52766 > 127.0.0.1.6379: Flags [.], ack 113, win 342, options [nop,n
 IP 127.0.0.1.52767 > 127.0.0.1.6379: Flags [S], seq 3453687710, win 43690, options [mss 65495,sackOK,TS val 1132419549 ecr 0,nop,wscale 7], length 0
 IP 127.0.0.1.6379 > 127.0.0.1.52767: Flags [S.], seq 4076862539, ack 3453687711, win 43690, options [mss 65495,sackOK,TS val 1132419549 ecr 1132419549,nop,wscale 7], length 0
 IP 127.0.0.1.52767 > 127.0.0.1.6379: Flags [.], ack 1, win 342, options [nop,nop,TS val 1132419549 ecr 1132419549], length 0
-IP 127.0.0.1.52767 > 127.0.0.1.6379: Flags [P.], seq 1:39, ack 1, win 342, options [nop,nop,TS val 1132419549 ecr 1132419549], length 38: RESP invalid
+IP 127.0.0.1.52767 > 127.0.0.1.6379: Flags [P.], seq 1:39, ack 1, win 342, options [nop,nop,TS val 1132419549 ecr 1132419549], length 38: RESP length too large
 IP 127.0.0.1.6379 > 127.0.0.1.52767: Flags [.], ack 39, win 342, options [nop,nop,TS val 1132419549 ecr 1132419549], length 0
 IP 127.0.0.1.6379 > 127.0.0.1.52767: Flags [P.], seq 1:48, ack 39, win 342, options [nop,nop,TS val 1132419549 ecr 1132419549], length 47: RESP "ERR Protocol error: invalid multibulk length"
 IP 127.0.0.1.52767 > 127.0.0.1.6379: Flags [.], ack 48, win 342, options [nop,nop,TS val 1132419549 ecr 1132419549], length 0
@@ -64,7 +64,7 @@ IP 127.0.0.1.6379 > 127.0.0.1.52767: Flags [.], ack 40, win 342, options [nop,no
 IP 127.0.0.1.52768 > 127.0.0.1.6379: Flags [S], seq 3109305893, win 43690, options [mss 65495,sackOK,TS val 1132419852 ecr 0,nop,wscale 7], length 0
 IP 127.0.0.1.6379 > 127.0.0.1.52768: Flags [S.], seq 4202059680, ack 3109305894, win 43690, options [mss 65495,sackOK,TS val 1132419852 ecr 1132419852,nop,wscale 7], length 0
 IP 127.0.0.1.52768 > 127.0.0.1.6379: Flags [.], ack 1, win 342, options [nop,nop,TS val 1132419852 ecr 1132419852], length 0
-IP 127.0.0.1.52768 > 127.0.0.1.6379: Flags [P.], seq 1:7, ack 1, win 342, options [nop,nop,TS val 1132419852 ecr 1132419852], length 6: RESP invalid
+IP 127.0.0.1.52768 > 127.0.0.1.6379: Flags [P.], seq 1:7, ack 1, win 342, options [nop,nop,TS val 1132419852 ecr 1132419852], length 6: RESP length negative and not -1
 IP 127.0.0.1.6379 > 127.0.0.1.52768: Flags [.], ack 7, win 342, options [nop,nop,TS val 1132419852 ecr 1132419852], length 0
 IP 127.0.0.1.52768 > 127.0.0.1.6379: Flags [F.], seq 7, ack 1, win 342, options [nop,nop,TS val 1132420152 ecr 1132419852], length 0
 IP 127.0.0.1.6379 > 127.0.0.1.52768: Flags [F.], seq 1, ack 8, win 342, options [nop,nop,TS val 1132420152 ecr 1132420152], length 0
@@ -72,7 +72,7 @@ IP 127.0.0.1.52768 > 127.0.0.1.6379: Flags [.], ack 2, win 342, options [nop,nop
 IP 127.0.0.1.52769 > 127.0.0.1.6379: Flags [S], seq 4072438166, win 43690, options [mss 65495,sackOK,TS val 1132420154 ecr 0,nop,wscale 7], length 0
 IP 127.0.0.1.6379 > 127.0.0.1.52769: Flags [S.], seq 156730490, ack 4072438167, win 43690, options [mss 65495,sackOK,TS val 1132420154 ecr 1132420154,nop,wscale 7], length 0
 IP 127.0.0.1.52769 > 127.0.0.1.6379: Flags [.], ack 1, win 342, options [nop,nop,TS val 1132420154 ecr 1132420154], length 0
-IP 127.0.0.1.52769 > 127.0.0.1.6379: Flags [P.], seq 1:11, ack 1, win 342, options [nop,nop,TS val 1132420154 ecr 1132420154], length 10: RESP invalid [|RESP]
+IP 127.0.0.1.52769 > 127.0.0.1.6379: Flags [P.], seq 1:11, ack 1, win 342, options [nop,nop,TS val 1132420154 ecr 1132420154], length 10: RESP length negative and not -1 "hi"
 IP 127.0.0.1.6379 > 127.0.0.1.52769: Flags [.], ack 11, win 342, options [nop,nop,TS val 1132420154 ecr 1132420154], length 0
 IP 127.0.0.1.6379 > 127.0.0.1.52769: Flags [P.], seq 1:57, ack 11, win 342, options [nop,nop,TS val 1132420154 ecr 1132420154], length 56: RESP "ERR unknown command '$-20'" "ERR unknown command 'hi'"
 IP 127.0.0.1.52769 > 127.0.0.1.6379: Flags [.], ack 57, win 342, options [nop,nop,TS val 1132420154 ecr 1132420154], length 0
@@ -134,7 +134,7 @@ IP 127.0.0.1.52776 > 127.0.0.1.6379: Flags [.], ack 17, win 342, options [nop,no
 IP 127.0.0.1.52777 > 127.0.0.1.6379: Flags [S], seq 357339476, win 43690, options [mss 65495,sackOK,TS val 1132422271 ecr 0,nop,wscale 7], length 0
 IP 127.0.0.1.6379 > 127.0.0.1.52777: Flags [S.], seq 3123925211, ack 357339477, win 43690, options [mss 65495,sackOK,TS val 1132422271 ecr 1132422271,nop,wscale 7], length 0
 IP 127.0.0.1.52777 > 127.0.0.1.6379: Flags [.], ack 1, win 342, options [nop,nop,TS val 1132422271 ecr 1132422271], length 0
-IP 127.0.0.1.52777 > 127.0.0.1.6379: Flags [P.], seq 1:21, ack 1, win 342, options [nop,nop,TS val 1132422271 ecr 1132422271], length 20: RESP "PING" "PING" "PING" [|RESP]
+IP 127.0.0.1.52777 > 127.0.0.1.6379: Flags [P.], seq 1:21, ack 1, win 342, options [nop,nop,TS val 1132422271 ecr 1132422271], length 20: RESP "PING" "PING" "PING"
 IP 127.0.0.1.6379 > 127.0.0.1.52777: Flags [.], ack 21, win 342, options [nop,nop,TS val 1132422271 ecr 1132422271], length 0
 IP 127.0.0.1.6379 > 127.0.0.1.52777: Flags [P.], seq 1:22, ack 21, win 342, options [nop,nop,TS val 1132422271 ecr 1132422271], length 21: RESP "PONG" "PONG" "PONG"
 IP 127.0.0.1.52777 > 127.0.0.1.6379: Flags [.], ack 22, win 342, options [nop,nop,TS val 1132422271 ecr 1132422271], length 0
@@ -144,7 +144,7 @@ IP 127.0.0.1.52777 > 127.0.0.1.6379: Flags [.], ack 23, win 342, options [nop,no
 IP 127.0.0.1.52778 > 127.0.0.1.6379: Flags [S], seq 2069568772, win 43690, options [mss 65495,sackOK,TS val 1132422573 ecr 0,nop,wscale 7], length 0
 IP 127.0.0.1.6379 > 127.0.0.1.52778: Flags [S.], seq 1085796497, ack 2069568773, win 43690, options [mss 65495,sackOK,TS val 1132422573 ecr 1132422573,nop,wscale 7], length 0
 IP 127.0.0.1.52778 > 127.0.0.1.6379: Flags [.], ack 1, win 342, options [nop,nop,TS val 1132422573 ecr 1132422573], length 0
-IP 127.0.0.1.52778 > 127.0.0.1.6379: Flags [P.], seq 1:21, ack 1, win 342, options [nop,nop,TS val 1132422573 ecr 1132422573], length 20: RESP "PING" "PING" "PING" [|RESP]
+IP 127.0.0.1.52778 > 127.0.0.1.6379: Flags [P.], seq 1:21, ack 1, win 342, options [nop,nop,TS val 1132422573 ecr 1132422573], length 20: RESP "PING" "PING" "PING"
 IP 127.0.0.1.6379 > 127.0.0.1.52778: Flags [.], ack 21, win 342, options [nop,nop,TS val 1132422573 ecr 1132422573], length 0
 IP 127.0.0.1.6379 > 127.0.0.1.52778: Flags [P.], seq 1:22, ack 21, win 342, options [nop,nop,TS val 1132422573 ecr 1132422573], length 21: RESP "PONG" "PONG" "PONG"
 IP 127.0.0.1.52778 > 127.0.0.1.6379: Flags [.], ack 22, win 342, options [nop,nop,TS val 1132422573 ecr 1132422573], length 0
@@ -154,7 +154,7 @@ IP 127.0.0.1.52778 > 127.0.0.1.6379: Flags [.], ack 23, win 342, options [nop,no
 IP 127.0.0.1.52779 > 127.0.0.1.6379: Flags [S], seq 1578479120, win 43690, options [mss 65495,sackOK,TS val 1132422875 ecr 0,nop,wscale 7], length 0
 IP 127.0.0.1.6379 > 127.0.0.1.52779: Flags [S.], seq 2529957046, ack 1578479121, win 43690, options [mss 65495,sackOK,TS val 1132422875 ecr 1132422875,nop,wscale 7], length 0
 IP 127.0.0.1.52779 > 127.0.0.1.6379: Flags [.], ack 1, win 342, options [nop,nop,TS val 1132422875 ecr 1132422875], length 0
-IP 127.0.0.1.52779 > 127.0.0.1.6379: Flags [P.], seq 1:24, ack 1, win 342, options [nop,nop,TS val 1132422875 ecr 1132422875], length 23: RESP "PING" "PING" "PING" [|RESP]
+IP 127.0.0.1.52779 > 127.0.0.1.6379: Flags [P.], seq 1:24, ack 1, win 342, options [nop,nop,TS val 1132422875 ecr 1132422875], length 23: RESP "PING" "PING" "PING"
 IP 127.0.0.1.6379 > 127.0.0.1.52779: Flags [.], ack 24, win 342, options [nop,nop,TS val 1132422875 ecr 1132422875], length 0
 IP 127.0.0.1.6379 > 127.0.0.1.52779: Flags [P.], seq 1:22, ack 24, win 342, options [nop,nop,TS val 1132422875 ecr 1132422875], length 21: RESP "PONG" "PONG" "PONG"
 IP 127.0.0.1.52779 > 127.0.0.1.6379: Flags [.], ack 22, win 342, options [nop,nop,TS val 1132422875 ecr 1132422875], length 0

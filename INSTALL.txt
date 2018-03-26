@@ -37,6 +37,7 @@ Please see "PLATFORMS" for notes about tested platforms.
 FILES
 -----
 CHANGES		- description of differences between releases
+CONTRIBUTING	- guidelines for contributing
 CREDITS		- people that have helped tcpdump along
 INSTALL.txt	- this file
 LICENSE		- the license under which tcpdump is distributed
@@ -62,7 +63,7 @@ config.guess	- autoconf support
 config.h.in	- autoconf input
 config.sub	- autoconf support
 configure	- configure script (run this first)
-configure.in	- configure script source
+configure.ac	- configure script source
 ether.h		- Ethernet definitions
 ethertype.h	- Ethernet type value definitions
 extract.h	- alignment definitions
@@ -118,5 +119,4 @@ tcpdump.c	- main program
 timeval-operations.h - timeval operations macros
 udp.h		- UDP definitions
 util-print.c	- utility routines for protocol printers
-vfprintf.c	- emulation routine
 win32		- headers and routines for building on Win32 systems

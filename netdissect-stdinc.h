@@ -41,13 +41,128 @@
 
 #include <errno.h>
 
+#include "compiler-tests.h"
+
+#include "varattrs.h"
+
+/*
+ * Get the C99 types, and the PRI[doux]64 format strings, defined.
+ */
+#ifdef HAVE_PCAP_PCAP_INTTYPES_H
+  /*
+   * We have pcap/pcap-inttypes.h; use that, as it'll do all the
+   * work, and won't cause problems if a file includes this file
+   * and later includes a pcap header file that also includes
+   * pcap/pcap-inttypes.h.
+   */
+  #include <pcap/pcap-inttypes.h>
+#else
+  /*
+   * OK, we don't have pcap/pcap-inttypes.h, so we'll have to
+   * do the work ourselves, but at least we don't have to
+   * worry about other headers including it and causing
+   * clashes.
+   */
+  #if defined(_MSC_VER)
+    /*
+     * Compiler is MSVC.
+     */
+    #if _MSC_VER >= 1800
+      /*
+       * VS 2013 or newer; we have <inttypes.h>.
+       */
+      #include <inttypes.h>
+    #else
+      /*
+       * Earlier VS; we have to define this stuff ourselves.
+       */
+      typedef unsigned char uint8_t;
+      typedef signed char int8_t;
+      typedef unsigned short uint16_t;
+      typedef signed short int16_t;
+      typedef unsigned int uint32_t;
+      typedef signed int int32_t;
+      #ifdef _MSC_EXTENSIONS
+        typedef unsigned _int64 uint64_t;
+        typedef _int64 int64_t;
+      #else /* _MSC_EXTENSIONS */
+        typedef unsigned long long uint64_t;
+        typedef long long int64_t;
+      #endif
+
+      /*
+       * We have _strtoi64().  Use that for strtoint64_t().
+       */
+      #define strtoint64_t	_strtoi64
+    #endif
+
+    /*
+     * Suppress definition of intN_t in bittypes.h, which might be included
+     * by <pcap/pcap.h> in older versions of WinPcap.
+     * (Yes, HAVE_U_INTn_T, as the definition guards are UN*X-oriented, and
+     * we check for u_intN_t in the UN*X configure script.)
+     */
+    #define HAVE_U_INT8_T
+    #define HAVE_U_INT16_T
+    #define HAVE_U_INT32_T
+    #define HAVE_U_INT64_T
+
+    /*
+     * These may be defined by <inttypes.h>.  If not, define them
+     * ourselves.
+     *
+     * XXX - for MSVC, we always want the _MSC_EXTENSIONS versions.
+     * What about other compilers?  If, as the MinGW Web site says MinGW
+     * does, the other compilers just use Microsoft's run-time library,
+     * then they should probably use the _MSC_EXTENSIONS even if the
+     * compiler doesn't define _MSC_EXTENSIONS.
+     */
+    #ifndef PRId64
+      #ifdef _MSC_EXTENSIONS
+        #define PRId64	"I64d"
+      #else
+        #define PRId64	"lld"
+      #endif
+    #endif /* PRId64 */
+
+    #ifndef PRIo64
+      #ifdef _MSC_EXTENSIONS
+        #define PRIo64	"I64o"
+      #else
+        #define PRIo64	"llo"
+      #endif
+    #endif /* PRIo64 */
+
+    #ifndef PRIx64
+      #ifdef _MSC_EXTENSIONS
+        #define PRIx64	"I64x"
+      #else
+        #define PRIx64	"llx"
+      #endif
+    #endif
+
+    #ifndef PRIu64
+      #ifdef _MSC_EXTENSIONS
+        #define PRIu64	"I64u"
+      #else
+        #define PRIu64	"llu"
+      #endif
+    #endif
+  #elif defined(__MINGW32__) || !defined(_WIN32)
+    /*
+     * Compiler is MinGW or target is UN*X or MS-DOS.  Just use
+     * <inttypes.h>.
+     */
+    #include <inttypes.h>
+  #endif
+#endif /* HAVE_PCAP_PCAP_INTTYPES_H */
+
 #ifdef _WIN32
 
 /*
  * Includes and definitions for Windows.
  */
 
-#include <stdint.h>
 #include <stdio.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -57,102 +172,66 @@
 #include <fcntl.h>
 #include <sys/types.h>
 
-#ifndef uint8_t
-#define uint8_t		unsigned char
+#ifdef _MSC_VER
+  /*
+   * Compiler is MSVC.
+   */
+  #if _MSC_VER >= 1800
+    /*
+     * VS 2013 or newer; we have strtoll().  Use that for strtoint64_t().
+     */
+    #define strtoint64_t	strtoll
+  #else
+    /*
+     * Earlier VS; we don't have strtoll(), but we do have
+     * _strtoi64().  Use that for strtoint64_t().
+     */
+    #define strtoint64_t	_strtoi64
+  #endif
+
+  /*
+   * Microsoft's documentation doesn't speak of LL as a valid
+   * suffix for 64-bit integers, so we'll just use i64.
+   */
+  #define INT64_T_CONSTANT(constant)	(constant##i64)
+#else
+  /*
+   * Non-Microsoft compiler.
+   *
+   * XXX - should we use strtoll or should we use _strtoi64()?
+   */
+  #define strtoint64_t		strtoll
+
+  /*
+   * Assume LL works.
+   */
+  #define INT64_T_CONSTANT(constant)	(constant##LL)
 #endif
-
-#ifndef int8_t
-#define int8_t		signed char
-#endif
-
-#ifndef uint16_t
-#define uint16_t	unsigned short
-#endif
-
-#ifndef int16_t
-#define int16_t		signed short
-#endif
-
-#ifndef uint32_t
-#define uint32_t	unsigned int
-#endif
-
-#ifndef int32_t
-#define int32_t		signed int
-#endif
-
-#ifdef _MSC_EXTENSIONS
-
-#ifndef uint64_t
-#define uint64_t	unsigned _int64
-#endif
-
-#ifndef int64_t
-#define int64_t		_int64
-#endif
-
-#ifndef PRId64
-#define PRId64		"I64d"
-#endif
-
-#ifndef PRIo64
-#define PRIo64		"I64o"
-#endif
-
-#ifndef PRIu64
-#define PRIu64		"I64u"
-#endif
-
-#ifndef PRIx64
-#define PRIx64		"I64x"
-#endif
-
-#else /* _MSC_EXTENSIONS */
-
-#ifndef uint64_t
-#define uint64_t	unsigned long long
-#endif
-
-#ifndef int64_t
-#define int64_t		long long
-#endif
-
-#ifndef PRId64
-#define PRId64		"lld"
-#endif
-
-#ifndef PRIo64
-#define PRIo64		"llo"
-#endif
-
-#ifndef PRIu64
-#define PRIu64		"llu"
-#endif
-
-#ifndef PRIx64
-#define PRIx64		"llx"
-#endif
-
-#endif /* _MSC_EXTENSIONS */
-
-/*
- * Suppress definition of intN_t in bittypes.h, as included by <pcap/pcap.h>
- * on Windows.
- * (Yes, HAVE_U_INTn_T, as the definition guards are UN*X-oriented, and
- * we check for u_intN_t in the UN*X configure script.)
- */
-#define HAVE_U_INT8_T
-#define HAVE_U_INT16_T
-#define HAVE_U_INT32_T
-#define HAVE_U_INT64_T
 
 #ifdef _MSC_VER
-#define stat _stat
-#define open _open
-#define fstat _fstat
-#define read _read
-#define close _close
-#define O_RDONLY _O_RDONLY
+  /*
+   * Microsoft tries to avoid polluting the C namespace with UN*Xisms,
+   * by adding a preceding underscore; we *want* the UN*Xisms, so add
+   * #defines to let us use them.
+   */
+  #define isascii __isascii
+  #define stat _stat
+  #define strdup _strdup
+  #define open _open
+  #define fstat _fstat
+  #define read _read
+  #define close _close
+  #define O_RDONLY _O_RDONLY
+
+  /*
+   * If <crtdbg.h> has been included, and _DEBUG is defined, and
+   * __STDC__ is zero, <crtdbg.h> will define strdup() to call
+   * _strdup_dbg().  So if it's already defined, don't redefine
+   * it.
+   */
+  #ifndef strdup
+    #define strdup _strdup
+  #endif
 #endif  /* _MSC_VER */
 
 /*
@@ -162,7 +241,7 @@
 #define inline __inline
 #endif
 
-#ifdef AF_INET6
+#if defined(AF_INET6) && !defined(HAVE_OS_IPV6_SUPPORT)
 #define HAVE_OS_IPV6_SUPPORT
 #endif
 
@@ -181,9 +260,6 @@ typedef char* caddr_t;
 #endif /* caddr_t */
 
 #define MAXHOSTNAMELEN	64
-#define snprintf _snprintf
-#define vsnprintf _vsnprintf
-#define RETSIGTYPE void
 
 #else /* _WIN32 */
 
@@ -194,65 +270,88 @@ typedef char* caddr_t;
 #include <ctype.h>
 #include <unistd.h>
 #include <netdb.h>
-#if HAVE_INTTYPES_H
-#include <inttypes.h>
-#elif HAVE_STDINT_H
-#include <stdint.h>
-#endif
 #include <sys/param.h>
 #include <sys/types.h>			/* concession to AIX */
 #include <sys/time.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-#ifdef TIME_WITH_SYS_TIME
 #include <time.h>
-#endif
 
 #include <arpa/inet.h>
 
-#endif /* _WIN32 */
-
-#ifndef HAVE___ATTRIBUTE__
-#define __attribute__(x)
-#endif
+/*
+ * Assume all UN*Xes have strtoll(), and use it for strtoint64_t().
+ */
+#define strtoint64_t	strtoll
 
 /*
- * Used to declare a structure unaligned, so that the C compiler,
- * if necessary, generates code that doesn't assume alignment.
- * This is required because there is no guarantee that the packet
- * data we get from libpcap/WinPcap is properly aligned.
- *
- * This assumes that, for all compilers that support __attribute__:
- *
- *	1) they support __attribute__((packed));
- *
- *	2) for all instruction set architectures requiring strict
- *	   alignment, declaring a structure with that attribute
- *	   causes the compiler to generate code that handles
- *	   misaligned 2-byte, 4-byte, and 8-byte integral
- *	   quantities.
- *
- * It does not (yet) handle compilers where you can get the compiler
- * to generate code of that sort by some other means.
- *
- * This is required in order to, for example, keep the compiler from
- * generating, for
- *
- *	if (bp->bp_htype == 1 && bp->bp_hlen == 6 && bp->bp_op == BOOTPREQUEST) {
- *
- * in print-bootp.c, code that loads the first 4-byte word of a
- * "struct bootp", masking out the bp_hops field, and comparing the result
- * against 0x01010600.
- *
- * Note: this also requires that padding be put into the structure,
- * at least for compilers where it's implemented as __attribute__((packed)).
+ * Assume LL works.
  */
-#if !(defined(_MSC_VER) && defined(UNALIGNED))
-/* MSVC may have its own macro defined with the same name and purpose. */
-#undef UNALIGNED
-#define UNALIGNED	__attribute__((packed))
-#endif
+#define INT64_T_CONSTANT(constant)	(constant##LL)
+
+#endif /* _WIN32 */
+
+/*
+ * Function attributes, for various compilers.
+ */
+#include "funcattrs.h"
+
+/*
+ * On Windows, snprintf(), with that name and with C99 behavior - i.e.,
+ * guaranteeing that the formatted string is null-terminated - didn't
+ * appear until Visual Studio 2015.  Prior to that, the C runtime had
+ * only _snprintf(), which *doesn't* guarantee that the string is
+ * null-terminated if it is truncated due to the buffer being too
+ * small.  We therefore can't just define snprintf to be _snprintf
+ * and define vsnprintf to be _vsnprintf, as we're relying on null-
+ * termination of strings in all cases.
+ *
+ * Furthermore, some versions of Visual Studio prior to Visual
+ * Studio 2015 had vsnprintf() (but not snprintf()!), but those
+ * versions don't guarantee null termination, either.
+ *
+ * We assume all UN*Xes that have snprintf() and vsnprintf() provide
+ * C99 behavior.
+ */
+#if defined(_MSC_VER) || defined(__MINGW32__)
+  #if defined(_MSC_VER) && _MSC_VER >= 1900
+    /*
+     * VS 2015 or newer; just use the C runtime's snprintf() and
+     * vsnprintf().
+     */
+    #define nd_snprintf		snprintf
+    #define nd_vsnprintf	vsnprintf
+  #else /* defined(_MSC_VER) && _MSC_VER >= 1900 */
+    /*
+     * VS prior to 2015, or MingGW; assume we have _snprintf_s() and
+     * _vsnprintf_s(), which guarantee null termination.
+     */
+    #define nd_snprintf(buf, buflen, fmt, ...) \
+        _snprintf_s(buf, buflen, _TRUNCATE, fmt, __VA_ARGS__)
+    #define nd_vsnprintf(buf, buflen, fmt, ap) \
+        _vsnprintf_s(buf, buflen, _TRUNCATE, fmt, ap)
+  #endif /* defined(_MSC_VER) && _MSC_VER >= 1900 */
+#else /* defined(_MSC_VER) || defined(__MINGW32__) */
+  /*
+   * Some other compiler, which we assume to be a UN*X compiler.
+   * Use the system's snprintf() if we have it, otherwise use
+   * our own implementation
+   */
+  #ifdef HAVE_SNPRINTF
+    #define nd_snprintf		snprintf
+  #else /* HAVE_SNPRINTF */
+    int nd_snprintf (char *str, size_t sz, FORMAT_STRING(const char *format), ...)
+        PRINTFLIKE(3, 4);
+  #endif /* HAVE_SNPRINTF */
+
+  #ifdef HAVE_VSNPRINTF
+    #define nd_vsnprintf	vsnprintf
+  #else /* HAVE_VSNPRINTF */
+    int nd_vsnprintf (char *str, size_t sz, FORMAT_STRING(const char *format),
+        va_list ap) PRINTFLIKE(3, 0);
+  #endif /* HAVE_VSNPRINTF */
+#endif /* defined(_MSC_VER) || defined(__MINGW32__) */
 
 /*
  * fopen() read and write modes for text files and binary files.
@@ -275,8 +374,8 @@ typedef char* caddr_t;
  * an 80386, so, for example, it avoids the bswap instruction added in
  * the 80486.
  *
- * (We don't use them on OS X; Apple provides their own, which *doesn't*
- * avoid the bswap instruction, as OS X only supports machines that
+ * (We don't use them on macOS; Apple provides their own, which *doesn't*
+ * avoid the bswap instruction, as macOS only supports machines that
  * have it.)
  */
 #if defined(__GNUC__) && defined(__i386__) && !defined(__APPLE__) && !defined(__ntohl)
@@ -361,7 +460,20 @@ struct in6_addr {
 #define DIAG_JOINSTR(x,y) XSTRINGIFY(x ## y)
 #define DIAG_DO_PRAGMA(x) _Pragma (#x)
 
-#if defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 402
+/*
+ * The current clang compilers also define __GNUC__ and __GNUC_MINOR__
+ * thus we need to test the clang case before the GCC one
+ */
+#if defined(__clang__)
+#  if (__clang_major__ * 100) + __clang_minor__ >= 208
+#    define DIAG_PRAGMA(x) DIAG_DO_PRAGMA(clang diagnostic x)
+#    define DIAG_OFF(x) DIAG_PRAGMA(push) DIAG_PRAGMA(ignored DIAG_JOINSTR(-W,x))
+#    define DIAG_ON(x) DIAG_PRAGMA(pop)
+#  else
+#    define DIAG_OFF(x)
+#    define DIAG_ON(x)
+#  endif
+#elif defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 402
 #  define DIAG_PRAGMA(x) DIAG_DO_PRAGMA(GCC diagnostic x)
 #  if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
 #    define DIAG_OFF(x) DIAG_PRAGMA(push) DIAG_PRAGMA(ignored DIAG_JOINSTR(-W,x))
@@ -370,13 +482,18 @@ struct in6_addr {
 #    define DIAG_OFF(x) DIAG_PRAGMA(ignored DIAG_JOINSTR(-W,x))
 #    define DIAG_ON(x)  DIAG_PRAGMA(warning DIAG_JOINSTR(-W,x))
 #  endif
-#elif defined(__clang__) && ((__clang_major__ * 100) + __clang_minor__ >= 208)
-#  define DIAG_PRAGMA(x) DIAG_DO_PRAGMA(clang diagnostic x)
-#  define DIAG_OFF(x) DIAG_PRAGMA(push) DIAG_PRAGMA(ignored DIAG_JOINSTR(-W,x))
-#  define DIAG_ON(x) DIAG_PRAGMA(pop)
 #else
 #  define DIAG_OFF(x)
 #  define DIAG_ON(x)
+#endif
+
+/* Use for clang specific warnings */
+#ifdef __clang__
+#  define DIAG_OFF_CLANG(x) DIAG_OFF(x)
+#  define DIAG_ON_CLANG(x)  DIAG_ON(x)
+#else
+#  define DIAG_OFF_CLANG(x)
+#  define DIAG_ON_CLANG(x)
 #endif
 
 /*
@@ -394,11 +511,18 @@ struct in6_addr {
  * end of Apple deprecation workaround macros
  */
 
-#ifndef min
-#define min(a,b) ((a)>(b)?(b):(a))
-#endif
-#ifndef max
-#define max(a,b) ((b)>(a)?(b):(a))
-#endif
+/*
+ * Statement attributes, for various compilers.
+ *
+ * This was introduced sufficiently recently that compilers implementing
+ * it also implement __has_attribute() (for example, GCC 5.0 and later
+ * have __has_attribute(), and the "fallthrough" attribute was introduced
+ * in GCC 7).
+ */
+#if __has_attribute(fallthrough)
+#  define ND_FALL_THROUGH __attribute__ ((fallthrough))
+#else
+#  define ND_FALL_THROUGH
+#endif /*  __has_attribute(fallthrough) */
 
 #endif /* netdissect_stdinc_h */

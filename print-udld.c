@@ -20,10 +20,10 @@
 /* specification: RFC 5171 */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include "netdissect.h"
 #include "extract.h"
@@ -99,22 +99,23 @@ udld_print (netdissect_options *ndo, const u_char *pptr, u_int length)
     int code, type, len;
     const u_char *tptr;
 
+    ndo->ndo_protocol = "udld";
     if (length < UDLD_HEADER_LEN)
         goto trunc;
 
     tptr = pptr;
 
-    ND_TCHECK2(*tptr, UDLD_HEADER_LEN);
+    ND_TCHECK_LEN(tptr, UDLD_HEADER_LEN);
 
-    code = UDLD_EXTRACT_OPCODE(*tptr);
+    code = UDLD_EXTRACT_OPCODE(EXTRACT_U_1(tptr));
 
-    ND_PRINT((ndo, "UDLDv%u, Code %s (%x), Flags [%s] (0x%02x), length %u",
-           UDLD_EXTRACT_VERSION(*tptr),
+    ND_PRINT("UDLDv%u, Code %s (%x), Flags [%s] (0x%02x), length %u",
+           UDLD_EXTRACT_VERSION(EXTRACT_U_1(tptr)),
            tok2str(udld_code_values, "Reserved", code),
            code,
-           bittok2str(udld_flags_values, "none", *(tptr+1)),
-           *(tptr+1),
-           length));
+           bittok2str(udld_flags_values, "none", EXTRACT_U_1((tptr + 1))),
+           EXTRACT_U_1((tptr + 1)),
+           length);
 
     /*
      * In non-verbose mode, just print version and opcode type
@@ -123,19 +124,19 @@ udld_print (netdissect_options *ndo, const u_char *pptr, u_int length)
 	return;
     }
 
-    ND_PRINT((ndo, "\n\tChecksum 0x%04x (unverified)", EXTRACT_16BITS(tptr+2)));
+    ND_PRINT("\n\tChecksum 0x%04x (unverified)", EXTRACT_BE_U_2(tptr + 2));
 
     tptr += UDLD_HEADER_LEN;
 
     while (tptr < (pptr+length)) {
 
-        ND_TCHECK2(*tptr, 4);
-	type = EXTRACT_16BITS(tptr);
-        len  = EXTRACT_16BITS(tptr+2);
+        ND_TCHECK_4(tptr);
+	type = EXTRACT_BE_U_2(tptr);
+        len  = EXTRACT_BE_U_2(tptr + 2);
 
-        ND_PRINT((ndo, "\n\t%s (0x%04x) TLV, length %u",
+        ND_PRINT("\n\t%s (0x%04x) TLV, length %u",
                tok2str(udld_tlv_values, "Unknown", type),
-               type, len));
+               type, len);
 
         if (type == 0)
             goto invalid;
@@ -147,18 +148,18 @@ udld_print (netdissect_options *ndo, const u_char *pptr, u_int length)
         len -= 4;
         tptr += 4;
 
-        ND_TCHECK2(*tptr, len);
+        ND_TCHECK_LEN(tptr, len);
 
         switch (type) {
         case UDLD_DEVICE_ID_TLV:
         case UDLD_PORT_ID_TLV:
         case UDLD_DEVICE_NAME_TLV:
-            ND_PRINT((ndo, ", "));
+            ND_PRINT(", ");
             fn_printzp(ndo, tptr, len, NULL);
             break;
 
         case UDLD_ECHO_TLV:
-            ND_PRINT((ndo, ", "));
+            ND_PRINT(", ");
             (void)fn_printn(ndo, tptr, len, NULL);
             break;
 
@@ -166,13 +167,13 @@ udld_print (netdissect_options *ndo, const u_char *pptr, u_int length)
         case UDLD_TIMEOUT_INTERVAL_TLV:
             if (len != 1)
                 goto invalid;
-            ND_PRINT((ndo, ", %us", (*tptr)));
+            ND_PRINT(", %us", (EXTRACT_U_1(tptr)));
             break;
 
         case UDLD_SEQ_NUMBER_TLV:
             if (len != 4)
                 goto invalid;
-            ND_PRINT((ndo, ", %u", EXTRACT_32BITS(tptr)));
+            ND_PRINT(", %u", EXTRACT_BE_U_4(tptr));
             break;
 
         default:
@@ -184,15 +185,8 @@ udld_print (netdissect_options *ndo, const u_char *pptr, u_int length)
     return;
 
 invalid:
-    ND_PRINT((ndo, "%s", istr));
+    ND_PRINT("%s", istr);
     return;
 trunc:
-    ND_PRINT((ndo, "%s", tstr));
+    ND_PRINT("%s", tstr);
 }
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 4
- * End:
- */

@@ -24,42 +24,42 @@
 /* \summary: IPSEC Authentication Header printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
-
-#include "ah.h"
+#include "netdissect-stdinc.h"
 
 #include "netdissect.h"
 #include "extract.h"
 
+#include "ah.h"
+
 int
-ah_print(netdissect_options *ndo, register const u_char *bp)
+ah_print(netdissect_options *ndo, const u_char *bp)
 {
-	register const struct ah *ah;
-	register const u_char *ep;
-	int sumlen;
-	uint32_t spi;
+	const struct ah *ah;
+	u_int sumlen;
 
+	ndo->ndo_protocol = "ah";
 	ah = (const struct ah *)bp;
-	ep = ndo->ndo_snapend;		/* 'ep' points to the end of available data. */
 
-	ND_TCHECK(*ah);
+	ND_TCHECK_SIZE(ah);
 
-	sumlen = ah->ah_len << 2;
-	spi = EXTRACT_32BITS(&ah->ah_spi);
+	sumlen = EXTRACT_U_1(ah->ah_len) << 2;
 
-	ND_PRINT((ndo, "AH(spi=0x%08x", spi));
+	ND_PRINT("AH(spi=0x%08x", EXTRACT_BE_U_4(ah->ah_spi));
 	if (ndo->ndo_vflag)
-		ND_PRINT((ndo, ",sumlen=%d", sumlen));
-	ND_PRINT((ndo, ",seq=0x%x", EXTRACT_32BITS(ah + 1)));
-	if (bp + sizeof(struct ah) + sumlen > ep)
-		ND_PRINT((ndo, "[truncated]"));
-	ND_PRINT((ndo, "): "));
+		ND_PRINT(",sumlen=%u", sumlen);
+	ND_TCHECK_4(ah + 1);
+	ND_PRINT(",seq=0x%x", EXTRACT_BE_U_4(ah + 1));
+	if (!ND_TTEST_LEN(bp, sizeof(struct ah) + sumlen)) {
+		ND_PRINT("[truncated]):");
+		return -1;
+	}
+	ND_PRINT("): ");
 
 	return sizeof(struct ah) + sumlen;
  trunc:
-	ND_PRINT((ndo, "[|AH]"));
+	ND_PRINT("[|AH]");
 	return -1;
 }

@@ -886,11 +886,11 @@ IP (tos 0x0, ttl 64, id 53604, offset 0, flags [DF], proto TCP (6), length 189)
 	 buffer_id NONE, total_len 119, in_port 1, reason ACTION
 	 data (119 octets), frame decoding below
 STP 802.1s, Rapid STP, CIST Flags [Proposal, Learn, Forward, Agreement], length 102
-	port-role Designated, CIST root-id 8000.08:9e:01:62:d5:f4, CIST ext-pathcost 0 
-	CIST regional-root-id 8000.08:9e:01:62:d5:f4, CIST port-id 8034, 
+	port-role Designated, CIST root-id 8000.08:9e:01:62:d5:f4, CIST ext-pathcost 0
+	CIST regional-root-id 8000.08:9e:01:62:d5:f4, CIST port-id 8034,
 	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
-	v3len 64, MCID Name pica8, rev 0, 
-		digest ac36177f50283cd4b83821d8ab26de62, CIST int-root-pathcost 0, 
+	v3len 64, MCID Name pica8, rev 0,
+		digest ac36177f50283cd4b83821d8ab26de62, CIST int-root-pathcost 0,
 	CIST bridge-id 8000.08:9e:01:62:d5:f4, CIST remaining-hops 20
 IP (tos 0x0, ttl 64, id 53605, offset 0, flags [DF], proto TCP (6), length 168)
     10.0.0.81.56068 > 10.0.0.20.6633: Flags [P.], cksum 0x4a03 (correct), seq 10350:10466, ack 4641, win 1035, options [nop,nop,TS val 3 ecr 47837000], length 116: OpenFlow
@@ -1319,11 +1319,11 @@ IP (tos 0x0, ttl 64, id 53775, offset 0, flags [DF], proto TCP (6), length 189)
 	 buffer_id NONE, total_len 119, in_port 1, reason NO_MATCH
 	 data (119 octets), frame decoding below
 STP 802.1s, Rapid STP, CIST Flags [Proposal, Learn, Forward, Agreement], length 102
-	port-role Designated, CIST root-id 8000.08:9e:01:62:d5:f4, CIST ext-pathcost 0 
-	CIST regional-root-id 8000.08:9e:01:62:d5:f4, CIST port-id 8034, 
+	port-role Designated, CIST root-id 8000.08:9e:01:62:d5:f4, CIST ext-pathcost 0
+	CIST regional-root-id 8000.08:9e:01:62:d5:f4, CIST port-id 8034,
 	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
-	v3len 64, MCID Name pica8, rev 0, 
-		digest ac36177f50283cd4b83821d8ab26de62, CIST int-root-pathcost 0, 
+	v3len 64, MCID Name pica8, rev 0,
+		digest ac36177f50283cd4b83821d8ab26de62, CIST int-root-pathcost 0,
 	CIST bridge-id 8000.08:9e:01:62:d5:f4, CIST remaining-hops 20
 IP (tos 0x0, ttl 64, id 53128, offset 0, flags [DF], proto TCP (6), length 52)
     10.0.0.20.6633 > 10.0.0.81.56068: Flags [.], cksum 0x148b (incorrect -> 0xb3e0), seq 4857, ack 14903, win 331, options [nop,nop,TS val 47839052 ecr 6], length 0

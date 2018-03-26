@@ -33,7 +33,8 @@ enum {
     LINKADDR_ETHER,
     LINKADDR_FRELAY,
     LINKADDR_IEEE1394,
-    LINKADDR_ATM
+    LINKADDR_ATM,
+    LINKADDR_OTHER
 };
 
 #define BUFSIZE 128
@@ -41,21 +42,16 @@ enum {
 extern const char *linkaddr_string(netdissect_options *, const u_char *, const unsigned int, const unsigned int);
 extern const char *etheraddr_string(netdissect_options *, const u_char *);
 extern const char *le64addr_string(netdissect_options *, const u_char *);
-extern const char *etherproto_string(netdissect_options *, u_short);
 extern const char *tcpport_string(netdissect_options *, u_short);
 extern const char *udpport_string(netdissect_options *, u_short);
-extern const char *isonsap_string(netdissect_options *, const u_char *, register u_int);
+extern const char *isonsap_string(netdissect_options *, const u_char *, u_int);
 extern const char *dnaddr_string(netdissect_options *, u_short);
-extern const char *protoid_string(netdissect_options *, const u_char *);
 extern const char *ipxsap_string(netdissect_options *, u_short);
-extern const char *getname(netdissect_options *, const u_char *);
-extern const char *getname6(netdissect_options *, const u_char *);
+extern const char *ipaddr_string(netdissect_options *, const u_char *);
+extern const char *ip6addr_string(netdissect_options *, const u_char *);
 extern const char *intoa(uint32_t);
 
 extern void init_addrtoname(netdissect_options *, uint32_t, uint32_t);
 extern struct hnamemem *newhnamemem(netdissect_options *);
 extern struct h6namemem *newh6namemem(netdissect_options *);
 extern const char * ieee8021q_tci_string(const uint16_t);
-
-#define ipaddr_string(ndo, p) getname(ndo, (const u_char *)(p))
-#define ip6addr_string(ndo, p) getname6(ndo, (const u_char *)(p))

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1998-2004  Hannes Gredler <hannes@tcpdump.org>
+ * Copyright (c) 1998-2004  Hannes Gredler <hannes@gredler.at>
  *      The TCPDUMP project
  *
  * Redistribution and use in source and binary forms, with or without
@@ -17,10 +17,10 @@
 /* \summary: Syslog protocol printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include "netdissect.h"
 #include "extract.h"
@@ -78,36 +78,37 @@ static const struct tok syslog_facility_values[] = {
 
 void
 syslog_print(netdissect_options *ndo,
-             register const u_char *pptr, register u_int len)
+             const u_char *pptr, u_int len)
 {
     uint16_t msg_off = 0;
     uint16_t pri = 0;
     uint16_t facility,severity;
 
+    ndo->ndo_protocol = "syslog";
     /* extract decimal figures that are
      * encapsulated within < > tags
      * based on this decimal figure extract the
      * severity and facility values
      */
 
-    ND_TCHECK2(*pptr, 1);
-    if (*(pptr+msg_off) == '<') {
+    ND_TCHECK_1(pptr);
+    if (EXTRACT_U_1(pptr + msg_off) == '<') {
         msg_off++;
-        ND_TCHECK2(*(pptr + msg_off), 1);
-        while ( *(pptr+msg_off) >= '0' &&
-                *(pptr+msg_off) <= '9' &&
-                msg_off <= SYSLOG_MAX_DIGITS) {
-            pri = pri * 10 + (*(pptr+msg_off) - '0');
+        ND_TCHECK_1(pptr + msg_off);
+        while (msg_off <= SYSLOG_MAX_DIGITS &&
+               EXTRACT_U_1(pptr + msg_off) >= '0' &&
+               EXTRACT_U_1(pptr + msg_off) <= '9') {
+            pri = pri * 10 + (EXTRACT_U_1(pptr + msg_off) - '0');
             msg_off++;
-            ND_TCHECK2(*(pptr + msg_off), 1);
+            ND_TCHECK_1(pptr + msg_off);
         }
-        if (*(pptr+msg_off) != '>') {
-            ND_PRINT((ndo, "%s", tstr));
+        if (EXTRACT_U_1(pptr + msg_off) != '>') {
+            ND_PRINT("%s", tstr);
             return;
         }
         msg_off++;
     } else {
-        ND_PRINT((ndo, "%s", tstr));
+        ND_PRINT("%s", tstr);
         return;
     }
 
@@ -116,24 +117,24 @@ syslog_print(netdissect_options *ndo,
 
     if (ndo->ndo_vflag < 1 )
     {
-        ND_PRINT((ndo, "SYSLOG %s.%s, length: %u",
+        ND_PRINT("SYSLOG %s.%s, length: %u",
                tok2str(syslog_facility_values, "unknown (%u)", facility),
                tok2str(syslog_severity_values, "unknown (%u)", severity),
-               len));
+               len);
         return;
     }
 
-    ND_PRINT((ndo, "SYSLOG, length: %u\n\tFacility %s (%u), Severity %s (%u)\n\tMsg: ",
+    ND_PRINT("SYSLOG, length: %u\n\tFacility %s (%u), Severity %s (%u)\n\tMsg: ",
            len,
            tok2str(syslog_facility_values, "unknown (%u)", facility),
            facility,
            tok2str(syslog_severity_values, "unknown (%u)", severity),
-           severity));
+           severity);
 
     /* print the syslog text in verbose mode */
     for (; msg_off < len; msg_off++) {
-        ND_TCHECK2(*(pptr + msg_off), 1);
-        safeputchar(ndo, *(pptr + msg_off));
+        ND_TCHECK_1(pptr + msg_off);
+        safeputchar(ndo, EXTRACT_U_1(pptr + msg_off));
     }
 
     if (ndo->ndo_vflag > 1)
@@ -142,5 +143,5 @@ syslog_print(netdissect_options *ndo,
     return;
 
 trunc:
-    ND_PRINT((ndo, "%s", tstr));
+    ND_PRINT("%s", tstr);
 }

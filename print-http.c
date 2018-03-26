@@ -14,10 +14,10 @@
 /* \summary: Hypertext Transfer Protocol (HTTP) printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -73,5 +73,6 @@ static const char *httpcmds[] = {
 void
 http_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 {
+	ndo->ndo_protocol = "http";
 	txtproto_print(ndo, pptr, len, "http", httpcmds, RESP_CODE_SECOND_TOKEN);
 }

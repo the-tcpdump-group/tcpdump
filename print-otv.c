@@ -18,13 +18,15 @@
 /* specification: draft-hasmit-otv-04 */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include "netdissect.h"
 #include "extract.h"
+
+#define OTV_HDR_LEN 8
 
 /*
  * OTV header, draft-hasmit-otv-04
@@ -42,27 +44,32 @@ void
 otv_print(netdissect_options *ndo, const u_char *bp, u_int len)
 {
     uint8_t flags;
-    uint32_t overlay_id;
-    uint32_t instance_id;
 
-    if (len < 8) {
-        ND_PRINT((ndo, "[|OTV]"));
-        return;
-    }
+    ndo->ndo_protocol = "otv";
+    ND_PRINT("OTV, ");
+    if (len < OTV_HDR_LEN)
+        goto trunc;
 
-    flags = *bp;
+    ND_TCHECK_1(bp);
+    flags = EXTRACT_U_1(bp);
+    ND_PRINT("flags [%s] (0x%02x), ", flags & 0x08 ? "I" : ".", flags);
     bp += 1;
 
-    overlay_id = EXTRACT_24BITS(bp);
+    ND_TCHECK_3(bp);
+    ND_PRINT("overlay %u, ", EXTRACT_BE_U_3(bp));
     bp += 3;
 
-    instance_id = EXTRACT_24BITS(bp);
-    bp += 4;
+    ND_TCHECK_3(bp);
+    ND_PRINT("instance %u\n", EXTRACT_BE_U_3(bp));
+    bp += 3;
 
-    ND_PRINT((ndo, "OTV, "));
-    ND_PRINT((ndo, "flags [%s] (0x%02x), ", flags & 0x08 ? "I" : ".", flags));
-    ND_PRINT((ndo, "overlay %u, ", overlay_id));
-    ND_PRINT((ndo, "instance %u\n", instance_id));
+    /* Reserved */
+    ND_TCHECK_1(bp);
+    bp += 1;
 
-    ether_print(ndo, bp, len - 8, len - 8, NULL, NULL);
+    ether_print(ndo, bp, len - OTV_HDR_LEN, ndo->ndo_snapend - bp, NULL, NULL);
+    return;
+
+trunc:
+    ND_PRINT(" [|OTV]");
 }

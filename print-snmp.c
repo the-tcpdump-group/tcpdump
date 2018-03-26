@@ -59,10 +59,10 @@
 /* \summary: Simple Network Management Protocol (SNMP) printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -72,6 +72,7 @@
 #endif
 
 #include "netdissect.h"
+#include "extract.h"
 
 #undef OPAQUE  /* defined in <wingdi.h> */
 
@@ -197,7 +198,7 @@ static const char *ErrorStatus[] = {
 #define DECODE_ErrorStatus(e) \
 	( e >= 0 && (size_t)e < sizeof(ErrorStatus)/sizeof(ErrorStatus[0]) \
 		? ErrorStatus[e] \
-		: (snprintf(errbuf, sizeof(errbuf), "err=%u", e), errbuf))
+		: (nd_snprintf(errbuf, sizeof(errbuf), "err=%u", e), errbuf))
 
 /*
  * generic-trap values in the SNMP Trap-PDU
@@ -215,7 +216,7 @@ static const char *GenericTrap[] = {
 #define DECODE_GenericTrap(t) \
 	( t >= 0 && (size_t)t < sizeof(GenericTrap)/sizeof(GenericTrap[0]) \
 		? GenericTrap[t] \
-		: (snprintf(buf, sizeof(buf), "gt=%d", t), buf))
+		: (nd_snprintf(buf, sizeof(buf), "gt=%d", t), buf))
 
 /*
  * ASN.1 type class table
@@ -276,28 +277,46 @@ static struct obj {
  * Currently, this includes the prefixes for the Internet MIB, the
  * private enterprises tree, and the experimental tree.
  */
+#define OID_FIRST_OCTET(x, y)	(((x)*40) + (y))	/* X.690 8.19.4 */
+
+#ifndef NO_ABREV_MIB
+static const uint8_t mib_oid[] = { OID_FIRST_OCTET(1, 3), 6, 1, 2, 1 };
+#endif
+#ifndef NO_ABREV_ENTER
+static const uint8_t enterprises_oid[] = { OID_FIRST_OCTET(1, 3), 6, 1, 4, 1 };
+#endif
+#ifndef NO_ABREV_EXPERI
+static const uint8_t experimental_oid[] = { OID_FIRST_OCTET(1, 3), 6, 1, 3 };
+#endif
+#ifndef NO_ABBREV_SNMPMODS
+static const uint8_t snmpModules_oid[] = { OID_FIRST_OCTET(1, 3), 6, 1, 6, 3 };
+#endif
+
+#define OBJ_ABBREV_ENTRY(prefix, obj) \
+	{ prefix, &_ ## obj ## _obj, obj ## _oid, sizeof (obj ## _oid) }
 static const struct obj_abrev {
 	const char *prefix;		/* prefix for this abrev */
 	struct obj *node;		/* pointer into object table */
-	const char *oid;		/* ASN.1 encoded OID */
+	const uint8_t *oid;		/* ASN.1 encoded OID */
+	size_t oid_len;			/* length of OID */
 } obj_abrev_list[] = {
 #ifndef NO_ABREV_MIB
 	/* .iso.org.dod.internet.mgmt.mib */
-	{ "",	&_mib_obj,		"\53\6\1\2\1" },
+	OBJ_ABBREV_ENTRY("",	mib),
 #endif
 #ifndef NO_ABREV_ENTER
 	/* .iso.org.dod.internet.private.enterprises */
-	{ "E:",	&_enterprises_obj,	"\53\6\1\4\1" },
+	OBJ_ABBREV_ENTRY("E:",	enterprises),
 #endif
 #ifndef NO_ABREV_EXPERI
 	/* .iso.org.dod.internet.experimental */
-	{ "X:",	&_experimental_obj,	"\53\6\1\3" },
+	OBJ_ABBREV_ENTRY("X:",	experimental),
 #endif
 #ifndef NO_ABBREV_SNMPMODS
 	/* .iso.org.dod.internet.snmpV2.snmpModules */
-        { "S:", &_snmpModules_obj,      "\53\6\1\6\3" },
+	OBJ_ABBREV_ENTRY("S:",	snmpModules),
 #endif
-	{ 0,0,0 }
+	{ 0,0,0,0 }
 };
 
 /*
@@ -313,10 +332,10 @@ static const struct obj_abrev {
 		} while ((objp = objp->next) != NULL); \
 	} \
 	if (objp) { \
-		ND_PRINT((ndo, suppressdot?"%s":".%s", objp->desc)); \
+		ND_PRINT(suppressdot?"%s":".%s", objp->desc); \
 		objp = objp->child; \
 	} else \
-		ND_PRINT((ndo, suppressdot?"%u":".%u", (o))); \
+		ND_PRINT(suppressdot?"%u":".%u", (o)); \
 }
 
 /*
@@ -330,10 +349,7 @@ struct be {
 		int32_t integer;
 		uint32_t uns;
 		const u_char *str;
-	        struct {
-		        uint32_t high;
-		        uint32_t low;
-		} uns64;
+		uint64_t uns64;
 	} data;
 	u_short id;
 	u_char form, class;		/* tag info */
@@ -402,18 +418,18 @@ static const char *SnmpVersion[] = {
  */
 static int
 asn1_parse(netdissect_options *ndo,
-           register const u_char *p, u_int len, struct be *elem)
+           const u_char *p, u_int len, struct be *elem)
 {
 	u_char form, class, id;
-	int i, hdr;
+	u_int i, hdr;
 
 	elem->asnlen = 0;
 	elem->type = BE_ANY;
 	if (len < 1) {
-		ND_PRINT((ndo, "[nothing to parse]"));
+		ND_PRINT("[nothing to parse]");
 		return -1;
 	}
-	ND_TCHECK(*p);
+	ND_TCHECK_1(p);
 
 	/*
 	 * it would be nice to use a bit field, but you can't depend on them.
@@ -422,14 +438,14 @@ asn1_parse(netdissect_options *ndo,
 	 *  +---+---+---+---+---+---+---+---+
 	 *    7   6   5   4   3   2   1   0
 	 */
-	id = *p & ASN_ID_BITS;		/* lower 5 bits, range 00-1f */
+	id = EXTRACT_U_1(p) & ASN_ID_BITS;		/* lower 5 bits, range 00-1f */
 #ifdef notdef
-	form = (*p & 0xe0) >> 5;	/* move upper 3 bits to lower 3 */
+	form = (EXTRACT_U_1(p) & 0xe0) >> 5;	/* move upper 3 bits to lower 3 */
 	class = form >> 1;		/* bits 7&6 -> bits 1&0, range 0-3 */
 	form &= 0x1;			/* bit 5 -> bit 0, range 0-1 */
 #else
-	form = (u_char)(*p & ASN_FORM_BITS) >> ASN_FORM_SHIFT;
-	class = (u_char)(*p & ASN_CLASS_BITS) >> ASN_CLASS_SHIFT;
+	form = (u_char)(EXTRACT_U_1(p) & ASN_FORM_BITS) >> ASN_FORM_SHIFT;
+	class = (u_char)(EXTRACT_U_1(p) & ASN_CLASS_BITS) >> ASN_CLASS_SHIFT;
 #endif
 	elem->form = form;
 	elem->class = class;
@@ -447,58 +463,66 @@ asn1_parse(netdissect_options *ndo,
 		 * bit set.  XXX - this doesn't handle a value
 		 * that won't fit in 32 bits.
 		 */
-		for (id = 0; *p & ASN_BIT8; len--, hdr++, p++) {
+		id = 0;
+		ND_TCHECK_1(p);
+		while (EXTRACT_U_1(p) & ASN_BIT8) {
 			if (len < 1) {
-				ND_PRINT((ndo, "[Xtagfield?]"));
+				ND_PRINT("[Xtagfield?]");
 				return -1;
 			}
-			ND_TCHECK(*p);
-			id = (id << 7) | (*p & ~ASN_BIT8);
+			id = (id << 7) | (EXTRACT_U_1(p) & ~ASN_BIT8);
+			len--;
+			hdr++;
+			p++;
+			ND_TCHECK_1(p);
 		}
 		if (len < 1) {
-			ND_PRINT((ndo, "[Xtagfield?]"));
+			ND_PRINT("[Xtagfield?]");
 			return -1;
 		}
-		ND_TCHECK(*p);
-		elem->id = id = (id << 7) | *p;
+		ND_TCHECK_1(p);
+		elem->id = id = (id << 7) | EXTRACT_U_1(p);
 		--len;
 		++hdr;
 		++p;
 	}
 	if (len < 1) {
-		ND_PRINT((ndo, "[no asnlen]"));
+		ND_PRINT("[no asnlen]");
 		return -1;
 	}
-	ND_TCHECK(*p);
-	elem->asnlen = *p;
+	ND_TCHECK_1(p);
+	elem->asnlen = EXTRACT_U_1(p);
 	p++; len--; hdr++;
 	if (elem->asnlen & ASN_BIT8) {
 		uint32_t noct = elem->asnlen % ASN_BIT8;
 		elem->asnlen = 0;
 		if (len < noct) {
-			ND_PRINT((ndo, "[asnlen? %d<%d]", len, noct));
+			ND_PRINT("[asnlen? %d<%d]", len, noct);
 			return -1;
 		}
-		ND_TCHECK2(*p, noct);
-		for (; noct-- > 0; len--, hdr++)
-			elem->asnlen = (elem->asnlen << ASN_SHIFT8) | *p++;
+		ND_TCHECK_LEN(p, noct);
+		for (; noct-- > 0; len--, hdr++) {
+			elem->asnlen = (elem->asnlen << ASN_SHIFT8) | EXTRACT_U_1(p);
+			p++;
+		}
 	}
 	if (len < elem->asnlen) {
-		ND_PRINT((ndo, "[len%d<asnlen%u]", len, elem->asnlen));
+		ND_PRINT("[len%d<asnlen%u]", len, elem->asnlen);
 		return -1;
 	}
 	if (form >= sizeof(Form)/sizeof(Form[0])) {
-		ND_PRINT((ndo, "[form?%d]", form));
+		ND_PRINT("[form?%d]", form);
 		return -1;
 	}
 	if (class >= sizeof(Class)/sizeof(Class[0])) {
-		ND_PRINT((ndo, "[class?%c/%d]", *Form[form], class));
+		ND_PRINT("[class?%c/%d]", *Form[form], class);
 		return -1;
 	}
 	if ((int)id >= Class[class].numIDs) {
-		ND_PRINT((ndo, "[id?%c/%s/%d]", *Form[form], Class[class].name, id));
+		ND_PRINT("[id?%c/%s/%d]", *Form[form], Class[class].name, id);
 		return -1;
 	}
+	ND_TCHECK_LEN(p, elem->asnlen);
 
 	switch (form) {
 	case PRIMITIVE:
@@ -511,15 +535,18 @@ asn1_parse(netdissect_options *ndo,
 				break;
 
 			case INTEGER: {
-				register int32_t data;
+				int32_t data;
 				elem->type = BE_INT;
 				data = 0;
 
-				ND_TCHECK2(*p, elem->asnlen);
-				if (*p & ASN_BIT8)	/* negative */
+				if (elem->asnlen == 0) {
+					ND_PRINT("[asnlen=0]");
+					return -1;
+				}
+				if (EXTRACT_U_1(p) & ASN_BIT8)	/* negative */
 					data = -1;
-				for (i = elem->asnlen; i-- > 0; p++)
-					data = (data << ASN_SHIFT8) | *p;
+				for (i = elem->asnlen; i != 0; p++, i--)
+					data = (data << ASN_SHIFT8) | EXTRACT_U_1(p);
 				elem->data.integer = data;
 				break;
 			}
@@ -537,7 +564,7 @@ asn1_parse(netdissect_options *ndo,
 			default:
 				elem->type = BE_OCTET;
 				elem->data.raw = (const uint8_t *)p;
-				ND_PRINT((ndo, "[P/U/%s]", Class[class].Id[id]));
+				ND_PRINT("[P/U/%s]", Class[class].Id[id]);
 				break;
 			}
 			break;
@@ -552,36 +579,30 @@ asn1_parse(netdissect_options *ndo,
 			case COUNTER:
 			case GAUGE:
 			case TIMETICKS: {
-				register uint32_t data;
-				ND_TCHECK2(*p, elem->asnlen);
+				uint32_t data;
 				elem->type = BE_UNS;
 				data = 0;
-				for (i = elem->asnlen; i-- > 0; p++)
-					data = (data << 8) + *p;
+				for (i = elem->asnlen; i != 0; p++, i--)
+					data = (data << 8) + EXTRACT_U_1(p);
 				elem->data.uns = data;
 				break;
 			}
 
 			case COUNTER64: {
-				register uint32_t high, low;
-				ND_TCHECK2(*p, elem->asnlen);
+				uint64_t data64;
 			        elem->type = BE_UNS64;
-				high = 0, low = 0;
-				for (i = elem->asnlen; i-- > 0; p++) {
-				        high = (high << 8) |
-					    ((low & 0xFF000000) >> 24);
-					low = (low << 8) | *p;
-				}
-				elem->data.uns64.high = high;
-				elem->data.uns64.low = low;
+				data64 = 0;
+				for (i = elem->asnlen; i != 0; p++, i--)
+					data64 = (data64 << 8) + EXTRACT_U_1(p);
+				elem->data.uns64 = data64;
 				break;
 			}
 
 			default:
 				elem->type = BE_OCTET;
 				elem->data.raw = (const uint8_t *)p;
-				ND_PRINT((ndo, "[P/A/%s]",
-					Class[class].Id[id]));
+				ND_PRINT("[P/A/%s]",
+					Class[class].Id[id]);
 				break;
 			}
 			break;
@@ -606,8 +627,7 @@ asn1_parse(netdissect_options *ndo,
 			break;
 
 		default:
-			ND_PRINT((ndo, "[P/%s/%s]", Class[class].name, Class[class].Id[id]));
-			ND_TCHECK2(*p, elem->asnlen);
+			ND_PRINT("[P/%s/%s]", Class[class].name, Class[class].Id[id]);
 			elem->type = BE_OCTET;
 			elem->data.raw = (const uint8_t *)p;
 			break;
@@ -626,7 +646,7 @@ asn1_parse(netdissect_options *ndo,
 			default:
 				elem->type = BE_OCTET;
 				elem->data.raw = (const uint8_t *)p;
-				ND_PRINT((ndo, "C/U/%s", Class[class].Id[id]));
+				ND_PRINT("C/U/%s", Class[class].Id[id]);
 				break;
 			}
 			break;
@@ -639,7 +659,7 @@ asn1_parse(netdissect_options *ndo,
 		default:
 			elem->type = BE_OCTET;
 			elem->data.raw = (const uint8_t *)p;
-			ND_PRINT((ndo, "C/%s/%s", Class[class].name, Class[class].Id[id]));
+			ND_PRINT("C/%s/%s", Class[class].name, Class[class].Id[id]);
 			break;
 		}
 		break;
@@ -649,7 +669,57 @@ asn1_parse(netdissect_options *ndo,
 	return elem->asnlen + hdr;
 
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	ND_PRINT("%s", tstr);
+	return -1;
+}
+
+static int
+asn1_print_octets(netdissect_options *ndo, struct be *elem)
+{
+	const u_char *p = (const u_char *)elem->data.raw;
+	uint32_t asnlen = elem->asnlen;
+	uint32_t i;
+
+	ND_TCHECK_LEN(p, asnlen);
+	for (i = asnlen; i != 0; p++, i--)
+		ND_PRINT("_%.2x", EXTRACT_U_1(p));
+	return 0;
+
+trunc:
+	ND_PRINT("%s", tstr);
+	return -1;
+}
+
+static int
+asn1_print_string(netdissect_options *ndo, struct be *elem)
+{
+	int printable = 1, first = 1;
+	const u_char *p;
+	uint32_t asnlen = elem->asnlen;
+	uint32_t i;
+
+	p = elem->data.str;
+	ND_TCHECK_LEN(p, asnlen);
+	for (i = asnlen; printable && i != 0; p++, i--)
+		printable = ND_ISPRINT(EXTRACT_U_1(p));
+	p = elem->data.str;
+	if (printable) {
+		ND_PRINT("\"");
+		if (fn_printn(ndo, p, asnlen, ndo->ndo_snapend)) {
+			ND_PRINT("\"");
+			goto trunc;
+		}
+		ND_PRINT("\"");
+	} else {
+		for (i = asnlen; i != 0; p++, i--) {
+			ND_PRINT(first ? "%.2x" : "_%.2x", EXTRACT_U_1(p));
+			first = 0;
+		}
+	}
+	return 0;
+
+trunc:
+	ND_PRINT("%s", tstr);
 	return -1;
 }
 
@@ -662,16 +732,15 @@ static int
 asn1_print(netdissect_options *ndo,
            struct be *elem)
 {
-	const u_char *p = (const u_char *)elem->data.raw;
+	const u_char *p;
 	uint32_t asnlen = elem->asnlen;
 	uint32_t i;
 
 	switch (elem->type) {
 
 	case BE_OCTET:
-		ND_TCHECK2(*p, asnlen);
-		for (i = asnlen; i-- > 0; p++)
-			ND_PRINT((ndo, "_%.2x", *p));
+		if (asn1_print_octets(ndo, elem) == -1)
+			return -1;
 		break;
 
 	case BE_NULL:
@@ -680,162 +749,108 @@ asn1_print(netdissect_options *ndo,
 	case BE_OID: {
 		int o = 0, first = -1;
 
+		p = (const u_char *)elem->data.raw;
 		i = asnlen;
-		if (!nd_smi_module_loaded) {
-			if (!ndo->ndo_nflag && asnlen > 2) {
-				const struct obj_abrev *a = &obj_abrev_list[0];
-				size_t a_len = strlen(a->oid);
-				for (; a->node; a++) {
-					ND_TCHECK2(*p, a_len);
-					if (memcmp(a->oid, p, a_len) == 0) {
-						objp = a->node->child;
-						i -= strlen(a->oid);
-						p += strlen(a->oid);
-						ND_PRINT((ndo, "%s", a->prefix));
-						first = 1;
-						break;
-					}
+		if (!ndo->ndo_nflag && asnlen > 2) {
+			const struct obj_abrev *a = &obj_abrev_list[0];
+			for (; a->node; a++) {
+				if (i < a->oid_len)
+					continue;
+				if (!ND_TTEST_LEN(p, a->oid_len))
+					continue;
+				if (memcmp(a->oid, p, a->oid_len) == 0) {
+					objp = a->node->child;
+					i -= a->oid_len;
+					p += a->oid_len;
+					ND_PRINT("%s", a->prefix);
+					first = 1;
+					break;
 				}
 			}
+		}
 
-			for (; i-- > 0; p++) {
-				ND_TCHECK(*p);
-				o = (o << ASN_SHIFT7) + (*p & ~ASN_BIT8);
-				if (*p & ASN_LONGLEN)
-				        continue;
+		for (; i != 0; p++, i--) {
+			ND_TCHECK_1(p);
+			o = (o << ASN_SHIFT7) + (EXTRACT_U_1(p) & ~ASN_BIT8);
+			if (EXTRACT_U_1(p) & ASN_LONGLEN)
+			        continue;
 
-				/*
-				 * first subitem encodes two items with
-				 * 1st*OIDMUX+2nd
-				 * (see X.690:1997 clause 8.19 for the details)
-				 */
-				if (first < 0) {
-				        int s;
-					if (!ndo->ndo_nflag)
-						objp = mibroot;
-					first = 0;
-					s = o / OIDMUX;
-					if (s > 2) s = 2;
-					OBJ_PRINT(s, first);
-					o -= s * OIDMUX;
-				}
-				OBJ_PRINT(o, first);
-				if (--first < 0)
-					first = 0;
-				o = 0;
+			/*
+			 * first subitem encodes two items with
+			 * 1st*OIDMUX+2nd
+			 * (see X.690:1997 clause 8.19 for the details)
+			 */
+			if (first < 0) {
+			        int s;
+				if (!ndo->ndo_nflag)
+					objp = mibroot;
+				first = 0;
+				s = o / OIDMUX;
+				if (s > 2) s = 2;
+				OBJ_PRINT(s, first);
+				o -= s * OIDMUX;
 			}
+			OBJ_PRINT(o, first);
+			if (--first < 0)
+				first = 0;
+			o = 0;
 		}
 		break;
 	}
 
 	case BE_INT:
-		ND_PRINT((ndo, "%d", elem->data.integer));
+		ND_PRINT("%d", elem->data.integer);
 		break;
 
 	case BE_UNS:
-		ND_PRINT((ndo, "%u", elem->data.uns));
+		ND_PRINT("%u", elem->data.uns);
 		break;
 
-	case BE_UNS64: {	/* idea borrowed from by Marshall Rose */
-	        double d;
-		int j, carry;
-		char *cpf, *cpl, last[6], first[30];
-		if (elem->data.uns64.high == 0) {
-			ND_PRINT((ndo, "%u", elem->data.uns64.low));
-			break;
-		}
-		d = elem->data.uns64.high * 4294967296.0;	/* 2^32 */
-		if (elem->data.uns64.high <= 0x1fffff) {
-		        d += elem->data.uns64.low;
-#if 0 /*is looks illegal, but what is the intention?*/
-			ND_PRINT((ndo, "%.f", d));
-#else
-			ND_PRINT((ndo, "%f", d));
-#endif
-			break;
-		}
-		d += (elem->data.uns64.low & 0xfffff000);
-#if 0 /*is looks illegal, but what is the intention?*/
-		snprintf(first, sizeof(first), "%.f", d);
-#else
-		snprintf(first, sizeof(first), "%f", d);
-#endif
-		snprintf(last, sizeof(last), "%5.5d",
-		    elem->data.uns64.low & 0xfff);
-		for (carry = 0, cpf = first+strlen(first)-1, cpl = last+4;
-		     cpl >= last;
-		     cpf--, cpl--) {
-		        j = carry + (*cpf - '0') + (*cpl - '0');
-			if (j > 9) {
-			        j -= 10;
-				carry = 1;
-			} else {
-			        carry = 0;
-		        }
-			*cpf = j + '0';
-		}
-		ND_PRINT((ndo, "%s", first));
+	case BE_UNS64:
+		ND_PRINT("%" PRIu64, elem->data.uns64);
 		break;
-	}
 
-	case BE_STR: {
-		register int printable = 1, first = 1;
-
-		p = elem->data.str;
-		ND_TCHECK2(*p, asnlen);
-		for (i = asnlen; printable && i-- > 0; p++)
-			printable = ND_ISPRINT(*p);
-		p = elem->data.str;
-		if (printable) {
-			ND_PRINT((ndo, "\""));
-			if (fn_printn(ndo, p, asnlen, ndo->ndo_snapend)) {
-				ND_PRINT((ndo, "\""));
-				goto trunc;
-			}
-			ND_PRINT((ndo, "\""));
-		} else
-			for (i = asnlen; i-- > 0; p++) {
-				ND_PRINT((ndo, first ? "%.2x" : "_%.2x", *p));
-				first = 0;
-			}
+	case BE_STR:
+		if (asn1_print_string(ndo, elem) == -1)
+			return -1;
 		break;
-	}
 
 	case BE_SEQ:
-		ND_PRINT((ndo, "Seq(%u)", elem->asnlen));
+		ND_PRINT("Seq(%u)", elem->asnlen);
 		break;
 
 	case BE_INETADDR:
 		if (asnlen != ASNLEN_INETADDR)
-			ND_PRINT((ndo, "[inetaddr len!=%d]", ASNLEN_INETADDR));
-		ND_TCHECK2(*p, asnlen);
-		for (i = asnlen; i-- != 0; p++) {
-			ND_PRINT((ndo, (i == asnlen-1) ? "%u" : ".%u", *p));
+			ND_PRINT("[inetaddr len!=%d]", ASNLEN_INETADDR);
+		p = (const u_char *)elem->data.raw;
+		ND_TCHECK_LEN(p, asnlen);
+		for (i = asnlen; i != 0; p++, i--) {
+			ND_PRINT((i == asnlen) ? "%u" : ".%u", EXTRACT_U_1(p));
 		}
 		break;
 
 	case BE_NOSUCHOBJECT:
 	case BE_NOSUCHINST:
 	case BE_ENDOFMIBVIEW:
-		ND_PRINT((ndo, "[%s]", Class[EXCEPTIONS].Id[elem->id]));
+		ND_PRINT("[%s]", Class[EXCEPTIONS].Id[elem->id]);
 		break;
 
 	case BE_PDU:
-		ND_PRINT((ndo, "%s(%u)", Class[CONTEXT].Id[elem->id], elem->asnlen));
+		ND_PRINT("%s(%u)", Class[CONTEXT].Id[elem->id], elem->asnlen);
 		break;
 
 	case BE_ANY:
-		ND_PRINT((ndo, "[BE_ANY!?]"));
+		ND_PRINT("[BE_ANY!?]");
 		break;
 
 	default:
-		ND_PRINT((ndo, "[be!?]"));
+		ND_PRINT("[be!?]");
 		break;
 	}
 	return 0;
 
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	ND_PRINT("%s", tstr);
 	return -1;
 }
 
@@ -858,13 +873,13 @@ asn1_decode(u_char *p, u_int length)
 	while (i >= 0 && length > 0) {
 		i = asn1_parse(ndo, p, length, &elem);
 		if (i >= 0) {
-			ND_PRINT((ndo, " "));
+			ND_PRINT(" ");
 			if (asn1_print(ndo, &elem) < 0)
 				return;
 			if (elem.type == BE_SEQ || elem.type == BE_PDU) {
-				ND_PRINT((ndo, " {"));
+				ND_PRINT(" {");
 				asn1_decode(elem.data.raw, elem.asnlen);
-				ND_PRINT((ndo, " }"));
+				ND_PRINT(" }");
 			}
 			length -= i;
 			p += i;
@@ -903,39 +918,38 @@ smi_decode_oid(netdissect_options *ndo,
 {
 	const u_char *p = (const u_char *)elem->data.raw;
 	uint32_t asnlen = elem->asnlen;
-	int o = 0, first = -1, i = asnlen;
+	uint32_t i = asnlen;
+	int o = 0, first = -1;
 	unsigned int firstval;
 
-	if (nd_smi_module_loaded) {
-		for (*oidlen = 0; i-- > 0; p++) {
-			ND_TCHECK(*p);
-		        o = (o << ASN_SHIFT7) + (*p & ~ASN_BIT8);
-			if (*p & ASN_LONGLEN)
-			    continue;
+	for (*oidlen = 0; i != 0; p++, i--) {
+		ND_TCHECK_1(p);
+	        o = (o << ASN_SHIFT7) + (EXTRACT_U_1(p) & ~ASN_BIT8);
+		if (EXTRACT_U_1(p) & ASN_LONGLEN)
+		    continue;
 
-			/*
-			 * first subitem encodes two items with 1st*OIDMUX+2nd
-			 * (see X.690:1997 clause 8.19 for the details)
-			 */
-			if (first < 0) {
-		        	first = 0;
-				firstval = o / OIDMUX;
-				if (firstval > 2) firstval = 2;
-				o -= firstval * OIDMUX;
-				if (*oidlen < oidsize) {
-				    oid[(*oidlen)++] = firstval;
-				}
-			}
+		/*
+		 * first subitem encodes two items with 1st*OIDMUX+2nd
+		 * (see X.690:1997 clause 8.19 for the details)
+		 */
+		if (first < 0) {
+	        	first = 0;
+			firstval = o / OIDMUX;
+			if (firstval > 2) firstval = 2;
+			o -= firstval * OIDMUX;
 			if (*oidlen < oidsize) {
-				oid[(*oidlen)++] = o;
+			    oid[(*oidlen)++] = firstval;
 			}
-			o = 0;
 		}
+		if (*oidlen < oidsize) {
+			oid[(*oidlen)++] = o;
+		}
+		o = 0;
 	}
 	return 0;
 
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	ND_PRINT("%s", tstr);
 	return -1;
 }
 
@@ -1037,6 +1051,10 @@ smi_print_variable(netdissect_options *ndo,
 	SmiNode *smiNode = NULL;
 	unsigned int i;
 
+	if (!nd_smi_module_loaded) {
+		*status = asn1_print(ndo, elem);
+		return NULL;
+	}
 	*status = smi_decode_oid(ndo, elem, oid, sizeof(oid) / sizeof(unsigned int),
 	    &oidlen);
 	if (*status < 0)
@@ -1047,12 +1065,12 @@ smi_print_variable(netdissect_options *ndo,
 		return NULL;
 	}
 	if (ndo->ndo_vflag) {
-		ND_PRINT((ndo, "%s::", smiGetNodeModule(smiNode)->name));
+		ND_PRINT("%s::", smiGetNodeModule(smiNode)->name);
 	}
-	ND_PRINT((ndo, "%s", smiNode->name));
+	ND_PRINT("%s", smiNode->name);
 	if (smiNode->oidlen < oidlen) {
 		for (i = smiNode->oidlen; i < oidlen; i++) {
-			ND_PRINT((ndo, ".%u", oid[i]));
+			ND_PRINT(".%u", oid[i]);
 		}
 	}
 	*status = 0;
@@ -1080,20 +1098,20 @@ smi_print_value(netdissect_options *ndo,
 	}
 
 	if (NOTIFY_CLASS(pduid) && smiNode->access < SMI_ACCESS_NOTIFY) {
-	    ND_PRINT((ndo, "[notNotifyable]"));
+	    ND_PRINT("[notNotifyable]");
 	}
 
 	if (READ_CLASS(pduid) && smiNode->access < SMI_ACCESS_READ_ONLY) {
-	    ND_PRINT((ndo, "[notReadable]"));
+	    ND_PRINT("[notReadable]");
 	}
 
 	if (WRITE_CLASS(pduid) && smiNode->access < SMI_ACCESS_READ_WRITE) {
-	    ND_PRINT((ndo, "[notWritable]"));
+	    ND_PRINT("[notWritable]");
 	}
 
 	if (RESPONSE_CLASS(pduid)
 	    && smiNode->access == SMI_ACCESS_NOT_ACCESSIBLE) {
-	    ND_PRINT((ndo, "[noAccess]"));
+	    ND_PRINT("[noAccess]");
 	}
 
 	smiType = smiGetNodeType(smiNode);
@@ -1102,11 +1120,11 @@ smi_print_value(netdissect_options *ndo,
 	}
 
 	if (! smi_check_type(smiType->basetype, elem->type)) {
-	    ND_PRINT((ndo, "[wrongType]"));
+	    ND_PRINT("[wrongType]");
 	}
 
 	if (! smi_check_range(smiType, elem)) {
-	    ND_PRINT((ndo, "[outOfRange]"));
+	    ND_PRINT("[outOfRange]");
 	}
 
 	/* resolve bits to named bits */
@@ -1122,22 +1140,24 @@ smi_print_value(netdissect_options *ndo,
 	        if (smiType->basetype == SMI_BASETYPE_BITS) {
 		        /* print bit labels */
 		} else {
-		        smi_decode_oid(ndo, elem, oid,
-				       sizeof(oid)/sizeof(unsigned int),
-				       &oidlen);
-			smiNode = smiGetNodeByOID(oidlen, oid);
-			if (smiNode) {
-			        if (ndo->ndo_vflag) {
-					ND_PRINT((ndo, "%s::", smiGetNodeModule(smiNode)->name));
-				}
-				ND_PRINT((ndo, "%s", smiNode->name));
-				if (smiNode->oidlen < oidlen) {
-				        for (i = smiNode->oidlen;
-					     i < oidlen; i++) {
-					        ND_PRINT((ndo, ".%u", oid[i]));
+			if (nd_smi_module_loaded &&
+			    smi_decode_oid(ndo, elem, oid,
+					   sizeof(oid)/sizeof(unsigned int),
+					   &oidlen) == 0) {
+				smiNode = smiGetNodeByOID(oidlen, oid);
+				if (smiNode) {
+				        if (ndo->ndo_vflag) {
+						ND_PRINT("%s::", smiGetNodeModule(smiNode)->name);
 					}
+					ND_PRINT("%s", smiNode->name);
+					if (smiNode->oidlen < oidlen) {
+					        for (i = smiNode->oidlen;
+						     i < oidlen; i++) {
+						        ND_PRINT(".%u", oid[i]);
+						}
+					}
+					done++;
 				}
-				done++;
 			}
 		}
 		break;
@@ -1149,8 +1169,8 @@ smi_print_value(netdissect_options *ndo,
 			     nn = smiGetNextNamedNumber(nn)) {
 			         if (nn->value.value.integer32
 				     == elem->data.integer) {
-				         ND_PRINT((ndo, "%s", nn->name));
-					 ND_PRINT((ndo, "(%d)", elem->data.integer));
+				         ND_PRINT("%s", nn->name);
+					 ND_PRINT("(%d)", elem->data.integer);
 					 done++;
 					 break;
 				}
@@ -1217,12 +1237,12 @@ varbind_print(netdissect_options *ndo,
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_SEQ) {
-		ND_PRINT((ndo, "[!SEQ of varbind]"));
+		ND_PRINT("[!SEQ of varbind]");
 		asn1_print(ndo, &elem);
 		return;
 	}
 	if ((u_int)count < length)
-		ND_PRINT((ndo, "[%d extra after SEQ of varbind]", length - count));
+		ND_PRINT("[%d extra after SEQ of varbind]", length - count);
 	/* descend */
 	length = elem.asnlen;
 	np = (const u_char *)elem.data.raw;
@@ -1231,13 +1251,13 @@ varbind_print(netdissect_options *ndo,
 		const u_char *vbend;
 		u_int vblength;
 
-		ND_PRINT((ndo, " "));
+		ND_PRINT(" ");
 
 		/* Sequence */
 		if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 			return;
 		if (elem.type != BE_SEQ) {
-			ND_PRINT((ndo, "[!varbind]"));
+			ND_PRINT("[!varbind]");
 			asn1_print(ndo, &elem);
 			return;
 		}
@@ -1251,7 +1271,7 @@ varbind_print(netdissect_options *ndo,
 		if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 			return;
 		if (elem.type != BE_OID) {
-			ND_PRINT((ndo, "[objName!=OID]"));
+			ND_PRINT("[objName!=OID]");
 			asn1_print(ndo, &elem);
 			return;
 		}
@@ -1267,7 +1287,7 @@ varbind_print(netdissect_options *ndo,
 
 		if (pduid != GETREQ && pduid != GETNEXTREQ
 		    && pduid != GETBULKREQ)
-			ND_PRINT((ndo, "="));
+			ND_PRINT("=");
 
 		/* objVal (ANY) */
 		if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
@@ -1275,7 +1295,7 @@ varbind_print(netdissect_options *ndo,
 		if (pduid == GETREQ || pduid == GETNEXTREQ
 		    || pduid == GETBULKREQ) {
 			if (elem.type != BE_NULL) {
-				ND_PRINT((ndo, "[objVal!=NULL]"));
+				ND_PRINT("[objVal!=NULL]");
 				if (asn1_print(ndo, &elem) < 0)
 					return;
 			}
@@ -1310,12 +1330,12 @@ snmppdu_print(netdissect_options *ndo,
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_INT) {
-		ND_PRINT((ndo, "[reqId!=INT]"));
+		ND_PRINT("[reqId!=INT]");
 		asn1_print(ndo, &elem);
 		return;
 	}
 	if (ndo->ndo_vflag)
-		ND_PRINT((ndo, "R=%d ", elem.data.integer));
+		ND_PRINT("R=%d ", elem.data.integer);
 	length -= count;
 	np += count;
 
@@ -1323,7 +1343,7 @@ snmppdu_print(netdissect_options *ndo,
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_INT) {
-		ND_PRINT((ndo, "[errorStatus!=INT]"));
+		ND_PRINT("[errorStatus!=INT]");
 		asn1_print(ndo, &elem);
 		return;
 	}
@@ -1332,13 +1352,13 @@ snmppdu_print(netdissect_options *ndo,
 	    || pduid == INFORMREQ || pduid == V2TRAP || pduid == REPORT)
 	    && elem.data.integer != 0) {
 		char errbuf[20];
-		ND_PRINT((ndo, "[errorStatus(%s)!=0]",
-			DECODE_ErrorStatus(elem.data.integer)));
+		ND_PRINT("[errorStatus(%s)!=0]",
+			DECODE_ErrorStatus(elem.data.integer));
 	} else if (pduid == GETBULKREQ) {
-		ND_PRINT((ndo, " N=%d", elem.data.integer));
+		ND_PRINT(" N=%d", elem.data.integer);
 	} else if (elem.data.integer != 0) {
 		char errbuf[20];
-		ND_PRINT((ndo, " %s", DECODE_ErrorStatus(elem.data.integer)));
+		ND_PRINT(" %s", DECODE_ErrorStatus(elem.data.integer));
 		error_status = elem.data.integer;
 	}
 	length -= count;
@@ -1348,23 +1368,23 @@ snmppdu_print(netdissect_options *ndo,
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_INT) {
-		ND_PRINT((ndo, "[errorIndex!=INT]"));
+		ND_PRINT("[errorIndex!=INT]");
 		asn1_print(ndo, &elem);
 		return;
 	}
 	if ((pduid == GETREQ || pduid == GETNEXTREQ || pduid == SETREQ
 	    || pduid == INFORMREQ || pduid == V2TRAP || pduid == REPORT)
 	    && elem.data.integer != 0)
-		ND_PRINT((ndo, "[errorIndex(%d)!=0]", elem.data.integer));
+		ND_PRINT("[errorIndex(%d)!=0]", elem.data.integer);
 	else if (pduid == GETBULKREQ)
-		ND_PRINT((ndo, " M=%d", elem.data.integer));
+		ND_PRINT(" M=%d", elem.data.integer);
 	else if (elem.data.integer != 0) {
 		if (!error_status)
-			ND_PRINT((ndo, "[errorIndex(%d) w/o errorStatus]", elem.data.integer));
+			ND_PRINT("[errorIndex(%d) w/o errorStatus]", elem.data.integer);
 		else
-			ND_PRINT((ndo, "@%d", elem.data.integer));
+			ND_PRINT("@%d", elem.data.integer);
 	} else if (error_status) {
-		ND_PRINT((ndo, "[errorIndex==0]"));
+		ND_PRINT("[errorIndex==0]");
 	}
 	length -= count;
 	np += count;
@@ -1383,13 +1403,13 @@ trappdu_print(netdissect_options *ndo,
 	struct be elem;
 	int count = 0, generic;
 
-	ND_PRINT((ndo, " "));
+	ND_PRINT(" ");
 
 	/* enterprise (oid) */
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_OID) {
-		ND_PRINT((ndo, "[enterprise!=OID]"));
+		ND_PRINT("[enterprise!=OID]");
 		asn1_print(ndo, &elem);
 		return;
 	}
@@ -1398,13 +1418,13 @@ trappdu_print(netdissect_options *ndo,
 	length -= count;
 	np += count;
 
-	ND_PRINT((ndo, " "));
+	ND_PRINT(" ");
 
 	/* agent-addr (inetaddr) */
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_INETADDR) {
-		ND_PRINT((ndo, "[agent-addr!=INETADDR]"));
+		ND_PRINT("[agent-addr!=INETADDR]");
 		asn1_print(ndo, &elem);
 		return;
 	}
@@ -1417,14 +1437,14 @@ trappdu_print(netdissect_options *ndo,
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_INT) {
-		ND_PRINT((ndo, "[generic-trap!=INT]"));
+		ND_PRINT("[generic-trap!=INT]");
 		asn1_print(ndo, &elem);
 		return;
 	}
 	generic = elem.data.integer;
 	{
 		char buf[20];
-		ND_PRINT((ndo, " %s", DECODE_GenericTrap(generic)));
+		ND_PRINT(" %s", DECODE_GenericTrap(generic));
 	}
 	length -= count;
 	np += count;
@@ -1433,25 +1453,25 @@ trappdu_print(netdissect_options *ndo,
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_INT) {
-		ND_PRINT((ndo, "[specific-trap!=INT]"));
+		ND_PRINT("[specific-trap!=INT]");
 		asn1_print(ndo, &elem);
 		return;
 	}
 	if (generic != GT_ENTERPRISE) {
 		if (elem.data.integer != 0)
-			ND_PRINT((ndo, "[specific-trap(%d)!=0]", elem.data.integer));
+			ND_PRINT("[specific-trap(%d)!=0]", elem.data.integer);
 	} else
-		ND_PRINT((ndo, " s=%d", elem.data.integer));
+		ND_PRINT(" s=%d", elem.data.integer);
 	length -= count;
 	np += count;
 
-	ND_PRINT((ndo, " "));
+	ND_PRINT(" ");
 
 	/* time-stamp (TimeTicks) */
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_UNS) {			/* XXX */
-		ND_PRINT((ndo, "[time-stamp!=TIMETICKS]"));
+		ND_PRINT("[time-stamp!=TIMETICKS]");
 		asn1_print(ndo, &elem);
 		return;
 	}
@@ -1478,17 +1498,17 @@ pdu_print(netdissect_options *ndo,
 	if ((count = asn1_parse(ndo, np, length, &pdu)) < 0)
 		return;
 	if (pdu.type != BE_PDU) {
-		ND_PRINT((ndo, "[no PDU]"));
+		ND_PRINT("[no PDU]");
 		return;
 	}
 	if ((u_int)count < length)
-		ND_PRINT((ndo, "[%d extra after PDU]", length - count));
+		ND_PRINT("[%d extra after PDU]", length - count);
 	if (ndo->ndo_vflag) {
-		ND_PRINT((ndo, "{ "));
+		ND_PRINT("{ ");
 	}
 	if (asn1_print(ndo, &pdu) < 0)
 		return;
-	ND_PRINT((ndo, " "));
+	ND_PRINT(" ");
 	/* descend into PDU */
 	length = pdu.asnlen;
 	np = (const u_char *)pdu.data.raw;
@@ -1496,12 +1516,12 @@ pdu_print(netdissect_options *ndo,
 	if (version == SNMP_VERSION_1 &&
 	    (pdu.id == GETBULKREQ || pdu.id == INFORMREQ ||
 	     pdu.id == V2TRAP || pdu.id == REPORT)) {
-	        ND_PRINT((ndo, "[v2 PDU in v1 message]"));
+	        ND_PRINT("[v2 PDU in v1 message]");
 		return;
 	}
 
 	if (version == SNMP_VERSION_2 && pdu.id == TRAP) {
-		ND_PRINT((ndo, "[v1 PDU in v2 message]"));
+		ND_PRINT("[v1 PDU in v2 message]");
 		return;
 	}
 
@@ -1522,7 +1542,7 @@ pdu_print(netdissect_options *ndo,
 	}
 
 	if (ndo->ndo_vflag) {
-		ND_PRINT((ndo, " } "));
+		ND_PRINT(" } ");
 	}
 }
 
@@ -1534,13 +1554,13 @@ scopedpdu_print(netdissect_options *ndo,
                 const u_char *np, u_int length, int version)
 {
 	struct be elem;
-	int i, count = 0;
+	int count = 0;
 
 	/* Sequence */
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_SEQ) {
-		ND_PRINT((ndo, "[!scoped PDU]"));
+		ND_PRINT("[!scoped PDU]");
 		asn1_print(ndo, &elem);
 		return;
 	}
@@ -1551,31 +1571,33 @@ scopedpdu_print(netdissect_options *ndo,
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_STR) {
-		ND_PRINT((ndo, "[contextEngineID!=STR]"));
+		ND_PRINT("[contextEngineID!=STR]");
 		asn1_print(ndo, &elem);
 		return;
 	}
 	length -= count;
 	np += count;
 
-	ND_PRINT((ndo, "E= "));
-	for (i = 0; i < (int)elem.asnlen; i++) {
-		ND_PRINT((ndo, "0x%02X", elem.data.str[i]));
-	}
-	ND_PRINT((ndo, " "));
+	ND_PRINT("E=");
+	if (asn1_print_octets(ndo, &elem) == -1)
+		return;
+	ND_PRINT(" ");
 
 	/* contextName (OCTET STRING) */
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_STR) {
-		ND_PRINT((ndo, "[contextName!=STR]"));
+		ND_PRINT("[contextName!=STR]");
 		asn1_print(ndo, &elem);
 		return;
 	}
 	length -= count;
 	np += count;
 
-	ND_PRINT((ndo, "C=%.*s ", (int)elem.asnlen, elem.data.str));
+	ND_PRINT("C=");
+	if (asn1_print_string(ndo, &elem) == -1)
+		return;
+	ND_PRINT(" ");
 
 	pdu_print(ndo, np, length, version);
 }
@@ -1594,16 +1616,20 @@ community_print(netdissect_options *ndo,
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_STR) {
-		ND_PRINT((ndo, "[comm!=STR]"));
+		ND_PRINT("[comm!=STR]");
 		asn1_print(ndo, &elem);
 		return;
 	}
 	/* default community */
 	if (!(elem.asnlen == sizeof(DEF_COMMUNITY) - 1 &&
 	    strncmp((const char *)elem.data.str, DEF_COMMUNITY,
-	            sizeof(DEF_COMMUNITY) - 1) == 0))
+	            sizeof(DEF_COMMUNITY) - 1) == 0)) {
 		/* ! "public" */
-		ND_PRINT((ndo, "C=%.*s ", (int)elem.asnlen, elem.data.str));
+		ND_PRINT("C=");
+		if (asn1_print_string(ndo, &elem) == -1)
+			return;
+		ND_PRINT(" ");
+	}
 	length -= count;
 	np += count;
 
@@ -1624,7 +1650,7 @@ usm_print(netdissect_options *ndo,
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_SEQ) {
-		ND_PRINT((ndo, "[!usm]"));
+		ND_PRINT("[!usm]");
 		asn1_print(ndo, &elem);
 		return;
 	}
@@ -1635,7 +1661,7 @@ usm_print(netdissect_options *ndo,
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_STR) {
-		ND_PRINT((ndo, "[msgAuthoritativeEngineID!=STR]"));
+		ND_PRINT("[msgAuthoritativeEngineID!=STR]");
 		asn1_print(ndo, &elem);
 		return;
 	}
@@ -1646,12 +1672,12 @@ usm_print(netdissect_options *ndo,
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_INT) {
-		ND_PRINT((ndo, "[msgAuthoritativeEngineBoots!=INT]"));
+		ND_PRINT("[msgAuthoritativeEngineBoots!=INT]");
 		asn1_print(ndo, &elem);
 		return;
 	}
 	if (ndo->ndo_vflag)
-		ND_PRINT((ndo, "B=%d ", elem.data.integer));
+		ND_PRINT("B=%d ", elem.data.integer);
 	length -= count;
 	np += count;
 
@@ -1659,12 +1685,12 @@ usm_print(netdissect_options *ndo,
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_INT) {
-		ND_PRINT((ndo, "[msgAuthoritativeEngineTime!=INT]"));
+		ND_PRINT("[msgAuthoritativeEngineTime!=INT]");
 		asn1_print(ndo, &elem);
 		return;
 	}
 	if (ndo->ndo_vflag)
-		ND_PRINT((ndo, "T=%d ", elem.data.integer));
+		ND_PRINT("T=%d ", elem.data.integer);
 	length -= count;
 	np += count;
 
@@ -1672,20 +1698,23 @@ usm_print(netdissect_options *ndo,
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_STR) {
-		ND_PRINT((ndo, "[msgUserName!=STR]"));
+		ND_PRINT("[msgUserName!=STR]");
 		asn1_print(ndo, &elem);
 		return;
 	}
 	length -= count;
         np += count;
 
-	ND_PRINT((ndo, "U=%.*s ", (int)elem.asnlen, elem.data.str));
+	ND_PRINT("U=");
+	if (asn1_print_string(ndo, &elem) == -1)
+		return;
+	ND_PRINT(" ");
 
 	/* msgAuthenticationParameters (OCTET STRING) */
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_STR) {
-		ND_PRINT((ndo, "[msgAuthenticationParameters!=STR]"));
+		ND_PRINT("[msgAuthenticationParameters!=STR]");
 		asn1_print(ndo, &elem);
 		return;
 	}
@@ -1696,7 +1725,7 @@ usm_print(netdissect_options *ndo,
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_STR) {
-		ND_PRINT((ndo, "[msgPrivacyParameters!=STR]"));
+		ND_PRINT("[msgPrivacyParameters!=STR]");
 		asn1_print(ndo, &elem);
 		return;
 	}
@@ -1704,7 +1733,7 @@ usm_print(netdissect_options *ndo,
         np += count;
 
 	if ((u_int)count < length)
-		ND_PRINT((ndo, "[%d extra after usm SEQ]", length - count));
+		ND_PRINT("[%d extra after usm SEQ]", length - count);
 }
 
 /*
@@ -1725,7 +1754,7 @@ v3msg_print(netdissect_options *ndo,
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_SEQ) {
-		ND_PRINT((ndo, "[!message]"));
+		ND_PRINT("[!message]");
 		asn1_print(ndo, &elem);
 		return;
 	}
@@ -1733,14 +1762,14 @@ v3msg_print(netdissect_options *ndo,
 	np = (const u_char *)elem.data.raw;
 
 	if (ndo->ndo_vflag) {
-		ND_PRINT((ndo, "{ "));
+		ND_PRINT("{ ");
 	}
 
 	/* msgID (INTEGER) */
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_INT) {
-		ND_PRINT((ndo, "[msgID!=INT]"));
+		ND_PRINT("[msgID!=INT]");
 		asn1_print(ndo, &elem);
 		return;
 	}
@@ -1751,7 +1780,7 @@ v3msg_print(netdissect_options *ndo,
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_INT) {
-		ND_PRINT((ndo, "[msgMaxSize!=INT]"));
+		ND_PRINT("[msgMaxSize!=INT]");
 		asn1_print(ndo, &elem);
 		return;
 	}
@@ -1762,33 +1791,33 @@ v3msg_print(netdissect_options *ndo,
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_STR) {
-		ND_PRINT((ndo, "[msgFlags!=STR]"));
+		ND_PRINT("[msgFlags!=STR]");
 		asn1_print(ndo, &elem);
 		return;
 	}
 	if (elem.asnlen != 1) {
-		ND_PRINT((ndo, "[msgFlags size %d]", elem.asnlen));
+		ND_PRINT("[msgFlags size %d]", elem.asnlen);
 		return;
 	}
-	flags = elem.data.str[0];
+	flags = EXTRACT_U_1(elem.data.str);
 	if (flags != 0x00 && flags != 0x01 && flags != 0x03
 	    && flags != 0x04 && flags != 0x05 && flags != 0x07) {
-		ND_PRINT((ndo, "[msgFlags=0x%02X]", flags));
+		ND_PRINT("[msgFlags=0x%02X]", flags);
 		return;
 	}
 	length -= count;
 	np += count;
 
-	ND_PRINT((ndo, "F=%s%s%s ",
+	ND_PRINT("F=%s%s%s ",
 	          flags & 0x01 ? "a" : "",
 	          flags & 0x02 ? "p" : "",
-	          flags & 0x04 ? "r" : ""));
+	          flags & 0x04 ? "r" : "");
 
 	/* msgSecurityModel (INTEGER) */
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_INT) {
-		ND_PRINT((ndo, "[msgSecurityModel!=INT]"));
+		ND_PRINT("[msgSecurityModel!=INT]");
 		asn1_print(ndo, &elem);
 		return;
 	}
@@ -1797,18 +1826,18 @@ v3msg_print(netdissect_options *ndo,
 	np += count;
 
 	if ((u_int)count < length)
-		ND_PRINT((ndo, "[%d extra after message SEQ]", length - count));
+		ND_PRINT("[%d extra after message SEQ]", length - count);
 
 	if (ndo->ndo_vflag) {
-		ND_PRINT((ndo, "} "));
+		ND_PRINT("} ");
 	}
 
 	if (model == 3) {
 	    if (ndo->ndo_vflag) {
-		ND_PRINT((ndo, "{ USM "));
+		ND_PRINT("{ USM ");
 	    }
 	} else {
-	    ND_PRINT((ndo, "[security model %d]", model));
+	    ND_PRINT("[security model %d]", model);
             return;
 	}
 
@@ -1819,7 +1848,7 @@ v3msg_print(netdissect_options *ndo,
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_STR) {
-		ND_PRINT((ndo, "[msgSecurityParameters!=STR]"));
+		ND_PRINT("[msgSecurityParameters!=STR]");
 		asn1_print(ndo, &elem);
 		return;
 	}
@@ -1829,18 +1858,18 @@ v3msg_print(netdissect_options *ndo,
 	if (model == 3) {
 	    usm_print(ndo, elem.data.str, elem.asnlen);
 	    if (ndo->ndo_vflag) {
-		ND_PRINT((ndo, "} "));
+		ND_PRINT("} ");
 	    }
 	}
 
 	if (ndo->ndo_vflag) {
-	    ND_PRINT((ndo, "{ ScopedPDU "));
+	    ND_PRINT("{ ScopedPDU ");
 	}
 
 	scopedpdu_print(ndo, np, length, 3);
 
 	if (ndo->ndo_vflag) {
-		ND_PRINT((ndo, "} "));
+		ND_PRINT("} ");
 	}
 }
 
@@ -1855,18 +1884,19 @@ snmp_print(netdissect_options *ndo,
 	int count = 0;
 	int version = 0;
 
-	ND_PRINT((ndo, " "));
+	ndo->ndo_protocol = "snmp";
+	ND_PRINT(" ");
 
 	/* initial Sequence */
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_SEQ) {
-		ND_PRINT((ndo, "[!init SEQ]"));
+		ND_PRINT("[!init SEQ]");
 		asn1_print(ndo, &elem);
 		return;
 	}
 	if ((u_int)count < length)
-		ND_PRINT((ndo, "[%d extra after iSEQ]", length - count));
+		ND_PRINT("[%d extra after iSEQ]", length - count);
 	/* descend */
 	length = elem.asnlen;
 	np = (const u_char *)elem.data.raw;
@@ -1875,7 +1905,7 @@ snmp_print(netdissect_options *ndo,
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
 		return;
 	if (elem.type != BE_INT) {
-		ND_PRINT((ndo, "[version!=INT]"));
+		ND_PRINT("[version!=INT]");
 		asn1_print(ndo, &elem);
 		return;
 	}
@@ -1885,10 +1915,10 @@ snmp_print(netdissect_options *ndo,
 	case SNMP_VERSION_2:
 	case SNMP_VERSION_3:
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo, "{ %s ", SnmpVersion[elem.data.integer]));
+			ND_PRINT("{ %s ", SnmpVersion[elem.data.integer]);
 		break;
 	default:
-	        ND_PRINT((ndo, "[version = %d]", elem.data.integer));
+	        ND_PRINT("SNMP [version = %d]", elem.data.integer);
 		return;
 	}
 	version = elem.data.integer;
@@ -1904,11 +1934,11 @@ snmp_print(netdissect_options *ndo,
 		v3msg_print(ndo, np, length);
 		break;
 	default:
-		ND_PRINT((ndo, "[version = %d]", elem.data.integer));
+		ND_PRINT("[version = %d]", elem.data.integer);
 		break;
 	}
 
 	if (ndo->ndo_vflag) {
-		ND_PRINT((ndo, "} "));
+		ND_PRINT("} ");
 	}
 }
