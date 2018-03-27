@@ -332,6 +332,20 @@ int espprint_decode_hex(netdissect_options *ndo,
 	return i;
 }
 
+static int
+strendswith(char *str, char *end)
+{
+	char *p;
+
+	if (strlen(str) > strlen(end) &&
+	    !strcmp(str + strlen(str) - strlen(end), end)) {
+		p = strstr(str, end);
+		*p = '\0';
+		return 1;
+	}
+	return 0;
+}
+
 /*
  * decode the form:    SPINUM@IP <tab> ALGONAME:0xsecret
  */
@@ -344,7 +358,7 @@ espprint_decode_encalgo(netdissect_options *ndo,
 	size_t i;
 	const EVP_CIPHER *evp;
 	int authlen = 0;
-	char *colon, *p;
+	char *colon;
 
 	colon = strchr(decode, ':');
 	if (colon == NULL) {
@@ -353,18 +367,13 @@ espprint_decode_encalgo(netdissect_options *ndo,
 	}
 	*colon = '\0';
 
-	if (strlen(decode) > strlen("-hmac96") &&
-	    !strcmp(decode + strlen(decode) - strlen("-hmac96"),
-		    "-hmac96")) {
-		p = strstr(decode, "-hmac96");
-		*p = '\0';
+	if (strendswith(decode, "-hmac96"))
 		authlen = 12;
-	}
-	if (strlen(decode) > strlen("-cbc") &&
-	    !strcmp(decode + strlen(decode) - strlen("-cbc"), "-cbc")) {
-		p = strstr(decode, "-cbc");
-		*p = '\0';
-	}
+
+	if (strendswith(decode, "-hmac-sha256-128"))
+		authlen = 16;
+
+	(void)strendswith(decode, "-cbc");
 	evp = EVP_get_cipherbyname(decode);
 
 	if (!evp) {
