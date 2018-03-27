@@ -700,6 +700,7 @@ set(TCPDUMP_LINK_LIBRARIES ${PCAP_LIBRARIES} ${TCPDUMP_LINK_LIBRARIES})
 #
 # Optional libraries.
 #
+
 #
 # libsmi.
 #
@@ -799,6 +800,94 @@ if(WITH_CAP_NG)
         set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} cap-ng)
     endif(HAVE_LIBCAP_NG)
 endif(WITH_CAP_NG)
+
+###################################################################
+#   Warning options
+###################################################################
+
+#
+# Check and add warning options if we have a .devel file.
+#
+if(EXISTS ${CMAKE_SOURCE_DIR}/.devel OR EXISTS ${CMAKE_BINARY_DIR}/.devel)
+    #
+    # Warning options.
+    #
+    if(MSVC AND NOT ${CMAKE_C_COMPILER} MATCHES "clang*")
+        #
+        # MSVC, with Microsoft's front end and code generator.
+        # "MSVC" is also set for Microsoft's compiler with a Clang
+        # front end and their code generator ("Clang/C2"), so we
+        # check for clang.exe and treat that differently.
+        #
+        check_and_add_compiler_option(-Wall)
+        #
+        # Disable some pointless warnings that /Wall turns on.
+        #
+        # Unfortunately, MSVC does not appear to have an equivalent
+        # to "__attribute__((unused))" to mark a particular function
+        # parameter as being known to be unused, so that the compiler
+        # won't warn about it (for example, the function might have
+        # that parameter because a pointer to it is being used, and
+        # the signature of that function includes that parameter).
+        # C++ lets you give a parameter a type but no name, but C
+        # doesn't have that.
+        #
+        check_and_add_compiler_option(-wd4100)
+        #
+        # In theory, we care whether somebody uses f() rather than
+        # f(void) to declare a function with no arguments, but, in
+        # practice, there are places in the Windows header files
+        # that appear to do that, so we squelch that warning.
+        #
+        check_and_add_compiler_option(-wd4255)
+        #
+        # Windows FD_SET() generates this, so we suppress it.
+        #
+        check_and_add_compiler_option(-wd4548)
+        #
+        # Perhaps testing something #defined to be 0 with #ifdef is an
+        # error, and it should be tested with #if, but perhaps it's
+        # not, and Microsoft does that in its headers, so we squelch
+        # that warning.
+        #
+        check_and_add_compiler_option(-wd4574)
+        #
+        # The Windows headers also test not-defined values in #if, so
+        # we don't want warnings about that, either.
+        #
+        check_and_add_compiler_option(-wd4668)
+        #
+        # We do *not* care whether some function is, or isn't, going to be
+        # expanded inline.
+        #
+        check_and_add_compiler_option(-wd4710)
+        check_and_add_compiler_option(-wd4711)
+        #
+        # We do *not* care whether we're adding padding bytes after
+        # structure members.
+        #
+        check_and_add_compiler_option(-wd4820)
+    else()
+        #
+        # Other compilers, including MSVC with a Clang front end and
+        # Microsoft's code generator.  We currently treat them as if
+        # they might support GCC-style -W options.
+        #
+        check_and_add_compiler_option(-Wall)
+        check_and_add_compiler_option(-Wmissing-prototypes)
+        check_and_add_compiler_option(-Wstrict-prototypes)
+        check_and_add_compiler_option(-Wwrite-strings)
+        check_and_add_compiler_option(-Wpointer-arith)
+        check_and_add_compiler_option(-Wcast-qual)
+        check_and_add_compiler_option(-Wshadow)
+        check_and_add_compiler_option(-Wdeclaration-after-statement)
+        check_and_add_compiler_option(-Wpedantic)
+        check_and_add_compiler_option(-Wold-style-definition)
+        check_and_add_compiler_option(-Wused-but-marked-unused)
+        check_and_add_compiler_option(-W)
+        check_and_add_compiler_option(-Wassign-enum)
+    endif()
+endif()
 
 ######################################
 # Input files
