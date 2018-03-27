@@ -48,6 +48,7 @@ macro(check_and_add_compiler_option _option)
     endif()
 endmacro()
 
+set(C_ADDITIONAL_FLAGS "")
 if(CMAKE_C_COMPILER_ID MATCHES "GNU" OR
    CMAKE_C_COMPILER_ID MATCHES "Clang")
     check_and_add_compiler_option("-std=gnu99")
