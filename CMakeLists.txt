@@ -44,7 +44,7 @@ macro(check_and_add_compiler_option _option)
     string(REGEX REPLACE "^-" "" _option_variable ${_temp_option_variable})
     check_c_compiler_flag("${_option}" ${_option_variable})
     if(${${_option_variable}})
-        set(C_ADDITIONAL_FLAGS ${C_ADDITIONAL_FLAGS} "${_option}")
+        set(C_ADDITIONAL_FLAGS "${C_ADDITIONAL_FLAGS} ${_option}")
     endif()
 endmacro()
 
@@ -1000,7 +1000,7 @@ endif(NOT WIN32)
 add_library(netdissect STATIC
     ${NETDISSECT_SOURCE_LIST_C}
 )
-set_target_properties(netdissect PROPERTIES COMPILE_FLAGS "${C_ADDITIONAL_FLAGS}")
+set_target_properties(netdissect PROPERTIES COMPILE_FLAGS ${C_ADDITIONAL_FLAGS})
 
 set(TCPDUMP_SOURCE_LIST_C tcpdump.c)
 
@@ -1033,7 +1033,7 @@ source_group("Header Files" FILES ${PROJECT_SOURCE_LIST_H})
 ######################################
 
 add_executable(tcpdump ${TCPDUMP_SOURCE_LIST_C})
-set_target_properties(tcpdump PROPERTIES COMPILE_FLAGS "${C_ADDITIONAL_FLAGS}")
+set_target_properties(tcpdump PROPERTIES COMPILE_FLAGS ${C_ADDITIONAL_FLAGS})
 target_link_libraries(tcpdump netdissect ${TCPDUMP_LINK_LIBRARIES})
 
 ######################################
