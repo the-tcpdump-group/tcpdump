@@ -1085,7 +1085,6 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 		 * Yes.  Open it with pcap_open().
 		 */
 		*ebuf = '\0';
-fprintf(stderr, "Opening %s\n", device);
 		pc = pcap_open(device, ndo->ndo_snaplen,
 		    pflag ? 0 : PCAP_OPENFLAG_PROMISCUOUS, 1000, NULL,
 		    ebuf);
