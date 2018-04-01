@@ -1012,9 +1012,35 @@ read_infile(char *fname)
 static long
 parse_interface_number(const char *device)
 {
+	const char *p;
 	long devnum;
 	char *end;
 
+	/*
+	 * Search for a colon, terminating any scheme at the beginning
+	 * of the device.
+	 */
+	p = strchr(device, ':');
+	if (p != NULL) {
+		/*
+		 * We found it.  Is it followed by "//"?
+		 */
+		p++;	/* skip the : */
+		if (strncmp(p, "//", 2) == 0) {
+			/*
+			 * Yes.  Search for the next /, at the end of the
+			 * authority part of the URL.
+			 */
+			p += 2;	/* skip the // */
+			p = strchr(p, '/');
+			if (p != NULL) {
+				/*
+				 * OK, past the / is the path.
+				 */
+				device = p + 1;
+			}
+		}
+	}
 	devnum = strtol(device, &end, 10);
 	if (device != end && *end == '\0') {
 		/*
@@ -1037,14 +1063,54 @@ parse_interface_number(const char *device)
 }
 
 static char *
-find_interface_by_number(long devnum)
+find_interface_by_number(const char *url, long devnum)
 {
 	pcap_if_t *dev, *devlist;
 	long i;
 	char ebuf[PCAP_ERRBUF_SIZE];
 	char *device;
+#ifdef HAVE_PCAP_FINDALLDEVS_EX
+	const char *endp;
+	char *host_url;
+#endif
+	int status;
 
-	if (pcap_findalldevs(&devlist, ebuf) < 0)
+#ifdef HAVE_PCAP_FINDALLDEVS_EX
+	/*
+	 * Search for a colon, terminating any scheme at the beginning
+	 * of the URL.
+	 */
+	endp = strchr(url, ':');
+	if (endp != NULL) {
+		/*
+		 * We found it.  Is it followed by "//"?
+		 */
+		endp++;	/* skip the : */
+		if (strncmp(endp, "//", 2) == 0) {
+			/*
+			 * Yes.  Search for the next /, at the end of the
+			 * authority part of the URL.
+			 */
+			endp += 2;	/* skip the // */
+			endp = strchr(endp, '/');
+		} else
+			endp = NULL;
+	}
+	if (endp != NULL) {
+		/*
+		 * OK, everything from device to endp is a URL to hand
+		 * to pcap_findalldevs_ex().
+		 */
+		endp++;	/* Include the trailing / in the URL; pcap_findalldevs_ex() requires it */
+		host_url = malloc(endp - url + 1);
+		memcpy(host_url, url, endp - url);
+		host_url[endp - url] = '\0';
+		status = pcap_findalldevs_ex(host_url, NULL, &devlist, ebuf);
+		free(host_url);
+	} else
+#endif
+	status = pcap_findalldevs(&devlist, ebuf);
+	if (status < 0)
 		error("%s", ebuf);
 	/*
 	 * Look for the devnum-th entry in the list of devices (1-based).
@@ -1090,12 +1156,14 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 		    ebuf);
 		if (pc == NULL) {
 			/*
-			 * If this failed with "No such device", that means
+			 * If this failed with "No such device" or "The system
+			 * cannot find the device specified", that means
 			 * the interface doesn't exist; return NULL, so that
 			 * the caller can see whether the device name is
 			 * actually an interface index.
 			 */
-			if (strstr(ebuf, "No such device") != NULL)
+			if (strstr(ebuf, "No such device") != NULL ||
+			    strstr(ebuf, "The system cannot find the device specified") != NULL)
 				return (NULL);
 			error("%s", ebuf);
 		}
@@ -1922,7 +1990,7 @@ main(int argc, char **argv)
 			 * find_interface_by_number() exits if it
 			 * couldn't be found.
 			 */
-			device = find_interface_by_number(devnum);
+			device = find_interface_by_number(device, devnum);
 			pd = open_interface(device, ndo, ebuf);
 			if (pd == NULL)
 				error("%s", ebuf);
