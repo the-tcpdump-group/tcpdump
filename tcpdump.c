@@ -192,7 +192,9 @@ static int Uflag;			/* "unbuffered" output of dump files */
 static int Wflag;			/* recycle output files after this number of files */
 static int WflagChars;
 static char *zflag = NULL;		/* compress each savefile using a specified command (like gzip or bzip2) */
+#ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
 static int immediate_mode;
+#endif
 
 static int infodelay;
 static int infoprint;
