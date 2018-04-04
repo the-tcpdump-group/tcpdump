@@ -28,10 +28,10 @@
 #include "netdissect.h"
 #include "extract.h"
 
-static const char tstr[] = " [|bt]";
-
 #if defined(DLT_BLUETOOTH_HCI_H4_WITH_PHDR) && defined(HAVE_PCAP_BLUETOOTH_H)
 #include <pcap/bluetooth.h>
+
+static const char tstr[] = " [|bt]";
 
 #define	BT_HDRLEN sizeof(pcap_bluetooth_h4_header)
 /*
