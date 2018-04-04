@@ -34,10 +34,12 @@
 #include "netdissect-stdinc.h"
 
 #include "netdissect.h"
-static const char tstr[] = " [|nflog]";
 
 #if defined(DLT_NFLOG) && defined(HAVE_PCAP_NFLOG_H)
+
 #include <pcap/nflog.h>
+
+static const char tstr[] = " [|nflog]";
 
 static const struct tok nflog_values[] = {
 	{ AF_INET,		"IPv4" },
