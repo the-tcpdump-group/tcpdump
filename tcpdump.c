@@ -255,6 +255,7 @@ static const struct tok status_flags[] = {
 };
 #endif
 
+static pcap_dumper_t *p = NULL;
 static pcap_t *pd;
 
 static int supports_monitor_mode;
@@ -2178,7 +2179,6 @@ DIAG_ON_CLANG(assign-enum)
 	}
 #endif
 	if (WFileName) {
-		pcap_dumper_t *p;
 		/* Do not exceed the default PATH_MAX for files. */
 		dumpinfo.CurrentFileName = (char *)malloc(PATH_MAX + 1);
 
@@ -2905,6 +2905,11 @@ void requestinfo(int signo _U_)
 		++infoprint;
 	else
 		info(0);
+
+#ifdef HAVE_PCAP_DUMP_FLUSH
+	if (p != NULL)
+		pcap_dump_flush(p);
+#endif
 }
 #endif
 
