@@ -148,6 +148,10 @@ The Regents of the University of California.  All rights reserved.\n";
 #define SIGNAL_REQ_INFO SIGUSR1
 #endif
 
+#if defined(HAVE_PCAP_DUMP_FLUSH) && defined(SIGUSR2)
+#define SIGNAL_FLUSH_PCAP SIGUSR2
+#endif
+
 static int Bflag;			/* buffer size */
 #ifdef HAVE_PCAP_DUMP_FTELL64
 static int64_t Cflag;			/* rotate dump files after this many bytes */
@@ -230,6 +234,10 @@ static void droproot(const char *, const char *);
 
 #ifdef SIGNAL_REQ_INFO
 void requestinfo(int);
+#endif
+
+#ifdef SIGNAL_FLUSH_PCAP
+void flushpcap(int);
 #endif
 
 #ifdef _WIN32
@@ -2273,6 +2281,9 @@ DIAG_ON_CLANG(assign-enum)
 	if (RFileName == NULL)
 		(void)setsignal(SIGNAL_REQ_INFO, requestinfo);
 #endif
+#ifdef SIGNAL_FLUSH_PCAP
+	(void)setsignal(SIGNAL_FLUSH_PCAP, flushpcap);
+#endif
 
 	if (ndo->ndo_vflag > 0 && WFileName && !print) {
 		/*
@@ -2905,11 +2916,14 @@ void requestinfo(int signo _U_)
 		++infoprint;
 	else
 		info(0);
-
-#ifdef HAVE_PCAP_DUMP_FLUSH
-	if (p != NULL)
-		pcap_dump_flush(p);
+}
 #endif
+
+#ifdef SIGNAL_FLUSH_PCAP
+void flushpcap(int signo _U_)
+{
+    if (p != NULL)
+        pcap_dump_flush(p);
 }
 #endif
 
