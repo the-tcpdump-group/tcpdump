@@ -263,8 +263,8 @@ static const struct tok status_flags[] = {
 };
 #endif
 
-static pcap_dumper_t *p = NULL;
 static pcap_t *pd;
+static pcap_dumper_t *pdd = NULL;
 
 static int supports_monitor_mode;
 
@@ -276,7 +276,7 @@ struct dump_info {
 	char	*WFileName;
 	char	*CurrentFileName;
 	pcap_t	*pd;
-	pcap_dumper_t *p;
+	pcap_dumper_t *pdd;
 	netdissect_options *ndo;
 #ifdef HAVE_CAPSICUM
 	int	dirfd;
@@ -2199,7 +2199,7 @@ DIAG_ON_CLANG(assign-enum)
 		else
 		  MakeFilename(dumpinfo.CurrentFileName, WFileName, 0, 0);
 
-		p = pcap_dump_open(pd, dumpinfo.CurrentFileName);
+		pdd = pcap_dump_open(pd, dumpinfo.CurrentFileName);
 #ifdef HAVE_LIBCAP_NG
 		/* Give up CAP_DAC_OVERRIDE capability.
 		 * Only allow it to be restored if the -C or -G flag have been
@@ -2213,7 +2213,7 @@ DIAG_ON_CLANG(assign-enum)
 			);
 		capng_apply(CAPNG_SELECT_BOTH);
 #endif /* HAVE_LIBCAP_NG */
-		if (p == NULL)
+		if (pdd == NULL)
 			error("%s", pcap_geterr(pd));
 #ifdef HAVE_CAPSICUM
 		set_dumper_capsicum_rights(p);
@@ -2246,13 +2246,13 @@ DIAG_ON_CLANG(assign-enum)
 #endif
 			callback = dump_packet_and_trunc;
 			dumpinfo.pd = pd;
-			dumpinfo.p = p;
+			dumpinfo.pdd = pdd;
 			pcap_userdata = (u_char *)&dumpinfo;
 		} else {
 			callback = dump_packet;
 			dumpinfo.WFileName = WFileName;
 			dumpinfo.pd = pd;
-			dumpinfo.p = p;
+			dumpinfo.pdd = pdd;
 			pcap_userdata = (u_char *)&dumpinfo;
 		}
 		if (print) {
@@ -2264,7 +2264,7 @@ DIAG_ON_CLANG(assign-enum)
 
 #ifdef HAVE_PCAP_DUMP_FLUSH
 		if (Uflag)
-			pcap_dump_flush(p);
+			pcap_dump_flush(pdd);
 #endif
 	} else {
 		dlt = pcap_datalink(pd);
@@ -2699,7 +2699,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			/*
 			 * Close the current file and open a new one.
 			 */
-			pcap_dump_close(dump_info->p);
+			pcap_dump_close(dump_info->pdd);
 
 			/*
 			 * Compress the file we just closed, if the user asked for it
@@ -2759,18 +2759,18 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 				error("unable to fdopen file %s",
 				    dump_info->CurrentFileName);
 			}
-			dump_info->p = pcap_dump_fopen(dump_info->pd, fp);
+			dump_info->pdd = pcap_dump_fopen(dump_info->pd, fp);
 #else	/* !HAVE_CAPSICUM */
-			dump_info->p = pcap_dump_open(dump_info->pd, dump_info->CurrentFileName);
+			dump_info->pdd = pcap_dump_open(dump_info->pd, dump_info->CurrentFileName);
 #endif
 #ifdef HAVE_LIBCAP_NG
 			capng_update(CAPNG_DROP, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
 			capng_apply(CAPNG_SELECT_BOTH);
 #endif /* HAVE_LIBCAP_NG */
-			if (dump_info->p == NULL)
+			if (dump_info->pdd == NULL)
 				error("%s", pcap_geterr(pd));
 #ifdef HAVE_CAPSICUM
-			set_dumper_capsicum_rights(dump_info->p);
+			set_dumper_capsicum_rights(dump_info->pdd);
 #endif
 		}
 	}
@@ -2782,7 +2782,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 	 */
 	if (Cflag != 0) {
 #ifdef HAVE_PCAP_DUMP_FTELL64
-		int64_t size = pcap_dump_ftell64(dump_info->p);
+		int64_t size = pcap_dump_ftell64(dump_info->pdd);
 #else
 		/*
 		 * XXX - this only handles a Cflag value > 2^31-1 on
@@ -2790,7 +2790,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 		 * Windows) or LLP64 (64-bit Windows) would require
 		 * a version of libpcap with pcap_dump_ftell64().
 		 */
-		long size = pcap_dump_ftell(dump_info->p);
+		long size = pcap_dump_ftell(dump_info->pdd);
 #endif
 
 		if (size == -1)
@@ -2804,7 +2804,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			/*
 			 * Close the current file and open a new one.
 			 */
-			pcap_dump_close(dump_info->p);
+			pcap_dump_close(dump_info->pdd);
 
 			/*
 			 * Compress the file we just closed, if the user
@@ -2840,26 +2840,26 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 				error("unable to fdopen file %s",
 				    dump_info->CurrentFileName);
 			}
-			dump_info->p = pcap_dump_fopen(dump_info->pd, fp);
+			dump_info->pdd = pcap_dump_fopen(dump_info->pd, fp);
 #else	/* !HAVE_CAPSICUM */
-			dump_info->p = pcap_dump_open(dump_info->pd, dump_info->CurrentFileName);
+			dump_info->pdd = pcap_dump_open(dump_info->pd, dump_info->CurrentFileName);
 #endif
 #ifdef HAVE_LIBCAP_NG
 			capng_update(CAPNG_DROP, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
 			capng_apply(CAPNG_SELECT_BOTH);
 #endif /* HAVE_LIBCAP_NG */
-			if (dump_info->p == NULL)
+			if (dump_info->pdd == NULL)
 				error("%s", pcap_geterr(pd));
 #ifdef HAVE_CAPSICUM
-			set_dumper_capsicum_rights(dump_info->p);
+			set_dumper_capsicum_rights(dump_info->pdd);
 #endif
 		}
 	}
 
-	pcap_dump((u_char *)dump_info->p, h, sp);
+	pcap_dump((u_char *)dump_info->pdd, h, sp);
 #ifdef HAVE_PCAP_DUMP_FLUSH
 	if (Uflag)
-		pcap_dump_flush(dump_info->p);
+		pcap_dump_flush(dump_info->pdd);
 #endif
 
 	if (dump_info->ndo != NULL)
@@ -2881,10 +2881,10 @@ dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 
 	dump_info = (struct dump_info *)user;
 
-	pcap_dump((u_char *)dump_info->p, h, sp);
+	pcap_dump((u_char *)dump_info->pdd, h, sp);
 #ifdef HAVE_PCAP_DUMP_FLUSH
 	if (Uflag)
-		pcap_dump_flush(dump_info->p);
+		pcap_dump_flush(dump_info->pdd);
 #endif
 
 	if (dump_info->ndo != NULL)
@@ -2922,8 +2922,8 @@ void requestinfo(int signo _U_)
 #ifdef SIGNAL_FLUSH_PCAP
 void flushpcap(int signo _U_)
 {
-    if (p != NULL)
-        pcap_dump_flush(p);
+	if (pdd != NULL)
+		pcap_dump_flush(pdd);
 }
 #endif
 
