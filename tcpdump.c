@@ -142,9 +142,9 @@ The Regents of the University of California.  All rights reserved.\n";
 #define PATH_MAX 1024
 #endif
 
-#ifdef SIGINFO
+#if defined(SIGINFO)
 #define SIGNAL_REQ_INFO SIGINFO
-#elif SIGUSR1
+#elif defined(SIGUSR1)
 #define SIGNAL_REQ_INFO SIGUSR1
 #endif
 
@@ -233,11 +233,11 @@ static void dump_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void droproot(const char *, const char *);
 
 #ifdef SIGNAL_REQ_INFO
-void requestinfo(int);
+static void requestinfo(int);
 #endif
 
 #ifdef SIGNAL_FLUSH_PCAP
-void flushpcap(int);
+static void flushpcap(int);
 #endif
 
 #ifdef _WIN32
@@ -2910,7 +2910,8 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 }
 
 #ifdef SIGNAL_REQ_INFO
-void requestinfo(int signo _U_)
+static void
+requestinfo(int signo _U_)
 {
 	if (infodelay)
 		++infoprint;
@@ -2920,7 +2921,8 @@ void requestinfo(int signo _U_)
 #endif
 
 #ifdef SIGNAL_FLUSH_PCAP
-void flushpcap(int signo _U_)
+static void
+flushpcap(int signo _U_)
 {
 	if (pdd != NULL)
 		pcap_dump_flush(pdd);
