@@ -1156,7 +1156,7 @@ those are reported as \fBECT(1)\fP, \fBECT(0)\fP, or \fBCE\fP.
 \fIoffset\fP is the fragment offset field; it is printed whether this is
 part of a fragmented datagram or not.
 \fIflags\fP are the MF and DF flags; \fB+\fP is reported if MF is set,
-and \fBDF\P is reported if F is set.  If neither are set, \fB.\fP is
+and \fBDF\fP is reported if F is set.  If neither are set, \fB.\fP is
 reported.
 \fIproto\fP is the protocol ID field.
 \fIlength\fP is the total length field.
