@@ -562,7 +562,7 @@ handle_ctrl_proto(netdissect_options *ndo,
 		/* RFC 1661 says this is intended to be human readable */
 		if (len > 8) {
 			ND_PRINT("\n\t  Message\n\t    ");
-			if (fn_printn(ndo, tptr + 4, len - 4, ndo->ndo_snapend))
+			if (nd_printn(ndo, tptr + 4, len - 4, ndo->ndo_snapend))
 				goto trunc;
 		}
 		break;

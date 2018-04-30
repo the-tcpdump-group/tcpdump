@@ -353,9 +353,9 @@ rpki_rtr_pdu_print (netdissect_options *ndo, const u_char *tptr, const u_int len
 	    if (text_length) {
 		if (pdu_len < tlen + text_length)
 		    goto invalid;
-		/* fn_printn() makes the bounds check */
+		/* nd_printn() makes the bounds check */
 		ND_PRINT("%sError text: ", indent_string(indent+2));
-		if (fn_printn(ndo, tptr + tlen, text_length, ndo->ndo_snapend))
+		if (nd_printn(ndo, tptr + tlen, text_length, ndo->ndo_snapend))
 			goto trunc;
 	    }
 	}

@@ -189,7 +189,7 @@ ipx_sap_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 		ND_PRINT("'");
 		goto trunc;
 	    }
-	    if (fn_printzp(ndo, ipx, 48, ndo->ndo_snapend)) {
+	    if (nd_printzp(ndo, ipx, 48, ndo->ndo_snapend)) {
 		ND_PRINT("'");
 		goto trunc;
 	    }

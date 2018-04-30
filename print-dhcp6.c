@@ -744,7 +744,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				label_len = EXTRACT_U_1(tp);
 				tp++;
 				if (label_len < remain_len - 1) {
-					(void)fn_printn(ndo, tp, label_len, NULL);
+					(void)nd_printn(ndo, tp, label_len, NULL);
 					tp += label_len;
 					remain_len -= (label_len + 1);
 					if(EXTRACT_U_1(tp)) ND_PRINT(".");
@@ -764,7 +764,7 @@ dhcp6opt_print(netdissect_options *ndo,
 			}
 			tp = (const u_char *)(dh6o + 1);
 			ND_PRINT("=");
-			(void)fn_printn(ndo, tp, (u_int)optlen, NULL);
+			(void)nd_printn(ndo, tp, (u_int)optlen, NULL);
 			ND_PRINT(")");
 			break;
 

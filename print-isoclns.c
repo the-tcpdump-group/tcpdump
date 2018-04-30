@@ -1398,7 +1398,7 @@ isis_print_mcid(netdissect_options *ndo,
   ND_TCHECK_SIZE(mcid);
   ND_PRINT("ID: %u, Name: ", EXTRACT_U_1(mcid->format_id));
 
-  if (fn_printzp(ndo, mcid->name, 32, ndo->ndo_snapend))
+  if (nd_printzp(ndo, mcid->name, 32, ndo->ndo_snapend))
     goto trunc;
 
   ND_PRINT("\n\t              Lvl: %u", EXTRACT_BE_U_2(mcid->revision_lvl));
@@ -2846,7 +2846,7 @@ isis_print(netdissect_options *ndo,
 
 	    switch (EXTRACT_U_1(tptr)) {
 	    case ISIS_SUBTLV_AUTH_SIMPLE:
-		if (fn_printzp(ndo, tptr + 1, tlv_len - 1, ndo->ndo_snapend))
+		if (nd_printzp(ndo, tptr + 1, tlv_len - 1, ndo->ndo_snapend))
 		    goto trunc;
 		break;
 	    case ISIS_SUBTLV_AUTH_MD5:
@@ -2974,7 +2974,7 @@ isis_print(netdissect_options *ndo,
 
 	case ISIS_TLV_HOSTNAME:
 	    ND_PRINT("\n\t      Hostname: ");
-	    if (fn_printzp(ndo, tptr, tmp, ndo->ndo_snapend))
+	    if (nd_printzp(ndo, tptr, tmp, ndo->ndo_snapend))
 		goto trunc;
 	    break;
 

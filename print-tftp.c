@@ -121,7 +121,7 @@ tftp_print(netdissect_options *ndo,
 		ND_PRINT(" ");
 		/* Print filename */
 		ND_PRINT("\"");
-		ui = fn_printztn(ndo, bp, length, ndo->ndo_snapend);
+		ui = nd_printztn(ndo, bp, length, ndo->ndo_snapend);
 		ND_PRINT("\"");
 		if (ui == 0)
 			goto trunc;
@@ -132,7 +132,7 @@ tftp_print(netdissect_options *ndo,
 		if (length == 0)
 			goto trunc;	/* no mode */
 		ND_PRINT(" ");
-		ui = fn_printztn(ndo, bp, length, ndo->ndo_snapend);
+		ui = nd_printztn(ndo, bp, length, ndo->ndo_snapend);
 		if (ui == 0)
 			goto trunc;
 		bp += ui;
@@ -143,7 +143,7 @@ tftp_print(netdissect_options *ndo,
 			ND_TCHECK_1(bp);
 			if (EXTRACT_U_1(bp) != '\0')
 				ND_PRINT(" ");
-			ui = fn_printztn(ndo, bp, length, ndo->ndo_snapend);
+			ui = nd_printztn(ndo, bp, length, ndo->ndo_snapend);
 			if (ui == 0)
 				goto trunc;
 			bp += ui;
@@ -157,7 +157,7 @@ tftp_print(netdissect_options *ndo,
 			ND_TCHECK_1(bp);
 			if (EXTRACT_U_1(bp) != '\0')
 				ND_PRINT(" ");
-			ui = fn_printztn(ndo, bp, length, ndo->ndo_snapend);
+			ui = nd_printztn(ndo, bp, length, ndo->ndo_snapend);
 			if (ui == 0)
 				goto trunc;
 			bp += ui;
@@ -186,7 +186,7 @@ tftp_print(netdissect_options *ndo,
 		if (length == 0)
 			goto trunc;	/* no error message */
 		ND_PRINT(" \"");
-		ui = fn_printztn(ndo, bp, length, ndo->ndo_snapend);
+		ui = nd_printztn(ndo, bp, length, ndo->ndo_snapend);
 		ND_PRINT("\"");
 		if (ui == 0)
 			goto trunc;

@@ -705,7 +705,7 @@ asn1_print_string(netdissect_options *ndo, struct be *elem)
 	p = elem->data.str;
 	if (printable) {
 		ND_PRINT("\"");
-		if (fn_printn(ndo, p, asnlen, ndo->ndo_snapend)) {
+		if (nd_printn(ndo, p, asnlen, ndo->ndo_snapend)) {
 			ND_PRINT("\"");
 			goto trunc;
 		}

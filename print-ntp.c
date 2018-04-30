@@ -300,7 +300,7 @@ ntp_time_print(netdissect_options *ndo,
 		break;
 
 	case PRIM_REF:
-		if (fn_printn(ndo, (const u_char *)&(bp->refid), 4, ndo->ndo_snapend))
+		if (nd_printn(ndo, (const u_char *)&(bp->refid), 4, ndo->ndo_snapend))
 			goto trunc;
 		break;
 

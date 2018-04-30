@@ -87,13 +87,14 @@ fn_print_char(netdissect_options *ndo, u_char c)
 }
 
 /*
- * Print out a null-terminated filename (or other ASCII string).
+ * Print out a null-terminated filename (or other ASCII string), part of
+ * the packet buffer.
  * If ep is NULL, assume no truncation check is needed.
  * Return true if truncated.
  * Stop at ep (if given) or before the null char, whichever is first.
  */
 int
-fn_print(netdissect_options *ndo,
+nd_print(netdissect_options *ndo,
          const u_char *s, const u_char *ep)
 {
 	int ret;
@@ -114,13 +115,13 @@ fn_print(netdissect_options *ndo,
 
 /*
  * Print out a null-terminated filename (or other ASCII string) from
- * a fixed-length buffer.
+ * a fixed-length buffer, part of the packet buffer.
  * If ep is NULL, assume no truncation check is needed.
  * Return the number of bytes of string processed, including the
  * terminating null, if not truncated.  Return 0 if truncated.
  */
 u_int
-fn_printztn(netdissect_options *ndo,
+nd_printztn(netdissect_options *ndo,
          const u_char *s, u_int n, const u_char *ep)
 {
 	u_int bytes;
@@ -156,13 +157,14 @@ fn_printztn(netdissect_options *ndo,
 }
 
 /*
- * Print out a counted filename (or other ASCII string).
+ * Print out a counted filename (or other ASCII string), part of
+ * the packet buffer.
  * If ep is NULL, assume no truncation check is needed.
  * Return true if truncated.
  * Stop at ep (if given) or after n bytes, whichever is first.
  */
 int
-fn_printn(netdissect_options *ndo,
+nd_printn(netdissect_options *ndo,
           const u_char *s, u_int n, const u_char *ep)
 {
 	u_char c;
@@ -177,14 +179,15 @@ fn_printn(netdissect_options *ndo,
 }
 
 /*
- * Print out a null-padded filename (or other ASCII string).
+ * Print out a null-padded filename (or other ASCII string), part of
+ * the packet buffer.
  * If ep is NULL, assume no truncation check is needed.
  * Return true if truncated.
  * Stop at ep (if given) or after n bytes or before the null char,
  * whichever is first.
  */
 int
-fn_printzp(netdissect_options *ndo,
+nd_printzp(netdissect_options *ndo,
            const u_char *s, u_int n,
            const u_char *ep)
 {

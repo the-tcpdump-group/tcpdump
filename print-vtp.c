@@ -150,7 +150,7 @@ vtp_print (netdissect_options *ndo,
 	ND_PRINT(" [invalid MgmtD Len %u]", mgmtd_len);
 	return;
     }
-    fn_printzp(ndo, tptr + 4, mgmtd_len, NULL);
+    nd_printzp(ndo, tptr + 4, mgmtd_len, NULL);
     ND_PRINT(", %s: %u",
 	   tok2str(vtp_header_values, "Unknown", type),
 	   EXTRACT_U_1(tptr + 2));
@@ -267,7 +267,7 @@ vtp_print (netdissect_options *ndo,
 	    if (len < 4*((name_len + 3)/4))
 		goto trunc;
 	    ND_TCHECK_LEN(tptr, name_len);
-	    fn_printzp(ndo, tptr, name_len, NULL);
+	    nd_printzp(ndo, tptr, name_len, NULL);
 
 	    /*
 	     * Vlan names are aligned to 32-bit boundaries.

@@ -126,8 +126,8 @@ hsrp_print(netdissect_options *ndo, const u_char *bp, u_int len)
 		unsigned_relts_print(ndo, EXTRACT_U_1(hp->hsrp_holdtime));
 		ND_PRINT(" priority=%u", EXTRACT_U_1(hp->hsrp_priority));
 		ND_PRINT(" auth=\"");
-		if (fn_printn(ndo, hp->hsrp_authdata, sizeof(hp->hsrp_authdata),
-		    ndo->ndo_snapend)) {
+		if (nd_printn(ndo, hp->hsrp_authdata, sizeof(hp->hsrp_authdata),
+			      ndo->ndo_snapend)) {
 			ND_PRINT("\"");
 			goto trunc;
 		}

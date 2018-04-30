@@ -155,12 +155,12 @@ udld_print (netdissect_options *ndo, const u_char *pptr, u_int length)
         case UDLD_PORT_ID_TLV:
         case UDLD_DEVICE_NAME_TLV:
             ND_PRINT(", ");
-            fn_printzp(ndo, tptr, len, NULL);
+            nd_printzp(ndo, tptr, len, NULL);
             break;
 
         case UDLD_ECHO_TLV:
             ND_PRINT(", ");
-            (void)fn_printn(ndo, tptr, len, NULL);
+            (void)nd_printn(ndo, tptr, len, NULL);
             break;
 
         case UDLD_MESSAGE_INTERVAL_TLV:

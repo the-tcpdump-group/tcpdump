@@ -895,7 +895,7 @@ of10_bsn_message_print(netdissect_options *ndo,
 		cp += 4;
 		/* data */
 		ND_PRINT(", data '");
-		if (fn_printn(ndo, cp, len - 8, ep)) {
+		if (nd_printn(ndo, cp, len - 8, ep)) {
 			ND_PRINT("'");
 			goto trunc;
 		}
@@ -916,7 +916,7 @@ of10_bsn_message_print(netdissect_options *ndo,
 		/* already checked that len >= 4 */
 		/* data */
 		ND_PRINT(", data '");
-		if (fn_printn(ndo, cp, len - 4, ep)) {
+		if (nd_printn(ndo, cp, len - 4, ep)) {
 			ND_PRINT("'");
 			goto trunc;
 		}
@@ -1158,7 +1158,7 @@ of10_phy_ports_print(netdissect_options *ndo,
 		/* name */
 		ND_TCHECK_LEN(cp, OFP_MAX_PORT_NAME_LEN);
 		ND_PRINT(", name '");
-		fn_print(ndo, cp, cp + OFP_MAX_PORT_NAME_LEN);
+		nd_print(ndo, cp, cp + OFP_MAX_PORT_NAME_LEN);
 		ND_PRINT("'");
 		cp += OFP_MAX_PORT_NAME_LEN;
 
@@ -1840,31 +1840,31 @@ of10_desc_stats_reply_print(netdissect_options *ndo,
 	/* mfr_desc */
 	ND_TCHECK_LEN(cp, DESC_STR_LEN);
 	ND_PRINT("\n\t  mfr_desc '");
-	fn_print(ndo, cp, cp + DESC_STR_LEN);
+	nd_print(ndo, cp, cp + DESC_STR_LEN);
 	ND_PRINT("'");
 	cp += DESC_STR_LEN;
 	/* hw_desc */
 	ND_TCHECK_LEN(cp, DESC_STR_LEN);
 	ND_PRINT("\n\t  hw_desc '");
-	fn_print(ndo, cp, cp + DESC_STR_LEN);
+	nd_print(ndo, cp, cp + DESC_STR_LEN);
 	ND_PRINT("'");
 	cp += DESC_STR_LEN;
 	/* sw_desc */
 	ND_TCHECK_LEN(cp, DESC_STR_LEN);
 	ND_PRINT("\n\t  sw_desc '");
-	fn_print(ndo, cp, cp + DESC_STR_LEN);
+	nd_print(ndo, cp, cp + DESC_STR_LEN);
 	ND_PRINT("'");
 	cp += DESC_STR_LEN;
 	/* serial_num */
 	ND_TCHECK_LEN(cp, SERIAL_NUM_LEN);
 	ND_PRINT("\n\t  serial_num '");
-	fn_print(ndo, cp, cp + SERIAL_NUM_LEN);
+	nd_print(ndo, cp, cp + SERIAL_NUM_LEN);
 	ND_PRINT("'");
 	cp += SERIAL_NUM_LEN;
 	/* dp_desc */
 	ND_TCHECK_LEN(cp, DESC_STR_LEN);
 	ND_PRINT("\n\t  dp_desc '");
-	fn_print(ndo, cp, cp + DESC_STR_LEN);
+	nd_print(ndo, cp, cp + DESC_STR_LEN);
 	ND_PRINT("'");
 	return cp + DESC_STR_LEN;
 
@@ -2012,7 +2012,7 @@ of10_table_stats_reply_print(netdissect_options *ndo,
 		/* name */
 		ND_TCHECK_LEN(cp, OFP_MAX_TABLE_NAME_LEN);
 		ND_PRINT(", name '");
-		fn_print(ndo, cp, cp + OFP_MAX_TABLE_NAME_LEN);
+		nd_print(ndo, cp, cp + OFP_MAX_TABLE_NAME_LEN);
 		ND_PRINT("'");
 		cp += OFP_MAX_TABLE_NAME_LEN;
 		/* wildcards */

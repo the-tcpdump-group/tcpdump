@@ -292,7 +292,7 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
     ND_PRINT("\n\tv3len %u, ", EXTRACT_BE_U_2(ptr + MST_BPDU_VER3_LEN_OFFSET));
     ND_TCHECK_4(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 12);
     ND_PRINT("MCID Name ");
-    if (fn_printzp(ndo, ptr + MST_BPDU_CONFIG_NAME_OFFSET, 32, ndo->ndo_snapend))
+    if (nd_printzp(ndo, ptr + MST_BPDU_CONFIG_NAME_OFFSET, 32, ndo->ndo_snapend))
 	goto trunc;
     ND_PRINT(", rev %u,"
             "\n\t\tdigest %08x%08x%08x%08x, ",
@@ -366,7 +366,7 @@ stp_print_spb_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
 
     ND_PRINT("\n\tv4len %u, ", EXTRACT_BE_U_2(ptr + offset));
     ND_PRINT("AUXMCID Name ");
-    if (fn_printzp(ndo, ptr + offset + SPB_BPDU_CONFIG_NAME_OFFSET, 32,
+    if (nd_printzp(ndo, ptr + offset + SPB_BPDU_CONFIG_NAME_OFFSET, 32,
 		   ndo->ndo_snapend))
 	goto trunc;
     ND_PRINT(", Rev %u,\n\t\tdigest %08x%08x%08x%08x",

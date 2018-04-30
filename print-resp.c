@@ -205,7 +205,7 @@ static int resp_get_length(netdissect_options *, const u_char *, int, const u_ch
  */
 #define RESP_PRINT_SEGMENT(_ndo, _bp, _len)            \
     ND_PRINT(" \"");                                   \
-    if (fn_printn(_ndo, _bp, _len, _ndo->ndo_snapend)) \
+    if (nd_printn(_ndo, _bp, _len, _ndo->ndo_snapend)) \
         goto trunc;                                    \
     fn_print_char(_ndo, '"');
 

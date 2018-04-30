@@ -688,7 +688,7 @@ olsr_print(netdissect_options *ndo,
                 else
                     ND_PRINT(", address %s, name \"",
                             ipaddr_string(ndo, msg_data));
-                (void)fn_printn(ndo, msg_data + addr_size, name_entry_len, NULL);
+                (void)nd_printn(ndo, msg_data + addr_size, name_entry_len, NULL);
                 ND_PRINT("\"");
 
                 msg_data += addr_size + name_entry_len + name_entry_padding;

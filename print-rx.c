@@ -771,7 +771,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, u_int sport,
 				goto trunc; \
 			bp += sizeof(uint32_t); \
 			ND_PRINT(" \""); \
-			if (fn_printn(ndo, bp, _i, ndo->ndo_snapend)) \
+			if (nd_printn(ndo, bp, _i, ndo->ndo_snapend)) \
 				goto trunc; \
 			ND_PRINT("\""); \
 			bp += ((_i + sizeof(uint32_t) - 1) / sizeof(uint32_t)) * sizeof(uint32_t); \
@@ -869,7 +869,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, u_int sport,
 			} \
 			s[(MAX)] = '\0'; \
 			ND_PRINT(" \""); \
-			fn_print(ndo, s, NULL); \
+			nd_print(ndo, s, NULL); \
 			ND_PRINT("\""); \
 		}
 
@@ -1190,7 +1190,7 @@ acl_print(netdissect_options *ndo,
 			goto finish;
 		s += n;
 		ND_PRINT(" +{");
-		fn_print(ndo, (u_char *)user, NULL);
+		nd_print(ndo, (u_char *)user, NULL);
 		ND_PRINT(" ");
 		ACLOUT(acl);
 		ND_PRINT("}");
@@ -1204,7 +1204,7 @@ acl_print(netdissect_options *ndo,
 			goto finish;
 		s += n;
 		ND_PRINT(" -{");
-		fn_print(ndo, (u_char *)user, NULL);
+		nd_print(ndo, (u_char *)user, NULL);
 		ND_PRINT(" ");
 		ACLOUT(acl);
 		ND_PRINT("}");

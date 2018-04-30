@@ -205,7 +205,7 @@ wb_id(netdissect_options *ndo,
 	cp = (const char *)(io + nid);
 	if (ND_TTEST_LEN(cp, len)) {
 		ND_PRINT("\"");
-		fn_print(ndo, (const u_char *)cp, (const u_char *)cp + len);
+		nd_print(ndo, (const u_char *)cp, (const u_char *)cp + len);
 		ND_PRINT("\"");
 	}
 
