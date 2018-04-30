@@ -329,7 +329,7 @@ EXTRACT_HE_U_2(const void *p)
 	return val;
 }
 
-static inline uint16_t
+static inline int16_t
 EXTRACT_HE_S_2(const void *p)
 {
 	int16_t val;
@@ -338,7 +338,7 @@ EXTRACT_HE_S_2(const void *p)
 	return val;
 }
 
-static inline uint16_t
+static inline uint32_t
 EXTRACT_HE_U_4(const void *p)
 {
 	uint32_t val;
@@ -347,7 +347,7 @@ EXTRACT_HE_U_4(const void *p)
 	return val;
 }
 
-static inline uint16_t
+static inline int32_t
 EXTRACT_HE_S_4(const void *p)
 {
 	int32_t val;
