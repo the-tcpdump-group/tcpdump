@@ -248,7 +248,7 @@ print_dns_label(netdissect_options *ndo,
         if (lab_length == 0)
             return (int)length;
         if (length > 1 && print)
-            safeputchar(ndo, '.');
+            ND_PRINT(".");
         if (length+lab_length > max_length) {
             if (print)
                 safeputs(ndo, cp+length, max_length-length);
@@ -818,9 +818,9 @@ hncp_print_rec(netdissect_options *ndo,
                 format_ip6addr(ndo, value)
             );
             if (l < 64) {
-                safeputchar(ndo, '"');
+                ND_PRINT("\"");
                 safeputs(ndo, value + 17, l);
-                safeputchar(ndo, '"');
+                ND_PRINT("\"");
             } else {
                 ND_PRINT("%s", istr);
             }
