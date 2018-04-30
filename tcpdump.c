@@ -259,6 +259,9 @@ static const struct tok status_flags[] = {
 	{ PCAP_IF_RUNNING,  "Running"  },
 #endif
 	{ PCAP_IF_LOOPBACK, "Loopback" },
+#ifdef PCAP_IF_WIRELESS
+	{ PCAP_IF_WIRELESS, "Wireless" },
+#endif
 	{ 0, NULL }
 };
 #endif
@@ -477,8 +480,50 @@ show_devices_and_exit(void)
 		printf("%d.%s", i+1, dev->name);
 		if (dev->description != NULL)
 			printf(" (%s)", dev->description);
-		if (dev->flags != 0)
-			printf(" [%s]", bittok2str(status_flags, "none", dev->flags));
+		if (dev->flags != 0) {
+			printf(" [");
+			printf("%s", bittok2str(status_flags, "none", dev->flags));
+#ifdef PCAP_IF_WIRELESS
+			if (dev->flags & PCAP_IF_WIRELESS) {
+				switch (dev->flags & PCAP_IF_CONNECTION_STATUS) {
+
+				case PCAP_IF_CONNECTION_STATUS_UNKNOWN:
+					printf(", Association status unknown");
+					break;
+
+				case PCAP_IF_CONNECTION_STATUS_CONNECTED:
+					printf(", Associated");
+					break;
+
+				case PCAP_IF_CONNECTION_STATUS_DISCONNECTED:
+					printf(", Not associated");
+					break;
+
+				case PCAP_IF_CONNECTION_STATUS_NOT_APPLICABLE:
+					break;
+				}
+			} else {
+				switch (dev->flags & PCAP_IF_CONNECTION_STATUS) {
+
+				case PCAP_IF_CONNECTION_STATUS_UNKNOWN:
+					printf(", Connection status unknown");
+					break;
+
+				case PCAP_IF_CONNECTION_STATUS_CONNECTED:
+					printf(", Connected");
+					break;
+
+				case PCAP_IF_CONNECTION_STATUS_DISCONNECTED:
+					printf(", Disconnected");
+					break;
+
+				case PCAP_IF_CONNECTION_STATUS_NOT_APPLICABLE:
+					break;
+				}
+			}
+#endif
+			printf("]");
+		}
 		printf("\n");
 	}
 	pcap_freealldevs(devlist);
