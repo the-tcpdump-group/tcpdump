@@ -909,17 +909,10 @@ safeputs(netdissect_options *ndo,
 	u_int idx = 0;
 
 	while (idx < maxlen && EXTRACT_U_1(s)) {
-		safeputchar(ndo, EXTRACT_U_1(s));
+		fn_print_char(ndo, EXTRACT_U_1(s));
 		idx++;
 		s++;
 	}
-}
-
-void
-safeputchar(netdissect_options *ndo,
-            const u_char c)
-{
-	ND_PRINT((c < 0x80 && ND_ISPRINT(c)) ? "%c" : "\\0x%02x", c);
 }
 
 #if (defined(__i386__) || defined(_M_IX86) || defined(__X86__) || defined(__x86_64__) || defined(_M_X64)) || \

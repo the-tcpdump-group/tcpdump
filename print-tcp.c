@@ -824,7 +824,7 @@ print_tcp_rst_data(netdissect_options *ndo,
         while (length-- && sp < ndo->ndo_snapend) {
                 c = EXTRACT_U_1(sp);
                 sp++;
-                safeputchar(ndo, c);
+                fn_print_char(ndo, c);
         }
         ND_PRINT("]");
 }

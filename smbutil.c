@@ -254,7 +254,7 @@ print_asc(netdissect_options *ndo,
 {
     u_int i;
     for (i = 0; i < len; i++)
-        safeputchar(ndo, EXTRACT_U_1(buf + i));
+        fn_print_char(ndo, EXTRACT_U_1(buf + i));
 }
 
 static const char *

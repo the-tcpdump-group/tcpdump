@@ -1185,7 +1185,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     return-1;
                 ND_PRINT("%s  Session Name: ", indent);
                 for (i = 0; i < namelen; i++)
-                    safeputchar(ndo, EXTRACT_U_1(obj_tptr + 4 + i));
+                    fn_print_char(ndo, EXTRACT_U_1(obj_tptr + 4 + i));
                 ND_PRINT("%s  Setup Priority: %u, Holding Priority: %u, Flags: [%s] (%#x)",
                        indent,
                        EXTRACT_U_1(obj_tptr),

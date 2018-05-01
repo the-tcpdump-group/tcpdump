@@ -1711,7 +1711,7 @@ dnsname_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 				break;
 			}
 			while (i-- && cp < ep) {
-				safeputchar(ndo, EXTRACT_U_1(cp));
+				fn_print_char(ndo, EXTRACT_U_1(cp));
 				cp++;
 			}
 			if (cp + 1 < ep && EXTRACT_U_1(cp))
@@ -1832,7 +1832,7 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 				cp++;
 				ND_PRINT(", \"");
 				while (cp < ep) {
-					safeputchar(ndo, EXTRACT_U_1(cp));
+					fn_print_char(ndo, EXTRACT_U_1(cp));
 					cp++;
 				}
 				ND_PRINT("\"");
@@ -1930,7 +1930,7 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 				cp++;
 				ND_PRINT(", \"");
 				while (cp < ep) {
-					safeputchar(ndo, EXTRACT_U_1(cp));
+					fn_print_char(ndo, EXTRACT_U_1(cp));
 					cp++;
 				}
 				ND_PRINT("\"");

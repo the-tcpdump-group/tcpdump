@@ -502,7 +502,7 @@ mfr_print(netdissect_options *ndo,
             case MFR_CTRL_IE_LINK_ID:
                 for (idx = 0; idx < ie_len && idx < MFR_ID_STRING_MAXLEN; idx++) {
                     if (EXTRACT_U_1(tptr + idx) != 0) /* don't print null termination */
-                        safeputchar(ndo, EXTRACT_U_1(tptr + idx));
+                        fn_print_char(ndo, EXTRACT_U_1(tptr + idx));
                     else
                         break;
                 }

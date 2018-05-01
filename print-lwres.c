@@ -205,7 +205,7 @@ lwres_printname(netdissect_options *ndo,
 
 	ND_PRINT(" ");
 	for (i = 0; i < l; i++) {
-		safeputchar(ndo, EXTRACT_U_1(p));
+		fn_print_char(ndo, EXTRACT_U_1(p));
 		p++;
 	}
 	p++;	/* skip terminating \0 */

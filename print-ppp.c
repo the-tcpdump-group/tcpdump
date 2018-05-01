@@ -901,7 +901,7 @@ handle_chap(netdissect_options *ndo,
 		ND_PRINT(", Name ");
 		for (i = 0; i < name_size; i++) {
 			ND_TCHECK_1(p);
-			safeputchar(ndo, EXTRACT_U_1(p));
+			fn_print_char(ndo, EXTRACT_U_1(p));
 			p++;
 		}
 		break;
@@ -911,7 +911,7 @@ handle_chap(netdissect_options *ndo,
 		ND_PRINT(", Msg ");
 		for (i = 0; i< msg_size; i++) {
 			ND_TCHECK_1(p);
-			safeputchar(ndo, EXTRACT_U_1(p));
+			fn_print_char(ndo, EXTRACT_U_1(p));
 			p++;
 		}
 		break;
@@ -982,7 +982,7 @@ handle_pap(netdissect_options *ndo,
 		ND_PRINT(", Peer ");
 		for (i = 0; i < peerid_len; i++) {
 			ND_TCHECK_1(p);
-			safeputchar(ndo, EXTRACT_U_1(p));
+			fn_print_char(ndo, EXTRACT_U_1(p));
 			p++;
 		}
 
@@ -996,7 +996,7 @@ handle_pap(netdissect_options *ndo,
 		ND_PRINT(", Name ");
 		for (i = 0; i < passwd_len; i++) {
 			ND_TCHECK_1(p);
-			safeputchar(ndo, EXTRACT_U_1(p));
+			fn_print_char(ndo, EXTRACT_U_1(p));
 			p++;
 		}
 		break;
@@ -1019,7 +1019,7 @@ handle_pap(netdissect_options *ndo,
 		ND_PRINT(", Msg ");
 		for (i = 0; i< msg_len; i++) {
 			ND_TCHECK_1(p);
-			safeputchar(ndo, EXTRACT_U_1(p));
+			fn_print_char(ndo, EXTRACT_U_1(p));
 			p++;
 		}
 		break;

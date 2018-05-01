@@ -1398,7 +1398,7 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 			u_int i;
 			ND_PRINT(" len=%u ", len);
 			for (i = 0; i < len; i++)
-				safeputchar(ndo, EXTRACT_U_1(data + i));
+				fn_print_char(ndo, EXTRACT_U_1(data + i));
 			len = 0;
 			break;
 		    }
