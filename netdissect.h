@@ -355,8 +355,6 @@ extern void txtproto_print(netdissect_options *, const u_char *, u_int,
 #define ND_ISGRAPH(c)	((c) > 0x20 && (c) <= 0x7E)
 #define ND_TOASCII(c)	((c) & 0x7F)
 
-extern void safeputs(netdissect_options *, const u_char *, const u_int);
-
 #if (defined(__i386__) || defined(_M_IX86) || defined(__X86__) || defined(__x86_64__) || defined(_M_X64)) || \
     (defined(__arm__) || defined(_M_ARM) || defined(__aarch64__)) || \
     (defined(__m68k__) && (!defined(__mc68000__) && !defined(__mc68010__))) || \

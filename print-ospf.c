@@ -1168,7 +1168,7 @@ ospf_print(netdissect_options *ndo,
 
 		case OSPF_AUTH_SIMPLE:
 			ND_PRINT("\n\tSimple text password: ");
-			safeputs(ndo, op->ospf_authdata, OSPF_AUTH_SIMPLE_LEN);
+			(void)nd_printzp(ndo, op->ospf_authdata, OSPF_AUTH_SIMPLE_LEN, NULL);
 			break;
 
 		case OSPF_AUTH_MD5:

@@ -251,11 +251,11 @@ print_dns_label(netdissect_options *ndo,
             ND_PRINT(".");
         if (length+lab_length > max_length) {
             if (print)
-                safeputs(ndo, cp+length, max_length-length);
+                (void)nd_printzp(ndo, cp+length, max_length-length, NULL);
             break;
         }
         if (print)
-            safeputs(ndo, cp+length, lab_length);
+            (void)nd_printzp(ndo, cp+length, lab_length, NULL);
         length += lab_length;
     }
     if (print)
@@ -585,7 +585,7 @@ hncp_print_rec(netdissect_options *ndo,
             ND_PRINT(" Verdict: %u Fingerprint: %s Common Name: ",
                 EXTRACT_U_1(value),
                 format_256(value + 4));
-            safeputs(ndo, value + 36, bodylen - 36);
+            (void)nd_printzp(ndo, value + 36, bodylen - 36, NULL);
         }
             break;
 
@@ -604,7 +604,7 @@ hncp_print_rec(netdissect_options *ndo,
             ND_PRINT(" M: %u P: %u H: %u L: %u User-agent: ",
                 M, P, H, L
             );
-            safeputs(ndo, value + 4, bodylen - 4);
+            (void)nd_printzp(ndo, value + 4, bodylen - 4, NULL);
         }
             break;
 
@@ -689,7 +689,7 @@ hncp_print_rec(netdissect_options *ndo,
                 print_dns_label(ndo, value+1, bodylen-1, 1);
             } else if (policy == 130) {
                 ND_PRINT("Opaque UTF-8: ");
-                safeputs(ndo, value + 1, bodylen - 1);
+                (void)nd_printzp(ndo, value + 1, bodylen - 1, NULL);
             } else if (policy == 131) {
                 if (bodylen != 1) {
                     ND_PRINT(" %s", istr);
@@ -819,7 +819,7 @@ hncp_print_rec(netdissect_options *ndo,
             );
             if (l < 64) {
                 ND_PRINT("\"");
-                safeputs(ndo, value + 17, l);
+                (void)nd_printzp(ndo, value + 17, l, NULL);
                 ND_PRINT("\"");
             } else {
                 ND_PRINT("%s", istr);

@@ -902,19 +902,6 @@ txtproto_print(netdissect_options *ndo, const u_char *pptr, u_int len,
 	}
 }
 
-void
-safeputs(netdissect_options *ndo,
-         const u_char *s, const u_int maxlen)
-{
-	u_int idx = 0;
-
-	while (idx < maxlen && EXTRACT_U_1(s)) {
-		fn_print_char(ndo, EXTRACT_U_1(s));
-		idx++;
-		s++;
-	}
-}
-
 #if (defined(__i386__) || defined(_M_IX86) || defined(__X86__) || defined(__x86_64__) || defined(_M_X64)) || \
     (defined(__arm__) || defined(_M_ARM) || defined(__aarch64__)) || \
     (defined(__m68k__) && (!defined(__mc68000__) && !defined(__mc68010__))) || \
