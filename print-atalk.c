@@ -36,7 +36,6 @@
 #include "extract.h"
 #include "appletalk.h"
 
-static const char tstr[] = "[|atalk]";
 
 static const struct tok type2str[] = {
 	{ ddpRTMP,		"rtmp" },
@@ -289,7 +288,7 @@ atp_print(netdissect_options *ndo,
 
 	if ((const u_char *)(ap + 1) > ndo->ndo_snapend) {
 		/* Just bail if we don't have the whole chunk. */
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return;
 	}
 	if (length < sizeof(*ap)) {
@@ -433,7 +432,7 @@ nbp_print(netdissect_options *ndo,
 	/* ep points to end of available data */
 	ep = ndo->ndo_snapend;
 	if ((const u_char *)tp > ep) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return;
 	}
 	control = EXTRACT_U_1(np->control);
@@ -443,7 +442,7 @@ nbp_print(netdissect_options *ndo,
 	case nbpLkUp:
 		ND_PRINT(i == nbpLkUp? " nbp-lkup %u:":" nbp-brRq %u:", EXTRACT_U_1(np->id));
 		if ((const u_char *)(tp + 1) > ep) {
-			ND_PRINT("%s", tstr);
+			nd_print_trunc(ndo);
 			return;
 		}
 		(void)nbp_name_print(ndo, tp, ep);
@@ -487,7 +486,7 @@ print_cstring(netdissect_options *ndo,
 	u_int length;
 
 	if (cp >= (const char *)ep) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return (0);
 	}
 	length = EXTRACT_U_1(cp);
@@ -500,7 +499,7 @@ print_cstring(netdissect_options *ndo,
 	}
 	while (length != 0) {
 		if (cp >= (const char *)ep) {
-			ND_PRINT("%s", tstr);
+			nd_print_trunc(ndo);
 			return (0);
 		}
 		fn_print_char(ndo, EXTRACT_U_1(cp));
@@ -518,7 +517,7 @@ nbp_tuple_print(netdissect_options *ndo,
 	const struct atNBPtuple *tpn;
 
 	if ((const u_char *)(tp + 1) > ep) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return 0;
 	}
 	tpn = nbp_name_print(ndo, tp, ep);

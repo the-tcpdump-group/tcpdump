@@ -34,7 +34,6 @@
 #include "netdissect.h"
 #include "extract.h"
 
-static const char tstr[] = " [|NSH]";
 static const struct tok nsh_flags [] = {
     { 0x20, "O" },
     { 0x10, "C" },
@@ -181,6 +180,6 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
     return;
 
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }
 

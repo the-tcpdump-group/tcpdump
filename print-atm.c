@@ -123,7 +123,6 @@
 
 /* end of the original atmuni31.h */
 
-static const char tstr[] = "[|atm]";
 
 #define OAM_CRC10_MASK 0x3ff
 #define OAM_PAYLOAD_LEN 48
@@ -255,7 +254,7 @@ atm_if_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "atm_if";
 	if (caplen < 1 || length < 1) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return (caplen);
 	}
 
@@ -272,7 +271,7 @@ atm_if_print(netdissect_options *ndo,
 	 * control field.
 	 */
 	if (caplen < 3 || length < 3) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return (caplen);
 	}
 
@@ -304,7 +303,7 @@ atm_if_print(netdissect_options *ndo,
 		 * new DLT_IEEE802_6 value if we added it?
 		 */
 		if (caplen < 20 || length < 20) {
-			ND_PRINT("%s", tstr);
+			nd_print_trunc(ndo);
 			return (caplen);
 		}
 		if (ndo->ndo_eflag)
@@ -376,7 +375,7 @@ sig_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT(" %s", tstr);
+	nd_print_trunc(ndo);
 }
 
 /*
@@ -552,6 +551,6 @@ oam_print (netdissect_options *ndo,
     return;
 
 trunc:
-    ND_PRINT("[|oam]");
+    nd_print_trunc(ndo);
     return;
 }

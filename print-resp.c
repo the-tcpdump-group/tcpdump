@@ -42,7 +42,6 @@
 
 #include "extract.h"
 
-static const char tstr[] = " [|RESP]";
 
 /*
  * For information regarding RESP, see: http://redis.io/topics/protocol
@@ -238,7 +237,7 @@ resp_print(netdissect_options *ndo, const u_char *bp, u_int length)
     return;
 
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }
 
 static int

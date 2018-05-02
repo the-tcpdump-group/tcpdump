@@ -39,7 +39,6 @@
 
 #include <pcap/nflog.h>
 
-static const char tstr[] = " [|nflog]";
 
 static const struct tok nflog_values[] = {
 	{ AF_INET,		"IPv4" },
@@ -160,7 +159,7 @@ nflog_if_print(netdissect_options *ndo,
 
 	return h_size;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return h_size;
 }
 

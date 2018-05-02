@@ -18,5 +18,4 @@ UI 22! IS-IS, length 262139
 	      unknown subTLV #16, length: 1
 	      unknown subTLV #224, length: 0
 	      unknown subTLV #59, length: 0
-	      unknown subTLV #5, length: 166
-		 [|isis] [|isis]
+	      unknown subTLV #5, length: 166 [|isis] [|isis]

@@ -31,7 +31,6 @@
 #include "addrtoname.h"
 #include "oui.h"
 
-static const char tstr[] = " [|slow]";
 
 #define	SLOW_PROTO_LACP                     1
 #define	SLOW_PROTO_MARKER                   2
@@ -341,7 +340,7 @@ tooshort:
     return;
 
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }
 
 static void
@@ -483,7 +482,7 @@ tooshort:
     return;
 
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }
 
 static void
@@ -750,5 +749,5 @@ tooshort:
     return;
 
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }

@@ -43,7 +43,6 @@
 #include "openflow.h"
 #include "oui.h"
 
-static const char tstr[] = " [|openflow]";
 
 #define OF_VER_1_0    0x01
 
@@ -125,7 +124,7 @@ invalid: /* fail current packet */
 	ND_TCHECK_LEN(cp, ep - cp);
 	return ep;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 

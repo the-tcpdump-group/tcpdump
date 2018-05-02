@@ -34,7 +34,6 @@
 #include "netdissect.h"
 #include "addrtoname.h"
 
-static const char tstr[] = " [|ipfc]";
 
 struct ipfc_header {
 	nd_byte ipfc_dhost[2+MAC_ADDR_LEN];
@@ -130,7 +129,7 @@ ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 	}
 	return (IPFC_HDRLEN + llc_hdrlen);
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return caplen;
 }
 

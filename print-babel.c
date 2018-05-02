@@ -41,7 +41,6 @@
 #include "addrtoname.h"
 #include "extract.h"
 
-static const char tstr[] = "[|babel]";
 
 static void babel_print_v2(netdissect_options *, const u_char *cp, u_int length);
 
@@ -73,7 +72,7 @@ babel_print(netdissect_options *ndo,
     return;
 
  trunc:
-    ND_PRINT(" %s", tstr);
+    nd_print_trunc(ndo);
     return;
 }
 
@@ -449,7 +448,7 @@ babel_print_v2(netdissect_options *ndo,
                 ae = EXTRACT_U_1(message + 2);
                 rc = network_address(ae, message + 8,
                                      len - 6, address);
-                if(rc < 0) { ND_PRINT("%s", tstr); break; }
+                if(rc < 0) { nd_print_trunc(ndo); break; }
                 ND_PRINT("%s rxcost %u interval %s",
                        ae == 0 ? "any" : format_address(ndo, address),
                        rxcost, format_interval(interval));
@@ -729,7 +728,7 @@ babel_print_v2(netdissect_options *ndo,
     return;
 
  trunc:
-    ND_PRINT(" %s", tstr);
+    nd_print_trunc(ndo);
     return;
 
  invalid:

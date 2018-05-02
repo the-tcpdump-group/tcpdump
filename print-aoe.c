@@ -39,7 +39,6 @@
 #include "extract.h"
 #include "addrtoname.h"
 
-static const char tstr[] = " [|aoe]";
 
 #define AOE_V1 1
 #define ATA_SECTOR_SIZE 512
@@ -199,7 +198,7 @@ invalid:
 	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -248,7 +247,7 @@ invalid:
 	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -299,7 +298,7 @@ invalid:
 	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -334,7 +333,7 @@ invalid:
 	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 /* cp points to the Ver/Flags octet */
@@ -392,7 +391,7 @@ invalid:
 	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 void
@@ -425,6 +424,6 @@ invalid:
 	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 

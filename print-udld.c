@@ -28,7 +28,6 @@
 #include "netdissect.h"
 #include "extract.h"
 
-static const char tstr[] = " [|udld]";
 
 #define UDLD_HEADER_LEN			4
 #define UDLD_DEVICE_ID_TLV		0x0001
@@ -188,5 +187,5 @@ invalid:
     ND_PRINT("%s", istr);
     return;
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }

@@ -36,7 +36,6 @@
 #include "netdissect.h"
 #include "extract.h"
 
-static const char tstr[] = " [|zmtp1]";
 
 /* Maximum number of ZMTP/1.0 frame body bytes (without the flags) to dump in
  * hex and ASCII under a single "-v" flag.
@@ -136,7 +135,7 @@ zmtp1_print_frame(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 	return cp + body_len_declared;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -206,7 +205,7 @@ zmtp1_print_intermediate_part(netdissect_options *ndo, const u_char *cp, const u
 	return cp + frame_offset;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return cp + len;
 }
 
@@ -215,7 +214,7 @@ zmtp1_datagram_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 {
 	const u_char *ep = min(ndo->ndo_snapend, cp + len);
 
-	ndo->ndo_protocol = "zmtp1_datagram";
+	ndo->ndo_protocol = "zmtp1";
 	cp = zmtp1_print_intermediate_part(ndo, cp, len);
 	while (cp < ep)
 		cp = zmtp1_print_frame(ndo, cp, ep);

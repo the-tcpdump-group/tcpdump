@@ -47,7 +47,6 @@
 #define SLIPDIR_IN 0
 #define SLIPDIR_OUT 1
 
-static const char tstr[] = "[|slip]";
 
 static u_int lastlen[2][256];
 static u_int lastconn = 255;
@@ -65,7 +64,7 @@ sl_if_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "sl_if";
 	if (caplen < SLIP_HDRLEN || length < SLIP_HDRLEN) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return (caplen);
 	}
 
@@ -78,7 +77,7 @@ sl_if_print(netdissect_options *ndo,
 		sliplink_print(ndo, p, ip, length);
 
 	if (caplen < 1 || length < 1) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return (caplen + SLIP_HDRLEN);
 	}
 
@@ -106,7 +105,7 @@ sl_bsdos_if_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "sl_bsdos_if";
 	if (caplen < SLIP_HDRLEN) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return (caplen);
 	}
 

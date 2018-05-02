@@ -39,7 +39,6 @@
 #include "netdissect.h"
 #include "extract.h"
 
-static const char tstr[] = "[|pflog]";
 
 static const struct tok pf_reasons[] = {
 	{ 0,	"0(match)" },
@@ -118,7 +117,7 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	ndo->ndo_protocol = "pflog_if";
 	/* check length */
 	if (caplen < sizeof(uint8_t)) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return (caplen);
 	}
 
@@ -131,7 +130,7 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	hdrlen = BPF_WORDALIGN(hdr->length);
 
 	if (caplen < hdrlen) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return (hdrlen);	/* XXX: true? */
 	}
 
@@ -175,6 +174,6 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 
 	return (hdrlen);
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return (hdrlen);
 }

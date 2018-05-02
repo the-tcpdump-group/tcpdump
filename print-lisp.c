@@ -109,7 +109,6 @@
 #include "extract.h"
 #include "addrtoname.h"
 
-static const char tstr[] = " [|LISP]";
 
 #define IPv4_AFI			1
 #define IPv6_AFI			2
@@ -387,7 +386,7 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	}
 	return;
 trunc:
-	ND_PRINT("\n   %s", tstr);
+	nd_print_trunc(ndo);
 	return;
 invalid:
 	ND_PRINT("\n   %s", istr);

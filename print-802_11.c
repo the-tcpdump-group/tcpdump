@@ -2004,7 +2004,6 @@ ieee_802_11_hdr_print(netdissect_options *ndo,
 #define	roundup2(x, y)	(((x)+((y)-1))&(~((y)-1))) /* if y is powers of two */
 #endif
 
-static const char tstr[] = "[|802.11]";
 
 static u_int
 ieee802_11_print(netdissect_options *ndo,
@@ -2020,7 +2019,7 @@ ieee802_11_print(netdissect_options *ndo,
 	caplen = orig_caplen;
 	/* Remove FCS, if present */
 	if (length < fcslen) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return caplen;
 	}
 	length -= fcslen;
@@ -2032,7 +2031,7 @@ ieee802_11_print(netdissect_options *ndo,
 	}
 
 	if (caplen < IEEE802_11_FC_LEN) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return orig_caplen;
 	}
 
@@ -2052,7 +2051,7 @@ ieee802_11_print(netdissect_options *ndo,
 		meshdrlen = 0;
 
 	if (caplen < hdrlen) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return hdrlen;
 	}
 
@@ -2072,13 +2071,13 @@ ieee802_11_print(netdissect_options *ndo,
 	case T_MGMT:
 		get_mgmt_src_dst_mac(p - hdrlen, &src.addr, &dst.addr);
 		if (!mgmt_body_print(ndo, fc, src.addr, p, length)) {
-			ND_PRINT("%s", tstr);
+			nd_print_trunc(ndo);
 			return hdrlen;
 		}
 		break;
 	case T_CTRL:
 		if (!ctrl_body_print(ndo, fc, p - hdrlen)) {
-			ND_PRINT("%s", tstr);
+			nd_print_trunc(ndo);
 			return hdrlen;
 		}
 		break;
@@ -2089,7 +2088,7 @@ ieee802_11_print(netdissect_options *ndo,
 		if (FC_PROTECTED(fc)) {
 			ND_PRINT("Data");
 			if (!wep_print(ndo, p)) {
-				ND_PRINT("%s", tstr);
+				nd_print_trunc(ndo);
 				return hdrlen;
 			}
 		} else {
@@ -3007,7 +3006,7 @@ print_radiotap_field(netdissect_options *ndo,
 	return 0;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return rc;
 }
 
@@ -3084,7 +3083,7 @@ ieee802_11_radio_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "802.11_radio";
 	if (caplen < sizeof(*hdr)) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return caplen;
 	}
 
@@ -3096,7 +3095,7 @@ ieee802_11_radio_print(netdissect_options *ndo,
 	 * If we don't have the entire radiotap header, just give up.
 	 */
 	if (caplen < len) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return caplen;
 	}
 	cpack_init(&cpacker, (const uint8_t *)hdr, len); /* align against header start */
@@ -3109,7 +3108,7 @@ ieee802_11_radio_print(netdissect_options *ndo,
 
 	/* are there more bitmap extensions than bytes in header? */
 	if ((const u_char*)(last_presentp + 1) > p + len) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return caplen;
 	}
 
@@ -3205,27 +3204,27 @@ ieee802_11_radio_print(netdissect_options *ndo,
 			bit0 = 0;
 			vendor_namespace = 1;
 			if ((cpack_align_and_reserve(&cpacker, 2)) == NULL) {
-				ND_PRINT("%s", tstr);
+				nd_print_trunc(ndo);
 				break;
 			}
 			if (cpack_uint8(&cpacker, &vendor_oui[0]) != 0) {
-				ND_PRINT("%s", tstr);
+				nd_print_trunc(ndo);
 				break;
 			}
 			if (cpack_uint8(&cpacker, &vendor_oui[1]) != 0) {
-				ND_PRINT("%s", tstr);
+				nd_print_trunc(ndo);
 				break;
 			}
 			if (cpack_uint8(&cpacker, &vendor_oui[2]) != 0) {
-				ND_PRINT("%s", tstr);
+				nd_print_trunc(ndo);
 				break;
 			}
 			if (cpack_uint8(&cpacker, &vendor_subnamespace) != 0) {
-				ND_PRINT("%s", tstr);
+				nd_print_trunc(ndo);
 				break;
 			}
 			if (cpack_uint16(&cpacker, &skip_length) != 0) {
-				ND_PRINT("%s", tstr);
+				nd_print_trunc(ndo);
 				break;
 			}
 			break;
@@ -3262,7 +3261,7 @@ ieee802_11_radio_avs_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "802.11_radio_avs";
 	if (caplen < 8) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return caplen;
 	}
 
@@ -3273,12 +3272,12 @@ ieee802_11_radio_avs_print(netdissect_options *ndo,
 		 * to be large enough to include even the version
 		 * cookie or capture header length!
 		 */
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return caplen;
 	}
 
 	if (caplen < caphdr_len) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return caplen;
 	}
 
@@ -3315,7 +3314,7 @@ prism_if_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "prism_if";
 	if (caplen < 4) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return caplen;
 	}
 
@@ -3325,7 +3324,7 @@ prism_if_print(netdissect_options *ndo,
 		return ieee802_11_radio_avs_print(ndo, p, length, caplen);
 
 	if (caplen < PRISM_HDR_LEN) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return caplen;
 	}
 

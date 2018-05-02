@@ -34,7 +34,6 @@
 #include "ethertype.h"
 #include "extract.h"
 
-static const char tstr[] = "[|ARP]";
 
 /*
  * Address Resolution Protocol.
@@ -266,7 +265,7 @@ atmarp_print(netdissect_options *ndo,
 	op = ATMOP(ap);
 
 	if (!ND_TTEST_LEN(aar_tpa(ap), ATMTPROTO_LEN(ap))) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		ND_DEFAULTPRINT((const u_char *)ap, length);
 		return;
 	}
@@ -349,7 +348,7 @@ atmarp_print(netdissect_options *ndo,
         return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 void
@@ -386,7 +385,7 @@ arp_print(netdissect_options *ndo,
 	}
 
 	if (!ND_TTEST_LEN(TPA(ap), PROTO_LEN(ap))) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		ND_DEFAULTPRINT((const u_char *)ap, length);
 		return;
 	}
@@ -469,5 +468,5 @@ arp_print(netdissect_options *ndo,
 
 	return;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }

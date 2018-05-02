@@ -9,7 +9,6 @@
 #include "netdissect.h"
 #include "extract.h"
 
-static const char tstr[] = "[|ipnet]";
 
 typedef struct ipnet_hdr {
 	nd_uint8_t	iph_version;
@@ -58,7 +57,7 @@ ipnet_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	ND_PRINT(", length %u: ", length);
 	return;
 trunc:
-	ND_PRINT(" %s", tstr);
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -100,7 +99,7 @@ ipnet_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 	}
 	return;
 trunc:
-	ND_PRINT(" %s", tstr);
+	nd_print_trunc(ndo);
 }
 
 /*

@@ -72,7 +72,6 @@
 #include "oui.h"
 #include "openflow.h"
 
-static const char tstr[] = " [|openflow]";
 
 #define OFPT_HELLO                    0x00
 #define OFPT_ERROR                    0x01
@@ -747,7 +746,7 @@ of10_data_print(netdissect_options *ndo,
 	return cp + len;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -952,7 +951,7 @@ invalid: /* skip the undersized data */
 	ND_TCHECK_LEN(cp0, len);
 	return cp0 + len;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -1026,7 +1025,7 @@ invalid:
 	ND_TCHECK_LEN(cp0, len);
 	return cp0 + len;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -1055,7 +1054,7 @@ invalid: /* skip the undersized data */
 	ND_TCHECK_LEN(cp, len);
 	return cp + len;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -1084,7 +1083,7 @@ invalid: /* skip the undersized data */
 	ND_TCHECK_LEN(cp, len);
 	return cp + len;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -1110,7 +1109,7 @@ invalid: /* skip the undersized data */
 	ND_TCHECK_LEN(cp, len);
 	return cp + len;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -1132,7 +1131,7 @@ of10_packet_data_print(netdissect_options *ndo,
 	return cp + len;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -1213,7 +1212,7 @@ invalid: /* skip the undersized trailing data */
 	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -1289,7 +1288,7 @@ invalid: /* skip the rest of queue properties */
 	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -1337,7 +1336,7 @@ invalid: /* skip the rest of queues */
 	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -1441,7 +1440,7 @@ of10_match_print(netdissect_options *ndo,
 	return cp + 2;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -1608,7 +1607,7 @@ invalid: /* skip the rest of actions */
 	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -1647,7 +1646,7 @@ of10_features_reply_print(netdissect_options *ndo,
 	return of10_phy_ports_print(ndo, cp, ep, len - OF_SWITCH_FEATURES_LEN);
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -1705,7 +1704,7 @@ of10_flow_mod_print(netdissect_options *ndo,
 	return of10_actions_print(ndo, "\n\t ", cp, ep, len - OF_FLOW_MOD_LEN);
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -1742,7 +1741,7 @@ of10_port_mod_print(netdissect_options *ndo,
 	return cp + 4;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -1826,7 +1825,7 @@ invalid: /* skip the message body */
 	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -1873,7 +1872,7 @@ invalid: /* skip the message body */
 	ND_TCHECK_LEN(cp, len);
 	return cp + len;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -1954,7 +1953,7 @@ invalid: /* skip the rest of flow statistics entries */
 	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -1987,7 +1986,7 @@ invalid: /* skip the message body */
 	ND_TCHECK_LEN(cp, len);
 	return cp + len;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -2047,7 +2046,7 @@ invalid: /* skip the undersized trailing data */
 	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -2132,7 +2131,7 @@ invalid: /* skip the undersized trailing data */
 	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -2180,7 +2179,7 @@ invalid: /* skip the undersized trailing data */
 	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -2221,7 +2220,7 @@ of10_stats_reply_print(netdissect_options *ndo,
 	return cp0 + len;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -2259,7 +2258,7 @@ invalid: /* skip the rest of the message body */
 	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -2292,7 +2291,7 @@ of10_packet_in_print(netdissect_options *ndo,
 	return of10_packet_data_print(ndo, cp, ep, len - (OF_PACKET_IN_LEN - 2));
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -2346,7 +2345,7 @@ of10_flow_removed_print(netdissect_options *ndo,
 	return cp + 8;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -2379,7 +2378,7 @@ of10_error_print(netdissect_options *ndo,
 	return of10_data_print(ndo, cp, ep, len - OF_ERROR_MSG_LEN);
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -2563,6 +2562,6 @@ next_message:
 	ND_TCHECK_LEN(cp0, len0 - OF_HEADER_LEN);
 	return cp0 + len0 - OF_HEADER_LEN;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }

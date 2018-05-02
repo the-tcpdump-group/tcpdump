@@ -43,7 +43,6 @@
 #define IN_CLASSD(i) (((int32_t)(i) & 0xf0000000) == 0xe0000000)
 #endif
 
-static const char tstr[] = "[|igmp]";
 
 /* (following from ipmulti/mrouted/prune.h) */
 
@@ -127,7 +126,7 @@ print_mtrace(netdissect_options *ndo,
         ND_PRINT(" with-ttl %u", EXTRACT_U_1(tr->tr_rttl));
     return;
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }
 
 static void
@@ -149,7 +148,7 @@ print_mresp(netdissect_options *ndo,
         ND_PRINT(" with-ttl %u", EXTRACT_U_1(tr->tr_rttl));
     return;
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }
 
 static void
@@ -203,7 +202,7 @@ print_igmpv3_report(netdissect_options *ndo,
     }
     return;
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }
 
 static void
@@ -259,7 +258,7 @@ print_igmpv3_query(netdissect_options *ndo,
     ND_PRINT("]");
     return;
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }
 
 void
@@ -344,5 +343,5 @@ igmp_print(netdissect_options *ndo,
     }
     return;
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }

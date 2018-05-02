@@ -33,7 +33,6 @@
 #include "addrtoname.h"
 #include "extract.h"
 
-static const char tstr[] = " [|bootp]";
 
 /*
  * Bootstrap Protocol (BOOTP).  RFC951 and RFC1048.
@@ -364,7 +363,7 @@ bootp_print(netdissect_options *ndo,
 		if (nd_printztn(ndo, bp->bp_sname, (u_int)sizeof(bp->bp_sname),
 				ndo->ndo_snapend)) {
 			ND_PRINT("\"");
-			ND_PRINT("%s", tstr + 1);
+			nd_print_trunc(ndo);
 			return;
 		}
 		ND_PRINT("\"");
@@ -375,7 +374,7 @@ bootp_print(netdissect_options *ndo,
 		if (nd_printztn(ndo, bp->bp_file, (u_int)sizeof(bp->bp_file),
 				ndo->ndo_snapend)) {
 			ND_PRINT("\"");
-			ND_PRINT("%s", tstr + 1);
+			nd_print_trunc(ndo);
 			return;
 		}
 		ND_PRINT("\"");
@@ -399,7 +398,7 @@ bootp_print(netdissect_options *ndo,
 
 	return;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 /*
@@ -1083,7 +1082,7 @@ cmu_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 #undef PRINTCMUADDR

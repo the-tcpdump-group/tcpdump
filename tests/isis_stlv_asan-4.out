@@ -24,5 +24,4 @@ UI 22! Pad! IS-IS, length 262138
 	       RES: 8, MTID(s): 385
 	       unknown subTLV #129, length: 68
 	       unknown subTLV #32, length: 32
-	       unknown subTLV #129, length: 129
-		 [|isis] [|isis]
+	       unknown subTLV #129, length: 129 [|isis] [|isis]

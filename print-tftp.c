@@ -58,7 +58,6 @@
 #define	EEXISTS		6		/* file already exists */
 #define	ENOUSER		7		/* no such user */
 
-static const char tstr[] = " [|tftp]";
 
 /* op code to string mapping */
 static const struct tok op2str[] = {
@@ -199,6 +198,6 @@ tftp_print(netdissect_options *ndo,
 	}
 	return;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return;
 }

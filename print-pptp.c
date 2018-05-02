@@ -34,7 +34,6 @@
 #include "netdissect.h"
 #include "extract.h"
 
-static const char tstr[] = " [|pptp]";
 
 #define PPTP_MSG_TYPE_CTRL	1	/* Control Message */
 #define PPTP_MSG_TYPE_MGMT	2	/* Management Message (currently not used */
@@ -553,7 +552,7 @@ pptp_sccrq_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -584,7 +583,7 @@ pptp_sccrp_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -620,7 +619,7 @@ pptp_stopccrq_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -639,7 +638,7 @@ pptp_stopccrp_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -654,7 +653,7 @@ pptp_echorq_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -675,7 +674,7 @@ pptp_echorp_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -712,7 +711,7 @@ pptp_ocrq_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -743,7 +742,7 @@ pptp_ocrp_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -774,7 +773,7 @@ pptp_icrq_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -801,7 +800,7 @@ pptp_icrp_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -826,7 +825,7 @@ pptp_iccn_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -843,7 +842,7 @@ pptp_ccrq_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -868,7 +867,7 @@ pptp_cdn_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -897,7 +896,7 @@ pptp_wen_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -918,7 +917,7 @@ pptp_sli_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 void
@@ -1028,5 +1027,5 @@ pptp_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }

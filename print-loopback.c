@@ -42,7 +42,6 @@
 #include "extract.h"
 #include "addrtoname.h"
 
-static const char tstr[] = " [|loopback]";
 
 #define LOOPBACK_REPLY   1
 #define LOOPBACK_FWDDATA 2
@@ -101,7 +100,7 @@ invalid:
 	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 void
@@ -131,6 +130,6 @@ invalid:
 	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 

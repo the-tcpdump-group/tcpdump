@@ -42,10 +42,6 @@
 
 #include "nfs.h"
 
-static const char vat_tstr[] = " [|vat]";
-static const char rtp_tstr[] = " [|rtp]";
-static const char rtcp_tstr[] = " [|rtcp]";
-static const char udp_tstr[] = " [|udp]";
 
 struct rtcphdr {
 	nd_uint16_t rh_flags;	/* T:2 P:1 CNT:5 PT:8 */
@@ -102,6 +98,7 @@ vat_print(netdissect_options *ndo, const void *hdr, u_int length)
 	/* vat/vt audio */
 	u_int ts;
 
+	ndo->ndo_protocol = "vat";
 	if (length < 2) {
 		ND_PRINT("udp/va/vat, length %u < 2", length);
 		return;
@@ -137,7 +134,7 @@ vat_print(netdissect_options *ndo, const void *hdr, u_int length)
 	}
 
 trunc:
-	ND_PRINT("%s", vat_tstr);
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -149,6 +146,7 @@ rtp_print(netdissect_options *ndo, const void *hdr, u_int len)
 	uint32_t i0, i1;
 	const char * ptype;
 
+	ndo->ndo_protocol = "rtp";
 	if (len < 8) {
 		ND_PRINT("udp/rtp, length %u < 8", len);
 		return;
@@ -225,7 +223,7 @@ rtp_print(netdissect_options *ndo, const void *hdr, u_int len)
 	}
 
 trunc:
-	ND_PRINT("%s", rtp_tstr);
+	nd_print_trunc(ndo);
 }
 
 static const u_char *
@@ -239,6 +237,8 @@ rtcp_print(netdissect_options *ndo, const u_char *hdr, const u_char *ep)
 	uint16_t flags;
 	u_int cnt;
 	double ts, dts;
+
+	ndo->ndo_protocol = "rtcp";
 	if ((const u_char *)(rh + 1) > ep)
 		goto trunc;
 	ND_TCHECK_SIZE(rh);
@@ -307,7 +307,7 @@ rtcp_print(netdissect_options *ndo, const u_char *hdr, const u_char *ep)
 	return (hdr + len);
 
 trunc:
-	ND_PRINT("%s", rtcp_tstr);
+	nd_print_trunc(ndo);
 	return ep;
 }
 
@@ -718,5 +718,5 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	return;
 
 trunc:
-	ND_PRINT("%s", udp_tstr);
+	nd_print_trunc(ndo);
 }

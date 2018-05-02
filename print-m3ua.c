@@ -35,7 +35,6 @@
 #include "netdissect.h"
 #include "extract.h"
 
-static const char tstr[] = " [|m3ua]";
 
 #define M3UA_REL_1_0 1
 
@@ -234,7 +233,7 @@ invalid:
   ND_TCHECK_LEN(buf, size);
   return;
 trunc:
-  ND_PRINT("%s", tstr);
+  nd_print_trunc(ndo);
 }
 
 /*
@@ -282,7 +281,7 @@ invalid:
   ND_TCHECK_LEN(buf, size);
   return;
 trunc:
-  ND_PRINT("%s", tstr);
+  nd_print_trunc(ndo);
 }
 
 /*
@@ -338,6 +337,6 @@ invalid:
   ND_TCHECK_LEN(buf, size);
   return;
 trunc:
-  ND_PRINT("%s", tstr);
+  nd_print_trunc(ndo);
 }
 

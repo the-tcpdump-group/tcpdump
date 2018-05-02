@@ -37,7 +37,6 @@
 
 #include "af.h"
 
-static const char tstr[] = "[|rip]";
 
 /*
  * RFC 1058 and RFC 2453 header of packet.
@@ -291,14 +290,14 @@ rip_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "rip";
 	if (ndo->ndo_snapend < dat) {
-		ND_PRINT(" %s", tstr);
+		nd_print_trunc(ndo);
 		return;
 	}
 	i = ndo->ndo_snapend - dat;
 	if (i > length)
 		i = length;
 	if (i < sizeof(*rp)) {
-		ND_PRINT(" %s", tstr);
+		nd_print_trunc(ndo);
 		return;
 	}
 	i -= sizeof(*rp);
@@ -349,7 +348,7 @@ rip_print(netdissect_options *ndo,
 				entry_size = rip_entry_print_v1(ndo, p, i);
 				if (entry_size == 0) {
 					/* Error */
-					ND_PRINT("%s", tstr);
+					nd_print_trunc(ndo);
 					break;
 				}
 				p += entry_size;
@@ -365,7 +364,7 @@ rip_print(netdissect_options *ndo,
 				entry_size = rip_entry_print_v2(ndo, p, i);
 				if (entry_size == 0) {
 					/* Error */
-					ND_PRINT("%s", tstr);
+					nd_print_trunc(ndo);
 					break;
 				}
 #if 0

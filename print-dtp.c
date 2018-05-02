@@ -27,7 +27,6 @@
 #include "addrtoname.h"
 #include "extract.h"
 
-static const char tstr[] = " [|dtp]";
 
 #define DTP_HEADER_LEN			1
 #define DTP_DOMAIN_TLV			0x0001
@@ -118,5 +117,5 @@ dtp_print (netdissect_options *ndo, const u_char *pptr, u_int length)
     ND_PRINT("%s", istr);
     return;
  trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }

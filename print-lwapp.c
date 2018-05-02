@@ -29,8 +29,6 @@
 #include "extract.h"
 #include "addrtoname.h"
 
-static const char control_tstr[] = " [|lwapp_control]";
-static const char data_tstr[] = " [|lwapp_data]";
 
 /*
  * LWAPP transport (common) header
@@ -296,7 +294,7 @@ lwapp_control_print(netdissect_options *ndo,
     return;
 
 trunc:
-    ND_PRINT("%s", control_tstr);
+    nd_print_trunc(ndo);
 }
 
 void
@@ -365,5 +363,5 @@ lwapp_data_print(netdissect_options *ndo,
     return;
 
 trunc:
-    ND_PRINT("%s", data_tstr);
+    nd_print_trunc(ndo);
 }

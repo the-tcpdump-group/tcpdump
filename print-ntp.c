@@ -46,7 +46,6 @@
 #include "addrtoname.h"
 #include "extract.h"
 
-static const char tstr[] = " [|ntp]";
 
 /*
  * Based on ntp.h from the U of MD implementation
@@ -377,7 +376,7 @@ invalid:
 	return;
 
 trunc:
-	ND_PRINT(" %s", tstr);
+	nd_print_trunc(ndo);
 }
 
 /*
@@ -437,7 +436,7 @@ invalid:
 	return;
 
 trunc:
-	ND_PRINT(" %s", tstr);
+	nd_print_trunc(ndo);
 }
 
 union ntpdata {
@@ -501,7 +500,7 @@ ntp_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT(" %s", tstr);
+	nd_print_trunc(ndo);
 }
 
 static void

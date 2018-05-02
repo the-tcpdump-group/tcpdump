@@ -31,7 +31,6 @@
 #include "addrtoname.h"
 #include "extract.h"
 
-static const char tstr[] = "[|wb]";
 
 /* XXX need to add byte-swapping macros! */
 /* XXX - you mean like the ones in "extract.h"? */
@@ -319,7 +318,7 @@ wb_dops(netdissect_options *ndo, const struct pkt_dop *dop,
 		u_int t;
 
 		if (!ND_TTEST_SIZE(dh)) {
-			ND_PRINT("%s", tstr);
+			nd_print_trunc(ndo);
 			break;
 		}
 		t = EXTRACT_U_1(dh->dh_type);
@@ -405,7 +404,7 @@ wb_print(netdissect_options *ndo,
 	ndo->ndo_protocol = "wb";
 	ph = (const struct pkt_hdr *)hdr;
 	if (len < sizeof(*ph) || !ND_TTEST_SIZE(ph)) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return;
 	}
 	len -= sizeof(*ph);
@@ -422,37 +421,37 @@ wb_print(netdissect_options *ndo,
 	case PT_ID:
 		if (wb_id(ndo, (const struct pkt_id *)(ph + 1), len) >= 0)
 			return;
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		break;
 
 	case PT_RREQ:
 		if (wb_rreq(ndo, (const struct pkt_rreq *)(ph + 1), len) >= 0)
 			return;
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		break;
 
 	case PT_RREP:
 		if (wb_rrep(ndo, (const struct pkt_rrep *)(ph + 1), len) >= 0)
 			return;
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		break;
 
 	case PT_DRAWOP:
 		if (wb_drawop(ndo, (const struct pkt_dop *)(ph + 1), len) >= 0)
 			return;
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		break;
 
 	case PT_PREQ:
 		if (wb_preq(ndo, (const struct pkt_preq *)(ph + 1), len) >= 0)
 			return;
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		break;
 
 	case PT_PREP:
 		if (wb_prep(ndo, (const struct pkt_prep *)(ph + 1), len) >= 0)
 			return;
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		break;
 
 	default:

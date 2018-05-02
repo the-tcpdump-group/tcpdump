@@ -36,7 +36,6 @@
 
 #include "ospf.h"
 
-static const char tstr[] = " [|ospf2]";
 
 static const struct tok ospf_option_values[] = {
         { OSPF_OPTION_T,	"MultiTopology" }, /* draft-ietf-ospf-mt-09 */
@@ -1111,7 +1110,7 @@ ospf_print(netdissect_options *ndo,
 	const u_char *dataend;
 	const char *cp;
 
-	ndo->ndo_protocol = "ospf";
+	ndo->ndo_protocol = "ospf2";
 	op = (const struct ospfhdr *)bp;
 
 	/* XXX Before we do anything else, strip off the MD5 trailer */
@@ -1202,5 +1201,5 @@ ospf_print(netdissect_options *ndo,
 
 	return;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }

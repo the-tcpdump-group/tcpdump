@@ -161,7 +161,6 @@ enum dccp_reset_codes {
 	__DCCP_RESET_CODE_LAST
 };
 
-static const char tstr[] = "[|dccp]";
 
 static const char *dccp_reset_codes[] = {
 	"unspecified",
@@ -514,7 +513,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 	}
 	return;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return;
 }
 
@@ -662,6 +661,6 @@ static u_int dccp_print_option(netdissect_options *ndo, const u_char *option, u_
 
 	return optlen;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return 0;
 }

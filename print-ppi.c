@@ -13,7 +13,6 @@
 #include "netdissect.h"
 #include "extract.h"
 
-static const char tstr[] = "[|ppi]";
 
 typedef struct ppi_header {
 	nd_uint8_t	ppi_ver;
@@ -66,7 +65,7 @@ ppi_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "ppi";
 	if (caplen < sizeof(ppi_header_t)) {
-		ND_PRINT(" %s", tstr);
+		nd_print_trunc(ndo);
 		return (caplen);
 	}
 
@@ -78,11 +77,11 @@ ppi_print(netdissect_options *ndo,
 		 * If we don't have the entire PPI header, don't
 		 * bother.
 		 */
-		ND_PRINT(" %s", tstr);
+		nd_print_trunc(ndo);
 		return (caplen);
 	}
 	if (len < sizeof(ppi_header_t)) {
-		ND_PRINT(" %s", tstr);
+		nd_print_trunc(ndo);
 		return (len);
 	}
 	ND_TCHECK_4(hdr->ppi_dlt);

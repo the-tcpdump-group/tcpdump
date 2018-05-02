@@ -4,8 +4,7 @@ FRF.16 Frag, seq 693, Flags [Begin], UI e8! IS-IS, length 262137
 	  chksum: 0x0900 (unverified), PDU length: 33667, Flags: [ Overload bit set, expense ATT bit set, L1 IS ]
 	    Multi-Topology Capability TLV #144, length: 137
 	      O: 0, RES: 4, MTID(s): 3945
-	      unknown subTLV #8, length: 233
-		 [|isis]
+	      unknown subTLV #8, length: 233 [|isis]
 	    unknown TLV #213, length: 243
 		0x0000:  5cca 8010 0410 0594 4510 0410 6e55 0000
 		0x0010:  0101 080a 8cf3 ac2b 269c 0e2d 0e0e 0e0e

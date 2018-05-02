@@ -284,7 +284,6 @@ struct lsu6 {
     struct lsa6 lsu_lsa[1]; /* may repeat	*/
 };
 
-static const char tstr[] = " [|ospf3]";
 
 static const struct tok ospf6_option_values[] = {
 	{ OSPF6_OPTION_V6,	"V6" },
@@ -962,7 +961,7 @@ ospf6_print(netdissect_options *ndo,
 	const char *cp;
 	uint16_t datalen;
 
-	ndo->ndo_protocol = "ospf6";
+	ndo->ndo_protocol = "ospf3";
 	op = (const struct ospf6hdr *)bp;
 
 	/* If the type is valid translate it, or just print the type */
@@ -1012,5 +1011,5 @@ ospf6_print(netdissect_options *ndo,
 
 	return;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }

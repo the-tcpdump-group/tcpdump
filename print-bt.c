@@ -31,7 +31,6 @@
 #if defined(DLT_BLUETOOTH_HCI_H4_WITH_PHDR) && defined(HAVE_PCAP_BLUETOOTH_H)
 #include <pcap/bluetooth.h>
 
-static const char tstr[] = " [|bt]";
 
 #define	BT_HDRLEN sizeof(pcap_bluetooth_h4_header)
 /*
@@ -62,7 +61,7 @@ bt_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *
 		ND_DEFAULTPRINT(p, caplen);
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return (BT_HDRLEN);
 }
 #endif

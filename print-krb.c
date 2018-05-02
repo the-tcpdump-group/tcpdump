@@ -49,7 +49,6 @@
  * RFC 1510, RFC 2630, etc.
  */
 
-static const char tstr[] = " [|kerberos]";
 
 static const u_char *c_print(netdissect_options *, const u_char *, const u_char *);
 static const u_char *krb4_print_hdr(netdissect_options *, const u_char *);
@@ -148,7 +147,7 @@ krb4_print_hdr(netdissect_options *ndo,
 	return (cp);
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return (NULL);
 
 #undef PRINT
@@ -170,7 +169,7 @@ krb4_print(netdissect_options *ndo,
 	kp = (const struct krb *)cp;
 
 	if (!ND_TTEST_1(kp->type)) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return;
 	}
 
@@ -232,7 +231,7 @@ krb4_print(netdissect_options *ndo,
 
 	return;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 void
@@ -245,7 +244,7 @@ krb_print(netdissect_options *ndo,
 	kp = (const struct krb *)dat;
 
 	if (dat >= ndo->ndo_snapend) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return;
 	}
 

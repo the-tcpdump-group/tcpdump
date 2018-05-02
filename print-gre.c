@@ -51,7 +51,6 @@
 #include "extract.h"
 #include "ethertype.h"
 
-static const char tstr[] = "[|gre]";
 
 #define	GRE_CP		0x8000		/* checksum present */
 #define	GRE_RP		0x4000		/* routing present */
@@ -110,7 +109,7 @@ gre_print(netdissect_options *ndo, const u_char *bp, u_int length)
         return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return;
 }
 
@@ -239,7 +238,7 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -324,7 +323,7 @@ gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 static int

@@ -50,7 +50,6 @@
 #include "oui.h"
 #include "signature.h"
 
-static const char tstr[] = " [|isis]";
 
 /*
  * IS-IS is defined in ISO 10589.  Look there for protocol definitions.
@@ -780,6 +779,7 @@ clnp_print(netdissect_options *ndo,
 	const struct clnp_segment_header_t *clnp_segment_header;
         uint8_t rfd_error,rfd_error_major,rfd_error_minor;
 
+	ndo->ndo_protocol = "clnp";
 	clnp_header = (const struct clnp_header_t *) pptr;
         ND_TCHECK_SIZE(clnp_header);
 
@@ -1073,7 +1073,7 @@ clnp_print(netdissect_options *ndo,
         return (1);
 
  trunc:
-    ND_PRINT("[|clnp]");
+    nd_print_trunc(ndo);
     return (1);
 
 }
@@ -1108,6 +1108,7 @@ esis_print(netdissect_options *ndo,
 	u_int li, version, esis_pdu_type, source_address_length, source_address_number;
 	const struct esis_header_t *esis_header;
 
+	ndo->ndo_protocol = "esis";
 	if (!ndo->ndo_eflag)
 		ND_PRINT("ES-IS");
 
@@ -1386,7 +1387,7 @@ esis_print(netdissect_options *ndo,
             pptr += opli;
         }
 trunc:
-        ND_PRINT("[|esis]");
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -1409,7 +1410,7 @@ isis_print_mcid(netdissect_options *ndo,
     ND_PRINT("%.2x ", mcid->digest[i]);
 
 trunc:
-  ND_PRINT("%s", tstr);
+  nd_print_trunc(ndo);
 }
 
 static int
@@ -1530,8 +1531,7 @@ isis_print_mt_port_cap_subtlv(netdissect_options *ndo,
   return 0;
 
   trunc:
-    ND_PRINT("\n\t\t");
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
     return(1);
 }
 
@@ -1659,8 +1659,7 @@ isis_print_mt_capability_subtlv(netdissect_options *ndo,
   return 0;
 
   trunc:
-    ND_PRINT("\n\t\t");
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
     return(1);
 }
 
@@ -1824,8 +1823,7 @@ isis_print_ip_reach_subtlv(netdissect_options *ndo,
     return(1);
 
 trunc:
-    ND_PRINT("%s", ident);
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
     return(0);
 }
 
@@ -2270,6 +2268,7 @@ isis_print(netdissect_options *ndo,
     u_int i,vendor_id;
     int sigcheck;
 
+    ndo->ndo_protocol = "isis";
     packet_len=length;
     optr = p; /* initialize the _o_riginal pointer to the packet start -
                  need it for parsing the checksum TLV and authentication
@@ -3231,7 +3230,7 @@ isis_print(netdissect_options *ndo,
     return (1);
 
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
     return (1);
 }
 

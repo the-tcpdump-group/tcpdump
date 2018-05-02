@@ -31,7 +31,6 @@
 #include "extract.h"
 #include "addrtoname.h"
 
-static const char tstr[] = "[|RPKI-RTR]";
 
 /*
  * RPKI/Router PDU header
@@ -381,7 +380,7 @@ invalid:
     ND_TCHECK_LEN(tptr, len);
     return len;
 trunc:
-    ND_PRINT("\n\t%s", tstr);
+    nd_print_trunc(ndo);
     return len;
 }
 

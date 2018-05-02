@@ -89,7 +89,6 @@
 #include "extract.h"
 #include "oui.h"
 
-static const char tstr[] = " [|radius]";
 
 #define TAM_SIZE(x) (sizeof(x)/sizeof(x[0]) )
 
@@ -638,7 +637,7 @@ print_attr_string(netdissect_options *ndo,
    return;
 
    trunc:
-      ND_PRINT("%s", tstr);
+      nd_print_trunc(ndo);
 }
 
 /*
@@ -699,7 +698,7 @@ print_vendor_attr(netdissect_options *ndo,
     return;
 
    trunc:
-     ND_PRINT("%s", tstr);
+     nd_print_trunc(ndo);
 }
 
 /******************************/
@@ -822,7 +821,7 @@ print_attr_num(netdissect_options *ndo,
    return;
 
    trunc:
-     ND_PRINT("%s", tstr);
+     nd_print_trunc(ndo);
 }
 
 /*****************************/
@@ -865,7 +864,7 @@ print_attr_address(netdissect_options *ndo,
    return;
 
    trunc:
-     ND_PRINT("%s", tstr);
+     nd_print_trunc(ndo);
 }
 
 /*****************************/
@@ -892,7 +891,7 @@ print_attr_address6(netdissect_options *ndo,
    return;
 
    trunc:
-     ND_PRINT("%s", tstr);
+     nd_print_trunc(ndo);
 }
 
 static void
@@ -925,7 +924,7 @@ print_attr_netmask6(netdissect_options *ndo,
    return;
 
    trunc:
-     ND_PRINT("%s", tstr);
+     nd_print_trunc(ndo);
 }
 
 /*************************************/
@@ -959,7 +958,7 @@ print_attr_time(netdissect_options *ndo,
    return;
 
    trunc:
-     ND_PRINT("%s", tstr);
+     nd_print_trunc(ndo);
 }
 
 /***********************************/
@@ -1050,7 +1049,7 @@ print_attr_strange(netdissect_options *ndo,
    return;
 
    trunc:
-     ND_PRINT("%s", tstr);
+     nd_print_trunc(ndo);
 }
 
 static void
@@ -1114,7 +1113,7 @@ radius_attrs_print(netdissect_options *ndo,
    return;
 
 trunc:
-   ND_PRINT("%s", tstr);
+   nd_print_trunc(ndo);
 }
 
 void
@@ -1131,7 +1130,7 @@ radius_print(netdissect_options *ndo,
 
    if (len < MIN_RADIUS_LEN)
    {
-	  ND_PRINT("%s", tstr);
+	  nd_print_trunc(ndo);
 	  return;
    }
 
@@ -1162,5 +1161,5 @@ radius_print(netdissect_options *ndo,
    return;
 
 trunc:
-   ND_PRINT("%s", tstr);
+   nd_print_trunc(ndo);
 }

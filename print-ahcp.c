@@ -39,7 +39,6 @@
 #include "extract.h"
 #include "addrtoname.h"
 
-static const char tstr[] = " [|ahcp]";
 
 #define AHCP_MAGIC_NUMBER 43
 #define AHCP_VERSION_1 1
@@ -121,7 +120,7 @@ invalid:
 	ND_TCHECK_LEN(cp, ep - cp);
 	return 0;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -139,7 +138,7 @@ invalid:
 	ND_TCHECK_LEN(cp, ep - cp);
 	return 0;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -163,7 +162,7 @@ invalid:
 	ND_TCHECK_LEN(cp, ep - cp);
 	return 0;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -187,7 +186,7 @@ invalid:
 	ND_TCHECK_LEN(cp, ep - cp);
 	return 0;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -211,7 +210,7 @@ invalid:
 	ND_TCHECK_LEN(cp, ep - cp);
 	return 0;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -235,7 +234,7 @@ invalid:
 	ND_TCHECK_LEN(cp, ep - cp);
 	return 0;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -296,7 +295,7 @@ invalid:
 	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -341,7 +340,7 @@ invalid:
 	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 void
@@ -408,5 +407,5 @@ invalid:
 	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }

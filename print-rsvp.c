@@ -33,7 +33,6 @@
 #include "af.h"
 #include "signature.h"
 
-static const char tstr[] = " [|rsvp]";
 
 /*
  * RFC 2205 common header
@@ -643,7 +642,7 @@ rsvp_intserv_print(netdissect_options *ndo,
     return (parameter_length+4); /* header length 4 bytes */
 
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
     return 0;
 }
 
@@ -1866,8 +1865,7 @@ invalid:
     ND_PRINT("%s", istr);
     return -1;
 trunc:
-    ND_PRINT("\n\t\t");
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
     return -1;
 }
 
@@ -2020,6 +2018,5 @@ rsvp_print(netdissect_options *ndo,
 
     return;
 trunc:
-    ND_PRINT("\n\t\t");
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }

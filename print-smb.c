@@ -20,7 +20,6 @@
 #include "extract.h"
 #include "smb.h"
 
-static const char tstr[] = "[|SMB]";
 
 static int request = 0;
 static int unicodestr = 0;
@@ -142,7 +141,7 @@ trans2_qfsinfo(netdissect_options *ndo,
     }
     return;
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }
 
 static const struct smbfnsint trans2_fns[] = {
@@ -236,7 +235,7 @@ print_trans2(netdissect_options *ndo,
     }
     return;
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }
 
 static void
@@ -317,7 +316,7 @@ print_browse(netdissect_options *ndo,
     }
     return;
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }
 
 
@@ -392,7 +391,7 @@ print_trans(netdissect_options *ndo,
     }
     return;
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }
 
 
@@ -435,7 +434,7 @@ print_negprot(netdissect_options *ndo,
     }
     return;
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }
 
 static void
@@ -480,7 +479,7 @@ print_sesssetup(netdissect_options *ndo,
     }
     return;
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }
 
 static void
@@ -521,7 +520,7 @@ print_lockingandx(netdissect_options *ndo,
     }
     return;
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }
 
 
@@ -923,7 +922,7 @@ print_smb(netdissect_options *ndo,
     ND_PRINT("\n");
     return;
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }
 
 
@@ -1089,7 +1088,7 @@ nbt_tcp_print(netdissect_options *ndo,
     }
     return;
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }
 
 static const struct tok opcode_str[] = {
@@ -1243,7 +1242,7 @@ out:
     ND_PRINT("\n");
     return;
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }
 
 /*
@@ -1287,7 +1286,7 @@ smb_tcp_print(netdissect_options *ndo,
 	ND_PRINT(" SMB-over-TCP packet:(raw data or continuation?)\n");
     return;
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }
 
 /*
@@ -1478,7 +1477,7 @@ out:
     ND_PRINT("\n");
     return;
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }
 
 

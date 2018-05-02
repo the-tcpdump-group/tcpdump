@@ -37,7 +37,6 @@
 #include "ethertype.h"
 #include "extract.h"
 
-static const char tstr[] = "[|TIPC]";
 
 #define TIPC_USER_LOW_IMPORTANCE	0
 #define TIPC_USER_MEDIUM_IMPORTANCE	1
@@ -216,7 +215,7 @@ print_payload(netdissect_options *ndo, const struct payload_tipc_pkthdr *ap)
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -284,7 +283,7 @@ print_internal(netdissect_options *ndo, const struct internal_tipc_pkthdr *ap)
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -330,7 +329,7 @@ print_link_conf(netdissect_options *ndo, const struct link_conf_tipc_pkthdr *ap)
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 void
@@ -374,5 +373,5 @@ tipc_print(netdissect_options *ndo, const u_char *bp, u_int length _U_,
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }

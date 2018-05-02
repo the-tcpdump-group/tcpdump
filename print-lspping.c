@@ -30,7 +30,6 @@
 #include "l2vpn.h"
 #include "oui.h"
 
-static const char tstr[] = " [|lspping]";
 
 /*
  * LSPPING common header
@@ -1088,6 +1087,6 @@ tooshort:
     ND_PRINT("\n\t\t packet is too short");
     return;
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
     return;
 }

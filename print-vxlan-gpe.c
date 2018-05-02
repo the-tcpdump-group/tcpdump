@@ -34,7 +34,6 @@
 #include "netdissect.h"
 #include "extract.h"
 
-static const char tstr[] = " [|VXLAN-GPE]";
 static const struct tok vxlan_gpe_flags [] = {
     { 0x08, "I" },
     { 0x04, "P" },
@@ -109,6 +108,6 @@ vxlan_gpe_print(netdissect_options *ndo, const u_char *bp, u_int len)
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 

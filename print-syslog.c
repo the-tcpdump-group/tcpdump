@@ -25,7 +25,6 @@
 #include "netdissect.h"
 #include "extract.h"
 
-static const char tstr[] = "[|syslog]";
 
 /*
  * tokenlists and #defines taken from Ethereal - Network traffic analyzer
@@ -103,12 +102,12 @@ syslog_print(netdissect_options *ndo,
             ND_TCHECK_1(pptr + msg_off);
         }
         if (EXTRACT_U_1(pptr + msg_off) != '>') {
-            ND_PRINT("%s", tstr);
+            nd_print_trunc(ndo);
             return;
         }
         msg_off++;
     } else {
-        ND_PRINT("%s", tstr);
+        nd_print_trunc(ndo);
         return;
     }
 
@@ -143,5 +142,5 @@ syslog_print(netdissect_options *ndo,
     return;
 
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }

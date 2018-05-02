@@ -33,7 +33,6 @@
 #include "extract.h"
 #include "af.h"
 
-static const char tstr[] = " [|null]";
 
 /*
  * The DLT_NULL packet header is 4 bytes long. It contains a host-byte-order
@@ -141,6 +140,6 @@ null_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 
 	return (NULL_HDRLEN);
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return (NULL_HDRLEN);
 }

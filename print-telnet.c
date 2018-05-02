@@ -58,7 +58,6 @@
 #include "netdissect.h"
 #include "extract.h"
 
-static const char tstr[] = " [|telnet]";
 
 #define TELCMDS
 #define TELOPTS
@@ -501,7 +500,7 @@ done:
 	return sp - osp;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 pktend:
 	return -1;
 #undef FETCH
@@ -556,5 +555,5 @@ telnet_print(netdissect_options *ndo, const u_char *sp, u_int length)
 	}
 	return;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }

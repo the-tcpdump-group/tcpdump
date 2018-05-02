@@ -39,7 +39,6 @@
 #include "extract.h"
 #include "nlpid.h"
 
-static const char tstr[] = "[|cdp]";
 
 #define CDP_HEADER_LEN             4
 #define CDP_HEADER_VERSION_OFFSET  0
@@ -99,7 +98,7 @@ cdp_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "cdp";
 	if (caplen < CDP_HEADER_LEN) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return;
 	}
 
@@ -279,7 +278,7 @@ cdp_print(netdissect_options *ndo,
 
 	return;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 /*

@@ -76,7 +76,6 @@
 
 #undef OPAQUE  /* defined in <wingdi.h> */
 
-static const char tstr[] = "[|snmp]";
 
 /*
  * Universal ASN.1 types
@@ -669,7 +668,7 @@ asn1_parse(netdissect_options *ndo,
 	return elem->asnlen + hdr;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -686,7 +685,7 @@ asn1_print_octets(netdissect_options *ndo, struct be *elem)
 	return 0;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -719,7 +718,7 @@ asn1_print_string(netdissect_options *ndo, struct be *elem)
 	return 0;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -850,7 +849,7 @@ asn1_print(netdissect_options *ndo,
 	return 0;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -949,7 +948,7 @@ smi_decode_oid(netdissect_options *ndo,
 	return 0;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 

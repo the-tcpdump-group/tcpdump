@@ -135,7 +135,6 @@ typedef struct _usb_isodesc {
 	nd_byte		pad[4];
 } usb_isodesc;
 
-static const char tstr[] = "[|usb]";
 
 /* returns direction: 1=inbound 2=outbound -1=invalid */
 static int
@@ -245,7 +244,7 @@ usb_linux_48_byte_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 {
 	ndo->ndo_protocol = "usb_linux_48_byte_if";
 	if (h->caplen < sizeof(pcap_usb_header)) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return(sizeof(pcap_usb_header));
 	}
 
@@ -269,7 +268,7 @@ usb_linux_64_byte_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 {
 	ndo->ndo_protocol = "usb_linux_64_byte_if";
 	if (h->caplen < sizeof(pcap_usb_header_mmapped)) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return(sizeof(pcap_usb_header_mmapped));
 	}
 

@@ -82,7 +82,6 @@ struct tsp {
 
 #define	TSPTYPENUMBER		25
 
-static const char tstr[] = "[|timed]";
 
 static const char *tsptype[TSPTYPENUMBER] =
   { "ANY", "ADJTIME", "ACK", "MASTERREQ", "MASTERACK", "SETTIME", "MASTERUP",
@@ -144,5 +143,5 @@ timed_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT(" %s", tstr);
+	nd_print_trunc(ndo);
 }

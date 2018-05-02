@@ -32,7 +32,6 @@
 #include "addrtoname.h"
 #include "extract.h"
 
-static const char tstr[] = "[|MEDSA]";
 
 /*
  * Marvell Extended Distributed Switch Archiecture.
@@ -189,5 +188,5 @@ medsa_print(netdissect_options *ndo,
 	}
 	return;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }

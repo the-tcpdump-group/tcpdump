@@ -35,7 +35,6 @@
 #include "extract.h"
 #include "addrtoname.h"
 
-static const char tstr[] = " [|eigrp]";
 
 struct eigrp_common_header {
     nd_uint8_t  version;
@@ -524,5 +523,5 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
     }
     return;
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }

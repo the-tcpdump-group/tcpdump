@@ -89,7 +89,6 @@ struct token_header {
 	nd_uint16_t  token_rseg[ROUTING_SEGMENT_MAX];
 };
 
-static const char tstr[] = "[|token-ring]";
 
 /* Extract src, dst addresses */
 static void
@@ -157,7 +156,7 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 	trp = (const struct token_header *)p;
 
 	if (caplen < TOKEN_HDRLEN) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return hdr_len;
 	}
 
@@ -175,13 +174,13 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 			token_hdr_print(ndo, trp, length, srcmac, dstmac);
 
 		if (caplen < TOKEN_HDRLEN + 2) {
-			ND_PRINT("%s", tstr);
+			nd_print_trunc(ndo);
 			return hdr_len;
 		}
 		route_len = RIF_LENGTH(trp);
 		hdr_len += route_len;
 		if (caplen < hdr_len) {
-			ND_PRINT("%s", tstr);
+			nd_print_trunc(ndo);
 			return hdr_len;
 		}
 		if (ndo->ndo_vflag) {

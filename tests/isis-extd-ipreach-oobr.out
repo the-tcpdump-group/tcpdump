@@ -23,8 +23,7 @@
 	              Lvl: 18757, Digest: 45 45 49 45 45 45 49 45 45 45 49 45 45 45 49 45  [|isis]
 	         AUX-MCID: ID: 69, Name: EIEEEIEEEIEEEIEEEIEEEIEEEIEEEIEE
 	              Lvl: 17737, Digest: 45 45 45 49 45 45 45 49 45 45 45 49 45 45 45 49  [|isis]
-	       unknown subTLV #69, length: 69
-		 [|isis]
+	       unknown subTLV #69, length: 69 [|isis]
 	      0x0000:  0000 0466 0049 4545 4549 4545 4549 4545
 	      0x0010:  4549 4545 4549 4545 4549 4545 4549 4545
 	      0x0020:  4549 4545 4549 4545 4549 4545 4549 4545

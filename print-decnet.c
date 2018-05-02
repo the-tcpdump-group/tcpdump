@@ -54,7 +54,6 @@ struct dn_naddr {
 #include "extract.h"
 #include "addrtoname.h"
 
-static const char tstr[] = "[|decnet]";
 
 #ifndef _WIN32
 typedef nd_uint8_t byte;		/* single byte field */
@@ -509,18 +508,18 @@ decnet_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "decnet";
 	if (length < sizeof(struct shorthdr)) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return;
 	}
 
 	ND_TCHECK_LEN(ap, sizeof(short));
 	pktlen = EXTRACT_LE_U_2(ap);
 	if (pktlen < sizeof(struct shorthdr)) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return;
 	}
 	if (pktlen > length) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return;
 	}
 	length = pktlen;
@@ -535,7 +534,7 @@ decnet_print(netdissect_options *ndo,
 	    if (ndo->ndo_vflag)
 		ND_PRINT("[pad:%u] ", padlen);
 	    if (length < padlen + 2) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return;
 	    }
 	    ND_TCHECK_LEN(ap + sizeof(short), padlen);
@@ -563,7 +562,7 @@ decnet_print(netdissect_options *ndo,
 	switch (mflags & RMF_MASK) {
 	case RMF_LONG:
 	    if (length < sizeof(struct longhdr)) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return;
 	    }
 	    ND_TCHECK_SIZE(&rhp->rh_long);
@@ -606,7 +605,7 @@ decnet_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return;
 }
 

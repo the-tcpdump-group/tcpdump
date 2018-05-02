@@ -27,7 +27,6 @@
 #include "netdissect.h"
 #include "extract.h"
 
-static const char tstr[] = "[|forces]";
 
 #define	ForCES_VERS	1
 #define	ForCES_HDRL	24
@@ -682,7 +681,7 @@ prestlv_print(netdissect_options *ndo,
 	return 0;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -717,7 +716,7 @@ fdatatlv_print(netdissect_options *ndo,
 	return 0;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -763,7 +762,7 @@ sdatailv_print(netdissect_options *ndo,
 	return 0;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -792,7 +791,7 @@ sdatatlv_print(netdissect_options *ndo,
 	return sdatailv_print(ndo, tdp, rlen, op_msk, indent);
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -834,7 +833,7 @@ pkeyitlv_print(netdissect_options *ndo,
 	return fdatatlv_print(ndo, dp, tll, op_msk, indent);
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -991,7 +990,7 @@ pd_err:
 	return len;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -1056,7 +1055,7 @@ pdata_print(netdissect_options *ndo,
 		return 0;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -1103,7 +1102,7 @@ genoptlv_print(netdissect_options *ndo,
 	}
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -1157,7 +1156,7 @@ recpdoptlv_print(netdissect_options *ndo,
 	return 0;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -1216,7 +1215,7 @@ otlv_print(netdissect_options *ndo,
 	return rc;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -1274,7 +1273,7 @@ asttlv_print(netdissect_options *ndo,
 	return 0;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -1327,7 +1326,7 @@ asrtlv_print(netdissect_options *ndo,
 	return 0;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -1376,7 +1375,7 @@ print_metailv(netdissect_options *ndo,
 	return 0;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -1417,7 +1416,7 @@ print_metatlv(netdissect_options *ndo,
 	return 0;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -1511,7 +1510,7 @@ redirect_print(netdissect_options *ndo,
 	return 0;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -1597,7 +1596,7 @@ lfbselect_print(netdissect_options *ndo,
 	return 0;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -1692,7 +1691,7 @@ forces_type_print(netdissect_options *ndo,
 	return 0;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return -1;
 }
 
@@ -1773,5 +1772,5 @@ error:
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }

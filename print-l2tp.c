@@ -68,7 +68,6 @@
 
 #define L2TP_PROXY_AUTH_ID_MASK		0x00ff
 
-static const char tstr[] = " [|l2tp]";
 
 #define	L2TP_MSGTYPE_SCCRQ	1  /* Start-Control-Connection-Request */
 #define	L2TP_MSGTYPE_SCCRP	2  /* Start-Control-Connection-Reply */
@@ -879,5 +878,5 @@ l2tp_print(netdissect_options *ndo, const u_char *dat, u_int length)
 	return;
 
  trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }

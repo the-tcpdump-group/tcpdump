@@ -42,7 +42,6 @@
 
 #include "ip6.h"
 
-static const char tstr[] = "[|MOBILITY]";
 
 /* Mobility header */
 struct ip6_mobility {
@@ -340,6 +339,6 @@ mobility_print(netdissect_options *ndo,
 	return(mhlen);
 
  trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return(-1);
 }

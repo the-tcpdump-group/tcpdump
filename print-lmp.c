@@ -31,7 +31,6 @@
 #include "addrtoname.h"
 #include "gmpls.h"
 
-static const char tstr[] = " [|lmp]";
 
 /*
  * LMP common header
@@ -1134,5 +1133,5 @@ lmp_print(netdissect_options *ndo,
     }
     return;
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }

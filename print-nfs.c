@@ -42,7 +42,6 @@
 #include "rpc_auth.h"
 #include "rpc_msg.h"
 
-static const char tstr[] = " [|nfs]";
 
 static void nfs_printfh(netdissect_options *, const uint32_t *, const u_int);
 static int xid_map_enter(netdissect_options *, const struct sunrpc_msg *, const u_char *);
@@ -326,7 +325,7 @@ nfsreply_print(netdissect_options *ndo,
 	const struct sunrpc_msg *rp;
 	char srcid[20], dstid[20];	/*fits 32bit*/
 
-	ndo->ndo_protocol = "nfsreply";
+	ndo->ndo_protocol = "nfs";
 	nfserr = 0;		/* assume no error */
 	rp = (const struct sunrpc_msg *)bp;
 
@@ -347,7 +346,7 @@ nfsreply_print(netdissect_options *ndo,
 
 trunc:
 	if (!nfserr)
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 }
 
 void
@@ -362,7 +361,7 @@ nfsreply_noaddr_print(netdissect_options *ndo,
 	uint32_t rhigh;
 	enum sunrpc_auth_stat rwhy;
 
-	ndo->ndo_protocol = "nfsreply_noaddr";
+	ndo->ndo_protocol = "nfs";
 	nfserr = 0;		/* assume no error */
 	rp = (const struct sunrpc_msg *)bp;
 
@@ -409,7 +408,7 @@ nfsreply_noaddr_print(netdissect_options *ndo,
 
 trunc:
 	if (!nfserr)
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 }
 
 /*
@@ -532,7 +531,7 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 	uint32_t access_flags;
 	struct nfsv3_sattr sa3;
 
-	ndo->ndo_protocol = "nfsreq_noaddr";
+	ndo->ndo_protocol = "nfs";
 	ND_PRINT("%u", length);
 	nfserr = 0;		/* assume no error */
 	rp = (const struct sunrpc_msg *)bp;
@@ -789,7 +788,7 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 
 trunc:
 	if (!nfserr)
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 }
 
 /*
@@ -1758,5 +1757,5 @@ interp_reply(netdissect_options *ndo,
 	}
 trunc:
 	if (!nfserr)
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 }

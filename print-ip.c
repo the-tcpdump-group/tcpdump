@@ -36,7 +36,6 @@
 #include "ip.h"
 #include "ipproto.h"
 
-static const char tstr[] = "[|ip]";
 
 static const struct tok ip_option_values[] = {
     { IPOPT_EOL, "EOL" },
@@ -318,7 +317,7 @@ ip_optprint(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 #define IP_RES 0x8000
@@ -704,7 +703,7 @@ ip_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return;
 }
 
@@ -732,6 +731,6 @@ ipN_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	return;
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return;
 }
