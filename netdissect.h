@@ -655,6 +655,8 @@ extern int nextproto4_cksum(netdissect_options *, const struct ip *, const uint8
 extern int nextproto6_cksum(netdissect_options *, const struct ip6_hdr *, const uint8_t *, u_int, u_int, u_int);
 
 /* Utilities */
+extern void nd_print_trunc(netdissect_options *);
+
 extern int mask2plen(uint32_t);
 extern int mask62plen(const u_char *);
 

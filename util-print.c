@@ -426,6 +426,12 @@ signed_relts_print(netdissect_options *ndo,
 	unsigned_relts_print(ndo, secs);
 }
 
+/* Print the truncated string */
+void nd_print_trunc(netdissect_options *ndo)
+{
+	ND_PRINT(" [|%s]", ndo->ndo_protocol);
+}
+
 /*
  *  this is a generic routine for printing unknown data;
  *  we pass on the linefeed plus indentation string to
