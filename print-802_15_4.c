@@ -72,7 +72,7 @@ ieee802_15_4_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "802.15.4";
 	if (caplen < 3) {
-		ND_PRINT("[|802.15.4]");
+		nd_print_trunc(ndo);
 		return caplen;
 	}
 	hdrlen = 3;
@@ -98,7 +98,7 @@ ieee802_15_4_print(netdissect_options *ndo,
 			 * the source and destination addresses be present,
 			 * but the destination address is missing.
 			 */
-			ND_PRINT("[|802.15.4]");
+			nd_print_trunc(ndo);
 			return hdrlen;
 		}
 		if (ndo->ndo_vflag)
@@ -110,7 +110,7 @@ ieee802_15_4_print(netdissect_options *ndo,
 		return hdrlen;
 	case FC_ADDRESSING_MODE_SHORT:
 		if (caplen < 2) {
-			ND_PRINT("[|802.15.4]");
+			nd_print_trunc(ndo);
 			return hdrlen;
 		}
 		panid = EXTRACT_LE_U_2(p);
@@ -118,7 +118,7 @@ ieee802_15_4_print(netdissect_options *ndo,
 		caplen -= 2;
 		hdrlen += 2;
 		if (caplen < 2) {
-			ND_PRINT("[|802.15.4]");
+			nd_print_trunc(ndo);
 			return hdrlen;
 		}
 		if (ndo->ndo_vflag)
@@ -129,7 +129,7 @@ ieee802_15_4_print(netdissect_options *ndo,
 		break;
 	case FC_ADDRESSING_MODE_LONG:
 		if (caplen < 2) {
-			ND_PRINT("[|802.15.4]");
+			nd_print_trunc(ndo);
 			return hdrlen;
 		}
 		panid = EXTRACT_LE_U_2(p);
@@ -137,7 +137,7 @@ ieee802_15_4_print(netdissect_options *ndo,
 		caplen -= 2;
 		hdrlen += 2;
 		if (caplen < 8) {
-			ND_PRINT("[|802.15.4]");
+			nd_print_trunc(ndo);
 			return hdrlen;
 		}
 		if (ndo->ndo_vflag)
@@ -170,7 +170,7 @@ ieee802_15_4_print(netdissect_options *ndo,
 			 * PAN ID, fetched above.)
 			 */
 			if (caplen < 2) {
-				ND_PRINT("[|802.15.4]");
+				nd_print_trunc(ndo);
 				return hdrlen;
 			}
 			panid = EXTRACT_LE_U_2(p);
@@ -179,7 +179,7 @@ ieee802_15_4_print(netdissect_options *ndo,
 			hdrlen += 2;
 		}
 		if (caplen < 2) {
-			ND_PRINT("[|802.15.4]");
+			nd_print_trunc(ndo);
 			return hdrlen;
 		}
 		if (ndo->ndo_vflag)
@@ -196,7 +196,7 @@ ieee802_15_4_print(netdissect_options *ndo,
 			 * PAN ID, fetched above.)
 			 */
 			if (caplen < 2) {
-				ND_PRINT("[|802.15.4]");
+				nd_print_trunc(ndo);
 				return hdrlen;
 			}
 			panid = EXTRACT_LE_U_2(p);
@@ -205,7 +205,7 @@ ieee802_15_4_print(netdissect_options *ndo,
 			hdrlen += 2;
 		}
 		if (caplen < 8) {
-			ND_PRINT("[|802.15.4]");
+			nd_print_trunc(ndo);
 			return hdrlen;
 		}
 		if (ndo->ndo_vflag)
