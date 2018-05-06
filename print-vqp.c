@@ -208,5 +208,5 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
     }
     return;
 trunc:
-    ND_PRINT("\n\t[|VQP]");
+    nd_print_trunc(ndo);
 }

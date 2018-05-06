@@ -6,4 +6,4 @@ IP (tos 0xc, ttl 254, id 21263, offset 0, flags [rsvd], proto TCP (6), length 51
 	  Attribute Set (128), length: 7, Flags [OTPE+f]: 
 	    Origin AS: 148
 	      Multi-Protocol Reach NLRI (14), length: 71, Flags [T+6]:  [path attr too short]
-	  Origin (1), length: 5invalid len[|BGP]
+	  Origin (1), length: 5invalid len [|bgp]

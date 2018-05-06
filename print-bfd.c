@@ -403,5 +403,5 @@ bfd_print(netdissect_options *ndo, const u_char *pptr,
         return;
 
 trunc:
-        ND_PRINT("[|BFD]");
+        nd_print_trunc(ndo);
 }

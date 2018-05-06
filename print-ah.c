@@ -60,6 +60,6 @@ ah_print(netdissect_options *ndo, const u_char *bp)
 
 	return sizeof(struct ah) + sumlen;
  trunc:
-	ND_PRINT("[|AH]");
+	nd_print_trunc(ndo);
 	return -1;
 }

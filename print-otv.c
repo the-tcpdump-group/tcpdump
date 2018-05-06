@@ -71,5 +71,5 @@ otv_print(netdissect_options *ndo, const u_char *bp, u_int len)
     return;
 
 trunc:
-    ND_PRINT(" [|OTV]");
+    nd_print_trunc(ndo);
 }

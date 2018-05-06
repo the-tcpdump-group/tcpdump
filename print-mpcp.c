@@ -247,5 +247,5 @@ mpcp_print(netdissect_options *ndo, const u_char *pptr, u_int length)
     return;
 
 trunc:
-    ND_PRINT("\n\t[|MPCP]");
+    nd_print_trunc(ndo);
 }

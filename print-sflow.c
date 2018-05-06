@@ -971,5 +971,5 @@ sflow_print(netdissect_options *ndo,
     return;
 
  trunc:
-    ND_PRINT("[|SFLOW]");
+    nd_print_trunc(ndo);
 }

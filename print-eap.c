@@ -296,5 +296,5 @@ eap_print(netdissect_options *ndo,
     return;
 
  trunc:
-    ND_PRINT("\n\t[|EAP]");
+    nd_print_trunc(ndo);
 }

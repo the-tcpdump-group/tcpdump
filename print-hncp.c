@@ -857,7 +857,7 @@ hncp_print_rec(netdissect_options *ndo,
     return;
 
  trunc:
-    ND_PRINT("%s", "[|hncp]");
+    nd_print_trunc(ndo);
     return;
 
  invalid:

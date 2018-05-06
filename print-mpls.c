@@ -211,5 +211,5 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	return;
 
 trunc:
-	ND_PRINT("[|MPLS]");
+	nd_print_trunc(ndo);
 }

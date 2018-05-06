@@ -4,4 +4,4 @@ IP6 (flowlabel 0x01cc3, hlim 234, next-header UDP (17) payload length: 11025) 40
 		Unknown (4)
 		Unknown (4)
 		SNTP-servers (61956)  (invalid)
-	[|hncp]
+	 [|hncp]

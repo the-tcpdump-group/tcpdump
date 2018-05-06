@@ -428,7 +428,7 @@ pgm_print(netdissect_options *ndo,
 	     * make sure there's enough for the first option header
 	     */
 	    if (!ND_TTEST_LEN(bp, PGM_MIN_OPT_LEN)) {
-		ND_PRINT("[|OPT]");
+		nd_print_trunc(ndo);
 		return;
 	    }
 
@@ -463,7 +463,7 @@ pgm_print(netdissect_options *ndo,
 		    return;
 		}
 		if (!ND_TTEST_2(bp)) {
-		    ND_PRINT(" [|OPT]");
+		    nd_print_trunc(ndo);
 		    return;
 		}
 		opt_type = EXTRACT_U_1(bp);
@@ -480,7 +480,7 @@ pgm_print(netdissect_options *ndo,
 		    return;
 		}
 		if (!ND_TTEST_LEN(bp, opt_len - 2)) {
-		    ND_PRINT(" [|OPT]");
+		    nd_print_trunc(ndo);
 		    return;
 		}
 
@@ -840,7 +840,7 @@ pgm_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("[|pgm]");
+	nd_print_trunc(ndo);
 	if (ch != '\0')
 		ND_PRINT(">");
 }

@@ -57,4 +57,4 @@
 	Update Message (2), length: 30
 	  Unknown Attribute (0), length: 3, Flags [+f]: 
 	    no Attribute 0 decoder
-	    0x0000:  0001 05[|BGP]
+	    0x0000:  0001 05 [|bgp]

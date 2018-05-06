@@ -2595,7 +2595,7 @@ bgp_capabilities_print(netdissect_options *ndo,
     return;
 
 trunc:
-    ND_PRINT("[|BGP]");
+    nd_print_trunc(ndo);
 }
 
 static void
@@ -2666,7 +2666,7 @@ bgp_open_print(netdissect_options *ndo,
     }
     return;
 trunc:
-    ND_PRINT("[|BGP]");
+    nd_print_trunc(ndo);
 }
 
 static void
@@ -2854,7 +2854,7 @@ bgp_update_print(netdissect_options *ndo,
     }
     return;
 trunc:
-    ND_PRINT("[|BGP]");
+    nd_print_trunc(ndo);
 }
 
 static void
@@ -2972,7 +2972,7 @@ bgp_notification_print(netdissect_options *ndo,
 
     return;
 trunc:
-    ND_PRINT("[|BGP]");
+    nd_print_trunc(ndo);
 }
 
 static void
@@ -3004,7 +3004,7 @@ bgp_route_refresh_print(netdissect_options *ndo,
 
     return;
 trunc:
-    ND_PRINT("[|BGP]");
+    nd_print_trunc(ndo);
 }
 
 static int
@@ -3047,7 +3047,7 @@ bgp_pdu_print(netdissect_options *ndo,
     }
     return 1;
 trunc:
-    ND_PRINT("[|BGP]");
+    nd_print_trunc(ndo);
     return 0;
 }
 
@@ -3093,7 +3093,7 @@ bgp_print(netdissect_options *ndo,
         bgp_header = (const struct bgp *)p;
 
         if (start != p)
-            ND_PRINT(" [|BGP]");
+            nd_print_trunc(ndo);
 
         hlen = EXTRACT_BE_U_2(bgp_header->bgp_len);
         if (hlen < BGP_SIZE) {
@@ -3119,5 +3119,5 @@ bgp_print(netdissect_options *ndo,
     return;
 
 trunc:
-    ND_PRINT(" [|BGP]");
+    nd_print_trunc(ndo);
 }

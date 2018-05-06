@@ -187,7 +187,7 @@ hbhopt_print(netdissect_options *ndo, const u_char *bp)
     return(hbhlen);
 
   trunc:
-    ND_PRINT("[|HBH]");
+    nd_print_trunc(ndo);
     return(-1);
 }
 
@@ -210,6 +210,6 @@ dstopt_print(netdissect_options *ndo, const u_char *bp)
     return(dstoptlen);
 
   trunc:
-    ND_PRINT("[|DSTOPT]");
+    nd_print_trunc(ndo);
     return(-1);
 }
