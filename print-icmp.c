@@ -592,6 +592,9 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                 ndo->ndo_snapend = snapend_save;
 	}
 
+	/* ndo_protocol reassignment after ip_print() call */
+	ndo->ndo_protocol = "icmp";
+
         /*
          * Attempt to decode the MPLS extensions only for some ICMP types.
          */
@@ -697,5 +700,5 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 
 	return;
 trunc:
-	ND_PRINT("[|icmp]");
+	nd_print_trunc(ndo);
 }
