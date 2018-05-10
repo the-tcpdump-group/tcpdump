@@ -55,6 +55,8 @@
 #define HEXDUMP_HEXSTUFF_PER_LINE \
 		(HEXDUMP_HEXSTUFF_PER_SHORT * HEXDUMP_SHORTS_PER_LINE)
 
+static void hex_and_ascii_print_with_offset(netdissect_options *, const char *, const u_char *, u_int, u_int);
+
 void
 ascii_print(netdissect_options *ndo,
             const u_char *cp, u_int length)
@@ -93,7 +95,7 @@ ascii_print(netdissect_options *ndo,
 	}
 }
 
-void
+static void
 hex_and_ascii_print_with_offset(netdissect_options *ndo, const char *ident,
     const u_char *cp, u_int length, u_int oset)
 {
