@@ -116,8 +116,8 @@ static const struct tok vtp_stp_type_values[] = {
 };
 
 void
-vtp_print (netdissect_options *ndo,
-           const u_char *pptr, u_int length)
+vtp_print(netdissect_options *ndo,
+          const u_char *pptr, u_int length)
 {
     u_int type, len, name_len, tlv_len, tlv_value, mgmtd_len;
     const u_char *tptr;

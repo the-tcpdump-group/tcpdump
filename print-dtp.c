@@ -43,7 +43,7 @@ static const struct tok dtp_tlv_values[] = {
 };
 
 void
-dtp_print (netdissect_options *ndo, const u_char *pptr, u_int length)
+dtp_print(netdissect_options *ndo, const u_char *pptr, u_int length)
 {
     int type, len;
     const u_char *tptr;

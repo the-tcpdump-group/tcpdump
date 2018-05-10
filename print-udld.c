@@ -93,7 +93,7 @@ static const struct tok udld_flags_values[] = {
 #define	UDLD_EXTRACT_OPCODE(x) ((x)&0x1f)
 
 void
-udld_print (netdissect_options *ndo, const u_char *pptr, u_int length)
+udld_print(netdissect_options *ndo, const u_char *pptr, u_int length)
 {
     int code, type, len;
     const u_char *tptr;
