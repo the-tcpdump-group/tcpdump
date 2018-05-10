@@ -96,5 +96,5 @@ msdp_print(netdissect_options *ndo, const u_char *sp, u_int length)
 	}
 	return;
 trunc:
-	ND_PRINT(" [|msdp]");
+	nd_print_trunc(ndo);
 }

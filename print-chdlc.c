@@ -113,7 +113,7 @@ chdlc_print(netdissect_options *ndo, const u_char *p, u_int length)
 	return (CHDLC_HDRLEN);
 
 trunc:
-	ND_PRINT("[|chdlc]");
+	nd_print_trunc(ndo);
 	return ndo->ndo_snapend - bp;
 }
 
@@ -147,6 +147,7 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
 	const struct cisco_slarp *slarp;
         u_int sec,min,hrs,days;
 
+	ndo->ndo_protocol = "chdlc_slarp";
 	ND_PRINT("SLARP (length: %u), ",length);
 	if (length < SLARP_MIN_LEN)
 		goto trunc;
@@ -201,5 +202,5 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
 	return;
 
 trunc:
-	ND_PRINT("[|slarp]");
+	nd_print_trunc(ndo);
 }

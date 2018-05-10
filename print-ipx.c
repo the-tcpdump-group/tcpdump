@@ -223,7 +223,7 @@ ipx_sap_print(netdissect_options *ndo, const u_char *ipx, u_int length)
     }
     return;
 trunc:
-    ND_PRINT("[|ipx]");
+    nd_print_trunc(ndo);
 }
 
 static void
@@ -266,5 +266,5 @@ ipx_rip_print(netdissect_options *ndo, const u_char *ipx, u_int length)
     }
     return;
 trunc:
-    ND_PRINT("[|ipx]");
+    nd_print_trunc(ndo);
 }

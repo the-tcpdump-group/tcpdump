@@ -157,7 +157,7 @@ dvmrp_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("[|dvmrp]");
+	nd_print_trunc(ndo);
 	return;
 }
 

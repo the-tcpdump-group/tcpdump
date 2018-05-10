@@ -66,6 +66,6 @@ frag6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2)
 		return sizeof(struct ip6_frag);
 	}
 trunc:
-	ND_PRINT("[|frag]");
+	nd_print_trunc(ndo);
 	return -1;
 }

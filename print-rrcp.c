@@ -142,5 +142,5 @@ rrcp_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("[|rrcp]");
+	nd_print_trunc(ndo);
 }

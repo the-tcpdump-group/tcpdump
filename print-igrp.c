@@ -152,5 +152,5 @@ igrp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	if (nint == 0 && nsys == 0 && next == 0)
 		return;
 trunc:
-	ND_PRINT(" [|igrp]");
+	nd_print_trunc(ndo);
 }

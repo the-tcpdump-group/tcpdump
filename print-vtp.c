@@ -394,5 +394,5 @@ vtp_print(netdissect_options *ndo,
     return;
 
  trunc:
-    ND_PRINT("[|vtp]");
+    nd_print_trunc(ndo);
 }

@@ -105,7 +105,7 @@ enc_if_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "enc_if";
 	if (caplen < ENC_HDRLEN) {
-		ND_PRINT("[|enc]");
+		nd_print_trunc(ndo);
 		goto out;
 	}
 

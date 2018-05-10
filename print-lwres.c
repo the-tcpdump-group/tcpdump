@@ -602,5 +602,5 @@ lwres_print(netdissect_options *ndo,
 	return;
 
   trunc:
-	ND_PRINT("[|lwres]");
+	nd_print_trunc(ndo);
 }

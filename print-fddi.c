@@ -284,7 +284,7 @@ fddi_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 
 	ndo->ndo_protocol = "fddi";
 	if (caplen < FDDI_HDRLEN) {
-		ND_PRINT("[|fddi]");
+		nd_print_trunc(ndo);
 		return (caplen);
 	}
 

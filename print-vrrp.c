@@ -180,5 +180,5 @@ vrrp_print(netdissect_options *ndo,
 	}
 	return;
 trunc:
-	ND_PRINT("[|vrrp]");
+	nd_print_trunc(ndo);
 }

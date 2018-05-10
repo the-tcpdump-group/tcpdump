@@ -712,5 +712,5 @@ olsr_print(netdissect_options *ndo,
     return;
 
  trunc:
-    ND_PRINT("[|olsr]");
+    nd_print_trunc(ndo);
 }

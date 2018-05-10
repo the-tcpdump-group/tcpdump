@@ -246,7 +246,7 @@ cnfp_v1_print(netdissect_options *ndo, const u_char *cp)
 	return;
 
 trunc:
-	ND_PRINT("[|cnfp]");
+	nd_print_trunc(ndo);
 	return;
 }
 
@@ -349,7 +349,7 @@ cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 	return;
 
 trunc:
-	ND_PRINT("[|cnfp]");
+	nd_print_trunc(ndo);
 	return;
 }
 
@@ -455,7 +455,7 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 	return;
 
 trunc:
-	ND_PRINT("[|cnfp]");
+	nd_print_trunc(ndo);
 	return;
 }
 
@@ -491,6 +491,6 @@ cnfp_print(netdissect_options *ndo, const u_char *cp)
 	return;
 
 trunc:
-	ND_PRINT("[|cnfp]");
+	nd_print_trunc(ndo);
 	return;
 }

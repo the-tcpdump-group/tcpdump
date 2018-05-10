@@ -80,5 +80,5 @@ carp_print(netdissect_options *ndo, const u_char *bp, u_int len, u_int ttl)
 
 	return;
 trunc:
-	ND_PRINT("[|carp]");
+	nd_print_trunc(ndo);
 }

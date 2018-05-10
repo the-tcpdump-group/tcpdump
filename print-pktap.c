@@ -108,7 +108,7 @@ pktap_if_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "pktap_if";
 	if (caplen < sizeof(pktap_header_t) || length < sizeof(pktap_header_t)) {
-		ND_PRINT("[|pktap]");
+		nd_print_trunc(ndo);
 		return (caplen);
 	}
 	hdr = (const pktap_header_t *)p;
@@ -122,11 +122,11 @@ pktap_if_print(netdissect_options *ndo,
 		 * is the length supplied so that the header can
 		 * be expanded in the future)?
 		 */
-		ND_PRINT("[|pktap]");
+		nd_print_trunc(ndo);
 		return (caplen);
 	}
 	if (caplen < hdrlen || length < hdrlen) {
-		ND_PRINT("[|pktap]");
+		nd_print_trunc(ndo);
 		return (caplen);
 	}
 

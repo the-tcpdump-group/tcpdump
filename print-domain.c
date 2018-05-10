@@ -777,5 +777,5 @@ domain_print(netdissect_options *ndo,
 	return;
 
   trunc:
-	ND_PRINT("[|domain]");
+	nd_print_trunc(ndo);
 }

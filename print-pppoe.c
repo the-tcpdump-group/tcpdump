@@ -198,6 +198,6 @@ pppoe_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	}
 
 trunc:
-	ND_PRINT("[|pppoe]");
+	nd_print_trunc(ndo);
 	return (PPPOE_HDRLEN);
 }

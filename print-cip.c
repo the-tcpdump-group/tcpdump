@@ -75,7 +75,7 @@ cip_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 		cip_print(ndo, length);
 
 	if (cmplen == 0) {
-		ND_PRINT("[|cip]");
+		nd_print_trunc(ndo);
 		return 0;
 	}
 	if (memcmp(rfcllc, p, cmplen) == 0) {

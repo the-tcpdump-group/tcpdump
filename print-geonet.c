@@ -275,5 +275,5 @@ invalid:
 	return;
 
 trunc:
-	ND_PRINT("[|geonet]");
+	nd_print_trunc(ndo);
 }

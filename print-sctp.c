@@ -768,5 +768,5 @@ sctp_print(netdissect_options *ndo,
     return;
 
 trunc:
-    ND_PRINT("[|sctp]");
+    nd_print_trunc(ndo);
 }
