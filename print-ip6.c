@@ -421,9 +421,12 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			ND_PRINT("ip-proto-%u %u", nh, len);
 			return;
 		}
+
+		/* ndo_protocol reassignment after xxx_print() calls */
+		ndo->ndo_protocol = "ip6";
 	}
 
 	return;
 trunc:
-	ND_PRINT("[|ip6]");
+	nd_print_trunc(ndo);
 }
