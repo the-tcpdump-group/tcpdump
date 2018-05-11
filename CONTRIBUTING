@@ -126,7 +126,7 @@ d) The printer may receive incomplete packet in the buffer, truncated at any
    For ND_TCHECK_LEN:
      Define : static const char tstr[] = " [|protocol]";
      Define a label: trunc
-     Print with: ND_PRINT("%s", tstr);
+     Print with: nd_print_trunc(ndo);
    You can test the code via:
      sudo ./tcpdump -s snaplen [-v][v][...] -i lo # in a terminal
      sudo tcpreplay -i lo sample.pcap             # in another terminal
