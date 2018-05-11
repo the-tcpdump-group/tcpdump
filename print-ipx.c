@@ -93,7 +93,7 @@ ipx_print(netdissect_options *ndo, const u_char *p, u_int length)
 	ipx_decode(ndo, ipx, p + ipxSize, length - ipxSize);
 	return;
 trunc:
-	ND_PRINT("[|ipx %u]", length);
+	nd_print_trunc(ndo);
 }
 
 static const char *

@@ -69,10 +69,8 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	ND_PRINT("MPLS");
 	do {
 		ND_TCHECK_LEN(p, sizeof(label_entry));
-		if (length < sizeof(label_entry)) {
-			ND_PRINT("[|MPLS], length %u", length);
-			return;
-		}
+		if (length < sizeof(label_entry))
+			goto trunc;
 		label_entry = EXTRACT_BE_U_4(p);
 		ND_PRINT("%s(label %u",
 		       (label_stack_depth && ndo->ndo_vflag) ? "\n\t" : " ",

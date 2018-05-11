@@ -343,6 +343,6 @@ zephyr_print(netdissect_options *ndo, const u_char *cp, int length)
     return;
 
 trunc:
-    ND_PRINT(" [|zephyr] (%d)", length);
+    nd_print_trunc(ndo);
     return;
 }

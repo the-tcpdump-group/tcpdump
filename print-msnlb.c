@@ -62,5 +62,5 @@ msnlb_print(netdissect_options *ndo, const u_char *bp)
 	ND_PRINT(" host IP: %s", ipaddr_string(ndo, hb->host_ip));
 	return;
 trunc:
-	ND_PRINT("[|MS NLB]");
+	nd_print_trunc(ndo);
 }
