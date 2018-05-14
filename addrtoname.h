@@ -39,12 +39,12 @@ enum {
 
 #define BUFSIZE 128
 
-extern const char *linkaddr_string(netdissect_options *, const u_char *, const unsigned int, const unsigned int);
-extern const char *etheraddr_string(netdissect_options *, const u_char *);
-extern const char *le64addr_string(netdissect_options *, const u_char *);
+extern const char *linkaddr_string(netdissect_options *, const uint8_t *, const unsigned int, const unsigned int);
+extern const char *etheraddr_string(netdissect_options *, const uint8_t *);
+extern const char *le64addr_string(netdissect_options *, const uint8_t *);
 extern const char *tcpport_string(netdissect_options *, u_short);
 extern const char *udpport_string(netdissect_options *, u_short);
-extern const char *isonsap_string(netdissect_options *, const u_char *, u_int);
+extern const char *isonsap_string(netdissect_options *, const uint8_t *, u_int);
 extern const char *dnaddr_string(netdissect_options *, u_short);
 extern const char *ipxsap_string(netdissect_options *, u_short);
 extern const char *ipaddr_string(netdissect_options *, const u_char *);

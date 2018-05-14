@@ -563,7 +563,7 @@ lookup_protoid(netdissect_options *ndo, const u_char *pi)
 }
 
 const char *
-etheraddr_string(netdissect_options *ndo, const u_char *ep)
+etheraddr_string(netdissect_options *ndo, const uint8_t *ep)
 {
 	int i;
 	char *cp;
@@ -610,7 +610,7 @@ etheraddr_string(netdissect_options *ndo, const u_char *ep)
 }
 
 const char *
-le64addr_string(netdissect_options *ndo, const u_char *ep)
+le64addr_string(netdissect_options *ndo, const uint8_t *ep)
 {
 	const unsigned int len = 8;
 	u_int i;
@@ -641,7 +641,7 @@ le64addr_string(netdissect_options *ndo, const u_char *ep)
 }
 
 const char *
-linkaddr_string(netdissect_options *ndo, const u_char *ep,
+linkaddr_string(netdissect_options *ndo, const uint8_t *ep,
 		const unsigned int type, const unsigned int len)
 {
 	u_int i;
@@ -678,7 +678,7 @@ linkaddr_string(netdissect_options *ndo, const u_char *ep,
 
 #define ISONSAP_MAX_LENGTH 20
 const char *
-isonsap_string(netdissect_options *ndo, const u_char *nsap,
+isonsap_string(netdissect_options *ndo, const uint8_t *nsap,
 	       u_int nsap_length)
 {
 	u_int nsap_idx;
