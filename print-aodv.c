@@ -202,7 +202,7 @@ aodv_extension(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT(" [|hello]");
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -233,7 +233,7 @@ aodv_rreq(netdissect_options *ndo, const u_char *dat, u_int length)
 	return;
 
 trunc:
-	ND_PRINT(" [|rreq");
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -261,7 +261,7 @@ aodv_rrep(netdissect_options *ndo, const u_char *dat, u_int length)
 	return;
 
 trunc:
-	ND_PRINT(" [|rreq");
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -291,7 +291,7 @@ aodv_rerr(netdissect_options *ndo, const u_char *dat, u_int length)
 	return;
 
 trunc:
-	ND_PRINT("[|rerr]");
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -322,7 +322,7 @@ aodv_v6_rreq(netdissect_options *ndo, const u_char *dat, u_int length)
 	return;
 
 trunc:
-	ND_PRINT(" [|rreq");
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -350,7 +350,7 @@ aodv_v6_rrep(netdissect_options *ndo, const u_char *dat, u_int length)
 	return;
 
 trunc:
-	ND_PRINT(" [|rreq");
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -380,7 +380,7 @@ aodv_v6_rerr(netdissect_options *ndo, const u_char *dat, u_int length)
 	return;
 
 trunc:
-	ND_PRINT("[|rerr]");
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -411,7 +411,7 @@ aodv_v6_draft_01_rreq(netdissect_options *ndo, const u_char *dat, u_int length)
 	return;
 
 trunc:
-	ND_PRINT(" [|rreq");
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -439,7 +439,7 @@ aodv_v6_draft_01_rrep(netdissect_options *ndo, const u_char *dat, u_int length)
 	return;
 
 trunc:
-	ND_PRINT(" [|rreq");
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -469,7 +469,7 @@ aodv_v6_draft_01_rerr(netdissect_options *ndo, const u_char *dat, u_int length)
 	return;
 
 trunc:
-	ND_PRINT("[|rerr]");
+	nd_print_trunc(ndo);
 }
 
 void
@@ -536,5 +536,5 @@ aodv_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT(" [|aodv]");
+	nd_print_trunc(ndo);
 }
