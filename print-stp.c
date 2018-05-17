@@ -509,5 +509,5 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
 
     return;
 trunc:
-    ND_PRINT("[|stp %u]", length);
+    nd_print_trunc(ndo);
 }
