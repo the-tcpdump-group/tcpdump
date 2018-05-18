@@ -402,7 +402,7 @@ struct meshcntl_t {
 #define PRINT_SSID(p) \
 	if (p.ssid_present) { \
 		ND_PRINT(" ("); \
-		nd_print(ndo, p.ssid.ssid, NULL); \
+		fn_print_str(ndo, p.ssid.ssid); \
 		ND_PRINT(")"); \
 	}
 
