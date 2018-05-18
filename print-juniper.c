@@ -498,7 +498,7 @@ juniper_ggsn_if_print(netdissect_options *ndo,
         return l2info.header_len;
 
 trunc:
-	ND_PRINT("[|juniper_services]");
+	nd_print_trunc(ndo);
 	return l2info.header_len;
 }
 #endif
@@ -576,7 +576,7 @@ juniper_es_if_print(netdissect_options *ndo,
         return l2info.header_len;
 
 trunc:
-	ND_PRINT("[|juniper_services]");
+	nd_print_trunc(ndo);
 	return l2info.header_len;
 }
 #endif
@@ -616,7 +616,7 @@ juniper_monitor_if_print(netdissect_options *ndo,
         return l2info.header_len;
 
 trunc:
-	ND_PRINT("[|juniper_services]");
+	nd_print_trunc(ndo);
 	return l2info.header_len;
 }
 #endif
@@ -658,7 +658,7 @@ juniper_services_if_print(netdissect_options *ndo,
         return l2info.header_len;
 
 trunc:
-	ND_PRINT("[|juniper_services]");
+	nd_print_trunc(ndo);
 	return l2info.header_len;
 }
 #endif
@@ -788,7 +788,7 @@ juniper_pppoe_atm_if_print(netdissect_options *ndo,
         return l2info.header_len;
 
 trunc:
-	ND_PRINT("[|juniper_pppoe_atm]");
+	nd_print_trunc(ndo);
 	return l2info.header_len;
 }
 #endif
@@ -1003,7 +1003,7 @@ juniper_atm1_if_print(netdissect_options *ndo,
 	return l2info.header_len;
 
 trunc:
-	ND_PRINT("[|juniper_atm1]");
+	nd_print_trunc(ndo);
 	return l2info.header_len;
 }
 #endif
@@ -1067,7 +1067,7 @@ juniper_atm2_if_print(netdissect_options *ndo,
 	return l2info.header_len;
 
 trunc:
-	ND_PRINT("[|juniper_atm2]");
+	nd_print_trunc(ndo);
 	return l2info.header_len;
 }
 #endif
@@ -1514,7 +1514,7 @@ juniper_parse_header(netdissect_options *ndo,
         ND_PRINT("hlen %u, proto 0x%04x, ", l2info->header_len, l2info->proto);
 
     return 1; /* everything went ok so far. continue parsing */
- trunc:
-    ND_PRINT("[|juniper_hdr], length %u", h->len);
+trunc:
+    nd_print_trunc(ndo);
     return 0;
 }
