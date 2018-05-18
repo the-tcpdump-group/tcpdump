@@ -183,7 +183,7 @@ tcp_print(netdissect_options *ndo,
         ch = '\0';
         if (!ND_TTEST_2(tp->th_dport)) {
 	        if (ip6) {
-                        ND_PRINT("%s > %s: ",
+                        ND_PRINT("%s > %s: [|tcp]",
                                      ip6addr_string(ndo, ip6->ip6_src),
                                      ip6addr_string(ndo, ip6->ip6_dst));
 	        } else {
