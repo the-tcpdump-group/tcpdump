@@ -149,7 +149,6 @@ pgm_print(netdissect_options *ndo,
 {
 	const struct pgm_header *pgm;
 	const struct ip *ip;
-	char ch;
 	uint8_t pgm_type_val;
 	uint16_t sport, dport;
 	u_int nla_afnum;
@@ -165,7 +164,6 @@ pgm_print(netdissect_options *ndo,
 		ip6 = (const struct ip6_hdr *)bp2;
 	else
 		ip6 = NULL;
-	ch = '\0';
 	if (!ND_TTEST_2(pgm->pgm_dport)) {
 		if (ip6) {
 			ND_PRINT("%s > %s:",
@@ -842,6 +840,4 @@ pgm_print(netdissect_options *ndo,
 
 trunc:
 	nd_print_trunc(ndo);
-	if (ch != '\0')
-		ND_PRINT(">");
 }
