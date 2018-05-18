@@ -168,10 +168,7 @@ krb4_print(netdissect_options *ndo,
 
 	kp = (const struct krb *)cp;
 
-	if (!ND_TTEST_1(kp->type)) {
-		nd_print_trunc(ndo);
-		return;
-	}
+	ND_TCHECK_1(kp->type);
 
 	type = EXTRACT_U_1(kp->type) & (0xFF << 1);
 

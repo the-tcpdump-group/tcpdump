@@ -426,10 +426,7 @@ pgm_print(netdissect_options *ndo,
 	    /*
 	     * make sure there's enough for the first option header
 	     */
-	    if (!ND_TTEST_LEN(bp, PGM_MIN_OPT_LEN)) {
-		nd_print_trunc(ndo);
-		return;
-	    }
+	    ND_TCHECK_LEN(bp, PGM_MIN_OPT_LEN);
 
 	    /*
 	     * That option header MUST be an OPT_LENGTH option
@@ -461,10 +458,7 @@ pgm_print(netdissect_options *ndo,
 		    ND_PRINT("[Total option length leaves no room for final option]");
 		    return;
 		}
-		if (!ND_TTEST_2(bp)) {
-		    nd_print_trunc(ndo);
-		    return;
-		}
+		ND_TCHECK_2(bp);
 		opt_type = EXTRACT_U_1(bp);
 		bp++;
 		opt_len = EXTRACT_U_1(bp);
@@ -478,10 +472,7 @@ pgm_print(netdissect_options *ndo,
 		    ND_PRINT("[Total option length leaves no room for final option]");
 		    return;
 		}
-		if (!ND_TTEST_LEN(bp, opt_len - 2)) {
-		    nd_print_trunc(ndo);
-		    return;
-		}
+		ND_TCHECK_LEN(bp, opt_len - 2);
 
 		switch (opt_type & PGM_OPT_MASK) {
 		case PGM_OPT_LENGTH:
