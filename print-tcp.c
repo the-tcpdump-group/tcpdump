@@ -787,7 +787,7 @@ tcp_print(netdissect_options *ndo,
  bad:
         ND_PRINT("[bad opt]");
         if (ch != '\0')
-                ND_PRINT(">");
+                ND_PRINT("]");
         return;
  trunc:
         nd_print_trunc(ndo);
