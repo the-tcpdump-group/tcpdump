@@ -87,6 +87,20 @@ fn_print_char(netdissect_options *ndo, u_char c)
 }
 
 /*
+ * Print a null-terminated string, filtering out non-printable characters.
+ * DON'T USE IT with a pointer on the packet buffer because there is no
+ * truncation check. For this use, see the nd_printX() functions below.
+ */
+void
+fn_print_str(netdissect_options *ndo, const u_char *s)
+{
+	while (*s != '\0') {
+		fn_print_char(ndo, *s);
+		s++;
+       }
+}
+
+/*
  * Print out a null-terminated filename (or other ASCII string), part of
  * the packet buffer.
  * If ep is NULL, assume no truncation check is needed.
