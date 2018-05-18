@@ -654,10 +654,7 @@ rfc1048_print(netdissect_options *ndo,
 				ND_PRINT(", occurs %u", ntag);
 		}
 
-		if (!ND_TTEST_LEN(bp, len)) {
-			ND_PRINT("[|rfc1048 %u]", len);
-			return;
-		}
+		ND_TCHECK_LEN(bp, len);
 
 		if (tag == TAG_DHCP_MESSAGE && len == 1) {
 			ND_PRINT("%s", tok2str(dhcp_msg_values, "Unknown (%u)", EXTRACT_U_1(bp)));
@@ -1049,7 +1046,7 @@ rfc1048_print(netdissect_options *ndo,
 	}
 	return;
 trunc:
-	ND_PRINT("|[rfc1048]");
+	nd_print_trunc(ndo);
 }
 
 #define PRINTCMUADDR(m, s) { ND_TCHECK_4(&cmu->m); \
