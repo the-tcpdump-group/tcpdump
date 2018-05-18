@@ -679,10 +679,7 @@ void
 isoclns_print(netdissect_options *ndo, const u_char *p, u_int length)
 {
 	ndo->ndo_protocol = "isoclns";
-	if (!ND_TTEST_1(p)) { /* enough bytes on the wire ? */
-		ND_PRINT("|OSI");
-		return;
-	}
+	ND_TCHECK_1(p); /* enough bytes on the wire ? */
 
 	if (ndo->ndo_eflag)
 		ND_PRINT("OSI NLPID %s (0x%02x): ", tok2str(nlpid_values, "Unknown", EXTRACT_U_1(p)), EXTRACT_U_1(p));
@@ -731,6 +728,9 @@ isoclns_print(netdissect_options *ndo, const u_char *p, u_int length)
 			print_unknown_data(ndo, p, "\n\t", length);
 		break;
 	}
+	return;
+trunc:
+	nd_print_trunc(ndo);
 }
 
 #define	CLNP_PDU_ER	 1
