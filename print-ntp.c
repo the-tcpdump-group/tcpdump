@@ -371,7 +371,7 @@ ntp_time_print(netdissect_options *ndo,
 	return;
 
 invalid:
-	ND_PRINT(" %s", istr);
+	ND_PRINT("%s", istr);
 	ND_TCHECK_LEN(bp, length);
 	return;
 
@@ -431,7 +431,7 @@ ntp_control_print(netdissect_options *ndo,
 	return;
 
 invalid:
-	ND_PRINT(" %s", istr);
+	ND_PRINT("%s", istr);
 	ND_TCHECK_LEN(cd, length);
 	return;
 
