@@ -479,13 +479,13 @@ nbp_print(netdissect_options *ndo,
 }
 
 /* print a counted string */
-static const char *
+static const u_char *
 print_cstring(netdissect_options *ndo,
-              const char *cp, const u_char *ep)
+              const u_char *cp, const u_char *ep)
 {
 	u_int length;
 
-	if (cp >= (const char *)ep) {
+	if (cp >= ep) {
 		nd_print_trunc(ndo);
 		return (0);
 	}
@@ -498,7 +498,7 @@ print_cstring(netdissect_options *ndo,
 		return (0);
 	}
 	while (length != 0) {
-		if (cp >= (const char *)ep) {
+		if (cp >= ep) {
 			nd_print_trunc(ndo);
 			return (0);
 		}
@@ -543,7 +543,7 @@ static const struct atNBPtuple *
 nbp_name_print(netdissect_options *ndo,
                const struct atNBPtuple *tp, const u_char *ep)
 {
-	const char *cp = (const char *)tp + nbpTupleSize;
+	const u_char *cp = (const u_char *)tp + nbpTupleSize;
 
 	ND_PRINT(" ");
 
