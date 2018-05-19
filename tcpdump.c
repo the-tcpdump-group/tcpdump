@@ -1697,7 +1697,10 @@ main(int argc, char **argv)
 				Qflag = PCAP_D_OUT;
 			else if (ascii_strcasecmp(optarg, "inout") == 0)
 				Qflag = PCAP_D_INOUT;
-			else
+			else if (ascii_strcasecmp(optarg, "show") == 0) {
+				Qflag = PCAP_D_INOUT;
+				ndo->ndo_showdir = 1;
+			} else
 				error("unknown capture direction `%s'", optarg);
 			break;
 #endif /* HAVE_PCAP_SETDIRECTION */

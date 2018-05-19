@@ -85,7 +85,7 @@ tcpdump \- dump traffic on a network
 ]
 [
 .B \-Q
-.I in|out|inout
+.I in|out|inout|show
 ]
 .ti +8
 [
@@ -593,8 +593,10 @@ flag.
 .BI \-\-direction= direction
 .PD
 Choose send/receive direction \fIdirection\fR for which packets should be
-captured. Possible values are `in', `out' and `inout'. Not available
-on all platforms.
+captured. Possible values are `in', `out', `inout' and `show'. `show' is the
+same as `inout' except that it prints the direction of the packet, if known.
+A < sign indicates a received packet, while a > sign a transmitted one.
+Not available on all platforms.
 .TP
 .B \-q
 Quick (quiet?) output.
