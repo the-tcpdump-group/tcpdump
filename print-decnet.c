@@ -488,10 +488,10 @@ struct dcmsg				/* disconnect confirm message */
 /* Forwards */
 static int print_decnet_ctlmsg(netdissect_options *, const union routehdr *, u_int, u_int);
 static void print_t_info(netdissect_options *, u_int);
-static int print_l1_routes(netdissect_options *, const char *, u_int);
-static int print_l2_routes(netdissect_options *, const char *, u_int);
+static int print_l1_routes(netdissect_options *, const u_char *, u_int);
+static int print_l2_routes(netdissect_options *, const u_char *, u_int);
 static void print_i_info(netdissect_options *, u_int);
-static int print_elist(const char *, u_int);
+static int print_elist(const u_char *, u_int);
 static int print_nsp(netdissect_options *, const u_char *, u_int);
 static void print_reason(netdissect_options *, u_int);
 
@@ -620,7 +620,7 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 	u_int src, dst, info, blksize, eco, ueco, hello, other, vers;
 	etheraddr srcea, rtea;
 	u_int priority;
-	const char *rhpx = (const char *)rhp;
+	const u_char *rhpx = (const u_char *)rhp;
 	int ret;
 
 	switch (mflags & RMF_CTLMASK) {
@@ -761,7 +761,7 @@ print_t_info(netdissect_options *ndo,
 
 static int
 print_l1_routes(netdissect_options *ndo,
-                const char *rp, u_int len)
+                const u_char *rp, u_int len)
 {
 	u_int count;
 	u_int id;
@@ -792,7 +792,7 @@ trunc:
 
 static int
 print_l2_routes(netdissect_options *ndo,
-                const char *rp, u_int len)
+                const u_char *rp, u_int len)
 {
 	u_int count;
 	u_int area;
@@ -841,7 +841,7 @@ print_i_info(netdissect_options *ndo,
 }
 
 static int
-print_elist(const char *elp _U_, u_int len _U_)
+print_elist(const u_char *elp _U_, u_int len _U_)
 {
 	/* Not enough examples available for me to debug this */
 	return (1);
