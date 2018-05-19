@@ -373,6 +373,22 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	 * bigger lengths.
 	 */
 
+#ifdef HAVE_PCAP_SETDIRECTION
+	if (ndo->ndo_showdir) {
+		switch (h->dir) {
+		case PCAP_D_IN:
+			ND_PRINT("<  ");
+			break;
+		case PCAP_D_OUT:
+			ND_PRINT(" > ");
+			break;
+		default:
+			ND_PRINT("   ");
+			break;
+		}
+	}
+#endif
+
 	ts_print(ndo, &h->ts);
 
 	/*

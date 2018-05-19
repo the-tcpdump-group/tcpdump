@@ -198,6 +198,9 @@ struct netdissect_options {
   int   ndo_packettype;	/* as specified by -T */
 
   int   ndo_snaplen;
+#ifdef HAVE_PCAP_SETDIRECTION
+  int   ndo_showdir;		/* show packet direction */
+#endif
 
   /*global pointers to beginning and end of current packet (during printing) */
   const u_char *ndo_packetp;
