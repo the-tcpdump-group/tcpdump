@@ -45,7 +45,7 @@ struct tsp {
 		struct tsp_timeval tspu_time;
 		nd_int8_t tspu_hopcnt;
 	} tsp_u;
-	nd_byte		tsp_name[256];
+	nd_byte		tsp_name[256];	/* null-terminated string up to 256 */
 };
 
 #define	tsp_time	tsp_u.tspu_time
@@ -138,7 +138,8 @@ timed_print(netdissect_options *ndo,
 		break;
 	}
 	ND_PRINT(" name ");
-	if (nd_print(ndo, (const u_char *)tsp->tsp_name, (const u_char *)tsp->tsp_name + sizeof(tsp->tsp_name)))
+	if (nd_printzp(ndo, tsp->tsp_name, sizeof(tsp->tsp_name),
+		       ndo->ndo_snapend))
 		goto trunc;
 	return;
 
