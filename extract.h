@@ -25,7 +25,7 @@
  * For 8-bit values; needed to fetch a one-byte value.  Byte order
  * isn't relevant, and alignment isn't an issue.
  */
-#define EXTRACT_U_1(p)	(*(p))
+#define EXTRACT_U_1(p)	((uint8_t)(*(p)))
 #define EXTRACT_S_1(p)	((int8_t)(*(p)))
 
 /*
