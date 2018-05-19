@@ -77,7 +77,7 @@
 #define DIRECTION(trp)		((EXTRACT_BE_U_2((trp)->token_rcf) & 0x0080) >> 7)
 #define LARGEST_FRAME(trp)	((EXTRACT_BE_U_2((trp)->token_rcf) & 0x0070) >> 4)
 #define RING_NUMBER(trp, x)	((EXTRACT_BE_U_2((trp)->token_rseg[x]) & 0xfff0) >> 4)
-#define BRIDGE_NUMBER(trp, x)	((EXTRACT_BE_U_2((trp)->token_rseg[x]) & 0x000f))
+#define BRIDGE_NUMBER(trp, x)	(EXTRACT_BE_U_2((trp)->token_rseg[x]) & 0x000f)
 #define SEGMENT_COUNT(trp)	((int)((RIF_LENGTH(trp) - 2) / 2))
 
 struct token_header {

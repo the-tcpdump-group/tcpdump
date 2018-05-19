@@ -40,7 +40,7 @@ struct cfm_common_header_t {
 };
 
 #define	CFM_VERSION 0
-#define CFM_EXTRACT_VERSION(x) (((x)&0x1f))
+#define CFM_EXTRACT_VERSION(x) ((x)&0x1f)
 #define CFM_EXTRACT_MD_LEVEL(x) (((x)&0xe0)>>5)
 
 #define	CFM_OPCODE_CCM 1
@@ -77,7 +77,7 @@ static const float ccm_interval_base[8] = {0.0f, 0.003333f, 0.01f, 0.1f, 1.0f, 1
 #define CCM_INTERVAL_MAX_MULTIPLIER 3.5
 
 #define CFM_CCM_RDI_FLAG 0x80
-#define CFM_EXTRACT_CCM_INTERVAL(x) (((x)&0x07))
+#define CFM_EXTRACT_CCM_INTERVAL(x) ((x)&0x07)
 
 #define CFM_CCM_MD_FORMAT_8021 0
 #define CFM_CCM_MD_FORMAT_NONE 1

@@ -68,8 +68,8 @@ struct	medsa_pkthdr {
 #define CODE_ARP_MIRROR	4
 #define CFI(medsa)	(EXTRACT_U_1(medsa->port_trunc_codehi_cfi) & 0x01)
 #define PRI(medsa)	(EXTRACT_U_1(medsa->pri_vidhi_codelo) >> 5)
-#define VID(medsa)	(((u_short)(EXTRACT_U_1(medsa->pri_vidhi_codelo) & 0xf) << 8 |	\
-			  EXTRACT_U_1(medsa->vidlo)))
+#define VID(medsa)	((u_short)(EXTRACT_U_1(medsa->pri_vidhi_codelo) & 0xf) << 8 |	\
+			  EXTRACT_U_1(medsa->vidlo))
 
 static const struct tok tag_values[] = {
 	{ TAG_TO_CPU, "To_CPU" },

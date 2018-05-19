@@ -1045,7 +1045,7 @@ lldp_private_tia_print(netdissect_options *ndo,
                    (EXTRACT_U_1(tptr + 15) >> 4));
             ND_PRINT("\n\t    Altitude resolution %u, altitude value 0x%x",
                    (EXTRACT_BE_U_2(tptr + 15)>>6)&0x3f,
-                   ((EXTRACT_BE_U_4(tptr + 16) & 0x3fffffff)));
+                   (EXTRACT_BE_U_4(tptr + 16) & 0x3fffffff));
             ND_PRINT("\n\t    Datum %s (0x%02x)",
                    tok2str(lldp_tia_location_datum_type_values, "unknown", EXTRACT_U_1(tptr + 20)),
                    EXTRACT_U_1(tptr + 20));

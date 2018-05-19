@@ -1778,7 +1778,7 @@ rsvp_obj_print(netdissect_options *ndo,
 
                 ND_PRINT("%s  Action: %s (%u), Label type: %u", indent,
                        tok2str(rsvp_obj_label_set_action_values, "Unknown", action),
-                       action, ((EXTRACT_BE_U_4(obj_tptr) & 0x7F)));
+                       action, (EXTRACT_BE_U_4(obj_tptr) & 0x7F));
 
                 switch (action) {
                 case LABEL_SET_INCLUSIVE_RANGE:
