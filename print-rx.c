@@ -869,7 +869,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, u_int sport,
 			} \
 			s[(MAX)] = '\0'; \
 			ND_PRINT(" \""); \
-			nd_print(ndo, s, NULL); \
+			fn_print_str(ndo, s); \
 			ND_PRINT("\""); \
 		}
 
@@ -1190,7 +1190,7 @@ acl_print(netdissect_options *ndo,
 			goto finish;
 		s += n;
 		ND_PRINT(" +{");
-		nd_print(ndo, (u_char *)user, NULL);
+		fn_print_str(ndo, (u_char *)user);
 		ND_PRINT(" ");
 		ACLOUT(acl);
 		ND_PRINT("}");
@@ -1204,7 +1204,7 @@ acl_print(netdissect_options *ndo,
 			goto finish;
 		s += n;
 		ND_PRINT(" -{");
-		nd_print(ndo, (u_char *)user, NULL);
+		fn_print_str(ndo, (u_char *)user);
 		ND_PRINT(" ");
 		ACLOUT(acl);
 		ND_PRINT("}");
