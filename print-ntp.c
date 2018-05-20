@@ -276,7 +276,7 @@ ntp_time_print(netdissect_options *ndo,
 
 	ND_TCHECK_1(bp->ppoll);
 	ND_PRINT(", poll %d", EXTRACT_S_1(bp->ppoll));
-	p_poll(ndo, EXTRACT_U_1(bp->ppoll));
+	p_poll(ndo, EXTRACT_S_1(bp->ppoll));
 
 	ND_TCHECK_1(bp->precision);
 	ND_PRINT(", precision %d", EXTRACT_S_1(bp->precision));
