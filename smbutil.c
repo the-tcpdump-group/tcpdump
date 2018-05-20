@@ -318,8 +318,7 @@ smb_data_print(netdissect_options *ndo, const u_char *buf, u_int len)
     return;
 
 trunc:
-    ND_PRINT("\n");
-    ND_PRINT("WARNING: Short packet. Try increasing the snap length\n");
+    nd_print_trunc(ndo);
 }
 
 
@@ -815,8 +814,7 @@ smb_fdata1(netdissect_options *ndo,
     return(buf);
 
 trunc:
-    ND_PRINT("\n");
-    ND_PRINT("WARNING: Short packet. Try increasing the snap length\n");
+    nd_print_trunc(ndo);
     return(NULL);
 }
 
