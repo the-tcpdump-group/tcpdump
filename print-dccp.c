@@ -537,7 +537,8 @@ static const struct tok dccp_option_values[] = {
 	{ 0, NULL }
 };
 
-static u_int dccp_print_option(netdissect_options *ndo, const u_char *option, u_int hlen)
+static u_int
+dccp_print_option(netdissect_options *ndo, const u_char *option, u_int hlen)
 {
 	uint8_t optlen, i;
 
@@ -630,16 +631,54 @@ static u_int dccp_print_option(netdissect_options *ndo, const u_char *option, u_
 			}
 			break;
 		case 41:
-			if (optlen == 4)
+		/*
+		 * 13.1.  Timestamp Option
+		 *
+		 *  +--------+--------+--------+--------+--------+--------+
+		 *  |00101001|00000110|          Timestamp Value          |
+		 *  +--------+--------+--------+--------+--------+--------+
+		 *   Type=41  Length=6
+		 */
+			if (optlen == 6)
 				ND_PRINT(" %u", EXTRACT_BE_U_4(option + 2));
 			else
-				ND_PRINT(" optlen != 4");
+				ND_PRINT(" [optlen != 6]");
 			break;
 		case 42:
-			if (optlen == 4)
+		/*
+		 * 13.3.  Timestamp Echo Option
+		 *
+		 *  +--------+--------+--------+--------+--------+--------+
+		 *  |00101010|00000110|           Timestamp Echo          |
+		 *  +--------+--------+--------+--------+--------+--------+
+		 *   Type=42    Len=6
+		 *
+		 *  +--------+--------+------- ... -------+--------+--------+
+		 *  |00101010|00001000|  Timestamp Echo   |   Elapsed Time  |
+		 *  +--------+--------+------- ... -------+--------+--------+
+		 *   Type=42    Len=8       (4 bytes)
+		 *
+		 *  +--------+--------+------- ... -------+------- ... -------+
+		 *  |00101010|00001010|  Timestamp Echo   |    Elapsed Time   |
+		 *  +--------+--------+------- ... -------+------- ... -------+
+		 *   Type=42   Len=10       (4 bytes)           (4 bytes)
+		 */
+			switch (optlen) {
+			case 6:
 				ND_PRINT(" %u", EXTRACT_BE_U_4(option + 2));
-			else
-				ND_PRINT(" optlen != 4");
+				break;
+			case 8:
+				ND_PRINT(" %u", EXTRACT_BE_U_4(option + 2));
+				ND_PRINT(" (elapsed time %u)", EXTRACT_BE_U_2(option + 6));
+				break;
+			case 10:
+				ND_PRINT(" %u", EXTRACT_BE_U_4(option + 2));
+				ND_PRINT(" (elapsed time %u)", EXTRACT_BE_U_4(option + 6));
+				break;
+			default:
+				ND_PRINT(" [optlen != 6 or 8 or 10]");
+				break;
+			}
 			break;
 		case 43:
 			if (optlen == 6)
@@ -647,7 +686,7 @@ static u_int dccp_print_option(netdissect_options *ndo, const u_char *option, u_
 			else if (optlen == 4)
 				ND_PRINT(" %u", EXTRACT_BE_U_2(option + 2));
 			else
-				ND_PRINT(" optlen != 4 or 6");
+				ND_PRINT(" [optlen != 4 or 6]");
 			break;
 		case 44:
 			if (optlen > 2) {
