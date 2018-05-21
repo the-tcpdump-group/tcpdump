@@ -604,6 +604,7 @@ hncp_prefix-oobr	hncp_prefix-oobr.pcapng		hncp_prefix-oobr.out		-vvv
 
 # bad packets from Ryan Ackroyd
 ieee802.11_meshhdr-oobr	ieee802.11_meshhdr-oobr.pcap	ieee802.11_meshhdr-oobr.out	-H -c1
+dccp_options-oobr	dccp_options-oobr.pcap		dccp_options-oobr.out		-vv -c8
 
 # RTP tests
 # fuzzed pcap
