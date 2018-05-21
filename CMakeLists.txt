@@ -723,7 +723,7 @@ if(WITH_CRYPTO)
         # Check for some functions.
         #
         cmake_push_check_state()
-        set(CMAKE_REQUIRED_LIBRARIES crypto)
+        set(CMAKE_REQUIRED_LIBRARIES ${CRYPTO_LIBRARIES})
 
         #
       	# 1) do we have EVP_CIPHER_CTX_new?

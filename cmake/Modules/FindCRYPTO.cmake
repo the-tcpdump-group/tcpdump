@@ -2,11 +2,29 @@
 # Try to find libcrypto.
 #
 
+if(MSVC)
+  find_package(OpenSSL QUIET)
+endif()
+
 # Try to find the header
-find_path(CRYPTO_INCLUDE_DIR openssl/crypto.h)
+find_path(CRYPTO_INCLUDE_DIR openssl/crypto.h
+  HINTS
+    ${OPENSSL_INCLUDE_DIR}
+)
 
 # Try to find the library
-find_library(CRYPTO_LIBRARY crypto)
+if(NOT MSVC)
+  find_library(CRYPTO_LIBRARY crypto)
+else()
+  if(USE_STATIC_RT)
+    set(OPENSSL_MSVC_STATIC_RT 1)
+  endif()
+  # going the extra mile...
+  set(CRYPTO_LIBRARY_RELEASE ${LIB_EAY_RELEASE})
+  set(CRYPTO_LIBRARY_DEBUG ${LIB_EAY_DEBUG})
+  include(SelectLibraryConfigurations)
+  select_library_configurations(CRYPTO)
+endif()
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(CRYPTO
