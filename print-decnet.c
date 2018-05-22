@@ -618,7 +618,6 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 	u_int mflags = EXTRACT_U_1(rhp->rh_short.sh_flags);
 	const union controlmsg *cmp = (const union controlmsg *)rhp;
 	u_int src, dst, info, blksize, eco, ueco, hello, other, vers;
-	etheraddr srcea, rtea;
 	u_int priority;
 	const u_char *rhpx = (const u_char *)rhp;
 	int ret;
@@ -690,9 +689,8 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 	    vers = EXTRACT_U_1(cmp->cm_rhello.rh_vers);
 	    eco = EXTRACT_U_1(cmp->cm_rhello.rh_eco);
 	    ueco = EXTRACT_U_1(cmp->cm_rhello.rh_ueco);
-	    memcpy((char *)&srcea, (const char *)&(cmp->cm_rhello.rh_src),
-		sizeof(srcea));
-	    src = EXTRACT_LE_U_2(srcea.dne_remote.dne_nodeaddr);
+	    src =
+		EXTRACT_LE_U_2(cmp->cm_rhello.rh_src.dne_remote.dne_nodeaddr);
 	    info = EXTRACT_U_1(cmp->cm_rhello.rh_info);
 	    blksize = EXTRACT_LE_U_2(cmp->cm_rhello.rh_blksize);
 	    priority = EXTRACT_U_1(cmp->cm_rhello.rh_priority);
@@ -712,15 +710,13 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 	    vers = EXTRACT_U_1(cmp->cm_ehello.eh_vers);
 	    eco = EXTRACT_U_1(cmp->cm_ehello.eh_eco);
 	    ueco = EXTRACT_U_1(cmp->cm_ehello.eh_ueco);
-	    memcpy((char *)&srcea, (const char *)&(cmp->cm_ehello.eh_src),
-		sizeof(srcea));
-	    src = EXTRACT_LE_U_2(srcea.dne_remote.dne_nodeaddr);
+	    src =
+		EXTRACT_LE_U_2(cmp->cm_ehello.eh_src.dne_remote.dne_nodeaddr);
 	    info = EXTRACT_U_1(cmp->cm_ehello.eh_info);
 	    blksize = EXTRACT_LE_U_2(cmp->cm_ehello.eh_blksize);
 	    /*seed*/
-	    memcpy((char *)&rtea, (const char *)&(cmp->cm_ehello.eh_router),
-		sizeof(rtea));
-	    dst = EXTRACT_LE_U_2(rtea.dne_remote.dne_nodeaddr);
+	    dst =
+		EXTRACT_LE_U_2(cmp->cm_ehello.eh_router.dne_remote.dne_nodeaddr);
 	    hello = EXTRACT_LE_U_2(cmp->cm_ehello.eh_hello);
 	    other = EXTRACT_U_1(cmp->cm_ehello.eh_data);
 	    print_i_info(ndo, info);
