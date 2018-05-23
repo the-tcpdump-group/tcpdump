@@ -546,7 +546,6 @@ check_include_file(pcap/pcap-inttypes.h HAVE_PCAP_PCAP_INTTYPES_H)
 # netdissect-stdinc.h first.
 #
 set(CMAKE_EXTRA_INCLUDE_FILES netdissect-stdinc.h)
-check_include_file(pcap/bluetooth.h HAVE_PCAP_BLUETOOTH_H)
 check_include_file(pcap/nflog.h HAVE_PCAP_NFLOG_H)
 cmake_pop_check_state()
 

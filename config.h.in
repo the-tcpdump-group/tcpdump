@@ -96,9 +96,6 @@
 /* if there's an os_proto.h for this platform, to use additional prototypes */
 #undef HAVE_OS_PROTO_H
 
-/* Define to 1 if you have the <pcap/bluetooth.h> header file. */
-#undef HAVE_PCAP_BLUETOOTH_H
-
 /* Define to 1 if you have the `pcap_breakloop' function. */
 #undef HAVE_PCAP_BREAKLOOP
 

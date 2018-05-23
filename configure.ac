@@ -897,7 +897,6 @@ AC_CHECK_TYPE([u_int64_t], ,
 #
 savedcppflags="$CPPFLAGS"
 CPPFLAGS="$CPPFLAGS $V_INCLS"
-AC_CHECK_HEADERS(pcap/bluetooth.h,,,[#include "netdissect-stdinc.h"])
 AC_CHECK_HEADERS(pcap/nflog.h,,,[#include "netdissect-stdinc.h"])
 CPPFLAGS="$savedcppflags"
 
