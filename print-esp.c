@@ -193,7 +193,7 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 	unsigned int len;
 	EVP_CIPHER_CTX *ctx;
 	unsigned int block_size, output_buffer_size;
-	u_char *output_buffer;
+	u_char *output_buffer, *input_buffer;
 
 	/* initiator arg is any non-zero value */
 	if(initiator) initiator=1;
@@ -241,7 +241,21 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 		EVP_CIPHER_CTX_free(ctx);
 		return 0;
 	}
-	EVP_Cipher(ctx, output_buffer, buf, len);
+
+	//same size as the output_buffer
+	input_buffer = (u_char *)malloc(output_buffer_size);
+	if(input_buffer == NULL) {
+		(*ndo->ndo_warning)(ndo, "can't allocate memory for decryption buffer");
+		EVP_CIPHER_CTX_free(ctx);
+		return 0;
+	}
+	
+	//I believe we should either use calloc or set both buffers to 0
+	memset(output_buffer, 0, output_buffer_size);
+	memset(input_buffer, 0, output_buffer_size);
+	memcpy(input_buffer, buf, len);
+
+	EVP_Cipher(ctx, output_buffer, buf, output_buffer_size);
 	EVP_CIPHER_CTX_free(ctx);
 
 	/*
@@ -250,6 +264,7 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 	 */
 	memcpy(buf, output_buffer, len);
 	free(output_buffer);
+	free(input_buffer);
 
 	ndo->ndo_packetp = buf;
 	ndo->ndo_snapend = end;
