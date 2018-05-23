@@ -255,7 +255,7 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 	memset(input_buffer, 0, output_buffer_size);
 	memcpy(input_buffer, buf, len);
 
-	EVP_Cipher(ctx, output_buffer, buf, output_buffer_size);
+	EVP_Cipher(ctx, output_buffer, input_buffer, output_buffer_size);
 	EVP_CIPHER_CTX_free(ctx);
 
 	/*
