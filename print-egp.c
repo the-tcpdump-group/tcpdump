@@ -132,7 +132,7 @@ static const char *egp_reasons[] = {
 };
 
 static void
-egpnrprint(netdissect_options *ndo,
+egpnr_print(netdissect_options *ndo,
            const struct egp_packet *egp, u_int length)
 {
 	const uint8_t *cp;
@@ -242,7 +242,7 @@ egpnrprint(netdissect_options *ndo,
 	}
 	return;
 trunc:
-	ND_PRINT("[|]");
+	nd_print_trunc(ndo);
 }
 
 void
@@ -375,7 +375,7 @@ egp_print(netdissect_options *ndo,
 		       EXTRACT_U_1(egp->egp_intgw),
 		       EXTRACT_U_1(egp->egp_extgw));
 		if (ndo->ndo_vflag)
-			egpnrprint(ndo, egp, length);
+			egpnr_print(ndo, egp, length);
 		break;
 
 	case EGPT_ERROR:
