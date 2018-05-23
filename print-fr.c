@@ -227,8 +227,8 @@ fr_if_print(netdissect_options *ndo,
             return (0);
         else
             return length;
- trunc:
-        ND_PRINT("[|fr]");
+trunc:
+        nd_print_trunc(ndo);
         return caplen;
 }
 
@@ -365,8 +365,8 @@ fr_print(netdissect_options *ndo,
 
 	return hdr_len;
 
- trunc:
-        ND_PRINT("[|fr]");
+trunc:
+        nd_print_trunc(ndo);
         return 0;
 
 }
@@ -385,8 +385,8 @@ mfr_if_print(netdissect_options *ndo,
             return (0);
         else
             return length;
- trunc:
-        ND_PRINT("[|mfr]");
+trunc:
+        nd_print_trunc(ndo);
         return caplen;
 }
 
@@ -574,8 +574,8 @@ mfr_print(netdissect_options *ndo,
 
     return hdr_len;
 
- trunc:
-    ND_PRINT("[|mfr]");
+trunc:
+    nd_print_trunc(ndo);
     return length;
 }
 
@@ -626,7 +626,7 @@ frf15_print(netdissect_options *ndo,
     return;
 
 trunc:
-    ND_PRINT("[|frf.15]");
+    nd_print_trunc(ndo);
 }
 
 /*
@@ -802,7 +802,7 @@ q933_print(netdissect_options *ndo,
 	u_int non_locking_shift;
 	u_int unshift_codeset;
 
-	ndo->ndo_protocol = "q933";
+	ndo->ndo_protocol = "q.933";
 	ND_PRINT("%s", ndo->ndo_eflag ? "" : "Q.933");
 
 	if (length == 0 || !ND_TTEST_1(p)) {
@@ -1064,7 +1064,7 @@ q933_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("[|q.933]");
+	nd_print_trunc(ndo);
 }
 
 static int

@@ -21,4 +21,4 @@ Q.922, invalid address
 UI 2c! Pad! Q.922, hdr-len 2, DLCI 288, Flags [none], NLPID NULL (0x00), length 24: 
 	0x0000:  1188 6b68                                ..kh
 Q.922, invalid address
-UI 2c! Pad! Q.933, CCITT, codeset 0[|q.933]
+UI 2c! Pad! Q.933, CCITT, codeset 0 [|q.933]
