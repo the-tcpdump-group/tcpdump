@@ -6514,30 +6514,6 @@ $as_echo "#define u_int64_t uint64_t" >>confdefs.h
 fi
 
 
-#
-# Check for some headers introduced in later versions of libpcap
-# and used by some printers.
-#
-# Those headers might use the {u_}intN_t types, so we must do this
-# after we check for what's needed to get them defined.
-#
-savedcppflags="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $V_INCLS"
-for ac_header in pcap/nflog.h
-do :
-  ac_fn_c_check_header_compile "$LINENO" "pcap/nflog.h" "ac_cv_header_pcap_nflog_h" "#include \"netdissect-stdinc.h\"
-"
-if test "x$ac_cv_header_pcap_nflog_h" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_PCAP_NFLOG_H 1
-_ACEOF
-
-fi
-
-done
-
-CPPFLAGS="$savedcppflags"
-
 if test -n "$ac_tool_prefix"; then
   # Extract the first word of "${ac_tool_prefix}ranlib", so it can be a program name with args.
 set dummy ${ac_tool_prefix}ranlib; ac_word=$2

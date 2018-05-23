@@ -539,17 +539,6 @@ set(CMAKE_REQUIRED_INCLUDES ${PCAP_INCLUDE_DIRS})
 check_include_file(pcap/pcap-inttypes.h HAVE_PCAP_PCAP_INTTYPES_H)
 
 #
-# Check for some headers introduced in later versions of libpcap
-# and used by some printers.
-#
-# Those headers might use the {u_}intN_t types, so we must include
-# netdissect-stdinc.h first.
-#
-set(CMAKE_EXTRA_INCLUDE_FILES netdissect-stdinc.h)
-check_include_file(pcap/nflog.h HAVE_PCAP_NFLOG_H)
-cmake_pop_check_state()
-
-#
 # Check for various functions in libpcap/WinPcap.
 #
 cmake_push_check_state()

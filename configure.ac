@@ -888,18 +888,6 @@ AC_CHECK_TYPE([u_int64_t], ,
 #include <sys/types.h>
 ])
 
-#
-# Check for some headers introduced in later versions of libpcap
-# and used by some printers.
-#
-# Those headers might use the {u_}intN_t types, so we must do this
-# after we check for what's needed to get them defined.
-#
-savedcppflags="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $V_INCLS"
-AC_CHECK_HEADERS(pcap/nflog.h,,,[#include "netdissect-stdinc.h"])
-CPPFLAGS="$savedcppflags"
-
 AC_PROG_RANLIB
 AC_CHECK_TOOL([AR], [ar])
 
