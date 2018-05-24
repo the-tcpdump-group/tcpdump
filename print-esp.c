@@ -192,8 +192,8 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 	const u_char *iv;
 	unsigned int len;
 	EVP_CIPHER_CTX *ctx;
-	unsigned int block_size, output_buffer_size;
-	u_char *output_buffer;
+	unsigned int block_size, buffer_size;
+	u_char *input_buffer, *output_buffer;
 
 	/* initiator arg is any non-zero value */
 	if(initiator) initiator=1;
@@ -228,20 +228,43 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 		(*ndo->ndo_warning)(ndo, "espkey init failed");
 	set_cipher_parameters(ctx, NULL, NULL, iv, 0);
 	/*
-	 * Allocate a buffer for the decrypted data.
-	 * The output buffer must be separate from the input buffer, and
-	 * its size must be a multiple of the cipher block size.
+	 * Allocate buffers for the encrypted and decrypted data.
+	 * Both buffers' sizes must be a multiple of the cipher block
+	 * size, and the output buffer must be separate from the input
+	 * buffer.
 	 */
 	block_size = (unsigned int)EVP_CIPHER_CTX_block_size(ctx);
-	output_buffer_size = len + (block_size - len % block_size);
-	output_buffer = (u_char *)malloc(output_buffer_size);
-	if (output_buffer == NULL) {
+	buffer_size = len + (block_size - len % block_size);
+
+	/*
+	 * Attempt to allocate the input buffer.
+	 */
+	input_buffer = (u_char *)malloc(buffer_size);
+	if (input_buffer == NULL) {
 		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
-			"can't allocate memory for decryption buffer");
+			"can't allocate memory for encrypted data buffer");
 		EVP_CIPHER_CTX_free(ctx);
 		return 0;
 	}
-	EVP_Cipher(ctx, output_buffer, buf, len);
+	/*
+	 * Copy the input data to the encrypted data buffer, and pad it
+	 * with zeroes.
+	 */
+	memcpy(input_buffer, buf, len);
+	memset(input_buffer + len, 0, buffer_size - len);
+
+	/*
+	 * Attempt to allocate the output buffer.
+	 */
+	output_buffer = (u_char *)malloc(buffer_size);
+	if (output_buffer == NULL) {
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+			"can't allocate memory for decryption buffer");
+		free(input_buffer);
+		EVP_CIPHER_CTX_free(ctx);
+		return 0;
+	}
+	EVP_Cipher(ctx, output_buffer, input_buffer, len);
 	EVP_CIPHER_CTX_free(ctx);
 
 	/*
@@ -249,6 +272,7 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 	 * but changing this would require a more complicated fix.
 	 */
 	memcpy(buf, output_buffer, len);
+	free(input_buffer);
 	free(output_buffer);
 
 	ndo->ndo_packetp = buf;
@@ -666,8 +690,8 @@ esp_print(netdissect_options *ndo,
 	const u_char *ivoff;
 	const u_char *p;
 	EVP_CIPHER_CTX *ctx;
-	unsigned int block_size, output_buffer_size;
-	u_char *output_buffer;
+	unsigned int block_size, buffer_size;
+	u_char *input_buffer, *output_buffer;
 #endif
 
 	ndo->ndo_protocol = "esp";
@@ -784,22 +808,45 @@ esp_print(netdissect_options *ndo,
 			len = ep - (p + ivlen);
 
 			/*
-			 * Allocate a buffer for the decrypted data.
-			 * The output buffer must be separate from the
-			 * input buffer, and its size must be a multiple
-			 * of the cipher block size.
+			 * Allocate buffers for the encrypted and decrypted
+			 * data.  Both buffers' sizes must be a multiple of
+			 * the cipher block size, and the output buffer must
+			 * be separate from the input buffer.
 			 */
 			block_size = (unsigned int)EVP_CIPHER_CTX_block_size(ctx);
-			output_buffer_size = len + (block_size - len % block_size);
-			output_buffer = (u_char *)malloc(output_buffer_size);
+			buffer_size = len + (block_size - len % block_size);
+
+			/*
+			 * Attempt to allocate the input buffer.
+			 */
+			input_buffer = (u_char *)malloc(buffer_size);
+			if (input_buffer == NULL) {
+				(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+					"esp_print: can't allocate memory for encrypted data buffer");
+				EVP_CIPHER_CTX_free(ctx);
+				return 0;
+			}
+			/*
+			 * Copy the input data to the encrypted data buffer,
+			 * and pad it with zeroes.
+			 */
+			memcpy(input_buffer, p + ivlen, len);
+			memset(input_buffer + len, 0, buffer_size - len);
+
+			/*
+			 * Attempt to allocate the output buffer.
+			 */
+			output_buffer = (u_char *)malloc(buffer_size);
 			if (output_buffer == NULL) {
 				(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
-					"esp_print: malloc decryption buffer");
+					"esp_print: can't allocate memory for decryption buffer");
+				free(input_buffer);
 				EVP_CIPHER_CTX_free(ctx);
 				return -1;
 			}
 
-			EVP_Cipher(ctx, output_buffer, p + ivlen, len);
+			EVP_Cipher(ctx, output_buffer, input_buffer, len);
+			free(input_buffer);
 			EVP_CIPHER_CTX_free(ctx);
 			/*
 			 * XXX - of course this is wrong, because buf is a
