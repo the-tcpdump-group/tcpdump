@@ -64,7 +64,7 @@ static const struct printer printers[] = {
 #ifdef DLT_NETANALYZER_TRANSPARENT
 	{ netanalyzer_transparent_if_print, DLT_NETANALYZER_TRANSPARENT },
 #endif
-#if defined(DLT_NFLOG) && defined(HAVE_PCAP_NFLOG_H)
+#ifdef DLT_NFLOG
 	{ nflog_if_print,	DLT_NFLOG},
 #endif
 #ifdef DLT_CIP
@@ -83,7 +83,7 @@ static const struct printer printers[] = {
 #ifdef DLT_APPLE_IP_OVER_IEEE1394
 	{ ap1394_if_print,	DLT_APPLE_IP_OVER_IEEE1394 },
 #endif
-#if defined(DLT_BLUETOOTH_HCI_H4_WITH_PHDR) && defined(HAVE_PCAP_BLUETOOTH_H)
+#ifdef DLT_BLUETOOTH_HCI_H4_WITH_PHDR
 	{ bt_if_print,		DLT_BLUETOOTH_HCI_H4_WITH_PHDR},
 #endif
 #ifdef DLT_LANE8023
