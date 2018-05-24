@@ -267,11 +267,11 @@ tcp_print(netdissect_options *ndo,
                         if (rev) {
                                 UNALIGNED_MEMCPY(&tha.src, dst, sizeof ip6->ip6_dst);
                                 UNALIGNED_MEMCPY(&tha.dst, src, sizeof ip6->ip6_src);
-                                tha.port = dport << 16 | sport;
+                                tha.port = ((u_int)dport) << 16 | sport;
                         } else {
                                 UNALIGNED_MEMCPY(&tha.dst, dst, sizeof ip6->ip6_dst);
                                 UNALIGNED_MEMCPY(&tha.src, src, sizeof ip6->ip6_src);
-                                tha.port = sport << 16 | dport;
+                                tha.port = ((u_int)sport) << 16 | dport;
                         }
 
                         for (th = &tcp_seq_hash[tha.port % TSEQ_HASHSIZE];
@@ -318,11 +318,11 @@ tcp_print(netdissect_options *ndo,
                         if (rev) {
                                 UNALIGNED_MEMCPY(&tha.src, &ip->ip_dst, sizeof ip->ip_dst);
                                 UNALIGNED_MEMCPY(&tha.dst, &ip->ip_src, sizeof ip->ip_src);
-                                tha.port = dport << 16 | sport;
+                                tha.port = ((u_int)dport) << 16 | sport;
                         } else {
                                 UNALIGNED_MEMCPY(&tha.dst, &ip->ip_dst, sizeof ip->ip_dst);
                                 UNALIGNED_MEMCPY(&tha.src, &ip->ip_src, sizeof ip->ip_src);
-                                tha.port = sport << 16 | dport;
+                                tha.port = ((u_int)sport) << 16 | dport;
                         }
 
                         for (th = &tcp_seq_hash[tha.port % TSEQ_HASHSIZE];
