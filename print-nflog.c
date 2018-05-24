@@ -223,4 +223,4 @@ trunc:
 	return h_size;
 }
 
-#endif /* defined(DLT_NFLOG) && defined(HAVE_PCAP_NFLOG_H) */
+#endif /* DLT_NFLOG */
