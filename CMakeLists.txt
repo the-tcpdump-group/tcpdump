@@ -121,7 +121,7 @@ endif()
 
 # Get, parse, format and set tcpdump's version string from
 # [tcpdump_root]/VERSION for later use.
- 
+
 # Get MAJOR, MINOR, PATCH & SUFFIX
 file(STRINGS ${tcpdump_SOURCE_DIR}/VERSION
     PACKAGE_VERSION

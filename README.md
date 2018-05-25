@@ -18,7 +18,7 @@ Anonymous Git is available via:
 	git clone git://bpf.tcpdump.org/tcpdump
 
 formerly from 	Lawrence Berkeley National Laboratory
-		Network Research Group <tcpdump@ee.lbl.gov>  
+		Network Research Group <tcpdump@ee.lbl.gov>
 		ftp://ftp.ee.lbl.gov/old/tcpdump.tar.Z (3.4)
 
 This directory contains source code for tcpdump, a tool for network
