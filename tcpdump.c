@@ -1182,13 +1182,6 @@ find_interface_by_number(const char *url, long devnum)
 }
 #endif
 
-#ifdef HAVE_PCAP_OPEN
-/*
- * Prefix for rpcap URLs.
- */
-static char rpcap_prefix[] = "rpcap://";
-#endif
-
 static pcap_t *
 open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 {
@@ -1199,10 +1192,11 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 #endif
 
 #ifdef HAVE_PCAP_OPEN
+# define STRING_EQ(s, s_cst) (strncmp(s, s_cst, strlen(s_cst)) == 0)
 	/*
 	 * Is this an rpcap URL?
 	 */
-	if (strncmp(device, rpcap_prefix, sizeof(rpcap_prefix) - 1) == 0) {
+	if (STRING_EQ(device, "rpcap://") || STRING_EQ(device, "rpcaps://")) {
 		/*
 		 * Yes.  Open it with pcap_open().
 		 */
