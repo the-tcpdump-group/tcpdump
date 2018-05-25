@@ -132,6 +132,7 @@ vat_print(netdissect_options *ndo, const void *hdr, u_int length)
 		if (i0 & 0x3f000000)
 			ND_PRINT(" s%u", (i0 >> 24) & 0x3f);
 	}
+	return;
 
 trunc:
 	nd_print_trunc(ndo);
@@ -221,6 +222,7 @@ rtp_print(netdissect_options *ndo, const void *hdr, u_int len)
 		if (contype == 0x1f) /*XXX H.261 */
 			ND_PRINT(" 0x%04x", EXTRACT_BE_U_4(ip) >> 16);
 	}
+	return;
 
 trunc:
 	nd_print_trunc(ndo);
