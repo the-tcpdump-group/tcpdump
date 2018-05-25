@@ -7,7 +7,7 @@ UI 22! ES-IS, length 65565
 	redirect (6), v: 1, checksum: 0x7034 (incorrect should be 0x44ec), holding time: 21315s, length indicator: 16
 	  02.0400
 	  SNPA (length: 0): <empty>
-	  Unknown Option #0, length 0, value:  [|esis]
+	  Unknown Option #0, length 0, value: 
 UI 32! ES-IS, length 65565
 	ESH (2), v: 1, checksum: 0x70a1 (incorrect should be 0xfb4e), holding time: 21315s, length indicator: 17
 	  Number of Source Addresses: 2

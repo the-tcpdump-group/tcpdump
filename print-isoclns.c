@@ -1386,6 +1386,8 @@ esis_print(netdissect_options *ndo,
                 print_unknown_data(ndo, pptr, "\n\t  ", opli);
             pptr += opli;
         }
+        return;
+
 trunc:
 	nd_print_trunc(ndo);
 }
@@ -1408,6 +1410,7 @@ isis_print_mcid(netdissect_options *ndo,
 
   for(i=0;i<16;i++)
     ND_PRINT("%.2x ", mcid->digest[i]);
+  return;
 
 trunc:
   nd_print_trunc(ndo);
