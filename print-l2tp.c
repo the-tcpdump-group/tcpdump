@@ -761,7 +761,7 @@ l2tp_avp_print(netdissect_options *ndo, const u_char *dat, int length)
 	return;
 
  trunc:
-	ND_PRINT("|...");
+	nd_print_trunc(ndo);
 }
 
 
