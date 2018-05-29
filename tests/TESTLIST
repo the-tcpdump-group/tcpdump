@@ -211,7 +211,8 @@ geonet-calm-fast	geonet_and_calm_fast.pcap	geonet_and_calm_fast.out	-vv
 m3ua isup.pcap isup.out
 m3ua-vv isup.pcap isupvv.out -vv
 
-# NFLOG test case moved to nflog-e.sh
+# NFLOG test case
+nflog-e nflog.pcap nflog-e.out -e
 
 # syslog test case
 syslog-v	syslog_udp.pcap		syslog-v.out		-v
