@@ -294,10 +294,8 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 
 	/* make sure we have enough data to look at the X bit */
 	cp = (const u_char *)(dh + 1);
-	if (cp > ndo->ndo_snapend) {
-		ND_PRINT("[Invalid packet|dccp]");
-		return;
-	}
+	if (cp > ndo->ndo_snapend)
+		goto trunc;
 	if (len < sizeof(struct dccp_hdr)) {
 		ND_PRINT("truncated-dccp - %u bytes missing!",
 			  len - (u_int)sizeof(struct dccp_hdr));
