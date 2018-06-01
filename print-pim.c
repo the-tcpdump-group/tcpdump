@@ -244,7 +244,7 @@ pimv1_join_prune_print(netdissect_options *ndo,
 	}
 	return;
 trunc:
-	ND_PRINT("[|pim]");
+	nd_print_trunc(ndo);
 	return;
 }
 
@@ -333,7 +333,7 @@ pimv1_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("[|pim]");
+	nd_print_trunc(ndo);
 	return;
 }
 
@@ -452,7 +452,7 @@ cisco_autorp_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("[|autorp]");
+	nd_print_trunc(ndo);
 	return;
 }
 
@@ -495,7 +495,7 @@ pim_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("[|pim]");
+	nd_print_trunc(ndo);
 	return;
 }
 
@@ -708,6 +708,7 @@ pimv2_print(netdissect_options *ndo,
 	u_int pim_typever;
 	u_int pimv2_addr_len;
 
+	ndo->ndo_protocol = "pimv2";
 	if (len < 2)
 		goto trunc;
 	ND_TCHECK_1(pim->pim_rsv);
@@ -1198,5 +1199,5 @@ pimv2_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("[|pim]");
+	nd_print_trunc(ndo);
 }
