@@ -442,8 +442,13 @@ mptcp_print(netdissect_options *ndo,
                 return 0;
 
         opt = (const struct mptcp_option *) cp;
+        ND_TCHECK_SIZE(opt);
         subtype = min(MPTCP_OPT_SUBTYPE(opt->sub_etc), MPTCP_SUB_FCLOSE + 1);
 
         ND_PRINT(" %s", mptcp_options[subtype].name);
         return mptcp_options[subtype].print(ndo, cp, len, flags);
+
+trunc:
+        nd_print_trunc(ndo);
+        return 0;
 }
