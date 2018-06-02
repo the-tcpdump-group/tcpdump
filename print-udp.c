@@ -451,6 +451,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 
 		case PT_RPC:
 			rp = (const struct sunrpc_msg *)(up + 1);
+			ND_TCHECK_4(rp->rm_direction);
 			direction = (enum sunrpc_msg_type) EXTRACT_BE_U_4(rp->rm_direction);
 			if (direction == SUNRPC_CALL)
 				sunrpc_print(ndo, (const u_char *)rp, length,
