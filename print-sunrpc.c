@@ -169,6 +169,7 @@ sunrpc_print(netdissect_options *ndo, const u_char *bp,
 
 	ndo->ndo_protocol = "sunrpc";
 	rp = (const struct sunrpc_msg *)bp;
+	ND_TCHECK_SIZE(rp);
 
 	if (!ndo->ndo_nflag) {
 		nd_snprintf(srcid, sizeof(srcid), "0x%x",
@@ -218,6 +219,10 @@ sunrpc_print(netdissect_options *ndo, const u_char *bp,
 		ND_PRINT(".%u", EXTRACT_BE_U_4(rp->rm_call.cb_vers));
 		break;
 	}
+	return;
+
+trunc:
+	nd_print_trunc(ndo);
 }
 
 static char *
