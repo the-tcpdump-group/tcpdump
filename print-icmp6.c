@@ -1417,8 +1417,6 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 	size_t l;
 	u_int i;
 
-#define ECHECK(var) if ((const u_char *)&(var) > ep - sizeof(var)) return
-
 	cp = bp;
 	/* 'ep' points to the end of available data. */
 	ep = ndo->ndo_snapend;
@@ -1426,7 +1424,7 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 	while (cp < ep) {
 		op = (const struct nd_opt_hdr *)cp;
 
-		ECHECK(op->nd_opt_len);
+		ND_TCHECK_1(op->nd_opt_len);
 		if (resid <= 0)
 			return;
 		opt_type = EXTRACT_U_1(op->nd_opt_type);
@@ -1551,7 +1549,6 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
  trunc:
 	ND_PRINT("[ndp opt]");
 	return;
-#undef ECHECK
 }
 
 static void
