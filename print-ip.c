@@ -242,8 +242,9 @@ trunc:
 
 /*
  * print IP options.
+   If truncated return -1, else 0.
  */
-static void
+static int
 ip_optprint(netdissect_options *ndo,
             const u_char *cp, u_int length)
 {
@@ -271,20 +272,20 @@ ip_optprint(netdissect_options *ndo,
 			option_len = EXTRACT_U_1(cp + 1);
 			if (option_len < 2) {
 				ND_PRINT(" [bad length %u]", option_len);
-				return;
+				return 0;
 			}
 		}
 
 		if (option_len > length) {
 			ND_PRINT(" [bad length %u]", option_len);
-			return;
+			return 0;
 		}
 
 		ND_TCHECK_LEN(cp, option_len);
 
 		switch (option_code) {
 		case IPOPT_EOL:
-			return;
+			return 0;
 
 		case IPOPT_TS:
 			if (ip_printts(ndo, cp, option_len) == -1)
@@ -314,10 +315,10 @@ ip_optprint(netdissect_options *ndo,
 			break;
 		}
 	}
-	return;
+	return 0;
 
 trunc:
-	nd_print_trunc(ndo);
+	return -1;
 }
 
 #define IP_RES 0x8000
@@ -547,6 +548,7 @@ ip_print(netdissect_options *ndo,
 	uint8_t ip_tos, ip_ttl, ip_proto;
 	uint16_t sum, ip_sum;
 	const char *p_name;
+	int truncated = 0;
 
 	ndo->ndo_protocol = "ip";
 	ipds->ip = (const struct ip *)bp;
@@ -648,7 +650,11 @@ ip_print(netdissect_options *ndo,
 
             if ((hlen - sizeof(struct ip)) > 0) {
                 ND_PRINT(", options (");
-                ip_optprint(ndo, (const u_char *)(ipds->ip + 1), hlen - sizeof(struct ip));
+                if (ip_optprint(ndo, (const u_char *)(ipds->ip + 1),
+                    hlen - sizeof(struct ip)) == -1) {
+                        ND_PRINT(" [truncated-option]");
+			truncated = 1;
+                }
                 ND_PRINT(")");
             }
 
@@ -664,6 +670,12 @@ ip_print(netdissect_options *ndo,
 	    }
 
 	    ND_PRINT(")\n    ");
+	    if (truncated) {
+		ND_PRINT("%s > %s: ",
+			 ipaddr_string(ndo, ipds->ip->ip_src),
+			 ipaddr_string(ndo, ipds->ip->ip_dst));
+		goto trunc;
+	    }
 	}
 
 	/*
