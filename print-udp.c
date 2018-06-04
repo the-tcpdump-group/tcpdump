@@ -556,6 +556,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		 * TCP does, and we do so for UDP-over-IPv6.
 		 */
 	        if (IP_V(ip) == 4 && (ndo->ndo_vflag > 1)) {
+			ND_TCHECK_2(up->uh_sum);
 			udp_sum = EXTRACT_BE_U_2(up->uh_sum);
 			if (udp_sum == 0) {
 				ND_PRINT("[no cksum] ");
@@ -574,6 +575,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			/* for IPv6, UDP checksum is mandatory */
 			if (ND_TTEST_LEN(cp, length)) {
 				sum = udp6_cksum(ndo, ip6, up, length + sizeof(struct udphdr));
+				ND_TCHECK_2(up->uh_sum);
 				udp_sum = EXTRACT_BE_U_2(up->uh_sum);
 
 	                        if (sum != 0) {
