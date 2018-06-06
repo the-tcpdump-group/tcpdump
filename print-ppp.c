@@ -1469,7 +1469,7 @@ cleanup:
 
 trunc:
 	ndo->ndo_snapend = se;
-	ND_PRINT("[|ppp]");
+	nd_print_trunc(ndo);
 }
 
 
@@ -1602,7 +1602,7 @@ ppp_print(netdissect_options *ndo,
 	handle_ppp(ndo, proto, p, length);
 	return (hdr_len);
 trunc:
-	ND_PRINT("[|ppp]");
+	nd_print_trunc(ndo);
 	return (0);
 }
 
@@ -1617,7 +1617,7 @@ ppp_if_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "ppp_if";
 	if (caplen < PPP_HDRLEN) {
-		ND_PRINT("[|ppp]");
+		nd_print_trunc(ndo);
 		return (caplen);
 	}
 
@@ -1688,7 +1688,7 @@ ppp_hdlc_if_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "ppp_hdlc_if";
 	if (caplen < 2) {
-		ND_PRINT("[|ppp]");
+		nd_print_trunc(ndo);
 		return (caplen);
 	}
 
@@ -1696,7 +1696,7 @@ ppp_hdlc_if_print(netdissect_options *ndo,
 
 	case PPP_ADDRESS:
 		if (caplen < 4 || length < 4) {
-			ND_PRINT("[|ppp]");
+			nd_print_trunc(ndo);
 			return (caplen);
 		}
 
@@ -1722,7 +1722,7 @@ ppp_hdlc_if_print(netdissect_options *ndo,
 
 	default:
 		if (caplen < 4) {
-			ND_PRINT("[|ppp]");
+			nd_print_trunc(ndo);
 			return (caplen);
 		}
 
@@ -1763,7 +1763,7 @@ ppp_bsdos_if_print(netdissect_options *ndo _U_,
 
 	ndo->ndo_protocol = "ppp_bsdos_if";
 	if (caplen < PPP_BSDI_HDRLEN) {
-		ND_PRINT("[|ppp]");
+		nd_print_trunc(ndo);
 		return (caplen);
 	}
 

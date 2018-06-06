@@ -2752,7 +2752,7 @@ ike_sub0_print(netdissect_options *ndo,
 
 	return cp;
 trunc:
-	ND_PRINT(" [|isakmp]");
+	nd_print_trunc(ndo);
 	return NULL;
 }
 
@@ -2920,7 +2920,7 @@ ikev2_sub0_print(netdissect_options *ndo, const struct isakmp *base,
 
 	return cp;
 trunc:
-	ND_PRINT(" [|isakmp]");
+	nd_print_trunc(ndo);
 	return NULL;
 }
 
@@ -3045,7 +3045,7 @@ isakmp_print(netdissect_options *ndo,
 	ep = ndo->ndo_snapend;
 
 	if ((const struct isakmp *)ep < p + 1) {
-		ND_PRINT("[|isakmp]");
+		nd_print_trunc(ndo);
 		return;
 	}
 
@@ -3130,6 +3130,6 @@ isakmp_rfc3948_print(netdissect_options *ndo,
 	}
 
 trunc:
-	ND_PRINT("[|isakmp]");
+	nd_print_trunc(ndo);
 	return;
 }

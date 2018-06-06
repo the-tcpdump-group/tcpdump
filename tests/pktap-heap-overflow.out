@@ -1,2 +1,2 @@
  [|pktap_if]
-[|ppp]
+ [|ppp_hdlc_if]

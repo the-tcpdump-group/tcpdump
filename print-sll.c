@@ -208,7 +208,7 @@ sll_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 		 * adds this many bytes of header to every packet in a
 		 * cooked socket capture.
 		 */
-		ND_PRINT("[|sll]");
+		nd_print_trunc(ndo);
 		return (caplen);
 	}
 

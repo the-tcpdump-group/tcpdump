@@ -106,7 +106,7 @@ llap_print(netdissect_options *ndo,
 		return (length);
 	}
 	if (!ND_TTEST_LEN(bp, sizeof(*lp))) {
-		ND_PRINT(" [|llap]");
+		nd_print_trunc(ndo);
 		return (0);	/* cut short by the snapshot length */
 	}
 	lp = (const struct LAP *)bp;
@@ -221,7 +221,7 @@ aarp_print(netdissect_options *ndo,
 	ap = (const struct aarp *)bp;
 	if (!ND_TTEST_SIZE(ap)) {
 		/* Just bail if we don't have the whole chunk. */
-		ND_PRINT(" [|aarp]");
+		nd_print_trunc(ndo);
 		return;
 	}
 	if (length < sizeof(*ap)) {
