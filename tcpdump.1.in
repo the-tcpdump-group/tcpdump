@@ -27,7 +27,7 @@ tcpdump \- dump traffic on a network
 .na
 .B tcpdump
 [
-.B \-AbdDefhHIJKlLnNOpqStuUvxX#
+.B \-AbdDefhHIJKlLnNOpqRStuUvxX#
 ] [
 .B \-B
 .I buffer_size
@@ -606,6 +606,18 @@ Read packets from \fIfile\fR (which was created with the
 .B \-w
 option or by other tools that write pcap or pcapng files).
 Standard input is used if \fIfile\fR is ``-''.
+.TP
+.BI \-R " time"
+.PD 0
+.TP
+.BI \-\-max\-runtime= time
+.PD
+Capture packets until \fItime\fP has elapsed since the first packet arrived.
+Valid units are `us', `ms', `s', `m' and `h'.
+Respectively, these correspond to microseconds, milliseconds, seconds, minutes,
+and hours.
+There should be no space between the number and the units; `5ms' is good,
+`5 ms' is not.
 .TP
 .B \-S
 .PD 0

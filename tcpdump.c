@@ -192,6 +192,8 @@ static int pflag;			/* don't go promiscuous */
 #ifdef HAVE_PCAP_SETDIRECTION
 static int Qflag = -1;			/* restrict captured packet by send/receive direction */
 #endif
+static int64_t Rflag = 0; /* max time to capture after first packet, in microseconds */
+struct timeval first_packet_time; /* store the first packet time, for use in check_runtime */
 static int Uflag;			/* "unbuffered" output of dump files */
 static int Wflag;			/* recycle output files after this number of files */
 static int WflagChars;
@@ -230,7 +232,10 @@ static NORETURN void show_remote_devices_and_exit(void);
 static void print_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void dump_packet_and_trunc(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void dump_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
+static void check_runtime(const struct pcap_pkthdr *);
 static void droproot(const char *, const char *);
+
+static int64_t parse_runtime_str(const char*);
 
 #ifdef SIGNAL_REQ_INFO
 static void requestinfo(int);
@@ -555,6 +560,67 @@ show_remote_devices_and_exit(void)
 }
 #endif /* HAVE_PCAP_FINDALLDEVS */
 
+static int64_t
+parse_runtime_str(const char* optarg) {
+  size_t i=0;
+  size_t time_str_len=0, unit_str_len=0;
+  size_t optarg_len = strlen(optarg);
+  char time_str[32];
+  char unit_str[32];
+  double unit_factor;
+  size_t max_cmp_len=2;
+  double time_us;
+  /* Find first non-numeric character and use that to split string*/
+  char delta;
+  for (i=0; i<optarg_len; i++) {
+    delta = optarg[i] - '0';
+    if ((delta < 0) || (delta > 9)) {
+      time_str_len = i;
+      unit_str_len = optarg_len - i;
+      break;
+    }
+  }
+  /* Sanity check values; number shouldn't have more than 20 digits*/
+  if ((unit_str_len==0)||(unit_str_len>2)
+      ||(time_str_len==0)||(time_str_len>20)) {
+    fprintf(stderr, "Warning: invalid runtime specified! Make sure to specify units.\n");
+    return(0);
+  }
+
+  /*Copy values into (oversized) ouffers*/
+  strncpy(time_str, optarg, time_str_len);
+  strncpy(unit_str, optarg+time_str_len, unit_str_len);
+
+  /* Parse the unit string to get factor to convert to microseconds */
+  if (strncmp(unit_str, "us", max_cmp_len)==0){
+    unit_factor=1;
+  }
+  else if (strncmp(unit_str, "ms", max_cmp_len)==0) {
+    unit_factor=1e3;
+  }
+  else if (strncmp(unit_str, "s", max_cmp_len)==0) {
+    unit_factor=1e6;
+  }
+  else if (strncmp(unit_str, "m", max_cmp_len)==0) {
+    unit_factor=6e7;
+  }
+  else if (strncmp(unit_str, "h", max_cmp_len)==0) {
+    unit_factor=3.6e9;
+  }
+  else {
+    fprintf(stderr, "Warning: invalid runtime units specified!\n");
+    return(0);
+  }
+  /* Parse time as a double */
+  time_us = atof(time_str) * (double)unit_factor;
+  if ((time_us > LLONG_MAX)||(time_us < 0)){
+    fprintf(stderr, "Warning: invalid runtime value specified!\n");
+    return(0);
+  }
+  return (int64_t)time_us;
+}
+
+
 /*
  * Short options.
  *
@@ -633,7 +699,7 @@ show_remote_devices_and_exit(void)
 #define U_FLAG
 #endif
 
-#define SHORTOPTS "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpq" Q_FLAG "r:s:StT:u" U_FLAG "vV:w:W:xXy:Yz:Z:#"
+#define SHORTOPTS "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpq" Q_FLAG "r:R:s:StT:u" U_FLAG "vV:w:W:xXy:Yz:Z:#"
 
 /*
  * Long options.
@@ -688,6 +754,7 @@ static const struct option longopts[] = {
 #ifdef HAVE_PCAP_SETDIRECTION
 	{ "direction", required_argument, NULL, 'Q' },
 #endif
+  { "max-runtime", required_argument, NULL, 'R', },
 	{ "snapshot-length", required_argument, NULL, 's' },
 	{ "absolute-tcp-sequence-numbers", no_argument, NULL, 'S' },
 #ifdef HAVE_PCAP_DUMP_FLUSH
@@ -1702,9 +1769,13 @@ main(int argc, char **argv)
 			break;
 #endif /* HAVE_PCAP_SETDIRECTION */
 
-		case 'r':
+                case 'r':
 			RFileName = optarg;
 			break;
+
+                case 'R':
+                  Rflag = parse_runtime_str(optarg);
+                  break;
 
 		case 's':
 			ndo->ndo_snaplen = strtol(optarg, &end, 0);
@@ -2705,6 +2776,10 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 {
 	struct dump_info *dump_info;
 
+  /* Check that we haven't exceeded runtime before dumping this packet */
+  if (Rflag)
+    check_runtime(h);
+
 	++packets_captured;
 
 	++infodelay;
@@ -2920,6 +2995,11 @@ dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
 	struct dump_info *dump_info;
 
+  /* Check that we haven't exceeded runtime before dumping this packet */
+  if (Rflag)
+    check_runtime(h);
+
+
 	++packets_captured;
 
 	++infodelay;
@@ -2943,6 +3023,10 @@ dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 static void
 print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
+  /* Check that we haven't exceeded runtime before dumping this packet */
+  if (Rflag)
+    check_runtime(h);
+
 	++packets_captured;
 
 	++infodelay;
@@ -2952,6 +3036,27 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	--infodelay;
 	if (infoprint)
 		info(0);
+}
+
+static void
+check_runtime(const struct pcap_pkthdr *h)
+{
+  if (packets_captured == 0) {
+    first_packet_time = h->ts;
+  }
+  else {
+    int64_t runtime;
+    /* Add difference in seconds converted to microseconds */
+    runtime = 1000000 * (h->ts.tv_sec - first_packet_time.tv_sec);
+    /* Add difference in microseconds */
+    runtime += (h->ts.tv_usec - first_packet_time.tv_usec);
+    if (runtime > Rflag) {
+       (void)fprintf(stderr,
+         "Maximum runtime reached: %" PRId64 " microseconds\n", Rflag);
+       info(1);
+       exit_tcpdump(S_SUCCESS);
+    }
+  }
 }
 
 #ifdef SIGNAL_REQ_INFO
@@ -3048,7 +3153,7 @@ print_usage(void)
 {
 	print_version();
 	(void)fprintf(stderr,
-"Usage: %s [-aAbd" D_FLAG "efhH" I_FLAG J_FLAG "KlLnNOpqStu" U_FLAG "vxX#]" B_FLAG_USAGE " [ -c count ]\n", program_name);
+"Usage: %s [-aAbd" D_FLAG "efhH" I_FLAG J_FLAG "KlLnNOpqRStu" U_FLAG "vxX#]" B_FLAG_USAGE " [ -c count ]\n", program_name);
 	(void)fprintf(stderr,
 "\t\t[ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]\n");
 	(void)fprintf(stderr,
@@ -3060,7 +3165,7 @@ print_usage(void)
 	(void)fprintf(stderr,
 "\t\t[ -M secret ] [ --number ] [ --print ]" Q_FLAG_USAGE "\n");
 	(void)fprintf(stderr,
-"\t\t[ -r file ] [ -s snaplen ]" TIME_STAMP_PRECISION_USAGE "\n");
+"\t\t[ -r file ] [-R max-runtime ] [ -s snaplen ]" TIME_STAMP_PRECISION_USAGE "\n");
 	(void)fprintf(stderr,
 "\t\t[ -T type ] [ --version ] [ -V file ] [ -w file ]\n");
 	(void)fprintf(stderr,
