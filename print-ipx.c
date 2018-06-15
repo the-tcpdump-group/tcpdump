@@ -60,7 +60,7 @@ struct ipxHdr {
 
 #define ipxSize	30
 
-static const char *ipxaddr_string(uint32_t, const u_char *);
+static const char *ipxaddr_string(netdissect_options *, uint32_t, const u_char *);
 static void ipx_decode(netdissect_options *, const struct ipxHdr *, const u_char *, u_int);
 static void ipx_sap_print(netdissect_options *, const u_char *, u_int);
 static void ipx_rip_print(netdissect_options *, const u_char *, u_int);
@@ -79,11 +79,11 @@ ipx_print(netdissect_options *ndo, const u_char *p, u_int length)
 
 	ND_TCHECK_2(ipx->srcSkt);
 	ND_PRINT("%s.%04x > ",
-		     ipxaddr_string(EXTRACT_BE_U_4(ipx->srcNet), ipx->srcNode),
+		     ipxaddr_string(ndo, EXTRACT_BE_U_4(ipx->srcNet), ipx->srcNode),
 		     EXTRACT_BE_U_2(ipx->srcSkt));
 
 	ND_PRINT("%s.%04x: ",
-		     ipxaddr_string(EXTRACT_BE_U_4(ipx->dstNet), ipx->dstNode),
+		     ipxaddr_string(ndo, EXTRACT_BE_U_4(ipx->dstNet), ipx->dstNode),
 		     EXTRACT_BE_U_2(ipx->dstSkt));
 
 	/* take length from ipx header */
@@ -102,7 +102,7 @@ trunc:
 }
 
 static const char *
-ipxaddr_string(uint32_t net, const u_char *node)
+ipxaddr_string(netdissect_options *ndo, uint32_t net, const u_char *node)
 {
     static char line[256];
 
@@ -208,7 +208,7 @@ ipx_sap_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	    if (length < 10)
 		goto trunc;
 	    ND_PRINT(" addr %s",
-		ipxaddr_string(EXTRACT_BE_U_4(ipx), ipx + 4));
+		ipxaddr_string(ndo, EXTRACT_BE_U_4(ipx), ipx + 4));
 	    ipx += 10;
 	    length -= 10;
 	    /*

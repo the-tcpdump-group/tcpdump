@@ -176,7 +176,7 @@ struct  atmarp_pkthdr {
 #define ATMTPA(ap) (aar_tpa(ap))
 
 static int
-isnonzero(const u_char *a, size_t len)
+isnonzero(netdissect_options *ndo, const u_char *a, size_t len)
 {
 	while (len > 0) {
 		if (EXTRACT_U_1(a) != 0)
@@ -421,7 +421,7 @@ arp_print(netdissect_options *ndo,
 	case ARPOP_REQUEST:
 		ND_PRINT("who-has ");
 		tpaddr_print_ip(ndo, ap, pro);
-		if (isnonzero((const u_char *)THA(ap), HRD_LEN(ap)))
+		if (isnonzero(ndo, (const u_char *)THA(ap), HRD_LEN(ap)))
 			ND_PRINT(" (%s)",
 				  linkaddr_string(ndo, THA(ap), linkaddr, HRD_LEN(ap)));
 		ND_PRINT(" tell ");

@@ -494,8 +494,8 @@ static struct rx_cache_entry	rx_cache[RX_CACHE_SIZE];
 static uint32_t	rx_cache_next = 0;
 static uint32_t	rx_cache_hint = 0;
 static void	rx_cache_insert(netdissect_options *, const u_char *, const struct ip *, u_int);
-static int	rx_cache_find(const struct rx_header *, const struct ip *,
-			      uint32_t, uint32_t *);
+static int	rx_cache_find(netdissect_options *, const struct rx_header *,
+			      const struct ip *, uint32_t, uint32_t *);
 
 static void fs_print(netdissect_options *, const u_char *, u_int);
 static void fs_reply_print(netdissect_options *, const u_char *, u_int, uint32_t);
@@ -636,7 +636,7 @@ rx_print(netdissect_options *ndo,
 					EXTRACT_BE_U_4(rxh->seq) == 1) ||
 		    type == RX_PACKET_TYPE_ABORT) &&
 		   (flags & RX_CLIENT_INITIATED) == 0 &&
-		   rx_cache_find(rxh, (const struct ip *) bp2,
+		   rx_cache_find(ndo, rxh, (const struct ip *) bp2,
 				 sport, &opcode)) {
 
 		switch (sport) {
@@ -713,8 +713,8 @@ rx_cache_insert(netdissect_options *ndo,
  */
 
 static int
-rx_cache_find(const struct rx_header *rxh, const struct ip *ip, u_int sport,
-	      uint32_t *opcode)
+rx_cache_find(netdissect_options *ndo, const struct rx_header *rxh,
+	      const struct ip *ip, u_int sport, uint32_t *opcode)
 {
 	uint32_t i;
 	struct rx_cache_entry *rxent;

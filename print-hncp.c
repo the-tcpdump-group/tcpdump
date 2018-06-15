@@ -157,7 +157,7 @@ is_ipv4_mapped_address(const u_char *addr)
 }
 
 static const char *
-format_nid(const u_char *data)
+format_nid(netdissect_options *ndo, const u_char *data)
 {
     static char buf[4][sizeof("01:01:01:01")];
     static int i = 0;
@@ -169,7 +169,7 @@ format_nid(const u_char *data)
 }
 
 static const char *
-format_256(const u_char *data)
+format_256(netdissect_options *ndo, const u_char *data)
 {
     static char buf[4][sizeof("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")];
     static int i = 0;
@@ -489,7 +489,7 @@ hncp_print_rec(netdissect_options *ndo,
                 nd_print_invalid(ndo);
                 break;
             }
-            node_identifier = format_nid(value);
+            node_identifier = format_nid(ndo, value);
             ND_PRINT(" NID: %s", node_identifier);
         }
             break;
@@ -501,7 +501,7 @@ hncp_print_rec(netdissect_options *ndo,
                 nd_print_invalid(ndo);
                 break;
             }
-            node_identifier = format_nid(value);
+            node_identifier = format_nid(ndo, value);
             endpoint_identifier = EXTRACT_BE_U_4(value + 4);
             ND_PRINT(" NID: %s EPID: %08x",
                 node_identifier,
@@ -529,7 +529,7 @@ hncp_print_rec(netdissect_options *ndo,
                 nd_print_invalid(ndo);
                 break;
             }
-            node_identifier = format_nid(value);
+            node_identifier = format_nid(ndo, value);
             sequence_number = EXTRACT_BE_U_4(value + 4);
             interval = format_interval(EXTRACT_BE_U_4(value + 8));
             hash = EXTRACT_BE_U_8(value + 12);
@@ -550,7 +550,7 @@ hncp_print_rec(netdissect_options *ndo,
                 nd_print_invalid(ndo);
                 break;
             }
-            peer_node_identifier = format_nid(value);
+            peer_node_identifier = format_nid(ndo, value);
             peer_endpoint_identifier = EXTRACT_BE_U_4(value + 4);
             endpoint_identifier = EXTRACT_BE_U_4(value + 8);
             ND_PRINT(" Peer-NID: %s Peer-EPID: %08x Local-EPID: %08x",
@@ -584,7 +584,7 @@ hncp_print_rec(netdissect_options *ndo,
             }
             ND_PRINT(" Verdict: %u Fingerprint: %s Common Name: ",
                 EXTRACT_U_1(value),
-                format_256(value + 4));
+                format_256(ndo, value + 4));
             (void)nd_printzp(ndo, value + 36, bodylen - 36, NULL);
         }
             break;
@@ -836,7 +836,7 @@ hncp_print_rec(netdissect_options *ndo,
                 nd_print_invalid(ndo);
                 break;
             }
-            ND_PRINT(" PSK: %s", format_256(value));
+            ND_PRINT(" PSK: %s", format_256(ndo, value));
             hncp_print_rec(ndo, value + 32, bodylen - 32, indent+1);
         }
             break;

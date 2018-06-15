@@ -87,7 +87,7 @@ static const struct tok rstp_obj_port_role_values[] = {
 #define ND_TCHECK_BRIDGE_ID(p) ND_TCHECK_8(p)
 
 static char *
-stp_print_bridge_id(const u_char *p)
+stp_print_bridge_id(netdissect_options *ndo, const u_char *p)
 {
     static char bridge_id_str[sizeof("pppp.aa:bb:cc:dd:ee:ff")];
 
@@ -113,7 +113,7 @@ stp_print_config_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
 
     ND_TCHECK_2(stp_bpdu->port_id);
     ND_PRINT(", bridge-id %s.%04x, length %u",
-           stp_print_bridge_id((const u_char *)&stp_bpdu->bridge_id),
+           stp_print_bridge_id(ndo, (const u_char *)&stp_bpdu->bridge_id),
            EXTRACT_BE_U_2(stp_bpdu->port_id), length);
 
     /* in non-verbose mode just print the bridge-id */
@@ -130,7 +130,7 @@ stp_print_config_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
            (float) EXTRACT_BE_U_2(stp_bpdu->forward_delay) / STP_TIME_BASE);
 
     ND_PRINT("\n\troot-id %s, root-pathcost %u",
-           stp_print_bridge_id((const u_char *)&stp_bpdu->root_id),
+           stp_print_bridge_id(ndo, (const u_char *)&stp_bpdu->root_id),
            EXTRACT_BE_U_4(stp_bpdu->root_path_cost));
 
     /* Port role is only valid for 802.1w */
@@ -270,12 +270,12 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
 
     ND_TCHECK_4(stp_bpdu->root_path_cost);
     ND_PRINT("CIST root-id %s, CIST ext-pathcost %u",
-           stp_print_bridge_id((const u_char *)&stp_bpdu->root_id),
+           stp_print_bridge_id(ndo, (const u_char *)&stp_bpdu->root_id),
            EXTRACT_BE_U_4(stp_bpdu->root_path_cost));
 
     ND_TCHECK_SIZE(&stp_bpdu->bridge_id);
     ND_PRINT("\n\tCIST regional-root-id %s, ",
-           stp_print_bridge_id((const u_char *)&stp_bpdu->bridge_id));
+           stp_print_bridge_id(ndo, (const u_char *)&stp_bpdu->bridge_id));
 
     ND_TCHECK_2(stp_bpdu->port_id);
     ND_PRINT("CIST port-id %04x,", EXTRACT_BE_U_2(stp_bpdu->port_id));
@@ -308,7 +308,7 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
 
     ND_TCHECK_BRIDGE_ID(ptr + MST_BPDU_CIST_BRIDGE_ID_OFFSET);
     ND_PRINT("\n\tCIST bridge-id %s, ",
-           stp_print_bridge_id(ptr + MST_BPDU_CIST_BRIDGE_ID_OFFSET));
+           stp_print_bridge_id(ndo, ptr + MST_BPDU_CIST_BRIDGE_ID_OFFSET));
 
     ND_TCHECK_1(ptr + MST_BPDU_CIST_REMAIN_HOPS_OFFSET);
     ND_PRINT("CIST remaining-hops %u", EXTRACT_U_1(ptr + MST_BPDU_CIST_REMAIN_HOPS_OFFSET));
@@ -330,7 +330,7 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
                    tok2str(rstp_obj_port_role_values, "Unknown",
                            RSTP_EXTRACT_PORT_ROLE(EXTRACT_U_1(ptr + offset))));
             ND_PRINT("\n\t\tMSTI regional-root-id %s, pathcost %u",
-                   stp_print_bridge_id(ptr + offset +
+                   stp_print_bridge_id(ndo, ptr + offset +
                                        MST_BPDU_MSTI_ROOT_PRIO_OFFSET),
                    EXTRACT_BE_U_4(ptr + offset + MST_BPDU_MSTI_ROOT_PATH_COST_OFFSET));
             ND_PRINT("\n\t\tMSTI bridge-prio %u, port-prio %u, hops %u",

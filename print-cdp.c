@@ -87,7 +87,7 @@ static const struct tok cdp_capability_values[] = {
 
 static int cdp_print_addr(netdissect_options *, const u_char *, u_int);
 static int cdp_print_prefixes(netdissect_options *, const u_char *, u_int);
-static unsigned int cdp_get_number(const u_char *, u_int);
+static unsigned int cdp_get_number(netdissect_options *, const u_char *, u_int);
 
 void
 cdp_print(netdissect_options *ndo,
@@ -231,7 +231,7 @@ cdp_print(netdissect_options *ndo,
 			    ND_PRINT("app %u, vlan %u", EXTRACT_U_1(tptr), EXTRACT_BE_U_2(tptr + 1));
 			break;
 		    case 0x10: /* Power - not documented */
-			ND_PRINT("%1.2fW", cdp_get_number(tptr, len) / 1000.0);
+			ND_PRINT("%1.2fW", cdp_get_number(ndo, tptr, len) / 1000.0);
 			break;
 		    case 0x11: /* MTU - not documented */
 			if (len < 4)
@@ -417,7 +417,8 @@ trunc:
 /* read in a <n>-byte number, MSB first
  * (of course this can handle max sizeof(int))
  */
-static unsigned int cdp_get_number(const u_char * p, u_int l)
+static unsigned int
+cdp_get_number(netdissect_options *ndo, const u_char * p, u_int l)
 {
     unsigned int res=0;
     while( l>0 )

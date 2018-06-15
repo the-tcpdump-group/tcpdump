@@ -69,7 +69,7 @@ int_unix_date(uint32_t dos_date)
  * in network byte order
  */
 static time_t
-make_unix_date(const u_char *date_ptr)
+make_unix_date(netdissect_options *ndo, const u_char *date_ptr)
 {
     uint32_t dos_date = 0;
 
@@ -83,7 +83,7 @@ make_unix_date(const u_char *date_ptr)
  * in halfword-swapped network byte order!
  */
 static time_t
-make_unix_date2(const u_char *date_ptr)
+make_unix_date2(netdissect_options *ndo, const u_char *date_ptr)
 {
     uint32_t x, x2;
 
@@ -97,7 +97,7 @@ make_unix_date2(const u_char *date_ptr)
  * It's originally in "100ns units since jan 1st 1601"
  */
 static time_t
-interpret_long_date(const u_char *p)
+interpret_long_date(netdissect_options *ndo, const u_char *p)
 {
     double d;
     time_t ret;
@@ -766,7 +766,7 @@ smb_fdata1(netdissect_options *ndo,
 		if (x == 0 || x == 0xFFFFFFFF)
 		    t = 0;
 		else
-		    t = make_unix_date(buf);
+		    t = make_unix_date(ndo, buf);
 		buf += 4;
 		break;
 	    case 2:
@@ -775,12 +775,12 @@ smb_fdata1(netdissect_options *ndo,
 		if (x == 0 || x == 0xFFFFFFFF)
 		    t = 0;
 		else
-		    t = make_unix_date2(buf);
+		    t = make_unix_date2(ndo, buf);
 		buf += 4;
 		break;
 	    case 3:
 		ND_TCHECK_8(buf);
-		t = interpret_long_date(buf);
+		t = interpret_long_date(ndo, buf);
 		buf += 8;
 		break;
 	    default:

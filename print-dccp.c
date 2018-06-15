@@ -191,7 +191,8 @@ static const char *dccp_feature_nums[] = {
 };
 
 static u_int
-dccp_csum_coverage(const struct dccp_hdr* dh, u_int len)
+dccp_csum_coverage(netdissect_options *ndo,
+		   const struct dccp_hdr* dh, u_int len)
 {
 	u_int cov;
 
@@ -205,14 +206,14 @@ static uint16_t dccp_cksum(netdissect_options *ndo, const struct ip *ip,
 	const struct dccp_hdr *dh, u_int len)
 {
 	return nextproto4_cksum(ndo, ip, (const uint8_t *)(const void *)dh, len,
-				dccp_csum_coverage(dh, len), IPPROTO_DCCP);
+				dccp_csum_coverage(ndo, dh, len), IPPROTO_DCCP);
 }
 
 static uint16_t dccp6_cksum(netdissect_options *ndo, const struct ip6_hdr *ip6,
 	const struct dccp_hdr *dh, u_int len)
 {
 	return nextproto6_cksum(ndo, ip6, (const uint8_t *)(const void *)dh, len,
-				dccp_csum_coverage(dh, len), IPPROTO_DCCP);
+				dccp_csum_coverage(ndo, dh, len), IPPROTO_DCCP);
 }
 
 static const char *dccp_reset_code(uint8_t code)
@@ -222,7 +223,8 @@ static const char *dccp_reset_code(uint8_t code)
 	return dccp_reset_codes[code];
 }
 
-static uint64_t dccp_seqno(const u_char *bp)
+static uint64_t
+dccp_seqno(netdissect_options *ndo, const u_char *bp)
 {
 	const struct dccp_hdr *dh = (const struct dccp_hdr *)bp;
 	uint64_t seqno;
@@ -238,7 +240,7 @@ static uint64_t dccp_seqno(const u_char *bp)
 }
 
 static unsigned int
-dccp_basic_hdr_len(const struct dccp_hdr *dh)
+dccp_basic_hdr_len(netdissect_options *ndo, const struct dccp_hdr *dh)
 {
 	return DCCPH_X(dh) ? sizeof(struct dccp_hdr_ext) : sizeof(struct dccp_hdr);
 }
@@ -246,7 +248,7 @@ dccp_basic_hdr_len(const struct dccp_hdr *dh)
 static void dccp_print_ack_no(netdissect_options *ndo, const u_char *bp)
 {
 	const struct dccp_hdr *dh = (const struct dccp_hdr *)bp;
-	const u_char *ackp = bp + dccp_basic_hdr_len(dh);
+	const u_char *ackp = bp + dccp_basic_hdr_len(ndo, dh);
 	uint64_t ackno;
 
 	if (DCCPH_X(dh) != 0) {
@@ -303,7 +305,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 	}
 
 	/* get the length of the generic header */
-	fixed_hdrlen = dccp_basic_hdr_len(dh);
+	fixed_hdrlen = dccp_basic_hdr_len(ndo, dh);
 	if (len < fixed_hdrlen) {
 		ND_PRINT("truncated-dccp - %u bytes missing!",
 			  fixed_hdrlen - len);
@@ -488,7 +490,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 	if (ndo->ndo_vflag < 2)
 		return;
 
-	ND_PRINT("seq %" PRIu64, dccp_seqno(bp));
+	ND_PRINT("seq %" PRIu64, dccp_seqno(ndo, bp));
 
 	/* process options */
 	if (hlen > fixed_hdrlen){

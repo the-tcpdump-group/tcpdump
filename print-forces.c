@@ -429,7 +429,7 @@ tlv_valid(u_int tlvl, u_int rlen)
 }
 
 static int
-ilv_valid(const struct forces_ilv *ilv, u_int rlen)
+ilv_valid(netdissect_options *ndo, const struct forces_ilv *ilv, u_int rlen)
 {
 	if (rlen < ILV_HDRL)
 		return INVALID_RLEN;
@@ -742,7 +742,7 @@ sdatailv_print(netdissect_options *ndo,
 		char *ib = indent_pr(indent, 1);
 		const u_char *tdp = (const u_char *) ILV_DATA(ilv);
 		ND_TCHECK_SIZE(ilv);
-		invilv = ilv_valid(ilv, rlen);
+		invilv = ilv_valid(ndo, ilv, rlen);
 		if (invilv) {
 			ND_PRINT("%s[", ib + 1);
 			hex_print_with_offset(ndo, ib, tdp, rlen, 0);
@@ -1399,7 +1399,7 @@ print_metatlv(netdissect_options *ndo,
 	ND_PRINT("\n%s METADATA length %u\n", ib, rlen);
 	while (rlen != 0) {
 		ND_TCHECK_SIZE(ilv);
-		invilv = ilv_valid(ilv, rlen);
+		invilv = ilv_valid(ndo, ilv, rlen);
 		if (invilv) {
 			break;
 		}

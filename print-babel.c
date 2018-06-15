@@ -108,7 +108,7 @@ static const struct tok diversity_str[] = {
 };
 
 static const char *
-format_id(const u_char *id)
+format_id(netdissect_options *ndo, const u_char *id)
 {
     static char buf[25];
     nd_snprintf(buf, 25, "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
@@ -467,7 +467,7 @@ babel_print_v2(netdissect_options *ndo,
             else {
                 ND_PRINT("\n\tRouter Id");
                 if(len < 10) goto invalid;
-                ND_PRINT(" %s", format_id(message + 4));
+                ND_PRINT(" %s", format_id(ndo, message + 4));
             }
         }
             break;
@@ -577,7 +577,7 @@ babel_print_v2(netdissect_options *ndo,
                 ND_PRINT("(%u hops) for %s seqno %u id %s",
                        EXTRACT_U_1(message + 6),
                        ae == 0 ? "invalid AE 0" : format_prefix(ndo, prefix, plen),
-                       seqno, format_id(message + 8));
+                       seqno, format_id(ndo, message + 8));
             }
         }
             break;
@@ -713,7 +713,7 @@ babel_print_v2(netdissect_options *ndo,
                           hopc, format_prefix(ndo, prefix, plen));
                 ND_PRINT("%s) seqno %u id %s",
                           format_prefix(ndo, src_prefix, src_plen),
-                          seqno, format_id(router_id));
+                          seqno, format_id(ndo, router_id));
             }
         }
             break;

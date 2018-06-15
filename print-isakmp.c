@@ -766,7 +766,7 @@ cookie_find(const cookie_t *in)
 
 /* record initiator */
 static void
-cookie_record(const cookie_t *in, const u_char *bp2)
+cookie_record(netdissect_options *ndo, const cookie_t *in, const u_char *bp2)
 {
 	int i;
 	const struct ip *ip;
@@ -802,10 +802,10 @@ cookie_record(const cookie_t *in, const u_char *bp2)
 	ninitiator = (ninitiator + 1) % MAXINITIATORS;
 }
 
-#define cookie_isinitiator(x, y)	cookie_sidecheck((x), (y), 1)
-#define cookie_isresponder(x, y)	cookie_sidecheck((x), (y), 0)
+#define cookie_isinitiator(ndo, x, y)	cookie_sidecheck(ndo, (x), (y), 1)
+#define cookie_isresponder(ndo, x, y)	cookie_sidecheck(ndo, (x), (y), 0)
 static int
-cookie_sidecheck(int i, const u_char *bp2, int initiator)
+cookie_sidecheck(netdissect_options *ndo, int i, const u_char *bp2, int initiator)
 {
 	const struct ip *ip;
 	const struct ip6_hdr *ip6;
@@ -2831,13 +2831,13 @@ ikev1_print(netdissect_options *ndo,
 			/* the first packet */
 			ND_PRINT(" I");
 			if (bp2)
-				cookie_record(&base->i_ck, bp2);
+				cookie_record(ndo, &base->i_ck, bp2);
 		} else
 			ND_PRINT(" ?");
 	} else {
-		if (bp2 && cookie_isinitiator(i, bp2))
+		if (bp2 && cookie_isinitiator(ndo, i, bp2))
 			ND_PRINT(" I");
-		else if (bp2 && cookie_isresponder(i, bp2))
+		else if (bp2 && cookie_isresponder(ndo, i, bp2))
 			ND_PRINT(" R");
 		else
 			ND_PRINT(" ?");

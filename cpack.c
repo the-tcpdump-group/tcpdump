@@ -95,7 +95,7 @@ cpack_init(struct cpack_state *cs, const uint8_t *buf, size_t buflen)
 
 /* Unpack a 64-bit unsigned integer. */
 int
-cpack_uint64(struct cpack_state *cs, uint64_t *u)
+cpack_uint64(netdissect_options *ndo, struct cpack_state *cs, uint64_t *u)
 {
 	const uint8_t *next;
 
@@ -111,7 +111,7 @@ cpack_uint64(struct cpack_state *cs, uint64_t *u)
 
 /* Unpack a 64-bit signed integer. */
 int
-cpack_int64(struct cpack_state *cs, int64_t *u)
+cpack_int64(netdissect_options *ndo, struct cpack_state *cs, int64_t *u)
 {
 	const uint8_t *next;
 
@@ -127,7 +127,7 @@ cpack_int64(struct cpack_state *cs, int64_t *u)
 
 /* Unpack a 32-bit unsigned integer. */
 int
-cpack_uint32(struct cpack_state *cs, uint32_t *u)
+cpack_uint32(netdissect_options *ndo, struct cpack_state *cs, uint32_t *u)
 {
 	const uint8_t *next;
 
@@ -143,7 +143,7 @@ cpack_uint32(struct cpack_state *cs, uint32_t *u)
 
 /* Unpack a 32-bit signed integer. */
 int
-cpack_int32(struct cpack_state *cs, int32_t *u)
+cpack_int32(netdissect_options *ndo, struct cpack_state *cs, int32_t *u)
 {
 	const uint8_t *next;
 
@@ -159,7 +159,7 @@ cpack_int32(struct cpack_state *cs, int32_t *u)
 
 /* Unpack a 16-bit unsigned integer. */
 int
-cpack_uint16(struct cpack_state *cs, uint16_t *u)
+cpack_uint16(netdissect_options *ndo, struct cpack_state *cs, uint16_t *u)
 {
 	const uint8_t *next;
 
@@ -175,7 +175,7 @@ cpack_uint16(struct cpack_state *cs, uint16_t *u)
 
 /* Unpack a 16-bit signed integer. */
 int
-cpack_int16(struct cpack_state *cs, int16_t *u)
+cpack_int16(netdissect_options *ndo, struct cpack_state *cs, int16_t *u)
 {
 	const uint8_t *next;
 
@@ -191,7 +191,7 @@ cpack_int16(struct cpack_state *cs, int16_t *u)
 
 /* Unpack an 8-bit unsigned integer. */
 int
-cpack_uint8(struct cpack_state *cs, uint8_t *u)
+cpack_uint8(netdissect_options *ndo, struct cpack_state *cs, uint8_t *u)
 {
 	/* No space left? */
 	if ((size_t)(cs->c_next - cs->c_buf) >= cs->c_len)
@@ -206,7 +206,7 @@ cpack_uint8(struct cpack_state *cs, uint8_t *u)
 
 /* Unpack an 8-bit signed integer. */
 int
-cpack_int8(struct cpack_state *cs, int8_t *u)
+cpack_int8(netdissect_options *ndo, struct cpack_state *cs, int8_t *u)
 {
 	/* No space left? */
 	if ((size_t)(cs->c_next - cs->c_buf) >= cs->c_len)

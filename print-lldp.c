@@ -924,7 +924,7 @@ lldp_private_8023_print(netdissect_options *ndo,
  * Extract 34bits of latitude/longitude coordinates.
  */
 static uint64_t
-lldp_extract_latlon(const u_char *tptr)
+lldp_extract_latlon(netdissect_options *ndo, const u_char *tptr)
 {
     uint64_t latlon;
 
@@ -1037,9 +1037,9 @@ lldp_private_tia_print(netdissect_options *ndo,
                 return hexdump;
             }
             ND_PRINT("\n\t    Latitude resolution %u, latitude value %" PRIu64,
-                   (EXTRACT_U_1(tptr + 5) >> 2), lldp_extract_latlon(tptr + 5));
+                   (EXTRACT_U_1(tptr + 5) >> 2), lldp_extract_latlon(ndo, tptr + 5));
             ND_PRINT("\n\t    Longitude resolution %u, longitude value %" PRIu64,
-                   (EXTRACT_U_1(tptr + 10) >> 2), lldp_extract_latlon(tptr + 10));
+                   (EXTRACT_U_1(tptr + 10) >> 2), lldp_extract_latlon(ndo, tptr + 10));
             ND_PRINT("\n\t    Altitude type %s (%u)",
                    tok2str(lldp_tia_location_altitude_type_values, "unknown",EXTRACT_U_1(tptr + 15) >> 4),
                    (EXTRACT_U_1(tptr + 15) >> 4));

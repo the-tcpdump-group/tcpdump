@@ -1163,7 +1163,8 @@ ip_heuristic_guess(netdissect_options *ndo,
 }
 
 static int
-juniper_read_tlv_value(const u_char *p, u_int tlv_type, u_int tlv_len)
+juniper_read_tlv_value(netdissect_options *ndo,
+		       const u_char *p, u_int tlv_type, u_int tlv_len)
 {
    int tlv_value;
 
@@ -1288,7 +1289,7 @@ juniper_parse_header(netdissect_options *ndo,
                        tlv_type,
                        tlv_len);
 
-            tlv_value = juniper_read_tlv_value(tptr, tlv_type, tlv_len);
+            tlv_value = juniper_read_tlv_value(ndo, tptr, tlv_type, tlv_len);
             switch (tlv_type) {
             case JUNIPER_EXT_TLV_IFD_NAME:
                 /* FIXME */

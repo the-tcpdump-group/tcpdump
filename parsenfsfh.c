@@ -77,11 +77,11 @@
 #define	FHT_HPUX9	11
 #define	FHT_BSD44	12
 
-static int is_UCX(const unsigned char *, u_int);
+static int is_UCX(netdissect_options *, const unsigned char *, u_int);
 
 void
-Parse_fh(const unsigned char *fh, u_int len, my_fsid *fsidp,
-	 uint32_t *inop,
+Parse_fh(netdissect_options *ndo, const unsigned char *fh, u_int len,
+	 my_fsid *fsidp, uint32_t *inop,
 	 const char **osnamep, /* if non-NULL, return OS name here */
 	 const char **fsnamep, /* if non-NULL, return server fs name here (for VMS) */
 	 int ourself)	/* true if file handle was generated on this host */
@@ -220,7 +220,7 @@ Parse_fh(const unsigned char *fh, u_int len, my_fsid *fsidp,
 			    }
 		        }
 			else {
-			    if (is_UCX(fhp, len)) {
+			    if (is_UCX(ndo, fhp, len)) {
 				fhtype = FHT_VMSUCX;
 			    }
 			    else {
@@ -429,7 +429,7 @@ Parse_fh(const unsigned char *fh, u_int len, my_fsid *fsidp,
  *	(3) followed by string of nulls
  */
 static int
-is_UCX(const unsigned char *fhp, u_int len)
+is_UCX(netdissect_options *ndo, const unsigned char *fhp, u_int len)
 {
 	u_int i;
 	int seen_null = 0;

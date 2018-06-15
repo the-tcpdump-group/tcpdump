@@ -46,8 +46,7 @@
 
 static void nfs_printfh(netdissect_options *, const uint32_t *, const u_int);
 static int xid_map_enter(netdissect_options *, const struct sunrpc_msg *, const u_char *);
-static int xid_map_find(const struct sunrpc_msg *, const u_char *,
-			    uint32_t *, uint32_t *);
+static int xid_map_find(netdissect_options *, const struct sunrpc_msg *, const u_char *, uint32_t *, uint32_t *);
 static void interp_reply(netdissect_options *, const struct sunrpc_msg *, uint32_t, uint32_t, int);
 static const uint32_t *parse_post_op_attr(netdissect_options *, const uint32_t *, int);
 
@@ -395,7 +394,7 @@ nfsreply_noaddr_print(netdissect_options *ndo,
 
 	case SUNRPC_MSG_ACCEPTED:
 		ND_PRINT("reply ok %u", length);
-		if (xid_map_find(rp, bp2, &proc, &vers) >= 0)
+		if (xid_map_find(ndo, rp, bp2, &proc, &vers) >= 0)
 			interp_reply(ndo, rp, proc, vers, length);
 		break;
 
@@ -916,7 +915,7 @@ nfs_printfh(netdissect_options *ndo,
 		return;
 	}
 
-	Parse_fh((const u_char *)dp, len, &fsid, &ino, NULL, &sfsname, 0);
+	Parse_fh(ndo, (const u_char *)dp, len, &fsid, &ino, NULL, &sfsname, 0);
 
 	if (sfsname) {
 		/* file system ID is ASCII, not numeric, for this server OS */
@@ -1026,8 +1025,8 @@ xid_map_enter(netdissect_options *ndo,
  * version in vers return, or returns -1 on failure
  */
 static int
-xid_map_find(const struct sunrpc_msg *rp, const u_char *bp, uint32_t *proc,
-	     uint32_t *vers)
+xid_map_find(netdissect_options *ndo, const struct sunrpc_msg *rp,
+	     const u_char *bp, uint32_t *proc, uint32_t *vers)
 {
 	int i;
 	struct xid_map_entry *xmep;
