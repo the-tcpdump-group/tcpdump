@@ -421,7 +421,7 @@ EXTRACT_IPV4_TO_NETWORK_ORDER(const void *p)
 
 #define EXTRACT_BE_S_6(p) \
 	(((*((const uint8_t *)(p) + 0)) & 0x80) ? \
-	  ((uint64_t)(((uint64_t)(*((const uint8_t *)(p) + 0)) << 40) | \
+	   ((int64_t)(((uint64_t)(*((const uint8_t *)(p) + 0)) << 40) | \
 	              ((uint64_t)(*((const uint8_t *)(p) + 1)) << 32) | \
 	              ((uint64_t)(*((const uint8_t *)(p) + 2)) << 24) | \
 	              ((uint64_t)(*((const uint8_t *)(p) + 3)) << 16) | \
