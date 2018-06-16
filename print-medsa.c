@@ -53,23 +53,23 @@ struct	medsa_pkthdr {
 };
 
 /* Bytes 0 and 1 are reserved and should contain 0 */
-#define TAG(medsa)	(EXTRACT_U_1(medsa->tag_flags_dev) >> 6)
+#define TAG(medsa)	(GET_U_1(medsa->tag_flags_dev) >> 6)
 #define TAG_TO_CPU	0
 #define TAG_FROM_CPU	1
 #define TAG_FORWARD	3
-#define SRC_TAG(medsa)	((EXTRACT_U_1(medsa->tag_flags_dev) >> 5) & 0x01)
-#define SRC_DEV(medsa)	(EXTRACT_U_1(medsa->tag_flags_dev) & 0x1f)
-#define SRC_PORT(medsa)	((EXTRACT_U_1(medsa->port_trunc_codehi_cfi) >> 3) & 0x01f)
-#define TRUNK(medsa)	((EXTRACT_U_1(medsa->port_trunc_codehi_cfi) >> 2) & 0x01)
-#define CODE(medsa)	((EXTRACT_U_1(medsa->port_trunc_codehi_cfi) & 0x06) |	\
-			 ((EXTRACT_U_1(medsa->pri_vidhi_codelo) >> 4) & 0x01))
+#define SRC_TAG(medsa)	((GET_U_1(medsa->tag_flags_dev) >> 5) & 0x01)
+#define SRC_DEV(medsa)	(GET_U_1(medsa->tag_flags_dev) & 0x1f)
+#define SRC_PORT(medsa)	((GET_U_1(medsa->port_trunc_codehi_cfi) >> 3) & 0x01f)
+#define TRUNK(medsa)	((GET_U_1(medsa->port_trunc_codehi_cfi) >> 2) & 0x01)
+#define CODE(medsa)	((GET_U_1(medsa->port_trunc_codehi_cfi) & 0x06) |	\
+			 ((GET_U_1(medsa->pri_vidhi_codelo) >> 4) & 0x01))
 #define CODE_BDPU	0
 #define CODE_IGMP_MLD	2
 #define CODE_ARP_MIRROR	4
-#define CFI(medsa)	(EXTRACT_U_1(medsa->port_trunc_codehi_cfi) & 0x01)
-#define PRI(medsa)	(EXTRACT_U_1(medsa->pri_vidhi_codelo) >> 5)
-#define VID(medsa)	((u_short)(EXTRACT_U_1(medsa->pri_vidhi_codelo) & 0xf) << 8 |	\
-			  EXTRACT_U_1(medsa->vidlo))
+#define CFI(medsa)	(GET_U_1(medsa->port_trunc_codehi_cfi) & 0x01)
+#define PRI(medsa)	(GET_U_1(medsa->pri_vidhi_codelo) >> 5)
+#define VID(medsa)	((u_short)(GET_U_1(medsa->pri_vidhi_codelo) & 0xf) << 8 |	\
+			  GET_U_1(medsa->vidlo))
 
 static const struct tok tag_values[] = {
 	{ TAG_TO_CPU, "To_CPU" },
@@ -160,7 +160,7 @@ medsa_print(netdissect_options *ndo,
 	length -= 8;
 	caplen -= 8;
 
-	ether_type = EXTRACT_BE_U_2(medsa->ether_type);
+	ether_type = GET_BE_U_2(medsa->ether_type);
 	if (ether_type <= MAX_ETHERNET_LENGTH_VAL) {
 		/* Try to print the LLC-layer header & higher layers */
 		if (llc_print(ndo, bp, length, caplen, src, dst) < 0) {

@@ -429,13 +429,13 @@ handle_ctrl_proto(netdissect_options *ndo,
 		goto trunc;
 	ND_TCHECK_2(tptr);
 
-	code = EXTRACT_U_1(tptr);
+	code = GET_U_1(tptr);
 	tptr++;
 
 	ND_PRINT("%s (0x%02x), id %u, length %u",
 	          tok2str(cpcodes, "Unknown Opcode",code),
 	          code,
-	          EXTRACT_U_1(tptr), /* ID */
+	          GET_U_1(tptr), /* ID */
 	          length + 2);
 	tptr++;
 
@@ -443,7 +443,7 @@ handle_ctrl_proto(netdissect_options *ndo,
 		return;
 
 	ND_TCHECK_2(tptr);
-	len = EXTRACT_BE_U_2(tptr);
+	len = GET_BE_U_2(tptr);
 	tptr += 2;
 
 	if (len < 4) {
@@ -471,12 +471,12 @@ handle_ctrl_proto(netdissect_options *ndo,
 		if (length < 11)
 			break;
 		ND_TCHECK_4(tptr);
-		ND_PRINT("\n\t  Magic-Num 0x%08x", EXTRACT_BE_U_4(tptr));
+		ND_PRINT("\n\t  Magic-Num 0x%08x", GET_BE_U_4(tptr));
 		tptr += 4;
 		ND_TCHECK_3(tptr);
 		ND_PRINT(" Vendor: %s (%u)",
-                       tok2str(oui_values,"Unknown",EXTRACT_BE_U_3(tptr)),
-                       EXTRACT_BE_U_3(tptr));
+                       tok2str(oui_values,"Unknown",GET_BE_U_3(tptr)),
+                       GET_BE_U_3(tptr));
 		/* XXX: need to decode Kind and Value(s)? */
 		break;
 	case CPCODES_CONF_REQ:
@@ -538,8 +538,8 @@ handle_ctrl_proto(netdissect_options *ndo,
 			break;
 		ND_TCHECK_2(tptr);
 		ND_PRINT("\n\t  Rejected %s Protocol (0x%04x)",
-		       tok2str(ppptype2str,"unknown", EXTRACT_BE_U_2(tptr)),
-		       EXTRACT_BE_U_2(tptr));
+		       tok2str(ppptype2str,"unknown", GET_BE_U_2(tptr)),
+		       GET_BE_U_2(tptr));
 		/* XXX: need to decode Rejected-Information? - hexdump for now */
 		if (len > 6) {
 			ND_PRINT("\n\t  Rejected Packet");
@@ -552,7 +552,7 @@ handle_ctrl_proto(netdissect_options *ndo,
 		if (length < 8)
 			break;
 		ND_TCHECK_4(tptr);
-		ND_PRINT("\n\t  Magic-Num 0x%08x", EXTRACT_BE_U_4(tptr));
+		ND_PRINT("\n\t  Magic-Num 0x%08x", GET_BE_U_4(tptr));
 		/* XXX: need to decode Data? - hexdump for now */
 		if (len > 8) {
 			ND_PRINT("\n\t  -----trailing data-----");
@@ -564,7 +564,7 @@ handle_ctrl_proto(netdissect_options *ndo,
 		if (length < 8)
 			break;
 		ND_TCHECK_4(tptr);
-		ND_PRINT("\n\t  Magic-Num 0x%08x", EXTRACT_BE_U_4(tptr));
+		ND_PRINT("\n\t  Magic-Num 0x%08x", GET_BE_U_4(tptr));
 		/* RFC 1661 says this is intended to be human readable */
 		if (len > 8) {
 			ND_PRINT("\n\t  Message\n\t    ");
@@ -576,9 +576,9 @@ handle_ctrl_proto(netdissect_options *ndo,
 		if (length < 12)
 			break;
 		ND_TCHECK_4(tptr);
-		ND_PRINT("\n\t  Magic-Num 0x%08x", EXTRACT_BE_U_4(tptr));
+		ND_PRINT("\n\t  Magic-Num 0x%08x", GET_BE_U_4(tptr));
 		ND_TCHECK_4(tptr + 4);
-		ND_PRINT(", Seconds-Remaining %us", EXTRACT_BE_U_4(tptr + 4));
+		ND_PRINT(", Seconds-Remaining %us", GET_BE_U_4(tptr + 4));
 		/* XXX: need to decode Message? */
 		break;
 	default:
@@ -605,8 +605,8 @@ print_lcp_config_options(netdissect_options *ndo,
 	if (length < 2)
 		return 0;
 	ND_TCHECK_2(p);
-	opt = EXTRACT_U_1(p);
-	len = EXTRACT_U_1(p + 1);
+	opt = GET_U_1(p);
+	len = GET_U_1(p + 1);
 	if (length < len)
 		return 0;
 	if (len < 2) {
@@ -632,15 +632,15 @@ print_lcp_config_options(netdissect_options *ndo,
 		}
 		ND_TCHECK_3(p + 2);
 		ND_PRINT(": Vendor: %s (%u)",
-			tok2str(oui_values,"Unknown",EXTRACT_BE_U_3(p + 2)),
-			EXTRACT_BE_U_3(p + 2));
+			tok2str(oui_values,"Unknown",GET_BE_U_3(p + 2)),
+			GET_BE_U_3(p + 2));
 #if 0
 		ND_TCHECK_1(p + 5);
-		ND_PRINT(", kind: 0x%02x", EXTRACT_U_1(p + 5));
+		ND_PRINT(", kind: 0x%02x", GET_U_1(p + 5));
 		ND_PRINT(", Value: 0x");
 		for (i = 0; i < len - 6; i++) {
 			ND_TCHECK_1(p + 6 + i);
-			ND_PRINT("%02x", EXTRACT_U_1(p + 6 + i));
+			ND_PRINT("%02x", GET_U_1(p + 6 + i));
 		}
 #endif
 		break;
@@ -650,7 +650,7 @@ print_lcp_config_options(netdissect_options *ndo,
 			return len;
 		}
 		ND_TCHECK_2(p + 2);
-		ND_PRINT(": %u", EXTRACT_BE_U_2(p + 2));
+		ND_PRINT(": %u", GET_BE_U_2(p + 2));
 		break;
 	case LCPOPT_ACCM:
 		if (len != 6) {
@@ -658,7 +658,7 @@ print_lcp_config_options(netdissect_options *ndo,
 			return len;
 		}
 		ND_TCHECK_4(p + 2);
-		ND_PRINT(": 0x%08x", EXTRACT_BE_U_4(p + 2));
+		ND_PRINT(": 0x%08x", GET_BE_U_4(p + 2));
 		break;
 	case LCPOPT_AP:
 		if (len < 4) {
@@ -666,12 +666,14 @@ print_lcp_config_options(netdissect_options *ndo,
 			return len;
 		}
 		ND_TCHECK_2(p + 2);
-		ND_PRINT(": %s", tok2str(ppptype2str, "Unknown Auth Proto (0x04x)", EXTRACT_BE_U_2(p + 2)));
+		ND_PRINT(": %s",
+			 tok2str(ppptype2str, "Unknown Auth Proto (0x04x)", GET_BE_U_2(p + 2)));
 
-		switch (EXTRACT_BE_U_2(p + 2)) {
+		switch (GET_BE_U_2(p + 2)) {
 		case PPP_CHAP:
 			ND_TCHECK_1(p + 4);
-			ND_PRINT(", %s", tok2str(authalg_values, "Unknown Auth Alg %u", EXTRACT_U_1(p + 4)));
+			ND_PRINT(", %s",
+				 tok2str(authalg_values, "Unknown Auth Alg %u", GET_U_1(p + 4)));
 			break;
 		case PPP_PAP: /* fall through */
 		case PPP_EAP:
@@ -688,7 +690,7 @@ print_lcp_config_options(netdissect_options *ndo,
 			return 0;
 		}
 		ND_TCHECK_2(p + 2);
-		if (EXTRACT_BE_U_2(p + 2) == PPP_LQM)
+		if (GET_BE_U_2(p + 2) == PPP_LQM)
 			ND_PRINT(": LQR");
 		else
 			ND_PRINT(": unknown");
@@ -699,7 +701,7 @@ print_lcp_config_options(netdissect_options *ndo,
 			return 0;
 		}
 		ND_TCHECK_4(p + 2);
-		ND_PRINT(": 0x%08x", EXTRACT_BE_U_4(p + 2));
+		ND_PRINT(": 0x%08x", GET_BE_U_4(p + 2));
 		break;
 	case LCPOPT_PFC:
 		break;
@@ -711,7 +713,7 @@ print_lcp_config_options(netdissect_options *ndo,
 			return 0;
 		}
 		ND_TCHECK_2(p + 2);
-		ND_PRINT(": 0x%04x", EXTRACT_BE_U_2(p + 2));
+		ND_PRINT(": 0x%04x", GET_BE_U_2(p + 2));
 		break;
 	case LCPOPT_CBACK:
 		if (len < 3) {
@@ -721,8 +723,8 @@ print_lcp_config_options(netdissect_options *ndo,
 		ND_PRINT(": ");
 		ND_TCHECK_1(p + 2);
 		ND_PRINT(": Callback Operation %s (%u)",
-                       tok2str(ppp_callback_values, "Unknown", EXTRACT_U_1(p + 2)),
-                       EXTRACT_U_1(p + 2));
+                       tok2str(ppp_callback_values, "Unknown", GET_U_1(p + 2)),
+                       GET_U_1(p + 2));
 		break;
 	case LCPOPT_MLMRRU:
 		if (len != 4) {
@@ -730,7 +732,7 @@ print_lcp_config_options(netdissect_options *ndo,
 			return 0;
 		}
 		ND_TCHECK_2(p + 2);
-		ND_PRINT(": %u", EXTRACT_BE_U_2(p + 2));
+		ND_PRINT(": %u", GET_BE_U_2(p + 2));
 		break;
 	case LCPOPT_MLED:
 		if (len < 3) {
@@ -738,7 +740,7 @@ print_lcp_config_options(netdissect_options *ndo,
 			return 0;
 		}
 		ND_TCHECK_1(p + 2);
-		switch (EXTRACT_U_1(p + 2)) {		/* class */
+		switch (GET_U_1(p + 2)) {		/* class */
 		case MEDCLASS_NULL:
 			ND_PRINT(": Null");
 			break;
@@ -768,7 +770,7 @@ print_lcp_config_options(netdissect_options *ndo,
 			ND_PRINT(": PSNDN"); /* XXX */
 			break;
 		default:
-			ND_PRINT(": Unknown class %u", EXTRACT_U_1(p + 2));
+			ND_PRINT(": Unknown class %u", GET_U_1(p + 2));
 			break;
 		}
 		break;
@@ -840,8 +842,9 @@ handle_mlppp(netdissect_options *ndo,
     }
 
     ND_PRINT("seq 0x%03x, Flags [%s], length %u",
-           (EXTRACT_BE_U_2(p))&0x0fff, /* only support 12-Bit sequence space for now */
-           bittok2str(ppp_ml_flag_values, "none", EXTRACT_U_1(p) & 0xc0),
+           (GET_BE_U_2(p))&0x0fff,
+           /* only support 12-Bit sequence space for now */
+           bittok2str(ppp_ml_flag_values, "none", GET_U_1(p) & 0xc0),
            length);
 }
 
@@ -861,23 +864,23 @@ handle_chap(netdissect_options *ndo,
 		return;
 	} else if (length < 4) {
 		ND_TCHECK_1(p);
-		ND_PRINT("[|chap 0x%02x]", EXTRACT_U_1(p));
+		ND_PRINT("[|chap 0x%02x]", GET_U_1(p));
 		return;
 	}
 
 	ND_TCHECK_1(p);
-	code = EXTRACT_U_1(p);
+	code = GET_U_1(p);
 	ND_PRINT("CHAP, %s (0x%02x)",
                tok2str(chapcode_values,"unknown",code),
                code);
 	p++;
 
 	ND_TCHECK_1(p);
-	ND_PRINT(", id %u", EXTRACT_U_1(p));	/* ID */
+	ND_PRINT(", id %u", GET_U_1(p));	/* ID */
 	p++;
 
 	ND_TCHECK_2(p);
-	len = EXTRACT_BE_U_2(p);
+	len = GET_BE_U_2(p);
 	p += 2;
 
 	/*
@@ -893,21 +896,21 @@ handle_chap(netdissect_options *ndo,
 		if (length - (p - p0) < 1)
 			return;
 		ND_TCHECK_1(p);
-		val_size = EXTRACT_U_1(p);	/* value size */
+		val_size = GET_U_1(p);	/* value size */
 		p++;
 		if (length - (p - p0) < val_size)
 			return;
 		ND_PRINT(", Value ");
 		for (i = 0; i < val_size; i++) {
 			ND_TCHECK_1(p);
-			ND_PRINT("%02x", EXTRACT_U_1(p));
+			ND_PRINT("%02x", GET_U_1(p));
 			p++;
 		}
 		name_size = len - (p - p0);
 		ND_PRINT(", Name ");
 		for (i = 0; i < name_size; i++) {
 			ND_TCHECK_1(p);
-			fn_print_char(ndo, EXTRACT_U_1(p));
+			fn_print_char(ndo, GET_U_1(p));
 			p++;
 		}
 		break;
@@ -917,7 +920,7 @@ handle_chap(netdissect_options *ndo,
 		ND_PRINT(", Msg ");
 		for (i = 0; i< msg_size; i++) {
 			ND_TCHECK_1(p);
-			fn_print_char(ndo, EXTRACT_U_1(p));
+			fn_print_char(ndo, GET_U_1(p));
 			p++;
 		}
 		break;
@@ -944,23 +947,23 @@ handle_pap(netdissect_options *ndo,
 		return;
 	} else if (length < 4) {
 		ND_TCHECK_1(p);
-		ND_PRINT("[|pap 0x%02x]", EXTRACT_U_1(p));
+		ND_PRINT("[|pap 0x%02x]", GET_U_1(p));
 		return;
 	}
 
 	ND_TCHECK_1(p);
-	code = EXTRACT_U_1(p);
+	code = GET_U_1(p);
 	ND_PRINT("PAP, %s (0x%02x)",
 	          tok2str(papcode_values, "unknown", code),
 	          code);
 	p++;
 
 	ND_TCHECK_1(p);
-	ND_PRINT(", id %u", EXTRACT_U_1(p));	/* ID */
+	ND_PRINT(", id %u", GET_U_1(p));	/* ID */
 	p++;
 
 	ND_TCHECK_2(p);
-	len = EXTRACT_BE_U_2(p);
+	len = GET_BE_U_2(p);
 	p += 2;
 
 	if (len > length) {
@@ -981,28 +984,28 @@ handle_pap(netdissect_options *ndo,
 		if (length - (p - p0) < 1)
 			return;
 		ND_TCHECK_1(p);
-		peerid_len = EXTRACT_U_1(p);	/* Peer-ID Length */
+		peerid_len = GET_U_1(p);	/* Peer-ID Length */
 		p++;
 		if (length - (p - p0) < peerid_len)
 			return;
 		ND_PRINT(", Peer ");
 		for (i = 0; i < peerid_len; i++) {
 			ND_TCHECK_1(p);
-			fn_print_char(ndo, EXTRACT_U_1(p));
+			fn_print_char(ndo, GET_U_1(p));
 			p++;
 		}
 
 		if (length - (p - p0) < 1)
 			return;
 		ND_TCHECK_1(p);
-		passwd_len = EXTRACT_U_1(p);	/* Password Length */
+		passwd_len = GET_U_1(p);	/* Password Length */
 		p++;
 		if (length - (p - p0) < passwd_len)
 			return;
 		ND_PRINT(", Name ");
 		for (i = 0; i < passwd_len; i++) {
 			ND_TCHECK_1(p);
-			fn_print_char(ndo, EXTRACT_U_1(p));
+			fn_print_char(ndo, GET_U_1(p));
 			p++;
 		}
 		break;
@@ -1018,14 +1021,14 @@ handle_pap(netdissect_options *ndo,
 		if (length - (p - p0) < 1)
 			return;
 		ND_TCHECK_1(p);
-		msg_len = EXTRACT_U_1(p);	/* Msg-Length */
+		msg_len = GET_U_1(p);	/* Msg-Length */
 		p++;
 		if (length - (p - p0) < msg_len)
 			return;
 		ND_PRINT(", Msg ");
 		for (i = 0; i< msg_len; i++) {
 			ND_TCHECK_1(p);
-			fn_print_char(ndo, EXTRACT_U_1(p));
+			fn_print_char(ndo, GET_U_1(p));
 			p++;
 		}
 		break;
@@ -1056,8 +1059,8 @@ print_ipcp_config_options(netdissect_options *ndo,
 	if (length < 2)
 		return 0;
 	ND_TCHECK_2(p);
-	opt = EXTRACT_U_1(p);
-	len = EXTRACT_U_1(p + 1);
+	opt = GET_U_1(p);
+	len = GET_U_1(p + 1);
 	if (length < len)
 		return 0;
 	if (len < 2) {
@@ -1090,7 +1093,7 @@ print_ipcp_config_options(netdissect_options *ndo,
 			return 0;
 		}
 		ND_TCHECK_2(p + 2);
-		compproto = EXTRACT_BE_U_2(p + 2);
+		compproto = GET_BE_U_2(p + 2);
 
 		ND_PRINT(": %s (0x%02x):",
 		          tok2str(ipcpopt_compproto_values, "Unknown", compproto),
@@ -1110,11 +1113,11 @@ print_ipcp_config_options(netdissect_options *ndo,
                         ND_TCHECK_LEN(p + 2, IPCPOPT_IPCOMP_MINLEN);
                         ND_PRINT("\n\t    TCP Space %u, non-TCP Space %u"
                                ", maxPeriod %u, maxTime %u, maxHdr %u",
-                               EXTRACT_BE_U_2(p + 4),
-                               EXTRACT_BE_U_2(p + 6),
-                               EXTRACT_BE_U_2(p + 8),
-                               EXTRACT_BE_U_2(p + 10),
-                               EXTRACT_BE_U_2(p + 12));
+                               GET_BE_U_2(p + 4),
+                               GET_BE_U_2(p + 6),
+                               GET_BE_U_2(p + 8),
+                               GET_BE_U_2(p + 10),
+                               GET_BE_U_2(p + 12));
 
                         /* suboptions present ? */
                         if (len > IPCPOPT_IPCOMP_MINLEN) {
@@ -1125,8 +1128,8 @@ print_ipcp_config_options(netdissect_options *ndo,
 
                                 while (ipcomp_subopttotallen >= 2) {
                                         ND_TCHECK_2(p);
-                                        ipcomp_subopt = EXTRACT_U_1(p);
-                                        ipcomp_suboptlen = EXTRACT_U_1(p + 1);
+                                        ipcomp_subopt = GET_U_1(p);
+                                        ipcomp_suboptlen = GET_U_1(p + 1);
 
                                         /* sanity check */
                                         if (ipcomp_subopt == 0 ||
@@ -1197,8 +1200,8 @@ print_ip6cp_config_options(netdissect_options *ndo,
 	if (length < 2)
 		return 0;
 	ND_TCHECK_2(p);
-	opt = EXTRACT_U_1(p);
-	len = EXTRACT_U_1(p + 1);
+	opt = GET_U_1(p);
+	len = GET_U_1(p + 1);
 	if (length < len)
 		return 0;
 	if (len < 2) {
@@ -1222,10 +1225,10 @@ print_ip6cp_config_options(netdissect_options *ndo,
 		}
 		ND_TCHECK_8(p + 2);
 		ND_PRINT(": %04x:%04x:%04x:%04x",
-		       EXTRACT_BE_U_2(p + 2),
-		       EXTRACT_BE_U_2(p + 4),
-		       EXTRACT_BE_U_2(p + 6),
-		       EXTRACT_BE_U_2(p + 8));
+		       GET_BE_U_2(p + 2),
+		       GET_BE_U_2(p + 4),
+		       GET_BE_U_2(p + 6),
+		       GET_BE_U_2(p + 8));
 		break;
 	default:
 		/*
@@ -1257,8 +1260,8 @@ print_ccp_config_options(netdissect_options *ndo,
 	if (length < 2)
 		return 0;
 	ND_TCHECK_2(p);
-	opt = EXTRACT_U_1(p);
-	len = EXTRACT_U_1(p + 1);
+	opt = GET_U_1(p);
+	len = GET_U_1(p + 1);
 	if (length < len)
 		return 0;
 	if (len < 2) {
@@ -1282,8 +1285,8 @@ print_ccp_config_options(netdissect_options *ndo,
 		}
 		ND_TCHECK_1(p + 2);
 		ND_PRINT(": Version: %u, Dictionary Bits: %u",
-			EXTRACT_U_1(p + 2) >> 5,
-			EXTRACT_U_1(p + 2) & 0x1f);
+			GET_U_1(p + 2) >> 5,
+			GET_U_1(p + 2) & 0x1f);
 		break;
 	case CCPOPT_MVRCA:
 		if (len < 4) {
@@ -1292,10 +1295,10 @@ print_ccp_config_options(netdissect_options *ndo,
 		}
 		ND_TCHECK_1(p + 3);
 		ND_PRINT(": Features: %u, PxP: %s, History: %u, #CTX-ID: %u",
-				(EXTRACT_U_1(p + 2) & 0xc0) >> 6,
-				(EXTRACT_U_1(p + 2) & 0x20) ? "Enabled" : "Disabled",
-				EXTRACT_U_1(p + 2) & 0x1f,
-				EXTRACT_U_1(p + 3));
+				(GET_U_1(p + 2) & 0xc0) >> 6,
+				(GET_U_1(p + 2) & 0x20) ? "Enabled" : "Disabled",
+				GET_U_1(p + 2) & 0x1f,
+				GET_U_1(p + 3));
 		break;
 	case CCPOPT_DEFLATE:
 		if (len < 4) {
@@ -1304,11 +1307,11 @@ print_ccp_config_options(netdissect_options *ndo,
 		}
 		ND_TCHECK_1(p + 3);
 		ND_PRINT(": Window: %uK, Method: %s (0x%x), MBZ: %u, CHK: %u",
-			(EXTRACT_U_1(p + 2) & 0xf0) >> 4,
-			((EXTRACT_U_1(p + 2) & 0x0f) == 8) ? "zlib" : "unknown",
-			EXTRACT_U_1(p + 2) & 0x0f,
-			(EXTRACT_U_1(p + 3) & 0xfc) >> 2,
-			EXTRACT_U_1(p + 3) & 0x03);
+			(GET_U_1(p + 2) & 0xf0) >> 4,
+			((GET_U_1(p + 2) & 0x0f) == 8) ? "zlib" : "unknown",
+			GET_U_1(p + 2) & 0x0f,
+			(GET_U_1(p + 3) & 0xfc) >> 2,
+			GET_U_1(p + 3) & 0x03);
 		break;
 
 /* XXX: to be supported */
@@ -1356,8 +1359,8 @@ print_bacp_config_options(netdissect_options *ndo,
 	if (length < 2)
 		return 0;
 	ND_TCHECK_2(p);
-	opt = EXTRACT_U_1(p);
-	len = EXTRACT_U_1(p + 1);
+	opt = GET_U_1(p);
+	len = GET_U_1(p + 1);
 	if (length < len)
 		return 0;
 	if (len < 2) {
@@ -1380,7 +1383,7 @@ print_bacp_config_options(netdissect_options *ndo,
 			return len;
 		}
 		ND_TCHECK_4(p + 2);
-		ND_PRINT(": Magic-Num 0x%08x", EXTRACT_BE_U_4(p + 2));
+		ND_PRINT(": Magic-Num 0x%08x", GET_BE_U_4(p + 2));
 		break;
 	default:
 		/*
@@ -1423,13 +1426,13 @@ ppp_hdlc(netdissect_options *ndo,
 	 * contents.
 	 */
 	for (s = p, t = b, i = length; i != 0 && ND_TTEST_1(s); i--) {
-		c = EXTRACT_U_1(s);
+		c = GET_U_1(s);
 		s++;
 		if (c == 0x7d) {
 			if (i <= 1 || !ND_TTEST_1(s))
 				break;
 			i--;
-			c = EXTRACT_U_1(s) ^ 0x20;
+			c = GET_U_1(s) ^ 0x20;
 			s++;
 		}
 		*t++ = c;
@@ -1445,7 +1448,7 @@ ppp_hdlc(netdissect_options *ndo,
         /* now lets guess about the payload codepoint format */
         if (length < 1)
                 goto trunc;
-        proto = EXTRACT_U_1(b); /* start with a one-octet codepoint guess */
+        proto = GET_U_1(b); /* start with a one-octet codepoint guess */
 
         switch (proto) {
         case PPP_IP:
@@ -1460,13 +1463,13 @@ ppp_hdlc(netdissect_options *ndo,
 
         if (length < 2)
                 goto trunc;
-        proto = EXTRACT_BE_U_2(b); /* next guess - load two octets */
+        proto = GET_BE_U_2(b); /* next guess - load two octets */
 
         switch (proto) {
         case (PPP_ADDRESS << 8 | PPP_CONTROL): /* looks like a PPP frame */
             if (length < 4)
                 goto trunc;
-            proto = EXTRACT_BE_U_2(b + 2); /* load the PPP proto-id */
+            proto = GET_BE_U_2(b + 2); /* load the PPP proto-id */
             handle_ppp(ndo, proto, b + 4, length - 4);
             break;
         default: /* last guess - proto must be a PPP proto-id */
@@ -1563,7 +1566,7 @@ ppp_print(netdissect_options *ndo,
 	if (length < 2)
 		goto trunc;
 	ND_TCHECK_2(p);
-        ppp_header = EXTRACT_BE_U_2(p);
+        ppp_header = GET_BE_U_2(p);
 
         switch(ppp_header) {
         case (PPP_WITHDIRECTION_IN  << 8 | PPP_CONTROL):
@@ -1591,14 +1594,14 @@ ppp_print(netdissect_options *ndo,
 	if (length < 2)
 		goto trunc;
 	ND_TCHECK_1(p);
-	if (EXTRACT_U_1(p) % 2) {
-		proto = EXTRACT_U_1(p);	/* PFC is used */
+	if (GET_U_1(p) % 2) {
+		proto = GET_U_1(p);	/* PFC is used */
 		p++;
 		length--;
 		hdr_len++;
 	} else {
 		ND_TCHECK_2(p);
-		proto = EXTRACT_BE_U_2(p);
+		proto = GET_BE_U_2(p);
 		p += 2;
 		length -= 2;
 		hdr_len += 2;
@@ -1670,8 +1673,8 @@ ppp_if_print(netdissect_options *ndo,
 	 * BSD/OS, is?)
 	 */
 	if (ndo->ndo_eflag)
-		ND_PRINT("%c %4d %02x ", EXTRACT_U_1(p) ? 'O' : 'I',
-		    length, EXTRACT_U_1(p + 1));
+		ND_PRINT("%c %4d %02x ", GET_U_1(p) ? 'O' : 'I',
+			 length, GET_U_1(p + 1));
 #endif
 
 	ppp_print(ndo, p, length);
@@ -1703,7 +1706,7 @@ ppp_hdlc_if_print(netdissect_options *ndo,
 		return (caplen);
 	}
 
-	switch (EXTRACT_U_1(p)) {
+	switch (GET_U_1(p)) {
 
 	case PPP_ADDRESS:
 		if (caplen < 4) {
@@ -1712,13 +1715,13 @@ ppp_hdlc_if_print(netdissect_options *ndo,
 		}
 
 		if (ndo->ndo_eflag)
-			ND_PRINT("%02x %02x %u ", EXTRACT_U_1(p),
-			    EXTRACT_U_1(p + 1), length);
+			ND_PRINT("%02x %02x %u ", GET_U_1(p),
+				 GET_U_1(p + 1), length);
 		p += 2;
 		length -= 2;
 		hdrlen += 2;
 
-		proto = EXTRACT_BE_U_2(p);
+		proto = GET_BE_U_2(p);
 		p += 2;
 		length -= 2;
 		hdrlen += 2;
@@ -1738,8 +1741,8 @@ ppp_hdlc_if_print(netdissect_options *ndo,
 		}
 
 		if (ndo->ndo_eflag)
-			ND_PRINT("%02x %02x %u ", EXTRACT_U_1(p),
-			    EXTRACT_U_1(p + 1), length);
+			ND_PRINT("%02x %02x %u ", GET_U_1(p),
+				 GET_U_1(p + 1), length);
 		p += 2;
 		hdrlen += 2;
 
@@ -1748,8 +1751,8 @@ ppp_hdlc_if_print(netdissect_options *ndo,
 		 * the next two octets as an Ethernet type; does that
 		 * ever happen?
 		 */
-		ND_PRINT("unknown addr %02x; ctrl %02x", EXTRACT_U_1(p),
-		    EXTRACT_U_1(p + 1));
+		ND_PRINT("unknown addr %02x; ctrl %02x", GET_U_1(p),
+			 GET_U_1(p + 1));
 		break;
 	}
 
@@ -1781,11 +1784,11 @@ ppp_bsdos_if_print(netdissect_options *ndo _U_,
 	hdrlength = 0;
 
 #if 0
-	if (EXTRACT_U_1(p) == PPP_ADDRESS &&
-	    EXTRACT_U_1(p + 1) == PPP_CONTROL) {
+	if (GET_U_1(p) == PPP_ADDRESS &&
+	    GET_U_1(p + 1) == PPP_CONTROL) {
 		if (ndo->ndo_eflag)
-			ND_PRINT("%02x %02x ", EXTRACT_U_1(p),
-			    EXTRACT_U_1(p + 1));
+			ND_PRINT("%02x %02x ", GET_U_1(p),
+				 GET_U_1(p + 1));
 		p += 2;
 		hdrlength = 2;
 	}
@@ -1793,16 +1796,16 @@ ppp_bsdos_if_print(netdissect_options *ndo _U_,
 	if (ndo->ndo_eflag)
 		ND_PRINT("%u ", length);
 	/* Retrieve the protocol type */
-	if (EXTRACT_U_1(p) & 01) {
+	if (GET_U_1(p) & 01) {
 		/* Compressed protocol field */
-		ptype = EXTRACT_U_1(p);
+		ptype = GET_U_1(p);
 		if (ndo->ndo_eflag)
 			ND_PRINT("%02x ", ptype);
 		p++;
 		hdrlength += 1;
 	} else {
 		/* Un-compressed protocol field */
-		ptype = EXTRACT_BE_U_2(p);
+		ptype = GET_BE_U_2(p);
 		if (ndo->ndo_eflag)
 			ND_PRINT("%04x ", ptype);
 		p += 2;
@@ -1811,8 +1814,8 @@ ppp_bsdos_if_print(netdissect_options *ndo _U_,
 #else
 	ptype = 0;	/*XXX*/
 	if (ndo->ndo_eflag)
-		ND_PRINT("%c ", EXTRACT_U_1(p + SLC_DIR) ? 'O' : 'I');
-	llhl = EXTRACT_U_1(p + SLC_LLHL);
+		ND_PRINT("%c ", GET_U_1(p + SLC_DIR) ? 'O' : 'I');
+	llhl = GET_U_1(p + SLC_LLHL);
 	if (llhl) {
 		/* link level header */
 		struct ppp_header *ph;
@@ -1822,9 +1825,9 @@ ppp_bsdos_if_print(netdissect_options *ndo _U_,
 		if (ph->phdr_addr == PPP_ADDRESS
 		 && ph->phdr_ctl == PPP_CONTROL) {
 			if (ndo->ndo_eflag)
-				ND_PRINT("%02x %02x ", EXTRACT_U_1(q),
-				    EXTRACT_U_1(q + 1));
-			ptype = EXTRACT_BE_U_2(&ph->phdr_type);
+				ND_PRINT("%02x %02x ", GET_U_1(q),
+					 GET_U_1(q + 1));
+			ptype = GET_BE_U_2(&ph->phdr_type);
 			if (ndo->ndo_eflag && (ptype == PPP_VJC || ptype == PPP_VJNC)) {
 				ND_PRINT("%s ", tok2str(ppptype2str,
 						"proto-#%u", ptype));
@@ -1833,14 +1836,14 @@ ppp_bsdos_if_print(netdissect_options *ndo _U_,
 			if (ndo->ndo_eflag) {
 				ND_PRINT("LLH=[");
 				for (i = 0; i < llhl; i++)
-					ND_PRINT("%02x", EXTRACT_U_1(q + i));
+					ND_PRINT("%02x", GET_U_1(q + i));
 				ND_PRINT("] ");
 			}
 		}
 	}
 	if (ndo->ndo_eflag)
 		ND_PRINT("%u ", length);
-	if (EXTRACT_U_1(p + SLC_CHL)) {
+	if (GET_U_1(p + SLC_CHL)) {
 		q = p + SLC_BPFHDRLEN + llhl;
 
 		switch (ptype) {
@@ -1883,7 +1886,7 @@ ppp_bsdos_if_print(netdissect_options *ndo _U_,
 				ND_PRINT("CH=[");
 				for (i = 0; i < llhl; i++)
 					ND_PRINT("%02x",
-					    EXTRACT_U_1(q + i));
+					    GET_U_1(q + i));
 				ND_PRINT("] ");
 			}
 			break;

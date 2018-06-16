@@ -714,8 +714,8 @@ esp_print(netdissect_options *ndo,
 		nd_print_trunc(ndo);
 		goto fail;
 	}
-	ND_PRINT("ESP(spi=0x%08x", EXTRACT_BE_U_4(esp->esp_spi));
-	ND_PRINT(",seq=0x%x)", EXTRACT_BE_U_4(esp->esp_seq));
+	ND_PRINT("ESP(spi=0x%08x", GET_BE_U_4(esp->esp_spi));
+	ND_PRINT(",seq=0x%x)", GET_BE_U_4(esp->esp_seq));
 	ND_PRINT(", length %u", length);
 
 #ifndef HAVE_LIBCRYPTO
@@ -737,14 +737,14 @@ esp_print(netdissect_options *ndo,
 	case 6:
 		ip6 = (const struct ip6_hdr *)bp2;
 		/* we do not attempt to decrypt jumbograms */
-		if (!EXTRACT_BE_U_2(ip6->ip6_plen))
+		if (!GET_BE_U_2(ip6->ip6_plen))
 			goto fail;
 		/* if we can't get nexthdr, we do not need to decrypt it */
-		len = sizeof(struct ip6_hdr) + EXTRACT_BE_U_2(ip6->ip6_plen);
+		len = sizeof(struct ip6_hdr) + GET_BE_U_2(ip6->ip6_plen);
 
 		/* see if we can find the SA, and if so, decode it */
 		for (sa = ndo->ndo_sa_list_head; sa != NULL; sa = sa->next) {
-			if (sa->spi == EXTRACT_BE_U_4(esp->esp_spi) &&
+			if (sa->spi == GET_BE_U_4(esp->esp_spi) &&
 			    sa->daddr_version == 6 &&
 			    UNALIGNED_MEMCMP(&sa->daddr.in6, &ip6->ip6_dst,
 				   sizeof(nd_ipv6)) == 0) {
@@ -754,13 +754,13 @@ esp_print(netdissect_options *ndo,
 		break;
 	case 4:
 		/* nexthdr & padding are in the last fragment */
-		if (EXTRACT_BE_U_2(ip->ip_off) & IP_MF)
+		if (GET_BE_U_2(ip->ip_off) & IP_MF)
 			goto fail;
-		len = EXTRACT_BE_U_2(ip->ip_len);
+		len = GET_BE_U_2(ip->ip_len);
 
 		/* see if we can find the SA, and if so, decode it */
 		for (sa = ndo->ndo_sa_list_head; sa != NULL; sa = sa->next) {
-			if (sa->spi == EXTRACT_BE_U_4(esp->esp_spi) &&
+			if (sa->spi == GET_BE_U_4(esp->esp_spi) &&
 			    sa->daddr_version == 4 &&
 			    UNALIGNED_MEMCMP(&sa->daddr.in4, &ip->ip_dst,
 				   sizeof(nd_ipv4)) == 0) {
@@ -860,14 +860,14 @@ esp_print(netdissect_options *ndo,
 		advance = sizeof(struct newesp);
 
 	/* sanity check for pad length */
-	if (ep - bp < EXTRACT_U_1(ep - 2))
+	if (ep - bp < GET_U_1(ep - 2))
 		goto fail;
 
 	if (padlen)
-		*padlen = EXTRACT_U_1(ep - 2) + 2;
+		*padlen = GET_U_1(ep - 2) + 2;
 
 	if (nhdr)
-		*nhdr = EXTRACT_U_1(ep - 1);
+		*nhdr = GET_U_1(ep - 1);
 
 	ND_PRINT(": ");
 	return advance;

@@ -63,7 +63,7 @@ bt_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *
 	ND_TCHECK_4(&hdr->direction);
 	if (ndo->ndo_eflag)
 		ND_PRINT(", hci length %u, direction %s", length,
-			 (EXTRACT_BE_U_4(hdr->direction)&0x1) ? "in" : "out");
+			 (GET_BE_U_4(hdr->direction)&0x1) ? "in" : "out");
 
 	if (!ndo->ndo_suppress_default_print)
 		ND_DEFAULTPRINT(p, caplen);

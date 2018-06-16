@@ -134,7 +134,7 @@ sliplink_print(netdissect_options *ndo,
 	int dir;
 	u_int hlen;
 
-	dir = EXTRACT_U_1(p + SLX_DIR);
+	dir = GET_U_1(p + SLX_DIR);
 	switch (dir) {
 
 	case SLIPDIR_IN:
@@ -150,7 +150,7 @@ sliplink_print(netdissect_options *ndo,
 		dir = -1;
 		break;
 	}
-	switch (EXTRACT_U_1(p + SLX_CHDR) & 0xf0) {
+	switch (GET_U_1(p + SLX_CHDR) & 0xf0) {
 
 	case TYPE_IP:
 		ND_PRINT("ip %u: ", length + SLIP_HDRLEN);
@@ -162,7 +162,7 @@ sliplink_print(netdissect_options *ndo,
 		 * Get it from the link layer since sl_uncompress_tcp()
 		 * has restored the IP header copy to IPPROTO_TCP.
 		 */
-		lastconn = EXTRACT_U_1(((const struct ip *)(p + SLX_CHDR))->ip_p);
+		lastconn = GET_U_1(((const struct ip *)(p + SLX_CHDR))->ip_p);
 		ND_PRINT("utcp %u: ", lastconn);
 		if (dir == -1) {
 			/* Direction is bogus, don't use it */
@@ -180,13 +180,13 @@ sliplink_print(netdissect_options *ndo,
 			/* Direction is bogus, don't use it */
 			return 0;
 		}
-		if (EXTRACT_U_1(p + SLX_CHDR) & TYPE_COMPRESSED_TCP) {
+		if (GET_U_1(p + SLX_CHDR) & TYPE_COMPRESSED_TCP) {
 			if (compressed_sl_print(ndo, p + SLX_CHDR, ip,
 					        length, dir) == -1)
 				goto trunc;
 			ND_PRINT(": ");
 		} else
-			ND_PRINT("slip-%u!: ", EXTRACT_U_1(p + SLX_CHDR));
+			ND_PRINT("slip-%u!: ", GET_U_1(p + SLX_CHDR));
 	}
 	return 0;
 trunc:
@@ -199,9 +199,9 @@ print_sl_change(netdissect_options *ndo,
 {
 	u_int i;
 
-	if ((i = EXTRACT_U_1(cp)) == 0) {
+	if ((i = GET_U_1(cp)) == 0) {
 		cp++;
-		i = EXTRACT_BE_U_2(cp);
+		i = GET_BE_U_2(cp);
 		cp += 2;
 	}
 	ND_PRINT(" %s%u", str, i);
@@ -214,9 +214,9 @@ print_sl_winchange(netdissect_options *ndo,
 {
 	int16_t i;
 
-	if ((i = EXTRACT_U_1(cp)) == 0) {
+	if ((i = GET_U_1(cp)) == 0) {
 		cp++;
-		i = EXTRACT_BE_S_2(cp);
+		i = GET_BE_S_2(cp);
 		cp += 2;
 	}
 	if (i >= 0)
@@ -234,10 +234,10 @@ compressed_sl_print(netdissect_options *ndo,
 	const u_char *cp = chdr;
 	u_int flags, hlen;
 
-	flags = EXTRACT_U_1(cp);
+	flags = GET_U_1(cp);
 	cp++;
 	if (flags & NEW_C) {
-		lastconn = EXTRACT_U_1(cp);
+		lastconn = GET_U_1(cp);
 		cp++;
 		ND_PRINT("ctcp %u", lastconn);
 	} else

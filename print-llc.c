@@ -167,8 +167,8 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		return (length);
 	}
 
-	dsap_field = EXTRACT_U_1(p);
-	ssap_field = EXTRACT_U_1(p + 1);
+	dsap_field = GET_U_1(p);
+	ssap_field = GET_U_1(p + 1);
 
 	/*
 	 * OK, what type of LLC frame is this?  The length
@@ -176,7 +176,7 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 	 * have a two-byte control field, and U frames have
 	 * a one-byte control field.
 	 */
-	control = EXTRACT_U_1(p + 2);
+	control = GET_U_1(p + 2);
 	if ((control & LLC_U_FMT) == LLC_U_FMT) {
 		/*
 		 * U frame.
@@ -202,7 +202,7 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		/*
 		 * ...and is little-endian.
 		 */
-		control = EXTRACT_LE_U_2(p + 2);
+		control = GET_LE_U_2(p + 2);
 		is_u = 0;
 		hdrlen = 4;	/* DSAP, SSAP, 2-byte control field */
 	}
@@ -373,15 +373,15 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 					ND_DEFAULTPRINT((const u_char *)p, caplen);
 				return (hdrlen);
 			}
-			if (EXTRACT_U_1(p) == LLC_XID_FI) {
+			if (GET_U_1(p) == LLC_XID_FI) {
 				if (caplen < 3 || length < 3) {
 					nd_print_trunc(ndo);
 					if (caplen > 0)
 						ND_DEFAULTPRINT((const u_char *)p, caplen);
 				} else
 					ND_PRINT(": %02x %02x",
-						  EXTRACT_U_1(p + 1),
-						  EXTRACT_U_1(p + 2));
+						  GET_U_1(p + 1),
+						  GET_U_1(p + 2));
 				return (hdrlen);
 			}
 		}
@@ -432,8 +432,8 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 	ND_TCHECK_5(p);
 	if (caplen < 5 || length < 5)
 		goto trunc;
-	orgcode = EXTRACT_BE_U_3(p);
-	et = EXTRACT_BE_U_2(p + 3);
+	orgcode = GET_BE_U_3(p);
+	et = GET_BE_U_2(p + 3);
 
 	if (ndo->ndo_eflag) {
 		/*

@@ -58,7 +58,7 @@ ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
 
 	cp = (const u_char *)ip6;
 	advance = sizeof(struct ip6_hdr);
-	nh = EXTRACT_U_1(ip6->ip6_nxt);
+	nh = GET_U_1(ip6->ip6_nxt);
 	dst_addr = (const void *)ip6->ip6_dst;
 
 	while (cp < ndo->ndo_snapend) {
@@ -77,8 +77,8 @@ ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
 			 * the first 8 octets.
 			 */
 			ND_TCHECK_2(cp);
-			advance = (EXTRACT_U_1(cp + 1) + 1) << 3;
-			nh = EXTRACT_U_1(cp);
+			advance = (GET_U_1(cp + 1) + 1) << 3;
+			nh = GET_U_1(cp);
 			break;
 
 		case IPPROTO_FRAGMENT:
@@ -89,7 +89,7 @@ ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
 			 */
 			ND_TCHECK_1(cp);
 			advance = sizeof(struct ip6_frag);
-			nh = EXTRACT_U_1(cp);
+			nh = GET_U_1(cp);
 			break;
 
 		case IPPROTO_ROUTING:
@@ -98,8 +98,8 @@ ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
 			 */
 			dp = (const struct ip6_rthdr *)cp;
 			ND_TCHECK_SIZE(dp);
-			len = EXTRACT_U_1(dp->ip6r_len);
-			switch (EXTRACT_U_1(dp->ip6r_type)) {
+			len = GET_U_1(dp->ip6r_len);
+			switch (GET_U_1(dp->ip6r_type)) {
 
 			case IPV6_RTHDR_TYPE_0:
 			case IPV6_RTHDR_TYPE_2:		/* Mobile IPv6 ID-20 */
@@ -175,7 +175,7 @@ nextproto6_cksum(netdissect_options *ndo,
         /* pseudo-header */
         memset(&ph, 0, sizeof(ph));
         UNALIGNED_MEMCPY(&ph.ph_src, ip6->ip6_src, sizeof (struct in6_addr));
-        nh = EXTRACT_U_1(ip6->ip6_nxt);
+        nh = GET_U_1(ip6->ip6_nxt);
         switch (nh) {
 
         case IPPROTO_HOPOPTS:
@@ -241,15 +241,15 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
           return;
 	}
 
-	payload_len = EXTRACT_BE_U_2(ip6->ip6_plen);
+	payload_len = GET_BE_U_2(ip6->ip6_plen);
 	len = payload_len + sizeof(struct ip6_hdr);
 	if (length < len)
 		ND_PRINT("truncated-ip6 - %u bytes missing!",
 			len - length);
 
-        nh = EXTRACT_U_1(ip6->ip6_nxt);
+        nh = GET_U_1(ip6->ip6_nxt);
         if (ndo->ndo_vflag) {
-            flow = EXTRACT_BE_U_4(ip6->ip6_flow);
+            flow = GET_BE_U_4(ip6->ip6_flow);
             ND_PRINT("(");
 #if 0
             /* rfc1883 */
@@ -266,7 +266,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 #endif
 
             ND_PRINT("hlim %u, next-header %s (%u) payload length: %u) ",
-                         EXTRACT_U_1(ip6->ip6_hlim),
+                         GET_U_1(ip6->ip6_hlim),
                          tok2str(ipproto_values,"unknown",nh),
                          nh,
                          payload_len);
@@ -299,19 +299,19 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			advance = hbhopt_print(ndo, cp);
 			if (advance < 0)
 				return;
-			nh = EXTRACT_U_1(cp);
+			nh = GET_U_1(cp);
 			break;
 		case IPPROTO_DSTOPTS:
 			advance = dstopt_print(ndo, cp);
 			if (advance < 0)
 				return;
-			nh = EXTRACT_U_1(cp);
+			nh = GET_U_1(cp);
 			break;
 		case IPPROTO_FRAGMENT:
 			advance = frag6_print(ndo, cp, (const u_char *)ip6);
 			if (advance < 0 || ndo->ndo_snapend <= cp + advance)
 				return;
-			nh = EXTRACT_U_1(cp);
+			nh = GET_U_1(cp);
 			fragmented = 1;
 			break;
 
@@ -328,14 +328,14 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			advance = mobility_print(ndo, cp, (const u_char *)ip6);
 			if (advance < 0)
 				return;
-			nh = EXTRACT_U_1(cp);
+			nh = GET_U_1(cp);
 			return;
 		case IPPROTO_ROUTING:
 			ND_TCHECK_1(cp);
 			advance = rt6_print(ndo, cp, (const u_char *)ip6);
 			if (advance < 0)
 				return;
-			nh = EXTRACT_U_1(cp);
+			nh = GET_U_1(cp);
 			break;
 		case IPPROTO_SCTP:
 			sctp_print(ndo, cp, (const u_char *)ip6, len);
@@ -356,7 +356,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			advance = ah_print(ndo, cp);
 			if (advance < 0)
 				return;
-			nh = EXTRACT_U_1(cp);
+			nh = GET_U_1(cp);
 			break;
 		case IPPROTO_ESP:
 		    {

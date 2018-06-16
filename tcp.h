@@ -49,7 +49,7 @@ struct tcphdr {
 	nd_uint16_t	th_urp;			/* urgent pointer */
 };
 
-#define TH_OFF(th)	((EXTRACT_U_1((th)->th_offx2) & 0xf0) >> 4)
+#define TH_OFF(th)	((GET_U_1((th)->th_offx2) & 0xf0) >> 4)
 
 /* TCP flags */
 #define	TH_FIN     0x01

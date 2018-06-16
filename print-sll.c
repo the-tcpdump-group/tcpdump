@@ -154,18 +154,19 @@ sll_print(netdissect_options *ndo, const struct sll_header *sllp, u_int length)
 	u_short ether_type;
 
 	ndo->ndo_protocol = "sll";
-        ND_PRINT("%3s ",tok2str(sll_pkttype_values,"?",EXTRACT_BE_U_2(sllp->sll_pkttype)));
+        ND_PRINT("%3s ",
+		 tok2str(sll_pkttype_values,"?",GET_BE_U_2(sllp->sll_pkttype)));
 
 	/*
 	 * XXX - check the link-layer address type value?
 	 * For now, we just assume 6 means Ethernet.
 	 * XXX - print others as strings of hex?
 	 */
-	if (EXTRACT_BE_U_2(sllp->sll_halen) == 6)
+	if (GET_BE_U_2(sllp->sll_halen) == 6)
 		ND_PRINT("%s ", etheraddr_string(ndo, sllp->sll_addr));
 
 	if (!ndo->ndo_qflag) {
-		ether_type = EXTRACT_BE_U_2(sllp->sll_protocol);
+		ether_type = GET_BE_U_2(sllp->sll_protocol);
 
 		if (ether_type <= MAX_ETHERNET_LENGTH_VAL) {
 			/*
@@ -245,7 +246,7 @@ sll_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 	p += SLL_HDR_LEN;
 	hdrlen = SLL_HDR_LEN;
 
-	hatype = EXTRACT_BE_U_2(sllp->sll_hatype);
+	hatype = GET_BE_U_2(sllp->sll_hatype);
 	switch (hatype) {
 
 	case 803:
@@ -255,7 +256,7 @@ sll_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 		 */
 		return (SLL_HDR_LEN + ieee802_11_radio_print(ndo, p, length, caplen));
 	}
-	ether_type = EXTRACT_BE_U_2(sllp->sll_protocol);
+	ether_type = GET_BE_U_2(sllp->sll_protocol);
 
 recurse:
 	/*
@@ -306,12 +307,12 @@ recurse:
 			return (hdrlen + caplen);
 		}
 	        if (ndo->ndo_eflag) {
-			uint16_t tag = EXTRACT_BE_U_2(p);
+			uint16_t tag = GET_BE_U_2(p);
 
 			ND_PRINT("%s, ", ieee8021q_tci_string(tag));
 		}
 
-		ether_type = EXTRACT_BE_U_2(p + 2);
+		ether_type = GET_BE_U_2(p + 2);
 		if (ether_type <= MAX_ETHERNET_LENGTH_VAL)
 			ether_type = LINUX_SLL_P_802_2;
 		if (!ndo->ndo_qflag) {
@@ -342,18 +343,19 @@ sll2_print(netdissect_options *ndo, const struct sll2_header *sllp, u_int length
 	u_short ether_type;
 
 	ndo->ndo_protocol = "sll2";
-        ND_PRINT("%3s ",tok2str(sll_pkttype_values,"?",EXTRACT_U_1(sllp->sll2_pkttype)));
+        ND_PRINT("%3s ",
+		 tok2str(sll_pkttype_values,"?",GET_U_1(sllp->sll2_pkttype)));
 
 	/*
 	 * XXX - check the link-layer address type value?
 	 * For now, we just assume 6 means Ethernet.
 	 * XXX - print others as strings of hex?
 	 */
-	if (EXTRACT_U_1(sllp->sll2_halen) == 6)
+	if (GET_U_1(sllp->sll2_halen) == 6)
 		ND_PRINT("%s ", etheraddr_string(ndo, sllp->sll2_addr));
 
 	if (!ndo->ndo_qflag) {
-		ether_type = EXTRACT_BE_U_2(sllp->sll2_protocol);
+		ether_type = GET_BE_U_2(sllp->sll2_protocol);
 
 		if (ether_type <= MAX_ETHERNET_LENGTH_VAL) {
 			/*
@@ -426,7 +428,7 @@ sll2_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 
 	sllp = (const struct sll2_header *)p;
 #ifdef HAVE_NET_IF_H
-	if_index = EXTRACT_BE_U_4(sllp->sll2_if_index);
+	if_index = GET_BE_U_4(sllp->sll2_if_index);
 	if (if_indextoname(if_index, ifname))
 		ND_PRINT("ifindex %u (%s) ", if_index, ifname);
 	else
@@ -444,7 +446,7 @@ sll2_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 	p += SLL2_HDR_LEN;
 	hdrlen = SLL2_HDR_LEN;
 
-	hatype = EXTRACT_BE_U_2(sllp->sll2_hatype);
+	hatype = GET_BE_U_2(sllp->sll2_hatype);
 	switch (hatype) {
 
 	case 803:
@@ -454,7 +456,7 @@ sll2_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 		 */
 		return (SLL_HDR_LEN + ieee802_11_radio_print(ndo, p, length, caplen));
 	}
-	ether_type = EXTRACT_BE_U_2(sllp->sll2_protocol);
+	ether_type = GET_BE_U_2(sllp->sll2_protocol);
 
 recurse:
 	/*
@@ -505,12 +507,12 @@ recurse:
 			return (hdrlen + caplen);
 		}
 	        if (ndo->ndo_eflag) {
-			uint16_t tag = EXTRACT_BE_U_2(p);
+			uint16_t tag = GET_BE_U_2(p);
 
 			ND_PRINT("%s, ", ieee8021q_tci_string(tag));
 		}
 
-		ether_type = EXTRACT_BE_U_2(p + 2);
+		ether_type = GET_BE_U_2(p + 2);
 		if (ether_type <= MAX_ETHERNET_LENGTH_VAL)
 			ether_type = LINUX_SLL_P_802_2;
 		if (!ndo->ndo_qflag) {

@@ -61,10 +61,10 @@ chdlc_print(netdissect_options *ndo, const u_char *p, u_int length)
 	if (length < CHDLC_HDRLEN)
 		goto trunc;
 	ND_TCHECK_LEN(p, CHDLC_HDRLEN);
-	proto = EXTRACT_BE_U_2(p + 2);
+	proto = GET_BE_U_2(p + 2);
 	if (ndo->ndo_eflag) {
                 ND_PRINT("%s, ethertype %s (0x%04x), length %u: ",
-                       tok2str(chdlc_cast_values, "0x%02x", EXTRACT_U_1(p)),
+                       tok2str(chdlc_cast_values, "0x%02x", GET_U_1(p)),
                        tok2str(ethertype_values, "Unknown", proto),
                        proto,
                        length);
@@ -97,9 +97,9 @@ chdlc_print(netdissect_options *ndo, const u_char *p, u_int length)
                 if (length < 2)
                     goto trunc;
                 ND_TCHECK_2(p);
-                if (EXTRACT_U_1(p + 1) == NLPID_CLNP ||
-                    EXTRACT_U_1(p + 1) == NLPID_ESIS ||
-                    EXTRACT_U_1(p + 1) == NLPID_ISIS)
+                if (GET_U_1(p + 1) == NLPID_CLNP ||
+                    GET_U_1(p + 1) == NLPID_ESIS ||
+                    GET_U_1(p + 1) == NLPID_ISIS)
                     isoclns_print(ndo, p + 1, length - 1);
                 else
                     isoclns_print(ndo, p, length);
@@ -154,7 +154,7 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
 
 	slarp = (const struct cisco_slarp *)cp;
 	ND_TCHECK_LEN(slarp, SLARP_MIN_LEN);
-	switch (EXTRACT_BE_U_4(slarp->code)) {
+	switch (GET_BE_U_4(slarp->code)) {
 	case SLARP_REQUEST:
 		ND_PRINT("request");
 		/*
@@ -174,14 +174,14 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
 		break;
 	case SLARP_KEEPALIVE:
 		ND_PRINT("keepalive: mineseen=0x%08x, yourseen=0x%08x, reliability=0x%04x",
-                       EXTRACT_BE_U_4(slarp->un.keep.myseq),
-                       EXTRACT_BE_U_4(slarp->un.keep.yourseq),
-                       EXTRACT_BE_U_2(slarp->un.keep.rel));
+                       GET_BE_U_4(slarp->un.keep.myseq),
+                       GET_BE_U_4(slarp->un.keep.yourseq),
+                       GET_BE_U_2(slarp->un.keep.rel));
 
                 if (length >= SLARP_MAX_LEN) { /* uptime-stamp is optional */
                         cp += SLARP_MIN_LEN;
                         ND_TCHECK_4(cp);
-                        sec = EXTRACT_BE_U_4(cp) / 1000;
+                        sec = GET_BE_U_4(cp) / 1000;
                         min = sec / 60; sec -= min * 60;
                         hrs = min / 60; min -= hrs * 60;
                         days = hrs / 24; hrs -= days * 24;
@@ -189,7 +189,7 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
                 }
 		break;
 	default:
-		ND_PRINT("0x%02x unknown", EXTRACT_BE_U_4(slarp->code));
+		ND_PRINT("0x%02x unknown", GET_BE_U_4(slarp->code));
                 if (ndo->ndo_vflag <= 1)
                     print_unknown_data(ndo,cp+4,"\n\t",length-4);
 		break;

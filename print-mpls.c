@@ -71,7 +71,7 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		ND_TCHECK_LEN(p, sizeof(label_entry));
 		if (length < sizeof(label_entry))
 			goto trunc;
-		label_entry = EXTRACT_BE_U_4(p);
+		label_entry = GET_BE_U_4(p);
 		ND_PRINT("%s(label %u",
 		       (label_stack_depth && ndo->ndo_vflag) ? "\n\t" : " ",
        		       MPLS_LABEL(label_entry));
@@ -133,7 +133,7 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			/* nothing to print */
 			return;
 		}
-		switch(EXTRACT_U_1(p)) {
+		switch(GET_U_1(p)) {
 
 		case 0x45:
 		case 0x46:

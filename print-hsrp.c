@@ -101,30 +101,32 @@ hsrp_print(netdissect_options *ndo, const u_char *bp, u_int len)
 
 	ndo->ndo_protocol = "hsrp";
 	ND_TCHECK_1(hp->hsrp_version);
-	version = EXTRACT_U_1(hp->hsrp_version);
+	version = GET_U_1(hp->hsrp_version);
 	ND_PRINT("HSRPv%u", version);
 	if (version != 0)
 		return;
 	ND_TCHECK_1(hp->hsrp_op_code);
 	ND_PRINT("-");
-	ND_PRINT("%s ", tok2strary(op_code_str, "unknown (%u)", EXTRACT_U_1(hp->hsrp_op_code)));
+	ND_PRINT("%s ",
+		 tok2strary(op_code_str, "unknown (%u)", GET_U_1(hp->hsrp_op_code)));
 	ND_PRINT("%u: ", len);
 	ND_TCHECK_1(hp->hsrp_state);
-	ND_PRINT("state=%s ", tok2str(states, "Unknown (%u)", EXTRACT_U_1(hp->hsrp_state)));
+	ND_PRINT("state=%s ",
+		 tok2str(states, "Unknown (%u)", GET_U_1(hp->hsrp_state)));
 	ND_TCHECK_1(hp->hsrp_group);
-	ND_PRINT("group=%u ", EXTRACT_U_1(hp->hsrp_group));
+	ND_PRINT("group=%u ", GET_U_1(hp->hsrp_group));
 	ND_TCHECK_1(hp->hsrp_reserved);
-	if (EXTRACT_U_1(hp->hsrp_reserved) != 0) {
-		ND_PRINT("[reserved=%u!] ", EXTRACT_U_1(hp->hsrp_reserved));
+	if (GET_U_1(hp->hsrp_reserved) != 0) {
+		ND_PRINT("[reserved=%u!] ", GET_U_1(hp->hsrp_reserved));
 	}
 	ND_TCHECK_4(hp->hsrp_virtaddr);
 	ND_PRINT("addr=%s", ipaddr_string(ndo, hp->hsrp_virtaddr));
 	if (ndo->ndo_vflag) {
 		ND_PRINT(" hellotime=");
-		unsigned_relts_print(ndo, EXTRACT_U_1(hp->hsrp_hellotime));
+		unsigned_relts_print(ndo, GET_U_1(hp->hsrp_hellotime));
 		ND_PRINT(" holdtime=");
-		unsigned_relts_print(ndo, EXTRACT_U_1(hp->hsrp_holdtime));
-		ND_PRINT(" priority=%u", EXTRACT_U_1(hp->hsrp_priority));
+		unsigned_relts_print(ndo, GET_U_1(hp->hsrp_holdtime));
+		ND_PRINT(" priority=%u", GET_U_1(hp->hsrp_priority));
 		ND_PRINT(" auth=\"");
 		if (nd_printn(ndo, hp->hsrp_authdata, sizeof(hp->hsrp_authdata),
 			      ndo->ndo_snapend)) {

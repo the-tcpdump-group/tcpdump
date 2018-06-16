@@ -68,8 +68,8 @@ static void zep_print_ts(netdissect_options *ndo, const u_char *p)
 	uint32_t f;
 	float ff;
 
-	i = EXTRACT_BE_U_4(p);
-	uf = EXTRACT_BE_U_4(p + 4);
+	i = GET_BE_U_4(p);
+	uf = GET_BE_U_4(p + 4);
 	ff = (float) uf;
 	if (ff < 0.0)           /* some compilers are buggy */
 		ff += FMAXINT;
@@ -111,31 +111,31 @@ zep_print(netdissect_options *ndo,
 
 	ND_TCHECK_LEN(bp, 8);
 
-	if (EXTRACT_U_1(bp) != 'E' || EXTRACT_U_1(bp + 1) != 'X')
+	if (GET_U_1(bp) != 'E' || GET_U_1(bp + 1) != 'X')
 		goto trunc;
 
-	version = EXTRACT_U_1(bp + 2);
+	version = GET_U_1(bp + 2);
 	ND_PRINT("v%d ", version);
 
 	if (version == 1) {
 		/* ZEP v1 packet. */
 		ND_TCHECK_LEN(bp, 16);
 		ND_PRINT("Channel ID %d, Device ID 0x%04x, ",
-			 EXTRACT_U_1(bp + 3), EXTRACT_BE_U_2(bp + 4));
-		if (EXTRACT_U_1(bp + 6))
+			 GET_U_1(bp + 3), GET_BE_U_2(bp + 4));
+		if (GET_U_1(bp + 6))
 			ND_PRINT("CRC, ");
 		else
-			ND_PRINT("LQI %d, ", EXTRACT_U_1(bp + 7));
-		inner_len = EXTRACT_U_1(bp + 15);
+			ND_PRINT("LQI %d, ", GET_U_1(bp + 7));
+		inner_len = GET_U_1(bp + 15);
 		ND_PRINT("inner len = %d", inner_len);
 
 		bp += 16;
 		len -= 16;
 	} else {
 		/* ZEP v2 packet. */
-		if (EXTRACT_U_1(bp + 3) == 2) {
+		if (GET_U_1(bp + 3) == 2) {
 			/* ZEP v2 ack. */
-			seq_no = EXTRACT_BE_U_4(bp + 4);
+			seq_no = GET_BE_U_4(bp + 4);
 			ND_PRINT("ACK, seq# = %d", seq_no);
 			inner_len = 0;
 			bp += 8;
@@ -145,16 +145,16 @@ zep_print(netdissect_options *ndo,
 			ND_TCHECK_LEN(bp, 32);
 
 			ND_PRINT("Type %d, Channel ID %d, Device ID 0x%04x, ",
-				 EXTRACT_U_1(bp + 3), EXTRACT_U_1(bp + 4),
-				 EXTRACT_BE_U_2(bp + 5));
-			if (EXTRACT_U_1(bp + 7))
+				 GET_U_1(bp + 3), GET_U_1(bp + 4),
+				 GET_BE_U_2(bp + 5));
+			if (GET_U_1(bp + 7))
 				ND_PRINT("CRC, ");
 			else
-				ND_PRINT("LQI %d, ", EXTRACT_U_1(bp + 8));
+				ND_PRINT("LQI %d, ", GET_U_1(bp + 8));
 
 			zep_print_ts(ndo, bp + 9);
-			seq_no = EXTRACT_BE_U_4(bp + 17);
-			inner_len = EXTRACT_U_1(bp + 31);
+			seq_no = GET_BE_U_4(bp + 17);
+			inner_len = GET_U_1(bp + 31);
 			ND_PRINT(", seq# = %d, inner len = %d",
 				 seq_no, inner_len);
 			bp += 32;

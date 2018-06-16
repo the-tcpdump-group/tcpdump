@@ -57,7 +57,7 @@ dtp_print(netdissect_options *ndo, const u_char *pptr, u_int length)
     ND_TCHECK_LEN(tptr, DTP_HEADER_LEN);
 
     ND_PRINT("DTPv%u, length %u",
-           EXTRACT_U_1(tptr),
+           GET_U_1(tptr),
            length);
 
     /*
@@ -72,8 +72,8 @@ dtp_print(netdissect_options *ndo, const u_char *pptr, u_int length)
     while (tptr < (pptr+length)) {
 
         ND_TCHECK_4(tptr);
-	type = EXTRACT_BE_U_2(tptr);
-        len  = EXTRACT_BE_U_2(tptr + 2);
+	type = GET_BE_U_2(tptr);
+        len  = GET_BE_U_2(tptr + 2);
        /* XXX: should not be but sometimes it is, see the test captures */
         if (type == 0)
             return;
@@ -96,7 +96,7 @@ dtp_print(netdissect_options *ndo, const u_char *pptr, u_int length)
 	case DTP_DTP_TYPE_TLV:
                 if (len < 5)
                     goto invalid;
-                ND_PRINT(", 0x%x", EXTRACT_U_1(tptr + 4));
+                ND_PRINT(", 0x%x", GET_U_1(tptr + 4));
                 break;
 
 	case DTP_NEIGHBOR_TLV:

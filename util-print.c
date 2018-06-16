@@ -109,7 +109,7 @@ nd_print(netdissect_options *ndo,
 
 	ret = 1;			/* assume truncated */
 	while (ep == NULL || s < ep) {
-		c = EXTRACT_U_1(s);
+		c = GET_U_1(s);
 		s++;
 		if (c == '\0') {
 			ret = 0;
@@ -162,7 +162,7 @@ nd_printztn(netdissect_options *ndo,
 			break;
 		}
 
-		c = EXTRACT_U_1(s);
+		c = GET_U_1(s);
 		s++;
 		bytes++;
 		n--;
@@ -190,7 +190,7 @@ nd_printn(netdissect_options *ndo,
 
 	while (n > 0 && (ep == NULL || s < ep)) {
 		n--;
-		c = EXTRACT_U_1(s);
+		c = GET_U_1(s);
 		s++;
 		fn_print_char(ndo, c);
 	}
@@ -216,7 +216,7 @@ nd_printzp(netdissect_options *ndo,
 	ret = 1;			/* assume truncated */
 	while (n > 0 && (ep == NULL || s < ep)) {
 		n--;
-		c = EXTRACT_U_1(s);
+		c = GET_U_1(s);
 		s++;
 		if (c == '\0') {
 			ret = 0;
@@ -701,15 +701,15 @@ fetch_token(netdissect_options *ndo, const u_char *pptr, u_int idx, u_int len,
 			/* ran past end of captured data */
 			return (0);
 		}
-		if (!isascii(EXTRACT_U_1(pptr + idx))) {
+		if (!isascii(GET_U_1(pptr + idx))) {
 			/* not an ASCII character */
 			return (0);
 		}
-		if (isspace(EXTRACT_U_1(pptr + idx))) {
+		if (isspace(GET_U_1(pptr + idx))) {
 			/* end of token */
 			break;
 		}
-		if (!isprint(EXTRACT_U_1(pptr + idx))) {
+		if (!isprint(GET_U_1(pptr + idx))) {
 			/* not part of a command token or response code */
 			return (0);
 		}
@@ -717,7 +717,7 @@ fetch_token(netdissect_options *ndo, const u_char *pptr, u_int idx, u_int len,
 			/* no room for this character and terminating '\0' */
 			return (0);
 		}
-		tbuf[toklen] = EXTRACT_U_1(pptr + idx);
+		tbuf[toklen] = GET_U_1(pptr + idx);
 		toklen++;
 	}
 	if (toklen == 0) {
@@ -735,15 +735,15 @@ fetch_token(netdissect_options *ndo, const u_char *pptr, u_int idx, u_int len,
 			/* ran past end of captured data */
 			break;
 		}
-		if (EXTRACT_U_1(pptr + idx) == '\r' || EXTRACT_U_1(pptr + idx) == '\n') {
+		if (GET_U_1(pptr + idx) == '\r' || GET_U_1(pptr + idx) == '\n') {
 			/* end of line */
 			break;
 		}
-		if (!isascii(EXTRACT_U_1(pptr + idx)) || !isprint(EXTRACT_U_1(pptr + idx))) {
+		if (!isascii(GET_U_1(pptr + idx)) || !isprint(GET_U_1(pptr + idx))) {
 			/* not a printable ASCII character */
 			break;
 		}
-		if (!isspace(EXTRACT_U_1(pptr + idx))) {
+		if (!isspace(GET_U_1(pptr + idx))) {
 			/* beginning of next token */
 			break;
 		}
@@ -767,7 +767,7 @@ print_txt_line(netdissect_options *ndo, const char *prefix,
 	startidx = idx;
 	while (idx < len) {
 		ND_TCHECK_1(pptr + idx);
-		if (EXTRACT_U_1(pptr + idx) == '\n') {
+		if (GET_U_1(pptr + idx) == '\n') {
 			/*
 			 * LF without CR; end of line.
 			 * Skip the LF and print the line, with the
@@ -776,14 +776,14 @@ print_txt_line(netdissect_options *ndo, const char *prefix,
 			linelen = idx - startidx;
 			idx++;
 			goto print;
-		} else if (EXTRACT_U_1(pptr + idx) == '\r') {
+		} else if (GET_U_1(pptr + idx) == '\r') {
 			/* CR - any LF? */
 			if ((idx+1) >= len) {
 				/* not in this packet */
 				return (0);
 			}
 			ND_TCHECK_1(pptr + idx + 1);
-			if (EXTRACT_U_1(pptr + idx + 1) == '\n') {
+			if (GET_U_1(pptr + idx + 1) == '\n') {
 				/*
 				 * CR-LF; end of line.
 				 * Skip the CR-LF and print the line, with
@@ -800,9 +800,9 @@ print_txt_line(netdissect_options *ndo, const char *prefix,
 			 * it.
 			 */
 			return (0);
-		} else if (!isascii(EXTRACT_U_1(pptr + idx)) ||
-			   (!isprint(EXTRACT_U_1(pptr + idx)) &&
-			    EXTRACT_U_1(pptr + idx) != '\t')) {
+		} else if (!isascii(GET_U_1(pptr + idx)) ||
+			   (!isprint(GET_U_1(pptr + idx)) &&
+			    GET_U_1(pptr + idx) != '\t')) {
 			/*
 			 * Not a printable ASCII character and not a tab;
 			 * treat this as if it were binary data, and

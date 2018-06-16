@@ -49,7 +49,7 @@
 #define DOP_ROUNDUP(x)	((((int)(x)) + (DOP_ALIGN - 1)) & ~(DOP_ALIGN - 1))
 #define DOP_NEXT(d)\
 	((const struct dophdr *)((const u_char *)(d) + \
-				DOP_ROUNDUP(EXTRACT_BE_U_2((d)->dh_len) + sizeof(*(d)))))
+				DOP_ROUNDUP(GET_BE_U_2((d)->dh_len) + sizeof(*(d)))))
 
 /*
  * Format of the whiteboard packet header.
@@ -191,14 +191,14 @@ wb_id(netdissect_options *ndo,
 	len -= sizeof(*id);
 
 	ND_PRINT(" %u/%s:%u (max %u/%s:%u) ",
-	       EXTRACT_BE_U_4(id->pi_ps.slot),
+	       GET_BE_U_4(id->pi_ps.slot),
 	       ipaddr_string(ndo, id->pi_ps.page.p_sid),
-	       EXTRACT_BE_U_4(id->pi_ps.page.p_uid),
-	       EXTRACT_BE_U_4(id->pi_mslot),
+	       GET_BE_U_4(id->pi_ps.page.p_uid),
+	       GET_BE_U_4(id->pi_mslot),
 	       ipaddr_string(ndo, id->pi_mpage.p_sid),
-	       EXTRACT_BE_U_4(id->pi_mpage.p_uid));
+	       GET_BE_U_4(id->pi_mpage.p_uid));
 
-	nid = EXTRACT_BE_U_2(id->pi_ps.nid);
+	nid = GET_BE_U_2(id->pi_ps.nid);
 	len -= sizeof(*io) * nid;
 	io = (const struct id_off *)(id + 1);
 	cp = (const char *)(io + nid);
@@ -211,7 +211,7 @@ wb_id(netdissect_options *ndo,
 	c = '<';
 	for (i = 0; i < nid && ND_TTEST_SIZE(io); ++io, ++i) {
 		ND_PRINT("%c%s:%u",
-		    c, ipaddr_string(ndo, io->id), EXTRACT_BE_U_4(io->off));
+		    c, ipaddr_string(ndo, io->id), GET_BE_U_4(io->off));
 		c = ',';
 	}
 	if (i >= nid) {
@@ -232,9 +232,9 @@ wb_rreq(netdissect_options *ndo,
 	ND_PRINT(" please repair %s %s:%u<%u:%u>",
 	       ipaddr_string(ndo, rreq->pr_id),
 	       ipaddr_string(ndo, rreq->pr_page.p_sid),
-	       EXTRACT_BE_U_4(rreq->pr_page.p_uid),
-	       EXTRACT_BE_U_4(rreq->pr_sseq),
-	       EXTRACT_BE_U_4(rreq->pr_eseq));
+	       GET_BE_U_4(rreq->pr_page.p_uid),
+	       GET_BE_U_4(rreq->pr_sseq),
+	       GET_BE_U_4(rreq->pr_eseq));
 	return (0);
 }
 
@@ -247,9 +247,9 @@ wb_preq(netdissect_options *ndo,
 		return (-1);
 
 	ND_PRINT(" need %u/%s:%u",
-	       EXTRACT_BE_U_4(preq->pp_low),
+	       GET_BE_U_4(preq->pp_low),
 	       ipaddr_string(ndo, preq->pp_page.p_sid),
-	       EXTRACT_BE_U_4(preq->pp_page.p_uid));
+	       GET_BE_U_4(preq->pp_page.p_uid));
 	return (0);
 }
 
@@ -264,20 +264,20 @@ wb_prep(netdissect_options *ndo,
 	ND_PRINT(" wb-prep:");
 	if (len < sizeof(*prep) || !ND_TTEST_SIZE(prep))
 		return (-1);
-	n = EXTRACT_BE_U_4(prep->pp_n);
+	n = GET_BE_U_4(prep->pp_n);
 	ps = (const struct pgstate *)(prep + 1);
 	while (n != 0 && ND_TTEST_SIZE(ps)) {
 		const struct id_off *io, *ie;
 		char c = '<';
 
 		ND_PRINT(" %u/%s:%u",
-		    EXTRACT_BE_U_4(ps->slot),
+		    GET_BE_U_4(ps->slot),
 		    ipaddr_string(ndo, ps->page.p_sid),
-		    EXTRACT_BE_U_4(ps->page.p_uid));
+		    GET_BE_U_4(ps->page.p_uid));
 		io = (const struct id_off *)(ps + 1);
-		for (ie = io + EXTRACT_U_1(ps->nid); io < ie && ND_TTEST_SIZE(io); ++io) {
+		for (ie = io + GET_U_1(ps->nid); io < ie && ND_TTEST_SIZE(io); ++io) {
 			ND_PRINT("%c%s:%u", c, ipaddr_string(ndo, io->id),
-			    EXTRACT_BE_U_4(io->off));
+			    GET_BE_U_4(io->off));
 			c = ',';
 		}
 		ND_PRINT(">");
@@ -321,14 +321,14 @@ wb_dops(netdissect_options *ndo, const struct pkt_dop *dop,
 			nd_print_trunc(ndo);
 			break;
 		}
-		t = EXTRACT_U_1(dh->dh_type);
+		t = GET_U_1(dh->dh_type);
 
 		if (t > DT_MAXTYPE)
 			ND_PRINT(" dop-%u!", t);
 		else {
 			ND_PRINT(" %s", dopstr[t]);
 			if (t == DT_SKIP || t == DT_HOLE) {
-				uint32_t ts = EXTRACT_BE_U_4(dh->dh_ts);
+				uint32_t ts = GET_BE_U_4(dh->dh_ts);
 				ND_PRINT("%u", ts - ss + 1);
 				if (ss > ts || ts > es) {
 					ND_PRINT("[|]");
@@ -358,14 +358,14 @@ wb_rrep(netdissect_options *ndo,
 	ND_PRINT(" for %s %s:%u<%u:%u>",
 	    ipaddr_string(ndo, rrep->pr_id),
 	    ipaddr_string(ndo, dop->pd_page.p_sid),
-	    EXTRACT_BE_U_4(dop->pd_page.p_uid),
-	    EXTRACT_BE_U_4(dop->pd_sseq),
-	    EXTRACT_BE_U_4(dop->pd_eseq));
+	    GET_BE_U_4(dop->pd_page.p_uid),
+	    GET_BE_U_4(dop->pd_sseq),
+	    GET_BE_U_4(dop->pd_eseq));
 
 	if (ndo->ndo_vflag)
 		return (wb_dops(ndo, dop,
-		    EXTRACT_BE_U_4(dop->pd_sseq),
-		    EXTRACT_BE_U_4(dop->pd_eseq)));
+		    GET_BE_U_4(dop->pd_sseq),
+		    GET_BE_U_4(dop->pd_eseq)));
 	return (0);
 }
 
@@ -380,14 +380,14 @@ wb_drawop(netdissect_options *ndo,
 
 	ND_PRINT(" %s:%u<%u:%u>",
 	    ipaddr_string(ndo, dop->pd_page.p_sid),
-	    EXTRACT_BE_U_4(dop->pd_page.p_uid),
-	    EXTRACT_BE_U_4(dop->pd_sseq),
-	    EXTRACT_BE_U_4(dop->pd_eseq));
+	    GET_BE_U_4(dop->pd_page.p_uid),
+	    GET_BE_U_4(dop->pd_sseq),
+	    GET_BE_U_4(dop->pd_eseq));
 
 	if (ndo->ndo_vflag)
 		return (wb_dops(ndo, dop,
-				EXTRACT_BE_U_4(dop->pd_sseq),
-				EXTRACT_BE_U_4(dop->pd_eseq)));
+				GET_BE_U_4(dop->pd_sseq),
+				GET_BE_U_4(dop->pd_eseq)));
 	return (0);
 }
 
@@ -409,9 +409,9 @@ wb_print(netdissect_options *ndo,
 	}
 	len -= sizeof(*ph);
 
-	if (EXTRACT_U_1(ph->ph_flags))
+	if (GET_U_1(ph->ph_flags))
 		ND_PRINT("*");
-	type = EXTRACT_U_1(ph->ph_type);
+	type = GET_U_1(ph->ph_type);
 	switch (type) {
 
 	case PT_KILL:

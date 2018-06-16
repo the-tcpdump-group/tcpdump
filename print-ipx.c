@@ -79,16 +79,16 @@ ipx_print(netdissect_options *ndo, const u_char *p, u_int length)
 
 	ND_TCHECK_2(ipx->srcSkt);
 	ND_PRINT("%s.%04x > ",
-		     ipxaddr_string(ndo, EXTRACT_BE_U_4(ipx->srcNet), ipx->srcNode),
-		     EXTRACT_BE_U_2(ipx->srcSkt));
+		     ipxaddr_string(ndo, GET_BE_U_4(ipx->srcNet), ipx->srcNode),
+		     GET_BE_U_2(ipx->srcSkt));
 
 	ND_PRINT("%s.%04x: ",
-		     ipxaddr_string(ndo, EXTRACT_BE_U_4(ipx->dstNet), ipx->dstNode),
-		     EXTRACT_BE_U_2(ipx->dstSkt));
+		     ipxaddr_string(ndo, GET_BE_U_4(ipx->dstNet), ipx->dstNode),
+		     GET_BE_U_2(ipx->dstSkt));
 
 	/* take length from ipx header */
 	ND_TCHECK_2(ipx->length);
-	length = EXTRACT_BE_U_2(ipx->length);
+	length = GET_BE_U_2(ipx->length);
 
 	if (length < ipxSize) {
 		ND_PRINT("[length %u < %u]", length, ipxSize);
@@ -107,9 +107,9 @@ ipxaddr_string(netdissect_options *ndo, uint32_t net, const u_char *node)
     static char line[256];
 
     nd_snprintf(line, sizeof(line), "%08x.%02x:%02x:%02x:%02x:%02x:%02x",
-	    net, EXTRACT_U_1(node), EXTRACT_U_1(node + 1),
-	    EXTRACT_U_1(node + 2), EXTRACT_U_1(node + 3),
-	    EXTRACT_U_1(node + 4), EXTRACT_U_1(node + 5));
+	    net, GET_U_1(node), GET_U_1(node + 1),
+	    GET_U_1(node + 2), GET_U_1(node + 3),
+	    GET_U_1(node + 4), GET_U_1(node + 5));
 
     return line;
 }
@@ -119,7 +119,7 @@ ipx_decode(netdissect_options *ndo, const struct ipxHdr *ipx, const u_char *data
 {
     u_short dstSkt;
 
-    dstSkt = EXTRACT_BE_U_2(ipx->dstSkt);
+    dstSkt = GET_BE_U_2(ipx->dstSkt);
     switch (dstSkt) {
       case IPX_SKT_NCP:
 	ND_PRINT("ipx-ncp %u", length);
@@ -160,7 +160,7 @@ ipx_sap_print(netdissect_options *ndo, const u_char *ipx, u_int length)
     int command, i;
 
     ND_TCHECK_2(ipx);
-    command = EXTRACT_BE_U_2(ipx);
+    command = GET_BE_U_2(ipx);
     ipx += 2;
     length -= 2;
 
@@ -173,7 +173,7 @@ ipx_sap_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	    ND_PRINT("ipx-sap-nearest-req");
 
 	ND_TCHECK_2(ipx);
-	ND_PRINT(" %s", ipxsap_string(ndo, htons(EXTRACT_BE_U_2(ipx))));
+	ND_PRINT(" %s", ipxsap_string(ndo, htons(GET_BE_U_2(ipx))));
 	break;
 
       case 2:
@@ -187,7 +187,7 @@ ipx_sap_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	    ND_TCHECK_2(ipx);
 	    if (length < 2)
 		goto trunc;
-	    ND_PRINT(" %s '", ipxsap_string(ndo, htons(EXTRACT_BE_U_2(ipx))));
+	    ND_PRINT(" %s '", ipxsap_string(ndo, htons(GET_BE_U_2(ipx))));
 	    ipx += 2;
 	    length -= 2;
 	    if (length < 48) {
@@ -208,7 +208,7 @@ ipx_sap_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	    if (length < 10)
 		goto trunc;
 	    ND_PRINT(" addr %s",
-		ipxaddr_string(ndo, EXTRACT_BE_U_4(ipx), ipx + 4));
+		ipxaddr_string(ndo, GET_BE_U_4(ipx), ipx + 4));
 	    ipx += 10;
 	    length -= 10;
 	    /*
@@ -237,7 +237,7 @@ ipx_rip_print(netdissect_options *ndo, const u_char *ipx, u_int length)
     int command, i;
 
     ND_TCHECK_2(ipx);
-    command = EXTRACT_BE_U_2(ipx);
+    command = GET_BE_U_2(ipx);
     ipx += 2;
     length -= 2;
 
@@ -248,8 +248,8 @@ ipx_rip_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	    if (length < 8)
 		goto trunc;
 	    ND_TCHECK_8(ipx);
-	    ND_PRINT(" %08x/%u.%u", EXTRACT_BE_U_4(ipx),
-			 EXTRACT_BE_U_2(ipx + 4), EXTRACT_BE_U_2(ipx + 6));
+	    ND_PRINT(" %08x/%u.%u", GET_BE_U_4(ipx),
+			 GET_BE_U_2(ipx + 4), GET_BE_U_2(ipx + 6));
 	}
 	break;
       case 2:
@@ -258,8 +258,8 @@ ipx_rip_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	    if (length < 8)
 		goto trunc;
 	    ND_TCHECK_8(ipx);
-	    ND_PRINT(" %08x/%u.%u", EXTRACT_BE_U_4(ipx),
-			 EXTRACT_BE_U_2(ipx + 4), EXTRACT_BE_U_2(ipx + 6));
+	    ND_PRINT(" %08x/%u.%u", GET_BE_U_4(ipx),
+			 GET_BE_U_2(ipx + 4), GET_BE_U_2(ipx + 6));
 
 	    ipx += 8;
 	    length -= 8;

@@ -39,19 +39,19 @@ ipnet_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	hdr = (const ipnet_hdr_t *)bp;
 
 	ND_TCHECK_SIZE(hdr);
-	ND_PRINT("%u > %u", EXTRACT_BE_U_4(hdr->iph_zsrc),
-		  EXTRACT_BE_U_4(hdr->iph_zdst));
+	ND_PRINT("%u > %u", GET_BE_U_4(hdr->iph_zsrc),
+		  GET_BE_U_4(hdr->iph_zdst));
 
 	if (!ndo->ndo_qflag) {
 		ND_PRINT(", family %s (%u)",
                           tok2str(ipnet_values, "Unknown",
-                                  EXTRACT_U_1(hdr->iph_family)),
-                          EXTRACT_U_1(hdr->iph_family));
+                                  GET_U_1(hdr->iph_family)),
+                          GET_U_1(hdr->iph_family));
         } else {
 		ND_PRINT(", %s",
                           tok2str(ipnet_values,
                                   "Unknown Ethertype (0x%04x)",
-				  EXTRACT_U_1(hdr->iph_family)));
+				  GET_U_1(hdr->iph_family)));
         }
 
 	ND_PRINT(", length %u: ", length);
@@ -78,7 +78,7 @@ ipnet_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 	p += sizeof(ipnet_hdr_t);
 
 	ND_TCHECK_1(hdr->iph_family);
-	switch (EXTRACT_U_1(hdr->iph_family)) {
+	switch (GET_U_1(hdr->iph_family)) {
 
 	case IPH_AF_INET:
 	        ip_print(ndo, p, length);

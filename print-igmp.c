@@ -119,11 +119,11 @@ print_mtrace(netdissect_options *ndo,
 	return;
     }
     ND_PRINT("mtrace %u: %s to %s reply-to %s",
-        EXTRACT_BE_U_3(tr->tr_qid),
+        GET_BE_U_3(tr->tr_qid),
         ipaddr_string(ndo, tr->tr_src), ipaddr_string(ndo, tr->tr_dst),
         ipaddr_string(ndo, tr->tr_raddr));
-    if (IN_CLASSD(EXTRACT_BE_U_4(tr->tr_raddr)))
-        ND_PRINT(" with-ttl %u", EXTRACT_U_1(tr->tr_rttl));
+    if (IN_CLASSD(GET_BE_U_4(tr->tr_raddr)))
+        ND_PRINT(" with-ttl %u", GET_U_1(tr->tr_rttl));
     return;
 trunc:
     nd_print_trunc(ndo);
@@ -141,11 +141,11 @@ print_mresp(netdissect_options *ndo,
 	return;
     }
     ND_PRINT("mresp %u: %s to %s reply-to %s",
-        EXTRACT_BE_U_3(tr->tr_qid),
+        GET_BE_U_3(tr->tr_qid),
         ipaddr_string(ndo, tr->tr_src), ipaddr_string(ndo, tr->tr_dst),
         ipaddr_string(ndo, tr->tr_raddr));
-    if (IN_CLASSD(EXTRACT_BE_U_4(tr->tr_raddr)))
-        ND_PRINT(" with-ttl %u", EXTRACT_U_1(tr->tr_rttl));
+    if (IN_CLASSD(GET_BE_U_4(tr->tr_raddr)))
+        ND_PRINT(" with-ttl %u", GET_U_1(tr->tr_rttl));
     return;
 trunc:
     nd_print_trunc(ndo);
@@ -164,7 +164,7 @@ print_igmpv3_report(netdissect_options *ndo,
 	return;
     }
     ND_TCHECK_2(bp + 6);
-    ngroups = EXTRACT_BE_U_2(bp + 6);
+    ngroups = GET_BE_U_2(bp + 6);
     ND_PRINT(", %u group record(s)", ngroups);
     if (ndo->ndo_vflag > 0) {
 	/* Print the group records */
@@ -177,8 +177,8 @@ print_igmpv3_report(netdissect_options *ndo,
 	    ND_TCHECK_4(bp + (group + 4));
             ND_PRINT(" [gaddr %s", ipaddr_string(ndo, bp + group + 4));
 	    ND_PRINT(" %s", tok2str(igmpv3report2str, " [v3-report-#%u]",
-								EXTRACT_U_1(bp + group)));
-            nsrcs = EXTRACT_BE_U_2(bp + group + 2);
+								GET_U_1(bp + group)));
+            nsrcs = GET_BE_U_2(bp + group + 2);
 	    /* Check the number of sources and print them */
 	    if (len < group+8+(nsrcs<<2)) {
 		ND_PRINT(" [invalid number of sources %u]", nsrcs);
@@ -221,7 +221,7 @@ print_igmpv3_query(netdissect_options *ndo,
 	return;
     }
     ND_TCHECK_1(bp + 1);
-    mrc = EXTRACT_U_1(bp + 1);
+    mrc = GET_U_1(bp + 1);
     if (mrc < 128) {
 	mrt = mrc;
     } else {
@@ -237,11 +237,11 @@ print_igmpv3_query(netdissect_options *ndo,
 	ND_PRINT("]");
     }
     ND_TCHECK_4(bp + 4);
-    if (EXTRACT_BE_U_4(bp + 4) == 0)
+    if (GET_BE_U_4(bp + 4) == 0)
 	return;
     ND_PRINT(" [gaddr %s", ipaddr_string(ndo, bp + 4));
     ND_TCHECK_2(bp + 10);
-    nsrcs = EXTRACT_BE_U_2(bp + 10);
+    nsrcs = GET_BE_U_2(bp + 10);
     if (nsrcs > 0) {
 	if (len < 12 + (nsrcs << 2))
 	    ND_PRINT(" [invalid number of sources]");
@@ -274,21 +274,21 @@ igmp_print(netdissect_options *ndo,
     }
 
     ND_TCHECK_1(bp);
-    switch (EXTRACT_U_1(bp)) {
+    switch (GET_U_1(bp)) {
     case 0x11:
         ND_PRINT("igmp query");
 	if (len >= 12)
 	    print_igmpv3_query(ndo, bp, len);
 	else {
             ND_TCHECK_1(bp + 1);
-	    if (EXTRACT_U_1(bp + 1)) {
+	    if (GET_U_1(bp + 1)) {
 		ND_PRINT(" v2");
-		if (EXTRACT_U_1(bp + 1) != 100)
-		    ND_PRINT(" [max resp time %u]", EXTRACT_U_1(bp + 1));
+		if (GET_U_1(bp + 1) != 100)
+		    ND_PRINT(" [max resp time %u]", GET_U_1(bp + 1));
 	    } else
 		ND_PRINT(" v1");
             ND_TCHECK_4(bp + 4);
-	    if (EXTRACT_BE_U_4(bp + 4))
+	    if (GET_BE_U_4(bp + 4))
                 ND_PRINT(" [gaddr %s]", ipaddr_string(ndo, bp + 4));
             if (len != 8)
                 ND_PRINT(" [len %u]", len);
@@ -330,7 +330,7 @@ igmp_print(netdissect_options *ndo,
         print_mtrace(ndo, bp, len);
         break;
     default:
-        ND_PRINT("igmp-%u", EXTRACT_U_1(bp));
+        ND_PRINT("igmp-%u", GET_U_1(bp));
         break;
     }
 
@@ -339,7 +339,7 @@ igmp_print(netdissect_options *ndo,
         vec[0].ptr = bp;
         vec[0].len = len;
         if (in_cksum(vec, 1))
-            ND_PRINT(" bad igmp cksum %x!", EXTRACT_BE_U_2(bp + 2));
+            ND_PRINT(" bad igmp cksum %x!", GET_BE_U_2(bp + 2));
     }
     return;
 trunc:

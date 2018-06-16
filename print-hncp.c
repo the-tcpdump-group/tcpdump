@@ -163,8 +163,8 @@ format_nid(netdissect_options *ndo, const u_char *data)
     static int i = 0;
     i = (i + 1) % 4;
     nd_snprintf(buf[i], sizeof(buf[i]), "%02x:%02x:%02x:%02x",
-             EXTRACT_U_1(data), EXTRACT_U_1(data + 1), EXTRACT_U_1(data + 2),
-             EXTRACT_U_1(data + 3));
+             GET_U_1(data), GET_U_1(data + 1), GET_U_1(data + 2),
+             GET_U_1(data + 3));
     return buf[i];
 }
 
@@ -175,10 +175,10 @@ format_256(netdissect_options *ndo, const u_char *data)
     static int i = 0;
     i = (i + 1) % 4;
     nd_snprintf(buf[i], sizeof(buf[i]), "%016" PRIx64 "%016" PRIx64 "%016" PRIx64 "%016" PRIx64,
-         EXTRACT_BE_U_8(data),
-         EXTRACT_BE_U_8(data + 8),
-         EXTRACT_BE_U_8(data + 16),
-         EXTRACT_BE_U_8(data + 24)
+         GET_BE_U_8(data),
+         GET_BE_U_8(data + 8),
+         GET_BE_U_8(data + 16),
+         GET_BE_U_8(data + 24)
     );
     return buf[i];
 }
@@ -208,12 +208,12 @@ print_prefix(netdissect_options *ndo, const u_char *prefix, u_int max_length)
     int plenbytes;
     char buf[sizeof("xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx::/128")];
 
-    if (EXTRACT_U_1(prefix) >= 96 && max_length >= IPV4_MAPPED_HEADING_LEN + 1 &&
+    if (GET_U_1(prefix) >= 96 && max_length >= IPV4_MAPPED_HEADING_LEN + 1 &&
         is_ipv4_mapped_address(prefix + 1)) {
         struct in_addr addr;
         u_int plen;
 
-        plen = EXTRACT_U_1(prefix) - 96;
+        plen = GET_U_1(prefix) - 96;
         if (32 < plen)
             return -1;
         max_length -= 1;
@@ -243,7 +243,7 @@ print_dns_label(netdissect_options *ndo,
 {
     u_int length = 0;
     while (length < max_length) {
-        u_int lab_length = EXTRACT_U_1(cp + length);
+        u_int lab_length = GET_U_1(cp + length);
         length++;
         if (lab_length == 0)
             return (int)length;
@@ -276,8 +276,8 @@ dhcpv4_print(netdissect_options *ndo,
         if (i + 2 > length)
             return -1;
         tlv = cp + i;
-        type = EXTRACT_U_1(tlv);
-        optlen = EXTRACT_U_1(tlv + 1);
+        type = GET_U_1(tlv);
+        optlen = GET_U_1(tlv + 1);
         value = tlv + 2;
 
         ND_PRINT("\n");
@@ -328,8 +328,8 @@ dhcpv6_print(netdissect_options *ndo,
         if (i + 4 > length)
             return -1;
         tlv = cp + i;
-        type = EXTRACT_BE_U_2(tlv);
-        optlen = EXTRACT_BE_U_2(tlv + 2);
+        type = GET_BE_U_2(tlv);
+        optlen = GET_BE_U_2(tlv + 2);
         value = tlv + 4;
 
         ND_PRINT("\n");
@@ -429,8 +429,8 @@ hncp_print_rec(netdissect_options *ndo,
         if (i + 4 > length)
             goto invalid;
 
-        type = EXTRACT_BE_U_2(tlv);
-        bodylen = EXTRACT_BE_U_2(tlv + 2);
+        type = GET_BE_U_2(tlv);
+        bodylen = GET_BE_U_2(tlv + 2);
         value = tlv + 4;
         ND_TCHECK_LEN(value, bodylen);
         if (i + bodylen + 4 > length)
@@ -502,7 +502,7 @@ hncp_print_rec(netdissect_options *ndo,
                 break;
             }
             node_identifier = format_nid(ndo, value);
-            endpoint_identifier = EXTRACT_BE_U_4(value + 4);
+            endpoint_identifier = GET_BE_U_4(value + 4);
             ND_PRINT(" NID: %s EPID: %08x",
                 node_identifier,
                 endpoint_identifier
@@ -516,7 +516,7 @@ hncp_print_rec(netdissect_options *ndo,
                 nd_print_invalid(ndo);
                 break;
             }
-            hash = EXTRACT_BE_U_8(value);
+            hash = GET_BE_U_8(value);
             ND_PRINT(" hash: %016" PRIx64, hash);
         }
             break;
@@ -530,9 +530,9 @@ hncp_print_rec(netdissect_options *ndo,
                 break;
             }
             node_identifier = format_nid(ndo, value);
-            sequence_number = EXTRACT_BE_U_4(value + 4);
-            interval = format_interval(EXTRACT_BE_U_4(value + 8));
-            hash = EXTRACT_BE_U_8(value + 12);
+            sequence_number = GET_BE_U_4(value + 4);
+            interval = format_interval(GET_BE_U_4(value + 8));
+            hash = GET_BE_U_8(value + 12);
             ND_PRINT(" NID: %s seqno: %u %s hash: %016" PRIx64,
                 node_identifier,
                 sequence_number,
@@ -551,8 +551,8 @@ hncp_print_rec(netdissect_options *ndo,
                 break;
             }
             peer_node_identifier = format_nid(ndo, value);
-            peer_endpoint_identifier = EXTRACT_BE_U_4(value + 4);
-            endpoint_identifier = EXTRACT_BE_U_4(value + 8);
+            peer_endpoint_identifier = GET_BE_U_4(value + 4);
+            endpoint_identifier = GET_BE_U_4(value + 8);
             ND_PRINT(" Peer-NID: %s Peer-EPID: %08x Local-EPID: %08x",
                 peer_node_identifier,
                 peer_endpoint_identifier,
@@ -568,8 +568,8 @@ hncp_print_rec(netdissect_options *ndo,
                 nd_print_invalid(ndo);
                 break;
             }
-            endpoint_identifier = EXTRACT_BE_U_4(value);
-            interval = format_interval(EXTRACT_BE_U_4(value + 4));
+            endpoint_identifier = GET_BE_U_4(value);
+            interval = format_interval(GET_BE_U_4(value + 4));
             ND_PRINT(" EPID: %08x Interval: %s",
                 endpoint_identifier,
                 interval
@@ -583,7 +583,7 @@ hncp_print_rec(netdissect_options *ndo,
                 break;
             }
             ND_PRINT(" Verdict: %u Fingerprint: %s Common Name: ",
-                EXTRACT_U_1(value),
+                GET_U_1(value),
                 format_256(ndo, value + 4));
             (void)nd_printzp(ndo, value + 36, bodylen - 36, NULL);
         }
@@ -596,7 +596,7 @@ hncp_print_rec(netdissect_options *ndo,
                 nd_print_invalid(ndo);
                 break;
             }
-            capabilities = EXTRACT_BE_U_2(value + 2);
+            capabilities = GET_BE_U_2(value + 2);
             M = (uint8_t)((capabilities >> 12) & 0xf);
             P = (uint8_t)((capabilities >> 8) & 0xf);
             H = (uint8_t)((capabilities >> 4) & 0xf);
@@ -616,13 +616,13 @@ hncp_print_rec(netdissect_options *ndo,
 
         case HNCP_DELEGATED_PREFIX: {
             int l;
-            if (bodylen < 9 || bodylen < 9 + (EXTRACT_U_1(value + 8) + 7) / 8) {
+            if (bodylen < 9 || bodylen < 9 + (GET_U_1(value + 8) + 7) / 8) {
                 nd_print_invalid(ndo);
                 break;
             }
             ND_PRINT(" VLSO: %s PLSO: %s Prefix: ",
-                format_interval(EXTRACT_BE_U_4(value)),
-                format_interval(EXTRACT_BE_U_4(value + 4))
+                format_interval(GET_BE_U_4(value)),
+                format_interval(GET_BE_U_4(value + 4))
             );
             l = print_prefix(ndo, value + 8, bodylen - 8);
             if (l == -1) {
@@ -656,7 +656,7 @@ hncp_print_rec(netdissect_options *ndo,
                 nd_print_invalid(ndo);
                 break;
             }
-            policy = EXTRACT_U_1(value);
+            policy = GET_U_1(value);
             ND_PRINT(" type: ");
             if (policy == 0) {
                 if (bodylen != 1) {
@@ -727,13 +727,13 @@ hncp_print_rec(netdissect_options *ndo,
         case HNCP_ASSIGNED_PREFIX: {
             uint8_t prty;
             int l;
-            if (bodylen < 6 || bodylen < 6 + (EXTRACT_U_1(value + 5) + 7) / 8) {
+            if (bodylen < 6 || bodylen < 6 + (GET_U_1(value + 5) + 7) / 8) {
                 nd_print_invalid(ndo);
                 break;
             }
-            prty = EXTRACT_U_1(value + 4) & 0xf;
+            prty = GET_U_1(value + 4) & 0xf;
             ND_PRINT(" EPID: %08x Prty: %u",
-                EXTRACT_BE_U_4(value),
+                GET_BE_U_4(value),
                 prty
             );
             ND_PRINT(" Prefix: ");
@@ -756,7 +756,7 @@ hncp_print_rec(netdissect_options *ndo,
                 nd_print_invalid(ndo);
                 break;
             }
-            endpoint_identifier = EXTRACT_BE_U_4(value);
+            endpoint_identifier = GET_BE_U_4(value);
             ip_address = format_ip6addr(ndo, value + 4);
             ND_PRINT(" EPID: %08x IP Address: %s",
                 endpoint_identifier,
@@ -777,9 +777,9 @@ hncp_print_rec(netdissect_options *ndo,
             ip_address = format_ip6addr(ndo, value);
             ND_PRINT(" IP-Address: %s %c%c%c ",
                 ip_address,
-                (EXTRACT_U_1(value + 16) & 4) ? 'l' : '-',
-                (EXTRACT_U_1(value + 16) & 2) ? 'b' : '-',
-                (EXTRACT_U_1(value + 16) & 1) ? 's' : '-'
+                (GET_U_1(value + 16) & 4) ? 'l' : '-',
+                (GET_U_1(value + 16) & 2) ? 'b' : '-',
+                (GET_U_1(value + 16) & 1) ? 's' : '-'
             );
             len = print_dns_label(ndo, value+17, bodylen-17, 1);
             if (len < 0) {
@@ -809,7 +809,7 @@ hncp_print_rec(netdissect_options *ndo,
                 nd_print_invalid(ndo);
                 break;
             }
-            l = EXTRACT_U_1(value + 16);
+            l = GET_U_1(value + 16);
             if (bodylen < 17 + l) {
                 nd_print_invalid(ndo);
                 break;

@@ -93,7 +93,7 @@ static int brcm_tag_print_full(netdissect_options *ndo, const u_char *bp,
 		return (1);
 
 	for (i = 0; i < BRCM_TAG_LEN; i++)
-		tag[i] = EXTRACT_U_1(bp + i);
+		tag[i] = GET_U_1(bp + i);
 
 	ND_PRINT("BRCM tag OP: %s", tag[0] ? "IG" : "EG");
 	if (tag[0] & (1 << BRCM_OPCODE_SHIFT)) {

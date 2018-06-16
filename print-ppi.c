@@ -35,12 +35,12 @@ ppi_header_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	hdr = (const ppi_header_t *)bp;
 
-	len = EXTRACT_LE_U_2(hdr->ppi_len);
-	dlt = EXTRACT_LE_U_4(hdr->ppi_dlt);
+	len = GET_LE_U_2(hdr->ppi_len);
+	dlt = GET_LE_U_4(hdr->ppi_dlt);
 	dltname = pcap_datalink_val_to_name(dlt);
 
 	if (!ndo->ndo_qflag) {
-		ND_PRINT("V.%u DLT %s (%u) len %u", EXTRACT_U_1(hdr->ppi_ver),
+		ND_PRINT("V.%u DLT %s (%u) len %u", GET_U_1(hdr->ppi_ver),
 			  (dltname != NULL ? dltname : "UNKNOWN"), dlt,
                           len);
         } else {
@@ -71,7 +71,7 @@ ppi_print(netdissect_options *ndo,
 
 	hdr = (const ppi_header_t *)p;
 	ND_TCHECK_2(hdr->ppi_len);
-	len = EXTRACT_LE_U_2(hdr->ppi_len);
+	len = GET_LE_U_2(hdr->ppi_len);
 	if (caplen < len) {
 		/*
 		 * If we don't have the entire PPI header, don't
@@ -85,7 +85,7 @@ ppi_print(netdissect_options *ndo,
 		return (len);
 	}
 	ND_TCHECK_4(hdr->ppi_dlt);
-	dlt = EXTRACT_LE_U_4(hdr->ppi_dlt);
+	dlt = GET_LE_U_4(hdr->ppi_dlt);
 
 	if (ndo->ndo_eflag)
 		ppi_header_print(ndo, p, length);

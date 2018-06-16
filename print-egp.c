@@ -143,7 +143,7 @@ egpnr_print(netdissect_options *ndo,
 	u_int intgw, extgw, t_gateways;
 	const char *comma;
 
-	addr = EXTRACT_IPV4_TO_NETWORK_ORDER(egp->egp_sourcenet);
+	addr = GET_IPV4_TO_NETWORK_ORDER(egp->egp_sourcenet);
 	if (IN_CLASSA(addr)) {
 		net = addr & IN_CLASSA_NET;
 		netlen = 1;
@@ -160,8 +160,8 @@ egpnr_print(netdissect_options *ndo,
 	cp = (const uint8_t *)(egp + 1);
 	length -= sizeof(*egp);
 
-	intgw = EXTRACT_U_1(egp->egp_intgw);
-	extgw = EXTRACT_U_1(egp->egp_extgw);
+	intgw = GET_U_1(egp->egp_intgw);
+	extgw = GET_U_1(egp->egp_extgw);
 	t_gateways = intgw + extgw;
 	for (gateways = 0; gateways < t_gateways; ++gateways) {
 		/* Pickup host part of gateway address */
@@ -172,15 +172,15 @@ egpnr_print(netdissect_options *ndo,
 		switch (netlen) {
 
 		case 1:
-			addr = EXTRACT_U_1(cp);
+			addr = GET_U_1(cp);
 			cp++;
 			/* fall through */
 		case 2:
-			addr = (addr << 8) | EXTRACT_U_1(cp);
+			addr = (addr << 8) | GET_U_1(cp);
 			cp++;
 			/* fall through */
 		case 3:
-			addr = (addr << 8) | EXTRACT_U_1(cp);
+			addr = (addr << 8) | GET_U_1(cp);
 			cp++;
 			break;
 		}
@@ -189,7 +189,7 @@ egpnr_print(netdissect_options *ndo,
 		if (length < 1)
 			goto trunc;
 		ND_TCHECK_1(cp);
-		distances = EXTRACT_U_1(cp);
+		distances = GET_U_1(cp);
 		cp++;
 		length--;
 		ND_PRINT(" %s %s ",
@@ -202,10 +202,10 @@ egpnr_print(netdissect_options *ndo,
 			if (length < 2)
 				goto trunc;
 			ND_TCHECK_2(cp);
-			ND_PRINT("%sd%u:", comma, EXTRACT_U_1(cp));
+			ND_PRINT("%sd%u:", comma, GET_U_1(cp));
 			cp++;
 			comma = ", ";
-			networks = EXTRACT_U_1(cp);
+			networks = GET_U_1(cp);
 			cp++;
 			length -= 2;
 			while (networks != 0) {
@@ -213,23 +213,23 @@ egpnr_print(netdissect_options *ndo,
 				if (length < 1)
 					goto trunc;
 				ND_TCHECK_1(cp);
-				addr = ((uint32_t) EXTRACT_U_1(cp)) << 24;
+				addr = ((uint32_t) GET_U_1(cp)) << 24;
 				cp++;
 				length--;
 				if (IN_CLASSB(addr)) {
 					if (length < 1)
 						goto trunc;
 					ND_TCHECK_1(cp);
-					addr |= ((uint32_t) EXTRACT_U_1(cp)) << 16;
+					addr |= ((uint32_t) GET_U_1(cp)) << 16;
 					cp++;
 					length--;
 				} else if (!IN_CLASSA(addr)) {
 					if (length < 2)
 						goto trunc;
 					ND_TCHECK_2(cp);
-					addr |= ((uint32_t) EXTRACT_U_1(cp)) << 16;
+					addr |= ((uint32_t) GET_U_1(cp)) << 16;
 					cp++;
-					addr |= ((uint32_t) EXTRACT_U_1(cp)) << 8;
+					addr |= ((uint32_t) GET_U_1(cp)) << 8;
 					cp++;
 					length -= 2;
 				}
@@ -262,12 +262,12 @@ egp_print(netdissect_options *ndo,
 		return;
 	}
 
-	version = EXTRACT_U_1(egp->egp_version);
+	version = GET_U_1(egp->egp_version);
         if (!ndo->ndo_vflag) {
             ND_PRINT("EGPv%u, AS %u, seq %u, length %u",
                    version,
-                   EXTRACT_BE_U_2(egp->egp_as),
-                   EXTRACT_BE_U_2(egp->egp_sequence),
+                   GET_BE_U_2(egp->egp_as),
+                   GET_BE_U_2(egp->egp_sequence),
                    length);
             return;
         } else
@@ -280,9 +280,9 @@ egp_print(netdissect_options *ndo,
 		return;
 	}
 
-	type = EXTRACT_U_1(egp->egp_type);
-	code = EXTRACT_U_1(egp->egp_code);
-	status = EXTRACT_U_1(egp->egp_status);
+	type = GET_U_1(egp->egp_type);
+	code = GET_U_1(egp->egp_code);
+	status = GET_U_1(egp->egp_status);
 
 	switch (type) {
 	case EGPT_ACQUIRE:
@@ -303,8 +303,8 @@ egp_print(netdissect_options *ndo,
 				break;
 			}
 			ND_PRINT(" hello:%u poll:%u",
-			       EXTRACT_BE_U_2(egp->egp_hello),
-			       EXTRACT_BE_U_2(egp->egp_poll));
+			       GET_BE_U_2(egp->egp_hello),
+			       GET_BE_U_2(egp->egp_poll));
 			break;
 
 		case EGPC_REFUSE:
@@ -372,8 +372,8 @@ egp_print(netdissect_options *ndo,
 			ND_PRINT(" [status %u]", status);
 		ND_PRINT(" %s int %u ext %u",
 		       ipaddr_string(ndo, egp->egp_sourcenet),
-		       EXTRACT_U_1(egp->egp_intgw),
-		       EXTRACT_U_1(egp->egp_extgw));
+		       GET_U_1(egp->egp_intgw),
+		       GET_U_1(egp->egp_extgw));
 		if (ndo->ndo_vflag)
 			egpnr_print(ndo, egp, length);
 		break;
@@ -385,10 +385,11 @@ egp_print(netdissect_options *ndo,
 		else
 			ND_PRINT(" [status %u]", status);
 
-		if (EXTRACT_BE_U_2(egp->egp_reason) <= EGPR_UVERSION)
-			ND_PRINT(" %s", egp_reasons[EXTRACT_BE_U_2(egp->egp_reason)]);
+		if (GET_BE_U_2(egp->egp_reason) <= EGPR_UVERSION)
+			ND_PRINT(" %s",
+				 egp_reasons[GET_BE_U_2(egp->egp_reason)]);
 		else
-			ND_PRINT(" [reason %u]", EXTRACT_BE_U_2(egp->egp_reason));
+			ND_PRINT(" [reason %u]", GET_BE_U_2(egp->egp_reason));
 		break;
 
 	default:

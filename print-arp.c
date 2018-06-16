@@ -77,18 +77,18 @@ struct  arp_pkthdr {
 	nd_byte		ar_tpa[];	/* target protocol address */
 #endif
 #define ar_sha(ap)	(((const u_char *)((ap)+1))+  0)
-#define ar_spa(ap)	(((const u_char *)((ap)+1))+  EXTRACT_U_1((ap)->ar_hln))
-#define ar_tha(ap)	(((const u_char *)((ap)+1))+  EXTRACT_U_1((ap)->ar_hln)+EXTRACT_U_1((ap)->ar_pln))
-#define ar_tpa(ap)	(((const u_char *)((ap)+1))+2*EXTRACT_U_1((ap)->ar_hln)+EXTRACT_U_1((ap)->ar_pln))
+#define ar_spa(ap)	(((const u_char *)((ap)+1))+  GET_U_1((ap)->ar_hln))
+#define ar_tha(ap)	(((const u_char *)((ap)+1))+  GET_U_1((ap)->ar_hln)+GET_U_1((ap)->ar_pln))
+#define ar_tpa(ap)	(((const u_char *)((ap)+1))+2*GET_U_1((ap)->ar_hln)+GET_U_1((ap)->ar_pln))
 };
 
 #define ARP_HDRLEN	8
 
-#define HRD(ap) EXTRACT_BE_U_2((ap)->ar_hrd)
-#define HRD_LEN(ap) EXTRACT_U_1((ap)->ar_hln)
-#define PROTO_LEN(ap) EXTRACT_U_1((ap)->ar_pln)
-#define OP(ap)  EXTRACT_BE_U_2((ap)->ar_op)
-#define PRO(ap) EXTRACT_BE_U_2((ap)->ar_pro)
+#define HRD(ap) GET_BE_U_2((ap)->ar_hrd)
+#define HRD_LEN(ap) GET_U_1((ap)->ar_hln)
+#define PROTO_LEN(ap) GET_U_1((ap)->ar_pln)
+#define OP(ap)  GET_BE_U_2((ap)->ar_op)
+#define PRO(ap) GET_BE_U_2((ap)->ar_pro)
 #define SHA(ap) (ar_sha(ap))
 #define SPA(ap) (ar_spa(ap))
 #define THA(ap) (ar_tha(ap))
@@ -151,15 +151,15 @@ struct  atmarp_pkthdr {
 	nd_byte		aar_tpa[];	/* target protocol address */
 #endif
 
-#define ATMHRD(ap)  EXTRACT_BE_U_2((ap)->aar_hrd)
-#define ATMSHRD_LEN(ap) (EXTRACT_U_1((ap)->aar_shtl) & ATMARP_LEN_MASK)
-#define ATMSSLN(ap) (EXTRACT_U_1((ap)->aar_sstl) & ATMARP_LEN_MASK)
-#define ATMSPROTO_LEN(ap) EXTRACT_U_1((ap)->aar_spln)
-#define ATMOP(ap)   EXTRACT_BE_U_2((ap)->aar_op)
-#define ATMPRO(ap)  EXTRACT_BE_U_2((ap)->aar_pro)
-#define ATMTHRD_LEN(ap) (EXTRACT_U_1((ap)->aar_thtl) & ATMARP_LEN_MASK)
-#define ATMTSLN(ap) (EXTRACT_U_1((ap)->aar_tstl) & ATMARP_LEN_MASK)
-#define ATMTPROTO_LEN(ap) EXTRACT_U_1((ap)->aar_tpln)
+#define ATMHRD(ap)  GET_BE_U_2((ap)->aar_hrd)
+#define ATMSHRD_LEN(ap) (GET_U_1((ap)->aar_shtl) & ATMARP_LEN_MASK)
+#define ATMSSLN(ap) (GET_U_1((ap)->aar_sstl) & ATMARP_LEN_MASK)
+#define ATMSPROTO_LEN(ap) GET_U_1((ap)->aar_spln)
+#define ATMOP(ap)   GET_BE_U_2((ap)->aar_op)
+#define ATMPRO(ap)  GET_BE_U_2((ap)->aar_pro)
+#define ATMTHRD_LEN(ap) (GET_U_1((ap)->aar_thtl) & ATMARP_LEN_MASK)
+#define ATMTSLN(ap) (GET_U_1((ap)->aar_tstl) & ATMARP_LEN_MASK)
+#define ATMTPROTO_LEN(ap) GET_U_1((ap)->aar_tpln)
 #define aar_sha(ap)	((const u_char *)((ap)+1))
 #define aar_ssa(ap)	(aar_sha(ap) + ATMSHRD_LEN(ap))
 #define aar_spa(ap)	(aar_ssa(ap) + ATMSSLN(ap))
@@ -179,7 +179,7 @@ static int
 isnonzero(netdissect_options *ndo, const u_char *a, size_t len)
 {
 	while (len > 0) {
-		if (EXTRACT_U_1(a) != 0)
+		if (GET_U_1(a) != 0)
 			return (1);
 		a++;
 		len--;

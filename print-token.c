@@ -69,15 +69,15 @@
 #define TOKEN_HDRLEN		14
 #define ROUTING_SEGMENT_MAX	16
 #define IS_SOURCE_ROUTED(trp)	((trp)->token_shost[0] & 0x80)
-#define FRAME_TYPE(trp)		((EXTRACT_U_1((trp)->token_fc) & 0xC0) >> 6)
+#define FRAME_TYPE(trp)		((GET_U_1((trp)->token_fc) & 0xC0) >> 6)
 #define TOKEN_FC_LLC		1
 
-#define BROADCAST(trp)		((EXTRACT_BE_U_2((trp)->token_rcf) & 0xE000) >> 13)
-#define RIF_LENGTH(trp)		((EXTRACT_BE_U_2((trp)->token_rcf) & 0x1f00) >> 8)
-#define DIRECTION(trp)		((EXTRACT_BE_U_2((trp)->token_rcf) & 0x0080) >> 7)
-#define LARGEST_FRAME(trp)	((EXTRACT_BE_U_2((trp)->token_rcf) & 0x0070) >> 4)
-#define RING_NUMBER(trp, x)	((EXTRACT_BE_U_2((trp)->token_rseg[x]) & 0xfff0) >> 4)
-#define BRIDGE_NUMBER(trp, x)	(EXTRACT_BE_U_2((trp)->token_rseg[x]) & 0x000f)
+#define BROADCAST(trp)		((GET_BE_U_2((trp)->token_rcf) & 0xE000) >> 13)
+#define RIF_LENGTH(trp)		((GET_BE_U_2((trp)->token_rcf) & 0x1f00) >> 8)
+#define DIRECTION(trp)		((GET_BE_U_2((trp)->token_rcf) & 0x0080) >> 7)
+#define LARGEST_FRAME(trp)	((GET_BE_U_2((trp)->token_rcf) & 0x0070) >> 4)
+#define RING_NUMBER(trp, x)	((GET_BE_U_2((trp)->token_rseg[x]) & 0xfff0) >> 4)
+#define BRIDGE_NUMBER(trp, x)	(GET_BE_U_2((trp)->token_rseg[x]) & 0x000f)
 #define SEGMENT_COUNT(trp)	((int)((RIF_LENGTH(trp) - 2) / 2))
 
 struct token_header {
@@ -113,8 +113,8 @@ token_hdr_print(netdissect_options *ndo,
 
 	if (!ndo->ndo_qflag)
 		ND_PRINT("%02x %02x ",
-		       EXTRACT_U_1(trp->token_ac),
-		       EXTRACT_U_1(trp->token_fc));
+		       GET_U_1(trp->token_ac),
+		       GET_U_1(trp->token_fc));
 	ND_PRINT("%s > %s, length %u: ",
 	       srcname, dstname,
 	       length);
@@ -191,10 +191,11 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 				ND_PRINT(" [%u:%u]", RING_NUMBER(trp, seg),
 				    BRIDGE_NUMBER(trp, seg));
 		} else {
-			ND_PRINT("rt = %x", EXTRACT_BE_U_2(trp->token_rcf));
+			ND_PRINT("rt = %x", GET_BE_U_2(trp->token_rcf));
 
 			for (seg = 0; seg < SEGMENT_COUNT(trp); seg++)
-				ND_PRINT(":%x", EXTRACT_BE_U_2(trp->token_rseg[seg]));
+				ND_PRINT(":%x",
+					 GET_BE_U_2(trp->token_rseg[seg]));
 		}
 		ND_PRINT(" (%s) ", largest_frame[LARGEST_FRAME(trp)]);
 	} else {

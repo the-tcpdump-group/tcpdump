@@ -184,13 +184,13 @@ auth_print(netdissect_options *ndo, const u_char *pptr)
         pptr += sizeof (struct bfd_header_t);
         bfd_auth_header = (const struct bfd_auth_header_t *)pptr;
         ND_TCHECK_SIZE(bfd_auth_header);
-        auth_type = EXTRACT_U_1(bfd_auth_header->auth_type);
-        auth_len = EXTRACT_U_1(bfd_auth_header->auth_len);
+        auth_type = GET_U_1(bfd_auth_header->auth_type);
+        auth_len = GET_U_1(bfd_auth_header->auth_len);
         ND_PRINT("\n\tAuthentication: %s (%u), length: %u",
                  tok2str(bfd_v1_authentication_values,"Unknown",auth_type),
                  auth_type, auth_len);
                 pptr += 2;
-                ND_PRINT("\n\t  Auth Key ID: %u", EXTRACT_U_1(pptr));
+                ND_PRINT("\n\t  Auth Key ID: %u", GET_U_1(pptr));
 
         switch(auth_type) {
             case AUTH_PASSWORD:
@@ -242,12 +242,12 @@ auth_print(netdissect_options *ndo, const u_char *pptr)
                 }
                 pptr += 2;
                 ND_TCHECK_4(pptr);
-                ND_PRINT(", Sequence Number: 0x%08x", EXTRACT_BE_U_4(pptr));
+                ND_PRINT(", Sequence Number: 0x%08x", GET_BE_U_4(pptr));
                 pptr += 4;
                 ND_TCHECK_LEN(pptr, AUTH_MD5_HASH_LEN);
                 ND_PRINT("\n\t  Digest: ");
                 for(i = 0; i < AUTH_MD5_HASH_LEN; i++)
-                    ND_PRINT("%02x", EXTRACT_U_1(pptr + i));
+                    ND_PRINT("%02x", GET_U_1(pptr + i));
                 break;
             case AUTH_SHA1:
             case AUTH_MET_SHA1:
@@ -273,12 +273,12 @@ auth_print(netdissect_options *ndo, const u_char *pptr)
                 }
                 pptr += 2;
                 ND_TCHECK_4(pptr);
-                ND_PRINT(", Sequence Number: 0x%08x", EXTRACT_BE_U_4(pptr));
+                ND_PRINT(", Sequence Number: 0x%08x", GET_BE_U_4(pptr));
                 pptr += 4;
                 ND_TCHECK_LEN(pptr, AUTH_SHA1_HASH_LEN);
                 ND_PRINT("\n\t  Hash: ");
                 for(i = 0; i < AUTH_SHA1_HASH_LEN; i++)
-                    ND_PRINT("%02x", EXTRACT_U_1(pptr + i));
+                    ND_PRINT("%02x", GET_U_1(pptr + i));
                 break;
         }
         return 0;
@@ -303,9 +303,9 @@ bfd_print(netdissect_options *ndo, const u_char *pptr,
 
             bfd_header = (const struct bfd_header_t *)pptr;
             ND_TCHECK_SIZE(bfd_header);
-            version_diag = EXTRACT_U_1(bfd_header->version_diag);
+            version_diag = GET_U_1(bfd_header->version_diag);
             version = BFD_EXTRACT_VERSION(version_diag);
-            flags = EXTRACT_U_1(bfd_header->flags);
+            flags = GET_U_1(bfd_header->flags);
 
             switch (version) {
 
@@ -326,16 +326,21 @@ bfd_print(netdissect_options *ndo, const u_char *pptr,
                        BFD_EXTRACT_DIAG(version_diag));
 
                 ND_PRINT("\n\tDetection Timer Multiplier: %u (%u ms Detection time), BFD Length: %u",
-                       EXTRACT_U_1(bfd_header->detect_time_multiplier),
-                       EXTRACT_U_1(bfd_header->detect_time_multiplier) * EXTRACT_BE_U_4(bfd_header->desired_min_tx_interval)/1000,
-                       EXTRACT_U_1(bfd_header->length));
+                       GET_U_1(bfd_header->detect_time_multiplier),
+                       GET_U_1(bfd_header->detect_time_multiplier) * GET_BE_U_4(bfd_header->desired_min_tx_interval)/1000,
+                       GET_U_1(bfd_header->length));
 
 
-                ND_PRINT("\n\tMy Discriminator: 0x%08x", EXTRACT_BE_U_4(bfd_header->my_discriminator));
-                ND_PRINT(", Your Discriminator: 0x%08x", EXTRACT_BE_U_4(bfd_header->your_discriminator));
-                ND_PRINT("\n\t  Desired min Tx Interval:    %4u ms", EXTRACT_BE_U_4(bfd_header->desired_min_tx_interval)/1000);
-                ND_PRINT("\n\t  Required min Rx Interval:   %4u ms", EXTRACT_BE_U_4(bfd_header->required_min_rx_interval)/1000);
-                ND_PRINT("\n\t  Required min Echo Interval: %4u ms", EXTRACT_BE_U_4(bfd_header->required_min_echo_interval)/1000);
+                ND_PRINT("\n\tMy Discriminator: 0x%08x",
+                         GET_BE_U_4(bfd_header->my_discriminator));
+                ND_PRINT(", Your Discriminator: 0x%08x",
+                         GET_BE_U_4(bfd_header->your_discriminator));
+                ND_PRINT("\n\t  Desired min Tx Interval:    %4u ms",
+                         GET_BE_U_4(bfd_header->desired_min_tx_interval)/1000);
+                ND_PRINT("\n\t  Required min Rx Interval:   %4u ms",
+                         GET_BE_U_4(bfd_header->required_min_rx_interval)/1000);
+                ND_PRINT("\n\t  Required min Echo Interval: %4u ms",
+                         GET_BE_U_4(bfd_header->required_min_echo_interval)/1000);
 
                 if (flags & BFD_FLAG_AUTH) {
                     if (auth_print(ndo, pptr))
@@ -362,16 +367,21 @@ bfd_print(netdissect_options *ndo, const u_char *pptr,
                        BFD_EXTRACT_DIAG(version_diag));
 
                 ND_PRINT("\n\tDetection Timer Multiplier: %u (%u ms Detection time), BFD Length: %u",
-                       EXTRACT_U_1(bfd_header->detect_time_multiplier),
-                       EXTRACT_U_1(bfd_header->detect_time_multiplier) * EXTRACT_BE_U_4(bfd_header->desired_min_tx_interval)/1000,
-                       EXTRACT_U_1(bfd_header->length));
+                       GET_U_1(bfd_header->detect_time_multiplier),
+                       GET_U_1(bfd_header->detect_time_multiplier) * GET_BE_U_4(bfd_header->desired_min_tx_interval)/1000,
+                       GET_U_1(bfd_header->length));
 
 
-                ND_PRINT("\n\tMy Discriminator: 0x%08x", EXTRACT_BE_U_4(bfd_header->my_discriminator));
-                ND_PRINT(", Your Discriminator: 0x%08x", EXTRACT_BE_U_4(bfd_header->your_discriminator));
-                ND_PRINT("\n\t  Desired min Tx Interval:    %4u ms", EXTRACT_BE_U_4(bfd_header->desired_min_tx_interval)/1000);
-                ND_PRINT("\n\t  Required min Rx Interval:   %4u ms", EXTRACT_BE_U_4(bfd_header->required_min_rx_interval)/1000);
-                ND_PRINT("\n\t  Required min Echo Interval: %4u ms", EXTRACT_BE_U_4(bfd_header->required_min_echo_interval)/1000);
+                ND_PRINT("\n\tMy Discriminator: 0x%08x",
+                         GET_BE_U_4(bfd_header->my_discriminator));
+                ND_PRINT(", Your Discriminator: 0x%08x",
+                         GET_BE_U_4(bfd_header->your_discriminator));
+                ND_PRINT("\n\t  Desired min Tx Interval:    %4u ms",
+                         GET_BE_U_4(bfd_header->desired_min_tx_interval)/1000);
+                ND_PRINT("\n\t  Required min Rx Interval:   %4u ms",
+                         GET_BE_U_4(bfd_header->required_min_rx_interval)/1000);
+                ND_PRINT("\n\t  Required min Echo Interval: %4u ms",
+                         GET_BE_U_4(bfd_header->required_min_echo_interval)/1000);
 
                 if (flags & BFD_FLAG_AUTH) {
                     if (auth_print(ndo, pptr))

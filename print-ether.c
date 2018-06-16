@@ -118,8 +118,7 @@ ether_hdr_print(netdissect_options *ndo,
 		     etheraddr_string(ndo, ehp->ether_shost),
 		     etheraddr_string(ndo, ehp->ether_dhost));
 
-	length_type = EXTRACT_BE_U_2(bp +
-			 	     (hdrlen - sizeof(ehp->ether_length_type)));
+	length_type = GET_BE_U_2(bp + (hdrlen - sizeof(ehp->ether_length_type)));
 	if (!ndo->ndo_qflag) {
 	        if (length_type <= MAX_ETHERNET_LENGTH_VAL) {
 		        ND_PRINT(", 802.3");
@@ -193,8 +192,7 @@ ether_print_hdr_len(netdissect_options *ndo,
 	src.addr_string = etheraddr_string;
 	dst.addr = ehp->ether_dhost;
 	dst.addr_string = etheraddr_string;
-	length_type = EXTRACT_BE_U_2((const u_char *)ehp +
-				     (hdrlen - sizeof(ehp->ether_length_type)));
+	length_type = GET_BE_U_2((const u_char *)ehp + (hdrlen - sizeof(ehp->ether_length_type)));
 
 recurse:
 	/*
@@ -229,12 +227,12 @@ recurse:
 			return (hdrlen + length);
 		}
 	        if (ndo->ndo_eflag) {
-			uint16_t tag = EXTRACT_BE_U_2(p);
+			uint16_t tag = GET_BE_U_2(p);
 
 			ND_PRINT("%s, ", ieee8021q_tci_string(tag));
 		}
 
-		length_type = EXTRACT_BE_U_2(p + 2);
+		length_type = GET_BE_U_2(p + 2);
 		if (ndo->ndo_eflag && length_type > MAX_ETHERNET_LENGTH_VAL)
 			ND_PRINT("ethertype %s, ", tok2str(ethertype_values,"0x%04x", length_type));
 		p += 4;

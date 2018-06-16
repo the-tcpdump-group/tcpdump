@@ -88,7 +88,7 @@ struct ip6_hdr {
 };
 
 #define ip6_vfc		ip6_ctlun.ip6_un2_vfc
-#define IP6_VERSION(ip6_hdr)	((EXTRACT_U_1((ip6_hdr)->ip6_vfc) & 0xf0) >> 4)
+#define IP6_VERSION(ip6_hdr)	((GET_U_1((ip6_hdr)->ip6_vfc) & 0xf0) >> 4)
 #define ip6_flow	ip6_ctlun.ip6_un1.ip6_un1_flow
 #define ip6_plen	ip6_ctlun.ip6_un1.ip6_un1_plen
 #define ip6_nxt		ip6_ctlun.ip6_un1.ip6_un1_nxt

@@ -492,12 +492,12 @@ juniper_ggsn_if_print(netdissect_options *ndo,
         gh = (struct juniper_ggsn_header *)&l2info.cookie;
 
         ND_TCHECK_SIZE(gh);
-        proto = EXTRACT_U_1(gh->proto);
+        proto = GET_U_1(gh->proto);
         if (ndo->ndo_eflag) {
             ND_PRINT("proto %s (%u), vlan %u: ",
                    tok2str(juniper_protocol_values,"Unknown",proto),
                    proto,
-                   EXTRACT_BE_U_2(gh->vlan_id));
+                   GET_BE_U_2(gh->vlan_id));
         }
 
         switch (proto) {
@@ -546,7 +546,7 @@ juniper_es_if_print(netdissect_options *ndo,
         ih = (const struct juniper_ipsec_header *)p;
 
         ND_TCHECK_SIZE(ih);
-        switch (EXTRACT_U_1(ih->type)) {
+        switch (GET_U_1(ih->type)) {
         case JUNIPER_IPSEC_O_ESP_ENCRYPT_ESP_AUTHEN_TYPE:
         case JUNIPER_IPSEC_O_ESP_ENCRYPT_AH_AUTHEN_TYPE:
             rewrite_len = 0;
@@ -560,7 +560,7 @@ juniper_es_if_print(netdissect_options *ndo,
             break;
         default:
             ND_PRINT("ES Invalid type %u, length %u",
-                   EXTRACT_U_1(ih->type),
+                   GET_U_1(ih->type),
                    l2info.length);
             return l2info.header_len;
         }
@@ -571,20 +571,20 @@ juniper_es_if_print(netdissect_options *ndo,
         if (ndo->ndo_eflag) {
             if (!es_type_bundle) {
                 ND_PRINT("ES SA, index %u, ttl %u type %s (%u), spi %u, Tunnel %s > %s, length %u\n",
-                       EXTRACT_BE_U_2(ih->sa_index),
-                       EXTRACT_U_1(ih->ttl),
-                       tok2str(juniper_ipsec_type_values,"Unknown",EXTRACT_U_1(ih->type)),
-                       EXTRACT_U_1(ih->type),
-                       EXTRACT_BE_U_4(ih->spi),
+                       GET_BE_U_2(ih->sa_index),
+                       GET_U_1(ih->ttl),
+                       tok2str(juniper_ipsec_type_values,"Unknown",GET_U_1(ih->type)),
+                       GET_U_1(ih->type),
+                       GET_BE_U_4(ih->spi),
                        ipaddr_string(ndo, ih->src_ip),
                        ipaddr_string(ndo, ih->dst_ip),
                        l2info.length);
             } else {
                 ND_PRINT("ES SA, index %u, ttl %u type %s (%u), length %u\n",
-                       EXTRACT_BE_U_2(ih->sa_index),
-                       EXTRACT_U_1(ih->ttl),
-                       tok2str(juniper_ipsec_type_values,"Unknown",EXTRACT_U_1(ih->type)),
-                       EXTRACT_U_1(ih->type),
+                       GET_BE_U_2(ih->sa_index),
+                       GET_U_1(ih->ttl),
+                       tok2str(juniper_ipsec_type_values,"Unknown",GET_U_1(ih->type)),
+                       GET_U_1(ih->type),
                        l2info.length);
             }
         }
@@ -623,9 +623,9 @@ juniper_monitor_if_print(netdissect_options *ndo,
         ND_TCHECK_SIZE(mh);
         if (ndo->ndo_eflag)
             ND_PRINT("service-id %u, iif %u, pkt-type %u: ",
-                   EXTRACT_BE_U_4(mh->service_id),
-                   EXTRACT_BE_U_2(mh->iif),
-                   EXTRACT_U_1(mh->pkt_type));
+                   GET_BE_U_4(mh->service_id),
+                   GET_BE_U_2(mh->iif),
+                   GET_U_1(mh->pkt_type));
 
         /* no proto field - lets guess by first byte of IP header*/
         ip_heuristic_guess (ndo, p, l2info.length);
@@ -664,10 +664,10 @@ juniper_services_if_print(netdissect_options *ndo,
         ND_TCHECK_SIZE(sh);
         if (ndo->ndo_eflag)
             ND_PRINT("service-id %u flags 0x%02x service-set-id 0x%04x iif %u: ",
-                   EXTRACT_U_1(sh->svc_id),
-                   EXTRACT_U_1(sh->flags_len),
-                   EXTRACT_BE_U_2(sh->svc_set_id),
-                   EXTRACT_BE_U_3(sh->dir_iif));
+                   GET_U_1(sh->svc_id),
+                   GET_U_1(sh->flags_len),
+                   GET_BE_U_2(sh->svc_set_id),
+                   GET_BE_U_3(sh->dir_iif));
 
         /* no proto field - lets guess by first byte of IP header*/
         ip_heuristic_guess (ndo, p, l2info.length);
@@ -791,7 +791,7 @@ juniper_pppoe_atm_if_print(netdissect_options *ndo,
         p+=l2info.header_len;
 
         ND_TCHECK_2(p);
-        extracted_ethertype = EXTRACT_BE_U_2(p);
+        extracted_ethertype = GET_BE_U_2(p);
         /* this DLT contains nothing but raw PPPoE frames,
          * prepended with a type field*/
         if (ethertype_print(ndo, extracted_ethertype,
@@ -825,7 +825,9 @@ juniper_mlppp_if_print(netdissect_options *ndo,
         /* suppress Bundle-ID if frame was captured on a child-link
          * best indicator if the cookie looks like a proto */
         if (ndo->ndo_eflag &&
+            /* use EXTRACT_, not GET_ (not packet buffer pointer) */
             EXTRACT_BE_U_2(&l2info.cookie) != PPP_OSI &&
+            /* use EXTRACT_, not GET_ (not packet buffer pointer) */
             EXTRACT_BE_U_2(&l2info.cookie) !=  (PPP_ADDRESS << 8 | PPP_CONTROL))
             ND_PRINT("Bundle-ID %u: ", l2info.bundle);
 
@@ -856,6 +858,7 @@ juniper_mlppp_if_print(netdissect_options *ndo,
         }
 
         /* zero length cookie ? */
+        /* use EXTRACT_, not GET_ (not packet buffer pointer) */
         switch (EXTRACT_BE_U_2(&l2info.cookie)) {
         case PPP_OSI:
             ppp_print(ndo, p - 2, l2info.length + 2);
@@ -914,6 +917,7 @@ juniper_mfr_if_print(netdissect_options *ndo,
         }
 
         /* suppress Bundle-ID if frame was captured on a child-link */
+        /* use EXTRACT_, not GET_ (not packet buffer pointer) */
         if (ndo->ndo_eflag && EXTRACT_BE_U_4(l2info.cookie) != 1)
             ND_PRINT("Bundle-ID %u, ", l2info.bundle);
         switch (l2info.proto) {
@@ -949,6 +953,7 @@ juniper_mlfr_if_print(netdissect_options *ndo,
         p+=l2info.header_len;
 
         /* suppress Bundle-ID if frame was captured on a child-link */
+        /* use EXTRACT_, not GET_ (not packet buffer pointer) */
         if (ndo->ndo_eflag && EXTRACT_BE_U_4(l2info.cookie) != 1)
             ND_PRINT("Bundle-ID %u, ", l2info.bundle);
         switch (l2info.proto) {
@@ -1000,15 +1005,15 @@ juniper_atm1_if_print(netdissect_options *ndo,
         }
 
         ND_TCHECK_3(p);
-        if (EXTRACT_BE_U_3(p) == 0xfefe03 || /* NLPID encaps ? */
-            EXTRACT_BE_U_3(p) == 0xaaaa03) { /* SNAP encaps ? */
+        if (GET_BE_U_3(p) == 0xfefe03 || /* NLPID encaps ? */
+            GET_BE_U_3(p) == 0xaaaa03) { /* SNAP encaps ? */
 
             llc_hdrlen = llc_print(ndo, p, l2info.length, l2info.caplen, NULL, NULL);
             if (llc_hdrlen > 0)
                 return l2info.header_len;
         }
 
-        if (EXTRACT_U_1(p) == 0x03) { /* Cisco style NLPID encaps ? */
+        if (GET_U_1(p) == 0x03) { /* Cisco style NLPID encaps ? */
             isoclns_print(ndo, p + 1, l2info.length - 1);
             /* FIXME check if frame was recognized */
             return l2info.header_len;
@@ -1055,8 +1060,8 @@ juniper_atm2_if_print(netdissect_options *ndo,
         }
 
         ND_TCHECK_3(p);
-        if (EXTRACT_BE_U_3(p) == 0xfefe03 || /* NLPID encaps ? */
-            EXTRACT_BE_U_3(p) == 0xaaaa03) { /* SNAP encaps ? */
+        if (GET_BE_U_3(p) == 0xfefe03 || /* NLPID encaps ? */
+            GET_BE_U_3(p) == 0xaaaa03) { /* SNAP encaps ? */
 
             llc_hdrlen = llc_print(ndo, p, l2info.length, l2info.caplen, NULL, NULL);
             if (llc_hdrlen > 0)
@@ -1064,12 +1069,13 @@ juniper_atm2_if_print(netdissect_options *ndo,
         }
 
         if (l2info.direction != JUNIPER_BPF_PKT_IN && /* ether-over-1483 encaps ? */
+            /* use EXTRACT_, not GET_ (not packet buffer pointer) */
             (EXTRACT_BE_U_4(l2info.cookie) & ATM2_GAP_COUNT_MASK)) {
             ether_print(ndo, p, l2info.length, l2info.caplen, NULL, NULL);
             return l2info.header_len;
         }
 
-        if (EXTRACT_U_1(p) == 0x03) { /* Cisco style NLPID encaps ? */
+        if (GET_U_1(p) == 0x03) { /* Cisco style NLPID encaps ? */
             isoclns_print(ndo, p + 1, l2info.length - 1);
             /* FIXME check if frame was recognized */
             return l2info.header_len;
@@ -1094,7 +1100,7 @@ static int
 juniper_ppp_heuristic_guess(netdissect_options *ndo,
                             const u_char *p, u_int length)
 {
-    switch(EXTRACT_BE_U_2(p)) {
+    switch(GET_BE_U_2(p)) {
     case PPP_IP :
     case PPP_OSI :
     case PPP_MPLS_UCAST :
@@ -1123,7 +1129,7 @@ static int
 ip_heuristic_guess(netdissect_options *ndo,
                    const u_char *p, u_int length)
 {
-    switch(EXTRACT_U_1(p)) {
+    switch(GET_U_1(p)) {
     case 0x45:
     case 0x46:
     case 0x47:
@@ -1172,16 +1178,16 @@ juniper_read_tlv_value(netdissect_options *ndo,
    if (tlv_type < 128) {
        switch (tlv_len) {
        case 1:
-           tlv_value = EXTRACT_U_1(p);
+           tlv_value = GET_U_1(p);
            break;
        case 2:
-           tlv_value = EXTRACT_LE_U_2(p);
+           tlv_value = GET_LE_U_2(p);
            break;
        case 3:
-           tlv_value = EXTRACT_LE_U_3(p);
+           tlv_value = GET_LE_U_3(p);
            break;
        case 4:
-           tlv_value = EXTRACT_LE_U_4(p);
+           tlv_value = GET_LE_U_4(p);
            break;
        default:
            tlv_value = -1;
@@ -1191,16 +1197,16 @@ juniper_read_tlv_value(netdissect_options *ndo,
        /* TLVs >= 128 are big endian encoded */
        switch (tlv_len) {
        case 1:
-           tlv_value = EXTRACT_U_1(p);
+           tlv_value = GET_U_1(p);
            break;
        case 2:
-           tlv_value = EXTRACT_BE_U_2(p);
+           tlv_value = GET_BE_U_2(p);
            break;
        case 3:
-           tlv_value = EXTRACT_BE_U_3(p);
+           tlv_value = GET_BE_U_3(p);
            break;
        case 4:
-           tlv_value = EXTRACT_BE_U_4(p);
+           tlv_value = GET_BE_U_4(p);
            break;
        default:
            tlv_value = -1;
@@ -1232,10 +1238,10 @@ juniper_parse_header(netdissect_options *ndo,
     l2info->length = h->len;
     l2info->caplen = h->caplen;
     ND_TCHECK_4(p);
-    l2info->flags = EXTRACT_U_1(p + 3);
-    l2info->direction = EXTRACT_U_1(p + 3) & JUNIPER_BPF_PKT_IN;
+    l2info->flags = GET_U_1(p + 3);
+    l2info->direction = GET_U_1(p + 3) & JUNIPER_BPF_PKT_IN;
 
-    if (EXTRACT_BE_U_3(p) != JUNIPER_MGC_NUMBER) { /* magic number found ? */
+    if (GET_BE_U_3(p) != JUNIPER_MGC_NUMBER) { /* magic number found ? */
         ND_PRINT("no magic-number found!");
         return 0;
     }
@@ -1257,7 +1263,7 @@ juniper_parse_header(netdissect_options *ndo,
 
         /* ok to read extension length ? */
         ND_TCHECK_2(tptr);
-        jnx_ext_len = EXTRACT_BE_U_2(tptr);
+        jnx_ext_len = GET_BE_U_2(tptr);
         jnx_header_len += 2;
         tptr +=2;
 
@@ -1271,9 +1277,9 @@ juniper_parse_header(netdissect_options *ndo,
 
         ND_TCHECK_LEN(tptr, jnx_ext_len);
         while (jnx_ext_len > JUNIPER_EXT_TLV_OVERHEAD) {
-            tlv_type = EXTRACT_U_1(tptr);
+            tlv_type = GET_U_1(tptr);
             tptr++;
-            tlv_len = EXTRACT_U_1(tptr);
+            tlv_len = GET_U_1(tptr);
             tptr++;
             tlv_value = 0;
 
@@ -1360,7 +1366,7 @@ juniper_parse_header(netdissect_options *ndo,
 
             l2info->cookie_len += lp->cookie_len;
 
-            switch (EXTRACT_U_1(p)) {
+            switch (GET_U_1(p)) {
             case LS_COOKIE_ID:
                 l2info->cookie_type = LS_COOKIE_ID;
                 l2info->cookie_len += 2;
@@ -1379,7 +1385,7 @@ juniper_parse_header(netdissect_options *ndo,
 #ifdef DLT_JUNIPER_MFR
             /* MFR child links don't carry cookies */
             if (l2info->pictype == DLT_JUNIPER_MFR &&
-                (EXTRACT_U_1(p) & MFR_BE_MASK) == MFR_BE_MASK) {
+                (GET_U_1(p) & MFR_BE_MASK) == MFR_BE_MASK) {
                 l2info->cookie_len = 0;
             }
 #endif
@@ -1398,8 +1404,8 @@ juniper_parse_header(netdissect_options *ndo,
                 if (ndo->ndo_eflag)
                     ND_PRINT(", cookie 0x");
                 for (idx = 0; idx < l2info->cookie_len; idx++) {
-                    l2info->cookie[idx] = EXTRACT_U_1(p + idx); /* copy cookie data */
-                    if (ndo->ndo_eflag) ND_PRINT("%02x", EXTRACT_U_1(p + idx));
+                    l2info->cookie[idx] = GET_U_1(p + idx); /* copy cookie data */
+                    if (ndo->ndo_eflag) ND_PRINT("%02x", GET_U_1(p + idx));
                 }
             }
 
@@ -1407,7 +1413,7 @@ juniper_parse_header(netdissect_options *ndo,
 
 
             ND_TCHECK_2(p + l2info->cookie_len);
-            l2info->proto = EXTRACT_BE_U_2(p + l2info->cookie_len);
+            l2info->proto = GET_BE_U_2(p + l2info->cookie_len);
             break;
         }
         ++lp;
@@ -1423,6 +1429,7 @@ juniper_parse_header(netdissect_options *ndo,
             l2info->bundle = l2info->cookie[1];
             break;
         case AS_COOKIE_ID:
+            /* use EXTRACT_, not GET_ (not packet buffer pointer) */
             l2info->bundle = (EXTRACT_BE_U_2(&l2info->cookie[6])>>3)&0xfff;
             l2info->proto = (l2info->cookie[5])&JUNIPER_LSQ_L3_PROTO_MASK;
             break;
@@ -1438,12 +1445,13 @@ juniper_parse_header(netdissect_options *ndo,
         case LS_COOKIE_ID:
             ND_TCHECK_2(p);
             l2info->bundle = l2info->cookie[1];
-            l2info->proto = EXTRACT_BE_U_2(p);
+            l2info->proto = GET_BE_U_2(p);
             l2info->header_len += 2;
             l2info->length -= 2;
             l2info->caplen -= 2;
             break;
         case AS_COOKIE_ID:
+            /* use EXTRACT_, not GET_ (not packet buffer pointer) */
             l2info->bundle = (EXTRACT_BE_U_2(&l2info->cookie[6])>>3)&0xfff;
             l2info->proto = (l2info->cookie[5])&JUNIPER_LSQ_L3_PROTO_MASK;
             break;
@@ -1462,12 +1470,13 @@ juniper_parse_header(netdissect_options *ndo,
         case LS_COOKIE_ID:
             ND_TCHECK_2(p);
             l2info->bundle = l2info->cookie[1];
-            l2info->proto = EXTRACT_BE_U_2(p);
+            l2info->proto = GET_BE_U_2(p);
             l2info->header_len += 2;
             l2info->length -= 2;
             l2info->caplen -= 2;
             break;
         case AS_COOKIE_ID:
+            /* use EXTRACT_, not GET_ (not packet buffer pointer) */
             l2info->bundle = (EXTRACT_BE_U_2(&l2info->cookie[6])>>3)&0xfff;
             l2info->proto = (l2info->cookie[5])&JUNIPER_LSQ_L3_PROTO_MASK;
             break;
@@ -1482,7 +1491,7 @@ juniper_parse_header(netdissect_options *ndo,
         ND_TCHECK_4(p);
         /* ATM cell relay control word present ? */
         if (l2info->cookie[7] & ATM2_PKT_TYPE_MASK) {
-            control_word = EXTRACT_BE_U_4(p);
+            control_word = GET_BE_U_4(p);
             /* some control word heuristics */
             switch(control_word) {
             case 0: /* zero control word */

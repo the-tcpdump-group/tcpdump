@@ -354,8 +354,8 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 	str = buf;
 
 	ND_TCHECK_1(dp->icmp_code);
-	icmp_type = EXTRACT_U_1(dp->icmp_type);
-	icmp_code = EXTRACT_U_1(dp->icmp_code);
+	icmp_type = GET_U_1(dp->icmp_type);
+	icmp_code = GET_U_1(dp->icmp_code);
 	switch (icmp_type) {
 
 	case ICMP_ECHO:
@@ -364,8 +364,8 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		(void)nd_snprintf(buf, sizeof(buf), "echo %s, id %u, seq %u",
                                icmp_type == ICMP_ECHO ?
                                "request" : "reply",
-                               EXTRACT_BE_U_2(dp->icmp_id),
-                               EXTRACT_BE_U_2(dp->icmp_seq));
+                               GET_BE_U_2(dp->icmp_id),
+                               GET_BE_U_2(dp->icmp_seq));
 		break;
 
 	case ICMP_UNREACH:
@@ -377,7 +377,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			(void)nd_snprintf(buf, sizeof(buf),
 			    "%s protocol %u unreachable",
 			    ipaddr_string(ndo, dp->icmp_ip.ip_dst),
-			    EXTRACT_U_1(dp->icmp_ip.ip_p));
+			    GET_U_1(dp->icmp_ip.ip_p));
 			break;
 
 		case ICMP_UNREACH_PORT:
@@ -386,8 +386,8 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			hlen = IP_HL(oip) * 4;
 			ouh = (const struct udphdr *)(((const u_char *)oip) + hlen);
 			ND_TCHECK_2(ouh->uh_dport);
-			dport = EXTRACT_BE_U_2(ouh->uh_dport);
-			ip_proto = EXTRACT_U_1(oip->ip_p);
+			dport = GET_BE_U_2(ouh->uh_dport);
+			ip_proto = GET_U_1(oip->ip_p);
 			switch (ip_proto) {
 
 			case IPPROTO_TCP:
@@ -417,7 +417,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		    {
 			const struct mtu_discovery *mp;
 			mp = (const struct mtu_discovery *)(const u_char *)&dp->icmp_void;
-			mtu = EXTRACT_BE_U_2(mp->nexthopmtu);
+			mtu = GET_BE_U_2(mp->nexthopmtu);
 			if (mtu) {
 				(void)nd_snprintf(buf, sizeof(buf),
 				    "%s unreachable - need to frag (mtu %u)",
@@ -461,7 +461,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		ND_TCHECK_SIZE(ihp);
 		(void)strncpy(cp, " lifetime ", sizeof(buf) - (cp - buf));
 		cp = buf + strlen(buf);
-		lifetime = EXTRACT_BE_U_2(ihp->ird_lifetime);
+		lifetime = GET_BE_U_2(ihp->ird_lifetime);
 		if (lifetime < 60) {
 			(void)nd_snprintf(cp, sizeof(buf) - (cp - buf), "%u",
 			    lifetime);
@@ -477,11 +477,11 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		}
 		cp = buf + strlen(buf);
 
-		num = EXTRACT_U_1(ihp->ird_addrnum);
+		num = GET_U_1(ihp->ird_addrnum);
 		(void)nd_snprintf(cp, sizeof(buf) - (cp - buf), " %u:", num);
 		cp = buf + strlen(buf);
 
-		size = EXTRACT_U_1(ihp->ird_addrsiz);
+		size = GET_U_1(ihp->ird_addrsiz);
 		if (size != 2) {
 			(void)nd_snprintf(cp, sizeof(buf) - (cp - buf),
 			    " [size %u]", size);
@@ -492,7 +492,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			ND_TCHECK_SIZE(idp);
 			(void)nd_snprintf(cp, sizeof(buf) - (cp - buf), " {%s %u}",
 			    ipaddr_string(ndo, idp->ird_addr),
-			    EXTRACT_BE_U_4(idp->ird_pref));
+			    GET_BE_U_4(idp->ird_pref));
 			cp = buf + strlen(buf);
 			++idp;
 		num--;
@@ -526,36 +526,37 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		else {
 			ND_TCHECK_1(dp->icmp_pptr);
 			(void)nd_snprintf(buf, sizeof(buf),
-			    "parameter problem - octet %u", EXTRACT_U_1(dp->icmp_pptr));
+			    "parameter problem - octet %u",
+			    GET_U_1(dp->icmp_pptr));
 		}
 		break;
 
 	case ICMP_MASKREPLY:
 		ND_TCHECK_4(dp->icmp_mask);
 		(void)nd_snprintf(buf, sizeof(buf), "address mask is 0x%08x",
-		    EXTRACT_BE_U_4(dp->icmp_mask));
+		    GET_BE_U_4(dp->icmp_mask));
 		break;
 
 	case ICMP_TSTAMP:
 		ND_TCHECK_2(dp->icmp_seq);
 		(void)nd_snprintf(buf, sizeof(buf),
 		    "time stamp query id %u seq %u",
-		    EXTRACT_BE_U_2(dp->icmp_id),
-		    EXTRACT_BE_U_2(dp->icmp_seq));
+		    GET_BE_U_2(dp->icmp_id),
+		    GET_BE_U_2(dp->icmp_seq));
 		break;
 
 	case ICMP_TSTAMPREPLY:
 		ND_TCHECK_4(dp->icmp_ttime);
 		(void)nd_snprintf(buf, sizeof(buf),
 		    "time stamp reply id %u seq %u: org %s",
-                               EXTRACT_BE_U_2(dp->icmp_id),
-                               EXTRACT_BE_U_2(dp->icmp_seq),
-                               icmp_tstamp_print(EXTRACT_BE_U_4(dp->icmp_otime)));
+                               GET_BE_U_2(dp->icmp_id),
+                               GET_BE_U_2(dp->icmp_seq),
+                               icmp_tstamp_print(GET_BE_U_4(dp->icmp_otime)));
 
                 (void)nd_snprintf(buf+strlen(buf),sizeof(buf)-strlen(buf),", recv %s",
-                         icmp_tstamp_print(EXTRACT_BE_U_4(dp->icmp_rtime)));
+                         icmp_tstamp_print(GET_BE_U_4(dp->icmp_rtime)));
                 (void)nd_snprintf(buf+strlen(buf),sizeof(buf)-strlen(buf),", xmit %s",
-                         icmp_tstamp_print(EXTRACT_BE_U_4(dp->icmp_ttime)));
+                         icmp_tstamp_print(GET_BE_U_4(dp->icmp_ttime)));
                 break;
 
 	default:
@@ -571,7 +572,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			vec[0].len = plen;
 			sum = in_cksum(vec, 1);
 			if (sum != 0) {
-				uint16_t icmp_sum = EXTRACT_BE_U_2(dp->icmp_cksum);
+				uint16_t icmp_sum = GET_BE_U_2(dp->icmp_cksum);
 				ND_PRINT(" (wrong icmp cksum %x (->%x)!)",
 					     icmp_sum,
 					     in_cksum_shouldbe(icmp_sum, sum));
@@ -589,7 +590,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		ip = (const struct ip *)bp;
                 snapend_save = ndo->ndo_snapend;
 		ND_TCHECK_2(ip->ip_len);
-		ip_print(ndo, bp, EXTRACT_BE_U_2(ip->ip_len));
+		ip_print(ndo, bp, GET_BE_U_2(ip->ip_len));
                 ndo->ndo_snapend = snapend_save;
 	}
 
@@ -609,7 +610,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
              * to check if an extension header is present. This is expedient,
              * however not all implementations set the length field proper.
              */
-            if (EXTRACT_U_1(ext_dp->icmp_length) == 0 &&
+            if (GET_U_1(ext_dp->icmp_length) == 0 &&
                 ND_TTEST_LEN(ext_dp->icmp_ext_version_res, plen - ICMP_EXTD_MINLEN)) {
                 vec[0].ptr = (const uint8_t *)(const void *)&ext_dp->icmp_ext_version_res;
                 vec[0].len = plen - ICMP_EXTD_MINLEN;
@@ -635,7 +636,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                 vec[0].ptr = (const uint8_t *)(const void *)&ext_dp->icmp_ext_version_res;
                 vec[0].len = hlen;
                 ND_PRINT(", checksum 0x%04x (%scorrect), length %u",
-                       EXTRACT_BE_U_2(ext_dp->icmp_ext_checksum),
+                       GET_BE_U_2(ext_dp->icmp_ext_checksum),
                        in_cksum(vec, 1) ? "in" : "",
                        hlen);
             }
@@ -647,9 +648,9 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 
                 icmp_mpls_ext_object_header = (const struct icmp_mpls_ext_object_header_t *)obj_tptr;
                 ND_TCHECK_SIZE(icmp_mpls_ext_object_header);
-                obj_tlen = EXTRACT_BE_U_2(icmp_mpls_ext_object_header->length);
-                obj_class_num = EXTRACT_U_1(icmp_mpls_ext_object_header->class_num);
-                obj_ctype = EXTRACT_U_1(icmp_mpls_ext_object_header->ctype);
+                obj_tlen = GET_BE_U_2(icmp_mpls_ext_object_header->length);
+                obj_class_num = GET_U_1(icmp_mpls_ext_object_header->class_num);
+                obj_ctype = GET_U_1(icmp_mpls_ext_object_header->ctype);
                 obj_tptr += sizeof(struct icmp_mpls_ext_object_header_t);
 
                 ND_PRINT("\n\t  %s Object (%u), Class-Type: %u, length %u",
@@ -672,7 +673,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                     switch(obj_ctype) {
                     case 1:
                         ND_TCHECK_4(obj_tptr);
-                        raw_label = EXTRACT_BE_U_4(obj_tptr);
+                        raw_label = GET_BE_U_4(obj_tptr);
                         ND_PRINT("\n\t    label %u, exp %u", MPLS_LABEL(raw_label), MPLS_EXP(raw_label));
                         if (MPLS_STACK(raw_label))
                             ND_PRINT(", [S]");

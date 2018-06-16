@@ -45,7 +45,7 @@ symantec_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	sp = (const struct symantec_header *)bp;
 
-	etype = EXTRACT_BE_U_2(sp->ether_type);
+	etype = GET_BE_U_2(sp->ether_type);
 	if (!ndo->ndo_qflag) {
 	        if (etype <= MAX_ETHERNET_LENGTH_VAL)
 		          ND_PRINT("invalid ethertype %u", etype);
@@ -91,7 +91,7 @@ symantec_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_
 	sp = (const struct symantec_header *)p;
 	p += sizeof (struct symantec_header);
 
-	ether_type = EXTRACT_BE_U_2(sp->ether_type);
+	ether_type = GET_BE_U_2(sp->ether_type);
 
 	if (ether_type <= MAX_ETHERNET_LENGTH_VAL) {
 		/* ether_type not known, print raw packet */

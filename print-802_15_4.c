@@ -540,7 +540,7 @@ ieee802_15_4_print_addr(netdissect_options *ndo, const u_char *p,
 		ND_PRINT("none");
 		break;
 	case 2:
-		ND_PRINT("%04x", EXTRACT_LE_U_2(p));
+		ND_PRINT("%04x", GET_LE_U_2(p));
 		break;
 	case 8:
 		ND_PRINT("%s", le64addr_string(ndo, p));
@@ -585,7 +585,7 @@ ieee802_15_4_print_gts_info(netdissect_options *ndo,
 	u_int len;
 	int i;
 
-	gts_spec = EXTRACT_U_1(p);
+	gts_spec = GET_U_1(p);
 	gts_cnt = gts_spec & 0x7;
 
 	if (gts_cnt == 0) {
@@ -605,14 +605,14 @@ ieee802_15_4_print_gts_info(netdissect_options *ndo,
 	}
 	ND_PRINT("GTS Descriptor Count = %d, ", gts_cnt);
 	ND_PRINT("GTS Directions Mask = %02x, [ ",
-		 EXTRACT_U_1(p + 1) & 0x7f);
+		 GET_U_1(p + 1) & 0x7f);
 
 	for(i = 0; i < gts_cnt; i++) {
 		ND_PRINT("[ ");
 		ieee802_15_4_print_addr(ndo, p + 2 + i * 3, 2);
 		ND_PRINT(", Start slot = %d, Length = %d ] ",
-			 EXTRACT_U_1(p + 2 + i * 3 + 1) & 0x0f,
-			 (EXTRACT_U_1(p + 2 + i * 3 + 1) >> 4) & 0x0f);
+			 GET_U_1(p + 2 + i * 3 + 1) & 0x0f,
+			 (GET_U_1(p + 2 + i * 3 + 1) >> 4) & 0x0f);
 	}
 	ND_PRINT("]");
 	return len;
@@ -631,7 +631,7 @@ ieee802_15_4_print_pending_addresses(netdissect_options *ndo,
 {
 	uint8_t pas, s_cnt, e_cnt, len, i;
 
-	pas = EXTRACT_U_1(p);
+	pas = GET_U_1(p);
 	s_cnt = pas & 0x7;
 	e_cnt = (pas >> 4) & 0x7;
 	len = 1 + s_cnt * 2 + e_cnt * 8;
@@ -683,11 +683,11 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 		if (ie_len < 3) {
 			ND_PRINT("[ERROR: Vendor OUI missing]");
 		} else {
-			ND_PRINT("OUI = 0x%02x%02x%02x, ", EXTRACT_U_1(p),
-				 EXTRACT_U_1(p + 1), EXTRACT_U_1(p + 2));
+			ND_PRINT("OUI = 0x%02x%02x%02x, ", GET_U_1(p),
+				 GET_U_1(p + 1), GET_U_1(p + 2));
 			ND_PRINT("Data = ");
 			for(i = 3; i < ie_len; i++) {
-				ND_PRINT("%02x ", EXTRACT_U_1(p + i));
+				ND_PRINT("%02x ", GET_U_1(p + i));
 			}
 		}
 		break;
@@ -696,10 +696,10 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 			ND_PRINT("[ERROR: Truncated CSL IE]");
 		} else {
 			ND_PRINT("CSL Phase = %d, CSL Period = %d",
-				 EXTRACT_LE_U_2(p), EXTRACT_LE_U_2(p + 2));
+				 GET_LE_U_2(p), GET_LE_U_2(p + 2));
 			if (ie_len >= 6) {
 				ND_PRINT(", Rendezvous time = %d",
-					 EXTRACT_LE_U_2(p + 4));
+					 GET_LE_U_2(p + 4));
 			}
 			if (ie_len != 4 && ie_len != 6) {
 				ND_PRINT(" [ERROR: CSL IE length wrong]");
@@ -711,9 +711,9 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 			ND_PRINT("[ERROR: Truncated RIT IE]");
 		} else {
 			ND_PRINT("Time to First Listen = %d, # of Repeat Listen = %d, Repeat Listen Interval = %d",
-				 EXTRACT_U_1(p),
-				 EXTRACT_U_1(p + 1),
-				 EXTRACT_LE_U_2(p + 2));
+				 GET_U_1(p),
+				 GET_U_1(p + 1),
+				 GET_LE_U_2(p + 2));
 		}
 		break;
 	case 0x1c: /* DSME PAN Descriptor IE */
@@ -728,7 +728,7 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 
 			hopping_present = 0;
 
-			ss = EXTRACT_LE_U_2(p);
+			ss = GET_LE_U_2(p);
 			ieee802_15_4_print_superframe_specification(ndo, ss);
 			if (ie_len < 3) {
 				ND_PRINT("[ERROR: Truncated before pending addresses field]");
@@ -750,7 +750,7 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 					ND_PRINT("[ERROR: Truncated before DSME Superframe Specification]");
 					break;
 				}
-				ss = EXTRACT_LE_U_2(p + ptr);
+				ss = GET_LE_U_2(p + ptr);
 				ptr += 2;
 				ND_PRINT("Multi-superframe Order = %d", ss & 0xff);
 				ND_PRINT(", %s", ((ss & 0x100) ?
@@ -771,7 +771,7 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 					ND_PRINT("[ERROR: Truncated before DSME Superframe Specification]");
 					break;
 				}
-				ss = EXTRACT_U_1(p + ptr);
+				ss = GET_U_1(p + ptr);
 				ptr++;
 				ND_PRINT("Multi-superframe Order = %d",
 					 ss & 0x0f);
@@ -790,17 +790,17 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 				break;
 			}
 			ND_PRINT("Beacon timestamp = %" PRIu64 ", offset = %d",
-				 EXTRACT_LE_U_6(p + ptr),
-				 EXTRACT_LE_U_2(p + ptr + 6));
+				 GET_LE_U_6(p + ptr),
+				 GET_LE_U_2(p + ptr + 6));
 			ptr += 8;
 			if (ie_len < ptr + 4) {
 				ND_PRINT(" [ERROR: Truncated before Beacon Bitmap]");
 				break;
 			}
 
-			ulen = EXTRACT_LE_U_2(p + ptr + 2);
+			ulen = GET_LE_U_2(p + ptr + 2);
 			ND_PRINT("SD Index = %d, Bitmap len = %d, ",
-				 EXTRACT_LE_U_2(p + ptr), ulen);
+				 GET_LE_U_2(p + ptr), ulen);
 			ptr += 4;
 			if (ie_len < ptr + ulen) {
 				ND_PRINT(" [ERROR: Truncated in SD bitmap]");
@@ -808,7 +808,7 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 			}
 			ND_PRINT(" SD Bitmap = ");
 			for(i = 0; i < ulen; i++) {
-				ND_PRINT("%02x ", EXTRACT_U_1(p + ptr + i));
+				ND_PRINT("%02x ", GET_U_1(p + ptr + i));
 			}
 			ptr += ulen;
 
@@ -817,12 +817,12 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 				break;
 			}
 
-			ulen = EXTRACT_LE_U_2(p + ptr + 4);
+			ulen = GET_LE_U_2(p + ptr + 4);
 			ND_PRINT("Hopping Seq ID = %d, PAN Coordinator BSN = %d, "
 				 "Channel offset = %d, Bitmap length = %d, ",
-				 EXTRACT_U_1(p + ptr),
-				 EXTRACT_U_1(p + ptr + 1),
-				 EXTRACT_LE_U_2(p + ptr + 2),
+				 GET_U_1(p + ptr),
+				 GET_U_1(p + ptr + 1),
+				 GET_LE_U_2(p + ptr + 2),
 				 ulen);
 			ptr += 5;
 			if (ie_len < ptr + ulen) {
@@ -831,7 +831,7 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 			}
 			ND_PRINT(" Channel offset bitmap = ");
 			for(i = 0; i < ulen; i++) {
-				ND_PRINT("%02x ", EXTRACT_U_1(p + ptr + i));
+				ND_PRINT("%02x ", GET_U_1(p + ptr + i));
 			}
 			ptr += ulen;
 			if (hopping_present) {
@@ -839,7 +839,7 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 					ND_PRINT(" [ERROR: Truncated in Hopping Sequence length]");
 					break;
 				}
-				ulen = EXTRACT_U_1(p + ptr);
+				ulen = GET_U_1(p + ptr);
 				ptr++;
 				ND_PRINT("Hopping Seq length = %d [ ", ulen);
 
@@ -852,7 +852,8 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 					break;
 				}
 				for(i = 0; i < ulen; i++) {
-					ND_PRINT("%02x ", EXTRACT_LE_U_2(p + ptr + i * 2));
+					ND_PRINT("%02x ",
+						 GET_LE_U_2(p + ptr + i * 2));
 				}
 				ND_PRINT("]");
 				ptr += ulen * 2;
@@ -864,8 +865,8 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 			ND_PRINT("[ERROR: Length != 2]");
 		} else {
 			uint16_t r_time, w_u_interval;
-			r_time = EXTRACT_LE_U_2(p);
-			w_u_interval = EXTRACT_LE_U_2(p + 2);
+			r_time = GET_LE_U_2(p);
+			w_u_interval = GET_LE_U_2(p + 2);
 
 			ND_PRINT("Rendezvous time = %d, Wake-up Interval = %d",
 				 r_time, w_u_interval);
@@ -878,7 +879,7 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 			uint16_t val;
 			int16_t timecorr;
 
-			val = EXTRACT_LE_U_2(p);
+			val = GET_LE_U_2(p);
 			if (val & 0x8000) { ND_PRINT("Negative "); }
 			val &= 0xfff;
 			val <<= 4;
@@ -909,7 +910,7 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 	default:
 		ND_PRINT("IE Data = ");
 		for(i = 0; i < ie_len; i++) {
-			ND_PRINT("%02x ", EXTRACT_U_1(p + i));
+			ND_PRINT("%02x ", GET_U_1(p + i));
 		}
 		break;
 	}
@@ -938,7 +939,7 @@ ieee802_15_4_print_header_ie_list(netdissect_options *ndo,
 			return -1;
 		}
 		/* Extract IE Header */
-		ie = EXTRACT_LE_U_2(p);
+		ie = GET_LE_U_2(p);
 		if (CHECK_BIT(ie, 15)) {
 			ND_PRINT("[ERROR: Header IE with type 1] ");
 		}
@@ -971,7 +972,7 @@ ieee802_15_4_print_header_ie_list(netdissect_options *ndo,
 			if (ie_len != 0) {
 				ND_PRINT("IE Data = ");
 				for(i = 0; i < ie_len; i++) {
-					ND_PRINT("%02x ", EXTRACT_U_1(p + i));
+					ND_PRINT("%02x ", GET_U_1(p + i));
 				}
 			}
 		}
@@ -1010,12 +1011,12 @@ ieee802_15_4_print_mlme_ie(netdissect_options *ndo,
 			ND_PRINT("[ERROR: Vendor OUI missing]");
 		} else {
 			ND_PRINT("OUI = 0x%02x%02x%02x, ",
-				 EXTRACT_U_1(p),
-				 EXTRACT_U_1(p + 1),
-				 EXTRACT_U_1(p + 2));
+				 GET_U_1(p),
+				 GET_U_1(p + 1),
+				 GET_U_1(p + 2));
 			ND_PRINT("Data = ");
 			for(i = 3; i < sub_ie_len; i++) {
-				ND_PRINT("%02x ", EXTRACT_U_1(p + i));
+				ND_PRINT("%02x ", GET_U_1(p + i));
 			}
 		}
 		break;
@@ -1023,25 +1024,25 @@ ieee802_15_4_print_mlme_ie(netdissect_options *ndo,
 		if (sub_ie_len < 1) {
 			ND_PRINT("[ERROR: Hopping sequence ID missing]");
 		} else if (sub_ie_len == 1) {
-			ND_PRINT("Hopping Sequence ID = %d", EXTRACT_U_1(p));
+			ND_PRINT("Hopping Sequence ID = %d", GET_U_1(p));
 			p++;
 			sub_ie_len--;
 		} else {
 			uint16_t channel_page, number_of_channels;
 
-			ND_PRINT("Hopping Sequence ID = %d", EXTRACT_U_1(p));
+			ND_PRINT("Hopping Sequence ID = %d", GET_U_1(p));
 			p++;
 			sub_ie_len--;
 			if (sub_ie_len < 7) {
 				ND_PRINT("[ERROR: IE truncated]");
 				break;
 			}
-			channel_page = EXTRACT_U_1(p);
-			number_of_channels = EXTRACT_LE_U_2(p + 1);
+			channel_page = GET_U_1(p);
+			number_of_channels = GET_LE_U_2(p + 1);
 			ND_PRINT("Channel Page = %d, Number of Channels = %d, ",
 				 channel_page, number_of_channels);
 			ND_PRINT("Phy Configuration = 0x%08x, ",
-				 EXTRACT_LE_U_4(p + 3));
+				 GET_LE_U_4(p + 3));
 			p += 7;
 			sub_ie_len -= 7;
 			if (channel_page == 9 || channel_page == 10) {
@@ -1052,7 +1053,7 @@ ieee802_15_4_print_mlme_ie(netdissect_options *ndo,
 				}
 				ND_PRINT("Extended bitmap = 0x");
 				for(i = 0; i < len; i++) {
-					ND_PRINT("%02x", EXTRACT_U_1(p + i));
+					ND_PRINT("%02x", GET_U_1(p + i));
 				}
 				ND_PRINT(", ");
 				p += len;
@@ -1062,7 +1063,7 @@ ieee802_15_4_print_mlme_ie(netdissect_options *ndo,
 				ND_PRINT("[ERROR: IE truncated]");
 				break;
 			}
-			len = EXTRACT_LE_U_2(p);
+			len = GET_LE_U_2(p);
 			p += 2;
 			sub_ie_len -= 2;
 			ND_PRINT("Hopping Seq length = %d [ ", len);
@@ -1072,7 +1073,7 @@ ieee802_15_4_print_mlme_ie(netdissect_options *ndo,
 				break;
 			}
 			for(i = 0; i < len; i++) {
-				ND_PRINT("%02x ", EXTRACT_LE_U_2(p + i * 2));
+				ND_PRINT("%02x ", GET_LE_U_2(p + i * 2));
 			}
 			ND_PRINT("]");
 			p += len * 2;
@@ -1081,7 +1082,7 @@ ieee802_15_4_print_mlme_ie(netdissect_options *ndo,
 				ND_PRINT("[ERROR: IE truncated]");
 				break;
 			}
-			ND_PRINT("Current hop = %d", EXTRACT_LE_U_2(p));
+			ND_PRINT("Current hop = %d", GET_LE_U_2(p));
 		}
 
 		break;
@@ -1090,7 +1091,7 @@ ieee802_15_4_print_mlme_ie(netdissect_options *ndo,
 			ND_PRINT("[ERROR: Length != 6]");
 		}
 		ND_PRINT("ASN = %010" PRIx64 ", Join Metric = %d ",
-			 EXTRACT_LE_U_5(p), EXTRACT_U_1(p + 5));
+			 GET_LE_U_5(p), GET_U_1(p + 5));
 		break;
 	case 0x1b: /* TSCH Slotframe and Link IE. */
 		{
@@ -1100,7 +1101,7 @@ ieee802_15_4_print_mlme_ie(netdissect_options *ndo,
 				ND_PRINT("[ERROR: Truncated IE]");
 				break;
 			}
-			sf_num = EXTRACT_U_1(p);
+			sf_num = GET_U_1(p);
 			ND_PRINT("Slotframes = %d ", sf_num);
 			off = 1;
 			for(i = 0; i < sf_num; i++) {
@@ -1108,10 +1109,10 @@ ieee802_15_4_print_mlme_ie(netdissect_options *ndo,
 					ND_PRINT("[ERROR: Truncated IE before slotframes]");
 					break;
 				}
-				links = EXTRACT_U_1(p + off + 3);
+				links = GET_U_1(p + off + 3);
 				ND_PRINT("\n\t\t\t[ Handle %d, size = %d, links = %d ",
-					 EXTRACT_U_1(p + off),
-					 EXTRACT_LE_U_2(p + off + 1),
+					 GET_U_1(p + off),
+					 GET_LE_U_2(p + off + 1),
 					 links);
 				off += 4;
 				for(j = 0; j < links; j++) {
@@ -1119,10 +1120,10 @@ ieee802_15_4_print_mlme_ie(netdissect_options *ndo,
 						ND_PRINT("[ERROR: Truncated IE links]");
 						break;
 					}
-					opts = EXTRACT_U_1(p + off + 4);
+					opts = GET_U_1(p + off + 4);
 					ND_PRINT("\n\t\t\t\t[ Timeslot =  %d, Offset = %d, Options = ",
-						 EXTRACT_LE_U_2(p + off),
-						 EXTRACT_LE_U_2(p + off + 2));
+						 GET_LE_U_2(p + off),
+						 GET_LE_U_2(p + off + 2));
 					if (opts & 0x1) { ND_PRINT("TX "); }
 					if (opts & 0x2) { ND_PRINT("RX "); }
 					if (opts & 0x4) { ND_PRINT("Shared "); }
@@ -1141,42 +1142,42 @@ ieee802_15_4_print_mlme_ie(netdissect_options *ndo,
 		break;
 	case 0x1c: /* TSCH Timeslot IE. */
 		if (sub_ie_len == 1) {
-			ND_PRINT("Time slot ID = %d ", EXTRACT_U_1(p));
+			ND_PRINT("Time slot ID = %d ", GET_U_1(p));
 		} else if (sub_ie_len == 25) {
 			ND_PRINT("Time slot ID = %d, CCA Offset = %d, CCA = %d, TX Offset = %d, RX Offset = %d, RX Ack Delay = %d, TX Ack Delay = %d, RX Wait = %d, Ack Wait = %d, RX TX = %d, Max Ack = %d, Max TX = %d, Time slot Length = %d ",
-				 EXTRACT_U_1(p),
-				 EXTRACT_LE_U_2(p + 1),
-				 EXTRACT_LE_U_2(p + 3),
-				 EXTRACT_LE_U_2(p + 5),
-				 EXTRACT_LE_U_2(p + 7),
-				 EXTRACT_LE_U_2(p + 9),
-				 EXTRACT_LE_U_2(p + 11),
-				 EXTRACT_LE_U_2(p + 13),
-				 EXTRACT_LE_U_2(p + 15),
-				 EXTRACT_LE_U_2(p + 17),
-				 EXTRACT_LE_U_2(p + 19),
-				 EXTRACT_LE_U_2(p + 21),
-				 EXTRACT_LE_U_2(p + 23));
+				 GET_U_1(p),
+				 GET_LE_U_2(p + 1),
+				 GET_LE_U_2(p + 3),
+				 GET_LE_U_2(p + 5),
+				 GET_LE_U_2(p + 7),
+				 GET_LE_U_2(p + 9),
+				 GET_LE_U_2(p + 11),
+				 GET_LE_U_2(p + 13),
+				 GET_LE_U_2(p + 15),
+				 GET_LE_U_2(p + 17),
+				 GET_LE_U_2(p + 19),
+				 GET_LE_U_2(p + 21),
+				 GET_LE_U_2(p + 23));
 		} else if (sub_ie_len == 27) {
 			ND_PRINT("Time slot ID = %d, CCA Offset = %d, CCA = %d, TX Offset = %d, RX Offset = %d, RX Ack Delay = %d, TX Ack Delay = %d, RX Wait = %d, Ack Wait = %d, RX TX = %d, Max Ack = %d, Max TX = %d, Time slot Length = %d ",
-				 EXTRACT_U_1(p),
-				 EXTRACT_LE_U_2(p + 1),
-				 EXTRACT_LE_U_2(p + 3),
-				 EXTRACT_LE_U_2(p + 5),
-				 EXTRACT_LE_U_2(p + 7),
-				 EXTRACT_LE_U_2(p + 9),
-				 EXTRACT_LE_U_2(p + 11),
-				 EXTRACT_LE_U_2(p + 13),
-				 EXTRACT_LE_U_2(p + 15),
-				 EXTRACT_LE_U_2(p + 17),
-				 EXTRACT_LE_U_2(p + 19),
-				 EXTRACT_LE_U_3(p + 21),
-				 EXTRACT_LE_U_3(p + 24));
+				 GET_U_1(p),
+				 GET_LE_U_2(p + 1),
+				 GET_LE_U_2(p + 3),
+				 GET_LE_U_2(p + 5),
+				 GET_LE_U_2(p + 7),
+				 GET_LE_U_2(p + 9),
+				 GET_LE_U_2(p + 11),
+				 GET_LE_U_2(p + 13),
+				 GET_LE_U_2(p + 15),
+				 GET_LE_U_2(p + 17),
+				 GET_LE_U_2(p + 19),
+				 GET_LE_U_3(p + 21),
+				 GET_LE_U_3(p + 24));
 		} else {
 			ND_PRINT("[ERROR: Length not 1, 25, or 27]");
 			ND_PRINT("\n\t\t\tIE Data = ");
 			for(i = 0; i < sub_ie_len; i++) {
-				ND_PRINT("%02x ", EXTRACT_U_1(p + i));
+				ND_PRINT("%02x ", GET_U_1(p + i));
 			}
 		}
 		break;
@@ -1233,7 +1234,7 @@ ieee802_15_4_print_mlme_ie(netdissect_options *ndo,
 	default:
 		ND_PRINT("IE Data = ");
 		for(i = 0; i < sub_ie_len; i++) {
-			ND_PRINT("%02x ", EXTRACT_U_1(p + i));
+			ND_PRINT("%02x ", GET_U_1(p + i));
 		}
 		break;
 	}
@@ -1257,7 +1258,7 @@ ieee802_15_4_print_mlme_ie_list(netdissect_options *ndo,
 			return;
 		}
 		/* Extract IE header */
-		ie = EXTRACT_LE_U_2(p);
+		ie = GET_LE_U_2(p);
 		type = CHECK_BIT(ie, 15);
 		if (type) {
 			/* Long type */
@@ -1289,7 +1290,7 @@ ieee802_15_4_print_mlme_ie_list(netdissect_options *ndo,
 			} else if (ndo->ndo_vflag > 2) {
 				ND_PRINT("IE Data = ");
 				for(i = 0; i < sub_ie_len; i++) {
-					ND_PRINT("%02x ", EXTRACT_U_1(p + i));
+					ND_PRINT("%02x ", GET_U_1(p + i));
 				}
 			}
 		}
@@ -1320,8 +1321,8 @@ ieee802_15_4_print_mpx_ie(netdissect_options *ndo,
 		return;
 	}
 
-	transfer_type = EXTRACT_U_1(p) & 0x7;
-	tid = EXTRACT_U_1(p) >> 3;
+	transfer_type = GET_U_1(p) & 0x7;
+	tid = GET_U_1(p) >> 3;
 	switch (transfer_type) {
 	case 0x00: /* Full upper layer frame. */
 	case 0x01: /* Full upper layer frame with small Multiplex ID. */
@@ -1335,7 +1336,7 @@ ieee802_15_4_print_mpx_ie(netdissect_options *ndo,
 			}
 			data_start = 3;
 			ND_PRINT("tid = 0x%02x, Multiplex ID = 0x%04x, ",
-				 tid, EXTRACT_LE_U_2(p + 1));
+				 tid, GET_LE_U_2(p + 1));
 		} else {
 			data_start = 1;
 			ND_PRINT("Multiplex ID = 0x%04x, ", tid);
@@ -1348,7 +1349,7 @@ ieee802_15_4_print_mpx_ie(netdissect_options *ndo,
 			return;
 		}
 
-		fragment_number = EXTRACT_U_1(p + 1);
+		fragment_number = GET_U_1(p + 1);
 		ND_PRINT("Type = %s, tid = 0x%02x, fragment = 0x%02x, ",
 			 (transfer_type == 0x02 ?
 			  (fragment_number == 0 ?
@@ -1363,8 +1364,8 @@ ieee802_15_4_print_mpx_ie(netdissect_options *ndo,
 				ND_PRINT("[ERROR: Total upper layer size or multiplex ID missing]");
 				return;
 			}
-			total_size = EXTRACT_LE_U_2(p + 2);
-			multiplex_id = EXTRACT_LE_U_2(p + 4);
+			total_size = GET_LE_U_2(p + 2);
+			multiplex_id = GET_LE_U_2(p + 4);
 			ND_PRINT("Total upper layer size = 0x%04x, Multiplex ID = 0x%04x, ",
 				 total_size, multiplex_id);
 			data_start = 6;
@@ -1376,13 +1377,13 @@ ieee802_15_4_print_mpx_ie(netdissect_options *ndo,
 				 tid);
 		} else if (ie_len == 3) {
 			ND_PRINT("Type = Abort, tid = 0x%02x, max size = 0x%04x",
-				 tid, EXTRACT_LE_U_2(p + 1));
+				 tid, GET_LE_U_2(p + 1));
 		} else {
 			ND_PRINT("Type = Abort, tid = 0x%02x, invalid length = %d (not 1 or 3)",
 				 tid, ie_len);
 			ND_PRINT("Abort data = ");
 			for(i = 1; i < ie_len; i++) {
-				ND_PRINT("%02x ", EXTRACT_U_1(p + i));
+				ND_PRINT("%02x ", GET_U_1(p + i));
 			}
 		}
 		return;
@@ -1399,7 +1400,7 @@ ieee802_15_4_print_mpx_ie(netdissect_options *ndo,
 
 	ND_PRINT("Upper layer data = ");
 	for(i = data_start; i < ie_len; i++) {
-		ND_PRINT("%02x ", EXTRACT_U_1(p + i));
+		ND_PRINT("%02x ", GET_U_1(p + i));
 	}
 }
 
@@ -1424,7 +1425,7 @@ ieee802_15_4_print_payload_ie_list(netdissect_options *ndo,
 			return -1;
 		}
 		/* Extract IE header */
-		ie = EXTRACT_LE_U_2(p);
+		ie = GET_LE_U_2(p);
 		if ((CHECK_BIT(ie, 15)) == 0) {
 			ND_PRINT("[ERROR: Payload IE with type 0] ");
 		}
@@ -1453,13 +1454,13 @@ ieee802_15_4_print_payload_ie_list(netdissect_options *ndo,
 					ND_PRINT("[ERROR: Vendor OUI missing]");
 				} else {
 					ND_PRINT("OUI = 0x%02x%02x%02x, ",
-						 EXTRACT_U_1(p),
-						 EXTRACT_U_1(p + 1),
-						 EXTRACT_U_1(p + 2));
+						 GET_U_1(p),
+						 GET_U_1(p + 1),
+						 GET_U_1(p + 2));
 					ND_PRINT("Data = ");
 					for(i = 3; i < ie_len; i++) {
 						ND_PRINT("%02x ",
-							 EXTRACT_U_1(p + i));
+							 GET_U_1(p + i));
 					}
 				}
 				break;
@@ -1471,16 +1472,17 @@ ieee802_15_4_print_payload_ie_list(netdissect_options *ndo,
 					ND_PRINT("[ERROR: Subtype ID missing]");
 				} else {
 					ND_PRINT("Subtype ID = 0x%02x, Subtype content = ",
-						 EXTRACT_U_1(p));
+						 GET_U_1(p));
 					for(i = 1; i < ie_len; i++) {
-						ND_PRINT("%02x ", EXTRACT_U_1(p + i));
+						ND_PRINT("%02x ",
+							 GET_U_1(p + i));
 					}
 				}
 				break;
 			default:
 				ND_PRINT("IE Data = ");
 				for(i = 0; i < ie_len; i++) {
-					ND_PRINT("%02x ", EXTRACT_U_1(p + i));
+					ND_PRINT("%02x ", GET_U_1(p + i));
 				}
 				break;
 			}
@@ -1488,7 +1490,7 @@ ieee802_15_4_print_payload_ie_list(netdissect_options *ndo,
 			if (ie_len != 0) {
 				ND_PRINT("IE Data = ");
 				for(i = 0; i < ie_len; i++) {
-					ND_PRINT("%02x ", EXTRACT_U_1(p + i));
+					ND_PRINT("%02x ", GET_U_1(p + i));
 				}
 			}
 		}
@@ -1520,7 +1522,7 @@ ieee802_15_4_print_aux_sec_header(netdissect_options *ndo,
 		ND_PRINT("[ERROR: Truncated before Aux Security Header]");
 		return -1;
 	}
-	sc = EXTRACT_U_1(p);
+	sc = GET_U_1(p);
 	len = 1;
 	*security_level = sc & 0x7;
 	key_id_mode = (sc >> 3) & 0x3;
@@ -1542,7 +1544,7 @@ ieee802_15_4_print_aux_sec_header(netdissect_options *ndo,
 		p += 4;
 		if (ndo->ndo_vflag > 1) {
 			ND_PRINT("Frame Counter 0x%08x ",
-				 EXTRACT_LE_U_4(p + 1));
+				 GET_LE_U_4(p + 1));
 		}
 	}
 	switch (key_id_mode) {
@@ -1561,7 +1563,7 @@ ieee802_15_4_print_aux_sec_header(netdissect_options *ndo,
 		}
 		if (ndo->ndo_vflag > 1) {
 			ND_PRINT("KeySource 0x%04x:%0x4x, ",
-				 EXTRACT_LE_U_2(p), EXTRACT_LE_U_2(p + 2));
+				 GET_LE_U_2(p), GET_LE_U_2(p + 2));
 		}
 		p += 4;
 		caplen -= 4;
@@ -1585,7 +1587,7 @@ ieee802_15_4_print_aux_sec_header(netdissect_options *ndo,
 		return -1;
 	}
 	if (ndo->ndo_vflag > 1) {
-		ND_PRINT("KeyIndex 0x%02x, ", EXTRACT_U_1(p));
+		ND_PRINT("KeyIndex 0x%02x, ", GET_U_1(p));
 	}
 	caplen -= 1;
 	p += 1;
@@ -1613,7 +1615,7 @@ ieee802_15_4_print_command_data(netdissect_options *ndo,
 			return -1;
 		} else {
 			uint8_t cap_info;
-			cap_info = EXTRACT_U_1(p);
+			cap_info = GET_U_1(p);
 			ND_PRINT("%s%s%s%s%s%s",
 				 ((cap_info & 0x02) ?
 				  "FFD, " : "RFD, "),
@@ -1637,7 +1639,7 @@ ieee802_15_4_print_command_data(netdissect_options *ndo,
 		} else {
 			ND_PRINT("Short address = ");
 			ieee802_15_4_print_addr(ndo, p, 2);
-			switch (EXTRACT_U_1(p + 2)) {
+			switch (GET_U_1(p + 2)) {
 			case 0x00:
 				ND_PRINT(", Association successful");
 				break;
@@ -1655,7 +1657,7 @@ ieee802_15_4_print_command_data(netdissect_options *ndo,
 				break;
 			default:
 				ND_PRINT(", Status = 0x%02x",
-					 EXTRACT_U_1(p + 2));
+					 GET_U_1(p + 2));
 				break;
 			}
 			return caplen;
@@ -1666,7 +1668,7 @@ ieee802_15_4_print_command_data(netdissect_options *ndo,
 			ND_PRINT("Invalid Disassociation Notification command length");
 			return -1;
 		} else {
-			switch (EXTRACT_U_1(p)) {
+			switch (GET_U_1(p)) {
 			case 0x00:
 				ND_PRINT("Reserved");
 				break;
@@ -1677,7 +1679,7 @@ ieee802_15_4_print_command_data(netdissect_options *ndo,
 				ND_PRINT("Reason = The device wishes to leave the PAN");
 				break;
 			default:
-				ND_PRINT("Reason = 0x%02x", EXTRACT_U_1(p + 2));
+				ND_PRINT("Reason = 0x%02x", GET_U_1(p + 2));
 				break;
 			}
 			return caplen;
@@ -1698,12 +1700,12 @@ ieee802_15_4_print_command_data(netdissect_options *ndo,
 			uint16_t channel, page;
 
 			ND_PRINT("Pan ID = 0x%04x, Coordinator short address = ",
-				 EXTRACT_LE_U_2(p));
+				 GET_LE_U_2(p));
 			ieee802_15_4_print_addr(ndo, p + 2, 2);
-			channel = EXTRACT_U_1(p + 4);
+			channel = GET_U_1(p + 4);
 
 			if (caplen == 8) {
-				page = EXTRACT_U_1(p + 7);
+				page = GET_U_1(p + 7);
 			} else {
 				page = 0x80;
 			}
@@ -1728,7 +1730,7 @@ ieee802_15_4_print_command_data(netdissect_options *ndo,
 		} else {
 			uint8_t gts;
 
-			gts = EXTRACT_U_1(p);
+			gts = GET_U_1(p);
 			ND_PRINT("GTS Length = %d, %s, %s",
 				 gts & 0xf,
 				 (CHECK_BIT(gts, 4) ?
@@ -1775,7 +1777,7 @@ ieee802_15_4_print_command_data(netdissect_options *ndo,
 	default:
 		ND_PRINT("Command Data = ");
 		for(i = 0; i < caplen; i++) {
-			ND_PRINT("%02x ", EXTRACT_U_1(p + i));
+			ND_PRINT("%02x ", GET_U_1(p + i));
 		}
 		break;
 	}
@@ -1811,14 +1813,14 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 		fcs = 0;
 	} else {
 		/* Test for 4 octet FCS. */
-		fcs = EXTRACT_LE_U_4(p + caplen - 4);
+		fcs = GET_LE_U_4(p + caplen - 4);
 		crc_check = ieee802_15_4_crc32(p, caplen - 4);
 		if (crc_check == fcs) {
 			/* Remove FCS */
 			caplen -= 4;
 		} else {
 			/* Test for 2 octet FCS. */
-			fcs = EXTRACT_LE_U_2(p + caplen - 2);
+			fcs = GET_LE_U_2(p + caplen - 2);
 			crc_check = ieee802_15_4_crc16(p, caplen - 2);
 			if (crc_check == fcs) {
 				/* Remove FCS */
@@ -1857,7 +1859,7 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 		p += 2;
 		caplen -= 2;
 	} else {
-		seq = EXTRACT_U_1(p + 2);
+		seq = GET_U_1(p + 2);
 		p += 3;
 		caplen -= 3;
 		if (ndo->ndo_vflag)
@@ -1969,7 +1971,7 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 			ND_PRINT("[ERROR: Truncated before dst_pan]");
 			return 0;
 		}
-		ND_PRINT("%04x:", EXTRACT_LE_U_2(p));
+		ND_PRINT("%04x:", GET_LE_U_2(p));
 		p += 2;
 		caplen -= 2;
 	} else {
@@ -1991,7 +1993,7 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 			ND_PRINT("[ERROR: Truncated before dst_pan]");
 			return 0;
 		}
-		ND_PRINT("%04x:", EXTRACT_LE_U_2(p));
+		ND_PRINT("%04x:", GET_LE_U_2(p));
 		p += 2;
 		caplen -= 2;
 	} else {
@@ -2076,7 +2078,7 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 		ND_PRINT("\n\tMIC ");
 
 		for(len = 0; len < miclen; len++) {
-			ND_PRINT("%02x", EXTRACT_U_1(mic_start + len));
+			ND_PRINT("%02x", GET_U_1(mic_start + len));
 		}
 		ND_PRINT(" ");
 	}
@@ -2101,7 +2103,7 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 			} else {
 				uint16_t ss;
 
-				ss = EXTRACT_LE_U_2(p);
+				ss = GET_LE_U_2(p);
 				ieee802_15_4_print_superframe_specification(ndo, ss);
 				p += 2;
 				caplen -= 2;
@@ -2148,7 +2150,7 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 		} else {
 			uint8_t command_id;
 
-			command_id = EXTRACT_U_1(p);
+			command_id = GET_U_1(p);
 			if (command_id >= 0x30) {
 				ND_PRINT("Command ID = Reserved 0x%02x ",
 					 command_id);
@@ -2205,13 +2207,13 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 	} else {
 		if (caplen > 4) {
 			/* Test for 4 octet FCS. */
-			fcs = EXTRACT_LE_U_4(p + caplen - 4);
+			fcs = GET_LE_U_4(p + caplen - 4);
 			crc_check = ieee802_15_4_crc32(p, caplen - 4);
 			if (crc_check == fcs) {
 				/* Remove FCS */
 				caplen -= 4;
 			} else {
-				fcs = EXTRACT_LE_U_2(p + caplen - 2);
+				fcs = GET_LE_U_2(p + caplen - 2);
 				crc_check = ieee802_15_4_crc16(p, caplen - 2);
 				if (crc_check == fcs) {
 					/* Remove FCS */
@@ -2219,7 +2221,7 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 				}
 			}
 		} else {
-			fcs = EXTRACT_LE_U_2(p + caplen - 2);
+			fcs = GET_LE_U_2(p + caplen - 2);
 			crc_check = ieee802_15_4_crc16(p, caplen - 2);
 			if (crc_check == fcs) {
 				/* Remove FCS */
@@ -2256,7 +2258,7 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 			p += 2;
 			caplen -= 2;
 		} else {
-			seq = EXTRACT_U_1(p + 2);
+			seq = GET_U_1(p + 2);
 			p += 3;
 			caplen -= 3;
 			if (ndo->ndo_vflag)
@@ -2264,7 +2266,7 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 		}
 	} else {
 		/* Short format of header, but with seq no */
-		seq = EXTRACT_U_1(p + 1);
+		seq = GET_U_1(p + 1);
 		p += 2;
 		caplen -= 2;
 		if (ndo->ndo_vflag)
@@ -2289,7 +2291,7 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 			ND_PRINT("[ERROR: Truncated before dst_pan]");
 			return 0;
 		}
-		ND_PRINT("%04x:", EXTRACT_LE_U_2(p));
+		ND_PRINT("%04x:", GET_LE_U_2(p));
 		p += 2;
 		caplen -= 2;
 	} else {
@@ -2388,7 +2390,7 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 		ND_PRINT("\n\tMIC ");
 
 		for(len = 0; len < miclen; len++) {
-			ND_PRINT("%02x", EXTRACT_U_1(mic_start + len));
+			ND_PRINT("%02x", GET_U_1(mic_start + len));
 		}
 		ND_PRINT(" ");
 	}
@@ -2447,7 +2449,7 @@ ieee802_15_4_print(netdissect_options *ndo,
 		return caplen;
 	}
 
-	fc = EXTRACT_LE_U_2(p);
+	fc = GET_LE_U_2(p);
 
 	/* First we need to check the frame type to know how to parse the rest
 	   of the FC. Frame type is the first 3 bit of the frame control field.
@@ -2507,8 +2509,8 @@ ieee802_15_4_tap_if_print(netdissect_options *ndo,
 		return h->caplen;
 	}
 
-	version = EXTRACT_U_1(p);
-	length = EXTRACT_LE_U_2(p+2);
+	version = GET_U_1(p);
+	length = GET_LE_U_2(p + 2);
 	if (version != 0 || length < 4) {
 		nd_print_invalid(ndo);
 		return 0;

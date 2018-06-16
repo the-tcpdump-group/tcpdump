@@ -397,7 +397,7 @@ telnet_parse(netdissect_options *ndo, const u_char *sp, u_int length, int print)
 		if (length < 1) \
 			goto pktend; \
 		ND_TCHECK_1(sp); \
-		c = EXTRACT_U_1(sp); \
+		c = GET_U_1(sp); \
 		sp++; \
 		length--; \
 	} while (0)
@@ -439,12 +439,12 @@ telnet_parse(netdissect_options *ndo, const u_char *sp, u_int length, int print)
 		p = sp;
 		while (length > (u_int)(p + 1 - sp)) {
 			ND_TCHECK_2(p);
-			if (EXTRACT_U_1(p) == IAC && EXTRACT_U_1(p + 1) == SE)
+			if (GET_U_1(p) == IAC && GET_U_1(p + 1) == SE)
 				break;
 			p++;
 		}
 		ND_TCHECK_1(p);
-		if (EXTRACT_U_1(p) != IAC)
+		if (GET_U_1(p) != IAC)
 			goto pktend;
 
 		switch (x) {
@@ -517,7 +517,7 @@ telnet_print(netdissect_options *ndo, const u_char *sp, u_int length)
 	osp = sp;
 
 	ND_TCHECK_1(sp);
-	while (length > 0 && EXTRACT_U_1(sp) == IAC) {
+	while (length > 0 && GET_U_1(sp) == IAC) {
 		/*
 		 * Parse the Telnet command without printing it,
 		 * to determine its length.

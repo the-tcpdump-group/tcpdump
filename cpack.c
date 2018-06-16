@@ -102,7 +102,7 @@ cpack_uint64(netdissect_options *ndo, struct cpack_state *cs, uint64_t *u)
 	if ((next = cpack_align_and_reserve(cs, sizeof(*u))) == NULL)
 		return -1;
 
-	*u = EXTRACT_LE_U_8(next);
+	*u = GET_LE_U_8(next);
 
 	/* Move pointer past the uint64_t. */
 	cs->c_next = next + sizeof(*u);
@@ -118,7 +118,7 @@ cpack_int64(netdissect_options *ndo, struct cpack_state *cs, int64_t *u)
 	if ((next = cpack_align_and_reserve(cs, sizeof(*u))) == NULL)
 		return -1;
 
-	*u = EXTRACT_LE_S_8(next);
+	*u = GET_LE_S_8(next);
 
 	/* Move pointer past the int64_t. */
 	cs->c_next = next + sizeof(*u);
@@ -134,7 +134,7 @@ cpack_uint32(netdissect_options *ndo, struct cpack_state *cs, uint32_t *u)
 	if ((next = cpack_align_and_reserve(cs, sizeof(*u))) == NULL)
 		return -1;
 
-	*u = EXTRACT_LE_U_4(next);
+	*u = GET_LE_U_4(next);
 
 	/* Move pointer past the uint32_t. */
 	cs->c_next = next + sizeof(*u);
@@ -150,7 +150,7 @@ cpack_int32(netdissect_options *ndo, struct cpack_state *cs, int32_t *u)
 	if ((next = cpack_align_and_reserve(cs, sizeof(*u))) == NULL)
 		return -1;
 
-	*u = EXTRACT_LE_S_4(next);
+	*u = GET_LE_S_4(next);
 
 	/* Move pointer past the int32_t. */
 	cs->c_next = next + sizeof(*u);
@@ -166,7 +166,7 @@ cpack_uint16(netdissect_options *ndo, struct cpack_state *cs, uint16_t *u)
 	if ((next = cpack_align_and_reserve(cs, sizeof(*u))) == NULL)
 		return -1;
 
-	*u = EXTRACT_LE_U_2(next);
+	*u = GET_LE_U_2(next);
 
 	/* Move pointer past the uint16_t. */
 	cs->c_next = next + sizeof(*u);
@@ -182,7 +182,7 @@ cpack_int16(netdissect_options *ndo, struct cpack_state *cs, int16_t *u)
 	if ((next = cpack_align_and_reserve(cs, sizeof(*u))) == NULL)
 		return -1;
 
-	*u = EXTRACT_LE_S_2(next);
+	*u = GET_LE_S_2(next);
 
 	/* Move pointer past the int16_t. */
 	cs->c_next = next + sizeof(*u);
@@ -197,7 +197,7 @@ cpack_uint8(netdissect_options *ndo, struct cpack_state *cs, uint8_t *u)
 	if ((size_t)(cs->c_next - cs->c_buf) >= cs->c_len)
 		return -1;
 
-	*u = EXTRACT_U_1(cs->c_next);
+	*u = GET_U_1(cs->c_next);
 
 	/* Move pointer past the uint8_t. */
 	cs->c_next++;
@@ -212,7 +212,7 @@ cpack_int8(netdissect_options *ndo, struct cpack_state *cs, int8_t *u)
 	if ((size_t)(cs->c_next - cs->c_buf) >= cs->c_len)
 		return -1;
 
-	*u = EXTRACT_S_1(cs->c_next);
+	*u = GET_S_1(cs->c_next);
 
 	/* Move pointer past the int8_t. */
 	cs->c_next++;

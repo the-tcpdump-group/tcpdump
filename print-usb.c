@@ -187,7 +187,7 @@ usb_header_print(netdissect_options *ndo, const pcap_usb_header *uh)
 	int direction;
 	uint8_t transfer_type, event_type;
 
-	transfer_type = EXTRACT_U_1(uh->transfer_type);
+	transfer_type = GET_U_1(uh->transfer_type);
 	switch(transfer_type)
 	{
 		case URB_ISOCHRONOUS:
@@ -206,7 +206,7 @@ usb_header_print(netdissect_options *ndo, const pcap_usb_header *uh)
 			ND_PRINT(" ?");
 	}
 
-	event_type = EXTRACT_U_1(uh->event_type);
+	event_type = GET_U_1(uh->event_type);
 	switch(event_type)
 	{
 		case URB_SUBMIT:
@@ -227,7 +227,9 @@ usb_header_print(netdissect_options *ndo, const pcap_usb_header *uh)
 		ND_PRINT(" from");
 	else if(direction == 2)
 		ND_PRINT(" to");
-	ND_PRINT(" %u:%u:%u", EXTRACT_HE_U_2(uh->bus_id), EXTRACT_U_1(uh->device_address), EXTRACT_U_1(uh->endpoint_number) & 0x7f);
+	ND_PRINT(" %u:%u:%u", GET_HE_U_2(uh->bus_id),
+		 GET_U_1(uh->device_address),
+		 GET_U_1(uh->endpoint_number) & 0x7f);
 }
 
 /*

@@ -261,60 +261,60 @@ parse_sattr3(netdissect_options *ndo,
              const uint32_t *dp, struct nfsv3_sattr *sa3)
 {
 	ND_TCHECK_4(dp);
-	sa3->sa_modeset = EXTRACT_BE_U_4(dp);
+	sa3->sa_modeset = GET_BE_U_4(dp);
 	dp++;
 	if (sa3->sa_modeset) {
 		ND_TCHECK_4(dp);
-		sa3->sa_mode = EXTRACT_BE_U_4(dp);
+		sa3->sa_mode = GET_BE_U_4(dp);
 		dp++;
 	}
 
 	ND_TCHECK_4(dp);
-	sa3->sa_uidset = EXTRACT_BE_U_4(dp);
+	sa3->sa_uidset = GET_BE_U_4(dp);
 	dp++;
 	if (sa3->sa_uidset) {
 		ND_TCHECK_4(dp);
-		sa3->sa_uid = EXTRACT_BE_U_4(dp);
+		sa3->sa_uid = GET_BE_U_4(dp);
 		dp++;
 	}
 
 	ND_TCHECK_4(dp);
-	sa3->sa_gidset = EXTRACT_BE_U_4(dp);
+	sa3->sa_gidset = GET_BE_U_4(dp);
 	dp++;
 	if (sa3->sa_gidset) {
 		ND_TCHECK_4(dp);
-		sa3->sa_gid = EXTRACT_BE_U_4(dp);
+		sa3->sa_gid = GET_BE_U_4(dp);
 		dp++;
 	}
 
 	ND_TCHECK_4(dp);
-	sa3->sa_sizeset = EXTRACT_BE_U_4(dp);
+	sa3->sa_sizeset = GET_BE_U_4(dp);
 	dp++;
 	if (sa3->sa_sizeset) {
 		ND_TCHECK_4(dp);
-		sa3->sa_size = EXTRACT_BE_U_4(dp);
+		sa3->sa_size = GET_BE_U_4(dp);
 		dp++;
 	}
 
 	ND_TCHECK_4(dp);
-	sa3->sa_atimetype = EXTRACT_BE_U_4(dp);
+	sa3->sa_atimetype = GET_BE_U_4(dp);
 	dp++;
 	if (sa3->sa_atimetype == NFSV3SATTRTIME_TOCLIENT) {
 		ND_TCHECK_4(dp + 1);
-		sa3->sa_atime.nfsv3_sec = EXTRACT_BE_U_4(dp);
+		sa3->sa_atime.nfsv3_sec = GET_BE_U_4(dp);
 		dp++;
-		sa3->sa_atime.nfsv3_nsec = EXTRACT_BE_U_4(dp);
+		sa3->sa_atime.nfsv3_nsec = GET_BE_U_4(dp);
 		dp++;
 	}
 
 	ND_TCHECK_4(dp);
-	sa3->sa_mtimetype = EXTRACT_BE_U_4(dp);
+	sa3->sa_mtimetype = GET_BE_U_4(dp);
 	dp++;
 	if (sa3->sa_mtimetype == NFSV3SATTRTIME_TOCLIENT) {
 		ND_TCHECK_4(dp + 1);
-		sa3->sa_mtime.nfsv3_sec = EXTRACT_BE_U_4(dp);
+		sa3->sa_mtime.nfsv3_sec = GET_BE_U_4(dp);
 		dp++;
-		sa3->sa_mtime.nfsv3_nsec = EXTRACT_BE_U_4(dp);
+		sa3->sa_mtime.nfsv3_nsec = GET_BE_U_4(dp);
 		dp++;
 	}
 
@@ -358,11 +358,11 @@ nfsreply_print(netdissect_options *ndo,
 	if (!ndo->ndo_nflag) {
 		strlcpy(srcid, "nfs", sizeof(srcid));
 		nd_snprintf(dstid, sizeof(dstid), "%u",
-		    EXTRACT_BE_U_4(rp->rm_xid));
+		    GET_BE_U_4(rp->rm_xid));
 	} else {
 		nd_snprintf(srcid, sizeof(srcid), "%u", NFS_PORT);
 		nd_snprintf(dstid, sizeof(dstid), "%u",
-		    EXTRACT_BE_U_4(rp->rm_xid));
+		    GET_BE_U_4(rp->rm_xid));
 	}
 	print_nfsaddr(ndo, bp2, srcid, dstid);
 
@@ -389,7 +389,7 @@ nfsreply_noaddr_print(netdissect_options *ndo,
 	rp = (const struct sunrpc_msg *)bp;
 
 	ND_TCHECK_4(rp->rm_reply.rp_stat);
-	reply_stat = EXTRACT_BE_U_4(&rp->rm_reply.rp_stat);
+	reply_stat = GET_BE_U_4(&rp->rm_reply.rp_stat);
 	switch (reply_stat) {
 
 	case SUNRPC_MSG_ACCEPTED:
@@ -401,19 +401,19 @@ nfsreply_noaddr_print(netdissect_options *ndo,
 	case SUNRPC_MSG_DENIED:
 		ND_PRINT("reply ERR %u: ", length);
 		ND_TCHECK_4(rp->rm_reply.rp_reject.rj_stat);
-		rstat = EXTRACT_BE_U_4(&rp->rm_reply.rp_reject.rj_stat);
+		rstat = GET_BE_U_4(&rp->rm_reply.rp_reject.rj_stat);
 		switch (rstat) {
 
 		case SUNRPC_RPC_MISMATCH:
 			ND_TCHECK_4(rp->rm_reply.rp_reject.rj_vers.high);
-			rlow = EXTRACT_BE_U_4(&rp->rm_reply.rp_reject.rj_vers.low);
-			rhigh = EXTRACT_BE_U_4(&rp->rm_reply.rp_reject.rj_vers.high);
+			rlow = GET_BE_U_4(&rp->rm_reply.rp_reject.rj_vers.low);
+			rhigh = GET_BE_U_4(&rp->rm_reply.rp_reject.rj_vers.high);
 			ND_PRINT("RPC Version mismatch (%u-%u)", rlow, rhigh);
 			break;
 
 		case SUNRPC_AUTH_ERROR:
 			ND_TCHECK_4(rp->rm_reply.rp_reject.rj_why);
-			rwhy = EXTRACT_BE_U_4(&rp->rm_reply.rp_reject.rj_why);
+			rwhy = GET_BE_U_4(&rp->rm_reply.rp_reject.rj_why);
 			ND_PRINT("Auth %s", tok2str(sunrpc_auth_str, "Invalid failure code %u", rwhy));
 			break;
 
@@ -453,7 +453,7 @@ parsereq(netdissect_options *ndo,
 	if (length < 2 * sizeof(*dp))
 		goto trunc;
 	ND_TCHECK_4(dp + 1);
-	len = EXTRACT_BE_U_4(dp + 1);
+	len = GET_BE_U_4(dp + 1);
 	rounded_len = roundup2(len, 4);
 	ND_TCHECK_LEN(dp + 2, rounded_len);
 	if (2 * sizeof(*dp) + rounded_len <= length) {
@@ -473,7 +473,7 @@ parsereq(netdissect_options *ndo,
 		if (length < 2 * sizeof(*dp))
 			goto trunc;
 		ND_TCHECK_4(dp + 1);
-		len = EXTRACT_BE_U_4(dp + 1);
+		len = GET_BE_U_4(dp + 1);
 		rounded_len = roundup2(len, 4);
 		ND_TCHECK_LEN(dp + 2, rounded_len);
 		if (2 * sizeof(*dp) + rounded_len < length) {
@@ -503,7 +503,7 @@ parsefh(netdissect_options *ndo,
 
 	if (v3) {
 		ND_TCHECK_4(dp);
-		len = EXTRACT_BE_U_4(dp) / 4;
+		len = GET_BE_U_4(dp) / 4;
 		dp++;
 	} else
 		len = NFSX_V2FH / 4;
@@ -531,7 +531,7 @@ parsefn(netdissect_options *ndo,
 	ND_TCHECK_4(dp);
 
 	/* Fetch big-endian string length */
-	len = EXTRACT_BE_U_4(dp);
+	len = GET_BE_U_4(dp);
 	dp++;
 
 	if (UINT_MAX - len < 3) {
@@ -593,8 +593,8 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 	if (!xid_map_enter(ndo, rp, bp2))	/* record proc number for later on */
 		goto trunc;
 
-	v3 = (EXTRACT_BE_U_4(&rp->rm_call.cb_vers) == NFS_VER3);
-	proc = EXTRACT_BE_U_4(&rp->rm_call.cb_proc);
+	v3 = (GET_BE_U_4(&rp->rm_call.cb_vers) == NFS_VER3);
+	proc = GET_BE_U_4(&rp->rm_call.cb_proc);
 
 	if (!v3 && proc < NFS_NPROCS)
 		proc =  nfsv3_procid[proc];
@@ -635,7 +635,7 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 		if (dp == NULL)
 			goto trunc;
 		ND_TCHECK_4(dp);
-		access_flags = EXTRACT_BE_U_4(dp);
+		access_flags = GET_BE_U_4(dp);
 		if (access_flags & ~NFSV3ACCESS_FULL) {
 			/* NFSV3ACCESS definitions aren't up to date */
 			ND_PRINT(" %04x", access_flags);
@@ -678,13 +678,13 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 		if (v3) {
 			ND_TCHECK_4(dp + 2);
 			ND_PRINT(" %u bytes @ %" PRIu64,
-			       EXTRACT_BE_U_4(dp + 2),
-			       EXTRACT_BE_U_8(dp));
+			       GET_BE_U_4(dp + 2),
+			       GET_BE_U_8(dp));
 		} else {
 			ND_TCHECK_4(dp + 1);
 			ND_PRINT(" %u bytes @ %u",
-			    EXTRACT_BE_U_4(dp + 1),
-			    EXTRACT_BE_U_4(dp));
+			    GET_BE_U_4(dp + 1),
+			    GET_BE_U_4(dp));
 		}
 		break;
 
@@ -698,21 +698,21 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 		if (v3) {
 			ND_TCHECK_4(dp + 4);
 			ND_PRINT(" %u (%u) bytes @ %" PRIu64,
-					EXTRACT_BE_U_4(dp + 4),
-					EXTRACT_BE_U_4(dp + 2),
-					EXTRACT_BE_U_8(dp));
+					GET_BE_U_4(dp + 4),
+					GET_BE_U_4(dp + 2),
+					GET_BE_U_8(dp));
 			if (ndo->ndo_vflag) {
 				ND_PRINT(" <%s>",
 					tok2str(nfsv3_writemodes,
-						NULL, EXTRACT_BE_U_4(dp + 3)));
+						NULL, GET_BE_U_4(dp + 3)));
 			}
 		} else {
 			ND_TCHECK_4(dp + 3);
 			ND_PRINT(" %u (%u) bytes @ %u (%u)",
-					EXTRACT_BE_U_4(dp + 3),
-					EXTRACT_BE_U_4(dp + 2),
-					EXTRACT_BE_U_4(dp + 1),
-					EXTRACT_BE_U_4(dp));
+					GET_BE_U_4(dp + 3),
+					GET_BE_U_4(dp + 2),
+					GET_BE_U_4(dp + 1),
+					GET_BE_U_4(dp));
 		}
 		break;
 
@@ -740,7 +740,7 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 		if (dp == NULL)
 			goto trunc;
 		ND_TCHECK_4(dp);
-		type = (nfs_type) EXTRACT_BE_U_4(dp);
+		type = (nfs_type) GET_BE_U_4(dp);
 		dp++;
 		dp = parse_sattr3(ndo, dp, &sa3);
 		if (dp == NULL)
@@ -749,8 +749,8 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 		if (ndo->ndo_vflag && (type == NFCHR || type == NFBLK)) {
 			ND_TCHECK_4(dp + 1);
 			ND_PRINT(" %u/%u",
-			       EXTRACT_BE_U_4(dp),
-			       EXTRACT_BE_U_4(dp + 1));
+			       GET_BE_U_4(dp),
+			       GET_BE_U_4(dp + 1));
 			dp += 2;
 		}
 		if (ndo->ndo_vflag)
@@ -795,8 +795,8 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 			 * offset cookie here.
 			 */
 			ND_PRINT(" %u bytes @ %" PRId64,
-			    EXTRACT_BE_U_4(dp + 4),
-			    EXTRACT_BE_U_8(dp));
+			    GET_BE_U_4(dp + 4),
+			    GET_BE_U_8(dp));
 			if (ndo->ndo_vflag) {
 				/*
 				 * This displays the 8 bytes
@@ -805,8 +805,8 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 				 * to the high-order byte.
 				 */
 				ND_PRINT(" verf %08x%08x",
-					  EXTRACT_BE_U_4(dp + 2),
-					  EXTRACT_BE_U_4(dp + 3));
+					  GET_BE_U_4(dp + 2),
+					  GET_BE_U_4(dp + 3));
 			}
 		} else {
 			ND_TCHECK_4(dp + 1);
@@ -815,8 +815,8 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 			 * common, but offsets > 2^31 aren't.
 			 */
 			ND_PRINT(" %u bytes @ %u",
-			    EXTRACT_BE_U_4(dp + 1),
-			    EXTRACT_BE_U_4(dp));
+			    GET_BE_U_4(dp + 1),
+			    GET_BE_U_4(dp));
 		}
 		break;
 
@@ -833,8 +833,8 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 		 * cookie here.
 		 */
 		ND_PRINT(" %u bytes @ %" PRId64,
-			EXTRACT_BE_U_4(dp + 4),
-			EXTRACT_BE_U_8(dp));
+			GET_BE_U_4(dp + 4),
+			GET_BE_U_8(dp));
 		if (ndo->ndo_vflag) {
 			ND_TCHECK_4(dp + 5);
 			/*
@@ -844,9 +844,9 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 			 * to the high-order byte.
 			 */
 			ND_PRINT(" max %u verf %08x%08x",
-			          EXTRACT_BE_U_4(dp + 5),
-				  EXTRACT_BE_U_4(dp + 2),
-				  EXTRACT_BE_U_4(dp + 3));
+			          GET_BE_U_4(dp + 5),
+			          GET_BE_U_4(dp + 2),
+			          GET_BE_U_4(dp + 3));
 		}
 		break;
 
@@ -859,8 +859,8 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 			goto trunc;
 		ND_TCHECK_4(dp + 2);
 		ND_PRINT(" %u bytes @ %" PRIu64,
-			EXTRACT_BE_U_4(dp + 2),
-			EXTRACT_BE_U_8(dp));
+			GET_BE_U_4(dp + 2),
+			GET_BE_U_8(dp));
 		break;
 
 	default:
@@ -908,7 +908,7 @@ nfs_printfh(netdissect_options *ndo,
 			 * running tcpdump may show the same file
 			 * handle in different ways.
 			 */
-			ND_PRINT("%s%x", sep, EXTRACT_BE_U_4(dp + i));
+			ND_PRINT("%s%x", sep, GET_BE_U_4(dp + i));
 			sep = ":";
 		}
 		ND_PRINT("]");
@@ -1015,8 +1015,8 @@ xid_map_enter(netdissect_options *ndo,
 		UNALIGNED_MEMCPY(&xmep->server, ip6->ip6_dst,
 				 sizeof(ip6->ip6_dst));
 	}
-	xmep->proc = EXTRACT_BE_U_4(&rp->rm_call.cb_proc);
-	xmep->vers = EXTRACT_BE_U_4(&rp->rm_call.cb_vers);
+	xmep->proc = GET_BE_U_4(&rp->rm_call.cb_proc);
+	xmep->vers = GET_BE_U_4(&rp->rm_call.cb_vers);
 	return (1);
 }
 
@@ -1113,7 +1113,7 @@ parserep(netdissect_options *ndo,
 	 */
 	dp = ((const uint32_t *)&rp->rm_reply) + 1;
 	ND_TCHECK_4(dp + 1);
-	len = EXTRACT_BE_U_4(dp + 1);
+	len = GET_BE_U_4(dp + 1);
 	if (len >= length)
 		return (NULL);
 	/*
@@ -1125,7 +1125,7 @@ parserep(netdissect_options *ndo,
 	 * now we can check the ar_stat field
 	 */
 	ND_TCHECK_4(dp);
-	astat = (enum sunrpc_accept_stat) EXTRACT_BE_U_4(dp);
+	astat = (enum sunrpc_accept_stat) GET_BE_U_4(dp);
 	if (astat != SUNRPC_SUCCESS) {
 		ND_PRINT(" %s", tok2str(sunrpc_str, "ar_stat %u", astat));
 		*nfserrp = 1;		/* suppress trunc string */
@@ -1146,7 +1146,7 @@ parsestatus(netdissect_options *ndo,
 
 	ND_TCHECK_4(dp);
 
-	errnum = EXTRACT_BE_U_4(dp);
+	errnum = GET_BE_U_4(dp);
 	if (er)
 		*er = errnum;
 	if (errnum != 0) {
@@ -1177,17 +1177,17 @@ parsefattr(netdissect_options *ndo,
 		 */
 		ND_PRINT(" %s %o ids %d/%d",
 		    tok2str(type2str, "unk-ft %u ",
-		    EXTRACT_BE_U_4(fap->fa_type)),
-		    EXTRACT_BE_U_4(fap->fa_mode),
-		    EXTRACT_BE_S_4(fap->fa_uid),
-		    EXTRACT_BE_S_4(fap->fa_gid));
+		    GET_BE_U_4(fap->fa_type)),
+		    GET_BE_U_4(fap->fa_mode),
+		    GET_BE_S_4(fap->fa_uid),
+		    GET_BE_S_4(fap->fa_gid));
 		if (v3) {
 			ND_TCHECK_8(fap->fa3_size);
 			ND_PRINT(" sz %" PRIu64,
-				EXTRACT_BE_U_8(fap->fa3_size));
+				GET_BE_U_8(fap->fa3_size));
 		} else {
 			ND_TCHECK_4(fap->fa2_size);
-			ND_PRINT(" sz %u", EXTRACT_BE_U_4(fap->fa2_size));
+			ND_PRINT(" sz %u", GET_BE_U_4(fap->fa2_size));
 		}
 	}
 	/* print lots more stuff */
@@ -1195,38 +1195,38 @@ parsefattr(netdissect_options *ndo,
 		if (v3) {
 			ND_TCHECK_8(&fap->fa3_ctime);
 			ND_PRINT(" nlink %u rdev %u/%u",
-			       EXTRACT_BE_U_4(fap->fa_nlink),
-			       EXTRACT_BE_U_4(fap->fa3_rdev.specdata1),
-			       EXTRACT_BE_U_4(fap->fa3_rdev.specdata2));
+			       GET_BE_U_4(fap->fa_nlink),
+			       GET_BE_U_4(fap->fa3_rdev.specdata1),
+			       GET_BE_U_4(fap->fa3_rdev.specdata2));
 			ND_PRINT(" fsid %" PRIx64,
-				EXTRACT_BE_U_8(fap->fa3_fsid));
+				GET_BE_U_8(fap->fa3_fsid));
 			ND_PRINT(" fileid %" PRIx64,
-				EXTRACT_BE_U_8(fap->fa3_fileid));
+				GET_BE_U_8(fap->fa3_fileid));
 			ND_PRINT(" a/m/ctime %u.%06u",
-			       EXTRACT_BE_U_4(fap->fa3_atime.nfsv3_sec),
-			       EXTRACT_BE_U_4(fap->fa3_atime.nfsv3_nsec));
+			       GET_BE_U_4(fap->fa3_atime.nfsv3_sec),
+			       GET_BE_U_4(fap->fa3_atime.nfsv3_nsec));
 			ND_PRINT(" %u.%06u",
-			       EXTRACT_BE_U_4(fap->fa3_mtime.nfsv3_sec),
-			       EXTRACT_BE_U_4(fap->fa3_mtime.nfsv3_nsec));
+			       GET_BE_U_4(fap->fa3_mtime.nfsv3_sec),
+			       GET_BE_U_4(fap->fa3_mtime.nfsv3_nsec));
 			ND_PRINT(" %u.%06u",
-			       EXTRACT_BE_U_4(fap->fa3_ctime.nfsv3_sec),
-			       EXTRACT_BE_U_4(fap->fa3_ctime.nfsv3_nsec));
+			       GET_BE_U_4(fap->fa3_ctime.nfsv3_sec),
+			       GET_BE_U_4(fap->fa3_ctime.nfsv3_nsec));
 		} else {
 			ND_TCHECK_8(&fap->fa2_ctime);
 			ND_PRINT(" nlink %u rdev 0x%x fsid 0x%x nodeid 0x%x a/m/ctime",
-			       EXTRACT_BE_U_4(fap->fa_nlink),
-			       EXTRACT_BE_U_4(fap->fa2_rdev),
-			       EXTRACT_BE_U_4(fap->fa2_fsid),
-			       EXTRACT_BE_U_4(fap->fa2_fileid));
+			       GET_BE_U_4(fap->fa_nlink),
+			       GET_BE_U_4(fap->fa2_rdev),
+			       GET_BE_U_4(fap->fa2_fsid),
+			       GET_BE_U_4(fap->fa2_fileid));
 			ND_PRINT(" %u.%06u",
-			       EXTRACT_BE_U_4(fap->fa2_atime.nfsv2_sec),
-			       EXTRACT_BE_U_4(fap->fa2_atime.nfsv2_usec));
+			       GET_BE_U_4(fap->fa2_atime.nfsv2_sec),
+			       GET_BE_U_4(fap->fa2_atime.nfsv2_usec));
 			ND_PRINT(" %u.%06u",
-			       EXTRACT_BE_U_4(fap->fa2_mtime.nfsv2_sec),
-			       EXTRACT_BE_U_4(fap->fa2_mtime.nfsv2_usec));
+			       GET_BE_U_4(fap->fa2_mtime.nfsv2_sec),
+			       GET_BE_U_4(fap->fa2_mtime.nfsv2_usec));
 			ND_PRINT(" %u.%06u",
-			       EXTRACT_BE_U_4(fap->fa2_ctime.nfsv2_sec),
-			       EXTRACT_BE_U_4(fap->fa2_ctime.nfsv2_usec));
+			       GET_BE_U_4(fap->fa2_ctime.nfsv2_sec),
+			       GET_BE_U_4(fap->fa2_ctime.nfsv2_usec));
 		}
 	}
 	return ((const uint32_t *)((const unsigned char *)dp +
@@ -1319,23 +1319,23 @@ parsestatfs(netdissect_options *ndo,
 
 	if (v3) {
 		ND_PRINT(" tbytes %" PRIu64 " fbytes %" PRIu64 " abytes %" PRIu64,
-			EXTRACT_BE_U_8(sfsp->sf_tbytes),
-			EXTRACT_BE_U_8(sfsp->sf_fbytes),
-			EXTRACT_BE_U_8(sfsp->sf_abytes));
+			GET_BE_U_8(sfsp->sf_tbytes),
+			GET_BE_U_8(sfsp->sf_fbytes),
+			GET_BE_U_8(sfsp->sf_abytes));
 		if (ndo->ndo_vflag) {
 			ND_PRINT(" tfiles %" PRIu64 " ffiles %" PRIu64 " afiles %" PRIu64 " invar %u",
-			       EXTRACT_BE_U_8(sfsp->sf_tfiles),
-			       EXTRACT_BE_U_8(sfsp->sf_ffiles),
-			       EXTRACT_BE_U_8(sfsp->sf_afiles),
-			       EXTRACT_BE_U_4(sfsp->sf_invarsec));
+			       GET_BE_U_8(sfsp->sf_tfiles),
+			       GET_BE_U_8(sfsp->sf_ffiles),
+			       GET_BE_U_8(sfsp->sf_afiles),
+			       GET_BE_U_4(sfsp->sf_invarsec));
 		}
 	} else {
 		ND_PRINT(" tsize %u bsize %u blocks %u bfree %u bavail %u",
-			EXTRACT_BE_U_4(sfsp->sf_tsize),
-			EXTRACT_BE_U_4(sfsp->sf_bsize),
-			EXTRACT_BE_U_4(sfsp->sf_blocks),
-			EXTRACT_BE_U_4(sfsp->sf_bfree),
-			EXTRACT_BE_U_4(sfsp->sf_bavail));
+			GET_BE_U_4(sfsp->sf_tsize),
+			GET_BE_U_4(sfsp->sf_bsize),
+			GET_BE_U_4(sfsp->sf_blocks),
+			GET_BE_U_4(sfsp->sf_bfree),
+			GET_BE_U_4(sfsp->sf_bavail));
 	}
 
 	return (1);
@@ -1359,8 +1359,8 @@ parserddires(netdissect_options *ndo,
 
 	ND_TCHECK_4(dp + 2);
 	ND_PRINT(" offset 0x%x size %u ",
-	       EXTRACT_BE_U_4(dp), EXTRACT_BE_U_4(dp + 1));
-	if (EXTRACT_BE_U_4(dp + 2) != 0)
+	       GET_BE_U_4(dp), GET_BE_U_4(dp + 1));
+	if (GET_BE_U_4(dp + 2) != 0)
 		ND_PRINT(" eof");
 
 	return (1);
@@ -1373,10 +1373,10 @@ parse_wcc_attr(netdissect_options *ndo,
                const uint32_t *dp)
 {
 	/* Our caller has already checked this */
-	ND_PRINT(" sz %" PRIu64, EXTRACT_BE_U_8(dp));
+	ND_PRINT(" sz %" PRIu64, GET_BE_U_8(dp));
 	ND_PRINT(" mtime %u.%06u ctime %u.%06u",
-	       EXTRACT_BE_U_4(dp + 2), EXTRACT_BE_U_4(dp + 3),
-	       EXTRACT_BE_U_4(dp + 4), EXTRACT_BE_U_4(dp + 5));
+	       GET_BE_U_4(dp + 2), GET_BE_U_4(dp + 3),
+	       GET_BE_U_4(dp + 4), GET_BE_U_4(dp + 5));
 	return (dp + 6);
 }
 
@@ -1388,7 +1388,7 @@ parse_pre_op_attr(netdissect_options *ndo,
                   const uint32_t *dp, int verbose)
 {
 	ND_TCHECK_4(dp);
-	if (!EXTRACT_BE_U_4(dp))
+	if (!GET_BE_U_4(dp))
 		return (dp + 1);
 	dp++;
 	ND_TCHECK_LEN(dp, 24);
@@ -1410,7 +1410,7 @@ parse_post_op_attr(netdissect_options *ndo,
                    const uint32_t *dp, int verbose)
 {
 	ND_TCHECK_4(dp);
-	if (!EXTRACT_BE_U_4(dp))
+	if (!GET_BE_U_4(dp))
 		return (dp + 1);
 	dp++;
 	if (verbose) {
@@ -1449,7 +1449,7 @@ parsecreateopres(netdissect_options *ndo,
 		dp = parse_wcc_data(ndo, dp, verbose);
 	else {
 		ND_TCHECK_4(dp);
-		if (!EXTRACT_BE_U_4(dp))
+		if (!GET_BE_U_4(dp))
 			return (dp + 1);
 		dp++;
 		dp = parsefh(ndo, dp, 1);
@@ -1505,7 +1505,7 @@ parsev3rddirres(netdissect_options *ndo,
 		 * from the low-order byte to the high-order byte.
 		 */
 		ND_PRINT(" verf %08x%08x",
-			  EXTRACT_BE_U_4(dp), EXTRACT_BE_U_4(dp + 1));
+			  GET_BE_U_4(dp), GET_BE_U_4(dp + 1));
 		dp += 2;
 	}
 	return dp;
@@ -1534,19 +1534,19 @@ parsefsinfo(netdissect_options *ndo,
 	sfp = (const struct nfsv3_fsinfo *)dp;
 	ND_TCHECK_SIZE(sfp);
 	ND_PRINT(" rtmax %u rtpref %u wtmax %u wtpref %u dtpref %u",
-	       EXTRACT_BE_U_4(sfp->fs_rtmax),
-	       EXTRACT_BE_U_4(sfp->fs_rtpref),
-	       EXTRACT_BE_U_4(sfp->fs_wtmax),
-	       EXTRACT_BE_U_4(sfp->fs_wtpref),
-	       EXTRACT_BE_U_4(sfp->fs_dtpref));
+	       GET_BE_U_4(sfp->fs_rtmax),
+	       GET_BE_U_4(sfp->fs_rtpref),
+	       GET_BE_U_4(sfp->fs_wtmax),
+	       GET_BE_U_4(sfp->fs_wtpref),
+	       GET_BE_U_4(sfp->fs_dtpref));
 	if (ndo->ndo_vflag) {
 		ND_PRINT(" rtmult %u wtmult %u maxfsz %" PRIu64,
-		       EXTRACT_BE_U_4(sfp->fs_rtmult),
-		       EXTRACT_BE_U_4(sfp->fs_wtmult),
-		       EXTRACT_BE_U_8(sfp->fs_maxfilesize));
+		       GET_BE_U_4(sfp->fs_rtmult),
+		       GET_BE_U_4(sfp->fs_wtmult),
+		       GET_BE_U_8(sfp->fs_maxfilesize));
 		ND_PRINT(" delta %u.%06u ",
-		       EXTRACT_BE_U_4(sfp->fs_timedelta.nfsv3_sec),
-		       EXTRACT_BE_U_4(sfp->fs_timedelta.nfsv3_nsec));
+		       GET_BE_U_4(sfp->fs_timedelta.nfsv3_sec),
+		       GET_BE_U_4(sfp->fs_timedelta.nfsv3_nsec));
 	}
 	return (1);
 trunc:
@@ -1575,12 +1575,12 @@ parsepathconf(netdissect_options *ndo,
 	ND_TCHECK_SIZE(spp);
 
 	ND_PRINT(" linkmax %u namemax %u %s %s %s %s",
-	       EXTRACT_BE_U_4(spp->pc_linkmax),
-	       EXTRACT_BE_U_4(spp->pc_namemax),
-	       EXTRACT_BE_U_4(spp->pc_notrunc) ? "notrunc" : "",
-	       EXTRACT_BE_U_4(spp->pc_chownrestricted) ? "chownres" : "",
-	       EXTRACT_BE_U_4(spp->pc_caseinsensitive) ? "igncase" : "",
-	       EXTRACT_BE_U_4(spp->pc_casepreserving) ? "keepcase" : "");
+	       GET_BE_U_4(spp->pc_linkmax),
+	       GET_BE_U_4(spp->pc_namemax),
+	       GET_BE_U_4(spp->pc_notrunc) ? "notrunc" : "",
+	       GET_BE_U_4(spp->pc_chownrestricted) ? "chownres" : "",
+	       GET_BE_U_4(spp->pc_caseinsensitive) ? "igncase" : "",
+	       GET_BE_U_4(spp->pc_casepreserving) ? "keepcase" : "");
 	return (1);
 trunc:
 	return (0);
@@ -1674,7 +1674,7 @@ interp_reply(netdissect_options *ndo,
 			goto trunc;
 		if (!er) {
 			ND_TCHECK_4(dp);
-			ND_PRINT(" c %04x", EXTRACT_BE_U_4(dp));
+			ND_PRINT(" c %04x", GET_BE_U_4(dp));
 		}
 		break;
 
@@ -1700,8 +1700,8 @@ interp_reply(netdissect_options *ndo,
 			if (!er) {
 				if (ndo->ndo_vflag) {
 					ND_TCHECK_4(dp + 1);
-					ND_PRINT(" %u bytes", EXTRACT_BE_U_4(dp));
-					if (EXTRACT_BE_U_4(dp + 1))
+					ND_PRINT(" %u bytes", GET_BE_U_4(dp));
+					if (GET_BE_U_4(dp + 1))
 						ND_PRINT(" EOF");
 				}
 			}
@@ -1725,16 +1725,17 @@ interp_reply(netdissect_options *ndo,
 			if (!er) {
 				if (ndo->ndo_vflag) {
 					ND_TCHECK_4(dp);
-					ND_PRINT(" %u bytes", EXTRACT_BE_U_4(dp));
+					ND_PRINT(" %u bytes", GET_BE_U_4(dp));
 					if (ndo->ndo_vflag > 1) {
 						ND_TCHECK_4(dp + 1);
 						ND_PRINT(" <%s>",
 							tok2str(nfsv3_writemodes,
-								NULL, EXTRACT_BE_U_4(dp + 1)));
+								NULL, GET_BE_U_4(dp + 1)));
 
 						/* write-verf-cookie */
 						ND_TCHECK_8(dp + 2);
-						ND_PRINT(" verf %" PRIx64, EXTRACT_BE_U_8(dp + 2));
+						ND_PRINT(" verf %" PRIx64,
+						         GET_BE_U_8(dp + 2));
 					}
 				}
 			}
@@ -1898,7 +1899,7 @@ interp_reply(netdissect_options *ndo,
 		if (ndo->ndo_vflag > 1) {
 			/* write-verf-cookie */
 			ND_TCHECK_8(dp);
-			ND_PRINT(" verf %" PRIx64, EXTRACT_BE_U_8(dp));
+			ND_PRINT(" verf %" PRIx64, GET_BE_U_8(dp));
 		}
 		break;
 

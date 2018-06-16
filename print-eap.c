@@ -161,13 +161,13 @@ eap_print(netdissect_options *ndo,
     tlen = length;
     eap = (const struct eap_frame_t *)cp;
     ND_TCHECK_SIZE(eap);
-    eap_type = EXTRACT_U_1(eap->type);
+    eap_type = GET_U_1(eap->type);
 
     ND_PRINT("%s (%u) v%u, len %u",
            tok2str(eap_frame_type_values, "unknown", eap_type),
            eap_type,
-           EXTRACT_U_1(eap->version),
-           EXTRACT_BE_U_2(eap->length));
+           GET_U_1(eap->version),
+           GET_BE_U_2(eap->length));
 
     if (ndo->ndo_vflag < 1)
         return;
@@ -178,13 +178,13 @@ eap_print(netdissect_options *ndo,
     switch (eap_type) {
     case EAP_FRAME_TYPE_PACKET:
         ND_TCHECK_1(tptr);
-        type = EXTRACT_U_1(tptr);
+        type = GET_U_1(tptr);
         ND_TCHECK_2(tptr + 2);
-        len = EXTRACT_BE_U_2(tptr + 2);
+        len = GET_BE_U_2(tptr + 2);
         ND_PRINT(", %s (%u), id %u, len %u",
                tok2str(eap_code_values, "unknown", type),
                type,
-               EXTRACT_U_1((tptr + 1)),
+               GET_U_1((tptr + 1)),
                len);
 
         ND_TCHECK_LEN(tptr, len);
@@ -192,7 +192,7 @@ eap_print(netdissect_options *ndo,
         if (type == EAP_REQUEST || type == EAP_RESPONSE) {
             /* RFC 3748 Section 4.1 */
             ND_TCHECK_1(tptr + 4);
-            subtype = EXTRACT_U_1(tptr + 4);
+            subtype = GET_U_1(tptr + 4);
             ND_PRINT("\n\t\t Type %s (%u)",
                    tok2str(eap_type_values, "unknown", subtype),
                    subtype);
@@ -223,8 +223,8 @@ eap_print(netdissect_options *ndo,
                 while (count < len) {
                     ND_TCHECK_1(tptr + count);
                     ND_PRINT(" %s (%u),",
-                           tok2str(eap_type_values, "unknown", EXTRACT_U_1((tptr + count))),
-                           EXTRACT_U_1(tptr + count));
+                           tok2str(eap_type_values, "unknown", GET_U_1((tptr + count))),
+                           GET_U_1(tptr + count));
                     count++;
                 }
                 break;
@@ -234,28 +234,28 @@ eap_print(netdissect_options *ndo,
                 ND_TCHECK_1(tptr + 5);
                 if (subtype == EAP_TYPE_TTLS)
                     ND_PRINT(" TTLSv%u",
-                           EAP_TTLS_VERSION(EXTRACT_U_1((tptr + 5))));
+                           EAP_TTLS_VERSION(GET_U_1((tptr + 5))));
                 ND_PRINT(" flags [%s] 0x%02x,",
-                       bittok2str(eap_tls_flags_values, "none", EXTRACT_U_1((tptr + 5))),
-                       EXTRACT_U_1(tptr + 5));
+                       bittok2str(eap_tls_flags_values, "none", GET_U_1((tptr + 5))),
+                       GET_U_1(tptr + 5));
 
-                if (EAP_TLS_EXTRACT_BIT_L(EXTRACT_U_1(tptr + 5))) {
+                if (EAP_TLS_EXTRACT_BIT_L(GET_U_1(tptr + 5))) {
                     ND_TCHECK_4(tptr + 6);
-		    ND_PRINT(" len %u", EXTRACT_BE_U_4(tptr + 6));
+		    ND_PRINT(" len %u", GET_BE_U_4(tptr + 6));
                 }
                 break;
 
             case EAP_TYPE_FAST:
                 ND_TCHECK_1(tptr + 5);
                 ND_PRINT(" FASTv%u",
-                       EAP_TTLS_VERSION(EXTRACT_U_1((tptr + 5))));
+                       EAP_TTLS_VERSION(GET_U_1((tptr + 5))));
                 ND_PRINT(" flags [%s] 0x%02x,",
-                       bittok2str(eap_tls_flags_values, "none", EXTRACT_U_1((tptr + 5))),
-                       EXTRACT_U_1(tptr + 5));
+                       bittok2str(eap_tls_flags_values, "none", GET_U_1((tptr + 5))),
+                       GET_U_1(tptr + 5));
 
-                if (EAP_TLS_EXTRACT_BIT_L(EXTRACT_U_1(tptr + 5))) {
+                if (EAP_TLS_EXTRACT_BIT_L(GET_U_1(tptr + 5))) {
                     ND_TCHECK_4(tptr + 6);
-                    ND_PRINT(" len %u", EXTRACT_BE_U_4(tptr + 6));
+                    ND_PRINT(" len %u", GET_BE_U_4(tptr + 6));
                 }
 
                 /* FIXME - TLV attributes follow */
@@ -265,8 +265,8 @@ eap_print(netdissect_options *ndo,
             case EAP_TYPE_SIM:
                 ND_TCHECK_1(tptr + 5);
                 ND_PRINT(" subtype [%s] 0x%02x,",
-                       tok2str(eap_aka_subtype_values, "unknown", EXTRACT_U_1((tptr + 5))),
-                       EXTRACT_U_1(tptr + 5));
+                       tok2str(eap_aka_subtype_values, "unknown", GET_U_1((tptr + 5))),
+                       GET_U_1(tptr + 5));
 
                 /* FIXME - TLV attributes follow */
                 break;

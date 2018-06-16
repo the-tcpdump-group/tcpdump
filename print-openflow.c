@@ -85,19 +85,19 @@ of_header_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep
 		goto invalid;
 	/* version */
 	ND_TCHECK_1(cp);
-	version = EXTRACT_U_1(cp);
+	version = GET_U_1(cp);
 	cp += 1;
 	/* type */
 	ND_TCHECK_1(cp);
-	type = EXTRACT_U_1(cp);
+	type = GET_U_1(cp);
 	cp += 1;
 	/* length */
 	ND_TCHECK_2(cp);
-	length = EXTRACT_BE_U_2(cp);
+	length = GET_BE_U_2(cp);
 	cp += 2;
 	/* xid */
 	ND_TCHECK_4(cp);
-	xid = EXTRACT_BE_U_4(cp);
+	xid = GET_BE_U_4(cp);
 	cp += 4;
 	/* Message length includes the header length and a message always includes
 	 * the basic header. A message length underrun fails decoding of the rest of

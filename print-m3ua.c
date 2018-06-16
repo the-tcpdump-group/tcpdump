@@ -219,7 +219,7 @@ tag_value_print(netdissect_options *ndo,
     if (size < 4)
       goto invalid;
     ND_TCHECK_LEN(buf, size);
-    ND_PRINT("0x%08x", EXTRACT_BE_U_4(buf));
+    ND_PRINT("0x%08x", GET_BE_U_4(buf));
     break;
   /* ... */
   default:
@@ -261,10 +261,10 @@ m3ua_tags_print(netdissect_options *ndo,
       goto invalid;
     ND_TCHECK_LEN(p, sizeof(struct m3ua_param_header));
     /* Parameter Tag */
-    hdr_tag = EXTRACT_BE_U_2(p);
+    hdr_tag = GET_BE_U_2(p);
     ND_PRINT("\n\t\t\t%s: ", tok2str(ParamName, "Unknown Parameter (0x%04x)", hdr_tag));
     /* Parameter Length */
-    hdr_len = EXTRACT_BE_U_2(p + 2);
+    hdr_len = GET_BE_U_2(p + 2);
     if (hdr_len < sizeof(struct m3ua_param_header))
       goto invalid;
     /* Parameter Value */
@@ -308,10 +308,10 @@ m3ua_print(netdissect_options *ndo,
   if (size < sizeof(struct m3ua_common_header))
     goto invalid;
   ND_TCHECK_SIZE(hdr);
-  if (EXTRACT_U_1(hdr->v) != M3UA_REL_1_0)
+  if (GET_U_1(hdr->v) != M3UA_REL_1_0)
     return;
 
-  msg_class = EXTRACT_U_1(hdr->msg_class);
+  msg_class = GET_U_1(hdr->msg_class);
   dict =
     msg_class == M3UA_MSGC_MGMT     ? MgmtMessages :
     msg_class == M3UA_MSGC_TRANSFER ? TransferMessages :
@@ -323,13 +323,15 @@ m3ua_print(netdissect_options *ndo,
 
   ND_PRINT("\n\t\t%s", tok2str(MessageClasses, "Unknown message class %i", msg_class));
   if (dict != NULL)
-    ND_PRINT(" %s Message", tok2str(dict, "Unknown (0x%02x)", EXTRACT_U_1(hdr->msg_type)));
+    ND_PRINT(" %s Message",
+             tok2str(dict, "Unknown (0x%02x)", GET_U_1(hdr->msg_type)));
 
-  if (size != EXTRACT_BE_U_4(hdr->len))
-    ND_PRINT("\n\t\t\t@@@@@@ Corrupted length %u of message @@@@@@", EXTRACT_BE_U_4(hdr->len));
+  if (size != GET_BE_U_4(hdr->len))
+    ND_PRINT("\n\t\t\t@@@@@@ Corrupted length %u of message @@@@@@",
+             GET_BE_U_4(hdr->len));
   else
     m3ua_tags_print(ndo, buf + sizeof(struct m3ua_common_header),
-                    EXTRACT_BE_U_4(hdr->len) - sizeof(struct m3ua_common_header));
+                    GET_BE_U_4(hdr->len) - sizeof(struct m3ua_common_header));
   return;
 
 invalid:

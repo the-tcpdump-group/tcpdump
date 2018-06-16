@@ -985,7 +985,7 @@ wep_print(netdissect_options *ndo,
 	uint32_t iv;
 
 	ND_TCHECK_LEN(p, IEEE802_11_IV_LEN + IEEE802_11_KID_LEN);
-	iv = EXTRACT_LE_U_4(p);
+	iv = GET_LE_U_4(p);
 
 	ND_PRINT(" IV:%3x Pad %x KeyID %x", IV_IV(iv), IV_PAD(iv),
 	    IV_KEYID(iv));
@@ -1023,14 +1023,14 @@ parse_elements(netdissect_options *ndo,
 		ND_TCHECK_2(p + offset);
 		if (length < 2)
 			goto trunc;
-		elementlen = EXTRACT_U_1(p + offset + 1);
+		elementlen = GET_U_1(p + offset + 1);
 
 		/* Make sure we have the entire element. */
 		ND_TCHECK_LEN(p + offset + 2, elementlen);
 		if (length < elementlen + 2)
 			goto trunc;
 
-		switch (EXTRACT_U_1(p + offset)) {
+		switch (GET_U_1(p + offset)) {
 		case E_SSID:
 			memcpy(&ssid, p + offset, 2);
 			offset += 2;
@@ -1122,7 +1122,7 @@ parse_elements(netdissect_options *ndo,
 				length -= ds.length;
 				break;
 			}
-			ds.channel = EXTRACT_U_1(p + offset);
+			ds.channel = GET_U_1(p + offset);
 			offset += 1;
 			length -= 1;
 			/*
@@ -1194,7 +1194,7 @@ parse_elements(netdissect_options *ndo,
 		default:
 #if 0
 			ND_PRINT("(1) unhandled element_id (%u)  ",
-			    EXTRACT_U_1(p + offset));
+			    GET_U_1(p + offset));
 #endif
 			offset += 2 + elementlen;
 			length -= 2 + elementlen;
@@ -1230,10 +1230,10 @@ handle_beacon(netdissect_options *ndo,
 	memcpy(&pbody.timestamp, p, IEEE802_11_TSTAMP_LEN);
 	offset += IEEE802_11_TSTAMP_LEN;
 	length -= IEEE802_11_TSTAMP_LEN;
-	pbody.beacon_interval = EXTRACT_LE_U_2(p + offset);
+	pbody.beacon_interval = GET_LE_U_2(p + offset);
 	offset += IEEE802_11_BCNINT_LEN;
 	length -= IEEE802_11_BCNINT_LEN;
-	pbody.capability_info = EXTRACT_LE_U_2(p + offset);
+	pbody.capability_info = GET_LE_U_2(p + offset);
 	offset += IEEE802_11_CAPINFO_LEN;
 	length -= IEEE802_11_CAPINFO_LEN;
 
@@ -1263,10 +1263,10 @@ handle_assoc_request(netdissect_options *ndo,
 	ND_TCHECK_LEN(p, IEEE802_11_CAPINFO_LEN + IEEE802_11_LISTENINT_LEN);
 	if (length < IEEE802_11_CAPINFO_LEN + IEEE802_11_LISTENINT_LEN)
 		goto trunc;
-	pbody.capability_info = EXTRACT_LE_U_2(p);
+	pbody.capability_info = GET_LE_U_2(p);
 	offset += IEEE802_11_CAPINFO_LEN;
 	length -= IEEE802_11_CAPINFO_LEN;
-	pbody.listen_interval = EXTRACT_LE_U_2(p + offset);
+	pbody.listen_interval = GET_LE_U_2(p + offset);
 	offset += IEEE802_11_LISTENINT_LEN;
 	length -= IEEE802_11_LISTENINT_LEN;
 
@@ -1294,13 +1294,13 @@ handle_assoc_response(netdissect_options *ndo,
 	if (length < IEEE802_11_CAPINFO_LEN + IEEE802_11_STATUS_LEN +
 	    IEEE802_11_AID_LEN)
 		goto trunc;
-	pbody.capability_info = EXTRACT_LE_U_2(p);
+	pbody.capability_info = GET_LE_U_2(p);
 	offset += IEEE802_11_CAPINFO_LEN;
 	length -= IEEE802_11_CAPINFO_LEN;
-	pbody.status_code = EXTRACT_LE_U_2(p + offset);
+	pbody.status_code = GET_LE_U_2(p + offset);
 	offset += IEEE802_11_STATUS_LEN;
 	length -= IEEE802_11_STATUS_LEN;
-	pbody.aid = EXTRACT_LE_U_2(p + offset);
+	pbody.aid = GET_LE_U_2(p + offset);
 	offset += IEEE802_11_AID_LEN;
 	length -= IEEE802_11_AID_LEN;
 
@@ -1332,10 +1332,10 @@ handle_reassoc_request(netdissect_options *ndo,
 	if (length < IEEE802_11_CAPINFO_LEN + IEEE802_11_LISTENINT_LEN +
 	    IEEE802_11_AP_LEN)
 		goto trunc;
-	pbody.capability_info = EXTRACT_LE_U_2(p);
+	pbody.capability_info = GET_LE_U_2(p);
 	offset += IEEE802_11_CAPINFO_LEN;
 	length -= IEEE802_11_CAPINFO_LEN;
-	pbody.listen_interval = EXTRACT_LE_U_2(p + offset);
+	pbody.listen_interval = GET_LE_U_2(p + offset);
 	offset += IEEE802_11_LISTENINT_LEN;
 	length -= IEEE802_11_LISTENINT_LEN;
 	memcpy(&pbody.ap, p+offset, IEEE802_11_AP_LEN);
@@ -1396,10 +1396,10 @@ handle_probe_response(netdissect_options *ndo,
 	memcpy(&pbody.timestamp, p, IEEE802_11_TSTAMP_LEN);
 	offset += IEEE802_11_TSTAMP_LEN;
 	length -= IEEE802_11_TSTAMP_LEN;
-	pbody.beacon_interval = EXTRACT_LE_U_2(p + offset);
+	pbody.beacon_interval = GET_LE_U_2(p + offset);
 	offset += IEEE802_11_BCNINT_LEN;
 	length -= IEEE802_11_BCNINT_LEN;
-	pbody.capability_info = EXTRACT_LE_U_2(p + offset);
+	pbody.capability_info = GET_LE_U_2(p + offset);
 	offset += IEEE802_11_CAPINFO_LEN;
 	length -= IEEE802_11_CAPINFO_LEN;
 
@@ -1432,7 +1432,7 @@ handle_disassoc(netdissect_options *ndo,
 	ND_TCHECK_LEN(p, IEEE802_11_REASON_LEN);
 	if (length < IEEE802_11_REASON_LEN)
 		goto trunc;
-	pbody.reason_code = EXTRACT_LE_U_2(p);
+	pbody.reason_code = GET_LE_U_2(p);
 
 	ND_PRINT(": %s",
 	    (pbody.reason_code < NUM_REASONS)
@@ -1457,13 +1457,13 @@ handle_auth(netdissect_options *ndo,
 	ND_TCHECK_6(p);
 	if (length < 6)
 		goto trunc;
-	pbody.auth_alg = EXTRACT_LE_U_2(p);
+	pbody.auth_alg = GET_LE_U_2(p);
 	offset += 2;
 	length -= 2;
-	pbody.auth_trans_seq_num = EXTRACT_LE_U_2(p + offset);
+	pbody.auth_trans_seq_num = GET_LE_U_2(p + offset);
 	offset += 2;
 	length -= 2;
-	pbody.status_code = EXTRACT_LE_U_2(p + offset);
+	pbody.status_code = GET_LE_U_2(p + offset);
 	offset += 2;
 	length -= 2;
 
@@ -1511,7 +1511,7 @@ handle_deauth(netdissect_options *ndo,
 	ND_TCHECK_LEN(p, IEEE802_11_REASON_LEN);
 	if (length < IEEE802_11_REASON_LEN)
 		goto trunc;
-	pbody.reason_code = EXTRACT_LE_U_2(p);
+	pbody.reason_code = GET_LE_U_2(p);
 
 	reason = (pbody.reason_code < NUM_REASONS)
 			? reason_text[pbody.reason_code]
@@ -1589,22 +1589,22 @@ handle_action(netdissect_options *ndo,
 	} else {
 		ND_PRINT(" (%s): ", etheraddr_string(ndo, src));
 	}
-	switch (EXTRACT_U_1(p)) {
-	case 0: ND_PRINT("Spectrum Management Act#%u", EXTRACT_U_1(p + 1)); break;
-	case 1: ND_PRINT("QoS Act#%u", EXTRACT_U_1(p + 1)); break;
-	case 2: ND_PRINT("DLS Act#%u", EXTRACT_U_1(p + 1)); break;
-	case 3: ND_PRINT("BA "); PRINT_BA_ACTION(EXTRACT_U_1(p + 1)); break;
-	case 7: ND_PRINT("HT "); PRINT_HT_ACTION(EXTRACT_U_1(p + 1)); break;
-	case 13: ND_PRINT("MeshAction "); PRINT_MESH_ACTION(EXTRACT_U_1(p + 1)); break;
+	switch (GET_U_1(p)) {
+	case 0: ND_PRINT("Spectrum Management Act#%u", GET_U_1(p + 1)); break;
+	case 1: ND_PRINT("QoS Act#%u", GET_U_1(p + 1)); break;
+	case 2: ND_PRINT("DLS Act#%u", GET_U_1(p + 1)); break;
+	case 3: ND_PRINT("BA "); PRINT_BA_ACTION(GET_U_1(p + 1)); break;
+	case 7: ND_PRINT("HT "); PRINT_HT_ACTION(GET_U_1(p + 1)); break;
+	case 13: ND_PRINT("MeshAction "); PRINT_MESH_ACTION(GET_U_1(p + 1)); break;
 	case 14:
 		ND_PRINT("MultiohopAction ");
-		PRINT_MULTIHOP_ACTION(EXTRACT_U_1(p + 1)); break;
+		PRINT_MULTIHOP_ACTION(GET_U_1(p + 1)); break;
 	case 15:
 		ND_PRINT("SelfprotectAction ");
-		PRINT_SELFPROT_ACTION(EXTRACT_U_1(p + 1)); break;
-	case 127: ND_PRINT("Vendor Act#%u", EXTRACT_U_1(p + 1)); break;
+		PRINT_SELFPROT_ACTION(GET_U_1(p + 1)); break;
+	case 127: ND_PRINT("Vendor Act#%u", GET_U_1(p + 1)); break;
 	default:
-		ND_PRINT("Reserved(%u) Act#%u", EXTRACT_U_1(p), EXTRACT_U_1(p + 1));
+		ND_PRINT("Reserved(%u) Act#%u", GET_U_1(p), GET_U_1(p + 1));
 		break;
 	}
 	return 1;
@@ -1677,8 +1677,8 @@ ctrl_body_print(netdissect_options *ndo,
 			ND_PRINT(" RA:%s TA:%s CTL(%x) SEQ(%u) ",
 			    etheraddr_string(ndo, ((const struct ctrl_bar_hdr_t *)p)->ra),
 			    etheraddr_string(ndo, ((const struct ctrl_bar_hdr_t *)p)->ta),
-			    EXTRACT_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->ctl),
-			    EXTRACT_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->seq));
+			    GET_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->ctl),
+			    GET_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->seq));
 		break;
 	case CTRL_BA:
 		ND_TCHECK_LEN(p, CTRL_BA_HDRLEN);
@@ -1689,7 +1689,7 @@ ctrl_body_print(netdissect_options *ndo,
 	case CTRL_PS_POLL:
 		ND_TCHECK_LEN(p, CTRL_PS_POLL_HDRLEN);
 		ND_PRINT(" AID(%x)",
-		    EXTRACT_LE_U_2(((const struct ctrl_ps_poll_hdr_t *)p)->aid));
+		    GET_LE_U_2(((const struct ctrl_ps_poll_hdr_t *)p)->aid));
 		break;
 	case CTRL_RTS:
 		ND_TCHECK_LEN(p, CTRL_RTS_HDRLEN);
@@ -1861,8 +1861,8 @@ ctrl_header_print(netdissect_options *ndo, uint16_t fc, const u_char *p)
 		ND_PRINT(" RA:%s TA:%s CTL(%x) SEQ(%u) ",
 		    etheraddr_string(ndo, ((const struct ctrl_bar_hdr_t *)p)->ra),
 		    etheraddr_string(ndo, ((const struct ctrl_bar_hdr_t *)p)->ta),
-		    EXTRACT_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->ctl),
-		    EXTRACT_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->seq));
+		    GET_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->ctl),
+		    GET_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->seq));
 		break;
 	case CTRL_BA:
 		ND_PRINT("RA:%s ",
@@ -1949,7 +1949,7 @@ extract_header_length(netdissect_options *ndo,
 static int
 extract_mesh_header_length(netdissect_options *ndo, const u_char *p)
 {
-	return (EXTRACT_U_1(p) &~ 3) ? 0 : 6*(1 + (EXTRACT_U_1(p) & 3));
+	return (GET_U_1(p) &~ 3) ? 0 : 6*(1 + (GET_U_1(p) & 3));
 }
 
 /*
@@ -1975,15 +1975,15 @@ ieee_802_11_hdr_print(netdissect_options *ndo,
 			ND_PRINT("Protected ");
 		if (FC_TYPE(fc) != T_CTRL || FC_SUBTYPE(fc) != CTRL_PS_POLL)
 			ND_PRINT("%uus ",
-			    EXTRACT_LE_U_2(((const struct mgmt_header_t *)p)->duration));
+			    GET_LE_U_2(((const struct mgmt_header_t *)p)->duration));
 	}
 	if (meshdrlen != 0) {
 		const struct meshcntl_t *mc =
 		    (const struct meshcntl_t *)(p + hdrlen - meshdrlen);
-		u_int ae = EXTRACT_U_1(mc->flags) & 3;
+		u_int ae = GET_U_1(mc->flags) & 3;
 
 		ND_PRINT("MeshData (AE %u TTL %u seq %u", ae,
-		    EXTRACT_U_1(mc->ttl), EXTRACT_LE_U_4(mc->seq));
+		    GET_U_1(mc->ttl), GET_LE_U_4(mc->seq));
 		if (ae > 0)
 			ND_PRINT(" A4:%s", etheraddr_string(ndo, mc->addr4));
 		if (ae > 1)
@@ -2038,7 +2038,7 @@ ieee802_11_print(netdissect_options *ndo,
 		return orig_caplen;
 	}
 
-	fc = EXTRACT_LE_U_2(p);
+	fc = GET_LE_U_2(p);
 	hdrlen = extract_header_length(ndo, fc);
 	if (hdrlen == 0) {
 		/* Unknown frame type or control frame subtype; quit. */
@@ -3072,7 +3072,7 @@ ieee802_11_radio_print(netdissect_options *ndo,
 {
 #define	BIT(n)	(1U << n)
 #define	IS_EXTENDED(__p)	\
-	    (EXTRACT_LE_U_4(__p) & BIT(IEEE80211_RADIOTAP_EXT)) != 0
+	    (GET_LE_U_4(__p) & BIT(IEEE80211_RADIOTAP_EXT)) != 0
 
 	struct cpack_state cpacker;
 	const struct ieee80211_radiotap_header *hdr;
@@ -3096,7 +3096,7 @@ ieee802_11_radio_print(netdissect_options *ndo,
 
 	hdr = (const struct ieee80211_radiotap_header *)p;
 
-	len = EXTRACT_LE_U_2(hdr->it_len);
+	len = GET_LE_U_2(hdr->it_len);
 	if (len < sizeof(*hdr)) {
 		/*
 		 * The length is the length of the entire header, so
@@ -3144,7 +3144,7 @@ ieee802_11_radio_print(netdissect_options *ndo,
 	fcslen = 0;
 	for (presentp = &hdr->it_present; presentp <= last_presentp;
 	    presentp++) {
-		presentflags = EXTRACT_LE_U_4(presentp);
+		presentflags = GET_LE_U_4(presentp);
 
 		/*
 		 * If this is a vendor namespace, we don't handle it.
@@ -3281,7 +3281,7 @@ ieee802_11_radio_avs_print(netdissect_options *ndo,
 		return caplen;
 	}
 
-	caphdr_len = EXTRACT_BE_U_4(p + 4);
+	caphdr_len = GET_BE_U_4(p + 4);
 	if (caphdr_len < 8) {
 		/*
 		 * Yow!  The capture header length is claimed not
@@ -3334,7 +3334,7 @@ prism_if_print(netdissect_options *ndo,
 		return caplen;
 	}
 
-	msgcode = EXTRACT_BE_U_4(p);
+	msgcode = GET_BE_U_4(p);
 	if (msgcode == WLANCAP_MAGIC_COOKIE_V1 ||
 	    msgcode == WLANCAP_MAGIC_COOKIE_V2)
 		return ieee802_11_radio_avs_print(ndo, p, length, caplen);

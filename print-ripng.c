@@ -98,8 +98,8 @@ rip6_entry_print(netdissect_options *ndo, const struct netinfo6 *ni, u_int metri
 	uint16_t tag;
 
 	l = ND_PRINT("%s/%u", ip6addr_string(ndo, ni->rip6_dest),
-		     EXTRACT_U_1(ni->rip6_plen));
-	tag = EXTRACT_BE_U_2(ni->rip6_tag);
+		     GET_U_1(ni->rip6_plen));
+	tag = GET_BE_U_2(ni->rip6_tag);
 	if (tag)
 		l += ND_PRINT(" [%u]", tag);
 	if (metric)
@@ -118,7 +118,7 @@ ripng_print(netdissect_options *ndo, const u_char *dat, unsigned int length)
 
 	ndo->ndo_protocol = "ripng";
 	ND_TCHECK_1(rp->rip6_cmd);
-	cmd = EXTRACT_U_1(rp->rip6_cmd);
+	cmd = GET_U_1(rp->rip6_cmd);
 	switch (cmd) {
 
 	case RIP6_REQUEST:
@@ -129,7 +129,7 @@ ripng_print(netdissect_options *ndo, const u_char *dat, unsigned int length)
  		j = length_left / sizeof(*ni);
 		if (j == 1) {
 			ND_TCHECK_SIZE(rp->rip6_nets);
-			if (EXTRACT_U_1(rp->rip6_nets->rip6_metric) == HOPCNT_INFINITY6
+			if (GET_U_1(rp->rip6_nets->rip6_metric) == HOPCNT_INFINITY6
 			    && ND_IN6_IS_ADDR_UNSPECIFIED(&rp->rip6_nets->rip6_dest)) {
 				ND_PRINT(" ripng-req dump");
 				break;
@@ -168,7 +168,7 @@ ripng_print(netdissect_options *ndo, const u_char *dat, unsigned int length)
 				ND_PRINT("\n\t");
 			else
 				ND_PRINT(" ");
-			rip6_entry_print(ndo, ni, EXTRACT_U_1(ni->rip6_metric));
+			rip6_entry_print(ndo, ni, GET_U_1(ni->rip6_metric));
 		}
 		if (length_left != 0)
 			goto trunc;
@@ -178,8 +178,8 @@ ripng_print(netdissect_options *ndo, const u_char *dat, unsigned int length)
 		break;
 	}
 	ND_TCHECK_1(rp->rip6_vers);
-	if (EXTRACT_U_1(rp->rip6_vers) != RIP6_VERSION)
-		ND_PRINT(" [vers %u]", EXTRACT_U_1(rp->rip6_vers));
+	if (GET_U_1(rp->rip6_vers) != RIP6_VERSION)
+		ND_PRINT(" [vers %u]", GET_U_1(rp->rip6_vers));
 	return;
 
 trunc:

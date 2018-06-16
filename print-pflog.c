@@ -90,17 +90,17 @@ pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
 	uint32_t rulenr, subrulenr;
 
 	ndo->ndo_protocol = "pflog";
-	rulenr = EXTRACT_BE_U_4(&hdr->rulenr);
-	subrulenr = EXTRACT_BE_U_4(&hdr->subrulenr);
+	rulenr = GET_BE_U_4(&hdr->rulenr);
+	subrulenr = GET_BE_U_4(&hdr->subrulenr);
 	if (subrulenr == (uint32_t)-1)
 		ND_PRINT("rule %u/", rulenr);
 	else
 		ND_PRINT("rule %u.%s.%u/", rulenr, hdr->ruleset, subrulenr);
 
 	ND_PRINT("%s: %s %s on %s: ",
-	    tok2str(pf_reasons, "unkn(%u)", EXTRACT_U_1(&hdr->reason)),
-	    tok2str(pf_actions, "unkn(%u)", EXTRACT_U_1(&hdr->action)),
-	    tok2str(pf_directions, "unkn(%u)", EXTRACT_U_1(&hdr->dir)),
+	    tok2str(pf_reasons, "unkn(%u)", GET_U_1(&hdr->reason)),
+	    tok2str(pf_actions, "unkn(%u)", GET_U_1(&hdr->action)),
+	    tok2str(pf_directions, "unkn(%u)", GET_U_1(&hdr->dir)),
 	    hdr->ifname);
 }
 
@@ -140,7 +140,7 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 		pflog_print(ndo, hdr);
 
 	/* skip to the real packet */
-	af = EXTRACT_U_1(&hdr->af);
+	af = GET_U_1(&hdr->af);
 	length -= hdrlen;
 	caplen -= hdrlen;
 	p += hdrlen;

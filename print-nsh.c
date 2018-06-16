@@ -68,18 +68,18 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
 
     ND_TCHECK_LEN(bp, NSH_BASE_HDR_LEN + NSH_SERVICE_PATH_HDR_LEN);
 
-    ver = (uint8_t)(EXTRACT_U_1(bp) >> 6);
-    flags = EXTRACT_U_1(bp);
+    ver = (uint8_t)(GET_U_1(bp) >> 6);
+    flags = GET_U_1(bp);
     bp += 1;
-    length = EXTRACT_U_1(bp);
+    length = GET_U_1(bp);
     bp += 1;
-    md_type = EXTRACT_U_1(bp);
+    md_type = GET_U_1(bp);
     bp += 1;
-    next_protocol = EXTRACT_U_1(bp);
+    next_protocol = GET_U_1(bp);
     bp += 1;
-    service_path_id = EXTRACT_BE_U_3(bp);
+    service_path_id = GET_BE_U_3(bp);
     bp += 3;
-    service_index = EXTRACT_U_1(bp);
+    service_index = GET_U_1(bp);
     bp += 1;
 
     ND_PRINT("NSH, ");
@@ -117,7 +117,7 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
     if (ndo->ndo_vflag > 2) {
         if (md_type == 0x01) {
             for (n = 0; n < length - 2; n++) {
-                ctx = EXTRACT_BE_U_4(bp);
+                ctx = GET_BE_U_4(bp);
                 bp += NSH_HDR_WORD_SIZE;
                 ND_PRINT("\n        Context[%02u]: 0x%08x", n, ctx);
             }
@@ -125,11 +125,11 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
         else if (md_type == 0x02) {
             n = 0;
             while (n < length - 2) {
-                tlv_class = EXTRACT_BE_U_2(bp);
+                tlv_class = GET_BE_U_2(bp);
                 bp += 2;
-                tlv_type  = EXTRACT_U_1(bp);
+                tlv_type  = GET_U_1(bp);
                 bp += 1;
-                tlv_len   = EXTRACT_U_1(bp);
+                tlv_len   = GET_U_1(bp);
                 bp += 1;
 
                 ND_PRINT("\n        TLV Class %u, Type %u, Len %u",
@@ -143,7 +143,7 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
                 }
 
                 for (vn = 0; vn < tlv_len; vn++) {
-                    ctx = EXTRACT_BE_U_4(bp);
+                    ctx = GET_BE_U_4(bp);
                     bp += NSH_HDR_WORD_SIZE;
                     ND_PRINT("\n            Value[%02u]: 0x%08x", vn, ctx);
                 }

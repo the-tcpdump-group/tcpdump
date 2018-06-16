@@ -73,7 +73,7 @@ make_unix_date(netdissect_options *ndo, const u_char *date_ptr)
 {
     uint32_t dos_date = 0;
 
-    dos_date = EXTRACT_LE_U_4(date_ptr);
+    dos_date = GET_LE_U_4(date_ptr);
 
     return int_unix_date(dos_date);
 }
@@ -87,7 +87,7 @@ make_unix_date2(netdissect_options *ndo, const u_char *date_ptr)
 {
     uint32_t x, x2;
 
-    x = EXTRACT_LE_U_4(date_ptr);
+    x = GET_LE_U_4(date_ptr);
     x2 = ((x & 0xFFFF) << 16) | ((x & 0xFFFF0000) >> 16);
     return int_unix_date(x2);
 }
@@ -103,7 +103,7 @@ interpret_long_date(netdissect_options *ndo, const u_char *p)
     time_t ret;
 
     /* this gives us seconds since jan 1st 1601 (approx) */
-    d = (EXTRACT_LE_U_4(p + 4) * 256.0 + EXTRACT_U_1(p + 3)) * (1.0e-7 * (1 << 24));
+    d = (GET_LE_U_4(p + 4) * 256.0 + GET_U_1(p + 3)) * (1.0e-7 * (1 << 24));
 
     /* now adjust by 369 years to make the secs since 1970 */
     d -= 369.0 * 365.25 * 24 * 60 * 60;
@@ -133,7 +133,7 @@ name_interpret(netdissect_options *ndo,
     if (in >= maxbuf)
 	return(-1);	/* name goes past the end of the buffer */
     ND_TCHECK_1(in);
-    len = EXTRACT_U_1(in) / 2;
+    len = GET_U_1(in) / 2;
     in++;
 
     *out=0;
@@ -145,12 +145,12 @@ name_interpret(netdissect_options *ndo,
 	ND_TCHECK_2(in);
 	if (in + 1 >= maxbuf)
 	    return(-1);	/* name goes past the end of the buffer */
-	if (EXTRACT_U_1(in) < 'A' || EXTRACT_U_1(in) > 'P' ||
-	    EXTRACT_U_1(in + 1) < 'A' || EXTRACT_U_1(in + 1) > 'P') {
+	if (GET_U_1(in) < 'A' || GET_U_1(in) > 'P' ||
+	    GET_U_1(in + 1) < 'A' || GET_U_1(in + 1) > 'P') {
 	    *out = 0;
 	    return(0);
 	}
-	*out = ((EXTRACT_U_1(in) - 'A') << 4) + (EXTRACT_U_1(in + 1) - 'A');
+	*out = ((GET_U_1(in) - 'A') << 4) + (GET_U_1(in + 1) - 'A');
 	in += 2;
 	out++;
 	len--;
@@ -179,7 +179,7 @@ name_ptr(netdissect_options *ndo,
 	return(NULL);	/* name goes past the end of the buffer */
     ND_TCHECK_1(p);
 
-    c = EXTRACT_U_1(p);
+    c = GET_U_1(p);
 
     /* XXX - this should use the same code that the DNS dissector does */
     if ((c & 0xC0) == 0xC0) {
@@ -188,7 +188,7 @@ name_ptr(netdissect_options *ndo,
 	ND_TCHECK_2(p);
 	if ((p + 1) >= maxbuf)
 	    return(NULL);	/* name goes past the end of the buffer */
-	l = EXTRACT_BE_U_2(p) & 0x3FFF;
+	l = GET_BE_U_2(p) & 0x3FFF;
 	if (l == 0) {
 	    /* We have a pointer that points to itself. */
 	    return(NULL);
@@ -232,14 +232,14 @@ name_len(netdissect_options *ndo,
     if (s >= maxbuf)
 	return(-1);	/* name goes past the end of the buffer */
     ND_TCHECK_1(s);
-    c = EXTRACT_U_1(s);
+    c = GET_U_1(s);
     if ((c & 0xC0) == 0xC0)
 	return(2);
-    while (EXTRACT_U_1(s)) {
+    while (GET_U_1(s)) {
 	if (s >= maxbuf)
 	    return(-1);	/* name goes past the end of the buffer */
 	ND_TCHECK_1(s);
-	s += EXTRACT_U_1(s) + 1;
+	s += GET_U_1(s) + 1;
 	ND_TCHECK_1(s);
     }
     return(PTR_DIFF(s, s0) + 1);
@@ -254,7 +254,7 @@ print_asc(netdissect_options *ndo,
 {
     u_int i;
     for (i = 0; i < len; i++)
-        fn_print_char(ndo, EXTRACT_U_1(buf + i));
+        fn_print_char(ndo, GET_U_1(buf + i));
 }
 
 static const char *
@@ -284,7 +284,7 @@ smb_data_print(netdissect_options *ndo, const u_char *buf, u_int len)
     ND_PRINT("[%03X] ", i);
     for (i = 0; i < len; /*nothing*/) {
         ND_TCHECK_1(buf + i);
-	ND_PRINT("%02X ", EXTRACT_U_1(buf + i) & 0xff);
+	ND_PRINT("%02X ", GET_U_1(buf + i) & 0xff);
 	i++;
 	if (i%8 == 0)
 	    ND_PRINT(" ");
@@ -368,7 +368,7 @@ unistr(netdissect_options *ndo,
 	    for (;;) {
 		ND_TCHECK_1(sp);
 		*len += 1;
-		if (EXTRACT_U_1(sp) == 0)
+		if (GET_U_1(sp) == 0)
 		    break;
 		sp++;
 	    }
@@ -377,7 +377,7 @@ unistr(netdissect_options *ndo,
 	    for (;;) {
 		ND_TCHECK_2(sp);
 		*len += 2;
-		if (EXTRACT_U_1(sp) == 0 && EXTRACT_U_1(sp + 1) == 0)
+		if (GET_U_1(sp) == 0 && GET_U_1(sp + 1) == 0)
 		    break;
 		sp += 2;
 	    }
@@ -394,10 +394,10 @@ unistr(netdissect_options *ndo,
           ND_TCHECK_1(s);
 	    if (l >= MAX_UNISTR_SIZE)
 		break;
-	    if (ND_ISPRINT(EXTRACT_U_1(s)))
-		buf[l] = EXTRACT_U_1(s);
+	    if (ND_ISPRINT(GET_U_1(s)))
+		buf[l] = GET_U_1(s);
 	    else {
-		if (EXTRACT_U_1(s) == 0)
+		if (GET_U_1(s) == 0)
 		    break;
 		buf[l] = '.';
 	    }
@@ -410,12 +410,12 @@ unistr(netdissect_options *ndo,
 	    ND_TCHECK_2(s);
 	    if (l >= MAX_UNISTR_SIZE)
 		break;
-	    if (EXTRACT_U_1(s + 1) == 0 && ND_ISPRINT(EXTRACT_U_1(s))) {
+	    if (GET_U_1(s + 1) == 0 && ND_ISPRINT(GET_U_1(s))) {
 		/* It's a printable ASCII character */
-		buf[l] = EXTRACT_U_1(s);
+		buf[l] = GET_U_1(s);
 	    } else {
 		/* It's a non-ASCII character or a non-printable ASCII character */
-		if (EXTRACT_U_1(s) == 0 && EXTRACT_U_1(s + 1) == 0)
+		if (GET_U_1(s) == 0 && GET_U_1(s + 1) == 0)
 		    break;
 		buf[l] = '.';
 	    }
@@ -445,14 +445,14 @@ smb_fdata1(netdissect_options *ndo,
 	switch (*fmt) {
 	case 'a':
 	    ND_TCHECK_1(buf);
-	    write_bits(ndo, EXTRACT_U_1(buf), attrib_fmt);
+	    write_bits(ndo, GET_U_1(buf), attrib_fmt);
 	    buf++;
 	    fmt++;
 	    break;
 
 	case 'A':
 	    ND_TCHECK_2(buf);
-	    write_bits(ndo, EXTRACT_LE_U_2(buf), attrib_fmt);
+	    write_bits(ndo, GET_LE_U_2(buf), attrib_fmt);
 	    buf += 2;
 	    fmt++;
 	    break;
@@ -473,7 +473,7 @@ smb_fdata1(netdissect_options *ndo,
 	    bitfmt[l] = '\0';
 	    fmt = p + 1;
 	    ND_TCHECK_1(buf);
-	    write_bits(ndo, EXTRACT_U_1(buf), bitfmt);
+	    write_bits(ndo, GET_U_1(buf), bitfmt);
 	    buf++;
 	    break;
 	  }
@@ -496,7 +496,7 @@ smb_fdata1(netdissect_options *ndo,
 	  {
 	    unsigned int x;
 	    ND_TCHECK_1(buf);
-	    x = EXTRACT_U_1(buf);
+	    x = GET_U_1(buf);
 	    ND_PRINT("%u (0x%x)", x, x);
 	    buf += 1;
 	    fmt++;
@@ -506,8 +506,8 @@ smb_fdata1(netdissect_options *ndo,
 	  {
 	    int x;
 	    ND_TCHECK_2(buf);
-	    x = reverse ? EXTRACT_BE_S_2(buf) :
-			  EXTRACT_LE_S_2(buf);
+	    x = reverse ? GET_BE_S_2(buf) :
+			  GET_LE_S_2(buf);
 	    ND_PRINT("%d (0x%x)", x, x);
 	    buf += 2;
 	    fmt++;
@@ -517,8 +517,8 @@ smb_fdata1(netdissect_options *ndo,
 	  {
 	    int x;
 	    ND_TCHECK_4(buf);
-	    x = reverse ? EXTRACT_BE_S_4(buf) :
-			  EXTRACT_LE_S_4(buf);
+	    x = reverse ? GET_BE_S_4(buf) :
+			  GET_LE_S_4(buf);
 	    ND_PRINT("%d (0x%x)", x, x);
 	    buf += 4;
 	    fmt++;
@@ -528,8 +528,8 @@ smb_fdata1(netdissect_options *ndo,
 	  {
 	    uint64_t x;
 	    ND_TCHECK_8(buf);
-	    x = reverse ? EXTRACT_BE_U_8(buf) :
-			  EXTRACT_LE_U_8(buf);
+	    x = reverse ? GET_BE_U_8(buf) :
+			  GET_LE_U_8(buf);
 	    ND_PRINT("%" PRIu64 " (0x%" PRIx64 ")", x, x);
 	    buf += 8;
 	    fmt++;
@@ -539,8 +539,8 @@ smb_fdata1(netdissect_options *ndo,
 	  {
 	    unsigned int x;
 	    ND_TCHECK_2(buf);
-	    x = reverse ? EXTRACT_BE_U_2(buf) :
-			  EXTRACT_LE_U_2(buf);
+	    x = reverse ? GET_BE_U_2(buf) :
+			  GET_LE_U_2(buf);
 	    ND_PRINT("%u (0x%x)", x, x);
 	    buf += 2;
 	    fmt++;
@@ -550,8 +550,8 @@ smb_fdata1(netdissect_options *ndo,
 	  {
 	    unsigned int x;
 	    ND_TCHECK_4(buf);
-	    x = reverse ? EXTRACT_BE_U_4(buf) :
-			  EXTRACT_LE_U_4(buf);
+	    x = reverse ? GET_BE_U_4(buf) :
+			  GET_LE_U_4(buf);
 	    ND_PRINT("%u (0x%x)", x, x);
 	    buf += 4;
 	    fmt++;
@@ -563,10 +563,10 @@ smb_fdata1(netdissect_options *ndo,
 	    uint32_t x1, x2;
 	    uint64_t x;
 	    ND_TCHECK_8(buf);
-	    x1 = reverse ? EXTRACT_BE_U_4(buf) :
-			   EXTRACT_LE_U_4(buf);
-	    x2 = reverse ? EXTRACT_BE_U_4(buf + 4) :
-			   EXTRACT_LE_U_4(buf + 4);
+	    x1 = reverse ? GET_BE_U_4(buf) :
+			   GET_LE_U_4(buf);
+	    x2 = reverse ? GET_BE_U_4(buf + 4) :
+			   GET_LE_U_4(buf + 4);
 	    x = (((uint64_t)x1) << 32) | x2;
 	    ND_PRINT("%" PRIu64 " (0x%" PRIx64 ")", x, x);
 	    buf += 8;
@@ -577,7 +577,7 @@ smb_fdata1(netdissect_options *ndo,
 	  {
 	    unsigned int x;
 	    ND_TCHECK_1(buf);
-	    x = EXTRACT_U_1(buf);
+	    x = GET_U_1(buf);
 	    ND_PRINT("0x%X", x);
 	    buf += 1;
 	    fmt++;
@@ -587,8 +587,8 @@ smb_fdata1(netdissect_options *ndo,
 	  {
 	    unsigned int x;
 	    ND_TCHECK_2(buf);
-	    x = reverse ? EXTRACT_BE_U_2(buf) :
-			  EXTRACT_LE_U_2(buf);
+	    x = reverse ? GET_BE_U_2(buf) :
+			  GET_LE_U_2(buf);
 	    ND_PRINT("0x%X", x);
 	    buf += 2;
 	    fmt++;
@@ -598,8 +598,8 @@ smb_fdata1(netdissect_options *ndo,
 	  {
 	    unsigned int x;
 	    ND_TCHECK_4(buf);
-	    x = reverse ? EXTRACT_BE_U_4(buf) :
-			  EXTRACT_LE_U_4(buf);
+	    x = reverse ? GET_BE_U_4(buf) :
+			  GET_LE_U_4(buf);
 	    ND_PRINT("0x%X", x);
 	    buf += 4;
 	    fmt++;
@@ -612,7 +612,7 @@ smb_fdata1(netdissect_options *ndo,
 
 	    case 'b':
 		ND_TCHECK_1(buf);
-		stringlen = EXTRACT_U_1(buf);
+		stringlen = GET_U_1(buf);
 		ND_PRINT("%u", stringlen);
 		buf += 1;
 		break;
@@ -620,8 +620,8 @@ smb_fdata1(netdissect_options *ndo,
 	    case 'd':
 	    case 'u':
 		ND_TCHECK_2(buf);
-		stringlen = reverse ? EXTRACT_BE_U_2(buf) :
-				      EXTRACT_LE_U_2(buf);
+		stringlen = reverse ? GET_BE_U_2(buf) :
+				      GET_LE_U_2(buf);
 		ND_PRINT("%u", stringlen);
 		buf += 2;
 		break;
@@ -629,8 +629,8 @@ smb_fdata1(netdissect_options *ndo,
 	    case 'D':
 	    case 'U':
 		ND_TCHECK_4(buf);
-		stringlen = reverse ? EXTRACT_BE_U_4(buf) :
-				      EXTRACT_LE_U_4(buf);
+		stringlen = reverse ? GET_BE_U_4(buf) :
+				      GET_LE_U_4(buf);
 		ND_PRINT("%u", stringlen);
 		buf += 4;
 		break;
@@ -661,8 +661,8 @@ smb_fdata1(netdissect_options *ndo,
 	    uint32_t len;
 
 	    ND_TCHECK_1(buf);
-	    if (EXTRACT_U_1(buf) != 4 && EXTRACT_U_1(buf) != 2) {
-		ND_PRINT("Error! ASCIIZ buffer of type %u", EXTRACT_U_1(buf));
+	    if (GET_U_1(buf) != 4 && GET_U_1(buf) != 2) {
+		ND_PRINT("Error! ASCIIZ buffer of type %u", GET_U_1(buf));
 		return maxbuf;	/* give up */
 	    }
 	    len = 0;
@@ -711,7 +711,7 @@ smb_fdata1(netdissect_options *ndo,
 	    int l = atoi(fmt + 1);
 	    ND_TCHECK_LEN(buf, l);
 	    while (l--) {
-		ND_PRINT("%02x", EXTRACT_U_1(buf));
+		ND_PRINT("%02x", GET_U_1(buf));
 		buf++;
 	    }
 	    fmt++;
@@ -741,7 +741,7 @@ smb_fdata1(netdissect_options *ndo,
 		break;
 	    case 2:
 		ND_TCHECK_1(buf + 15);
-		name_type = EXTRACT_U_1(buf + 15);
+		name_type = GET_U_1(buf + 15);
 		ND_PRINT("%-15.15s NameType=0x%02X (%s)", buf, name_type,
 		    name_type_str(name_type));
 		buf += 16;
@@ -762,7 +762,7 @@ smb_fdata1(netdissect_options *ndo,
 	    switch (atoi(fmt + 1)) {
 	    case 1:
 		ND_TCHECK_4(buf);
-		x = EXTRACT_LE_U_4(buf);
+		x = GET_LE_U_4(buf);
 		if (x == 0 || x == 0xFFFFFFFF)
 		    t = 0;
 		else
@@ -771,7 +771,7 @@ smb_fdata1(netdissect_options *ndo,
 		break;
 	    case 2:
 		ND_TCHECK_4(buf);
-		x = EXTRACT_LE_U_4(buf);
+		x = GET_LE_U_4(buf);
 		if (x == 0 || x == 0xFFFFFFFF)
 		    t = 0;
 		else

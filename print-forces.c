@@ -155,23 +155,23 @@ static const struct tok ForCES_TPs[] = {
  */
 struct forcesh {
 	nd_uint8_t fm_vrsvd;	/* version and reserved */
-#define ForCES_V(forcesh)	(EXTRACT_U_1((forcesh)->fm_vrsvd) >> 4)
+#define ForCES_V(forcesh)	(GET_U_1((forcesh)->fm_vrsvd) >> 4)
 	nd_uint8_t fm_tom;	/* type of message */
 	nd_uint16_t fm_len;	/* total length * 4 bytes */
-#define ForCES_BLN(forcesh)	((uint32_t)(EXTRACT_BE_U_2((forcesh)->fm_len) << 2))
+#define ForCES_BLN(forcesh)	((uint32_t)(GET_BE_U_2((forcesh)->fm_len) << 2))
 	nd_uint32_t fm_sid;	/* Source ID */
-#define ForCES_SID(forcesh)	EXTRACT_BE_U_4((forcesh)->fm_sid)
+#define ForCES_SID(forcesh)	GET_BE_U_4((forcesh)->fm_sid)
 	nd_uint32_t fm_did;	/* Destination ID */
-#define ForCES_DID(forcesh)	EXTRACT_BE_U_4((forcesh)->fm_did)
+#define ForCES_DID(forcesh)	GET_BE_U_4((forcesh)->fm_did)
 	nd_uint8_t fm_cor[8];	/* correlator */
 	nd_uint32_t fm_flags;	/* flags */
-#define ForCES_ACK(forcesh)	((EXTRACT_BE_U_4((forcesh)->fm_flags)&0xC0000000) >> 30)
-#define ForCES_PRI(forcesh)	((EXTRACT_BE_U_4((forcesh)->fm_flags)&0x38000000) >> 27)
-#define ForCES_RS1(forcesh)	((EXTRACT_BE_U_4((forcesh)->fm_flags)&0x07000000) >> 24)
-#define ForCES_EM(forcesh)	((EXTRACT_BE_U_4((forcesh)->fm_flags)&0x00C00000) >> 22)
-#define ForCES_AT(forcesh)	((EXTRACT_BE_U_4((forcesh)->fm_flags)&0x00200000) >> 21)
-#define ForCES_TP(forcesh)	((EXTRACT_BE_U_4((forcesh)->fm_flags)&0x00180000) >> 19)
-#define ForCES_RS2(forcesh)	((EXTRACT_BE_U_4((forcesh)->fm_flags)&0x0007FFFF) >> 0)
+#define ForCES_ACK(forcesh)	((GET_BE_U_4((forcesh)->fm_flags)&0xC0000000) >> 30)
+#define ForCES_PRI(forcesh)	((GET_BE_U_4((forcesh)->fm_flags)&0x38000000) >> 27)
+#define ForCES_RS1(forcesh)	((GET_BE_U_4((forcesh)->fm_flags)&0x07000000) >> 24)
+#define ForCES_EM(forcesh)	((GET_BE_U_4((forcesh)->fm_flags)&0x00C00000) >> 22)
+#define ForCES_AT(forcesh)	((GET_BE_U_4((forcesh)->fm_flags)&0x00200000) >> 21)
+#define ForCES_TP(forcesh)	((GET_BE_U_4((forcesh)->fm_flags)&0x00180000) >> 19)
+#define ForCES_RS2(forcesh)	((GET_BE_U_4((forcesh)->fm_flags)&0x0007FFFF) >> 0)
 };
 
 #define ForCES_HLN_VALID(fhl,tlen) ((tlen) >= ForCES_HDRL && \
@@ -392,14 +392,14 @@ struct forces_tlv {
 #define	GET_TOP_TLV(fhdr) ((const struct forces_tlv *)((fhdr) + sizeof (struct forcesh)))
 #define TLV_SET_LEN(len)  (F_ALN_LEN(TLV_HDRL) + (len))
 #define TLV_DATA(tlvp)   ((const void*)(((const char*)(tlvp)) + TLV_SET_LEN(0)))
-#define GO_NXT_TLV(tlv,rlen) ((rlen) -= F_ALN_LEN(EXTRACT_BE_U_2((tlv)->length)), \
+#define GO_NXT_TLV(tlv,rlen) ((rlen) -= F_ALN_LEN(GET_BE_U_2((tlv)->length)), \
 		              (const struct forces_tlv*)(((const char*)(tlv)) \
-				      + F_ALN_LEN(EXTRACT_BE_U_2((tlv)->length))))
+				      + F_ALN_LEN(GET_BE_U_2((tlv)->length))))
 #define ILV_SET_LEN(len)  (F_ALN_LEN(ILV_HDRL) + (len))
 #define ILV_DATA(ilvp)   ((const void*)(((const char*)(ilvp)) + ILV_SET_LEN(0)))
-#define GO_NXT_ILV(ilv,rlen) ((rlen) -= F_ALN_LEN(EXTRACT_BE_U_4((ilv)->length)), \
+#define GO_NXT_ILV(ilv,rlen) ((rlen) -= F_ALN_LEN(GET_BE_U_4((ilv)->length)), \
 		              (const struct forces_ilv *)(((const char*)(ilv)) \
-				      + F_ALN_LEN(EXTRACT_BE_U_4((ilv)->length))))
+				      + F_ALN_LEN(GET_BE_U_4((ilv)->length))))
 #define INVALID_RLEN 1
 #define INVALID_STLN 2
 #define INVALID_LTLN 3
@@ -433,11 +433,11 @@ ilv_valid(netdissect_options *ndo, const struct forces_ilv *ilv, u_int rlen)
 {
 	if (rlen < ILV_HDRL)
 		return INVALID_RLEN;
-	if (EXTRACT_BE_U_4(ilv->length) < ILV_HDRL)
+	if (GET_BE_U_4(ilv->length) < ILV_HDRL)
 		return INVALID_STLN;
-	if (EXTRACT_BE_U_4(ilv->length) > rlen)
+	if (GET_BE_U_4(ilv->length) > rlen)
 		return INVALID_LTLN;
-	if (rlen < F_ALN_LEN(EXTRACT_BE_U_4(ilv->length)))
+	if (rlen < F_ALN_LEN(GET_BE_U_4(ilv->length)))
 		return INVALID_ALEN;
 
 	return 0;
@@ -667,7 +667,7 @@ prestlv_print(netdissect_options *ndo,
 	}
 
 	ND_TCHECK_SIZE(r);
-	result = EXTRACT_U_1(r->result);
+	result = GET_U_1(r->result);
 	if (result >= 0x18 && result <= 0xFE) {
 		ND_PRINT("illegal reserved result code: 0x%x!\n", result);
 		return -1;
@@ -701,7 +701,7 @@ fdatatlv_print(netdissect_options *ndo,
 	 */
 	rlen = len - TLV_HDRL;
 	ND_TCHECK_SIZE(tlv);
-	type = EXTRACT_BE_U_2(tlv->type);
+	type = GET_BE_U_2(tlv->type);
 	if (type != F_TLV_FULD) {
 		ND_PRINT("Error: expecting FULLDATA!\n");
 		return -1;
@@ -750,9 +750,9 @@ sdatailv_print(netdissect_options *ndo,
 			return -1;
 		}
 		if (ndo->ndo_vflag >= 3) {
-			u_int ilvl = EXTRACT_BE_U_4(ilv->length);
+			u_int ilvl = GET_BE_U_4(ilv->length);
 			ND_PRINT("\n%s ILV: type %x length %u\n", ib + 1,
-				  EXTRACT_BE_U_4(ilv->type), ilvl);
+				  GET_BE_U_4(ilv->type), ilvl);
 			hex_print_with_offset(ndo, "\t\t[", tdp, ilvl-ILV_HDRL, 0);
 		}
 
@@ -782,7 +782,7 @@ sdatatlv_print(netdissect_options *ndo,
 	 */
 	rlen = len - TLV_HDRL;
 	ND_TCHECK_SIZE(tlv);
-	type = EXTRACT_BE_U_2(tlv->type);
+	type = GET_BE_U_2(tlv->type);
 	if (type != F_TLV_SPAD) {
 		ND_PRINT("Error: expecting SPARSEDATA!\n");
 		return -1;
@@ -810,11 +810,11 @@ pkeyitlv_print(netdissect_options *ndo,
 	u_int invtlv;
 
 	ND_TCHECK_1(tdp);
-	id = EXTRACT_BE_U_4(tdp);
+	id = GET_BE_U_4(tdp);
 	ND_PRINT("%sKeyinfo: Key 0x%x\n", ib, id);
 	ND_TCHECK_SIZE(kdtlv);
-	type = EXTRACT_BE_U_2(kdtlv->type);
-	tll = EXTRACT_BE_U_2(kdtlv->length);
+	type = GET_BE_U_2(kdtlv->type);
+	tll = GET_BE_U_2(kdtlv->length);
 	invtlv = tlv_valid(tll, len);
 
 	if (invtlv) {
@@ -828,7 +828,7 @@ pkeyitlv_print(netdissect_options *ndo,
 	 * length is large enough but not too large (it doesn't
 	 * go past the end of the containing TLV).
 	 */
-	tll = EXTRACT_BE_U_2(kdtlv->length);
+	tll = GET_BE_U_2(kdtlv->length);
 	dp = (const u_char *) TLV_DATA(kdtlv);
 	return fdatatlv_print(ndo, dp, tll, op_msk, indent);
 
@@ -855,7 +855,7 @@ pdatacnt_print(netdissect_options *ndo,
 		ND_TCHECK_4(pptr);
 		if (len < 4)
 			goto trunc;
-		id = EXTRACT_BE_U_4(pptr);
+		id = GET_BE_U_4(pptr);
 		if (ndo->ndo_vflag >= 3)
 			ND_PRINT("%sID#%02u: %u\n", ib, i + 1, id);
 		len -= 4;
@@ -875,11 +875,11 @@ pdatacnt_print(netdissect_options *ndo,
 			pptr += sizeof(struct forces_tlv);
 			len -= sizeof(struct forces_tlv);
 
-			starti = EXTRACT_BE_U_4(pptr);
+			starti = GET_BE_U_4(pptr);
 			pptr += 4;
 			len -= 4;
 
-			endi = EXTRACT_BE_U_4(pptr);
+			endi = GET_BE_U_4(pptr);
 			pptr += 4;
 			len -= 4;
 
@@ -905,7 +905,7 @@ pdatacnt_print(netdissect_options *ndo,
 			pptr += sizeof(struct forces_tlv);
 			len -= sizeof(struct forces_tlv);
 			/* skip key content */
-			tll = EXTRACT_BE_U_2(keytlv->length);
+			tll = GET_BE_U_2(keytlv->length);
 			if (tll < TLV_HDRL) {
 				ND_PRINT("key content length %u < %u\n",
 					tll, TLV_HDRL);
@@ -931,8 +931,8 @@ pdatacnt_print(netdissect_options *ndo,
 		u_int invtlv;
 
 		ND_TCHECK_SIZE(pdtlv);
-		type = EXTRACT_BE_U_2(pdtlv->type);
-		tlvl = EXTRACT_BE_U_2(pdtlv->length);
+		type = GET_BE_U_2(pdtlv->type);
+		tlvl = GET_BE_U_2(pdtlv->length);
 		invtlv = tlv_valid(tlvl, len);
 		if (invtlv) {
 			ND_PRINT("%s Outstanding bytes %u for TLV type 0x%x TLV len %u\n",
@@ -1010,26 +1010,26 @@ pdata_print(netdissect_options *ndo,
 		goto trunc;
 	if (ndo->ndo_vflag >= 3) {
 		ND_PRINT("\n%sPathdata: Flags 0x%x ID count %u\n",
-		       ib, EXTRACT_BE_U_2(pdh->pflags),
-		       EXTRACT_BE_U_2(pdh->pIDcnt));
+		       ib, GET_BE_U_2(pdh->pflags),
+		       GET_BE_U_2(pdh->pIDcnt));
 	}
 
-	if (EXTRACT_BE_U_2(pdh->pflags) & F_SELKEY) {
+	if (GET_BE_U_2(pdh->pflags) & F_SELKEY) {
 		op_msk |= B_KEYIN;
 	}
 
 	/* Table GET Range operation */
-	if (EXTRACT_BE_U_2(pdh->pflags) & F_SELTABRANGE) {
+	if (GET_BE_U_2(pdh->pflags) & F_SELTABRANGE) {
 		op_msk |= B_TRNG;
 	}
 	/* Table SET append operation */
-	if (EXTRACT_BE_U_2(pdh->pflags) & F_TABAPPEND) {
+	if (GET_BE_U_2(pdh->pflags) & F_TABAPPEND) {
 		op_msk |= B_APPND;
 	}
 
 	pptr += sizeof(struct pathdata_h);
 	len -= sizeof(struct pathdata_h);
-	idcnt = EXTRACT_BE_U_2(pdh->pIDcnt);
+	idcnt = GET_BE_U_2(pdh->pIDcnt);
 	minsize = idcnt * 4;
 	if (len < minsize) {
 		ND_PRINT("\t\t\ttruncated IDs expected %uB got %uB\n", minsize,
@@ -1071,8 +1071,8 @@ genoptlv_print(netdissect_options *ndo,
 	char *ib = indent_pr(indent, 0);
 
 	ND_TCHECK_SIZE(pdtlv);
-	type = EXTRACT_BE_U_2(pdtlv->type);
-	tlvl = EXTRACT_BE_U_2(pdtlv->length);
+	type = GET_BE_U_2(pdtlv->type);
+	tlvl = GET_BE_U_2(pdtlv->length);
 	invtlv = tlv_valid(tlvl, len);
 	ND_PRINT("genoptlvprint - %s TLV type 0x%x len %u\n",
 	       tok2str(ForCES_TLV, NULL, type), type, tlvl);
@@ -1120,7 +1120,7 @@ recpdoptlv_print(netdissect_options *ndo,
 		const u_char *dp;
 
 		ND_TCHECK_SIZE(pdtlv);
-		tlvl = EXTRACT_BE_U_2(pdtlv->length);
+		tlvl = GET_BE_U_2(pdtlv->length);
 		invtlv = tlv_valid(tlvl, len);
 		if (invtlv) {
 			break;
@@ -1132,7 +1132,7 @@ recpdoptlv_print(netdissect_options *ndo,
 		 * go past the end of the containing TLV).
 		 */
 		ib = indent_pr(indent, 0);
-		type = EXTRACT_BE_U_2(pdtlv->type);
+		type = GET_BE_U_2(pdtlv->type);
 		dp = (const u_char *) TLV_DATA(pdtlv);
 
 		if (ndo->ndo_vflag >= 3)
@@ -1148,8 +1148,8 @@ recpdoptlv_print(netdissect_options *ndo,
 
 	if (len) {
 		ND_PRINT("\n\t\tMessy PATHDATA TLV header, type (0x%x)\n\t\texcess of %u Bytes ",
-		          EXTRACT_BE_U_2(pdtlv->type),
-		          len - EXTRACT_BE_U_2(pdtlv->length));
+		          GET_BE_U_2(pdtlv->type),
+		          len - GET_BE_U_2(pdtlv->length));
 		return -1;
 	}
 
@@ -1191,17 +1191,17 @@ otlv_print(netdissect_options *ndo,
 	 * >= TLV_HDRL.
 	 */
 	ND_TCHECK_SIZE(otlv);
-	type = EXTRACT_BE_U_2(otlv->type);
-	tll = EXTRACT_BE_U_2(otlv->length) - TLV_HDRL;
+	type = GET_BE_U_2(otlv->type);
+	tll = GET_BE_U_2(otlv->length) - TLV_HDRL;
 	ops = get_forces_optlv_h(type);
 	if (ndo->ndo_vflag >= 3) {
 		ND_PRINT("%sOper TLV %s(0x%x) length %u\n", ib, ops->s, type,
-		       EXTRACT_BE_U_2(otlv->length));
+		       GET_BE_U_2(otlv->length));
 	}
 	/* rest of ops must at least have 12B {pathinfo} */
 	if (tll < OP_MIN_SIZ) {
 		ND_PRINT("\t\tOper TLV %s(0x%x) length %u\n", ops->s, type,
-		       EXTRACT_BE_U_2(otlv->length));
+		       GET_BE_U_2(otlv->length));
 		ND_PRINT("\t\tTruncated data size %u minimum required %u\n", tll,
 		       OP_MIN_SIZ);
 		return invoptlv_print(ndo, dp, tll, ops->op_msk, indent);
@@ -1240,7 +1240,7 @@ asttlv_print(netdissect_options *ndo,
 		return -1;
 	}
 	ND_TCHECK_4(pptr);
-	rescode = EXTRACT_BE_U_4(pptr);
+	rescode = GET_BE_U_4(pptr);
 	if (rescode > ASTMCD) {
 		ND_PRINT("illegal ASTresult result code: %u!\n", rescode);
 		return -1;
@@ -1298,7 +1298,7 @@ asrtlv_print(netdissect_options *ndo,
 		return -1;
 	}
 	ND_TCHECK_4(pptr);
-	rescode = EXTRACT_BE_U_4(pptr);
+	rescode = GET_BE_U_4(pptr);
 
 	if (rescode > ASRMCD) {
 		ND_PRINT("illegal ASRresult result code: %u!\n", rescode);
@@ -1364,10 +1364,10 @@ print_metailv(netdissect_options *ndo,
 	 * print_metatlv() has ensured that len (what remains in the
 	 * ILV) >= ILV_HDRL.
 	 */
-	rlen = EXTRACT_BE_U_4(ilv->length) - ILV_HDRL;
+	rlen = GET_BE_U_4(ilv->length) - ILV_HDRL;
 	ND_TCHECK_SIZE(ilv);
-	ND_PRINT("%sMetaID 0x%x length %u\n", ib, EXTRACT_BE_U_4(ilv->type),
-		  EXTRACT_BE_U_4(ilv->length));
+	ND_PRINT("%sMetaID 0x%x length %u\n", ib, GET_BE_U_4(ilv->type),
+		  GET_BE_U_4(ilv->length));
 	if (ndo->ndo_vflag >= 3) {
 		hex_print_with_offset(ndo, "\t\t[", ILV_DATA(ilv), rlen, 0);
 		ND_PRINT(" ]\n");
@@ -1470,8 +1470,8 @@ redirect_print(netdissect_options *ndo,
 		uint16_t type, tlvl;
 
 		ND_TCHECK_SIZE(tlv);
-		type = EXTRACT_BE_U_2(tlv->type);
-		tlvl = EXTRACT_BE_U_2(tlv->length);
+		type = GET_BE_U_2(tlv->type);
+		tlvl = GET_BE_U_2(tlv->length);
 		invtlv = tlv_valid(tlvl, rlen);
 		if (invtlv) {
 			ND_PRINT("Bad Redirect data\n");
@@ -1502,8 +1502,8 @@ redirect_print(netdissect_options *ndo,
 
 	if (rlen) {
 		ND_PRINT("\n\t\tMessy Redirect TLV header, type (0x%x)\n\t\texcess of %u Bytes ",
-		          EXTRACT_BE_U_2(tlv->type),
-		          rlen - EXTRACT_BE_U_2(tlv->length));
+		          GET_BE_U_2(tlv->type),
+		          rlen - GET_BE_U_2(tlv->length));
 		return -1;
 	}
 
@@ -1551,9 +1551,9 @@ lfbselect_print(netdissect_options *ndo,
 	if (ndo->ndo_vflag >= 3) {
 		ND_PRINT("\n%s%s(Classid %x) instance %x\n",
 		       ib,
-		       tok2str(ForCES_LFBs, NULL, EXTRACT_BE_U_4(lfbs->class)),
-		       EXTRACT_BE_U_4(lfbs->class),
-		       EXTRACT_BE_U_4(lfbs->instance));
+		       tok2str(ForCES_LFBs, NULL, GET_BE_U_4(lfbs->class)),
+		       GET_BE_U_4(lfbs->class),
+		       GET_BE_U_4(lfbs->instance));
 	}
 
 	otlv = (const struct forces_tlv *)(lfbs + 1);
@@ -1563,8 +1563,8 @@ lfbselect_print(netdissect_options *ndo,
 		uint16_t type, tlvl;
 
 		ND_TCHECK_SIZE(otlv);
-		type = EXTRACT_BE_U_2(otlv->type);
-		tlvl = EXTRACT_BE_U_2(otlv->length);
+		type = GET_BE_U_2(otlv->type);
+		tlvl = GET_BE_U_2(otlv->length);
 		invtlv = tlv_valid(tlvl, rlen);
 		if (invtlv)
 			break;
@@ -1588,8 +1588,8 @@ lfbselect_print(netdissect_options *ndo,
 
 	if (rlen) {
 		ND_PRINT("\n\t\tMessy oper TLV header, type (0x%x)\n\t\texcess of %u Bytes ",
-		          EXTRACT_BE_U_2(otlv->type),
-		          rlen - EXTRACT_BE_U_2(otlv->length));
+		          GET_BE_U_2(otlv->type),
+		          rlen - GET_BE_U_2(otlv->length));
 		return -1;
 	}
 
@@ -1644,8 +1644,8 @@ forces_type_print(netdissect_options *ndo,
 		u_int type, tlvl;
 
 		ND_TCHECK_SIZE(tltlv);
-		type = EXTRACT_BE_U_2(tltlv->type);
-		tlvl = EXTRACT_BE_U_2(tltlv->length);
+		type = GET_BE_U_2(tltlv->type);
+		tlvl = GET_BE_U_2(tltlv->length);
 		invtlv = tlv_valid(tlvl, rlen);
 		if (invtlv)
 			break;
@@ -1684,7 +1684,7 @@ forces_type_print(netdissect_options *ndo,
 	 */
 	if (rlen) {
 		ND_PRINT("\tMess TopTLV header: min %u, total %u advertised %u ",
-		       TLV_HDRL, rlen, EXTRACT_BE_U_2(tltlv->length));
+		       TLV_HDRL, rlen, GET_BE_U_2(tltlv->length));
 		return -1;
 	}
 
@@ -1709,7 +1709,7 @@ forces_print(netdissect_options *ndo,
 	ndo->ndo_protocol = "forces";
 	fhdr = (const struct forcesh *)pptr;
 	ND_TCHECK_SIZE(fhdr);
-	tom = EXTRACT_U_1(fhdr->fm_tom);
+	tom = GET_U_1(fhdr->fm_tom);
 	if (!tom_valid(tom)) {
 		ND_PRINT("Invalid ForCES message type %u\n", tom);
 		goto error;
@@ -1731,14 +1731,14 @@ forces_print(netdissect_options *ndo,
 	}
 
 	ND_TCHECK_4(pptr + 20);
-	flg_raw = EXTRACT_BE_U_4(pptr + 20);
+	flg_raw = GET_BE_U_4(pptr + 20);
 	if (ndo->ndo_vflag >= 1) {
 		ND_PRINT("\n\tForCES Version %u len %uB flags 0x%08x ",
 		       ForCES_V(fhdr), mlen, flg_raw);
 		ND_PRINT("\n\tSrcID 0x%x(%s) DstID 0x%x(%s) Correlator 0x%" PRIx64,
 		       ForCES_SID(fhdr), ForCES_node(ForCES_SID(fhdr)),
 		       ForCES_DID(fhdr), ForCES_node(ForCES_DID(fhdr)),
-		       EXTRACT_BE_U_8(fhdr->fm_cor));
+		       GET_BE_U_8(fhdr->fm_cor));
 
 	}
 	if (ndo->ndo_vflag >= 2) {

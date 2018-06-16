@@ -118,7 +118,7 @@ c_print(netdissect_options *ndo,
 
 	flag = 1;
 	while (s < ep) {
-		c = EXTRACT_U_1(s);
+		c = GET_U_1(s);
 		s++;
 		if (c == '\0') {
 			flag = 0;
@@ -163,14 +163,14 @@ krb4_print(netdissect_options *ndo,
 
 #define PRINT		if ((cp = c_print(ndo, cp, ndo->ndo_snapend)) == NULL) goto trunc
 /*  True if struct krb is little endian */
-#define IS_LENDIAN(kp)	((EXTRACT_U_1((kp)->type) & 0x01) != 0)
-#define KTOHSP(kp, cp)	(IS_LENDIAN(kp) ? EXTRACT_LE_U_2(cp) : EXTRACT_BE_U_2(cp))
+#define IS_LENDIAN(kp)	((GET_U_1((kp)->type) & 0x01) != 0)
+#define KTOHSP(kp, cp)	(IS_LENDIAN(kp) ? GET_LE_U_2(cp) : GET_BE_U_2(cp))
 
 	kp = (const struct krb *)cp;
 
 	ND_TCHECK_1(kp->type);
 
-	type = EXTRACT_U_1(kp->type) & (0xFF << 1);
+	type = GET_U_1(kp->type) & (0xFF << 1);
 
 	ND_PRINT(" %s %s: ",
 	    IS_LENDIAN(kp) ? "le" : "be", tok2str(type2str, NULL, type));
@@ -182,7 +182,7 @@ krb4_print(netdissect_options *ndo,
 			return;
 		cp += 4;	/* ctime */
 		ND_TCHECK_1(cp);
-		ND_PRINT(" %umin ", EXTRACT_U_1(cp) * 5);
+		ND_PRINT(" %umin ", GET_U_1(cp) * 5);
 		cp++;
 		PRINT;
 		ND_PRINT(".");
@@ -192,14 +192,14 @@ krb4_print(netdissect_options *ndo,
 	case AUTH_MSG_APPL_REQUEST:
 		cp += 2;
 		ND_TCHECK_1(cp);
-		ND_PRINT("v%u ", EXTRACT_U_1(cp));
+		ND_PRINT("v%u ", GET_U_1(cp));
 		cp++;
 		PRINT;
 		ND_TCHECK_1(cp);
-		ND_PRINT(" (%u)", EXTRACT_U_1(cp));
+		ND_PRINT(" (%u)", GET_U_1(cp));
 		cp++;
 		ND_TCHECK_1(cp);
-		ND_PRINT(" (%u)", EXTRACT_U_1(cp));
+		ND_PRINT(" (%u)", GET_U_1(cp));
 		break;
 
 	case AUTH_MSG_KDC_REPLY:
@@ -245,16 +245,16 @@ krb_print(netdissect_options *ndo,
 		return;
 	}
 
-	switch (EXTRACT_U_1(kp->pvno)) {
+	switch (GET_U_1(kp->pvno)) {
 
 	case 1:
 	case 2:
 	case 3:
-		ND_PRINT(" v%u", EXTRACT_U_1(kp->pvno));
+		ND_PRINT(" v%u", GET_U_1(kp->pvno));
 		break;
 
 	case 4:
-		ND_PRINT(" v%u", EXTRACT_U_1(kp->pvno));
+		ND_PRINT(" v%u", GET_U_1(kp->pvno));
 		krb4_print(ndo, (const u_char *)kp);
 		break;
 

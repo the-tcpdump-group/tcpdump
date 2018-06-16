@@ -634,13 +634,13 @@ print_attr_string(netdissect_options *ndo,
       case TUNNEL_PASS:
            if (length < 3)
               goto trunc;
-           if (EXTRACT_U_1(data) && (EXTRACT_U_1(data) <= 0x1F))
-              ND_PRINT("Tag[%u] ", EXTRACT_U_1(data));
+           if (GET_U_1(data) && (GET_U_1(data) <= 0x1F))
+              ND_PRINT("Tag[%u] ", GET_U_1(data));
            else
               ND_PRINT("Tag[Unused] ");
            data++;
            length--;
-           ND_PRINT("Salt %u ", EXTRACT_BE_U_2(data));
+           ND_PRINT("Salt %u ", GET_BE_U_2(data));
            data+=2;
            length-=2;
         break;
@@ -650,12 +650,12 @@ print_attr_string(netdissect_options *ndo,
       case TUNNEL_ASSIGN_ID:
       case TUNNEL_CLIENT_AUTH:
       case TUNNEL_SERVER_AUTH:
-           if (EXTRACT_U_1(data) <= 0x1F)
+           if (GET_U_1(data) <= 0x1F)
            {
               if (length < 1)
                  goto trunc;
-              if (EXTRACT_U_1(data))
-                ND_PRINT("Tag[%u] ", EXTRACT_U_1(data));
+              if (GET_U_1(data))
+                ND_PRINT("Tag[%u] ", GET_U_1(data));
               else
                 ND_PRINT("Tag[Unused] ");
               data++;
@@ -666,15 +666,15 @@ print_attr_string(netdissect_options *ndo,
            if (length < 1)
               goto trunc;
            ND_PRINT("%s (0x%02x) ",
-                  tok2str(rfc4675_tagged,"Unknown tag",EXTRACT_U_1(data)),
-                  EXTRACT_U_1(data));
+                  tok2str(rfc4675_tagged,"Unknown tag",GET_U_1(data)),
+                  GET_U_1(data));
            data++;
            length--;
         break;
    }
 
-   for (i=0; i < length && EXTRACT_U_1(data); i++, data++)
-       ND_PRINT("%c", ND_ISPRINT(EXTRACT_U_1(data)) ? EXTRACT_U_1(data) : '.');
+   for (i=0; i < length && GET_U_1(data); i++, data++)
+       ND_PRINT("%c", ND_ISPRINT(GET_U_1(data)) ? GET_U_1(data) : '.');
 
    return;
 
@@ -697,7 +697,7 @@ print_vendor_attr(netdissect_options *ndo,
     if (length < 4)
         goto trunc;
     ND_TCHECK_4(data);
-    vendor_id = EXTRACT_BE_U_4(data);
+    vendor_id = GET_BE_U_4(data);
     data+=4;
     length-=4;
 
@@ -708,8 +708,8 @@ print_vendor_attr(netdissect_options *ndo,
     while (length >= 2) {
 	ND_TCHECK_2(data);
 
-        vendor_type = EXTRACT_U_1(data);
-        vendor_length = EXTRACT_U_1(data + 1);
+        vendor_type = GET_U_1(data);
+        vendor_length = GET_U_1(data + 1);
 
         if (vendor_length < 2)
         {
@@ -734,7 +734,7 @@ print_vendor_attr(netdissect_options *ndo,
                vendor_type,
                vendor_length);
         for (idx = 0; idx < vendor_length ; idx++, data++)
-            ND_PRINT("%c", ND_ISPRINT(EXTRACT_U_1(data)) ? EXTRACT_U_1(data) : '.');
+            ND_PRINT("%c", ND_ISPRINT(GET_U_1(data)) ? GET_U_1(data) : '.');
         length-=vendor_length;
     }
     return;
@@ -772,16 +772,16 @@ print_attr_num(netdissect_options *ndo,
 
       if ( (attr_code == TUNNEL_TYPE) || (attr_code == TUNNEL_MEDIUM) )
       {
-         if (!EXTRACT_U_1(data))
+         if (!GET_U_1(data))
             ND_PRINT("Tag[Unused] ");
          else
-            ND_PRINT("Tag[%u] ", EXTRACT_U_1(data));
+            ND_PRINT("Tag[%u] ", GET_U_1(data));
          data++;
-         data_value = EXTRACT_BE_U_3(data);
+         data_value = GET_BE_U_3(data);
       }
       else
       {
-         data_value = EXTRACT_BE_U_4(data);
+         data_value = GET_BE_U_4(data);
       }
       if ( data_value <= (uint32_t)(attr_type[attr_code].siz_subtypes - 1 +
             attr_type[attr_code].first_subtype) &&
@@ -795,10 +795,10 @@ print_attr_num(netdissect_options *ndo,
       switch(attr_code) /* Be aware of special cases... */
       {
         case FRM_IPX:
-             if (EXTRACT_BE_U_4(data) == 0xFFFFFFFE )
+             if (GET_BE_U_4(data) == 0xFFFFFFFE )
                 ND_PRINT("NAS Select");
              else
-                ND_PRINT("%u", EXTRACT_BE_U_4(data));
+                ND_PRINT("%u", GET_BE_U_4(data));
           break;
 
         case SESSION_TIMEOUT:
@@ -806,7 +806,7 @@ print_attr_num(netdissect_options *ndo,
         case ACCT_DELAY:
         case ACCT_SESSION_TIME:
         case ACCT_INT_INTERVAL:
-             timeout = EXTRACT_BE_U_4(data);
+             timeout = GET_BE_U_4(data);
              if ( timeout < 60 )
                 ND_PRINT("%02d secs", timeout);
              else
@@ -822,38 +822,38 @@ print_attr_num(netdissect_options *ndo,
           break;
 
         case FRM_ATALK_LINK:
-             if (EXTRACT_BE_U_4(data))
-                ND_PRINT("%u", EXTRACT_BE_U_4(data));
+             if (GET_BE_U_4(data))
+                ND_PRINT("%u", GET_BE_U_4(data));
              else
                 ND_PRINT("Unnumbered");
           break;
 
         case FRM_ATALK_NETWORK:
-             if (EXTRACT_BE_U_4(data))
-                ND_PRINT("%u", EXTRACT_BE_U_4(data));
+             if (GET_BE_U_4(data))
+                ND_PRINT("%u", GET_BE_U_4(data));
              else
                 ND_PRINT("NAS assigned");
           break;
 
         case TUNNEL_PREFERENCE:
-            if (EXTRACT_U_1(data))
-               ND_PRINT("Tag[%u] ", EXTRACT_U_1(data));
+            if (GET_U_1(data))
+               ND_PRINT("Tag[%u] ", GET_U_1(data));
             else
                ND_PRINT("Tag[Unused] ");
             data++;
-            ND_PRINT("%u", EXTRACT_BE_U_3(data));
+            ND_PRINT("%u", GET_BE_U_3(data));
           break;
 
         case EGRESS_VLAN_ID:
             ND_PRINT("%s (0x%02x) ",
-                   tok2str(rfc4675_tagged,"Unknown tag",EXTRACT_U_1(data)),
-                   EXTRACT_U_1(data));
+                   tok2str(rfc4675_tagged,"Unknown tag",GET_U_1(data)),
+                   GET_U_1(data));
             data++;
-            ND_PRINT("%u", EXTRACT_BE_U_3(data));
+            ND_PRINT("%u", GET_BE_U_3(data));
           break;
 
         default:
-             ND_PRINT("%u", EXTRACT_BE_U_4(data));
+             ND_PRINT("%u", GET_BE_U_4(data));
           break;
 
       } /* switch */
@@ -889,10 +889,10 @@ print_attr_address(netdissect_options *ndo,
    {
       case FRM_IPADDR:
       case LOG_IPHOST:
-           if (EXTRACT_BE_U_4(data) == 0xFFFFFFFF )
+           if (GET_BE_U_4(data) == 0xFFFFFFFF )
               ND_PRINT("User Selected");
            else
-              if (EXTRACT_BE_U_4(data) == 0xFFFFFFFE )
+              if (GET_BE_U_4(data) == 0xFFFFFFFE )
                  ND_PRINT("NAS Select");
               else
                  ND_PRINT("%s",ipaddr_string(ndo, data));
@@ -948,9 +948,9 @@ print_attr_netmask6(netdissect_options *ndo,
        return;
    }
    ND_TCHECK_LEN(data, length);
-   if (EXTRACT_U_1(data + 1) > 128)
+   if (GET_U_1(data + 1) > 128)
    {
-      ND_PRINT("ERROR: netmask %u not in range (0..128)", EXTRACT_U_1(data + 1));
+      ND_PRINT("ERROR: netmask %u not in range (0..128)", GET_U_1(data + 1));
       return;
    }
 
@@ -958,9 +958,9 @@ print_attr_netmask6(netdissect_options *ndo,
    if (length > 2)
       memcpy(data2, data+2, length-2);
 
-   ND_PRINT("%s/%u", ip6addr_string(ndo, data2), EXTRACT_U_1(data + 1));
+   ND_PRINT("%s/%u", ip6addr_string(ndo, data2), GET_U_1(data + 1));
 
-   if (EXTRACT_U_1(data + 1) > 8 * (length - 2))
+   if (GET_U_1(data + 1) > 8 * (length - 2))
       ND_PRINT(" (inconsistent prefix length)");
 
    return;
@@ -979,13 +979,13 @@ print_attr_mip6_home_link_prefix(netdissect_options *ndo,
       return;
    }
    ND_TCHECK_LEN(data, length);
-   if (EXTRACT_U_1(data) > 128)
+   if (GET_U_1(data) > 128)
    {
-      ND_PRINT("ERROR: netmask %u not in range (0..128)", EXTRACT_U_1(data));
+      ND_PRINT("ERROR: netmask %u not in range (0..128)", GET_U_1(data));
       return;
    }
 
-   ND_PRINT("%s/%u", ip6addr_string(ndo, data + 1), EXTRACT_U_1(data));
+   ND_PRINT("%s/%u", ip6addr_string(ndo, data + 1), GET_U_1(data));
 
    return;
 
@@ -1016,7 +1016,7 @@ print_attr_time(netdissect_options *ndo,
 
    ND_TCHECK_4(data);
 
-   attr_time = EXTRACT_BE_U_4(data);
+   attr_time = GET_BE_U_4(data);
    strlcpy(string, ctime(&attr_time), sizeof(string));
    /* Get rid of the newline */
    string[24] = '\0';
@@ -1043,7 +1043,7 @@ print_attr_vector64(netdissect_options *ndo,
    ND_PRINT("[");
    ND_TCHECK_8(data[0]);
 
-   data_value = EXTRACT_BE_U_8(data);
+   data_value = GET_BE_U_8(data);
    /* Print the 64-bit field in a format similar to bittok2str(), less
     * flagging any unknown bits. This way it should be easier to replace
     * the custom code with a library function later.
@@ -1103,13 +1103,13 @@ print_attr_strange(netdissect_options *ndo,
                return;
            }
            ND_TCHECK_1(data);
-           if (EXTRACT_U_1(data))
+           if (GET_U_1(data))
               ND_PRINT("User can change password");
            else
               ND_PRINT("User cannot change password");
            data++;
            ND_TCHECK_1(data);
-           ND_PRINT(", Min password length: %u", EXTRACT_U_1(data));
+           ND_PRINT(", Min password length: %u", GET_U_1(data));
            data++;
            ND_PRINT(", created at: ");
            ND_TCHECK_4(data);
@@ -1144,7 +1144,7 @@ print_attr_strange(netdissect_options *ndo,
            }
            ND_TCHECK_4(data);
 
-           error_cause_value = EXTRACT_BE_U_4(data);
+           error_cause_value = GET_BE_U_4(data);
            ND_PRINT("Error cause %u: %s", error_cause_value, tok2str(errorcausetype, "Error-Cause %u not known", error_cause_value));
         break;
    }
@@ -1168,8 +1168,8 @@ radius_attrs_print(netdissect_options *ndo,
         goto trunc;
      ND_TCHECK_SIZE(rad_attr);
 
-     type = EXTRACT_U_1(rad_attr->type);
-     len = EXTRACT_U_1(rad_attr->len);
+     type = GET_U_1(rad_attr->type);
+     len = GET_U_1(rad_attr->len);
      if (type != 0 && type < TAM_SIZE(attr_type))
 	attr_string = attr_type[type].name;
      else
@@ -1224,7 +1224,7 @@ radius_print(netdissect_options *ndo,
    ndo->ndo_protocol = "radius";
    ND_TCHECK_LEN(dat, MIN_RADIUS_LEN);
    rad = (const struct radius_hdr *)dat;
-   len = EXTRACT_BE_U_2(rad->len);
+   len = GET_BE_U_2(rad->len);
 
    if (len < MIN_RADIUS_LEN)
    {
@@ -1237,18 +1237,18 @@ radius_print(netdissect_options *ndo,
 
    if (ndo->ndo_vflag < 1) {
        ND_PRINT("RADIUS, %s (%u), id: 0x%02x length: %u",
-              tok2str(radius_command_values,"Unknown Command",EXTRACT_U_1(rad->code)),
-              EXTRACT_U_1(rad->code),
-              EXTRACT_U_1(rad->id),
+              tok2str(radius_command_values,"Unknown Command",GET_U_1(rad->code)),
+              GET_U_1(rad->code),
+              GET_U_1(rad->id),
               len);
        return;
    }
    else {
        ND_PRINT("RADIUS, length: %u\n\t%s (%u), id: 0x%02x, Authenticator: ",
               len,
-              tok2str(radius_command_values,"Unknown Command",EXTRACT_U_1(rad->code)),
-              EXTRACT_U_1(rad->code),
-              EXTRACT_U_1(rad->id));
+              tok2str(radius_command_values,"Unknown Command",GET_U_1(rad->code)),
+              GET_U_1(rad->code),
+              GET_U_1(rad->id));
 
        for(auth_idx=0; auth_idx < 16; auth_idx++)
             ND_PRINT("%02x", rad->auth[auth_idx]);

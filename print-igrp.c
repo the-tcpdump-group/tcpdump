@@ -82,17 +82,17 @@ igrp_entry_print(netdissect_options *ndo, const struct igrprte *igr,
 		ND_PRINT(" %u.%u.%u.0", igr->igr_net[0],
 		    igr->igr_net[1], igr->igr_net[2]);
 
-	delay = EXTRACT_BE_U_3(igr->igr_dly);
-	bandwidth = EXTRACT_BE_U_3(igr->igr_bw);
+	delay = GET_BE_U_3(igr->igr_dly);
+	bandwidth = GET_BE_U_3(igr->igr_bw);
 	metric = bandwidth + delay;
 	if (metric > 0xffffff)
 		metric = 0xffffff;
-	mtu = EXTRACT_BE_U_2(igr->igr_mtu);
+	mtu = GET_BE_U_2(igr->igr_mtu);
 
 	ND_PRINT(" d=%u b=%u r=%u l=%u M=%u mtu=%u in %u hops",
 	    10 * delay, bandwidth == 0 ? 0 : 10000000 / bandwidth,
-	    EXTRACT_U_1(igr->igr_rel), EXTRACT_U_1(igr->igr_ld), metric,
-	    mtu, EXTRACT_U_1(igr->igr_hct));
+	    GET_U_1(igr->igr_rel), GET_U_1(igr->igr_ld), metric,
+	    mtu, GET_U_1(igr->igr_hct));
 }
 
 static const struct tok op2str[] = {
@@ -115,15 +115,15 @@ igrp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	/* Header */
 	ND_TCHECK_SIZE(hdr);
-	nint = EXTRACT_BE_U_2(hdr->ig_ni);
-	nsys = EXTRACT_BE_U_2(hdr->ig_ns);
-	next = EXTRACT_BE_U_2(hdr->ig_nx);
+	nint = GET_BE_U_2(hdr->ig_ni);
+	nsys = GET_BE_U_2(hdr->ig_ns);
+	next = GET_BE_U_2(hdr->ig_nx);
 
 	ND_PRINT(" %s V%u edit=%u AS=%u (%u/%u/%u)",
-	    tok2str(op2str, "op-#%u", IGRP_OP(EXTRACT_U_1(hdr->ig_vop))),
-	    IGRP_V(EXTRACT_U_1(hdr->ig_vop)),
-	    EXTRACT_U_1(hdr->ig_ed),
-	    EXTRACT_BE_U_2(hdr->ig_as),
+	    tok2str(op2str, "op-#%u", IGRP_OP(GET_U_1(hdr->ig_vop))),
+	    IGRP_V(GET_U_1(hdr->ig_vop)),
+	    GET_U_1(hdr->ig_ed),
+	    GET_BE_U_2(hdr->ig_as),
 	    nint,
 	    nsys,
 	    next);

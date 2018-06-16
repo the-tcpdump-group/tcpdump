@@ -47,8 +47,8 @@ calm_fast_print(netdissect_options *ndo, const u_char *bp, u_int length, const s
 	ND_TCHECK_2(bp);
 	if (length < 2)
 		goto trunc;
-	srcNwref = EXTRACT_U_1(bp);
-	dstNwref = EXTRACT_U_1(bp + 1);
+	srcNwref = GET_U_1(bp);
+	dstNwref = GET_U_1(bp + 1);
 	length -= 2;
 	bp += 2;
 

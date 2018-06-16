@@ -182,14 +182,14 @@ rpki_rtr_pdu_print(netdissect_options *ndo, const u_char *tptr, const u_int len,
 
     /* Protocol Version */
     ND_TCHECK_1(tptr);
-    if (EXTRACT_U_1(tptr) != 0) {
+    if (GET_U_1(tptr) != 0) {
 	/* Skip the rest of the input buffer because even if this is
 	 * a well-formed PDU of a future RPKI-Router protocol version
 	 * followed by a well-formed PDU of RPKI-Router protocol
 	 * version 0, there is no way to know exactly how to skip the
 	 * current PDU.
 	 */
-	ND_PRINT("%sRPKI-RTRv%u (unknown)", indent_string(8), EXTRACT_U_1(tptr));
+	ND_PRINT("%sRPKI-RTRv%u (unknown)", indent_string(8), GET_U_1(tptr));
 	return len;
     }
     if (len < sizeof(rpki_rtr_pdu)) {
@@ -199,7 +199,7 @@ rpki_rtr_pdu_print(netdissect_options *ndo, const u_char *tptr, const u_int len,
     ND_TCHECK_LEN(tptr, sizeof(rpki_rtr_pdu));
     pdu_header = (const rpki_rtr_pdu *)tptr;
     pdu_type = pdu_header->pdu_type;
-    pdu_len = EXTRACT_BE_U_4(pdu_header->length);
+    pdu_len = GET_BE_U_4(pdu_header->length);
     /* Do not check bounds with pdu_len yet, do it in the case blocks
      * below to make it possible to decode at least the beginning of
      * a truncated Error Report PDU or a truncated encapsulated PDU.
@@ -228,8 +228,8 @@ rpki_rtr_pdu_print(netdissect_options *ndo, const u_char *tptr, const u_int len,
         msg = (const u_char *)(pdu_header + 1);
 	ND_PRINT("%sSession ID: 0x%04x, Serial: %u",
 	       indent_string(indent+2),
-	       EXTRACT_BE_U_2(pdu_header->u.session_id),
-	       EXTRACT_BE_U_4(msg));
+	       GET_BE_U_2(pdu_header->u.session_id),
+	       GET_BE_U_4(msg));
 	break;
 
 	/*
@@ -252,7 +252,7 @@ rpki_rtr_pdu_print(netdissect_options *ndo, const u_char *tptr, const u_int len,
 	/* no additional boundary to check */
 	ND_PRINT("%sSession ID: 0x%04x",
 	       indent_string(indent+2),
-	       EXTRACT_BE_U_2(pdu_header->u.session_id));
+	       GET_BE_U_2(pdu_header->u.session_id));
 	break;
 
     case RPKI_RTR_IPV4_PREFIX_PDU:
@@ -267,7 +267,7 @@ rpki_rtr_pdu_print(netdissect_options *ndo, const u_char *tptr, const u_int len,
 		   indent_string(indent+2),
 		   ipaddr_string(ndo, pdu->prefix),
 		   pdu->prefix_length, pdu->max_length,
-		   EXTRACT_BE_U_4(pdu->as), pdu->flags);
+		   GET_BE_U_4(pdu->as), pdu->flags);
 	}
 	break;
 
@@ -283,7 +283,7 @@ rpki_rtr_pdu_print(netdissect_options *ndo, const u_char *tptr, const u_int len,
 		   indent_string(indent+2),
 		   ip6addr_string(ndo, pdu->prefix),
 		   pdu->prefix_length, pdu->max_length,
-		   EXTRACT_BE_U_4(pdu->as), pdu->flags);
+		   GET_BE_U_4(pdu->as), pdu->flags);
 	}
 	break;
 
@@ -301,10 +301,10 @@ rpki_rtr_pdu_print(netdissect_options *ndo, const u_char *tptr, const u_int len,
 	     * data element, more data elements may be present.
 	     */
 	    pdu = (const rpki_rtr_pdu_error_report *)tptr;
-	    encapsulated_pdu_length = EXTRACT_BE_U_4(pdu->encapsulated_pdu_length);
+	    encapsulated_pdu_length = GET_BE_U_4(pdu->encapsulated_pdu_length);
 	    tlen += 4;
 
-	    error_code = EXTRACT_BE_U_2(pdu->pdu_header.u.error_code);
+	    error_code = GET_BE_U_2(pdu->pdu_header.u.error_code);
 	    ND_PRINT("%sError code: %s (%u), Encapsulated PDU length: %u",
 		   indent_string(indent+2),
 		   tok2str(rpki_rtr_error_codes, "Unknown", error_code),
@@ -346,7 +346,7 @@ rpki_rtr_pdu_print(netdissect_options *ndo, const u_char *tptr, const u_int len,
 	    /*
 	     * Extract, trail-zero and print the Error message.
 	     */
-	    text_length = EXTRACT_BE_U_4(tptr + tlen);
+	    text_length = GET_BE_U_4(tptr + tlen);
 	    tlen += 4;
 
 	    if (text_length) {

@@ -118,12 +118,12 @@ mobility_opt_print(netdissect_options *ndo,
 
 	for (i = 0; i < len; i += optlen) {
 		ND_TCHECK_1(bp + i);
-		if (EXTRACT_U_1(bp + i) == IP6MOPT_PAD1)
+		if (GET_U_1(bp + i) == IP6MOPT_PAD1)
 			optlen = 1;
 		else {
 			if (i + 1 < len) {
 				ND_TCHECK_1(bp + i + 1);
-				optlen = EXTRACT_U_1(bp + i + 1) + 2;
+				optlen = GET_U_1(bp + i + 1) + 2;
 			}
 			else
 				goto trunc;
@@ -132,7 +132,7 @@ mobility_opt_print(netdissect_options *ndo,
 			goto trunc;
 		ND_TCHECK_1(bp + i + optlen);
 
-		switch (EXTRACT_U_1(bp + i)) {
+		switch (GET_U_1(bp + i)) {
 		case IP6MOPT_PAD1:
 			ND_PRINT("(pad1)");
 			break;
@@ -151,7 +151,7 @@ mobility_opt_print(netdissect_options *ndo,
 			/* units of 4 secs */
 			ND_TCHECK_2(bp + i + 2);
 			ND_PRINT("(refresh: %u)",
-				EXTRACT_BE_U_2(bp + i + 2) << 2);
+				GET_BE_U_2(bp + i + 2) << 2);
 			break;
 		case IP6MOPT_ALTCOA:
 			if (len - i < IP6MOPT_ALTCOA_MINLEN) {
@@ -169,8 +169,8 @@ mobility_opt_print(netdissect_options *ndo,
 			ND_TCHECK_2(bp + i + 2);
 			ND_TCHECK_2(bp + i + 4);
 			ND_PRINT("(ni: ho=0x%04x co=0x%04x)",
-				EXTRACT_BE_U_2(bp + i + 2),
-				EXTRACT_BE_U_2(bp + i + 4));
+				GET_BE_U_2(bp + i + 2),
+				GET_BE_U_2(bp + i + 4));
 			break;
 		case IP6MOPT_AUTH:
 			if (len - i < IP6MOPT_AUTH_MINLEN) {
@@ -181,10 +181,12 @@ mobility_opt_print(netdissect_options *ndo,
 			break;
 		default:
 			if (len - i < IP6MOPT_MINLEN) {
-				ND_PRINT("(sopt_type %u: trunc)", EXTRACT_U_1(bp + i));
+				ND_PRINT("(sopt_type %u: trunc)",
+					 GET_U_1(bp + i));
 				goto trunc;
 			}
-			ND_PRINT("(type-0x%02x: len=%u)", EXTRACT_U_1(bp + i), EXTRACT_U_1(bp + i + 1));
+			ND_PRINT("(type-0x%02x: len=%u)", GET_U_1(bp + i),
+				 GET_U_1(bp + i + 1));
 			break;
 		}
 	}
@@ -228,12 +230,12 @@ mobility_print(netdissect_options *ndo,
 		mhlen = ep - bp;
 		goto trunc;
 	}
-	mhlen = (EXTRACT_U_1(mh->ip6m_len) + 1) << 3;
+	mhlen = (GET_U_1(mh->ip6m_len) + 1) << 3;
 
 	/* XXX ip6m_cksum */
 
 	ND_TCHECK_1(mh->ip6m_type);
-	type = EXTRACT_U_1(mh->ip6m_type);
+	type = GET_U_1(mh->ip6m_type);
 	if (type <= IP6M_MAX && mhlen < ip6m_hdrlen[type]) {
 		ND_PRINT("(header length %u is too small for type %u)", mhlen, type);
 		goto trunc;
@@ -250,47 +252,47 @@ mobility_print(netdissect_options *ndo,
 			ND_TCHECK_4(bp + hlen + 4);
 			ND_PRINT(" %s Init Cookie=%08x:%08x",
 			       type == IP6M_HOME_TEST_INIT ? "Home" : "Care-of",
-			       EXTRACT_BE_U_4(bp + hlen),
-			       EXTRACT_BE_U_4(bp + hlen + 4));
+			       GET_BE_U_4(bp + hlen),
+			       GET_BE_U_4(bp + hlen + 4));
 		}
 		hlen += 8;
 		break;
 	case IP6M_HOME_TEST:
 	case IP6M_CAREOF_TEST:
 		ND_TCHECK_2(mh->ip6m_data16[0]);
-		ND_PRINT(" nonce id=0x%x", EXTRACT_BE_U_2(mh->ip6m_data16[0]));
+		ND_PRINT(" nonce id=0x%x", GET_BE_U_2(mh->ip6m_data16[0]));
 		hlen = IP6M_MINLEN;
 		if (ndo->ndo_vflag) {
 			ND_TCHECK_4(bp + hlen + 4);
 			ND_PRINT(" %s Init Cookie=%08x:%08x",
 			       type == IP6M_HOME_TEST ? "Home" : "Care-of",
-			       EXTRACT_BE_U_4(bp + hlen),
-			       EXTRACT_BE_U_4(bp + hlen + 4));
+			       GET_BE_U_4(bp + hlen),
+			       GET_BE_U_4(bp + hlen + 4));
 		}
 		hlen += 8;
 		if (ndo->ndo_vflag) {
 			ND_TCHECK_4(bp + hlen + 4);
 			ND_PRINT(" %s Keygen Token=%08x:%08x",
 			       type == IP6M_HOME_TEST ? "Home" : "Care-of",
-			       EXTRACT_BE_U_4(bp + hlen),
-			       EXTRACT_BE_U_4(bp + hlen + 4));
+			       GET_BE_U_4(bp + hlen),
+			       GET_BE_U_4(bp + hlen + 4));
 		}
 		hlen += 8;
 		break;
 	case IP6M_BINDING_UPDATE:
 		ND_TCHECK_2(mh->ip6m_data16[0]);
-		ND_PRINT(" seq#=%u", EXTRACT_BE_U_2(mh->ip6m_data16[0]));
+		ND_PRINT(" seq#=%u", GET_BE_U_2(mh->ip6m_data16[0]));
 		hlen = IP6M_MINLEN;
 		ND_TCHECK_2(bp + hlen);
-		if (EXTRACT_U_1(bp + hlen) & 0xf0) {
+		if (GET_U_1(bp + hlen) & 0xf0) {
 			ND_PRINT(" ");
-			if (EXTRACT_U_1(bp + hlen) & 0x80)
+			if (GET_U_1(bp + hlen) & 0x80)
 				ND_PRINT("A");
-			if (EXTRACT_U_1(bp + hlen) & 0x40)
+			if (GET_U_1(bp + hlen) & 0x40)
 				ND_PRINT("H");
-			if (EXTRACT_U_1(bp + hlen) & 0x20)
+			if (GET_U_1(bp + hlen) & 0x20)
 				ND_PRINT("L");
-			if (EXTRACT_U_1(bp + hlen) & 0x10)
+			if (GET_U_1(bp + hlen) & 0x10)
 				ND_PRINT("K");
 		}
 		/* Reserved (4bits) */
@@ -299,28 +301,28 @@ mobility_print(netdissect_options *ndo,
 		hlen += 1;
 		ND_TCHECK_2(bp + hlen);
 		/* units of 4 secs */
-		ND_PRINT(" lifetime=%u", EXTRACT_BE_U_2(bp + hlen) << 2);
+		ND_PRINT(" lifetime=%u", GET_BE_U_2(bp + hlen) << 2);
 		hlen += 2;
 		break;
 	case IP6M_BINDING_ACK:
 		ND_TCHECK_1(mh->ip6m_data8[0]);
-		ND_PRINT(" status=%u", EXTRACT_U_1(mh->ip6m_data8[0]));
+		ND_PRINT(" status=%u", GET_U_1(mh->ip6m_data8[0]));
 		ND_TCHECK_1(mh->ip6m_data8[1]);
-		if (EXTRACT_U_1(mh->ip6m_data8[1]) & 0x80)
+		if (GET_U_1(mh->ip6m_data8[1]) & 0x80)
 			ND_PRINT(" K");
 		/* Reserved (7bits) */
 		hlen = IP6M_MINLEN;
 		ND_TCHECK_2(bp + hlen);
-		ND_PRINT(" seq#=%u", EXTRACT_BE_U_2(bp + hlen));
+		ND_PRINT(" seq#=%u", GET_BE_U_2(bp + hlen));
 		hlen += 2;
 		ND_TCHECK_2(bp + hlen);
 		/* units of 4 secs */
-		ND_PRINT(" lifetime=%u", EXTRACT_BE_U_2(bp + hlen) << 2);
+		ND_PRINT(" lifetime=%u", GET_BE_U_2(bp + hlen) << 2);
 		hlen += 2;
 		break;
 	case IP6M_BINDING_ERROR:
 		ND_TCHECK_1(mh->ip6m_data8[0]);
-		ND_PRINT(" status=%u", EXTRACT_U_1(mh->ip6m_data8[0]));
+		ND_PRINT(" status=%u", GET_U_1(mh->ip6m_data8[0]));
 		/* Reserved */
 		hlen = IP6M_MINLEN;
 		ND_TCHECK_16(bp + hlen);
@@ -328,7 +330,7 @@ mobility_print(netdissect_options *ndo,
 		hlen += 16;
 		break;
 	default:
-		ND_PRINT(" len=%u", EXTRACT_U_1(mh->ip6m_len));
+		ND_PRINT(" len=%u", GET_U_1(mh->ip6m_len));
 		return(mhlen);
 		break;
 	}

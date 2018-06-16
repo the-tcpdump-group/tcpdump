@@ -130,18 +130,18 @@ arcnet_print(netdissect_options *ndo, const u_char *bp, u_int length, int phds,
 
 	if (ndo->ndo_qflag) {
 		ND_PRINT("%02x %02x %u: ",
-			     EXTRACT_U_1(ap->arc_shost),
-			     EXTRACT_U_1(ap->arc_dhost),
+			     GET_U_1(ap->arc_shost),
+			     GET_U_1(ap->arc_dhost),
 			     length);
 		return;
 	}
 
-	arctypename = tok2str(arctypemap, "%02x", EXTRACT_U_1(ap->arc_type));
+	arctypename = tok2str(arctypemap, "%02x", GET_U_1(ap->arc_type));
 
 	if (!phds) {
 		ND_PRINT("%02x %02x %s %u: ",
-			     EXTRACT_U_1(ap->arc_shost),
-			     EXTRACT_U_1(ap->arc_dhost),
+			     GET_U_1(ap->arc_shost),
+			     GET_U_1(ap->arc_dhost),
 			     arctypename,
 			     length);
 		return;
@@ -149,8 +149,8 @@ arcnet_print(netdissect_options *ndo, const u_char *bp, u_int length, int phds,
 
 	if (flag == 0) {
 		ND_PRINT("%02x %02x %s seqid %04x %u: ",
-			EXTRACT_U_1(ap->arc_shost),
-			EXTRACT_U_1(ap->arc_dhost),
+			GET_U_1(ap->arc_shost),
+			GET_U_1(ap->arc_dhost),
 			arctypename, seqid,
 			length);
 		return;
@@ -159,15 +159,15 @@ arcnet_print(netdissect_options *ndo, const u_char *bp, u_int length, int phds,
 	if (flag & 1)
 		ND_PRINT("%02x %02x %s seqid %04x "
 			"(first of %u fragments) %u: ",
-			EXTRACT_U_1(ap->arc_shost),
-			EXTRACT_U_1(ap->arc_dhost),
+			GET_U_1(ap->arc_shost),
+			GET_U_1(ap->arc_dhost),
 			arctypename, seqid,
 			(flag + 3) / 2, length);
 	else
 		ND_PRINT("%02x %02x %s seqid %04x "
 			"(fragment %u) %u: ",
-			EXTRACT_U_1(ap->arc_shost),
-			EXTRACT_U_1(ap->arc_dhost),
+			GET_U_1(ap->arc_shost),
+			GET_U_1(ap->arc_dhost),
 			arctypename, seqid,
 			flag/2 + 1, length);
 }
@@ -197,7 +197,7 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 	}
 
 	ap = (const struct arc_header *)p;
-	arc_type = EXTRACT_U_1(ap->arc_type);
+	arc_type = GET_U_1(ap->arc_type);
 
 	switch (arc_type) {
 	default:
@@ -219,7 +219,7 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 			return (caplen);
 		}
 
-		flag = EXTRACT_U_1(ap->arc_flag);
+		flag = GET_U_1(ap->arc_flag);
 		if (flag == 0xff) {
 			if (caplen < ARC_HDRNEWLEN_EXC) {
 				arcnet_print(ndo, p, length, 0, 0, 0);
@@ -227,11 +227,11 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 				nd_print_trunc(ndo);
 				return (caplen);
 			}
-			flag = EXTRACT_U_1(ap->arc_flag2);
-			seqid = EXTRACT_BE_U_2(ap->arc_seqid2);
+			flag = GET_U_1(ap->arc_flag2);
+			seqid = GET_BE_U_2(ap->arc_seqid2);
 			archdrlen = ARC_HDRNEWLEN_EXC;
 		} else {
-			seqid = EXTRACT_BE_U_2(ap->arc_seqid);
+			seqid = GET_BE_U_2(ap->arc_seqid);
 			archdrlen = ARC_HDRNEWLEN;
 		}
 	}
@@ -287,7 +287,7 @@ arcnet_linux_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, cons
 	}
 
 	ap = (const struct arc_linux_header *)p;
-	arc_type = EXTRACT_U_1(ap->arc_type);
+	arc_type = GET_U_1(ap->arc_type);
 
 	switch (arc_type) {
 	default:

@@ -245,8 +245,8 @@ olsr_print_lq_neighbor4(netdissect_options *ndo,
         ND_PRINT("\n\t      neighbor %s, link-quality %.2f%%"
                ", neighbor-link-quality %.2f%%",
                ipaddr_string(ndo, lq_neighbor->neighbor),
-               ((double)EXTRACT_U_1(lq_neighbor->link_quality)/2.55),
-               ((double)EXTRACT_U_1(lq_neighbor->neighbor_link_quality)/2.55));
+               ((double) GET_U_1(lq_neighbor->link_quality)/2.55),
+               ((double) GET_U_1(lq_neighbor->neighbor_link_quality)/2.55));
 
         msg_data += sizeof(struct olsr_lq_neighbor4);
         hello_len -= sizeof(struct olsr_lq_neighbor4);
@@ -270,8 +270,8 @@ olsr_print_lq_neighbor6(netdissect_options *ndo,
         ND_PRINT("\n\t      neighbor %s, link-quality %.2f%%"
                ", neighbor-link-quality %.2f%%",
                ip6addr_string(ndo, lq_neighbor->neighbor),
-               ((double)EXTRACT_U_1(lq_neighbor->link_quality)/2.55),
-               ((double)EXTRACT_U_1(lq_neighbor->neighbor_link_quality)/2.55));
+               ((double) GET_U_1(lq_neighbor->link_quality)/2.55),
+               ((double) GET_U_1(lq_neighbor->neighbor_link_quality)/2.55));
 
         msg_data += sizeof(struct olsr_lq_neighbor6);
         hello_len -= sizeof(struct olsr_lq_neighbor6);
@@ -340,11 +340,11 @@ olsr_print(netdissect_options *ndo,
     ND_TCHECK_LEN(tptr, sizeof(struct olsr_common));
 
     ptr.common = (const struct olsr_common *)tptr;
-    length = min(length, EXTRACT_BE_U_2(ptr.common->packet_len));
+    length = min(length, GET_BE_U_2(ptr.common->packet_len));
 
     ND_PRINT("OLSRv%i, seq 0x%04x, length %u",
             (is_ipv6 == 0) ? 4 : 6,
-            EXTRACT_BE_U_2(ptr.common->packet_seq),
+            GET_BE_U_2(ptr.common->packet_seq),
             length);
 
     tptr += sizeof(struct olsr_common);
@@ -368,8 +368,8 @@ olsr_print(netdissect_options *ndo,
         {
             ND_TCHECK_LEN(tptr, sizeof(struct olsr_msg6));
             msgptr.v6 = (const struct olsr_msg6 *) tptr;
-            msg_type = EXTRACT_U_1(msgptr.v6->msg_type);
-            msg_len = EXTRACT_BE_U_2(msgptr.v6->msg_len);
+            msg_type = GET_U_1(msgptr.v6->msg_type);
+            msg_len = GET_BE_U_2(msgptr.v6->msg_len);
             if ((msg_len >= sizeof (struct olsr_msg6))
                     && (msg_len <= length))
                 msg_len_valid = 1;
@@ -383,10 +383,10 @@ olsr_print(netdissect_options *ndo,
                     "\n\t  vtime %.3fs, msg-seq 0x%04x, length %u%s",
                     tok2str(olsr_msg_values, "Unknown", msg_type),
                     msg_type, ip6addr_string(ndo, msgptr.v6->originator),
-                    EXTRACT_U_1(msgptr.v6->ttl),
-                    EXTRACT_U_1(msgptr.v6->hopcount),
-                    ME_TO_DOUBLE(EXTRACT_U_1(msgptr.v6->vtime)),
-                    EXTRACT_BE_U_2(msgptr.v6->msg_seq),
+                    GET_U_1(msgptr.v6->ttl),
+                    GET_U_1(msgptr.v6->hopcount),
+                    ME_TO_DOUBLE(GET_U_1(msgptr.v6->vtime)),
+                    GET_BE_U_2(msgptr.v6->msg_seq),
                     msg_len, (msg_len_valid == 0) ? " (invalid)" : "");
             if (!msg_len_valid) {
                 return;
@@ -399,8 +399,8 @@ olsr_print(netdissect_options *ndo,
         {
             ND_TCHECK_LEN(tptr, sizeof(struct olsr_msg4));
             msgptr.v4 = (const struct olsr_msg4 *) tptr;
-            msg_type = EXTRACT_U_1(msgptr.v4->msg_type);
-            msg_len = EXTRACT_BE_U_2(msgptr.v4->msg_len);
+            msg_type = GET_U_1(msgptr.v4->msg_type);
+            msg_len = GET_BE_U_2(msgptr.v4->msg_len);
             if ((msg_len >= sizeof (struct olsr_msg4))
                     && (msg_len <= length))
                 msg_len_valid = 1;
@@ -414,10 +414,10 @@ olsr_print(netdissect_options *ndo,
                     "\n\t  vtime %.3fs, msg-seq 0x%04x, length %u%s",
                     tok2str(olsr_msg_values, "Unknown", msg_type),
                     msg_type, ipaddr_string(ndo, msgptr.v4->originator),
-                    EXTRACT_U_1(msgptr.v4->ttl),
-                    EXTRACT_U_1(msgptr.v4->hopcount),
-                    ME_TO_DOUBLE(EXTRACT_U_1(msgptr.v4->vtime)),
-                    EXTRACT_BE_U_2(msgptr.v4->msg_seq),
+                    GET_U_1(msgptr.v4->ttl),
+                    GET_U_1(msgptr.v4->hopcount),
+                    ME_TO_DOUBLE(GET_U_1(msgptr.v4->vtime)),
+                    GET_BE_U_2(msgptr.v4->msg_seq),
                     msg_len, (msg_len_valid == 0) ? " (invalid)" : "");
             if (!msg_len_valid) {
                 return;
@@ -436,8 +436,8 @@ olsr_print(netdissect_options *ndo,
 
             ptr.hello = (const struct olsr_hello *)msg_data;
             ND_PRINT("\n\t  hello-time %.3fs, MPR willingness %u",
-                   ME_TO_DOUBLE(EXTRACT_U_1(ptr.hello->htime)),
-                   EXTRACT_U_1(ptr.hello->will));
+                   ME_TO_DOUBLE(GET_U_1(ptr.hello->htime)),
+                   GET_U_1(ptr.hello->will));
             msg_data += sizeof(struct olsr_hello);
             msg_tlen -= sizeof(struct olsr_hello);
 
@@ -451,9 +451,9 @@ olsr_print(netdissect_options *ndo,
 
                 ptr.hello_link = (const struct olsr_hello_link *)msg_data;
 
-                hello_len = EXTRACT_BE_U_2(ptr.hello_link->len);
-                link_type = OLSR_EXTRACT_LINK_TYPE(EXTRACT_U_1(ptr.hello_link->link_code));
-                neighbor_type = OLSR_EXTRACT_NEIGHBOR_TYPE(EXTRACT_U_1(ptr.hello_link->link_code));
+                hello_len = GET_BE_U_2(ptr.hello_link->len);
+                link_type = OLSR_EXTRACT_LINK_TYPE(GET_U_1(ptr.hello_link->link_code));
+                neighbor_type = OLSR_EXTRACT_NEIGHBOR_TYPE(GET_U_1(ptr.hello_link->link_code));
 
                 if ((hello_len <= msg_tlen)
                         && (hello_len >= sizeof(struct olsr_hello_link)))
@@ -499,7 +499,7 @@ olsr_print(netdissect_options *ndo,
 
             ptr.tc = (const struct olsr_tc *)msg_data;
             ND_PRINT("\n\t    advertised neighbor seq 0x%04x",
-                   EXTRACT_BE_U_2(ptr.tc->ans_seq));
+                   GET_BE_U_2(ptr.tc->ans_seq));
             msg_data += sizeof(struct olsr_tc);
             msg_tlen -= sizeof(struct olsr_tc);
 
@@ -609,7 +609,7 @@ olsr_print(netdissect_options *ndo,
                         ND_PRINT("%s%s/%u",
                                 col == 0 ? "\n\t    " : ", ",
                                 ipaddr_string(ndo, ptr.hna->network),
-                                mask2plen(EXTRACT_BE_U_4(ptr.hna->mask)));
+                                mask2plen(GET_BE_U_4(ptr.hna->mask)));
                     }
 
                     msg_data += sizeof(struct olsr_hna4);
@@ -631,7 +631,7 @@ olsr_print(netdissect_options *ndo,
                 goto trunc;
             ND_TCHECK_4(msg_data);
 
-            name_entries = EXTRACT_BE_U_2(msg_data + 2);
+            name_entries = GET_BE_U_2(msg_data + 2);
             addr_size = 4;
             if (is_ipv6)
                 addr_size = 16;
@@ -642,7 +642,7 @@ olsr_print(netdissect_options *ndo,
                 name_entries_valid = 1;
 
             ND_PRINT("\n\t  Version %u, Entries %u%s",
-                   EXTRACT_BE_U_2(msg_data),
+                   GET_BE_U_2(msg_data),
                    name_entries, (name_entries_valid == 0) ? " (invalid)" : "");
 
             if (name_entries_valid == 0)
@@ -658,8 +658,8 @@ olsr_print(netdissect_options *ndo,
                     break;
                 ND_TCHECK_4(msg_data);
 
-                name_entry_type = EXTRACT_BE_U_2(msg_data);
-                name_entry_len = EXTRACT_BE_U_2(msg_data + 2);
+                name_entry_type = GET_BE_U_2(msg_data);
+                name_entry_len = GET_BE_U_2(msg_data + 2);
 
                 msg_data += 4;
                 msg_tlen -= 4;

@@ -111,18 +111,18 @@ static void
 nflog_hdr_print(netdissect_options *ndo, const nflog_hdr_t *hdr, u_int length)
 {
 	ND_PRINT("version %u, resource ID %u",
-	    EXTRACT_U_1(hdr->nflog_version), EXTRACT_BE_U_2(hdr->nflog_rid));
+	    GET_U_1(hdr->nflog_version), GET_BE_U_2(hdr->nflog_rid));
 
 	if (!ndo->ndo_qflag) {
 		ND_PRINT(", family %s (%u)",
 			 tok2str(nflog_values, "Unknown",
-				 EXTRACT_U_1(hdr->nflog_family)),
-			 EXTRACT_U_1(hdr->nflog_family));
+				 GET_U_1(hdr->nflog_family)),
+			 GET_U_1(hdr->nflog_family));
 		} else {
 		ND_PRINT(", %s",
 			 tok2str(nflog_values,
 				 "Unknown NFLOG (0x%02x)",
-			 EXTRACT_U_1(hdr->nflog_family)));
+			 GET_U_1(hdr->nflog_family)));
 		}
 
 	ND_PRINT(", length %u: ", length);
@@ -143,8 +143,8 @@ nflog_if_print(netdissect_options *ndo,
 		goto trunc;
 
 	ND_TCHECK_SIZE(hdr);
-	if (EXTRACT_U_1(hdr->nflog_version) != 0) {
-		ND_PRINT("version %u (unknown)", EXTRACT_U_1(hdr->nflog_version));
+	if (GET_U_1(hdr->nflog_version) != 0) {
+		ND_PRINT("version %u (unknown)", GET_U_1(hdr->nflog_version));
 		return h_size;
 	}
 
@@ -164,7 +164,7 @@ nflog_if_print(netdissect_options *ndo,
 
 		tlv = (const nflog_tlv_t *) p;
 		ND_TCHECK_SIZE(tlv);
-		size = EXTRACT_HE_U_2(tlv->tlv_length);
+		size = GET_HE_U_2(tlv->tlv_length);
 		if (size % 4 != 0)
 			size += 4 - size % 4;
 
@@ -176,7 +176,7 @@ nflog_if_print(netdissect_options *ndo,
 		if (caplen < size)
 			goto trunc;	/* No. */
 
-		if (EXTRACT_HE_U_2(tlv->tlv_type) == NFULA_PAYLOAD) {
+		if (GET_HE_U_2(tlv->tlv_type) == NFULA_PAYLOAD) {
 			/*
 			 * This TLV's data is the packet payload.
 			 * Skip past the TLV header, and break out
@@ -195,7 +195,7 @@ nflog_if_print(netdissect_options *ndo,
 		caplen -= size;
 	}
 
-	switch (EXTRACT_U_1(hdr->nflog_family)) {
+	switch (GET_U_1(hdr->nflog_family)) {
 
 	case AF_INET:
 		ip_print(ndo, p, length);

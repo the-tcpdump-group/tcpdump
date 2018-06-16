@@ -79,7 +79,7 @@ dvmrp_print(netdissect_options *ndo,
 		return;
 
 	ND_TCHECK_1(bp + 1);
-	type = EXTRACT_U_1(bp + 1);
+	type = GET_U_1(bp + 1);
 
 	/* Skip IGMP header */
 	bp += 8;
@@ -124,8 +124,8 @@ dvmrp_print(netdissect_options *ndo,
 		 */
 		bp -= 4;
 		ND_TCHECK_4(bp);
-		major_version = EXTRACT_U_1(bp + 3);
-		minor_version = EXTRACT_U_1(bp + 2);
+		major_version = GET_U_1(bp + 3);
+		minor_version = GET_U_1(bp + 2);
 		bp += 4;
 		if (print_neighbors2(ndo, bp, ep, len, major_version,
 		    minor_version) < 0)
@@ -176,14 +176,14 @@ print_report(netdissect_options *ndo,
 			return (0);
 		}
 		ND_TCHECK_3(bp);
-		mask = (uint32_t)0xff << 24 | EXTRACT_U_1(bp) << 16 |
-			EXTRACT_U_1(bp + 1) << 8 | EXTRACT_U_1(bp + 2);
+		mask = (uint32_t)0xff << 24 | GET_U_1(bp) << 16 |
+			GET_U_1(bp + 1) << 8 | GET_U_1(bp + 2);
 		width = 1;
-		if (EXTRACT_U_1(bp))
+		if (GET_U_1(bp))
 			width = 2;
-		if (EXTRACT_U_1(bp + 1))
+		if (GET_U_1(bp + 1))
 			width = 3;
-		if (EXTRACT_U_1(bp + 2))
+		if (GET_U_1(bp + 2))
 			width = 4;
 
 		ND_PRINT("\n\tMask %s", intoa(htonl(mask)));
@@ -201,14 +201,14 @@ print_report(netdissect_options *ndo,
 			origin = 0;
 			for (i = 0; i < width; ++i) {
 				ND_TCHECK_1(bp);
-				origin = origin << 8 | EXTRACT_U_1(bp);
+				origin = origin << 8 | GET_U_1(bp);
 				bp++;
 			}
 			for ( ; i < 4; ++i)
 				origin <<= 8;
 
 			ND_TCHECK_1(bp);
-			metric = EXTRACT_U_1(bp);
+			metric = GET_U_1(bp);
 			bp++;
 			done = metric & 0x80;
 			metric &= 0x7f;
@@ -235,7 +235,7 @@ print_probe(netdissect_options *ndo,
 		ND_PRINT(" [|}");
 		return (0);
 	}
-	genid = EXTRACT_BE_U_4(bp);
+	genid = GET_BE_U_4(bp);
 	bp += 4;
 	len -= 4;
 	ND_PRINT(ndo->ndo_vflag > 1 ? "\n\t" : " ");
@@ -267,11 +267,11 @@ print_neighbors(netdissect_options *ndo,
 		ND_TCHECK_7(bp);
 		laddr = bp;
 		bp += 4;
-		metric = EXTRACT_U_1(bp);
+		metric = GET_U_1(bp);
 		bp++;
-		thresh = EXTRACT_U_1(bp);
+		thresh = GET_U_1(bp);
 		bp++;
-		ncount = EXTRACT_U_1(bp);
+		ncount = GET_U_1(bp);
 		bp++;
 		len -= 7;
 		while (--ncount >= 0) {
@@ -304,13 +304,13 @@ print_neighbors2(netdissect_options *ndo,
 		ND_TCHECK_8(bp);
 		laddr = bp;
 		bp += 4;
-		metric = EXTRACT_U_1(bp);
+		metric = GET_U_1(bp);
 		bp++;
-		thresh = EXTRACT_U_1(bp);
+		thresh = GET_U_1(bp);
 		bp++;
-		flags = EXTRACT_U_1(bp);
+		flags = GET_U_1(bp);
 		bp++;
-		ncount = EXTRACT_U_1(bp);
+		ncount = GET_U_1(bp);
 		bp++;
 		len -= 8;
 		while (--ncount >= 0 && (len >= 4) && (bp + 4) <= ep) {
@@ -349,7 +349,7 @@ print_prune(netdissect_options *ndo,
 	ND_PRINT(" src %s grp %s", ipaddr_string(ndo, bp), ipaddr_string(ndo, bp + 4));
 	bp += 8;
 	ND_PRINT(" timer ");
-	unsigned_relts_print(ndo, EXTRACT_BE_U_4(bp));
+	unsigned_relts_print(ndo, GET_BE_U_4(bp));
 	return (0);
 trunc:
 	return (-1);

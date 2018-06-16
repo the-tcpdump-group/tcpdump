@@ -76,10 +76,10 @@ sunatm_if_print(netdissect_options *ndo,
 	}
 
 	if (ndo->ndo_eflag) {
-		ND_PRINT(EXTRACT_U_1(p + DIR_POS) & 0x80 ? "Tx: " : "Rx: ");
+		ND_PRINT(GET_U_1(p + DIR_POS) & 0x80 ? "Tx: " : "Rx: ");
 	}
 
-	switch (EXTRACT_U_1(p + DIR_POS) & 0x0f) {
+	switch (GET_U_1(p + DIR_POS) & 0x0f) {
 
 	case PT_LANE:
 		traftype = ATM_LANE;
@@ -94,8 +94,8 @@ sunatm_if_print(netdissect_options *ndo,
 		break;
 	}
 
-	vci = EXTRACT_BE_U_2(p + VCI_POS);
-	vpi = EXTRACT_U_1(p + VPI_POS);
+	vci = GET_BE_U_2(p + VCI_POS);
+	vpi = GET_U_1(p + VPI_POS);
 
 	p += PKT_BEGIN_POS;
 	caplen -= PKT_BEGIN_POS;

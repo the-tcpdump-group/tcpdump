@@ -99,30 +99,30 @@ timed_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "timed";
 	ND_TCHECK_1(tsp->tsp_type);
-	tsp_type = EXTRACT_U_1(tsp->tsp_type);
+	tsp_type = GET_U_1(tsp->tsp_type);
 	if (tsp_type < TSPTYPENUMBER)
 		ND_PRINT("TSP_%s", tsptype[tsp_type]);
 	else
 		ND_PRINT("(tsp_type %#x)", tsp_type);
 
 	ND_TCHECK_1(tsp->tsp_vers);
-	ND_PRINT(" vers %u", EXTRACT_U_1(tsp->tsp_vers));
+	ND_PRINT(" vers %u", GET_U_1(tsp->tsp_vers));
 
 	ND_TCHECK_2(tsp->tsp_seq);
-	ND_PRINT(" seq %u", EXTRACT_BE_U_2(tsp->tsp_seq));
+	ND_PRINT(" seq %u", GET_BE_U_2(tsp->tsp_seq));
 
 	switch (tsp_type) {
 	case TSP_LOOP:
 		ND_TCHECK_1(tsp->tsp_hopcnt);
-		ND_PRINT(" hopcnt %u", EXTRACT_U_1(tsp->tsp_hopcnt));
+		ND_PRINT(" hopcnt %u", GET_U_1(tsp->tsp_hopcnt));
 		break;
 	case TSP_SETTIME:
 	case TSP_ADJTIME:
 	case TSP_SETDATE:
 	case TSP_SETDATEREQ:
 		ND_TCHECK_8(&tsp->tsp_time);
-		sec = EXTRACT_BE_S_4(tsp->tsp_time.tv_sec);
-		usec = EXTRACT_BE_S_4(tsp->tsp_time.tv_usec);
+		sec = GET_BE_S_4(tsp->tsp_time.tv_sec);
+		usec = GET_BE_S_4(tsp->tsp_time.tv_usec);
 		/* XXX The comparison below is always false? */
 		if (usec < 0)
 			/* invalid, skip the rest of the packet */

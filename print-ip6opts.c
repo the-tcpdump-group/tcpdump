@@ -48,18 +48,18 @@ ip6_sopt_print(netdissect_options *ndo, const u_char *bp, int len)
     int optlen;
 
     for (i = 0; i < len; i += optlen) {
-	if (EXTRACT_U_1(bp + i) == IP6OPT_PAD1)
+	if (GET_U_1(bp + i) == IP6OPT_PAD1)
 	    optlen = 1;
 	else {
 	    if (i + 1 < len)
-		optlen = EXTRACT_U_1(bp + i + 1) + 2;
+		optlen = GET_U_1(bp + i + 1) + 2;
 	    else
 		goto trunc;
 	}
 	if (i + optlen > len)
 	    goto trunc;
 
-	switch (EXTRACT_U_1(bp + i)) {
+	switch (GET_U_1(bp + i)) {
 	case IP6OPT_PAD1:
             ND_PRINT(", pad1");
 	    break;
@@ -72,10 +72,11 @@ ip6_sopt_print(netdissect_options *ndo, const u_char *bp, int len)
 	    break;
 	default:
 	    if (len - i < IP6OPT_MINLEN) {
-		ND_PRINT(", sopt_type %u: trunc)", EXTRACT_U_1(bp + i));
+		ND_PRINT(", sopt_type %u: trunc)", GET_U_1(bp + i));
 		goto trunc;
 	    }
-	    ND_PRINT(", sopt_type 0x%02x: len=%u", EXTRACT_U_1(bp + i), EXTRACT_U_1(bp + i + 1));
+	    ND_PRINT(", sopt_type 0x%02x: len=%u", GET_U_1(bp + i),
+                     GET_U_1(bp + i + 1));
 	    break;
 	}
     }
@@ -94,18 +95,18 @@ ip6_opt_print(netdissect_options *ndo, const u_char *bp, int len)
     if (len == 0)
         return 0;
     for (i = 0; i < len; i += optlen) {
-	if (EXTRACT_U_1(bp + i) == IP6OPT_PAD1)
+	if (GET_U_1(bp + i) == IP6OPT_PAD1)
 	    optlen = 1;
 	else {
 	    if (i + 1 < len)
-		optlen = EXTRACT_U_1(bp + i + 1) + 2;
+		optlen = GET_U_1(bp + i + 1) + 2;
 	    else
 		goto trunc;
 	}
 	if (i + optlen > len)
 	    goto trunc;
 
-	switch (EXTRACT_U_1(bp + i)) {
+	switch (GET_U_1(bp + i)) {
 	case IP6OPT_PAD1:
             ND_PRINT("(pad1)");
 	    break;
@@ -121,34 +122,34 @@ ip6_opt_print(netdissect_options *ndo, const u_char *bp, int len)
 		ND_PRINT("(rtalert: trunc)");
 		goto trunc;
 	    }
-	    if (EXTRACT_U_1(bp + i + 1) != IP6OPT_RTALERT_LEN - 2) {
-		ND_PRINT("(rtalert: invalid len %u)", EXTRACT_U_1(bp + i + 1));
+	    if (GET_U_1(bp + i + 1) != IP6OPT_RTALERT_LEN - 2) {
+		ND_PRINT("(rtalert: invalid len %u)", GET_U_1(bp + i + 1));
 		goto trunc;
 	    }
-	    ND_PRINT("(rtalert: 0x%04x) ", EXTRACT_BE_U_2(bp + i + 2));
+	    ND_PRINT("(rtalert: 0x%04x) ", GET_BE_U_2(bp + i + 2));
 	    break;
 	case IP6OPT_JUMBO:
 	    if (len - i < IP6OPT_JUMBO_LEN) {
 		ND_PRINT("(jumbo: trunc)");
 		goto trunc;
 	    }
-	    if (EXTRACT_U_1(bp + i + 1) != IP6OPT_JUMBO_LEN - 2) {
-		ND_PRINT("(jumbo: invalid len %u)", EXTRACT_U_1(bp + i + 1));
+	    if (GET_U_1(bp + i + 1) != IP6OPT_JUMBO_LEN - 2) {
+		ND_PRINT("(jumbo: invalid len %u)", GET_U_1(bp + i + 1));
 		goto trunc;
 	    }
-	    ND_PRINT("(jumbo: %u) ", EXTRACT_BE_U_4(bp + i + 2));
+	    ND_PRINT("(jumbo: %u) ", GET_BE_U_4(bp + i + 2));
 	    break;
         case IP6OPT_HOME_ADDRESS:
 	    if (len - i < IP6OPT_HOMEADDR_MINLEN) {
 		ND_PRINT("(homeaddr: trunc)");
 		goto trunc;
 	    }
-	    if (EXTRACT_U_1(bp + i + 1) < IP6OPT_HOMEADDR_MINLEN - 2) {
-		ND_PRINT("(homeaddr: invalid len %u)", EXTRACT_U_1(bp + i + 1));
+	    if (GET_U_1(bp + i + 1) < IP6OPT_HOMEADDR_MINLEN - 2) {
+		ND_PRINT("(homeaddr: invalid len %u)", GET_U_1(bp + i + 1));
 		goto trunc;
 	    }
 	    ND_PRINT("(homeaddr: %s", ip6addr_string(ndo, bp + i + 2));
-	    if (EXTRACT_U_1(bp + i + 1) > IP6OPT_HOMEADDR_MINLEN - 2) {
+	    if (GET_U_1(bp + i + 1) > IP6OPT_HOMEADDR_MINLEN - 2) {
 		if (ip6_sopt_print(ndo, bp + i + IP6OPT_HOMEADDR_MINLEN,
 				   (optlen - IP6OPT_HOMEADDR_MINLEN)) == -1)
 			goto trunc;
@@ -157,10 +158,11 @@ ip6_opt_print(netdissect_options *ndo, const u_char *bp, int len)
 	    break;
 	default:
 	    if (len - i < IP6OPT_MINLEN) {
-		ND_PRINT("(type %u: trunc)", EXTRACT_U_1(bp + i));
+		ND_PRINT("(type %u: trunc)", GET_U_1(bp + i));
 		goto trunc;
 	    }
-	    ND_PRINT("(opt_type 0x%02x: len=%u)", EXTRACT_U_1(bp + i), EXTRACT_U_1(bp + i + 1));
+	    ND_PRINT("(opt_type 0x%02x: len=%u)", GET_U_1(bp + i),
+                     GET_U_1(bp + i + 1));
 	    break;
 	}
     }
@@ -179,7 +181,7 @@ hbhopt_print(netdissect_options *ndo, const u_char *bp)
 
     ndo->ndo_protocol = "hbhopt";
     ND_TCHECK_1(dp->ip6h_len);
-    hbhlen = (EXTRACT_U_1(dp->ip6h_len) + 1) << 3;
+    hbhlen = (GET_U_1(dp->ip6h_len) + 1) << 3;
     ND_TCHECK_LEN(dp, hbhlen);
     ND_PRINT("HBH ");
     if (ndo->ndo_vflag)
@@ -201,7 +203,7 @@ dstopt_print(netdissect_options *ndo, const u_char *bp)
 
     ndo->ndo_protocol = "dstopt";
     ND_TCHECK_1(dp->ip6d_len);
-    dstoptlen = (EXTRACT_U_1(dp->ip6d_len) + 1) << 3;
+    dstoptlen = (GET_U_1(dp->ip6d_len) + 1) << 3;
     ND_TCHECK_LEN(dp, dstoptlen);
     ND_PRINT("DSTOPT ");
     if (ndo->ndo_vflag) {

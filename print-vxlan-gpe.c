@@ -69,13 +69,13 @@ vxlan_gpe_print(netdissect_options *ndo, const u_char *bp, u_int len)
 
     ND_TCHECK_LEN(bp, VXLAN_GPE_HDR_LEN);
 
-    flags = EXTRACT_U_1(bp);
+    flags = GET_U_1(bp);
     bp += 3;
 
-    next_protocol = EXTRACT_U_1(bp);
+    next_protocol = GET_U_1(bp);
     bp += 1;
 
-    vni = EXTRACT_BE_U_3(bp);
+    vni = GET_BE_U_3(bp);
     bp += 4;
 
     ND_PRINT("VXLAN-GPE, ");

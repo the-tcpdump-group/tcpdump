@@ -184,7 +184,7 @@ lwapp_control_print(netdissect_options *ndo,
         lwapp_trans_header = (const struct lwapp_transport_header *)pptr;
     }
     ND_TCHECK_SIZE(lwapp_trans_header);
-    version = EXTRACT_U_1(lwapp_trans_header->version);
+    version = GET_U_1(lwapp_trans_header->version);
 
     /*
      * Sanity checking of the header.
@@ -206,14 +206,14 @@ lwapp_control_print(netdissect_options *ndo,
     }
 
     /* ok they seem to want to know everything - lets fully decode it */
-    tlen=EXTRACT_BE_U_2(lwapp_trans_header->length);
+    tlen=GET_BE_U_2(lwapp_trans_header->length);
 
     ND_PRINT("LWAPPv%u, %s frame, Radio-id %u, Flags [%s], Frag-id %u, length %u",
            LWAPP_EXTRACT_VERSION(version),
            LWAPP_EXTRACT_CONTROL_BIT(version) ? "Control" : "Data",
            LWAPP_EXTRACT_RID(version),
            bittok2str(lwapp_header_bits_values,"none",version&0x07),
-	   EXTRACT_U_1(lwapp_trans_header->frag_id),
+	   GET_U_1(lwapp_trans_header->frag_id),
 	   tlen);
 
     if (has_ap_ident) {
@@ -233,20 +233,20 @@ lwapp_control_print(netdissect_options *ndo,
         }
 
         lwapp_control_header = (const struct lwapp_control_header *)tptr;
-	msg_tlen = EXTRACT_BE_U_2(lwapp_control_header->len);
+	msg_tlen = GET_BE_U_2(lwapp_control_header->len);
         if (tlen < sizeof(struct lwapp_control_header) + msg_tlen) {
             ND_PRINT("\n\t  Msg goes past end of PDU");
             break;
         }
 
 	/* print message header */
-	msg_type = EXTRACT_U_1(lwapp_control_header->msg_type);
+	msg_type = GET_U_1(lwapp_control_header->msg_type);
         ND_PRINT("\n\t  Msg type: %s (%u), Seqnum: %u, Msg len: %u, Session: 0x%08x",
                tok2str(lwapp_msg_type_values,"Unknown",msg_type),
                msg_type,
-               EXTRACT_U_1(lwapp_control_header->seq_num),
+               GET_U_1(lwapp_control_header->seq_num),
                msg_tlen,
-               EXTRACT_BE_U_4(lwapp_control_header->session_id));
+               GET_BE_U_4(lwapp_control_header->session_id));
 
         /* did we capture enough for fully decoding the message */
         ND_TCHECK_LEN(tptr, msg_tlen);
@@ -313,7 +313,7 @@ lwapp_data_print(netdissect_options *ndo,
     ND_TCHECK_6(tptr);
     lwapp_trans_header = (const struct lwapp_transport_header *)pptr;
     ND_TCHECK_SIZE(lwapp_trans_header);
-    version = EXTRACT_U_1(lwapp_trans_header->version);
+    version = GET_U_1(lwapp_trans_header->version);
 
     /*
      * Sanity checking of the header.
@@ -335,7 +335,7 @@ lwapp_data_print(netdissect_options *ndo,
     }
 
     /* ok they seem to want to know everything - lets fully decode it */
-    tlen=EXTRACT_BE_U_2(lwapp_trans_header->length);
+    tlen=GET_BE_U_2(lwapp_trans_header->length);
     if (tlen < sizeof(struct lwapp_transport_header)) {
         ND_PRINT("LWAPPv%u, %s frame, Radio-id  %u, Flags [%s], length %u < transport header length",
                LWAPP_EXTRACT_VERSION(version),
@@ -351,7 +351,7 @@ lwapp_data_print(netdissect_options *ndo,
            LWAPP_EXTRACT_CONTROL_BIT(version) ? "Control" : "Data",
            LWAPP_EXTRACT_RID(version),
            bittok2str(lwapp_header_bits_values,"none",version&0x07),
-           EXTRACT_U_1(lwapp_trans_header->frag_id),
+           GET_U_1(lwapp_trans_header->frag_id),
            tlen);
 
     tptr+=sizeof(struct lwapp_transport_header);

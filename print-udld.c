@@ -106,14 +106,14 @@ udld_print(netdissect_options *ndo, const u_char *pptr, u_int length)
 
     ND_TCHECK_LEN(tptr, UDLD_HEADER_LEN);
 
-    code = UDLD_EXTRACT_OPCODE(EXTRACT_U_1(tptr));
+    code = UDLD_EXTRACT_OPCODE(GET_U_1(tptr));
 
     ND_PRINT("UDLDv%u, Code %s (%x), Flags [%s] (0x%02x), length %u",
-           UDLD_EXTRACT_VERSION(EXTRACT_U_1(tptr)),
+           UDLD_EXTRACT_VERSION(GET_U_1(tptr)),
            tok2str(udld_code_values, "Reserved", code),
            code,
-           bittok2str(udld_flags_values, "none", EXTRACT_U_1((tptr + 1))),
-           EXTRACT_U_1((tptr + 1)),
+           bittok2str(udld_flags_values, "none", GET_U_1((tptr + 1))),
+           GET_U_1((tptr + 1)),
            length);
 
     /*
@@ -123,15 +123,15 @@ udld_print(netdissect_options *ndo, const u_char *pptr, u_int length)
 	return;
     }
 
-    ND_PRINT("\n\tChecksum 0x%04x (unverified)", EXTRACT_BE_U_2(tptr + 2));
+    ND_PRINT("\n\tChecksum 0x%04x (unverified)", GET_BE_U_2(tptr + 2));
 
     tptr += UDLD_HEADER_LEN;
 
     while (tptr < (pptr+length)) {
 
         ND_TCHECK_4(tptr);
-	type = EXTRACT_BE_U_2(tptr);
-        len  = EXTRACT_BE_U_2(tptr + 2);
+	type = GET_BE_U_2(tptr);
+        len  = GET_BE_U_2(tptr + 2);
 
         ND_PRINT("\n\t%s (0x%04x) TLV, length %u",
                tok2str(udld_tlv_values, "Unknown", type),
@@ -166,13 +166,13 @@ udld_print(netdissect_options *ndo, const u_char *pptr, u_int length)
         case UDLD_TIMEOUT_INTERVAL_TLV:
             if (len != 1)
                 goto invalid;
-            ND_PRINT(", %us", (EXTRACT_U_1(tptr)));
+            ND_PRINT(", %us", (GET_U_1(tptr)));
             break;
 
         case UDLD_SEQ_NUMBER_TLV:
             if (len != 4)
                 goto invalid;
-            ND_PRINT(", %u", EXTRACT_BE_U_4(tptr));
+            ND_PRINT(", %u", GET_BE_U_4(tptr));
             break;
 
         default:
