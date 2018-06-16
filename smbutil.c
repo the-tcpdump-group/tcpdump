@@ -235,11 +235,11 @@ name_len(netdissect_options *ndo,
     c = EXTRACT_U_1(s);
     if ((c & 0xC0) == 0xC0)
 	return(2);
-    while (*s) {
+    while (EXTRACT_U_1(s)) {
 	if (s >= maxbuf)
 	    return(-1);	/* name goes past the end of the buffer */
 	ND_TCHECK_1(s);
-	s += (*s) + 1;
+	s += EXTRACT_U_1(s) + 1;
 	ND_TCHECK_1(s);
     }
     return(PTR_DIFF(s, s0) + 1);
