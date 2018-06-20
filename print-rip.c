@@ -189,6 +189,7 @@ rip_entry_print_v1(netdissect_options *ndo, const u_char *p,
 	/* RFC 1058 */
 	if (remaining < RIP_ROUTELEN)
 		return (0);
+	ND_TCHECK_SIZE(ni);
 	family = EXTRACT_BE_U_2(ni->rip_family);
 	if (family != BSD_AFNUM_INET && family != 0) {
 		ND_PRINT("\n\t AFI %s, ", tok2str(bsd_af_values, "Unknown (%u)", family));
@@ -212,6 +213,8 @@ rip_entry_print_v1(netdissect_options *ndo, const u_char *p,
                ipaddr_string(ndo, ni->rip_dest),
                EXTRACT_BE_U_4(ni->rip_metric));
 	return (RIP_ROUTELEN);
+trunc:
+	return 0;
 }
 
 static unsigned
@@ -224,6 +227,7 @@ rip_entry_print_v2(netdissect_options *ndo, const u_char *p,
 
 	if (remaining < sizeof(*eh))
 		return (0);
+	ND_TCHECK_SIZE(eh);
 	family = EXTRACT_BE_U_2(eh->rip_family);
 	if (family == 0xFFFF) { /* variable-sized authentication structures */
 		uint16_t auth_type = EXTRACT_BE_U_2(eh->rip_tag);
@@ -238,6 +242,7 @@ rip_entry_print_v2(netdissect_options *ndo, const u_char *p,
 			const struct rip_auth_crypto_v2 *ch;
 
 			ch = (const struct rip_auth_crypto_v2 *)p;
+			ND_TCHECK_SIZE(ch);
 			if (remaining < sizeof(*ch))
 				return (0);
 			ND_PRINT("\n\t  Auth header:");
@@ -262,6 +267,7 @@ rip_entry_print_v2(netdissect_options *ndo, const u_char *p,
                 print_unknown_data(ndo, p + sizeof(*eh), "\n\t  ", RIP_ROUTELEN - sizeof(*eh));
 	} else { /* BSD_AFNUM_INET or AFI 0 */
 		ni = (const struct rip_netinfo_v2 *)p;
+		ND_TCHECK_SIZE(ni);
 		if (remaining < sizeof(*ni))
 			return (0);
 		ND_PRINT("\n\t  AFI %s, %15s/%-2d, tag 0x%04x, metric: %u, next-hop: ",
@@ -276,6 +282,8 @@ rip_entry_print_v2(netdissect_options *ndo, const u_char *p,
 			ND_PRINT("self");
 	}
 	return (RIP_ROUTELEN);
+trunc:
+	return 0;
 }
 
 void
@@ -304,6 +312,7 @@ rip_print(netdissect_options *ndo,
 
 	rp = (const struct rip *)dat;
 
+	ND_TCHECK_SIZE(rp);
 	vers = EXTRACT_U_1(rp->rip_vers);
 	ND_PRINT("%sRIPv%u",
                (ndo->ndo_vflag >= 1) ? "\n\t" : "",
@@ -403,4 +412,6 @@ rip_print(netdissect_options *ndo,
 		if (!print_unknown_data(ndo, (const uint8_t *)rp, "\n\t", length))
 			return;
 	}
+trunc:
+	return;
 }
