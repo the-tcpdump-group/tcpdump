@@ -361,7 +361,7 @@ bootp_print(netdissect_options *ndo,
 	if (EXTRACT_U_1(bp->bp_sname)) {
 		ND_PRINT("\n\t  sname \"");
 		if (nd_printztn(ndo, bp->bp_sname, (u_int)sizeof(bp->bp_sname),
-				ndo->ndo_snapend)) {
+				ndo->ndo_snapend) == 0) {
 			ND_PRINT("\"");
 			nd_print_trunc(ndo);
 			return;
@@ -372,7 +372,7 @@ bootp_print(netdissect_options *ndo,
 	if (EXTRACT_U_1(bp->bp_file)) {
 		ND_PRINT("\n\t  file \"");
 		if (nd_printztn(ndo, bp->bp_file, (u_int)sizeof(bp->bp_file),
-				ndo->ndo_snapend)) {
+				ndo->ndo_snapend) == 0) {
 			ND_PRINT("\"");
 			nd_print_trunc(ndo);
 			return;
