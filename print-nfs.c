@@ -420,21 +420,48 @@ parsereq(netdissect_options *ndo,
          const struct sunrpc_msg *rp, u_int length)
 {
 	const uint32_t *dp;
-	u_int len;
+	u_int len, rounded_len;
 
 	/*
-	 * find the start of the req data (if we captured it)
+	 * Find the start of the req data (if we captured it).
+	 * First, get the length of the credentials, and make sure
+	 * we have all of the opaque part of the credentials.
 	 */
 	dp = (const uint32_t *)&rp->rm_call.cb_cred;
+	if (length < 2 * sizeof(*dp))
+		goto trunc;
 	ND_TCHECK_4(dp + 1);
 	len = EXTRACT_BE_U_4(dp + 1);
-	if (len < length) {
+	rounded_len = roundup2(len, 4);
+	ND_TCHECK_LEN(dp + 2, rounded_len);
+	if (2 * sizeof(*dp) + rounded_len <= length) {
+		/*
+		 * We have all of the credentials.  Skip past them; they
+		 * consist of 4 bytes of flavor, 4 bytes of length,
+		 * and len-rounded-up-to-a-multiple-of-4 bytes of
+		 * data.
+		 */
 		dp += (len + (2 * sizeof(*dp) + 3)) / sizeof(*dp);
+		length -= 2 * sizeof(*dp) + rounded_len;
+
+		/*
+		 * Now get the length of the verifier, and make sure
+		 * we have all of the opaque part of the verifier.
+		 */
+		if (length < 2 * sizeof(*dp))
+			goto trunc;
 		ND_TCHECK_4(dp + 1);
 		len = EXTRACT_BE_U_4(dp + 1);
-		if (len < length) {
+		rounded_len = roundup2(len, 4);
+		ND_TCHECK_LEN(dp + 2, rounded_len);
+		if (2 * sizeof(*dp) + rounded_len < length) {
+			/*
+			 * We have all of the verifier.  Skip past it;
+			 * it consists of 4 bytes of flavor, 4 bytes of
+			 * length, and len-rounded-up-to-a-multiple-of-4
+			 * bytes of data.
+			 */
 			dp += (len + (2 * sizeof(*dp) + 3)) / sizeof(*dp);
-			ND_TCHECK_LEN(dp, 0);
 			return (dp);
 		}
 	}
