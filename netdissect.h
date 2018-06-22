@@ -104,6 +104,13 @@ typedef unsigned char nd_mac_addr[MAC_ADDR_LEN];
  */
 typedef unsigned char nd_byte;
 
+/*
+ * Round up x to a multiple of y; y must be a power of 2.
+ */
+#ifndef roundup2
+#define	roundup2(x, y)	(((x)+((y)-1))&(~((y)-1)))
+#endif
+
 /* nd_snprintf et al */
 
 #include <stdarg.h>

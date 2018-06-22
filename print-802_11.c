@@ -2000,11 +2000,6 @@ ieee_802_11_hdr_print(netdissect_options *ndo,
 	}
 }
 
-#ifndef roundup2
-#define	roundup2(x, y)	(((x)+((y)-1))&(~((y)-1))) /* if y is powers of two */
-#endif
-
-
 static u_int
 ieee802_11_print(netdissect_options *ndo,
                  const u_char *p, u_int length, u_int orig_caplen, int pad,
