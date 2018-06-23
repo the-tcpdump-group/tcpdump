@@ -131,6 +131,7 @@ dvmrp		mrinfo_query.pcap	dvmrp.out
 # ICMPv6
 icmpv6          icmpv6.pcap             icmpv6.out      -vv
 icmpv6_opt24-v	icmpv6_opt24.pcap	icmpv6_opt24-v.out	-v
+icmpv6-length-zero icmpv6-length-zero.pcapng icmpv6-length-zero.out
 
 # SPB tests
 spb	            spb.pcap	            spb.out
