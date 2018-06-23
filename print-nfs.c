@@ -228,6 +228,34 @@ print_nfsaddr(netdissect_options *ndo,
 	ND_PRINT("%s.%s > %s.%s: ", srcaddr, s, dstaddr, d);
 }
 
+/*
+ * NFS Version 3 sattr3 structure for the new node creation case.
+ * This does not have a fixed layout on the network, so this
+ * structure does not correspond to the layout of the data on
+ * the network; it's used to store the data when the sattr3
+ * is parsed for use when it's later printed.
+ */
+struct nfsv3_sattr {
+	uint32_t sa_modeset;
+	uint32_t sa_mode;
+	uint32_t sa_uidset;
+	uint32_t sa_uid;
+	uint32_t sa_gidset;
+	uint32_t sa_gid;
+	uint32_t sa_sizeset;
+	uint32_t sa_size;
+	uint32_t sa_atimetype;
+	struct {
+		uint32_t nfsv3_sec;
+		uint32_t nfsv3_nsec;
+	}        sa_atime;
+	uint32_t sa_mtimetype;
+	struct {
+		uint32_t nfsv3_sec;
+		uint32_t nfsv3_nsec;
+	}        sa_mtime;
+};
+
 static const uint32_t *
 parse_sattr3(netdissect_options *ndo,
              const uint32_t *dp, struct nfsv3_sattr *sa3)
@@ -1113,7 +1141,7 @@ parsefattr(netdissect_options *ndo,
 	const struct nfs_fattr *fap;
 
 	fap = (const struct nfs_fattr *)dp;
-	ND_TCHECK_4(&fap->fa_gid);
+	ND_TCHECK_4(fap->fa_gid);
 	if (verbose) {
 		/*
 		 * XXX - UIDs and GIDs are unsigned in NFS and in
@@ -1123,17 +1151,17 @@ parsefattr(netdissect_options *ndo,
 		 */
 		ND_PRINT(" %s %o ids %d/%d",
 		    tok2str(type2str, "unk-ft %u ",
-		    EXTRACT_BE_U_4(&fap->fa_type)),
-		    EXTRACT_BE_U_4(&fap->fa_mode),
-		    EXTRACT_BE_S_4(&fap->fa_uid),
-		    EXTRACT_BE_S_4(&fap->fa_gid));
+		    EXTRACT_BE_U_4(fap->fa_type)),
+		    EXTRACT_BE_U_4(fap->fa_mode),
+		    EXTRACT_BE_S_4(fap->fa_uid),
+		    EXTRACT_BE_S_4(fap->fa_gid));
 		if (v3) {
-			ND_TCHECK_8(&fap->fa3_size);
+			ND_TCHECK_8(fap->fa3_size);
 			ND_PRINT(" sz %" PRIu64,
-				EXTRACT_BE_U_8((const uint32_t *)&fap->fa3_size));
+				EXTRACT_BE_U_8(fap->fa3_size));
 		} else {
-			ND_TCHECK_4(&fap->fa2_size);
-			ND_PRINT(" sz %u", EXTRACT_BE_U_4(&fap->fa2_size));
+			ND_TCHECK_4(fap->fa2_size);
+			ND_PRINT(" sz %u", EXTRACT_BE_U_4(fap->fa2_size));
 		}
 	}
 	/* print lots more stuff */
@@ -1141,38 +1169,38 @@ parsefattr(netdissect_options *ndo,
 		if (v3) {
 			ND_TCHECK_8(&fap->fa3_ctime);
 			ND_PRINT(" nlink %u rdev %u/%u",
-			       EXTRACT_BE_U_4(&fap->fa_nlink),
-			       EXTRACT_BE_U_4(&fap->fa3_rdev.specdata1),
-			       EXTRACT_BE_U_4(&fap->fa3_rdev.specdata2));
+			       EXTRACT_BE_U_4(fap->fa_nlink),
+			       EXTRACT_BE_U_4(fap->fa3_rdev.specdata1),
+			       EXTRACT_BE_U_4(fap->fa3_rdev.specdata2));
 			ND_PRINT(" fsid %" PRIx64,
-				EXTRACT_BE_U_8((const uint32_t *)&fap->fa3_fsid));
+				EXTRACT_BE_U_8(fap->fa3_fsid));
 			ND_PRINT(" fileid %" PRIx64,
-				EXTRACT_BE_U_8((const uint32_t *)&fap->fa3_fileid));
+				EXTRACT_BE_U_8(fap->fa3_fileid));
 			ND_PRINT(" a/m/ctime %u.%06u",
-			       EXTRACT_BE_U_4(&fap->fa3_atime.nfsv3_sec),
-			       EXTRACT_BE_U_4(&fap->fa3_atime.nfsv3_nsec));
+			       EXTRACT_BE_U_4(fap->fa3_atime.nfsv3_sec),
+			       EXTRACT_BE_U_4(fap->fa3_atime.nfsv3_nsec));
 			ND_PRINT(" %u.%06u",
-			       EXTRACT_BE_U_4(&fap->fa3_mtime.nfsv3_sec),
-			       EXTRACT_BE_U_4(&fap->fa3_mtime.nfsv3_nsec));
+			       EXTRACT_BE_U_4(fap->fa3_mtime.nfsv3_sec),
+			       EXTRACT_BE_U_4(fap->fa3_mtime.nfsv3_nsec));
 			ND_PRINT(" %u.%06u",
-			       EXTRACT_BE_U_4(&fap->fa3_ctime.nfsv3_sec),
-			       EXTRACT_BE_U_4(&fap->fa3_ctime.nfsv3_nsec));
+			       EXTRACT_BE_U_4(fap->fa3_ctime.nfsv3_sec),
+			       EXTRACT_BE_U_4(fap->fa3_ctime.nfsv3_nsec));
 		} else {
 			ND_TCHECK_8(&fap->fa2_ctime);
 			ND_PRINT(" nlink %u rdev 0x%x fsid 0x%x nodeid 0x%x a/m/ctime",
-			       EXTRACT_BE_U_4(&fap->fa_nlink),
-			       EXTRACT_BE_U_4(&fap->fa2_rdev),
-			       EXTRACT_BE_U_4(&fap->fa2_fsid),
-			       EXTRACT_BE_U_4(&fap->fa2_fileid));
+			       EXTRACT_BE_U_4(fap->fa_nlink),
+			       EXTRACT_BE_U_4(fap->fa2_rdev),
+			       EXTRACT_BE_U_4(fap->fa2_fsid),
+			       EXTRACT_BE_U_4(fap->fa2_fileid));
 			ND_PRINT(" %u.%06u",
-			       EXTRACT_BE_U_4(&fap->fa2_atime.nfsv2_sec),
-			       EXTRACT_BE_U_4(&fap->fa2_atime.nfsv2_usec));
+			       EXTRACT_BE_U_4(fap->fa2_atime.nfsv2_sec),
+			       EXTRACT_BE_U_4(fap->fa2_atime.nfsv2_usec));
 			ND_PRINT(" %u.%06u",
-			       EXTRACT_BE_U_4(&fap->fa2_mtime.nfsv2_sec),
-			       EXTRACT_BE_U_4(&fap->fa2_mtime.nfsv2_usec));
+			       EXTRACT_BE_U_4(fap->fa2_mtime.nfsv2_sec),
+			       EXTRACT_BE_U_4(fap->fa2_mtime.nfsv2_usec));
 			ND_PRINT(" %u.%06u",
-			       EXTRACT_BE_U_4(&fap->fa2_ctime.nfsv2_sec),
-			       EXTRACT_BE_U_4(&fap->fa2_ctime.nfsv2_usec));
+			       EXTRACT_BE_U_4(fap->fa2_ctime.nfsv2_sec),
+			       EXTRACT_BE_U_4(fap->fa2_ctime.nfsv2_usec));
 		}
 	}
 	return ((const uint32_t *)((const unsigned char *)dp +
@@ -1260,23 +1288,23 @@ parsestatfs(netdissect_options *ndo,
 
 	if (v3) {
 		ND_PRINT(" tbytes %" PRIu64 " fbytes %" PRIu64 " abytes %" PRIu64,
-			EXTRACT_BE_U_8((const uint32_t *)&sfsp->sf_tbytes),
-			EXTRACT_BE_U_8((const uint32_t *)&sfsp->sf_fbytes),
-			EXTRACT_BE_U_8((const uint32_t *)&sfsp->sf_abytes));
+			EXTRACT_BE_U_8(sfsp->sf_tbytes),
+			EXTRACT_BE_U_8(sfsp->sf_fbytes),
+			EXTRACT_BE_U_8(sfsp->sf_abytes));
 		if (ndo->ndo_vflag) {
 			ND_PRINT(" tfiles %" PRIu64 " ffiles %" PRIu64 " afiles %" PRIu64 " invar %u",
-			       EXTRACT_BE_U_8((const uint32_t *)&sfsp->sf_tfiles),
-			       EXTRACT_BE_U_8((const uint32_t *)&sfsp->sf_ffiles),
-			       EXTRACT_BE_U_8((const uint32_t *)&sfsp->sf_afiles),
-			       EXTRACT_BE_U_4(&sfsp->sf_invarsec));
+			       EXTRACT_BE_U_8(sfsp->sf_tfiles),
+			       EXTRACT_BE_U_8(sfsp->sf_ffiles),
+			       EXTRACT_BE_U_8(sfsp->sf_afiles),
+			       EXTRACT_BE_U_4(sfsp->sf_invarsec));
 		}
 	} else {
 		ND_PRINT(" tsize %u bsize %u blocks %u bfree %u bavail %u",
-			EXTRACT_BE_U_4(&sfsp->sf_tsize),
-			EXTRACT_BE_U_4(&sfsp->sf_bsize),
-			EXTRACT_BE_U_4(&sfsp->sf_blocks),
-			EXTRACT_BE_U_4(&sfsp->sf_bfree),
-			EXTRACT_BE_U_4(&sfsp->sf_bavail));
+			EXTRACT_BE_U_4(sfsp->sf_tsize),
+			EXTRACT_BE_U_4(sfsp->sf_bsize),
+			EXTRACT_BE_U_4(sfsp->sf_blocks),
+			EXTRACT_BE_U_4(sfsp->sf_bfree),
+			EXTRACT_BE_U_4(sfsp->sf_bavail));
 	}
 
 	return (1);
@@ -1466,19 +1494,19 @@ parsefsinfo(netdissect_options *ndo,
 	sfp = (const struct nfsv3_fsinfo *)dp;
 	ND_TCHECK_SIZE(sfp);
 	ND_PRINT(" rtmax %u rtpref %u wtmax %u wtpref %u dtpref %u",
-	       EXTRACT_BE_U_4(&sfp->fs_rtmax),
-	       EXTRACT_BE_U_4(&sfp->fs_rtpref),
-	       EXTRACT_BE_U_4(&sfp->fs_wtmax),
-	       EXTRACT_BE_U_4(&sfp->fs_wtpref),
-	       EXTRACT_BE_U_4(&sfp->fs_dtpref));
+	       EXTRACT_BE_U_4(sfp->fs_rtmax),
+	       EXTRACT_BE_U_4(sfp->fs_rtpref),
+	       EXTRACT_BE_U_4(sfp->fs_wtmax),
+	       EXTRACT_BE_U_4(sfp->fs_wtpref),
+	       EXTRACT_BE_U_4(sfp->fs_dtpref));
 	if (ndo->ndo_vflag) {
 		ND_PRINT(" rtmult %u wtmult %u maxfsz %" PRIu64,
-		       EXTRACT_BE_U_4(&sfp->fs_rtmult),
-		       EXTRACT_BE_U_4(&sfp->fs_wtmult),
-		       EXTRACT_BE_U_8((const uint32_t *)&sfp->fs_maxfilesize));
+		       EXTRACT_BE_U_4(sfp->fs_rtmult),
+		       EXTRACT_BE_U_4(sfp->fs_wtmult),
+		       EXTRACT_BE_U_8(sfp->fs_maxfilesize));
 		ND_PRINT(" delta %u.%06u ",
-		       EXTRACT_BE_U_4(&sfp->fs_timedelta.nfsv3_sec),
-		       EXTRACT_BE_U_4(&sfp->fs_timedelta.nfsv3_nsec));
+		       EXTRACT_BE_U_4(sfp->fs_timedelta.nfsv3_sec),
+		       EXTRACT_BE_U_4(sfp->fs_timedelta.nfsv3_nsec));
 	}
 	return (1);
 trunc:
@@ -1505,12 +1533,12 @@ parsepathconf(netdissect_options *ndo,
 	ND_TCHECK_SIZE(spp);
 
 	ND_PRINT(" linkmax %u namemax %u %s %s %s %s",
-	       EXTRACT_BE_U_4(&spp->pc_linkmax),
-	       EXTRACT_BE_U_4(&spp->pc_namemax),
-	       EXTRACT_BE_U_4(&spp->pc_notrunc) ? "notrunc" : "",
-	       EXTRACT_BE_U_4(&spp->pc_chownrestricted) ? "chownres" : "",
-	       EXTRACT_BE_U_4(&spp->pc_caseinsensitive) ? "igncase" : "",
-	       EXTRACT_BE_U_4(&spp->pc_casepreserving) ? "keepcase" : "");
+	       EXTRACT_BE_U_4(spp->pc_linkmax),
+	       EXTRACT_BE_U_4(spp->pc_namemax),
+	       EXTRACT_BE_U_4(spp->pc_notrunc) ? "notrunc" : "",
+	       EXTRACT_BE_U_4(spp->pc_chownrestricted) ? "chownres" : "",
+	       EXTRACT_BE_U_4(spp->pc_caseinsensitive) ? "igncase" : "",
+	       EXTRACT_BE_U_4(spp->pc_casepreserving) ? "keepcase" : "");
 	return (1);
 trunc:
 	return (0);
