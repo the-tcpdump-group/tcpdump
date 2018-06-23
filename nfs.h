@@ -284,15 +284,6 @@ struct nfsv3_time {
 typedef struct nfsv3_time	nfstime3;
 
 /*
- * Quads are defined as arrays of 2 longs to ensure dense packing for the
- * protocol and to facilitate xdr conversion.
- */
-struct nfs_uquad {
-	nd_uint32_t nfsuquad[2];
-};
-typedef	struct nfs_uquad	nfsuint64;
-
-/*
  * NFS Version 3 special file number.
  */
 struct nfsv3_spec {
