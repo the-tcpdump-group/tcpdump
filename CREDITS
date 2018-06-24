@@ -1,16 +1,12 @@
-This file lists people who have contributed to tcpdump:
+This file lists people who have contributed to tcpdump.
 
-The current maintainers:
-    Bill Fenner                   <fenner at research dot att dot com>
+The current maintainers (in alphabetical order):
     Denis Ovsienko                <denis at ovsienko dot info>
-    Fulvio Risso                  <risso at polito dot it>
-    Guy Harris                    <guy at alum dot mit dot edu>
-    Hannes Gredler                <hannes at gredler dot at>
-    Michael Richardson            <mcr at sandelman dot ottawa dot on dot ca>
     Francois-Xavier Le Bail       <devel dot fx dot lebail at orange dot fr>
+    Guy Harris                    <guy at alum dot mit dot edu>
+    Michael Richardson            <mcr at sandelman dot ottawa dot on dot ca>
 
-Additional people who have contributed patches:
-
+Additional people who have contributed patches (in alphabetical order):
     Aaron Campbell                <aaron at arbor dot net>
     A Costa                       <agcosta at gis dot net>
     Albert Chin                   <china at thewrittenword dot com>
@@ -234,5 +230,8 @@ The original LBL crew:
     Craig Leres
     Van Jacobson
 
-Past maintainers:
-    Jun-ichiro itojun Hagino         <itojun at iijlab dot net>		Also see: http://www.wide.ad.jp/itojun-award/
+Past maintainers (in alphabetical order):
+    Bill Fenner                   <fenner at research dot att dot com>
+    Fulvio Risso                  <risso at polito dot it>
+    Hannes Gredler                <hannes at gredler dot at>
+    Jun-ichiro itojun Hagino      <itojun at iijlab dot net>		Also see: http://www.wide.ad.jp/itojun-award/
