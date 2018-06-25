@@ -234,8 +234,8 @@ aoev1_query_print(netdissect_options *ndo,
 	if (cslen > AOEV1_MAX_CONFSTR_LEN || AOEV1_QUERY_ARG_LEN + cslen > len)
 		goto invalid;
 	/* Config String */
-	ND_TCHECK_LEN(cp, cslen);
 	if (cslen) {
+		ND_TCHECK_LEN(cp, cslen);
 		ND_PRINT("\n\tConfig String (length %u): ", cslen);
 		if (nd_printn(ndo, cp, cslen, ndo->ndo_snapend))
 			goto trunc;
