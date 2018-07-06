@@ -33,7 +33,7 @@
 
 #define SYSLOG_SEVERITY_MASK 0x0007  /* 0000 0000 0000 0111 */
 #define SYSLOG_FACILITY_MASK 0x03f8  /* 0000 0011 1111 1000 */
-#define SYSLOG_MAX_DIGITS 3 /* The maximum number if priority digits to read in. */
+#define SYSLOG_MAX_DIGITS 3 /* The maximum number of priority digits to read in. */
 
 static const struct tok syslog_severity_values[] = {
   { 0,      "emergency" },
