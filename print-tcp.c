@@ -714,6 +714,12 @@ tcp_print(netdissect_options *ndo,
                 rtsp_print(ndo, bp, length);
         } else if (length > 2 &&
                  (IS_SRC_OR_DST_PORT(NAMESERVER_PORT))) {
+                /* domain_print() assumes it does not have to prepend a space before its
+                 * own output to separate it from the output of the calling function. This
+                 * works well with udp_print(), but requires a small prop here.
+                 */
+                ND_PRINT((ndo, " "));
+
                 /*
                  * TCP DNS query has 2byte length at the head.
                  * XXX packet could be unaligned, it can go strange
