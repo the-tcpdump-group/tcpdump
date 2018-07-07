@@ -675,6 +675,7 @@ infodir
 docdir
 oldincludedir
 includedir
+runstatedir
 localstatedir
 sharedstatedir
 sysconfdir
@@ -755,6 +756,7 @@ datadir='${datarootdir}'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
 localstatedir='${prefix}/var'
+runstatedir='${localstatedir}/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
@@ -1007,6 +1009,15 @@ do
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
 
+  -runstatedir | --runstatedir | --runstatedi | --runstated \
+  | --runstate | --runstat | --runsta | --runst | --runs \
+  | --run | --ru | --r)
+    ac_prev=runstatedir ;;
+  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
+  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
+  | --run=* | --ru=* | --r=*)
+    runstatedir=$ac_optarg ;;
+
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
@@ -1144,7 +1155,7 @@ fi
 for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
 		datadir sysconfdir sharedstatedir localstatedir includedir \
 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
-		libdir localedir mandir
+		libdir localedir mandir runstatedir
 do
   eval ac_val=\$$ac_var
   # Remove trailing slashes.
@@ -1297,6 +1308,7 @@ Fine tuning of the installation directories:
   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
   --libdir=DIR            object code libraries [EPREFIX/lib]
   --includedir=DIR        C header files [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
@@ -6745,6 +6757,49 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 	CFLAGS="$save_CFLAGS"
 
 
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -W option" >&5
+$as_echo_n "checking whether the compiler supports the -W option... " >&6; }
+	save_CFLAGS="$CFLAGS"
+	if expr "x-W" : "x-W.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -W"
+	elif expr "x-W" : "x-f.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS -Werror -W"
+	elif expr "x-W" : "x-m.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS -Werror -W"
+	else
+	    CFLAGS="$CFLAGS -W"
+	fi
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+return 0
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+		CFLAGS="$save_CFLAGS"
+		V_CCOPT="$V_CCOPT -W"
+
+else
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		CFLAGS="$save_CFLAGS"
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wall option" >&5
 $as_echo_n "checking whether the compiler supports the -Wall option... " >&6; }
 	save_CFLAGS="$CFLAGS"
@@ -6788,20 +6843,20 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wmissing-prototypes option" >&5
-$as_echo_n "checking whether the compiler supports the -Wmissing-prototypes option... " >&6; }
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wassign-enum option" >&5
+$as_echo_n "checking whether the compiler supports the -Wassign-enum option... " >&6; }
 	save_CFLAGS="$CFLAGS"
-	if expr "x-Wmissing-prototypes" : "x-W.*" >/dev/null
+	if expr "x-Wassign-enum" : "x-W.*" >/dev/null
 	then
-	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -Wmissing-prototypes"
-	elif expr "x-Wmissing-prototypes" : "x-f.*" >/dev/null
+	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -Wassign-enum"
+	elif expr "x-Wassign-enum" : "x-f.*" >/dev/null
 	then
-	    CFLAGS="$CFLAGS -Werror -Wmissing-prototypes"
-	elif expr "x-Wmissing-prototypes" : "x-m.*" >/dev/null
+	    CFLAGS="$CFLAGS -Werror -Wassign-enum"
+	elif expr "x-Wassign-enum" : "x-m.*" >/dev/null
 	then
-	    CFLAGS="$CFLAGS -Werror -Wmissing-prototypes"
+	    CFLAGS="$CFLAGS -Werror -Wassign-enum"
 	else
-	    CFLAGS="$CFLAGS -Wmissing-prototypes"
+	    CFLAGS="$CFLAGS -Wassign-enum"
 	fi
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -6819,136 +6874,7 @@ if ac_fn_c_try_compile "$LINENO"; then :
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 		CFLAGS="$save_CFLAGS"
-		V_CCOPT="$V_CCOPT -Wmissing-prototypes"
-
-else
-
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-		CFLAGS="$save_CFLAGS"
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wstrict-prototypes option" >&5
-$as_echo_n "checking whether the compiler supports the -Wstrict-prototypes option... " >&6; }
-	save_CFLAGS="$CFLAGS"
-	if expr "x-Wstrict-prototypes" : "x-W.*" >/dev/null
-	then
-	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -Wstrict-prototypes"
-	elif expr "x-Wstrict-prototypes" : "x-f.*" >/dev/null
-	then
-	    CFLAGS="$CFLAGS -Werror -Wstrict-prototypes"
-	elif expr "x-Wstrict-prototypes" : "x-m.*" >/dev/null
-	then
-	    CFLAGS="$CFLAGS -Werror -Wstrict-prototypes"
-	else
-	    CFLAGS="$CFLAGS -Wstrict-prototypes"
-	fi
-	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-return 0
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-		CFLAGS="$save_CFLAGS"
-		V_CCOPT="$V_CCOPT -Wstrict-prototypes"
-
-else
-
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-		CFLAGS="$save_CFLAGS"
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wwrite-strings option" >&5
-$as_echo_n "checking whether the compiler supports the -Wwrite-strings option... " >&6; }
-	save_CFLAGS="$CFLAGS"
-	if expr "x-Wwrite-strings" : "x-W.*" >/dev/null
-	then
-	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -Wwrite-strings"
-	elif expr "x-Wwrite-strings" : "x-f.*" >/dev/null
-	then
-	    CFLAGS="$CFLAGS -Werror -Wwrite-strings"
-	elif expr "x-Wwrite-strings" : "x-m.*" >/dev/null
-	then
-	    CFLAGS="$CFLAGS -Werror -Wwrite-strings"
-	else
-	    CFLAGS="$CFLAGS -Wwrite-strings"
-	fi
-	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-return 0
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-		CFLAGS="$save_CFLAGS"
-		V_CCOPT="$V_CCOPT -Wwrite-strings"
-
-else
-
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-		CFLAGS="$save_CFLAGS"
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wpointer-arith option" >&5
-$as_echo_n "checking whether the compiler supports the -Wpointer-arith option... " >&6; }
-	save_CFLAGS="$CFLAGS"
-	if expr "x-Wpointer-arith" : "x-W.*" >/dev/null
-	then
-	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -Wpointer-arith"
-	elif expr "x-Wpointer-arith" : "x-f.*" >/dev/null
-	then
-	    CFLAGS="$CFLAGS -Werror -Wpointer-arith"
-	elif expr "x-Wpointer-arith" : "x-m.*" >/dev/null
-	then
-	    CFLAGS="$CFLAGS -Werror -Wpointer-arith"
-	else
-	    CFLAGS="$CFLAGS -Wpointer-arith"
-	fi
-	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-return 0
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-		CFLAGS="$save_CFLAGS"
-		V_CCOPT="$V_CCOPT -Wpointer-arith"
+		V_CCOPT="$V_CCOPT -Wassign-enum"
 
 else
 
@@ -7003,49 +6929,6 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wshadow option" >&5
-$as_echo_n "checking whether the compiler supports the -Wshadow option... " >&6; }
-	save_CFLAGS="$CFLAGS"
-	if expr "x-Wshadow" : "x-W.*" >/dev/null
-	then
-	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -Wshadow"
-	elif expr "x-Wshadow" : "x-f.*" >/dev/null
-	then
-	    CFLAGS="$CFLAGS -Werror -Wshadow"
-	elif expr "x-Wshadow" : "x-m.*" >/dev/null
-	then
-	    CFLAGS="$CFLAGS -Werror -Wshadow"
-	else
-	    CFLAGS="$CFLAGS -Wshadow"
-	fi
-	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-return 0
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-		CFLAGS="$save_CFLAGS"
-		V_CCOPT="$V_CCOPT -Wshadow"
-
-else
-
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-		CFLAGS="$save_CFLAGS"
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wdeclaration-after-statement option" >&5
 $as_echo_n "checking whether the compiler supports the -Wdeclaration-after-statement option... " >&6; }
 	save_CFLAGS="$CFLAGS"
@@ -7089,20 +6972,20 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wpedantic option" >&5
-$as_echo_n "checking whether the compiler supports the -Wpedantic option... " >&6; }
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wmissing-prototypes option" >&5
+$as_echo_n "checking whether the compiler supports the -Wmissing-prototypes option... " >&6; }
 	save_CFLAGS="$CFLAGS"
-	if expr "x-Wpedantic" : "x-W.*" >/dev/null
+	if expr "x-Wmissing-prototypes" : "x-W.*" >/dev/null
 	then
-	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -Wpedantic"
-	elif expr "x-Wpedantic" : "x-f.*" >/dev/null
+	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -Wmissing-prototypes"
+	elif expr "x-Wmissing-prototypes" : "x-f.*" >/dev/null
 	then
-	    CFLAGS="$CFLAGS -Werror -Wpedantic"
-	elif expr "x-Wpedantic" : "x-m.*" >/dev/null
+	    CFLAGS="$CFLAGS -Werror -Wmissing-prototypes"
+	elif expr "x-Wmissing-prototypes" : "x-m.*" >/dev/null
 	then
-	    CFLAGS="$CFLAGS -Werror -Wpedantic"
+	    CFLAGS="$CFLAGS -Werror -Wmissing-prototypes"
 	else
-	    CFLAGS="$CFLAGS -Wpedantic"
+	    CFLAGS="$CFLAGS -Wmissing-prototypes"
 	fi
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -7120,7 +7003,7 @@ if ac_fn_c_try_compile "$LINENO"; then :
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 		CFLAGS="$save_CFLAGS"
-		V_CCOPT="$V_CCOPT -Wpedantic"
+		V_CCOPT="$V_CCOPT -Wmissing-prototypes"
 
 else
 
@@ -7175,6 +7058,178 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wpedantic option" >&5
+$as_echo_n "checking whether the compiler supports the -Wpedantic option... " >&6; }
+	save_CFLAGS="$CFLAGS"
+	if expr "x-Wpedantic" : "x-W.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -Wpedantic"
+	elif expr "x-Wpedantic" : "x-f.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS -Werror -Wpedantic"
+	elif expr "x-Wpedantic" : "x-m.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS -Werror -Wpedantic"
+	else
+	    CFLAGS="$CFLAGS -Wpedantic"
+	fi
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+return 0
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+		CFLAGS="$save_CFLAGS"
+		V_CCOPT="$V_CCOPT -Wpedantic"
+
+else
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		CFLAGS="$save_CFLAGS"
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wpointer-arith option" >&5
+$as_echo_n "checking whether the compiler supports the -Wpointer-arith option... " >&6; }
+	save_CFLAGS="$CFLAGS"
+	if expr "x-Wpointer-arith" : "x-W.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -Wpointer-arith"
+	elif expr "x-Wpointer-arith" : "x-f.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS -Werror -Wpointer-arith"
+	elif expr "x-Wpointer-arith" : "x-m.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS -Werror -Wpointer-arith"
+	else
+	    CFLAGS="$CFLAGS -Wpointer-arith"
+	fi
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+return 0
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+		CFLAGS="$save_CFLAGS"
+		V_CCOPT="$V_CCOPT -Wpointer-arith"
+
+else
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		CFLAGS="$save_CFLAGS"
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wshadow option" >&5
+$as_echo_n "checking whether the compiler supports the -Wshadow option... " >&6; }
+	save_CFLAGS="$CFLAGS"
+	if expr "x-Wshadow" : "x-W.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -Wshadow"
+	elif expr "x-Wshadow" : "x-f.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS -Werror -Wshadow"
+	elif expr "x-Wshadow" : "x-m.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS -Werror -Wshadow"
+	else
+	    CFLAGS="$CFLAGS -Wshadow"
+	fi
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+return 0
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+		CFLAGS="$save_CFLAGS"
+		V_CCOPT="$V_CCOPT -Wshadow"
+
+else
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		CFLAGS="$save_CFLAGS"
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wstrict-prototypes option" >&5
+$as_echo_n "checking whether the compiler supports the -Wstrict-prototypes option... " >&6; }
+	save_CFLAGS="$CFLAGS"
+	if expr "x-Wstrict-prototypes" : "x-W.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -Wstrict-prototypes"
+	elif expr "x-Wstrict-prototypes" : "x-f.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS -Werror -Wstrict-prototypes"
+	elif expr "x-Wstrict-prototypes" : "x-m.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS -Werror -Wstrict-prototypes"
+	else
+	    CFLAGS="$CFLAGS -Wstrict-prototypes"
+	fi
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+return 0
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+		CFLAGS="$save_CFLAGS"
+		V_CCOPT="$V_CCOPT -Wstrict-prototypes"
+
+else
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		CFLAGS="$save_CFLAGS"
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wused-but-marked-unused option" >&5
 $as_echo_n "checking whether the compiler supports the -Wused-but-marked-unused option... " >&6; }
 	save_CFLAGS="$CFLAGS"
@@ -7218,20 +7273,20 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -W option" >&5
-$as_echo_n "checking whether the compiler supports the -W option... " >&6; }
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wwrite-strings option" >&5
+$as_echo_n "checking whether the compiler supports the -Wwrite-strings option... " >&6; }
 	save_CFLAGS="$CFLAGS"
-	if expr "x-W" : "x-W.*" >/dev/null
+	if expr "x-Wwrite-strings" : "x-W.*" >/dev/null
 	then
-	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -W"
-	elif expr "x-W" : "x-f.*" >/dev/null
+	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -Wwrite-strings"
+	elif expr "x-Wwrite-strings" : "x-f.*" >/dev/null
 	then
-	    CFLAGS="$CFLAGS -Werror -W"
-	elif expr "x-W" : "x-m.*" >/dev/null
+	    CFLAGS="$CFLAGS -Werror -Wwrite-strings"
+	elif expr "x-Wwrite-strings" : "x-m.*" >/dev/null
 	then
-	    CFLAGS="$CFLAGS -Werror -W"
+	    CFLAGS="$CFLAGS -Werror -Wwrite-strings"
 	else
-	    CFLAGS="$CFLAGS -W"
+	    CFLAGS="$CFLAGS -Wwrite-strings"
 	fi
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -7249,50 +7304,7 @@ if ac_fn_c_try_compile "$LINENO"; then :
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 		CFLAGS="$save_CFLAGS"
-		V_CCOPT="$V_CCOPT -W"
-
-else
-
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-		CFLAGS="$save_CFLAGS"
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wassign-enum option" >&5
-$as_echo_n "checking whether the compiler supports the -Wassign-enum option... " >&6; }
-	save_CFLAGS="$CFLAGS"
-	if expr "x-Wassign-enum" : "x-W.*" >/dev/null
-	then
-	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -Wassign-enum"
-	elif expr "x-Wassign-enum" : "x-f.*" >/dev/null
-	then
-	    CFLAGS="$CFLAGS -Werror -Wassign-enum"
-	elif expr "x-Wassign-enum" : "x-m.*" >/dev/null
-	then
-	    CFLAGS="$CFLAGS -Werror -Wassign-enum"
-	else
-	    CFLAGS="$CFLAGS -Wassign-enum"
-	fi
-	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-return 0
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-		CFLAGS="$save_CFLAGS"
-		V_CCOPT="$V_CCOPT -Wassign-enum"
+		V_CCOPT="$V_CCOPT -Wwrite-strings"
 
 else
 
