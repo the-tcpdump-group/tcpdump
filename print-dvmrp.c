@@ -231,7 +231,7 @@ print_probe(netdissect_options *ndo,
 		ND_PRINT((ndo, " [|}"));
 		return (0);
 	}
-	genid = (bp[0] << 24) | (bp[1] << 16) | (bp[2] << 8) | bp[3];
+	genid = EXTRACT_32BITS(bp);
 	bp += 4;
 	len -= 4;
 	ND_PRINT((ndo, ndo->ndo_vflag > 1 ? "\n\t" : " "));
