@@ -240,9 +240,8 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 	 */
 	input_buffer = (u_char *)malloc(buffer_size);
 	if (input_buffer == NULL) {
-		(*ndo->ndo_warning)(ndo, "can't allocate memory for encrypted data buffer");
 		EVP_CIPHER_CTX_free(ctx);
-		return 0;
+		(*ndo->ndo_error)(ndo, "can't allocate memory for encrypted data buffer");
 	}
 	/*
 	 * Copy the input data to the encrypted data buffer, and pad it
@@ -256,10 +255,9 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 	 */
 	output_buffer = (u_char *)malloc(buffer_size);
 	if (output_buffer == NULL) {
-		(*ndo->ndo_warning)(ndo, "can't allocate memory for decryption buffer");
 		free(input_buffer);
 		EVP_CIPHER_CTX_free(ctx);
-		return 0;
+		(*ndo->ndo_error)(ndo, "can't allocate memory for decryption buffer");
 	}
 	EVP_Cipher(ctx, output_buffer, input_buffer, len);
 	EVP_CIPHER_CTX_free(ctx);
@@ -817,9 +815,8 @@ esp_print(netdissect_options *ndo,
 			 */
 			input_buffer = (u_char *)malloc(buffer_size);
 			if (input_buffer == NULL) {
-				(*ndo->ndo_warning)(ndo, "can't allocate memory for encrypted data buffer");
 				EVP_CIPHER_CTX_free(ctx);
-				return 0;
+				(*ndo->ndo_error)(ndo, "can't allocate memory for encrypted data buffer");
 			}
 			/*
 			 * Copy the input data to the encrypted data buffer,
@@ -833,10 +830,9 @@ esp_print(netdissect_options *ndo,
 			 */
 			output_buffer = (u_char *)malloc(buffer_size);
 			if (output_buffer == NULL) {
-				(*ndo->ndo_warning)(ndo, "can't allocate memory for decryption buffer");
 				free(input_buffer);
 				EVP_CIPHER_CTX_free(ctx);
-				return -1;
+				(*ndo->ndo_error)(ndo, "can't allocate memory for decryption buffer");
 			}
 
 			EVP_Cipher(ctx, output_buffer, input_buffer, len);
