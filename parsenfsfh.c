@@ -77,22 +77,6 @@
 #define	FHT_HPUX9	11
 #define	FHT_BSD44	12
 
-#ifdef	ultrix
-/* Nasty hack to keep the Ultrix C compiler from emitting bogus warnings */
-#define	XFF(x)	((uint32_t)(x))
-#else
-#define	XFF(x)	(x)
-#endif
-
-#define	make_uint32(msb,b,c,lsb)\
-	(XFF(lsb) + (XFF(c)<<8) + (XFF(b)<<16) + (XFF(msb)<<24))
-
-#define	make_uint24(msb,b, lsb)\
-	(XFF(lsb) + (XFF(b)<<8) + (XFF(msb)<<16))
-
-#define	make_uint16(msb,lsb)\
-	(XFF(lsb) + (XFF(msb)<<8))
-
 static int is_UCX(const unsigned char *, u_int);
 
 void
@@ -255,8 +239,7 @@ Parse_fh(const unsigned char *fh, u_int len, my_fsid *fsidp,
 	    fsidp->Fsid_dev.Major = EXTRACT_U_1(fhp + 6);
 	    fsidp->fsid_code = 0;
 
-	    *inop = make_uint32(EXTRACT_U_1(fhp + 12), EXTRACT_U_1(fhp + 13),
-				EXTRACT_U_1(fhp + 14), EXTRACT_U_1(fhp + 15));
+	    *inop = EXTRACT_BE_U_4(fhp + 12);
 
 	    if (osnamep)
 		*osnamep = "Auspex";
@@ -267,27 +250,21 @@ Parse_fh(const unsigned char *fh, u_int len, my_fsid *fsidp,
 	    fsidp->Fsid_dev.Major = EXTRACT_U_1(fhp + 1);
 	    fsidp->fsid_code = 0;
 
-	    *inop = make_uint32(EXTRACT_U_1(fhp + 15), EXTRACT_U_1(fhp + 14),
-				EXTRACT_U_1(fhp + 13), EXTRACT_U_1(fhp + 12));
+	    *inop = EXTRACT_LE_U_4(fhp + 12);
 
 	    if (osnamep)
 		*osnamep = "BSD 4.4";
 	    break;
 
 	case FHT_DECOSF:
-	    fsidp->fsid_code = make_uint32(EXTRACT_U_1(fhp + 7),
-					   EXTRACT_U_1(fhp + 6),
-					   EXTRACT_U_1(fhp + 5),
-					   EXTRACT_U_1(fhp + 4));
+	    fsidp->fsid_code = EXTRACT_LE_U_4(fhp + 4);
 			/* XXX could ignore 3 high-order bytes */
 
-	    temp = make_uint32(EXTRACT_U_1(fhp + 3), EXTRACT_U_1(fhp + 2),
-			       EXTRACT_U_1(fhp + 1), EXTRACT_U_1(fhp));
+	    temp = EXTRACT_LE_U_4(fhp);
 	    fsidp->Fsid_dev.Minor = temp & 0xFFFFF;
 	    fsidp->Fsid_dev.Major = (temp>>20) & 0xFFF;
 
-	    *inop = make_uint32(EXTRACT_U_1(fhp + 15), EXTRACT_U_1(fhp + 14),
-				EXTRACT_U_1(fhp + 13), EXTRACT_U_1(fhp + 12));
+	    *inop = EXTRACT_LE_U_4(fhp + 12);
 	    if (osnamep)
 		*osnamep = "OSF";
 	    break;
@@ -297,25 +274,18 @@ Parse_fh(const unsigned char *fh, u_int len, my_fsid *fsidp,
 	    fsidp->Fsid_dev.Major = EXTRACT_U_1(fhp + 2);
 	    fsidp->fsid_code = 0;
 
-	    *inop = make_uint32(EXTRACT_U_1(fhp + 8), EXTRACT_U_1(fhp + 9),
-				EXTRACT_U_1(fhp + 10), EXTRACT_U_1(fhp + 11));
+	    *inop = EXTRACT_BE_U_4(fhp + 8);
 
 	    if (osnamep)
 		*osnamep = "IRIX4";
 	    break;
 
 	case FHT_IRIX5:
-	    fsidp->Fsid_dev.Minor = make_uint16(EXTRACT_U_1(fhp + 2),
-						EXTRACT_U_1(fhp + 3));
-	    fsidp->Fsid_dev.Major = make_uint16(EXTRACT_U_1(fhp),
-						EXTRACT_U_1(fhp + 1));
-	    fsidp->fsid_code = make_uint32(EXTRACT_U_1(fhp + 4),
-					   EXTRACT_U_1(fhp + 5),
-					   EXTRACT_U_1(fhp + 6),
-					   EXTRACT_U_1(fhp + 7));
+	    fsidp->Fsid_dev.Minor = EXTRACT_BE_U_2(fhp + 2);
+	    fsidp->Fsid_dev.Major = EXTRACT_BE_U_2(fhp);
+	    fsidp->fsid_code = EXTRACT_BE_U_4(fhp + 4);
 
-	    *inop = make_uint32(EXTRACT_U_1(fhp + 12), EXTRACT_U_1(fhp + 13),
-				EXTRACT_U_1(fhp + 14), EXTRACT_U_1(fhp + 15));
+	    *inop = EXTRACT_BE_U_4(fhp + 12);
 
 	    if (osnamep)
 		*osnamep = "IRIX5";
@@ -335,31 +305,22 @@ Parse_fh(const unsigned char *fh, u_int len, my_fsid *fsidp,
 	case FHT_SUNOS4:
 	    fsidp->Fsid_dev.Minor = EXTRACT_U_1(fhp + 3);
 	    fsidp->Fsid_dev.Major = EXTRACT_U_1(fhp + 2);
-	    fsidp->fsid_code = make_uint32(EXTRACT_U_1(fhp + 4),
-					   EXTRACT_U_1(fhp + 5),
-					   EXTRACT_U_1(fhp + 6),
-					   EXTRACT_U_1(fhp + 7));
+	    fsidp->fsid_code = EXTRACT_BE_U_4(fhp + 4);
 
-	    *inop = make_uint32(EXTRACT_U_1(fhp + 12), EXTRACT_U_1(fhp + 13),
-				EXTRACT_U_1(fhp + 14), EXTRACT_U_1(fhp + 15));
+	    *inop = EXTRACT_BE_U_4(fhp + 12);
 
 	    if (osnamep)
 		*osnamep = "SUNOS4";
 	    break;
 
 	case FHT_SUNOS5:
-	    temp = make_uint16(EXTRACT_U_1(fhp), EXTRACT_U_1(fhp + 1));
+	    temp = EXTRACT_BE_U_2(fhp);
 	    fsidp->Fsid_dev.Major = (temp>>2) &  0x3FFF;
-	    temp = make_uint24(EXTRACT_U_1(fhp + 1), EXTRACT_U_1(fhp + 2),
-			       EXTRACT_U_1(fhp + 3));
+	    temp = EXTRACT_BE_U_3(fhp + 1);
 	    fsidp->Fsid_dev.Minor = temp & 0x3FFFF;
-	    fsidp->fsid_code = make_uint32(EXTRACT_U_1(fhp + 4),
-					   EXTRACT_U_1(fhp + 5),
-					   EXTRACT_U_1(fhp + 6),
-					   EXTRACT_U_1(fhp + 7));
+	    fsidp->fsid_code = EXTRACT_BE_U_4(fhp + 4);
 
-	    *inop = make_uint32(EXTRACT_U_1(fhp + 12), EXTRACT_U_1(fhp + 13),
-				EXTRACT_U_1(fhp + 14), EXTRACT_U_1(fhp + 15));
+	    *inop = EXTRACT_BE_U_4(fhp + 12);
 
 	    if (osnamep)
 		*osnamep = "SUNOS5";
@@ -370,8 +331,7 @@ Parse_fh(const unsigned char *fh, u_int len, my_fsid *fsidp,
 	    fsidp->Fsid_dev.Minor = EXTRACT_U_1(fhp);
 	    fsidp->Fsid_dev.Major = EXTRACT_U_1(fhp + 1);
 
-	    temp = make_uint32(EXTRACT_U_1(fhp + 7), EXTRACT_U_1(fhp + 6),
-			       EXTRACT_U_1(fhp + 5), EXTRACT_U_1(fhp + 4));
+	    temp = EXTRACT_LE_U_4(fhp + 4);
 	    *inop = temp;
 	    if (osnamep)
 		*osnamep = "Ultrix";
@@ -396,8 +356,9 @@ Parse_fh(const unsigned char *fh, u_int len, my_fsid *fsidp,
 	    }
 
 	    /* VMS file ID is: (RVN, FidHi, FidLo) */
-	    *inop = make_uint32(EXTRACT_U_1(fhp + 26), EXTRACT_U_1(fhp + 27),
-				EXTRACT_U_1(fhp + 23), EXTRACT_U_1(fhp + 22));
+	    *inop = (EXTRACT_U_1(fhp + 26) << 24) |
+	    	    (EXTRACT_U_1(fhp + 27) << 16) |
+		    (EXTRACT_LE_U_2(fhp + 22) << 0);
 
 	    /* Caller must save (and null-terminate?) this value */
 	    if (fsnamep)
@@ -408,17 +369,11 @@ Parse_fh(const unsigned char *fh, u_int len, my_fsid *fsidp,
 	    break;
 
 	case FHT_AIX32:
-	    fsidp->Fsid_dev.Minor = make_uint16(EXTRACT_U_1(fhp + 2),
-						EXTRACT_U_1(fhp + 3));
-	    fsidp->Fsid_dev.Major = make_uint16(EXTRACT_U_1(fhp),
-						EXTRACT_U_1(fhp + 1));
-	    fsidp->fsid_code = make_uint32(EXTRACT_U_1(fhp + 4),
-					   EXTRACT_U_1(fhp + 5),
-					   EXTRACT_U_1(fhp + 6),
-					   EXTRACT_U_1(fhp + 7));
+	    fsidp->Fsid_dev.Minor = EXTRACT_BE_U_2(fhp + 2);
+	    fsidp->Fsid_dev.Major = EXTRACT_BE_U_2(fhp);
+	    fsidp->fsid_code = EXTRACT_BE_U_4(fhp + 4);
 
-	    *inop = make_uint32(EXTRACT_U_1(fhp + 12), EXTRACT_U_1(fhp + 13),
-				EXTRACT_U_1(fhp + 14), EXTRACT_U_1(fhp + 15));
+	    *inop = EXTRACT_BE_U_4(fhp + 12);
 
 	    if (osnamep)
 		*osnamep = "AIX32";
@@ -426,16 +381,11 @@ Parse_fh(const unsigned char *fh, u_int len, my_fsid *fsidp,
 
 	case FHT_HPUX9:
 	    fsidp->Fsid_dev.Major = EXTRACT_U_1(fhp);
-	    temp = make_uint24(EXTRACT_U_1(fhp + 1), EXTRACT_U_1(fhp + 2),
-			       EXTRACT_U_1(fhp + 3));
+	    temp = EXTRACT_BE_U_3(fhp + 1);
 	    fsidp->Fsid_dev.Minor = temp;
-	    fsidp->fsid_code = make_uint32(EXTRACT_U_1(fhp + 4),
-					   EXTRACT_U_1(fhp + 5),
-					   EXTRACT_U_1(fhp + 6),
-					   EXTRACT_U_1(fhp + 7));
+	    fsidp->fsid_code = EXTRACT_BE_U_4(fhp + 4);
 
-	    *inop = make_uint32(EXTRACT_U_1(fhp + 12), EXTRACT_U_1(fhp + 13),
-				EXTRACT_U_1(fhp + 14), EXTRACT_U_1(fhp + 15));
+	    *inop = EXTRACT_BE_U_4(fhp + 12);
 
 	    if (osnamep)
 		*osnamep = "HPUX9";
