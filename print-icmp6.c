@@ -1199,7 +1199,7 @@ icmp6_print(netdissect_options *ndo,
 			p = (const struct nd_router_advert *)dp;
 			ND_TCHECK_4(p->nd_ra_retransmit);
 			ND_PRINT("\n\thop limit %u, Flags [%s]"
-                                  ", pref %s, router lifetime %us, reachable time %us, retrans time %us",
+                                  ", pref %s, router lifetime %us, reachable time %ums, retrans timer %ums",
                                   EXTRACT_U_1(p->nd_ra_curhoplimit),
                                   bittok2str(icmp6_opt_ra_flag_values,"none",EXTRACT_U_1(p->nd_ra_flags_reserved)),
                                   get_rtpref(EXTRACT_U_1(p->nd_ra_flags_reserved)),
