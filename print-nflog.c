@@ -40,7 +40,7 @@
 
 /*
  * Structure of an NFLOG header and TLV parts, as described at
- * http://www.tcpdump.org/linktypes/LINKTYPE_NFLOG.html
+ * https://www.tcpdump.org/linktypes/LINKTYPE_NFLOG.html
  *
  * The NFLOG header is big-endian.
  *

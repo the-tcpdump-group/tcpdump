@@ -1905,7 +1905,7 @@ It is currently being maintained by tcpdump.org.
 The current version is available via http:
 .LP
 .RS
-.I http://www.tcpdump.org/
+.I https://www.tcpdump.org/
 .RE
 .LP
 The original distribution is available via anonymous ftp:
