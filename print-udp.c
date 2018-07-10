@@ -615,7 +615,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		else if (IS_SRC_OR_DST_PORT(NTP_PORT))
 			ntp_print(ndo, (const u_char *)(up + 1), length);
 		else if (IS_SRC_OR_DST_PORT(KERBEROS_PORT) || IS_SRC_OR_DST_PORT(KERBEROS_SEC_PORT))
-			krb_print(ndo, (const void *)(up + 1));
+			krb_print(ndo, (const u_char *)(up + 1));
 		else if (IS_SRC_OR_DST_PORT(L2TP_PORT))
 			l2tp_print(ndo, (const u_char *)(up + 1), length);
 #ifdef ENABLE_SMB
@@ -627,14 +627,14 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		else if (dport == VAT_PORT)
 			vat_print(ndo, (const void *)(up + 1), length);
 		else if (IS_SRC_OR_DST_PORT(ZEPHYR_SRV_PORT) || IS_SRC_OR_DST_PORT(ZEPHYR_CLT_PORT))
-			zephyr_print(ndo, (const void *)(up + 1), length);
+			zephyr_print(ndo, (const u_char *)(up + 1), length);
 		/*
 		 * Since there are 10 possible ports to check, I think
 		 * a <> test would be more efficient
 		 */
 		else if ((sport >= RX_PORT_LOW && sport <= RX_PORT_HIGH) ||
 			 (dport >= RX_PORT_LOW && dport <= RX_PORT_HIGH))
-			rx_print(ndo, (const void *)(up + 1), length, sport, dport,
+			rx_print(ndo, (const u_char *)(up + 1), length, sport, dport,
 				 (const u_char *) ip);
 		else if (IS_SRC_OR_DST_PORT(RIPNG_PORT))
 			ripng_print(ndo, (const u_char *)(up + 1), length);
@@ -652,7 +652,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		else if (dport == WB_PORT)
 			wb_print(ndo, (const u_char *)(up + 1), length);
 		else if (IS_SRC_OR_DST_PORT(CISCO_AUTORP_PORT))
-			cisco_autorp_print(ndo, (const void *)(up + 1), length);
+			cisco_autorp_print(ndo, (const u_char *)(up + 1), length);
 		else if (IS_SRC_OR_DST_PORT(RADIUS_PORT) ||
 			 IS_SRC_OR_DST_PORT(RADIUS_NEW_PORT) ||
 			 IS_SRC_OR_DST_PORT(RADIUS_ACCOUNTING_PORT) ||
