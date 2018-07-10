@@ -479,6 +479,7 @@ hoobr_rt6_print		hoobr_rt6_print.pcap		hoobr_rt6_print.out
 hoobr_nfs_printfh	hoobr_nfs_printfh.pcap		hoobr_nfs_printfh.out
 hoobr_aodv_extension	hoobr_aodv_extension.pcap	hoobr_aodv_extension.out
 hoobr_nfs_xid_map_enter hoobr_nfs_xid_map_enter.pcap    hoobr_nfs_xid_map_enter.out
+hoobr_bfd_print		hoobr_bfd_print.pcap		hoobr_bfd_print.out
 
 # bad packets from Wilfried Kirsch
 slip-bad-direction	slip-bad-direction.pcap		slip-bad-direction.out	-ve
