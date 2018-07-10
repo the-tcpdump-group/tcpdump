@@ -356,8 +356,8 @@ Parse_fh(const unsigned char *fh, u_int len, my_fsid *fsidp,
 	    }
 
 	    /* VMS file ID is: (RVN, FidHi, FidLo) */
-	    *inop = (EXTRACT_U_1(fhp + 26) << 24) |
-	    	    (EXTRACT_U_1(fhp + 27) << 16) |
+	    *inop = (((uint32_t)EXTRACT_U_1(fhp + 26)) << 24) |
+		    (((uint32_t)EXTRACT_U_1(fhp + 27)) << 16) |
 		    (EXTRACT_LE_U_2(fhp + 22) << 0);
 
 	    /* Caller must save (and null-terminate?) this value */
