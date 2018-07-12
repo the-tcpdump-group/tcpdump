@@ -1119,7 +1119,11 @@ parse_interface_number(const char *device)
 }
 
 static char *
-find_interface_by_number(const char *url, long devnum)
+find_interface_by_number(const char *url
+#ifndef HAVE_PCAP_FINDALLDEVS_EX
+_U_
+#endif
+, long devnum)
 {
 	pcap_if_t *dev, *devlist;
 	long i;
