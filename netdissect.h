@@ -465,6 +465,7 @@ extern u_int raw_if_print IF_PRINTER_ARGS;
 extern u_int sl_bsdos_if_print IF_PRINTER_ARGS;
 extern u_int sl_if_print IF_PRINTER_ARGS;
 extern u_int sll_if_print IF_PRINTER_ARGS;
+extern u_int sll2_if_print IF_PRINTER_ARGS;
 extern u_int sunatm_if_print IF_PRINTER_ARGS;
 extern u_int symantec_if_print IF_PRINTER_ARGS;
 extern u_int token_if_print IF_PRINTER_ARGS;

@@ -126,6 +126,9 @@ static const struct printer printers[] = {
 #ifdef DLT_LINUX_SLL
 	{ sll_if_print,		DLT_LINUX_SLL },
 #endif
+#ifdef DLT_LINUX_SLL2
+	{ sll2_if_print,	DLT_LINUX_SLL2 },
+#endif
 #ifdef DLT_FR
 	{ fr_if_print,		DLT_FR },
 #endif

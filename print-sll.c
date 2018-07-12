@@ -85,6 +85,21 @@ struct sll_header {
 };
 
 /*
+ * A DLT_LINUX_SLL2 fake link-layer header.
+ */
+#define SLL2_HDR_LEN	20		/* total header length */
+
+struct sll2_header {
+	nd_uint16_t	sll2_protocol;		/* protocol */
+	nd_uint16_t	sll2_reserved_mbz;	/* reserved - must be zero */
+	nd_uint32_t	sll2_if_index;		/* 1-based interface index */
+	nd_uint16_t	sll2_hatype;		/* link-layer address type */
+	nd_uint8_t	sll2_pkttype;		/* packet type */
+	nd_uint8_t	sll2_halen;		/* link-layer address length */
+	nd_byte		sll2_addr[SLL_ADDRLEN];	/* link-layer address */
+};
+
+/*
  * The LINUX_SLL_ values for "sll_pkttype"; these correspond to the
  * PACKET_ values on Linux, but are defined here so that they're
  * available even on systems other than Linux, and so that they
@@ -301,6 +316,186 @@ recurse:
 			/* ether_type not known, print raw packet */
 			if (!ndo->ndo_eflag)
 				sll_print(ndo, sllp, length + SLL_HDR_LEN);
+			if (!ndo->ndo_suppress_default_print)
+				ND_DEFAULTPRINT(p, caplen);
+		}
+	}
+
+	return (hdrlen);
+}
+
+static void
+sll2_print(netdissect_options *ndo, const struct sll2_header *sllp, u_int length)
+{
+	u_short ether_type;
+
+	ndo->ndo_protocol = "sll2";
+        ND_PRINT("%3s ",tok2str(sll_pkttype_values,"?",EXTRACT_BE_U_2(sllp->sll2_pkttype)));
+
+	/*
+	 * XXX - check the link-layer address type value?
+	 * For now, we just assume 6 means Ethernet.
+	 * XXX - print others as strings of hex?
+	 */
+	if (EXTRACT_U_1(sllp->sll2_halen) == 6)
+		ND_PRINT("%s ", etheraddr_string(ndo, sllp->sll2_addr));
+
+	if (!ndo->ndo_qflag) {
+		ether_type = EXTRACT_BE_U_2(sllp->sll2_protocol);
+
+		if (ether_type <= MAX_ETHERNET_LENGTH_VAL) {
+			/*
+			 * Not an Ethernet type; what type is it?
+			 */
+			switch (ether_type) {
+
+			case LINUX_SLL_P_802_3:
+				/*
+				 * Ethernet_802.3 IPX frame.
+				 */
+				ND_PRINT("802.3");
+				break;
+
+			case LINUX_SLL_P_802_2:
+				/*
+				 * 802.2.
+				 */
+				ND_PRINT("802.2");
+				break;
+
+			default:
+				/*
+				 * What is it?
+				 */
+				ND_PRINT("ethertype Unknown (0x%04x)",
+				    ether_type);
+				break;
+			}
+		} else {
+			ND_PRINT("ethertype %s (0x%04x)",
+			    tok2str(ethertype_values, "Unknown", ether_type),
+			    ether_type);
+		}
+		ND_PRINT(", length %u: ", length);
+	}
+}
+
+/*
+ * This is the top level routine of the printer.  'p' points to the
+ * Linux "cooked capture" header of the packet, 'h->ts' is the timestamp,
+ * 'h->len' is the length of the packet off the wire, and 'h->caplen'
+ * is the number of bytes actually captured.
+ */
+u_int
+sll2_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
+{
+	u_int caplen = h->caplen;
+	u_int length = h->len;
+	const struct sll2_header *sllp;
+	u_short ether_type;
+	int llc_hdrlen;
+	u_int hdrlen;
+
+	ndo->ndo_protocol = "sll2_if";
+	if (caplen < SLL2_HDR_LEN) {
+		/*
+		 * XXX - this "can't happen" because "pcap-linux.c" always
+		 * adds this many bytes of header to every packet in a
+		 * cooked socket capture.
+		 */
+		nd_print_trunc(ndo);
+		return (caplen);
+	}
+
+	sllp = (const struct sll2_header *)p;
+
+	if (ndo->ndo_eflag)
+		sll2_print(ndo, sllp, length);
+
+	/*
+	 * Go past the cooked-mode header.
+	 */
+	length -= SLL2_HDR_LEN;
+	caplen -= SLL2_HDR_LEN;
+	p += SLL2_HDR_LEN;
+	hdrlen = SLL2_HDR_LEN;
+
+	ether_type = EXTRACT_BE_U_2(sllp->sll2_protocol);
+
+recurse:
+	/*
+	 * Is it (gag) an 802.3 encapsulation, or some non-Ethernet
+	 * packet type?
+	 */
+	if (ether_type <= MAX_ETHERNET_LENGTH_VAL) {
+		/*
+		 * Yes - what type is it?
+		 */
+		switch (ether_type) {
+
+		case LINUX_SLL_P_802_3:
+			/*
+			 * Ethernet_802.3 IPX frame.
+			 */
+			ipx_print(ndo, p, length);
+			break;
+
+		case LINUX_SLL_P_802_2:
+			/*
+			 * 802.2.
+			 * Try to print the LLC-layer header & higher layers.
+			 */
+			llc_hdrlen = llc_print(ndo, p, length, caplen, NULL, NULL);
+			if (llc_hdrlen < 0)
+				goto unknown;	/* unknown LLC type */
+			hdrlen += llc_hdrlen;
+			break;
+
+		default:
+			/*FALLTHROUGH*/
+
+		unknown:
+			/* packet type not known, print raw packet */
+			if (!ndo->ndo_suppress_default_print)
+				ND_DEFAULTPRINT(p, caplen);
+			break;
+		}
+	} else if (ether_type == ETHERTYPE_8021Q) {
+		/*
+		 * Print VLAN information, and then go back and process
+		 * the enclosed type field.
+		 */
+		if (caplen < 4) {
+			ND_PRINT("[|vlan]");
+			return (hdrlen + caplen);
+		}
+		if (length < 4) {
+			ND_PRINT("[|vlan]");
+			return (hdrlen + length);
+		}
+	        if (ndo->ndo_eflag) {
+	        	uint16_t tag = EXTRACT_BE_U_2(p);
+
+			ND_PRINT("%s, ", ieee8021q_tci_string(tag));
+		}
+
+		ether_type = EXTRACT_BE_U_2(p + 2);
+		if (ether_type <= MAX_ETHERNET_LENGTH_VAL)
+			ether_type = LINUX_SLL_P_802_2;
+		if (!ndo->ndo_qflag) {
+			ND_PRINT("ethertype %s, ",
+			    tok2str(ethertype_values, "Unknown", ether_type));
+		}
+		p += 4;
+		length -= 4;
+		caplen -= 4;
+		hdrlen += 4;
+		goto recurse;
+	} else {
+		if (ethertype_print(ndo, ether_type, p, length, caplen, NULL, NULL) == 0) {
+			/* ether_type not known, print raw packet */
+			if (!ndo->ndo_eflag)
+				sll2_print(ndo, sllp, length + SLL_HDR_LEN);
 			if (!ndo->ndo_suppress_default_print)
 				ND_DEFAULTPRINT(p, caplen);
 		}
