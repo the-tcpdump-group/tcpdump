@@ -24,7 +24,7 @@ if(PCAP_CONFIG)
   # XXX - this assumes that there's only one -I flag in the output
   # of pcap-config --cflags.  That *should* be the case.
   #
-  string(REGEX REPLACE "-I" "" PCAP_INCLUDE_DIRS ${PCAP_CONFIG_OUTPUT})
+  string(REGEX REPLACE "-I" "" PCAP_INCLUDE_DIRS "${PCAP_CONFIG_OUTPUT}")
   set(PCAP_INCLUDE_DIR ${PCAP_INCLUDE_DIRS})
 
   # Now, get the libraries.
