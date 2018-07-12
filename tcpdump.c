@@ -1978,6 +1978,10 @@ main(int argc, char **argv)
 			    RFileName, dlt_name,
 			    pcap_datalink_val_to_description(dlt));
 		}
+#ifdef DLT_LINUX_SLL2
+		if (dlt == DLT_LINUX_SLL2)
+			fprintf(stderr, "Warning: interface names might be incorrect\n");
+#endif
 	} else {
 		/*
 		 * We're doing a live capture.
