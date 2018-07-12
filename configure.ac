@@ -24,7 +24,7 @@ AC_PROG_CC_C99
 AC_LBL_C_INIT(V_CCOPT, V_INCLS)
 AC_LBL_C_INLINE
 
-AC_CHECK_HEADERS(fcntl.h rpc/rpc.h rpc/rpcent.h)
+AC_CHECK_HEADERS(fcntl.h rpc/rpc.h rpc/rpcent.h net/if.h)
 AC_CHECK_HEADERS(net/pfvar.h, , , [#include <sys/types.h>
 #include <sys/socket.h>
 #include <net/if.h>])

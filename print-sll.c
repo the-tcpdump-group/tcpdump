@@ -25,6 +25,10 @@
 #include <config.h>
 #endif
 
+#ifdef HAVE_NET_IF_H
+#include <net/if.h>
+#endif
+
 #include "netdissect-stdinc.h"
 
 #include "netdissect.h"
@@ -395,6 +399,9 @@ sll2_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 	u_short ether_type;
 	int llc_hdrlen;
 	u_int hdrlen;
+#ifdef HAVE_NET_IF_H
+	char ifname[IF_NAMESIZE];
+#endif
 
 	ndo->ndo_protocol = "sll2_if";
 	if (caplen < SLL2_HDR_LEN) {
@@ -408,6 +415,13 @@ sll2_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 	}
 
 	sllp = (const struct sll2_header *)p;
+#ifdef HAVE_NET_IF_H
+	uint32_t index = EXTRACT_BE_U_4(sllp->sll2_if_index);
+	if (if_indextoname(index, ifname))
+		ND_PRINT("ifindex %u (%s) ", index, ifname);
+	else
+		ND_PRINT("ifindex %u ", index);
+#endif
 
 	if (ndo->ndo_eflag)
 		sll2_print(ndo, sllp, length);
