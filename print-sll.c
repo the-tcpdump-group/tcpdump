@@ -330,7 +330,7 @@ sll2_print(netdissect_options *ndo, const struct sll2_header *sllp, u_int length
 	u_short ether_type;
 
 	ndo->ndo_protocol = "sll2";
-        ND_PRINT("%3s ",tok2str(sll_pkttype_values,"?",EXTRACT_BE_U_2(sllp->sll2_pkttype)));
+        ND_PRINT("%3s ",tok2str(sll_pkttype_values,"?",EXTRACT_U_1(sllp->sll2_pkttype)));
 
 	/*
 	 * XXX - check the link-layer address type value?
