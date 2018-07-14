@@ -732,20 +732,15 @@ droproot(const char *username, const char *chroot_dir)
 {
 	struct passwd *pw = NULL;
 
-	if (chroot_dir && !username) {
-		fprintf(stderr, "%s: Chroot without dropping root is insecure\n",
-			program_name);
-		exit_tcpdump(S_ERR_HOST_PROGRAM);
-	}
+	if (chroot_dir && !username)
+		error("Chroot without dropping root is insecure");
 
 	pw = getpwnam(username);
 	if (pw) {
 		if (chroot_dir) {
-			if (chroot(chroot_dir) != 0 || chdir ("/") != 0) {
-				fprintf(stderr, "%s: Couldn't chroot/chdir to '%.64s': %s\n",
-					program_name, chroot_dir, pcap_strerror(errno));
-				exit_tcpdump(S_ERR_HOST_PROGRAM);
-			}
+			if (chroot(chroot_dir) != 0 || chdir ("/") != 0)
+				error("Couldn't chroot/chdir to '%.64s': %s",
+				      chroot_dir, pcap_strerror(errno));
 		}
 #ifdef HAVE_LIBCAP_NG
 		{
@@ -758,24 +753,18 @@ droproot(const char *username, const char *chroot_dir)
 		}
 #else
 		if (initgroups(pw->pw_name, pw->pw_gid) != 0 ||
-		    setgid(pw->pw_gid) != 0 || setuid(pw->pw_uid) != 0) {
-			fprintf(stderr, "%s: Couldn't change to '%.32s' uid=%lu gid=%lu: %s\n",
-				program_name, username,
+		    setgid(pw->pw_gid) != 0 || setuid(pw->pw_uid) != 0)
+			error("Couldn't change to '%.32s' uid=%lu gid=%lu: %s",
+				username,
 				(unsigned long)pw->pw_uid,
 				(unsigned long)pw->pw_gid,
 				pcap_strerror(errno));
-			exit_tcpdump(S_ERR_HOST_PROGRAM);
-		}
 		else {
 			fprintf(stderr, "dropped privs to %s\n", username);
 		}
 #endif /* HAVE_LIBCAP_NG */
-	}
-	else {
-		fprintf(stderr, "%s: Couldn't find user '%.32s'\n",
-			program_name, username);
-		exit_tcpdump(S_ERR_HOST_PROGRAM);
-	}
+	} else
+		error("Couldn't find user '%.32s'", username);
 #ifdef HAVE_LIBCAP_NG
 	/* We don't need CAP_SETUID, CAP_SETGID and CAP_SYS_CHROOT any more. */
 DIAG_OFF_CLANG(assign-enum)
