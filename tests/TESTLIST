@@ -368,9 +368,9 @@ lisp_ipv6_eid		lisp_ipv6.pcap		lisp_ipv6.out		-v
 pcap-invalid-version-1 pcap-invalid-version-1.pcap pcap-invalid-version-1.out
 pcap-invalid-version-2 pcap-invalid-version-2.pcap pcap-invalid-version-2.out
 
-# pcap-ng invalid version (first: version = 0.1 ; second: version = 1.1)
-pcap-ng-invalid-vers-1 pcap-ng-invalid-vers-1.pcap pcap-ng-invalid-vers-1.out
-pcap-ng-invalid-vers-2 pcap-ng-invalid-vers-2.pcap pcap-ng-invalid-vers-2.out
+# pcapng invalid version (first: version = 0.1 ; second: version = 1.1)
+pcapng-invalid-vers-1 pcapng-invalid-vers-1.pcapng pcapng-invalid-vers-1.out
+pcapng-invalid-vers-2 pcapng-invalid-vers-2.pcapng pcapng-invalid-vers-2.out
 
 # NSH tests
 nsh                    nsh.pcap                nsh.out
