@@ -314,7 +314,6 @@ static u_int hexdigit(netdissect_options *ndo, char hex)
 	else {
 		(*ndo->ndo_error)(ndo, S_ERR_ND_ESP_SECRET,
 				  "invalid hex digit %c in espsecret\n", hex);
-		return 0;
 	}
 }
 
@@ -549,7 +548,6 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 			(*ndo->ndo_error)(ndo, S_ERR_ND_OPEN_FILE,
 					  "print_esp: can't open %s: %s\n",
 					  filename, strerror(errno));
-			return;
 		}
 
 		while (fgets(fileline, sizeof(fileline)-1, secretfile) != NULL) {
