@@ -7230,6 +7230,49 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wunreachable-code-return option" >&5
+$as_echo_n "checking whether the compiler supports the -Wunreachable-code-return option... " >&6; }
+	save_CFLAGS="$CFLAGS"
+	if expr "x-Wunreachable-code-return" : "x-W.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -Wunreachable-code-return"
+	elif expr "x-Wunreachable-code-return" : "x-f.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS -Werror -Wunreachable-code-return"
+	elif expr "x-Wunreachable-code-return" : "x-m.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS -Werror -Wunreachable-code-return"
+	else
+	    CFLAGS="$CFLAGS -Wunreachable-code-return"
+	fi
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+return 0
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+		CFLAGS="$save_CFLAGS"
+		V_CCOPT="$V_CCOPT -Wunreachable-code-return"
+
+else
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		CFLAGS="$save_CFLAGS"
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wused-but-marked-unused option" >&5
 $as_echo_n "checking whether the compiler supports the -Wused-but-marked-unused option... " >&6; }
 	save_CFLAGS="$CFLAGS"
