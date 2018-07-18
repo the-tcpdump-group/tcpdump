@@ -218,7 +218,7 @@ flag will forcibly flush the packet buffer into the output file.
 .LP
 Reading packets from a network interface may require that you have
 special privileges; see the
-.B pcap (3PCAP)
+.BR pcap (3PCAP)
 man page for details.  Reading a saved packet file doesn't require
 special privileges.
 .SH OPTIONS
@@ -292,7 +292,7 @@ flag will not be supported if
 was built with an older version of
 .I libpcap
 that lacks the
-.B pcap_findalldevs()
+.BR pcap_findalldevs(3PCAP)
 function.
 .TP
 .B \-e
@@ -727,7 +727,7 @@ flag will not be supported if
 was built with an older version of
 .I libpcap
 that lacks the
-.B pcap_dump_flush()
+.BR pcap_dump_flush(3PCAP)
 function.
 .TP
 .B \-v
