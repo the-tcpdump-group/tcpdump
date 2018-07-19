@@ -1217,7 +1217,7 @@ host \fIcsam\fP.
 .RS
 .nf
 .sp .5
-\s-2\f(CWIP rtsg.1023 > csam.login: Flags [S], seq 768512:768512, win 4096, opts [mss 1024]
+\f(CWIP rtsg.1023 > csam.login: Flags [S], seq 768512:768512, win 4096, opts [mss 1024]
 IP csam.login > rtsg.1023: Flags [S.], seq, 947648:947648, ack 768513, win 4096, opts [mss 1024]
 IP rtsg.1023 > csam.login: Flags [.], ack 1, win 4096
 IP rtsg.1023 > csam.login: Flags [P.], seq 1:2, ack 1, win 4096, length 1
@@ -1225,7 +1225,7 @@ IP csam.login > rtsg.1023: Flags [.], ack 2, win 4096
 IP rtsg.1023 > csam.login: Flags [P.], seq 2:21, ack 1, win 4096, length 19
 IP csam.login > rtsg.1023: Flags [P.], seq 1:2, ack 21, win 4077, length 1
 IP csam.login > rtsg.1023: Flags [P.], seq 2:3, ack 21, win 4077, urg 1, length 1
-IP csam.login > rtsg.1023: Flags [P.], seq 3:4, ack 21, win 4077, urg 1, length 1\fR\s+2
+IP csam.login > rtsg.1023: Flags [P.], seq 3:4, ack 21, win 4077, urg 1, length 1\fR
 .sp .5
 .fi
 .RE
@@ -1826,9 +1826,9 @@ protocol) and packet size.
 .RS
 .nf
 .sp .5
-\s-2\f(CWicsd-net.112.220 > jssmag.2: nbp-lkup 190: "=:LaserWriter@*"
+\f(CWicsd-net.112.220 > jssmag.2: nbp-lkup 190: "=:LaserWriter@*"
 jssmag.209.2 > icsd-net.112.220: nbp-reply 190: "RM1140:LaserWriter@*" 250
-techpit.2 > icsd-net.112.220: nbp-reply 190: "techpit:LaserWriter@*" 186\fR\s+2
+techpit.2 > icsd-net.112.220: nbp-reply 190: "techpit:LaserWriter@*" 186\fR
 .sp .5
 .fi
 .RE
@@ -1846,7 +1846,7 @@ another reply to the same request saying host techpit has laserwriter
 .RS
 .nf
 .sp .5
-\s-2\f(CWjssmag.209.165 > helios.132: atp-req  12266<0-7> 0xae030001
+\f(CWjssmag.209.165 > helios.132: atp-req  12266<0-7> 0xae030001
 helios.132 > jssmag.209.165: atp-resp 12266:0 (512) 0xae040000
 helios.132 > jssmag.209.165: atp-resp 12266:1 (512) 0xae040000
 helios.132 > jssmag.209.165: atp-resp 12266:2 (512) 0xae040000
@@ -1859,7 +1859,7 @@ jssmag.209.165 > helios.132: atp-req  12266<3,5> 0xae030001
 helios.132 > jssmag.209.165: atp-resp 12266:3 (512) 0xae040000
 helios.132 > jssmag.209.165: atp-resp 12266:5 (512) 0xae040000
 jssmag.209.165 > helios.132: atp-rel  12266<0-7> 0xae030001
-jssmag.209.133 > helios.132: atp-req* 12267<0-7> 0xae030002\fR\s+2
+jssmag.209.133 > helios.132: atp-req* 12267<0-7> 0xae030002\fR
 .sp .5
 .fi
 .RE
