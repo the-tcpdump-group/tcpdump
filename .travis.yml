@@ -47,7 +47,6 @@ addons:
     packages:
       - libssl-dev
       - libssl1.0.0
-      - libdnet-dev
       - libsmi2-dev
       - libcap-ng-dev
       - libpcap-dev

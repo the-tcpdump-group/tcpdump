@@ -641,7 +641,6 @@ extern int nextproto6_cksum(netdissect_options *, const struct ip6_hdr *, const 
 extern int mask2plen(uint32_t);
 extern int mask62plen(const u_char *);
 
-extern const char *dnname_string(netdissect_options *, u_short);
 extern const char *dnnum_string(netdissect_options *, u_short);
 
 extern char *smb_errstr(int, int);
