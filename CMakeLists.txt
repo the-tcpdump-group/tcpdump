@@ -482,45 +482,6 @@ if(HAVE_ETHER_NTOHOST)
 endif()
 cmake_pop_check_state()
 
-check_function_exists(dnet_htoa STDLIBS_HAVE_DNET_HTOA)
-if(STDLIBS_HAVE_DNET_HTOA)
-    set(HAVE_DNET_HTOA TRUE)
-else(STDLIBS_HAVE_DNET_HTOA)
-    check_library_exists(dnet dnet_htoa "" HAVE_DNET_HTOA)
-    if(HAVE_DNET_HTOA)
-        set(TCPDUMP_LINK_LIBRARIES dnet ${TCPDUMP_LINK_LIBRARIES})
-    endif(HAVE_DNET_HTOA)
-endif(STDLIBS_HAVE_DNET_HTOA)
-if(HAVE_DNET_HTOA)
-    #
-    # OK, we have dnet_htoa().  Do we have netdnet/dnetdb.h?
-    #
-    check_include_files("sys/types.h;netdnet/dnetdb.h" HAVE_NETDNET_DNETDB_H)
-    if(HAVE_NETDNET_DNETDB_H)
-        #
-        # Yes.  Does it declare dnet_htoa()?
-        #
-        cmake_push_check_state()
-        set(CMAKE_REQUIRED_LIBRARIES dnet)
-        check_symbol_exists(dnet_htoa "sys/types.h;netdnet/dnetdb.h" NETDNET_DNETDB_H_DECLARES_DNET_HTOA)
-        cmake_pop_check_state()
-    endif(HAVE_NETDNET_DNETDB_H)
-
-    #
-    # Do we have netdnet/dn.h?
-    #
-    check_include_file(netdnet/dn.h HAVE_NETDNET_DN_H)
-    if(HAVE_NETDNET_DN_H)
-        #
-        # Yes.  Does it declare struct dn_naddr?
-        #
-        cmake_push_check_state()
-        set(CMAKE_EXTRA_INCLUDE_FILES netdnet/dn.h)
-        check_type_size("struct dn_naddr" STRUCT_DN_NADDR)
-        cmake_pop_check_state()
-    endif(HAVE_NETDNET_DN_H)
-endif(HAVE_DNET_HTOA)
-
 #
 # Data types.
 #

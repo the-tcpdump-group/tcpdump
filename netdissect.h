@@ -718,7 +718,6 @@ extern void nd_print_invalid(netdissect_options *);
 extern int mask2plen(uint32_t);
 extern int mask62plen(const u_char *);
 
-extern const char *dnname_string(netdissect_options *, u_short);
 extern const char *dnnum_string(netdissect_options *, u_short);
 
 extern int decode_prefix4(netdissect_options *, const u_char *, u_int, char *, size_t);

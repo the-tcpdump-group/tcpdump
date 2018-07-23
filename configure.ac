@@ -385,45 +385,6 @@ if test "$ipv6" = "yes" -a "$ipv6lib" != "none"; then
 	fi
 fi
 
-AC_SEARCH_LIBS(dnet_htoa, dnet,
-[
-	AC_DEFINE(HAVE_DNET_HTOA, 1,
-	    [define if you have the dnet_htoa function])
-	#
-	# OK, we have dnet_htoa().  Do we have netdnet/dnetdb.h?
-	#
-	AC_CHECK_HEADERS(netdnet/dnetdb.h)
-	if test "$ac_cv_header_netdnet_dnetdb_h" = "yes"; then
-		#
-		# Yes.  Does it declare dnet_htoa()?
-		#
-		AC_CHECK_DECL(dnet_htoa,
-		[
-			# Yes.
-			AC_DEFINE(NETDNET_DNETDB_H_DECLARES_DNET_HTOA,,
-			    [Define to 1 if netenet/dnetdb.h declares `dnet_htoa'])
-		],,
-		[
-AC_INCLUDES_DEFAULT
-#include <netdnet/dnetdb.h>
-		])
-	fi
-
-	#
-	# Do we have netdnet/dn.h?
-	#
-	AC_CHECK_HEADERS(netdnet/dn.h)
-	if test "$ac_cv_header_netdnet_dn_h" = "yes"; then
-		#
-		# Yes.  Does it declare struct dn_naddr?
-		#
-		AC_CHECK_TYPES(struct dn_naddr,,,
-		[
-#include <netdnet/dn.h>
-		])
-	fi
-])
-
 AC_REPLACE_FUNCS(strlcat strlcpy strdup strsep getservent getopt_long)
 AC_CHECK_FUNCS(fork vfork strftime)
 AC_CHECK_FUNCS(setlinebuf)

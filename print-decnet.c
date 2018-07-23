@@ -31,25 +31,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef HAVE_DNET_HTOA
-  #ifdef HAVE_NETDNET_DN_H
-    #include <netdnet/dn.h>
-  #endif
-  #ifndef HAVE_STRUCT_DN_NADDR
-#define DN_MAXADDL	20		/* max size of DECnet address */
-struct dn_naddr {
-	unsigned short	a_len;		/* length of address */
-	unsigned char	a_addr[DN_MAXADDL]; /* address as bytes */
-};
-  #endif /* HAVE_STRUCT_DN_NADDR */
-  #ifdef HAVE_NETDNET_DNETDB_H
-    #include <netdnet/dnetdb.h>
-  #endif
-  #ifndef NETDNET_DNETDB_H_DECLARES_DNET_HTOA
-    extern char *dnet_htoa(struct dn_naddr *);
-  #endif
-#endif
-
 #include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
@@ -1247,23 +1228,4 @@ dnnum_string(netdissect_options *ndo, u_short dnaddr)
 		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC, "dnnum_string: malloc");
 	snprintf(str, siz, "%u.%u", area, node);
 	return(str);
-}
-
-const char *
-dnname_string(netdissect_options *ndo, u_short dnaddr)
-{
-#ifdef HAVE_DNET_HTOA
-	struct dn_naddr dna;
-	char *dnname;
-
-	dna.a_len = sizeof(short);
-	memcpy((char *)dna.a_addr, (char *)&dnaddr, sizeof(short));
-	dnname = dnet_htoa(&dna);
-	if(dnname != NULL)
-		return (strdup(dnname));
-	else
-		return(dnnum_string(ndo, dnaddr));
-#else
-	return(dnnum_string(ndo, dnaddr));	/* punt */
-#endif
 }

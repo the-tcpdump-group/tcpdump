@@ -30,9 +30,6 @@
 /* Define to 1 if you have the declaration of `ether_ntohost' */
 #undef HAVE_DECL_ETHER_NTOHOST
 
-/* define if you have the dnet_htoa function */
-#undef HAVE_DNET_HTOA
-
 /* Define to 1 if you have the `ether_ntohost' function. */
 #undef HAVE_ETHER_NTOHOST
 
@@ -71,12 +68,6 @@
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
-
-/* Define to 1 if you have the <netdnet/dnetdb.h> header file. */
-#undef HAVE_NETDNET_DNETDB_H
-
-/* Define to 1 if you have the <netdnet/dn.h> header file. */
-#undef HAVE_NETDNET_DN_H
 
 /* Define to 1 if you have the <net/if.h> header file. */
 #undef HAVE_NET_IF_H
@@ -210,9 +201,6 @@
 /* Define to 1 if you have the `strsep' function. */
 #undef HAVE_STRSEP
 
-/* Define to 1 if the system has the type `struct dn_naddr'. */
-#undef HAVE_STRUCT_DN_NADDR
-
 /* Define to 1 if the system has the type `struct ether_addr'. */
 #undef HAVE_STRUCT_ETHER_ADDR
 
@@ -233,9 +221,6 @@
 
 /* define if libpcap has yydebug */
 #undef HAVE_YYDEBUG
-
-/* Define to 1 if netenet/dnetdb.h declares `dnet_htoa' */
-#undef NETDNET_DNETDB_H_DECLARES_DNET_HTOA
 
 /* Define to 1 if netinet/ether.h declares `ether_ntohost' */
 #undef NETINET_ETHER_H_DECLARES_ETHER_NTOHOST
