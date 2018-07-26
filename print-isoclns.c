@@ -29,7 +29,7 @@
 /*
  * specification:
  *
- * CLNP: ISO 8473
+ * CLNP: ISO 8473 (respective ITU version is at http://www.itu.int/rec/T-REC-X.233/en/)
  * ES-IS: ISO 9542
  * IS-IS: ISO 10589
  */
@@ -1057,6 +1057,18 @@ clnp_print(netdissect_options *ndo,
                 clnp_print(ndo, pptr, length - li);
                 break;
             }
+
+        /* The cases above break from the switch block if they see and print
+         * a CLNP header in the Data part. For an Error Report PDU this is
+         * described in Section 7.9.6 of ITU X.233 (1997 E), also known as
+         * ISO/IEC 8473-1:1998(E). It is not clear why in this code the same
+         * applies to an Echo Response PDU, as the standard does not specify
+         * the contents -- could be a proprietary extension or a bug. In either
+         * case, if the Data part does not contain a CLNP header, its structure
+         * is considered unknown and the decoding falls through to print the
+         * contents as-is.
+         */
+        ND_FALL_THROUGH;
 
         case 	CLNP_PDU_DT:
         case 	CLNP_PDU_MD:
