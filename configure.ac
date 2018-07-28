@@ -409,7 +409,7 @@ AC_INCLUDES_DEFAULT
 	fi
 ])
 
-AC_REPLACE_FUNCS(strlcat strlcpy strdup strsep getservent getopt_long pcap_dump_ftell)
+AC_REPLACE_FUNCS(strlcat strlcpy strdup strsep getservent getopt_long)
 AC_CHECK_FUNCS(fork vfork strftime)
 AC_CHECK_FUNCS(setlinebuf)
 
@@ -726,6 +726,7 @@ if test $ac_cv_func_pcap_lib_version = "no" ; then
 fi
 AC_CHECK_FUNCS(pcap_setdirection pcap_set_immediate_mode pcap_dump_ftell64)
 AC_CHECK_FUNCS(pcap_open pcap_findalldevs_ex)
+AC_REPLACE_FUNCS(pcap_dump_ftell)
 
 #
 # Check for special debugging functions
