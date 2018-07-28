@@ -48,6 +48,8 @@ VERSION		- version of this release
 aclocal.m4	- autoconf macros
 addrtoname.c	- address to hostname routines
 addrtoname.h	- address to hostname definitions
+addrtostr.c	- address to printable string routines
+addrtostr.h	- address to printable string definitions
 ah.h		- IPSEC Authentication Header definitions
 appletalk.h	- AppleTalk definitions
 ascii_strcasecmp.c - locale-independent case-independent string comparison
@@ -64,7 +66,6 @@ config.h.in	- autoconf input
 config.sub	- autoconf support
 configure	- configure script (run this first)
 configure.ac	- configure script source
-ether.h		- Ethernet definitions
 ethertype.h	- Ethernet type value definitions
 extract.h	- alignment definitions
 gmpls.c		- GMPLS definitions
@@ -105,8 +106,6 @@ print-*.c	- The netdissect printers
 rpc_auth.h	- definitions for ONC RPC authentication
 rpc_msg.h	- definitions for ONC RPC messages
 send-ack.awk	- unidirectional tcp send/ack awk script
-setsignal.c	- OS-independent signal routines
-setsignal.h	- OS-independent signal prototypes
 slcompress.h	- SLIP/PPP Van Jacobson compression (RFC1144) definitions
 smb.h		- SMB/CIFS definitions
 smbutil.c	- SMB/CIFS utility routines
