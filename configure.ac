@@ -409,7 +409,7 @@ AC_INCLUDES_DEFAULT
 	fi
 ])
 
-AC_REPLACE_FUNCS(strlcat strlcpy strdup strsep getservent getopt_long)
+AC_REPLACE_FUNCS(strlcat strlcpy strdup strsep getservent getopt_long pcap_dump_ftell)
 AC_CHECK_FUNCS(fork vfork strftime)
 AC_CHECK_FUNCS(setlinebuf)
 
@@ -671,17 +671,6 @@ dnl it's absent (it has hooks into the live capture routines),
 dnl so just define the HAVE_ value if it's there.
 dnl
 AC_CHECK_FUNCS(pcap_breakloop)
-
-dnl
-dnl Check for "pcap_dump_ftell()" and use a substitute version
-dnl if it's not present.
-dnl
-AC_CHECK_FUNC(pcap_dump_ftell,
-	AC_DEFINE(HAVE_PCAP_DUMP_FTELL, 1,
-	    [define if libpcap has pcap_dump_ftell()]),
-	[
-	    AC_LIBOBJ(pcap_dump_ftell)
-	])
 
 #
 # Do we have the new open API?  Check for pcap_create, and assume that,

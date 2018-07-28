@@ -117,7 +117,7 @@
 /* Define to 1 if you have the `pcap_dump_flush' function. */
 #undef HAVE_PCAP_DUMP_FLUSH
 
-/* define if libpcap has pcap_dump_ftell() */
+/* Define to 1 if you have the `pcap_dump_ftell' function. */
 #undef HAVE_PCAP_DUMP_FTELL
 
 /* Define to 1 if you have the `pcap_dump_ftell64' function. */

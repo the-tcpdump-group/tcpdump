@@ -363,7 +363,6 @@ EXTRA_DIST = \
 	missing/win_ether_ntohost.h \
 	mkdep \
 	packetdat.awk \
-	pcap_dump_ftell.c \
 	print-pflog.c \
 	print-smb.c \
 	send-ack.awk \
@@ -407,6 +406,8 @@ strlcpy.o: $(srcdir)/missing/strlcpy.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/strlcpy.c
 strsep.o: $(srcdir)/missing/strsep.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/strsep.c
+pcap_dump_ftell.o: $(srcdir)/missing/pcap_dump_ftell.c
+	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/pcap_dump_ftell.c
 
 install: all
 	[ -d $(DESTDIR)$(sbindir) ] || \
