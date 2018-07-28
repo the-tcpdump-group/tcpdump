@@ -1019,6 +1019,7 @@ fs_print(netdissect_options *ndo,
 			}
 			if (j == 0)
 				ND_PRINT((ndo, " <none!>"));
+			break;
 		}
 		case 65537:	/* Fetch data 64 */
 			FIDOUT();
@@ -1279,6 +1280,7 @@ cb_print(netdissect_options *ndo,
 				bp += sizeof(int32_t);
 				tok2str(cb_types, "type %d", t);
 			}
+			break;
 		}
 		case 214: {
 			ND_PRINT((ndo, " afsuuid"));
@@ -1740,6 +1742,7 @@ vldb_reply_print(netdissect_options *ndo,
 			INTOUT();
 			ND_PRINT((ndo, " nextindex"));
 			INTOUT();
+			/*FALLTHROUGH*/
 		case 503:	/* Get entry by id */
 		case 504:	/* Get entry by name */
 		{	unsigned long nservers, j;
@@ -1789,6 +1792,7 @@ vldb_reply_print(netdissect_options *ndo,
 			INTOUT();
 			ND_PRINT((ndo, " nextindex"));
 			INTOUT();
+			/*FALLTHROUGH*/
 		case 518:	/* Get entry by ID N */
 		case 519:	/* Get entry by name N */
 		{	unsigned long nservers, j;
