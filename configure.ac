@@ -145,7 +145,6 @@ AC_ARG_ENABLE(smb,
    enableval=yes)
 case "$enableval" in
 yes)	AC_MSG_RESULT(yes)
-	AC_WARN([The SMB printer may have exploitable buffer overflows!!!])
 	AC_DEFINE(ENABLE_SMB, 1,
 	    [define if you want to build the possibly-buggy SMB printer])
 	LOCALSRC="print-smb.c smbutil.c $LOCALSRC"
