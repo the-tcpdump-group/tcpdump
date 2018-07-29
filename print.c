@@ -39,6 +39,8 @@
 #include "print.h"
 #include "netdissect-alloc.h"
 
+#include "pcap-missing.h"
+
 struct printer {
 	if_printer f;
 	int type;
