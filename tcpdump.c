@@ -152,7 +152,9 @@ The Regents of the University of California.  All rights reserved.\n";
 #define SIGNAL_FLUSH_PCAP SIGUSR2
 #endif
 
+#if defined(HAVE_PCAP_CREATE) || defined(_WIN32)
 static int Bflag;			/* buffer size */
+#endif
 #ifdef HAVE_PCAP_DUMP_FTELL64
 static int64_t Cflag;			/* rotate dump files after this many bytes */
 #else
@@ -186,13 +188,15 @@ static int Lflag;			/* list available data link types and exit */
 static int Iflag;			/* rfmon (monitor) mode */
 #ifdef HAVE_PCAP_SET_TSTAMP_TYPE
 static int Jflag;			/* list available time stamp types */
-#endif
 static int jflag = -1;			/* packet time stamp source */
+#endif
 static int pflag;			/* don't go promiscuous */
 #ifdef HAVE_PCAP_SETDIRECTION
 static int Qflag = -1;			/* restrict captured packet by send/receive direction */
 #endif
+#ifdef HAVE_PCAP_DUMP_FLUSH
 static int Uflag;			/* "unbuffered" output of dump files */
+#endif
 static int Wflag;			/* recycle output files after this number of files */
 static int WflagChars;
 static char *zflag = NULL;		/* compress each savefile using a specified command (like gzip or bzip2) */
@@ -218,7 +222,9 @@ static void cleanup(int);
 static void child_cleanup(int);
 static void print_version(void);
 static void print_usage(void);
+#ifdef HAVE_PCAP_SET_TSTAMP_TYPE
 static NORETURN void show_tstamp_types_and_exit(pcap_t *, const char *device);
+#endif
 static NORETURN void show_dlts_and_exit(pcap_t *, const char *device);
 #ifdef HAVE_PCAP_FINDALLDEVS
 static NORETURN void show_devices_and_exit(void);
