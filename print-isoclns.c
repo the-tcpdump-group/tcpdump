@@ -903,7 +903,7 @@ clnp_print(netdissect_options *ndo,
         }
 
         /* now walk the options */
-        while (li_remaining >= 2) {
+        while (li_remaining != 0) {
             u_int op, opli;
             const uint8_t *tptr;
 
