@@ -61,12 +61,6 @@ int32_t thiszone;		/* seconds offset from gmt to local time */
 /* invalid string to print '(invalid)' for malformed or corrupted packets */
 const char istr[] = " (invalid)";
 
-/*
- * timestamp display buffer size, the biggest size of both formats is needed
- * sizeof("0000000000.000000000") > sizeof("00:00:00.000000000")
- */
-#define TS_BUF_SIZE sizeof("0000000000.000000000")
-
 #define TOKBUFSIZE 128
 
 /*
@@ -235,77 +229,59 @@ nd_printzp(netdissect_options *ndo,
 }
 
 /*
- * Format the timestamp
+ * Print the timestamp as HH:MM:SS.FRAC.
  */
-static char *
-ts_format(netdissect_options *ndo
-#ifndef HAVE_PCAP_SET_TSTAMP_PRECISION
-_U_
-#endif
-, int sec, int usec, char *buf)
+static void
+ts_hmsfrac_print(netdissect_options *ndo, int sec, int usec)
 {
-	const char *format;
-
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
 	switch (ndo->ndo_tstamp_precision) {
 
 	case PCAP_TSTAMP_PRECISION_MICRO:
-		format = "%02d:%02d:%02d.%06u";
+		ND_PRINT("%02d:%02d:%02d.%06u", sec / 3600, (sec % 3600) / 60,
+		    sec % 60, usec);
 		break;
 
 	case PCAP_TSTAMP_PRECISION_NANO:
-		format = "%02d:%02d:%02d.%09u";
+		ND_PRINT("%02d:%02d:%02d.%09u", sec / 3600, (sec % 3600) / 60,
+		    sec % 60, usec);
 		break;
 
 	default:
-		format = "%02d:%02d:%02d.{unknown}";
+		ND_PRINT("%02d:%02d:%02d.{unknown}", sec / 3600, (sec % 3600) / 60,
+		    sec % 60);
 		break;
 	}
 #else
-	format = "%02d:%02d:%02d.%06u";
+	ND_PRINT("%02d:%02d:%02d.%06u", sec / 3600, (sec % 3600) / 60,
+	    sec % 60, usec);
 #endif
-
-	nd_snprintf(buf, TS_BUF_SIZE, format,
-                 sec / 3600, (sec % 3600) / 60, sec % 60, usec);
-
-        return buf;
 }
 
 /*
- * Format the timestamp - Unix timeval style
+ * Print the timestamp - Unix timeval style, as SECS.FRAC.
  */
-static char *
-ts_unix_format(netdissect_options *ndo
-#ifndef HAVE_PCAP_SET_TSTAMP_PRECISION
-_U_
-#endif
-, int sec, int usec, char *buf)
+static void
+ts_unix_print(netdissect_options *ndo, int sec, int usec)
 {
-	const char *format;
-
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
 	switch (ndo->ndo_tstamp_precision) {
 
 	case PCAP_TSTAMP_PRECISION_MICRO:
-		format = "%u.%06u";
+		ND_PRINT("%u.%06u", (unsigned)sec, (unsigned)usec);
 		break;
 
 	case PCAP_TSTAMP_PRECISION_NANO:
-		format = "%u.%09u";
+		ND_PRINT("%u.%09u", (unsigned)sec, (unsigned)usec);
 		break;
 
 	default:
-		format = "%u.{unknown}";
+		ND_PRINT("%u.{unknown}", (unsigned)sec);
 		break;
 	}
 #else
-	format = "%u.%06u";
+	ND_PRINT("%u.%06u", (unsigned)sec, (unsigned)usec);
 #endif
-
-	nd_snprintf(buf, TS_BUF_SIZE, format,
-		 (unsigned)sec, (unsigned)usec);
-
-	return buf;
 }
 
 /*
@@ -318,7 +294,6 @@ ts_print(netdissect_options *ndo,
 	int s;
 	struct tm *tm;
 	time_t Time;
-	char buf[TS_BUF_SIZE];
 	static struct timeval tv_ref;
 	struct timeval tv_result;
 	int negative_offset;
@@ -328,15 +303,16 @@ ts_print(netdissect_options *ndo,
 
 	case 0: /* Default */
 		s = (tvp->tv_sec + thiszone) % 86400;
-		ND_PRINT("%s ", ts_format(ndo, s, tvp->tv_usec, buf));
+		ts_hmsfrac_print(ndo, s, tvp->tv_usec);
+		ND_PRINT(" ");
 		break;
 
 	case 1: /* No time stamp */
 		break;
 
 	case 2: /* Unix timeval style */
-		ND_PRINT("%s ", ts_unix_format(ndo,
-			  tvp->tv_sec, tvp->tv_usec, buf));
+		ts_unix_print(ndo, tvp->tv_sec, tvp->tv_usec);
+		ND_PRINT(" ");
 		break;
 
 	case 3: /* Microseconds/nanoseconds since previous packet */
@@ -366,9 +342,8 @@ ts_print(netdissect_options *ndo,
 			netdissect_timevalsub(tvp, &tv_ref, &tv_result, nano_prec);
 
 		ND_PRINT((negative_offset ? "-" : " "));
-
-		ND_PRINT("%s ", ts_format(ndo,
-			  tv_result.tv_sec, tv_result.tv_usec, buf));
+		ts_hmsfrac_print(ndo, tv_result.tv_sec, tv_result.tv_usec);
+		ND_PRINT(" ");
 
                 if (ndo->ndo_tflag == 3)
 			tv_ref = *tvp; /* set timestamp for previous packet */
@@ -379,11 +354,13 @@ ts_print(netdissect_options *ndo,
 		Time = (tvp->tv_sec + thiszone) - s;
 		tm = gmtime (&Time);
 		if (!tm)
-			ND_PRINT("Date fail  ");
-		else
-			ND_PRINT("%04d-%02d-%02d %s ",
-                               tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday,
-                               ts_format(ndo, s, tvp->tv_usec, buf));
+			ND_PRINT("Date fail ");
+		else {
+			ND_PRINT("%04d-%02d-%02d ",
+			    tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday);
+			ts_hmsfrac_print(ndo, s, tvp->tv_usec);
+			ND_PRINT(" ");
+		}
 		break;
 	}
 }
