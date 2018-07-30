@@ -64,6 +64,7 @@ __RCSID("NetBSD: print-juniper.c,v 1.3 2007/07/25 06:31:32 dogcow Exp ");
 #define JUNIPER_IPSEC_O_AH_AUTHENTICATION_TYPE 4
 #define JUNIPER_IPSEC_O_ESP_ENCRYPTION_TYPE 5
 
+#ifdef DLT_JUNIPER_ES
 static const struct tok juniper_ipsec_type_values[] = {
     { JUNIPER_IPSEC_O_ESP_ENCRYPT_ESP_AUTHEN_TYPE, "ESP ENCR-AUTH" },
     { JUNIPER_IPSEC_O_ESP_ENCRYPT_AH_AUTHEN_TYPE, "ESP ENCR-AH AUTH" },
@@ -72,6 +73,7 @@ static const struct tok juniper_ipsec_type_values[] = {
     { JUNIPER_IPSEC_O_ESP_ENCRYPTION_TYPE, "ESP ENCR" },
     { 0, NULL}
 };
+#endif
 
 static const struct tok juniper_direction_values[] = {
     { JUNIPER_BPF_IN,  "In"},
@@ -438,16 +440,29 @@ struct juniper_l2info_t {
 
 #define MFR_BE_MASK 0xc0
 
+#ifdef DLT_JUNIPER_GGSN
 static const struct tok juniper_protocol_values[] = {
     { JUNIPER_PROTO_NULL, "Null" },
     { JUNIPER_PROTO_IPV4, "IPv4" },
     { JUNIPER_PROTO_IPV6, "IPv6" },
     { 0, NULL}
 };
+#endif
 
 static int ip_heuristic_guess(netdissect_options *, const u_char *, u_int);
+#ifdef DLT_JUNIPER_ATM2
 static int juniper_ppp_heuristic_guess(netdissect_options *, const u_char *, u_int);
+#endif
+#if defined(DLT_JUNIPER_GGSN) || defined(DLT_JUNIPER_ES) || \
+    defined(DLT_JUNIPER_MONITOR) || defined(DLT_JUNIPER_SERVICES) || \
+    defined(DLT_JUNIPER_PPPOE) || defined(DLT_JUNIPER_ETHER) || \
+    defined(DLT_JUNIPER_PPP) || defined(DLT_JUNIPER_FRELAY) || \
+    defined(DLT_JUNIPER_CHDLC) || defined(DLT_JUNIPER_PPPOE_ATM) || \
+    defined(DLT_JUNIPER_MLPPP) || defined(DLT_JUNIPER_MFR) || \
+    defined(DLT_JUNIPER_MLFR) || defined(DLT_JUNIPER_ATM1) || \
+    defined(DLT_JUNIPER_ATM2)
 static int juniper_parse_header(netdissect_options *, const u_char *, const struct pcap_pkthdr *, struct juniper_l2info_t *);
+#endif
 
 #ifdef DLT_JUNIPER_GGSN
 u_int
@@ -1072,7 +1087,7 @@ trunc:
 }
 #endif
 
-
+#ifdef DLT_JUNIPER_ATM2
 /* try to guess, based on all PPP protos that are supported in
  * a juniper router if the payload data is encapsulated using PPP */
 static int
@@ -1102,6 +1117,7 @@ juniper_ppp_heuristic_guess(netdissect_options *ndo,
     }
     return 1; /* we printed a ppp packet */
 }
+#endif
 
 static int
 ip_heuristic_guess(netdissect_options *ndo,
@@ -1193,6 +1209,14 @@ juniper_read_tlv_value(const u_char *p, u_int tlv_type, u_int tlv_len)
    return tlv_value;
 }
 
+#if defined(DLT_JUNIPER_GGSN) || defined(DLT_JUNIPER_ES) || \
+    defined(DLT_JUNIPER_MONITOR) || defined(DLT_JUNIPER_SERVICES) || \
+    defined(DLT_JUNIPER_PPPOE) || defined(DLT_JUNIPER_ETHER) || \
+    defined(DLT_JUNIPER_PPP) || defined(DLT_JUNIPER_FRELAY) || \
+    defined(DLT_JUNIPER_CHDLC) || defined(DLT_JUNIPER_PPPOE_ATM) || \
+    defined(DLT_JUNIPER_MLPPP) || defined(DLT_JUNIPER_MFR) || \
+    defined(DLT_JUNIPER_MLFR) || defined(DLT_JUNIPER_ATM1) || \
+    defined(DLT_JUNIPER_ATM2)
 static int
 juniper_parse_header(netdissect_options *ndo,
                      const u_char *p, const struct pcap_pkthdr *h, struct juniper_l2info_t *l2info)
@@ -1200,7 +1224,9 @@ juniper_parse_header(netdissect_options *ndo,
     const struct juniper_cookie_table_t *lp = juniper_cookie_table;
     u_int idx, jnx_ext_len, jnx_header_len = 0;
     uint8_t tlv_type,tlv_len;
+#ifdef DLT_JUNIPER_ATM2
     uint32_t control_word;
+#endif
     int tlv_value;
     const u_char *tptr;
 
@@ -1518,3 +1544,4 @@ trunc:
     nd_print_trunc(ndo);
     return 0;
 }
+#endif
