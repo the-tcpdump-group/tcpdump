@@ -39,6 +39,17 @@ __RCSID("NetBSD: print-juniper.c,v 1.3 2007/07/25 06:31:32 dogcow Exp ");
 #include "ethertype.h"
 #include "atm.h"
 
+/*
+ * If none of the Juniper DLT_s are defined, there's nothing to do.
+ */
+#if defined(DLT_JUNIPER_GGSN) || defined(DLT_JUNIPER_ES) || \
+    defined(DLT_JUNIPER_MONITOR) || defined(DLT_JUNIPER_SERVICES) || \
+    defined(DLT_JUNIPER_PPPOE) || defined(DLT_JUNIPER_ETHER) || \
+    defined(DLT_JUNIPER_PPP) || defined(DLT_JUNIPER_FRELAY) || \
+    defined(DLT_JUNIPER_CHDLC) || defined(DLT_JUNIPER_PPPOE_ATM) || \
+    defined(DLT_JUNIPER_MLPPP) || defined(DLT_JUNIPER_MFR) || \
+    defined(DLT_JUNIPER_MLFR) || defined(DLT_JUNIPER_ATM1) || \
+    defined(DLT_JUNIPER_ATM2)
 #define JUNIPER_BPF_OUT           0       /* Outgoing packet */
 #define JUNIPER_BPF_IN            1       /* Incoming packet */
 #define JUNIPER_BPF_PKT_IN        0x1     /* Incoming packet */
@@ -453,16 +464,7 @@ static int ip_heuristic_guess(netdissect_options *, const u_char *, u_int);
 #ifdef DLT_JUNIPER_ATM2
 static int juniper_ppp_heuristic_guess(netdissect_options *, const u_char *, u_int);
 #endif
-#if defined(DLT_JUNIPER_GGSN) || defined(DLT_JUNIPER_ES) || \
-    defined(DLT_JUNIPER_MONITOR) || defined(DLT_JUNIPER_SERVICES) || \
-    defined(DLT_JUNIPER_PPPOE) || defined(DLT_JUNIPER_ETHER) || \
-    defined(DLT_JUNIPER_PPP) || defined(DLT_JUNIPER_FRELAY) || \
-    defined(DLT_JUNIPER_CHDLC) || defined(DLT_JUNIPER_PPPOE_ATM) || \
-    defined(DLT_JUNIPER_MLPPP) || defined(DLT_JUNIPER_MFR) || \
-    defined(DLT_JUNIPER_MLFR) || defined(DLT_JUNIPER_ATM1) || \
-    defined(DLT_JUNIPER_ATM2)
 static int juniper_parse_header(netdissect_options *, const u_char *, const struct pcap_pkthdr *, struct juniper_l2info_t *);
-#endif
 
 #ifdef DLT_JUNIPER_GGSN
 u_int
@@ -1085,9 +1087,7 @@ trunc:
 	nd_print_trunc(ndo);
 	return l2info.header_len;
 }
-#endif
 
-#ifdef DLT_JUNIPER_ATM2
 /* try to guess, based on all PPP protos that are supported in
  * a juniper router if the payload data is encapsulated using PPP */
 static int
@@ -1209,14 +1209,6 @@ juniper_read_tlv_value(const u_char *p, u_int tlv_type, u_int tlv_len)
    return tlv_value;
 }
 
-#if defined(DLT_JUNIPER_GGSN) || defined(DLT_JUNIPER_ES) || \
-    defined(DLT_JUNIPER_MONITOR) || defined(DLT_JUNIPER_SERVICES) || \
-    defined(DLT_JUNIPER_PPPOE) || defined(DLT_JUNIPER_ETHER) || \
-    defined(DLT_JUNIPER_PPP) || defined(DLT_JUNIPER_FRELAY) || \
-    defined(DLT_JUNIPER_CHDLC) || defined(DLT_JUNIPER_PPPOE_ATM) || \
-    defined(DLT_JUNIPER_MLPPP) || defined(DLT_JUNIPER_MFR) || \
-    defined(DLT_JUNIPER_MLFR) || defined(DLT_JUNIPER_ATM1) || \
-    defined(DLT_JUNIPER_ATM2)
 static int
 juniper_parse_header(netdissect_options *ndo,
                      const u_char *p, const struct pcap_pkthdr *h, struct juniper_l2info_t *l2info)
@@ -1544,4 +1536,11 @@ trunc:
     nd_print_trunc(ndo);
     return 0;
 }
-#endif
+#endif /* defined(DLT_JUNIPER_GGSN) || defined(DLT_JUNIPER_ES) || \
+          defined(DLT_JUNIPER_MONITOR) || defined(DLT_JUNIPER_SERVICES) || \
+          defined(DLT_JUNIPER_PPPOE) || defined(DLT_JUNIPER_ETHER) || \
+          defined(DLT_JUNIPER_PPP) || defined(DLT_JUNIPER_FRELAY) || \
+          defined(DLT_JUNIPER_CHDLC) || defined(DLT_JUNIPER_PPPOE_ATM) || \
+          defined(DLT_JUNIPER_MLPPP) || defined(DLT_JUNIPER_MFR) || \
+          defined(DLT_JUNIPER_MLFR) || defined(DLT_JUNIPER_ATM1) || \
+          defined(DLT_JUNIPER_ATM2) */
