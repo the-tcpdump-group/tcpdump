@@ -1305,6 +1305,10 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 		if (status < 0)
 			error("%s: Can't set time stamp type: %s",
 		              device, pcap_statustostr(status));
+    else if (status == PCAP_WARNING_TSTAMP_TYPE_NOTSUP)
+      warning("Could not set timestamp type '%s' on %s: %s",
+        pcap_tstamp_type_val_to_name(jflag), device,
+        pcap_statustostr(status));
 	}
 #endif
 	status = pcap_activate(pc);
