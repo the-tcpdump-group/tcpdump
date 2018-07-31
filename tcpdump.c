@@ -1248,9 +1248,9 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 	status = pcap_set_tstamp_precision(pc, ndo->ndo_tstamp_precision);
 	if (status != 0)
 		error("%s: Can't set %ssecond time stamp precision: %s",
-			device,
-			tstamp_precision_to_string(ndo->ndo_tstamp_precision),
-			pcap_statustostr(status));
+		    device,
+		    tstamp_precision_to_string(ndo->ndo_tstamp_precision),
+		    pcap_statustostr(status));
 #endif
 
 #ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
@@ -1258,8 +1258,7 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 		status = pcap_set_immediate_mode(pc, 1);
 		if (status != 0)
 			error("%s: Can't set immediate mode: %s",
-			device,
-			pcap_statustostr(status));
+			    device, pcap_statustostr(status));
 	}
 #endif
 	/*
@@ -1304,11 +1303,11 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 		status = pcap_set_tstamp_type(pc, jflag);
 		if (status < 0)
 			error("%s: Can't set time stamp type: %s",
-		              device, pcap_statustostr(status));
+			    device, pcap_statustostr(status));
 		else if (status > 0)
 			warning("When trying to set timestamp type '%s' on %s: %s",
-				pcap_tstamp_type_val_to_name(jflag), device,
-				pcap_statustostr(status));
+			    pcap_tstamp_type_val_to_name(jflag), device,
+			    pcap_statustostr(status));
 	}
 #endif
 	status = pcap_activate(pc);
