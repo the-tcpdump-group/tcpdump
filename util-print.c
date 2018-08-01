@@ -501,7 +501,7 @@ tok2str(const struct tok *lp, const char *fmt,
 
 /*
  * Convert a bit token value to a string; use "fmt" if not found.
- * this is useful for parsing bitfields, the output strings are seperated
+ * this is useful for parsing bitfields, the output strings are separated
  * if the s field is positive.
  */
 static char *
@@ -555,7 +555,7 @@ bittok2str_internal(const struct tok *lp, const char *fmt,
 
 /*
  * Convert a bit token value to a string; use "fmt" if not found.
- * this is useful for parsing bitfields, the output strings are not seperated.
+ * this is useful for parsing bitfields, the output strings are not separated.
  */
 char *
 bittok2str_nosep(const struct tok *lp, const char *fmt,
@@ -566,7 +566,7 @@ bittok2str_nosep(const struct tok *lp, const char *fmt,
 
 /*
  * Convert a bit token value to a string; use "fmt" if not found.
- * this is useful for parsing bitfields, the output strings are comma seperated.
+ * this is useful for parsing bitfields, the output strings are comma separated.
  */
 char *
 bittok2str(const struct tok *lp, const char *fmt,
