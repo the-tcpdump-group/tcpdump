@@ -393,12 +393,22 @@ whois-v		whois.pcap		whois-v.out	-v
 hncp hncp.pcap hncp.out -vvv
 
 # BFD tests with authentication fields
+bfd-raw-auth-simple bfd-raw-auth-simple.pcap bfd-raw-auth-simple.out -t
+bfd-raw-auth-simple-v bfd-raw-auth-simple.pcap bfd-raw-auth-simple-v.out -t -v
+bfd-raw-auth-md5 bfd-raw-auth-md5.pcap bfd-raw-auth-md5.out -t
+bfd-raw-auth-md5-v bfd-raw-auth-md5.pcap bfd-raw-auth-md5-v.out -t -v
+bfd-raw-auth-sha1 bfd-raw-auth-sha1.pcap bfd-raw-auth-sha1.out -t
+bfd-raw-auth-sha1-v bfd-raw-auth-sha1.pcap bfd-raw-auth-sha1-v.out -t -v
 bfd-raw-auth-simple bfd-raw-auth-simple.pcap bfd-raw-auth-simple.out
 bfd-raw-auth-simple-v bfd-raw-auth-simple.pcap bfd-raw-auth-simple-v.out -v
 bfd-raw-auth-md5 bfd-raw-auth-md5.pcap bfd-raw-auth-md5.out
 bfd-raw-auth-md5-v bfd-raw-auth-md5.pcap bfd-raw-auth-md5-v.out -v
 bfd-raw-auth-sha1 bfd-raw-auth-sha1.pcap bfd-raw-auth-sha1.out
 bfd-raw-auth-sha1-v bfd-raw-auth-sha1.pcap bfd-raw-auth-sha1-v.out -v
+
+# GUE (UDP encapsulation)
+gue	gue.pcap	gue.out	-t
+gue-v	gue.pcap	gue-v.out	-t -v
 
 # bad packets from Hanno Böck
 heap-overflow-1	heap-overflow-1.pcap		heap-overflow-1.out	-v
@@ -630,3 +640,4 @@ ntp-mode7		ntp-mode7.pcap		ntp-mode7.out
 ntp-mode7--v		ntp-mode7.pcap		ntp-mode7--v.out	-v
 ntp-mode7--vv		ntp-mode7.pcap		ntp-mode7--vv.out	-vv
 ntp-mode7--vvv		ntp-mode7.pcap		ntp-mode7--vvv.out	-vvv
+>>>>>>> upstream/master

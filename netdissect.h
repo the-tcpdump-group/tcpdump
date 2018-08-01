@@ -531,6 +531,7 @@ extern void ftp_print(netdissect_options *, const u_char *, u_int);
 extern void geneve_print(netdissect_options *, const u_char *, u_int);
 extern void geonet_print(netdissect_options *, const u_char *, u_int, const struct lladdr_info *);
 extern void gre_print(netdissect_options *, const u_char *, u_int);
+extern void gue_print(netdissect_options *, const u_char *, u_int);
 extern int hbhopt_print(netdissect_options *, const u_char *);
 extern void hex_and_ascii_print(netdissect_options *, const char *, const u_char *, u_int);
 extern void hex_print(netdissect_options *, const char *ident, const u_char *cp, u_int);
