@@ -1021,6 +1021,7 @@ print_attr_vector64(netdissect_options *ndo,
                  register const u_char *data, u_int length, u_short attr_code _U_)
 {
    uint64_t data_value, i;
+   const char *sep = "";
 
    if (length != 8)
    {
@@ -1028,14 +1029,22 @@ print_attr_vector64(netdissect_options *ndo,
        return;
    }
 
+   ND_PRINT("[");
    ND_TCHECK_8(data[0]);
 
    data_value = EXTRACT_BE_U_8(data);
+   /* Print the 64-bit field in a format similar to bittok2str(), less
+    * flagging any unknown bits. This way it should be easier to replace
+    * the custom code with a library function later.
+    */
    for (i = 0; i < TAM_SIZE(mip6_feature_vector); i++) {
        if (data_value & mip6_feature_vector[i].v) {
-           ND_PRINT(" %s", mip6_feature_vector[i].s);
+           ND_PRINT("%s%s", sep, mip6_feature_vector[i].s);
+           sep = ", ";
        }
    }
+
+   ND_PRINT("]");
 
    return;
 
