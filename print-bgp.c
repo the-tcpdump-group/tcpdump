@@ -2507,6 +2507,7 @@ bgp_capabilities_print(netdissect_options *ndo,
         ND_TCHECK_LEN(opt + 2 + i, cap_len);
         switch (cap_type) {
         case BGP_CAPCODE_MP:
+            /* AFI (16 bits), Reserved (8 bits), SAFI (8 bits) */
             if (cap_len < 4) {
                 ND_PRINT(" (too short, < 4)");
                 return;
@@ -2518,6 +2519,7 @@ bgp_capabilities_print(netdissect_options *ndo,
                EXTRACT_U_1(opt + i + 5));
             break;
         case BGP_CAPCODE_RESTART:
+            /* Restart Flags (4 bits), Restart Time in seconds (12 bits) */
             if (cap_len < 2) {
                 ND_PRINT(" (too short, < 2)");
                 return;
