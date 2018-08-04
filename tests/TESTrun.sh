@@ -1,5 +1,7 @@
 #!/bin/sh
 
+TZ=GMT0; export TZ
+
 mkdir -p NEW
 mkdir -p DIFF
 cat /dev/null > failure-outputs.txt

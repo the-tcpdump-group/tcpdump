@@ -2,6 +2,8 @@
 
 # Update the tests given as positional parameters
 
+TZ=GMT0; export TZ
+
 for TEST in "$@"; do
     PREFIX=tests
     MATCH=0
@@ -12,7 +14,7 @@ for TEST in "$@"; do
         [ $name != "$TEST" ] && continue    # not the requested test
         [ _$output = _ ] && continue    # ignore incomplete lines
         MATCH=1
-        ./tcpdump -n -t -r "$PREFIX/$input" $options >"$PREFIX/$output"
+        ./tcpdump -# -n -r "$PREFIX/$input" $options >"$PREFIX/$output"
     done < $PREFIX/TESTLIST
     [ $MATCH = 0 ] && echo "test $TEST not found" >&2
 done
