@@ -28,23 +28,11 @@
 
 #include "funcattrs.h"
 
-/* snprintf et al */
-
 #include <stdarg.h>
 
 #if HAVE_STDINT_H
 #include <stdint.h>
 #endif
-
-#if !defined(HAVE_SNPRINTF)
-int snprintf(char *, size_t, FORMAT_STRING(const char *), ...)
-     PRINTFLIKE(3, 4);
-#endif /* !defined(HAVE_SNPRINTF) */
-
-#if !defined(HAVE_VSNPRINTF)
-int vsnprintf(char *, size_t, FORMAT_STRING(const char *), va_list)
-     PRINTFLIKE(3, 0);
-#endif /* !defined(HAVE_VSNPRINTF) */
 
 #ifndef HAVE_STRLCAT
 extern size_t strlcat(char *, const char *, size_t);

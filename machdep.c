@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 /*
@@ -29,15 +29,12 @@
  * need to do to get it defined?  This is clearly wrong, as we shouldn't
  * have to include UNIX or Windows system header files to get it.
  */
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #ifdef __osf__
+#include <stdio.h>
 #include <sys/sysinfo.h>
 #include <sys/proc.h>
-
-#if !defined(HAVE_SNPRINTF)
-int snprintf(char *, size_t, const char *, ...) PRINTFLIKE(3, 4);
-#endif /* !defined(HAVE_SNPRINTF) */
 #endif /* __osf__ */
 
 #include "machdep.h"

@@ -24,10 +24,10 @@
 /* \summary: IPSEC Encapsulating Security Payload (ESP) printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -87,8 +87,8 @@
  */
 
 struct newesp {
-	uint32_t	esp_spi;	/* ESP */
-	uint32_t	esp_seq;	/* Sequence number */
+	nd_uint32_t	esp_spi;	/* ESP */
+	nd_uint32_t	esp_seq;	/* Sequence number */
 	/*variable size*/		/* (IV and) Payload data */
 	/*variable size*/		/* padding */
 	/*8bit*/			/* pad size */
@@ -184,15 +184,16 @@ set_cipher_parameters(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher,
 USES_APPLE_DEPRECATED_API
 int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 				      int initiator,
-				      u_char spii[8], u_char spir[8],
+				      const u_char spii[8],
+				      const u_char spir[8],
 				      const u_char *buf, const u_char *end)
 {
 	struct sa_list *sa;
 	const u_char *iv;
 	unsigned int len;
 	EVP_CIPHER_CTX *ctx;
-	unsigned int block_size, output_buffer_size;
-	u_char *output_buffer;
+	unsigned int block_size, buffer_size;
+	u_char *input_buffer, *output_buffer;
 
 	/* initiator arg is any non-zero value */
 	if(initiator) initiator=1;
@@ -227,19 +228,41 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 		(*ndo->ndo_warning)(ndo, "espkey init failed");
 	set_cipher_parameters(ctx, NULL, NULL, iv, 0);
 	/*
-	 * Allocate a buffer for the decrypted data.
-	 * The output buffer must be separate from the input buffer, and
-	 * its size must be a multiple of the cipher block size.
+	 * Allocate buffers for the encrypted and decrypted data.
+	 * Both buffers' sizes must be a multiple of the cipher block
+	 * size, and the output buffer must be separate from the input
+	 * buffer.
 	 */
 	block_size = (unsigned int)EVP_CIPHER_CTX_block_size(ctx);
-	output_buffer_size = len + (block_size - len % block_size);
-	output_buffer = (u_char *)malloc(output_buffer_size);
-	if (output_buffer == NULL) {
-		(*ndo->ndo_warning)(ndo, "can't allocate memory for decryption buffer");
+	buffer_size = len + (block_size - len % block_size);
+
+	/*
+	 * Attempt to allocate the input buffer.
+	 */
+	input_buffer = (u_char *)malloc(buffer_size);
+	if (input_buffer == NULL) {
 		EVP_CIPHER_CTX_free(ctx);
-		return 0;
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+			"can't allocate memory for encrypted data buffer");
 	}
-	EVP_Cipher(ctx, output_buffer, buf, len);
+	/*
+	 * Copy the input data to the encrypted data buffer, and pad it
+	 * with zeroes.
+	 */
+	memcpy(input_buffer, buf, len);
+	memset(input_buffer + len, 0, buffer_size - len);
+
+	/*
+	 * Attempt to allocate the output buffer.
+	 */
+	output_buffer = (u_char *)malloc(buffer_size);
+	if (output_buffer == NULL) {
+		free(input_buffer);
+		EVP_CIPHER_CTX_free(ctx);
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+			"can't allocate memory for decryption buffer");
+	}
+	EVP_Cipher(ctx, output_buffer, input_buffer, len);
 	EVP_CIPHER_CTX_free(ctx);
 
 	/*
@@ -247,6 +270,7 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 	 * but changing this would require a more complicated fix.
 	 */
 	memcpy(buf, output_buffer, len);
+	free(input_buffer);
 	free(output_buffer);
 
 	ndo->ndo_packetp = buf;
@@ -263,9 +287,11 @@ static void esp_print_addsa(netdissect_options *ndo,
 
 	struct sa_list *nsa;
 
+	/* malloc() return used in a 'struct sa_list': do not free() */
 	nsa = (struct sa_list *)malloc(sizeof(struct sa_list));
 	if (nsa == NULL)
-		(*ndo->ndo_error)(ndo, "ran out of memory to allocate sa structure");
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+				  "esp_print_addsa: malloc");
 
 	*nsa = *sa;
 
@@ -286,8 +312,8 @@ static u_int hexdigit(netdissect_options *ndo, char hex)
 	else if (hex >= 'a' && hex <= 'f')
 		return (hex - 'a' + 10);
 	else {
-		(*ndo->ndo_error)(ndo, "invalid hex digit %c in espsecret\n", hex);
-		return 0;
+		(*ndo->ndo_error)(ndo, S_ERR_ND_ESP_SECRET,
+				  "invalid hex digit %c in espsecret\n", hex);
 	}
 }
 
@@ -313,7 +339,7 @@ int espprint_decode_hex(netdissect_options *ndo,
 	len = strlen(hex) / 2;
 
 	if (len > binbuf_len) {
-		(*ndo->ndo_warning)(ndo, "secret is too big: %d\n", len);
+		(*ndo->ndo_warning)(ndo, "secret is too big: %u\n", len);
 		return 0;
 	}
 
@@ -519,9 +545,9 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 
 		secretfile = fopen(filename, FOPEN_READ_TXT);
 		if (secretfile == NULL) {
-			(*ndo->ndo_error)(ndo, "print_esp: can't open %s: %s\n",
-			    filename, strerror(errno));
-			return;
+			(*ndo->ndo_error)(ndo, S_ERR_ND_OPEN_FILE,
+					  "print_esp: can't open %s: %s\n",
+					  filename, strerror(errno));
 		}
 
 		while (fgets(fileline, sizeof(fileline)-1, secretfile) != NULL) {
@@ -636,19 +662,19 @@ esp_print(netdissect_options *ndo,
 	_U_
 #endif
 	,
-	int *nhdr
+	u_int *nhdr
 #ifndef HAVE_LIBCRYPTO
 	_U_
 #endif
 	,
-	int *padlen
+	u_int *padlen
 #ifndef HAVE_LIBCRYPTO
 	_U_
 #endif
 	)
 {
-	register const struct newesp *esp;
-	register const u_char *ep;
+	const struct newesp *esp;
+	const u_char *ep;
 #ifdef HAVE_LIBCRYPTO
 	const struct ip *ip;
 	struct sa_list *sa = NULL;
@@ -660,10 +686,11 @@ esp_print(netdissect_options *ndo,
 	const u_char *ivoff;
 	const u_char *p;
 	EVP_CIPHER_CTX *ctx;
-	unsigned int block_size, output_buffer_size;
-	u_char *output_buffer;
+	unsigned int block_size, buffer_size;
+	u_char *input_buffer, *output_buffer;
 #endif
 
+	ndo->ndo_protocol = "esp";
 	esp = (const struct newesp *)bp;
 
 #ifdef HAVE_LIBCRYPTO
@@ -680,12 +707,12 @@ esp_print(netdissect_options *ndo,
 	ep = ndo->ndo_snapend;
 
 	if ((const u_char *)(esp + 1) >= ep) {
-		ND_PRINT((ndo, "[|ESP]"));
+		nd_print_trunc(ndo);
 		goto fail;
 	}
-	ND_PRINT((ndo, "ESP(spi=0x%08x", EXTRACT_32BITS(&esp->esp_spi)));
-	ND_PRINT((ndo, ",seq=0x%x)", EXTRACT_32BITS(&esp->esp_seq)));
-	ND_PRINT((ndo, ", length %u", length));
+	ND_PRINT("ESP(spi=0x%08x", EXTRACT_BE_U_4(esp->esp_spi));
+	ND_PRINT(",seq=0x%x)", EXTRACT_BE_U_4(esp->esp_seq));
+	ND_PRINT(", length %u", length);
 
 #ifndef HAVE_LIBCRYPTO
 	goto fail;
@@ -706,33 +733,33 @@ esp_print(netdissect_options *ndo,
 	case 6:
 		ip6 = (const struct ip6_hdr *)bp2;
 		/* we do not attempt to decrypt jumbograms */
-		if (!EXTRACT_16BITS(&ip6->ip6_plen))
+		if (!EXTRACT_BE_U_2(ip6->ip6_plen))
 			goto fail;
 		/* if we can't get nexthdr, we do not need to decrypt it */
-		len = sizeof(struct ip6_hdr) + EXTRACT_16BITS(&ip6->ip6_plen);
+		len = sizeof(struct ip6_hdr) + EXTRACT_BE_U_2(ip6->ip6_plen);
 
 		/* see if we can find the SA, and if so, decode it */
 		for (sa = ndo->ndo_sa_list_head; sa != NULL; sa = sa->next) {
-			if (sa->spi == EXTRACT_32BITS(&esp->esp_spi) &&
+			if (sa->spi == EXTRACT_BE_U_4(esp->esp_spi) &&
 			    sa->daddr_version == 6 &&
 			    UNALIGNED_MEMCMP(&sa->daddr.in6, &ip6->ip6_dst,
-				   sizeof(struct in6_addr)) == 0) {
+				   sizeof(nd_ipv6)) == 0) {
 				break;
 			}
 		}
 		break;
 	case 4:
 		/* nexthdr & padding are in the last fragment */
-		if (EXTRACT_16BITS(&ip->ip_off) & IP_MF)
+		if (EXTRACT_BE_U_2(ip->ip_off) & IP_MF)
 			goto fail;
-		len = EXTRACT_16BITS(&ip->ip_len);
+		len = EXTRACT_BE_U_2(ip->ip_len);
 
 		/* see if we can find the SA, and if so, decode it */
 		for (sa = ndo->ndo_sa_list_head; sa != NULL; sa = sa->next) {
-			if (sa->spi == EXTRACT_32BITS(&esp->esp_spi) &&
+			if (sa->spi == EXTRACT_BE_U_4(esp->esp_spi) &&
 			    sa->daddr_version == 4 &&
 			    UNALIGNED_MEMCMP(&sa->daddr.in4, &ip->ip_dst,
-				   sizeof(struct in_addr)) == 0) {
+				   sizeof(nd_ipv4)) == 0) {
 				break;
 			}
 		}
@@ -777,21 +804,43 @@ esp_print(netdissect_options *ndo,
 			len = ep - (p + ivlen);
 
 			/*
-			 * Allocate a buffer for the decrypted data.
-			 * The output buffer must be separate from the
-			 * input buffer, and its size must be a multiple
-			 * of the cipher block size.
+			 * Allocate buffers for the encrypted and decrypted
+			 * data.  Both buffers' sizes must be a multiple of
+			 * the cipher block size, and the output buffer must
+			 * be separate from the input buffer.
 			 */
 			block_size = (unsigned int)EVP_CIPHER_CTX_block_size(ctx);
-			output_buffer_size = len + (block_size - len % block_size);
-			output_buffer = (u_char *)malloc(output_buffer_size);
-			if (output_buffer == NULL) {
-				(*ndo->ndo_warning)(ndo, "can't allocate memory for decryption buffer");
+			buffer_size = len + (block_size - len % block_size);
+
+			/*
+			 * Attempt to allocate the input buffer.
+			 */
+			input_buffer = (u_char *)malloc(buffer_size);
+			if (input_buffer == NULL) {
 				EVP_CIPHER_CTX_free(ctx);
-				return -1;
+				(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+					"esp_print: can't allocate memory for encrypted data buffer");
+			}
+			/*
+			 * Copy the input data to the encrypted data buffer,
+			 * and pad it with zeroes.
+			 */
+			memcpy(input_buffer, p + ivlen, len);
+			memset(input_buffer + len, 0, buffer_size - len);
+
+			/*
+			 * Attempt to allocate the output buffer.
+			 */
+			output_buffer = (u_char *)malloc(buffer_size);
+			if (output_buffer == NULL) {
+				free(input_buffer);
+				EVP_CIPHER_CTX_free(ctx);
+				(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+					"esp_print: can't allocate memory for decryption buffer");
 			}
 
-			EVP_Cipher(ctx, output_buffer, p + ivlen, len);
+			EVP_Cipher(ctx, output_buffer, input_buffer, len);
+			free(input_buffer);
 			EVP_CIPHER_CTX_free(ctx);
 			/*
 			 * XXX - of course this is wrong, because buf is a
@@ -807,16 +856,16 @@ esp_print(netdissect_options *ndo,
 		advance = sizeof(struct newesp);
 
 	/* sanity check for pad length */
-	if (ep - bp < *(ep - 2))
+	if (ep - bp < EXTRACT_U_1(ep - 2))
 		goto fail;
 
 	if (padlen)
-		*padlen = *(ep - 2) + 2;
+		*padlen = EXTRACT_U_1(ep - 2) + 2;
 
 	if (nhdr)
-		*nhdr = *(ep - 1);
+		*nhdr = EXTRACT_U_1(ep - 1);
 
-	ND_PRINT((ndo, ": "));
+	ND_PRINT(": ");
 	return advance;
 #endif
 
@@ -826,10 +875,3 @@ fail:
 #ifdef HAVE_LIBCRYPTO
 USES_APPLE_RST
 #endif
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

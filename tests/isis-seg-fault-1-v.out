@@ -31,50 +31,27 @@ IS-IS, length 1497
 	        unknown subTLV #0, length: 0
 	        unknown subTLV #0, length: 0
 	        unknown subTLV #64, length: 0
-	        unknown subTLV #0, length: 189
-		    0x0000:  0000 0000 0000 0000 0000 0000 0000 0000
-		    0x0010:  00c2 0000 0000 0000 0000 0000 0000 0000
-		    0x0020:  0000 0000 0000 0000 0000 0000 0020 0000
-		    0x0030:  00f0 0000 0000 0000 0000 0000 0000 0000
-		    0x0040:  0000 0000 0000 0000 0000 0000 5900 0000
-		    0x0050:  0000 0000 0000 0000 0000 0000 0000 0000
-		    0x0060:  0000 0000 0000 0000 0000 0000 0000 0000
-		    0x0070:  0000 0000 0000 0000 0000 0000 0000 0000
-		    0x0080:  0000 0000 0000 0000 0000 7d00 0008 ff00
-		    0x0090:  004a 0000 0000 0000 0000 0000 0000 0000
-		    0x00a0:  8000 0000 0000 0000 0000 0000 0000 0000
-		    0x00b0:  0000 0000 0000 0000 0000 0000 00
+	        unknown subTLV #0, length: 189 (remaining data in subTLVs shorter than the current subTLV)
 	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
 	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 3400.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.2302.0000.00, no sub-TLVs present
+	      IS Neighbor: 0020.0000.00f0.00, no sub-TLVs present
 	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0069.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0200.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0067.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, sub-TLVs present (37)
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
 	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 7800.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0065.00, sub-TLVs present (128)
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.7d, no sub-TLVs present
+	      IS Neighbor: 0000.4a00.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.80, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0034.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, sub-TLVs present (35)
+	        unknown subTLV #2, length: 0
 	        unknown subTLV #0, length: 0
 	        unknown subTLV #0, length: 0
 	        unknown subTLV #0, length: 0
@@ -84,91 +61,48 @@ IS-IS, length 1497
 	        unknown subTLV #0, length: 0
 	        unknown subTLV #0, length: 0
 	        unknown subTLV #0, length: 0
+	        unknown subTLV #105, length: 0
 	        unknown subTLV #0, length: 0
 	        unknown subTLV #0, length: 0
 	        unknown subTLV #0, length: 0
 	        unknown subTLV #0, length: 0
+	        unknown subTLV #2, length: 0
 	        unknown subTLV #0, length: 0
+	        Remaining data in subTLVs shorter than a subTLV header
+	      IS Neighbor: 0000.0000.0000.67, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.6500.8000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.4200.0000.00, sub-TLVs present (8)
 	        unknown subTLV #0, length: 0
-	        unknown subTLV #66, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 8
-		    0x0000:  0000 0008 ff00 0000
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #121, length: 1
-		    0x0000:  00
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #50, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #132, length: 8
-		    0x0000:  0000 0000 0000 0000
-	        unknown subTLV #0, length: 0
-	      IS Neighbor: 8900.0000.0000.00, no sub-TLVs present
+	        Remaining data in TLV shorter than a subTLV header
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 7901.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.32, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0800.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0089.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0025.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0025.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0025.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0800.00, no sub-TLVs present
 	      IS Neighbor: 2500.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.2500.0000.c9, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0008.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: f700.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.004f.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 3d00.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0080.0002.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.007e.00, no sub-TLVs present
+	      IS Neighbor: 4a00.0000.0000.00, no sub-TLVs present
 	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
 	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
 	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present

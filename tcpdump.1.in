@@ -20,7 +20,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "2 February 2017"
+.TH TCPDUMP 1  "8 April 2018"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -38,23 +38,31 @@ tcpdump \- dump traffic on a network
 .B \-c
 .I count
 ]
-.br
-.ti +8
 [
 .B \-C
 .I file_size
-] [
-.B \-G
-.I rotate_seconds
-] [
+]
+.ti +8
+[
+.B \-E
+.I spi@ipaddr algo:secret,...
+]
+.ti +8
+[
 .B \-F
 .I file
 ]
-.br
-.ti +8
+[
+.B \-G
+.I rotate_seconds
+]
 [
 .B \-i
 .I interface
+]
+.ti +8
+[
+.B \-\-immediate\-mode
 ]
 [
 .B \-j
@@ -64,14 +72,16 @@ tcpdump \- dump traffic on a network
 .B \-m
 .I module
 ]
+.ti +8
 [
 .B \-M
 .I secret
 ]
-.br
-.ti +8
 [
 .B \-\-number
+]
+[
+.B \-\-print
 ]
 [
 .B \-Q
@@ -83,10 +93,6 @@ tcpdump \- dump traffic on a network
 .I file
 ]
 [
-.B \-V
-.I file
-]
-[
 .B \-s
 .I snaplen
 ]
@@ -95,27 +101,26 @@ tcpdump \- dump traffic on a network
 .I type
 ]
 [
+.B \-\-version
+]
+.ti +8
+[
+.B \-V
+.I file
+]
+[
 .B \-w
 .I file
 ]
-.br
-.ti +8
 [
 .B \-W
 .I filecount
 ]
-.br
-.ti +8
-[
-.B \-E
-.I spi@ipaddr algo:secret,...
-]
-.br
-.ti +8
 [
 .B \-y
 .I datalinktype
 ]
+.ti +8
 [
 .B \-z
 .I postrotate-command
@@ -127,13 +132,6 @@ tcpdump \- dump traffic on a network
 .ti +8
 [
 .BI \-\-time\-stamp\-precision= tstamp_precision
-]
-.ti +8
-[
-.B \-\-immediate\-mode
-]
-[
-.B \-\-version
 ]
 .ti +8
 [
@@ -204,19 +202,23 @@ is running, if the OS reports that information to applications; if not,
 it will be reported as 0).
 .LP
 On platforms that support the SIGINFO signal, such as most BSDs
-(including Mac OS X) and Digital/Tru64 UNIX, it will report those counts
+(including macOS) and Digital/Tru64 UNIX, it will report those counts
 when it receives a SIGINFO signal (generated, for example, by typing
 your ``status'' character, typically control-T, although on some
-platforms, such as Mac OS X, the ``status'' character is not set by
+platforms, such as macOS, the ``status'' character is not set by
 default, so you must set it with
 .BR stty (1)
 in order to use it) and will continue capturing packets. On platforms that
 do not support the SIGINFO signal, the same can be achieved by using the
 SIGUSR1 signal.
 .LP
+Using the SIGUSR2 signal along with the
+.B \-w
+flag will forcibly flush the packet buffer into the output file.
+.LP
 Reading packets from a network interface may require that you have
 special privileges; see the
-.B pcap (3PCAP)
+.BR pcap (3PCAP)
 man page for details.  Reading a saved packet file doesn't require
 special privileges.
 .SH OPTIONS
@@ -290,7 +292,7 @@ flag will not be supported if
 was built with an older version of
 .I libpcap
 that lacks the
-.B pcap_findalldevs()
+.BR pcap_findalldevs(3PCAP)
 function.
 .TP
 .B \-e
@@ -441,7 +443,7 @@ terminal rather than to a file or pipe.
 .PD
 Set the time stamp type for the capture to \fItstamp_type\fP.  The names
 to use for the time stamp types are given in
-.BR pcap-tstamp (@MAN_MISC_INFO@);
+.BR \%pcap-tstamp (@MAN_MISC_INFO@);
 not all the types listed there will necessarily be valid for any given
 interface.
 .TP
@@ -463,12 +465,12 @@ accuracy to a savefile, the time stamps are written with nanosecond
 resolution, and the file is written with a different magic number, to
 indicate that the time stamps are in seconds and nanoseconds; not all
 programs that read pcap savefiles will be able to read those captures.
-.LP
+.IP
 When reading a savefile, convert time stamps to the precision specified
 by \fItimestamp_precision\fP, and display them with that resolution.  If
 the precision specified is less than the precision of time stamps in the
 file, the conversion will lose precision.
-.LP
+.IP
 The supported values for \fItimestamp_precision\fP are \fBmicro\fP for
 microsecond resolution and \fBnano\fP for nanosecond resolution.  The
 default is microsecond resolution.
@@ -579,6 +581,12 @@ Note that the interface might be in promiscuous
 mode for some other reason; hence, `-p' cannot be used as an abbreviation for
 `ether host {local-hw-addr} or ether broadcast'.
 .TP
+.BI \-\-print
+Print parsed packet output, even if the raw packets are being saved to a
+file with the
+.B \-w
+flag.
+.TP
 .BI \-Q " direction"
 .PD 0
 .TP
@@ -596,7 +604,7 @@ lines are shorter.
 .BI \-r " file"
 Read packets from \fIfile\fR (which was created with the
 .B \-w
-option or by other tools that write pcap or pcap-ng files).
+option or by other tools that write pcap or pcapng files).
 Standard input is used if \fIfile\fR is ``-''.
 .TP
 .B \-S
@@ -616,14 +624,21 @@ default of 262144 bytes.
 Packets truncated because of a limited snapshot
 are indicated in the output with ``[|\fIproto\fP]'', where \fIproto\fP
 is the name of the protocol level at which the truncation has occurred.
+.IP
 Note that taking larger snapshots both increases
 the amount of time it takes to process packets and, effectively,
 decreases the amount of packet buffering.
 This may cause packets to be
 lost.
-You should limit \fIsnaplen\fP to the smallest number that will
-capture the protocol information you're interested in.
-Setting
+Note also that taking smaller snapshots will discard data from protocols
+above the transport layer, which loses information that may be
+important.  NFS and AFS requests and replies, for example, are very
+large, and much of the detail won't be available if a too-short snapshot
+length is selected.
+.IP
+If you need to reduce the snapshot size below the default, you should
+limit \fIsnaplen\fP to the smallest number that will capture the
+protocol information you're interested in.  Setting
 \fIsnaplen\fP to 0 sets it to the default of 262144,
 for backwards compatibility with recent older versions of
 .IR tcpdump .
@@ -690,7 +705,9 @@ Print undecoded NFS handles.
 .PD
 If the
 .B \-w
-option is not specified, make the printed packet output
+option is not specified, or if it is specified but the
+.B \-\-print
+flag is also specified, make the printed packet output
 ``packet-buffered''; i.e., as the description of the contents of each
 packet is printed, it will be written to the standard output, rather
 than, when not writing to a terminal, being written only when the output
@@ -710,7 +727,7 @@ flag will not be supported if
 was built with an older version of
 .I libpcap
 that lacks the
-.B pcap_dump_flush()
+.BR pcap_dump_flush(3PCAP)
 function.
 .TP
 .B \-v
@@ -722,7 +739,7 @@ IP and ICMP header checksum.
 .IP
 When writing to a file with the
 .B \-w
-option, report, every 10 seconds, the number of packets captured.
+option, report, once per second, the number of packets captured.
 .TP
 .B \-vv
 Even more verbose output.
@@ -1139,7 +1156,7 @@ those are reported as \fBECT(1)\fP, \fBECT(0)\fP, or \fBCE\fP.
 \fIoffset\fP is the fragment offset field; it is printed whether this is
 part of a fragmented datagram or not.
 \fIflags\fP are the MF and DF flags; \fB+\fP is reported if MF is set,
-and \fBDF\P is reported if F is set.  If neither are set, \fB.\fP is
+and \fBDF\fP is reported if F is set.  If neither are set, \fB.\fP is
 reported.
 \fIproto\fP is the protocol ID field.
 \fIlength\fP is the total length field.
@@ -1200,7 +1217,7 @@ host \fIcsam\fP.
 .RS
 .nf
 .sp .5
-\s-2\f(CWIP rtsg.1023 > csam.login: Flags [S], seq 768512:768512, win 4096, opts [mss 1024]
+\f(CWIP rtsg.1023 > csam.login: Flags [S], seq 768512:768512, win 4096, opts [mss 1024]
 IP csam.login > rtsg.1023: Flags [S.], seq, 947648:947648, ack 768513, win 4096, opts [mss 1024]
 IP rtsg.1023 > csam.login: Flags [.], ack 1, win 4096
 IP rtsg.1023 > csam.login: Flags [P.], seq 1:2, ack 1, win 4096, length 1
@@ -1208,7 +1225,7 @@ IP csam.login > rtsg.1023: Flags [.], ack 2, win 4096
 IP rtsg.1023 > csam.login: Flags [P.], seq 2:21, ack 1, win 4096, length 19
 IP csam.login > rtsg.1023: Flags [P.], seq 1:2, ack 21, win 4077, length 1
 IP csam.login > rtsg.1023: Flags [P.], seq 2:3, ack 21, win 4077, urg 1, length 1
-IP csam.login > rtsg.1023: Flags [P.], seq 3:4, ack 21, win 4077, urg 1, length 1\fR\s+2
+IP csam.login > rtsg.1023: Flags [P.], seq 3:4, ack 21, win 4077, urg 1, length 1\fR
 .sp .5
 .fi
 .RE
@@ -1219,7 +1236,7 @@ The \fBS\fP indicates that the \fISYN\fP flag was set.
 The packet sequence number was 768512 and it contained no data.
 (The notation is `first:last' which means `sequence
 numbers \fIfirst\fP
-up to but not including \fIlast\fP.)
+up to but not including \fIlast\fP'.)
 There was no piggy-backed ack, the available receive window was 4096
 bytes and there was a max-segment-size option requesting an mss of
 1024 bytes.
@@ -1458,7 +1475,7 @@ Some offsets and field values may be expressed as names
 rather than as numeric values. For example tcp[13] may
 be replaced with tcp[tcpflags]. The following TCP flag
 field values are also available: tcp-fin, tcp-syn, tcp-rst,
-tcp-push, tcp-act, tcp-urg.
+tcp-push, tcp-ack, tcp-urg.
 .PP
 This can be demonstrated as:
 .RS
@@ -1669,11 +1686,6 @@ the file mode (in octal), the uid and gid, and the file size.
 .LP
 If the \-v flag is given more than once, even more details are printed.
 .LP
-Note that NFS requests are very large and much of the detail won't be printed
-unless \fIsnaplen\fP is increased.
-Try using `\fB\-s 192\fP' to watch
-NFS traffic.
-.LP
 NFS reply packets do not explicitly identify the RPC operation.
 Instead,
 \fItcpdump\fP keeps track of ``recent'' requests, and matches them to the
@@ -1736,11 +1748,6 @@ are printed.
 Error codes are printed for abort packets, with the exception of Ubik
 beacon packets (because abort packets are used to signify a yes vote
 for the Ubik protocol).
-.LP
-Note that AFS requests are very large and many of the arguments won't
-be printed unless \fIsnaplen\fP is increased.
-Try using `\fB-s 256\fP'
-to watch AFS traffic.
 .LP
 AFS reply packets do not explicitly identify the RPC operation.
 Instead,
@@ -1819,9 +1826,9 @@ protocol) and packet size.
 .RS
 .nf
 .sp .5
-\s-2\f(CWicsd-net.112.220 > jssmag.2: nbp-lkup 190: "=:LaserWriter@*"
+\f(CWicsd-net.112.220 > jssmag.2: nbp-lkup 190: "=:LaserWriter@*"
 jssmag.209.2 > icsd-net.112.220: nbp-reply 190: "RM1140:LaserWriter@*" 250
-techpit.2 > icsd-net.112.220: nbp-reply 190: "techpit:LaserWriter@*" 186\fR\s+2
+techpit.2 > icsd-net.112.220: nbp-reply 190: "techpit:LaserWriter@*" 186\fR
 .sp .5
 .fi
 .RE
@@ -1839,7 +1846,7 @@ another reply to the same request saying host techpit has laserwriter
 .RS
 .nf
 .sp .5
-\s-2\f(CWjssmag.209.165 > helios.132: atp-req  12266<0-7> 0xae030001
+\f(CWjssmag.209.165 > helios.132: atp-req  12266<0-7> 0xae030001
 helios.132 > jssmag.209.165: atp-resp 12266:0 (512) 0xae040000
 helios.132 > jssmag.209.165: atp-resp 12266:1 (512) 0xae040000
 helios.132 > jssmag.209.165: atp-resp 12266:2 (512) 0xae040000
@@ -1852,7 +1859,7 @@ jssmag.209.165 > helios.132: atp-req  12266<3,5> 0xae030001
 helios.132 > jssmag.209.165: atp-resp 12266:3 (512) 0xae040000
 helios.132 > jssmag.209.165: atp-resp 12266:5 (512) 0xae040000
 jssmag.209.165 > helios.132: atp-rel  12266<0-7> 0xae030001
-jssmag.209.133 > helios.132: atp-req* 12267<0-7> 0xae030002\fR\s+2
+jssmag.209.133 > helios.132: atp-req* 12267<0-7> 0xae030002\fR
 .sp .5
 .fi
 .RE
@@ -1878,8 +1885,8 @@ The `*' on the request
 indicates that XO (`exactly once') was \fInot\fP set.
 
 .SH "SEE ALSO"
-stty(1), pcap(3PCAP), bpf(4), nit(4P), pcap-savefile(@MAN_FILE_FORMATS@),
-pcap-filter(@MAN_MISC_INFO@), pcap-tstamp(@MAN_MISC_INFO@)
+stty(1), pcap(3PCAP), bpf(4), nit(4P), \%pcap-savefile(@MAN_FILE_FORMATS@),
+\%pcap-filter(@MAN_MISC_INFO@), \%pcap-tstamp(@MAN_MISC_INFO@)
 .LP
 .RS
 .I http://www.iana.org/assignments/media-types/application/vnd.tcpdump.pcap
@@ -1898,7 +1905,7 @@ It is currently being maintained by tcpdump.org.
 The current version is available via http:
 .LP
 .RS
-.I http://www.tcpdump.org/
+.I https://www.tcpdump.org/
 .RE
 .LP
 The original distribution is available via anonymous ftp:
@@ -1908,7 +1915,7 @@ The original distribution is available via anonymous ftp:
 .RE
 .LP
 IPv6/IPsec support is added by WIDE/KAME project.
-This program uses Eric Young's SSLeay library, under specific configurations.
+This program uses OpenSSL/LibreSSL, under specific configurations.
 .SH BUGS
 To report a security issue please send an e-mail to \%security@tcpdump.org.
 .LP

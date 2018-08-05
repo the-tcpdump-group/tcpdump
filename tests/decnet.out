@@ -4,7 +4,7 @@ endnode-hello endnode vers 2 eco 0 ueco 0 src 1.1 blksize 16434 rtr 0.0 hello 10
 endnode-hello endnode vers 2 eco 0 ueco 0 src 1.1 blksize 16434 rtr 0.0 hello 10 data 2
 endnode-hello endnode vers 2 eco 0 ueco 0 src 1.1 blksize 16434 rtr 0.0 hello 10 data 2
 1.1 > 1.1 34 conn-initiate 8195>0 ver 4.1 segsize 16403 
-1.1 > 1.1 9 [|decnet]
+1.1 > 1.1 9  [|decnet]
 1.1 > 1.1 16 conn-confirm 8196>8195 ver 4.1 segsize 16403 
 1.1 > 1.1 19 link-service 8195>8196 ack 0 ackdat 0 seg 1 dat seg count 0 
 1.1 > 1.1 15 ils-ack 8196>8195 ack 1 ackdat 0 
@@ -18,7 +18,7 @@ endnode-hello endnode vers 2 eco 0 ueco 0 src 1.1 blksize 16434 rtr 0.0 hello 10
 1.1 > 1.1 15 data-ack 8195>8196 ack 2 oack 0 
 endnode-hello endnode vers 2 eco 0 ueco 0 src 1.1 blksize 16434 rtr 0.0 hello 10 data 2
 1.1 > 1.1 34 conn-initiate 8197>0 ver 4.1 segsize 16403 
-1.1 > 1.1 9 [|decnet]
+1.1 > 1.1 9  [|decnet]
 1.1 > 1.1 16 conn-confirm 8198>8197 ver 4.1 segsize 16403 
 1.1 > 1.1 19 link-service 8197>8198 ack 0 ackdat 0 seg 1 dat seg count 0 
 1.1 > 1.1 15 ils-ack 8198>8197 ack 1 ackdat 0 

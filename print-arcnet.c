@@ -24,10 +24,10 @@
 /* \summary: Attached Resource Computer NETwork (ARCNET) printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include "netdissect.h"
 #include "extract.h"
@@ -41,22 +41,22 @@
  * as given to interface code.
  */
 struct	arc_header {
-	uint8_t  arc_shost;
-	uint8_t  arc_dhost;
-	uint8_t  arc_type;
+	nd_uint8_t  arc_shost;
+	nd_uint8_t  arc_dhost;
+	nd_uint8_t  arc_type;
 	/*
 	 * only present for newstyle encoding with LL fragmentation.
 	 * Don't use sizeof(anything), use ARC_HDR{,NEW}LEN instead.
 	 */
-	uint8_t  arc_flag;
-	uint16_t arc_seqid;
+	nd_uint8_t  arc_flag;
+	nd_uint16_t arc_seqid;
 
 	/*
 	 * only present in exception packets (arc_flag == 0xff)
 	 */
-	uint8_t  arc_type2;	/* same as arc_type */
-	uint8_t  arc_flag2;	/* real flag value */
-	uint16_t arc_seqid2;	/* real seqid value */
+	nd_uint8_t  arc_type2;	/* same as arc_type */
+	nd_uint8_t  arc_flag2;	/* real flag value */
+	nd_uint16_t arc_seqid2;	/* real seqid value */
 };
 
 #define	ARC_HDRLEN		3
@@ -85,17 +85,17 @@ struct	arc_header {
  * never presents packets that look like exception frames.
  */
 struct	arc_linux_header {
-	uint8_t  arc_shost;
-	uint8_t  arc_dhost;
-	uint16_t arc_offset;
-	uint8_t  arc_type;
+	nd_uint8_t  arc_shost;
+	nd_uint8_t  arc_dhost;
+	nd_uint16_t arc_offset;
+	nd_uint8_t  arc_type;
 	/*
 	 * only present for newstyle encoding with LL fragmentation.
 	 * Don't use sizeof(anything), use ARC_LINUX_HDR{,NEW}LEN
 	 * instead.
 	 */
-	uint8_t  arc_flag;
-	uint16_t arc_seqid;
+	nd_uint8_t  arc_flag;
+	nd_uint16_t arc_seqid;
 };
 
 #define	ARC_LINUX_HDRLEN	5
@@ -118,51 +118,58 @@ static const struct tok arctypemap[] = {
 	{ 0, 0 }
 };
 
-static inline void
+static void
 arcnet_print(netdissect_options *ndo, const u_char *bp, u_int length, int phds,
-             int flag, u_int seqid)
+             u_int flag, u_int seqid)
 {
 	const struct arc_header *ap;
 	const char *arctypename;
 
-
+	ndo->ndo_protocol = "arcnet";
 	ap = (const struct arc_header *)bp;
 
-
 	if (ndo->ndo_qflag) {
-		ND_PRINT((ndo, "%02x %02x %d: ",
-			     ap->arc_shost,
-			     ap->arc_dhost,
-			     length));
+		ND_PRINT("%02x %02x %u: ",
+			     EXTRACT_U_1(ap->arc_shost),
+			     EXTRACT_U_1(ap->arc_dhost),
+			     length);
 		return;
 	}
 
-	arctypename = tok2str(arctypemap, "%02x", ap->arc_type);
+	arctypename = tok2str(arctypemap, "%02x", EXTRACT_U_1(ap->arc_type));
 
 	if (!phds) {
-		ND_PRINT((ndo, "%02x %02x %s %d: ",
-			     ap->arc_shost, ap->arc_dhost, arctypename,
-			     length));
-			     return;
+		ND_PRINT("%02x %02x %s %u: ",
+			     EXTRACT_U_1(ap->arc_shost),
+			     EXTRACT_U_1(ap->arc_dhost),
+			     arctypename,
+			     length);
+		return;
 	}
 
 	if (flag == 0) {
-		ND_PRINT((ndo, "%02x %02x %s seqid %04x %d: ",
-			ap->arc_shost, ap->arc_dhost, arctypename, seqid,
-			length));
-			return;
+		ND_PRINT("%02x %02x %s seqid %04x %u: ",
+			EXTRACT_U_1(ap->arc_shost),
+			EXTRACT_U_1(ap->arc_dhost),
+			arctypename, seqid,
+			length);
+		return;
 	}
 
 	if (flag & 1)
-		ND_PRINT((ndo, "%02x %02x %s seqid %04x "
-			"(first of %d fragments) %d: ",
-			ap->arc_shost, ap->arc_dhost, arctypename, seqid,
-			(flag + 3) / 2, length));
+		ND_PRINT("%02x %02x %s seqid %04x "
+			"(first of %u fragments) %u: ",
+			EXTRACT_U_1(ap->arc_shost),
+			EXTRACT_U_1(ap->arc_dhost),
+			arctypename, seqid,
+			(flag + 3) / 2, length);
 	else
-		ND_PRINT((ndo, "%02x %02x %s seqid %04x "
-			"(fragment %d) %d: ",
-			ap->arc_shost, ap->arc_dhost, arctypename, seqid,
-			flag/2 + 1, length));
+		ND_PRINT("%02x %02x %s seqid %04x "
+			"(fragment %u) %u: ",
+			EXTRACT_U_1(ap->arc_shost),
+			EXTRACT_U_1(ap->arc_dhost),
+			arctypename, seqid,
+			flag/2 + 1, length);
 }
 
 /*
@@ -178,17 +185,19 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 	u_int length = h->len;
 	const struct arc_header *ap;
 
-	int phds, flag = 0, archdrlen = 0;
+	int phds;
+	u_int flag = 0, archdrlen = 0;
 	u_int seqid = 0;
 	u_char arc_type;
 
+	ndo->ndo_protocol = "arcnet_if";
 	if (caplen < ARC_HDRLEN || length < ARC_HDRLEN) {
-		ND_PRINT((ndo, "[|arcnet]"));
+		nd_print_trunc(ndo);
 		return (caplen);
 	}
 
 	ap = (const struct arc_header *)p;
-	arc_type = ap->arc_type;
+	arc_type = EXTRACT_U_1(ap->arc_type);
 
 	switch (arc_type) {
 	default:
@@ -205,22 +214,22 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 	if (phds) {
 		if (caplen < ARC_HDRNEWLEN || length < ARC_HDRNEWLEN) {
 			arcnet_print(ndo, p, length, 0, 0, 0);
-			ND_PRINT((ndo, "[|phds]"));
+			ND_PRINT("[|phds]");
 			return (caplen);
 		}
 
-		if (ap->arc_flag == 0xff) {
+		flag = EXTRACT_U_1(ap->arc_flag);
+		if (flag == 0xff) {
 			if (caplen < ARC_HDRNEWLEN_EXC || length < ARC_HDRNEWLEN_EXC) {
 				arcnet_print(ndo, p, length, 0, 0, 0);
-				ND_PRINT((ndo, "[|phds extended]"));
+				ND_PRINT("[|phds extended]");
 				return (caplen);
 			}
-			flag = ap->arc_flag2;
-			seqid = EXTRACT_16BITS(&ap->arc_seqid2);
+			flag = EXTRACT_U_1(ap->arc_flag2);
+			seqid = EXTRACT_BE_U_2(ap->arc_seqid2);
 			archdrlen = ARC_HDRNEWLEN_EXC;
 		} else {
-			flag = ap->arc_flag;
-			seqid = EXTRACT_16BITS(&ap->arc_seqid);
+			seqid = EXTRACT_BE_U_2(ap->arc_seqid);
 			archdrlen = ARC_HDRNEWLEN;
 		}
 	}
@@ -269,19 +278,20 @@ arcnet_linux_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, cons
 	int archdrlen = 0;
 	u_char arc_type;
 
+	ndo->ndo_protocol = "arcnet_linux_if";
 	if (caplen < ARC_LINUX_HDRLEN || length < ARC_LINUX_HDRLEN) {
-		ND_PRINT((ndo, "[|arcnet]"));
+		nd_print_trunc(ndo);
 		return (caplen);
 	}
 
 	ap = (const struct arc_linux_header *)p;
-	arc_type = ap->arc_type;
+	arc_type = EXTRACT_U_1(ap->arc_type);
 
 	switch (arc_type) {
 	default:
 		archdrlen = ARC_LINUX_HDRNEWLEN;
 		if (caplen < ARC_LINUX_HDRNEWLEN || length < ARC_LINUX_HDRNEWLEN) {
-			ND_PRINT((ndo, "[|arcnet]"));
+			nd_print_trunc(ndo);
 			return (caplen);
 		}
 		break;
@@ -339,7 +349,7 @@ arcnet_encap_print(netdissect_options *ndo, u_char arctype, const u_char *p,
 
 	case ARCTYPE_ATALK:	/* XXX was this ever used? */
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo, "et1 "));
+			ND_PRINT("et1 ");
 		atalk_print(ndo, p, length);
 		return (1);
 
@@ -351,10 +361,3 @@ arcnet_encap_print(netdissect_options *ndo, u_char arctype, const u_char *p,
 		return (0);
 	}
 }
-
-/*
- * Local Variables:
- * c-style: bsd
- * End:
- */
-

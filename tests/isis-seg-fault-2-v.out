@@ -14,8 +14,7 @@ IS-IS, length 1497
 	      unknown subTLV #0, length: 0
 	      unknown subTLV #0, length: 0
 	      unknown subTLV #0, length: 0
-	      unknown subTLV #0, length: 37
-		 [|isis]
+	      unknown subTLV #0, length: 37 [|isis]
 	    Area address(es) TLV #1, length: 4
 	      Area address (length: 3): 49.000a
 	    IPv4 Interface address(es) TLV #132, length: 4

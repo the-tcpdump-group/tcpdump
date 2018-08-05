@@ -23,12 +23,12 @@
 /* \summary: Classical-IP over ATM printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include <string.h>
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include "netdissect.h"
 #include "addrtoname.h"
@@ -41,13 +41,13 @@ static const unsigned char rfcllc[] = {
 	0x00,
 	0x00 };
 
-static inline void
+static void
 cip_print(netdissect_options *ndo, u_int length)
 {
 	/*
 	 * There is no MAC-layer header, so just print the length.
 	 */
-	ND_PRINT((ndo, "%u: ", length));
+	ND_PRINT("%u: ", length);
 }
 
 /*
@@ -64,6 +64,7 @@ cip_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 	size_t cmplen;
 	int llc_hdrlen;
 
+	ndo->ndo_protocol = "cip_if";
 	cmplen = sizeof(rfcllc);
 	if (cmplen > caplen)
 		cmplen = caplen;
@@ -74,7 +75,7 @@ cip_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 		cip_print(ndo, length);
 
 	if (cmplen == 0) {
-		ND_PRINT((ndo, "[|cip]"));
+		nd_print_trunc(ndo);
 		return 0;
 	}
 	if (memcmp(rfcllc, p, cmplen) == 0) {
@@ -98,11 +99,3 @@ cip_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 
 	return (llc_hdrlen);
 }
-
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

@@ -1,5 +1,6 @@
+/* -*- Mode: c; tab-width: 8; indent-tabs-mode: 1; c-basic-offset: 8; -*- */
 /*
- * Copyright (c) 1982, 1986, 1993
+ * Copyright (c) 1993, 1994, 1995, 1996, 1997
  *	The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -12,11 +13,11 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. All advertising materials mentioning features or use of this software
  *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
+ *	This product includes software developed by the Computer Systems
+ *	Engineering Group at Lawrence Berkeley Laboratory.
+ * 4. Neither the name of the University nor of the Laboratory may be used
+ *    to endorse or promote products derived from this software without
+ *    specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -29,29 +30,30 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- *
- *	@(#)if_ether.h	8.3 (Berkeley) 5/2/95
  */
 
-#define	ETHERMTU	1500
+#ifndef varattrs_h
+#define varattrs_h
 
-/*
- * The number of bytes in an ethernet (MAC) address.
- */
-#define	ETHER_ADDR_LEN		6
+#include "compiler-tests.h"
 
 /*
- * Structure of an Ethernet header.
+ * Attributes to apply to variables, using various compiler-specific
+ * extensions.
  */
-struct	ether_header {
-	uint8_t		ether_dhost[ETHER_ADDR_LEN];
-	uint8_t		ether_shost[ETHER_ADDR_LEN];
-	uint16_t	ether_length_type;
-};
 
-/*
- * Length of an Ethernet header; note that some compilers may pad
- * "struct ether_header" to a multiple of 4 bytes, for example, so
- * "sizeof (struct ether_header)" may not give the right answer.
- */
-#define ETHER_HDRLEN		14
+#if __has_attribute(unused) \
+    || ND_IS_AT_LEAST_GNUC_VERSION(2,0)
+  /*
+   * Compiler with support for __attribute__((unused)), or GCC 2.0 and
+   * later, so it supports __attribute__((unused)).
+   */
+  #define _U_ __attribute__((unused))
+#else
+  /*
+   * We don't know of any way to mark a variable as unused.
+   */
+  #define _U_
+#endif
+
+#endif

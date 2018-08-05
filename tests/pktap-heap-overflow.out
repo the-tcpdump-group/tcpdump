@@ -1,3 +1,2 @@
-[|pktap]
-[|ppp]
-EXIT CODE 00000100
+ [|pktap_if]
+ [|ppp_hdlc_if]
