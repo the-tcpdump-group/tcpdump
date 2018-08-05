@@ -65,8 +65,8 @@ enum sunrpc_auth_stat {
  * Authentication info.  Opaque to client.
  */
 struct sunrpc_opaque_auth {
-	uint32_t oa_flavor;		/* flavor of auth */
-	uint32_t oa_len;		/* length of opaque body */
+	nd_uint32_t oa_flavor;		/* flavor of auth */
+	nd_uint32_t oa_len;		/* length of opaque body */
 	/* zero or more bytes of body */
 };
 

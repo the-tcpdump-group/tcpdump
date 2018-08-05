@@ -22,10 +22,10 @@
 /* \summary: Raw IP printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include "netdissect.h"
 
@@ -36,8 +36,9 @@
 u_int
 raw_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
+	ndo->ndo_protocol = "raw_if";
 	if (ndo->ndo_eflag)
-		ND_PRINT((ndo, "ip: "));
+		ND_PRINT("ip: ");
 
 	ipN_print(ndo, p, h->len);
 

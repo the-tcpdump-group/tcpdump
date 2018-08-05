@@ -1,16 +1,12 @@
-This file lists people who have contributed to tcpdump:
+This file lists people who have contributed to tcpdump.
 
-The current maintainers:
-    Bill Fenner                   <fenner at research dot att dot com>
+The current maintainers (in alphabetical order):
     Denis Ovsienko                <denis at ovsienko dot info>
-    Fulvio Risso                  <risso at polito dot it>
+    Francois-Xavier Le Bail       <devel dot fx dot lebail at orange dot fr>
     Guy Harris                    <guy at alum dot mit dot edu>
-    Hannes Gredler                <hannes at juniper dot net>
     Michael Richardson            <mcr at sandelman dot ottawa dot on dot ca>
-    Francois-Xavier Le Bail       <fx dot lebail at yahoo dot com>
 
-Additional people who have contributed patches:
-
+Additional people who have contributed patches (in alphabetical order):
     Aaron Campbell                <aaron at arbor dot net>
     A Costa                       <agcosta at gis dot net>
     Albert Chin                   <china at thewrittenword dot com>
@@ -39,6 +35,7 @@ Additional people who have contributed patches:
     Bjoern A. Zeeb                <bzeeb at Zabbadoz dot NeT>
     Bram                          <tcpdump at mail dot wizbit dot be>
     Brent L. Bates                <blbates at vigyan dot com>
+    Brian Carpenter               <brian dot carpenter at gmail dot com>
     Brian Ginsbach                <ginsbach at cray dot com>
     Bruce M. Simpson              <bms at spc dot org>
     Carles Kishimoto Bisbe        <ckishimo at ac dot upc dot es>
@@ -54,6 +51,7 @@ Additional people who have contributed patches:
     Craig Rodrigues               <rodrigc at mediaone dot net>
     Crist J. Clark                <cjclark at alum dot mit dot edu>
     Daniel Hagerty                <hag at ai dot mit dot edu>
+    Daniel Lee                    <Longinus00 at gmail dot com>
     Darren Reed                   <darrenr at reed dot wattle dot id dot au>
     David Binderman               <d dot binderman at virgin dot net>
     David Horn                    <dhorn2000 at gmail dot com>
@@ -85,6 +83,7 @@ Additional people who have contributed patches:
     Greg Stark                    <gsstark at mit dot edu>
     Hank Leininger                <tcpdump-workers at progressive-comp dot com>
     Hannes Viertel                <hviertel at juniper dot net>
+    Hanno Böck                    <hanno at hboeck dot de>
     Harry Raaymakers              <harryr at connect dot com dot au>
     Heinz-Ado Arnolds             <Ado dot Arnolds at dhm-systems dot de>
     Hendrik Scholz                <hendrik at scholz dot net>
@@ -111,6 +110,7 @@ Additional people who have contributed patches:
     Juliusz Chroboczek            <jch at pps dot jussieu dot fr>
     Kaarthik Sivakumar            <kaarthik at torrentnet dot com>
     Kaladhar Musunuru             <kaladharm at sourceforge dot net>
+    Kamil Frankowicz              <kontakt at frankowicz dot me>
     Karl Norby                    <karl-norby at sourceforge dot net>
     Kazushi Sugyo                 <sugyo at pb dot jp dot nec dot com>
     Kelly Carmichael              <kcarmich at ipapp dot com>
@@ -122,8 +122,7 @@ Additional people who have contributed patches:
     Krzysztof Halasa              <khc at pm dot waw dot pl>
     Larry Lile                    <lile at stdio dot com>
     Lennert Buytenhek             <buytenh at gnu dot org>
-    Loganaden Velvindron          <logan at elandsys dot com>
-    Daniel Lee                    <Longinus00 at gmail dot com>
+    Loganaden Velvindron          <logan at hackers dot mu>
     Loris Degioanni               <loris at netgroup-serv dot polito dot it>
     Love Hörnquist-Åstrand        <lha at stacken dot kth dot se>
     Lucas C. Villa Real           <lucasvr at us dot ibm dot com>
@@ -166,6 +165,7 @@ Additional people who have contributed patches:
     Paolo Abeni                   <paolo dot abeni at email dot it>
     Pascal Hennequin              <pascal dot hennequin at int-evry dot fr>
     Pasvorn Boonmark              <boonmark at juniper dot net>
+    Patrik Lundquist              <patrik dot lundquist at gmail dot com>
     Paul Ferrell                  <pflarr at sourceforge dot net>
     Paul Mundt                    <lethal at linux-sh dot org>
     Paul S. Traina                <pst at freebsd dot org>
@@ -230,5 +230,8 @@ The original LBL crew:
     Craig Leres
     Van Jacobson
 
-Past maintainers:
-    Jun-ichiro itojun Hagino         <itojun at iijlab dot net>		Also see: http://www.wide.ad.jp/itojun-award/
+Past maintainers (in alphabetical order):
+    Bill Fenner                   <fenner at research dot att dot com>
+    Fulvio Risso                  <risso at polito dot it>
+    Hannes Gredler                <hannes at gredler dot at>
+    Jun-ichiro itojun Hagino      <itojun at iijlab dot net>		Also see: http://www.wide.ad.jp/itojun-award/

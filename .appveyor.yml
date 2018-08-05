@@ -1,0 +1,20 @@
+version: '{build}'
+
+branches:
+  only:
+  - master
+
+clone_depth: 5
+
+matrix:
+  fast_finish: true
+
+install:
+  - appveyor DownloadFile http://www.winpcap.org/install/bin/WpdPack_4_1_2.zip
+  - 7z x .\WpdPack_4_1_2.zip -oc:\projects\libpcap\Win32
+
+build_script:
+  - md build
+  - cd build
+  - cmake -DCMAKE_PREFIX_PATH=c:\projects\libpcap\Win32\WpdPack -G"Visual Studio 12 2013" ..
+  - msbuild -nologo -p:Configuration=Release tcpdump.sln
