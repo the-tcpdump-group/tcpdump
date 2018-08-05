@@ -701,7 +701,7 @@ print_attr_string(netdissect_options *ndo,
    u_int type, subtype;
    int count=0, len;
    const u_char *tptr;
-
+  
    ND_TCHECK_LEN(data, length);
 
    switch(attr_code)
@@ -849,6 +849,7 @@ print_attr_string(netdissect_options *ndo,
            data+=len;
         break;
    }
+  
    for (i=0; i < length && EXTRACT_U_1(data); i++, data++)
        ND_PRINT("%c", ND_ISPRINT(EXTRACT_U_1(data)) ? EXTRACT_U_1(data) : '.');
 
