@@ -23,10 +23,10 @@
 /* \summary: Zephyr printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -95,7 +95,7 @@ parse_field(netdissect_options *ndo, const char **pptr, int *len, int *truncated
 	    /* Ran out of packet data without finding it */
 	    return NULL;
 	}
-	if (!ND_TTEST(**pptr)) {
+	if (!ND_TTEST_SIZE(*pptr)) {
 	    /* Ran out of captured data without finding it */
 	    *truncated = 1;
 	    return NULL;
@@ -119,7 +119,7 @@ z_triple(const char *class, const char *inst, const char *recipient)
 {
     if (!*recipient)
 	recipient = "*";
-    snprintf(z_buf, sizeof(z_buf), "<%s,%s,%s>", class, inst, recipient);
+    nd_snprintf(z_buf, sizeof(z_buf), "<%s,%s,%s>", class, inst, recipient);
     z_buf[sizeof(z_buf)-1] = '\0';
     return z_buf;
 }
@@ -144,21 +144,33 @@ str_to_lower(const char *string)
 void
 zephyr_print(netdissect_options *ndo, const u_char *cp, int length)
 {
-    struct z_packet z;
+    struct z_packet z = {
+        NULL,	/* version */
+        0,	/* numfields */
+        0,	/* kind */
+        NULL,	/* uid */
+        0,	/* port */
+        0,	/* auth */
+        0,	/* authlen */
+        NULL,	/* authdata */
+        NULL,	/* class */
+        NULL,	/* inst */
+        NULL,	/* opcode */
+        NULL,	/* sender */
+        NULL,	/* recipient */
+        NULL,	/* format */
+        0,	/* cksum */
+        0,	/* multi */
+        NULL	/* multi_uid */
+    };
     const char *parse = (const char *) cp;
     int parselen = length;
     const char *s;
     int lose = 0;
     int truncated = 0;
 
+    ndo->ndo_protocol = "zephyr";
     /* squelch compiler warnings */
-
-    z.kind = 0;
-    z.class = 0;
-    z.inst = 0;
-    z.opcode = 0;
-    z.sender = 0;
-    z.recipient = 0;
 
 #define PARSE_STRING						\
 	s = parse_field(ndo, &parse, &parselen, &truncated);	\
@@ -198,34 +210,34 @@ zephyr_print(netdissect_options *ndo, const u_char *cp, int length)
     if (lose)
         goto trunc;
 
-    ND_PRINT((ndo, " zephyr"));
+    ND_PRINT(" zephyr");
     if (strncmp(z.version+4, "0.2", 3)) {
-	ND_PRINT((ndo, " v%s", z.version+4));
+	ND_PRINT(" v%s", z.version+4);
 	return;
     }
 
-    ND_PRINT((ndo, " %s", tok2str(z_types, "type %d", z.kind)));
+    ND_PRINT(" %s", tok2str(z_types, "type %d", z.kind));
     if (z.kind == Z_PACKET_SERVACK) {
 	/* Initialization to silence warnings */
 	const char *ackdata = NULL;
 	PARSE_FIELD_STR(ackdata);
 	if (!lose && strcmp(ackdata, "SENT"))
-	    ND_PRINT((ndo, "/%s", str_to_lower(ackdata)));
+	    ND_PRINT("/%s", str_to_lower(ackdata));
     }
-    if (*z.sender) ND_PRINT((ndo, " %s", z.sender));
+    if (*z.sender) ND_PRINT(" %s", z.sender);
 
     if (!strcmp(z.class, "USER_LOCATE")) {
 	if (!strcmp(z.opcode, "USER_HIDE"))
-	    ND_PRINT((ndo, " hide"));
+	    ND_PRINT(" hide");
 	else if (!strcmp(z.opcode, "USER_UNHIDE"))
-	    ND_PRINT((ndo, " unhide"));
+	    ND_PRINT(" unhide");
 	else
-	    ND_PRINT((ndo, " locate %s", z.inst));
+	    ND_PRINT(" locate %s", z.inst);
 	return;
     }
 
     if (!strcmp(z.class, "ZEPHYR_ADMIN")) {
-	ND_PRINT((ndo, " zephyr-admin %s", str_to_lower(z.opcode)));
+	ND_PRINT(" zephyr-admin %s", str_to_lower(z.opcode));
 	return;
     }
 
@@ -235,79 +247,79 @@ zephyr_print(netdissect_options *ndo, const u_char *cp, int length)
 		!strcmp(z.opcode, "SUBSCRIBE_NODEFS") ||
 		!strcmp(z.opcode, "UNSUBSCRIBE")) {
 
-		ND_PRINT((ndo, " %ssub%s", strcmp(z.opcode, "SUBSCRIBE") ? "un" : "",
+		ND_PRINT(" %ssub%s", strcmp(z.opcode, "SUBSCRIBE") ? "un" : "",
 				   strcmp(z.opcode, "SUBSCRIBE_NODEFS") ? "" :
-								   "-nodefs"));
+								   "-nodefs");
 		if (z.kind != Z_PACKET_SERVACK) {
 		    /* Initialization to silence warnings */
 		    const char *c = NULL, *i = NULL, *r = NULL;
 		    PARSE_FIELD_STR(c);
 		    PARSE_FIELD_STR(i);
 		    PARSE_FIELD_STR(r);
-		    if (!lose) ND_PRINT((ndo, " %s", z_triple(c, i, r)));
+		    if (!lose) ND_PRINT(" %s", z_triple(c, i, r));
 		}
 		return;
 	    }
 
 	    if (!strcmp(z.opcode, "GIMME")) {
-		ND_PRINT((ndo, " ret"));
+		ND_PRINT(" ret");
 		return;
 	    }
 
 	    if (!strcmp(z.opcode, "GIMMEDEFS")) {
-		ND_PRINT((ndo, " gimme-defs"));
+		ND_PRINT(" gimme-defs");
 		return;
 	    }
 
 	    if (!strcmp(z.opcode, "CLEARSUB")) {
-		ND_PRINT((ndo, " clear-subs"));
+		ND_PRINT(" clear-subs");
 		return;
 	    }
 
-	    ND_PRINT((ndo, " %s", str_to_lower(z.opcode)));
+	    ND_PRINT(" %s", str_to_lower(z.opcode));
 	    return;
 	}
 
 	if (!strcmp(z.inst, "HM")) {
-	    ND_PRINT((ndo, " %s", str_to_lower(z.opcode)));
+	    ND_PRINT(" %s", str_to_lower(z.opcode));
 	    return;
 	}
 
 	if (!strcmp(z.inst, "REALM")) {
 	    if (!strcmp(z.opcode, "ADD_SUBSCRIBE"))
-		ND_PRINT((ndo, " realm add-subs"));
+		ND_PRINT(" realm add-subs");
 	    if (!strcmp(z.opcode, "REQ_SUBSCRIBE"))
-		ND_PRINT((ndo, " realm req-subs"));
+		ND_PRINT(" realm req-subs");
 	    if (!strcmp(z.opcode, "RLM_SUBSCRIBE"))
-		ND_PRINT((ndo, " realm rlm-sub"));
+		ND_PRINT(" realm rlm-sub");
 	    if (!strcmp(z.opcode, "RLM_UNSUBSCRIBE"))
-		ND_PRINT((ndo, " realm rlm-unsub"));
+		ND_PRINT(" realm rlm-unsub");
 	    return;
 	}
     }
 
     if (!strcmp(z.class, "HM_CTL")) {
-	ND_PRINT((ndo, " hm_ctl %s", str_to_lower(z.inst)));
-	ND_PRINT((ndo, " %s", str_to_lower(z.opcode)));
+	ND_PRINT(" hm_ctl %s", str_to_lower(z.inst));
+	ND_PRINT(" %s", str_to_lower(z.opcode));
 	return;
     }
 
     if (!strcmp(z.class, "HM_STAT")) {
 	if (!strcmp(z.inst, "HMST_CLIENT") && !strcmp(z.opcode, "GIMMESTATS")) {
-	    ND_PRINT((ndo, " get-client-stats"));
+	    ND_PRINT(" get-client-stats");
 	    return;
 	}
     }
 
     if (!strcmp(z.class, "WG_CTL")) {
-	ND_PRINT((ndo, " wg_ctl %s", str_to_lower(z.inst)));
-	ND_PRINT((ndo, " %s", str_to_lower(z.opcode)));
+	ND_PRINT(" wg_ctl %s", str_to_lower(z.inst));
+	ND_PRINT(" %s", str_to_lower(z.opcode));
 	return;
     }
 
     if (!strcmp(z.class, "LOGIN")) {
 	if (!strcmp(z.opcode, "USER_FLUSH")) {
-	    ND_PRINT((ndo, " flush_locs"));
+	    ND_PRINT(" flush_locs");
 	    return;
 	}
 
@@ -317,7 +329,7 @@ zephyr_print(netdissect_options *ndo, const u_char *cp, int length)
 	    !strcmp(z.opcode, "REALM-ANNOUNCED") ||
 	    !strcmp(z.opcode, "NET-VISIBLE") ||
 	    !strcmp(z.opcode, "NET-ANNOUNCED")) {
-	    ND_PRINT((ndo, " set-exposure %s", str_to_lower(z.opcode)));
+	    ND_PRINT(" set-exposure %s", str_to_lower(z.opcode));
 	    return;
 	}
     }
@@ -325,12 +337,12 @@ zephyr_print(netdissect_options *ndo, const u_char *cp, int length)
     if (!*z.recipient)
 	z.recipient = "*";
 
-    ND_PRINT((ndo, " to %s", z_triple(z.class, z.inst, z.recipient)));
+    ND_PRINT(" to %s", z_triple(z.class, z.inst, z.recipient));
     if (*z.opcode)
-	ND_PRINT((ndo, " op %s", z.opcode));
+	ND_PRINT(" op %s", z.opcode);
     return;
 
 trunc:
-    ND_PRINT((ndo, " [|zephyr] (%d)", length));
+    nd_print_trunc(ndo);
     return;
 }

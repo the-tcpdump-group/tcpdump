@@ -10,7 +10,5 @@ AnswerCount=0
 AuthorityCount=0
 AddressRecCount=0
 QuestionRecords:
-Name=
-WARNING: Short packet. Try increasing the snap length
-
+Name= [|nbt_udp137]
 

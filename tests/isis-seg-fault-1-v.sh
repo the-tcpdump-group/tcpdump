@@ -14,7 +14,7 @@ elif grep '^CC = .*gcc' ../Makefile >/dev/null
 then
 	passed=`cat .passed`
 	failed=`cat .failed`
-	if ./TESTonce $test_name isis-seg-fault-1.pcap isis-seg-fault-1-v.out '-v'
+	if ./TESTonce $test_name isis-seg-fault-1.pcapng isis-seg-fault-1-v.out '-v'
 	then
 		passed=`expr $passed + 1`
 		echo $passed >.passed

@@ -7671,4 +7671,4 @@ c2:02:52:72:00:00 > 01:00:5e:00:00:0d, ethertype IPv4 (0x0800), length 65535: (t
 	  DR Priority Option (19), length 4, Value: 1
 	    0x0000:  0000 0001
 	  State Refresh Capability Option (21), length 2, Value: ERROR: Option Length != 4 Bytes (2)
-	    0x0000:  0069[|pim]
+	    0x0000:  0069 [|pimv2]

@@ -36,7 +36,7 @@
  */
 
 extern const struct tok ipproto_values[];
-extern const char *netdb_protoname (const nd_uint8_t);
+extern const char *netdb_protoname (const uint8_t);
 
 #ifndef IPPROTO_IP
 #define	IPPROTO_IP		0		/* dummy for IP */

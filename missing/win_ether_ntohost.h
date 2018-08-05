@@ -1,7 +1,4 @@
 /*
- * Copyright (c) 1993, 1994, 1995, 1996, 1997
- *	The Regents of the University of California.  All rights reserved.
- *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that: (1) source code distributions
  * retain the above copyright notice and this paragraph in its entirety, (2)
@@ -17,15 +14,20 @@
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * tcpdump/Win32 functions for reading and parsing system's Ethernet
+ * address file:
+ *    '%SystemRoot%/drivers/etc/ethers'  (Win-NT+)
+ * or '%Windir%/etc/ethers'              (Win-9x/ME)
+ *
+ * G. Vanem <gvanem@yahoo.no> 2012.
  */
 
-#include <stdio.h>
-#include <pcap.h>
+/*
+ * The number of bytes in an ethernet (MAC) address.
+ */
+#define ETHER_ADDR_LEN		6
 
-#include "pcap-missing.h"
-
-long
-pcap_dump_ftell(pcap_dumper_t *p)
-{
-	return (ftell((FILE *)p));
-}
+typedef struct ether_addr {
+        unsigned char octet[ETHER_ADDR_LEN];
+      } ether_address;

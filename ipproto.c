@@ -14,10 +14,10 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include "netdissect.h"
 #include "ipproto.h"
@@ -355,7 +355,7 @@ static const char *netdb_protocol_names[256] = {
 
 /* The function enforces the array index to be 8-bit. */
 const char *
-netdb_protoname (const nd_uint8_t protoid)
+netdb_protoname (const uint8_t protoid)
 {
 	return netdb_protocol_names[protoid];
 }

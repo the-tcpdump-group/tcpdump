@@ -24,7 +24,7 @@ CFLAGS = -I ${PCAP_DIR}/wpcap/libpcap/bpf \
 	-D_U_="__attribute__((unused))" \
 	-D_WIN32_WINNT=0x0501 \
 	-mno-cygwin ${OPTFLAGS}
-LDFLAGS = 
+LDFLAGS =
 LIBS = -L ${PCAP_DIR}/WPCAP/LIB -lwpcap -lws2_32
 OBJS = \
 	../../addrtoname.o \

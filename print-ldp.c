@@ -17,10 +17,10 @@
 /* \summary: Label Distribution Protocol (LDP) printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include "netdissect.h"
 #include "extract.h"
@@ -28,6 +28,7 @@
 
 #include "l2vpn.h"
 #include "af.h"
+
 
 /*
  * ldp common header
@@ -45,10 +46,10 @@
  */
 
 struct ldp_common_header {
-    uint8_t version[2];
-    uint8_t pdu_length[2];
-    uint8_t lsr_id[4];
-    uint8_t label_space[2];
+    nd_uint16_t version;
+    nd_uint16_t pdu_length;
+    nd_ipv4     lsr_id;
+    nd_uint16_t label_space;
 };
 
 #define LDP_VERSION 1
@@ -78,9 +79,9 @@ struct ldp_common_header {
  */
 
 struct ldp_msg_header {
-    uint8_t type[2];
-    uint8_t length[2];
-    uint8_t id[4];
+    nd_uint16_t type;
+    nd_uint16_t length;
+    nd_uint32_t id;
 };
 
 #define	LDP_MASK_MSG_TYPE(x)  ((x)&0x7fff)
@@ -210,7 +211,7 @@ static const struct tok ldp_fec_martini_ifparm_vccv_cv_values[] = {
     { 0, NULL}
 };
 
-static int ldp_pdu_print(netdissect_options *, register const u_char *);
+static int ldp_pdu_print(netdissect_options *, const u_char *);
 
 /*
  * ldp tlv header
@@ -230,16 +231,16 @@ static int ldp_pdu_print(netdissect_options *, register const u_char *);
  */
 
 #define TLV_TCHECK(minlen) \
-    ND_TCHECK2(*tptr, minlen); if (tlv_tlen < minlen) goto badtlv;
+    ND_TCHECK_LEN(tptr, minlen); if (tlv_tlen < minlen) goto badtlv;
 
 static int
 ldp_tlv_print(netdissect_options *ndo,
-              register const u_char *tptr,
+              const u_char *tptr,
               u_short msg_tlen)
 {
     struct ldp_tlv_header {
-        uint8_t type[2];
-        uint8_t length[2];
+        nd_uint16_t type;
+        nd_uint16_t length;
     };
 
     const struct ldp_tlv_header *ldp_tlv_header;
@@ -250,24 +251,24 @@ ldp_tlv_print(netdissect_options *ndo,
     int i;
 
     ldp_tlv_header = (const struct ldp_tlv_header *)tptr;
-    ND_TCHECK(*ldp_tlv_header);
-    tlv_len=EXTRACT_16BITS(ldp_tlv_header->length);
+    ND_TCHECK_SIZE(ldp_tlv_header);
+    tlv_len=EXTRACT_BE_U_2(ldp_tlv_header->length);
     if (tlv_len + 4 > msg_tlen) {
-        ND_PRINT((ndo, "\n\t\t TLV contents go past end of message"));
+        ND_PRINT("\n\t\t TLV contents go past end of message");
         return 0;
     }
     tlv_tlen=tlv_len;
-    tlv_type=LDP_MASK_TLV_TYPE(EXTRACT_16BITS(ldp_tlv_header->type));
+    tlv_type=LDP_MASK_TLV_TYPE(EXTRACT_BE_U_2(ldp_tlv_header->type));
 
     /* FIXME vendor private / experimental check */
-    ND_PRINT((ndo, "\n\t    %s TLV (0x%04x), length: %u, Flags: [%s and %s forward if unknown]",
+    ND_PRINT("\n\t    %s TLV (0x%04x), length: %u, Flags: [%s and %s forward if unknown]",
            tok2str(ldp_tlv_values,
                    "Unknown",
                    tlv_type),
            tlv_type,
            tlv_len,
-           LDP_MASK_U_BIT(EXTRACT_16BITS(&ldp_tlv_header->type)) ? "continue processing" : "ignore",
-           LDP_MASK_F_BIT(EXTRACT_16BITS(&ldp_tlv_header->type)) ? "do" : "don't"));
+           LDP_MASK_U_BIT(EXTRACT_BE_U_2(ldp_tlv_header->type)) ? "continue processing" : "ignore",
+           LDP_MASK_F_BIT(EXTRACT_BE_U_2(ldp_tlv_header->type)) ? "do" : "don't");
 
     tptr+=sizeof(struct ldp_tlv_header);
 
@@ -275,47 +276,47 @@ ldp_tlv_print(netdissect_options *ndo,
 
     case LDP_TLV_COMMON_HELLO:
         TLV_TCHECK(4);
-        ND_PRINT((ndo, "\n\t      Hold Time: %us, Flags: [%s Hello%s]",
-               EXTRACT_16BITS(tptr),
-               (EXTRACT_16BITS(tptr+2)&0x8000) ? "Targeted" : "Link",
-               (EXTRACT_16BITS(tptr+2)&0x4000) ? ", Request for targeted Hellos" : ""));
+        ND_PRINT("\n\t      Hold Time: %us, Flags: [%s Hello%s]",
+               EXTRACT_BE_U_2(tptr),
+               (EXTRACT_BE_U_2(tptr + 2)&0x8000) ? "Targeted" : "Link",
+               (EXTRACT_BE_U_2(tptr + 2)&0x4000) ? ", Request for targeted Hellos" : "");
         break;
 
     case LDP_TLV_IPV4_TRANSPORT_ADDR:
         TLV_TCHECK(4);
-        ND_PRINT((ndo, "\n\t      IPv4 Transport Address: %s", ipaddr_string(ndo, tptr)));
+        ND_PRINT("\n\t      IPv4 Transport Address: %s", ipaddr_string(ndo, tptr));
         break;
     case LDP_TLV_IPV6_TRANSPORT_ADDR:
         TLV_TCHECK(16);
-        ND_PRINT((ndo, "\n\t      IPv6 Transport Address: %s", ip6addr_string(ndo, tptr)));
+        ND_PRINT("\n\t      IPv6 Transport Address: %s", ip6addr_string(ndo, tptr));
         break;
     case LDP_TLV_CONFIG_SEQ_NUMBER:
         TLV_TCHECK(4);
-        ND_PRINT((ndo, "\n\t      Sequence Number: %u", EXTRACT_32BITS(tptr)));
+        ND_PRINT("\n\t      Sequence Number: %u", EXTRACT_BE_U_4(tptr));
         break;
 
     case LDP_TLV_ADDRESS_LIST:
         TLV_TCHECK(LDP_TLV_ADDRESS_LIST_AFNUM_LEN);
-	af = EXTRACT_16BITS(tptr);
+	af = EXTRACT_BE_U_2(tptr);
 	tptr+=LDP_TLV_ADDRESS_LIST_AFNUM_LEN;
         tlv_tlen -= LDP_TLV_ADDRESS_LIST_AFNUM_LEN;
-	ND_PRINT((ndo, "\n\t      Address Family: %s, addresses",
-               tok2str(af_values, "Unknown (%u)", af)));
+	ND_PRINT("\n\t      Address Family: %s, addresses",
+               tok2str(af_values, "Unknown (%u)", af));
         switch (af) {
         case AFNUM_INET:
-	    while(tlv_tlen >= sizeof(struct in_addr)) {
-		ND_TCHECK2(*tptr, sizeof(struct in_addr));
-		ND_PRINT((ndo, " %s", ipaddr_string(ndo, tptr)));
-		tlv_tlen-=sizeof(struct in_addr);
-		tptr+=sizeof(struct in_addr);
+	    while(tlv_tlen >= sizeof(nd_ipv4)) {
+		ND_TCHECK_LEN(tptr, sizeof(nd_ipv4));
+		ND_PRINT(" %s", ipaddr_string(ndo, tptr));
+		tlv_tlen-=sizeof(nd_ipv4);
+		tptr+=sizeof(nd_ipv4);
 	    }
             break;
         case AFNUM_INET6:
-	    while(tlv_tlen >= sizeof(struct in6_addr)) {
-		ND_TCHECK2(*tptr, sizeof(struct in6_addr));
-		ND_PRINT((ndo, " %s", ip6addr_string(ndo, tptr)));
-		tlv_tlen-=sizeof(struct in6_addr);
-		tptr+=sizeof(struct in6_addr);
+	    while(tlv_tlen >= sizeof(nd_ipv6)) {
+		ND_TCHECK_LEN(tptr, sizeof(nd_ipv6));
+		ND_PRINT(" %s", ip6addr_string(ndo, tptr));
+		tlv_tlen-=sizeof(nd_ipv6);
+		tptr+=sizeof(nd_ipv6);
 	    }
             break;
         default:
@@ -326,19 +327,19 @@ ldp_tlv_print(netdissect_options *ndo,
 
     case LDP_TLV_COMMON_SESSION:
 	TLV_TCHECK(8);
-	ND_PRINT((ndo, "\n\t      Version: %u, Keepalive: %us, Flags: [Downstream %s, Loop Detection %s]",
-	       EXTRACT_16BITS(tptr), EXTRACT_16BITS(tptr+2),
-	       (EXTRACT_16BITS(tptr+6)&0x8000) ? "On Demand" : "Unsolicited",
-	       (EXTRACT_16BITS(tptr+6)&0x4000) ? "Enabled" : "Disabled"
-	       ));
+	ND_PRINT("\n\t      Version: %u, Keepalive: %us, Flags: [Downstream %s, Loop Detection %s]",
+	       EXTRACT_BE_U_2(tptr), EXTRACT_BE_U_2(tptr + 2),
+	       (EXTRACT_BE_U_2(tptr + 6)&0x8000) ? "On Demand" : "Unsolicited",
+	       (EXTRACT_BE_U_2(tptr + 6)&0x4000) ? "Enabled" : "Disabled"
+	       );
 	break;
 
     case LDP_TLV_FEC:
         TLV_TCHECK(1);
-        fec_type = *tptr;
-	ND_PRINT((ndo, "\n\t      %s FEC (0x%02x)",
+        fec_type = EXTRACT_U_1(tptr);
+	ND_PRINT("\n\t      %s FEC (0x%02x)",
 	       tok2str(ldp_fec_values, "Unknown", fec_type),
-	       fec_type));
+	       fec_type);
 
 	tptr+=1;
 	tlv_tlen-=1;
@@ -348,7 +349,7 @@ ldp_tlv_print(netdissect_options *ndo,
 	    break;
 	case LDP_FEC_PREFIX:
 	    TLV_TCHECK(2);
-	    af = EXTRACT_16BITS(tptr);
+	    af = EXTRACT_BE_U_2(tptr);
 	    tptr+=LDP_TLV_ADDRESS_LIST_AFNUM_LEN;
 	    tlv_tlen-=LDP_TLV_ADDRESS_LIST_AFNUM_LEN;
 	    if (af == AFNUM_INET) {
@@ -356,25 +357,25 @@ ldp_tlv_print(netdissect_options *ndo,
 		if (i == -2)
 		    goto trunc;
 		if (i == -3)
-		    ND_PRINT((ndo, ": IPv4 prefix (goes past end of TLV)"));
+		    ND_PRINT(": IPv4 prefix (goes past end of TLV)");
 		else if (i == -1)
-		    ND_PRINT((ndo, ": IPv4 prefix (invalid length)"));
+		    ND_PRINT(": IPv4 prefix (invalid length)");
 		else
-		    ND_PRINT((ndo, ": IPv4 prefix %s", buf));
+		    ND_PRINT(": IPv4 prefix %s", buf);
 	    }
 	    else if (af == AFNUM_INET6) {
 		i=decode_prefix6(ndo, tptr, tlv_tlen, buf, sizeof(buf));
 		if (i == -2)
 		    goto trunc;
 		if (i == -3)
-		    ND_PRINT((ndo, ": IPv4 prefix (goes past end of TLV)"));
+		    ND_PRINT(": IPv4 prefix (goes past end of TLV)");
 		else if (i == -1)
-		    ND_PRINT((ndo, ": IPv6 prefix (invalid length)"));
+		    ND_PRINT(": IPv6 prefix (invalid length)");
 		else
-		    ND_PRINT((ndo, ": IPv6 prefix %s", buf));
+		    ND_PRINT(": IPv6 prefix %s", buf);
 	    }
 	    else
-		ND_PRINT((ndo, ": Address family %u prefix", af));
+		ND_PRINT(": Address family %u prefix", af);
 	    break;
 	case LDP_FEC_HOSTADDRESS:
 	    break;
@@ -384,7 +385,7 @@ ldp_tlv_print(netdissect_options *ndo,
              * Pseudowire Types.
              */
             TLV_TCHECK(7);
-            vc_info_len = *(tptr+2);
+            vc_info_len = EXTRACT_U_1(tptr + 2);
 
             /*
 	     * According to RFC 4908, the VC info Length field can be zero,
@@ -392,25 +393,25 @@ ldp_tlv_print(netdissect_options *ndo,
 	     * there's no VC ID.
 	     */
             if (vc_info_len == 0) {
-                ND_PRINT((ndo, ": %s, %scontrol word, group-ID %u, VC-info-length: %u",
-                       tok2str(mpls_pw_types_values, "Unknown", EXTRACT_16BITS(tptr)&0x7fff),
-                       EXTRACT_16BITS(tptr)&0x8000 ? "" : "no ",
-                       EXTRACT_32BITS(tptr+3),
-                       vc_info_len));
+                ND_PRINT(": %s, %scontrol word, group-ID %u, VC-info-length: %u",
+                       tok2str(mpls_pw_types_values, "Unknown", EXTRACT_BE_U_2(tptr)&0x7fff),
+                       EXTRACT_BE_U_2(tptr)&0x8000 ? "" : "no ",
+                       EXTRACT_BE_U_4(tptr + 3),
+                       vc_info_len);
                 break;
             }
 
             /* Make sure we have the VC ID as well */
             TLV_TCHECK(11);
-	    ND_PRINT((ndo, ": %s, %scontrol word, group-ID %u, VC-ID %u, VC-info-length: %u",
-		   tok2str(mpls_pw_types_values, "Unknown", EXTRACT_16BITS(tptr)&0x7fff),
-		   EXTRACT_16BITS(tptr)&0x8000 ? "" : "no ",
-                   EXTRACT_32BITS(tptr+3),
-		   EXTRACT_32BITS(tptr+7),
-                   vc_info_len));
+	    ND_PRINT(": %s, %scontrol word, group-ID %u, VC-ID %u, VC-info-length: %u",
+		   tok2str(mpls_pw_types_values, "Unknown", EXTRACT_BE_U_2(tptr)&0x7fff),
+		   EXTRACT_BE_U_2(tptr)&0x8000 ? "" : "no ",
+		   EXTRACT_BE_U_4(tptr + 3),
+		   EXTRACT_BE_U_4(tptr + 7),
+		   vc_info_len);
             if (vc_info_len < 4) {
                 /* minimum 4, for the VC ID */
-                ND_PRINT((ndo, " (invalid, < 4"));
+                ND_PRINT(" (invalid, < 4");
                 return(tlv_len+4); /* Type & Length fields not included */
 	    }
             vc_info_len -= 4; /* subtract out the VC ID, giving the length of the interface parameters */
@@ -421,36 +422,36 @@ ldp_tlv_print(netdissect_options *ndo,
             TLV_TCHECK(vc_info_len);
 
             while (vc_info_len > 2) {
-                vc_info_tlv_type = *tptr;
-                vc_info_tlv_len = *(tptr+1);
+                vc_info_tlv_type = EXTRACT_U_1(tptr);
+                vc_info_tlv_len = EXTRACT_U_1(tptr + 1);
                 if (vc_info_tlv_len < 2)
                     break;
                 if (vc_info_len < vc_info_tlv_len)
                     break;
 
-                ND_PRINT((ndo, "\n\t\tInterface Parameter: %s (0x%02x), len %u",
+                ND_PRINT("\n\t\tInterface Parameter: %s (0x%02x), len %u",
                        tok2str(ldp_fec_martini_ifparm_values,"Unknown",vc_info_tlv_type),
                        vc_info_tlv_type,
-                       vc_info_tlv_len));
+                       vc_info_tlv_len);
 
                 switch(vc_info_tlv_type) {
                 case LDP_FEC_MARTINI_IFPARM_MTU:
-                    ND_PRINT((ndo, ": %u", EXTRACT_16BITS(tptr+2)));
+                    ND_PRINT(": %u", EXTRACT_BE_U_2(tptr + 2));
                     break;
 
                 case LDP_FEC_MARTINI_IFPARM_DESC:
-                    ND_PRINT((ndo, ": "));
+                    ND_PRINT(": ");
                     for (idx = 2; idx < vc_info_tlv_len; idx++)
-                        safeputchar(ndo, *(tptr + idx));
+                        fn_print_char(ndo, EXTRACT_U_1(tptr + idx));
                     break;
 
                 case LDP_FEC_MARTINI_IFPARM_VCCV:
-                    ND_PRINT((ndo, "\n\t\t  Control Channels (0x%02x) = [%s]",
-                           *(tptr+2),
-                           bittok2str(ldp_fec_martini_ifparm_vccv_cc_values, "none", *(tptr+2))));
-                    ND_PRINT((ndo, "\n\t\t  CV Types (0x%02x) = [%s]",
-                           *(tptr+3),
-                           bittok2str(ldp_fec_martini_ifparm_vccv_cv_values, "none", *(tptr+3))));
+                    ND_PRINT("\n\t\t  Control Channels (0x%02x) = [%s]",
+                           EXTRACT_U_1((tptr + 2)),
+                           bittok2str(ldp_fec_martini_ifparm_vccv_cc_values, "none", EXTRACT_U_1((tptr + 2))));
+                    ND_PRINT("\n\t\t  CV Types (0x%02x) = [%s]",
+                           EXTRACT_U_1((tptr + 3)),
+                           bittok2str(ldp_fec_martini_ifparm_vccv_cv_values, "none", EXTRACT_U_1((tptr + 3))));
                     break;
 
                 default:
@@ -468,45 +469,45 @@ ldp_tlv_print(netdissect_options *ndo,
 
     case LDP_TLV_GENERIC_LABEL:
 	TLV_TCHECK(4);
-	ND_PRINT((ndo, "\n\t      Label: %u", EXTRACT_32BITS(tptr) & 0xfffff));
+	ND_PRINT("\n\t      Label: %u", EXTRACT_BE_U_4(tptr) & 0xfffff);
 	break;
 
     case LDP_TLV_STATUS:
 	TLV_TCHECK(8);
-	ui = EXTRACT_32BITS(tptr);
+	ui = EXTRACT_BE_U_4(tptr);
 	tptr+=4;
-	ND_PRINT((ndo, "\n\t      Status: 0x%02x, Flags: [%s and %s forward]",
+	ND_PRINT("\n\t      Status: 0x%02x, Flags: [%s and %s forward]",
 	       ui&0x3fffffff,
 	       ui&0x80000000 ? "Fatal error" : "Advisory Notification",
-	       ui&0x40000000 ? "do" : "don't"));
-	ui = EXTRACT_32BITS(tptr);
+	       ui&0x40000000 ? "do" : "don't");
+	ui = EXTRACT_BE_U_4(tptr);
 	tptr+=4;
 	if (ui)
-	    ND_PRINT((ndo, ", causing Message ID: 0x%08x", ui));
+	    ND_PRINT(", causing Message ID: 0x%08x", ui);
 	break;
 
     case LDP_TLV_FT_SESSION:
 	TLV_TCHECK(8);
-	ft_flags = EXTRACT_16BITS(tptr);
-	ND_PRINT((ndo, "\n\t      Flags: [%sReconnect, %sSave State, %sAll-Label Protection, %s Checkpoint, %sRe-Learn State]",
+	ft_flags = EXTRACT_BE_U_2(tptr);
+	ND_PRINT("\n\t      Flags: [%sReconnect, %sSave State, %sAll-Label Protection, %s Checkpoint, %sRe-Learn State]",
 	       ft_flags&0x8000 ? "" : "No ",
 	       ft_flags&0x8 ? "" : "Don't ",
 	       ft_flags&0x4 ? "" : "No ",
 	       ft_flags&0x2 ? "Sequence Numbered Label" : "All Labels",
-	       ft_flags&0x1 ? "" : "Don't "));
+	       ft_flags&0x1 ? "" : "Don't ");
 	tptr+=4;
-	ui = EXTRACT_32BITS(tptr);
+	ui = EXTRACT_BE_U_4(tptr);
 	if (ui)
-	    ND_PRINT((ndo, ", Reconnect Timeout: %ums", ui));
+	    ND_PRINT(", Reconnect Timeout: %ums", ui);
 	tptr+=4;
-	ui = EXTRACT_32BITS(tptr);
+	ui = EXTRACT_BE_U_4(tptr);
 	if (ui)
-	    ND_PRINT((ndo, ", Recovery Time: %ums", ui));
+	    ND_PRINT(", Recovery Time: %ums", ui);
 	break;
 
     case LDP_TLV_MTU:
 	TLV_TCHECK(2);
-	ND_PRINT((ndo, "\n\t      MTU: %u", EXTRACT_16BITS(tptr)));
+	ND_PRINT("\n\t      MTU: %u", EXTRACT_BE_U_2(tptr));
 	break;
 
 
@@ -534,19 +535,21 @@ ldp_tlv_print(netdissect_options *ndo,
     return(tlv_len+4); /* Type & Length fields not included */
 
 trunc:
-    ND_PRINT((ndo, "\n\t\t packet exceeded snapshot"));
+    nd_print_trunc(ndo);
     return 0;
 
 badtlv:
-    ND_PRINT((ndo, "\n\t\t TLV contents go past end of TLV"));
+    ND_PRINT("\n\t\t TLV contents go past end of TLV");
     return(tlv_len+4); /* Type & Length fields not included */
 }
 
 void
 ldp_print(netdissect_options *ndo,
-          register const u_char *pptr, register u_int len)
+          const u_char *pptr, u_int len)
 {
     int processed;
+
+    ndo->ndo_protocol = "ldp";
     while (len > (sizeof(struct ldp_common_header) + sizeof(struct ldp_msg_header))) {
         processed = ldp_pdu_print(ndo, pptr);
         if (processed == 0)
@@ -558,7 +561,7 @@ ldp_print(netdissect_options *ndo,
 
 static int
 ldp_pdu_print(netdissect_options *ndo,
-              register const u_char *pptr)
+              const u_char *pptr)
 {
     const struct ldp_common_header *ldp_com_header;
     const struct ldp_msg_header *ldp_msg_header;
@@ -568,34 +571,34 @@ ldp_pdu_print(netdissect_options *ndo,
     int hexdump,processed;
 
     ldp_com_header = (const struct ldp_common_header *)pptr;
-    ND_TCHECK(*ldp_com_header);
+    ND_TCHECK_SIZE(ldp_com_header);
 
     /*
      * Sanity checking of the header.
      */
-    if (EXTRACT_16BITS(&ldp_com_header->version) != LDP_VERSION) {
-	ND_PRINT((ndo, "%sLDP version %u packet not supported",
+    if (EXTRACT_BE_U_2(ldp_com_header->version) != LDP_VERSION) {
+	ND_PRINT("%sLDP version %u packet not supported",
                (ndo->ndo_vflag < 1) ? "" : "\n\t",
-               EXTRACT_16BITS(&ldp_com_header->version)));
+               EXTRACT_BE_U_2(ldp_com_header->version));
 	return 0;
     }
 
-    pdu_len = EXTRACT_16BITS(&ldp_com_header->pdu_length);
+    pdu_len = EXTRACT_BE_U_2(ldp_com_header->pdu_length);
     if (pdu_len < sizeof(struct ldp_common_header)-4) {
         /* length too short */
-        ND_PRINT((ndo, "%sLDP, pdu-length: %u (too short, < %u)",
+        ND_PRINT("%sLDP, pdu-length: %u (too short, < %u)",
                (ndo->ndo_vflag < 1) ? "" : "\n\t",
                pdu_len,
-               (u_int)(sizeof(struct ldp_common_header)-4)));
+               (u_int)(sizeof(struct ldp_common_header)-4));
         return 0;
     }
 
     /* print the LSR-ID, label-space & length */
-    ND_PRINT((ndo, "%sLDP, Label-Space-ID: %s:%u, pdu-length: %u",
+    ND_PRINT("%sLDP, Label-Space-ID: %s:%u, pdu-length: %u",
            (ndo->ndo_vflag < 1) ? "" : "\n\t",
-           ipaddr_string(ndo, &ldp_com_header->lsr_id),
-           EXTRACT_16BITS(&ldp_com_header->label_space),
-           pdu_len));
+           ipaddr_string(ndo, ldp_com_header->lsr_id),
+           EXTRACT_BE_U_2(ldp_com_header->label_space),
+           pdu_len);
 
     /* bail out if non-verbose */
     if (ndo->ndo_vflag < 1)
@@ -607,40 +610,40 @@ ldp_pdu_print(netdissect_options *ndo,
 
     while(tlen>0) {
         /* did we capture enough for fully decoding the msg header ? */
-        ND_TCHECK2(*tptr, sizeof(struct ldp_msg_header));
+        ND_TCHECK_LEN(tptr, sizeof(struct ldp_msg_header));
 
         ldp_msg_header = (const struct ldp_msg_header *)tptr;
-        msg_len=EXTRACT_16BITS(ldp_msg_header->length);
-        msg_type=LDP_MASK_MSG_TYPE(EXTRACT_16BITS(ldp_msg_header->type));
+        msg_len=EXTRACT_BE_U_2(ldp_msg_header->length);
+        msg_type=LDP_MASK_MSG_TYPE(EXTRACT_BE_U_2(ldp_msg_header->type));
 
         if (msg_len < sizeof(struct ldp_msg_header)-4) {
             /* length too short */
             /* FIXME vendor private / experimental check */
-            ND_PRINT((ndo, "\n\t  %s Message (0x%04x), length: %u (too short, < %u)",
+            ND_PRINT("\n\t  %s Message (0x%04x), length: %u (too short, < %u)",
                    tok2str(ldp_msg_values,
                            "Unknown",
                            msg_type),
                    msg_type,
                    msg_len,
-                   (u_int)(sizeof(struct ldp_msg_header)-4)));
+                   (u_int)(sizeof(struct ldp_msg_header)-4));
             return 0;
         }
 
         /* FIXME vendor private / experimental check */
-        ND_PRINT((ndo, "\n\t  %s Message (0x%04x), length: %u, Message ID: 0x%08x, Flags: [%s if unknown]",
+        ND_PRINT("\n\t  %s Message (0x%04x), length: %u, Message ID: 0x%08x, Flags: [%s if unknown]",
                tok2str(ldp_msg_values,
                        "Unknown",
                        msg_type),
                msg_type,
                msg_len,
-               EXTRACT_32BITS(&ldp_msg_header->id),
-               LDP_MASK_U_BIT(EXTRACT_16BITS(&ldp_msg_header->type)) ? "continue processing" : "ignore"));
+               EXTRACT_BE_U_4(ldp_msg_header->id),
+               LDP_MASK_U_BIT(EXTRACT_BE_U_2(ldp_msg_header->type)) ? "continue processing" : "ignore");
 
         msg_tptr=tptr+sizeof(struct ldp_msg_header);
         msg_tlen=msg_len-(sizeof(struct ldp_msg_header)-4); /* Type & Length fields not included */
 
         /* did we capture enough for fully decoding the message ? */
-        ND_TCHECK2(*tptr, msg_len);
+        ND_TCHECK_LEN(tptr, msg_len);
         hexdump=FALSE;
 
         switch(msg_type) {
@@ -686,13 +689,6 @@ ldp_pdu_print(netdissect_options *ndo,
     }
     return pdu_len+4;
 trunc:
-    ND_PRINT((ndo, "\n\t\t packet exceeded snapshot"));
+    nd_print_trunc(ndo);
     return 0;
 }
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

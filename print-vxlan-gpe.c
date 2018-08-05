@@ -26,15 +26,14 @@
 /* specification: draft-ietf-nvo3-vxlan-gpe-01 */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include "netdissect.h"
 #include "extract.h"
 
-static const char tstr[] = " [|VXLAN-GPE]";
 static const struct tok vxlan_gpe_flags [] = {
     { 0x08, "I" },
     { 0x04, "P" },
@@ -64,25 +63,26 @@ vxlan_gpe_print(netdissect_options *ndo, const u_char *bp, u_int len)
     uint8_t next_protocol;
     uint32_t vni;
 
+    ndo->ndo_protocol = "vxlan_gpe";
     if (len < VXLAN_GPE_HDR_LEN)
         goto trunc;
 
-    ND_TCHECK2(*bp, VXLAN_GPE_HDR_LEN);
+    ND_TCHECK_LEN(bp, VXLAN_GPE_HDR_LEN);
 
-    flags = *bp;
+    flags = EXTRACT_U_1(bp);
     bp += 3;
 
-    next_protocol = *bp;
+    next_protocol = EXTRACT_U_1(bp);
     bp += 1;
 
-    vni = EXTRACT_24BITS(bp);
+    vni = EXTRACT_BE_U_3(bp);
     bp += 4;
 
-    ND_PRINT((ndo, "VXLAN-GPE, "));
-    ND_PRINT((ndo, "flags [%s], ",
-              bittok2str_nosep(vxlan_gpe_flags, "none", flags)));
-    ND_PRINT((ndo, "vni %u", vni));
-    ND_PRINT((ndo, ndo->ndo_vflag ? "\n    " : ": "));
+    ND_PRINT("VXLAN-GPE, ");
+    ND_PRINT("flags [%s], ",
+              bittok2str_nosep(vxlan_gpe_flags, "none", flags));
+    ND_PRINT("vni %u", vni);
+    ND_PRINT(ndo->ndo_vflag ? "\n    " : ": ");
 
     switch (next_protocol) {
     case 0x1:
@@ -101,13 +101,13 @@ vxlan_gpe_print(netdissect_options *ndo, const u_char *bp, u_int len)
         mpls_print(ndo, bp, len - VXLAN_GPE_HDR_LEN);
         break;
     default:
-        ND_PRINT((ndo, "ERROR: unknown-next-protocol"));
+        ND_PRINT("ERROR: unknown-next-protocol");
         return;
     }
 
 	return;
 
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	nd_print_trunc(ndo);
 }
 

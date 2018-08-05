@@ -51,8 +51,8 @@
  */
 struct ip {
 	nd_uint8_t	ip_vhl;		/* header length, version */
-#define IP_V(ip)	(((ip)->ip_vhl & 0xf0) >> 4)
-#define IP_HL(ip)	((ip)->ip_vhl & 0x0f)
+#define IP_V(ip)	((EXTRACT_U_1((ip)->ip_vhl) & 0xf0) >> 4)
+#define IP_HL(ip)	(EXTRACT_U_1((ip)->ip_vhl) & 0x0f)
 	nd_uint8_t	ip_tos;		/* type of service */
 	nd_uint16_t	ip_len;		/* total length */
 	nd_uint16_t	ip_id;		/* identification */

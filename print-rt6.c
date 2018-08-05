@@ -22,10 +22,10 @@
 /* \summary: IPv6 routing header printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include <string.h>
 
@@ -36,51 +36,75 @@
 #include "ip6.h"
 
 int
-rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 _U_)
+rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 {
-	register const struct ip6_rthdr *dp;
-	register const struct ip6_rthdr0 *dp0;
-	register const u_char *ep;
-	int i, len;
-	register const struct in6_addr *addr;
+	const struct ip6_rthdr *dp;
+	const struct ip6_rthdr0 *dp0;
+	const struct ip6_srh *srh;
+	u_int i, len, type;
+	const u_char *p;
 
+	ndo->ndo_protocol = "rt6";
 	dp = (const struct ip6_rthdr *)bp;
 
-	/* 'ep' points to the end of available data. */
-	ep = ndo->ndo_snapend;
+	ND_TCHECK_1(dp->ip6r_segleft);
 
-	ND_TCHECK(dp->ip6r_segleft);
+	len = EXTRACT_U_1(dp->ip6r_len);
+	ND_PRINT("srcrt (len=%u", len);	/*)*/
+	type = EXTRACT_U_1(dp->ip6r_type);
+	ND_PRINT(", type=%u", type);
+	ND_PRINT(", segleft=%u", EXTRACT_U_1(dp->ip6r_segleft));
 
-	len = dp->ip6r_len;
-	ND_PRINT((ndo, "srcrt (len=%d", dp->ip6r_len));	/*)*/
-	ND_PRINT((ndo, ", type=%d", dp->ip6r_type));
-	ND_PRINT((ndo, ", segleft=%d", dp->ip6r_segleft));
-
-	switch (dp->ip6r_type) {
+	switch (type) {
 	case IPV6_RTHDR_TYPE_0:
 	case IPV6_RTHDR_TYPE_2:			/* Mobile IPv6 ID-20 */
 		dp0 = (const struct ip6_rthdr0 *)dp;
 
-		ND_TCHECK(dp0->ip6r0_reserved);
-		if (EXTRACT_32BITS(dp0->ip6r0_reserved) || ndo->ndo_vflag) {
-			ND_PRINT((ndo, ", rsv=0x%0x",
-			    EXTRACT_32BITS(&dp0->ip6r0_reserved)));
+		ND_TCHECK_4(dp0->ip6r0_reserved);
+		if (EXTRACT_BE_U_4(dp0->ip6r0_reserved) || ndo->ndo_vflag) {
+			ND_PRINT(", rsv=0x%0x",
+			    EXTRACT_BE_U_4(dp0->ip6r0_reserved));
 		}
 
 		if (len % 2 == 1)
 			goto trunc;
 		len >>= 1;
-		addr = &dp0->ip6r0_addr[0];
+		p = (const u_char *) dp0->ip6r0_addr;
 		for (i = 0; i < len; i++) {
-			if ((const u_char *)(addr + 1) > ep)
-				goto trunc;
-
-			ND_PRINT((ndo, ", [%d]%s", i, ip6addr_string(ndo, addr)));
-			addr++;
+			ND_TCHECK_16(p);
+			ND_PRINT(", [%u]%s", i, ip6addr_string(ndo, p));
+			p += 16;
 		}
 		/*(*/
-		ND_PRINT((ndo, ") "));
-		return((dp0->ip6r0_len + 1) << 3);
+		ND_PRINT(") ");
+		return((EXTRACT_U_1(dp0->ip6r0_len) + 1) << 3);
+		break;
+	case IPV6_RTHDR_TYPE_4:
+		srh = (const struct ip6_srh *)dp;
+		ND_TCHECK_1(srh->srh_last_ent);
+		ND_PRINT(", last-entry=%u", EXTRACT_U_1(srh->srh_last_ent));
+
+		ND_TCHECK_1(srh->srh_flags);
+		if (EXTRACT_U_1(srh->srh_flags) || ndo->ndo_vflag) {
+			ND_PRINT(", flags=0x%0x",
+				EXTRACT_U_1(srh->srh_flags));
+		}
+
+		ND_TCHECK_2(srh->srh_tag);
+		ND_PRINT(", tag=%x", EXTRACT_BE_U_2(srh->srh_tag));
+
+		if (len % 2 == 1)
+			goto trunc;
+		len >>= 1;
+		p  = (const u_char *) srh->srh_segments;
+		for (i = 0; i < len; i++) {
+			ND_TCHECK_16(p);
+			ND_PRINT(", [%u]%s", i, ip6addr_string(ndo, p));
+			p += 16;
+		}
+		/*(*/
+		ND_PRINT(") ");
+		return((EXTRACT_U_1(srh->srh_len) + 1) << 3);
 		break;
 	default:
 		goto trunc;
@@ -88,6 +112,6 @@ rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 
 	}
 
  trunc:
-	ND_PRINT((ndo, "[|srcrt]"));
+	ND_PRINT("[|srcrt]");
 	return -1;
 }

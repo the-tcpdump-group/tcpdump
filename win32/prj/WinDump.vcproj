@@ -3791,7 +3791,7 @@
 			</FileConfiguration>
 		</File>
 
-		<File RelativePath="..\Src\ether_ntohost.c">
+		<File RelativePath="..\..\missing\win_ether_ntohost.c">
 			<FileConfiguration
 				Name="Debug|Win32"
 				>
