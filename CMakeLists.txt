@@ -862,19 +862,20 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/.devel OR EXISTS ${CMAKE_BINARY_DIR}/.devel)
         # Microsoft's code generator.  We currently treat them as if
         # they might support GCC-style -W options.
         #
-        check_and_add_compiler_option(-Wall)
-        check_and_add_compiler_option(-Wmissing-prototypes)
-        check_and_add_compiler_option(-Wstrict-prototypes)
-        check_and_add_compiler_option(-Wwrite-strings)
-        check_and_add_compiler_option(-Wpointer-arith)
-        check_and_add_compiler_option(-Wcast-qual)
-        check_and_add_compiler_option(-Wshadow)
-        check_and_add_compiler_option(-Wdeclaration-after-statement)
-        check_and_add_compiler_option(-Wpedantic)
-        check_and_add_compiler_option(-Wold-style-definition)
-        check_and_add_compiler_option(-Wused-but-marked-unused)
         check_and_add_compiler_option(-W)
+        check_and_add_compiler_option(-Wall)
         check_and_add_compiler_option(-Wassign-enum)
+        check_and_add_compiler_option(-Wcast-qual)
+        check_and_add_compiler_option(-Wdeclaration-after-statement)
+        check_and_add_compiler_option(-Wmissing-prototypes)
+        check_and_add_compiler_option(-Wold-style-definition)
+        check_and_add_compiler_option(-Wpedantic)
+        check_and_add_compiler_option(-Wpointer-arith)
+        check_and_add_compiler_option(-Wshadow)
+        check_and_add_compiler_option(-Wstrict-prototypes)
+        check_and_add_compiler_option(-Wunreachable-code-return)
+        check_and_add_compiler_option(-Wused-but-marked-unused)
+        check_and_add_compiler_option(-Wwrite-strings)
     endif()
 endif()
 
@@ -899,7 +900,6 @@ set(NETDISSECT_SOURCE_LIST_C
     checksum.c
     cpack.c
     gmpls.c
-    gmt2local.c
     in_cksum.c
     ipproto.c
     l2vpn.c

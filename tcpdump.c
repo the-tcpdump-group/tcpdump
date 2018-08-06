@@ -132,7 +132,6 @@ The Regents of the University of California.  All rights reserved.\n";
 #include "interface.h"
 #include "addrtoname.h"
 #include "machdep.h"
-#include "gmt2local.h"
 #include "pcap-missing.h"
 #include "ascii_strcasecmp.h"
 
@@ -1412,7 +1411,6 @@ main(int argc, char **argv)
 {
 	int cnt, op, i;
 	bpf_u_int32 localnet = 0, netmask = 0;
-	int timezone_offset = 0;
 	char *cp, *infile, *cmdbuf, *device, *RFileName, *VFileName, *WFileName;
 	char *endp;
 	pcap_handler callback;
@@ -1869,14 +1867,11 @@ main(int argc, char **argv)
 	switch (ndo->ndo_tflag) {
 
 	case 0: /* Default */
-	case 4: /* Default + Date*/
-		timezone_offset = gmt2local(0);
-		break;
-
 	case 1: /* No time stamp */
 	case 2: /* Unix timeval style */
-	case 3: /* Microseconds since previous packet */
-        case 5: /* Microseconds since first packet */
+	case 3: /* Microseconds/nanoseconds since previous packet */
+	case 4: /* Date + Default */
+	case 5: /* Microseconds/nanoseconds since first packet */
 		break;
 
 	default: /* Not supported */
@@ -2138,7 +2133,7 @@ main(int argc, char **argv)
 		capdns = capdns_setup();
 #endif	/* HAVE_CASPER */
 
-	init_print(ndo, localnet, netmask, timezone_offset);
+	init_print(ndo, localnet, netmask);
 
 #ifndef _WIN32
 	(void)setsignal(SIGPIPE, cleanup);

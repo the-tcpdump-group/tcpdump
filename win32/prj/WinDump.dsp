@@ -129,10 +129,6 @@ SOURCE=..\..\gmpls.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\gmt2local.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\in_cksum.c
 # End Source File
 # Begin Source File

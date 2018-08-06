@@ -243,11 +243,9 @@ static int	ndo_printf(netdissect_options *ndo,
 		     PRINTFLIKE(2, 3);
 
 void
-init_print(netdissect_options *ndo, uint32_t localnet, uint32_t mask,
-	   uint32_t timezone_offset)
+init_print(netdissect_options *ndo, uint32_t localnet, uint32_t mask)
 {
 
-	thiszone = timezone_offset;
 	init_addrtoname(ndo, localnet, mask);
 	init_checksum();
 }

@@ -119,7 +119,6 @@ typedef unsigned char nd_byte;
 #include "ip.h" /* struct ip for nextproto4_cksum() */
 #include "ip6.h" /* struct ip6 for nextproto6_cksum() */
 
-extern int32_t thiszone;	/* seconds offset from gmt to local time */
 /* invalid string to print '(invalid)' for malformed or corrupted packets */
 extern const char istr[];
 
@@ -518,6 +517,9 @@ extern int dstopt_print(netdissect_options *, const u_char *);
 extern void dtp_print(netdissect_options *, const u_char *, u_int);
 extern void dvmrp_print(netdissect_options *, const u_char *, u_int);
 extern void eap_print(netdissect_options *, const u_char *, u_int);
+
+extern void my_print_eap(netdissect_options *, const u_char *);
+
 extern void egp_print(netdissect_options *, const u_char *, u_int);
 extern void eigrp_print(netdissect_options *, const u_char *, u_int);
 extern int esp_print(netdissect_options *, const u_char *, const int, const u_char *, u_int *, u_int *);

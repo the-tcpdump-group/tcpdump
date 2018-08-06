@@ -31,7 +31,6 @@ OBJS = \
 	../../af.o \
 	../../checksum.o \
 	../../gmpls.o \
-	../../gmt2local.o \
 	../../missing/inet_aton.o \
 	../../missing/inet_ntop.o \
 	../../missing/strlcpy.o \
