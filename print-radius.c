@@ -445,13 +445,19 @@ static const struct tok errorcausetype[] = {
                                };
 
 /* MIP6-Feature-Vector standard values */
+/* https://www.iana.org/assignments/aaa-parameters/aaa-parameters.xhtml */
 #define MIP6_INTEGRATED 0x0000000000000001
 #define LOCAL_HOME_AGENT_ASSIGNMENT 0x0000000000000002
 #define PMIP6_SUPPORTED 0x0000010000000000
 #define IP4_HOA_SUPPORTED 0x0000020000000000
 #define LOCAL_MAG_ROUTING_SUPPORTED 0x0000040000000000
+#define ASSIGN_LOCAL_IP 0x0000080000000000
+#define MIP4_SUPPORTED 0x0000100000000000
+#define OPTIMIZED_IDLE_MODE_MOBILITY 0x0000200000000000
+#define GTPv2_SUPPORTED 0x0000400000000000
 #define IP4_TRANSPORT_SUPPORTED 0x0000800000000000
 #define IP4_HOA_ONLY_SUPPORTED 0x0001000000000000
+#define INTER_MAG_ROUTING_SUPPORTED 0x0002000000000000
 static struct mip6_feature_vector {
                   uint64_t v;
                   const char *s;
@@ -461,8 +467,13 @@ static struct mip6_feature_vector {
                                  { PMIP6_SUPPORTED,             "PMIP6_SUPPORTED" },
                                  { IP4_HOA_SUPPORTED,           "IP4_HOA_SUPPORTED" },
                                  { LOCAL_MAG_ROUTING_SUPPORTED, "LOCAL_MAG_ROUTING_SUPPORTED" },
+                                 { ASSIGN_LOCAL_IP,             "ASSIGN_LOCAL_IP" },
+                                 { MIP4_SUPPORTED,              "MIP4_SUPPORTED" },
+                                 { OPTIMIZED_IDLE_MODE_MOBILITY, "OPTIMIZED_IDLE_MODE_MOBILITY" },
+                                 { GTPv2_SUPPORTED,             "GTPv2_SUPPORTED" },
                                  { IP4_TRANSPORT_SUPPORTED,     "IP4_TRANSPORT_SUPPORTED" },
-                                 { IP4_HOA_ONLY_SUPPORTED,      "IP4_HOA_ONLY_SUPPORTED" }
+                                 { IP4_HOA_ONLY_SUPPORTED,      "IP4_HOA_ONLY_SUPPORTED" },
+                                 { INTER_MAG_ROUTING_SUPPORTED, "INTER_MAG_ROUTING_SUPPORTED" },
                                };
 
 
