@@ -119,7 +119,6 @@ typedef unsigned char nd_byte;
 #include "ip.h" /* struct ip for nextproto4_cksum() */
 #include "ip6.h" /* struct ip6 for nextproto6_cksum() */
 
-extern int32_t thiszone;	/* seconds offset from gmt to local time */
 /* invalid string to print '(invalid)' for malformed or corrupted packets */
 extern const char istr[];
 

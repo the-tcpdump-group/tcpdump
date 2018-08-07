@@ -57,11 +57,14 @@
 #include "ascii_strcasecmp.h"
 #include "timeval-operations.h"
 
-int32_t thiszone;		/* seconds offset from gmt to local time */
 /* invalid string to print '(invalid)' for malformed or corrupted packets */
 const char istr[] = " (invalid)";
 
 #define TOKBUFSIZE 128
+
+
+enum date_flag { WITHOUT_DATE = 0, WITH_DATE = 1 };
+enum time_flag { UTC_TIME = 0, LOCAL_TIME = 1 };
 
 /*
  * Print out a character, filtering out the non-printable ones
@@ -229,32 +232,50 @@ nd_printzp(netdissect_options *ndo,
 }
 
 /*
- * Print the timestamp as HH:MM:SS.FRAC.
+ * Print the timestamp as [YY:MM:DD] HH:MM:SS.FRAC.
+ *   if time_flag == LOCAL_TIME print local time else UTC/GMT time
+ *   if date_flag == WITH_DATE print YY:MM:DD before HH:MM:SS.FRAC
  */
 static void
-ts_hmsfrac_print(netdissect_options *ndo, int sec, int usec)
+ts_date_hmsfrac_print(netdissect_options *ndo, int sec, int usec,
+		      enum date_flag date_flag, enum time_flag time_flag)
 {
+	time_t Time = sec;
+	struct tm *tm;
+	char timestr[32];
+
+	if (time_flag == LOCAL_TIME)
+		tm = localtime(&Time);
+	else
+		tm = gmtime(&Time);
+
+	if (!tm) {
+		ND_PRINT("[Error converting time]");
+		return;
+	}
+	if (date_flag == WITH_DATE)
+		strftime(timestr, sizeof(timestr), "%Y-%m-%d %H:%M:%S", tm);
+	else
+		strftime(timestr, sizeof(timestr), "%H:%M:%S", tm);
+	ND_PRINT("%s", timestr);
+
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
 	switch (ndo->ndo_tstamp_precision) {
 
 	case PCAP_TSTAMP_PRECISION_MICRO:
-		ND_PRINT("%02d:%02d:%02d.%06u", sec / 3600, (sec % 3600) / 60,
-		    sec % 60, usec);
+		ND_PRINT(".%06u", usec);
 		break;
 
 	case PCAP_TSTAMP_PRECISION_NANO:
-		ND_PRINT("%02d:%02d:%02d.%09u", sec / 3600, (sec % 3600) / 60,
-		    sec % 60, usec);
+		ND_PRINT(".%09u", usec);
 		break;
 
 	default:
-		ND_PRINT("%02d:%02d:%02d.{unknown}", sec / 3600, (sec % 3600) / 60,
-		    sec % 60);
+		ND_PRINT(".{unknown}");
 		break;
 	}
 #else
-	ND_PRINT("%02d:%02d:%02d.%06u", sec / 3600, (sec % 3600) / 60,
-	    sec % 60, usec);
+	ND_PRINT(".%06u", usec);
 #endif
 }
 
@@ -291,9 +312,6 @@ void
 ts_print(netdissect_options *ndo,
          const struct timeval *tvp)
 {
-	int s;
-	struct tm *tm;
-	time_t Time;
 	static struct timeval tv_ref;
 	struct timeval tv_result;
 	int negative_offset;
@@ -302,8 +320,8 @@ ts_print(netdissect_options *ndo,
 	switch (ndo->ndo_tflag) {
 
 	case 0: /* Default */
-		s = (tvp->tv_sec + thiszone) % 86400;
-		ts_hmsfrac_print(ndo, s, tvp->tv_usec);
+		ts_date_hmsfrac_print(ndo, tvp->tv_sec, tvp->tv_usec,
+				      WITHOUT_DATE, LOCAL_TIME);
 		ND_PRINT(" ");
 		break;
 
@@ -342,25 +360,18 @@ ts_print(netdissect_options *ndo,
 			netdissect_timevalsub(tvp, &tv_ref, &tv_result, nano_prec);
 
 		ND_PRINT((negative_offset ? "-" : " "));
-		ts_hmsfrac_print(ndo, tv_result.tv_sec, tv_result.tv_usec);
+		ts_date_hmsfrac_print(ndo, tv_result.tv_sec, tv_result.tv_usec,
+				      WITHOUT_DATE, UTC_TIME);
 		ND_PRINT(" ");
 
                 if (ndo->ndo_tflag == 3)
 			tv_ref = *tvp; /* set timestamp for previous packet */
 		break;
 
-	case 4: /* Default + Date */
-		s = (tvp->tv_sec + thiszone) % 86400;
-		Time = (tvp->tv_sec + thiszone) - s;
-		tm = gmtime (&Time);
-		if (!tm)
-			ND_PRINT("Date fail ");
-		else {
-			ND_PRINT("%04d-%02d-%02d ",
-			    tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday);
-			ts_hmsfrac_print(ndo, s, tvp->tv_usec);
-			ND_PRINT(" ");
-		}
+	case 4: /* Date + Default */
+		ts_date_hmsfrac_print(ndo, tvp->tv_sec, tvp->tv_usec,
+				      WITH_DATE, LOCAL_TIME);
+		ND_PRINT(" ");
 		break;
 	}
 }
