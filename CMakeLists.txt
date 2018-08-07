@@ -899,7 +899,6 @@ set(NETDISSECT_SOURCE_LIST_C
     checksum.c
     cpack.c
     gmpls.c
-    gmt2local.c
     in_cksum.c
     ipproto.c
     l2vpn.c

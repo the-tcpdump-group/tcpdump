@@ -80,7 +80,6 @@ LIBNETDISSECT_SRC=\
 	checksum.c \
 	cpack.c \
 	gmpls.c \
-	gmt2local.c \
 	in_cksum.c \
 	ipproto.c \
 	l2vpn.c \
@@ -267,7 +266,6 @@ HDR = \
 	getopt_long.h \
 	getservent.h \
 	gmpls.h \
-	gmt2local.h \
 	interface.h \
 	ip.h \
 	ip6.h \
