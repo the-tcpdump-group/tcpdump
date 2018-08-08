@@ -3101,6 +3101,15 @@ ieee802_11_radio_print(netdissect_options *ndo,
 	hdr = (const struct ieee80211_radiotap_header *)p;
 
 	len = EXTRACT_LE_16BITS(&hdr->it_len);
+	if (len < sizeof(*hdr)) {
+		/*
+		 * The length is the length of the entire header, so
+		 * it must be as large as the fixed-length part of
+		 * the header.
+		 */
+		ND_PRINT((ndo, "%s", tstr));
+		return caplen;
+	}
 
 	/*
 	 * If we don't have the entire radiotap header, just give up.
