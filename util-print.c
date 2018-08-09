@@ -270,6 +270,11 @@ ts_date_hmsfrac_print(netdissect_options *ndo, int sec, int usec,
 	struct tm *tm;
 	char timestr[32];
 
+	if ((unsigned)sec & 0x80000000) {
+		ND_PRINT("[Error converting time]");
+		return;
+	}
+
 	if (time_flag == LOCAL_TIME)
 		tm = localtime(&Time);
 	else
