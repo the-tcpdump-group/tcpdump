@@ -232,6 +232,32 @@ nd_printzp(netdissect_options *ndo,
 }
 
 /*
+ * Print the timestamp .FRAC part (Microseconds/nanoseconds)
+ */
+static void
+ts_frac_print(netdissect_options *ndo, int usec)
+{
+#ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
+	switch (ndo->ndo_tstamp_precision) {
+
+	case PCAP_TSTAMP_PRECISION_MICRO:
+		ND_PRINT(".%06u", (unsigned)usec);
+		break;
+
+	case PCAP_TSTAMP_PRECISION_NANO:
+		ND_PRINT(".%09u", (unsigned)usec);
+		break;
+
+	default:
+		ND_PRINT(".{unknown}");
+		break;
+	}
+#else
+	ND_PRINT(".%06u", (unsigned)usec);
+#endif
+}
+
+/*
  * Print the timestamp as [YY:MM:DD] HH:MM:SS.FRAC.
  *   if time_flag == LOCAL_TIME print local time else UTC/GMT time
  *   if date_flag == WITH_DATE print YY:MM:DD before HH:MM:SS.FRAC
@@ -259,24 +285,7 @@ ts_date_hmsfrac_print(netdissect_options *ndo, int sec, int usec,
 		strftime(timestr, sizeof(timestr), "%H:%M:%S", tm);
 	ND_PRINT("%s", timestr);
 
-#ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
-	switch (ndo->ndo_tstamp_precision) {
-
-	case PCAP_TSTAMP_PRECISION_MICRO:
-		ND_PRINT(".%06u", usec);
-		break;
-
-	case PCAP_TSTAMP_PRECISION_NANO:
-		ND_PRINT(".%09u", usec);
-		break;
-
-	default:
-		ND_PRINT(".{unknown}");
-		break;
-	}
-#else
-	ND_PRINT(".%06u", usec);
-#endif
+	ts_frac_print(ndo, usec);
 }
 
 /*
@@ -285,24 +294,8 @@ ts_date_hmsfrac_print(netdissect_options *ndo, int sec, int usec,
 static void
 ts_unix_print(netdissect_options *ndo, int sec, int usec)
 {
-#ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
-	switch (ndo->ndo_tstamp_precision) {
-
-	case PCAP_TSTAMP_PRECISION_MICRO:
-		ND_PRINT("%u.%06u", (unsigned)sec, (unsigned)usec);
-		break;
-
-	case PCAP_TSTAMP_PRECISION_NANO:
-		ND_PRINT("%u.%09u", (unsigned)sec, (unsigned)usec);
-		break;
-
-	default:
-		ND_PRINT("%u.{unknown}", (unsigned)sec);
-		break;
-	}
-#else
-	ND_PRINT("%u.%06u", (unsigned)sec, (unsigned)usec);
-#endif
+	ND_PRINT("%u", (unsigned)sec);
+	ts_frac_print(ndo, usec);
 }
 
 /*
