@@ -1,4 +1,4 @@
-# The options -n and -t are useless in TESTLIST. They are already set
+# The options -# and -n are useless in TESTLIST. They are already set
 # in TESTonce.
 
 # Various flags applied to a TCP session.
@@ -325,7 +325,7 @@ medsa		medsa.pcap		medsa.out
 medsa-e		medsa.pcap		medsa-e.out	-e
 
 # VXLAN tests
-vxlan  vxlan.pcap  vxlan.out  -# -e
+vxlan  vxlan.pcap  vxlan.out -e
 
 # CVEs 2014 malformed packets from Steffen Bauch
 cve-2014-8767-OLSR cve-2014-8767-OLSR.pcap cve-2014-8767-OLSR.out -v

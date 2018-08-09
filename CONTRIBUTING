@@ -73,7 +73,7 @@ How to add new code and to update existing code
 6) Add/update sample.pcap files
    We use tests directory to do regression tests on the dissection of captured
    packets.  Those captured packets were saved running tcpdump with option "-w
-   sample.pcap".  Additional options like "-n" and "-t" are used to create
+   sample.pcap".  Additional options like "-#" and "-n" are used to create
    relevant and reproducible output.  The actual test compares the current text
    output with the expected result (sample.out) saved from a previous version.
 
@@ -85,7 +85,7 @@ How to add new code and to update existing code
    test-name   sample.pcap   sample.out   tcpdump-options
 
    The sample.out file can be build by:
-   (cd tests && ../tcpdump -n -t -r sample.pcap tcpdump-options > sample.out)
+   (cd tests && ../tcpdump -# -n -r sample.pcap tcpdump-options > sample.out)
 
    Or, for convenience, use "./update-test.sh test-name"
 
