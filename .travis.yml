@@ -87,7 +87,7 @@ before_script:
 script:
   - if [ "$COVERITY_SCAN_BRANCH" = 1 ]; then exit 0; fi
   - if [ "$TRAVIS_OS_NAME" = osx ]; then OSX_SSL_DIR=$(ls /usr/local/Cellar/openssl); echo "OSX_SSL_DIR=$OSX_SSL_DIR"; fi
-  - if [ "$CMAKE" = no ]; then touch .devel configure; fi
+  - touch .devel configure
   - if [ "$CMAKE" = no ]; then echo '$ ./configure [...]' && echo -n travis_fold:start:script.configure; fi
   - if [ "$CMAKE" = no ]; then ./configure --with-crypto=${CRYPTO} CPPFLAGS="-I/usr/local/Cellar/openssl/$OSX_SSL_DIR/include/" --prefix=/tmp; fi
   - if [ "$CMAKE" = no ]; then echo -n travis_fold:end:script.configure; fi
