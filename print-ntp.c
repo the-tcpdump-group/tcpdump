@@ -566,7 +566,7 @@ p_ntp_time(netdissect_options *ndo,
 		    ND_PRINT(" (unrepresentable)");
 		} else {
 		    /* use ISO 8601 (RFC3339) format */
-		    strftime(time_buf, sizeof (time_buf), "%Y-%m-%dT%H:%M:%S", tm);
+		    strftime(time_buf, sizeof (time_buf), "%Y-%m-%dT%H:%M:%SZ", tm);
 		    ND_PRINT(" (%s)", time_buf);
 		}
 	    }
