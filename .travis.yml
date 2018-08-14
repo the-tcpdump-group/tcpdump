@@ -93,7 +93,9 @@ script:
   - if [ "$CMAKE" = no ]; then echo -n travis_fold:end:script.configure; fi
   - if [ "$CMAKE" = yes ]; then mkdir build; fi
   - if [ "$CMAKE" = yes ]; then cd build; fi
+  - if [ "$CMAKE" = yes ]; then echo -n travis_fold:start:script.cmake; fi
   - if [ "$CMAKE" = yes ]; then cmake -DCMAKE_PREFIX_PATH=/tmp -DCMAKE_INSTALL_PREFIX=/tmp ..; fi
+  - if [ "$CMAKE" = yes ]; then echo -n travis_fold:end:script.cmake; fi
   - make -s
   - echo '$ make install [...]' && echo -n travis_fold:start:script.make_install
   - PATH=$PATH make install
