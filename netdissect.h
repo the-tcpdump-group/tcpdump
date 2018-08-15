@@ -517,6 +517,9 @@ extern int dstopt_print(netdissect_options *, const u_char *);
 extern void dtp_print(netdissect_options *, const u_char *, u_int);
 extern void dvmrp_print(netdissect_options *, const u_char *, u_int);
 extern void eap_print(netdissect_options *, const u_char *, u_int);
+
+extern void my_print_eap(netdissect_options *, const u_char *);
+
 extern void egp_print(netdissect_options *, const u_char *, u_int);
 extern void eigrp_print(netdissect_options *, const u_char *, u_int);
 extern int esp_print(netdissect_options *, const u_char *, const int, const u_char *, u_int *, u_int *);
