@@ -171,6 +171,8 @@ static const struct tok radius_command_values[] = {
 #define ARAP_PASS          70
 #define ARAP_FEATURES      71
 
+#define EAP_MESSAGE        79
+
 #define TUNNEL_PRIV_GROUP  81
 #define TUNNEL_ASSIGN_ID   82
 #define TUNNEL_PREFERENCE  83
@@ -671,6 +673,11 @@ print_attr_string(netdissect_options *ndo,
            data++;
            length--;
         break;
+      case EAP_MESSAGE:
+           if (length < 1)
+              goto trunc;
+           eap_print(ndo, data, length);
+           return;
    }
 
    for (i=0; i < length && EXTRACT_U_1(data); i++, data++)

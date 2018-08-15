@@ -397,7 +397,7 @@ ethertype_print(netdissect_options *ndo,
 		return (1);
 
 	case ETHERTYPE_EAPOL:
-	        eap_print(ndo, p, length);
+	        eapol_print(ndo, p, length);
 		return (1);
 
 	case ETHERTYPE_RRCP:
