@@ -163,21 +163,14 @@ eap_print(netdissect_options *ndo,
     ND_TCHECK_SIZE(eap);
     eap_type = EXTRACT_U_1(eap->type);
 
-    /* in non-verbose mode just lets print the basic info */
-    if (ndo->ndo_vflag < 1) {
-	ND_PRINT("%s (%u) v%u, len %u",
-               tok2str(eap_frame_type_values, "unknown", eap_type),
-               eap_type,
-               EXTRACT_U_1(eap->version),
-               EXTRACT_BE_U_2(eap->length));
-	return;
-    }
-
     ND_PRINT("%s (%u) v%u, len %u",
            tok2str(eap_frame_type_values, "unknown", eap_type),
            eap_type,
            EXTRACT_U_1(eap->version),
            EXTRACT_BE_U_2(eap->length));
+
+    if (ndo->ndo_vflag < 1)
+        return;
 
     tptr += sizeof(struct eap_frame_t);
     tlen -= sizeof(struct eap_frame_t);
