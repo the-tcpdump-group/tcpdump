@@ -189,7 +189,8 @@ eap_print(netdissect_options *ndo,
 
         ND_TCHECK_LEN(tptr, len);
 
-        if (type <= 2) { /* For EAP_REQUEST and EAP_RESPONSE only */
+        if (type == EAP_REQUEST || type == EAP_RESPONSE) {
+            /* RFC 3748 Section 4.1 */
             ND_TCHECK_1(tptr + 4);
             subtype = EXTRACT_U_1(tptr + 4);
             ND_PRINT("\n\t\t Type %s (%u)",
