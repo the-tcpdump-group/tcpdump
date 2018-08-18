@@ -1174,26 +1174,22 @@ radius_attrs_print(netdissect_options *ndo,
 	attr_string = attr_type[type].name;
      else
 	attr_string = "Unknown";
-     if (len < 2)
-     {
-	ND_PRINT("\n\t  %s Attribute (%u), length: %u (bogus, must be >= 2)",
+
+     ND_PRINT("\n\t  %s Attribute (%u), length: %u",
                attr_string,
                type,
                len);
-	return;
+     if (len < 2)
+     {
+       ND_PRINT(" (bogus, must be >= 2)");
+       return;
      }
      if (len > length)
      {
-	ND_PRINT("\n\t  %s Attribute (%u), length: %u (bogus, goes past end of packet)",
-               attr_string,
-               type,
-               len);
+        ND_PRINT(" (bogus, goes past end of packet)");
         return;
      }
-     ND_PRINT("\n\t  %s Attribute (%u), length: %u, Value: ",
-            attr_string,
-            type,
-            len);
+     ND_PRINT(", Value: ");
 
      if (type < TAM_SIZE(attr_type))
      {
