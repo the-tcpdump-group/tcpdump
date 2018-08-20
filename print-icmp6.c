@@ -840,7 +840,7 @@ rpl_printopts(netdissect_options *ndo, const uint8_t *opts, u_int length)
         }
         return;
 trunc:
-	ND_PRINT(" [|truncated]");
+	nd_print_trunc(ndo);
 	return;
 }
 
@@ -869,7 +869,7 @@ rpl_dio_print(netdissect_options *ndo,
         }
 	return;
 trunc:
-	ND_PRINT(" [|truncated]");
+	nd_print_trunc(ndo);
 	return;
 }
 
@@ -911,7 +911,7 @@ rpl_dao_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT(" [|truncated]");
+	nd_print_trunc(ndo);
 	return;
 
 tooshort:
@@ -1013,7 +1013,7 @@ rpl_print(netdissect_options *ndo,
 
 #if 0
 trunc:
-	ND_PRINT(" [|truncated]");
+	nd_print_trunc(ndo);
 	return;
 #endif
 
@@ -1328,7 +1328,7 @@ icmp6_print(netdissect_options *ndo,
                 ND_PRINT(", length %u", length);
 	return;
 trunc:
-	ND_PRINT("[|icmp6]");
+	nd_print_trunc(ndo);
 }
 
 static const struct udphdr *
@@ -1626,7 +1626,7 @@ mldv2_report_print(netdissect_options *ndo, const u_char *bp, u_int len)
     }
     return;
 trunc:
-    ND_PRINT("[|icmp6]");
+    nd_print_trunc(ndo);
     return;
 }
 
@@ -1693,7 +1693,7 @@ mldv2_query_print(netdissect_options *ndo, const u_char *bp, u_int len)
     ND_PRINT("]");
     return;
 trunc:
-    ND_PRINT("[|icmp6]");
+    nd_print_trunc(ndo);
     return;
 }
 
@@ -1862,10 +1862,8 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 		break;
 
 	case ICMP6_NI_REPLY:
-		if (icmp6len > siz) {
-			ND_PRINT("[|icmp6: node information reply]");
-			break;
-		}
+		if (icmp6len > siz)
+			goto trunc;
 
 		needcomma = 0;
 
@@ -1980,7 +1978,7 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 	return;
 
 trunc:
-	ND_PRINT("[|icmp6]");
+	nd_print_trunc(ndo);
 }
 
 static void
@@ -2116,5 +2114,5 @@ icmp6_rrenum_print(netdissect_options *ndo, const u_char *bp, const u_char *ep)
 	return;
 
 trunc:
-	ND_PRINT("[|icmp6]");
+	nd_print_trunc(ndo);
 }
