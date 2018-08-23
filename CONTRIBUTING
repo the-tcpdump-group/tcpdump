@@ -126,9 +126,18 @@ c) Put the format of packets/headers/options as comments if there is no
 
 d) The printer may receive incomplete packet in the buffer, truncated at any
    random position, for example by capturing with '-s size' option.
-   Thus use ND_TTEST, ND_TTEST_LEN, ND_TCHECK or ND_TCHECK_LEN for bound checking.
-   For ND_TCHECK_LEN:
-     Define : static const char tstr[] = " [|protocol]";
+   Thus use, for bounds checking, one of the following macros (defined in
+   netdissect.h or extract.h):
+    ND_TCHECK_n(p), n in { 1, 2, 3, 4, 5, 6, 7, 8, 16 }
+    ND_TCHECK_SIZE(p)
+    ND_TCHECK_LEN(p, l)
+
+    ND_TTEST_n(p), n in { 1, 2, 3, 4, 5, 6, 7, 8, 16 }
+    ND_TTEST_SIZE(p)
+    ND_TTEST_LEN(p, l)
+
+   For the ND_TCHECK_* macros (if not already done):
+     Assign: ndo->ndo_protocol = "protocol";
      Define a label: trunc
      Print with: nd_print_trunc(ndo);
    You can test the code via:
