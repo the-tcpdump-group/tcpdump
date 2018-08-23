@@ -1435,7 +1435,7 @@ trunc:
 	return (NULL);
 }
 
-static int
+static const uint32_t *
 parsewccres(netdissect_options *ndo,
             const uint32_t *dp, int verbose)
 {
@@ -1443,7 +1443,7 @@ parsewccres(netdissect_options *ndo,
 
 	if (!(dp = parsestatus(ndo, dp, &er)))
 		return (0);
-	return parse_wcc_data(ndo, dp, verbose) != NULL;
+	return parse_wcc_data(ndo, dp, verbose);
 }
 
 static const uint32_t *
@@ -1668,6 +1668,10 @@ interp_reply(netdissect_options *ndo,
 					ND_PRINT(" <%s>",
 						tok2str(nfsv3_writemodes,
 							NULL, EXTRACT_BE_U_4(dp + 1)));
+
+					/* write-verf-cookie */
+					ND_TCHECK_8(dp + 2);
+					ND_PRINT(" verf %" PRIx64, EXTRACT_BE_U_8(dp + 2));
 				}
 				return;
 			}
@@ -1803,8 +1807,14 @@ interp_reply(netdissect_options *ndo,
 
 	case NFSPROC_COMMIT:
 		dp = parserep(ndo, rp, length);
-		if (dp != NULL && parsewccres(ndo, dp, ndo->ndo_vflag) != 0)
+		if (dp != NULL && (dp = parsewccres(ndo, dp, ndo->ndo_vflag)) != 0) {
+			if (ndo->ndo_vflag > 1) {
+				/* write-verf-cookie */
+				ND_TCHECK_8(dp);
+				ND_PRINT(" verf %" PRIx64, EXTRACT_BE_U_8(dp));
+			}
 			return;
+		}
 		break;
 
 	default:
