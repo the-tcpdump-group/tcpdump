@@ -79,6 +79,11 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         fprintf(outfile, "Couldn't open pcap file %s\n", errbuf);
         return 0;
     }
+    if (lookup_printer(pcap_datalink(pkts)) == NULL) {
+        //do not go further if we have no printer
+        pcap_close(pkts);
+        return 0;
+    }
     Ndo.ndo_if_printer = get_if_printer(&Ndo, pcap_datalink(pkts));
 
     //loop over packets
