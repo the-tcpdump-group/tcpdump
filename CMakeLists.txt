@@ -1225,3 +1225,5 @@ add_custom_target(uninstall
 #
 add_custom_target(check
     COMMAND ${CMAKE_SOURCE_DIR}/tests/TESTrun.sh)
+
+add_subdirectory(fuzz)
