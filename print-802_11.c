@@ -2058,6 +2058,10 @@ ieee802_11_print(netdissect_options *ndo,
 		hdrlen = roundup2(hdrlen, 4);
 	if (ndo->ndo_Hflag && FC_TYPE(fc) == T_DATA &&
 	    DATA_FRAME_IS_QOS(FC_SUBTYPE(fc))) {
+		if (caplen < hdrlen + 1) {
+			ND_PRINT((ndo, "%s", tstr));
+			return hdrlen;
+		}
 		meshdrlen = extract_mesh_header_length(p+hdrlen);
 		hdrlen += meshdrlen;
 	} else
