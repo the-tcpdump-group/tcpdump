@@ -2710,11 +2710,11 @@ bgp_update_print(netdissect_options *ndo,
         add_path = check_add_path(ndo, p, withdrawn_routes_len, 32);
         while (withdrawn_routes_len != 0) {
             if (add_path) {
-            	if (withdrawn_routes_len < 4) {
-            	    p += withdrawn_routes_len;
-            	    length -= withdrawn_routes_len;
-            	    break;
-            	}
+                if (withdrawn_routes_len < 4) {
+                    p += withdrawn_routes_len;
+                    length -= withdrawn_routes_len;
+                    break;
+                }
                 path_id = EXTRACT_BE_U_4(p);
                 p += 4;
                 length -= 4;
