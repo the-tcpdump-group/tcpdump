@@ -458,7 +458,7 @@ static const struct tok errorcausetype[] = {
 #define IP4_TRANSPORT_SUPPORTED 0x0000800000000000
 #define IP4_HOA_ONLY_SUPPORTED 0x0001000000000000
 #define INTER_MAG_ROUTING_SUPPORTED 0x0002000000000000
-static struct mip6_feature_vector {
+static const struct mip6_feature_vector {
                   uint64_t v;
                   const char *s;
                 } mip6_feature_vector[] = {
@@ -477,7 +477,7 @@ static struct mip6_feature_vector {
                                };
 
 
-static struct attrtype {
+static const struct attrtype {
                   const char *name;      /* Attribute name                 */
                   const char **subtypes; /* Standard Values (if any)       */
                   u_char siz_subtypes;   /* Size of total standard values  */
