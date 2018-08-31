@@ -400,7 +400,7 @@ sll2_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 	int llc_hdrlen;
 	u_int hdrlen;
 #ifdef HAVE_NET_IF_H
-	uint32_t index;
+	uint32_t if_index;
 	char ifname[IF_NAMESIZE];
 #endif
 
@@ -417,11 +417,11 @@ sll2_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 
 	sllp = (const struct sll2_header *)p;
 #ifdef HAVE_NET_IF_H
-	index = EXTRACT_BE_U_4(sllp->sll2_if_index);
-	if (if_indextoname(index, ifname))
-		ND_PRINT("ifindex %u (%s) ", index, ifname);
+	if_index = EXTRACT_BE_U_4(sllp->sll2_if_index);
+	if (if_indextoname(if_index, ifname))
+		ND_PRINT("ifindex %u (%s) ", if_index, ifname);
 	else
-		ND_PRINT("ifindex %u ", index);
+		ND_PRINT("ifindex %u ", if_index);
 #endif
 
 	if (ndo->ndo_eflag)
