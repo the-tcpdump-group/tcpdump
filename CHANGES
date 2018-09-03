@@ -718,7 +718,7 @@ Tue.   March 30, 2004. mcr@sandelman.ottawa.on.ca. Summary for 3.8.3 release
 Mon.   March 29, 2004. mcr@sandelman.ottawa.on.ca. Summary for 3.8.2 release
 
 	Fixes for print-isakmp.c      CVE:    CAN-2004-0183, CAN-2004-0184
-	  		     http://www.rapid7.com/advisories/R7-0017.html
+			     http://www.rapid7.com/advisories/R7-0017.html
 	IP-over-IEEE1394 printing.
 	some MINGW32 changes.
 	updates for autoconf 2.5

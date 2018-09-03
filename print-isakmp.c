@@ -1188,7 +1188,7 @@ static const struct attrmap encr_t_map[] = {
 static const struct attrmap oakley_t_map[] = {
 	{ NULL,	0, { NULL } },
 	{ "enc", 8,	{ NULL, "1des", "idea", "blowfish", "rc5",
-		 	  "3des", "cast", "aes", }, },
+			  "3des", "cast", "aes", }, },
 	{ "hash", 7,	{ NULL, "md5", "sha1", "tiger",
 			  "sha2-256", "sha2-384", "sha2-512", }, },
 	{ "auth", 6,	{ NULL, "preshared", "dss", "rsa sig", "rsa enc",

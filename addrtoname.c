@@ -702,7 +702,7 @@ isonsap_string(netdissect_options *ndo, const uint8_t *nsap,
 		*cp++ = hex[*nsap++ & 0xf];
 		if (((nsap_idx & 1) == 0) &&
 		     (nsap_idx + 1 < nsap_length)) {
-		     	*cp++ = '.';
+			*cp++ = '.';
 		}
 	}
 	*cp = '\0';

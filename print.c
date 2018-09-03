@@ -70,7 +70,7 @@ static const struct printer printers[] = {
 	{ nflog_if_print,	DLT_NFLOG},
 #endif
 #ifdef DLT_CIP
-	{ cip_if_print,	 	DLT_CIP },
+	{ cip_if_print,		DLT_CIP },
 #endif
 #ifdef DLT_ATM_CLIP
 	{ cip_if_print,		DLT_ATM_CLIP },

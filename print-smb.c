@@ -834,7 +834,7 @@ print_smb(netdissect_options *ndo,
     smb_fdata(ndo, buf, fmt_smbheader, buf + 33, unicodestr);
 
     if (nterrcodes) {
-    	nterror = EXTRACT_LE_U_4(buf + 5);
+	nterror = EXTRACT_LE_U_4(buf + 5);
 	if (nterror)
 	    ND_PRINT("NTError = %s\n", nt_errstr(nterror));
     } else {

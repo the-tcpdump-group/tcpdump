@@ -139,7 +139,7 @@ struct icmp6_hdr {
 #define ICMP6_MAXTYPE			201
 
 #define ICMP6_DST_UNREACH_NOROUTE	0	/* no route to destination */
-#define ICMP6_DST_UNREACH_ADMIN	 	1	/* administratively prohibited */
+#define ICMP6_DST_UNREACH_ADMIN		1	/* administratively prohibited */
 #define ICMP6_DST_UNREACH_NOTNEIGHBOR	2	/* not a neighbor(obsolete) */
 #define ICMP6_DST_UNREACH_BEYONDSCOPE	2	/* beyond scope of source address */
 #define ICMP6_DST_UNREACH_ADDR		3	/* address unreachable */
@@ -148,7 +148,7 @@ struct icmp6_hdr {
 #define ICMP6_TIME_EXCEED_TRANSIT 	0	/* ttl==0 in transit */
 #define ICMP6_TIME_EXCEED_REASSEMBLY	1	/* ttl==0 in reass */
 
-#define ICMP6_PARAMPROB_HEADER 	 	0	/* erroneous header field */
+#define ICMP6_PARAMPROB_HEADER 		0	/* erroneous header field */
 #define ICMP6_PARAMPROB_NEXTHEADER	1	/* unrecognized next header */
 #define ICMP6_PARAMPROB_OPTION		2	/* unrecognized option */
 
@@ -320,7 +320,7 @@ struct nd_opt_rdnss {		/* RDNSS RFC 6106 5.1 */
 	nd_uint8_t	nd_opt_rdnss_len;
 	nd_uint16_t	nd_opt_rdnss_reserved;
 	nd_uint32_t	nd_opt_rdnss_lifetime;
-	nd_ipv6	 	nd_opt_rdnss_addr[1];	/* variable-length */
+	nd_ipv6		nd_opt_rdnss_addr[1];	/* variable-length */
 };
 
 struct nd_opt_dnssl {		/* DNSSL RFC 6106 5.2 */
@@ -883,7 +883,7 @@ rpl_dao_print(netdissect_options *ndo,
 
         ND_TCHECK_SIZE(dao);
         if (length < ND_RPL_DAO_MIN_LEN)
-        	goto tooshort;
+		goto tooshort;
 
         bp += ND_RPL_DAO_MIN_LEN;
         length -= ND_RPL_DAO_MIN_LEN;
@@ -928,7 +928,7 @@ rpl_daoack_print(netdissect_options *ndo,
 
         ND_TCHECK_LEN(daoack, ND_RPL_DAOACK_MIN_LEN);
         if (length < ND_RPL_DAOACK_MIN_LEN)
-        	goto tooshort;
+		goto tooshort;
 
         bp += ND_RPL_DAOACK_MIN_LEN;
         length -= ND_RPL_DAOACK_MIN_LEN;

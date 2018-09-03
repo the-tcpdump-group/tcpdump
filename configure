@@ -3510,7 +3510,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 		    ;;
 
 	    osf*)
-	    	    #
+		    #
 		    # Presumed to be DEC OSF/1, Digital UNIX, or
 		    # Tru64 UNIX.
 		    #

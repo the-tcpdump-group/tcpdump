@@ -188,7 +188,7 @@ tcp_print(netdissect_options *ndo,
                                      ip6addr_string(ndo, ip6->ip6_dst));
 	        } else {
 	                ND_PRINT("%s > %s:",
-        	                     ipaddr_string(ndo, ip->ip_src),
+		                     ipaddr_string(ndo, ip->ip_src),
                 	             ipaddr_string(ndo, ip->ip_dst));
                 }
                 nd_print_trunc(ndo);

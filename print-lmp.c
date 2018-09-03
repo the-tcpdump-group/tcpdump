@@ -872,7 +872,7 @@ lmp_print(netdissect_options *ndo,
 
 			ND_PRINT("\n\t\t    Channel Status: %s (%u)",
 					tok2str(lmp_obj_channel_status_values,
-			 		"Unknown",
+					"Unknown",
 					EXTRACT_BE_U_4(obj_tptr + offset + 4)&0x3FFFFFF),
 					EXTRACT_BE_U_4(obj_tptr + offset + 4)&0x3FFFFFF);
 			offset+=8;

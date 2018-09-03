@@ -245,10 +245,10 @@ struct tim_t {
 
 #define	E_SSID 		0
 #define	E_RATES 	1
-#define	E_FH	 	2
+#define	E_FH		2
 #define	E_DS 		3
-#define	E_CF	 	4
-#define	E_TIM	 	5
+#define	E_CF		4
+#define	E_TIM		5
 #define	E_IBSS 		6
 /* reserved 		7 */
 /* reserved 		8 */
@@ -840,7 +840,7 @@ static const char *status_text[] = {
 	"Reserved",						/*  8 */
 	"Reserved",						/*  9 */
 	"Cannot Support all requested capabilities in the Capability "
-	  "Information field",	  				/* 10 */
+	  "Information field",					/* 10 */
 	"Reassociation denied due to inability to confirm that association "
 	  "exists",						/* 11 */
 	"Association denied due to reason outside the scope of the "
@@ -851,9 +851,9 @@ static const char *status_text[] = {
 	  "sequence number out of expected sequence",		/* 14 */
 	"Authentication rejected because of challenge failure",	/* 15 */
 	"Authentication rejected due to timeout waiting for next frame in "
-	  "sequence",	  					/* 16 */
+	  "sequence",						/* 16 */
 	"Association denied because AP is unable to handle additional"
-	  "associated stations",	  			/* 17 */
+	  "associated stations",				/* 17 */
 	"Association denied due to requesting station not supporting all of "
 	  "the data rates in BSSBasicRateSet parameter",	/* 18 */
 	"Association denied due to requesting station not supporting "

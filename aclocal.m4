@@ -169,7 +169,7 @@ AC_DEFUN(AC_LBL_C_INIT,
 		    ;;
 
 	    osf*)
-	    	    #
+		    #
 		    # Presumed to be DEC OSF/1, Digital UNIX, or
 		    # Tru64 UNIX.
 		    #
@@ -1072,9 +1072,9 @@ AC_DEFUN(AC_LBL_SSLEAY,
 	# Or should we just look for "libcrypto.*"?
 	#
 	if test -d "$1/$tmplib" -a \( -f "$1/$tmplib/libcrypto.a" -o \
-		          	    -f "$1/$tmplib/libcrypto.so" -o \
-		          	    -f "$1/$tmplib/libcrypto.sl" -o \
-			  	    -f "$1/$tmplib/libcrypto.dylib" \); then
+				    -f "$1/$tmplib/libcrypto.so" -o \
+				    -f "$1/$tmplib/libcrypto.sl" -o \
+				    -f "$1/$tmplib/libcrypto.dylib" \); then
 		ac_cv_ssleay_path="$1"
 	fi
 

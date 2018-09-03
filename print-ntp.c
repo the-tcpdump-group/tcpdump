@@ -350,21 +350,21 @@ ntp_time_print(netdissect_options *ndo,
 		ND_TCHECK_4(bp->key_id);
 		ND_PRINT("\n\tKey id: %u", EXTRACT_BE_U_4(bp->key_id));
 		ND_TCHECK_LEN(bp->message_digest, 16);
-                ND_PRINT("\n\tAuthentication: %08x%08x%08x%08x",
-        		       EXTRACT_BE_U_4(bp->message_digest),
-        		       EXTRACT_BE_U_4(bp->message_digest + 4),
-        		       EXTRACT_BE_U_4(bp->message_digest + 8),
-        		       EXTRACT_BE_U_4(bp->message_digest + 12));
+		ND_PRINT("\n\tAuthentication: %08x%08x%08x%08x",
+			 EXTRACT_BE_U_4(bp->message_digest),
+			 EXTRACT_BE_U_4(bp->message_digest + 4),
+			 EXTRACT_BE_U_4(bp->message_digest + 8),
+			 EXTRACT_BE_U_4(bp->message_digest + 12));
 	} else if (length == NTP_TIMEMSG_MINLEN + 4 + 20) { 	/* Optional: key-id + 160-bit digest */
 		ND_TCHECK_4(bp->key_id);
 		ND_PRINT("\n\tKey id: %u", EXTRACT_BE_U_4(bp->key_id));
 		ND_TCHECK_LEN(bp->message_digest, 20);
 		ND_PRINT("\n\tAuthentication: %08x%08x%08x%08x%08x",
-		               EXTRACT_BE_U_4(bp->message_digest),
-		               EXTRACT_BE_U_4(bp->message_digest + 4),
-		               EXTRACT_BE_U_4(bp->message_digest + 8),
-		               EXTRACT_BE_U_4(bp->message_digest + 12),
-		               EXTRACT_BE_U_4(bp->message_digest + 16));
+			 EXTRACT_BE_U_4(bp->message_digest),
+			 EXTRACT_BE_U_4(bp->message_digest + 4),
+			 EXTRACT_BE_U_4(bp->message_digest + 8),
+			 EXTRACT_BE_U_4(bp->message_digest + 12),
+			 EXTRACT_BE_U_4(bp->message_digest + 16));
 	} else if (length > NTP_TIMEMSG_MINLEN) {
 		ND_PRINT("\n\t(%u more bytes after the header)", length - NTP_TIMEMSG_MINLEN);
 	}
@@ -449,7 +449,7 @@ union ntpdata {
  */
 void
 ntp_print(netdissect_options *ndo,
-          const u_char *cp, u_int length)
+	  const u_char *cp, u_int length)
 {
 	const union ntpdata *bp = (const union ntpdata *)cp;
 	u_int mode, version, leapind;
@@ -465,19 +465,19 @@ ntp_print(netdissect_options *ndo,
 	mode = (status & MODEMASK) >> MODESHIFT;
 	if (!ndo->ndo_vflag) {
 		ND_PRINT(", %s, length %u",
-		          tok2str(ntp_mode_values, "Unknown mode", mode),
-		          length);
+			 tok2str(ntp_mode_values, "Unknown mode", mode),
+			 length);
 		return;
 	}
 
 	ND_PRINT(", %s, length %u\n",
-	          tok2str(ntp_mode_values, "Unknown mode", mode), length);
+		  tok2str(ntp_mode_values, "Unknown mode", mode), length);
 
 	/* leapind = (status & LEAPMASK) >> LEAPSHIFT; */
 	leapind = (status & LEAPMASK);
 	ND_PRINT("\tLeap indicator: %s (%u)",
-	          tok2str(ntp_leapind_values, "Unknown", leapind),
-	          leapind);
+		 tok2str(ntp_leapind_values, "Unknown", leapind),
+		 leapind);
 
 	switch (mode) {
 
@@ -522,7 +522,7 @@ p_sfix(netdissect_options *ndo,
 
 static void
 p_ntp_time(netdissect_options *ndo,
-           const struct l_fixedpt *lfp)
+	   const struct l_fixedpt *lfp)
 {
 	uint32_t i;
 	uint32_t uf;
@@ -577,8 +577,8 @@ p_ntp_time(netdissect_options *ndo,
 /* Prints time difference between *lfp and *olfp */
 static void
 p_ntp_delta(netdissect_options *ndo,
-            const struct l_fixedpt *olfp,
-            const struct l_fixedpt *lfp)
+	    const struct l_fixedpt *olfp,
+	    const struct l_fixedpt *lfp)
 {
 	uint32_t u, uf;
 	uint32_t ou, ouf;

@@ -298,7 +298,7 @@ recurse:
 			return (hdrlen + length);
 		}
 	        if (ndo->ndo_eflag) {
-	        	uint16_t tag = EXTRACT_BE_U_2(p);
+			uint16_t tag = EXTRACT_BE_U_2(p);
 
 			ND_PRINT("%s, ", ieee8021q_tci_string(tag));
 		}
@@ -489,7 +489,7 @@ recurse:
 			return (hdrlen + length);
 		}
 	        if (ndo->ndo_eflag) {
-	        	uint16_t tag = EXTRACT_BE_U_2(p);
+			uint16_t tag = EXTRACT_BE_U_2(p);
 
 			ND_PRINT("%s, ", ieee8021q_tci_string(tag));
 		}

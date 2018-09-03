@@ -714,7 +714,7 @@ lldp_private_8021_print(netdissect_options *ndo,
         break;
     case LLDP_PRIVATE_8021_SUBTYPE_CONGESTION_NOTIFICATION:
         if(tlv_len<LLDP_PRIVATE_8021_SUBTYPE_CONGESTION_NOTIFICATION_LENGTH){
-        	return hexdump;
+		return hexdump;
         }
         tval=EXTRACT_U_1(tptr + 4);
         ND_PRINT("\n\t    Pre-Priority CNPV Indicator");
@@ -736,7 +736,7 @@ lldp_private_8021_print(netdissect_options *ndo,
         }
         tval=EXTRACT_U_1(tptr + 4);
         ND_PRINT("\n\t    Willing:%u, CBS:%u, RES:%u, Max TCs:%u",
-        	tval >> 7, (tval >> 6) & 0x02, (tval >> 3) & 0x07, tval & 0x07);
+		tval >> 7, (tval >> 6) & 0x02, (tval >> 3) & 0x07, tval & 0x07);
 
         /*Print Priority Assignment Table*/
         print_ets_priority_assignment_table(ndo, tptr + 5);
@@ -751,7 +751,7 @@ lldp_private_8021_print(netdissect_options *ndo,
 
     case LLDP_PRIVATE_8021_SUBTYPE_ETS_RECOMMENDATION:
         if(tlv_len<LLDP_PRIVATE_8021_SUBTYPE_ETS_RECOMMENDATION_LENGTH) {
-        	return hexdump;
+		return hexdump;
         }
         ND_PRINT("\n\t    RES: %u", EXTRACT_U_1(tptr + 4));
         /*Print Priority Assignment Table */
@@ -768,7 +768,7 @@ lldp_private_8021_print(netdissect_options *ndo,
         }
         tval=EXTRACT_U_1(tptr + 4);
         ND_PRINT("\n\t    Willing: %u, MBC: %u, RES: %u, PFC cap:%u ",
-        	tval >> 7, (tval >> 6) & 0x01, (tval >> 4) & 0x03, (tval & 0x0f));
+		tval >> 7, (tval >> 6) & 0x01, (tval >> 4) & 0x03, (tval & 0x0f));
         ND_PRINT("\n\t    PFC Enable");
         tval=EXTRACT_U_1(tptr + 5);
         ND_PRINT("\n\t     Priority : 0  1  2  3  4  5  6  7");
@@ -783,40 +783,40 @@ lldp_private_8021_print(netdissect_options *ndo,
         }
         ND_PRINT("\n\t    RES: %u", EXTRACT_U_1(tptr + 4));
         if(tlv_len<=LLDP_PRIVATE_8021_SUBTYPE_APPLICATION_PRIORITY_MIN_LENGTH){
-        	return hexdump;
+		return hexdump;
         }
         /*  Length of Application Priority Table */
         sublen=tlv_len-5;
         if(sublen%3!=0){
-        	return hexdump;
+		return hexdump;
         }
         i=0;
         ND_PRINT("\n\t    Application Priority Table");
         while(i<sublen) {
-        	tval=EXTRACT_U_1(tptr + i + 5);
-        	ND_PRINT("\n\t      Priority: %u, RES: %u, Sel: %u, Protocol ID: %u",
-        		 tval >> 5, (tval >> 3) & 0x03, (tval & 0x07),
+		tval=EXTRACT_U_1(tptr + i + 5);
+		ND_PRINT("\n\t      Priority: %u, RES: %u, Sel: %u, Protocol ID: %u",
+			 tval >> 5, (tval >> 3) & 0x03, (tval & 0x07),
 			 EXTRACT_BE_U_2(tptr + i + 5));
-        	i=i+3;
+		i=i+3;
         }
         break;
     case LLDP_PRIVATE_8021_SUBTYPE_EVB:
         if(tlv_len<LLDP_PRIVATE_8021_SUBTYPE_EVB_LENGTH){
-        	return hexdump;
+		return hexdump;
         }
         ND_PRINT("\n\t    EVB Bridge Status");
         tval=EXTRACT_U_1(tptr + 4);
         ND_PRINT("\n\t      RES: %u, BGID: %u, RRCAP: %u, RRCTR: %u",
-        	tval >> 3, (tval >> 2) & 0x01, (tval >> 1) & 0x01, tval & 0x01);
+		tval >> 3, (tval >> 2) & 0x01, (tval >> 1) & 0x01, tval & 0x01);
         ND_PRINT("\n\t    EVB Station Status");
         tval=EXTRACT_U_1(tptr + 5);
         ND_PRINT("\n\t      RES: %u, SGID: %u, RRREQ: %u,RRSTAT: %u",
-        	tval >> 4, (tval >> 3) & 0x01, (tval >> 2) & 0x01, tval & 0x03);
+		tval >> 4, (tval >> 3) & 0x01, (tval >> 2) & 0x01, tval & 0x03);
         tval=EXTRACT_U_1(tptr + 6);
         ND_PRINT("\n\t    R: %u, RTE: %u, ",tval >> 5, tval & 0x1f);
         tval=EXTRACT_U_1(tptr + 7);
         ND_PRINT("EVB Mode: %s [%u]",
-        	tok2str(lldp_evb_mode_values, "unknown", tval >> 6), tval >> 6);
+		tok2str(lldp_evb_mode_values, "unknown", tval >> 6), tval >> 6);
         ND_PRINT("\n\t    ROL: %u, RWD: %u, ", (tval >> 5) & 0x01, tval & 0x1f);
         tval=EXTRACT_U_1(tptr + 8);
         ND_PRINT("RES: %u, ROL: %u, RKA: %u", tval >> 6, (tval >> 5) & 0x01, tval & 0x1f);
@@ -824,22 +824,22 @@ lldp_private_8021_print(netdissect_options *ndo,
 
     case LLDP_PRIVATE_8021_SUBTYPE_CDCP:
         if(tlv_len<LLDP_PRIVATE_8021_SUBTYPE_CDCP_MIN_LENGTH){
-        	return hexdump;
+		return hexdump;
         }
         tval=EXTRACT_U_1(tptr + 4);
         ND_PRINT("\n\t    Role: %u, RES: %u, Scomp: %u ",
-        	tval >> 7, (tval >> 4) & 0x07, (tval >> 3) & 0x01);
+		tval >> 7, (tval >> 4) & 0x07, (tval >> 3) & 0x01);
         ND_PRINT("ChnCap: %u", EXTRACT_BE_U_2(tptr + 6) & 0x0fff);
         sublen=tlv_len-8;
         if(sublen%3!=0) {
-        	return hexdump;
+		return hexdump;
         }
         i=0;
         while(i<sublen) {
 		tval=EXTRACT_BE_U_3(tptr + i + 8);
-        	ND_PRINT("\n\t    SCID: %u, SVID: %u",
-        		tval >> 12, tval & 0x000fff);
-        	i=i+3;
+		ND_PRINT("\n\t    SCID: %u, SVID: %u",
+			tval >> 12, tval & 0x000fff);
+		i=i+3;
         }
         break;
 

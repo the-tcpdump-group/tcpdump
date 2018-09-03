@@ -482,7 +482,7 @@ ospf6_print_lsa(netdissect_options *ndo,
 	 * header.
 	 */
         if (length < sizeof(struct lsa6_hdr) || (const u_char *)lsap + length > dataend)
-        	return (1);
+		return (1);
         lsa_length = length - sizeof(struct lsa6_hdr);
         tptr = (const uint8_t *)lsap+sizeof(struct lsa6_hdr);
 

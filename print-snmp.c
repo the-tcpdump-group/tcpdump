@@ -932,7 +932,7 @@ smi_decode_oid(netdissect_options *ndo,
 		 * (see X.690:1997 clause 8.19 for the details)
 		 */
 		if (first < 0) {
-	        	first = 0;
+			first = 0;
 			firstval = o / OIDMUX;
 			if (firstval > 2) firstval = 2;
 			o -= firstval * OIDMUX;
