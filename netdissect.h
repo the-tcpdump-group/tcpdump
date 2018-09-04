@@ -411,6 +411,8 @@ extern const char *tok2strary_internal(const char **, int, const char *, int);
 
 extern if_printer lookup_printer(int);
 
+#define ND_DEBUG {printf(" [%s:%d %s] ", __FILE__, __LINE__, __FUNCTION__); fflush(stdout);}
+
 /* The DLT printer routines */
 
 extern u_int ap1394_if_print IF_PRINTER_ARGS;
