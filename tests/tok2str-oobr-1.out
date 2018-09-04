@@ -9,8 +9,7 @@
 	  Extended Community (16), length: 24, Flags [OT]: 
 	    target (0x0002), Flags [none]: 1:1 (= 0.0.0.1)
 	    source-AS (0x0009), Flags [none]: AS 1
-	    unknown extd community typecode (0x010a), Flags [none]
-	      0x0000:  010a 0a00 0004 0006
+	    unknown extd community typecode (0x010a), Flags [none]: 0a0000040006
 	    0x0000:  0002 0001 0000 0001 0009 0001 0000 0000
 	    0x0010:  010a 0a00 0004 0006
 	  Multi-Protocol Reach NLRI (14), length: 32, Flags [OE]: 
