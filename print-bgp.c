@@ -410,7 +410,7 @@ static const struct tok bgp_safi_values[] = {
 #define BGP_COMMUNITY_NO_ADVERT              0xffffff02
 #define BGP_COMMUNITY_NO_EXPORT_SUBCONFED    0xffffff03
 
-/* Extended community type - draft-ietf-idr-bgp-ext-communities-05 */
+/* Extended community type - RFC 4360 */
 #define BGP_EXT_COM_RT_0        0x0002  /* Route Target,Format AS(2bytes):AN(4bytes) */
 #define BGP_EXT_COM_RT_1        0x0102  /* Route Target,Format IP address:AN(2bytes) */
 #define BGP_EXT_COM_RT_2        0x0202  /* Route Target,Format AN(4bytes):local(2bytes) */
@@ -713,9 +713,7 @@ trunc:
     return (total_length);
 }
 
-/* RDs and RTs share the same semantics
- * we use bgp_vpn_rd_print for
- * printing route targets inside a NLRI */
+/* Print an RFC 4364 Route Distinguisher */
 const char *
 bgp_vpn_rd_print(netdissect_options *ndo,
                  const u_char *pptr)
@@ -727,25 +725,25 @@ bgp_vpn_rd_print(netdissect_options *ndo,
     /* ok lets load the RD format */
     switch (EXTRACT_BE_U_2(pptr)) {
 
-        /* 2-byte-AS:number fmt*/
     case 0:
+        /* 2-byte-AS:number fmt */
         nd_snprintf(pos, sizeof(rd) - (pos - rd), "%u:%u (= %u.%u.%u.%u)",
                  EXTRACT_BE_U_2(pptr + 2),
                  EXTRACT_BE_U_4(pptr + 4),
                  EXTRACT_U_1(pptr + 4), EXTRACT_U_1(pptr + 5),
                  EXTRACT_U_1(pptr + 6), EXTRACT_U_1(pptr + 7));
         break;
-        /* IP-address:AS fmt*/
 
     case 1:
+        /* IP-address:AS fmt */
         nd_snprintf(pos, sizeof(rd) - (pos - rd), "%u.%u.%u.%u:%u",
                  EXTRACT_U_1(pptr + 2), EXTRACT_U_1(pptr + 3),
                  EXTRACT_U_1(pptr + 4), EXTRACT_U_1(pptr + 5),
                  EXTRACT_BE_U_2(pptr + 6));
         break;
 
-        /* 4-byte-AS:number fmt*/
     case 2:
+        /* 4-byte-AS:number fmt */
         nd_snprintf(pos, sizeof(rd) - (pos - rd), "%s:%u (%u.%u.%u.%u:%u)",
                  as_printf(ndo, astostr, sizeof(astostr), EXTRACT_BE_U_4(pptr + 2)),
                  EXTRACT_BE_U_2(pptr + 6), EXTRACT_U_1(pptr + 2),
@@ -761,11 +759,101 @@ bgp_vpn_rd_print(netdissect_options *ndo,
     return (rd);
 }
 
+/*
+ * Print an RFC 4360 Extended Community.
+ */
+static void
+bgp_extended_community_print(netdissect_options *ndo,
+                             const u_char *pptr)
+{
+    union { /* copy buffer for bandwidth values */
+        float f;
+        uint32_t i;
+    } bw;
+
+    switch (EXTRACT_BE_U_2(pptr)) {
+
+    case BGP_EXT_COM_RT_0:
+    case BGP_EXT_COM_RO_0:
+    case BGP_EXT_COM_L2VPN_RT_0:
+        ND_PRINT("%u:%u (= %s)",
+                 EXTRACT_BE_U_2(pptr + 2),
+                 EXTRACT_BE_U_4(pptr + 4),
+                 ipaddr_string(ndo, pptr+4));
+        break;
+
+    case BGP_EXT_COM_RT_1:
+    case BGP_EXT_COM_RO_1:
+    case BGP_EXT_COM_L2VPN_RT_1:
+    case BGP_EXT_COM_VRF_RT_IMP:
+        ND_PRINT("%s:%u",
+                 ipaddr_string(ndo, pptr+2),
+                 EXTRACT_BE_U_2(pptr + 6));
+        break;
+
+    case BGP_EXT_COM_RT_2:
+        case BGP_EXT_COM_RO_2:
+            ND_PRINT("%s:%u",
+                     as_printf(ndo, astostr, sizeof(astostr),
+                     EXTRACT_BE_U_4(pptr + 2)), EXTRACT_BE_U_2(pptr + 6));
+            break;
+
+    case BGP_EXT_COM_LINKBAND:
+            bw.i = EXTRACT_BE_U_4(pptr + 2);
+            ND_PRINT("bandwidth: %.3f Mbps",
+                     bw.f*8/1000000);
+            break;
+
+    case BGP_EXT_COM_VPN_ORIGIN:
+    case BGP_EXT_COM_VPN_ORIGIN2:
+    case BGP_EXT_COM_VPN_ORIGIN3:
+    case BGP_EXT_COM_VPN_ORIGIN4:
+    case BGP_EXT_COM_OSPF_RID:
+    case BGP_EXT_COM_OSPF_RID2:
+        ND_PRINT("%s", ipaddr_string(ndo, pptr+2));
+        break;
+
+    case BGP_EXT_COM_OSPF_RTYPE:
+    case BGP_EXT_COM_OSPF_RTYPE2:
+        ND_PRINT("area:%s, router-type:%s, metric-type:%s%s",
+                 ipaddr_string(ndo, pptr+2),
+                 tok2str(bgp_extd_comm_ospf_rtype_values,
+                         "unknown (0x%02x)",
+                         EXTRACT_U_1((pptr + 6))),
+                 (EXTRACT_U_1(pptr + 7) &  BGP_OSPF_RTYPE_METRIC_TYPE) ? "E2" : "",
+                 ((EXTRACT_U_1(pptr + 6) == BGP_OSPF_RTYPE_EXT) || (EXTRACT_U_1(pptr + 6) == BGP_OSPF_RTYPE_NSSA)) ? "E1" : "");
+        break;
+
+    case BGP_EXT_COM_L2INFO:
+        ND_PRINT("%s Control Flags [0x%02x]:MTU %u",
+                 tok2str(l2vpn_encaps_values,
+                         "unknown encaps",
+                         EXTRACT_U_1((pptr + 2))),
+                 EXTRACT_U_1((pptr + 3)),
+                          EXTRACT_BE_U_2(pptr + 4));
+        break;
+
+    case BGP_EXT_COM_SOURCE_AS:
+        ND_PRINT("AS %u", EXTRACT_BE_U_2(pptr + 2));
+        break;
+
+    default:
+        ND_PRINT("%02x%02x%02x%02x%02x%02x",
+                 EXTRACT_U_1(pptr + 2),
+                 EXTRACT_U_1(pptr + 3),
+                 EXTRACT_U_1(pptr + 4),
+                 EXTRACT_U_1(pptr + 5),
+                 EXTRACT_U_1(pptr + 6),
+                 EXTRACT_U_1(pptr + 7));
+        break;
+    }
+}
+
+/* RFC 4684 */
 static int
 decode_rt_routing_info(netdissect_options *ndo,
-                       const u_char *pptr, char *buf, u_int buflen)
+                       const u_char *pptr)
 {
-    uint8_t route_target[8];
     u_int plen;
     char asbuf[sizeof(astostr)]; /* bgp_vpn_rd_print() overwrites astostr */
 
@@ -779,12 +867,14 @@ decode_rt_routing_info(netdissect_options *ndo,
      */
     if (0 == plen) {
         /* Without "origin AS", without "route target". */
-        nd_snprintf(buf, buflen, "default route target");
+        ND_PRINT("\n\t      default route target");
         return 1;
     }
 
-    if (32 > plen)
+    if (32 > plen) {
+        ND_PRINT("\n\t      (illegal prefix length)");
         return -1;
+    }
 
     /* With at least "origin AS", possibly with "route target". */
     ND_TCHECK_4(pptr + 1);
@@ -792,26 +882,18 @@ decode_rt_routing_info(netdissect_options *ndo,
 
     plen -= 32; /* adjust prefix length */
 
-    if (64 < plen)
-        return -1;
-
-    /* From now on (plen + 7) / 8 evaluates to { 0, 1, 2, ..., 8 }
-     * and gives the number of octets in the variable-length "route
-     * target" field inside this NLRI "prefix". Look for it.
+    /* An extended community is 8 octets, so the remaining prefix
+     * length must be 64.
      */
-    memset(&route_target, 0, sizeof(route_target));
-    ND_TCHECK_LEN(pptr + 5, (plen + 7) / 8);
-    memcpy(&route_target, pptr + 5, (plen + 7) / 8);
-    /* Which specification says to do this? */
-    if (plen % 8) {
-        ((u_char *)&route_target)[(plen + 7) / 8 - 1] &=
-            ((0xff00 >> (plen % 8)) & 0xff);
+    if (64 != plen) {
+        ND_PRINT("\n\t    (illegal prefix length)");
+        return -1;
     }
-    nd_snprintf(buf, buflen, "origin AS: %s, route target %s",
-             asbuf,
-             bgp_vpn_rd_print(ndo, (u_char *)&route_target));
+    ND_TCHECK_LEN(pptr + 5, 8);
+    ND_PRINT("\n\t      origin AS: %s, route target ", asbuf);
+    bgp_extended_community_print(ndo, pptr + 5);
 
-    return 5 + (plen + 7) / 8;
+    return 5 + 8;
 
 trunc:
     return -2;
@@ -1463,10 +1545,6 @@ bgp_attr_print(netdissect_options *ndo,
     u_int i;
     uint16_t af;
     uint8_t safi, snpa, nhlen;
-    union { /* copy buffer for bandwidth values */
-        float f;
-        uint32_t i;
-    } bw;
     int advance;
     u_int tlen;
     const u_char *tptr;
@@ -1894,13 +1972,9 @@ bgp_attr_print(netdissect_options *ndo,
                     ND_PRINT("\n\t      %s", buf);
                 break;
             case (AFNUM_INET<<8 | SAFNUM_RT_ROUTING_INFO):
-                advance = decode_rt_routing_info(ndo, tptr, buf, sizeof(buf));
-                if (advance == -1)
-                    ND_PRINT("\n\t    (illegal prefix length)");
-                else if (advance == -2)
+                advance = decode_rt_routing_info(ndo, tptr);
+                if (advance == -2)
                     goto trunc;
-                else
-                    ND_PRINT("\n\t      %s", buf);
                 break;
             case (AFNUM_INET<<8 | SAFNUM_MULTICAST_VPN): /* fall through */
             case (AFNUM_INET6<<8 | SAFNUM_MULTICAST_VPN):
@@ -2207,71 +2281,11 @@ bgp_attr_print(netdissect_options *ndo,
                       extd_comm,
                       bittok2str(bgp_extd_comm_flag_values, "none", extd_comm));
 
-            ND_TCHECK_6(tptr + 2);
+            ND_TCHECK_8(tptr);
             if (tlen < 8)
                 goto trunc;
-            switch(extd_comm) {
-            case BGP_EXT_COM_RT_0:
-            case BGP_EXT_COM_RO_0:
-            case BGP_EXT_COM_L2VPN_RT_0:
-                ND_PRINT(": %u:%u (= %s)",
-                          EXTRACT_BE_U_2(tptr + 2),
-                          EXTRACT_BE_U_4(tptr + 4),
-                          ipaddr_string(ndo, tptr+4));
-                break;
-            case BGP_EXT_COM_RT_1:
-            case BGP_EXT_COM_RO_1:
-            case BGP_EXT_COM_L2VPN_RT_1:
-            case BGP_EXT_COM_VRF_RT_IMP:
-                ND_PRINT(": %s:%u",
-                          ipaddr_string(ndo, tptr+2),
-                          EXTRACT_BE_U_2(tptr + 6));
-                break;
-            case BGP_EXT_COM_RT_2:
-            case BGP_EXT_COM_RO_2:
-                ND_PRINT(": %s:%u",
-                          as_printf(ndo, astostr, sizeof(astostr),
-                          EXTRACT_BE_U_4(tptr + 2)), EXTRACT_BE_U_2(tptr + 6));
-                break;
-            case BGP_EXT_COM_LINKBAND:
-                bw.i = EXTRACT_BE_U_4(tptr + 2);
-                ND_PRINT(": bandwidth: %.3f Mbps",
-                          bw.f*8/1000000);
-                break;
-            case BGP_EXT_COM_VPN_ORIGIN:
-            case BGP_EXT_COM_VPN_ORIGIN2:
-            case BGP_EXT_COM_VPN_ORIGIN3:
-            case BGP_EXT_COM_VPN_ORIGIN4:
-            case BGP_EXT_COM_OSPF_RID:
-            case BGP_EXT_COM_OSPF_RID2:
-                ND_PRINT("%s", ipaddr_string(ndo, tptr+2));
-                break;
-            case BGP_EXT_COM_OSPF_RTYPE:
-            case BGP_EXT_COM_OSPF_RTYPE2:
-                ND_PRINT(": area:%s, router-type:%s, metric-type:%s%s",
-                          ipaddr_string(ndo, tptr+2),
-                          tok2str(bgp_extd_comm_ospf_rtype_values,
-                                  "unknown (0x%02x)",
-                                  EXTRACT_U_1((tptr + 6))),
-                          (EXTRACT_U_1(tptr + 7) &  BGP_OSPF_RTYPE_METRIC_TYPE) ? "E2" : "",
-                          ((EXTRACT_U_1(tptr + 6) == BGP_OSPF_RTYPE_EXT) || (EXTRACT_U_1(tptr + 6) == BGP_OSPF_RTYPE_NSSA)) ? "E1" : "");
-                break;
-            case BGP_EXT_COM_L2INFO:
-                ND_PRINT(": %s Control Flags [0x%02x]:MTU %u",
-                          tok2str(l2vpn_encaps_values,
-                                  "unknown encaps",
-                                  EXTRACT_U_1((tptr + 2))),
-                          EXTRACT_U_1((tptr + 3)),
-                          EXTRACT_BE_U_2(tptr + 4));
-                break;
-            case BGP_EXT_COM_SOURCE_AS:
-                ND_PRINT(": AS %u", EXTRACT_BE_U_2(tptr + 2));
-                break;
-            default:
-                ND_TCHECK_8(tptr);
-                print_unknown_data(ndo, tptr, "\n\t      ", 8);
-                break;
-            }
+            ND_PRINT(": ");
+            bgp_extended_community_print(ndo, tptr);
             tlen -= 8;
             tptr += 8;
         }
