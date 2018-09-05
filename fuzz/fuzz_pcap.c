@@ -34,6 +34,25 @@ void fuzz_openFile(const char * name) {
     outfile = fopen(name, "w");
 }
 
+static int bufferToFile(const char * name, const uint8_t *Data, size_t Size) {
+    FILE * fd;
+    if (remove(name) != 0) {
+        printf("failed remove, errno=%d\n", errno);
+        return -1;
+    }
+    fd = fopen(name, "wb");
+    if (fd == NULL) {
+        printf("failed open, errno=%d\n", errno);
+        return -2;
+    }
+    if (fwrite (Data, 1, Size, fd) != Size) {
+        fclose(fd);
+        return -3;
+    }
+    fclose(fd);
+    return 0;
+}
+
 int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     pcap_t * pkts;
     char errbuf[PCAP_ERRBUF_SIZE];
@@ -63,21 +82,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     init_print(&Ndo, 0, 0);
 
     //rewrite buffer to a file as libpcap does not have buffer inputs
-    int fd = open("/tmp/fuzz.pcap", O_RDWR | O_CREAT, 0666);
-    if (fd == -1) {
-        printf("failed open, errno=%d\n", errno);
+    if (bufferToFile("/tmp/fuzz.pcap", Data, Size) < 0) {
         return 0;
     }
-    if (ftruncate(fd, Size) == -1) {
-        return 0;
-    }
-    if (lseek (fd, 0, SEEK_SET) < 0) {
-        return 0;
-    }
-    if (write (fd, Data, Size) != Size) {
-        return 0;
-    }
-    close(fd);
 
     //initialize structure
     pkts = pcap_open_offline("/tmp/fuzz.pcap", errbuf);
