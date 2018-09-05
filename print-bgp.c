@@ -131,20 +131,20 @@ struct bgp_route_refresh {
 #define BGPTYPE_RCID_PATH               13    /* deprecated RFC1863 */
 #define BGPTYPE_MP_REACH_NLRI           14    /* RFC4760 */
 #define BGPTYPE_MP_UNREACH_NLRI         15    /* RFC4760 */
-#define BGPTYPE_EXTD_COMMUNITIES        16      /* RFC4360 */
-#define BGPTYPE_AS4_PATH                17      /* RFC6793 */
-#define BGPTYPE_AGGREGATOR4             18      /* RFC6793 */
-#define BGPTYPE_PMSI_TUNNEL             22      /* RFC6514 */
-#define BGPTYPE_TUNNEL_ENCAP            23      /* RFC5512 */
-#define BGPTYPE_TRAFFIC_ENG             24      /* RFC5543 */
-#define BGPTYPE_IPV6_EXTD_COMMUNITIES   25      /* RFC5701 */
-#define BGPTYPE_AIGP                    26      /* RFC7311 */
-#define BGPTYPE_PE_DISTINGUISHER_LABEL  27      /* RFC6514 */
-#define BGPTYPE_ENTROPY_LABEL           28      /* RFC6790 */
-#define BGPTYPE_LARGE_COMMUNITY         32      /* draft-ietf-idr-large-community-05 */
-#define BGPTYPE_ATTR_SET               128      /* RFC6368 */
+#define BGPTYPE_EXTD_COMMUNITIES        16    /* RFC4360 */
+#define BGPTYPE_AS4_PATH                17    /* RFC6793 */
+#define BGPTYPE_AGGREGATOR4             18    /* RFC6793 */
+#define BGPTYPE_PMSI_TUNNEL             22    /* RFC6514 */
+#define BGPTYPE_TUNNEL_ENCAP            23    /* RFC5512 */
+#define BGPTYPE_TRAFFIC_ENG             24    /* RFC5543 */
+#define BGPTYPE_IPV6_EXTD_COMMUNITIES   25    /* RFC5701 */
+#define BGPTYPE_AIGP                    26    /* RFC7311 */
+#define BGPTYPE_PE_DISTINGUISHER_LABEL  27    /* RFC6514 */
+#define BGPTYPE_ENTROPY_LABEL           28    /* RFC6790 */
+#define BGPTYPE_LARGE_COMMUNITY         32    /* draft-ietf-idr-large-community-05 */
+#define BGPTYPE_ATTR_SET               128    /* RFC6368 */
 
-#define BGP_MP_NLRI_MINSIZE              3       /* End of RIB Marker detection */
+#define BGP_MP_NLRI_MINSIZE              3    /* End of RIB Marker detection */
 
 static const struct tok bgp_attr_values[] = {
     { BGPTYPE_ORIGIN,           "Origin"},
@@ -468,12 +468,12 @@ static const struct tok bgp_extd_comm_subtype_values[] = {
     { BGP_EXT_COM_OSPF_RID,    "ospf-router-id"},
     { BGP_EXT_COM_OSPF_RID2,   "ospf-router-id"},
     { BGP_EXT_COM_L2INFO,      "layer2-info"},
-    { BGP_EXT_COM_EIGRP_GEN , "eigrp-general-route (flag, tag)" },
-    { BGP_EXT_COM_EIGRP_METRIC_AS_DELAY , "eigrp-route-metric (AS, delay)" },
-    { BGP_EXT_COM_EIGRP_METRIC_REL_NH_BW , "eigrp-route-metric (reliability, nexthop, bandwidth)" },
-    { BGP_EXT_COM_EIGRP_METRIC_LOAD_MTU , "eigrp-route-metric (load, MTU)" },
-    { BGP_EXT_COM_EIGRP_EXT_REMAS_REMID , "eigrp-external-route (remote-AS, remote-ID)" },
-    { BGP_EXT_COM_EIGRP_EXT_REMPROTO_REMMETRIC , "eigrp-external-route (remote-proto, remote-metric)" },
+    { BGP_EXT_COM_EIGRP_GEN,   "eigrp-general-route (flag, tag)" },
+    { BGP_EXT_COM_EIGRP_METRIC_AS_DELAY, "eigrp-route-metric (AS, delay)" },
+    { BGP_EXT_COM_EIGRP_METRIC_REL_NH_BW, "eigrp-route-metric (reliability, nexthop, bandwidth)" },
+    { BGP_EXT_COM_EIGRP_METRIC_LOAD_MTU, "eigrp-route-metric (load, MTU)" },
+    { BGP_EXT_COM_EIGRP_EXT_REMAS_REMID, "eigrp-external-route (remote-AS, remote-ID)" },
+    { BGP_EXT_COM_EIGRP_EXT_REMPROTO_REMMETRIC, "eigrp-external-route (remote-proto, remote-metric)" },
     { BGP_EXT_COM_SOURCE_AS, "source-AS" },
     { BGP_EXT_COM_VRF_RT_IMP, "vrf-route-import"},
     { BGP_EXT_COM_L2VPN_RT_0, "l2vpn-id"},
@@ -728,27 +728,27 @@ bgp_vpn_rd_print(netdissect_options *ndo,
     case 0:
         /* 2-byte-AS:number fmt */
         nd_snprintf(pos, sizeof(rd) - (pos - rd), "%u:%u (= %u.%u.%u.%u)",
-                 EXTRACT_BE_U_2(pptr + 2),
-                 EXTRACT_BE_U_4(pptr + 4),
-                 EXTRACT_U_1(pptr + 4), EXTRACT_U_1(pptr + 5),
-                 EXTRACT_U_1(pptr + 6), EXTRACT_U_1(pptr + 7));
+                    EXTRACT_BE_U_2(pptr + 2),
+                    EXTRACT_BE_U_4(pptr + 4),
+                    EXTRACT_U_1(pptr + 4), EXTRACT_U_1(pptr + 5),
+                    EXTRACT_U_1(pptr + 6), EXTRACT_U_1(pptr + 7));
         break;
 
     case 1:
         /* IP-address:AS fmt */
         nd_snprintf(pos, sizeof(rd) - (pos - rd), "%u.%u.%u.%u:%u",
-                 EXTRACT_U_1(pptr + 2), EXTRACT_U_1(pptr + 3),
-                 EXTRACT_U_1(pptr + 4), EXTRACT_U_1(pptr + 5),
-                 EXTRACT_BE_U_2(pptr + 6));
+                    EXTRACT_U_1(pptr + 2), EXTRACT_U_1(pptr + 3),
+                    EXTRACT_U_1(pptr + 4), EXTRACT_U_1(pptr + 5),
+                    EXTRACT_BE_U_2(pptr + 6));
         break;
 
     case 2:
         /* 4-byte-AS:number fmt */
         nd_snprintf(pos, sizeof(rd) - (pos - rd), "%s:%u (%u.%u.%u.%u:%u)",
-                 as_printf(ndo, astostr, sizeof(astostr), EXTRACT_BE_U_4(pptr + 2)),
-                 EXTRACT_BE_U_2(pptr + 6), EXTRACT_U_1(pptr + 2),
-                 EXTRACT_U_1(pptr + 3), EXTRACT_U_1(pptr + 4),
-                 EXTRACT_U_1(pptr + 5), EXTRACT_BE_U_2(pptr + 6));
+                    as_printf(ndo, astostr, sizeof(astostr), EXTRACT_BE_U_4(pptr + 2)),
+                    EXTRACT_BE_U_2(pptr + 6), EXTRACT_U_1(pptr + 2),
+                    EXTRACT_U_1(pptr + 3), EXTRACT_U_1(pptr + 4),
+                    EXTRACT_U_1(pptr + 5), EXTRACT_BE_U_2(pptr + 6));
         break;
     default:
         nd_snprintf(pos, sizeof(rd) - (pos - rd), "unknown RD format");
@@ -830,7 +830,7 @@ bgp_extended_community_print(netdissect_options *ndo,
                          "unknown encaps",
                          EXTRACT_U_1((pptr + 2))),
                  EXTRACT_U_1((pptr + 3)),
-                          EXTRACT_BE_U_2(pptr + 4));
+                 EXTRACT_BE_U_2(pptr + 4));
         break;
 
     case BGP_EXT_COM_SOURCE_AS:
@@ -926,11 +926,11 @@ decode_labeled_vpn_prefix4(netdissect_options *ndo,
     }
     /* the label may get offsetted by 4 bits so lets shift it right */
     nd_snprintf(buf, buflen, "RD: %s, %s/%u, label:%u %s",
-             bgp_vpn_rd_print(ndo, pptr+4),
-             ipaddr_string(ndo, (const u_char *)&addr),
-             plen,
-             EXTRACT_BE_U_3(pptr + 1)>>4,
-             ((EXTRACT_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
+                bgp_vpn_rd_print(ndo, pptr+4),
+                ipaddr_string(ndo, (const u_char *)&addr),
+                plen,
+                EXTRACT_BE_U_3(pptr + 1)>>4,
+                ((EXTRACT_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
 
     return 12 + (plen + 7) / 8;
 
@@ -978,7 +978,7 @@ decode_mdt_vpn_nlri(netdissect_options *ndo,
     ND_TCHECK_LEN(pptr, sizeof(nd_ipv4));
 
     nd_snprintf(buf, buflen, "RD: %s, VPN IP Address: %s, MC Group Address: %s",
-             bgp_vpn_rd_print(ndo, rd), ipaddr_string(ndo, vpn_ip), ipaddr_string(ndo, pptr));
+                bgp_vpn_rd_print(ndo, rd), ipaddr_string(ndo, vpn_ip), ipaddr_string(ndo, pptr));
 
     return MDT_VPN_NLRI_LEN + 1;
 
@@ -1029,9 +1029,9 @@ decode_multicast_vpn(netdissect_options *ndo,
         ND_TCHECK_LEN(pptr, BGP_VPN_RD_LEN);
         offset = strlen(buf);
         nd_snprintf(buf + offset, buflen - offset, ", RD: %s, Originator %s",
-                 bgp_vpn_rd_print(ndo, pptr),
-                 bgp_vpn_ip_print(ndo, pptr + BGP_VPN_RD_LEN,
-                                  (route_length - BGP_VPN_RD_LEN) << 3));
+                    bgp_vpn_rd_print(ndo, pptr),
+                    bgp_vpn_ip_print(ndo, pptr + BGP_VPN_RD_LEN,
+                                     (route_length - BGP_VPN_RD_LEN) << 3));
         break;
     case BGP_MULTICAST_VPN_ROUTE_TYPE_INTER_AS_I_PMSI:
         ND_TCHECK_LEN(pptr, BGP_VPN_RD_LEN + 4);
@@ -1046,7 +1046,7 @@ decode_multicast_vpn(netdissect_options *ndo,
         ND_TCHECK_LEN(pptr, BGP_VPN_RD_LEN);
         offset = strlen(buf);
         nd_snprintf(buf + offset, buflen - offset, ", RD: %s",
-                 bgp_vpn_rd_print(ndo, pptr));
+                    bgp_vpn_rd_print(ndo, pptr));
         pptr += BGP_VPN_RD_LEN;
 
         sg_length = bgp_vpn_sg_print(ndo, pptr, buf, buflen);
@@ -1055,14 +1055,14 @@ decode_multicast_vpn(netdissect_options *ndo,
         ND_TCHECK_LEN(pptr, addr_length);
         offset = strlen(buf);
         nd_snprintf(buf + offset, buflen - offset, ", Originator %s",
-                 bgp_vpn_ip_print(ndo, pptr, addr_length << 3));
+                    bgp_vpn_ip_print(ndo, pptr, addr_length << 3));
         break;
 
     case BGP_MULTICAST_VPN_ROUTE_TYPE_SOURCE_ACTIVE:
         ND_TCHECK_LEN(pptr, BGP_VPN_RD_LEN);
         offset = strlen(buf);
         nd_snprintf(buf + offset, buflen - offset, ", RD: %s",
-                 bgp_vpn_rd_print(ndo, pptr));
+                    bgp_vpn_rd_print(ndo, pptr));
         pptr += BGP_VPN_RD_LEN;
 
         bgp_vpn_sg_print(ndo, pptr, buf, buflen);
@@ -1073,9 +1073,9 @@ decode_multicast_vpn(netdissect_options *ndo,
         ND_TCHECK_LEN(pptr, BGP_VPN_RD_LEN + 4);
         offset = strlen(buf);
         nd_snprintf(buf + offset, buflen - offset, ", RD: %s, Source-AS %s",
-                 bgp_vpn_rd_print(ndo, pptr),
-                 as_printf(ndo, astostr, sizeof(astostr),
-                 EXTRACT_BE_U_4(pptr + BGP_VPN_RD_LEN)));
+                    bgp_vpn_rd_print(ndo, pptr),
+                    as_printf(ndo, astostr, sizeof(astostr),
+                    EXTRACT_BE_U_4(pptr + BGP_VPN_RD_LEN)));
         pptr += BGP_VPN_RD_LEN + 4;
 
         bgp_vpn_sg_print(ndo, pptr, buf, buflen);
@@ -1135,8 +1135,8 @@ decode_labeled_vpn_l2(netdissect_options *ndo,
         ND_TCHECK_LEN(pptr, 12);
         buf[0] = '\0';
         stringlen = nd_snprintf(buf, buflen, "RD: %s, BGPNH: %s",
-                             bgp_vpn_rd_print(ndo, pptr),
-                             ipaddr_string(ndo, pptr+8));
+                                bgp_vpn_rd_print(ndo, pptr),
+                                ipaddr_string(ndo, pptr+8));
         UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
         pptr += 12;
         tlen -= 12;
@@ -1148,10 +1148,10 @@ decode_labeled_vpn_l2(netdissect_options *ndo,
         ND_TCHECK_LEN(pptr, 15);
         buf[0] = '\0';
         stringlen = nd_snprintf(buf, buflen, "RD: %s, CE-ID: %u, Label-Block Offset: %u, Label Base %u",
-                             bgp_vpn_rd_print(ndo, pptr),
-                             EXTRACT_BE_U_2(pptr + 8),
-                             EXTRACT_BE_U_2(pptr + 10),
-                             EXTRACT_BE_U_3(pptr + 12)>>4); /* the label is offsetted by 4 bits so lets shift it right */
+                                bgp_vpn_rd_print(ndo, pptr),
+                                EXTRACT_BE_U_2(pptr + 8),
+                                EXTRACT_BE_U_2(pptr + 10),
+                                EXTRACT_BE_U_3(pptr + 12)>>4); /* the label is offsetted by 4 bits so lets shift it right */
         UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
         pptr += 15;
         tlen -= 15;
@@ -1176,8 +1176,8 @@ decode_labeled_vpn_l2(netdissect_options *ndo,
             case 1:
                 if (buflen != 0) {
                     stringlen=nd_snprintf(buf,buflen, "\n\t\tcircuit status vector (%u) length: %u: 0x",
-                                       tlv_type,
-                                       tlv_len);
+                                          tlv_type,
+                                          tlv_len);
                     UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
                 }
                 while (ttlv_len != 0) {
@@ -1191,7 +1191,7 @@ decode_labeled_vpn_l2(netdissect_options *ndo,
                     ND_TCHECK_1(pptr);
                     if (buflen != 0) {
                         stringlen=nd_snprintf(buf,buflen, "%02x",
-                                           EXTRACT_U_1(pptr));
+                                              EXTRACT_U_1(pptr));
                         pptr++;
                         UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
                     }
@@ -1202,8 +1202,8 @@ decode_labeled_vpn_l2(netdissect_options *ndo,
             default:
                 if (buflen != 0) {
                     stringlen=nd_snprintf(buf,buflen, "\n\t\tunknown TLV #%u, length: %u",
-                                       tlv_type,
-                                       tlv_len);
+                                          tlv_type,
+                                          tlv_len);
                     UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
                 }
                 if (tlen < ttlv_len) {
@@ -1292,10 +1292,10 @@ decode_labeled_prefix6(netdissect_options *ndo,
     }
     /* the label may get offsetted by 4 bits so lets shift it right */
     nd_snprintf(buf, buflen, "%s/%u, label:%u %s",
-             ip6addr_string(ndo, (const u_char *)&addr),
-             plen,
-             EXTRACT_BE_U_3(pptr + 1)>>4,
-             ((EXTRACT_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
+                ip6addr_string(ndo, (const u_char *)&addr),
+                plen,
+                EXTRACT_BE_U_3(pptr + 1)>>4,
+                ((EXTRACT_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
 
     return 4 + plenbytes;
 
@@ -1333,11 +1333,11 @@ decode_labeled_vpn_prefix6(netdissect_options *ndo,
     }
     /* the label may get offsetted by 4 bits so lets shift it right */
     nd_snprintf(buf, buflen, "RD: %s, %s/%u, label:%u %s",
-             bgp_vpn_rd_print(ndo, pptr+4),
-             ip6addr_string(ndo, (const u_char *)&addr),
-             plen,
-             EXTRACT_BE_U_3(pptr + 1)>>4,
-             ((EXTRACT_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
+                bgp_vpn_rd_print(ndo, pptr+4),
+                ip6addr_string(ndo, (const u_char *)&addr),
+                plen,
+                EXTRACT_BE_U_3(pptr + 1)>>4,
+                ((EXTRACT_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
 
     return 12 + (plen + 7) / 8;
 
@@ -1366,8 +1366,8 @@ decode_clnp_prefix(netdissect_options *ndo,
             ((0xff00 >> (plen % 8)) & 0xff);
     }
     nd_snprintf(buf, buflen, "%s/%u",
-             isonsap_string(ndo, addr,(plen + 7) / 8),
-             plen);
+                isonsap_string(ndo, addr,(plen + 7) / 8),
+                plen);
 
     return 1 + (plen + 7) / 8;
 
@@ -1401,11 +1401,11 @@ decode_labeled_vpn_clnp_prefix(netdissect_options *ndo,
     }
     /* the label may get offsetted by 4 bits so lets shift it right */
     nd_snprintf(buf, buflen, "RD: %s, %s/%u, label:%u %s",
-             bgp_vpn_rd_print(ndo, pptr+4),
-             isonsap_string(ndo, addr,(plen + 7) / 8),
-             plen,
-             EXTRACT_BE_U_3(pptr + 1)>>4,
-             ((EXTRACT_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
+                bgp_vpn_rd_print(ndo, pptr+4),
+                isonsap_string(ndo, addr,(plen + 7) / 8),
+                plen,
+                EXTRACT_BE_U_3(pptr + 1)>>4,
+                ((EXTRACT_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
 
     return 12 + (plen + 7) / 8;
 
