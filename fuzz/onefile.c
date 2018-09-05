@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size);
+void fuzz_openFile(const char * name);
 
 int main(int argc, char** argv)
 {
@@ -10,7 +11,10 @@ int main(int argc, char** argv)
     uint8_t *Data;
     size_t Size;
 
-    if (argc != 2) {
+    if (argc == 3) {
+        //opens output file without error checking
+        fuzz_openFile(argv[2]);
+    } else if (argc != 2) {
         return 1;
     }
     //opens the file, get its size, and reads it into a buffer
