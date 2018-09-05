@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <unistd.h>
 #include <string.h>
 
 #include <pcap/pcap.h>
@@ -28,6 +27,13 @@ fuzz_ndo_printf(netdissect_options *ndo, const char *fmt, ...)
     return (ret);
 }
 
+void fuzz_openFile(const char * name) {
+    if (outfile != NULL) {
+        fclose(outfile);
+    }
+    outfile = fopen(name, "w");
+}
+
 int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     pcap_t * pkts;
     char errbuf[PCAP_ERRBUF_SIZE];
@@ -36,6 +42,14 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     int r;
     u_int packets_captured = 0;
     netdissect_options Ndo;
+
+    //initialize output file
+    if (outfile == NULL) {
+        outfile = fopen("/dev/null", "w");
+        if (outfile == NULL) {
+            return 0;
+        }
+    }
 
     memset(&Ndo, 0, sizeof(Ndo));
     ndo_set_function_pointers(&Ndo);
@@ -46,15 +60,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     Ndo.ndo_vflag = 5;
     //to out outputfile
     Ndo.ndo_printf=fuzz_ndo_printf;
-
-    //initialize output file
-    if (outfile == NULL) {
-        outfile = fopen("/dev/null", "w");
-        if (outfile == NULL) {
-            return 0;
-        }
-        init_print(&Ndo, 0, 0);
-    }
+    init_print(&Ndo, 0, 0);
 
     //rewrite buffer to a file as libpcap does not have buffer inputs
     int fd = open("/tmp/fuzz.pcap", O_RDWR | O_CREAT, 0666);
