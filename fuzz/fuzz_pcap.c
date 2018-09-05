@@ -37,8 +37,10 @@ void fuzz_openFile(const char * name) {
 static int bufferToFile(const char * name, const uint8_t *Data, size_t Size) {
     FILE * fd;
     if (remove(name) != 0) {
-        printf("failed remove, errno=%d\n", errno);
-        return -1;
+        if (errno != ENOENT) {
+            printf("failed remove, errno=%d\n", errno);
+            return -1;
+        }
     }
     fd = fopen(name, "wb");
     if (fd == NULL) {
