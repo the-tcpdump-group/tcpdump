@@ -1361,7 +1361,7 @@ trunc:
 
 static int
 bgp_attr_print(netdissect_options *ndo,
-               u_int atype, const u_char *pptr, u_int len)
+               u_int atype, const u_char *pptr, u_int len, const unsigned attr_set_level)
 {
 	int i;
 	uint16_t af;
@@ -2284,8 +2284,16 @@ bgp_attr_print(netdissect_options *ndo,
                             ND_PRINT((ndo, "+%x", aflags & 0xf));
                         ND_PRINT((ndo, "]: "));
                     }
-                    /* FIXME check for recursion */
-                    if (!bgp_attr_print(ndo, atype, tptr, alen))
+                    /* The protocol encoding per se allows ATTR_SET to be nested as many times
+                     * as the message can accommodate. This printer used to be able to recurse
+                     * into ATTR_SET contents until the stack exhaustion, but now there is a
+                     * limit on that (if live protocol exchange goes that many levels deep,
+                     * something is probably wrong anyway). Feel free to refine this value if
+                     * you can find the spec with respective normative text.
+                     */
+                    if (attr_set_level == 10)
+                        ND_PRINT((ndo, "(too many nested levels, not recursing)"));
+                    else if (!bgp_attr_print(ndo, atype, tptr, alen, attr_set_level + 1))
                         return 0;
                     tptr += alen;
                     len -= alen;
@@ -2592,7 +2600,7 @@ bgp_update_print(netdissect_options *ndo,
 				goto trunc;
 			if (length < alen)
 				goto trunc;
-			if (!bgp_attr_print(ndo, atype, p, alen))
+			if (!bgp_attr_print(ndo, atype, p, alen, 0))
 				goto trunc;
 			p += alen;
 			len -= alen;
