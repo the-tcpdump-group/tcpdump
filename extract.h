@@ -65,7 +65,6 @@
 #endif
 
 #if (defined(__i386__) || defined(_M_IX86) || defined(__X86__) || defined(__x86_64__) || defined(_M_X64)) || \
-    (defined(__arm__) || defined(_M_ARM) || defined(__aarch64__)) || \
     (defined(__m68k__) && (!defined(__mc68000__) && !defined(__mc68010__))) || \
     (defined(__ppc__) || defined(__ppc64__) || defined(_M_PPC) || defined(_ARCH_PPC) || defined(_ARCH_PPC64)) || \
     (defined(__s390__) || defined(__s390x__) || defined(__zarch__))
@@ -74,9 +73,6 @@
  * cast the pointer and fetch through it.
  *
  * XXX - are those all the x86 tests we need?
- * XXX - do we need to worry about ARMv1 through ARMv5, which didn't
- * support unaligned loads, and, if so, do we need to worry about all
- * of them, or just some of them, e.g. ARMv5?
  * XXX - are those the only 68k tests we need not to generated
  * unaligned accesses if the target is the 68000 or 68010?
  * XXX - are there any tests we don't need, because some definitions are for
@@ -259,6 +255,16 @@ EXTRACT_IPV4_TO_HOST_ORDER(const void *p)
  * set to do unaligned loads, so do unaligned loads of big-endian
  * quantities the hard way - fetch the bytes one at a time and
  * assemble them.
+ *
+ * XXX - ARM is a special case.  ARMv1 through ARMv5 didn't suppory
+ * unaligned loads; ARMv6 and later support it *but* have a bit in
+ * the system control register that the OS can set and that causes
+ * unaligned loads to fault rather than succeeding.
+ *
+ * At least some OSes may set that flag, so we do *not* treat ARM
+ * as supporting unaligned loads.  If your OS supports them on ARM,
+ * and you want to use them, please update the tests in the #if above
+ * to check for ARM *and* for your OS.
  */
 #define EXTRACT_BE_U_2(p) \
 	((uint16_t)(((uint16_t)(*((const uint8_t *)(p) + 0)) << 8) | \
