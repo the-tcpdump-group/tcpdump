@@ -807,7 +807,14 @@ smb_fdata(netdissect_options *ndo,
 	    while (buf < maxbuf) {
 		const u_char *buf2;
 		depth++;
-		buf2 = smb_fdata(ndo, buf, fmt, maxbuf, unicodestr);
+		/* Not sure how this relates with the protocol specification,
+		 * but in order to avoid stack exhaustion recurse at most that
+		 * many levels.
+		 */
+		if (depth == 10)
+			ND_PRINT((ndo, "(too many nested levels, not recursing)"));
+		else
+			buf2 = smb_fdata(ndo, buf, fmt, maxbuf, unicodestr);
 		depth--;
 		if (buf2 == NULL)
 		    return(NULL);
