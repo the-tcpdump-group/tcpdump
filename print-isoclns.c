@@ -2697,7 +2697,8 @@ isis_print(netdissect_options *ndo,
 	    lan_alen = EXTRACT_U_1(tptr); /* LAN address length */
 	    tptr++;
 	    if (lan_alen == 0) {
-                ND_PRINT("\n\t      LAN address length 0 bytes (invalid)");
+                ND_PRINT("\n\t      LAN address length 0 bytes");
+                nd_print_invalid(ndo);
                 break;
             }
             tmp --;

@@ -57,11 +57,7 @@
 #include "ascii_strcasecmp.h"
 #include "timeval-operations.h"
 
-/* invalid string to print '(invalid)' for malformed or corrupted packets */
-const char istr[] = " (invalid)";
-
 #define TOKBUFSIZE 128
-
 
 enum date_flag { WITHOUT_DATE = 0, WITH_DATE = 1 };
 enum time_flag { UTC_TIME = 0, LOCAL_TIME = 1 };
@@ -442,6 +438,12 @@ signed_relts_print(netdissect_options *ndo,
 void nd_print_trunc(netdissect_options *ndo)
 {
 	ND_PRINT(" [|%s]", ndo->ndo_protocol);
+}
+
+/* Print the invalid string */
+void nd_print_invalid(netdissect_options *ndo)
+{
+	ND_PRINT(" (invalid)");
 }
 
 /*

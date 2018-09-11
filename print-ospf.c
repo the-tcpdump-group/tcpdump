@@ -503,7 +503,7 @@ ospf_te_lsa_print(netdissect_options *ndo,
 trunc:
     return -1;
 invalid:
-    ND_PRINT("%s", istr);
+    nd_print_invalid(ndo);
     return -1;
 }
 

@@ -96,7 +96,7 @@ loopback_message_print(netdissect_options *ndo, const u_char *cp, const u_int le
 	return;
 
 invalid:
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
@@ -126,7 +126,7 @@ loopback_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 	return;
 
 invalid:
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:

@@ -389,7 +389,7 @@ trunc:
 	nd_print_trunc(ndo);
 	return;
 invalid:
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	return;
 }
 

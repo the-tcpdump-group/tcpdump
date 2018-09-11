@@ -558,7 +558,7 @@ ip_print(netdissect_options *ndo,
 	      ND_PRINT("IP6, wrong link-layer encapsulation");
 	    else
 	      ND_PRINT("IP%u", IP_V(ipds->ip));
-	    ND_PRINT("%s", istr);
+	    nd_print_invalid(ndo);
 	    return;
 	}
 	if (!ndo->ndo_eflag)

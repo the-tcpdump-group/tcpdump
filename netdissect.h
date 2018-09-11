@@ -119,9 +119,6 @@ typedef unsigned char nd_byte;
 #include "ip.h" /* struct ip for nextproto4_cksum() */
 #include "ip6.h" /* struct ip6 for nextproto6_cksum() */
 
-/* invalid string to print '(invalid)' for malformed or corrupted packets */
-extern const char istr[];
-
 #ifndef HAVE_STRLCAT
 extern size_t strlcat (char *, const char *, size_t);
 #endif
@@ -665,6 +662,7 @@ extern int nextproto6_cksum(netdissect_options *, const struct ip6_hdr *, const 
 
 /* Utilities */
 extern void nd_print_trunc(netdissect_options *);
+extern void nd_print_invalid(netdissect_options *);
 
 extern int mask2plen(uint32_t);
 extern int mask62plen(const u_char *);

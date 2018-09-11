@@ -184,7 +184,7 @@ udld_print(netdissect_options *ndo, const u_char *pptr, u_int length)
     return;
 
 invalid:
-    ND_PRINT("%s", istr);
+    nd_print_invalid(ndo);
     return;
 trunc:
     nd_print_trunc(ndo);

@@ -229,7 +229,7 @@ tag_value_print(netdissect_options *ndo,
   return;
 
 invalid:
-  ND_PRINT("%s", istr);
+  nd_print_invalid(ndo);
   ND_TCHECK_LEN(buf, size);
   return;
 trunc:
@@ -277,7 +277,7 @@ m3ua_tags_print(netdissect_options *ndo,
   return;
 
 invalid:
-  ND_PRINT("%s", istr);
+  nd_print_invalid(ndo);
   ND_TCHECK_LEN(buf, size);
   return;
 trunc:
@@ -333,7 +333,7 @@ m3ua_print(netdissect_options *ndo,
   return;
 
 invalid:
-  ND_PRINT("%s", istr);
+  nd_print_invalid(ndo);
   ND_TCHECK_LEN(buf, size);
   return;
 trunc:

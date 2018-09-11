@@ -947,7 +947,7 @@ of10_bsn_message_print(netdissect_options *ndo,
 	return cp;
 
 invalid: /* skip the undersized data */
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp0, len);
 	return cp0 + len;
 trunc:
@@ -1021,7 +1021,7 @@ of10_bsn_actions_print(netdissect_options *ndo,
 	return cp;
 
 invalid:
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp0, len);
 	return cp0 + len;
 trunc:
@@ -1050,7 +1050,7 @@ of10_vendor_action_print(netdissect_options *ndo,
 	return decoder(ndo, cp, ep, len - 4);
 
 invalid: /* skip the undersized data */
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
 	return cp + len;
 trunc:
@@ -1079,7 +1079,7 @@ of10_vendor_message_print(netdissect_options *ndo,
 	return decoder(ndo, cp, ep, len - 4);
 
 invalid: /* skip the undersized data */
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
 	return cp + len;
 trunc:
@@ -1105,7 +1105,7 @@ of10_vendor_data_print(netdissect_options *ndo,
 	return of10_data_print(ndo, cp, ep, len - 4);
 
 invalid: /* skip the undersized data */
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
 	return cp + len;
 trunc:
@@ -1208,7 +1208,7 @@ next_port:
 	return cp;
 
 invalid: /* skip the undersized trailing data */
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
@@ -1284,7 +1284,7 @@ next_property:
 	return cp;
 
 invalid: /* skip the rest of queue properties */
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
@@ -1332,7 +1332,7 @@ next_queue:
 	return cp;
 
 invalid: /* skip the rest of queues */
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
@@ -1603,7 +1603,7 @@ next_action:
 	return cp;
 
 invalid: /* skip the rest of actions */
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
@@ -1821,7 +1821,7 @@ of10_stats_request_print(netdissect_options *ndo,
 	return cp;
 
 invalid: /* skip the message body */
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
@@ -1868,7 +1868,7 @@ of10_desc_stats_reply_print(netdissect_options *ndo,
 	return cp + DESC_STR_LEN;
 
 invalid: /* skip the message body */
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
 	return cp + len;
 trunc:
@@ -1949,7 +1949,7 @@ of10_flow_stats_reply_print(netdissect_options *ndo,
 	return cp;
 
 invalid: /* skip the rest of flow statistics entries */
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
@@ -1982,7 +1982,7 @@ of10_aggregate_stats_reply_print(netdissect_options *ndo,
 	return cp + 4;
 
 invalid: /* skip the message body */
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
 	return cp + len;
 trunc:
@@ -2042,7 +2042,7 @@ of10_table_stats_reply_print(netdissect_options *ndo,
 	return cp;
 
 invalid: /* skip the undersized trailing data */
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
@@ -2127,7 +2127,7 @@ next_port:
 	return cp;
 
 invalid: /* skip the undersized trailing data */
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
@@ -2175,7 +2175,7 @@ of10_queue_stats_reply_print(netdissect_options *ndo,
 	return cp;
 
 invalid: /* skip the undersized trailing data */
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
@@ -2254,7 +2254,7 @@ of10_packet_out_print(netdissect_options *ndo,
 	return of10_packet_data_print(ndo, cp, ep, len - OF_PACKET_OUT_LEN - actions_len);
 
 invalid: /* skip the rest of the message body */
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp0, len0);
 	return cp0 + len0;
 trunc:
@@ -2557,7 +2557,7 @@ of10_header_body_print(netdissect_options *ndo,
 	goto next_message;
 
 invalid: /* skip the message body */
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 next_message:
 	ND_TCHECK_LEN(cp0, len0 - OF_HEADER_LEN);
 	return cp0 + len0 - OF_HEADER_LEN;

@@ -336,7 +336,7 @@ subtlvs_print(netdissect_options *ndo,
     return;
 
  invalid:
-    ND_PRINT("%s", istr);
+    nd_print_invalid(ndo);
 }
 
 #define ICHECK(i, l) \
@@ -732,6 +732,6 @@ babel_print_v2(netdissect_options *ndo,
     return;
 
  invalid:
-    ND_PRINT("%s", istr);
+    nd_print_invalid(ndo);
     return;
 }

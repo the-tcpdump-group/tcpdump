@@ -120,7 +120,7 @@ of_header_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep
 	}
 
 invalid: /* fail current packet */
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, ep - cp);
 	return ep;
 trunc:

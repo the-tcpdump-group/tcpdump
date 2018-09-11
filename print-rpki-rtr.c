@@ -376,7 +376,7 @@ rpki_rtr_pdu_print (netdissect_options *ndo, const u_char *tptr, const u_int len
     return pdu_len;
 
 invalid:
-    ND_PRINT("%s", istr);
+    nd_print_invalid(ndo);
     ND_TCHECK_LEN(tptr, len);
     return len;
 trunc:

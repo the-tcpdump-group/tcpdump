@@ -1041,7 +1041,7 @@ icmp6_print(netdissect_options *ndo,
 	ep = ndo->ndo_snapend;
 	if (length == 0) {
 		ND_PRINT("ICMP6, length 0");
-		ND_PRINT("%s", istr);
+		nd_print_invalid(ndo);
 		return;
 	}
 

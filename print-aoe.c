@@ -194,7 +194,7 @@ aoev1_issue_print(netdissect_options *ndo,
 	return;
 
 invalid:
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
@@ -243,7 +243,7 @@ aoev1_query_print(netdissect_options *ndo,
 	return;
 
 invalid:
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
@@ -294,7 +294,7 @@ aoev1_mac_print(netdissect_options *ndo,
 	return;
 
 invalid:
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
@@ -329,7 +329,7 @@ aoev1_reserve_print(netdissect_options *ndo,
 	return;
 
 invalid:
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
@@ -387,7 +387,7 @@ aoev1_print(netdissect_options *ndo,
 	return;
 
 invalid:
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
@@ -420,7 +420,7 @@ aoe_print(netdissect_options *ndo,
 	return;
 
 invalid:
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:

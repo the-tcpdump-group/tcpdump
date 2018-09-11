@@ -116,7 +116,7 @@ ahcp_time_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 	return 0;
 
 invalid:
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, ep - cp);
 	return 0;
 trunc:
@@ -134,7 +134,7 @@ ahcp_seconds_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 	return 0;
 
 invalid:
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, ep - cp);
 	return 0;
 trunc:
@@ -158,7 +158,7 @@ ahcp_ipv6_addresses_print(netdissect_options *ndo, const u_char *cp, const u_cha
 	return 0;
 
 invalid:
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, ep - cp);
 	return 0;
 trunc:
@@ -182,7 +182,7 @@ ahcp_ipv4_addresses_print(netdissect_options *ndo, const u_char *cp, const u_cha
 	return 0;
 
 invalid:
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, ep - cp);
 	return 0;
 trunc:
@@ -206,7 +206,7 @@ ahcp_ipv6_prefixes_print(netdissect_options *ndo, const u_char *cp, const u_char
 	return 0;
 
 invalid:
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, ep - cp);
 	return 0;
 trunc:
@@ -230,7 +230,7 @@ ahcp_ipv4_prefixes_print(netdissect_options *ndo, const u_char *cp, const u_char
 	return 0;
 
 invalid:
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, ep - cp);
 	return 0;
 trunc:
@@ -291,7 +291,7 @@ ahcp1_options_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 	return;
 
 invalid:
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
@@ -336,7 +336,7 @@ ahcp1_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 	return;
 
 invalid:
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
@@ -403,7 +403,7 @@ ahcp_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 	return;
 
 invalid:
-	ND_PRINT("%s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:

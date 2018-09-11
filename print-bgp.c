@@ -2581,7 +2581,7 @@ bgp_capabilities_print(netdissect_options *ndo,
             cap_offset=2;
             while (tcap_len != 0) {
                 if (tcap_len < 4) {
-                    ND_PRINT("\n\t\t(invalid)");
+                    nd_print_invalid(ndo);
                     break;
                 }
                 ND_PRINT("\n\t\tAFI %s (%u), SAFI %s (%u), Send/Receive: %s",
