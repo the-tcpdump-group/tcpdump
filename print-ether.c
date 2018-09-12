@@ -148,7 +148,8 @@ ether_hdr_print(netdissect_options *ndo,
 u_int
 ether_print(netdissect_options *ndo,
             const u_char *p, u_int length, u_int caplen,
-            void (*print_encap_header)(netdissect_options *ndo, const u_char *), const u_char *encap_header_arg)
+            void (*print_encap_header)(netdissect_options *ndo, const u_char *),
+            const u_char *encap_header_arg)
 {
 	const struct ether_header *ehp;
 	u_int orig_length;
@@ -161,10 +162,6 @@ ether_print(netdissect_options *ndo,
 	if (caplen < ETHER_HDRLEN) {
 		nd_print_trunc(ndo);
 		return (caplen);
-	}
-	if (length < ETHER_HDRLEN) {
-		nd_print_trunc(ndo);
-		return (length);
 	}
 
 	if (ndo->ndo_eflag) {
@@ -211,10 +208,6 @@ recurse:
 		if (caplen < 4) {
 			ND_PRINT("[|vlan]");
 			return (hdrlen + caplen);
-		}
-		if (length < 4) {
-			ND_PRINT("[|vlan]");
-			return (hdrlen + length);
 		}
 	        if (ndo->ndo_eflag) {
 			uint16_t tag = EXTRACT_BE_U_2(p);
