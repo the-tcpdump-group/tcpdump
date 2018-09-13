@@ -289,7 +289,7 @@ netanalyzer_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	 * Fail if we don't have enough data for the Hilscher pseudo-header.
 	 */
 	ndo->ndo_protocol = "netanalyzer_if";
-	if (h->len < 4 || h->caplen < 4) {
+	if (h->caplen < 4) {
 		nd_print_trunc(ndo);
 		return (h->caplen);
 	}
@@ -318,7 +318,7 @@ netanalyzer_transparent_if_print(netdissect_options *ndo,
 	 * preamble, and SOF.
 	 */
 	ndo->ndo_protocol = "netanalyzer_transparent_if";
-	if (h->len < 12 || h->caplen < 12) {
+	if (h->caplen < 12) {
 		nd_print_trunc(ndo);
 		return (h->caplen);
 	}
