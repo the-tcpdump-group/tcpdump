@@ -349,7 +349,8 @@ again:
 
 	case IPPROTO_AH:
 		if (!ND_TTEST_1(ipds->cp)) {
-			ND_PRINT("[|AH]");
+			ndo->ndo_protocol = "ah";
+			nd_print_trunc(ndo);
 			break;
 		}
 		ipds->nh = EXTRACT_U_1(ipds->cp);
