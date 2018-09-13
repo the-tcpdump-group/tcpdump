@@ -320,11 +320,11 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	u_int hdrlen;
 	int invalid_header = 0;
 
-	if(ndo->ndo_packet_number)
+	if (ndo->ndo_packet_number)
 		ND_PRINT("%5u  ", packets_captured);
 
 	/* Sanity checks on packet length / capture length */
-	if(h->caplen == 0) {
+	if (h->caplen == 0) {
 		invalid_header = 1;
 		ND_PRINT("[Invalid header: caplen==0");
 	}
@@ -471,7 +471,7 @@ ndo_error(netdissect_options *ndo, status_exit_codes_t status,
 {
 	va_list ap;
 
-	if(ndo->program_name)
+	if (ndo->program_name)
 		(void)fprintf(stderr, "%s: ", ndo->program_name);
 	va_start(ap, fmt);
 	(void)vfprintf(stderr, fmt, ap);
@@ -492,7 +492,7 @@ ndo_warning(netdissect_options *ndo, const char *fmt, ...)
 {
 	va_list ap;
 
-	if(ndo->program_name)
+	if (ndo->program_name)
 		(void)fprintf(stderr, "%s: ", ndo->program_name);
 	(void)fprintf(stderr, "WARNING: ");
 	va_start(ap, fmt);
