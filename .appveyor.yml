@@ -13,8 +13,15 @@ install:
   - appveyor DownloadFile http://www.winpcap.org/install/bin/WpdPack_4_1_2.zip
   - 7z x .\WpdPack_4_1_2.zip -oc:\projects\libpcap\Win32
 
+environment:
+  matrix:
+    - GENERATOR: "Visual Studio 12 2013"
+      SDK: WpdPack
+    - GENERATOR: "Visual Studio 12 2013 Win64"
+      SDK: WpdPack
+
 build_script:
   - md build
   - cd build
-  - cmake -DCMAKE_PREFIX_PATH=c:\projects\libpcap\Win32\WpdPack -G"Visual Studio 12 2013" ..
+  - cmake -DCMAKE_PREFIX_PATH=c:\projects\libpcap\Win32\%SDK% -G"%GENERATOR%" ..
   - msbuild -nologo -p:Configuration=Release tcpdump.sln
