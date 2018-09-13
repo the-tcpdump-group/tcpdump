@@ -102,6 +102,22 @@ else(PCAP_CONFIG)
   find_path(PCAP_INCLUDE_DIR pcap.h)
 
   # Try to find the library
+  if(WIN32)
+    # The 64-bit Packet.lib is located under /x64
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+      #
+      # For the WinPcap and Npcap SDKs, the Lib subdirectory of the top-level
+      # directory contains 32-bit libraries; the 64-bit libraries are in the
+      # Lib/x64 directory.
+      #
+      # The only way to *FORCE* CMake to look in the Lib/x64 directory
+      # without searching in the Lib directory first appears to be to set
+      # CMAKE_LIBRARY_ARCHITECTURE to "x64".
+      #
+      set(CMAKE_LIBRARY_ARCHITECTURE "x64")
+    endif()
+  endif()
+
   find_library(PCAP_LIBRARY pcap)
   if(WIN32)
     if(NOT PCAP_LIBRARY)
