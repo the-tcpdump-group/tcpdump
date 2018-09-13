@@ -290,7 +290,8 @@ recurse:
 		 * the enclosed type field.
 		 */
 		if (caplen < 4) {
-			ND_PRINT("[|vlan]");
+			ndo->ndo_protocol = "vlan";
+			nd_print_trunc(ndo);
 			return (hdrlen + caplen);
 		}
 	        if (ndo->ndo_eflag) {
@@ -477,7 +478,8 @@ recurse:
 		 * the enclosed type field.
 		 */
 		if (caplen < 4) {
-			ND_PRINT("[|vlan]");
+			ndo->ndo_protocol = "vlan";
+			nd_print_trunc(ndo);
 			return (hdrlen + caplen);
 		}
 	        if (ndo->ndo_eflag) {
