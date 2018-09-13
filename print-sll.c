@@ -293,10 +293,6 @@ recurse:
 			ND_PRINT("[|vlan]");
 			return (hdrlen + caplen);
 		}
-		if (length < 4) {
-			ND_PRINT("[|vlan]");
-			return (hdrlen + length);
-		}
 	        if (ndo->ndo_eflag) {
 			uint16_t tag = EXTRACT_BE_U_2(p);
 
@@ -483,10 +479,6 @@ recurse:
 		if (caplen < 4) {
 			ND_PRINT("[|vlan]");
 			return (hdrlen + caplen);
-		}
-		if (length < 4) {
-			ND_PRINT("[|vlan]");
-			return (hdrlen + length);
 		}
 	        if (ndo->ndo_eflag) {
 			uint16_t tag = EXTRACT_BE_U_2(p);
