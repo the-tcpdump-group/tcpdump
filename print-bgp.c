@@ -3113,8 +3113,8 @@ bgp_print(netdissect_options *ndo,
 
         hlen = EXTRACT_BE_U_2(bgp_header->bgp_len);
         if (hlen < BGP_SIZE) {
-            ND_PRINT("\n[|BGP Bogus header length %u < %u]", hlen,
-                      BGP_SIZE);
+            ND_PRINT("\nmessage length %u < %u", hlen, BGP_SIZE);
+            nd_print_invalid(ndo);
             break;
         }
 
