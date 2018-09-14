@@ -107,7 +107,7 @@ pktap_if_print(netdissect_options *ndo,
 	struct pcap_pkthdr nhdr;
 
 	ndo->ndo_protocol = "pktap_if";
-	if (caplen < sizeof(pktap_header_t) || length < sizeof(pktap_header_t)) {
+	if (caplen < sizeof(pktap_header_t)) {
 		nd_print_trunc(ndo);
 		return (caplen);
 	}
@@ -125,7 +125,7 @@ pktap_if_print(netdissect_options *ndo,
 		nd_print_trunc(ndo);
 		return (caplen);
 	}
-	if (caplen < hdrlen || length < hdrlen) {
+	if (caplen < hdrlen) {
 		nd_print_trunc(ndo);
 		return (caplen);
 	}

@@ -1695,7 +1695,7 @@ ppp_hdlc_if_print(netdissect_options *ndo,
 	switch (EXTRACT_U_1(p)) {
 
 	case PPP_ADDRESS:
-		if (caplen < 4 || length < 4) {
+		if (caplen < 4) {
 			nd_print_trunc(ndo);
 			return (caplen);
 		}

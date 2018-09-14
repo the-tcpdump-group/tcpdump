@@ -139,7 +139,7 @@ nflog_if_print(netdissect_options *ndo,
 	u_int length = h->len;
 
 	ndo->ndo_protocol = "nflog_if";
-	if (caplen < sizeof(nflog_hdr_t) || length < sizeof(nflog_hdr_t))
+	if (caplen < sizeof(nflog_hdr_t))
 		goto trunc;
 
 	ND_TCHECK_SIZE(hdr);
@@ -159,7 +159,7 @@ nflog_if_print(netdissect_options *ndo,
 		const nflog_tlv_t *tlv;
 
 		/* We have some data.  Do we have enough for the TLV header? */
-		if (caplen < sizeof(nflog_tlv_t) || length < sizeof(nflog_tlv_t))
+		if (caplen < sizeof(nflog_tlv_t))
 			goto trunc;	/* No. */
 
 		tlv = (const nflog_tlv_t *) p;
@@ -173,7 +173,7 @@ nflog_if_print(netdissect_options *ndo,
 			goto trunc;	/* Yes. Give up now. */
 
 		/* Do we have enough data for the full TLV? */
-		if (caplen < size || length < size)
+		if (caplen < size)
 			goto trunc;	/* No. */
 
 		if (EXTRACT_HE_U_2(tlv->tlv_type) == NFULA_PAYLOAD) {

@@ -191,7 +191,7 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 	u_char arc_type;
 
 	ndo->ndo_protocol = "arcnet_if";
-	if (caplen < ARC_HDRLEN || length < ARC_HDRLEN) {
+	if (caplen < ARC_HDRLEN) {
 		nd_print_trunc(ndo);
 		return (caplen);
 	}
@@ -212,7 +212,7 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 	}
 
 	if (phds) {
-		if (caplen < ARC_HDRNEWLEN || length < ARC_HDRNEWLEN) {
+		if (caplen < ARC_HDRNEWLEN) {
 			arcnet_print(ndo, p, length, 0, 0, 0);
 			ND_PRINT("[|phds]");
 			return (caplen);
@@ -220,7 +220,7 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 
 		flag = EXTRACT_U_1(ap->arc_flag);
 		if (flag == 0xff) {
-			if (caplen < ARC_HDRNEWLEN_EXC || length < ARC_HDRNEWLEN_EXC) {
+			if (caplen < ARC_HDRNEWLEN_EXC) {
 				arcnet_print(ndo, p, length, 0, 0, 0);
 				ND_PRINT("[|phds extended]");
 				return (caplen);
@@ -279,7 +279,7 @@ arcnet_linux_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, cons
 	u_char arc_type;
 
 	ndo->ndo_protocol = "arcnet_linux_if";
-	if (caplen < ARC_LINUX_HDRLEN || length < ARC_LINUX_HDRLEN) {
+	if (caplen < ARC_LINUX_HDRLEN) {
 		nd_print_trunc(ndo);
 		return (caplen);
 	}
@@ -290,7 +290,7 @@ arcnet_linux_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, cons
 	switch (arc_type) {
 	default:
 		archdrlen = ARC_LINUX_HDRNEWLEN;
-		if (caplen < ARC_LINUX_HDRNEWLEN || length < ARC_LINUX_HDRNEWLEN) {
+		if (caplen < ARC_LINUX_HDRNEWLEN) {
 			nd_print_trunc(ndo);
 			return (caplen);
 		}

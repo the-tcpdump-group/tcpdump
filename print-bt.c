@@ -54,7 +54,7 @@ bt_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *
 	const bluetooth_h4_header* hdr = (const bluetooth_h4_header*)p;
 
 	ndo->ndo_protocol = "bt_if";
-	if (caplen < BT_HDRLEN || length < BT_HDRLEN)
+	if (caplen < BT_HDRLEN)
 		goto trunc;
 	caplen -= BT_HDRLEN;
 	length -= BT_HDRLEN;

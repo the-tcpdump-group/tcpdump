@@ -253,7 +253,7 @@ atm_if_print(netdissect_options *ndo,
 	u_int hdrlen = 0;
 
 	ndo->ndo_protocol = "atm_if";
-	if (caplen < 1 || length < 1) {
+	if (caplen < 1) {
 		nd_print_trunc(ndo);
 		return (caplen);
 	}
@@ -270,7 +270,7 @@ atm_if_print(netdissect_options *ndo,
 	 * Must have at least a DSAP, an SSAP, and the first byte of the
 	 * control field.
 	 */
-	if (caplen < 3 || length < 3) {
+	if (caplen < 3) {
 		nd_print_trunc(ndo);
 		return (caplen);
 	}
@@ -302,7 +302,7 @@ atm_if_print(netdissect_options *ndo,
 		 * packets?  If so, could it be changed to use a
 		 * new DLT_IEEE802_6 value if we added it?
 		 */
-		if (caplen < 20 || length < 20) {
+		if (caplen < 20) {
 			nd_print_trunc(ndo);
 			return (caplen);
 		}
