@@ -21,7 +21,11 @@ environment:
       SDK: WpdPack
 
 build_script:
+  #
+  # Appveyor defaults to cmd.exe, so use cmd.exe syntax.
+  #
+  - type NUL >.devel
   - md build
   - cd build
   - cmake -DCMAKE_PREFIX_PATH=c:\projects\libpcap\Win32\%SDK% -G"%GENERATOR%" ..
-  - msbuild -nologo -p:Configuration=Release tcpdump.sln
+  - msbuild /m /nologo /p:Configuration=Release tcpdump.sln
