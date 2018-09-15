@@ -214,7 +214,8 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 	if (phds) {
 		if (caplen < ARC_HDRNEWLEN) {
 			arcnet_print(ndo, p, length, 0, 0, 0);
-			ND_PRINT("[|phds]");
+			ND_PRINT(" phds");
+			nd_print_trunc(ndo);
 			return (caplen);
 		}
 
@@ -222,7 +223,8 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 		if (flag == 0xff) {
 			if (caplen < ARC_HDRNEWLEN_EXC) {
 				arcnet_print(ndo, p, length, 0, 0, 0);
-				ND_PRINT("[|phds extended]");
+				ND_PRINT(" phds extended");
+				nd_print_trunc(ndo);
 				return (caplen);
 			}
 			flag = EXTRACT_U_1(ap->arc_flag2);
