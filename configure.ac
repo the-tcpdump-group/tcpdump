@@ -20,7 +20,14 @@ AC_CONFIG_SRCDIR(tcpdump.c)
 AC_CANONICAL_HOST
 
 AC_LBL_C_INIT_BEFORE_CC(V_INCLS)
+#
+# Try to enable as many C99 features as we can.
+# At minimum, we want C++/C99-style // comments.
+#
 AC_PROG_CC_C99
+if test "$ac_cv_prog_cc_c99" = "no"; then
+	AC_MSG_WARN([The C compiler does not support C99; there may be compiler errors])
+fi
 AC_LBL_C_INIT(V_CCOPT, V_INCLS)
 AC_LBL_C_INLINE
 
