@@ -874,7 +874,6 @@ AC_DEFUN(AC_LBL_DEVEL,
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wall)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wassign-enum)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wcast-qual)
-		    AC_LBL_CHECK_COMPILER_OPT($1, -Wdeclaration-after-statement)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wmissing-prototypes)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wold-style-definition)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wpedantic)
