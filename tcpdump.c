@@ -74,7 +74,7 @@ The Regents of the University of California.  All rights reserved.\n";
 #ifdef HAVE_GETOPT_LONG
 #include <getopt.h>
 #else
-#include "getopt_long.h"
+#include "missing/getopt_long.h"
 #endif
 /* Capsicum-specific code requires macros from <net/bpf.h>, which will fail
  * to compile if <pcap.h> has already been included; including the headers

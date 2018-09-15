@@ -263,7 +263,6 @@ HDR = \
 	ethertype.h \
 	extract.h \
 	funcattrs.h \
-	getopt_long.h \
 	getservent.h \
 	gmpls.h \
 	interface.h \
@@ -349,6 +348,7 @@ EXTRA_DIST = \
 	makemib \
 	missing/dlnames.c \
 	missing/datalinks.c \
+	missing/getopt_long.h \
 	missing/getopt_long.c \
 	missing/getservent.c \
 	missing/pcap_dump_ftell.c \
