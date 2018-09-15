@@ -985,7 +985,7 @@ static char *
 copy_argv(char **argv)
 {
 	char **p;
-	u_int len = 0;
+	size_t len = 0;
 	char *buf;
 	char *src, *dst;
 
