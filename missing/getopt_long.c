@@ -495,32 +495,16 @@ start:
 		}
 	}
 
-	optchar = (int)*place++;
-	/*
-	 * If the user specified "-" and  '-' isn't listed in
-	 * options, return -1 (non-option) as per POSIX.
-	 */
-	if (optchar == (int)'-' && *place == '\0')
-		return (-1);
-	if (optchar == (int)':') {
-		if (!*place)
-			++optind;
-#ifdef GNU_COMPATIBLE
-		if (PRINT_ERROR)
-			warnx(posixly_correct ? illoptchar : gnuoptchar,
-			      optchar);
-#else
-		if (PRINT_ERROR)
-			warnx(illoptchar, optchar);
-#endif
-		optopt = optchar;
-		return (BADCH);
-	}
-	oli = strchr(options, optchar);
-	if (oli == NULL) {
+	if ((optchar = (int)*place++) == (int)':' ||
+	    (optchar == (int)'-' && *place != '\0') ||
+	    (oli = strchr(options, optchar)) == NULL) {
 		/*
-		 * Unknown option character.
+		 * If the user specified "-" and  '-' isn't listed in
+		 * options, return -1 (non-option) as per POSIX.
+		 * Otherwise, it is an unknown option character (or ':').
 		 */
+		if (optchar == (int)'-' && *place == '\0')
+			return (-1);
 		if (!*place)
 			++optind;
 #ifdef GNU_COMPATIBLE
