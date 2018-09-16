@@ -584,42 +584,61 @@ ataddr_string(netdissect_options *ndo,
 	FILE *fp;
 
 	/*
-	 * if this is the first call, see if there's an AppleTalk
-	 * number to name map file.
+	 * Are we doing address to name resolution?
 	 */
-	if (first && (first = 0, !ndo->ndo_nflag)
-	    && (fp = fopen("/etc/atalk.names", "r"))) {
-		char line[256];
-		u_int i1, i2;
+	if (!ndo->ndo_nflag) {
+		/*
+		 * Yes.  Have we tried to open and read an AppleTalk
+		 * number to name map file?
+		 */
+		if (!first) {
+			/*
+			 * No; try to do so.
+			 */
+			first = 0;
+			fp = fopen("/etc/atalk.names", "r");
+			if (fp != NULL) {
+				char line[256];
+				u_int i1, i2;
 
-		while (fgets(line, sizeof(line), fp)) {
-			if (line[0] == '\n' || line[0] == 0 || line[0] == '#')
-				continue;
-			if (sscanf(line, "%u.%u %256s", &i1, &i2, nambuf) == 3)
-				/* got a hostname. */
-				i2 |= (i1 << 8);
-			else if (sscanf(line, "%u %256s", &i1, nambuf) == 2)
-				/* got a net name */
-				i2 = (i1 << 8) | 255;
-			else
-				continue;
+				while (fgets(line, sizeof(line), fp)) {
+					if (line[0] == '\n' || line[0] == 0 ||
+					    line[0] == '#')
+						continue;
+					if (sscanf(line, "%u.%u %256s", &i1,
+					    &i2, nambuf) == 3)
+						/* got a hostname. */
+						i2 |= (i1 << 8);
+					else if (sscanf(line, "%u %256s", &i1,
+					    nambuf) == 2)
+						/* got a net name */
+						i2 = (i1 << 8) | 255;
+					else
+						continue;
 
-			for (tp = &hnametable[i2 & (HASHNAMESIZE-1)];
-			     tp->nxt; tp = tp->nxt)
-				;
-			tp->addr = i2;
-			tp->nxt = newhnamemem(ndo);
-			tp->name = strdup(nambuf);
-			if (tp->name == NULL)
-				(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
-					"ataddr_string: strdup(nambuf)");
+					for (tp = &hnametable[i2 & (HASHNAMESIZE-1)];
+					     tp->nxt; tp = tp->nxt)
+						;
+					tp->addr = i2;
+					tp->nxt = newhnamemem(ndo);
+					tp->name = strdup(nambuf);
+					if (tp->name == NULL)
+						(*ndo->ndo_error)(ndo,
+						    S_ERR_ND_MEM_ALLOC,
+						    "ataddr_string: strdup(nambuf)");
+				}
+				fclose(fp);
+			}
 		}
-		fclose(fp);
-	}
 
-	for (tp = &hnametable[i & (HASHNAMESIZE-1)]; tp->nxt; tp = tp->nxt)
-		if (tp->addr == i)
-			return (tp->name);
+		/*
+		 * Now try to look up the address in the table.
+		 */
+		for (tp = &hnametable[i & (HASHNAMESIZE-1)]; tp->nxt;
+		    tp = tp->nxt)
+			if (tp->addr == i)
+				return (tp->name);
+	}
 
 	/* didn't have the node name -- see if we've got the net name */
 	i |= 255;
