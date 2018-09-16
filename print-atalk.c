@@ -630,15 +630,14 @@ ataddr_string(netdissect_options *ndo,
 				fclose(fp);
 			}
 		}
-
-		/*
-		 * Now try to look up the address in the table.
-		 */
-		for (tp = &hnametable[i & (HASHNAMESIZE-1)]; tp->nxt;
-		    tp = tp->nxt)
-			if (tp->addr == i)
-				return (tp->name);
 	}
+
+	/*
+	 * Now try to look up the address in the table.
+	 */
+	for (tp = &hnametable[i & (HASHNAMESIZE-1)]; tp->nxt; tp = tp->nxt)
+		if (tp->addr == i)
+			return (tp->name);
 
 	/* didn't have the node name -- see if we've got the net name */
 	i |= 255;
