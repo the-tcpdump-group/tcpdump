@@ -1673,8 +1673,8 @@ interp_reply(netdissect_options *ndo,
 					ND_TCHECK_8(dp + 2);
 					ND_PRINT(" verf %" PRIx64, EXTRACT_BE_U_8(dp + 2));
 				}
-				return;
 			}
+			return;
 		} else {
 			if (parseattrstat(ndo, dp, ndo->ndo_vflag, v3) != 0)
 				return;
@@ -1760,8 +1760,8 @@ interp_reply(netdissect_options *ndo,
 				ND_PRINT(" dir:");
 				if (!(dp = parse_wcc_data(ndo, dp, ndo->ndo_vflag)))
 					break;
-				return;
 			}
+			return;
 		} else {
 			if (parsestatus(ndo, dp, &er) != NULL)
 				return;
