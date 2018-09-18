@@ -323,8 +323,6 @@ trunc:
 	return NULL;
 }
 
-static int nfserr;		/* true if we error rather than trunc */
-
 static void
 print_sattr3(netdissect_options *ndo,
              const struct nfsv3_sattr *sa3, int verbose)
@@ -354,7 +352,6 @@ nfsreply_print(netdissect_options *ndo,
 	char srcid[20], dstid[20];	/*fits 32bit*/
 
 	ndo->ndo_protocol = "nfs";
-	nfserr = 0;		/* assume no error */
 	rp = (const struct sunrpc_msg *)bp;
 
 	ND_TCHECK_4(rp->rm_xid);
@@ -373,8 +370,7 @@ nfsreply_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	if (!nfserr)
-		nd_print_trunc(ndo);
+	nd_print_trunc(ndo);
 }
 
 void
@@ -390,7 +386,6 @@ nfsreply_noaddr_print(netdissect_options *ndo,
 	enum sunrpc_auth_stat rwhy;
 
 	ndo->ndo_protocol = "nfs";
-	nfserr = 0;		/* assume no error */
 	rp = (const struct sunrpc_msg *)bp;
 
 	ND_TCHECK_4(rp->rm_reply.rp_stat);
@@ -435,8 +430,7 @@ nfsreply_noaddr_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	if (!nfserr)
-		nd_print_trunc(ndo);
+	nd_print_trunc(ndo);
 }
 
 /*
@@ -588,7 +582,6 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "nfs";
 	ND_PRINT("%u", length);
-	nfserr = 0;		/* assume no error */
 	rp = (const struct sunrpc_msg *)bp;
 
 	if (!xid_map_enter(ndo, rp, bp2))	/* record proc number for later on */
@@ -609,9 +602,11 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 	case NFSPROC_FSSTAT:
 	case NFSPROC_FSINFO:
 	case NFSPROC_PATHCONF:
-		if ((dp = parsereq(ndo, rp, length)) != NULL &&
-		    parsefh(ndo, dp, v3) != NULL)
-			return;
+		dp = parsereq(ndo, rp, length);
+		if (dp == NULL)
+			goto trunc;
+		if (parsefh(ndo, dp, v3) == NULL)
+			goto trunc;
 		break;
 
 	case NFSPROC_LOOKUP:
@@ -619,231 +614,256 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 	case NFSPROC_MKDIR:
 	case NFSPROC_REMOVE:
 	case NFSPROC_RMDIR:
-		if ((dp = parsereq(ndo, rp, length)) != NULL &&
-		    parsefhn(ndo, dp, v3) != NULL)
-			return;
+		dp = parsereq(ndo, rp, length);
+		if (dp == NULL)
+			goto trunc;
+		if (parsefhn(ndo, dp, v3) == NULL)
+			goto trunc;
 		break;
 
 	case NFSPROC_ACCESS:
-		if ((dp = parsereq(ndo, rp, length)) != NULL &&
-		    (dp = parsefh(ndo, dp, v3)) != NULL) {
-			ND_TCHECK_4(dp);
-			access_flags = EXTRACT_BE_U_4(dp);
-			if (access_flags & ~NFSV3ACCESS_FULL) {
-				/* NFSV3ACCESS definitions aren't up to date */
-				ND_PRINT(" %04x", access_flags);
-			} else if ((access_flags & NFSV3ACCESS_FULL) == NFSV3ACCESS_FULL) {
-				ND_PRINT(" NFS_ACCESS_FULL");
-			} else {
-				char separator = ' ';
-				if (access_flags & NFSV3ACCESS_READ) {
-					ND_PRINT(" NFS_ACCESS_READ");
-					separator = '|';
-				}
-				if (access_flags & NFSV3ACCESS_LOOKUP) {
-					ND_PRINT("%cNFS_ACCESS_LOOKUP", separator);
-					separator = '|';
-				}
-				if (access_flags & NFSV3ACCESS_MODIFY) {
-					ND_PRINT("%cNFS_ACCESS_MODIFY", separator);
-					separator = '|';
-				}
-				if (access_flags & NFSV3ACCESS_EXTEND) {
-					ND_PRINT("%cNFS_ACCESS_EXTEND", separator);
-					separator = '|';
-				}
-				if (access_flags & NFSV3ACCESS_DELETE) {
-					ND_PRINT("%cNFS_ACCESS_DELETE", separator);
-					separator = '|';
-				}
-				if (access_flags & NFSV3ACCESS_EXECUTE)
-					ND_PRINT("%cNFS_ACCESS_EXECUTE", separator);
+		dp = parsereq(ndo, rp, length);
+		if (dp == NULL)
+			goto trunc;
+		dp = parsefh(ndo, dp, v3);
+		if (dp == NULL)
+			goto trunc;
+		ND_TCHECK_4(dp);
+		access_flags = EXTRACT_BE_U_4(dp);
+		if (access_flags & ~NFSV3ACCESS_FULL) {
+			/* NFSV3ACCESS definitions aren't up to date */
+			ND_PRINT(" %04x", access_flags);
+		} else if ((access_flags & NFSV3ACCESS_FULL) == NFSV3ACCESS_FULL) {
+			ND_PRINT(" NFS_ACCESS_FULL");
+		} else {
+			char separator = ' ';
+			if (access_flags & NFSV3ACCESS_READ) {
+				ND_PRINT(" NFS_ACCESS_READ");
+				separator = '|';
 			}
-			return;
+			if (access_flags & NFSV3ACCESS_LOOKUP) {
+				ND_PRINT("%cNFS_ACCESS_LOOKUP", separator);
+				separator = '|';
+			}
+			if (access_flags & NFSV3ACCESS_MODIFY) {
+				ND_PRINT("%cNFS_ACCESS_MODIFY", separator);
+				separator = '|';
+			}
+			if (access_flags & NFSV3ACCESS_EXTEND) {
+				ND_PRINT("%cNFS_ACCESS_EXTEND", separator);
+				separator = '|';
+			}
+			if (access_flags & NFSV3ACCESS_DELETE) {
+				ND_PRINT("%cNFS_ACCESS_DELETE", separator);
+				separator = '|';
+			}
+			if (access_flags & NFSV3ACCESS_EXECUTE)
+				ND_PRINT("%cNFS_ACCESS_EXECUTE", separator);
 		}
 		break;
 
 	case NFSPROC_READ:
-		if ((dp = parsereq(ndo, rp, length)) != NULL &&
-		    (dp = parsefh(ndo, dp, v3)) != NULL) {
-			if (v3) {
-				ND_TCHECK_4(dp + 2);
-				ND_PRINT(" %u bytes @ %" PRIu64,
-				       EXTRACT_BE_U_4(dp + 2),
-				       EXTRACT_BE_U_8(dp));
-			} else {
-				ND_TCHECK_4(dp + 1);
-				ND_PRINT(" %u bytes @ %u",
-				    EXTRACT_BE_U_4(dp + 1),
-				    EXTRACT_BE_U_4(dp));
-			}
-			return;
+		dp = parsereq(ndo, rp, length);
+		if (dp == NULL)
+			goto trunc;
+		dp = parsefh(ndo, dp, v3);
+		if (dp == NULL)
+			goto trunc;
+		if (v3) {
+			ND_TCHECK_4(dp + 2);
+			ND_PRINT(" %u bytes @ %" PRIu64,
+			       EXTRACT_BE_U_4(dp + 2),
+			       EXTRACT_BE_U_8(dp));
+		} else {
+			ND_TCHECK_4(dp + 1);
+			ND_PRINT(" %u bytes @ %u",
+			    EXTRACT_BE_U_4(dp + 1),
+			    EXTRACT_BE_U_4(dp));
 		}
 		break;
 
 	case NFSPROC_WRITE:
-		if ((dp = parsereq(ndo, rp, length)) != NULL &&
-		    (dp = parsefh(ndo, dp, v3)) != NULL) {
-			if (v3) {
-				ND_TCHECK_4(dp + 4);
-				ND_PRINT(" %u (%u) bytes @ %" PRIu64,
-						EXTRACT_BE_U_4(dp + 4),
-						EXTRACT_BE_U_4(dp + 2),
-						EXTRACT_BE_U_8(dp));
-				if (ndo->ndo_vflag) {
-					ND_PRINT(" <%s>",
-						tok2str(nfsv3_writemodes,
-							NULL, EXTRACT_BE_U_4(dp + 3)));
-				}
-			} else {
-				ND_TCHECK_4(dp + 3);
-				ND_PRINT(" %u (%u) bytes @ %u (%u)",
-						EXTRACT_BE_U_4(dp + 3),
-						EXTRACT_BE_U_4(dp + 2),
-						EXTRACT_BE_U_4(dp + 1),
-						EXTRACT_BE_U_4(dp));
+		dp = parsereq(ndo, rp, length);
+		if (dp == NULL)
+			goto trunc;
+		dp = parsefh(ndo, dp, v3);
+		if (dp == NULL)
+			goto trunc;
+		if (v3) {
+			ND_TCHECK_4(dp + 4);
+			ND_PRINT(" %u (%u) bytes @ %" PRIu64,
+					EXTRACT_BE_U_4(dp + 4),
+					EXTRACT_BE_U_4(dp + 2),
+					EXTRACT_BE_U_8(dp));
+			if (ndo->ndo_vflag) {
+				ND_PRINT(" <%s>",
+					tok2str(nfsv3_writemodes,
+						NULL, EXTRACT_BE_U_4(dp + 3)));
 			}
-			return;
+		} else {
+			ND_TCHECK_4(dp + 3);
+			ND_PRINT(" %u (%u) bytes @ %u (%u)",
+					EXTRACT_BE_U_4(dp + 3),
+					EXTRACT_BE_U_4(dp + 2),
+					EXTRACT_BE_U_4(dp + 1),
+					EXTRACT_BE_U_4(dp));
 		}
 		break;
 
 	case NFSPROC_SYMLINK:
-		if ((dp = parsereq(ndo, rp, length)) != NULL &&
-		    (dp = parsefhn(ndo, dp, v3)) != NULL) {
-			ND_PRINT(" ->");
-			if (v3 && (dp = parse_sattr3(ndo, dp, &sa3)) == NULL)
-				break;
-			if (parsefn(ndo, dp) == NULL)
-				break;
-			if (v3 && ndo->ndo_vflag)
-				print_sattr3(ndo, &sa3, ndo->ndo_vflag);
-			return;
-		}
+		dp = parsereq(ndo, rp, length);
+		if (dp == NULL)
+			goto trunc;
+		dp = parsefhn(ndo, dp, v3);
+		if (dp == NULL)
+			goto trunc;
+		ND_PRINT(" ->");
+		if (v3 && (dp = parse_sattr3(ndo, dp, &sa3)) == NULL)
+			goto trunc;
+		if (parsefn(ndo, dp) == NULL)
+			goto trunc;
+		if (v3 && ndo->ndo_vflag)
+			print_sattr3(ndo, &sa3, ndo->ndo_vflag);
 		break;
 
 	case NFSPROC_MKNOD:
-		if ((dp = parsereq(ndo, rp, length)) != NULL &&
-		    (dp = parsefhn(ndo, dp, v3)) != NULL) {
-			ND_TCHECK_4(dp);
-			type = (nfs_type) EXTRACT_BE_U_4(dp);
-			dp++;
-			if ((dp = parse_sattr3(ndo, dp, &sa3)) == NULL)
-				break;
-			ND_PRINT(" %s", tok2str(type2str, "unk-ft %u", type));
-			if (ndo->ndo_vflag && (type == NFCHR || type == NFBLK)) {
-				ND_TCHECK_4(dp + 1);
-				ND_PRINT(" %u/%u",
-				       EXTRACT_BE_U_4(dp),
-				       EXTRACT_BE_U_4(dp + 1));
-				dp += 2;
-			}
-			if (ndo->ndo_vflag)
-				print_sattr3(ndo, &sa3, ndo->ndo_vflag);
-			return;
+		dp = parsereq(ndo, rp, length);
+		if (dp == NULL)
+			goto trunc;
+		dp = parsefhn(ndo, dp, v3);
+		if (dp == NULL)
+			goto trunc;
+		ND_TCHECK_4(dp);
+		type = (nfs_type) EXTRACT_BE_U_4(dp);
+		dp++;
+		dp = parse_sattr3(ndo, dp, &sa3);
+		if (dp == NULL)
+			goto trunc;
+		ND_PRINT(" %s", tok2str(type2str, "unk-ft %u", type));
+		if (ndo->ndo_vflag && (type == NFCHR || type == NFBLK)) {
+			ND_TCHECK_4(dp + 1);
+			ND_PRINT(" %u/%u",
+			       EXTRACT_BE_U_4(dp),
+			       EXTRACT_BE_U_4(dp + 1));
+			dp += 2;
 		}
+		if (ndo->ndo_vflag)
+			print_sattr3(ndo, &sa3, ndo->ndo_vflag);
 		break;
 
 	case NFSPROC_RENAME:
-		if ((dp = parsereq(ndo, rp, length)) != NULL &&
-		    (dp = parsefhn(ndo, dp, v3)) != NULL) {
-			ND_PRINT(" ->");
-			if (parsefhn(ndo, dp, v3) != NULL)
-				return;
-		}
+		dp = parsereq(ndo, rp, length);
+		if (dp == NULL)
+			goto trunc;
+		dp = parsefhn(ndo, dp, v3);
+		if (dp == NULL)
+			goto trunc;
+		ND_PRINT(" ->");
+		if (parsefhn(ndo, dp, v3) == NULL)
+			goto trunc;
 		break;
 
 	case NFSPROC_LINK:
-		if ((dp = parsereq(ndo, rp, length)) != NULL &&
-		    (dp = parsefh(ndo, dp, v3)) != NULL) {
-			ND_PRINT(" ->");
-			if (parsefhn(ndo, dp, v3) != NULL)
-				return;
-		}
+		dp = parsereq(ndo, rp, length);
+		if (dp == NULL)
+			goto trunc;
+		dp = parsefh(ndo, dp, v3);
+		if (dp == NULL)
+			goto trunc;
+		ND_PRINT(" ->");
+		if (parsefhn(ndo, dp, v3) == NULL)
+			goto trunc;
 		break;
 
 	case NFSPROC_READDIR:
-		if ((dp = parsereq(ndo, rp, length)) != NULL &&
-		    (dp = parsefh(ndo, dp, v3)) != NULL) {
-			if (v3) {
-				ND_TCHECK_4(dp + 4);
-				/*
-				 * We shouldn't really try to interpret the
-				 * offset cookie here.
-				 */
-				ND_PRINT(" %u bytes @ %" PRId64,
-				    EXTRACT_BE_U_4(dp + 4),
-				    EXTRACT_BE_U_8(dp));
-				if (ndo->ndo_vflag) {
-					/*
-					 * This displays the 8 bytes
-					 * of the verifier in order,
-					 * from the low-order byte
-					 * to the high-order byte.
-					 */
-					ND_PRINT(" verf %08x%08x",
-						  EXTRACT_BE_U_4(dp + 2),
-						  EXTRACT_BE_U_4(dp + 3));
-				}
-			} else {
-				ND_TCHECK_4(dp + 1);
-				/*
-				 * Print the offset as signed, since -1 is
-				 * common, but offsets > 2^31 aren't.
-				 */
-				ND_PRINT(" %u bytes @ %u",
-				    EXTRACT_BE_U_4(dp + 1),
-				    EXTRACT_BE_U_4(dp));
-			}
-			return;
-		}
-		break;
-
-	case NFSPROC_READDIRPLUS:
-		if ((dp = parsereq(ndo, rp, length)) != NULL &&
-		    (dp = parsefh(ndo, dp, v3)) != NULL) {
+		dp = parsereq(ndo, rp, length);
+		if (dp == NULL)
+			goto trunc;
+		dp = parsefh(ndo, dp, v3);
+		if (dp == NULL)
+			goto trunc;
+		if (v3) {
 			ND_TCHECK_4(dp + 4);
 			/*
-			 * We don't try to interpret the offset
-			 * cookie here.
+			 * We shouldn't really try to interpret the
+			 * offset cookie here.
 			 */
 			ND_PRINT(" %u bytes @ %" PRId64,
-				EXTRACT_BE_U_4(dp + 4),
-				EXTRACT_BE_U_8(dp));
+			    EXTRACT_BE_U_4(dp + 4),
+			    EXTRACT_BE_U_8(dp));
 			if (ndo->ndo_vflag) {
-				ND_TCHECK_4(dp + 5);
 				/*
 				 * This displays the 8 bytes
 				 * of the verifier in order,
 				 * from the low-order byte
 				 * to the high-order byte.
 				 */
-				ND_PRINT(" max %u verf %08x%08x",
-				          EXTRACT_BE_U_4(dp + 5),
+				ND_PRINT(" verf %08x%08x",
 					  EXTRACT_BE_U_4(dp + 2),
 					  EXTRACT_BE_U_4(dp + 3));
 			}
-			return;
+		} else {
+			ND_TCHECK_4(dp + 1);
+			/*
+			 * Print the offset as signed, since -1 is
+			 * common, but offsets > 2^31 aren't.
+			 */
+			ND_PRINT(" %u bytes @ %u",
+			    EXTRACT_BE_U_4(dp + 1),
+			    EXTRACT_BE_U_4(dp));
+		}
+		break;
+
+	case NFSPROC_READDIRPLUS:
+		dp = parsereq(ndo, rp, length);
+		if (dp == NULL)
+			goto trunc;
+		dp = parsefh(ndo, dp, v3);
+		if (dp == NULL)
+			goto trunc;
+		ND_TCHECK_4(dp + 4);
+		/*
+		 * We don't try to interpret the offset
+		 * cookie here.
+		 */
+		ND_PRINT(" %u bytes @ %" PRId64,
+			EXTRACT_BE_U_4(dp + 4),
+			EXTRACT_BE_U_8(dp));
+		if (ndo->ndo_vflag) {
+			ND_TCHECK_4(dp + 5);
+			/*
+			 * This displays the 8 bytes
+			 * of the verifier in order,
+			 * from the low-order byte
+			 * to the high-order byte.
+			 */
+			ND_PRINT(" max %u verf %08x%08x",
+			          EXTRACT_BE_U_4(dp + 5),
+				  EXTRACT_BE_U_4(dp + 2),
+				  EXTRACT_BE_U_4(dp + 3));
 		}
 		break;
 
 	case NFSPROC_COMMIT:
-		if ((dp = parsereq(ndo, rp, length)) != NULL &&
-		    (dp = parsefh(ndo, dp, v3)) != NULL) {
-			ND_TCHECK_4(dp + 2);
-			ND_PRINT(" %u bytes @ %" PRIu64,
-				EXTRACT_BE_U_4(dp + 2),
-				EXTRACT_BE_U_8(dp));
-			return;
-		}
+		dp = parsereq(ndo, rp, length);
+		if (dp == NULL)
+			goto trunc;
+		dp = parsefh(ndo, dp, v3);
+		if (dp == NULL)
+			goto trunc;
+		ND_TCHECK_4(dp + 2);
+		ND_PRINT(" %u bytes @ %" PRIu64,
+			EXTRACT_BE_U_4(dp + 2),
+			EXTRACT_BE_U_8(dp));
 		break;
 
 	default:
-		return;
+		break;
 	}
+	return;
 
 trunc:
-	if (!nfserr)
-		nd_print_trunc(ndo);
+	nd_print_trunc(ndo);
 }
 
 /*
@@ -1064,7 +1084,7 @@ xid_map_find(const struct sunrpc_msg *rp, const u_char *bp, uint32_t *proc,
  */
 static const uint32_t *
 parserep(netdissect_options *ndo,
-         const struct sunrpc_msg *rp, u_int length)
+         const struct sunrpc_msg *rp, u_int length, int *nfserrp)
 {
 	const uint32_t *dp;
 	u_int len;
@@ -1102,7 +1122,7 @@ parserep(netdissect_options *ndo,
 	astat = (enum sunrpc_accept_stat) EXTRACT_BE_U_4(dp);
 	if (astat != SUNRPC_SUCCESS) {
 		ND_PRINT(" %s", tok2str(sunrpc_str, "ar_stat %u", astat));
-		nfserr = 1;		/* suppress trunc string */
+		*nfserrp = 1;		/* suppress trunc string */
 		return (NULL);
 	}
 	/* successful return */
@@ -1114,7 +1134,7 @@ trunc:
 
 static const uint32_t *
 parsestatus(netdissect_options *ndo,
-            const uint32_t *dp, u_int *er)
+            const uint32_t *dp, u_int *er, int *nfserrp)
 {
 	u_int errnum;
 
@@ -1127,7 +1147,7 @@ parsestatus(netdissect_options *ndo,
 		if (!ndo->ndo_qflag)
 			ND_PRINT(" ERROR: %s",
 			    tok2str(status2str, "unk %u", errnum));
-		nfserr = 1;
+		*nfserrp = 1;
 	}
 	return (dp + 1);
 trunc:
@@ -1211,11 +1231,11 @@ trunc:
 
 static int
 parseattrstat(netdissect_options *ndo,
-              const uint32_t *dp, int verbose, int v3)
+              const uint32_t *dp, int verbose, int v3, int *nfserrp)
 {
 	u_int er;
 
-	dp = parsestatus(ndo, dp, &er);
+	dp = parsestatus(ndo, dp, &er, nfserrp);
 	if (dp == NULL)
 		return (0);
 	if (er)
@@ -1226,11 +1246,12 @@ parseattrstat(netdissect_options *ndo,
 
 static int
 parsediropres(netdissect_options *ndo,
-              const uint32_t *dp)
+              const uint32_t *dp, int *nfserrp)
 {
 	u_int er;
 
-	if (!(dp = parsestatus(ndo, dp, &er)))
+	dp = parsestatus(ndo, dp, &er, nfserrp);
+	if (dp == NULL)
 		return (0);
 	if (er)
 		return (1);
@@ -1244,29 +1265,32 @@ parsediropres(netdissect_options *ndo,
 
 static int
 parselinkres(netdissect_options *ndo,
-             const uint32_t *dp, int v3)
+             const uint32_t *dp, int v3, int *nfserrp)
 {
 	u_int er;
 
-	dp = parsestatus(ndo, dp, &er);
+	dp = parsestatus(ndo, dp, &er, nfserrp);
 	if (dp == NULL)
 		return(0);
 	if (er)
 		return(1);
-	if (v3 && !(dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag)))
-		return (0);
+	if (v3) {
+		dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag);
+		if (dp == NULL)
+			return (0);
+	}
 	ND_PRINT(" ");
 	return (parsefn(ndo, dp) != NULL);
 }
 
 static int
 parsestatfs(netdissect_options *ndo,
-            const uint32_t *dp, int v3)
+            const uint32_t *dp, int v3, int *nfserrp)
 {
 	const struct nfs_statfs *sfsp;
 	u_int er;
 
-	dp = parsestatus(ndo, dp, &er);
+	dp = parsestatus(ndo, dp, &er, nfserrp);
 	if (dp == NULL)
 		return (0);
 	if (!v3 && er)
@@ -1278,7 +1302,8 @@ parsestatfs(netdissect_options *ndo,
 	if (v3) {
 		if (ndo->ndo_vflag)
 			ND_PRINT(" POST:");
-		if (!(dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag)))
+		dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag);
+		if (dp == NULL)
 			return (0);
 	}
 
@@ -1314,11 +1339,11 @@ trunc:
 
 static int
 parserddires(netdissect_options *ndo,
-             const uint32_t *dp)
+             const uint32_t *dp, int *nfserrp)
 {
 	u_int er;
 
-	dp = parsestatus(ndo, dp, &er);
+	dp = parsestatus(ndo, dp, &er, nfserrp);
 	if (dp == NULL)
 		return (0);
 	if (er)
@@ -1396,7 +1421,8 @@ parse_wcc_data(netdissect_options *ndo,
 {
 	if (verbose > 1)
 		ND_PRINT(" PRE:");
-	if (!(dp = parse_pre_op_attr(ndo, dp, verbose)))
+	dp = parse_pre_op_attr(ndo, dp, verbose);
+	if (dp == NULL)
 		return (0);
 
 	if (verbose)
@@ -1406,11 +1432,12 @@ parse_wcc_data(netdissect_options *ndo,
 
 static const uint32_t *
 parsecreateopres(netdissect_options *ndo,
-                 const uint32_t *dp, int verbose)
+                 const uint32_t *dp, int verbose, int *nfserrp)
 {
 	u_int er;
 
-	if (!(dp = parsestatus(ndo, dp, &er)))
+	dp = parsestatus(ndo, dp, &er, nfserrp);
+	if (dp == NULL)
 		return (0);
 	if (er)
 		dp = parse_wcc_data(ndo, dp, verbose);
@@ -1419,10 +1446,12 @@ parsecreateopres(netdissect_options *ndo,
 		if (!EXTRACT_BE_U_4(dp))
 			return (dp + 1);
 		dp++;
-		if (!(dp = parsefh(ndo, dp, 1)))
+		dp = parsefh(ndo, dp, 1);
+		if (dp == NULL)
 			return (0);
 		if (verbose) {
-			if (!(dp = parse_post_op_attr(ndo, dp, verbose)))
+			dp = parse_post_op_attr(ndo, dp, verbose);
+			if (dp == NULL)
 				return (0);
 			if (ndo->ndo_vflag > 1) {
 				ND_PRINT(" dir attr:");
@@ -1437,26 +1466,29 @@ trunc:
 
 static const uint32_t *
 parsewccres(netdissect_options *ndo,
-            const uint32_t *dp, int verbose)
+            const uint32_t *dp, int verbose, int *nfserrp)
 {
 	u_int er;
 
-	if (!(dp = parsestatus(ndo, dp, &er)))
+	dp = parsestatus(ndo, dp, &er, nfserrp);
+	if (dp == NULL)
 		return (0);
 	return parse_wcc_data(ndo, dp, verbose);
 }
 
 static const uint32_t *
 parsev3rddirres(netdissect_options *ndo,
-                const uint32_t *dp, int verbose)
+                const uint32_t *dp, int verbose, int *nfserrp)
 {
 	u_int er;
 
-	if (!(dp = parsestatus(ndo, dp, &er)))
+	dp = parsestatus(ndo, dp, &er, nfserrp);
+	if (dp == NULL)
 		return (0);
 	if (ndo->ndo_vflag)
 		ND_PRINT(" POST:");
-	if (!(dp = parse_post_op_attr(ndo, dp, verbose)))
+	dp = parse_post_op_attr(ndo, dp, verbose);
+	if (dp == NULL)
 		return (0);
 	if (er)
 		return dp;
@@ -1477,16 +1509,18 @@ trunc:
 
 static int
 parsefsinfo(netdissect_options *ndo,
-            const uint32_t *dp)
+            const uint32_t *dp, int *nfserrp)
 {
 	const struct nfsv3_fsinfo *sfp;
 	u_int er;
 
-	if (!(dp = parsestatus(ndo, dp, &er)))
+	dp = parsestatus(ndo, dp, &er, nfserrp);
+	if (dp == NULL)
 		return (0);
 	if (ndo->ndo_vflag)
 		ND_PRINT(" POST:");
-	if (!(dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag)))
+	dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag);
+	if (dp == NULL)
 		return (0);
 	if (er)
 		return (1);
@@ -1515,16 +1549,18 @@ trunc:
 
 static int
 parsepathconf(netdissect_options *ndo,
-              const uint32_t *dp)
+              const uint32_t *dp, int *nfserrp)
 {
 	u_int er;
 	const struct nfsv3_pathconf *spp;
 
-	if (!(dp = parsestatus(ndo, dp, &er)))
+	dp = parsestatus(ndo, dp, &er, nfserrp);
+	if (dp == NULL)
 		return (0);
 	if (ndo->ndo_vflag)
 		ND_PRINT(" POST:");
-	if (!(dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag)))
+	dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag);
+	if (dp == NULL)
 		return (0);
 	if (er)
 		return (1);
@@ -1546,11 +1582,13 @@ trunc:
 
 static void
 interp_reply(netdissect_options *ndo,
-             const struct sunrpc_msg *rp, uint32_t proc, uint32_t vers, int length)
+             const struct sunrpc_msg *rp, uint32_t proc, uint32_t vers,
+             int length)
 {
 	const uint32_t *dp;
 	int v3;
 	u_int er;
+	int nfserr = 0;
 
 	v3 = (vers == NFS_VER3);
 
@@ -1561,265 +1599,308 @@ interp_reply(netdissect_options *ndo,
 	switch (proc) {
 
 	case NFSPROC_GETATTR:
-		dp = parserep(ndo, rp, length);
-		if (dp != NULL && parseattrstat(ndo, dp, !ndo->ndo_qflag, v3) != 0)
-			return;
+		dp = parserep(ndo, rp, length, &nfserr);
+		if (dp == NULL)
+			goto trunc;
+		if (parseattrstat(ndo, dp, !ndo->ndo_qflag, v3, &nfserr) == 0)
+			goto trunc;
 		break;
 
 	case NFSPROC_SETATTR:
-		if (!(dp = parserep(ndo, rp, length)))
-			return;
+		dp = parserep(ndo, rp, length, &nfserr);
+		if (dp == NULL)
+			goto trunc;
 		if (v3) {
-			if (parsewccres(ndo, dp, ndo->ndo_vflag))
-				return;
+			if (parsewccres(ndo, dp, ndo->ndo_vflag, &nfserr) == 0)
+				goto trunc;
 		} else {
-			if (parseattrstat(ndo, dp, !ndo->ndo_qflag, 0) != 0)
-				return;
+			if (parseattrstat(ndo, dp, !ndo->ndo_qflag, 0, &nfserr) == 0)
+				goto trunc;
 		}
 		break;
 
 	case NFSPROC_LOOKUP:
-		if (!(dp = parserep(ndo, rp, length)))
-			break;
+		dp = parserep(ndo, rp, length, &nfserr);
+		if (dp == NULL)
+			goto trunc;
 		if (v3) {
-			if (!(dp = parsestatus(ndo, dp, &er)))
-				break;
+			dp = parsestatus(ndo, dp, &er, &nfserr);
+			if (dp == NULL)
+				goto trunc;
 			if (er) {
 				if (ndo->ndo_vflag > 1) {
 					ND_PRINT(" post dattr:");
 					dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag);
+					if (dp == NULL)
+						goto trunc;
 				}
 			} else {
-				if (!(dp = parsefh(ndo, dp, v3)))
-					break;
-				if ((dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag)) &&
-				    ndo->ndo_vflag > 1) {
+				dp = parsefh(ndo, dp, v3);
+				if (dp == NULL)
+					goto trunc;
+				dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag);
+				if (dp == NULL)
+					goto trunc;
+				if (ndo->ndo_vflag > 1) {
 					ND_PRINT(" post dattr:");
 					dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag);
+					if (dp == NULL)
+						goto trunc;
 				}
 			}
-			if (dp)
-				return;
 		} else {
-			if (parsediropres(ndo, dp) != 0)
-				return;
+			if (parsediropres(ndo, dp, &nfserr) == 0)
+				goto trunc;
 		}
 		break;
 
 	case NFSPROC_ACCESS:
-		if (!(dp = parserep(ndo, rp, length)))
-			break;
-		if (!(dp = parsestatus(ndo, dp, &er)))
-			break;
+		dp = parserep(ndo, rp, length, &nfserr);
+		if (dp == NULL)
+			goto trunc;
+		dp = parsestatus(ndo, dp, &er, &nfserr);
+		if (dp == NULL)
+			goto trunc;
 		if (ndo->ndo_vflag)
 			ND_PRINT(" attr:");
-		if (!(dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag)))
-			break;
+		dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag);
+		if (dp == NULL)
+			goto trunc;
 		if (!er) {
 			ND_TCHECK_4(dp);
 			ND_PRINT(" c %04x", EXTRACT_BE_U_4(dp));
 		}
-		return;
+		break;
 
 	case NFSPROC_READLINK:
-		dp = parserep(ndo, rp, length);
-		if (dp != NULL && parselinkres(ndo, dp, v3) != 0)
-			return;
+		dp = parserep(ndo, rp, length, &nfserr);
+		if (dp == NULL)
+			goto trunc;
+		if (parselinkres(ndo, dp, v3, &nfserr) == 0)
+			goto trunc;
 		break;
 
 	case NFSPROC_READ:
-		if (!(dp = parserep(ndo, rp, length)))
-			break;
+		dp = parserep(ndo, rp, length, &nfserr);
+		if (dp == NULL)
+			goto trunc;
 		if (v3) {
-			if (!(dp = parsestatus(ndo, dp, &er)))
-				break;
-			if (!(dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag)))
-				break;
-			if (er)
-				return;
-			if (ndo->ndo_vflag) {
-				ND_TCHECK_4(dp + 1);
-				ND_PRINT(" %u bytes", EXTRACT_BE_U_4(dp));
-				if (EXTRACT_BE_U_4(dp + 1))
-					ND_PRINT(" EOF");
+			dp = parsestatus(ndo, dp, &er, &nfserr);
+			if (dp == NULL)
+				goto trunc;
+			dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag);
+			if (dp == NULL)
+				goto trunc;
+			if (!er) {
+				if (ndo->ndo_vflag) {
+					ND_TCHECK_4(dp + 1);
+					ND_PRINT(" %u bytes", EXTRACT_BE_U_4(dp));
+					if (EXTRACT_BE_U_4(dp + 1))
+						ND_PRINT(" EOF");
+				}
 			}
-			return;
 		} else {
-			if (parseattrstat(ndo, dp, ndo->ndo_vflag, 0) != 0)
-				return;
+			if (parseattrstat(ndo, dp, ndo->ndo_vflag, 0, &nfserr) == 0)
+				goto trunc;
 		}
 		break;
 
 	case NFSPROC_WRITE:
-		if (!(dp = parserep(ndo, rp, length)))
-			break;
+		dp = parserep(ndo, rp, length, &nfserr);
+		if (dp == NULL)
+			goto trunc;
 		if (v3) {
-			if (!(dp = parsestatus(ndo, dp, &er)))
-				break;
-			if (!(dp = parse_wcc_data(ndo, dp, ndo->ndo_vflag)))
-				break;
-			if (er)
-				return;
-			if (ndo->ndo_vflag) {
-				ND_TCHECK_4(dp);
-				ND_PRINT(" %u bytes", EXTRACT_BE_U_4(dp));
-				if (ndo->ndo_vflag > 1) {
-					ND_TCHECK_4(dp + 1);
-					ND_PRINT(" <%s>",
-						tok2str(nfsv3_writemodes,
-							NULL, EXTRACT_BE_U_4(dp + 1)));
+			dp = parsestatus(ndo, dp, &er, &nfserr);
+			if (dp == NULL)
+				goto trunc;
+			dp = parse_wcc_data(ndo, dp, ndo->ndo_vflag);
+			if (dp == NULL)
+				goto trunc;
+			if (!er) {
+				if (ndo->ndo_vflag) {
+					ND_TCHECK_4(dp);
+					ND_PRINT(" %u bytes", EXTRACT_BE_U_4(dp));
+					if (ndo->ndo_vflag > 1) {
+						ND_TCHECK_4(dp + 1);
+						ND_PRINT(" <%s>",
+							tok2str(nfsv3_writemodes,
+								NULL, EXTRACT_BE_U_4(dp + 1)));
 
-					/* write-verf-cookie */
-					ND_TCHECK_8(dp + 2);
-					ND_PRINT(" verf %" PRIx64, EXTRACT_BE_U_8(dp + 2));
+						/* write-verf-cookie */
+						ND_TCHECK_8(dp + 2);
+						ND_PRINT(" verf %" PRIx64, EXTRACT_BE_U_8(dp + 2));
+					}
 				}
 			}
 			return;
 		} else {
-			if (parseattrstat(ndo, dp, ndo->ndo_vflag, v3) != 0)
-				return;
+			if (parseattrstat(ndo, dp, ndo->ndo_vflag, v3, &nfserr) == 0)
+				goto trunc;
 		}
 		break;
 
 	case NFSPROC_CREATE:
 	case NFSPROC_MKDIR:
-		if (!(dp = parserep(ndo, rp, length)))
-			break;
+		dp = parserep(ndo, rp, length, &nfserr);
+		if (dp == NULL)
+			goto trunc;
 		if (v3) {
-			if (parsecreateopres(ndo, dp, ndo->ndo_vflag) != NULL)
-				return;
+			if (parsecreateopres(ndo, dp, ndo->ndo_vflag, &nfserr) == NULL)
+				goto trunc;
 		} else {
-			if (parsediropres(ndo, dp) != 0)
-				return;
+			if (parsediropres(ndo, dp, &nfserr) == 0)
+				goto trunc;
 		}
 		break;
 
 	case NFSPROC_SYMLINK:
-		if (!(dp = parserep(ndo, rp, length)))
-			break;
+		dp = parserep(ndo, rp, length, &nfserr);
+		if (dp == NULL)
+			goto trunc;
 		if (v3) {
-			if (parsecreateopres(ndo, dp, ndo->ndo_vflag) != NULL)
-				return;
+			if (parsecreateopres(ndo, dp, ndo->ndo_vflag, &nfserr) == NULL)
+				goto trunc;
 		} else {
-			if (parsestatus(ndo, dp, &er) != NULL)
-				return;
+			if (parsestatus(ndo, dp, &er, &nfserr) == NULL)
+				goto trunc;
 		}
 		break;
 
 	case NFSPROC_MKNOD:
-		if (!(dp = parserep(ndo, rp, length)))
-			break;
-		if (parsecreateopres(ndo, dp, ndo->ndo_vflag) != NULL)
-			return;
+		dp = parserep(ndo, rp, length, &nfserr);
+		if (dp == NULL)
+			goto trunc;
+		if (parsecreateopres(ndo, dp, ndo->ndo_vflag, &nfserr) == NULL)
+			goto trunc;
 		break;
 
 	case NFSPROC_REMOVE:
 	case NFSPROC_RMDIR:
-		if (!(dp = parserep(ndo, rp, length)))
-			break;
+		dp = parserep(ndo, rp, length, &nfserr);
+		if (dp == NULL)
+			goto trunc;
 		if (v3) {
-			if (parsewccres(ndo, dp, ndo->ndo_vflag))
-				return;
+			if (parsewccres(ndo, dp, ndo->ndo_vflag, &nfserr) == NULL)
+				goto trunc;
 		} else {
-			if (parsestatus(ndo, dp, &er) != NULL)
-				return;
+			if (parsestatus(ndo, dp, &er, &nfserr) == NULL)
+				goto trunc;
 		}
 		break;
 
 	case NFSPROC_RENAME:
-		if (!(dp = parserep(ndo, rp, length)))
-			break;
+		dp = parserep(ndo, rp, length, &nfserr);
+		if (dp == NULL)
+			goto trunc;
 		if (v3) {
-			if (!(dp = parsestatus(ndo, dp, &er)))
-				break;
+			dp = parsestatus(ndo, dp, &er, &nfserr);
+			if (dp == NULL)
+				goto trunc;
 			if (ndo->ndo_vflag) {
 				ND_PRINT(" from:");
-				if (!(dp = parse_wcc_data(ndo, dp, ndo->ndo_vflag)))
-					break;
+				dp = parse_wcc_data(ndo, dp, ndo->ndo_vflag);
+				if (dp == NULL)
+					goto trunc;
 				ND_PRINT(" to:");
-				if (!(dp = parse_wcc_data(ndo, dp, ndo->ndo_vflag)))
-					break;
+				dp = parse_wcc_data(ndo, dp, ndo->ndo_vflag);
+				if (dp == NULL)
+					goto trunc;
 			}
-			return;
 		} else {
-			if (parsestatus(ndo, dp, &er) != NULL)
-				return;
+			if (parsestatus(ndo, dp, &er, &nfserr) == NULL)
+				goto trunc;
 		}
 		break;
 
 	case NFSPROC_LINK:
-		if (!(dp = parserep(ndo, rp, length)))
-			break;
+		dp = parserep(ndo, rp, length, &nfserr);
+		if (dp == NULL)
+			goto trunc;
 		if (v3) {
-			if (!(dp = parsestatus(ndo, dp, &er)))
-				break;
+			dp = parsestatus(ndo, dp, &er, &nfserr);
+			if (dp == NULL)
+				goto trunc;
 			if (ndo->ndo_vflag) {
 				ND_PRINT(" file POST:");
-				if (!(dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag)))
-					break;
+				dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag);
+				if (dp == NULL)
+					goto trunc;
 				ND_PRINT(" dir:");
-				if (!(dp = parse_wcc_data(ndo, dp, ndo->ndo_vflag)))
-					break;
+				dp = parse_wcc_data(ndo, dp, ndo->ndo_vflag);
+				if (dp == NULL)
+					goto trunc;
 			}
 			return;
 		} else {
-			if (parsestatus(ndo, dp, &er) != NULL)
-				return;
+			if (parsestatus(ndo, dp, &er, &nfserr) == NULL)
+				goto trunc;
 		}
 		break;
 
 	case NFSPROC_READDIR:
-		if (!(dp = parserep(ndo, rp, length)))
-			break;
+		dp = parserep(ndo, rp, length, &nfserr);
+		if (dp == NULL)
+			goto trunc;
 		if (v3) {
-			if (parsev3rddirres(ndo, dp, ndo->ndo_vflag))
-				return;
+			if (parsev3rddirres(ndo, dp, ndo->ndo_vflag, &nfserr) == NULL)
+				goto trunc;
 		} else {
-			if (parserddires(ndo, dp) != 0)
-				return;
+			if (parserddires(ndo, dp, &nfserr) == 0)
+				goto trunc;
 		}
 		break;
 
 	case NFSPROC_READDIRPLUS:
-		if (!(dp = parserep(ndo, rp, length)))
-			break;
-		if (parsev3rddirres(ndo, dp, ndo->ndo_vflag))
-			return;
+		dp = parserep(ndo, rp, length, &nfserr);
+		if (dp == NULL)
+			goto trunc;
+		if (parsev3rddirres(ndo, dp, ndo->ndo_vflag, &nfserr) == NULL)
+			goto trunc;
 		break;
 
 	case NFSPROC_FSSTAT:
-		dp = parserep(ndo, rp, length);
-		if (dp != NULL && parsestatfs(ndo, dp, v3) != 0)
-			return;
+		dp = parserep(ndo, rp, length, &nfserr);
+		if (dp == NULL)
+			goto trunc;
+		if (parsestatfs(ndo, dp, v3, &nfserr) == 0)
+			goto trunc;
 		break;
 
 	case NFSPROC_FSINFO:
-		dp = parserep(ndo, rp, length);
-		if (dp != NULL && parsefsinfo(ndo, dp) != 0)
-			return;
+		dp = parserep(ndo, rp, length, &nfserr);
+		if (dp == NULL)
+			goto trunc;
+		if (parsefsinfo(ndo, dp, &nfserr) == 0)
+			goto trunc;
 		break;
 
 	case NFSPROC_PATHCONF:
-		dp = parserep(ndo, rp, length);
-		if (dp != NULL && parsepathconf(ndo, dp) != 0)
-			return;
+		dp = parserep(ndo, rp, length, &nfserr);
+		if (dp == NULL)
+			goto trunc;
+		if (parsepathconf(ndo, dp, &nfserr) == 0)
+			goto trunc;
 		break;
 
 	case NFSPROC_COMMIT:
-		dp = parserep(ndo, rp, length);
-		if (dp != NULL && (dp = parsewccres(ndo, dp, ndo->ndo_vflag)) != 0) {
-			if (ndo->ndo_vflag > 1) {
-				/* write-verf-cookie */
-				ND_TCHECK_8(dp);
-				ND_PRINT(" verf %" PRIx64, EXTRACT_BE_U_8(dp));
-			}
-			return;
+		dp = parserep(ndo, rp, length, &nfserr);
+		if (dp == NULL)
+			goto trunc;
+		dp = parsewccres(ndo, dp, ndo->ndo_vflag, &nfserr);
+		if (dp == NULL)
+			goto trunc;
+		if (ndo->ndo_vflag > 1) {
+			/* write-verf-cookie */
+			ND_TCHECK_8(dp);
+			ND_PRINT(" verf %" PRIx64, EXTRACT_BE_U_8(dp));
 		}
 		break;
 
 	default:
-		return;
+		break;
 	}
+	return;
+
 trunc:
 	if (!nfserr)
 		nd_print_trunc(ndo);
