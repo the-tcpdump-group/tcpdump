@@ -286,7 +286,7 @@ struct netdissect_options {
 #define MAXIMUM_SNAPLEN	262144
 
 /*
- * True if "l" bytes of "var" were captured.
+ * True if "l" bytes from "p" were captured.
  *
  * The "ndo->ndo_snapend - (l) <= ndo->ndo_snapend" checks to make sure
  * "l" isn't so large that "ndo->ndo_snapend - (l)" underflows.
