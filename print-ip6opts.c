@@ -41,7 +41,7 @@
 
 #include "ip6.h"
 
-static void
+static int
 ip6_sopt_print(netdissect_options *ndo, const u_char *bp, int len)
 {
     int i;
@@ -79,20 +79,20 @@ ip6_sopt_print(netdissect_options *ndo, const u_char *bp, int len)
 	    break;
 	}
     }
-    return;
+    return 0;
 
 trunc:
-    ND_PRINT("[trunc] ");
+    return -1;
 }
 
-static void
+static int
 ip6_opt_print(netdissect_options *ndo, const u_char *bp, int len)
 {
     int i;
     int optlen = 0;
 
     if (len == 0)
-        return;
+        return 0;
     for (i = 0; i < len; i += optlen) {
 	if (EXTRACT_U_1(bp + i) == IP6OPT_PAD1)
 	    optlen = 1;
@@ -148,9 +148,10 @@ ip6_opt_print(netdissect_options *ndo, const u_char *bp, int len)
 		goto trunc;
 	    }
 	    ND_PRINT("(homeaddr: %s", ip6addr_string(ndo, bp + i + 2));
-            if (EXTRACT_U_1(bp + i + 1) > IP6OPT_HOMEADDR_MINLEN - 2) {
-		ip6_sopt_print(ndo, bp + i + IP6OPT_HOMEADDR_MINLEN,
-                               (optlen - IP6OPT_HOMEADDR_MINLEN));
+	    if (EXTRACT_U_1(bp + i + 1) > IP6OPT_HOMEADDR_MINLEN - 2) {
+		if (ip6_sopt_print(ndo, bp + i + IP6OPT_HOMEADDR_MINLEN,
+				   (optlen - IP6OPT_HOMEADDR_MINLEN)) == -1)
+			goto trunc;
 	    }
             ND_PRINT(")");
 	    break;
@@ -164,10 +165,10 @@ ip6_opt_print(netdissect_options *ndo, const u_char *bp, int len)
 	}
     }
     ND_PRINT(" ");
-    return;
+    return 0;
 
 trunc:
-    ND_PRINT("[trunc] ");
+    return -1;
 }
 
 int
@@ -182,13 +183,14 @@ hbhopt_print(netdissect_options *ndo, const u_char *bp)
     ND_TCHECK_LEN(dp, hbhlen);
     ND_PRINT("HBH ");
     if (ndo->ndo_vflag)
-	ip6_opt_print(ndo, (const u_char *)dp + sizeof(*dp), hbhlen - sizeof(*dp));
+	if (ip6_opt_print(ndo, (const u_char *)dp + sizeof(*dp),
+			  hbhlen - sizeof(*dp)) == -1)
+	    goto trunc;
+    return hbhlen;
 
-    return(hbhlen);
-
-  trunc:
+trunc:
     nd_print_trunc(ndo);
-    return(-1);
+    return -1;
 }
 
 int
@@ -203,13 +205,14 @@ dstopt_print(netdissect_options *ndo, const u_char *bp)
     ND_TCHECK_LEN(dp, dstoptlen);
     ND_PRINT("DSTOPT ");
     if (ndo->ndo_vflag) {
-	ip6_opt_print(ndo, (const u_char *)dp + sizeof(*dp),
-	    dstoptlen - sizeof(*dp));
+	if (ip6_opt_print(ndo, (const u_char *)dp + sizeof(*dp),
+			  dstoptlen - sizeof(*dp)) == -1)
+	    goto trunc;
     }
 
-    return(dstoptlen);
+    return dstoptlen;
 
-  trunc:
+trunc:
     nd_print_trunc(ndo);
-    return(-1);
+    return -1;
 }
