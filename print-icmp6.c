@@ -479,7 +479,7 @@ struct rr_result {		/* router renumbering result message */
 static const char *get_rtpref(u_int);
 static const char *get_lifetime(uint32_t);
 static void print_lladdr(netdissect_options *ndo, const u_char *, size_t);
-static void icmp6_opt_print(netdissect_options *ndo, const u_char *, int);
+static int icmp6_opt_print(netdissect_options *ndo, const u_char *, int);
 static void mld6_print(netdissect_options *ndo, const u_char *);
 static void mldv2_report_print(netdissect_options *ndo, const u_char *, u_int);
 static void mldv2_query_print(netdissect_options *ndo, const u_char *, u_int);
@@ -1187,8 +1187,9 @@ icmp6_print(netdissect_options *ndo,
 	case ND_ROUTER_SOLICIT:
 #define RTSOLLEN 8
 		if (ndo->ndo_vflag) {
-			icmp6_opt_print(ndo, (const u_char *)dp + RTSOLLEN,
-					length - RTSOLLEN);
+			if (icmp6_opt_print(ndo, (const u_char *)dp + RTSOLLEN,
+					    length - RTSOLLEN) == -1)
+				goto trunc;
 		}
 		break;
 	case ND_ROUTER_ADVERT:
@@ -1207,8 +1208,9 @@ icmp6_print(netdissect_options *ndo,
                                   EXTRACT_BE_U_4(p->nd_ra_reachable),
                                   EXTRACT_BE_U_4(p->nd_ra_retransmit));
 
-			icmp6_opt_print(ndo, (const u_char *)dp + RTADVLEN,
-					length - RTADVLEN);
+			if (icmp6_opt_print(ndo, (const u_char *)dp + RTADVLEN,
+					    length - RTADVLEN) == -1)
+				goto trunc;
 		}
 		break;
 	case ND_NEIGHBOR_SOLICIT:
@@ -1219,8 +1221,9 @@ icmp6_print(netdissect_options *ndo,
 		ND_PRINT(", who has %s", ip6addr_string(ndo, p->nd_ns_target));
 		if (ndo->ndo_vflag) {
 #define NDSOLLEN 24
-			icmp6_opt_print(ndo, (const u_char *)dp + NDSOLLEN,
-					length - NDSOLLEN);
+			if (icmp6_opt_print(ndo, (const u_char *)dp + NDSOLLEN,
+					    length - NDSOLLEN) == -1)
+				goto trunc;
 		}
 	    }
 		break;
@@ -1238,8 +1241,9 @@ icmp6_print(netdissect_options *ndo,
                                              "none",
                                              EXTRACT_BE_U_4(p->nd_na_flags_reserved)));
 #define NDADVLEN 24
-			icmp6_opt_print(ndo, (const u_char *)dp + NDADVLEN,
-					length - NDADVLEN);
+			if (icmp6_opt_print(ndo, (const u_char *)dp + NDADVLEN,
+					    length - NDADVLEN) == -1)
+				goto trunc;
 #undef NDADVLEN
 		}
 	    }
@@ -1255,8 +1259,9 @@ icmp6_print(netdissect_options *ndo,
 		ND_PRINT(" to %s", ip6addr_string(ndo, p->nd_rd_target));
 #define REDIRECTLEN 40
 		if (ndo->ndo_vflag) {
-			icmp6_opt_print(ndo, (const u_char *)dp + REDIRECTLEN,
-					length - REDIRECTLEN);
+			if (icmp6_opt_print(ndo, (const u_char *)dp + REDIRECTLEN,
+					    length - REDIRECTLEN) == -1)
+				goto trunc;
 #undef REDIRECTLEN
 		}
 	    }
@@ -1310,8 +1315,9 @@ icmp6_print(netdissect_options *ndo,
 			if (flags & 0x4000)
 				ND_PRINT("O");
 #define MPADVLEN 8
-			icmp6_opt_print(ndo, (const u_char *)dp + MPADVLEN,
-					length - MPADVLEN);
+			if (icmp6_opt_print(ndo, (const u_char *)dp + MPADVLEN,
+					    length - MPADVLEN) == -1)
+				goto trunc;
 		}
 		break;
         case ND_RPL_MESSAGE:
@@ -1405,7 +1411,7 @@ get_upperlayer(netdissect_options *ndo, const u_char *bp, u_int *prot)
 	return(NULL);		/* should be notreached, though */
 }
 
-static void
+static int
 icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 {
 	const struct nd_opt_hdr *op;
@@ -1431,7 +1437,7 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 
 		ND_TCHECK_1(op->nd_opt_len);
 		if (resid <= 0)
-			return;
+			return 0;
 		opt_type = EXTRACT_U_1(op->nd_opt_type);
 		opt_len = EXTRACT_U_1(op->nd_opt_len);
 		if (opt_len == 0)
@@ -1538,7 +1544,7 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 		default:
                         if (ndo->ndo_vflag <= 1) {
                                 print_unknown_data(ndo,cp+2,"\n\t  ", (opt_len << 3) - 2); /* skip option header */
-                            return;
+                            return 0;
                         }
                         break;
 		}
@@ -1549,11 +1555,10 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 		cp += opt_len << 3;
 		resid -= opt_len << 3;
 	}
-	return;
+	return 0;
 
- trunc:
-	ND_PRINT("[ndp opt]");
-	return;
+trunc:
+	return -1;
 }
 
 static void
