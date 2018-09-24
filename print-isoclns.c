@@ -2279,7 +2279,8 @@ isis_print(netdissect_options *ndo,
     uint8_t ext_is_len, ext_ip_len, mt_len;
     uint8_t isis_subtlv_idrp;
     const uint8_t *optr, *pptr, *tptr;
-    u_short packet_len,pdu_len, key_id;
+    u_int packet_len;
+    u_short pdu_len, key_id;
     u_int i,vendor_id;
     int sigcheck;
 
