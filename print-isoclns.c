@@ -1078,7 +1078,7 @@ clnp_print(netdissect_options *ndo,
             /* dump the PDU specific data */
             if (length-(pptr-optr) > 0) {
                 ND_PRINT("\n\t  undecoded non-header data, length %u", length-li);
-                print_unknown_data(ndo, pptr, "\n\t  ", length - (pptr - optr));
+                print_unknown_data(ndo, pptr, "\n\t  ", length - (int)(pptr - optr));
             }
         }
 
@@ -1323,7 +1323,7 @@ esis_print(netdissect_options *ndo,
 	default:
 		if (ndo->ndo_vflag <= 1) {
 			if (pptr < ndo->ndo_snapend)
-				print_unknown_data(ndo, pptr, "\n\t  ", ndo->ndo_snapend - pptr);
+				print_unknown_data(ndo, pptr, "\n\t  ", (int)(ndo->ndo_snapend - pptr));
 		}
 		return;
 	}
@@ -2106,7 +2106,7 @@ trunc:
  * it is called from various MT-TLVs (222,229,235,237)
  */
 
-static int
+static u_int
 isis_print_mtid(netdissect_options *ndo,
                 const uint8_t *tptr, const char *ident)
 {
@@ -2133,7 +2133,7 @@ isis_print_mtid(netdissect_options *ndo,
  * the amount of processed bytes
  */
 
-static int
+static u_int
 isis_print_extd_ip_reach(netdissect_options *ndo,
                          const uint8_t *tptr, const char *ident, uint16_t afi)
 {
@@ -2276,7 +2276,7 @@ isis_print(netdissect_options *ndo,
 
     uint8_t version, pdu_version, fixed_len;
     uint8_t pdu_type, pdu_max_area, max_area, pdu_id_length, id_length, tlv_type, tlv_len, tmp, alen, lan_alen, prefix_len;
-    uint8_t ext_is_len, ext_ip_len, mt_len;
+    u_int ext_is_len, ext_ip_len, mt_len;
     uint8_t isis_subtlv_idrp;
     const uint8_t *optr, *pptr, *tptr;
     u_int packet_len;
@@ -3058,7 +3058,7 @@ isis_print(netdissect_options *ndo,
              * to avoid conflicts the checksum TLV is zeroed.
              * see rfc3358 for details
              */
-            osi_print_cksum(ndo, optr, EXTRACT_BE_U_2(tptr), tptr-optr,
+            osi_print_cksum(ndo, optr, EXTRACT_BE_U_2(tptr), (int)(tptr-optr),
                             length);
 	    break;
 
@@ -3269,7 +3269,7 @@ osi_print_cksum(netdissect_options *ndo, const uint8_t *pptr,
                 ND_PRINT(" (unverified)");
         } else {
 #if 0
-                printf("\nosi_print_cksum: %p %u %u\n", pptr, checksum_offset, length);
+                printf("\nosi_print_cksum: %p %d %u\n", pptr, checksum_offset, length);
 #endif
                 calculated_checksum = create_osi_cksum(pptr, checksum_offset, length);
                 if (checksum == calculated_checksum) {
