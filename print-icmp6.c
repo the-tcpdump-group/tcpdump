@@ -954,7 +954,7 @@ rpl_daoack_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT(" [|dao-truncated]");
+	nd_print_trunc(ndo);
 	return;
 
 tooshort:
