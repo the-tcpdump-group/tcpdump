@@ -802,7 +802,7 @@ init_servarray(netdissect_options *ndo)
 
 		while (table->name)
 			table = table->nxt;
-		if (ndo->ndo_nflag) {
+		if (ndo->ndo_nflag > 1) {
 			(void)nd_snprintf(buf, sizeof(buf), "%d", port);
 			table->name = strdup(buf);
 		} else
@@ -1226,7 +1226,7 @@ init_addrtoname(netdissect_options *ndo, uint32_t localnet, uint32_t mask)
 		f_localnet = localnet;
 		f_netmask = mask;
 	}
-	if (ndo->ndo_nflag)
+	if (ndo->ndo_nflag > 1)
 		/*
 		 * Simplest way to suppress names.
 		 */

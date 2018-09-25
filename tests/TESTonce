@@ -21,7 +21,7 @@ if ($^O eq 'MSWin32') {
 else {
     # we used to do this as a nice pipeline, but the problem is that $r fails to
     # to be set properly if the tcpdump core dumps.
-    $r = system "../tcpdump 2>/dev/null -# -n -r $input $options >NEW/$output";
+    $r = system "../tcpdump 2>/dev/null -# -nn -r $input $options >NEW/$output";
     if($r != 0) {
         # this means tcpdump failed.
         open(OUTPUT, ">>"."NEW/$output") || die "fail to open $output\n";
