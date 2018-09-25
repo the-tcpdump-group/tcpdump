@@ -150,15 +150,6 @@ sliplink_print(netdissect_options *ndo,
 		dir = -1;
 		break;
 	}
-	if (ndo->ndo_nflag) {
-		/* XXX just dump the header */
-		int i;
-
-		for (i = SLX_CHDR; i < SLX_CHDR + CHDR_LEN - 1; ++i)
-			ND_PRINT("%02x.", EXTRACT_U_1(p + i));
-		ND_PRINT("%02x: ", EXTRACT_U_1(p + SLX_CHDR + CHDR_LEN - 1));
-		return 0;
-	}
 	switch (EXTRACT_U_1(p + SLX_CHDR) & 0xf0) {
 
 	case TYPE_IP:
