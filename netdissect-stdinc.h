@@ -215,6 +215,7 @@
    * #defines to let us use them.
    */
   #define isascii __isascii
+  #define isatty _isatty
   #define stat _stat
   #define strdup _strdup
   #define open _open
