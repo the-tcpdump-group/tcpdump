@@ -207,6 +207,10 @@ static void print_attr_address(netdissect_options *, const u_char *, u_int, u_sh
 static void print_attr_address6(netdissect_options *, const u_char *, u_int, u_short);
 static void print_attr_netmask6(netdissect_options *, const u_char *, u_int, u_short);
 static void print_attr_mip6_home_link_prefix(netdissect_options *, const u_char *, u_int, u_short);
+static void print_attr_operator_name(netdissect_options *, const u_char *, u_int, u_short);
+static void print_attr_location_information(netdissect_options *, const u_char *, u_int, u_short);
+static void print_attr_location_data(netdissect_options *, const u_char *, u_int, u_short);
+static void print_basic_location_policy_rules(netdissect_options *, const u_char *, u_int, u_short);
 static void print_attr_time(netdissect_options *, const u_char *, u_int, u_short);
 static void print_attr_vector64(netdissect_options *, register const u_char *, u_int, u_short);
 static void print_attr_strange(netdissect_options *, const u_char *, u_int, u_short);
@@ -480,6 +484,33 @@ static const struct mip6_feature_vector {
                                  { INTER_MAG_ROUTING_SUPPORTED, "INTER_MAG_ROUTING_SUPPORTED" },
                                };
 
+#define OPERATOR_NAME_TADIG 0x30
+#define OPERATOR_NAME_REALM 0x31
+#define OPERATOR_NAME_E212  0x32
+#define OPERATOR_NAME_ICC   0x33
+static const struct tok operator_name_vector[] = {
+                                 { OPERATOR_NAME_TADIG, "TADIG" },
+                                 { OPERATOR_NAME_REALM, "REALM" },
+                                 { OPERATOR_NAME_E212,  "E212"  },
+                                 { OPERATOR_NAME_ICC,   "ICC"   },
+                                 { 0, NULL }
+                               };
+
+#define LOCATION_INFORMATION_CODE_CIVIC      0
+#define LOCATION_INFORMATION_CODE_GEOSPATIAL 1
+static const struct tok location_information_code_vector[] = {
+                                 { LOCATION_INFORMATION_CODE_CIVIC     , "Civic"      },
+                                 { LOCATION_INFORMATION_CODE_GEOSPATIAL, "Geospatial" },
+                                 { 0, NULL }
+                               };
+
+#define LOCATION_INFORMATION_ENTITY_USER   0
+#define LOCATION_INFORMATION_ENTITY_RADIUS 1
+static const struct tok location_information_entity_vector[] = {
+                                 { LOCATION_INFORMATION_ENTITY_USER,   "User"   },
+                                 { LOCATION_INFORMATION_ENTITY_RADIUS, "RADIUS" },
+                                 { 0, NULL }
+                               };
 
 static const struct attrtype {
                   const char *name;      /* Attribute name                 */
@@ -615,6 +646,10 @@ static const struct attrtype {
      { "Delegated-IPv6-Prefix",           NULL, 0, 0, print_attr_netmask6 },
      { "MIP6-Feature-Vector",             NULL, 0, 0, print_attr_vector64 },
      { "MIP6-Home-Link-Prefix",           NULL, 0, 0, print_attr_mip6_home_link_prefix },
+     { "Operator-Name",                   NULL, 0, 0, print_attr_operator_name },
+     { "Location-Information",            NULL, 0, 0, print_attr_location_information },
+     { "Location-Data",                   NULL, 0, 0, print_attr_location_data },
+     { "Basic-Location-Policy-Rules",     NULL, 0, 0, print_basic_location_policy_rules }
   };
 
 
@@ -1001,6 +1036,143 @@ print_attr_mip6_home_link_prefix(netdissect_options *ndo,
    trunc:
      nd_print_trunc(ndo);
 }
+
+static void
+print_attr_operator_name(netdissect_options *ndo,
+                    const u_char *data, u_int length, u_short attr_code _U_)
+{
+   u_int i;
+   u_int namespace_value;
+
+   ND_TCHECK_LEN(data, length);
+   if (length < 2)
+   {
+      ND_PRINT("ERROR: length %u < 2", length);
+      return;
+   }
+   namespace_value = EXTRACT_U_1(data);
+   data++;
+   ND_PRINT("[%s] ", tok2str(operator_name_vector, "Namespace %u not known", namespace_value));
+
+   for (i=0; i < length-1 && EXTRACT_U_1(data); i++, data++)
+      ND_PRINT("%c", ND_ASCII_ISPRINT(EXTRACT_U_1(data)) ? EXTRACT_U_1(data) : '.');
+
+   return;
+
+   trunc:
+      nd_print_trunc(ndo);
+}
+
+static void
+print_attr_location_information(netdissect_options *ndo,
+                    const u_char *data, u_int length, u_short attr_code _U_)
+{
+   u_int i;
+   u_int16_t index;
+   u_int8_t code, entity;
+   u_int64_t sighting_time, time_to_live;
+
+   ND_TCHECK_LEN(data, length);
+   if (length < 21)
+   {
+     ND_PRINT("ERROR: length %u < 21", length);
+      return;
+   }
+
+   index = EXTRACT_BE_U_2(data);
+   data += 2;
+
+   code = EXTRACT_U_1(data);
+   data++;
+
+   entity = EXTRACT_U_1(data);
+   data++;
+
+   sighting_time = EXTRACT_BE_U_8(data);
+   data += 8;
+
+   time_to_live = EXTRACT_BE_U_8(data);
+   data += 8;
+
+   ND_PRINT("Index %u, code %s, entity %s, sighting time %llu, time to live %llu: ",
+       index,
+       tok2str(location_information_code_vector, "Code %u not known", code),
+       tok2str(location_information_entity_vector, "Entity %u not known", entity),
+       sighting_time, // FIXME: NTP format, should share code from print-ntp.c?
+       time_to_live // FIXME: NTP format, should share code from print-ntp.c?
+   );
+
+   for (i=0; i < length-20 && EXTRACT_U_1(data); i++, data++)
+      ND_PRINT("%c", ND_ASCII_ISPRINT(EXTRACT_U_1(data)) ? EXTRACT_U_1(data) : '.');
+
+   return;
+
+   trunc:
+      nd_print_trunc(ndo);
+}
+
+static void
+print_attr_location_data(netdissect_options *ndo,
+                    const u_char *data, u_int length, u_short attr_code _U_)
+{
+   u_int i;
+   u_int16_t index;
+
+   ND_TCHECK_LEN(data, length);
+   if (length < 3)
+   {
+     ND_PRINT("ERROR: length %u < 3", length);
+      return;
+   }
+
+   index = EXTRACT_BE_U_2(data);
+   data += 2;
+   ND_PRINT("Index %u: ", index);
+
+   for (i=0; i < length-2 && EXTRACT_U_1(data); i++, data++)
+      ND_PRINT("%c", ND_ASCII_ISPRINT(EXTRACT_U_1(data)) ? EXTRACT_U_1(data) : '.');
+
+   return;
+
+   trunc:
+      nd_print_trunc(ndo);
+}
+
+static void
+print_basic_location_policy_rules(netdissect_options *ndo,
+                    const u_char *data, u_int length, u_short attr_code _U_)
+{
+   u_int i;
+   u_int16_t flags;
+   u_int64_t retention_expires;
+
+   ND_TCHECK_LEN(data, length);
+   if (length < 10)
+   {
+     ND_PRINT("ERROR: length %u < 10", length);
+      return;
+   }
+
+   flags = EXTRACT_BE_U_2(data);
+   data += 2;
+
+   retention_expires = EXTRACT_BE_U_8(data);
+   data += 8;
+
+   ND_PRINT("Flags: %s, retention expires %llu: ",
+       flags & 0x8000 ? "Retransmission Allowed" : "none",
+       retention_expires
+   );
+
+   for (i=0; i < length-10 && EXTRACT_U_1(data); i++, data++)
+      ND_PRINT("%c", ND_ASCII_ISPRINT(EXTRACT_U_1(data)) ? EXTRACT_U_1(data) : '.');
+
+   return;
+
+   trunc:
+      nd_print_trunc(ndo);
+}
+
 
 /*************************************/
 /* Print an attribute of 'secs since */

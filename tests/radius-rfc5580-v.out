@@ -1,0 +1,12 @@
+    1  18:33:42.683243 IP (tos 0x0, ttl 64, id 39176, offset 0, flags [none], proto UDP (17), length 211)
+    127.0.0.1.38167 > 127.0.0.1.1812: RADIUS, length: 183
+	Access-Request (1), id: 0x02, Authenticator: c670215681da366d666794ca6abdb54b
+	  Operator-Name Attribute (126), length: 18, Value: [TADIG] namespace TADIG
+	  Operator-Name Attribute (126), length: 18, Value: [REALM] namespace REALM
+	  Operator-Name Attribute (126), length: 17, Value: [E212] namespace E212
+	  Operator-Name Attribute (126), length: 16, Value: [ICC] namespace ICC
+	  Operator-Name Attribute (126), length: 20, Value: [Namespace 52 not known] namespace INVALID
+	  Location-Information Attribute (127), length: 25, Value: Index 1, code Civic, entity User, sighting time 81985529216486895, time to live 81985529216486895: GPS
+	  Location-Data Attribute (128), length: 15, Value: Index 1: my location
+	  Basic-Location-Policy-Rules Attribute (129), length: 17, Value: Flags: none, retention expires 81985529216486895: test1
+	  Basic-Location-Policy-Rules Attribute (129), length: 17, Value: Flags: Retransmission Allowed, retention expires 81985529216486895: test2
