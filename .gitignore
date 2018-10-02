@@ -29,6 +29,9 @@ uninstall.vcxproj*
 CMakeCache.txt
 CMakeFiles/
 Debug/
+Release/
+MinSizeRel/
+RelWithDebInfo/
 cmake_install.cmake
 cmake_uninstall.cmake
 netdissect.dir/
