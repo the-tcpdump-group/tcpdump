@@ -94,9 +94,6 @@ struct tcphdr {
 #ifndef FTP_PORT
 #define FTP_PORT		21
 #endif
-#ifndef SSH_PORT
-#define SSH_PORT		22
-#endif
 #ifndef TELNET_PORT
 #define TELNET_PORT		23
 #endif
@@ -111,9 +108,6 @@ struct tcphdr {
 #endif
 #ifndef HTTP_PORT
 #define HTTP_PORT		80
-#endif
-#ifndef NETBIOS_NS_PORT
-#define NETBIOS_NS_PORT		137	/* RFC 1001, RFC 1002 */
 #endif
 #ifndef NETBIOS_SSN_PORT
 #define NETBIOS_SSN_PORT	139	/* RFC 1001, RFC 1002 */
