@@ -88,6 +88,7 @@ LIBNETDISSECT_SRC=\
 	netdissect.c \
 	netdissect-alloc.c \
 	nlpid.c \
+	ntp.c \
 	oui.c \
 	parsenfsfh.c \
 	print.c \
@@ -294,6 +295,7 @@ HDR = \
 	nfs.h \
 	nfsfh.h \
 	nlpid.h \
+	ntp.h \
 	openflow.h \
 	ospf.h \
 	oui.h \

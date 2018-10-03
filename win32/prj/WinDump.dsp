@@ -125,6 +125,10 @@ SOURCE=..\..\missing\getopt_long.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\ntp.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\gmpls.c
 # End Source File
 # Begin Source File
