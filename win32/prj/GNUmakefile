@@ -42,6 +42,7 @@ OBJS = \
 	../../machdep.o \
 	../../oui.o \
 	../../parsenfsfh.o \
+	../../ntp.o \
 	../../print-802_11.o \
 	../../print-ah.o \
 	../../print-aodv.o \

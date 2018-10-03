@@ -32,57 +32,14 @@
  * RFC 5905 - NTPv4
  */
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#include "netdissect-stdinc.h"
-
-#ifdef HAVE_STRFTIME
-#include <time.h>
-#endif
-
-#include "netdissect.h"
+#include "ntp.h"
 #include "addrtoname.h"
-#include "extract.h"
 
 
 /*
  * Based on ntp.h from the U of MD implementation
  *	This file is based on Version 2 of the NTP spec (RFC1119).
  */
-
-/*
- *  Definitions for the masses
- */
-#define	JAN_1970	INT64_T_CONSTANT(2208988800)	/* 1970 - 1900 in seconds */
-
-/*
- * Structure definitions for NTP fixed point values
- *
- *    0			  1		      2			  3
- *    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *   |			       Integer Part			     |
- *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *   |			       Fraction Part			     |
- *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *
- *    0			  1		      2			  3
- *    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *   |		  Integer Part	     |	   Fraction Part	     |
- *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-*/
-struct l_fixedpt {
-	nd_uint32_t int_part;
-	nd_uint32_t fraction;
-};
-
-struct s_fixedpt {
-	nd_uint16_t int_part;
-	nd_uint16_t fraction;
-};
 
 /* rfc2030
  *                      1                   2                   3
@@ -186,7 +143,6 @@ struct ntp_time_data {
 #define	INFO_REPLY	63	/* **** THIS implementation dependent **** */
 
 static void p_sfix(netdissect_options *ndo, const struct s_fixedpt *);
-static void p_ntp_time(netdissect_options *, const struct l_fixedpt *);
 static void p_ntp_delta(netdissect_options *, const struct l_fixedpt *, const struct l_fixedpt *);
 static void p_poll(netdissect_options *, const int);
 
@@ -516,62 +472,6 @@ p_sfix(netdissect_options *ndo,
 	ff = f / 65536.0;		/* shift radix point by 16 bits */
 	f = (int)(ff * 1000000.0);	/* Treat fraction as parts per million */
 	ND_PRINT("%d.%06d", i, f);
-}
-
-#define	FMAXINT	(4294967296.0)	/* floating point rep. of MAXINT */
-
-static void
-p_ntp_time(netdissect_options *ndo,
-	   const struct l_fixedpt *lfp)
-{
-	uint32_t i;
-	uint32_t uf;
-	uint32_t f;
-	double ff;
-
-	i = GET_BE_U_4(lfp->int_part);
-	uf = GET_BE_U_4(lfp->fraction);
-	ff = uf;
-	if (ff < 0.0)		/* some compilers are buggy */
-		ff += FMAXINT;
-	ff = ff / FMAXINT;			/* shift radix point by 32 bits */
-	f = (uint32_t)(ff * 1000000000.0);	/* treat fraction as parts per billion */
-	ND_PRINT("%u.%09u", i, f);
-
-#ifdef HAVE_STRFTIME
-	/*
-	 * print the UTC time in human-readable format.
-	 */
-	if (i) {
-	    int64_t seconds_64bit = (int64_t)i - JAN_1970;
-	    time_t seconds;
-	    struct tm *tm;
-	    char time_buf[128];
-
-	    seconds = (time_t)seconds_64bit;
-	    if (seconds != seconds_64bit) {
-		/*
-		 * It doesn't fit into a time_t, so we can't hand it
-		 * to gmtime.
-		 */
-		ND_PRINT(" (unrepresentable)");
-	    } else {
-		tm = gmtime(&seconds);
-		if (tm == NULL) {
-		    /*
-		     * gmtime() can't handle it.
-		     * (Yes, that might happen with some version of
-		     * Microsoft's C library.)
-		     */
-		    ND_PRINT(" (unrepresentable)");
-		} else {
-		    /* use ISO 8601 (RFC3339) format */
-		    strftime(time_buf, sizeof (time_buf), "%Y-%m-%dT%H:%M:%SZ", tm);
-		    ND_PRINT(" (%s)", time_buf);
-		}
-	    }
-	}
-#endif
 }
 
 /* Prints time difference between *lfp and *olfp */

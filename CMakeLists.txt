@@ -945,6 +945,7 @@ set(NETDISSECT_SOURCE_LIST_C
     netdissect-alloc.c
     nlpid.c
     oui.c
+    ntp.c
     parsenfsfh.c
     print.c
     print-802_11.c
