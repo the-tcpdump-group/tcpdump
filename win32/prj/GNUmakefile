@@ -139,7 +139,7 @@ OBJS = \
 	../../print-vjc.o \
 	../../print-vqp.o \
 	../../print-vrrp.o \
-        ../../print-vtp.o \
+	../../print-vtp.o \
 	../../print-wb.o \
 	../../print-zephyr.o \
 	../../setsignal.o \
