@@ -2380,10 +2380,10 @@ DIAG_ON_CLANG(assign-enum)
 		dlt = pcap_datalink(pd);
 		dlt_name = pcap_datalink_val_to_name(dlt);
 		if (dlt_name == NULL) {
-			(void)fprintf(stderr, "listening on %s, link-type %u, capture size %u bytes\n",
+			(void)fprintf(stderr, "listening on %s, link-type %u, capture size %d bytes\n",
 			    device, dlt, ndo->ndo_snaplen);
 		} else {
-			(void)fprintf(stderr, "listening on %s, link-type %s (%s), capture size %u bytes\n",
+			(void)fprintf(stderr, "listening on %s, link-type %s (%s), capture size %d bytes\n",
 			    device, dlt_name,
 			    pcap_datalink_val_to_description(dlt), ndo->ndo_snaplen);
 		}
