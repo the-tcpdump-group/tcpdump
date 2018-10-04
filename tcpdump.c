@@ -1974,15 +1974,14 @@ main(int argc, char **argv)
 #endif
 		dlt = pcap_datalink(pd);
 		dlt_name = pcap_datalink_val_to_name(dlt);
+		fprintf(stderr, "reading from file %s", RFileName);
 		if (dlt_name == NULL) {
-			fprintf(stderr, "reading from file %s, link-type %u\n",
-			    RFileName, dlt);
+			fprintf(stderr, ", link-type %u", dlt);
 		} else {
-			fprintf(stderr,
-			    "reading from file %s, link-type %s (%s)\n",
-			    RFileName, dlt_name,
-			    pcap_datalink_val_to_description(dlt));
+			fprintf(stderr, ", link-type %s (%s)", dlt_name,
+				pcap_datalink_val_to_description(dlt));
 		}
+		fprintf(stderr, ", snapshot length %d\n", pcap_snapshot(pd));
 #ifdef DLT_LINUX_SLL2
 		if (dlt == DLT_LINUX_SLL2)
 			fprintf(stderr, "Warning: interface names might be incorrect\n");
@@ -2502,15 +2501,15 @@ DIAG_ON_CLANG(assign-enum)
 				 * Report the new file.
 				 */
 				dlt_name = pcap_datalink_val_to_name(dlt);
+				fprintf(stderr, "reading from file %s", RFileName);
 				if (dlt_name == NULL) {
-					fprintf(stderr, "reading from file %s, link-type %u\n",
-					    RFileName, dlt);
+					fprintf(stderr, ", link-type %u", dlt);
 				} else {
-					fprintf(stderr,
-					"reading from file %s, link-type %s (%s)\n",
-					    RFileName, dlt_name,
-					    pcap_datalink_val_to_description(dlt));
+					fprintf(stderr, ", link-type %s (%s)",
+						dlt_name,
+						pcap_datalink_val_to_description(dlt));
 				}
+				fprintf(stderr, ", snapshot length %d\n", pcap_snapshot(pd));
 			}
 		}
 	}
