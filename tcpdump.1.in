@@ -684,16 +684,20 @@ Print the timestamp, as seconds since January 1, 1970, 00:00:00, UTC, and
 fractions of a second since that time, on each dump line.
 .TP
 .B \-ttt
-Print a delta (micro-second resolution) between current and previous line
-on each dump line.
+Print a delta (microsecond or nanosecond resolution depending on the
+.B \-\-time\-stamp-precision
+option) between current and previous line on each dump line.
+The default is microsecond resolution.
 .TP
 .B \-tttt
 Print a timestamp, as hours, minutes, seconds, and fractions of a second
 since midnight, preceded by the date, on each dump line.
 .TP
 .B \-ttttt
-Print a delta (micro-second resolution) between current and first line
-on each dump line.
+Print a delta (microsecond or nanosecond resolution depending on the
+.B \-\-time\-stamp-precision
+option) between current and first line on each dump line.
+The default is microsecond resolution.
 .TP
 .B \-u
 Print undecoded NFS handles.
