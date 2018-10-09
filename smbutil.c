@@ -464,6 +464,8 @@ smb_fdata1(netdissect_options *ndo,
 	    u_int l;
 
 	    p = strchr(++fmt, '}');
+	    if (p == NULL)
+	        goto trunc;
 	    l = PTR_DIFF(p, fmt);
 
 	    if (l > sizeof(bitfmt) - 1)
@@ -866,6 +868,8 @@ smb_fdata(netdissect_options *ndo,
 		return(buf);
 	    memset(s, 0, sizeof(s));
 	    p = strchr(fmt, ']');
+	    if (p == NULL)
+		return(NULL);
 	    if ((size_t)(p - fmt + 1) > sizeof(s)) {
 		/* overrun */
 		return(buf);
