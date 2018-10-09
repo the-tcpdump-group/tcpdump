@@ -1156,6 +1156,9 @@ _U_
 		 */
 		endp++;	/* Include the trailing / in the URL; pcap_findalldevs_ex() requires it */
 		host_url = malloc(endp - url + 1);
+		if (host_url == NULL && (endp - url + 1) > 0)
+			error("Invalid allocation for host");
+
 		memcpy(host_url, url, endp - url);
 		host_url[endp - url] = '\0';
 		status = pcap_findalldevs_ex(host_url, NULL, &devlist, ebuf);
