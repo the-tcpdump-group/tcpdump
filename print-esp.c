@@ -424,7 +424,7 @@ espprint_decode_encalgo(netdissect_options *ndo,
 USES_APPLE_RST
 
 /*
- * for the moment, ignore the auth algorith, just hard code the authenticator
+ * for the moment, ignore the auth algorithm, just hard code the authenticator
  * length. Need to research how openssl looks up HMAC stuff.
  */
 static int
@@ -577,6 +577,10 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 		uint32_t spino;
 
 		spistr = strsep(&spikey, "@");
+		if (spistr == NULL) {
+			(*ndo->ndo_warning)(ndo, "print_esp: failed to find the @ token");
+			return;
+		}
 
 		spino = strtoul(spistr, &foo, 0);
 		if (spistr == foo || !spikey) {
