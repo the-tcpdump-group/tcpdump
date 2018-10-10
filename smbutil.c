@@ -467,7 +467,7 @@ smb_fdata1(netdissect_options *ndo,
 	    l = PTR_DIFF(p, fmt);
 
 	    if (l > sizeof(bitfmt) - 1)
-		    l = sizeof(bitfmt)-1;
+		l = sizeof(bitfmt)-1;
 
 	    strncpy(bitfmt, fmt, l);
 	    bitfmt[l] = '\0';
