@@ -328,8 +328,8 @@ typedef char* caddr_t;
      * VS prior to 2015, or MingGW; assume we have _snprintf_s() and
      * _vsnprintf_s(), which guarantee null termination.
      */
-    #define nd_snprintf(buf, buflen, fmt, ...) \
-        _snprintf_s(buf, buflen, _TRUNCATE, fmt, __VA_ARGS__)
+    #define nd_snprintf(buf, buflen, ...) \
+        _snprintf_s(buf, buflen, _TRUNCATE, __VA_ARGS__)
     #define nd_vsnprintf(buf, buflen, fmt, ap) \
         _vsnprintf_s(buf, buflen, _TRUNCATE, fmt, ap)
   #endif /* defined(_MSC_VER) && _MSC_VER >= 1900 */
