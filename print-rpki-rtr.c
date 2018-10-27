@@ -173,8 +173,8 @@ indent_string (u_int indent)
  * Print a single PDU.
  */
 static u_int
-rpki_rtr_pdu_print (netdissect_options *ndo, const u_char *tptr, const u_int len,
-	const u_char recurse, const u_int indent)
+rpki_rtr_pdu_print(netdissect_options *ndo, const u_char *tptr, const u_int len,
+		   const u_char recurse, const u_int indent)
 {
     const rpki_rtr_pdu *pdu_header;
     u_int pdu_type, pdu_len, hexdump;
