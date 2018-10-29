@@ -104,4 +104,5 @@ script:
   - ./tcpdump -D
   - ./tcpdump -J
   - ./tcpdump --version
+  - ./tcpdump -h
   - if [ "$CMAKE" = no ]; then make releasetar; fi
