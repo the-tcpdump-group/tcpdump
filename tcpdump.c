@@ -624,6 +624,10 @@ show_remote_devices_and_exit(void)
 #define J_FLAG
 #endif /* PCAP_ERROR_TSTAMP_TYPE_NOTSUP */
 
+#ifdef USE_LIBSMI
+#define m_FLAG_USAGE "[ -m module ] ..."
+#endif
+
 #ifdef HAVE_PCAP_SETDIRECTION
 #define Q_FLAG "Q:"
 #define Q_FLAG_USAGE " [ -Q in|out|inout ]"
@@ -713,7 +717,7 @@ static const struct option longopts[] = {
 };
 
 #ifdef HAVE_PCAP_FINDALLDEVS_EX
-#define LIST_REMOTE_INTERFACES_USAGE "[ --list-remote-interfaces remote-source  ]"
+#define LIST_REMOTE_INTERFACES_USAGE "[ --list-remote-interfaces remote-source ]"
 #else
 #define LIST_REMOTE_INTERFACES_USAGE
 #endif
@@ -3059,6 +3063,10 @@ print_usage(void)
 #ifdef HAVE_PCAP_FINDALLDEVS_EX
 	(void)fprintf(stderr,
 "\t\t" LIST_REMOTE_INTERFACES_USAGE "\n");
+#endif
+#ifdef USE_LIBSMI
+	(void)fprintf(stderr,
+"\t\t" m_FLAG_USAGE "\n");
 #endif
 	(void)fprintf(stderr,
 "\t\t[ -M secret ] [ --number ] [ --print ]" Q_FLAG_USAGE "\n");
