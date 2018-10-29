@@ -635,3 +635,7 @@ ntp-mode7--vvv		ntp-mode7.pcap		ntp-mode7--vvv.out	-vvv
 # RX/AFS
 rx			afs.pcap		rx.out
 rx-v			afs.pcap		rx-v.out		-v
+
+# Empty pcap/pcapng tests
+empty-pcap	empty.pcap	empty.out
+empty-pcapng	empty.pcapng	empty.out
