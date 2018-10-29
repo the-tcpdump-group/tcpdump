@@ -7135,6 +7135,49 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wsign-compare option" >&5
+$as_echo_n "checking whether the compiler supports the -Wsign-compare option... " >&6; }
+	save_CFLAGS="$CFLAGS"
+	if expr "x-Wsign-compare" : "x-W.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -Wsign-compare"
+	elif expr "x-Wsign-compare" : "x-f.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS -Werror -Wsign-compare"
+	elif expr "x-Wsign-compare" : "x-m.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS -Werror -Wsign-compare"
+	else
+	    CFLAGS="$CFLAGS -Wsign-compare"
+	fi
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+return 0
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+		CFLAGS="$save_CFLAGS"
+		V_CCOPT="$V_CCOPT -Wsign-compare"
+
+else
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		CFLAGS="$save_CFLAGS"
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wstrict-prototypes option" >&5
 $as_echo_n "checking whether the compiler supports the -Wstrict-prototypes option... " >&6; }
 	save_CFLAGS="$CFLAGS"

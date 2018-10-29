@@ -879,6 +879,7 @@ AC_DEFUN(AC_LBL_DEVEL,
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wpedantic)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wpointer-arith)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wshadow)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wsign-compare)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wstrict-prototypes)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wunreachable-code-return)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wused-but-marked-unused)
