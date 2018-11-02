@@ -543,7 +543,7 @@ tcp_print(netdissect_options *ndo,
                                         break;
 
                                 case SIGNATURE_INVALID:
-                                        ND_PRINT("invalid");
+                                        nd_print_invalid(ndo);
                                         break;
 
                                 case CANT_CHECK_SIGNATURE:
@@ -572,7 +572,7 @@ tcp_print(netdissect_options *ndo,
                                  * at this point.)
                                  */
                                 if (datalen < 2) {
-                                        ND_PRINT(" invalid");
+                                        nd_print_invalid(ndo);
                                 } else {
                                         LENCHECK(1);
                                         ND_PRINT(" keyid %u", EXTRACT_U_1(cp));
@@ -851,7 +851,7 @@ print_tcp_fastopen_option(netdissect_options *ndo, const u_char *cp,
         } else {
                 /* Fast Open Cookie */
                 if (datalen % 2 != 0 || datalen < 4 || datalen > 16) {
-                        ND_PRINT(" invalid");
+                        nd_print_invalid(ndo);
                 } else {
                         ND_PRINT(" cookie ");
                         for (i = 0; i < datalen; ++i)
