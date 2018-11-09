@@ -750,33 +750,36 @@ endif(WITH_CRYPTO)
 # Some of this is in the system library, some of it is in other libraries.
 #
 if(WITH_CAPSICUM)
-    check_function_exists(cap_enter HAVE_CAP_ENTER)
-    check_function_exists(cap_rights_limit HAVE_CAP_RIGHTS_LIMIT)
-    check_function_exists(cap_ioctls_limit HAVE_CAP_IOCTLS_LIMIT)
-    check_function_exists(openat HAVE_OPENAT)
-    if(HAVE_CAP_ENTER AND HAVE_CAP_RIGHTS_LIMIT AND
-       HAVE_CAP_IOCTLS_LIMIT AND HAVE_OPENAT)
-        #
-        # OK, we have the functions we need to support Capsicum.
-        #
-        set(HAVE_CAPSICUM TRUE)
+    check_include_files("sys/capsicum.h" HAVE_SYS_CAPSICUM_H)
+    if(HAVE_SYS_CAPSICUM_H)
+        check_function_exists(cap_enter HAVE_CAP_ENTER)
+        check_function_exists(cap_rights_limit HAVE_CAP_RIGHTS_LIMIT)
+        check_function_exists(cap_ioctls_limit HAVE_CAP_IOCTLS_LIMIT)
+        check_function_exists(openat HAVE_OPENAT)
+        if(HAVE_CAP_ENTER AND HAVE_CAP_RIGHTS_LIMIT AND
+           HAVE_CAP_IOCTLS_LIMIT AND HAVE_OPENAT)
+            #
+            # OK, we have the functions we need to support Capsicum.
+            #
+            set(HAVE_CAPSICUM TRUE)
 
-        #
-        # OK, can we use Casper?
-        #
-        check_library_exists(casper cap_init "" HAVE_CAP_INIT)
-        if(HAVE_CAP_INIT)
-            cmake_push_check_state()
-            set(CMAKE_REQUIRED_LIBRARIES casper)
-            check_library_exists(cap_dns cap_gethostbyaddr "" HAVE_CAP_GETHOSTBYADDR)
-            cmake_pop_check_state()
-            if(HAVE_CAP_GETHOSTBYADDR)
-                set(HAVE_CASPER TRUE)
-                set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} casper cap_dns)
-            endif(HAVE_CAP_GETHOSTBYADDR)
-        endif(HAVE_CAP_INIT)
-    endif(HAVE_CAP_ENTER AND HAVE_CAP_RIGHTS_LIMIT AND
-          HAVE_CAP_IOCTLS_LIMIT AND HAVE_OPENAT)
+            #
+            # OK, can we use Casper?
+            #
+            check_library_exists(casper cap_init "" HAVE_CAP_INIT)
+            if(HAVE_CAP_INIT)
+                cmake_push_check_state()
+                set(CMAKE_REQUIRED_LIBRARIES casper)
+                check_library_exists(cap_dns cap_gethostbyaddr "" HAVE_CAP_GETHOSTBYADDR)
+                cmake_pop_check_state()
+                if(HAVE_CAP_GETHOSTBYADDR)
+                    set(HAVE_CASPER TRUE)
+                    set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} casper cap_dns)
+                endif(HAVE_CAP_GETHOSTBYADDR)
+            endif(HAVE_CAP_INIT)
+        endif(HAVE_CAP_ENTER AND HAVE_CAP_RIGHTS_LIMIT AND
+              HAVE_CAP_IOCTLS_LIMIT AND HAVE_OPENAT)
+    endif(HAVE_SYS_CAPSICUM_H)
 endif(WITH_CAPSICUM)
 
 #
