@@ -2268,7 +2268,7 @@ DIAG_ON_CLANG(assign-enum)
 		if (pdd == NULL)
 			error("%s", pcap_geterr(pd));
 #ifdef HAVE_CAPSICUM
-		set_dumper_capsicum_rights(p);
+		set_dumper_capsicum_rights(pdd);
 #endif
 		if (Cflag != 0 || Gflag != 0) {
 #ifdef HAVE_CAPSICUM
