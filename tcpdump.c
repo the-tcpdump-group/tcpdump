@@ -81,7 +81,7 @@ The Regents of the University of California.  All rights reserved.\n";
  * in the opposite order works fine.
  */
 #ifdef HAVE_CAPSICUM
-#include <sys/capability.h>
+#include <sys/capsicum.h>
 #include <sys/ioccom.h>
 #include <net/bpf.h>
 #include <libgen.h>
