@@ -519,8 +519,16 @@ struct in6_addr {
  * it also implement __has_attribute() (for example, GCC 5.0 and later
  * have __has_attribute(), and the "fallthrough" attribute was introduced
  * in GCC 7).
+ *
+ * Unfortunately, Clang does this wrong - a statement
+ *
+ *    __attribute__ ((fallthrough));
+ *
+ * produces bogus -Wmissing-declaration "declaration does not declare
+ * anything" warnings (dear Clang: that's not a declaration, it's an
+ * empty statement).  GCC, however, has no trouble with this.
  */
-#if __has_attribute(fallthrough)
+#if __has_attribute(fallthrough) && !defined(__clang__)
 #  define ND_FALL_THROUGH __attribute__ ((fallthrough))
 #else
 #  define ND_FALL_THROUGH
