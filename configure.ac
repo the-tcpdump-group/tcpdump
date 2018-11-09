@@ -199,9 +199,18 @@ AC_ARG_WITH(sandbox-capsicum,
 # present, imply others are present?
 #
 if test ! -z "$with_sandbox-capsicum" && test "$with_sandbox-capsicum" != "no" ; then
-	AC_CHECK_FUNCS(cap_enter cap_rights_limit cap_ioctls_limit openat,
-	    ac_lbl_capsicum_function_seen=yes,
-	    ac_lbl_capsicum_function_not_seen=yes)
+	#
+	# First, make sure we have the required header.
+	#
+	AC_CHECK_HEADER(sys/capsicum.h,
+	[
+		#
+		# We do; now make sure we have the required functions.
+		#
+		AC_CHECK_FUNCS(cap_enter cap_rights_limit cap_ioctls_limit openat,
+		    ac_lbl_capsicum_function_seen=yes,
+		    ac_lbl_capsicum_function_not_seen=yes)
+	])
 	AC_CHECK_LIB(casper, cap_init, LIBS="$LIBS -lcasper")
 	AC_CHECK_LIB(cap_dns, cap_gethostbyaddr, LIBS="$LIBS -lcap_dns")
 fi

@@ -4332,7 +4332,16 @@ fi
 # present, imply others are present?
 #
 if test ! -z "$with_sandbox-capsicum" && test "$with_sandbox-capsicum" != "no" ; then
-	for ac_func in cap_enter cap_rights_limit cap_ioctls_limit openat
+	#
+	# First, make sure we have the required header.
+	#
+	ac_fn_c_check_header_mongrel "$LINENO" "sys/capsicum.h" "ac_cv_header_sys_capsicum_h" "$ac_includes_default"
+if test "x$ac_cv_header_sys_capsicum_h" = xyes; then :
+
+		#
+		# We do; now make sure we have the required functions.
+		#
+		for ac_func in cap_enter cap_rights_limit cap_ioctls_limit openat
 do :
   as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
@@ -4345,6 +4354,10 @@ else
   ac_lbl_capsicum_function_not_seen=yes
 fi
 done
+
+
+fi
+
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for cap_init in -lcasper" >&5
 $as_echo_n "checking for cap_init in -lcasper... " >&6; }
