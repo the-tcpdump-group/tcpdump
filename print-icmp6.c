@@ -1166,7 +1166,7 @@ icmp6_print(netdissect_options *ndo,
 	case ICMP6_ECHO_REQUEST:
 	case ICMP6_ECHO_REPLY:
                 ND_TCHECK_2(dp->icmp6_seq);
-                ND_PRINT(", seq %u", EXTRACT_BE_U_2(dp->icmp6_seq));
+                ND_PRINT(", id %u, seq %u", EXTRACT_BE_U_2(dp->icmp6_id), EXTRACT_BE_U_2(dp->icmp6_seq));
 		break;
 	case ICMP6_MEMBERSHIP_QUERY:
 		if (length == MLD_MINLEN) {
