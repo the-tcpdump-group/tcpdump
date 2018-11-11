@@ -306,7 +306,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 	fixed_hdrlen = dccp_basic_hdr_len(dh);
 	if (len < fixed_hdrlen) {
 		ND_PRINT("truncated-dccp - %u bytes missing!",
-			  len - fixed_hdrlen);
+			  fixed_hdrlen - len);
 		return;
 	}
 	ND_TCHECK_LEN(dh, fixed_hdrlen);
@@ -370,7 +370,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 		if (len < fixed_hdrlen) {
 			ND_PRINT("truncated-%s - %u bytes missing!",
 				  tok2str(dccp_pkt_type_str, "", dccph_type),
-				  len - fixed_hdrlen);
+				  fixed_hdrlen - len);
 			return;
 		}
 		ND_TCHECK_SIZE(dhr);
@@ -386,7 +386,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 		if (len < fixed_hdrlen) {
 			ND_PRINT("truncated-%s - %u bytes missing!",
 				  tok2str(dccp_pkt_type_str, "", dccph_type),
-				  len - fixed_hdrlen);
+				  fixed_hdrlen - len);
 			return;
 		}
 		ND_TCHECK_SIZE(dhr);
@@ -403,7 +403,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 		if (len < fixed_hdrlen) {
 			ND_PRINT("truncated-%s - %u bytes missing!",
 				  tok2str(dccp_pkt_type_str, "", dccph_type),
-				  len - fixed_hdrlen);
+				  fixed_hdrlen - len);
 			return;
 		}
 		ND_PRINT("%s ", tok2str(dccp_pkt_type_str, "", dccph_type));
@@ -414,7 +414,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 		if (len < fixed_hdrlen) {
 			ND_PRINT("truncated-%s - %u bytes missing!",
 				  tok2str(dccp_pkt_type_str, "", dccph_type),
-				  len - fixed_hdrlen);
+				  fixed_hdrlen - len);
 			return;
 		}
 		ND_PRINT("%s ", tok2str(dccp_pkt_type_str, "", dccph_type));
@@ -425,7 +425,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 		if (len < fixed_hdrlen) {
 			ND_PRINT("truncated-%s - %u bytes missing!",
 				  tok2str(dccp_pkt_type_str, "", dccph_type),
-				  len - fixed_hdrlen);
+				  fixed_hdrlen - len);
 			return;
 		}
 		ND_PRINT("%s ", tok2str(dccp_pkt_type_str, "", dccph_type));
@@ -435,7 +435,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 		if (len < fixed_hdrlen) {
 			ND_PRINT("truncated-%s - %u bytes missing!",
 				  tok2str(dccp_pkt_type_str, "", dccph_type),
-				  len - fixed_hdrlen);
+				  fixed_hdrlen - len);
 			return;
 		}
 		ND_PRINT("%s ", tok2str(dccp_pkt_type_str, "", dccph_type));
@@ -447,7 +447,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 		if (len < fixed_hdrlen) {
 			ND_PRINT("truncated-%s - %u bytes missing!",
 				  tok2str(dccp_pkt_type_str, "", dccph_type),
-				  len - fixed_hdrlen);
+				  fixed_hdrlen - len);
 			return;
 		}
 		ND_TCHECK_SIZE(dhr);
@@ -461,7 +461,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 		if (len < fixed_hdrlen) {
 			ND_PRINT("truncated-%s - %u bytes missing!",
 				  tok2str(dccp_pkt_type_str, "", dccph_type),
-				  len - fixed_hdrlen);
+				  fixed_hdrlen - len);
 			return;
 		}
 		ND_PRINT("%s ", tok2str(dccp_pkt_type_str, "", dccph_type));
@@ -471,7 +471,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 		if (len < fixed_hdrlen) {
 			ND_PRINT("truncated-%s - %u bytes missing!",
 				  tok2str(dccp_pkt_type_str, "", dccph_type),
-				  len - fixed_hdrlen);
+				  fixed_hdrlen - len);
 			return;
 		}
 		ND_PRINT("%s ", tok2str(dccp_pkt_type_str, "", dccph_type));
