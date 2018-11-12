@@ -298,7 +298,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 		goto trunc;
 	if (len < sizeof(struct dccp_hdr)) {
 		ND_PRINT("truncated-dccp - %u bytes missing!",
-			  len - (u_int)sizeof(struct dccp_hdr));
+			 (u_int)sizeof(struct dccp_hdr) - len);
 		return;
 	}
 
