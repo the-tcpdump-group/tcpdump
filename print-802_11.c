@@ -3058,7 +3058,7 @@ print_in_radiotap_namespace(netdissect_options *ndo,
 	return 0;
 }
 
-static u_int
+u_int
 ieee802_11_radio_print(netdissect_options *ndo,
                        const u_char *p, u_int length, u_int caplen)
 {
