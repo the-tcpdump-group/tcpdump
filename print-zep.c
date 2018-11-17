@@ -69,11 +69,12 @@ static void zep_print_ts(netdissect_options *ndo, const u_char *p)
 	
 	i = EXTRACT_BE_U_4(p);
 	uf = EXTRACT_BE_U_4(p + 4);
-	ff = uf;
+	ff = (float) uf;
 	if (ff < 0.0)           /* some compilers are buggy */
 		ff += FMAXINT;
-	ff = ff / FMAXINT;      /* shift radix point by 32 bits */
-	f = ff * 1000000000.0;  /* treat fraction as parts per billion */
+	ff = (float) (ff / FMAXINT); /* shift radix point by 32 bits */
+	f = (uint32_t) (ff * 1000000000.0);  /* treat fraction as parts per
+						billion */
 	ND_PRINT("%u.%09d", i, f);
 	
 #ifdef HAVE_STRFTIME

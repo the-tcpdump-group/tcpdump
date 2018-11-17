@@ -476,7 +476,6 @@ ieee802_15_4_crc32(const u_char *p,
 		   u_int data_len)
 {
 	uint32_t crc, byte;
-	u_char x;
 	int b;
 	
 	crc = 0x00000000; /* Note, initial value is 0x00000000 not 0xffffffff */
@@ -581,7 +580,8 @@ ieee802_15_4_print_gts_info(netdissect_options *ndo,
 			    u_int data_len)
 {
 	uint8_t gts_spec, gts_cnt;
-	int len, i;
+	u_int len;
+	int i;
 	
 	gts_spec = EXTRACT_U_1(p);
 	gts_cnt = gts_spec & 0x7;
@@ -720,7 +720,8 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 		if (ie_len < 2) {
 			ND_PRINT("[ERROR: Truncated DSME PAN IE]");
 		} else {
-			uint16_t ss, ptr, len;
+			uint16_t ss, ptr, ulen;
+			int16_t len;
 			int hopping_present;
 			
 			hopping_present = 0;
@@ -795,64 +796,64 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 				break;
 			}
 			
-			len = EXTRACT_LE_U_2(p + ptr + 2);
+			ulen = EXTRACT_LE_U_2(p + ptr + 2);
 			ND_PRINT("SD Index = %d, Bitmap len = %d, ",
-				 EXTRACT_LE_U_2(p + ptr), len);
+				 EXTRACT_LE_U_2(p + ptr), ulen);
 			ptr += 4;
-			if (ie_len < ptr + len) {
+			if (ie_len < ptr + ulen) {
 				ND_PRINT(" [ERROR: Truncated in SD bitmap]");
 				break;
 			}
 			ND_PRINT(" SD Bitmap = ");
-			for(i = 0; i < len; i++) {
+			for(i = 0; i < ulen; i++) {
 				ND_PRINT("%02x ", EXTRACT_U_1(p + ptr + i));
 			}
-			ptr += len;
+			ptr += ulen;
 			
 			if (ie_len < ptr + 5) {
 				ND_PRINT(" [ERROR: Truncated before Channel hopping specification]");
 				break;
 			}
 			
-			len = EXTRACT_LE_U_2(p + ptr + 4);
+			ulen = EXTRACT_LE_U_2(p + ptr + 4);
 			ND_PRINT("Hopping Seq ID = %d, PAN Coordinator BSN = %d, "
 				 "Channel offset = %d, Bitmap length = %d, ",
 				 EXTRACT_U_1(p + ptr),
 				 EXTRACT_U_1(p + ptr + 1),
 				 EXTRACT_LE_U_2(p + ptr + 2),
-				 len);
+				 ulen);
 			ptr += 5;
-			if (ie_len < ptr + len) {
+			if (ie_len < ptr + ulen) {
 				ND_PRINT(" [ERROR: Truncated in Channel offset bitmap]");
 				break;
 			}
 			ND_PRINT(" Channel offset bitmap = ");
-			for(i = 0; i < len; i++) {
+			for(i = 0; i < ulen; i++) {
 				ND_PRINT("%02x ", EXTRACT_U_1(p + ptr + i));
 			}
-			ptr += len;
+			ptr += ulen;
 			if (hopping_present) {
 				if (ie_len < ptr + 1) {
 					ND_PRINT(" [ERROR: Truncated in Hopping Sequence length]");
 					break;
 				}
-				len = EXTRACT_U_1(p + ptr);
+				ulen = EXTRACT_U_1(p + ptr);
 				ptr++;
-				ND_PRINT("Hopping Seq length = %d [ ", len);
+				ND_PRINT("Hopping Seq length = %d [ ", ulen);
 				
 				/* The specification is not clear how the
 				   hopping sequence is encoded, I assume two
 				   octet unsigned integers for each channel. */
 				
-				if (ie_len < ptr + len * 2) {
+				if (ie_len < ptr + ulen * 2) {
 					ND_PRINT(" [ERROR: Truncated in Channel offset bitmap]");
 					break;
 				}
-				for(i = 0; i < len; i++) {
+				for(i = 0; i < ulen; i++) {
 					ND_PRINT("%02x ", EXTRACT_LE_U_2(p + ptr + i * 2));
 				}
 				ND_PRINT("]");
-				ptr += len * 2;
+				ptr += ulen * 2;
 			}
 		}
 		break;
@@ -1024,7 +1025,7 @@ ieee802_15_4_print_mlme_ie(netdissect_options *ndo,
 			p++;
 			sub_ie_len--;
 		} else {
-			int channel_page, number_of_channels;
+			uint16_t channel_page, number_of_channels;
 			
 			ND_PRINT("Hopping Sequence ID = %d", EXTRACT_U_1(p));
 			p++;
