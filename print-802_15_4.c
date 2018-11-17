@@ -475,8 +475,8 @@ static uint32_t
 ieee802_15_4_crc32(const u_char *p,
 		   uint16_t data_len)
 {
-	uint32_t crc, mask, byte;
-	u_char x, y;
+	uint32_t crc, byte;
+	u_char x;
 	int b;
 	
 	crc = 0x00000000; /* Note, initial value is 0x00000000 not 0xffffffff */
@@ -622,7 +622,7 @@ ieee802_15_4_print_gts_info(netdissect_options *ndo,
  *
  * Returns number of byts consumed from the packet or -1 in case of error.
  */
-static int
+static int16_t
 ieee802_15_4_print_pending_addresses(netdissect_options *ndo,
 				     const u_char *p,
 				     uint16_t data_len)
@@ -720,8 +720,8 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 		if (ie_len < 2) {
 			ND_PRINT("[ERROR: Truncated DSME PAN IE]");
 		} else {
-			uint16_t ss, ptr;
-			int len, hopping_present;
+			uint16_t ss, ptr, len;
+			int hopping_present;
 			
 			hopping_present = 0;
 			
@@ -924,7 +924,8 @@ ieee802_15_4_print_header_ie_list(netdissect_options *ndo,
 				  uint16_t caplen,
 				  int *payload_ie_present)
 {
-	int len, ie, ie_len, element_id, i;
+	int len, ie, element_id, i;
+	uint16_t ie_len;
 	
 	*payload_ie_present = 0;
 	len = 0;
@@ -1243,7 +1244,8 @@ ieee802_15_4_print_mlme_ie_list(netdissect_options *ndo,
 				const u_char *p,
 				uint16_t ie_len)
 {
-	int ie, sub_ie_len, sub_id, i, type;
+	int ie, sub_id, i, type;
+	uint16_t sub_ie_len;
 	
 	do {
 		if (ie_len < 2) {
@@ -1308,6 +1310,7 @@ ieee802_15_4_print_mpx_ie(netdissect_options *ndo,
 	int fragment_number, data_start;
 	int i;
 
+	data_start = 0;
 	if (ie_len < 1) {
 		ND_PRINT("[ERROR: Transaction control byte missing]");
 		return;
@@ -1407,7 +1410,8 @@ ieee802_15_4_print_payload_ie_list(netdissect_options *ndo,
 				   const u_char *p,
 				   uint16_t caplen)
 {
-	int len, ie, ie_len, group_id, i;
+	int len, ie, group_id, i;
+	uint16_t ie_len;
 	
 	len = 0;
 	do {
@@ -1794,7 +1798,8 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 	const u_char *mic_start = NULL;
 	
 	payload_ie_present = 0;
-	
+
+	crc_check = 0;
 	/* Assume 2 octet FCS, the FCS length depends on the PHY, and we do not
 	   know about that. */
 	if (caplen < 4) {
@@ -2186,6 +2191,7 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 	ie_present = 0;
 	payload_ie_present = 0;
 	security_enabled = 0;
+	crc_check = 0;
 	
 	/* Assume 2 octet FCS, the FCS length depends on the PHY, and we do not
 	   know about that. */
