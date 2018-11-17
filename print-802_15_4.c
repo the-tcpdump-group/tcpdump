@@ -423,7 +423,7 @@ static const char *mac_c_names[] = {
  */
 static uint16_t
 ieee802_15_4_crc16(const u_char *p,
-		   uint16_t data_len)
+		   u_int data_len)
 {
 	uint16_t crc;
 	u_char x, y;
@@ -473,7 +473,7 @@ ieee802_15_4_reverse32(uint32_t x)
  */
 static uint32_t
 ieee802_15_4_crc32(const u_char *p,
-		   uint16_t data_len)
+		   u_int data_len)
 {
 	uint32_t crc, byte;
 	u_char x;
@@ -578,7 +578,7 @@ ieee802_15_4_print_superframe_specification(netdissect_options *ndo,
 static int
 ieee802_15_4_print_gts_info(netdissect_options *ndo,
 			    const u_char *p,
-			    uint16_t data_len)
+			    u_int data_len)
 {
 	uint8_t gts_spec, gts_cnt;
 	int len, i;
@@ -625,7 +625,7 @@ ieee802_15_4_print_gts_info(netdissect_options *ndo,
 static int16_t
 ieee802_15_4_print_pending_addresses(netdissect_options *ndo,
 				     const u_char *p,
-				     uint16_t data_len)
+				     u_int data_len)
 {
 	uint8_t pas, s_cnt, e_cnt, len, i;
 	
@@ -921,7 +921,7 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 static int
 ieee802_15_4_print_header_ie_list(netdissect_options *ndo,
 				  const u_char *p,
-				  uint16_t caplen,
+				  u_int caplen,
 				  int *payload_ie_present)
 {
 	int len, ie, element_id, i;
@@ -996,7 +996,8 @@ ieee802_15_4_print_mlme_ie(netdissect_options *ndo,
 			   uint16_t sub_ie_len,
 			   int sub_id)
 {
-	int i, j, len;
+	int i, j;
+	uint16_t len;
 	
 	/* Note, as there is no overlap with the long and short
 	   MLME sub IDs, we can just use one switch here. */
@@ -1408,7 +1409,7 @@ ieee802_15_4_print_mpx_ie(netdissect_options *ndo,
 static int
 ieee802_15_4_print_payload_ie_list(netdissect_options *ndo,
 				   const u_char *p,
-				   uint16_t caplen)
+				   u_int caplen)
 {
 	int len, ie, group_id, i;
 	uint16_t ie_len;
@@ -1507,7 +1508,7 @@ ieee802_15_4_print_payload_ie_list(netdissect_options *ndo,
 static int
 ieee802_15_4_print_aux_sec_header(netdissect_options *ndo,
 				  const u_char *p,
-				  uint16_t caplen,
+				  u_int caplen,
 				  int *security_level)
 {
 	int sc, key_id_mode, len;
@@ -2369,7 +2370,8 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 		if (security_level >= 4) {
 			ND_PRINT("Payload IEs present, but encrypted, cannot print ");
 		} else {
-			len = ieee802_15_4_print_payload_ie_list(ndo, p, caplen);
+			len = ieee802_15_4_print_payload_ie_list(ndo, p,
+								 caplen);
 			if (len < 0) {
 				return 0;
 			}
