@@ -21,7 +21,7 @@
 
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include <netdissect-stdinc.h>
@@ -62,112 +62,124 @@
 /* Print timestamp */
 static void zep_print_ts(netdissect_options *ndo, const u_char *p)
 {
-  int32_t i;
-  uint32_t uf;
-  uint32_t f;
-  float ff;
-
-  i = EXTRACT_32BITS(p);
-  uf = EXTRACT_32BITS(p + 4);
-  ff = uf;
-  if (ff < 0.0)           /* some compilers are buggy */
-    ff += FMAXINT;
-  ff = ff / FMAXINT;      /* shift radix point by 32 bits */
-  f = ff * 1000000000.0;  /* treat fraction as parts per billion */
-  ND_PRINT((ndo, "%u.%09d", i, f));
-
+	int32_t i;
+	uint32_t uf;
+	uint32_t f;
+	float ff;
+	
+	i = EXTRACT_BE_U_4(p);
+	uf = EXTRACT_BE_U_4(p + 4);
+	ff = uf;
+	if (ff < 0.0)           /* some compilers are buggy */
+		ff += FMAXINT;
+	ff = ff / FMAXINT;      /* shift radix point by 32 bits */
+	f = ff * 1000000000.0;  /* treat fraction as parts per billion */
+	ND_PRINT("%u.%09d", i, f);
+	
 #ifdef HAVE_STRFTIME
-  /*
-   * print the time in human-readable format.
-   */
-  if (i) {
-    time_t seconds = i - JAN_1970;
-    struct tm *tm;
-    char time_buf[128];
-
-    tm = localtime(&seconds);
-    strftime(time_buf, sizeof (time_buf), "%Y/%m/%d %H:%M:%S", tm);
-    ND_PRINT((ndo, " (%s)", time_buf));
-  }
+	/*
+	 * print the time in human-readable format.
+	 */
+	if (i) {
+		time_t seconds = i - JAN_1970;
+		struct tm *tm;
+		char time_buf[128];
+		
+		tm = localtime(&seconds);
+		strftime(time_buf, sizeof (time_buf), "%Y/%m/%d %H:%M:%S", tm);
+		ND_PRINT(" (%s)", time_buf);
+	}
 #endif
 }
 
 /*
  * Main function to print packets.
  */
- 
+
 void
 zep_print(netdissect_options *ndo,
 	  const u_char *bp, u_int len)
 {
-    uint8_t version, inner_len;
-    uint32_t seq_no;
-    
-    ND_PRINT((ndo, "ZEP"));
-    
-    ND_TCHECK2(*bp, 8);
-
-    if (*bp != 'E' || *(bp+1) != 'X') goto trunc;
-    
-    version = *(bp + 2);
-    ND_PRINT((ndo, "v%d ", version));
-
-    if (version == 1) {
-      /* ZEP v1 packet. */
-      ND_TCHECK2(*bp, 16);
-      ND_PRINT((ndo, "Channel ID %d, Device ID 0x%04x, ",
-		*(bp + 3), EXTRACT_16BITS(bp + 4)));
-      if (*(bp + 6))
-	ND_PRINT((ndo, "CRC, "));
-      else
-	ND_PRINT((ndo, "LQI %d, ", *(bp + 7)));
-      inner_len = *(bp + 15);
-      ND_PRINT((ndo, "inner len = %d", inner_len));
-
-      bp += 16;
-      len -= 16;
-    } else {
-      /* ZEP v2 packet. */
-      if (*(bp + 3) == 2) {
-	/* ZEP v2 ack. */
-	seq_no = EXTRACT_32BITS(bp + 4);
-	ND_PRINT((ndo, "ACK, seq# = %d", seq_no));
-	inner_len = 0;
-	bp += 8;
-	len -= 8;
-      } else {
-	/* ZEP v2 data, or some other. */
-	ND_TCHECK2(*bp, 32);
+	uint8_t version, inner_len;
+	uint32_t seq_no;
 	
-	ND_PRINT((ndo, "Type %d, Channel ID %d, Device ID 0x%04x, ",
-		  *(bp + 3), *(bp + 4), EXTRACT_16BITS(bp + 5)));
-	if (*(bp + 7))
-	  ND_PRINT((ndo, "CRC, "));
-	else
-	  ND_PRINT((ndo, "LQI %d, ", *(bp + 8)));
-	
-	zep_print_ts(ndo, bp + 9);
-	seq_no = EXTRACT_32BITS(bp + 17);
-	inner_len = *(bp + 31);
-	ND_PRINT((ndo, ", seq# = %d, inner len = %d", seq_no, inner_len));
-	bp += 32;
-	len -= 32;
-      }
-    }
+	ndo->ndo_protocol ="ZEP";
 
-    if (inner_len != 0) {
-      /* Call 802.15.4 dissector. */
-      ND_PRINT((ndo, "\n\t"));
-      if (ieee802_15_4_print(ndo, bp, inner_len)) {
-	bp += len;
-	len = 0;
-      }
-    }
-    
-    if (!ndo->ndo_suppress_default_print)
-      ND_DEFAULTPRINT(bp, len);
-    
-    return;    
+	ND_PRINT("ZEP");
+	
+	ND_TCHECK_LEN(bp, 8);
+	
+	if (EXTRACT_U_1(bp) != 'E' || EXTRACT_U_1(bp + 1) != 'X')
+		goto trunc;
+	
+	version = EXTRACT_U_1(bp + 2);
+	ND_PRINT("v%d ", version);
+	
+	if (version == 1) {
+		/* ZEP v1 packet. */
+		ND_TCHECK_LEN(bp, 16);
+		ND_PRINT("Channel ID %d, Device ID 0x%04x, ",
+			 EXTRACT_U_1(bp + 3), EXTRACT_BE_U_2(bp + 4));
+		if (EXTRACT_U_1(bp + 6))
+			ND_PRINT("CRC, ");
+		else
+			ND_PRINT("LQI %d, ", EXTRACT_U_1(bp + 7));
+		inner_len = EXTRACT_U_1(bp + 15);
+		ND_PRINT("inner len = %d", inner_len);
+		
+		bp += 16;
+		len -= 16;
+	} else {
+		/* ZEP v2 packet. */
+		if (EXTRACT_U_1(bp + 3) == 2) {
+			/* ZEP v2 ack. */
+			seq_no = EXTRACT_BE_U_4(bp + 4);
+			ND_PRINT("ACK, seq# = %d", seq_no);
+			inner_len = 0;
+			bp += 8;
+			len -= 8;
+		} else {
+			/* ZEP v2 data, or some other. */
+			ND_TCHECK_LEN(bp, 32);
+			
+			ND_PRINT("Type %d, Channel ID %d, Device ID 0x%04x, ",
+				 EXTRACT_U_1(bp + 3), EXTRACT_U_1(bp + 4),
+				 EXTRACT_BE_U_2(bp + 5));
+			if (EXTRACT_U_1(bp + 7))
+				ND_PRINT("CRC, ");
+			else
+				ND_PRINT("LQI %d, ", EXTRACT_U_1(bp + 8));
+			
+			zep_print_ts(ndo, bp + 9);
+			seq_no = EXTRACT_BE_U_4(bp + 17);
+			inner_len = EXTRACT_U_1(bp + 31);
+			ND_PRINT(", seq# = %d, inner len = %d",
+				 seq_no, inner_len);
+			bp += 32;
+			len -= 32;
+		}
+	}
+	
+	if (inner_len != 0) {
+		/* Call 802.15.4 dissector. */
+		ND_PRINT("\n\t");
+		if (ieee802_15_4_print(ndo, bp, inner_len)) {
+			bp += len;
+			len = 0;
+		}
+	}
+	
+	if (!ndo->ndo_suppress_default_print)
+		ND_DEFAULTPRINT(bp, len);
+	
+	return;    
  trunc:
-    ND_PRINT((ndo, " [|ZEP]"));
+	ND_PRINT(" [|ZEP]");
 }
+
+/*
+ * Local Variables:
+ * c-style: whitesmith
+ * c-basic-offset: 8
+ * End:
+ */

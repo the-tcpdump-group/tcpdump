@@ -18,10 +18,10 @@
 /* \summary: ISO CALM FAST and ETSI GeoNetworking printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include "netdissect.h"
 #include "extract.h"
@@ -59,25 +59,25 @@ static void
 print_btp_body(netdissect_options *ndo,
                const u_char *bp)
 {
-	int version;
-	int msg_type;
+	u_int version;
+	u_int msg_type;
 	const char *msg_type_str;
 
 	/* Assuming ItsDpuHeader */
-	version = bp[0];
-	msg_type = bp[1];
+	version = EXTRACT_U_1(bp);
+	msg_type = EXTRACT_U_1(bp + 1);
 	msg_type_str = tok2str(msg_type_values, "unknown (%u)", msg_type);
 
-	ND_PRINT((ndo, "; ItsPduHeader v:%d t:%d-%s", version, msg_type, msg_type_str));
+	ND_PRINT("; ItsPduHeader v:%u t:%u-%s", version, msg_type, msg_type_str);
 }
 
 static void
 print_btp(netdissect_options *ndo,
           const u_char *bp)
 {
-	uint16_t dest = EXTRACT_16BITS(bp+0);
-	uint16_t src = EXTRACT_16BITS(bp+2);
-	ND_PRINT((ndo, "; BTP Dst:%u Src:%u", dest, src));
+	uint16_t dest = EXTRACT_BE_U_2(bp + 0);
+	uint16_t src = EXTRACT_BE_U_2(bp + 2);
+	ND_PRINT("; BTP Dst:%u Src:%u", dest, src);
 }
 
 static int
@@ -86,16 +86,16 @@ print_long_pos_vector(netdissect_options *ndo,
 {
 	uint32_t lat, lon;
 
-	if (!ND_TTEST2(*bp, GEONET_ADDR_LEN))
+	if (!ND_TTEST_LEN(bp, GEONET_ADDR_LEN))
 		return (-1);
-	ND_PRINT((ndo, "GN_ADDR:%s ", linkaddr_string (ndo, bp, 0, GEONET_ADDR_LEN)));
+	ND_PRINT("GN_ADDR:%s ", linkaddr_string (ndo, bp, 0, GEONET_ADDR_LEN));
 
-	if (!ND_TTEST2(*(bp+12), 8))
+	if (!ND_TTEST_8(bp + 12))
 		return (-1);
-	lat = EXTRACT_32BITS(bp+12);
-	ND_PRINT((ndo, "lat:%d ", lat));
-	lon = EXTRACT_32BITS(bp+16);
-	ND_PRINT((ndo, "lon:%d", lon));
+	lat = EXTRACT_BE_U_4(bp + 12);
+	ND_PRINT("lat:%u ", lat);
+	lon = EXTRACT_BE_U_4(bp + 16);
+	ND_PRINT("lon:%u", lon);
 	return (0);
 }
 
@@ -108,32 +108,33 @@ void
 geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	     const struct lladdr_info *src)
 {
-	int version;
-	int next_hdr;
-	int hdr_type;
-	int hdr_subtype;
+	u_int version;
+	u_int next_hdr;
+	u_int hdr_type;
+	u_int hdr_subtype;
 	uint16_t payload_length;
-	int hop_limit;
+	u_int hop_limit;
 	const char *next_hdr_txt = "Unknown";
 	const char *hdr_type_txt = "Unknown";
 	int hdr_size = -1;
 
-	ND_PRINT((ndo, "GeoNet "));
+	ndo->ndo_protocol = "geonet";
+	ND_PRINT("GeoNet ");
 	if (src != NULL)
-		ND_PRINT((ndo, "src:%s", (src->addr_string)(ndo, src->addr)));
-	ND_PRINT((ndo, "; "));
+		ND_PRINT("src:%s", (src->addr_string)(ndo, src->addr));
+	ND_PRINT("; ");
 
 	/* Process Common Header */
 	if (length < 36)
 		goto invalid;
 
-	ND_TCHECK2(*bp, 8);
-	version = bp[0] >> 4;
-	next_hdr = bp[0] & 0x0f;
-	hdr_type = bp[1] >> 4;
-	hdr_subtype = bp[1] & 0x0f;
-	payload_length = EXTRACT_16BITS(bp+4);
-	hop_limit = bp[7];
+	ND_TCHECK_8(bp);
+	version = EXTRACT_U_1(bp) >> 4;
+	next_hdr = EXTRACT_U_1(bp) & 0x0f;
+	hdr_type = EXTRACT_U_1(bp + 1) >> 4;
+	hdr_subtype = EXTRACT_U_1(bp + 1) & 0x0f;
+	payload_length = EXTRACT_BE_U_2(bp + 4);
+	hop_limit = EXTRACT_U_1(bp + 7);
 
 	switch (next_hdr) {
 		case 0: next_hdr_txt = "Any"; break;
@@ -170,11 +171,11 @@ geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			break;
 	}
 
-	ND_PRINT((ndo, "v:%d ", version));
-	ND_PRINT((ndo, "NH:%d-%s ", next_hdr, next_hdr_txt));
-	ND_PRINT((ndo, "HT:%d-%d-%s ", hdr_type, hdr_subtype, hdr_type_txt));
-	ND_PRINT((ndo, "HopLim:%d ", hop_limit));
-	ND_PRINT((ndo, "Payload:%d ", payload_length));
+	ND_PRINT("v:%u ", version);
+	ND_PRINT("NH:%u-%s ", next_hdr, next_hdr_txt);
+	ND_PRINT("HT:%u-%u-%s ", hdr_type, hdr_subtype, hdr_type_txt);
+	ND_PRINT("HopLim:%u ", hop_limit);
+	ND_PRINT("Payload:%u ", payload_length);
 	if (print_long_pos_vector(ndo, bp + 8) == -1)
 		goto trunc;
 
@@ -232,7 +233,7 @@ geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	if (hdr_size >= 0) {
 		if (length < (u_int)hdr_size)
 			goto invalid;
-		ND_TCHECK2(*bp, hdr_size);
+		ND_TCHECK_LEN(bp, hdr_size);
 		length -= hdr_size;
 		bp += hdr_size;
 		switch (next_hdr) {
@@ -242,7 +243,7 @@ geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			case 2: /* BTP A/B */
 				if (length < 4)
 					goto invalid;
-				ND_TCHECK2(*bp, 4);
+				ND_TCHECK_4(bp);
 				print_btp(ndo, bp);
 				length -= 4;
 				bp += 4;
@@ -254,7 +255,7 @@ geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 					 * or was that just not
 					 * reporting genuine errors?
 					 */
-					ND_TCHECK2(*bp, 2);
+					ND_TCHECK_2(bp);
 					print_btp_body(ndo, bp);
 				}
 				break;
@@ -269,18 +270,10 @@ geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	return;
 
 invalid:
-	ND_PRINT((ndo, " Malformed (small) "));
+	ND_PRINT(" Malformed (small) ");
 	/* XXX - print the remaining data as hex? */
 	return;
 
 trunc:
-	ND_PRINT((ndo, "[|geonet]"));
+	nd_print_trunc(ndo);
 }
-
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

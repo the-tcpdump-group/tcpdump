@@ -20,6 +20,13 @@
  */
 
 /*
+ * Maximum length of the length field in an Ethernet header; any value
+ * greater than this is not a length value, so it's either an Ethernet
+ * type or an invalid value.
+ */
+#define	MAX_ETHERNET_LENGTH_VAL	1500
+
+/*
  * Ethernet types.
  *
  * We wrap the declarations with #ifdef, so that if a file includes
@@ -144,6 +151,9 @@
 #endif
 #ifndef ETHERTYPE_PPPOES
 #define ETHERTYPE_PPPOES	0x8864
+#endif
+#ifndef ETHERTYPE_NSH
+#define ETHERTYPE_NSH		0x894F
 #endif
 #ifndef ETHERTYPE_PPPOED2
 #define ETHERTYPE_PPPOED2	0x3c12

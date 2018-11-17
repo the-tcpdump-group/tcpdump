@@ -14,13 +14,27 @@ env:
     - BUILD_LIBPCAP=true
     # encrypted COVERITY_SCAN_TOKEN from
     # https://scan.coverity.com/projects/<project_id>/submit_build?tab=travis_ci
-    - secure: "pcl5WdUhdnG5VpiyIKkVkNimnkvrnbWb8YOgw2ERJ0qNqIaF/Re4qV/rDXYe+AkRwAR071HQW6KlDnpeUlHKPNhmfzeUlmOxSatvdVPw+FV5KqOuidZbHDH/RiWvvlOyaJq26aDExFSDxV+98v39q+n1jNSqggHLe8o48zVK/+U="
+    - secure: "DwUeukcRGl1vXNZDDt2237zCA58ZzmzWpCkPcb/Hpeh8OvRw1eBZJiu4L8iD2qtY4A/dPDvOeBiml5MF6bVri9Dui1yPkvkvFqIXzbK5CWS6Ye+NgSBNMwqnAjhTMv/x8I4Bvy9IhDGwj/2JXVUvjBddRMLRyr/ag+MDRB1IVAI="
     # Coverity run condition (avoid matrix multiple runs), need customized
     # build script. Need an update if new matrix cases.
-    - coverity_scan_run_condition='"$TRAVIS_OS_NAME" = linux -a "$CC" = gcc'
+    - coverity_scan_run_condition='"$TRAVIS_OS_NAME" = linux -a "$CC" = gcc -a "$REMOTE" = enable -a "$CMAKE" = no -a "$CRYPTO" = yes'
     # Coverity script test mode (if true no uploading, avoid reaching the quota)
     # usual processing: false.
     - coverity_scan_script_test_mode=false
+  matrix:
+    # NOTE: REMOTE= is for the libpcap build, which is done with autotools
+    # even if we're building tcpdump with CMake.
+    - CMAKE=no  REMOTE=disable CRYPTO=no
+    - CMAKE=no  REMOTE=disable CRYPTO=yes
+    - CMAKE=no  REMOTE=enable  CRYPTO=no
+    - CMAKE=no  REMOTE=enable  CRYPTO=yes
+    - CMAKE=yes REMOTE=disable CRYPTO=no
+    - CMAKE=yes REMOTE=disable CRYPTO=yes
+    - CMAKE=yes REMOTE=enable  CRYPTO=no
+    - CMAKE=yes REMOTE=enable  CRYPTO=yes
+
+matrix:
+  fast_finish: true
 
 addons:
   coverity_scan:
@@ -42,6 +56,11 @@ addons:
     branch_pattern: coverity_scan
   apt:
     packages:
+      - libusb-1.0-0-dev
+      - libdbus-glib-1-dev
+      - libbluetooth-dev
+      - libnl-genl-3-dev
+      - libibverbs-dev
       - libssl-dev
       - libssl0.9.8
       - libssl1.0.0
@@ -63,18 +82,27 @@ install:
   - if [ "$TRAVIS_OS_NAME" = osx ]; then brew install libsmi | grep -v '%'; fi
 
 before_script:
-  - if [ "$BUILD_LIBPCAP" = true ]; then (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth=50 --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure && make); fi
+  - if [ "$BUILD_LIBPCAP" = true ]; then (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth 3 --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure "--${REMOTE}-remote" --prefix=/tmp && make && make install); fi
 
 script:
-  - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then touch .devel configure; fi
-  - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then echo '$ ./configure [...]' && echo -n travis_fold:start:script.configure; fi
-  - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then ./configure --prefix=/tmp; fi
-  - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then echo -n travis_fold:end:script.configure; fi
-  - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then make -s; fi
-  - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then echo '$ make install [...]' && echo -n travis_fold:start:script.make_install; fi
-  - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then PATH=$PATH make install; fi
-  - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then echo -n travis_fold:end:script.make_install; fi
-  - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then make check; fi
-  - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then ./tcpdump -D; fi
-  - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then ./tcpdump -J; fi
-  - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then ./tcpdump --version; fi
+  - if [ "$COVERITY_SCAN_BRANCH" = 1 ]; then exit 0; fi
+  - if [ "$TRAVIS_OS_NAME" = osx ]; then OSX_SSL_DIR=$(ls /usr/local/Cellar/openssl); echo "OSX_SSL_DIR=$OSX_SSL_DIR"; fi
+  - touch .devel configure
+  - if [ "$CMAKE" = no ]; then echo '$ ./configure [...]' && echo -n travis_fold:start:script.configure; fi
+  - if [ "$CMAKE" = no ]; then ./configure --with-crypto=${CRYPTO} CPPFLAGS="-I/usr/local/Cellar/openssl/$OSX_SSL_DIR/include/" --prefix=/tmp; fi
+  - if [ "$CMAKE" = no ]; then echo -n travis_fold:end:script.configure; fi
+  - if [ "$CMAKE" = yes ]; then mkdir build; fi
+  - if [ "$CMAKE" = yes ]; then cd build; fi
+  - if [ "$CMAKE" = yes ]; then echo -n travis_fold:start:script.cmake; fi
+  - if [ "$CMAKE" = yes ]; then cmake -DCMAKE_PREFIX_PATH=/tmp -DCMAKE_INSTALL_PREFIX=/tmp ..; fi
+  - if [ "$CMAKE" = yes ]; then echo -n travis_fold:end:script.cmake; fi
+  - make -s
+  - echo '$ make install [...]' && echo -n travis_fold:start:script.make_install
+  - PATH=$PATH make install
+  - echo -n travis_fold:end:script.make_install
+  - if [ "$CMAKE" = no ]; then make check; fi
+  - ./tcpdump -D
+  - ./tcpdump -J
+  - ./tcpdump --version
+  - ./tcpdump -h
+  - if [ "$CMAKE" = no ]; then make releasetar; fi

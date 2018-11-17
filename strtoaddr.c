@@ -16,10 +16,10 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 #include <stddef.h>
 #include <string.h>
 
@@ -41,10 +41,6 @@
  * WARNING: Don't even consider trying to compile this on a system where
  * sizeof(int) < 4.  sizeof(int) > 4 is fine; all the world's not a VAX.
  */
-
-#ifndef NS_IN6ADDRSZ
-#define NS_IN6ADDRSZ   16   /* IPv6 T_AAAA */
-#endif
 
 /* int
  * strtoaddr(src, dst)

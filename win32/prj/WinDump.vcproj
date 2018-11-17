@@ -447,28 +447,6 @@
 			</FileConfiguration>
 		</File>
 		<File
-			RelativePath="..\..\gmt2local.c"
-			>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions=""
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions=""
-				/>
-			</FileConfiguration>
-		</File>
-		<File
 			RelativePath="..\..\in_cksum.c"
 			>
 			<FileConfiguration
@@ -3791,7 +3769,7 @@
 			</FileConfiguration>
 		</File>
 
-		<File RelativePath="..\Src\ether_ntohost.c">
+		<File RelativePath="..\..\missing\win_ether_ntohost.c">
 			<FileConfiguration
 				Name="Debug|Win32"
 				>

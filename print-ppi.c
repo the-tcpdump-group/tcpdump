@@ -5,26 +5,27 @@
 /* \summary: Oracle DLT_PPI printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include "netdissect.h"
 #include "extract.h"
 
+
 typedef struct ppi_header {
-	uint8_t		ppi_ver;
-	uint8_t		ppi_flags;
-	uint16_t	ppi_len;
-	uint32_t	ppi_dlt;
+	nd_uint8_t	ppi_ver;
+	nd_uint8_t	ppi_flags;
+	nd_uint16_t	ppi_len;
+	nd_uint32_t	ppi_dlt;
 } ppi_header_t;
 
 #define	PPI_HDRLEN	8
 
 #ifdef DLT_PPI
 
-static inline void
+static void
 ppi_header_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	const ppi_header_t *hdr;
@@ -34,24 +35,24 @@ ppi_header_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	hdr = (const ppi_header_t *)bp;
 
-	len = EXTRACT_LE_16BITS(&hdr->ppi_len);
-	dlt = EXTRACT_LE_32BITS(&hdr->ppi_dlt);
+	len = EXTRACT_LE_U_2(hdr->ppi_len);
+	dlt = EXTRACT_LE_U_4(hdr->ppi_dlt);
 	dltname = pcap_datalink_val_to_name(dlt);
 
 	if (!ndo->ndo_qflag) {
-		ND_PRINT((ndo, "V.%d DLT %s (%d) len %d", hdr->ppi_ver,
+		ND_PRINT("V.%u DLT %s (%u) len %u", EXTRACT_U_1(hdr->ppi_ver),
 			  (dltname != NULL ? dltname : "UNKNOWN"), dlt,
-                          len));
+                          len);
         } else {
-		ND_PRINT((ndo, "%s", (dltname != NULL ? dltname : "UNKNOWN")));
+		ND_PRINT("%s", (dltname != NULL ? dltname : "UNKNOWN"));
         }
 
-	ND_PRINT((ndo, ", length %u: ", length));
+	ND_PRINT(", length %u: ", length);
 }
 
 static u_int
 ppi_print(netdissect_options *ndo,
-               const struct pcap_pkthdr *h, const u_char *p)
+	  const struct pcap_pkthdr *h, const u_char *p)
 {
 	if_printer printer;
 	const ppi_header_t *hdr;
@@ -62,26 +63,29 @@ ppi_print(netdissect_options *ndo,
 	uint32_t hdrlen;
 	struct pcap_pkthdr nhdr;
 
+	ndo->ndo_protocol = "ppi";
 	if (caplen < sizeof(ppi_header_t)) {
-		ND_PRINT((ndo, "[|ppi]"));
+		nd_print_trunc(ndo);
 		return (caplen);
 	}
 
 	hdr = (const ppi_header_t *)p;
-	len = EXTRACT_LE_16BITS(&hdr->ppi_len);
+	ND_TCHECK_2(hdr->ppi_len);
+	len = EXTRACT_LE_U_2(hdr->ppi_len);
 	if (caplen < len) {
 		/*
 		 * If we don't have the entire PPI header, don't
 		 * bother.
 		 */
-		ND_PRINT((ndo, "[|ppi]"));
+		nd_print_trunc(ndo);
 		return (caplen);
 	}
 	if (len < sizeof(ppi_header_t)) {
-		ND_PRINT((ndo, "[|ppi]"));
+		nd_print_trunc(ndo);
 		return (len);
 	}
-	dlt = EXTRACT_LE_32BITS(&hdr->ppi_dlt);
+	ND_TCHECK_4(hdr->ppi_dlt);
+	dlt = EXTRACT_LE_U_4(hdr->ppi_dlt);
 
 	if (ndo->ndo_eflag)
 		ppi_header_print(ndo, p, length);
@@ -104,6 +108,8 @@ ppi_print(netdissect_options *ndo,
 		hdrlen = 0;
 	}
 	return (len + hdrlen);
+trunc:
+	return (caplen);
 }
 
 /*
@@ -114,16 +120,9 @@ ppi_print(netdissect_options *ndo,
  */
 u_int
 ppi_if_print(netdissect_options *ndo,
-               const struct pcap_pkthdr *h, const u_char *p)
+	     const struct pcap_pkthdr *h, const u_char *p)
 {
+	ndo->ndo_protocol = "ppi_if";
 	return (ppi_print(ndo, h, p));
 }
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */
-
 #endif /* DLT_PPI */

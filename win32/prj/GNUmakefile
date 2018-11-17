@@ -24,14 +24,13 @@ CFLAGS = -I ${PCAP_DIR}/wpcap/libpcap/bpf \
 	-D_U_="__attribute__((unused))" \
 	-D_WIN32_WINNT=0x0501 \
 	-mno-cygwin ${OPTFLAGS}
-LDFLAGS = 
+LDFLAGS =
 LIBS = -L ${PCAP_DIR}/WPCAP/LIB -lwpcap -lws2_32
 OBJS = \
 	../../addrtoname.o \
 	../../af.o \
 	../../checksum.o \
 	../../gmpls.o \
-	../../gmt2local.o \
 	../../missing/inet_aton.o \
 	../../missing/inet_ntop.o \
 	../../missing/strlcpy.o \
@@ -140,7 +139,7 @@ OBJS = \
 	../../print-vjc.o \
 	../../print-vqp.o \
 	../../print-vrrp.o \
-        ../../print-vtp.o \
+	../../print-vtp.o \
 	../../print-wb.o \
 	../../print-zephyr.o \
 	../../setsignal.o \

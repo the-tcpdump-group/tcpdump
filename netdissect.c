@@ -23,10 +23,10 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 #include "netdissect.h"
 #include <string.h>
 #include <stdio.h>
@@ -122,14 +122,14 @@ nd_load_smi_module(const char *module, char *errbuf, size_t errbuf_size)
 {
 #ifdef USE_LIBSMI
 	if (smiLoadModule(module) == 0) {
-		snprintf(errbuf, errbuf_size, "could not load MIB module %s",
+		nd_snprintf(errbuf, errbuf_size, "could not load MIB module %s",
 		    module);
 		return (-1);
 	}
 	nd_smi_module_loaded = 1;
 	return (0);
 #else
-	snprintf(errbuf, errbuf_size, "MIB module %s not loaded: no libsmi support",
+	nd_snprintf(errbuf, errbuf_size, "MIB module %s not loaded: no libsmi support",
 	    module);
 	return (-1);
 #endif

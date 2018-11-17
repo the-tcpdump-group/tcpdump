@@ -1,0 +1,31 @@
+version: '{build}'
+
+branches:
+  only:
+  - master
+
+clone_depth: 5
+
+matrix:
+  fast_finish: true
+
+install:
+  - appveyor DownloadFile http://www.winpcap.org/install/bin/WpdPack_4_1_2.zip
+  - 7z x .\WpdPack_4_1_2.zip -oc:\projects\libpcap\Win32
+
+environment:
+  matrix:
+    - GENERATOR: "Visual Studio 14 2015"
+      SDK: WpdPack
+    - GENERATOR: "Visual Studio 14 2015 Win64"
+      SDK: WpdPack
+
+build_script:
+  #
+  # Appveyor defaults to cmd.exe, so use cmd.exe syntax.
+  #
+  - type NUL >.devel
+  - md build
+  - cd build
+  - cmake -DCMAKE_PREFIX_PATH=c:\projects\libpcap\Win32\%SDK% -G"%GENERATOR%" ..
+  - msbuild /m /nologo /p:Configuration=Release tcpdump.sln
