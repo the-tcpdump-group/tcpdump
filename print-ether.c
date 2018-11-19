@@ -163,6 +163,10 @@ ether_print(netdissect_options *ndo,
 		nd_print_trunc(ndo);
 		return (caplen);
 	}
+	if (length < ETHER_HDRLEN) {
+		nd_print_trunc(ndo);
+		return (length);
+	}
 
 	if (ndo->ndo_eflag) {
 		if (print_encap_header != NULL)
@@ -209,6 +213,11 @@ recurse:
 			ndo->ndo_protocol = "vlan";
 			nd_print_trunc(ndo);
 			return (hdrlen + caplen);
+		}
+		if (length < 4) {
+			ndo->ndo_protocol = "vlan";
+			nd_print_trunc(ndo);
+			return (hdrlen + length);
 		}
 	        if (ndo->ndo_eflag) {
 			uint16_t tag = EXTRACT_BE_U_2(p);
