@@ -53,6 +53,7 @@ ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
 	const void *dst_addr;
 	const struct ip6_rthdr *dp;
 	const struct ip6_rthdr0 *dp0;
+	const struct ip6_srh *srh;
 	const u_char *p;
 	int i, len;
 
@@ -113,6 +114,19 @@ ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
 					dst_addr = (const void *)p;
 					p += 16;
 				}
+				break;
+			case IPV6_RTHDR_TYPE_4:
+				/* IPv6 Segment Routing Header (SRH) */
+				srh = (const struct ip6_srh *)dp;
+				if (len % 2 == 1)
+					goto trunc;
+				p = (const u_char *) srh->srh_segments;
+				/*
+				 * The list of segments are encoded in the reverse order.
+				 * Accordingly, the final DA is encoded in srh_segments[0]
+				 */
+				ND_TCHECK_16(p);
+				dst_addr = (const void *)p;
 				break;
 
 			default:
