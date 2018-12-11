@@ -139,15 +139,13 @@ struct tok {
 	const char *s;		/* string */
 };
 
-extern const char *tok2strbuf(const struct tok *, FORMAT_STRING(const char *),
-			      u_int, char *buf, size_t bufsize);
+extern const char *tok2strbuf(const struct tok *, const char *, u_int,
+			      char *buf, size_t bufsize);
 
 /* tok2str is deprecated */
-extern const char *tok2str(const struct tok *, FORMAT_STRING(const char *),
-			   u_int);
-extern char *bittok2str(const struct tok *, FORMAT_STRING(const char *), u_int);
-extern char *bittok2str_nosep(const struct tok *, FORMAT_STRING(const char *),
-			      u_int);
+extern const char *tok2str(const struct tok *, const char *, u_int);
+extern char *bittok2str(const struct tok *, const char *, u_int);
+extern char *bittok2str_nosep(const struct tok *, const char *, u_int);
 
 /* Initialize netdissect. */
 extern int nd_init(char *, size_t);
