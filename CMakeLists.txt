@@ -859,6 +859,20 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/.devel OR EXISTS ${CMAKE_BINARY_DIR}/.devel)
         # structure members.
         #
         check_and_add_compiler_option(-wd4820)
+        #
+        # We do *not* care about every single place the compiler would
+        # have inserted Spectre mitigation if only we had told it to
+        # do so with /Qspectre.  I guess the theory is that it's seeing
+        # bounds checks that would prevent out-of-bounds loads and that
+        # those out-of-bounds loads could be done speculatively and that
+        # the Spectre attack could detect the value of the out-of-bounds
+        # data *if* it's within our address space, but unless I'm
+        # missing something I don't see that as being any form of
+        # security hole.
+        #
+        # XXX - add /Qspectre if that is really worth doing.
+        #
+        check_and_add_compiler_option(-wd5045)
     else()
         #
         # Other compilers, including MSVC with a Clang front end and
