@@ -101,8 +101,8 @@ hex_and_ascii_print_with_offset(netdissect_options *ndo, const char *ident,
 {
 	u_int caplength;
 	u_int i;
-	int s1, s2;
-	int nshorts;
+	u_int s1, s2;
+	u_int nshorts;
 	char hexstuff[HEXDUMP_SHORTS_PER_LINE*HEXDUMP_HEXSTUFF_PER_SHORT+1], *hsp;
 	char asciistuff[ASCII_LINELENGTH+1], *asp;
 
@@ -112,7 +112,7 @@ hex_and_ascii_print_with_offset(netdissect_options *ndo, const char *ident,
 	nshorts = length / sizeof(u_short);
 	i = 0;
 	hsp = hexstuff; asp = asciistuff;
-	while (--nshorts >= 0) {
+	while (nshorts != 0) {
 		s1 = EXTRACT_U_1(cp);
 		cp++;
 		s2 = EXTRACT_U_1(cp);
@@ -120,8 +120,8 @@ hex_and_ascii_print_with_offset(netdissect_options *ndo, const char *ident,
 		(void)nd_snprintf(hsp, sizeof(hexstuff) - (hsp - hexstuff),
 		    " %02x%02x", s1, s2);
 		hsp += HEXDUMP_HEXSTUFF_PER_SHORT;
-		*(asp++) = (ND_ISGRAPH(s1) ? s1 : '.');
-		*(asp++) = (ND_ISGRAPH(s2) ? s2 : '.');
+		*(asp++) = (char)(ND_ISGRAPH(s1) ? s1 : '.');
+		*(asp++) = (char)(ND_ISGRAPH(s2) ? s2 : '.');
 		i++;
 		if (i >= HEXDUMP_SHORTS_PER_LINE) {
 			*hsp = *asp = '\0';
@@ -131,6 +131,7 @@ hex_and_ascii_print_with_offset(netdissect_options *ndo, const char *ident,
 			i = 0; hsp = hexstuff; asp = asciistuff;
 			oset += HEXDUMP_BYTES_PER_LINE;
 		}
+		nshorts--;
 	}
 	if (length & 1) {
 		s1 = EXTRACT_U_1(cp);
@@ -138,7 +139,7 @@ hex_and_ascii_print_with_offset(netdissect_options *ndo, const char *ident,
 		(void)nd_snprintf(hsp, sizeof(hexstuff) - (hsp - hexstuff),
 		    " %02x", s1);
 		hsp += 3;
-		*(asp++) = (ND_ISGRAPH(s1) ? s1 : '.');
+		*(asp++) = (char)(ND_ISGRAPH(s1) ? s1 : '.');
 		++i;
 	}
 	if (i > 0) {
@@ -166,14 +167,14 @@ hex_print_with_offset(netdissect_options *ndo,
 {
 	u_int caplength;
 	u_int i, s;
-	int nshorts;
+	u_int nshorts;
 
 	caplength = (ndo->ndo_snapend > cp) ? ndo->ndo_snapend - cp : 0;
 	if (length > caplength)
 		length = caplength;
-	nshorts = (u_int) length / sizeof(u_short);
+	nshorts = length / sizeof(u_short);
 	i = 0;
-	while (--nshorts >= 0) {
+	while (nshorts != 0) {
 		if ((i++ % 8) == 0) {
 			ND_PRINT("%s0x%04x: ", ident, oset);
 			oset += HEXDUMP_BYTES_PER_LINE;
@@ -182,6 +183,7 @@ hex_print_with_offset(netdissect_options *ndo,
 		cp++;
 		ND_PRINT(" %02x%02x", s, EXTRACT_U_1(cp));
 		cp++;
+		nshorts--;
 	}
 	if (length & 1) {
 		if ((i % 8) == 0)
