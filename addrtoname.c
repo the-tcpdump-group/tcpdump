@@ -242,13 +242,13 @@ intoa(uint32_t addr)
 	n = 4;
 	do {
 		byte = addr & 0xff;
-		*--cp = byte % 10 + '0';
+		*--cp = (char)(byte % 10) + '0';
 		byte /= 10;
 		if (byte > 0) {
-			*--cp = byte % 10 + '0';
+			*--cp = (char)(byte % 10) + '0';
 			byte /= 10;
 			if (byte > 0)
-				*--cp = byte + '0';
+				*--cp = (char)byte + '0';
 		}
 		*--cp = '.';
 		addr >>= 8;
@@ -426,9 +426,9 @@ lookup_emem(netdissect_options *ndo, const u_char *ep)
 			return tp;
 		else
 			tp = tp->e_nxt;
-	tp->e_addr0 = i;
-	tp->e_addr1 = j;
-	tp->e_addr2 = k;
+	tp->e_addr0 = (u_short)i;
+	tp->e_addr1 = (u_short)j;
+	tp->e_addr2 = (u_short)k;
 	tp->e_nxt = (struct enamemem *)calloc(1, sizeof(*tp));
 	if (tp->e_nxt == NULL)
 		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC, "lookup_emem: calloc");
@@ -470,9 +470,9 @@ lookup_bytestring(netdissect_options *ndo, const u_char *bs,
 		else
 			tp = tp->bs_nxt;
 
-	tp->bs_addr0 = i;
-	tp->bs_addr1 = j;
-	tp->bs_addr2 = k;
+	tp->bs_addr0 = (u_short)i;
+	tp->bs_addr1 = (u_short)j;
+	tp->bs_addr2 = (u_short)k;
 
 	tp->bs_bytes = (u_char *) calloc(1, nlen);
 	if (tp->bs_bytes == NULL)
@@ -519,9 +519,9 @@ lookup_nsap(netdissect_options *ndo, const u_char *nsap,
 			return tp;
 		else
 			tp = tp->e_nxt;
-	tp->e_addr0 = i;
-	tp->e_addr1 = j;
-	tp->e_addr2 = k;
+	tp->e_addr0 = (u_short)i;
+	tp->e_addr1 = (u_short)j;
+	tp->e_addr2 = (u_short)k;
 	tp->e_nsap = (u_char *)malloc(nsap_length + 1);
 	if (tp->e_nsap == NULL)
 		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC, "lookup_nsap: malloc");
@@ -554,7 +554,7 @@ lookup_protoid(netdissect_options *ndo, const u_char *pi)
 		else
 			tp = tp->p_nxt;
 	tp->p_oui = i;
-	tp->p_proto = j;
+	tp->p_proto = (u_short)j;
 	tp->p_nxt = (struct protoidmem *)calloc(1, sizeof(*tp));
 	if (tp->p_nxt == NULL)
 		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC, "lookup_protoid: calloc");
@@ -979,7 +979,10 @@ init_etherarray(netdissect_options *ndo)
 	}
 }
 
-static const struct tok ipxsap_db[] = {
+static const struct ipxsap_ent {
+	uint16_t	v;
+	const char	*s;
+} ipxsap_db[] = {
 	{ 0x0000, "Unknown" },
 	{ 0x0001, "User" },
 	{ 0x0002, "User Group" },
@@ -1203,7 +1206,7 @@ init_ipxsaparray(netdissect_options *ndo)
 	struct hnamemem *table;
 
 	for (i = 0; ipxsap_db[i].s != NULL; i++) {
-		int j = htons(ipxsap_db[i].v) & (HASHNAMESIZE-1);
+		u_int j = htons(ipxsap_db[i].v) & (HASHNAMESIZE-1);
 		table = &ipxsaptable[j];
 		while (table->name)
 			table = table->nxt;
