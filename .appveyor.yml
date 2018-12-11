@@ -12,6 +12,8 @@ matrix:
 install:
   - appveyor DownloadFile http://www.winpcap.org/install/bin/WpdPack_4_1_2.zip
   - 7z x .\WpdPack_4_1_2.zip -oc:\projects\libpcap\Win32
+  - appveyor DownloadFile https://nmap.org/npcap/dist/npcap-sdk-0.1.zip
+  - 7z x .\npcap-sdk-0.1.zip -oc:\projects\libpcap\Win32
 
 environment:
   matrix:
@@ -19,6 +21,10 @@ environment:
       SDK: WpdPack
     - GENERATOR: "Visual Studio 14 2015 Win64"
       SDK: WpdPack
+    - GENERATOR: "Visual Studio 14 2015"
+      SDK: npcap-sdk-0.1
+    - GENERATOR: "Visual Studio 14 2015 Win64"
+      SDK: npcap-sdk-0.1
 
 build_script:
   #
