@@ -313,7 +313,7 @@ trunc:
 	return ep;
 }
 
-static int udp_cksum(netdissect_options *ndo, const struct ip *ip,
+static uint16_t udp_cksum(netdissect_options *ndo, const struct ip *ip,
 		     const struct udphdr *up,
 		     u_int len)
 {
@@ -321,7 +321,7 @@ static int udp_cksum(netdissect_options *ndo, const struct ip *ip,
 				IPPROTO_UDP);
 }
 
-static int udp6_cksum(netdissect_options *ndo, const struct ip6_hdr *ip6,
+static uint16_t udp6_cksum(netdissect_options *ndo, const struct ip6_hdr *ip6,
 		      const struct udphdr *up, u_int len)
 {
 	return nextproto6_cksum(ndo, ip6, (const uint8_t *)(const void *)up, len, len,

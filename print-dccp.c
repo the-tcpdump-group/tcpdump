@@ -201,14 +201,14 @@ dccp_csum_coverage(const struct dccp_hdr* dh, u_int len)
 	return (cov > len)? len : cov;
 }
 
-static int dccp_cksum(netdissect_options *ndo, const struct ip *ip,
+static uint16_t dccp_cksum(netdissect_options *ndo, const struct ip *ip,
 	const struct dccp_hdr *dh, u_int len)
 {
 	return nextproto4_cksum(ndo, ip, (const uint8_t *)(const void *)dh, len,
 				dccp_csum_coverage(dh, len), IPPROTO_DCCP);
 }
 
-static int dccp6_cksum(netdissect_options *ndo, const struct ip6_hdr *ip6,
+static uint16_t dccp6_cksum(netdissect_options *ndo, const struct ip6_hdr *ip6,
 	const struct dccp_hdr *dh, u_int len)
 {
 	return nextproto6_cksum(ndo, ip6, (const uint8_t *)(const void *)dh, len,

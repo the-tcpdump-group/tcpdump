@@ -138,7 +138,7 @@ trunc:
 /*
  * Compute a V4-style checksum by building a pseudoheader.
  */
-int
+uint16_t
 nextproto4_cksum(netdissect_options *ndo,
                  const struct ip *ip, const uint8_t *data,
                  u_int len, u_int covlen, u_int next_proto)

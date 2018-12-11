@@ -136,7 +136,7 @@ static const struct tok tcp_option_values[] = {
         { 0, NULL }
 };
 
-static int
+static uint16_t
 tcp_cksum(netdissect_options *ndo,
           const struct ip *ip,
           const struct tcphdr *tp,
@@ -146,7 +146,7 @@ tcp_cksum(netdissect_options *ndo,
                                 IPPROTO_TCP);
 }
 
-static int
+static uint16_t
 tcp6_cksum(netdissect_options *ndo,
            const struct ip6_hdr *ip6,
            const struct tcphdr *tp,
