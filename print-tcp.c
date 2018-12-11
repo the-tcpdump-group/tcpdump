@@ -820,7 +820,7 @@ static void
 print_tcp_rst_data(netdissect_options *ndo,
                    const u_char *sp, u_int length)
 {
-        int c;
+        u_char c;
 
         ND_PRINT(ND_TTEST_LEN(sp, length) ? " [RST" : " [!RST");
         if (length > MAX_RST_DATA_LEN) {
