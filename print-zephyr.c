@@ -134,7 +134,7 @@ str_to_lower(const char *string)
 
     zb_string = z_buf;
     while (*zb_string) {
-	*zb_string = tolower((unsigned char)(*zb_string));
+	*zb_string = ND_TOLOWER((unsigned char)(*zb_string));
 	zb_string++;
     }
 

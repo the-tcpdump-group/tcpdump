@@ -892,7 +892,7 @@ txtproto_print(netdissect_options *ndo, const u_char *pptr, u_int len,
 
 	/* Capitalize the protocol name */
 	for (pnp = protoname; *pnp != '\0'; pnp++)
-		ND_PRINT("%c", toupper((u_char)*pnp));
+		ND_PRINT("%c", ND_TOUPPER((u_char)*pnp));
 
 	if (print_this) {
 		/*
