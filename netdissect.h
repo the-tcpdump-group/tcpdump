@@ -375,7 +375,7 @@ extern void txtproto_print(netdissect_options *, const u_char *, u_int,
  * them a char, as those might be in the range -128 to 127.
  */
 #define ND_TOLOWER(c)	(((c) >= 'A' && (c) <= 'Z') ? (c) - 'A' + 'a' : (c))
-#define ND_TOUPPER(c)	(((c) >= 'a' && (c) <= 'z') ? (c) - 'a' + 'z' : (c))
+#define ND_TOUPPER(c)	(((c) >= 'a' && (c) <= 'z') ? (c) - 'a' + 'A' : (c))
 
 #if (defined(__i386__) || defined(_M_IX86) || defined(__X86__) || defined(__x86_64__) || defined(_M_X64)) || \
     (defined(__arm__) || defined(_M_ARM) || defined(__aarch64__)) || \
