@@ -520,6 +520,10 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			udpipaddr_print(ndo, ip, sport, dport);
 			lmp_print(ndo, cp, length);
 			break;
+		case PT_PTP:
+			udpipaddr_print(ndo, ip, sport, dport);
+			ptp_print(ndo, cp, length);
+			break;
 		}
 		return;
 	}
@@ -718,7 +722,10 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			if (ndo->ndo_vflag)
 				ND_PRINT("kip ");
 			llap_print(ndo, cp, length);
-		} else {
+                } else if (IS_SRC_OR_DST_PORT(PTP_EVENT_PORT) ||
+                        IS_SRC_OR_DST_PORT(PTP_GENERAL_PORT)) {
+                        ptp_print(ndo, cp, length);
+                }else {
 			if (ulen > length)
 				ND_PRINT("UDP, bad length %u > %u",
 				    ulen, length);

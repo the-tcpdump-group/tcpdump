@@ -281,6 +281,7 @@ extern void nd_pop_all_packet_info(netdissect_options *);
 #define PT_PGM_ZMTP1	15	/* ZMTP/1.0 inside PGM (native or UDP-encapsulated) */
 #define PT_LMP		16	/* Link Management Protocol */
 #define PT_RESP		17	/* RESP */
+#define PT_PTP		18	/* PTP */
 
 #ifndef min
 #define min(a,b) ((a)>(b)?(b):(a))
@@ -688,6 +689,7 @@ extern void zep_print(netdissect_options *, const u_char *, u_int);
 extern void zephyr_print(netdissect_options *, const u_char *, int);
 extern void zmtp1_print(netdissect_options *, const u_char *, u_int);
 extern void zmtp1_datagram_print(netdissect_options *, const u_char *, const u_int);
+extern void ptp_print(netdissect_options *, const u_char *, const u_int);
 
 /* checksum routines */
 extern void init_checksum(void);
