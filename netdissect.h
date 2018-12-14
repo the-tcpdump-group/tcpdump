@@ -281,6 +281,7 @@ extern void nd_pop_all_packet_info(netdissect_options *);
 #define PT_PGM_ZMTP1	15	/* ZMTP/1.0 inside PGM (native or UDP-encapsulated) */
 #define PT_LMP		16	/* Link Management Protocol */
 #define PT_RESP		17	/* RESP */
+#define PT_PTP		18	/* PTP */
 
 #ifndef min
 #define min(a,b) ((a)>(b)?(b):(a))
@@ -644,6 +645,7 @@ extern void pimv1_print(netdissect_options *, const u_char *, u_int);
 extern u_int ppp_print(netdissect_options *, const u_char *, u_int);
 extern u_int pppoe_print(netdissect_options *, const u_char *, u_int);
 extern void pptp_print(netdissect_options *, const u_char *);
+extern void ptp_print(netdissect_options *, const u_char *, const u_int);
 extern int print_unknown_data(netdissect_options *, const u_char *, const char *, int);
 extern const char *q922_string(netdissect_options *, const u_char *, u_int);
 extern void q933_print(netdissect_options *, const u_char *, u_int);
