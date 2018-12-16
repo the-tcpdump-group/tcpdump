@@ -361,6 +361,9 @@ Savefiles will have the name specified by
 which should include a time format as defined by
 .BR strftime (3).
 If no time format is specified, each new file will overwrite the previous.
+Whenever a generated filename is not unique, tcpdump will overwrite the
+preexisting data; providing a time specification that is coarser than the
+capture period is therefore not advised.
 .IP
 If used in conjunction with the
 .B \-C
@@ -801,9 +804,15 @@ files, allowing them to sort correctly.
 Used in conjunction with the
 .B \-G
 option, this will limit the number of rotated dump files that get
-created, exiting with status 0 when reaching the limit. If used with
+created, exiting with status 0 when reaching the limit.
+.IP
+If used in conjunction with both
 .B \-C
-as well, the behavior will result in cyclical files per timeslice.
+and
+.B \-G,
+the
+.B \-W
+option will currently be ignored, and will only affect the file name.
 .TP
 .B \-x
 When parsing and printing,
