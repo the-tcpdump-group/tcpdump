@@ -8,7 +8,7 @@
     8  16:32:37.692912 IPOIB, ethertype IPv4 (0x0800), length 128: 192.168.56.10 > 192.168.56.24: ICMP echo request, id 6495, seq 5, length 64
     9  16:32:45.050083 IPOIB, ethertype IPv4 (0x0800), length 104: 192.168.56.10.34170 > 192.168.56.24.22: Flags [SEW], seq 798232822, win 32983, options [mss 65480,sackOK,TS val 62202209 ecr 0,nop,wscale 8], length 0
    10  16:32:45.050250 IPOIB, ethertype IPv4 (0x0800), length 96: 192.168.56.10.34170 > 192.168.56.24.22: Flags [.], ack 3051049339, win 33232, options [nop,nop,TS val 62202209 ecr 81054], length 0
-   11  16:32:45.051868 IPOIB, ethertype IPv4 (0x0800), length 122: 192.168.56.10.34170 > 192.168.56.24.22: Flags [P.], seq 0:26, ack 1, win 33232, options [nop,nop,TS val 62202209 ecr 81054], length 26
+   11  16:32:45.051868 IPOIB, ethertype IPv4 (0x0800), length 122: 192.168.56.10.34170 > 192.168.56.24.22: Flags [P.], seq 0:26, ack 1, win 33232, options [nop,nop,TS val 62202209 ecr 81054], length 26: SSH: SSH-2.0-OpenSSH_7.5 FIPS
    12  16:32:45.062494 IPOIB, ethertype IPv4 (0x0800), length 96: 192.168.56.10.34170 > 192.168.56.24.22: Flags [.], ack 23, win 33232, options [nop,nop,TS val 62202210 ecr 81055], length 0
    13  16:32:45.130591 IPOIB, ethertype IPv4 (0x0800), length 1160: 192.168.56.10.34170 > 192.168.56.24.22: Flags [P.], seq 26:1090, ack 23, win 33232, options [nop,nop,TS val 62202217 ecr 81055], length 1064
    14  16:32:45.158656 IPOIB, ethertype IPv4 (0x0800), length 96: 192.168.56.10.34170 > 192.168.56.24.22: Flags [.], ack 1087, win 33232, options [nop,nop,TS val 62202220 ecr 81064], length 0

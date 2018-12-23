@@ -1070,6 +1070,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-slow.c
     print-smtp.c
     print-snmp.c
+    print-ssh.c
     print-stp.c
     print-sunatm.c
     print-sunrpc.c

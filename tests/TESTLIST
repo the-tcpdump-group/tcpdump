@@ -627,6 +627,9 @@ rx_ubik-oobr		rx_ubik-oobr.pcap		rx_ubik-oobr.out -c1
 rtp-seg-fault-1  rtp-seg-fault-1.pcapng  rtp-seg-fault-1.out  -v -T rtp
 rtp-seg-fault-2  rtp-seg-fault-2.pcapng  rtp-seg-fault-2.out  -v -T rtp
 
+# SSH tests
+ssh			ssh.pcap		ssh.out
+
 # NFS tests
 nfs-write-verf-cookie nfs-write-verf-cookie.pcapng nfs-write-verf-cookie.out -vv
 
