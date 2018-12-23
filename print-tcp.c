@@ -721,6 +721,8 @@ tcp_print(netdissect_options *ndo,
                 pptp_print(ndo, bp);
         else if (IS_SRC_OR_DST_PORT(REDIS_PORT))
                 resp_print(ndo, bp, length);
+        else if (IS_SRC_OR_DST_PORT(SSH_PORT))
+                ssh_print(ndo, bp, length);
 #ifdef ENABLE_SMB
         else if (IS_SRC_OR_DST_PORT(NETBIOS_SSN_PORT))
                 nbt_tcp_print(ndo, bp, length);
