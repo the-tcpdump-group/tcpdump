@@ -3,6 +3,7 @@ version: '{build}'
 branches:
   only:
   - master
+  - tcpdump-4.9
 
 clone_depth: 5
 
