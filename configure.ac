@@ -229,6 +229,34 @@ else
 	AC_MSG_RESULT(no)
 fi
 
+AC_ARG_ENABLE(minimal,
+	AS_HELP_STRING([--enable-minimal], [Support printing only common
+			protocols, for a smaller binary]),
+	[AC_DEFINE_UNQUOTED([ND_MINIMAL], [$enableval], [Minimal build])]
+)
+for i in `ls print-*.c | grep -v print-smb.c | grep -v print-pflog.c`
+do
+	ALL_DISSECTORS="$i $ALL_DISSECTORS"
+done
+AS_IF([test "x$enable_minimal" = xyes],
+  [
+	DISSECTORS="\
+	print-802_11.c print-aodv.c print-arp.c print-ascii.c \
+	print-bgp.c print-bootp.c print-cdp.c print-domain.c print-eap.c \
+	print-ether.c print-gre.c print-icmp.c print-igmp.c print-ip.c \
+	print-ip6.c print-ip6opts.c print-rt6.c print-frag6.c print-icmp6.c \
+	print-l2tp.c print-lldp.c print-llc.c print-nfs.c print-ntp.c \
+	print-null.c print-olsr.c print-ospf.c print-ppp.c print-pppoe.c \
+	print-pptp.c print-radius.c print-raw.c print-rsvp.c print-sctp.c \
+	print-sip.c print-sll.c print-snmp.c print-stp.c print-sunrpc.c \
+	print-syslog.c print-tcp.c print-telnet.c print-tftp.c print-udp.c \
+	print-ipnet.c print-forces.c"
+  ],
+  [
+	DISSECTORS=$ALL_DISSECTORS
+  ]
+)
+
 #
 # We must check this before checking whether to check the OS's IPv6,
 # support because, on some platforms (such as SunOS 5.x), the test
@@ -1023,6 +1051,9 @@ AC_SUBST(V_PCAPDEP)
 AC_SUBST(LOCALSRC)
 AC_SUBST(MAN_FILE_FORMATS)
 AC_SUBST(MAN_MISC_INFO)
+AC_SUBST(ND_MINIMAL)
+AC_SUBST(DISSECTORS)
+AC_SUBST(ALL_DISSECTORS)
 
 AC_PROG_INSTALL
 

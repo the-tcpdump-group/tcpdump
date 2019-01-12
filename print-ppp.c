@@ -1514,6 +1514,7 @@ handle_ppp(netdissect_options *ndo,
 	case PPP_IPV6:
 		ip6_print(ndo, p, length);
 		break;
+#ifndef ND_MINIMAL
 	case ETHERTYPE_IPX:	/*XXX*/
 	case PPP_IPX:
 		ipx_print(ndo, p, length);
@@ -1525,6 +1526,7 @@ handle_ppp(netdissect_options *ndo,
 	case PPP_MPLS_MCAST:
 		mpls_print(ndo, p, length);
 		break;
+#endif
 	case PPP_COMP:
 		ND_PRINT("compressed PPP data");
 		break;
@@ -1716,9 +1718,11 @@ ppp_hdlc_if_print(netdissect_options *ndo,
 		handle_ppp(ndo, proto, p, length);
 		break;
 
+#ifndef ND_MINIMAL
 	case CHDLC_UNICAST:
 	case CHDLC_BCAST:
 		return (chdlc_if_print(ndo, h, p));
+#endif
 
 	default:
 		if (caplen < 4) {

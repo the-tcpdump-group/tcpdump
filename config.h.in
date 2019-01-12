@@ -243,6 +243,9 @@
 /* Define to 1 if netenet/dnetdb.h declares `dnet_htoa' */
 #undef NETDNET_DNETDB_H_DECLARES_DNET_HTOA
 
+/* Minimal build */
+#undef ND_MINIMAL
+
 /* Define to 1 if netinet/ether.h declares `ether_ntohost' */
 #undef NETINET_ETHER_H_DECLARES_ETHER_NTOHOST
 

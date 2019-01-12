@@ -612,9 +612,11 @@ sctp_print(netdissect_options *ndo,
 	    } else if (ndo->ndo_vflag >= 2) {	/* if verbose output is specified */
 					/* at the command line */
 		switch (ppid) {
+#ifndef ND_MINIMAL
 		case SCTP_PPID_M3UA :
 			m3ua_print(ndo, bp, payload_size);
 			break;
+#endif
 		default:
 			ND_PRINT("[Payload");
 			if (!ndo->ndo_suppress_default_print) {

@@ -654,8 +654,10 @@ linkaddr_string(netdissect_options *ndo, const uint8_t *ep,
 	if (type == LINKADDR_ETHER && len == MAC_ADDR_LEN)
 		return (etheraddr_string(ndo, ep));
 
+#ifndef ND_MINIMAL
 	if (type == LINKADDR_FRELAY)
 		return (q922_string(ndo, ep, len));
+#endif
 
 	tp = lookup_bytestring(ndo, ep, len);
 	if (tp->bs_name)
@@ -1242,6 +1244,7 @@ init_addrtoname(netdissect_options *ndo, uint32_t localnet, uint32_t mask)
 	init_ipxsaparray(ndo);
 }
 
+#ifndef ND_MINIMAL
 const char *
 dnaddr_string(netdissect_options *ndo, u_short dnaddr)
 {
@@ -1261,6 +1264,7 @@ dnaddr_string(netdissect_options *ndo, u_short dnaddr)
 
 	return(tp->name);
 }
+#endif
 
 /* Return a zero'ed hnamemem struct and cuts down on calloc() overhead */
 struct hnamemem *

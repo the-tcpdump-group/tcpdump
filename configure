@@ -623,6 +623,9 @@ ac_subst_vars='LTLIBOBJS
 INSTALL_DATA
 INSTALL_SCRIPT
 INSTALL_PROGRAM
+ALL_DISSECTORS
+DISSECTORS
+ND_MINIMAL
 MAN_MISC_INFO
 MAN_FILE_FORMATS
 LOCALSRC
@@ -704,6 +707,7 @@ enable_smb
 with_user
 with_chroot
 with_sandbox_capsicum
+enable_minimal
 with_system_libpcap
 with_crypto
 with_cap_ng
@@ -1333,6 +1337,8 @@ Optional Features:
   --disable-universal     don't build universal on macOS
   --enable-smb            enable possibly-buggy SMB printer default=yes
   --disable-smb           disable possibly-buggy SMB printer
+  --enable-minimal        Support printing only common protocols, for a
+                          smaller binary
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -4463,6 +4469,41 @@ $as_echo "yes" >&6; }
 else
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
+fi
+
+# Check whether --enable-minimal was given.
+if test "${enable_minimal+set}" = set; then :
+  enableval=$enable_minimal;
+cat >>confdefs.h <<_ACEOF
+#define ND_MINIMAL $enableval
+_ACEOF
+
+
+fi
+
+for i in `ls print-*.c | grep -v print-smb.c | grep -v print-pflog.c`
+do
+	ALL_DISSECTORS="$i $ALL_DISSECTORS"
+done
+if test "x$enable_minimal" = xyes; then :
+
+	DISSECTORS="\
+	print-802_11.c print-aodv.c print-arp.c print-ascii.c \
+	print-bgp.c print-bootp.c print-cdp.c print-domain.c print-eap.c \
+	print-ether.c print-gre.c print-icmp.c print-igmp.c print-ip.c \
+	print-ip6.c print-ip6opts.c print-rt6.c print-frag6.c print-icmp6.c \
+	print-l2tp.c print-lldp.c print-llc.c print-nfs.c print-ntp.c \
+	print-null.c print-olsr.c print-ospf.c print-ppp.c print-pppoe.c \
+	print-pptp.c print-radius.c print-raw.c print-rsvp.c print-sctp.c \
+	print-sip.c print-sll.c print-snmp.c print-stp.c print-sunrpc.c \
+	print-syslog.c print-tcp.c print-telnet.c print-tftp.c print-udp.c \
+	print-ipnet.c print-forces.c"
+
+else
+
+	DISSECTORS=$ALL_DISSECTORS
+
+
 fi
 
 #
@@ -7742,6 +7783,9 @@ if test "$missing_includes" = "yes"; then
 	CPPFLAGS="$CPPFLAGS -I$srcdir/missing"
 	V_INCLS="$V_INCLS -I$srcdir/missing"
 fi
+
+
+
 
 
 

@@ -316,12 +316,16 @@ igmp_print(netdissect_options *ndo,
         ND_PRINT("igmp dvmrp");
         if (len < 8)
             ND_PRINT(" [len %u]", len);
+#ifndef ND_MINIMAL
         else
             dvmrp_print(ndo, bp, len);
+#endif
         break;
     case 0x14:
         ND_PRINT("igmp pimv1");
+#ifndef ND_MINIMAL
         pimv1_print(ndo, bp, len);
+#endif
         break;
     case 0x1e:
         print_mresp(ndo, bp, len);
