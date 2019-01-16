@@ -930,7 +930,7 @@ static const char *reason_text[] = {
 	"Disassociated because the information in the Supported Channels "
 	  "element is unacceptable",				/* 11 */
 	"Disassociated due to BSS transition management",	/* 12 */
-	"Reserved",						/* 13 */
+	"Invalid Information Element",				/* 13 */
 	"Michael MIC failure",					/* 14 */
 	"4-Way Handshake timeout",				/* 15 */
 	"Group key update timeout",				/* 16 */
@@ -943,12 +943,14 @@ static const char *reason_text[] = {
 	"Invalid RSN IE Capabilities",				/* 22 */
 	"IEEE 802.1X Authentication failed",			/* 23 */
 	"Cipher suite is rejected per security policy",		/* 24 */
-	"Reserved",						/* 25 */
-	"Reserved",						/* 26 */
-	"Reserved",						/* 27 */
-	"Reserved",						/* 28 */
-	"Reserved",						/* 29 */
-	"Reserved",						/* 30 */
+	"TDLS direct-link teardown due to TDLS peer station unreachable via "
+	  "the TDLS direct link",						/* 25 */
+	"TDLS direct-link teardown for unspecified reason",		/* 26 */
+	"Disassociated because session terminated by SSP request",/* 27 */
+	"Disassociated because of lack of SSP roaming agreement",/* 28 */
+	"Requested service rejected because of SSP cipher suite or "
+	  "AKM requirement",						/* 29 */
+	"Requested service not authorized in this location",	/* 30 */
 	"TS deleted because QoS AP lacks sufficient bandwidth for this "
 	  "QoS STA due to a change in BSS service characteristics or "
 	  "operational mode (e.g. an HT BSS change from 40 MHz channel "
@@ -974,8 +976,47 @@ static const char *reason_text[] = {
 	"Reserved",						/* 43 */
 	"Reserved",						/* 44 */
 	"Peer STA does not support the requested cipher suite",	/* 45 */
-	"Association denied due to requesting STA not supporting HT "
-	  "features",						/* 46 */
+	"In a DLS Teardown frame: The teardown was initiated by the "
+	  "DLS peer. In a Disassociation frame: Disassociated because "
+	  "authorized access limit reached",					/* 46 */
+	"In a DLS Teardown frame: The teardown was initiated by the "
+	  "AP. In a Disassociation frame: Disassociated due to external "
+	  "service requirements",								/* 47 */
+	"Invalid FT Action frame count",						/* 48 */
+	"Invalid pairwise master key identifier (PMKID)",		/* 49 */
+	"Invalid MDE",											/* 50 */
+	"Invalid FTE",											/* 51 */
+	"Mesh peering canceled for unknown reasons",			/* 52 */
+	"The mesh STA has reached the supported maximum number of "
+	  "peer mesh STAs",										/* 53 */
+	"The received information violates the Mesh Configuration "
+	  "policy configured in the mesh STA profile",			/* 54 */
+	"The mesh STA has received a Mesh Peering Close frame "
+	  "requesting to close the mesh peering",				/* 55 */
+	"The mesh STA has resent dot11MeshMaxRetries Mesh "
+	  "Peering Open frames, without receiving a Mesh Peering "
+	  "Confirm frame"										/* 56 */
+	"The confirmTimer for the mesh peering instance times out",	/* 57 */
+	"The mesh STA fails to unwrap the GTK or the values in the "
+	  "wrapped contents do not match",						/* 58 */
+	"The mesh STA receives inconsistent information about the "
+	  "mesh parameters between mesh peering Management frames",	/* 59 */
+	"The mesh STA fails the authenticated mesh peering exchange "
+	  "because due to failure in selecting either the pairwise "
+	  "ciphersuite or group ciphersuite",					/* 60 */
+	"The mesh STA does not have proxy information for this "
+	  "external destination",								/* 61 */
+	"The mesh STA does not have forwarding information for this "
+	  "destination",										/* 62 */
+	"The mesh STA determines that the link to the next hop of an "
+	  "active path in its forwarding information is no longer "
+	  "usable",												/* 63 */
+	"The Deauthentication frame was sent because the MAC "
+	  "address of the STA already exists in the mesh BSS",	/* 64 */
+	"The mesh STA performs channel switch to meet regulatory "
+	  "requirements",										/* 65 */
+	"The mesh STA performs channel switching with unspecified "
+	  "reason",												/* 66 */
 };
 #define NUM_REASONS	(sizeof(reason_text) / sizeof(reason_text[0]))
 
