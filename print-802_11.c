@@ -927,9 +927,9 @@ static const char *reason_text[] = {
 	  "responding station",					/* 9 */
 	"Disassociated because the information in the Power Capability "
 	  "element is unacceptable",				/* 10 */
-	"Disassociated because the information in the SupportedChannels "
+	"Disassociated because the information in the Supported Channels "
 	  "element is unacceptable",				/* 11 */
-	"Invalid Information Element",				/* 12 */
+	"Disassociated due to BSS transition management",	/* 12 */
 	"Reserved",						/* 13 */
 	"Michael MIC failure",					/* 14 */
 	"4-Way Handshake timeout",				/* 15 */
@@ -937,6 +937,7 @@ static const char *reason_text[] = {
 	"Information element in 4-Way Handshake different from (Re)Association"
 	  "Request/Probe Response/Beacon",			/* 17 */
 	"Group Cipher is not valid",				/* 18 */
+	"Pairwise Cipher is not valid",				/* 19 */
 	"AKMP is not valid",					/* 20 */
 	"Unsupported RSN IE version",				/* 21 */
 	"Invalid RSN IE Capabilities",				/* 22 */
