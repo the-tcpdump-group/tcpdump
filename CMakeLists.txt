@@ -944,6 +944,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-bfd.c
     print-bgp.c
     print-bootp.c
+    print-brcmtag.c
     print-bt.c
     print-calm-fast.c
     print-carp.c
