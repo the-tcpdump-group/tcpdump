@@ -106,7 +106,8 @@ const struct tok ethertype_values[] = {
 
 static void
 ether_hdr_print(netdissect_options *ndo,
-                const u_char *bp, u_int length)
+                const u_char *bp, u_int length,
+		u_int hdrlen)
 {
 	const struct ether_header *ehp;
 	uint16_t length_type;
@@ -117,7 +118,8 @@ ether_hdr_print(netdissect_options *ndo,
 		     etheraddr_string(ndo, ehp->ether_shost),
 		     etheraddr_string(ndo, ehp->ether_dhost));
 
-	length_type = EXTRACT_BE_U_2(ehp->ether_length_type);
+	length_type = EXTRACT_BE_U_2(bp +
+			 	     (hdrlen - sizeof(ehp->ether_length_type)));
 	if (!ndo->ndo_qflag) {
 	        if (length_type <= MAX_ETHERNET_LENGTH_VAL) {
 		        ND_PRINT(", 802.3");
@@ -138,7 +140,8 @@ ether_hdr_print(netdissect_options *ndo,
 }
 
 /*
- * Print an Ethernet frame.
+ * Print an Ethernet frame while specyfing a non-standard Ethernet header
+ * length.
  * This might be encapsulated within another frame; we might be passed
  * a pointer to a function that can print header information for that
  * frame's protocol, and an argument to pass to that function.
@@ -146,46 +149,52 @@ ether_hdr_print(netdissect_options *ndo,
  * FIXME: caplen can and should be derived from ndo->ndo_snapend and p.
  */
 u_int
-ether_print(netdissect_options *ndo,
+ether_print_hdr_len(netdissect_options *ndo,
             const u_char *p, u_int length, u_int caplen,
             void (*print_encap_header)(netdissect_options *ndo, const u_char *),
-            const u_char *encap_header_arg)
+            const u_char *encap_header_arg, u_int hdrlen)
 {
 	const struct ether_header *ehp;
 	u_int orig_length;
 	u_short length_type;
-	u_int hdrlen;
 	int llc_hdrlen;
 	struct lladdr_info src, dst;
 
-	ndo->ndo_protocol = "ether";
-	if (caplen < ETHER_HDRLEN) {
+	/* Unless specified otherwise, assume a standard Ethernet header */
+	if (hdrlen == ETHER_HDRLEN)
+		ndo->ndo_protocol = "ether";
+
+	if (caplen < hdrlen) {
 		nd_print_trunc(ndo);
 		return (caplen);
 	}
-	if (length < ETHER_HDRLEN) {
+	if (length < hdrlen) {
 		nd_print_trunc(ndo);
 		return (length);
 	}
 
+	/* If the offset is set, then the upper printer is responsible for
+	 * printing the relevant part of the Ethernet header.
+	 */
 	if (ndo->ndo_eflag) {
 		if (print_encap_header != NULL)
 			(*print_encap_header)(ndo, encap_header_arg);
-		ether_hdr_print(ndo, p, length);
+		ether_hdr_print(ndo, p, length, hdrlen);
 	}
+
 	orig_length = length;
 
-	length -= ETHER_HDRLEN;
-	caplen -= ETHER_HDRLEN;
+	length -= hdrlen;
+	caplen -= hdrlen;
 	ehp = (const struct ether_header *)p;
-	p += ETHER_HDRLEN;
-	hdrlen = ETHER_HDRLEN;
+	p += hdrlen;
 
 	src.addr = ehp->ether_shost;
 	src.addr_string = etheraddr_string;
 	dst.addr = ehp->ether_dhost;
 	dst.addr_string = etheraddr_string;
-	length_type = EXTRACT_BE_U_2(ehp->ether_length_type);
+	length_type = EXTRACT_BE_U_2((const u_char *)ehp +
+				     (hdrlen - sizeof(ehp->ether_length_type)));
 
 recurse:
 	/*
@@ -258,7 +267,8 @@ recurse:
 			if (!ndo->ndo_eflag) {
 				if (print_encap_header != NULL)
 					(*print_encap_header)(ndo, encap_header_arg);
-				ether_hdr_print(ndo, (const u_char *)ehp, orig_length);
+				ether_hdr_print(ndo, (const u_char *)ehp, orig_length,
+						hdrlen);
 			}
 
 			if (!ndo->ndo_suppress_default_print)
@@ -266,6 +276,25 @@ recurse:
 		}
 	}
 	return (hdrlen);
+}
+
+/*
+ * Print an Ethernet frame.
+ * This might be encapsulated within another frame; we might be passed
+ * a pointer to a function that can print header information for that
+ * frame's protocol, and an argument to pass to that function.
+ *
+ * FIXME: caplen can and should be derived from ndo->ndo_snapend and p.
+ */
+u_int
+ether_print(netdissect_options *ndo,
+            const u_char *p, u_int length, u_int caplen,
+            void (*print_encap_header)(netdissect_options *ndo, const u_char *),
+            const u_char *encap_header_arg)
+{
+	return (ether_print_hdr_len(ndo, p, length, caplen,
+					  print_encap_header, encap_header_arg,
+					  ETHER_HDRLEN));
 }
 
 /*
