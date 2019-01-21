@@ -803,17 +803,25 @@ smb_fdata(netdissect_options *ndo,
     while (*fmt) {
 	switch (*fmt) {
 	case '*':
+	    /*
+	     * List of multiple instances of something described by the
+	     * remainder of the string (which may itself include a list
+	     * of multiple instances of something, so we recurse).
+	     */
 	    fmt++;
 	    while (buf < maxbuf) {
 		const u_char *buf2;
 		depth++;
-		/* Not sure how this relates with the protocol specification,
-		 * but in order to avoid stack exhaustion recurse at most that
-		 * many levels.
+		/*
+		 * In order to avoid stack exhaustion recurse at most 10
+		 * levels; that "should not happen", as no SMB structure
+		 * should be nested *that* deeply, and we thus shouldn't
+		 * have format strings with that level of nesting.
 		 */
-		if (depth == 10)
+		if (depth == 10) {
 			ND_PRINT((ndo, "(too many nested levels, not recursing)"));
-		else
+			buf2 = buf;
+		} else
 			buf2 = smb_fdata(ndo, buf, fmt, maxbuf, unicodestr);
 		depth--;
 		if (buf2 == NULL)
@@ -825,22 +833,35 @@ smb_fdata(netdissect_options *ndo,
 	    return(buf);
 
 	case '|':
+	    /*
+	     * Just do a bounds check.
+	     */
 	    fmt++;
 	    if (buf >= maxbuf)
 		return(buf);
 	    break;
 
 	case '%':
+	    /*
+	     * XXX - unused?
+	     */
 	    fmt++;
 	    buf = maxbuf;
 	    break;
 
 	case '#':
+	    /*
+	     * Done?
+	     */
 	    fmt++;
 	    return(buf);
 	    break;
 
 	case '[':
+	    /*
+	     * Format of an item, enclosed in square brackets; dissect
+	     * the item with smb_fdata1().
+	     */
 	    fmt++;
 	    if (buf >= maxbuf)
 		return(buf);
@@ -859,6 +880,9 @@ smb_fdata(netdissect_options *ndo,
 	    break;
 
 	default:
+	    /*
+	     * Not a formatting character, so just print it.
+	     */
 	    ND_PRINT((ndo, "%c", *fmt));
 	    fmt++;
 	    break;
