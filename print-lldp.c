@@ -540,11 +540,11 @@ static const struct tok lldp_mdi_power_class_values[] = {
     { 0, NULL}
 };
 
-#define LLDP_AGGREGATION_CAPABILTIY     (1 <<  0)
+#define LLDP_AGGREGATION_CAPABILITY     (1 <<  0)
 #define LLDP_AGGREGATION_STATUS         (1 <<  1)
 
 static const struct tok lldp_aggregation_values[] = {
-    { LLDP_AGGREGATION_CAPABILTIY, "supported"},
+    { LLDP_AGGREGATION_CAPABILITY, "supported"},
     { LLDP_AGGREGATION_STATUS, "enabled"},
     { 0, NULL}
 };

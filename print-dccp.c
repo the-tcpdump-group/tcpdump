@@ -85,7 +85,7 @@ struct dccp_hdr_ext {
 #define DCCPH_TYPE(dh)	((EXTRACT_U_1((dh)->dccph_xtr) >> 1) & 0xF)
 
 /**
- * struct dccp_hdr_request - Conection initiation request header
+ * struct dccp_hdr_request - Connection initiation request header
  *
  * @dccph_req_service - Service to which the client app wants to connect
  */
@@ -94,7 +94,7 @@ struct dccp_hdr_request {
 };
 
 /**
- * struct dccp_hdr_response - Conection initiation response header
+ * struct dccp_hdr_response - Connection initiation response header
  *
  * @dccph_resp_ack - 48 bit ack number, contains GSR
  * @dccph_resp_service - Echoes the Service Code on a received DCCP-Request
@@ -268,7 +268,7 @@ static u_int dccp_print_option(netdissect_options *, const u_char *, u_int);
  * dccp_print - show dccp packet
  * @bp - beginning of dccp packet
  * @data2 - beginning of enclosing
- * @len - lenght of ip packet
+ * @len - length of ip packet
  */
 void
 dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,

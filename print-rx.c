@@ -750,7 +750,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, u_int sport,
 }
 
 /*
- * These extrememly grody macros handle the printing of various AFS stuff.
+ * These extremely grody macros handle the printing of various AFS stuff.
  */
 
 #define FIDOUT() { uint32_t n1, n2, n3; \

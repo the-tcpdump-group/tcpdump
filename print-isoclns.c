@@ -2354,7 +2354,7 @@ isis_print(netdissect_options *ndo,
     case 0:
         id_length = 6;	 /* silly shit again */
 	break;
-    case 1:              /* 1-8 are valid sys-ID lenghts */
+    case 1:              /* 1-8 are valid sys-ID lengths */
     case 2:
     case 3:
     case 4:
@@ -2676,7 +2676,7 @@ isis_print(netdissect_options *ndo,
                        isonsap_string(ndo, tptr, alen));
 		tptr += alen;
 		tmp -= alen + 1;
-		if (tmp==0) /* if this is the last area address do not attemt a boundary check */
+		if (tmp==0) /* if this is the last area address do not attempt a boundary check */
                     break;
 		ND_TCHECK_1(tptr);
 		alen = EXTRACT_U_1(tptr);

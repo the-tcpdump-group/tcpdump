@@ -36,7 +36,7 @@
 /*
  * Marvell Extended Distributed Switch Archiecture.
  *
- * A Marvell propriatary header used for passing packets to/from
+ * A Marvell proprietary header used for passing packets to/from
  * specific ports of a switch. There is no open specification of this
  * header, but is documented in the Marvell Switch data sheets. For
  * background, see:

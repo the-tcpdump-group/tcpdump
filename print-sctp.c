@@ -89,7 +89,7 @@
  * qxie1@email.mot.com
  *
  * Any bugs reported given to us we will try to fix... any fixes shared will
- * be incorperated into the next SCTP release.
+ * be incorporated into the next SCTP release.
  */
 
 /* The valid defines for all message
@@ -249,7 +249,7 @@ struct sctpSendableInit{
 
 /* Selective Acknowledgement
  * has the following structure with
- * a optional ammount of trailing int's
+ * a optional amount of trailing int's
  * on the last part (based on the numberOfDesc
  * field).
  */

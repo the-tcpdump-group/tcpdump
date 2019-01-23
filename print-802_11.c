@@ -231,7 +231,7 @@ struct cf_t {
 	uint8_t		count;
 	uint8_t		period;
 	uint16_t	max_duration;
-	uint16_t	dur_remaing;
+	uint16_t	dur_remaining;
 };
 
 struct tim_t {
@@ -1348,7 +1348,7 @@ static int
 handle_reassoc_response(netdissect_options *ndo,
                         const u_char *p, u_int length)
 {
-	/* Same as a Association Reponse */
+	/* Same as a Association Response */
 	return handle_assoc_response(ndo, p, length);
 }
 

@@ -251,7 +251,7 @@ network_address(int ae, const unsigned char *a, unsigned int len,
  * o Type 1 stands for PadN sub-TLV with the same encoding as the PadN TLV.
  * o Type 2 stands for Diversity sub-TLV, which propagates diversity routing
  *   data. Its body is a variable-length sequence of 8-bit unsigned integers,
- *   each representing per-hop number of interferring radio channel for the
+ *   each representing per-hop number of interfering radio channel for the
  *   prefix. Channel 0 is invalid and must not be used in the sub-TLV, channel
  *   255 interferes with any other channel.
  * o Type 3 stands for Timestamp sub-TLV, used to compute RTT between

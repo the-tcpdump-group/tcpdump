@@ -434,7 +434,7 @@ resp_print_inline(netdissect_options *ndo, const u_char *bp, int length) {
 
     /*
      * Found it; bp_ptr points to the \r or \n, so bp_ptr - bp is the
-     * Length of the line text that preceeds it.  Print it.
+     * Length of the line text that precedes it.  Print it.
      */
     len = (bp_ptr - bp);
     RESP_PRINT_SEGMENT(ndo, bp, len);

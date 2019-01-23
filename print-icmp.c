@@ -260,7 +260,7 @@ struct id_rdiscovery {
  * draft-bonica-internet-icmp-08
  *
  * The Destination Unreachable, Time Exceeded
- * and Parameter Problem messages are slighly changed as per
+ * and Parameter Problem messages are slightly changed as per
  * the above draft. A new Length field gets added to give
  * the caller an idea about the length of the piggypacked
  * IP packet before the MPLS extension header starts.

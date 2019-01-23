@@ -232,7 +232,7 @@ struct pptp_msg_sli {
 /* attributes that appear more than once in above messages:
 
    Number of
-   occurence    attributes
+   occurrence    attributes
   --------------------------------------
       2         uint32_t bearer_cap;
       2         uint32_t bearer_type;
