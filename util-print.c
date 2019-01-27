@@ -295,6 +295,11 @@ ts_date_hmsfrac_print(netdissect_options *ndo, int sec, int usec,
 static void
 ts_unix_print(netdissect_options *ndo, int sec, int usec)
 {
+	if ((unsigned)sec & 0x80000000) {
+		ND_PRINT("[Error converting time]");
+		return;
+	}
+
 	ND_PRINT("%u", (unsigned)sec);
 	ts_frac_print(ndo, usec);
 }
