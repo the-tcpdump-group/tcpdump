@@ -224,6 +224,12 @@ static const struct printer printers[] = {
 #ifdef DLT_PPP_SERIAL
 	{ ppp_hdlc_if_print,	DLT_PPP_SERIAL },
 #endif
+#ifdef DLT_DSA_TAG_BRCM
+	{ brcm_tag_if_print,	DLT_DSA_TAG_BRCM },
+#endif
+#ifdef DLT_DSA_TAG_BRCM_PREPEND
+	{ brcm_tag_prepend_if_print, DLT_DSA_TAG_BRCM_PREPEND },
+#endif
 	{ NULL,			0 },
 };
 

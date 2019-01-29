@@ -28,6 +28,11 @@ bgp-large-community bgp-large-community.pcap bgp-large-community.out -v
 bgp-shutdown-communication bgp-shutdown-communication.pcapng bgp-shutdown-communication.out -v
 bgp-addpath bgp-addpath.pcap bgp-addpath.out -v
 
+# Broadcom tag tests
+brcmtag		brcm-tag.pcap		brcm-tag.out
+brcmtag-e	brcm-tag.pcap		brcm-tag-e.out	-e
+brcmtagprepend	brcm-tag-prepend.pcap	brcm-tag-prepend.out -e
+
 # EAP tests
 eapon1		eapon1.pcap		eapon1.out
 
