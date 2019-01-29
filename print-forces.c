@@ -536,7 +536,7 @@ chk_op_type(netdissect_options *ndo,
 			}
 		} else {
 			if (!(msk & omsk)) {
-				ND_PRINT("Illegal DATA encoding for type 0x%x programmed %x got %x \n",
+				ND_PRINT("Illegal DATA encoding for type 0x%x programmed %x got %x\n",
 				          type, omsk, msk);
 			}
 		}
