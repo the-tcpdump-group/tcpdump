@@ -348,7 +348,7 @@ print_trans(netdissect_options *ndo,
 	param = buf + EXTRACT_LE_U_2(w + 10 * 2);
 	datalen = EXTRACT_LE_U_2(w + 11 * 2);
 	data = buf + EXTRACT_LE_U_2(w + 12 * 2);
-	f1 = "TotParamCnt=[u] \nTotDataCnt=[u] \nMaxParmCnt=[u] \nMaxDataCnt=[u]\nMaxSCnt=[u] \nTransFlags=[w] \nRes1=[w] \nRes2=[w] \nRes3=[w]\nParamCnt=[u] \nParamOff=[u] \nDataCnt=[u] \nDataOff=[u] \nSUCnt=[u]\n";
+	f1 = "TotParamCnt=[u]\nTotDataCnt=[u]\nMaxParmCnt=[u]\nMaxDataCnt=[u]\nMaxSCnt=[u]\nTransFlags=[w]\nRes1=[w]\nRes2=[w]\nRes3=[w]\nParamCnt=[u]\nParamOff=[u]\nDataCnt=[u]\nDataOff=[u]\nSUCnt=[u]\n";
 	f2 = "|Name=[S]\n";
 	f3 = "|Param ";
 	f4 = "|Data ";
@@ -358,7 +358,7 @@ print_trans(netdissect_options *ndo,
 	param = buf + EXTRACT_LE_U_2(w + 4 * 2);
 	datalen = EXTRACT_LE_U_2(w + 6 * 2);
 	data = buf + EXTRACT_LE_U_2(w + 7 * 2);
-	f1 = "TotParamCnt=[u] \nTotDataCnt=[u] \nRes1=[u]\nParamCnt=[u] \nParamOff=[u] \nRes2=[u] \nDataCnt=[u] \nDataOff=[u] \nRes3=[u]\nLsetup=[u]\n";
+	f1 = "TotParamCnt=[u]\nTotDataCnt=[u]\nRes1=[u]\nParamCnt=[u]\nParamOff=[u]\nRes2=[u]\nDataCnt=[u]\nDataOff=[u]\nRes3=[u]\nLsetup=[u]\n";
 	f2 = "|Unknown ";
 	f3 = "|Param ";
 	f4 = "|Data ";
