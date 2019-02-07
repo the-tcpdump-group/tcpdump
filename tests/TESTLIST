@@ -612,6 +612,7 @@ rtp-seg-fault-2  rtp-seg-fault-2.pcapng  rtp-seg-fault-2.out  -v -T rtp
 # NFS tests
 # fuzzed pcap
 nfs-seg-fault-1  nfs-seg-fault-1.pcapng  nfs-seg-fault-1.out
+nfs-write-verf-cookie nfs-write-verf-cookie.pcapng nfs-write-verf-cookie.out -vv
 
 # DNS infinite loop tests
 #
