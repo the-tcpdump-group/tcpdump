@@ -184,6 +184,7 @@
 #define T_MAILB		253		/* transfer mailbox records */
 #define T_MAILA		254		/* transfer mail agent records */
 #define T_ANY		255		/* wildcard match */
+#define T_URI		256		/* uri records [RFC7553] */
 
 /*
  * Values for class field

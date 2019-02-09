@@ -332,6 +332,7 @@ const struct tok ns_type2str[] = {
 	{ T_MAILB,	"MAILB" },		/* RFC 1035 */
 	{ T_MAILA,	"MAILA" },		/* RFC 1035 */
 	{ T_ANY,	"ANY" },
+	{ T_URI,	"URI" },		/* RFC 7553 */
 	{ 0,		NULL }
 };
 
@@ -551,6 +552,14 @@ ns_rprint(netdissect_options *ndo,
 		}
 		break;
 	    }
+
+	case T_URI:
+		if (!ND_TTEST_LEN(cp, len))
+			return(NULL);
+		ND_PRINT(" %u %u ", GET_BE_U_2(cp), GET_BE_U_2(cp + 2));
+		if (nd_printn(ndo, cp + 4, len - 4, ndo->ndo_snapend))
+			return(NULL);
+		break;
 
 	case T_OPT:
 		ND_PRINT(" UDPsize=%u", class);
