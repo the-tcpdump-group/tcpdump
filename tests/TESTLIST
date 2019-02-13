@@ -645,3 +645,6 @@ rx-v			afs.pcap		rx-v.out		-v
 # Empty pcap/pcapng tests
 empty-pcap	empty.pcap	empty.out
 empty-pcapng	empty.pcapng	empty.out
+
+# DNS Extended rcode tests
+dns-badcookie	dns-badcookie.pcap	dns-badcookie.out
