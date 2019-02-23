@@ -57,7 +57,7 @@ static const struct tok msg_type_values[] = {
 
 static void
 print_btp_body(netdissect_options *ndo,
-               const u_char *bp)
+	       const u_char *bp)
 {
 	u_int version;
 	u_int msg_type;
@@ -73,7 +73,7 @@ print_btp_body(netdissect_options *ndo,
 
 static void
 print_btp(netdissect_options *ndo,
-          const u_char *bp)
+	  const u_char *bp)
 {
 	uint16_t dest = EXTRACT_BE_U_2(bp + 0);
 	uint16_t src = EXTRACT_BE_U_2(bp + 2);
@@ -82,7 +82,7 @@ print_btp(netdissect_options *ndo,
 
 static int
 print_long_pos_vector(netdissect_options *ndo,
-                      const u_char *bp)
+		      const u_char *bp)
 {
 	uint32_t lat, lon;
 
