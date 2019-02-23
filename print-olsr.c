@@ -240,8 +240,7 @@ olsr_print_lq_neighbor4(netdissect_options *ndo,
     while (hello_len >= sizeof(struct olsr_lq_neighbor4)) {
 
         lq_neighbor = (const struct olsr_lq_neighbor4 *)msg_data;
-        if (!ND_TTEST_SIZE(lq_neighbor))
-            return (-1);
+        ND_TCHECK_SIZE(lq_neighbor);
 
         ND_PRINT("\n\t      neighbor %s, link-quality %.2f%%"
                ", neighbor-link-quality %.2f%%",
@@ -253,6 +252,8 @@ olsr_print_lq_neighbor4(netdissect_options *ndo,
         hello_len -= sizeof(struct olsr_lq_neighbor4);
     }
     return (0);
+trunc:
+    return -1;
 }
 
 static int
@@ -264,8 +265,7 @@ olsr_print_lq_neighbor6(netdissect_options *ndo,
     while (hello_len >= sizeof(struct olsr_lq_neighbor6)) {
 
         lq_neighbor = (const struct olsr_lq_neighbor6 *)msg_data;
-        if (!ND_TTEST_SIZE(lq_neighbor))
-            return (-1);
+        ND_TCHECK_SIZE(lq_neighbor);
 
         ND_PRINT("\n\t      neighbor %s, link-quality %.2f%%"
                ", neighbor-link-quality %.2f%%",
@@ -277,6 +277,8 @@ olsr_print_lq_neighbor6(netdissect_options *ndo,
         hello_len -= sizeof(struct olsr_lq_neighbor6);
     }
     return (0);
+trunc:
+    return -1;
 }
 
 /*
@@ -293,8 +295,7 @@ olsr_print_neighbor(netdissect_options *ndo,
 
     while (hello_len >= sizeof(nd_ipv4)) {
 
-        if (!ND_TTEST_LEN(msg_data, sizeof(nd_ipv4)))
-            return (-1);
+        ND_TCHECK_LEN(msg_data, sizeof(nd_ipv4));
         /* print 4 neighbors per line */
 
         ND_PRINT("%s%s", ipaddr_string(ndo, msg_data),
@@ -304,6 +305,8 @@ olsr_print_neighbor(netdissect_options *ndo,
         hello_len -= sizeof(nd_ipv4);
     }
     return (0);
+trunc:
+    return -1;
 }
 
 
