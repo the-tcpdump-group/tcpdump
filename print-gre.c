@@ -364,8 +364,7 @@ gre_sre_ip_print(netdissect_options *ndo, uint8_t sreoff, uint8_t srelen,
 	}
 
 	while (srelen != 0) {
-		if (!ND_TTEST_4(bp))
-			return (0);
+		ND_TCHECK_4(bp);
 		if (len < 4)
 			return (0);
 
@@ -378,6 +377,8 @@ gre_sre_ip_print(netdissect_options *ndo, uint8_t sreoff, uint8_t srelen,
 		srelen -= 4;
 	}
 	return (1);
+trunc:
+	return 0;
 }
 
 static int
@@ -400,8 +401,7 @@ gre_sre_asn_print(netdissect_options *ndo, uint8_t sreoff, uint8_t srelen,
 	}
 
 	while (srelen != 0) {
-		if (!ND_TTEST_2(bp))
-			return (0);
+		ND_TCHECK_2(bp);
 		if (len < 2)
 			return (0);
 
@@ -413,4 +413,6 @@ gre_sre_asn_print(netdissect_options *ndo, uint8_t sreoff, uint8_t srelen,
 		srelen -= 2;
 	}
 	return (1);
+trunc:
+	return 0;
 }
