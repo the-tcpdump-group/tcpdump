@@ -88,20 +88,20 @@ gre_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	if (len < 2)
 		goto trunc;
 	vers = EXTRACT_BE_U_2(bp) & GRE_VERS_MASK;
-        ND_PRINT("GREv%u",vers);
+	ND_PRINT("GREv%u",vers);
 
-        switch(vers) {
-        case 0:
-            gre_print_0(ndo, bp, len);
-            break;
-        case 1:
-            gre_print_1(ndo, bp, len);
-            break;
+	switch(vers) {
+	case 0:
+		gre_print_0(ndo, bp, len);
+		break;
+	case 1:
+		gre_print_1(ndo, bp, len);
+		break;
 	default:
-            ND_PRINT(" ERROR: unknown-version");
-            break;
-        }
-        return;
+		ND_PRINT(" ERROR: unknown-version");
+		break;
+	}
+	return;
 
 trunc:
 	nd_print_trunc(ndo);
@@ -116,9 +116,9 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	/* 16 bits ND_TCHECKed in gre_print() */
 	flags = EXTRACT_BE_U_2(bp);
-        if (ndo->ndo_vflag)
-            ND_PRINT(", Flags [%s]",
-                   bittok2str(gre_flag_values,"none",flags));
+	if (ndo->ndo_vflag)
+		ND_PRINT(", Flags [%s]",
+			 bittok2str(gre_flag_values,"none",flags));
 
 	len -= 2;
 	bp += 2;
@@ -193,21 +193,20 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 		}
 	}
 
-        if (ndo->ndo_eflag)
-            ND_PRINT(", proto %s (0x%04x)",
-                   tok2str(ethertype_values,"unknown",prot),
-                   prot);
+	if (ndo->ndo_eflag)
+		ND_PRINT(", proto %s (0x%04x)",
+			 tok2str(ethertype_values,"unknown",prot), prot);
 
-        ND_PRINT(", length %u",length);
+	ND_PRINT(", length %u",length);
 
-        if (ndo->ndo_vflag < 1)
-            ND_PRINT(": "); /* put in a colon as protocol demarc */
-        else
-            ND_PRINT("\n\t"); /* if verbose go multiline */
+	if (ndo->ndo_vflag < 1)
+		ND_PRINT(": "); /* put in a colon as protocol demarc */
+	else
+		ND_PRINT("\n\t"); /* if verbose go multiline */
 
 	switch (prot) {
 	case ETHERTYPE_IP:
-	        ip_print(ndo, bp, len);
+		ip_print(ndo, bp, len);
 		break;
 	case ETHERTYPE_IPV6:
 		ip6_print(ndo, bp, len);
@@ -248,8 +247,8 @@ gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 	bp += 2;
 
 	if (ndo->ndo_vflag)
-            ND_PRINT(", Flags [%s]",
-                   bittok2str(gre_flag_values,"none",flags));
+		ND_PRINT(", Flags [%s]",
+			 bittok2str(gre_flag_values,"none",flags));
 
 	ND_TCHECK_2(bp);
 	if (len < 2)
@@ -292,20 +291,19 @@ gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 	if ((flags & GRE_SP) == 0)
 		ND_PRINT(", no-payload");
 
-        if (ndo->ndo_eflag)
-            ND_PRINT(", proto %s (0x%04x)",
-                   tok2str(ethertype_values,"unknown",prot),
-                   prot);
+	if (ndo->ndo_eflag)
+		ND_PRINT(", proto %s (0x%04x)",
+			 tok2str(ethertype_values,"unknown",prot), prot);
 
-        ND_PRINT(", length %u",length);
+	ND_PRINT(", length %u",length);
 
-        if ((flags & GRE_SP) == 0)
-            return;
+	if ((flags & GRE_SP) == 0)
+		return;
 
-        if (ndo->ndo_vflag < 1)
-            ND_PRINT(": "); /* put in a colon as protocol demarc */
-        else
-            ND_PRINT("\n\t"); /* if verbose go multiline */
+	if (ndo->ndo_vflag < 1)
+		ND_PRINT(": "); /* put in a colon as protocol demarc */
+	else
+		ND_PRINT("\n\t"); /* if verbose go multiline */
 
 	switch (prot) {
 	case ETHERTYPE_PPP:
@@ -323,7 +321,7 @@ trunc:
 
 static int
 gre_sre_print(netdissect_options *ndo, uint16_t af, uint8_t sreoff,
-    uint8_t srelen, const u_char *bp, u_int len)
+	      uint8_t srelen, const u_char *bp, u_int len)
 {
 	int ret;
 
@@ -347,7 +345,7 @@ gre_sre_print(netdissect_options *ndo, uint16_t af, uint8_t sreoff,
 
 static int
 gre_sre_ip_print(netdissect_options *ndo, uint8_t sreoff, uint8_t srelen,
-                 const u_char *bp, u_int len)
+		 const u_char *bp, u_int len)
 {
 	const u_char *up = bp;
 	char buf[INET_ADDRSTRLEN];
@@ -373,7 +371,7 @@ gre_sre_ip_print(netdissect_options *ndo, uint8_t sreoff, uint8_t srelen,
 
 		addrtostr(bp, buf, sizeof(buf));
 		ND_PRINT(" %s%s",
-		    ((bp - up) == sreoff) ? "*" : "", buf);
+			 ((bp - up) == sreoff) ? "*" : "", buf);
 
 		bp += 4;
 		len -= 4;
@@ -384,7 +382,7 @@ gre_sre_ip_print(netdissect_options *ndo, uint8_t sreoff, uint8_t srelen,
 
 static int
 gre_sre_asn_print(netdissect_options *ndo, uint8_t sreoff, uint8_t srelen,
-                  const u_char *bp, u_int len)
+		  const u_char *bp, u_int len)
 {
 	const u_char *up = bp;
 
@@ -408,8 +406,7 @@ gre_sre_asn_print(netdissect_options *ndo, uint8_t sreoff, uint8_t srelen,
 			return (0);
 
 		ND_PRINT(" %s%x",
-		    ((bp - up) == sreoff) ? "*" : "",
-		    EXTRACT_BE_U_2(bp));
+			 ((bp - up) == sreoff) ? "*" : "", EXTRACT_BE_U_2(bp));
 
 		bp += 2;
 		len -= 2;
