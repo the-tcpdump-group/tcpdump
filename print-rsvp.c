@@ -729,8 +729,7 @@ rsvp_obj_print(netdissect_options *ndo,
         obj_tlen=rsvp_obj_len-sizeof(struct rsvp_object_header);
 
         /* did we capture enough for fully decoding the object ? */
-        if (!ND_TTEST_LEN(tptr, rsvp_obj_len))
-            return -1;
+        ND_TCHECK_LEN(tptr, rsvp_obj_len);
         hexdump=FALSE;
 
         switch(rsvp_obj_class_num) {
