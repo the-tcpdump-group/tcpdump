@@ -984,14 +984,15 @@ wep_print(netdissect_options *ndo,
 {
 	uint32_t iv;
 
-	if (!ND_TTEST_LEN(p, IEEE802_11_IV_LEN + IEEE802_11_KID_LEN))
-		return 0;
+	ND_TCHECK_LEN(p, IEEE802_11_IV_LEN + IEEE802_11_KID_LEN);
 	iv = EXTRACT_LE_U_4(p);
 
 	ND_PRINT(" IV:%3x Pad %x KeyID %x", IV_IV(iv), IV_PAD(iv),
 	    IV_KEYID(iv));
 
 	return 1;
+trunc:
+	return 0;
 }
 
 static int
@@ -1019,17 +1020,15 @@ parse_elements(netdissect_options *ndo,
 
 	while (length != 0) {
 		/* Make sure we at least have the element ID and length. */
-		if (!ND_TTEST_2(p + offset))
-			return 0;
+		ND_TCHECK_2(p + offset);
 		if (length < 2)
-			return 0;
+			goto trunc;
 		elementlen = EXTRACT_U_1(p + offset + 1);
 
 		/* Make sure we have the entire element. */
-		if (!ND_TTEST_LEN(p + offset + 2, elementlen))
-			return 0;
+		ND_TCHECK_LEN(p + offset + 2, elementlen);
 		if (length < elementlen + 2)
-			return 0;
+			goto trunc;
 
 		switch (EXTRACT_U_1(p + offset)) {
 		case E_SSID:
@@ -1205,6 +1204,8 @@ parse_elements(netdissect_options *ndo,
 
 	/* No problems found. */
 	return 1;
+trunc:
+	return 0;
 }
 
 /*********************************************************************************
@@ -1221,11 +1222,11 @@ handle_beacon(netdissect_options *ndo,
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	if (!ND_TTEST_LEN(p, IEEE802_11_TSTAMP_LEN + IEEE802_11_BCNINT_LEN + IEEE802_11_CAPINFO_LEN))
-		return 0;
+	ND_TCHECK_LEN(p, IEEE802_11_TSTAMP_LEN + IEEE802_11_BCNINT_LEN +
+		      IEEE802_11_CAPINFO_LEN);
 	if (length < IEEE802_11_TSTAMP_LEN + IEEE802_11_BCNINT_LEN +
 	    IEEE802_11_CAPINFO_LEN)
-		return 0;
+		goto trunc;
 	memcpy(&pbody.timestamp, p, IEEE802_11_TSTAMP_LEN);
 	offset += IEEE802_11_TSTAMP_LEN;
 	length -= IEEE802_11_TSTAMP_LEN;
@@ -1245,6 +1246,8 @@ handle_beacon(netdissect_options *ndo,
 	PRINT_DS_CHANNEL(pbody);
 
 	return ret;
+trunc:
+	return 0;
 }
 
 static int
@@ -1257,10 +1260,9 @@ handle_assoc_request(netdissect_options *ndo,
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	if (!ND_TTEST_LEN(p, IEEE802_11_CAPINFO_LEN + IEEE802_11_LISTENINT_LEN))
-		return 0;
+	ND_TCHECK_LEN(p, IEEE802_11_CAPINFO_LEN + IEEE802_11_LISTENINT_LEN);
 	if (length < IEEE802_11_CAPINFO_LEN + IEEE802_11_LISTENINT_LEN)
-		return 0;
+		goto trunc;
 	pbody.capability_info = EXTRACT_LE_U_2(p);
 	offset += IEEE802_11_CAPINFO_LEN;
 	length -= IEEE802_11_CAPINFO_LEN;
@@ -1273,6 +1275,8 @@ handle_assoc_request(netdissect_options *ndo,
 	PRINT_SSID(pbody);
 	PRINT_RATES(pbody);
 	return ret;
+trunc:
+	return 0;
 }
 
 static int
@@ -1285,11 +1289,11 @@ handle_assoc_response(netdissect_options *ndo,
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	if (!ND_TTEST_LEN(p, IEEE802_11_CAPINFO_LEN + IEEE802_11_STATUS_LEN + IEEE802_11_AID_LEN))
-		return 0;
+	ND_TCHECK_LEN(p, IEEE802_11_CAPINFO_LEN + IEEE802_11_STATUS_LEN +
+		      IEEE802_11_AID_LEN);
 	if (length < IEEE802_11_CAPINFO_LEN + IEEE802_11_STATUS_LEN +
 	    IEEE802_11_AID_LEN)
-		return 0;
+		goto trunc;
 	pbody.capability_info = EXTRACT_LE_U_2(p);
 	offset += IEEE802_11_CAPINFO_LEN;
 	length -= IEEE802_11_CAPINFO_LEN;
@@ -1309,6 +1313,8 @@ handle_assoc_response(netdissect_options *ndo,
 		: "n/a"));
 
 	return ret;
+trunc:
+	return 0;
 }
 
 static int
@@ -1321,11 +1327,11 @@ handle_reassoc_request(netdissect_options *ndo,
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	if (!ND_TTEST_LEN(p, IEEE802_11_CAPINFO_LEN + IEEE802_11_LISTENINT_LEN + IEEE802_11_AP_LEN))
-		return 0;
+	ND_TCHECK_LEN(p, IEEE802_11_CAPINFO_LEN + IEEE802_11_LISTENINT_LEN +
+		      IEEE802_11_AP_LEN);
 	if (length < IEEE802_11_CAPINFO_LEN + IEEE802_11_LISTENINT_LEN +
 	    IEEE802_11_AP_LEN)
-		return 0;
+		goto trunc;
 	pbody.capability_info = EXTRACT_LE_U_2(p);
 	offset += IEEE802_11_CAPINFO_LEN;
 	length -= IEEE802_11_CAPINFO_LEN;
@@ -1342,6 +1348,8 @@ handle_reassoc_request(netdissect_options *ndo,
 	ND_PRINT(" AP : %s", etheraddr_string(ndo,  pbody.ap ));
 
 	return ret;
+trunc:
+	return 0;
 }
 
 static int
@@ -1380,11 +1388,11 @@ handle_probe_response(netdissect_options *ndo,
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	if (!ND_TTEST_LEN(p, IEEE802_11_TSTAMP_LEN + IEEE802_11_BCNINT_LEN + IEEE802_11_CAPINFO_LEN))
-		return 0;
+	ND_TCHECK_LEN(p, IEEE802_11_TSTAMP_LEN + IEEE802_11_BCNINT_LEN +
+		      IEEE802_11_CAPINFO_LEN);
 	if (length < IEEE802_11_TSTAMP_LEN + IEEE802_11_BCNINT_LEN +
 	    IEEE802_11_CAPINFO_LEN)
-		return 0;
+		goto trunc;
 	memcpy(&pbody.timestamp, p, IEEE802_11_TSTAMP_LEN);
 	offset += IEEE802_11_TSTAMP_LEN;
 	length -= IEEE802_11_TSTAMP_LEN;
@@ -1402,6 +1410,8 @@ handle_probe_response(netdissect_options *ndo,
 	PRINT_DS_CHANNEL(pbody);
 
 	return ret;
+trunc:
+	return 0;
 }
 
 static int
@@ -1419,10 +1429,9 @@ handle_disassoc(netdissect_options *ndo,
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	if (!ND_TTEST_LEN(p, IEEE802_11_REASON_LEN))
-		return 0;
+	ND_TCHECK_LEN(p, IEEE802_11_REASON_LEN);
 	if (length < IEEE802_11_REASON_LEN)
-		return 0;
+		goto trunc;
 	pbody.reason_code = EXTRACT_LE_U_2(p);
 
 	ND_PRINT(": %s",
@@ -1431,6 +1440,8 @@ handle_disassoc(netdissect_options *ndo,
 		: "Reserved");
 
 	return 1;
+trunc:
+	return 0;
 }
 
 static int
@@ -1443,10 +1454,9 @@ handle_auth(netdissect_options *ndo,
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	if (!ND_TTEST_6(p))
-		return 0;
+	ND_TCHECK_6(p);
 	if (length < 6)
-		return 0;
+		goto trunc;
 	pbody.auth_alg = EXTRACT_LE_U_2(p);
 	offset += 2;
 	length -= 2;
@@ -1485,6 +1495,8 @@ handle_auth(netdissect_options *ndo,
 		: "");
 
 	return ret;
+trunc:
+	return 0;
 }
 
 static int
@@ -1496,10 +1508,9 @@ handle_deauth(netdissect_options *ndo,
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	if (!ND_TTEST_LEN(p, IEEE802_11_REASON_LEN))
-		return 0;
+	ND_TCHECK_LEN(p, IEEE802_11_REASON_LEN);
 	if (length < IEEE802_11_REASON_LEN)
-		return 0;
+		goto trunc;
 	pbody.reason_code = EXTRACT_LE_U_2(p);
 
 	reason = (pbody.reason_code < NUM_REASONS)
@@ -1512,6 +1523,8 @@ handle_deauth(netdissect_options *ndo,
 		ND_PRINT(" (%s): %s", etheraddr_string(ndo, src), reason);
 	}
 	return 1;
+trunc:
+	return 0;
 }
 
 #define	PRINT_HT_ACTION(v) (\
@@ -1568,10 +1581,9 @@ static int
 handle_action(netdissect_options *ndo,
 	      const uint8_t *src, const u_char *p, u_int length)
 {
-	if (!ND_TTEST_2(p))
-		return 0;
+	ND_TCHECK_2(p);
 	if (length < 2)
-		return 0;
+		goto trunc;
 	if (ndo->ndo_eflag) {
 		ND_PRINT(": ");
 	} else {
@@ -1596,6 +1608,8 @@ handle_action(netdissect_options *ndo,
 		break;
 	}
 	return 1;
+trunc:
+	return 0;
 }
 
 
@@ -1658,8 +1672,7 @@ ctrl_body_print(netdissect_options *ndo,
 		/* XXX - requires special handling */
 		break;
 	case CTRL_BAR:
-		if (!ND_TTEST_LEN(p, CTRL_BAR_HDRLEN))
-			return 0;
+		ND_TCHECK_LEN(p, CTRL_BAR_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s TA:%s CTL(%x) SEQ(%u) ",
 			    etheraddr_string(ndo, ((const struct ctrl_bar_hdr_t *)p)->ra),
@@ -1668,55 +1681,50 @@ ctrl_body_print(netdissect_options *ndo,
 			    EXTRACT_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->seq));
 		break;
 	case CTRL_BA:
-		if (!ND_TTEST_LEN(p, CTRL_BA_HDRLEN))
-			return 0;
+		ND_TCHECK_LEN(p, CTRL_BA_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
 			    etheraddr_string(ndo, ((const struct ctrl_ba_hdr_t *)p)->ra));
 		break;
 	case CTRL_PS_POLL:
-		if (!ND_TTEST_LEN(p, CTRL_PS_POLL_HDRLEN))
-			return 0;
+		ND_TCHECK_LEN(p, CTRL_PS_POLL_HDRLEN);
 		ND_PRINT(" AID(%x)",
 		    EXTRACT_LE_U_2(((const struct ctrl_ps_poll_hdr_t *)p)->aid));
 		break;
 	case CTRL_RTS:
-		if (!ND_TTEST_LEN(p, CTRL_RTS_HDRLEN))
-			return 0;
+		ND_TCHECK_LEN(p, CTRL_RTS_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" TA:%s ",
 			    etheraddr_string(ndo, ((const struct ctrl_rts_hdr_t *)p)->ta));
 		break;
 	case CTRL_CTS:
-		if (!ND_TTEST_LEN(p, CTRL_CTS_HDRLEN))
-			return 0;
+		ND_TCHECK_LEN(p, CTRL_CTS_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
 			    etheraddr_string(ndo, ((const struct ctrl_cts_hdr_t *)p)->ra));
 		break;
 	case CTRL_ACK:
-		if (!ND_TTEST_LEN(p, CTRL_ACK_HDRLEN))
-			return 0;
+		ND_TCHECK_LEN(p, CTRL_ACK_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
 			    etheraddr_string(ndo, ((const struct ctrl_ack_hdr_t *)p)->ra));
 		break;
 	case CTRL_CF_END:
-		if (!ND_TTEST_LEN(p, CTRL_END_HDRLEN))
-			return 0;
+		ND_TCHECK_LEN(p, CTRL_END_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
 			    etheraddr_string(ndo, ((const struct ctrl_end_hdr_t *)p)->ra));
 		break;
 	case CTRL_END_ACK:
-		if (!ND_TTEST_LEN(p, CTRL_END_ACK_HDRLEN))
-			return 0;
+		ND_TCHECK_LEN(p, CTRL_END_ACK_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
 			    etheraddr_string(ndo, ((const struct ctrl_end_ack_hdr_t *)p)->ra));
 		break;
 	}
 	return 1;
+trunc:
+	return 0;
 }
 
 /*
