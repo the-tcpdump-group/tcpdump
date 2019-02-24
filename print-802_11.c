@@ -75,22 +75,22 @@
 #define	T_DATA 0x2 /* data */
 #define	T_RESV 0x3  /* reserved */
 
-#define	ST_ASSOC_REQUEST   	0x0
-#define	ST_ASSOC_RESPONSE 	0x1
-#define	ST_REASSOC_REQUEST   	0x2
-#define	ST_REASSOC_RESPONSE  	0x3
-#define	ST_PROBE_REQUEST   	0x4
-#define	ST_PROBE_RESPONSE   	0x5
-/* RESERVED 			0x6  */
-/* RESERVED 			0x7  */
-#define	ST_BEACON   		0x8
+#define	ST_ASSOC_REQUEST	0x0
+#define	ST_ASSOC_RESPONSE	0x1
+#define	ST_REASSOC_REQUEST	0x2
+#define	ST_REASSOC_RESPONSE	0x3
+#define	ST_PROBE_REQUEST	0x4
+#define	ST_PROBE_RESPONSE	0x5
+/* RESERVED			0x6  */
+/* RESERVED			0x7  */
+#define	ST_BEACON		0x8
 #define	ST_ATIM			0x9
 #define	ST_DISASSOC		0xA
 #define	ST_AUTH			0xB
 #define	ST_DEAUTH		0xC
 #define	ST_ACTION		0xD
-/* RESERVED 			0xE  */
-/* RESERVED 			0xF  */
+/* RESERVED			0xE  */
+/* RESERVED			0xF  */
 
 static const struct tok st_str[] = {
 	{ ST_ASSOC_REQUEST,    "Assoc Request"    },
@@ -175,7 +175,7 @@ static const struct tok ctrl_str[] = {
 
 struct mgmt_header_t {
 	nd_uint16_t	fc;
-	nd_uint16_t 	duration;
+	nd_uint16_t	duration;
 	nd_mac_addr	da;
 	nd_mac_addr	sa;
 	nd_mac_addr	bssid;
@@ -215,7 +215,7 @@ struct fh_t {
 	uint8_t		length;
 	uint16_t	dwell_time;
 	uint8_t		hop_set;
-	uint8_t 	hop_pattern;
+	uint8_t	hop_pattern;
 	uint8_t		hop_index;
 };
 
@@ -243,38 +243,38 @@ struct tim_t {
 	uint8_t		bitmap[251];
 };
 
-#define	E_SSID 		0
-#define	E_RATES 	1
+#define	E_SSID		0
+#define	E_RATES	1
 #define	E_FH		2
-#define	E_DS 		3
+#define	E_DS		3
 #define	E_CF		4
 #define	E_TIM		5
-#define	E_IBSS 		6
-/* reserved 		7 */
-/* reserved 		8 */
-/* reserved 		9 */
-/* reserved 		10 */
-/* reserved 		11 */
-/* reserved 		12 */
-/* reserved 		13 */
-/* reserved 		14 */
-/* reserved 		15 */
-/* reserved 		16 */
+#define	E_IBSS		6
+/* reserved		7 */
+/* reserved		8 */
+/* reserved		9 */
+/* reserved		10 */
+/* reserved		11 */
+/* reserved		12 */
+/* reserved		13 */
+/* reserved		14 */
+/* reserved		15 */
+/* reserved		16 */
 
-#define	E_CHALLENGE 	16
-/* reserved 		17 */
-/* reserved 		18 */
-/* reserved 		19 */
-/* reserved 		16 */
-/* reserved 		16 */
+#define	E_CHALLENGE	16
+/* reserved		17 */
+/* reserved		18 */
+/* reserved		19 */
+/* reserved		16 */
+/* reserved		16 */
 
 
 struct mgmt_body_t {
-	uint8_t   	timestamp[IEEE802_11_TSTAMP_LEN];
-	uint16_t  	beacon_interval;
-	uint16_t 	listen_interval;
-	uint16_t 	status_code;
-	uint16_t 	aid;
+	uint8_t		timestamp[IEEE802_11_TSTAMP_LEN];
+	uint16_t	beacon_interval;
+	uint16_t	listen_interval;
+	uint16_t	status_code;
+	uint16_t	aid;
 	u_char		ap[IEEE802_11_AP_LEN];
 	uint16_t	reason_code;
 	uint16_t	auth_alg;
@@ -285,7 +285,7 @@ struct mgmt_body_t {
 	int		ssid_present;
 	struct ssid_t	ssid;
 	int		rates_present;
-	struct rates_t 	rates;
+	struct rates_t	rates;
 	int		ds_present;
 	struct ds_t	ds;
 	int		cf_present;
@@ -913,7 +913,7 @@ static const char *status_text[] = {
 static const char *reason_text[] = {
 	"Reserved",						/* 0 */
 	"Unspecified reason",					/* 1 */
-	"Previous authentication no longer valid",  		/* 2 */
+	"Previous authentication no longer valid",		/* 2 */
 	"Deauthenticated because sending station is leaving (or has left) "
 	  "IBSS or ESS",					/* 3 */
 	"Disassociated due to inactivity",			/* 4 */
@@ -956,7 +956,7 @@ static const char *reason_text[] = {
 	"Disassociated because QoS AP lacks sufficient bandwidth for this "
 	  "QoS STA",						/* 33 */
 	"Disassociated because of excessive number of frames that need to be "
-          "acknowledged, but are not acknowledged for AP transmissions "
+	  "acknowledged, but are not acknowledged for AP transmissions "
 	  "and/or poor channel conditions",			/* 34 */
 	"Disassociated because STA is transmitting outside the limits "
 	  "of its TXOPs",					/* 35 */
@@ -980,7 +980,7 @@ static const char *reason_text[] = {
 
 static int
 wep_print(netdissect_options *ndo,
-          const u_char *p)
+	  const u_char *p)
 {
 	uint32_t iv;
 
@@ -996,8 +996,8 @@ wep_print(netdissect_options *ndo,
 
 static int
 parse_elements(netdissect_options *ndo,
-               struct mgmt_body_t *pbody, const u_char *p, int offset,
-               u_int length)
+	       struct mgmt_body_t *pbody, const u_char *p, int offset,
+	       u_int length)
 {
 	u_int elementlen;
 	struct ssid_t ssid;
@@ -1213,7 +1213,7 @@ parse_elements(netdissect_options *ndo,
 
 static int
 handle_beacon(netdissect_options *ndo,
-              const u_char *p, u_int length)
+	      const u_char *p, u_int length)
 {
 	struct mgmt_body_t pbody;
 	int offset = 0;
@@ -1249,7 +1249,7 @@ handle_beacon(netdissect_options *ndo,
 
 static int
 handle_assoc_request(netdissect_options *ndo,
-                     const u_char *p, u_int length)
+		     const u_char *p, u_int length)
 {
 	struct mgmt_body_t pbody;
 	int offset = 0;
@@ -1277,7 +1277,7 @@ handle_assoc_request(netdissect_options *ndo,
 
 static int
 handle_assoc_response(netdissect_options *ndo,
-                      const u_char *p, u_int length)
+		      const u_char *p, u_int length)
 {
 	struct mgmt_body_t pbody;
 	int offset = 0;
@@ -1313,7 +1313,7 @@ handle_assoc_response(netdissect_options *ndo,
 
 static int
 handle_reassoc_request(netdissect_options *ndo,
-                       const u_char *p, u_int length)
+		       const u_char *p, u_int length)
 {
 	struct mgmt_body_t pbody;
 	int offset = 0;
@@ -1346,7 +1346,7 @@ handle_reassoc_request(netdissect_options *ndo,
 
 static int
 handle_reassoc_response(netdissect_options *ndo,
-                        const u_char *p, u_int length)
+			const u_char *p, u_int length)
 {
 	/* Same as a Association Response */
 	return handle_assoc_response(ndo, p, length);
@@ -1354,7 +1354,7 @@ handle_reassoc_response(netdissect_options *ndo,
 
 static int
 handle_probe_request(netdissect_options *ndo,
-                     const u_char *p, u_int length)
+		     const u_char *p, u_int length)
 {
 	struct mgmt_body_t  pbody;
 	int offset = 0;
@@ -1372,7 +1372,7 @@ handle_probe_request(netdissect_options *ndo,
 
 static int
 handle_probe_response(netdissect_options *ndo,
-                      const u_char *p, u_int length)
+		      const u_char *p, u_int length)
 {
 	struct mgmt_body_t  pbody;
 	int offset = 0;
@@ -1413,7 +1413,7 @@ handle_atim(void)
 
 static int
 handle_disassoc(netdissect_options *ndo,
-                const u_char *p, u_int length)
+		const u_char *p, u_int length)
 {
 	struct mgmt_body_t  pbody;
 
@@ -1435,7 +1435,7 @@ handle_disassoc(netdissect_options *ndo,
 
 static int
 handle_auth(netdissect_options *ndo,
-            const u_char *p, u_int length)
+	    const u_char *p, u_int length)
 {
 	struct mgmt_body_t  pbody;
 	int offset = 0;
@@ -1468,7 +1468,7 @@ handle_auth(netdissect_options *ndo,
 			: "Reserved",
 		    pbody.auth_trans_seq_num,
 		    ((pbody.auth_trans_seq_num % 2)
-		        ? ((pbody.status_code < NUM_STATUSES)
+			? ((pbody.status_code < NUM_STATUSES)
 			       ? status_text[pbody.status_code]
 			       : "n/a") : ""));
 		return ret;
@@ -1479,17 +1479,17 @@ handle_auth(netdissect_options *ndo,
 		: "Reserved",
 	    pbody.auth_trans_seq_num,
 	    (pbody.auth_trans_seq_num % 2)
-	        ? ((pbody.status_code < NUM_STATUSES)
+		? ((pbody.status_code < NUM_STATUSES)
 		    ? status_text[pbody.status_code]
-	            : "n/a")
-	        : "");
+		    : "n/a")
+		: "");
 
 	return ret;
 }
 
 static int
 handle_deauth(netdissect_options *ndo,
-              const uint8_t *src, const u_char *p, u_int length)
+	      const uint8_t *src, const u_char *p, u_int length)
 {
 	struct mgmt_body_t  pbody;
 	const char *reason = NULL;
@@ -1566,7 +1566,7 @@ handle_deauth(netdissect_options *ndo,
 
 static int
 handle_action(netdissect_options *ndo,
-              const uint8_t *src, const u_char *p, u_int length)
+	      const uint8_t *src, const u_char *p, u_int length)
 {
 	if (!ND_TTEST_2(p))
 		return 0;
@@ -1606,7 +1606,7 @@ handle_action(netdissect_options *ndo,
 
 static int
 mgmt_body_print(netdissect_options *ndo,
-                uint16_t fc, const uint8_t *src, const u_char *p, u_int length)
+		uint16_t fc, const uint8_t *src, const u_char *p, u_int length)
 {
 	ND_PRINT("%s", tok2str(st_str, "Unhandled Management subtype(%x)", FC_SUBTYPE(fc)));
 
@@ -1650,7 +1650,7 @@ mgmt_body_print(netdissect_options *ndo,
 
 static int
 ctrl_body_print(netdissect_options *ndo,
-                uint16_t fc, const u_char *p)
+		uint16_t fc, const u_char *p)
 {
 	ND_PRINT("%s", tok2str(ctrl_str, "Unknown Ctrl Subtype", FC_SUBTYPE(fc)));
 	switch (FC_SUBTYPE(fc)) {
@@ -1734,7 +1734,7 @@ ctrl_body_print(netdissect_options *ndo,
  */
 static void
 get_data_src_dst_mac(uint16_t fc, const u_char *p, const uint8_t **srcp,
-                     const uint8_t **dstp)
+		     const uint8_t **dstp)
 {
 #define ADDR1  (p + 4)
 #define ADDR2  (p + 10)
@@ -1896,7 +1896,7 @@ ctrl_header_print(netdissect_options *ndo, uint16_t fc, const u_char *p)
 
 static int
 extract_header_length(netdissect_options *ndo,
-                      uint16_t fc)
+		      uint16_t fc)
 {
 	int len;
 
@@ -1949,8 +1949,8 @@ extract_mesh_header_length(const u_char *p)
  */
 static void
 ieee_802_11_hdr_print(netdissect_options *ndo,
-                      uint16_t fc, const u_char *p, u_int hdrlen,
-                      u_int meshdrlen)
+		      uint16_t fc, const u_char *p, u_int hdrlen,
+		      u_int meshdrlen)
 {
 	if (ndo->ndo_vflag) {
 		if (FC_MORE_DATA(fc))
@@ -2002,8 +2002,8 @@ ieee_802_11_hdr_print(netdissect_options *ndo,
 
 static u_int
 ieee802_11_print(netdissect_options *ndo,
-                 const u_char *p, u_int length, u_int orig_caplen, int pad,
-                 u_int fcslen)
+		 const u_char *p, u_int length, u_int orig_caplen, int pad,
+		 u_int fcslen)
 {
 	uint16_t fc;
 	u_int caplen, hdrlen, meshdrlen;
@@ -2121,7 +2121,7 @@ ieee802_11_print(netdissect_options *ndo,
  */
 u_int
 ieee802_11_if_print(netdissect_options *ndo,
-                    const struct pcap_pkthdr *h, const u_char *p)
+		    const struct pcap_pkthdr *h, const u_char *p)
 {
 	ndo->ndo_protocol = "802.11_if";
 	return ieee802_11_print(ndo, p, h->len, h->caplen, 0, 0);
@@ -2227,14 +2227,14 @@ struct ieee80211_radiotap_header {
  *      Tx/Rx data rate.  If bit 0x80 is set then it represents an
  *	an MCS index and not an IEEE rate.
  *
- * IEEE80211_RADIOTAP_DBM_ANTSIGNAL     int8_t          decibels from
- *                                                      one milliwatt (dBm)
+ * IEEE80211_RADIOTAP_DBM_ANTSIGNAL     int8_t         decibels from
+ *                                                     one milliwatt (dBm)
  *
  *      RF signal power at the antenna, decibel difference from
  *      one milliwatt.
  *
- * IEEE80211_RADIOTAP_DBM_ANTNOISE      int8_t          decibels from
- *                                                      one milliwatt (dBm)
+ * IEEE80211_RADIOTAP_DBM_ANTNOISE      int8_t         decibels from
+ *                                                     one milliwatt (dBm)
  *
  *      RF noise power at the antenna, decibel difference from one
  *      milliwatt.
@@ -2268,8 +2268,8 @@ struct ieee80211_radiotap_header {
  *      set at factory calibration.  0 is max power.  Monotonically
  *      nondecreasing with lower power levels.
  *
- * IEEE80211_RADIOTAP_DBM_TX_POWER      int8_t          decibels from
- *                                                      one milliwatt (dBm)
+ * IEEE80211_RADIOTAP_DBM_TX_POWER      int8_t         decibels from
+ *                                                     one milliwatt (dBm)
  *
  *      Transmit power expressed as dBm (decibels from a 1 milliwatt
  *      reference). This is the absolute power level measured at
@@ -2289,10 +2289,10 @@ struct ieee80211_radiotap_header {
  *
  *     Properties of received frames. See flags defined below.
  *
- * IEEE80211_RADIOTAP_XCHANNEL          uint32_t	bitmap
- *					uint16_t	MHz
- *					uint8_t		channel number
- *					uint8_t		.5 dBm
+ * IEEE80211_RADIOTAP_XCHANNEL          uint32_t       bitmap
+ *					uint16_t       MHz
+ *					uint8_t        channel number
+ *					uint8_t        .5 dBm
  *
  *	Extended channel specification: flags (see below) followed by
  *	frequency in MHz, the corresponding IEEE channel number, and
@@ -2300,9 +2300,9 @@ struct ieee80211_radiotap_header {
  *	units.  This property supersedes IEEE80211_RADIOTAP_CHANNEL
  *	and only one of the two should be present.
  *
- * IEEE80211_RADIOTAP_MCS		uint8_t		known
- *					uint8_t		flags
- *					uint8_t		mcs
+ * IEEE80211_RADIOTAP_MCS		uint8_t        known
+ *					uint8_t        flags
+ *					uint8_t        mcs
  *
  *	Bitset indicating which fields have known values, followed
  *	by bitset of flag values, followed by the MCS rate index as
@@ -2319,8 +2319,8 @@ struct ieee80211_radiotap_header {
  *
  * IEEE80211_RADIOTAP_VENDOR_NAMESPACE
  *					uint8_t  OUI[3]
- *                                   uint8_t  subspace
- *                                   uint16_t length
+ *                                      uint8_t        subspace
+ *                                      uint16_t       length
  *
  *     The Vendor Namespace Field contains three sub-fields. The first
  *     sub-field is 3 bytes long. It contains the vendor's IEEE 802
@@ -2373,15 +2373,15 @@ enum ieee80211_radiotap_type {
 
 /* Useful combinations of channel characteristics, borrowed from Ethereal */
 #define IEEE80211_CHAN_A \
-        (IEEE80211_CHAN_5GHZ | IEEE80211_CHAN_OFDM)
+	(IEEE80211_CHAN_5GHZ | IEEE80211_CHAN_OFDM)
 #define IEEE80211_CHAN_B \
-        (IEEE80211_CHAN_2GHZ | IEEE80211_CHAN_CCK)
+	(IEEE80211_CHAN_2GHZ | IEEE80211_CHAN_CCK)
 #define IEEE80211_CHAN_G \
-        (IEEE80211_CHAN_2GHZ | IEEE80211_CHAN_DYN)
+	(IEEE80211_CHAN_2GHZ | IEEE80211_CHAN_DYN)
 #define IEEE80211_CHAN_TA \
-        (IEEE80211_CHAN_5GHZ | IEEE80211_CHAN_OFDM | IEEE80211_CHAN_TURBO)
+	(IEEE80211_CHAN_5GHZ | IEEE80211_CHAN_OFDM | IEEE80211_CHAN_TURBO)
 #define IEEE80211_CHAN_TG \
-        (IEEE80211_CHAN_2GHZ | IEEE80211_CHAN_DYN  | IEEE80211_CHAN_TURBO)
+	(IEEE80211_CHAN_2GHZ | IEEE80211_CHAN_DYN  | IEEE80211_CHAN_TURBO)
 
 
 /* For IEEE80211_RADIOTAP_FLAGS */
@@ -2496,7 +2496,7 @@ enum ieee80211_radiotap_type {
 
 static void
 print_chaninfo(netdissect_options *ndo,
-               uint16_t freq, int flags, int presentflags)
+	       uint16_t freq, int flags, int presentflags)
 {
 	ND_PRINT("%u MHz", freq);
 	if (presentflags & (1 << IEEE80211_RADIOTAP_MCS)) {
@@ -2542,8 +2542,8 @@ print_chaninfo(netdissect_options *ndo,
 
 static int
 print_radiotap_field(netdissect_options *ndo,
-                     struct cpack_state *s, uint32_t bit, uint8_t *flagsp,
-                     uint32_t presentflags)
+		     struct cpack_state *s, uint32_t bit, uint8_t *flagsp,
+		     uint32_t presentflags)
 {
 	u_int i;
 	int rc;
@@ -3012,8 +3012,8 @@ trunc:
 
 static int
 print_in_radiotap_namespace(netdissect_options *ndo,
-                            struct cpack_state *s, uint8_t *flags,
-                            uint32_t presentflags, int bit0)
+			    struct cpack_state *s, uint8_t *flags,
+			    uint32_t presentflags, int bit0)
 {
 #define	BITNO_32(x) (((x) >> 16) ? 16 + BITNO_16((x) >> 16) : BITNO_16((x)))
 #define	BITNO_16(x) (((x) >> 8) ? 8 + BITNO_8((x) >> 8) : BITNO_8((x)))
@@ -3060,7 +3060,7 @@ print_in_radiotap_namespace(netdissect_options *ndo,
 
 u_int
 ieee802_11_radio_print(netdissect_options *ndo,
-                       const u_char *p, u_int length, u_int caplen)
+		       const u_char *p, u_int length, u_int caplen)
 {
 #define	BIT(n)	(1U << n)
 #define	IS_EXTENDED(__p)	\
@@ -3263,7 +3263,7 @@ ieee802_11_radio_print(netdissect_options *ndo,
 
 static u_int
 ieee802_11_radio_avs_print(netdissect_options *ndo,
-                           const u_char *p, u_int length, u_int caplen)
+			   const u_char *p, u_int length, u_int caplen)
 {
 	uint32_t caphdr_len;
 
@@ -3314,7 +3314,7 @@ ieee802_11_radio_avs_print(netdissect_options *ndo,
  */
 u_int
 prism_if_print(netdissect_options *ndo,
-               const struct pcap_pkthdr *h, const u_char *p)
+	       const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
@@ -3346,7 +3346,7 @@ prism_if_print(netdissect_options *ndo,
  */
 u_int
 ieee802_11_radio_if_print(netdissect_options *ndo,
-                          const struct pcap_pkthdr *h, const u_char *p)
+			  const struct pcap_pkthdr *h, const u_char *p)
 {
 	ndo->ndo_protocol = "802.11_radio_if";
 	return ieee802_11_radio_print(ndo, p, h->len, h->caplen);
@@ -3359,7 +3359,7 @@ ieee802_11_radio_if_print(netdissect_options *ndo,
  */
 u_int
 ieee802_11_radio_avs_if_print(netdissect_options *ndo,
-                              const struct pcap_pkthdr *h, const u_char *p)
+			      const struct pcap_pkthdr *h, const u_char *p)
 {
 	ndo->ndo_protocol = "802.11_radio_avs_if";
 	return ieee802_11_radio_avs_print(ndo, p, h->len, h->caplen);
