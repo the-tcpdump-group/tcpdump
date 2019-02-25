@@ -1748,8 +1748,7 @@ isis_print_tlv_ip_reach(netdissect_options *ndo,
 			return (0);
 		}
 
-		if (!ND_TTEST_SIZE(tlv_ip_reach))
-		    return (0);
+		ND_TCHECK_SIZE(tlv_ip_reach);
 
 		prefix_len = mask2plen(EXTRACT_IPV4_TO_HOST_ORDER(tlv_ip_reach->mask));
 
@@ -1791,6 +1790,8 @@ isis_print_tlv_ip_reach(netdissect_options *ndo,
 		tlv_ip_reach++;
 	}
 	return (1);
+trunc:
+	return 0;
 }
 
 /*
@@ -1861,8 +1862,7 @@ isis_print_ext_is_reach(netdissect_options *ndo,
         uint32_t i;
     } bw;
 
-    if (!ND_TTEST_LEN(tptr, NODE_ID_LEN))
-        return(0);
+    ND_TCHECK_LEN(tptr, NODE_ID_LEN);
     if (tlv_remaining < NODE_ID_LEN)
         return(0);
 
@@ -1871,8 +1871,7 @@ isis_print_ext_is_reach(netdissect_options *ndo,
     tlv_remaining-=NODE_ID_LEN;
 
     if (tlv_type != ISIS_TLV_IS_ALIAS_ID) { /* the Alias TLV Metric field is implicit 0 */
-        if (!ND_TTEST_3(tptr))    /* and is therefore skipped */
-	    return(0);
+        ND_TCHECK_3(tptr);
 	if (tlv_remaining < 3)
 	    return(0);
 	ND_PRINT(", Metric: %u", EXTRACT_BE_U_3(tptr));
@@ -1880,8 +1879,7 @@ isis_print_ext_is_reach(netdissect_options *ndo,
 	tlv_remaining-=3;
     }
 
-    if (!ND_TTEST_1(tptr))
-        return(0);
+    ND_TCHECK_1(tptr);
     if (tlv_remaining < 1)
         return(0);
     subtlv_sum_len=EXTRACT_U_1(tptr); /* read out subTLV length */
@@ -1895,8 +1893,7 @@ isis_print_ext_is_reach(netdissect_options *ndo,
         nd_snprintf(ident_buffer, sizeof(ident_buffer), "%s  ",ident);
         ident = ident_buffer;
         while (subtlv_sum_len != 0) {
-            if (!ND_TTEST_2(tptr))
-                return(0);
+            ND_TCHECK_2(tptr);
             if (tlv_remaining < 2) {
                 ND_PRINT("%sRemaining data in TLV shorter than a subTLV header",ident);
                 proc_bytes += tlv_remaining;
@@ -2110,8 +2107,7 @@ static u_int
 isis_print_mtid(netdissect_options *ndo,
                 const uint8_t *tptr, const char *ident)
 {
-    if (!ND_TTEST_2(tptr))
-        return(0);
+    ND_TCHECK_2(tptr);
 
     ND_PRINT("%s%s",
            ident,
@@ -2124,6 +2120,8 @@ isis_print_mtid(netdissect_options *ndo,
            bittok2str(isis_mt_flag_values, "none",ISIS_MASK_MTFLAGS(EXTRACT_BE_U_2(tptr))));
 
     return(2);
+trunc:
+    return 0;
 }
 
 /*
@@ -2141,15 +2139,13 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
     uint8_t prefix[sizeof(nd_ipv6)]; /* shared copy buffer for IPv4 and IPv6 prefixes */
     u_int metric, status_byte, bit_length, byte_length, sublen, processed, subtlvtype, subtlvlen;
 
-    if (!ND_TTEST_4(tptr))
-        return (0);
+    ND_TCHECK_4(tptr);
     metric = EXTRACT_BE_U_4(tptr);
     processed=4;
     tptr+=4;
 
     if (afi == AF_INET) {
-        if (!ND_TTEST_1(tptr)) /* fetch status byte */
-            return (0);
+        ND_TCHECK_1(tptr);
         status_byte=EXTRACT_U_1(tptr);
         tptr++;
         bit_length = status_byte&0x3f;
@@ -2161,8 +2157,7 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
         }
         processed++;
     } else if (afi == AF_INET6) {
-        if (!ND_TTEST_2(tptr)) /* fetch status & prefix_len byte */
-            return (0);
+        ND_TCHECK_2(tptr);
         status_byte=EXTRACT_U_1(tptr);
         bit_length=EXTRACT_U_1(tptr + 1);
         if (bit_length > 128) {
@@ -2178,8 +2173,7 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
 
     byte_length = (bit_length + 7) / 8; /* prefix has variable length encoding */
 
-    if (!ND_TTEST_LEN(tptr, byte_length))
-        return (0);
+    ND_TCHECK_LEN(tptr, byte_length);
     memset(prefix, 0, sizeof(prefix));   /* clear the copy buffer */
     memcpy(prefix,tptr,byte_length);    /* copy as much as is stored in the TLV */
     tptr+=byte_length;
@@ -2214,16 +2208,14 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
            than one subTLV - therefore the first byte must reflect
            the aggregate bytecount of the subTLVs for this prefix
         */
-        if (!ND_TTEST_1(tptr))
-            return (0);
+        ND_TCHECK_1(tptr);
         sublen=EXTRACT_U_1(tptr);
         tptr++;
         processed+=sublen+1;
         ND_PRINT(" (%u)", sublen);   /* print out subTLV length */
 
         while (sublen>0) {
-            if (!ND_TTEST_2(tptr))
-                return (0);
+            ND_TCHECK_2(tptr);
             subtlvtype=EXTRACT_U_1(tptr);
             subtlvlen=EXTRACT_U_1(tptr + 1);
             tptr+=2;
@@ -2236,6 +2228,8 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
         }
     }
     return (processed);
+trunc:
+    return 0;
 }
 
 /*
