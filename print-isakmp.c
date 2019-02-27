@@ -1175,7 +1175,7 @@ static const struct attrmap ipsec_t_map[] = {
 };
 
 static const struct attrmap encr_t_map[] = {
-	{ NULL,	0, { NULL } }, 	{ NULL,	0, { NULL } },  /* 0, 1 */
+	{ NULL,	0, { NULL } },	{ NULL,	0, { NULL } },  /* 0, 1 */
 	{ NULL,	0, { NULL } },	{ NULL,	0, { NULL } },  /* 2, 3 */
 	{ NULL,	0, { NULL } },	{ NULL,	0, { NULL } },  /* 4, 5 */
 	{ NULL,	0, { NULL } },	{ NULL,	0, { NULL } },  /* 6, 7 */
