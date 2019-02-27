@@ -3103,8 +3103,7 @@ isakmp_rfc3948_print(netdissect_options *ndo,
 	/*
 	 * see if this is an IKE packet
 	 */
-	if (EXTRACT_U_1(bp) == 0 && EXTRACT_U_1(bp + 1) == 0 &&
-	    EXTRACT_U_1(bp + 2) == 0 && EXTRACT_U_1(bp + 3) == 0) {
+	if (EXTRACT_BE_U_4(bp) == 0) {
 		ND_PRINT("NONESP-encap: ");
 		isakmp_print(ndo, bp+4, length-4, bp2);
 		return;
