@@ -449,9 +449,9 @@ isForCES_port(u_short Port)
 
 void
 sctp_print(netdissect_options *ndo,
-           const u_char *bp,        /* beginning of sctp packet */
-           const u_char *bp2,       /* beginning of enclosing */
-           u_int sctpPacketLength)  /* ip packet */
+	   const u_char *bp,        /* beginning of sctp packet */
+	   const u_char *bp2,       /* beginning of enclosing */
+	   u_int sctpPacketLength)  /* ip packet */
 {
   u_int sctpPacketLengthRemaining;
   const struct sctpHeader *sctpPktHdr;
@@ -500,12 +500,12 @@ sctp_print(netdissect_options *ndo,
   }
 
   if (isForCES_port(sourcePort)) {
-         ND_PRINT("[%s]", tok2str(ForCES_channels, NULL, sourcePort));
-         isforces = 1;
+	 ND_PRINT("[%s]", tok2str(ForCES_channels, NULL, sourcePort));
+	 isforces = 1;
   }
   if (isForCES_port(destPort)) {
-         ND_PRINT("[%s]", tok2str(ForCES_channels, NULL, destPort));
-         isforces = 1;
+	 ND_PRINT("[%s]", tok2str(ForCES_channels, NULL, destPort));
+	 isforces = 1;
   }
 
   bp += sizeof(struct sctpHeader);
@@ -525,14 +525,14 @@ sctp_print(netdissect_options *ndo,
 
       chunkDescPtr = (const struct sctpChunkDesc *)bp;
       if (sctpPacketLengthRemaining < sizeof(*chunkDescPtr)) {
-        ND_PRINT("%s%u) [chunk descriptor cut off at end of packet]", sep, chunkCount+1);
-        break;
+	ND_PRINT("%s%u) [chunk descriptor cut off at end of packet]", sep, chunkCount+1);
+	break;
       }
       ND_TCHECK_SIZE(chunkDescPtr);
       chunkLength = EXTRACT_BE_U_2(chunkDescPtr->chunkLength);
       if (chunkLength < sizeof(*chunkDescPtr)) {
-        ND_PRINT("%s%u) [Bad chunk length %u, < size of chunk descriptor]", sep, chunkCount+1, chunkLength);
-        break;
+	ND_PRINT("%s%u) [Bad chunk length %u, < size of chunk descriptor]", sep, chunkCount+1, chunkLength);
+	break;
       }
       chunkLengthRemaining = chunkLength;
 
@@ -541,8 +541,8 @@ sctp_print(netdissect_options *ndo,
 	align = 4 - align;
 
       if (sctpPacketLengthRemaining < align) {
-        ND_PRINT("%s%u) [Bad chunk length %u, > remaining data in packet]", sep, chunkCount+1, chunkLength);
-        break;
+	ND_PRINT("%s%u) [Bad chunk length %u, > remaining data in packet]", sep, chunkCount+1, chunkLength);
+	break;
       }
 
       ND_TCHECK_LEN(bp, chunkLength);
@@ -554,7 +554,7 @@ sctp_print(netdissect_options *ndo,
       ND_PRINT("%s%u) ", sep, chunkCount+1);
       chunkID = EXTRACT_U_1(chunkDescPtr->chunkID);
       ND_PRINT("[%s] ", tok2str(sctp_chunkid_str, "Unknown chunk type: 0x%x",
-                                      chunkID));
+	       chunkID));
       switch (chunkID)
 	{
 	case SCTP_DATA :
@@ -575,7 +575,7 @@ sctp_print(netdissect_options *ndo,
 	      ND_PRINT("(E)");
 
 	    if( ((chunkFlg & SCTP_DATA_UNORDERED) == SCTP_DATA_UNORDERED) ||
-	        ((chunkFlg & SCTP_DATA_FIRST_FRAG) == SCTP_DATA_FIRST_FRAG) ||
+		((chunkFlg & SCTP_DATA_FIRST_FRAG) == SCTP_DATA_FIRST_FRAG) ||
 		((chunkFlg & SCTP_DATA_LAST_FRAG) == SCTP_DATA_LAST_FRAG) )
 	      ND_PRINT(" ");
 
@@ -645,7 +645,7 @@ sctp_print(netdissect_options *ndo,
 	    ND_PRINT("[MIS: %u] ", EXTRACT_BE_U_2(init->MaxInboundStreams));
 	    ND_PRINT("[init TSN: %u] ", EXTRACT_BE_U_4(init->initialTSN));
 	    bp += sizeof(*init);
- 	    sctpPacketLengthRemaining -= sizeof(*init);
+	    sctpPacketLengthRemaining -= sizeof(*init);
 	    chunkLengthRemaining -= sizeof(*init);
 
 #if 0 /* ALC you can add code for optional params here */
@@ -653,9 +653,9 @@ sctp_print(netdissect_options *ndo,
 	      ND_PRINT(" @@@@@ UNFINISHED @@@@@@%s\n",
 		     "Optional params present, but not printed.");
 #endif
-            bp += chunkLengthRemaining;
+	    bp += chunkLengthRemaining;
 	    sctpPacketLengthRemaining -= chunkLengthRemaining;
-            chunkLengthRemaining = 0;
+	    chunkLengthRemaining = 0;
 	    break;
 	  }
 	case SCTP_INITIATION_ACK :
@@ -672,18 +672,18 @@ sctp_print(netdissect_options *ndo,
 	    ND_PRINT("[OS: %u] ", EXTRACT_BE_U_2(init->NumPreopenStreams));
 	    ND_PRINT("[MIS: %u] ", EXTRACT_BE_U_2(init->MaxInboundStreams));
 	    ND_PRINT("[init TSN: %u] ", EXTRACT_BE_U_4(init->initialTSN));
-            bp += sizeof(*init);
-            sctpPacketLengthRemaining -= sizeof(*init);
-            chunkLengthRemaining -= sizeof(*init);
+	    bp += sizeof(*init);
+	    sctpPacketLengthRemaining -= sizeof(*init);
+	    chunkLengthRemaining -= sizeof(*init);
 
 #if 0 /* ALC you can add code for optional params here */
 	    if( chunkLengthRemaining != 0 )
 	      ND_PRINT(" @@@@@ UNFINISHED @@@@@@%s\n",
 		     "Optional params present, but not printed.");
 #endif
-            bp += chunkLengthRemaining;
+	    bp += chunkLengthRemaining;
 	    sctpPacketLengthRemaining -= chunkLengthRemaining;
-            chunkLengthRemaining = 0;
+	    chunkLengthRemaining = 0;
 	    break;
 	  }
 	case SCTP_SELECTIVE_ACK:
@@ -702,9 +702,9 @@ sctp_print(netdissect_options *ndo,
 	    ND_PRINT("[a_rwnd %u] ", EXTRACT_BE_U_4(sack->updatedRwnd));
 	    ND_PRINT("[#gap acks %u] ", EXTRACT_BE_U_2(sack->numberOfdesc));
 	    ND_PRINT("[#dup tsns %u] ", EXTRACT_BE_U_2(sack->numDupTsns));
-            bp += sizeof(*sack);
+	    bp += sizeof(*sack);
 	    sctpPacketLengthRemaining -= sizeof(*sack);
-            chunkLengthRemaining -= sizeof(*sack);
+	    chunkLengthRemaining -= sizeof(*sack);
 
 
 	    /* print gaps */
@@ -730,17 +730,17 @@ sctp_print(netdissect_options *ndo,
 		ND_PRINT("bogus chunk length %u]", chunkLength);
 		return;
 	      }
-              dupTSN = (const u_char *)bp;
+	      dupTSN = (const u_char *)bp;
 	      ND_PRINT("\n\t\t[dup TSN #%u: %u] ", tsnNo+1,
-	        EXTRACT_BE_U_4(dupTSN));
+		       EXTRACT_BE_U_4(dupTSN));
 	    }
 	    break;
 	  }
 	default :
 	  {
-            bp += chunkLengthRemaining;
-            sctpPacketLengthRemaining -= chunkLengthRemaining;
-            chunkLengthRemaining = 0;
+	    bp += chunkLengthRemaining;
+	    sctpPacketLengthRemaining -= chunkLengthRemaining;
+	    chunkLengthRemaining = 0;
 	    break;
 	  }
 	}
@@ -753,7 +753,7 @@ sctp_print(netdissect_options *ndo,
       sctpPacketLengthRemaining -= chunkLengthRemaining;
 
       if (ndo->ndo_vflag < 2)
-        sep = ", (";
+	sep = ", (";
 
       if (align != 0) {
 	/*
