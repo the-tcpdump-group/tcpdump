@@ -609,11 +609,15 @@ sctp_print(netdissect_options *ndo,
 
 	    if (isforces) {
 		forces_print(ndo, bp, payload_size);
+		/* ndo_protocol reassignment after forces_print() call */
+		ndo->ndo_protocol = "sctp";
 	    } else if (ndo->ndo_vflag >= 2) {	/* if verbose output is specified */
 					/* at the command line */
 		switch (ppid) {
 		case SCTP_PPID_M3UA :
 			m3ua_print(ndo, bp, payload_size);
+			/* ndo_protocol reassignment after m3ua_print() call */
+			ndo->ndo_protocol = "sctp";
 			break;
 		default:
 			ND_PRINT("[Payload");
