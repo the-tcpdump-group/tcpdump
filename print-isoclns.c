@@ -72,10 +72,10 @@
 #define ISIS_PDU_L1_LAN_IIH	15
 #define ISIS_PDU_L2_LAN_IIH	16
 #define ISIS_PDU_PTP_IIH	17
-#define ISIS_PDU_L1_LSP       	18
-#define ISIS_PDU_L2_LSP       	20
-#define ISIS_PDU_L1_CSNP  	24
-#define ISIS_PDU_L2_CSNP  	25
+#define ISIS_PDU_L1_LSP		18
+#define ISIS_PDU_L2_LSP		20
+#define ISIS_PDU_L1_CSNP	24
+#define ISIS_PDU_L2_CSNP	25
 #define ISIS_PDU_L1_PSNP        26
 #define ISIS_PDU_L2_PSNP        27
 
@@ -892,7 +892,7 @@ clnp_print(netdissect_options *ndo,
                     ND_PRINT("li < size of fixed part of CLNP header, addresses, and segment part");
                     return (0);
                 }
-            	clnp_segment_header = (const struct clnp_segment_header_t *) pptr;
+		clnp_segment_header = (const struct clnp_segment_header_t *) pptr;
                 ND_TCHECK_SIZE(clnp_segment_header);
                 ND_PRINT("\n\tData Unit ID: 0x%04x, Segment Offset: %u, Total PDU Length: %u",
                        EXTRACT_BE_U_2(clnp_segment_header->data_unit_id),
@@ -1049,7 +1049,7 @@ clnp_print(netdissect_options *ndo,
         switch (clnp_pdu_type) {
 
         case    CLNP_PDU_ER: /* fall through */
-        case 	CLNP_PDU_ERP:
+        case	CLNP_PDU_ERP:
             ND_TCHECK_1(pptr);
             if (EXTRACT_U_1(pptr) == NLPID_CLNP) {
                 ND_PRINT("\n\t-----original packet-----\n\t");
@@ -1070,9 +1070,9 @@ clnp_print(netdissect_options *ndo,
          */
         ND_FALL_THROUGH;
 
-        case 	CLNP_PDU_DT:
-        case 	CLNP_PDU_MD:
-        case 	CLNP_PDU_ERQ:
+        case	CLNP_PDU_DT:
+        case	CLNP_PDU_MD:
+        case	CLNP_PDU_ERQ:
 
         default:
             /* dump the PDU specific data */
@@ -1277,19 +1277,19 @@ esis_print(netdissect_options *ndo,
 
             while (source_address_number > 0) {
                 ND_TCHECK_1(pptr);
-            	if (li < 1) {
+		if (li < 1) {
                     ND_PRINT(", bad esh/li");
-            	    return;
-            	}
+		    return;
+		}
                 source_address_length = EXTRACT_U_1(pptr);
                 pptr++;
-            	li--;
+		li--;
 
                 ND_TCHECK_LEN(pptr, source_address_length);
-            	if (li < source_address_length) {
+		if (li < source_address_length) {
                     ND_PRINT(", bad esh/li");
-            	    return;
-            	}
+		    return;
+		}
                 ND_PRINT("\n\t  NET (length: %u): %s",
                        source_address_length,
                        isonsap_string(ndo, pptr, source_address_length));
@@ -1414,7 +1414,7 @@ isis_print_mcid(netdissect_options *ndo,
   ND_PRINT("ID: %u, Name: ", EXTRACT_U_1(mcid->format_id));
 
   if (nd_printzp(ndo, mcid->name, 32, ndo->ndo_snapend))
-    goto trunc;
+      goto trunc;
 
   ND_PRINT("\n\t              Lvl: %u", EXTRACT_BE_U_2(mcid->revision_lvl));
 
@@ -1454,7 +1454,7 @@ isis_print_mt_port_cap_subtlv(netdissect_options *ndo,
 
     /* Make sure the subTLV fits within the space left */
     if (len < stlv_len)
-      goto trunc;
+        goto trunc;
     /* Make sure the entire subTLV is in the captured data */
     ND_TCHECK_LEN(tptr, stlv_len);
 
@@ -1462,8 +1462,8 @@ isis_print_mt_port_cap_subtlv(netdissect_options *ndo,
     {
       case ISIS_SUBTLV_SPB_MCID:
       {
-      	if (stlv_len < ISIS_SUBTLV_SPB_MCID_MIN_LEN)
-      	  goto trunc;
+	if (stlv_len < ISIS_SUBTLV_SPB_MCID_MIN_LEN)
+	    goto trunc;
 
         subtlv_spb_mcid = (const struct isis_subtlv_spb_mcid *)tptr;
 
