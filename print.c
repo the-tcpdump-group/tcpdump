@@ -57,6 +57,9 @@ static const struct printer printers[] = {
 #ifdef DLT_IEEE802_15_4_NOFCS
 	{ ieee802_15_4_if_print, DLT_IEEE802_15_4_NOFCS },
 #endif
+#ifdef DLT_IEEE802_15_4_TAP
+	{ ieee802_15_4_tap_if_print, DLT_IEEE802_15_4_TAP },
+#endif
 #ifdef DLT_PPI
 	{ ppi_if_print,		DLT_PPI },
 #endif
