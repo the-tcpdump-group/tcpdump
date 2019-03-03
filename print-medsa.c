@@ -32,6 +32,13 @@
 #include "addrtoname.h"
 #include "extract.h"
 
+struct	ether_header {
+	nd_mac_addr	ether_dhost;
+	nd_mac_addr	ether_shost;
+	nd_uint16_t	ether_length_type;
+};
+
+#define ETHER_SA_OFFSET		12
 
 /*
  * Marvell Extended Distributed Switch Archiecture.
@@ -43,33 +50,36 @@
  *
  * https://lwn.net/Articles/302333/
  */
-struct	medsa_pkthdr {
-	nd_byte     reserved[2];
+
+struct mdsa_pkthdr {
 	nd_uint8_t  tag_flags_dev;
 	nd_uint8_t  port_trunc_codehi_cfi;
 	nd_uint8_t  pri_vidhi_codelo;
 	nd_uint8_t  vidlo;
-	nd_uint16_t ether_type;
 };
 
-/* Bytes 0 and 1 are reserved and should contain 0 */
-#define TAG(medsa)	(EXTRACT_U_1(medsa->tag_flags_dev) >> 6)
+#define MEDSA_TAG_LEN 6
+#define MDSA_TAG_LEN 4
+#define ETHER_TYPE_LEN 2
+
+/* EDSA header bytes 0 and 1 are reserved and should contain 0 */
+#define TAG(medsa)	(EXTRACT_U_1(mdsa->tag_flags_dev) >> 6)
 #define TAG_TO_CPU	0
 #define TAG_FROM_CPU	1
 #define TAG_FORWARD	3
-#define SRC_TAG(medsa)	((EXTRACT_U_1(medsa->tag_flags_dev) >> 5) & 0x01)
-#define SRC_DEV(medsa)	(EXTRACT_U_1(medsa->tag_flags_dev) & 0x1f)
-#define SRC_PORT(medsa)	((EXTRACT_U_1(medsa->port_trunc_codehi_cfi) >> 3) & 0x01f)
-#define TRUNK(medsa)	((EXTRACT_U_1(medsa->port_trunc_codehi_cfi) >> 2) & 0x01)
-#define CODE(medsa)	((EXTRACT_U_1(medsa->port_trunc_codehi_cfi) & 0x06) |	\
-			 ((EXTRACT_U_1(medsa->pri_vidhi_codelo) >> 4) & 0x01))
+#define SRC_TAG(medsa)	((EXTRACT_U_1(mdsa->tag_flags_dev) >> 5) & 0x01)
+#define SRC_DEV(medsa)	(EXTRACT_U_1(mdsa->tag_flags_dev) & 0x1f)
+#define SRC_PORT(medsa)	((EXTRACT_U_1(mdsa->port_trunc_codehi_cfi) >> 3) & 0x01f)
+#define TRUNK(medsa)	((EXTRACT_U_1(mdsa->port_trunc_codehi_cfi) >> 2) & 0x01)
+#define CODE(medsa)	((EXTRACT_U_1(mdsa->port_trunc_codehi_cfi) & 0x06) |	\
+			 ((EXTRACT_U_1(mdsa->pri_vidhi_codelo) >> 4) & 0x01))
 #define CODE_BDPU	0
 #define CODE_IGMP_MLD	2
 #define CODE_ARP_MIRROR	4
-#define CFI(medsa)	(EXTRACT_U_1(medsa->port_trunc_codehi_cfi) & 0x01)
-#define PRI(medsa)	(EXTRACT_U_1(medsa->pri_vidhi_codelo) >> 5)
-#define VID(medsa)	((u_short)(EXTRACT_U_1(medsa->pri_vidhi_codelo) & 0xf) << 8 |	\
-			  EXTRACT_U_1(medsa->vidlo))
+#define CFI(medsa)	(EXTRACT_U_1(mdsa->port_trunc_codehi_cfi) & 0x01)
+#define PRI(medsa)	(EXTRACT_U_1(mdsa->pri_vidhi_codelo) >> 5)
+#define VID(medsa)	((u_short)(EXTRACT_U_1(mdsa->pri_vidhi_codelo) & 0xf) << 8 |	\
+			  EXTRACT_U_1(mdsa->vidlo))
 
 static const struct tok tag_values[] = {
 	{ TAG_TO_CPU, "To_CPU" },
@@ -86,54 +96,54 @@ static const struct tok code_values[] = {
 };
 
 static void
-medsa_print_full(netdissect_options *ndo,
-		 const struct medsa_pkthdr *medsa,
-		 u_int caplen)
+mdsa_print_full(netdissect_options *ndo,
+		const struct mdsa_pkthdr *mdsa,
+		u_int caplen)
 {
-	u_char tag = TAG(medsa);
+	u_char tag = TAG(mdsa);
 
 	ND_PRINT("%s",
 		  tok2str(tag_values, "Unknown (%u)", tag));
 
 	switch (tag) {
 	case TAG_TO_CPU:
-		ND_PRINT(", %stagged", SRC_TAG(medsa) ? "" : "un");
+		ND_PRINT(", %stagged", SRC_TAG(mdsa) ? "" : "un");
 		ND_PRINT(", dev.port:vlan %u.%u:%u",
-			  SRC_DEV(medsa), SRC_PORT(medsa), VID(medsa));
+			  SRC_DEV(mdsa), SRC_PORT(mdsa), VID(mdsa));
 
 		ND_PRINT(", %s",
-			  tok2str(code_values, "Unknown (%u)", CODE(medsa)));
-		if (CFI(medsa))
+			  tok2str(code_values, "Unknown (%u)", CODE(mdsa)));
+		if (CFI(mdsa))
 			ND_PRINT(", CFI");
 
-		ND_PRINT(", pri %u: ", PRI(medsa));
+		ND_PRINT(", pri %u: ", PRI(mdsa));
 		break;
 	case TAG_FROM_CPU:
-		ND_PRINT(", %stagged", SRC_TAG(medsa) ? "" : "un");
+		ND_PRINT(", %stagged", SRC_TAG(mdsa) ? "" : "un");
 		ND_PRINT(", dev.port:vlan %u.%u:%u",
-			  SRC_DEV(medsa), SRC_PORT(medsa), VID(medsa));
+			  SRC_DEV(mdsa), SRC_PORT(mdsa), VID(mdsa));
 
-		if (CFI(medsa))
+		if (CFI(mdsa))
 			ND_PRINT(", CFI");
 
-		ND_PRINT(", pri %u: ", PRI(medsa));
+		ND_PRINT(", pri %u: ", PRI(mdsa));
 		break;
 	case TAG_FORWARD:
-		ND_PRINT(", %stagged", SRC_TAG(medsa) ? "" : "un");
-		if (TRUNK(medsa))
+		ND_PRINT(", %stagged", SRC_TAG(mdsa) ? "" : "un");
+		if (TRUNK(mdsa))
 			ND_PRINT(", dev.trunk:vlan %u.%u:%u",
-				  SRC_DEV(medsa), SRC_PORT(medsa), VID(medsa));
+				  SRC_DEV(mdsa), SRC_PORT(mdsa), VID(mdsa));
 		else
 			ND_PRINT(", dev.port:vlan %u.%u:%u",
-				  SRC_DEV(medsa), SRC_PORT(medsa), VID(medsa));
+				  SRC_DEV(mdsa), SRC_PORT(mdsa), VID(mdsa));
 
-		if (CFI(medsa))
+		if (CFI(mdsa))
 			ND_PRINT(", CFI");
 
-		ND_PRINT(", pri %u: ", PRI(medsa));
+		ND_PRINT(", pri %u: ", PRI(mdsa));
 		break;
 	default:
-		ND_DEFAULTPRINT((const u_char *)medsa, caplen);
+		ND_DEFAULTPRINT((const u_char *)mdsa, caplen);
 		return;
 	}
 }
@@ -143,24 +153,33 @@ medsa_print(netdissect_options *ndo,
 	    const u_char *bp, u_int length, u_int caplen,
 	    const struct lladdr_info *src, const struct lladdr_info *dst)
 {
-	const struct medsa_pkthdr *medsa;
+	const struct mdsa_pkthdr *mdsa;
 	u_short ether_type;
 
 	ndo->ndo_protocol = "medsa";
-	medsa = (const struct medsa_pkthdr *)bp;
-	ND_TCHECK_SIZE(medsa);
+	ND_TCHECK_LEN(bp, MEDSA_TAG_LEN);
+
+	/* First two bytes are reserved, skip them to the common part */
+	mdsa = (const struct mdsa_pkthdr *)(bp + 2);
 
 	if (!ndo->ndo_eflag)
 		ND_PRINT("MEDSA %u.%u:%u: ",
-			  SRC_DEV(medsa), SRC_PORT(medsa), VID(medsa));
+			  SRC_DEV(mdsa), SRC_PORT(mdsa), VID(mdsa));
 	else
-		medsa_print_full(ndo, medsa, caplen);
+		mdsa_print_full(ndo, mdsa, caplen);
 
-	bp += 8;
-	length -= 8;
-	caplen -= 8;
+	bp += MEDSA_TAG_LEN;
+	length -= MEDSA_TAG_LEN;
+	caplen -= MEDSA_TAG_LEN;
 
-	ether_type = EXTRACT_BE_U_2(medsa->ether_type);
+	/* Get the real ethertype of the frame, which follows directly
+	   after the EDSA header. */
+	ether_type = EXTRACT_BE_U_2(bp);
+
+	bp += ETHER_TYPE_LEN;
+	length -= ETHER_TYPE_LEN;
+	caplen -= ETHER_TYPE_LEN;
+
 	if (ether_type <= MAX_ETHERNET_LENGTH_VAL) {
 		/* Try to print the LLC-layer header & higher layers */
 		if (llc_print(ndo, bp, length, caplen, src, dst) < 0) {
@@ -189,4 +208,60 @@ medsa_print(netdissect_options *ndo,
 	return;
 trunc:
 	nd_print_trunc(ndo);
+}
+
+/* The DSA tag is 4 bytes. It has the same content as the last 4 bytes
+ * of the EDSA tag.
+ */
+
+u_int
+mdsa_tag_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
+		  const u_char *bp)
+{
+	const struct mdsa_pkthdr *mdsa;
+	const struct ether_header *ehp;
+	int old_eflag = ndo->ndo_eflag;
+	u_int caplen = h->caplen;
+	u_int length = h->len;
+	int ret;
+
+	ndo->ndo_protocol = "mdsa";
+	if (caplen < ETHER_SA_OFFSET + MDSA_TAG_LEN) {
+		nd_print_trunc(ndo);
+		return (caplen);
+	}
+
+	if (length < ETHER_SA_OFFSET + MDSA_TAG_LEN) {
+		nd_print_trunc(ndo);
+		return (length);
+	}
+
+	ehp = (const struct ether_header *)bp;
+	if (ndo->ndo_eflag)
+		ND_PRINT("%s > %s, ",
+			     etheraddr_string(ndo, ehp->ether_shost),
+			     etheraddr_string(ndo, ehp->ether_dhost));
+
+	mdsa = (const struct mdsa_pkthdr *)(bp + ETHER_SA_OFFSET);
+
+	if (!ndo->ndo_eflag)
+		ND_PRINT("MDSA %u.%u:%u: ",
+			  SRC_DEV(mdsa), SRC_PORT(mdsa), VID(mdsa));
+	else
+		mdsa_print_full(ndo, mdsa, caplen - ETHER_SA_OFFSET);
+
+	/* We printed the Ethernet header already */
+	ndo->ndo_eflag = 0;
+
+	/* Parse the Ethernet frame regularly telling how big the non
+	 * standard Ethernet header is.
+	 *
+	 * +-----------++-----------++------------------++--------------+
+	 * | MAC DA (6)|| MAC SA (6)||Marvel DSA tag (4)||Type/Length(2)|
+	 * +-----------++-----------++------------------++--------------+
+	 */
+	ret = ether_print_hdr_len(ndo, bp, length, caplen, NULL, NULL,
+				  ETHER_SA_OFFSET + MDSA_TAG_LEN + 2);
+	ndo->ndo_eflag = old_eflag;
+	return ret;
 }

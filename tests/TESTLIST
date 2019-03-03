@@ -329,6 +329,10 @@ dhcp-mud	dhcp-mud.pcap		dhcp-mud.out	-vv
 medsa		medsa.pcap		medsa.out
 medsa-e		medsa.pcap		medsa-e.out	-e
 
+# MDSA tests
+mdsa		mdsa.pcap		mdsa.out
+mdsa-e		mdsa.pcap		mdsa-e.out	-e
+
 # VXLAN tests
 vxlan  vxlan.pcap  vxlan.out -e
 

@@ -468,6 +468,7 @@ extern u_int juniper_services_if_print IF_PRINTER_ARGS;
 extern u_int lane_if_print IF_PRINTER_ARGS;
 extern u_int ltalk_if_print IF_PRINTER_ARGS;
 extern u_int mfr_if_print IF_PRINTER_ARGS;
+extern u_int mdsa_tag_if_print IF_PRINTER_ARGS;
 extern u_int netanalyzer_if_print IF_PRINTER_ARGS;
 extern u_int netanalyzer_transparent_if_print IF_PRINTER_ARGS;
 extern u_int nflog_if_print IF_PRINTER_ARGS;
