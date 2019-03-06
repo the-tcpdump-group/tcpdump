@@ -828,10 +828,11 @@ print_tcp_rst_data(netdissect_options *ndo,
                 ND_PRINT("+");			/* indicate we truncate */
         }
         ND_PRINT(" ");
-        while (length-- && sp < ndo->ndo_snapend) {
+        while (length && sp < ndo->ndo_snapend) {
                 c = EXTRACT_U_1(sp);
                 sp++;
                 fn_print_char(ndo, c);
+		length--;
         }
         ND_PRINT("]");
 }
