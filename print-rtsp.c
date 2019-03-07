@@ -44,5 +44,5 @@ void
 rtsp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 {
 	ndo->ndo_protocol = "rtsp";
-	txtproto_print(ndo, pptr, len, "rtsp", rtspcmds, RESP_CODE_SECOND_TOKEN);
+	txtproto_print(ndo, pptr, len, rtspcmds, RESP_CODE_SECOND_TOKEN);
 }

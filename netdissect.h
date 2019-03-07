@@ -346,7 +346,7 @@ extern int nd_printzp(netdissect_options *, const u_char *, u_int, const u_char 
 #define RESP_CODE_SECOND_TOKEN	0x00000001	/* response code is second token in response line */
 
 extern void txtproto_print(netdissect_options *, const u_char *, u_int,
-    const char *, const char **, u_int);
+			   const char **, u_int);
 
 /*
  * Locale-independent macros for testing character properties and

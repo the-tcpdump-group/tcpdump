@@ -709,7 +709,8 @@ tcp_print(netdissect_options *ndo,
                 smtp_print(ndo, bp, length);
         } else if (IS_SRC_OR_DST_PORT(WHOIS_PORT)) {
                 ND_PRINT(": ");
-                txtproto_print(ndo, bp, length, "whois", NULL, 0); /* RFC 3912 */
+                ndo->ndo_protocol = "whois";	/* needed by txtproto_print() */
+                txtproto_print(ndo, bp, length, NULL, 0); /* RFC 3912 */
         } else if (IS_SRC_OR_DST_PORT(BGP_PORT))
                 bgp_print(ndo, bp, length);
         else if (IS_SRC_OR_DST_PORT(PPTP_PORT))
@@ -832,7 +833,7 @@ print_tcp_rst_data(netdissect_options *ndo,
                 c = EXTRACT_U_1(sp);
                 sp++;
                 fn_print_char(ndo, c);
-		length--;
+                length--;
         }
         ND_PRINT("]");
 }

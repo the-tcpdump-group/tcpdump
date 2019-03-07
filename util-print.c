@@ -752,8 +752,8 @@ fetch_token(netdissect_options *ndo, const u_char *pptr, u_int idx, u_int len,
  * the line ending.
  */
 static u_int
-print_txt_line(netdissect_options *ndo, const char *protoname,
-    const char *prefix, const u_char *pptr, u_int idx, u_int len)
+print_txt_line(netdissect_options *ndo, const char *prefix,
+	       const u_char *pptr, u_int idx, u_int len)
 {
 	u_int startidx;
 	u_int linelen;
@@ -813,8 +813,8 @@ print_txt_line(netdissect_options *ndo, const char *protoname,
 	 */
 trunc:
 	linelen = idx - startidx;
-	ND_PRINT("%s%.*s[!%s]", prefix, (int)linelen, pptr + startidx,
-	    protoname);
+	ND_PRINT("%s%.*s", prefix, (int)linelen, pptr + startidx);
+	nd_print_trunc(ndo);
 	return (0);
 
 print:
@@ -822,9 +822,10 @@ print:
 	return (idx);
 }
 
+/* Assign needed before calling txtproto_print(): ndo->ndo_protocol = "proto" */
 void
 txtproto_print(netdissect_options *ndo, const u_char *pptr, u_int len,
-    const char *protoname, const char **cmds, u_int flags)
+	       const char **cmds, u_int flags)
 {
 	u_int idx, eol;
 	u_char token[MAX_TOKEN+1];
@@ -896,7 +897,7 @@ txtproto_print(netdissect_options *ndo, const u_char *pptr, u_int len,
 	}
 
 	/* Capitalize the protocol name */
-	for (pnp = protoname; *pnp != '\0'; pnp++)
+	for (pnp = ndo->ndo_protocol; *pnp != '\0'; pnp++)
 		ND_PRINT("%c", ND_TOUPPER((u_char)*pnp));
 
 	if (print_this) {
@@ -916,14 +917,14 @@ txtproto_print(netdissect_options *ndo, const u_char *pptr, u_int len,
 			 */
 			ND_PRINT(", length: %u", len);
 			for (idx = 0;
-			    idx < len && (eol = print_txt_line(ndo, protoname, "\n\t", pptr, idx, len)) != 0;
+			    idx < len && (eol = print_txt_line(ndo, "\n\t", pptr, idx, len)) != 0;
 			    idx = eol)
 				;
 		} else {
 			/*
 			 * Just print the first text line.
 			 */
-			print_txt_line(ndo, protoname, ": ", pptr, 0, len);
+			print_txt_line(ndo, ": ", pptr, 0, len);
 		}
 	}
 }
