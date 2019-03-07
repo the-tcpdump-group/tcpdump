@@ -95,7 +95,7 @@ struct tcp_seq_hash6 {
 
 #define TSEQ_HASHSIZE 919
 
-/* These tcp optinos do not have the size octet */
+/* These tcp options do not have the size octet */
 #define ZEROLENOPT(o) ((o) == TCPOPT_EOL || (o) == TCPOPT_NOP)
 
 static struct tcp_seq_hash tcp_seq_hash4[TSEQ_HASHSIZE];
