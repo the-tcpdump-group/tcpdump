@@ -301,10 +301,11 @@ subtlvs_print(netdissect_options *ndo,
                 break;
             }
             sep = " ";
-            while(sublen--) {
+            while (sublen) {
                 ND_PRINT("%s%s", sep, tok2str(diversity_str, "%u", EXTRACT_U_1(cp)));
                 cp++;
                 sep = "-";
+                sublen--;
             }
             if(tlv_type != MESSAGE_UPDATE &&
                tlv_type != MESSAGE_UPDATE_SRC_SPECIFIC)
