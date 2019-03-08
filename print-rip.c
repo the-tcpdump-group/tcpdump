@@ -293,7 +293,7 @@ rip_print(netdissect_options *ndo,
 	const struct rip *rp;
 	uint8_t vers, cmd;
 	const u_char *p;
-	u_int i, j;
+	u_int len, routecount;
 	unsigned entry_size;
 
 	ndo->ndo_protocol = "rip";
@@ -301,14 +301,14 @@ rip_print(netdissect_options *ndo,
 		nd_print_trunc(ndo);
 		return;
 	}
-	i = ndo->ndo_snapend - dat;
-	if (i > length)
-		i = length;
-	if (i < sizeof(*rp)) {
+	len = ndo->ndo_snapend - dat;
+	if (len > length)
+		len = length;
+	if (len < sizeof(*rp)) {
 		nd_print_trunc(ndo);
 		return;
 	}
-	i -= sizeof(*rp);
+	len -= sizeof(*rp);
 
 	rp = (const struct rip *)dat;
 
@@ -350,40 +350,40 @@ rip_print(netdissect_options *ndo,
 		switch (vers) {
 
 		case 1:
-			j = length / RIP_ROUTELEN;
-			ND_PRINT(", routes: %u", j);
+			routecount = length / RIP_ROUTELEN;
+			ND_PRINT(", routes: %u", routecount);
 			p = (const u_char *)(rp + 1);
-			while (i != 0) {
-				entry_size = rip_entry_print_v1(ndo, p, i);
+			while (len != 0) {
+				entry_size = rip_entry_print_v1(ndo, p, len);
 				if (entry_size == 0) {
 					/* Error */
 					nd_print_trunc(ndo);
 					break;
 				}
 				p += entry_size;
-				i -= entry_size;
+				len -= entry_size;
 			}
 			break;
 
 		case 2:
-			j = length / RIP_ROUTELEN;
-			ND_PRINT(", routes: %u or less", j);
+			routecount = length / RIP_ROUTELEN;
+			ND_PRINT(", routes: %u or less", routecount);
 			p = (const u_char *)(rp + 1);
-			while (i != 0) {
-				entry_size = rip_entry_print_v2(ndo, p, i);
+			while (len != 0) {
+				entry_size = rip_entry_print_v2(ndo, p, len);
 				if (entry_size == 0) {
 					/* Error */
 					nd_print_trunc(ndo);
 					break;
 				}
 #if 0
-				if (i < entry_size) {
+				if (len < entry_size) {
 					ND_PRINT("WTF?");
 					break;
 				}
 #endif
 				p += entry_size;
-				i -= entry_size;
+				len -= entry_size;
 			}
 			break;
 
