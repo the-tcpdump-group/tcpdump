@@ -1199,7 +1199,7 @@ nbt_udp137_print(netdissect_options *ndo,
 		    p = smb_fdata(ndo, p, "NumNames=[B]\n", p + 1, 0);
 		    if (p == NULL)
 			goto out;
-		    while (numnames--) {
+		    while (numnames) {
 			p = smb_fdata(ndo, p, "Name=[n2]\t#", maxbuf, 0);
 			if (p == NULL)
 			    goto out;
@@ -1224,6 +1224,7 @@ nbt_udp137_print(netdissect_options *ndo,
 			    ND_PRINT("<PERMANENT> ");
 			ND_PRINT("\n");
 			p += 2;
+			numnames--;
 		    }
 		} else {
 		    if (p >= maxbuf)
