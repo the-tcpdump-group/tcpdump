@@ -488,13 +488,14 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			break;
 		}
 		idp = (const struct id_rdiscovery *)&dp->icmp_data;
-		while (num-- > 0) {
+		while (num > 0) {
 			ND_TCHECK_SIZE(idp);
 			(void)nd_snprintf(cp, sizeof(buf) - (cp - buf), " {%s %u}",
 			    ipaddr_string(ndo, idp->ird_addr),
 			    EXTRACT_BE_U_4(idp->ird_pref));
 			cp = buf + strlen(buf);
 			++idp;
+		num--;
 		}
 	    }
 		break;
