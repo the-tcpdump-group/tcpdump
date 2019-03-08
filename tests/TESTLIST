@@ -163,6 +163,9 @@ rpvst-v		rpvstp-trunk-native-vid5.pcap	rpvst-v.out	-v
 ripv1v2         ripv1v2.pcap            ripv1v2.out     -v
 ripv2_auth      ripv2_auth.pcap         ripv2_auth.out  -v
 
+# RIP invalid
+ripv2-invalid-length ripv2-invalid-length.pcap ripv2-invalid-length.out -v
+
 # DHCPv6 tests
 dhcpv6-aftr-name	dhcpv6-AFTR-Name-RFC6334.pcap	dhcpv6-AFTR-Name-RFC6334.out	-v
 dhcpv6-ia-na	dhcpv6-ia-na.pcap	dhcpv6-ia-na.out	-v

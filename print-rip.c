@@ -360,6 +360,12 @@ rip_print(netdissect_options *ndo,
 					nd_print_trunc(ndo);
 					break;
 				}
+				if (len < entry_size) {
+					ND_PRINT(" [len(%u) < entry_size(%u)]",
+						 len, entry_size);
+					nd_print_invalid(ndo);
+					break;
+				}
 				p += entry_size;
 				len -= entry_size;
 			}
@@ -376,12 +382,12 @@ rip_print(netdissect_options *ndo,
 					nd_print_trunc(ndo);
 					break;
 				}
-#if 0
 				if (len < entry_size) {
-					ND_PRINT("WTF?");
+					ND_PRINT(" [len(%u) < entry_size(%u)]",
+						 len, entry_size);
+					nd_print_invalid(ndo);
 					break;
 				}
-#endif
 				p += entry_size;
 				len -= entry_size;
 			}
