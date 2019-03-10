@@ -95,8 +95,11 @@ tftp_print(netdissect_options *ndo,
 	u_int ui;
 
 	ndo->ndo_protocol = "tftp";
+
+	/* Print protocol */
+	ND_PRINT("TFTP");
 	/* Print length */
-	ND_PRINT(" %u", length);
+	ND_PRINT(", length %u", length);
 
 	/* Print tftp request type */
 	if (length < 2)
@@ -104,7 +107,7 @@ tftp_print(netdissect_options *ndo,
 	ND_TCHECK_2(bp);
 	opcode = EXTRACT_BE_U_2(bp);
 	cp = tok2str(op2str, "tftp-#%u", opcode);
-	ND_PRINT(" %s", cp);
+	ND_PRINT(", %s", cp);
 	/* Bail if bogus opcode */
 	if (*cp == 't')
 		return;
