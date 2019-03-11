@@ -93,6 +93,9 @@ e1000g		e1000g.pcap		e1000g.out
 # IPX/Netware packets
 ipx		ipx.pcap		ipx.out
 
+# IPX/Netware invalid
+ipx-invalid-length ipx-invalid-length.pcap ipx-invalid-length.out
+
 # IETF FORCES WG packets and printer
 forces01        forces1.pcap            forces1.out
 forces01vvv     forces1.pcap            forces1vvv.out  -v -v -v

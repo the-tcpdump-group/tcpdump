@@ -90,6 +90,11 @@ ipx_print(netdissect_options *ndo, const u_char *p, u_int length)
 	ND_TCHECK_2(ipx->length);
 	length = EXTRACT_BE_U_2(ipx->length);
 
+	if (length < ipxSize) {
+		ND_PRINT("[length %u < %u]", length, ipxSize);
+		nd_print_invalid(ndo);
+		return;
+	}
 	ipx_decode(ndo, ipx, p + ipxSize, length - ipxSize);
 	return;
 trunc:
