@@ -62,7 +62,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     struct pcap_pkthdr *header;
     int r;
     u_int packets_captured = 0;
-    netdissect_options Ndo;
+    static netdissect_options Ndo;
+    static int initialized = 0;
 
     //initialize output file
     if (outfile == NULL) {
@@ -72,16 +73,19 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         }
     }
 
-    memset(&Ndo, 0, sizeof(Ndo));
-    ndo_set_function_pointers(&Ndo);
-    Ndo.program_name = "fuzz";
-    //avoid lookups
-    Ndo.ndo_nflag = 1;
-    //most verbose
-    Ndo.ndo_vflag = 5;
-    //to out outputfile
-    Ndo.ndo_printf=fuzz_ndo_printf;
-    init_print(&Ndo, 0, 0);
+    if (!initialized) {
+	memset(&Ndo, 0, sizeof(Ndo));
+	ndo_set_function_pointers(&Ndo);
+	Ndo.program_name = "fuzz";
+	//avoid lookups
+	Ndo.ndo_nflag = 1;
+	//most verbose
+	Ndo.ndo_vflag = 5;
+	//to out outputfile
+	Ndo.ndo_printf=fuzz_ndo_printf;
+	init_print(&Ndo, 0, 0);
+	initialized = 1;
+    }
 
     //rewrite buffer to a file as libpcap does not have buffer inputs
     if (bufferToFile("/tmp/fuzz.pcap", Data, Size) < 0) {

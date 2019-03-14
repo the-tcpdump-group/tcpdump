@@ -1,0 +1,65 @@
+#!/usr/bin/env python
+# Copyright (c) 2019
+#      Arista Networks, Inc.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+#   1. Redistributions of source code must retain the above copyright
+#      notice, this list of conditions and the following disclaimer.
+#   2. Redistributions in binary form must reproduce the above copyright
+#      notice, this list of conditions and the following disclaimer in
+#      the documentation and/or other materials provided with the
+#      distribution.
+#   3. The names of the authors may not be used to endorse or promote
+#      products derived from this software without specific prior
+#      written permission.
+#
+# THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+from __future__ import absolute_import, division, print_function
+from scapy.all import *
+import argparse
+import os.path
+
+def convert( corpus, args ):
+    data = file( corpus ).read()
+    typ = args.type
+    if typ is None:
+        # Heuristics
+        if data[ :16 ] == 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF:
+            typ = 'bgp'
+        elif ord( data[ 0 ] ) == 0x45:
+            typ = 'ip'
+        elif ord( data[ 0 ] ) == 0x60:
+            typ = 'ip6'
+        else:
+            typ = 'ether'
+        #print( "%x -> %s" % ( ord( data[ 0 ] ), typ ) )
+    if typ == 'bgp':
+        pkt = Ether() / IP() / TCP( sport=540, dport=179 ) / data
+    elif typ == 'ip':
+        pkt = Ether() / IP( data )
+    elif typ == 'ip6':
+        pkt = Ether() / IPv6( data )
+    elif typ == 'ether':
+        pkt = Ether( data )
+    else:
+        assert False, "I don't know what type %s is" % typ
+    pcapFile = "%s.pcap" % os.path.basename( corpus )
+    wrpcap( pcapFile, pkt )
+    print( "Outputting %s to %s" % ( pkt.summary(), pcapFile ) )
+
+def main( ):
+    parser = argparse.ArgumentParser( description='Convert corpus to pcap' )
+    parser.add_argument( 'corpus', nargs='+', help='corpus files to convert' )
+    parser.add_argument( '--type', '-t', help='type of file if heuristic fails' )
+    args = parser.parse_args()
+    for corpus in args.corpus:
+        convert( corpus, args )
+
+if __name__ == "__main__":
+    main()
