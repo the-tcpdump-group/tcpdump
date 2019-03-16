@@ -500,7 +500,7 @@ asn1_parse(netdissect_options *ndo,
 			return -1;
 		}
 		ND_TCHECK_LEN(p, noct);
-		for (; noct-- > 0; len--, hdr++) {
+		for (; noct != 0; len--, hdr++, noct--) {
 			elem->asnlen = (elem->asnlen << ASN_SHIFT8) | EXTRACT_U_1(p);
 			p++;
 		}
