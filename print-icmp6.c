@@ -216,6 +216,7 @@ struct nd_router_advert {	/* router advertisement */
 #define ND_RA_FLAG_MANAGED	0x80
 #define ND_RA_FLAG_OTHER	0x40
 #define ND_RA_FLAG_HOME_AGENT	0x20
+#define ND_RA_FLAG_IPV6ONLY	0x02
 
 /*
  * Router preference values based on draft-draves-ipngwg-router-selection-01.
@@ -698,6 +699,7 @@ static const struct tok icmp6_opt_ra_flag_values[] = {
     { ND_RA_FLAG_MANAGED, "managed" },
     { ND_RA_FLAG_OTHER, "other stateful"},
     { ND_RA_FLAG_HOME_AGENT, "home agent"},
+    { ND_RA_FLAG_IPV6ONLY, "ipv6 only"},
     { 0,	NULL }
 };
 
