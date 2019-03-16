@@ -66,14 +66,14 @@ struct	ether_header {
 #define BRCM_EG_TC_MASK		0x7
 #define BRCM_EG_PID_MASK	0x1f
 
-const struct tok brcm_tag_te_values[] = {
+static const struct tok brcm_tag_te_values[] = {
 	{ 0, "None" },
 	{ 1, "Untag" },
 	{ 2, "Header"},
 	{ 3, "Reserved" },
 };
 
-const struct tok brcm_tag_rc_values[] = {
+static const struct tok brcm_tag_rc_values[] = {
 	{ 1, "mirror" },
 	{ 2, "MAC learning" },
 	{ 4, "switching" },
