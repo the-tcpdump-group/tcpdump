@@ -29,6 +29,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 
 #include "netdissect.h"
 #include "addrtoname.h"
@@ -533,6 +534,12 @@ parsefn(netdissect_options *ndo,
 	/* Fetch big-endian string length */
 	len = EXTRACT_BE_U_4(dp);
 	dp++;
+
+	if (UINT_MAX - len < 3) {
+		ND_PRINT("[cannot pad to 32-bit boundaries]");
+		nd_print_invalid(ndo);
+		return NULL;
+	}
 
 	ND_TCHECK_LEN(dp, ((len + 3) & ~3));
 
