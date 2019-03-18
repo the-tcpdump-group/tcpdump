@@ -126,8 +126,9 @@ pppoe           pppoe.pcap             pppoe.out
 pppoes          pppoes.pcap            pppoes.out
 pppoes_id       pppoes.pcap            pppoes_id.out   pppoes 0x3b
 
-# PPP tests
+# PPP invalid
 truncated_aack  truncated-aack.pcap    trunc_aack.out
+ppp-invalid-lengths ppp-invalid-lengths.pcap ppp-invalid-lengths.out -v
 
 # IGMP tests
 igmpv1		IGMP_V1.pcap		igmpv1.out

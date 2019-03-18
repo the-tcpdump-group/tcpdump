@@ -515,6 +515,12 @@ handle_ctrl_proto(netdissect_options *ndo,
 
 			if ((advance = (*pfunc)(ndo, tptr, len)) == 0)
 				break;
+			if (tlen < advance) {
+				ND_PRINT(" [options length %u < %u]",
+					 tlen, advance);
+				nd_print_invalid(ndo);
+				break;
+			}
 			tlen -= advance;
 			tptr += advance;
 		} while (tlen != 0);
@@ -1134,7 +1140,12 @@ print_ipcp_config_options(netdissect_options *ndo,
                                                        ipcomp_subopt),
                                                ipcomp_subopt,
                                                ipcomp_suboptlen);
-
+                                        if (ipcomp_subopttotallen < ipcomp_suboptlen) {
+                                                ND_PRINT(" [suboptions length %u < %u]",
+                                                         ipcomp_subopttotallen, ipcomp_suboptlen);
+                                                nd_print_invalid(ndo);
+                                                break;
+                                        }
                                         ipcomp_subopttotallen -= ipcomp_suboptlen;
                                         p += ipcomp_suboptlen;
                                 }
