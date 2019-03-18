@@ -417,7 +417,7 @@ handle_ctrl_proto(netdissect_options *ndo,
 	const char *typestr;
 	u_int code, len;
 	u_int (*pfunc)(netdissect_options *, const u_char *, u_int);
-	u_int x, j;
+	u_int tlen, advance;
         const u_char *tptr;
 
         tptr=pptr;
@@ -483,7 +483,7 @@ handle_ctrl_proto(netdissect_options *ndo,
 	case CPCODES_CONF_ACK:
 	case CPCODES_CONF_NAK:
 	case CPCODES_CONF_REJ:
-		x = len - 4;	/* Code(1), Identifier(1) and Length(2) */
+		tlen = len - 4;	/* Code(1), Identifier(1) and Length(2) */
 		do {
 			switch (proto) {
 			case PPP_LCP:
@@ -513,11 +513,11 @@ handle_ctrl_proto(netdissect_options *ndo,
 			if (pfunc == NULL) /* catch the above null pointer if unknown CP */
 				break;
 
-			if ((j = (*pfunc)(ndo, tptr, len)) == 0)
+			if ((advance = (*pfunc)(ndo, tptr, len)) == 0)
 				break;
-			x -= j;
-			tptr += j;
-		} while (x != 0);
+			tlen -= advance;
+			tptr += advance;
+		} while (tlen != 0);
 		break;
 
 	case CPCODES_TERM_REQ:
