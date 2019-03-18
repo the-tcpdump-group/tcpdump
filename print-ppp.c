@@ -1096,9 +1096,9 @@ print_ipcp_config_options(netdissect_options *ndo,
                         break;
                 case IPCPOPT_IPCOMP_HDRCOMP:
                         if (len < IPCPOPT_IPCOMP_MINLEN) {
-                        	ND_PRINT(" (length bogus, should be >= %u)",
-                        		IPCPOPT_IPCOMP_MINLEN);
-                        	return 0;
+                                ND_PRINT(" (length bogus, should be >= %u)",
+                                         IPCPOPT_IPCOMP_MINLEN);
+                                return 0;
                         }
 
                         ND_TCHECK_LEN(p + 2, IPCPOPT_IPCOMP_MINLEN);
