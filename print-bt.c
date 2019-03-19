@@ -53,7 +53,8 @@ bt_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *
 	u_int caplen = h->caplen;
 	const bluetooth_h4_header* hdr = (const bluetooth_h4_header*)p;
 
-	ndo->ndo_protocol = "bt_if";
+	ndo->ndo_protocol = "bluetooth";
+	nd_print_protocol(ndo);
 	if (caplen < BT_HDRLEN)
 		goto trunc;
 	caplen -= BT_HDRLEN;
@@ -61,7 +62,7 @@ bt_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *
 	p += BT_HDRLEN;
 	ND_TCHECK_4(&hdr->direction);
 	if (ndo->ndo_eflag)
-		ND_PRINT("hci length %u, direction %s, ", length,
+		ND_PRINT(", hci length %u, direction %s", length,
 			 (EXTRACT_BE_U_4(hdr->direction)&0x1) ? "in" : "out");
 
 	if (!ndo->ndo_suppress_default_print)
