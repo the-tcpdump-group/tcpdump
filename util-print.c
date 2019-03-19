@@ -445,6 +445,12 @@ void nd_print_trunc(netdissect_options *ndo)
 	ND_PRINT(" [|%s]", ndo->ndo_protocol);
 }
 
+/* Print the protocol name */
+void nd_print_protocol(netdissect_options *ndo)
+{
+	ND_PRINT("%s", ndo->ndo_protocol);
+}
+
 /* Print the invalid string */
 void nd_print_invalid(netdissect_options *ndo)
 {

@@ -685,6 +685,7 @@ extern uint16_t nextproto6_cksum(netdissect_options *, const struct ip6_hdr *, c
 
 /* Utilities */
 extern void nd_print_trunc(netdissect_options *);
+extern void nd_print_protocol(netdissect_options *);
 extern void nd_print_invalid(netdissect_options *);
 
 extern int mask2plen(uint32_t);
