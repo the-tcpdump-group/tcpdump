@@ -3,7 +3,7 @@
 	  IP-Comp Option (0x02), length 218: IP Header Compression (0x61):
 	    TCP Space 24929, non-TCP Space 24929, maxPeriod 25441, maxTime 24929, maxHdr 24953
 	      Suboptions, length 204
-		Unknown Suboption #220, length 220 [suboptions length 204 < 220] (invalid)
+		Unknown Suboption #220, length 220 [remaining suboptions length 204 < 220] (invalid)
 	  unknown Option (0x7b), length 123
 	    0x0000:  7b7b 7b7b 7b7b 7b7b 7b7b 7b7b 7b7b 7b7b
 	    0x0010:  7b7b 7b7b 7b7b 7b7b 7b7b 7b7b 7b7b 7b7b
@@ -748,4 +748,4 @@
 	    0x00b0:  1212 1212 1212 1212 1212 1212 1212 1212
 	    0x00c0:  1212 1212 1212 1212 1212 1212 1212 1212
 	    0x00d0:  1212 1212 1212 1212 1212 1212 1212 1212
-	    0x00e0:  1212 1212 [options length 38 < 230] (invalid)
+	    0x00e0:  1212 1212 [remaining options length 38 < 230] (invalid)
