@@ -424,7 +424,7 @@ lmp_print_data_link_subobjs(netdissect_options *ndo, const u_char *obj_tptr,
 
 void
 lmp_print(netdissect_options *ndo,
-          const u_char *pptr, u_int len)
+          const u_char *pptr, u_int length)
 {
     const struct lmp_common_header *lmp_com_header;
     const struct lmp_object_header *lmp_obj_header;
@@ -460,7 +460,7 @@ lmp_print(netdissect_options *ndo,
         ND_PRINT("LMPv%u %s Message, length: %u",
                LMP_EXTRACT_VERSION(version_res),
                tok2str(lmp_msg_type_values, "unknown (%u)",EXTRACT_U_1(lmp_com_header->msg_type)),
-               len);
+               length);
         return;
     }
 
@@ -477,9 +477,9 @@ lmp_print(netdissect_options *ndo,
         ND_PRINT(" (too short)");
         return;
     }
-    if (tlen > len) {
+    if (tlen > length) {
         ND_PRINT(" (too long)");
-        tlen = len;
+        tlen = length;
     }
 
     tptr+=sizeof(struct lmp_common_header);
