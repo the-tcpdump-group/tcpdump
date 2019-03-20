@@ -361,7 +361,7 @@ rip_print(netdissect_options *ndo,
 					break;
 				}
 				if (len < entry_size) {
-					ND_PRINT(" [len(%u) < entry_size(%u)]",
+					ND_PRINT(" [remaining entries length %u < %u]",
 						 len, entry_size);
 					nd_print_invalid(ndo);
 					break;
@@ -383,7 +383,7 @@ rip_print(netdissect_options *ndo,
 					break;
 				}
 				if (len < entry_size) {
-					ND_PRINT(" [len(%u) < entry_size(%u)]",
+					ND_PRINT(" [remaining entries length %u < %u]",
 						 len, entry_size);
 					nd_print_invalid(ndo);
 					break;

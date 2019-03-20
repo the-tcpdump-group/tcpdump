@@ -9,4 +9,4 @@
 	  AFI IPv4,       10.7.57.0/24, tag 0x0000, metric: 268435457, next-hop: self
 	  AFI IPv4,       10.7.61.0/24, tag 0x0000, metric: 1, next-hop: self
 	  AFI Unknown (37)
-	  0x0000:  5100 0000 ff00 0000 0000 0000 0000 0002 [len(16) < entry_size(20)] (invalid)
+	  0x0000:  5100 0000 ff00 0000 0000 0000 0000 0002 [remaining entries length 16 < 20] (invalid)
