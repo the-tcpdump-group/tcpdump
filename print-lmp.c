@@ -1128,6 +1128,11 @@ lmp_print(netdissect_options *ndo,
             print_unknown_data(ndo,tptr+sizeof(struct lmp_object_header),"\n\t    ",
                                lmp_obj_len-sizeof(struct lmp_object_header));
 
+        if (tlen < lmp_obj_len) {
+            ND_PRINT(" [remaining objects length %u < %u]", tlen, lmp_obj_len);
+            nd_print_invalid(ndo);
+            break;
+        }
         tptr+=lmp_obj_len;
         tlen-=lmp_obj_len;
     }
