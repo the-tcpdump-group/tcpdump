@@ -9,6 +9,8 @@ compiler:
   - gcc
   - clang
 
+cache: ccache
+
 env:
   global:
     - BUILD_LIBPCAP=true
@@ -21,6 +23,7 @@ env:
     # Coverity script test mode (if true no uploading, avoid reaching the quota)
     # usual processing: false.
     - coverity_scan_script_test_mode=false
+    - MAKEFLAGS='-j 2' # Travis CI VMs come with 2 cores
   matrix:
     # NOTE: REMOTE= is for the libpcap build, which is done with autotools
     # even if we're building tcpdump with CMake.
