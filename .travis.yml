@@ -107,3 +107,14 @@ script:
   - ./tcpdump --version
   - ./tcpdump -h
   - if [ "$CMAKE" = no ]; then make releasetar; fi
+  - echo '$ cat Makefile [...]'; echo travis_fold:start:script.cat_makefile
+  - if [ "$CMAKE" = no ]; then cat Makefile | sed -n '1,/DO NOT DELETE THIS LINE -- mkdep uses it/p'; fi
+  - if [ "$CMAKE" = yes ]; then cat Makefile; fi
+  - echo -n travis_fold:end:script.cat_makefile
+  - echo '$ cat config.h'; echo travis_fold:start:script.cat_config_h
+  - cat config.h
+  - echo -n travis_fold:end:script.cat_config_h
+  - if [ "$CMAKE" = no ]; then echo '$ cat config.log'; echo travis_fold:start:script.cat_config_log; fi
+  - if [ "$CMAKE" = no ]; then cat config.log; fi
+  - if [ "$CMAKE" = no ]; then echo -n travis_fold:end:script.cat_config_log; fi
+  - if [ "$TRAVIS_OS_NAME" = osx ]; then sleep 10; fi
