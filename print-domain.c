@@ -47,7 +47,20 @@ static const char *ns_resp[] = {
 	" NotImp", " Refused", " YXDomain", " YXRRSet",
 	" NXRRSet", " NotAuth", " NotZone", " Resp11",
 	" Resp12", " Resp13", " Resp14", " NoChange",
+	" BadVers", "Resp17", " Resp18", " Resp19",
+	" Resp20", "Resp21", " Resp22", " BadCookie",
 };
+
+static const char *
+ns_rcode(int rcode) {
+	static char buf[sizeof(" Resp4095")];
+
+	if (rcode < sizeof(ns_resp)/sizeof(ns_resp[0])) {
+		return (ns_resp[rcode]);
+	}
+	snprintf(buf, sizeof(buf), " Resp%u", rcode & 0xfff);
+	return (buf);
+}
 
 /* skip over a domain name */
 static const u_char *
@@ -592,7 +605,7 @@ domain_print(netdissect_options *ndo,
          const u_char *bp, u_int length, int is_mdns)
 {
 	const dns_header_t *np;
-	uint16_t flags;
+	uint16_t flags, rcode, rdlen, type;
 	u_int qdcount, ancount, nscount, arcount;
 	u_int i;
 	const u_char *cp;
@@ -608,12 +621,56 @@ domain_print(netdissect_options *ndo,
 	nscount = EXTRACT_BE_U_2(np->nscount);
 	arcount = EXTRACT_BE_U_2(np->arcount);
 
+	/* find the opt record to extract extended rcode */
+	cp = (const u_char *)(np + 1);
+	rcode = DNS_RCODE(flags);
+	for (i = 0; i < qdcount; i++) {
+		if ((cp = ns_nskip(ndo, cp)) == NULL)
+			goto print;
+		cp += 4;	/* skip QTYPE and QCLASS */
+		if (cp >= ndo->ndo_snapend)
+			goto print;
+	}
+	for (i = 0; i < ancount + nscount; i++) {
+		if ((cp = ns_nskip(ndo, cp)) == NULL)
+			goto print;
+		cp += 8;	/* skip TYPE, CLASS and TTL */
+		if (cp + 2 > ndo->ndo_snapend)
+			goto print;
+		rdlen = EXTRACT_BE_U_2(cp);
+		cp += 2 + rdlen;
+		if (cp >= ndo->ndo_snapend)
+			goto print;
+	}
+	for (i = 0; i < arcount; i++) {
+		if ((cp = ns_nskip(ndo, cp)) == NULL)
+			goto print;
+		if (cp + 2 > ndo->ndo_snapend)
+			goto print;
+		type = EXTRACT_BE_U_2(cp);
+		cp += 4;	/* skip TYPE and CLASS */
+		if (cp + 1 > ndo->ndo_snapend)
+			goto print;
+		if (type == T_OPT) {
+			rcode |= (*cp << 4);
+			goto print;
+		}
+		cp += 4;
+		if (cp + 2 > ndo->ndo_snapend)
+			goto print;
+		rdlen = EXTRACT_BE_U_2(cp);
+		cp += 2 + rdlen;
+		if (cp >= ndo->ndo_snapend)
+			goto print;
+	}
+
+ print:
 	if (DNS_QR(flags)) {
 		/* this is a response */
 		ND_PRINT("%u%s%s%s%s%s%s",
 			EXTRACT_BE_U_2(np->id),
 			ns_ops[DNS_OPCODE(flags)],
-			ns_resp[DNS_RCODE(flags)],
+			ns_rcode(rcode),
 			DNS_AA(flags)? "*" : "",
 			DNS_RA(flags)? "" : "-",
 			DNS_TC(flags)? "|" : "",
