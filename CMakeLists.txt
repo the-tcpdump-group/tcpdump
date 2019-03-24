@@ -1069,6 +1069,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-vxlan.c
     print-vxlan-gpe.c
     print-wb.c
+    print-zep.c
     print-zephyr.c
     print-zeromq.c
     ${LOCALSRC}

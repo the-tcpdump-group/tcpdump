@@ -488,14 +488,6 @@ EXTRACT_IPV4_TO_NETWORK_ORDER(const void *p)
 	           ((uint32_t)(*((const uint8_t *)(p) + 2)) << 16) | \
 	           ((uint32_t)(*((const uint8_t *)(p) + 1)) << 8) | \
 	           ((uint32_t)(*((const uint8_t *)(p) + 0)) << 0)))
-#define EXTRACT_LE_U_3(p) \
-	((uint32_t)(((uint32_t)(*((const uint8_t *)(p) + 2)) << 16) | \
-	            ((uint32_t)(*((const uint8_t *)(p) + 1)) << 8) | \
-	            ((uint32_t)(*((const uint8_t *)(p) + 0)) << 0)))
-#define EXTRACT_LE_S_3(p) \
-	((int32_t)(((uint32_t)(*((const uint8_t *)(p) + 2)) << 16) | \
-	           ((uint32_t)(*((const uint8_t *)(p) + 1)) << 8) | \
-	           ((uint32_t)(*((const uint8_t *)(p) + 0)) << 0)))
 #define EXTRACT_LE_U_8(p) \
 	((uint64_t)(((uint64_t)(*((const uint8_t *)(p) + 7)) << 56) | \
 	            ((uint64_t)(*((const uint8_t *)(p) + 6)) << 48) | \
@@ -514,6 +506,40 @@ EXTRACT_IPV4_TO_NETWORK_ORDER(const void *p)
 	           ((uint64_t)(*((const uint8_t *)(p) + 2)) << 16) | \
 	           ((uint64_t)(*((const uint8_t *)(p) + 1)) << 8) | \
 	           ((uint64_t)(*((const uint8_t *)(p) + 0)) << 0)))
+
+/*
+ * Non-power-of-2 sizes.
+ */
+
+#define EXTRACT_LE_U_3(p) \
+	((uint32_t)(((uint32_t)(*((const uint8_t *)(p) + 2)) << 16) | \
+	            ((uint32_t)(*((const uint8_t *)(p) + 1)) << 8) | \
+	            ((uint32_t)(*((const uint8_t *)(p) + 0)) << 0)))
+#define EXTRACT_LE_S_3(p) \
+	((int32_t)(((uint32_t)(*((const uint8_t *)(p) + 2)) << 16) | \
+	           ((uint32_t)(*((const uint8_t *)(p) + 1)) << 8) | \
+	           ((uint32_t)(*((const uint8_t *)(p) + 0)) << 0)))
+#define EXTRACT_LE_U_5(p) \
+	((uint64_t)(((uint64_t)(*((const uint8_t *)(p) + 4)) << 32) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 3)) << 24) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 2)) << 16) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 1)) << 8) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 0)) << 0)))
+#define EXTRACT_LE_U_6(p) \
+	((uint64_t)(((uint64_t)(*((const uint8_t *)(p) + 5)) << 40) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 4)) << 32) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 3)) << 24) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 2)) << 16) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 1)) << 8) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 0)) << 0)))
+#define EXTRACT_LE_U_7(p) \
+	((uint64_t)(((uint64_t)(*((const uint8_t *)(p) + 6)) << 48) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 5)) << 40) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 4)) << 32) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 3)) << 24) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 2)) << 16) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 1)) << 8) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 0)) << 0)))
 
 /*
  * Macros to check the presence of the values in question.
