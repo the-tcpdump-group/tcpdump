@@ -230,3 +230,6 @@ struct udphdr {
 #ifndef LWAPP_CONTROL_PORT
 #define LWAPP_CONTROL_PORT		12223	/* RFC 5412 */
 #endif
+#ifndef ZEP_PORT
+#define ZEP_PORT			17754	/* XXX */
+#endif
