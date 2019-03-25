@@ -701,7 +701,7 @@ rx_cache_insert(netdissect_options *ndo,
 	UNALIGNED_MEMCPY(&rxent->client, ip->ip_src, sizeof(uint32_t));
 	UNALIGNED_MEMCPY(&rxent->server, ip->ip_dst, sizeof(uint32_t));
 	rxent->dport = dport;
-	rxent->serviceId = EXTRACT_BE_U_4(rxh->serviceId);
+	rxent->serviceId = EXTRACT_BE_U_2(rxh->serviceId);
 	rxent->opcode = EXTRACT_BE_U_4(bp + sizeof(struct rx_header));
 }
 
@@ -732,7 +732,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, u_int sport,
 		if (rxent->callnum == EXTRACT_BE_U_4(rxh->callNumber) &&
 		    rxent->client.s_addr == clip &&
 		    rxent->server.s_addr == sip &&
-		    rxent->serviceId == EXTRACT_BE_U_4(rxh->serviceId) &&
+		    rxent->serviceId == EXTRACT_BE_U_2(rxh->serviceId) &&
 		    rxent->dport == sport) {
 
 			/* We got a match! */
