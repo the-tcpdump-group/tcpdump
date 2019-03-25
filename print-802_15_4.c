@@ -430,7 +430,7 @@ ieee802_15_4_crc16(const u_char *p,
 
 	crc = 0x0000; /* Note, initial value is 0x0000 not 0xffff. */
 
-	while (data_len--){
+	while (data_len != 0){
 		y = *p++;
 		/* Reverse bits on input */
 		y = (((y & 0xaa) >> 1) | ((y & 0x55) << 1));
@@ -443,6 +443,7 @@ ieee802_15_4_crc16(const u_char *p,
 			((unsigned short)(x << 12)) ^
 			((unsigned short)(x <<5)) ^
 			((unsigned short)x);
+		data_len--;
 	}
 	/* Reverse bits on output */
 	crc = (((crc & 0xaaaa) >> 1) | ((crc & 0x5555) << 1));
@@ -480,7 +481,7 @@ ieee802_15_4_crc32(const u_char *p,
 
 	crc = 0x00000000; /* Note, initial value is 0x00000000 not 0xffffffff */
 
-	while (data_len--){
+	while (data_len != 0){
 		byte = *p++;
 		/* Reverse bits on input */
 		byte = ieee802_15_4_reverse32(byte);
@@ -492,6 +493,7 @@ ieee802_15_4_crc32(const u_char *p,
 		    crc = crc << 1;
 		  byte = byte << 1;
 		}
+		data_len--;
 	}
 	/* Reverse bits on output */
 	crc = ieee802_15_4_reverse32(crc);
