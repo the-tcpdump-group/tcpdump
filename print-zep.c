@@ -177,10 +177,3 @@ zep_print(netdissect_options *ndo,
  trunc:
 	ND_PRINT(" [|ZEP]");
 }
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

@@ -2521,11 +2521,3 @@ ieee802_15_4_tap_if_print(netdissect_options *ndo,
 
 	return ieee802_15_4_print(ndo, p+length, h->caplen-length) + length;
 }
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */
-
