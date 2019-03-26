@@ -19,6 +19,7 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+/* \summary: ZigBee Encapsulation Protocol (ZEP) printer */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -106,7 +107,7 @@ zep_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol ="ZEP";
 
-	ND_PRINT("ZEP");
+	nd_print_protocol(ndo);
 
 	ND_TCHECK_LEN(bp, 8);
 
@@ -175,5 +176,5 @@ zep_print(netdissect_options *ndo,
 
 	return;
  trunc:
-	ND_PRINT(" [|ZEP]");
+	nd_print_trunc(ndo);
 }
