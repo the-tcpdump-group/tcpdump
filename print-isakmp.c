@@ -2686,7 +2686,7 @@ ikev2_e_print(netdissect_options *ndo,
 #ifdef HAVE_LIBCRYPTO
 	np = GET_U_1(ext->np);
 
-	/* try to decypt it! */
+	/* try to decrypt it! */
 	if(esp_print_decrypt_buffer_by_ikev2(ndo,
 					     GET_U_1(base->flags) & ISAKMP_FLAG_I,
 					     base->i_ck, base->r_ck,
