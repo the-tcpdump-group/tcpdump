@@ -1057,9 +1057,6 @@ print_attr_vector64(netdissect_options *ndo,
    ND_PRINT("]");
 
    return;
-
-   trunc:
-     nd_print_trunc(ndo);
 }
 
 /***********************************/
