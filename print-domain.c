@@ -52,7 +52,7 @@ static const char *ns_resp[] = {
 };
 
 static const char *
-ns_rcode(int rcode) {
+ns_rcode(u_int rcode) {
 	static char buf[sizeof(" Resp4095")];
 
 	if (rcode < sizeof(ns_resp)/sizeof(ns_resp[0])) {
