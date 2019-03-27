@@ -71,6 +71,7 @@ static const struct tok brcm_tag_te_values[] = {
 	{ 1, "Untag" },
 	{ 2, "Header"},
 	{ 3, "Reserved" },
+	{ 0, NULL }
 };
 
 static const struct tok brcm_tag_rc_values[] = {
@@ -80,6 +81,7 @@ static const struct tok brcm_tag_rc_values[] = {
 	{ 8, "prot term" },
 	{ 16, "prot snoop" },
 	{ 32, "exception" },
+	{ 0, NULL }
 };
 
 static int brcm_tag_print_full(netdissect_options *ndo, const u_char *bp,
