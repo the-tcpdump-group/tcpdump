@@ -1041,7 +1041,6 @@ print_attr_vector64(netdissect_options *ndo,
    }
 
    ND_PRINT("[");
-   ND_TCHECK_8(data[0]);
 
    data_value = GET_BE_U_8(data);
    /* Print the 64-bit field in a format similar to bittok2str(), less
