@@ -5,6 +5,8 @@ os:
   - linux
   - osx
 
+dist: xenial
+
 compiler:
   - gcc
   - clang
@@ -65,7 +67,6 @@ addons:
       - libnl-genl-3-dev
       - libibverbs-dev
       - libssl-dev
-      - libssl0.9.8
       - libssl1.0.0
       - libdnet-dev
       - libsmi2-dev
