@@ -66,15 +66,14 @@ again:
 
 	case IPPROTO_ESP:
 	{
-		u_int enh, padlen;
-		advance = esp_print(ndo, bp, length,
-				          iph, &enh, &padlen);
-		if (advance <= 0)
-			break;
-		bp += advance;
-		length -= advance + padlen;
-		nh = enh & 0xff;
-		goto again;
+		esp_print(ndo, bp, length, iph, ver, fragmented, ttl_hl);
+		/*
+		 * Either this has decrypted the payload and
+		 * printed it, in which case there's nothing more
+		 * to do, or it hasn't, in which case there's
+		 * nothing more to do.
+		 */
+		break;
 	}
 
 	case IPPROTO_IPCOMP:
@@ -111,7 +110,7 @@ again:
 
 	case IPPROTO_ICMPV6:
 		icmp6_print(ndo, bp, length, iph, fragmented);
-		return;
+		break;
 
 	case IPPROTO_PIGP:
 		/*
@@ -156,10 +155,8 @@ again:
 	case IPPROTO_IPV4:
 		/* ipv4-in-ip encapsulation */
 		ip_print(ndo, bp, length);
-		if (! ndo->ndo_vflag) {
+		if (! ndo->ndo_vflag)
 			ND_PRINT(" (ipip-proto-4)");
-			return;
-		}
 		break;
 
 	case IPPROTO_IPV6:

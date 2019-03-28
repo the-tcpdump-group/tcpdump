@@ -657,25 +657,21 @@ void esp_print_decodesecret(netdissect_options *ndo)
 #endif
 
 #ifdef HAVE_LIBCRYPTO
+#define USED_IF_LIBCRYPTO
+#else
+#define USED_IF_LIBCRYPTO _U_
+#endif
+
+#ifdef HAVE_LIBCRYPTO
 USES_APPLE_DEPRECATED_API
 #endif
-int
+void
 esp_print(netdissect_options *ndo,
-	  const u_char *bp, const int length, const u_char *bp2
-#ifndef HAVE_LIBCRYPTO
-	_U_
-#endif
-	,
-	u_int *nhdr
-#ifndef HAVE_LIBCRYPTO
-	_U_
-#endif
-	,
-	u_int *padlen
-#ifndef HAVE_LIBCRYPTO
-	_U_
-#endif
-	)
+	  const u_char *bp, u_int length,
+	  const u_char *bp2 USED_IF_LIBCRYPTO,
+	  u_int ver USED_IF_LIBCRYPTO,
+	  int fragmented USED_IF_LIBCRYPTO,
+	  u_int ttl_hl USED_IF_LIBCRYPTO)
 {
 	const struct newesp *esp;
 	const u_char *ep;
@@ -692,6 +688,8 @@ esp_print(netdissect_options *ndo,
 	EVP_CIPHER_CTX *ctx;
 	unsigned int block_size, buffer_size;
 	u_char *input_buffer, *output_buffer;
+	u_int padlen;
+	u_int nh;
 #endif
 
 	ndo->ndo_protocol = "esp";
@@ -712,25 +710,23 @@ esp_print(netdissect_options *ndo,
 
 	if ((const u_char *)(esp + 1) >= ep) {
 		nd_print_trunc(ndo);
-		goto fail;
+		return;
 	}
 	ND_PRINT("ESP(spi=0x%08x", GET_BE_U_4(esp->esp_spi));
 	ND_PRINT(",seq=0x%x)", GET_BE_U_4(esp->esp_seq));
 	ND_PRINT(", length %u", length);
 
-#ifndef HAVE_LIBCRYPTO
-	goto fail;
-#else
+#ifdef HAVE_LIBCRYPTO
 	/* initiailize SAs */
 	if (ndo->ndo_sa_list_head == NULL) {
 		if (!ndo->ndo_espsecret)
-			goto fail;
+			return;
 
 		esp_print_decodesecret(ndo);
 	}
 
 	if (ndo->ndo_sa_list_head == NULL)
-		goto fail;
+		return;
 
 	ip = (const struct ip *)bp2;
 	switch (IP_V(ip)) {
@@ -738,7 +734,7 @@ esp_print(netdissect_options *ndo,
 		ip6 = (const struct ip6_hdr *)bp2;
 		/* we do not attempt to decrypt jumbograms */
 		if (!GET_BE_U_2(ip6->ip6_plen))
-			goto fail;
+			return;
 		/* if we can't get nexthdr, we do not need to decrypt it */
 		len = sizeof(struct ip6_hdr) + GET_BE_U_2(ip6->ip6_plen);
 
@@ -755,7 +751,7 @@ esp_print(netdissect_options *ndo,
 	case 4:
 		/* nexthdr & padding are in the last fragment */
 		if (GET_BE_U_2(ip->ip_off) & IP_MF)
-			goto fail;
+			return;
 		len = GET_BE_U_2(ip->ip_len);
 
 		/* see if we can find the SA, and if so, decode it */
@@ -769,7 +765,7 @@ esp_print(netdissect_options *ndo,
 		}
 		break;
 	default:
-		goto fail;
+		return;
 	}
 
 	/* if we didn't find the specific one, then look for
@@ -780,11 +776,11 @@ esp_print(netdissect_options *ndo,
 
 	/* if not found fail */
 	if (sa == NULL)
-		goto fail;
+		return;
 
 	/* if we can't get nexthdr, we do not need to decrypt it */
 	if (ep - bp2 < len)
-		goto fail;
+		return;
 	if (ep - bp2 > len) {
 		/* FCS included at end of frame (NetBSD 1.6 or later) */
 		ep = bp2 + len;
@@ -860,21 +856,26 @@ esp_print(netdissect_options *ndo,
 		advance = sizeof(struct newesp);
 
 	/* sanity check for pad length */
-	if (ep - bp < GET_U_1(ep - 2))
-		goto fail;
+	padlen = GET_U_1(ep - 2);
+	if (ep - bp < padlen)
+		return;
 
-	if (padlen)
-		*padlen = GET_U_1(ep - 2) + 2;
+	/*
+	 * Sanity check for payload length; +2 is for the pad length
+	 * and next header fields.
+	 */
+	if (length <= advance + padlen + 2)
+		return;
+	bp += advance;
+	length -= advance + padlen + 2;
 
-	if (nhdr)
-		*nhdr = GET_U_1(ep - 1);
+	nh = GET_U_1(ep - 1);
 
 	ND_PRINT(": ");
-	return advance;
-#endif
 
-fail:
-	return -1;
+	/* Now print the payload. */
+	ip_print_demux(ndo, bp, length, ver, fragmented, ttl_hl, nh, bp2);
+#endif
 }
 #ifdef HAVE_LIBCRYPTO
 USES_APPLE_RST

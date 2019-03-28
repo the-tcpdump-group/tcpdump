@@ -3124,20 +3124,16 @@ isakmp_rfc3948_print(netdissect_options *ndo,
 
 	/* must be an ESP packet */
 	{
-		u_int nh, enh, padlen;
-		int advance;
-
 		ND_PRINT("UDP-encap: ");
 
-		advance = esp_print(ndo, bp, length, bp2, &enh, &padlen);
-		if(advance <= 0)
-			return;
+		esp_print(ndo, bp, length, bp2, ver, fragmented, ttl_hl);
 
-		bp += advance;
-		length -= advance + padlen;
-		nh = enh & 0xff;
-
-		ip_print_demux(ndo, bp, length, ver, fragmented, ttl_hl, nh, bp2);
+		/*
+		 * Either this has decrypted the payload and
+		 * printed it, in which case there's nothing more
+		 * to do, or it hasn't, in which case there's
+		 * nothing more to do.
+		 */
 		return;
 	}
 
