@@ -439,10 +439,10 @@ ieee802_15_4_crc16(const u_char *p,
 		/* Update CRC */
 		x = crc >> 8 ^ y;
 		x ^= x >> 4;
-		crc = (crc << 8) ^
-			((unsigned short)(x << 12)) ^
-			((unsigned short)(x <<5)) ^
-			((unsigned short)x);
+		crc = ((uint16_t)(crc << 8)) ^
+			((uint16_t)(x << 12)) ^
+			((uint16_t)(x << 5)) ^
+			((uint16_t)x);
 		data_len--;
 	}
 	/* Reverse bits on output */
