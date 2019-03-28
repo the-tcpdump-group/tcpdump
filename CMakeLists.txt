@@ -981,6 +981,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-igmp.c
     print-igrp.c
     print-ip.c
+    print-ip-demux.c
     print-ip6.c
     print-ip6opts.c
     print-ipcomp.c

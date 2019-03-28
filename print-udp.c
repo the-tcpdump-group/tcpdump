@@ -383,7 +383,7 @@ udpipaddr_print(netdissect_options *ndo, const struct ip *ip, int sport, int dpo
 
 void
 udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
-	  const u_char *bp2, int fragmented)
+	  const u_char *bp2, int fragmented, u_int ttl_hl)
 {
 	const struct udphdr *up;
 	const struct ip *ip;
@@ -607,7 +607,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	        else if (IS_SRC_OR_DST_PORT(ISAKMP_PORT))
 			 isakmp_print(ndo, (const u_char *)(up + 1), length, bp2);
 	        else if (IS_SRC_OR_DST_PORT(ISAKMP_PORT_NATT))
-			 isakmp_rfc3948_print(ndo, (const u_char *)(up + 1), length, bp2);
+			 isakmp_rfc3948_print(ndo, (const u_char *)(up + 1), length, bp2, IP_V(ip), fragmented, ttl_hl);
 	        else if (IS_SRC_OR_DST_PORT(ISAKMP_PORT_USER1) || IS_SRC_OR_DST_PORT(ISAKMP_PORT_USER2))
 			isakmp_print(ndo, (const u_char *)(up + 1), length, bp2);
 		else if (IS_SRC_OR_DST_PORT(SNMP_PORT) || IS_SRC_OR_DST_PORT(SNMPTRAP_PORT))

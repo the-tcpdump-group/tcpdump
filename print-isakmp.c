@@ -3099,7 +3099,7 @@ isakmp_print(netdissect_options *ndo,
 void
 isakmp_rfc3948_print(netdissect_options *ndo,
 		     const u_char *bp, u_int length,
-		     const u_char *bp2)
+		     const u_char *bp2, int ver, int fragmented, u_int ttl_hl)
 {
 	ndo->ndo_protocol = "isakmp_rfc3948";
 	ND_TCHECK_1(bp);
@@ -3137,7 +3137,7 @@ isakmp_rfc3948_print(netdissect_options *ndo,
 		length -= advance + padlen;
 		nh = enh & 0xff;
 
-		ip_inner_print(ndo, bp, length, nh, bp2);
+		ip_print_demux(ndo, bp, length, ver, fragmented, ttl_hl, nh, bp2);
 		return;
 	}
 

@@ -569,12 +569,11 @@ extern void igrp_print(netdissect_options *, const u_char *, u_int);
 extern void ip6_print(netdissect_options *, const u_char *, u_int);
 extern void ipN_print(netdissect_options *, const u_char *, u_int);
 extern void ip_print(netdissect_options *, const u_char *, u_int);
-extern void ip_inner_print(netdissect_options *, const u_char *, u_int, u_int nh, const u_char *);
 extern void ipcomp_print(netdissect_options *, const u_char *);
 extern void ipx_netbios_print(netdissect_options *, const u_char *, u_int);
 extern void ipx_print(netdissect_options *, const u_char *, u_int);
 extern void isakmp_print(netdissect_options *, const u_char *, u_int, const u_char *);
-extern void isakmp_rfc3948_print(netdissect_options *, const u_char *, u_int, const u_char *);
+extern void isakmp_rfc3948_print(netdissect_options *, const u_char *, u_int, const u_char *, int, int, u_int);
 extern void isoclns_print(netdissect_options *, const u_char *, u_int);
 extern void krb_print(netdissect_options *, const u_char *);
 extern void l2tp_print(netdissect_options *, const u_char *, u_int);
@@ -657,7 +656,7 @@ extern void timed_print(netdissect_options *, const u_char *);
 extern void tipc_print(netdissect_options *, const u_char *, u_int, u_int);
 extern u_int token_print(netdissect_options *, const u_char *, u_int, u_int);
 extern void udld_print(netdissect_options *, const u_char *, u_int);
-extern void udp_print(netdissect_options *, const u_char *, u_int, const u_char *, int);
+extern void udp_print(netdissect_options *, const u_char *, u_int, const u_char *, int, u_int);
 extern int vjc_print(netdissect_options *, const u_char *, u_short);
 extern void vqp_print(netdissect_options *, const u_char *, u_int);
 extern void vrrp_print(netdissect_options *, const u_char *, u_int, const u_char *, int);
@@ -681,6 +680,9 @@ struct cksum_vec {
 };
 extern uint16_t in_cksum(const struct cksum_vec *, int);
 extern uint16_t in_cksum_shouldbe(uint16_t, uint16_t);
+
+/* IP protocol demuxing routines */
+extern void ip_print_demux(netdissect_options *, const u_char *, u_int, u_int, int, u_int, u_int, const u_char *);
 
 extern uint16_t nextproto4_cksum(netdissect_options *, const struct ip *, const uint8_t *, u_int, u_int, u_int);
 

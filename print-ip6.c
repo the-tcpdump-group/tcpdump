@@ -281,6 +281,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	cp = (const u_char *)ip6;
 	advance = sizeof(struct ip6_hdr);
+	/* Process extension headers */
 	while (cp < ndo->ndo_snapend && advance > 0) {
 		if (len < (u_int)advance)
 			goto trunc;
@@ -295,18 +296,21 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		}
 
 		switch (nh) {
+
 		case IPPROTO_HOPOPTS:
 			advance = hbhopt_print(ndo, cp);
 			if (advance < 0)
 				return;
 			nh = GET_U_1(cp);
 			break;
+
 		case IPPROTO_DSTOPTS:
 			advance = dstopt_print(ndo, cp);
 			if (advance < 0)
 				return;
 			nh = GET_U_1(cp);
 			break;
+
 		case IPPROTO_FRAGMENT:
 			advance = frag6_print(ndo, cp, (const u_char *)ip6);
 			if (advance < 0 || ndo->ndo_snapend <= cp + advance)
@@ -330,6 +334,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 				return;
 			nh = GET_U_1(cp);
 			return;
+
 		case IPPROTO_ROUTING:
 			ND_TCHECK_1(cp);
 			advance = rt6_print(ndo, cp, (const u_char *)ip6);
@@ -337,88 +342,14 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 				return;
 			nh = GET_U_1(cp);
 			break;
-		case IPPROTO_SCTP:
-			sctp_print(ndo, cp, (const u_char *)ip6, len);
-			return;
-		case IPPROTO_DCCP:
-			dccp_print(ndo, cp, (const u_char *)ip6, len);
-			return;
-		case IPPROTO_TCP:
-			tcp_print(ndo, cp, len, (const u_char *)ip6, fragmented);
-			return;
-		case IPPROTO_UDP:
-			udp_print(ndo, cp, len, (const u_char *)ip6, fragmented);
-			return;
-		case IPPROTO_ICMPV6:
-			icmp6_print(ndo, cp, len, (const u_char *)ip6, fragmented);
-			return;
-		case IPPROTO_AH:
-			advance = ah_print(ndo, cp);
-			if (advance < 0)
-				return;
-			nh = GET_U_1(cp);
-			break;
-		case IPPROTO_ESP:
-		    {
-			u_int enh, padlen;
-			advance = esp_print(ndo, cp, len, (const u_char *)ip6, &enh, &padlen);
-			if (advance < 0)
-				return;
-			nh = enh & 0xff;
-			len -= padlen;
-			break;
-		    }
-		case IPPROTO_IPCOMP:
-		    {
-			ipcomp_print(ndo, cp);
-			/*
-			 * Either this has decompressed the payload and
-			 * printed it, in which case there's nothing more
-			 * to do, or it hasn't, in which case there's
-			 * nothing more to do.
-			 */
-			advance = -1;
-			break;
-		    }
-
-		case IPPROTO_PIM:
-			pim_print(ndo, cp, len, (const u_char *)ip6);
-			return;
-
-		case IPPROTO_OSPF:
-			ospf6_print(ndo, cp, len);
-			return;
-
-		case IPPROTO_IPV6:
-			ip6_print(ndo, cp, len);
-			return;
-
-		case IPPROTO_IPV4:
-		        ip_print(ndo, cp, len);
-			return;
-
-                case IPPROTO_PGM:
-                        pgm_print(ndo, cp, len, (const u_char *)ip6);
-                        return;
-
-		case IPPROTO_GRE:
-			gre_print(ndo, cp, len);
-			return;
-
-		case IPPROTO_RSVP:
-			rsvp_print(ndo, cp, len);
-			return;
-
-		case IPPROTO_EIGRP:
-			eigrp_print(ndo, cp, len);
-			return;
-
-		case IPPROTO_NONE:
-			ND_PRINT("no next header");
-			return;
 
 		default:
-			ND_PRINT("ip-proto-%u %u", nh, len);
+			/*
+			 * Not an extension header; hand off to the
+			 * IP protocol demuxer.
+			 */
+			ip_print_demux(ndo, cp, len, 6, fragmented,
+			    GET_U_1(ip6->ip6_hlim), nh, bp);
 			return;
 		}
 
