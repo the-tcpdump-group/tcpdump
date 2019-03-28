@@ -791,6 +791,13 @@ esp_print(netdissect_options *ndo,
 	/* length of the IV, if there is one; 0, if there isn't */
 	ivlen = sa->ivlen;
 	secret = sa->secret;
+	/*
+	 * Make sure the authentication data/integrity check value length
+	 * isn't bigger than the total amount of data available and, if
+	 * not, slice that off.
+	 */
+	if (ep - bp < sa->authlen)
+		return;
 	ep = ep - sa->authlen;
 
 	if (sa->evp) {
