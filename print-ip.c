@@ -483,17 +483,9 @@ again:
 
 	case IPPROTO_VRRP:
 		if (ndo->ndo_packettype == PT_CARP) {
-			if (ndo->ndo_vflag)
-				ND_PRINT("carp %s > %s: ",
-					     ipaddr_string(ndo, ipds->ip->ip_src),
-					     ipaddr_string(ndo, ipds->ip->ip_dst));
 			carp_print(ndo, ipds->cp, ipds->len,
 				GET_U_1(ipds->ip->ip_ttl));
 		} else {
-			if (ndo->ndo_vflag)
-				ND_PRINT("vrrp %s > %s: ",
-					     ipaddr_string(ndo, ipds->ip->ip_src),
-					     ipaddr_string(ndo, ipds->ip->ip_dst));
 			vrrp_print(ndo, ipds->cp, ipds->len,
 				(const u_char *)ipds->ip,
 				GET_U_1(ipds->ip->ip_ttl));
