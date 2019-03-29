@@ -729,12 +729,13 @@ esp_print(netdissect_options *ndo,
 		return;
 
 	ip = (const struct ip *)bp2;
-	switch (IP_V(ip)) {
+	switch (ver) {
 	case 6:
 		ip6 = (const struct ip6_hdr *)bp2;
 		/* we do not attempt to decrypt jumbograms */
 		if (!GET_BE_U_2(ip6->ip6_plen))
 			return;
+		/* XXX - check whether it's fragmented? */
 		/* if we can't get nexthdr, we do not need to decrypt it */
 		len = sizeof(struct ip6_hdr) + GET_BE_U_2(ip6->ip6_plen);
 
@@ -750,7 +751,7 @@ esp_print(netdissect_options *ndo,
 		break;
 	case 4:
 		/* nexthdr & padding are in the last fragment */
-		if (GET_BE_U_2(ip->ip_off) & IP_MF)
+		if (fragmented)
 			return;
 		len = GET_BE_U_2(ip->ip_len);
 
@@ -800,82 +801,105 @@ esp_print(netdissect_options *ndo,
 		return;
 	ep = ep - sa->authlen;
 
-	if (sa->evp) {
-		ctx = EVP_CIPHER_CTX_new();
-		if (ctx != NULL) {
-			if (set_cipher_parameters(ctx, sa->evp, secret, NULL, 0) < 0)
-				(*ndo->ndo_warning)(ndo, "espkey init failed");
-
-			p = ivoff;
-			set_cipher_parameters(ctx, NULL, NULL, p, 0);
-			len = ep - (p + ivlen);
-
-			/*
-			 * Allocate buffers for the encrypted and decrypted
-			 * data.  Both buffers' sizes must be a multiple of
-			 * the cipher block size, and the output buffer must
-			 * be separate from the input buffer.
-			 */
-			block_size = (unsigned int)EVP_CIPHER_CTX_block_size(ctx);
-			buffer_size = len + (block_size - len % block_size);
-
-			/*
-			 * Attempt to allocate the input buffer.
-			 */
-			input_buffer = (u_char *)malloc(buffer_size);
-			if (input_buffer == NULL) {
-				EVP_CIPHER_CTX_free(ctx);
-				(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
-					"esp_print: can't allocate memory for encrypted data buffer");
-			}
-			/*
-			 * Copy the input data to the encrypted data buffer,
-			 * and pad it with zeroes.
-			 */
-			memcpy(input_buffer, p + ivlen, len);
-			memset(input_buffer + len, 0, buffer_size - len);
-
-			/*
-			 * Attempt to allocate the output buffer.
-			 */
-			output_buffer = (u_char *)malloc(buffer_size);
-			if (output_buffer == NULL) {
-				free(input_buffer);
-				EVP_CIPHER_CTX_free(ctx);
-				(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
-					"esp_print: can't allocate memory for decryption buffer");
-			}
-
-			EVP_Cipher(ctx, output_buffer, input_buffer, len);
-			free(input_buffer);
-			EVP_CIPHER_CTX_free(ctx);
-			/*
-			 * XXX - of course this is wrong, because buf is a
-			 * const buffer, but changing this would require a
-			 * more complicated fix.
-			 */
-			memcpy(p + ivlen, output_buffer, len);
-			free(output_buffer);
-			advance = ivoff - (const u_char *)esp + ivlen;
-		} else
-			advance = sizeof(struct newesp);
-	} else
-		advance = sizeof(struct newesp);
-
-	/* sanity check for pad length */
-	padlen = GET_U_1(ep - 2);
-	if (ep - bp < padlen)
+	if (sa->evp == NULL)
 		return;
+	ctx = EVP_CIPHER_CTX_new();
+	if (ctx == NULL) {
+		/*
+		 * Failed to initialize the cipher context.
+		 * From a look at the OpenSSL code, this appears to
+		 * mean "couldn't allocate memory for the cipher context";
+		 * note that we're not passing any parameters, so there's
+		 * not much else it can mean.
+		 */
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+			"esp_print: can't allocate memory for cipher context");
+	}
+
+	if (set_cipher_parameters(ctx, sa->evp, secret, NULL, 0) < 0)
+		(*ndo->ndo_warning)(ndo, "espkey init failed");
+
+	p = ivoff;
+	set_cipher_parameters(ctx, NULL, NULL, p, 0);
+	len = ep - (p + ivlen);
+
+	/*
+	 * Allocate buffers for the encrypted and decrypted
+	 * data.  Both buffers' sizes must be a multiple of
+	 * the cipher block size, and the output buffer must
+	 * be separate from the input buffer.
+	 */
+	block_size = (unsigned int)EVP_CIPHER_CTX_block_size(ctx);
+	buffer_size = len + (block_size - len % block_size);
+
+	/*
+	 * Attempt to allocate the input buffer.
+	 */
+	input_buffer = (u_char *)malloc(buffer_size);
+	if (input_buffer == NULL) {
+		EVP_CIPHER_CTX_free(ctx);
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+			"esp_print: can't allocate memory for encrypted data buffer");
+	}
+	/*
+	 * Copy the input data to the encrypted data buffer,
+	 * and pad it with zeroes.
+	 */
+	memcpy(input_buffer, p + ivlen, len);
+	memset(input_buffer + len, 0, buffer_size - len);
+
+	/*
+	 * Attempt to allocate the output buffer.
+	 */
+	output_buffer = (u_char *)malloc(buffer_size);
+	if (output_buffer == NULL) {
+		free(input_buffer);
+		EVP_CIPHER_CTX_free(ctx);
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+			"esp_print: can't allocate memory for decryption buffer");
+	}
+
+	EVP_Cipher(ctx, output_buffer, input_buffer, len);
+	free(input_buffer);
+	EVP_CIPHER_CTX_free(ctx);
+	/*
+	 * XXX - of course this is wrong, because buf is a
+	 * const buffer, but changing this would require a
+	 * more complicated fix.
+	 */
+	memcpy(p + ivlen, output_buffer, len);
+	free(output_buffer);
+	advance = ivoff - (const u_char *)esp + ivlen;
+
+	/*
+	 * Sanity check for pad length.
+	 *
+	 * XXX - the check can fail if the packet is corrupt *or* if
+	 * it was not decrypted with the correct key, so that the
+	 * "plaintext" is not what was being sent.
+	 */
+	padlen = GET_U_1(ep - 2);
+	if (ep - bp < padlen) {
+		nd_print_trunc(ndo);
+		return;
+	}
 
 	/*
 	 * Sanity check for payload length; +2 is for the pad length
 	 * and next header fields.
+	 *
+	 * XXX - the check can fail if the packet is corrupt *or* if
+	 * it was not decrypted with the correct key, so that the
+	 * "plaintext" is not what was being sent.
 	 */
-	if (length <= advance + padlen + 2)
+	if (length <= advance + padlen + 2) {
+		nd_print_trunc(ndo);
 		return;
+	}
 	bp += advance;
 	length -= advance + padlen + 2;
 
+	/* Get the next header */
 	nh = GET_U_1(ep - 1);
 
 	ND_PRINT(": ");
