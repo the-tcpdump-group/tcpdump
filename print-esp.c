@@ -152,7 +152,7 @@ EVP_CIPHER_CTX_free(EVP_CIPHER_CTX *ctx)
  * the cipher, so calling it twice, with the second call having a
  * null cipher, will clear the already-set cipher.  EVP_CipherInit_ex(),
  * however, won't reset the cipher context, so you can use it to specify
- * the IV oin a second call after a first call to EVP_CipherInit_ex()
+ * the IV in a second call after a first call to EVP_CipherInit_ex()
  * to set the cipher and the key.
  *
  * XXX - is there some reason why we need to make two calls?
@@ -224,9 +224,14 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 	ctx = EVP_CIPHER_CTX_new();
 	if (ctx == NULL)
 		return 0;
-	if (set_cipher_parameters(ctx, sa->evp, sa->secret, NULL, 0) < 0)
+	if (set_cipher_parameters(ctx, sa->evp, sa->secret, NULL, 0) < 0) {
 		(*ndo->ndo_warning)(ndo, "espkey init failed");
-	set_cipher_parameters(ctx, NULL, NULL, iv, 0);
+		return 0;
+	}
+	if (set_cipher_parameters(ctx, NULL, NULL, iv, 0) < 0) {
+		(*ndo->ndo_warning)(ndo, "IV init failed");
+		return 0;
+	}
 	/*
 	 * Allocate buffers for the encrypted and decrypted data.
 	 * Both buffers' sizes must be a multiple of the cipher block
@@ -262,7 +267,10 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
 			"can't allocate memory for decryption buffer");
 	}
-	EVP_Cipher(ctx, output_buffer, input_buffer, len);
+	if (!EVP_Cipher(ctx, output_buffer, input_buffer, len)) {
+		(*ndo->ndo_warning)(ndo, "EVP_Cipher failed");
+		return 0;
+	}
 	EVP_CIPHER_CTX_free(ctx);
 
 	/*
@@ -816,11 +824,16 @@ esp_print(netdissect_options *ndo,
 			"esp_print: can't allocate memory for cipher context");
 	}
 
-	if (set_cipher_parameters(ctx, sa->evp, secret, NULL, 0) < 0)
+	if (set_cipher_parameters(ctx, sa->evp, secret, NULL, 0) < 0) {
 		(*ndo->ndo_warning)(ndo, "espkey init failed");
+		return;
+	}
 
 	p = ivoff;
-	set_cipher_parameters(ctx, NULL, NULL, p, 0);
+	if (set_cipher_parameters(ctx, NULL, NULL, p, 0) < 0) {
+		(*ndo->ndo_warning)(ndo, "IV init failed");
+		return;
+	}
 	len = ep - (p + ivlen);
 
 	/*
@@ -859,7 +872,11 @@ esp_print(netdissect_options *ndo,
 			"esp_print: can't allocate memory for decryption buffer");
 	}
 
-	EVP_Cipher(ctx, output_buffer, input_buffer, len);
+	if (!EVP_Cipher(ctx, output_buffer, input_buffer, len)) {
+		free(input_buffer);
+		(*ndo->ndo_warning)(ndo, "EVP_Cipher failed");
+		return;
+	}
 	free(input_buffer);
 	EVP_CIPHER_CTX_free(ctx);
 	/*
