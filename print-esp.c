@@ -111,7 +111,7 @@ struct sa_list {
 	u_char          spii[8];      /* for IKEv2 */
 	u_char          spir[8];
 	const EVP_CIPHER *evp;
-	int		ivlen;
+	u_int		ivlen;
 	int		authlen;
 	u_char          authsecret[256];
 	int             authsecret_len;
@@ -406,6 +406,7 @@ espprint_decode_encalgo(netdissect_options *ndo,
 
 	sa->evp = evp;
 	sa->authlen = authlen;
+	/* This returns an int, but it should never be negative */
 	sa->ivlen = EVP_CIPHER_iv_length(evp);
 
 	colon++;
@@ -688,9 +689,9 @@ esp_print(netdissect_options *ndo,
 	struct sa_list *sa = NULL;
 	const struct ip6_hdr *ip6 = NULL;
 	int advance;
-	int len;
+	u_int ctlen;
 	u_char *secret;
-	int ivlen = 0;
+	u_int ivlen;
 	const u_char *ivoff;
 	const u_char *p;
 	EVP_CIPHER_CTX *ctx;
@@ -745,7 +746,6 @@ esp_print(netdissect_options *ndo,
 			return;
 		/* XXX - check whether it's fragmented? */
 		/* if we can't get nexthdr, we do not need to decrypt it */
-		len = sizeof(struct ip6_hdr) + GET_BE_U_2(ip6->ip6_plen);
 
 		/* see if we can find the SA, and if so, decode it */
 		for (sa = ndo->ndo_sa_list_head; sa != NULL; sa = sa->next) {
@@ -761,7 +761,6 @@ esp_print(netdissect_options *ndo,
 		/* nexthdr & padding are in the last fragment */
 		if (fragmented)
 			return;
-		len = GET_BE_U_2(ip->ip_len);
 
 		/* see if we can find the SA, and if so, decode it */
 		for (sa = ndo->ndo_sa_list_head; sa != NULL; sa = sa->next) {
@@ -787,14 +786,6 @@ esp_print(netdissect_options *ndo,
 	if (sa == NULL)
 		return;
 
-	/* if we can't get nexthdr, we do not need to decrypt it */
-	if (ep - bp2 < len)
-		return;
-	if (ep - bp2 > len) {
-		/* FCS included at end of frame (NetBSD 1.6 or later) */
-		ep = bp2 + len;
-	}
-
 	/* pointer to the IV, if there is one */
 	ivoff = (const u_char *)(esp + 1) + 0;
 	/* length of the IV, if there is one; 0, if there isn't */
@@ -805,12 +796,27 @@ esp_print(netdissect_options *ndo,
 	 * isn't bigger than the total amount of data available and, if
 	 * not, slice that off.
 	 */
-	if (ep - bp < sa->authlen)
+	if (ep - bp < sa->authlen) {
+		nd_print_trunc(ndo);
 		return;
+	}
 	ep = ep - sa->authlen;
 
 	if (sa->evp == NULL)
 		return;
+
+	/*
+	 * If the next header value is past the end of the available
+	 * data, we won't be able to fetch it once we've decrypted
+	 * the ciphertext, so there's no point in decrypting the data.
+	 *
+	 * Report it as truncation.
+	 */
+	if (!ND_TTEST_1(ep - 1)) {
+		nd_print_trunc(ndo);
+		return;
+	}
+
 	ctx = EVP_CIPHER_CTX_new();
 	if (ctx == NULL) {
 		/*
@@ -834,7 +840,16 @@ esp_print(netdissect_options *ndo,
 		(*ndo->ndo_warning)(ndo, "IV init failed");
 		return;
 	}
-	len = ep - (p + ivlen);
+
+	/*
+	 * Calculate the length of the ciphertext.  ep points to
+	 * the beginning of the authentication data/integrity check
+	 * value, i.e. right past the end of the ciphertext; p points
+	 * to the beginning of the payload, i.e. to the initialization
+	 * vector, so if we skip past the initialization vector, it
+	 * points to the beginning of the ciphertext.
+	 */
+	ctlen = ep - (p + ivlen);
 
 	/*
 	 * Allocate buffers for the encrypted and decrypted
@@ -843,7 +858,7 @@ esp_print(netdissect_options *ndo,
 	 * be separate from the input buffer.
 	 */
 	block_size = (unsigned int)EVP_CIPHER_CTX_block_size(ctx);
-	buffer_size = len + (block_size - len % block_size);
+	buffer_size = ctlen + (block_size - ctlen % block_size);
 
 	/*
 	 * Attempt to allocate the input buffer.
@@ -858,8 +873,8 @@ esp_print(netdissect_options *ndo,
 	 * Copy the input data to the encrypted data buffer,
 	 * and pad it with zeroes.
 	 */
-	memcpy(input_buffer, p + ivlen, len);
-	memset(input_buffer + len, 0, buffer_size - len);
+	memcpy(input_buffer, p + ivlen, ctlen);
+	memset(input_buffer + ctlen, 0, buffer_size - ctlen);
 
 	/*
 	 * Attempt to allocate the output buffer.
@@ -872,7 +887,7 @@ esp_print(netdissect_options *ndo,
 			"esp_print: can't allocate memory for decryption buffer");
 	}
 
-	if (!EVP_Cipher(ctx, output_buffer, input_buffer, len)) {
+	if (!EVP_Cipher(ctx, output_buffer, input_buffer, ctlen)) {
 		free(input_buffer);
 		(*ndo->ndo_warning)(ndo, "EVP_Cipher failed");
 		return;
@@ -884,7 +899,7 @@ esp_print(netdissect_options *ndo,
 	 * const buffer, but changing this would require a
 	 * more complicated fix.
 	 */
-	memcpy(p + ivlen, output_buffer, len);
+	memcpy(p + ivlen, output_buffer, ctlen);
 	free(output_buffer);
 	advance = ivoff - (const u_char *)esp + ivlen;
 
