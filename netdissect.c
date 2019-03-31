@@ -144,3 +144,46 @@ nd_smi_version_string(void)
 	return (NULL);
 #endif
 }
+
+
+int
+nd_push_buffer(netdissect_options *ndo, u_char *new_buffer,
+    const u_char *new_packetp, const u_char *new_snapend)
+{
+	struct netdissect_saved_info *ndsi;
+
+	ndsi = (struct netdissect_saved_info *)malloc(sizeof(struct netdissect_saved_info));
+	if (ndsi == NULL)
+		return (0);	/* fail */
+	ndsi->ndsi_buffer = new_buffer;
+	ndsi->ndsi_packetp = ndo->ndo_packetp;
+	ndsi->ndsi_snapend = ndo->ndo_snapend;
+	ndsi->ndsi_prev = ndo->ndo_buffer_stack;
+
+	ndo->ndo_packetp = new_packetp;
+	ndo->ndo_snapend = new_snapend;
+	ndo->ndo_buffer_stack = ndsi;
+
+	return (1);	/* success */
+}
+
+void
+nd_pop_buffer(netdissect_options *ndo)
+{
+	struct netdissect_saved_info *ndsi;
+
+	ndsi = ndo->ndo_buffer_stack;
+	ndo->ndo_packetp = ndsi->ndsi_packetp;
+	ndo->ndo_snapend = ndsi->ndsi_snapend;
+	ndo->ndo_buffer_stack = ndsi->ndsi_prev;
+
+	free(ndsi->ndsi_buffer);
+	free(ndsi);
+}
+
+void
+nd_pop_all_buffers(netdissect_options *ndo)
+{
+	while (ndo->ndo_buffer_stack != NULL)
+		nd_pop_buffer(ndo);
+}

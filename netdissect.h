@@ -168,6 +168,26 @@ typedef struct netdissect_options netdissect_options;
 
 typedef u_int (*if_printer) IF_PRINTER_ARGS;
 
+/*
+ * In case the data in a buffer needs to be processed by being decrypted,
+ * decompressed, etc. before it's dissected, we can't process it in place,
+ * we have to allocate a new buffer for the processed data.
+ *
+ * We keep a stack of those buffers; when we allocate a new buffer, we
+ * push the current one onto a stack, and when we're done with the new
+ * buffer, we free the current buffer and pop the previous one off the
+ * stack.
+ *
+ * A buffer has a beginnning and end pointer, and a link to the previous
+ * buffer on the stack.
+ */
+struct netdissect_saved_info {
+  u_char *ndsi_buffer;				/* pointer to allocated buffer data */
+  const u_char *ndsi_packetp;			/* saved beginning of data */
+  const u_char *ndsi_snapend;			/* saved end of data */
+  struct netdissect_saved_info *ndsi_prev;	/* previous buffer on the stack */
+};
+
 struct netdissect_options {
   int ndo_bflag;		/* print 4 byte ASes in ASDOT notation */
   int ndo_eflag;		/* print ethernet header */
@@ -208,6 +228,9 @@ struct netdissect_options {
   const u_char *ndo_packetp;
   const u_char *ndo_snapend;
 
+  /* stack of saved buffer information */
+  struct netdissect_saved_info *ndo_buffer_stack;
+
   /* pointer to the if_printer function */
   if_printer ndo_if_printer;
 
@@ -229,6 +252,11 @@ struct netdissect_options {
 		      const char *fmt, ...)
 		      PRINTFLIKE_FUNCPTR(2, 3);
 };
+
+extern int nd_push_buffer(netdissect_options *, u_char *, const u_char *,
+    const u_char *);
+extern void nd_pop_buffer(netdissect_options *);
+extern void nd_pop_all_buffers(netdissect_options *);
 
 #define PT_VAT		1	/* Visual Audio Tool */
 #define PT_WB		2	/* distributed White Board */

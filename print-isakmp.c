@@ -2697,6 +2697,13 @@ ikev2_e_print(netdissect_options *ndo,
 		/* got it decrypted, print stuff inside. */
 		ikev2_sub_print(ndo, base, np, ext,
 				ndo->ndo_snapend, phase, doi, proto, depth+1);
+
+		/*
+		 * esp_print_decrypt_buffer_by_ikev2 pushed information
+		 * on the buffer stack; we're done with the buffer, so
+		 * pop it (which frees the buffer)
+		 */
+		nd_pop_buffer(ndo);
 	}
 #endif
 

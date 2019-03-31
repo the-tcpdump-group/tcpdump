@@ -179,7 +179,16 @@ set_cipher_parameters(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher,
 #endif
 
 /*
- * this will adjust ndo_packetp and ndo_snapend to new buffer!
+ * This will allocate a new buffer containing the decrypted data.
+ * It returns 1 on success and 0 on failure.
+ *
+ * It will push the new buffer and the values of ndo->ndo_packetp and
+ * ndo->ndo_snapend onto the buffer stack, and change ndo->ndo_packetp
+ * and ndo->ndo_snapend to refer to the new buffer.
+ *
+ * Our caller must pop the buffer off the stack when it's finished
+ * dissecting anything in it and before it does any dissection of
+ * anything in the old buffer.  That will free the new buffer.
  */
 USES_APPLE_DEPRECATED_API
 int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
@@ -190,10 +199,12 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 {
 	struct sa_list *sa;
 	const u_char *iv;
+	const u_char *ct;
 	unsigned int len;
 	EVP_CIPHER_CTX *ctx;
 	unsigned int block_size, buffer_size;
 	u_char *input_buffer, *output_buffer;
+	const u_char *pt;
 
 	/* initiator arg is any non-zero value */
 	if(initiator) initiator=1;
@@ -216,10 +227,10 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 	 */
 	end = end - sa->authlen;
 	iv  = buf;
-	buf = buf + sa->ivlen;
-	len = end-buf;
+	ct = iv + sa->ivlen;
+	len = end-ct;
 
-	if(end <= buf) return 0;
+	if(end <= ct) return 0;
 
 	ctx = EVP_CIPHER_CTX_new();
 	if (ctx == NULL)
@@ -254,7 +265,7 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 	 * Copy the input data to the encrypted data buffer, and pad it
 	 * with zeroes.
 	 */
-	memcpy(input_buffer, buf, len);
+	memcpy(input_buffer, ct, len);
 	memset(input_buffer + len, 0, buffer_size - len);
 
 	/*
@@ -274,15 +285,24 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 	EVP_CIPHER_CTX_free(ctx);
 
 	/*
-	 * XXX - of course this is wrong, because buf is a const buffer,
-	 * but changing this would require a more complicated fix.
+	 * Free the input buffer; we no longer need it.
 	 */
-	memcpy(buf, output_buffer, len);
 	free(input_buffer);
-	free(output_buffer);
 
-	ndo->ndo_packetp = buf;
-	ndo->ndo_snapend = end;
+	/*
+	 * Get a pointer to the plaintext.
+	 */
+	pt = output_buffer;
+
+	/*
+	 * Switch to the output buffer for dissection, and save it
+	 * on the buffer stack so it can be freed; our caller must
+	 * pop it when done.
+	 */
+	if (!nd_push_buffer(ndo, output_buffer, pt, pt + len)) {
+		free(output_buffer);
+		return 0;
+	}
 
 	return 1;
 }
@@ -695,6 +715,8 @@ esp_print(netdissect_options *ndo,
 	EVP_CIPHER_CTX *ctx;
 	unsigned int block_size, buffer_size;
 	u_char *input_buffer, *output_buffer;
+	const u_char *pt;
+	u_int ptlen;
 	u_int padlen;
 	u_int nh;
 #endif
@@ -888,13 +910,28 @@ esp_print(netdissect_options *ndo,
 	}
 	free(input_buffer);
 	EVP_CIPHER_CTX_free(ctx);
+
 	/*
-	 * XXX - of course this is wrong, because buf is a
-	 * const buffer, but changing this would require a
-	 * more complicated fix.
+	 * Pointer to the plaintext.
 	 */
-	memcpy(ct, output_buffer, ctlen);
-	free(output_buffer);
+	pt = output_buffer;
+
+	/*
+	 * Length of the plaintext, which is the same as the length
+	 * of the ciphertext.
+	 */
+	ptlen = ctlen;
+
+	/*
+	 * Switch to the output buffer for dissection, and
+	 * save it on the buffer stack so it can be freed.
+	 */
+	if (!nd_push_buffer(ndo, output_buffer, pt, pt + ctlen)) {
+		free(output_buffer);
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+			"esp_print: can't push buffer on buffer stack");
+	}
+	ep = pt + ptlen;
 
 	/*
 	 * Sanity check for pad length; if it, plus 2 for the pad
@@ -906,7 +943,7 @@ esp_print(netdissect_options *ndo,
 	 * "plaintext" is not what was being sent.
 	 */
 	padlen = GET_U_1(ep - 2);
-	if (padlen + 2 > ctlen) {
+	if (padlen + 2 > ptlen) {
 		nd_print_trunc(ndo);
 		return;
 	}
@@ -916,9 +953,12 @@ esp_print(netdissect_options *ndo,
 
 	ND_PRINT(": ");
 
-	/* Now print the payload. */
-	ip_print_demux(ndo, ct, ctlen - (padlen + 2),  ver, fragmented,
+	/* Now dissect the plaintext. */
+	ip_print_demux(ndo, pt, ptlen - (padlen + 2), ver, fragmented,
 	    ttl_hl, nh, bp2);
+
+	/* Pop the buffer, freeing it. */
+	nd_pop_buffer(ndo);
 #endif
 }
 #ifdef HAVE_LIBCRYPTO
