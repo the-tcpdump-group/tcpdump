@@ -688,12 +688,10 @@ esp_print(netdissect_options *ndo,
 	const struct ip *ip;
 	struct sa_list *sa = NULL;
 	const struct ip6_hdr *ip6 = NULL;
-	int advance;
-	u_int ctlen;
-	u_char *secret;
+	const u_char *ivptr;
 	u_int ivlen;
-	const u_char *ivoff;
-	const u_char *p;
+	const u_char *ctptr;
+	u_int ctlen;
 	EVP_CIPHER_CTX *ctx;
 	unsigned int block_size, buffer_size;
 	u_char *input_buffer, *output_buffer;
@@ -703,16 +701,6 @@ esp_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "esp";
 	esp = (const struct newesp *)bp;
-
-#ifdef HAVE_LIBCRYPTO
-	secret = NULL;
-	advance = 0;
-#endif
-
-#if 0
-	/* keep secret out of a register */
-	p = (u_char *)&secret;
-#endif
 
 	/* 'ep' points to the end of available data. */
 	ep = ndo->ndo_snapend;
@@ -787,20 +775,37 @@ esp_print(netdissect_options *ndo,
 		return;
 
 	/* pointer to the IV, if there is one */
-	ivoff = (const u_char *)(esp + 1) + 0;
+	ivptr = (const u_char *)(esp + 1) + 0;
 	/* length of the IV, if there is one; 0, if there isn't */
 	ivlen = sa->ivlen;
-	secret = sa->secret;
+
+	/*
+	 * Get a pointer to the ciphertext.
+	 *
+	 * p points to the beginning of the payload, i.e. to the
+	 * initialization vector, so if we skip past the initialization
+	 * vector, it points to the beginning of the ciphertext.
+	 */
+	ctptr = ivptr + ivlen;
+
 	/*
 	 * Make sure the authentication data/integrity check value length
-	 * isn't bigger than the total amount of data available and, if
-	 * not, slice that off.
+	 * isn't bigger than the total amount of data available after
+	 * the ESP header and initialization vector is removed and,
+	 * if not, slice the authentication data/ICV off.
 	 */
-	if (ep - bp < sa->authlen) {
+	if (ep - ctptr < sa->authlen) {
 		nd_print_trunc(ndo);
 		return;
 	}
 	ep = ep - sa->authlen;
+
+	/*
+	 * Calculate the length of the ciphertext.  ep points to
+	 * the beginning of the authentication data/integrity check
+	 * value, i.e. right past the end of the ciphertext; 
+	 */
+	ctlen = ep - ctptr;
 
 	if (sa->evp == NULL)
 		return;
@@ -830,26 +835,15 @@ esp_print(netdissect_options *ndo,
 			"esp_print: can't allocate memory for cipher context");
 	}
 
-	if (set_cipher_parameters(ctx, sa->evp, secret, NULL, 0) < 0) {
+	if (set_cipher_parameters(ctx, sa->evp, sa->secret, NULL, 0) < 0) {
 		(*ndo->ndo_warning)(ndo, "espkey init failed");
 		return;
 	}
 
-	p = ivoff;
-	if (set_cipher_parameters(ctx, NULL, NULL, p, 0) < 0) {
+	if (set_cipher_parameters(ctx, NULL, NULL, ivptr, 0) < 0) {
 		(*ndo->ndo_warning)(ndo, "IV init failed");
 		return;
 	}
-
-	/*
-	 * Calculate the length of the ciphertext.  ep points to
-	 * the beginning of the authentication data/integrity check
-	 * value, i.e. right past the end of the ciphertext; p points
-	 * to the beginning of the payload, i.e. to the initialization
-	 * vector, so if we skip past the initialization vector, it
-	 * points to the beginning of the ciphertext.
-	 */
-	ctlen = ep - (p + ivlen);
 
 	/*
 	 * Allocate buffers for the encrypted and decrypted
@@ -873,7 +867,7 @@ esp_print(netdissect_options *ndo,
 	 * Copy the input data to the encrypted data buffer,
 	 * and pad it with zeroes.
 	 */
-	memcpy(input_buffer, p + ivlen, ctlen);
+	memcpy(input_buffer, ctptr, ctlen);
 	memset(input_buffer + ctlen, 0, buffer_size - ctlen);
 
 	/*
@@ -899,37 +893,23 @@ esp_print(netdissect_options *ndo,
 	 * const buffer, but changing this would require a
 	 * more complicated fix.
 	 */
-	memcpy(p + ivlen, output_buffer, ctlen);
+	memcpy(ctptr, output_buffer, ctlen);
 	free(output_buffer);
-	advance = ivoff - (const u_char *)esp + ivlen;
 
 	/*
-	 * Sanity check for pad length.
+	 * Sanity check for pad length; if it, plus 2 for the pad
+	 * length and next header fields, is bigger than the ciphertext
+	 * length (which is also the plaintext length), it's too big.
 	 *
 	 * XXX - the check can fail if the packet is corrupt *or* if
 	 * it was not decrypted with the correct key, so that the
 	 * "plaintext" is not what was being sent.
 	 */
 	padlen = GET_U_1(ep - 2);
-	if (ep - bp < padlen) {
+	if (padlen + 2 > ctlen) {
 		nd_print_trunc(ndo);
 		return;
 	}
-
-	/*
-	 * Sanity check for payload length; +2 is for the pad length
-	 * and next header fields.
-	 *
-	 * XXX - the check can fail if the packet is corrupt *or* if
-	 * it was not decrypted with the correct key, so that the
-	 * "plaintext" is not what was being sent.
-	 */
-	if (length <= advance + padlen + 2) {
-		nd_print_trunc(ndo);
-		return;
-	}
-	bp += advance;
-	length -= advance + padlen + 2;
 
 	/* Get the next header */
 	nh = GET_U_1(ep - 1);
@@ -937,7 +917,8 @@ esp_print(netdissect_options *ndo,
 	ND_PRINT(": ");
 
 	/* Now print the payload. */
-	ip_print_demux(ndo, bp, length, ver, fragmented, ttl_hl, nh, bp2);
+	ip_print_demux(ndo, ctptr, ctlen - (padlen + 2),  ver, fragmented,
+	    ttl_hl, nh, bp2);
 #endif
 }
 #ifdef HAVE_LIBCRYPTO
