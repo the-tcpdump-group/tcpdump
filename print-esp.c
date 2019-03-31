@@ -688,9 +688,9 @@ esp_print(netdissect_options *ndo,
 	const struct ip *ip;
 	struct sa_list *sa = NULL;
 	const struct ip6_hdr *ip6 = NULL;
-	const u_char *ivptr;
+	const u_char *iv;
 	u_int ivlen;
-	const u_char *ctptr;
+	const u_char *ct;
 	u_int ctlen;
 	EVP_CIPHER_CTX *ctx;
 	unsigned int block_size, buffer_size;
@@ -775,7 +775,7 @@ esp_print(netdissect_options *ndo,
 		return;
 
 	/* pointer to the IV, if there is one */
-	ivptr = (const u_char *)(esp + 1) + 0;
+	iv = (const u_char *)(esp + 1) + 0;
 	/* length of the IV, if there is one; 0, if there isn't */
 	ivlen = sa->ivlen;
 
@@ -786,7 +786,7 @@ esp_print(netdissect_options *ndo,
 	 * initialization vector, so if we skip past the initialization
 	 * vector, it points to the beginning of the ciphertext.
 	 */
-	ctptr = ivptr + ivlen;
+	ct = iv + ivlen;
 
 	/*
 	 * Make sure the authentication data/integrity check value length
@@ -794,7 +794,7 @@ esp_print(netdissect_options *ndo,
 	 * the ESP header and initialization vector is removed and,
 	 * if not, slice the authentication data/ICV off.
 	 */
-	if (ep - ctptr < sa->authlen) {
+	if (ep - ct < sa->authlen) {
 		nd_print_trunc(ndo);
 		return;
 	}
@@ -805,7 +805,7 @@ esp_print(netdissect_options *ndo,
 	 * the beginning of the authentication data/integrity check
 	 * value, i.e. right past the end of the ciphertext; 
 	 */
-	ctlen = ep - ctptr;
+	ctlen = ep - ct;
 
 	if (sa->evp == NULL)
 		return;
@@ -840,7 +840,7 @@ esp_print(netdissect_options *ndo,
 		return;
 	}
 
-	if (set_cipher_parameters(ctx, NULL, NULL, ivptr, 0) < 0) {
+	if (set_cipher_parameters(ctx, NULL, NULL, iv, 0) < 0) {
 		(*ndo->ndo_warning)(ndo, "IV init failed");
 		return;
 	}
@@ -867,7 +867,7 @@ esp_print(netdissect_options *ndo,
 	 * Copy the input data to the encrypted data buffer,
 	 * and pad it with zeroes.
 	 */
-	memcpy(input_buffer, ctptr, ctlen);
+	memcpy(input_buffer, ct, ctlen);
 	memset(input_buffer + ctlen, 0, buffer_size - ctlen);
 
 	/*
@@ -893,7 +893,7 @@ esp_print(netdissect_options *ndo,
 	 * const buffer, but changing this would require a
 	 * more complicated fix.
 	 */
-	memcpy(ctptr, output_buffer, ctlen);
+	memcpy(ct, output_buffer, ctlen);
 	free(output_buffer);
 
 	/*
@@ -917,7 +917,7 @@ esp_print(netdissect_options *ndo,
 	ND_PRINT(": ");
 
 	/* Now print the payload. */
-	ip_print_demux(ndo, ctptr, ctlen - (padlen + 2),  ver, fragmented,
+	ip_print_demux(ndo, ct, ctlen - (padlen + 2),  ver, fragmented,
 	    ttl_hl, nh, bp2);
 #endif
 }
