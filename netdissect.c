@@ -30,6 +30,7 @@
 #include "netdissect.h"
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #ifdef USE_LIBSMI
 #include <smi.h>
