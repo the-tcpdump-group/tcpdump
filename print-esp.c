@@ -825,7 +825,7 @@ esp_print(netdissect_options *ndo,
 	/*
 	 * Calculate the length of the ciphertext.  ep points to
 	 * the beginning of the authentication data/integrity check
-	 * value, i.e. right past the end of the ciphertext; 
+	 * value, i.e. right past the end of the ciphertext;
 	 */
 	ctlen = ep - ct;
 
