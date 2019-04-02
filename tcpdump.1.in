@@ -478,6 +478,19 @@ The supported values for \fItimestamp_precision\fP are \fBmicro\fP for
 microsecond resolution and \fBnano\fP for nanosecond resolution.  The
 default is microsecond resolution.
 .TP
+.B \-\-micro
+.PD 0
+.TP
+.B \-\-nano
+.PD
+Shorthands for \fB\-\-time\-stamp\-precision=micro\fP or
+\fB\-\-time\-stamp\-precision=nano\fP, adjusting the time stamp
+precision accordingly.  When reading packets from a savefile, using
+\fB\-\-micro\fP truncates time stamps if the savefile was created with
+nanosecond precision.  In contrast, a savefile created with microsecond
+precision will have trailing zeroes added to the time stamp when
+\fB\-\-nano\fP is used.
+.TP
 .B \-K
 .PD 0
 .TP
