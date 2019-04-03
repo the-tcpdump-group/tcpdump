@@ -164,7 +164,7 @@ brcm_tag_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	 * +-----------++-----------++----------------++--------------+
 	 */
 	ret = ether_print_hdr_len(ndo, p, length, caplen, NULL, NULL,
-				  ETHER_SA_OFFSET + BRCM_TAG_LEN + 2);
+				  ETHER_SA_OFFSET + BRCM_TAG_LEN + ETHER_TYPE_LEN);
 	ndo->ndo_eflag = old_eflag;
 	return ret;
 }
