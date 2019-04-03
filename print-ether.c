@@ -106,7 +106,7 @@ const struct tok ethertype_values[] = {
 
 static void
 ether_hdr_print(netdissect_options *ndo,
-                const u_char *bp, u_int length,
+		const u_char *bp, u_int length,
 		u_int hdrlen)
 {
 	const struct ether_header *ehp;
@@ -115,25 +115,25 @@ ether_hdr_print(netdissect_options *ndo,
 	ehp = (const struct ether_header *)bp;
 
 	ND_PRINT("%s > %s",
-		     etheraddr_string(ndo, ehp->ether_shost),
-		     etheraddr_string(ndo, ehp->ether_dhost));
+		 etheraddr_string(ndo, ehp->ether_shost),
+		 etheraddr_string(ndo, ehp->ether_dhost));
 
 	length_type = GET_BE_U_2(bp + (hdrlen - sizeof(ehp->ether_length_type)));
 	if (!ndo->ndo_qflag) {
-	        if (length_type <= MAX_ETHERNET_LENGTH_VAL) {
-		        ND_PRINT(", 802.3");
+		if (length_type <= MAX_ETHERNET_LENGTH_VAL) {
+			ND_PRINT(", 802.3");
 			length = length_type;
 		} else
-		        ND_PRINT(", ethertype %s (0x%04x)",
-				       tok2str(ethertype_values,"Unknown", length_type),
-                                       length_type);
-        } else {
-                if (length_type <= MAX_ETHERNET_LENGTH_VAL) {
-                        ND_PRINT(", 802.3");
+			ND_PRINT(", ethertype %s (0x%04x)",
+				 tok2str(ethertype_values,"Unknown", length_type),
+				 length_type);
+	} else {
+		if (length_type <= MAX_ETHERNET_LENGTH_VAL) {
+			ND_PRINT(", 802.3");
 			length = length_type;
 		} else
-                        ND_PRINT(", %s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", length_type));
-        }
+			ND_PRINT(", %s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", length_type));
+	}
 
 	ND_PRINT(", length %u: ", length);
 }
@@ -149,9 +149,9 @@ ether_hdr_print(netdissect_options *ndo,
  */
 u_int
 ether_print_hdr_len(netdissect_options *ndo,
-            const u_char *p, u_int length, u_int caplen,
-            void (*print_encap_header)(netdissect_options *ndo, const u_char *),
-            const u_char *encap_header_arg, u_int hdrlen)
+		    const u_char *p, u_int length, u_int caplen,
+		    void (*print_encap_header)(netdissect_options *ndo, const u_char *),
+		    const u_char *encap_header_arg, u_int hdrlen)
 {
 	const struct ether_header *ehp;
 	u_int orig_length;
@@ -209,9 +209,9 @@ recurse:
 		}
 		hdrlen += llc_hdrlen;
 	} else if (length_type == ETHERTYPE_8021Q  ||
-                length_type == ETHERTYPE_8021Q9100 ||
-                length_type == ETHERTYPE_8021Q9200 ||
-                length_type == ETHERTYPE_8021QinQ) {
+		length_type == ETHERTYPE_8021Q9100 ||
+		length_type == ETHERTYPE_8021Q9200 ||
+		length_type == ETHERTYPE_8021QinQ) {
 		/*
 		 * Print VLAN information, and then go back and process
 		 * the enclosed type field.
@@ -226,7 +226,7 @@ recurse:
 			nd_print_trunc(ndo);
 			return (hdrlen + length);
 		}
-	        if (ndo->ndo_eflag) {
+		if (ndo->ndo_eflag) {
 			uint16_t tag = GET_BE_U_2(p);
 
 			ND_PRINT("%s, ", ieee8021q_tci_string(tag));
@@ -286,13 +286,13 @@ recurse:
  */
 u_int
 ether_print(netdissect_options *ndo,
-            const u_char *p, u_int length, u_int caplen,
-            void (*print_encap_header)(netdissect_options *ndo, const u_char *),
-            const u_char *encap_header_arg)
+	    const u_char *p, u_int length, u_int caplen,
+	    void (*print_encap_header)(netdissect_options *ndo, const u_char *),
+	    const u_char *encap_header_arg)
 {
 	return (ether_print_hdr_len(ndo, p, length, caplen,
-					  print_encap_header, encap_header_arg,
-					  ETHER_HDRLEN));
+				    print_encap_header, encap_header_arg,
+				    ETHER_HDRLEN));
 }
 
 /*
@@ -303,7 +303,7 @@ ether_print(netdissect_options *ndo,
  */
 u_int
 ether_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
-               const u_char *p)
+	       const u_char *p)
 {
 	ndo->ndo_protocol = "ether_if";
 	return (ether_print(ndo, p, h->len, h->caplen, NULL, NULL));
@@ -320,7 +320,7 @@ ether_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
  */
 u_int
 netanalyzer_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
-                     const u_char *p)
+		     const u_char *p)
 {
 	/*
 	 * Fail if we don't have enough data for the Hilscher pseudo-header.
@@ -347,8 +347,8 @@ netanalyzer_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
  */
 u_int
 netanalyzer_transparent_if_print(netdissect_options *ndo,
-                                 const struct pcap_pkthdr *h,
-                                 const u_char *p)
+				 const struct pcap_pkthdr *h,
+				 const u_char *p)
 {
 	/*
 	 * Fail if we don't have enough data for the Hilscher pseudo-header,
@@ -373,14 +373,14 @@ netanalyzer_transparent_if_print(netdissect_options *ndo,
 
 int
 ethertype_print(netdissect_options *ndo,
-                u_short ether_type, const u_char *p,
-                u_int length, u_int caplen,
-                const struct lladdr_info *src, const struct lladdr_info *dst)
+		u_short ether_type, const u_char *p,
+		u_int length, u_int caplen,
+		const struct lladdr_info *src, const struct lladdr_info *dst)
 {
 	switch (ether_type) {
 
 	case ETHERTYPE_IP:
-	        ip_print(ndo, p, length);
+		ip_print(ndo, p, length);
 		return (1);
 
 	case ETHERTYPE_IPV6:
@@ -389,7 +389,7 @@ ethertype_print(netdissect_options *ndo,
 
 	case ETHERTYPE_ARP:
 	case ETHERTYPE_REVARP:
-	        arp_print(ndo, p, length, caplen);
+		arp_print(ndo, p, length, caplen);
 		return (1);
 
 	case ETHERTYPE_DN:
@@ -428,11 +428,11 @@ ethertype_print(netdissect_options *ndo,
 		return (1);
 
 	case ETHERTYPE_EAPOL:
-	        eap_print(ndo, p, length);
+		eap_print(ndo, p, length);
 		return (1);
 
 	case ETHERTYPE_RRCP:
-	        rrcp_print(ndo, p, length, src, dst);
+		rrcp_print(ndo, p, length, src, dst);
 		return (1);
 
 	case ETHERTYPE_PPP:
@@ -443,11 +443,11 @@ ethertype_print(netdissect_options *ndo,
 		return (1);
 
 	case ETHERTYPE_MPCP:
-	        mpcp_print(ndo, p, length);
+		mpcp_print(ndo, p, length);
 		return (1);
 
 	case ETHERTYPE_SLOW:
-	        slow_print(ndo, p, length);
+		slow_print(ndo, p, length);
 		return (1);
 
 	case ETHERTYPE_CFM:
@@ -459,13 +459,13 @@ ethertype_print(netdissect_options *ndo,
 		lldp_print(ndo, p, length);
 		return (1);
 
-        case ETHERTYPE_NSH:
-                nsh_print(ndo, p, length);
-                return (1);
+	case ETHERTYPE_NSH:
+		nsh_print(ndo, p, length);
+		return (1);
 
-        case ETHERTYPE_LOOPBACK:
+	case ETHERTYPE_LOOPBACK:
 		loopback_print(ndo, p, length);
-                return (1);
+		return (1);
 
 	case ETHERTYPE_MPLS:
 	case ETHERTYPE_MPLS_MULTI:
@@ -480,14 +480,14 @@ ethertype_print(netdissect_options *ndo,
 		msnlb_print(ndo, p);
 		return (1);
 
-        case ETHERTYPE_GEONET_OLD:
-        case ETHERTYPE_GEONET:
-                geonet_print(ndo, p, length, src);
-                return (1);
+	case ETHERTYPE_GEONET_OLD:
+	case ETHERTYPE_GEONET:
+		geonet_print(ndo, p, length, src);
+		return (1);
 
-        case ETHERTYPE_CALM_FAST:
-                calm_fast_print(ndo, p, length, src);
-                return (1);
+	case ETHERTYPE_CALM_FAST:
+		calm_fast_print(ndo, p, length, src);
+		return (1);
 
 	case ETHERTYPE_AOE:
 		aoe_print(ndo, p, length);
