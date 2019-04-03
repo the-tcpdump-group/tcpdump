@@ -148,7 +148,7 @@ ether_hdr_print(netdissect_options *ndo,
  * FIXME: caplen can and should be derived from ndo->ndo_snapend and p.
  */
 u_int
-ether_print_hdr_len(netdissect_options *ndo,
+ether_hdr_len_print(netdissect_options *ndo,
 		    const u_char *p, u_int length, u_int caplen,
 		    void (*print_encap_header)(netdissect_options *ndo, const u_char *),
 		    const u_char *encap_header_arg, u_int hdrlen)
@@ -290,7 +290,7 @@ ether_print(netdissect_options *ndo,
 	    void (*print_encap_header)(netdissect_options *ndo, const u_char *),
 	    const u_char *encap_header_arg)
 {
-	return (ether_print_hdr_len(ndo, p, length, caplen,
+	return (ether_hdr_len_print(ndo, p, length, caplen,
 				    print_encap_header, encap_header_arg,
 				    ETHER_HDRLEN));
 }

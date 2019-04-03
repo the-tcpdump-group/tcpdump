@@ -571,7 +571,7 @@ extern void egp_print(netdissect_options *, const u_char *, u_int);
 extern void eigrp_print(netdissect_options *, const u_char *, u_int);
 extern void esp_print(netdissect_options *, const u_char *, u_int, const u_char *, u_int, int, u_int);
 extern u_int ether_print(netdissect_options *, const u_char *, u_int, u_int, void (*)(netdissect_options *, const u_char *), const u_char *);
-extern u_int ether_print_hdr_len(netdissect_options *, const u_char *, u_int, u_int, void (*)(netdissect_options *, const u_char *), const u_char *, u_int);
+extern u_int ether_hdr_len_print(netdissect_options *, const u_char *, u_int, u_int, void (*)(netdissect_options *, const u_char *), const u_char *, u_int);
 extern int ethertype_print(netdissect_options *, u_short, const u_char *, u_int, u_int, const struct lladdr_info *, const struct lladdr_info *);
 extern u_int fddi_print(netdissect_options *, const u_char *, u_int, u_int);
 extern void forces_print(netdissect_options *, const u_char *, u_int);

@@ -163,7 +163,7 @@ brcm_tag_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	 * | MAC DA (6)|| MAC SA (6)||Broadcom tag (4)||Type/Length(2)|
 	 * +-----------++-----------++----------------++--------------+
 	 */
-	ret = ether_print_hdr_len(ndo, p, length, caplen, NULL, NULL,
+	ret = ether_hdr_len_print(ndo, p, length, caplen, NULL, NULL,
 				  ETHER_SA_OFFSET + BRCM_TAG_LEN + ETHER_TYPE_LEN);
 	ndo->ndo_eflag = old_eflag;
 	return ret;
