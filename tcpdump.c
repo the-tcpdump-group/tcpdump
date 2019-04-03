@@ -92,6 +92,19 @@ The Regents of the University of California.  All rights reserved.\n";
 #endif	/* HAVE_CASPER */
 #endif	/* HAVE_CAPSICUM */
 #ifdef HAVE_PCAP_OPEN
+/*
+ * We found pcap_open() in the capture library, so we'll be using
+ * the remote capture APIs; define PCAP_REMOTE before we include pcap.h,
+ * so we get those APIs declared, and the types and #defines that they
+ * use defined.
+ *
+ * WinPcap's headers require that PCAP_REMOTE be defined in order to get
+ * remote-capture APIs declared and types and #defines that they use
+ * defined.
+ *
+ * (Versions of libpcap with those APIs, and thus Npcap, which is based on
+ * those versions of libpcap, don't require it.)
+ */
 #define HAVE_REMOTE
 #endif
 #include <pcap.h>
