@@ -303,7 +303,7 @@ dhcpv4_print(netdissect_options *ndo,
             const u_char *tp = value;
             while (tp < value + optlen) {
                 ND_PRINT(" ");
-                if ((tp = ns_nprint(ndo, tp, value + optlen)) == NULL)
+                if ((tp = fqdn_print(ndo, tp, value + optlen)) == NULL)
                     return -1;
             }
         }
@@ -356,7 +356,7 @@ dhcpv6_print(netdissect_options *ndo,
                 const u_char *tp = value;
                 while (tp < value + optlen) {
                     ND_PRINT(" ");
-                    if ((tp = ns_nprint(ndo, tp, value + optlen)) == NULL)
+                    if ((tp = fqdn_print(ndo, tp, value + optlen)) == NULL)
                         return -1;
                 }
             }

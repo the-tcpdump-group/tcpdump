@@ -569,7 +569,7 @@ dhcp6opt_print(netdissect_options *ndo,
 			tp = (const u_char *)(dh6o + 1);
 			while (tp < cp + sizeof(*dh6o) + optlen) {
 				ND_PRINT(" ");
-				if ((tp = ns_nprint(ndo, tp, cp + sizeof(*dh6o) + optlen)) == NULL)
+				if ((tp = fqdn_print(ndo, tp, cp + sizeof(*dh6o) + optlen)) == NULL)
 					goto trunc;
 			}
 			ND_PRINT(")");
@@ -724,7 +724,7 @@ dhcp6opt_print(netdissect_options *ndo,
 					break;
 				case DH6OPT_NTP_SUBOPTION_SRV_FQDN:
 					ND_PRINT(" ");
-					if (ns_nprint(ndo, tp, tp + subopt_len) == NULL)
+					if (fqdn_print(ndo, tp, tp + subopt_len) == NULL)
 						goto trunc;
 					break;
 				default:

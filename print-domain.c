@@ -98,7 +98,6 @@ ns_nskip(netdissect_options *ndo,
 	return (cp);
 }
 
-/* print a <domain-name> */
 static const u_char *
 blabel_print(netdissect_options *ndo,
              const u_char *cp)
@@ -162,8 +161,9 @@ labellen(netdissect_options *ndo,
 		return(i);
 }
 
+/* print a <domain-name> */
 const u_char *
-ns_nprint(netdissect_options *ndo,
+fqdn_print(netdissect_options *ndo,
           const u_char *cp, const u_char *bp)
 {
 	u_int i, l;
@@ -376,7 +376,7 @@ ns_qprint(netdissect_options *ndo,
 	}
 
 	ND_PRINT("? ");
-	cp = ns_nprint(ndo, np, bp);
+	cp = fqdn_print(ndo, np, bp);
 	return(cp ? cp + 4 : NULL);
 }
 
@@ -391,7 +391,7 @@ ns_rprint(netdissect_options *ndo,
 
 	if (ndo->ndo_vflag) {
 		ND_PRINT(" ");
-		if ((cp = ns_nprint(ndo, cp, bp)) == NULL)
+		if ((cp = fqdn_print(ndo, cp, bp)) == NULL)
 			return NULL;
 	} else
 		cp = ns_nskip(ndo, cp);
@@ -456,7 +456,7 @@ ns_rprint(netdissect_options *ndo,
 	case T_DNAME:
 #endif
 		ND_PRINT(" ");
-		if (ns_nprint(ndo, cp, bp) == NULL)
+		if (fqdn_print(ndo, cp, bp) == NULL)
 			return(NULL);
 		break;
 
@@ -464,10 +464,10 @@ ns_rprint(netdissect_options *ndo,
 		if (!ndo->ndo_vflag)
 			break;
 		ND_PRINT(" ");
-		if ((cp = ns_nprint(ndo, cp, bp)) == NULL)
+		if ((cp = fqdn_print(ndo, cp, bp)) == NULL)
 			return(NULL);
 		ND_PRINT(" ");
-		if ((cp = ns_nprint(ndo, cp, bp)) == NULL)
+		if ((cp = fqdn_print(ndo, cp, bp)) == NULL)
 			return(NULL);
 		if (!ND_TTEST_LEN(cp, 5 * 4))
 			return(NULL);
@@ -486,7 +486,7 @@ ns_rprint(netdissect_options *ndo,
 		ND_PRINT(" ");
 		if (!ND_TTEST_2(cp))
 			return(NULL);
-		if (ns_nprint(ndo, cp + 2, bp) == NULL)
+		if (fqdn_print(ndo, cp + 2, bp) == NULL)
 			return(NULL);
 		ND_PRINT(" %u", GET_BE_U_2(cp));
 		break;
@@ -505,7 +505,7 @@ ns_rprint(netdissect_options *ndo,
 		ND_PRINT(" ");
 		if (!ND_TTEST_6(cp))
 			return(NULL);
-		if (ns_nprint(ndo, cp + 6, bp) == NULL)
+		if (fqdn_print(ndo, cp + 6, bp) == NULL)
 			return(NULL);
 		ND_PRINT(":%u %u %u", GET_BE_U_2(cp + 4),
 			  GET_BE_U_2(cp), GET_BE_U_2(cp + 2));
@@ -546,7 +546,7 @@ ns_rprint(netdissect_options *ndo,
 		}
 		if (pbit > 0) {
 			ND_PRINT(" ");
-			if (ns_nprint(ndo, cp + 1 + sizeof(a) - pbyte, bp) == NULL)
+			if (fqdn_print(ndo, cp + 1 + sizeof(a) - pbyte, bp) == NULL)
 				return(NULL);
 		}
 		break;
@@ -572,7 +572,7 @@ ns_rprint(netdissect_options *ndo,
 		if (!ndo->ndo_vflag)
 			break;
 		ND_PRINT(" ");
-		if ((cp = ns_nprint(ndo, cp, bp)) == NULL)
+		if ((cp = fqdn_print(ndo, cp, bp)) == NULL)
 			return(NULL);
 		cp += 6;
 		if (!ND_TTEST_2(cp))
