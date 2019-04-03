@@ -683,6 +683,8 @@ show_remote_devices_and_exit(void)
 #define OPTION_IMMEDIATE_MODE		130
 #define OPTION_PRINT			131
 #define OPTION_LIST_REMOTE_INTERFACES	132
+#define OPTION_TSTAMP_MICRO		133
+#define OPTION_TSTAMP_NANO		134
 
 static const struct option longopts[] = {
 #if defined(HAVE_PCAP_CREATE) || defined(_WIN32)
@@ -702,6 +704,8 @@ static const struct option longopts[] = {
 	{ "list-time-stamp-types", no_argument, NULL, 'J' },
 #endif
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
+	{ "micro", no_argument, NULL, OPTION_TSTAMP_MICRO},
+	{ "nano", no_argument, NULL, OPTION_TSTAMP_NANO},
 	{ "time-stamp-precision", required_argument, NULL, OPTION_TSTAMP_PRECISION},
 #endif
 	{ "dont-verify-checksums", no_argument, NULL, 'K' },
@@ -740,12 +744,6 @@ static const struct option longopts[] = {
 #define IMMEDIATE_MODE_USAGE " [ --immediate-mode ]"
 #else
 #define IMMEDIATE_MODE_USAGE ""
-#endif
-
-#ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
-#define TIME_STAMP_PRECISION_USAGE " [ --time-stamp-precision precision ]"
-#else
-#define TIME_STAMP_PRECISION_USAGE
 #endif
 
 #ifndef _WIN32
@@ -1872,6 +1870,16 @@ main(int argc, char **argv)
 		case OPTION_PRINT:
 			print = 1;
 			break;
+
+#ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
+		case OPTION_TSTAMP_MICRO:
+			ndo->ndo_tstamp_precision = PCAP_TSTAMP_PRECISION_MICRO;
+			break;
+
+		case OPTION_TSTAMP_NANO:
+			ndo->ndo_tstamp_precision = PCAP_TSTAMP_PRECISION_NANO;
+			break;
+#endif
 
 		default:
 			print_usage();
@@ -3087,11 +3095,13 @@ print_usage(void)
 	(void)fprintf(stderr,
 "\t\t[ -M secret ] [ --number ] [ --print ]" Q_FLAG_USAGE "\n");
 	(void)fprintf(stderr,
-"\t\t[ -r file ] [ -s snaplen ]" TIME_STAMP_PRECISION_USAGE "\n");
+"\t\t[ -r file ] [ -s snaplen ] [ -T type ] [ --version ]\n");
 	(void)fprintf(stderr,
-"\t\t[ -T type ] [ --version ] [ -V file ] [ -w file ]\n");
+"\t\t[ -V file ] [ -w file ] [ -W filecount ] [ -y datalinktype ]\n");
+#ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
 	(void)fprintf(stderr,
-"\t\t[ -W filecount ] [ -y datalinktype ]\n");
+"\t\t[ --time-stamp-precision precision ] [ --micro ] [ --nano ]\n");
+#endif
 	(void)fprintf(stderr,
 "\t\t[ -z postrotate-command ] [ -Z user ] [ expression ]\n");
 }
