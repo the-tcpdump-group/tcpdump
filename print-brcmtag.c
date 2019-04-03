@@ -101,7 +101,7 @@ static int brcm_tag_print_full(netdissect_options *ndo, const u_char *bp,
 	if (tag[0] & (1 << BRCM_OPCODE_SHIFT)) {
 		/* Ingress Broadcom tag */
 		ND_PRINT(", TC: %d", (tag[1] >> BRCM_IG_TC_SHIFT) &
-				     BRCM_IG_TC_MASK);
+			 BRCM_IG_TC_MASK);
 		ND_PRINT(", TE: %s",
 			 tok2str(brcm_tag_te_values, "unknown",
 				 (tag[1] & BRCM_IG_TE_MASK)));
@@ -112,9 +112,9 @@ static int brcm_tag_print_full(netdissect_options *ndo, const u_char *bp,
 		/* Egress Broadcom tag */
 		ND_PRINT(", CID: %d", tag[1]);
 		ND_PRINT(", RC: %s", tok2str(brcm_tag_rc_values,
-					   "reserved", tag[2]));
+			 "reserved", tag[2]));
 		ND_PRINT(", TC: %d", (tag[3] >> BRCM_EG_TC_SHIFT) &
-				    BRCM_EG_TC_MASK);
+			 BRCM_EG_TC_MASK);
 		ND_PRINT(", port: %d", tag[3] & BRCM_EG_PID_MASK);
 	}
 	ND_PRINT(", ");
@@ -146,8 +146,8 @@ brcm_tag_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	ehp = (const struct ether_header *)p;
 	if (ndo->ndo_eflag)
 		ND_PRINT("%s > %s, ",
-			     etheraddr_string(ndo, ehp->ether_shost),
-			     etheraddr_string(ndo, ehp->ether_dhost));
+			 etheraddr_string(ndo, ehp->ether_shost),
+			 etheraddr_string(ndo, ehp->ether_dhost));
 
 	if (brcm_tag_print_full(ndo, p + ETHER_SA_OFFSET,
 				caplen - ETHER_SA_OFFSET))
