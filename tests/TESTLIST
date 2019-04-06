@@ -335,10 +335,6 @@ dhcp-rfc3004	dhcp-rfc3004.pcap	dhcp-rfc3004-v.out	-v
 dhcp-rfc5859	dhcp-rfc5859.pcap	dhcp-rfc5859-v.out	-v
 dhcp-mud	dhcp-mud.pcap		dhcp-mud.out	-vv
 
-# MEDSA tests
-medsa		medsa.pcap		medsa.out
-medsa-e		medsa.pcap		medsa-e.out	-e
-
 # VXLAN tests
 vxlan  vxlan.pcap  vxlan.out -e
 
