@@ -2814,14 +2814,19 @@ isis_print(netdissect_options *ndo,
 	    break;
 
 	case ISIS_TLV_IP6_REACH:
-	    while (tlen>0) {
+            while (tlen != 0) {
                 ext_ip_len = isis_print_extd_ip_reach(ndo, tptr, "\n\t      ", AF_INET6);
                 if (ext_ip_len == 0) /* did something go wrong ? */
                     goto trunc;
+                if (tlen < ext_ip_len) {
+                    ND_PRINT(" [remaining tlv length %u < %u]", tlen, ext_ip_len);
+                    nd_print_invalid(ndo);
+                    break;
+                }
                 tptr+=ext_ip_len;
-		tlen-=ext_ip_len;
-	    }
-	    break;
+                tlen-=ext_ip_len;
+            }
+            break;
 
 	case ISIS_TLV_MT_IP6_REACH:
             mt_len = isis_print_mtid(ndo, tptr, "\n\t      ");
