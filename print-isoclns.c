@@ -2724,27 +2724,41 @@ isis_print(netdissect_options *ndo,
                 ext_is_len = isis_print_ext_is_reach(ndo, tptr, "\n\t      ", tlv_type, tlen);
                 if (ext_is_len == 0) /* did something go wrong ? */
                     goto trunc;
-
+                if (tlen < ext_is_len) {
+                    ND_PRINT(" [remaining tlv length %u < %u]", tlen, ext_is_len);
+                    nd_print_invalid(ndo);
+                    break;
+                }
                 tlen-=ext_is_len;
                 tptr+=ext_is_len;
             }
             break;
 
         case ISIS_TLV_IS_ALIAS_ID:
-	    while (tlen >= NODE_ID_LEN+1) { /* is it worth attempting a decode ? */
-	        ext_is_len = isis_print_ext_is_reach(ndo, tptr, "\n\t      ", tlv_type, tlen);
-		if (ext_is_len == 0) /* did something go wrong ? */
-	            goto trunc;
-		tlen-=ext_is_len;
-		tptr+=ext_is_len;
-	    }
-	    break;
+            while (tlen >= NODE_ID_LEN+1) { /* is it worth attempting a decode ? */
+                ext_is_len = isis_print_ext_is_reach(ndo, tptr, "\n\t      ", tlv_type, tlen);
+                if (ext_is_len == 0) /* did something go wrong ? */
+                    goto trunc;
+                if (tlen < ext_is_len) {
+                    ND_PRINT(" [remaining tlv length %u < %u]", tlen, ext_is_len);
+                    nd_print_invalid(ndo);
+                    break;
+                }
+                tlen-=ext_is_len;
+                tptr+=ext_is_len;
+            }
+            break;
 
         case ISIS_TLV_EXT_IS_REACH:
             while (tlen >= NODE_ID_LEN+3+1) { /* is it worth attempting a decode ? */
                 ext_is_len = isis_print_ext_is_reach(ndo, tptr, "\n\t      ", tlv_type, tlen);
                 if (ext_is_len == 0) /* did something go wrong ? */
                     goto trunc;
+                if (tlen < ext_is_len) {
+                    ND_PRINT(" [remaining tlv length %u < %u]", tlen, ext_is_len);
+                    nd_print_invalid(ndo);
+                    break;
+                }
                 tlen-=ext_is_len;
                 tptr+=ext_is_len;
             }
@@ -2787,14 +2801,19 @@ isis_print(netdissect_options *ndo,
 		break;
 
 	case ISIS_TLV_EXTD_IP_REACH:
-	    while (tlen>0) {
+            while (tlen != 0) {
                 ext_ip_len = isis_print_extd_ip_reach(ndo, tptr, "\n\t      ", AF_INET);
                 if (ext_ip_len == 0) /* did something go wrong ? */
                     goto trunc;
+                if (tlen < ext_ip_len) {
+                    ND_PRINT(" [remaining tlv length %u < %u]", tlen, ext_ip_len);
+                    nd_print_invalid(ndo);
+                    break;
+                }
                 tptr+=ext_ip_len;
-		tlen-=ext_ip_len;
-	    }
-	    break;
+                tlen-=ext_ip_len;
+            }
+            break;
 
         case ISIS_TLV_MT_IP_REACH:
             mt_len = isis_print_mtid(ndo, tptr, "\n\t      ");
@@ -2804,14 +2823,19 @@ isis_print(netdissect_options *ndo,
             tptr+=mt_len;
             tlen-=mt_len;
 
-            while (tlen>0) {
+            while (tlen != 0) {
                 ext_ip_len = isis_print_extd_ip_reach(ndo, tptr, "\n\t      ", AF_INET);
                 if (ext_ip_len == 0) /* did something go wrong ? */
                     goto trunc;
+                if (tlen < ext_ip_len) {
+                    ND_PRINT(" [remaining tlv length %u < %u]", tlen, ext_ip_len);
+                    nd_print_invalid(ndo);
+                    break;
+                }
                 tptr+=ext_ip_len;
-		tlen-=ext_ip_len;
-	    }
-	    break;
+                tlen-=ext_ip_len;
+            }
+            break;
 
 	case ISIS_TLV_IP6_REACH:
             while (tlen != 0) {
@@ -2836,14 +2860,19 @@ isis_print(netdissect_options *ndo,
             tptr+=mt_len;
             tlen-=mt_len;
 
-	    while (tlen>0) {
+            while (tlen != 0) {
                 ext_ip_len = isis_print_extd_ip_reach(ndo, tptr, "\n\t      ", AF_INET6);
                 if (ext_ip_len == 0) /* did something go wrong ? */
                     goto trunc;
+                if (tlen < ext_ip_len) {
+                    ND_PRINT(" [remaining tlv length %u < %u]", tlen, ext_ip_len);
+                    nd_print_invalid(ndo);
+                    break;
+                }
                 tptr+=ext_ip_len;
-		tlen-=ext_ip_len;
-	    }
-	    break;
+                tlen-=ext_ip_len;
+            }
+            break;
 
 	case ISIS_TLV_IP6ADDR:
 	    while (tlen>=sizeof(nd_ipv6)) {

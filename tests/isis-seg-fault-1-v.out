@@ -42,70 +42,7 @@
 	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
 	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
 	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.7d, no sub-TLVs present
-	      IS Neighbor: 0000.4a00.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.80, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0034.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, sub-TLVs present (35)
-	        unknown subTLV #2, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #105, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #0, length: 0
-	        unknown subTLV #2, length: 0
-	        unknown subTLV #0, length: 0
-	        Remaining data in subTLVs shorter than a subTLV header
-	      IS Neighbor: 0000.0000.0000.67, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.6500.8000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.4200.0000.00, sub-TLVs present (8)
-	        unknown subTLV #0, length: 0
-	        Remaining data in TLV shorter than a subTLV header
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 7901.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.32, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0800.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0089.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0025.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0025.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0025.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0800.00, no sub-TLVs present
-	      IS Neighbor: 2500.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 4a00.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
-	      IS Neighbor: 0000.0000.0000.00, no sub-TLVs present
+	      IS Neighbor: 0000.0000.0000.7d, no sub-TLVs present [remaining tlv length 9 < 11] (invalid)
 	    Padding TLV #8, length: 255
 	    Padding TLV #8, length: 255
 	    Padding TLV #8, length: 247
