@@ -1452,9 +1452,9 @@ isis_print_mt_port_cap_subtlv(netdissect_options *ndo,
                stlv_type,
                stlv_len);
 
-    tptr = tptr + 2;
+    tptr += 2;
     /*len -= TLV_TYPE_LEN_OFFSET;*/
-    len = len - 2;
+    len -= 2;
 
     /* Make sure the subTLV fits within the space left */
     if (len < stlv_len)
@@ -1482,9 +1482,9 @@ isis_print_mt_port_cap_subtlv(netdissect_options *ndo,
 
           /*tptr += SPB_MCID_MIN_LEN;
             len -= SPB_MCID_MIN_LEN; */
-        tptr = tptr + ISIS_SUBTLV_SPB_MCID_MIN_LEN;
-        len = len - ISIS_SUBTLV_SPB_MCID_MIN_LEN;
-        stlv_len = stlv_len - ISIS_SUBTLV_SPB_MCID_MIN_LEN;
+        tptr += ISIS_SUBTLV_SPB_MCID_MIN_LEN;
+        len -= ISIS_SUBTLV_SPB_MCID_MIN_LEN;
+        stlv_len -= ISIS_SUBTLV_SPB_MCID_MIN_LEN;
 
         break;
       }
@@ -1509,11 +1509,11 @@ isis_print_mt_port_cap_subtlv(netdissect_options *ndo,
             ND_PRINT("%08x ", GET_BE_U_4(tptr));
             if (i%4 == 0 && i != 8)
               ND_PRINT("\n\t                 ");
-            tptr = tptr + 4;
+            tptr += 4;
         }
 
-        len = len - ISIS_SUBTLV_SPB_DIGEST_MIN_LEN;
-        stlv_len = stlv_len - ISIS_SUBTLV_SPB_DIGEST_MIN_LEN;
+        len -= ISIS_SUBTLV_SPB_DIGEST_MIN_LEN;
+        stlv_len -= ISIS_SUBTLV_SPB_DIGEST_MIN_LEN;
 
         break;
       }
@@ -1525,16 +1525,16 @@ isis_print_mt_port_cap_subtlv(netdissect_options *ndo,
           ND_PRINT("\n\t           ECT: %08x",
                       GET_BE_U_4(tptr));
 
-          tptr = tptr+4;
+          tptr += 4;
 
           ND_PRINT(" BVID: %u, U:%01x M:%01x ",
                      (GET_BE_U_2(tptr) >> 4) ,
                      (GET_BE_U_2(tptr) >> 3) & 0x01,
                      (GET_BE_U_2(tptr) >> 2) & 0x01);
 
-          tptr = tptr + 2;
-          len = len - ISIS_SUBTLV_SPB_BVID_MIN_LEN;
-          stlv_len = stlv_len - ISIS_SUBTLV_SPB_BVID_MIN_LEN;
+          tptr += 2;
+          len -= ISIS_SUBTLV_SPB_BVID_MIN_LEN;
+          stlv_len -= ISIS_SUBTLV_SPB_BVID_MIN_LEN;
         }
 
         break;
@@ -1565,8 +1565,8 @@ isis_print_mt_capability_subtlv(netdissect_options *ndo,
     ND_TCHECK_2(tptr);
     stlv_type = GET_U_1(tptr);
     stlv_len  = GET_U_1(tptr + 1);
-    tptr = tptr + 2;
-    len = len - 2;
+    tptr += 2;
+    len -= 2;
 
     /* first lets see if we know the subTLVs name*/
     ND_PRINT("\n\t      %s subTLV #%u, length: %u",
@@ -1587,27 +1587,27 @@ isis_print_mt_capability_subtlv(netdissect_options *ndo,
             goto trunc;
 
           ND_PRINT("\n\t        CIST Root-ID: %08x", GET_BE_U_4(tptr));
-          tptr = tptr+4;
+          tptr += 4;
           ND_PRINT(" %08x", GET_BE_U_4(tptr));
-          tptr = tptr+4;
+          tptr += 4;
           ND_PRINT(", Path Cost: %08x", GET_BE_U_4(tptr));
-          tptr = tptr+4;
+          tptr += 4;
           ND_PRINT(", Prio: %u", GET_BE_U_2(tptr));
-          tptr = tptr + 2;
+          tptr += 2;
           ND_PRINT("\n\t        RES: %u",
                     GET_BE_U_2(tptr) >> 5);
           ND_PRINT(", V: %u",
                     (GET_BE_U_2(tptr) >> 4) & 0x0001);
           ND_PRINT(", SPSource-ID: %u",
                     (GET_BE_U_4(tptr) & 0x000fffff));
-          tptr = tptr+4;
+          tptr += 4;
           ND_PRINT(", No of Trees: %x", GET_U_1(tptr));
 
           treecount = GET_U_1(tptr);
           tptr++;
 
-          len = len - ISIS_SUBTLV_SPB_INSTANCE_MIN_LEN;
-          stlv_len = stlv_len - ISIS_SUBTLV_SPB_INSTANCE_MIN_LEN;
+          len -= ISIS_SUBTLV_SPB_INSTANCE_MIN_LEN;
+          stlv_len -= ISIS_SUBTLV_SPB_INSTANCE_MIN_LEN;
 
           while (treecount)
           {
@@ -1624,15 +1624,15 @@ isis_print_mt_capability_subtlv(netdissect_options *ndo,
 
             ND_PRINT(", ECT: %08x", GET_BE_U_4(tptr));
 
-            tptr = tptr + 4;
+            tptr += 4;
 
             ND_PRINT(", BVID: %u, SPVID: %u",
                       (GET_BE_U_3(tptr) >> 12) & 0x000fff,
                       GET_BE_U_3(tptr) & 0x000fff);
 
-            tptr = tptr + 3;
-            len = len - ISIS_SUBTLV_SPB_INSTANCE_VLAN_TUPLE_LEN;
-            stlv_len = stlv_len - ISIS_SUBTLV_SPB_INSTANCE_VLAN_TUPLE_LEN;
+            tptr += 3;
+            len -= ISIS_SUBTLV_SPB_INSTANCE_VLAN_TUPLE_LEN;
+            stlv_len -= ISIS_SUBTLV_SPB_INSTANCE_VLAN_TUPLE_LEN;
             treecount--;
           }
 
@@ -1643,16 +1643,16 @@ isis_print_mt_capability_subtlv(netdissect_options *ndo,
             goto trunc;
 
           ND_PRINT("\n\t        BMAC: %08x", GET_BE_U_4(tptr));
-          tptr = tptr+4;
+          tptr += 4;
           ND_PRINT("%04x", GET_BE_U_2(tptr));
-          tptr = tptr+2;
+          tptr += 2;
 
           ND_PRINT(", RES: %u, VID: %u", GET_BE_U_2(tptr) >> 12,
                     (GET_BE_U_2(tptr)) & 0x0fff);
 
-          tptr = tptr+2;
-          len = len - 8;
-          stlv_len = stlv_len - 8;
+          tptr += 2;
+          len -= 8;
+          stlv_len -= 8;
 
           while (stlv_len >= 4) {
             ND_TCHECK_4(tptr);
@@ -1662,9 +1662,9 @@ isis_print_mt_capability_subtlv(netdissect_options *ndo,
                     (GET_BE_U_4(tptr) >> 24) & 0x03f,
                     (GET_BE_U_4(tptr)) & 0x0ffffff);
 
-            tptr = tptr + 4;
-            len = len - 4;
-            stlv_len = stlv_len - 4;
+            tptr += 4;
+            len -= 4;
+            stlv_len -= 4;
           }
 
         break;
@@ -2981,8 +2981,8 @@ isis_print(netdissect_options *ndo,
               (GET_BE_U_2(tptr) >> 12),
               (GET_BE_U_2(tptr) & 0x0fff));
 
-      tlen = tlen-2;
-      tptr = tptr+2;
+      tlen -= 2;
+      tptr += 2;
 
       if (tlen)
         isis_print_mt_port_cap_subtlv(ndo, tptr, tlen);
@@ -2999,8 +2999,8 @@ isis_print(netdissect_options *ndo,
                 (GET_BE_U_2(tptr) >> 12) & 0x07,
                 GET_BE_U_2(tptr) & 0x0fff);
 
-      tlen = tlen-2;
-      tptr = tptr+2;
+      tlen -= 2;
+      tptr += 2;
 
       if (tlen)
         isis_print_mt_capability_subtlv(ndo, tptr, tlen);
