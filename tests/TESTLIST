@@ -666,3 +666,6 @@ empty-pcapng	empty.pcapng	empty.out
 # DNS Extended rcode tests
 dns-badcookie	dns-badcookie.pcap	dns-badcookie.out
 dns-badvers	dns-badvers.pcap	dns-badvers.out
+
+# LLDP
+lldp-app-priority	lldp-app-priority.pcap	lldp-app-priority.out	-v

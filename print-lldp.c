@@ -796,7 +796,7 @@ lldp_private_8021_print(netdissect_options *ndo,
 		tval=GET_U_1(tptr + i + 5);
 		ND_PRINT("\n\t      Priority: %u, RES: %u, Sel: %u, Protocol ID: %u",
 			 tval >> 5, (tval >> 3) & 0x03, (tval & 0x07),
-			 GET_BE_U_2(tptr + i + 5));
+			 GET_BE_U_2(tptr + i + 6));
 		i=i+3;
         }
         break;
