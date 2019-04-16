@@ -68,7 +68,7 @@
  * b12: To_CPU's Code[0]
  */
 
-#define TOK(tag, byte, mask, shift) ((((const u_char *) tag)[byte] & (mask)) >> (shift))
+#define TOK(tag, byte, mask, shift) ((GET_U_1(&(((const u_char *) tag)[byte])) & (mask)) >> (shift))
 
 #define DSA_LEN 4
 #define DSA_MODE(tag) TOK(tag, 0, 0xc0, 6)
