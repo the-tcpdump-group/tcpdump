@@ -35,8 +35,16 @@ brcmtag		brcm-tag.pcap		brcm-tag.out
 brcmtag-e	brcm-tag.pcap		brcm-tag-e.out	-e
 brcmtagprepend	brcm-tag-prepend.pcap	brcm-tag-prepend.out -e
 
+# Marvell DSA tag tests
+dsa		dsa.pcap		dsa.out
+dsa-e		dsa.pcap		dsa-e.out	-e
+
 # EAP tests
 eapon1		eapon1.pcap		eapon1.out
+
+# Marvell DSA tag tests
+edsa		edsa.pcap		edsa.out
+edsa-e		edsa.pcap		edsa-e.out	-e
 
 # ESP tests
 esp0		02-sunrise-sunset-esp.pcap	esp0.out
@@ -334,10 +342,6 @@ geneve-tcp	geneve.pcap		geneve-tcp.out	"geneve && tcp"
 dhcp-rfc3004	dhcp-rfc3004.pcap	dhcp-rfc3004-v.out	-v
 dhcp-rfc5859	dhcp-rfc5859.pcap	dhcp-rfc5859-v.out	-v
 dhcp-mud	dhcp-mud.pcap		dhcp-mud.out	-vv
-
-# MEDSA tests
-medsa		medsa.pcap		medsa.out
-medsa-e		medsa.pcap		medsa-e.out	-e
 
 # VXLAN tests
 vxlan  vxlan.pcap  vxlan.out -e

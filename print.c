@@ -237,6 +237,12 @@ static const struct printer printers[] = {
 #ifdef DLT_VSOCK
 	{ vsock_if_print,	DLT_VSOCK },
 #endif
+#ifdef DLT_DSA_TAG_DSA
+	{ dsa_if_print,	DLT_DSA_TAG_DSA },
+#endif
+#ifdef DLT_DSA_TAG_EDSA
+	{ edsa_if_print,	DLT_DSA_TAG_EDSA },
+#endif
 	{ NULL,			0 },
 };
 

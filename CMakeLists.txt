@@ -957,6 +957,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-decnet.c
     print-dhcp6.c
     print-domain.c
+    print-dsa.c
     print-dtp.c
     print-dvmrp.c
     print-eap.c
@@ -1004,7 +1005,6 @@ set(NETDISSECT_SOURCE_LIST_C
     print-lwapp.c
     print-lwres.c
     print-m3ua.c
-    print-medsa.c
     print-mobile.c
     print-mobility.c
     print-mpcp.c
