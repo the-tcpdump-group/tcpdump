@@ -217,8 +217,10 @@ static char *zflag = NULL;		/* compress each savefile using a specified command 
 static int immediate_mode;
 #endif
 
-static int infodelay;
 static int infoprint;
+#ifndef _WIN32
+static int gotalarm;
+#endif /* _WIN32 */
 
 char *program_name;
 
@@ -2387,6 +2389,9 @@ DIAG_ON_CLANG(assign-enum)
 		 */
 		struct itimerval timer;
 		(void)setsignal(SIGALRM, verbose_stats_dump);
+		alarm(1);
+		/* signal alarm to get the first iteration ASAP */
+		gotalarm = 1;
 		timer.it_interval.tv_sec = 1;
 		timer.it_interval.tv_usec = 0;
 		timer.it_value.tv_sec = 1;
@@ -2738,8 +2743,6 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 
 	++packets_captured;
 
-	++infodelay;
-
 	dump_info = (struct dump_info *)user;
 
 	/*
@@ -2941,9 +2944,18 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 	if (dump_info->ndo != NULL)
 		pretty_print_packet(dump_info->ndo, h, sp, packets_captured);
 
-	--infodelay;
-	if (infoprint)
+	if (infoprint) {
 		info(0);
+		infoprint = 0;
+	}
+
+#ifndef _WIN32
+	if (gotalarm) {
+		fprintf(stderr, "Got %u\r", packets_captured);
+		gotalarm = 0;
+		alarm(1);
+	}
+#endif /* !_WIN32 */
 }
 
 static void
@@ -2952,8 +2964,6 @@ dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	struct dump_info *dump_info;
 
 	++packets_captured;
-
-	++infodelay;
 
 	dump_info = (struct dump_info *)user;
 
@@ -2966,9 +2976,10 @@ dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	if (dump_info->ndo != NULL)
 		pretty_print_packet(dump_info->ndo, h, sp, packets_captured);
 
-	--infodelay;
-	if (infoprint)
+	if (infoprint) {
 		info(0);
+		infoprint = 0;
+	}
 }
 
 static void
@@ -2976,23 +2987,27 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
 	++packets_captured;
 
-	++infodelay;
-
 	pretty_print_packet((netdissect_options *)user, h, sp, packets_captured);
 
-	--infodelay;
-	if (infoprint)
+	if (infoprint) {
 		info(0);
+		infoprint = 0;
+	}
+
+#ifndef _WIN32
+	if (gotalarm) {
+		fprintf(stderr, "Got %u\r", packets_captured);
+		gotalarm = 0;
+		alarm(1);
+	}
+#endif /* !_WIN32 */
 }
 
 #ifdef SIGNAL_REQ_INFO
 static void
 requestinfo(int signo _U_)
 {
-	if (infodelay)
-		++infoprint;
-	else
-		info(0);
+	infoprint = 1;
 }
 #endif
 
@@ -3010,7 +3025,7 @@ print_packets_captured (void)
 {
 	static u_int prev_packets_captured, first = 1;
 
-	if (infodelay == 0 && (first || packets_captured != prev_packets_captured)) {
+	if (first || packets_captured != prev_packets_captured) {
 		fprintf(stderr, "Got %u\r", packets_captured);
 		first = 0;
 		prev_packets_captured = packets_captured;
@@ -3029,7 +3044,7 @@ static void CALLBACK verbose_stats_dump(PVOID param _U_,
 #else /* _WIN32 */
 static void verbose_stats_dump(int sig _U_)
 {
-	print_packets_captured();
+	gotalarm = 1;
 }
 #endif /* _WIN32 */
 
