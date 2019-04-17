@@ -106,6 +106,9 @@ static const struct printer printers[] = {
 #ifdef DLT_IPV6
 	{ raw_if_print,		DLT_IPV6 },
 #endif
+#ifdef DLT_IPOIB
+	{ ipoib_if_print,       DLT_IPOIB },
+#endif
 #ifdef DLT_USB_LINUX
 	{ usb_linux_48_byte_if_print, DLT_USB_LINUX},
 #endif /* DLT_USB_LINUX */

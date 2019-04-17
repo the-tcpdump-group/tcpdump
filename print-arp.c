@@ -54,6 +54,7 @@ struct  arp_pkthdr {
 #define ARPHRD_ATM2225  19      /* ATM (RFC 2225) */
 #define ARPHRD_STRIP    23      /* Ricochet Starmode Radio hardware format */
 #define ARPHRD_IEEE1394 24      /* IEEE 1394 (FireWire) hardware format */
+#define ARPHRD_INFINIBAND 32    /* InfiniBand RFC 4391 */
         nd_uint16_t ar_pro;     /* format of protocol address */
         nd_uint8_t  ar_hln;     /* length of hardware address */
         nd_uint8_t  ar_pln;     /* length of protocol address */
@@ -114,6 +115,7 @@ static const struct tok arphrd_values[] = {
     { ARPHRD_STRIP, "Strip" },
     { ARPHRD_IEEE1394, "IEEE 1394" },
     { ARPHRD_ATM2225, "ATM" },
+    { ARPHRD_INFINIBAND, "InfiniBand" },
     { 0, NULL }
 };
 
