@@ -347,9 +347,9 @@ udpipaddr_print(netdissect_options *ndo, const struct ip *ip, int sport, int dpo
 			} else {
 				ND_PRINT("%s.%s > %s.%s: ",
 					ip6addr_string(ndo, ip6->ip6_src),
-					udpport_string(ndo, sport),
+					udpport_string(ndo, (uint16_t)sport),
 					ip6addr_string(ndo, ip6->ip6_dst),
-					udpport_string(ndo, dport));
+					udpport_string(ndo, (uint16_t)dport));
 			}
 		} else {
 			if (sport != -1) {
@@ -367,15 +367,15 @@ udpipaddr_print(netdissect_options *ndo, const struct ip *ip, int sport, int dpo
 			} else {
 				ND_PRINT("%s.%s > %s.%s: ",
 					ipaddr_string(ndo, ip->ip_src),
-					udpport_string(ndo, sport),
+					udpport_string(ndo, (uint16_t)sport),
 					ipaddr_string(ndo, ip->ip_dst),
-					udpport_string(ndo, dport));
+					udpport_string(ndo, (uint16_t)dport));
 			}
 		} else {
 			if (sport != -1) {
 				ND_PRINT("%s > %s: ",
-					udpport_string(ndo, sport),
-					udpport_string(ndo, dport));
+					udpport_string(ndo, (uint16_t)sport),
+					udpport_string(ndo, (uint16_t)dport));
 			}
 		}
 	}

@@ -364,7 +364,7 @@ babel_print_v2(netdissect_options *ndo,
     i = 0;
     while(i < bodylen) {
         const u_char *message;
-        u_int type, len;
+        uint8_t type, len;
 
         message = cp + 4 + i;
 

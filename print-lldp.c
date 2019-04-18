@@ -1166,7 +1166,8 @@ lldp_private_dcbx_print(netdissect_options *ndo,
     uint8_t tval;
     uint16_t tlv;
     uint32_t i, pgval, uval;
-    u_int tlen, tlv_type, tlv_len;
+    u_int tlen, tlv_type;
+    uint16_t tlv_len;
     const u_char *tptr, *mptr;
 
     if (len < 4) {

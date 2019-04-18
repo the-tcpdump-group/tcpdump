@@ -39,8 +39,8 @@
 void
 ip_print_demux(netdissect_options *ndo,
 	       const u_char *bp,
-	       u_int length, u_int ver, int fragmented, u_int ttl_hl, u_int nh,
-	       const u_char *iph)
+	       u_int length, u_int ver, int fragmented, u_int ttl_hl,
+	       uint8_t nh, const u_char *iph)
 {
 	int advance;
 	const char *p_name;

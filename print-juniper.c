@@ -425,7 +425,7 @@ struct juniper_l2info_t {
     uint32_t caplen;
     uint32_t pictype;
     uint8_t direction;
-    uint8_t header_len;
+    u_int header_len;
     uint8_t cookie_len;
     uint8_t cookie_type;
     uint8_t cookie[8];

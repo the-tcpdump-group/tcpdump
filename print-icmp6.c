@@ -1031,7 +1031,7 @@ icmp6_print(netdissect_options *ndo,
 	const struct ip6_hdr *ip;
 	const struct ip6_hdr *oip;
 	const struct udphdr *ouh;
-	u_int dport;
+	uint16_t dport;
 	const u_char *ep;
 	u_int prot;
 

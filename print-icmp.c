@@ -343,7 +343,8 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
         uint32_t raw_label;
         const u_char *snapend_save;
 	const struct icmp_mpls_ext_object_header_t *icmp_mpls_ext_object_header;
-	u_int hlen, dport, mtu, obj_tlen, obj_class_num, obj_ctype;
+	u_int hlen, mtu, obj_tlen, obj_class_num, obj_ctype;
+	uint16_t dport;
 	char buf[MAXHOSTNAMELEN + 100];
 	struct cksum_vec vec[1];
 

@@ -562,7 +562,7 @@ sctp_print(netdissect_options *ndo,
 	    const struct sctpDataPart *dataHdrPtr;
 	    uint8_t chunkFlg;
 	    uint32_t ppid;
-	    u_int payload_size;
+	    uint16_t payload_size;
 
 	    chunkFlg = GET_U_1(chunkDescPtr->chunkFlg);
 	    if ((chunkFlg & SCTP_DATA_UNORDERED) == SCTP_DATA_UNORDERED)

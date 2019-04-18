@@ -174,7 +174,7 @@ trunc:
 uint16_t
 nextproto6_cksum(netdissect_options *ndo,
                  const struct ip6_hdr *ip6, const uint8_t *data,
-		 u_int len, u_int covlen, u_int next_proto)
+		 u_int len, u_int covlen, uint8_t next_proto)
 {
         struct {
                 struct in6_addr ph_src;

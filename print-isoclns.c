@@ -2108,7 +2108,7 @@ trunc:
  * it is called from various MT-TLVs (222,229,235,237)
  */
 
-static u_int
+static uint8_t
 isis_print_mtid(netdissect_options *ndo,
                 const uint8_t *tptr, const char *ident)
 {
@@ -2275,7 +2275,8 @@ isis_print(netdissect_options *ndo,
 
     uint8_t version, pdu_version, fixed_len;
     uint8_t pdu_type, pdu_max_area, max_area, pdu_id_length, id_length, tlv_type, tlv_len, tlen, alen, lan_alen, prefix_len;
-    u_int ext_is_len, ext_ip_len, mt_len;
+    u_int ext_is_len, ext_ip_len;
+    uint8_t mt_len;
     uint8_t isis_subtlv_idrp;
     const uint8_t *optr, *pptr, *tptr;
     u_int packet_len;

@@ -713,12 +713,12 @@ extern uint16_t in_cksum(const struct cksum_vec *, int);
 extern uint16_t in_cksum_shouldbe(uint16_t, uint16_t);
 
 /* IP protocol demuxing routines */
-extern void ip_print_demux(netdissect_options *, const u_char *, u_int, u_int, int, u_int, u_int, const u_char *);
+extern void ip_print_demux(netdissect_options *, const u_char *, u_int, u_int, int, u_int, uint8_t, const u_char *);
 
-extern uint16_t nextproto4_cksum(netdissect_options *, const struct ip *, const uint8_t *, u_int, u_int, u_int);
+extern uint16_t nextproto4_cksum(netdissect_options *, const struct ip *, const uint8_t *, u_int, u_int, uint8_t);
 
 /* in print-ip6.c */
-extern uint16_t nextproto6_cksum(netdissect_options *, const struct ip6_hdr *, const uint8_t *, u_int, u_int, u_int);
+extern uint16_t nextproto6_cksum(netdissect_options *, const struct ip6_hdr *, const uint8_t *, u_int, u_int, uint8_t);
 
 /* Utilities */
 extern void nd_print_trunc(netdissect_options *);

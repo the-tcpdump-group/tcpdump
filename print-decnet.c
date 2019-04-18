@@ -502,7 +502,8 @@ decnet_print(netdissect_options *ndo,
 {
 	const union routehdr *rhp;
 	u_int mflags;
-	u_int dst, src, hops;
+	uint16_t dst, src;
+	u_int hops;
 	u_int nsplen, pktlen;
 	const u_char *nspp;
 

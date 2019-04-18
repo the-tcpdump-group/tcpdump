@@ -1641,7 +1641,7 @@ forces_type_print(netdissect_options *ndo,
 	/*XXX: 15 top level tlvs will probably be fine
 	   You are nuts if you send more ;-> */
 	while (rlen != 0) {
-		u_int type, tlvl;
+		uint16_t type, tlvl;
 
 		ND_TCHECK_SIZE(tltlv);
 		type = GET_BE_U_2(tltlv->type);

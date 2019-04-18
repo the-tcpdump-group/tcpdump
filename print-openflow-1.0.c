@@ -1351,7 +1351,7 @@ of10_match_print(netdissect_options *ndo,
 	uint32_t wildcards;
 	uint16_t dl_type;
 	uint8_t nw_proto;
-	u_char nw_bits;
+	u_int nw_bits;
 	const char *field_name;
 
 	/* wildcards */

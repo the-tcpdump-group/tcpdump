@@ -1540,7 +1540,7 @@ check_add_path(netdissect_options *ndo, const u_char *pptr, u_int length,
 
 static int
 bgp_attr_print(netdissect_options *ndo,
-               u_int atype, const u_char *pptr, u_int len)
+               uint8_t atype, const u_char *pptr, u_int len)
 {
     u_int i;
     uint16_t af;
@@ -2776,7 +2776,8 @@ bgp_update_print(netdissect_options *ndo,
     if (len) {
         /* do something more useful!*/
         while (len) {
-            u_int aflags, atype, alenlen, alen;
+            uint8_t aflags, atype, alenlen;
+            uint16_t alen;
 
             ND_TCHECK_2(p);
             if (length < 2)

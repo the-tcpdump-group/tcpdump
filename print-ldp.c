@@ -233,7 +233,7 @@ static int ldp_pdu_print(netdissect_options *, const u_char *);
 #define TLV_TCHECK(minlen) \
     ND_TCHECK_LEN(tptr, minlen); if (tlv_tlen < minlen) goto badtlv;
 
-static int
+static u_int
 ldp_tlv_print(netdissect_options *ndo,
               const u_char *tptr,
               u_short msg_tlen)
@@ -567,7 +567,8 @@ ldp_pdu_print(netdissect_options *ndo,
     const struct ldp_msg_header *ldp_msg_header;
     const u_char *tptr,*msg_tptr;
     u_short tlen;
-    u_short pdu_len,msg_len,msg_type,msg_tlen;
+    u_short pdu_len,msg_len,msg_type;
+    u_int msg_tlen;
     int hexdump,processed;
 
     ldp_com_header = (const struct ldp_common_header *)pptr;

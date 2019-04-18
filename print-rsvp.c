@@ -673,8 +673,8 @@ rsvp_obj_print(netdissect_options *ndo,
         const struct rsvp_obj_frr_t *rsvp_obj_frr;
     } obj_ptr;
 
-    u_short rsvp_obj_len,rsvp_obj_ctype,rsvp_obj_class_num,obj_tlen;
-    u_int intserv_serv_tlen;
+    u_short rsvp_obj_len,rsvp_obj_ctype,rsvp_obj_class_num;
+    u_int obj_tlen,intserv_serv_tlen;
     int hexdump;
     u_int processed,padbytes,error_code,error_value,i,sigcheck;
     union {
