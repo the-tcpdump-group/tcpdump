@@ -429,7 +429,7 @@ struct juniper_l2info_t {
     uint8_t cookie_len;
     uint8_t cookie_type;
     uint8_t cookie[8];
-    uint8_t bundle;
+    u_int bundle;
     uint16_t proto;
     uint8_t flags;
 };

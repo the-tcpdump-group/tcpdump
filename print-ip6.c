@@ -234,7 +234,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	const u_char *ipend;
 	const u_char *cp;
 	u_int payload_len;
-	u_int nh;
+	uint8_t nh;
 	int fragmented = 0;
 	u_int flow;
 

@@ -236,7 +236,7 @@ static int ldp_pdu_print(netdissect_options *, const u_char *);
 static u_int
 ldp_tlv_print(netdissect_options *ndo,
               const u_char *tptr,
-              u_short msg_tlen)
+              u_int msg_tlen)
 {
     struct ldp_tlv_header {
         nd_uint16_t type;

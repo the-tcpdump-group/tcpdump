@@ -93,7 +93,7 @@ void
 cdp_print(netdissect_options *ndo,
           const u_char *pptr, u_int length, u_int caplen)
 {
-	u_int type, len, i, j;
+	u_int type, len, i;
 	const u_char *tptr;
 
 	ndo->ndo_protocol = "cdp";
@@ -173,12 +173,14 @@ cdp_print(netdissect_options *ndo,
 		    case 0x05: /* Version */
 			ND_PRINT("\n\t  ");
 			for (i=0;i<len;i++) {
-			    j = GET_U_1(tptr + i);
-			    if (j == '\n') /* lets rework the version string to
+			    u_char c;
+
+			    c = GET_U_1(tptr + i);
+			    if (c == '\n') /* lets rework the version string to
 					      get a nice indentation */
 				ND_PRINT("\n\t  ");
 			    else
-				fn_print_char(ndo, j);
+				fn_print_char(ndo, c);
 			}
 			break;
 		    case 0x06: /* Platform */

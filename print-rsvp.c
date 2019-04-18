@@ -490,7 +490,7 @@ static const struct tok rsvp_obj_generalized_uni_values[] = {
  */
 static u_int
 rsvp_intserv_print(netdissect_options *ndo,
-                   const u_char *tptr, u_short obj_tlen)
+                   const u_char *tptr, u_int obj_tlen)
 {
     u_int parameter_id,parameter_length;
     union {
@@ -681,7 +681,7 @@ rsvp_obj_print(netdissect_options *ndo,
 	float f;
 	uint32_t i;
     } bw;
-    uint8_t namelen;
+    u_int namelen;
 
     u_int action, subchannel;
 

@@ -618,7 +618,8 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 	/* Our caller has already checked for mflags */
 	u_int mflags = GET_U_1(rhp->rh_short.sh_flags);
 	const union controlmsg *cmp = (const union controlmsg *)rhp;
-	u_int src, dst, info, blksize, eco, ueco, hello, other, vers;
+	uint16_t src, dst;
+	u_int info, blksize, eco, ueco, hello, other, vers;
 	u_int priority;
 	const u_char *rhpx = (const u_char *)rhp;
 	int ret;

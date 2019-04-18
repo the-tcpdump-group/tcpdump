@@ -1009,8 +1009,8 @@ static int
 decode_multicast_vpn(netdissect_options *ndo,
                      const u_char *pptr, char *buf, size_t buflen)
 {
-    uint8_t route_type, route_length, addr_length;
-    u_int sg_length;
+    uint8_t route_type, route_length;
+    u_int addr_length, sg_length;
     u_int offset;
 
     ND_TCHECK_2(pptr);

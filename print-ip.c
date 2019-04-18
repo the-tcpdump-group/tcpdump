@@ -483,7 +483,7 @@ ip_print(netdissect_options *ndo,
 	 * fragments.
 	 */
 	if ((off & IP_OFFMASK) == 0) {
-		u_int nh = GET_U_1(ip->ip_p);
+		uint8_t nh = GET_U_1(ip->ip_p);
 
 		if (nh != IPPROTO_TCP && nh != IPPROTO_UDP &&
 		    nh != IPPROTO_SCTP && nh != IPPROTO_DCCP) {

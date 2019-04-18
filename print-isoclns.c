@@ -2730,8 +2730,8 @@ isis_print(netdissect_options *ndo,
                     nd_print_invalid(ndo);
                     break;
                 }
-                tlen-=ext_is_len;
-                tptr+=ext_is_len;
+                tlen-=(uint8_t)ext_is_len;
+                tptr+=(uint8_t)ext_is_len;
             }
             break;
 
@@ -2745,8 +2745,8 @@ isis_print(netdissect_options *ndo,
                     nd_print_invalid(ndo);
                     break;
                 }
-                tlen-=ext_is_len;
-                tptr+=ext_is_len;
+                tlen-=(uint8_t)ext_is_len;
+                tptr+=(uint8_t)ext_is_len;
             }
             break;
 
@@ -2760,8 +2760,8 @@ isis_print(netdissect_options *ndo,
                     nd_print_invalid(ndo);
                     break;
                 }
-                tlen-=ext_is_len;
-                tptr+=ext_is_len;
+                tlen-=(uint8_t)ext_is_len;
+                tptr+=(uint8_t)ext_is_len;
             }
             break;
         case ISIS_TLV_IS_REACH:
@@ -2811,8 +2811,8 @@ isis_print(netdissect_options *ndo,
                     nd_print_invalid(ndo);
                     break;
                 }
-                tptr+=ext_ip_len;
-                tlen-=ext_ip_len;
+                tlen-=(uint8_t)ext_ip_len;
+                tptr+=(uint8_t)ext_ip_len;
             }
             break;
 
@@ -2833,8 +2833,8 @@ isis_print(netdissect_options *ndo,
                     nd_print_invalid(ndo);
                     break;
                 }
-                tptr+=ext_ip_len;
-                tlen-=ext_ip_len;
+                tlen-=(uint8_t)ext_ip_len;
+                tptr+=(uint8_t)ext_ip_len;
             }
             break;
 
@@ -2848,8 +2848,8 @@ isis_print(netdissect_options *ndo,
                     nd_print_invalid(ndo);
                     break;
                 }
-                tptr+=ext_ip_len;
-                tlen-=ext_ip_len;
+                tlen-=(uint8_t)ext_ip_len;
+                tptr+=(uint8_t)ext_ip_len;
             }
             break;
 
@@ -2870,8 +2870,8 @@ isis_print(netdissect_options *ndo,
                     nd_print_invalid(ndo);
                     break;
                 }
-                tptr+=ext_ip_len;
-                tlen-=ext_ip_len;
+                tlen-=(uint8_t)ext_ip_len;
+                tptr+=(uint8_t)ext_ip_len;
             }
             break;
 
