@@ -1925,8 +1925,8 @@ bgp_attr_print(netdissect_options *ndo,
             ND_PRINT(", no SNPA");
         }
 
-        add_path4 = check_add_path(ndo, tptr, (len-(tptr - pptr)), 32);
-        add_path6 = check_add_path(ndo, tptr, (len-(tptr - pptr)), 128);
+        add_path4 = check_add_path(ndo, tptr, (len-ND_BYTES_BETWEEN(tptr, pptr)), 32);
+        add_path6 = check_add_path(ndo, tptr, (len-ND_BYTES_BETWEEN(tptr, pptr)), 128);
 
         while (tptr < pptr + len) {
             switch (af<<8 | safi) {
@@ -2106,8 +2106,8 @@ bgp_attr_print(netdissect_options *ndo,
 
         tptr += 3;
 
-        add_path4 = check_add_path(ndo, tptr, (len-(tptr - pptr)), 32);
-        add_path6 = check_add_path(ndo, tptr, (len-(tptr - pptr)), 128);
+        add_path4 = check_add_path(ndo, tptr, (len-ND_BYTES_BETWEEN(tptr, pptr)), 32);
+        add_path6 = check_add_path(ndo, tptr, (len-ND_BYTES_BETWEEN(tptr, pptr)), 128);
 
         while (tptr < pptr + len) {
             switch (af<<8 | safi) {

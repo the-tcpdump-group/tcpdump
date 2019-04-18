@@ -210,7 +210,7 @@ lwres_printname(netdissect_options *ndo,
 	}
 	p++;	/* skip terminating \0 */
 
-	return (int)(p - p0);
+	return ND_BYTES_BETWEEN(p, p0);
 
   trunc:
 	return -1;
@@ -254,7 +254,7 @@ lwres_printbinlen(netdissect_options *ndo,
 		ND_PRINT("%02x", GET_U_1(p));
 		p++;
 	}
-	return (int)(p - p0);
+	return ND_BYTES_BETWEEN(p, p0);
 
   trunc:
 	return -1;
@@ -297,7 +297,7 @@ lwres_printaddr(netdissect_options *ndo,
 		}
 	}
 
-	return p - p0;
+	return ND_BYTES_BETWEEN(p, p0);
 
   trunc:
 	return -1;

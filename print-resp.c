@@ -311,7 +311,7 @@ resp_print_string_error_integer(netdissect_options *ndo, const u_char *bp, int l
      * preceding the \r\n.  That includes the opcode, so don't print
      * that.
      */
-    len = (bp_ptr - bp);
+    len = ND_BYTES_BETWEEN(bp_ptr, bp);
     RESP_PRINT_SEGMENT(ndo, bp, len);
     ret_len = 1 /*<opcode>*/ + len /*<string>*/ + 2 /*<CRLF>*/;
 
@@ -436,7 +436,7 @@ resp_print_inline(netdissect_options *ndo, const u_char *bp, int length) {
      * Found it; bp_ptr points to the \r or \n, so bp_ptr - bp is the
      * Length of the line text that precedes it.  Print it.
      */
-    len = (bp_ptr - bp);
+    len = ND_BYTES_BETWEEN(bp_ptr, bp);
     RESP_PRINT_SEGMENT(ndo, bp, len);
 
     /*

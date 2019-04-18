@@ -419,7 +419,7 @@ print_negprot(netdissect_options *ndo,
 	smb_fdata(ndo, words + 1, f1, min(words + 1 + wct * 2, maxbuf),
 	    unicodestr);
     else
-	smb_data_print(ndo, words + 1, min(wct * 2, PTR_DIFF(maxbuf, words + 1)));
+	smb_data_print(ndo, words + 1, min(wct * 2, ND_BYTES_BETWEEN(maxbuf, words + 1)));
 
     ND_TCHECK_2(data);
     bcc = GET_LE_U_2(data);
@@ -430,7 +430,7 @@ print_negprot(netdissect_options *ndo,
                                              maxbuf), unicodestr);
 	else
 	    smb_data_print(ndo, data + 2,
-                           min(GET_LE_U_2(data), PTR_DIFF(maxbuf, data + 2)));
+                           min(GET_LE_U_2(data), ND_BYTES_BETWEEN(maxbuf, data + 2)));
     }
     return;
 trunc:
@@ -464,7 +464,7 @@ print_sesssetup(netdissect_options *ndo,
 	smb_fdata(ndo, words + 1, f1, min(words + 1 + wct * 2, maxbuf),
 	    unicodestr);
     else
-	smb_data_print(ndo, words + 1, min(wct * 2, PTR_DIFF(maxbuf, words + 1)));
+	smb_data_print(ndo, words + 1, min(wct * 2, ND_BYTES_BETWEEN(maxbuf, words + 1)));
 
     ND_TCHECK_2(data);
     bcc = GET_LE_U_2(data);
@@ -475,7 +475,7 @@ print_sesssetup(netdissect_options *ndo,
                                              maxbuf), unicodestr);
 	else
 	    smb_data_print(ndo, data + 2,
-                           min(GET_LE_U_2(data), PTR_DIFF(maxbuf, data + 2)));
+                           min(GET_LE_U_2(data), ND_BYTES_BETWEEN(maxbuf, data + 2)));
     }
     return;
 trunc:
@@ -516,7 +516,7 @@ print_lockingandx(netdissect_options *ndo,
                                              maxbuf), unicodestr);
 	else
 	    smb_data_print(ndo, data + 2,
-                           min(GET_LE_U_2(data), PTR_DIFF(maxbuf, data + 2)));
+                           min(GET_LE_U_2(data), ND_BYTES_BETWEEN(maxbuf, data + 2)));
     }
     return;
 trunc:
@@ -892,7 +892,7 @@ print_smb(netdissect_options *ndo,
 	    } else {
 		if (bcc > 0) {
 		    ND_PRINT("smb_buf[]=\n");
-		    smb_data_print(ndo, data + 2, min(bcc, PTR_DIFF(maxbuf, data + 2)));
+		    smb_data_print(ndo, data + 2, min(bcc, ND_BYTES_BETWEEN(maxbuf, data + 2)));
 		}
 	    }
 	}

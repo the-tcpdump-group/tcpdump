@@ -357,10 +357,15 @@ extern void nd_pop_all_buffers(netdissect_options *);
 #define ND_TCHECK_SIZE(p) ND_TCHECK_LEN(p, sizeof(*(p)))
 
 /*
+ * Number of bytes between two pointers.
+ */
+#define ND_BYTES_BETWEEN(p1, p2) ((u_int)(((const uint8_t *)(p1)) - (const uint8_t *)(p2)))
+
+/*
  * Number of bytes remaining in the captured data, starting at the
  * byte pointed to by the argument.
  */
-#define ND_BYTES_AVAILABLE_AFTER(p) ((u_int)(ndo->ndo_snapend - (p)))
+#define ND_BYTES_AVAILABLE_AFTER(p) ND_BYTES_BETWEEN(ndo->ndo_snapend, (p))
 
 #define ND_PRINT(...) (ndo->ndo_printf)(ndo, __VA_ARGS__)
 #define ND_DEFAULTPRINT(ap, length) (*ndo->ndo_default_print)(ndo, ap, length)

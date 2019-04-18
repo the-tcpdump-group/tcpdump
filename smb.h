@@ -116,8 +116,6 @@
 #define TRANSACT2_FINDNOTIFYNEXT  12
 #define TRANSACT2_MKDIR           13
 
-#define PTR_DIFF(p1, p2) ((size_t)(((const char *)(p1)) - (const char *)(p2)))
-
 /* some protos */
 const u_char *smb_fdata(netdissect_options *, const u_char *, const char *, const u_char *, int);
 extern const char *smb_errstr(int, int);

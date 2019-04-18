@@ -242,7 +242,7 @@ name_len(netdissect_options *ndo,
 	s += GET_U_1(s) + 1;
 	ND_TCHECK_1(s);
     }
-    return(PTR_DIFF(s, s0) + 1);
+    return(ND_BYTES_BETWEEN(s, s0) + 1);
 
 trunc:
     return(-1);	/* name goes past the end of the buffer */
@@ -330,7 +330,7 @@ write_bits(netdissect_options *ndo,
     u_int i = 0;
 
     while ((p = strchr(fmt, '|'))) {
-	size_t l = PTR_DIFF(p, fmt);
+	u_int l = ND_BYTES_BETWEEN(p, fmt);
 	if (l && (val & (1 << i)))
 	    ND_PRINT("%.*s ", (int)l, fmt);
 	fmt = p + 1;
@@ -464,7 +464,7 @@ smb_fdata1(netdissect_options *ndo,
 	    u_int l;
 
 	    p = strchr(++fmt, '}');
-	    l = PTR_DIFF(p, fmt);
+	    l = ND_BYTES_BETWEEN(p, fmt);
 
 	    if (l > sizeof(bitfmt) - 1)
 		l = sizeof(bitfmt)-1;
@@ -728,7 +728,7 @@ smb_fdata1(netdissect_options *ndo,
 
 	    switch (t) {
 	    case 1:
-		name_type = name_extract(ndo, startbuf, PTR_DIFF(buf, startbuf),
+		name_type = name_extract(ndo, startbuf, ND_BYTES_BETWEEN(buf, startbuf),
 		    maxbuf, nbuf);
 		if (name_type < 0)
 		    goto trunc;
@@ -885,8 +885,8 @@ smb_fdata(netdissect_options *ndo,
 	}
     }
     if (!depth && buf < maxbuf) {
-	size_t len = PTR_DIFF(maxbuf, buf);
-	ND_PRINT("Data: (%lu bytes)\n", (unsigned long)len);
+	u_int len = ND_BYTES_BETWEEN(maxbuf, buf);
+	ND_PRINT("Data: (%u bytes)\n", len);
 	smb_data_print(ndo, buf, len);
 	return(buf + len);
     }
