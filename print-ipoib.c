@@ -45,7 +45,6 @@ static inline void
 ipoib_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	uint16_t ether_type;
-	char abuf[40];
 
 	ether_type = GET_BE_U_2(&bp[40]);
 	if (!ndo->ndo_qflag) {
@@ -73,7 +72,6 @@ ipoib_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 	const u_char *orig_hdr = p;
 	u_int orig_length;
 	u_short ether_type;
-	u_short extracted_ether_type;
 
 	if (caplen < IPOIB_HDRLEN || length < IPOIB_HDRLEN) {
 		printf("[|ipoib]");
