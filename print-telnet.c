@@ -497,7 +497,7 @@ telnet_parse(netdissect_options *ndo, const u_char *sp, u_int length, int print)
 	}
 
 done:
-	return sp - osp;
+	return (int)(sp - osp);
 
 trunc:
 	nd_print_trunc(ndo);
@@ -532,7 +532,7 @@ telnet_print(netdissect_options *ndo, const u_char *sp, u_int length)
 		if (ndo->ndo_Xflag && 2 < ndo->ndo_vflag) {
 			if (first)
 				ND_PRINT("\nTelnet:");
-			hex_print_with_offset(ndo, "\n", sp, l, sp - osp);
+			hex_print_with_offset(ndo, "\n", sp, l, (u_int)(sp - osp));
 			if (l > 8)
 				ND_PRINT("\n\t\t\t\t");
 			else

@@ -381,7 +381,7 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		/* Check if packet isn't over yet */
 		if (packet_iterator + packet_offset < ndo->ndo_snapend) {
 			hex_print_with_offset(ndo, "\n    Data: ", packet_iterator + packet_offset,
-				(ndo->ndo_snapend - (packet_iterator + packet_offset)), 0);
+				ND_BYTES_AVAILABLE_AFTER(packet_iterator + packet_offset), 0);
 		}
 	}
 	return;

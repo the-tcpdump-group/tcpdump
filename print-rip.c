@@ -303,7 +303,7 @@ rip_print(netdissect_options *ndo,
 		nd_print_trunc(ndo);
 		return;
 	}
-	len = ndo->ndo_snapend - dat;
+	len = ND_BYTES_AVAILABLE_AFTER(dat);
 	if (len > length)
 		len = length;
 	if (len < sizeof(*rp)) {

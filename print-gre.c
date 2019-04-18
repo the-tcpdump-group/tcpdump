@@ -224,7 +224,7 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 		isoclns_print(ndo, bp, len);
 		break;
 	case ETHERTYPE_TEB:
-		ether_print(ndo, bp, len, ndo->ndo_snapend - bp, NULL, NULL);
+		ether_print(ndo, bp, len, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL);
 		break;
 	default:
 		ND_PRINT("gre-proto-0x%x", prot);

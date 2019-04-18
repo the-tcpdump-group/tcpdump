@@ -276,7 +276,7 @@ fr_print(netdissect_options *ndo,
                         if (ethertype_print(ndo, extracted_ethertype,
                                             p+addr_len+ETHERTYPE_LEN,
                                             length-addr_len-ETHERTYPE_LEN,
-                                            ndo->ndo_snapend-p-addr_len-ETHERTYPE_LEN,
+                                            ND_BYTES_AVAILABLE_AFTER(p)-addr_len-ETHERTYPE_LEN,
                                             NULL, NULL) == 0)
                                 /* ether_type not known, probably it wasn't one */
                                 ND_PRINT("UI %02x! ", GET_U_1(p + addr_len));
@@ -333,7 +333,7 @@ fr_print(netdissect_options *ndo,
 		break;
 
 	case NLPID_SNAP:
-		if (snap_print(ndo, p, length, ndo->ndo_snapend - p, NULL, NULL, 0) == 0) {
+		if (snap_print(ndo, p, length, ND_BYTES_AVAILABLE_AFTER(p), NULL, NULL, 0) == 0) {
 			/* ether_type not known, print raw packet */
                         if (!ndo->ndo_eflag)
                             fr_hdr_print(ndo, length + hdr_len, hdr_len,

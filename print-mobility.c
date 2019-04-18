@@ -227,7 +227,7 @@ mobility_print(netdissect_options *ndo,
 		 * returned length, however, as it breaks out of the
 		 * header-processing loop.
 		 */
-		mhlen = ep - bp;
+		mhlen = (unsigned)(ep - bp);
 		goto trunc;
 	}
 	mhlen = (GET_U_1(mh->ip6m_len) + 1) << 3;

@@ -65,7 +65,7 @@ vxlan_print(netdissect_options *ndo, const u_char *bp, u_int len)
     ND_PRINT("flags [%s] (0x%02x), ", flags & 0x08 ? "I" : ".", flags);
     ND_PRINT("vni %u\n", vni);
 
-    ether_print(ndo, bp, len - VXLAN_HDR_LEN, ndo->ndo_snapend - bp, NULL, NULL);
+    ether_print(ndo, bp, len - VXLAN_HDR_LEN, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL);
 
     return;
 

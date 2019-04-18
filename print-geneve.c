@@ -224,9 +224,9 @@ geneve_print(netdissect_options *ndo, const u_char *bp, u_int len)
     else
         ND_PRINT("\n\t");
 
-    if (ethertype_print(ndo, prot, bp, len, ndo->ndo_snapend - bp, NULL, NULL) == 0) {
+    if (ethertype_print(ndo, prot, bp, len, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL) == 0) {
         if (prot == ETHERTYPE_TEB)
-            ether_print(ndo, bp, len, ndo->ndo_snapend - bp, NULL, NULL);
+            ether_print(ndo, bp, len, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL);
         else
             ND_PRINT("geneve-proto-0x%x", prot);
     }

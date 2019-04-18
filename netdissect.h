@@ -356,6 +356,12 @@ extern void nd_pop_all_buffers(netdissect_options *);
 /* Bail out if "*(p)" was not captured */
 #define ND_TCHECK_SIZE(p) ND_TCHECK_LEN(p, sizeof(*(p)))
 
+/*
+ * Number of bytes remaining in the captured data, starting at the
+ * byte pointed to by the argument.
+ */
+#define ND_BYTES_AVAILABLE_AFTER(p) ((u_int)(ndo->ndo_snapend - (p)))
+
 #define ND_PRINT(...) (ndo->ndo_printf)(ndo, __VA_ARGS__)
 #define ND_DEFAULTPRINT(ap, length) (*ndo->ndo_default_print)(ndo, ap, length)
 
@@ -731,8 +737,8 @@ extern int mask62plen(const u_char *);
 extern const char *dnname_string(netdissect_options *, u_short);
 extern const char *dnnum_string(netdissect_options *, u_short);
 
-extern int decode_prefix4(netdissect_options *, const u_char *, u_int, char *, u_int);
-extern int decode_prefix6(netdissect_options *, const u_char *, u_int, char *, u_int);
+extern int decode_prefix4(netdissect_options *, const u_char *, u_int, char *, size_t);
+extern int decode_prefix6(netdissect_options *, const u_char *, u_int, char *, size_t);
 
 extern void esp_print_decodesecret(netdissect_options *);
 extern int esp_print_decrypt_buffer_by_ikev2(netdissect_options *, int,

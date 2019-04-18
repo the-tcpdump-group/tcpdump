@@ -535,7 +535,7 @@ as_printf(netdissect_options *ndo,
 
 int
 decode_prefix4(netdissect_options *ndo,
-               const u_char *pptr, u_int itemlen, char *buf, u_int buflen)
+               const u_char *pptr, u_int itemlen, char *buf, size_t buflen)
 {
     struct in_addr addr;
     u_int plen, plenbytes;
@@ -567,7 +567,8 @@ badtlv:
 
 static int
 decode_labeled_prefix4(netdissect_options *ndo,
-                       const u_char *pptr, u_int itemlen, char *buf, u_int buflen)
+                       const u_char *pptr, u_int itemlen, char *buf,
+                       size_t buflen)
 {
     struct in_addr addr;
     u_int plen, plenbytes;
@@ -672,7 +673,7 @@ trunc:
  */
 static u_int
 bgp_vpn_sg_print(netdissect_options *ndo,
-                 const u_char *pptr, char *buf, u_int buflen)
+                 const u_char *pptr, char *buf, size_t buflen)
 {
     uint8_t addr_length;
     u_int total_length, offset;
@@ -687,7 +688,7 @@ bgp_vpn_sg_print(netdissect_options *ndo,
     /* Source address */
     ND_TCHECK_LEN(pptr, (addr_length >> 3));
     total_length += (addr_length >> 3) + 1;
-    offset = strlen(buf);
+    offset = (u_int)strlen(buf);
     if (addr_length) {
         nd_snprintf(buf + offset, buflen - offset, ", Source %s",
              bgp_vpn_ip_print(ndo, pptr, addr_length));
@@ -702,7 +703,7 @@ bgp_vpn_sg_print(netdissect_options *ndo,
     /* Group address */
     ND_TCHECK_LEN(pptr, (addr_length >> 3));
     total_length += (addr_length >> 3) + 1;
-    offset = strlen(buf);
+    offset = (u_int)strlen(buf);
     if (addr_length) {
         nd_snprintf(buf + offset, buflen - offset, ", Group %s",
              bgp_vpn_ip_print(ndo, pptr, addr_length));
@@ -901,7 +902,7 @@ trunc:
 
 static int
 decode_labeled_vpn_prefix4(netdissect_options *ndo,
-                           const u_char *pptr, char *buf, u_int buflen)
+                           const u_char *pptr, char *buf, size_t buflen)
 {
     struct in_addr addr;
     u_int plen;
@@ -952,7 +953,7 @@ trunc:
 
 static int
 decode_mdt_vpn_nlri(netdissect_options *ndo,
-                    const u_char *pptr, char *buf, u_int buflen)
+                    const u_char *pptr, char *buf, size_t buflen)
 {
     const u_char *rd;
     const u_char *vpn_ip;
@@ -1027,7 +1028,7 @@ decode_multicast_vpn(netdissect_options *ndo,
     switch(route_type) {
     case BGP_MULTICAST_VPN_ROUTE_TYPE_INTRA_AS_I_PMSI:
         ND_TCHECK_LEN(pptr, BGP_VPN_RD_LEN);
-        offset = strlen(buf);
+        offset = (u_int)strlen(buf);
         nd_snprintf(buf + offset, buflen - offset, ", RD: %s, Originator %s",
                     bgp_vpn_rd_print(ndo, pptr),
                     bgp_vpn_ip_print(ndo, pptr + BGP_VPN_RD_LEN,
@@ -1035,7 +1036,7 @@ decode_multicast_vpn(netdissect_options *ndo,
         break;
     case BGP_MULTICAST_VPN_ROUTE_TYPE_INTER_AS_I_PMSI:
         ND_TCHECK_LEN(pptr, BGP_VPN_RD_LEN + 4);
-        offset = strlen(buf);
+        offset = (u_int)strlen(buf);
         nd_snprintf(buf + offset, buflen - offset, ", RD: %s, Source-AS %s",
         bgp_vpn_rd_print(ndo, pptr),
         as_printf(ndo, astostr, sizeof(astostr),
@@ -1044,7 +1045,7 @@ decode_multicast_vpn(netdissect_options *ndo,
 
     case BGP_MULTICAST_VPN_ROUTE_TYPE_S_PMSI:
         ND_TCHECK_LEN(pptr, BGP_VPN_RD_LEN);
-        offset = strlen(buf);
+        offset = (u_int)strlen(buf);
         nd_snprintf(buf + offset, buflen - offset, ", RD: %s",
                     bgp_vpn_rd_print(ndo, pptr));
         pptr += BGP_VPN_RD_LEN;
@@ -1053,14 +1054,14 @@ decode_multicast_vpn(netdissect_options *ndo,
         addr_length =  route_length - sg_length;
 
         ND_TCHECK_LEN(pptr, addr_length);
-        offset = strlen(buf);
+        offset = (u_int)strlen(buf);
         nd_snprintf(buf + offset, buflen - offset, ", Originator %s",
                     bgp_vpn_ip_print(ndo, pptr, addr_length << 3));
         break;
 
     case BGP_MULTICAST_VPN_ROUTE_TYPE_SOURCE_ACTIVE:
         ND_TCHECK_LEN(pptr, BGP_VPN_RD_LEN);
-        offset = strlen(buf);
+        offset = (u_int)strlen(buf);
         nd_snprintf(buf + offset, buflen - offset, ", RD: %s",
                     bgp_vpn_rd_print(ndo, pptr));
         pptr += BGP_VPN_RD_LEN;
@@ -1071,7 +1072,7 @@ decode_multicast_vpn(netdissect_options *ndo,
     case BGP_MULTICAST_VPN_ROUTE_TYPE_SHARED_TREE_JOIN: /* fall through */
     case BGP_MULTICAST_VPN_ROUTE_TYPE_SOURCE_TREE_JOIN:
         ND_TCHECK_LEN(pptr, BGP_VPN_RD_LEN + 4);
-        offset = strlen(buf);
+        offset = (u_int)strlen(buf);
         nd_snprintf(buf + offset, buflen - offset, ", RD: %s, Source-AS %s",
                     bgp_vpn_rd_print(ndo, pptr),
                     as_printf(ndo, astostr, sizeof(astostr),
@@ -1117,7 +1118,7 @@ trunc:
 
 static int
 decode_labeled_vpn_l2(netdissect_options *ndo,
-                      const u_char *pptr, char *buf, u_int buflen)
+                      const u_char *pptr, char *buf, size_t buflen)
 {
     u_int plen, tlen, tlv_type, tlv_len, ttlv_len;
     int stringlen;
@@ -1230,7 +1231,7 @@ trunc:
 
 int
 decode_prefix6(netdissect_options *ndo,
-               const u_char *pd, u_int itemlen, char *buf, u_int buflen)
+               const u_char *pd, u_int itemlen, char *buf, size_t buflen)
 {
     struct in6_addr addr;
     u_int plen, plenbytes;
@@ -1263,7 +1264,7 @@ badtlv:
 
 static int
 decode_labeled_prefix6(netdissect_options *ndo,
-               const u_char *pptr, u_int itemlen, char *buf, u_int buflen)
+               const u_char *pptr, u_int itemlen, char *buf, size_t buflen)
 {
     struct in6_addr addr;
     u_int plen, plenbytes;
@@ -1308,7 +1309,7 @@ badtlv:
 
 static int
 decode_labeled_vpn_prefix6(netdissect_options *ndo,
-                           const u_char *pptr, char *buf, u_int buflen)
+                           const u_char *pptr, char *buf, size_t buflen)
 {
     struct in6_addr addr;
     u_int plen;
@@ -1347,7 +1348,7 @@ trunc:
 
 static int
 decode_clnp_prefix(netdissect_options *ndo,
-                   const u_char *pptr, char *buf, u_int buflen)
+                   const u_char *pptr, char *buf, size_t buflen)
 {
     uint8_t addr[19];
     u_int plen;
@@ -1377,7 +1378,7 @@ trunc:
 
 static int
 decode_labeled_vpn_clnp_prefix(netdissect_options *ndo,
-                               const u_char *pptr, char *buf, u_int buflen)
+                               const u_char *pptr, char *buf, size_t buflen)
 {
     uint8_t addr[19];
     u_int plen;

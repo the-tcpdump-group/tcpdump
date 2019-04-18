@@ -114,7 +114,7 @@ chdlc_print(netdissect_options *ndo, const u_char *p, u_int length)
 
 trunc:
 	nd_print_trunc(ndo);
-	return ndo->ndo_snapend - bp;
+	return (ND_BYTES_AVAILABLE_AFTER(bp));
 }
 
 /*

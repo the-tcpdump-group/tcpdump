@@ -65,7 +65,7 @@ ascii_print(netdissect_options *ndo,
 	u_char s;
 
 	ndo->ndo_protocol = "ascii";
-	caplength = (ndo->ndo_snapend > cp) ? ndo->ndo_snapend - cp : 0;
+	caplength = (ndo->ndo_snapend > cp) ? ND_BYTES_AVAILABLE_AFTER(cp) : 0;
 	if (length > caplength)
 		length = caplength;
 	ND_PRINT("\n");
@@ -106,7 +106,7 @@ hex_and_ascii_print_with_offset(netdissect_options *ndo, const char *ident,
 	char hexstuff[HEXDUMP_SHORTS_PER_LINE*HEXDUMP_HEXSTUFF_PER_SHORT+1], *hsp;
 	char asciistuff[ASCII_LINELENGTH+1], *asp;
 
-	caplength = (ndo->ndo_snapend > cp) ? ndo->ndo_snapend - cp : 0;
+	caplength = (ndo->ndo_snapend > cp) ? ND_BYTES_AVAILABLE_AFTER(cp) : 0;
 	if (length > caplength)
 		length = caplength;
 	nshorts = length / sizeof(u_short);
@@ -169,7 +169,7 @@ hex_print_with_offset(netdissect_options *ndo,
 	u_int i, s;
 	u_int nshorts;
 
-	caplength = (ndo->ndo_snapend > cp) ? ndo->ndo_snapend - cp : 0;
+	caplength = (ndo->ndo_snapend > cp) ? ND_BYTES_AVAILABLE_AFTER(cp) : 0;
 	if (length > caplength)
 		length = caplength;
 	nshorts = length / sizeof(u_short);

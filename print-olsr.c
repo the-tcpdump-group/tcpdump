@@ -519,10 +519,10 @@ olsr_print(netdissect_options *ndo,
 
         case OLSR_MID_MSG:
         {
-            size_t addr_size = sizeof(nd_ipv4);
+            u_int addr_size = (u_int)sizeof(nd_ipv4);
 
             if (is_ipv6)
-                addr_size = sizeof(nd_ipv6);
+                addr_size = (u_int)sizeof(nd_ipv6);
 
             while (msg_tlen >= addr_size) {
                 ND_TCHECK_LEN(msg_data, addr_size);

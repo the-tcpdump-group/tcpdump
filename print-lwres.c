@@ -210,7 +210,7 @@ lwres_printname(netdissect_options *ndo,
 	}
 	p++;	/* skip terminating \0 */
 
-	return p - p0;
+	return (int)(p - p0);
 
   trunc:
 	return -1;
@@ -254,7 +254,7 @@ lwres_printbinlen(netdissect_options *ndo,
 		ND_PRINT("%02x", GET_U_1(p));
 		p++;
 	}
-	return p - p0;
+	return (int)(p - p0);
 
   trunc:
 	return -1;
