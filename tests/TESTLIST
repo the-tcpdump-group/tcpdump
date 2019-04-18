@@ -681,3 +681,5 @@ dns-uri		dns-uri.pcap	dns-uri.out
 vsock-1	vsock-1.pcapng	vsock-1.out
 vsock-1-v	vsock-1.pcapng	vsock-1-v.out -v
 vsock-1-vv	vsock-1.pcapng	vsock-1-vv.out -vv
+#IP over infinband (ipoib)
+ipoib	ipoib.pcap	ipoib.out
