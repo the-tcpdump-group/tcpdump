@@ -202,42 +202,6 @@ static const struct tok icmp2str[] = {
 	{ 0,				NULL }
 };
 
-/* Formats for most of the ICMP_UNREACH codes */
-static const struct tok unreach2str[] = {
-	{ ICMP_UNREACH_NET,		"net %s unreachable" },
-	{ ICMP_UNREACH_HOST,		"host %s unreachable" },
-	{ ICMP_UNREACH_SRCFAIL,
-	    "%s unreachable - source route failed" },
-	{ ICMP_UNREACH_NET_UNKNOWN,	"net %s unreachable - unknown" },
-	{ ICMP_UNREACH_HOST_UNKNOWN,	"host %s unreachable - unknown" },
-	{ ICMP_UNREACH_ISOLATED,
-	    "%s unreachable - source host isolated" },
-	{ ICMP_UNREACH_NET_PROHIB,
-	    "net %s unreachable - admin prohibited" },
-	{ ICMP_UNREACH_HOST_PROHIB,
-	    "host %s unreachable - admin prohibited" },
-	{ ICMP_UNREACH_TOSNET,
-	    "net %s unreachable - tos prohibited" },
-	{ ICMP_UNREACH_TOSHOST,
-	    "host %s unreachable - tos prohibited" },
-	{ ICMP_UNREACH_FILTER_PROHIB,
-	    "host %s unreachable - admin prohibited filter" },
-	{ ICMP_UNREACH_HOST_PRECEDENCE,
-	    "host %s unreachable - host precedence violation" },
-	{ ICMP_UNREACH_PRECEDENCE_CUTOFF,
-	    "host %s unreachable - precedence cutoff" },
-	{ 0,				NULL }
-};
-
-/* Formats for the ICMP_REDIRECT codes */
-static const struct tok type2str[] = {
-	{ ICMP_REDIRECT_NET,		"redirect %s to net %s" },
-	{ ICMP_REDIRECT_HOST,		"redirect %s to host %s" },
-	{ ICMP_REDIRECT_TOSNET,		"redirect-tos %s to net %s" },
-	{ ICMP_REDIRECT_TOSHOST,	"redirect-tos %s to host %s" },
-	{ 0,				NULL }
-};
-
 /* rfc1191 */
 struct mtu_discovery {
 	nd_uint16_t unused;
@@ -335,7 +299,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 	uint8_t icmp_type, icmp_code;
         const struct icmp_ext_t *ext_dp;
 	const struct ip *ip;
-	const char *str, *fmt;
+	const char *str;
 	const struct ip *oip;
 	uint8_t ip_proto;
 	const struct udphdr *ouh;
@@ -372,6 +336,18 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 	case ICMP_UNREACH:
 		ND_TCHECK_4(dp->icmp_ip.ip_dst);
 		switch (icmp_code) {
+
+		case ICMP_UNREACH_NET:
+			(void)nd_snprintf(buf, sizeof(buf),
+			    "net %s unreachable",
+			    ipaddr_string(ndo, dp->icmp_ip.ip_dst));
+			break;
+
+		case ICMP_UNREACH_HOST:
+			(void)nd_snprintf(buf, sizeof(buf),
+			    "host %s unreachable",
+			    ipaddr_string(ndo, dp->icmp_ip.ip_dst));
+			break;
 
 		case ICMP_UNREACH_PROTOCOL:
 			ND_TCHECK_1(dp->icmp_ip.ip_p);
@@ -431,22 +407,120 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		    }
 			break;
 
-		default:
-			fmt = tok2str(unreach2str, "#%u %%s unreachable",
-			    icmp_code);
-			(void)nd_snprintf(buf, sizeof(buf), fmt,
+		case ICMP_UNREACH_SRCFAIL:
+			(void)nd_snprintf(buf, sizeof(buf),
+			    "%s unreachable - source route failed",
 			    ipaddr_string(ndo, dp->icmp_ip.ip_dst));
+			break;
+
+		case ICMP_UNREACH_NET_UNKNOWN:
+			(void)nd_snprintf(buf, sizeof(buf),
+			    "net %s unreachable - unknown",
+			    ipaddr_string(ndo, dp->icmp_ip.ip_dst));
+			break;
+
+		case ICMP_UNREACH_HOST_UNKNOWN:
+			(void)nd_snprintf(buf, sizeof(buf),
+			    "host %s unreachable - unknown",
+			    ipaddr_string(ndo, dp->icmp_ip.ip_dst));
+			break;
+
+		case ICMP_UNREACH_ISOLATED:
+			(void)nd_snprintf(buf, sizeof(buf),
+			    "%s unreachable - source host isolated",
+			    ipaddr_string(ndo, dp->icmp_ip.ip_dst));
+			break;
+
+		case ICMP_UNREACH_NET_PROHIB:
+			(void)nd_snprintf(buf, sizeof(buf),
+			    "net %s unreachable - admin prohibited",
+			    ipaddr_string(ndo, dp->icmp_ip.ip_dst));
+			break;
+
+		case ICMP_UNREACH_HOST_PROHIB:
+			(void)nd_snprintf(buf, sizeof(buf),
+			    "host %s unreachable - admin prohibited",
+			    ipaddr_string(ndo, dp->icmp_ip.ip_dst));
+			break;
+
+		case ICMP_UNREACH_TOSNET:
+			(void)nd_snprintf(buf, sizeof(buf),
+			    "net %s unreachable - tos prohibited",
+			    ipaddr_string(ndo, dp->icmp_ip.ip_dst));
+			break;
+
+		case ICMP_UNREACH_TOSHOST:
+			(void)nd_snprintf(buf, sizeof(buf),
+			    "host %s unreachable - tos prohibited",
+			    ipaddr_string(ndo, dp->icmp_ip.ip_dst));
+			break;
+
+		case ICMP_UNREACH_FILTER_PROHIB:
+			(void)nd_snprintf(buf, sizeof(buf),
+			    "host %s unreachable - admin prohibited filter",
+			    ipaddr_string(ndo, dp->icmp_ip.ip_dst));
+			break;
+
+		case ICMP_UNREACH_HOST_PRECEDENCE:
+			(void)nd_snprintf(buf, sizeof(buf),
+			    "host %s unreachable - host precedence violation",
+			    ipaddr_string(ndo, dp->icmp_ip.ip_dst));
+			break;
+
+		case ICMP_UNREACH_PRECEDENCE_CUTOFF:
+			(void)nd_snprintf(buf, sizeof(buf),
+			    "host %s unreachable - precedence cutoff",
+			    ipaddr_string(ndo, dp->icmp_ip.ip_dst));
+			break;
+
+		default:
+			(void)nd_snprintf(buf, sizeof(buf),
+			    "%s unreachable - #%u",
+			    ipaddr_string(ndo, dp->icmp_ip.ip_dst),
+			    icmp_code);
 			break;
 		}
 		break;
 
 	case ICMP_REDIRECT:
 		ND_TCHECK_4(dp->icmp_ip.ip_dst);
-		fmt = tok2str(type2str, "redirect-#%u %%s to net %%s",
-		    icmp_code);
-		(void)nd_snprintf(buf, sizeof(buf), fmt,
-		    ipaddr_string(ndo, dp->icmp_ip.ip_dst),
-		    ipaddr_string(ndo, dp->icmp_gwaddr));
+		switch (icmp_code) {
+
+		case ICMP_REDIRECT_NET:
+			(void)nd_snprintf(buf, sizeof(buf),
+			    "redirect %s to net %s",
+			    ipaddr_string(ndo, dp->icmp_ip.ip_dst),
+			    ipaddr_string(ndo, dp->icmp_gwaddr));
+			break;
+
+		case ICMP_REDIRECT_HOST:
+			(void)nd_snprintf(buf, sizeof(buf),
+			    "redirect %s to host %s",
+			    ipaddr_string(ndo, dp->icmp_ip.ip_dst),
+			    ipaddr_string(ndo, dp->icmp_gwaddr));
+			break;
+
+		case ICMP_REDIRECT_TOSNET:
+			(void)nd_snprintf(buf, sizeof(buf),
+			    "redirect-tos %s to net %s",
+			    ipaddr_string(ndo, dp->icmp_ip.ip_dst),
+			    ipaddr_string(ndo, dp->icmp_gwaddr));
+			break;
+
+		case ICMP_REDIRECT_TOSHOST:
+			(void)nd_snprintf(buf, sizeof(buf),
+			    "redirect-tos %s to host %s",
+			    ipaddr_string(ndo, dp->icmp_ip.ip_dst),
+			    ipaddr_string(ndo, dp->icmp_gwaddr));
+			break;
+
+		default:
+			(void)nd_snprintf(buf, sizeof(buf),
+			    "redirect-#%u %s to %s", icmp_code,
+			    ipaddr_string(ndo, dp->icmp_ip.ip_dst),
+			    ipaddr_string(ndo, dp->icmp_gwaddr));
+			break;
+		}
 		break;
 
 	case ICMP_ROUTERADVERT:
