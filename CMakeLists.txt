@@ -520,7 +520,7 @@ endif(HAVE_AF_INET6 AND HAVE_STRUCT_IN6_ADDR)
 ######################################
 
 #
-# libpcap/WinPcap.
+# libpcap/WinPcap/Npcap.
 # First, find it.
 #
 find_package(PCAP REQUIRED)
@@ -540,7 +540,7 @@ set(CMAKE_REQUIRED_INCLUDES ${PCAP_INCLUDE_DIRS})
 check_include_file(pcap/pcap-inttypes.h HAVE_PCAP_PCAP_INTTYPES_H)
 
 #
-# Check for various functions in libpcap/WinPcap.
+# Check for various functions in libpcap/WinPcap/Npcap.
 #
 cmake_push_check_state()
 set(CMAKE_REQUIRED_LIBRARIES ${PCAP_LIBRARIES})
