@@ -988,6 +988,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-ipcomp.c
     print-ipfc.c
     print-ipnet.c
+    print-ipoib.c
     print-ipx.c
     print-isakmp.c
     print-isoclns.c
