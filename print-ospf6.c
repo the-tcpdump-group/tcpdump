@@ -603,9 +603,9 @@ ospf6_print_lsa(netdissect_options *ndo,
 			if (lsa_length < sizeof (nd_ipv6))
 				return (1);
 			lsa_length -= sizeof (nd_ipv6);
-			ND_TCHECK_8(tptr);
+			ND_TCHECK_16(tptr);
 			ND_PRINT(" forward %s",
-			       ip6addr_string(ndo, tptr));
+				 ip6addr_string(ndo, tptr));
 			tptr += sizeof(nd_ipv6);
 		}
 
