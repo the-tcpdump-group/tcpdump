@@ -155,8 +155,6 @@ again:
 	case IPPROTO_IPV4:
 		/* ipv4-in-ip encapsulation */
 		ip_print(ndo, bp, length);
-		if (! ndo->ndo_vflag)
-			ND_PRINT(" (ipip-proto-4)");
 		break;
 
 	case IPPROTO_IPV6:
