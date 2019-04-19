@@ -23,6 +23,8 @@
  * Copyright (c) 2011, 2016, Oracle and/or its affiliates. All rights reserved.
  */
 
+/* \summary: IP-over-InfiniBand (IPoIB) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -46,17 +48,17 @@ ipoib_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	uint16_t ether_type;
 
-	ether_type = GET_BE_U_2(&bp[40]);
+	ether_type = GET_BE_U_2(bp + 40);
 	if (!ndo->ndo_qflag) {
-		(void)printf(", ethertype %s (0x%04x)",
+		ND_PRINT(", ethertype %s (0x%04x)",
 			     tok2str(ethertype_values,"Unknown", ether_type),
 			     ether_type);
 	} else {
-		(void)printf(", ethertype %s",
+		ND_PRINT(", ethertype %s",
 			     tok2str(ethertype_values,"Unknown", ether_type));
 	}
 
-	(void)printf(", length %u: ", length);
+	ND_PRINT(", length %u: ", length);
 }
 
 /*
@@ -74,11 +76,12 @@ ipoib_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 	u_short ether_type;
 
 	if (caplen < IPOIB_HDRLEN || length < IPOIB_HDRLEN) {
-		printf("[|ipoib]");
+		nd_print_trunc(ndo);
 		return;
 	}
 
 	if (ndo->ndo_eflag) {
+		ND_PRINT("IPOIB");
 		if (print_encap_header != NULL)
 			(*print_encap_header)(encap_header_arg);
 		ipoib_hdr_print(ndo, p, length);
@@ -87,7 +90,7 @@ ipoib_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 
 	length -= IPOIB_HDRLEN;
 	caplen -= IPOIB_HDRLEN;
-	ether_type = GET_BE_U_2(&p[40]);
+	ether_type = GET_BE_U_2(p + 40);
 	p += IPOIB_HDRLEN;
 
 	if (ethertype_print(ndo, ether_type, p, length, caplen, NULL, NULL) == 0) {
@@ -112,14 +115,8 @@ ipoib_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 u_int
 ipoib_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
+	ndo->ndo_protocol = "ipoib";
 	ipoib_print(ndo, p, h->len, h->caplen, NULL, NULL);
 
 	return (IPOIB_HDRLEN);
 }
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */
