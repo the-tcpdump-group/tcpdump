@@ -1539,13 +1539,13 @@ ieee802_15_4_print_aux_sec_header(netdissect_options *ndo,
 			ND_PRINT("[ERROR: Truncated before Frame Counter]");
 			return -1;
 		}
-		len += 4;
-		caplen -= 4;
-		p += 4;
 		if (ndo->ndo_vflag > 1) {
 			ND_PRINT("Frame Counter 0x%08x ",
-				 GET_LE_U_4(p + 1));
+				 GET_LE_U_4(p));
 		}
+		p += 4;
+		caplen -= 4;
+		len += 4;
 	}
 	switch (key_id_mode) {
 	case 0x00: /* Implicit. */
@@ -2008,6 +2008,13 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 	p += src_addr_len;
 	caplen -= src_addr_len;
 	if (CHECK_BIT(fc, 3)) {
+		/*
+		 * XXX - if frame_version is 0, this is the 2003
+		 * spec, and you don't have the auxiliary security
+		 * header, you have a frame counter and key index
+		 * for the AES-CTR and AES-CCM security suites but
+		 * not for the AES-CBC-MAC security suite.
+		 */
 		len = ieee802_15_4_print_aux_sec_header(ndo, p, caplen,
 							&security_level);
 		if (len < 0) {
