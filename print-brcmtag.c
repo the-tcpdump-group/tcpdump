@@ -32,13 +32,6 @@
 #include "addrtoname.h"
 #include "extract.h"
 
-struct	ether_header {
-	nd_mac_addr	ether_dhost;
-	nd_mac_addr	ether_shost;
-	nd_uint16_t	ether_length_type;
-};
-
-#define ETHER_SA_OFFSET		12
 #define ETHER_TYPE_LEN		2
 
 #define BRCM_TAG_LEN		4
@@ -126,46 +119,46 @@ u_int
 brcm_tag_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 		  const u_char *p)
 {
-	const struct ether_header *ehp;
-	int old_eflag = ndo->ndo_eflag;
 	u_int caplen = h->caplen;
 	u_int length = h->len;
+	int save_eflag;
 	int ret;
 
 	ndo->ndo_protocol = "brcm-tag";
-	if (caplen < ETHER_SA_OFFSET + BRCM_TAG_LEN) {
+	if (caplen < 2*MAC_ADDR_LEN + BRCM_TAG_LEN) {
 		nd_print_trunc(ndo);
 		return (caplen);
 	}
 
-	if (length < ETHER_SA_OFFSET + BRCM_TAG_LEN) {
+	if (length < 2*MAC_ADDR_LEN + BRCM_TAG_LEN) {
 		nd_print_trunc(ndo);
 		return (length);
 	}
 
-	ehp = (const struct ether_header *)p;
 	if (ndo->ndo_eflag)
 		ND_PRINT("%s > %s, ",
-			 etheraddr_string(ndo, ehp->ether_shost),
-			 etheraddr_string(ndo, ehp->ether_dhost));
+			 etheraddr_string(ndo, p + MAC_ADDR_LEN),
+			 etheraddr_string(ndo, p));
 
-	if (brcm_tag_print_full(ndo, p + ETHER_SA_OFFSET,
-				caplen - ETHER_SA_OFFSET))
+	if (brcm_tag_print_full(ndo, p + 2*MAC_ADDR_LEN,
+				caplen - 2*MAC_ADDR_LEN))
 		return (1);
 
-	/* We printed the Ethernet header already */
+	/* We printed the Ethernet destination and source addresses already */
+	save_eflag = ndo->ndo_eflag;
 	ndo->ndo_eflag = 0;
 
-	/* Parse the Ethernet frame regularly telling how big the non
-	 * standard Ethernet header is.
+	/* Parse the rest of the Ethernet header, and the frame payload,
+	 * telling ether_hdr_len_print() how big the non-standard Ethernet
+	 * header is.
 	 *
-	 * +-----------++-----------++----------------++--------------+
-	 * | MAC DA (6)|| MAC SA (6)||Broadcom tag (4)||Type/Length(2)|
-	 * +-----------++-----------++----------------++--------------+
+	 * +-----------+-----------+----------------+--------------+
+	 * | MAC DA (6)| MAC SA (6)|Broadcom tag (4)|Type/Length(2)|
+	 * +-----------+-----------+----------------+--------------+
 	 */
 	ret = ether_hdr_len_print(ndo, p, length, caplen, NULL, NULL,
-				  ETHER_SA_OFFSET + BRCM_TAG_LEN + ETHER_TYPE_LEN);
-	ndo->ndo_eflag = old_eflag;
+				  2*MAC_ADDR_LEN + BRCM_TAG_LEN + ETHER_TYPE_LEN);
+	ndo->ndo_eflag = save_eflag;
 	return ret;
 }
 

@@ -112,34 +112,35 @@ dsa_if_print_full(netdissect_options *ndo, const struct pcap_pkthdr *h,
 		  const u_char *p, u_int taglen)
 {
 	const u_char *edsa, *dsa;
-	int eflag, ret;
+	int save_eflag;
+	int ret;
 
-	if (h->caplen < 12 + taglen) {
+	if (h->caplen < 2*MAC_ADDR_LEN + taglen) {
 		nd_print_trunc(ndo);
 		return (h->caplen);
 	}
 
-	if (h->len < 12 + taglen) {
+	if (h->len < 2*MAC_ADDR_LEN + taglen) {
 		nd_print_trunc(ndo);
 		return (h->len);
 	}
 
 	if (taglen == EDSA_LEN) {
-		edsa = p + 12;
+		edsa = p + 2*MAC_ADDR_LEN;
 		dsa = edsa + 4;
 	} else {
 		edsa = NULL;
-		dsa = p + 12;
+		dsa = p + 2*MAC_ADDR_LEN;
 	}
 
 	if (ndo->ndo_eflag) {
 		ND_PRINT("%s > %s, ",
-			 etheraddr_string(ndo, p + 6),
+			 etheraddr_string(ndo, p + MAC_ADDR_LEN),
 			 etheraddr_string(ndo, p));
 
 		if (edsa) {
 			ND_PRINT("Marvell EDSA ethertype 0x%04x (%s), ", EDSA_ETYPE(edsa),
-				 tok2str(ethertype_values, "unregistered", EDSA_ETYPE(edsa)));
+				 tok2str(ethertype_values, "Unknown", EDSA_ETYPE(edsa)));
 			ND_PRINT("rsvd %u %u, ", edsa[2], edsa[3]);
 		} else {
 			ND_PRINT("Marvell DSA ");
@@ -209,11 +210,22 @@ dsa_if_print_full(netdissect_options *ndo, const struct pcap_pkthdr *h,
 		ND_PRINT("VLAN %u%c, ", DSA_VID(dsa), DSA_TAGGED(dsa) ? 't' : 'u');
 	}
 
-	eflag = ndo->ndo_eflag;
+	/* We printed the Ethernet destination and source addresses already */
+	save_eflag = ndo->ndo_eflag;
 	ndo->ndo_eflag = 0;
+
+	/* Parse the rest of the Ethernet header, and the frame payload,
+	 * telling ether_hdr_len_print() how big the non-standard Ethernet
+	 * header is.
+	 *
+	 * +-----------+-----------+---------------------+--------------+
+	 * | MAC DA (6)| MAC SA (6)|DSA/EDSA tag (taglen)|Type/Length(2)|
+	 * +-----------+-----------+---------------------+--------------+
+	 */
 	ret = ether_hdr_len_print(ndo, p, h->len, h->caplen, NULL, NULL,
-				  12 + taglen + 2);
-	ndo->ndo_eflag = eflag;
+				  2*MAC_ADDR_LEN + taglen + 2);
+
+	ndo->ndo_eflag = save_eflag;
 
 	return ret;
 }
