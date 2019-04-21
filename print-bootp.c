@@ -1055,7 +1055,7 @@ trunc:
 	nd_print_trunc(ndo);
 }
 
-#define PRINTCMUADDR(m, s) { ND_TCHECK_4(&cmu->m); \
+#define PRINTCMUADDR(m, s) { ND_TCHECK_4(cmu->m); \
     if (GET_IPV4_TO_NETWORK_ORDER(cmu->m) != 0) \
 	ND_PRINT(" %s:%s", s, ipaddr_string(ndo, cmu->m)); }
 

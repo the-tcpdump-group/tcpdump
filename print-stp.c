@@ -113,7 +113,7 @@ stp_print_config_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
 
     ND_TCHECK_2(stp_bpdu->port_id);
     ND_PRINT(", bridge-id %s.%04x, length %u",
-           stp_print_bridge_id(ndo, (const u_char *)&stp_bpdu->bridge_id),
+           stp_print_bridge_id(ndo, stp_bpdu->bridge_id),
            GET_BE_U_2(stp_bpdu->port_id), length);
 
     /* in non-verbose mode just print the bridge-id */
@@ -130,7 +130,7 @@ stp_print_config_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
            (float) GET_BE_U_2(stp_bpdu->forward_delay) / STP_TIME_BASE);
 
     ND_PRINT("\n\troot-id %s, root-pathcost %u",
-           stp_print_bridge_id(ndo, (const u_char *)&stp_bpdu->root_id),
+           stp_print_bridge_id(ndo, stp_bpdu->root_id),
            GET_BE_U_4(stp_bpdu->root_path_cost));
 
     /* Port role is only valid for 802.1w */
@@ -270,12 +270,12 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
 
     ND_TCHECK_4(stp_bpdu->root_path_cost);
     ND_PRINT("CIST root-id %s, CIST ext-pathcost %u",
-           stp_print_bridge_id(ndo, (const u_char *)&stp_bpdu->root_id),
+           stp_print_bridge_id(ndo, stp_bpdu->root_id),
            GET_BE_U_4(stp_bpdu->root_path_cost));
 
-    ND_TCHECK_SIZE(&stp_bpdu->bridge_id);
+    ND_TCHECK_SIZE(stp_bpdu->bridge_id);
     ND_PRINT("\n\tCIST regional-root-id %s, ",
-           stp_print_bridge_id(ndo, (const u_char *)&stp_bpdu->bridge_id));
+           stp_print_bridge_id(ndo, stp_bpdu->bridge_id));
 
     ND_TCHECK_2(stp_bpdu->port_id);
     ND_PRINT("CIST port-id %04x,", GET_BE_U_2(stp_bpdu->port_id));

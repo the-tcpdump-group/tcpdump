@@ -60,7 +60,7 @@ bt_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *
 	caplen -= BT_HDRLEN;
 	length -= BT_HDRLEN;
 	p += BT_HDRLEN;
-	ND_TCHECK_4(&hdr->direction);
+	ND_TCHECK_4(hdr->direction);
 	if (ndo->ndo_eflag)
 		ND_PRINT(", hci length %u, direction %s", length,
 			 (GET_BE_U_4(hdr->direction)&0x1) ? "in" : "out");
