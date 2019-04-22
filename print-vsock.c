@@ -127,24 +127,24 @@ vsock_virtio_hdr_print(netdissect_options *ndo, const struct virtio_vsock_hdr *h
 	uint16_t u16_v;
 	uint32_t u32_v;
 
-	u32_v = GET_LE_U_4(&hdr->len);
+	u32_v = GET_LE_U_4(hdr->len);
 	ND_PRINT("len %u", u32_v);
 
-	u16_v = GET_LE_U_2(&hdr->type);
+	u16_v = GET_LE_U_2(hdr->type);
 	ND_PRINT(", type %s",
 		 tok2str(virtio_type, "Invalid type (%hu)", u16_v));
 
-	u16_v = GET_LE_U_2(&hdr->op);
+	u16_v = GET_LE_U_2(hdr->op);
 	ND_PRINT(", op %s",
 		 tok2str(virtio_op, "Invalid op (%hu)", u16_v));
 
-	u32_v = GET_LE_U_4(&hdr->flags);
+	u32_v = GET_LE_U_4(hdr->flags);
 	ND_PRINT(", flags %x", u32_v);
 
-	u32_v = GET_LE_U_4(&hdr->buf_alloc);
+	u32_v = GET_LE_U_4(hdr->buf_alloc);
 	ND_PRINT(", buf_alloc %u", u32_v);
 
-	u32_v = GET_LE_U_4(&hdr->fwd_cnt);
+	u32_v = GET_LE_U_4(hdr->fwd_cnt);
 	ND_PRINT(", fwd_cnt %u", u32_v);
 }
 
@@ -194,7 +194,7 @@ vsock_hdr_print(netdissect_options *ndo, const u_char *p, const u_int len)
 	size_t total_hdr_size;
 	int ret = 0;
 
-	hdr_transport = GET_LE_U_2(&hdr->transport);
+	hdr_transport = GET_LE_U_2(hdr->transport);
 	ND_PRINT("%s",
 		 tok2str(vsock_transport, "Invalid transport (%u)",
 			  hdr_transport));
@@ -207,11 +207,11 @@ vsock_hdr_print(netdissect_options *ndo, const u_char *p, const u_int len)
 	} else
 		ND_PRINT(" ");
 
-	hdr_src_cid = GET_LE_U_8(&hdr->src_cid);
-	hdr_dst_cid = GET_LE_U_8(&hdr->dst_cid);
-	hdr_src_port = GET_LE_U_4(&hdr->src_port);
-	hdr_dst_port = GET_LE_U_4(&hdr->dst_port);
-	hdr_op = GET_LE_U_2(&hdr->op);
+	hdr_src_cid = GET_LE_U_8(hdr->src_cid);
+	hdr_dst_cid = GET_LE_U_8(hdr->dst_cid);
+	hdr_src_port = GET_LE_U_4(hdr->src_port);
+	hdr_dst_port = GET_LE_U_4(hdr->dst_port);
+	hdr_op = GET_LE_U_2(hdr->op);
 	ND_PRINT("%" PRIu64 ".%u > %" PRIu64 ".%u %s, length %u",
 		 hdr_src_cid, hdr_src_port,
 		 hdr_dst_cid, hdr_dst_port,
