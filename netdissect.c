@@ -151,40 +151,65 @@ int
 nd_push_buffer(netdissect_options *ndo, u_char *new_buffer,
     const u_char *new_packetp, const u_char *new_snapend)
 {
-	struct netdissect_saved_info *ndsi;
+	struct netdissect_saved_packet_info *ndspi;
 
-	ndsi = (struct netdissect_saved_info *)malloc(sizeof(struct netdissect_saved_info));
-	if (ndsi == NULL)
+	ndspi = (struct netdissect_saved_packet_info *)malloc(sizeof(struct netdissect_saved_packet_info));
+	if (ndspi == NULL)
 		return (0);	/* fail */
-	ndsi->ndsi_buffer = new_buffer;
-	ndsi->ndsi_packetp = ndo->ndo_packetp;
-	ndsi->ndsi_snapend = ndo->ndo_snapend;
-	ndsi->ndsi_prev = ndo->ndo_buffer_stack;
+	ndspi->ndspi_buffer = new_buffer;
+	ndspi->ndspi_packetp = ndo->ndo_packetp;
+	ndspi->ndspi_snapend = ndo->ndo_snapend;
+	ndspi->ndspi_prev = ndo->ndo_packet_info_stack;
 
 	ndo->ndo_packetp = new_packetp;
 	ndo->ndo_snapend = new_snapend;
-	ndo->ndo_buffer_stack = ndsi;
+	ndo->ndo_packet_info_stack = ndspi;
+
+	return (1);	/* success */
+}
+
+/*
+ * Set a new snapshot end to the minimum of the existing snapshot end
+ * and the new snapshot end.
+ */
+int
+nd_push_snapend(netdissect_options *ndo, const u_char *new_snapend)
+{
+	struct netdissect_saved_packet_info *ndspi;
+
+	ndspi = (struct netdissect_saved_packet_info *)malloc(sizeof(struct netdissect_saved_packet_info));
+	if (ndspi == NULL)
+		return (0);	/* fail */
+	ndspi->ndspi_buffer = NULL;	/* no new buffer */
+	ndspi->ndspi_packetp = ndo->ndo_packetp;
+	ndspi->ndspi_snapend = ndo->ndo_snapend;
+	ndspi->ndspi_prev = ndo->ndo_packet_info_stack;
+
+	/* No new packet pointer, either */
+	if (new_snapend < ndo->ndo_snapend)
+		ndo->ndo_snapend = new_snapend;
+	ndo->ndo_packet_info_stack = ndspi;
 
 	return (1);	/* success */
 }
 
 void
-nd_pop_buffer(netdissect_options *ndo)
+nd_pop_packet_info(netdissect_options *ndo)
 {
-	struct netdissect_saved_info *ndsi;
+	struct netdissect_saved_packet_info *ndspi;
 
-	ndsi = ndo->ndo_buffer_stack;
-	ndo->ndo_packetp = ndsi->ndsi_packetp;
-	ndo->ndo_snapend = ndsi->ndsi_snapend;
-	ndo->ndo_buffer_stack = ndsi->ndsi_prev;
+	ndspi = ndo->ndo_packet_info_stack;
+	ndo->ndo_packetp = ndspi->ndspi_packetp;
+	ndo->ndo_snapend = ndspi->ndspi_snapend;
+	ndo->ndo_packet_info_stack = ndspi->ndspi_prev;
 
-	free(ndsi->ndsi_buffer);
-	free(ndsi);
+	free(ndspi->ndspi_buffer);
+	free(ndspi);
 }
 
 void
-nd_pop_all_buffers(netdissect_options *ndo)
+nd_pop_all_packet_info(netdissect_options *ndo)
 {
-	while (ndo->ndo_buffer_stack != NULL)
-		nd_pop_buffer(ndo);
+	while (ndo->ndo_packet_info_stack != NULL)
+		nd_pop_packet_info(ndo);
 }

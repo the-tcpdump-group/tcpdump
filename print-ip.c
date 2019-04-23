@@ -340,7 +340,6 @@ ip_print(netdissect_options *ndo,
 	 u_int length)
 {
 	const struct ip *ip;
-	const u_char *ipend;
 	u_int off;
 	u_int hlen;
 	u_int len;
@@ -397,9 +396,7 @@ ip_print(netdissect_options *ndo,
 	/*
 	 * Cut off the snapshot length to the end of the IP payload.
 	 */
-	ipend = bp + len;
-	if (ipend < ndo->ndo_snapend)
-		ndo->ndo_snapend = ipend;
+	nd_push_snapend(ndo, bp + len);
 
 	len -= hlen;
 
@@ -498,8 +495,10 @@ ip_print(netdissect_options *ndo,
 		 * Ultra quiet now means that all this stuff should be
 		 * suppressed.
 		 */
-		if (ndo->ndo_qflag > 1)
+		if (ndo->ndo_qflag > 1) {
+			nd_pop_packet_info(ndo);
 			return;
+		}
 
 		/*
 		 * This isn't the first frag, so we're missing the
@@ -513,10 +512,12 @@ ip_print(netdissect_options *ndo,
 		else
 			ND_PRINT(" ip-proto-%u", ip_proto);
 	}
+	nd_pop_packet_info(ndo);
 	return;
 
 trunc:
 	nd_print_trunc(ndo);
+	nd_pop_packet_info(ndo);
 	return;
 }
 

@@ -118,23 +118,27 @@ ether_hdr_print(netdissect_options *ndo,
 		 etheraddr_string(ndo, ehp->ether_dhost));
 
 	length_type = GET_BE_U_2(bp + (hdrlen - sizeof(ehp->ether_length_type)));
-	if (!ndo->ndo_qflag) {
-		if (length_type <= MAX_ETHERNET_LENGTH_VAL) {
-			ND_PRINT(", 802.3");
-			length = length_type;
-		} else
-			ND_PRINT(", ethertype %s (0x%04x)",
-				 tok2str(ethertype_values,"Unknown", length_type),
-				 length_type);
+	if (length_type <= MAX_ETHERNET_LENGTH_VAL) {
+		/*
+		 * It's a length field.
+		 */
+		ND_PRINT(", 802.3, length %u", length_type);
+		if (length_type > length - hdrlen)
+			ND_PRINT(" (too large, > %u)", length - hdrlen);
+		ND_PRINT(": ");
 	} else {
-		if (length_type <= MAX_ETHERNET_LENGTH_VAL) {
-			ND_PRINT(", 802.3");
-			length = length_type;
-		} else
-			ND_PRINT(", %s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", length_type));
+		/*
+		 * It's a type field.
+		 */
+		if (!ndo->ndo_qflag)
+			ND_PRINT(", ethertype %s (0x%04x), length %u: ",
+				 tok2str(ethertype_values,"Unknown", length_type),
+				 length_type, length);
+		else
+			ND_PRINT(", %s, length %u: ",
+			         tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", length_type),
+			         length);
 	}
-
-	ND_PRINT(", length %u: ", length);
 }
 
 /*
@@ -198,6 +202,22 @@ recurse:
 	 * Is it (gag) an 802.3 encapsulation?
 	 */
 	if (length_type <= MAX_ETHERNET_LENGTH_VAL) {
+		/*
+		 * The length/type field contains the length of the
+		 * remaining payload; use it as such, as long as
+		 * it's not too large (bigger than the actual payload).
+		 */
+		if (length_type < length) {
+			length = length_type;
+			if (caplen > length)
+				caplen = length;
+		}
+
+		/*
+		 * Cut off the snapshot length to the end of the payload.
+		 */
+		nd_push_snapend(ndo, p + length);
+
 		/* Try to print the LLC-layer header & higher layers */
 		llc_hdrlen = llc_print(ndo, p, length, caplen, &src, &dst);
 		if (llc_hdrlen < 0) {
@@ -207,6 +227,8 @@ recurse:
 			llc_hdrlen = -llc_hdrlen;
 		}
 		hdrlen += llc_hdrlen;
+		nd_pop_packet_info(ndo);
+		return (hdrlen);
 	} else if (length_type == ETHERTYPE_8021Q  ||
 		length_type == ETHERTYPE_8021Q9100 ||
 		length_type == ETHERTYPE_8021Q9200 ||

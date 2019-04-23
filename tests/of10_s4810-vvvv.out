@@ -1235,11 +1235,7 @@ STP 802.1s, Rapid STP, CIST Flags [Proposal, Learn, Forward, Agreement], length 
 	 buffer_id 0xffffffff, in_port CONTROLLER
 	 action type OUTPUT, len 8, port 1
 	 data (60 octets), frame decoding below
-67:68:00:00:00:00 > 61:62:63:64:65:66 Null Information, send seq 0, rcv seq 0, Flags [Command], length 46
-	0x0000:  0000 0000 0000 0000 0000 0000 0000 0000  ................
-	0x0010:  0000 0000 0000 0000 0000 0000 0000 0000  ................
-	0x0020:  0000 0000 0000 0000 0000 0000 0000 0112  ................
-	0x0030:  0008 0000 0045                           .....E
+ [|llc]
 	version 1.0, type BARRIER_REQUEST, length 8, xid 0x00000045
   111  12:51:40.432275 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
     10.0.0.81.56068 > 10.0.0.20.6633: Flags [P.], cksum 0xb6f1 (correct), seq 14734:14742, ack 4821, win 1035, options [nop,nop,TS val 3 ecr 47837403], length 8: OpenFlow

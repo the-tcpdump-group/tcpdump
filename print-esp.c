@@ -958,7 +958,7 @@ esp_print(netdissect_options *ndo,
 	    ttl_hl, nh, bp2);
 
 	/* Pop the buffer, freeing it. */
-	nd_pop_buffer(ndo);
+	nd_pop_packet_info(ndo);
 #endif
 }
 #ifdef HAVE_LIBCRYPTO

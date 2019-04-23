@@ -418,11 +418,12 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	}
 
 	/*
-	 * Free all pushed buffers; if we got here by a printer quitting,
-	 * we need to release anything that didn't get released because
-	 * we longjmped out of the code before it popped a buffer.
+	 * Empty the stack of packet information, freeing all pushed buffers;
+	 * if we got here by a printer quitting, we need to release anything
+	 * that didn't get released because we longjmped out of the code
+	 * before it popped the packet information.
 	 */
-	nd_pop_all_buffers(ndo);
+	nd_pop_all_packet_info(ndo);
 
 	/*
 	 * Restore the original snapend, as a printer might have

@@ -2703,7 +2703,7 @@ ikev2_e_print(netdissect_options *ndo,
 		 * on the buffer stack; we're done with the buffer, so
 		 * pop it (which frees the buffer)
 		 */
-		nd_pop_buffer(ndo);
+		nd_pop_packet_info(ndo);
 	}
 #endif
 

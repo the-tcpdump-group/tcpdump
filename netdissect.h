@@ -180,12 +180,18 @@ typedef u_int (*if_printer) IF_PRINTER_ARGS;
  *
  * A buffer has a beginnning and end pointer, and a link to the previous
  * buffer on the stack.
+ *
+ * In other cases, we temporarily adjust the snapshot end to reflect a
+ * packet-length field in the packet data and, when finished dissecting
+ * that part of the packet, restore the old snapshot end.  We keep that
+ * on the stack with null buffer pointer, meaning there's nothing to
+ * free.
  */
-struct netdissect_saved_info {
-  u_char *ndsi_buffer;				/* pointer to allocated buffer data */
-  const u_char *ndsi_packetp;			/* saved beginning of data */
-  const u_char *ndsi_snapend;			/* saved end of data */
-  struct netdissect_saved_info *ndsi_prev;	/* previous buffer on the stack */
+struct netdissect_saved_packet_info {
+  u_char *ndspi_buffer;					/* pointer to allocated buffer data */
+  const u_char *ndspi_packetp;				/* saved beginning of data */
+  const u_char *ndspi_snapend;				/* saved end of data */
+  struct netdissect_saved_packet_info *ndspi_prev;	/* previous buffer on the stack */
 };
 
 struct netdissect_options {
@@ -228,8 +234,8 @@ struct netdissect_options {
   const u_char *ndo_packetp;
   const u_char *ndo_snapend;
 
-  /* stack of saved buffer information */
-  struct netdissect_saved_info *ndo_buffer_stack;
+  /* stack of saved packet boundary and buffer information */
+  struct netdissect_saved_packet_info *ndo_packet_info_stack;
 
   /* pointer to the if_printer function */
   if_printer ndo_if_printer;
@@ -255,8 +261,9 @@ struct netdissect_options {
 
 extern int nd_push_buffer(netdissect_options *, u_char *, const u_char *,
     const u_char *);
-extern void nd_pop_buffer(netdissect_options *);
-extern void nd_pop_all_buffers(netdissect_options *);
+extern int nd_push_snapend(netdissect_options *, const u_char *);
+extern void nd_pop_packet_info(netdissect_options *);
+extern void nd_pop_all_packet_info(netdissect_options *);
 
 #define PT_VAT		1	/* Visual Audio Tool */
 #define PT_WB		2	/* distributed White Board */

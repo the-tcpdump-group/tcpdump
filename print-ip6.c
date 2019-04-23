@@ -231,7 +231,6 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	const struct ip6_hdr *ip6;
 	int advance;
 	u_int len;
-	const u_char *ipend;
 	const u_char *cp;
 	u_int payload_len;
 	uint8_t nh;
@@ -289,9 +288,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	/*
 	 * Cut off the snapshot length to the end of the IP payload.
 	 */
-	ipend = bp + len;
-	if (ipend < ndo->ndo_snapend)
-		ndo->ndo_snapend = ipend;
+	nd_push_snapend(ndo, bp + len);
 
 	cp = (const u_char *)ip6;
 	advance = sizeof(struct ip6_hdr);
@@ -313,22 +310,28 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 		case IPPROTO_HOPOPTS:
 			advance = hbhopt_print(ndo, cp);
-			if (advance < 0)
+			if (advance < 0) {
+				nd_pop_packet_info(ndo);
 				return;
+			}
 			nh = GET_U_1(cp);
 			break;
 
 		case IPPROTO_DSTOPTS:
 			advance = dstopt_print(ndo, cp);
-			if (advance < 0)
+			if (advance < 0) {
+				nd_pop_packet_info(ndo);
 				return;
+			}
 			nh = GET_U_1(cp);
 			break;
 
 		case IPPROTO_FRAGMENT:
 			advance = frag6_print(ndo, cp, (const u_char *)ip6);
-			if (advance < 0 || ndo->ndo_snapend <= cp + advance)
+			if (advance < 0 || ndo->ndo_snapend <= cp + advance) {
+				nd_pop_packet_info(ndo);
 				return;
+			}
 			nh = GET_U_1(cp);
 			fragmented = 1;
 			break;
@@ -344,16 +347,21 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			 * mobility header.
 			 */
 			advance = mobility_print(ndo, cp, (const u_char *)ip6);
-			if (advance < 0)
+			if (advance < 0) {
+				nd_pop_packet_info(ndo);
 				return;
+			}
 			nh = GET_U_1(cp);
+			nd_pop_packet_info(ndo);
 			return;
 
 		case IPPROTO_ROUTING:
 			ND_TCHECK_1(cp);
 			advance = rt6_print(ndo, cp, (const u_char *)ip6);
-			if (advance < 0)
+			if (advance < 0) {
+				nd_pop_packet_info(ndo);
 				return;
+			}
 			nh = GET_U_1(cp);
 			break;
 
@@ -364,6 +372,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			 */
 			ip_print_demux(ndo, cp, len, 6, fragmented,
 			    GET_U_1(ip6->ip6_hlim), nh, bp);
+			nd_pop_packet_info(ndo);
 			return;
 		}
 
@@ -371,6 +380,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		ndo->ndo_protocol = "ip6";
 	}
 
+	nd_pop_packet_info(ndo);
 	return;
 trunc:
 	nd_print_trunc(ndo);
