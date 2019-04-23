@@ -683,3 +683,4 @@ vsock-1-v	vsock-1.pcapng	vsock-1-v.out -v
 vsock-1-vv	vsock-1.pcapng	vsock-1-vv.out -vv
 #IP over infinband (ipoib)
 ipoib	ipoib.pcap	ipoib.out
+ipoib-e	ipoib.pcap	ipoib-e.out -e
