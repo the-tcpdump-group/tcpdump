@@ -77,15 +77,12 @@ static const struct tok brcm_tag_rc_values[] = {
 	{ 0, NULL }
 };
 
-static int brcm_tag_print_full(netdissect_options *ndo, const u_char *bp,
-			       u_int length)
+static void
+brcm_tag_print(netdissect_options *ndo, const u_char *bp)
 {
 	uint8_t tag[BRCM_TAG_LEN];
 	uint16_t dst_map;
 	unsigned int i;
-
-	if (length < BRCM_TAG_LEN)
-		return (1);
 
 	for (i = 0; i < BRCM_TAG_LEN; i++)
 		tag[i] = GET_U_1(bp + i);
@@ -111,8 +108,6 @@ static int brcm_tag_print_full(netdissect_options *ndo, const u_char *bp,
 		ND_PRINT(", port: %d", tag[3] & BRCM_EG_PID_MASK);
 	}
 	ND_PRINT(", ");
-
-	return (0);
 }
 
 u_int
@@ -121,51 +116,10 @@ brcm_tag_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
-	int save_eflag;
-	int ret;
 
 	ndo->ndo_protocol = "brcm-tag";
-	if (caplen < 2*MAC_ADDR_LEN + BRCM_TAG_LEN) {
-		nd_print_trunc(ndo);
-		return (caplen);
-	}
-
-	if (length < 2*MAC_ADDR_LEN + BRCM_TAG_LEN) {
-		nd_print_trunc(ndo);
-		return (length);
-	}
-
-	if (ndo->ndo_eflag)
-		ND_PRINT("%s > %s, ",
-			 etheraddr_string(ndo, p + MAC_ADDR_LEN),
-			 etheraddr_string(ndo, p));
-
-	if (brcm_tag_print_full(ndo, p + 2*MAC_ADDR_LEN,
-				caplen - 2*MAC_ADDR_LEN))
-		return (1);
-
-	/* We printed the Ethernet destination and source addresses already */
-	save_eflag = ndo->ndo_eflag;
-	ndo->ndo_eflag = 0;
-
-	/* Parse the rest of the Ethernet header, and the frame payload,
-	 * telling ether_hdr_len_print() how big the non-standard Ethernet
-	 * header is.
-	 *
-	 * +-----------+-----------+----------------+--------------+
-	 * | MAC DA (6)| MAC SA (6)|Broadcom tag (4)|Type/Length(2)|
-	 * +-----------+-----------+----------------+--------------+
-	 */
-	ret = ether_hdr_len_print(ndo, p, length, caplen, NULL, NULL,
-				  2*MAC_ADDR_LEN + BRCM_TAG_LEN + ETHER_TYPE_LEN);
-	ndo->ndo_eflag = save_eflag;
-	return ret;
-}
-
-static void brcm_tag_print_encap(netdissect_options *ndo,
-				 const u_char *p)
-{
-	brcm_tag_print_full(ndo, p, BRCM_TAG_LEN);
+	return (ether_print_switch_tag(ndo, p, length, caplen,
+	    brcm_tag_print, BRCM_TAG_LEN));
 }
 
 u_int
@@ -186,14 +140,16 @@ brcm_tag_prepend_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 		return (length);
 	}
 
-	/* Parse the Ethernet frame regularly and utilize the encapsulation
-	 * header printing facility to pring the pre-pended Broadcom tag.
-	 *
-	 * +-----------------++-----------++-----------++--------------+
-	 * | Broadcom tag (4)|| MAC DA (6)|| MAC SA (6)||Type/Length(2)|
-	 * +-----------------++-----------++-----------++--------------+
+	if (ndo->ndo_eflag) {
+		/* Print the prepended Broadcom tag. */
+		brcm_tag_print(ndo, p);
+	}
+	p += BRCM_TAG_LEN;
+	length -= BRCM_TAG_LEN;
+	caplen -= BRCM_TAG_LEN;
+
+	/*
+	 * Now print the Ethernet frame following it.
 	 */
-	return ether_print(ndo, p + BRCM_TAG_LEN,
-			   length - BRCM_TAG_LEN,
-			   caplen - BRCM_TAG_LEN, brcm_tag_print_encap, p);
+	return ether_print(ndo, p, length, caplen, NULL, NULL);
 }

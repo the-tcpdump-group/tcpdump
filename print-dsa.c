@@ -87,7 +87,6 @@
 #define DSA_CODE(tag) ((TOK(tag, 1, 0x06, 1) << 1) | TOK(tag, 2, 0x10, 4))
 
 #define EDSA_LEN 8
-#define EDSA_ETYPE(tag) ((u_short)((TOK(tag, 0, 0xff, 0) << 8) | (TOK(tag, 1, 0xff, 0))))
 
 static const struct tok dsa_mode_values[] = {
 	{ DSA_MODE_TO_CPU, "To CPU" },
@@ -107,141 +106,114 @@ static const struct tok dsa_code_values[] = {
 	{ 0, NULL }
 };
 
-static u_int
-dsa_if_print_full(netdissect_options *ndo, const struct pcap_pkthdr *h,
-		  const u_char *p, u_int taglen)
+static void
+tag_common_print(netdissect_options *ndo, const u_char *p)
 {
-	const u_char *edsa, *dsa;
-	int save_eflag;
-	int ret;
-
-	if (h->caplen < 2*MAC_ADDR_LEN + taglen) {
-		nd_print_trunc(ndo);
-		return (h->caplen);
-	}
-
-	if (h->len < 2*MAC_ADDR_LEN + taglen) {
-		nd_print_trunc(ndo);
-		return (h->len);
-	}
-
-	if (taglen == EDSA_LEN) {
-		edsa = p + 2*MAC_ADDR_LEN;
-		dsa = edsa + 4;
-	} else {
-		edsa = NULL;
-		dsa = p + 2*MAC_ADDR_LEN;
-	}
-
 	if (ndo->ndo_eflag) {
-		ND_PRINT("%s > %s, ",
-			 etheraddr_string(ndo, p + MAC_ADDR_LEN),
-			 etheraddr_string(ndo, p));
+		ND_PRINT("mode %s, ", tok2str(dsa_mode_values, "unknown", DSA_MODE(p)));
 
-		if (edsa) {
-			ND_PRINT("Marvell EDSA ethertype 0x%04x (%s), ", EDSA_ETYPE(edsa),
-				 tok2str(ethertype_values, "Unknown", EDSA_ETYPE(edsa)));
-			ND_PRINT("rsvd %u %u, ", edsa[2], edsa[3]);
-		} else {
-			ND_PRINT("Marvell DSA ");
-		}
-
-		ND_PRINT("mode %s, ", tok2str(dsa_mode_values, "unknown", DSA_MODE(dsa)));
-
-		switch (DSA_MODE(dsa)) {
+		switch (DSA_MODE(p)) {
 		case DSA_MODE_FORWARD:
-			ND_PRINT("dev %u, %s %u, ", DSA_DEV(dsa),
-				 DSA_TRUNK(dsa) ? "trunk" : "port", DSA_PORT(dsa));
+			ND_PRINT("dev %u, %s %u, ", DSA_DEV(p),
+				 DSA_TRUNK(p) ? "trunk" : "port", DSA_PORT(p));
 			break;
 		case DSA_MODE_FROM_CPU:
 			ND_PRINT("target dev %u, port %u, ",
-				 DSA_DEV(dsa), DSA_PORT(dsa));
+				 DSA_DEV(p), DSA_PORT(p));
 			break;
 		case DSA_MODE_TO_CPU:
 			ND_PRINT("source dev %u, port %u, ",
-				 DSA_DEV(dsa), DSA_PORT(dsa));
+				 DSA_DEV(p), DSA_PORT(p));
 			ND_PRINT("code %s, ",
-				 tok2str(dsa_code_values, "reserved", DSA_CODE(dsa)));
+				 tok2str(dsa_code_values, "reserved", DSA_CODE(p)));
 			break;
 		case DSA_MODE_TO_SNIFFER:
 			ND_PRINT("source dev %u, port %u, ",
-				 DSA_DEV(dsa), DSA_PORT(dsa));
+				 DSA_DEV(p), DSA_PORT(p));
 			ND_PRINT("%s sniff, ",
-				 DSA_RX_SNIFF(dsa) ? "ingress" : "egress");
+				 DSA_RX_SNIFF(p) ? "ingress" : "egress");
 			break;
 		default:
 			break;
 		}
 
-		ND_PRINT("%s, ", DSA_TAGGED(dsa) ? "tagged" : "untagged");
-		ND_PRINT("%s", DSA_CFI(dsa) ? "CFI, " : "");
-		ND_PRINT("VID %u, ", DSA_VID(dsa));
-		ND_PRINT("FPri %u, ", DSA_PRI(dsa));
+		ND_PRINT("%s, ", DSA_TAGGED(p) ? "tagged" : "untagged");
+		ND_PRINT("%s", DSA_CFI(p) ? "CFI, " : "");
+		ND_PRINT("VID %u, ", DSA_VID(p));
+		ND_PRINT("FPri %u, ", DSA_PRI(p));
 	} else {
-		if (edsa) {
-			ND_PRINT("EDSA 0x%04x, ", EDSA_ETYPE(edsa));
-		} else {
-			ND_PRINT("DSA ");
-		}
-
-		switch (DSA_MODE(dsa)) {
+		switch (DSA_MODE(p)) {
 		case DSA_MODE_FORWARD:
 			ND_PRINT("Forward %s %u.%u, ",
-				 DSA_TRUNK(dsa) ? "trunk" : "port",
-				 DSA_DEV(dsa), DSA_PORT(dsa));
+				 DSA_TRUNK(p) ? "trunk" : "port",
+				 DSA_DEV(p), DSA_PORT(p));
 			break;
 		case DSA_MODE_FROM_CPU:
 			ND_PRINT("CPU > port %u.%u, ",
-				 DSA_DEV(dsa), DSA_PORT(dsa));
+				 DSA_DEV(p), DSA_PORT(p));
 			break;
 		case DSA_MODE_TO_CPU:
 			ND_PRINT("port %u.%u > CPU, ",
-				 DSA_DEV(dsa), DSA_PORT(dsa));
+				 DSA_DEV(p), DSA_PORT(p));
 			break;
 		case DSA_MODE_TO_SNIFFER:
 			ND_PRINT("port %u.%u > %s Sniffer, ",
-				 DSA_DEV(dsa), DSA_PORT(dsa),
-				 DSA_RX_SNIFF(dsa) ? "Rx" : "Tx");
+				 DSA_DEV(p), DSA_PORT(p),
+				 DSA_RX_SNIFF(p) ? "Rx" : "Tx");
 			break;
 		default:
 			break;
 		}
 
-		ND_PRINT("VLAN %u%c, ", DSA_VID(dsa), DSA_TAGGED(dsa) ? 't' : 'u');
+		ND_PRINT("VLAN %u%c, ", DSA_VID(p), DSA_TAGGED(p) ? 't' : 'u');
 	}
+}
 
-	/* We printed the Ethernet destination and source addresses already */
-	save_eflag = ndo->ndo_eflag;
-	ndo->ndo_eflag = 0;
+static void
+dsa_tag_print(netdissect_options *ndo, const u_char *bp)
+{
+	if (ndo->ndo_eflag)
+		ND_PRINT("Marvell DSA ");
+	else
+		ND_PRINT("DSA ");
+	tag_common_print(ndo, bp);
+}
 
-	/* Parse the rest of the Ethernet header, and the frame payload,
-	 * telling ether_hdr_len_print() how big the non-standard Ethernet
-	 * header is.
-	 *
-	 * +-----------+-----------+---------------------+--------------+
-	 * | MAC DA (6)| MAC SA (6)|DSA/EDSA tag (taglen)|Type/Length(2)|
-	 * +-----------+-----------+---------------------+--------------+
-	 */
-	ret = ether_hdr_len_print(ndo, p, h->len, h->caplen, NULL, NULL,
-				  2*MAC_ADDR_LEN + taglen + 2);
+static void
+edsa_tag_print(netdissect_options *ndo, const u_char *bp)
+{
+	const u_char *p = bp;
+	uint16_t edsa_etype;
 
-	ndo->ndo_eflag = save_eflag;
-
-	return ret;
+	edsa_etype = GET_BE_U_2(p);
+	if (ndo->ndo_eflag) {
+		ND_PRINT("Marvell EDSA ethertype 0x%04x (%s), ", edsa_etype,
+			 tok2str(ethertype_values, "Unknown", edsa_etype));
+		ND_PRINT("rsvd %u %u, ", GET_U_1(p + 2), GET_U_1(p + 3));
+	} else
+		ND_PRINT("EDSA 0x%04x, ", edsa_etype);
+	p += 4;
+	tag_common_print(ndo, p);
 }
 
 u_int
 dsa_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
-	ndo->ndo_protocol = "dsa";
+	u_int caplen = h->caplen;
+	u_int length = h->len;
 
-	return dsa_if_print_full(ndo, h, p, DSA_LEN);
+	ndo->ndo_protocol = "dsa";
+	return (ether_print_switch_tag(ndo, p, length, caplen,
+	    dsa_tag_print, DSA_LEN));
 }
 
 u_int
 edsa_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
-	ndo->ndo_protocol = "edsa";
+	u_int caplen = h->caplen;
+	u_int length = h->len;
 
-	return dsa_if_print_full(ndo, h, p, EDSA_LEN);
+	ndo->ndo_protocol = "edsa";
+	return (ether_print_switch_tag(ndo, p, length, caplen,
+	    edsa_tag_print, EDSA_LEN));
 }
