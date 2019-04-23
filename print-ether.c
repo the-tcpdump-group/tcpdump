@@ -254,8 +254,15 @@ recurse:
 		}
 
 		length_type = GET_BE_U_2(p + 2);
-		if (ndo->ndo_eflag && length_type > MAX_ETHERNET_LENGTH_VAL)
-			ND_PRINT("ethertype %s, ", tok2str(ethertype_values,"0x%04x", length_type));
+		if (ndo->ndo_eflag && length_type > MAX_ETHERNET_LENGTH_VAL) {
+			if (!ndo->ndo_qflag)
+				ND_PRINT("ethertype %s (0x%04x), ",
+					 tok2str(ethertype_values,"Unknown", length_type),
+					 length_type);
+			else
+				ND_PRINT("%s, ",
+				         tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", length_type));
+		}
 		p += 4;
 		length -= 4;
 		caplen -= 4;
