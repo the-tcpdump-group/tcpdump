@@ -105,10 +105,12 @@ script:
   - PATH=$PATH make install
   - echo -n travis_fold:end:script.make_install
   - if [ "$CMAKE" = no ]; then make check; fi
-  - ./tcpdump -D
-  - ./tcpdump -J
   - ./tcpdump --version
   - ./tcpdump -h
+  - ./tcpdump -D
+  - sudo ./tcpdump -J
+  - sudo ./tcpdump -L
+  - sudo ./tcpdump -#n -c 10
   - if [ "$CMAKE" = no ]; then make releasetar; fi
   - echo '$ cat Makefile [...]'; echo travis_fold:start:script.cat_makefile
   - if [ "$CMAKE" = no ]; then cat Makefile | sed -n '1,/DO NOT DELETE THIS LINE -- mkdep uses it/p'; fi
