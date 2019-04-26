@@ -24,8 +24,15 @@ if(PCAP_CONFIG)
   # XXX - this assumes that there's only one -I flag in the output
   # of pcap-config --cflags.  That *should* be the case.
   #
-  string(REGEX REPLACE "-I" "" PCAP_INCLUDE_DIRS "${PCAP_CONFIG_OUTPUT}")
-  set(PCAP_INCLUDE_DIR ${PCAP_INCLUDE_DIRS})
+  string(REGEX REPLACE "-I" "" _pcap_include_dir "${PCAP_CONFIG_OUTPUT}")
+
+  # Try to find the header
+  # We use what pcap-config provided as a hint, because the
+  # pcap-config that ships with macOS bogusly supplies
+  # -I/usr/local/include even though the header isn't
+  # there (it may be under /usr/include or it may be
+  # buried in the Xcode app bundle).
+  find_path(PCAP_INCLUDE_DIRS pcap.h HINTS ${_pcap_include_dir})
 
   # Now, get the libraries.
   execute_process(COMMAND "${PCAP_CONFIG}" "--libs"
@@ -52,6 +59,11 @@ if(PCAP_CONFIG)
       # the directories in which to look for libraries" except in
       # find_library() calls; it *really* prefers using full paths to
       # library files, rather than library names.
+      #
+      # Furthermore, the pcap-config shipped with macOS reports
+      # -I/usr/local/include for --cflags and -L/usr/local/lib for
+      # --libs, rather than reporting the appropriate system (or
+      # Xcode application) directory.
       #
       find_library(_libfullpath ${_lib} HINTS ${__pcap_library_dirs})
       list(APPEND PCAP_LIBRARIES ${_libfullpath})
@@ -84,22 +96,13 @@ if(PCAP_CONFIG)
       list(APPEND PCAP_STATIC_LIBRARIES ${_libfullpath})
     endif()
   endforeach()
-
-  # Try to find the header
-  find_path(PCAP_INCLUDE_DIR pcap.h HINTS ${PCAP_INCLUDE_DIRS})
-
-  # Try to find the library
-  find_library(PCAP_LIBRARY pcap HINTS ${_pcap_library_dirs})
-
-  # Try to find the static library (XXX - what about AIX?)
-  include(CMakePushCheckState)
-  cmake_push_check_state()
-  set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-  find_library(PCAP_STATIC_LIBRARY pcap HINTS ${_pcap_static_library_dirs})
-  cmake_pop_check_state()
 else(PCAP_CONFIG)
-  # Try to find the header
-  find_path(PCAP_INCLUDE_DIR pcap.h)
+  #
+  # We don't have pcap-config.
+  # Try to find the header by just looking for it in whatever
+  # directories find_path() uses by default.
+  #
+  find_path(PCAP_INCLUDE_DIRS pcap.h)
 
   # Try to find the library
   if(WIN32)
@@ -118,34 +121,30 @@ else(PCAP_CONFIG)
     endif()
   endif()
 
-  find_library(PCAP_LIBRARY pcap)
+  find_library(PCAP_LIBRAIES pcap)
   if(WIN32)
-    if(NOT PCAP_LIBRARY)
+    if(NOT PCAP_LIBRARIES)
       #
       # OK, look for it under the name wpcap.
       #
-      find_library(PCAP_LIBRARY wpcap)
-    endif(NOT PCAP_LIBRARY)
+      find_library(PCAP_LIBRARIES wpcap)
+    endif(NOT PCAP_LIBRARIES)
   endif(WIN32)
   if(NOT WIN32)
     # Try to find the static library (XXX - what about AIX?)
     include(CMakePushCheckState)
     cmake_push_check_state()
     set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-    find_library(PCAP_STATIC_LIBRARY pcap)
+    find_library(PCAP_STATIC_LIBRARIES pcap)
     cmake_pop_check_state()
   endif(NOT WIN32)
-
-  set(PCAP_INCLUDE_DIRS ${PCAP_INCLUDE_DIR})
-  set(PCAP_LIBRARIES ${PCAP_LIBRARY})
-  set(PCAP_STATIC_LIBRARIES ${PCAP_STATIC_LIBRARY})
 endif(PCAP_CONFIG)
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(PCAP
   DEFAULT_MSG
-  PCAP_INCLUDE_DIR
-  PCAP_LIBRARY
+  PCAP_INCLUDE_DIRS
+  PCAP_LIBRARIES
 )
 
 mark_as_advanced(
