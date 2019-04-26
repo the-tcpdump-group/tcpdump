@@ -179,6 +179,9 @@ struct udphdr {
 #ifndef WB_PORT
 #define WB_PORT				4567
 #endif
+#ifndef BFD_MULTIHOP_PORT
+#define BFD_MULTIHOP_PORT		4784	/* RFC 5883 */
+#endif
 #ifndef VXLAN_PORT
 #define VXLAN_PORT			4789	/* RFC 7348 */
 #endif
@@ -205,6 +208,9 @@ struct udphdr {
 #endif
 #ifndef BABEL_PORT_OLD
 #define BABEL_PORT_OLD			6697	/* RFC 6126 */
+#endif
+#ifndef BFD_LAG_PORT
+#define BFD_LAG_PORT			6784	/* RFC 7310 */
 #endif
 #ifndef RX_PORT_LOW
 #define RX_PORT_LOW			7000	/*XXX*/

@@ -684,3 +684,9 @@ vsock-1-vv	vsock-1.pcapng	vsock-1-vv.out -vv
 #IP over infinband (ipoib)
 ipoib	ipoib.pcap	ipoib.out
 ipoib-e	ipoib.pcap	ipoib-e.out -e
+
+# BFD multihop and lag (RFC5883 & 7130)
+bfd-multihop	bfd-multihop.pcap	bfd-multihop.out
+bfd-multihop-v	bfd-multihop.pcap	bfd-multihop-v.out	-v
+bfd-lag		bfd-lag.pcap		bfd-lag.out
+bfd-lag-v	bfd-lag.pcap		bfd-lag-v.out		-v
