@@ -121,7 +121,7 @@ else(PCAP_CONFIG)
     endif()
   endif()
 
-  find_library(PCAP_LIBRAIES pcap)
+  find_library(PCAP_LIBRARIES pcap)
   if(WIN32)
     if(NOT PCAP_LIBRARIES)
       #
