@@ -81,6 +81,8 @@ before_install:
   - date
   - if [ "$TRAVIS_OS_NAME" = osx ]; then brew update >/dev/null; fi
   - if [ "$TRAVIS_OS_NAME" = linux ]; then dpkg-query -f '${Package}__${Version}__${Architecture}\n' -W 'lib*-dev'; fi
+  - if [ "$TRAVIS_OS_NAME" = linux ]; then sudo curl -s -L https://entrust.com/root-certificates/entrust_l1k.cer -o /usr/local/share/ca-certificates/entrust_l1k.crt; fi
+  - if [ "$TRAVIS_OS_NAME" = linux ]; then sudo update-ca-certificates; fi
 
 install:
   - if [ "$TRAVIS_OS_NAME" = osx ]; then brew install libsmi | grep -v '%'; fi
