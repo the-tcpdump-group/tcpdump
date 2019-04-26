@@ -253,7 +253,7 @@ ldp_tlv_print(netdissect_options *ndo,
     ldp_tlv_header = (const struct ldp_tlv_header *)tptr;
     ND_TCHECK_SIZE(ldp_tlv_header);
     tlv_len=GET_BE_U_2(ldp_tlv_header->length);
-    if (tlv_len + 4 > msg_tlen) {
+    if (tlv_len + 4U > msg_tlen) {
         ND_PRINT("\n\t\t TLV contents go past end of message");
         return 0;
     }
