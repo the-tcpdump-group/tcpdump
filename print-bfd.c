@@ -142,6 +142,13 @@ static const struct tok bfd_diag_values[] = {
     { 0, NULL }
 };
 
+static const struct tok bfd_port_values[] = {
+    { BFD_CONTROL_PORT,  "Control" },
+    { BFD_MULTIHOP_PORT, "Multihop" },
+    { BFD_LAG_PORT,      "Lag" },
+    { 0, NULL }
+};
+
 #define BFD_FLAG_AUTH 0x04
 
 static const struct tok bfd_v0_flag_values[] = {
@@ -292,7 +299,9 @@ bfd_print(netdissect_options *ndo, const u_char *pptr,
           u_int len, u_int port)
 {
 	ndo->ndo_protocol = "bfd";
-        if (port == BFD_CONTROL_PORT) {
+        if (port == BFD_CONTROL_PORT ||
+            port == BFD_MULTIHOP_PORT ||
+            port == BFD_LAG_PORT) {
             /*
              * Control packet.
              */
@@ -352,15 +361,17 @@ bfd_print(netdissect_options *ndo, const u_char *pptr,
             case 1:
                 if (ndo->ndo_vflag < 1)
                 {
-                    ND_PRINT("BFDv1, Control, State %s, Flags: [%s], length: %u",
+                    ND_PRINT("BFDv1, %s, State %s, Flags: [%s], length: %u",
+                           tok2str(bfd_port_values, "unknown (%u)", port),
                            tok2str(bfd_v1_state_values, "unknown (%u)", (flags & 0xc0) >> 6),
                            bittok2str(bfd_v1_flag_values, "none", flags & 0x3f),
                            len);
                     return;
                 }
 
-                ND_PRINT("BFDv1, length: %u\n\tControl, State %s, Flags: [%s], Diagnostic: %s (0x%02x)",
+                ND_PRINT("BFDv1, length: %u\n\t%s, State %s, Flags: [%s], Diagnostic: %s (0x%02x)",
                        len,
+                       tok2str(bfd_port_values, "unknown (%u)", port),
                        tok2str(bfd_v1_state_values, "unknown (%u)", (flags & 0xc0) >> 6),
                        bittok2str(bfd_v1_flag_values, "none", flags & 0x3f),
                        tok2str(bfd_diag_values,"unknown",BFD_EXTRACT_DIAG(version_diag)),
