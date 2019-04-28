@@ -470,7 +470,9 @@ ip_print(netdissect_options *ndo,
 		ND_PRINT("%s > %s: ",
 			 ipaddr_string(ndo, ip->ip_src),
 			 ipaddr_string(ndo, ip->ip_dst));
-		goto trunc;
+		nd_print_trunc(ndo);
+		nd_pop_packet_info(ndo);
+		return;
 	    }
 	}
 
@@ -517,7 +519,6 @@ ip_print(netdissect_options *ndo,
 
 trunc:
 	nd_print_trunc(ndo);
-	nd_pop_packet_info(ndo);
 	return;
 }
 
