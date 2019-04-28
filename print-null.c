@@ -86,7 +86,7 @@ null_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 		goto trunc;
 
 	ND_TCHECK_4(p);
-	memcpy((char *)&family, (const char *)p, sizeof(family));
+	family = GET_HE_U_4(p);
 
 	/*
 	 * This isn't necessarily in our host byte order; if this is
