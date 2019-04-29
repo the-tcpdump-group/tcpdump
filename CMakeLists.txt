@@ -66,6 +66,14 @@ elseif(CMAKE_C_COMPILER_ID MATCHES "Intel")
     check_and_add_compiler_option("-c99")
 endif()
 
+# 
+# Treat source files as being in UTF-8 with MSVC.
+# We assume that UTF-8 source is OK with other compilers.
+# 
+if(MSVC AND NOT ${CMAKE_C_COMPILER} MATCHES "clang*")
+    set(C_ADDITIONAL_FLAGS "${C_ADDITIONAL_FLAGS} /utf-8")
+endif(MSVC AND NOT ${CMAKE_C_COMPILER} MATCHES "clang*")
+
 set(LIBRARY_NAME netdissect)
 
 ###################################################################
