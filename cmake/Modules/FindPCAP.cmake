@@ -36,7 +36,7 @@ if(WIN32)
     #
     set(CMAKE_LIBRARY_ARCHITECTURE "x64")
   endif()
-  find_library(PCAP_LIBRARY pcap wpcap)
+  find_library(PCAP_LIBRARY NAMES pcap wpcap)
 
   #
   # Do the standard arg processing, including failing if it's a
