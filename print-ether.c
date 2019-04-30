@@ -196,7 +196,7 @@ ether_print_common(netdissect_options *ndo, const u_char *p, u_int length,
 	length_type = GET_BE_U_2(p);
 
 	length -= 2;
-	caplen += 2;
+	caplen -= 2;
 	p += 2;
 	hdrlen += 2;
 
