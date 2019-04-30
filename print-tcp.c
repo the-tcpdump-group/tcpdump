@@ -399,7 +399,7 @@ tcp_print(netdissect_options *ndo,
                                 else
                                         ND_PRINT(" (correct)");
                         }
-                } else if (IP_V(ip) == 6 && ip6->ip6_plen) {
+                } else if (IP_V(ip) == 6 && GET_BE_U_2(ip6->ip6_plen)) {
                         if (ND_TTEST_LEN(tp->th_sport, length)) {
                                 sum = tcp6_cksum(ndo, ip6, tp, length);
                                 tcp_sum = GET_BE_U_2(tp->th_sum);
