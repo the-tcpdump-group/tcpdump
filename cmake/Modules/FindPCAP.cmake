@@ -67,7 +67,7 @@ else(WIN32)
   # libpcap isn't available - not all systems ship pkg-config, and
   # libpcap didn't have .pc files until libpcap 1.9.0.
   #
-  if(PCAP_FIND_QUIET)
+  if(PCAP_FIND_QUIETLY)
     set(_quiet "QUIET")
   endif()
 
@@ -75,7 +75,7 @@ else(WIN32)
   # First, try pkg-config.
   #
   find_package(PkgConfig)
-  pkg_search_module(CONFIG_PCAP ${QUIET} libpcap)
+  pkg_search_module(CONFIG_PCAP ${_quiet} libpcap)
 
   if(NOT CONFIG_PCAP_FOUND)
     #
@@ -85,6 +85,11 @@ else(WIN32)
     if(PCAP_CONFIG)
       #
       # We have pcap-config; use it.
+      #
+      if(NOT "${_quiet}" STREQUAL "QUIET")
+        message(STATUS "Found pcap-config")
+      endif()
+
       #
       # if this is macOS or some other Darwin-based OS, check whether
       # it's the system-supplied one.
