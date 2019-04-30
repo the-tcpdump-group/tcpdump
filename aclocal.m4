@@ -537,6 +537,10 @@ AC_DEFUN(AC_LBL_LIBPCAP,
             #
             # We have it.  Are there .pc files for libpcap?
             #
+            # --exists was introduced in pkg-config 0.4.0; that
+            # dates back to late 2000, so we won't worry about
+            # earlier releases that lack it.
+            #
             AC_MSG_CHECKING(whether there are .pc files for libpcap)
             if "$PKG_CONFIG" libpcap --exists ; then
                 #

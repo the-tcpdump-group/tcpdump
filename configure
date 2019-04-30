@@ -5462,6 +5462,10 @@ fi
             #
             # We have it.  Are there .pc files for libpcap?
             #
+            # --exists was introduced in pkg-config 0.4.0; that
+            # dates back to late 2000, so we won't worry about
+            # earlier releases that lack it.
+            #
             { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether there are .pc files for libpcap" >&5
 $as_echo_n "checking whether there are .pc files for libpcap... " >&6; }
             if "$PKG_CONFIG" libpcap --exists ; then
