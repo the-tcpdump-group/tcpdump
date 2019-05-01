@@ -571,7 +571,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 					ND_PRINT("[udp sum ok] ");
 			}
 		}
-		else if (IP_V(ip) == 6 && GET_BE_U_2(ip6->ip6_plen)) {
+		else if (IP_V(ip) == 6) {
 			/* for IPv6, UDP checksum is mandatory */
 			if (ND_TTEST_LEN(cp, length)) {
 				sum = udp6_cksum(ndo, ip6, up, length + sizeof(struct udphdr));
