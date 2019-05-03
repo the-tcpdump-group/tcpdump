@@ -193,6 +193,27 @@ nd_push_snapend(netdissect_options *ndo, const u_char *new_snapend)
 	return (1);	/* success */
 }
 
+/*
+ * Change an already-pushed snapshot end.  This may increase the
+ * snapshot end, as it may be used, for example, for a Jumbo Payload
+ * option in IPv6.  It must not increase it past the snapshot length
+ * atop which the current one was pushed, however.
+ */
+void
+nd_change_snapend(netdissect_options *ndo, const u_char *new_snapend)
+{
+	struct netdissect_saved_packet_info *ndspi;
+
+	ndspi = ndo->ndo_packet_info_stack;
+	if (ndspi->ndspi_prev != NULL) {
+		if (new_snapend <= ndspi->ndspi_prev->ndspi_snapend)
+			ndo->ndo_snapend = new_snapend;
+	} else {
+		if (new_snapend < ndo->ndo_snapend)
+			ndo->ndo_snapend = new_snapend;
+	}
+}
+
 void
 nd_pop_packet_info(netdissect_options *ndo)
 {

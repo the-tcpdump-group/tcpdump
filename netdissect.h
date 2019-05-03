@@ -262,6 +262,7 @@ struct netdissect_options {
 extern int nd_push_buffer(netdissect_options *, u_char *, const u_char *,
     const u_char *);
 extern int nd_push_snapend(netdissect_options *, const u_char *);
+extern void nd_change_snapend(netdissect_options *, const u_char *);
 extern void nd_pop_packet_info(netdissect_options *);
 extern void nd_pop_all_packet_info(netdissect_options *);
 
@@ -585,7 +586,7 @@ extern void cnfp_print(netdissect_options *, const u_char *);
 extern void dccp_print(netdissect_options *, const u_char *, const u_char *, u_int);
 extern void decnet_print(netdissect_options *, const u_char *, u_int, u_int);
 extern void dhcp6_print(netdissect_options *, const u_char *, u_int);
-extern int dstopt_print(netdissect_options *, const u_char *);
+extern int dstopt_process(netdissect_options *, const u_char *);
 extern void dtp_print(netdissect_options *, const u_char *, u_int);
 extern void dvmrp_print(netdissect_options *, const u_char *, u_int);
 extern void eap_print(netdissect_options *, const u_char *, u_int);
@@ -603,7 +604,7 @@ extern void ftp_print(netdissect_options *, const u_char *, u_int);
 extern void geneve_print(netdissect_options *, const u_char *, u_int);
 extern void geonet_print(netdissect_options *, const u_char *, u_int, const struct lladdr_info *);
 extern void gre_print(netdissect_options *, const u_char *, u_int);
-extern int hbhopt_print(netdissect_options *, const u_char *);
+extern int hbhopt_process(netdissect_options *, const u_char *, int *, uint32_t *);
 extern void hex_and_ascii_print(netdissect_options *, const char *, const u_char *, u_int);
 extern void hex_print(netdissect_options *, const char *ident, const u_char *cp, u_int);
 extern void hex_print_with_offset(netdissect_options *, const char *ident, const u_char *cp, u_int, u_int);

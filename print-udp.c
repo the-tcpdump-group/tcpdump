@@ -389,7 +389,8 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	const struct ip *ip;
 	const u_char *cp;
 	const u_char *ep = ndo->ndo_snapend;
-	uint16_t sport, dport, ulen;
+	uint16_t sport, dport;
+	u_int ulen;
 	const struct ip6_hdr *ip6;
 
 	ndo->ndo_protocol = "udp";
@@ -417,6 +418,13 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		goto trunc;
 	}
 	ulen = GET_BE_U_2(up->uh_ulen);
+	/*
+	 * IPv6 Jumbo Datagrams; see RFC 2675.
+	 * If the length is zero, and the length provided to us is
+	 * > 65535, use the provided length as the length.
+	 */
+	if (ulen == 0 && length > 65535)
+		ulen = length;
 	if (ulen < sizeof(struct udphdr)) {
 		udpipaddr_print(ndo, ip, sport, dport);
 		ND_PRINT("truncated-udplength %u", ulen);

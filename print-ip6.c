@@ -231,11 +231,14 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	const struct ip6_hdr *ip6;
 	int advance;
 	u_int len;
+	u_int total_advance;
 	const u_char *cp;
-	u_int payload_len;
+	uint32_t payload_len;
 	uint8_t nh;
 	int fragmented = 0;
 	u_int flow;
+	int found_extension_header;
+	int found_jumbo;
 
 	ndo->ndo_protocol = "ip6";
 	ip6 = (const struct ip6_hdr *)bp;
@@ -255,10 +258,35 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	}
 
 	payload_len = GET_BE_U_2(ip6->ip6_plen);
-	len = payload_len + sizeof(struct ip6_hdr);
-	if (length < len)
-		ND_PRINT("truncated-ip6 - %u bytes missing!",
-			len - length);
+	/*
+	 * RFC 1883 says:
+	 *
+	 * The Payload Length field in the IPv6 header must be set to zero
+	 * in every packet that carries the Jumbo Payload option.  If a
+	 * packet is received with a valid Jumbo Payload option present and
+	 * a non-zero IPv6 Payload Length field, an ICMP Parameter Problem
+	 * message, Code 0, should be sent to the packet's source, pointing
+	 * to the Option Type field of the Jumbo Payload option.
+	 *
+	 * Later versions of the IPv6 spec don't discuss the Jumbo Payload
+	 * option.
+	 *
+	 * If the payload length is 0, we temporarily just set the total
+	 * length to the remaining data in the packet (which, for Ethernet,
+	 * could include frame padding, but if it's a Jumbo Payload frame,
+	 * it shouldn't even be sendable over Ethernet, so we don't worry
+	 * about that), so we can process the extension headers in order
+	 * to *find* a Jumbo Payload hop-by-hop option and, when we've
+	 * processed all the extension headers, check whether we found
+	 * a Jumbo Payload option, and fail if we haven't.
+	 */
+	if (payload_len != 0) {
+		len = payload_len + sizeof(struct ip6_hdr);
+		if (length < len)
+			ND_PRINT("truncated-ip6 - %u bytes missing!",
+				len - length);
+	} else
+		len = length + sizeof(struct ip6_hdr);
 
         nh = GET_U_1(ip6->ip6_nxt);
         if (ndo->ndo_vflag) {
@@ -292,12 +320,16 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	cp = (const u_char *)ip6;
 	advance = sizeof(struct ip6_hdr);
+	total_advance = 0;
 	/* Process extension headers */
+	found_extension_header = 0;
+	found_jumbo = 0;
 	while (cp < ndo->ndo_snapend && advance > 0) {
 		if (len < (u_int)advance)
 			goto trunc;
 		cp += advance;
 		len -= advance;
+		total_advance += advance;
 
 		if (cp == (const u_char *)(ip6 + 1) &&
 		    nh != IPPROTO_TCP && nh != IPPROTO_UDP &&
@@ -309,20 +341,22 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		switch (nh) {
 
 		case IPPROTO_HOPOPTS:
-			advance = hbhopt_print(ndo, cp);
+			advance = hbhopt_process(ndo, cp, &found_jumbo, &payload_len);
 			if (advance < 0) {
 				nd_pop_packet_info(ndo);
 				return;
 			}
+			found_extension_header = 1;
 			nh = GET_U_1(cp);
 			break;
 
 		case IPPROTO_DSTOPTS:
-			advance = dstopt_print(ndo, cp);
+			advance = dstopt_process(ndo, cp);
 			if (advance < 0) {
 				nd_pop_packet_info(ndo);
 				return;
 			}
+			found_extension_header = 1;
 			nh = GET_U_1(cp);
 			break;
 
@@ -332,6 +366,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 				nd_pop_packet_info(ndo);
 				return;
 			}
+			found_extension_header = 1;
 			nh = GET_U_1(cp);
 			fragmented = 1;
 			break;
@@ -351,6 +386,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 				nd_pop_packet_info(ndo);
 				return;
 			}
+			found_extension_header = 1;
 			nh = GET_U_1(cp);
 			nd_pop_packet_info(ndo);
 			return;
@@ -362,6 +398,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 				nd_pop_packet_info(ndo);
 				return;
 			}
+			found_extension_header = 1;
 			nh = GET_U_1(cp);
 			break;
 
@@ -370,6 +407,62 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			 * Not an extension header; hand off to the
 			 * IP protocol demuxer.
 			 */
+			if (found_jumbo) {
+				/*
+				 * We saw a Jumbo Payload option.
+				 * Set the length to the payload length
+				 * plus the IPv6 header length, and
+				 * change the snapshot length accordingly.
+				 */
+				len = payload_len + sizeof(struct ip6_hdr);
+				if (length < len)
+					ND_PRINT("truncated-ip6 - %u bytes missing!",
+						len - length);
+				nd_change_snapend(ndo, bp + len);
+
+				/*
+				 * Now subtract the length of the IPv6
+				 * header plus extension headers to get
+				 * the payload length.
+				 */
+				len -= total_advance;
+			} else {
+				/*
+				 * We didn't see a Jumbo Payload option;
+				 * was the payload length zero?
+				 */
+				if (payload_len == 0) {
+					/*
+					 * Yes.  If we found an extension
+					 * header, treat that as a truncated
+					 * packet header, as there was
+					 * no payload to contain an
+					 * extension header.
+					 */
+					if (found_extension_header)
+						goto trunc;
+
+					/*
+					 * OK, we didn't see any extnesion
+					 * header, but that means we have
+					 * no payload, so set the length
+					 * to the IPv6 header length,
+					 * and change the snapshot length
+					 * accordingly.
+					 */
+					len = sizeof(struct ip6_hdr);
+					nd_change_snapend(ndo, bp + len);
+
+					/*
+					 * Now subtract the length of
+					 * the IPv6 header plus extension
+					 * headers (there weren't any, so
+					 * that's just the IPv6 header
+					 * length) to get the payload length.
+					 */
+					len -= total_advance;
+				}
+			}
 			ip_print_demux(ndo, cp, len, 6, fragmented,
 			    GET_U_1(ip6->ip6_hlim), nh, bp);
 			nd_pop_packet_info(ndo);
