@@ -413,8 +413,14 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 				 * Set the length to the payload length
 				 * plus the IPv6 header length, and
 				 * change the snapshot length accordingly.
+				 *
+				 * But make sure it's not shorter than
+				 * the total number of bytes we've
+				 * processed so far.
 				 */
 				len = payload_len + sizeof(struct ip6_hdr);
+				if (len < total_advance)
+					goto trunc;
 				if (length < len)
 					ND_PRINT("truncated-ip6 - %u bytes missing!",
 						len - length);

@@ -88,10 +88,12 @@ trunc:
 
 static int
 ip6_opt_process(netdissect_options *ndo, const u_char *bp, int len,
-		int *found_jumbo, uint32_t *jumbolen)
+		int *found_jumbop, uint32_t *payload_len)
 {
     int i;
     int optlen = 0;
+    int found_jumbo = 0;
+    uint32_t jumbolen = 0;
 
     if (len == 0)
         return 0;
@@ -141,10 +143,32 @@ ip6_opt_process(netdissect_options *ndo, const u_char *bp, int len,
 		ND_PRINT("(jumbo: invalid len %u)", GET_U_1(bp + i + 1));
 		goto trunc;
 	    }
-	    *found_jumbo = 1;
-	    *jumbolen = GET_BE_U_4(bp + i + 2);
-	    if (ndo->ndo_vflag)
-    	        ND_PRINT("(jumbo: %u) ", *jumbolen);
+	    jumbolen = GET_BE_U_4(bp + i + 2);
+	    if (found_jumbo) {
+		/* More than one Jumbo Payload option */
+		if (ndo->ndo_vflag)
+		    ND_PRINT("(jumbo: %u - already seen) ", jumbolen);
+	    } else {
+		found_jumbo = 1;
+		if (*payload_len != 0) {
+		    /* Payload length was non-zero - not valid */
+		    if (ndo->ndo_vflag)
+			ND_PRINT("(jumbo: %u - payload len != 0) ", jumbolen);
+		} else {
+		    /* Payload length was zero in the IPv6 header */
+		    if (jumbolen < 65536) {
+			/* Too short */
+			if (ndo->ndo_vflag)
+			    ND_PRINT("(jumbo: %u - < 65536) ", jumbolen);
+		    } else {
+			/* OK, this is valid */
+			*found_jumbop = 1;
+			*payload_len = jumbolen;
+			if (ndo->ndo_vflag)
+			    ND_PRINT("(jumbo: %u) ", jumbolen);
+		    }
+		}
+	    }
 	    break;
         case IP6OPT_HOME_ADDRESS:
 	    if (len - i < IP6OPT_HOMEADDR_MINLEN) {
