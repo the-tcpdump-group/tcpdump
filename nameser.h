@@ -199,6 +199,22 @@
 #define C_CACHE_FLUSH	0x8000		/* mDNS cache flush flag in replies */
 
 /*
+ * Values for EDNS option types
+ */
+
+#define E_NSID		3		/* name server identifier */
+#define E_DAU		5		/* signal DNSSEC algorithm understood */
+#define E_DHU		6		/* signal DS hash understood */
+#define E_N3U		7		/* signal NSEC3 hash understood */
+#define E_ECS		8		/* EDNS client subnet */
+#define E_EXPIRE		9		/* zone expiration */
+#define E_COOKIE		10		/* DNS cookies */
+#define E_KEEPALIVE		11		/* TCP keepalive */
+#define E_PADDING		12		/* pad DNS messages */
+#define E_CHAIN		13		/* chain DNS queries */
+#define E_KEYTAG		14		/* EDNS key tag */
+
+/*
  * Status return codes for T_UNSPEC conversion routines
  */
 #define CONV_SUCCESS 0

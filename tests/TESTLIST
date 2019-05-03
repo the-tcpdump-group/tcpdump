@@ -738,3 +738,8 @@ arista-ether-ev          arista_ether.pcap        arista_ether-ev.out      -ev
 
 # TIPC length field test
 huge-tipc-messages	huge-tipc-messages.pcap	huge-tipc-messages.out
+
+# EDNS Options
+edns-opts	edns-opts.pcap		edns-opts.out
+edns-opts-v	edns-opts.pcap		edns-opts-v.out		-v
+edns-opts-vv	edns-opts.pcap		edns-opts-vv.out		-vv
