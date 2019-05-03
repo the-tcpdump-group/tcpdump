@@ -267,6 +267,27 @@ ns_cprint(netdissect_options *ndo,
 	return (cp + i);
 }
 
+extern const struct tok edns_opt2str[];
+
+/* print an <EDNS-option> */
+static const u_char *
+eopt_print(netdissect_options *ndo,
+          const u_char *cp)
+{
+	u_int i;
+
+	if (!ND_TTEST_2(cp))
+		return (NULL);
+	i = GET_BE_U_2(cp);
+	cp += 2;
+	ND_PRINT(" %s", tok2str(edns_opt2str, "Opt%u", i));
+	if (!ND_TTEST_2(cp))
+		return (NULL);
+	i = GET_BE_U_2(cp);
+	cp += 2;
+	return (cp + i);
+}
+
 extern const struct tok ns_type2str[];
 
 /* https://www.iana.org/assignments/dns-parameters */
@@ -343,6 +364,23 @@ const struct tok ns_class2str[] = {
 	{ C_CHAOS,	"CHAOS" },
 	{ C_HS,		"HS" },
 	{ C_ANY,	"ANY" },
+	{ 0,		NULL }
+};
+
+extern const struct tok edns_opt2str[];
+
+const struct tok edns_opt2str[] = {
+	{ E_NSID,		"NSID" },
+	{ E_DAU,	"DAU" },
+	{ E_DHU,	"DHU" },
+	{ E_N3U,	"N3U" },
+	{ E_ECS,	"ECS" },
+	{ E_EXPIRE,	"EXPIRE" },
+	{ E_COOKIE,	"COOKIE" },
+	{ E_KEEPALIVE,	"KEEPALIVE" },
+	{ E_PADDING,	"PADDING" },
+	{ E_CHAIN,	"CHAIN" },
+	{ E_KEYTAG,	"KEYTAG" },
 	{ 0,		NULL }
 };
 
@@ -565,6 +603,11 @@ ns_rprint(netdissect_options *ndo,
 		ND_PRINT(" UDPsize=%u", class);
 		if (opt_flags & 0x8000)
 			ND_PRINT(" DO");
+		while (cp < rp) {
+			cp = eopt_print(ndo, cp);
+			if (cp == NULL)
+				return(NULL);
+		}
 		break;
 
 	case T_UNSPECA:		/* One long string */

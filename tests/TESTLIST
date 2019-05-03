@@ -778,3 +778,8 @@ ldp_tlv_print-oobr ldp_tlv_print-oobr.pcap ldp_tlv_print-oobr.out -v
 #someip tests
 someip1		someip1.pcap	someip1.out
 someip2		someip2.pcap	someip2.out
+
+# EDNS Options
+edns-opts	edns-opts.pcap		edns-opts.out
+edns-opts-v	edns-opts.pcap		edns-opts-v.out		-v
+edns-opts-vv	edns-opts.pcap		edns-opts-vv.out		-vv
