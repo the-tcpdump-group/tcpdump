@@ -198,7 +198,7 @@ AC_ARG_WITH(sandbox-capsicum,
 # XXX - do we need to check for all of them, or are there some that, if
 # present, imply others are present?
 #
-if test ! -z "$with_sandbox-capsicum" && test "$with_sandbox-capsicum" != "no" ; then
+if test ! -z "$with_sandbox_capsicum" && test "$with_sandbox_capsicum" != "no" ; then
 	#
 	# First, make sure we have the required header.
 	#
