@@ -151,6 +151,7 @@ struct icmp6_hdr {
 #define ICMP6_PARAMPROB_HEADER 		0	/* erroneous header field */
 #define ICMP6_PARAMPROB_NEXTHEADER	1	/* unrecognized next header */
 #define ICMP6_PARAMPROB_OPTION		2	/* unrecognized option */
+#define ICMP6_PARAMPROB_FRAGHDRCHAIN	3	/* incomplete header chain */
 
 #define ICMP6_INFOMSG_MASK		0x80	/* all informational messages */
 
@@ -1160,6 +1161,10 @@ icmp6_print(netdissect_options *ndo,
                         break;
 		case ICMP6_PARAMPROB_OPTION:
                         ND_PRINT(", option - octet %u",
+				 GET_BE_U_4(dp->icmp6_pptr));
+                        break;
+		case ICMP6_PARAMPROB_FRAGHDRCHAIN:
+                        ND_PRINT(", incomplete header chain - octet %u",
 				 GET_BE_U_4(dp->icmp6_pptr));
                         break;
 		default:
