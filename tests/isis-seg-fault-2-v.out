@@ -3,18 +3,6 @@
 	  source-id: 3333.3333.3333,  holding time: 10s, Flags: [unknown circuit type 0x21]
 	  lan-id:    3333.5a33.3333.02, Priority: 64, PDU length: 1497
 	    Multi-Topology Capability TLV #144, length: 1
-	      O: 1, RES: 4, MTID(s): 3073
-	      unknown subTLV #4, length: 3
-	      unknown subTLV #132, length: 4
-	      unknown subTLV #55, length: 3
-	      unknown subTLV #6, length: 6
-	      unknown subTLV #8, length: 191
-	      unknown subTLV #0, length: 0
-	      unknown subTLV #0, length: 0
-	      unknown subTLV #0, length: 0
-	      unknown subTLV #0, length: 0
-	      unknown subTLV #0, length: 0
-	      unknown subTLV #0, length: 37 [|isis]
 	    Area address(es) TLV #1, length: 4
 	      Area address (length: 3): 49.000a
 	    IPv4 Interface address(es) TLV #132, length: 4

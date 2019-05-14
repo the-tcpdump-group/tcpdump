@@ -17,7 +17,7 @@
 		0x0010:  2026 2020 2020 2020 2020 2020 2020 8f8f
 	    Multi-Topology-Aware Port Capability TLV #143, length: 143
 	       RES: 8, MTID(s): 3983
-	       unknown subTLV #143, length: 143 [|isis]
+	       unknown subTLV #143, length: 143 (> containing TLV length)
 	    Multi-Topology-Aware Port Capability TLV #143, length: 143
 	       RES: 8, MTID(s): 3983
-	       unknown subTLV #143, length: 143 [|isis] [|isis]
+	       unknown subTLV #143, length: 143 (> containing TLV length) [|isis]
