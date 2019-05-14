@@ -1187,7 +1187,7 @@ otlv_print(netdissect_options *ndo,
 	const struct optlv_h *ops;
 
 	/*
-	 * lfbselect_print() has ensured that EXTRACT_BE_U_2(otlv->length)
+	 * lfbselect_print() has ensured that GET_BE_U_2(otlv->length)
 	 * >= TLV_HDRL.
 	 */
 	ND_TCHECK_SIZE(otlv);
