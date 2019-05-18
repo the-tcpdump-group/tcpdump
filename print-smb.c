@@ -809,6 +809,8 @@ print_smb(netdissect_options *ndo,
         "[P4]SMB Command   =  [B]\nError class   =  [BP1]\nError code    =  [u]\nFlags1        =  [B]\nFlags2        =  [B][P13]\nTree ID       =  [u]\nProc ID       =  [u]\nUID           =  [u]\nMID           =  [u]\nWord Count    =  [b]\n";
     u_int smboffset;
 
+    ndo->ndo_protocol = "smb";
+
     ND_TCHECK_1(buf + 9);
     request = (GET_U_1(buf + 9) & 0x80) ? 0 : 1;
     startbuf = buf;
