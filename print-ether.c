@@ -303,34 +303,34 @@ recurse:
 			llc_hdrlen = -llc_hdrlen;
 		}
 		hdrlen += llc_hdrlen;
-		} else if (length_type == ETHERTYPE_ARISTA) {
-			if (caplen < 2) {
-				ND_PRINT("[|arista]");
-				return (hdrlen + caplen);
+	} else if (length_type == ETHERTYPE_ARISTA) {
+		if (caplen < 2) {
+			ND_PRINT("[|arista]");
+			return (hdrlen + caplen);
+		}
+		if (length < 2) {
+			ND_PRINT("[|arista]");
+			return (hdrlen + length);
+		}
+		ether_type_print(ndo, length_type);
+		ND_PRINT(", length %u: ", orig_length);
+		int bytesConsumed = arista_print_ethertype(ndo, p, length);
+		if (bytesConsumed > 0) {
+			p += bytesConsumed;
+			length -= bytesConsumed;
+			caplen -= bytesConsumed;
+			hdrlen += bytesConsumed;
+			goto recurse;
+		} else {
+			/* subtype/version not known, print raw packet */
+			if (!ndo->ndo_eflag && length_type > MAX_ETHERNET_LENGTH_VAL) {
+				ether_addresses_print(ndo, src.addr, dst.addr);
+				ether_type_print(ndo, length_type);
+				ND_PRINT(", length %u: ", orig_length);
 			}
-			if (length < 2) {
-				ND_PRINT("[|arista]");
-				return (hdrlen + length);
-			}
-			ether_type_print(ndo, length_type);
-			ND_PRINT(", length %u: ", orig_length);
-			int bytesConsumed = arista_print_ethertype(ndo, p, length);
-			if (bytesConsumed > 0) {
-				p += bytesConsumed;
-				length -= bytesConsumed;
-				caplen -= bytesConsumed;
-				hdrlen += bytesConsumed;
-				goto recurse;
-			} else {
-				/* subtype/version not known, print raw packet */
-				if (!ndo->ndo_eflag && length_type > MAX_ETHERNET_LENGTH_VAL) {
-					ether_addresses_print(ndo, src.addr, dst.addr);
-					ether_type_print(ndo, length_type);
-					ND_PRINT(", length %u: ", orig_length);
-				}
-				 if (!ndo->ndo_suppress_default_print)
-					 ND_DEFAULTPRINT(p, caplen);
-			}
+			 if (!ndo->ndo_suppress_default_print)
+				 ND_DEFAULTPRINT(p, caplen);
+		}
 	} else {
 		/*
 		 * It's a type field with some other value.
