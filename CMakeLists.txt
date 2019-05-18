@@ -955,6 +955,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-aoe.c
     print-ap1394.c
     print-arcnet.c
+    print-arista.c
     print-arp.c
     print-ascii.c
     print-atalk.c
