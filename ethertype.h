@@ -206,5 +206,8 @@
 #ifndef	ETHERTYPE_GEONET
 #define	ETHERTYPE_GEONET        0x8947  /* ETSI GeoNetworking (Official IEEE registration from Jan 2013) */
 #endif
+#ifndef	ETHERTYPE_ARISTA
+#define	ETHERTYPE_ARISTA        0xd28b /*  Arista Networks vendor specific EtherType */
+#endif
 
 extern const struct tok ethertype_values[];

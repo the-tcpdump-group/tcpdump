@@ -1279,6 +1279,8 @@ v3.0 Mon Jun 20 19:23:27 PDT 1994
 - print-arp.c: Print hardware ethernet addresses if they're not
   what we expect.
 
+- print-arista.c : Print Arista Specific Protocol.
+
 - print-bootp.c: Decode the cmu vendor field. Add RFC1497 tags.
   Many helpful suggestions from Gordon Ross (gwr@jericho.mc.com).
 

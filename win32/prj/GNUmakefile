@@ -47,6 +47,7 @@ OBJS = \
 	../../print-aodv.o \
 	../../print-ap1394.o \
 	../../print-arcnet.o \
+	../../print-arista.o \
 	../../print-arp.o \
 	../../print-ascii.o \
 	../../print-atalk.o \
