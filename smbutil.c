@@ -342,7 +342,7 @@ write_bits(netdissect_options *ndo,
 #define MAX_UNISTR_SIZE	1000
 static const char *
 unistr(netdissect_options *ndo,
-       const u_char *s, uint32_t *len, int use_unicode)
+       const u_char *s, uint32_t *len, int is_null_terminated, int use_unicode)
 {
     static char buf[MAX_UNISTR_SIZE+1];
     size_t l = 0;
@@ -360,7 +360,7 @@ unistr(netdissect_options *ndo,
 	    padding++;
 	}
     }
-    if (*len == 0) {
+    if (is_null_terminated) {
 	/*
 	 * Null-terminated string.
 	 */
@@ -650,7 +650,7 @@ smb_fdata1(netdissect_options *ndo,
 	    uint32_t len;
 
 	    len = 0;
-	    s = unistr(ndo, buf, &len, (*fmt == 'R') ? 0 : unicodestr);
+	    s = unistr(ndo, buf, &len, 1, (*fmt == 'R') ? 0 : unicodestr);
 	    if (s == NULL)
 		goto trunc;
 	    ND_PRINT("%s", s);
@@ -670,7 +670,7 @@ smb_fdata1(netdissect_options *ndo,
 		return maxbuf;	/* give up */
 	    }
 	    len = 0;
-	    s = unistr(ndo, buf + 1, &len, (*fmt == 'Y') ? 0 : unicodestr);
+	    s = unistr(ndo, buf + 1, &len, 1, (*fmt == 'Y') ? 0 : unicodestr);
 	    if (s == NULL)
 		goto trunc;
 	    ND_PRINT("%s", s);
@@ -702,7 +702,7 @@ smb_fdata1(netdissect_options *ndo,
 	case 'C':
 	  {
 	    const char *s;
-	    s = unistr(ndo, buf, &stringlen, unicodestr);
+	    s = unistr(ndo, buf, &stringlen, 0, unicodestr);
 	    if (s == NULL)
 		goto trunc;
 	    ND_PRINT("%s", s);
