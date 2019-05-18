@@ -348,6 +348,7 @@ unistr(netdissect_options *ndo,
     size_t l = 0;
     uint32_t strsize;
     const u_char *sp;
+    int padding = 0;
 
     if (use_unicode) {
 	/*
@@ -356,6 +357,7 @@ unistr(netdissect_options *ndo,
 	if (((s - startbuf) % 2) != 0) {
 	    ND_TCHECK_1(s);
 	    s++;
+	    padding++;
 	}
     }
     if (*len == 0) {
@@ -383,11 +385,13 @@ unistr(netdissect_options *ndo,
 	    }
 	    strsize = *len - 2;
 	}
+	*len += padding;
     } else {
 	/*
 	 * Counted string.
 	 */
 	strsize = *len;
+	*len += padding;
     }
     if (!use_unicode) {
     	while (strsize != 0) {
