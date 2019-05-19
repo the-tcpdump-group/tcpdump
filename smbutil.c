@@ -340,11 +340,10 @@ write_bits(netdissect_options *ndo,
 
 /* convert a UCS-2 string into an ASCII string */
 #define MAX_UNISTR_SIZE	1000
-static const char *
-unistr(netdissect_options *ndo,
+static int
+unistr(netdissect_options *ndo, char (*buf)[MAX_UNISTR_SIZE+1],
        const u_char *s, uint32_t *len, int is_null_terminated, int use_unicode)
 {
-    static char buf[MAX_UNISTR_SIZE+1];
     size_t l = 0;
     uint32_t strsize;
     const u_char *sp;
@@ -399,11 +398,11 @@ unistr(netdissect_options *ndo,
 	    if (l >= MAX_UNISTR_SIZE)
 		break;
 	    if (ND_ISPRINT(GET_U_1(s)))
-		buf[l] = GET_U_1(s);
+		(*buf)[l] = GET_U_1(s);
 	    else {
 		if (GET_U_1(s) == 0)
 		    break;
-		buf[l] = '.';
+		(*buf)[l] = '.';
 	    }
 	    l++;
 	    s++;
@@ -416,12 +415,12 @@ unistr(netdissect_options *ndo,
 		break;
 	    if (GET_U_1(s + 1) == 0 && ND_ISPRINT(GET_U_1(s))) {
 		/* It's a printable ASCII character */
-		buf[l] = GET_U_1(s);
+		(*buf)[l] = GET_U_1(s);
 	    } else {
 		/* It's a non-ASCII character or a non-printable ASCII character */
 		if (GET_U_1(s) == 0 && GET_U_1(s + 1) == 0)
 		    break;
-		buf[l] = '.';
+		(*buf)[l] = '.';
 	    }
 	    l++;
 	    s += 2;
@@ -430,11 +429,11 @@ unistr(netdissect_options *ndo,
 	    strsize -= 2;
 	}
     }
-    buf[l] = 0;
-    return buf;
+    (*buf)[l] = 0;
+    return 0;
 
 trunc:
-    return NULL;
+    return -1;
 }
 
 static const u_char *
@@ -444,6 +443,7 @@ smb_fdata1(netdissect_options *ndo,
 {
     int reverse = 0;
     const char *attrib_fmt = "READONLY|HIDDEN|SYSTEM|VOLUME|DIR|ARCHIVE|";
+    char strbuf[MAX_UNISTR_SIZE+1];
 
     while (*fmt && buf<maxbuf) {
 	switch (*fmt) {
@@ -646,14 +646,12 @@ smb_fdata1(netdissect_options *ndo,
 	case 'R':	/* like 'S', but always ASCII */
 	  {
 	    /*XXX unistr() */
-	    const char *s;
 	    uint32_t len;
 
 	    len = 0;
-	    s = unistr(ndo, buf, &len, 1, (*fmt == 'R') ? 0 : unicodestr);
-	    if (s == NULL)
+	    if (unistr(ndo, &strbuf, buf, &len, 1, (*fmt == 'R') ? 0 : unicodestr) == -1)
 		goto trunc;
-	    ND_PRINT("%s", s);
+	    ND_PRINT("%s", strbuf);
 	    buf += len;
 	    fmt++;
 	    break;
@@ -661,7 +659,6 @@ smb_fdata1(netdissect_options *ndo,
 	case 'Z':
 	case 'Y':	/* like 'Z', but always ASCII */
 	  {
-	    const char *s;
 	    uint32_t len;
 
 	    ND_TCHECK_1(buf);
@@ -670,10 +667,9 @@ smb_fdata1(netdissect_options *ndo,
 		return maxbuf;	/* give up */
 	    }
 	    len = 0;
-	    s = unistr(ndo, buf + 1, &len, 1, (*fmt == 'Y') ? 0 : unicodestr);
-	    if (s == NULL)
+	    if (unistr(ndo, &strbuf, buf + 1, &len, 1, (*fmt == 'Y') ? 0 : unicodestr) == -1)
 		goto trunc;
-	    ND_PRINT("%s", s);
+	    ND_PRINT("%s", strbuf);
 	    buf += len + 1;
 	    fmt++;
 	    break;
@@ -701,11 +697,9 @@ smb_fdata1(netdissect_options *ndo,
 	  }
 	case 'C':
 	  {
-	    const char *s;
-	    s = unistr(ndo, buf, &stringlen, 0, unicodestr);
-	    if (s == NULL)
+	    if (unistr(ndo, &strbuf, buf, &stringlen, 0, unicodestr) == -1)
 		goto trunc;
-	    ND_PRINT("%s", s);
+	    ND_PRINT("%s", strbuf);
 	    buf += stringlen;
 	    fmt++;
 	    break;
