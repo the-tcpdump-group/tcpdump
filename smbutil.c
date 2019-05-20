@@ -344,6 +344,7 @@ static int
 unistr(netdissect_options *ndo, char (*buf)[MAX_UNISTR_SIZE+1],
        const u_char *s, uint32_t *len, int is_null_terminated, int use_unicode)
 {
+    u_int c;
     size_t l = 0;
     uint32_t strsize;
     const u_char *sp;
@@ -362,6 +363,7 @@ unistr(netdissect_options *ndo, char (*buf)[MAX_UNISTR_SIZE+1],
     if (is_null_terminated) {
 	/*
 	 * Null-terminated string.
+	 * Find the length, counting the terminating NUL.
 	 */
 	strsize = 0;
 	sp = s;
@@ -394,45 +396,75 @@ unistr(netdissect_options *ndo, char (*buf)[MAX_UNISTR_SIZE+1],
     }
     if (!use_unicode) {
     	while (strsize != 0) {
-          ND_TCHECK_1(s);
-	    if (l >= MAX_UNISTR_SIZE)
-		break;
-	    if (ND_ISPRINT(GET_U_1(s)))
-		(*buf)[l] = GET_U_1(s);
-	    else {
-		if (GET_U_1(s) == 0)
-		    break;
-		(*buf)[l] = '.';
-	    }
-	    l++;
+	    ND_TCHECK_1(s);
+	    c = GET_U_1(s);
 	    s++;
 	    strsize--;
+	    if (c == 0) {
+		/*
+		 * Even counted strings may have embedded null
+		 * terminators, so quit here, and skip past
+		 * the rest of the data.
+		 *
+		 * Make sure, however, that the rest of the data
+		 * is there, so we don't overflow the buffer when
+		 * skipping past it.
+		 */
+		ND_TCHECK_LEN(s, strsize);
+		break;
+	    }
+	    if (l < MAX_UNISTR_SIZE) {
+		if (ND_ISPRINT(c)) {
+		    /* It's a printable ASCII character */
+		    (*buf)[l] = c;
+		} else {
+		    /* It's a non-ASCII character or a non-printable ASCII character */
+		    (*buf)[l] = '.';
+		}
+		l++;
+	    }
 	}
     } else {
-	while (strsize != 0) {
+	while (strsize > 1) {
 	    ND_TCHECK_2(s);
-	    if (l >= MAX_UNISTR_SIZE)
-		break;
-	    if (GET_U_1(s + 1) == 0 && ND_ISPRINT(GET_U_1(s))) {
-		/* It's a printable ASCII character */
-		(*buf)[l] = GET_U_1(s);
-	    } else {
-		/* It's a non-ASCII character or a non-printable ASCII character */
-		if (GET_U_1(s) == 0 && GET_U_1(s + 1) == 0)
-		    break;
-		(*buf)[l] = '.';
-	    }
-	    l++;
+	    c = GET_LE_U_2(s);
 	    s += 2;
-	    if (strsize == 1)
-		break;
 	    strsize -= 2;
+	    if (c == 0) {
+		/*
+		 * Even counted strings may have embedded null
+		 * terminators, so quit here, and skip past
+		 * the rest of the data.
+		 *
+		 * Make sure, however, that the rest of the data
+		 * is there, so we don't overflow the buffer when
+		 * skipping past it.
+		 */
+		ND_TCHECK_LEN(s, strsize);
+		break;
+	    }
+	    if (l < MAX_UNISTR_SIZE) {
+		if (ND_ISPRINT(c)) {
+		    /* It's a printable ASCII character */
+		    (*buf)[l] = c;
+		} else {
+		    /* It's a non-ASCII character or a non-printable ASCII character */
+		    (*buf)[l] = '.';
+		}
+		l++;
+	    }
+	}
+	if (strsize == 1) {
+	    /* We have half of a code point; skip past it */
+	    ND_TCHECK_1(s);
+	    s++;
 	}
     }
     (*buf)[l] = 0;
     return 0;
 
 trunc:
+    (*buf)[l] = 0;
     return -1;
 }
 
@@ -647,11 +679,13 @@ smb_fdata1(netdissect_options *ndo,
 	  {
 	    /*XXX unistr() */
 	    uint32_t len;
+	    int result;
 
 	    len = 0;
-	    if (unistr(ndo, &strbuf, buf, &len, 1, (*fmt == 'R') ? 0 : unicodestr) == -1)
-		goto trunc;
+	    result = unistr(ndo, &strbuf, buf, &len, 1, (*fmt == 'R') ? 0 : unicodestr);
 	    ND_PRINT("%s", strbuf);
+	    if (result == -1)
+		goto trunc;
 	    buf += len;
 	    fmt++;
 	    break;
@@ -660,6 +694,7 @@ smb_fdata1(netdissect_options *ndo,
 	case 'Y':	/* like 'Z', but always ASCII */
 	  {
 	    uint32_t len;
+	    int result;
 
 	    ND_TCHECK_1(buf);
 	    if (GET_U_1(buf) != 4 && GET_U_1(buf) != 2) {
@@ -667,9 +702,10 @@ smb_fdata1(netdissect_options *ndo,
 		return maxbuf;	/* give up */
 	    }
 	    len = 0;
-	    if (unistr(ndo, &strbuf, buf + 1, &len, 1, (*fmt == 'Y') ? 0 : unicodestr) == -1)
-		goto trunc;
+	    result = unistr(ndo, &strbuf, buf + 1, &len, 1, (*fmt == 'Y') ? 0 : unicodestr);
 	    ND_PRINT("%s", strbuf);
+	    if (result == -1)
+		goto trunc;
 	    buf += len + 1;
 	    fmt++;
 	    break;
@@ -697,9 +733,12 @@ smb_fdata1(netdissect_options *ndo,
 	  }
 	case 'C':
 	  {
-	    if (unistr(ndo, &strbuf, buf, &stringlen, 0, unicodestr) == -1)
-		goto trunc;
+	    int result;
+
+	    result = unistr(ndo, &strbuf, buf, &stringlen, 0, unicodestr);
 	    ND_PRINT("%s", strbuf);
+	    if (result == -1)
+		goto trunc;
 	    buf += stringlen;
 	    fmt++;
 	    break;
@@ -872,8 +911,17 @@ smb_fdata(netdissect_options *ndo,
 	    s[p - fmt] = '\0';
 	    fmt = p + 1;
 	    buf = smb_fdata1(ndo, buf, s, maxbuf, unicodestr);
-	    if (buf == NULL)
+	    if (buf == NULL) {
+		/*
+		 * Truncated.
+		 * Is the next character a newline?
+		 * If so, print it before quitting, so we don't
+		 * get stuff in the middle of the line.
+		 */
+		if (*fmt == '\n')
+		    ND_PRINT("\n");
 		return(NULL);
+	    }
 	    break;
 
 	default:
