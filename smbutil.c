@@ -20,8 +20,19 @@
 #include "extract.h"
 #include "smb.h"
 
+static int stringlen_is_set;
 static uint32_t stringlen;
 extern const u_char *startbuf;
+
+/*
+ * Reset SMB state.
+ */
+void
+smb_reset(void)
+{
+    stringlen_is_set = 0;
+    stringlen = 0;
+}
 
 /*
  * interpret a 32 bit dos packed date/time to some parameters
@@ -649,6 +660,7 @@ smb_fdata1(netdissect_options *ndo,
 	    case 'b':
 		ND_TCHECK_1(buf);
 		stringlen = GET_U_1(buf);
+		stringlen_is_set = 1;
 		ND_PRINT("%u", stringlen);
 		buf += 1;
 		break;
@@ -658,6 +670,7 @@ smb_fdata1(netdissect_options *ndo,
 		ND_TCHECK_2(buf);
 		stringlen = reverse ? GET_BE_U_2(buf) :
 				      GET_LE_U_2(buf);
+		stringlen_is_set = 1;
 		ND_PRINT("%u", stringlen);
 		buf += 2;
 		break;
@@ -667,6 +680,7 @@ smb_fdata1(netdissect_options *ndo,
 		ND_TCHECK_4(buf);
 		stringlen = reverse ? GET_BE_U_4(buf) :
 				      GET_LE_U_4(buf);
+		stringlen_is_set = 1;
 		ND_PRINT("%u", stringlen);
 		buf += 4;
 		break;
@@ -723,6 +737,10 @@ smb_fdata1(netdissect_options *ndo,
 	  }
 	case 'c':
 	  {
+            if (!stringlen_is_set) {
+                ND_PRINT("{stringlen not set}");
+                goto trunc;
+            }
 	    ND_TCHECK_LEN(buf, stringlen);
 	    ND_PRINT("%-*.*s", (int)stringlen, (int)stringlen, buf);
 	    buf += stringlen;
@@ -735,6 +753,10 @@ smb_fdata1(netdissect_options *ndo,
 	  {
 	    int result;
 
+            if (!stringlen_is_set) {
+                ND_PRINT("{stringlen not set}");
+                goto trunc;
+            }
 	    result = unistr(ndo, &strbuf, buf, &stringlen, 0, unicodestr);
 	    ND_PRINT("%s", strbuf);
 	    if (result == -1)

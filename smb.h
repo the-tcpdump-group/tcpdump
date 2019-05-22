@@ -117,6 +117,7 @@
 #define TRANSACT2_MKDIR           13
 
 /* some protos */
+void smb_reset(void);
 const u_char *smb_fdata(netdissect_options *, const u_char *, const char *, const u_char *, int);
 extern const char *smb_errstr(int, int);
 extern const char *nt_errstr(uint32_t);

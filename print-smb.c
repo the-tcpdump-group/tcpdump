@@ -867,6 +867,7 @@ print_smb(netdissect_options *ndo,
 	    f2 = fn->descript.rep_f2;
 	}
 
+	smb_reset();
 	if (fn->descript.fn)
 	    (*fn->descript.fn)(ndo, words, data, buf, maxbuf);
 	else {
