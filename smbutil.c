@@ -351,15 +351,14 @@ write_bits(netdissect_options *ndo,
 
 /* convert a UCS-2 string into an ASCII string */
 #define MAX_UNISTR_SIZE	1000
-static int
+static const u_char *
 unistr(netdissect_options *ndo, char (*buf)[MAX_UNISTR_SIZE+1],
-       const u_char *s, uint32_t *len, int is_null_terminated, int use_unicode)
+       const u_char *s, uint32_t strsize, int is_null_terminated,
+       int use_unicode)
 {
     u_int c;
     size_t l = 0;
-    uint32_t strsize;
     const u_char *sp;
-    int padding = 0;
 
     if (use_unicode) {
 	/*
@@ -368,7 +367,6 @@ unistr(netdissect_options *ndo, char (*buf)[MAX_UNISTR_SIZE+1],
 	if (((s - startbuf) % 2) != 0) {
 	    ND_TCHECK_1(s);
 	    s++;
-	    padding++;
 	}
     }
     if (is_null_terminated) {
@@ -381,29 +379,22 @@ unistr(netdissect_options *ndo, char (*buf)[MAX_UNISTR_SIZE+1],
 	if (!use_unicode) {
 	    for (;;) {
 		ND_TCHECK_1(sp);
-		*len += 1;
-		if (GET_U_1(sp) == 0)
-		    break;
+		c = GET_U_1(sp);
 		sp++;
+		strsize++;
+		if (c == '\0')
+		    break;
 	    }
-	    strsize = *len - 1;
 	} else {
 	    for (;;) {
 		ND_TCHECK_2(sp);
-		*len += 2;
-		if (GET_U_1(sp) == 0 && GET_U_1(sp + 1) == 0)
-		    break;
+		c = GET_LE_U_2(sp);
 		sp += 2;
+		strsize += 2;
+		if (c == '\0')
+		    break;
 	    }
-	    strsize = *len - 2;
 	}
-	*len += padding;
-    } else {
-	/*
-	 * Counted string.
-	 */
-	strsize = *len;
-	*len += padding;
     }
     if (!use_unicode) {
     	while (strsize != 0) {
@@ -422,6 +413,8 @@ unistr(netdissect_options *ndo, char (*buf)[MAX_UNISTR_SIZE+1],
 		 * skipping past it.
 		 */
 		ND_TCHECK_LEN(s, strsize);
+		s += strsize;
+		strsize = 0;
 		break;
 	    }
 	    if (l < MAX_UNISTR_SIZE) {
@@ -452,6 +445,8 @@ unistr(netdissect_options *ndo, char (*buf)[MAX_UNISTR_SIZE+1],
 		 * skipping past it.
 		 */
 		ND_TCHECK_LEN(s, strsize);
+		s += strsize;
+		strsize = 0;
 		break;
 	    }
 	    if (l < MAX_UNISTR_SIZE) {
@@ -472,11 +467,11 @@ unistr(netdissect_options *ndo, char (*buf)[MAX_UNISTR_SIZE+1],
 	}
     }
     (*buf)[l] = 0;
-    return 0;
+    return s;
 
 trunc:
     (*buf)[l] = 0;
-    return -1;
+    return NULL;
 }
 
 static const u_char *
@@ -692,35 +687,25 @@ smb_fdata1(netdissect_options *ndo,
 	case 'R':	/* like 'S', but always ASCII */
 	  {
 	    /*XXX unistr() */
-	    uint32_t len;
-	    int result;
-
-	    len = 0;
-	    result = unistr(ndo, &strbuf, buf, &len, 1, (*fmt == 'R') ? 0 : unicodestr);
+	    buf = unistr(ndo, &strbuf, buf, 0, 1, (*fmt == 'R') ? 0 : unicodestr);
 	    ND_PRINT("%s", strbuf);
-	    if (result == -1)
+	    if (buf == NULL)
 		goto trunc;
-	    buf += len;
 	    fmt++;
 	    break;
 	  }
 	case 'Z':
 	case 'Y':	/* like 'Z', but always ASCII */
 	  {
-	    uint32_t len;
-	    int result;
-
 	    ND_TCHECK_1(buf);
 	    if (GET_U_1(buf) != 4 && GET_U_1(buf) != 2) {
 		ND_PRINT("Error! ASCIIZ buffer of type %u", GET_U_1(buf));
 		return maxbuf;	/* give up */
 	    }
-	    len = 0;
-	    result = unistr(ndo, &strbuf, buf + 1, &len, 1, (*fmt == 'Y') ? 0 : unicodestr);
+	    buf = unistr(ndo, &strbuf, buf + 1, 0, 1, (*fmt == 'Y') ? 0 : unicodestr);
 	    ND_PRINT("%s", strbuf);
-	    if (result == -1)
+	    if (buf == NULL)
 		goto trunc;
-	    buf += len + 1;
 	    fmt++;
 	    break;
 	  }
@@ -751,17 +736,14 @@ smb_fdata1(netdissect_options *ndo,
 	  }
 	case 'C':
 	  {
-	    int result;
-
             if (!stringlen_is_set) {
                 ND_PRINT("{stringlen not set}");
                 goto trunc;
             }
-	    result = unistr(ndo, &strbuf, buf, &stringlen, 0, unicodestr);
+	    buf = unistr(ndo, &strbuf, buf, stringlen, 0, unicodestr);
 	    ND_PRINT("%s", strbuf);
-	    if (result == -1)
+	    if (buf == NULL)
 		goto trunc;
-	    buf += stringlen;
 	    fmt++;
 	    break;
 	  }
