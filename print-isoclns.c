@@ -3237,7 +3237,7 @@ isis_print(netdissect_options *ndo,
                            "Unknown (0x%02x)",
                            isis_subtlv_idrp));
             tptr++;
-            tlen--; 
+            tlen--;
             switch (isis_subtlv_idrp) {
             case ISIS_SUBTLV_IDRP_ASN:
                 if (tlen < 2)
