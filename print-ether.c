@@ -314,7 +314,7 @@ recurse:
 		}
 		ether_type_print(ndo, length_type);
 		ND_PRINT(", length %u: ", orig_length);
-		int bytesConsumed = arista_print_ethertype(ndo, p, length);
+		int bytesConsumed = arista_ethertype_print(ndo, p, length);
 		if (bytesConsumed > 0) {
 			p += bytesConsumed;
 			length -= bytesConsumed;

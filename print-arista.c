@@ -1,5 +1,7 @@
 // Copyright (c) 2018 Arista Networks, Inc.  All rights reserved.
 
+/* \summary: EtherType protocol for Arista Networks printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -19,7 +21,7 @@
 #define ARISTA_TIMESTAMP_V2 0x20
 
 int
-arista_print_ethertype(netdissect_options *ndo, const u_char *bp, u_int len _U_)
+arista_ethertype_print(netdissect_options *ndo, const u_char *bp, u_int len _U_)
 {
 	uint16_t subTypeId;
 	uint16_t version;
