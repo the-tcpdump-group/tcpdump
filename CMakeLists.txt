@@ -717,10 +717,12 @@ if(WITH_CRYPTO)
     find_package(CRYPTO)
     if(CRYPTO_FOUND)
         #
-        # Check for some functions.
+        # Check for some headers and functions.
         #
         cmake_push_check_state()
         set(CMAKE_REQUIRED_LIBRARIES crypto)
+
+        check_include_file(openssl/evp.h HAVE_OPENSSL_EVP_H)
 
         #
       	# 1) do we have EVP_CIPHER_CTX_new?
