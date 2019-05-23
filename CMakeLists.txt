@@ -725,7 +725,7 @@ if(WITH_CRYPTO)
         check_include_file(openssl/evp.h HAVE_OPENSSL_EVP_H)
 
         #
-      	# 1) do we have EVP_CIPHER_CTX_new?
+        # 1) do we have EVP_CIPHER_CTX_new?
         # If so, we use it to allocate an EVP_CIPHER_CTX, as
         # EVP_CIPHER_CTX may be opaque; otherwise, we allocate
         # it ourselves.
