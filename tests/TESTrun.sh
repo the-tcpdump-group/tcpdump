@@ -34,6 +34,9 @@ runSimpleTests()
       failed=`expr $failed + 1`
       echo $failed >.failed
     fi
+    if [ -d COREFILES ]; then
+        if [ -f core ]; then mv core COREFILES/$name.core; fi
+    fi
     [ "$only" != "" -a "$name" = "$only" ] && break
   done
   # I hate shells with their stupid, useless subshells.
