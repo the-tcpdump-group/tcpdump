@@ -229,6 +229,8 @@ print_prefix(netdissect_options *ndo, const u_char *prefix, u_int max_length)
         plenbytes += 1 + IPV4_MAPPED_HEADING_LEN;
     } else {
         plenbytes = decode_prefix6(ndo, prefix, max_length, buf, sizeof(buf));
+        if (plenbytes < 0)
+            return plenbytes;
     }
 
     ND_PRINT((ndo, "%s", buf));
