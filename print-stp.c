@@ -273,7 +273,7 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
            stp_print_bridge_id(ndo, stp_bpdu->root_id),
            GET_BE_U_4(stp_bpdu->root_path_cost));
 
-    ND_TCHECK_SIZE(stp_bpdu->bridge_id);
+    ND_TCHECK_SIZE(&stp_bpdu->bridge_id);
     ND_PRINT("\n\tCIST regional-root-id %s, ",
            stp_print_bridge_id(ndo, stp_bpdu->bridge_id));
 
