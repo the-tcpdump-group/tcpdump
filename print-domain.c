@@ -622,6 +622,14 @@ domain_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "domain";
 	np = (const dns_header_t *)bp;
+
+	if(length < sizeof(*np)) {
+		nd_print_protocol(ndo);
+		ND_PRINT(" [length %u < %lu]", length, (unsigned long)sizeof(*np));
+		nd_print_invalid(ndo);
+		return;
+	}
+
 	ND_TCHECK_SIZE(np);
 	flags = GET_BE_U_2(np->flags);
 	/* get the byte-order right */
