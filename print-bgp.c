@@ -537,7 +537,7 @@ int
 decode_prefix4(netdissect_options *ndo,
                const u_char *pptr, u_int itemlen, char *buf, size_t buflen)
 {
-    struct in_addr addr;
+    nd_ipv4 addr;
     u_int plen, plenbytes;
 
     ND_TCHECK_1(pptr);
@@ -570,7 +570,7 @@ decode_labeled_prefix4(netdissect_options *ndo,
                        const u_char *pptr, u_int itemlen, char *buf,
                        size_t buflen)
 {
-    struct in_addr addr;
+    nd_ipv4 addr;
     u_int plen, plenbytes;
 
     /* prefix length and label = 4 bytes */
@@ -904,7 +904,7 @@ static int
 decode_labeled_vpn_prefix4(netdissect_options *ndo,
                            const u_char *pptr, char *buf, size_t buflen)
 {
-    struct in_addr addr;
+    nd_ipv4 addr;
     u_int plen;
 
     ND_TCHECK_1(pptr);

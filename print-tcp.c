@@ -68,8 +68,8 @@ static void print_tcp_fastopen_option(netdissect_options *ndo, const u_char *cp,
 
 
 struct tha {
-        struct in_addr src;
-        struct in_addr dst;
+        nd_ipv4 src;
+        nd_ipv4 dst;
         u_int port;
 };
 

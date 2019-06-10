@@ -210,7 +210,7 @@ print_prefix(netdissect_options *ndo, const u_char *prefix, u_int max_length)
 
     if (GET_U_1(prefix) >= 96 && max_length >= IPV4_MAPPED_HEADING_LEN + 1 &&
         is_ipv4_mapped_address(prefix + 1)) {
-        struct in_addr addr;
+        nd_ipv4 addr;
         u_int plen;
 
         plen = GET_U_1(prefix) - 96;
