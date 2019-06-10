@@ -1438,7 +1438,7 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 	const struct nd_opt_homeagent_info *oph;
 	const struct nd_opt_route_info *opri;
 	const u_char *cp, *ep, *domp;
-	struct in6_addr in6;
+	nd_ipv6 in6;
 	size_t l;
 	u_int i;
 

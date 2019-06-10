@@ -184,7 +184,7 @@ win32_gethostbyaddr(const char *addr, int len, int type)
 #endif /* _WIN32 */
 
 struct h6namemem {
-	struct in6_addr addr;
+	nd_ipv6 addr;
 	char *name;
 	struct h6namemem *nxt;
 };
@@ -346,7 +346,7 @@ ip6addr_string(netdissect_options *ndo, const u_char *ap)
 {
 	struct hostent *hp;
 	union {
-		struct in6_addr addr;
+		nd_ipv6 addr;
 		struct for_hash_addr {
 			char fill[14];
 			uint16_t d;
@@ -362,7 +362,7 @@ ip6addr_string(netdissect_options *ndo, const u_char *ap)
 		if (memcmp(&p->addr, &addr, sizeof(addr)) == 0)
 			return (p->name);
 	}
-	p->addr = addr.addr;
+	memcpy(p->addr, addr.addr, sizeof(nd_ipv6));
 	p->nxt = newh6namemem(ndo);
 
 	/*

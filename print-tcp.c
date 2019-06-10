@@ -81,8 +81,8 @@ struct tcp_seq_hash {
 };
 
 struct tha6 {
-        struct in6_addr src;
-        struct in6_addr dst;
+        nd_ipv6 src;
+        nd_ipv6 dst;
         u_int port;
 };
 

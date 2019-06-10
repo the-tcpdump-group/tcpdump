@@ -526,7 +526,7 @@ ns_rprint(netdissect_options *ndo,
 
 	case T_A6:
 	    {
-		struct in6_addr a;
+		nd_ipv6 a;
 		int pbit, pbyte;
 		char ntop_buf[INET6_ADDRSTRLEN];
 
@@ -540,8 +540,8 @@ ns_rprint(netdissect_options *ndo,
 		} else if (pbit < 128) {
 			if (!ND_TTEST_LEN(cp + 1, sizeof(a) - pbyte))
 				return(NULL);
-			memset(&a, 0, sizeof(a));
-			memcpy(&a.s6_addr[pbyte], cp + 1, sizeof(a) - pbyte);
+			memset(a, 0, sizeof(a));
+			memcpy(a + pbyte, cp + 1, sizeof(a) - pbyte);
 			ND_PRINT(" %u %s", pbit,
 			    addrtostr6(&a, ntop_buf, sizeof(ntop_buf)));
 		}

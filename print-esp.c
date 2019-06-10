@@ -100,7 +100,7 @@ struct newesp {
 #ifdef HAVE_LIBCRYPTO
 union inaddr_u {
 	nd_ipv4 in4;
-	struct in6_addr in6;
+	nd_ipv6 in6;
 };
 struct sa_list {
 	struct sa_list	*next;

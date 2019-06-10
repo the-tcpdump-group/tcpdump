@@ -1233,7 +1233,7 @@ int
 decode_prefix6(netdissect_options *ndo,
                const u_char *pd, u_int itemlen, char *buf, size_t buflen)
 {
-    struct in6_addr addr;
+    nd_ipv6 addr;
     u_int plen, plenbytes;
 
     ND_TCHECK_1(pd);
@@ -1249,7 +1249,7 @@ decode_prefix6(netdissect_options *ndo,
     ITEMCHECK(plenbytes);
     memcpy(&addr, pd + 1, plenbytes);
     if (plen % 8) {
-        addr.s6_addr[plenbytes - 1] &=
+        addr[plenbytes - 1] &=
             ((0xff00 >> (plen % 8)) & 0xff);
     }
     nd_snprintf(buf, buflen, "%s/%u", ip6addr_string(ndo, (const u_char *)&addr), plen);
@@ -1266,7 +1266,7 @@ static int
 decode_labeled_prefix6(netdissect_options *ndo,
                const u_char *pptr, u_int itemlen, char *buf, size_t buflen)
 {
-    struct in6_addr addr;
+    nd_ipv6 addr;
     u_int plen, plenbytes;
 
     /* prefix length and label = 4 bytes */
@@ -1288,7 +1288,7 @@ decode_labeled_prefix6(netdissect_options *ndo,
     ND_TCHECK_LEN(pptr + 4, plenbytes);
     memcpy(&addr, pptr + 4, plenbytes);
     if (plen % 8) {
-        addr.s6_addr[plenbytes - 1] &=
+        addr[plenbytes - 1] &=
             ((0xff00 >> (plen % 8)) & 0xff);
     }
     /* the label may get offsetted by 4 bits so lets shift it right */
@@ -1311,7 +1311,7 @@ static int
 decode_labeled_vpn_prefix6(netdissect_options *ndo,
                            const u_char *pptr, char *buf, size_t buflen)
 {
-    struct in6_addr addr;
+    nd_ipv6 addr;
     u_int plen;
 
     ND_TCHECK_1(pptr);
@@ -1329,7 +1329,7 @@ decode_labeled_vpn_prefix6(netdissect_options *ndo,
     ND_TCHECK_LEN(pptr + 12, (plen + 7) / 8);
     memcpy(&addr, pptr + 12, (plen + 7) / 8);
     if (plen % 8) {
-        addr.s6_addr[(plen + 7) / 8 - 1] &=
+        addr[(plen + 7) / 8 - 1] &=
             ((0xff00 >> (plen % 8)) & 0xff);
     }
     /* the label may get offsetted by 4 bits so lets shift it right */
