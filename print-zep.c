@@ -105,9 +105,9 @@ zep_print(netdissect_options *ndo,
 	uint8_t version, inner_len;
 	uint32_t seq_no;
 
-	ndo->ndo_protocol ="ZEP";
+	ndo->ndo_protocol ="zep";
 
-	nd_print_protocol(ndo);
+	nd_print_protocol_caps(ndo);
 
 	ND_TCHECK_LEN(bp, 8);
 
