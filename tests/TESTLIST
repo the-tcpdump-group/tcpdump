@@ -205,6 +205,9 @@ epgm_zmtp1v	epgm_zmtp1.pcap		epgm_zmtp1v.out	-v -T pgm_zmtp1
 # fuzzed pcap
 zmtp1-inf-loop-1 zmtp1-inf-loop-1.pcapng zmtp1-inf-loop-1.out -T zmtp1
 
+# native PGM POLL/POLR
+pgm_poll_polr	pgm_poll_polr.pcap	pgm_poll_polr.out	-v
+
 # MS NLB tests
 msnlb		msnlb.pcap		msnlb.out
 msnlb2		msnlb2.pcapng		msnlb2.out
