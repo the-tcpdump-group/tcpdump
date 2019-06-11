@@ -451,6 +451,14 @@ void nd_print_protocol(netdissect_options *ndo)
 	ND_PRINT("%s", ndo->ndo_protocol);
 }
 
+/* Print the protocol name in caps (uppercases) */
+void nd_print_protocol_caps(netdissect_options *ndo)
+{
+	const char *p;
+        for (p = ndo->ndo_protocol; *p != '\0'; p++)
+                ND_PRINT("%c", ND_TOUPPER((u_char)*p));
+}
+
 /* Print the invalid string */
 void nd_print_invalid(netdissect_options *ndo)
 {
