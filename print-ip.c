@@ -525,7 +525,7 @@ trunc:
 void
 ipN_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
-	ndo->ndo_protocol = "ipN";
+	ndo->ndo_protocol = "ipn";
 	if (length < 1) {
 		ND_PRINT("truncated-ip %u", length);
 		return;
