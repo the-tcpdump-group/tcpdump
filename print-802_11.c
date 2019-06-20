@@ -914,7 +914,7 @@ static const char *reason_text[] = {
 	"Reserved",						/* 0 */
 	"Unspecified reason",					/* 1 */
 	"Previous authentication no longer valid",		/* 2 */
-	"Deauthenticated because sending STA is leaving (or has left)"
+	"Deauthenticated because sending STA is leaving (or has left) "
 	  "IBSS or ESS",					/* 3 */
 	"Disassociated due to inactivity",			/* 4 */
 	"Disassociated because AP is unable to handle all currently "
