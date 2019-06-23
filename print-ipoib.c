@@ -81,7 +81,7 @@ ipoib_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 	}
 
 	if (ndo->ndo_eflag) {
-		ND_PRINT("IPOIB");
+		nd_print_protocol_caps(ndo);
 		if (print_encap_header != NULL)
 			(*print_encap_header)(encap_header_arg);
 		ipoib_hdr_print(ndo, p, length);

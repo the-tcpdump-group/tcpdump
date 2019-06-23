@@ -29,7 +29,6 @@ static int
 ssh_print_version(netdissect_options *ndo, const u_char *pptr, u_int len)
 {
 	u_int idx = 0;
-	const char *pnp;
 
 	if ( GET_U_1(pptr+idx) != 'S' )
 		return 0;
@@ -86,9 +85,7 @@ trunc:
 	return -1;
 print:
 	ND_PRINT(": ");
-	/* Capitalize the protocol name */
-	for (pnp = ndo->ndo_protocol; *pnp != '\0'; pnp++)
-		ND_PRINT("%c", ND_TOUPPER((u_char)*pnp));
+	nd_print_protocol_caps(ndo);
 	ND_PRINT(": %.*s", (int)idx, pptr);
 	return idx;
 }

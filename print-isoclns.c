@@ -786,7 +786,7 @@ clnp_print(netdissect_options *ndo,
         optr = pptr;
 
         if (!ndo->ndo_eflag)
-            ND_PRINT("CLNP");
+            nd_print_protocol_caps(ndo);
 
         /*
          * Sanity checking of the header.

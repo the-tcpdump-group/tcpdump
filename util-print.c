@@ -845,7 +845,6 @@ txtproto_print(netdissect_options *ndo, const u_char *pptr, u_int len,
 	u_char token[MAX_TOKEN+1];
 	const char *cmd;
 	int print_this = 0;
-	const char *pnp;
 
 	if (cmds != NULL) {
 		/*
@@ -910,9 +909,7 @@ txtproto_print(netdissect_options *ndo, const u_char *pptr, u_int len,
 		print_this = 1;
 	}
 
-	/* Capitalize the protocol name */
-	for (pnp = ndo->ndo_protocol; *pnp != '\0'; pnp++)
-		ND_PRINT("%c", ND_TOUPPER((u_char)*pnp));
+	nd_print_protocol_caps(ndo);
 
 	if (print_this) {
 		/*
