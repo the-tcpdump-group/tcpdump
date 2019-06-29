@@ -19,6 +19,9 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#ifndef EXTRACT_H
+#define EXTRACT_H
+
 #include <string.h>
 
 /*
@@ -892,3 +895,5 @@ get_ipv4_to_network_order(netdissect_options *ndo, const u_char *p)
 
 #define GET_IPV4_TO_HOST_ORDER(p) get_ipv4_to_host_order(ndo, (const u_char *)(p))
 #define GET_IPV4_TO_NETWORK_ORDER(p) get_ipv4_to_network_order(ndo, (const u_char *)(p))
+
+#endif /* EXTRACT_H */
