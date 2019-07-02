@@ -378,7 +378,7 @@ bootp_print(netdissect_options *ndo,
 	}
 
 	/* Decode the vendor buffer */
-	ND_TCHECK(bp->bp_vend[0]);
+	ND_TCHECK2(bp->bp_vend[0], 4);
 	if (memcmp((const char *)bp->bp_vend, vm_rfc1048,
 		    sizeof(uint32_t)) == 0)
 		rfc1048_print(ndo, bp->bp_vend);
