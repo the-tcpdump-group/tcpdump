@@ -406,6 +406,38 @@ static const char hex[16] = {
 	'8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
 };
 
+/*
+ * Convert an octet to two hex digits.
+ *
+ * Coverity appears either:
+ *
+ *    not to believe the C standard when it asserts that a uint8_t is
+ *    exactly 8 bits in size;
+ *
+ *    not to believe that an unsigned type of exactly 8 bits has a value
+ *    in the range of 0 to 255;
+ *
+ *    not to believe that, for a range of unsigned values, if you shift
+ *    one of those values right by 4 bits, the maximum result value is
+ *    the maximum value shifted right by 4 bits, with no stray 1's shifted
+ *    in;
+ *
+ *    not to believe that 255 >> 4 is 15;
+ *
+ * so it gets upset that we're taking a "tainted" unsigned value, shifting
+ * it right 4 bits, and using it as an index into a 16-element array.
+ *
+ * So we do a stupid pointless masking of the result of the shift with
+ * 0xf, to hammer the point home to Coverity.
+ */
+static inline char *
+octet_to_hex(char *cp, uint8_t octet)
+{
+	*cp++ = hex[(octet >> 4) & 0xf];
+	*cp++ = hex[(octet >> 0) & 0xf];
+	return (cp);
+}
+
 /* Find the hash node that corresponds the ether address 'ep' */
 
 static struct enamemem *
@@ -566,7 +598,6 @@ const char *
 etheraddr_string(netdissect_options *ndo, const uint8_t *ep)
 {
 	int i;
-	uint8_t octet;
 	char *cp;
 	struct enamemem *tp;
 	int oui;
@@ -590,14 +621,10 @@ etheraddr_string(netdissect_options *ndo, const uint8_t *ep)
 #endif
 	cp = buf;
 	oui = EXTRACT_BE_U_3(ep);
-	octet = *ep++;
-	*cp++ = hex[octet >> 4];
-	*cp++ = hex[octet & 0xf];
+	cp = octet_to_hex(cp, *ep++);
 	for (i = 5; --i >= 0;) {
 		*cp++ = ':';
-		octet = *ep++;
-		*cp++ = hex[octet >> 4];
-		*cp++ = hex[octet & 0xf];
+		cp = octet_to_hex(cp, *ep++);
 	}
 
 	if (!ndo->ndo_nflag) {
@@ -617,7 +644,6 @@ le64addr_string(netdissect_options *ndo, const uint8_t *ep)
 {
 	const unsigned int len = 8;
 	u_int i;
-	uint8_t octet;
 	char *cp;
 	struct bsnamemem *tp;
 	char buf[BUFSIZE];
@@ -628,9 +654,7 @@ le64addr_string(netdissect_options *ndo, const uint8_t *ep)
 
 	cp = buf;
 	for (i = len; i > 0 ; --i) {
-		octet = *(ep + i - 1);
-		*cp++ = hex[octet >> 4];
-		*cp++ = hex[octet & 0xf];
+		cp = octet_to_hex(cp, *(ep + i - 1));
 		*cp++ = ':';
 	}
 	cp --;
@@ -650,7 +674,6 @@ linkaddr_string(netdissect_options *ndo, const uint8_t *ep,
 		const unsigned int type, const unsigned int len)
 {
 	u_int i;
-	uint8_t octet;
 	char *cp;
 	struct bsnamemem *tp;
 
@@ -671,14 +694,10 @@ linkaddr_string(netdissect_options *ndo, const uint8_t *ep,
 	if (tp->bs_name == NULL)
 		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
 				  "linkaddr_string: malloc");
-	octet = *ep++;
-	*cp++ = hex[octet >> 4];
-	*cp++ = hex[octet & 0xf];
+	cp = octet_to_hex(cp, *ep++);
 	for (i = len-1; i > 0 ; --i) {
 		*cp++ = ':';
-		octet = *ep++;
-		*cp++ = hex[octet >> 4];
-		*cp++ = hex[octet & 0xf];
+		cp = octet_to_hex(cp, *ep++);
 	}
 	*cp = '\0';
 	return (tp->bs_name);
@@ -690,7 +709,6 @@ isonsap_string(netdissect_options *ndo, const uint8_t *nsap,
 	       u_int nsap_length)
 {
 	u_int nsap_idx;
-	uint8_t octet;
 	char *cp;
 	struct enamemem *tp;
 
@@ -707,9 +725,7 @@ isonsap_string(netdissect_options *ndo, const uint8_t *nsap,
 				  "isonsap_string: malloc");
 
 	for (nsap_idx = 0; nsap_idx < nsap_length; nsap_idx++) {
-		octet = *nsap++;
-		*cp++ = hex[octet >> 4];
-		*cp++ = hex[octet & 0xf];
+		cp = octet_to_hex(cp, *nsap++);
 		if (((nsap_idx & 1) == 0) &&
 		     (nsap_idx + 1 < nsap_length)) {
 			*cp++ = '.';
