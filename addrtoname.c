@@ -566,6 +566,7 @@ const char *
 etheraddr_string(netdissect_options *ndo, const uint8_t *ep)
 {
 	int i;
+	uint8_t octet;
 	char *cp;
 	struct enamemem *tp;
 	int oui;
@@ -589,12 +590,14 @@ etheraddr_string(netdissect_options *ndo, const uint8_t *ep)
 #endif
 	cp = buf;
 	oui = EXTRACT_BE_U_3(ep);
-	*cp++ = hex[*ep >> 4 ];
-	*cp++ = hex[*ep++ & 0xf];
+	octet = *ep++;
+	*cp++ = hex[octet >> 4];
+	*cp++ = hex[octet & 0xf];
 	for (i = 5; --i >= 0;) {
 		*cp++ = ':';
-		*cp++ = hex[*ep >> 4 ];
-		*cp++ = hex[*ep++ & 0xf];
+		octet = *ep++;
+		*cp++ = hex[octet >> 4];
+		*cp++ = hex[octet & 0xf];
 	}
 
 	if (!ndo->ndo_nflag) {
@@ -614,6 +617,7 @@ le64addr_string(netdissect_options *ndo, const uint8_t *ep)
 {
 	const unsigned int len = 8;
 	u_int i;
+	uint8_t octet;
 	char *cp;
 	struct bsnamemem *tp;
 	char buf[BUFSIZE];
@@ -624,8 +628,9 @@ le64addr_string(netdissect_options *ndo, const uint8_t *ep)
 
 	cp = buf;
 	for (i = len; i > 0 ; --i) {
-		*cp++ = hex[*(ep + i - 1) >> 4];
-		*cp++ = hex[*(ep + i - 1) & 0xf];
+		octet = *(ep + i - 1);
+		*cp++ = hex[octet >> 4];
+		*cp++ = hex[octet & 0xf];
 		*cp++ = ':';
 	}
 	cp --;
@@ -645,6 +650,7 @@ linkaddr_string(netdissect_options *ndo, const uint8_t *ep,
 		const unsigned int type, const unsigned int len)
 {
 	u_int i;
+	uint8_t octet;
 	char *cp;
 	struct bsnamemem *tp;
 
@@ -665,12 +671,14 @@ linkaddr_string(netdissect_options *ndo, const uint8_t *ep,
 	if (tp->bs_name == NULL)
 		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
 				  "linkaddr_string: malloc");
-	*cp++ = hex[*ep >> 4];
-	*cp++ = hex[*ep++ & 0xf];
+	octet = *ep++;
+	*cp++ = hex[octet >> 4];
+	*cp++ = hex[octet & 0xf];
 	for (i = len-1; i > 0 ; --i) {
 		*cp++ = ':';
-		*cp++ = hex[*ep >> 4];
-		*cp++ = hex[*ep++ & 0xf];
+		octet = *ep++;
+		*cp++ = hex[octet >> 4];
+		*cp++ = hex[octet & 0xf];
 	}
 	*cp = '\0';
 	return (tp->bs_name);
@@ -682,6 +690,7 @@ isonsap_string(netdissect_options *ndo, const uint8_t *nsap,
 	       u_int nsap_length)
 {
 	u_int nsap_idx;
+	uint8_t octet;
 	char *cp;
 	struct enamemem *tp;
 
@@ -698,8 +707,9 @@ isonsap_string(netdissect_options *ndo, const uint8_t *nsap,
 				  "isonsap_string: malloc");
 
 	for (nsap_idx = 0; nsap_idx < nsap_length; nsap_idx++) {
-		*cp++ = hex[*nsap >> 4];
-		*cp++ = hex[*nsap++ & 0xf];
+		octet = *nsap++;
+		*cp++ = hex[octet >> 4];
+		*cp++ = hex[octet & 0xf];
 		if (((nsap_idx & 1) == 0) &&
 		     (nsap_idx + 1 < nsap_length)) {
 			*cp++ = '.';
