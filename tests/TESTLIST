@@ -277,6 +277,9 @@ pimv2_register-v	PIM_register_register-stop.pcap	pimv2_register-v.out	-v
 pimv2_sm-v		PIM-SM_join_prune.pcap		pimv2_sm-v.out		-v
 pimv2_bootstrap-v	PIMv2_bootstrap.pcap		pimv2_bootstrap-v.out	-v
 pimv2_hellos-v		PIMv2_hellos.pcap		pimv2_hellos-v.out	-v
+pim-packet-assortment	pim-packet-assortment.pcap	pim-packet-assortment.out
+pim-packet-assortment-v	pim-packet-assortment.pcap	pim-packet-assortment-v.out -v
+pim-packet-assortment-vv	pim-packet-assortment.pcap	pim-packet-assortment-vv.out -vv
 
 # IS-IS tests
 isis_infloop-v	isis-infinite-loop.pcap		isis_infloop-v.out	-v
