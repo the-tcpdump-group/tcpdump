@@ -118,6 +118,23 @@ static const struct tok pimv2_register_flag_values[] = {
     { 0, NULL}
 };
 
+#define PIMV2_DF_ELECTION_OFFER                  1
+#define PIMV2_DF_ELECTION_WINNER                 2
+#define PIMV2_DF_ELECTION_BACKOFF                3
+#define PIMV2_DF_ELECTION_PASS                   4
+
+static struct tok pimv2_df_election_flag_values[] = {
+    { PIMV2_DF_ELECTION_OFFER, "Offer" },
+    { PIMV2_DF_ELECTION_WINNER, "Winner" },
+    { PIMV2_DF_ELECTION_BACKOFF, "Backoff" },
+    { PIMV2_DF_ELECTION_PASS, "Pass" },
+    { 0, NULL}
+};
+
+#define PIMV2_DF_ELECTION_PASS_BACKOFF_STR(x)   ( \
+      x == PIMV2_DF_ELECTION_BACKOFF ? "offer" : "new winner" )
+
+
 /*
  * XXX: We consider a case where IPv6 is not ready yet for portability,
  * but PIM dependent defintions should be independent of IPv6...
@@ -133,7 +150,8 @@ struct pim {
 			 */
 #define PIM_VER(x)	(((x) & 0xf0) >> 4)
 #define PIM_TYPE(x)	((x) & 0x0f)
-	nd_uint8_t	pim_rsv;	/* Reserved in v1, address length in v2 */
+	nd_uint8_t	pim_rsv;	/* Reserved in v1, subtype+address length in v2 */
+#define PIM_SUBTYPE(x)  (((x) & 0xf0) >> 4)
 	nd_uint16_t	pim_cksum;	/* IP style check sum */
 };
 
@@ -705,6 +723,7 @@ pimv2_print(netdissect_options *ndo,
 {
 	const struct pim *pim = (const struct pim *)bp;
 	int advance;
+	int subtype;
 	enum checksum_status cksum_status;
 	u_int pim_typever;
 	u_int pimv2_addr_len;
@@ -714,7 +733,8 @@ pimv2_print(netdissect_options *ndo,
 		goto trunc;
 	ND_TCHECK_1(pim->pim_rsv);
 	pim_typever = GET_U_1(pim->pim_typever);
-	pimv2_addr_len = GET_U_1(pim->pim_rsv);
+	/* RFC5015 allocates the high 4 bits of pim_rsv for "subtype". */
+	pimv2_addr_len = GET_U_1(pim->pim_rsv) & 0x0f;
 	if (pimv2_addr_len != 0)
 		ND_PRINT(", RFC2117-encoding");
 
@@ -1192,6 +1212,48 @@ pimv2_print(netdissect_options *ndo,
 		unsigned_relts_print(ndo, GET_BE_U_2(bp));
 		break;
 
+	case PIMV2_TYPE_DF_ELECTION:
+		subtype = PIM_SUBTYPE(GET_U_1(pim->pim_rsv));
+		ND_PRINT("\n\t  %s,", tok2str( pimv2_df_election_flag_values,
+			 "Unknown", subtype) );
+
+		ND_PRINT(" rpa=");
+		if ((advance = pimv2_addr_print(ndo, bp, len, pimv2_unicast, pimv2_addr_len, 0)) < 0) {
+			goto trunc;
+		}
+		bp += advance;
+		len -= advance;
+		ND_PRINT(" sender pref=%u", GET_BE_U_4(bp) );
+		ND_PRINT(" sender metric=%u", GET_BE_U_4(bp + 4));
+
+		bp += 8;
+		len -= 8;
+
+		switch (subtype) {
+		case PIMV2_DF_ELECTION_BACKOFF:
+		case PIMV2_DF_ELECTION_PASS:
+			ND_PRINT("\n\t  %s addr=", PIMV2_DF_ELECTION_PASS_BACKOFF_STR(subtype));
+			if ((advance = pimv2_addr_print(ndo, bp, len, pimv2_unicast, pimv2_addr_len, 0)) < 0) {
+				goto trunc;
+			}
+			bp += advance;
+			len -= advance;
+
+			ND_PRINT(" %s pref=%u", PIMV2_DF_ELECTION_PASS_BACKOFF_STR(subtype), GET_BE_U_4(bp) );
+			ND_PRINT(" %s metric=%u", PIMV2_DF_ELECTION_PASS_BACKOFF_STR(subtype), GET_BE_U_4(bp + 4));
+
+			bp += 8;
+			len -= 8;
+
+			if (subtype == PIMV2_DF_ELECTION_BACKOFF) {
+				ND_PRINT(" interval %dms", GET_BE_U_2(bp));
+			}
+
+			break;
+		default:
+			break;
+		}
+		break;
 
 	 default:
 		ND_PRINT(" [type %u]", PIM_TYPE(pim_typever));
