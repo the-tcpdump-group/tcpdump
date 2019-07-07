@@ -29,6 +29,7 @@ bgp-shutdown-communication bgp-shutdown-communication.pcapng bgp-shutdown-commun
 bgp-addpath bgp-addpath.pcap bgp-addpath.out -v
 bgp-4byte-asn	bgp-4byte-asn.pcap	bgp-4byte-asn.out	-v
 bgp-4byte-asdot	bgp-4byte-asn.pcap	bgp-4byte-asdot.out	-vb
+bgp-lu-multiple-labels bgp-lu-multiple-labels.pcap bgp-lu-multiple-labels.out -v
 
 # Broadcom tag tests
 brcmtag		brcm-tag.pcap		brcm-tag.out

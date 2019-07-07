@@ -216,6 +216,7 @@ static const struct tok bgp_opt_values[] = {
 #define BGP_CAPCODE_ORF                 3 /* RFC5291 */
 #define BGP_CAPCODE_MR                  4 /* RFC3107 */
 #define BGP_CAPCODE_EXT_NH              5 /* RFC5549 */
+#define BGP_CAPCODE_ML                  8 /* RFC8277 */
 #define BGP_CAPCODE_RESTART            64 /* RFC4724  */
 #define BGP_CAPCODE_AS_NEW             65 /* RFC6793 */
 #define BGP_CAPCODE_DYN_CAP            67 /* draft-ietf-idr-dynamic-cap */
@@ -230,6 +231,7 @@ static const struct tok bgp_capcode_values[] = {
     { BGP_CAPCODE_ORF,          "Cooperative Route Filtering"},
     { BGP_CAPCODE_MR,           "Multiple Routes to a Destination"},
     { BGP_CAPCODE_EXT_NH,       "Extended Next Hop Encoding"},
+    { BGP_CAPCODE_ML,           "Multiple Labels"},
     { BGP_CAPCODE_RESTART,      "Graceful Restart"},
     { BGP_CAPCODE_AS_NEW,       "32-Bit AS Number"},
     { BGP_CAPCODE_DYN_CAP,      "Dynamic Capability"},
@@ -2425,6 +2427,22 @@ bgp_capabilities_print(netdissect_options *ndo,
                GET_BE_U_2(opt + i + 2),
                tok2str(bgp_safi_values, "Unknown", GET_U_1(opt + i + 5)),
                GET_U_1(opt + i + 5));
+            break;
+        case BGP_CAPCODE_ML:
+            cap_offset = 2;
+            tcap_len = cap_len;
+            while (tcap_len >= 4) {
+                ND_PRINT( "\n\t\tAFI %s (%u), SAFI %s (%u), Count: %u",
+                       tok2str(af_values, "Unknown",
+                                  GET_BE_U_2(opt + i + cap_offset)),
+                       GET_BE_U_2(opt + i + cap_offset),
+                       tok2str(bgp_safi_values, "Unknown",
+                                  GET_U_1(opt + i + cap_offset + 2)),
+                       GET_U_1(opt + i + cap_offset + 2),
+                       GET_U_1(opt + i + cap_offset + 3));
+                tcap_len -= 4;
+                cap_offset += 4;
+            }
             break;
         case BGP_CAPCODE_RESTART:
             /* Restart Flags (4 bits), Restart Time in seconds (12 bits) */
