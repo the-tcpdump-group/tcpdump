@@ -168,10 +168,15 @@ The Regents of the University of California.  All rights reserved.\n";
 static int Bflag;			/* buffer size */
 #endif
 #ifdef HAVE_PCAP_DUMP_FTELL64
+static int64_t size_bytes;		/* number of bytes to capture before exiting */
+static int64_t size_total_bytes;	/* keeps track of total bytes captured */
 static int64_t Cflag;			/* rotate dump files after this many bytes */
 #else
+static long size_bytes;		/* number of bytes to capture before exiting */
+static long size_total_bytes;		/* keeps track of total bytes captured */
 static long Cflag;			/* rotate dump files after this many bytes */
 #endif
+static int sizeflag;
 static int Cflag_count;			/* Keep track of which file number we're writing */
 #ifdef HAVE_PCAP_FINDALLDEVS
 static int Dflag;			/* list available devices and exit */
@@ -685,6 +690,7 @@ show_remote_devices_and_exit(void)
 #define OPTION_LIST_REMOTE_INTERFACES	132
 #define OPTION_TSTAMP_MICRO		133
 #define OPTION_TSTAMP_NANO		134
+#define OPTION_LIMIT_CAPTURE_SIZE	135
 
 static const struct option longopts[] = {
 #if defined(HAVE_PCAP_CREATE) || defined(_WIN32)
@@ -728,6 +734,7 @@ static const struct option longopts[] = {
 	{ "debug-filter-parser", no_argument, NULL, 'Y' },
 #endif
 	{ "relinquish-privileges", required_argument, NULL, 'Z' },
+	{ "limit-capture-size", required_argument, NULL, OPTION_LIMIT_CAPTURE_SIZE },
 	{ "number", no_argument, NULL, '#' },
 	{ "print", no_argument, NULL, OPTION_PRINT },
 	{ "version", no_argument, NULL, OPTION_VERSION },
@@ -816,6 +823,57 @@ getWflagChars(int x)
 	return c;
 }
 
+#ifdef HAVE_PCAP_DUMP_FTELL64
+static int64_t getFileSize(char *x)
+#else
+static long getFileSize(char *x)
+#endif
+{
+	errno = 0;
+	char *endp;
+	int multiplier = 0;
+#ifdef HAVE_PCAP_DUMP_FTELL64
+	int64_t l = strtoint64_t(x, &endp, 10);
+#else
+	long l = strtol(x, &endp, 10);
+#endif
+	if (endp == x || errno != 0){
+		error("invalid file size %s", x);
+	}
+
+	if (strlen(endp) == 0)
+		multiplier = 1000000;
+	else if (ascii_strcasecmp(endp, "ki") == 0)
+		multiplier = 1024;
+	else if (ascii_strcasecmp(endp, "mi") == 0)
+		multiplier = 1024 * 1024;
+	else if (ascii_strcasecmp(endp, "gi") == 0)
+		multiplier = 1024 * 1024 * 1024;
+	else if (ascii_strcasecmp(endp, "k") == 0)
+		multiplier = 1000;
+	else if (ascii_strcasecmp(endp, "m") == 0)
+		multiplier = 1000 * 1000;
+	else if (ascii_strcasecmp(endp, "g") == 0)
+		multiplier = 1000 * 1000 * 1000;
+	else
+		error("invalid file size %s", x);
+
+	/*
+	 * Will multiplying it overflow?
+	 */
+#ifdef HAVE_PCAP_DUMP_FTELL64
+	if (l > INT64_T_CONSTANT(0x7fffffffffffffff) / multiplier)
+#else
+	if (l > LONG_MAX / multiplier)
+#endif
+		error("file size %s is too large", x);
+	l *= multiplier;
+
+	if (l < 1)
+		error("invalid file size %s", x);
+
+	return(l);
+}
 
 static void
 MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
@@ -1433,7 +1491,6 @@ main(int argc, char **argv)
 	int cnt, op, i;
 	bpf_u_int32 localnet = 0, netmask = 0;
 	char *cp, *infile, *cmdbuf, *device, *RFileName, *VFileName, *WFileName;
-	char *endp;
 	pcap_handler callback;
 	int dlt;
 	const char *dlt_name;
@@ -1538,25 +1595,7 @@ main(int argc, char **argv)
 			break;
 
 		case 'C':
-			errno = 0;
-#ifdef HAVE_PCAP_DUMP_FTELL64
-			Cflag = strtoint64_t(optarg, &endp, 10);
-#else
-			Cflag = strtol(optarg, &endp, 10);
-#endif
-			if (endp == optarg || *endp != '\0' || errno != 0
-			    || Cflag <= 0)
-				error("invalid file size %s", optarg);
-			/*
-			 * Will multiplying it by 1000000 overflow?
-			 */
-#ifdef HAVE_PCAP_DUMP_FTELL64
-			if (Cflag > INT64_T_CONSTANT(0x7fffffffffffffff) / 1000000)
-#else
-			if (Cflag > LONG_MAX / 1000000)
-#endif
-				error("file size %s is too large", optarg);
-			Cflag *= 1000000;
+			Cflag = getFileSize(optarg);
 			break;
 
 		case 'd':
@@ -1643,6 +1682,11 @@ main(int argc, char **argv)
 			Jflag++;
 			break;
 #endif
+		case OPTION_LIMIT_CAPTURE_SIZE:
+			errno = 0;
+			sizeflag=1;
+			size_bytes = getFileSize(optarg);
+			break;
 
 		case 'l':
 #ifdef _WIN32
@@ -2743,6 +2787,31 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 	dump_info = (struct dump_info *)user;
 
 	/*
+	 * XXX - this won't prevent capture files from getting
+	 * larger than mbytes - the last packet written to the
+	 * file could put it over.
+	 */
+#ifdef HAVE_PCAP_DUMP_FTELL64
+                int64_t size = pcap_dump_ftell64(dump_info->pdd);
+#else
+	/*
+	 * XXX - this only handles a mbytes/Cflag value > 2^31-1 on
+	 * LP64 platforms; to handle ILP32 (32-bit UN*X and
+	 * Windows) or LLP64 (64-bit Windows) would require
+	 * a version of libpcap with pcap_dump_ftell64().
+	 */
+	long size = pcap_dump_ftell(dump_info->pdd);
+#endif
+	if (size == -1)
+		error("ftell fails on output file");
+
+	if (sizeflag != 0 && (size_total_bytes+size) > size_bytes) {
+		(void)fprintf(stderr, "Maximum byte count reached.\n");
+		info(1);
+		exit_tcpdump(S_SUCCESS);
+	}
+
+	/*
 	 * XXX - this won't force the file to rotate on the specified time
 	 * boundary, but it will rotate on the first packet received after the
 	 * specified Gflag number of seconds. Note: if a Gflag time boundary
@@ -2776,6 +2845,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			 * Close the current file and open a new one.
 			 */
 			pcap_dump_close(dump_info->pdd);
+			size_total_bytes+=size;
 
 			/*
 			 * Compress the file we just closed, if the user asked for it
@@ -2857,20 +2927,6 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 	 * file could put it over Cflag.
 	 */
 	if (Cflag != 0) {
-#ifdef HAVE_PCAP_DUMP_FTELL64
-		int64_t size = pcap_dump_ftell64(dump_info->pdd);
-#else
-		/*
-		 * XXX - this only handles a Cflag value > 2^31-1 on
-		 * LP64 platforms; to handle ILP32 (32-bit UN*X and
-		 * Windows) or LLP64 (64-bit Windows) would require
-		 * a version of libpcap with pcap_dump_ftell64().
-		 */
-		long size = pcap_dump_ftell(dump_info->pdd);
-#endif
-
-		if (size == -1)
-			error("ftell fails on output file");
 		if (size > Cflag) {
 #ifdef HAVE_CAPSICUM
 			FILE *fp;
@@ -2881,6 +2937,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			 * Close the current file and open a new one.
 			 */
 			pcap_dump_close(dump_info->pdd);
+			size_total_bytes+=size;
 
 			/*
 			 * Compress the file we just closed, if the user
@@ -2969,6 +3026,33 @@ dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	--infodelay;
 	if (infoprint)
 		info(0);
+
+	/*
+	 * XXX - this won't prevent capture files from getting
+	 * larger than mbytes - the last packet written to the
+	 * file could put it over.
+	 */
+	if (sizeflag != 0) {
+#ifdef HAVE_PCAP_DUMP_FTELL64
+		int64_t size = pcap_dump_ftell64(dump_info->pdd);
+#else
+		/*
+		 * XXX - this only handles a Cflag value > 2^31-1 on
+		 * LP64 platforms; to handle ILP32 (32-bit UN*X and
+		 * Windows) or LLP64 (64-bit Windows) would require
+		 * a version of libpcap with pcap_dump_ftell64().
+		 */
+		long size = pcap_dump_ftell(dump_info->pdd);
+#endif
+		if (size == -1)
+			error("ftell fails on output file");
+
+		if (size > size_bytes) {
+			(void)fprintf(stderr, "Maximum byte count reached.\n");
+			info(1);
+			exit_tcpdump(S_SUCCESS);
+		}
+	}
 }
 
 static void
@@ -2983,6 +3067,13 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	--infodelay;
 	if (infoprint)
 		info(0);
+
+	size_total_bytes+=h->len;
+	if (sizeflag != 0 && size_total_bytes > size_bytes) {
+		(void)fprintf(stderr, "Maximum byte count reached.\n");
+		info(1);
+		exit_tcpdump(S_SUCCESS);
+	}
 }
 
 #ifdef SIGNAL_REQ_INFO
@@ -3103,5 +3194,7 @@ print_usage(void)
 "\t\t[ --time-stamp-precision precision ] [ --micro ] [ --nano ]\n");
 #endif
 	(void)fprintf(stderr,
-"\t\t[ -z postrotate-command ] [ -Z user ] [ expression ]\n");
+"\t\t[ --limit-capture-size max_size ] [ -z postrotate-command ]\n");
+	(void)fprintf(stderr,
+"\t\t[ -Z user ] [ expression ]\n");
 }
