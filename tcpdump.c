@@ -1728,7 +1728,7 @@ main(int argc, char **argv)
 			break;
 
 		case 's':
-			ndo->ndo_snaplen = strtol(optarg, &end, 0);
+			ndo->ndo_snaplen = (int)strtol(optarg, &end, 0);
 			if (optarg == end || *end != '\0'
 			    || ndo->ndo_snaplen < 0 || ndo->ndo_snaplen > MAXIMUM_SNAPLEN)
 				error("invalid snaplen %s (must be >= 0 and <= %d)",
