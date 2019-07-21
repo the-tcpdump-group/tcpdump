@@ -1041,7 +1041,8 @@ copy_argv(char **argv)
 static char *
 read_infile(char *fname)
 {
-	int i, fd, cc;
+	int i, fd;
+	ssize_t cc;
 	char *cp;
 	struct stat buf;
 
@@ -1060,7 +1061,7 @@ read_infile(char *fname)
 	if (cc < 0)
 		error("read %s: %s", fname, pcap_strerror(errno));
 	if (cc != buf.st_size)
-		error("short read %s (%d != %d)", fname, cc, (int)buf.st_size);
+		error("short read %s (%zd != %d)", fname, cc, (int)buf.st_size);
 
 	close(fd);
 	/* replace "# comment" with spaces */
