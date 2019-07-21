@@ -233,6 +233,11 @@
   #ifndef strdup
     #define strdup _strdup
   #endif
+
+  /*
+   * Windows doesn't have ssize_t; routines such as _read() return int.
+   */
+  typedef int ssize_t;
 #endif  /* _MSC_VER */
 
 /*
