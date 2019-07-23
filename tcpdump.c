@@ -1447,7 +1447,7 @@ main(int argc, char **argv)
 	char ebuf[PCAP_ERRBUF_SIZE];
 	char VFileLine[PATH_MAX + 1];
 	char *username = NULL;
-	char *chroot_dir = NULL;
+	const char *chroot_dir = NULL;
 	char *ret = NULL;
 	char *end;
 #ifdef HAVE_PCAP_FINDALLDEVS
