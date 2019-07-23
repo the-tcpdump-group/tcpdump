@@ -231,7 +231,7 @@ nd_printzp(netdissect_options *ndo,
  * Print the timestamp .FRAC part (Microseconds/nanoseconds)
  */
 static void
-ts_frac_print(netdissect_options *ndo, int usec)
+ts_frac_print(netdissect_options *ndo, long usec)
 {
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
 	switch (ndo->ndo_tstamp_precision) {
@@ -259,7 +259,7 @@ ts_frac_print(netdissect_options *ndo, int usec)
  *   if date_flag == WITH_DATE print YY:MM:DD before HH:MM:SS.FRAC
  */
 static void
-ts_date_hmsfrac_print(netdissect_options *ndo, int sec, int usec,
+ts_date_hmsfrac_print(netdissect_options *ndo, long sec, long usec,
 		      enum date_flag date_flag, enum time_flag time_flag)
 {
 	time_t Time = sec;
@@ -293,7 +293,7 @@ ts_date_hmsfrac_print(netdissect_options *ndo, int sec, int usec,
  * Print the timestamp - Unix timeval style, as SECS.FRAC.
  */
 static void
-ts_unix_print(netdissect_options *ndo, int sec, int usec)
+ts_unix_print(netdissect_options *ndo, long sec, long usec)
 {
 	if ((unsigned)sec & 0x80000000) {
 		ND_PRINT("[Error converting time]");
