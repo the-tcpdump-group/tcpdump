@@ -1446,7 +1446,7 @@ main(int argc, char **argv)
 	u_char *pcap_userdata;
 	char ebuf[PCAP_ERRBUF_SIZE];
 	char VFileLine[PATH_MAX + 1];
-	char *username = NULL;
+	const char *username = NULL;
 #ifndef _WIN32
 	const char *chroot_dir = NULL;
 #endif
