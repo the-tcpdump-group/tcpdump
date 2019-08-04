@@ -625,7 +625,7 @@ domain_print(netdissect_options *ndo,
 
 	if(length < sizeof(*np)) {
 		nd_print_protocol(ndo);
-		ND_PRINT(" [length %u < %lu]", length, (unsigned long)sizeof(*np));
+		ND_PRINT(" [length %u < %" PRIsize "]" , length, sizeof(*np));
 		nd_print_invalid(ndo);
 		return;
 	}
