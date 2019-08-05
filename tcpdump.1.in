@@ -1915,7 +1915,7 @@ stty(1), pcap(3PCAP), bpf(4), nit(4P), \%pcap-savefile(@MAN_FILE_FORMATS@),
 \%pcap-filter(@MAN_MISC_INFO@), \%pcap-tstamp(@MAN_MISC_INFO@)
 .LP
 .RS
-.I http://www.iana.org/assignments/media-types/application/vnd.tcpdump.pcap
+.I https://www.iana.org/assignments/media-types/application/vnd.tcpdump.pcap
 .RE
 .LP
 .SH AUTHORS

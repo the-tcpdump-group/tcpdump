@@ -289,7 +289,7 @@ recurse:
 		 * It's a type field, with the type for Alteon jumbo frames.
 		 * See
 		 *
-		 *	http://tools.ietf.org/html/draft-ietf-isis-ext-eth-01
+		 *	https://tools.ietf.org/html/draft-ietf-isis-ext-eth-01
 		 *
 		 * which indicates that, following the type field,
 		 * there's an LLC header and payload.

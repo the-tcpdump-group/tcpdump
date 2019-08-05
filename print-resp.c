@@ -44,7 +44,7 @@
 
 
 /*
- * For information regarding RESP, see: http://redis.io/topics/protocol
+ * For information regarding RESP, see: https://redis.io/topics/protocol
  */
 
 #define RESP_SIMPLE_STRING    '+'

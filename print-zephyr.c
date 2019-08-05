@@ -1,7 +1,7 @@
 /*
  * Decode and print Zephyr packets.
  *
- *	http://web.mit.edu/zephyr/doc/protocol
+ *	https://web.mit.edu/zephyr/doc/protocol
  *
  * Copyright (c) 2001 Nickolai Zeldovich <kolya@MIT.EDU>
  * All rights reserved.

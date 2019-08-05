@@ -113,8 +113,8 @@
 #endif
 
 /* see:
-        http://en.wikipedia.org/wiki/IEEE_802.1Q
-    and http://en.wikipedia.org/wiki/QinQ
+        https://en.wikipedia.org/wiki/IEEE_802.1Q
+    and https://en.wikipedia.org/wiki/QinQ
 */
 #ifndef	ETHERTYPE_8021Q9100
 #define	ETHERTYPE_8021Q9100	0x9100

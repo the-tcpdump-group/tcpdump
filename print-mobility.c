@@ -61,7 +61,7 @@ struct ip6_mobility {
 
 #define IP6M_MINLEN	8
 
-/* http://www.iana.org/assignments/mobility-parameters/mobility-parameters.xhtml */
+/* https://www.iana.org/assignments/mobility-parameters/mobility-parameters.xhtml */
 
 /* message type */
 #define IP6M_BINDING_REQUEST	0	/* Binding Refresh Request */

@@ -269,7 +269,7 @@ ns_cprint(netdissect_options *ndo,
 
 extern const struct tok ns_type2str[];
 
-/* http://www.iana.org/assignments/dns-parameters */
+/* https://www.iana.org/assignments/dns-parameters */
 const struct tok ns_type2str[] = {
 	{ T_A,		"A" },			/* RFC 1035 */
 	{ T_NS,		"NS" },			/* RFC 1035 */

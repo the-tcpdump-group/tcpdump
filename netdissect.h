@@ -302,7 +302,7 @@ extern void nd_pop_all_packet_info(netdissect_options *);
  *    1) big enough for maximum-size Linux loopback packets (65549)
  *       and some USB packets captured with USBPcap:
  *
- *           http://desowin.org/usbpcap/
+ *           https://desowin.org/usbpcap/
  *
  *       (> 131072, < 262144)
  *
@@ -338,7 +338,7 @@ extern void nd_pop_all_packet_info(netdissect_options *);
  * you subtract a positive integer from a pointer, the result is
  * guaranteed to be less than the original pointer value). See
  *
- *	http://www.kb.cert.org/vuls/id/162289
+ *	https://www.kb.cert.org/vuls/id/162289
  */
 
 /*

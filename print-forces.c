@@ -189,7 +189,7 @@ static const struct tok ForCES_LFBs[] = {
 };
 
 /* this is defined in RFC5810 section A.2 */
-/*   http://www.iana.org/assignments/forces/forces.xhtml#oper-tlv-types */
+/*   https://www.iana.org/assignments/forces/forces.xhtml#oper-tlv-types */
 enum {
 	F_OP_RSV        = 0,
 	F_OP_SET        = 1,

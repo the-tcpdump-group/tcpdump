@@ -29,7 +29,7 @@
 /*
  * specification:
  *
- * CLNP: ISO 8473 (respective ITU version is at http://www.itu.int/rec/T-REC-X.233/en/)
+ * CLNP: ISO 8473 (respective ITU version is at https://www.itu.int/rec/T-REC-X.233/en/)
  * ES-IS: ISO 9542
  * IS-IS: ISO 10589
  */

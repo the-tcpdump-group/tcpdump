@@ -442,7 +442,7 @@ static const struct tok bgp_safi_values[] = {
 #define BGP_EXT_COM_L2VPN_RT_0  0x000a  /* L2VPN Identifier,Format AS(2bytes):AN(4bytes) */
 #define BGP_EXT_COM_L2VPN_RT_1  0xF10a  /* L2VPN Identifier,Format IP address:AN(2bytes) */
 
-/* http://www.cisco.com/en/US/tech/tk436/tk428/technologies_tech_note09186a00801eb09a.shtml  */
+/* https://www.cisco.com/en/US/tech/tk436/tk428/technologies_tech_note09186a00801eb09a.shtml  */
 #define BGP_EXT_COM_EIGRP_GEN                    0x8800
 #define BGP_EXT_COM_EIGRP_METRIC_AS_DELAY        0x8801
 #define BGP_EXT_COM_EIGRP_METRIC_REL_NH_BW       0x8802

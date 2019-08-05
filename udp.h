@@ -195,7 +195,7 @@ struct udphdr {
 #define GENEVE_PORT			6081	/* draft-gross-geneve-02 */
 #endif
 #ifndef SFLOW_PORT
-#define SFLOW_PORT			6343	/* http://www.sflow.org/developers/specifications.php */
+#define SFLOW_PORT			6343	/* https://sflow.org/developers/specifications.php */
 #endif
 #ifndef BABEL_PORT
 #define BABEL_PORT			6696	/* RFC 6126 errata */

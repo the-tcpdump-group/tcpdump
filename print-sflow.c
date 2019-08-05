@@ -19,7 +19,7 @@
 
 /* \summary: sFlow protocol printer */
 
-/* specification: http://www.sflow.org/developers/specifications.php */
+/* specification: https://sflow.org/developers/specifications.php */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
