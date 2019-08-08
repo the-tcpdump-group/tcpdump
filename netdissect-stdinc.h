@@ -107,11 +107,6 @@
 #define PRIx64		"I64x"
 #endif
 
-/*
- * MSVC's support library doesn't support %zu to print a size_t until
- * Visual Studio 2017, but supports %Iu earlier, so use that.
- */
-#define PRIsize		"Iu"
 #else /* _MSC_EXTENSIONS */
 
 #ifndef uint64_t
@@ -138,10 +133,6 @@
 #define PRIx64		"llx"
 #endif
 
-/*
- * Assume the support library supports %zu; it's required by C99.
- */
-#define PRIsize		"zu"
 #endif /* _MSC_EXTENSIONS */
 
 /*
