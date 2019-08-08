@@ -884,7 +884,7 @@ sflow_print(netdissect_options *ndo,
     if (len < sizeof(struct sflow_datagram_t)) {
         ND_TCHECK(sflow_datagram->version);
         ND_PRINT((ndo, "sFlowv%u", EXTRACT_32BITS(sflow_datagram->version)));
-        ND_PRINT((ndo, " [length %u < %" PRIsize "]",
+        ND_PRINT((ndo, " [length %u < %zu]",
                   len, sizeof(struct sflow_datagram_t)));
         ND_PRINT((ndo, " (invalid)"));
         return;
