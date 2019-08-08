@@ -14,13 +14,12 @@ cache: ccache
 
 env:
   global:
-    - BUILD_LIBPCAP=true
     # encrypted COVERITY_SCAN_TOKEN from
     # https://scan.coverity.com/projects/<project_id>/submit_build?tab=travis_ci
     - secure: "DwUeukcRGl1vXNZDDt2237zCA58ZzmzWpCkPcb/Hpeh8OvRw1eBZJiu4L8iD2qtY4A/dPDvOeBiml5MF6bVri9Dui1yPkvkvFqIXzbK5CWS6Ye+NgSBNMwqnAjhTMv/x8I4Bvy9IhDGwj/2JXVUvjBddRMLRyr/ag+MDRB1IVAI="
     # Coverity run condition (avoid matrix multiple runs), need customized
     # build script. Need an update if new matrix cases.
-    - coverity_scan_run_condition='"$TRAVIS_OS_NAME" = linux -a "$CC" = gcc -a "$REMOTE" = enable -a "$CMAKE" = no -a "$CRYPTO" = yes'
+    - coverity_scan_run_condition='"$TRAVIS_OS_NAME" = linux -a "$CC" = gcc -a "$REMOTE" = enable -a "$CMAKE" = no -a "$CRYPTO" = yes -a "$BUILD_LIBPCAP" = yes'
     # Coverity script test mode (if true no uploading, avoid reaching the quota)
     # usual processing: false.
     - coverity_scan_script_test_mode=false
@@ -28,14 +27,22 @@ env:
   matrix:
     # NOTE: REMOTE= is for the libpcap build, which is done with autotools
     # even if we're building tcpdump with CMake.
-    - CMAKE=no  REMOTE=disable CRYPTO=no
-    - CMAKE=no  REMOTE=disable CRYPTO=yes
-    - CMAKE=no  REMOTE=enable  CRYPTO=no
-    - CMAKE=no  REMOTE=enable  CRYPTO=yes
-    - CMAKE=yes REMOTE=disable CRYPTO=no
-    - CMAKE=yes REMOTE=disable CRYPTO=yes
-    - CMAKE=yes REMOTE=enable  CRYPTO=no
-    - CMAKE=yes REMOTE=enable  CRYPTO=yes
+    - BUILD_LIBPCAP=no  CMAKE=no  REMOTE=disable CRYPTO=no
+    - BUILD_LIBPCAP=no  CMAKE=no  REMOTE=disable CRYPTO=yes
+    - BUILD_LIBPCAP=no  CMAKE=no  REMOTE=enable  CRYPTO=no
+    - BUILD_LIBPCAP=no  CMAKE=no  REMOTE=enable  CRYPTO=yes
+    - BUILD_LIBPCAP=no  CMAKE=yes REMOTE=disable CRYPTO=no
+    - BUILD_LIBPCAP=no  CMAKE=yes REMOTE=disable CRYPTO=yes
+    - BUILD_LIBPCAP=no  CMAKE=yes REMOTE=enable  CRYPTO=no
+    - BUILD_LIBPCAP=no  CMAKE=yes REMOTE=enable  CRYPTO=yes
+    - BUILD_LIBPCAP=yes CMAKE=no  REMOTE=disable CRYPTO=no
+    - BUILD_LIBPCAP=yes CMAKE=no  REMOTE=disable CRYPTO=yes
+    - BUILD_LIBPCAP=yes CMAKE=no  REMOTE=enable  CRYPTO=no
+    - BUILD_LIBPCAP=yes CMAKE=no  REMOTE=enable  CRYPTO=yes
+    - BUILD_LIBPCAP=yes CMAKE=yes REMOTE=disable CRYPTO=no
+    - BUILD_LIBPCAP=yes CMAKE=yes REMOTE=disable CRYPTO=yes
+    - BUILD_LIBPCAP=yes CMAKE=yes REMOTE=enable  CRYPTO=no
+    - BUILD_LIBPCAP=yes CMAKE=yes REMOTE=enable  CRYPTO=yes
 
 matrix:
   fast_finish: true
@@ -88,7 +95,7 @@ install:
   - if [ "$TRAVIS_OS_NAME" = osx ]; then brew install libsmi | grep -v '%'; fi
 
 before_script:
-  - if [ "$BUILD_LIBPCAP" = true ]; then (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth 3 --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure "--${REMOTE}-remote" --prefix=/tmp && make && make install); fi
+  - if [ "$BUILD_LIBPCAP" = yes ]; then (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth 3 --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure "--${REMOTE}-remote" --prefix=/tmp && make && make install); fi
 
 script:
   - if [ "$COVERITY_SCAN_BRANCH" = 1 ]; then exit 0; fi
@@ -106,7 +113,7 @@ script:
   - echo '$ make install [...]' && echo travis_fold:start:script.make_install
   - PATH=$PATH make install
   - echo -n travis_fold:end:script.make_install
-  - if [ "$CMAKE" = no ]; then make check; fi
+  - if [ "$CMAKE" = no -a "$BUILD_LIBPCAP" = yes ]; then make check; fi
   - ./tcpdump --version
   - ./tcpdump -h
   - ./tcpdump -D
