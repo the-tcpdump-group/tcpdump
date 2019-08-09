@@ -5,8 +5,25 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 project(tcpdump)
 
 #
+# For checking if a compiler flag works and adding it if it does.
+#
+include(CheckCCompilerFlag)
+macro(check_and_add_compiler_option _option)
+    message(STATUS "Checking C compiler flag ${_option}")
+    string(REPLACE "=" "-" _temp_option_variable ${_option})
+    string(REGEX REPLACE "^-" "" _option_variable ${_temp_option_variable})
+    check_c_compiler_flag("${_option}" ${_option_variable})
+    if(${${_option_variable}})
+        set(C_ADDITIONAL_FLAGS "${C_ADDITIONAL_FLAGS} ${_option}")
+    endif()
+endmacro()
+
+#
 # If we're building with Visual Studio, we require Visual Studio 2015,
 # in order to get sufficient C99 compatibility.  Check for that.
+#
+# If not, try the appropriate flag for the compiler to enable C99
+# features.
 #
 if(MSVC)
     if(MSVC_VERSION LESS 1900)
@@ -53,17 +70,6 @@ else(MSVC)
     # that can't be made to support those features, we can add a test to make
     # sure we actually *have* C99 support.
     #
-    include(CheckCCompilerFlag)
-    macro(check_and_add_compiler_option _option)
-        message(STATUS "Checking C compiler flag ${_option}")
-        string(REPLACE "=" "-" _temp_option_variable ${_option})
-        string(REGEX REPLACE "^-" "" _option_variable ${_temp_option_variable})
-        check_c_compiler_flag("${_option}" ${_option_variable})
-        if(${${_option_variable}})
-            set(C_ADDITIONAL_FLAGS "${C_ADDITIONAL_FLAGS} ${_option}")
-        endif()
-    endmacro()
-
     set(C_ADDITIONAL_FLAGS "")
     if(CMAKE_C_COMPILER_ID MATCHES "GNU" OR
        CMAKE_C_COMPILER_ID MATCHES "Clang")
