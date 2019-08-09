@@ -5,74 +5,83 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 project(tcpdump)
 
 #
-# Try to enable as many C99 features as we can.
-# At minimum, we want C++/C99-style // comments.
+# If we're building with Visual Studio, we require Visual Studio 2015,
+# in order to get sufficient C99 compatibility.  Check for that.
 #
-# Newer versions of compilers might default to supporting C99, but older
-# versions may require a special flag.
-#
-# Prior to CMake 3.1, setting CMAKE_C_STANDARD will not have any effect,
-# so, unless and until we require CMake 3.1 or later, we have to do it
-# ourselves on pre-3.1 CMake, so we just do it ourselves on all versions
-# of CMake.
-#
-# Note: with CMake 3.1 through 3.5, the only compilers for which CMake
-# handles CMAKE_C_STANDARD are GCC and Clang.  3.6 adds support only
-# for Intel C; 3.9 adds support for PGI C, Sun C, and IBM XL C, and
-# 3.10 adds support for Cray C and IAR C, but no version of CMake has
-# support for HP C.  Therefore, even if we use CMAKE_C_STANDARD with
-# compilers for which CMake supports it, we may still have to do it
-# ourselves on other compilers.
-#
-# See the CMake documentation for the CMAKE_<LANG>_COMPILER_ID variables
-# for a list of compiler IDs.
-#
-# We don't worry about MSVC; it doesn't have such a flag - either it
-# doesn't support the C99 features we need at all, or it supports them
-# regardless of the compiler flag.
-#
-# XXX - this just tests whether the option works and adds it if it does.
-# We don't test whether it's necessary in order to get the C99 features
-# that we use; if we ever have a user who tries to compile with a compiler
-# that can't be made to support those features, we can add a test to make
-# sure we actually *have* C99 support.
-#
-include(CheckCCompilerFlag)
-macro(check_and_add_compiler_option _option)
-    message(STATUS "Checking C compiler flag ${_option}")
-    string(REPLACE "=" "-" _temp_option_variable ${_option})
-    string(REGEX REPLACE "^-" "" _option_variable ${_temp_option_variable})
-    check_c_compiler_flag("${_option}" ${_option_variable})
-    if(${${_option_variable}})
-        set(C_ADDITIONAL_FLAGS "${C_ADDITIONAL_FLAGS} ${_option}")
+if(MSVC)
+    if(MSVC_VERSION LESS 1900)
+        message(FATAL_ERROR "Visual Studio 2015 or later is required")
     endif()
-endmacro()
 
-set(C_ADDITIONAL_FLAGS "")
-if(CMAKE_C_COMPILER_ID MATCHES "GNU" OR
-   CMAKE_C_COMPILER_ID MATCHES "Clang")
-    check_and_add_compiler_option("-std=gnu99")
-elseif(CMAKE_C_COMPILER_ID MATCHES "XL")
+    # 
+    # Treat source files as being in UTF-8 with MSVC if it's not using
+    # the Clang front end.
+    # We assume that UTF-8 source is OK with other compilers and with
+    # MSVC if it's using the Clang front end.
+    # 
+    if(NOT ${CMAKE_C_COMPILER} MATCHES "clang*")
+        set(C_ADDITIONAL_FLAGS "${C_ADDITIONAL_FLAGS} /utf-8")
+    endif(NOT ${CMAKE_C_COMPILER} MATCHES "clang*")
+else(MSVC)
     #
-    # We want support for extensions picked up for GNU C compatibility,
-    # so we use -qlanglvl=extc99.
+    # Try to enable as many C99 features as we can.
+    # At minimum, we want C++/C99-style // comments.
     #
-    check_and_add_compiler_option("-qlanglvl=extc99")
-elseif(CMAKE_C_COMPILER_ID MATCHES "HP")
-    check_and_add_compiler_option("-AC99")
-elseif(CMAKE_C_COMPILER_ID MATCHES "Sun")
-    check_and_add_compiler_option("-xc99")
-elseif(CMAKE_C_COMPILER_ID MATCHES "Intel")
-    check_and_add_compiler_option("-c99")
-endif()
+    # Newer versions of compilers might default to supporting C99, but
+    # older versions may require a special flag.
+    #
+    # Prior to CMake 3.1, setting CMAKE_C_STANDARD will not have any effect,
+    # so, unless and until we require CMake 3.1 or later, we have to do it
+    # ourselves on pre-3.1 CMake, so we just do it ourselves on all versions
+    # of CMake.
+    #
+    # Note: with CMake 3.1 through 3.5, the only compilers for which CMake
+    # handles CMAKE_C_STANDARD are GCC and Clang.  3.6 adds support only
+    # for Intel C; 3.9 adds support for PGI C, Sun C, and IBM XL C, and
+    # 3.10 adds support for Cray C and IAR C, but no version of CMake has
+    # support for HP C.  Therefore, even if we use CMAKE_C_STANDARD with
+    # compilers for which CMake supports it, we may still have to do it
+    # ourselves on other compilers.
+    #
+    # See the CMake documentation for the CMAKE_<LANG>_COMPILER_ID variables
+    # for a list of compiler IDs.
+    #
+    #
+    # XXX - this just tests whether the option works and adds it if it does.
+    # We don't test whether it's necessary in order to get the C99 features
+    # that we use; if we ever have a user who tries to compile with a compiler
+    # that can't be made to support those features, we can add a test to make
+    # sure we actually *have* C99 support.
+    #
+    include(CheckCCompilerFlag)
+    macro(check_and_add_compiler_option _option)
+        message(STATUS "Checking C compiler flag ${_option}")
+        string(REPLACE "=" "-" _temp_option_variable ${_option})
+        string(REGEX REPLACE "^-" "" _option_variable ${_temp_option_variable})
+        check_c_compiler_flag("${_option}" ${_option_variable})
+        if(${${_option_variable}})
+            set(C_ADDITIONAL_FLAGS "${C_ADDITIONAL_FLAGS} ${_option}")
+        endif()
+    endmacro()
 
-# 
-# Treat source files as being in UTF-8 with MSVC.
-# We assume that UTF-8 source is OK with other compilers.
-# 
-if(MSVC AND NOT ${CMAKE_C_COMPILER} MATCHES "clang*")
-    set(C_ADDITIONAL_FLAGS "${C_ADDITIONAL_FLAGS} /utf-8")
-endif(MSVC AND NOT ${CMAKE_C_COMPILER} MATCHES "clang*")
+    set(C_ADDITIONAL_FLAGS "")
+    if(CMAKE_C_COMPILER_ID MATCHES "GNU" OR
+       CMAKE_C_COMPILER_ID MATCHES "Clang")
+        check_and_add_compiler_option("-std=gnu99")
+    elseif(CMAKE_C_COMPILER_ID MATCHES "XL")
+        #
+        # We want support for extensions picked up for GNU C compatibility,
+        # so we use -qlanglvl=extc99.
+        #
+        check_and_add_compiler_option("-qlanglvl=extc99")
+    elseif(CMAKE_C_COMPILER_ID MATCHES "HP")
+        check_and_add_compiler_option("-AC99")
+    elseif(CMAKE_C_COMPILER_ID MATCHES "Sun")
+        check_and_add_compiler_option("-xc99")
+    elseif(CMAKE_C_COMPILER_ID MATCHES "Intel")
+        check_and_add_compiler_option("-c99")
+    endif()
+endif(MSVC)
 
 set(LIBRARY_NAME netdissect)
 
