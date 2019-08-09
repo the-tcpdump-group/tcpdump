@@ -400,7 +400,7 @@ Parse_fh(netdissect_options *ndo, const unsigned char *fh, u_int len,
 #endif
 	    /* Save the actual handle, so it can be display with -u */
 	    for (i = 0; i < len*4 && i*2 < sizeof(fsidp->Opaque_Handle) - 1; i++)
-		(void)nd_snprintf(&(fsidp->Opaque_Handle[i*2]), 3, "%.2X",
+		(void)snprintf(&(fsidp->Opaque_Handle[i*2]), 3, "%.2X",
 			       GET_U_1(fhp + i));
 	    fsidp->Opaque_Handle[i*2] = '\0';
 

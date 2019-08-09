@@ -301,16 +301,16 @@ cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 		       GET_BE_U_4(nr->last_time)%1000);
 
 		asbuf[0] = buf[0] = '\0';
-		nd_snprintf(buf, sizeof(buf), "/%u", GET_U_1(nr->src_mask));
-		nd_snprintf(asbuf, sizeof(asbuf), ":%u",
+		snprintf(buf, sizeof(buf), "/%u", GET_U_1(nr->src_mask));
+		snprintf(asbuf, sizeof(asbuf), ":%u",
 			GET_BE_U_2(nr->src_as));
 		ND_PRINT("\n    %s%s%s:%u ",
 			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->src_ina)),
 			buf, asbuf,
 			GET_BE_U_2(nr->srcport));
 
-		nd_snprintf(buf, sizeof(buf), "/%u", GET_U_1(nr->dst_mask));
-		nd_snprintf(asbuf, sizeof(asbuf), ":%u",
+		snprintf(buf, sizeof(buf), "/%u", GET_U_1(nr->dst_mask));
+		snprintf(asbuf, sizeof(asbuf), ":%u",
 			 GET_BE_U_2(nr->dst_as));
 		ND_PRINT("> %s%s%s:%u ",
 			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->dst_ina)),
@@ -404,16 +404,16 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 		       GET_BE_U_4(nr->last_time)%1000);
 
 		asbuf[0] = buf[0] = '\0';
-		nd_snprintf(buf, sizeof(buf), "/%u", GET_U_1(nr->src_mask));
-		nd_snprintf(asbuf, sizeof(asbuf), ":%u",
+		snprintf(buf, sizeof(buf), "/%u", GET_U_1(nr->src_mask));
+		snprintf(asbuf, sizeof(asbuf), ":%u",
 			GET_BE_U_2(nr->src_as));
 		ND_PRINT("\n    %s%s%s:%u ",
 			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->src_ina)),
 			buf, asbuf,
 			GET_BE_U_2(nr->srcport));
 
-		nd_snprintf(buf, sizeof(buf), "/%u", GET_U_1(nr->dst_mask));
-		nd_snprintf(asbuf, sizeof(asbuf), ":%u",
+		snprintf(buf, sizeof(buf), "/%u", GET_U_1(nr->dst_mask));
+		snprintf(asbuf, sizeof(asbuf), ":%u",
 			 GET_BE_U_2(nr->dst_as));
 		ND_PRINT("> %s%s%s:%u ",
 			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->dst_ina)),
@@ -444,7 +444,7 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 		}
 
 		buf[0]='\0';
-		nd_snprintf(buf, sizeof(buf), "(%u<>%u encaps)",
+		snprintf(buf, sizeof(buf), "(%u<>%u encaps)",
 			 (GET_BE_U_2(nr->flags) >> 8) & 0xff,
 			 (GET_BE_U_2(nr->flags)) & 0xff);
 		ND_PRINT("tos %u, %u (%u octets) %s",

@@ -1712,19 +1712,19 @@ isis_print_id(netdissect_options *ndo, const uint8_t *cp, u_int id_len)
     if (sysid_len > id_len)
         sysid_len = id_len;
     for (i = 1; i <= sysid_len; i++) {
-        nd_snprintf(pos, sizeof(id) - (pos - id), "%02x", GET_U_1(cp));
+        snprintf(pos, sizeof(id) - (pos - id), "%02x", GET_U_1(cp));
 	cp++;
 	pos += strlen(pos);
 	if (i == 2 || i == 4)
 	    *pos++ = '.';
 	}
     if (id_len >= NODE_ID_LEN) {
-        nd_snprintf(pos, sizeof(id) - (pos - id), ".%02x", GET_U_1(cp));
+        snprintf(pos, sizeof(id) - (pos - id), ".%02x", GET_U_1(cp));
 	cp++;
 	pos += strlen(pos);
     }
     if (id_len == LSP_ID_LEN)
-        nd_snprintf(pos, sizeof(id) - (pos - id), "-%02x", GET_U_1(cp));
+        snprintf(pos, sizeof(id) - (pos - id), "-%02x", GET_U_1(cp));
     return (id);
 }
 
@@ -1913,7 +1913,7 @@ isis_print_ext_is_reach(netdissect_options *ndo,
     if (subtlv_sum_len) {
         ND_PRINT(" (%u)", subtlv_sum_len);
         /* prepend the indent string */
-        nd_snprintf(ident_buffer, sizeof(ident_buffer), "%s  ",ident);
+        snprintf(ident_buffer, sizeof(ident_buffer), "%s  ",ident);
         ident = ident_buffer;
         while (subtlv_sum_len != 0) {
             ND_TCHECK_2(tptr);
@@ -2246,7 +2246,7 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
             subtlvlen=GET_U_1(tptr + 1);
             tptr+=2;
             /* prepend the indent string */
-            nd_snprintf(ident_buffer, sizeof(ident_buffer), "%s  ",ident);
+            snprintf(ident_buffer, sizeof(ident_buffer), "%s  ",ident);
             if (!isis_print_ip_reach_subtlv(ndo, tptr, subtlvtype, subtlvlen, ident_buffer))
                 return(0);
             tptr+=subtlvlen;

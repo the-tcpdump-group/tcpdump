@@ -507,7 +507,7 @@ tok2strbuf(const struct tok *lp, const char *fmt,
 	if (fmt == NULL)
 		fmt = "#%d";
 
-	(void)nd_snprintf(buf, bufsize, fmt, v);
+	(void)snprintf(buf, bufsize, fmt, v);
 	return (const char *)buf;
 }
 
@@ -579,7 +579,7 @@ bittok2str_internal(const struct tok *lp, const char *fmt,
 
         if (bufp == buf)
             /* bummer - lets print the "unknown" message as advised in the fmt string if we got one */
-            (void)nd_snprintf(buf, sizeof(buf), fmt == NULL ? "#%08x" : fmt, v);
+            (void)snprintf(buf, sizeof(buf), fmt == NULL ? "#%08x" : fmt, v);
         return (buf);
 }
 
@@ -621,7 +621,7 @@ tok2strary_internal(const char **lp, int n, const char *fmt,
 		return lp[v];
 	if (fmt == NULL)
 		fmt = "#%d";
-	(void)nd_snprintf(buf, sizeof(buf), fmt, v);
+	(void)snprintf(buf, sizeof(buf), fmt, v);
 	return (buf);
 }
 

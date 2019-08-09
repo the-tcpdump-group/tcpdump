@@ -91,7 +91,7 @@ stp_print_bridge_id(netdissect_options *ndo, const u_char *p)
 {
     static char bridge_id_str[sizeof("pppp.aa:bb:cc:dd:ee:ff")];
 
-    nd_snprintf(bridge_id_str, sizeof(bridge_id_str),
+    snprintf(bridge_id_str, sizeof(bridge_id_str),
              "%.2x%.2x.%.2x:%.2x:%.2x:%.2x:%.2x:%.2x",
              GET_U_1(p), GET_U_1(p + 1), GET_U_1(p + 2),
              GET_U_1(p + 3), GET_U_1(p + 4), GET_U_1(p + 5),

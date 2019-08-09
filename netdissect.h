@@ -112,8 +112,6 @@ typedef unsigned char nd_byte;
 #define	roundup2(x, y)	(((x)+((y)-1))&(~((y)-1)))
 #endif
 
-/* nd_snprintf et al */
-
 #include <stdarg.h>
 #include <pcap.h>
 

@@ -1074,17 +1074,17 @@ smb_errstr(int class, int num)
 		const err_code_struct *err = err_classes[i].err_msgs;
 		for (j = 0; err[j].name; j++)
 		    if (num == err[j].code) {
-			nd_snprintf(ret, sizeof(ret), "%s - %s (%s)",
+			snprintf(ret, sizeof(ret), "%s - %s (%s)",
 			    err_classes[i].class, err[j].name, err[j].message);
 			return ret;
 		    }
 	    }
 
-	    nd_snprintf(ret, sizeof(ret), "%s - %d", err_classes[i].class, num);
+	    snprintf(ret, sizeof(ret), "%s - %d", err_classes[i].class, num);
 	    return ret;
 	}
 
-    nd_snprintf(ret, sizeof(ret), "ERROR: Unknown error (%d,%d)", class, num);
+    snprintf(ret, sizeof(ret), "ERROR: Unknown error (%d,%d)", class, num);
     return(ret);
 }
 
@@ -1965,6 +1965,6 @@ nt_errstr(uint32_t err)
 	    return nt_errors[i].name;
     }
 
-    nd_snprintf(ret, sizeof(ret), "0x%08x", err);
+    snprintf(ret, sizeof(ret), "0x%08x", err);
     return ret;
 }

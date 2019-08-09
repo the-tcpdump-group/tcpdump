@@ -197,7 +197,7 @@ static const char *ErrorStatus[] = {
 #define DECODE_ErrorStatus(e) \
 	( e >= 0 && (size_t)e < sizeof(ErrorStatus)/sizeof(ErrorStatus[0]) \
 		? ErrorStatus[e] \
-		: (nd_snprintf(errbuf, sizeof(errbuf), "err=%u", e), errbuf))
+		: (snprintf(errbuf, sizeof(errbuf), "err=%u", e), errbuf))
 
 /*
  * generic-trap values in the SNMP Trap-PDU
@@ -215,7 +215,7 @@ static const char *GenericTrap[] = {
 #define DECODE_GenericTrap(t) \
 	( t >= 0 && (size_t)t < sizeof(GenericTrap)/sizeof(GenericTrap[0]) \
 		? GenericTrap[t] \
-		: (nd_snprintf(buf, sizeof(buf), "gt=%d", t), buf))
+		: (snprintf(buf, sizeof(buf), "gt=%d", t), buf))
 
 /*
  * ASN.1 type class table

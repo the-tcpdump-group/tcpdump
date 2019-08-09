@@ -2820,7 +2820,7 @@ static char *
 numstr(u_int x)
 {
 	static char buf[20];
-	nd_snprintf(buf, sizeof(buf), "#%u", x);
+	snprintf(buf, sizeof(buf), "#%u", x);
 	return buf;
 }
 

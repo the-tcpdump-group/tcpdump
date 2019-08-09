@@ -180,12 +180,9 @@
   #define strtoint64_t	strtoll
 
   /*
-   * Microsoft's documentation doesn't speak of LL as a valid
-   * suffix for 64-bit integers, so we'll just use i64.
-   *
-   * XXX - is that still the case as of VS 2015?
+   * And we have LL as a suffix for constants, so use that.
    */
-  #define INT64_T_CONSTANT(constant)	(constant##i64)
+  #define INT64_T_CONSTANT(constant)	(constant##LL)
 #else
   /*
    * Non-Microsoft compiler.
@@ -294,62 +291,6 @@ typedef char* caddr_t;
  * Function attributes, for various compilers.
  */
 #include "funcattrs.h"
-
-/*
- * On Windows, snprintf(), with that name and with C99 behavior - i.e.,
- * guaranteeing that the formatted string is null-terminated - didn't
- * appear until Visual Studio 2015.  Prior to that, the C runtime had
- * only _snprintf(), which *doesn't* guarantee that the string is
- * null-terminated if it is truncated due to the buffer being too
- * small.  We therefore can't just define snprintf to be _snprintf
- * and define vsnprintf to be _vsnprintf, as we're relying on null-
- * termination of strings in all cases.
- *
- * Furthermore, some versions of Visual Studio prior to Visual
- * Studio 2015 had vsnprintf() (but not snprintf()!), but those
- * versions don't guarantee null termination, either.
- *
- * We assume all UN*Xes that have snprintf() and vsnprintf() provide
- * C99 behavior.
- */
-#if defined(_MSC_VER) || defined(__MINGW32__)
-  #if defined(_MSC_VER) && _MSC_VER >= 1900
-    /*
-     * VS 2015 or newer; just use the C runtime's snprintf() and
-     * vsnprintf().
-     */
-    #define nd_snprintf		snprintf
-    #define nd_vsnprintf	vsnprintf
-  #else /* defined(_MSC_VER) && _MSC_VER >= 1900 */
-    /*
-     * VS prior to 2015, or MingGW; assume we have _snprintf_s() and
-     * _vsnprintf_s(), which guarantee null termination.
-     */
-    #define nd_snprintf(buf, buflen, ...) \
-        _snprintf_s(buf, buflen, _TRUNCATE, __VA_ARGS__)
-    #define nd_vsnprintf(buf, buflen, fmt, ap) \
-        _vsnprintf_s(buf, buflen, _TRUNCATE, fmt, ap)
-  #endif /* defined(_MSC_VER) && _MSC_VER >= 1900 */
-#else /* defined(_MSC_VER) || defined(__MINGW32__) */
-  /*
-   * Some other compiler, which we assume to be a UN*X compiler.
-   * Use the system's snprintf() if we have it, otherwise use
-   * our own implementation
-   */
-  #ifdef HAVE_SNPRINTF
-    #define nd_snprintf		snprintf
-  #else /* HAVE_SNPRINTF */
-    int nd_snprintf (char *str, size_t sz, FORMAT_STRING(const char *format), ...)
-        PRINTFLIKE(3, 4);
-  #endif /* HAVE_SNPRINTF */
-
-  #ifdef HAVE_VSNPRINTF
-    #define nd_vsnprintf	vsnprintf
-  #else /* HAVE_VSNPRINTF */
-    int nd_vsnprintf (char *str, size_t sz, FORMAT_STRING(const char *format),
-        va_list ap) PRINTFLIKE(3, 0);
-  #endif /* HAVE_VSNPRINTF */
-#endif /* defined(_MSC_VER) || defined(__MINGW32__) */
 
 /*
  * fopen() read and write modes for text files and binary files.

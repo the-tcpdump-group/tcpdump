@@ -111,7 +111,7 @@ static const char *
 format_id(netdissect_options *ndo, const u_char *id)
 {
     static char buf[25];
-    nd_snprintf(buf, 25, "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
+    snprintf(buf, 25, "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
              GET_U_1(id), GET_U_1(id + 1), GET_U_1(id + 2),
              GET_U_1(id + 3), GET_U_1(id + 4), GET_U_1(id + 5),
              GET_U_1(id + 6), GET_U_1(id + 7));
@@ -127,9 +127,9 @@ format_prefix(netdissect_options *ndo, const u_char *prefix, unsigned char plen)
 {
     static char buf[50];
     if(plen >= 96 && memcmp(prefix, v4prefix, 12) == 0)
-        nd_snprintf(buf, 50, "%s/%u", ipaddr_string(ndo, prefix + 12), plen - 96);
+        snprintf(buf, 50, "%s/%u", ipaddr_string(ndo, prefix + 12), plen - 96);
     else
-        nd_snprintf(buf, 50, "%s/%u", ip6addr_string(ndo, prefix), plen);
+        snprintf(buf, 50, "%s/%u", ip6addr_string(ndo, prefix), plen);
     buf[49] = '\0';
     return buf;
 }
@@ -150,7 +150,7 @@ format_interval(const uint16_t i)
 
     if (i == 0)
         return "0.0s (bogus)";
-    nd_snprintf(buf, sizeof(buf), "%u.%02us", i / 100, i % 100);
+    snprintf(buf, sizeof(buf), "%u.%02us", i / 100, i % 100);
     return buf;
 }
 
@@ -164,7 +164,7 @@ static const char *
 format_timestamp(const uint32_t i)
 {
     static char buf[sizeof("0000.000000s")];
-    nd_snprintf(buf, sizeof(buf), "%u.%06us", i / 1000000, i % 1000000);
+    snprintf(buf, sizeof(buf), "%u.%06us", i / 1000000, i % 1000000);
     return buf;
 }
 
