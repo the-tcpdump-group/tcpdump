@@ -280,12 +280,15 @@ cmake_pop_check_state()
 
 #
 # Make sure we have vsnprintf() and snprintf(); we require them.
+# We use check_symbol_exists(), as they aren't necessarily external
+# functions - in Visual Studio, for example, they're inline functions
+# calling a common external function.
 #
-check_function_exists(vsnprintf HAVE_VSNPRINTF)
+check_symbol_exists(vsnprintf "stdio.h" HAVE_VSNPRINTF)
 if(NOT HAVE_VSNPRINTF)
     message(FATAL_ERROR "vsnprintf() is required but wasn't found")
 endif(NOT HAVE_VSNPRINTF)
-check_function_exists(snprintf HAVE_SNPRINTF)
+check_symbol_exists(snprintf "stdio.h" HAVE_SNPRINTF)
 if(NOT HAVE_SNPRINTF)
     message(FATAL_ERROR "snprintf() is required but wasn't found")
 endif()
@@ -297,8 +300,8 @@ check_function_exists(setlinebuf HAVE_SETLINEBUF)
 # For Windows,  don't need to waste time checking for fork() or vfork().
 #
 if(NOT WIN32)
-  check_function_exists(fork HAVE_FORK)
-  check_function_exists(vfork HAVE_VFORK)
+    check_function_exists(fork HAVE_FORK)
+    check_function_exists(vfork HAVE_VFORK)
 endif(NOT WIN32)
 
 #
