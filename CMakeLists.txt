@@ -25,6 +25,7 @@ endmacro()
 # If not, try the appropriate flag for the compiler to enable C99
 # features.
 #
+set(C_ADDITIONAL_FLAGS "")
 if(MSVC)
     if(MSVC_VERSION LESS 1900)
         message(FATAL_ERROR "Visual Studio 2015 or later is required")
@@ -63,14 +64,12 @@ else(MSVC)
     # See the CMake documentation for the CMAKE_<LANG>_COMPILER_ID variables
     # for a list of compiler IDs.
     #
-    #
     # XXX - this just tests whether the option works and adds it if it does.
     # We don't test whether it's necessary in order to get the C99 features
     # that we use; if we ever have a user who tries to compile with a compiler
     # that can't be made to support those features, we can add a test to make
     # sure we actually *have* C99 support.
     #
-    set(C_ADDITIONAL_FLAGS "")
     if(CMAKE_C_COMPILER_ID MATCHES "GNU" OR
        CMAKE_C_COMPILER_ID MATCHES "Clang")
         check_and_add_compiler_option("-std=gnu99")
