@@ -46,6 +46,21 @@
 #include "varattrs.h"
 
 /*
+ * XXX - verify that we have at least C99 support on UN*Xes?
+ *
+ * What about MinGW or various DOS toolchains?  We're currently assuming
+ * sufficient C99 support there.
+ */
+#if defined(_MSC_VER)
+  /*
+   * Make sure we have VS 2015 or later.
+   */
+  #if _MSC_VER < 1900
+    #error "Building tcpdump requires VS 2015 or later"
+  #endif
+#endif
+
+/*
  * Get the C99 types, and the PRI[doux]64 format strings, defined.
  */
 #ifdef HAVE_PCAP_PCAP_INTTYPES_H
@@ -63,39 +78,25 @@
    * worry about other headers including it and causing
    * clashes.
    */
+
+  /*
+   * If the compiler is MSVC, we require VS 2015 or newer, so we
+   * have <inttypes.h> - and support for %zu in the formatted
+   * printing functions.
+   *
+   * If the compiler is MinGW, we assume we have <inttypes.h> - and
+   * support for %zu in the formatted printing functions.
+   *
+   * If the target is UN*X, we assume we have a C99-or-later development
+   * environment, and thus have <inttypes.h> - and support for %zu in
+   * the formatted printing functions.
+   *
+   * If the target is MS-DOS, we assume we have <inttypes.h> - and support
+   * for %zu in the formatted printing functions.
+   */
+  #include <inttypes.h>
+
   #if defined(_MSC_VER)
-    /*
-     * Compiler is MSVC.
-     */
-    #if _MSC_VER >= 1800
-      /*
-       * VS 2013 or newer; we have <inttypes.h>.
-       */
-      #include <inttypes.h>
-    #else
-      /*
-       * Earlier VS; we have to define this stuff ourselves.
-       */
-      typedef unsigned char uint8_t;
-      typedef signed char int8_t;
-      typedef unsigned short uint16_t;
-      typedef signed short int16_t;
-      typedef unsigned int uint32_t;
-      typedef signed int int32_t;
-      #ifdef _MSC_EXTENSIONS
-        typedef unsigned _int64 uint64_t;
-        typedef _int64 int64_t;
-      #else /* _MSC_EXTENSIONS */
-        typedef unsigned long long uint64_t;
-        typedef long long int64_t;
-      #endif
-
-      /*
-       * We have _strtoi64().  Use that for strtoint64_t().
-       */
-      #define strtoint64_t	_strtoi64
-    #endif
-
     /*
      * Suppress definition of intN_t in bittypes.h, which might be included
      * by <pcap/pcap.h> in older versions of WinPcap.
@@ -110,6 +111,9 @@
     /*
      * These may be defined by <inttypes.h>.  If not, define them
      * ourselves.
+     *
+     * XXX - given the assumptions above, will they ever *not* be
+     * defined by <inttypes.h>?
      *
      * XXX - for MSVC, we always want the _MSC_EXTENSIONS versions.
      * What about other compilers?  If, as the MinGW Web site says MinGW
@@ -148,12 +152,6 @@
         #define PRIu64	"llu"
       #endif
     #endif
-  #elif defined(__MINGW32__) || !defined(_WIN32)
-    /*
-     * Compiler is MinGW or target is UN*X or MS-DOS.  Just use
-     * <inttypes.h>.
-     */
-    #include <inttypes.h>
   #endif
 #endif /* HAVE_PCAP_PCAP_INTTYPES_H */
 
@@ -175,23 +173,17 @@
 #ifdef _MSC_VER
   /*
    * Compiler is MSVC.
+   *
+   * We require VS 2015 or newer, so we have strtoll().  Use that for
+   * strtoint64_t().
    */
-  #if _MSC_VER >= 1800
-    /*
-     * VS 2013 or newer; we have strtoll().  Use that for strtoint64_t().
-     */
-    #define strtoint64_t	strtoll
-  #else
-    /*
-     * Earlier VS; we don't have strtoll(), but we do have
-     * _strtoi64().  Use that for strtoint64_t().
-     */
-    #define strtoint64_t	_strtoi64
-  #endif
+  #define strtoint64_t	strtoll
 
   /*
    * Microsoft's documentation doesn't speak of LL as a valid
    * suffix for 64-bit integers, so we'll just use i64.
+   *
+   * XXX - is that still the case as of VS 2015?
    */
   #define INT64_T_CONSTANT(constant)	(constant##i64)
 #else
