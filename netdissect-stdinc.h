@@ -100,58 +100,12 @@
     /*
      * Suppress definition of intN_t in bittypes.h, which might be included
      * by <pcap/pcap.h> in older versions of WinPcap.
-     * (Yes, HAVE_U_INTn_T, as the definition guards are UN*X-oriented, and
-     * we check for u_intN_t in the UN*X configure script.)
+     * (Yes, HAVE_U_INTn_T, as the definition guards are UN*X-oriented.)
      */
     #define HAVE_U_INT8_T
     #define HAVE_U_INT16_T
     #define HAVE_U_INT32_T
     #define HAVE_U_INT64_T
-
-    /*
-     * These may be defined by <inttypes.h>.  If not, define them
-     * ourselves.
-     *
-     * XXX - given the assumptions above, will they ever *not* be
-     * defined by <inttypes.h>?
-     *
-     * XXX - for MSVC, we always want the _MSC_EXTENSIONS versions.
-     * What about other compilers?  If, as the MinGW Web site says MinGW
-     * does, the other compilers just use Microsoft's run-time library,
-     * then they should probably use the _MSC_EXTENSIONS even if the
-     * compiler doesn't define _MSC_EXTENSIONS.
-     */
-    #ifndef PRId64
-      #ifdef _MSC_EXTENSIONS
-        #define PRId64	"I64d"
-      #else
-        #define PRId64	"lld"
-      #endif
-    #endif /* PRId64 */
-
-    #ifndef PRIo64
-      #ifdef _MSC_EXTENSIONS
-        #define PRIo64	"I64o"
-      #else
-        #define PRIo64	"llo"
-      #endif
-    #endif /* PRIo64 */
-
-    #ifndef PRIx64
-      #ifdef _MSC_EXTENSIONS
-        #define PRIx64	"I64x"
-      #else
-        #define PRIx64	"llx"
-      #endif
-    #endif
-
-    #ifndef PRIu64
-      #ifdef _MSC_EXTENSIONS
-        #define PRIu64	"I64u"
-      #else
-        #define PRIu64	"llu"
-      #endif
-    #endif
   #endif
 #endif /* HAVE_PCAP_PCAP_INTTYPES_H */
 
