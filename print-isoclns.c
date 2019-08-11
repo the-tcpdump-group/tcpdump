@@ -1763,9 +1763,9 @@ isis_print_tlv_ip_reach(netdissect_options *ndo,
 
 	while (length > 0) {
 		if ((size_t)length < sizeof(*tlv_ip_reach)) {
-			ND_PRINT("short IPv4 Reachability (%u vs %lu)",
+			ND_PRINT("short IPv4 Reachability (%u vs %zu)",
                                length,
-                               (unsigned long)sizeof(*tlv_ip_reach));
+                               sizeof(*tlv_ip_reach));
 			return (0);
 		}
 
@@ -2435,8 +2435,8 @@ isis_print(netdissect_options *ndo,
     case ISIS_PDU_L1_LAN_IIH:
     case ISIS_PDU_L2_LAN_IIH:
         if (fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_IIH_LAN_HEADER_SIZE)) {
-            ND_PRINT(", bogus fixed header length %u should be %lu",
-                     fixed_len, (unsigned long)(ISIS_COMMON_HEADER_SIZE+ISIS_IIH_LAN_HEADER_SIZE));
+            ND_PRINT(", bogus fixed header length %u should be %zu",
+                     fixed_len, ISIS_COMMON_HEADER_SIZE+ISIS_IIH_LAN_HEADER_SIZE);
             return (0);
         }
         ND_TCHECK_SIZE(header_iih_lan);
@@ -2480,8 +2480,8 @@ isis_print(netdissect_options *ndo,
 
     case ISIS_PDU_PTP_IIH:
         if (fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_IIH_PTP_HEADER_SIZE)) {
-            ND_PRINT(", bogus fixed header length %u should be %lu",
-                      fixed_len, (unsigned long)(ISIS_COMMON_HEADER_SIZE+ISIS_IIH_PTP_HEADER_SIZE));
+            ND_PRINT(", bogus fixed header length %u should be %zu",
+                      fixed_len, ISIS_COMMON_HEADER_SIZE+ISIS_IIH_PTP_HEADER_SIZE);
             return (0);
         }
         ND_TCHECK_SIZE(header_iih_ptp);
@@ -2521,8 +2521,8 @@ isis_print(netdissect_options *ndo,
     case ISIS_PDU_L1_LSP:
     case ISIS_PDU_L2_LSP:
         if (fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_LSP_HEADER_SIZE)) {
-            ND_PRINT(", bogus fixed header length %u should be %lu",
-                   fixed_len, (unsigned long)ISIS_LSP_HEADER_SIZE);
+            ND_PRINT(", bogus fixed header length %u should be %zu",
+                   fixed_len, ISIS_LSP_HEADER_SIZE);
             return (0);
         }
         ND_TCHECK_SIZE(header_lsp);
@@ -2579,8 +2579,8 @@ isis_print(netdissect_options *ndo,
     case ISIS_PDU_L1_CSNP:
     case ISIS_PDU_L2_CSNP:
         if (fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_CSNP_HEADER_SIZE)) {
-            ND_PRINT(", bogus fixed header length %u should be %lu",
-                      fixed_len, (unsigned long)(ISIS_COMMON_HEADER_SIZE+ISIS_CSNP_HEADER_SIZE));
+            ND_PRINT(", bogus fixed header length %u should be %zu",
+                      fixed_len, ISIS_COMMON_HEADER_SIZE+ISIS_CSNP_HEADER_SIZE);
             return (0);
         }
         ND_TCHECK_SIZE(header_csnp);
@@ -2617,8 +2617,8 @@ isis_print(netdissect_options *ndo,
     case ISIS_PDU_L1_PSNP:
     case ISIS_PDU_L2_PSNP:
         if (fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_PSNP_HEADER_SIZE)) {
-            ND_PRINT("- bogus fixed header length %u should be %lu",
-                   fixed_len, (unsigned long)(ISIS_COMMON_HEADER_SIZE+ISIS_PSNP_HEADER_SIZE));
+            ND_PRINT("- bogus fixed header length %u should be %zu",
+                   fixed_len, ISIS_COMMON_HEADER_SIZE+ISIS_PSNP_HEADER_SIZE);
             return (0);
         }
         ND_TCHECK_SIZE(header_psnp);

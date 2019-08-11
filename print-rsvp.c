@@ -698,8 +698,8 @@ rsvp_obj_print(netdissect_options *ndo,
             return -1;
         }
         if(rsvp_obj_len < sizeof(struct rsvp_object_header)) {
-            ND_PRINT("%sERROR: object header too short %u < %lu", indent, rsvp_obj_len,
-                   (unsigned long)sizeof(struct rsvp_object_header));
+            ND_PRINT("%sERROR: object header too short %u < %zu", indent, rsvp_obj_len,
+                   sizeof(struct rsvp_object_header));
             return -1;
         }
 
@@ -1921,8 +1921,8 @@ rsvp_print(netdissect_options *ndo,
            GET_BE_U_2(rsvp_com_header->checksum));
 
     if (tlen < sizeof(struct rsvp_common_header)) {
-        ND_PRINT("ERROR: common header too short %u < %lu", tlen,
-               (unsigned long)sizeof(struct rsvp_common_header));
+        ND_PRINT("ERROR: common header too short %u < %zu", tlen,
+               sizeof(struct rsvp_common_header));
         return;
     }
 
@@ -1969,8 +1969,8 @@ rsvp_print(netdissect_options *ndo,
                    GET_BE_U_2(rsvp_com_header->checksum));
 
             if (subtlen < sizeof(struct rsvp_common_header)) {
-                ND_PRINT("ERROR: common header too short %u < %lu", subtlen,
-                       (unsigned long)sizeof(struct rsvp_common_header));
+                ND_PRINT("ERROR: common header too short %u < %zu", subtlen,
+                       sizeof(struct rsvp_common_header));
                 return;
             }
 

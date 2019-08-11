@@ -341,8 +341,8 @@ cfm_print(netdissect_options *ndo,
     case CFM_OPCODE_CCM:
         msg_ptr.cfm_ccm = (const struct cfm_ccm_t *)tptr;
         if (first_tlv_offset < sizeof(*msg_ptr.cfm_ccm)) {
-            ND_PRINT(" (too small 1, must be >= %lu)",
-                     (unsigned long) sizeof(*msg_ptr.cfm_ccm));
+            ND_PRINT(" (too small 1, must be >= %zu)",
+                     sizeof(*msg_ptr.cfm_ccm));
             return;
         }
         if (tlen < sizeof(*msg_ptr.cfm_ccm))
@@ -471,8 +471,8 @@ cfm_print(netdissect_options *ndo,
     case CFM_OPCODE_LTM:
         msg_ptr.cfm_ltm = (const struct cfm_ltm_t *)tptr;
         if (first_tlv_offset < sizeof(*msg_ptr.cfm_ltm)) {
-            ND_PRINT(" (too small 4, must be >= %lu)",
-                     (unsigned long) sizeof(*msg_ptr.cfm_ltm));
+            ND_PRINT(" (too small 4, must be >= %zu)",
+                     sizeof(*msg_ptr.cfm_ltm));
             return;
         }
         if (tlen < sizeof(*msg_ptr.cfm_ltm))
@@ -494,8 +494,8 @@ cfm_print(netdissect_options *ndo,
     case CFM_OPCODE_LTR:
         msg_ptr.cfm_ltr = (const struct cfm_ltr_t *)tptr;
         if (first_tlv_offset < sizeof(*msg_ptr.cfm_ltr)) {
-            ND_PRINT(" (too small 5, must be >= %lu)",
-                     (unsigned long) sizeof(*msg_ptr.cfm_ltr));
+            ND_PRINT(" (too small 5, must be >= %zu)",
+                     sizeof(*msg_ptr.cfm_ltr));
             return;
         }
         if (tlen < sizeof(*msg_ptr.cfm_ltr))
