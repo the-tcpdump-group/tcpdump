@@ -21,6 +21,14 @@ environment:
       SDK: npcap-sdk-0.1
     - GENERATOR: "Visual Studio 14 2015 Win64"
       SDK: npcap-sdk-0.1
+    - GENERATOR: "Visual Studio 15 2017"
+      SDK: WpdPack
+    - GENERATOR: "Visual Studio 15 2017 Win64"
+      SDK: WpdPack
+    - GENERATOR: "Visual Studio 15 2017"
+      SDK: npcap-sdk-0.1
+    - GENERATOR: "Visual Studio 15 2017 Win64"
+      SDK: npcap-sdk-0.1
 
 build_script:
   #
