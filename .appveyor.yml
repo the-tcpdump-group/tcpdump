@@ -14,29 +14,29 @@ install:
 environment:
   matrix:
     - image: Visual Studio 2015
-    - GENERATOR: "Visual Studio 14 2015"
-      SDK: WpdPack
+      - GENERATOR: "Visual Studio 14 2015"
+        SDK: WpdPack
     - image: Visual Studio 2015
-    - GENERATOR: "Visual Studio 14 2015 Win64"
-      SDK: WpdPack
+      - GENERATOR: "Visual Studio 14 2015 Win64"
+        SDK: WpdPack
     - image: Visual Studio 2015
-    - GENERATOR: "Visual Studio 14 2015"
-      SDK: npcap-sdk-0.1
+      - GENERATOR: "Visual Studio 14 2015"
+        SDK: npcap-sdk-0.1
     - image: Visual Studio 2015
-    - GENERATOR: "Visual Studio 14 2015 Win64"
-      SDK: npcap-sdk-0.1
+      - GENERATOR: "Visual Studio 14 2015 Win64"
+        SDK: npcap-sdk-0.1
     - image: Visual Studio 2017
-    - GENERATOR: "Visual Studio 15 2017"
-      SDK: WpdPack
+      - GENERATOR: "Visual Studio 15 2017"
+        SDK: WpdPack
     - image: Visual Studio 2017
-    - GENERATOR: "Visual Studio 15 2017 Win64"
-      SDK: WpdPack
+      - GENERATOR: "Visual Studio 15 2017 Win64"
+        SDK: WpdPack
     - image: Visual Studio 2017
-    - GENERATOR: "Visual Studio 15 2017"
-      SDK: npcap-sdk-0.1
+      - GENERATOR: "Visual Studio 15 2017"
+        SDK: npcap-sdk-0.1
     - image: Visual Studio 2017
-    - GENERATOR: "Visual Studio 15 2017 Win64"
-      SDK: npcap-sdk-0.1
+      - GENERATOR: "Visual Studio 15 2017 Win64"
+        SDK: npcap-sdk-0.1
 
 build_script:
   #
