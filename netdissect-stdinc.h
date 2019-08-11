@@ -46,6 +46,9 @@
 #include "varattrs.h"
 
 /*
+ * If we're compiling with Visual Studio, make sure we have at least
+ * VS 2015 or later, so we have sufficient C99 support.
+ *
  * XXX - verify that we have at least C99 support on UN*Xes?
  *
  * What about MinGW or various DOS toolchains?  We're currently assuming
@@ -80,6 +83,9 @@
    */
 
   /*
+   * Include <inttypes.h> to get the integer types and PRi[doux]64 values
+   * defined.
+   *
    * If the compiler is MSVC, we require VS 2015 or newer, so we
    * have <inttypes.h> - and support for %zu in the formatted
    * printing functions.
