@@ -65,6 +65,22 @@ extern const char * ieee8021q_tci_string(const uint16_t);
  */
 
 static inline const char *
+get_ipaddr_string(netdissect_options *ndo, const u_char *p)
+{
+        if (!ND_TTEST_4(p))
+                longjmp(ndo->ndo_truncated, 1);
+        return ipaddr_string(ndo, p);
+}
+
+static inline const char *
+get_ip6addr_string(netdissect_options *ndo, const u_char *p)
+{
+        if (!ND_TTEST_16(p))
+                longjmp(ndo->ndo_truncated, 1);
+        return ip6addr_string(ndo, p);
+}
+
+static inline const char *
 get_le64addr_string(netdissect_options *ndo, const u_char *p)
 {
         if (!ND_TTEST_8(p))
@@ -72,4 +88,6 @@ get_le64addr_string(netdissect_options *ndo, const u_char *p)
         return le64addr_string(ndo, p);
 }
 
+#define GET_IPADDR_STRING(p) get_ipaddr_string(ndo, (const u_char *)(p))
+#define GET_IP6ADDR_STRING(p) get_ip6addr_string(ndo, (const u_char *)(p))
 #define GET_LE64ADDR_STRING(p) get_le64addr_string(ndo, (const u_char *)(p))
