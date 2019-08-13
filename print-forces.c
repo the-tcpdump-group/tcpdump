@@ -711,7 +711,7 @@ fdatatlv_print(netdissect_options *ndo,
 		char *ib = indent_pr(indent + 2, 1);
 		ND_PRINT("%s[", ib + 1);
 		hex_print_with_offset(ndo, ib, tdp, rlen, 0);
-		ND_PRINT("\n%s]\n", ib + 1);
+		ND_PRINT("\n%s]", ib + 1);
 	}
 	return 0;
 
@@ -1768,7 +1768,6 @@ error:
 		hex_print_with_offset(ndo, "\n\t ", pptr, len, 0);
 		ND_PRINT("\n\t ]");
 	}
-	ND_PRINT("\n");
 	return;
 
 trunc:
