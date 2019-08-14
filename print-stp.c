@@ -381,7 +381,7 @@ stp_print_spb_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
     ND_PRINT("\n\tAgreement num %u, Discarded Agreement num %u, Agreement valid-"
             "flag %u,\n\tRestricted role-flag: %u, Format id %u cap %u, "
             "Convention id %u cap %u,\n\tEdge count %u, "
-            "Agreement digest %08x%08x%08x%08x%08x\n",
+            "Agreement digest %08x%08x%08x%08x%08x",
             GET_U_1(ptr + offset + SPB_BPDU_AGREEMENT_OFFSET)>>6,
             GET_U_1(ptr + offset + SPB_BPDU_AGREEMENT_OFFSET)>>4 & 0x3,
             GET_U_1(ptr + offset + SPB_BPDU_AGREEMENT_OFFSET)>>3 & 0x1,
