@@ -120,7 +120,6 @@ zmtp1_print_frame(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 		if (body_len_printed > 1) {
 			ND_PRINT(", first %" PRIu64 " byte(s) of body:", body_len_printed - 1);
 			hex_and_ascii_print(ndo, "\n\t ", cp + header_len + 1, body_len_printed - 1);
-			ND_PRINT("\n");
 		}
 	}
 
@@ -198,7 +197,6 @@ zmtp1_print_intermediate_part(netdissect_options *ndo, const u_char *cp, const u
 			if (len_printed > 1) {
 				ND_PRINT(", first %"PRIu64" byte(s):", len_printed);
 				hex_and_ascii_print(ndo, "\n\t ", cp, len_printed);
-				ND_PRINT("\n");
 			}
 		}
 	}
