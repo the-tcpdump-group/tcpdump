@@ -633,3 +633,4 @@ dns-zlip-3		dns-zlip-3.pcap		dns-zlip-3.out
 
 # CVE 2019-ABCD
 kh-addrfail-001         kh-addrfail-001.pcap    kh-addrfail-001.out
+kh-addrfail-002         kh-addrfail-002.pcap    kh-addrfail-002.out
