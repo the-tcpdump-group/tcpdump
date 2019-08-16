@@ -630,3 +630,6 @@ nfs-seg-fault-1  nfs-seg-fault-1.pcap  nfs-seg-fault-1.out
 dns-zlip-1		dns-zlip-1.pcap		dns-zlip-1.out
 dns-zlip-2		dns-zlip-2.pcap		dns-zlip-2.out
 dns-zlip-3		dns-zlip-3.pcap		dns-zlip-3.out
+
+# CVE 2019-ABCD
+kh-addrfail-001         kh-addrfail-001.pcap    kh-addrfail-001.out
