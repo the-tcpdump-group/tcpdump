@@ -3,6 +3,7 @@
 $TCPDUMP = "../tcpdump" if (!($TCPDUMP = $ENV{TCPDUMP_BIN}));
 
 use File::Basename;
+use POSIX qw( WEXITSTATUS WIFEXITED);
 
 system("mkdir -p NEW DIFF");
 
@@ -19,6 +20,8 @@ $options=$ARGV[3];
 my $r;
 
 $outputbase = basename($output);
+my $coredump = false;
+my $status = 0;
 
 if ($^O eq 'MSWin32') {
     $r = system "..\\windump -# -n -r $input $options 2>NUL | sed 's/\\r//' | tee NEW/$outputbase | diff $output - >DIFF/$outputbase.diff";
@@ -31,7 +34,14 @@ else {
     if($r != 0) {
         # this means tcpdump failed.
         open(OUTPUT, ">>"."NEW/$outputbase") || die "fail to open $outputbase\n";
-        printf OUTPUT "EXIT CODE %08x\n", $r;
+        if( $r & 128 ) {
+            $coredump = $r & 127;
+        }
+        if( WIFEXITED($r)) {
+            $status = WEXITSTATUS($r);
+        }
+
+        printf OUTPUT "EXIT CODE %08x: dump:%d code: %d\n", $r, $coredump, $status;
         close(OUTPUT);
         $r = 0;
     }
@@ -46,7 +56,7 @@ if($r == 0) {
   unlink "DIFF/$outputbase.diff";
   exit 0;
 }
-printf "    %-35s: TEST FAILED(%s)", $name, $r == -1 ? $! : "exit $?";
+printf "    %-35s: TEST FAILED(%s)", $name, $r == -1 ? $! : "exit core=$coredump/stat=$status";
 open FOUT, '>>failure-outputs.txt';
 printf FOUT "\nFailed test: $name\n\n";
 close FOUT;

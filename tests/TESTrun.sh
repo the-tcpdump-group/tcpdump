@@ -5,16 +5,28 @@ srcdir=${SRCDIR-..}
 
 echo RUNNING from ${srcdir}
 
-mkdir -p NEW
-mkdir -p DIFF
+# make it absolute
+srcdir=$(cd $srcdir && pwd)
+
+# this should be run from the compiled build directory,
+# with srcdir= set to wherever the source code is.
+# not from the tests directory.
+echo RUNNING from ${srcdir}
+
+mkdir -p tests/NEW
+mkdir -p tests/DIFF
 cat /dev/null > failure-outputs.txt
 
 runComplexTests()
 {
-  for i in ${srcdir}/*.sh
+  for i in ${srcdir}/tests/*.sh
   do
-    case $i in ${srcdir}/TEST*.sh) continue;; esac
-    sh ./$i ${srcdir}
+    case $i in
+        ${srcdir}/tests/TEST*.sh) continue;;
+        ${srcdir}/tests/\*.sh) continue;;
+    esac
+    echo Running $i
+    (cd tests && sh $i ${srcdir})
   done
   passed=`cat .passed`
   failed=`cat .failed`
@@ -32,6 +44,7 @@ runSimpleTests()
     rm -f core
     [ "$only" != "" -a "$name" != "$only" ] && continue
     export SRCDIR=${srcdir}
+    (cd tests  # run TESTonce in tests directory
     if ${srcdir}/tests/TESTonce $name ${srcdir}/tests/$input ${srcdir}/tests/$output "$options"
     then
       passed=`expr $passed + 1`
@@ -39,7 +52,7 @@ runSimpleTests()
     else
       failed=`expr $failed + 1`
       echo $failed >.failed
-    fi
+    fi)
     [ "$only" != "" -a "$name" = "$only" ] && break
   done
   # I hate shells with their stupid, useless subshells.
