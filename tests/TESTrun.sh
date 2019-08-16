@@ -1,6 +1,9 @@
 #!/bin/sh
 
 TZ=GMT0; export TZ
+srcdir=${SRCDIR-..}
+
+echo RUNNING from ${srcdir}
 
 mkdir -p NEW
 mkdir -p DIFF
@@ -8,10 +11,10 @@ cat /dev/null > failure-outputs.txt
 
 runComplexTests()
 {
-  for i in *.sh
+  for i in ${srcdir}/*.sh
   do
-    case $i in TEST*.sh) continue;; esac
-    sh ./$i
+    case $i in ${srcdir}/TEST*.sh) continue;; esac
+    sh ./$i ${srcdir}
   done
   passed=`cat .passed`
   failed=`cat .failed`
@@ -20,7 +23,7 @@ runComplexTests()
 runSimpleTests()
 {
   only=$1
-  cat TESTLIST | while read name input output options
+  cat ${srcdir}/tests/TESTLIST | while read name input output options
   do
     case $name in
       \#*) continue;;
@@ -28,7 +31,8 @@ runSimpleTests()
     esac
     rm -f core
     [ "$only" != "" -a "$name" != "$only" ] && continue
-    if ./TESTonce $name $input $output "$options"
+    export SRCDIR=${srcdir}
+    if ${srcdir}/tests/TESTonce $name ${srcdir}/tests/$input ${srcdir}/tests/$output "$options"
     then
       passed=`expr $passed + 1`
       echo $passed >.passed
