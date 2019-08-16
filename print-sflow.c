@@ -924,6 +924,8 @@ sflow_print(netdissect_options *ndo,
 
     /* skip Common header */
     tptr += sizeof(const struct sflow_datagram_t);
+
+    if(tlen <= sizeof(const struct sflow_datagram_t)) goto trunc;
     tlen -= sizeof(const struct sflow_datagram_t);
 
     while (nsamples > 0 && tlen > 0) {
