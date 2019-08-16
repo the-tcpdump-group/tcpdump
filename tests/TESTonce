@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+use File::Basename;
+
 system("mkdir -p NEW DIFF");
 
 if(@ARGV != 4) {
@@ -14,38 +16,40 @@ $options=$ARGV[3];
 
 my $r;
 
+$outputbase = basename($output);
+
 if ($^O eq 'MSWin32') {
-    $r = system "..\\windump -n -t -r $input $options 2>NUL | sed 's/\\r//' | tee NEW/$output | diff $output - >DIFF/$output.diff";
+    $r = system "..\\windump -n -t -r $input $options 2>NUL | sed 's/\\r//' | tee NEW/$outputbase | diff $output - >DIFF/$outputbase.diff";
     # need to do same as below for Cygwin.
 }
 else {
     # we used to do this as a nice pipeline, but the problem is that $r fails to
     # to be set properly if the tcpdump core dumps.
-    $r = system "../tcpdump 2>/dev/null -n -t -r $input $options >NEW/$output";
+    $r = system "../tcpdump 2>/dev/null -n -t -r $input $options >NEW/$outputbase";
     if($r != 0) {
         # this means tcpdump failed.
-        open(OUTPUT, ">>"."NEW/$output") || die "fail to open $output\n";
+        open(OUTPUT, ">>"."NEW/$outputbase") || die "fail to open $outputbase\n";
         printf OUTPUT "EXIT CODE %08x\n", $r;
         close(OUTPUT);
         $r = 0;
     }
     if($r == 0) {
-        $r = system "cat NEW/$output | diff $output - >DIFF/$output.diff";
+        $r = system "cat NEW/$outputbase | diff $output - >DIFF/$outputbase.diff";
     }
     #print sprintf("END: %08x\n", $r);
 }
 
 if($r == 0) {
   printf "    %-35s: passed\n", $name;
-  unlink "DIFF/$output.diff";
+  unlink "DIFF/$outputbase.diff";
   exit 0;
 }
 printf "    %-35s: TEST FAILED(%s)", $name, $r == -1 ? $! : "exit $?";
 open FOUT, '>>failure-outputs.txt';
 printf FOUT "\nFailed test: $name\n\n";
 close FOUT;
-if(-f "DIFF/$output.diff") {
-    system "cat DIFF/$output.diff >> failure-outputs.txt";
+if(-f "DIFF/$outputbase.diff") {
+    system "cat DIFF/$outputbase.diff >> failure-outputs.txt";
 }
 
 if($r == -1) {
