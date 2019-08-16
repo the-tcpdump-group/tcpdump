@@ -135,7 +135,7 @@ else(WIN32)
           endif()
         endif()
       endforeach()
-        
+
       #
       # Now, get the library directories and libraries for dynamic linking.
       #

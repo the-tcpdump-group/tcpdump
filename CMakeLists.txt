@@ -31,12 +31,12 @@ if(MSVC)
         message(FATAL_ERROR "Visual Studio 2015 or later is required")
     endif()
 
-    # 
+    #
     # Treat source files as being in UTF-8 with MSVC if it's not using
     # the Clang front end.
     # We assume that UTF-8 source is OK with other compilers and with
     # MSVC if it's using the Clang front end.
-    # 
+    #
     if(NOT ${CMAKE_C_COMPILER} MATCHES "clang*")
         set(C_ADDITIONAL_FLAGS "${C_ADDITIONAL_FLAGS} /utf-8")
     endif(NOT ${CMAKE_C_COMPILER} MATCHES "clang*")
