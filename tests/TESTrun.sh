@@ -13,6 +13,8 @@ srcdir=$(cd $srcdir && pwd)
 # not from the tests directory.
 echo RUNNING from ${srcdir}
 
+passedfile=$(pwd)/tests/.passed
+failedfile=$(pwd)/tests/.failed
 mkdir -p tests/NEW
 mkdir -p tests/DIFF
 cat /dev/null > failure-outputs.txt
@@ -28,8 +30,8 @@ runComplexTests()
     echo Running $i
     (cd tests && sh $i ${srcdir})
   done
-  passed=`cat .passed`
-  failed=`cat .failed`
+  passed=`cat ${passedfile}`
+  failed=`cat ${failedfile}`
 }
 
 runSimpleTests()
@@ -44,26 +46,29 @@ runSimpleTests()
     rm -f core
     [ "$only" != "" -a "$name" != "$only" ] && continue
     export SRCDIR=${srcdir}
+    # I hate shells with their stupid, useless subshells.
+    passed=`cat ${passedfile}`
+    failed=`cat ${failedfile}`
     (cd tests  # run TESTonce in tests directory
     if ${srcdir}/tests/TESTonce $name ${srcdir}/tests/$input ${srcdir}/tests/$output "$options"
     then
       passed=`expr $passed + 1`
-      echo $passed >.passed
+      echo $passed >${passedfile}
     else
       failed=`expr $failed + 1`
-      echo $failed >.failed
+      echo $failed >${failedfile}
     fi)
     [ "$only" != "" -a "$name" = "$only" ] && break
   done
   # I hate shells with their stupid, useless subshells.
-  passed=`cat .passed`
-  failed=`cat .failed`
+  passed=`cat ${passedfile}`
+  failed=`cat ${failedfile}`
 }
 
 passed=0
 failed=0
-echo $passed >.passed
-echo $failed >.failed
+echo $passed >${passedfile}
+echo $failed >${failedfile}
 if [ $# -eq 0 ]
 then
   runComplexTests
@@ -81,7 +86,7 @@ echo '------------------------------------------------'
 printf "%4u tests failed\n" $failed
 printf "%4u tests passed\n" $passed
 echo
-cat failure-outputs.txt
+cat tests/failure-outputs.txt
 echo
 echo
 exit $failed
