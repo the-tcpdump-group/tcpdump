@@ -8,7 +8,7 @@ here=`pwd`
 mkdir -p builds
 cd builds
 
-export CFLAGS='-fno-omit-frame-pointer -fsanitize=address -fno-optimize-sibling-calls -fPIC -Wextra -g3 -ggdb3 -O0'
+export CFLAGS='-fno-omit-frame-pointer -fsanitize=address -fno-optimize-sibling-calls -fPIC -Wextra -g3 -ggdb3 -O0 -Werror'
 for arch in i386 x86_64
 do
         case $arch in
