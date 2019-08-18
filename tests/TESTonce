@@ -23,8 +23,10 @@ $outputbase = basename($output);
 my $coredump = false;
 my $status = 0;
 my $linecount = 0;
+my $rawstderrlog = "NEW/${outputbase}.raw.stderr";
 my $stderrlog = "NEW/${outputbase}.stderr";
 my $diffstat = 0;
+my $errdiffstat = 0;
 
 if ($^O eq 'MSWin32') {
     $r = system "..\\windump -# -n -r $input $options 2>NUL | sed 's/\\r//' | tee NEW/$outputbase | diff $output - >DIFF/$outputbase.diff";
@@ -33,7 +35,7 @@ if ($^O eq 'MSWin32') {
 else {
     # we used to do this as a nice pipeline, but the problem is that $r fails to
     # to be set properly if the tcpdump core dumps.
-    $r = system "$TCPDUMP 2>${stderrlog} -# -n -r $input $options >NEW/${outputbase}";
+    $r = system "$TCPDUMP 2>${rawstderrlog} -# -n -r $input $options >NEW/${outputbase}";
     if($r == -1) {
         # failed to start due to error.
         $status = $!;
@@ -50,7 +52,11 @@ else {
             $status = WEXITSTATUS($r);
         }
 
-        printf OUTPUT "EXIT CODE %08x: dump:%d code: %d\n", $r, $coredump, $status;
+        if($coredump || $status) {
+            printf OUTPUT "EXIT CODE %08x: dump:%d code: %d\n", $r, $coredump, $status;
+        } else {
+            printf OUTPUT "EXIT CODE %08x\n", $r;
+        }
         close(OUTPUT);
         $r = 0;
     }
@@ -58,16 +64,37 @@ else {
         $r = system "cat NEW/$outputbase | diff $output - >DIFF/$outputbase.diff";
         $diffstat = WEXITSTATUS($r);
     }
-    if($r == 0) {
-        $linecount = 0;
-        open(ERROROUT, "<" . $stderrlog);
-        while(<ERROROUT>) {
-            next if /^$/;  # blank lines are boring
-            next if /^reading from file/;  # stock output boring too
-            $linecount++;
+
+    # process the file, sanitize "reading from" line, and count lines
+    $linecount = 0;
+    open(ERRORRAW, "<" . $rawstderrlog);
+    open(ERROROUT, ">" . $stderrlog);
+    while(<ERRORRAW>) {
+        next if /^$/;  # blank lines are boring
+        if(/^(reading from file )(.*)(,.*)$/) {
+            my $filename = basename($2);
+            print ERROROUT "${1}${filename}${3}\n";
+            next;
         }
-        if($linecount == 0) {
+        print ERROROUT;
+        $linecount++;
+    }
+    close(ERROROUT);
+    close(ERRORRAW);
+
+    if ( -f "$output.stderr" ) {
+        $nr = system "cat $stderrlog | diff $output.stderr - >DIFF/$outputbase.stderr.diff";
+        if($r == 0) {
+            $r = $nr;
+        }
+        $errdiffstat = WEXITSTATUS($nr);
+    }
+
+    if($r == 0) {
+        if($linecount == 0 && $status == 0) {
             unlink($stderrlog);
+        } else {
+            $errdiffstat = 1;
         }
     }
 
@@ -77,14 +104,14 @@ else {
 if($r == 0) {
     my $stderrlog="";
     if($linecount > 0) {
-        $stderrlog=sprintf("%d lines in stderr", $linecount);
+        $stderrlog=sprintf("-- %d lines extra in stderr", $linecount);
     }
     printf "    %-35s: passed%s\n", $name, $stderrlog;
     unlink "DIFF/$outputbase.diff";
     exit 0;
 }
 # must have failed!
-printf "    %-35s: TEST FAILED(exit core=%d/diffstat=%d/r=%d)", $name, $coredump, $diffstat, $r;
+printf "    %-35s: TEST FAILED(exit core=%d/diffstat=%d,%d/r=%d)", $name, $coredump, $diffstat, $errdiffstat, $r;
 open FOUT, '>>failure-outputs.txt';
 printf FOUT "\nFailed test: $name\n\n";
 close FOUT;

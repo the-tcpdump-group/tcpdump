@@ -15,9 +15,10 @@ echo RUNNING from ${srcdir}
 
 passedfile=$(pwd)/tests/.passed
 failedfile=$(pwd)/tests/.failed
+failureoutput=$(pwd)/tests/failure-outputs.txt
 mkdir -p tests/NEW
 mkdir -p tests/DIFF
-cat /dev/null > failure-outputs.txt
+cat /dev/null > ${failureoutput}
 
 runComplexTests()
 {
@@ -86,7 +87,7 @@ echo '------------------------------------------------'
 printf "%4u tests failed\n" $failed
 printf "%4u tests passed\n" $passed
 echo
-cat tests/failure-outputs.txt
+cat ${failureoutput}
 echo
 echo
 exit $failed
