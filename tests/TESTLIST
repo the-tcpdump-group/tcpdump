@@ -634,3 +634,12 @@ dns-zlip-3		dns-zlip-3.pcap		dns-zlip-3.out
 # CVE 2019-ABCD
 kh-addrfail-001         kh-addrfail-001.pcap    kh-addrfail-001.out
 kh-addrfail-002         kh-addrfail-002.pcap    kh-addrfail-002.out
+kh-addrfail-003         kh-addrfail-003.pcap    kh-addrfail-003.out
+kh-addrfail-004         kh-addrfail-004.pcap    kh-addrfail-004.out
+kh-addrfail-005         kh-addrfail-005.pcap    kh-addrfail-005.out
+kh-addrfail-006         kh-addrfail-006.pcap    kh-addrfail-006.out
+kh-addrfail-007         kh-addrfail-007.pcap    kh-addrfail-007.out
+kh-addrfail-008         kh-addrfail-008.pcap    kh-addrfail-008.out
+kh-addrfail-009         kh-addrfail-009.pcap    kh-addrfail-009.out
+kh-addrfail-010         kh-addrfail-010.pcap    kh-addrfail-010.out
+kh-addrfail-011         kh-addrfail-011.pcap    kh-addrfail-011.out
