@@ -27,6 +27,8 @@ else {
     # to be set properly if the tcpdump core dumps.
     $r = system "../tcpdump 2>/dev/null -n -t -r $input $options >NEW/$outputbase";
     if($r != 0) {
+        my $coredump = false;
+        my $status = 0;
         # this means tcpdump failed.
         open(OUTPUT, ">>"."NEW/$outputbase") || die "fail to open $outputbase\n";
         printf OUTPUT "EXIT CODE %08x\n", $r;
