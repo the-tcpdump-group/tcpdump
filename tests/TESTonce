@@ -30,7 +30,7 @@ if ($^O eq 'MSWin32') {
 else {
     # we used to do this as a nice pipeline, but the problem is that $r fails to
     # to be set properly if the tcpdump core dumps.
-    $r = system "$TCPDUMP 2>/dev/null -# -n -r $input $options >NEW/$outputbase";
+    $r = system "$TCPDUMP 2>NEW/$outputbase.stderr -# -n -r $input $options >NEW/$outputbase";
     if($r != 0) {
         my $coredump = false;
         my $status = 0;
