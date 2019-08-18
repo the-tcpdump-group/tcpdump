@@ -4,9 +4,25 @@ srcdir=${SRCDIR-..}
 
 echo RUNNING from ${srcdir}
 
+<<<<<<< HEAD
 mkdir -p NEW
 mkdir -p DIFF
-cat /dev/null > failure-outputs.txt
+
+# make it absolute
+srcdir=$(cd $srcdir && pwd)
+
+# this should be run from the compiled build directory,
+# with srcdir= set to wherever the source code is.
+# not from the tests directory.
+echo RUNNING from ${srcdir}
+
+passedfile=$(pwd)/tests/.passed
+failedfile=$(pwd)/tests/.failed
+failureoutput=$(pwd)/tests/failure-outputs.txt
+mkdir -p tests/NEW
+mkdir -p tests/DIFF
+
+cat /dev/null > ${failureoutput}
 
 runComplexTests()
 {
@@ -15,8 +31,8 @@ runComplexTests()
     case $i in ${srcdir}/tests/TEST*.sh) continue;; esac
     sh $i ${srcdir}
   done
-  passed=`cat .passed`
-  failed=`cat .failed`
+  passed=`cat ${passedfile}`
+  failed=`cat ${failedfile}`
 }
 
 runSimpleTests()
@@ -31,28 +47,34 @@ runSimpleTests()
     rm -f core
     [ "$only" != "" -a "$name" != "$only" ] && continue
     export SRCDIR=${srcdir}
+    # I hate shells with their stupid, useless subshells.
+    passed=`cat ${passedfile}`
+    failed=`cat ${failedfile}`
+    (cd tests  # run TESTonce in tests directory
+
     if ${srcdir}/tests/TESTonce $name ${srcdir}/tests/$input ${srcdir}/tests/$output "$options"
     then
       passed=`expr $passed + 1`
-      echo $passed >.passed
+      echo $passed >${passedfile}
     else
       failed=`expr $failed + 1`
-      echo $failed >.failed
+      echo $failed >${failedfile}
     fi
     if [ -d COREFILES ]; then
         if [ -f core ]; then mv core COREFILES/$name.core; fi
-    fi
+    fi)
+
     [ "$only" != "" -a "$name" = "$only" ] && break
   done
   # I hate shells with their stupid, useless subshells.
-  passed=`cat .passed`
-  failed=`cat .failed`
+  passed=`cat ${passedfile}`
+  failed=`cat ${failedfile}`
 }
 
 passed=0
 failed=0
-echo $passed >.passed
-echo $failed >.failed
+echo $passed >${passedfile}
+echo $failed >${failedfile}
 if [ $# -eq 0 ]
 then
   runComplexTests
@@ -70,7 +92,7 @@ echo '------------------------------------------------'
 printf "%4u tests failed\n" $failed
 printf "%4u tests passed\n" $passed
 echo
-cat failure-outputs.txt
+cat ${failureoutput}
 echo
 echo
 exit $failed
