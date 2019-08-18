@@ -380,6 +380,8 @@ static const struct tok bgp_aigp_values[] = {
 #define SAFNUM_VPLS                     65
 /* RFC6037 */
 #define SAFNUM_MDT                      66
+/* RFC7432 */
+#define SAFNUM_EVPN                     70
 /* RFC4364 */
 #define SAFNUM_VPNUNICAST               128
 /* RFC6513 */
@@ -399,6 +401,7 @@ static const struct tok bgp_safi_values[] = {
     { SAFNUM_TUNNEL,            "Tunnel"},
     { SAFNUM_VPLS,              "VPLS"},
     { SAFNUM_MDT,               "MDT"},
+    { SAFNUM_EVPN,              "EVPN"},
     { SAFNUM_VPNUNICAST,        "labeled VPN Unicast"},
     { SAFNUM_VPNMULTICAST,      "labeled VPN Multicast"},
     { SAFNUM_VPNUNIMULTICAST,   "labeled VPN Unicast+Multicast"},
