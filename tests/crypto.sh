@@ -65,7 +65,7 @@ then
 			echo $failed >.failed
 			exitcode=1
 		fi
-		if ${srcdir}/tests/TESTonce espudp1 ${srcdir}/tests/espudp1.pcap ${srcdir}/tests/espudp1.out "-nnnn -E "\file ${srcdir}/tests/esp-secrets.txt\""
+		if ${srcdir}/tests/TESTonce espudp1 ${srcdir}/tests/espudp1.pcap ${srcdir}/tests/espudp1.out "-nnnn -E \"file ${srcdir}/tests/esp-secrets.txt\""
 		then
 			passed=`expr $passed + 1`
 			echo $passed >.passed
