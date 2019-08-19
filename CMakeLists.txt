@@ -1224,5 +1224,4 @@ add_custom_target(uninstall
 # Tcpdump tests
 #
 add_custom_target(check
-    COMMAND ./TESTrun.sh
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+    COMMAND ${CMAKE_SOURCE_DIR}/tests/TESTrun.sh)
