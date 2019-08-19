@@ -1,12 +1,12 @@
 #!/bin/sh
 
 TZ=GMT0; export TZ
-srcdir=${SRCDIR-..}
+srcdir=${SRCDIR-.}
 
 echo RUNNING from ${srcdir}
 
 # make it absolute
-srcdir=$(cd $srcdir && pwd)
+srcdir=`cd $srcdir; pwd`
 
 # this should be run from the compiled build directory,
 # with srcdir= set to wherever the source code is.

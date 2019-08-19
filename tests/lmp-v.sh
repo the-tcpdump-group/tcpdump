@@ -6,6 +6,8 @@
 # GCC build and must reproduce correctly on any other GCC build regardless of
 # the architecture.
 
+srcdir=${SRCDIR-.}
+
 exitcode=0
 
 # A Windows build may have no file named Makefile and also a version of grep
@@ -17,7 +19,7 @@ elif grep '^CC = .*gcc' ../Makefile >/dev/null
 then
 	passed=`cat .passed`
 	failed=`cat .failed`
-	if ./TESTonce lmp-v lmp.pcap lmp-v.out '-T lmp -v'
+	if ${srcdir}/tests/TESTonce lmp-v ${srcdir}/tests/lmp.pcap ${srcdir}/tests/lmp-v.out '-T lmp -v'
 	then
 		passed=`expr $passed + 1`
 		echo $passed >.passed
