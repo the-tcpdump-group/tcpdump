@@ -19,9 +19,9 @@ testsdir=`cd ${testsdir}; pwd`
 
 echo Running tests from ${testsdir}
 
-passedfile=$(pwd)/tests/.passed
-failedfile=$(pwd)/tests/.failed
-failureoutput=$(pwd)/tests/failure-outputs.txt
+passedfile=`pwd`/tests/.passed
+failedfile=`pwd`/tests/.failed
+failureoutput=`pwd`/tests/failure-outputs.txt
 mkdir -p tests/NEW
 mkdir -p tests/DIFF
 cat /dev/null > ${failureoutput}
