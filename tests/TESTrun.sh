@@ -1,17 +1,23 @@
 #!/bin/sh
 
+#
+# Force UTC, so time stamps are printed in a standard time zone, and
+# tests don't have to be run in the time zone in which the output
+# file was generated.
+#
 TZ=GMT0; export TZ
-srcdir=${SRCDIR-.}
 
-echo RUNNING from ${srcdir}
+#
+# Get the tests directory from $0.
+#
+testsdir=`dirname "$0"`
 
-# make it absolute
-srcdir=`cd $srcdir; pwd`
+#
+# Convert it to an absolute path, so it works even after we do a cd.
+#
+testsdir=`cd ${testsdir}; pwd`
 
-# this should be run from the compiled build directory,
-# with srcdir= set to wherever the source code is.
-# not from the tests directory.
-echo RUNNING from ${srcdir}
+echo Running tests from ${testsdir}
 
 passedfile=$(pwd)/tests/.passed
 failedfile=$(pwd)/tests/.failed
@@ -22,11 +28,11 @@ cat /dev/null > ${failureoutput}
 
 runComplexTests()
 {
-  for i in ${srcdir}/tests/*.sh
+  for i in ${testsdir}/*.sh
   do
     case $i in
-        ${srcdir}/tests/TEST*.sh) continue;;
-        ${srcdir}/tests/\*.sh) continue;;
+        ${testsdir}/TEST*.sh) continue;;
+        ${testsdir}/\*.sh) continue;;
     esac
     echo Running $i
     (cd tests && sh $i ${srcdir})
@@ -38,7 +44,7 @@ runComplexTests()
 runSimpleTests()
 {
   only=$1
-  cat ${srcdir}/tests/TESTLIST | while read name input output options
+  cat ${testsdir}/TESTLIST | while read name input output options
   do
     case $name in
       \#*) continue;;
@@ -46,12 +52,11 @@ runSimpleTests()
     esac
     rm -f core
     [ "$only" != "" -a "$name" != "$only" ] && continue
-    export SRCDIR=${srcdir}
     # I hate shells with their stupid, useless subshells.
     passed=`cat ${passedfile}`
     failed=`cat ${failedfile}`
     (cd tests  # run TESTonce in tests directory
-    if ${srcdir}/tests/TESTonce $name ${srcdir}/tests/$input ${srcdir}/tests/$output "$options"
+    if ${testsdir}/TESTonce $name ${testsdir}/$input ${testsdir}/$output "$options"
     then
       passed=`expr $passed + 1`
       echo $passed >${passedfile}

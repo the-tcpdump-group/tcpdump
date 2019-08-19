@@ -6,7 +6,10 @@
 # GCC build and must reproduce correctly on any other GCC build regardless of
 # the architecture.
 
-srcdir=${SRCDIR-.}
+#
+# Get the tests directory from $0.
+#
+testsdir=`dirname "$0"`
 
 exitcode=0
 
@@ -19,7 +22,7 @@ elif grep '^CC = .*gcc' ../Makefile >/dev/null
 then
 	passed=`cat .passed`
 	failed=`cat .failed`
-	if ${srcdir}/tests/TESTonce lmp-v ${srcdir}/tests/lmp.pcap ${srcdir}/tests/lmp-v.out '-T lmp -v'
+	if ${testsdir}/TESTonce lmp-v ${testsdir}/lmp.pcap ${testsdir}/lmp-v.out '-T lmp -v'
 	then
 		passed=`expr $passed + 1`
 		echo $passed >.passed
