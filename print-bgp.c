@@ -223,6 +223,7 @@ static const struct tok bgp_opt_values[] = {
 #define BGP_CAPCODE_MULTISESS          68 /* draft-ietf-idr-bgp-multisession */
 #define BGP_CAPCODE_ADD_PATH           69 /* RFC7911 */
 #define BGP_CAPCODE_ENH_RR             70 /* draft-keyur-bgp-enhanced-route-refresh */
+#define BGP_CAPCODE_LLGR               71 /* draft-uttaro-idr-bgp-persistence-05 */
 #define BGP_CAPCODE_RR_CISCO          128
 
 static const struct tok bgp_capcode_values[] = {
@@ -238,6 +239,7 @@ static const struct tok bgp_capcode_values[] = {
     { BGP_CAPCODE_MULTISESS,    "Multisession BGP"},
     { BGP_CAPCODE_ADD_PATH,     "Multiple Paths"},
     { BGP_CAPCODE_ENH_RR,       "Enhanced Route Refresh"},
+    { BGP_CAPCODE_LLGR,         "Long-lived Graceful Restart"},
     { BGP_CAPCODE_RR_CISCO,     "Route Refresh (Cisco)"},
     { 0, NULL}
 };
@@ -2473,6 +2475,7 @@ bgp_capabilities_print(netdissect_options *ndo,
             }
             break;
         case BGP_CAPCODE_RR:
+        case BGP_CAPCODE_LLGR:
         case BGP_CAPCODE_RR_CISCO:
             break;
         case BGP_CAPCODE_AS_NEW:
