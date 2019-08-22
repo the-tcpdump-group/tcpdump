@@ -143,6 +143,7 @@ static const struct tok isis_pdu_values[] = {
 #define ISIS_TLV_MT_IP6_REACH        237 /* draft-ietf-isis-wg-multi-topology-05 */
 #define ISIS_TLV_PTP_ADJ             240 /* rfc3373 */
 #define ISIS_TLV_IIH_SEQNR           241 /* draft-shen-isis-iih-sequence-00 */
+#define ISIS_TLV_ROUTER_CAPABILITY   242 /* rfc7981 */
 #define ISIS_TLV_VENDOR_PRIVATE      250 /* draft-ietf-isis-experimental-tlv-01 */
 #define ISIS_TLV_VENDOR_PRIVATE_MINLEN 3
 
@@ -187,6 +188,7 @@ static const struct tok isis_tlv_values[] = {
     { ISIS_TLV_MT_IP6_REACH,       "Multi-Topology IP6 Reachability"},
     { ISIS_TLV_PTP_ADJ,            "Point-to-point Adjacency State"},
     { ISIS_TLV_IIH_SEQNR,          "Hello PDU Sequence Number"},
+    { ISIS_TLV_ROUTER_CAPABILITY,  "IS-IS Router Capability"},
     { ISIS_TLV_VENDOR_PRIVATE,     "Vendor Private"},
     { 0, NULL }
 };
@@ -337,6 +339,12 @@ static const struct tok clnp_option_qos_global_values[] = {
     { 0x04, "delay vs. cost"},
     { 0x02, "error vs. delay"},
     { 0x01, "error vs. cost"},
+    { 0, NULL }
+};
+
+static const struct tok isis_tlv_router_capability_flags[] = {
+    { 0x01, "S bit"},
+    { 0x02, "D bit"},
     { 0, NULL }
 };
 
@@ -3305,6 +3313,21 @@ isis_print(netdissect_options *ndo,
 	        break;
             ND_TCHECK_4(tptr); /* check if four bytes are on the wire */
             ND_PRINT("\n\t      Sequence number: %u", GET_BE_U_4(tptr));
+            break;
+
+        case ISIS_TLV_ROUTER_CAPABILITY:
+            if (tlen < 5) {
+                ND_PRINT(" [object length %u < 5]", tlen);
+                nd_print_invalid(ndo);
+                break;
+            }
+            ND_TCHECK_5(tptr); /* router-id + flags */
+            ND_PRINT("\n\t\tRouter-id: %s", ipaddr_string(ndo, tptr));
+            ND_PRINT("\n\t\tFlags: [%s]",
+                      bittok2str(isis_tlv_router_capability_flags,
+                        "none",
+                        GET_U_1(tptr+4)));
+            /* FIXME Optional set of sub-TLV */
             break;
 
         case ISIS_TLV_VENDOR_PRIVATE:
