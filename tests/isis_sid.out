@@ -1,7 +1,7 @@
     1  12:36:55.841195 IS-IS, length 495
 	L2 LSP, hlen: 27, v: 1, pdu-v: 1, sys-id-len: 6 (0), max-area: 3 (0)
 	  lsp-id: 0192.0168.0001.00-00, seq: 0x0000000b, lifetime:  1196s
-	  chksum: 0xc074 (correct), PDU length: 495, Flags: [ L2 IS ]
+	  chksum: 0xc074 (incorrect should be 0x3cf5), PDU length: 495, Flags: [ L2 IS ]
 	    Area address(es) TLV #1, length: 4
 	      Area address (length: 3): 49.0002
 	    LSP Buffersize TLV #14, length: 2
@@ -94,6 +94,6 @@
 	      IPv4 prefix:     172.16.11.0/24, Distribution: up, Metric: 63
 	      IPv4 prefix:     192.168.0.1/32, Distribution: up, Metric: 63
 	    IS-IS Router Capability TLV #242, length: 8
-	      Router-ID 192.168.0.1, Flags [none]
+	      Router-ID 192.168.0.1, Flags [S bit, D bit]
 		unknown subTLV #19, length: 1
 		0x0000:  00

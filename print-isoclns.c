@@ -375,6 +375,7 @@ static const struct tok isis_router_capability_sr_flags[] = {
 #define ISIS_SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE 20 /* rfc4205 */
 #define ISIS_SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR    21 /* rfc4205 */
 #define ISIS_SUBTLV_EXT_IS_REACH_BW_CONSTRAINTS       22 /* rfc4124 */
+#define ISIS_SUBTLV_EXT_IS_REACH_LAN_ADJ_SEGMENT_ID   32 /* rfc8667 */
 
 #define ISIS_SUBTLV_SPB_METRIC                        29 /* rfc6329 */
 
@@ -393,6 +394,7 @@ static const struct tok isis_ext_is_reach_subtlv_values[] = {
     { ISIS_SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR,      "Interface Switching Capability" },
     { ISIS_SUBTLV_EXT_IS_REACH_BW_CONSTRAINTS_OLD,     "Bandwidth Constraints (old)" },
     { ISIS_SUBTLV_EXT_IS_REACH_BW_CONSTRAINTS,         "Bandwidth Constraints" },
+    { ISIS_SUBTLV_EXT_IS_REACH_LAN_ADJ_SEGMENT_ID,     "LAN Adjacency Segment Identifier" },
     { ISIS_SUBTLV_SPB_METRIC,                          "SPB Metric" },
     { 250,                                             "Reserved for cisco specific extensions" },
     { 251,                                             "Reserved for cisco specific extensions" },
@@ -445,6 +447,16 @@ static const struct tok isis_subtlv_link_attribute_values[] = {
     { 0x01, "Local Protection Available" },
     { 0x02, "Link excluded from local protection path" },
     { 0x04, "Local maintenance required"},
+    { 0, NULL }
+};
+
+static const struct tok isis_lan_adj_sid_flag_values[] = {
+    { 0x80, "Address family IPv6" },
+    { 0x40, "Backup" },
+    { 0x20, "Value" },
+    { 0x10, "Local significance" },
+    { 0x08, "Set of adjacencies" },
+    { 0x04, "Persistent" },
     { 0, NULL }
 };
 
@@ -2175,6 +2187,41 @@ isis_print_ext_is_reach(netdissect_options *ndo,
                                 return(0);
                         }
                     }
+                }
+                break;
+            case ISIS_SUBTLV_EXT_IS_REACH_LAN_ADJ_SEGMENT_ID:
+                if (subtlv_len >= 8) {
+                    ND_PRINT("%s  Flags: [%s]", ident,
+                              bittok2str(isis_lan_adj_sid_flag_values,
+                                         "none",
+                                         GET_U_1(tptr)));
+                    int vflag = (GET_U_1(tptr) & 0x20) ? 1:0;
+                    int lflag = (GET_U_1(tptr) & 0x10) ? 1:0;
+                    tptr++;
+                    subtlv_len--;
+                    subtlv_sum_len--;
+                    proc_bytes++;
+                    ND_PRINT("%s  Weight: %u", ident, GET_U_1(tptr));
+                    tptr++;
+                    subtlv_len--;
+                    subtlv_sum_len--;
+                    proc_bytes++;
+                    if(subtlv_len>=SYSTEM_ID_LEN) {
+                        ND_TCHECK_LEN(tptr, SYSTEM_ID_LEN);
+                        ND_PRINT("%s  Neighbor System-ID: %s", ident,
+                            isis_print_id(ndo, tptr, SYSTEM_ID_LEN));
+                    }
+                    /* RFC 8667 section 2.2.2 */
+                    /* if V-flag is set to 1 and L-flag is set to 1 ==> 3 octet label */
+                    /* if V-flag is set to 0 and L-flag is set to 0 ==> 4 octet index */
+                    if (vflag && lflag) {
+                        ND_PRINT("%s  Label: %u",
+                                  ident, GET_BE_U_3(tptr+SYSTEM_ID_LEN));
+                    } else if ((!vflag) && (!lflag)) {
+                        ND_PRINT("%s  Index: %u",
+                                  ident, GET_BE_U_4(tptr+SYSTEM_ID_LEN));
+                    } else
+                        nd_print_invalid(ndo);
                 }
                 break;
             default:
