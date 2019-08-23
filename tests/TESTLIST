@@ -299,6 +299,7 @@ isis_cap_tlv	isis_cap_tlv.pcap		isis_cap_tlv.out	-v
 # isis-seg-fault-1-v is now conditionally handled by isis-seg-fault-1-v.sh
 isis-seg-fault-2-v isis-seg-fault-2.pcapng isis-seg-fault-2-v.out -v
 isis-seg-fault-3-v isis-seg-fault-3.pcapng isis-seg-fault-3-v.out -v
+isis_sid	isis_sid.pcap			isis_sid.out	-v
 
 # RSVP tests
 rsvp_infloop-v	rsvp-infinite-loop.pcap		rsvp_infloop-v.out	-v
