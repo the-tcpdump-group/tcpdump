@@ -433,6 +433,7 @@ static const struct tok bgp_safi_values[] = {
 
 #define BGP_EXT_COM_OSPF_RTYPE  0x0306  /* OSPF Route Type,Format Area(4B):RouteType(1B):Options(1B) */
 #define BGP_EXT_COM_OSPF_RTYPE2 0x8000  /* duplicate - keep for backwards compatibility */
+#define BGP_EXT_COM_ENCAP       0x030c  /* rfc5512 */
 
 #define BGP_EXT_COM_OSPF_RID    0x0107  /* OSPF Router ID,Format RouterID(4B):Unused(2B) */
 #define BGP_EXT_COM_OSPF_RID2   0x8001  /* duplicate - keep for backwards compatibility */
@@ -472,6 +473,7 @@ static const struct tok bgp_extd_comm_subtype_values[] = {
     { BGP_EXT_COM_VPN_ORIGIN4, "ospf-domain"},
     { BGP_EXT_COM_OSPF_RTYPE,  "ospf-route-type"},
     { BGP_EXT_COM_OSPF_RTYPE2, "ospf-route-type"},
+    { BGP_EXT_COM_ENCAP,       "encapsulation"},
     { BGP_EXT_COM_OSPF_RID,    "ospf-router-id"},
     { BGP_EXT_COM_OSPF_RID2,   "ospf-router-id"},
     { BGP_EXT_COM_L2INFO,      "layer2-info"},
@@ -485,6 +487,46 @@ static const struct tok bgp_extd_comm_subtype_values[] = {
     { BGP_EXT_COM_VRF_RT_IMP, "vrf-route-import"},
     { BGP_EXT_COM_L2VPN_RT_0, "l2vpn-id"},
     { BGP_EXT_COM_L2VPN_RT_1, "l2vpn-id"},
+    { 0, NULL},
+};
+
+/* RFC RFC5512 BGP Tunnel Encapsulation Attribute Tunnel Types */
+#define BGP_ENCAP_TUNNEL_L2TPV3_IP  1
+#define BGP_ENCAP_TUNNEL_GRE        2
+#define BGP_ENCAP_TUNNEL_TRANSMIT   3
+#define BGP_ENCAP_TUNNEL_IPSEC      4
+#define BGP_ENCAP_TUNNEL_IP_IPSEC   5
+#define BGP_ENCAP_TUNNEL_MPLS_IP    6
+#define BGP_ENCAP_TUNNEL_IP_IP      7
+#define BGP_ENCAP_TUNNEL_VXLAN      8
+#define BGP_ENCAP_TUNNEL_NVGRE      9
+#define BGP_ENCAP_TUNNEL_MPLS       10
+#define BGP_ENCAP_TUNNEL_MPLS_GRE   11
+#define BGP_ENCAP_TUNNEL_VXLAN_GPE  12
+#define BGP_ENCAP_TUNNEL_MPLS_UDP   13
+#define BGP_ENCAP_TUNNEL_IPV6       14
+#define BGP_ENCAP_TUNNEL_SR_TE      15
+#define BGP_ENCAP_TUNNEL_BARE       16
+#define BGP_ENCAP_TUNNEL_SR         17
+
+static const struct tok bgp_extd_comm_encap_tunnel_values[] = {
+    { BGP_ENCAP_TUNNEL_L2TPV3_IP,    "L2TPv3 over IP"},
+    { BGP_ENCAP_TUNNEL_GRE,          "GRE"},
+    { BGP_ENCAP_TUNNEL_TRANSMIT,     "Transmit Tunnel"},
+    { BGP_ENCAP_TUNNEL_IPSEC,        "IPsec"},
+    { BGP_ENCAP_TUNNEL_IP_IPSEC,     "IP in IP with IPsec"},
+    { BGP_ENCAP_TUNNEL_MPLS_IP,      "MPLS in IP with IPsec"},
+    { BGP_ENCAP_TUNNEL_IP_IP,        "IP in IP"},
+    { BGP_ENCAP_TUNNEL_VXLAN,        "VXLAN"},
+    { BGP_ENCAP_TUNNEL_NVGRE,        "NVGRE"},
+    { BGP_ENCAP_TUNNEL_MPLS,         "MPLS"},
+    { BGP_ENCAP_TUNNEL_MPLS_GRE,     "MPLS in GRE"},
+    { BGP_ENCAP_TUNNEL_VXLAN_GPE,    "VXLAN GPE"},
+    { BGP_ENCAP_TUNNEL_MPLS_UDP,     "MPLS in UDP"},
+    { BGP_ENCAP_TUNNEL_IPV6,         "IPv6"},
+    { BGP_ENCAP_TUNNEL_SR_TE,        "SR TE"},
+    { BGP_ENCAP_TUNNEL_BARE,         "Bare"},
+    { BGP_ENCAP_TUNNEL_SR,           "SR"},
     { 0, NULL},
 };
 
@@ -843,6 +885,12 @@ bgp_extended_community_print(netdissect_options *ndo,
 
     case BGP_EXT_COM_SOURCE_AS:
         ND_PRINT("AS %u", GET_BE_U_2(pptr + 2));
+        break;
+
+    case BGP_EXT_COM_ENCAP:
+        ND_PRINT("Tunnel type: %s", tok2str(bgp_extd_comm_encap_tunnel_values,
+                                           "unknown encaps",
+                                           GET_BE_U_2(pptr + 6)));
         break;
 
     default:

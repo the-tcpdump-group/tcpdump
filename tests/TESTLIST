@@ -32,6 +32,7 @@ bgp-4byte-asdot	bgp-4byte-asn.pcap	bgp-4byte-asdot.out	-vb
 bgp-lu-multiple-labels bgp-lu-multiple-labels.pcap bgp-lu-multiple-labels.out -v
 bgp-evpn	bgp-evpn.pcap		bgp-evpn.out		-v
 bgp-llgr	bgp-evpn.pcap		bgp-llgr.out		-v
+bgp-encap	bgp-encap.pcap		bgp-encap.out		-v
 
 # Broadcom tag tests
 brcmtag		brcm-tag.pcap		brcm-tag.out
