@@ -86,7 +86,7 @@ then
 			echo $failed >.failed
 			exitcode=1
 		fi
-		if ${testsdir}/TESTonce isakmp4 ${testsdir}/isakmp4500.pcap ${testsdir}/isakmp4.out "-E \"file esp-secrets.txt\""
+		if ${testsdir}/TESTonce isakmp4 ${testsdir}/isakmp4500.pcap ${testsdir}/isakmp4.out "-E \"file ${testsdir}/esp-secrets.txt\""
 		then
 			passed=`expr $passed + 1`
 			echo $passed >.passed
