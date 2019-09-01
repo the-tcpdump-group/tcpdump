@@ -162,7 +162,6 @@
    * by adding a preceding underscore; we *want* the UN*Xisms, so add
    * #defines to let us use them.
    */
-  #define isascii __isascii
   #define isatty _isatty
   #define stat _stat
   #define strdup _strdup
