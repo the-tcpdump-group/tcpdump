@@ -422,7 +422,7 @@ unistr(netdissect_options *ndo, char (*buf)[MAX_UNISTR_SIZE+1],
 	    if (l < MAX_UNISTR_SIZE) {
 		if (ND_ASCII_ISPRINT(c)) {
 		    /* It's a printable ASCII character */
-		    (*buf)[l] = c;
+		    (*buf)[l] = (char)c;
 		} else {
 		    /* It's a non-ASCII character or a non-printable ASCII character */
 		    (*buf)[l] = '.';
@@ -454,7 +454,7 @@ unistr(netdissect_options *ndo, char (*buf)[MAX_UNISTR_SIZE+1],
 	    if (l < MAX_UNISTR_SIZE) {
 		if (ND_ASCII_ISPRINT(c)) {
 		    /* It's a printable ASCII character */
-		    (*buf)[l] = c;
+		    (*buf)[l] = (char)c;
 		} else {
 		    /* It's a non-ASCII character or a non-printable ASCII character */
 		    (*buf)[l] = '.';
