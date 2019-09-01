@@ -47,6 +47,8 @@
 
 #include <string.h>
 
+#include "netdissect-ctype.h"
+
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -2267,7 +2269,7 @@ ikev2_ID_print(netdissect_options *ndo, u_char tpay,
 	if(dumpascii) {
 		ND_TCHECK_LEN(typedata, idtype_len);
 		for(i=0; i<idtype_len; i++) {
-			if(ND_ISPRINT(GET_U_1(typedata + i))) {
+			if(ND_ASCII_ISPRINT(GET_U_1(typedata + i))) {
 				ND_PRINT("%c", GET_U_1(typedata + i));
 			} else {
 				ND_PRINT(".");
@@ -2610,7 +2612,7 @@ ikev2_vid_print(netdissect_options *ndo, u_char tpay,
 	len = item_len - 4;
 	ND_TCHECK_LEN(vid, len);
 	for(i=0; i<len; i++) {
-		if(ND_ISPRINT(GET_U_1(vid + i)))
+		if(ND_ASCII_ISPRINT(GET_U_1(vid + i)))
 			ND_PRINT("%c", GET_U_1(vid + i));
 		else ND_PRINT(".");
 	}

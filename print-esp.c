@@ -631,7 +631,7 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 
 	if (decode) {
 		/* skip any blank spaces */
-		while (isspace((unsigned char)*decode))
+		while (*decode == ' ' || *decode == '\t' || *decode == '\r' || *decode == '\n')
 			decode++;
 
 		if(!espprint_decode_encalgo(ndo, decode, &sa1)) {

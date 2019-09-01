@@ -49,6 +49,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "netdissect-ctype.h"
+
 #include "netdissect.h"
 #include "extract.h"
 #include "nfsfh.h"
@@ -442,7 +444,7 @@ is_UCX(netdissect_options *ndo, const unsigned char *fhp, u_int len)
 		return(0);
 
 	for (i = 1; i < 14; i++) {
-	    if (ND_ISPRINT(GET_U_1(fhp + i))) {
+	    if (ND_ASCII_ISPRINT(GET_U_1(fhp + i))) {
 		if (seen_null)
 		   return(0);
 		else

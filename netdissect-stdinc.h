@@ -124,7 +124,6 @@
 #include <stdio.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#include <ctype.h>
 #include <time.h>
 #include <io.h>
 #include <fcntl.h>
@@ -222,7 +221,6 @@ typedef char* caddr_t;
  * Includes and definitions for various flavors of UN*X.
  */
 
-#include <ctype.h>
 #include <unistd.h>
 #include <netdb.h>
 #include <sys/param.h>

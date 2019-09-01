@@ -71,6 +71,8 @@
 #include <smi.h>
 #endif
 
+#include "netdissect-ctype.h"
+
 #include "netdissect.h"
 #include "extract.h"
 
@@ -700,7 +702,7 @@ asn1_print_string(netdissect_options *ndo, struct be *elem)
 	p = elem->data.str;
 	ND_TCHECK_LEN(p, asnlen);
 	for (i = asnlen; printable && i != 0; p++, i--)
-		printable = ND_ISPRINT(GET_U_1(p));
+		printable = ND_ASCII_ISPRINT(GET_U_1(p));
 	p = elem->data.str;
 	if (printable) {
 		ND_PRINT("\"");

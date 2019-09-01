@@ -22,6 +22,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "netdissect-ctype.h"
+
 #include "netdissect.h"
 #include "extract.h"
 
@@ -44,14 +46,17 @@ ssh_print_version(netdissect_options *ndo, const u_char *pptr, u_int len)
 	idx++;
 
 	while (idx < len) {
-		if (GET_U_1(pptr + idx) == '\n') {
+		u_char c;
+
+		c = GET_U_1(pptr + idx);
+		if (c == '\n') {
 			/*
 			 * LF without CR; end of line.
 			 * Skip the LF and print the line, with the
 			 * exception of the LF.
 			 */
 			goto print;
-		} else if (GET_U_1(pptr + idx) == '\r') {
+		} else if (c == '\r') {
 			/* CR - any LF? */
 			if ((idx+1) >= len) {
 				/* not in this packet */
@@ -71,8 +76,7 @@ ssh_print_version(netdissect_options *ndo, const u_char *pptr, u_int len)
 			 * if it were binary data and don't print it.
 			 */
 			goto trunc;
-		} else if (!isascii(GET_U_1(pptr + idx)) ||
-			   !isprint(GET_U_1(pptr + idx)) ) {
+		} else if (!ND_ASCII_ISPRINT(c) ) {
 			/*
 			 * Not a printable ASCII character; treat this
 			 * as if it were binary data and don't print it.

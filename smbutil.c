@@ -16,6 +16,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "netdissect-ctype.h"
+
 #include "netdissect.h"
 #include "extract.h"
 #include "smb.h"
@@ -418,7 +420,7 @@ unistr(netdissect_options *ndo, char (*buf)[MAX_UNISTR_SIZE+1],
 		break;
 	    }
 	    if (l < MAX_UNISTR_SIZE) {
-		if (ND_ISPRINT(c)) {
+		if (ND_ASCII_ISPRINT(c)) {
 		    /* It's a printable ASCII character */
 		    (*buf)[l] = c;
 		} else {
@@ -450,7 +452,7 @@ unistr(netdissect_options *ndo, char (*buf)[MAX_UNISTR_SIZE+1],
 		break;
 	    }
 	    if (l < MAX_UNISTR_SIZE) {
-		if (ND_ISPRINT(c)) {
+		if (ND_ASCII_ISPRINT(c)) {
 		    /* It's a printable ASCII character */
 		    (*buf)[l] = c;
 		} else {
@@ -526,7 +528,7 @@ smb_fdata1(netdissect_options *ndo,
 	    ND_TCHECK_LEN(buf, l);
 	    buf += l;
 	    fmt++;
-	    while (isdigit((unsigned char)*fmt))
+	    while (ND_ASCII_ISDIGIT(*fmt))
 		fmt++;
 	    break;
 	  }
@@ -716,7 +718,7 @@ smb_fdata1(netdissect_options *ndo,
 	    ND_PRINT("%-*.*s", l, l, buf);
 	    buf += l;
 	    fmt++;
-	    while (isdigit((unsigned char)*fmt))
+	    while (ND_ASCII_ISDIGIT(*fmt))
 		fmt++;
 	    break;
 	  }
@@ -730,7 +732,7 @@ smb_fdata1(netdissect_options *ndo,
 	    ND_PRINT("%-*.*s", (int)stringlen, (int)stringlen, buf);
 	    buf += stringlen;
 	    fmt++;
-	    while (isdigit((unsigned char)*fmt))
+	    while (ND_ASCII_ISDIGIT(*fmt))
 		fmt++;
 	    break;
 	  }
@@ -756,7 +758,7 @@ smb_fdata1(netdissect_options *ndo,
 		buf++;
 	    }
 	    fmt++;
-	    while (isdigit((unsigned char)*fmt))
+	    while (ND_ASCII_ISDIGIT(*fmt))
 		fmt++;
 	    break;
 	  }
@@ -789,7 +791,7 @@ smb_fdata1(netdissect_options *ndo,
 		break;
 	    }
 	    fmt++;
-	    while (isdigit((unsigned char)*fmt))
+	    while (ND_ASCII_ISDIGIT(*fmt))
 		fmt++;
 	    break;
 	  }
@@ -838,7 +840,7 @@ smb_fdata1(netdissect_options *ndo,
 		tstring = "NULL\n";
 	    ND_PRINT("%s", tstring);
 	    fmt++;
-	    while (isdigit((unsigned char)*fmt))
+	    while (ND_ASCII_ISDIGIT(*fmt))
 		fmt++;
 	    break;
 	  }
