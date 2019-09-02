@@ -302,6 +302,7 @@ isis-seg-fault-3-v isis-seg-fault-3.pcapng isis-seg-fault-3-v.out -v
 
 # RSVP tests
 rsvp_infloop-v	rsvp-infinite-loop.pcap		rsvp_infloop-v.out	-v
+rsvp_cap	rsvp_cap.pcap			rsvp_cap.out		-v
 # fuzzed pcap
 rsvp-inf-loop-2-v rsvp-inf-loop-2.pcapng	rsvp-inf-loop-2-v.out -v
 
