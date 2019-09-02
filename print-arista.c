@@ -11,7 +11,6 @@
 #include <string.h>
 
 #include "netdissect.h"
-#include "interface.h"
 #include "extract.h"
 #include "addrtoname.h"
 
