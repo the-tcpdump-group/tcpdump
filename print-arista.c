@@ -6,7 +6,7 @@
 #include "config.h"
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include <string.h>
 
