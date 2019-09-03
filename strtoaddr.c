@@ -84,8 +84,6 @@ strtoaddr(const char *src, void *dst)
 		for (;;) {
 			if (ND_ASCII_ISDIGIT(c)) {
 				digit = c - '0';
-				if (digit >= 10)
-					break;
 				val = (val * 10) + digit;
 				c = *++src;
 			} else
