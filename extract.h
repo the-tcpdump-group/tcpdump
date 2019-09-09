@@ -855,6 +855,14 @@ get_ipv4_to_network_order(netdissect_options *ndo, const u_char *p)
 	return EXTRACT_IPV4_TO_NETWORK_ORDER(p);
 }
 
+static inline void
+get_cpy_bytes(netdissect_options *ndo, u_char *dst, const u_char *p, size_t len)
+{
+	if (!ND_TTEST_LEN(p, len))
+		longjmp(ndo->ndo_truncated, 1);
+	UNALIGNED_MEMCPY(dst, p, len);
+}
+
 #define GET_U_1(p) get_u_1(ndo, (const u_char *)(p))
 #define GET_S_1(p) get_s_1(ndo, (const u_char *)(p))
 
@@ -895,5 +903,7 @@ get_ipv4_to_network_order(netdissect_options *ndo, const u_char *p)
 
 #define GET_IPV4_TO_HOST_ORDER(p) get_ipv4_to_host_order(ndo, (const u_char *)(p))
 #define GET_IPV4_TO_NETWORK_ORDER(p) get_ipv4_to_network_order(ndo, (const u_char *)(p))
+
+#define GET_CPY_BYTES(dst, p, len) get_cpy_bytes(ndo, (u_char *)(dst), (const u_char *)(p), len)
 
 #endif /* EXTRACT_H */
