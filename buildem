@@ -19,9 +19,10 @@ do
         do
                 mkdir -p $arch/$compiler
                 set -x
+                set -e
                 (cd $arch/$compiler && mkdir -p libpcap tcpdump &&
-                  (cd libpcap && CC=$compiler $here/libpcap/configure --target=$target && make ) &&
-                  (cd tcpdump && CC=$compiler $here/tcpdump/configure --target=$target && make && make check))
+                  (cd libpcap && CC=$compiler $here/libpcap/configure --target=$target && make CFLAGS="$CFLAGS -Werror") &&
+                  (cd tcpdump && CC=$compiler $here/tcpdump/configure --target=$target && make CFLAGS="$CFLAGS -Werror" && make check))
         done
         )
 done
