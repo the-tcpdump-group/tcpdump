@@ -631,7 +631,7 @@ dns-zlip-1		dns-zlip-1.pcap		dns-zlip-1.out
 dns-zlip-2		dns-zlip-2.pcap		dns-zlip-2.out
 dns-zlip-3		dns-zlip-3.pcap		dns-zlip-3.out
 
-# CVE 2019-ABCD
+# CVE-2019-15120
 kh-addrfail-001         kh-addrfail-001.pcap    kh-addrfail-001.out
 kh-addrfail-002         kh-addrfail-002.pcap    kh-addrfail-002.out
 kh-addrfail-003         kh-addrfail-003.pcap    kh-addrfail-003.out
@@ -643,3 +643,9 @@ kh-addrfail-008         kh-addrfail-008.pcap    kh-addrfail-008.out
 kh-addrfail-009         kh-addrfail-009.pcap    kh-addrfail-009.out
 kh-addrfail-010         kh-addrfail-010.pcap    kh-addrfail-010.out
 kh-addrfail-011         kh-addrfail-011.pcap    kh-addrfail-011.out
+kh-tcpdump-001          kh-tcpdump-001.pcap     kh-tcpdump-001.out
+kh-tcpdump-002          kh-tcpdump-002.pcap     kh-tcpdump-002.out
+kh-tcpdump-003          kh-tcpdump-003.pcap     kh-tcpdump-003.out
+
+
+# CVE-2019-15116
