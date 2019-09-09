@@ -165,7 +165,7 @@ ip6_finddst(netdissect_options *ndo, nd_ipv6 *dst,
 
 done:
 trunc:
-	UNALIGNED_MEMCPY(dst, dst_addr, sizeof(nd_ipv6));
+	GET_CPY_BYTES(dst, dst_addr, sizeof(nd_ipv6));
 }
 
 /*
@@ -188,7 +188,7 @@ nextproto6_cksum(netdissect_options *ndo,
 
         /* pseudo-header */
         memset(&ph, 0, sizeof(ph));
-        UNALIGNED_MEMCPY(&ph.ph_src, ip6->ip6_src, sizeof (nd_ipv6));
+        GET_CPY_BYTES(&ph.ph_src, ip6->ip6_src, sizeof(nd_ipv6));
         nh = GET_U_1(ip6->ip6_nxt);
         switch (nh) {
 
@@ -207,8 +207,7 @@ nextproto6_cksum(netdissect_options *ndo,
                 break;
 
         default:
-                UNALIGNED_MEMCPY(&ph.ph_dst, ip6->ip6_dst,
-                                 sizeof (nd_ipv6));
+                GET_CPY_BYTES(&ph.ph_dst, ip6->ip6_dst, sizeof(nd_ipv6));
                 break;
         }
         ph.ph_len = htonl(len);
