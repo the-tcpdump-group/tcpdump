@@ -344,9 +344,6 @@ kday8           kday8.pcap              kday8.out       -v
 cve2015-0261_01    cve2015-0261-ipv6.pcap       cve2015-0261-ipv6.out -v
 cve2015-0261_02    cve2015-0261-crash.pcap      cve2015-0261-crash.out -v
 
-# bad packets from Luis Rocha
-cve-2018-10105-segv-sflowprint cve-2018-10105-segv-sflowprint.pcap      cve-2018-10105-segv-sflowprint.out -v
-
 # OLSRv1 tests
 olsrv1_1	OLSRv1_HNA_sgw_1.pcap		OLSRv1_HNA_sgw_1.out	-v
 
@@ -648,4 +645,9 @@ kh-tcpdump-002          kh-tcpdump-002.pcap     kh-tcpdump-002.out
 kh-tcpdump-003          kh-tcpdump-003.pcap     kh-tcpdump-003.out
 
 
-# CVE-2019-15116
+# CVE-2018-10105 bad packets from Luis Rocha
+cve-2018-10105-segv-sflowprint           cve-2018-10105-segv-sflowprint.pcap      cve-2018-10105-segv-sflowprint.out -v
+cve-2018-10105_smbprint-readofsize1      cve-2018-10105_smbprint-readofsize1.pcap cve-2018-10105_smbprint-readofsize1.out
+cve-2018-10105_smbutil_withoutasan       cve-2018-10105_smbutil_withoutasan.pcap  cve-2018-10105_smbutil_withoutasan.out
+
+
