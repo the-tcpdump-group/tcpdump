@@ -10,10 +10,10 @@ cat /dev/null > failure-outputs.txt
 
 runComplexTests()
 {
-  for i in ${srcdir}/*.sh
+  for i in ${srcdir}/tests/*.sh
   do
-    case $i in ${srcdir}/TEST*.sh) continue;; esac
-    sh ./$i ${srcdir}
+    case $i in ${srcdir}/tests/TEST*.sh) continue;; esac
+    sh $i ${srcdir}
   done
   passed=`cat .passed`
   failed=`cat .failed`

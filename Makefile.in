@@ -438,7 +438,7 @@ distclean:
 	rm -rf autom4te.cache tests/DIFF tests/NEW
 
 check: tcpdump
-	(mkdir -p tests && SRCDIR=${srcdir} ${srcdir}/tests/TESTrun.sh )
+	(mkdir -p tests && export SRCDIR=$$(cd ${srcdir}; pwd) && cd tests && $$SRCDIR/tests/TESTrun.sh )
 
 extags: $(TAGFILES)
 	ctags $(TAGFILES)
