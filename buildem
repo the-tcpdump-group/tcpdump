@@ -15,7 +15,7 @@ do
         i386) CFLAGS="-m32 $CFLAGS"; export LDFLAGS="-m32"; export CXXFLAGS=-m32; target="i686-pc-linux-gnu" ;;
         esac
         (
-        for compiler in clang-6.0 gcc
+        for compiler in clang-7 gcc
         do
                 mkdir -p $arch/$compiler
                 set -x
