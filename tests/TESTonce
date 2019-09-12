@@ -1,6 +1,9 @@
 #!/usr/bin/env perl
 
+$TCPDUMP = "../tcpdump" if (!($TCPDUMP = $ENV{TCPDUMP_BIN}));
+
 use File::Basename;
+use POSIX qw( WEXITSTATUS WIFEXITED);
 
 system("mkdir -p NEW DIFF");
 
@@ -26,7 +29,7 @@ my $diffstat = 0;
 my $errdiffstat = 0;
 
 if ($^O eq 'MSWin32') {
-    $r = system "..\\windump -n -t -r $input $options 2>NUL | sed 's/\\r//' | tee NEW/$outputbase | diff $output - >DIFF/$outputbase.diff";
+    $r = system "..\\windump -# -n -r $input $options 2>NUL | sed 's/\\r//' | tee NEW/$outputbase | diff $output - >DIFF/$outputbase.diff";
     # need to do same as below for Cygwin.
 }
 else {
@@ -107,7 +110,6 @@ if($r == 0) {
     unlink "DIFF/$outputbase.diff";
     exit 0;
 }
-
 # must have failed!
 printf "    %-35s: TEST FAILED(exit core=%d/diffstat=%d,%d/r=%d)", $name, $coredump, $diffstat, $errdiffstat, $r;
 open FOUT, '>>failure-outputs.txt';

@@ -1,12 +1,9 @@
 #!/bin/sh
 
+TZ=GMT0; export TZ
 srcdir=${SRCDIR-..}
 
 echo RUNNING from ${srcdir}
-
-<<<<<<< HEAD
-mkdir -p NEW
-mkdir -p DIFF
 
 # make it absolute
 srcdir=$(cd $srcdir && pwd)
@@ -21,15 +18,18 @@ failedfile=$(pwd)/tests/.failed
 failureoutput=$(pwd)/tests/failure-outputs.txt
 mkdir -p tests/NEW
 mkdir -p tests/DIFF
-
 cat /dev/null > ${failureoutput}
 
 runComplexTests()
 {
   for i in ${srcdir}/tests/*.sh
   do
-    case $i in ${srcdir}/tests/TEST*.sh) continue;; esac
-    sh $i ${srcdir}
+    case $i in
+        ${srcdir}/tests/TEST*.sh) continue;;
+        ${srcdir}/tests/\*.sh) continue;;
+    esac
+    echo Running $i
+    (cd tests && sh $i ${srcdir})
   done
   passed=`cat ${passedfile}`
   failed=`cat ${failedfile}`
@@ -51,7 +51,6 @@ runSimpleTests()
     passed=`cat ${passedfile}`
     failed=`cat ${failedfile}`
     (cd tests  # run TESTonce in tests directory
-
     if ${srcdir}/tests/TESTonce $name ${srcdir}/tests/$input ${srcdir}/tests/$output "$options"
     then
       passed=`expr $passed + 1`
@@ -63,7 +62,6 @@ runSimpleTests()
     if [ -d COREFILES ]; then
         if [ -f core ]; then mv core COREFILES/$name.core; fi
     fi)
-
     [ "$only" != "" -a "$name" = "$only" ] && break
   done
   # I hate shells with their stupid, useless subshells.
