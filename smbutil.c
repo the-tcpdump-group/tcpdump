@@ -798,6 +798,7 @@ smb_fdata(netdissect_options *ndo,
           int unicodestr)
 {
     static int depth = 0;
+    const u_char *buf_start = buf;
     char s[128];
     char *p;
 
@@ -876,8 +877,9 @@ smb_fdata(netdissect_options *ndo,
 	    s[p - fmt] = '\0';
 	    fmt = p + 1;
 	    buf = smb_fdata1(ndo, buf, s, maxbuf, unicodestr);
-	    if (buf == NULL)
+	    if(buf < buf_start || buf == NULL) {
 		return(NULL);
+	    }
 	    break;
 
 	default:
