@@ -478,12 +478,13 @@ smb_fdata1(netdissect_options *ndo,
 
 	case 'P':
 	  {
-	    int l = atoi(fmt + 1);
+	    int l = atoi(fmt + 1);	    
+	    if(l <= 0) goto trunc;  /* actually error in fmt string */
 	    ND_TCHECK2(buf[0], l);
 	    buf += l;
 	    fmt++;
 	    while (isdigit((unsigned char)*fmt))
-		fmt++;
+	      fmt++;
 	    break;
 	  }
 	case 'r':
