@@ -3,9 +3,7 @@
 TZ=GMT0; export TZ
 srcdir=${SRCDIR-..}
 
-echo RUNNING from ${srcdir}
-
-# make it absolute
+# make it absolute for later use.
 srcdir=$(cd $srcdir && pwd)
 
 # this should be run from the compiled build directory,
@@ -29,7 +27,7 @@ runComplexTests()
         ${srcdir}/tests/\*.sh) continue;;
     esac
     echo Running $i
-    (cd tests && sh $i ${srcdir})
+    (sh $i ${srcdir})
   done
   passed=`cat ${passedfile}`
   failed=`cat ${failedfile}`

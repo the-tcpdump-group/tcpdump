@@ -1,11 +1,11 @@
 #!/usr/bin/env perl
 
-$TCPDUMP = "../tcpdump" if (!($TCPDUMP = $ENV{TCPDUMP_BIN}));
+$TCPDUMP = "tcpdump" if (!($TCPDUMP = $ENV{TCPDUMP_BIN}));
 
 use File::Basename;
 use POSIX qw( WEXITSTATUS WIFEXITED);
 
-system("mkdir -p NEW DIFF");
+system("mkdir -p tests/NEW tests/DIFF");
 
 if(@ARGV != 4) {
   print "Usage: TESTonce name input output options\n";
@@ -29,13 +29,13 @@ my $diffstat = 0;
 my $errdiffstat = 0;
 
 if ($^O eq 'MSWin32') {
-    $r = system "..\\windump -# -n -r $input $options 2>NUL | sed 's/\\r//' | tee NEW/$outputbase | diff $output - >DIFF/$outputbase.diff";
+    $r = system "..\\windump -t -n -r $input $options 2>NUL | sed 's/\\r//' | tee NEW/$outputbase | diff $output - >DIFF/$outputbase.diff";
     # need to do same as below for Cygwin.
 }
 else {
     # we used to do this as a nice pipeline, but the problem is that $r fails to
     # to be set properly if the tcpdump core dumps.
-    $r = system "$TCPDUMP 2>${rawstderrlog} -# -n -r $input $options >NEW/${outputbase}";
+    $r = system "$TCPDUMP 2>${rawstderrlog} -t -n -r $input $options >NEW/${outputbase}";
     if($r == -1) {
         # failed to start due to error.
         $status = $!;

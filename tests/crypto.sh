@@ -1,13 +1,15 @@
 #!/bin/sh
 
 srcdir=${1-..}
-echo crypto.sh using ${srcdir}
+echo crypto.sh using ${srcdir} from $(pwd)
 
 testdir=${srcdir}/tests
 
 exitcode=0
-passed=`cat .passed`
-failed=`cat .failed`
+passedfile=tests/.passed
+failedfile=tests/.failed
+passed=`cat ${passedfile}`
+failed=`cat ${failedfile}`
 
 # Only attempt OpenSSL-specific tests when compiled with the library.
 
@@ -16,28 +18,28 @@ then
 	if ${testdir}/TESTonce esp1 ${testdir}/02-sunrise-sunset-esp.pcap ${testdir}/esp1.out '-E "0x12345678@192.1.2.45 3des-cbc-hmac96:0x4043434545464649494a4a4c4c4f4f515152525454575758"'
 	then
 		passed=`expr $passed + 1`
-		echo $passed >.passed
+		echo $passed >${passedfile}
 	else
 		failed=`expr $failed + 1`
-		echo $failed >.failed
+		echo $failed >${failedfile}
 		exitcode=1
 	fi
 	if ${testdir}//TESTonce esp2 ${testdir}/08-sunrise-sunset-esp2.pcap ${testdir}/esp2.out '-E "0x12345678@192.1.2.45 3des-cbc-hmac96:0x43434545464649494a4a4c4c4f4f51515252545457575840,0xabcdabcd@192.0.1.1 3des-cbc-hmac96:0x434545464649494a4a4c4c4f4f5151525254545757584043"'
 	then
 		passed=`expr $passed + 1`
-		echo $passed >.passed
+		echo $passed >${passedfile}
 	else
 		failed=`expr $failed + 1`
-		echo $failed >.failed
+		echo $failed >${failedfile}
 		exitcode=1
 	fi
 	if ${testdir}/TESTonce esp3 ${testdir}/02-sunrise-sunset-esp.pcap ${testdir}/esp1.out '-E "3des-cbc-hmac96:0x4043434545464649494a4a4c4c4f4f515152525454575758"'
 	then
 		passed=`expr $passed + 1`
-		echo $passed >.passed
+		echo $passed >${passedfile}
 	else
 		failed=`expr $failed + 1`
-		echo $failed >.failed
+		echo $failed >${failedfile}
 		exitcode=1
 	fi
 	# Reading the secret(s) from a file does not work with Capsicum.
@@ -50,68 +52,68 @@ then
 		printf "$FORMAT" ikev2pI2
 		printf "$FORMAT" isakmp4
 	else
-		if ${testdir}/TESTonce esp4 ${testdir}/08-sunrise-sunset-esp2.pcap ${testdir}/esp2.out '-E "file esp-secrets.txt"'
+		if ${testdir}/TESTonce esp4 ${testdir}/08-sunrise-sunset-esp2.pcap ${testdir}/esp2.out '-E "file ${testdir}/esp-secrets.txt"'
 		then
 			passed=`expr $passed + 1`
-			echo $passed >.passed
+			echo $passed >${passedfile}
 		else
 			failed=`expr $failed + 1`
-			echo $failed >.failed
+			echo $failed >${failedfile}
 			exitcode=1
 		fi
-		if ${testdir}/TESTonce esp5 ${testdir}/08-sunrise-sunset-aes.pcap ${testdir}/esp5.out '-E "file esp-secrets.txt"'
+		if ${testdir}/TESTonce esp5 ${testdir}/08-sunrise-sunset-aes.pcap ${testdir}/esp5.out '-E "file ${testdir}/esp-secrets.txt"'
 		then
 			passed=`expr $passed + 1`
-			echo $passed >.passed
+			echo $passed >${passedfile}
 		else
 			failed=`expr $failed + 1`
-			echo $failed >.failed
+			echo $failed >${failedfile}
 			exitcode=1
 		fi
-		if ${testdir}/TESTonce espudp1 ${testdir}/espudp1.pcap ${testdir}/espudp1.out '-nnnn -E "file esp-secrets.txt"'
+		if ${testdir}/TESTonce espudp1 ${testdir}/espudp1.pcap ${testdir}/espudp1.out '-nnnn -E "file ${testdir}/esp-secrets.txt"'
 		then
 			passed=`expr $passed + 1`
-			echo $passed >.passed
+			echo $passed >${passedfile}
 		else
 			failed=`expr $failed + 1`
-			echo $failed >.failed
+			echo $failed >${failedfile}
 			exitcode=1
 		fi
-		if ${testdir}/TESTonce ikev2pI2 ${testdir}/ikev2pI2.pcap ${testdir}/ikev2pI2.out '-E "file ikev2pI2-secrets.txt" -v -v -v -v'
+		if ${testdir}/TESTonce ikev2pI2 ${testdir}/ikev2pI2.pcap ${testdir}/ikev2pI2.out '-E "file ${testdir}/ikev2pI2-secrets.txt" -v -v -v -v'
 		then
 			passed=`expr $passed + 1`
-			echo $passed >.passed
+			echo $passed >${passedfile}
 		else
 			failed=`expr $failed + 1`
-			echo $failed >.failed
+			echo $failed >${failedfile}
 			exitcode=1
 		fi
-		if ${testdir}/TESTonce isakmp4 ${testdir}/isakmp4500.pcap ${testdir}/isakmp4.out '-E "file esp-secrets.txt"'
+		if ${testdir}/TESTonce isakmp4 ${testdir}/isakmp4500.pcap ${testdir}/isakmp4.out '-E "file ${testdir}/esp-secrets.txt"'
 		then
 			passed=`expr $passed + 1`
-			echo $passed >.passed
+			echo $passed >${passedfile}
 		else
 			failed=`expr $failed + 1`
-			echo $failed >.failed
+			echo $failed >${failedfile}
 			exitcode=1
 		fi
 	fi
 	if ${testdir}/TESTonce bgp-as-path-oobr-ssl ${testdir}/bgp-as-path-oobr.pcap ${testdir}/bgp-as-path-oobr-ssl.out '-vvv -e'
 	then
 		passed=`expr $passed + 1`
-		echo $passed >.passed
+		echo $passed >${passedfile}
 	else
 		failed=`expr $failed + 1`
-		echo $failed >.failed
+		echo $failed >${failedfile}
 		exitcode=1
 	fi
 	if ${testdir}/TESTonce bgp-aigp-oobr-ssl ${testdir}/bgp-aigp-oobr.pcap ${testdir}/bgp-aigp-oobr-ssl.out '-vvv -e'
 	then
 		passed=`expr $passed + 1`
-		echo $passed >.passed
+		echo $passed >${passedfile}
 	else
 		failed=`expr $failed + 1`
-		echo $failed >.failed
+		echo $failed >${failedfile}
 		exitcode=1
 	fi
 	FORMAT='    %-35s: TEST SKIPPED (compiled w/OpenSSL)\n'
@@ -132,19 +134,19 @@ else
 	if ${testdir}/TESTonce bgp-as-path-oobr-nossl ${testdir}/bgp-as-path-oobr.pcap ${testdir}/bgp-as-path-oobr-nossl.out '-vvv -e'
 	then
 		passed=`expr $passed + 1`
-		echo $passed >.passed
+		echo $passed >${passedfile}
 	else
 		failed=`expr $failed + 1`
-		echo $failed >.failed
+		echo $failed >${failedfile}
 		exitcode=1
 	fi
 	if ${testdir}/TESTonce bgp-aigp-oobr-nossl ${testdir}/bgp-aigp-oobr.pcap ${testdir}/bgp-aigp-oobr-nossl.out '-vvv -e'
 	then
 		passed=`expr $passed + 1`
-		echo $passed >.passed
+		echo $passed >${passedfile}
 	else
 		failed=`expr $failed + 1`
-		echo $failed >.failed
+		echo $failed >${failedfile}
 		exitcode=1
 	fi
 fi
