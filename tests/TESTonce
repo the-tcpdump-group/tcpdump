@@ -53,9 +53,9 @@ else {
         }
 
         if($coredump || $status) {
-            printf OUTPUT "EXIT CODE %08x: dump:%d code: %d\n", $r, $coredump, $status;
+            printf OUTPUT "\nEXIT CODE %08x: dump:%d code: %d\n", $r, $coredump, $status;
         } else {
-            printf OUTPUT "EXIT CODE %08x\n", $r;
+            printf OUTPUT "\nEXIT CODE %08x\n", $r;
         }
         close(OUTPUT);
         $r = 0;
