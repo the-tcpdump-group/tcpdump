@@ -44,7 +44,8 @@ runSimpleTests()
     esac
     rm -f core
     [ "$only" != "" -a "$name" != "$only" ] && continue
-    export SRCDIR=${srcdir}
+    SRCDIR=${srcdir}
+    export SRCDIR
     # I hate shells with their stupid, useless subshells.
     passed=`cat ${passedfile}`
     failed=`cat ${failedfile}`
