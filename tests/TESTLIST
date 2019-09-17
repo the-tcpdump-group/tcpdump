@@ -602,14 +602,10 @@ babel_update_oobr	babel_update_oobr.pcap	babel_update_oobr.out	-c 52
 ospf6_print_lshdr-oobr	ospf6_print_lshdr-oobr.pcapng	ospf6_print_lshdr-oobr.out	-vv -c15
 rpl-dao-oobr		rpl-dao-oobr.pcapng		rpl-dao-oobr.out		-vv -c1
 hncp_prefix-oobr	hncp_prefix-oobr.pcapng		hncp_prefix-oobr.out		-vvv
-smb_print_trans-oobr1	smb_print_trans-oobr1.pcapng	smb_print_trans-oobr1.out	-vv -c4
 
 # bad packets from Ryan Ackroyd
 ieee802.11_meshhdr-oobr	ieee802.11_meshhdr-oobr.pcap	ieee802.11_meshhdr-oobr.out	-H -c1
 dccp_options-oobr	dccp_options-oobr.pcap		dccp_options-oobr.out		-vv -c8
-
-# bad packets from Philippe Antoine
-smb_print_trans-oobr2	smb_print_trans-oobr2.pcap	smb_print_trans-oobr2.out	-vv -c1
 
 # RTP tests
 # fuzzed pcap
@@ -647,7 +643,5 @@ kh-tcpdump-003          kh-tcpdump-003.pcap     kh-tcpdump-003.out
 
 # CVE-2018-10105 bad packets from Luis Rocha
 cve-2018-10105-segv-sflowprint           cve-2018-10105-segv-sflowprint.pcapng    cve-2018-10105-segv-sflowprint.out -v
-cve-2018-10105_smbprint-readofsize1      cve-2018-10105_smbprint-readofsize1.pcap cve-2018-10105_smbprint-readofsize1.out -vvv
-cve-2018-10105_smbutil_withoutasan       cve-2018-10105_smbutil_withoutasan.pcap  cve-2018-10105_smbutil_withoutasan.out -vvv
 
 
