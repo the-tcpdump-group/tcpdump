@@ -57,8 +57,8 @@ runSimpleTests()
       failed=`expr $failed + 1`
       echo $failed >${failedfile}
     fi
-    if [ -d COREFILES ]; then
-        if [ -f core ]; then mv core COREFILES/$name.core; fi
+    if [ -d tests/COREFILES ]; then
+        if [ -f core ]; then mv core tests/COREFILES/$name.core; fi
     fi)
     [ "$only" != "" -a "$name" = "$only" ] && break
   done
