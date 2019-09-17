@@ -23,19 +23,19 @@ $outputbase = basename($output);
 my $coredump = false;
 my $status = 0;
 my $linecount = 0;
-my $rawstderrlog = "NEW/${outputbase}.raw.stderr";
-my $stderrlog = "NEW/${outputbase}.stderr";
+my $rawstderrlog = "tests/NEW/${outputbase}.raw.stderr";
+my $stderrlog = "tests/NEW/${outputbase}.stderr";
 my $diffstat = 0;
 my $errdiffstat = 0;
 
 if ($^O eq 'MSWin32') {
-    $r = system "..\\windump -t -n -r $input $options 2>NUL | sed 's/\\r//' | tee NEW/$outputbase | diff $output - >DIFF/$outputbase.diff";
+    $r = system "..\\windump -t -n -r $input $options 2>NUL | sed 's/\\r//' | tee tests/NEW/$outputbase | diff $output - >tests/DIFF/$outputbase.diff";
     # need to do same as below for Cygwin.
 }
 else {
     # we used to do this as a nice pipeline, but the problem is that $r fails to
     # to be set properly if the tcpdump core dumps.
-    $r = system "$TCPDUMP 2>${rawstderrlog} -t -n -r $input $options >NEW/${outputbase}";
+    $r = system "$TCPDUMP 2>${rawstderrlog} -t -n -r $input $options >tests/NEW/${outputbase}";
     if($r == -1) {
         # failed to start due to error.
         $status = $!;
@@ -44,7 +44,7 @@ else {
         $coredump = false;
         $status = 0;
         # this means tcpdump failed.
-        open(OUTPUT, ">>"."NEW/$outputbase") || die "fail to open $outputbase\n";
+        open(OUTPUT, ">>"."tests/NEW/$outputbase") || die "fail to open $outputbase\n";
         if( $r & 128 ) {
             $coredump = $r & 127;
         }
@@ -61,7 +61,7 @@ else {
         $r = 0;
     }
     if($r == 0) {
-        $r = system "cat NEW/$outputbase | diff $output - >DIFF/$outputbase.diff";
+        $r = system "cat tests/NEW/$outputbase | diff $output - >tests/DIFF/$outputbase.diff";
         $diffstat = WEXITSTATUS($r);
     }
 
@@ -83,7 +83,7 @@ else {
     close(ERRORRAW);
 
     if ( -f "$output.stderr" ) {
-        $nr = system "cat $stderrlog | diff $output.stderr - >DIFF/$outputbase.stderr.diff";
+        $nr = system "cat $stderrlog | diff $output.stderr - >tests/DIFF/$outputbase.stderr.diff";
         if($r == 0) {
             $r = $nr;
         }
@@ -107,7 +107,7 @@ if($r == 0) {
         $stderrlog=sprintf("-- %d lines extra in stderr", $linecount);
     }
     printf "    %-35s: passed%s\n", $name, $stderrlog;
-    unlink "DIFF/$outputbase.diff";
+    unlink "tests/DIFF/$outputbase.diff";
     exit 0;
 }
 # must have failed!
@@ -115,8 +115,8 @@ printf "    %-35s: TEST FAILED(exit core=%d/diffstat=%d,%d/r=%d)", $name, $cored
 open FOUT, '>>failure-outputs.txt';
 printf FOUT "\nFailed test: $name\n\n";
 close FOUT;
-if(-f "DIFF/$outputbase.diff") {
-    system "cat DIFF/$outputbase.diff >> failure-outputs.txt";
+if(-f "tests/DIFF/$outputbase.diff") {
+    system "cat tests/DIFF/$outputbase.diff >> failure-outputs.txt";
 }
 
 if($r == -1) {

@@ -3,6 +3,9 @@
 srcdir=${1-..}
 echo crypto.sh using ${srcdir} from $(pwd)
 
+SRCDIR=$srcdir
+export SRCDIR
+
 testdir=${srcdir}/tests
 
 exitcode=0
