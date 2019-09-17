@@ -8,7 +8,7 @@ exitcode=0
 test_name=isis-seg-fault-1-v
 
 srcdir=${1-..}
-echo $0 using ${srcdir}
+: echo $0 using ${srcdir}
 
 testdir=${srcdir}/tests
 passedfile=tests/.passed

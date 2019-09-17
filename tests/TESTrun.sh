@@ -26,7 +26,7 @@ runComplexTests()
         ${srcdir}/tests/TEST*.sh) continue;;
         ${srcdir}/tests/\*.sh) continue;;
     esac
-    echo Running $i
+    : echo Running $i
     (sh $i ${srcdir})
   done
   passed=`cat ${passedfile}`

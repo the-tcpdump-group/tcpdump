@@ -2,7 +2,7 @@
 
 exitcode=0
 srcdir=${1-..}
-echo $0 using ${srcdir}
+: echo $0 using ${srcdir}
 
 testdir=${srcdir}/tests
 passedfile=tests/.passed

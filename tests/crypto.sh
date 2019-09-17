@@ -1,7 +1,7 @@
 #!/bin/sh
 
 srcdir=${1-..}
-echo crypto.sh using ${srcdir} from $(pwd)
+: echo crypto.sh using ${srcdir} from $(pwd)
 
 SRCDIR=$srcdir
 export SRCDIR
