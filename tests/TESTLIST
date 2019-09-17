@@ -647,7 +647,7 @@ kh-tcpdump-003          kh-tcpdump-003.pcap     kh-tcpdump-003.out
 
 # CVE-2018-10105 bad packets from Luis Rocha
 cve-2018-10105-segv-sflowprint           cve-2018-10105-segv-sflowprint.pcapng    cve-2018-10105-segv-sflowprint.out -v
-cve-2018-10105_smbprint-readofsize1      cve-2018-10105_smbprint-readofsize1.pcap cve-2018-10105_smbprint-readofsize1.out
-cve-2018-10105_smbutil_withoutasan       cve-2018-10105_smbutil_withoutasan.pcap  cve-2018-10105_smbutil_withoutasan.out
+cve-2018-10105_smbprint-readofsize1      cve-2018-10105_smbprint-readofsize1.pcap cve-2018-10105_smbprint-readofsize1.out -vvv
+cve-2018-10105_smbutil_withoutasan       cve-2018-10105_smbutil_withoutasan.pcap  cve-2018-10105_smbutil_withoutasan.out -vvv
 
 
