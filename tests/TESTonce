@@ -24,7 +24,7 @@ $output=$ARGV[2];
 $options=$ARGV[3];
 
 my $r;
-my $debug = 1;
+my $debug = 0; # change to suit.
 
 $outputbase = basename($output);
 my $coredump = false;
