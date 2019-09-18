@@ -1,6 +1,12 @@
 #!/usr/bin/env perl
 
-$TCPDUMP = "tcpdump" if (!($TCPDUMP = $ENV{TCPDUMP_BIN}));
+$TCPDUMP = "./tcpdump";
+if ($^O eq 'MSWin32') {
+    $TCPDUMP = "windump";
+}
+if($ENV{TCPDUMP_BIN}) {
+    $TCPDUMP = $ENV{TCPDUMP_BIN};
+}
 
 use File::Basename;
 use POSIX qw( WEXITSTATUS WIFEXITED);
@@ -18,6 +24,7 @@ $output=$ARGV[2];
 $options=$ARGV[3];
 
 my $r;
+my $debug = 1;
 
 $outputbase = basename($output);
 my $coredump = false;
@@ -27,15 +34,18 @@ my $rawstderrlog = "tests/NEW/${outputbase}.raw.stderr";
 my $stderrlog = "tests/NEW/${outputbase}.stderr";
 my $diffstat = 0;
 my $errdiffstat = 0;
+my $cmd;
 
 if ($^O eq 'MSWin32') {
-    $r = system "..\\windump -t -n -r $input $options 2>NUL | sed 's/\\r//' | tee tests/NEW/$outputbase | diff $output - >tests/DIFF/$outputbase.diff";
+    $r = system ".\\${TCPDUMP} -t -n -r $input $options 2>NUL | sed 's/\\r//' | tee tests/NEW/${outputbase} | diff $output - >tests/DIFF/${outputbase}.diff";
     # need to do same as below for Cygwin.
 }
 else {
     # we used to do this as a nice pipeline, but the problem is that $r fails to
     # to be set properly if the tcpdump core dumps.
-    $r = system "$TCPDUMP 2>${rawstderrlog} -t -n -r $input $options >tests/NEW/${outputbase}";
+    $cmd = "$TCPDUMP 2>${rawstderrlog} -t -n -r $input $options >tests/NEW/${outputbase}";
+    print "CMD: $cmd\n" if $debug;
+    $r = system $cmd;
     if($r == -1) {
         # failed to start due to error.
         $status = $!;
@@ -60,12 +70,17 @@ else {
         close(OUTPUT);
         $r = 0;  # clear the error so that the diff will occur.
     }
-    #print "RUNNING DIFF after ${r}\n";
+    print "RUNNING DIFF after ${r}\n" if $debug;
 
     # always run diff.
-    #print "RUNNING: cat tests/NEW/${outputbase} | diff $output - >tests/DIFF/${outputbase}.diff\n";
-    $r = system "cat tests/NEW/${outputbase} | diff $output - >tests/DIFF/${outputbase}.diff";
-    $diffstat = WEXITSTATUS($r);
+    $cmd = "cat tests/NEW/${outputbase} | diff $output - >tests/DIFF/${outputbase}.diff";
+    print "RUNNING: $cmd\n" if $debug;
+    $r = system $cmd;
+    if(WIFEXITED($r)) {
+        $diffstat = WEXITSTATUS($r);
+    }
+
+    #system("/bin/sh");
 
     # process the file, sanitize "reading from" line, and count lines
     $linecount = 0;
@@ -96,14 +111,14 @@ else {
 
     if($r == 0) {
         if($linecount == 0 && $status == 0) {
-            #print "UNLINK: ${stderrlog}\n";
-            unlink($stderrlog);
+            print "UNLINK: ${stderrlog}\n" if $debug;
+            unlink($stderrlog) unless $debug;
         } else {
             $errdiffstat = "+";
         }
     }
 
-    #print sprintf("END: %08x\n", $r);
+    print sprintf("END: %08x\n", $r) if $debug;
 }
 
 if($r == 0) {
@@ -114,7 +129,7 @@ if($r == 0) {
     if(!defined($ENV{"SKIPPASSED"})) {
         printf "    %-35s: passed%s\n", $name, $stderrlog;
     }
-    unlink "tests/DIFF/$outputbase.diff";
+    unlink "tests/DIFF/$outputbase.diff" unless $debug;
     exit 0;
 }
 # must have failed!
