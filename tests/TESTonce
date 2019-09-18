@@ -88,13 +88,15 @@ else {
             $r = $nr;
         }
         $errdiffstat = WEXITSTATUS($nr);
+    } else {
+        $errdiffstat = "-"
     }
 
     if($r == 0) {
         if($linecount == 0 && $status == 0) {
             unlink($stderrlog);
         } else {
-            $errdiffstat = 1;
+            $errdiffstat = "+";
         }
     }
 
@@ -106,7 +108,9 @@ if($r == 0) {
     if($linecount > 0) {
         $stderrlog=sprintf("-- %d lines extra in stderr", $linecount);
     }
-    printf "    %-35s: passed%s\n", $name, $stderrlog;
+    if(!defined($ENV{"SKIPPASSED"})) {
+        printf "    %-35s: passed%s\n", $name, $stderrlog;
+    }
     unlink "tests/DIFF/$outputbase.diff";
     exit 0;
 }

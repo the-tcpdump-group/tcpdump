@@ -89,7 +89,9 @@ echo '------------------------------------------------'
 printf "%4u tests failed\n" $failed
 printf "%4u tests passed\n" $passed
 echo
-cat ${failureoutput}
+if [ -z "$SKIPPASSED" ]; then
+    cat ${failureoutput}
+fi
 echo
 echo
 exit $failed
