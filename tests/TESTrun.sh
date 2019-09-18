@@ -49,8 +49,8 @@ runSimpleTests()
     # I hate shells with their stupid, useless subshells.
     passed=`cat ${passedfile}`
     failed=`cat ${failedfile}`
-    (cd tests  # run TESTonce in tests directory
-    if ${srcdir}/tests/TESTonce $name ${srcdir}/tests/$input ${srcdir}/tests/$output "$options"
+    (
+    if ${srcdir}/tests/TESTonce $name ${srcdir}/tests/$input ${srcdir}/tests/$output "$options" </dev/tty
     then
       passed=`expr $passed + 1`
       echo $passed >${passedfile}
