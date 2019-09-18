@@ -87,7 +87,7 @@ else {
     open(ERRORRAW, "<" . $rawstderrlog);
     open(ERROROUT, ">" . $stderrlog);
     while(<ERRORRAW>) {
-        next if /^$/;  # blank lines are boring
+        next if /^\s*$/;  # blank lines are boring
         if(/^(reading from file )(.*)(,.*)$/) {
             my $filename = basename($2);
             print ERROROUT "${1}${filename}${3}\n";
@@ -123,7 +123,7 @@ else {
 
 if($r == 0) {
     my $stderrlog="";
-    if($linecount > 0) {
+    if($linecount > 0 && $errdiffstat != "-") {
         $stderrlog=sprintf("-- %d lines extra in stderr", $linecount);
     }
     if(!defined($ENV{"SKIPPASSED"})) {
