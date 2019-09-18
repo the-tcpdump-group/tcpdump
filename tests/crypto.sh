@@ -55,7 +55,7 @@ then
 		printf "$FORMAT" ikev2pI2
 		printf "$FORMAT" isakmp4
 	else
-		if ${testdir}/TESTonce esp4 ${testdir}/08-sunrise-sunset-esp2.pcap ${testdir}/esp2.out '-E "file ${testdir}/esp-secrets.txt"'
+		if ${testdir}/TESTonce esp4 ${testdir}/08-sunrise-sunset-esp2.pcap ${testdir}/esp4.out '-E "file '${testdir}'/esp-secrets.txt"'
 		then
 			passed=`expr $passed + 1`
 			echo $passed >${passedfile}
@@ -64,7 +64,7 @@ then
 			echo $failed >${failedfile}
 			exitcode=1
 		fi
-		if ${testdir}/TESTonce esp5 ${testdir}/08-sunrise-sunset-aes.pcap ${testdir}/esp5.out '-E "file ${testdir}/esp-secrets.txt"'
+		if ${testdir}/TESTonce esp5 ${testdir}/08-sunrise-sunset-aes.pcap ${testdir}/esp5.out '-E "file '${testdir}'/esp-secrets.txt"'
 		then
 			passed=`expr $passed + 1`
 			echo $passed >${passedfile}
@@ -73,7 +73,7 @@ then
 			echo $failed >${failedfile}
 			exitcode=1
 		fi
-		if ${testdir}/TESTonce espudp1 ${testdir}/espudp1.pcap ${testdir}/espudp1.out '-nnnn -E "file ${testdir}/esp-secrets.txt"'
+		if ${testdir}/TESTonce espudp1 ${testdir}/espudp1.pcap ${testdir}/espudp1.out '-nnnn -E "file '${testdir}'/esp-secrets.txt"'
 		then
 			passed=`expr $passed + 1`
 			echo $passed >${passedfile}
@@ -82,7 +82,7 @@ then
 			echo $failed >${failedfile}
 			exitcode=1
 		fi
-		if ${testdir}/TESTonce ikev2pI2 ${testdir}/ikev2pI2.pcap ${testdir}/ikev2pI2.out '-E "file ${testdir}/ikev2pI2-secrets.txt" -v -v -v -v'
+		if ${testdir}/TESTonce ikev2pI2 ${testdir}/ikev2pI2.pcap ${testdir}/ikev2pI2.out '-E "file '${testdir}'/ikev2pI2-secrets.txt" -v -v -v -v'
 		then
 			passed=`expr $passed + 1`
 			echo $passed >${passedfile}
@@ -91,7 +91,7 @@ then
 			echo $failed >${failedfile}
 			exitcode=1
 		fi
-		if ${testdir}/TESTonce isakmp4 ${testdir}/isakmp4500.pcap ${testdir}/isakmp4.out '-E "file ${testdir}/esp-secrets.txt"'
+		if ${testdir}/TESTonce isakmp4 ${testdir}/isakmp4500.pcap ${testdir}/isakmp4.out '-E "file '${testdir}'/esp-secrets.txt"'
 		then
 			passed=`expr $passed + 1`
 			echo $passed >${passedfile}
