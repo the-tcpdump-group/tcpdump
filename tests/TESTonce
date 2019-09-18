@@ -43,8 +43,8 @@ else {
     if($r != 0) {
         $coredump = false;
         $status = 0;
-        # this means tcpdump failed.
-        open(OUTPUT, ">>"."tests/NEW/$outputbase") || die "fail to open $outputbase\n";
+        # this means tcpdump failed, which however, might be expected.
+        open(OUTPUT, ">>"."tests/NEW/${outputbase}") || die "fail to open ${outputbase}\n";
         if( $r & 128 ) {
             $coredump = $r & 127;
         }
@@ -58,12 +58,14 @@ else {
             printf OUTPUT "\nEXIT CODE %08x\n", $r;
         }
         close(OUTPUT);
-        $r = 0;
+        $r = 0;  # clear the error so that the diff will occur.
     }
-    if($r == 0) {
-        $r = system "cat tests/NEW/$outputbase | diff $output - >tests/DIFF/$outputbase.diff";
-        $diffstat = WEXITSTATUS($r);
-    }
+    #print "RUNNING DIFF after ${r}\n";
+
+    # always run diff.
+    #print "RUNNING: cat tests/NEW/${outputbase} | diff $output - >tests/DIFF/${outputbase}.diff\n";
+    $r = system "cat tests/NEW/${outputbase} | diff $output - >tests/DIFF/${outputbase}.diff";
+    $diffstat = WEXITSTATUS($r);
 
     # process the file, sanitize "reading from" line, and count lines
     $linecount = 0;
@@ -94,6 +96,7 @@ else {
 
     if($r == 0) {
         if($linecount == 0 && $status == 0) {
+            #print "UNLINK: ${stderrlog}\n";
             unlink($stderrlog);
         } else {
             $errdiffstat = "+";
@@ -116,11 +119,11 @@ if($r == 0) {
 }
 # must have failed!
 printf "    %-35s: TEST FAILED(exit core=%d/diffstat=%d,%d/r=%d)", $name, $coredump, $diffstat, $errdiffstat, $r;
-open FOUT, '>>failure-outputs.txt';
+open FOUT, '>>tests/failure-outputs.txt';
 printf FOUT "\nFailed test: $name\n\n";
 close FOUT;
 if(-f "tests/DIFF/$outputbase.diff") {
-    system "cat tests/DIFF/$outputbase.diff >> failure-outputs.txt";
+    system "cat tests/DIFF/$outputbase.diff >> tests/failure-outputs.txt";
 }
 
 if($r == -1) {
