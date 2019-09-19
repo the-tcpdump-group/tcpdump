@@ -253,14 +253,14 @@ pgm_print(netdissect_options *ndo,
 	}
 
 	case PGM_POLL: {
-	    const struct pgm_poll *poll;
+	    const struct pgm_poll *pgm_poll;
 	    uint32_t ivl, rnd, mask;
 
-	    poll = (const struct pgm_poll *)(pgm + 1);
-	    ND_TCHECK_SIZE(poll);
-	    bp = (const u_char *) (poll + 1);
+	    pgm_poll = (const struct pgm_poll *)(pgm + 1);
+	    ND_TCHECK_SIZE(pgm_poll);
+	    bp = (const u_char *) (pgm_poll + 1);
 
-	    switch (GET_BE_U_2(poll->pgmp_nla_afi)) {
+	    switch (GET_BE_U_2(pgm_poll->pgmp_nla_afi)) {
 	    case AFNUM_INET:
 		ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 		addrtostr(bp, nla_buf, sizeof(nla_buf));
@@ -289,8 +289,8 @@ pgm_print(netdissect_options *ndo,
 	    bp += sizeof(uint32_t);
 
 	    ND_PRINT("POLL seq %u round %u nla %s ivl %u rnd 0x%08x "
-			 "mask 0x%08x", GET_BE_U_4(poll->pgmp_seq),
-			 GET_BE_U_2(poll->pgmp_round), nla_buf, ivl, rnd,
+			 "mask 0x%08x", GET_BE_U_4(pgm_poll->pgmp_seq),
+			 GET_BE_U_2(pgm_poll->pgmp_round), nla_buf, ivl, rnd,
 			 mask);
 	    break;
 	}
