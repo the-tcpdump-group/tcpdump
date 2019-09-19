@@ -1,3 +1,6 @@
+# bad packets from Otto Airamo and Antti Levomäki
+nbns-valgrind		nbns-valgrind.pcap		nbns-valgrind.out	-vvv -e
+
 smb_print_trans-oobr1	smb_print_trans-oobr1.pcapng	smb_print_trans-oobr1.out	-vv -c4
 # bad packets from Philippe Antoine
 smb_print_trans-oobr2	smb_print_trans-oobr2.pcap	smb_print_trans-oobr2.out	-vv -c1

@@ -26,8 +26,8 @@ bgp_infloop-v		bgp-infinite-loop.pcap		bgp_infloop-v.out	-v
 bgp-aigp	bgp-aigp.pcap	bgp-aigp.out	-v
 bgp-large-community bgp-large-community.pcap bgp-large-community.out -v
 
-# EAP tests
-eapon1		eapon1.pcap		eapon1.out
+# EAP tests. eapon1.pcap has NBT packets mixed in, eapon2.pcap removes them.
+eapon2		eapon2.pcap		eapon2.out
 
 # ESP tests
 esp0		02-sunrise-sunset-esp.pcap	esp0.out
@@ -469,8 +469,6 @@ hoobr_nfs_xid_map_enter hoobr_nfs_xid_map_enter.pcap    hoobr_nfs_xid_map_enter.
 # bad packets from Wilfried Kirsch
 slip-bad-direction	slip-bad-direction.pcap		slip-bad-direction.out	-ve
 
-# bad packets from Otto Airamo and Antti Levomäki
-nbns-valgrind		nbns-valgrind.pcap		nbns-valgrind.out	-vvv -e
 arp-oobr		arp-oobr.pcap			arp-oobr.out	-vvv -e
 icmp-cksum-oobr-1	icmp-cksum-oobr-1.pcap		icmp-cksum-oobr-1.out	-vvv -e
 icmp-cksum-oobr-2	icmp-cksum-oobr-2.pcap		icmp-cksum-oobr-2.out	-vvv -e
