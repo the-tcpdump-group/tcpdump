@@ -17,6 +17,9 @@ do
         (
         for compiler in clang-7 gcc
         do
+            echo
+            echo
+            echo BUILDING $arch/$compiler
                 mkdir -p $arch/$compiler
                 set -x
                 set -e
