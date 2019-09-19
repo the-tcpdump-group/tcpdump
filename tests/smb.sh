@@ -13,7 +13,7 @@ failed=`cat ${failedfile}`
 
 # Only attempt OpenSSL-specific tests when compiled with the library.
 
-if grep '^#define ENABLE_SMB 1$' ${srcdir}/config.h >/dev/null
+if grep '^#define ENABLE_SMB 1$' config.h >/dev/null
 then
     cat ${srcdir}/tests/SMBLIST | while read name input output options
     do

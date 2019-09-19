@@ -16,7 +16,7 @@ failed=`cat ${failedfile}`
 
 # Only attempt OpenSSL-specific tests when compiled with the library.
 
-if grep '^#define HAVE_LIBCRYPTO 1$' ${srcdir}/config.h >/dev/null
+if grep '^#define HAVE_LIBCRYPTO 1$' config.h >/dev/null
 then
 	if ${testdir}/TESTonce esp1 ${testdir}/02-sunrise-sunset-esp.pcap ${testdir}/esp1.out '-E "0x12345678@192.1.2.45 3des-cbc-hmac96:0x4043434545464649494a4a4c4c4f4f515152525454575758"'
 	then
@@ -46,7 +46,7 @@ then
 		exitcode=1
 	fi
 	# Reading the secret(s) from a file does not work with Capsicum.
-	if grep '^#define HAVE_CAPSICUM 1$' ${srcdir}/config.h >/dev/null
+	if grep '^#define HAVE_CAPSICUM 1$' config.h >/dev/null
 	then
 		FORMAT='    %-35s: TEST SKIPPED (compiled w/Capsicum)\n'
 		printf "$FORMAT" esp4
