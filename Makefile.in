@@ -456,7 +456,7 @@ TAGS: $(TAGFILES)
 	etags $(TAGFILES)
 
 releasetar:
-	@cwd=`pwd` ; dir=`basename $$cwd` ; name=$(PROG)-`cat VERSION` ; \
+	@name=$(PROG)-`cat VERSION` ; \
 	   mkdir $$name; \
 	   tar cf - $(CSRC) $(HDR) $(LIBNETDISSECT_SRC) $(EXTRA_DIST) $(TEST_DIST) | (cd $$name; tar xf -); \
 	   tar -c -z -f $$name.tar.gz $$name; \
