@@ -381,7 +381,7 @@ EXTRA_DIST = \
 	win32/prj/WinDump.sln \
 	win32/prj/WinDump.vcproj
 
-TEST_DIST= `find tests \( -name 'DIFF' -prune \) -o \( -name NEW -prune \) -o -type f \! -name '.*' \! -name '*~' -print`
+TEST_DIST= `git ls-files tests | grep -v 'tests/\..*'`
 
 all: $(PROG)
 
