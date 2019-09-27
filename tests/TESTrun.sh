@@ -51,7 +51,7 @@ runSimpleTests()
     passed=`cat ${passedfile}`
     failed=`cat ${failedfile}`
     (
-    if ${srcdir}/tests/TESTonce $name ${srcdir}/tests/$input ${srcdir}/tests/$output "$options" </dev/tty
+    if ${srcdir}/tests/TESTonce $name ${srcdir}/tests/$input ${srcdir}/tests/$output "$options" 
     then
       passed=`expr $passed + 1`
       echo $passed >${passedfile}
