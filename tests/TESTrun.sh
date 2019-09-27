@@ -4,16 +4,17 @@ TZ=GMT0; export TZ
 srcdir=${SRCDIR-..}
 
 # make it absolute for later use.
-srcdir=$(cd $srcdir && pwd)
+pwd
+srcdir=`cd $srcdir && pwd`
 
 # this should be run from the compiled build directory,
 # with srcdir= set to wherever the source code is.
 # not from the tests directory.
 echo RUNNING from ${srcdir}
 
-passedfile=$(pwd)/tests/.passed
-failedfile=$(pwd)/tests/.failed
-failureoutput=$(pwd)/tests/failure-outputs.txt
+passedfile=`pwd`/tests/.passed
+failedfile=`pwd`/tests/.failed
+failureoutput=`pwd`/tests/failure-outputs.txt
 mkdir -p tests/NEW
 mkdir -p tests/DIFF
 cat /dev/null > ${failureoutput}

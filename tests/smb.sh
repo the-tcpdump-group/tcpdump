@@ -1,7 +1,7 @@
 #!/bin/sh
 
 srcdir=${1-..}
-: echo smb.sh using ${srcdir} from $(pwd)
+: echo smb.sh using ${srcdir} from `pwd`
 
 testdir=${srcdir}/tests
 
