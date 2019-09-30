@@ -594,7 +594,7 @@ pgm_print(netdissect_options *ndo,
 		    case AFNUM_INET6:
 			if (opt_len != PGM_OPT_REDIRECT_FIXED_LEN + sizeof(nd_ipv6)) {
 			    ND_PRINT("[Bad OPT_REDIRECT option, length %u != %u + address size]",
-			        PGM_OPT_REDIRECT_FIXED_LEN, opt_len);
+			        opt_len, PGM_OPT_REDIRECT_FIXED_LEN);
 			    return;
 			}
 			ND_TCHECK_LEN(bp, sizeof(nd_ipv6));
