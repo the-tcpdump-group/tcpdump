@@ -2022,6 +2022,29 @@ main(int argc, char **argv)
 		if (dlt == DLT_LINUX_SLL2)
 			fprintf(stderr, "Warning: interface names might be incorrect\n");
 #endif
+	} else if (dflag && !device) {
+		int dump_dlt = DLT_EN10MB;
+		/*
+		 * We're dumping the compiled code without an explicit
+		 * device specification.  (If a device is specified, we
+		 * definitely want to open it to use the DLT of that device.)
+		 * Either default to DLT_EN10MB with a warning, or use
+		 * the user-specified value if supplied.
+		 */
+		/*
+		 * If no snapshot length was specified, or a length of 0 was
+		 * specified, default to 256KB.
+		 */
+		if (ndo->ndo_snaplen == 0)
+			ndo->ndo_snaplen = MAXIMUM_SNAPLEN;
+		/*
+		 * If a DLT was specified with the -y flag, use that instead.
+		 */
+		if (yflag_dlt != -1)
+			dump_dlt = yflag_dlt;
+		else
+			fprintf(stderr, "Warning: assuming Ethernet\n");
+	        pd = pcap_open_dead(dump_dlt, ndo->ndo_snaplen);
 	} else {
 		/*
 		 * We're doing a live capture.
