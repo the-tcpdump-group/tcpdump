@@ -1408,7 +1408,7 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 	 * specified, default to 256KB.
 	 */
 	if (ndo->ndo_snaplen == 0)
-		ndo->ndo_snaplen = 262144;
+		ndo->ndo_snaplen = MAXIMUM_SNAPLEN;
 	pc = pcap_open_live(device, ndo->ndo_snaplen, !pflag, 1000, ebuf);
 	if (pc == NULL) {
 		/*
