@@ -267,6 +267,51 @@ ns_cprint(netdissect_options *ndo,
 	return (cp + i);
 }
 
+static void
+print_eopt_ecs(netdissect_options *ndo, const u_char *cp,
+               u_int datalen)
+{
+    u_int family;
+    u_char src_len, scope_len;
+    if (!ND_TTEST_2(cp))
+        nd_print_invalid(ndo);
+    family = GET_BE_U_2(cp);
+    cp += 2;
+    if (!ND_TTEST_1(cp))
+        nd_print_invalid(ndo);
+    src_len = GET_U_1(cp);
+    cp += 1;
+    if (!ND_TTEST_1(cp))
+        nd_print_invalid(ndo);
+    scope_len = GET_U_1(cp);
+    cp += 1;
+
+    switch(family) {
+        case 1:
+            if (datalen - 4 > INET_ADDRSTRLEN) {
+                nd_print_invalid(ndo);
+            } else {
+                char addr[INET_ADDRSTRLEN];
+                memset(addr, 0, sizeof(addr));
+                memcpy(addr, cp, datalen - 4);
+                ND_PRINT("%s/%d/%d", addrtostr(cp, addr, sizeof(addr)), src_len, scope_len);
+            }
+            break;
+        case 2:
+            if (datalen - 4 > INET6_ADDRSTRLEN) {
+                nd_print_invalid(ndo);
+            } else {
+                char addr[INET6_ADDRSTRLEN];
+                memset(addr, 0, sizeof(addr));
+                memcpy(addr, cp, datalen - 4);
+                ND_PRINT("%s/%d/%d", addrtostr6(cp, addr, sizeof(addr)), src_len, scope_len);
+            }
+            break;
+        default:
+            nd_print_invalid(ndo);
+    }
+}
+
 extern const struct tok edns_opt2str[];
 
 /* print an <EDNS-option> */
@@ -284,10 +329,15 @@ eopt_print(netdissect_options *ndo,
 	if (!ND_TTEST_2(cp))
 		return (NULL);
 	datalen = GET_BE_U_2(cp);
+    cp += 2;
 
-	if (datalen > 0)
+    if (datalen > 0)
 	    ND_PRINT(" ");
 	switch(opt) {
+
+    case E_ECS:
+        print_eopt_ecs(ndo, cp, datalen);
+        break;
 
     case E_COOKIE:
         if (datalen < 8 || (datalen > 8 && datalen < 16) || datalen > 40) {
@@ -295,20 +345,21 @@ eopt_print(netdissect_options *ndo,
         } else {
             for (i = 0; i < datalen; ++i) {
                 ND_PRINT("%02x", GET_U_1(cp + i));
-                if (i == 8) {
+                // split client and server cookie
+                if (i == 8)
                     ND_PRINT(" ");
-                }
             }
         }
         break;
     default:
-        for (i = 0; i < datalen; ++i) {
+        for (i = 0; i < datalen; ++i)
             ND_PRINT("%02x", GET_U_1(cp + i));
-        }
+
 	}
-	cp += 2;
 	return (cp + datalen);
 }
+
+
 
 extern const struct tok ns_type2str[];
 
