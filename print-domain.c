@@ -274,18 +274,40 @@ static const u_char *
 eopt_print(netdissect_options *ndo,
           const u_char *cp)
 {
-	u_int i;
+	u_int opt, datalen, i;
 
 	if (!ND_TTEST_2(cp))
 		return (NULL);
-	i = GET_BE_U_2(cp);
+    opt = GET_BE_U_2(cp);
 	cp += 2;
-	ND_PRINT(" %s", tok2str(edns_opt2str, "Opt%u", i));
+	ND_PRINT("%s", tok2str(edns_opt2str, "Opt%u", opt));
 	if (!ND_TTEST_2(cp))
 		return (NULL);
-	i = GET_BE_U_2(cp);
+	datalen = GET_BE_U_2(cp);
+
+	if (datalen > 0)
+	    ND_PRINT(" ");
+	switch(opt) {
+
+    case E_COOKIE:
+        if (datalen < 8 || (datalen > 8 && datalen < 16) || datalen > 40) {
+            nd_print_invalid(ndo);
+        } else {
+            for (i = 0; i < datalen; ++i) {
+                ND_PRINT("%02x", GET_U_1(cp + i));
+                if (i == 8) {
+                    ND_PRINT(" ");
+                }
+            }
+        }
+        break;
+    default:
+        for (i = 0; i < datalen; ++i) {
+            ND_PRINT("%02x", GET_U_1(cp + i));
+        }
+	}
 	cp += 2;
-	return (cp + i);
+	return (cp + datalen);
 }
 
 extern const struct tok ns_type2str[];
@@ -600,14 +622,16 @@ ns_rprint(netdissect_options *ndo,
 		break;
 
 	case T_OPT:
-		ND_PRINT(" UDPsize=%u", class);
+		ND_PRINT(" [UDPsize %u", class);
 		if (opt_flags & 0x8000)
-			ND_PRINT(" DO");
+			ND_PRINT(",DO");
 		while (cp < rp) {
-			cp = eopt_print(ndo, cp);
+            ND_PRINT(",");
+            cp = eopt_print(ndo, cp);
 			if (cp == NULL)
 				return(NULL);
 		}
+		ND_PRINT("] ");
 		break;
 
 	case T_UNSPECA:		/* One long string */
