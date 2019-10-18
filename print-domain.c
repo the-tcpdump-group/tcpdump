@@ -267,26 +267,173 @@ ns_cprint(netdissect_options *ndo,
 	return (cp + i);
 }
 
+static void
+print_eopt_ecs(netdissect_options *ndo, const u_char *cp,
+               u_int data_len)
+{
+    u_int family, addr_bits, src_len, scope_len;
+
+    u_char padded[32];
+    char addr[INET6_ADDRSTRLEN];
+
+    /* ecs option must at least contain family, src len, and scope len */
+    if (data_len < 4) {
+        nd_print_invalid(ndo);
+        return;
+    }
+
+    family = GET_BE_U_2(cp);
+    cp += 2;
+    src_len = GET_U_1(cp);
+    cp += 1;
+    scope_len = GET_U_1(cp);
+    cp += 1;
+
+    if (family == 1)
+        addr_bits = 32;
+    else if (family == 2)
+        addr_bits = 128;
+    else {
+        nd_print_invalid(ndo);
+        return;
+    }
+
+    if (data_len - 4 > (addr_bits / 8)) {
+        nd_print_invalid(ndo);
+        return;
+    }
+    /* checks for invalid ecs scope or source length */
+    if (src_len > addr_bits || scope_len > addr_bits || ((src_len + 7) / 8) != (data_len - 4)) {
+        nd_print_invalid(ndo);
+        return;
+    }
+
+    /* pad the truncated address from ecs with zeros */
+    memset(padded, 0, sizeof(padded));
+    memcpy(padded, cp, data_len - 4);
+
+
+    if (family == 1)
+        ND_PRINT("%s/%d/%d", addrtostr(padded, addr, INET_ADDRSTRLEN),
+                src_len, scope_len);
+    else
+        ND_PRINT("%s/%d/%d", addrtostr6(padded, addr, INET6_ADDRSTRLEN),
+                src_len, scope_len);
+
+}
+
 extern const struct tok edns_opt2str[];
+extern const struct tok dau_alg2str[];
+extern const struct tok dhu_alg2str[];
+extern const struct tok n3u_alg2str[];
+
 
 /* print an <EDNS-option> */
 static const u_char *
 eopt_print(netdissect_options *ndo,
           const u_char *cp)
 {
-	u_int i;
+    u_int opt, data_len, i;
 
-	if (!ND_TTEST_2(cp))
-		return (NULL);
-	i = GET_BE_U_2(cp);
-	cp += 2;
-	ND_PRINT(" %s", tok2str(edns_opt2str, "Opt%u", i));
-	if (!ND_TTEST_2(cp))
-		return (NULL);
-	i = GET_BE_U_2(cp);
-	cp += 2;
-	return (cp + i);
+    if (!ND_TTEST_2(cp))
+        return (NULL);
+    opt = GET_BE_U_2(cp);
+    cp += 2;
+    ND_PRINT("%s", tok2str(edns_opt2str, "Opt%u", opt));
+    if (!ND_TTEST_2(cp))
+        return (NULL);
+    data_len = GET_BE_U_2(cp);
+    cp += 2;
+
+    ND_TCHECK_LEN(cp, data_len);
+
+    if (data_len > 0) {
+        ND_PRINT(" ");
+        switch (opt) {
+
+        case E_ECS:
+            print_eopt_ecs(ndo, cp, data_len);
+            break;
+        case E_COOKIE:
+            if (data_len < 8 || (data_len > 8 && data_len < 16) || data_len > 40)
+                nd_print_invalid(ndo);
+            else {
+                for (i = 0; i < data_len; ++i) {
+                    /* split client and server cookie */
+                    if (i == 8)
+                        ND_PRINT(" ");
+                    ND_PRINT("%02x", GET_U_1(cp + i));
+                }
+            }
+            break;
+        case E_KEEPALIVE:
+            if (data_len != 2)
+                nd_print_invalid(ndo);
+            else
+                /* keepalive is in increments of 100ms. Convert to seconds */
+                ND_PRINT("%0.1f sec", (GET_BE_U_2(cp) / 10.0));
+            break;
+        case E_EXPIRE:
+            if (data_len != 4)
+                nd_print_invalid(ndo);
+            else
+                ND_PRINT("%u sec", GET_BE_U_4(cp));
+            break;
+        case E_PADDING:
+            /* ignore contents and just print length */
+            ND_PRINT("(%u)", data_len);
+            break;
+        case E_KEYTAG:
+            if (data_len % 2 != 0)
+                nd_print_invalid(ndo);
+            else
+                for (i = 0; i < data_len; i += 2) {
+                    if (i > 0)
+                        ND_PRINT(" ");
+                    ND_PRINT("%u", GET_BE_U_2(cp + i));
+                }
+            break;
+        case E_DAU:
+            for (i = 0; i < data_len; ++i) {
+                if (i > 0)
+                    ND_PRINT(" ");
+                ND_PRINT("%s", tok2str(dau_alg2str, "Alg_%u", GET_U_1(cp + i)));
+            }
+            break;
+        case E_DHU:
+            for (i = 0; i < data_len; ++i) {
+                if (i > 0)
+                    ND_PRINT(" ");
+                ND_PRINT("%s", tok2str(dhu_alg2str, "Alg_%u", GET_U_1(cp + i)));
+            }
+            break;
+        case E_N3U:
+            for (i = 0; i < data_len; ++i) {
+                if (i > 0)
+                    ND_PRINT(" ");
+                ND_PRINT("%s", tok2str(n3u_alg2str, "Alg_%u", GET_U_1(cp + i)));
+            }
+            break;
+        case E_CHAIN:
+            fqdn_print(ndo, cp, cp + data_len);
+            break;
+        case E_NSID:
+            /* intentional fall-through. NSID is an undefined byte string */
+        default:
+            for (i = 0; i < data_len; ++i)
+                ND_PRINT("%02x", GET_U_1(cp + i));
+            break;
+        }
+    }
+    return (cp + data_len);
+
+  trunc:
+    nd_print_invalid(ndo);
+    return (NULL);
+
 }
+
+
 
 extern const struct tok ns_type2str[];
 
@@ -367,21 +514,57 @@ const struct tok ns_class2str[] = {
 	{ 0,		NULL }
 };
 
-extern const struct tok edns_opt2str[];
-
 const struct tok edns_opt2str[] = {
-	{ E_NSID,		"NSID" },
-	{ E_DAU,	"DAU" },
-	{ E_DHU,	"DHU" },
-	{ E_N3U,	"N3U" },
-	{ E_ECS,	"ECS" },
-	{ E_EXPIRE,	"EXPIRE" },
-	{ E_COOKIE,	"COOKIE" },
-	{ E_KEEPALIVE,	"KEEPALIVE" },
-	{ E_PADDING,	"PADDING" },
-	{ E_CHAIN,	"CHAIN" },
-	{ E_KEYTAG,	"KEYTAG" },
-	{ 0,		NULL }
+    { E_LLQ,        "LLQ" },
+    { E_UL,         "UL" },
+    { E_NSID,       "NSID" },
+    { E_DAU,        "DAU" },
+    { E_DHU,        "DHU" },
+    { E_N3U,        "N3U" },
+    { E_ECS,        "ECS" },
+    { E_EXPIRE,     "EXPIRE" },
+    { E_COOKIE,     "COOKIE" },
+    { E_KEEPALIVE,  "KEEPALIVE" },
+    { E_PADDING,    "PADDING" },
+    { E_CHAIN,      "CHAIN" },
+    { E_KEYTAG,     "KEY-TAG" },
+    { E_CLIENTTAG,  "CLIENT-TAG" },
+    { E_SERVERTAG,  "SERVER-TAG" },
+    { 0,            NULL }
+};
+
+const struct tok dau_alg2str[] = {
+    { A_DELETE,             "DELETE" },
+    { A_RSAMD5,             "RSAMD5" },
+    { A_DH,                 "DH" },
+    { A_DSA,                "DS" },
+    { A_RSASHA1,            "RSASHA1" },
+    { A_DSA_NSEC3_SHA1,     "DSA-NSEC3-SHA1" },
+    { A_RSASHA1_NSEC3_SHA1, "RSASHA1-NSEC3-SHA1" },
+    { A_RSASHA256,          "RSASHA256" },
+    { A_RSASHA512,          "RSASHA512" },
+    { A_ECC_GOST,           "ECC-GOST" },
+    { A_ECDSAP256SHA256,    "ECDSAP256SHA256" },
+    { A_ECDSAP384SHA384,    "ECDSAP384SHA384" },
+    { A_ED25519,            "ED25519" },
+    { A_ED448,              "ED448" },
+    { A_INDIRECT,           "INDIRECT" },
+    { A_PRIVATEDNS,         "PRIVATEDNS" },
+    { A_PRIVATEOID,         "PRIVATEOID" },
+    { 0,                NULL }
+};
+
+const struct tok dhu_alg2str[] = {
+    { DS_SHA1,  "SHA-1" },
+    { DS_SHA256,"SHA-256" },
+    { DS_GOST,  "GOST_R_34.11-94" },
+    { DS_SHA384,"SHA-384" },
+    { 0,    NULL }
+};
+
+const struct tok n3u_alg2str[] = {
+    { NSEC_SHA1,"SHA-1" },
+    { 0,    NULL }
 };
 
 /* print a query */
@@ -603,11 +786,17 @@ ns_rprint(netdissect_options *ndo,
 		ND_PRINT(" UDPsize=%u", class);
 		if (opt_flags & 0x8000)
 			ND_PRINT(" DO");
-		while (cp < rp) {
-			cp = eopt_print(ndo, cp);
-			if (cp == NULL)
-				return(NULL);
-		}
+        if (cp < rp) {
+            ND_PRINT(" [");
+            while (cp < rp) {
+                cp = eopt_print(ndo, cp);
+                if (cp == NULL)
+                    return(NULL);
+                if (cp < rp)
+                    ND_PRINT(",");
+            }
+            ND_PRINT("]");
+        }
 		break;
 
 	case T_UNSPECA:		/* One long string */

@@ -201,18 +201,60 @@
 /*
  * Values for EDNS option types
  */
+#define E_LLQ           1       /* long lived queries protocol */
+#define E_UL            2       /* dynamic dns update leases */
+#define E_NSID          3       /* name server identifier */
+#define E_DAU           5       /* signal DNSSEC algorithm understood */
+#define E_DHU           6       /* signal DS hash understood */
+#define E_N3U           7       /* signal NSEC3 hash understood */
+#define E_ECS           8       /* EDNS client subnet */
+#define E_EXPIRE        9       /* zone expiration */
+#define E_COOKIE        10      /* DNS cookies */
+#define E_KEEPALIVE     11      /* TCP keepalive */
+#define E_PADDING       12      /* pad DNS messages */
+#define E_CHAIN         13      /* chain DNS queries */
+#define E_KEYTAG        14      /* EDNS key tag */
+#define E_CLIENTTAG     16      /* EDNS client tag */
+#define E_SERVERTAG     17      /* EDNS server tag */
 
-#define E_NSID		3		/* name server identifier */
-#define E_DAU		5		/* signal DNSSEC algorithm understood */
-#define E_DHU		6		/* signal DS hash understood */
-#define E_N3U		7		/* signal NSEC3 hash understood */
-#define E_ECS		8		/* EDNS client subnet */
-#define E_EXPIRE		9		/* zone expiration */
-#define E_COOKIE		10		/* DNS cookies */
-#define E_KEEPALIVE		11		/* TCP keepalive */
-#define E_PADDING		12		/* pad DNS messages */
-#define E_CHAIN		13		/* chain DNS queries */
-#define E_KEYTAG		14		/* EDNS key tag */
+/*
+ * Values for DNSSEC Algorithms
+ * https://www.iana.org/assignments/dns-sec-alg-numbers/dns-sec-alg-numbers.xhtml
+ */
+
+#define A_DELETE                0
+#define A_RSAMD5                1
+#define A_DH                    2
+#define A_DSA                   3
+#define A_RSASHA1               5
+#define A_DSA_NSEC3_SHA1        6
+#define A_RSASHA1_NSEC3_SHA1    7
+#define A_RSASHA256             8
+#define A_RSASHA512             10
+#define A_ECC_GOST              12
+#define A_ECDSAP256SHA256       13
+#define A_ECDSAP384SHA384       14
+#define A_ED25519               15
+#define A_ED448                 16
+#define A_INDIRECT              252
+#define A_PRIVATEDNS            253
+#define A_PRIVATEOID            254
+
+/*
+ * Values for NSEC3 algorithms
+ * https://www.iana.org/assignments/dnssec-nsec3-parameters/dnssec-nsec3-parameters.xhtml
+ */
+#define NSEC_SHA1   1
+
+/*
+ * Values for delegation signer algorithms
+ * https://www.iana.org/assignments/ds-rr-types/ds-rr-types.xhtml
+ */
+#define DS_SHA1     1
+#define DS_SHA256   2
+#define DS_GOST     3
+#define DS_SHA384   4
+
 
 /*
  * Status return codes for T_UNSPEC conversion routines
