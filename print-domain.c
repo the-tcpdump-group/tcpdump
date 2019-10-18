@@ -288,9 +288,9 @@ print_eopt_ecs(netdissect_options *ndo, const u_char *cp,
 
     switch(family) {
         case 1:
-            if (datalen - 4 > INET_ADDRSTRLEN) {
+            if (datalen - 4 > INET_ADDRSTRLEN)
                 nd_print_invalid(ndo);
-            } else {
+            else {
                 char addr[INET_ADDRSTRLEN];
                 memset(addr, 0, sizeof(addr));
                 memcpy(addr, cp, datalen - 4);
@@ -298,9 +298,9 @@ print_eopt_ecs(netdissect_options *ndo, const u_char *cp,
             }
             break;
         case 2:
-            if (datalen - 4 > INET6_ADDRSTRLEN) {
+            if (datalen - 4 > INET6_ADDRSTRLEN)
                 nd_print_invalid(ndo);
-            } else {
+            else {
                 char addr[INET6_ADDRSTRLEN];
                 memset(addr, 0, sizeof(addr));
                 memcpy(addr, cp, datalen - 4);
