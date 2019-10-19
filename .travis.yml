@@ -119,7 +119,7 @@ script:
   - ./tcpdump -D
   - sudo ./tcpdump -J
   - sudo ./tcpdump -L
-  - sudo ./tcpdump -#n -c 10
+  - if [ "$TRAVIS_OS_NAME" = linux ]; then sudo ./tcpdump -#n -c 10; fi
   - if [ "$CMAKE" = no ]; then make releasetar; fi
   - echo '$ cat Makefile [...]'; echo travis_fold:start:script.cat_makefile
   - if [ "$CMAKE" = no ]; then cat Makefile | sed -n '1,/DO NOT DELETE THIS LINE -- mkdep uses it/p'; fi
