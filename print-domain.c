@@ -371,9 +371,7 @@ eopt_print(netdissect_options *ndo,
                     ND_PRINT("%s ", tok2str(dnssec_alg2str, "Alg%u", GET_U_1(cp + i)));
                 break;
             case E_CHAIN:
-                /* Chain gives a single non-compressed FQDN so just read directly */
-                for (i = 1; i < datalen - 1; ++i)
-                    ND_PRINT("%c", GET_U_1(cp + i));
+                fqdn_print(ndo, cp, cp + datalen);
                 break;
             default:
                 for (i = 0; i < datalen; ++i)
