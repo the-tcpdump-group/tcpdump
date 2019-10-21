@@ -271,7 +271,7 @@ static void
 print_eopt_ecs(netdissect_options *ndo, const u_char *cp,
                u_int datalen)
 {
-    u_int family;
+    u_int family, addr_len;
     u_char src_len, scope_len;
     if (!ND_TTEST_2(cp))
         nd_print_invalid(ndo);
@@ -286,33 +286,36 @@ print_eopt_ecs(netdissect_options *ndo, const u_char *cp,
     scope_len = GET_U_1(cp);
     cp += 1;
 
-    switch(family) {
-        case 1:
-            if (datalen - 4 > INET_ADDRSTRLEN)
-                nd_print_invalid(ndo);
-            else {
-                char addr[INET_ADDRSTRLEN];
-                memset(addr, 0, sizeof(addr));
-                memcpy(addr, cp, datalen - 4);
-                ND_PRINT("%s/%d/%d", addrtostr(cp, addr, sizeof(addr)), src_len, scope_len);
-            }
-            break;
-        case 2:
-            if (datalen - 4 > INET6_ADDRSTRLEN)
-                nd_print_invalid(ndo);
-            else {
-                char addr[INET6_ADDRSTRLEN];
-                memset(addr, 0, sizeof(addr));
-                memcpy(addr, cp, datalen - 4);
-                ND_PRINT("%s/%d/%d", addrtostr6(cp, addr, sizeof(addr)), src_len, scope_len);
-            }
-            break;
-        default:
-            nd_print_invalid(ndo);
+    if (family == 1) 
+        addr_len = INET_ADDRSTRLEN;
+    else if (family == 2)
+        addr_len = INET6_ADDRSTRLEN;
+    else {
+        nd_print_invalid(ndo);
+        return;
     }
+
+    if (datalen - 4 > addr_len) {
+        nd_print_invalid(ndo);
+        return;
+    }
+
+    /* pad the truncated address from ecs with zeros */
+    char addr[addr_len];
+    memset(addr, 0, sizeof(addr));
+    memcpy(addr, cp, datalen - 4);
+
+    if (family == 1)
+        ND_PRINT("%s/%d/%d", addrtostr(cp, addr, sizeof(addr)),
+                src_len, scope_len);
+    else
+        ND_PRINT("%s/%d/%d", addrtostr6(cp, addr, sizeof(addr)),
+                src_len, scope_len);
+
 }
 
 extern const struct tok edns_opt2str[];
+extern const struct tok dnssec_alg2str[];
 
 /* print an <EDNS-option> */
 static const u_char *
@@ -331,32 +334,55 @@ eopt_print(netdissect_options *ndo,
 	datalen = GET_BE_U_2(cp);
     cp += 2;
 
-    if (datalen > 0)
-	    ND_PRINT(" ");
-	switch(opt) {
+    ND_TCHECK_LEN(cp, datalen);
 
-    case E_ECS:
-        print_eopt_ecs(ndo, cp, datalen);
-        break;
+    if (datalen > 0) {
+        ND_PRINT(" ");
+        switch (opt) {
 
-    case E_COOKIE:
-        if (datalen < 8 || (datalen > 8 && datalen < 16) || datalen > 40) {
-            nd_print_invalid(ndo);
-        } else {
-            for (i = 0; i < datalen; ++i) {
-                ND_PRINT("%02x", GET_U_1(cp + i));
-                // split client and server cookie
-                if (i == 8)
-                    ND_PRINT(" ");
-            }
+            case E_ECS:
+                print_eopt_ecs(ndo, cp, datalen);
+                break;
+
+            case E_COOKIE:
+                if (datalen < 8 || (datalen > 8 && datalen < 16) || datalen > 40) {
+                    nd_print_invalid(ndo);
+                } else {
+                    for (i = 0; i < datalen; ++i) {
+                        ND_PRINT("%02x", GET_U_1(cp + i));
+                        // split client and server cookie
+                        if (i == 8)
+                            ND_PRINT(" ");
+                    }
+                }
+                break;
+            case E_KEEPALIVE:
+                if (datalen != 2)
+                    nd_print_invalid(ndo);
+                else
+                    /* keepalive is in increments of 100ms. Convert to seconds */
+                    ND_PRINT("%0.1f sec", (GET_BE_U_2(cp) / 10.0));
+                break;
+            case E_DAU:
+            case E_DHU:
+            case E_N3U:
+                /* intentional fall-through as they share algorithms */
+                for (i = 0; i < datalen; ++i)
+                    ND_PRINT("%s ", tok2str(dnssec_alg2str, "Alg%u", GET_U_1(cp + i)));
+                break;
+            default:
+                for (i = 0; i < datalen; ++i)
+                    ND_PRINT("%02x", GET_U_1(cp + i));
+                break;
+
         }
-        break;
-    default:
-        for (i = 0; i < datalen; ++i)
-            ND_PRINT("%02x", GET_U_1(cp + i));
-
-	}
+    }
 	return (cp + datalen);
+
+  trunc:
+    nd_print_trunc(ndo);
+    return (cp + datalen);
+
 }
 
 
@@ -440,8 +466,6 @@ const struct tok ns_class2str[] = {
 	{ 0,		NULL }
 };
 
-extern const struct tok edns_opt2str[];
-
 const struct tok edns_opt2str[] = {
 	{ E_NSID,		"NSID" },
 	{ E_DAU,	"DAU" },
@@ -455,6 +479,27 @@ const struct tok edns_opt2str[] = {
 	{ E_CHAIN,	"CHAIN" },
 	{ E_KEYTAG,	"KEYTAG" },
 	{ 0,		NULL }
+};
+
+const struct tok dnssec_alg2str[] = {
+    { A_DELETE, "DELETE" },
+    { A_RSAMD5, "RSAMD5" },
+    { A_DH, "DH" },
+    { A_DSA, "DS" },
+    { A_RSASHA1, "RSASHA1" },
+    { A_DSA_NSEC3_SHA1, "DSA-NSEC3-SHA1" },
+    { A_RSASHA1_NSEC3_SHA1, "RSASHA1-NSEC3-SHA1" },
+    { A_RSASHA256, "RSASHA256" },
+    { A_RSASHA512, "RSASHA512" },
+    { A_ECC_GOST, "ECC-GOST" },
+    { A_ECDSAP256SHA256, "ECDSAP256SHA256" },
+    { A_ECDSAP384SHA384, "ECDSAP384SHA384" },
+    { A_ED25519, "ED25519" },
+    { A_ED448, "ED448" },
+    { A_INDIRECT, "INDIRECT" },
+    { A_PRIVATEDNS, "PRIVATEDNS" },
+    { A_PRIVATEOID, "PRIVATEOID" },
+    { 0, NULL }
 };
 
 /* print a query */
