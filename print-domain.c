@@ -350,7 +350,7 @@ eopt_print(netdissect_options *ndo,
                 } else {
                     for (i = 0; i < datalen; ++i) {
                         ND_PRINT("%02x", GET_U_1(cp + i));
-                        // split client and server cookie
+                        /* split client and server cookie */
                         if (i == 8)
                             ND_PRINT(" ");
                     }
@@ -369,6 +369,11 @@ eopt_print(netdissect_options *ndo,
                 /* intentional fall-through as they share algorithms */
                 for (i = 0; i < datalen; ++i)
                     ND_PRINT("%s ", tok2str(dnssec_alg2str, "Alg%u", GET_U_1(cp + i)));
+                break;
+            case E_CHAIN:
+                /* Chain gives a single non-compressed FQDN so just read directly */
+                for (i = 1; i < datalen - 1; ++i)
+                    ND_PRINT("%c", GET_U_1(cp + i));
                 break;
             default:
                 for (i = 0; i < datalen; ++i)
