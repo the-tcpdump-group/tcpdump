@@ -731,6 +731,11 @@ bfd-multihop-v	bfd-multihop.pcap	bfd-multihop-v.out	-v
 bfd-lag		bfd-lag.pcap		bfd-lag.out
 bfd-lag-v	bfd-lag.pcap		bfd-lag-v.out		-v
 
+# EDNS Options
+edns-opts	edns-opts.pcap		edns-opts.out
+edns-opts-v	edns-opts.pcap		edns-opts-v.out		-v
+edns-opts-vv	edns-opts.pcap		edns-opts-vv.out		-vv
+
 # Arista Vendor Specific Tests
 arista-ether             arista_ether.pcap        arista_ether.out
 arista-ether-e           arista_ether.pcap        arista_ether-e.out       -e
