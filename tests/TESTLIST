@@ -608,6 +608,7 @@ isakmp-ikev1_n_print-oobr isakmp-ikev1_n_print-oobr.pcap isakmp-ikev1_n_print-oo
 ldp-ldp_tlv_print-oobr ldp-ldp_tlv_print-oobr.pcap ldp-ldp_tlv_print-oobr.out -v
 icmp-icmp_print-oobr-1 icmp-icmp_print-oobr-1.pcap icmp-icmp_print-oobr-1.out -v
 icmp-icmp_print-oobr-2 icmp-icmp_print-oobr-2.pcap icmp-icmp_print-oobr-2.out -v
+rsvp-rsvp_obj_print-oobr rsvp-rsvp_obj_print-oobr.pcap rsvp-rsvp_obj_print-oobr.out -v
 # The .pcap file is truncated after the 1st packet.
 hncp_dhcpv6data-oobr	hncp_dhcpv6data-oobr.pcap	hncp_dhcpv6data-oobr.out -v -c1
 hncp_dhcpv4data-oobr	hncp_dhcpv4data-oobr.pcap	hncp_dhcpv4data-oobr.out -v -c1
