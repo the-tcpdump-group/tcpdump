@@ -343,68 +343,66 @@ eopt_print(netdissect_options *ndo,
         ND_PRINT(" ");
         switch (opt) {
 
-            case E_ECS:
-                print_eopt_ecs(ndo, cp, datalen);
-                break;
-
-            case E_COOKIE:
-                if (datalen < 8 || (datalen > 8 && datalen < 16) || datalen > 40) {
-                    nd_print_invalid(ndo);
-                } else {
-                    for (i = 0; i < datalen; ++i) {
-                        ND_PRINT("%02x", GET_U_1(cp + i));
-                        /* split client and server cookie */
-                        if (i == 8)
-                            ND_PRINT(" ");
-                    }
-                }
-                break;
-            case E_KEEPALIVE:
-                if (datalen != 2)
-                    nd_print_invalid(ndo);
-                else
-                    /* keepalive is in increments of 100ms. Convert to seconds */
-                    ND_PRINT("%0.1f sec", (GET_BE_U_2(cp) / 10.0));
-                break;
-            case E_EXPIRE:
-                if (datalen != 4)
-                    nd_print_invalid(ndo);
-                else
-                    ND_PRINT("%u sec", GET_BE_U_4(cp));
-                break;
-            case E_PADDING:
-                /* ignore contents and just print length */
-                ND_PRINT("(%u)", datalen);
-                break;
-            case E_KEYTAG:
-                if (datalen % 2 != 0)
-                    nd_print_invalid(ndo);
-                else
-                    for (i = 0; i < datalen; i += 2)
-                        ND_PRINT("%u ", GET_BE_U_2(cp + i));
-                break;
-            case E_DAU:
-                for (i = 0; i < datalen; ++i)
-                    ND_PRINT("%s ", tok2str(dau_alg2str, "Alg_%u", GET_U_1(cp + i)));
-                break;
-            case E_DHU:
-                for (i = 0; i < datalen; ++i)
-                    ND_PRINT("%s ", tok2str(dhu_alg2str, "Alg_%u", GET_U_1(cp + i)));
-                break;
-            case E_N3U:
-                for (i = 0; i < datalen; ++i)
-                    ND_PRINT("%s ", tok2str(n3u_alg2str, "Alg_%u", GET_U_1(cp + i)));
-                break;
-            case E_CHAIN:
-                fqdn_print(ndo, cp, cp + datalen);
-                break;
-            case E_NSID:
-                /* intentional fall-through. NSID is an undefined byte string */
-            default:
-                for (i = 0; i < datalen; ++i)
+        case E_ECS:
+            print_eopt_ecs(ndo, cp, datalen);
+            break;
+        case E_COOKIE:
+            if (datalen < 8 || (datalen > 8 && datalen < 16) || datalen > 40) {
+                nd_print_invalid(ndo);
+            } else {
+                for (i = 0; i < datalen; ++i) {
                     ND_PRINT("%02x", GET_U_1(cp + i));
-                break;
-
+                    /* split client and server cookie */
+                    if (i == 8)
+                        ND_PRINT(" ");
+                }
+            }
+            break;
+        case E_KEEPALIVE:
+            if (datalen != 2)
+                nd_print_invalid(ndo);
+            else
+                /* keepalive is in increments of 100ms. Convert to seconds */
+                ND_PRINT("%0.1f sec", (GET_BE_U_2(cp) / 10.0));
+            break;
+        case E_EXPIRE:
+            if (datalen != 4)
+                nd_print_invalid(ndo);
+            else
+                ND_PRINT("%u sec", GET_BE_U_4(cp));
+            break;
+        case E_PADDING:
+            /* ignore contents and just print length */
+            ND_PRINT("(%u)", datalen);
+            break;
+        case E_KEYTAG:
+            if (datalen % 2 != 0)
+                nd_print_invalid(ndo);
+            else
+                for (i = 0; i < datalen; i += 2)
+                    ND_PRINT("%u ", GET_BE_U_2(cp + i));
+            break;
+        case E_DAU:
+            for (i = 0; i < datalen; ++i)
+                ND_PRINT("%s ", tok2str(dau_alg2str, "Alg_%u", GET_U_1(cp + i)));
+            break;
+        case E_DHU:
+            for (i = 0; i < datalen; ++i)
+                ND_PRINT("%s ", tok2str(dhu_alg2str, "Alg_%u", GET_U_1(cp + i)));
+            break;
+        case E_N3U:
+            for (i = 0; i < datalen; ++i)
+                ND_PRINT("%s ", tok2str(n3u_alg2str, "Alg_%u", GET_U_1(cp + i)));
+            break;
+        case E_CHAIN:
+            fqdn_print(ndo, cp, cp + datalen);
+            break;
+        case E_NSID:
+            /* intentional fall-through. NSID is an undefined byte string */
+        default:
+            for (i = 0; i < datalen; ++i)
+                ND_PRINT("%02x", GET_U_1(cp + i));
+            break;
         }
     }
 	return (cp + datalen);
