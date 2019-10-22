@@ -315,7 +315,10 @@ print_eopt_ecs(netdissect_options *ndo, const u_char *cp,
 }
 
 extern const struct tok edns_opt2str[];
-extern const struct tok dnssec_alg2str[];
+extern const struct tok dau_alg2str[];
+extern const struct tok dhu_alg2str[];
+extern const struct tok n3u_alg2str[];
+
 
 /* print an <EDNS-option> */
 static const u_char *
@@ -363,16 +366,40 @@ eopt_print(netdissect_options *ndo,
                     /* keepalive is in increments of 100ms. Convert to seconds */
                     ND_PRINT("%0.1f sec", (GET_BE_U_2(cp) / 10.0));
                 break;
+            case E_EXPIRE:
+                if (datalen != 4)
+                    nd_print_invalid(ndo);
+                else
+                    ND_PRINT("%u sec", GET_BE_U_4(cp));
+                break;
+            case E_PADDING:
+                /* ignore contents and just print length */
+                ND_PRINT("(%u)", datalen);
+                break;
+            case E_KEYTAG:
+                if (datalen % 2 != 0)
+                    nd_print_invalid(ndo);
+                else
+                    for (i = 0; i < datalen; i += 2)
+                        ND_PRINT("%u ", GET_BE_U_2(cp + i));
+                break;
             case E_DAU:
-            case E_DHU:
-            case E_N3U:
-                /* intentional fall-through as they share algorithms */
                 for (i = 0; i < datalen; ++i)
-                    ND_PRINT("%s ", tok2str(dnssec_alg2str, "Alg%u", GET_U_1(cp + i)));
+                    ND_PRINT("%s ", tok2str(dau_alg2str, "Alg_%u", GET_U_1(cp + i)));
+                break;
+            case E_DHU:
+                for (i = 0; i < datalen; ++i)
+                    ND_PRINT("%s ", tok2str(dhu_alg2str, "Alg_%u", GET_U_1(cp + i)));
+                break;
+            case E_N3U:
+                for (i = 0; i < datalen; ++i)
+                    ND_PRINT("%s ", tok2str(n3u_alg2str, "Alg_%u", GET_U_1(cp + i)));
                 break;
             case E_CHAIN:
                 fqdn_print(ndo, cp, cp + datalen);
                 break;
+            case E_NSID:
+                /* intentional fall-through. NSID is an undefined byte string */
             default:
                 for (i = 0; i < datalen; ++i)
                     ND_PRINT("%02x", GET_U_1(cp + i));
@@ -383,7 +410,7 @@ eopt_print(netdissect_options *ndo,
 	return (cp + datalen);
 
   trunc:
-    nd_print_trunc(ndo);
+    nd_print_invalid(ndo);
     return (cp + datalen);
 
 }
@@ -484,7 +511,7 @@ const struct tok edns_opt2str[] = {
 	{ 0,		NULL }
 };
 
-const struct tok dnssec_alg2str[] = {
+const struct tok dau_alg2str[] = {
     { A_DELETE, "DELETE" },
     { A_RSAMD5, "RSAMD5" },
     { A_DH, "DH" },
@@ -502,6 +529,19 @@ const struct tok dnssec_alg2str[] = {
     { A_INDIRECT, "INDIRECT" },
     { A_PRIVATEDNS, "PRIVATEDNS" },
     { A_PRIVATEOID, "PRIVATEOID" },
+    { 0, NULL }
+};
+
+const struct tok dhu_alg2str[] = {
+    { DS_SHA1, "SHA-1" },
+    { DS_SHA256, "SHA-256" },
+    { DS_GOST, "GOST_R_34.11-94" },
+    { DS_SHA384, "SHA-384" },
+    { 0, NULL }
+};
+
+const struct tok n3u_alg2str[] = {
+    { NSEC_SHA1, "SHA-1" },
     { 0, NULL }
 };
 

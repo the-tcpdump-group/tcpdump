@@ -215,7 +215,8 @@
 #define E_KEYTAG		14		/* EDNS key tag */
 
 /*
- * Values for DNS Security Algorithms
+ * Values for DNSSEC Algorithms
+ * https://www.iana.org/assignments/dns-sec-alg-numbers/dns-sec-alg-numbers.xhtml
  */
 
 #define A_DELETE                0
@@ -235,6 +236,22 @@
 #define A_INDIRECT              252
 #define A_PRIVATEDNS            253
 #define A_PRIVATEOID            254
+
+/*
+ * Values for NSEC3 algorithms
+ * https://www.iana.org/assignments/dnssec-nsec3-parameters/dnssec-nsec3-parameters.xhtml
+ */
+#define NSEC_SHA1   1
+
+/*
+ * Values for delegation signer algorithms
+ * https://www.iana.org/assignments/ds-rr-types/ds-rr-types.xhtml
+ */
+#define DS_SHA1	    1
+#define DS_SHA256   2
+#define DS_GOST     3
+#define DS_SHA384   4
+
 
 /*
  * Status return codes for T_UNSPEC conversion routines
