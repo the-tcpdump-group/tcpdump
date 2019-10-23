@@ -269,7 +269,7 @@ ns_cprint(netdissect_options *ndo,
 
 static void
 print_eopt_ecs(netdissect_options *ndo, const u_char *cp,
-               u_int datalen)
+               u_int data_len)
 {
     u_int family, addr_len, addr_bytes;
     u_char src_len, scope_len;
@@ -297,7 +297,7 @@ print_eopt_ecs(netdissect_options *ndo, const u_char *cp,
         return;
     }
 
-    if (datalen - 4 > addr_bytes) {
+    if (data_len - 4 > addr_bytes) {
         nd_print_invalid(ndo);
         return;
     }
@@ -305,7 +305,7 @@ print_eopt_ecs(netdissect_options *ndo, const u_char *cp,
     /* pad the truncated address from ecs with zeros */
     u_char padded[addr_bytes];
     memset(padded, 0, sizeof(padded));
-    memcpy(padded, cp, datalen - 4);
+    memcpy(padded, cp, data_len - 4);
 
     char addr[addr_len];
 
@@ -329,7 +329,7 @@ static const u_char *
 eopt_print(netdissect_options *ndo,
           const u_char *cp)
 {
-	u_int opt, datalen, i;
+	u_int opt, data_len, i;
 
 	if (!ND_TTEST_2(cp))
 		return (NULL);
@@ -338,23 +338,23 @@ eopt_print(netdissect_options *ndo,
 	ND_PRINT("%s", tok2str(edns_opt2str, "Opt%u", opt));
 	if (!ND_TTEST_2(cp))
 		return (NULL);
-	datalen = GET_BE_U_2(cp);
+	data_len = GET_BE_U_2(cp);
     cp += 2;
 
-    ND_TCHECK_LEN(cp, datalen);
+    ND_TCHECK_LEN(cp, data_len);
 
-    if (datalen > 0) {
+    if (data_len > 0) {
         ND_PRINT(" ");
         switch (opt) {
 
         case E_ECS:
-            print_eopt_ecs(ndo, cp, datalen);
+            print_eopt_ecs(ndo, cp, data_len);
             break;
         case E_COOKIE:
-            if (datalen < 8 || (datalen > 8 && datalen < 16) || datalen > 40) {
+            if (data_len < 8 || (data_len > 8 && data_len < 16) || data_len > 40) {
                 nd_print_invalid(ndo);
             } else {
-                for (i = 0; i < datalen; ++i) {
+                for (i = 0; i < data_len; ++i) {
                     /* split client and server cookie */
                     if (i == 8)
                         ND_PRINT(" ");
@@ -363,34 +363,34 @@ eopt_print(netdissect_options *ndo,
             }
             break;
         case E_KEEPALIVE:
-            if (datalen != 2)
+            if (data_len != 2)
                 nd_print_invalid(ndo);
             else
                 /* keepalive is in increments of 100ms. Convert to seconds */
                 ND_PRINT("%0.1f sec", (GET_BE_U_2(cp) / 10.0));
             break;
         case E_EXPIRE:
-            if (datalen != 4)
+            if (data_len != 4)
                 nd_print_invalid(ndo);
             else
                 ND_PRINT("%u sec", GET_BE_U_4(cp));
             break;
         case E_PADDING:
             /* ignore contents and just print length */
-            ND_PRINT("(%u)", datalen);
+            ND_PRINT("(%u)", data_len);
             break;
         case E_KEYTAG:
-            if (datalen % 2 != 0)
+            if (data_len % 2 != 0)
                 nd_print_invalid(ndo);
             else
-                for (i = 0; i < datalen; i += 2) {
+                for (i = 0; i < data_len; i += 2) {
                     if (i > 0)
                         ND_PRINT(" ");
                     ND_PRINT("%u", GET_BE_U_2(cp + i));
                 }
             break;
         case E_DAU:
-            for (i = 0; i < datalen; ++i) {
+            for (i = 0; i < data_len; ++i) {
                 if (i > 0)
                     ND_PRINT(" ");
                 ND_PRINT("%s", tok2str(dau_alg2str, "Alg_%u", GET_U_1(cp + i)));
@@ -398,31 +398,31 @@ eopt_print(netdissect_options *ndo,
             }
             break;
         case E_DHU:
-            for (i = 0; i < datalen; ++i) {
+            for (i = 0; i < data_len; ++i) {
                 if (i > 0)
                     ND_PRINT(" ");
                 ND_PRINT("%s", tok2str(dhu_alg2str, "Alg_%u", GET_U_1(cp + i)));
             }
             break;
         case E_N3U:
-            for (i = 0; i < datalen; ++i) {
+            for (i = 0; i < data_len; ++i) {
                 if (i > 0)
                     ND_PRINT(" ");
                 ND_PRINT("%s", tok2str(n3u_alg2str, "Alg_%u", GET_U_1(cp + i)));
             }
             break;
         case E_CHAIN:
-            fqdn_print(ndo, cp, cp + datalen);
+            fqdn_print(ndo, cp, cp + data_len);
             break;
         case E_NSID:
             /* intentional fall-through. NSID is an undefined byte string */
         default:
-            for (i = 0; i < datalen; ++i)
+            for (i = 0; i < data_len; ++i)
                 ND_PRINT("%02x", GET_U_1(cp + i));
             break;
         }
     }
-	return (cp + datalen);
+	return (cp + data_len);
 
   trunc:
     nd_print_invalid(ndo);
@@ -780,16 +780,18 @@ ns_rprint(netdissect_options *ndo,
 		break;
 
 	case T_OPT:
-		ND_PRINT(" [UDPsize %u", class);
+		ND_PRINT(" UDPsize=%u", class);
 		if (opt_flags & 0x8000)
-			ND_PRINT(",DO");
+			ND_PRINT(" DO");
+		ND_PRINT(" [");
 		while (cp < rp) {
-		    ND_PRINT(",");
 		    cp = eopt_print(ndo, cp);
 		    if (cp == NULL)
 		        return(NULL);
+		    if (cp < rp)
+                ND_PRINT(",");
 		}
-		ND_PRINT("] ");
+		ND_PRINT("]");
 		break;
 
 	case T_UNSPECA:		/* One long string */
