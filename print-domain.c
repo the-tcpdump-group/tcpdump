@@ -271,7 +271,7 @@ static void
 print_eopt_ecs(netdissect_options *ndo, const u_char *cp,
                u_int datalen)
 {
-    u_int family, addr_len;
+    u_int family, addr_len, addr_bytes;
     u_char src_len, scope_len;
     if (!ND_TTEST_2(cp))
         nd_print_invalid(ndo);
@@ -286,11 +286,13 @@ print_eopt_ecs(netdissect_options *ndo, const u_char *cp,
     scope_len = GET_U_1(cp);
     cp += 1;
 
-    if (family == 1) 
+    if (family == 1) {
         addr_len = INET_ADDRSTRLEN;
-    else if (family == 2)
+        addr_bytes = 4;
+    } else if (family == 2) {
         addr_len = INET6_ADDRSTRLEN;
-    else {
+        addr_bytes = 16;
+    } else {
         nd_print_invalid(ndo);
         return;
     }
@@ -301,15 +303,17 @@ print_eopt_ecs(netdissect_options *ndo, const u_char *cp,
     }
 
     /* pad the truncated address from ecs with zeros */
+    u_char padded[addr_bytes];
+    memset(padded, 0, sizeof(padded));
+    memcpy(padded, cp, datalen - 4);
+
     char addr[addr_len];
-    memset(addr, 0, sizeof(addr));
-    memcpy(addr, cp, datalen - 4);
 
     if (family == 1)
-        ND_PRINT("%s/%d/%d", addrtostr(cp, addr, sizeof(addr)),
+        ND_PRINT("%s/%d/%d", addrtostr(padded, addr, sizeof(addr)),
                 src_len, scope_len);
     else
-        ND_PRINT("%s/%d/%d", addrtostr6(cp, addr, sizeof(addr)),
+        ND_PRINT("%s/%d/%d", addrtostr6(padded, addr, sizeof(addr)),
                 src_len, scope_len);
 
 }
@@ -351,10 +355,10 @@ eopt_print(netdissect_options *ndo,
                 nd_print_invalid(ndo);
             } else {
                 for (i = 0; i < datalen; ++i) {
-                    ND_PRINT("%02x", GET_U_1(cp + i));
                     /* split client and server cookie */
                     if (i == 8)
                         ND_PRINT(" ");
+                    ND_PRINT("%02x", GET_U_1(cp + i));
                 }
             }
             break;
@@ -379,20 +383,33 @@ eopt_print(netdissect_options *ndo,
             if (datalen % 2 != 0)
                 nd_print_invalid(ndo);
             else
-                for (i = 0; i < datalen; i += 2)
-                    ND_PRINT("%u ", GET_BE_U_2(cp + i));
+                for (i = 0; i < datalen; i += 2) {
+                    if (i > 0)
+                        ND_PRINT(" ");
+                    ND_PRINT("%u", GET_BE_U_2(cp + i));
+                }
             break;
         case E_DAU:
-            for (i = 0; i < datalen; ++i)
-                ND_PRINT("%s ", tok2str(dau_alg2str, "Alg_%u", GET_U_1(cp + i)));
+            for (i = 0; i < datalen; ++i) {
+                if (i > 0)
+                    ND_PRINT(" ");
+                ND_PRINT("%s", tok2str(dau_alg2str, "Alg_%u", GET_U_1(cp + i)));
+
+            }
             break;
         case E_DHU:
-            for (i = 0; i < datalen; ++i)
-                ND_PRINT("%s ", tok2str(dhu_alg2str, "Alg_%u", GET_U_1(cp + i)));
+            for (i = 0; i < datalen; ++i) {
+                if (i > 0)
+                    ND_PRINT(" ");
+                ND_PRINT("%s", tok2str(dhu_alg2str, "Alg_%u", GET_U_1(cp + i)));
+            }
             break;
         case E_N3U:
-            for (i = 0; i < datalen; ++i)
-                ND_PRINT("%s ", tok2str(n3u_alg2str, "Alg_%u", GET_U_1(cp + i)));
+            for (i = 0; i < datalen; ++i) {
+                if (i > 0)
+                    ND_PRINT(" ");
+                ND_PRINT("%s", tok2str(n3u_alg2str, "Alg_%u", GET_U_1(cp + i)));
+            }
             break;
         case E_CHAIN:
             fqdn_print(ndo, cp, cp + datalen);
