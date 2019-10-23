@@ -648,6 +648,9 @@ icmp6_nodeinfo_oobr	icmp6_nodeinfo_oobr.pcap	icmp6_nodeinfo_oobr.out
 # bad packets from Henri Salo
 rx_ubik-oobr		rx_ubik-oobr.pcap		rx_ubik-oobr.out -c1
 
+# bad packets from Junjie Wang
+ospf6_print_lshdr-oobr ospf6_print_lshdr-oobr.pcap ospf6_print_lshdr-oobr.out -vv
+
 # RTP tests
 # fuzzed pcap
 rtp-seg-fault-1  rtp-seg-fault-1.pcapng  rtp-seg-fault-1.out  -v -T rtp
