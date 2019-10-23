@@ -512,52 +512,56 @@ const struct tok ns_class2str[] = {
 };
 
 const struct tok edns_opt2str[] = {
-	{ E_NSID,		"NSID" },
-	{ E_DAU,	"DAU" },
-	{ E_DHU,	"DHU" },
-	{ E_N3U,	"N3U" },
-	{ E_ECS,	"ECS" },
-	{ E_EXPIRE,	"EXPIRE" },
-	{ E_COOKIE,	"COOKIE" },
+    { E_LLQ,        "LLQ" },
+    { E_UL,         "UL" },
+	{ E_NSID,	    "NSID" },
+	{ E_DAU,	    "DAU" },
+	{ E_DHU,	    "DHU" },
+	{ E_N3U,	    "N3U" },
+	{ E_ECS,	    "ECS" },
+	{ E_EXPIRE,	    "EXPIRE" },
+	{ E_COOKIE,	    "COOKIE" },
 	{ E_KEEPALIVE,	"KEEPALIVE" },
 	{ E_PADDING,	"PADDING" },
-	{ E_CHAIN,	"CHAIN" },
-	{ E_KEYTAG,	"KEYTAG" },
-	{ 0,		NULL }
+	{ E_CHAIN,	    "CHAIN" },
+	{ E_KEYTAG,	    "KEY-TAG" },
+    { E_CLIENTTAG,  "CLIENT-TAG" },
+    { E_SERVERTAG,  "SERVER-TAG" },
+	{ 0,		    NULL }
 };
 
 const struct tok dau_alg2str[] = {
-    { A_DELETE, "DELETE" },
-    { A_RSAMD5, "RSAMD5" },
-    { A_DH, "DH" },
-    { A_DSA, "DS" },
-    { A_RSASHA1, "RSASHA1" },
-    { A_DSA_NSEC3_SHA1, "DSA-NSEC3-SHA1" },
+    { A_DELETE,             "DELETE" },
+    { A_RSAMD5,             "RSAMD5" },
+    { A_DH,                 "DH" },
+    { A_DSA,                "DS" },
+    { A_RSASHA1,            "RSASHA1" },
+    { A_DSA_NSEC3_SHA1,     "DSA-NSEC3-SHA1" },
     { A_RSASHA1_NSEC3_SHA1, "RSASHA1-NSEC3-SHA1" },
-    { A_RSASHA256, "RSASHA256" },
-    { A_RSASHA512, "RSASHA512" },
-    { A_ECC_GOST, "ECC-GOST" },
-    { A_ECDSAP256SHA256, "ECDSAP256SHA256" },
-    { A_ECDSAP384SHA384, "ECDSAP384SHA384" },
-    { A_ED25519, "ED25519" },
-    { A_ED448, "ED448" },
-    { A_INDIRECT, "INDIRECT" },
-    { A_PRIVATEDNS, "PRIVATEDNS" },
-    { A_PRIVATEOID, "PRIVATEOID" },
-    { 0, NULL }
+    { A_RSASHA256,          "RSASHA256" },
+    { A_RSASHA512,          "RSASHA512" },
+    { A_ECC_GOST,           "ECC-GOST" },
+    { A_ECDSAP256SHA256,    "ECDSAP256SHA256" },
+    { A_ECDSAP384SHA384,    "ECDSAP384SHA384" },
+    { A_ED25519,            "ED25519" },
+    { A_ED448,              "ED448" },
+    { A_INDIRECT,           "INDIRECT" },
+    { A_PRIVATEDNS,         "PRIVATEDNS" },
+    { A_PRIVATEOID,         "PRIVATEOID" },
+    { 0,                NULL }
 };
 
 const struct tok dhu_alg2str[] = {
-    { DS_SHA1, "SHA-1" },
-    { DS_SHA256, "SHA-256" },
-    { DS_GOST, "GOST_R_34.11-94" },
-    { DS_SHA384, "SHA-384" },
-    { 0, NULL }
+    { DS_SHA1,  "SHA-1" },
+    { DS_SHA256,"SHA-256" },
+    { DS_GOST,  "GOST_R_34.11-94" },
+    { DS_SHA384,"SHA-384" },
+    { 0,    NULL }
 };
 
 const struct tok n3u_alg2str[] = {
-    { NSEC_SHA1, "SHA-1" },
-    { 0, NULL }
+    { NSEC_SHA1,"SHA-1" },
+    { 0,    NULL }
 };
 
 /* print a query */
@@ -780,10 +784,10 @@ ns_rprint(netdissect_options *ndo,
 		if (opt_flags & 0x8000)
 			ND_PRINT(",DO");
 		while (cp < rp) {
-            ND_PRINT(",");
-            cp = eopt_print(ndo, cp);
-			if (cp == NULL)
-				return(NULL);
+		    ND_PRINT(",");
+		    cp = eopt_print(ndo, cp);
+		    if (cp == NULL)
+		        return(NULL);
 		}
 		ND_PRINT("] ");
 		break;
