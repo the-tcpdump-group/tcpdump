@@ -297,7 +297,7 @@ print_eopt_ecs(netdissect_options *ndo, const u_char *cp,
         return;
     }
 
-    if (datalen - 4 > addr_len) {
+    if (datalen - 4 > addr_bytes) {
         nd_print_invalid(ndo);
         return;
     }
