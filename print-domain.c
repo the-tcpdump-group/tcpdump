@@ -271,7 +271,7 @@ static void
 print_eopt_ecs(netdissect_options *ndo, const u_char *cp,
                u_int data_len)
 {
-    u_int family, addr_len, addr_bytes;
+    u_int family, addr_len, addr_bits;
     u_char src_len, scope_len;
     if (!ND_TTEST_2(cp))
         nd_print_invalid(ndo);
@@ -288,22 +288,27 @@ print_eopt_ecs(netdissect_options *ndo, const u_char *cp,
 
     if (family == 1) {
         addr_len = INET_ADDRSTRLEN;
-        addr_bytes = 4;
+        addr_bits = 32;
     } else if (family == 2) {
         addr_len = INET6_ADDRSTRLEN;
-        addr_bytes = 16;
+        addr_bits = 128;
     } else {
         nd_print_invalid(ndo);
         return;
     }
 
-    if (data_len - 4 > addr_bytes) {
+    if (data_len - 4 > (addr_bits / 8)) {
+        nd_print_invalid(ndo);
+        return;
+    }
+    /* checks for invalid ecs scope or source length */
+    if (src_len > addr_bits || scope_len > addr_bits || ((src_len + 7) / 8) != (data_len - 4)) {
         nd_print_invalid(ndo);
         return;
     }
 
     /* pad the truncated address from ecs with zeros */
-    u_char padded[addr_bytes];
+    u_char padded[(addr_bits / 8)];
     memset(padded, 0, sizeof(padded));
     memcpy(padded, cp, data_len - 4);
 
