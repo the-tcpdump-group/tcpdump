@@ -514,20 +514,20 @@ const struct tok ns_class2str[] = {
 const struct tok edns_opt2str[] = {
     { E_LLQ,        "LLQ" },
     { E_UL,         "UL" },
-	{ E_NSID,	    "NSID" },
-	{ E_DAU,	    "DAU" },
-	{ E_DHU,	    "DHU" },
-	{ E_N3U,	    "N3U" },
-	{ E_ECS,	    "ECS" },
-	{ E_EXPIRE,	    "EXPIRE" },
-	{ E_COOKIE,	    "COOKIE" },
-	{ E_KEEPALIVE,	"KEEPALIVE" },
-	{ E_PADDING,	"PADDING" },
-	{ E_CHAIN,	    "CHAIN" },
-	{ E_KEYTAG,	    "KEY-TAG" },
+    { E_NSID,       "NSID" },
+    { E_DAU,        "DAU" },
+    { E_DHU,        "DHU" },
+    { E_N3U,        "N3U" },
+    { E_ECS,        "ECS" },
+    { E_EXPIRE,     "EXPIRE" },
+    { E_COOKIE,     "COOKIE" },
+    { E_KEEPALIVE,  "KEEPALIVE" },
+    { E_PADDING,    "PADDING" },
+    { E_CHAIN,      "CHAIN" },
+    { E_KEYTAG,     "KEY-TAG" },
     { E_CLIENTTAG,  "CLIENT-TAG" },
     { E_SERVERTAG,  "SERVER-TAG" },
-	{ 0,		    NULL }
+    { 0,            NULL }
 };
 
 const struct tok dau_alg2str[] = {
