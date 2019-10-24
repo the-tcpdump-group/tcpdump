@@ -334,16 +334,16 @@ static const u_char *
 eopt_print(netdissect_options *ndo,
           const u_char *cp)
 {
-	u_int opt, data_len, i;
+    u_int opt, data_len, i;
 
-	if (!ND_TTEST_2(cp))
-		return (NULL);
+    if (!ND_TTEST_2(cp))
+        return (NULL);
     opt = GET_BE_U_2(cp);
-	cp += 2;
-	ND_PRINT("%s", tok2str(edns_opt2str, "Opt%u", opt));
-	if (!ND_TTEST_2(cp))
-		return (NULL);
-	data_len = GET_BE_U_2(cp);
+    cp += 2;
+    ND_PRINT("%s", tok2str(edns_opt2str, "Opt%u", opt));
+    if (!ND_TTEST_2(cp))
+        return (NULL);
+    data_len = GET_BE_U_2(cp);
     cp += 2;
 
     ND_TCHECK_LEN(cp, data_len);
@@ -427,7 +427,7 @@ eopt_print(netdissect_options *ndo,
             break;
         }
     }
-	return (cp + data_len);
+    return (cp + data_len);
 
   trunc:
     nd_print_invalid(ndo);
@@ -788,7 +788,7 @@ ns_rprint(netdissect_options *ndo,
 		ND_PRINT(" UDPsize=%u", class);
 		if (opt_flags & 0x8000)
 			ND_PRINT(" DO");
-		if (cp < rp) {
+        if (cp < rp) {
             ND_PRINT(" [");
             while (cp < rp) {
                 cp = eopt_print(ndo, cp);
@@ -798,8 +798,7 @@ ns_rprint(netdissect_options *ndo,
                     ND_PRINT(",");
             }
             ND_PRINT("]");
-		}
-
+        }
 		break;
 
 	case T_UNSPECA:		/* One long string */
