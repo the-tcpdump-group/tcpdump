@@ -98,6 +98,7 @@ LIBNETDISSECT_SRC=\
 	print-aoe.c \
 	print-ap1394.c \
 	print-arcnet.c \
+	print-arista.c \
 	print-arp.c \
 	print-ascii.c \
 	print-atalk.c \
@@ -213,6 +214,7 @@ LIBNETDISSECT_SRC=\
 	print-slow.c \
 	print-smtp.c \
 	print-snmp.c \
+	print-ssh.c \
 	print-stp.c \
 	print-sunatm.c \
 	print-sunrpc.c \
@@ -282,6 +284,7 @@ HDR = \
 	nameser.h \
 	netdissect.h \
 	netdissect-alloc.h \
+	netdissect-ctype.h \
 	netdissect-stdinc.h \
 	nfs.h \
 	nfsfh.h \
@@ -378,7 +381,7 @@ EXTRA_DIST = \
 	win32/prj/WinDump.sln \
 	win32/prj/WinDump.vcproj
 
-TEST_DIST= `find tests \( -name 'DIFF' -prune \) -o \( -name NEW -prune \) -o -type f \! -name '.*' \! -name '*~' -print`
+TEST_DIST= `git ls-files tests | grep -v 'tests/\..*'`
 
 all: $(PROG)
 
@@ -441,7 +444,7 @@ distclean:
 	rm -rf autom4te.cache tests/DIFF tests/NEW
 
 check: tcpdump
-	(cd tests && ./TESTrun.sh)
+	$(srcdir)/tests/TESTrun.sh
 
 extags: $(TAGFILES)
 	ctags $(TAGFILES)
@@ -453,7 +456,7 @@ TAGS: $(TAGFILES)
 	etags $(TAGFILES)
 
 releasetar:
-	@cwd=`pwd` ; dir=`basename $$cwd` ; name=$(PROG)-`cat VERSION` ; \
+	@name=$(PROG)-`cat VERSION` ; \
 	   mkdir $$name; \
 	   tar cf - $(CSRC) $(HDR) $(LIBNETDISSECT_SRC) $(EXTRA_DIST) $(TEST_DIST) | (cd $$name; tar xf -); \
 	   tar -c -z -f $$name.tar.gz $$name; \

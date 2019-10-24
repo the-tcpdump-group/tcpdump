@@ -428,12 +428,13 @@ AC_REPLACE_FUNCS(strlcat strlcpy strdup strsep getservent getopt_long)
 AC_CHECK_FUNCS(fork vfork strftime)
 AC_CHECK_FUNCS(setlinebuf)
 
-needsnprintf=no
-AC_CHECK_FUNCS(vsnprintf snprintf,,
-	[needsnprintf=yes])
-if test $needsnprintf = yes; then
-	AC_LIBOBJ(snprintf)
-fi
+#
+# Make sure we have vsnprintf() and snprintf(); we require them.
+#
+AC_CHECK_FUNC(vsnprintf,,
+    AC_MSG_ERROR([vsnprintf() is required but wasn't found]))
+AC_CHECK_FUNC(snprintf,,
+    AC_MSG_ERROR([snprintf() is required but wasn't found]))
 
 AC_CHECK_LIB(rpc, main)		dnl It's unclear why we might need -lrpc
 

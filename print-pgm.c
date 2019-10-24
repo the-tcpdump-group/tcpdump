@@ -74,17 +74,17 @@ struct pgm_ack {
 struct pgm_poll {
     nd_uint32_t	pgmp_seq;
     nd_uint16_t	pgmp_round;
+    nd_uint16_t	pgmp_subtype;
+    nd_uint16_t	pgmp_nla_afi;
     nd_uint16_t	pgmp_reserved;
+    /* ... uint8_t	pgmp_nla[0]; */
     /* ... options */
 };
 
 struct pgm_polr {
     nd_uint32_t	pgmp_seq;
     nd_uint16_t	pgmp_round;
-    nd_uint16_t	pgmp_subtype;
-    nd_uint16_t	pgmp_nla_afi;
     nd_uint16_t	pgmp_reserved;
-    /* ... uint8_t	pgmp_nla[0]; */
     /* ... options */
 };
 
@@ -253,25 +253,14 @@ pgm_print(netdissect_options *ndo,
 	}
 
 	case PGM_POLL: {
-	    const struct pgm_poll *poll_msg;
-
-	    poll_msg = (const struct pgm_poll *)(pgm + 1);
-	    ND_TCHECK_SIZE(poll_msg);
-	    ND_PRINT("POLL seq %u round %u",
-			 GET_BE_U_4(poll_msg->pgmp_seq),
-			 GET_BE_U_2(poll_msg->pgmp_round));
-	    bp = (const u_char *) (poll_msg + 1);
-	    break;
-	}
-	case PGM_POLR: {
-	    const struct pgm_polr *polr;
+	    const struct pgm_poll *pgm_poll;
 	    uint32_t ivl, rnd, mask;
 
-	    polr = (const struct pgm_polr *)(pgm + 1);
-	    ND_TCHECK_SIZE(polr);
-	    bp = (const u_char *) (polr + 1);
+	    pgm_poll = (const struct pgm_poll *)(pgm + 1);
+	    ND_TCHECK_SIZE(pgm_poll);
+	    bp = (const u_char *) (pgm_poll + 1);
 
-	    switch (GET_BE_U_2(polr->pgmp_nla_afi)) {
+	    switch (GET_BE_U_2(pgm_poll->pgmp_nla_afi)) {
 	    case AFNUM_INET:
 		ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 		addrtostr(bp, nla_buf, sizeof(nla_buf));
@@ -299,10 +288,21 @@ pgm_print(netdissect_options *ndo,
 	    mask = GET_BE_U_4(bp);
 	    bp += sizeof(uint32_t);
 
-	    ND_PRINT("POLR seq %u round %u nla %s ivl %u rnd 0x%08x "
-			 "mask 0x%08x", GET_BE_U_4(polr->pgmp_seq),
-			 GET_BE_U_2(polr->pgmp_round), nla_buf, ivl, rnd,
+	    ND_PRINT("POLL seq %u round %u nla %s ivl %u rnd 0x%08x "
+			 "mask 0x%08x", GET_BE_U_4(pgm_poll->pgmp_seq),
+			 GET_BE_U_2(pgm_poll->pgmp_round), nla_buf, ivl, rnd,
 			 mask);
+	    break;
+	}
+	case PGM_POLR: {
+	    const struct pgm_polr *polr_msg;
+
+	    polr_msg = (const struct pgm_polr *)(pgm + 1);
+	    ND_TCHECK_SIZE(polr_msg);
+	    ND_PRINT("POLR seq %u round %u",
+			 GET_BE_U_4(polr_msg->pgmp_seq),
+			 GET_BE_U_2(polr_msg->pgmp_round));
+	    bp = (const u_char *) (polr_msg + 1);
 	    break;
 	}
 	case PGM_ODATA: {

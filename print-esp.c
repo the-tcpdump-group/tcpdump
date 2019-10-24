@@ -99,8 +99,8 @@ struct newesp {
 
 #ifdef HAVE_LIBCRYPTO
 union inaddr_u {
-	struct in_addr in4;
-	struct in6_addr in6;
+	nd_ipv4 in4;
+	nd_ipv6 in6;
 };
 struct sa_list {
 	struct sa_list	*next;
@@ -631,7 +631,7 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 
 	if (decode) {
 		/* skip any blank spaces */
-		while (isspace((unsigned char)*decode))
+		while (*decode == ' ' || *decode == '\t' || *decode == '\r' || *decode == '\n')
 			decode++;
 
 		if(!espprint_decode_encalgo(ndo, decode, &sa1)) {

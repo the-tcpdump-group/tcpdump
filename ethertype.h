@@ -113,8 +113,8 @@
 #endif
 
 /* see:
-        http://en.wikipedia.org/wiki/IEEE_802.1Q
-    and http://en.wikipedia.org/wiki/QinQ
+        https://en.wikipedia.org/wiki/IEEE_802.1Q
+    and https://en.wikipedia.org/wiki/QinQ
 */
 #ifndef	ETHERTYPE_8021Q9100
 #define	ETHERTYPE_8021Q9100	0x9100
@@ -205,6 +205,9 @@
 #endif
 #ifndef	ETHERTYPE_GEONET
 #define	ETHERTYPE_GEONET        0x8947  /* ETSI GeoNetworking (Official IEEE registration from Jan 2013) */
+#endif
+#ifndef	ETHERTYPE_ARISTA
+#define	ETHERTYPE_ARISTA        0xd28b /*  Arista Networks vendor specific EtherType */
 #endif
 
 extern const struct tok ethertype_values[];

@@ -327,7 +327,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 			  ipaddr_string(ndo, ip->ip_dst), dport);
 	}
 
-	ND_PRINT("DCCP");
+	nd_print_protocol_caps(ndo);
 
 	if (ndo->ndo_qflag) {
 		ND_PRINT(" %u", len - hlen);

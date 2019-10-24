@@ -5,37 +5,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 project(tcpdump)
 
 #
-# Try to enable as many C99 features as we can.
-# At minimum, we want C++/C99-style // comments.
-#
-# Newer versions of compilers might default to supporting C99, but older
-# versions may require a special flag.
-#
-# Prior to CMake 3.1, setting CMAKE_C_STANDARD will not have any effect,
-# so, unless and until we require CMake 3.1 or later, we have to do it
-# ourselves on pre-3.1 CMake, so we just do it ourselves on all versions
-# of CMake.
-#
-# Note: with CMake 3.1 through 3.5, the only compilers for which CMake
-# handles CMAKE_C_STANDARD are GCC and Clang.  3.6 adds support only
-# for Intel C; 3.9 adds support for PGI C, Sun C, and IBM XL C, and
-# 3.10 adds support for Cray C and IAR C, but no version of CMake has
-# support for HP C.  Therefore, even if we use CMAKE_C_STANDARD with
-# compilers for which CMake supports it, we may still have to do it
-# ourselves on other compilers.
-#
-# See the CMake documentation for the CMAKE_<LANG>_COMPILER_ID variables
-# for a list of compiler IDs.
-#
-# We don't worry about MSVC; it doesn't have such a flag - either it
-# doesn't support the C99 features we need at all, or it supports them
-# regardless of the compiler flag.
-#
-# XXX - this just tests whether the option works and adds it if it does.
-# We don't test whether it's necessary in order to get the C99 features
-# that we use; if we ever have a user who tries to compile with a compiler
-# that can't be made to support those features, we can add a test to make
-# sure we actually *have* C99 support.
+# For checking if a compiler flag works and adding it if it does.
 #
 include(CheckCCompilerFlag)
 macro(check_and_add_compiler_option _option)
@@ -48,31 +18,75 @@ macro(check_and_add_compiler_option _option)
     endif()
 endmacro()
 
+#
+# If we're building with Visual Studio, we require Visual Studio 2015,
+# in order to get sufficient C99 compatibility.  Check for that.
+#
+# If not, try the appropriate flag for the compiler to enable C99
+# features.
+#
 set(C_ADDITIONAL_FLAGS "")
-if(CMAKE_C_COMPILER_ID MATCHES "GNU" OR
-   CMAKE_C_COMPILER_ID MATCHES "Clang")
-    check_and_add_compiler_option("-std=gnu99")
-elseif(CMAKE_C_COMPILER_ID MATCHES "XL")
-    #
-    # We want support for extensions picked up for GNU C compatibility,
-    # so we use -qlanglvl=extc99.
-    #
-    check_and_add_compiler_option("-qlanglvl=extc99")
-elseif(CMAKE_C_COMPILER_ID MATCHES "HP")
-    check_and_add_compiler_option("-AC99")
-elseif(CMAKE_C_COMPILER_ID MATCHES "Sun")
-    check_and_add_compiler_option("-xc99")
-elseif(CMAKE_C_COMPILER_ID MATCHES "Intel")
-    check_and_add_compiler_option("-c99")
-endif()
+if(MSVC)
+    if(MSVC_VERSION LESS 1900)
+        message(FATAL_ERROR "Visual Studio 2015 or later is required")
+    endif()
 
-# 
-# Treat source files as being in UTF-8 with MSVC.
-# We assume that UTF-8 source is OK with other compilers.
-# 
-if(MSVC AND NOT ${CMAKE_C_COMPILER} MATCHES "clang*")
-    set(C_ADDITIONAL_FLAGS "${C_ADDITIONAL_FLAGS} /utf-8")
-endif(MSVC AND NOT ${CMAKE_C_COMPILER} MATCHES "clang*")
+    #
+    # Treat source files as being in UTF-8 with MSVC if it's not using
+    # the Clang front end.
+    # We assume that UTF-8 source is OK with other compilers and with
+    # MSVC if it's using the Clang front end.
+    #
+    if(NOT ${CMAKE_C_COMPILER} MATCHES "clang*")
+        set(C_ADDITIONAL_FLAGS "${C_ADDITIONAL_FLAGS} /utf-8")
+    endif(NOT ${CMAKE_C_COMPILER} MATCHES "clang*")
+else(MSVC)
+    #
+    # Try to enable as many C99 features as we can.
+    # At minimum, we want C++/C99-style // comments.
+    #
+    # Newer versions of compilers might default to supporting C99, but
+    # older versions may require a special flag.
+    #
+    # Prior to CMake 3.1, setting CMAKE_C_STANDARD will not have any effect,
+    # so, unless and until we require CMake 3.1 or later, we have to do it
+    # ourselves on pre-3.1 CMake, so we just do it ourselves on all versions
+    # of CMake.
+    #
+    # Note: with CMake 3.1 through 3.5, the only compilers for which CMake
+    # handles CMAKE_C_STANDARD are GCC and Clang.  3.6 adds support only
+    # for Intel C; 3.9 adds support for PGI C, Sun C, and IBM XL C, and
+    # 3.10 adds support for Cray C and IAR C, but no version of CMake has
+    # support for HP C.  Therefore, even if we use CMAKE_C_STANDARD with
+    # compilers for which CMake supports it, we may still have to do it
+    # ourselves on other compilers.
+    #
+    # See the CMake documentation for the CMAKE_<LANG>_COMPILER_ID variables
+    # for a list of compiler IDs.
+    #
+    # XXX - this just tests whether the option works and adds it if it does.
+    # We don't test whether it's necessary in order to get the C99 features
+    # that we use; if we ever have a user who tries to compile with a compiler
+    # that can't be made to support those features, we can add a test to make
+    # sure we actually *have* C99 support.
+    #
+    if(CMAKE_C_COMPILER_ID MATCHES "GNU" OR
+       CMAKE_C_COMPILER_ID MATCHES "Clang")
+        check_and_add_compiler_option("-std=gnu99")
+    elseif(CMAKE_C_COMPILER_ID MATCHES "XL")
+        #
+        # We want support for extensions picked up for GNU C compatibility,
+        # so we use -qlanglvl=extc99.
+        #
+        check_and_add_compiler_option("-qlanglvl=extc99")
+    elseif(CMAKE_C_COMPILER_ID MATCHES "HP")
+        check_and_add_compiler_option("-AC99")
+    elseif(CMAKE_C_COMPILER_ID MATCHES "Sun")
+        check_and_add_compiler_option("-xc99")
+    elseif(CMAKE_C_COMPILER_ID MATCHES "Intel")
+        check_and_add_compiler_option("-c99")
+    endif()
+endif(MSVC)
 
 set(LIBRARY_NAME netdissect)
 
@@ -278,37 +292,31 @@ else(STDLIBS_HAVE_GETSERVENT)
 endif(STDLIBS_HAVE_GETSERVENT)
 cmake_pop_check_state()
 
+#
+# Make sure we have vsnprintf() and snprintf(); we require them.
+# We use check_symbol_exists(), as they aren't necessarily external
+# functions - in Visual Studio, for example, they're inline functions
+# calling a common external function.
+#
+check_symbol_exists(vsnprintf "stdio.h" HAVE_VSNPRINTF)
+if(NOT HAVE_VSNPRINTF)
+    message(FATAL_ERROR "vsnprintf() is required but wasn't found")
+endif(NOT HAVE_VSNPRINTF)
+check_symbol_exists(snprintf "stdio.h" HAVE_SNPRINTF)
+if(NOT HAVE_SNPRINTF)
+    message(FATAL_ERROR "snprintf() is required but wasn't found")
+endif()
+
 check_function_exists(getopt_long HAVE_GETOPT_LONG)
-#
-# For Windows, either
-#
-#   1) we're using VS 2015, in which case we have both snprintf()
-#      and vsnprintf(), and they behave in a C99-compliant fashion,
-#      so we use them
-#
-# or
-#
-#   2) we're not, and we don't have snprintf(), and we either don't
-#      have vsnprintf() or we have one that *doesn't* behave in a
-#      C99-compliant fashion, but we *do* have _snprintf_s() and
-#      _vsnprintf_s(), so we wrap them with #defines
-#
-# and we test for both of them at compile time, so we don't need to
-# check for snprintf() or vsnprintf() here.
-#
-# XXX - do we need to care about UN*Xes that don't have snprintf()
-# or vsnprintf() any more?
-#
-# We also don't need to waste time checking for fork() or vfork().
-#
-if(NOT WIN32)
-  check_function_exists(vsnprintf HAVE_VSNPRINTF)
-  check_function_exists(snprintf HAVE_SNPRINTF)
-  check_function_exists(fork HAVE_FORK)
-  check_function_exists(vfork HAVE_VFORK)
-endif(NOT WIN32)
 check_function_exists(strftime HAVE_STRFTIME)
 check_function_exists(setlinebuf HAVE_SETLINEBUF)
+#
+# For Windows,  don't need to waste time checking for fork() or vfork().
+#
+if(NOT WIN32)
+    check_function_exists(fork HAVE_FORK)
+    check_function_exists(vfork HAVE_VFORK)
+endif(NOT WIN32)
 
 #
 # Some platforms may need -lnsl for getrpcbynumber.
@@ -717,13 +725,15 @@ if(WITH_CRYPTO)
     find_package(CRYPTO)
     if(CRYPTO_FOUND)
         #
-        # Check for some functions.
+        # Check for some headers and functions.
         #
         cmake_push_check_state()
         set(CMAKE_REQUIRED_LIBRARIES crypto)
 
+        check_include_file(openssl/evp.h HAVE_OPENSSL_EVP_H)
+
         #
-      	# 1) do we have EVP_CIPHER_CTX_new?
+        # 1) do we have EVP_CIPHER_CTX_new?
         # If so, we use it to allocate an EVP_CIPHER_CTX, as
         # EVP_CIPHER_CTX may be opaque; otherwise, we allocate
         # it ourselves.
@@ -907,6 +917,7 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/.devel OR EXISTS ${CMAKE_BINARY_DIR}/.devel)
         check_and_add_compiler_option(-Wold-style-definition)
         check_and_add_compiler_option(-Wpedantic)
         check_and_add_compiler_option(-Wpointer-arith)
+        check_and_add_compiler_option(-Wpointer-sign)
         check_and_add_compiler_option(-Wshadow)
         check_and_add_compiler_option(-Wsign-compare)
         check_and_add_compiler_option(-Wstrict-prototypes)
@@ -955,6 +966,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-aoe.c
     print-ap1394.c
     print-arcnet.c
+    print-arista.c
     print-arp.c
     print-ascii.c
     print-atalk.c
@@ -1070,6 +1082,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-slow.c
     print-smtp.c
     print-snmp.c
+    print-ssh.c
     print-stp.c
     print-sunatm.c
     print-sunrpc.c
@@ -1111,11 +1124,6 @@ foreach(FUNC strlcat strlcpy strdup strsep getservent getopt_long)
         set(NETDISSECT_SOURCE_LIST_C ${NETDISSECT_SOURCE_LIST_C} missing/${FUNC}.c)
     endif()
 endforeach()
-if(NOT WIN32)
-    if(NOT HAVE_VSNPRINTF OR NOT HAVE_SNPRINTF)
-        set(NETDISSECT_SOURCE_LIST_C ${NETDISSECT_SOURCE_LIST_C} missing/snprintf.c)
-    endif(NOT HAVE_VSNPRINTF OR NOT HAVE_SNPRINTF)
-endif(NOT WIN32)
 
 add_library(netdissect STATIC
     ${NETDISSECT_SOURCE_LIST_C}
@@ -1216,5 +1224,4 @@ add_custom_target(uninstall
 # Tcpdump tests
 #
 add_custom_target(check
-    COMMAND ./TESTrun.sh
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+    COMMAND ${CMAKE_SOURCE_DIR}/tests/TESTrun.sh)

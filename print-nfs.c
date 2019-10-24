@@ -357,11 +357,11 @@ nfsreply_print(netdissect_options *ndo,
 	ND_TCHECK_4(rp->rm_xid);
 	if (!ndo->ndo_nflag) {
 		strlcpy(srcid, "nfs", sizeof(srcid));
-		nd_snprintf(dstid, sizeof(dstid), "%u",
+		snprintf(dstid, sizeof(dstid), "%u",
 		    GET_BE_U_4(rp->rm_xid));
 	} else {
-		nd_snprintf(srcid, sizeof(srcid), "%u", NFS_PORT);
-		nd_snprintf(dstid, sizeof(dstid), "%u",
+		snprintf(srcid, sizeof(srcid), "%u", NFS_PORT);
+		snprintf(dstid, sizeof(dstid), "%u",
 		    GET_BE_U_4(rp->rm_xid));
 	}
 	print_nfsaddr(ndo, bp2, srcid, dstid);
@@ -955,8 +955,8 @@ nfs_printfh(netdissect_options *ndo,
 struct xid_map_entry {
 	uint32_t	xid;		/* transaction ID (net order) */
 	int ipver;			/* IP version (4 or 6) */
-	struct in6_addr	client;		/* client IP address (net order) */
-	struct in6_addr	server;		/* server IP address (net order) */
+	nd_ipv6	client;			/* client IP address (net order) */
+	nd_ipv6	server;			/* server IP address (net order) */
 	uint32_t	proc;		/* call proc number (host order) */
 	uint32_t	vers;		/* program version (host order) */
 };

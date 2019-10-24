@@ -5159,29 +5159,23 @@ fi
 done
 
 
-needsnprintf=no
-for ac_func in vsnprintf snprintf
-do :
-  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
-ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
-if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
-  cat >>confdefs.h <<_ACEOF
-#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
-_ACEOF
+#
+# Make sure we have vsnprintf() and snprintf(); we require them.
+#
+ac_fn_c_check_func "$LINENO" "vsnprintf" "ac_cv_func_vsnprintf"
+if test "x$ac_cv_func_vsnprintf" = xyes; then :
 
 else
-  needsnprintf=yes
+  as_fn_error $? "vsnprintf() is required but wasn't found" "$LINENO" 5
 fi
-done
 
-if test $needsnprintf = yes; then
-	case " $LIBOBJS " in
-  *" snprintf.$ac_objext "* ) ;;
-  *) LIBOBJS="$LIBOBJS snprintf.$ac_objext"
- ;;
-esac
+ac_fn_c_check_func "$LINENO" "snprintf" "ac_cv_func_snprintf"
+if test "x$ac_cv_func_snprintf" = xyes; then :
 
+else
+  as_fn_error $? "snprintf() is required but wasn't found" "$LINENO" 5
 fi
+
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lrpc" >&5
 $as_echo_n "checking for main in -lrpc... " >&6; }
@@ -7247,6 +7241,49 @@ if ac_fn_c_try_compile "$LINENO"; then :
 $as_echo "yes" >&6; }
 		CFLAGS="$save_CFLAGS"
 		V_CCOPT="$V_CCOPT -Wpointer-arith"
+
+else
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		CFLAGS="$save_CFLAGS"
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wpointer-sign option" >&5
+$as_echo_n "checking whether the compiler supports the -Wpointer-sign option... " >&6; }
+	save_CFLAGS="$CFLAGS"
+	if expr "x-Wpointer-sign" : "x-W.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -Wpointer-sign"
+	elif expr "x-Wpointer-sign" : "x-f.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS -Werror -Wpointer-sign"
+	elif expr "x-Wpointer-sign" : "x-m.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS -Werror -Wpointer-sign"
+	else
+	    CFLAGS="$CFLAGS -Wpointer-sign"
+	fi
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+return 0
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+		CFLAGS="$save_CFLAGS"
+		V_CCOPT="$V_CCOPT -Wpointer-sign"
 
 else
 

@@ -19,7 +19,7 @@
 
 /* \summary: sFlow protocol printer */
 
-/* specification: http://www.sflow.org/developers/specifications.php */
+/* specification: https://sflow.org/developers/specifications.php */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -872,6 +872,12 @@ sflow_print(netdissect_options *ndo,
     tptr = pptr;
     tlen = len;
     sflow_datagram = (const struct sflow_datagram_t *)pptr;
+    if (len < sizeof(struct sflow_datagram_t)) {
+        ND_PRINT("sFlowv%u", GET_BE_U_4(sflow_datagram->version));
+        ND_PRINT(" [length %u < %zu]", len, sizeof(struct sflow_datagram_t));
+        nd_print_invalid(ndo);
+        return;
+    }
     ND_TCHECK_SIZE(sflow_datagram);
 
     /*

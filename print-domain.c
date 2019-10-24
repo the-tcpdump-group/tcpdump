@@ -290,7 +290,7 @@ eopt_print(netdissect_options *ndo,
 
 extern const struct tok ns_type2str[];
 
-/* http://www.iana.org/assignments/dns-parameters */
+/* https://www.iana.org/assignments/dns-parameters */
 const struct tok ns_type2str[] = {
 	{ T_A,		"A" },			/* RFC 1035 */
 	{ T_NS,		"NS" },			/* RFC 1035 */
@@ -564,7 +564,7 @@ ns_rprint(netdissect_options *ndo,
 
 	case T_A6:
 	    {
-		struct in6_addr a;
+		nd_ipv6 a;
 		int pbit, pbyte;
 		char ntop_buf[INET6_ADDRSTRLEN];
 
@@ -578,8 +578,8 @@ ns_rprint(netdissect_options *ndo,
 		} else if (pbit < 128) {
 			if (!ND_TTEST_LEN(cp + 1, sizeof(a) - pbyte))
 				return(NULL);
-			memset(&a, 0, sizeof(a));
-			memcpy(&a.s6_addr[pbyte], cp + 1, sizeof(a) - pbyte);
+			memset(a, 0, sizeof(a));
+			memcpy(a + pbyte, cp + 1, sizeof(a) - pbyte);
 			ND_PRINT(" %u %s", pbit,
 			    addrtostr6(&a, ntop_buf, sizeof(ntop_buf)));
 		}
@@ -665,6 +665,14 @@ domain_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "domain";
 	np = (const dns_header_t *)bp;
+
+	if(length < sizeof(*np)) {
+		nd_print_protocol(ndo);
+		ND_PRINT(" [length %u < %zu]", length, sizeof(*np));
+		nd_print_invalid(ndo);
+		return;
+	}
+
 	ND_TCHECK_SIZE(np);
 	flags = GET_BE_U_2(np->flags);
 	/* get the byte-order right */

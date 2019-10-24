@@ -21,7 +21,7 @@
 
 /* \summary: Berkeley UNIX Time Synchronization Protocol */
 
-/* specification: http://docs.freebsd.org/44doc/smm/12.timed/paper.pdf */
+/* specification: https://docs.freebsd.org/44doc/smm/12.timed/paper.pdf */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>

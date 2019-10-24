@@ -1399,6 +1399,11 @@ juniper_parse_header(netdissect_options *ndo,
                        lp->s,
                        l2info->cookie_len);
 
+            if (l2info->cookie_len > 8) {
+                nd_print_invalid(ndo);
+                return 0;
+            }
+
             if (l2info->cookie_len > 0) {
                 ND_TCHECK_LEN(p, l2info->cookie_len);
                 if (ndo->ndo_eflag)

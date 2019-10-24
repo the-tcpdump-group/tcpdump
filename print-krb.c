@@ -40,7 +40,7 @@
  * Kerberos Authentication and Authorization System
  * by S. P. Miller, B. C. Neuman, J. I. Schiller, and J. H. Saltzer
  *
- * http://web.mit.edu/Saltzer/www/publications/athenaplan/e.2.1.pdf
+ * https://web.mit.edu/Saltzer/www/publications/athenaplan/e.2.1.pdf
  *
  * 7. Appendix I Design Specifications
  *

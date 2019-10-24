@@ -186,9 +186,6 @@
 /* Define to 1 if you have the `setlinebuf' function. */
 #cmakedefine HAVE_SETLINEBUF 1
 
-/* Define to 1 if you have the `snprintf' function. */
-#cmakedefine HAVE_SNPRINTF 1
-
 /* Define to 1 if you have the <stdint.h> header file. */
 #cmakedefine HAVE_STDINT_H 1
 
@@ -236,9 +233,6 @@
 
 /* Define to 1 if you have the `vfork' function. */
 #cmakedefine HAVE_VFORK 1
-
-/* Define to 1 if you have the `vsnprintf' function. */
-#cmakedefine HAVE_VSNPRINTF 1
 
 /* Define to 1 if you have the `wsockinit' function. */
 #cmakedefine HAVE_WSOCKINIT 1

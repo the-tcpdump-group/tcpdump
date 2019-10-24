@@ -844,7 +844,7 @@ MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
 	if (cnt == 0 && max_chars == 0)
 		strncpy(buffer, filename, PATH_MAX + 1);
 	else
-		if (nd_snprintf(buffer, PATH_MAX + 1, "%s%0*d", filename, max_chars, cnt) > PATH_MAX)
+		if (snprintf(buffer, PATH_MAX + 1, "%s%0*d", filename, max_chars, cnt) > PATH_MAX)
                   /* Report an error if the filename is too large */
                   error("too many output files or filename is too long (> %d)", PATH_MAX);
         free(filename);
@@ -1041,7 +1041,8 @@ copy_argv(char **argv)
 static char *
 read_infile(char *fname)
 {
-	int i, fd, cc;
+	int i, fd;
+	ssize_t cc;
 	char *cp;
 	struct stat buf;
 
@@ -1060,7 +1061,7 @@ read_infile(char *fname)
 	if (cc < 0)
 		error("read %s: %s", fname, pcap_strerror(errno));
 	if (cc != buf.st_size)
-		error("short read %s (%d != %d)", fname, cc, (int)buf.st_size);
+		error("short read %s (%zd != %d)", fname, cc, (int)buf.st_size);
 
 	close(fd);
 	/* replace "# comment" with spaces */
@@ -1342,7 +1343,7 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 			/*
 			 * Return an error for our caller to handle.
 			 */
-			nd_snprintf(ebuf, PCAP_ERRBUF_SIZE, "%s: %s\n(%s)",
+			snprintf(ebuf, PCAP_ERRBUF_SIZE, "%s: %s\n(%s)",
 			    device, pcap_statustostr(status), cp);
 			pcap_close(pc);
 			return (NULL);
@@ -1356,7 +1357,7 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 			char sysctl[32];
 			size_t s = sizeof(parent);
 
-			nd_snprintf(sysctl, sizeof(sysctl),
+			snprintf(sysctl, sizeof(sysctl),
 			    "net.wlan.%d.%%parent", atoi(device + 4));
 			sysctlbyname(sysctl, parent, &s, NULL, 0);
 			strlcpy(newdev, device, sizeof(newdev));
@@ -1407,7 +1408,7 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 	 * specified, default to 256KB.
 	 */
 	if (ndo->ndo_snaplen == 0)
-		ndo->ndo_snaplen = 262144;
+		ndo->ndo_snaplen = MAXIMUM_SNAPLEN;
 	pc = pcap_open_live(device, ndo->ndo_snaplen, !pflag, 1000, ebuf);
 	if (pc == NULL) {
 		/*
@@ -1445,8 +1446,10 @@ main(int argc, char **argv)
 	u_char *pcap_userdata;
 	char ebuf[PCAP_ERRBUF_SIZE];
 	char VFileLine[PATH_MAX + 1];
-	char *username = NULL;
-	char *chroot_dir = NULL;
+	const char *username = NULL;
+#ifndef _WIN32
+	const char *chroot_dir = NULL;
+#endif
 	char *ret = NULL;
 	char *end;
 #ifdef HAVE_PCAP_FINDALLDEVS
@@ -1727,7 +1730,7 @@ main(int argc, char **argv)
 			break;
 
 		case 's':
-			ndo->ndo_snaplen = strtol(optarg, &end, 0);
+			ndo->ndo_snaplen = (int)strtol(optarg, &end, 0);
 			if (optarg == end || *end != '\0'
 			    || ndo->ndo_snaplen < 0 || ndo->ndo_snaplen > MAXIMUM_SNAPLEN)
 				error("invalid snaplen %s (must be >= 0 and <= %d)",

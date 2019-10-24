@@ -23,6 +23,8 @@
 #include <stddef.h>
 #include <string.h>
 
+#include "netdissect-ctype.h"
+
 #include "strtoaddr.h"
 
 #ifndef NS_INADDRSZ
@@ -69,21 +71,19 @@ strtoaddr(const char *src, void *dst)
 		 * Values are specified as for C:
 		 * 0x=hex, 0=octal, isdigit=decimal.
 		 */
-		if (!isdigit(c))
+		if (!ND_ASCII_ISDIGIT(c))
 			return (0);
 		val = 0;
 		if (c == '0') {
 			c = *++src;
 			if (c == 'x' || c == 'X')
 				return (0);
-			else if (isdigit(c) && c != '9')
+			else if (ND_ASCII_ISDIGIT(c) && c != '9')
 				return (0);
 		}
 		for (;;) {
-			if (isdigit(c)) {
+			if (ND_ASCII_ISDIGIT(c)) {
 				digit = c - '0';
-				if (digit >= 10)
-					break;
 				val = (val * 10) + digit;
 				c = *++src;
 			} else
@@ -107,7 +107,7 @@ strtoaddr(const char *src, void *dst)
 	/*
 	 * Check for trailing characters.
 	 */
-	if (c != '\0' && !isspace(c))
+	if (c != '\0' && c != ' ' && c != '\t')
 		return (0);
 	/*
 	 * Find the number of parts specified.

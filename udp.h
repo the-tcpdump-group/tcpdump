@@ -77,9 +77,6 @@ struct udphdr {
 #ifndef SNMPTRAP_PORT
 #define SNMPTRAP_PORT			162	/*XXX*/
 #endif
-#ifndef APPLETALK_ECHO
-#define APPLETALK_ECHO			204	/*XXX*/
-#endif
 #ifndef CISCO_AUTORP_PORT
 #define CISCO_AUTORP_PORT		496	/*XXX*/
 #endif
@@ -121,9 +118,6 @@ struct udphdr {
 #endif
 #ifndef LWRES_PORT
 #define LWRES_PORT			921	/*XXX*/
-#endif
-#ifndef MS_SQL_SERVER_MONITOR
-#define MS_SQL_SERVER_MONITOR		1434	/*XXX*/
 #endif
 #ifndef VQP_PORT
 #define VQP_PORT			1589	/*XXX*/
@@ -201,7 +195,7 @@ struct udphdr {
 #define GENEVE_PORT			6081	/* draft-gross-geneve-02 */
 #endif
 #ifndef SFLOW_PORT
-#define SFLOW_PORT			6343	/* http://www.sflow.org/developers/specifications.php */
+#define SFLOW_PORT			6343	/* https://sflow.org/developers/specifications.php */
 #endif
 #ifndef BABEL_PORT
 #define BABEL_PORT			6696	/* RFC 6126 errata */

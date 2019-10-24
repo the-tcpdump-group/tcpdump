@@ -29,7 +29,7 @@
 
 /*
  * originally defined as the Ethernet Configuration Testing Protocol.
- * specification: http://www.mit.edu/people/jhawk/ctp.pdf
+ * specification: https://www.mit.edu/people/jhawk/ctp.pdf
  */
 
 #ifdef HAVE_CONFIG_H

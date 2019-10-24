@@ -151,6 +151,7 @@ struct icmp6_hdr {
 #define ICMP6_PARAMPROB_HEADER 		0	/* erroneous header field */
 #define ICMP6_PARAMPROB_NEXTHEADER	1	/* unrecognized next header */
 #define ICMP6_PARAMPROB_OPTION		2	/* unrecognized option */
+#define ICMP6_PARAMPROB_FRAGHDRCHAIN	3	/* incomplete header chain */
 
 #define ICMP6_INFOMSG_MASK		0x80	/* all informational messages */
 
@@ -757,7 +758,7 @@ get_lifetime(uint32_t v)
 	if (v == (uint32_t)~0UL)
 		return "infinity";
 	else {
-		nd_snprintf(buf, sizeof(buf), "%us", v);
+		snprintf(buf, sizeof(buf), "%us", v);
 		return buf;
 	}
 }
@@ -1162,6 +1163,10 @@ icmp6_print(netdissect_options *ndo,
                         ND_PRINT(", option - octet %u",
 				 GET_BE_U_4(dp->icmp6_pptr));
                         break;
+		case ICMP6_PARAMPROB_FRAGHDRCHAIN:
+                        ND_PRINT(", incomplete header chain - octet %u",
+				 GET_BE_U_4(dp->icmp6_pptr));
+                        break;
 		default:
                         ND_PRINT(", code-#%u",
                                   icmp6_code);
@@ -1433,7 +1438,7 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 	const struct nd_opt_homeagent_info *oph;
 	const struct nd_opt_route_info *opri;
 	const u_char *cp, *ep, *domp;
-	struct in6_addr in6;
+	nd_ipv6 in6;
 	size_t l;
 	u_int i;
 

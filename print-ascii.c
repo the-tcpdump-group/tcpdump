@@ -43,7 +43,10 @@
 #endif
 
 #include "netdissect-stdinc.h"
+
 #include <stdio.h>
+
+#include "netdissect-ctype.h"
 
 #include "netdissect.h"
 #include "extract.h"
@@ -86,7 +89,7 @@ ascii_print(netdissect_options *ndo,
 			if (length > 1 && GET_U_1(cp) != '\n')
 				ND_PRINT(".");
 		} else {
-			if (!ND_ISGRAPH(s) &&
+			if (!ND_ASCII_ISGRAPH(s) &&
 			    (s != '\t' && s != ' ' && s != '\n'))
 				ND_PRINT(".");
 			else
@@ -117,11 +120,11 @@ hex_and_ascii_print_with_offset(netdissect_options *ndo, const char *ident,
 		cp++;
 		s2 = GET_U_1(cp);
 		cp++;
-		(void)nd_snprintf(hsp, sizeof(hexstuff) - (hsp - hexstuff),
+		(void)snprintf(hsp, sizeof(hexstuff) - (hsp - hexstuff),
 		    " %02x%02x", s1, s2);
 		hsp += HEXDUMP_HEXSTUFF_PER_SHORT;
-		*(asp++) = (char)(ND_ISGRAPH(s1) ? s1 : '.');
-		*(asp++) = (char)(ND_ISGRAPH(s2) ? s2 : '.');
+		*(asp++) = (char)(ND_ASCII_ISGRAPH(s1) ? s1 : '.');
+		*(asp++) = (char)(ND_ASCII_ISGRAPH(s2) ? s2 : '.');
 		i++;
 		if (i >= HEXDUMP_SHORTS_PER_LINE) {
 			*hsp = *asp = '\0';
@@ -136,10 +139,10 @@ hex_and_ascii_print_with_offset(netdissect_options *ndo, const char *ident,
 	if (length & 1) {
 		s1 = GET_U_1(cp);
 		cp++;
-		(void)nd_snprintf(hsp, sizeof(hexstuff) - (hsp - hexstuff),
+		(void)snprintf(hsp, sizeof(hexstuff) - (hsp - hexstuff),
 		    " %02x", s1);
 		hsp += 3;
-		*(asp++) = (char)(ND_ISGRAPH(s1) ? s1 : '.');
+		*(asp++) = (char)(ND_ASCII_ISGRAPH(s1) ? s1 : '.');
 		++i;
 	}
 	if (i > 0) {

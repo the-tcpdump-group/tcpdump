@@ -112,8 +112,6 @@ typedef unsigned char nd_byte;
 #define	roundup2(x, y)	(((x)+((y)-1))&(~((y)-1)))
 #endif
 
-/* nd_snprintf et al */
-
 #include <stdarg.h>
 #include <pcap.h>
 
@@ -304,7 +302,7 @@ extern void nd_pop_all_packet_info(netdissect_options *);
  *    1) big enough for maximum-size Linux loopback packets (65549)
  *       and some USB packets captured with USBPcap:
  *
- *           http://desowin.org/usbpcap/
+ *           https://desowin.org/usbpcap/
  *
  *       (> 131072, < 262144)
  *
@@ -340,7 +338,7 @@ extern void nd_pop_all_packet_info(netdissect_options *);
  * you subtract a positive integer from a pointer, the result is
  * guaranteed to be less than the original pointer value). See
  *
- *	http://www.kb.cert.org/vuls/id/162289
+ *	https://www.kb.cert.org/vuls/id/162289
  */
 
 /*
@@ -396,35 +394,6 @@ extern int nd_printzp(netdissect_options *, const u_char *, u_int, const u_char 
 
 extern void txtproto_print(netdissect_options *, const u_char *, u_int,
 			   const char **, u_int);
-
-/*
- * Locale-independent macros for testing character properties and
- * stripping the 8th bit from characters.
- *
- * Byte values outside the ASCII range are considered unprintable, so
- * both ND_ISPRINT() and ND_ISGRAPH() return "false" for them.
- *
- * Assumed to be handed a value between 0 and 255, i.e. don't hand them
- * a char, as those might be in the range -128 to 127.
- */
-#define ND_ISASCII(c)	(!((c) & 0x80))	/* value is an ASCII code point */
-#define ND_ISPRINT(c)	((c) >= 0x20 && (c) <= 0x7E)
-#define ND_ISGRAPH(c)	((c) > 0x20 && (c) <= 0x7E)
-#define ND_TOASCII(c)	((c) & 0x7F)
-
-/*
- * Locale-independent macros for coverting to upper or lower case.
- *
- * Byte values outside the ASCII range are not converted.  Byte values
- * *in* the ASCII range are converted to byte values in the ASCII range;
- * in particular, 'i' is upper-cased to 'I" and 'I' is lower-cased to 'i',
- * even in Turkish locales.
- *
- * Assumed to be handed a value between 0 and 255, i.e. don't hand
- * them a char, as those might be in the range -128 to 127.
- */
-#define ND_TOLOWER(c)	(((c) >= 'A' && (c) <= 'Z') ? (c) - 'A' + 'a' : (c))
-#define ND_TOUPPER(c)	(((c) >= 'a' && (c) <= 'z') ? (c) - 'a' + 'A' : (c))
 
 #if (defined(__i386__) || defined(_M_IX86) || defined(__X86__) || defined(__x86_64__) || defined(_M_X64)) || \
     (defined(__arm__) || defined(_M_ARM) || defined(__aarch64__)) || \
@@ -566,6 +535,7 @@ extern int ah_print(netdissect_options *, const u_char *);
 extern void ahcp_print(netdissect_options *, const u_char *, const u_int);
 extern void aodv_print(netdissect_options *, const u_char *, u_int, int);
 extern void aoe_print(netdissect_options *, const u_char *, const u_int);
+extern int  arista_ethertype_print(netdissect_options *,const u_char *, u_int);
 extern void arp_print(netdissect_options *, const u_char *, u_int, u_int);
 extern void ascii_print(netdissect_options *, const u_char *, u_int);
 extern void atalk_print(netdissect_options *, const u_char *, u_int);
@@ -689,6 +659,7 @@ extern void rtsp_print(netdissect_options *, const u_char *, u_int);
 extern void rx_print(netdissect_options *, const u_char *, u_int, u_int, u_int, const u_char *);
 extern void sctp_print(netdissect_options *, const u_char *, const u_char *, u_int);
 extern void sflow_print(netdissect_options *, const u_char *, u_int);
+extern void ssh_print(netdissect_options *, const u_char *, u_int);
 extern void sip_print(netdissect_options *, const u_char *, u_int);
 extern void slow_print(netdissect_options *, const u_char *, u_int);
 extern void smb_data_print(netdissect_options *, const u_char *, u_int);
@@ -742,6 +713,7 @@ extern uint16_t nextproto6_cksum(netdissect_options *, const struct ip6_hdr *, c
 /* Utilities */
 extern void nd_print_trunc(netdissect_options *);
 extern void nd_print_protocol(netdissect_options *);
+extern void nd_print_protocol_caps(netdissect_options *);
 extern void nd_print_invalid(netdissect_options *);
 
 extern int mask2plen(uint32_t);

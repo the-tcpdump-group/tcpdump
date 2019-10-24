@@ -517,8 +517,8 @@ ospf_print_lshdr(netdissect_options *ndo,
         ND_TCHECK_2(lshp->ls_length);
         ls_length = GET_BE_U_2(lshp->ls_length);
         if (ls_length < sizeof(struct lsa_hdr)) {
-                ND_PRINT("\n\t    Bogus length %u < header (%lu)", ls_length,
-                    (unsigned long)sizeof(struct lsa_hdr));
+                ND_PRINT("\n\t    Bogus length %u < header (%zu)", ls_length,
+                    sizeof(struct lsa_hdr));
                 return(-1);
         }
 

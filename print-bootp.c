@@ -512,7 +512,7 @@ static const struct tok tag2str[] = {
 	{ TAG_CLASSLESS_STA_RT_MS, "$Classless-Static-Route-Microsoft" },
 /* RFC 5859 - TFTP Server Address Option for DHCPv4 */
 	{ TAG_TFTP_SERVER_ADDRESS, "iTFTP-Server-Address" },
-/* http://www.iana.org/assignments/bootp-dhcp-extensions/index.htm */
+/* https://www.iana.org/assignments/bootp-dhcp-parameters/bootp-dhcp-parameters.xhtml#options */
 	{ TAG_SLP_NAMING_AUTH,	"aSLP-NA" },
 	{ TAG_CLIENT_FQDN,	"$FQDN" },
 	{ TAG_AGENT_CIRCUIT,	"$Agent-Information" },

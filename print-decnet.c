@@ -1245,7 +1245,7 @@ dnnum_string(netdissect_options *ndo, u_short dnaddr)
 	str = (char *)malloc(siz = sizeof("00.0000"));
 	if (str == NULL)
 		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC, "dnnum_string: malloc");
-	nd_snprintf(str, siz, "%u.%u", area, node);
+	snprintf(str, siz, "%u.%u", area, node);
 	return(str);
 }
 

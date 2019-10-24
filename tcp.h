@@ -94,6 +94,9 @@ struct tcphdr {
 #ifndef FTP_PORT
 #define FTP_PORT		21
 #endif
+#ifndef SSH_PORT
+#define SSH_PORT		22
+#endif
 #ifndef TELNET_PORT
 #define TELNET_PORT		23
 #endif

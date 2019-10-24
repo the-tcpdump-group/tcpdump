@@ -106,7 +106,7 @@ ipxaddr_string(netdissect_options *ndo, uint32_t net, const u_char *node)
 {
     static char line[256];
 
-    nd_snprintf(line, sizeof(line), "%08x.%02x:%02x:%02x:%02x:%02x:%02x",
+    snprintf(line, sizeof(line), "%08x.%02x:%02x:%02x:%02x:%02x:%02x",
 	    net, GET_U_1(node), GET_U_1(node + 1),
 	    GET_U_1(node + 2), GET_U_1(node + 3),
 	    GET_U_1(node + 4), GET_U_1(node + 5));

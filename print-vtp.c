@@ -13,8 +13,8 @@
  * FOR A PARTICULAR PURPOSE.
  *
  * Reference documentation:
- *  http://www.cisco.com/c/en/us/support/docs/lan-switching/vtp/10558-21.html
- *  http://docstore.mik.ua/univercd/cc/td/doc/product/lan/trsrb/frames.htm
+ *  https://www.cisco.com/c/en/us/support/docs/lan-switching/vtp/10558-21.html
+ *  https://docstore.mik.ua/univercd/cc/td/doc/product/lan/trsrb/frames.htm
  *
  * Original code ode by Carles Kishimoto <carles.kishimoto@gmail.com>
  */
@@ -242,7 +242,7 @@ vtp_print(netdissect_options *ndo,
 	 */
 
 	tptr += 4;
-	while (tptr < (pptr+length)) {
+	while ((unsigned)(tptr - pptr) < length) {
 
 	    ND_TCHECK_1(tptr);
 	    len = GET_U_1(tptr);
@@ -281,7 +281,7 @@ vtp_print(netdissect_options *ndo,
 
                 /*
                  * Cisco specs say 2 bytes for type + 2 bytes for length;
-                 * see http://docstore.mik.ua/univercd/cc/td/doc/product/lan/trsrb/frames.htm
+                 * see https://docstore.mik.ua/univercd/cc/td/doc/product/lan/trsrb/frames.htm
                  * However, actual packets on the wire appear to use 1
                  * byte for the type and 1 byte for the length, so that's
                  * what we do.

@@ -152,7 +152,7 @@ q922_string(netdissect_options *ndo, const u_char *p, u_int length)
     memset(buffer, 0, sizeof(buffer));
 
     if (parse_q922_header(ndo, p, &dlci, &addr_len, &flags, length) == 1){
-        nd_snprintf(buffer, sizeof(buffer), "DLCI %u", dlci);
+        snprintf(buffer, sizeof(buffer), "DLCI %u", dlci);
     }
 
     return buffer;
@@ -495,6 +495,12 @@ mfr_print(netdissect_options *ndo,
             switch (ie_type) {
 
             case MFR_CTRL_IE_MAGIC_NUM:
+                /* FRF.16.1 Section 3.4.3 Magic Number Information Element */
+                if (ie_len != 4) {
+                    ND_PRINT("[IE data length %d != 4]", ie_len);
+                    nd_print_invalid(ndo);
+                    break;
+                }
                 ND_PRINT("0x%08x", GET_BE_U_4(tptr));
                 break;
 

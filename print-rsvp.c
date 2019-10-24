@@ -113,6 +113,13 @@ static const struct tok rsvp_header_flag_values[] = {
     { 0, NULL}
 };
 
+static const struct tok rsvp_obj_capability_flag_values[] = {
+    { 0x0004,                "RecoveryPath Transmit Enabled" },
+    { 0x0002,                "RecoveryPath Desired" },
+    { 0x0001,                "RecoveryPath Srefresh Capable" },
+    { 0, NULL}
+};
+
 #define	RSVP_OBJ_SESSION            1   /* rfc2205 */
 #define	RSVP_OBJ_RSVP_HOP           3   /* rfc2205, rfc3473 */
 #define	RSVP_OBJ_INTEGRITY          4   /* rfc2747 */
@@ -146,6 +153,7 @@ static const struct tok rsvp_header_flag_values[] = {
 #define	RSVP_OBJ_SUGGESTED_LABEL    129 /* rfc3473 */
 #define	RSVP_OBJ_ACCEPT_LABEL_SET   130 /* rfc3473 */
 #define	RSVP_OBJ_RESTART_CAPABILITY 131 /* rfc3473 */
+#define RSVP_OBJ_CAPABILITY         134 /* rfc5063 */
 #define	RSVP_OBJ_NOTIFY_REQ         195 /* rfc3473 */
 #define	RSVP_OBJ_ADMIN_STATUS       196 /* rfc3473 */
 #define	RSVP_OBJ_PROPERTIES         204 /* juniper proprietary */
@@ -193,6 +201,7 @@ static const struct tok rsvp_obj_values[] = {
     { RSVP_OBJ_CALL_ID,            "Call-ID" },
     { RSVP_OBJ_CALL_OPS,           "Call Capability" },
     { RSVP_OBJ_RESTART_CAPABILITY, "Restart Capability" },
+    { RSVP_OBJ_CAPABILITY,         "Capability" },
     { RSVP_OBJ_NOTIFY_REQ,         "Notify Request" },
     { RSVP_OBJ_PROTECTION,         "Protection" },
     { RSVP_OBJ_ADMIN_STATUS,       "Administrative Status" },
@@ -280,6 +289,7 @@ static const struct tok rsvp_ctype_values[] = {
     { 256*RSVP_OBJ_ERROR_SPEC+RSVP_CTYPE_3,                  "IPv4 plus opt. TLVs" },
     { 256*RSVP_OBJ_ERROR_SPEC+RSVP_CTYPE_4,                  "IPv6 plus opt. TLVs" },
     { 256*RSVP_OBJ_RESTART_CAPABILITY+RSVP_CTYPE_1,          "IPv4" },
+    { 256*RSVP_OBJ_CAPABILITY+RSVP_CTYPE_1,                  "1" },
     { 256*RSVP_OBJ_SESSION_ATTRIBUTE+RSVP_CTYPE_TUNNEL_IPV4, "Tunnel IPv4" },
     { 256*RSVP_OBJ_FASTREROUTE+RSVP_CTYPE_TUNNEL_IPV4,       "Tunnel IPv4" }, /* old style*/
     { 256*RSVP_OBJ_FASTREROUTE+RSVP_CTYPE_1,                 "1" }, /* new style */
@@ -322,6 +332,8 @@ struct rsvp_obj_frr_t {
 
 #define RSVP_OBJ_XRO_MASK_SUBOBJ(x)   ((x)&0x7f)
 #define RSVP_OBJ_XRO_MASK_LOOSE(x)    ((x)&0x80)
+
+#define RSVP_OBJ_CAPABILITY_FLAGS_MASK  0x7
 
 #define	RSVP_OBJ_XRO_RES       0
 #define	RSVP_OBJ_XRO_IPV4      1
@@ -698,8 +710,8 @@ rsvp_obj_print(netdissect_options *ndo,
             return -1;
         }
         if(rsvp_obj_len < sizeof(struct rsvp_object_header)) {
-            ND_PRINT("%sERROR: object header too short %u < %lu", indent, rsvp_obj_len,
-                   (unsigned long)sizeof(struct rsvp_object_header));
+            ND_PRINT("%sERROR: object header too short %u < %zu", indent, rsvp_obj_len,
+                   sizeof(struct rsvp_object_header));
             return -1;
         }
 
@@ -1170,6 +1182,28 @@ rsvp_obj_print(netdissect_options *ndo,
                        GET_BE_U_4(obj_tptr + 4));
                 obj_tlen-=8;
                 obj_tptr+=8;
+                break;
+            default:
+                hexdump=TRUE;
+            }
+            break;
+
+        case RSVP_OBJ_CAPABILITY:
+            switch(rsvp_obj_ctype) {
+            case RSVP_CTYPE_1:
+                if (obj_tlen < 4)
+                    return-1;
+                uint8_t unused_and_flags = GET_BE_U_4(obj_tptr);
+                if (unused_and_flags & ~RSVP_OBJ_CAPABILITY_FLAGS_MASK)
+                    ND_PRINT("%s  [reserved=0x%08x must be zero]", indent,
+                        unused_and_flags & ~RSVP_OBJ_CAPABILITY_FLAGS_MASK);
+                ND_PRINT("%s  Flags: [%s]",
+                       indent,
+                       bittok2str(rsvp_obj_capability_flag_values,
+                                  "none",
+                                  (unused_and_flags & RSVP_OBJ_CAPABILITY_FLAGS_MASK)));
+                obj_tlen-=4;
+                obj_tptr+=4;
                 break;
             default:
                 hexdump=TRUE;
@@ -1921,8 +1955,8 @@ rsvp_print(netdissect_options *ndo,
            GET_BE_U_2(rsvp_com_header->checksum));
 
     if (tlen < sizeof(struct rsvp_common_header)) {
-        ND_PRINT("ERROR: common header too short %u < %lu", tlen,
-               (unsigned long)sizeof(struct rsvp_common_header));
+        ND_PRINT("ERROR: common header too short %u < %zu", tlen,
+               sizeof(struct rsvp_common_header));
         return;
     }
 
@@ -1969,8 +2003,8 @@ rsvp_print(netdissect_options *ndo,
                    GET_BE_U_2(rsvp_com_header->checksum));
 
             if (subtlen < sizeof(struct rsvp_common_header)) {
-                ND_PRINT("ERROR: common header too short %u < %lu", subtlen,
-                       (unsigned long)sizeof(struct rsvp_common_header));
+                ND_PRINT("ERROR: common header too short %u < %zu", subtlen,
+                       sizeof(struct rsvp_common_header));
                 return;
             }
 

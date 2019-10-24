@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 
+ * Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
  *	1997, 2000, 2011, 2012
  *	The Regents of the University of California.  All rights reserved.
  *
@@ -29,10 +29,9 @@
 #include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include <stdio.h>
-#include <pcap.h>
 
 #include "netdissect.h"
 #include "extract.h"
@@ -81,7 +80,7 @@ ipoib_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 	}
 
 	if (ndo->ndo_eflag) {
-		ND_PRINT("IPOIB");
+		nd_print_protocol_caps(ndo);
 		if (print_encap_header != NULL)
 			(*print_encap_header)(encap_header_arg);
 		ipoib_hdr_print(ndo, p, length);

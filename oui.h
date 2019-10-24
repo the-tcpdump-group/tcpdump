@@ -45,7 +45,7 @@ extern const struct tok smi_values[];
  * These are SMI Network Management Private Enterprise Codes for
  * organizations; see
  *
- *	http://www.iana.org/assignments/enterprise-numbers
+ *	https://www.iana.org/assignments/enterprise-numbers
  *
  * for a list.
  *

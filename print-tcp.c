@@ -68,8 +68,8 @@ static void print_tcp_fastopen_option(netdissect_options *ndo, const u_char *cp,
 
 
 struct tha {
-        struct in_addr src;
-        struct in_addr dst;
+        nd_ipv4 src;
+        nd_ipv4 dst;
         u_int port;
 };
 
@@ -81,8 +81,8 @@ struct tcp_seq_hash {
 };
 
 struct tha6 {
-        struct in6_addr src;
-        struct in6_addr dst;
+        nd_ipv6 src;
+        nd_ipv6 dst;
         u_int port;
 };
 
@@ -227,8 +227,8 @@ tcp_print(netdissect_options *ndo,
         hlen = TH_OFF(tp) * 4;
 
         if (hlen < sizeof(*tp)) {
-                ND_PRINT(" tcp %u [bad hdr length %u - too short, < %lu]",
-                         length - hlen, hlen, (unsigned long)sizeof(*tp));
+                ND_PRINT(" tcp %u [bad hdr length %u - too short, < %zu]",
+                         length - hlen, hlen, sizeof(*tp));
                 return;
         }
 
@@ -721,6 +721,8 @@ tcp_print(netdissect_options *ndo,
                 pptp_print(ndo, bp);
         else if (IS_SRC_OR_DST_PORT(REDIS_PORT))
                 resp_print(ndo, bp, length);
+        else if (IS_SRC_OR_DST_PORT(SSH_PORT))
+                ssh_print(ndo, bp, length);
 #ifdef ENABLE_SMB
         else if (IS_SRC_OR_DST_PORT(NETBIOS_SSN_PORT))
                 nbt_tcp_print(ndo, bp, length);

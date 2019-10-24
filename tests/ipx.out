@@ -7,8 +7,6 @@
 [010] 20 00 01 02 5F 5F 4D 53  42 52 4F 57 53 45 5F 5F   ^@^A^B__MS BROWSE__
 [020] 02 01                                             ^B^A 
 SMB PACKET: SMBtrans (REQUEST)
-
-
     5  10:06:37.582596 IPX 00000000.00:03:47:1b:c1:a8.0453 > 00000000.ff:ff:ff:ff:ff:ff.0453: ipx-rip-resp a8f87967/1.2
     6  10:07:10.193661 IPX 00000000.00:30:c1:bf:57:55.0452 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 030c '0030C1BF575580D0NPIBF5755' addr 00000000.00:30:c1:bf:57:55
     7  10:07:14.493808 IPX 00000000.00:14:85:ac:cd:ad.4008 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 064e 'EKTA!!!!!!!!!!!A5569B20ABE511CE9CA400004C762832' addr 00000000.00:14:85:ac:cd:ad
@@ -41,8 +39,6 @@ SMB PACKET: SMBtrans (REQUEST)
 [010] 20 00 01 02 5F 5F 4D 53  42 52 4F 57 53 45 5F 5F   ^@^A^B__MS BROWSE__
 [020] 02 01                                             ^B^A 
 SMB PACKET: SMBtrans (REQUEST)
-
-
    32  10:11:37.612708 IPX 00000000.00:13:20:61:83:a3.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
    33  10:11:37.625971 IPX 00000000.00:03:47:1b:c1:a8.0453 > 00000000.ff:ff:ff:ff:ff:ff.0453: ipx-rip-resp a8f87967/1.2
    34  10:11:38.433061 IPX 00000000.00:13:20:61:83:a3.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
@@ -55,8 +51,6 @@ SMB PACKET: SMBtrans (REQUEST)
 [030] 20 20 20 00 41 56 45 53  48 20 20 20 20 20 20 20     ^@AVES H       
 [040] 20 20 20 00                                          ^@ 
 SMB PACKET: SMBtrans (REQUEST)
-
-
    37  10:12:10.196195 IPX 00000000.00:30:c1:bf:57:55.0452 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 030c '0030C1BF575580D0NPIBF5755' addr 00000000.00:30:c1:bf:57:55
    38  10:12:14.500611 IPX 00000000.00:14:85:ac:cd:ad.4008 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 064e 'EKTA!!!!!!!!!!!A5569B20ABE511CE9CA400004C762832' addr 00000000.00:14:85:ac:cd:ad
    39  10:12:15.688284 IPX 00000000.00:13:20:61:83:a3.4008 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 064e 'AVESH!!!!!!!!!!A5569B20ABE511CE9CA400004C762832' addr 00000000.00:13:20:61:83:a3
@@ -70,8 +64,6 @@ SMB PACKET: SMBtrans (REQUEST)
 [010] 20 00 01 02 5F 5F 4D 53  42 52 4F 57 53 45 5F 5F   ^@^A^B__MS BROWSE__
 [020] 02 01                                             ^B^A 
 SMB PACKET: SMBtrans (REQUEST)
-
-
    45  10:13:07.039144 IPX 00000000.00:14:85:ac:cd:ad.0553 > 00000000.ff:ff:ff:ff:ff:ff.0553: ipx-nwlink-dgm 187
 >>> IPX transport Data: (68 bytes)
 [000] 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ^@^@^@^@^@^@^@^@ ^@^@^@^@^@^@^@^@
@@ -80,8 +72,6 @@ SMB PACKET: SMBtrans (REQUEST)
 [030] 20 20 20 00 45 4B 54 41  20 20 20 20 20 20 20 20     ^@EKTA         
 [040] 20 20 20 00                                          ^@ 
 SMB PACKET: SMBtrans (REQUEST)
-
-
    46  10:13:07.040801 IPX 00000000.00:14:85:ac:cd:ad.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
    47  10:13:07.820138 IPX 00000000.00:14:85:ac:cd:ad.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
    48  10:13:08.599456 IPX 00000000.00:14:85:ac:cd:ad.0455 > 00000000.ff:ff:ff:ff:ff:ff.0455: ipx-netbios 50
@@ -100,8 +90,6 @@ SMB PACKET: SMBtrans (REQUEST)
 [030] 20 20 20 00 41 44 4D 49  4E 54 45 53 54 20 20 20     ^@ADMI NTEST   
 [040] 20 20 20 00                                          ^@ 
 SMB PACKET: SMBtrans (REQUEST)
-
-
    57  10:14:10.197156 IPX 00000000.00:30:c1:bf:57:55.0452 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 030c '0030C1BF575580D0NPIBF5755' addr 00000000.00:30:c1:bf:57:55
    58  10:14:14.503363 IPX 00000000.00:14:85:ac:cd:ad.4008 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 064e 'EKTA!!!!!!!!!!!A5569B20ABE511CE9CA400004C762832' addr 00000000.00:14:85:ac:cd:ad
    59  10:14:15.692322 IPX 00000000.00:13:20:61:83:a3.4008 > 00000000.ff:ff:ff:ff:ff:ff.0452: ipx-sap-resp 064e 'AVESH!!!!!!!!!!A5569B20ABE511CE9CA400004C762832' addr 00000000.00:13:20:61:83:a3

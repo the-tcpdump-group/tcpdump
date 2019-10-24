@@ -2,6 +2,9 @@
 
 $TCPDUMP = "../tcpdump" if (!($TCPDUMP = $ENV{TCPDUMP_BIN}));
 
+use File::Basename;
+use POSIX qw( WEXITSTATUS WIFEXITED);
+
 system("mkdir -p NEW DIFF");
 
 if(@ARGV != 4) {
@@ -16,38 +19,105 @@ $options=$ARGV[3];
 
 my $r;
 
+$outputbase = basename($output);
+my $coredump = false;
+my $status = 0;
+my $linecount = 0;
+my $rawstderrlog = "NEW/${outputbase}.raw.stderr";
+my $stderrlog = "NEW/${outputbase}.stderr";
+my $diffstat = 0;
+my $errdiffstat = 0;
+
 if ($^O eq 'MSWin32') {
-    $r = system "..\\windump -# -n -r $input $options 2>NUL | sed 's/\\r//' | tee NEW/$output | diff $output - >DIFF/$output.diff";
+    $r = system "..\\windump -# -n -r $input $options 2>NUL | sed 's/\\r//' | tee NEW/$outputbase | diff $output - >DIFF/$outputbase.diff";
     # need to do same as below for Cygwin.
 }
 else {
     # we used to do this as a nice pipeline, but the problem is that $r fails to
     # to be set properly if the tcpdump core dumps.
-    $r = system "$TCPDUMP 2>/dev/null -# -n -r $input $options >NEW/$output";
+    $r = system "$TCPDUMP 2>${rawstderrlog} -# -n -r $input $options >NEW/${outputbase}";
+    if($r == -1) {
+        # failed to start due to error.
+        $status = $!;
+    }
     if($r != 0) {
+        $coredump = false;
+        $status = 0;
         # this means tcpdump failed.
-        open(OUTPUT, ">>"."NEW/$output") || die "fail to open $output\n";
-        printf OUTPUT "EXIT CODE %08x\n", $r;
+        open(OUTPUT, ">>"."NEW/$outputbase") || die "fail to open $outputbase\n";
+        if( $r & 128 ) {
+            $coredump = $r & 127;
+        }
+        if( WIFEXITED($r)) {
+            $status = WEXITSTATUS($r);
+        }
+
+        if($coredump || $status) {
+            printf OUTPUT "EXIT CODE %08x: dump:%d code: %d\n", $r, $coredump, $status;
+        } else {
+            printf OUTPUT "EXIT CODE %08x\n", $r;
+        }
         close(OUTPUT);
         $r = 0;
     }
     if($r == 0) {
-        $r = system "cat NEW/$output | diff $output - >DIFF/$output.diff";
+        $r = system "cat NEW/$outputbase | diff $output - >DIFF/$outputbase.diff";
+        $diffstat = WEXITSTATUS($r);
     }
+
+    # process the file, sanitize "reading from" line, and count lines
+    $linecount = 0;
+    open(ERRORRAW, "<" . $rawstderrlog);
+    open(ERROROUT, ">" . $stderrlog);
+    while(<ERRORRAW>) {
+        next if /^$/;  # blank lines are boring
+        if(/^(reading from file )(.*)(,.*)$/) {
+            my $filename = basename($2);
+            print ERROROUT "${1}${filename}${3}\n";
+            next;
+        }
+        print ERROROUT;
+        $linecount++;
+    }
+    close(ERROROUT);
+    close(ERRORRAW);
+
+    if ( -f "$output.stderr" ) {
+        $nr = system "cat $stderrlog | diff $output.stderr - >DIFF/$outputbase.stderr.diff";
+        if($r == 0) {
+            $r = $nr;
+        }
+        $errdiffstat = WEXITSTATUS($nr);
+    }
+
+    if($r == 0) {
+        if($linecount == 0 && $status == 0) {
+            unlink($stderrlog);
+        } else {
+            $errdiffstat = 1;
+        }
+    }
+
     #print sprintf("END: %08x\n", $r);
 }
 
 if($r == 0) {
-  printf "    %-35s: passed\n", $name;
-  unlink "DIFF/$output.diff";
-  exit 0;
+    if($linecount == 0) {
+        printf "    %-35s: passed\n", $name;
+    } else {
+        printf "    %-35s: passed with error messages:\n", $name;
+        system "cat $stderrlog";
+    }
+    unlink "DIFF/$outputbase.diff";
+    exit 0;
 }
-printf "    %-35s: TEST FAILED(%s)", $name, $r == -1 ? $! : "exit $?";
+# must have failed!
+printf "    %-35s: TEST FAILED(exit core=%d/diffstat=%d,%d/r=%d)", $name, $coredump, $diffstat, $errdiffstat, $r;
 open FOUT, '>>failure-outputs.txt';
 printf FOUT "\nFailed test: $name\n\n";
 close FOUT;
-if(-f "DIFF/$output.diff") {
-    system "cat DIFF/$output.diff >> failure-outputs.txt";
+if(-f "DIFF/$outputbase.diff") {
+    system "cat DIFF/$outputbase.diff >> failure-outputs.txt";
 }
 
 if($r == -1) {
@@ -65,8 +135,19 @@ if($r & 127 || -f "core") {
     if(-f "core") {
         $with = "with";
     }
-    printf " (terminated with signal %u, %s coredump)\n", ($r & 127), $with;
+    printf " (terminated with signal %u, %s coredump)", ($r & 127), $with;
+    if($linecount == 0) {
+        print "\n";
+    } else {
+        print " with error messages:\n";
+        system "cat $stderrlog";
+    }
     exit ($r & 128) ? 10 : 20;
 }
-print "\n";
+if($linecount == 0) {
+    print "\n";
+} else {
+    print " with error messages:\n";
+    system "cat $stderrlog";
+}
 exit $r >> 8;

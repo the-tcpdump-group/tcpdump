@@ -184,7 +184,7 @@ win32_gethostbyaddr(const char *addr, int len, int type)
 #endif /* _WIN32 */
 
 struct h6namemem {
-	struct in6_addr addr;
+	nd_ipv6 addr;
 	char *name;
 	struct h6namemem *nxt;
 };
@@ -346,7 +346,7 @@ ip6addr_string(netdissect_options *ndo, const u_char *ap)
 {
 	struct hostent *hp;
 	union {
-		struct in6_addr addr;
+		nd_ipv6 addr;
 		struct for_hash_addr {
 			char fill[14];
 			uint16_t d;
@@ -362,7 +362,7 @@ ip6addr_string(netdissect_options *ndo, const u_char *ap)
 		if (memcmp(&p->addr, &addr, sizeof(addr)) == 0)
 			return (p->name);
 	}
-	p->addr = addr.addr;
+	memcpy(p->addr, addr.addr, sizeof(nd_ipv6));
 	p->nxt = newh6namemem(ndo);
 
 	/*
@@ -405,6 +405,38 @@ static const char hex[16] = {
 	'0', '1', '2', '3', '4', '5', '6', '7',
 	'8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
 };
+
+/*
+ * Convert an octet to two hex digits.
+ *
+ * Coverity appears either:
+ *
+ *    not to believe the C standard when it asserts that a uint8_t is
+ *    exactly 8 bits in size;
+ *
+ *    not to believe that an unsigned type of exactly 8 bits has a value
+ *    in the range of 0 to 255;
+ *
+ *    not to believe that, for a range of unsigned values, if you shift
+ *    one of those values right by 4 bits, the maximum result value is
+ *    the maximum value shifted right by 4 bits, with no stray 1's shifted
+ *    in;
+ *
+ *    not to believe that 255 >> 4 is 15;
+ *
+ * so it gets upset that we're taking a "tainted" unsigned value, shifting
+ * it right 4 bits, and using it as an index into a 16-element array.
+ *
+ * So we do a stupid pointless masking of the result of the shift with
+ * 0xf, to hammer the point home to Coverity.
+ */
+static inline char *
+octet_to_hex(char *cp, uint8_t octet)
+{
+	*cp++ = hex[(octet >> 4) & 0xf];
+	*cp++ = hex[(octet >> 0) & 0xf];
+	return (cp);
+}
 
 /* Find the hash node that corresponds the ether address 'ep' */
 
@@ -589,16 +621,14 @@ etheraddr_string(netdissect_options *ndo, const uint8_t *ep)
 #endif
 	cp = buf;
 	oui = EXTRACT_BE_U_3(ep);
-	*cp++ = hex[*ep >> 4 ];
-	*cp++ = hex[*ep++ & 0xf];
+	cp = octet_to_hex(cp, *ep++);
 	for (i = 5; --i >= 0;) {
 		*cp++ = ':';
-		*cp++ = hex[*ep >> 4 ];
-		*cp++ = hex[*ep++ & 0xf];
+		cp = octet_to_hex(cp, *ep++);
 	}
 
 	if (!ndo->ndo_nflag) {
-		nd_snprintf(cp, BUFSIZE - (2 + 5*3), " (oui %s)",
+		snprintf(cp, BUFSIZE - (2 + 5*3), " (oui %s)",
 		    tok2str(oui_values, "Unknown", oui));
 	} else
 		*cp = '\0';
@@ -624,8 +654,7 @@ le64addr_string(netdissect_options *ndo, const uint8_t *ep)
 
 	cp = buf;
 	for (i = len; i > 0 ; --i) {
-		*cp++ = hex[*(ep + i - 1) >> 4];
-		*cp++ = hex[*(ep + i - 1) & 0xf];
+		cp = octet_to_hex(cp, *(ep + i - 1));
 		*cp++ = ':';
 	}
 	cp --;
@@ -665,12 +694,10 @@ linkaddr_string(netdissect_options *ndo, const uint8_t *ep,
 	if (tp->bs_name == NULL)
 		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
 				  "linkaddr_string: malloc");
-	*cp++ = hex[*ep >> 4];
-	*cp++ = hex[*ep++ & 0xf];
+	cp = octet_to_hex(cp, *ep++);
 	for (i = len-1; i > 0 ; --i) {
 		*cp++ = ':';
-		*cp++ = hex[*ep >> 4];
-		*cp++ = hex[*ep++ & 0xf];
+		cp = octet_to_hex(cp, *ep++);
 	}
 	*cp = '\0';
 	return (tp->bs_name);
@@ -698,8 +725,7 @@ isonsap_string(netdissect_options *ndo, const uint8_t *nsap,
 				  "isonsap_string: malloc");
 
 	for (nsap_idx = 0; nsap_idx < nsap_length; nsap_idx++) {
-		*cp++ = hex[*nsap >> 4];
-		*cp++ = hex[*nsap++ & 0xf];
+		cp = octet_to_hex(cp, *nsap++);
 		if (((nsap_idx & 1) == 0) &&
 		     (nsap_idx + 1 < nsap_length)) {
 			*cp++ = '.';
@@ -723,7 +749,7 @@ tcpport_string(netdissect_options *ndo, u_short port)
 	tp->addr = i;
 	tp->nxt = newhnamemem(ndo);
 
-	(void)nd_snprintf(buf, sizeof(buf), "%u", i);
+	(void)snprintf(buf, sizeof(buf), "%u", i);
 	tp->name = strdup(buf);
 	if (tp->name == NULL)
 		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
@@ -745,7 +771,7 @@ udpport_string(netdissect_options *ndo, u_short port)
 	tp->addr = i;
 	tp->nxt = newhnamemem(ndo);
 
-	(void)nd_snprintf(buf, sizeof(buf), "%u", i);
+	(void)snprintf(buf, sizeof(buf), "%u", i);
 	tp->name = strdup(buf);
 	if (tp->name == NULL)
 		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
@@ -803,7 +829,7 @@ init_servarray(netdissect_options *ndo)
 		while (table->name)
 			table = table->nxt;
 		if (ndo->ndo_nflag) {
-			(void)nd_snprintf(buf, sizeof(buf), "%d", port);
+			(void)snprintf(buf, sizeof(buf), "%d", port);
 			table->name = strdup(buf);
 		} else
 			table->name = strdup(sv->s_name);
@@ -1307,7 +1333,7 @@ const char *
 ieee8021q_tci_string(const uint16_t tci)
 {
 	static char buf[128];
-	nd_snprintf(buf, sizeof(buf), "vlan %u, p %u%s",
+	snprintf(buf, sizeof(buf), "vlan %u, p %u%s",
 	         tci & 0xfff,
 	         tci >> 13,
 	         (tci & 0x1000) ? ", DEI" : "");

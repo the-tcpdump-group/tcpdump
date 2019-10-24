@@ -90,6 +90,8 @@
 
 #include <string.h>
 
+#include "netdissect-ctype.h"
+
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -674,7 +676,7 @@ print_attr_string(netdissect_options *ndo,
    }
 
    for (i=0; i < length && GET_U_1(data); i++, data++)
-       ND_PRINT("%c", ND_ISPRINT(GET_U_1(data)) ? GET_U_1(data) : '.');
+       ND_PRINT("%c", ND_ASCII_ISPRINT(GET_U_1(data)) ? GET_U_1(data) : '.');
 
    return;
 
@@ -734,7 +736,7 @@ print_vendor_attr(netdissect_options *ndo,
                vendor_type,
                vendor_length);
         for (idx = 0; idx < vendor_length ; idx++, data++)
-            ND_PRINT("%c", ND_ISPRINT(GET_U_1(data)) ? GET_U_1(data) : '.');
+            ND_PRINT("%c", ND_ASCII_ISPRINT(GET_U_1(data)) ? GET_U_1(data) : '.');
         length-=vendor_length;
     }
     return;

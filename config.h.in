@@ -183,9 +183,6 @@
 /* Define to 1 if you have the `setlinebuf' function. */
 #undef HAVE_SETLINEBUF
 
-/* Define to 1 if you have the `snprintf' function. */
-#undef HAVE_SNPRINTF
-
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
 
@@ -233,9 +230,6 @@
 
 /* Define to 1 if you have the `vfork' function. */
 #undef HAVE_VFORK
-
-/* Define to 1 if you have the `vsnprintf' function. */
-#undef HAVE_VSNPRINTF
 
 /* define if libpcap has yydebug */
 #undef HAVE_YYDEBUG

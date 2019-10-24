@@ -29,6 +29,8 @@
 
 #include "netdissect-stdinc.h"
 
+#include "netdissect-ctype.h"
+
 #include "netdissect.h"
 #include "extract.h"
 
@@ -158,7 +160,7 @@ pppoe_print(netdissect_options *ndo, const u_char *bp, u_int length)
 				/* TODO print UTF-8 decoded text */
 				ND_TCHECK_LEN(p, tag_len);
 				for (v = p; v < p + tag_len && tag_str_len < MAXTAGPRINT-1; v++)
-					if (ND_ISPRINT(GET_U_1(v))) {
+					if (ND_ASCII_ISPRINT(GET_U_1(v))) {
 						tag_str[tag_str_len++] = GET_U_1(v);
 						ascii_count++;
 					} else {

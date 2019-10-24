@@ -1,7 +1,7 @@
 /*
  * Decode and print Zephyr packets.
  *
- *	http://web.mit.edu/zephyr/doc/protocol
+ *	https://web.mit.edu/zephyr/doc/protocol
  *
  * Copyright (c) 2001 Nickolai Zeldovich <kolya@MIT.EDU>
  * All rights reserved.
@@ -31,6 +31,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+#include "netdissect-ctype.h"
 
 #include "netdissect.h"
 
@@ -119,7 +121,7 @@ z_triple(const char *class, const char *inst, const char *recipient)
 {
     if (!*recipient)
 	recipient = "*";
-    nd_snprintf(z_buf, sizeof(z_buf), "<%s,%s,%s>", class, inst, recipient);
+    snprintf(z_buf, sizeof(z_buf), "<%s,%s,%s>", class, inst, recipient);
     z_buf[sizeof(z_buf)-1] = '\0';
     return z_buf;
 }
@@ -134,7 +136,7 @@ str_to_lower(const char *string)
 
     zb_string = z_buf;
     while (*zb_string) {
-	*zb_string = ND_TOLOWER((unsigned char)(*zb_string));
+	*zb_string = ND_ASCII_TOLOWER(*zb_string);
 	zb_string++;
     }
 

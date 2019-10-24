@@ -47,6 +47,8 @@
 
 #include <string.h>
 
+#include "netdissect-ctype.h"
+
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -635,8 +637,8 @@ ikev1_print(netdissect_options *ndo,
 #define MAXINITIATORS	20
 static int ninitiator = 0;
 union inaddr_u {
-	struct in_addr in4;
-	struct in6_addr in6;
+	nd_ipv4 in4;
+	nd_ipv6 in6;
 };
 static struct {
 	cookie_t initiator;
@@ -2267,7 +2269,7 @@ ikev2_ID_print(netdissect_options *ndo, u_char tpay,
 	if(dumpascii) {
 		ND_TCHECK_LEN(typedata, idtype_len);
 		for(i=0; i<idtype_len; i++) {
-			if(ND_ISPRINT(GET_U_1(typedata + i))) {
+			if(ND_ASCII_ISPRINT(GET_U_1(typedata + i))) {
 				ND_PRINT("%c", GET_U_1(typedata + i));
 			} else {
 				ND_PRINT(".");
@@ -2610,7 +2612,7 @@ ikev2_vid_print(netdissect_options *ndo, u_char tpay,
 	len = item_len - 4;
 	ND_TCHECK_LEN(vid, len);
 	for(i=0; i<len; i++) {
-		if(ND_ISPRINT(GET_U_1(vid + i)))
+		if(ND_ASCII_ISPRINT(GET_U_1(vid + i)))
 			ND_PRINT("%c", GET_U_1(vid + i));
 		else ND_PRINT(".");
 	}
@@ -2820,7 +2822,7 @@ static char *
 numstr(u_int x)
 {
 	static char buf[20];
-	nd_snprintf(buf, sizeof(buf), "#%u", x);
+	snprintf(buf, sizeof(buf), "#%u", x);
 	return buf;
 }
 

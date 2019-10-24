@@ -44,7 +44,7 @@
  * calculation.
  */
 static void
-ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
+ip6_finddst(netdissect_options *ndo, nd_ipv6 *dst,
             const struct ip6_hdr *ip6)
 {
 	const u_char *cp;
@@ -165,7 +165,7 @@ ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
 
 done:
 trunc:
-	UNALIGNED_MEMCPY(dst, dst_addr, sizeof(nd_ipv6));
+	GET_CPY_BYTES(dst, dst_addr, sizeof(nd_ipv6));
 }
 
 /*
@@ -177,8 +177,8 @@ nextproto6_cksum(netdissect_options *ndo,
 		 u_int len, u_int covlen, uint8_t next_proto)
 {
         struct {
-                struct in6_addr ph_src;
-                struct in6_addr ph_dst;
+                nd_ipv6 ph_src;
+                nd_ipv6 ph_dst;
                 uint32_t       ph_len;
                 uint8_t        ph_zero[3];
                 uint8_t        ph_nxt;
@@ -188,7 +188,7 @@ nextproto6_cksum(netdissect_options *ndo,
 
         /* pseudo-header */
         memset(&ph, 0, sizeof(ph));
-        UNALIGNED_MEMCPY(&ph.ph_src, ip6->ip6_src, sizeof (struct in6_addr));
+        GET_CPY_BYTES(&ph.ph_src, ip6->ip6_src, sizeof(nd_ipv6));
         nh = GET_U_1(ip6->ip6_nxt);
         switch (nh) {
 
@@ -207,8 +207,7 @@ nextproto6_cksum(netdissect_options *ndo,
                 break;
 
         default:
-                UNALIGNED_MEMCPY(&ph.ph_dst, ip6->ip6_dst,
-                                 sizeof (struct in6_addr));
+                GET_CPY_BYTES(&ph.ph_dst, ip6->ip6_dst, sizeof(nd_ipv6));
                 break;
         }
         ph.ph_len = htonl(len);
@@ -413,8 +412,14 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 				 * Set the length to the payload length
 				 * plus the IPv6 header length, and
 				 * change the snapshot length accordingly.
+				 *
+				 * But make sure it's not shorter than
+				 * the total number of bytes we've
+				 * processed so far.
 				 */
 				len = payload_len + sizeof(struct ip6_hdr);
+				if (len < total_advance)
+					goto trunc;
 				if (length < len)
 					ND_PRINT("truncated-ip6 - %u bytes missing!",
 						len - length);

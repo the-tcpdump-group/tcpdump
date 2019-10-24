@@ -29,6 +29,10 @@ bgp-shutdown-communication bgp-shutdown-communication.pcapng bgp-shutdown-commun
 bgp-addpath bgp-addpath.pcap bgp-addpath.out -v
 bgp-4byte-asn	bgp-4byte-asn.pcap	bgp-4byte-asn.out	-v
 bgp-4byte-asdot	bgp-4byte-asn.pcap	bgp-4byte-asdot.out	-vb
+bgp-lu-multiple-labels bgp-lu-multiple-labels.pcap bgp-lu-multiple-labels.out -v
+bgp-evpn	bgp-evpn.pcap		bgp-evpn.out		-v
+bgp-llgr	bgp-evpn.pcap		bgp-llgr.out		-v
+bgp-encap	bgp-encap.pcap		bgp-encap.out		-v
 
 # Broadcom tag tests
 brcmtag		brcm-tag.pcap		brcm-tag.out
@@ -151,6 +155,7 @@ dvmrp		mrinfo_query.pcap	dvmrp.out
 icmpv6          icmpv6.pcap             icmpv6.out      -vv
 icmpv6_opt24-v	icmpv6_opt24.pcap	icmpv6_opt24-v.out	-v
 icmpv6-length-zero icmpv6-length-zero.pcapng icmpv6-length-zero.out
+icmpv6-rfc7112	icmpv6-rfc7112.pcap	icmpv6-rfc7112.out
 
 # SPB tests
 spb	            spb.pcap	            spb.out
@@ -203,6 +208,9 @@ pgm_zmtp1v	pgm_zmtp1.pcap		pgm_zmtp1v.out	-v -T pgm_zmtp1
 epgm_zmtp1v	epgm_zmtp1.pcap		epgm_zmtp1v.out	-v -T pgm_zmtp1
 # fuzzed pcap
 zmtp1-inf-loop-1 zmtp1-inf-loop-1.pcapng zmtp1-inf-loop-1.out -T zmtp1
+
+# native PGM POLL/POLR
+pgm_poll_polr	pgm_poll_polr.pcap	pgm_poll_polr.out	-v
 
 # MS NLB tests
 msnlb		msnlb.pcap		msnlb.out
@@ -273,6 +281,9 @@ pimv2_register-v	PIM_register_register-stop.pcap	pimv2_register-v.out	-v
 pimv2_sm-v		PIM-SM_join_prune.pcap		pimv2_sm-v.out		-v
 pimv2_bootstrap-v	PIMv2_bootstrap.pcap		pimv2_bootstrap-v.out	-v
 pimv2_hellos-v		PIMv2_hellos.pcap		pimv2_hellos-v.out	-v
+pim-packet-assortment	pim-packet-assortment.pcap	pim-packet-assortment.out
+pim-packet-assortment-v	pim-packet-assortment.pcap	pim-packet-assortment-v.out -v
+pim-packet-assortment-vv	pim-packet-assortment.pcap	pim-packet-assortment-vv.out -vv
 
 # IS-IS tests
 isis_infloop-v	isis-infinite-loop.pcap		isis_infloop-v.out	-v
@@ -283,6 +294,7 @@ isis_1-v	ISIS_external_lsp.pcap		isis_1-v.out	-v
 isis_2-v	ISIS_level1_adjacency.pcap	isis_2-v.out	-v
 isis_3-v	ISIS_level2_adjacency.pcap	isis_3-v.out	-v
 isis_4-v	ISIS_p2p_adjacency.pcap		isis_4-v.out	-v
+isis_cap_tlv	isis_cap_tlv.pcap		isis_cap_tlv.out	-v
 # fuzzed pcap
 # isis-seg-fault-1-v is now conditionally handled by isis-seg-fault-1-v.sh
 isis-seg-fault-2-v isis-seg-fault-2.pcapng isis-seg-fault-2-v.out -v
@@ -290,6 +302,7 @@ isis-seg-fault-3-v isis-seg-fault-3.pcapng isis-seg-fault-3-v.out -v
 
 # RSVP tests
 rsvp_infloop-v	rsvp-infinite-loop.pcap		rsvp_infloop-v.out	-v
+rsvp_cap	rsvp_cap.pcap			rsvp_cap.out		-v
 # fuzzed pcap
 rsvp-inf-loop-2-v rsvp-inf-loop-2.pcapng	rsvp-inf-loop-2-v.out -v
 
@@ -334,7 +347,7 @@ aoe_1		AoE_Linux.pcap		aoe_1.out
 aoe_1-v		AoE_Linux.pcap		aoe_1-v.out	-v
 
 # Geneve tests
-geneve-v	geneve.pcap		geneve-vv.out	-vv
+geneve-vv	geneve.pcap		geneve-vv.out	-vv
 geneve-vni	geneve.pcap		geneve-vni.out	geneve 0xb
 geneve-tcp	geneve.pcap		geneve-tcp.out	"geneve && tcp"
 
@@ -537,8 +550,8 @@ pimv2-oobr-4		pimv2-oobr-4.pcap		pimv2-oobr-4.out		-vvv -e
 802_15_4-data		802_15_4-data.pcap		802_15_4-data.out	-vvv -e
 802_15_4_beacon		802_15_4_beacon.pcap		802_15_4_beacon.out	-vvv -e
 lmpv1_busyloop		lmpv1_busyloop.pcap		lmpv1_busyloop.out	-vvv -e
-juniper_atm1		juniper_atm1.pcap		juniper_atm1.out	-vvv -e
-juniper_es		juniper_es.pcap			juniper_es.out	-vvv -e
+juniper_atm1_oobr	juniper_atm1_oobr.pcap		juniper_atm1_oobr.out	-vvv -e
+juniper_es_oobr		juniper_es_oobr.pcap		juniper_es_oobr.out	-vvv -e
 
 # bad packets from Yannick Formaggio
 l2tp-avp-overflow	l2tp-avp-overflow.pcap		l2tp-avp-overflow.out	-v
@@ -591,18 +604,28 @@ radius_attr_asan	radius_attr_asan.pcap		radius_attr_asan.out	-v
 ospf6_decode_v3_asan	ospf6_decode_v3_asan.pcap	ospf6_decode_v3_asan.out -v
 ip_ts_opts_asan		ip_ts_opts_asan.pcap		ip_ts_opts_asan.out	-v
 isakmpv1-attr-oobr	isakmpv1-attr-oobr.pcap		isakmpv1-attr-oobr.out	-v
+isakmp-ikev1_n_print-oobr isakmp-ikev1_n_print-oobr.pcap isakmp-ikev1_n_print-oobr.out -v
+ldp-ldp_tlv_print-oobr ldp-ldp_tlv_print-oobr.pcap ldp-ldp_tlv_print-oobr.out -v
+icmp-icmp_print-oobr-1 icmp-icmp_print-oobr-1.pcap icmp-icmp_print-oobr-1.out -v
+icmp-icmp_print-oobr-2 icmp-icmp_print-oobr-2.pcap icmp-icmp_print-oobr-2.out -v
+rsvp-rsvp_obj_print-oobr rsvp-rsvp_obj_print-oobr.pcap rsvp-rsvp_obj_print-oobr.out -v
+vrrp-vrrp_print-oobr vrrp-vrrp_print-oobr.pcap vrrp-vrrp_print-oobr.out -v
+vrrp-vrrp_print-oobr-2 vrrp-vrrp_print-oobr-2.pcap vrrp-vrrp_print-oobr-2.out -v
+bgp-bgp_capabilities_print-oobr-1 bgp-bgp_capabilities_print-oobr-1.pcap bgp-bgp_capabilities_print-oobr-1.out -v
+bgp-bgp_capabilities_print-oobr-2 bgp-bgp_capabilities_print-oobr-2.pcap bgp-bgp_capabilities_print-oobr-2.out -v
+lmp-lmp_print_data_link_subobjs-oobr lmp-lmp_print_data_link_subobjs-oobr.pcap lmp-lmp_print_data_link_subobjs-oobr.out -v
 # The .pcap file is truncated after the 1st packet.
 hncp_dhcpv6data-oobr	hncp_dhcpv6data-oobr.pcap	hncp_dhcpv6data-oobr.out -v -c1
 hncp_dhcpv4data-oobr	hncp_dhcpv4data-oobr.pcap	hncp_dhcpv4data-oobr.out -v -c1
 vqp-oobr		vqp-oobr.pcap			vqp-oobr.out		-v -c1
 bgp_pmsi_tunnel-oobr	bgp_pmsi_tunnel-oobr.pcap	bgp_pmsi_tunnel-oobr.out -v -c1
-bgp_mvpn_6_and_7	bgp_mvpn_6_and_7.pcap		bgp_mvpn_6_and_7.out	-v -c1
+bgp_mvpn_6_and_7_oobr	bgp_mvpn_6_and_7_oobr.pcap	bgp_mvpn_6_and_7_oobr.out	-v -c1
 rsvp_fast_reroute-oobr	rsvp_fast_reroute-oobr.pcap	rsvp_fast_reroute-oobr.out -v -c1
 esis_opt_prot-oobr	esis_opt_prot-oobr.pcap		esis_opt_prot-oobr.out	-v -c1
 rsvp_uni-oobr-1	rsvp_uni-oobr-1.pcap	rsvp_uni-oobr-1.out	-v -c1
 rsvp_uni-oobr-2	rsvp_uni-oobr-2.pcap	rsvp_uni-oobr-2.out	-v -c1
 rsvp_uni-oobr-3	rsvp_uni-oobr-3.pcap	rsvp_uni-oobr-3.out	-v -c3
-rpki-rtr-oob		rpki-rtr-oob.pcap	rpki-rtr-oob.out	-v -c1
+rpki-rtr-oobr		rpki-rtr-oobr.pcap	rpki-rtr-oobr.out	-v -c1
 lldp_8023_mtu-oobr	lldp_8023_mtu-oobr.pcap	lldp_8023_mtu-oobr.out	-v -c1
 bgp_vpn_rt-oobr	bgp_vpn_rt-oobr.pcap	bgp_vpn_rt-oobr.out	-v -c1
 cfm_sender_id-oobr	cfm_sender_id-oobr.pcap	cfm_sender_id-oobr.out	-v -c1
@@ -611,6 +634,9 @@ olsr-oobr-1		olsr-oobr-1.pcap		olsr-oobr-1.out	-v
 olsr-oobr-2		olsr-oobr-2.pcap		olsr-oobr-2.out	-v
 ikev1_id_ipv6_addr_subnet-oobr	ikev1_id_ipv6_addr_subnet-oobr.pcap	ikev1_id_ipv6_addr_subnet-oobr.out	-v
 isakmp-various-oobr	isakmp-various-oobr.pcap	isakmp-various-oobr.out	-v
+aoe-oobr-1		aoe-oobr-1.pcap			aoe-oobr-1.out	-v -c1
+frf16_magic_ie-oobr	frf16_magic_ie-oobr.pcap	frf16_magic_ie-oobr.out	-v -c1
+rx_serviceid_oobr	rx_serviceid_oobr.pcap		rx_serviceid_oobr.out
 
 # bad packets from Katie Holly
 mlppp-oobr		mlppp-oobr.pcap			mlppp-oobr.out
@@ -622,10 +648,17 @@ icmp6_nodeinfo_oobr	icmp6_nodeinfo_oobr.pcap	icmp6_nodeinfo_oobr.out
 # bad packets from Henri Salo
 rx_ubik-oobr		rx_ubik-oobr.pcap		rx_ubik-oobr.out -c1
 
+# bad packets from Junjie Wang
+ospf6_print_lshdr-oobr ospf6_print_lshdr-oobr.pcap ospf6_print_lshdr-oobr.out -vv
+rpl-dao-oobr rpl-dao-oobr.pcap rpl-dao-oobr.out -vv
+
 # RTP tests
 # fuzzed pcap
 rtp-seg-fault-1  rtp-seg-fault-1.pcapng  rtp-seg-fault-1.out  -v -T rtp
 rtp-seg-fault-2  rtp-seg-fault-2.pcapng  rtp-seg-fault-2.out  -v -T rtp
+
+# SSH tests
+ssh			ssh.pcap		ssh.out
 
 # NFS tests
 nfs-write-verf-cookie nfs-write-verf-cookie.pcapng nfs-write-verf-cookie.out -vv
@@ -695,3 +728,11 @@ bfd-lag-v	bfd-lag.pcap		bfd-lag-v.out		-v
 edns-opts	edns-opts.pcap		edns-opts.out
 edns-opts-v	edns-opts.pcap		edns-opts-v.out		-v
 edns-opts-vv	edns-opts.pcap		edns-opts-vv.out		-vv
+
+# Arista Vendor Specific Tests
+arista-ether             arista_ether.pcap        arista_ether.out
+arista-ether-e           arista_ether.pcap        arista_ether-e.out       -e
+arista-ether-ev          arista_ether.pcap        arista_ether-ev.out      -ev
+
+# TIPC length field test
+huge-tipc-messages	huge-tipc-messages.pcap	huge-tipc-messages.out

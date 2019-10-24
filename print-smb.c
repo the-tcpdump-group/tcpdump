@@ -374,15 +374,21 @@ print_trans(netdissect_options *ndo,
     if (bcc > 0) {
 	smb_fdata(ndo, data1 + 2, f2, maxbuf - (paramlen + datalen), unicodestr);
 
-	if (strcmp((const char *)(data1 + 2), "\\MAILSLOT\\BROWSE") == 0) {
+#define MAILSLOT_BROWSE_STR "\\MAILSLOT\\BROWSE"
+	ND_TCHECK_LEN(data1 + 2, strlen(MAILSLOT_BROWSE_STR) + 1);
+	if (strcmp((const char *)(data1 + 2), MAILSLOT_BROWSE_STR) == 0) {
 	    print_browse(ndo, param, paramlen, data, datalen);
 	    return;
 	}
+#undef MAILSLOT_BROWSE_STR
 
-	if (strcmp((const char *)(data1 + 2), "\\PIPE\\LANMAN") == 0) {
+#define PIPE_LANMAN_STR "\\PIPE\\LANMAN"
+	ND_TCHECK_LEN(data1 + 2, strlen(PIPE_LANMAN_STR) + 1);
+	if (strcmp((const char *)(data1 + 2), PIPE_LANMAN_STR) == 0) {
 	    print_ipc(ndo, param, paramlen, data, datalen);
 	    return;
 	}
+#undef PIPE_LANMAN_STR
 
 	if (paramlen)
 	    smb_fdata(ndo, param, f3, min(param + paramlen, maxbuf), unicodestr);
@@ -809,6 +815,8 @@ print_smb(netdissect_options *ndo,
         "[P4]SMB Command   =  [B]\nError class   =  [BP1]\nError code    =  [u]\nFlags1        =  [B]\nFlags2        =  [B][P13]\nTree ID       =  [u]\nProc ID       =  [u]\nUID           =  [u]\nMID           =  [u]\nWord Count    =  [b]\n";
     u_int smboffset;
 
+    ndo->ndo_protocol = "smb";
+
     ND_TCHECK_1(buf + 9);
     request = (GET_U_1(buf + 9) & 0x80) ? 0 : 1;
     startbuf = buf;
@@ -820,11 +828,12 @@ print_smb(netdissect_options *ndo,
     if (ndo->ndo_vflag > 1)
 	ND_PRINT("\n");
 
-    ND_PRINT("SMB PACKET: %s (%s)\n", fn->name, request ? "REQUEST" : "REPLY");
+    ND_PRINT("SMB PACKET: %s (%s)", fn->name, request ? "REQUEST" : "REPLY");
 
     if (ndo->ndo_vflag < 2)
 	return;
 
+    ND_PRINT("\n");
     ND_TCHECK_2(buf + 10);
     flags2 = GET_LE_U_2(buf + 10);
     unicodestr = flags2 & 0x8000;
@@ -865,6 +874,7 @@ print_smb(netdissect_options *ndo,
 	    f2 = fn->descript.rep_f2;
 	}
 
+	smb_reset();
 	if (fn->descript.fn)
 	    (*fn->descript.fn)(ndo, words, data, buf, maxbuf);
 	else {
@@ -919,7 +929,6 @@ print_smb(netdissect_options *ndo,
 	smboffset = newsmboffset;
     }
 
-    ND_PRINT("\n");
     return;
 trunc:
     nd_print_trunc(ndo);
@@ -1084,7 +1093,6 @@ nbt_tcp_print(netdissect_options *ndo,
 	    data = smb_fdata(ndo, data, "NBT - Unknown packet type\nType=[B]\n", maxbuf, 0);
 	    break;
 	}
-	ND_PRINT("\n");
     }
     return;
 trunc:
@@ -1240,7 +1248,6 @@ nbt_udp137_print(netdissect_options *ndo,
 	smb_fdata(ndo, p, "AdditionalData:\n", maxbuf, 0);
 
 out:
-    ND_PRINT("\n");
     return;
 trunc:
     nd_print_trunc(ndo);
@@ -1324,7 +1331,7 @@ nbt_udp138_print(netdissect_options *ndo,
 	    print_smb(ndo, data, maxbuf);
     }
 out:
-    ND_PRINT("\n");
+    return;
 }
 
 
@@ -1475,7 +1482,6 @@ netbeui_print(netdissect_options *ndo,
     }
 
 out:
-    ND_PRINT("\n");
     return;
 trunc:
     nd_print_trunc(ndo);
@@ -1508,7 +1514,6 @@ ipx_netbios_print(netdissect_options *ndo,
 	if (memcmp(data + i, "\377SMB", 4) == 0) {
 	    smb_fdata(ndo, data, "\n>>> IPX transport ", data + i, 0);
 	    print_smb(ndo, data + i, maxbuf);
-	    ND_PRINT("\n");
 	    break;
 	}
     }

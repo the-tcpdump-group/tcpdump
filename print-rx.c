@@ -480,8 +480,8 @@ static const struct tok rx_ack_reasons[] = {
 
 struct rx_cache_entry {
 	uint32_t	callnum;	/* Call number (net order) */
-	struct in_addr	client;		/* client IP address (net order) */
-	struct in_addr	server;		/* server IP address (net order) */
+	nd_ipv4	client;			/* client IP address (net order) */
+	nd_ipv4	server;			/* server IP address (net order) */
 	u_int		dport;		/* server port (host order) */
 	uint16_t	serviceId;	/* Service identifier (net order) */
 	uint32_t	opcode;		/* RX opcode (host order) */
@@ -730,8 +730,8 @@ rx_cache_find(netdissect_options *ndo, const struct rx_header *rxh,
 	do {
 		rxent = &rx_cache[i];
 		if (rxent->callnum == GET_BE_U_4(rxh->callNumber) &&
-		    rxent->client.s_addr == clip &&
-		    rxent->server.s_addr == sip &&
+		    GET_IPV4_TO_NETWORK_ORDER(rxent->client) == clip &&
+		    GET_IPV4_TO_NETWORK_ORDER(rxent->server) == sip &&
 		    rxent->serviceId == GET_BE_U_2(rxh->serviceId) &&
 		    rxent->dport == sport) {
 
@@ -1186,7 +1186,7 @@ acl_print(netdissect_options *ndo,
 	          acl & PRSFS_ADMINISTER ? "a" : "");
 
 	for (i = 0; i < pos; i++) {
-		nd_snprintf(fmt, sizeof(fmt), "%%%ds %%d\n%%n", maxsize - 1);
+		snprintf(fmt, sizeof(fmt), "%%%ds %%d\n%%n", maxsize - 1);
 		if (sscanf((char *) s, fmt, user, &acl, &n) != 2)
 			goto finish;
 		s += n;
@@ -1200,7 +1200,7 @@ acl_print(netdissect_options *ndo,
 	}
 
 	for (i = 0; i < neg; i++) {
-		nd_snprintf(fmt, sizeof(fmt), "%%%ds %%d\n%%n", maxsize - 1);
+		snprintf(fmt, sizeof(fmt), "%%%ds %%d\n%%n", maxsize - 1);
 		if (sscanf((char *) s, fmt, user, &acl, &n) != 2)
 			goto finish;
 		s += n;

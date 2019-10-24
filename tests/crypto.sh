@@ -1,5 +1,10 @@
 #!/bin/sh
 
+#
+# Get the tests directory from $0.
+#
+testsdir=`dirname "$0"`
+
 exitcode=0
 passed=`cat .passed`
 failed=`cat .failed`
@@ -8,7 +13,7 @@ failed=`cat .failed`
 
 if grep '^#define HAVE_LIBCRYPTO 1$' ../config.h >/dev/null
 then
-	if ./TESTonce esp1 02-sunrise-sunset-esp.pcap esp1.out '-E "0x12345678@192.1.2.45 3des-cbc-hmac96:0x4043434545464649494a4a4c4c4f4f515152525454575758"'
+	if ${testsdir}/TESTonce esp1 ${testsdir}/02-sunrise-sunset-esp.pcap ${testsdir}/esp1.out '-E "0x12345678@192.1.2.45 3des-cbc-hmac96:0x4043434545464649494a4a4c4c4f4f515152525454575758"'
 	then
 		passed=`expr $passed + 1`
 		echo $passed >.passed
@@ -17,7 +22,7 @@ then
 		echo $failed >.failed
 		exitcode=1
 	fi
-	if ./TESTonce esp2 08-sunrise-sunset-esp2.pcap esp2.out '-E "0x12345678@192.1.2.45 3des-cbc-hmac96:0x43434545464649494a4a4c4c4f4f51515252545457575840,0xabcdabcd@192.0.1.1 3des-cbc-hmac96:0x434545464649494a4a4c4c4f4f5151525254545757584043"'
+	if ${testsdir}/TESTonce esp2 ${testsdir}/08-sunrise-sunset-esp2.pcap ${testsdir}/esp2.out '-E "0x12345678@192.1.2.45 3des-cbc-hmac96:0x43434545464649494a4a4c4c4f4f51515252545457575840,0xabcdabcd@192.0.1.1 3des-cbc-hmac96:0x434545464649494a4a4c4c4f4f5151525254545757584043"'
 	then
 		passed=`expr $passed + 1`
 		echo $passed >.passed
@@ -26,7 +31,7 @@ then
 		echo $failed >.failed
 		exitcode=1
 	fi
-	if ./TESTonce esp3 02-sunrise-sunset-esp.pcap esp1.out '-E "3des-cbc-hmac96:0x4043434545464649494a4a4c4c4f4f515152525454575758"'
+	if ${testsdir}/TESTonce esp3 ${testsdir}/02-sunrise-sunset-esp.pcap ${testsdir}/esp1.out '-E "3des-cbc-hmac96:0x4043434545464649494a4a4c4c4f4f515152525454575758"'
 	then
 		passed=`expr $passed + 1`
 		echo $passed >.passed
@@ -45,7 +50,7 @@ then
 		printf "$FORMAT" ikev2pI2
 		printf "$FORMAT" isakmp4
 	else
-		if ./TESTonce esp4 08-sunrise-sunset-esp2.pcap esp2.out '-E "file esp-secrets.txt"'
+		if ${testsdir}/TESTonce esp4 ${testsdir}/08-sunrise-sunset-esp2.pcap ${testsdir}/esp2.out "-E \"file ${testsdir}/esp-secrets.txt\""
 		then
 			passed=`expr $passed + 1`
 			echo $passed >.passed
@@ -54,7 +59,7 @@ then
 			echo $failed >.failed
 			exitcode=1
 		fi
-		if ./TESTonce esp5 08-sunrise-sunset-aes.pcap esp5.out '-E "file esp-secrets.txt"'
+		if ${testsdir}/TESTonce esp5 ${testsdir}/08-sunrise-sunset-aes.pcap ${testsdir}/esp5.out "-E \"file ${testsdir}/esp-secrets.txt\""
 		then
 			passed=`expr $passed + 1`
 			echo $passed >.passed
@@ -63,7 +68,7 @@ then
 			echo $failed >.failed
 			exitcode=1
 		fi
-		if ./TESTonce espudp1 espudp1.pcap espudp1.out '-nnnn -E "file esp-secrets.txt"'
+		if ${testsdir}/TESTonce espudp1 ${testsdir}/espudp1.pcap ${testsdir}/espudp1.out "-nnnn -E \"file ${testsdir}/esp-secrets.txt\""
 		then
 			passed=`expr $passed + 1`
 			echo $passed >.passed
@@ -72,7 +77,7 @@ then
 			echo $failed >.failed
 			exitcode=1
 		fi
-		if ./TESTonce ikev2pI2 ikev2pI2.pcap ikev2pI2.out '-E "file ikev2pI2-secrets.txt" -v -v -v -v'
+		if ${testsdir}/TESTonce ikev2pI2 ${testsdir}/ikev2pI2.pcap ${testsdir}/ikev2pI2.out "-E \"file ${testsdir}/ikev2pI2-secrets.txt\" -v -v -v -v"
 		then
 			passed=`expr $passed + 1`
 			echo $passed >.passed
@@ -81,7 +86,7 @@ then
 			echo $failed >.failed
 			exitcode=1
 		fi
-		if ./TESTonce isakmp4 isakmp4500.pcap isakmp4.out '-E "file esp-secrets.txt"'
+		if ${testsdir}/TESTonce isakmp4 ${testsdir}/isakmp4500.pcap ${testsdir}/isakmp4.out "-E \"file ${testsdir}/esp-secrets.txt\""
 		then
 			passed=`expr $passed + 1`
 			echo $passed >.passed
@@ -91,7 +96,7 @@ then
 			exitcode=1
 		fi
 	fi
-	if ./TESTonce bgp-as-path-oobr-ssl bgp-as-path-oobr.pcap bgp-as-path-oobr-ssl.out '-vvv -e'
+	if ${testsdir}/TESTonce bgp-as-path-oobr-ssl ${testsdir}/bgp-as-path-oobr.pcap ${testsdir}/bgp-as-path-oobr-ssl.out '-vvv -e'
 	then
 		passed=`expr $passed + 1`
 		echo $passed >.passed
@@ -100,7 +105,7 @@ then
 		echo $failed >.failed
 		exitcode=1
 	fi
-	if ./TESTonce bgp-aigp-oobr-ssl bgp-aigp-oobr.pcap bgp-aigp-oobr-ssl.out '-vvv -e'
+	if ${testsdir}/TESTonce bgp-aigp-oobr-ssl ${testsdir}/bgp-aigp-oobr.pcap ${testsdir}/bgp-aigp-oobr-ssl.out '-vvv -e'
 	then
 		passed=`expr $passed + 1`
 		echo $passed >.passed
@@ -124,7 +129,7 @@ else
 	printf "$FORMAT" isakmp4
 	printf "$FORMAT" bgp-as-path-oobr-ssl
 	printf "$FORMAT" bgp-aigp-oobr-ssl
-	if ./TESTonce bgp-as-path-oobr-nossl bgp-as-path-oobr.pcap bgp-as-path-oobr-nossl.out '-vvv -e'
+	if ${testsdir}/TESTonce bgp-as-path-oobr-nossl ${testsdir}/bgp-as-path-oobr.pcap ${testsdir}/bgp-as-path-oobr-nossl.out '-vvv -e'
 	then
 		passed=`expr $passed + 1`
 		echo $passed >.passed
@@ -133,7 +138,7 @@ else
 		echo $failed >.failed
 		exitcode=1
 	fi
-	if ./TESTonce bgp-aigp-oobr-nossl bgp-aigp-oobr.pcap bgp-aigp-oobr-nossl.out '-vvv -e'
+	if ${testsdir}/TESTonce bgp-aigp-oobr-nossl ${testsdir}/bgp-aigp-oobr.pcap ${testsdir}/bgp-aigp-oobr-nossl.out '-vvv -e'
 	then
 		passed=`expr $passed + 1`
 		echo $passed >.passed

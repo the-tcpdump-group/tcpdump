@@ -91,7 +91,7 @@ stp_print_bridge_id(netdissect_options *ndo, const u_char *p)
 {
     static char bridge_id_str[sizeof("pppp.aa:bb:cc:dd:ee:ff")];
 
-    nd_snprintf(bridge_id_str, sizeof(bridge_id_str),
+    snprintf(bridge_id_str, sizeof(bridge_id_str),
              "%.2x%.2x.%.2x:%.2x:%.2x:%.2x:%.2x:%.2x",
              GET_U_1(p), GET_U_1(p + 1), GET_U_1(p + 2),
              GET_U_1(p + 3), GET_U_1(p + 4), GET_U_1(p + 5),
@@ -273,7 +273,7 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
            stp_print_bridge_id(ndo, stp_bpdu->root_id),
            GET_BE_U_4(stp_bpdu->root_path_cost));
 
-    ND_TCHECK_SIZE(stp_bpdu->bridge_id);
+    ND_TCHECK_SIZE(&stp_bpdu->bridge_id);
     ND_PRINT("\n\tCIST regional-root-id %s, ",
            stp_print_bridge_id(ndo, stp_bpdu->bridge_id));
 
@@ -381,7 +381,7 @@ stp_print_spb_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
     ND_PRINT("\n\tAgreement num %u, Discarded Agreement num %u, Agreement valid-"
             "flag %u,\n\tRestricted role-flag: %u, Format id %u cap %u, "
             "Convention id %u cap %u,\n\tEdge count %u, "
-            "Agreement digest %08x%08x%08x%08x%08x\n",
+            "Agreement digest %08x%08x%08x%08x%08x",
             GET_U_1(ptr + offset + SPB_BPDU_AGREEMENT_OFFSET)>>6,
             GET_U_1(ptr + offset + SPB_BPDU_AGREEMENT_OFFSET)>>4 & 0x3,
             GET_U_1(ptr + offset + SPB_BPDU_AGREEMENT_OFFSET)>>3 & 0x1,

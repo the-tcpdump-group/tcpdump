@@ -4,6 +4,11 @@
 # may produce a slightly different result if the compiler is not GCC.
 # Test only with GCC (similar to GitHub issue #333).
 
+#
+# Get the tests directory from $0.
+#
+testsdir=`dirname "$0"`
+
 exitcode=0
 test_name=isis-seg-fault-1-v
 
@@ -14,7 +19,7 @@ elif grep '^CC = .*gcc' ../Makefile >/dev/null
 then
 	passed=`cat .passed`
 	failed=`cat .failed`
-	if ./TESTonce $test_name isis-seg-fault-1.pcapng isis-seg-fault-1-v.out '-v'
+	if ${testsdir}/TESTonce $test_name ${testsdir}/isis-seg-fault-1.pcapng ${testsdir}/isis-seg-fault-1-v.out '-v'
 	then
 		passed=`expr $passed + 1`
 		echo $passed >.passed

@@ -625,6 +625,10 @@ SOURCE="..\..\print-snmp.c"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\print-ssh.c"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\print-stp.c"
 # End Source File
 # Begin Source File

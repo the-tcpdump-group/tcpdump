@@ -127,7 +127,7 @@ struct ip6_dest {
 	/* followed by options */
 };
 
-/* http://www.iana.org/assignments/ipv6-parameters/ipv6-parameters.xhtml */
+/* https://www.iana.org/assignments/ipv6-parameters/ipv6-parameters.xhtml */
 
 /* Option types and related macros */
 #define IP6OPT_PAD1		0x00	/* 00 0 00000 */
