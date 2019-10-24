@@ -654,6 +654,9 @@ ospf6_print_lshdr-oobr ospf6_print_lshdr-oobr.pcap ospf6_print_lshdr-oobr.out -v
 rpl-dao-oobr rpl-dao-oobr.pcap rpl-dao-oobr.out -vv
 hncp_prefix-oobr hncp_prefix-oobr.pcap hncp_prefix-oobr.out -vvv
 
+# bad packets from Ryan Ackroyd
+ieee802.11_meshhdr-oobr ieee802.11_meshhdr-oobr.pcap ieee802.11_meshhdr-oobr.out -H
+
 # RTP tests
 # fuzzed pcap
 rtp-seg-fault-1  rtp-seg-fault-1.pcapng  rtp-seg-fault-1.out  -v -T rtp
