@@ -203,17 +203,17 @@
  */
 #define E_LLQ           1       /* long lived queries protocol */
 #define E_UL            2       /* dynamic dns update leases */
-#define E_NSID          3		/* name server identifier */
-#define E_DAU           5		/* signal DNSSEC algorithm understood */
-#define E_DHU           6		/* signal DS hash understood */
-#define E_N3U           7		/* signal NSEC3 hash understood */
-#define E_ECS           8		/* EDNS client subnet */
-#define E_EXPIRE        9		/* zone expiration */
-#define E_COOKIE        10		/* DNS cookies */
-#define E_KEEPALIVE     11		/* TCP keepalive */
-#define E_PADDING       12		/* pad DNS messages */
-#define E_CHAIN         13		/* chain DNS queries */
-#define E_KEYTAG        14		/* EDNS key tag */
+#define E_NSID          3       /* name server identifier */
+#define E_DAU           5       /* signal DNSSEC algorithm understood */
+#define E_DHU           6       /* signal DS hash understood */
+#define E_N3U           7       /* signal NSEC3 hash understood */
+#define E_ECS           8       /* EDNS client subnet */
+#define E_EXPIRE        9       /* zone expiration */
+#define E_COOKIE        10      /* DNS cookies */
+#define E_KEEPALIVE     11      /* TCP keepalive */
+#define E_PADDING       12      /* pad DNS messages */
+#define E_CHAIN         13      /* chain DNS queries */
+#define E_KEYTAG        14      /* EDNS key tag */
 #define E_CLIENTTAG     16      /* EDNS client tag */
 #define E_SERVERTAG     17      /* EDNS server tag */
 
