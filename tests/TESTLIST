@@ -652,6 +652,7 @@ rx_ubik-oobr		rx_ubik-oobr.pcap		rx_ubik-oobr.out -c1
 # bad packets from Junjie Wang
 ospf6_print_lshdr-oobr ospf6_print_lshdr-oobr.pcap ospf6_print_lshdr-oobr.out -vv
 rpl-dao-oobr rpl-dao-oobr.pcap rpl-dao-oobr.out -vv
+hncp_prefix-oobr hncp_prefix-oobr.pcap hncp_prefix-oobr.out -vvv
 
 # RTP tests
 # fuzzed pcap
