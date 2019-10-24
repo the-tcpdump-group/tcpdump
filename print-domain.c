@@ -271,28 +271,35 @@ static void
 print_eopt_ecs(netdissect_options *ndo, const u_char *cp,
                u_int data_len)
 {
-    u_int family, addr_len, addr_bits;
-    u_char src_len, scope_len;
-    if (!ND_TTEST_2(cp))
+    u_int family, addr_bits, src_len, scope_len;
+
+    u_char padded[32];
+    char addr[INET6_ADDRSTRLEN];
+
+    if (!ND_TTEST_2(cp)) {
         nd_print_invalid(ndo);
+        return;
+    }
     family = GET_BE_U_2(cp);
     cp += 2;
-    if (!ND_TTEST_1(cp))
+    if (!ND_TTEST_1(cp)) {
         nd_print_invalid(ndo);
+        return;
+    }
     src_len = GET_U_1(cp);
     cp += 1;
-    if (!ND_TTEST_1(cp))
+    if (!ND_TTEST_1(cp)) {
         nd_print_invalid(ndo);
+        return;
+    }
     scope_len = GET_U_1(cp);
     cp += 1;
 
-    if (family == 1) {
-        addr_len = INET_ADDRSTRLEN;
+    if (family == 1)
         addr_bits = 32;
-    } else if (family == 2) {
-        addr_len = INET6_ADDRSTRLEN;
+    else if (family == 2)
         addr_bits = 128;
-    } else {
+    else {
         nd_print_invalid(ndo);
         return;
     }
@@ -308,17 +315,15 @@ print_eopt_ecs(netdissect_options *ndo, const u_char *cp,
     }
 
     /* pad the truncated address from ecs with zeros */
-    u_char padded[(addr_bits / 8)];
     memset(padded, 0, sizeof(padded));
     memcpy(padded, cp, data_len - 4);
 
-    char addr[addr_len];
 
     if (family == 1)
-        ND_PRINT("%s/%d/%d", addrtostr(padded, addr, sizeof(addr)),
+        ND_PRINT("%s/%d/%d", addrtostr(padded, addr, INET_ADDRSTRLEN),
                 src_len, scope_len);
     else
-        ND_PRINT("%s/%d/%d", addrtostr6(padded, addr, sizeof(addr)),
+        ND_PRINT("%s/%d/%d", addrtostr6(padded, addr, INET6_ADDRSTRLEN),
                 src_len, scope_len);
 
 }
