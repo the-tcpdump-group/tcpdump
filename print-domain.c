@@ -788,15 +788,18 @@ ns_rprint(netdissect_options *ndo,
 		ND_PRINT(" UDPsize=%u", class);
 		if (opt_flags & 0x8000)
 			ND_PRINT(" DO");
-		ND_PRINT(" [");
-		while (cp < rp) {
-		    cp = eopt_print(ndo, cp);
-		    if (cp == NULL)
-		        return(NULL);
-		    if (cp < rp)
-                ND_PRINT(",");
+		if (cp < rp) {
+            ND_PRINT(" [");
+            while (cp < rp) {
+                cp = eopt_print(ndo, cp);
+                if (cp == NULL)
+                    return(NULL);
+                if (cp < rp)
+                    ND_PRINT(",");
+            }
+            ND_PRINT("]");
 		}
-		ND_PRINT("]");
+
 		break;
 
 	case T_UNSPECA:		/* One long string */
