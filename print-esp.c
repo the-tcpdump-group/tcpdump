@@ -278,7 +278,7 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
 			"can't allocate memory for decryption buffer");
 	}
-	if (!EVP_Cipher(ctx, output_buffer, input_buffer, len)) {
+	if (!EVP_Cipher(ctx, output_buffer, input_buffer, buffer_size)) {
 		(*ndo->ndo_warning)(ndo, "EVP_Cipher failed");
 		return 0;
 	}
