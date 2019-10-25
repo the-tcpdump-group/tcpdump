@@ -276,22 +276,16 @@ print_eopt_ecs(netdissect_options *ndo, const u_char *cp,
     u_char padded[32];
     char addr[INET6_ADDRSTRLEN];
 
-    if (!ND_TTEST_2(cp)) {
+    /* ecs option must at least contain family, src len, and scope len */
+    if (data_len < 4) {
         nd_print_invalid(ndo);
         return;
     }
+
     family = GET_BE_U_2(cp);
     cp += 2;
-    if (!ND_TTEST_1(cp)) {
-        nd_print_invalid(ndo);
-        return;
-    }
     src_len = GET_U_1(cp);
     cp += 1;
-    if (!ND_TTEST_1(cp)) {
-        nd_print_invalid(ndo);
-        return;
-    }
     scope_len = GET_U_1(cp);
     cp += 1;
 
@@ -361,9 +355,9 @@ eopt_print(netdissect_options *ndo,
             print_eopt_ecs(ndo, cp, data_len);
             break;
         case E_COOKIE:
-            if (data_len < 8 || (data_len > 8 && data_len < 16) || data_len > 40) {
+            if (data_len < 8 || (data_len > 8 && data_len < 16) || data_len > 40)
                 nd_print_invalid(ndo);
-            } else {
+            else {
                 for (i = 0; i < data_len; ++i) {
                     /* split client and server cookie */
                     if (i == 8)
@@ -404,7 +398,6 @@ eopt_print(netdissect_options *ndo,
                 if (i > 0)
                     ND_PRINT(" ");
                 ND_PRINT("%s", tok2str(dau_alg2str, "Alg_%u", GET_U_1(cp + i)));
-
             }
             break;
         case E_DHU:
