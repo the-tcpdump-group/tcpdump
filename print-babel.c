@@ -495,8 +495,8 @@ babel_print_v2(netdissect_options *ndo,
         case MESSAGE_UPDATE: {
             if (!ndo->ndo_vflag) {
                 ND_PRINT(" update");
-                if(len < 1)
-                    ND_PRINT("/truncated");
+                if(len < 10)
+                    goto invalid;
                 else
                     ND_PRINT("%s%s%s",
                            (GET_U_1(message + 3) & 0x80) ? "/prefix": "",
