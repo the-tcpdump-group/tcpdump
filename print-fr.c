@@ -458,7 +458,13 @@ mfr_print(netdissect_options *ndo,
  */
 
     ndo->ndo_protocol = "mfr";
-    ND_TCHECK_4(p); /* minimum frame header length */
+
+    if (length < 4) {	/* minimum frame header length */
+        ND_PRINT("[length %u < 4]", length);
+        nd_print_invalid(ndo);
+        return length;
+    }
+    ND_TCHECK_4(p);
 
     if ((GET_U_1(p) & MFR_BEC_MASK) == MFR_CTRL_FRAME && GET_U_1(p + 1) == 0) {
         ND_PRINT("FRF.16 Control, Flags [%s], %s, length %u",
