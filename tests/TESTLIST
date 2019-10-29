@@ -655,10 +655,14 @@ babel_update_oobr	babel_update_oobr.pcap		babel_update_oobr.out
 ospf6_print_lshdr-oobr ospf6_print_lshdr-oobr.pcap ospf6_print_lshdr-oobr.out -vv
 rpl-dao-oobr rpl-dao-oobr.pcap rpl-dao-oobr.out -vv
 hncp_prefix-oobr hncp_prefix-oobr.pcap hncp_prefix-oobr.out -vvv
+smb_print_trans-oobr1 smb_print_trans-oobr1.pcap smb_print_trans-oobr1.out -vv
 
 # bad packets from Ryan Ackroyd
 ieee802.11_meshhdr-oobr ieee802.11_meshhdr-oobr.pcap ieee802.11_meshhdr-oobr.out -H
 dccp_options-oobr dccp_options-oobr.pcap dccp_options-oobr.out -vv
+
+# bad packets from Philippe Antoine
+smb_print_trans-oobr2 smb_print_trans-oobr2.pcap smb_print_trans-oobr2.out -vv
 
 # RTP tests
 # fuzzed pcap
