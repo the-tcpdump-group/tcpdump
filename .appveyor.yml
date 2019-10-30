@@ -45,5 +45,5 @@ build_script:
   - type NUL >.devel
   - md build
   - cd build
-  - cmake -DCMAKE_PREFIX_PATH=c:\projects\libpcap\Win32\%SDK% -G"%GENERATOR%" ..
+  - cmake -DPCAP_ROOT=c:\projects\libpcap\Win32\%SDK% -G"%GENERATOR%" ..
   - msbuild /m /nologo /p:Configuration=Release tcpdump.sln

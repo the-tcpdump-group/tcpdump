@@ -1,5 +1,14 @@
 cmake_minimum_required(VERSION 2.8.6)
 
+#
+# We want find_path() and find_library() to honor {packagename}_ROOT,
+# as that appears to be the standard way to say "hey, look here for
+# this package" from the command line.
+#
+if(POLICY CMP0074)
+    cmake_policy(SET CMP0074 NEW)
+endif()
+
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
 project(tcpdump)
