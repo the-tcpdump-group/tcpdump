@@ -662,7 +662,6 @@ extern void sflow_print(netdissect_options *, const u_char *, u_int);
 extern void ssh_print(netdissect_options *, const u_char *, u_int);
 extern void sip_print(netdissect_options *, const u_char *, u_int);
 extern void slow_print(netdissect_options *, const u_char *, u_int);
-extern void smb_data_print(netdissect_options *, const u_char *, u_int);
 extern void smb_tcp_print(netdissect_options *, const u_char *, u_int);
 extern void smtp_print(netdissect_options *, const u_char *, u_int);
 extern int snap_print(netdissect_options *, const u_char *, u_int, u_int, const struct lladdr_info *, const struct lladdr_info *, u_int);
