@@ -746,3 +746,5 @@ huge-tipc-messages	huge-tipc-messages.pcap	huge-tipc-messages.out
 
 # CVE-2018-10105 bad packets from Luis Rocha
 sflow_print-segv sflow_print-segv.pcap sflow_print-segv.out -v
+smb_data_print-oobr smb_data_print-oobr.pcapng smb_data_print-oobr.out -vv
+smb_data_print-segv smb_data_print-segv.pcapng smb_data_print-segv.out -vv
