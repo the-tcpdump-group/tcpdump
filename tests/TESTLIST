@@ -642,6 +642,9 @@ bgp_mp_reach_nlri-oobr bgp_mp_reach_nlri-oobr.pcap     bgp_mp_reach_nlri-oobr.ou
 
 # bad packets from Katie Holly
 mlppp-oobr		mlppp-oobr.pcap			mlppp-oobr.out
+kh-timed-001-oobr	kh-timed-001-oobr.pcap		kh-timed-001-oobr.out
+kh-timed-002-oobr	kh-timed-002-oobr.pcap		kh-timed-002-oobr.out
+kh-timed-004-oobr	kh-timed-004-oobr.pcap		kh-timed-004-oobr.out
 
 # bad packets from Kim Gwan Yeong
 mptcp-dss-oobr		mptcp-dss-oobr.pcap		mptcp-dss-oobr.out	-v
