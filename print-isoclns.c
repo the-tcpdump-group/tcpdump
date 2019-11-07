@@ -2711,8 +2711,8 @@ isis_print(netdissect_options *ndo,
 	    break;
 	case ISIS_TLV_ISNEIGH:
 	    while (tlen != 0) {
-	    	if (tlen < MAC_ADDR_LEN)
-	    	    goto tlv_trunc;
+		if (tlen < MAC_ADDR_LEN)
+		    goto tlv_trunc;
                 ND_TCHECK_LEN(tptr, MAC_ADDR_LEN);
                 ND_PRINT("\n\t      SNPA: %s", isis_print_id(ndo, tptr, MAC_ADDR_LEN));
                 tlen -= MAC_ADDR_LEN;
@@ -3115,8 +3115,8 @@ isis_print(netdissect_options *ndo,
 	    tlen-=sizeof(nd_ipv4);
 
 	    while (tlen != 0) {
-	    	if (tlen < 4)
-	    	    goto tlv_trunc;
+		if (tlen < 4)
+		    goto tlv_trunc;
                 ND_TCHECK_4(tptr);
                 ND_PRINT("\n\t      Link-ID: 0x%08x", GET_BE_U_4(tptr));
                 tptr+=4;
@@ -3127,8 +3127,8 @@ isis_print(netdissect_options *ndo,
 	case ISIS_TLV_LSP:
 	    tlv_lsp = (const struct isis_tlv_lsp *)tptr;
 	    while (tlen != 0) {
-	    	if (tlen < sizeof(struct isis_tlv_lsp))
-	    	    goto tlv_trunc;
+		if (tlen < sizeof(struct isis_tlv_lsp))
+		    goto tlv_trunc;
 		ND_TCHECK_1(tlv_lsp->lsp_id + LSP_ID_LEN - 1);
 		ND_PRINT("\n\t      lsp-id: %s",
                        isis_print_id(ndo, tlv_lsp->lsp_id, LSP_ID_LEN));
