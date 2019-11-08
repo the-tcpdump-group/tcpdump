@@ -2285,6 +2285,14 @@ isis_clear_checksum_lifetime(void *header)
  * Decode IS-IS packets.  Return 0 on error.
  */
 
+#define INVALID_OR_DECREMENT(length,decr) \
+    if ((length) < (decr)) { \
+        ND_PRINT(" [packet length %u < %u]", (length), (u_int) (decr)); \
+        nd_print_invalid(ndo); \
+        return 1; \
+    } \
+    length -= (decr);
+
 static int
 isis_print(netdissect_options *ndo,
            const uint8_t *p, u_int length)
@@ -2482,7 +2490,7 @@ isis_print(netdissect_options *ndo,
                 return (0);
         }
 
-        packet_len -= (ISIS_COMMON_HEADER_SIZE+ISIS_IIH_LAN_HEADER_SIZE);
+        INVALID_OR_DECREMENT(packet_len,ISIS_COMMON_HEADER_SIZE+ISIS_IIH_LAN_HEADER_SIZE);
         pptr = p + (ISIS_COMMON_HEADER_SIZE+ISIS_IIH_LAN_HEADER_SIZE);
         break;
 
@@ -2521,8 +2529,7 @@ isis_print(netdissect_options *ndo,
             if (!print_unknown_data(ndo, pptr, "\n\t  ", ISIS_IIH_PTP_HEADER_SIZE))
                 return (0);
         }
-
-        packet_len -= (ISIS_COMMON_HEADER_SIZE+ISIS_IIH_PTP_HEADER_SIZE);
+        INVALID_OR_DECREMENT(packet_len,ISIS_COMMON_HEADER_SIZE+ISIS_IIH_PTP_HEADER_SIZE);
         pptr = p + (ISIS_COMMON_HEADER_SIZE+ISIS_IIH_PTP_HEADER_SIZE);
         break;
 
@@ -2580,7 +2587,7 @@ isis_print(netdissect_options *ndo,
                 return (0);
         }
 
-        packet_len -= (ISIS_COMMON_HEADER_SIZE+ISIS_LSP_HEADER_SIZE);
+        INVALID_OR_DECREMENT(packet_len,ISIS_COMMON_HEADER_SIZE+ISIS_LSP_HEADER_SIZE);
         pptr = p + (ISIS_COMMON_HEADER_SIZE+ISIS_LSP_HEADER_SIZE);
         break;
 
@@ -2618,7 +2625,7 @@ isis_print(netdissect_options *ndo,
                 return (0);
         }
 
-        packet_len -= (ISIS_COMMON_HEADER_SIZE+ISIS_CSNP_HEADER_SIZE);
+        INVALID_OR_DECREMENT(packet_len,ISIS_COMMON_HEADER_SIZE+ISIS_CSNP_HEADER_SIZE);
         pptr = p + (ISIS_COMMON_HEADER_SIZE+ISIS_CSNP_HEADER_SIZE);
         break;
 
@@ -2652,7 +2659,7 @@ isis_print(netdissect_options *ndo,
                 return (0);
         }
 
-        packet_len -= (ISIS_COMMON_HEADER_SIZE+ISIS_PSNP_HEADER_SIZE);
+        INVALID_OR_DECREMENT(packet_len,ISIS_COMMON_HEADER_SIZE+ISIS_PSNP_HEADER_SIZE);
         pptr = p + (ISIS_COMMON_HEADER_SIZE+ISIS_PSNP_HEADER_SIZE);
         break;
 

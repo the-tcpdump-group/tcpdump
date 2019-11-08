@@ -4,47 +4,4 @@
 	  lsp-id: 0100.1401.0001.00-14, seq: 0x01000100, lifetime:   256s
 	  chksum: 0x1401 (unverified), PDU length: 20, Flags: [ Unused 0x0 (invalid) ]
 	  0x0000:  0014 0100 0100 1401 0001 0014 0100 0100
-	  0x0010:  1401 00
-	    Area address(es) TLV #1, length: 0
-	    unknown TLV #20, length: 1
-	      0x0000:  00
-	    Area address(es) TLV #1, length: 0
-	    unknown TLV #20, length: 1
-	      0x0000:  00
-	    Area address(es) TLV #1, length: 0
-	    unknown TLV #20, length: 1
-	      0x0000:  00
-	    Area address(es) TLV #1, length: 0
-	    unknown TLV #20, length: 1
-	      0x0000:  00
-	    Area address(es) TLV #1, length: 0
-	    unknown TLV #20, length: 1
-	      0x0000:  00
-	    Area address(es) TLV #1, length: 0
-	    unknown TLV #20, length: 1
-	      0x0000:  00
-	    Area address(es) TLV #1, length: 0
-	    unknown TLV #20, length: 1
-	      0x0000:  00
-	    Area address(es) TLV #1, length: 0
-	    unknown TLV #20, length: 1
-	      0x0000:  00
-	    Area address(es) TLV #1, length: 0
-	    unknown TLV #20, length: 1
-	      0x0000:  00
-	    Area address(es) TLV #1, length: 0
-	    unknown TLV #20, length: 1
-	      0x0000:  00
-	    Area address(es) TLV #1, length: 0
-	    unknown TLV #20, length: 1
-	      0x0000:  00
-	    Area address(es) TLV #1, length: 0
-	    unknown TLV #20, length: 1
-	      0x0000:  00
-	    Area address(es) TLV #1, length: 0
-	    unknown TLV #20, length: 1
-	      0x0000:  00
-	    Area address(es) TLV #1, length: 0
-	    unknown TLV #20, length: 1
-	      0x0000:  00
-	    Area address(es) TLV #1, length: 0 [|isis]
+	  0x0010:  1401 00 [packet length 20 < 27] (invalid)
