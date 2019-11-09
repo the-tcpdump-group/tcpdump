@@ -2287,7 +2287,7 @@ isis_clear_checksum_lifetime(void *header)
 
 #define INVALID_OR_DECREMENT(length,decr) \
     if ((length) < (decr)) { \
-        ND_PRINT(" [packet length %u < %u]", (length), (u_int) (decr)); \
+        ND_PRINT(" [packet length %u < %zu]", (length), (decr)); \
         nd_print_invalid(ndo); \
         return 1; \
     } \
