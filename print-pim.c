@@ -813,7 +813,9 @@ pimv2_print(netdissect_options *ndo,
 			switch (otype) {
 			case PIMV2_HELLO_OPTION_HOLDTIME:
 				if (olen != 2) {
-					ND_PRINT("ERROR: Option Length != 2 Bytes (%u)", olen);
+					ND_PRINT("[option length %u != 2]", olen);
+					nd_print_invalid(ndo);
+					return;
 				} else {
 					unsigned_relts_print(ndo,
 							     GET_BE_U_2(bp));
@@ -822,7 +824,9 @@ pimv2_print(netdissect_options *ndo,
 
 			case PIMV2_HELLO_OPTION_LANPRUNEDELAY:
 				if (olen != 4) {
-					ND_PRINT("ERROR: Option Length != 4 Bytes (%u)", olen);
+					ND_PRINT("[option length %u != 4]", olen);
+					nd_print_invalid(ndo);
+					return;
 				} else {
 					char t_bit;
 					uint16_t lan_delay, override_interval;
@@ -845,14 +849,18 @@ pimv2_print(netdissect_options *ndo,
 					ND_PRINT("%u", GET_BE_U_4(bp));
 					break;
 				default:
-					ND_PRINT("ERROR: Option Length != 4 Bytes (%u)", olen);
+					ND_PRINT("[option length %u != 4]", olen);
+					nd_print_invalid(ndo);
+					return;
 					break;
 				}
 				break;
 
 			case PIMV2_HELLO_OPTION_GENID:
 				if (olen != 4) {
-					ND_PRINT("ERROR: Option Length != 4 Bytes (%u)", olen);
+					ND_PRINT("[option length %u != 4]", olen);
+					nd_print_invalid(ndo);
+					return;
 				} else {
 					ND_PRINT("0x%08x", GET_BE_U_4(bp));
 				}
@@ -860,7 +868,9 @@ pimv2_print(netdissect_options *ndo,
 
 			case PIMV2_HELLO_OPTION_REFRESH_CAP:
 				if (olen != 4) {
-					ND_PRINT("ERROR: Option Length != 4 Bytes (%u)", olen);
+					ND_PRINT("[option length %u != 4]", olen);
+					nd_print_invalid(ndo);
+					return;
 				} else {
 					ND_PRINT("v%u", GET_U_1(bp));
 					if (GET_U_1(bp + 1) != 0) {
