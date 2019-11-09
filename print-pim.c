@@ -729,8 +729,11 @@ pimv2_print(netdissect_options *ndo,
 	u_int pimv2_addr_len;
 
 	ndo->ndo_protocol = "pimv2";
-	if (len < 2)
-		goto trunc;
+	if (len < 2) {
+		ND_PRINT("[length %u < 2]", len);
+		nd_print_invalid(ndo);
+		return;
+	}
 	ND_TCHECK_1(pim->pim_rsv);
 	pim_typever = GET_U_1(pim->pim_typever);
 	/* RFC5015 allocates the high 4 bits of pim_rsv for "subtype". */
@@ -738,8 +741,11 @@ pimv2_print(netdissect_options *ndo,
 	if (pimv2_addr_len != 0)
 		ND_PRINT(", RFC2117-encoding");
 
-	if (len < 4)
-		goto trunc;
+	if (len < 4) {
+		ND_PRINT("[length %u < 4]", len);
+		nd_print_invalid(ndo);
+		return;
+	}
 	ND_TCHECK_2(pim->pim_cksum);
 	ND_PRINT(", cksum 0x%04x ", GET_BE_U_2(pim->pim_cksum));
 	if (GET_BE_U_2(pim->pim_cksum) == 0) {
