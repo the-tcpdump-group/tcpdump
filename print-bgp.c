@@ -2017,17 +2017,21 @@ bgp_attr_print(netdissect_options *ndo,
 	if (ret < 0)
 	    break;
 
-        tptr +=3;
+        tptr += 3;
+        tlen -= 3;
 
         ND_TCHECK_1(tptr);
         nhlen = GET_U_1(tptr);
-        tlen = nhlen;
         tptr++;
+        tlen--;
 
-        if (tlen) {
+        if (nhlen) {
             u_int nnh = 0;
+            uint8_t tnhlen = nhlen;
+            if (tlen < tnhlen)
+                goto trunc;
             ND_PRINT("\n\t    nexthop: ");
-            while (tlen != 0) {
+            while (tnhlen != 0) {
                 if (nnh++ > 0) {
                     ND_PRINT(", " );
                 }
@@ -2039,104 +2043,123 @@ bgp_attr_print(netdissect_options *ndo,
                 case (AFNUM_INET<<8 | SAFNUM_RT_ROUTING_INFO):
                 case (AFNUM_INET<<8 | SAFNUM_MULTICAST_VPN):
                 case (AFNUM_INET<<8 | SAFNUM_MDT):
-                    if (tlen < sizeof(nd_ipv4)) {
+                    if (tnhlen < sizeof(nd_ipv4)) {
                         ND_PRINT("invalid len");
-                        tlen = 0;
+                        tptr += tnhlen;
+                        tlen -= tnhlen;
+                        tnhlen = 0;
                     } else {
                         ND_TCHECK_LEN(tptr, sizeof(nd_ipv4));
                         ND_PRINT("%s",ipaddr_string(ndo, tptr));
-                        tlen -= sizeof(nd_ipv4);
                         tptr += sizeof(nd_ipv4);
+                        tnhlen -= sizeof(nd_ipv4);
+                        tlen -= sizeof(nd_ipv4);
                     }
                     break;
                 case (AFNUM_INET<<8 | SAFNUM_VPNUNICAST):
                 case (AFNUM_INET<<8 | SAFNUM_VPNMULTICAST):
                 case (AFNUM_INET<<8 | SAFNUM_VPNUNIMULTICAST):
-                    if (tlen < sizeof(nd_ipv4)+BGP_VPN_RD_LEN) {
+                    if (tnhlen < sizeof(nd_ipv4)+BGP_VPN_RD_LEN) {
                         ND_PRINT("invalid len");
-                        tlen = 0;
+                        tptr += tnhlen;
+                        tlen -= tnhlen;
+                        tnhlen = 0;
                     } else {
                         ND_TCHECK_LEN(tptr,
                                       sizeof(nd_ipv4) + BGP_VPN_RD_LEN);
                         ND_PRINT("RD: %s, %s",
                                   bgp_vpn_rd_print(ndo, tptr),
                                   ipaddr_string(ndo, tptr+BGP_VPN_RD_LEN));
-                        tlen -= (sizeof(nd_ipv4)+BGP_VPN_RD_LEN);
                         tptr += (sizeof(nd_ipv4)+BGP_VPN_RD_LEN);
+                        tlen -= (sizeof(nd_ipv4)+BGP_VPN_RD_LEN);
+                        tnhlen -= (sizeof(nd_ipv4)+BGP_VPN_RD_LEN);
                     }
                     break;
                 case (AFNUM_INET6<<8 | SAFNUM_UNICAST):
                 case (AFNUM_INET6<<8 | SAFNUM_MULTICAST):
                 case (AFNUM_INET6<<8 | SAFNUM_UNIMULTICAST):
                 case (AFNUM_INET6<<8 | SAFNUM_LABUNICAST):
-                    if (tlen < sizeof(nd_ipv6)) {
+                    if (tnhlen < sizeof(nd_ipv6)) {
                         ND_PRINT("invalid len");
-                        tlen = 0;
+                        tptr += tnhlen;
+                        tlen -= tnhlen;
+                        tnhlen = 0;
                     } else {
                         ND_TCHECK_LEN(tptr, sizeof(nd_ipv6));
                         ND_PRINT("%s", ip6addr_string(ndo, tptr));
-                        tlen -= sizeof(nd_ipv6);
                         tptr += sizeof(nd_ipv6);
+                        tlen -= sizeof(nd_ipv6);
+                        tnhlen -= sizeof(nd_ipv6);
                     }
                     break;
                 case (AFNUM_INET6<<8 | SAFNUM_VPNUNICAST):
                 case (AFNUM_INET6<<8 | SAFNUM_VPNMULTICAST):
                 case (AFNUM_INET6<<8 | SAFNUM_VPNUNIMULTICAST):
-                    if (tlen < sizeof(nd_ipv6)+BGP_VPN_RD_LEN) {
+                    if (tnhlen < sizeof(nd_ipv6)+BGP_VPN_RD_LEN) {
                         ND_PRINT("invalid len");
-                        tlen = 0;
+                        tptr += tnhlen;
+                        tlen -= tnhlen;
+                        tnhlen = 0;
                     } else {
                         ND_TCHECK_LEN(tptr,
                                       sizeof(nd_ipv6) + BGP_VPN_RD_LEN);
                         ND_PRINT("RD: %s, %s",
                                   bgp_vpn_rd_print(ndo, tptr),
                                   ip6addr_string(ndo, tptr+BGP_VPN_RD_LEN));
-                        tlen -= (sizeof(nd_ipv6)+BGP_VPN_RD_LEN);
                         tptr += (sizeof(nd_ipv6)+BGP_VPN_RD_LEN);
+                        tlen -= (sizeof(nd_ipv6)+BGP_VPN_RD_LEN);
+                        tnhlen -= (sizeof(nd_ipv6)+BGP_VPN_RD_LEN);
                     }
                     break;
                 case (AFNUM_VPLS<<8 | SAFNUM_VPLS):
                 case (AFNUM_L2VPN<<8 | SAFNUM_VPNUNICAST):
                 case (AFNUM_L2VPN<<8 | SAFNUM_VPNMULTICAST):
                 case (AFNUM_L2VPN<<8 | SAFNUM_VPNUNIMULTICAST):
-                    if (tlen < sizeof(nd_ipv4)) {
+                    if (tnhlen < sizeof(nd_ipv4)) {
                         ND_PRINT("invalid len");
-                        tlen = 0;
+                        tptr += tnhlen;
+                        tlen -= tnhlen;
+                        tnhlen = 0;
                     } else {
                         ND_TCHECK_LEN(tptr, sizeof(nd_ipv4));
                         ND_PRINT("%s", ipaddr_string(ndo, tptr));
-                        tlen -= (sizeof(nd_ipv4));
                         tptr += (sizeof(nd_ipv4));
+                        tlen -= (sizeof(nd_ipv4));
+                        tnhlen -= (sizeof(nd_ipv4));
                     }
                     break;
                 case (AFNUM_NSAP<<8 | SAFNUM_UNICAST):
                 case (AFNUM_NSAP<<8 | SAFNUM_MULTICAST):
                 case (AFNUM_NSAP<<8 | SAFNUM_UNIMULTICAST):
-                    ND_TCHECK_LEN(tptr, tlen);
-                    ND_PRINT("%s", isonsap_string(ndo, tptr, tlen));
-                    tptr += tlen;
-                    tlen = 0;
+                    ND_TCHECK_LEN(tptr, tnhlen);
+                    ND_PRINT("%s", isonsap_string(ndo, tptr, tnhlen));
+                    tptr += tnhlen;
+                    tlen -= tnhlen;
+                    tnhlen = 0;
                     break;
 
                 case (AFNUM_NSAP<<8 | SAFNUM_VPNUNICAST):
                 case (AFNUM_NSAP<<8 | SAFNUM_VPNMULTICAST):
                 case (AFNUM_NSAP<<8 | SAFNUM_VPNUNIMULTICAST):
-                    if (tlen < BGP_VPN_RD_LEN+1) {
+                    if (tnhlen < BGP_VPN_RD_LEN+1) {
                         ND_PRINT("invalid len");
-                        tlen = 0;
+                        tptr += tnhlen;
+                        tlen -= tnhlen;
+                        tnhlen = 0;
                     } else {
-                        ND_TCHECK_LEN(tptr, tlen);
+                        ND_TCHECK_LEN(tptr, tnhlen);
                         ND_PRINT("RD: %s, %s",
                                   bgp_vpn_rd_print(ndo, tptr),
-                                  isonsap_string(ndo, tptr+BGP_VPN_RD_LEN,tlen-BGP_VPN_RD_LEN));
+                                  isonsap_string(ndo, tptr+BGP_VPN_RD_LEN,tnhlen-BGP_VPN_RD_LEN));
                         /* rfc986 mapped IPv4 address ? */
                         if (GET_BE_U_4(tptr + BGP_VPN_RD_LEN) ==  0x47000601)
                             ND_PRINT(" = %s", ipaddr_string(ndo, tptr+BGP_VPN_RD_LEN+4));
                         /* rfc1888 mapped IPv6 address ? */
                         else if (GET_BE_U_3(tptr + BGP_VPN_RD_LEN) ==  0x350000)
                             ND_PRINT(" = %s", ip6addr_string(ndo, tptr+BGP_VPN_RD_LEN+3));
-                        tptr += tlen;
-                        tlen = 0;
+                        tptr += tnhlen;
+                        tlen -= tnhlen;
+                        tnhlen = 0;
                     }
                     break;
                 default:
@@ -2145,26 +2168,39 @@ bgp_attr_print(netdissect_options *ndo,
 		     * an unsupported AFI/SAFI.
 		     */
                     ND_PRINT("ERROR: no AFI %u/SAFI %u nexthop decoder", af, safi);
-                    tptr += tlen;
-                    tlen = 0;
+                    tptr += tnhlen;
+                    tlen -= tnhlen;
+                    tnhlen = 0;
                     goto done;
                     break;
                 }
             }
         }
         ND_PRINT(", nh-length: %u", nhlen);
-        tptr += tlen;
 
+        /* As per RFC 2858; this is reserved in RFC 4760 */
+        if (tlen < 1)
+            goto trunc;
         ND_TCHECK_1(tptr);
         snpa = GET_U_1(tptr);
         tptr++;
+        tlen--;
 
         if (snpa) {
             ND_PRINT("\n\t    %u SNPA", snpa);
             for (/*nothing*/; snpa != 0; snpa--) {
+                uint8_t snpalen;
+            	if (tlen < 1)
+            	    goto trunc;
                 ND_TCHECK_1(tptr);
-                ND_PRINT("\n\t      %u bytes", GET_U_1(tptr));
-                tptr += GET_U_1(tptr) + 1;
+                snpalen = GET_U_1(tptr);
+                ND_PRINT("\n\t      %u bytes", snpalen);
+                tptr++;
+                tlen--;
+                if (tlen < snpalen)
+                    goto trunc;
+                tptr += snpalen;
+                tlen -= snpalen;
             }
         } else {
             ND_PRINT(", no SNPA");

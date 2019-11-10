@@ -3349,34 +3349,7 @@
 	    21 SNPA
 	      0 bytes
 	      0 bytes
-	      138 bytes
-	      255 bytes
-	      33 bytes
-	      116 bytes
-	      3 bytes
-	      4 bytes
-	      128 bytes
-	      0 bytes
-	      0 bytes
-	      0 bytes
-	      0 bytes
-	      172 bytes
-	      1 bytes
-	      12 bytes
-	      0 bytes
-	      116 bytes
-	      2 bytes
-	      10 bytes
-	      0 bytes
-	    0x0000:  0001 800c 0000 0000 0000 0000 ac12 c400
-	    0x0010:  1500 008a 0140 4040 4040 4040 4040 0000
-	    0x0020:  498a 0000 028a ac11 2100 7400 4051 0000
-	    0x0030:  498a 0000 028a ac11 6900 7400 4051 0000
-	    0x0040:  498a 0000 028a ac11 6920 7400 4051 0000
-	    0x0050:  498a 0000 028a ac11 6930 7400 4051 0000
-	    0x0060:  498a 0000 028a ac11 c057 7400 4051 0000
-	    0x0070:  498a 0000 028a ac11 c090 7200 40a1 0000
-	    0x0080:  49 [|bgp]
+	      138 bytes [|bgp] [|bgp]
 	Update Message (2), length: 154
 	  Origin (1), length: 1, Flags [T]: Incomplete
 	    0x0000:  02
