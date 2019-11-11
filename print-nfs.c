@@ -524,7 +524,7 @@ static const uint32_t *
 parsefn(netdissect_options *ndo,
         const uint32_t *dp)
 {
-	uint32_t len;
+	uint32_t len, rounded_len;
 	const u_char *cp;
 
 	/* Bail if we don't have the string length */
@@ -540,11 +540,12 @@ parsefn(netdissect_options *ndo,
 		return NULL;
 	}
 
-	ND_TCHECK_LEN(dp, ((len + 3) & ~3));
+	rounded_len = roundup2(len, 4);
+	ND_TCHECK_LEN(dp, rounded_len);
 
 	cp = (const u_char *)dp;
 	/* Update 32-bit pointer (NFS filenames padded to 32-bit boundaries) */
-	dp += ((len + 3) & ~3) / sizeof(*dp);
+	dp += rounded_len / sizeof(*dp);
 	ND_PRINT("\"");
 	if (nd_printn(ndo, cp, len, ndo->ndo_snapend)) {
 		ND_PRINT("\"");

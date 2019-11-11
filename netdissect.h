@@ -109,7 +109,7 @@ typedef unsigned char nd_byte;
  * Round up x to a multiple of y; y must be a power of 2.
  */
 #ifndef roundup2
-#define	roundup2(x, y)	(((x)+((y)-1))&(~((y)-1)))
+#define	roundup2(x, y)	(((x)+((u_int)((y)-1)))&(~((u_int)((y)-1))))
 #endif
 
 #include <stdarg.h>

@@ -46,7 +46,7 @@
  * an even multiple of DOP_ALIGN bytes, which must be a power of two.
  */
 #define DOP_ALIGN 4
-#define DOP_ROUNDUP(x)	((((int)(x)) + (DOP_ALIGN - 1)) & ~(DOP_ALIGN - 1))
+#define DOP_ROUNDUP(x)	roundup2(x, DOP_ALIGN)
 #define DOP_NEXT(d)\
 	((const struct dophdr *)((const u_char *)(d) + \
 				DOP_ROUNDUP(GET_BE_U_2((d)->dh_len) + sizeof(*(d)))))

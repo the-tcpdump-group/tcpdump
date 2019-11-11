@@ -827,7 +827,7 @@ hncp_print_rec(netdissect_options *ndo,
                 nd_print_invalid(ndo);
             }
             l += 17;
-            l += -l & 3;
+            l = roundup2(l, 4);
             if (bodylen >= l)
                 hncp_print_rec(ndo, value + l, bodylen - l, indent+1);
         }
@@ -852,7 +852,7 @@ hncp_print_rec(netdissect_options *ndo,
         }
     skip_multiline:
 
-        i += 4 + bodylen + (-bodylen & 3);
+        i += 4 + roundup2(bodylen, 4);
     }
     print_type_in_line(ndo, last_type_mask, last_type_count, indent, &first_one);
 
