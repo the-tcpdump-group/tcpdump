@@ -2026,6 +2026,8 @@ main(int argc, char **argv)
 		/* Run with '-Z root' to restore old behaviour */
 		if (!username)
 			username = WITH_USER;
+		else if (strcmp(username, "root") == 0)
+			username = NULL;
 	}
 #endif
 
