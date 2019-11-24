@@ -1347,8 +1347,6 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 			 */
 			snprintf(ebuf, PCAP_ERRBUF_SIZE, "%s: %s\n(%s)",
 			    device, pcap_statustostr(status), cp);
-			pcap_close(pc);
-			return (NULL);
 		} else if (status == PCAP_ERROR_PERM_DENIED && *cp != '\0')
 			error("%s: %s\n(%s)", device,
 			    pcap_statustostr(status), cp);
@@ -1379,6 +1377,8 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 		else
 			error("%s: %s", device,
 			    pcap_statustostr(status));
+		pcap_close(pc);
+		return (NULL);
 	} else if (status > 0) {
 		/*
 		 * pcap_activate() succeeded, but it's warning us
