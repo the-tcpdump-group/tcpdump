@@ -17,7 +17,7 @@ exitcode=0
 # that won't return an error when the file does not exist. Work around.
 if [ ! -f ../Makefile ]
 then
-	printf '    %-35s: TEST SKIPPED (no Makefile)\n' 'lmp-v'
+	printf '    %-40s: TEST SKIPPED (no Makefile)\n' 'lmp-v'
 elif grep '^CC = .*gcc' ../Makefile >/dev/null
 then
 	passed=`cat .passed`
@@ -32,7 +32,7 @@ then
 		exitcode=1
 	fi
 else
-	printf '    %-35s: TEST SKIPPED (compiler is not GCC)\n' 'lmp-v'
+	printf '    %-40s: TEST SKIPPED (compiler is not GCC)\n' 'lmp-v'
 fi
 
 exit $exitcode

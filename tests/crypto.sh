@@ -43,7 +43,7 @@ then
 	# Reading the secret(s) from a file does not work with Capsicum.
 	if grep '^#define HAVE_CAPSICUM 1$' ../config.h >/dev/null
 	then
-		FORMAT='    %-35s: TEST SKIPPED (compiled w/Capsicum)\n'
+		FORMAT='    %-40s: TEST SKIPPED (compiled w/Capsicum)\n'
 		printf "$FORMAT" esp4
 		printf "$FORMAT" esp5
 		printf "$FORMAT" espudp1
@@ -114,11 +114,11 @@ then
 		echo $failed >.failed
 		exitcode=1
 	fi
-	FORMAT='    %-35s: TEST SKIPPED (compiled w/OpenSSL)\n'
+	FORMAT='    %-40s: TEST SKIPPED (compiled w/OpenSSL)\n'
 	printf "$FORMAT" bgp-as-path-oobr-nossl
 	printf "$FORMAT" bgp-aigp-oobr-nossl
 else
-	FORMAT='    %-35s: TEST SKIPPED (compiled w/o OpenSSL)\n'
+	FORMAT='    %-40s: TEST SKIPPED (compiled w/o OpenSSL)\n'
 	printf "$FORMAT" esp1
 	printf "$FORMAT" esp2
 	printf "$FORMAT" esp3

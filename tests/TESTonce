@@ -103,16 +103,16 @@ else {
 
 if($r == 0) {
     if($linecount == 0) {
-        printf "    %-35s: passed\n", $name;
+        printf "    %-40s: passed\n", $name;
     } else {
-        printf "    %-35s: passed with error messages:\n", $name;
+        printf "    %-40s: passed with error messages:\n", $name;
         system "cat $stderrlog";
     }
     unlink "DIFF/$outputbase.diff";
     exit 0;
 }
 # must have failed!
-printf "    %-35s: TEST FAILED(exit core=%d/diffstat=%d,%d/r=%d)", $name, $coredump, $diffstat, $errdiffstat, $r;
+printf "    %-40s: TEST FAILED(exit core=%d/diffstat=%d,%d/r=%d)", $name, $coredump, $diffstat, $errdiffstat, $r;
 open FOUT, '>>failure-outputs.txt';
 printf FOUT "\nFailed test: $name\n\n";
 close FOUT;

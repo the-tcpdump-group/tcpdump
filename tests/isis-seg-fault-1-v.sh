@@ -14,7 +14,7 @@ test_name=isis-seg-fault-1-v
 
 if [ ! -f ../Makefile ]
 then
-	printf '    %-35s: TEST SKIPPED (no Makefile)\n' $test_name
+	printf '    %-40s: TEST SKIPPED (no Makefile)\n' $test_name
 elif grep '^CC = .*gcc' ../Makefile >/dev/null
 then
 	passed=`cat .passed`
@@ -29,7 +29,7 @@ then
 		exitcode=1
 	fi
 else
-	printf '    %-35s: TEST SKIPPED (compiler is not GCC)\n' $test_name
+	printf '    %-40s: TEST SKIPPED (compiler is not GCC)\n' $test_name
 fi
 
 exit $exitcode
