@@ -388,11 +388,11 @@ ahcp_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 				cp += 4;
 				/* Source Id */
 				ND_TCHECK_8(cp);
-				ND_PRINT(", Source Id %s", linkaddr_string(ndo, cp, 0, 8));
+				ND_PRINT(", Source Id %s", linkaddr_string(ndo, cp, LINKADDR_OTHER, 8));
 				cp += 8;
 				/* Destination Id */
 				ND_TCHECK_8(cp);
-				ND_PRINT(", Destination Id %s", linkaddr_string(ndo, cp, 0, 8));
+				ND_PRINT(", Destination Id %s", linkaddr_string(ndo, cp, LINKADDR_OTHER, 8));
 				cp += 8;
 			}
 			/* Body */
