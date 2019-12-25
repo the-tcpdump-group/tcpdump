@@ -39,13 +39,13 @@
  * The length does include the version and length fields.
  */
 typedef struct rpki_rtr_pdu_ {
-    u_char version;		/* Version number */
-    u_char pdu_type;		/* PDU type */
+    nd_uint8_t version;		/* Version number */
+    nd_uint8_t pdu_type;		/* PDU type */
     union {
-	u_char session_id[2];	/* Session id */
-	u_char error_code[2];	/* Error code */
+	nd_uint16_t session_id;	/* Session id */
+	nd_uint16_t error_code;	/* Error code */
     } u;
-    u_char length[4];
+    nd_uint32_t length;
 } rpki_rtr_pdu;
 
 /*
@@ -53,12 +53,12 @@ typedef struct rpki_rtr_pdu_ {
  */
 typedef struct rpki_rtr_pdu_ipv4_prefix_ {
     rpki_rtr_pdu pdu_header;
-    u_char flags;
-    u_char prefix_length;
-    u_char max_length;
-    u_char zero;
-    u_char prefix[4];
-    u_char as[4];
+    nd_uint8_t flags;
+    nd_uint8_t prefix_length;
+    nd_uint8_t max_length;
+    nd_uint8_t zero;
+    nd_ipv4 prefix;
+    nd_uint32_t as;
 } rpki_rtr_pdu_ipv4_prefix;
 
 /*
@@ -66,12 +66,12 @@ typedef struct rpki_rtr_pdu_ipv4_prefix_ {
  */
 typedef struct rpki_rtr_pdu_ipv6_prefix_ {
     rpki_rtr_pdu pdu_header;
-    u_char flags;
-    u_char prefix_length;
-    u_char max_length;
-    u_char zero;
-    u_char prefix[16];
-    u_char as[4];
+    nd_uint8_t flags;
+    nd_uint8_t prefix_length;
+    nd_uint8_t max_length;
+    nd_uint8_t zero;
+    nd_ipv6 prefix;
+    nd_uint32_t as;
 } rpki_rtr_pdu_ipv6_prefix;
 
 /*
@@ -79,7 +79,7 @@ typedef struct rpki_rtr_pdu_ipv6_prefix_ {
  */
 typedef struct rpki_rtr_pdu_error_report_ {
     rpki_rtr_pdu pdu_header;
-    u_char encapsulated_pdu_length[4]; /* Encapsulated PDU length */
+    nd_uint32_t encapsulated_pdu_length; /* Encapsulated PDU length */
     /* Copy of Erroneous PDU (variable, optional) */
     /* Length of Error Text (4 octets in network byte order) */
     /* Arbitrary Text of Error Diagnostic Message (variable, optional) */
@@ -198,7 +198,7 @@ rpki_rtr_pdu_print(netdissect_options *ndo, const u_char *tptr, const u_int len,
     }
     ND_TCHECK_LEN(tptr, sizeof(rpki_rtr_pdu));
     pdu_header = (const rpki_rtr_pdu *)tptr;
-    pdu_type = pdu_header->pdu_type;
+    pdu_type = GET_U_1(pdu_header->pdu_type);
     pdu_len = GET_BE_U_4(pdu_header->length);
     /* Do not check bounds with pdu_len yet, do it in the case blocks
      * below to make it possible to decode at least the beginning of
@@ -208,7 +208,7 @@ rpki_rtr_pdu_print(netdissect_options *ndo, const u_char *tptr, const u_int len,
 
     ND_PRINT("%sRPKI-RTRv%u, %s PDU (%u), length: %u",
 	   indent_string(8),
-	   pdu_header->version,
+	   GET_U_1(pdu_header->version),
 	   tok2str(rpki_rtr_pdu_values, "Unknown", pdu_type),
 	   pdu_type, pdu_len);
     if (pdu_len < sizeof(rpki_rtr_pdu) || pdu_len > len)
@@ -266,8 +266,8 @@ rpki_rtr_pdu_print(netdissect_options *ndo, const u_char *tptr, const u_int len,
 	    ND_PRINT("%sIPv4 Prefix %s/%u-%u, origin-as %u, flags 0x%02x",
 		   indent_string(indent+2),
 		   ipaddr_string(ndo, pdu->prefix),
-		   pdu->prefix_length, pdu->max_length,
-		   GET_BE_U_4(pdu->as), pdu->flags);
+		   GET_U_1(pdu->prefix_length), GET_U_1(pdu->max_length),
+		   GET_BE_U_4(pdu->as), GET_U_1(pdu->flags));
 	}
 	break;
 
@@ -282,8 +282,8 @@ rpki_rtr_pdu_print(netdissect_options *ndo, const u_char *tptr, const u_int len,
 	    ND_PRINT("%sIPv6 Prefix %s/%u-%u, origin-as %u, flags 0x%02x",
 		   indent_string(indent+2),
 		   ip6addr_string(ndo, pdu->prefix),
-		   pdu->prefix_length, pdu->max_length,
-		   GET_BE_U_4(pdu->as), pdu->flags);
+		   GET_U_1(pdu->prefix_length), GET_U_1(pdu->max_length),
+		   GET_BE_U_4(pdu->as), GET_U_1(pdu->flags));
 	}
 	break;
 
