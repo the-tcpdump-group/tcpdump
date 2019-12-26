@@ -164,7 +164,15 @@ typedef struct netdissect_options netdissect_options;
 
 #define IF_PRINTER_ARGS (netdissect_options *, const struct pcap_pkthdr *, const u_char *)
 
-typedef u_int (*if_printer) IF_PRINTER_ARGS;
+typedef u_int (*uint_if_printer) IF_PRINTER_ARGS;
+typedef void  (*void_if_printer) IF_PRINTER_ARGS;
+
+/* pointer to the uint_if_printer or the void_if_printer function */
+typedef union {
+	uint_if_printer uint_printer;
+	void_if_printer void_printer;
+	void* printer;		/* generic when testing if NULL or not */
+} if_printer_t;
 
 /*
  * In case the data in a buffer needs to be processed by being decrypted,
@@ -227,6 +235,7 @@ struct netdissect_options {
   int   ndo_packettype;	/* as specified by -T */
 
   int   ndo_snaplen;
+  int   ndo_ll_header_length;	/* link-layer header length */
 
   /*global pointers to beginning and end of current packet (during printing) */
   const u_char *ndo_packetp;
@@ -235,8 +244,9 @@ struct netdissect_options {
   /* stack of saved packet boundary and buffer information */
   struct netdissect_saved_packet_info *ndo_packet_info_stack;
 
-  /* pointer to the if_printer function */
-  if_printer ndo_if_printer;
+  /* pointer to the uint_if_printer or the void_if_printer function */
+  if_printer_t ndo_if_printer;
+  int ndo_void_printer; /* void_if_printer ? (FALSE/TRUE) */
 
   /* pointer to void function to output stuff */
   void (*ndo_default_print)(netdissect_options *,
@@ -443,7 +453,9 @@ extern int unaligned_memcmp(const void *, const void *, size_t);
 extern const char *tok2strary_internal(const char **, int, const char *, int);
 #define	tok2strary(a,f,i) tok2strary_internal(a, sizeof(a)/sizeof(a[0]),f,i)
 
-extern if_printer lookup_printer(int);
+extern uint_if_printer lookup_uint_printer(int);
+extern void_if_printer lookup_void_printer(int);
+extern if_printer_t lookup_printer(netdissect_options *, int);
 
 #define ND_DEBUG {printf(" [%s:%d %s] ", __FILE__, __LINE__, __FUNCTION__); fflush(stdout);}
 

@@ -102,7 +102,7 @@ pktap_if_print(netdissect_options *ndo,
 	uint32_t dlt, hdrlen, rectype;
 	u_int caplen = h->caplen;
 	u_int length = h->len;
-	if_printer printer;
+	if_printer_t printer;
 	const pktap_header_t *hdr;
 	struct pcap_pkthdr nhdr;
 
@@ -145,11 +145,16 @@ pktap_if_print(netdissect_options *ndo,
 		break;
 
 	case PKT_REC_PACKET:
-		if ((printer = lookup_printer(dlt)) != NULL) {
+		printer = lookup_printer(ndo, dlt);
+		if (printer.printer != NULL) {
 			nhdr = *h;
 			nhdr.caplen = caplen;
 			nhdr.len = length;
-			hdrlen += printer(ndo, &nhdr, p);
+			if (ndo->ndo_void_printer == TRUE) {
+				printer.void_printer(ndo, &nhdr, p);
+				hdrlen += ndo->ndo_ll_header_length;
+			} else
+				hdrlen += printer.uint_printer(ndo, &nhdr, p);
 		} else {
 			if (!ndo->ndo_eflag)
 				pktap_header_print(ndo, (const u_char *)hdr,

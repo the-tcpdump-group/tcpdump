@@ -54,7 +54,7 @@ static u_int
 ppi_print(netdissect_options *ndo,
 	  const struct pcap_pkthdr *h, const u_char *p)
 {
-	if_printer printer;
+	if_printer_t printer;
 	const ppi_header_t *hdr;
 	u_int caplen = h->caplen;
 	u_int length = h->len;
@@ -94,11 +94,16 @@ ppi_print(netdissect_options *ndo,
 	caplen -= len;
 	p += len;
 
-	if ((printer = lookup_printer(dlt)) != NULL) {
+	printer = lookup_printer(ndo, dlt);
+	if (printer.printer != NULL) {
 		nhdr = *h;
 		nhdr.caplen = caplen;
 		nhdr.len = length;
-		hdrlen = printer(ndo, &nhdr, p);
+		if (ndo->ndo_void_printer == TRUE) {
+			printer.void_printer(ndo, &nhdr, p);
+			hdrlen = ndo->ndo_ll_header_length;
+		} else
+			hdrlen = printer.uint_printer(ndo, &nhdr, p);
 	} else {
 		if (!ndo->ndo_eflag)
 			ppi_header_print(ndo, (const u_char *)hdr, length + len);
