@@ -924,19 +924,19 @@ if test "$want_libcrypto" != "no"; then
 			# EVP_CIPHER_CTX, as EVP_CIPHER_CTX may be
 			# opaque; otherwise, we allocate it ourselves.
 			#
-			# 2) do we have EVP_CipherInit_ex()?
+			# 2) do we have EVP_DecryptInit_ex()?
 			# If so, we use it, because we need to be
 			# able to make two "initialize the cipher"
 			# calls, one with the cipher and key, and
 			# one with the IV, and, as of OpenSSL 1.1,
-			# You Can't Do That with EVP_CipherInit(),
-			# because a call to EVP_CipherInit() will
+			# You Can't Do That with EVP_DecryptInit(),
+			# because a call to EVP_DecryptInit() will
 			# unconditionally clear the context, and
 			# if you don't supply a cipher, it'll
 			# clear the cipher, rendering the context
 			# unusable and causing a crash.
 			#
-			AC_CHECK_FUNCS(EVP_CIPHER_CTX_new EVP_CipherInit_ex)
+			AC_CHECK_FUNCS(EVP_CIPHER_CTX_new EVP_DecryptInit_ex)
 		fi
 	])
 fi

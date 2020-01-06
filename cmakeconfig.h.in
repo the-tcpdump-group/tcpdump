@@ -33,11 +33,11 @@
 /* Define to 1 if you have the `ether_ntohost' function. */
 #cmakedefine HAVE_ETHER_NTOHOST 1
 
-/* Define to 1 if you have the `EVP_CipherInit_ex' function. */
-#cmakedefine HAVE_EVP_CIPHERINIT_EX 1
-
 /* Define to 1 if you have the `EVP_CIPHER_CTX_new' function. */
 #cmakedefine HAVE_EVP_CIPHER_CTX_NEW 1
+
+/* Define to 1 if you have the `EVP_DecryptInit_ex' function. */
+#cmakedefine HAVE_EVP_DECRYPTINIT_EX 1
 
 /* Define to 1 if you have the <fcntl.h> header file. */
 #cmakedefine HAVE_FCNTL_H 1
