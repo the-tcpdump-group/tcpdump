@@ -469,8 +469,8 @@ espprint_decode_authalgo(netdissect_options *ndo,
 	}
 	*colon = '\0';
 
-	if(ascii_strcasecmp(colon,"sha1") == 0 ||
-	   ascii_strcasecmp(colon,"md5") == 0) {
+	if(ascii_strcasecmp(decode,"sha1") == 0 ||
+	   ascii_strcasecmp(decode,"md5") == 0) {
 		sa->authlen = 12;
 	}
 	return 1;
