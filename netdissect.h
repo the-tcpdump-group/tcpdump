@@ -645,7 +645,7 @@ extern void pimv1_print(netdissect_options *, const u_char *, u_int);
 extern u_int ppp_print(netdissect_options *, const u_char *, u_int);
 extern u_int pppoe_print(netdissect_options *, const u_char *, u_int);
 extern void pptp_print(netdissect_options *, const u_char *);
-extern void ptp_print(netdissect_options *, const u_char *, const u_int);
+extern void ptp_print(netdissect_options *, const u_char *, u_int);
 extern int print_unknown_data(netdissect_options *, const u_char *, const char *, int);
 extern const char *q922_string(netdissect_options *, const u_char *, u_int);
 extern void q933_print(netdissect_options *, const u_char *, u_int);
