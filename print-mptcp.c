@@ -178,21 +178,30 @@ mp_capable_print(netdissect_options *ndo,
 {
         const struct mp_capable *mpc = (const struct mp_capable *) opt;
 
-        if (!(opt_len == 12 && (flags & TH_SYN)) &&
-            !(opt_len == 20 && (flags & (TH_SYN | TH_ACK)) == TH_ACK))
+        if (!((opt_len == 12 || opt_len == 4) && flags & TH_SYN) &&
+            !((opt_len == 20 || opt_len == 22) && (flags & (TH_SYN | TH_ACK)) ==
+              TH_ACK))
                 return 0;
 
-        if (MP_CAPABLE_OPT_VERSION(mpc->sub_ver) != 0) {
-                ND_PRINT(" Unknown Version (%u)", MP_CAPABLE_OPT_VERSION(mpc->sub_ver));
-                return 1;
+        switch (MP_CAPABLE_OPT_VERSION(mpc->sub_ver)) {
+                case 0: /* fall through */
+                case 1:
+                        ND_PRINT(" v%d", MP_CAPABLE_OPT_VERSION(mpc->sub_ver));
+                        break;
+                default:
+                        ND_PRINT(" Unknown Version (%d)",
+                                  MP_CAPABLE_OPT_VERSION(mpc->sub_ver));
+                        return 1;
         }
 
         if (GET_U_1(mpc->flags) & MP_CAPABLE_C)
                 ND_PRINT(" csum");
-        ND_PRINT(" {0x%" PRIx64, GET_BE_U_8(mpc->sender_key));
-        if (opt_len == 20) /* ACK */
-                ND_PRINT(",0x%" PRIx64, GET_BE_U_8(mpc->receiver_key));
-        ND_PRINT("}");
+        if (opt_len == 12 || opt_len >= 20) {
+                ND_PRINT(" {0x%" PRIx64, GET_BE_U_8(mpc->sender_key));
+                if (opt_len >= 20)
+                        ND_PRINT(",0x%" PRIx64, GET_BE_U_8(mpc->receiver_key));
+                ND_PRINT("}");
+        }
         return 1;
 }
 

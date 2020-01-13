@@ -217,7 +217,8 @@ msnlb		msnlb.pcap		msnlb.out
 msnlb2		msnlb2.pcapng		msnlb2.out
 
 # MPTCP tests
-mptcp		mptcp.pcap		mptcp.out
+mptcp-v0	mptcp-v0.pcap		mptcp-v0.out
+mptcp-v1	mptcp-v1.pcap		mptcp-v1.out
 mptcp-fclose	mptcp-fclose.pcap	mptcp-fclose.out
 # TFO tests
 tfo		tfo-5c1fa7f9ae91.pcap	tfo.out
