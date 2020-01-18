@@ -1,0 +1,96 @@
+#!/usr/bin/env python
+# Copyright (c) 2019
+#      Arista Networks, Inc.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+#   1. Redistributions of source code must retain the above copyright
+#      notice, this list of conditions and the following disclaimer.
+#   2. Redistributions in binary form must reproduce the above copyright
+#      notice, this list of conditions and the following disclaimer in
+#      the documentation and/or other materials provided with the
+#      distribution.
+#   3. The names of the authors may not be used to endorse or promote
+#      products derived from this software without specific prior
+#      written permission.
+#
+# THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+from __future__ import absolute_import, division, print_function
+from scapy.all import *
+import argparse
+import os.path
+
+# There are various BGP layer implementations out there for
+# scapy; to avoid additional dependencies we inline the
+# absolute simplest to get scapy to parse
+# the length for us.
+BGP_MARKER = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+class MiniBGP( Packet ):
+    fields_desc = [
+            XBitField( 'marker', BGP_MARKER, 0x80 ),
+            ShortField( 'len', None ),
+            ByteField( 'type', None ),
+            StrLenField( 'data', None, length_from=lambda pkt: pkt.len-19 ),
+            ]
+
+scapy.packet.bind_layers(TCP, MiniBGP, dport=179)
+scapy.packet.bind_layers(TCP, MiniBGP, sport=179)
+
+def corpus_filename( f, suffix ):
+    outFile = os.path.splitext( os.path.basename( f ) )[ 0 ]
+    outFile += "-%s" % suffix
+    return outFile
+
+def process_pkt( f, n, pkt, typ ):
+    outFile = corpus_filename( f, str( n ) )
+    print( "Outputting %s to %s/%s" % ( pkt.summary(), typ, outFile ) )
+    if not os.path.exists( typ ):
+        os.mkdir( typ )
+    file( os.path.join( typ, outFile ), "w" ).write( pkt.build() )
+
+def convert( f ):
+    """Open one pcap file, and convert the sequence of packets in it
+    to a series of oss-fuzz corpus input.  We pick the most-specific
+    fuzzer that a packet matches out of all that we support - e.g.,
+    if it's an IP packet with BGP inside, we don't output to either
+    the ethernet or ip fuzzers: just the BGP one."""
+    pkts = rdpcap( f )
+    n = 1
+    for pkt in pkts:
+        if pkt.haslayer( MiniBGP ):
+            # The goal here is to have two renderings:
+            # 1. all bgp messages together;
+            # 2. individual bgp messages
+            # if a pcap has multiple BGP messages.
+            # However, #2 requires more scapy than I have
+            # figured out yet, so we just dump the whole
+            # TCP payload.
+            process_pkt( f, n, pkt[ MiniBGP ], "bgp" )
+        elif pkt.haslayer( IP ):
+            process_pkt( f, n, pkt[ IP ], "ip" )
+        elif pkt.haslayer( IPv6 ):
+            process_pkt( f, n, pkt[ IPv6 ], "ip6" )
+        elif pkt.haslayer( Ether ):
+            # rdpcap() can get confused by some of the dumps.
+            # If we get a packet with no payload, just skip it.
+            if pkt.payload:
+                process_pkt( f, n, pkt[ Ether ], "ether" )
+        else:
+            print( "%s skipping %s" % ( f, pkt.summary() ) )
+        n += 1
+
+def main( ):
+    parser = argparse.ArgumentParser( description='Convert pcaps to corpus' )
+    parser.add_argument( 'pcap', nargs='+', help='pcap files to convert' )
+    args = parser.parse_args()
+    print( args.pcap )
+    for pcap in args.pcap:
+        convert( pcap )
+
+if __name__ == "__main__":
+    main()
