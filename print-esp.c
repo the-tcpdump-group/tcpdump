@@ -145,7 +145,7 @@ EVP_CIPHER_CTX_free(EVP_CIPHER_CTX *ctx)
 }
 #endif
 
-#ifdef HAVE_EVP_CIPHERINIT_EX
+#ifdef HAVE_EVP_DECRYPTINIT_EX
 /*
  * Initialize the cipher by calling EVP_DecryptInit_ex(), because
  * calling EVP_DecryptInit() will reset the cipher context, clearing
