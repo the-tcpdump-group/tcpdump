@@ -203,6 +203,7 @@ static int Iflag;			/* rfmon (monitor) mode */
 static int Jflag;			/* list available time stamp types */
 static int jflag = -1;			/* packet time stamp source */
 #endif
+static int lflag;			/* line-buffered output */
 static int pflag;			/* don't go promiscuous */
 #ifdef HAVE_PCAP_SETDIRECTION
 static int Qflag = -1;			/* restrict captured packet by send/receive direction */
@@ -213,6 +214,7 @@ static int Uflag;			/* "unbuffered" output of dump files */
 static int Wflag;			/* recycle output files after this number of files */
 static int WflagChars;
 static char *zflag = NULL;		/* compress each savefile using a specified command (like gzip or bzip2) */
+static int timeout = 1000;		/* default timeout = 1000 ms = 1 s */
 #ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
 static int immediate_mode;
 #endif
@@ -1229,7 +1231,7 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 		 */
 		*ebuf = '\0';
 		pc = pcap_open(device, ndo->ndo_snaplen,
-		    pflag ? 0 : PCAP_OPENFLAG_PROMISCUOUS, 1000, NULL,
+		    pflag ? 0 : PCAP_OPENFLAG_PROMISCUOUS, timeout, NULL,
 		    ebuf);
 		if (pc == NULL) {
 			/*
@@ -1311,7 +1313,7 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 			error("%s: Can't set monitor mode: %s",
 			    device, pcap_statustostr(status));
 	}
-	status = pcap_set_timeout(pc, 1000);
+	status = pcap_set_timeout(pc, timeout);
 	if (status != 0)
 		error("%s: pcap_set_timeout failed: %s",
 		    device, pcap_statustostr(status));
@@ -1411,7 +1413,7 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 	 */
 	if (ndo->ndo_snaplen == 0)
 		ndo->ndo_snaplen = MAXIMUM_SNAPLEN;
-	pc = pcap_open_live(device, ndo->ndo_snaplen, !pflag, 1000, ebuf);
+	pc = pcap_open_live(device, ndo->ndo_snaplen, !pflag, timeout, ebuf);
 	if (pc == NULL) {
 		/*
 		 * If this failed with "No such device", that means
@@ -1668,6 +1670,7 @@ main(int argc, char **argv)
 			setvbuf(stdout, NULL, _IOLBF, 0);
 #endif
 #endif /* _WIN32 */
+			lflag = 1;
 			break;
 
 		case 'K':
@@ -1924,19 +1927,18 @@ main(int argc, char **argv)
 	if (VFileName != NULL && RFileName != NULL)
 		error("-V and -r are mutually exclusive.");
 
-#ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
 	/*
-	 * If we're printing dissected packets to the standard output
-	 * and the standard output is a terminal, use immediate mode,
-	 * as the user's probably expecting to see packets pop up
-	 * immediately.
+	 * If we're printing dissected packets to the standard output,
+	 * and either the standard output is a terminal or we're doing
+	 * "line" buffering, set the capture timeout to .1 second rather
+	 * than 1 second, as the user's probably expecting to see packets
+	 * pop up immediately shortly after they arrive.
 	 *
-	 * XXX - set the timeout to a lower value, instead?  If so,
-	 * what value would be appropriate?
+	 * XXX - would there be some value appropriate for all cases,
+	 * based on, say, the buffer size and packet input rate?
 	 */
-	if ((WFileName == NULL || print) && isatty(1))
-		immediate_mode = 1;
-#endif
+	if ((WFileName == NULL || print) && (isatty(1) || lflag))
+		timeout = 100;
 
 #ifdef WITH_CHROOT
 	/* if run as root, prepare for chrooting */
