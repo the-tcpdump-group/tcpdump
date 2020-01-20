@@ -340,7 +340,7 @@ cdp_print_addr(netdissect_options *ndo,
 			ND_TCHECK_4(p);
 			if (p + 4 > endp)
 				goto trunc;
-			ND_PRINT("IPv4 (%u) %s", num, ipaddr_string(ndo, p));
+			ND_PRINT("IPv4 (%u) %s", num, GET_IPADDR_STRING(p));
 			p += 4;
 		}
 		else if (pt == PT_IEEE_802_2 && pl == 8 &&
@@ -356,7 +356,7 @@ cdp_print_addr(netdissect_options *ndo,
 			if (p + al > endp)
 				goto trunc;
 
-			ND_PRINT("IPv6 (%u) %s", num, ip6addr_string(ndo, p));
+			ND_PRINT("IPv6 (%u) %s", num, GET_IP6ADDR_STRING(p));
 			p += al;
 		}
 		else {

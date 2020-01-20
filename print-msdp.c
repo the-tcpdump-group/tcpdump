@@ -77,7 +77,7 @@ msdp_print(netdissect_options *ndo, const u_char *sp, u_int length)
 		case 2:
 			ND_PRINT(" SA-Request");
 			ND_TCHECK_5(sp);
-			ND_PRINT(" for %s", ipaddr_string(ndo, sp + 1));
+			ND_PRINT(" for %s", GET_IPADDR_STRING(sp + 1));
 			break;
 		case 4:
 			ND_PRINT(" Keepalive");

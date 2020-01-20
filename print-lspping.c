@@ -687,7 +687,7 @@ lspping_print(netdissect_options *ndo,
                         subtlv_ptr.lspping_tlv_targetfec_subtlv_ldp_ipv4 =
                             (const struct lspping_tlv_targetfec_subtlv_ldp_ipv4_t *)subtlv_tptr;
                         ND_PRINT("\n\t      %s/%u",
-                               ipaddr_string(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_ldp_ipv4->prefix),
+                               GET_IPADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_ldp_ipv4->prefix),
                                GET_U_1(subtlv_ptr.lspping_tlv_targetfec_subtlv_ldp_ipv4->prefix_len));
                     }
                     break;
@@ -701,7 +701,7 @@ lspping_print(netdissect_options *ndo,
                         subtlv_ptr.lspping_tlv_targetfec_subtlv_ldp_ipv6 =
                             (const struct lspping_tlv_targetfec_subtlv_ldp_ipv6_t *)subtlv_tptr;
                         ND_PRINT("\n\t      %s/%u",
-                               ip6addr_string(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_ldp_ipv6->prefix),
+                               GET_IP6ADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_ldp_ipv6->prefix),
                                GET_U_1(subtlv_ptr.lspping_tlv_targetfec_subtlv_ldp_ipv6->prefix_len));
                     }
                     break;
@@ -715,7 +715,7 @@ lspping_print(netdissect_options *ndo,
                         subtlv_ptr.lspping_tlv_targetfec_subtlv_bgp_ipv4 =
                             (const struct lspping_tlv_targetfec_subtlv_bgp_ipv4_t *)subtlv_tptr;
                         ND_PRINT("\n\t      %s/%u",
-                               ipaddr_string(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_bgp_ipv4->prefix),
+                               GET_IPADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_bgp_ipv4->prefix),
                                GET_U_1(subtlv_ptr.lspping_tlv_targetfec_subtlv_bgp_ipv4->prefix_len));
                     }
                     break;
@@ -729,7 +729,7 @@ lspping_print(netdissect_options *ndo,
                         subtlv_ptr.lspping_tlv_targetfec_subtlv_bgp_ipv6 =
                             (const struct lspping_tlv_targetfec_subtlv_bgp_ipv6_t *)subtlv_tptr;
                         ND_PRINT("\n\t      %s/%u",
-                               ip6addr_string(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_bgp_ipv6->prefix),
+                               GET_IP6ADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_bgp_ipv6->prefix),
                                GET_U_1(subtlv_ptr.lspping_tlv_targetfec_subtlv_bgp_ipv6->prefix_len));
                     }
                     break;
@@ -744,11 +744,11 @@ lspping_print(netdissect_options *ndo,
                             (const struct lspping_tlv_targetfec_subtlv_rsvp_ipv4_t *)subtlv_tptr;
                         ND_PRINT("\n\t      tunnel end-point %s, tunnel sender %s, lsp-id 0x%04x"
                                "\n\t      tunnel-id 0x%04x, extended tunnel-id %s",
-                               ipaddr_string(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv4->tunnel_endpoint),
-                               ipaddr_string(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv4->tunnel_sender),
+                               GET_IPADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv4->tunnel_endpoint),
+                               GET_IPADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv4->tunnel_sender),
                                GET_BE_U_2(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv4->lsp_id),
                                GET_BE_U_2(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv4->tunnel_id),
-                               ipaddr_string(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv4->extended_tunnel_id));
+                               GET_IPADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv4->extended_tunnel_id));
                     }
                     break;
 
@@ -762,11 +762,11 @@ lspping_print(netdissect_options *ndo,
                             (const struct lspping_tlv_targetfec_subtlv_rsvp_ipv6_t *)subtlv_tptr;
                         ND_PRINT("\n\t      tunnel end-point %s, tunnel sender %s, lsp-id 0x%04x"
                                "\n\t      tunnel-id 0x%04x, extended tunnel-id %s",
-                               ip6addr_string(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv6->tunnel_endpoint),
-                               ip6addr_string(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv6->tunnel_sender),
+                               GET_IP6ADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv6->tunnel_endpoint),
+                               GET_IP6ADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv6->tunnel_sender),
                                GET_BE_U_2(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv6->lsp_id),
                                GET_BE_U_2(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv6->tunnel_id),
-                               ip6addr_string(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv6->extended_tunnel_id));
+                               GET_IP6ADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv6->extended_tunnel_id));
                     }
                     break;
 
@@ -780,7 +780,7 @@ lspping_print(netdissect_options *ndo,
                             (const struct lspping_tlv_targetfec_subtlv_l3vpn_ipv4_t *)subtlv_tptr;
                         ND_PRINT("\n\t      RD: %s, %s/%u",
                                bgp_vpn_rd_print(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv4->rd),
-                               ipaddr_string(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv4->prefix),
+                               GET_IPADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv4->prefix),
                                GET_U_1(subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv4->prefix_len));
                     }
                     break;
@@ -795,7 +795,7 @@ lspping_print(netdissect_options *ndo,
                             (const struct lspping_tlv_targetfec_subtlv_l3vpn_ipv6_t *)subtlv_tptr;
                         ND_PRINT("\n\t      RD: %s, %s/%u",
                                bgp_vpn_rd_print(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv6->rd),
-                               ip6addr_string(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv6->prefix),
+                               GET_IP6ADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv6->prefix),
                                GET_U_1(subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv6->prefix_len));
                     }
                     break;
@@ -831,7 +831,7 @@ lspping_print(netdissect_options *ndo,
                             (const struct lspping_tlv_targetfec_subtlv_fec_128_pw_old *)subtlv_tptr;
                         ND_PRINT("\n\t      Remote PE: %s"
                                "\n\t      PW ID: 0x%08x, PW Type: %s (%u)",
-                               ipaddr_string(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid_old->remote_pe_address),
+                               GET_IPADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid_old->remote_pe_address),
                                GET_BE_U_4(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid_old->pw_id),
                                tok2str(mpls_pw_types_values,
                                        "unknown",
@@ -850,8 +850,8 @@ lspping_print(netdissect_options *ndo,
                             (const struct lspping_tlv_targetfec_subtlv_fec_128_pw *)subtlv_tptr;
                         ND_PRINT("\n\t      Sender PE: %s, Remote PE: %s"
                                "\n\t      PW ID: 0x%08x, PW Type: %s (%u)",
-                               ipaddr_string(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid->sender_pe_address),
-                               ipaddr_string(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid->remote_pe_address),
+                               GET_IPADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid->sender_pe_address),
+                               GET_IPADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid->remote_pe_address),
                                GET_BE_U_4(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid->pw_id),
                                tok2str(mpls_pw_types_values,
                                        "unknown",
@@ -927,8 +927,8 @@ lspping_print(netdissect_options *ndo,
                     (const struct lspping_tlv_downstream_map_ipv4_t *)tlv_tptr;
                 ND_PRINT("\n\t    Downstream IP: %s"
                        "\n\t    Downstream Interface IP: %s",
-                       ipaddr_string(ndo, tlv_ptr.lspping_tlv_downstream_map_ipv4->downstream_ip),
-                       ipaddr_string(ndo, tlv_ptr.lspping_tlv_downstream_map_ipv4->downstream_interface));
+                       GET_IPADDR_STRING(tlv_ptr.lspping_tlv_downstream_map_ipv4->downstream_ip),
+                       GET_IPADDR_STRING(tlv_ptr.lspping_tlv_downstream_map_ipv4->downstream_interface));
                 tlv_tptr+=sizeof(struct lspping_tlv_downstream_map_ipv4_t);
                 tlv_tlen-=sizeof(struct lspping_tlv_downstream_map_ipv4_t);
                 break;
@@ -947,7 +947,7 @@ lspping_print(netdissect_options *ndo,
                     (const struct lspping_tlv_downstream_map_ipv4_unmb_t *)tlv_tptr;
                 ND_PRINT("\n\t    Downstream IP: %s"
                        "\n\t    Downstream Interface Index: 0x%08x",
-                       ipaddr_string(ndo, tlv_ptr.lspping_tlv_downstream_map_ipv4_unmb->downstream_ip),
+                       GET_IPADDR_STRING(tlv_ptr.lspping_tlv_downstream_map_ipv4_unmb->downstream_ip),
                        GET_BE_U_4(tlv_ptr.lspping_tlv_downstream_map_ipv4_unmb->downstream_interface));
                 tlv_tptr+=sizeof(struct lspping_tlv_downstream_map_ipv4_unmb_t);
                 tlv_tlen-=sizeof(struct lspping_tlv_downstream_map_ipv4_unmb_t);
@@ -967,8 +967,8 @@ lspping_print(netdissect_options *ndo,
                     (const struct lspping_tlv_downstream_map_ipv6_t *)tlv_tptr;
                 ND_PRINT("\n\t    Downstream IP: %s"
                        "\n\t    Downstream Interface IP: %s",
-                       ip6addr_string(ndo, tlv_ptr.lspping_tlv_downstream_map_ipv6->downstream_ip),
-                       ip6addr_string(ndo, tlv_ptr.lspping_tlv_downstream_map_ipv6->downstream_interface));
+                       GET_IP6ADDR_STRING(tlv_ptr.lspping_tlv_downstream_map_ipv6->downstream_ip),
+                       GET_IP6ADDR_STRING(tlv_ptr.lspping_tlv_downstream_map_ipv6->downstream_interface));
                 tlv_tptr+=sizeof(struct lspping_tlv_downstream_map_ipv6_t);
                 tlv_tlen-=sizeof(struct lspping_tlv_downstream_map_ipv6_t);
                 break;
@@ -987,7 +987,7 @@ lspping_print(netdissect_options *ndo,
                    (const struct lspping_tlv_downstream_map_ipv6_unmb_t *)tlv_tptr;
                 ND_PRINT("\n\t    Downstream IP: %s"
                        "\n\t    Downstream Interface Index: 0x%08x",
-                       ip6addr_string(ndo, tlv_ptr.lspping_tlv_downstream_map_ipv6_unmb->downstream_ip),
+                       GET_IP6ADDR_STRING(tlv_ptr.lspping_tlv_downstream_map_ipv6_unmb->downstream_ip),
                        GET_BE_U_4(tlv_ptr.lspping_tlv_downstream_map_ipv6_unmb->downstream_interface));
                 tlv_tptr+=sizeof(struct lspping_tlv_downstream_map_ipv6_unmb_t);
                 tlv_tlen-=sizeof(struct lspping_tlv_downstream_map_ipv6_unmb_t);

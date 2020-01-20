@@ -865,8 +865,8 @@ clnp_print(netdissect_options *ndo,
         if (ndo->ndo_vflag < 1) {
             ND_PRINT("%s%s > %s, %s, length %u",
                    ndo->ndo_eflag ? "" : ", ",
-                   isonsap_string(ndo, source_address, source_address_length),
-                   isonsap_string(ndo, dest_address, dest_address_length),
+                   GET_ISONSAP_STRING(source_address, source_address_length),
+                   GET_ISONSAP_STRING(dest_address, dest_address_length),
                    tok2str(clnp_pdu_values,"unknown (%u)",clnp_pdu_type),
                    length);
             return (1);
@@ -890,9 +890,9 @@ clnp_print(netdissect_options *ndo,
 
         ND_PRINT("\n\tsource address (length %u): %s\n\tdest   address (length %u): %s",
                source_address_length,
-               isonsap_string(ndo, source_address, source_address_length),
+               GET_ISONSAP_STRING(source_address, source_address_length),
                dest_address_length,
-               isonsap_string(ndo, dest_address, dest_address_length));
+               GET_ISONSAP_STRING(dest_address, dest_address_length));
 
         if (clnp_flags & CLNP_SEGMENT_PART) {
                 if (li_remaining < sizeof(struct clnp_segment_header_t)) {
@@ -981,7 +981,7 @@ clnp_print(netdissect_options *ndo,
                                                   source_address_length);
                                     ND_PRINT("\n\t    NSAP address (length %u): %s",
                                            source_address_length,
-                                           isonsap_string(ndo, source_address, source_address_length));
+                                           GET_ISONSAP_STRING(source_address, source_address_length));
                             }
                             tlen-=source_address_length+1;
                     }
@@ -1222,7 +1222,7 @@ esis_print(netdissect_options *ndo,
 		dst = pptr;
 		pptr += dstl;
                 li -= dstl;
-		ND_PRINT("\n\t  %s", isonsap_string(ndo, dst, dstl));
+		ND_PRINT("\n\t  %s", GET_ISONSAP_STRING(dst, dstl));
 
 		ND_TCHECK_1(pptr);
 		if (li < 1) {
@@ -1259,15 +1259,15 @@ esis_print(netdissect_options *ndo,
 		if (snpal == 6)
 			ND_PRINT("\n\t  SNPA (length: %u): %s",
 			       snpal,
-			       etheraddr_string(ndo, snpa));
+			       GET_ETHERADDR_STRING(snpa));
 		else
 			ND_PRINT("\n\t  SNPA (length: %u): %s",
 			       snpal,
-			       linkaddr_string(ndo, snpa, LINKADDR_OTHER, snpal));
+			       GET_LINKADDR_STRING(snpa, LINKADDR_OTHER, snpal));
 		if (netal != 0)
 			ND_PRINT("\n\t  NET (length: %u) %s",
 			       netal,
-			       isonsap_string(ndo, neta, netal));
+			       GET_ISONSAP_STRING(neta, netal));
 		break;
 	}
 
@@ -1300,7 +1300,7 @@ esis_print(netdissect_options *ndo,
 		}
                 ND_PRINT("\n\t  NET (length: %u): %s",
                        source_address_length,
-                       isonsap_string(ndo, pptr, source_address_length));
+                       GET_ISONSAP_STRING(pptr, source_address_length));
                 pptr += source_address_length;
                 li -= source_address_length;
                 source_address_number--;
@@ -1322,7 +1322,7 @@ esis_print(netdissect_options *ndo,
                 ND_PRINT(", bad ish/li");
                 return;
             }
-            ND_PRINT("\n\t  NET (length: %u): %s", source_address_length, isonsap_string(ndo, pptr, source_address_length));
+            ND_PRINT("\n\t  NET (length: %u): %s", source_address_length, GET_ISONSAP_STRING(pptr, source_address_length));
             pptr += source_address_length;
             li -= source_address_length;
             break;
@@ -1784,12 +1784,12 @@ isis_print_tlv_ip_reach(netdissect_options *ndo,
 		if (prefix_len == -1)
 			ND_PRINT("%sIPv4 prefix: %s mask %s",
                                ident,
-			       ipaddr_string(ndo, (tlv_ip_reach->prefix)),
-			       ipaddr_string(ndo, (tlv_ip_reach->mask)));
+			       GET_IPADDR_STRING(tlv_ip_reach->prefix),
+			       GET_IPADDR_STRING(tlv_ip_reach->mask));
 		else
 			ND_PRINT("%sIPv4 prefix: %15s/%u",
                                ident,
-			       ipaddr_string(ndo, (tlv_ip_reach->prefix)),
+			       GET_IPADDR_STRING(tlv_ip_reach->prefix),
 			       prefix_len);
 
 		ND_PRINT(", Distribution: %s, Metric: %u, %s",
@@ -1972,7 +1972,7 @@ isis_print_ext_is_reach(netdissect_options *ndo,
             case ISIS_SUBTLV_EXT_IS_REACH_IPV4_INTF_ADDR:
             case ISIS_SUBTLV_EXT_IS_REACH_IPV4_NEIGHBOR_ADDR:
                 if (subtlv_len >= sizeof(nd_ipv4))
-                    ND_PRINT(", %s", ipaddr_string(ndo, tptr));
+                    ND_PRINT(", %s", GET_IPADDR_STRING(tptr));
                 break;
             case ISIS_SUBTLV_EXT_IS_REACH_MAX_LINK_BW :
             case ISIS_SUBTLV_EXT_IS_REACH_RESERVABLE_BW:
@@ -2216,12 +2216,12 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
     if (afi == AF_INET)
         ND_PRINT("%sIPv4 prefix: %15s/%u",
                ident,
-               ipaddr_string(ndo, prefix),
+               ipaddr_string(ndo, prefix), /* local buffer, not packet data; don't use GET_IPADDR_STRING() */
                bit_length);
     else if (afi == AF_INET6)
         ND_PRINT("%sIPv6 prefix: %s/%u",
                ident,
-               ip6addr_string(ndo, prefix),
+               ip6addr_string(ndo, prefix), /* local buffer, not packet data; don't use GET_IP6ADDR_STRING() */
                bit_length);
 
     ND_PRINT(", Distribution: %s, Metric: %u",
@@ -2711,7 +2711,7 @@ isis_print(netdissect_options *ndo,
 	        ND_TCHECK_LEN(tptr, alen);
 		ND_PRINT("\n\t      Area address (length: %u): %s",
                        alen,
-                       isonsap_string(ndo, tptr, alen));
+                       GET_ISONSAP_STRING(tptr, alen));
 		tptr += alen;
 		tlen -= alen;
 	    }
@@ -2927,7 +2927,7 @@ isis_print(netdissect_options *ndo,
 		ND_TCHECK_LEN(tptr, sizeof(nd_ipv6));
 
                 ND_PRINT("\n\t      IPv6 interface address: %s",
-		       ip6addr_string(ndo, tptr));
+		       GET_IP6ADDR_STRING(tptr));
 
 		tptr += sizeof(nd_ipv6);
 		tlen -= sizeof(nd_ipv6);
@@ -3071,7 +3071,7 @@ isis_print(netdissect_options *ndo,
 	    if (tlen < sizeof(nd_ipv4))
 	        goto tlv_trunc;
 	    ND_TCHECK_LEN(pptr, sizeof(nd_ipv4));
-	    ND_PRINT("\n\t      Traffic Engineering Router ID: %s", ipaddr_string(ndo, pptr));
+	    ND_PRINT("\n\t      Traffic Engineering Router ID: %s", GET_IPADDR_STRING(pptr));
 	    break;
 
 	case ISIS_TLV_IPADDR:
@@ -3079,7 +3079,7 @@ isis_print(netdissect_options *ndo,
                 if (tlen < sizeof(nd_ipv4))
                     goto tlv_trunc;
 		ND_TCHECK_LEN(tptr, sizeof(nd_ipv4));
-		ND_PRINT("\n\t      IPv4 interface address: %s", ipaddr_string(ndo, tptr));
+		ND_PRINT("\n\t      IPv4 interface address: %s", GET_IPADDR_STRING(tptr));
 		tptr += sizeof(nd_ipv4);
 		tlen -= sizeof(nd_ipv4);
 	    }
@@ -3110,14 +3110,14 @@ isis_print(netdissect_options *ndo,
 	    if (tlen < sizeof(nd_ipv4))
 	        break;
 	    ND_TCHECK_LEN(tptr, sizeof(nd_ipv4));
-	    ND_PRINT("\n\t      IPv4 interface address: %s", ipaddr_string(ndo, tptr));
+	    ND_PRINT("\n\t      IPv4 interface address: %s", GET_IPADDR_STRING(tptr));
 	    tptr+=sizeof(nd_ipv4);
 	    tlen-=sizeof(nd_ipv4);
 
 	    if (tlen < sizeof(nd_ipv4))
 	        break;
 	    ND_TCHECK_LEN(tptr, sizeof(nd_ipv4));
-	    ND_PRINT("\n\t      IPv4 neighbor address: %s", ipaddr_string(ndo, tptr));
+	    ND_PRINT("\n\t      IPv4 neighbor address: %s", GET_IPADDR_STRING(tptr));
 	    tptr+=sizeof(nd_ipv4);
 	    tlen-=sizeof(nd_ipv4);
 
@@ -3309,7 +3309,7 @@ isis_print(netdissect_options *ndo,
                     break;
                 ND_TCHECK_LEN(tptr, prefix_len / 2);
                 ND_PRINT("\n\t\tAddress: %s/%u",
-                       isonsap_string(ndo, tptr, prefix_len / 2), prefix_len * 4);
+                       GET_ISONSAP_STRING(tptr, prefix_len / 2), prefix_len * 4);
                 tptr+=prefix_len/2;
                 tlen-=prefix_len/2;
             }
@@ -3329,7 +3329,7 @@ isis_print(netdissect_options *ndo,
                 break;
             }
             ND_TCHECK_5(tptr); /* router-id + flags */
-            ND_PRINT("\n\t\tRouter-id: %s", ipaddr_string(ndo, tptr));
+            ND_PRINT("\n\t\tRouter-id: %s", GET_IPADDR_STRING(tptr));
             ND_PRINT("\n\t\tFlags: [%s]",
                       bittok2str(isis_tlv_router_capability_flags,
                         "none",

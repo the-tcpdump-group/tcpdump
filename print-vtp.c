@@ -184,7 +184,7 @@ vtp_print(netdissect_options *ndo,
 	ND_TCHECK_8(tptr);
 	ND_PRINT("\n\t  Config Rev %x, Updater %s",
 	       GET_BE_U_4(tptr),
-	       ipaddr_string(ndo, tptr+4));
+	       GET_IPADDR_STRING(tptr+4));
 	tptr += 8;
 	ND_TCHECK_LEN(tptr, VTP_UPDATE_TIMESTAMP_LEN);
 	ND_PRINT(", Timestamp 0x%08x 0x%08x 0x%08x",

@@ -120,8 +120,8 @@ print_mtrace(netdissect_options *ndo,
     }
     ND_PRINT("mtrace %u: %s to %s reply-to %s",
         GET_BE_U_3(tr->tr_qid),
-        ipaddr_string(ndo, tr->tr_src), ipaddr_string(ndo, tr->tr_dst),
-        ipaddr_string(ndo, tr->tr_raddr));
+        GET_IPADDR_STRING(tr->tr_src), GET_IPADDR_STRING(tr->tr_dst),
+        GET_IPADDR_STRING(tr->tr_raddr));
     if (IN_CLASSD(GET_BE_U_4(tr->tr_raddr)))
         ND_PRINT(" with-ttl %u", GET_U_1(tr->tr_rttl));
     return;
@@ -142,8 +142,8 @@ print_mresp(netdissect_options *ndo,
     }
     ND_PRINT("mresp %u: %s to %s reply-to %s",
         GET_BE_U_3(tr->tr_qid),
-        ipaddr_string(ndo, tr->tr_src), ipaddr_string(ndo, tr->tr_dst),
-        ipaddr_string(ndo, tr->tr_raddr));
+        GET_IPADDR_STRING(tr->tr_src), GET_IPADDR_STRING(tr->tr_dst),
+        GET_IPADDR_STRING(tr->tr_raddr));
     if (IN_CLASSD(GET_BE_U_4(tr->tr_raddr)))
         ND_PRINT(" with-ttl %u", GET_U_1(tr->tr_rttl));
     return;
@@ -175,7 +175,7 @@ print_igmpv3_report(netdissect_options *ndo,
 		return;
 	    }
 	    ND_TCHECK_4(bp + (group + 4));
-            ND_PRINT(" [gaddr %s", ipaddr_string(ndo, bp + group + 4));
+            ND_PRINT(" [gaddr %s", GET_IPADDR_STRING(bp + group + 4));
 	    ND_PRINT(" %s", tok2str(igmpv3report2str, " [v3-report-#%u]",
 								GET_U_1(bp + group)));
             nsrcs = GET_BE_U_2(bp + group + 2);
@@ -191,7 +191,7 @@ print_igmpv3_report(netdissect_options *ndo,
                 ND_PRINT(" {");
                 for (j=0; j<nsrcs; j++) {
 		    ND_TCHECK_4(bp + (group + 8 + (j << 2)));
-		    ND_PRINT(" %s", ipaddr_string(ndo, bp + group + 8 + (j << 2)));
+		    ND_PRINT(" %s", GET_IPADDR_STRING(bp + group + 8 + (j << 2)));
 		}
                 ND_PRINT(" }");
             }
@@ -239,7 +239,7 @@ print_igmpv3_query(netdissect_options *ndo,
     ND_TCHECK_4(bp + 4);
     if (GET_BE_U_4(bp + 4) == 0)
 	return;
-    ND_PRINT(" [gaddr %s", ipaddr_string(ndo, bp + 4));
+    ND_PRINT(" [gaddr %s", GET_IPADDR_STRING(bp + 4));
     ND_TCHECK_2(bp + 10);
     nsrcs = GET_BE_U_2(bp + 10);
     if (nsrcs > 0) {
@@ -249,7 +249,7 @@ print_igmpv3_query(netdissect_options *ndo,
 	    ND_PRINT(" {");
 	    for (i=0; i<nsrcs; i++) {
 		ND_TCHECK_4(bp + (12 + (i << 2)));
-		ND_PRINT(" %s", ipaddr_string(ndo, bp + 12 + (i << 2)));
+		ND_PRINT(" %s", GET_IPADDR_STRING(bp + 12 + (i << 2)));
 	    }
 	    ND_PRINT(" }");
 	} else
@@ -289,20 +289,20 @@ igmp_print(netdissect_options *ndo,
 		ND_PRINT(" v1");
             ND_TCHECK_4(bp + 4);
 	    if (GET_BE_U_4(bp + 4))
-                ND_PRINT(" [gaddr %s]", ipaddr_string(ndo, bp + 4));
+                ND_PRINT(" [gaddr %s]", GET_IPADDR_STRING(bp + 4));
             if (len != 8)
                 ND_PRINT(" [len %u]", len);
 	}
         break;
     case 0x12:
         ND_TCHECK_4(bp + 4);
-        ND_PRINT("igmp v1 report %s", ipaddr_string(ndo, bp + 4));
+        ND_PRINT("igmp v1 report %s", GET_IPADDR_STRING(bp + 4));
         if (len != 8)
             ND_PRINT(" [len %u]", len);
         break;
     case 0x16:
         ND_TCHECK_4(bp + 4);
-        ND_PRINT("igmp v2 report %s", ipaddr_string(ndo, bp + 4));
+        ND_PRINT("igmp v2 report %s", GET_IPADDR_STRING(bp + 4));
         break;
     case 0x22:
         ND_PRINT("igmp v3 report");
@@ -310,7 +310,7 @@ igmp_print(netdissect_options *ndo,
         break;
     case 0x17:
         ND_TCHECK_4(bp + 4);
-        ND_PRINT("igmp leave %s", ipaddr_string(ndo, bp + 4));
+        ND_PRINT("igmp leave %s", GET_IPADDR_STRING(bp + 4));
         break;
     case 0x13:
         ND_PRINT("igmp dvmrp");

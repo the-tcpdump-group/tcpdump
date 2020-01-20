@@ -341,12 +341,12 @@ add_addr_print(netdissect_options *ndo,
         ND_PRINT(" id %u", GET_U_1(add_addr->addr_id));
         switch (ipver) {
         case 4:
-                ND_PRINT(" %s", ipaddr_string(ndo, add_addr->u.v4.addr));
+                ND_PRINT(" %s", GET_IPADDR_STRING(add_addr->u.v4.addr));
                 if (opt_len == 10)
                         ND_PRINT(":%u", GET_BE_U_2(add_addr->u.v4.port));
                 break;
         case 6:
-                ND_PRINT(" %s", ip6addr_string(ndo, add_addr->u.v6.addr));
+                ND_PRINT(" %s", GET_IP6ADDR_STRING(add_addr->u.v6.addr));
                 if (opt_len == 22)
                         ND_PRINT(":%u", GET_BE_U_2(add_addr->u.v6.port));
                 break;

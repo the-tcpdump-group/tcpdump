@@ -19,13 +19,12 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-/*
- * Definitions to let us compile most of the IPv6 code even on systems
- * without IPv6 support.
- */
-
 #include "extract.h"
 
+/*
+ * Definition to let us compile most of the IPv6 code even on systems
+ * without IPv6 support.
+ */
 #ifndef INET6_ADDRSTRLEN
 #define INET6_ADDRSTRLEN	46
 #endif
@@ -65,6 +64,40 @@ extern const char * ieee8021q_tci_string(const uint16_t);
  */
 
 static inline const char *
+get_linkaddr_string(netdissect_options *ndo, const uint8_t *p,
+    const unsigned int type, const unsigned int len)
+{
+        if (!ND_TTEST_LEN(p, len))
+                longjmp(ndo->ndo_truncated, 1);
+        return linkaddr_string(ndo, p, type, len);
+}
+
+static inline const char *
+get_etheraddr_string(netdissect_options *ndo, const uint8_t *p)
+{
+        if (!ND_TTEST_LEN(p, MAC_ADDR_LEN))
+                longjmp(ndo->ndo_truncated, 1);
+        return etheraddr_string(ndo, p);
+}
+
+static inline const char *
+get_le64addr_string(netdissect_options *ndo, const u_char *p)
+{
+        if (!ND_TTEST_8(p))
+                longjmp(ndo->ndo_truncated, 1);
+        return le64addr_string(ndo, p);
+}
+
+static inline const char *
+get_isonsap_string(netdissect_options *ndo, const uint8_t *nsap,
+    u_int nsap_length)
+{
+	if (!ND_TTEST_LEN(nsap, nsap_length))
+                longjmp(ndo->ndo_truncated, 1);
+        return isonsap_string(ndo, nsap, nsap_length);
+}
+
+static inline const char *
 get_ipaddr_string(netdissect_options *ndo, const u_char *p)
 {
         if (!ND_TTEST_4(p))
@@ -80,14 +113,9 @@ get_ip6addr_string(netdissect_options *ndo, const u_char *p)
         return ip6addr_string(ndo, p);
 }
 
-static inline const char *
-get_le64addr_string(netdissect_options *ndo, const u_char *p)
-{
-        if (!ND_TTEST_8(p))
-                longjmp(ndo->ndo_truncated, 1);
-        return le64addr_string(ndo, p);
-}
-
+#define GET_LINKADDR_STRING(p, type, len) get_linkaddr_string(ndo, (const u_char *)(p), type, len)
+#define GET_ETHERADDR_STRING(p) get_etheraddr_string(ndo, (const u_char *)(p))
+#define GET_LE64ADDR_STRING(p) get_le64addr_string(ndo, (const u_char *)(p))
+#define GET_ISONSAP_STRING(nsap, nsap_length) get_isonsap_string(ndo, (const u_char *)(nsap), nsap_length)
 #define GET_IPADDR_STRING(p) get_ipaddr_string(ndo, (const u_char *)(p))
 #define GET_IP6ADDR_STRING(p) get_ip6addr_string(ndo, (const u_char *)(p))
-#define GET_LE64ADDR_STRING(p) get_le64addr_string(ndo, (const u_char *)(p))

@@ -247,7 +247,7 @@ cfm_network_addr_print(netdissect_options *ndo,
             hexdump = TRUE;
             break;
         }
-        ND_PRINT(", %s", ipaddr_string(ndo, tptr + 1));
+        ND_PRINT(", %s", GET_IPADDR_STRING(tptr + 1));
         break;
 
     case AFNUM_INET6:
@@ -256,7 +256,7 @@ cfm_network_addr_print(netdissect_options *ndo,
             hexdump = TRUE;
             break;
         }
-        ND_PRINT(", %s", ip6addr_string(ndo, tptr + 1));
+        ND_PRINT(", %s", GET_IP6ADDR_STRING(tptr + 1));
         break;
 
     default:
@@ -408,8 +408,7 @@ cfm_print(netdissect_options *ndo,
 
             case CFM_CCM_MD_FORMAT_MAC:
                 if (md_namelength == 6) {
-                    ND_PRINT("\n\t  MAC %s", etheraddr_string(ndo,
-                               md_name));
+                    ND_PRINT("\n\t  MAC %s", GET_ETHERADDR_STRING(md_name));
                 } else {
                     ND_PRINT("\n\t  MAC (length invalid)");
                 }
@@ -487,8 +486,8 @@ cfm_print(netdissect_options *ndo,
                GET_U_1(msg_ptr.cfm_ltm->ttl));
 
         ND_PRINT("\n\t  Original-MAC %s, Target-MAC %s",
-               etheraddr_string(ndo, msg_ptr.cfm_ltm->original_mac),
-               etheraddr_string(ndo, msg_ptr.cfm_ltm->target_mac));
+               GET_ETHERADDR_STRING(msg_ptr.cfm_ltm->original_mac),
+               GET_ETHERADDR_STRING(msg_ptr.cfm_ltm->target_mac));
         break;
 
     case CFM_OPCODE_LTR:
@@ -649,7 +648,7 @@ cfm_print(netdissect_options *ndo,
                         hexdump = TRUE;
                         break;
                     }
-                    ND_PRINT("\n\t  MAC %s", etheraddr_string(ndo, tptr + 1));
+                    ND_PRINT("\n\t  MAC %s", GET_ETHERADDR_STRING(tptr + 1));
                     break;
 
                 case CFM_CHASSIS_ID_NETWORK_ADDRESS:

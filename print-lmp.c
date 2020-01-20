@@ -551,7 +551,7 @@ lmp_print(netdissect_options *ndo,
                     break;
                 }
                 ND_PRINT("\n\t    IPv4 Link ID: %s (0x%08x)",
-                       ipaddr_string(ndo, obj_tptr),
+                       GET_IPADDR_STRING(obj_tptr),
                        GET_BE_U_4(obj_tptr));
                 break;
             case LMP_CTYPE_IPV6_LOC:
@@ -561,7 +561,7 @@ lmp_print(netdissect_options *ndo,
                     break;
                 }
                 ND_PRINT("\n\t    IPv6 Link ID: %s (0x%08x)",
-                       ip6addr_string(ndo, obj_tptr),
+                       GET_IP6ADDR_STRING(obj_tptr),
                        GET_BE_U_4(obj_tptr));
                 break;
             case LMP_CTYPE_UNMD_LOC:
@@ -613,7 +613,7 @@ lmp_print(netdissect_options *ndo,
                     break;
                 }
                 ND_PRINT("\n\t    Node ID: %s (0x%08x)",
-                       ipaddr_string(ndo, obj_tptr),
+                       GET_IPADDR_STRING(obj_tptr),
                        GET_BE_U_4(obj_tptr));
                 break;
 
@@ -670,9 +670,9 @@ lmp_print(netdissect_options *ndo,
 
 		ND_PRINT("\n\t    Local Link-ID: %s (0x%08x)"
 		       "\n\t    Remote Link-ID: %s (0x%08x)",
-                       ipaddr_string(ndo, obj_tptr+4),
+                       GET_IPADDR_STRING(obj_tptr+4),
                        GET_BE_U_4(obj_tptr + 4),
-                       ipaddr_string(ndo, obj_tptr+8),
+                       GET_IPADDR_STRING(obj_tptr+8),
                        GET_BE_U_4(obj_tptr + 8));
 		break;
 
@@ -688,9 +688,9 @@ lmp_print(netdissect_options *ndo,
 
 		ND_PRINT("\n\t    Local Link-ID: %s (0x%08x)"
 		       "\n\t    Remote Link-ID: %s (0x%08x)",
-                       ip6addr_string(ndo, obj_tptr+4),
+                       GET_IP6ADDR_STRING(obj_tptr+4),
                        GET_BE_U_4(obj_tptr + 4),
-                       ip6addr_string(ndo, obj_tptr+20),
+                       GET_IP6ADDR_STRING(obj_tptr+20),
                        GET_BE_U_4(obj_tptr + 20));
                 break;
 
@@ -730,9 +730,9 @@ lmp_print(netdissect_options *ndo,
 			GET_U_1(obj_tptr)));
                 ND_PRINT("\n\t    Local Interface ID: %s (0x%08x)"
                        "\n\t    Remote Interface ID: %s (0x%08x)",
-                       ipaddr_string(ndo, obj_tptr+4),
+                       GET_IPADDR_STRING(obj_tptr+4),
                        GET_BE_U_4(obj_tptr + 4),
-                       ipaddr_string(ndo, obj_tptr+8),
+                       GET_IPADDR_STRING(obj_tptr+8),
                        GET_BE_U_4(obj_tptr + 8));
 
 		if (lmp_print_data_link_subobjs(ndo, obj_tptr, obj_tlen - 12, 12))
@@ -750,9 +750,9 @@ lmp_print(netdissect_options *ndo,
 			GET_U_1(obj_tptr)));
                 ND_PRINT("\n\t    Local Interface ID: %s (0x%08x)"
                        "\n\t    Remote Interface ID: %s (0x%08x)",
-                       ip6addr_string(ndo, obj_tptr+4),
+                       GET_IP6ADDR_STRING(obj_tptr+4),
                        GET_BE_U_4(obj_tptr + 4),
-                       ip6addr_string(ndo, obj_tptr+20),
+                       GET_IP6ADDR_STRING(obj_tptr+20),
                        GET_BE_U_4(obj_tptr + 20));
 
 		if (lmp_print_data_link_subobjs(ndo, obj_tptr, obj_tlen - 36, 36))
@@ -857,7 +857,7 @@ lmp_print(netdissect_options *ndo,
 		/* Decode pairs: <Interface_ID (4 bytes), Channel_status (4 bytes)> */
 		while (offset+8 <= obj_tlen) {
 			ND_PRINT("\n\t    Interface ID: %s (0x%08x)",
-			ipaddr_string(ndo, obj_tptr+offset),
+			GET_IPADDR_STRING(obj_tptr+offset),
 			GET_BE_U_4(obj_tptr + offset));
 
 			ND_PRINT("\n\t\t    Active: %s (%u)",
@@ -884,7 +884,7 @@ lmp_print(netdissect_options *ndo,
 		/* Decode pairs: <Interface_ID (16 bytes), Channel_status (4 bytes)> */
 		while (offset+20 <= obj_tlen) {
 			ND_PRINT("\n\t    Interface ID: %s (0x%08x)",
-			ip6addr_string(ndo, obj_tptr+offset),
+			GET_IP6ADDR_STRING(obj_tptr+offset),
 			GET_BE_U_4(obj_tptr + offset));
 
 			ND_PRINT("\n\t\t    Active: %s (%u)",
@@ -944,7 +944,7 @@ lmp_print(netdissect_options *ndo,
 		offset = 0;
 		while (offset+4 <= obj_tlen) {
 			ND_PRINT("\n\t    Interface ID: %s (0x%08x)",
-			ipaddr_string(ndo, obj_tptr+offset),
+			GET_IPADDR_STRING(obj_tptr+offset),
 			GET_BE_U_4(obj_tptr + offset));
 			offset+=4;
 		}
@@ -954,7 +954,7 @@ lmp_print(netdissect_options *ndo,
 		offset = 0;
 		while (offset+16 <= obj_tlen) {
 			ND_PRINT("\n\t    Interface ID: %s (0x%08x)",
-			ip6addr_string(ndo, obj_tptr+offset),
+			GET_IP6ADDR_STRING(obj_tptr+offset),
 			GET_BE_U_4(obj_tptr + offset));
 			offset+=16;
 		}
@@ -1074,7 +1074,7 @@ lmp_print(netdissect_options *ndo,
 		       GET_BE_U_2(obj_tptr + 10));
 
 		ND_PRINT("\n\t    Local Interface ID: %s (0x%08x)",
-		       ipaddr_string(ndo, obj_tptr+12),
+		       GET_IPADDR_STRING(obj_tptr+12),
 		       GET_BE_U_4(obj_tptr + 12));
 
 		break;

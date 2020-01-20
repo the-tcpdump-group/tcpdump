@@ -371,7 +371,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			ND_PRINT(" %s", ip6addr_string(ndo, tp));
+			ND_PRINT(" %s", GET_IP6ADDR_STRING(tp));
 			ND_PRINT(" pltime:%u vltime:%u",
 			    GET_BE_U_4(tp + 16),
 			    GET_BE_U_4(tp + 20));
@@ -561,7 +561,7 @@ dhcp6opt_print(netdissect_options *ndo,
 			}
 			tp = (const u_char *)(dh6o + 1);
 			for (i = 0; i < optlen; i += 16)
-				ND_PRINT(" %s", ip6addr_string(ndo, tp + i));
+				ND_PRINT(" %s", GET_IP6ADDR_STRING(tp + i));
 			ND_PRINT(")");
 			break;
 		case DH6OPT_SIP_SERVER_D:
@@ -618,7 +618,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			ND_PRINT(" %s/%u", ip6addr_string(ndo, tp + 9),
+			ND_PRINT(" %s/%u", GET_IP6ADDR_STRING(tp + 9),
 				 GET_U_1(tp + 8));
 			ND_PRINT(" pltime:%u vltime:%u",
 			    GET_BE_U_4(tp),
@@ -670,7 +670,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				ND_PRINT(" type_%u", dh6_lq_query_type);
 				break;
 			}
-			ND_PRINT(" %s", ip6addr_string(ndo, tp + 1));
+			ND_PRINT(" %s", GET_IP6ADDR_STRING(tp + 1));
 			if (optlen > 17) {
 				/* there are query-options */
 				dhcp6opt_print(ndo, tp + 17, tp + optlen);
@@ -691,7 +691,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			ND_PRINT(" %s ", ip6addr_string(ndo, tp));
+			ND_PRINT(" %s ", GET_IP6ADDR_STRING(tp));
 			/*
 			 * Print hex dump first 10 characters.
 			 */
@@ -720,7 +720,7 @@ dhcp6opt_print(netdissect_options *ndo,
 						ND_PRINT(" ?");
 						break;
 					}
-					ND_PRINT(" %s", ip6addr_string(ndo, tp));
+					ND_PRINT(" %s", GET_IP6ADDR_STRING(tp));
 					break;
 				case DH6OPT_NTP_SUBOPTION_SRV_FQDN:
 					ND_PRINT(" ");
@@ -828,9 +828,9 @@ dhcp6_print(netdissect_options *ndo,
 	} else {		/* relay messages */
 		ND_TCHECK_16(dh6relay->dh6relay_peeraddr);
 
-		ND_PRINT("linkaddr=%s", ip6addr_string(ndo, dh6relay->dh6relay_linkaddr));
+		ND_PRINT("linkaddr=%s", GET_IP6ADDR_STRING(dh6relay->dh6relay_linkaddr));
 
-		ND_PRINT(" peeraddr=%s", ip6addr_string(ndo, dh6relay->dh6relay_peeraddr));
+		ND_PRINT(" peeraddr=%s", GET_IP6ADDR_STRING(dh6relay->dh6relay_peeraddr));
 
 		dhcp6opt_print(ndo, (const u_char *)(dh6relay + 1), ep);
 	}

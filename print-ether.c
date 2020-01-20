@@ -109,7 +109,7 @@ ether_addresses_print(netdissect_options *ndo, const u_char *src,
 		      const u_char *dst)
 {
 	ND_PRINT("%s > %s, ",
-		 etheraddr_string(ndo, src), etheraddr_string(ndo, dst));
+		 GET_ETHERADDR_STRING(src), GET_ETHERADDR_STRING(dst));
 }
 
 static void

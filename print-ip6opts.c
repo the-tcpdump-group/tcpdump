@@ -180,7 +180,7 @@ ip6_opt_process(netdissect_options *ndo, const u_char *bp, int len,
 		goto trunc;
 	    }
 	    if (ndo->ndo_vflag) {
-		ND_PRINT("(homeaddr: %s", ip6addr_string(ndo, bp + i + 2));
+		ND_PRINT("(homeaddr: %s", GET_IP6ADDR_STRING(bp + i + 2));
 		if (GET_U_1(bp + i + 1) > IP6OPT_HOMEADDR_MINLEN - 2) {
 		    if (ip6_sopt_print(ndo, bp + i + IP6OPT_HOMEADDR_MINLEN,
 				       (optlen - IP6OPT_HOMEADDR_MINLEN)) == -1)

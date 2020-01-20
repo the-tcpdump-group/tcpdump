@@ -265,7 +265,7 @@ rpki_rtr_pdu_print(netdissect_options *ndo, const u_char *tptr, const u_int len,
 	    pdu = (const rpki_rtr_pdu_ipv4_prefix *)tptr;
 	    ND_PRINT("%sIPv4 Prefix %s/%u-%u, origin-as %u, flags 0x%02x",
 		   indent_string(indent+2),
-		   ipaddr_string(ndo, pdu->prefix),
+		   GET_IPADDR_STRING(pdu->prefix),
 		   GET_U_1(pdu->prefix_length), GET_U_1(pdu->max_length),
 		   GET_BE_U_4(pdu->as), GET_U_1(pdu->flags));
 	}
@@ -281,7 +281,7 @@ rpki_rtr_pdu_print(netdissect_options *ndo, const u_char *tptr, const u_int len,
 	    pdu = (const rpki_rtr_pdu_ipv6_prefix *)tptr;
 	    ND_PRINT("%sIPv6 Prefix %s/%u-%u, origin-as %u, flags 0x%02x",
 		   indent_string(indent+2),
-		   ip6addr_string(ndo, pdu->prefix),
+		   GET_IP6ADDR_STRING(pdu->prefix),
 		   GET_U_1(pdu->prefix_length), GET_U_1(pdu->max_length),
 		   GET_BE_U_4(pdu->as), GET_U_1(pdu->flags));
 	}

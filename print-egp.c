@@ -357,7 +357,7 @@ egp_print(netdissect_options *ndo,
 			ND_PRINT(" state:%s", egp_status_updown[status]);
 		else
 			ND_PRINT(" [status %u]", status);
-		ND_PRINT(" net:%s", ipaddr_string(ndo, egp->egp_sourcenet));
+		ND_PRINT(" net:%s", GET_IPADDR_STRING(egp->egp_sourcenet));
 		break;
 
 	case EGPT_UPDATE:
@@ -371,7 +371,7 @@ egp_print(netdissect_options *ndo,
 		else
 			ND_PRINT(" [status %u]", status);
 		ND_PRINT(" %s int %u ext %u",
-		       ipaddr_string(ndo, egp->egp_sourcenet),
+		       GET_IPADDR_STRING(egp->egp_sourcenet),
 		       GET_U_1(egp->egp_intgw),
 		       GET_U_1(egp->egp_extgw));
 		if (ndo->ndo_vflag)

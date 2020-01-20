@@ -299,7 +299,7 @@ bootp_print(netdissect_options *ndo,
 	bp_hlen = GET_U_1(bp->bp_hlen);
 	if (bp_htype == 1 && bp_hlen == 6 && bp_op == BOOTPREQUEST) {
 		ND_TCHECK_6(bp->bp_chaddr);
-		ND_PRINT(" from %s", etheraddr_string(ndo, bp->bp_chaddr));
+		ND_PRINT(" from %s", GET_ETHERADDR_STRING(bp->bp_chaddr));
 	}
 
 	ND_PRINT(", length %u", length);
@@ -334,27 +334,27 @@ bootp_print(netdissect_options *ndo,
 	/* Client's ip address */
 	ND_TCHECK_4(bp->bp_ciaddr);
 	if (GET_IPV4_TO_NETWORK_ORDER(bp->bp_ciaddr))
-		ND_PRINT("\n\t  Client-IP %s", ipaddr_string(ndo, bp->bp_ciaddr));
+		ND_PRINT("\n\t  Client-IP %s", GET_IPADDR_STRING(bp->bp_ciaddr));
 
 	/* 'your' ip address (bootp client) */
 	ND_TCHECK_4(bp->bp_yiaddr);
 	if (GET_IPV4_TO_NETWORK_ORDER(bp->bp_yiaddr))
-		ND_PRINT("\n\t  Your-IP %s", ipaddr_string(ndo, bp->bp_yiaddr));
+		ND_PRINT("\n\t  Your-IP %s", GET_IPADDR_STRING(bp->bp_yiaddr));
 
 	/* Server's ip address */
 	ND_TCHECK_4(bp->bp_siaddr);
 	if (GET_IPV4_TO_NETWORK_ORDER(bp->bp_siaddr))
-		ND_PRINT("\n\t  Server-IP %s", ipaddr_string(ndo, bp->bp_siaddr));
+		ND_PRINT("\n\t  Server-IP %s", GET_IPADDR_STRING(bp->bp_siaddr));
 
 	/* Gateway's ip address */
 	ND_TCHECK_4(bp->bp_giaddr);
 	if (GET_IPV4_TO_NETWORK_ORDER(bp->bp_giaddr))
-		ND_PRINT("\n\t  Gateway-IP %s", ipaddr_string(ndo, bp->bp_giaddr));
+		ND_PRINT("\n\t  Gateway-IP %s", GET_IPADDR_STRING(bp->bp_giaddr));
 
 	/* Client's Ethernet address */
 	if (bp_htype == 1 && bp_hlen == 6) {
 		ND_TCHECK_6(bp->bp_chaddr);
-		ND_PRINT("\n\t  Client-Ethernet-Address %s", etheraddr_string(ndo, bp->bp_chaddr));
+		ND_PRINT("\n\t  Client-Ethernet-Address %s", GET_ETHERADDR_STRING(bp->bp_chaddr));
 	}
 
 	ND_TCHECK_1(bp->bp_sname);		/* check first char only */
@@ -728,7 +728,7 @@ rfc1048_print(netdissect_options *ndo,
 				if (!first)
 					ND_PRINT(",");
 				if (c == 'i')
-					ND_PRINT("%s", ipaddr_string(ndo, bp));
+					ND_PRINT("%s", GET_IPADDR_STRING(bp));
 				else if (c == 'L')
 					ND_PRINT("%d", GET_BE_S_4(bp));
 				else
@@ -744,10 +744,10 @@ rfc1048_print(netdissect_options *ndo,
 			while (len >= 2*4) {
 				if (!first)
 					ND_PRINT(",");
-				ND_PRINT("(%s:", ipaddr_string(ndo, bp));
+				ND_PRINT("(%s:", GET_IPADDR_STRING(bp));
 				bp += 4;
 				len -= 4;
-				ND_PRINT("%s)", ipaddr_string(ndo, bp));
+				ND_PRINT("%s)", GET_IPADDR_STRING(bp));
 				bp += 4;
 				len -= 4;
 				first = 0;
@@ -984,7 +984,7 @@ rfc1048_print(netdissect_options *ndo,
 							ND_PRINT(".0");
 						ND_PRINT("/%u", mask_width);
 					}
-					ND_PRINT(":%s)", ipaddr_string(ndo, bp));
+					ND_PRINT(":%s)", GET_IPADDR_STRING(bp));
 					bp += 4;
 					len -= (significant_octets + 4);
 					first = 0;
@@ -1057,7 +1057,7 @@ trunc:
 
 #define PRINTCMUADDR(m, s) { ND_TCHECK_4(cmu->m); \
     if (GET_IPV4_TO_NETWORK_ORDER(cmu->m) != 0) \
-	ND_PRINT(" %s:%s", s, ipaddr_string(ndo, cmu->m)); }
+	ND_PRINT(" %s:%s", s, GET_IPADDR_STRING(cmu->m)); }
 
 static void
 cmu_print(netdissect_options *ndo,

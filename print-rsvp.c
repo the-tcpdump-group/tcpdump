@@ -754,7 +754,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     return -1;
                 ND_PRINT("%s  IPv4 DestAddress: %s, Protocol ID: 0x%02x",
                        indent,
-                       ipaddr_string(ndo, obj_tptr),
+                       GET_IPADDR_STRING(obj_tptr),
                        GET_U_1(obj_tptr + sizeof(nd_ipv4)));
                 ND_PRINT("%s  Flags: [0x%02x], DestPort %u",
                        indent,
@@ -768,7 +768,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     return -1;
                 ND_PRINT("%s  IPv6 DestAddress: %s, Protocol ID: 0x%02x",
                        indent,
-                       ip6addr_string(ndo, obj_tptr),
+                       GET_IP6ADDR_STRING(obj_tptr),
                        GET_U_1(obj_tptr + sizeof(nd_ipv6)));
                 ND_PRINT("%s  Flags: [0x%02x], DestPort %u",
                        indent,
@@ -783,9 +783,9 @@ rsvp_obj_print(netdissect_options *ndo,
                     return -1;
                 ND_PRINT("%s  IPv6 Tunnel EndPoint: %s, Tunnel ID: 0x%04x, Extended Tunnel ID: %s",
                        indent,
-                       ip6addr_string(ndo, obj_tptr),
+                       GET_IP6ADDR_STRING(obj_tptr),
                        GET_BE_U_2(obj_tptr + 18),
-                       ip6addr_string(ndo, obj_tptr + 20));
+                       GET_IP6ADDR_STRING(obj_tptr + 20));
                 obj_tlen-=36;
                 obj_tptr+=36;
                 break;
@@ -797,7 +797,7 @@ rsvp_obj_print(netdissect_options *ndo,
                        indent,
                        GET_BE_U_4(obj_tptr),
                        GET_BE_U_2(obj_tptr + 6),
-                       ip6addr_string(ndo, obj_tptr + 8));
+                       GET_IP6ADDR_STRING(obj_tptr + 8));
                 obj_tlen-=26;
                 obj_tptr+=26;
                 break;
@@ -806,9 +806,9 @@ rsvp_obj_print(netdissect_options *ndo,
                     return -1;
                 ND_PRINT("%s  IPv4 P2MP LSP ID: %s, Tunnel ID: 0x%04x, Extended Tunnel ID: %s",
                        indent,
-                       ipaddr_string(ndo, obj_tptr),
+                       GET_IPADDR_STRING(obj_tptr),
                        GET_BE_U_2(obj_tptr + 6),
-                       ipaddr_string(ndo, obj_tptr + 8));
+                       GET_IPADDR_STRING(obj_tptr + 8));
                 obj_tlen-=12;
                 obj_tptr+=12;
                 break;
@@ -818,9 +818,9 @@ rsvp_obj_print(netdissect_options *ndo,
                     return -1;
                 ND_PRINT("%s  IPv4 Tunnel EndPoint: %s, Tunnel ID: 0x%04x, Extended Tunnel ID: %s",
                        indent,
-                       ipaddr_string(ndo, obj_tptr),
+                       GET_IPADDR_STRING(obj_tptr),
                        GET_BE_U_2(obj_tptr + 6),
-                       ipaddr_string(ndo, obj_tptr + 8));
+                       GET_IPADDR_STRING(obj_tptr + 8));
                 obj_tlen-=12;
                 obj_tptr+=12;
                 break;
@@ -836,7 +836,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     return -1;
                 ND_PRINT("%s  IPv4 Receiver Address: %s",
                        indent,
-                       ipaddr_string(ndo, obj_tptr));
+                       GET_IPADDR_STRING(obj_tptr));
                 obj_tlen-=sizeof(nd_ipv4);
                 obj_tptr+=sizeof(nd_ipv4);
                 break;
@@ -845,7 +845,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     return -1;
                 ND_PRINT("%s  IPv6 Receiver Address: %s",
                        indent,
-                       ip6addr_string(ndo, obj_tptr));
+                       GET_IP6ADDR_STRING(obj_tptr));
                 obj_tlen-=sizeof(nd_ipv6);
                 obj_tptr+=sizeof(nd_ipv6);
                 break;
@@ -861,7 +861,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     return -1;
                 ND_PRINT("%s  IPv4 Notify Node Address: %s",
                        indent,
-                       ipaddr_string(ndo, obj_tptr));
+                       GET_IPADDR_STRING(obj_tptr));
                 obj_tlen-=sizeof(nd_ipv4);
                 obj_tptr+=sizeof(nd_ipv4);
                 break;
@@ -870,7 +870,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     return-1;
                 ND_PRINT("%s  IPv6 Notify Node Address: %s",
                        indent,
-                       ip6addr_string(ndo, obj_tptr));
+                       GET_IP6ADDR_STRING(obj_tptr));
                 obj_tlen-=sizeof(nd_ipv6);
                 obj_tptr+=sizeof(nd_ipv6);
                 break;
@@ -943,7 +943,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     return-1;
                 ND_PRINT("%s  Source Address: %s, Source Port: %u",
                        indent,
-                       ipaddr_string(ndo, obj_tptr),
+                       GET_IPADDR_STRING(obj_tptr),
                        GET_BE_U_2(obj_tptr + 6));
                 obj_tlen-=8;
                 obj_tptr+=8;
@@ -953,7 +953,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     return-1;
                 ND_PRINT("%s  Source Address: %s, Source Port: %u",
                        indent,
-                       ip6addr_string(ndo, obj_tptr),
+                       GET_IP6ADDR_STRING(obj_tptr),
                        GET_BE_U_2(obj_tptr + 18));
                 obj_tlen-=20;
                 obj_tptr+=20;
@@ -964,10 +964,10 @@ rsvp_obj_print(netdissect_options *ndo,
                 ND_PRINT("%s  IPv6 Tunnel Sender Address: %s, LSP ID: 0x%04x"
                        "%s  Sub-Group Originator ID: %s, Sub-Group ID: 0x%04x",
                        indent,
-                       ip6addr_string(ndo, obj_tptr),
+                       GET_IP6ADDR_STRING(obj_tptr),
                        GET_BE_U_2(obj_tptr + 18),
                        indent,
-                       ip6addr_string(ndo, obj_tptr+20),
+                       GET_IP6ADDR_STRING(obj_tptr+20),
                        GET_BE_U_2(obj_tptr + 38));
                 obj_tlen-=40;
                 obj_tptr+=40;
@@ -977,7 +977,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     return-1;
                 ND_PRINT("%s  IPv4 Tunnel Sender Address: %s, LSP-ID: 0x%04x",
                        indent,
-                       ipaddr_string(ndo, obj_tptr),
+                       GET_IPADDR_STRING(obj_tptr),
                        GET_BE_U_2(obj_tptr + 6));
                 obj_tlen-=8;
                 obj_tptr+=8;
@@ -988,10 +988,10 @@ rsvp_obj_print(netdissect_options *ndo,
                 ND_PRINT("%s  IPv4 Tunnel Sender Address: %s, LSP ID: 0x%04x"
                        "%s  Sub-Group Originator ID: %s, Sub-Group ID: 0x%04x",
                        indent,
-                       ipaddr_string(ndo, obj_tptr),
+                       GET_IPADDR_STRING(obj_tptr),
                        GET_BE_U_2(obj_tptr + 6),
                        indent,
-                       ipaddr_string(ndo, obj_tptr+8),
+                       GET_IPADDR_STRING(obj_tptr+8),
                        GET_BE_U_2(obj_tptr + 12));
                 obj_tlen-=16;
                 obj_tptr+=16;
@@ -1121,7 +1121,7 @@ rsvp_obj_print(netdissect_options *ndo,
 			}
                         ND_PRINT(", %s, %s/%u, Flags: [%s]",
                                RSVP_OBJ_XRO_MASK_LOOSE(GET_U_1(obj_tptr)) ? "Loose" : "Strict",
-                               ipaddr_string(ndo, obj_tptr+2),
+                               GET_IPADDR_STRING(obj_tptr+2),
                                GET_U_1((obj_tptr + 6)),
                                bittok2str(rsvp_obj_rro_flag_values,
                                    "none",
@@ -1310,13 +1310,13 @@ rsvp_obj_print(netdissect_options *ndo,
                             if (subobj_len < 8)
                                 return -1;
                             ND_PRINT("%s    UNI IPv4 TNA address: %s",
-                                   indent, ipaddr_string(ndo, obj_tptr + 4));
+                                   indent, GET_IPADDR_STRING(obj_tptr + 4));
                             break;
                         case AFNUM_INET6:
                             if (subobj_len < 20)
                                 return -1;
                             ND_PRINT("%s    UNI IPv6 TNA address: %s",
-                                   indent, ip6addr_string(ndo, obj_tptr + 4));
+                                   indent, GET_IP6ADDR_STRING(obj_tptr + 4));
                             break;
                         case AFNUM_NSAP:
                             if (subobj_len) {
@@ -1379,7 +1379,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     return-1;
                 ND_PRINT("%s  Previous/Next Interface: %s, Logical Interface Handle: 0x%08x",
                        indent,
-                       ipaddr_string(ndo, obj_tptr),
+                       GET_IPADDR_STRING(obj_tptr),
                        GET_BE_U_4(obj_tptr + 4));
                 obj_tlen-=8;
                 obj_tptr+=8;
@@ -1392,7 +1392,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     return-1;
                 ND_PRINT("%s  Previous/Next Interface: %s, Logical Interface Handle: 0x%08x",
                        indent,
-                       ip6addr_string(ndo, obj_tptr),
+                       GET_IP6ADDR_STRING(obj_tptr),
                        GET_BE_U_4(obj_tptr + 16));
                 obj_tlen-=20;
                 obj_tptr+=20;
@@ -1468,7 +1468,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     return-1;
                 ND_PRINT("%s  Source Address: %s, Source Port: %u",
                        indent,
-                       ipaddr_string(ndo, obj_tptr),
+                       GET_IPADDR_STRING(obj_tptr),
                        GET_BE_U_2(obj_tptr + 6));
                 obj_tlen-=8;
                 obj_tptr+=8;
@@ -1478,7 +1478,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     return-1;
                 ND_PRINT("%s  Source Address: %s, Source Port: %u",
                        indent,
-                       ip6addr_string(ndo, obj_tptr),
+                       GET_IP6ADDR_STRING(obj_tptr),
                        GET_BE_U_2(obj_tptr + 18));
                 obj_tlen-=20;
                 obj_tptr+=20;
@@ -1488,7 +1488,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     return-1;
                 ND_PRINT("%s  Source Address: %s, Flow Label: %u",
                        indent,
-                       ip6addr_string(ndo, obj_tptr),
+                       GET_IP6ADDR_STRING(obj_tptr),
                        GET_BE_U_3(obj_tptr + 17));
                 obj_tlen-=20;
                 obj_tptr+=20;
@@ -1498,7 +1498,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     return-1;
                 ND_PRINT("%s  Source Address: %s, LSP-ID: 0x%04x",
                        indent,
-                       ipaddr_string(ndo, obj_tptr),
+                       GET_IPADDR_STRING(obj_tptr),
                        GET_BE_U_2(obj_tptr + 18));
                 obj_tlen-=20;
                 obj_tptr+=20;
@@ -1509,10 +1509,10 @@ rsvp_obj_print(netdissect_options *ndo,
                 ND_PRINT("%s  IPv6 Tunnel Sender Address: %s, LSP ID: 0x%04x"
                        "%s  Sub-Group Originator ID: %s, Sub-Group ID: 0x%04x",
                        indent,
-                       ip6addr_string(ndo, obj_tptr),
+                       GET_IP6ADDR_STRING(obj_tptr),
                        GET_BE_U_2(obj_tptr + 18),
                        indent,
-                       ip6addr_string(ndo, obj_tptr+20),
+                       GET_IP6ADDR_STRING(obj_tptr+20),
                        GET_BE_U_2(obj_tptr + 38));
                 obj_tlen-=40;
                 obj_tptr+=40;
@@ -1522,7 +1522,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     return-1;
                 ND_PRINT("%s  Source Address: %s, LSP-ID: 0x%04x",
                        indent,
-                       ipaddr_string(ndo, obj_tptr),
+                       GET_IPADDR_STRING(obj_tptr),
                        GET_BE_U_2(obj_tptr + 6));
                 obj_tlen-=8;
                 obj_tptr+=8;
@@ -1533,10 +1533,10 @@ rsvp_obj_print(netdissect_options *ndo,
                 ND_PRINT("%s  IPv4 Tunnel Sender Address: %s, LSP ID: 0x%04x"
                        "%s  Sub-Group Originator ID: %s, Sub-Group ID: 0x%04x",
                        indent,
-                       ipaddr_string(ndo, obj_tptr),
+                       GET_IPADDR_STRING(obj_tptr),
                        GET_BE_U_2(obj_tptr + 6),
                        indent,
-                       ipaddr_string(ndo, obj_tptr+8),
+                       GET_IPADDR_STRING(obj_tptr+8),
                        GET_BE_U_2(obj_tptr + 12));
                 obj_tlen-=16;
                 obj_tptr+=16;
@@ -1599,8 +1599,8 @@ rsvp_obj_print(netdissect_options *ndo,
                 while(obj_tlen >= 8) {
                     ND_PRINT("%s  PLR-ID: %s, Avoid-Node-ID: %s",
                            indent,
-                           ipaddr_string(ndo, obj_tptr),
-                           ipaddr_string(ndo, obj_tptr + 4));
+                           GET_IPADDR_STRING(obj_tptr),
+                           GET_IPADDR_STRING(obj_tptr + 4));
                     obj_tlen-=8;
                     obj_tptr+=8;
                 }
@@ -1635,7 +1635,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 error_value=GET_BE_U_2(obj_tptr + 6);
                 ND_PRINT("%s  Error Node Address: %s, Flags: [0x%02x]%s  Error Code: %s (%u)",
                        indent,
-                       ipaddr_string(ndo, obj_tptr),
+                       GET_IPADDR_STRING(obj_tptr),
                        GET_U_1(obj_tptr + 4),
                        indent,
                        tok2str(rsvp_obj_error_code_values,"unknown",error_code),
@@ -1667,7 +1667,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 error_value=GET_BE_U_2(obj_tptr + 18);
                 ND_PRINT("%s  Error Node Address: %s, Flags: [0x%02x]%s  Error Code: %s (%u)",
                        indent,
-                       ip6addr_string(ndo, obj_tptr),
+                       GET_IP6ADDR_STRING(obj_tptr),
                        GET_U_1(obj_tptr + 16),
                        indent,
                        tok2str(rsvp_obj_error_code_values,"unknown",error_code),
@@ -1855,7 +1855,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 4)
                     return-1;
                 ND_PRINT("%s  Sub-LSP destination address: %s",
-                       indent, ipaddr_string(ndo, obj_tptr));
+                       indent, GET_IPADDR_STRING(obj_tptr));
 
                 obj_tlen-=4;
                 obj_tptr+=4;
@@ -1864,7 +1864,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 16)
                     return-1;
                 ND_PRINT("%s  Sub-LSP destination address: %s",
-                       indent, ip6addr_string(ndo, obj_tptr));
+                       indent, GET_IP6ADDR_STRING(obj_tptr));
 
                 obj_tlen-=16;
                 obj_tptr+=16;

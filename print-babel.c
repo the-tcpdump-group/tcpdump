@@ -126,6 +126,12 @@ static const char *
 format_prefix(netdissect_options *ndo, const u_char *prefix, unsigned char plen)
 {
     static char buf[50];
+
+    /*
+     * prefix points to a buffer on the stack into which the prefix has
+     * been placed, so we can't use GET_IPADDR_STRING() or
+     * GET_IP6ADDR_STRING() on it.
+     */
     if(plen >= 96 && memcmp(prefix, v4prefix, 12) == 0)
         snprintf(buf, 50, "%s/%u", ipaddr_string(ndo, prefix + 12), plen - 96);
     else
@@ -137,6 +143,11 @@ format_prefix(netdissect_options *ndo, const u_char *prefix, unsigned char plen)
 static const char *
 format_address(netdissect_options *ndo, const u_char *prefix)
 {
+    /*
+     * prefix points to a buffer on the stack into which the prefix has
+     * been placed, so we can't use GET_IPADDR_STRING() or
+     * GET_IP6ADDR_STRING() on it.
+     */
     if(memcmp(prefix, v4prefix, 12) == 0)
         return ipaddr_string(ndo, prefix + 12);
     else

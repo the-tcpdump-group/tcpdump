@@ -245,7 +245,7 @@ print_probe(netdissect_options *ndo,
 
 	while ((len > 0) && (bp < ep)) {
 		ND_TCHECK_4(bp);
-		ND_PRINT("\n\tneighbor %s", ipaddr_string(ndo, bp));
+		ND_PRINT("\n\tneighbor %s", GET_IPADDR_STRING(bp));
 		bp += 4; len -= 4;
 	}
 	return (0);
@@ -276,9 +276,9 @@ print_neighbors(netdissect_options *ndo,
 		len -= 7;
 		while (--ncount >= 0) {
 			ND_TCHECK_4(bp);
-			ND_PRINT(" [%s ->", ipaddr_string(ndo, laddr));
+			ND_PRINT(" [%s ->", GET_IPADDR_STRING(laddr));
 			ND_PRINT(" %s, (%u/%u)]",
-				   ipaddr_string(ndo, bp), metric, thresh);
+				   GET_IPADDR_STRING(bp), metric, thresh);
 			bp += 4;
 			len -= 4;
 		}
@@ -314,8 +314,8 @@ print_neighbors2(netdissect_options *ndo,
 		bp++;
 		len -= 8;
 		while (--ncount >= 0 && (len >= 4) && (bp + 4) <= ep) {
-			ND_PRINT(" [%s -> ", ipaddr_string(ndo, laddr));
-			ND_PRINT("%s (%u/%u", ipaddr_string(ndo, bp),
+			ND_PRINT(" [%s -> ", GET_IPADDR_STRING(laddr));
+			ND_PRINT("%s (%u/%u", GET_IPADDR_STRING(bp),
 				     metric, thresh);
 			if (flags & DVMRP_NF_TUNNEL)
 				ND_PRINT("/tunnel");
@@ -346,7 +346,7 @@ print_prune(netdissect_options *ndo,
             const u_char *bp)
 {
 	ND_TCHECK_LEN(bp, 12);
-	ND_PRINT(" src %s grp %s", ipaddr_string(ndo, bp), ipaddr_string(ndo, bp + 4));
+	ND_PRINT(" src %s grp %s", GET_IPADDR_STRING(bp), GET_IPADDR_STRING(bp + 4));
 	bp += 8;
 	ND_PRINT(" timer ");
 	unsigned_relts_print(ndo, GET_BE_U_4(bp));
@@ -360,7 +360,7 @@ print_graft(netdissect_options *ndo,
             const u_char *bp)
 {
 	ND_TCHECK_8(bp);
-	ND_PRINT(" src %s grp %s", ipaddr_string(ndo, bp), ipaddr_string(ndo, bp + 4));
+	ND_PRINT(" src %s grp %s", GET_IPADDR_STRING(bp), GET_IPADDR_STRING(bp + 4));
 	return (0);
 trunc:
 	return (-1);
@@ -371,7 +371,7 @@ print_graft_ack(netdissect_options *ndo,
                 const u_char *bp)
 {
 	ND_TCHECK_8(bp);
-	ND_PRINT(" src %s grp %s", ipaddr_string(ndo, bp), ipaddr_string(ndo, bp + 4));
+	ND_PRINT(" src %s grp %s", GET_IPADDR_STRING(bp), GET_IPADDR_STRING(bp + 4));
 	return (0);
 trunc:
 	return (-1);

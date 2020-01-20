@@ -245,7 +245,7 @@ aarp_print(netdissect_options *ndo,
 			return;
 
 		case 2:				/* response */
-			ND_PRINT("reply %s is-at %s", AT(psaddr), etheraddr_string(ndo, ap->hsaddr));
+			ND_PRINT("reply %s is-at %s", AT(psaddr), GET_ETHERADDR_STRING(ap->hsaddr));
 			return;
 
 		case 3:				/* probe (oy!) */

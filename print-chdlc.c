@@ -169,8 +169,8 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
 		break;
 	case SLARP_REPLY:
 		ND_PRINT("reply %s/%s",
-			ipaddr_string(ndo, slarp->un.addr.addr),
-			ipaddr_string(ndo, slarp->un.addr.mask));
+			GET_IPADDR_STRING(slarp->un.addr.addr),
+			GET_IPADDR_STRING(slarp->un.addr.mask));
 		break;
 	case SLARP_KEEPALIVE:
 		ND_PRINT("keepalive: mineseen=0x%08x, yourseen=0x%08x, reliability=0x%04x",

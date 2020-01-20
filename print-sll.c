@@ -163,7 +163,7 @@ sll_print(netdissect_options *ndo, const struct sll_header *sllp, u_int length)
 	 * XXX - print others as strings of hex?
 	 */
 	if (GET_BE_U_2(sllp->sll_halen) == 6)
-		ND_PRINT("%s ", etheraddr_string(ndo, sllp->sll_addr));
+		ND_PRINT("%s ", GET_ETHERADDR_STRING(sllp->sll_addr));
 
 	if (!ndo->ndo_qflag) {
 		ether_type = GET_BE_U_2(sllp->sll_protocol);
@@ -352,7 +352,7 @@ sll2_print(netdissect_options *ndo, const struct sll2_header *sllp, u_int length
 	 * XXX - print others as strings of hex?
 	 */
 	if (GET_U_1(sllp->sll2_halen) == 6)
-		ND_PRINT("%s ", etheraddr_string(ndo, sllp->sll2_addr));
+		ND_PRINT("%s ", GET_ETHERADDR_STRING(sllp->sll2_addr));
 
 	if (!ndo->ndo_qflag) {
 		ether_type = GET_BE_U_2(sllp->sll2_protocol);

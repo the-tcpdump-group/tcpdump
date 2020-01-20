@@ -1392,7 +1392,7 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 			if (len < 4)
 				ND_PRINT(" len=%u [bad: < 4]", len);
 			else
-				ND_PRINT(" len=%u %s", len, ipaddr_string(ndo, data));
+				ND_PRINT(" len=%u %s", len, GET_IPADDR_STRING(data));
 			len = 0;
 			break;
 		case IPSECDOI_ID_FQDN:
@@ -1413,7 +1413,7 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 			else {
 				mask = data + sizeof(nd_ipv4);
 				ND_PRINT(" len=%u %s/%u.%u.%u.%u", len,
-					  ipaddr_string(ndo, data),
+					  GET_IPADDR_STRING(data),
 					  GET_U_1(mask), GET_U_1(mask + 1),
 					  GET_U_1(mask + 2),
 					  GET_U_1(mask + 3));
@@ -1425,7 +1425,7 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 			if (len < 16)
 				ND_PRINT(" len=%u [bad: < 16]", len);
 			else
-				ND_PRINT(" len=%u %s", len, ip6addr_string(ndo, data));
+				ND_PRINT(" len=%u %s", len, GET_IP6ADDR_STRING(data));
 			len = 0;
 			break;
 		case IPSECDOI_ID_IPV6_ADDR_SUBNET:
@@ -1437,7 +1437,7 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 				mask = (const u_char *)(data + sizeof(nd_ipv6));
 				/*XXX*/
 				ND_PRINT(" len=%u %s/0x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x", len,
-					  ip6addr_string(ndo, data),
+					  GET_IP6ADDR_STRING(data),
 					  GET_U_1(mask), GET_U_1(mask + 1),
 					  GET_U_1(mask + 2),
 					  GET_U_1(mask + 3),
@@ -1462,8 +1462,8 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 				ND_PRINT(" len=%u [bad: < 8]", len);
 			else {
 				ND_PRINT(" len=%u %s-%s", len,
-					  ipaddr_string(ndo, data),
-					  ipaddr_string(ndo, data + sizeof(nd_ipv4)));
+					  GET_IPADDR_STRING(data),
+					  GET_IPADDR_STRING(data + sizeof(nd_ipv4)));
 			}
 			len = 0;
 			break;
@@ -1472,8 +1472,8 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 				ND_PRINT(" len=%u [bad: < 32]", len);
 			else {
 				ND_PRINT(" len=%u %s-%s", len,
-					  ip6addr_string(ndo, data),
-					  ip6addr_string(ndo, data + sizeof(nd_ipv6)));
+					  GET_IP6ADDR_STRING(data),
+					  GET_IP6ADDR_STRING(data + sizeof(nd_ipv6)));
 			}
 			len = 0;
 			break;

@@ -197,9 +197,9 @@ static const char *
 format_ip6addr(netdissect_options *ndo, const u_char *cp)
 {
     if (is_ipv4_mapped_address(cp))
-        return ipaddr_string(ndo, cp + IPV4_MAPPED_HEADING_LEN);
+        return GET_IPADDR_STRING(cp + IPV4_MAPPED_HEADING_LEN);
     else
-        return ip6addr_string(ndo, cp);
+        return GET_IP6ADDR_STRING(cp);
 }
 
 static int
@@ -298,7 +298,7 @@ dhcpv4_print(netdissect_options *ndo,
                 return -1;
             }
             for (t = 0; t < optlen; t += 4)
-                ND_PRINT(" %s", ipaddr_string(ndo, value + t));
+                ND_PRINT(" %s", GET_IPADDR_STRING(value + t));
         }
             break;
         case DH4OPT_DOMAIN_SEARCH: {
@@ -351,7 +351,7 @@ dhcpv6_print(netdissect_options *ndo,
                     return -1;
                 }
                 for (t = 0; t < optlen; t += 16)
-                    ND_PRINT(" %s", ip6addr_string(ndo, value + t));
+                    ND_PRINT(" %s", GET_IP6ADDR_STRING(value + t));
             }
                 break;
             case DH6OPT_DOMAIN_LIST: {

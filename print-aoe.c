@@ -292,7 +292,7 @@ aoev1_mac_print(netdissect_options *ndo,
 		cp += 1;
 		/* Ethernet Address */
 		ND_TCHECK_LEN(cp, MAC_ADDR_LEN);
-		ND_PRINT(", Ethernet Address: %s", etheraddr_string(ndo, cp));
+		ND_PRINT(", Ethernet Address: %s", GET_ETHERADDR_STRING(cp));
 		cp += MAC_ADDR_LEN;
 	}
 	return;
@@ -329,7 +329,7 @@ aoev1_reserve_print(netdissect_options *ndo,
 	/* addresses */
 	for (i = 0; i < nmacs; i++) {
 		ND_TCHECK_LEN(cp, MAC_ADDR_LEN);
-		ND_PRINT("\n\tEthernet Address %u: %s", i, etheraddr_string(ndo, cp));
+		ND_PRINT("\n\tEthernet Address %u: %s", i, GET_ETHERADDR_STRING(cp));
 		cp += MAC_ADDR_LEN;
 	}
 	return;

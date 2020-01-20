@@ -1520,7 +1520,7 @@ handle_deauth(netdissect_options *ndo,
 	if (ndo->ndo_eflag) {
 		ND_PRINT(": %s", reason);
 	} else {
-		ND_PRINT(" (%s): %s", etheraddr_string(ndo, src), reason);
+		ND_PRINT(" (%s): %s", GET_ETHERADDR_STRING(src), reason);
 	}
 	return 1;
 trunc:
@@ -1587,7 +1587,7 @@ handle_action(netdissect_options *ndo,
 	if (ndo->ndo_eflag) {
 		ND_PRINT(": ");
 	} else {
-		ND_PRINT(" (%s): ", etheraddr_string(ndo, src));
+		ND_PRINT(" (%s): ", GET_ETHERADDR_STRING(src));
 	}
 	switch (GET_U_1(p)) {
 	case 0: ND_PRINT("Spectrum Management Act#%u", GET_U_1(p + 1)); break;
@@ -1675,8 +1675,8 @@ ctrl_body_print(netdissect_options *ndo,
 		ND_TCHECK_LEN(p, CTRL_BAR_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s TA:%s CTL(%x) SEQ(%u) ",
-			    etheraddr_string(ndo, ((const struct ctrl_bar_hdr_t *)p)->ra),
-			    etheraddr_string(ndo, ((const struct ctrl_bar_hdr_t *)p)->ta),
+			    GET_ETHERADDR_STRING(((const struct ctrl_bar_hdr_t *)p)->ra),
+			    GET_ETHERADDR_STRING(((const struct ctrl_bar_hdr_t *)p)->ta),
 			    GET_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->ctl),
 			    GET_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->seq));
 		break;
@@ -1684,7 +1684,7 @@ ctrl_body_print(netdissect_options *ndo,
 		ND_TCHECK_LEN(p, CTRL_BA_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
-			    etheraddr_string(ndo, ((const struct ctrl_ba_hdr_t *)p)->ra));
+			    GET_ETHERADDR_STRING(((const struct ctrl_ba_hdr_t *)p)->ra));
 		break;
 	case CTRL_PS_POLL:
 		ND_TCHECK_LEN(p, CTRL_PS_POLL_HDRLEN);
@@ -1695,31 +1695,31 @@ ctrl_body_print(netdissect_options *ndo,
 		ND_TCHECK_LEN(p, CTRL_RTS_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" TA:%s ",
-			    etheraddr_string(ndo, ((const struct ctrl_rts_hdr_t *)p)->ta));
+			    GET_ETHERADDR_STRING(((const struct ctrl_rts_hdr_t *)p)->ta));
 		break;
 	case CTRL_CTS:
 		ND_TCHECK_LEN(p, CTRL_CTS_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
-			    etheraddr_string(ndo, ((const struct ctrl_cts_hdr_t *)p)->ra));
+			    GET_ETHERADDR_STRING(((const struct ctrl_cts_hdr_t *)p)->ra));
 		break;
 	case CTRL_ACK:
 		ND_TCHECK_LEN(p, CTRL_ACK_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
-			    etheraddr_string(ndo, ((const struct ctrl_ack_hdr_t *)p)->ra));
+			    GET_ETHERADDR_STRING(((const struct ctrl_ack_hdr_t *)p)->ra));
 		break;
 	case CTRL_CF_END:
 		ND_TCHECK_LEN(p, CTRL_END_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
-			    etheraddr_string(ndo, ((const struct ctrl_end_hdr_t *)p)->ra));
+			    GET_ETHERADDR_STRING(((const struct ctrl_end_hdr_t *)p)->ra));
 		break;
 	case CTRL_END_ACK:
 		ND_TCHECK_LEN(p, CTRL_END_ACK_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
-			    etheraddr_string(ndo, ((const struct ctrl_end_ack_hdr_t *)p)->ra));
+			    GET_ETHERADDR_STRING(((const struct ctrl_end_ack_hdr_t *)p)->ra));
 		break;
 	}
 	return 1;
@@ -1821,20 +1821,20 @@ data_header_print(netdissect_options *ndo, uint16_t fc, const u_char *p)
 
 	if (!FC_TO_DS(fc) && !FC_FROM_DS(fc)) {
 		ND_PRINT("DA:%s SA:%s BSSID:%s ",
-		    etheraddr_string(ndo, ADDR1), etheraddr_string(ndo, ADDR2),
-		    etheraddr_string(ndo, ADDR3));
+		    GET_ETHERADDR_STRING(ADDR1), GET_ETHERADDR_STRING(ADDR2),
+		    GET_ETHERADDR_STRING(ADDR3));
 	} else if (!FC_TO_DS(fc) && FC_FROM_DS(fc)) {
 		ND_PRINT("DA:%s BSSID:%s SA:%s ",
-		    etheraddr_string(ndo, ADDR1), etheraddr_string(ndo, ADDR2),
-		    etheraddr_string(ndo, ADDR3));
+		    GET_ETHERADDR_STRING(ADDR1), GET_ETHERADDR_STRING(ADDR2),
+		    GET_ETHERADDR_STRING(ADDR3));
 	} else if (FC_TO_DS(fc) && !FC_FROM_DS(fc)) {
 		ND_PRINT("BSSID:%s SA:%s DA:%s ",
-		    etheraddr_string(ndo, ADDR1), etheraddr_string(ndo, ADDR2),
-		    etheraddr_string(ndo, ADDR3));
+		    GET_ETHERADDR_STRING(ADDR1), GET_ETHERADDR_STRING(ADDR2),
+		    GET_ETHERADDR_STRING(ADDR3));
 	} else if (FC_TO_DS(fc) && FC_FROM_DS(fc)) {
 		ND_PRINT("RA:%s TA:%s DA:%s SA:%s ",
-		    etheraddr_string(ndo, ADDR1), etheraddr_string(ndo, ADDR2),
-		    etheraddr_string(ndo, ADDR3), etheraddr_string(ndo, ADDR4));
+		    GET_ETHERADDR_STRING(ADDR1), GET_ETHERADDR_STRING(ADDR2),
+		    GET_ETHERADDR_STRING(ADDR3), GET_ETHERADDR_STRING(ADDR4));
 	}
 
 #undef ADDR1
@@ -1849,8 +1849,8 @@ mgmt_header_print(netdissect_options *ndo, const u_char *p)
 	const struct mgmt_header_t *hp = (const struct mgmt_header_t *) p;
 
 	ND_PRINT("BSSID:%s DA:%s SA:%s ",
-	    etheraddr_string(ndo, (hp)->bssid), etheraddr_string(ndo, (hp)->da),
-	    etheraddr_string(ndo, (hp)->sa));
+	    GET_ETHERADDR_STRING((hp)->bssid), GET_ETHERADDR_STRING((hp)->da),
+	    GET_ETHERADDR_STRING((hp)->sa));
 }
 
 static void
@@ -1859,42 +1859,42 @@ ctrl_header_print(netdissect_options *ndo, uint16_t fc, const u_char *p)
 	switch (FC_SUBTYPE(fc)) {
 	case CTRL_BAR:
 		ND_PRINT(" RA:%s TA:%s CTL(%x) SEQ(%u) ",
-		    etheraddr_string(ndo, ((const struct ctrl_bar_hdr_t *)p)->ra),
-		    etheraddr_string(ndo, ((const struct ctrl_bar_hdr_t *)p)->ta),
+		    GET_ETHERADDR_STRING(((const struct ctrl_bar_hdr_t *)p)->ra),
+		    GET_ETHERADDR_STRING(((const struct ctrl_bar_hdr_t *)p)->ta),
 		    GET_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->ctl),
 		    GET_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->seq));
 		break;
 	case CTRL_BA:
 		ND_PRINT("RA:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_ba_hdr_t *)p)->ra));
+		    GET_ETHERADDR_STRING(((const struct ctrl_ba_hdr_t *)p)->ra));
 		break;
 	case CTRL_PS_POLL:
 		ND_PRINT("BSSID:%s TA:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_ps_poll_hdr_t *)p)->bssid),
-		    etheraddr_string(ndo, ((const struct ctrl_ps_poll_hdr_t *)p)->ta));
+		    GET_ETHERADDR_STRING(((const struct ctrl_ps_poll_hdr_t *)p)->bssid),
+		    GET_ETHERADDR_STRING(((const struct ctrl_ps_poll_hdr_t *)p)->ta));
 		break;
 	case CTRL_RTS:
 		ND_PRINT("RA:%s TA:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_rts_hdr_t *)p)->ra),
-		    etheraddr_string(ndo, ((const struct ctrl_rts_hdr_t *)p)->ta));
+		    GET_ETHERADDR_STRING(((const struct ctrl_rts_hdr_t *)p)->ra),
+		    GET_ETHERADDR_STRING(((const struct ctrl_rts_hdr_t *)p)->ta));
 		break;
 	case CTRL_CTS:
 		ND_PRINT("RA:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_cts_hdr_t *)p)->ra));
+		    GET_ETHERADDR_STRING(((const struct ctrl_cts_hdr_t *)p)->ra));
 		break;
 	case CTRL_ACK:
 		ND_PRINT("RA:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_ack_hdr_t *)p)->ra));
+		    GET_ETHERADDR_STRING(((const struct ctrl_ack_hdr_t *)p)->ra));
 		break;
 	case CTRL_CF_END:
 		ND_PRINT("RA:%s BSSID:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_end_hdr_t *)p)->ra),
-		    etheraddr_string(ndo, ((const struct ctrl_end_hdr_t *)p)->bssid));
+		    GET_ETHERADDR_STRING(((const struct ctrl_end_hdr_t *)p)->ra),
+		    GET_ETHERADDR_STRING(((const struct ctrl_end_hdr_t *)p)->bssid));
 		break;
 	case CTRL_END_ACK:
 		ND_PRINT("RA:%s BSSID:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_end_ack_hdr_t *)p)->ra),
-		    etheraddr_string(ndo, ((const struct ctrl_end_ack_hdr_t *)p)->bssid));
+		    GET_ETHERADDR_STRING(((const struct ctrl_end_ack_hdr_t *)p)->ra),
+		    GET_ETHERADDR_STRING(((const struct ctrl_end_ack_hdr_t *)p)->bssid));
 		break;
 	default:
 		/* We shouldn't get here - we should already have quit */
@@ -1985,11 +1985,11 @@ ieee_802_11_hdr_print(netdissect_options *ndo,
 		ND_PRINT("MeshData (AE %u TTL %u seq %u", ae,
 		    GET_U_1(mc->ttl), GET_LE_U_4(mc->seq));
 		if (ae > 0)
-			ND_PRINT(" A4:%s", etheraddr_string(ndo, mc->addr4));
+			ND_PRINT(" A4:%s", GET_ETHERADDR_STRING(mc->addr4));
 		if (ae > 1)
-			ND_PRINT(" A5:%s", etheraddr_string(ndo, mc->addr5));
+			ND_PRINT(" A5:%s", GET_ETHERADDR_STRING(mc->addr5));
 		if (ae > 2)
-			ND_PRINT(" A6:%s", etheraddr_string(ndo, mc->addr6));
+			ND_PRINT(" A6:%s", GET_ETHERADDR_STRING(mc->addr6));
 		ND_PRINT(") ");
 	}
 

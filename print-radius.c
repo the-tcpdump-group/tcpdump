@@ -897,11 +897,11 @@ print_attr_address(netdissect_options *ndo,
               if (GET_BE_U_4(data) == 0xFFFFFFFE )
                  ND_PRINT("NAS Select");
               else
-                 ND_PRINT("%s",ipaddr_string(ndo, data));
+                 ND_PRINT("%s",GET_IPADDR_STRING(data));
       break;
 
       default:
-          ND_PRINT("%s", ipaddr_string(ndo, data));
+          ND_PRINT("%s", GET_IPADDR_STRING(data));
       break;
    }
 
@@ -930,7 +930,7 @@ print_attr_address6(netdissect_options *ndo,
 
    ND_TCHECK_16(data);
 
-   ND_PRINT("%s", ip6addr_string(ndo, data));
+   ND_PRINT("%s", GET_IP6ADDR_STRING(data));
 
    return;
 
@@ -987,7 +987,7 @@ print_attr_mip6_home_link_prefix(netdissect_options *ndo,
       return;
    }
 
-   ND_PRINT("%s/%u", ip6addr_string(ndo, data + 1), GET_U_1(data));
+   ND_PRINT("%s/%u", GET_IP6ADDR_STRING(data + 1), GET_U_1(data));
 
    return;
 

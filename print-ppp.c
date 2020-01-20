@@ -753,7 +753,7 @@ print_lcp_config_options(netdissect_options *ndo,
 				return 0;
 			}
 			ND_TCHECK_4(p + 3);
-			ND_PRINT(": IPv4 %s", ipaddr_string(ndo, p + 3));
+			ND_PRINT(": IPv4 %s", GET_IPADDR_STRING(p + 3));
 			break;
 		case MEDCLASS_MAC:
 			if (len != 9) {
@@ -761,7 +761,7 @@ print_lcp_config_options(netdissect_options *ndo,
 				return 0;
 			}
 			ND_TCHECK_6(p + 3);
-			ND_PRINT(": MAC %s", etheraddr_string(ndo, p + 3));
+			ND_PRINT(": MAC %s", GET_ETHERADDR_STRING(p + 3));
 			break;
 		case MEDCLASS_MNB:
 			ND_PRINT(": Magic-Num-Block"); /* XXX */
@@ -1084,8 +1084,8 @@ print_ipcp_config_options(netdissect_options *ndo,
 		}
 		ND_TCHECK_4(p + 6);
 		ND_PRINT(": src %s, dst %s",
-		       ipaddr_string(ndo, p + 2),
-		       ipaddr_string(ndo, p + 6));
+		       GET_IPADDR_STRING(p + 2),
+		       GET_IPADDR_STRING(p + 6));
 		break;
 	case IPCPOPT_IPCOMP:
 		if (len < 4) {
@@ -1170,7 +1170,7 @@ print_ipcp_config_options(netdissect_options *ndo,
 			return 0;
 		}
 		ND_TCHECK_4(p + 2);
-		ND_PRINT(": %s", ipaddr_string(ndo, p + 2));
+		ND_PRINT(": %s", GET_IPADDR_STRING(p + 2));
 		break;
 	default:
 		/*

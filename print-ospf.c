@@ -238,7 +238,7 @@ ospf_grace_lsa_print(netdissect_options *ndo,
                 ND_PRINT("\n\t    Bogus length %u != 4", tlv_length);
                 return -1;
             }
-            ND_PRINT("%s", ipaddr_string(ndo, tptr));
+            ND_PRINT("%s", GET_IPADDR_STRING(tptr));
             break;
 
         default:
@@ -338,11 +338,11 @@ ospf_te_lsa_print(netdissect_options *ndo,
 			goto invalid;
 		    }
                     ND_PRINT(", %s (0x%08x)",
-                           ipaddr_string(ndo, tptr),
+                           GET_IPADDR_STRING(tptr),
                            GET_BE_U_4(tptr));
                     if (subtlv_length == 8) /* rfc4203 */
                         ND_PRINT(", %s (0x%08x)",
-                               ipaddr_string(ndo, tptr+4),
+                               GET_IPADDR_STRING(tptr+4),
                                GET_BE_U_4(tptr + 4));
                     break;
                 case LS_OPAQUE_TE_LINK_SUBTLV_LOCAL_IP:
@@ -351,7 +351,7 @@ ospf_te_lsa_print(netdissect_options *ndo,
 			ND_PRINT(" != 4");
 			goto invalid;
 		    }
-                    ND_PRINT(", %s", ipaddr_string(ndo, tptr));
+                    ND_PRINT(", %s", GET_IPADDR_STRING(tptr));
                     break;
                 case LS_OPAQUE_TE_LINK_SUBTLV_MAX_BW:
                 case LS_OPAQUE_TE_LINK_SUBTLV_MAX_RES_BW:
@@ -483,7 +483,7 @@ ospf_te_lsa_print(netdissect_options *ndo,
                 return -1;
             }
             ND_TCHECK_4(tptr);
-            ND_PRINT(", %s", ipaddr_string(ndo, tptr));
+            ND_PRINT(", %s", GET_IPADDR_STRING(tptr));
             break;
 
         default:
@@ -524,7 +524,7 @@ ospf_print_lshdr(netdissect_options *ndo,
 
         ND_TCHECK_4(lshp->ls_seq); /* XXX - ls_length check checked this */
         ND_PRINT("\n\t  Advertising Router %s, seq 0x%08x, age %us, length %u",
-                  ipaddr_string(ndo, lshp->ls_router),
+                  GET_IPADDR_STRING(lshp->ls_router),
                   GET_BE_U_4(lshp->ls_seq),
                   GET_BE_U_2(lshp->ls_age),
                   ls_length - (u_int)sizeof(struct lsa_hdr));
@@ -554,7 +554,7 @@ ospf_print_lshdr(netdissect_options *ndo,
             ND_PRINT("\n\t    %s LSA (%u), LSA-ID: %s",
                    tok2str(lsa_values,"unknown",ls_type),
                    ls_type,
-                   ipaddr_string(ndo, lshp->un_lsa_id.lsa_id));
+                   GET_IPADDR_STRING(lshp->un_lsa_id.lsa_id));
             break;
         }
 
@@ -652,26 +652,26 @@ ospf_print_lsa(netdissect_options *ndo,
 
 			case RLA_TYPE_VIRTUAL:
 				ND_PRINT("\n\t      Virtual Link: Neighbor Router-ID: %s, Interface Address: %s",
-				    ipaddr_string(ndo, rlp->link_id),
-				    ipaddr_string(ndo, rlp->link_data));
+				    GET_IPADDR_STRING(rlp->link_id),
+				    GET_IPADDR_STRING(rlp->link_data));
 				break;
 
 			case RLA_TYPE_ROUTER:
 				ND_PRINT("\n\t      Neighbor Router-ID: %s, Interface Address: %s",
-				    ipaddr_string(ndo, rlp->link_id),
-				    ipaddr_string(ndo, rlp->link_data));
+				    GET_IPADDR_STRING(rlp->link_id),
+				    GET_IPADDR_STRING(rlp->link_data));
 				break;
 
 			case RLA_TYPE_TRANSIT:
 				ND_PRINT("\n\t      Neighbor Network-ID: %s, Interface Address: %s",
-				    ipaddr_string(ndo, rlp->link_id),
-				    ipaddr_string(ndo, rlp->link_data));
+				    GET_IPADDR_STRING(rlp->link_id),
+				    GET_IPADDR_STRING(rlp->link_data));
 				break;
 
 			case RLA_TYPE_STUB:
 				ND_PRINT("\n\t      Stub Network: %s, Mask: %s",
-				    ipaddr_string(ndo, rlp->link_id),
-				    ipaddr_string(ndo, rlp->link_data));
+				    GET_IPADDR_STRING(rlp->link_id),
+				    GET_IPADDR_STRING(rlp->link_data));
 				break;
 
 			default:
@@ -691,11 +691,11 @@ ospf_print_lsa(netdissect_options *ndo,
 	case LS_TYPE_NETWORK:
 		ND_TCHECK_4(lsap->lsa_un.un_nla.nla_mask);
 		ND_PRINT("\n\t    Mask %s\n\t    Connected Routers:",
-		    ipaddr_string(ndo, lsap->lsa_un.un_nla.nla_mask));
+		    GET_IPADDR_STRING(lsap->lsa_un.un_nla.nla_mask));
 		ap = lsap->lsa_un.un_nla.nla_router;
 		while ((const u_char *)ap < ls_end) {
 			ND_TCHECK_SIZE(ap);
-			ND_PRINT("\n\t      %s", ipaddr_string(ndo, *ap));
+			ND_PRINT("\n\t      %s", GET_IPADDR_STRING(*ap));
 			++ap;
 		}
 		break;
@@ -703,7 +703,7 @@ ospf_print_lsa(netdissect_options *ndo,
 	case LS_TYPE_SUM_IP:
 		ND_TCHECK_4(lsap->lsa_un.un_nla.nla_mask);
 		ND_PRINT("\n\t    Mask %s",
-		    ipaddr_string(ndo, lsap->lsa_un.un_sla.sla_mask));
+		    GET_IPADDR_STRING(lsap->lsa_un.un_sla.sla_mask));
 		ND_TCHECK_SIZE(lsap->lsa_un.un_sla.sla_tosmetric);
 		lp = (const uint8_t *)lsap->lsa_un.un_sla.sla_tosmetric;
 		while (lp < ls_end) {
@@ -741,7 +741,7 @@ ospf_print_lsa(netdissect_options *ndo,
         case LS_TYPE_NSSA: /* fall through - those LSAs share the same format */
 		ND_TCHECK_4(lsap->lsa_un.un_nla.nla_mask);
 		ND_PRINT("\n\t    Mask %s",
-		    ipaddr_string(ndo, lsap->lsa_un.un_asla.asla_mask));
+		    GET_IPADDR_STRING(lsap->lsa_un.un_asla.asla_mask));
 
 		ND_TCHECK_SIZE(lsap->lsa_un.un_sla.sla_tosmetric);
 		almp = lsap->lsa_un.un_asla.asla_metric;
@@ -762,11 +762,11 @@ ospf_print_lsa(netdissect_options *ndo,
 
 			ND_TCHECK_4(almp->asla_forward);
 			if (GET_IPV4_TO_NETWORK_ORDER(almp->asla_forward) != 0) {
-				ND_PRINT(", forward %s", ipaddr_string(ndo, almp->asla_forward));
+				ND_PRINT(", forward %s", GET_IPADDR_STRING(almp->asla_forward));
 			}
 			ND_TCHECK_4(almp->asla_tag);
 			if (GET_IPV4_TO_NETWORK_ORDER(almp->asla_tag) != 0) {
-				ND_PRINT(", tag %s", ipaddr_string(ndo, almp->asla_tag));
+				ND_PRINT(", tag %s", GET_IPADDR_STRING(almp->asla_tag));
 			}
 			++almp;
 		}
@@ -781,12 +781,12 @@ ospf_print_lsa(netdissect_options *ndo,
 
 			case MCLA_VERTEX_ROUTER:
 				ND_PRINT("\n\t    Router Router-ID %s",
-				    ipaddr_string(ndo, mcp->mcla_vid));
+				    GET_IPADDR_STRING(mcp->mcla_vid));
 				break;
 
 			case MCLA_VERTEX_NETWORK:
 				ND_PRINT("\n\t    Network Designated Router %s",
-				    ipaddr_string(ndo, mcp->mcla_vid));
+				    GET_IPADDR_STRING(mcp->mcla_vid));
 				break;
 
 			default:
@@ -1000,25 +1000,25 @@ ospf_decode_v2(netdissect_options *ndo,
 		ND_PRINT("\n\t  Hello Timer %us, Dead Timer %us, Mask %s, Priority %u",
 		          GET_BE_U_2(op->ospf_hello.hello_helloint),
 		          GET_BE_U_4(op->ospf_hello.hello_deadint),
-		          ipaddr_string(ndo, op->ospf_hello.hello_mask),
+		          GET_IPADDR_STRING(op->ospf_hello.hello_mask),
 		          GET_U_1(op->ospf_hello.hello_priority));
 
 		ND_TCHECK_4(op->ospf_hello.hello_dr);
 		if (GET_IPV4_TO_NETWORK_ORDER(op->ospf_hello.hello_dr) != 0)
 			ND_PRINT("\n\t  Designated Router %s",
-			    ipaddr_string(ndo, op->ospf_hello.hello_dr));
+			    GET_IPADDR_STRING(op->ospf_hello.hello_dr));
 
 		ND_TCHECK_4(op->ospf_hello.hello_bdr);
 		if (GET_IPV4_TO_NETWORK_ORDER(op->ospf_hello.hello_bdr) != 0)
 			ND_PRINT(", Backup Designated Router %s",
-			          ipaddr_string(ndo, op->ospf_hello.hello_bdr));
+			          GET_IPADDR_STRING(op->ospf_hello.hello_bdr));
 
 		ap = op->ospf_hello.hello_neighbor;
 		if ((const u_char *)ap < dataend)
 			ND_PRINT("\n\t  Neighbor List:");
 		while ((const u_char *)ap < dataend) {
 			ND_TCHECK_SIZE(ap);
-			ND_PRINT("\n\t    %s", ipaddr_string(ndo, *ap));
+			ND_PRINT("\n\t    %s", GET_IPADDR_STRING(*ap));
 			++ap;
 		}
 		break;	/* HELLO */
@@ -1051,7 +1051,7 @@ ospf_decode_v2(netdissect_options *ndo,
                     ND_TCHECK_SIZE(lsrp);
 
                     ND_PRINT("\n\t  Advertising Router: %s, %s LSA (%u)",
-                           ipaddr_string(ndo, lsrp->ls_router),
+                           GET_IPADDR_STRING(lsrp->ls_router),
                            tok2str(lsa_values,"unknown",GET_BE_U_4(lsrp->ls_type)),
                            GET_BE_U_4(lsrp->ls_type));
 
@@ -1067,7 +1067,7 @@ ospf_decode_v2(netdissect_options *ndo,
                         break;
                     default:
                         ND_PRINT(", LSA-ID: %s",
-                               ipaddr_string(ndo, lsrp->un_ls_stateid.ls_stateid));
+                               GET_IPADDR_STRING(lsrp->un_ls_stateid.ls_stateid));
                         break;
                     }
 
@@ -1147,11 +1147,11 @@ ospf_print(netdissect_options *ndo,
 	}
 
 	ND_TCHECK_4(op->ospf_routerid);
-	ND_PRINT("\n\tRouter-ID %s", ipaddr_string(ndo, op->ospf_routerid));
+	ND_PRINT("\n\tRouter-ID %s", GET_IPADDR_STRING(op->ospf_routerid));
 
 	ND_TCHECK_4(op->ospf_areaid);
 	if (GET_IPV4_TO_NETWORK_ORDER(op->ospf_areaid) != 0)
-		ND_PRINT(", Area %s", ipaddr_string(ndo, op->ospf_areaid));
+		ND_PRINT(", Area %s", GET_IPADDR_STRING(op->ospf_areaid));
 	else
 		ND_PRINT(", Backbone Area");
 

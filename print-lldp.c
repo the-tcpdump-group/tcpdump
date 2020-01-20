@@ -1495,7 +1495,7 @@ lldp_print(netdissect_options *ndo,
                     if (tlv_len < 1+6) {
                         goto trunc;
                     }
-                    ND_PRINT("%s", etheraddr_string(ndo, tptr + 1));
+                    ND_PRINT("%s", GET_ETHERADDR_STRING(tptr + 1));
                     break;
 
                 case LLDP_CHASSIS_INTF_NAME_SUBTYPE: /* fall through */
@@ -1536,7 +1536,7 @@ lldp_print(netdissect_options *ndo,
                     if (tlv_len < 1+6) {
                         goto trunc;
                     }
-                    ND_PRINT("%s", etheraddr_string(ndo, tptr + 1));
+                    ND_PRINT("%s", GET_ETHERADDR_STRING(tptr + 1));
                     break;
 
                 case LLDP_PORT_INTF_NAME_SUBTYPE: /* fall through */

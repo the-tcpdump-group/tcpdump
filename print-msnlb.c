@@ -58,8 +58,8 @@ msnlb_print(netdissect_options *ndo, const u_char *bp)
 
 	ND_PRINT("MS NLB heartbeat, host priority: %u,",
 		GET_LE_U_4((hb->host_prio)));
-	ND_PRINT(" cluster IP: %s,", ipaddr_string(ndo, hb->virtual_ip));
-	ND_PRINT(" host IP: %s", ipaddr_string(ndo, hb->host_ip));
+	ND_PRINT(" cluster IP: %s,", GET_IPADDR_STRING(hb->virtual_ip));
+	ND_PRINT(" host IP: %s", GET_IPADDR_STRING(hb->host_ip));
 	return;
 trunc:
 	nd_print_trunc(ndo);
