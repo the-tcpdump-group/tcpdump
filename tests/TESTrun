@@ -1,0 +1,107 @@
+#!/usr/bin/perl
+
+$TCPDUMP = "./tcpdump" if (!($TCPDUMP = $ENV{TCPDUMP_BIN}));
+
+use File::Basename;
+use POSIX qw( WEXITSTATUS WIFEXITED);
+use Cwd qw(abs_path getcwd);
+use File::Path qw(make_path remove_tree);
+
+# these are created in the directory where we are run, which might be
+# a build directory.
+my $newdir = "tests/NEW";
+my $diffdir= "tests/DIFF";
+make_path($newdir);
+make_path($diffdir);
+my $origdir = getcwd();
+my $srcdir  = $ENV{'srcdir'} || ".";
+
+#
+# Force UTC, so time stamps are printed in a standard time zone, and
+# tests don't have to be run in the time zone in which the output
+# file was generated.
+#
+$ENV{'TZ'}='GMT0';
+
+#
+# Get the tests directory from $0.
+#
+my $testsdir = dirname($0);
+
+#
+# Convert it to an absolute path, so it works even after we do a cd.
+#
+$testsdir = abs_path($testsdir);
+print "Running tests from ${testsdir}\n";
+
+unshift(@INC, $testsdir);
+require 'testfuncs.pm';
+
+$passedcount = 0;
+$failedcount = 0;
+my $failureoutput=$origdir . "/tests/failure-outputs.txt";
+
+# truncate the output file
+open(FAILUREOUTPUT, ">" . $failureoutput);
+close(FAILUREOUTPUT);
+
+sub runComplexTests {
+
+    my @files = glob( $testsdir . '/*.sh' );
+    foreach $file (@files) {
+        if($file =~ /TEST.*\.sh/) {
+            print "File $file, skipped\n";
+            next;
+        }
+
+        print "Running $file\n";
+        system("cd tests && sh $file ${srcdir}")
+    }
+
+    # have to update passed/failed here
+}
+
+sub runSimpleTests {
+
+    local($only)=@_;
+    
+    open(TESTLIST, "<" . "${testsdir}/TESTLIST") || die "no ${testsdir}/TESTFILE: $!\n";
+    while(<TESTLIST>) {
+        next if /^\#/;
+        next if /^$/;
+
+        unlink("core");
+        ($name, $input, $output, @options) = split;
+        #print "processing ${only} vs ${name}\n";
+        next if(defined($only) && $only ne $name);
+        
+        my $options = join(" ", @options);
+        #print "@{options} becomes ${options}\n";
+
+        my $result =runtest($name, "${testsdir}/$input", "${testsdir}/${output}",$options);
+        if($result == 0) {
+            $passedcount++;
+        } else {
+            $failedcount++;
+        }
+
+        return if(defined($only));
+    }
+}
+
+if(scalar(@ARGV) == 0) {
+    runComplexTests();
+    runSimpleTests();
+} else {
+    runSimpleTests($ARGV[0]);
+}
+
+# exit with number of failing tests.
+print "------------------------------------------------\n";
+printf("%4u tests failed\n",$failedcount);
+printf("%4u tests passed\n",$passedcount);
+
+system("cat ${failureoutput}");
+exit $failedcount;
+
+    
