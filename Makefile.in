@@ -445,7 +445,7 @@ distclean:
 	rm -rf autom4te.cache tests/DIFF tests/NEW
 
 check: tcpdump
-	$(srcdir)/tests/TESTrun.sh
+	$(srcdir)/tests/TESTrun
 
 extags: $(TAGFILES)
 	ctags $(TAGFILES)
