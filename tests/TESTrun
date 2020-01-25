@@ -6,6 +6,7 @@ use File::Basename;
 use POSIX qw( WEXITSTATUS WIFEXITED);
 use Cwd qw(abs_path getcwd);
 use File::Path qw(make_path remove_tree);
+use YAML qw(LoadFile);
 
 # these are created in the directory where we are run, which might be
 # a build directory.
@@ -61,6 +62,41 @@ sub runComplexTests {
     # have to update passed/failed here
 }
 
+sub runOneYamlTest {
+    local($yamltest) = @_;
+
+    my $output = $yamltest->{output};
+    my $input  = $yamltest->{input};
+    my $name   = $yamltest->{name};
+    my $options= $yamltest->{args};
+    
+    #use Data::Dumper;
+    #print Dumper($yamltest);
+    
+    my $result = runtest($name, 
+                         $testsdir . "/" . $input, 
+                         $testsdir . "/" . $output, 
+                         $options);
+
+    if($result == 0) {
+        $passedcount++;
+    } else {
+        $failedcount++;
+    }
+}
+
+sub runYamlTests {
+    my @files = glob( $testsdir . '/*.yaml' );
+    foreach $file (@files) {
+        #print "FILE: ${file}\n";
+        my $yaml = LoadFile($file);
+
+        foreach $name (keys %$yaml) {
+            runOneYamlTest($yaml->{$name});
+        }
+    }        
+}
+
 sub runSimpleTests {
 
     local($only)=@_;
@@ -78,20 +114,19 @@ sub runSimpleTests {
         my $options = join(" ", @options);
         #print "@{options} becomes ${options}\n";
 
-        my $result =runtest($name, "${testsdir}/$input", "${testsdir}/${output}",$options);
-        if($result == 0) {
-            $passedcount++;
-        } else {
-            $failedcount++;
-        }
-
-        return if(defined($only));
+        my $hash = { name => $name,
+                     input=> $input,
+                     output=>$output,
+                     args => $options };
+                         
+        runOneYamlTest($hash);
     }
 }
 
 if(scalar(@ARGV) == 0) {
     runComplexTests();
     runSimpleTests();
+    runYamlTests();
 } else {
     runSimpleTests($ARGV[0]);
 }
