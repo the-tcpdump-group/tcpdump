@@ -6,7 +6,8 @@ use File::Basename;
 use POSIX qw( WEXITSTATUS WIFEXITED);
 use Cwd qw(abs_path getcwd);
 use File::Path qw(make_path remove_tree);
-use YAML qw(LoadFile);
+
+eval 'use YAML qw(LoadFile); 1' || die "TESTrun needs YAML.pm. apt install libyaml-perl/yum install per-YAML/cpanm YAML";
 
 # these are created in the directory where we are run, which might be
 # a build directory.
