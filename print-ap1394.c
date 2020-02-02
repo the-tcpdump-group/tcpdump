@@ -85,7 +85,7 @@ ap1394_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
+void
 ap1394_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int length = h->len;
@@ -96,9 +96,11 @@ ap1394_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 
 	ndo->ndo_protocol = "ap1394_if";
 	if (caplen < FIREWIRE_HDRLEN) {
+		ndo->ndo_ll_header_length += caplen;
 		nd_print_trunc(ndo);
-		return FIREWIRE_HDRLEN;
+		return;
 	}
+	ndo->ndo_ll_header_length += FIREWIRE_HDRLEN;
 
 	if (ndo->ndo_eflag)
 		ap1394_hdr_print(ndo, p, length);
@@ -122,5 +124,5 @@ ap1394_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 			ND_DEFAULTPRINT(p, caplen);
 	}
 
-	return FIREWIRE_HDRLEN;
+	return;
 }

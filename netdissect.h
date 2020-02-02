@@ -461,7 +461,7 @@ extern if_printer_t lookup_printer(netdissect_options *, int);
 
 /* The DLT printer routines */
 
-extern u_int ap1394_if_print IF_PRINTER_ARGS;
+extern void ap1394_if_print IF_PRINTER_ARGS;
 extern u_int arcnet_if_print IF_PRINTER_ARGS;
 extern u_int arcnet_linux_if_print IF_PRINTER_ARGS;
 extern u_int atm_if_print IF_PRINTER_ARGS;

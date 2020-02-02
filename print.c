@@ -91,9 +91,6 @@ static const struct uint_printer uint_printers[] = {
 #ifdef DLT_LOOP
 	{ null_if_print,	DLT_LOOP },
 #endif
-#ifdef DLT_APPLE_IP_OVER_IEEE1394
-	{ ap1394_if_print,	DLT_APPLE_IP_OVER_IEEE1394 },
-#endif
 #ifdef DLT_BLUETOOTH_HCI_H4_WITH_PHDR
 	{ bt_if_print,		DLT_BLUETOOTH_HCI_H4_WITH_PHDR},
 #endif
@@ -255,6 +252,9 @@ static const struct uint_printer uint_printers[] = {
 };
 
 static const struct void_printer void_printers[] = {
+#ifdef DLT_APPLE_IP_OVER_IEEE1394
+	{ ap1394_if_print,	DLT_APPLE_IP_OVER_IEEE1394 },
+#endif
 	{ NULL,                 0 },
 };
 
