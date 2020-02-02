@@ -7,8 +7,6 @@ use POSIX qw( WEXITSTATUS WIFEXITED);
 use Cwd qw(abs_path getcwd);
 use File::Path qw(mkpath);   # mkpath works with ancient perl, as well as newer perl
 
-eval 'use YAML qw(LoadFile); 1' || die "TESTrun needs YAML.pm. apt install libyaml-perl/yum install perl-YAML/cpanm YAML";
-
 # these are created in the directory where we are run, which might be
 # a build directory.
 my $newdir = "tests/NEW";
@@ -57,7 +55,7 @@ my $failureoutput=$origdir . "/tests/failure-outputs.txt";
 open(FAILUREOUTPUT, ">" . $failureoutput);
 close(FAILUREOUTPUT);
 
-sub runComplexTests {
+sub runShellTests {
 
     my @files = glob( $testsdir . '/*.sh' );
     foreach $file (@files) {
@@ -73,16 +71,16 @@ sub runComplexTests {
     # have to update passed/failed here
 }
 
-sub runOneYamlTest {
-    local($yamltest) = @_;
+sub runOneComplexTest {
+    local($testconfig) = @_;
 
-    my $output = $yamltest->{output};
-    my $input  = $yamltest->{input};
-    my $name   = $yamltest->{name};
-    my $options= $yamltest->{args};
+    my $output = $testconfig->{output};
+    my $input  = $testconfig->{input};
+    my $name   = $testconfig->{name};
+    my $options= $testconfig->{args};
     
     #use Data::Dumper;
-    #print Dumper($yamltest);
+    #print Dumper($testconfig);
     
     my $result = runtest($name, 
                          $testsdir . "/" . $input, 
@@ -96,14 +94,27 @@ sub runOneYamlTest {
     }
 }
 
-sub runYamlTests {
-    my @files = glob( $testsdir . '/*.yaml' );
+# *.tests files are PERL hash definitions.  They should create an array of hashes
+# one per test, and place it into the variable @testlist.
+sub runComplexTests {
+    my @files = glob( $testsdir . '/*.tests' );
     foreach $file (@files) {
-        #print "FILE: ${file}\n";
-        my $yaml = LoadFile($file);
-
-        foreach $name (keys %$yaml) {
-            runOneYamlTest($yaml->{$name});
+        my @testlist = undef;
+        print "FILE: ${file}\n";
+        open(FILE, "<".$file) || die "can not open $file: $!";
+        local $/ = undef;
+        $definitions = <FILE>;
+        close(FILE);
+        #print "STUFF: ${definitions}\n";
+        eval $definitions;
+        if(defined($testlist)) {
+            #use Data::Dumper;
+            #print Dumper($testlist);
+            foreach $test (@$testlist) {
+                runOneComplexTest($test);
+            }
+        } else {
+            warn "File: ${file} could not be loaded as PERL: $!";
         }
     }        
 }
@@ -130,14 +141,14 @@ sub runSimpleTests {
                      output=>$output,
                      args => $options };
                          
-        runOneYamlTest($hash);
+        runOneComplexTest($hash);
     }
 }
 
 if(scalar(@ARGV) == 0) {
-    runComplexTests();
+    runShellTests();
     runSimpleTests();
-    runYamlTests();
+    runComplexTests();
 } else {
     runSimpleTests($ARGV[0]);
 }
