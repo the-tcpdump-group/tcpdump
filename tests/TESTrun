@@ -142,6 +142,18 @@ if(scalar(@ARGV) == 0) {
     runSimpleTests($ARGV[0]);
 }
 
+#
+# XXX - read files used by shell scripts, and add the passed and failed
+# counts reported therein to our own passed and failed counts; we can
+# remove this once we no longer use shell scripts in tests.
+#
+open(PASSEDCOUNT, "<", "tests/.passed");
+$passedcount += <PASSEDCOUNT>;
+close(PASSEDCOUNT);
+open(FAILEDCOUNT, ">", "tests/.failed");
+$failedcount += <FAILEDCOUNT>;
+close(FAILEDCOUNT);
+
 # exit with number of failing tests.
 print "------------------------------------------------\n";
 printf("%4u tests failed\n",$failedcount);
@@ -149,5 +161,3 @@ printf("%4u tests passed\n",$passedcount);
 
 system("cat ${failureoutput}");
 exit $failedcount;
-
-    
