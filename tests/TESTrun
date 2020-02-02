@@ -41,6 +41,16 @@ require 'testfuncs.pm';
 
 $passedcount = 0;
 $failedcount = 0;
+#
+# XXX - create files used by shell scripts; we can remove this once we
+# no longer use shell scripts in tests.
+#
+open(PASSEDCOUNT, ">", "tests/.passed");
+print PASSEDCOUNT "${passedcount}\n";
+close(PASSEDCOUNT);
+open(FAILEDCOUNT, ">", "tests/.failed");
+print FAILEDCOUNT "${failedcount}\n";
+close(FAILEDCOUNT);
 my $failureoutput=$origdir . "/tests/failure-outputs.txt";
 
 # truncate the output file
