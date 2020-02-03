@@ -92,6 +92,19 @@ sub loadconfighash {
     }
     close(CONFIG_H);
     #print Dumper($main::confighhash);
+
+    # also grovel Makefile for some things and pretend they are config options.
+    open(MAKEFILE, "Makefile") || die "can not open Makefile: $!\n";
+    while(<MAKEFILE>) {
+        chomp;
+        #print "Processing $_\n";
+        if(/^CC\s*=.*gcc.*/) {
+            #print "GCC FOUND\n";
+            $main::confighhash->{'USING_GCC'} = 1;
+        }
+    }
+    close(MAKEFILE);
+
     return $main::confighhash;
 }
 
@@ -195,14 +208,14 @@ sub runSimpleTests {
                      input=> $input,
                      output=>$output,
                      args => $options };
-                         
+
         runOneComplexTest($hash);
     }
 }
 
 if(scalar(@ARGV) == 0) {
-    runShellTests();
-    runSimpleTests();
+    #runShellTests();
+    #runSimpleTests();
     runComplexTests();
 } else {
     runSimpleTests($ARGV[0]);
