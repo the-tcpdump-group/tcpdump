@@ -56,22 +56,6 @@ my $failureoutput=$origdir . "/tests/failure-outputs.txt";
 open(FAILUREOUTPUT, ">" . $failureoutput);
 close(FAILUREOUTPUT);
 
-sub runShellTests {
-
-    my @files = glob( $testsdir . '/*.sh' );
-    foreach $file (@files) {
-        if($file =~ /TEST.*\.sh/) {
-            print "File $file, skipped\n";
-            next;
-        }
-
-        print "Running $file\n";
-        system("cd tests && sh $file ${srcdir}")
-    }
-
-    # have to update passed/failed here
-}
-
 $confighhash = undef;
 
 sub loadconfighash {
@@ -214,8 +198,7 @@ sub runSimpleTests {
 }
 
 if(scalar(@ARGV) == 0) {
-    #runShellTests();
-    #runSimpleTests();
+    runSimpleTests();
     runComplexTests();
 } else {
     runSimpleTests($ARGV[0]);
