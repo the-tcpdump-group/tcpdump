@@ -6,6 +6,7 @@ use File::Basename;
 use POSIX qw( WEXITSTATUS WIFEXITED);
 use Cwd qw(abs_path getcwd);
 use File::Path qw(mkpath);   # mkpath works with ancient perl, as well as newer perl
+use Data::Dumper;            # for debugging.
 
 # these are created in the directory where we are run, which might be
 # a build directory.
@@ -71,6 +72,30 @@ sub runShellTests {
     # have to update passed/failed here
 }
 
+$confighhash = undef;
+
+sub loadconfighash {
+    if(defined($confighhash)) {
+        return $confighhash;
+    }
+
+    $main::confighhash = {};
+
+    # this could be loaded once perhaps.
+    open(CONFIG_H, "config.h") || die "Can not open config.h: $!\n";
+    while(<CONFIG_H>) {
+        chomp;
+        if(/^\#define (.*) 1/) {
+            #print "Setting $1\n";
+            $main::confighhash->{$1} = 1;
+        }
+    }
+    close(CONFIG_H);
+    #print Dumper($main::confighhash);
+    return $main::confighhash;
+}
+
+
 sub runOneComplexTest {
     local($testconfig) = @_;
 
@@ -78,13 +103,40 @@ sub runOneComplexTest {
     my $input  = $testconfig->{input};
     my $name   = $testconfig->{name};
     my $options= $testconfig->{args};
-    
+    my $foundit = 1;
+    my $unfoundit=1;
+
+    my $configset = $testconfig->{config_set};
+    my $configunset = $testconfig->{config_unset};
+    my $ch = loadconfighash();
+    #print Dumper($ch);
+
+    if(defined($configset)) {
+        $foundit = ($ch->{$configset} == 1);
+    }
+    if(defined($configunset)) {
+        $unfoundit=($ch->{$configunset} != 1);
+    }
+
+    if(!$foundit) {
+        print "${name} ... skipped, no ${configset}\n";
+        return 0;
+    }
+
+    if(!$unfoundit) {
+        print "${name} ... skipped, ${configunset} is set\n";
+        return 0;
+    }
+
     #use Data::Dumper;
     #print Dumper($testconfig);
-    
-    my $result = runtest($name, 
-                         $testsdir . "/" . $input, 
-                         $testsdir . "/" . $output, 
+
+    # EXPAND any occurances of @TESTDIR@ to $testsdir
+    $options =~ s/\@TESTDIR\@/$testsdir/;
+
+    my $result = runtest($name,
+                         $testsdir . "/" . $input,
+                         $testsdir . "/" . $output,
                          $options);
 
     if($result == 0) {
@@ -100,10 +152,13 @@ sub runComplexTests {
     my @files = glob( $testsdir . '/*.tests' );
     foreach $file (@files) {
         my @testlist = undef;
+        my $definitions;
         print "FILE: ${file}\n";
         open(FILE, "<".$file) || die "can not open $file: $!";
-        local $/ = undef;
-        $definitions = <FILE>;
+        {
+            local $/ = undef;
+            $definitions = <FILE>;
+        }
         close(FILE);
         #print "STUFF: ${definitions}\n";
         eval $definitions;
@@ -116,13 +171,13 @@ sub runComplexTests {
         } else {
             warn "File: ${file} could not be loaded as PERL: $!";
         }
-    }        
+    }
 }
 
 sub runSimpleTests {
 
     local($only)=@_;
-    
+
     open(TESTLIST, "<" . "${testsdir}/TESTLIST") || die "no ${testsdir}/TESTFILE: $!\n";
     while(<TESTLIST>) {
         next if /^\#/;
@@ -132,7 +187,7 @@ sub runSimpleTests {
         ($name, $input, $output, @options) = split;
         #print "processing ${only} vs ${name}\n";
         next if(defined($only) && $only ne $name);
-        
+
         my $options = join(" ", @options);
         #print "@{options} becomes ${options}\n";
 
