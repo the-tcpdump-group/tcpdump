@@ -1,0 +1,40 @@
+# -*- perl -*-
+
+$testlist = [
+    { 
+        config_set => 'HAVE_LIBCRYPTO',
+        name => 'esp1',
+        input => '02-sunrise-sunset-esp.pcap',
+        output => 'esp1.out',
+        args   => '-E "0x12345678@192.1.2.45 3des-cbc-hmac96:0x4043434545464649494a4a4c4c4f4f515152525454575758"'
+    },
+
+    {
+        config_set => 'HAVE_LIBCRYPTO',
+        name => 'esp2',
+        input => '08-sunrise-sunset-esp2.pcap',
+        output => 'esp2.out',
+        args   => '-E "0x12345678@192.1.2.45 3des-cbc-hmac96:0x43434545464649494a4a4c4c4f4f51515252545457575840,0xabcdabcd@192.0.1.1 3des-cbc-hmac96:0x434545464649494a4a4c4c4f4f5151525254545757584043"'
+    },
+
+    {
+        config_set => 'HAVE_LIBCRYPTO',
+        name => 'esp3',
+        input => '02-sunrise-sunset-esp.pcap',
+        output => 'esp1.out',
+        args   => '-E "3des-cbc-hmac96:0x4043434545464649494a4a4c4c4f4f515152525454575758"',
+    },
+    
+    {
+        config_set   => 'HAVE_LIBCRYPTO', 
+        config_unset => 'HAVE_CAPSICUM', 
+        name => 'esp4',
+        input => '08-sunrise-sunset-esp2.pcap',
+        output => 'esp2.out',
+        args   => '-E "file @TESTDIR@/esp-secrets.txt"',
+    }
+    ];
+
+1;
+
+
