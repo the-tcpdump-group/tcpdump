@@ -1,0 +1,13 @@
+# -*- perl -*-
+
+$testlist = [
+    {
+        config_set => 'USING_GCC',
+        name => 'lmp-v',
+        input => 'lmp.pcap',
+        output => 'lmp-v.out',
+        args   => '-T lmp -v'
+    },
+    ];
+
+1;
