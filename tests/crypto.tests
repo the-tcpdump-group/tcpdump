@@ -1,5 +1,8 @@
 # -*- perl -*-
 
+# Only attempt OpenSSL-specific tests when compiled with the library.
+# Reading the secret(s) from a file does not work with Capsicum.
+
 $testlist = [
     {
         config_set => 'HAVE_LIBCRYPTO',

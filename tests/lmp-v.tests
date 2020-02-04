@@ -1,5 +1,11 @@
 # -*- perl -*-
 
+# The "verbose" Link Management Protocol test involves a float calculation that
+# may produce a slightly different result depending on the architecture and the
+# compiler (see GitHub issue #333). The reference output was produced using a
+# GCC build and must reproduce correctly on any other GCC build regardless of
+# the architecture.
+
 $testlist = [
     {
         config_set => 'USING_GCC',

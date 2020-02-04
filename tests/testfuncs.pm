@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+# -*- perl -*-
 
 # expects to be run from the top directory, with "tests" subdirectory.
 
