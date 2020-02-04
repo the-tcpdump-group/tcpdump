@@ -107,12 +107,12 @@ sub runOneComplexTest {
     }
 
     if(!$foundit) {
-        print "${name} ... skipped, no ${configset}\n";
+        printf "    %-40s: skipped (no %s)\n", $name, $configset;
         return 0;
     }
 
     if(!$unfoundit) {
-        print "${name} ... skipped, ${configunset} is set\n";
+        printf "    %-40s: skipped (no %s)\n", $name, $configunset;
         return 0;
     }
 
