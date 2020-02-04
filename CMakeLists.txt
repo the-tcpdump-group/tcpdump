@@ -704,9 +704,6 @@ if(WITH_CRYPTO)
         #
         # Check for some headers and functions.
         #
-        cmake_push_check_state()
-        set(CMAKE_REQUIRED_LIBRARIES crypto)
-
         check_include_file(openssl/evp.h HAVE_OPENSSL_EVP_H)
 
         #
@@ -715,6 +712,9 @@ if(WITH_CRYPTO)
         # EVP_CIPHER_CTX may be opaque; otherwise, we allocate
         # it ourselves.
         #
+        cmake_push_check_state()
+        set(CMAKE_REQUIRED_LIBRARIES "${CRYPTO_LIBRARIES}")
+
         check_function_exists(EVP_CIPHER_CTX_new HAVE_EVP_CIPHER_CTX_NEW)
 
         #
