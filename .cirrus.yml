@@ -11,9 +11,8 @@ task:
       - image_family: freebsd-13-0-snap
   script:
     - pkg install -qy git autoconf
-    - (cd .. && git clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure --prefix=/tmp && make -j${MAXJOBS})
+    - (cd .. && git clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure --prefix=/tmp && make -s -j${MAXJOBS})
     - touch .devel
     - ./configure
-    - make -s all
-# The tests are currently broken.
-#    - make check
+    - make -s -j${MAXJOBS} all
+    - make check
