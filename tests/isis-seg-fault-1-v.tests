@@ -6,7 +6,6 @@
 
 $testlist = [
     {
-        config_set => 'USING_GCC',
         name => 'isis-seg-fault-1-v',
         input => 'isis-seg-fault-1.pcapng',
         output => 'isis-seg-fault-1-v.out',

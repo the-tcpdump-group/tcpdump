@@ -3392,62 +3392,11 @@ fi
 
 
 
-
     if test "$GCC" = yes ; then
 	    #
 	    # -Werror forces warnings to be errors.
 	    #
 	    ac_lbl_cc_force_warning_errors=-Werror
-
-	    #
-	    # Use -ffloat-store so that, on 32-bit x86, we don't
-	    # do 80-bit arithmetic with the FPU; that way we should
-	    # get the same results for floating-point calculations
-	    # on x86-32 and x86-64.
-	    #
-
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -ffloat-store option" >&5
-$as_echo_n "checking whether the compiler supports the -ffloat-store option... " >&6; }
-	save_CFLAGS="$CFLAGS"
-	if expr "x-ffloat-store" : "x-W.*" >/dev/null
-	then
-	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -ffloat-store"
-	elif expr "x-ffloat-store" : "x-f.*" >/dev/null
-	then
-	    CFLAGS="$CFLAGS -Werror -ffloat-store"
-	elif expr "x-ffloat-store" : "x-m.*" >/dev/null
-	then
-	    CFLAGS="$CFLAGS -Werror -ffloat-store"
-	else
-	    CFLAGS="$CFLAGS -ffloat-store"
-	fi
-	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-return 0
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-		CFLAGS="$save_CFLAGS"
-		V_CCOPT="$V_CCOPT -ffloat-store"
-
-else
-
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-		CFLAGS="$save_CFLAGS"
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
     else
 	    V_INCLS="$V_INCLS -I/usr/local/include"
 	    LDFLAGS="$LDFLAGS -L/usr/local/lib"
@@ -3542,7 +3491,8 @@ $as_echo_n "checking that Ultrix $CC hacks const in prototypes... " >&6; }
 		    if ${ac_cv_lbl_cc_const_proto+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <sys/types.h>
 int

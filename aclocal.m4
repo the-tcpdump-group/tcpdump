@@ -102,14 +102,6 @@ AC_DEFUN(AC_LBL_C_INIT,
 	    # -Werror forces warnings to be errors.
 	    #
 	    ac_lbl_cc_force_warning_errors=-Werror
-
-	    #
-	    # Use -ffloat-store so that, on 32-bit x86, we don't
-	    # do 80-bit arithmetic with the FPU; that way we should
-	    # get the same results for floating-point calculations
-	    # on x86-32 and x86-64.
-	    #
-	    AC_LBL_CHECK_COMPILER_OPT($1, -ffloat-store)
     else
 	    $2="$$2 -I/usr/local/include"
 	    LDFLAGS="$LDFLAGS -L/usr/local/lib"
