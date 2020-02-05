@@ -69,11 +69,17 @@ sub loadconfighash {
     #print Dumper($main::confighhash);
 
     # also run tcpdump --fp-type to get the type of floating-point
-    # arithmetic we're doing, setting a HAVE_{fptype} key
+    # arithmetic we're doing, setting a HAVE_{fptype} key based
+    # on the value it prints
     open(FPTYPE_PIPE, "./tcpdump --fp-type |") or die("piping tcpdump --fp-type failed\n");
-    my $have_fptype = "HAVE_" . <FPTYPE_PIPE>;
+    my $fptype_val = <FPTYPE_PIPE>;
     close(FPTYPE_PIPE);
-    $have_fptype =~ s/^\s+|\s+$//g;
+    my $have_fptype;
+    if($fptype_val == "9877.895") {
+        $have_fptype = "HAVE_FPTYPE1";
+    } else {
+        $have_fptype = "HAVE_FPTYPE2";
+    }
     $main::confighhash->{$have_fptype} = 1;
 
     return $main::confighhash;

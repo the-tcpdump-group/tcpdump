@@ -150,8 +150,6 @@ The Regents of the University of California.  All rights reserved.\n";
 
 #include "print.h"
 
-#include "fptype.h"
-
 #ifndef PATH_MAX
 #define PATH_MAX 1024
 #endif
@@ -1903,15 +1901,13 @@ main(int argc, char **argv)
 			 * may differ (e.g., it might be 32-bit, 64-bit,
 			 * or 80-bit).
 			 */
-			switch (float_type_check(0x4e93312d)) {
-
-			case 0x461a5794:
-				printf("FPTYPE1\n");
-				break;
-
-			default:
-				printf("FPTYPE2\n");
-				break;
+			{
+				union { /* int to float conversion buffer */
+					float f;
+					uint32_t i;
+				} f;
+				f.i = 0x4e93312d;
+				printf("%.3f\n", f.f*8/1000000);
 			}
 			return 0;
 

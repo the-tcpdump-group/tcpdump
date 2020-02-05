@@ -1110,7 +1110,7 @@ if(NOT C_ADDITIONAL_FLAGS STREQUAL "")
     set_target_properties(netdissect PROPERTIES COMPILE_FLAGS ${C_ADDITIONAL_FLAGS})
 endif()
 
-set(TCPDUMP_SOURCE_LIST_C fptype.c tcpdump.c)
+set(TCPDUMP_SOURCE_LIST_C tcpdump.c)
 
 if(NOT HAVE_BPF_DUMP)
     set(TCPDUMP_SOURCE_LIST_C ${TCPDUMP_SOURCE_LIST_C} bpf_dump.c)

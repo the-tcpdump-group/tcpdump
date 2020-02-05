@@ -70,7 +70,7 @@ DEPENDENCY_CFLAG = @DEPENDENCY_CFLAG@
 	@rm -f $@
 	$(CC) $(FULL_CFLAGS) -c $(srcdir)/$*.c
 
-CSRC =	fptype.c tcpdump.c
+CSRC =	tcpdump.c
 
 LIBNETDISSECT_SRC=\
 	addrtoname.c \
