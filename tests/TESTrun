@@ -68,17 +68,13 @@ sub loadconfighash {
     close(CONFIG_H);
     #print Dumper($main::confighhash);
 
-    # also grovel Makefile for some things and pretend they are config options.
-    open(MAKEFILE, "Makefile") || die "can not open Makefile: $!\n";
-    while(<MAKEFILE>) {
-        chomp;
-        #print "Processing $_\n";
-        if(/^CC\s*=.*gcc.*/) {
-            #print "GCC FOUND\n";
-            $main::confighhash->{'USING_GCC'} = 1;
-        }
-    }
-    close(MAKEFILE);
+    # also run tcpdump --fp-type to get the type of floating-point
+    # arithmetic we're doing, setting a HAVE_{fptype} key
+    open(FPTYPE_PIPE, "./tcpdump --fp-type |") or die("piping tcpdump --fp-type failed\n");
+    my $have_fptype = "HAVE_" . <FPTYPE_PIPE>;
+    close(FPTYPE_PIPE);
+    $have_fptype =~ s/^\s+|\s+$//g;
+    $main::confighhash->{$have_fptype} = 1;
 
     return $main::confighhash;
 }

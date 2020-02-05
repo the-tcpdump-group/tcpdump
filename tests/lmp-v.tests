@@ -1,13 +1,14 @@
 # -*- perl -*-
 
 # The "verbose" Link Management Protocol test involves a float calculation that
-# may produce a slightly different result depending on the architecture and the
-# compiler (see GitHub issue #333). The reference output was produced using a
-# GCC build and must reproduce correctly on any other GCC build regardless of
-# the architecture.
+# may produce a slightly different result depending on the compiler and the
+# version of the instruction set for which it's generating code (see GitHub
+# issue #333). The test is done only if we have a floating-point type, as
+# reported by "./tcpdump --fp-type", of FPTYPE1.
 
 $testlist = [
     {
+        config_set => 'HAVE_FPTYPE1',
         name => 'lmp-v',
         input => 'lmp.pcap',
         output => 'lmp-v.out',

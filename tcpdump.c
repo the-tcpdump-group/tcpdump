@@ -150,6 +150,8 @@ The Regents of the University of California.  All rights reserved.\n";
 
 #include "print.h"
 
+#include "fptype.h"
+
 #ifndef PATH_MAX
 #define PATH_MAX 1024
 #endif
@@ -687,6 +689,7 @@ show_remote_devices_and_exit(void)
 #define OPTION_LIST_REMOTE_INTERFACES	132
 #define OPTION_TSTAMP_MICRO		133
 #define OPTION_TSTAMP_NANO		134
+#define OPTION_FP_TYPE			135
 
 static const struct option longopts[] = {
 #if defined(HAVE_PCAP_CREATE) || defined(_WIN32)
@@ -730,6 +733,7 @@ static const struct option longopts[] = {
 	{ "debug-filter-parser", no_argument, NULL, 'Y' },
 #endif
 	{ "relinquish-privileges", required_argument, NULL, 'Z' },
+	{ "fp-type", no_argument, NULL, OPTION_FP_TYPE },
 	{ "number", no_argument, NULL, '#' },
 	{ "print", no_argument, NULL, OPTION_PRINT },
 	{ "version", no_argument, NULL, OPTION_VERSION },
@@ -1890,6 +1894,26 @@ main(int argc, char **argv)
 			ndo->ndo_tstamp_precision = PCAP_TSTAMP_PRECISION_NANO;
 			break;
 #endif
+
+		case OPTION_FP_TYPE:
+			/*
+			 * Print out the type of floating-point arithmetic
+			 * we're doing; it's probably IEEE, unless somebody
+			 * tries to run this on a VAX, but the precision
+			 * may differ (e.g., it might be 32-bit, 64-bit,
+			 * or 80-bit).
+			 */
+			switch (float_type_check(0x4e93312d)) {
+
+			case 0x461a5794:
+				printf("FPTYPE1\n");
+				break;
+
+			default:
+				printf("FPTYPE2\n");
+				break;
+			}
+			return 0;
 
 		default:
 			print_usage();
