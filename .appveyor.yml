@@ -47,3 +47,4 @@ build_script:
   - cd build
   - cmake -DPCAP_ROOT=c:\projects\libpcap\Win32\%SDK% -G"%GENERATOR%" ..
   - msbuild /m /nologo /p:Configuration=Release tcpdump.sln
+  - msbuild /nologo /p:Configuration=Release check.sln
