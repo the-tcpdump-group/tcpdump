@@ -210,7 +210,7 @@ cdp_print(netdissect_options *ndo,
 			ND_PRINT("%s", GET_U_1(tptr) ? "full": "half");
 			break;
 
-		    /* http://www.cisco.com/c/en/us/td/docs/voice_ip_comm/cata/186/2_12_m/english/release/notes/186rn21m.html
+		    /* https://www.cisco.com/c/en/us/td/docs/voice_ip_comm/cata/186/2_12_m/english/release/notes/186rn21m.html
 		     * plus more details from other sources
 		     *
 		     * There are apparently versions of the request with both
