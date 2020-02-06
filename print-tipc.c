@@ -23,8 +23,8 @@
 
 /*
  * specification:
- *	http://tipc.sourceforge.net/doc/draft-spec-tipc-07.html
- *	http://tipc.sourceforge.net/doc/tipc_message_formats.html
+ *     https://web.archive.org/web/20150302152944/http://tipc.sourceforge.net/doc/draft-spec-tipc-07.html
+ *     https://web.archive.org/web/20161025110514/http://tipc.sourceforge.net/doc/tipc_message_formats.html
  */
 
 #ifdef HAVE_CONFIG_H
