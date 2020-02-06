@@ -18,7 +18,7 @@
 /* \summary: Link Management Protocol (LMP) printer */
 
 /* specification: RFC 4204 */
-/* OIF UNI 1.0: http://www.oiforum.com/public/documents/OIF-UNI-01.0.pdf */
+/* OIF UNI 1.0: https://web.archive.org/web/20160401194747/http://www.oiforum.com/public/documents/OIF-UNI-01.0.pdf */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>

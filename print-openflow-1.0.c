@@ -6,7 +6,7 @@
  * up bogus values of selected message fields and decodes partially captured
  * messages up to the snapshot end. It is based on the specification below:
  *
- * [OF10] http://www.openflow.org/documents/openflow-spec-v1.0.0.pdf
+ * [OF10] https://web.archive.org/web/20160402132157/http://archive.openflow.org/documents/openflow-spec-v1.0.0.pdf
  *
  * Most functions in this file take 3 arguments into account:
  * * cp -- the pointer to the first octet to decode

@@ -1287,7 +1287,7 @@ rsvp_obj_print(netdissect_options *ndo,
                      *
                      * but that doesn't work; the new URL appears to be
                      *
-                     *    http://www.oiforum.com/public/documents/OIF-UNI-01.0.pdf
+                     *    https://web.archive.org/web/20160401194747/http://www.oiforum.com/public/documents/OIF-UNI-01.0.pdf
                      *
                      * and *that* document, in section 12.5.2.3
                      * "GENERALIZED_UNI Object (Class-Num=11bbbbbb (TBA))",

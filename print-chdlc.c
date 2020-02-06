@@ -161,7 +161,7 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
 		 * At least according to William "Chops" Westfield's
 		 * message in
 		 *
-		 *	http://www.nethelp.no/net/cisco-hdlc.txt
+		 *	https://web.archive.org/web/20190725151313/www.nethelp.no/net/cisco-hdlc.txt
 		 *
 		 * the address and mask aren't used in requests -
 		 * they're just zero.

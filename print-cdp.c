@@ -21,7 +21,7 @@
  * Code by Gert Doering, SpaceNet GmbH, gert@space.net
  *
  * Reference documentation:
- *    http://www.cisco.com/univercd/cc/td/doc/product/lan/trsrb/frames.htm
+ *    https://web.archive.org/web/20000914194913/http://www.cisco.com/univercd/cc/td/doc/product/lan/trsrb/frames.pdf
  */
 
 /* \summary: Cisco Discovery Protocol (CDP) printer */

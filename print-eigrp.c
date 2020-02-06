@@ -19,7 +19,7 @@
 /*
  * specification:
  *
- * http://www.rhyshaden.com/eigrp.htm
+ * https://web.archive.org/web/20190722221712/https://www.rhyshaden.com/eigrp.htm
  * RFC 7868
  */
 
