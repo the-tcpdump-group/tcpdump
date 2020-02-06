@@ -465,7 +465,7 @@ extern void ap1394_if_print IF_PRINTER_ARGS;
 extern u_int arcnet_if_print IF_PRINTER_ARGS;
 extern u_int arcnet_linux_if_print IF_PRINTER_ARGS;
 extern u_int atm_if_print IF_PRINTER_ARGS;
-extern u_int bt_if_print IF_PRINTER_ARGS;
+extern void bt_if_print IF_PRINTER_ARGS;
 extern u_int brcm_tag_if_print IF_PRINTER_ARGS;
 extern u_int brcm_tag_prepend_if_print IF_PRINTER_ARGS;
 extern u_int chdlc_if_print IF_PRINTER_ARGS;
