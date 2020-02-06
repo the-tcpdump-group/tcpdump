@@ -8,7 +8,7 @@ To build tcpdump under Windows, you need:
 
   and the Npcap SDK can be downloaded from
 
-    http://www.npcap.org
+    https://nmap.org/npcap/
 - CMake, which can be downloadd from
 
     https://cmake.org
