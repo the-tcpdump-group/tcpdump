@@ -7,7 +7,7 @@ dnl
 #
 # See
 #
-#	http://ftp.gnu.org/gnu/config/README
+#	https://ftp.gnu.org/gnu/config/README
 #
 # for the URLs to use to fetch new versions of config.guess and
 # config.sub.
