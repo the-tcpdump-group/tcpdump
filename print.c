@@ -87,10 +87,6 @@ static const struct uint_printer uint_printers[] = {
 #ifdef DLT_IP_OVER_FC
 	{ ipfc_if_print,	DLT_IP_OVER_FC },
 #endif
-	{ null_if_print,	DLT_NULL },
-#ifdef DLT_LOOP
-	{ null_if_print,	DLT_LOOP },
-#endif
 #ifdef DLT_LANE8023
 	{ lane_if_print,	DLT_LANE8023 },
 #endif
@@ -235,6 +231,10 @@ static const struct void_printer void_printers[] = {
 #endif
 #ifdef DLT_BLUETOOTH_HCI_H4_WITH_PHDR
 	{ bt_if_print,		DLT_BLUETOOTH_HCI_H4_WITH_PHDR},
+#endif
+	{ null_if_print,	DLT_NULL },
+#ifdef DLT_LOOP
+	{ null_if_print,	DLT_LOOP },
 #endif
 	{ raw_if_print,		DLT_RAW },
 #ifdef DLT_IPV4
