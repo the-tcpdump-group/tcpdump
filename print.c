@@ -98,13 +98,6 @@ static const struct uint_printer uint_printers[] = {
 #ifdef DLT_ARCNET_LINUX
 	{ arcnet_linux_if_print, DLT_ARCNET_LINUX },
 #endif
-	{ raw_if_print,		DLT_RAW },
-#ifdef DLT_IPV4
-	{ raw_if_print,		DLT_IPV4 },
-#endif
-#ifdef DLT_IPV6
-	{ raw_if_print,		DLT_IPV6 },
-#endif
 #ifdef DLT_IPOIB
 	{ ipoib_if_print,       DLT_IPOIB },
 #endif
@@ -242,6 +235,13 @@ static const struct void_printer void_printers[] = {
 #endif
 #ifdef DLT_BLUETOOTH_HCI_H4_WITH_PHDR
 	{ bt_if_print,		DLT_BLUETOOTH_HCI_H4_WITH_PHDR},
+#endif
+	{ raw_if_print,		DLT_RAW },
+#ifdef DLT_IPV4
+	{ raw_if_print,		DLT_IPV4 },
+#endif
+#ifdef DLT_IPV6
+	{ raw_if_print,		DLT_IPV6 },
 #endif
 #ifdef DLT_SUNATM
 	{ sunatm_if_print,	DLT_SUNATM },

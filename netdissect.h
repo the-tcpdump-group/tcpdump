@@ -514,7 +514,7 @@ extern u_int ppp_hdlc_if_print IF_PRINTER_ARGS;
 extern u_int ppp_if_print IF_PRINTER_ARGS;
 extern u_int pppoe_if_print IF_PRINTER_ARGS;
 extern u_int prism_if_print IF_PRINTER_ARGS;
-extern u_int raw_if_print IF_PRINTER_ARGS;
+extern void raw_if_print IF_PRINTER_ARGS;
 extern u_int sl_bsdos_if_print IF_PRINTER_ARGS;
 extern u_int sl_if_print IF_PRINTER_ARGS;
 extern u_int sll_if_print IF_PRINTER_ARGS;
