@@ -127,9 +127,6 @@ static const struct uint_printer uint_printers[] = {
 	{ mfr_if_print,		DLT_MFR },
 #endif
 	{ atm_if_print,		DLT_ATM_RFC1483 },
-#ifdef DLT_ENC
-	{ enc_if_print,		DLT_ENC },
-#endif
 	{ sl_if_print,		DLT_SLIP },
 #ifdef DLT_SLIP_BSDOS
 	{ sl_bsdos_if_print,	DLT_SLIP_BSDOS },
@@ -231,6 +228,9 @@ static const struct void_printer void_printers[] = {
 #endif
 #ifdef DLT_BLUETOOTH_HCI_H4_WITH_PHDR
 	{ bt_if_print,		DLT_BLUETOOTH_HCI_H4_WITH_PHDR},
+#endif
+#ifdef DLT_ENC
+	{ enc_if_print,		DLT_ENC },
 #endif
 	{ null_if_print,	DLT_NULL },
 #ifdef DLT_LOOP

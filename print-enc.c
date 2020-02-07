@@ -94,7 +94,7 @@ struct enchdr {
 #define	SWAPLONG(y) \
 ((((y)&0xff)<<24) | (((y)&0xff00)<<8) | (((y)&0xff0000)>>8) | (((y)>>24)&0xff))
 
-u_int
+void
 enc_if_print(netdissect_options *ndo,
              const struct pcap_pkthdr *h, const u_char *p)
 {
@@ -103,11 +103,13 @@ enc_if_print(netdissect_options *ndo,
 	u_int af, flags;
 	const struct enchdr *hdr;
 
-	ndo->ndo_protocol = "enc_if";
+	ndo->ndo_protocol = "enc";
 	if (caplen < ENC_HDRLEN) {
+		ndo->ndo_ll_header_length += caplen;
 		nd_print_trunc(ndo);
-		goto out;
+		return;
 	}
+	ndo->ndo_ll_header_length += ENC_HDRLEN;
 
 	hdr = (const struct enchdr *)p;
 	/*
@@ -159,6 +161,5 @@ enc_if_print(netdissect_options *ndo,
 		break;
 	}
 
-out:
-	return (ENC_HDRLEN);
+	return;
 }

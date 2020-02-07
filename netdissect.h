@@ -472,7 +472,7 @@ extern u_int chdlc_if_print IF_PRINTER_ARGS;
 extern u_int cip_if_print IF_PRINTER_ARGS;
 extern u_int dsa_if_print IF_PRINTER_ARGS;
 extern u_int edsa_if_print IF_PRINTER_ARGS;
-extern u_int enc_if_print IF_PRINTER_ARGS;
+extern void enc_if_print IF_PRINTER_ARGS;
 extern u_int ether_if_print IF_PRINTER_ARGS;
 extern u_int fddi_if_print IF_PRINTER_ARGS;
 extern u_int fr_if_print IF_PRINTER_ARGS;
