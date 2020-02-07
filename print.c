@@ -114,9 +114,6 @@ static const struct uint_printer uint_printers[] = {
 #ifdef DLT_USB_LINUX_MMAPPED
 	{ usb_linux_64_byte_if_print, DLT_USB_LINUX_MMAPPED},
 #endif /* DLT_USB_LINUX_MMAPPED */
-#ifdef DLT_SYMANTEC_FIREWALL
-	{ symantec_if_print,	DLT_SYMANTEC_FIREWALL },
-#endif
 #ifdef DLT_C_HDLC
 	{ chdlc_if_print,	DLT_C_HDLC },
 #endif
@@ -254,6 +251,9 @@ static const struct void_printer void_printers[] = {
 #endif
 #ifdef DLT_BLUETOOTH_HCI_H4_WITH_PHDR
 	{ bt_if_print,		DLT_BLUETOOTH_HCI_H4_WITH_PHDR},
+#endif
+#ifdef DLT_SYMANTEC_FIREWALL
+	{ symantec_if_print,	DLT_SYMANTEC_FIREWALL },
 #endif
 	{ NULL,                 0 },
 };

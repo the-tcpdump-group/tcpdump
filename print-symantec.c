@@ -69,7 +69,7 @@ symantec_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
+void
 symantec_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int length = h->len;
@@ -77,12 +77,14 @@ symantec_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_
 	const struct symantec_header *sp;
 	u_short ether_type;
 
-	ndo->ndo_protocol = "symantec_if";
+	ndo->ndo_protocol = "symantec";
 	if (caplen < sizeof (struct symantec_header)) {
+		ndo->ndo_ll_header_length += caplen;
 		nd_print_trunc(ndo);
-		return caplen;
+		return;
 	}
 
+	ndo->ndo_ll_header_length += sizeof (struct symantec_header);
 	if (ndo->ndo_eflag)
 		symantec_hdr_print(ndo, p, length);
 
@@ -109,5 +111,5 @@ symantec_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_
 			ND_DEFAULTPRINT(p, caplen);
 	}
 
-	return (sizeof (struct symantec_header));
+	return;
 }
