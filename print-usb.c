@@ -247,19 +247,21 @@ usb_header_print(netdissect_options *ndo, const pcap_usb_header *uh)
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
+void
 usb_linux_48_byte_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
                            const u_char *p)
 {
-	ndo->ndo_protocol = "usb_linux_48_byte_if";
+	ndo->ndo_protocol = "usb_linux_48_byte";
 	if (h->caplen < sizeof(pcap_usb_header)) {
+		ndo->ndo_ll_header_length += h->caplen;
 		nd_print_trunc(ndo);
-		return(sizeof(pcap_usb_header));
+		return;
 	}
+	ndo->ndo_ll_header_length += sizeof (pcap_usb_header);
 
 	usb_header_print(ndo, (const pcap_usb_header *) p);
 
-	return(sizeof(pcap_usb_header));
+	return;
 }
 
 #ifdef DLT_USB_LINUX_MMAPPED
@@ -271,19 +273,21 @@ usb_linux_48_byte_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
+void
 usb_linux_64_byte_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
                            const u_char *p)
 {
-	ndo->ndo_protocol = "usb_linux_64_byte_if";
+	ndo->ndo_protocol = "usb_linux_64_byte";
 	if (h->caplen < sizeof(pcap_usb_header_mmapped)) {
+		ndo->ndo_ll_header_length += h->caplen;
 		nd_print_trunc(ndo);
-		return(sizeof(pcap_usb_header_mmapped));
+		return;
 	}
+	ndo->ndo_ll_header_length += sizeof (pcap_usb_header_mmapped);
 
 	usb_header_print(ndo, (const pcap_usb_header *) p);
 
-	return(sizeof(pcap_usb_header_mmapped));
+	return;
 }
 #endif /* DLT_USB_LINUX_MMAPPED */
 

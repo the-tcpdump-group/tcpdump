@@ -108,12 +108,6 @@ static const struct uint_printer uint_printers[] = {
 #ifdef DLT_IPOIB
 	{ ipoib_if_print,       DLT_IPOIB },
 #endif
-#ifdef DLT_USB_LINUX
-	{ usb_linux_48_byte_if_print, DLT_USB_LINUX},
-#endif /* DLT_USB_LINUX */
-#ifdef DLT_USB_LINUX_MMAPPED
-	{ usb_linux_64_byte_if_print, DLT_USB_LINUX_MMAPPED},
-#endif /* DLT_USB_LINUX_MMAPPED */
 #ifdef DLT_C_HDLC
 	{ chdlc_if_print,	DLT_C_HDLC },
 #endif
@@ -255,6 +249,12 @@ static const struct void_printer void_printers[] = {
 #ifdef DLT_SYMANTEC_FIREWALL
 	{ symantec_if_print,	DLT_SYMANTEC_FIREWALL },
 #endif
+#ifdef DLT_USB_LINUX
+	{ usb_linux_48_byte_if_print, DLT_USB_LINUX},
+#endif /* DLT_USB_LINUX */
+#ifdef DLT_USB_LINUX_MMAPPED
+	{ usb_linux_64_byte_if_print, DLT_USB_LINUX_MMAPPED},
+#endif /* DLT_USB_LINUX_MMAPPED */
 	{ NULL,                 0 },
 };
 

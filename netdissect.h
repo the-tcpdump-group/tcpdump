@@ -522,8 +522,8 @@ extern u_int sll2_if_print IF_PRINTER_ARGS;
 extern u_int sunatm_if_print IF_PRINTER_ARGS;
 extern void symantec_if_print IF_PRINTER_ARGS;
 extern u_int token_if_print IF_PRINTER_ARGS;
-extern u_int usb_linux_48_byte_if_print IF_PRINTER_ARGS;
-extern u_int usb_linux_64_byte_if_print IF_PRINTER_ARGS;
+extern void usb_linux_48_byte_if_print IF_PRINTER_ARGS;
+extern void usb_linux_64_byte_if_print IF_PRINTER_ARGS;
 extern u_int vsock_if_print IF_PRINTER_ARGS;
 
 /*
