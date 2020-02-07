@@ -59,7 +59,7 @@
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
+void
 sunatm_if_print(netdissect_options *ndo,
                 const struct pcap_pkthdr *h, const u_char *p)
 {
@@ -69,11 +69,13 @@ sunatm_if_print(netdissect_options *ndo,
 	u_char vpi;
 	u_int traftype;
 
-	ndo->ndo_protocol = "sunatm_if";
+	ndo->ndo_protocol = "sunatm";
 	if (caplen < PKT_BEGIN_POS) {
+		ndo->ndo_ll_header_length += caplen;
 		nd_print_trunc(ndo);
-		return (caplen);
+		return;
 	}
+	ndo->ndo_ll_header_length += PKT_BEGIN_POS;
 
 	if (ndo->ndo_eflag) {
 		ND_PRINT(GET_U_1(p + DIR_POS) & 0x80 ? "Tx: " : "Rx: ");
@@ -102,5 +104,5 @@ sunatm_if_print(netdissect_options *ndo,
 	length -= PKT_BEGIN_POS;
 	atm_print(ndo, vpi, vci, traftype, p, length, caplen);
 
-	return (PKT_BEGIN_POS);
+	return;
 }
