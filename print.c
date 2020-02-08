@@ -54,9 +54,6 @@ struct void_printer {
 
 static const struct uint_printer uint_printers[] = {
 	{ ether_if_print,	DLT_EN10MB },
-#ifdef DLT_IPNET
-	{ ipnet_if_print,	DLT_IPNET },
-#endif
 #ifdef DLT_IEEE802_15_4
 	{ ieee802_15_4_if_print, DLT_IEEE802_15_4 },
 #endif
@@ -231,6 +228,9 @@ static const struct void_printer void_printers[] = {
 #endif
 #ifdef DLT_ENC
 	{ enc_if_print,		DLT_ENC },
+#endif
+#ifdef DLT_IPNET
+	{ ipnet_if_print,	DLT_IPNET },
 #endif
 	{ null_if_print,	DLT_NULL },
 #ifdef DLT_LOOP

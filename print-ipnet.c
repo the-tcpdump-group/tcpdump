@@ -65,9 +65,12 @@ ipnet_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 {
 	const ipnet_hdr_t *hdr;
 
-	ndo->ndo_protocol = "ipnet";
-	if (caplen < sizeof(ipnet_hdr_t))
-		goto trunc;
+	if (caplen < sizeof(ipnet_hdr_t)) {
+		ndo->ndo_ll_header_length += caplen;
+		nd_print_trunc(ndo);
+		return;
+	}
+	ndo->ndo_ll_header_length += sizeof(ipnet_hdr_t);
 
 	if (ndo->ndo_eflag)
 		ipnet_hdr_print(ndo, p, length);
@@ -77,7 +80,6 @@ ipnet_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 	hdr = (const ipnet_hdr_t *)p;
 	p += sizeof(ipnet_hdr_t);
 
-	ND_TCHECK_1(hdr->iph_family);
 	switch (GET_U_1(hdr->iph_family)) {
 
 	case IPH_AF_INET:
@@ -98,8 +100,6 @@ ipnet_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 		break;
 	}
 	return;
-trunc:
-	nd_print_trunc(ndo);
 }
 
 /*
@@ -108,13 +108,11 @@ trunc:
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
+void
 ipnet_if_print(netdissect_options *ndo,
                const struct pcap_pkthdr *h, const u_char *p)
 {
-	ndo->ndo_protocol = "ipnet_if";
+	ndo->ndo_protocol = "ipnet";
 	ipnet_print(ndo, p, h->len, h->caplen);
-
-	return (sizeof(ipnet_hdr_t));
 }
 #endif /* DLT_IPNET */
