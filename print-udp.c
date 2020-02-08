@@ -716,6 +716,8 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			vxlan_gpe_print(ndo, (const u_char *)(up + 1), length);
 		else if (IS_SRC_OR_DST_PORT(ZEP_PORT))
 			zep_print(ndo, (const u_char *)(up + 1), length);
+		else if (IS_SRC_OR_DST_PORT(MPLS_PORT))
+			mpls_print(ndo, (const u_char *)(up + 1), length);
 		else if (ND_TTEST_1(((const struct LAP *)cp)->type) &&
 			 GET_U_1(((const struct LAP *)cp)->type) == lapDDP &&
 			 (atalk_port(sport) || atalk_port(dport))) {
