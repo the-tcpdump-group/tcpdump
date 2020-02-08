@@ -203,6 +203,9 @@ struct udphdr {
 #ifndef SFLOW_PORT
 #define SFLOW_PORT			6343	/* https://sflow.org/developers/specifications.php */
 #endif
+#ifndef MPLS_PORT
+#define MPLS_PORT			6635	/* RFC 7510 */
+#endif
 #ifndef BABEL_PORT
 #define BABEL_PORT			6696	/* RFC 6126 errata */
 #endif

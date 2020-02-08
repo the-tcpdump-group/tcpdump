@@ -76,6 +76,8 @@ lspping-fec-rsvp-v  lspping-fec-rsvp.pcap lspping-fec-rsvp-v.out -v
 lspping-fec-rsvp-vv lspping-fec-rsvp.pcap lspping-fec-rsvp-vv.out -vv
 mpls-traceroute   mpls-traceroute.pcap mpls-traceroute.out
 mpls-traceroute-v mpls-traceroute.pcap mpls-traceroute-v.out -v
+mpls-over-udp  mpls-over-udp.pcap  mpls-over-udp.out
+mpls-over-udp-v  mpls-over-udp.pcap  mpls-over-udp-v.out -v
 
 # OSPF tests
 ospf-gmpls	ospf-gmpls.pcap				ospf-gmpls.out		-v
