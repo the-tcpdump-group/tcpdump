@@ -2,7 +2,7 @@ Building tcpdump on Windows with Visual Studio
 ==============================================
 
 Unlike the UN*Xes on which libpcap can capture network traffic, Windows
-has no network traffic capture mechanism that libpcap can use. 
+has no network traffic capture mechanism that libpcap can use.
 Therefore, libpcap requires a driver, and a library to access the
 driver, provided by the Npcap or WinPcap projects.
 
@@ -116,7 +116,7 @@ Building from the Visual Studio GUI
 
 ### Visual Studio 2017 ###
 
-Open the folder containing the libpcap source with Open > Folder. 
+Open the folder containing the libpcap source with Open > Folder.
 Visual Studio will run CMake; however, you will need to indicate where
 the Npcap or WinPcap SDK is installed.
 
@@ -141,7 +141,7 @@ you can build with CMake > "Build All".
 
 ### Visual Studio 2019 ###
 
-Open the folder containing the libpcap source with Open > Folder. 
+Open the folder containing the libpcap source with Open > Folder.
 Visual Studio will run CMake; however, you will need to indicate where
 the Npcap or WinPcap SDK is installed.
 
