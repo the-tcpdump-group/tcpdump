@@ -55,7 +55,9 @@ sub runtest {
         $program = ".\\windump";
     }
 
-    #print Dumper($opt);
+    my $debug  = $opt->{'debug'};
+
+    print Dumper($opt) if $debug;
     my $testdir=$opt->{'testdir'};
     my $name = $opt->{'name'};
     my $output=$testdir ."/".$opt->{'output'};
@@ -72,7 +74,7 @@ sub runtest {
         $args = $args . " -r ".$testdir."/".$opt->{'input'};
     }
 
-    #print Dumper($args);
+    print Dumper($args) if $debug;
     my $outputbase = basename($output);
     my $coredump = false;
     my $status = 0;
@@ -89,6 +91,7 @@ sub runtest {
     else {
         # we used to do this as a nice pipeline, but the problem is that $r fails to
         # to be set properly if the tcpdump core dumps.
+        print "${program} 2>${rawstderrlog} $args >tests/NEW/${outputbase}" if $debug;
         $r = system "${program} 2>${rawstderrlog} $args >tests/NEW/${outputbase}";
         if($r == -1) {
             # failed to start due to error.
@@ -138,6 +141,7 @@ sub runtest {
 
         if ( -f "$output.stderr" ) {
             $nr = system "cat $stderrlog | diff $output.stderr - >tests/DIFF/$outputbase.stderr.diff";
+            print "\nERROR output exited with $nr\n" if $debug;
             if($r == 0) {
                 $r = $nr;
             }
@@ -152,7 +156,7 @@ sub runtest {
             }
         }
 
-        #print sprintf("END: %08x\n", $r);
+        print sprintf("END: %08x linecount: %d\n", $r, $linecount) if $debug;
     }
 
     if($r == 0) {
