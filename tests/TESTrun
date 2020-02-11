@@ -278,6 +278,10 @@ sub runOneComplexTest {
                output=>$testsdir . "/" . $output,
                args => $args};
 
+    if(defined($testconfig->{program})) {
+        $opt->{'program'} = $testconfig->{program};
+    }
+
     my $result = runtest($opt);
 
     if($result == 0) {
