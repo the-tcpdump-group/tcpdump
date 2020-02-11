@@ -63,6 +63,9 @@ sub runtest {
 
     if(defined($opt->{'program'})) {
         $program= $opt->{'program'};
+    } else {
+        # setup default arguments for tcpdump
+        $args = $args . " -# -n"
     }
 
     if(defined($opt->{'input'})) {
@@ -80,13 +83,13 @@ sub runtest {
     my $errdiffstat = 0;
 
     if ($^O eq 'MSWin32') {
-        $r = system "${program} -# -n -r $input $args 2>NUL | sed 's/\\r//' | tee tests/NEW/$outputbase | diff $output - >tests/DIFF/$outputbase.diff";
+        $r = system "${program} $args 2>NUL | sed 's/\\r//' | tee tests/NEW/$outputbase | diff $output - >tests/DIFF/$outputbase.diff";
         # need to do same as below for Cygwin.
     }
     else {
         # we used to do this as a nice pipeline, but the problem is that $r fails to
         # to be set properly if the tcpdump core dumps.
-        $r = system "${program} 2>${rawstderrlog} -# -n $args >tests/NEW/${outputbase}";
+        $r = system "${program} 2>${rawstderrlog} $args >tests/NEW/${outputbase}";
         if($r == -1) {
             # failed to start due to error.
             $status = $!;
