@@ -56,15 +56,20 @@ sub runtest {
     }
 
     #print Dumper($opt);
+    my $testdir=$opt->{'testdir'};
     my $name = $opt->{'name'};
-    my $input= $opt->{'input'};
-    my $output=$opt->{'output'};
+    my $output=$testdir ."/".$opt->{'output'};
     my $args = $opt->{'args'};
 
     if(defined($opt->{'program'})) {
         $program= $opt->{'program'};
     }
 
+    if(defined($opt->{'input'})) {
+        $args = $args . " -r ".$testdir."/".$opt->{'input'};
+    }
+
+    #print Dumper($args);
     my $outputbase = basename($output);
     my $coredump = false;
     my $status = 0;
@@ -81,7 +86,7 @@ sub runtest {
     else {
         # we used to do this as a nice pipeline, but the problem is that $r fails to
         # to be set properly if the tcpdump core dumps.
-        $r = system "${program} 2>${rawstderrlog} -# -n -r $input $args >tests/NEW/${outputbase}";
+        $r = system "${program} 2>${rawstderrlog} -# -n $args >tests/NEW/${outputbase}";
         if($r == -1) {
             # failed to start due to error.
             $status = $!;
@@ -274,8 +279,9 @@ sub runOneComplexTest {
     $args =~ s/\@TESTDIR\@/$testsdir/;
 
     my $opt = {name => $name,
-               input=> $testsdir . "/" . $input,
-               output=>$testsdir . "/" . $output,
+               testdir=>$testsdir,
+               input=> $input,
+               output=>$output,
                args => $args};
 
     if(defined($testconfig->{program})) {
