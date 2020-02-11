@@ -63,6 +63,9 @@ sub runtest {
     my $output=$testdir ."/".$opt->{'output'};
     my $args = $opt->{'args'};
 
+    # EXPAND any occurances of @TESTDIR@ to $testsdir
+    $args =~ s/\@TESTDIR\@/$testsdir/;
+
     if(defined($opt->{'program'})) {
         $program= $opt->{'program'};
     } else {
@@ -281,9 +284,6 @@ sub runOneComplexTest {
 
     #use Data::Dumper;
     #print Dumper($testconfig);
-
-    # EXPAND any occurances of @TESTDIR@ to $testsdir
-    $args =~ s/\@TESTDIR\@/$testsdir/;
 
     my $opt = {name => $name,
                testdir=>$testsdir,
