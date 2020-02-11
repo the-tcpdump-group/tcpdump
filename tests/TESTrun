@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
 
-$TCPDUMP = "./tcpdump" if (!($TCPDUMP = $ENV{TCPDUMP_BIN}));
-
 use File::Basename;
 use POSIX qw( WEXITSTATUS WIFEXITED);
 use Cwd qw(abs_path getcwd);
@@ -49,13 +47,23 @@ close(FAILUREOUTPUT);
 $confighhash = undef;
 
 sub runtest {
-    my %opt = @_;
+    my ($opt) = @_;
     my $r;
 
-    my $name = %opt{'name'};
-    my $input= %opt{'input'};
-    my $output=%opt{'output'};
-    my $args = %opt{'args'};
+    my $program = "./tcpdump" if (!($TCPDUMP = $ENV{TCPDUMP_BIN}));
+    if ($^O eq 'MSWin32') {
+        $program = ".\\windump";
+    }
+
+    #print Dumper($opt);
+    my $name = $opt->{'name'};
+    my $input= $opt->{'input'};
+    my $output=$opt->{'output'};
+    my $args = $opt->{'args'};
+
+    if(defined($opt->{'program'})) {
+        $program= $opt->{'program'};
+    }
 
     my $outputbase = basename($output);
     my $coredump = false;
@@ -67,13 +75,13 @@ sub runtest {
     my $errdiffstat = 0;
 
     if ($^O eq 'MSWin32') {
-        $r = system "..\\windump -# -n -r $input $args 2>NUL | sed 's/\\r//' | tee tests/NEW/$outputbase | diff $output - >tests/DIFF/$outputbase.diff";
+        $r = system "${program} -# -n -r $input $args 2>NUL | sed 's/\\r//' | tee tests/NEW/$outputbase | diff $output - >tests/DIFF/$outputbase.diff";
         # need to do same as below for Cygwin.
     }
     else {
         # we used to do this as a nice pipeline, but the problem is that $r fails to
         # to be set properly if the tcpdump core dumps.
-        $r = system "$TCPDUMP 2>${rawstderrlog} -# -n -r $input $args >tests/NEW/${outputbase}";
+        $r = system "${program} 2>${rawstderrlog} -# -n -r $input $args >tests/NEW/${outputbase}";
         if($r == -1) {
             # failed to start due to error.
             $status = $!;
@@ -265,10 +273,12 @@ sub runOneComplexTest {
     # EXPAND any occurances of @TESTDIR@ to $testsdir
     $args =~ s/\@TESTDIR\@/$testsdir/;
 
-    my $result = runtest(name => $name,
-                         input=> $testsdir . "/" . $input,
-                         output=>$testsdir . "/" . $output,
-                         args => $args);
+    my $opt = {name => $name,
+               input=> $testsdir . "/" . $input,
+               output=>$testsdir . "/" . $output,
+               args => $args};
+
+    my $result = runtest($opt);
 
     if($result == 0) {
         $passedcount++;
