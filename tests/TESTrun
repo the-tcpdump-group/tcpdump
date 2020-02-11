@@ -253,10 +253,6 @@ sub loadconfighash {
 sub runOneComplexTest {
     local($testconfig) = @_;
 
-    my $output = $testconfig->{output};
-    my $input  = $testconfig->{input};
-    my $name   = $testconfig->{name};
-    my $args   = $testconfig->{args};
     my $foundit = 1;
     my $unfoundit=1;
 
@@ -285,17 +281,9 @@ sub runOneComplexTest {
     #use Data::Dumper;
     #print Dumper($testconfig);
 
-    my $opt = {name => $name,
-               testdir=>$testsdir,
-               input=> $input,
-               output=>$output,
-               args => $args};
-
-    if(defined($testconfig->{program})) {
-        $opt->{'program'} = $testconfig->{program};
-    }
-
-    my $result = runtest($opt);
+    $testconfig->{testdir} = $testsdir;
+    # rest just pass right through
+    my $result = runtest($testconfig);
 
     if($result == 0) {
         $passedcount++;
