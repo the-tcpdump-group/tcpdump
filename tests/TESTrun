@@ -151,6 +151,10 @@ sub runtest {
             $errdiffstat = WEXITSTATUS($nr);
         }
 
+        if($opt->{'error_line_count_ignore'}) {
+            $linecount = 0;
+        }
+
         if($r == 0) {
             if($linecount == 0 && $status == 0) {
                 unlink($stderrlog);
