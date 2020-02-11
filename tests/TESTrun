@@ -301,7 +301,7 @@ sub runOneComplexTest {
 sub runComplexTests {
     my @files = glob( $testsdir . '/*.tests' );
     foreach $file (@files) {
-        my @testlist = undef;
+        my $testlist = undef;
         my $definitions;
         print "FILE: ${file}\n";
         open(FILE, "<".$file) || die "can not open $file: $!";
@@ -311,7 +311,7 @@ sub runComplexTests {
         }
         close(FILE);
         #print "STUFF: ${definitions}\n";
-        eval $definitions;
+        eval $definitions || die "Failed to process from $file";
         if(defined($testlist)) {
             #use Data::Dumper;
             #print Dumper($testlist);
