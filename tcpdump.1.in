@@ -274,7 +274,7 @@ which
 .I tcpdump
 can capture packets.  For each network interface, a number and an
 interface name, possibly followed by a text description of the
-interface, is printed.  The interface name or the number can be supplied
+interface, are printed.  The interface name or the number can be supplied
 to the
 .B \-i
 flag to specify an interface on which to capture.
