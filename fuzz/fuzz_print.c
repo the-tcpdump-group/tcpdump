@@ -67,7 +67,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     printer = lookup_printer(&Ndo, Data[0]);
     if (printer.printer == NULL) {
         //do not go further if we have no printer
-        pcap_close(pkts);
         return 0;
     }
     Ndo.ndo_if_printer = get_if_printer(&Ndo, Data[0]);
