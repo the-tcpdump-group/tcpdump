@@ -94,7 +94,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         fprintf(outfile, "Couldn't open pcap file %s\n", errbuf);
         return 0;
     }
-    if (lookup_printer(pcap_datalink(pkts)) == NULL) {
+    if_printer_t printer;
+    printer = lookup_printer(&Ndo, pcap_datalink(pkts));
+    if (printer.printer == NULL) {
         //do not go further if we have no printer
         pcap_close(pkts);
         return 0;
