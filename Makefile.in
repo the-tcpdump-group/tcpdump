@@ -241,6 +241,7 @@ LIBNETDISSECT_SRC=\
 	print-zep.c \
 	print-zephyr.c \
 	print-zeromq.c \
+	print-someip.c \
 	signature.c \
 	strtoaddr.c \
 	util-print.c

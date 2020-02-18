@@ -242,3 +242,6 @@ struct udphdr {
 #ifndef ZEP_PORT
 #define ZEP_PORT			17754	/* XXX */
 #endif
+#ifndef SOMEIP_PORT
+#define SOMEIP_PORT			30490	/* https://www.autosar.org/standards/foundation */
+#endif

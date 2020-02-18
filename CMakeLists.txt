@@ -1086,6 +1086,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-zep.c
     print-zephyr.c
     print-zeromq.c
+    print-someip.c
     ${LOCALSRC}
     signature.c
     strtoaddr.c

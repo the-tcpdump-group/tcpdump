@@ -721,6 +721,10 @@ SOURCE="..\..\print-zephyr.c"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\print-someip.c"
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\setsignal.c
 # End Source File
 # Begin Source File

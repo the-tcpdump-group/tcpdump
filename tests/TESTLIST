@@ -758,3 +758,7 @@ ptp         ptp.pcap    ptp.out
 
 # bad packets from Jason Xiaole
 ldp_tlv_print-oobr ldp_tlv_print-oobr.pcap ldp_tlv_print-oobr.out -v
+
+#someip tests
+someip1		someip1.pcap	someip1.out
+someip2		someip2.pcap	someip2.out
