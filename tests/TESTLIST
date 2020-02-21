@@ -757,6 +757,7 @@ smb_data_print-oobr smb_data_print-oobr.pcapng smb_data_print-oobr.out -vv
 smb_data_print-segv smb_data_print-segv.pcapng smb_data_print-segv.out -vv
 #ptp tests
 ptp         ptp.pcap    ptp.out
+ptp_ethernet	ptp_ethernet.pcap	ptp_ethernet.out	-e
 
 # bad packets from Jason Xiaole
 ldp_tlv_print-oobr ldp_tlv_print-oobr.pcap ldp_tlv_print-oobr.out -v

@@ -179,6 +179,9 @@
 #ifndef ETHERTYPE_AOE
 #define ETHERTYPE_AOE  		0x88a2
 #endif
+#ifndef ETHERTYPE_PTP
+#define ETHERTYPE_PTP  		0x88f7
+#endif
 #ifndef	ETHERTYPE_LOOPBACK
 #define	ETHERTYPE_LOOPBACK	0x9000
 #endif
