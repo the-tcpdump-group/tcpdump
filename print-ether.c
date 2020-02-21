@@ -100,6 +100,7 @@ const struct tok ethertype_values[] = {
     { ETHERTYPE_GEONET,         "GeoNet"},
     { ETHERTYPE_CALM_FAST,      "CALM FAST"},
     { ETHERTYPE_AOE,            "AoE" },
+    { ETHERTYPE_PTP,            "PTP" },
     { ETHERTYPE_ARISTA,         "Arista Vendor Specific Protocol" },
     { 0, NULL}
 };
@@ -598,6 +599,10 @@ ethertype_print(netdissect_options *ndo,
 
 	case ETHERTYPE_AOE:
 		aoe_print(ndo, p, length);
+		return (1);
+
+	case ETHERTYPE_PTP:
+		ptp_print(ndo, p, length);
 		return (1);
 
 	case ETHERTYPE_LAT:
