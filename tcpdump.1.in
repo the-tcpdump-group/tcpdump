@@ -804,7 +804,7 @@ See
 .BR pcap-savefile (@MAN_FILE_FORMATS@)
 for a description of the file format.
 .TP
-.B \-W
+.BI \-W " filecount"
 Used in conjunction with the
 .B \-C
 option, this will limit the number
