@@ -106,7 +106,7 @@ static const struct tok isis_pdu_values[] = {
 #define ISIS_TLV_PART_DIS            4   /* iso10589 */
 #define ISIS_TLV_PREFIX_NEIGH        5   /* iso10589 */
 #define ISIS_TLV_ISNEIGH             6   /* iso10589 */
-#define ISIS_TLV_ISNEIGH_VARLEN      7   /* iso10589 */
+#define ISIS_TLV_INSTANCE_ID         7   /* rfc8202 */
 #define ISIS_TLV_PADDING             8   /* iso10589 */
 #define ISIS_TLV_LSP                 9   /* iso10589 */
 #define ISIS_TLV_AUTH                10  /* iso10589, rfc3567 */
@@ -154,7 +154,7 @@ static const struct tok isis_tlv_values[] = {
     { ISIS_TLV_PART_DIS,           "Partition DIS"},
     { ISIS_TLV_PREFIX_NEIGH,       "Prefix Neighbors"},
     { ISIS_TLV_ISNEIGH,            "IS Neighbor(s)"},
-    { ISIS_TLV_ISNEIGH_VARLEN,     "IS Neighbor(s) (variable length)"},
+    { ISIS_TLV_INSTANCE_ID,        "Instance Identifier"},
     { ISIS_TLV_PADDING,            "Padding"},
     { ISIS_TLV_LSP,                "LSP entries"},
     { ISIS_TLV_AUTH,               "Authentication"},
@@ -2311,14 +2311,14 @@ isis_print(netdissect_options *ndo,
     const struct isis_tlv_es_reach *tlv_es_reach;
 
     uint8_t version, pdu_version, fixed_len;
-    uint8_t pdu_type, pdu_max_area, max_area, pdu_id_length, id_length, tlv_type, tlv_len, tlen, alen, lan_alen, prefix_len;
+    uint8_t pdu_type, pdu_max_area, max_area, pdu_id_length, id_length, tlv_type, tlv_len, tlen, alen, prefix_len;
     u_int ext_is_len, ext_ip_len;
     uint8_t mt_len;
     uint8_t isis_subtlv_idrp;
     const uint8_t *optr, *pptr, *tptr;
     u_int packet_len;
     u_short pdu_len, key_id;
-    u_int i,vendor_id;
+    u_int i,vendor_id, num_vals;
     uint8_t auth_type;
     uint8_t num_system_ids;
     int sigcheck;
@@ -2727,26 +2727,22 @@ isis_print(netdissect_options *ndo,
 	    }
 	    break;
 
-        case ISIS_TLV_ISNEIGH_VARLEN:
-            if (tlen < 1)
-		goto tlv_trunc;
-            ND_TCHECK_1(tptr);
-	    lan_alen = GET_U_1(tptr); /* LAN address length */
-	    tptr++;
-	    tlen--;
-	    if (lan_alen == 0) {
-                ND_PRINT("\n\t      LAN address length 0 bytes");
-                nd_print_invalid(ndo);
-                break;
-            }
-            ND_PRINT("\n\t      LAN address length %u bytes ", lan_alen);
-	    while (tlen != 0) {
-                if (tlen < lan_alen)
-                    goto tlv_trunc;
-                ND_TCHECK_LEN(tptr, lan_alen);
-                ND_PRINT("\n\t\tIS Neighbor: %s", isis_print_id(ndo, tptr, lan_alen));
-                tlen -= lan_alen;
-                tptr +=lan_alen;
+        case ISIS_TLV_INSTANCE_ID:
+            if (tlen < 4)
+                goto tlv_trunc;
+            num_vals = (tlen-2)/2;
+            ND_PRINT("\n\t      Instance ID: %u, ITIDs(%u)%s ",
+                     GET_BE_U_2(tptr), num_vals,
+                     num_vals ? ":" : "");
+            tptr += 2;
+            tlen -= 2;
+            for (i=0; i < num_vals; i++) {
+                ND_PRINT("%u", GET_BE_U_2(tptr));
+                if (i < (num_vals - 1)) {
+                   ND_PRINT(", ");
+                }
+                tptr += 2;
+                tlen -= 2;
             }
             break;
 
