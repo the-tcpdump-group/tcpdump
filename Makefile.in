@@ -271,6 +271,7 @@ HDR = \
 	cpack.h \
 	ethertype.h \
 	extract.h \
+	fptype.h \
 	funcattrs.h \
 	getservent.h \
 	gmpls.h \
