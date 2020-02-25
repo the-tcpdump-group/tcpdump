@@ -221,6 +221,8 @@ msnlb2		msnlb2.pcapng		msnlb2.out
 # MPTCP tests
 mptcp		mptcp.pcap		mptcp.out
 mptcp-fclose	mptcp-fclose.pcap	mptcp-fclose.out
+mptcp-v1        mptcp-v1.pcap           mptcp-v1.out
+
 # TFO tests
 tfo		tfo-5c1fa7f9ae91.pcap	tfo.out
 # SCPS
