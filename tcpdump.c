@@ -220,6 +220,7 @@ static int timeout = 1000;		/* default timeout = 1000 ms = 1 s */
 #ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
 static int immediate_mode;
 #endif
+static int count_mode;
 
 static int infodelay;
 static int infoprint;
@@ -690,6 +691,7 @@ show_remote_devices_and_exit(void)
 #define OPTION_TSTAMP_MICRO		133
 #define OPTION_TSTAMP_NANO		134
 #define OPTION_FP_TYPE			135
+#define OPTION_COUNT			136
 
 static const struct option longopts[] = {
 #if defined(HAVE_PCAP_CREATE) || defined(_WIN32)
@@ -733,6 +735,7 @@ static const struct option longopts[] = {
 	{ "debug-filter-parser", no_argument, NULL, 'Y' },
 #endif
 	{ "relinquish-privileges", required_argument, NULL, 'Z' },
+	{ "count", no_argument, NULL, OPTION_COUNT },
 	{ "fp-type", no_argument, NULL, OPTION_FP_TYPE },
 	{ "number", no_argument, NULL, '#' },
 	{ "print", no_argument, NULL, OPTION_PRINT },
@@ -1908,6 +1911,10 @@ main(int argc, char **argv)
 			float_type_check(0x4e93312d);
 			return 0;
 
+		case OPTION_COUNT:
+			count_mode = 1;
+			break;
+
 		default:
 			print_usage();
 			exit_tcpdump(S_ERR_HOST_PROGRAM);
@@ -2595,6 +2602,10 @@ DIAG_ON_CLANG(assign-enum)
 	}
 	while (ret != NULL);
 
+	if (count_mode && RFileName != NULL)
+		fprintf(stderr, "%u packet%s\n", packets_captured,
+			PLURAL_SUFFIX(packets_captured));
+
 	free(cmdbuf);
 	pcap_freecode(&fcode);
 	exit_tcpdump(status == -1 ? 1 : 0);
@@ -3027,7 +3038,8 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 
 	++infodelay;
 
-	pretty_print_packet((netdissect_options *)user, h, sp, packets_captured);
+	if (!count_mode)
+		pretty_print_packet((netdissect_options *)user, h, sp, packets_captured);
 
 	--infodelay;
 	if (infoprint)
@@ -3125,7 +3137,7 @@ print_usage(void)
 {
 	print_version();
 	(void)fprintf(stderr,
-"Usage: %s [-aAbd" D_FLAG "efhH" I_FLAG J_FLAG "KlLnNOpqStu" U_FLAG "vxX#]" B_FLAG_USAGE " [ -c count ]\n", program_name);
+"Usage: %s [-aAbd" D_FLAG "efhH" I_FLAG J_FLAG "KlLnNOpqStu" U_FLAG "vxX#]" B_FLAG_USAGE " [ -c count ] [--count]\n", program_name);
 	(void)fprintf(stderr,
 "\t\t[ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]\n");
 	(void)fprintf(stderr,

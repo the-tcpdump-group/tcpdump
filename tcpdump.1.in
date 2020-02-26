@@ -39,6 +39,9 @@ tcpdump \- dump traffic on a network
 .I count
 ]
 [
+.B \-\-count
+]
+[
 .B \-C
 .I file_size
 ]
@@ -241,6 +244,12 @@ units of KiB (1024 bytes).
 .TP
 .BI \-c " count"
 Exit after receiving \fIcount\fP packets.
+.TP
+.BI \-\-count
+Print only on stderr the packet count when reading capture file(s) instead
+of parsing/printing the packets. If a filter is specified on the command
+line, \fItcpdump\fP counts only packets that were matched by the filter
+expression.
 .TP
 .BI \-C " file_size"
 Before writing a raw packet to a savefile, check whether the file is
