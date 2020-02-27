@@ -116,21 +116,29 @@ struct mp_dss {
 struct mp_add_addr {
         nd_uint8_t     kind;
         nd_uint8_t     len;
-        nd_uint8_t     sub_ipver;
+        nd_uint8_t     sub_echo;
         nd_uint8_t     addr_id;
         union {
                 struct {
                         nd_ipv4         addr;
                         nd_uint16_t     port;
+                        nd_uint64_t     mac;
                 } v4;
+                struct {
+                        nd_ipv4         addr;
+                        nd_uint64_t     mac;
+                } v4np;
                 struct {
                         nd_ipv6         addr;
                         nd_uint16_t     port;
+                        nd_uint64_t     mac;
                 } v6;
+                struct {
+                        nd_ipv6         addr;
+                        nd_uint64_t     mac;
+                } v6np;
         } u;
 };
-
-#define MP_ADD_ADDR_IPVER(sub_ipver)    ((GET_U_1(sub_ipver) >> 0) & 0xF)
 
 struct mp_remove_addr {
         nd_uint8_t     kind;
@@ -341,26 +349,30 @@ add_addr_print(netdissect_options *ndo,
                const u_char *opt, u_int opt_len, u_char flags _U_)
 {
         const struct mp_add_addr *add_addr = (const struct mp_add_addr *) opt;
-        u_int ipver = MP_ADD_ADDR_IPVER(add_addr->sub_ipver);
 
-        if (!((opt_len == 8 || opt_len == 10) && ipver == 4) &&
-            !((opt_len == 20 || opt_len == 22) && ipver == 6))
+        if (!(opt_len == 8 || opt_len == 10 || opt_len == 16 || opt_len == 18 ||
+            opt_len == 20 || opt_len == 22 || opt_len == 28 || opt_len == 30))
                 return 0;
 
         ND_PRINT(" id %u", GET_U_1(add_addr->addr_id));
-        switch (ipver) {
-        case 4:
+        if (opt_len == 8 || opt_len == 10 || opt_len == 16 || opt_len == 18) {
                 ND_PRINT(" %s", GET_IPADDR_STRING(add_addr->u.v4.addr));
-                if (opt_len == 10)
+                if (opt_len == 10 || opt_len == 18)
                         ND_PRINT(":%u", GET_BE_U_2(add_addr->u.v4.port));
-                break;
-        case 6:
+                if (opt_len == 16)
+                        ND_PRINT(" hmac 0x%" PRIx64, GET_BE_U_8(add_addr->u.v4np.mac));
+                if (opt_len == 18)
+                        ND_PRINT(" hmac 0x%" PRIx64, GET_BE_U_8(add_addr->u.v4.mac));
+        }
+
+        if (opt_len == 20 || opt_len == 22 || opt_len == 28 || opt_len == 30) {
                 ND_PRINT(" %s", GET_IP6ADDR_STRING(add_addr->u.v6.addr));
-                if (opt_len == 22)
+                if (opt_len == 22 || opt_len == 30)
                         ND_PRINT(":%u", GET_BE_U_2(add_addr->u.v6.port));
-                break;
-        default:
-                return 0;
+                if (opt_len == 28)
+                        ND_PRINT(" hmac 0x%" PRIx64, GET_BE_U_8(add_addr->u.v6np.mac));
+                if (opt_len == 30)
+                        ND_PRINT(" hmac 0x%" PRIx64, GET_BE_U_8(add_addr->u.v6.mac));
         }
 
         return 1;
