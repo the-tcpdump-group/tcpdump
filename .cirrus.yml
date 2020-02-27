@@ -2,6 +2,7 @@
 env:
   CIRRUS_CLONE_DEPTH: 3
   MAXJOBS: 2
+  IGNORE_OSVERSION: yes
 
 task:
   freebsd_instance:
