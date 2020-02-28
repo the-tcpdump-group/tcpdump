@@ -106,7 +106,7 @@
  *    |                         Nano Seconds                          |
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
- *  Delay Resp Message (msg type = 0x9)
+ *  Delay Resp Message (msg type=0x9)
  *     0                   1                   2                   3
  *     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  *                                    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -165,7 +165,7 @@
  *                                    | Requesting Port Identity      |
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
- *  Management Message (msg_type=0xD)
+ *  Management Message (msg type=0xD)
  *     0                   1                   2                   3
  *     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  *                                    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -261,7 +261,7 @@ static const struct tok ptp_flag_values[] = {
 
 const char *p_porigin_ts = "preciseOriginTimeStamp";
 const char *p_origin_ts = "originTimeStamp";
-const char *p_recv_ts = "recieveTimeStamp";
+const char *p_recv_ts = "receiveTimeStamp";
 
 #define PTP_VER_1 0x1
 #define PTP_VER_2 0x2
@@ -374,7 +374,7 @@ static void ptp_print_2(netdissect_options *ndo, const u_char *bp, u_int length)
     len -= 4; bp += 4; sns_corr = GET_BE_U_4(bp); ND_PRINT(", sub NS correction : %u", sns_corr);
 
     /* Reserved 2 */
-    len -= 4; bp += 4; rsvd2 = GET_BE_U_4(bp); ND_PRINT(", sub NS correction : 0x%x", rsvd2);
+    len -= 4; bp += 4; rsvd2 = GET_BE_U_4(bp); ND_PRINT(", reserved2 : %u", rsvd2);
 
     /* clock identity */
     len -= 4; bp += 4; clk_id = GET_BE_U_8(bp); ND_PRINT(", clock identity : 0x%"PRIx64, clk_id);
@@ -465,7 +465,7 @@ ptp_print_timestamp(netdissect_options *ndo, const u_char *bp, u_int *len, const
     uint64_t secs;
     uint32_t nsecs;
 
-    ND_PRINT(" %s :", stype);
+    ND_PRINT(", %s :", stype);
     /* sec time stamp 6 bytes */
     secs = GET_BE_U_2(bp) + GET_BE_U_4(bp+2);
     ND_PRINT(" %"PRIu64" seconds,", secs);
@@ -487,7 +487,7 @@ ptp_print_timestamp_identity(netdissect_options *ndo,
     uint16_t port_id;
     uint64_t port_identity;
 
-    ND_PRINT(" %s :", ttype);
+    ND_PRINT(", %s :", ttype);
     /* sec time stamp 6 bytes */
     secs = GET_BE_U_2(bp) + GET_BE_U_4(bp+2);
     ND_PRINT(" %"PRIu64" seconds,", secs);
@@ -521,7 +521,7 @@ ptp_print_announce_msg(netdissect_options *ndo, const u_char *bp, u_int *len)
     uint64_t secs;
     uint32_t nsecs;
 
-    ND_PRINT(" %s :", p_origin_ts);
+    ND_PRINT(", %s :", p_origin_ts);
     /* sec time stamp 6 bytes */
     secs = GET_BE_U_2(bp) + GET_BE_U_4(bp+2);
     ND_PRINT(" %"PRIu64" seconds", secs);
