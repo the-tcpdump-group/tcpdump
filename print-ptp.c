@@ -343,8 +343,8 @@ ptp_print_1(netdissect_options *ndo)
 static void ptp_print_2(netdissect_options *ndo, const u_char *bp, u_int length)
 {
     u_int len = length;
-    uint16_t msg_len, flags, seq_id;
-    uint8_t foct, domain_no, msg_type, v1_compat, rsvd1, port_id, lm_int, control;
+    uint16_t msg_len, flags, port_id, seq_id;
+    uint8_t foct, domain_no, msg_type, v1_compat, rsvd1, lm_int, control;
     uint32_t ns_corr, sns_corr, rsvd2;
     uint64_t clk_id;
 
