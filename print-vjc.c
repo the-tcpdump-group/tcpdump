@@ -77,7 +77,7 @@
  * unused argument remind us that we should fix this some day.
  *
  * XXX - also, it fetches the TCP checksum field in COMPRESSED_TCP
- * packets directly, rather than with EXTRACT_BE_U_2(); RFC 1144 says
+ * packets with GET_HE_U_2, rather than with GET_BE_U_2(); RFC 1144 says
  * it's "the unmodified TCP checksum", which would imply that it's
  * big-endian, but perhaps, on the platform where this was developed,
  * the packets were munged by the networking stack before being handed
@@ -112,7 +112,7 @@ vjc_print(netdissect_options *ndo, const u_char *bp, u_short proto _U_)
 		ND_TCHECK_1(bp + 2);
 		ND_PRINT("C=0x%02x ", GET_U_1(bp + 2));
 		ND_TCHECK_2(bp + 3);
-		ND_PRINT("sum=0x%04x ", *(const u_short *)(bp + 3));
+		ND_PRINT("sum=0x%04x ", GET_HE_U_2(bp + 3));
 		return -1;
 	case TYPE_ERROR:
 		if (ndo->ndo_eflag)
