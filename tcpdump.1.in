@@ -20,7 +20,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "26 Feb 2020"
+.TH TCPDUMP 1  "28 Feb 2020"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -135,6 +135,13 @@ tcpdump \- dump traffic on a network
 .ti +8
 [
 .BI \-\-time\-stamp\-precision= tstamp_precision
+]
+.ti +8
+[
+.BI \-\-micro
+]
+[
+.BI \-\-nano
 ]
 .ti +8
 [
