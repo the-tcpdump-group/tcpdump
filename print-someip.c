@@ -13,6 +13,8 @@
  * Original code by Francesco Fondelli (francesco dot fondelli, gmail dot com)
  */
 
+/* \summary: Autosar SOME/IP Protocol printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
