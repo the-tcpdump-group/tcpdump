@@ -128,21 +128,12 @@ nflog_hdr_print(netdissect_options *ndo, const nflog_hdr_t *hdr, u_int length)
 	ND_PRINT(", length %u: ", length);
 }
 
-static char *hook_names[] = { "PRE","IN","FWD","OUT","POST" };
-
-static const char *hook2txt(int hook) {
-  if(hook >= sizeof(hook_names)/sizeof(hook_names[0])) return "UNK";
-  return hook_names[hook];
-}
-
 u_int
 nflog_if_print(netdissect_options *ndo,
 			   const struct pcap_pkthdr *h, const u_char *p)
 {
 	const nflog_hdr_t *hdr = (const nflog_hdr_t *)p;
 	uint16_t size;
-	uint16_t hw_hdrlen = 0;
-	uint16_t hw_addrlen = 0;
 	uint16_t h_size = sizeof(nflog_hdr_t);
 	u_int caplen = h->caplen;
 	u_int length = h->len;
@@ -196,82 +187,6 @@ nflog_if_print(netdissect_options *ndo,
 			length -= sizeof(nflog_tlv_t);
 			caplen -= sizeof(nflog_tlv_t);
 			break;
-		}
-		{
-		  const u_char *adata = p+sizeof(nflog_tlv_t);
-		  switch(tlv->tlv_type) {
-			case NFULA_TIMESTAMP:
-			case NFULA_HWTYPE:
-				break;
-			case NFULA_PACKET_HDR:
-				if(ndo->ndo_vflag)
-				    ND_PRINT((ndo, "HOOK:%s ",
-					hook2txt(((nflog_packet_hdr_t *)adata)->hook)));
-				break;
-			case NFULA_MARK:
-				ND_PRINT((ndo, "MARK:0x%x ",
-					htonl(*(u_int32_t *)adata)));
-				break;
-			case NFULA_UID:
-				if(ndo->ndo_vflag)
-				    ND_PRINT((ndo, "UID:%u ",
-					htonl(*(u_int32_t *)adata)));
-				break;
-			case NFULA_GID:
-				if(ndo->ndo_vflag)
-				    ND_PRINT((ndo, "GID:%u ",
-					htonl(*(u_int32_t *)adata)));
-				break;
-			case NFULA_PREFIX:
-				if(p[sizeof(nflog_tlv_t)])
-				    ND_PRINT((ndo, "Prefix:%.*s ",
-					size-sizeof(nflog_tlv_t), adata));
-				break;
-			case NFULA_IFINDEX_INDEV:
-				if(ndo->ndo_vflag > 1)
-				    ND_PRINT((ndo, "iif:%u ",
-					htonl(*(u_int32_t *)adata)));
-				break;
-			case NFULA_IFINDEX_OUTDEV:
-				if(ndo->ndo_vflag > 1)
-				    ND_PRINT((ndo, "oif:%u ",
-					htonl(*(u_int32_t *)adata)));
-				break;
-			case NFULA_IFINDEX_PHYSINDEV:
-				if(ndo->ndo_vflag > 1)
-				    ND_PRINT((ndo, "phyiif:%u ",
-					htonl(*(u_int32_t *)adata)));
-				break;
-			case NFULA_IFINDEX_PHYSOUTDEV:
-				if(ndo->ndo_vflag > 1)
-				    ND_PRINT((ndo, "phyoif:%u ",
-					htonl(*(u_int32_t *)adata)));
-				break;
-			case NFULA_HWADDR:
-				hw_addrlen = htons(((nflog_hwaddr_t *)adata)->hw_addrlen);
-				break;
-			case NFULA_HWLEN:
-				hw_hdrlen = htons((*(u_int16_t *)adata));
-				break;
-			case NFULA_HWHEADER:
-				if (!hw_hdrlen || ndo->ndo_vflag < 2) break;
-				{
-				  char attr_buf[128];
-				  int n,l;
-				  memset(attr_buf,0,sizeof(attr_buf));
-				  for(n=0,l=0; n < hw_hdrlen && l < sizeof(attr_buf)-3; n++) {
-					if(hw_addrlen && 
-					   (n == hw_addrlen || n == hw_addrlen*2))
-						attr_buf[l++] = ':';
-					l += snprintf(&attr_buf[l],3,"%02x",adata[n]);
-				  }
-				  ND_PRINT((ndo, "HWHDR=%s ",attr_buf));
-				}
-				break;
-			default:
-				if (ndo->ndo_vflag < 3) break;
-				ND_PRINT((ndo, "ATTR%d/%d ",tlv->tlv_type,size));
-		  }
 		}
 
 		p += size;
