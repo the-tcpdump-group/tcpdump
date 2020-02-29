@@ -1,0 +1,8 @@
+HOOK:OUT Prefix:out-icmp oif:10 MARK:0x2 UID:0 GID:100 IP (tos 0x0, ttl 64, id 24087, offset 0, flags [DF], proto ICMP (1), length 84)
+    10.52.210.96 > 10.52.210.1: ICMP echo request, id 2995, seq 1, length 64
+HOOK:IN Prefix:in-icmp iif:10 MARK:0x1 HWHDR=e89a8fa8a7bc:6805ca0251b2:0800 IP (tos 0x0, ttl 64, id 39507, offset 0, flags [none], proto ICMP (1), length 84)
+    10.52.210.1 > 10.52.210.96: ICMP echo reply, id 2995, seq 1, length 64
+HOOK:OUT Prefix:out-dns oif:6 MARK:0x4 UID:1000 GID:100 IP (tos 0x0, ttl 64, id 9134, offset 0, flags [none], proto UDP (17), length 51)
+    10.0.0.64.49997 > 10.0.0.1.53: [udp sum ok] 2830+ A? ya.ru. (23)
+HOOK:IN Prefix:in-dns iif:6 MARK:0x3 HWHDR=e89a8fa8a7bc:6805ca0251b3:0800 IP (tos 0x0, ttl 64, id 8040, offset 0, flags [none], proto UDP (17), length 250)
+    10.0.0.1.53 > 10.0.0.64.49997: [udp sum ok] 2830 q: A? ya.ru. 3/2/4 YA.ru. [1m54s] A 93.158.134.3, YA.ru. [1m54s] A 213.180.204.3, YA.ru. [1m54s] A 213.180.193.3 ns: YA.ru. [1h4m20s] NS ns1.yandex.RU., YA.ru. [1h4m20s] NS ns2.yandex.RU. ar: ns1.YANDEX.ru. [15h47m28s] A 213.180.193.1, ns2.YANDEX.ru. [4h34m25s] A 93.158.134.1, ns1.YANDEX.ru. [1d23h35m14s] AAAA 2a02:6b8::1, ns2.YANDEX.ru. [1d23h35m14s] AAAA 2a02:6b8:0:1::1 (222)
