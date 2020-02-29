@@ -221,7 +221,8 @@ struct netdissect_options {
   const char *ndo_protocol;	/* protocol */
   jmp_buf ndo_truncated;	/* jmp_buf for setjmp()/longjmp() */
   void *ndo_last_mem_p;		/* pointer to the last allocated memory chunk */
-  int ndo_packet_number;	/* print a packet number in the beginning of line */
+  int ndo_packet_number;	/* flag: print a packet number in the beginning of line */
+  int ndo_packets_captured;     /* current count of captured packets */
   int ndo_suppress_default_print; /* don't use default_print() for unknown packet types */
   int ndo_tstamp_precision;	/* requested time stamp precision */
   const char *program_name;	/* Name of the program using the library */

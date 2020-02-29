@@ -397,14 +397,15 @@ get_if_printer(netdissect_options *ndo, int type)
 }
 
 void
-pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
-		    const u_char *sp, u_int packets_captured)
+pretty_print_packet(netdissect_options *ndo,
+                    const struct pcap_pkthdr *h,
+                    const u_char       *sp)
 {
 	u_int hdrlen;
 	int invalid_header = 0;
 
 	if (ndo->ndo_packet_number)
-		ND_PRINT("%5u  ", packets_captured);
+		ND_PRINT("%5u  ", ndo->ndo_packets_captured);
 
 	/* Sanity checks on packet length / capture length */
 	if (h->caplen == 0) {
