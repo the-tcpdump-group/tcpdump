@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
 
-$TCPDUMP = "./tcpdump" if (!($TCPDUMP = $ENV{TCPDUMP_BIN}));
-
 use File::Basename;
 use POSIX qw( WEXITSTATUS WIFEXITED);
 use Cwd qw(abs_path getcwd);
@@ -49,10 +47,38 @@ close(FAILUREOUTPUT);
 $confighhash = undef;
 
 sub runtest {
-    local($name, $input, $output, $options) = @_;
+    my ($opt) = @_;
     my $r;
 
-    $outputbase = basename($output);
+    my $program = "./tcpdump" if (!($TCPDUMP = $ENV{TCPDUMP_BIN}));
+    if ($^O eq 'MSWin32') {
+        $program = ".\\windump";
+    }
+
+    my $debug  = $opt->{'debug'};
+
+    print Dumper($opt) if $debug;
+    my $testdir=$opt->{'testdir'};
+    my $name = $opt->{'name'};
+    my $output=$testdir ."/".$opt->{'output'};
+    my $args = $opt->{'args'};
+
+    # EXPAND any occurances of @TESTDIR@ to $testsdir
+    $args =~ s/\@TESTDIR\@/$testsdir/;
+
+    if(defined($opt->{'program'})) {
+        $program= $opt->{'program'};
+    } else {
+        # setup default arguments for tcpdump
+        $args = $args . " -# -n"
+    }
+
+    if(defined($opt->{'input'})) {
+        $args = $args . " -r ".$testdir."/".$opt->{'input'};
+    }
+
+    print Dumper($args) if $debug;
+    my $outputbase = basename($output);
     my $coredump = false;
     my $status = 0;
     my $linecount = 0;
@@ -62,13 +88,14 @@ sub runtest {
     my $errdiffstat = 0;
 
     if ($^O eq 'MSWin32') {
-        $r = system "..\\windump -# -n -r $input $options 2>NUL | sed 's/\\r//' | tee tests/NEW/$outputbase | diff $output - >tests/DIFF/$outputbase.diff";
+        $r = system "${program} $args 2>NUL | sed 's/\\r//' | tee tests/NEW/$outputbase | diff $output - >tests/DIFF/$outputbase.diff";
         # need to do same as below for Cygwin.
     }
     else {
         # we used to do this as a nice pipeline, but the problem is that $r fails to
         # to be set properly if the tcpdump core dumps.
-        $r = system "$TCPDUMP 2>${rawstderrlog} -# -n -r $input $options >tests/NEW/${outputbase}";
+        print "${program} 2>${rawstderrlog} $args >tests/NEW/${outputbase}" if $debug;
+        $r = system "${program} 2>${rawstderrlog} $args >tests/NEW/${outputbase}";
         if($r == -1) {
             # failed to start due to error.
             $status = $!;
@@ -117,10 +144,15 @@ sub runtest {
 
         if ( -f "$output.stderr" ) {
             $nr = system "cat $stderrlog | diff $output.stderr - >tests/DIFF/$outputbase.stderr.diff";
+            print "\nERROR output exited with $nr\n" if $debug;
             if($r == 0) {
                 $r = $nr;
             }
             $errdiffstat = WEXITSTATUS($nr);
+        }
+
+        if($opt->{'error_line_count_ignore'}) {
+            $linecount = 0;
         }
 
         if($r == 0) {
@@ -131,7 +163,7 @@ sub runtest {
             }
         }
 
-        #print sprintf("END: %08x\n", $r);
+        print sprintf("END: %08x linecount: %d\n", $r, $linecount) if $debug;
     }
 
     if($r == 0) {
@@ -225,10 +257,6 @@ sub loadconfighash {
 sub runOneComplexTest {
     local($testconfig) = @_;
 
-    my $output = $testconfig->{output};
-    my $input  = $testconfig->{input};
-    my $name   = $testconfig->{name};
-    my $options= $testconfig->{args};
     my $foundit = 1;
     my $unfoundit=1;
 
@@ -257,13 +285,9 @@ sub runOneComplexTest {
     #use Data::Dumper;
     #print Dumper($testconfig);
 
-    # EXPAND any occurances of @TESTDIR@ to $testsdir
-    $options =~ s/\@TESTDIR\@/$testsdir/;
-
-    my $result = runtest($name,
-                         $testsdir . "/" . $input,
-                         $testsdir . "/" . $output,
-                         $options);
+    $testconfig->{testdir} = $testsdir;
+    # rest just pass right through
+    my $result = runtest($testconfig);
 
     if($result == 0) {
         $passedcount++;
@@ -277,7 +301,7 @@ sub runOneComplexTest {
 sub runComplexTests {
     my @files = glob( $testsdir . '/*.tests' );
     foreach $file (@files) {
-        my @testlist = undef;
+        my $testlist = undef;
         my $definitions;
         print "FILE: ${file}\n";
         open(FILE, "<".$file) || die "can not open $file: $!";
@@ -287,7 +311,7 @@ sub runComplexTests {
         }
         close(FILE);
         #print "STUFF: ${definitions}\n";
-        eval $definitions;
+        eval $definitions || die "Failed to process from $file";
         if(defined($testlist)) {
             #use Data::Dumper;
             #print Dumper($testlist);
