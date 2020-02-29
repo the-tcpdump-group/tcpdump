@@ -337,7 +337,7 @@ print_field(netdissect_options *ndo, const char *st, uint32_t flen,
 static void
 ptp_print_1(netdissect_options *ndo)
 {
-    ND_PRINT("ptp version 1: not implemented\n");
+    ND_PRINT(" (not implemented)");
 }
 
 static void ptp_print_2(netdissect_options *ndo, const u_char *bp, u_int length)
