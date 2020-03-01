@@ -115,7 +115,7 @@ static const struct tok arctypemap[] = {
 	{ ARCTYPE_IPX,		"ipx" },
 	{ ARCTYPE_INET6,	"ipv6" },
 	{ ARCTYPE_DIAGNOSE,	"diag" },
-	{ 0, 0 }
+	{ 0, NULL }
 };
 
 static void
