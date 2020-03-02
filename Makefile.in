@@ -470,4 +470,4 @@ testlist:
 	echo $(TEST_DIST)
 
 depend: $(GENSRC)
-	$(MKDEP) -c "$(CC)" -m "$(DEPENDENCY_CFLAG)" $(DEFS) $(INCLS) $(SRC) $(LIBNETDISSECT_SRC)
+	$(MKDEP) -c "$(CC)" -m "$(DEPENDENCY_CFLAG)" -s "$(srcdir)" $(DEFS) $(INCLS) $(SRC) $(LIBNETDISSECT_SRC)
