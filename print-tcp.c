@@ -702,6 +702,10 @@ tcp_print(netdissect_options *ndo,
                 case PT_RESP:
                         resp_print(ndo, bp, length);
                         break;
+                case PT_DOMAIN:
+                        ND_PRINT(" ");
+                        domain_print(ndo, bp + 2, length - 2, 0);
+                        break;
                 }
                 return;
         }

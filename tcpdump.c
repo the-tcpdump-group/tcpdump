@@ -1796,6 +1796,8 @@ main(int argc, char **argv)
 				ndo->ndo_packettype = PT_PTP;
 			else if (ascii_strcasecmp(optarg, "someip") == 0)
 				ndo->ndo_packettype = PT_SOMEIP;
+			else if (ascii_strcasecmp(optarg, "domain") == 0)
+				ndo->ndo_packettype = PT_DOMAIN;
 			else
 				error("unknown packet type `%s'", optarg);
 			break;

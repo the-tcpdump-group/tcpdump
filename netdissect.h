@@ -293,6 +293,7 @@ extern void nd_pop_all_packet_info(netdissect_options *);
 #define PT_RESP		17	/* RESP */
 #define PT_PTP		18	/* PTP */
 #define PT_SOMEIP	19	/* Autosar SOME/IP Protocol */
+#define PT_DOMAIN	20	/* Domain Name System (DNS) */
 
 #ifndef min
 #define min(a,b) ((a)>(b)?(b):(a))
