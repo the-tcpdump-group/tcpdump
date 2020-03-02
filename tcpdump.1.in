@@ -20,7 +20,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "28 Feb 2020"
+.TH TCPDUMP 1  "2 Mar 2020"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -685,18 +685,20 @@ Currently known types are
 \fBlmp\fR (Link Management Protocol),
 \fBpgm\fR (Pragmatic General Multicast),
 \fBpgm_zmtp1\fR (ZMTP/1.0 inside PGM/EPGM),
-\fBresp\fR (REdis Serialization Protocol),
+\fBptp\fR (Precision Time Protocol),
 \fBradius\fR (RADIUS),
+\fBresp\fR (REdis Serialization Protocol),
 \fBrpc\fR (Remote Procedure Call),
-\fBrtp\fR (Real-Time Applications protocol),
 \fBrtcp\fR (Real-Time Applications control protocol),
+\fBrtp\fR (Real-Time Applications protocol),
 \fBsnmp\fR (Simple Network Management Protocol),
+\fBsomeip\fR (SOME/IP),
 \fBtftp\fR (Trivial File Transfer Protocol),
 \fBvat\fR (Visual Audio Tool),
-\fBwb\fR (distributed White Board),
-\fBzmtp1\fR (ZeroMQ Message Transport Protocol 1.0)
+\fBvxlan\fR (Virtual eXtensible Local Area Network),
+\fBwb\fR (distributed White Board)
 and
-\fBvxlan\fR (Virtual eXtensible Local Area Network).
+\fBzmtp1\fR (ZeroMQ Message Transport Protocol 1.0).
 .IP
 Note that the \fBpgm\fR type above affects UDP interpretation only, the native
 PGM is always recognised as IP protocol 113 regardless. UDP-encapsulated PGM is
