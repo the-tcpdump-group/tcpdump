@@ -9124,7 +9124,7 @@ $as_echo "$as_me: executing $ac_file commands" >&6;}
   case $ac_file$ac_mode in
     "default-1":C) if test -f .devel; then
 	echo timestamp > stamp-h
-	cat Makefile-devel-adds >> Makefile
+	cat $ac_top_srcdir/Makefile-devel-adds >> Makefile
 	make depend
 fi ;;
 
