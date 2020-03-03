@@ -992,7 +992,7 @@ AC_CONFIG_HEADER(config.h)
 
 AC_OUTPUT_COMMANDS([if test -f .devel; then
 	echo timestamp > stamp-h
-	cat $ac_top_srcdir/Makefile-devel-adds >> Makefile
+	cat $srcdir/Makefile-devel-adds >> Makefile
 	make depend
 fi])
 AC_OUTPUT(Makefile tcpdump.1)
