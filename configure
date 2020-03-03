@@ -7453,7 +7453,7 @@ _ACEOF
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, with $ac_lbl_dependency_flag" >&5
 $as_echo "yes, with $ac_lbl_dependency_flag" >&6; }
 			DEPENDENCY_CFLAG="$ac_lbl_dependency_flag"
-			MKDEP='${srcdir}/mkdep'
+			MKDEP='${top_srcdir}/mkdep'
 		else
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
