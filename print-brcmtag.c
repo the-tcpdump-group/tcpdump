@@ -118,7 +118,7 @@ brcm_tag_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	u_int length = h->len;
 
 	ndo->ndo_protocol = "brcm-tag";
-	return (ether_print_switch_tag(ndo, p, length, caplen,
+	return (ether_switch_tag_print(ndo, p, length, caplen,
 	    brcm_tag_print, BRCM_TAG_LEN));
 }
 
