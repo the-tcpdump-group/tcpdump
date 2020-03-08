@@ -37,7 +37,7 @@
 #include "ipproto.h"
 
 void
-ip_print_demux(netdissect_options *ndo,
+ip_demux_print(netdissect_options *ndo,
 	       const u_char *bp,
 	       u_int length, u_int ver, int fragmented, u_int ttl_hl,
 	       uint8_t nh, const u_char *iph)

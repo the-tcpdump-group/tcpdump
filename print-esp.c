@@ -902,7 +902,7 @@ esp_print(netdissect_options *ndo,
 	ND_PRINT(": ");
 
 	/* Now dissect the plaintext. */
-	ip_print_demux(ndo, pt, payloadlen - (padlen + 2), ver, fragmented,
+	ip_demux_print(ndo, pt, payloadlen - (padlen + 2), ver, fragmented,
 	    ttl_hl, nh, bp2);
 
 	/* Pop the buffer, freeing it. */

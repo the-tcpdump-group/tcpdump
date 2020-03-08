@@ -719,7 +719,7 @@ extern uint16_t in_cksum(const struct cksum_vec *, int);
 extern uint16_t in_cksum_shouldbe(uint16_t, uint16_t);
 
 /* IP protocol demuxing routines */
-extern void ip_print_demux(netdissect_options *, const u_char *, u_int, u_int, int, u_int, uint8_t, const u_char *);
+extern void ip_demux_print(netdissect_options *, const u_char *, u_int, u_int, int, u_int, uint8_t, const u_char *);
 
 extern uint16_t nextproto4_cksum(netdissect_options *, const struct ip *, const uint8_t *, u_int, u_int, uint8_t);
 

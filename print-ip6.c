@@ -468,7 +468,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 					len -= total_advance;
 				}
 			}
-			ip_print_demux(ndo, cp, len, 6, fragmented,
+			ip_demux_print(ndo, cp, len, 6, fragmented,
 			    GET_U_1(ip6->ip6_hlim), nh, bp);
 			nd_pop_packet_info(ndo);
 			return;

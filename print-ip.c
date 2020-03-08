@@ -490,7 +490,7 @@ ip_print(netdissect_options *ndo,
 				     GET_IPADDR_STRING(ip->ip_src),
 				     GET_IPADDR_STRING(ip->ip_dst));
 		}
-		ip_print_demux(ndo, (const u_char *)ip + hlen, len, 4,
+		ip_demux_print(ndo, (const u_char *)ip + hlen, len, 4,
 		    off & IP_MF, GET_U_1(ip->ip_ttl), nh, bp);
 	} else {
 		/*
