@@ -277,7 +277,7 @@ do_decrypt(netdissect_options *ndo, const char *caller, struct sa_list *sa,
  * anything in the old buffer.  That will free the new buffer.
  */
 USES_APPLE_DEPRECATED_API
-int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
+int esp_decrypt_buffer_by_ikev2_print(netdissect_options *ndo,
 				      int initiator,
 				      const u_char spii[8],
 				      const u_char spir[8],
@@ -315,7 +315,7 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 
 	if(end <= ct) return 0;
 
-	pt = do_decrypt(ndo, "esp_print_decrypt_buffer_by_ikev2", sa, iv,
+	pt = do_decrypt(ndo, "esp_decrypt_buffer_by_ikev2_print", sa, iv,
 	    ct, ctlen);
 	if (pt == NULL)
 		return 0;
@@ -683,7 +683,7 @@ static void esp_init(netdissect_options *ndo _U_)
 }
 USES_APPLE_RST
 
-void esp_print_decodesecret(netdissect_options *ndo)
+void esp_decodesecret_print(netdissect_options *ndo)
 {
 	char *line;
 	char *p;
@@ -763,7 +763,7 @@ esp_print(netdissect_options *ndo,
 		if (!ndo->ndo_espsecret)
 			return;
 
-		esp_print_decodesecret(ndo);
+		esp_decodesecret_print(ndo);
 	}
 
 	if (ndo->ndo_sa_list_head == NULL)

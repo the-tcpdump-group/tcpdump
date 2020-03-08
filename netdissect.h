@@ -740,8 +740,8 @@ extern const char *dnnum_string(netdissect_options *, u_short);
 extern int decode_prefix4(netdissect_options *, const u_char *, u_int, char *, size_t);
 extern int decode_prefix6(netdissect_options *, const u_char *, u_int, char *, size_t);
 
-extern void esp_print_decodesecret(netdissect_options *);
-extern int esp_print_decrypt_buffer_by_ikev2(netdissect_options *, int,
+extern void esp_decodesecret_print(netdissect_options *);
+extern int esp_decrypt_buffer_by_ikev2_print(netdissect_options *, int,
 					     const u_char spii[8],
 					     const u_char spir[8],
 					     const u_char *, const u_char *);

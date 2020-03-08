@@ -2689,7 +2689,7 @@ ikev2_e_print(netdissect_options *ndo,
 	np = GET_U_1(ext->np);
 
 	/* try to decrypt it! */
-	if(esp_print_decrypt_buffer_by_ikev2(ndo,
+	if(esp_decrypt_buffer_by_ikev2_print(ndo,
 					     GET_U_1(base->flags) & ISAKMP_FLAG_I,
 					     base->i_ck, base->r_ck,
 					     dat, dat+dlen)) {
@@ -2701,7 +2701,7 @@ ikev2_e_print(netdissect_options *ndo,
 				ndo->ndo_snapend, phase, doi, proto, depth+1);
 
 		/*
-		 * esp_print_decrypt_buffer_by_ikev2 pushed information
+		 * esp_decrypt_buffer_by_ikev2_print pushed information
 		 * on the buffer stack; we're done with the buffer, so
 		 * pop it (which frees the buffer)
 		 */
@@ -3059,7 +3059,7 @@ isakmp_print(netdissect_options *ndo,
 	/* initialize SAs */
 	if (ndo->ndo_sa_list_head == NULL) {
 		if (ndo->ndo_espsecret)
-			esp_print_decodesecret(ndo);
+			esp_decodesecret_print(ndo);
 	}
 #endif
 
