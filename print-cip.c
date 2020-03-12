@@ -20,7 +20,7 @@
  *
  */
 
-/* \summary: Classical-IP over ATM printer */
+/* \summary: Linux Classical IP over ATM printer */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
