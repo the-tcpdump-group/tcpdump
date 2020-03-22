@@ -2,7 +2,12 @@
  * Oracle
  */
 
-/* \summary: Oracle DLT_PPI printer */
+/* \summary: Per-Packet Information (DLT_PPI) printer */
+
+/* Specification:
+ * Per-Packet Information Header Specification - Version 1.0.7
+ * https://web.archive.org/web/20160328114748/http://www.cacetech.com/documents/PPI%20Header%20format%201.0.7.pdf
+ */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -15,10 +20,12 @@
 
 
 typedef struct ppi_header {
-	nd_uint8_t	ppi_ver;
-	nd_uint8_t	ppi_flags;
-	nd_uint16_t	ppi_len;
-	nd_uint32_t	ppi_dlt;
+	nd_uint8_t	ppi_ver;	/* Version.  Currently 0 */
+	nd_uint8_t	ppi_flags;	/* Flags. */
+	nd_uint16_t	ppi_len;	/* Length of entire message, including
+					 * this header and TLV payload. */
+	nd_uint32_t	ppi_dlt;	/* Data Link Type of the captured
+					 * packet data. */
 } ppi_header_t;
 
 #define	PPI_HDRLEN	8
