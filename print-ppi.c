@@ -79,6 +79,13 @@ ppi_print(netdissect_options *ndo,
 	hdr = (const ppi_header_t *)p;
 	ND_TCHECK_2(hdr->ppi_len);
 	len = GET_LE_U_2(hdr->ppi_len);
+	if (len < sizeof(ppi_header_t) || len > 65532) {
+		/* It MUST be between 8 and 65,532 inclusive (spec 3.1.3) */
+		ND_PRINT(" [length %u < %zu or > 65532]", len,
+			 sizeof(ppi_header_t));
+		nd_print_invalid(ndo);
+		return (caplen);
+	}
 	if (caplen < len) {
 		/*
 		 * If we don't have the entire PPI header, don't
@@ -86,10 +93,6 @@ ppi_print(netdissect_options *ndo,
 		 */
 		nd_print_trunc(ndo);
 		return (caplen);
-	}
-	if (len < sizeof(ppi_header_t)) {
-		nd_print_trunc(ndo);
-		return (len);
 	}
 	ND_TCHECK_4(hdr->ppi_dlt);
 	dlt = GET_LE_U_4(hdr->ppi_dlt);
