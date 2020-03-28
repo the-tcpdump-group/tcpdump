@@ -152,7 +152,7 @@ EXTRACT_IPV4_TO_HOST_ORDER(const void *p)
  *
  * We do this in case the compiler can generate code using those
  * instructions to do an unaligned load and pass stuff to "ntohs()" or
- * "ntohl()", which might be better than than the code to fetch the
+ * "ntohl()", which might be better than the code to fetch the
  * bytes one at a time and assemble them.  (That might not be the
  * case on a little-endian platform, such as DEC's MIPS machines and
  * Alpha machines, where "ntohs()" and "ntohl()" might not be done

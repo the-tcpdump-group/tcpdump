@@ -1748,7 +1748,7 @@ ieee802_15_4_print_command_data(netdissect_options *ndo,
 		/* XXX Not implemented */
 	case 0x16: /* DSME GTS Response command */
 		/* XXX Not implemented */
-	case 0x17: /* DSME GTS GTS Notify command */
+	case 0x17: /* DSME GTS Notify command */
 		/* XXX Not implemented */
 	case 0x18: /* DSME Information Request command */
 		/* XXX Not implemented */

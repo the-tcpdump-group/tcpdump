@@ -286,7 +286,7 @@ atmarp_print(netdissect_options *ndo,
                           ATMSPROTO_LEN(ap),
                           ATMTPROTO_LEN(ap));
 
-                /* don't know know about the address formats */
+                /* don't know about the address formats */
                 if (!ndo->ndo_vflag) {
                     goto out;
                 }
@@ -407,7 +407,7 @@ arp_print(netdissect_options *ndo,
                       tok2str(ethertype_values, "Unknown Protocol (0x%04x)", pro),
                       PROTO_LEN(ap));
 
-            /* don't know know about the address formats */
+            /* don't know about the address formats */
             if (!ndo->ndo_vflag) {
                 goto out;
             }
