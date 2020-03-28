@@ -57,9 +57,15 @@ ppi_header_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	ND_PRINT(", length %u: ", length);
 }
 
-static u_int
-ppi_print(netdissect_options *ndo,
-	  const struct pcap_pkthdr *h, const u_char *p)
+/*
+ * This is the top level routine of the printer.  'p' points
+ * to the ether header of the packet, 'h->ts' is the timestamp,
+ * 'h->len' is the length of the packet off the wire, and 'h->caplen'
+ * is the number of bytes actually captured.
+ */
+void
+ppi_if_print(netdissect_options *ndo,
+	     const struct pcap_pkthdr *h, const u_char *p)
 {
 	if_printer_t printer;
 	const ppi_header_t *hdr;
@@ -73,18 +79,19 @@ ppi_print(netdissect_options *ndo,
 	ndo->ndo_protocol = "ppi";
 	if (caplen < sizeof(ppi_header_t)) {
 		nd_print_trunc(ndo);
-		return (caplen);
+		ndo->ndo_ll_header_length += caplen;
+		return;
 	}
 
 	hdr = (const ppi_header_t *)p;
-	ND_TCHECK_2(hdr->ppi_len);
 	len = GET_LE_U_2(hdr->ppi_len);
 	if (len < sizeof(ppi_header_t) || len > 65532) {
 		/* It MUST be between 8 and 65,532 inclusive (spec 3.1.3) */
 		ND_PRINT(" [length %u < %zu or > 65532]", len,
 			 sizeof(ppi_header_t));
 		nd_print_invalid(ndo);
-		return (caplen);
+		ndo->ndo_ll_header_length += caplen;
+		return;
 	}
 	if (caplen < len) {
 		/*
@@ -92,9 +99,9 @@ ppi_print(netdissect_options *ndo,
 		 * bother.
 		 */
 		nd_print_trunc(ndo);
-		return (caplen);
+		ndo->ndo_ll_header_length += caplen;
+		return;
 	}
-	ND_TCHECK_4(hdr->ppi_dlt);
 	dlt = GET_LE_U_4(hdr->ppi_dlt);
 
 	if (ndo->ndo_eflag)
@@ -122,22 +129,7 @@ ppi_print(netdissect_options *ndo,
 			ND_DEFAULTPRINT(p, caplen);
 		hdrlen = 0;
 	}
-	return (len + hdrlen);
-trunc:
-	return (caplen);
-}
-
-/*
- * This is the top level routine of the printer.  'p' points
- * to the ether header of the packet, 'h->ts' is the timestamp,
- * 'h->len' is the length of the packet off the wire, and 'h->caplen'
- * is the number of bytes actually captured.
- */
-u_int
-ppi_if_print(netdissect_options *ndo,
-	     const struct pcap_pkthdr *h, const u_char *p)
-{
-	ndo->ndo_protocol = "ppi_if";
-	return (ppi_print(ndo, h, p));
+	ndo->ndo_ll_header_length += len + hdrlen;
+	return;
 }
 #endif /* DLT_PPI */

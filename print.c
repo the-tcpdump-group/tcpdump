@@ -63,9 +63,6 @@ static const struct uint_printer uint_printers[] = {
 #ifdef DLT_IEEE802_15_4_TAP
 	{ ieee802_15_4_tap_if_print, DLT_IEEE802_15_4_TAP },
 #endif
-#ifdef DLT_PPI
-	{ ppi_if_print,		DLT_PPI },
-#endif
 #ifdef DLT_NETANALYZER
 	{ netanalyzer_if_print, DLT_NETANALYZER },
 #endif
@@ -235,6 +232,9 @@ static const struct void_printer void_printers[] = {
 	{ null_if_print,	DLT_NULL },
 #ifdef DLT_LOOP
 	{ null_if_print,	DLT_LOOP },
+#endif
+#ifdef DLT_PPI
+	{ ppi_if_print,		DLT_PPI },
 #endif
 	{ raw_if_print,		DLT_RAW },
 #ifdef DLT_IPV4
