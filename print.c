@@ -84,10 +84,6 @@ static const struct uint_printer uint_printers[] = {
 #ifdef DLT_LANE8023
 	{ lane_if_print,	DLT_LANE8023 },
 #endif
-	{ arcnet_if_print,	DLT_ARCNET },
-#ifdef DLT_ARCNET_LINUX
-	{ arcnet_linux_if_print, DLT_ARCNET_LINUX },
-#endif
 #ifdef DLT_IPOIB
 	{ ipoib_if_print,       DLT_IPOIB },
 #endif
@@ -216,6 +212,10 @@ static const struct uint_printer uint_printers[] = {
 static const struct void_printer void_printers[] = {
 #ifdef DLT_APPLE_IP_OVER_IEEE1394
 	{ ap1394_if_print,	DLT_APPLE_IP_OVER_IEEE1394 },
+#endif
+	{ arcnet_if_print,	DLT_ARCNET },
+#ifdef DLT_ARCNET_LINUX
+	{ arcnet_linux_if_print, DLT_ARCNET_LINUX },
 #endif
 #ifdef DLT_BLUETOOTH_HCI_H4_WITH_PHDR
 	{ bt_if_print,		DLT_BLUETOOTH_HCI_H4_WITH_PHDR},
