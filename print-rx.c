@@ -2683,7 +2683,7 @@ ubik_reply_print(netdissect_options *ndo,
 		}
 
 	/*
-	 * Otherwise, print out "yes" it it was a beacon packet (because
+	 * Otherwise, print out "yes" if it was a beacon packet (because
 	 * that's how yes votes are returned, go figure), otherwise
 	 * just print out the error code.
 	 */
