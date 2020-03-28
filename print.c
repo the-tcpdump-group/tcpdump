@@ -173,9 +173,6 @@ static const struct uint_printer uint_printers[] = {
 #ifdef DLT_JUNIPER_CHDLC
 	{ juniper_chdlc_if_print,	DLT_JUNIPER_CHDLC },
 #endif
-#ifdef DLT_PKTAP
-	{ pktap_if_print,	DLT_PKTAP },
-#endif
 #ifdef DLT_IEEE802_11_RADIO
 	{ ieee802_11_radio_if_print,	DLT_IEEE802_11_RADIO },
 #endif
@@ -232,6 +229,9 @@ static const struct void_printer void_printers[] = {
 	{ null_if_print,	DLT_NULL },
 #ifdef DLT_LOOP
 	{ null_if_print,	DLT_LOOP },
+#endif
+#ifdef DLT_PKTAP
+	{ pktap_if_print,	DLT_PKTAP },
 #endif
 #ifdef DLT_PPI
 	{ ppi_if_print,		DLT_PPI },
