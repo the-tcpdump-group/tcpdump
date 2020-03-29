@@ -321,7 +321,8 @@ TAGHDR = \
 	/usr/include/netinet/udp.h \
 	/usr/include/protocols/routed.h
 
-TAGFILES = $(SRC) $(HDR) $(TAGHDR) $(LIBNETDISSECT_SRC)
+TAGFILES = $(SRC) $(HDR) $(TAGHDR) $(LIBNETDISSECT_SRC) \
+	print-pflog.c print-smb.c smbutil.c
 
 CLEANFILES = $(PROG) $(OBJ) $(GENSRC) $(LIBNETDISSECT_OBJ)
 
