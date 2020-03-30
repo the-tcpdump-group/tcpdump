@@ -941,7 +941,7 @@ tstamp_precision_to_string(int precision)
  * necessary to make the standard I/O library work with an fdopen()ed
  * FILE * from that descriptor.
  *
- * A long time ago, in a galaxy far far away, AT&T decided that, instead
+ * A long time ago in a galaxy far, far away, AT&T decided that, instead
  * of providing separate APIs for getting and setting the FD_ flags on a
  * descriptor, getting and setting the O_ flags on a descriptor, and
  * locking files, they'd throw them all into a kitchen-sink fcntl() call
