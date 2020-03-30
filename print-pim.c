@@ -123,7 +123,7 @@ static const struct tok pimv2_register_flag_values[] = {
 #define PIMV2_DF_ELECTION_BACKOFF                3
 #define PIMV2_DF_ELECTION_PASS                   4
 
-static struct tok pimv2_df_election_flag_values[] = {
+static const struct tok pimv2_df_election_flag_values[] = {
     { PIMV2_DF_ELECTION_OFFER, "Offer" },
     { PIMV2_DF_ELECTION_WINNER, "Winner" },
     { PIMV2_DF_ELECTION_BACKOFF, "Backoff" },
