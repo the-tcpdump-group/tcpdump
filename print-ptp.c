@@ -467,7 +467,7 @@ ptp_print_timestamp(netdissect_options *ndo, const u_char *bp, u_int *len, const
 
     ND_PRINT(", %s :", stype);
     /* sec time stamp 6 bytes */
-    secs = GET_BE_U_2(bp) + GET_BE_U_4(bp+2);
+    secs = GET_BE_U_6(bp);
     ND_PRINT(" %"PRIu64" seconds,", secs);
     *len -= 6;
     bp += 6;
@@ -489,7 +489,7 @@ ptp_print_timestamp_identity(netdissect_options *ndo,
 
     ND_PRINT(", %s :", ttype);
     /* sec time stamp 6 bytes */
-    secs = GET_BE_U_2(bp) + GET_BE_U_4(bp+2);
+    secs = GET_BE_U_6(bp);
     ND_PRINT(" %"PRIu64" seconds,", secs);
     *len -= 6;
     bp += 6;
@@ -523,7 +523,7 @@ ptp_print_announce_msg(netdissect_options *ndo, const u_char *bp, u_int *len)
 
     ND_PRINT(", %s :", p_origin_ts);
     /* sec time stamp 6 bytes */
-    secs = GET_BE_U_2(bp) + GET_BE_U_4(bp+2);
+    secs = GET_BE_U_6(bp);
     ND_PRINT(" %"PRIu64" seconds", secs);
     *len -= 6;
     bp += 6;
