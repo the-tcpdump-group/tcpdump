@@ -36,7 +36,6 @@
 #include "llc.h"
 #include "nlpid.h"
 #include "extract.h"
-#include "oui.h"
 
 static void frf15_print(netdissect_options *ndo, const u_char *, u_int);
 
