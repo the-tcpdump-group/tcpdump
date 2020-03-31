@@ -45,10 +45,12 @@
 #endif
 
 #include "netdissect.h"
-#include "strtoaddr.h"
 #include "extract.h"
 
+#ifdef HAVE_LIBCRYPTO
+#include "strtoaddr.h"
 #include "ascii_strcasecmp.h"
+#endif
 
 #include "ip.h"
 #include "ip6.h"
