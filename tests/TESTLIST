@@ -39,6 +39,10 @@ brcmtag		brcm-tag.pcap		brcm-tag.out
 brcmtag-e	brcm-tag.pcap		brcm-tag-e.out	-e
 brcmtagprepend	brcm-tag-prepend.pcap	brcm-tag-prepend.out -e
 
+# Broadcom LI
+bcm-li bcm-li.pcap bcm-li.out
+bcm-li-v bcm-li.pcap bcm-li-v.out -v
+
 # Marvell DSA tag tests
 dsa		dsa.pcap		dsa.out
 dsa-e		dsa.pcap		dsa-e.out	-e

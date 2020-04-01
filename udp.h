@@ -161,6 +161,9 @@ struct udphdr {
 #ifndef MPLS_LSP_PING_PORT
 #define MPLS_LSP_PING_PORT		3503	/* draft-ietf-mpls-lsp-ping-02.txt */
 #endif
+#ifndef BCM_LI_PORT
+#define BCM_LI_PORT			49152   /* SDK default */
+#endif
 #ifndef BFD_CONTROL_PORT
 #define BFD_CONTROL_PORT		3784	/* RFC 5881 */
 #endif
