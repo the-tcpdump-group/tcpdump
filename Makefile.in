@@ -106,6 +106,7 @@ LIBNETDISSECT_SRC=\
 	print-atm.c \
 	print-babel.c \
 	print-beep.c \
+	print-bcm-li.c \
 	print-bfd.c \
 	print-bgp.c \
 	print-bootp.c \
