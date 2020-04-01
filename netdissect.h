@@ -556,6 +556,7 @@ extern void ascii_print(netdissect_options *, const u_char *, u_int);
 extern void atalk_print(netdissect_options *, const u_char *, u_int);
 extern void atm_print(netdissect_options *, u_int, u_int, u_int, const u_char *, u_int, u_int);
 extern void babel_print(netdissect_options *, const u_char *, u_int);
+extern u_int bcm_li_print(netdissect_options *, const u_char *, u_int);
 extern void beep_print(netdissect_options *, const u_char *, u_int);
 extern void bfd_print(netdissect_options *, const u_char *, u_int, u_int);
 extern void bgp_print(netdissect_options *, const u_char *, u_int);

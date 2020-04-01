@@ -949,6 +949,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-atalk.c
     print-atm.c
     print-babel.c
+    print-bcm-li.c
     print-beep.c
     print-bfd.c
     print-bgp.c
