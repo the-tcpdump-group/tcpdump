@@ -71,7 +71,7 @@ bcm_li_print(netdissect_options *ndo, const u_char *p, u_int length)
 		goto trunc;
 	ND_TCHECK_LEN(p, BCM_LI_SHIM_LEN);
 	shim = GET_BE_U_4(p);
-	
+
 	direction = (shim >> 29) & 0x7;
 	pkt_type = (shim >> 25) & 0xf;
 	pkt_subtype = (shim >> 22) & 0x7;
@@ -92,7 +92,7 @@ bcm_li_print(netdissect_options *ndo, const u_char *p, u_int length)
 	} else {
 	    return;
 	}
-	
+
 	switch (pkt_type) {
 	case BCM_LI_PKT_TYPE_ETHERNET:
 	    ether_print(ndo, bp, length, length, NULL, NULL);
