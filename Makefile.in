@@ -105,8 +105,8 @@ LIBNETDISSECT_SRC=\
 	print-atalk.c \
 	print-atm.c \
 	print-babel.c \
-	print-beep.c \
 	print-bcm-li.c \
+	print-beep.c \
 	print-bfd.c \
 	print-bgp.c \
 	print-bootp.c \
@@ -147,8 +147,8 @@ LIBNETDISSECT_SRC=\
 	print-icmp6.c \
 	print-igmp.c \
 	print-igrp.c \
-	print-ip.c \
 	print-ip-demux.c \
+	print-ip.c \
 	print-ip6.c \
 	print-ip6opts.c \
 	print-ipcomp.c \
@@ -217,6 +217,7 @@ LIBNETDISSECT_SRC=\
 	print-slow.c \
 	print-smtp.c \
 	print-snmp.c \
+	print-someip.c \
 	print-ssh.c \
 	print-stp.c \
 	print-sunatm.c \
@@ -237,13 +238,12 @@ LIBNETDISSECT_SRC=\
 	print-vrrp.c \
 	print-vsock.c \
 	print-vtp.c \
-	print-vxlan.c \
 	print-vxlan-gpe.c \
+	print-vxlan.c \
 	print-wb.c \
 	print-zep.c \
 	print-zephyr.c \
 	print-zeromq.c \
-	print-someip.c \
 	signature.c \
 	strtoaddr.c \
 	util-print.c
