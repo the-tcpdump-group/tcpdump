@@ -60,7 +60,7 @@ static const struct tok bcm_li_pkt_subtype_values[] = {
     { 0, NULL}
 };
 
-u_int
+void
 bcm_li_print(netdissect_options *ndo, const u_char *p, u_int length)
 {
     u_int shim, direction, pkt_type, pkt_subtype, li_id;
@@ -90,7 +90,7 @@ bcm_li_print(netdissect_options *ndo, const u_char *p, u_int length)
 	if (ndo->ndo_vflag) {
 	    ND_PRINT("\n    ");
 	} else {
-	    return (ND_BYTES_AVAILABLE_AFTER(bp));
+	    return;
 	}
 	
 	switch (pkt_type) {
@@ -121,10 +121,7 @@ bcm_li_print(netdissect_options *ndo, const u_char *p, u_int length)
 	    break;
 	}
 
-	return (length);
-
 trunc:
 	nd_print_trunc(ndo);
-	return (ND_BYTES_AVAILABLE_AFTER(bp));
 }
 
