@@ -121,6 +121,7 @@ bcm_li_print(netdissect_options *ndo, const u_char *p, u_int length)
 	    break;
 	}
 
+	return;
 trunc:
 	nd_print_trunc(ndo);
 }
