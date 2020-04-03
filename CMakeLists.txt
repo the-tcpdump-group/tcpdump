@@ -991,8 +991,8 @@ set(NETDISSECT_SOURCE_LIST_C
     print-icmp6.c
     print-igmp.c
     print-igrp.c
-    print-ip.c
     print-ip-demux.c
+    print-ip.c
     print-ip6.c
     print-ip6opts.c
     print-ipcomp.c
@@ -1061,6 +1061,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-slow.c
     print-smtp.c
     print-snmp.c
+    print-someip.c
     print-ssh.c
     print-stp.c
     print-sunatm.c
@@ -1081,13 +1082,12 @@ set(NETDISSECT_SOURCE_LIST_C
     print-vrrp.c
     print-vsock.c
     print-vtp.c
-    print-vxlan.c
     print-vxlan-gpe.c
+    print-vxlan.c
     print-wb.c
     print-zep.c
     print-zephyr.c
     print-zeromq.c
-    print-someip.c
     ${LOCALSRC}
     signature.c
     strtoaddr.c
