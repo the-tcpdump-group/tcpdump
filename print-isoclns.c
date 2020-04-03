@@ -1903,7 +1903,7 @@ isis_print_ip_reach_subtlv(netdissect_options *ndo,
     case ISIS_SUBTLV_EXTD_IP_REACH_PREFIX_SID:
 	{
 	    uint8_t algo, flags;
-	    uint sid;
+	    uint32_t sid;
 
 	    flags = GET_U_1(tptr);
 	    algo = GET_U_1(tptr+1);
@@ -2332,7 +2332,7 @@ trunc:
 }
 
 static void
-isis_print_router_cap_subtlv(netdissect_options *ndo, const uint8_t *tptr, uint tlen)
+isis_print_router_cap_subtlv(netdissect_options *ndo, const uint8_t *tptr, uint8_t tlen)
 {
     uint8_t subt, subl;
 
@@ -2360,7 +2360,7 @@ isis_print_router_cap_subtlv(netdissect_options *ndo, const uint8_t *tptr, uint 
 	case ISIS_SUBTLV_ROUTER_CAP_SR:
 	    {
 		uint8_t flags, sid_tlen, sid_type, sid_len;
-		uint range, sid;
+		uint32_t range, sid;
 		const uint8_t *sid_ptr;
 
 		flags = GET_U_1(tptr);
