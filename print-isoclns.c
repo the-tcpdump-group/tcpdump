@@ -348,6 +348,19 @@ static const struct tok isis_tlv_router_capability_flags[] = {
     { 0, NULL }
 };
 
+#define ISIS_SUBTLV_ROUTER_CAP_SR 2 /* rfc 8667 */
+
+static const struct tok isis_router_capability_subtlv_values[] = {
+    { ISIS_SUBTLV_ROUTER_CAP_SR, "SR-Capabilities"},
+    { 0, NULL }
+};
+
+static const struct tok isis_router_capability_sr_flags[] = {
+    { 0x80, "ipv4"},
+    { 0x40, "ipv6"},
+    { 0, NULL }
+};
+
 #define ISIS_SUBTLV_EXT_IS_REACH_ADMIN_GROUP           3 /* rfc5305 */
 #define ISIS_SUBTLV_EXT_IS_REACH_LINK_LOCAL_REMOTE_ID  4 /* rfc4205 */
 #define ISIS_SUBTLV_EXT_IS_REACH_LINK_REMOTE_ID        5 /* rfc5305 */
@@ -392,13 +405,40 @@ static const struct tok isis_ext_is_reach_subtlv_values[] = {
 
 #define ISIS_SUBTLV_EXTD_IP_REACH_ADMIN_TAG32          1 /* draft-ietf-isis-admin-tags-01 */
 #define ISIS_SUBTLV_EXTD_IP_REACH_ADMIN_TAG64          2 /* draft-ietf-isis-admin-tags-01 */
+#define ISIS_SUBTLV_EXTD_IP_REACH_PREFIX_SID           3 /* rfc8667 */
 #define ISIS_SUBTLV_EXTD_IP_REACH_MGMT_PREFIX_COLOR  117 /* draft-ietf-isis-wg-multi-topology-05 */
 
 static const struct tok isis_ext_ip_reach_subtlv_values[] = {
     { ISIS_SUBTLV_EXTD_IP_REACH_ADMIN_TAG32,           "32-Bit Administrative tag" },
     { ISIS_SUBTLV_EXTD_IP_REACH_ADMIN_TAG64,           "64-Bit Administrative tag" },
+    { ISIS_SUBTLV_EXTD_IP_REACH_PREFIX_SID,            "Prefix SID" },
     { ISIS_SUBTLV_EXTD_IP_REACH_MGMT_PREFIX_COLOR,     "Management Prefix Color" },
     { 0, NULL }
+};
+
+#define ISIS_PREFIX_SID_FLAG_R 0x80 /* rfc 8667 */
+#define ISIS_PREFIX_SID_FLAG_N 0x40 /* rfc 8667 */
+#define ISIS_PREFIX_SID_FLAG_P 0x20 /* rfc 8667 */
+#define ISIS_PREFIX_SID_FLAG_E 0x10 /* rfc 8667 */
+#define ISIS_PREFIX_SID_FLAG_V 0x08 /* rfc 8667 */
+#define ISIS_PREFIX_SID_FLAG_L 0x04 /* rfc 8667 */
+
+static const struct tok prefix_sid_flag_values[] = {
+    { ISIS_PREFIX_SID_FLAG_R, "Readvertisement"},
+    { ISIS_PREFIX_SID_FLAG_N, "Node"},
+    { ISIS_PREFIX_SID_FLAG_P, "No-PHP"},
+    { ISIS_PREFIX_SID_FLAG_E, "Explicit NULL"},
+    { ISIS_PREFIX_SID_FLAG_V, "Value"},
+    { ISIS_PREFIX_SID_FLAG_L, "Local"},
+    { 0, NULL}
+};
+
+
+/* rfc 8667 */
+static const struct tok prefix_sid_algo_values[] = {
+    { 0, "SPF"},
+    { 1, "strict-SPF"},
+    { 0, NULL}
 };
 
 static const struct tok isis_subtlv_link_attribute_values[] = {
@@ -1860,6 +1900,31 @@ isis_print_ip_reach_subtlv(netdissect_options *ndo,
 	    subl-=8;
 	}
 	break;
+    case ISIS_SUBTLV_EXTD_IP_REACH_PREFIX_SID:
+	{
+	    uint8_t algo, flags;
+	    uint sid;
+
+	    flags = GET_U_1(tptr);
+	    algo = GET_U_1(tptr+1);
+
+	    if (flags & ISIS_PREFIX_SID_FLAG_V) {
+		sid = GET_BE_U_3(tptr+2);
+		tptr+=5;
+		subl-=5;
+	    } else {
+		sid = GET_BE_U_4(tptr+2);
+		tptr+=6;
+		subl-=6;
+	    }
+
+	    ND_PRINT(", Flags [%s], Algo %s (%u), %s %u",
+		     bittok2str(prefix_sid_flag_values, "None", flags),
+		     tok2str(prefix_sid_algo_values, "Unknown", algo), algo,
+		     flags & ISIS_PREFIX_SID_FLAG_V ? "label" : "index",
+		     sid);
+	}
+	break;
     default:
 	if (!print_unknown_data(ndo, tptr, "\n\t\t    ", subl))
 	  return(0);
@@ -2264,6 +2329,90 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
     return (processed);
 trunc:
     return 0;
+}
+
+static void
+isis_print_router_cap_subtlv(netdissect_options *ndo, const uint8_t *tptr, uint tlen)
+{
+    uint8_t subt, subl;
+
+    while (tlen >= 2) {
+	ND_TCHECK_LEN(tptr, 2);
+	subt = GET_U_1(tptr);
+	subl = GET_U_1(tptr+1);
+	tlen -= 2;
+	tptr += 2;
+
+	/* first lets see if we know the subTLVs name*/
+	ND_PRINT("\n\t\t%s subTLV #%u, length: %u",
+              tok2str(isis_router_capability_subtlv_values, "unknown", subt),
+              subt, subl);
+
+	/*
+	 * Boundary check.
+	 */
+	if (subl > tlen) {
+	    break;
+	}
+	ND_TCHECK_LEN(tptr, subl);
+
+	switch (subt) {
+	case ISIS_SUBTLV_ROUTER_CAP_SR:
+	    {
+		uint8_t flags, sid_tlen, sid_type, sid_len;
+		uint range, sid;
+		const uint8_t *sid_ptr;
+
+		flags = GET_U_1(tptr);
+		range = GET_BE_U_3(tptr+1);
+		ND_PRINT(", Flags [%s], Range %u",
+			 bittok2str(isis_router_capability_sr_flags, "None", flags),
+			 range);
+		sid_ptr = tptr + 4;
+		sid_tlen = subl - 4;
+
+		while (sid_tlen >= 5) {
+		    sid_type = GET_U_1(sid_ptr);
+		    sid_len = GET_U_1(sid_ptr+1);
+		    sid_tlen -= 2;
+		    sid_ptr += 2;
+
+		    /*
+		     * Boundary check.
+		     */
+		    if (sid_len > sid_tlen) {
+			break;
+		    }
+
+		    switch (sid_type) {
+		    case 1:
+			if (sid_len == 3) {
+			    ND_PRINT(", SID value %u", GET_BE_U_3(sid_ptr));
+			} else if (sid_len == 4) {
+			    ND_PRINT(", SID value %u", GET_BE_U_4(sid_ptr));
+			} else {
+			    ND_PRINT(", Unknown SID length%u", sid_len);
+			}
+			break;
+		    default:
+			print_unknown_data(ndo, sid_ptr, "\n\t\t  ", sid_len);
+		    }
+
+		    sid_ptr += sid_len;
+		    sid_tlen -= sid_len;
+		}
+	    }
+	    break;
+	default:
+	    print_unknown_data(ndo, tptr, "\n\t\t", subl);
+	    break;
+	}
+
+	tlen -= subl;
+	tptr += subl;
+    }
+ trunc:
+    return;
 }
 
 /*
@@ -3325,12 +3474,14 @@ isis_print(netdissect_options *ndo,
                 break;
             }
             ND_TCHECK_5(tptr); /* router-id + flags */
-            ND_PRINT("\n\t\tRouter-id: %s", GET_IPADDR_STRING(tptr));
-            ND_PRINT("\n\t\tFlags: [%s]",
-                      bittok2str(isis_tlv_router_capability_flags,
-                        "none",
-                        GET_U_1(tptr+4)));
-            /* FIXME Optional set of sub-TLV */
+            ND_PRINT("\n\t      Router-ID %s", GET_IPADDR_STRING(tptr));
+            ND_PRINT(", Flags [%s]",
+		     bittok2str(isis_tlv_router_capability_flags, "none", GET_U_1(tptr+4)));
+
+	    /* Optional set of sub-TLV */
+	    if (tlen > 5) {
+		isis_print_router_cap_subtlv(ndo, tptr+5, tlen-5);
+	    }
             break;
 
         case ISIS_TLV_VENDOR_PRIVATE:
