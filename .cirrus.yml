@@ -17,5 +17,5 @@ task:
     - (cd .. && git clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure --prefix=/tmp && make -s -j${MAXJOBS})
     - touch .devel
     - ./configure
-    - make -s -j${MAXJOBS} all
+    - make -s -j${MAXJOBS} CFLAGS=-Werror all
     - make check
