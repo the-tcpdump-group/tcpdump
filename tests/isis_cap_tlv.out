@@ -85,5 +85,6 @@
 	      IPv4 prefix:     172.16.11.0/24, Distribution: up, Metric: 63
 	      IPv4 prefix:     192.168.0.1/32, Distribution: up, Metric: 63
 	    IS-IS Router Capability TLV #242, length: 8
-		Router-id: 192.168.0.1
-		Flags: [none]
+	      Router-ID 192.168.0.1, Flags [none]
+		unknown subTLV #19, length: 1
+		0x0000:  00

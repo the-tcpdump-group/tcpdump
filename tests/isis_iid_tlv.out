@@ -445,8 +445,9 @@
 	    Extended IS Reachability TLV #22, length: 11
 	      IS Neighbor: 2222.2222.2222.00, Metric: 10, no sub-TLVs present
 	    IS-IS Router Capability TLV #242, length: 9
-		Router-id: 1.1.1.1
-		Flags: [none]
+	      Router-ID 1.1.1.1, Flags [none]
+		unknown subTLV #27, length: 2
+		0x0000:  fa00
 	    IPv4 Interface address(es) TLV #132, length: 8
 	      IPv4 interface address: 2.2.2.1
 	      IPv4 interface address: 1.1.1.1
@@ -466,8 +467,9 @@
 	    Extended IS Reachability TLV #22, length: 11
 	      IS Neighbor: 2222.2222.2222.00, Metric: 10, no sub-TLVs present
 	    IS-IS Router Capability TLV #242, length: 9
-		Router-id: 1.1.1.1
-		Flags: [none]
+	      Router-ID 1.1.1.1, Flags [none]
+		unknown subTLV #27, length: 2
+		0x0000:  fa00
 	    IPv4 Interface address(es) TLV #132, length: 8
 	      IPv4 interface address: 2.2.2.1
 	      IPv4 interface address: 1.1.1.1
@@ -530,8 +532,9 @@
 	    Extended IS Reachability TLV #22, length: 11
 	      IS Neighbor: 2222.2222.2222.00, Metric: 10, no sub-TLVs present
 	    IS-IS Router Capability TLV #242, length: 9
-		Router-id: 1.1.1.1
-		Flags: [none]
+	      Router-ID 1.1.1.1, Flags [none]
+		unknown subTLV #27, length: 2
+		0x0000:  fa00
 	    IPv4 Interface address(es) TLV #132, length: 8
 	      IPv4 interface address: 2.2.2.1
 	      IPv4 interface address: 1.1.1.1
@@ -551,8 +554,9 @@
 	    Extended IS Reachability TLV #22, length: 11
 	      IS Neighbor: 2222.2222.2222.00, Metric: 10, no sub-TLVs present
 	    IS-IS Router Capability TLV #242, length: 9
-		Router-id: 1.1.1.1
-		Flags: [none]
+	      Router-ID 1.1.1.1, Flags [none]
+		unknown subTLV #27, length: 2
+		0x0000:  fa00
 	    IPv4 Interface address(es) TLV #132, length: 8
 	      IPv4 interface address: 2.2.2.1
 	      IPv4 interface address: 1.1.1.1
@@ -572,8 +576,9 @@
 	    Extended IS Reachability TLV #22, length: 11
 	      IS Neighbor: 1111.1111.1111.00, Metric: 10, no sub-TLVs present
 	    IS-IS Router Capability TLV #242, length: 9
-		Router-id: 1.1.1.2
-		Flags: [none]
+	      Router-ID 1.1.1.2, Flags [none]
+		unknown subTLV #27, length: 2
+		0x0000:  fa00
 	    IPv4 Interface address(es) TLV #132, length: 8
 	      IPv4 interface address: 2.2.2.2
 	      IPv4 interface address: 1.1.1.2
@@ -593,8 +598,9 @@
 	    Extended IS Reachability TLV #22, length: 11
 	      IS Neighbor: 1111.1111.1111.00, Metric: 10, no sub-TLVs present
 	    IS-IS Router Capability TLV #242, length: 9
-		Router-id: 1.1.1.2
-		Flags: [none]
+	      Router-ID 1.1.1.2, Flags [none]
+		unknown subTLV #27, length: 2
+		0x0000:  fa00
 	    IPv4 Interface address(es) TLV #132, length: 8
 	      IPv4 interface address: 2.2.2.2
 	      IPv4 interface address: 1.1.1.2
@@ -616,8 +622,9 @@
 	    Extended IS Reachability TLV #22, length: 11
 	      IS Neighbor: 1111.1111.1111.00, Metric: 10, no sub-TLVs present
 	    IS-IS Router Capability TLV #242, length: 9
-		Router-id: 1.1.1.2
-		Flags: [none]
+	      Router-ID 1.1.1.2, Flags [none]
+		unknown subTLV #27, length: 2
+		0x0000:  fa00
 	    Extended IPv4 Reachability TLV #135, length: 9
 	      IPv4 prefix:         2.2.2.1/32, Distribution: up, Metric: 20
 	    IPv4 Interface address(es) TLV #132, length: 8
@@ -639,8 +646,9 @@
 	    Extended IS Reachability TLV #22, length: 11
 	      IS Neighbor: 2222.2222.2222.00, Metric: 10, no sub-TLVs present
 	    IS-IS Router Capability TLV #242, length: 9
-		Router-id: 1.1.1.1
-		Flags: [none]
+	      Router-ID 1.1.1.1, Flags [none]
+		unknown subTLV #27, length: 2
+		0x0000:  fa00
 	    Extended IPv4 Reachability TLV #135, length: 9
 	      IPv4 prefix:         2.2.2.2/32, Distribution: up, Metric: 20
 	    IPv4 Interface address(es) TLV #132, length: 8
