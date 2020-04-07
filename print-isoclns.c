@@ -2360,7 +2360,7 @@ isis_print_router_cap_subtlv(netdissect_options *ndo, const uint8_t *tptr, uint8
 	case ISIS_SUBTLV_ROUTER_CAP_SR:
 	    {
 		uint8_t flags, sid_tlen, sid_type, sid_len;
-		uint32_t range, sid;
+		uint32_t range;
 		const uint8_t *sid_ptr;
 
 		flags = GET_U_1(tptr);
