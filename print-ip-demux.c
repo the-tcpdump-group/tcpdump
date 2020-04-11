@@ -105,7 +105,13 @@ again:
 		break;
 
 	case IPPROTO_ICMP:
-		icmp_print(ndo, bp, length, iph, fragmented);
+		if (ver == 4)
+			icmp_print(ndo, bp, length, iph, fragmented);
+		else {
+			ND_PRINT("[%s requires IPv4]",
+				 tok2str(ipproto_values,"unknown",nh));
+			nd_print_invalid(ndo);
+		}
 		break;
 
 	case IPPROTO_ICMPV6:
