@@ -428,7 +428,6 @@ eopt_print(netdissect_options *ndo,
     return (cp + data_len);
 
   trunc:
-    nd_print_invalid(ndo);
     return (NULL);
 
 }
