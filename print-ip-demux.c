@@ -109,7 +109,13 @@ again:
 		break;
 
 	case IPPROTO_ICMPV6:
-		icmp6_print(ndo, bp, length, iph, fragmented);
+		if (ver == 6)
+			icmp6_print(ndo, bp, length, iph, fragmented);
+		else {
+			ND_PRINT("[%s requires IPv6]",
+				 tok2str(ipproto_values,"unknown",nh));
+			nd_print_invalid(ndo);
+		}
 		break;
 
 	case IPPROTO_PIGP:
