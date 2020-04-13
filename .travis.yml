@@ -74,7 +74,7 @@ addons:
   apt:
     packages:
       - libusb-1.0-0-dev
-      - libdbus-glib-1-dev
+      - libdbus-1-dev
       - libbluetooth-dev
       - libnl-genl-3-dev
       - libibverbs-dev
