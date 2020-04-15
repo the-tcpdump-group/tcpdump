@@ -104,8 +104,7 @@ extern const char *netdb_protoname (const uint8_t);
 #ifndef IPPROTO_MOBILITY_OLD
 /*
  * The current Protocol Numbers list says that the IP protocol number for
- * mobility headers is 135; it cites draft-ietf-mobileip-ipv6-24, but
- * that draft doesn't actually give a number.
+ * mobility headers is 135; it cites RFC 6275 (obsoletes RFC 3775).
  *
  * It appears that 62 used to be used, even though that's assigned to
  * a protocol called CFTP; however, the only reference for CFTP is a
