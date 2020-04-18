@@ -1404,19 +1404,28 @@ trunc:
 	return 0;
 }
 
+/*
+ * Un-escape RFC 1662 PPP in HDLC-like framing, with octet escapes.
+ * The length argument is the on-the-wire length, not the captured
+ * length; we can only un-escape the captured part.
+ */
 static void
 ppp_hdlc(netdissect_options *ndo,
          const u_char *p, u_int length)
 {
+	u_int caplen = ndo->ndo_snapend - p;
 	u_char *b, *t, c;
 	const u_char *s;
 	u_int i, proto;
 	const void *se;
 
+	if (caplen == 0)
+		return;
+
         if (length == 0)
                 return;
 
-	b = (u_char *)nd_malloc(ndo, length);
+	b = (u_char *)nd_malloc(ndo, caplen);
 	if (b == NULL)
 		return;
 
@@ -1425,11 +1434,11 @@ ppp_hdlc(netdissect_options *ndo,
 	 * Do this so that we dont overwrite the original packet
 	 * contents.
 	 */
-	for (s = p, t = b, i = length; i != 0 && ND_TTEST_1(s); i--) {
+	for (s = p, t = b, i = caplen; i != 0; i--) {
 		c = GET_U_1(s);
 		s++;
 		if (c == 0x7d) {
-			if (i <= 1 || !ND_TTEST_1(s))
+			if (i <= 1)
 				break;
 			i--;
 			c = GET_U_1(s) ^ 0x20;
