@@ -3,8 +3,8 @@ language: c
 arch:
   - amd64
   - ppc64le
-#  - s390x
-#  - arm64
+  - s390x
+  - arm64
 
 os:
   - linux
@@ -15,6 +15,15 @@ dist: bionic
 compiler:
   - gcc
   - clang
+
+jobs:
+  exclude:
+  - arch: ppc64le
+    os: osx
+  - arch: s390x
+    os: osx
+  - arch: arm64
+    os: osx
 
 cache: ccache
 
