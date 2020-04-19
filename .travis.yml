@@ -1,5 +1,12 @@
 language: c
 
+#
+# Try building on these 4 architectures; all are 64-bit, and all but
+# "s390x", a/k/a z/Architecture, are little-endian. The crypto library
+# on Litle-endian PowerPC/Power ISA does some things that require more
+# careful adherence to the documentation, so it's useful for testing
+# that.
+#
 arch:
   - amd64
   - ppc64le
@@ -16,6 +23,12 @@ compiler:
   - gcc
   - clang
 
+#
+# Linux runs on all of the architectures listed above; macOS currently
+# runs only on 64-bit x86, although the Spaceshipologists are all in a
+# tizzy about the possibility of Arm-based Macs.  Suppress the macOS
+# builds that don't work.
+#
 jobs:
   exclude:
   - arch: ppc64le
@@ -42,14 +55,11 @@ env:
   matrix:
     # NOTE: REMOTE= is for the libpcap build, which is done with autotools
     # even if we're building tcpdump with CMake.
-    - BUILD_LIBPCAP=no  CMAKE=no  REMOTE=disable CRYPTO=no
-    - BUILD_LIBPCAP=no  CMAKE=no  REMOTE=disable CRYPTO=yes
-    - BUILD_LIBPCAP=no  CMAKE=no  REMOTE=enable  CRYPTO=no
-    - BUILD_LIBPCAP=no  CMAKE=no  REMOTE=enable  CRYPTO=yes
-    - BUILD_LIBPCAP=no  CMAKE=yes REMOTE=disable CRYPTO=no
-    - BUILD_LIBPCAP=no  CMAKE=yes REMOTE=disable CRYPTO=yes
-    - BUILD_LIBPCAP=no  CMAKE=yes REMOTE=enable  CRYPTO=no
-    - BUILD_LIBPCAP=no  CMAKE=yes REMOTE=enable  CRYPTO=yes
+    # It's irrelevant if we're building tcpdump with the system libpcap.
+    - BUILD_LIBPCAP=no  CMAKE=no                 CRYPTO=no
+    - BUILD_LIBPCAP=no  CMAKE=no                 CRYPTO=yes
+    - BUILD_LIBPCAP=no  CMAKE=yes                CRYPTO=no
+    - BUILD_LIBPCAP=no  CMAKE=yes                CRYPTO=yes
     - BUILD_LIBPCAP=yes CMAKE=no  REMOTE=disable CRYPTO=no
     - BUILD_LIBPCAP=yes CMAKE=no  REMOTE=disable CRYPTO=yes
     - BUILD_LIBPCAP=yes CMAKE=no  REMOTE=enable  CRYPTO=no
