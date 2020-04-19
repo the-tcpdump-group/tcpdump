@@ -29,6 +29,11 @@ compiler:
 # tizzy about the possibility of Arm-based Macs.  Suppress the macOS
 # builds that don't work.
 #
+# In addition, with newer versions of macOS, Apple ships a "gcc" that's
+# just another front end to Clang, presumably for backwards
+# compatibility with build scripts etc. that expect the compiler to be
+# "gcc", so don't bother doing "gcc" builds on macOS.
+#
 jobs:
   exclude:
   - arch: ppc64le
@@ -36,6 +41,8 @@ jobs:
   - arch: s390x
     os: osx
   - arch: arm64
+    os: osx
+  - compiler: gcc
     os: osx
 
 cache: ccache
