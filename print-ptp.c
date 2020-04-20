@@ -358,7 +358,7 @@ static void ptp_print_2(netdissect_options *ndo, const u_char *bp, u_int length)
     len -= 2; bp += 2; msg_len = GET_BE_U_2(bp); ND_PRINT(", length : %u", msg_len);
 
     /* domain */
-    len -= 2; bp += 2; domain_no = GET_BE_U_2(bp) & PTP_DOMAIN_MASK; ND_PRINT(", domain : %u", domain_no);
+    len -= 2; bp += 2; domain_no = (GET_BE_U_2(bp) & PTP_DOMAIN_MASK) >> 8; ND_PRINT(", domain : %u", domain_no);
 
     /* rsvd 1*/
     rsvd1 = GET_BE_U_2(bp) & PTP_RSVD1_MASK;
