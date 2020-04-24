@@ -2461,7 +2461,7 @@ DIAG_ON_CLANG(assign-enum)
 		 */
 		if (!ndo->ndo_vflag && !WFileName) {
 			(void)fprintf(stderr,
-			    "%s: verbose output suppressed, use -v or -vv for full protocol decode\n",
+			    "%s: verbose output suppressed, use -v[v]... for full protocol decode\n",
 			    program_name);
 		} else
 			(void)fprintf(stderr, "%s: ", program_name);
