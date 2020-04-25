@@ -312,7 +312,7 @@ isis_3-v	ISIS_level2_adjacency.pcap	isis_3-v.out	-v
 isis_4-v	ISIS_p2p_adjacency.pcap		isis_4-v.out	-v
 isis_cap_tlv	isis_cap_tlv.pcap		isis_cap_tlv.out	-v
 isis_iid-v      isis_iid_tlv.pcap               isis_iid_tlv.out        -v
-isis_sr-v	isis_sr.pcap			isis_sr.out	-v
+isis_sr-v	isis_sr.pcapng			isis_sr.out	-v
 # fuzzed pcap
 # isis-seg-fault-1-v is now conditionally handled by isis-seg-fault-1-v.sh
 isis-seg-fault-2-v isis-seg-fault-2.pcapng isis-seg-fault-2-v.out -v
