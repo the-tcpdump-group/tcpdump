@@ -133,7 +133,7 @@ ether_type_print(netdissect_options *ndo, uint16_t type)
  * printing Ethernet header information (such as a LANE ID for ATM LANE).
  */
 static u_int
-ether_print_common(netdissect_options *ndo, const u_char *p, u_int length,
+ether_common_print(netdissect_options *ndo, const u_char *p, u_int length,
     u_int caplen,
     void (*print_switch_tag)(netdissect_options *ndo, const u_char *),
     u_int switch_tag_len,
@@ -380,7 +380,7 @@ ether_switch_tag_print(netdissect_options *ndo, const u_char *p, u_int length,
     void (*print_switch_tag)(netdissect_options *, const u_char *),
     u_int switch_tag_len)
 {
-	return (ether_print_common(ndo, p, length, caplen, print_switch_tag,
+	return (ether_common_print(ndo, p, length, caplen, print_switch_tag,
 				   switch_tag_len, NULL, NULL));
 }
 
@@ -399,8 +399,8 @@ ether_print(netdissect_options *ndo,
 	    const u_char *encap_header_arg)
 {
 	ndo->ndo_protocol = "ether";
-	return (ether_print_common(ndo, p, length, caplen, NULL, 0,
-				    print_encap_header, encap_header_arg));
+	return (ether_common_print(ndo, p, length, caplen, NULL, 0,
+				   print_encap_header, encap_header_arg));
 }
 
 /*
