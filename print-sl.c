@@ -54,7 +54,7 @@ static u_int lastconn = 255;
 static int sliplink_print(netdissect_options *, const u_char *, const struct ip *, u_int);
 static int compressed_sl_print(netdissect_options *, const u_char *, const struct ip *, u_int, int);
 
-u_int
+void
 sl_if_print(netdissect_options *ndo,
             const struct pcap_pkthdr *h, const u_char *p)
 {
@@ -62,11 +62,13 @@ sl_if_print(netdissect_options *ndo,
 	u_int length = h->len;
 	const struct ip *ip;
 
-	ndo->ndo_protocol = "sl_if";
+	ndo->ndo_protocol = "slip";
 	if (caplen < SLIP_HDRLEN) {
 		nd_print_trunc(ndo);
-		return (caplen);
+		ndo->ndo_ll_header_length += caplen;
+		return;
 	}
+	ndo->ndo_ll_header_length += SLIP_HDRLEN;
 
 	caplen -= SLIP_HDRLEN;
 	length -= SLIP_HDRLEN;
@@ -76,7 +78,7 @@ sl_if_print(netdissect_options *ndo,
 	if (ndo->ndo_eflag)
 		if (sliplink_print(ndo, p, ip, length) == -1) {
 			nd_print_trunc(ndo);
-			return (caplen + SLIP_HDRLEN);
+			return;
 		}
 
 	switch (IP_V(ip)) {
@@ -90,10 +92,10 @@ sl_if_print(netdissect_options *ndo,
 		ND_PRINT("ip v%u", IP_V(ip));
 	}
 
-	return (SLIP_HDRLEN);
+	return;
 }
 
-u_int
+void
 sl_bsdos_if_print(netdissect_options *ndo,
                   const struct pcap_pkthdr *h, const u_char *p)
 {
@@ -101,11 +103,13 @@ sl_bsdos_if_print(netdissect_options *ndo,
 	u_int length = h->len;
 	const struct ip *ip;
 
-	ndo->ndo_protocol = "sl_bsdos_if";
+	ndo->ndo_protocol = "slip_bsdos";
 	if (caplen < SLIP_HDRLEN) {
 		nd_print_trunc(ndo);
-		return (caplen);
+		ndo->ndo_ll_header_length += caplen;
+		return;
 	}
+	ndo->ndo_ll_header_length += SLIP_HDRLEN;
 
 	length -= SLIP_HDRLEN;
 
@@ -118,7 +122,7 @@ sl_bsdos_if_print(netdissect_options *ndo,
 
 	ip_print(ndo, (const u_char *)ip, length);
 
-	return (SLIP_HDRLEN);
+	return;
 }
 
 static int

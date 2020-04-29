@@ -117,10 +117,6 @@ static const struct uint_printer uint_printers[] = {
 	{ mfr_if_print,		DLT_MFR },
 #endif
 	{ atm_if_print,		DLT_ATM_RFC1483 },
-	{ sl_if_print,		DLT_SLIP },
-#ifdef DLT_SLIP_BSDOS
-	{ sl_bsdos_if_print,	DLT_SLIP_BSDOS },
-#endif
 #ifdef DLT_LTALK
 	{ ltalk_if_print,	DLT_LTALK },
 #endif
@@ -243,6 +239,10 @@ static const struct void_printer void_printers[] = {
 #ifdef DLT_IPV6
 	{ raw_if_print,		DLT_IPV6 },
 #endif
+#ifdef DLT_SLIP_BSDOS
+	{ sl_bsdos_if_print,	DLT_SLIP_BSDOS },
+#endif
+	{ sl_if_print,		DLT_SLIP },
 #ifdef DLT_SUNATM
 	{ sunatm_if_print,	DLT_SUNATM },
 #endif
