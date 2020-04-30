@@ -539,6 +539,10 @@ hoobr_bfd_print		hoobr_bfd_print.pcap		hoobr_bfd_print.out
 # bad packets from Wilfried Kirsch
 slip-bad-direction	slip-bad-direction.pcap		slip-bad-direction.out	-ve
 
+# bad packets from GitHub issues #676 and #677
+slip-compressed_sl_print-oobr slip-compressed_sl_print-oobr.pcap slip-compressed_sl_print-oobr.out -e
+slip-sliplink_print-oobr slip-sliplink_print-oobr.pcap slip-sliplink_print-oobr.out -e
+
 # bad packets from Otto Airamo and Antti Levomäki
 nbns-valgrind		nbns-valgrind.pcap		nbns-valgrind.out	-vvv -e
 arp-oobr		arp-oobr.pcap			arp-oobr.out	-vvv -e
