@@ -79,11 +79,6 @@ sl_if_print(netdissect_options *ndo,
 			return (caplen + SLIP_HDRLEN);
 		}
 
-	if (caplen < 1) {
-		nd_print_trunc(ndo);
-		return (caplen + SLIP_HDRLEN);
-	}
-
 	switch (IP_V(ip)) {
 	case 4:
 	        ip_print(ndo, (const u_char *)ip, length);
