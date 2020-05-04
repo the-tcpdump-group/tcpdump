@@ -506,7 +506,7 @@ extern u_int ltalk_if_print IF_PRINTER_ARGS;
 extern u_int mfr_if_print IF_PRINTER_ARGS;
 extern u_int netanalyzer_if_print IF_PRINTER_ARGS;
 extern u_int netanalyzer_transparent_if_print IF_PRINTER_ARGS;
-extern u_int nflog_if_print IF_PRINTER_ARGS;
+extern void nflog_if_print IF_PRINTER_ARGS;
 extern void null_if_print IF_PRINTER_ARGS;
 extern u_int pflog_if_print IF_PRINTER_ARGS;
 extern void pktap_if_print IF_PRINTER_ARGS;

@@ -69,9 +69,6 @@ static const struct uint_printer uint_printers[] = {
 #ifdef DLT_NETANALYZER_TRANSPARENT
 	{ netanalyzer_transparent_if_print, DLT_NETANALYZER_TRANSPARENT },
 #endif
-#ifdef DLT_NFLOG
-	{ nflog_if_print,	DLT_NFLOG},
-#endif
 #ifdef DLT_CIP
 	{ cip_if_print,		DLT_CIP },
 #endif
@@ -221,6 +218,9 @@ static const struct void_printer void_printers[] = {
 #endif
 #ifdef DLT_IPNET
 	{ ipnet_if_print,	DLT_IPNET },
+#endif
+#ifdef DLT_NFLOG
+	{ nflog_if_print,	DLT_NFLOG},
 #endif
 	{ null_if_print,	DLT_NULL },
 #ifdef DLT_LOOP

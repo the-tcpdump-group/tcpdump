@@ -132,9 +132,9 @@ nflog_hdr_print(netdissect_options *ndo, const nflog_hdr_t *hdr, u_int length)
 	ND_PRINT(", length %u: ", length);
 }
 
-u_int
+void
 nflog_if_print(netdissect_options *ndo,
-			   const struct pcap_pkthdr *h, const u_char *p)
+	       const struct pcap_pkthdr *h, const u_char *p)
 {
 	const nflog_hdr_t *hdr = (const nflog_hdr_t *)p;
 	uint16_t size;
@@ -142,14 +142,17 @@ nflog_if_print(netdissect_options *ndo,
 	u_int caplen = h->caplen;
 	u_int length = h->len;
 
-	ndo->ndo_protocol = "nflog_if";
-	if (caplen < NFLOG_HDR_LEN)
-		goto trunc;
+	ndo->ndo_protocol = "nflog";
+	if (caplen < NFLOG_HDR_LEN) {
+		ndo->ndo_ll_header_length += caplen;
+		return;
+	}
+	ndo->ndo_ll_header_length += NFLOG_HDR_LEN;
 
 	ND_TCHECK_SIZE(hdr);
 	if (GET_U_1(hdr->nflog_version) != 0) {
 		ND_PRINT("version %u (unknown)", GET_U_1(hdr->nflog_version));
-		return h_size;
+		return;
 	}
 
 	if (ndo->ndo_eflag)
@@ -221,10 +224,12 @@ nflog_if_print(netdissect_options *ndo,
 		break;
 	}
 
-	return h_size;
+	ndo->ndo_ll_header_length += h_size - NFLOG_HDR_LEN;
+	return;
 trunc:
 	nd_print_trunc(ndo);
-	return h_size;
+	ndo->ndo_ll_header_length += h_size - NFLOG_HDR_LEN;
+	return;
 }
 
 #endif /* DLT_NFLOG */
