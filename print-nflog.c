@@ -144,6 +144,7 @@ nflog_if_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "nflog";
 	if (caplen < NFLOG_HDR_LEN) {
+		nd_print_trunc(ndo);
 		ndo->ndo_ll_header_length += caplen;
 		return;
 	}
