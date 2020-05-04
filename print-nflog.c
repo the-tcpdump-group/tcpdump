@@ -55,11 +55,15 @@ typedef struct nflog_hdr {
 	nd_uint16_t	nflog_rid;		/* resource ID */
 } nflog_hdr_t;
 
+#define NFLOG_HDR_LEN sizeof(nflog_hdr_t)
+
 typedef struct nflog_tlv {
 	nd_uint16_t	tlv_length;		/* tlv length */
 	nd_uint16_t	tlv_type;		/* tlv type */
 	/* value follows this */
 } nflog_tlv_t;
+
+#define NFLOG_TLV_LEN sizeof(nflog_tlv_t)
 
 typedef struct nflog_packet_hdr {
 	nd_uint16_t	hw_protocol;	/* hw protocol */
@@ -134,12 +138,12 @@ nflog_if_print(netdissect_options *ndo,
 {
 	const nflog_hdr_t *hdr = (const nflog_hdr_t *)p;
 	uint16_t size;
-	uint16_t h_size = sizeof(nflog_hdr_t);
+	uint16_t h_size = NFLOG_HDR_LEN;
 	u_int caplen = h->caplen;
 	u_int length = h->len;
 
 	ndo->ndo_protocol = "nflog_if";
-	if (caplen < sizeof(nflog_hdr_t))
+	if (caplen < NFLOG_HDR_LEN)
 		goto trunc;
 
 	ND_TCHECK_SIZE(hdr);
@@ -151,15 +155,15 @@ nflog_if_print(netdissect_options *ndo,
 	if (ndo->ndo_eflag)
 		nflog_hdr_print(ndo, hdr, length);
 
-	p += sizeof(nflog_hdr_t);
-	length -= sizeof(nflog_hdr_t);
-	caplen -= sizeof(nflog_hdr_t);
+	p += NFLOG_HDR_LEN;
+	length -= NFLOG_HDR_LEN;
+	caplen -= NFLOG_HDR_LEN;
 
 	while (length > 0) {
 		const nflog_tlv_t *tlv;
 
 		/* We have some data.  Do we have enough for the TLV header? */
-		if (caplen < sizeof(nflog_tlv_t))
+		if (caplen < NFLOG_TLV_LEN)
 			goto trunc;	/* No. */
 
 		tlv = (const nflog_tlv_t *) p;
@@ -169,7 +173,7 @@ nflog_if_print(netdissect_options *ndo,
 			size += 4 - size % 4;
 
 		/* Is the TLV's length less than the minimum? */
-		if (size < sizeof(nflog_tlv_t))
+		if (size < NFLOG_TLV_LEN)
 			goto trunc;	/* Yes. Give up now. */
 
 		/* Do we have enough data for the full TLV? */
@@ -182,10 +186,10 @@ nflog_if_print(netdissect_options *ndo,
 			 * Skip past the TLV header, and break out
 			 * of the loop so we print the packet data.
 			 */
-			p += sizeof(nflog_tlv_t);
-			h_size += sizeof(nflog_tlv_t);
-			length -= sizeof(nflog_tlv_t);
-			caplen -= sizeof(nflog_tlv_t);
+			p += NFLOG_TLV_LEN;
+			h_size += NFLOG_TLV_LEN;
+			length -= NFLOG_TLV_LEN;
+			caplen -= NFLOG_TLV_LEN;
 			break;
 		}
 
@@ -210,7 +214,7 @@ nflog_if_print(netdissect_options *ndo,
 	default:
 		if (!ndo->ndo_eflag)
 			nflog_hdr_print(ndo, hdr,
-				length + sizeof(nflog_hdr_t));
+					length + NFLOG_HDR_LEN);
 
 		if (!ndo->ndo_suppress_default_print)
 			ND_DEFAULTPRINT(p, caplen);
