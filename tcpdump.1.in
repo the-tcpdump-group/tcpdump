@@ -405,10 +405,11 @@ Attempt to detect 802.11s draft mesh headers.
 .TP
 .BI \-\-interface= interface
 .PD
-Listen on \fIinterface\fP.
-If unspecified, \fItcpdump\fP searches the system interface list for the
-lowest numbered, configured up interface (excluding loopback), which may turn
-out to be, for example, ``eth0''.
+Listen, report the list of link-layer types, report the list of time
+stamp types, or report the results of compiling a filter expression on
+\fIinterface\fP.  If unspecified, \fItcpdump\fP searches the system
+interface list for the lowest numbered, configured up interface
+(excluding loopback), which may turn out to be, for example, ``eth0''.
 .IP
 On Linux systems with 2.2 or later kernels, an
 .I interface
