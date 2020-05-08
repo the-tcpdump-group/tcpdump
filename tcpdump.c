@@ -1932,6 +1932,14 @@ main(int argc, char **argv)
 		show_remote_devices_and_exit();
 #endif
 
+#if defined(DLT_LINUX_SLL2) && defined(HAVE_PCAP_SET_DATALINK)
+/* Set default linktype DLT_LINUX_SLL2 when capturing on the "any" device */
+		if (device != NULL &&
+		    strncmp (device, "any", strlen("any")) == 0
+		    && yflag_dlt == -1)
+			yflag_dlt = DLT_LINUX_SLL2;
+#endif
+
 	switch (ndo->ndo_tflag) {
 
 	case 0: /* Default */
@@ -2180,7 +2188,8 @@ main(int argc, char **argv)
 			}
 #endif
 			(void)fprintf(stderr, "%s: data link type %s\n",
-				      program_name, yflag_dlt_name);
+				      program_name,
+				      pcap_datalink_val_to_name(yflag_dlt));
 			(void)fflush(stderr);
 		}
 		i = pcap_snapshot(pd);
