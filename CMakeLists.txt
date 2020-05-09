@@ -1077,6 +1077,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-token.c
     print-udld.c
     print-udp.c
+    print-unsupported.c
     print-usb.c
     print-vjc.c
     print-vqp.c

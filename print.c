@@ -379,20 +379,11 @@ has_printer(int type)
 if_printer_t
 get_if_printer(netdissect_options *ndo, int type)
 {
-	const char *dltname;
 	if_printer_t printer;
 
 	printer = lookup_printer(ndo, type);
-	if (printer.printer == NULL) {
-		dltname = pcap_datalink_val_to_name(type);
-		if (dltname != NULL)
-			(*ndo->ndo_error)(ndo, S_ERR_ND_NO_PRINTER,
-					  "packet printing is not supported for link type %s: use -w",
-					  dltname);
-		else
-			(*ndo->ndo_error)(ndo, S_ERR_ND_NO_PRINTER,
-					  "packet printing is not supported for link type %d: use -w", type);
-	}
+	if (printer.printer == NULL)
+		printer.void_printer = unsupported_if_print;
 	return printer;
 }
 
