@@ -343,8 +343,7 @@ sll2_print(netdissect_options *ndo, const struct sll2_header *sllp, u_int length
 	u_short ether_type;
 
 	ndo->ndo_protocol = "sll2";
-        ND_PRINT("%3s ",
-		 tok2str(sll_pkttype_values,"?",GET_U_1(sllp->sll2_pkttype)));
+	ND_PRINT("ifindex %u ", GET_BE_U_4(sllp->sll2_if_index));
 
 	/*
 	 * XXX - check the link-layer address type value?
@@ -429,11 +428,13 @@ sll2_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 	sllp = (const struct sll2_header *)p;
 #ifdef HAVE_NET_IF_H
 	if_index = GET_BE_U_4(sllp->sll2_if_index);
-	if (if_indextoname(if_index, ifname))
-		ND_PRINT("ifindex %u (%s) ", if_index, ifname);
-	else
-		ND_PRINT("ifindex %u ", if_index);
+	if (!if_indextoname(if_index, ifname))
+		strncpy(ifname, "?", 2);
+	ND_PRINT("%-5s ", ifname);
 #endif
+
+	ND_PRINT("%-3s ",
+		 tok2str(sll_pkttype_values, "?", GET_U_1(sllp->sll2_pkttype)));
 
 	if (ndo->ndo_eflag)
 		sll2_print(ndo, sllp, length);
