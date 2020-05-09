@@ -271,8 +271,7 @@ static void flushpcap(int);
   static void verbose_stats_dump(int sig);
 #endif /* _WIN32 */
 
-static void info(int);
-static u_int packets_captured;
+static void info(netdissect_options *ndo, int);
 
 #ifdef HAVE_PCAP_FINDALLDEVS
 static const struct tok status_flags[] = {
@@ -1439,6 +1438,9 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 	return (pc);
 }
 
+/* global because signal handlers */
+netdissect_options Ndo;
+
 int
 main(int argc, char **argv)
 {
@@ -1478,7 +1480,6 @@ main(int argc, char **argv)
 	const char *yflag_dlt_name = NULL;
 	int print = 0;
 
-	netdissect_options Ndo;
 	netdissect_options *ndo = &Ndo;
 
 	/*
@@ -2535,7 +2536,7 @@ DIAG_ON_CLANG(assign-enum)
 			 * We're doing a live capture.  Report the capture
 			 * statistics.
 			 */
-			info(1);
+                        info(ndo, 1);
 		}
 		pcap_close(pd);
 		if (VFileName != NULL) {
@@ -2614,8 +2615,8 @@ DIAG_ON_CLANG(assign-enum)
 	while (ret != NULL);
 
 	if (count_mode && RFileName != NULL)
-		fprintf(stderr, "%u packet%s\n", packets_captured,
-			PLURAL_SUFFIX(packets_captured));
+		fprintf(stderr, "%u packet%s\n", ndo->ndo_packets_captured,
+			PLURAL_SUFFIX(ndo->ndo_packets_captured));
 
 	free(cmdbuf);
 	pcap_freecode(&fcode);
@@ -2686,7 +2687,7 @@ cleanup(int signo _U_)
 		 */
 		putchar('\n');
 		(void)fflush(stdout);
-		info(1);
+		info(ndo, 1);
 	}
 	exit_tcpdump(S_SUCCESS);
 #endif
@@ -2705,7 +2706,8 @@ child_cleanup(int signo _U_)
 #endif /* HAVE_FORK && HAVE_VFORK */
 
 static void
-info(int verbose)
+info(netdissect_options *ndo,
+     int verbose)
 {
 	struct pcap_stat stats;
 
@@ -2723,8 +2725,8 @@ info(int verbose)
 	if (!verbose)
 		fprintf(stderr, "%s: ", program_name);
 
-	(void)fprintf(stderr, "%u packet%s captured", packets_captured,
-	    PLURAL_SUFFIX(packets_captured));
+	(void)fprintf(stderr, "%u packet%s captured", ndo->ndo_packets_captured,
+	    PLURAL_SUFFIX(ndo->ndo_packets_captured));
 	if (!verbose)
 		fputs(", ", stderr);
 	else
@@ -2806,8 +2808,8 @@ static void
 dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
 	struct dump_info *dump_info;
-
-	++packets_captured;
+        netdissect_options *ndo = (netdissect_options *)user;
+	++ndo->ndo_packets_captured;
 
 	++infodelay;
 
@@ -2861,7 +2863,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			if (Cflag == 0 && Wflag > 0 && Gflag_count >= Wflag) {
 				(void)fprintf(stderr, "Maximum file limit reached: %d\n",
 				    Wflag);
-				info(1);
+				info(ndo, 1);
 				exit_tcpdump(S_SUCCESS);
 				/* NOTREACHED */
 			}
@@ -3010,19 +3012,19 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 #endif
 
 	if (dump_info->ndo != NULL)
-		pretty_print_packet(dump_info->ndo, h, sp, packets_captured);
+                pretty_print_packet(dump_info->ndo, h, sp);
 
 	--infodelay;
 	if (infoprint)
-		info(0);
+                info(ndo, 0);
 }
 
 static void
 dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
 	struct dump_info *dump_info;
-
-	++packets_captured;
+        netdissect_options *ndo = (netdissect_options *)user;
+	++ndo->ndo_packets_captured;
 
 	++infodelay;
 
@@ -3035,26 +3037,27 @@ dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 #endif
 
 	if (dump_info->ndo != NULL)
-		pretty_print_packet(dump_info->ndo, h, sp, packets_captured);
+                pretty_print_packet(dump_info->ndo, h, sp);
 
 	--infodelay;
 	if (infoprint)
-		info(0);
+                info(ndo, 0);
 }
 
 static void
 print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
-	++packets_captured;
+        netdissect_options *ndo = (netdissect_options *)user;
+	++ndo->ndo_packets_captured;
 
 	++infodelay;
 
 	if (!count_mode)
-		pretty_print_packet((netdissect_options *)user, h, sp, packets_captured);
+                pretty_print_packet(ndo, h, sp);
 
 	--infodelay;
 	if (infoprint)
-		info(0);
+		info(ndo, 0);
 }
 
 #ifdef SIGNAL_REQ_INFO
@@ -3064,7 +3067,7 @@ requestinfo(int signo _U_)
 	if (infodelay)
 		++infoprint;
 	else
-		info(0);
+		info(&Ndo, 0);
 }
 #endif
 
@@ -3082,10 +3085,10 @@ print_packets_captured (void)
 {
 	static u_int prev_packets_captured, first = 1;
 
-	if (infodelay == 0 && (first || packets_captured != prev_packets_captured)) {
-		fprintf(stderr, "Got %u\r", packets_captured);
+	if (infodelay == 0 && (first || Ndo.ndo_packets_captured != prev_packets_captured)) {
+		fprintf(stderr, "Got %u\r", Ndo.ndo_packets_captured);
 		first = 0;
-		prev_packets_captured = packets_captured;
+		prev_packets_captured = Ndo.ndo_packets_captured;
 	}
 }
 
