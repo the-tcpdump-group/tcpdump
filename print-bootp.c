@@ -845,7 +845,11 @@ rfc1048_print(netdissect_options *ndo,
 					len = 0;
 					break;
 				}
-				if (GET_U_1(bp))
+				if (GET_U_1(bp) & 0xf0) {
+					ND_PRINT("[ERROR: MBZ nibble 0x%x != 0] ",
+						 (GET_U_1(bp) & 0xf0) >> 4);
+				}
+				if (GET_U_1(bp) & 0x0f)
 					ND_PRINT("[%s] ",
 						 client_fqdn_flags(GET_U_1(bp)));
 				bp++;
