@@ -816,7 +816,7 @@ rfc1048_print(netdissect_options *ndo,
 			case TAG_NETBIOS_NODE:
 				/* this option should be at least 1 byte long */
 				if (len < 1) {
-					ND_PRINT("ERROR: length < 1 bytes");
+					ND_PRINT("[ERROR: length < 1 bytes]");
 					break;
 				}
 				tag = GET_U_1(bp);
@@ -828,7 +828,7 @@ rfc1048_print(netdissect_options *ndo,
 			case TAG_OPT_OVERLOAD:
 				/* this option should be at least 1 byte long */
 				if (len < 1) {
-					ND_PRINT("ERROR: length < 1 bytes");
+					ND_PRINT("[ERROR: length < 1 bytes]");
 					break;
 				}
 				tag = GET_U_1(bp);
@@ -840,7 +840,7 @@ rfc1048_print(netdissect_options *ndo,
 			case TAG_CLIENT_FQDN:
 				/* this option should be at least 3 bytes long */
 				if (len < 3) {
-					ND_PRINT("ERROR: length < 3 bytes");
+					ND_PRINT("[ERROR: length < 3 bytes]");
 					bp += len;
 					len = 0;
 					break;
@@ -873,7 +873,7 @@ rfc1048_print(netdissect_options *ndo,
 
 				/* this option should be at least 1 byte long */
 				if (len < 1) {
-					ND_PRINT("ERROR: length < 1 bytes");
+					ND_PRINT("[ERROR: length < 1 bytes]");
 					break;
 				}
 				type = GET_U_1(bp);
@@ -947,7 +947,7 @@ rfc1048_print(netdissect_options *ndo,
 
 				/* this option should be at least 5 bytes long */
 				if (len < 5) {
-					ND_PRINT("ERROR: length < 5 bytes");
+					ND_PRINT("[ERROR: length < 5 bytes]");
 					bp += len;
 					len = 0;
 					break;
@@ -1002,7 +1002,7 @@ rfc1048_print(netdissect_options *ndo,
 
 				first = 1;
 				if (len < 2) {
-					ND_PRINT("ERROR: length < 2 bytes");
+					ND_PRINT("[ERROR: length < 2 bytes]");
 					bp += len;
 					len = 0;
 					break;
@@ -1014,13 +1014,13 @@ rfc1048_print(netdissect_options *ndo,
 					ND_PRINT("\n\t      ");
 					ND_PRINT("instance#%u: ", suboptnumber);
 					if (suboptlen == 0) {
-						ND_PRINT("ERROR: suboption length must be non-zero");
+						ND_PRINT("[ERROR: suboption length must be non-zero]");
 						bp += len;
 						len = 0;
 						break;
 					}
 					if (len < suboptlen) {
-						ND_PRINT("ERROR: invalid option");
+						ND_PRINT("[ERROR: invalid option]");
 						bp += len;
 						len = 0;
 						break;
