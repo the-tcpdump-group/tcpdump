@@ -126,7 +126,9 @@ before_script:
   - if [ "$BUILD_LIBPCAP" = yes ]; then (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth 3 --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure "--${REMOTE}-remote" --prefix=/tmp && make && make install); fi
 
 script:
-  - if [ "$COVERITY_SCAN_BRANCH" = 1 ]; then echo "Coverity build - nothing more to do"; exit 0; fi
+  - if [ "$COVERITY_SCAN_BRANCH" = 1 ]; then echo "Coverity build - nothing more to do"; fi
+  - if [ "$COVERITY_SCAN_BRANCH" = 1 ]; then exit 0; fi
+  - echo "One last message"
   - if [ "$TRAVIS_OS_NAME" = osx ]; then OSX_SSL_DIR=$(ls /usr/local/Cellar/openssl); echo "OSX_SSL_DIR=$OSX_SSL_DIR"; fi
   - touch .devel configure
   - if [ "$CMAKE" = no ]; then echo '$ ./configure [...]' && echo travis_fold:start:script.configure; fi
