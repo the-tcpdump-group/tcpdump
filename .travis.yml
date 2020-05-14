@@ -40,18 +40,7 @@ compiler:
 #
 jobs:
   exclude:
-  - arch: s390x
-    os: osx
-  - arch: arm64
-    os: osx
-  - compiler: gcc
-    os: osx
   - if: branch = "master"
-    arch: ppc64le
-  - if: branch = "master"
-    arch: s390x
-  - if: branch = "master"
-    arch: arm64
 
 cache: ccache
 
