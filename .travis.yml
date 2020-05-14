@@ -113,11 +113,11 @@ git:
 before_install:
   - uname -a
   - date
+  - gem install travis-conditions
   - if [ "$TRAVIS_OS_NAME" = osx ]; then brew update >/dev/null; fi
   - if [ "$TRAVIS_OS_NAME" = linux ]; then apt list --installed 'lib*-dev'; fi
 
 install:
-  - gem install travis-conditions
   - if [ "$TRAVIS_OS_NAME" = osx ]; then brew install libsmi | grep -v '%'; fi
 
 before_script:
