@@ -49,11 +49,11 @@ jobs:
   - compiler: gcc
     os: osx
   - arch: ppc64le
-    env: COVERITY_SCAN_BRANCH=1
+    if: branch == coverity_scan
   - arch: s390x
-    env: COVERITY_SCAN_BRANCH=1
+    if: branch == coverity_scan
   - arch: arm64
-    env: COVERITY_SCAN_BRANCH=1
+    if: branch == coverity_scan
 
 cache: ccache
 
