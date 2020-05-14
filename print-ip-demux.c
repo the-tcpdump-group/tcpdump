@@ -161,7 +161,13 @@ again:
 		break;
 
 	case IPPROTO_IGMP:
-		igmp_print(ndo, bp, length);
+		if (ver == 4)
+			igmp_print(ndo, bp, length);
+		else {
+			ND_PRINT("[%s requires IPv4]",
+				 tok2str(ipproto_values,"unknown",nh));
+			nd_print_invalid(ndo);
+		}
 		break;
 
 	case IPPROTO_IPV4:
