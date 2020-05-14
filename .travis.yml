@@ -40,7 +40,7 @@ compiler:
 #
 jobs:
   exclude:
-  - if: branch = "master"
+  - if: os = linux
 
 cache: ccache
 
