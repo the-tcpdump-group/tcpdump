@@ -49,11 +49,11 @@ jobs:
   - compiler: gcc
     os: osx
   - arch: ppc64le
-    if: branch == coverity_scan
+    if: branch == master
   - arch: s390x
-    if: branch == coverity_scan
+    if: branch == master
   - arch: arm64
-    if: branch == coverity_scan
+    if: branch == master
 
 cache: ccache
 
