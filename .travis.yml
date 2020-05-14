@@ -41,6 +41,7 @@ compiler:
 jobs:
   exclude:
   - if: 1 = 1
+    os: linux
 
 cache: ccache
 
