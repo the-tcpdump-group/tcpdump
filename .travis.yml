@@ -36,14 +36,13 @@ compiler:
 #
 jobs:
   exclude:
-  - arch: ppc64le
-    os: osx
   - arch: s390x
     os: osx
   - arch: arm64
     os: osx
   - compiler: gcc
     os: osx
+  - if: build = master AND arch = ppc64le AND os = osx
 
 cache: ccache
 
