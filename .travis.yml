@@ -34,13 +34,16 @@ compiler:
 # compatibility with build scripts etc. that expect the compiler to be
 # "gcc", so don't bother doing "gcc" builds on macOS.
 #
-# Furthermore, the Coverity-branch builds seem to time out on the
-# non-x86 platforms, so suppress them as well.  (Are they supported
-# at all?)
-#
 jobs:
   exclude:
-  - os: linux
+  - arch: ppc64le
+    os: osx
+  - arch: s390x
+    os: osx
+  - arch: arm64
+    os: osx
+  - compiler: gcc
+    os: osx
 
 cache: ccache
 
@@ -124,9 +127,7 @@ before_script:
   - if [ "$BUILD_LIBPCAP" = yes ]; then (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth 3 --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure "--${REMOTE}-remote" --prefix=/tmp && make && make install); fi
 
 script:
-  - if [ "$COVERITY_SCAN_BRANCH" = 1 ]; then echo "Coverity build - nothing more to do"; fi
   - if [ "$COVERITY_SCAN_BRANCH" = 1 ]; then exit 0; fi
-  - echo "One last message"
   - if [ "$TRAVIS_OS_NAME" = osx ]; then OSX_SSL_DIR=$(ls /usr/local/Cellar/openssl); echo "OSX_SSL_DIR=$OSX_SSL_DIR"; fi
   - touch .devel configure
   - if [ "$CMAKE" = no ]; then echo '$ ./configure [...]' && echo travis_fold:start:script.configure; fi
