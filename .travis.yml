@@ -40,8 +40,7 @@ compiler:
 #
 jobs:
   exclude:
-  - if: 1 = 1
-    os: linux
+  - os: linux
 
 cache: ccache
 
