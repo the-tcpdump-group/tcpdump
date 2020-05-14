@@ -34,6 +34,10 @@ compiler:
 # compatibility with build scripts etc. that expect the compiler to be
 # "gcc", so don't bother doing "gcc" builds on macOS.
 #
+# Furthermore, the Coverity-branch builds seem to time out on the
+# non-x86 platforms, so suppress them as well.  (Are they supported
+# at all?)
+#
 jobs:
   exclude:
   - arch: ppc64le
@@ -44,6 +48,12 @@ jobs:
     os: osx
   - compiler: gcc
     os: osx
+  - arch: ppc64le
+    env: COVERITY_SCAN_BRANCH=1
+  - arch: s390x
+    env: COVERITY_SCAN_BRANCH=1
+  - arch: arm64
+    env: COVERITY_SCAN_BRANCH=1
 
 cache: ccache
 
