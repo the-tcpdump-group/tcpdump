@@ -34,7 +34,31 @@ compiler:
 # compatibility with build scripts etc. that expect the compiler to be
 # "gcc", so don't bother doing "gcc" builds on macOS.
 #
+# Furthermore, the Coverity-branch builds seem to time out on the
+# non-x86 platforms, so suppress them as well.  (Are they supported
+# at all?)
+#
+# XXX - what is the fast_finish clause there for?  According to
+#
+#    https://docs.travis-ci.com/user/build-matrix/#fast-finishing
+#
+# "If some rows in the build matrix are allowed to fail, the build 
+# won't be marked as finished until they have completed.
+#
+# To mark the build as finished as soon as possible, add fast_finish:
+# true to the jobs section of your .travis.yml like this:
+#
+# jobs:
+#   fast_finish: true
+#
+# Now, the build result will be determined as soon as all the required
+# jobs finish, based on these results, while the rest of the
+# allow_failures jobs continue to run."
+#
+# but we *have* no allow_failures jobs.
+#
 jobs:
+  fast_finish: true
   exclude:
   - arch: ppc64le
     os: osx
@@ -44,6 +68,12 @@ jobs:
     os: osx
   - compiler: gcc
     os: osx
+  - if: branch = coverity_scan
+    arch: ppc64le
+  - if: branch = coverity_scan
+    arch: s390x
+  - if: branch = coverity_scan
+    arch: arm64
 
 cache: ccache
 
@@ -75,9 +105,6 @@ env:
     - BUILD_LIBPCAP=yes CMAKE=yes REMOTE=disable CRYPTO=yes
     - BUILD_LIBPCAP=yes CMAKE=yes REMOTE=enable  CRYPTO=no
     - BUILD_LIBPCAP=yes CMAKE=yes REMOTE=enable  CRYPTO=yes
-
-matrix:
-  fast_finish: true
 
 addons:
   coverity_scan:
