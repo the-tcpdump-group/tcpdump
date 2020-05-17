@@ -579,7 +579,10 @@ Use \fIsecret\fP as a shared secret for validating the digests found in
 TCP segments with the TCP-MD5 option (RFC 2385), if present.
 .TP
 .B \-n
-Don't convert addresses (i.e., host addresses, port numbers, etc.) to names.
+Don't convert addresses (i.e., host addresses, etc.) to names.
+.TP
+.B \-nn
+Don't convert addresses (i.e., host addresses, etc.) and port numbers to names.
 .TP
 .B \-N
 Don't print domain name qualification of host names.
