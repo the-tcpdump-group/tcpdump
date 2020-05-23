@@ -905,13 +905,101 @@ bgp_extended_community_print(netdissect_options *ndo,
     }
 }
 
+/*
+ * RFC4684 (Section 4)/RFC2858 (Section 4).
+ * RTC membership prefix is structured as follows
+ * [prefix-len] [origin-as] [route-target]
+ * The route-target is encoded as RT ext-comms.
+ * Prefix-len may be 0, 32..96
+ *
+ * Note that pptr is not packet data - it is
+ * a buffer owned by our caller - therefore GET_*
+ * macros can not be used.
+ */
+static char *
+bgp_rt_prefix_print(netdissect_options *ndo,
+                    const u_char *pptr,
+                    u_int plen)
+{
+    /* allocate space for the largest possible string */
+    char rtc_prefix_in_hex[20] = "";
+    u_int rtc_prefix_in_hex_len = 0;
+    static char output[60]; /* max response string */
+    uint16_t ec_type = 0;
+    u_int octet_count;
+    u_int i;
+
+    if (plen == 0) {
+        snprintf(output, sizeof(output), "route-target: 0:0/0");
+        return (output);
+    }
+
+    /* hex representation of the prefix */
+    octet_count = (plen+7)/8;
+    for (i=0; i<octet_count; i++) {
+        rtc_prefix_in_hex_len += snprintf(rtc_prefix_in_hex+rtc_prefix_in_hex_len,
+                                sizeof(rtc_prefix_in_hex)-rtc_prefix_in_hex_len,
+                                "%02x%s", *(pptr+i),
+                                ((i%2 == 1) && (i<octet_count-1)) ? " " : "");
+            }
+
+    if (plen < 16) {
+	/*
+	 * The prefix is too short to include the full ext-comm type,
+	 * so we have no way to parse it further.
+	 */
+        snprintf(output, sizeof(output), "route-target: partial-type: (%s/%d)",
+                 rtc_prefix_in_hex, plen);
+        return (output);
+    }
+
+    /*
+     * get the ext-comm type
+     * Note: pptr references a static 8 octet buffer with unused bits set to 0,
+     * hense EXTRACT_*() macros are safe.
+     */
+    ec_type = EXTRACT_BE_U_2(pptr);
+    switch (ec_type) {
+    case BGP_EXT_COM_RT_0:
+        /* 2-byte-AS:number fmt */
+        snprintf(output, sizeof(output), "route-target: %u:%u/%d (%s)",
+                 EXTRACT_BE_U_2(pptr+2),
+                 EXTRACT_BE_U_4(pptr+4),
+                 plen, rtc_prefix_in_hex);
+        break;
+
+    case BGP_EXT_COM_RT_1:
+        /* IP-address:AS fmt */
+        snprintf(output, sizeof(output), "route-target: %u.%u.%u.%u:%u/%d (%s)",
+                 *(pptr+2), *(pptr+3), *(pptr+4), *(pptr+5),
+                 EXTRACT_BE_U_2(pptr+6), plen, rtc_prefix_in_hex);
+        break;
+
+    case BGP_EXT_COM_RT_2:
+        /* 4-byte-AS:number fmt */
+        snprintf(output, sizeof(output), "route-target: %s:%u/%d (%s)",
+                 as_printf(ndo, astostr, sizeof(astostr), EXTRACT_BE_U_4(pptr+2)),
+                 EXTRACT_BE_U_2(pptr+6), plen, rtc_prefix_in_hex);
+        break;
+
+    default:
+        snprintf(output, sizeof(output), "route target: unknown-type(%04x) (%s/%d)",
+                 ec_type,
+                 rtc_prefix_in_hex, plen);
+        break;
+    }
+    return (output);
+}
+
 /* RFC 4684 */
 static int
 decode_rt_routing_info(netdissect_options *ndo,
                        const u_char *pptr)
 {
+    uint8_t route_target[8];
     u_int plen;
     char asbuf[sizeof(astostr)]; /* bgp_vpn_rd_print() overwrites astostr */
+    u_int num_octets;
 
     /* NLRI "prefix length" from RFC 2858 Section 4. */
     ND_TCHECK_1(pptr);
@@ -938,19 +1026,29 @@ decode_rt_routing_info(netdissect_options *ndo,
 
     plen -= 32; /* adjust prefix length */
 
-    /* An extended community is 8 octets, so the remaining prefix
-     * length must be 64.
-     */
-    if (64 != plen) {
-        ND_PRINT("\n\t    (illegal prefix length)");
+    if (64 < plen) {
+        ND_PRINT("\n\t      (illegal prefix length)");
         return -1;
     }
-    ND_TCHECK_LEN(pptr + 5, 8);
-    ND_PRINT("\n\t      origin AS: %s, route target ", asbuf);
-    bgp_extended_community_print(ndo, pptr + 5);
 
-    return 5 + 8;
+    /* From now on (plen + 7) / 8 evaluates to { 0, 1, 2, ..., 8 }
+     * and gives the number of octets in the variable-length "route
+     * target" field inside this NLRI "prefix". Look for it.
+     */
+    memset(&route_target, 0, sizeof(route_target));
+    num_octets = (plen + 7) / 8;
+    ND_TCHECK_LEN(pptr[5], num_octets);
+    memcpy(&route_target, &pptr[5], num_octets);
+    /* If mask-len is not on octet boundary, ensure all extra bits are 0 */
+    if (plen % 8) {
+        ((u_char *)&route_target)[num_octets - 1] &=
+            ((0xff00 >> (plen % 8)) & 0xff);
+    }
+    ND_PRINT("\n\t      origin AS: %s, %s",
+             asbuf,
+             bgp_rt_prefix_print(ndo, (u_char *)&route_target, plen));
 
+    return 5 + num_octets;
 trunc:
     return -2;
 }
