@@ -58,7 +58,6 @@ compiler:
 # but we *have* no allow_failures jobs.
 #
 jobs:
-  fast_finish: true
   exclude:
   - arch: ppc64le
     os: osx
