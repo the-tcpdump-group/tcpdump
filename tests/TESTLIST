@@ -141,6 +141,7 @@ babel1v         babel.pcap             babel1v.out     -v
 babel_auth      babel_auth.pcap        babel_auth.out  -v
 babel_pad1      babel_pad1.pcap        babel_pad1.out
 babel_rtt       babel_rtt.pcap         babel_rtt.out   -v
+babel_rfc6126bis  babel_rfc6126bis.pcap  babel_rfc6126bis.out     -v
 
 # PPPoE tests
 pppoe           pppoe.pcap             pppoe.out

@@ -1,5 +1,5 @@
     1  12:40:42.226395 IP6 (class 0xc0, hlim 1, next-header UDP (17) payload length: 436) fe80::b299:28ff:ffc8:d646.6696 > ff02::59:0:0:1:6.6696: [bad udp cksum 0x2997 -> 0xbbd2!] babel 2 (424)
-	Hello seqno 58134 interval 4.00s sub-unknown-0x08 sub-pad1 sub-pad1 sub-unknown-0x04 sub-unknown-0x30 sub-diversity 2-2 (bogus) sub-diversity 2-2 (bogus) sub-diversity 2-48 (bogus) (invalid)
+	Hello (Unicast) seqno 58134 interval 4.00s sub-unknown-0x08 sub-pad1 sub-pad1 sub-unknown-0x04 sub-unknown-0x30 sub-diversity 2-2 (bogus) sub-diversity 2-2 (bogus) sub-diversity 2-48 (bogus) (invalid)
 	Unknown message type 48
 	Unknown message type 223
 	Pad 1
