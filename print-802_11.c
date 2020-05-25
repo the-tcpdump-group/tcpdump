@@ -1091,7 +1091,7 @@ static const char *reason_text[] = {
 	  "requesting to close the mesh peering",				/* 55 */
 	"The mesh STA has resent dot11MeshMaxRetries Mesh "
 	  "Peering Open frames, without receiving a Mesh Peering "
-	  "Confirm frame"										/* 56 */
+	  "Confirm frame",										/* 56 */
 	"The confirmTimer for the mesh peering instance times out",	/* 57 */
 	"The mesh STA fails to unwrap the GTK or the values in the "
 	  "wrapped contents do not match",						/* 58 */
