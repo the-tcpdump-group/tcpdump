@@ -59,8 +59,8 @@
 #define ERROR_RX_PORT	7006		/* Doesn't seem to be used */
 #define BOS_RX_PORT	7007
 
-#define AFSNAMEMAX 256
 #define AFSOPAQUEMAX 1024
+#define AFSNAMEMAX 256			/* Must be >= PRNAMEMAX + 1, VLNAMEMAX + 1, and 32 + 1 */
 #define PRNAMEMAX 64
 #define VLNAMEMAX 65
 #define KANAMEMAX 64
@@ -854,13 +854,12 @@ rx_cache_find(netdissect_options *ndo, const struct rx_header *rxh,
 
 /*
  * This is the sickest one of all
+ * MAX is expected to be a constant here
  */
 
 #define VECOUT(MAX) { u_char *sp; \
-			u_char s[AFSNAMEMAX]; \
+			u_char s[(MAX) + 1]; \
 			uint32_t k; \
-			if ((MAX) + 1 > sizeof(s)) \
-				goto trunc; \
 			ND_TCHECK_LEN(bp, (MAX) * sizeof(uint32_t)); \
 			sp = s; \
 			for (k = 0; k < (MAX); k++) { \
