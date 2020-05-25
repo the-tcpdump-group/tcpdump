@@ -1193,7 +1193,7 @@ rsvp_obj_print(netdissect_options *ndo,
             case RSVP_CTYPE_1:
                 if (obj_tlen < 4)
                     return-1;
-                uint8_t unused_and_flags = GET_BE_U_4(obj_tptr);
+                uint32_t unused_and_flags = GET_BE_U_4(obj_tptr);
                 if (unused_and_flags & ~RSVP_OBJ_CAPABILITY_FLAGS_MASK)
                     ND_PRINT("%s  [reserved=0x%08x must be zero]", indent,
                         unused_and_flags & ~RSVP_OBJ_CAPABILITY_FLAGS_MASK);
