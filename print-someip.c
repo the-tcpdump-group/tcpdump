@@ -77,7 +77,7 @@ static const struct tok return_code_values[] = {
 };
 
 void
-someip_print(netdissect_options *ndo, const u_char *bp, u_int len)
+someip_print(netdissect_options *ndo, const u_char *bp, const u_int len)
 {
     uint32_t message_id;
     uint16_t service_id;
