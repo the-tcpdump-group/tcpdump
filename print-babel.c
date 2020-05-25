@@ -849,7 +849,7 @@ babel_print_v2(netdissect_options *ndo,
     if (length != 0) {
     	if(ndo->ndo_vflag) ND_PRINT("\n\t----");
     	else ND_PRINT(" |");
-        babel_print_v2_tlvs(ndo, cp, length, length);
+        ret = babel_print_v2_tlvs(ndo, cp, length, length);
         if (ret == -1)
             goto trunc;
         if (ret == -2)
