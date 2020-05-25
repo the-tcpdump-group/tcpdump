@@ -27,6 +27,15 @@
  */
 
 /* \summary: Babel Routing Protocol printer */
+/* Specifications:
+ *
+ * RFC 6126
+ * RFC 7298
+ * RFC 7557
+ * draft-ietf-babel-rfc6126bis-17
+ * draft-ietf-babel-hmac-10
+ * draft-ietf-babel-source-specific-0
+ */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -93,12 +102,22 @@ babel_print(netdissect_options *ndo,
 #define MESSAGE_UPDATE_SRC_SPECIFIC 13 /* last appearance in draft-boutier-babel-source-specific-01 */
 #define MESSAGE_REQUEST_SRC_SPECIFIC 14 /* idem */
 #define MESSAGE_MH_REQUEST_SRC_SPECIFIC 15 /* idem */
+#define MESSAGE_MAC 16
+#define MESSAGE_PC 17
+#define MESSAGE_CHALLENGE_REQUEST 18
+#define MESSAGE_CHALLENGE_REPLY 19
 
 /* sub-TLVs */
 #define MESSAGE_SUB_PAD1 0
 #define MESSAGE_SUB_PADN 1
 #define MESSAGE_SUB_DIVERSITY 2
 #define MESSAGE_SUB_TIMESTAMP 3
+
+/* "Mandatory" bit in sub-TLV types */
+#define MANDATORY_MASK 0x80
+
+/* Flags for the Hello TLV */
+#define UNICAST_MASK 0x8000
 
 /* Diversity sub-TLV channel codes */
 static const struct tok diversity_str[] = {
@@ -111,7 +130,7 @@ static const char *
 format_id(netdissect_options *ndo, const u_char *id)
 {
     static char buf[25];
-    nd_snprintf(buf, 25, "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
+    snprintf(buf, 25, "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
              GET_U_1(id), GET_U_1(id + 1), GET_U_1(id + 2),
              GET_U_1(id + 3), GET_U_1(id + 4), GET_U_1(id + 5),
              GET_U_1(id + 6), GET_U_1(id + 7));
@@ -126,10 +145,16 @@ static const char *
 format_prefix(netdissect_options *ndo, const u_char *prefix, unsigned char plen)
 {
     static char buf[50];
+
+    /*
+     * prefix points to a buffer on the stack into which the prefix has
+     * been placed, so we can't use GET_IPADDR_STRING() or
+     * GET_IP6ADDR_STRING() on it.
+     */
     if(plen >= 96 && memcmp(prefix, v4prefix, 12) == 0)
-        nd_snprintf(buf, 50, "%s/%u", ipaddr_string(ndo, prefix + 12), plen - 96);
+        snprintf(buf, 50, "%s/%u", ipaddr_string(ndo, prefix + 12), plen - 96);
     else
-        nd_snprintf(buf, 50, "%s/%u", ip6addr_string(ndo, prefix), plen);
+        snprintf(buf, 50, "%s/%u", ip6addr_string(ndo, prefix), plen);
     buf[49] = '\0';
     return buf;
 }
@@ -137,6 +162,11 @@ format_prefix(netdissect_options *ndo, const u_char *prefix, unsigned char plen)
 static const char *
 format_address(netdissect_options *ndo, const u_char *prefix)
 {
+    /*
+     * prefix points to a buffer on the stack into which the prefix has
+     * been placed, so we can't use GET_IPADDR_STRING() or
+     * GET_IP6ADDR_STRING() on it.
+     */
     if(memcmp(prefix, v4prefix, 12) == 0)
         return ipaddr_string(ndo, prefix + 12);
     else
@@ -150,7 +180,7 @@ format_interval(const uint16_t i)
 
     if (i == 0)
         return "0.0s (bogus)";
-    nd_snprintf(buf, sizeof(buf), "%u.%02us", i / 100, i % 100);
+    snprintf(buf, sizeof(buf), "%u.%02us", i / 100, i % 100);
     return buf;
 }
 
@@ -164,7 +194,7 @@ static const char *
 format_timestamp(const uint32_t i)
 {
     static char buf[sizeof("0000.000000s")];
-    nd_snprintf(buf, sizeof(buf), "%u.%06us", i / 1000000, i % 1000000);
+    snprintf(buf, sizeof(buf), "%u.%06us", i / 1000000, i % 1000000);
     return buf;
 }
 
@@ -282,6 +312,8 @@ subtlvs_print(netdissect_options *ndo,
             ND_PRINT(" sub-pad1");
             continue;
         }
+        if ((MANDATORY_MASK & subtype) != 0)
+            ND_PRINT(" (M)");
         if(cp == ep)
             goto invalid;
         sublen = GET_U_1(cp);
@@ -342,33 +374,28 @@ subtlvs_print(netdissect_options *ndo,
 }
 
 #define ICHECK(i, l) \
-	if ((i) + (l) > bodylen || (i) + (l) > length) goto invalid;
+	if ((i) + (l) > tlvs_length || (i) + (l) > packet_length_remaining) \
+	    goto invalid;
 
-static void
-babel_print_v2(netdissect_options *ndo,
-               const u_char *cp, u_int length)
+static int
+babel_print_v2_tlvs(netdissect_options *ndo,
+                    const u_char *cp, u_int tlvs_length,
+                    u_int packet_length_remaining)
 {
     u_int i;
-    u_short bodylen;
     u_char v4_prefix[16] =
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF, 0, 0, 0, 0 };
     u_char v6_prefix[16] = {0};
-
-    ND_TCHECK_4(cp);
-    if (length < 4)
-        goto invalid;
-    bodylen = GET_BE_U_2(cp + 2);
-    ND_PRINT(" (%u)", bodylen);
-
-    /* Process the TLVs in the body */
+ 
     i = 0;
-    while(i < bodylen) {
+    while(i < tlvs_length) {
         const u_char *message;
         uint8_t type;
         u_int len;
 
-        message = cp + 4 + i;
+        message = cp + i;
 
+        ICHECK(i, 1);
         ND_TCHECK_1(message);
         if((type = GET_U_1(message)) == MESSAGE_PAD1) {
             ND_PRINT(ndo->ndo_vflag ? "\n\tPad 1" : " pad1");
@@ -376,12 +403,12 @@ babel_print_v2(netdissect_options *ndo,
             continue;
         }
 
-        ND_TCHECK_2(message);
         ICHECK(i, 2);
+        ND_TCHECK_2(message);
         len = GET_U_1(message + 1);
 
-        ND_TCHECK_LEN(message, 2 + len);
         ICHECK(i, 2 + len);
+        ND_TCHECK_LEN(message, 2 + len);
 
         switch(type) {
         case MESSAGE_PADN: {
@@ -420,15 +447,22 @@ babel_print_v2(netdissect_options *ndo,
             break;
 
         case MESSAGE_HELLO:  {
-            u_short seqno, interval;
+            u_short seqno, interval, unicast;
             if (!ndo->ndo_vflag)
                 ND_PRINT(" hello");
             else {
                 ND_PRINT("\n\tHello ");
                 if(len < 6) goto invalid;
+                unicast = (GET_BE_U_2(message + 2) & UNICAST_MASK);
                 seqno = GET_BE_U_2(message + 4);
                 interval = GET_BE_U_2(message + 6);
-                ND_PRINT("seqno %u interval %s", seqno, format_interval(interval));
+                if(unicast)
+                     ND_PRINT("(Unicast) ");
+                ND_PRINT("seqno %u ", seqno);
+                if(interval!=0)
+                    ND_PRINT("interval %s", format_interval(interval));
+                else
+                    ND_PRINT("unscheduled");
                 /* Extra data. */
                 if(len > 6)
                     subtlvs_print(ndo, message + 8, message + 2 + len, type);
@@ -495,8 +529,8 @@ babel_print_v2(netdissect_options *ndo,
         case MESSAGE_UPDATE: {
             if (!ndo->ndo_vflag) {
                 ND_PRINT(" update");
-                if(len < 1)
-                    ND_PRINT("/truncated");
+                if(len < 10)
+                    goto invalid;
                 else
                     ND_PRINT("%s%s%s",
                            (GET_U_1(message + 3) & 0x80) ? "/prefix": "",
@@ -722,6 +756,51 @@ babel_print_v2(netdissect_options *ndo,
         }
             break;
 
+        case MESSAGE_MAC: {
+            if (!ndo->ndo_vflag)
+                ND_PRINT(" mac");
+            else { 
+                ND_PRINT("\n\tMAC ");
+                ND_PRINT("len %u", len);
+            }
+        }
+            break;
+
+        case MESSAGE_PC: {
+            if (!ndo->ndo_vflag)
+                ND_PRINT(" pc");
+            else {
+                ND_PRINT("\n\tPC");
+                if(len < 4) goto invalid;
+                ND_PRINT(" value %u",
+                    GET_BE_U_4(message + 2));
+                ND_PRINT(" index len %u", len-4);
+            }
+        }
+            break;
+
+        case MESSAGE_CHALLENGE_REQUEST: {
+            if (!ndo->ndo_vflag)
+                ND_PRINT(" challenge_request");
+            else {
+                ND_PRINT("\n\tChallenge Request");
+                if(len > 192) goto invalid;
+                ND_PRINT(" len %u", len);
+            }
+        }
+            break;
+
+        case MESSAGE_CHALLENGE_REPLY: {
+            if (!ndo->ndo_vflag)
+                ND_PRINT(" challenge_reply");
+            else {
+                ND_PRINT("\n\tChallenge Reply");
+                if (len > 192) goto invalid;
+                ND_PRINT(" len %u", len);
+            }
+        }
+            break;
+
         default:
             if (!ndo->ndo_vflag)
                 ND_PRINT(" unknown");
@@ -729,6 +808,52 @@ babel_print_v2(netdissect_options *ndo,
                 ND_PRINT("\n\tUnknown message type %u", type);
         }
         i += len + 2;
+    }
+
+    return 0; /* OK */
+
+trunc:
+    return -1; /* packet truncated by capture process */
+
+invalid:
+    return -2; /* packet is invalid */
+}
+
+static void
+babel_print_v2(netdissect_options *ndo,
+               const u_char *cp, u_int length)
+{
+    u_short bodylen;
+    int ret;
+
+    ND_TCHECK_4(cp);
+    if (length < 4)
+        goto invalid;
+    bodylen = GET_BE_U_2(cp + 2);
+    ND_PRINT(" (%u)", bodylen);
+    length -= 4;
+    cp += 4;
+
+    /* Process the TLVs in the body */
+    if (length < bodylen)
+        goto invalid;
+    ret = babel_print_v2_tlvs(ndo, cp, bodylen, length);
+    if (ret == -1)
+        goto trunc;
+    if (ret == -2)
+        goto invalid;
+    length -= bodylen;
+    cp += bodylen;
+
+    /* If there's a trailer, process the TLVs in the trailer */
+    if (length != 0) {
+    	if(ndo->ndo_vflag) ND_PRINT("\n\t----");
+    	else ND_PRINT(" |");
+        babel_print_v2_tlvs(ndo, cp, length, length);
+        if (ret == -1)
+            goto trunc;
+        if (ret == -2)
+            goto invalid;
     }
     return;
 

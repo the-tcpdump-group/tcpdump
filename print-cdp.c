@@ -21,7 +21,7 @@
  * Code by Gert Doering, SpaceNet GmbH, gert@space.net
  *
  * Reference documentation:
- *    http://www.cisco.com/univercd/cc/td/doc/product/lan/trsrb/frames.htm
+ *    https://web.archive.org/web/20000914194913/http://www.cisco.com/univercd/cc/td/doc/product/lan/trsrb/frames.pdf
  */
 
 /* \summary: Cisco Discovery Protocol (CDP) printer */
@@ -210,7 +210,7 @@ cdp_print(netdissect_options *ndo,
 			ND_PRINT("%s", GET_U_1(tptr) ? "full": "half");
 			break;
 
-		    /* http://www.cisco.com/c/en/us/td/docs/voice_ip_comm/cata/186/2_12_m/english/release/notes/186rn21m.html
+		    /* https://www.cisco.com/c/en/us/td/docs/voice_ip_comm/cata/186/2_12_m/english/release/notes/186rn21m.html
 		     * plus more details from other sources
 		     *
 		     * There are apparently versions of the request with both
@@ -340,7 +340,7 @@ cdp_print_addr(netdissect_options *ndo,
 			ND_TCHECK_4(p);
 			if (p + 4 > endp)
 				goto trunc;
-			ND_PRINT("IPv4 (%u) %s", num, ipaddr_string(ndo, p));
+			ND_PRINT("IPv4 (%u) %s", num, GET_IPADDR_STRING(p));
 			p += 4;
 		}
 		else if (pt == PT_IEEE_802_2 && pl == 8 &&
@@ -356,7 +356,7 @@ cdp_print_addr(netdissect_options *ndo,
 			if (p + al > endp)
 				goto trunc;
 
-			ND_PRINT("IPv6 (%u) %s", num, ip6addr_string(ndo, p));
+			ND_PRINT("IPv6 (%u) %s", num, GET_IP6ADDR_STRING(p));
 			p += al;
 		}
 		else {

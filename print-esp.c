@@ -45,10 +45,12 @@
 #endif
 
 #include "netdissect.h"
-#include "strtoaddr.h"
 #include "extract.h"
 
+#ifdef HAVE_LIBCRYPTO
+#include "strtoaddr.h"
 #include "ascii_strcasecmp.h"
+#endif
 
 #include "ip.h"
 #include "ip6.h"
@@ -145,14 +147,14 @@ EVP_CIPHER_CTX_free(EVP_CIPHER_CTX *ctx)
 }
 #endif
 
-#ifdef HAVE_EVP_CIPHERINIT_EX
+#ifdef HAVE_EVP_DECRYPTINIT_EX
 /*
- * Initialize the cipher by calling EVP_CipherInit_ex(), because
- * calling EVP_CipherInit() will reset the cipher context, clearing
+ * Initialize the cipher by calling EVP_DecryptInit_ex(), because
+ * calling EVP_DecryptInit() will reset the cipher context, clearing
  * the cipher, so calling it twice, with the second call having a
- * null cipher, will clear the already-set cipher.  EVP_CipherInit_ex(),
+ * null cipher, will clear the already-set cipher.  EVP_DecryptInit_ex(),
  * however, won't reset the cipher context, so you can use it to specify
- * the IV in a second call after a first call to EVP_CipherInit_ex()
+ * the IV in a second call after a first call to EVP_DecryptInit_ex()
  * to set the cipher and the key.
  *
  * XXX - is there some reason why we need to make two calls?
@@ -160,23 +162,109 @@ EVP_CIPHER_CTX_free(EVP_CIPHER_CTX *ctx)
 static int
 set_cipher_parameters(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher,
 		      const unsigned char *key,
-		      const unsigned char *iv, int enc)
+		      const unsigned char *iv)
 {
-	return EVP_CipherInit_ex(ctx, cipher, NULL, key, iv, enc);
+	return EVP_DecryptInit_ex(ctx, cipher, NULL, key, iv);
 }
 #else
 /*
- * Initialize the cipher by calling EVP_CipherInit(), because we don't
- * have EVP_CipherInit_ex(); we rely on it not trashing the context.
+ * Initialize the cipher by calling EVP_DecryptInit(), because we don't
+ * have EVP_DecryptInit_ex(); we rely on it not trashing the context.
  */
 static int
 set_cipher_parameters(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher,
 		      const unsigned char *key,
-		      const unsigned char *iv, int enc)
+		      const unsigned char *iv)
 {
-	return EVP_CipherInit(ctx, cipher, key, iv, enc);
+	return EVP_DecryptInit(ctx, cipher, key, iv);
 }
 #endif
+
+static u_char *
+do_decrypt(netdissect_options *ndo, const char *caller, struct sa_list *sa,
+    const u_char *iv, const u_char *ct, unsigned int ctlen)
+{
+	EVP_CIPHER_CTX *ctx;
+	unsigned int block_size;
+	unsigned int ptlen;
+	u_char *pt;
+	int len;
+
+	ctx = EVP_CIPHER_CTX_new();
+	if (ctx == NULL) {
+		/*
+		 * Failed to initialize the cipher context.
+		 * From a look at the OpenSSL code, this appears to
+		 * mean "couldn't allocate memory for the cipher context";
+		 * note that we're not passing any parameters, so there's
+		 * not much else it can mean.
+		 */
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+		    "%s: can't allocate memory for cipher context", caller);
+		return NULL;
+	}
+
+	if (set_cipher_parameters(ctx, sa->evp, sa->secret, NULL) < 0) {
+		EVP_CIPHER_CTX_free(ctx);
+		(*ndo->ndo_warning)(ndo, "%s: espkey init failed", caller);
+		return NULL;
+	}
+	if (set_cipher_parameters(ctx, NULL, NULL, iv) < 0) {
+		EVP_CIPHER_CTX_free(ctx);
+		(*ndo->ndo_warning)(ndo, "%s: IV init failed", caller);
+		return NULL;
+	}
+
+	/*
+	 * At least as I read RFC 5996 section 3.14 and RFC 4303 section 2.4,
+	 * if the cipher has a block size of which the ciphertext's size must
+	 * be a multiple, the payload must be padded to make that happen, so
+	 * the ciphertext length must be a multiple of the block size.  Fail
+	 * if that's not the case.
+	 */
+	block_size = (unsigned int)EVP_CIPHER_CTX_block_size(ctx);
+	if ((ctlen % block_size) != 0) {
+		EVP_CIPHER_CTX_free(ctx);
+		(*ndo->ndo_warning)(ndo,
+		    "%s: ciphertext size %u is not a multiple of the cipher block size %u",
+		    caller, ctlen, block_size);
+		return NULL;
+	}
+
+	/*
+	 * Attempt to allocate a buffer for the decrypted data, because
+	 * we can't decrypt on top of the input buffer.
+	 */
+	ptlen = ctlen;
+	pt = (u_char *)malloc(ptlen);
+	if (pt == NULL) {
+		EVP_CIPHER_CTX_free(ctx);
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+		    "%s: can't allocate memory for decryption buffer", caller);
+		return NULL;
+	}
+
+	/*
+	 * The size of the ciphertext handed to us is a multiple of the
+	 * cipher block size, so we don't need to worry about padding.
+	 */
+	if (!EVP_CIPHER_CTX_set_padding(ctx, 0)) {
+		free(pt);
+		EVP_CIPHER_CTX_free(ctx);
+		(*ndo->ndo_warning)(ndo,
+		    "%s: EVP_CIPHER_CTX_set_padding failed", caller);
+		return NULL;
+	}
+	if (!EVP_DecryptUpdate(ctx, pt, &len, ct, ctlen)) {
+		free(pt);
+		EVP_CIPHER_CTX_free(ctx);
+		(*ndo->ndo_warning)(ndo, "%s: EVP_DecryptUpdate failed",
+		    caller);
+		return NULL;
+	}
+	EVP_CIPHER_CTX_free(ctx);
+	return pt;
+}
 
 /*
  * This will allocate a new buffer containing the decrypted data.
@@ -191,7 +279,7 @@ set_cipher_parameters(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher,
  * anything in the old buffer.  That will free the new buffer.
  */
 USES_APPLE_DEPRECATED_API
-int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
+int esp_decrypt_buffer_by_ikev2_print(netdissect_options *ndo,
 				      int initiator,
 				      const u_char spii[8],
 				      const u_char spir[8],
@@ -200,11 +288,8 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 	struct sa_list *sa;
 	const u_char *iv;
 	const u_char *ct;
-	unsigned int len;
-	EVP_CIPHER_CTX *ctx;
-	unsigned int block_size, buffer_size;
-	u_char *input_buffer, *output_buffer;
-	const u_char *pt;
+	unsigned int ctlen;
+	u_char *pt;
 
 	/* initiator arg is any non-zero value */
 	if(initiator) initiator=1;
@@ -228,79 +313,22 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 	end = end - sa->authlen;
 	iv  = buf;
 	ct = iv + sa->ivlen;
-	len = end-ct;
+	ctlen = end-ct;
 
 	if(end <= ct) return 0;
 
-	ctx = EVP_CIPHER_CTX_new();
-	if (ctx == NULL)
+	pt = do_decrypt(ndo, "esp_decrypt_buffer_by_ikev2_print", sa, iv,
+	    ct, ctlen);
+	if (pt == NULL)
 		return 0;
-	if (set_cipher_parameters(ctx, sa->evp, sa->secret, NULL, 0) < 0) {
-		(*ndo->ndo_warning)(ndo, "espkey init failed");
-		return 0;
-	}
-	if (set_cipher_parameters(ctx, NULL, NULL, iv, 0) < 0) {
-		(*ndo->ndo_warning)(ndo, "IV init failed");
-		return 0;
-	}
-	/*
-	 * Allocate buffers for the encrypted and decrypted data.
-	 * Both buffers' sizes must be a multiple of the cipher block
-	 * size, and the output buffer must be separate from the input
-	 * buffer.
-	 */
-	block_size = (unsigned int)EVP_CIPHER_CTX_block_size(ctx);
-	buffer_size = len + (block_size - len % block_size);
-
-	/*
-	 * Attempt to allocate the input buffer.
-	 */
-	input_buffer = (u_char *)malloc(buffer_size);
-	if (input_buffer == NULL) {
-		EVP_CIPHER_CTX_free(ctx);
-		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
-			"can't allocate memory for encrypted data buffer");
-	}
-	/*
-	 * Copy the input data to the encrypted data buffer, and pad it
-	 * with zeroes.
-	 */
-	memcpy(input_buffer, ct, len);
-	memset(input_buffer + len, 0, buffer_size - len);
-
-	/*
-	 * Attempt to allocate the output buffer.
-	 */
-	output_buffer = (u_char *)malloc(buffer_size);
-	if (output_buffer == NULL) {
-		free(input_buffer);
-		EVP_CIPHER_CTX_free(ctx);
-		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
-			"can't allocate memory for decryption buffer");
-	}
-	if (!EVP_Cipher(ctx, output_buffer, input_buffer, len)) {
-		(*ndo->ndo_warning)(ndo, "EVP_Cipher failed");
-		return 0;
-	}
-	EVP_CIPHER_CTX_free(ctx);
-
-	/*
-	 * Free the input buffer; we no longer need it.
-	 */
-	free(input_buffer);
-
-	/*
-	 * Get a pointer to the plaintext.
-	 */
-	pt = output_buffer;
 
 	/*
 	 * Switch to the output buffer for dissection, and save it
 	 * on the buffer stack so it can be freed; our caller must
 	 * pop it when done.
 	 */
-	if (!nd_push_buffer(ndo, output_buffer, pt, pt + len)) {
-		free(output_buffer);
+	if (!nd_push_buffer(ndo, pt, pt, pt + ctlen)) {
+		free(pt);
 		return 0;
 	}
 
@@ -469,8 +497,8 @@ espprint_decode_authalgo(netdissect_options *ndo,
 	}
 	*colon = '\0';
 
-	if(ascii_strcasecmp(colon,"sha1") == 0 ||
-	   ascii_strcasecmp(colon,"md5") == 0) {
+	if(ascii_strcasecmp(decode,"sha1") == 0 ||
+	   ascii_strcasecmp(decode,"md5") == 0) {
 		sa->authlen = 12;
 	}
 	return 1;
@@ -631,7 +659,7 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 
 	if (decode) {
 		/* skip any blank spaces */
-		while (isspace((unsigned char)*decode))
+		while (*decode == ' ' || *decode == '\t' || *decode == '\r' || *decode == '\n')
 			decode++;
 
 		if(!espprint_decode_encalgo(ndo, decode, &sa1)) {
@@ -657,7 +685,7 @@ static void esp_init(netdissect_options *ndo _U_)
 }
 USES_APPLE_RST
 
-void esp_print_decodesecret(netdissect_options *ndo)
+void esp_decodesecret_print(netdissect_options *ndo)
 {
 	char *line;
 	char *p;
@@ -710,13 +738,9 @@ esp_print(netdissect_options *ndo,
 	const struct ip6_hdr *ip6 = NULL;
 	const u_char *iv;
 	u_int ivlen;
+	u_int payloadlen;
 	const u_char *ct;
-	u_int ctlen;
-	EVP_CIPHER_CTX *ctx;
-	unsigned int block_size, buffer_size;
-	u_char *input_buffer, *output_buffer;
-	const u_char *pt;
-	u_int ptlen;
+	u_char *pt;
 	u_int padlen;
 	u_int nh;
 #endif
@@ -741,7 +765,7 @@ esp_print(netdissect_options *ndo,
 		if (!ndo->ndo_espsecret)
 			return;
 
-		esp_print_decodesecret(ndo);
+		esp_decodesecret_print(ndo);
 	}
 
 	if (ndo->ndo_sa_list_head == NULL)
@@ -827,7 +851,7 @@ esp_print(netdissect_options *ndo,
 	 * the beginning of the authentication data/integrity check
 	 * value, i.e. right past the end of the ciphertext;
 	 */
-	ctlen = ep - ct;
+	payloadlen = ep - ct;
 
 	if (sa->evp == NULL)
 		return;
@@ -844,94 +868,20 @@ esp_print(netdissect_options *ndo,
 		return;
 	}
 
-	ctx = EVP_CIPHER_CTX_new();
-	if (ctx == NULL) {
-		/*
-		 * Failed to initialize the cipher context.
-		 * From a look at the OpenSSL code, this appears to
-		 * mean "couldn't allocate memory for the cipher context";
-		 * note that we're not passing any parameters, so there's
-		 * not much else it can mean.
-		 */
-		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
-			"esp_print: can't allocate memory for cipher context");
-	}
-
-	if (set_cipher_parameters(ctx, sa->evp, sa->secret, NULL, 0) < 0) {
-		(*ndo->ndo_warning)(ndo, "espkey init failed");
+	pt = do_decrypt(ndo, "esp_print", sa, iv, ct, payloadlen);
+	if (pt == NULL)
 		return;
-	}
-
-	if (set_cipher_parameters(ctx, NULL, NULL, iv, 0) < 0) {
-		(*ndo->ndo_warning)(ndo, "IV init failed");
-		return;
-	}
-
-	/*
-	 * Allocate buffers for the encrypted and decrypted
-	 * data.  Both buffers' sizes must be a multiple of
-	 * the cipher block size, and the output buffer must
-	 * be separate from the input buffer.
-	 */
-	block_size = (unsigned int)EVP_CIPHER_CTX_block_size(ctx);
-	buffer_size = ctlen + (block_size - ctlen % block_size);
-
-	/*
-	 * Attempt to allocate the input buffer.
-	 */
-	input_buffer = (u_char *)malloc(buffer_size);
-	if (input_buffer == NULL) {
-		EVP_CIPHER_CTX_free(ctx);
-		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
-			"esp_print: can't allocate memory for encrypted data buffer");
-	}
-	/*
-	 * Copy the input data to the encrypted data buffer,
-	 * and pad it with zeroes.
-	 */
-	memcpy(input_buffer, ct, ctlen);
-	memset(input_buffer + ctlen, 0, buffer_size - ctlen);
-
-	/*
-	 * Attempt to allocate the output buffer.
-	 */
-	output_buffer = (u_char *)malloc(buffer_size);
-	if (output_buffer == NULL) {
-		free(input_buffer);
-		EVP_CIPHER_CTX_free(ctx);
-		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
-			"esp_print: can't allocate memory for decryption buffer");
-	}
-
-	if (!EVP_Cipher(ctx, output_buffer, input_buffer, ctlen)) {
-		free(input_buffer);
-		(*ndo->ndo_warning)(ndo, "EVP_Cipher failed");
-		return;
-	}
-	free(input_buffer);
-	EVP_CIPHER_CTX_free(ctx);
-
-	/*
-	 * Pointer to the plaintext.
-	 */
-	pt = output_buffer;
-
-	/*
-	 * Length of the plaintext, which is the same as the length
-	 * of the ciphertext.
-	 */
-	ptlen = ctlen;
 
 	/*
 	 * Switch to the output buffer for dissection, and
 	 * save it on the buffer stack so it can be freed.
 	 */
-	if (!nd_push_buffer(ndo, output_buffer, pt, pt + ctlen)) {
-		free(output_buffer);
+	ep = pt + payloadlen;
+	if (!nd_push_buffer(ndo, pt, pt, ep)) {
+		free(pt);
 		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
 			"esp_print: can't push buffer on buffer stack");
 	}
-	ep = pt + ptlen;
 
 	/*
 	 * Sanity check for pad length; if it, plus 2 for the pad
@@ -943,7 +893,7 @@ esp_print(netdissect_options *ndo,
 	 * "plaintext" is not what was being sent.
 	 */
 	padlen = GET_U_1(ep - 2);
-	if (padlen + 2 > ptlen) {
+	if (padlen + 2 > payloadlen) {
 		nd_print_trunc(ndo);
 		return;
 	}
@@ -954,7 +904,7 @@ esp_print(netdissect_options *ndo,
 	ND_PRINT(": ");
 
 	/* Now dissect the plaintext. */
-	ip_print_demux(ndo, pt, ptlen - (padlen + 2), ver, fragmented,
+	ip_demux_print(ndo, pt, payloadlen - (padlen + 2), ver, fragmented,
 	    ttl_hl, nh, bp2);
 
 	/* Pop the buffer, freeing it. */

@@ -100,6 +100,7 @@ const struct tok ethertype_values[] = {
     { ETHERTYPE_GEONET,         "GeoNet"},
     { ETHERTYPE_CALM_FAST,      "CALM FAST"},
     { ETHERTYPE_AOE,            "AoE" },
+    { ETHERTYPE_PTP,            "PTP" },
     { ETHERTYPE_ARISTA,         "Arista Vendor Specific Protocol" },
     { 0, NULL}
 };
@@ -109,7 +110,7 @@ ether_addresses_print(netdissect_options *ndo, const u_char *src,
 		      const u_char *dst)
 {
 	ND_PRINT("%s > %s, ",
-		 etheraddr_string(ndo, src), etheraddr_string(ndo, dst));
+		 GET_ETHERADDR_STRING(src), GET_ETHERADDR_STRING(dst));
 }
 
 static void
@@ -132,7 +133,7 @@ ether_type_print(netdissect_options *ndo, uint16_t type)
  * printing Ethernet header information (such as a LANE ID for ATM LANE).
  */
 static u_int
-ether_print_common(netdissect_options *ndo, const u_char *p, u_int length,
+ether_common_print(netdissect_options *ndo, const u_char *p, u_int length,
     u_int caplen,
     void (*print_switch_tag)(netdissect_options *ndo, const u_char *),
     u_int switch_tag_len,
@@ -289,7 +290,7 @@ recurse:
 		 * It's a type field, with the type for Alteon jumbo frames.
 		 * See
 		 *
-		 *	http://tools.ietf.org/html/draft-ietf-isis-ext-eth-01
+		 *	https://tools.ietf.org/html/draft-ietf-isis-ext-eth-01
 		 *
 		 * which indicates that, following the type field,
 		 * there's an LLC header and payload.
@@ -374,12 +375,12 @@ recurse:
  * FIXME: caplen can and should be derived from ndo->ndo_snapend and p.
  */
 u_int
-ether_print_switch_tag(netdissect_options *ndo, const u_char *p, u_int length,
+ether_switch_tag_print(netdissect_options *ndo, const u_char *p, u_int length,
     u_int caplen,
     void (*print_switch_tag)(netdissect_options *, const u_char *),
     u_int switch_tag_len)
 {
-	return (ether_print_common(ndo, p, length, caplen, print_switch_tag,
+	return (ether_common_print(ndo, p, length, caplen, print_switch_tag,
 				   switch_tag_len, NULL, NULL));
 }
 
@@ -398,8 +399,8 @@ ether_print(netdissect_options *ndo,
 	    const u_char *encap_header_arg)
 {
 	ndo->ndo_protocol = "ether";
-	return (ether_print_common(ndo, p, length, caplen, NULL, 0,
-				    print_encap_header, encap_header_arg));
+	return (ether_common_print(ndo, p, length, caplen, NULL, 0,
+				   print_encap_header, encap_header_arg));
 }
 
 /*
@@ -598,6 +599,10 @@ ethertype_print(netdissect_options *ndo,
 
 	case ETHERTYPE_AOE:
 		aoe_print(ndo, p, length);
+		return (1);
+
+	case ETHERTYPE_PTP:
+		ptp_print(ndo, p, length);
 		return (1);
 
 	case ETHERTYPE_LAT:

@@ -181,7 +181,7 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 	case VQP_OBJ_IP_ADDRESS:
             if (vqp_obj_len != 4)
                 goto trunc;
-            ND_PRINT("%s (0x%08x)", ipaddr_string(ndo, tptr),
+            ND_PRINT("%s (0x%08x)", GET_IPADDR_STRING(tptr),
                      GET_BE_U_4(tptr));
             break;
             /* those objects have similar semantics - fall through */
@@ -196,7 +196,7 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 	case VQP_OBJ_MAC_NULL:
             if (vqp_obj_len != MAC_ADDR_LEN)
                 goto trunc;
-	      ND_PRINT("%s", etheraddr_string(ndo, tptr));
+	      ND_PRINT("%s", GET_ETHERADDR_STRING(tptr));
               break;
         default:
             if (ndo->ndo_vflag <= 1)

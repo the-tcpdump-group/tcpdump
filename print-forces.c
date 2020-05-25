@@ -189,7 +189,7 @@ static const struct tok ForCES_LFBs[] = {
 };
 
 /* this is defined in RFC5810 section A.2 */
-/*   http://www.iana.org/assignments/forces/forces.xhtml#oper-tlv-types */
+/*   https://www.iana.org/assignments/forces/forces.xhtml#oper-tlv-types */
 enum {
 	F_OP_RSV        = 0,
 	F_OP_SET        = 1,
@@ -388,7 +388,7 @@ struct forces_tlv {
 	nd_uint16_t length;
 };
 
-#define F_ALN_LEN(len) ( ((len)+ForCES_ALNL-1) & ~(ForCES_ALNL-1) )
+#define F_ALN_LEN(len) roundup2(len, ForCES_ALNL)
 #define	GET_TOP_TLV(fhdr) ((const struct forces_tlv *)((fhdr) + sizeof (struct forcesh)))
 #define TLV_SET_LEN(len)  (F_ALN_LEN(TLV_HDRL) + (len))
 #define TLV_DATA(tlvp)   ((const void*)(((const char*)(tlvp)) + TLV_SET_LEN(0)))
@@ -711,7 +711,7 @@ fdatatlv_print(netdissect_options *ndo,
 		char *ib = indent_pr(indent + 2, 1);
 		ND_PRINT("%s[", ib + 1);
 		hex_print_with_offset(ndo, ib, tdp, rlen, 0);
-		ND_PRINT("\n%s]\n", ib + 1);
+		ND_PRINT("\n%s]", ib + 1);
 	}
 	return 0;
 
@@ -1768,7 +1768,6 @@ error:
 		hex_print_with_offset(ndo, "\n\t ", pptr, len, 0);
 		ND_PRINT("\n\t ]");
 	}
-	ND_PRINT("\n");
 	return;
 
 trunc:

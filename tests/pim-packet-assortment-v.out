@@ -1,36 +1,36 @@
     1  17:10:44.789433 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto PIM (103), length 34)
     10.0.0.2 > 224.0.0.13: PIMv2, length 14
-	Bootstrap, RFC2117-encoding, cksum 0xcaa5 (correct) tag=17c hashmlen=4 BSRprio=93 BSR= [|pimv2]
+	Bootstrap, cksum 0xcaa5 (correct) tag=17c hashmlen=4 BSRprio=93 BSR=10.0.0.1
     2  17:10:59.798983 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto PIM (103), length 34)
     10.0.0.2 > 224.0.0.13: PIMv2, length 14
-	Bootstrap, RFC2117-encoding, cksum 0xcaa5 (correct) tag=17c hashmlen=4 BSRprio=93 BSR= [|pimv2]
+	Bootstrap, cksum 0xcaa5 (correct) tag=17c hashmlen=4 BSRprio=93 BSR=10.0.0.1
     3  17:11:14.807715 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto PIM (103), length 34)
     10.0.0.2 > 224.0.0.13: PIMv2, length 14
-	Bootstrap, RFC2117-encoding, cksum 0xc306 (correct) tag=177 hashmlen=12 BSRprio=0 BSR= [|pimv2]
+	Bootstrap, cksum 0xc306 (correct) tag=177 hashmlen=12 BSRprio=0 BSR=10.0.0.2
     4  17:11:14.823339 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto PIM (103), length 34)
     10.0.0.2 > 224.0.0.13: PIMv2, length 14
-	Bootstrap, RFC2117-encoding, cksum 0xc384 (correct) tag=ca hashmlen=12 BSRprio=46 BSR= [|pimv2]
+	Bootstrap, cksum 0xc384 (correct) tag=ca hashmlen=12 BSRprio=46 BSR=10.0.0.3
     5  17:11:14.838646 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto PIM (103), length 46)
     10.0.0.2 > 224.0.0.13: PIMv2, length 26
-	Bootstrap, RFC2117-encoding, cksum 0xd6ab (correct) tag=1b6 hashmlen=21 BSRprio=248 BSR= [|pimv2]
+	Bootstrap, cksum 0xd6ab (correct) tag=1b6 hashmlen=21 BSRprio=248 BSR=10.0.0.4 (group0: 225.0.0.1 RPcnt=0 FRPcnt=0)
     6  17:11:14.854392 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto PIM (103), length 78)
     10.0.0.2 > 224.0.0.13: PIMv2, length 58
-	Bootstrap, RFC2117-encoding, cksum 0x5abd (correct) tag=21 hashmlen=5 BSRprio=45 BSR= [|pimv2]
+	Bootstrap, cksum 0x5abd (correct) tag=21 hashmlen=5 BSRprio=45 BSR=10.0.0.7 (group0: 225.0.0.2(0x01) RPcnt=1 FRPcnt=1 RP0=10.0.0.5,holdtime=1m58s,prio=107) (group1: 225.0.0.3 RPcnt=1 FRPcnt=1 RP0=10.0.0.6,holdtime=2m43s,prio=39)
     7  17:11:14.870050 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto PIM (103), length 34)
     10.0.0.2 > 10.0.0.1: PIMv2, length 14
-	Bootstrap, RFC2117-encoding, cksum 0xc296 (correct) tag=166 hashmlen=12 BSRprio=123 BSR= [|pimv2]
+	Bootstrap, cksum 0xc296 (correct) tag=166 hashmlen=12 BSRprio=123 BSR=10.0.0.8
     8  17:11:29.877641 IP (tos 0xc0, ttl 1, id 5368, offset 0, flags [DF], proto PIM (103), length 34)
     10.0.0.1 > 224.0.0.13: PIMv2, length 14
-	Bootstrap, RFC2117-encoding, cksum 0xc2e0 (correct) tag=ea hashmlen=12 BSRprio=172 BSR= [|pimv2]
+	Bootstrap, cksum 0xc2e0 (correct) tag=ea hashmlen=12 BSRprio=172 BSR=10.0.0.9
     9  17:11:29.882313 IP (tos 0xc0, ttl 1, id 5369, offset 0, flags [DF], proto PIM (103), length 34)
     10.0.0.1 > 224.0.0.13: PIMv2, length 14
-	Bootstrap, RFC2117-encoding, cksum 0xbdd6 (correct) tag=cb hashmlen=17 BSRprio=212 BSR= [|pimv2]
+	Bootstrap, cksum 0xbdd6 (correct) tag=cb hashmlen=17 BSRprio=212 BSR=10.0.0.10
    10  17:11:29.886825 IP (tos 0xc0, ttl 1, id 5370, offset 0, flags [DF], proto PIM (103), length 46)
     10.0.0.1 > 224.0.0.13: PIMv2, length 26
-	Bootstrap, RFC2117-encoding, cksum 0xd12c (correct) tag=139 hashmlen=27 BSRprio=234 BSR= [|pimv2]
+	Bootstrap, cksum 0xd12c (correct) tag=139 hashmlen=27 BSRprio=234 BSR=10.0.0.11 (group0: 225.0.0.4 RPcnt=0 FRPcnt=0)
    11  17:11:29.891835 IP (tos 0xc0, ttl 1, id 5371, offset 0, flags [DF], proto PIM (103), length 78)
     10.0.0.1 > 224.0.0.13: PIMv2, length 58
-	Bootstrap, RFC2117-encoding, cksum 0x58fb (correct) tag=c9 hashmlen=1 BSRprio=90 BSR= [|pimv2]
+	Bootstrap, cksum 0x58fb (correct) tag=c9 hashmlen=1 BSRprio=90 BSR=10.0.0.14 (group0: 225.0.0.5(0x01) RPcnt=1 FRPcnt=1 RP0=10.0.0.12,holdtime=1m28s,prio=58) (group1: 225.0.0.6 RPcnt=1 FRPcnt=1 RP0=10.0.0.13,holdtime=2m27s,prio=93)
    12  17:11:52.114000 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto PIM (103), length 42)
     10.0.0.2 > 10.0.0.1: PIMv2, length 22
 	Candidate RP Advertisement, cksum 0xe833 (correct) prefix-cnt=1 prio=78 holdtime=1m31s RP=10.0.0.1 Group0=225.0.0.1(0x01)
@@ -772,67 +772,96 @@
 	Register Stop, cksum 0xf0d2 (correct) group=225.0.0.6 source=10.0.0.6
    89  17:18:19.135202 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto PIM (103), length 38)
     10.0.0.2 > 224.0.0.13: PIMv2, length 18
-	DF Election, RFC2117-encoding, cksum 0xca80 (correct) [type 10]
+	DF Election, cksum 0xca80 (correct)
+	  Offer, rpa=10.0.0.1 sender pref=100 sender metric=10
    90  17:18:19.151462 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto PIM (103), length 38)
     10.0.0.2 > 224.0.0.13: PIMv2, length 18
-	DF Election, RFC2117-encoding, cksum 0xca80 (correct) [type 10]
+	DF Election, cksum 0xca80 (correct)
+	  Offer, rpa=10.0.0.1 sender pref=100 sender metric=10
    91  17:18:19.167261 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto PIM (103), length 38)
     10.0.0.2 > 224.0.0.13: PIMv2, length 18
-	DF Election, RFC2117-encoding, cksum 0xca6f (correct) [type 10]
+	DF Election, cksum 0xca6f (correct)
+	  Winner, rpa=10.0.0.2 sender pref=100 sender metric=10
    92  17:18:19.183508 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto PIM (103), length 38)
     10.0.0.2 > 224.0.0.13: PIMv2, length 18
-	DF Election, RFC2117-encoding, cksum 0xca6f (correct) [type 10]
+	DF Election, cksum 0xca6f (correct)
+	  Winner, rpa=10.0.0.2 sender pref=100 sender metric=10
    93  17:18:19.199269 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto PIM (103), length 54)
     10.0.0.2 > 224.0.0.13: PIMv2, length 34
-	DF Election, RFC2117-encoding, cksum 0x6d52 (correct) [type 10]
+	DF Election, cksum 0x6d52 (correct)
+	  Backoff, rpa=10.0.0.3 sender pref=100 sender metric=10
+	  offer addr=10.0.0.4 offer pref=1000 offer metric=10000 interval 10000ms
    94  17:18:19.215274 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto PIM (103), length 54)
     10.0.0.2 > 224.0.0.13: PIMv2, length 34
-	DF Election, RFC2117-encoding, cksum 0x6d52 (correct) [type 10]
+	DF Election, cksum 0x6d52 (correct)
+	  Backoff, rpa=10.0.0.3 sender pref=100 sender metric=10
+	  offer addr=10.0.0.4 offer pref=1000 offer metric=10000 interval 10000ms
    95  17:18:19.231330 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto PIM (103), length 52)
     10.0.0.2 > 224.0.0.13: PIMv2, length 32
-	DF Election, RFC2117-encoding, cksum 0x944e (correct) [type 10]
+	DF Election, cksum 0x944e (correct)
+	  Pass, rpa=10.0.0.5 sender pref=100 sender metric=10
+	  new winner addr=10.0.0.6 new winner pref=1000 new winner metric=10000
    96  17:18:19.247063 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto PIM (103), length 52)
     10.0.0.2 > 224.0.0.13: PIMv2, length 32
-	DF Election, RFC2117-encoding, cksum 0x944e (correct) [type 10]
+	DF Election, cksum 0x944e (correct)
+	  Pass, rpa=10.0.0.5 sender pref=100 sender metric=10
+	  new winner addr=10.0.0.6 new winner pref=1000 new winner metric=10000
    97  17:18:19.263010 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto PIM (103), length 38)
     10.0.0.2 > 224.0.0.13: PIMv2, length 18
-	DF Election, RFC2117-encoding, cksum 0xca7a (correct) [type 10]
+	DF Election, cksum 0xca7a (correct)
+	  Offer, rpa=10.0.0.7 sender pref=100 sender metric=10
    98  17:18:34.278440 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto PIM (103), length 38)
     10.0.0.2 > 224.0.0.13: PIMv2, length 18
-	DF Election, RFC2117-encoding, cksum 0xca7a (correct) [type 10]
+	DF Election, cksum 0xca7a (correct)
+	  Offer, rpa=10.0.0.7 sender pref=100 sender metric=10
    99  17:18:49.292244 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto PIM (103), length 38)
     10.0.0.2 > 10.0.0.1: PIMv2, length 18
-	DF Election, RFC2117-encoding, cksum 0xca79 (correct) [type 10]
+	DF Election, cksum 0xca79 (correct)
+	  Offer, rpa=10.0.0.8 sender pref=100 sender metric=10
   100  17:19:04.301082 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto PIM (103), length 38)
     10.0.0.2 > 224.0.0.13: PIMv2, length 18
-	DF Election, RFC2117-encoding, cksum 0xca78 (correct) [type 10]
+	DF Election, cksum 0xca78 (correct)
+	  Offer, rpa=10.0.0.9 sender pref=100 sender metric=10
   101  17:19:19.311519 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto PIM (103), length 38)
     10.0.0.2 > 10.0.0.1: PIMv2, length 18
-	DF Election, RFC2117-encoding, cksum 0xca77 (correct) [type 10]
+	DF Election, cksum 0xca77 (correct)
+	  Offer, rpa=10.0.0.10 sender pref=100 sender metric=10
   102  17:19:34.317677 IP (tos 0xc0, ttl 1, id 53314, offset 0, flags [DF], proto PIM (103), length 38)
     10.0.0.1 > 224.0.0.13: PIMv2, length 18
-	DF Election, RFC2117-encoding, cksum 0xca76 (correct) [type 10]
+	DF Election, cksum 0xca76 (correct)
+	  Offer, rpa=10.0.0.11 sender pref=100 sender metric=10
   103  17:19:34.323132 IP (tos 0xc0, ttl 1, id 53315, offset 0, flags [DF], proto PIM (103), length 38)
     10.0.0.1 > 224.0.0.13: PIMv2, length 18
-	DF Election, RFC2117-encoding, cksum 0xca76 (correct) [type 10]
+	DF Election, cksum 0xca76 (correct)
+	  Offer, rpa=10.0.0.11 sender pref=100 sender metric=10
   104  17:19:34.328241 IP (tos 0xc0, ttl 1, id 53317, offset 0, flags [DF], proto PIM (103), length 38)
     10.0.0.1 > 224.0.0.13: PIMv2, length 18
-	DF Election, RFC2117-encoding, cksum 0xca65 (correct) [type 10]
+	DF Election, cksum 0xca65 (correct)
+	  Winner, rpa=10.0.0.12 sender pref=100 sender metric=10
   105  17:19:34.333292 IP (tos 0xc0, ttl 1, id 53318, offset 0, flags [DF], proto PIM (103), length 38)
     10.0.0.1 > 224.0.0.13: PIMv2, length 18
-	DF Election, RFC2117-encoding, cksum 0xca65 (correct) [type 10]
+	DF Election, cksum 0xca65 (correct)
+	  Winner, rpa=10.0.0.12 sender pref=100 sender metric=10
   106  17:19:34.338277 IP (tos 0xc0, ttl 1, id 53319, offset 0, flags [DF], proto PIM (103), length 54)
     10.0.0.1 > 224.0.0.13: PIMv2, length 34
-	DF Election, RFC2117-encoding, cksum 0x6d3e (correct) [type 10]
+	DF Election, cksum 0x6d3e (correct)
+	  Backoff, rpa=10.0.0.13 sender pref=100 sender metric=10
+	  offer addr=10.0.0.14 offer pref=1000 offer metric=10000 interval 10000ms
   107  17:19:34.345622 IP (tos 0xc0, ttl 1, id 53320, offset 0, flags [DF], proto PIM (103), length 54)
     10.0.0.1 > 224.0.0.13: PIMv2, length 34
-	DF Election, RFC2117-encoding, cksum 0x6d3e (correct) [type 10]
+	DF Election, cksum 0x6d3e (correct)
+	  Backoff, rpa=10.0.0.13 sender pref=100 sender metric=10
+	  offer addr=10.0.0.14 offer pref=1000 offer metric=10000 interval 10000ms
   108  17:19:34.350734 IP (tos 0xc0, ttl 1, id 53321, offset 0, flags [DF], proto PIM (103), length 52)
     10.0.0.1 > 224.0.0.13: PIMv2, length 32
-	DF Election, RFC2117-encoding, cksum 0x943a (correct) [type 10]
+	DF Election, cksum 0x943a (correct)
+	  Pass, rpa=10.0.0.15 sender pref=100 sender metric=10
+	  new winner addr=10.0.0.16 new winner pref=1000 new winner metric=10000
   109  17:19:34.355785 IP (tos 0xc0, ttl 1, id 53323, offset 0, flags [DF], proto PIM (103), length 52)
     10.0.0.1 > 224.0.0.13: PIMv2, length 32
-	DF Election, RFC2117-encoding, cksum 0x943a (correct) [type 10]
+	DF Election, cksum 0x943a (correct)
+	  Pass, rpa=10.0.0.15 sender pref=100 sender metric=10
+	  new winner addr=10.0.0.16 new winner pref=1000 new winner metric=10000
   110  17:19:46.562048 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto PIM (103), length 24)
     10.0.0.2 > 224.0.0.13: PIMv2, length 4
 	Graft, cksum 0xd9ff (correct), upstream-neighbor:  [|pimv2]
@@ -1003,27 +1032,27 @@
 	  Generation ID Option (20), length 4, Value: 0x00000226
 	  Address List Option (24), length 12, Value: 
   129  17:21:21.305747 IP6 (hlim 64, next-header PIM (103) payload length: 26) 10::2 > ff02::d: PIMv2, length 26
-	Bootstrap, RFC2117-encoding, cksum 0xbc73 (correct) tag=5f hashmlen=29 BSRprio=7 BSR= [|pimv2]
+	Bootstrap, cksum 0xbc73 (correct) tag=5f hashmlen=29 BSRprio=7 BSR=1::2
   130  17:21:36.317463 IP6 (hlim 64, next-header PIM (103) payload length: 26) 10::2 > ff02::d: PIMv2, length 26
-	Bootstrap, RFC2117-encoding, cksum 0xbc73 (correct) tag=5f hashmlen=29 BSRprio=7 BSR= [|pimv2]
+	Bootstrap, cksum 0xbc73 (correct) tag=5f hashmlen=29 BSRprio=7 BSR=1::2
   131  17:21:51.327358 IP6 (hlim 64, next-header PIM (103) payload length: 26) 10::2 > ff02::d: PIMv2, length 26
-	Bootstrap, RFC2117-encoding, cksum 0xc1d1 (correct) tag=195 hashmlen=22 BSRprio=114 BSR= [|pimv2]
+	Bootstrap, cksum 0xc1d1 (correct) tag=195 hashmlen=22 BSRprio=114 BSR=1::3
   132  17:21:51.342877 IP6 (hlim 64, next-header PIM (103) payload length: 26) 10::2 > ff02::d: PIMv2, length 26
-	Bootstrap, RFC2117-encoding, cksum 0xcd68 (correct) tag=133 hashmlen=11 BSRprio=60 BSR= [|pimv2]
+	Bootstrap, cksum 0xcd68 (correct) tag=133 hashmlen=11 BSRprio=60 BSR=1::4
   133  17:21:51.359070 IP6 (hlim 64, next-header PIM (103) payload length: 50) 10::2 > ff02::d: PIMv2, length 50
-	Bootstrap, RFC2117-encoding, cksum 0xbe23 (correct) tag=116 hashmlen=25 BSRprio=1 BSR= [|pimv2]
+	Bootstrap, cksum 0xbe23 (correct) tag=116 hashmlen=25 BSRprio=1 BSR=1::5 (group0: ff02::1 RPcnt=0 FRPcnt=0)
   134  17:21:51.375173 IP6 (hlim 64, next-header PIM (103) payload length: 118) 10::2 > ff02::d: PIMv2, length 118
-	Bootstrap, RFC2117-encoding, cksum 0x9791 (correct) tag=1e9 hashmlen=16 BSRprio=59 BSR= [|pimv2]
+	Bootstrap, cksum 0x9791 (correct) tag=1e9 hashmlen=16 BSRprio=59 BSR=1::8 (group0: ff02::2(0x01) RPcnt=1 FRPcnt=1 RP0=1::6,holdtime=1m15s,prio=64) (group1: ff02::3 RPcnt=1 FRPcnt=1 RP0=1::7,holdtime=1m30s,prio=229)
   135  17:21:51.389973 IP6 (hlim 64, next-header PIM (103) payload length: 26) 10::2 > 10::1: PIMv2, length 26
-	Bootstrap, RFC2117-encoding, cksum 0xbadd (correct) tag=9e hashmlen=29 BSRprio=86 BSR= [|pimv2]
+	Bootstrap, cksum 0xbadd (correct) tag=9e hashmlen=29 BSRprio=86 BSR=1::9
   136  17:22:06.397655 IP6 (class 0xc0, flowlabel 0x4b462, hlim 1, next-header PIM (103) payload length: 26) 10::1 > ff02::d: PIMv2, length 26
-	Bootstrap, RFC2117-encoding, cksum 0xcdee (correct) tag=6c hashmlen=11 BSRprio=120 BSR= [|pimv2]
+	Bootstrap, cksum 0xcdee (correct) tag=6c hashmlen=11 BSRprio=120 BSR=1::a
   137  17:22:06.401467 IP6 (class 0xc0, flowlabel 0x4b462, hlim 1, next-header PIM (103) payload length: 26) 10::1 > ff02::d: PIMv2, length 26
-	Bootstrap, RFC2117-encoding, cksum 0xd0dc (correct) tag=75 hashmlen=8 BSRprio=128 BSR= [|pimv2]
+	Bootstrap, cksum 0xd0dc (correct) tag=75 hashmlen=8 BSRprio=128 BSR=1::b
   138  17:22:06.405175 IP6 (class 0xc0, flowlabel 0x4b462, hlim 1, next-header PIM (103) payload length: 50) 10::1 > ff02::d: PIMv2, length 50
-	Bootstrap, RFC2117-encoding, cksum 0xcfd8 (correct) tag=1f9 hashmlen=6 BSRprio=96 BSR= [|pimv2]
+	Bootstrap, cksum 0xcfd8 (correct) tag=1f9 hashmlen=6 BSRprio=96 BSR=1::c (group0: ff02::4 RPcnt=0 FRPcnt=0)
   139  17:22:06.409793 IP6 (class 0xc0, flowlabel 0x4b462, hlim 1, next-header PIM (103) payload length: 118) 10::1 > ff02::d: PIMv2, length 118
-	Bootstrap, RFC2117-encoding, cksum 0x773d (correct) tag=110 hashmlen=18 BSRprio=218 BSR= [|pimv2]
+	Bootstrap, cksum 0x773d (correct) tag=110 hashmlen=18 BSRprio=218 BSR=1::f (group0: ff02::5(0x01) RPcnt=1 FRPcnt=1 RP0=1::d,holdtime=1m52s,prio=205) (group1: ff02::6 RPcnt=1 FRPcnt=1 RP0=1::e,holdtime=2m49s,prio=118)
   140  17:22:28.670554 IP6 (hlim 64, next-header PIM (103) payload length: 46) 10::2 > 10::1: PIMv2, length 46
 	Candidate RP Advertisement, cksum 0xce65 (correct) prefix-cnt=1 prio=73 holdtime=13m6s RP=1::2 Group0=ff02::1(0x01)
   141  17:22:28.686085 IP6 (hlim 64, next-header PIM (103) payload length: 46) 10::2 > 10::1: PIMv2, length 46
@@ -1630,47 +1659,76 @@
   206  17:28:48.590187 IP6 (class 0xc0, flowlabel 0xfe48b, hlim 255, next-header PIM (103) payload length: 42) 10::1 > 10::2: PIMv2, length 42
 	Register Stop, cksum 0xd9cb (incorrect) group=ff02::6 source=1::7
   207  17:28:55.824177 IP6 (hlim 64, next-header PIM (103) payload length: 30) 10::2 > ff02::d: PIMv2, length 30
-	DF Election, RFC2117-encoding, cksum 0xd3d7 (correct) [type 10]
+	DF Election, cksum 0xd3d7 (correct)
+	  Offer, rpa=1::2 sender pref=100 sender metric=10
   208  17:28:55.839949 IP6 (hlim 64, next-header PIM (103) payload length: 30) 10::2 > ff02::d: PIMv2, length 30
-	DF Election, RFC2117-encoding, cksum 0xd3d7 (correct) [type 10]
+	DF Election, cksum 0xd3d7 (correct)
+	  Offer, rpa=1::2 sender pref=100 sender metric=10
   209  17:28:55.855650 IP6 (hlim 64, next-header PIM (103) payload length: 30) 10::2 > ff02::d: PIMv2, length 30
-	DF Election, RFC2117-encoding, cksum 0xd3c6 (correct) [type 10]
+	DF Election, cksum 0xd3c6 (correct)
+	  Winner, rpa=1::3 sender pref=100 sender metric=10
   210  17:28:55.871248 IP6 (hlim 64, next-header PIM (103) payload length: 30) 10::2 > ff02::d: PIMv2, length 30
-	DF Election, RFC2117-encoding, cksum 0xd3c6 (correct) [type 10]
+	DF Election, cksum 0xd3c6 (correct)
+	  Winner, rpa=1::3 sender pref=100 sender metric=10
   211  17:28:55.887289 IP6 (hlim 64, next-header PIM (103) payload length: 58) 10::2 > ff02::d: PIMv2, length 58
-	DF Election, RFC2117-encoding, cksum 0x7f8b (correct) [type 10]
+	DF Election, cksum 0x7f8b (correct)
+	  Backoff, rpa=1::4 sender pref=100 sender metric=10
+	  offer addr=1::5 offer pref=1000 offer metric=10000 interval 10000ms
   212  17:28:55.903013 IP6 (hlim 64, next-header PIM (103) payload length: 58) 10::2 > ff02::d: PIMv2, length 58
-	DF Election, RFC2117-encoding, cksum 0x7f8b (correct) [type 10]
+	DF Election, cksum 0x7f8b (correct)
+	  Backoff, rpa=1::4 sender pref=100 sender metric=10
+	  offer addr=1::5 offer pref=1000 offer metric=10000 interval 10000ms
   213  17:28:55.919550 IP6 (hlim 64, next-header PIM (103) payload length: 56) 10::2 > ff02::d: PIMv2, length 56
-	DF Election, RFC2117-encoding, cksum 0xa689 (correct) [type 10]
+	DF Election, cksum 0xa689 (correct)
+	  Pass, rpa=1::6 sender pref=100 sender metric=10
+	  new winner addr=1::7 new winner pref=1000 new winner metric=10000
   214  17:28:55.935209 IP6 (hlim 64, next-header PIM (103) payload length: 56) 10::2 > ff02::d: PIMv2, length 56
-	DF Election, RFC2117-encoding, cksum 0xa689 (correct) [type 10]
+	DF Election, cksum 0xa689 (correct)
+	  Pass, rpa=1::6 sender pref=100 sender metric=10
+	  new winner addr=1::7 new winner pref=1000 new winner metric=10000
   215  17:28:55.951452 IP6 (hlim 64, next-header PIM (103) payload length: 30) 10::2 > ff02::d: PIMv2, length 30
-	DF Election, RFC2117-encoding, cksum 0xd3d1 (correct) [type 10]
+	DF Election, cksum 0xd3d1 (correct)
+	  Offer, rpa=1::8 sender pref=100 sender metric=10
   216  17:29:10.963613 IP6 (hlim 64, next-header PIM (103) payload length: 30) 10::2 > ff02::d: PIMv2, length 30
-	DF Election, RFC2117-encoding, cksum 0xd3d1 (correct) [type 10]
+	DF Election, cksum 0xd3d1 (correct)
+	  Offer, rpa=1::8 sender pref=100 sender metric=10
   217  17:29:25.974998 IP6 (hlim 64, next-header PIM (103) payload length: 30) 10::2 > 10::1: PIMv2, length 30
-	DF Election, RFC2117-encoding, cksum 0xd2cf (correct) [type 10]
+	DF Election, cksum 0xd2cf (correct)
+	  Offer, rpa=1::9 sender pref=100 sender metric=10
   218  17:29:40.984969 IP6 (hlim 64, next-header PIM (103) payload length: 30) 10::2 > ff02::d: PIMv2, length 30
-	DF Election, RFC2117-encoding, cksum 0xd3cf (correct) [type 10]
+	DF Election, cksum 0xd3cf (correct)
+	  Offer, rpa=1::a sender pref=100 sender metric=10
   219  17:29:55.998320 IP6 (hlim 64, next-header PIM (103) payload length: 30) 10::2 > 10::1: PIMv2, length 30
-	DF Election, RFC2117-encoding, cksum 0xd2cd (correct) [type 10]
+	DF Election, cksum 0xd2cd (correct)
+	  Offer, rpa=1::b sender pref=100 sender metric=10
   220  17:30:11.006628 IP6 (class 0xc0, flowlabel 0x4b462, hlim 1, next-header PIM (103) payload length: 30) 10::1 > ff02::d: PIMv2, length 30
-	DF Election, RFC2117-encoding, cksum 0xd3ce (correct) [type 10]
+	DF Election, cksum 0xd3ce (correct)
+	  Offer, rpa=1::c sender pref=100 sender metric=10
   221  17:30:11.011282 IP6 (class 0xc0, flowlabel 0x4b462, hlim 1, next-header PIM (103) payload length: 30) 10::1 > ff02::d: PIMv2, length 30
-	DF Election, RFC2117-encoding, cksum 0xd3ce (correct) [type 10]
+	DF Election, cksum 0xd3ce (correct)
+	  Offer, rpa=1::c sender pref=100 sender metric=10
   222  17:30:11.015823 IP6 (class 0xc0, flowlabel 0x4b462, hlim 1, next-header PIM (103) payload length: 30) 10::1 > ff02::d: PIMv2, length 30
-	DF Election, RFC2117-encoding, cksum 0xd3bd (correct) [type 10]
+	DF Election, cksum 0xd3bd (correct)
+	  Winner, rpa=1::d sender pref=100 sender metric=10
   223  17:30:11.020041 IP6 (class 0xc0, flowlabel 0x4b462, hlim 1, next-header PIM (103) payload length: 30) 10::1 > ff02::d: PIMv2, length 30
-	DF Election, RFC2117-encoding, cksum 0xd3bd (correct) [type 10]
+	DF Election, cksum 0xd3bd (correct)
+	  Winner, rpa=1::d sender pref=100 sender metric=10
   224  17:30:11.024077 IP6 (class 0xc0, flowlabel 0x4b462, hlim 1, next-header PIM (103) payload length: 58) 10::1 > ff02::d: PIMv2, length 58
-	DF Election, RFC2117-encoding, cksum 0x7f78 (correct) [type 10]
+	DF Election, cksum 0x7f78 (correct)
+	  Backoff, rpa=1::e sender pref=100 sender metric=10
+	  offer addr=1::f offer pref=1000 offer metric=10000 interval 10000ms
   225  17:30:11.028134 IP6 (class 0xc0, flowlabel 0x4b462, hlim 1, next-header PIM (103) payload length: 58) 10::1 > ff02::d: PIMv2, length 58
-	DF Election, RFC2117-encoding, cksum 0x7f78 (correct) [type 10]
+	DF Election, cksum 0x7f78 (correct)
+	  Backoff, rpa=1::e sender pref=100 sender metric=10
+	  offer addr=1::f offer pref=1000 offer metric=10000 interval 10000ms
   226  17:30:11.032519 IP6 (class 0xc0, flowlabel 0x4b462, hlim 1, next-header PIM (103) payload length: 56) 10::1 > ff02::d: PIMv2, length 56
-	DF Election, RFC2117-encoding, cksum 0xa676 (correct) [type 10]
+	DF Election, cksum 0xa676 (correct)
+	  Pass, rpa=1::10 sender pref=100 sender metric=10
+	  new winner addr=1::11 new winner pref=1000 new winner metric=10000
   227  17:30:11.037060 IP6 (class 0xc0, flowlabel 0x4b462, hlim 1, next-header PIM (103) payload length: 56) 10::1 > ff02::d: PIMv2, length 56
-	DF Election, RFC2117-encoding, cksum 0xa676 (correct) [type 10]
+	DF Election, cksum 0xa676 (correct)
+	  Pass, rpa=1::10 sender pref=100 sender metric=10
+	  new winner addr=1::11 new winner pref=1000 new winner metric=10000
   228  17:30:23.287232 IP6 (hlim 64, next-header PIM (103) payload length: 4) 10::2 > ff02::d: PIMv2, length 4
 	Graft, cksum 0xda72 (correct), upstream-neighbor:  [|pimv2]
   229  17:30:45.519013 IP6 (hlim 64, next-header PIM (103) payload length: 78) 10::2 > ff02::d: PIMv2, length 78

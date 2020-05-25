@@ -198,7 +198,7 @@ tpaddr_print_ip(netdissect_options *ndo,
 	else if (PROTO_LEN(ap) != 4)
 		ND_PRINT("<wrong len>");
 	else
-		ND_PRINT("%s", ipaddr_string(ndo, TPA(ap)));
+		ND_PRINT("%s", GET_IPADDR_STRING(TPA(ap)));
 }
 
 static void
@@ -210,7 +210,7 @@ spaddr_print_ip(netdissect_options *ndo,
 	else if (PROTO_LEN(ap) != 4)
 		ND_PRINT("<wrong len>");
 	else
-		ND_PRINT("%s", ipaddr_string(ndo, SPA(ap)));
+		ND_PRINT("%s", GET_IPADDR_STRING(SPA(ap)));
 }
 
 static void
@@ -221,10 +221,10 @@ atmarp_addr_print(netdissect_options *ndo,
 	if (ha_len == 0)
 		ND_PRINT("<No address>");
 	else {
-		ND_PRINT("%s", linkaddr_string(ndo, ha, LINKADDR_ATM, ha_len));
+		ND_PRINT("%s", GET_LINKADDR_STRING(ha, LINKADDR_ATM, ha_len));
 		if (srca_len != 0)
 			ND_PRINT(",%s",
-				  linkaddr_string(ndo, srca, LINKADDR_ATM, srca_len));
+				  GET_LINKADDR_STRING(srca, LINKADDR_ATM, srca_len));
 	}
 }
 
@@ -237,7 +237,7 @@ atmarp_tpaddr_print(netdissect_options *ndo,
 	else if (ATMTPROTO_LEN(ap) != 4)
 		ND_PRINT("<wrong tplen>");
 	else
-		ND_PRINT("%s", ipaddr_string(ndo, ATMTPA(ap)));
+		ND_PRINT("%s", GET_IPADDR_STRING(ATMTPA(ap)));
 }
 
 static void
@@ -249,7 +249,7 @@ atmarp_spaddr_print(netdissect_options *ndo,
 	else if (ATMSPROTO_LEN(ap) != 4)
 		ND_PRINT("<wrong splen>");
 	else
-		ND_PRINT("%s", ipaddr_string(ndo, ATMSPA(ap)));
+		ND_PRINT("%s", GET_IPADDR_STRING(ATMSPA(ap)));
 }
 
 static void
@@ -286,7 +286,7 @@ atmarp_print(netdissect_options *ndo,
                           ATMSPROTO_LEN(ap),
                           ATMTPROTO_LEN(ap));
 
-                /* don't know know about the address formats */
+                /* don't know about the address formats */
                 if (!ndo->ndo_vflag) {
                     goto out;
                 }
@@ -372,7 +372,7 @@ arp_print(netdissect_options *ndo,
         /* if its ATM then call the ATM ARP printer
            for Frame-relay ARP most of the fields
            are similar to Ethernet so overload the Ethernet Printer
-           and set the linkaddr type for linkaddr_string(ndo, ) accordingly */
+           and set the linkaddr type for GET_LINKADDR_STRING() accordingly */
 
         switch(hrd) {
         case ARPHRD_ATM2225:
@@ -407,7 +407,7 @@ arp_print(netdissect_options *ndo,
                       tok2str(ethertype_values, "Unknown Protocol (0x%04x)", pro),
                       PROTO_LEN(ap));
 
-            /* don't know know about the address formats */
+            /* don't know about the address formats */
             if (!ndo->ndo_vflag) {
                 goto out;
             }
@@ -425,7 +425,7 @@ arp_print(netdissect_options *ndo,
 		tpaddr_print_ip(ndo, ap, pro);
 		if (isnonzero(ndo, (const u_char *)THA(ap), HRD_LEN(ap)))
 			ND_PRINT(" (%s)",
-				  linkaddr_string(ndo, THA(ap), linkaddr, HRD_LEN(ap)));
+				  GET_LINKADDR_STRING(THA(ap), linkaddr, HRD_LEN(ap)));
 		ND_PRINT(" tell ");
 		spaddr_print_ip(ndo, ap, pro);
 		break;
@@ -433,30 +433,30 @@ arp_print(netdissect_options *ndo,
 	case ARPOP_REPLY:
 		spaddr_print_ip(ndo, ap, pro);
 		ND_PRINT(" is-at %s",
-                          linkaddr_string(ndo, SHA(ap), linkaddr, HRD_LEN(ap)));
+                          GET_LINKADDR_STRING(SHA(ap), linkaddr, HRD_LEN(ap)));
 		break;
 
 	case ARPOP_REVREQUEST:
 		ND_PRINT("who-is %s tell %s",
-			  linkaddr_string(ndo, THA(ap), linkaddr, HRD_LEN(ap)),
-			  linkaddr_string(ndo, SHA(ap), linkaddr, HRD_LEN(ap)));
+			  GET_LINKADDR_STRING(THA(ap), linkaddr, HRD_LEN(ap)),
+			  GET_LINKADDR_STRING(SHA(ap), linkaddr, HRD_LEN(ap)));
 		break;
 
 	case ARPOP_REVREPLY:
 		ND_PRINT("%s at ",
-			  linkaddr_string(ndo, THA(ap), linkaddr, HRD_LEN(ap)));
+			  GET_LINKADDR_STRING(THA(ap), linkaddr, HRD_LEN(ap)));
 		tpaddr_print_ip(ndo, ap, pro);
 		break;
 
 	case ARPOP_INVREQUEST:
 		ND_PRINT("who-is %s tell %s",
-			  linkaddr_string(ndo, THA(ap), linkaddr, HRD_LEN(ap)),
-			  linkaddr_string(ndo, SHA(ap), linkaddr, HRD_LEN(ap)));
+			  GET_LINKADDR_STRING(THA(ap), linkaddr, HRD_LEN(ap)),
+			  GET_LINKADDR_STRING(SHA(ap), linkaddr, HRD_LEN(ap)));
 		break;
 
 	case ARPOP_INVREPLY:
 		ND_PRINT("%s at ",
-			  linkaddr_string(ndo, SHA(ap), linkaddr, HRD_LEN(ap)));
+			  GET_LINKADDR_STRING(SHA(ap), linkaddr, HRD_LEN(ap)));
 		spaddr_print_ip(ndo, ap, pro);
 		break;
 

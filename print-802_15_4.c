@@ -1748,7 +1748,7 @@ ieee802_15_4_print_command_data(netdissect_options *ndo,
 		/* XXX Not implemented */
 	case 0x16: /* DSME GTS Response command */
 		/* XXX Not implemented */
-	case 0x17: /* DSME GTS GTS Notify command */
+	case 0x17: /* DSME GTS Notify command */
 		/* XXX Not implemented */
 	case 0x18: /* DSME Information Request command */
 		/* XXX Not implemented */
@@ -2449,7 +2449,7 @@ ieee802_15_4_print(netdissect_options *ndo,
 	int frame_type;
 	uint16_t fc;
 
-	ndo->ndo_protocol ="802.15.4";
+	ndo->ndo_protocol = "802.15.4";
 
 	if (caplen < 2) {
 		nd_print_trunc(ndo);
@@ -2497,7 +2497,7 @@ ieee802_15_4_if_print(netdissect_options *ndo,
                       const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
-	ndo->ndo_protocol ="802.15.4_if";
+	ndo->ndo_protocol = "802.15.4_if";
 	return ieee802_15_4_print(ndo, p, caplen);
 }
 

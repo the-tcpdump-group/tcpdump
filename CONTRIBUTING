@@ -49,7 +49,7 @@ How to add new code and to update existing code
    You can setup Travis CI and AppVeyor builds for your fork, so you can
    test your changes on Linux, macOS, and Windows before sending pull
    requests.
-   (See http://docs.travis-ci.com/user/getting-started/ for information
+   (See https://docs.travis-ci.com/user/tutorial/ for information
    on setting up Travis CI; go to https://ci.appveyor.com/login and log
    in with your GitHub account and select "NEW PROJECT" to set up an
    AppVeyor build.)

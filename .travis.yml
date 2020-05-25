@@ -1,26 +1,90 @@
 language: c
 
+#
+# Try building on these 4 architectures; all are 64-bit, and all but
+# "s390x", a/k/a z/Architecture, are little-endian. The crypto library
+# on Litle-endian PowerPC/Power ISA does some things that require more
+# careful adherence to the documentation, so it's useful for testing
+# that.
+#
+arch:
+  - amd64
+  - ppc64le
+  - s390x
+  - arm64
+
 os:
   - linux
   - osx
 
-dist: xenial
+dist: bionic
 
 compiler:
   - gcc
   - clang
 
+#
+# Linux runs on all of the architectures listed above; macOS currently
+# runs only on 64-bit x86, although the Spaceshipologists are all in a
+# tizzy about the possibility of Arm-based Macs.  Suppress the macOS
+# builds that don't work.
+#
+# In addition, with newer versions of macOS, Apple ships a "gcc" that's
+# just another front end to Clang, presumably for backwards
+# compatibility with build scripts etc. that expect the compiler to be
+# "gcc", so don't bother doing "gcc" builds on macOS.
+#
+# Furthermore, the Coverity-branch builds seem to time out on the
+# non-x86 platforms, so suppress them as well.  (Are they supported
+# at all?)
+#
+# XXX - what is the fast_finish clause there for?  According to
+#
+#    https://docs.travis-ci.com/user/build-matrix/#fast-finishing
+#
+# "If some rows in the build matrix are allowed to fail, the build 
+# won't be marked as finished until they have completed.
+#
+# To mark the build as finished as soon as possible, add fast_finish:
+# true to the jobs section of your .travis.yml like this:
+#
+# jobs:
+#   fast_finish: true
+#
+# Now, the build result will be determined as soon as all the required
+# jobs finish, based on these results, while the rest of the
+# allow_failures jobs continue to run."
+#
+# but we *have* no allow_failures jobs.
+#
+jobs:
+  fast_finish: true
+  exclude:
+  - arch: ppc64le
+    os: osx
+  - arch: s390x
+    os: osx
+  - arch: arm64
+    os: osx
+  - compiler: gcc
+    os: osx
+  - if: branch = coverity_scan
+    arch: ppc64le
+  - if: branch = coverity_scan
+    arch: s390x
+  - if: branch = coverity_scan
+    arch: arm64
+
 cache: ccache
 
 env:
   global:
-    - BUILD_LIBPCAP=true
     # encrypted COVERITY_SCAN_TOKEN from
     # https://scan.coverity.com/projects/<project_id>/submit_build?tab=travis_ci
     - secure: "DwUeukcRGl1vXNZDDt2237zCA58ZzmzWpCkPcb/Hpeh8OvRw1eBZJiu4L8iD2qtY4A/dPDvOeBiml5MF6bVri9Dui1yPkvkvFqIXzbK5CWS6Ye+NgSBNMwqnAjhTMv/x8I4Bvy9IhDGwj/2JXVUvjBddRMLRyr/ag+MDRB1IVAI="
     # Coverity run condition (avoid matrix multiple runs), need customized
     # build script. Need an update if new matrix cases.
-    - coverity_scan_run_condition='"$TRAVIS_OS_NAME" = linux -a "$CC" = gcc -a "$REMOTE" = enable -a "$CMAKE" = no -a "$CRYPTO" = yes'
+    - coverity_scan_run_condition='"$TRAVIS_CPU_ARCH" = amd64 -a "$TRAVIS_OS_NAME" = linux -a "$CC" = gcc -a "$REMOTE" = enable -a "$CMAKE" = no -a "$CRYPTO" = yes -a "$BUILD_LIBPCAP" = yes'
     # Coverity script test mode (if true no uploading, avoid reaching the quota)
     # usual processing: false.
     - coverity_scan_script_test_mode=false
@@ -28,17 +92,19 @@ env:
   matrix:
     # NOTE: REMOTE= is for the libpcap build, which is done with autotools
     # even if we're building tcpdump with CMake.
-    - CMAKE=no  REMOTE=disable CRYPTO=no
-    - CMAKE=no  REMOTE=disable CRYPTO=yes
-    - CMAKE=no  REMOTE=enable  CRYPTO=no
-    - CMAKE=no  REMOTE=enable  CRYPTO=yes
-    - CMAKE=yes REMOTE=disable CRYPTO=no
-    - CMAKE=yes REMOTE=disable CRYPTO=yes
-    - CMAKE=yes REMOTE=enable  CRYPTO=no
-    - CMAKE=yes REMOTE=enable  CRYPTO=yes
-
-matrix:
-  fast_finish: true
+    # It's irrelevant if we're building tcpdump with the system libpcap.
+    - BUILD_LIBPCAP=no  CMAKE=no                 CRYPTO=no
+    - BUILD_LIBPCAP=no  CMAKE=no                 CRYPTO=yes
+    - BUILD_LIBPCAP=no  CMAKE=yes                CRYPTO=no
+    - BUILD_LIBPCAP=no  CMAKE=yes                CRYPTO=yes
+    - BUILD_LIBPCAP=yes CMAKE=no  REMOTE=disable CRYPTO=no
+    - BUILD_LIBPCAP=yes CMAKE=no  REMOTE=disable CRYPTO=yes
+    - BUILD_LIBPCAP=yes CMAKE=no  REMOTE=enable  CRYPTO=no
+    - BUILD_LIBPCAP=yes CMAKE=no  REMOTE=enable  CRYPTO=yes
+    - BUILD_LIBPCAP=yes CMAKE=yes REMOTE=disable CRYPTO=no
+    - BUILD_LIBPCAP=yes CMAKE=yes REMOTE=disable CRYPTO=yes
+    - BUILD_LIBPCAP=yes CMAKE=yes REMOTE=enable  CRYPTO=no
+    - BUILD_LIBPCAP=yes CMAKE=yes REMOTE=enable  CRYPTO=yes
 
 addons:
   coverity_scan:
@@ -60,14 +126,12 @@ addons:
     branch_pattern: coverity_scan
   apt:
     packages:
-      - libusb-1.0-0-dev
-      - libdbus-glib-1-dev
+      - libdbus-1-dev
       - libbluetooth-dev
       - libnl-genl-3-dev
       - libibverbs-dev
       - libssl-dev
       - libssl1.0.0
-      - libdnet-dev
       - libsmi2-dev
       - libcap-ng-dev
       - libpcap-dev
@@ -79,16 +143,15 @@ git:
 before_install:
   - uname -a
   - date
+  - gem install travis-conditions
   - if [ "$TRAVIS_OS_NAME" = osx ]; then brew update >/dev/null; fi
-  - if [ "$TRAVIS_OS_NAME" = linux ]; then dpkg-query -f '${Package}__${Version}__${Architecture}\n' -W 'lib*-dev'; fi
-  - if [ "$TRAVIS_OS_NAME" = linux ]; then sudo curl -s -L https://entrust.com/root-certificates/entrust_l1k.cer -o /usr/local/share/ca-certificates/entrust_l1k.crt; fi
-  - if [ "$TRAVIS_OS_NAME" = linux ]; then sudo update-ca-certificates; fi
+  - if [ "$TRAVIS_OS_NAME" = linux ]; then apt list --installed 'lib*-dev'; fi
 
 install:
   - if [ "$TRAVIS_OS_NAME" = osx ]; then brew install libsmi | grep -v '%'; fi
 
 before_script:
-  - if [ "$BUILD_LIBPCAP" = true ]; then (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth 3 --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure "--${REMOTE}-remote" --prefix=/tmp && make && make install); fi
+  - if [ "$BUILD_LIBPCAP" = yes ]; then (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth 3 --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure "--${REMOTE}-remote" --prefix=/tmp && make && make install); fi
 
 script:
   - if [ "$COVERITY_SCAN_BRANCH" = 1 ]; then exit 0; fi
@@ -100,19 +163,19 @@ script:
   - if [ "$CMAKE" = yes ]; then mkdir build; fi
   - if [ "$CMAKE" = yes ]; then cd build; fi
   - if [ "$CMAKE" = yes ]; then echo travis_fold:start:script.cmake; fi
-  - if [ "$CMAKE" = yes ]; then cmake -DCMAKE_PREFIX_PATH=/tmp -DCMAKE_INSTALL_PREFIX=/tmp ..; fi
+  - if [ "$CMAKE" = yes ]; then cmake -DWITH_CRYPTO="$CRYPTO" -DCMAKE_PREFIX_PATH=/tmp -DCMAKE_INSTALL_PREFIX=/tmp ..; fi
   - if [ "$CMAKE" = yes ]; then echo -n travis_fold:end:script.cmake; fi
   - make -s CFLAGS=-Werror
   - echo '$ make install [...]' && echo travis_fold:start:script.make_install
   - PATH=$PATH make install
   - echo -n travis_fold:end:script.make_install
-  - if [ "$CMAKE" = no ]; then make check; fi
+  - if [ "$BUILD_LIBPCAP" = yes ]; then make check; fi
   - ./tcpdump --version
   - ./tcpdump -h
   - ./tcpdump -D
   - sudo ./tcpdump -J
   - sudo ./tcpdump -L
-  - sudo ./tcpdump -#n -c 10
+  - if [ "$TRAVIS_OS_NAME" = linux -a "$TRAVIS_CPU_ARCH" != ppc64le -a "$TRAVIS_CPU_ARCH" != s390x ]; then sudo ./tcpdump -#n -c 10; fi
   - if [ "$CMAKE" = no ]; then make releasetar; fi
   - echo '$ cat Makefile [...]'; echo travis_fold:start:script.cat_makefile
   - if [ "$CMAKE" = no ]; then cat Makefile | sed -n '1,/DO NOT DELETE THIS LINE -- mkdep uses it/p'; fi

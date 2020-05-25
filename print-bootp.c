@@ -299,7 +299,7 @@ bootp_print(netdissect_options *ndo,
 	bp_hlen = GET_U_1(bp->bp_hlen);
 	if (bp_htype == 1 && bp_hlen == 6 && bp_op == BOOTPREQUEST) {
 		ND_TCHECK_6(bp->bp_chaddr);
-		ND_PRINT(" from %s", etheraddr_string(ndo, bp->bp_chaddr));
+		ND_PRINT(" from %s", GET_ETHERADDR_STRING(bp->bp_chaddr));
 	}
 
 	ND_PRINT(", length %u", length);
@@ -334,27 +334,27 @@ bootp_print(netdissect_options *ndo,
 	/* Client's ip address */
 	ND_TCHECK_4(bp->bp_ciaddr);
 	if (GET_IPV4_TO_NETWORK_ORDER(bp->bp_ciaddr))
-		ND_PRINT("\n\t  Client-IP %s", ipaddr_string(ndo, bp->bp_ciaddr));
+		ND_PRINT("\n\t  Client-IP %s", GET_IPADDR_STRING(bp->bp_ciaddr));
 
 	/* 'your' ip address (bootp client) */
 	ND_TCHECK_4(bp->bp_yiaddr);
 	if (GET_IPV4_TO_NETWORK_ORDER(bp->bp_yiaddr))
-		ND_PRINT("\n\t  Your-IP %s", ipaddr_string(ndo, bp->bp_yiaddr));
+		ND_PRINT("\n\t  Your-IP %s", GET_IPADDR_STRING(bp->bp_yiaddr));
 
 	/* Server's ip address */
 	ND_TCHECK_4(bp->bp_siaddr);
 	if (GET_IPV4_TO_NETWORK_ORDER(bp->bp_siaddr))
-		ND_PRINT("\n\t  Server-IP %s", ipaddr_string(ndo, bp->bp_siaddr));
+		ND_PRINT("\n\t  Server-IP %s", GET_IPADDR_STRING(bp->bp_siaddr));
 
 	/* Gateway's ip address */
 	ND_TCHECK_4(bp->bp_giaddr);
 	if (GET_IPV4_TO_NETWORK_ORDER(bp->bp_giaddr))
-		ND_PRINT("\n\t  Gateway-IP %s", ipaddr_string(ndo, bp->bp_giaddr));
+		ND_PRINT("\n\t  Gateway-IP %s", GET_IPADDR_STRING(bp->bp_giaddr));
 
 	/* Client's Ethernet address */
 	if (bp_htype == 1 && bp_hlen == 6) {
 		ND_TCHECK_6(bp->bp_chaddr);
-		ND_PRINT("\n\t  Client-Ethernet-Address %s", etheraddr_string(ndo, bp->bp_chaddr));
+		ND_PRINT("\n\t  Client-Ethernet-Address %s", GET_ETHERADDR_STRING(bp->bp_chaddr));
 	}
 
 	ND_TCHECK_1(bp->bp_sname);		/* check first char only */
@@ -512,7 +512,7 @@ static const struct tok tag2str[] = {
 	{ TAG_CLASSLESS_STA_RT_MS, "$Classless-Static-Route-Microsoft" },
 /* RFC 5859 - TFTP Server Address Option for DHCPv4 */
 	{ TAG_TFTP_SERVER_ADDRESS, "iTFTP-Server-Address" },
-/* http://www.iana.org/assignments/bootp-dhcp-extensions/index.htm */
+/* https://www.iana.org/assignments/bootp-dhcp-parameters/bootp-dhcp-parameters.xhtml#options */
 	{ TAG_SLP_NAMING_AUTH,	"aSLP-NA" },
 	{ TAG_CLIENT_FQDN,	"$FQDN" },
 	{ TAG_AGENT_CIRCUIT,	"$Agent-Information" },
@@ -728,7 +728,7 @@ rfc1048_print(netdissect_options *ndo,
 				if (!first)
 					ND_PRINT(",");
 				if (c == 'i')
-					ND_PRINT("%s", ipaddr_string(ndo, bp));
+					ND_PRINT("%s", GET_IPADDR_STRING(bp));
 				else if (c == 'L')
 					ND_PRINT("%d", GET_BE_S_4(bp));
 				else
@@ -744,10 +744,10 @@ rfc1048_print(netdissect_options *ndo,
 			while (len >= 2*4) {
 				if (!first)
 					ND_PRINT(",");
-				ND_PRINT("(%s:", ipaddr_string(ndo, bp));
+				ND_PRINT("(%s:", GET_IPADDR_STRING(bp));
 				bp += 4;
 				len -= 4;
-				ND_PRINT("%s)", ipaddr_string(ndo, bp));
+				ND_PRINT("%s)", GET_IPADDR_STRING(bp));
 				bp += 4;
 				len -= 4;
 				first = 0;
@@ -816,7 +816,7 @@ rfc1048_print(netdissect_options *ndo,
 			case TAG_NETBIOS_NODE:
 				/* this option should be at least 1 byte long */
 				if (len < 1) {
-					ND_PRINT("ERROR: length < 1 bytes");
+					ND_PRINT("[ERROR: length < 1 bytes]");
 					break;
 				}
 				tag = GET_U_1(bp);
@@ -828,7 +828,7 @@ rfc1048_print(netdissect_options *ndo,
 			case TAG_OPT_OVERLOAD:
 				/* this option should be at least 1 byte long */
 				if (len < 1) {
-					ND_PRINT("ERROR: length < 1 bytes");
+					ND_PRINT("[ERROR: length < 1 bytes]");
 					break;
 				}
 				tag = GET_U_1(bp);
@@ -840,12 +840,16 @@ rfc1048_print(netdissect_options *ndo,
 			case TAG_CLIENT_FQDN:
 				/* this option should be at least 3 bytes long */
 				if (len < 3) {
-					ND_PRINT("ERROR: length < 3 bytes");
+					ND_PRINT("[ERROR: length < 3 bytes]");
 					bp += len;
 					len = 0;
 					break;
 				}
-				if (GET_U_1(bp))
+				if (GET_U_1(bp) & 0xf0) {
+					ND_PRINT("[ERROR: MBZ nibble 0x%x != 0] ",
+						 (GET_U_1(bp) & 0xf0) >> 4);
+				}
+				if (GET_U_1(bp) & 0x0f)
 					ND_PRINT("[%s] ",
 						 client_fqdn_flags(GET_U_1(bp)));
 				bp++;
@@ -869,7 +873,7 @@ rfc1048_print(netdissect_options *ndo,
 
 				/* this option should be at least 1 byte long */
 				if (len < 1) {
-					ND_PRINT("ERROR: length < 1 bytes");
+					ND_PRINT("[ERROR: length < 1 bytes]");
 					break;
 				}
 				type = GET_U_1(bp);
@@ -943,7 +947,7 @@ rfc1048_print(netdissect_options *ndo,
 
 				/* this option should be at least 5 bytes long */
 				if (len < 5) {
-					ND_PRINT("ERROR: length < 5 bytes");
+					ND_PRINT("[ERROR: length < 5 bytes]");
 					bp += len;
 					len = 0;
 					break;
@@ -984,7 +988,7 @@ rfc1048_print(netdissect_options *ndo,
 							ND_PRINT(".0");
 						ND_PRINT("/%u", mask_width);
 					}
-					ND_PRINT(":%s)", ipaddr_string(ndo, bp));
+					ND_PRINT(":%s)", GET_IPADDR_STRING(bp));
 					bp += 4;
 					len -= (significant_octets + 4);
 					first = 0;
@@ -998,7 +1002,7 @@ rfc1048_print(netdissect_options *ndo,
 
 				first = 1;
 				if (len < 2) {
-					ND_PRINT("ERROR: length < 2 bytes");
+					ND_PRINT("[ERROR: length < 2 bytes]");
 					bp += len;
 					len = 0;
 					break;
@@ -1010,13 +1014,13 @@ rfc1048_print(netdissect_options *ndo,
 					ND_PRINT("\n\t      ");
 					ND_PRINT("instance#%u: ", suboptnumber);
 					if (suboptlen == 0) {
-						ND_PRINT("ERROR: suboption length must be non-zero");
+						ND_PRINT("[ERROR: suboption length must be non-zero]");
 						bp += len;
 						len = 0;
 						break;
 					}
 					if (len < suboptlen) {
-						ND_PRINT("ERROR: invalid option");
+						ND_PRINT("[ERROR: invalid option]");
 						bp += len;
 						len = 0;
 						break;
@@ -1057,7 +1061,7 @@ trunc:
 
 #define PRINTCMUADDR(m, s) { ND_TCHECK_4(cmu->m); \
     if (GET_IPV4_TO_NETWORK_ORDER(cmu->m) != 0) \
-	ND_PRINT(" %s:%s", s, ipaddr_string(ndo, cmu->m)); }
+	ND_PRINT(" %s:%s", s, GET_IPADDR_STRING(cmu->m)); }
 
 static void
 cmu_print(netdissect_options *ndo,

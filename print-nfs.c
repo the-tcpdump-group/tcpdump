@@ -209,14 +209,14 @@ print_nfsaddr(netdissect_options *ndo,
 	switch (IP_V((const struct ip *)bp)) {
 	case 4:
 		ip = (const struct ip *)bp;
-		strlcpy(srcaddr, ipaddr_string(ndo, ip->ip_src), sizeof(srcaddr));
-		strlcpy(dstaddr, ipaddr_string(ndo, ip->ip_dst), sizeof(dstaddr));
+		strlcpy(srcaddr, GET_IPADDR_STRING(ip->ip_src), sizeof(srcaddr));
+		strlcpy(dstaddr, GET_IPADDR_STRING(ip->ip_dst), sizeof(dstaddr));
 		break;
 	case 6:
 		ip6 = (const struct ip6_hdr *)bp;
-		strlcpy(srcaddr, ip6addr_string(ndo, ip6->ip6_src),
+		strlcpy(srcaddr, GET_IP6ADDR_STRING(ip6->ip6_src),
 		    sizeof(srcaddr));
-		strlcpy(dstaddr, ip6addr_string(ndo, ip6->ip6_dst),
+		strlcpy(dstaddr, GET_IP6ADDR_STRING(ip6->ip6_dst),
 		    sizeof(dstaddr));
 		break;
 	default:
@@ -357,11 +357,11 @@ nfsreply_print(netdissect_options *ndo,
 	ND_TCHECK_4(rp->rm_xid);
 	if (!ndo->ndo_nflag) {
 		strlcpy(srcid, "nfs", sizeof(srcid));
-		nd_snprintf(dstid, sizeof(dstid), "%u",
+		snprintf(dstid, sizeof(dstid), "%u",
 		    GET_BE_U_4(rp->rm_xid));
 	} else {
-		nd_snprintf(srcid, sizeof(srcid), "%u", NFS_PORT);
-		nd_snprintf(dstid, sizeof(dstid), "%u",
+		snprintf(srcid, sizeof(srcid), "%u", NFS_PORT);
+		snprintf(dstid, sizeof(dstid), "%u",
 		    GET_BE_U_4(rp->rm_xid));
 	}
 	print_nfsaddr(ndo, bp2, srcid, dstid);
@@ -524,7 +524,7 @@ static const uint32_t *
 parsefn(netdissect_options *ndo,
         const uint32_t *dp)
 {
-	uint32_t len;
+	uint32_t len, rounded_len;
 	const u_char *cp;
 
 	/* Bail if we don't have the string length */
@@ -540,11 +540,12 @@ parsefn(netdissect_options *ndo,
 		return NULL;
 	}
 
-	ND_TCHECK_LEN(dp, ((len + 3) & ~3));
+	rounded_len = roundup2(len, 4);
+	ND_TCHECK_LEN(dp, rounded_len);
 
 	cp = (const u_char *)dp;
 	/* Update 32-bit pointer (NFS filenames padded to 32-bit boundaries) */
-	dp += ((len + 3) & ~3) / sizeof(*dp);
+	dp += rounded_len / sizeof(*dp);
 	ND_PRINT("\"");
 	if (nd_printn(ndo, cp, len, ndo->ndo_snapend)) {
 		ND_PRINT("\"");

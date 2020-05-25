@@ -65,9 +65,9 @@ const char *etc_path(const char *file)
         return (file);
     else
 #ifdef _WIN32
-    nd_snprintf(path, sizeof(path), "%s%s%s", env, __PATH_ETC_INET, file);
+    snprintf(path, sizeof(path), "%s%s%s", env, __PATH_ETC_INET, file);
 #else
-    nd_snprintf(path, sizeof(path), "%s%s", env, file);
+    snprintf(path, sizeof(path), "%s%s", env, file);
 #endif
     return (path);
 }

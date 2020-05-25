@@ -162,7 +162,7 @@ format_nid(netdissect_options *ndo, const u_char *data)
     static char buf[4][sizeof("01:01:01:01")];
     static int i = 0;
     i = (i + 1) % 4;
-    nd_snprintf(buf[i], sizeof(buf[i]), "%02x:%02x:%02x:%02x",
+    snprintf(buf[i], sizeof(buf[i]), "%02x:%02x:%02x:%02x",
              GET_U_1(data), GET_U_1(data + 1), GET_U_1(data + 2),
              GET_U_1(data + 3));
     return buf[i];
@@ -174,7 +174,7 @@ format_256(netdissect_options *ndo, const u_char *data)
     static char buf[4][sizeof("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")];
     static int i = 0;
     i = (i + 1) % 4;
-    nd_snprintf(buf[i], sizeof(buf[i]), "%016" PRIx64 "%016" PRIx64 "%016" PRIx64 "%016" PRIx64,
+    snprintf(buf[i], sizeof(buf[i]), "%016" PRIx64 "%016" PRIx64 "%016" PRIx64 "%016" PRIx64,
          GET_BE_U_8(data),
          GET_BE_U_8(data + 8),
          GET_BE_U_8(data + 16),
@@ -189,7 +189,7 @@ format_interval(const uint32_t n)
     static char buf[4][sizeof("0000000.000s")];
     static int i = 0;
     i = (i + 1) % 4;
-    nd_snprintf(buf[i], sizeof(buf[i]), "%u.%03us", n / 1000, n % 1000);
+    snprintf(buf[i], sizeof(buf[i]), "%u.%03us", n / 1000, n % 1000);
     return buf[i];
 }
 
@@ -197,9 +197,9 @@ static const char *
 format_ip6addr(netdissect_options *ndo, const u_char *cp)
 {
     if (is_ipv4_mapped_address(cp))
-        return ipaddr_string(ndo, cp + IPV4_MAPPED_HEADING_LEN);
+        return GET_IPADDR_STRING(cp + IPV4_MAPPED_HEADING_LEN);
     else
-        return ip6addr_string(ndo, cp);
+        return GET_IP6ADDR_STRING(cp);
 }
 
 static int
@@ -227,7 +227,7 @@ print_prefix(netdissect_options *ndo, const u_char *prefix, u_int max_length)
 		((u_char *)&addr)[plenbytes - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
 	}
-	nd_snprintf(buf, sizeof(buf), "%s/%u", ipaddr_string(ndo, (const u_char *)&addr), plen);
+	snprintf(buf, sizeof(buf), "%s/%u", ipaddr_string(ndo, (const u_char *)&addr), plen);
         plenbytes += 1 + IPV4_MAPPED_HEADING_LEN;
     } else {
         plenbytes = decode_prefix6(ndo, prefix, max_length, buf, sizeof(buf));
@@ -298,7 +298,7 @@ dhcpv4_print(netdissect_options *ndo,
                 return -1;
             }
             for (t = 0; t < optlen; t += 4)
-                ND_PRINT(" %s", ipaddr_string(ndo, value + t));
+                ND_PRINT(" %s", GET_IPADDR_STRING(value + t));
         }
             break;
         case DH4OPT_DOMAIN_SEARCH: {
@@ -351,7 +351,7 @@ dhcpv6_print(netdissect_options *ndo,
                     return -1;
                 }
                 for (t = 0; t < optlen; t += 16)
-                    ND_PRINT(" %s", ip6addr_string(ndo, value + t));
+                    ND_PRINT(" %s", GET_IP6ADDR_STRING(value + t));
             }
                 break;
             case DH6OPT_DOMAIN_LIST: {
@@ -827,7 +827,7 @@ hncp_print_rec(netdissect_options *ndo,
                 nd_print_invalid(ndo);
             }
             l += 17;
-            l += -l & 3;
+            l = roundup2(l, 4);
             if (bodylen >= l)
                 hncp_print_rec(ndo, value + l, bodylen - l, indent+1);
         }
@@ -852,7 +852,7 @@ hncp_print_rec(netdissect_options *ndo,
         }
     skip_multiline:
 
-        i += 4 + bodylen + (-bodylen & 3);
+        i += 4 + roundup2(bodylen, 4);
     }
     print_type_in_line(ndo, last_type_mask, last_type_count, indent, &first_one);
 

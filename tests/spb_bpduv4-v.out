@@ -13,7 +13,6 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-
     2  13:19:46.966286 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
 	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
 	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
@@ -29,7 +28,6 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-
     3  13:19:48.968104 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
 	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
 	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
@@ -45,7 +43,6 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-
     4  13:19:50.968841 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
 	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
 	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
@@ -61,7 +58,6 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-
     5  13:19:52.969919 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
 	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
 	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
@@ -77,7 +73,6 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-
     6  13:19:54.971627 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
 	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
 	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
@@ -93,7 +88,6 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-
     7  13:19:56.973555 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
 	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
 	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
@@ -109,7 +103,6 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-
     8  13:19:58.974590 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
 	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
 	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
@@ -125,7 +118,6 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-
     9  13:20:00.976152 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
 	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
 	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
@@ -141,7 +133,6 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-
    10  13:20:02.977225 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
 	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
 	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
@@ -157,7 +148,6 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-
    11  13:20:04.978131 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
 	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
 	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
@@ -173,7 +163,6 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-
    12  13:20:06.979284 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
 	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
 	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
@@ -189,7 +178,6 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-
    13  13:20:08.980357 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
 	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
 	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
@@ -205,7 +193,6 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-
    14  13:20:10.981246 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
 	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
 	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
@@ -221,7 +208,6 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-
    15  13:20:12.982792 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
 	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
 	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
@@ -237,7 +223,6 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-
    16  13:20:14.984471 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
 	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
 	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
@@ -253,7 +238,6 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-
    17  13:20:16.985513 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
 	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
 	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
@@ -269,7 +253,6 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-
    18  13:20:18.987468 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
 	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
 	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
@@ -285,7 +268,6 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-
    19  13:20:20.988197 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
 	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
 	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
@@ -301,7 +283,6 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-
    20  13:20:22.989416 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
 	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
 	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
@@ -317,7 +298,6 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-
    21  13:20:24.990564 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
 	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
 	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
@@ -333,7 +313,6 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-
    22  13:20:26.992430 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
 	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
 	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
@@ -349,7 +328,6 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-
    23  13:20:28.993313 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
 	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
 	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
@@ -365,7 +343,6 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-
    24  13:20:30.994755 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
 	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
 	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
@@ -381,7 +358,6 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-
    25  13:20:32.996159 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
 	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
 	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
@@ -397,4 +373,3 @@
 	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
 	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
 	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
-

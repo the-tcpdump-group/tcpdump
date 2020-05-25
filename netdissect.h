@@ -109,10 +109,8 @@ typedef unsigned char nd_byte;
  * Round up x to a multiple of y; y must be a power of 2.
  */
 #ifndef roundup2
-#define	roundup2(x, y)	(((x)+((y)-1))&(~((y)-1)))
+#define	roundup2(x, y)	(((x)+((u_int)((y)-1)))&(~((u_int)((y)-1))))
 #endif
-
-/* nd_snprintf et al */
 
 #include <stdarg.h>
 #include <pcap.h>
@@ -166,7 +164,15 @@ typedef struct netdissect_options netdissect_options;
 
 #define IF_PRINTER_ARGS (netdissect_options *, const struct pcap_pkthdr *, const u_char *)
 
-typedef u_int (*if_printer) IF_PRINTER_ARGS;
+typedef u_int (*uint_if_printer) IF_PRINTER_ARGS;
+typedef void  (*void_if_printer) IF_PRINTER_ARGS;
+
+/* pointer to the uint_if_printer or the void_if_printer function */
+typedef union {
+	uint_if_printer uint_printer;
+	void_if_printer void_printer;
+	void* printer;		/* generic when testing if NULL or not */
+} if_printer_t;
 
 /*
  * In case the data in a buffer needs to be processed by being decrypted,
@@ -229,6 +235,7 @@ struct netdissect_options {
   int   ndo_packettype;	/* as specified by -T */
 
   int   ndo_snaplen;
+  int   ndo_ll_header_length;	/* link-layer header length */
 
   /*global pointers to beginning and end of current packet (during printing) */
   const u_char *ndo_packetp;
@@ -237,8 +244,9 @@ struct netdissect_options {
   /* stack of saved packet boundary and buffer information */
   struct netdissect_saved_packet_info *ndo_packet_info_stack;
 
-  /* pointer to the if_printer function */
-  if_printer ndo_if_printer;
+  /* pointer to the uint_if_printer or the void_if_printer function */
+  if_printer_t ndo_if_printer;
+  int ndo_void_printer; /* void_if_printer ? (FALSE/TRUE) */
 
   /* pointer to void function to output stuff */
   void (*ndo_default_print)(netdissect_options *,
@@ -283,6 +291,9 @@ extern void nd_pop_all_packet_info(netdissect_options *);
 #define PT_PGM_ZMTP1	15	/* ZMTP/1.0 inside PGM (native or UDP-encapsulated) */
 #define PT_LMP		16	/* Link Management Protocol */
 #define PT_RESP		17	/* RESP */
+#define PT_PTP		18	/* PTP */
+#define PT_SOMEIP	19	/* Autosar SOME/IP Protocol */
+#define PT_DOMAIN	20	/* Domain Name System (DNS) */
 
 #ifndef min
 #define min(a,b) ((a)>(b)?(b):(a))
@@ -304,7 +315,7 @@ extern void nd_pop_all_packet_info(netdissect_options *);
  *    1) big enough for maximum-size Linux loopback packets (65549)
  *       and some USB packets captured with USBPcap:
  *
- *           http://desowin.org/usbpcap/
+ *           https://desowin.org/usbpcap/
  *
  *       (> 131072, < 262144)
  *
@@ -340,7 +351,7 @@ extern void nd_pop_all_packet_info(netdissect_options *);
  * you subtract a positive integer from a pointer, the result is
  * guaranteed to be less than the original pointer value). See
  *
- *	http://www.kb.cert.org/vuls/id/162289
+ *	https://www.kb.cert.org/vuls/id/162289
  */
 
 /*
@@ -397,35 +408,6 @@ extern int nd_printzp(netdissect_options *, const u_char *, u_int, const u_char 
 extern void txtproto_print(netdissect_options *, const u_char *, u_int,
 			   const char **, u_int);
 
-/*
- * Locale-independent macros for testing character properties and
- * stripping the 8th bit from characters.
- *
- * Byte values outside the ASCII range are considered unprintable, so
- * both ND_ISPRINT() and ND_ISGRAPH() return "false" for them.
- *
- * Assumed to be handed a value between 0 and 255, i.e. don't hand them
- * a char, as those might be in the range -128 to 127.
- */
-#define ND_ISASCII(c)	(!((c) & 0x80))	/* value is an ASCII code point */
-#define ND_ISPRINT(c)	((c) >= 0x20 && (c) <= 0x7E)
-#define ND_ISGRAPH(c)	((c) > 0x20 && (c) <= 0x7E)
-#define ND_TOASCII(c)	((c) & 0x7F)
-
-/*
- * Locale-independent macros for coverting to upper or lower case.
- *
- * Byte values outside the ASCII range are not converted.  Byte values
- * *in* the ASCII range are converted to byte values in the ASCII range;
- * in particular, 'i' is upper-cased to 'I" and 'I' is lower-cased to 'i',
- * even in Turkish locales.
- *
- * Assumed to be handed a value between 0 and 255, i.e. don't hand
- * them a char, as those might be in the range -128 to 127.
- */
-#define ND_TOLOWER(c)	(((c) >= 'A' && (c) <= 'Z') ? (c) - 'A' + 'a' : (c))
-#define ND_TOUPPER(c)	(((c) >= 'a' && (c) <= 'z') ? (c) - 'a' + 'A' : (c))
-
 #if (defined(__i386__) || defined(_M_IX86) || defined(__X86__) || defined(__x86_64__) || defined(_M_X64)) || \
     (defined(__arm__) || defined(_M_ARM) || defined(__aarch64__)) || \
     (defined(__m68k__) && (!defined(__mc68000__) && !defined(__mc68010__))) || \
@@ -473,24 +455,26 @@ extern int unaligned_memcmp(const void *, const void *, size_t);
 extern const char *tok2strary_internal(const char **, int, const char *, int);
 #define	tok2strary(a,f,i) tok2strary_internal(a, sizeof(a)/sizeof(a[0]),f,i)
 
-extern if_printer lookup_printer(int);
+extern uint_if_printer lookup_uint_printer(int);
+extern void_if_printer lookup_void_printer(int);
+extern if_printer_t lookup_printer(netdissect_options *, int);
 
 #define ND_DEBUG {printf(" [%s:%d %s] ", __FILE__, __LINE__, __FUNCTION__); fflush(stdout);}
 
 /* The DLT printer routines */
 
-extern u_int ap1394_if_print IF_PRINTER_ARGS;
-extern u_int arcnet_if_print IF_PRINTER_ARGS;
-extern u_int arcnet_linux_if_print IF_PRINTER_ARGS;
+extern void ap1394_if_print IF_PRINTER_ARGS;
+extern void arcnet_if_print IF_PRINTER_ARGS;
+extern void arcnet_linux_if_print IF_PRINTER_ARGS;
 extern u_int atm_if_print IF_PRINTER_ARGS;
-extern u_int bt_if_print IF_PRINTER_ARGS;
+extern void bt_if_print IF_PRINTER_ARGS;
 extern u_int brcm_tag_if_print IF_PRINTER_ARGS;
 extern u_int brcm_tag_prepend_if_print IF_PRINTER_ARGS;
 extern u_int chdlc_if_print IF_PRINTER_ARGS;
 extern u_int cip_if_print IF_PRINTER_ARGS;
 extern u_int dsa_if_print IF_PRINTER_ARGS;
 extern u_int edsa_if_print IF_PRINTER_ARGS;
-extern u_int enc_if_print IF_PRINTER_ARGS;
+extern void enc_if_print IF_PRINTER_ARGS;
 extern u_int ether_if_print IF_PRINTER_ARGS;
 extern u_int fddi_if_print IF_PRINTER_ARGS;
 extern u_int fr_if_print IF_PRINTER_ARGS;
@@ -501,7 +485,7 @@ extern u_int ieee802_15_4_if_print IF_PRINTER_ARGS;
 extern u_int ieee802_15_4_tap_if_print IF_PRINTER_ARGS;
 extern u_int ipfc_if_print IF_PRINTER_ARGS;
 extern u_int ipoib_if_print IF_PRINTER_ARGS;
-extern u_int ipnet_if_print IF_PRINTER_ARGS;
+extern void ipnet_if_print IF_PRINTER_ARGS;
 extern u_int juniper_atm1_if_print IF_PRINTER_ARGS;
 extern u_int juniper_atm2_if_print IF_PRINTER_ARGS;
 extern u_int juniper_chdlc_if_print IF_PRINTER_ARGS;
@@ -522,26 +506,27 @@ extern u_int ltalk_if_print IF_PRINTER_ARGS;
 extern u_int mfr_if_print IF_PRINTER_ARGS;
 extern u_int netanalyzer_if_print IF_PRINTER_ARGS;
 extern u_int netanalyzer_transparent_if_print IF_PRINTER_ARGS;
-extern u_int nflog_if_print IF_PRINTER_ARGS;
-extern u_int null_if_print IF_PRINTER_ARGS;
+extern void nflog_if_print IF_PRINTER_ARGS;
+extern void null_if_print IF_PRINTER_ARGS;
 extern u_int pflog_if_print IF_PRINTER_ARGS;
-extern u_int pktap_if_print IF_PRINTER_ARGS;
-extern u_int ppi_if_print IF_PRINTER_ARGS;
+extern void pktap_if_print IF_PRINTER_ARGS;
+extern void ppi_if_print IF_PRINTER_ARGS;
 extern u_int ppp_bsdos_if_print IF_PRINTER_ARGS;
 extern u_int ppp_hdlc_if_print IF_PRINTER_ARGS;
 extern u_int ppp_if_print IF_PRINTER_ARGS;
 extern u_int pppoe_if_print IF_PRINTER_ARGS;
 extern u_int prism_if_print IF_PRINTER_ARGS;
-extern u_int raw_if_print IF_PRINTER_ARGS;
-extern u_int sl_bsdos_if_print IF_PRINTER_ARGS;
-extern u_int sl_if_print IF_PRINTER_ARGS;
+extern void raw_if_print IF_PRINTER_ARGS;
+extern void sl_bsdos_if_print IF_PRINTER_ARGS;
+extern void sl_if_print IF_PRINTER_ARGS;
 extern u_int sll_if_print IF_PRINTER_ARGS;
 extern u_int sll2_if_print IF_PRINTER_ARGS;
-extern u_int sunatm_if_print IF_PRINTER_ARGS;
-extern u_int symantec_if_print IF_PRINTER_ARGS;
+extern void sunatm_if_print IF_PRINTER_ARGS;
+extern void symantec_if_print IF_PRINTER_ARGS;
 extern u_int token_if_print IF_PRINTER_ARGS;
-extern u_int usb_linux_48_byte_if_print IF_PRINTER_ARGS;
-extern u_int usb_linux_64_byte_if_print IF_PRINTER_ARGS;
+extern void unsupported_if_print IF_PRINTER_ARGS;
+extern void usb_linux_48_byte_if_print IF_PRINTER_ARGS;
+extern void usb_linux_64_byte_if_print IF_PRINTER_ARGS;
 extern u_int vsock_if_print IF_PRINTER_ARGS;
 
 /*
@@ -572,6 +557,7 @@ extern void ascii_print(netdissect_options *, const u_char *, u_int);
 extern void atalk_print(netdissect_options *, const u_char *, u_int);
 extern void atm_print(netdissect_options *, u_int, u_int, u_int, const u_char *, u_int, u_int);
 extern void babel_print(netdissect_options *, const u_char *, u_int);
+extern void bcm_li_print(netdissect_options *, const u_char *, u_int);
 extern void beep_print(netdissect_options *, const u_char *, u_int);
 extern void bfd_print(netdissect_options *, const u_char *, u_int, u_int);
 extern void bgp_print(netdissect_options *, const u_char *, u_int);
@@ -595,7 +581,7 @@ extern void egp_print(netdissect_options *, const u_char *, u_int);
 extern void eigrp_print(netdissect_options *, const u_char *, u_int);
 extern void esp_print(netdissect_options *, const u_char *, u_int, const u_char *, u_int, int, u_int);
 extern u_int ether_print(netdissect_options *, const u_char *, u_int, u_int, void (*)(netdissect_options *, const u_char *), const u_char *);
-extern u_int ether_print_switch_tag(netdissect_options *, const u_char *, u_int, u_int, void (*)(netdissect_options *, const u_char *), u_int);
+extern u_int ether_switch_tag_print(netdissect_options *, const u_char *, u_int, u_int, void (*)(netdissect_options *, const u_char *), u_int);
 extern int ethertype_print(netdissect_options *, u_short, const u_char *, u_int, u_int, const struct lladdr_info *, const struct lladdr_info *);
 extern u_int fddi_print(netdissect_options *, const u_char *, u_int, u_int);
 extern void forces_print(netdissect_options *, const u_char *, u_int);
@@ -675,6 +661,7 @@ extern void pimv1_print(netdissect_options *, const u_char *, u_int);
 extern u_int ppp_print(netdissect_options *, const u_char *, u_int);
 extern u_int pppoe_print(netdissect_options *, const u_char *, u_int);
 extern void pptp_print(netdissect_options *, const u_char *);
+extern void ptp_print(netdissect_options *, const u_char *, u_int);
 extern int print_unknown_data(netdissect_options *, const u_char *, const char *, int);
 extern const char *q922_string(netdissect_options *, const u_char *, u_int);
 extern void q933_print(netdissect_options *, const u_char *, u_int);
@@ -693,7 +680,6 @@ extern void sflow_print(netdissect_options *, const u_char *, u_int);
 extern void ssh_print(netdissect_options *, const u_char *, u_int);
 extern void sip_print(netdissect_options *, const u_char *, u_int);
 extern void slow_print(netdissect_options *, const u_char *, u_int);
-extern void smb_data_print(netdissect_options *, const u_char *, u_int);
 extern void smb_tcp_print(netdissect_options *, const u_char *, u_int);
 extern void smtp_print(netdissect_options *, const u_char *, u_int);
 extern int snap_print(netdissect_options *, const u_char *, u_int, u_int, const struct lladdr_info *, const struct lladdr_info *, u_int);
@@ -720,6 +706,7 @@ extern void zep_print(netdissect_options *, const u_char *, u_int);
 extern void zephyr_print(netdissect_options *, const u_char *, int);
 extern void zmtp1_print(netdissect_options *, const u_char *, u_int);
 extern void zmtp1_datagram_print(netdissect_options *, const u_char *, const u_int);
+extern void someip_print(netdissect_options *, const u_char *, const u_int);
 
 /* checksum routines */
 extern void init_checksum(void);
@@ -734,7 +721,7 @@ extern uint16_t in_cksum(const struct cksum_vec *, int);
 extern uint16_t in_cksum_shouldbe(uint16_t, uint16_t);
 
 /* IP protocol demuxing routines */
-extern void ip_print_demux(netdissect_options *, const u_char *, u_int, u_int, int, u_int, uint8_t, const u_char *);
+extern void ip_demux_print(netdissect_options *, const u_char *, u_int, u_int, int, u_int, uint8_t, const u_char *);
 
 extern uint16_t nextproto4_cksum(netdissect_options *, const struct ip *, const uint8_t *, u_int, u_int, uint8_t);
 
@@ -750,14 +737,13 @@ extern void nd_print_invalid(netdissect_options *);
 extern int mask2plen(uint32_t);
 extern int mask62plen(const u_char *);
 
-extern const char *dnname_string(netdissect_options *, u_short);
 extern const char *dnnum_string(netdissect_options *, u_short);
 
 extern int decode_prefix4(netdissect_options *, const u_char *, u_int, char *, size_t);
 extern int decode_prefix6(netdissect_options *, const u_char *, u_int, char *, size_t);
 
-extern void esp_print_decodesecret(netdissect_options *);
-extern int esp_print_decrypt_buffer_by_ikev2(netdissect_options *, int,
+extern void esp_decodesecret_print(netdissect_options *);
+extern int esp_decrypt_buffer_by_ikev2_print(netdissect_options *, int,
 					     const u_char spii[8],
 					     const u_char spir[8],
 					     const u_char *, const u_char *);

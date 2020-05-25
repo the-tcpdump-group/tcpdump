@@ -125,6 +125,10 @@ SOURCE=..\..\missing\getopt_long.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\ntp.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\gmpls.c
 # End Source File
 # Begin Source File
@@ -718,6 +722,10 @@ SOURCE="..\..\print-wb.c"
 # Begin Source File
 
 SOURCE="..\..\print-zephyr.c"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\print-someip.c"
 # End Source File
 # Begin Source File
 

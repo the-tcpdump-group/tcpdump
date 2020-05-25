@@ -16,6 +16,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "netdissect-ctype.h"
+
 #include "netdissect.h"
 #include "extract.h"
 #include "smb.h"
@@ -418,9 +420,9 @@ unistr(netdissect_options *ndo, char (*buf)[MAX_UNISTR_SIZE+1],
 		break;
 	    }
 	    if (l < MAX_UNISTR_SIZE) {
-		if (ND_ISPRINT(c)) {
+		if (ND_ASCII_ISPRINT(c)) {
 		    /* It's a printable ASCII character */
-		    (*buf)[l] = c;
+		    (*buf)[l] = (char)c;
 		} else {
 		    /* It's a non-ASCII character or a non-printable ASCII character */
 		    (*buf)[l] = '.';
@@ -450,9 +452,9 @@ unistr(netdissect_options *ndo, char (*buf)[MAX_UNISTR_SIZE+1],
 		break;
 	    }
 	    if (l < MAX_UNISTR_SIZE) {
-		if (ND_ISPRINT(c)) {
+		if (ND_ASCII_ISPRINT(c)) {
 		    /* It's a printable ASCII character */
-		    (*buf)[l] = c;
+		    (*buf)[l] = (char)c;
 		} else {
 		    /* It's a non-ASCII character or a non-printable ASCII character */
 		    (*buf)[l] = '.';
@@ -526,7 +528,7 @@ smb_fdata1(netdissect_options *ndo,
 	    ND_TCHECK_LEN(buf, l);
 	    buf += l;
 	    fmt++;
-	    while (isdigit((unsigned char)*fmt))
+	    while (ND_ASCII_ISDIGIT(*fmt))
 		fmt++;
 	    break;
 	  }
@@ -716,7 +718,7 @@ smb_fdata1(netdissect_options *ndo,
 	    ND_PRINT("%-*.*s", l, l, buf);
 	    buf += l;
 	    fmt++;
-	    while (isdigit((unsigned char)*fmt))
+	    while (ND_ASCII_ISDIGIT(*fmt))
 		fmt++;
 	    break;
 	  }
@@ -730,7 +732,7 @@ smb_fdata1(netdissect_options *ndo,
 	    ND_PRINT("%-*.*s", (int)stringlen, (int)stringlen, buf);
 	    buf += stringlen;
 	    fmt++;
-	    while (isdigit((unsigned char)*fmt))
+	    while (ND_ASCII_ISDIGIT(*fmt))
 		fmt++;
 	    break;
 	  }
@@ -756,7 +758,7 @@ smb_fdata1(netdissect_options *ndo,
 		buf++;
 	    }
 	    fmt++;
-	    while (isdigit((unsigned char)*fmt))
+	    while (ND_ASCII_ISDIGIT(*fmt))
 		fmt++;
 	    break;
 	  }
@@ -789,7 +791,7 @@ smb_fdata1(netdissect_options *ndo,
 		break;
 	    }
 	    fmt++;
-	    while (isdigit((unsigned char)*fmt))
+	    while (ND_ASCII_ISDIGIT(*fmt))
 		fmt++;
 	    break;
 	  }
@@ -838,7 +840,7 @@ smb_fdata1(netdissect_options *ndo,
 		tstring = "NULL\n";
 	    ND_PRINT("%s", tstring);
 	    fmt++;
-	    while (isdigit((unsigned char)*fmt))
+	    while (ND_ASCII_ISDIGIT(*fmt))
 		fmt++;
 	    break;
 	  }
@@ -871,11 +873,26 @@ smb_fdata(netdissect_options *ndo,
     while (*fmt) {
 	switch (*fmt) {
 	case '*':
+	    /*
+	     * List of multiple instances of something described by the
+	     * remainder of the string (which may itself include a list
+	     * of multiple instances of something, so we recurse).
+	     */
 	    fmt++;
 	    while (buf < maxbuf) {
 		const u_char *buf2;
 		depth++;
-		buf2 = smb_fdata(ndo, buf, fmt, maxbuf, unicodestr);
+		/*
+		 * In order to avoid stack exhaustion recurse at most 10
+		 * levels; that "should not happen", as no SMB structure
+		 * should be nested *that* deeply, and we thus shouldn't
+		 * have format strings with that level of nesting.
+		 */
+		if (depth == 10) {
+			ND_PRINT("(too many nested levels, not recursing)");
+			buf2 = buf;
+		} else
+			buf2 = smb_fdata(ndo, buf, fmt, maxbuf, unicodestr);
 		depth--;
 		if (buf2 == NULL)
 		    return(NULL);
@@ -886,22 +903,35 @@ smb_fdata(netdissect_options *ndo,
 	    return(buf);
 
 	case '|':
+	    /*
+	     * Just do a bounds check.
+	     */
 	    fmt++;
 	    if (buf >= maxbuf)
 		return(buf);
 	    break;
 
 	case '%':
+	    /*
+	     * XXX - unused?
+	     */
 	    fmt++;
 	    buf = maxbuf;
 	    break;
 
 	case '#':
+	    /*
+	     * Done?
+	     */
 	    fmt++;
 	    return(buf);
 	    break;
 
 	case '[':
+	    /*
+	     * Format of an item, enclosed in square brackets; dissect
+	     * the item with smb_fdata1().
+	     */
 	    fmt++;
 	    if (buf >= maxbuf)
 		return(buf);
@@ -929,6 +959,9 @@ smb_fdata(netdissect_options *ndo,
 	    break;
 
 	default:
+	    /*
+	     * Not a formatting character, so just print it.
+	     */
 	    ND_PRINT("%c", *fmt);
 	    fmt++;
 	    break;
@@ -1074,17 +1107,17 @@ smb_errstr(int class, int num)
 		const err_code_struct *err = err_classes[i].err_msgs;
 		for (j = 0; err[j].name; j++)
 		    if (num == err[j].code) {
-			nd_snprintf(ret, sizeof(ret), "%s - %s (%s)",
+			snprintf(ret, sizeof(ret), "%s - %s (%s)",
 			    err_classes[i].class, err[j].name, err[j].message);
 			return ret;
 		    }
 	    }
 
-	    nd_snprintf(ret, sizeof(ret), "%s - %d", err_classes[i].class, num);
+	    snprintf(ret, sizeof(ret), "%s - %d", err_classes[i].class, num);
 	    return ret;
 	}
 
-    nd_snprintf(ret, sizeof(ret), "ERROR: Unknown error (%d,%d)", class, num);
+    snprintf(ret, sizeof(ret), "ERROR: Unknown error (%d,%d)", class, num);
     return(ret);
 }
 
@@ -1965,6 +1998,6 @@ nt_errstr(uint32_t err)
 	    return nt_errors[i].name;
     }
 
-    nd_snprintf(ret, sizeof(ret), "0x%08x", err);
+    snprintf(ret, sizeof(ret), "0x%08x", err);
     return ret;
 }

@@ -97,7 +97,7 @@ rip6_entry_print(netdissect_options *ndo, const struct netinfo6 *ni, u_int metri
 	int l;
 	uint16_t tag;
 
-	l = ND_PRINT("%s/%u", ip6addr_string(ndo, ni->rip6_dest),
+	l = ND_PRINT("%s/%u", GET_IP6ADDR_STRING(ni->rip6_dest),
 		     GET_U_1(ni->rip6_plen));
 	tag = GET_BE_U_2(ni->rip6_tag);
 	if (tag)

@@ -49,6 +49,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "netdissect-ctype.h"
+
 #include "netdissect.h"
 #include "extract.h"
 #include "nfsfh.h"
@@ -400,7 +402,7 @@ Parse_fh(netdissect_options *ndo, const unsigned char *fh, u_int len,
 #endif
 	    /* Save the actual handle, so it can be display with -u */
 	    for (i = 0; i < len*4 && i*2 < sizeof(fsidp->Opaque_Handle) - 1; i++)
-		(void)nd_snprintf(&(fsidp->Opaque_Handle[i*2]), 3, "%.2X",
+		(void)snprintf(&(fsidp->Opaque_Handle[i*2]), 3, "%.2X",
 			       GET_U_1(fhp + i));
 	    fsidp->Opaque_Handle[i*2] = '\0';
 
@@ -442,7 +444,7 @@ is_UCX(netdissect_options *ndo, const unsigned char *fhp, u_int len)
 		return(0);
 
 	for (i = 1; i < 14; i++) {
-	    if (ND_ISPRINT(GET_U_1(fhp + i))) {
+	    if (ND_ASCII_ISPRINT(GET_U_1(fhp + i))) {
 		if (seen_null)
 		   return(0);
 		else

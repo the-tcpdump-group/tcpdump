@@ -85,6 +85,8 @@ machdep.h	- machine dependent definitions
 makemib		- mib to header script
 mib.h		- mib definitions
 missing/*	- replacements for missing library functions
+ntp.c		- functions to handle ntp structs
+ntp.h		- declarations of functions to handle ntp structs
 mkdep		- construct Makefile dependency list
 mpls.h		- MPLS definitions
 nameser.h	- DNS definitions

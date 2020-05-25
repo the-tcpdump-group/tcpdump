@@ -1,6 +1,12 @@
 #
 # Try to find libpcap.
 #
+# To tell this module where to look, a user may set the environment variable
+# PCAP_ROOT to point cmake to the *root* of a directory with include and
+# lib subdirectories for pcap.dll (e.g WpdPack or npcap-sdk).
+# Alternatively, PCAP_ROOT may also be set from cmake command line or GUI
+# (e.g cmake -DPCAP_ROOT=C:\path\to\pcap [...])
+#
 
 if(WIN32)
   #
@@ -135,7 +141,7 @@ else(WIN32)
           endif()
         endif()
       endforeach()
-        
+
       #
       # Now, get the library directories and libraries for dynamic linking.
       #

@@ -227,8 +227,8 @@ tcp_print(netdissect_options *ndo,
         hlen = TH_OFF(tp) * 4;
 
         if (hlen < sizeof(*tp)) {
-                ND_PRINT(" tcp %u [bad hdr length %u - too short, < %lu]",
-                         length - hlen, hlen, (unsigned long)sizeof(*tp));
+                ND_PRINT(" tcp %u [bad hdr length %u - too short, < %zu]",
+                         length - hlen, hlen, sizeof(*tp));
                 return;
         }
 
@@ -701,6 +701,10 @@ tcp_print(netdissect_options *ndo,
                         break;
                 case PT_RESP:
                         resp_print(ndo, bp, length);
+                        break;
+                case PT_DOMAIN:
+                        ND_PRINT(" ");
+                        domain_print(ndo, bp + 2, length - 2, 0);
                         break;
                 }
                 return;

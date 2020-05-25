@@ -628,7 +628,7 @@ etheraddr_string(netdissect_options *ndo, const uint8_t *ep)
 	}
 
 	if (!ndo->ndo_nflag) {
-		nd_snprintf(cp, BUFSIZE - (2 + 5*3), " (oui %s)",
+		snprintf(cp, BUFSIZE - (2 + 5*3), " (oui %s)",
 		    tok2str(oui_values, "Unknown", oui));
 	} else
 		*cp = '\0';
@@ -749,7 +749,7 @@ tcpport_string(netdissect_options *ndo, u_short port)
 	tp->addr = i;
 	tp->nxt = newhnamemem(ndo);
 
-	(void)nd_snprintf(buf, sizeof(buf), "%u", i);
+	(void)snprintf(buf, sizeof(buf), "%u", i);
 	tp->name = strdup(buf);
 	if (tp->name == NULL)
 		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
@@ -771,7 +771,7 @@ udpport_string(netdissect_options *ndo, u_short port)
 	tp->addr = i;
 	tp->nxt = newhnamemem(ndo);
 
-	(void)nd_snprintf(buf, sizeof(buf), "%u", i);
+	(void)snprintf(buf, sizeof(buf), "%u", i);
 	tp->name = strdup(buf);
 	if (tp->name == NULL)
 		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
@@ -829,7 +829,7 @@ init_servarray(netdissect_options *ndo)
 		while (table->name)
 			table = table->nxt;
 		if (ndo->ndo_nflag) {
-			(void)nd_snprintf(buf, sizeof(buf), "%d", port);
+			(void)snprintf(buf, sizeof(buf), "%d", port);
 			table->name = strdup(buf);
 		} else
 			table->name = strdup(sv->s_name);
@@ -847,26 +847,26 @@ static const struct eproto {
 	const char *s;
 	u_short p;
 } eproto_db[] = {
-	{ "pup", ETHERTYPE_PUP },
-	{ "xns", ETHERTYPE_NS },
-	{ "ip", ETHERTYPE_IP },
-	{ "ip6", ETHERTYPE_IPV6 },
 	{ "arp", ETHERTYPE_ARP },
-	{ "rarp", ETHERTYPE_REVARP },
-	{ "sprite", ETHERTYPE_SPRITE },
-	{ "mopdl", ETHERTYPE_MOPDL },
-	{ "moprc", ETHERTYPE_MOPRC },
-	{ "decnet", ETHERTYPE_DN },
-	{ "lat", ETHERTYPE_LAT },
-	{ "sca", ETHERTYPE_SCA },
-	{ "lanbridge", ETHERTYPE_LANBRIDGE },
-	{ "vexp", ETHERTYPE_VEXP },
-	{ "vprod", ETHERTYPE_VPROD },
 	{ "atalk", ETHERTYPE_ATALK },
 	{ "atalkarp", ETHERTYPE_AARP },
-	{ "loopback", ETHERTYPE_LOOPBACK },
-	{ "decdts", ETHERTYPE_DECDTS },
 	{ "decdns", ETHERTYPE_DECDNS },
+	{ "decdts", ETHERTYPE_DECDTS },
+	{ "decnet", ETHERTYPE_DN },
+	{ "ip", ETHERTYPE_IP },
+	{ "ip6", ETHERTYPE_IPV6 },
+	{ "lanbridge", ETHERTYPE_LANBRIDGE },
+	{ "lat", ETHERTYPE_LAT },
+	{ "loopback", ETHERTYPE_LOOPBACK },
+	{ "mopdl", ETHERTYPE_MOPDL },
+	{ "moprc", ETHERTYPE_MOPRC },
+	{ "pup", ETHERTYPE_PUP },
+	{ "rarp", ETHERTYPE_REVARP },
+	{ "sca", ETHERTYPE_SCA },
+	{ "sprite", ETHERTYPE_SPRITE },
+	{ "vexp", ETHERTYPE_VEXP },
+	{ "vprod", ETHERTYPE_VPROD },
+	{ "xns", ETHERTYPE_NS },
 	{ (char *)0, 0 }
 };
 
@@ -1280,10 +1280,7 @@ dnaddr_string(netdissect_options *ndo, u_short dnaddr)
 
 	tp->addr = dnaddr;
 	tp->nxt = newhnamemem(ndo);
-	if (ndo->ndo_nflag)
-		tp->name = dnnum_string(ndo, dnaddr);
-	else
-		tp->name = dnname_string(ndo, dnaddr);
+	tp->name = dnnum_string(ndo, dnaddr);
 
 	return(tp->name);
 }
@@ -1333,7 +1330,7 @@ const char *
 ieee8021q_tci_string(const uint16_t tci)
 {
 	static char buf[128];
-	nd_snprintf(buf, sizeof(buf), "vlan %u, p %u%s",
+	snprintf(buf, sizeof(buf), "vlan %u, p %u%s",
 	         tci & 0xfff,
 	         tci >> 13,
 	         (tci & 0x1000) ? ", DEI" : "");

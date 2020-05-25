@@ -520,6 +520,18 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			udpipaddr_print(ndo, ip, sport, dport);
 			lmp_print(ndo, cp, length);
 			break;
+		case PT_PTP:
+			udpipaddr_print(ndo, ip, sport, dport);
+			ptp_print(ndo, cp, length);
+			break;
+		case PT_SOMEIP:
+			udpipaddr_print(ndo, ip, sport, dport);
+			someip_print(ndo, cp, length);
+			break;
+		case PT_DOMAIN:
+			udpipaddr_print(ndo, ip, sport, dport);
+			domain_print(ndo, (const u_char *)(up + 1), length, 0);
+			break;
 		}
 		return;
 	}
@@ -679,6 +691,8 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 					(IP_V(ip) == 6) ? 1 : 0);
 		else if (IS_SRC_OR_DST_PORT(MPLS_LSP_PING_PORT))
 			lspping_print(ndo, (const u_char *)(up + 1), length);
+		else if (sport == BCM_LI_PORT)
+			bcm_li_print(ndo, (const u_char *)(up+1), length);
 		else if (dport == BFD_CONTROL_PORT ||
 			 dport == BFD_MULTIHOP_PORT ||
 			 dport == BFD_LAG_PORT ||
@@ -712,13 +726,20 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			vxlan_gpe_print(ndo, (const u_char *)(up + 1), length);
 		else if (IS_SRC_OR_DST_PORT(ZEP_PORT))
 			zep_print(ndo, (const u_char *)(up + 1), length);
+		else if (IS_SRC_OR_DST_PORT(MPLS_PORT))
+			mpls_print(ndo, (const u_char *)(up + 1), length);
 		else if (ND_TTEST_1(((const struct LAP *)cp)->type) &&
 			 GET_U_1(((const struct LAP *)cp)->type) == lapDDP &&
 			 (atalk_port(sport) || atalk_port(dport))) {
 			if (ndo->ndo_vflag)
 				ND_PRINT("kip ");
 			llap_print(ndo, cp, length);
-		} else {
+                } else if (IS_SRC_OR_DST_PORT(PTP_EVENT_PORT) ||
+                        IS_SRC_OR_DST_PORT(PTP_GENERAL_PORT)) {
+                        ptp_print(ndo, cp, length);
+                } else if (IS_SRC_OR_DST_PORT(SOMEIP_PORT))
+                        someip_print(ndo, (const u_char *)(up + 1), length);
+                else {
 			if (ulen > length)
 				ND_PRINT("UDP, bad length %u > %u",
 				    ulen, length);

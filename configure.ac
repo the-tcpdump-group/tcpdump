@@ -7,7 +7,7 @@ dnl
 #
 # See
 #
-#	http://ftp.gnu.org/gnu/config/README
+#	https://ftp.gnu.org/gnu/config/README
 #
 # for the URLs to use to fetch new versions of config.guess and
 # config.sub.
@@ -385,55 +385,17 @@ if test "$ipv6" = "yes" -a "$ipv6lib" != "none"; then
 	fi
 fi
 
-AC_SEARCH_LIBS(dnet_htoa, dnet,
-[
-	AC_DEFINE(HAVE_DNET_HTOA, 1,
-	    [define if you have the dnet_htoa function])
-	#
-	# OK, we have dnet_htoa().  Do we have netdnet/dnetdb.h?
-	#
-	AC_CHECK_HEADERS(netdnet/dnetdb.h)
-	if test "$ac_cv_header_netdnet_dnetdb_h" = "yes"; then
-		#
-		# Yes.  Does it declare dnet_htoa()?
-		#
-		AC_CHECK_DECL(dnet_htoa,
-		[
-			# Yes.
-			AC_DEFINE(NETDNET_DNETDB_H_DECLARES_DNET_HTOA,,
-			    [Define to 1 if netenet/dnetdb.h declares `dnet_htoa'])
-		],,
-		[
-AC_INCLUDES_DEFAULT
-#include <netdnet/dnetdb.h>
-		])
-	fi
-
-	#
-	# Do we have netdnet/dn.h?
-	#
-	AC_CHECK_HEADERS(netdnet/dn.h)
-	if test "$ac_cv_header_netdnet_dn_h" = "yes"; then
-		#
-		# Yes.  Does it declare struct dn_naddr?
-		#
-		AC_CHECK_TYPES(struct dn_naddr,,,
-		[
-#include <netdnet/dn.h>
-		])
-	fi
-])
-
 AC_REPLACE_FUNCS(strlcat strlcpy strdup strsep getservent getopt_long)
 AC_CHECK_FUNCS(fork vfork strftime)
 AC_CHECK_FUNCS(setlinebuf)
 
-needsnprintf=no
-AC_CHECK_FUNCS(vsnprintf snprintf,,
-	[needsnprintf=yes])
-if test $needsnprintf = yes; then
-	AC_LIBOBJ(snprintf)
-fi
+#
+# Make sure we have vsnprintf() and snprintf(); we require them.
+#
+AC_CHECK_FUNC(vsnprintf,,
+    AC_MSG_ERROR([vsnprintf() is required but wasn't found]))
+AC_CHECK_FUNC(snprintf,,
+    AC_MSG_ERROR([snprintf() is required but wasn't found]))
 
 AC_CHECK_LIB(rpc, main)		dnl It's unclear why we might need -lrpc
 
@@ -962,19 +924,19 @@ if test "$want_libcrypto" != "no"; then
 			# EVP_CIPHER_CTX, as EVP_CIPHER_CTX may be
 			# opaque; otherwise, we allocate it ourselves.
 			#
-			# 2) do we have EVP_CipherInit_ex()?
+			# 2) do we have EVP_DecryptInit_ex()?
 			# If so, we use it, because we need to be
 			# able to make two "initialize the cipher"
 			# calls, one with the cipher and key, and
 			# one with the IV, and, as of OpenSSL 1.1,
-			# You Can't Do That with EVP_CipherInit(),
-			# because a call to EVP_CipherInit() will
+			# You Can't Do That with EVP_DecryptInit(),
+			# because a call to EVP_DecryptInit() will
 			# unconditionally clear the context, and
 			# if you don't supply a cipher, it'll
 			# clear the cipher, rendering the context
 			# unusable and causing a crash.
 			#
-			AC_CHECK_FUNCS(EVP_CIPHER_CTX_new EVP_CipherInit_ex)
+			AC_CHECK_FUNCS(EVP_CIPHER_CTX_new EVP_DecryptInit_ex)
 		fi
 	])
 fi
@@ -1030,7 +992,7 @@ AC_CONFIG_HEADER(config.h)
 
 AC_OUTPUT_COMMANDS([if test -f .devel; then
 	echo timestamp > stamp-h
-	cat Makefile-devel-adds >> Makefile
+	cat $srcdir/Makefile-devel-adds >> Makefile
 	make depend
 fi])
 AC_OUTPUT(Makefile tcpdump.1)

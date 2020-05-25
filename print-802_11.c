@@ -831,82 +831,176 @@ static const char *auth_alg_text[]={"Open System","Shared Key","EAP"};
 static const char *status_text[] = {
 	"Successful",						/*  0 */
 	"Unspecified failure",					/*  1 */
-	"Reserved",						/*  2 */
-	"Reserved",						/*  3 */
+	"TDLS wakeup schedule rejected but alternative schedule "
+	  "provided",					/*  2 */
+	"TDLS wakeup schedule rejected",/*  3 */
 	"Reserved",						/*  4 */
-	"Reserved",						/*  5 */
-	"Reserved",						/*  6 */
-	"Reserved",						/*  7 */
+	"Security disabled",			/*  5 */
+	"Unacceptable lifetime",		/*  6 */
+	"Not in same BSS",				/*  7 */
 	"Reserved",						/*  8 */
 	"Reserved",						/*  9 */
 	"Cannot Support all requested capabilities in the Capability "
 	  "Information field",					/* 10 */
 	"Reassociation denied due to inability to confirm that association "
 	  "exists",						/* 11 */
-	"Association denied due to reason outside the scope of the "
+	"Association denied due to reason outside the scope of this "
 	  "standard",						/* 12 */
-	"Responding station does not support the specified authentication "
-	  "algorithm ",						/* 13 */
+	"Responding STA does not support the specified authentication "
+	  "algorithm",						/* 13 */
 	"Received an Authentication frame with authentication transaction "
 	  "sequence number out of expected sequence",		/* 14 */
 	"Authentication rejected because of challenge failure",	/* 15 */
 	"Authentication rejected due to timeout waiting for next frame in "
 	  "sequence",						/* 16 */
-	"Association denied because AP is unable to handle additional"
-	  "associated stations",				/* 17 */
-	"Association denied due to requesting station not supporting all of "
-	  "the data rates in BSSBasicRateSet parameter",	/* 18 */
-	"Association denied due to requesting station not supporting "
-	  "short preamble operation",				/* 19 */
-	"Association denied due to requesting station not supporting "
-	  "PBCC encoding",					/* 20 */
-	"Association denied due to requesting station not supporting "
-	  "channel agility",					/* 21 */
+	"Association denied because AP is unable to handle "
+	  "additional associated STAs",				/* 17 */
+	"Association denied due to requesting STA not supporting "
+	  "all of the data rates in the BSSBasicRateSet parameter, "
+	  "the Basic HT-MCS Set field of the HT Operation "
+	  "parameter, or the Basic VHT-MCS and NSS Set field in "
+	  "the VHT Operation parameter",	/* 18 */
+	"Association denied due to requesting STA not supporting "
+	  "the short preamble option",				/* 19 */
+	"Reserved",					/* 20 */
+	"Reserved",					/* 21 */
 	"Association request rejected because Spectrum Management "
 	  "capability is required",				/* 22 */
 	"Association request rejected because the information in the "
 	  "Power Capability element is unacceptable",		/* 23 */
 	"Association request rejected because the information in the "
 	  "Supported Channels element is unacceptable",		/* 24 */
-	"Association denied due to requesting station not supporting "
-	  "short slot operation",				/* 25 */
-	"Association denied due to requesting station not supporting "
-	  "DSSS-OFDM operation",				/* 26 */
+	"Association denied due to requesting STA not supporting "
+	  "the Short Slot Time option",				/* 25 */
+	"Reserved",				/* 26 */
 	"Association denied because the requested STA does not support HT "
 	  "features",						/* 27 */
-	"Reserved",						/* 28 */
-	"Association denied because the requested STA does not support "
-	  "the PCO transition time required by the AP",		/* 29 */
-	"Reserved",						/* 30 */
-	"Reserved",						/* 31 */
+	"R0KH unreachable",					/* 28 */
+	"Association denied because the requesting STA does not "
+	  "support the phased coexistence operation (PCO) "
+	  "transition time required by the AP",		/* 29 */
+	"Association request rejected temporarily; try again "
+	  "later",							/* 30 */
+	"Robust management frame policy violation",	/* 31 */
 	"Unspecified, QoS-related failure",			/* 32 */
-	"Association denied due to QAP having insufficient bandwidth "
-	  "to handle another QSTA",				/* 33 */
+	"Association denied because QoS AP or PCP has "
+	  "insufficient bandwidth to handle another QoS "
+	  "STA",									/* 33 */
 	"Association denied due to excessive frame loss rates and/or "
 	  "poor conditions on current operating channel",	/* 34 */
-	"Association (with QBSS) denied due to requesting station not "
-	  "supporting the QoS facility",			/* 35 */
-	"Association denied due to requesting station not supporting "
-	  "Block Ack",						/* 36 */
+	"Association (with QoS BSS) denied because the requesting STA "
+	  "does not support the QoS facility",			/* 35 */
+	"Reserved",									/* 36 */
 	"The request has been declined",			/* 37 */
 	"The request has not been successful as one or more parameters "
 	  "have invalid values",				/* 38 */
-	"The TS has not been created because the request cannot be honored. "
-	  "Try again with the suggested changes to the TSPEC",	/* 39 */
-	"Invalid Information Element",				/* 40 */
-	"Group Cipher is not valid",				/* 41 */
-	"Pairwise Cipher is not valid",				/* 42 */
-	"AKMP is not valid",					/* 43 */
-	"Unsupported RSN IE version",				/* 44 */
-	"Invalid RSN IE Capabilities",				/* 45 */
-	"Cipher suite is rejected per security policy",		/* 46 */
-	"The TS has not been created. However, the HC may be capable of "
-	  "creating a TS, in response to a request, after the time indicated "
-	  "in the TS Delay element",				/* 47 */
+	"The allocation or TS has not been created because the request "
+	  "cannot be honored; however, a suggested TSPEC/DMG TSPEC is "
+	  "provided so that the initiating STA can attempt to set "
+	  "another allocation or TS with the suggested changes to the "
+	  "TSPEC/DMG TSPEC",					/* 39 */
+	"Invalid element, i.e., an element defined in this standard "
+	  "for which the content does not meet the specifications in "
+	  "Clause 9",								/* 40 */
+	"Invalid group cipher",						/* 41 */
+	"Invalid pairwise cipher",					/* 42 */
+	"Invalid AKMP",								/* 43 */
+	"Unsupported RSNE version",					/* 44 */
+	"Invalid RSNE capabilities",				/* 45 */
+	"Cipher suite rejected because of security policy",		/* 46 */
+	"The TS or allocation has not been created; however, the "
+	  "HC or PCP might be capable of creating a TS or "
+	  "allocation, in response to a request, after the time "
+	  "indicated in the TS Delay element",		/* 47 */
 	"Direct Link is not allowed in the BSS by policy",	/* 48 */
-	"Destination STA is not present within this QBSS.",	/* 49 */
-	"The Destination STA is not a QSTA.",			/* 50 */
+	"The Destination STA is not present within this BSS",	/* 49 */
+	"The Destination STA is not a QoS STA",		/* 50 */
 
+	"Association denied because the listen interval is "
+	  "too large",								/* 51 */
+	"Invalid FT Action frame count",			/* 52 */
+	"Invalid pairwise master key identifier (PMKID)", /* 53 */
+	"Invalid MDE",								/* 54 */
+	"Invalid FTE",								/* 55 */
+	"Requested TCLAS processing is not supported by the AP "
+	  "or PCP",									/* 56 */
+	"The AP or PCP has insufficient TCLAS processing "
+	  "resources to satisfy the request",		/* 57 */
+	"The TS has not been created because the request "
+	  "cannot be honored; however, the HC or PCP suggests "
+	  "that the STA transition to a different BSS to set up "
+	  "the TS",									/* 58 */
+	"GAS Advertisement Protocol not supported",	/* 59 */
+	"No outstanding GAS request",				/* 60 */
+	"GAS Response not received from the Advertisement "
+	  "Server",									/* 61 */
+	"STA timed out waiting for GAS Query Response", /* 62 */
+	"LARGE GAS Response is larger than query response "
+	  "length limit",							/* 63 */
+	"Request refused because home network does not support "
+	  "request",								/* 64 */
+	"Advertisement Server in the network is not currently "
+	  "reachable",								/* 65 */
+	"Reserved",									/* 66 */
+	"Request refused due to permissions received via SSPN "
+	  "interface",								/* 67 */
+	"Request refused because the AP or PCP does not "
+	  "support unauthenticated access",			/* 68 */
+	"Reserved",									/* 69 */
+	"Reserved",									/* 70 */
+	"Reserved",									/* 71 */
+	"Invalid contents of RSNE", 				/* 72 */
+	"U-APSD coexistence is not supported", 		/* 73 */
+	"Requested U-APSD coexistence mode is not supported", /* 74 */
+	"Requested Interval/Duration value cannot be "
+	  "supported with U-APSD coexistence",		/* 75 */
+	"Authentication is rejected because an Anti-Clogging "
+	  "Token is required",						/* 76 */
+	"Authentication is rejected because the offered "
+	  "finite cyclic group is not supported",	/* 77 */
+	"The TBTT adjustment request has not been successful "
+	  "because the STA could not find an alternative TBTT", /* 78 */
+	"Transmission failure",						/* 79 */
+	"Requested TCLAS Not Supported",			/* 80 */
+	"TCLAS Resources Exhausted",				/* 81 */
+	"Rejected with Suggested BSS transition",	/* 82 */
+	"Reject with recommended schedule",			/* 83 */
+	"Reject because no wakeup schedule specified", /* 84 */
+	"Success, the destination STA is in power save mode", /* 85 */
+	"FST pending, in process of admitting FST session", /* 86 */
+	"Performing FST now",						/* 87 */
+	"FST pending, gap(s) in block ack window",	/* 88 */
+	"Reject because of U-PID setting",			/* 89 */
+	"Reserved",									/* 90 */
+	"Reserved",									/* 91 */
+	"(Re)Association refused for some external reason", /* 92 */
+	"(Re)Association refused because of memory limits "
+	  "at the AP",								/* 93 */
+	"(Re)Association refused because emergency services "
+	  "are not supported at the AP",			/* 94 */
+	"GAS query response not yet received",		/* 95 */
+	"Reject since the request is for transition to a "
+	  "frequency band subject to DSE procedures and "
+	  "FST Initiator is a dependent STA",		/* 96 */
+	"Requested TCLAS processing has been terminated by "
+	  "the AP",									/* 97 */
+	"The TS schedule conflicts with an existing "
+	  "schedule; an alternative schedule is provided", /* 98 */
+	"The association has been denied; however, one or "
+	  "more Multi-band elements are included that can "
+	  "be used by the receiving STA to join the BSS", /* 99 */
+	"The request failed due to a reservation conflict", /* 100 */
+	"The request failed due to exceeded MAF limit", /* 101 */
+	"The request failed due to exceeded MCCA track "
+	  "limit",									/* 102 */
+	"Association denied because the information in the"
+	  "Spectrum Management field is unacceptable", /* 103 */
+	"Association denied because the requesting STA "
+	  "does not support VHT features",			/* 104 */
+	"Enablement denied", 						/* 105 */
+	"Enablement denied due to restriction from an "
+	  "authorized GDB",							/* 106 */
+	"Authorization deenabled",					/* 107 */
 };
 #define NUM_STATUSES	(sizeof(status_text) / sizeof(status_text[0]))
 
@@ -914,40 +1008,45 @@ static const char *reason_text[] = {
 	"Reserved",						/* 0 */
 	"Unspecified reason",					/* 1 */
 	"Previous authentication no longer valid",		/* 2 */
-	"Deauthenticated because sending station is leaving (or has left) "
+	"Deauthenticated because sending STA is leaving (or has left) "
 	  "IBSS or ESS",					/* 3 */
 	"Disassociated due to inactivity",			/* 4 */
 	"Disassociated because AP is unable to handle all currently "
-	  " associated stations",				/* 5 */
-	"Class 2 frame received from nonauthenticated station", /* 6 */
-	"Class 3 frame received from nonassociated station",	/* 7 */
-	"Disassociated because sending station is leaving "
+	  " associated STAs",				/* 5 */
+	"Class 2 frame received from nonauthenticated STA", /* 6 */
+	"Class 3 frame received from nonassociated STA",	/* 7 */
+	"Disassociated because sending STA is leaving "
 	  "(or has left) BSS",					/* 8 */
-	"Station requesting (re)association is not authenticated with "
-	  "responding station",					/* 9 */
+	"STA requesting (re)association is not authenticated with "
+	  "responding STA",					/* 9 */
 	"Disassociated because the information in the Power Capability "
 	  "element is unacceptable",				/* 10 */
-	"Disassociated because the information in the SupportedChannels "
+	"Disassociated because the information in the Supported Channels "
 	  "element is unacceptable",				/* 11 */
-	"Invalid Information Element",				/* 12 */
-	"Reserved",						/* 13 */
-	"Michael MIC failure",					/* 14 */
+	"Disassociated due to BSS transition management",	/* 12 */
+	"Invalid element, i.e., an element defined in this standard for "
+	  "which the content does not meet the specifications "
+	  "in Clause 9",						/* 13 */
+	"Message integrity code (MIC) failure",	/* 14 */
 	"4-Way Handshake timeout",				/* 15 */
-	"Group key update timeout",				/* 16 */
+	"Group key handshake timeout",			/* 16 */
 	"Information element in 4-Way Handshake different from (Re)Association"
-	  "Request/Probe Response/Beacon",			/* 17 */
-	"Group Cipher is not valid",				/* 18 */
-	"AKMP is not valid",					/* 20 */
-	"Unsupported RSN IE version",				/* 21 */
-	"Invalid RSN IE Capabilities",				/* 22 */
-	"IEEE 802.1X Authentication failed",			/* 23 */
-	"Cipher suite is rejected per security policy",		/* 24 */
-	"Reserved",						/* 25 */
-	"Reserved",						/* 26 */
-	"Reserved",						/* 27 */
-	"Reserved",						/* 28 */
-	"Reserved",						/* 29 */
-	"Reserved",						/* 30 */
+	  "Request/Probe Response/Beacon frame",	/* 17 */
+	"Invalid group cipher",					/* 18 */
+	"Invalid pairwise cipher",				/* 19 */
+	"Invalid AKMP",							/* 20 */
+	"Unsupported RSNE version",				/* 21 */
+	"Invalid RSNE capabilities",				/* 22 */
+	"IEEE 802.1X authentication failed",			/* 23 */
+	"Cipher suite rejected because of the security policy",		/* 24 */
+	"TDLS direct-link teardown due to TDLS peer STA "
+	  "unreachable via the TDLS direct link",				/* 25 */
+	"TDLS direct-link teardown for unspecified reason",		/* 26 */
+	"Disassociated because session terminated by SSP request",/* 27 */
+	"Disassociated because of lack of SSP roaming agreement",/* 28 */
+	"Requested service rejected because of SSP cipher suite or "
+	  "AKM requirement",						/* 29 */
+	"Requested service not authorized in this location",	/* 30 */
 	"TS deleted because QoS AP lacks sufficient bandwidth for this "
 	  "QoS STA due to a change in BSS service characteristics or "
 	  "operational mode (e.g. an HT BSS change from 40 MHz channel "
@@ -956,7 +1055,7 @@ static const char *reason_text[] = {
 	"Disassociated because QoS AP lacks sufficient bandwidth for this "
 	  "QoS STA",						/* 33 */
 	"Disassociated because of excessive number of frames that need to be "
-	  "acknowledged, but are not acknowledged for AP transmissions "
+	  "acknowledged, but are not acknowledged due to AP transmissions "
 	  "and/or poor channel conditions",			/* 34 */
 	"Disassociated because STA is transmitting outside the limits "
 	  "of its TXOPs",					/* 35 */
@@ -973,8 +1072,47 @@ static const char *reason_text[] = {
 	"Reserved",						/* 43 */
 	"Reserved",						/* 44 */
 	"Peer STA does not support the requested cipher suite",	/* 45 */
-	"Association denied due to requesting STA not supporting HT "
-	  "features",						/* 46 */
+	"In a DLS Teardown frame: The teardown was initiated by the "
+	  "DLS peer. In a Disassociation frame: Disassociated because "
+	  "authorized access limit reached",					/* 46 */
+	"In a DLS Teardown frame: The teardown was initiated by the "
+	  "AP. In a Disassociation frame: Disassociated due to external "
+	  "service requirements",								/* 47 */
+	"Invalid FT Action frame count",						/* 48 */
+	"Invalid pairwise master key identifier (PMKID)",		/* 49 */
+	"Invalid MDE",											/* 50 */
+	"Invalid FTE",											/* 51 */
+	"Mesh peering canceled for unknown reasons",			/* 52 */
+	"The mesh STA has reached the supported maximum number of "
+	  "peer mesh STAs",										/* 53 */
+	"The received information violates the Mesh Configuration "
+	  "policy configured in the mesh STA profile",			/* 54 */
+	"The mesh STA has received a Mesh Peering Close frame "
+	  "requesting to close the mesh peering",				/* 55 */
+	"The mesh STA has resent dot11MeshMaxRetries Mesh "
+	  "Peering Open frames, without receiving a Mesh Peering "
+	  "Confirm frame"										/* 56 */
+	"The confirmTimer for the mesh peering instance times out",	/* 57 */
+	"The mesh STA fails to unwrap the GTK or the values in the "
+	  "wrapped contents do not match",						/* 58 */
+	"The mesh STA receives inconsistent information about the "
+	  "mesh parameters between mesh peering Management frames",	/* 59 */
+	"The mesh STA fails the authenticated mesh peering exchange "
+	  "because due to failure in selecting either the pairwise "
+	  "ciphersuite or group ciphersuite",					/* 60 */
+	"The mesh STA does not have proxy information for this "
+	  "external destination",								/* 61 */
+	"The mesh STA does not have forwarding information for this "
+	  "destination",										/* 62 */
+	"The mesh STA determines that the link to the next hop of an "
+	  "active path in its forwarding information is no longer "
+	  "usable",												/* 63 */
+	"The Deauthentication frame was sent because the MAC "
+	  "address of the STA already exists in the mesh BSS",	/* 64 */
+	"The mesh STA performs channel switch to meet regulatory "
+	  "requirements",										/* 65 */
+	"The mesh STA performs channel switching with unspecified "
+	  "reason",												/* 66 */
 };
 #define NUM_REASONS	(sizeof(reason_text) / sizeof(reason_text[0]))
 
@@ -1520,7 +1658,7 @@ handle_deauth(netdissect_options *ndo,
 	if (ndo->ndo_eflag) {
 		ND_PRINT(": %s", reason);
 	} else {
-		ND_PRINT(" (%s): %s", etheraddr_string(ndo, src), reason);
+		ND_PRINT(" (%s): %s", GET_ETHERADDR_STRING(src), reason);
 	}
 	return 1;
 trunc:
@@ -1587,7 +1725,7 @@ handle_action(netdissect_options *ndo,
 	if (ndo->ndo_eflag) {
 		ND_PRINT(": ");
 	} else {
-		ND_PRINT(" (%s): ", etheraddr_string(ndo, src));
+		ND_PRINT(" (%s): ", GET_ETHERADDR_STRING(src));
 	}
 	switch (GET_U_1(p)) {
 	case 0: ND_PRINT("Spectrum Management Act#%u", GET_U_1(p + 1)); break;
@@ -1675,8 +1813,8 @@ ctrl_body_print(netdissect_options *ndo,
 		ND_TCHECK_LEN(p, CTRL_BAR_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s TA:%s CTL(%x) SEQ(%u) ",
-			    etheraddr_string(ndo, ((const struct ctrl_bar_hdr_t *)p)->ra),
-			    etheraddr_string(ndo, ((const struct ctrl_bar_hdr_t *)p)->ta),
+			    GET_ETHERADDR_STRING(((const struct ctrl_bar_hdr_t *)p)->ra),
+			    GET_ETHERADDR_STRING(((const struct ctrl_bar_hdr_t *)p)->ta),
 			    GET_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->ctl),
 			    GET_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->seq));
 		break;
@@ -1684,7 +1822,7 @@ ctrl_body_print(netdissect_options *ndo,
 		ND_TCHECK_LEN(p, CTRL_BA_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
-			    etheraddr_string(ndo, ((const struct ctrl_ba_hdr_t *)p)->ra));
+			    GET_ETHERADDR_STRING(((const struct ctrl_ba_hdr_t *)p)->ra));
 		break;
 	case CTRL_PS_POLL:
 		ND_TCHECK_LEN(p, CTRL_PS_POLL_HDRLEN);
@@ -1695,31 +1833,31 @@ ctrl_body_print(netdissect_options *ndo,
 		ND_TCHECK_LEN(p, CTRL_RTS_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" TA:%s ",
-			    etheraddr_string(ndo, ((const struct ctrl_rts_hdr_t *)p)->ta));
+			    GET_ETHERADDR_STRING(((const struct ctrl_rts_hdr_t *)p)->ta));
 		break;
 	case CTRL_CTS:
 		ND_TCHECK_LEN(p, CTRL_CTS_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
-			    etheraddr_string(ndo, ((const struct ctrl_cts_hdr_t *)p)->ra));
+			    GET_ETHERADDR_STRING(((const struct ctrl_cts_hdr_t *)p)->ra));
 		break;
 	case CTRL_ACK:
 		ND_TCHECK_LEN(p, CTRL_ACK_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
-			    etheraddr_string(ndo, ((const struct ctrl_ack_hdr_t *)p)->ra));
+			    GET_ETHERADDR_STRING(((const struct ctrl_ack_hdr_t *)p)->ra));
 		break;
 	case CTRL_CF_END:
 		ND_TCHECK_LEN(p, CTRL_END_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
-			    etheraddr_string(ndo, ((const struct ctrl_end_hdr_t *)p)->ra));
+			    GET_ETHERADDR_STRING(((const struct ctrl_end_hdr_t *)p)->ra));
 		break;
 	case CTRL_END_ACK:
 		ND_TCHECK_LEN(p, CTRL_END_ACK_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
-			    etheraddr_string(ndo, ((const struct ctrl_end_ack_hdr_t *)p)->ra));
+			    GET_ETHERADDR_STRING(((const struct ctrl_end_ack_hdr_t *)p)->ra));
 		break;
 	}
 	return 1;
@@ -1821,20 +1959,20 @@ data_header_print(netdissect_options *ndo, uint16_t fc, const u_char *p)
 
 	if (!FC_TO_DS(fc) && !FC_FROM_DS(fc)) {
 		ND_PRINT("DA:%s SA:%s BSSID:%s ",
-		    etheraddr_string(ndo, ADDR1), etheraddr_string(ndo, ADDR2),
-		    etheraddr_string(ndo, ADDR3));
+		    GET_ETHERADDR_STRING(ADDR1), GET_ETHERADDR_STRING(ADDR2),
+		    GET_ETHERADDR_STRING(ADDR3));
 	} else if (!FC_TO_DS(fc) && FC_FROM_DS(fc)) {
 		ND_PRINT("DA:%s BSSID:%s SA:%s ",
-		    etheraddr_string(ndo, ADDR1), etheraddr_string(ndo, ADDR2),
-		    etheraddr_string(ndo, ADDR3));
+		    GET_ETHERADDR_STRING(ADDR1), GET_ETHERADDR_STRING(ADDR2),
+		    GET_ETHERADDR_STRING(ADDR3));
 	} else if (FC_TO_DS(fc) && !FC_FROM_DS(fc)) {
 		ND_PRINT("BSSID:%s SA:%s DA:%s ",
-		    etheraddr_string(ndo, ADDR1), etheraddr_string(ndo, ADDR2),
-		    etheraddr_string(ndo, ADDR3));
+		    GET_ETHERADDR_STRING(ADDR1), GET_ETHERADDR_STRING(ADDR2),
+		    GET_ETHERADDR_STRING(ADDR3));
 	} else if (FC_TO_DS(fc) && FC_FROM_DS(fc)) {
 		ND_PRINT("RA:%s TA:%s DA:%s SA:%s ",
-		    etheraddr_string(ndo, ADDR1), etheraddr_string(ndo, ADDR2),
-		    etheraddr_string(ndo, ADDR3), etheraddr_string(ndo, ADDR4));
+		    GET_ETHERADDR_STRING(ADDR1), GET_ETHERADDR_STRING(ADDR2),
+		    GET_ETHERADDR_STRING(ADDR3), GET_ETHERADDR_STRING(ADDR4));
 	}
 
 #undef ADDR1
@@ -1849,8 +1987,8 @@ mgmt_header_print(netdissect_options *ndo, const u_char *p)
 	const struct mgmt_header_t *hp = (const struct mgmt_header_t *) p;
 
 	ND_PRINT("BSSID:%s DA:%s SA:%s ",
-	    etheraddr_string(ndo, (hp)->bssid), etheraddr_string(ndo, (hp)->da),
-	    etheraddr_string(ndo, (hp)->sa));
+	    GET_ETHERADDR_STRING((hp)->bssid), GET_ETHERADDR_STRING((hp)->da),
+	    GET_ETHERADDR_STRING((hp)->sa));
 }
 
 static void
@@ -1859,42 +1997,42 @@ ctrl_header_print(netdissect_options *ndo, uint16_t fc, const u_char *p)
 	switch (FC_SUBTYPE(fc)) {
 	case CTRL_BAR:
 		ND_PRINT(" RA:%s TA:%s CTL(%x) SEQ(%u) ",
-		    etheraddr_string(ndo, ((const struct ctrl_bar_hdr_t *)p)->ra),
-		    etheraddr_string(ndo, ((const struct ctrl_bar_hdr_t *)p)->ta),
+		    GET_ETHERADDR_STRING(((const struct ctrl_bar_hdr_t *)p)->ra),
+		    GET_ETHERADDR_STRING(((const struct ctrl_bar_hdr_t *)p)->ta),
 		    GET_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->ctl),
 		    GET_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->seq));
 		break;
 	case CTRL_BA:
 		ND_PRINT("RA:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_ba_hdr_t *)p)->ra));
+		    GET_ETHERADDR_STRING(((const struct ctrl_ba_hdr_t *)p)->ra));
 		break;
 	case CTRL_PS_POLL:
 		ND_PRINT("BSSID:%s TA:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_ps_poll_hdr_t *)p)->bssid),
-		    etheraddr_string(ndo, ((const struct ctrl_ps_poll_hdr_t *)p)->ta));
+		    GET_ETHERADDR_STRING(((const struct ctrl_ps_poll_hdr_t *)p)->bssid),
+		    GET_ETHERADDR_STRING(((const struct ctrl_ps_poll_hdr_t *)p)->ta));
 		break;
 	case CTRL_RTS:
 		ND_PRINT("RA:%s TA:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_rts_hdr_t *)p)->ra),
-		    etheraddr_string(ndo, ((const struct ctrl_rts_hdr_t *)p)->ta));
+		    GET_ETHERADDR_STRING(((const struct ctrl_rts_hdr_t *)p)->ra),
+		    GET_ETHERADDR_STRING(((const struct ctrl_rts_hdr_t *)p)->ta));
 		break;
 	case CTRL_CTS:
 		ND_PRINT("RA:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_cts_hdr_t *)p)->ra));
+		    GET_ETHERADDR_STRING(((const struct ctrl_cts_hdr_t *)p)->ra));
 		break;
 	case CTRL_ACK:
 		ND_PRINT("RA:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_ack_hdr_t *)p)->ra));
+		    GET_ETHERADDR_STRING(((const struct ctrl_ack_hdr_t *)p)->ra));
 		break;
 	case CTRL_CF_END:
 		ND_PRINT("RA:%s BSSID:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_end_hdr_t *)p)->ra),
-		    etheraddr_string(ndo, ((const struct ctrl_end_hdr_t *)p)->bssid));
+		    GET_ETHERADDR_STRING(((const struct ctrl_end_hdr_t *)p)->ra),
+		    GET_ETHERADDR_STRING(((const struct ctrl_end_hdr_t *)p)->bssid));
 		break;
 	case CTRL_END_ACK:
 		ND_PRINT("RA:%s BSSID:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_end_ack_hdr_t *)p)->ra),
-		    etheraddr_string(ndo, ((const struct ctrl_end_ack_hdr_t *)p)->bssid));
+		    GET_ETHERADDR_STRING(((const struct ctrl_end_ack_hdr_t *)p)->ra),
+		    GET_ETHERADDR_STRING(((const struct ctrl_end_ack_hdr_t *)p)->bssid));
 		break;
 	default:
 		/* We shouldn't get here - we should already have quit */
@@ -1985,11 +2123,11 @@ ieee_802_11_hdr_print(netdissect_options *ndo,
 		ND_PRINT("MeshData (AE %u TTL %u seq %u", ae,
 		    GET_U_1(mc->ttl), GET_LE_U_4(mc->seq));
 		if (ae > 0)
-			ND_PRINT(" A4:%s", etheraddr_string(ndo, mc->addr4));
+			ND_PRINT(" A4:%s", GET_ETHERADDR_STRING(mc->addr4));
 		if (ae > 1)
-			ND_PRINT(" A5:%s", etheraddr_string(ndo, mc->addr5));
+			ND_PRINT(" A5:%s", GET_ETHERADDR_STRING(mc->addr5));
 		if (ae > 2)
-			ND_PRINT(" A6:%s", etheraddr_string(ndo, mc->addr6));
+			ND_PRINT(" A6:%s", GET_ETHERADDR_STRING(mc->addr6));
 		ND_PRINT(") ");
 	}
 

@@ -29,7 +29,7 @@
 
 /*
  * originally defined as the Ethernet Configuration Testing Protocol.
- * specification: http://www.mit.edu/people/jhawk/ctp.pdf
+ * specification: https://www.mit.edu/people/jhawk/ctp.pdf
  */
 
 #ifdef HAVE_CONFIG_H
@@ -83,7 +83,7 @@ loopback_message_print(netdissect_options *ndo, const u_char *cp, const u_int le
 				goto invalid;
 			/* forwarding address */
 			ND_TCHECK_LEN(cp, MAC_ADDR_LEN);
-			ND_PRINT(", forwarding address %s", etheraddr_string(ndo, cp));
+			ND_PRINT(", forwarding address %s", GET_ETHERADDR_STRING(cp));
 			cp += MAC_ADDR_LEN;
 			/* data */
 			ND_PRINT(", data (%u octets)", len - 8);

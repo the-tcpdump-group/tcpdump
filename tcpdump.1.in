@@ -20,7 +20,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "2 Apr 2019"
+.TH TCPDUMP 1  "2 Mar 2020"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -37,6 +37,9 @@ tcpdump \- dump traffic on a network
 [
 .B \-c
 .I count
+]
+[
+.B \-\-count
 ]
 [
 .B \-C
@@ -132,6 +135,13 @@ tcpdump \- dump traffic on a network
 .ti +8
 [
 .BI \-\-time\-stamp\-precision= tstamp_precision
+]
+.ti +8
+[
+.BI \-\-micro
+]
+[
+.BI \-\-nano
 ]
 .ti +8
 [
@@ -242,6 +252,12 @@ units of KiB (1024 bytes).
 .BI \-c " count"
 Exit after receiving \fIcount\fP packets.
 .TP
+.BI \-\-count
+Print only on stderr the packet count when reading capture file(s) instead
+of parsing/printing the packets. If a filter is specified on the command
+line, \fItcpdump\fP counts only packets that were matched by the filter
+expression.
+.TP
 .BI \-C " file_size"
 Before writing a raw packet to a savefile, check whether the file is
 currently larger than \fIfile_size\fP and, if so, close the current
@@ -278,7 +294,7 @@ which
 .I tcpdump
 can capture packets.  For each network interface, a number and an
 interface name, possibly followed by a text description of the
-interface, is printed.  The interface name or the number can be supplied
+interface, are printed.  The interface name or the number can be supplied
 to the
 .B \-i
 flag to specify an interface on which to capture.
@@ -393,10 +409,11 @@ Attempt to detect 802.11s draft mesh headers.
 .TP
 .BI \-\-interface= interface
 .PD
-Listen on \fIinterface\fP.
-If unspecified, \fItcpdump\fP searches the system interface list for the
-lowest numbered, configured up interface (excluding loopback), which may turn
-out to be, for example, ``eth0''.
+Listen, report the list of link-layer types, report the list of time
+stamp types, or report the results of compiling a filter expression on
+\fIinterface\fP.  If unspecified, \fItcpdump\fP searches the system
+interface list for the lowest numbered, configured up interface
+(excluding loopback), which may turn out to be, for example, ``eth0''.
 .IP
 On Linux systems with 2.2 or later kernels, an
 .I interface
@@ -676,21 +693,24 @@ Currently known types are
 \fBaodv\fR (Ad-hoc On-demand Distance Vector protocol),
 \fBcarp\fR (Common Address Redundancy Protocol),
 \fBcnfp\fR (Cisco NetFlow protocol),
+\fBdomain\fR (Domain Name System),
 \fBlmp\fR (Link Management Protocol),
 \fBpgm\fR (Pragmatic General Multicast),
 \fBpgm_zmtp1\fR (ZMTP/1.0 inside PGM/EPGM),
-\fBresp\fR (REdis Serialization Protocol),
+\fBptp\fR (Precision Time Protocol),
 \fBradius\fR (RADIUS),
+\fBresp\fR (REdis Serialization Protocol),
 \fBrpc\fR (Remote Procedure Call),
-\fBrtp\fR (Real-Time Applications protocol),
 \fBrtcp\fR (Real-Time Applications control protocol),
+\fBrtp\fR (Real-Time Applications protocol),
 \fBsnmp\fR (Simple Network Management Protocol),
+\fBsomeip\fR (SOME/IP),
 \fBtftp\fR (Trivial File Transfer Protocol),
 \fBvat\fR (Visual Audio Tool),
-\fBwb\fR (distributed White Board),
-\fBzmtp1\fR (ZeroMQ Message Transport Protocol 1.0)
+\fBvxlan\fR (Virtual eXtensible Local Area Network),
+\fBwb\fR (distributed White Board)
 and
-\fBvxlan\fR (Virtual eXtensible Local Area Network).
+\fBzmtp1\fR (ZeroMQ Message Transport Protocol 1.0).
 .IP
 Note that the \fBpgm\fR type above affects UDP interpretation only, the native
 PGM is always recognised as IP protocol 113 regardless. UDP-encapsulated PGM is
@@ -814,7 +834,7 @@ See
 .BR pcap-savefile (@MAN_FILE_FORMATS@)
 for a description of the file format.
 .TP
-.B \-W
+.BI \-W " filecount"
 Used in conjunction with the
 .B \-C
 option, this will limit the number
@@ -1925,7 +1945,9 @@ stty(1), pcap(3PCAP), bpf(4), nit(4P), \%pcap-savefile(@MAN_FILE_FORMATS@),
 \%pcap-filter(@MAN_MISC_INFO@), \%pcap-tstamp(@MAN_MISC_INFO@)
 .LP
 .RS
-.I http://www.iana.org/assignments/media-types/application/vnd.tcpdump.pcap
+.na
+.I https://www.iana.org/assignments/media-types/application/vnd.tcpdump.pcap
+.ad
 .RE
 .LP
 .SH AUTHORS
@@ -1938,7 +1960,7 @@ Lawrence Berkeley National Laboratory, University of California, Berkeley, CA.
 .LP
 It is currently being maintained by tcpdump.org.
 .LP
-The current version is available via http:
+The current version is available via HTTPS:
 .LP
 .RS
 .I https://www.tcpdump.org/

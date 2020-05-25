@@ -98,11 +98,6 @@ struct ip6_hdr {
 /* in network endian */
 #define IPV6_FLOWINFO_MASK	((uint32_t)htonl(0x0fffffff))	/* flow info (28 bits) */
 #define IPV6_FLOWLABEL_MASK	((uint32_t)htonl(0x000fffff))	/* flow label (20 bits) */
-#if 1
-/* ECN bits proposed by Sally Floyd */
-#define IP6TOS_CE		0x01	/* congestion experienced */
-#define IP6TOS_ECT		0x02	/* ECN-capable transport */
-#endif
 
 /*
  * Extension Headers
@@ -127,7 +122,7 @@ struct ip6_dest {
 	/* followed by options */
 };
 
-/* http://www.iana.org/assignments/ipv6-parameters/ipv6-parameters.xhtml */
+/* https://www.iana.org/assignments/ipv6-parameters/ipv6-parameters.xhtml */
 
 /* Option types and related macros */
 #define IP6OPT_PAD1		0x00	/* 00 0 00000 */

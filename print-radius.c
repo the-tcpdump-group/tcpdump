@@ -90,6 +90,8 @@
 
 #include <string.h>
 
+#include "netdissect-ctype.h"
+
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -674,7 +676,7 @@ print_attr_string(netdissect_options *ndo,
    }
 
    for (i=0; i < length && GET_U_1(data); i++, data++)
-       ND_PRINT("%c", ND_ISPRINT(GET_U_1(data)) ? GET_U_1(data) : '.');
+       ND_PRINT("%c", ND_ASCII_ISPRINT(GET_U_1(data)) ? GET_U_1(data) : '.');
 
    return;
 
@@ -734,7 +736,7 @@ print_vendor_attr(netdissect_options *ndo,
                vendor_type,
                vendor_length);
         for (idx = 0; idx < vendor_length ; idx++, data++)
-            ND_PRINT("%c", ND_ISPRINT(GET_U_1(data)) ? GET_U_1(data) : '.');
+            ND_PRINT("%c", ND_ASCII_ISPRINT(GET_U_1(data)) ? GET_U_1(data) : '.');
         length-=vendor_length;
     }
     return;
@@ -895,11 +897,11 @@ print_attr_address(netdissect_options *ndo,
               if (GET_BE_U_4(data) == 0xFFFFFFFE )
                  ND_PRINT("NAS Select");
               else
-                 ND_PRINT("%s",ipaddr_string(ndo, data));
+                 ND_PRINT("%s",GET_IPADDR_STRING(data));
       break;
 
       default:
-          ND_PRINT("%s", ipaddr_string(ndo, data));
+          ND_PRINT("%s", GET_IPADDR_STRING(data));
       break;
    }
 
@@ -928,7 +930,7 @@ print_attr_address6(netdissect_options *ndo,
 
    ND_TCHECK_16(data);
 
-   ND_PRINT("%s", ip6addr_string(ndo, data));
+   ND_PRINT("%s", GET_IP6ADDR_STRING(data));
 
    return;
 
@@ -985,7 +987,7 @@ print_attr_mip6_home_link_prefix(netdissect_options *ndo,
       return;
    }
 
-   ND_PRINT("%s/%u", ip6addr_string(ndo, data + 1), GET_U_1(data));
+   ND_PRINT("%s/%u", GET_IP6ADDR_STRING(data + 1), GET_U_1(data));
 
    return;
 

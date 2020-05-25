@@ -123,14 +123,14 @@ nd_load_smi_module(const char *module, char *errbuf, size_t errbuf_size)
 {
 #ifdef USE_LIBSMI
 	if (smiLoadModule(module) == 0) {
-		nd_snprintf(errbuf, errbuf_size, "could not load MIB module %s",
+		snprintf(errbuf, errbuf_size, "could not load MIB module %s",
 		    module);
 		return (-1);
 	}
 	nd_smi_module_loaded = 1;
 	return (0);
 #else
-	nd_snprintf(errbuf, errbuf_size, "MIB module %s not loaded: no libsmi support",
+	snprintf(errbuf, errbuf_size, "MIB module %s not loaded: no libsmi support",
 	    module);
 	return (-1);
 #endif

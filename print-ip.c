@@ -73,7 +73,7 @@ ip_printroute(netdissect_options *ndo,
 
 	for (len = 3; len < length; len += 4) {
 		ND_TCHECK_4(cp + len);
-		ND_PRINT(" %s", ipaddr_string(ndo, cp + len));
+		ND_PRINT(" %s", GET_IPADDR_STRING(cp + len));
 		if (ptr > len)
 			ND_PRINT(",");
 	}
@@ -223,7 +223,7 @@ ip_printts(netdissect_options *ndo,
 			type = " ^ ";
 		ND_TCHECK_LEN(cp + len, hoplen);
 		ND_PRINT("%s%u@%s", type, GET_BE_U_4(cp + len + hoplen - 4),
-			  hoplen!=8 ? "" : ipaddr_string(ndo, cp + len));
+			  hoplen!=8 ? "" : GET_IPADDR_STRING(cp + len));
 		type = " ";
 	}
 
@@ -468,8 +468,8 @@ ip_print(netdissect_options *ndo,
 	    ND_PRINT(")\n    ");
 	    if (truncated) {
 		ND_PRINT("%s > %s: ",
-			 ipaddr_string(ndo, ip->ip_src),
-			 ipaddr_string(ndo, ip->ip_dst));
+			 GET_IPADDR_STRING(ip->ip_src),
+			 GET_IPADDR_STRING(ip->ip_dst));
 		nd_print_trunc(ndo);
 		nd_pop_packet_info(ndo);
 		return;
@@ -487,10 +487,10 @@ ip_print(netdissect_options *ndo,
 		if (nh != IPPROTO_TCP && nh != IPPROTO_UDP &&
 		    nh != IPPROTO_SCTP && nh != IPPROTO_DCCP) {
 			ND_PRINT("%s > %s: ",
-				     ipaddr_string(ndo, ip->ip_src),
-				     ipaddr_string(ndo, ip->ip_dst));
+				     GET_IPADDR_STRING(ip->ip_src),
+				     GET_IPADDR_STRING(ip->ip_dst));
 		}
-		ip_print_demux(ndo, (const u_char *)ip + hlen, len, 4,
+		ip_demux_print(ndo, (const u_char *)ip + hlen, len, 4,
 		    off & IP_MF, GET_U_1(ip->ip_ttl), nh, bp);
 	} else {
 		/*
@@ -507,8 +507,8 @@ ip_print(netdissect_options *ndo,
 		 * next level protocol header.  print the ip addr
 		 * and the protocol.
 		 */
-		ND_PRINT("%s > %s:", ipaddr_string(ndo, ip->ip_src),
-		          ipaddr_string(ndo, ip->ip_dst));
+		ND_PRINT("%s > %s:", GET_IPADDR_STRING(ip->ip_src),
+		          GET_IPADDR_STRING(ip->ip_dst));
 		if (!ndo->ndo_nflag && (p_name = netdb_protoname(ip_proto)) != NULL)
 			ND_PRINT(" %s", p_name);
 		else

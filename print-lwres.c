@@ -280,13 +280,13 @@ lwres_printaddr(netdissect_options *ndo,
 	case 1:	/* IPv4 */
 		if (l < 4)
 			return -1;
-		ND_PRINT(" %s", ipaddr_string(ndo, p));
+		ND_PRINT(" %s", GET_IPADDR_STRING(p));
 		p += sizeof(nd_ipv4);
 		break;
 	case 2:	/* IPv6 */
 		if (l < 16)
 			return -1;
-		ND_PRINT(" %s", ip6addr_string(ndo, p));
+		ND_PRINT(" %s", GET_IP6ADDR_STRING(p));
 		p += sizeof(nd_ipv6);
 		break;
 	default:

@@ -203,7 +203,7 @@ dsa_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 	u_int length = h->len;
 
 	ndo->ndo_protocol = "dsa";
-	return (ether_print_switch_tag(ndo, p, length, caplen,
+	return (ether_switch_tag_print(ndo, p, length, caplen,
 	    dsa_tag_print, DSA_LEN));
 }
 
@@ -214,6 +214,6 @@ edsa_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 	u_int length = h->len;
 
 	ndo->ndo_protocol = "edsa";
-	return (ether_print_switch_tag(ndo, p, length, caplen,
+	return (ether_switch_tag_print(ndo, p, length, caplen,
 	    edsa_tag_print, EDSA_LEN));
 }

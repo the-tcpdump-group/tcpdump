@@ -19,7 +19,7 @@
 /*
  * specification:
  *
- * http://www.rhyshaden.com/eigrp.htm
+ * https://web.archive.org/web/20190722221712/https://www.rhyshaden.com/eigrp.htm
  * RFC 7868
  */
 
@@ -357,17 +357,16 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
             }
             byte_length = (bit_length + 7) / 8; /* variable length encoding */
             memset(prefix, 0, 4);
-            ND_TCHECK_LEN(tlv_ptr.eigrp_tlv_ip_int->destination, byte_length);
-            memcpy(prefix, tlv_ptr.eigrp_tlv_ip_int->destination, byte_length);
+            GET_CPY_BYTES(prefix, tlv_ptr.eigrp_tlv_ip_int->destination, byte_length);
 
             ND_PRINT("\n\t    IPv4 prefix: %15s/%u, nexthop: ",
-                   ipaddr_string(ndo, prefix),
+                   ipaddr_string(ndo, prefix),	/* local buffer, not packet data; don't use GET_IPADDR_STRING() */
                    bit_length);
             if (GET_BE_U_4(tlv_ptr.eigrp_tlv_ip_int->nexthop) == 0)
                 ND_PRINT("self");
             else
                 ND_PRINT("%s",
-                         ipaddr_string(ndo, tlv_ptr.eigrp_tlv_ip_int->nexthop));
+                         GET_IPADDR_STRING(tlv_ptr.eigrp_tlv_ip_int->nexthop));
 
             ND_PRINT("\n\t      delay %u ms, bandwidth %u Kbps, mtu %u, hop %u, reliability %u, load %u",
                    (GET_BE_U_4(tlv_ptr.eigrp_tlv_ip_int->delay)/100),
@@ -393,20 +392,19 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
             }
             byte_length = (bit_length + 7) / 8; /* variable length encoding */
             memset(prefix, 0, 4);
-            ND_TCHECK_LEN(tlv_ptr.eigrp_tlv_ip_ext->destination, byte_length);
-            memcpy(prefix, tlv_ptr.eigrp_tlv_ip_ext->destination, byte_length);
+            GET_CPY_BYTES(prefix, tlv_ptr.eigrp_tlv_ip_ext->destination, byte_length);
 
             ND_PRINT("\n\t    IPv4 prefix: %15s/%u, nexthop: ",
-                   ipaddr_string(ndo, prefix),
+                   ipaddr_string(ndo, prefix),	/* local buffer, not packet data; don't use GET_IPADDR_STRING() */
                    bit_length);
             if (GET_BE_U_4(tlv_ptr.eigrp_tlv_ip_ext->nexthop) == 0)
                 ND_PRINT("self");
             else
                 ND_PRINT("%s",
-                         ipaddr_string(ndo, tlv_ptr.eigrp_tlv_ip_ext->nexthop));
+                         GET_IPADDR_STRING(tlv_ptr.eigrp_tlv_ip_ext->nexthop));
 
             ND_PRINT("\n\t      origin-router %s, origin-as %u, origin-proto %s, flags [0x%02x], tag 0x%08x, metric %u",
-                   ipaddr_string(ndo, tlv_ptr.eigrp_tlv_ip_ext->origin_router),
+                   GET_IPADDR_STRING(tlv_ptr.eigrp_tlv_ip_ext->origin_router),
                    GET_BE_U_4(tlv_ptr.eigrp_tlv_ip_ext->origin_as),
                    tok2str(eigrp_ext_proto_id_values,"unknown",GET_U_1(tlv_ptr.eigrp_tlv_ip_ext->proto_id)),
                    GET_U_1(tlv_ptr.eigrp_tlv_ip_ext->flags),

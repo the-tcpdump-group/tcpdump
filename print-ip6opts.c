@@ -150,12 +150,19 @@ ip6_opt_process(netdissect_options *ndo, const u_char *bp, int len,
 		    ND_PRINT("(jumbo: %u - already seen) ", jumbolen);
 	    } else {
 		found_jumbo = 1;
-		if (*payload_len != 0) {
+		if (payload_len == NULL) {
+		    /* Not a hop-by-hop option - not valid */
+		    if (ndo->ndo_vflag)
+			ND_PRINT("(jumbo: %u - not a hop-by-hop option) ", jumbolen);
+		} else if (*payload_len != 0) {
 		    /* Payload length was non-zero - not valid */
 		    if (ndo->ndo_vflag)
 			ND_PRINT("(jumbo: %u - payload len != 0) ", jumbolen);
 		} else {
-		    /* Payload length was zero in the IPv6 header */
+		    /*
+		     * This is a hop-by-hop option, and Payload length
+		     * was zero in the IPv6 header.
+		     */
 		    if (jumbolen < 65536) {
 			/* Too short */
 			if (ndo->ndo_vflag)
@@ -180,7 +187,7 @@ ip6_opt_process(netdissect_options *ndo, const u_char *bp, int len,
 		goto trunc;
 	    }
 	    if (ndo->ndo_vflag) {
-		ND_PRINT("(homeaddr: %s", ip6addr_string(ndo, bp + i + 2));
+		ND_PRINT("(homeaddr: %s", GET_IP6ADDR_STRING(bp + i + 2));
 		if (GET_U_1(bp + i + 1) > IP6OPT_HOMEADDR_MINLEN - 2) {
 		    if (ip6_sopt_print(ndo, bp + i + IP6OPT_HOMEADDR_MINLEN,
 				       (optlen - IP6OPT_HOMEADDR_MINLEN)) == -1)
@@ -235,8 +242,6 @@ dstopt_process(netdissect_options *ndo, const u_char *bp)
 {
     const struct ip6_dest *dp = (const struct ip6_dest *)bp;
     u_int dstoptlen = 0;
-    int found_jumbo;
-    uint32_t jumbolen;
 
     ndo->ndo_protocol = "dstopt";
     ND_TCHECK_1(dp->ip6d_len);
@@ -245,12 +250,12 @@ dstopt_process(netdissect_options *ndo, const u_char *bp)
     ND_PRINT("DSTOPT ");
     if (ndo->ndo_vflag) {
 	/*
-	 * The Jumbo Payload option is a hop-by-hop option; we print,
-	 * but don't honor, Jumbo Payload destination options.
+	 * The Jumbo Payload option is a hop-by-hop option; we don't
+	 * honor Jumbo Payload destination options, reporting them
+	 * as invalid.
 	 */
 	if (ip6_opt_process(ndo, (const u_char *)dp + sizeof(*dp),
-			    dstoptlen - sizeof(*dp), &found_jumbo,
-			    &jumbolen) == -1)
+			    dstoptlen - sizeof(*dp), NULL, NULL) == -1)
 	    goto trunc;
     }
 

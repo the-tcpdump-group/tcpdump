@@ -115,7 +115,7 @@ static const struct tok arctypemap[] = {
 	{ ARCTYPE_IPX,		"ipx" },
 	{ ARCTYPE_INET6,	"ipv6" },
 	{ ARCTYPE_DIAGNOSE,	"diag" },
-	{ 0, 0 }
+	{ 0, NULL }
 };
 
 static void
@@ -178,7 +178,7 @@ arcnet_print(netdissect_options *ndo, const u_char *bp, u_int length, int phds,
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
+void
 arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
@@ -193,7 +193,8 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 	ndo->ndo_protocol = "arcnet_if";
 	if (caplen < ARC_HDRLEN) {
 		nd_print_trunc(ndo);
-		return (caplen);
+		ndo->ndo_ll_header_length += caplen;
+		return;
 	}
 
 	ap = (const struct arc_header *)p;
@@ -216,7 +217,8 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 			arcnet_print(ndo, p, length, 0, 0, 0);
 			ND_PRINT(" phds");
 			nd_print_trunc(ndo);
-			return (caplen);
+			ndo->ndo_ll_header_length += caplen;
+			return;
 		}
 
 		flag = GET_U_1(ap->arc_flag);
@@ -225,7 +227,8 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 				arcnet_print(ndo, p, length, 0, 0, 0);
 				ND_PRINT(" phds extended");
 				nd_print_trunc(ndo);
-				return (caplen);
+				ndo->ndo_ll_header_length += caplen;
+				return;
 			}
 			flag = GET_U_1(ap->arc_flag2);
 			seqid = GET_BE_U_2(ap->arc_seqid2);
@@ -251,13 +254,14 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 		/*
 		 * This is a middle fragment.
 		 */
-		return (archdrlen);
+		ndo->ndo_ll_header_length += archdrlen;
+		return;
 	}
 
 	if (!arcnet_encap_print(ndo, arc_type, p, length, caplen))
 		ND_DEFAULTPRINT(p, caplen);
 
-	return (archdrlen);
+	ndo->ndo_ll_header_length += archdrlen;
 }
 
 /*
@@ -270,7 +274,7 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
  * reassembled packets rather than raw frames, and headers have an
  * extra "offset" field between the src/dest and packet type.
  */
-u_int
+void
 arcnet_linux_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
@@ -283,7 +287,8 @@ arcnet_linux_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, cons
 	ndo->ndo_protocol = "arcnet_linux_if";
 	if (caplen < ARC_LINUX_HDRLEN) {
 		nd_print_trunc(ndo);
-		return (caplen);
+		ndo->ndo_ll_header_length += caplen;
+		return;
 	}
 
 	ap = (const struct arc_linux_header *)p;
@@ -294,7 +299,8 @@ arcnet_linux_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, cons
 		archdrlen = ARC_LINUX_HDRNEWLEN;
 		if (caplen < ARC_LINUX_HDRNEWLEN) {
 			nd_print_trunc(ndo);
-			return (caplen);
+			ndo->ndo_ll_header_length += caplen;
+			return;
 		}
 		break;
 	case ARCTYPE_IP_OLD:
@@ -317,7 +323,7 @@ arcnet_linux_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, cons
 	if (!arcnet_encap_print(ndo, arc_type, p, length, caplen))
 		ND_DEFAULTPRINT(p, caplen);
 
-	return (archdrlen);
+	ndo->ndo_ll_header_length += archdrlen;
 }
 
 /*

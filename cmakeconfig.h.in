@@ -30,17 +30,14 @@
 /* Define to 1 if you have the declaration of `ether_ntohost' */
 #cmakedefine HAVE_DECL_ETHER_NTOHOST 1
 
-/* define if you have the dnet_htoa function */
-#cmakedefine HAVE_DNET_HTOA 1
-
 /* Define to 1 if you have the `ether_ntohost' function. */
 #cmakedefine HAVE_ETHER_NTOHOST 1
 
-/* Define to 1 if you have the `EVP_CipherInit_ex' function. */
-#cmakedefine HAVE_EVP_CIPHERINIT_EX 1
-
 /* Define to 1 if you have the `EVP_CIPHER_CTX_new' function. */
 #cmakedefine HAVE_EVP_CIPHER_CTX_NEW 1
+
+/* Define to 1 if you have the `EVP_DecryptInit_ex' function. */
+#cmakedefine HAVE_EVP_DECRYPTINIT_EX 1
 
 /* Define to 1 if you have the <fcntl.h> header file. */
 #cmakedefine HAVE_FCNTL_H 1
@@ -71,12 +68,6 @@
 
 /* Define to 1 if you have the <memory.h> header file. */
 #cmakedefine HAVE_MEMORY_H 1
-
-/* Define to 1 if you have the <netdnet/dnetdb.h> header file. */
-#cmakedefine HAVE_NETDNET_DNETDB_H 1
-
-/* Define to 1 if you have the <netdnet/dn.h> header file. */
-#cmakedefine HAVE_NETDNET_DN_H 1
 
 /* Define to 1 if you have the <net/if.h> header file. */
 #cmakedefine HAVE_NET_IF_H 1
@@ -186,9 +177,6 @@
 /* Define to 1 if you have the `setlinebuf' function. */
 #cmakedefine HAVE_SETLINEBUF 1
 
-/* Define to 1 if you have the `snprintf' function. */
-#cmakedefine HAVE_SNPRINTF 1
-
 /* Define to 1 if you have the <stdint.h> header file. */
 #cmakedefine HAVE_STDINT_H 1
 
@@ -216,9 +204,6 @@
 /* Define to 1 if you have the `strsep' function. */
 #cmakedefine HAVE_STRSEP 1
 
-/* Define to 1 if the system has the type `struct dn_naddr'. */
-#cmakedefine HAVE_STRUCT_DN_NADDR 1
-
 /* Define to 1 if the system has the type `struct ether_addr'. */
 #cmakedefine HAVE_STRUCT_ETHER_ADDR 1
 
@@ -237,17 +222,11 @@
 /* Define to 1 if you have the `vfork' function. */
 #cmakedefine HAVE_VFORK 1
 
-/* Define to 1 if you have the `vsnprintf' function. */
-#cmakedefine HAVE_VSNPRINTF 1
-
 /* Define to 1 if you have the `wsockinit' function. */
 #cmakedefine HAVE_WSOCKINIT 1
 
 /* define if libpcap has yydebug */
 #cmakedefine HAVE_YYDEBUG 1
-
-/* Define to 1 if netenet/dnetdb.h declares `dnet_htoa' */
-#cmakedefine NETDNET_DNETDB_H_DECLARES_DNET_HTOA 1
 
 /* Define to 1 if netinet/ether.h declares `ether_ntohost' */
 #cmakedefine NETINET_ETHER_H_DECLARES_ETHER_NTOHOST 1

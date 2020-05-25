@@ -615,7 +615,7 @@ Wed.	April 25, 2007. ken@xelerance.com.  Summary for 3.9.6 tcpdump release
 	Add support for CFM Link-trace msg, Link-trace-Reply msg,
 	 Sender-ID tlv, private tlv, port, interface status
 	Add support for unidirectional link detection as per
-	 http://www.ietf.org/internet-drafts/draft-foschiano-udld-02.txt
+	 https://tools.ietf.org/id/draft-foschiano-udld-02.txt
 	Add support for the olsr protocol as per RFC 3626 plus the LQ
 	 extensions from olsr.org
 	Add support for variable-length checksum in DCCP, as per section 9 of
@@ -720,7 +720,7 @@ Tue.   March 30, 2004. mcr@sandelman.ottawa.on.ca. Summary for 3.8.3 release
 Mon.   March 29, 2004. mcr@sandelman.ottawa.on.ca. Summary for 3.8.2 release
 
 	Fixes for print-isakmp.c      CVE:    CAN-2004-0183, CAN-2004-0184
-			     http://www.rapid7.com/advisories/R7-0017.html
+	https://web.archive.org/web/20160328035955/https://www.rapid7.com/resources/advisories/R7-0017.jsp
 	IP-over-IEEE1394 printing.
 	some MINGW32 changes.
 	updates for autoconf 2.5

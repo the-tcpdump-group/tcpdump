@@ -95,21 +95,22 @@ pktap_header_print(netdissect_options *ndo, const u_char *bp, u_int length)
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
+void
 pktap_if_print(netdissect_options *ndo,
                const struct pcap_pkthdr *h, const u_char *p)
 {
 	uint32_t dlt, hdrlen, rectype;
 	u_int caplen = h->caplen;
 	u_int length = h->len;
-	if_printer printer;
+	if_printer_t printer;
 	const pktap_header_t *hdr;
 	struct pcap_pkthdr nhdr;
 
-	ndo->ndo_protocol = "pktap_if";
+	ndo->ndo_protocol = "pktap";
 	if (caplen < sizeof(pktap_header_t)) {
 		nd_print_trunc(ndo);
-		return (caplen);
+		ndo->ndo_ll_header_length += caplen;
+		return;
 	}
 	hdr = (const pktap_header_t *)p;
 	dlt = GET_LE_U_4(hdr->pkt_dlt);
@@ -123,11 +124,13 @@ pktap_if_print(netdissect_options *ndo,
 		 * be expanded in the future)?
 		 */
 		nd_print_trunc(ndo);
-		return (caplen);
+		ndo->ndo_ll_header_length += caplen;
+		return;
 	}
 	if (caplen < hdrlen) {
 		nd_print_trunc(ndo);
-		return (caplen);
+		ndo->ndo_ll_header_length += caplen;
+		return;
 	}
 
 	if (ndo->ndo_eflag)
@@ -145,11 +148,16 @@ pktap_if_print(netdissect_options *ndo,
 		break;
 
 	case PKT_REC_PACKET:
-		if ((printer = lookup_printer(dlt)) != NULL) {
+		printer = lookup_printer(ndo, dlt);
+		if (printer.printer != NULL) {
 			nhdr = *h;
 			nhdr.caplen = caplen;
 			nhdr.len = length;
-			hdrlen += printer(ndo, &nhdr, p);
+			if (ndo->ndo_void_printer == TRUE) {
+				printer.void_printer(ndo, &nhdr, p);
+				hdrlen += ndo->ndo_ll_header_length;
+			} else
+				hdrlen += printer.uint_printer(ndo, &nhdr, p);
 		} else {
 			if (!ndo->ndo_eflag)
 				pktap_header_print(ndo, (const u_char *)hdr,
@@ -161,6 +169,7 @@ pktap_if_print(netdissect_options *ndo,
 		break;
 	}
 
-	return (hdrlen);
+	ndo->ndo_ll_header_length += hdrlen;
+	return;
 }
 #endif /* DLT_PKTAP */

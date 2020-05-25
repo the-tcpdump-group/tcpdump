@@ -1360,10 +1360,10 @@ lldp_network_addr_print(netdissect_options *ndo, const u_char *tptr, u_int len)
     }
 
     if (!pfunc) {
-        nd_snprintf(buf, sizeof(buf), "AFI %s (%u), no AF printer !",
+        snprintf(buf, sizeof(buf), "AFI %s (%u), no AF printer !",
                  tok2str(af_values, "Unknown", af), af);
     } else {
-        nd_snprintf(buf, sizeof(buf), "AFI %s (%u): %s",
+        snprintf(buf, sizeof(buf), "AFI %s (%u): %s",
                  tok2str(af_values, "Unknown", af), af, (*pfunc)(ndo, tptr+1));
     }
 
@@ -1495,7 +1495,7 @@ lldp_print(netdissect_options *ndo,
                     if (tlv_len < 1+6) {
                         goto trunc;
                     }
-                    ND_PRINT("%s", etheraddr_string(ndo, tptr + 1));
+                    ND_PRINT("%s", GET_ETHERADDR_STRING(tptr + 1));
                     break;
 
                 case LLDP_CHASSIS_INTF_NAME_SUBTYPE: /* fall through */
@@ -1536,7 +1536,7 @@ lldp_print(netdissect_options *ndo,
                     if (tlv_len < 1+6) {
                         goto trunc;
                     }
-                    ND_PRINT("%s", etheraddr_string(ndo, tptr + 1));
+                    ND_PRINT("%s", GET_ETHERADDR_STRING(tptr + 1));
                     break;
 
                 case LLDP_PORT_INTF_NAME_SUBTYPE: /* fall through */

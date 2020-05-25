@@ -46,11 +46,12 @@
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
-#include <ctype.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "netdissect-ctype.h"
 
 #include "netdissect.h"
 #include "extract.h"
@@ -72,7 +73,7 @@ fn_print_char(netdissect_options *ndo, u_char c)
 		c = ND_TOASCII(c);
 		ND_PRINT("M-");
 	}
-	if (!ND_ISPRINT(c)) {
+	if (!ND_ASCII_ISPRINT(c)) {
 		c ^= 0x40;	/* DEL to ?, others to alpha */
 		ND_PRINT("^");
 	}
@@ -231,7 +232,7 @@ nd_printzp(netdissect_options *ndo,
  * Print the timestamp .FRAC part (Microseconds/nanoseconds)
  */
 static void
-ts_frac_print(netdissect_options *ndo, int usec)
+ts_frac_print(netdissect_options *ndo, long usec)
 {
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
 	switch (ndo->ndo_tstamp_precision) {
@@ -259,7 +260,7 @@ ts_frac_print(netdissect_options *ndo, int usec)
  *   if date_flag == WITH_DATE print YY:MM:DD before HH:MM:SS.FRAC
  */
 static void
-ts_date_hmsfrac_print(netdissect_options *ndo, int sec, int usec,
+ts_date_hmsfrac_print(netdissect_options *ndo, long sec, long usec,
 		      enum date_flag date_flag, enum time_flag time_flag)
 {
 	time_t Time = sec;
@@ -293,7 +294,7 @@ ts_date_hmsfrac_print(netdissect_options *ndo, int sec, int usec,
  * Print the timestamp - Unix timeval style, as SECS.FRAC.
  */
 static void
-ts_unix_print(netdissect_options *ndo, int sec, int usec)
+ts_unix_print(netdissect_options *ndo, long sec, long usec)
 {
 	if ((unsigned)sec & 0x80000000) {
 		ND_PRINT("[Error converting time]");
@@ -456,7 +457,7 @@ void nd_print_protocol_caps(netdissect_options *ndo)
 {
 	const char *p;
         for (p = ndo->ndo_protocol; *p != '\0'; p++)
-                ND_PRINT("%c", ND_TOUPPER((u_char)*p));
+                ND_PRINT("%c", ND_ASCII_TOUPPER(*p));
 }
 
 /* Print the invalid string */
@@ -507,7 +508,7 @@ tok2strbuf(const struct tok *lp, const char *fmt,
 	if (fmt == NULL)
 		fmt = "#%d";
 
-	(void)nd_snprintf(buf, bufsize, fmt, v);
+	(void)snprintf(buf, bufsize, fmt, v);
 	return (const char *)buf;
 }
 
@@ -579,7 +580,7 @@ bittok2str_internal(const struct tok *lp, const char *fmt,
 
         if (bufp == buf)
             /* bummer - lets print the "unknown" message as advised in the fmt string if we got one */
-            (void)nd_snprintf(buf, sizeof(buf), fmt == NULL ? "#%08x" : fmt, v);
+            (void)snprintf(buf, sizeof(buf), fmt == NULL ? "#%08x" : fmt, v);
         return (buf);
 }
 
@@ -621,7 +622,7 @@ tok2strary_internal(const char **lp, int n, const char *fmt,
 		return lp[v];
 	if (fmt == NULL)
 		fmt = "#%d";
-	(void)nd_snprintf(buf, sizeof(buf), fmt, v);
+	(void)snprintf(buf, sizeof(buf), fmt, v);
 	return (buf);
 }
 
@@ -703,21 +704,23 @@ fetch_token(netdissect_options *ndo, const u_char *pptr, u_int idx, u_int len,
     u_char *tbuf, size_t tbuflen)
 {
 	size_t toklen = 0;
+	u_char c;
 
 	for (; idx < len; idx++) {
 		if (!ND_TTEST_1(pptr + idx)) {
 			/* ran past end of captured data */
 			return (0);
 		}
-		if (!isascii(GET_U_1(pptr + idx))) {
+		c = GET_U_1(pptr + idx);
+		if (!ND_ISASCII(c)) {
 			/* not an ASCII character */
 			return (0);
 		}
-		if (isspace(GET_U_1(pptr + idx))) {
+		if (c == ' ' || c == '\t' || c == '\r' || c == '\n') {
 			/* end of token */
 			break;
 		}
-		if (!isprint(GET_U_1(pptr + idx))) {
+		if (!ND_ASCII_ISPRINT(c)) {
 			/* not part of a command token or response code */
 			return (0);
 		}
@@ -725,7 +728,7 @@ fetch_token(netdissect_options *ndo, const u_char *pptr, u_int idx, u_int len,
 			/* no room for this character and terminating '\0' */
 			return (0);
 		}
-		tbuf[toklen] = GET_U_1(pptr + idx);
+		tbuf[toklen] = c;
 		toklen++;
 	}
 	if (toklen == 0) {
@@ -743,15 +746,16 @@ fetch_token(netdissect_options *ndo, const u_char *pptr, u_int idx, u_int len,
 			/* ran past end of captured data */
 			break;
 		}
-		if (GET_U_1(pptr + idx) == '\r' || GET_U_1(pptr + idx) == '\n') {
+		c = GET_U_1(pptr + idx);
+		if (c == '\r' || c == '\n') {
 			/* end of line */
 			break;
 		}
-		if (!isascii(GET_U_1(pptr + idx)) || !isprint(GET_U_1(pptr + idx))) {
+		if (!ND_ASCII_ISPRINT(c)) {
 			/* not a printable ASCII character */
 			break;
 		}
-		if (!isspace(GET_U_1(pptr + idx))) {
+		if (c != ' ' && c != '\t' && c != '\r' && c != '\n') {
 			/* beginning of next token */
 			break;
 		}
@@ -771,11 +775,13 @@ print_txt_line(netdissect_options *ndo, const char *prefix,
 {
 	u_int startidx;
 	u_int linelen;
+	u_char c;
 
 	startidx = idx;
 	while (idx < len) {
 		ND_TCHECK_1(pptr + idx);
-		if (GET_U_1(pptr + idx) == '\n') {
+		c = GET_U_1(pptr + idx);
+		if (c == '\n') {
 			/*
 			 * LF without CR; end of line.
 			 * Skip the LF and print the line, with the
@@ -784,7 +790,7 @@ print_txt_line(netdissect_options *ndo, const char *prefix,
 			linelen = idx - startidx;
 			idx++;
 			goto print;
-		} else if (GET_U_1(pptr + idx) == '\r') {
+		} else if (c == '\r') {
 			/* CR - any LF? */
 			if ((idx+1) >= len) {
 				/* not in this packet */
@@ -808,9 +814,7 @@ print_txt_line(netdissect_options *ndo, const char *prefix,
 			 * it.
 			 */
 			return (0);
-		} else if (!isascii(GET_U_1(pptr + idx)) ||
-			   (!isprint(GET_U_1(pptr + idx)) &&
-			    GET_U_1(pptr + idx) != '\t')) {
+		} else if (!ND_ASCII_ISPRINT(c) && c != '\t') {
 			/*
 			 * Not a printable ASCII character and not a tab;
 			 * treat this as if it were binary data, and
@@ -884,8 +888,8 @@ txtproto_print(netdissect_options *ndo, const u_char *pptr, u_int len,
 				    sizeof(token));
 			}
 			if (idx != 0) {
-				if (isdigit(token[0]) && isdigit(token[1]) &&
-				    isdigit(token[2]) && token[3] == '\0') {
+				if (ND_ASCII_ISDIGIT(token[0]) && ND_ASCII_ISDIGIT(token[1]) &&
+				    ND_ASCII_ISDIGIT(token[2]) && token[3] == '\0') {
 					/* Yes. */
 					print_this = 1;
 				}

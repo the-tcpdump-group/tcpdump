@@ -151,7 +151,7 @@ ahcp_ipv6_addresses_print(netdissect_options *ndo, const u_char *cp, const u_cha
 		if (cp + 16 > ep)
 			goto invalid;
 		ND_TCHECK_16(cp);
-		ND_PRINT("%s%s", sep, ip6addr_string(ndo, cp));
+		ND_PRINT("%s%s", sep, GET_IP6ADDR_STRING(cp));
 		cp += 16;
 		sep = ", ";
 	}
@@ -175,7 +175,7 @@ ahcp_ipv4_addresses_print(netdissect_options *ndo, const u_char *cp, const u_cha
 		if (cp + 4 > ep)
 			goto invalid;
 		ND_TCHECK_4(cp);
-		ND_PRINT("%s%s", sep, ipaddr_string(ndo, cp));
+		ND_PRINT("%s%s", sep, GET_IPADDR_STRING(cp));
 		cp += 4;
 		sep = ", ";
 	}
@@ -199,7 +199,7 @@ ahcp_ipv6_prefixes_print(netdissect_options *ndo, const u_char *cp, const u_char
 		if (cp + 17 > ep)
 			goto invalid;
 		ND_TCHECK_LEN(cp, 17);
-		ND_PRINT("%s%s/%u", sep, ip6addr_string(ndo, cp),
+		ND_PRINT("%s%s/%u", sep, GET_IP6ADDR_STRING(cp),
 			 GET_U_1(cp + 16));
 		cp += 17;
 		sep = ", ";
@@ -224,7 +224,7 @@ ahcp_ipv4_prefixes_print(netdissect_options *ndo, const u_char *cp, const u_char
 		if (cp + 5 > ep)
 			goto invalid;
 		ND_TCHECK_5(cp);
-		ND_PRINT("%s%s/%u", sep, ipaddr_string(ndo, cp),
+		ND_PRINT("%s%s/%u", sep, GET_IPADDR_STRING(cp),
 			 GET_U_1(cp + 4));
 		cp += 5;
 		sep = ", ";
@@ -388,11 +388,11 @@ ahcp_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 				cp += 4;
 				/* Source Id */
 				ND_TCHECK_8(cp);
-				ND_PRINT(", Source Id %s", linkaddr_string(ndo, cp, 0, 8));
+				ND_PRINT(", Source Id %s", GET_LINKADDR_STRING(cp, LINKADDR_OTHER, 8));
 				cp += 8;
 				/* Destination Id */
 				ND_TCHECK_8(cp);
-				ND_PRINT(", Destination Id %s", linkaddr_string(ndo, cp, 0, 8));
+				ND_PRINT(", Destination Id %s", GET_LINKADDR_STRING(cp, LINKADDR_OTHER, 8));
 				cp += 8;
 			}
 			/* Body */

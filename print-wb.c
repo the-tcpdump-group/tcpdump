@@ -46,7 +46,7 @@
  * an even multiple of DOP_ALIGN bytes, which must be a power of two.
  */
 #define DOP_ALIGN 4
-#define DOP_ROUNDUP(x)	((((int)(x)) + (DOP_ALIGN - 1)) & ~(DOP_ALIGN - 1))
+#define DOP_ROUNDUP(x)	roundup2(x, DOP_ALIGN)
 #define DOP_NEXT(d)\
 	((const struct dophdr *)((const u_char *)(d) + \
 				DOP_ROUNDUP(GET_BE_U_2((d)->dh_len) + sizeof(*(d)))))
@@ -192,10 +192,10 @@ wb_id(netdissect_options *ndo,
 
 	ND_PRINT(" %u/%s:%u (max %u/%s:%u) ",
 	       GET_BE_U_4(id->pi_ps.slot),
-	       ipaddr_string(ndo, id->pi_ps.page.p_sid),
+	       GET_IPADDR_STRING(id->pi_ps.page.p_sid),
 	       GET_BE_U_4(id->pi_ps.page.p_uid),
 	       GET_BE_U_4(id->pi_mslot),
-	       ipaddr_string(ndo, id->pi_mpage.p_sid),
+	       GET_IPADDR_STRING(id->pi_mpage.p_sid),
 	       GET_BE_U_4(id->pi_mpage.p_uid));
 
 	nid = GET_BE_U_2(id->pi_ps.nid);
@@ -211,7 +211,7 @@ wb_id(netdissect_options *ndo,
 	c = '<';
 	for (i = 0; i < nid && ND_TTEST_SIZE(io); ++io, ++i) {
 		ND_PRINT("%c%s:%u",
-		    c, ipaddr_string(ndo, io->id), GET_BE_U_4(io->off));
+		    c, GET_IPADDR_STRING(io->id), GET_BE_U_4(io->off));
 		c = ',';
 	}
 	if (i >= nid) {
@@ -230,8 +230,8 @@ wb_rreq(netdissect_options *ndo,
 		return (-1);
 
 	ND_PRINT(" please repair %s %s:%u<%u:%u>",
-	       ipaddr_string(ndo, rreq->pr_id),
-	       ipaddr_string(ndo, rreq->pr_page.p_sid),
+	       GET_IPADDR_STRING(rreq->pr_id),
+	       GET_IPADDR_STRING(rreq->pr_page.p_sid),
 	       GET_BE_U_4(rreq->pr_page.p_uid),
 	       GET_BE_U_4(rreq->pr_sseq),
 	       GET_BE_U_4(rreq->pr_eseq));
@@ -248,7 +248,7 @@ wb_preq(netdissect_options *ndo,
 
 	ND_PRINT(" need %u/%s:%u",
 	       GET_BE_U_4(preq->pp_low),
-	       ipaddr_string(ndo, preq->pp_page.p_sid),
+	       GET_IPADDR_STRING(preq->pp_page.p_sid),
 	       GET_BE_U_4(preq->pp_page.p_uid));
 	return (0);
 }
@@ -272,11 +272,11 @@ wb_prep(netdissect_options *ndo,
 
 		ND_PRINT(" %u/%s:%u",
 		    GET_BE_U_4(ps->slot),
-		    ipaddr_string(ndo, ps->page.p_sid),
+		    GET_IPADDR_STRING(ps->page.p_sid),
 		    GET_BE_U_4(ps->page.p_uid));
 		io = (const struct id_off *)(ps + 1);
 		for (ie = io + GET_U_1(ps->nid); io < ie && ND_TTEST_SIZE(io); ++io) {
-			ND_PRINT("%c%s:%u", c, ipaddr_string(ndo, io->id),
+			ND_PRINT("%c%s:%u", c, GET_IPADDR_STRING(io->id),
 			    GET_BE_U_4(io->off));
 			c = ',';
 		}
@@ -356,8 +356,8 @@ wb_rrep(netdissect_options *ndo,
 	len -= sizeof(*rrep);
 
 	ND_PRINT(" for %s %s:%u<%u:%u>",
-	    ipaddr_string(ndo, rrep->pr_id),
-	    ipaddr_string(ndo, dop->pd_page.p_sid),
+	    GET_IPADDR_STRING(rrep->pr_id),
+	    GET_IPADDR_STRING(dop->pd_page.p_sid),
 	    GET_BE_U_4(dop->pd_page.p_uid),
 	    GET_BE_U_4(dop->pd_sseq),
 	    GET_BE_U_4(dop->pd_eseq));
@@ -379,7 +379,7 @@ wb_drawop(netdissect_options *ndo,
 	len -= sizeof(*dop);
 
 	ND_PRINT(" %s:%u<%u:%u>",
-	    ipaddr_string(ndo, dop->pd_page.p_sid),
+	    GET_IPADDR_STRING(dop->pd_page.p_sid),
 	    GET_BE_U_4(dop->pd_page.p_uid),
 	    GET_BE_U_4(dop->pd_sseq),
 	    GET_BE_U_4(dop->pd_eseq));

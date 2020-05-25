@@ -388,8 +388,8 @@ slow_marker_lacp_print(netdissect_options *ndo,
 
         /* length includes the type and length fields */
         if (tlv_len < sizeof(struct tlv_header_t)) {
-            ND_PRINT("\n\t    ERROR: illegal length - should be >= %lu",
-                   (unsigned long) sizeof(struct tlv_header_t));
+            ND_PRINT("\n\t    ERROR: illegal length - should be >= %zu",
+                   sizeof(struct tlv_header_t));
             return;
         }
 
@@ -409,8 +409,8 @@ slow_marker_lacp_print(netdissect_options *ndo,
         case ((SLOW_PROTO_LACP << 8) + LACP_TLV_PARTNER_INFO):
             if (tlv_tlen !=
                 sizeof(struct lacp_tlv_actor_partner_info_t)) {
-                ND_PRINT("\n\t    ERROR: illegal length - should be %lu",
-                       (unsigned long) (sizeof(struct tlv_header_t) + sizeof(struct lacp_tlv_actor_partner_info_t)));
+                ND_PRINT("\n\t    ERROR: illegal length - should be %zu",
+                       sizeof(struct tlv_header_t) + sizeof(struct lacp_tlv_actor_partner_info_t));
                 goto badlength;
             }
 
@@ -418,7 +418,7 @@ slow_marker_lacp_print(netdissect_options *ndo,
 
             ND_PRINT("\n\t  System %s, System Priority %u, Key %u"
                    ", Port %u, Port Priority %u\n\t  State Flags [%s]",
-                   etheraddr_string(ndo, tlv_ptr.lacp_tlv_actor_partner_info->sys),
+                   GET_ETHERADDR_STRING(tlv_ptr.lacp_tlv_actor_partner_info->sys),
                    GET_BE_U_2(tlv_ptr.lacp_tlv_actor_partner_info->sys_pri),
                    GET_BE_U_2(tlv_ptr.lacp_tlv_actor_partner_info->key),
                    GET_BE_U_2(tlv_ptr.lacp_tlv_actor_partner_info->port),
@@ -432,8 +432,8 @@ slow_marker_lacp_print(netdissect_options *ndo,
         case ((SLOW_PROTO_LACP << 8) + LACP_TLV_COLLECTOR_INFO):
             if (tlv_tlen !=
                 sizeof(struct lacp_tlv_collector_info_t)) {
-                ND_PRINT("\n\t    ERROR: illegal length - should be %lu",
-                       (unsigned long) (sizeof(struct tlv_header_t) + sizeof(struct lacp_tlv_collector_info_t)));
+                ND_PRINT("\n\t    ERROR: illegal length - should be %zu",
+                       sizeof(struct tlv_header_t) + sizeof(struct lacp_tlv_collector_info_t));
                 goto badlength;
             }
 
@@ -447,15 +447,15 @@ slow_marker_lacp_print(netdissect_options *ndo,
         case ((SLOW_PROTO_MARKER << 8) + MARKER_TLV_MARKER_INFO):
             if (tlv_tlen !=
                 sizeof(struct marker_tlv_marker_info_t)) {
-                ND_PRINT("\n\t    ERROR: illegal length - should be %lu",
-                       (unsigned long) (sizeof(struct tlv_header_t) + sizeof(struct marker_tlv_marker_info_t)));
+                ND_PRINT("\n\t    ERROR: illegal length - should be %zu",
+                       sizeof(struct tlv_header_t) + sizeof(struct marker_tlv_marker_info_t));
                 goto badlength;
             }
 
             tlv_ptr.marker_tlv_marker_info = (const struct marker_tlv_marker_info_t *)tlv_tptr;
 
             ND_PRINT("\n\t  Request System %s, Request Port %u, Request Transaction ID 0x%08x",
-                   etheraddr_string(ndo, tlv_ptr.marker_tlv_marker_info->req_sys),
+                   GET_ETHERADDR_STRING(tlv_ptr.marker_tlv_marker_info->req_sys),
                    GET_BE_U_2(tlv_ptr.marker_tlv_marker_info->req_port),
                    GET_BE_U_4(tlv_ptr.marker_tlv_marker_info->req_trans_id));
 
@@ -575,8 +575,8 @@ slow_oam_print(netdissect_options *ndo,
 
                 if (GET_U_1(tlv.slow_oam_info->info_length) !=
                     sizeof(struct slow_oam_info_t)) {
-                    ND_PRINT("\n\t    ERROR: illegal length - should be %lu",
-                           (unsigned long) sizeof(struct slow_oam_info_t));
+                    ND_PRINT("\n\t    ERROR: illegal length - should be %zu",
+                           sizeof(struct slow_oam_info_t));
                     hexdump = TRUE;
                     goto badlength_code_info;
                 }
@@ -676,8 +676,8 @@ slow_oam_print(netdissect_options *ndo,
 
                 if (GET_U_1(tlv.slow_oam_link_event->event_length) !=
                     sizeof(struct slow_oam_link_event_t)) {
-                    ND_PRINT("\n\t    ERROR: illegal length - should be %lu",
-                           (unsigned long) sizeof(struct slow_oam_link_event_t));
+                    ND_PRINT("\n\t    ERROR: illegal length - should be %zu",
+                           sizeof(struct slow_oam_link_event_t));
                     hexdump = TRUE;
                     goto badlength_event_notif;
                 }

@@ -37,7 +37,7 @@
 #include "ipproto.h"
 
 void
-ip_print_demux(netdissect_options *ndo,
+ip_demux_print(netdissect_options *ndo,
 	       const u_char *bp,
 	       u_int length, u_int ver, int fragmented, u_int ttl_hl,
 	       uint8_t nh, const u_char *iph)
@@ -105,11 +105,23 @@ again:
 		break;
 
 	case IPPROTO_ICMP:
-		icmp_print(ndo, bp, length, iph, fragmented);
+		if (ver == 4)
+			icmp_print(ndo, bp, length, iph, fragmented);
+		else {
+			ND_PRINT("[%s requires IPv4]",
+				 tok2str(ipproto_values,"unknown",nh));
+			nd_print_invalid(ndo);
+		}
 		break;
 
 	case IPPROTO_ICMPV6:
-		icmp6_print(ndo, bp, length, iph, fragmented);
+		if (ver == 6)
+			icmp6_print(ndo, bp, length, iph, fragmented);
+		else {
+			ND_PRINT("[%s requires IPv6]",
+				 tok2str(ipproto_values,"unknown",nh));
+			nd_print_invalid(ndo);
+		}
 		break;
 
 	case IPPROTO_PIGP:
@@ -149,7 +161,13 @@ again:
 		break;
 
 	case IPPROTO_IGMP:
-		igmp_print(ndo, bp, length);
+		if (ver == 4)
+			igmp_print(ndo, bp, length);
+		else {
+			ND_PRINT("[%s requires IPv4]",
+				 tok2str(ipproto_values,"unknown",nh));
+			nd_print_invalid(ndo);
+		}
 		break;
 
 	case IPPROTO_IPV4:

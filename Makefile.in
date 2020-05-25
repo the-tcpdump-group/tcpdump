@@ -32,6 +32,7 @@ mandir = @mandir@
 
 # VPATH
 srcdir = @srcdir@
+top_srcdir = @top_srcdir@
 VPATH = @srcdir@
 
 #
@@ -70,7 +71,7 @@ DEPENDENCY_CFLAG = @DEPENDENCY_CFLAG@
 	@rm -f $@
 	$(CC) $(FULL_CFLAGS) -c $(srcdir)/$*.c
 
-CSRC =	tcpdump.c
+CSRC =	fptype.c tcpdump.c
 
 LIBNETDISSECT_SRC=\
 	addrtoname.c \
@@ -87,6 +88,7 @@ LIBNETDISSECT_SRC=\
 	netdissect.c \
 	netdissect-alloc.c \
 	nlpid.c \
+	ntp.c \
 	oui.c \
 	parsenfsfh.c \
 	print.c \
@@ -104,6 +106,7 @@ LIBNETDISSECT_SRC=\
 	print-atalk.c \
 	print-atm.c \
 	print-babel.c \
+	print-bcm-li.c \
 	print-beep.c \
 	print-bfd.c \
 	print-bgp.c \
@@ -145,8 +148,8 @@ LIBNETDISSECT_SRC=\
 	print-icmp6.c \
 	print-igmp.c \
 	print-igrp.c \
-	print-ip.c \
 	print-ip-demux.c \
+	print-ip.c \
 	print-ip6.c \
 	print-ip6opts.c \
 	print-ipcomp.c \
@@ -195,6 +198,7 @@ LIBNETDISSECT_SRC=\
 	print-ppp.c \
 	print-pppoe.c \
 	print-pptp.c \
+	print-ptp.c \
 	print-radius.c \
 	print-raw.c \
 	print-resp.c \
@@ -214,6 +218,7 @@ LIBNETDISSECT_SRC=\
 	print-slow.c \
 	print-smtp.c \
 	print-snmp.c \
+	print-someip.c \
 	print-ssh.c \
 	print-stp.c \
 	print-sunatm.c \
@@ -228,14 +233,15 @@ LIBNETDISSECT_SRC=\
 	print-token.c \
 	print-udld.c \
 	print-udp.c \
+	print-unsupported.c \
 	print-usb.c \
 	print-vjc.c \
 	print-vqp.c \
 	print-vrrp.c \
 	print-vsock.c \
 	print-vtp.c \
-	print-vxlan.c \
 	print-vxlan-gpe.c \
+	print-vxlan.c \
 	print-wb.c \
 	print-zep.c \
 	print-zephyr.c \
@@ -269,6 +275,7 @@ HDR = \
 	cpack.h \
 	ethertype.h \
 	extract.h \
+	fptype.h \
 	funcattrs.h \
 	getservent.h \
 	gmpls.h \
@@ -284,10 +291,12 @@ HDR = \
 	nameser.h \
 	netdissect.h \
 	netdissect-alloc.h \
+	netdissect-ctype.h \
 	netdissect-stdinc.h \
 	nfs.h \
 	nfsfh.h \
 	nlpid.h \
+	ntp.h \
 	openflow.h \
 	ospf.h \
 	oui.h \
@@ -316,7 +325,8 @@ TAGHDR = \
 	/usr/include/netinet/udp.h \
 	/usr/include/protocols/routed.h
 
-TAGFILES = $(SRC) $(HDR) $(TAGHDR) $(LIBNETDISSECT_SRC)
+TAGFILES = $(SRC) $(HDR) $(TAGHDR) $(LIBNETDISSECT_SRC) \
+	print-pflog.c print-smb.c smbutil.c
 
 CLEANFILES = $(PROG) $(OBJ) $(GENSRC) $(LIBNETDISSECT_OBJ)
 
@@ -347,6 +357,7 @@ EXTRA_DIST = \
 	config.sub \
 	configure \
 	configure.ac \
+	doc/README.Win32.md \
 	install-sh \
 	lbl/os-osf4.h \
 	lbl/os-solaris2.h \
@@ -374,13 +385,12 @@ EXTRA_DIST = \
 	smbutil.c \
 	stime.awk \
 	tcpdump.1.in \
-	win32/prj/GNUmakefile \
 	win32/prj/WinDump.dsp \
 	win32/prj/WinDump.dsw \
 	win32/prj/WinDump.sln \
 	win32/prj/WinDump.vcproj
 
-TEST_DIST= `find tests \( -name 'DIFF' -prune \) -o \( -name NEW -prune \) -o -type f \! -name '.*' \! -name '*~' -print`
+TEST_DIST= `git ls-files tests | grep -v 'tests/\..*'`
 
 all: $(PROG)
 
@@ -443,7 +453,7 @@ distclean:
 	rm -rf autom4te.cache tests/DIFF tests/NEW
 
 check: tcpdump
-	(cd tests && ./TESTrun.sh)
+	$(srcdir)/tests/TESTrun
 
 extags: $(TAGFILES)
 	ctags $(TAGFILES)
@@ -455,7 +465,7 @@ TAGS: $(TAGFILES)
 	etags $(TAGFILES)
 
 releasetar:
-	@cwd=`pwd` ; dir=`basename $$cwd` ; name=$(PROG)-`cat VERSION` ; \
+	@name=$(PROG)-`cat VERSION` ; \
 	   mkdir $$name; \
 	   tar cf - $(CSRC) $(HDR) $(LIBNETDISSECT_SRC) $(EXTRA_DIST) $(TEST_DIST) | (cd $$name; tar xf -); \
 	   tar -c -z -f $$name.tar.gz $$name; \
@@ -465,4 +475,4 @@ testlist:
 	echo $(TEST_DIST)
 
 depend: $(GENSRC)
-	$(MKDEP) -c "$(CC)" -m "$(DEPENDENCY_CFLAG)" $(DEFS) $(INCLS) $(SRC) $(LIBNETDISSECT_SRC)
+	$(MKDEP) -c "$(CC)" -m "$(DEPENDENCY_CFLAG)" -s "$(srcdir)" $(DEFS) $(INCLS) $(SRC) $(LIBNETDISSECT_SRC)

@@ -165,7 +165,7 @@ ip6_finddst(netdissect_options *ndo, nd_ipv6 *dst,
 
 done:
 trunc:
-	UNALIGNED_MEMCPY(dst, dst_addr, sizeof(nd_ipv6));
+	GET_CPY_BYTES(dst, dst_addr, sizeof(nd_ipv6));
 }
 
 /*
@@ -188,7 +188,7 @@ nextproto6_cksum(netdissect_options *ndo,
 
         /* pseudo-header */
         memset(&ph, 0, sizeof(ph));
-        UNALIGNED_MEMCPY(&ph.ph_src, ip6->ip6_src, sizeof (nd_ipv6));
+        GET_CPY_BYTES(&ph.ph_src, ip6->ip6_src, sizeof(nd_ipv6));
         nh = GET_U_1(ip6->ip6_nxt);
         switch (nh) {
 
@@ -207,8 +207,7 @@ nextproto6_cksum(netdissect_options *ndo,
                 break;
 
         default:
-                UNALIGNED_MEMCPY(&ph.ph_dst, ip6->ip6_dst,
-                                 sizeof (nd_ipv6));
+                GET_CPY_BYTES(&ph.ph_dst, ip6->ip6_dst, sizeof(nd_ipv6));
                 break;
         }
         ph.ph_len = htonl(len);
@@ -334,8 +333,8 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		if (cp == (const u_char *)(ip6 + 1) &&
 		    nh != IPPROTO_TCP && nh != IPPROTO_UDP &&
 		    nh != IPPROTO_DCCP && nh != IPPROTO_SCTP) {
-			ND_PRINT("%s > %s: ", ip6addr_string(ndo, ip6->ip6_src),
-				     ip6addr_string(ndo, ip6->ip6_dst));
+			ND_PRINT("%s > %s: ", GET_IP6ADDR_STRING(ip6->ip6_src),
+				     GET_IP6ADDR_STRING(ip6->ip6_dst));
 		}
 
 		switch (nh) {
@@ -469,8 +468,8 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 					len -= total_advance;
 				}
 			}
-			ip_print_demux(ndo, cp, len, 6, fragmented,
-			    GET_U_1(ip6->ip6_hlim), nh, bp);
+			ip_demux_print(ndo, cp, len, 6, fragmented,
+				       GET_U_1(ip6->ip6_hlim), nh, bp);
 			nd_pop_packet_info(ndo);
 			return;
 		}

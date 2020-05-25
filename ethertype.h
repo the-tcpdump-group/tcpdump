@@ -113,8 +113,8 @@
 #endif
 
 /* see:
-        http://en.wikipedia.org/wiki/IEEE_802.1Q
-    and http://en.wikipedia.org/wiki/QinQ
+        https://en.wikipedia.org/wiki/IEEE_802.1Q
+    and https://en.wikipedia.org/wiki/QinQ
 */
 #ifndef	ETHERTYPE_8021Q9100
 #define	ETHERTYPE_8021Q9100	0x9100
@@ -178,6 +178,9 @@
 #endif
 #ifndef ETHERTYPE_AOE
 #define ETHERTYPE_AOE  		0x88a2
+#endif
+#ifndef ETHERTYPE_PTP
+#define ETHERTYPE_PTP  		0x88f7
 #endif
 #ifndef	ETHERTYPE_LOOPBACK
 #define	ETHERTYPE_LOOPBACK	0x9000

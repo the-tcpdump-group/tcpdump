@@ -55,7 +55,7 @@
 
 /*
  * The following constants are defined by IANA. Please refer to
- *    http://www.isi.edu/in-notes/iana/assignments/ppp-numbers
+ *    https://www.isi.edu/in-notes/iana/assignments/ppp-numbers
  * for the up-to-date information.
  */
 
@@ -753,7 +753,7 @@ print_lcp_config_options(netdissect_options *ndo,
 				return 0;
 			}
 			ND_TCHECK_4(p + 3);
-			ND_PRINT(": IPv4 %s", ipaddr_string(ndo, p + 3));
+			ND_PRINT(": IPv4 %s", GET_IPADDR_STRING(p + 3));
 			break;
 		case MEDCLASS_MAC:
 			if (len != 9) {
@@ -761,7 +761,7 @@ print_lcp_config_options(netdissect_options *ndo,
 				return 0;
 			}
 			ND_TCHECK_6(p + 3);
-			ND_PRINT(": MAC %s", etheraddr_string(ndo, p + 3));
+			ND_PRINT(": MAC %s", GET_ETHERADDR_STRING(p + 3));
 			break;
 		case MEDCLASS_MNB:
 			ND_PRINT(": Magic-Num-Block"); /* XXX */
@@ -1084,8 +1084,8 @@ print_ipcp_config_options(netdissect_options *ndo,
 		}
 		ND_TCHECK_4(p + 6);
 		ND_PRINT(": src %s, dst %s",
-		       ipaddr_string(ndo, p + 2),
-		       ipaddr_string(ndo, p + 6));
+		       GET_IPADDR_STRING(p + 2),
+		       GET_IPADDR_STRING(p + 6));
 		break;
 	case IPCPOPT_IPCOMP:
 		if (len < 4) {
@@ -1170,7 +1170,7 @@ print_ipcp_config_options(netdissect_options *ndo,
 			return 0;
 		}
 		ND_TCHECK_4(p + 2);
-		ND_PRINT(": %s", ipaddr_string(ndo, p + 2));
+		ND_PRINT(": %s", GET_IPADDR_STRING(p + 2));
 		break;
 	default:
 		/*
@@ -1404,19 +1404,28 @@ trunc:
 	return 0;
 }
 
+/*
+ * Un-escape RFC 1662 PPP in HDLC-like framing, with octet escapes.
+ * The length argument is the on-the-wire length, not the captured
+ * length; we can only un-escape the captured part.
+ */
 static void
 ppp_hdlc(netdissect_options *ndo,
          const u_char *p, u_int length)
 {
+	u_int caplen = ndo->ndo_snapend - p;
 	u_char *b, *t, c;
 	const u_char *s;
 	u_int i, proto;
 	const void *se;
 
+	if (caplen == 0)
+		return;
+
         if (length == 0)
                 return;
 
-	b = (u_char *)nd_malloc(ndo, length);
+	b = (u_char *)nd_malloc(ndo, caplen);
 	if (b == NULL)
 		return;
 
@@ -1425,11 +1434,11 @@ ppp_hdlc(netdissect_options *ndo,
 	 * Do this so that we dont overwrite the original packet
 	 * contents.
 	 */
-	for (s = p, t = b, i = length; i != 0 && ND_TTEST_1(s); i--) {
+	for (s = p, t = b, i = caplen; i != 0; i--) {
 		c = GET_U_1(s);
 		s++;
 		if (c == 0x7d) {
-			if (i <= 1 || !ND_TTEST_1(s))
+			if (i <= 1)
 				break;
 			i--;
 			c = GET_U_1(s) ^ 0x20;

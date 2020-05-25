@@ -46,7 +46,7 @@ typedef struct _bluetooth_h4_header {
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
+void
 bt_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int length = h->len;
@@ -55,22 +55,21 @@ bt_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *
 
 	ndo->ndo_protocol = "bluetooth";
 	nd_print_protocol(ndo);
-	if (caplen < BT_HDRLEN)
-		goto trunc;
+	if (caplen < BT_HDRLEN) {
+		ndo->ndo_ll_header_length += caplen;
+		nd_print_trunc(ndo);
+		return;
+	}
+	ndo->ndo_ll_header_length += BT_HDRLEN;
 	caplen -= BT_HDRLEN;
 	length -= BT_HDRLEN;
 	p += BT_HDRLEN;
-	ND_TCHECK_4(hdr->direction);
 	if (ndo->ndo_eflag)
 		ND_PRINT(", hci length %u, direction %s", length,
 			 (GET_BE_U_4(hdr->direction)&0x1) ? "in" : "out");
 
 	if (!ndo->ndo_suppress_default_print)
 		ND_DEFAULTPRINT(p, caplen);
-	return (BT_HDRLEN);
-
-trunc:
-	nd_print_trunc(ndo);
-	return (BT_HDRLEN);
+	return;
 }
 #endif

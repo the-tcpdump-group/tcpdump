@@ -381,7 +381,7 @@ numstr(int x)
 {
 	static char buf[20];
 
-	nd_snprintf(buf, sizeof(buf), "%#x", x);
+	snprintf(buf, sizeof(buf), "%#x", x);
 	return buf;
 }
 

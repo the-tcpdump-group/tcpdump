@@ -150,6 +150,8 @@ The Regents of the University of California.  All rights reserved.\n";
 
 #include "print.h"
 
+#include "fptype.h"
+
 #ifndef PATH_MAX
 #define PATH_MAX 1024
 #endif
@@ -208,6 +210,7 @@ static int Iflag;			/* rfmon (monitor) mode */
 static int Jflag;			/* list available time stamp types */
 static int jflag = -1;			/* packet time stamp source */
 #endif
+static int lflag;			/* line-buffered output */
 static int pflag;			/* don't go promiscuous */
 #ifdef HAVE_PCAP_SETDIRECTION
 static int Qflag = -1;			/* restrict captured packet by send/receive direction */
@@ -218,9 +221,11 @@ static int Uflag;			/* "unbuffered" output of dump files */
 static int Wflag;			/* recycle output files after this number of files */
 static int WflagChars;
 static char *zflag = NULL;		/* compress each savefile using a specified command (like gzip or bzip2) */
+static int timeout = 1000;		/* default timeout = 1000 ms = 1 s */
 #ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
 static int immediate_mode;
 #endif
+static int count_mode;
 
 static int infodelay;
 static int infoprint;
@@ -690,7 +695,9 @@ show_remote_devices_and_exit(void)
 #define OPTION_LIST_REMOTE_INTERFACES	132
 #define OPTION_TSTAMP_MICRO		133
 #define OPTION_TSTAMP_NANO		134
-#define OPTION_LIMIT_CAPTURE_SIZE	135
+#define OPTION_FP_TYPE			135
+#define OPTION_COUNT			136
+#define OPTION_LIMIT_CAPTURE_SIZE	137
 
 static const struct option longopts[] = {
 #if defined(HAVE_PCAP_CREATE) || defined(_WIN32)
@@ -734,6 +741,8 @@ static const struct option longopts[] = {
 	{ "debug-filter-parser", no_argument, NULL, 'Y' },
 #endif
 	{ "relinquish-privileges", required_argument, NULL, 'Z' },
+	{ "count", no_argument, NULL, OPTION_COUNT },
+	{ "fp-type", no_argument, NULL, OPTION_FP_TYPE },
 	{ "limit-capture-size", required_argument, NULL, OPTION_LIMIT_CAPTURE_SIZE },
 	{ "number", no_argument, NULL, '#' },
 	{ "print", no_argument, NULL, OPTION_PRINT },
@@ -902,7 +911,7 @@ MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
 	if (cnt == 0 && max_chars == 0)
 		strncpy(buffer, filename, PATH_MAX + 1);
 	else
-		if (nd_snprintf(buffer, PATH_MAX + 1, "%s%0*d", filename, max_chars, cnt) > PATH_MAX)
+		if (snprintf(buffer, PATH_MAX + 1, "%s%0*d", filename, max_chars, cnt) > PATH_MAX)
                   /* Report an error if the filename is too large */
                   error("too many output files or filename is too long (> %d)", PATH_MAX);
         free(filename);
@@ -912,13 +921,15 @@ static char *
 get_next_file(FILE *VFile, char *ptr)
 {
 	char *ret;
+	size_t len;
 
 	ret = fgets(ptr, PATH_MAX, VFile);
 	if (!ret)
 		return NULL;
 
-	if (ptr[strlen(ptr) - 1] == '\n')
-		ptr[strlen(ptr) - 1] = '\0';
+	len = strlen (ptr);
+	if (len > 0 && ptr[len - 1] == '\n')
+		ptr[len - 1] = '\0';
 
 	return ret;
 }
@@ -988,7 +999,7 @@ tstamp_precision_to_string(int precision)
  * necessary to make the standard I/O library work with an fdopen()ed
  * FILE * from that descriptor.
  *
- * A long time ago, in a galaxy far far away, AT&T decided that, instead
+ * A long time ago in a galaxy far, far away, AT&T decided that, instead
  * of providing separate APIs for getting and setting the FD_ flags on a
  * descriptor, getting and setting the O_ flags on a descriptor, and
  * locking files, they'd throw them all into a kitchen-sink fcntl() call
@@ -1099,7 +1110,8 @@ copy_argv(char **argv)
 static char *
 read_infile(char *fname)
 {
-	int i, fd, cc;
+	int i, fd;
+	ssize_t cc;
 	char *cp;
 	struct stat buf;
 
@@ -1118,7 +1130,7 @@ read_infile(char *fname)
 	if (cc < 0)
 		error("read %s: %s", fname, pcap_strerror(errno));
 	if (cc != buf.st_size)
-		error("short read %s (%d != %d)", fname, cc, (int)buf.st_size);
+		error("short read %s (%zd != %d)", fname, cc, (int)buf.st_size);
 
 	close(fd);
 	/* replace "# comment" with spaces */
@@ -1284,7 +1296,7 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 		 */
 		*ebuf = '\0';
 		pc = pcap_open(device, ndo->ndo_snaplen,
-		    pflag ? 0 : PCAP_OPENFLAG_PROMISCUOUS, 1000, NULL,
+		    pflag ? 0 : PCAP_OPENFLAG_PROMISCUOUS, timeout, NULL,
 		    ebuf);
 		if (pc == NULL) {
 			/*
@@ -1366,7 +1378,7 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 			error("%s: Can't set monitor mode: %s",
 			    device, pcap_statustostr(status));
 	}
-	status = pcap_set_timeout(pc, 1000);
+	status = pcap_set_timeout(pc, timeout);
 	if (status != 0)
 		error("%s: pcap_set_timeout failed: %s",
 		    device, pcap_statustostr(status));
@@ -1400,10 +1412,8 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 			/*
 			 * Return an error for our caller to handle.
 			 */
-			nd_snprintf(ebuf, PCAP_ERRBUF_SIZE, "%s: %s\n(%s)",
+			snprintf(ebuf, PCAP_ERRBUF_SIZE, "%s: %s\n(%s)",
 			    device, pcap_statustostr(status), cp);
-			pcap_close(pc);
-			return (NULL);
 		} else if (status == PCAP_ERROR_PERM_DENIED && *cp != '\0')
 			error("%s: %s\n(%s)", device,
 			    pcap_statustostr(status), cp);
@@ -1414,7 +1424,7 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 			char sysctl[32];
 			size_t s = sizeof(parent);
 
-			nd_snprintf(sysctl, sizeof(sysctl),
+			snprintf(sysctl, sizeof(sysctl),
 			    "net.wlan.%d.%%parent", atoi(device + 4));
 			sysctlbyname(sysctl, parent, &s, NULL, 0);
 			strlcpy(newdev, device, sizeof(newdev));
@@ -1434,6 +1444,8 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 		else
 			error("%s: %s", device,
 			    pcap_statustostr(status));
+		pcap_close(pc);
+		return (NULL);
 	} else if (status > 0) {
 		/*
 		 * pcap_activate() succeeded, but it's warning us
@@ -1465,8 +1477,8 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 	 * specified, default to 256KB.
 	 */
 	if (ndo->ndo_snaplen == 0)
-		ndo->ndo_snaplen = 262144;
-	pc = pcap_open_live(device, ndo->ndo_snaplen, !pflag, 1000, ebuf);
+		ndo->ndo_snaplen = MAXIMUM_SNAPLEN;
+	pc = pcap_open_live(device, ndo->ndo_snaplen, !pflag, timeout, ebuf);
 	if (pc == NULL) {
 		/*
 		 * If this failed with "No such device", that means
@@ -1502,8 +1514,10 @@ main(int argc, char **argv)
 	u_char *pcap_userdata;
 	char ebuf[PCAP_ERRBUF_SIZE];
 	char VFileLine[PATH_MAX + 1];
-	char *username = NULL;
-	char *chroot_dir = NULL;
+	const char *username = NULL;
+#ifndef _WIN32
+	const char *chroot_dir = NULL;
+#endif
 	char *ret = NULL;
 	char *end;
 #ifdef HAVE_PCAP_FINDALLDEVS
@@ -1707,6 +1721,7 @@ main(int argc, char **argv)
 			setvbuf(stdout, NULL, _IOLBF, 0);
 #endif
 #endif /* _WIN32 */
+			lflag = 1;
 			break;
 
 		case 'K':
@@ -1771,7 +1786,7 @@ main(int argc, char **argv)
 			break;
 
 		case 's':
-			ndo->ndo_snaplen = strtol(optarg, &end, 0);
+			ndo->ndo_snaplen = (int)strtol(optarg, &end, 0);
 			if (optarg == end || *end != '\0'
 			    || ndo->ndo_snaplen < 0 || ndo->ndo_snaplen > MAXIMUM_SNAPLEN)
 				error("invalid snaplen %s (must be >= 0 and <= %d)",
@@ -1821,6 +1836,12 @@ main(int argc, char **argv)
 				ndo->ndo_packettype = PT_LMP;
 			else if (ascii_strcasecmp(optarg, "resp") == 0)
 				ndo->ndo_packettype = PT_RESP;
+			else if (ascii_strcasecmp(optarg, "ptp") == 0)
+				ndo->ndo_packettype = PT_PTP;
+			else if (ascii_strcasecmp(optarg, "someip") == 0)
+				ndo->ndo_packettype = PT_SOMEIP;
+			else if (ascii_strcasecmp(optarg, "domain") == 0)
+				ndo->ndo_packettype = PT_DOMAIN;
 			else
 				error("unknown packet type `%s'", optarg);
 			break;
@@ -1925,6 +1946,21 @@ main(int argc, char **argv)
 			break;
 #endif
 
+		case OPTION_FP_TYPE:
+			/*
+			 * Print out the type of floating-point arithmetic
+			 * we're doing; it's probably IEEE, unless somebody
+			 * tries to run this on a VAX, but the precision
+			 * may differ (e.g., it might be 32-bit, 64-bit,
+			 * or 80-bit).
+			 */
+			float_type_check(0x4e93312d);
+			return 0;
+
+		case OPTION_COUNT:
+			count_mode = 1;
+			break;
+
 		default:
 			print_usage();
 			exit_tcpdump(S_ERR_HOST_PROGRAM);
@@ -1938,6 +1974,14 @@ main(int argc, char **argv)
 #ifdef HAVE_PCAP_FINDALLDEVS_EX
 	if (remote_interfaces_source != NULL)
 		show_remote_devices_and_exit();
+#endif
+
+#if defined(DLT_LINUX_SLL2) && defined(HAVE_PCAP_SET_DATALINK)
+/* Set default linktype DLT_LINUX_SLL2 when capturing on the "any" device */
+		if (device != NULL &&
+		    strncmp (device, "any", strlen("any")) == 0
+		    && yflag_dlt == -1)
+			yflag_dlt = DLT_LINUX_SLL2;
 #endif
 
 	switch (ndo->ndo_tflag) {
@@ -1961,19 +2005,18 @@ main(int argc, char **argv)
 	if (VFileName != NULL && RFileName != NULL)
 		error("-V and -r are mutually exclusive.");
 
-#ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
 	/*
-	 * If we're printing dissected packets to the standard output
-	 * and the standard output is a terminal, use immediate mode,
-	 * as the user's probably expecting to see packets pop up
-	 * immediately.
+	 * If we're printing dissected packets to the standard output,
+	 * and either the standard output is a terminal or we're doing
+	 * "line" buffering, set the capture timeout to .1 second rather
+	 * than 1 second, as the user's probably expecting to see packets
+	 * pop up immediately shortly after they arrive.
 	 *
-	 * XXX - set the timeout to a lower value, instead?  If so,
-	 * what value would be appropriate?
+	 * XXX - would there be some value appropriate for all cases,
+	 * based on, say, the buffer size and packet input rate?
 	 */
-	if ((WFileName == NULL || print) && isatty(1))
-		immediate_mode = 1;
-#endif
+	if ((WFileName == NULL || print) && (isatty(1) || lflag))
+		timeout = 100;
 
 #ifdef WITH_CHROOT
 	/* if run as root, prepare for chrooting */
@@ -2061,6 +2104,29 @@ main(int argc, char **argv)
 		if (dlt == DLT_LINUX_SLL2)
 			fprintf(stderr, "Warning: interface names might be incorrect\n");
 #endif
+	} else if (dflag && !device) {
+		int dump_dlt = DLT_EN10MB;
+		/*
+		 * We're dumping the compiled code without an explicit
+		 * device specification.  (If a device is specified, we
+		 * definitely want to open it to use the DLT of that device.)
+		 * Either default to DLT_EN10MB with a warning, or use
+		 * the user-specified value if supplied.
+		 */
+		/*
+		 * If no snapshot length was specified, or a length of 0 was
+		 * specified, default to 256KB.
+		 */
+		if (ndo->ndo_snaplen == 0)
+			ndo->ndo_snaplen = MAXIMUM_SNAPLEN;
+		/*
+		 * If a DLT was specified with the -y flag, use that instead.
+		 */
+		if (yflag_dlt != -1)
+			dump_dlt = yflag_dlt;
+		else
+			fprintf(stderr, "Warning: assuming Ethernet\n");
+	        pd = pcap_open_dead(dump_dlt, ndo->ndo_snaplen);
 	} else {
 		/*
 		 * We're doing a live capture.
@@ -2166,7 +2232,8 @@ main(int argc, char **argv)
 			}
 #endif
 			(void)fprintf(stderr, "%s: data link type %s\n",
-				      program_name, yflag_dlt_name);
+				      program_name,
+				      pcap_datalink_val_to_name(yflag_dlt));
 			(void)fflush(stderr);
 		}
 		i = pcap_snapshot(pd);
@@ -2447,7 +2514,7 @@ DIAG_ON_CLANG(assign-enum)
 		 */
 		if (!ndo->ndo_vflag && !WFileName) {
 			(void)fprintf(stderr,
-			    "%s: verbose output suppressed, use -v or -vv for full protocol decode\n",
+			    "%s: verbose output suppressed, use -v[v]... for full protocol decode\n",
 			    program_name);
 		} else
 			(void)fprintf(stderr, "%s: ", program_name);
@@ -2589,6 +2656,10 @@ DIAG_ON_CLANG(assign-enum)
 		}
 	}
 	while (ret != NULL);
+
+	if (count_mode && RFileName != NULL)
+		fprintf(stderr, "%u packet%s\n", packets_captured,
+			PLURAL_SUFFIX(packets_captured));
 
 	free(cmdbuf);
 	pcap_freecode(&fcode);
@@ -3062,7 +3133,8 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 
 	++infodelay;
 
-	pretty_print_packet((netdissect_options *)user, h, sp, packets_captured);
+	if (!count_mode)
+		pretty_print_packet((netdissect_options *)user, h, sp, packets_captured);
 
 	--infodelay;
 	if (infoprint)
@@ -3151,15 +3223,14 @@ print_version(void)
 	smi_version_string = nd_smi_version_string();
 	if (smi_version_string != NULL)
 		(void)fprintf (stderr, "SMI-library: %s\n", smi_version_string);
-#ifdef HAVE_DNET_HTOA
-	(void)fprintf(stderr, "libdnet unknown version\n");
-#endif
 
 #if defined(__SANITIZE_ADDRESS__)
 	(void)fprintf (stderr, "Compiled with AddressSanitizer/GCC.\n");
 #elif defined(__has_feature)
 #  if __has_feature(address_sanitizer)
-	(void)fprintf (stderr, "Compiled with AddressSanitizer/CLang.\n");
+	(void)fprintf (stderr, "Compiled with AddressSanitizer/Clang.\n");
+#  elif __has_feature(memory_sanitizer)
+	(void)fprintf (stderr, "Compiled with MemorySanitizer/Clang.\n");
 #  endif
 #endif /* __SANITIZE_ADDRESS__ or __has_feature */
 }
@@ -3170,7 +3241,7 @@ print_usage(void)
 {
 	print_version();
 	(void)fprintf(stderr,
-"Usage: %s [-aAbd" D_FLAG "efhH" I_FLAG J_FLAG "KlLnNOpqStu" U_FLAG "vxX#]" B_FLAG_USAGE " [ -c count ]\n", program_name);
+"Usage: %s [-Abd" D_FLAG "efhH" I_FLAG J_FLAG "KlLnNOpqStu" U_FLAG "vxX#]" B_FLAG_USAGE " [ -c count ] [--count]\n", program_name);
 	(void)fprintf(stderr,
 "\t\t[ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]\n");
 	(void)fprintf(stderr,

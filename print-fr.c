@@ -36,7 +36,6 @@
 #include "llc.h"
 #include "nlpid.h"
 #include "extract.h"
-#include "oui.h"
 
 static void frf15_print(netdissect_options *ndo, const u_char *, u_int);
 
@@ -152,7 +151,7 @@ q922_string(netdissect_options *ndo, const u_char *p, u_int length)
     memset(buffer, 0, sizeof(buffer));
 
     if (parse_q922_header(ndo, p, &dlci, &addr_len, &flags, length) == 1){
-        nd_snprintf(buffer, sizeof(buffer), "DLCI %u", dlci);
+        snprintf(buffer, sizeof(buffer), "DLCI %u", dlci);
     }
 
     return buffer;
@@ -458,7 +457,13 @@ mfr_print(netdissect_options *ndo,
  */
 
     ndo->ndo_protocol = "mfr";
-    ND_TCHECK_4(p); /* minimum frame header length */
+
+    if (length < 4) {	/* minimum frame header length */
+        ND_PRINT("[length %u < 4]", length);
+        nd_print_invalid(ndo);
+        return length;
+    }
+    ND_TCHECK_4(p);
 
     if ((GET_U_1(p) & MFR_BEC_MASK) == MFR_CTRL_FRAME && GET_U_1(p + 1) == 0) {
         ND_PRINT("FRF.16 Control, Flags [%s], %s, length %u",
@@ -495,6 +500,12 @@ mfr_print(netdissect_options *ndo,
             switch (ie_type) {
 
             case MFR_CTRL_IE_MAGIC_NUM:
+                /* FRF.16.1 Section 3.4.3 Magic Number Information Element */
+                if (ie_len != 4) {
+                    ND_PRINT("[IE data length %d != 4]", ie_len);
+                    nd_print_invalid(ndo);
+                    break;
+                }
                 ND_PRINT("0x%08x", GET_BE_U_4(tptr));
                 break;
 

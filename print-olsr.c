@@ -244,7 +244,7 @@ olsr_print_lq_neighbor4(netdissect_options *ndo,
 
         ND_PRINT("\n\t      neighbor %s, link-quality %.2f%%"
                ", neighbor-link-quality %.2f%%",
-               ipaddr_string(ndo, lq_neighbor->neighbor),
+               GET_IPADDR_STRING(lq_neighbor->neighbor),
                ((double) GET_U_1(lq_neighbor->link_quality)/2.55),
                ((double) GET_U_1(lq_neighbor->neighbor_link_quality)/2.55));
 
@@ -269,7 +269,7 @@ olsr_print_lq_neighbor6(netdissect_options *ndo,
 
         ND_PRINT("\n\t      neighbor %s, link-quality %.2f%%"
                ", neighbor-link-quality %.2f%%",
-               ip6addr_string(ndo, lq_neighbor->neighbor),
+               GET_IP6ADDR_STRING(lq_neighbor->neighbor),
                ((double) GET_U_1(lq_neighbor->link_quality)/2.55),
                ((double) GET_U_1(lq_neighbor->neighbor_link_quality)/2.55));
 
@@ -298,7 +298,7 @@ olsr_print_neighbor(netdissect_options *ndo,
         ND_TCHECK_LEN(msg_data, sizeof(nd_ipv4));
         /* print 4 neighbors per line */
 
-        ND_PRINT("%s%s", ipaddr_string(ndo, msg_data),
+        ND_PRINT("%s%s", GET_IPADDR_STRING(msg_data),
                neighbor % 4 == 0 ? "\n\t\t" : " ");
 
         msg_data += sizeof(nd_ipv4);
@@ -382,7 +382,7 @@ olsr_print(netdissect_options *ndo,
             ND_PRINT("\n\t%s Message (%#04x), originator %s, ttl %u, hop %u"
                     "\n\t  vtime %.3fs, msg-seq 0x%04x, length %u%s",
                     tok2str(olsr_msg_values, "Unknown", msg_type),
-                    msg_type, ip6addr_string(ndo, msgptr.v6->originator),
+                    msg_type, GET_IP6ADDR_STRING(msgptr.v6->originator),
                     GET_U_1(msgptr.v6->ttl),
                     GET_U_1(msgptr.v6->hopcount),
                     ME_TO_DOUBLE(GET_U_1(msgptr.v6->vtime)),
@@ -413,7 +413,7 @@ olsr_print(netdissect_options *ndo,
             ND_PRINT("\n\t%s Message (%#04x), originator %s, ttl %u, hop %u"
                     "\n\t  vtime %.3fs, msg-seq 0x%04x, length %u%s",
                     tok2str(olsr_msg_values, "Unknown", msg_type),
-                    msg_type, ipaddr_string(ndo, msgptr.v4->originator),
+                    msg_type, GET_IPADDR_STRING(msgptr.v4->originator),
                     GET_U_1(msgptr.v4->ttl),
                     GET_U_1(msgptr.v4->hopcount),
                     ME_TO_DOUBLE(GET_U_1(msgptr.v4->vtime)),
@@ -527,8 +527,8 @@ olsr_print(netdissect_options *ndo,
             while (msg_tlen >= addr_size) {
                 ND_TCHECK_LEN(msg_data, addr_size);
                 ND_PRINT("\n\t  interface address %s",
-                        is_ipv6 ? ip6addr_string(ndo, msg_data) :
-                        ipaddr_string(ndo, msg_data));
+                        is_ipv6 ? GET_IP6ADDR_STRING(msg_data) :
+                        GET_IPADDR_STRING(msg_data));
 
                 msg_data += addr_size;
                 msg_tlen -= addr_size;
@@ -552,7 +552,7 @@ olsr_print(netdissect_options *ndo,
                     hna6 = (const struct olsr_hna6 *)msg_data;
 
                     ND_PRINT("\n\t    #%i: %s/%u",
-                            i, ip6addr_string(ndo, hna6->network),
+                            i, GET_IP6ADDR_STRING(hna6->network),
                             mask62plen (hna6->mask));
 
                     msg_data += sizeof(struct olsr_hna6);
@@ -608,7 +608,7 @@ olsr_print(netdissect_options *ndo,
                         /* normal route */
                         ND_PRINT("%s%s/%u",
                                 col == 0 ? "\n\t    " : ", ",
-                                ipaddr_string(ndo, ptr.hna->network),
+                                GET_IPADDR_STRING(ptr.hna->network),
                                 mask2plen(GET_BE_U_4(ptr.hna->mask)));
                     }
 
@@ -687,10 +687,10 @@ olsr_print(netdissect_options *ndo,
 
                 if (is_ipv6)
                     ND_PRINT(", address %s, name \"",
-                            ip6addr_string(ndo, msg_data));
+                            GET_IP6ADDR_STRING(msg_data));
                 else
                     ND_PRINT(", address %s, name \"",
-                            ipaddr_string(ndo, msg_data));
+                            GET_IPADDR_STRING(msg_data));
                 (void)nd_printn(ndo, msg_data + addr_size, name_entry_len, NULL);
                 ND_PRINT("\"");
 

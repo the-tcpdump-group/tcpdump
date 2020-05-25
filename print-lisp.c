@@ -308,14 +308,16 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		switch (eid_afi) {
 		case IPv4_AFI:
 			ND_TCHECK_4(packet_iterator + packet_offset);
-			ND_PRINT(" EID %s/%u,", ipaddr_string(ndo,
-				packet_iterator + packet_offset), mask_len);
+			ND_PRINT(" EID %s/%u,",
+				GET_IPADDR_STRING(packet_iterator + packet_offset),
+				mask_len);
 			packet_offset += 4;
 			break;
 		case IPv6_AFI:
 			ND_TCHECK_16(packet_iterator + packet_offset);
-			ND_PRINT(" EID %s/%u,", ip6addr_string(ndo,
-				packet_iterator + packet_offset), mask_len);
+			ND_PRINT(" EID %s/%u,",
+				GET_IP6ADDR_STRING(packet_iterator + packet_offset),
+				mask_len);
 			packet_offset += 16;
 			break;
 		default:
@@ -342,12 +344,12 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			switch (loc_afi) {
 			case IPv4_AFI:
 				ND_TCHECK_4(packet_iterator + packet_offset);
-				ND_PRINT(" LOC %s", ipaddr_string(ndo, loc_ip_pointer));
+				ND_PRINT(" LOC %s", GET_IPADDR_STRING(loc_ip_pointer));
 				packet_offset += 4;
 				break;
 			case IPv6_AFI:
 				ND_TCHECK_16(packet_iterator + packet_offset);
-				ND_PRINT(" LOC %s", ip6addr_string(ndo, loc_ip_pointer));
+				ND_PRINT(" LOC %s", GET_IP6ADDR_STRING(loc_ip_pointer));
 				packet_offset += 16;
 				break;
 			default:

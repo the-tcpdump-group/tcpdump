@@ -480,8 +480,8 @@ static const struct tok rx_ack_reasons[] = {
 
 struct rx_cache_entry {
 	uint32_t	callnum;	/* Call number (net order) */
-	nd_ipv4	client;			/* client IP address (net order) */
-	nd_ipv4	server;			/* server IP address (net order) */
+	uint32_t	client;		/* client IP address (net order) */
+	uint32_t	server;		/* server IP address (net order) */
 	u_int		dport;		/* server port (host order) */
 	uint16_t	serviceId;	/* Service identifier (net order) */
 	uint32_t	opcode;		/* RX opcode (host order) */
@@ -698,8 +698,8 @@ rx_cache_insert(netdissect_options *ndo,
 		rx_cache_next = 0;
 
 	rxent->callnum = GET_BE_U_4(rxh->callNumber);
-	UNALIGNED_MEMCPY(&rxent->client, ip->ip_src, sizeof(uint32_t));
-	UNALIGNED_MEMCPY(&rxent->server, ip->ip_dst, sizeof(uint32_t));
+	rxent->client = GET_IPV4_TO_NETWORK_ORDER(ip->ip_src);
+	rxent->server = GET_IPV4_TO_NETWORK_ORDER(ip->ip_dst);
 	rxent->dport = dport;
 	rxent->serviceId = GET_BE_U_2(rxh->serviceId);
 	rxent->opcode = GET_BE_U_4(bp + sizeof(struct rx_header));
@@ -721,8 +721,8 @@ rx_cache_find(netdissect_options *ndo, const struct rx_header *rxh,
 	uint32_t clip;
 	uint32_t sip;
 
-	UNALIGNED_MEMCPY(&clip, ip->ip_dst, sizeof(uint32_t));
-	UNALIGNED_MEMCPY(&sip, ip->ip_src, sizeof(uint32_t));
+	clip = GET_IPV4_TO_NETWORK_ORDER(ip->ip_dst);
+	sip = GET_IPV4_TO_NETWORK_ORDER(ip->ip_src);
 
 	/* Start the search where we last left off */
 
@@ -730,8 +730,8 @@ rx_cache_find(netdissect_options *ndo, const struct rx_header *rxh,
 	do {
 		rxent = &rx_cache[i];
 		if (rxent->callnum == GET_BE_U_4(rxh->callNumber) &&
-		    GET_IPV4_TO_NETWORK_ORDER(rxent->client) == clip &&
-		    GET_IPV4_TO_NETWORK_ORDER(rxent->server) == sip &&
+		    rxent->client == clip &&
+		    rxent->server == sip &&
 		    rxent->serviceId == GET_BE_U_2(rxh->serviceId) &&
 		    rxent->dport == sport) {
 
@@ -1186,7 +1186,7 @@ acl_print(netdissect_options *ndo,
 	          acl & PRSFS_ADMINISTER ? "a" : "");
 
 	for (i = 0; i < pos; i++) {
-		nd_snprintf(fmt, sizeof(fmt), "%%%ds %%d\n%%n", maxsize - 1);
+		snprintf(fmt, sizeof(fmt), "%%%ds %%d\n%%n", maxsize - 1);
 		if (sscanf((char *) s, fmt, user, &acl, &n) != 2)
 			goto finish;
 		s += n;
@@ -1200,7 +1200,7 @@ acl_print(netdissect_options *ndo,
 	}
 
 	for (i = 0; i < neg; i++) {
-		nd_snprintf(fmt, sizeof(fmt), "%%%ds %%d\n%%n", maxsize - 1);
+		snprintf(fmt, sizeof(fmt), "%%%ds %%d\n%%n", maxsize - 1);
 		if (sscanf((char *) s, fmt, user, &acl, &n) != 2)
 			goto finish;
 		s += n;
@@ -2683,7 +2683,7 @@ ubik_reply_print(netdissect_options *ndo,
 		}
 
 	/*
-	 * Otherwise, print out "yes" it it was a beacon packet (because
+	 * Otherwise, print out "yes" if it was a beacon packet (because
 	 * that's how yes votes are returned, go figure), otherwise
 	 * just print out the error code.
 	 */

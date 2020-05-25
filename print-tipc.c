@@ -23,8 +23,8 @@
 
 /*
  * specification:
- *	http://tipc.sourceforge.net/doc/draft-spec-tipc-07.html
- *	http://tipc.sourceforge.net/doc/tipc_message_formats.html
+ *     https://web.archive.org/web/20150302152944/http://tipc.sourceforge.net/doc/draft-spec-tipc-07.html
+ *     https://web.archive.org/web/20161025110514/http://tipc.sourceforge.net/doc/tipc_message_formats.html
  */
 
 #ifdef HAVE_CONFIG_H
@@ -68,7 +68,7 @@ struct tipc_pkthdr {
 #define TIPC_VER(w0)		(((w0) >> 29) & 0x07)
 #define TIPC_USER(w0)		(((w0) >> 25) & 0x0F)
 #define TIPC_HSIZE(w0)		(((w0) >> 21) & 0x0F)
-#define TIPC_MSIZE(w0)		(((w0) >> 0) & 0xFFFF)
+#define TIPC_MSIZE(w0)		(((w0) >> 0) & 0x1FFFF)
 #define TIPC_MTYPE(w1)		(((w1) >> 29) & 0x07)
 #define TIPC_BROADCAST_ACK(w1)	(((w1) >> 0) & 0xFFFF)
 #define TIPC_LINK_ACK(w2)	(((w2) >> 16) & 0xFFFF)

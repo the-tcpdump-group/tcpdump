@@ -29,7 +29,7 @@
 /*
  * specification:
  *
- * CLNP: ISO 8473 (respective ITU version is at http://www.itu.int/rec/T-REC-X.233/en/)
+ * CLNP: ISO 8473 (respective ITU version is at https://www.itu.int/rec/T-REC-X.233/en/)
  * ES-IS: ISO 9542
  * IS-IS: ISO 10589
  */
@@ -106,7 +106,7 @@ static const struct tok isis_pdu_values[] = {
 #define ISIS_TLV_PART_DIS            4   /* iso10589 */
 #define ISIS_TLV_PREFIX_NEIGH        5   /* iso10589 */
 #define ISIS_TLV_ISNEIGH             6   /* iso10589 */
-#define ISIS_TLV_ISNEIGH_VARLEN      7   /* iso10589 */
+#define ISIS_TLV_INSTANCE_ID         7   /* rfc8202 */
 #define ISIS_TLV_PADDING             8   /* iso10589 */
 #define ISIS_TLV_LSP                 9   /* iso10589 */
 #define ISIS_TLV_AUTH                10  /* iso10589, rfc3567 */
@@ -143,6 +143,7 @@ static const struct tok isis_pdu_values[] = {
 #define ISIS_TLV_MT_IP6_REACH        237 /* draft-ietf-isis-wg-multi-topology-05 */
 #define ISIS_TLV_PTP_ADJ             240 /* rfc3373 */
 #define ISIS_TLV_IIH_SEQNR           241 /* draft-shen-isis-iih-sequence-00 */
+#define ISIS_TLV_ROUTER_CAPABILITY   242 /* rfc7981 */
 #define ISIS_TLV_VENDOR_PRIVATE      250 /* draft-ietf-isis-experimental-tlv-01 */
 #define ISIS_TLV_VENDOR_PRIVATE_MINLEN 3
 
@@ -153,7 +154,7 @@ static const struct tok isis_tlv_values[] = {
     { ISIS_TLV_PART_DIS,           "Partition DIS"},
     { ISIS_TLV_PREFIX_NEIGH,       "Prefix Neighbors"},
     { ISIS_TLV_ISNEIGH,            "IS Neighbor(s)"},
-    { ISIS_TLV_ISNEIGH_VARLEN,     "IS Neighbor(s) (variable length)"},
+    { ISIS_TLV_INSTANCE_ID,        "Instance Identifier"},
     { ISIS_TLV_PADDING,            "Padding"},
     { ISIS_TLV_LSP,                "LSP entries"},
     { ISIS_TLV_AUTH,               "Authentication"},
@@ -187,6 +188,7 @@ static const struct tok isis_tlv_values[] = {
     { ISIS_TLV_MT_IP6_REACH,       "Multi-Topology IP6 Reachability"},
     { ISIS_TLV_PTP_ADJ,            "Point-to-point Adjacency State"},
     { ISIS_TLV_IIH_SEQNR,          "Hello PDU Sequence Number"},
+    { ISIS_TLV_ROUTER_CAPABILITY,  "IS-IS Router Capability"},
     { ISIS_TLV_VENDOR_PRIVATE,     "Vendor Private"},
     { 0, NULL }
 };
@@ -340,6 +342,25 @@ static const struct tok clnp_option_qos_global_values[] = {
     { 0, NULL }
 };
 
+static const struct tok isis_tlv_router_capability_flags[] = {
+    { 0x01, "S bit"},
+    { 0x02, "D bit"},
+    { 0, NULL }
+};
+
+#define ISIS_SUBTLV_ROUTER_CAP_SR 2 /* rfc 8667 */
+
+static const struct tok isis_router_capability_subtlv_values[] = {
+    { ISIS_SUBTLV_ROUTER_CAP_SR, "SR-Capabilities"},
+    { 0, NULL }
+};
+
+static const struct tok isis_router_capability_sr_flags[] = {
+    { 0x80, "ipv4"},
+    { 0x40, "ipv6"},
+    { 0, NULL }
+};
+
 #define ISIS_SUBTLV_EXT_IS_REACH_ADMIN_GROUP           3 /* rfc5305 */
 #define ISIS_SUBTLV_EXT_IS_REACH_LINK_LOCAL_REMOTE_ID  4 /* rfc4205 */
 #define ISIS_SUBTLV_EXT_IS_REACH_LINK_REMOTE_ID        5 /* rfc5305 */
@@ -384,13 +405,40 @@ static const struct tok isis_ext_is_reach_subtlv_values[] = {
 
 #define ISIS_SUBTLV_EXTD_IP_REACH_ADMIN_TAG32          1 /* draft-ietf-isis-admin-tags-01 */
 #define ISIS_SUBTLV_EXTD_IP_REACH_ADMIN_TAG64          2 /* draft-ietf-isis-admin-tags-01 */
+#define ISIS_SUBTLV_EXTD_IP_REACH_PREFIX_SID           3 /* rfc8667 */
 #define ISIS_SUBTLV_EXTD_IP_REACH_MGMT_PREFIX_COLOR  117 /* draft-ietf-isis-wg-multi-topology-05 */
 
 static const struct tok isis_ext_ip_reach_subtlv_values[] = {
     { ISIS_SUBTLV_EXTD_IP_REACH_ADMIN_TAG32,           "32-Bit Administrative tag" },
     { ISIS_SUBTLV_EXTD_IP_REACH_ADMIN_TAG64,           "64-Bit Administrative tag" },
+    { ISIS_SUBTLV_EXTD_IP_REACH_PREFIX_SID,            "Prefix SID" },
     { ISIS_SUBTLV_EXTD_IP_REACH_MGMT_PREFIX_COLOR,     "Management Prefix Color" },
     { 0, NULL }
+};
+
+#define ISIS_PREFIX_SID_FLAG_R 0x80 /* rfc 8667 */
+#define ISIS_PREFIX_SID_FLAG_N 0x40 /* rfc 8667 */
+#define ISIS_PREFIX_SID_FLAG_P 0x20 /* rfc 8667 */
+#define ISIS_PREFIX_SID_FLAG_E 0x10 /* rfc 8667 */
+#define ISIS_PREFIX_SID_FLAG_V 0x08 /* rfc 8667 */
+#define ISIS_PREFIX_SID_FLAG_L 0x04 /* rfc 8667 */
+
+static const struct tok prefix_sid_flag_values[] = {
+    { ISIS_PREFIX_SID_FLAG_R, "Readvertisement"},
+    { ISIS_PREFIX_SID_FLAG_N, "Node"},
+    { ISIS_PREFIX_SID_FLAG_P, "No-PHP"},
+    { ISIS_PREFIX_SID_FLAG_E, "Explicit NULL"},
+    { ISIS_PREFIX_SID_FLAG_V, "Value"},
+    { ISIS_PREFIX_SID_FLAG_L, "Local"},
+    { 0, NULL}
+};
+
+
+/* rfc 8667 */
+static const struct tok prefix_sid_algo_values[] = {
+    { 0, "SPF"},
+    { 1, "strict-SPF"},
+    { 0, NULL}
 };
 
 static const struct tok isis_subtlv_link_attribute_values[] = {
@@ -857,8 +905,8 @@ clnp_print(netdissect_options *ndo,
         if (ndo->ndo_vflag < 1) {
             ND_PRINT("%s%s > %s, %s, length %u",
                    ndo->ndo_eflag ? "" : ", ",
-                   isonsap_string(ndo, source_address, source_address_length),
-                   isonsap_string(ndo, dest_address, dest_address_length),
+                   GET_ISONSAP_STRING(source_address, source_address_length),
+                   GET_ISONSAP_STRING(dest_address, dest_address_length),
                    tok2str(clnp_pdu_values,"unknown (%u)",clnp_pdu_type),
                    length);
             return (1);
@@ -882,9 +930,9 @@ clnp_print(netdissect_options *ndo,
 
         ND_PRINT("\n\tsource address (length %u): %s\n\tdest   address (length %u): %s",
                source_address_length,
-               isonsap_string(ndo, source_address, source_address_length),
+               GET_ISONSAP_STRING(source_address, source_address_length),
                dest_address_length,
-               isonsap_string(ndo, dest_address, dest_address_length));
+               GET_ISONSAP_STRING(dest_address, dest_address_length));
 
         if (clnp_flags & CLNP_SEGMENT_PART) {
                 if (li_remaining < sizeof(struct clnp_segment_header_t)) {
@@ -973,7 +1021,7 @@ clnp_print(netdissect_options *ndo,
                                                   source_address_length);
                                     ND_PRINT("\n\t    NSAP address (length %u): %s",
                                            source_address_length,
-                                           isonsap_string(ndo, source_address, source_address_length));
+                                           GET_ISONSAP_STRING(source_address, source_address_length));
                             }
                             tlen-=source_address_length+1;
                     }
@@ -1214,7 +1262,7 @@ esis_print(netdissect_options *ndo,
 		dst = pptr;
 		pptr += dstl;
                 li -= dstl;
-		ND_PRINT("\n\t  %s", isonsap_string(ndo, dst, dstl));
+		ND_PRINT("\n\t  %s", GET_ISONSAP_STRING(dst, dstl));
 
 		ND_TCHECK_1(pptr);
 		if (li < 1) {
@@ -1251,15 +1299,15 @@ esis_print(netdissect_options *ndo,
 		if (snpal == 6)
 			ND_PRINT("\n\t  SNPA (length: %u): %s",
 			       snpal,
-			       etheraddr_string(ndo, snpa));
+			       GET_ETHERADDR_STRING(snpa));
 		else
 			ND_PRINT("\n\t  SNPA (length: %u): %s",
 			       snpal,
-			       linkaddr_string(ndo, snpa, LINKADDR_OTHER, snpal));
+			       GET_LINKADDR_STRING(snpa, LINKADDR_OTHER, snpal));
 		if (netal != 0)
 			ND_PRINT("\n\t  NET (length: %u) %s",
 			       netal,
-			       isonsap_string(ndo, neta, netal));
+			       GET_ISONSAP_STRING(neta, netal));
 		break;
 	}
 
@@ -1292,7 +1340,7 @@ esis_print(netdissect_options *ndo,
 		}
                 ND_PRINT("\n\t  NET (length: %u): %s",
                        source_address_length,
-                       isonsap_string(ndo, pptr, source_address_length));
+                       GET_ISONSAP_STRING(pptr, source_address_length));
                 pptr += source_address_length;
                 li -= source_address_length;
                 source_address_number--;
@@ -1314,7 +1362,7 @@ esis_print(netdissect_options *ndo,
                 ND_PRINT(", bad ish/li");
                 return;
             }
-            ND_PRINT("\n\t  NET (length: %u): %s", source_address_length, isonsap_string(ndo, pptr, source_address_length));
+            ND_PRINT("\n\t  NET (length: %u): %s", source_address_length, GET_ISONSAP_STRING(pptr, source_address_length));
             pptr += source_address_length;
             li -= source_address_length;
             break;
@@ -1712,19 +1760,19 @@ isis_print_id(netdissect_options *ndo, const uint8_t *cp, u_int id_len)
     if (sysid_len > id_len)
         sysid_len = id_len;
     for (i = 1; i <= sysid_len; i++) {
-        nd_snprintf(pos, sizeof(id) - (pos - id), "%02x", GET_U_1(cp));
+        snprintf(pos, sizeof(id) - (pos - id), "%02x", GET_U_1(cp));
 	cp++;
 	pos += strlen(pos);
 	if (i == 2 || i == 4)
 	    *pos++ = '.';
 	}
     if (id_len >= NODE_ID_LEN) {
-        nd_snprintf(pos, sizeof(id) - (pos - id), ".%02x", GET_U_1(cp));
+        snprintf(pos, sizeof(id) - (pos - id), ".%02x", GET_U_1(cp));
 	cp++;
 	pos += strlen(pos);
     }
     if (id_len == LSP_ID_LEN)
-        nd_snprintf(pos, sizeof(id) - (pos - id), "-%02x", GET_U_1(cp));
+        snprintf(pos, sizeof(id) - (pos - id), "-%02x", GET_U_1(cp));
     return (id);
 }
 
@@ -1763,9 +1811,9 @@ isis_print_tlv_ip_reach(netdissect_options *ndo,
 
 	while (length > 0) {
 		if ((size_t)length < sizeof(*tlv_ip_reach)) {
-			ND_PRINT("short IPv4 Reachability (%u vs %lu)",
+			ND_PRINT("short IPv4 Reachability (%u vs %zu)",
                                length,
-                               (unsigned long)sizeof(*tlv_ip_reach));
+                               sizeof(*tlv_ip_reach));
 			return (0);
 		}
 
@@ -1776,12 +1824,12 @@ isis_print_tlv_ip_reach(netdissect_options *ndo,
 		if (prefix_len == -1)
 			ND_PRINT("%sIPv4 prefix: %s mask %s",
                                ident,
-			       ipaddr_string(ndo, (tlv_ip_reach->prefix)),
-			       ipaddr_string(ndo, (tlv_ip_reach->mask)));
+			       GET_IPADDR_STRING(tlv_ip_reach->prefix),
+			       GET_IPADDR_STRING(tlv_ip_reach->mask));
 		else
 			ND_PRINT("%sIPv4 prefix: %15s/%u",
                                ident,
-			       ipaddr_string(ndo, (tlv_ip_reach->prefix)),
+			       GET_IPADDR_STRING(tlv_ip_reach->prefix),
 			       prefix_len);
 
 		ND_PRINT(", Distribution: %s, Metric: %u, %s",
@@ -1852,6 +1900,31 @@ isis_print_ip_reach_subtlv(netdissect_options *ndo,
 	    subl-=8;
 	}
 	break;
+    case ISIS_SUBTLV_EXTD_IP_REACH_PREFIX_SID:
+	{
+	    uint8_t algo, flags;
+	    uint32_t sid;
+
+	    flags = GET_U_1(tptr);
+	    algo = GET_U_1(tptr+1);
+
+	    if (flags & ISIS_PREFIX_SID_FLAG_V) {
+		sid = GET_BE_U_3(tptr+2);
+		tptr+=5;
+		subl-=5;
+	    } else {
+		sid = GET_BE_U_4(tptr+2);
+		tptr+=6;
+		subl-=6;
+	    }
+
+	    ND_PRINT(", Flags [%s], Algo %s (%u), %s %u",
+		     bittok2str(prefix_sid_flag_values, "None", flags),
+		     tok2str(prefix_sid_algo_values, "Unknown", algo), algo,
+		     flags & ISIS_PREFIX_SID_FLAG_V ? "label" : "index",
+		     sid);
+	}
+	break;
     default:
 	if (!print_unknown_data(ndo, tptr, "\n\t\t    ", subl))
 	  return(0);
@@ -1913,7 +1986,7 @@ isis_print_ext_is_reach(netdissect_options *ndo,
     if (subtlv_sum_len) {
         ND_PRINT(" (%u)", subtlv_sum_len);
         /* prepend the indent string */
-        nd_snprintf(ident_buffer, sizeof(ident_buffer), "%s  ",ident);
+        snprintf(ident_buffer, sizeof(ident_buffer), "%s  ",ident);
         ident = ident_buffer;
         while (subtlv_sum_len != 0) {
             ND_TCHECK_2(tptr);
@@ -1964,7 +2037,7 @@ isis_print_ext_is_reach(netdissect_options *ndo,
             case ISIS_SUBTLV_EXT_IS_REACH_IPV4_INTF_ADDR:
             case ISIS_SUBTLV_EXT_IS_REACH_IPV4_NEIGHBOR_ADDR:
                 if (subtlv_len >= sizeof(nd_ipv4))
-                    ND_PRINT(", %s", ipaddr_string(ndo, tptr));
+                    ND_PRINT(", %s", GET_IPADDR_STRING(tptr));
                 break;
             case ISIS_SUBTLV_EXT_IS_REACH_MAX_LINK_BW :
             case ISIS_SUBTLV_EXT_IS_REACH_RESERVABLE_BW:
@@ -2208,12 +2281,12 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
     if (afi == AF_INET)
         ND_PRINT("%sIPv4 prefix: %15s/%u",
                ident,
-               ipaddr_string(ndo, prefix),
+               ipaddr_string(ndo, prefix), /* local buffer, not packet data; don't use GET_IPADDR_STRING() */
                bit_length);
     else if (afi == AF_INET6)
         ND_PRINT("%sIPv6 prefix: %s/%u",
                ident,
-               ip6addr_string(ndo, prefix),
+               ip6addr_string(ndo, prefix), /* local buffer, not packet data; don't use GET_IP6ADDR_STRING() */
                bit_length);
 
     ND_PRINT(", Distribution: %s, Metric: %u",
@@ -2246,7 +2319,7 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
             subtlvlen=GET_U_1(tptr + 1);
             tptr+=2;
             /* prepend the indent string */
-            nd_snprintf(ident_buffer, sizeof(ident_buffer), "%s  ",ident);
+            snprintf(ident_buffer, sizeof(ident_buffer), "%s  ",ident);
             if (!isis_print_ip_reach_subtlv(ndo, tptr, subtlvtype, subtlvlen, ident_buffer))
                 return(0);
             tptr+=subtlvlen;
@@ -2256,6 +2329,90 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
     return (processed);
 trunc:
     return 0;
+}
+
+static void
+isis_print_router_cap_subtlv(netdissect_options *ndo, const uint8_t *tptr, uint8_t tlen)
+{
+    uint8_t subt, subl;
+
+    while (tlen >= 2) {
+	ND_TCHECK_LEN(tptr, 2);
+	subt = GET_U_1(tptr);
+	subl = GET_U_1(tptr+1);
+	tlen -= 2;
+	tptr += 2;
+
+	/* first lets see if we know the subTLVs name*/
+	ND_PRINT("\n\t\t%s subTLV #%u, length: %u",
+              tok2str(isis_router_capability_subtlv_values, "unknown", subt),
+              subt, subl);
+
+	/*
+	 * Boundary check.
+	 */
+	if (subl > tlen) {
+	    break;
+	}
+	ND_TCHECK_LEN(tptr, subl);
+
+	switch (subt) {
+	case ISIS_SUBTLV_ROUTER_CAP_SR:
+	    {
+		uint8_t flags, sid_tlen, sid_type, sid_len;
+		uint32_t range;
+		const uint8_t *sid_ptr;
+
+		flags = GET_U_1(tptr);
+		range = GET_BE_U_3(tptr+1);
+		ND_PRINT(", Flags [%s], Range %u",
+			 bittok2str(isis_router_capability_sr_flags, "None", flags),
+			 range);
+		sid_ptr = tptr + 4;
+		sid_tlen = subl - 4;
+
+		while (sid_tlen >= 5) {
+		    sid_type = GET_U_1(sid_ptr);
+		    sid_len = GET_U_1(sid_ptr+1);
+		    sid_tlen -= 2;
+		    sid_ptr += 2;
+
+		    /*
+		     * Boundary check.
+		     */
+		    if (sid_len > sid_tlen) {
+			break;
+		    }
+
+		    switch (sid_type) {
+		    case 1:
+			if (sid_len == 3) {
+			    ND_PRINT(", SID value %u", GET_BE_U_3(sid_ptr));
+			} else if (sid_len == 4) {
+			    ND_PRINT(", SID value %u", GET_BE_U_4(sid_ptr));
+			} else {
+			    ND_PRINT(", Unknown SID length%u", sid_len);
+			}
+			break;
+		    default:
+			print_unknown_data(ndo, sid_ptr, "\n\t\t  ", sid_len);
+		    }
+
+		    sid_ptr += sid_len;
+		    sid_tlen -= sid_len;
+		}
+	    }
+	    break;
+	default:
+	    print_unknown_data(ndo, tptr, "\n\t\t", subl);
+	    break;
+	}
+
+	tlen -= subl;
+	tptr += subl;
+    }
+ trunc:
+    return;
 }
 
 /*
@@ -2277,6 +2434,14 @@ isis_clear_checksum_lifetime(void *header)
  * Decode IS-IS packets.  Return 0 on error.
  */
 
+#define INVALID_OR_DECREMENT(length,decr) \
+    if ((length) < (decr)) { \
+        ND_PRINT(" [packet length %u < %zu]", (length), (decr)); \
+        nd_print_invalid(ndo); \
+        return 1; \
+    } \
+    length -= (decr);
+
 static int
 isis_print(netdissect_options *ndo,
            const uint8_t *p, u_int length)
@@ -2295,14 +2460,14 @@ isis_print(netdissect_options *ndo,
     const struct isis_tlv_es_reach *tlv_es_reach;
 
     uint8_t version, pdu_version, fixed_len;
-    uint8_t pdu_type, pdu_max_area, max_area, pdu_id_length, id_length, tlv_type, tlv_len, tlen, alen, lan_alen, prefix_len;
+    uint8_t pdu_type, pdu_max_area, max_area, pdu_id_length, id_length, tlv_type, tlv_len, tlen, alen, prefix_len;
     u_int ext_is_len, ext_ip_len;
     uint8_t mt_len;
     uint8_t isis_subtlv_idrp;
     const uint8_t *optr, *pptr, *tptr;
     u_int packet_len;
     u_short pdu_len, key_id;
-    u_int i,vendor_id;
+    u_int i,vendor_id, num_vals;
     uint8_t auth_type;
     uint8_t num_system_ids;
     int sigcheck;
@@ -2435,8 +2600,8 @@ isis_print(netdissect_options *ndo,
     case ISIS_PDU_L1_LAN_IIH:
     case ISIS_PDU_L2_LAN_IIH:
         if (fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_IIH_LAN_HEADER_SIZE)) {
-            ND_PRINT(", bogus fixed header length %u should be %lu",
-                     fixed_len, (unsigned long)(ISIS_COMMON_HEADER_SIZE+ISIS_IIH_LAN_HEADER_SIZE));
+            ND_PRINT(", bogus fixed header length %u should be %zu",
+                     fixed_len, ISIS_COMMON_HEADER_SIZE+ISIS_IIH_LAN_HEADER_SIZE);
             return (0);
         }
         ND_TCHECK_SIZE(header_iih_lan);
@@ -2474,14 +2639,14 @@ isis_print(netdissect_options *ndo,
                 return (0);
         }
 
-        packet_len -= (ISIS_COMMON_HEADER_SIZE+ISIS_IIH_LAN_HEADER_SIZE);
+        INVALID_OR_DECREMENT(packet_len,ISIS_COMMON_HEADER_SIZE+ISIS_IIH_LAN_HEADER_SIZE);
         pptr = p + (ISIS_COMMON_HEADER_SIZE+ISIS_IIH_LAN_HEADER_SIZE);
         break;
 
     case ISIS_PDU_PTP_IIH:
         if (fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_IIH_PTP_HEADER_SIZE)) {
-            ND_PRINT(", bogus fixed header length %u should be %lu",
-                      fixed_len, (unsigned long)(ISIS_COMMON_HEADER_SIZE+ISIS_IIH_PTP_HEADER_SIZE));
+            ND_PRINT(", bogus fixed header length %u should be %zu",
+                      fixed_len, ISIS_COMMON_HEADER_SIZE+ISIS_IIH_PTP_HEADER_SIZE);
             return (0);
         }
         ND_TCHECK_SIZE(header_iih_ptp);
@@ -2513,16 +2678,15 @@ isis_print(netdissect_options *ndo,
             if (!print_unknown_data(ndo, pptr, "\n\t  ", ISIS_IIH_PTP_HEADER_SIZE))
                 return (0);
         }
-
-        packet_len -= (ISIS_COMMON_HEADER_SIZE+ISIS_IIH_PTP_HEADER_SIZE);
+        INVALID_OR_DECREMENT(packet_len,ISIS_COMMON_HEADER_SIZE+ISIS_IIH_PTP_HEADER_SIZE);
         pptr = p + (ISIS_COMMON_HEADER_SIZE+ISIS_IIH_PTP_HEADER_SIZE);
         break;
 
     case ISIS_PDU_L1_LSP:
     case ISIS_PDU_L2_LSP:
         if (fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_LSP_HEADER_SIZE)) {
-            ND_PRINT(", bogus fixed header length %u should be %lu",
-                   fixed_len, (unsigned long)ISIS_LSP_HEADER_SIZE);
+            ND_PRINT(", bogus fixed header length %u should be %zu",
+                   fixed_len, ISIS_LSP_HEADER_SIZE);
             return (0);
         }
         ND_TCHECK_SIZE(header_lsp);
@@ -2572,15 +2736,15 @@ isis_print(netdissect_options *ndo,
                 return (0);
         }
 
-        packet_len -= (ISIS_COMMON_HEADER_SIZE+ISIS_LSP_HEADER_SIZE);
+        INVALID_OR_DECREMENT(packet_len,ISIS_COMMON_HEADER_SIZE+ISIS_LSP_HEADER_SIZE);
         pptr = p + (ISIS_COMMON_HEADER_SIZE+ISIS_LSP_HEADER_SIZE);
         break;
 
     case ISIS_PDU_L1_CSNP:
     case ISIS_PDU_L2_CSNP:
         if (fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_CSNP_HEADER_SIZE)) {
-            ND_PRINT(", bogus fixed header length %u should be %lu",
-                      fixed_len, (unsigned long)(ISIS_COMMON_HEADER_SIZE+ISIS_CSNP_HEADER_SIZE));
+            ND_PRINT(", bogus fixed header length %u should be %zu",
+                      fixed_len, ISIS_COMMON_HEADER_SIZE+ISIS_CSNP_HEADER_SIZE);
             return (0);
         }
         ND_TCHECK_SIZE(header_csnp);
@@ -2610,15 +2774,15 @@ isis_print(netdissect_options *ndo,
                 return (0);
         }
 
-        packet_len -= (ISIS_COMMON_HEADER_SIZE+ISIS_CSNP_HEADER_SIZE);
+        INVALID_OR_DECREMENT(packet_len,ISIS_COMMON_HEADER_SIZE+ISIS_CSNP_HEADER_SIZE);
         pptr = p + (ISIS_COMMON_HEADER_SIZE+ISIS_CSNP_HEADER_SIZE);
         break;
 
     case ISIS_PDU_L1_PSNP:
     case ISIS_PDU_L2_PSNP:
         if (fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_PSNP_HEADER_SIZE)) {
-            ND_PRINT("- bogus fixed header length %u should be %lu",
-                   fixed_len, (unsigned long)(ISIS_COMMON_HEADER_SIZE+ISIS_PSNP_HEADER_SIZE));
+            ND_PRINT("- bogus fixed header length %u should be %zu",
+                   fixed_len, ISIS_COMMON_HEADER_SIZE+ISIS_PSNP_HEADER_SIZE);
             return (0);
         }
         ND_TCHECK_SIZE(header_psnp);
@@ -2644,7 +2808,7 @@ isis_print(netdissect_options *ndo,
                 return (0);
         }
 
-        packet_len -= (ISIS_COMMON_HEADER_SIZE+ISIS_PSNP_HEADER_SIZE);
+        INVALID_OR_DECREMENT(packet_len,ISIS_COMMON_HEADER_SIZE+ISIS_PSNP_HEADER_SIZE);
         pptr = p + (ISIS_COMMON_HEADER_SIZE+ISIS_PSNP_HEADER_SIZE);
         break;
 
@@ -2696,15 +2860,15 @@ isis_print(netdissect_options *ndo,
 	        ND_TCHECK_LEN(tptr, alen);
 		ND_PRINT("\n\t      Area address (length: %u): %s",
                        alen,
-                       isonsap_string(ndo, tptr, alen));
+                       GET_ISONSAP_STRING(tptr, alen));
 		tptr += alen;
 		tlen -= alen;
 	    }
 	    break;
 	case ISIS_TLV_ISNEIGH:
 	    while (tlen != 0) {
-	    	if (tlen < MAC_ADDR_LEN)
-	    	    goto tlv_trunc;
+		if (tlen < MAC_ADDR_LEN)
+		    goto tlv_trunc;
                 ND_TCHECK_LEN(tptr, MAC_ADDR_LEN);
                 ND_PRINT("\n\t      SNPA: %s", isis_print_id(ndo, tptr, MAC_ADDR_LEN));
                 tlen -= MAC_ADDR_LEN;
@@ -2712,26 +2876,22 @@ isis_print(netdissect_options *ndo,
 	    }
 	    break;
 
-        case ISIS_TLV_ISNEIGH_VARLEN:
-            if (tlen < 1)
-		goto tlv_trunc;
-            ND_TCHECK_1(tptr);
-	    lan_alen = GET_U_1(tptr); /* LAN address length */
-	    tptr++;
-	    tlen--;
-	    if (lan_alen == 0) {
-                ND_PRINT("\n\t      LAN address length 0 bytes");
-                nd_print_invalid(ndo);
-                break;
-            }
-            ND_PRINT("\n\t      LAN address length %u bytes ", lan_alen);
-	    while (tlen != 0) {
-                if (tlen < lan_alen)
-                    goto tlv_trunc;
-                ND_TCHECK_LEN(tptr, lan_alen);
-                ND_PRINT("\n\t\tIS Neighbor: %s", isis_print_id(ndo, tptr, lan_alen));
-                tlen -= lan_alen;
-                tptr +=lan_alen;
+        case ISIS_TLV_INSTANCE_ID:
+            if (tlen < 4)
+                goto tlv_trunc;
+            num_vals = (tlen-2)/2;
+            ND_PRINT("\n\t      Instance ID: %u, ITIDs(%u)%s ",
+                     GET_BE_U_2(tptr), num_vals,
+                     num_vals ? ":" : "");
+            tptr += 2;
+            tlen -= 2;
+            for (i=0; i < num_vals; i++) {
+                ND_PRINT("%u", GET_BE_U_2(tptr));
+                if (i < (num_vals - 1)) {
+                   ND_PRINT(", ");
+                }
+                tptr += 2;
+                tlen -= 2;
             }
             break;
 
@@ -2912,7 +3072,7 @@ isis_print(netdissect_options *ndo,
 		ND_TCHECK_LEN(tptr, sizeof(nd_ipv6));
 
                 ND_PRINT("\n\t      IPv6 interface address: %s",
-		       ip6addr_string(ndo, tptr));
+		       GET_IP6ADDR_STRING(tptr));
 
 		tptr += sizeof(nd_ipv6);
 		tlen -= sizeof(nd_ipv6);
@@ -3056,7 +3216,7 @@ isis_print(netdissect_options *ndo,
 	    if (tlen < sizeof(nd_ipv4))
 	        goto tlv_trunc;
 	    ND_TCHECK_LEN(pptr, sizeof(nd_ipv4));
-	    ND_PRINT("\n\t      Traffic Engineering Router ID: %s", ipaddr_string(ndo, pptr));
+	    ND_PRINT("\n\t      Traffic Engineering Router ID: %s", GET_IPADDR_STRING(pptr));
 	    break;
 
 	case ISIS_TLV_IPADDR:
@@ -3064,7 +3224,7 @@ isis_print(netdissect_options *ndo,
                 if (tlen < sizeof(nd_ipv4))
                     goto tlv_trunc;
 		ND_TCHECK_LEN(tptr, sizeof(nd_ipv4));
-		ND_PRINT("\n\t      IPv4 interface address: %s", ipaddr_string(ndo, tptr));
+		ND_PRINT("\n\t      IPv4 interface address: %s", GET_IPADDR_STRING(tptr));
 		tptr += sizeof(nd_ipv4);
 		tlen -= sizeof(nd_ipv4);
 	    }
@@ -3095,20 +3255,20 @@ isis_print(netdissect_options *ndo,
 	    if (tlen < sizeof(nd_ipv4))
 	        break;
 	    ND_TCHECK_LEN(tptr, sizeof(nd_ipv4));
-	    ND_PRINT("\n\t      IPv4 interface address: %s", ipaddr_string(ndo, tptr));
+	    ND_PRINT("\n\t      IPv4 interface address: %s", GET_IPADDR_STRING(tptr));
 	    tptr+=sizeof(nd_ipv4);
 	    tlen-=sizeof(nd_ipv4);
 
 	    if (tlen < sizeof(nd_ipv4))
 	        break;
 	    ND_TCHECK_LEN(tptr, sizeof(nd_ipv4));
-	    ND_PRINT("\n\t      IPv4 neighbor address: %s", ipaddr_string(ndo, tptr));
+	    ND_PRINT("\n\t      IPv4 neighbor address: %s", GET_IPADDR_STRING(tptr));
 	    tptr+=sizeof(nd_ipv4);
 	    tlen-=sizeof(nd_ipv4);
 
 	    while (tlen != 0) {
-	    	if (tlen < 4)
-	    	    goto tlv_trunc;
+		if (tlen < 4)
+		    goto tlv_trunc;
                 ND_TCHECK_4(tptr);
                 ND_PRINT("\n\t      Link-ID: 0x%08x", GET_BE_U_4(tptr));
                 tptr+=4;
@@ -3119,8 +3279,8 @@ isis_print(netdissect_options *ndo,
 	case ISIS_TLV_LSP:
 	    tlv_lsp = (const struct isis_tlv_lsp *)tptr;
 	    while (tlen != 0) {
-	    	if (tlen < sizeof(struct isis_tlv_lsp))
-	    	    goto tlv_trunc;
+		if (tlen < sizeof(struct isis_tlv_lsp))
+		    goto tlv_trunc;
 		ND_TCHECK_1(tlv_lsp->lsp_id + LSP_ID_LEN - 1);
 		ND_PRINT("\n\t      lsp-id: %s",
                        isis_print_id(ndo, tlv_lsp->lsp_id, LSP_ID_LEN));
@@ -3294,7 +3454,7 @@ isis_print(netdissect_options *ndo,
                     break;
                 ND_TCHECK_LEN(tptr, prefix_len / 2);
                 ND_PRINT("\n\t\tAddress: %s/%u",
-                       isonsap_string(ndo, tptr, prefix_len / 2), prefix_len * 4);
+                       GET_ISONSAP_STRING(tptr, prefix_len / 2), prefix_len * 4);
                 tptr+=prefix_len/2;
                 tlen-=prefix_len/2;
             }
@@ -3305,6 +3465,23 @@ isis_print(netdissect_options *ndo,
 	        break;
             ND_TCHECK_4(tptr); /* check if four bytes are on the wire */
             ND_PRINT("\n\t      Sequence number: %u", GET_BE_U_4(tptr));
+            break;
+
+        case ISIS_TLV_ROUTER_CAPABILITY:
+            if (tlen < 5) {
+                ND_PRINT(" [object length %u < 5]", tlen);
+                nd_print_invalid(ndo);
+                break;
+            }
+            ND_TCHECK_5(tptr); /* router-id + flags */
+            ND_PRINT("\n\t      Router-ID %s", GET_IPADDR_STRING(tptr));
+            ND_PRINT(", Flags [%s]",
+		     bittok2str(isis_tlv_router_capability_flags, "none", GET_U_1(tptr+4)));
+
+	    /* Optional set of sub-TLV */
+	    if (tlen > 5) {
+		isis_print_router_cap_subtlv(ndo, tptr+5, tlen-5);
+	    }
             break;
 
         case ISIS_TLV_VENDOR_PRIVATE:

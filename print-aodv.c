@@ -225,9 +225,9 @@ aodv_rreq(netdissect_options *ndo, const u_char *dat, u_int length)
 	    GET_U_1(ap->rreq_type) & RREQ_UNKNOWN ? "[U] " : " ",
 	    GET_U_1(ap->rreq_hops),
 	    GET_BE_U_4(ap->rreq_id),
-	    ipaddr_string(ndo, ap->rreq_da),
+	    GET_IPADDR_STRING(ap->rreq_da),
 	    GET_BE_U_4(ap->rreq_ds),
-	    ipaddr_string(ndo, ap->rreq_oa),
+	    GET_IPADDR_STRING(ap->rreq_oa),
 	    GET_BE_U_4(ap->rreq_os));
 	i = length - sizeof(*ap);
 	if (i >= sizeof(struct aodv_ext))
@@ -253,9 +253,9 @@ aodv_rrep(netdissect_options *ndo, const u_char *dat, u_int length)
 	    GET_U_1(ap->rrep_type) & RREP_ACK ? "[A] " : " ",
 	    GET_U_1(ap->rrep_ps) & RREP_PREFIX_MASK,
 	    GET_U_1(ap->rrep_hops),
-	    ipaddr_string(ndo, ap->rrep_da),
+	    GET_IPADDR_STRING(ap->rrep_da),
 	    GET_BE_U_4(ap->rrep_ds),
-	    ipaddr_string(ndo, ap->rrep_oa),
+	    GET_IPADDR_STRING(ap->rrep_oa),
 	    GET_BE_U_4(ap->rrep_life));
 	i = length - sizeof(*ap);
 	if (i >= sizeof(struct aodv_ext))
@@ -285,7 +285,7 @@ aodv_rerr(netdissect_options *ndo, const u_char *dat, u_int length)
 		ND_TCHECK_SIZE(dp);
 		if (i < sizeof(*dp))
 			goto trunc;
-		ND_PRINT(" {%s}(%u)", ipaddr_string(ndo, dp->u_da),
+		ND_PRINT(" {%s}(%u)", GET_IPADDR_STRING(dp->u_da),
 		    GET_BE_U_4(dp->u_ds));
 		dp++;
 		i -= sizeof(*dp);
@@ -314,9 +314,9 @@ aodv_v6_rreq(netdissect_options *ndo, const u_char *dat, u_int length)
 	    GET_U_1(ap->rreq_type) & RREQ_UNKNOWN ? "[U] " : " ",
 	    GET_U_1(ap->rreq_hops),
 	    GET_BE_U_4(ap->rreq_id),
-	    ip6addr_string(ndo, ap->rreq_da),
+	    GET_IP6ADDR_STRING(ap->rreq_da),
 	    GET_BE_U_4(ap->rreq_ds),
-	    ip6addr_string(ndo, ap->rreq_oa),
+	    GET_IP6ADDR_STRING(ap->rreq_oa),
 	    GET_BE_U_4(ap->rreq_os));
 	i = length - sizeof(*ap);
 	if (i >= sizeof(struct aodv_ext))
@@ -342,9 +342,9 @@ aodv_v6_rrep(netdissect_options *ndo, const u_char *dat, u_int length)
 	    GET_U_1(ap->rrep_type) & RREP_ACK ? "[A] " : " ",
 	    GET_U_1(ap->rrep_ps) & RREP_PREFIX_MASK,
 	    GET_U_1(ap->rrep_hops),
-	    ip6addr_string(ndo, ap->rrep_da),
+	    GET_IP6ADDR_STRING(ap->rrep_da),
 	    GET_BE_U_4(ap->rrep_ds),
-	    ip6addr_string(ndo, ap->rrep_oa),
+	    GET_IP6ADDR_STRING(ap->rrep_oa),
 	    GET_BE_U_4(ap->rrep_life));
 	i = length - sizeof(*ap);
 	if (i >= sizeof(struct aodv_ext))
@@ -374,7 +374,7 @@ aodv_v6_rerr(netdissect_options *ndo, const u_char *dat, u_int length)
 		ND_TCHECK_SIZE(dp6);
 		if (i < sizeof(*dp6))
 			goto trunc;
-		ND_PRINT(" {%s}(%u)", ip6addr_string(ndo, dp6->u_da),
+		ND_PRINT(" {%s}(%u)", GET_IP6ADDR_STRING(dp6->u_da),
 			 GET_BE_U_4(dp6->u_ds));
 		dp6++;
 		i -= sizeof(*dp6);
@@ -403,9 +403,9 @@ aodv_v6_draft_01_rreq(netdissect_options *ndo, const u_char *dat, u_int length)
 	    GET_U_1(ap->rreq_type) & RREQ_UNKNOWN ? "[U] " : " ",
 	    GET_U_1(ap->rreq_hops),
 	    GET_BE_U_4(ap->rreq_id),
-	    ip6addr_string(ndo, ap->rreq_da),
+	    GET_IP6ADDR_STRING(ap->rreq_da),
 	    GET_BE_U_4(ap->rreq_ds),
-	    ip6addr_string(ndo, ap->rreq_oa),
+	    GET_IP6ADDR_STRING(ap->rreq_oa),
 	    GET_BE_U_4(ap->rreq_os));
 	i = length - sizeof(*ap);
 	if (i >= sizeof(struct aodv_ext))
@@ -431,9 +431,9 @@ aodv_v6_draft_01_rrep(netdissect_options *ndo, const u_char *dat, u_int length)
 	    GET_U_1(ap->rrep_type) & RREP_ACK ? "[A] " : " ",
 	    GET_U_1(ap->rrep_ps) & RREP_PREFIX_MASK,
 	    GET_U_1(ap->rrep_hops),
-	    ip6addr_string(ndo, ap->rrep_da),
+	    GET_IP6ADDR_STRING(ap->rrep_da),
 	    GET_BE_U_4(ap->rrep_ds),
-	    ip6addr_string(ndo, ap->rrep_oa),
+	    GET_IP6ADDR_STRING(ap->rrep_oa),
 	    GET_BE_U_4(ap->rrep_life));
 	i = length - sizeof(*ap);
 	if (i >= sizeof(struct aodv_ext))
@@ -463,7 +463,7 @@ aodv_v6_draft_01_rerr(netdissect_options *ndo, const u_char *dat, u_int length)
 		ND_TCHECK_SIZE(dp6);
 		if (i < sizeof(*dp6))
 			goto trunc;
-		ND_PRINT(" {%s}(%u)", ip6addr_string(ndo, dp6->u_da),
+		ND_PRINT(" {%s}(%u)", GET_IP6ADDR_STRING(dp6->u_da),
 			 GET_BE_U_4(dp6->u_ds));
 		dp6++;
 		i -= sizeof(*dp6);

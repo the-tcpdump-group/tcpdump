@@ -38,3 +38,5 @@ netdissect.dir/
 tcpdump.dir/
 tcpdump.sln
 .vs/
+.passed
+.failed

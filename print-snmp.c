@@ -71,6 +71,8 @@
 #include <smi.h>
 #endif
 
+#include "netdissect-ctype.h"
+
 #include "netdissect.h"
 #include "extract.h"
 
@@ -197,7 +199,7 @@ static const char *ErrorStatus[] = {
 #define DECODE_ErrorStatus(e) \
 	( e >= 0 && (size_t)e < sizeof(ErrorStatus)/sizeof(ErrorStatus[0]) \
 		? ErrorStatus[e] \
-		: (nd_snprintf(errbuf, sizeof(errbuf), "err=%u", e), errbuf))
+		: (snprintf(errbuf, sizeof(errbuf), "err=%u", e), errbuf))
 
 /*
  * generic-trap values in the SNMP Trap-PDU
@@ -215,7 +217,7 @@ static const char *GenericTrap[] = {
 #define DECODE_GenericTrap(t) \
 	( t >= 0 && (size_t)t < sizeof(GenericTrap)/sizeof(GenericTrap[0]) \
 		? GenericTrap[t] \
-		: (nd_snprintf(buf, sizeof(buf), "gt=%d", t), buf))
+		: (snprintf(buf, sizeof(buf), "gt=%d", t), buf))
 
 /*
  * ASN.1 type class table
@@ -700,7 +702,7 @@ asn1_print_string(netdissect_options *ndo, struct be *elem)
 	p = elem->data.str;
 	ND_TCHECK_LEN(p, asnlen);
 	for (i = asnlen; printable && i != 0; p++, i--)
-		printable = ND_ISPRINT(GET_U_1(p));
+		printable = ND_ASCII_ISPRINT(GET_U_1(p));
 	p = elem->data.str;
 	if (printable) {
 		ND_PRINT("\"");
