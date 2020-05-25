@@ -1,0 +1,44 @@
+    1  08:33:04.1056259 OSI NLPID 0xfe unknown, length: 262140
+	0x0000:  fe7f 4a01 0066 0002 00ff ffff f200 0000
+	0x0010:  00c6 0000 007f e6ff 00e6 6800 0000
+    2  06:59:12.1058307 unknown CHDLC protocol (0xfafe)
+    3  22:59:12.1056259 OSI NLPID 0xfe unknown, length: 262140
+	0x0000:  fe7f 4a01 f165 0002 0000 0000 0000 0000
+	0x0010:  00c6 0000 007f e6ff 00e6 6800 0000
+    4  19:08:48.2149389571 IS-IS, length 262139
+	L2 Lan IIH, hlen: 27, v: 1, pdu-v: 1, sys-id-len: 6 (0), max-area: 3 (0)
+	  source-id: 3801.0101.0101,  holding time: 257s, Flags: [unknown circuit type 0x00]
+	  lan-id:    0101.0101.0100.00, Priority: 1, PDU length: 257
+	    Extended IS Reachability TLV #22, length: 12
+	      IS Neighbor: 0d0d.0d0d.0d0d.0d, Metric: 855309, sub-TLVs present (13)
+	        Remaining data in TLV shorter than a subTLV header
+	    Purge Originator Identifier TLV #13, length: 13
+	      Purge Originator System-ID: 0d0d.0d0d.0d0d
+	      Received from System-ID: 0d0d.0d0d.0d0d
+	    Purge Originator Identifier TLV #13, length: 13
+	      Purge Originator System-ID: 0d0d.0d0d.0d0d
+	      Received from System-ID: 0d0d.0d0d.0d0d
+	    Purge Originator Identifier TLV #13, length: 13
+	      Purge Originator System-ID: 0d64.0d0d.0d0d
+	      Received from System-ID: 0d0d.0d0d.0d0d
+	    Purge Originator Identifier TLV #13, length: 13
+	      Purge Originator System-ID: 0d0d.0d0d.0d0d
+	      Received from System-ID: 0d0d.0d0d.0d0d
+	    Purge Originator Identifier TLV #13, length: 13
+	      Purge Originator System-ID: 0d0d.0d0d.0d0d
+	      Received from System-ID: 0d0d.0d0d.0d0d
+	    Purge Originator Identifier TLV #13, length: 13
+	      Purge Originator System-ID: 0d1c.0d0d.0d0d
+	      Received from System-ID: 0d67.0d0d.0d0d
+	    Purge Originator Identifier TLV #13, length: 13
+	      Purge Originator System-ID: 0d0d.0000.0040
+	      Received from System-ID: cc58.5303.2910
+	    unknown TLV #0, length: 34
+		0x0000:  0000 0000 0000 0000 0000 0000 0000 0000
+		0x0010:  0000 0a16 0020 007f 0000 0036 041f 0116
+		0x0020:  0113
+	    unknown TLV #0, length: 0
+	    unknown TLV #0, length: 18
+		0x0000:  3a01 4996 0186 dd60 0000 c787 8787 6687
+		0x0010:  0000
+	    unknown TLV #0, length: 64 [|isis]

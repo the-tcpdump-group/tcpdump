@@ -175,7 +175,7 @@
 #define T_UID		101		/* user ID */
 #define T_GID		102		/* group ID */
 #define T_UNSPEC	103		/* Unspecified format (binary data) */
-#define T_UNSPECA	104		/* "unspecified ascii". Ugly MIT hack */
+#define T_UNSPECA	104		/* "unspecified ASCII". Ugly MIT hack */
 	/* Query type values which do not appear in resource records */
 #define T_TKEY		249		/* Transaction Key [RFC2930] */
 #define T_TSIG		250		/* Transaction Signature [RFC2845] */
@@ -184,6 +184,7 @@
 #define T_MAILB		253		/* transfer mailbox records */
 #define T_MAILA		254		/* transfer mail agent records */
 #define T_ANY		255		/* wildcard match */
+#define T_URI		256		/* uri records [RFC7553] */
 
 /*
  * Values for class field
@@ -198,6 +199,64 @@
 #define C_CACHE_FLUSH	0x8000		/* mDNS cache flush flag in replies */
 
 /*
+ * Values for EDNS option types
+ */
+#define E_LLQ           1       /* long lived queries protocol */
+#define E_UL            2       /* dynamic dns update leases */
+#define E_NSID          3       /* name server identifier */
+#define E_DAU           5       /* signal DNSSEC algorithm understood */
+#define E_DHU           6       /* signal DS hash understood */
+#define E_N3U           7       /* signal NSEC3 hash understood */
+#define E_ECS           8       /* EDNS client subnet */
+#define E_EXPIRE        9       /* zone expiration */
+#define E_COOKIE        10      /* DNS cookies */
+#define E_KEEPALIVE     11      /* TCP keepalive */
+#define E_PADDING       12      /* pad DNS messages */
+#define E_CHAIN         13      /* chain DNS queries */
+#define E_KEYTAG        14      /* EDNS key tag */
+#define E_CLIENTTAG     16      /* EDNS client tag */
+#define E_SERVERTAG     17      /* EDNS server tag */
+
+/*
+ * Values for DNSSEC Algorithms
+ * https://www.iana.org/assignments/dns-sec-alg-numbers/dns-sec-alg-numbers.xhtml
+ */
+
+#define A_DELETE                0
+#define A_RSAMD5                1
+#define A_DH                    2
+#define A_DSA                   3
+#define A_RSASHA1               5
+#define A_DSA_NSEC3_SHA1        6
+#define A_RSASHA1_NSEC3_SHA1    7
+#define A_RSASHA256             8
+#define A_RSASHA512             10
+#define A_ECC_GOST              12
+#define A_ECDSAP256SHA256       13
+#define A_ECDSAP384SHA384       14
+#define A_ED25519               15
+#define A_ED448                 16
+#define A_INDIRECT              252
+#define A_PRIVATEDNS            253
+#define A_PRIVATEOID            254
+
+/*
+ * Values for NSEC3 algorithms
+ * https://www.iana.org/assignments/dnssec-nsec3-parameters/dnssec-nsec3-parameters.xhtml
+ */
+#define NSEC_SHA1   1
+
+/*
+ * Values for delegation signer algorithms
+ * https://www.iana.org/assignments/ds-rr-types/ds-rr-types.xhtml
+ */
+#define DS_SHA1     1
+#define DS_SHA256   2
+#define DS_GOST     3
+#define DS_SHA384   4
+
+
+/*
  * Status return codes for T_UNSPEC conversion routines
  */
 #define CONV_SUCCESS 0
@@ -210,28 +269,26 @@
  * Structure for query header.
  */
 typedef struct {
-	uint16_t id;		/* query identification number */
-	uint8_t  flags1;	/* first byte of flags */
-	uint8_t  flags2;	/* second byte of flags */
-	uint16_t qdcount;	/* number of question entries */
-	uint16_t ancount;	/* number of answer entries */
-	uint16_t nscount;	/* number of authority entries */
-	uint16_t arcount;	/* number of resource entries */
-} HEADER;
+	nd_uint16_t id;		/* query identification number */
+	nd_uint16_t flags;	/* QR, Opcode, AA, TC, RD, RA, RCODE */
+	nd_uint16_t qdcount;	/* number of question entries */
+	nd_uint16_t ancount;	/* number of answer entries */
+	nd_uint16_t nscount;	/* number of authority entries */
+	nd_uint16_t arcount;	/* number of resource entries */
+} dns_header_t;
 
 /*
  * Macros for subfields of flag fields.
  */
-#define DNS_QR(np)	((np)->flags1 & 0x80)		/* response flag */
-#define DNS_OPCODE(np)	((((np)->flags1) >> 3) & 0xF)	/* purpose of message */
-#define DNS_AA(np)	((np)->flags1 & 0x04)		/* authoritative answer */
-#define DNS_TC(np)	((np)->flags1 & 0x02)		/* truncated message */
-#define DNS_RD(np)	((np)->flags1 & 0x01)		/* recursion desired */
-
-#define DNS_RA(np)	((np)->flags2 & 0x80)	/* recursion available */
-#define DNS_AD(np)	((np)->flags2 & 0x20)	/* authentic data from named */
-#define DNS_CD(np)	((np)->flags2 & 0x10)	/* checking disabled by resolver */
-#define DNS_RCODE(np)	((np)->flags2 & 0xF)	/* response code */
+#define DNS_QR(flags)		((flags) & 0x8000)	/* response flag */
+#define DNS_OPCODE(flags)	(((flags) >> 11) & 0xF)	/* purpose of message */
+#define DNS_AA(flags)		(flags & 0x0400)	/* authoritative answer */
+#define DNS_TC(flags)		(flags & 0x0200)	/* truncated message */
+#define DNS_RD(flags)		(flags & 0x0100)	/* recursion desired */
+#define DNS_RA(flags)		(flags & 0x0080)	/* recursion available */
+#define DNS_AD(flags)		(flags & 0x0020)	/* authentic data from named */
+#define DNS_CD(flags)		(flags & 0x0010)	/* checking disabled by resolver */
+#define DNS_RCODE(flags)	(flags & 0x000F)	/* response code */
 
 /*
  * Defines for handling compressed domain names, EDNS0 labels, etc.
@@ -239,62 +296,5 @@ typedef struct {
 #define INDIR_MASK	0xc0	/* 11.... */
 #define EDNS0_MASK	0x40	/* 01.... */
 #  define EDNS0_ELT_BITLABEL 0x01
-
-/*
- * Structure for passing resource records around.
- */
-struct rrec {
-	int16_t	r_zone;			/* zone number */
-	int16_t	r_class;		/* class number */
-	int16_t	r_type;			/* type number */
-	uint32_t	r_ttl;			/* time to live */
-	int	r_size;			/* size of data area */
-	char	*r_data;		/* pointer to data */
-};
-
-/*
- * Inline versions of get/put short/long.  Pointer is advanced.
- * We also assume that a "uint16_t" holds 2 "chars"
- * and that a "uint32_t" holds 4 "chars".
- *
- * These macros demonstrate the property of C whereby it can be
- * portable or it can be elegant but never both.
- */
-#define GETSHORT(s, cp) { \
-	register u_char *t_cp = (u_char *)(cp); \
-	(s) = ((uint16_t)t_cp[0] << 8) | (uint16_t)t_cp[1]; \
-	(cp) += 2; \
-}
-
-#define GETLONG(l, cp) { \
-	register u_char *t_cp = (u_char *)(cp); \
-	(l) = (((uint32_t)t_cp[0]) << 24) \
-	    | (((uint32_t)t_cp[1]) << 16) \
-	    | (((uint32_t)t_cp[2]) << 8) \
-	    | (((uint32_t)t_cp[3])); \
-	(cp) += 4; \
-}
-
-#define PUTSHORT(s, cp) { \
-	register uint16_t t_s = (uint16_t)(s); \
-	register u_char *t_cp = (u_char *)(cp); \
-	*t_cp++ = t_s >> 8; \
-	*t_cp   = t_s; \
-	(cp) += 2; \
-}
-
-/*
- * Warning: PUTLONG --no-longer-- destroys its first argument.  if you
- * were depending on this "feature", you will lose.
- */
-#define PUTLONG(l, cp) { \
-	register uint32_t t_l = (uint32_t)(l); \
-	register u_char *t_cp = (u_char *)(cp); \
-	*t_cp++ = t_l >> 24; \
-	*t_cp++ = t_l >> 16; \
-	*t_cp++ = t_l >> 8; \
-	*t_cp   = t_l; \
-	(cp) += 4; \
-}
 
 #endif /* !_NAMESER_H_ */

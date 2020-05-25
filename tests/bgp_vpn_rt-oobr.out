@@ -1,0 +1,17 @@
+    1  19:35:54.131862 IP (tos 0xc, ttl 254, id 21263, offset 0, flags [rsvd], proto TCP (6), length 60165, bad cksum 8e15 (->9eb8)!)
+    241.0.128.19.179 > 239.8.0.1.0: Flags [none], seq 2146695561:2146755682, win 56026, options [unknown-161,eol], length 60121: BGP
+	Update Message (2), length: 45
+	  Withdrawn routes:
+	    255.144.0.0/12
+	  Attribute Set (128), length: 7, Flags [OTPE+f]: 
+	    Origin AS: 0
+	      Multi-Protocol Unreach NLRI (15), length: 227, Flags [T+6]:  [path attr too short]
+	  AS Path (2), length: 5invalid len [|bgp] [|bgp]
+	Update Message (2), length: 45 [|bgp] [|bgp]
+	Update Message (2), length: 45
+	  Withdrawn routes:
+	    255.112.0.0/12
+	  Attribute Set (128), length: 7, Flags [OTPE+f]: 
+	    Origin AS: 0
+	      Multi-Protocol Reach NLRI (14), length: 227, Flags [T+6]:  [path attr too short]
+	  Origin (1), length: 132 [|bgp]

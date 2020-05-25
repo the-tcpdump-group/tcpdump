@@ -29,21 +29,19 @@
 
 /*
  * originally defined as the Ethernet Configuration Testing Protocol.
- * specification: http://www.mit.edu/people/jhawk/ctp.pdf
+ * specification: https://www.mit.edu/people/jhawk/ctp.pdf
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include "netdissect.h"
 #include "extract.h"
-#include "ether.h"
 #include "addrtoname.h"
 
-static const char tstr[] = " [|loopback]";
 
 #define LOOPBACK_REPLY   1
 #define LOOPBACK_FWDDATA 2
@@ -57,80 +55,81 @@ static const struct tok fcode_str[] = {
 static void
 loopback_message_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 {
-	const u_char *ep = cp + len;
+	const u_char *ep = ndo->ndo_snapend;
 	uint16_t function;
 
 	if (len < 2)
 		goto invalid;
 	/* function */
-	ND_TCHECK2(*cp, 2);
-	function = EXTRACT_LE_16BITS(cp);
+	ND_TCHECK_2(cp);
+	function = GET_LE_U_2(cp);
 	cp += 2;
-	ND_PRINT((ndo, ", %s", tok2str(fcode_str, " invalid (%u)", function)));
+	ND_PRINT(", %s", tok2str(fcode_str, " invalid (%u)", function));
 
 	switch (function) {
 		case LOOPBACK_REPLY:
 			if (len < 4)
 				goto invalid;
 			/* receipt number */
-			ND_TCHECK2(*cp, 2);
-			ND_PRINT((ndo, ", receipt number %u", EXTRACT_LE_16BITS(cp)));
+			ND_TCHECK_2(cp);
+			ND_PRINT(", receipt number %u", GET_LE_U_2(cp));
 			cp += 2;
 			/* data */
-			ND_PRINT((ndo, ", data (%u octets)", len - 4));
-			ND_TCHECK2(*cp, len - 4);
+			ND_PRINT(", data (%u octets)", len - 4);
+			ND_TCHECK_LEN(cp, len - 4);
 			break;
 		case LOOPBACK_FWDDATA:
 			if (len < 8)
 				goto invalid;
 			/* forwarding address */
-			ND_TCHECK2(*cp, ETHER_ADDR_LEN);
-			ND_PRINT((ndo, ", forwarding address %s", etheraddr_string(ndo, cp)));
-			cp += ETHER_ADDR_LEN;
+			ND_TCHECK_LEN(cp, MAC_ADDR_LEN);
+			ND_PRINT(", forwarding address %s", GET_ETHERADDR_STRING(cp));
+			cp += MAC_ADDR_LEN;
 			/* data */
-			ND_PRINT((ndo, ", data (%u octets)", len - 8));
-			ND_TCHECK2(*cp, len - 8);
+			ND_PRINT(", data (%u octets)", len - 8);
+			ND_TCHECK_LEN(cp, len - 8);
 			break;
 		default:
-			ND_TCHECK2(*cp, len - 2);
+			ND_TCHECK_LEN(cp, len - 2);
 			break;
 	}
 	return;
 
 invalid:
-	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, ep - cp);
+	nd_print_invalid(ndo);
+	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	nd_print_trunc(ndo);
 }
 
 void
 loopback_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 {
-	const u_char *ep = cp + len;
+	const u_char *ep = ndo->ndo_snapend;
 	uint16_t skipCount;
 
-	ND_PRINT((ndo, "Loopback"));
+	ndo->ndo_protocol = "loopback";
+	ND_PRINT("Loopback");
 	if (len < 2)
 		goto invalid;
 	/* skipCount */
-	ND_TCHECK2(*cp, 2);
-	skipCount = EXTRACT_LE_16BITS(cp);
+	ND_TCHECK_2(cp);
+	skipCount = GET_LE_U_2(cp);
 	cp += 2;
-	ND_PRINT((ndo, ", skipCount %u", skipCount));
+	ND_PRINT(", skipCount %u", skipCount);
 	if (skipCount % 8)
-		ND_PRINT((ndo, " (bogus)"));
+		ND_PRINT(" (bogus)");
 	if (skipCount > len - 2)
 		goto invalid;
 	loopback_message_print(ndo, cp + skipCount, len - 2 - skipCount);
 	return;
 
 invalid:
-	ND_PRINT((ndo, "%s", istr));
-	ND_TCHECK2(*cp, ep - cp);
+	nd_print_invalid(ndo);
+	ND_TCHECK_LEN(cp, ep - cp);
 	return;
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	nd_print_trunc(ndo);
 }
 

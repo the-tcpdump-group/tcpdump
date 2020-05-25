@@ -23,13 +23,14 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 #include "netdissect.h"
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #ifdef USE_LIBSMI
 #include <smi.h>
@@ -143,4 +144,93 @@ nd_smi_version_string(void)
 #else
 	return (NULL);
 #endif
+}
+
+
+int
+nd_push_buffer(netdissect_options *ndo, u_char *new_buffer,
+    const u_char *new_packetp, const u_char *new_snapend)
+{
+	struct netdissect_saved_packet_info *ndspi;
+
+	ndspi = (struct netdissect_saved_packet_info *)malloc(sizeof(struct netdissect_saved_packet_info));
+	if (ndspi == NULL)
+		return (0);	/* fail */
+	ndspi->ndspi_buffer = new_buffer;
+	ndspi->ndspi_packetp = ndo->ndo_packetp;
+	ndspi->ndspi_snapend = ndo->ndo_snapend;
+	ndspi->ndspi_prev = ndo->ndo_packet_info_stack;
+
+	ndo->ndo_packetp = new_packetp;
+	ndo->ndo_snapend = new_snapend;
+	ndo->ndo_packet_info_stack = ndspi;
+
+	return (1);	/* success */
+}
+
+/*
+ * Set a new snapshot end to the minimum of the existing snapshot end
+ * and the new snapshot end.
+ */
+int
+nd_push_snapend(netdissect_options *ndo, const u_char *new_snapend)
+{
+	struct netdissect_saved_packet_info *ndspi;
+
+	ndspi = (struct netdissect_saved_packet_info *)malloc(sizeof(struct netdissect_saved_packet_info));
+	if (ndspi == NULL)
+		return (0);	/* fail */
+	ndspi->ndspi_buffer = NULL;	/* no new buffer */
+	ndspi->ndspi_packetp = ndo->ndo_packetp;
+	ndspi->ndspi_snapend = ndo->ndo_snapend;
+	ndspi->ndspi_prev = ndo->ndo_packet_info_stack;
+
+	/* No new packet pointer, either */
+	if (new_snapend < ndo->ndo_snapend)
+		ndo->ndo_snapend = new_snapend;
+	ndo->ndo_packet_info_stack = ndspi;
+
+	return (1);	/* success */
+}
+
+/*
+ * Change an already-pushed snapshot end.  This may increase the
+ * snapshot end, as it may be used, for example, for a Jumbo Payload
+ * option in IPv6.  It must not increase it past the snapshot length
+ * atop which the current one was pushed, however.
+ */
+void
+nd_change_snapend(netdissect_options *ndo, const u_char *new_snapend)
+{
+	struct netdissect_saved_packet_info *ndspi;
+
+	ndspi = ndo->ndo_packet_info_stack;
+	if (ndspi->ndspi_prev != NULL) {
+		if (new_snapend <= ndspi->ndspi_prev->ndspi_snapend)
+			ndo->ndo_snapend = new_snapend;
+	} else {
+		if (new_snapend < ndo->ndo_snapend)
+			ndo->ndo_snapend = new_snapend;
+	}
+}
+
+void
+nd_pop_packet_info(netdissect_options *ndo)
+{
+	struct netdissect_saved_packet_info *ndspi;
+
+	ndspi = ndo->ndo_packet_info_stack;
+	ndo->ndo_packetp = ndspi->ndspi_packetp;
+	ndo->ndo_snapend = ndspi->ndspi_snapend;
+	ndo->ndo_packet_info_stack = ndspi->ndspi_prev;
+
+	free(ndspi->ndspi_buffer);
+	free(ndspi);
+}
+
+void
+nd_pop_all_packet_info(netdissect_options *ndo)
+{
+	while (ndo->ndo_packet_info_stack != NULL)
+		nd_pop_packet_info(ndo);
 }

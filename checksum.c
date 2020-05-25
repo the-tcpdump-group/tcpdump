@@ -14,14 +14,14 @@
  *
  * miscellaneous checksumming routines
  *
- * Original code by Hannes Gredler (hannes@juniper.net)
+ * Original code by Hannes Gredler (hannes@gredler.at)
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -90,8 +90,8 @@ static void
 init_crc10_table(void)
 {
 #define CRC10_POLYNOMIAL 0x633
-    register int i, j;
-    register uint16_t accum;
+    int i, j;
+    uint16_t accum;
     uint16_t verify_crc10_table[256];
 
     for ( i = 0;  i < 256;  i++ )
@@ -112,7 +112,7 @@ init_crc10_table(void)
 uint16_t
 verify_crc10_cksum(uint16_t accum, const u_char *p, int length)
 {
-    register int i;
+    int i;
 
     for ( i = 0;  i < length;  i++ )
     {

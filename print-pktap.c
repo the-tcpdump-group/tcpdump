@@ -22,10 +22,10 @@
 /* \summary: Apple's DLT_PKTAP printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include "netdissect.h"
 #include "extract.h"
@@ -44,20 +44,20 @@
  * to host byte order in libpcap.
  */
 typedef struct pktap_header {
-	uint32_t	pkt_len;	/* length of pktap header */
-	uint32_t	pkt_rectype;	/* type of record */
-	uint32_t	pkt_dlt;	/* DLT type of this packet */
+	nd_uint32_t	pkt_len;	/* length of pktap header */
+	nd_uint32_t	pkt_rectype;	/* type of record */
+	nd_uint32_t	pkt_dlt;	/* DLT type of this packet */
 	char		pkt_ifname[24];	/* interface name */
-	uint32_t	pkt_flags;
-	uint32_t	pkt_pfamily;	/* "protocol family" */
-	uint32_t	pkt_llhdrlen;	/* link-layer header length? */
-	uint32_t	pkt_lltrlrlen;	/* link-layer trailer length? */
-	uint32_t	pkt_pid;	/* process ID */
+	nd_uint32_t	pkt_flags;
+	nd_uint32_t	pkt_pfamily;	/* "protocol family" */
+	nd_uint32_t	pkt_llhdrlen;	/* link-layer header length? */
+	nd_uint32_t	pkt_lltrlrlen;	/* link-layer trailer length? */
+	nd_uint32_t	pkt_pid;	/* process ID */
 	char		pkt_cmdname[20]; /* command name */
-	uint32_t	pkt_svc_class;	/* "service class" */
-	uint16_t	pkt_iftype;	/* "interface type" */
-	uint16_t	pkt_ifunit;	/* unit number of interface? */
-	uint32_t	pkt_epid;	/* "effective process ID" */
+	nd_uint32_t	pkt_svc_class;	/* "service class" */
+	nd_uint16_t	pkt_iftype;	/* "interface type" */
+	nd_uint16_t	pkt_ifunit;	/* unit number of interface? */
+	nd_uint32_t	pkt_epid;	/* "effective process ID" */
 	char		pkt_ecmdname[20]; /* "effective command name" */
 } pktap_header_t;
 
@@ -67,7 +67,7 @@ typedef struct pktap_header {
 #define PKT_REC_NONE	0	/* nothing follows the header */
 #define PKT_REC_PACKET	1	/* a packet follows the header */
 
-static inline void
+static void
 pktap_header_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	const pktap_header_t *hdr;
@@ -76,17 +76,17 @@ pktap_header_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	hdr = (const pktap_header_t *)bp;
 
-	dlt = EXTRACT_LE_32BITS(&hdr->pkt_dlt);
-	hdrlen = EXTRACT_LE_32BITS(&hdr->pkt_len);
+	dlt = GET_LE_U_4(hdr->pkt_dlt);
+	hdrlen = GET_LE_U_4(hdr->pkt_len);
 	dltname = pcap_datalink_val_to_name(dlt);
 	if (!ndo->ndo_qflag) {
-		ND_PRINT((ndo,"DLT %s (%d) len %d",
-			  (dltname != NULL ? dltname : "UNKNOWN"), dlt, hdrlen));
+		ND_PRINT("DLT %s (%u) len %u",
+			  (dltname != NULL ? dltname : "UNKNOWN"), dlt, hdrlen);
         } else {
-		ND_PRINT((ndo,"%s", (dltname != NULL ? dltname : "UNKNOWN")));
+		ND_PRINT("%s", (dltname != NULL ? dltname : "UNKNOWN"));
         }
 
-	ND_PRINT((ndo, ", length %u: ", length));
+	ND_PRINT(", length %u: ", length);
 }
 
 /*
@@ -95,23 +95,26 @@ pktap_header_print(netdissect_options *ndo, const u_char *bp, u_int length)
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
+void
 pktap_if_print(netdissect_options *ndo,
                const struct pcap_pkthdr *h, const u_char *p)
 {
 	uint32_t dlt, hdrlen, rectype;
 	u_int caplen = h->caplen;
 	u_int length = h->len;
-	if_printer printer;
+	if_printer_t printer;
 	const pktap_header_t *hdr;
+	struct pcap_pkthdr nhdr;
 
-	if (caplen < sizeof(pktap_header_t) || length < sizeof(pktap_header_t)) {
-		ND_PRINT((ndo, "[|pktap]"));
-		return (0);
+	ndo->ndo_protocol = "pktap";
+	if (caplen < sizeof(pktap_header_t)) {
+		nd_print_trunc(ndo);
+		ndo->ndo_ll_header_length += caplen;
+		return;
 	}
 	hdr = (const pktap_header_t *)p;
-	dlt = EXTRACT_LE_32BITS(&hdr->pkt_dlt);
-	hdrlen = EXTRACT_LE_32BITS(&hdr->pkt_len);
+	dlt = GET_LE_U_4(hdr->pkt_dlt);
+	hdrlen = GET_LE_U_4(hdr->pkt_len);
 	if (hdrlen < sizeof(pktap_header_t)) {
 		/*
 		 * Claimed header length < structure length.
@@ -120,12 +123,14 @@ pktap_if_print(netdissect_options *ndo,
 		 * is the length supplied so that the header can
 		 * be expanded in the future)?
 		 */
-		ND_PRINT((ndo, "[|pktap]"));
-		return (0);
+		nd_print_trunc(ndo);
+		ndo->ndo_ll_header_length += caplen;
+		return;
 	}
-	if (caplen < hdrlen || length < hdrlen) {
-		ND_PRINT((ndo, "[|pktap]"));
-		return (hdrlen);
+	if (caplen < hdrlen) {
+		nd_print_trunc(ndo);
+		ndo->ndo_ll_header_length += caplen;
+		return;
 	}
 
 	if (ndo->ndo_eflag)
@@ -135,16 +140,24 @@ pktap_if_print(netdissect_options *ndo,
 	caplen -= hdrlen;
 	p += hdrlen;
 
-	rectype = EXTRACT_LE_32BITS(&hdr->pkt_rectype);
+	rectype = GET_LE_U_4(hdr->pkt_rectype);
 	switch (rectype) {
 
 	case PKT_REC_NONE:
-		ND_PRINT((ndo, "no data"));
+		ND_PRINT("no data");
 		break;
 
 	case PKT_REC_PACKET:
-		if ((printer = lookup_printer(dlt)) != NULL) {
-			hdrlen += printer(ndo, h, p);
+		printer = lookup_printer(ndo, dlt);
+		if (printer.printer != NULL) {
+			nhdr = *h;
+			nhdr.caplen = caplen;
+			nhdr.len = length;
+			if (ndo->ndo_void_printer == TRUE) {
+				printer.void_printer(ndo, &nhdr, p);
+				hdrlen += ndo->ndo_ll_header_length;
+			} else
+				hdrlen += printer.uint_printer(ndo, &nhdr, p);
 		} else {
 			if (!ndo->ndo_eflag)
 				pktap_header_print(ndo, (const u_char *)hdr,
@@ -156,14 +169,7 @@ pktap_if_print(netdissect_options *ndo,
 		break;
 	}
 
-	return (hdrlen);
+	ndo->ndo_ll_header_length += hdrlen;
+	return;
 }
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */
-
 #endif /* DLT_PKTAP */

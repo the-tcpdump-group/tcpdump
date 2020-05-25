@@ -18,15 +18,14 @@
 /* specification: RFC 7348 */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include "netdissect.h"
 #include "extract.h"
 
-static const char tstr[] = " [|VXLAN]";
 
 #define VXLAN_HDR_LEN 8
 
@@ -50,25 +49,26 @@ vxlan_print(netdissect_options *ndo, const u_char *bp, u_int len)
     uint8_t flags;
     uint32_t vni;
 
+    ndo->ndo_protocol = "vxlan";
     if (len < VXLAN_HDR_LEN)
         goto trunc;
 
-    ND_TCHECK2(*bp, VXLAN_HDR_LEN);
+    ND_TCHECK_LEN(bp, VXLAN_HDR_LEN);
 
-    flags = *bp;
+    flags = GET_U_1(bp);
     bp += 4;
 
-    vni = EXTRACT_24BITS(bp);
+    vni = GET_BE_U_3(bp);
     bp += 4;
 
-    ND_PRINT((ndo, "VXLAN, "));
-    ND_PRINT((ndo, "flags [%s] (0x%02x), ", flags & 0x08 ? "I" : ".", flags));
-    ND_PRINT((ndo, "vni %u\n", vni));
+    ND_PRINT("VXLAN, ");
+    ND_PRINT("flags [%s] (0x%02x), ", flags & 0x08 ? "I" : ".", flags);
+    ND_PRINT("vni %u\n", vni);
 
-    ether_print(ndo, bp, len - VXLAN_HDR_LEN, ndo->ndo_snapend - bp, NULL, NULL);
+    ether_print(ndo, bp, len - VXLAN_HDR_LEN, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL);
 
     return;
 
 trunc:
-    ND_PRINT((ndo, "%s", tstr));
+    nd_print_trunc(ndo);
 }
