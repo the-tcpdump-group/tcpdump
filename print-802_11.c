@@ -831,82 +831,176 @@ static const char *auth_alg_text[]={"Open System","Shared Key","EAP"};
 static const char *status_text[] = {
 	"Successful",						/*  0 */
 	"Unspecified failure",					/*  1 */
-	"Reserved",						/*  2 */
-	"Reserved",						/*  3 */
+	"TDLS wakeup schedule rejected but alternative schedule "
+	  "provided",					/*  2 */
+	"TDLS wakeup schedule rejected",/*  3 */
 	"Reserved",						/*  4 */
-	"Reserved",						/*  5 */
-	"Reserved",						/*  6 */
-	"Reserved",						/*  7 */
+	"Security disabled",			/*  5 */
+	"Unacceptable lifetime",		/*  6 */
+	"Not in same BSS",				/*  7 */
 	"Reserved",						/*  8 */
 	"Reserved",						/*  9 */
 	"Cannot Support all requested capabilities in the Capability "
 	  "Information field",					/* 10 */
 	"Reassociation denied due to inability to confirm that association "
 	  "exists",						/* 11 */
-	"Association denied due to reason outside the scope of the "
+	"Association denied due to reason outside the scope of this "
 	  "standard",						/* 12 */
-	"Responding station does not support the specified authentication "
-	  "algorithm ",						/* 13 */
+	"Responding STA does not support the specified authentication "
+	  "algorithm",						/* 13 */
 	"Received an Authentication frame with authentication transaction "
 	  "sequence number out of expected sequence",		/* 14 */
 	"Authentication rejected because of challenge failure",	/* 15 */
 	"Authentication rejected due to timeout waiting for next frame in "
 	  "sequence",						/* 16 */
-	"Association denied because AP is unable to handle additional"
-	  "associated stations",				/* 17 */
-	"Association denied due to requesting station not supporting all of "
-	  "the data rates in BSSBasicRateSet parameter",	/* 18 */
-	"Association denied due to requesting station not supporting "
-	  "short preamble operation",				/* 19 */
-	"Association denied due to requesting station not supporting "
-	  "PBCC encoding",					/* 20 */
-	"Association denied due to requesting station not supporting "
-	  "channel agility",					/* 21 */
+	"Association denied because AP is unable to handle "
+	  "additional associated STAs",				/* 17 */
+	"Association denied due to requesting STA not supporting "
+	  "all of the data rates in the BSSBasicRateSet parameter, "
+	  "the Basic HT-MCS Set field of the HT Operation "
+	  "parameter, or the Basic VHT-MCS and NSS Set field in "
+	  "the VHT Operation parameter",	/* 18 */
+	"Association denied due to requesting STA not supporting "
+	  "the short preamble option",				/* 19 */
+	"Reserved",					/* 20 */
+	"Reserved",					/* 21 */
 	"Association request rejected because Spectrum Management "
 	  "capability is required",				/* 22 */
 	"Association request rejected because the information in the "
 	  "Power Capability element is unacceptable",		/* 23 */
 	"Association request rejected because the information in the "
 	  "Supported Channels element is unacceptable",		/* 24 */
-	"Association denied due to requesting station not supporting "
-	  "short slot operation",				/* 25 */
-	"Association denied due to requesting station not supporting "
-	  "DSSS-OFDM operation",				/* 26 */
+	"Association denied due to requesting STA not supporting "
+	  "the Short Slot Time option",				/* 25 */
+	"Reserved",				/* 26 */
 	"Association denied because the requested STA does not support HT "
 	  "features",						/* 27 */
-	"Reserved",						/* 28 */
-	"Association denied because the requested STA does not support "
-	  "the PCO transition time required by the AP",		/* 29 */
-	"Reserved",						/* 30 */
-	"Reserved",						/* 31 */
+	"R0KH unreachable",					/* 28 */
+	"Association denied because the requesting STA does not "
+	  "support the phased coexistence operation (PCO) "
+	  "transition time required by the AP",		/* 29 */
+	"Association request rejected temporarily; try again "
+	  "later",							/* 30 */
+	"Robust management frame policy violation",	/* 31 */
 	"Unspecified, QoS-related failure",			/* 32 */
-	"Association denied due to QAP having insufficient bandwidth "
-	  "to handle another QSTA",				/* 33 */
+	"Association denied because QoS AP or PCP has "
+	  "insufficient bandwidth to handle another QoS "
+	  "STA",									/* 33 */
 	"Association denied due to excessive frame loss rates and/or "
 	  "poor conditions on current operating channel",	/* 34 */
-	"Association (with QBSS) denied due to requesting station not "
-	  "supporting the QoS facility",			/* 35 */
-	"Association denied due to requesting station not supporting "
-	  "Block Ack",						/* 36 */
+	"Association (with QoS BSS) denied because the requesting STA "
+	  "does not support the QoS facility",			/* 35 */
+	"Reserved",									/* 36 */
 	"The request has been declined",			/* 37 */
 	"The request has not been successful as one or more parameters "
 	  "have invalid values",				/* 38 */
-	"The TS has not been created because the request cannot be honored. "
-	  "Try again with the suggested changes to the TSPEC",	/* 39 */
-	"Invalid Information Element",				/* 40 */
-	"Group Cipher is not valid",				/* 41 */
-	"Pairwise Cipher is not valid",				/* 42 */
-	"AKMP is not valid",					/* 43 */
-	"Unsupported RSN IE version",				/* 44 */
-	"Invalid RSN IE Capabilities",				/* 45 */
-	"Cipher suite is rejected per security policy",		/* 46 */
-	"The TS has not been created. However, the HC may be capable of "
-	  "creating a TS, in response to a request, after the time indicated "
-	  "in the TS Delay element",				/* 47 */
+	"The allocation or TS has not been created because the request "
+	  "cannot be honored; however, a suggested TSPEC/DMG TSPEC is "
+	  "provided so that the initiating STA can attempt to set "
+	  "another allocation or TS with the suggested changes to the "
+	  "TSPEC/DMG TSPEC",					/* 39 */
+	"Invalid element, i.e., an element defined in this standard "
+	  "for which the content does not meet the specifications in "
+	  "Clause 9",								/* 40 */
+	"Invalid group cipher",						/* 41 */
+	"Invalid pairwise cipher",					/* 42 */
+	"Invalid AKMP",								/* 43 */
+	"Unsupported RSNE version",					/* 44 */
+	"Invalid RSNE capabilities",				/* 45 */
+	"Cipher suite rejected because of security policy",		/* 46 */
+	"The TS or allocation has not been created; however, the "
+	  "HC or PCP might be capable of creating a TS or "
+	  "allocation, in response to a request, after the time "
+	  "indicated in the TS Delay element",		/* 47 */
 	"Direct Link is not allowed in the BSS by policy",	/* 48 */
-	"Destination STA is not present within this QBSS.",	/* 49 */
-	"The Destination STA is not a QSTA.",			/* 50 */
+	"The Destination STA is not present within this BSS",	/* 49 */
+	"The Destination STA is not a QoS STA",		/* 50 */
 
+	"Association denied because the listen interval is "
+	  "too large",								/* 51 */
+	"Invalid FT Action frame count",			/* 52 */
+	"Invalid pairwise master key identifier (PMKID)", /* 53 */
+	"Invalid MDE",								/* 54 */
+	"Invalid FTE",								/* 55 */
+	"Requested TCLAS processing is not supported by the AP "
+	  "or PCP",									/* 56 */
+	"The AP or PCP has insufficient TCLAS processing "
+	  "resources to satisfy the request",		/* 57 */
+	"The TS has not been created because the request "
+	  "cannot be honored; however, the HC or PCP suggests "
+	  "that the STA transition to a different BSS to set up "
+	  "the TS",									/* 58 */
+	"GAS Advertisement Protocol not supported",	/* 59 */
+	"No outstanding GAS request",				/* 60 */
+	"GAS Response not received from the Advertisement "
+	  "Server",									/* 61 */
+	"STA timed out waiting for GAS Query Response", /* 62 */
+	"LARGE GAS Response is larger than query response "
+	  "length limit",							/* 63 */
+	"Request refused because home network does not support "
+	  "request",								/* 64 */
+	"Advertisement Server in the network is not currently "
+	  "reachable",								/* 65 */
+	"Reserved",									/* 66 */
+	"Request refused due to permissions received via SSPN "
+	  "interface",								/* 67 */
+	"Request refused because the AP or PCP does not "
+	  "support unauthenticated access",			/* 68 */
+	"Reserved",									/* 69 */
+	"Reserved",									/* 70 */
+	"Reserved",									/* 71 */
+	"Invalid contents of RSNE", 				/* 72 */
+	"U-APSD coexistence is not supported", 		/* 73 */
+	"Requested U-APSD coexistence mode is not supported", /* 74 */
+	"Requested Interval/Duration value cannot be "
+	  "supported with U-APSD coexistence",		/* 75 */
+	"Authentication is rejected because an Anti-Clogging "
+	  "Token is required",						/* 76 */
+	"Authentication is rejected because the offered "
+	  "finite cyclic group is not supported",	/* 77 */
+	"The TBTT adjustment request has not been successful "
+	  "because the STA could not find an alternative TBTT", /* 78 */
+	"Transmission failure",						/* 79 */
+	"Requested TCLAS Not Supported",			/* 80 */
+	"TCLAS Resources Exhausted",				/* 81 */
+	"Rejected with Suggested BSS transition",	/* 82 */
+	"Reject with recommended schedule",			/* 83 */
+	"Reject because no wakeup schedule specified", /* 84 */
+	"Success, the destination STA is in power save mode", /* 85 */
+	"FST pending, in process of admitting FST session", /* 86 */
+	"Performing FST now",						/* 87 */
+	"FST pending, gap(s) in block ack window",	/* 88 */
+	"Reject because of U-PID setting",			/* 89 */
+	"Reserved",									/* 90 */
+	"Reserved",									/* 91 */
+	"(Re)Association refused for some external reason", /* 92 */
+	"(Re)Association refused because of memory limits "
+	  "at the AP",								/* 93 */
+	"(Re)Association refused because emergency services "
+	  "are not supported at the AP",			/* 94 */
+	"GAS query response not yet received",		/* 95 */
+	"Reject since the request is for transition to a "
+	  "frequency band subject to DSE procedures and "
+	  "FST Initiator is a dependent STA",		/* 96 */
+	"Requested TCLAS processing has been terminated by "
+	  "the AP",									/* 97 */
+	"The TS schedule conflicts with an existing "
+	  "schedule; an alternative schedule is provided", /* 98 */
+	"The association has been denied; however, one or "
+	  "more Multi-band elements are included that can "
+	  "be used by the receiving STA to join the BSS", /* 99 */
+	"The request failed due to a reservation conflict", /* 100 */
+	"The request failed due to exceeded MAF limit", /* 101 */
+	"The request failed due to exceeded MCCA track "
+	  "limit",									/* 102 */
+	"Association denied because the information in the"
+	  "Spectrum Management field is unacceptable", /* 103 */
+	"Association denied because the requesting STA "
+	  "does not support VHT features",			/* 104 */
+	"Enablement denied", 						/* 105 */
+	"Enablement denied due to restriction from an "
+	  "authorized GDB",							/* 106 */
+	"Authorization deenabled",					/* 107 */
 };
 #define NUM_STATUSES	(sizeof(status_text) / sizeof(status_text[0]))
 
