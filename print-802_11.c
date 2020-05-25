@@ -1008,40 +1008,45 @@ static const char *reason_text[] = {
 	"Reserved",						/* 0 */
 	"Unspecified reason",					/* 1 */
 	"Previous authentication no longer valid",		/* 2 */
-	"Deauthenticated because sending station is leaving (or has left) "
+	"Deauthenticated because sending STA is leaving (or has left) "
 	  "IBSS or ESS",					/* 3 */
 	"Disassociated due to inactivity",			/* 4 */
 	"Disassociated because AP is unable to handle all currently "
-	  " associated stations",				/* 5 */
-	"Class 2 frame received from nonauthenticated station", /* 6 */
-	"Class 3 frame received from nonassociated station",	/* 7 */
-	"Disassociated because sending station is leaving "
+	  " associated STAs",				/* 5 */
+	"Class 2 frame received from nonauthenticated STA", /* 6 */
+	"Class 3 frame received from nonassociated STA",	/* 7 */
+	"Disassociated because sending STA is leaving "
 	  "(or has left) BSS",					/* 8 */
-	"Station requesting (re)association is not authenticated with "
-	  "responding station",					/* 9 */
+	"STA requesting (re)association is not authenticated with "
+	  "responding STA",					/* 9 */
 	"Disassociated because the information in the Power Capability "
 	  "element is unacceptable",				/* 10 */
-	"Disassociated because the information in the SupportedChannels "
+	"Disassociated because the information in the Supported Channels "
 	  "element is unacceptable",				/* 11 */
-	"Invalid Information Element",				/* 12 */
-	"Reserved",						/* 13 */
-	"Michael MIC failure",					/* 14 */
+	"Disassociated due to BSS transition management",	/* 12 */
+	"Invalid element, i.e., an element defined in this standard for "
+	  "which the content does not meet the specifications "
+	  "in Clause 9",						/* 13 */
+	"Message integrity code (MIC) failure",	/* 14 */
 	"4-Way Handshake timeout",				/* 15 */
-	"Group key update timeout",				/* 16 */
+	"Group key handshake timeout",			/* 16 */
 	"Information element in 4-Way Handshake different from (Re)Association"
-	  "Request/Probe Response/Beacon",			/* 17 */
-	"Group Cipher is not valid",				/* 18 */
-	"AKMP is not valid",					/* 20 */
-	"Unsupported RSN IE version",				/* 21 */
-	"Invalid RSN IE Capabilities",				/* 22 */
-	"IEEE 802.1X Authentication failed",			/* 23 */
-	"Cipher suite is rejected per security policy",		/* 24 */
-	"Reserved",						/* 25 */
-	"Reserved",						/* 26 */
-	"Reserved",						/* 27 */
-	"Reserved",						/* 28 */
-	"Reserved",						/* 29 */
-	"Reserved",						/* 30 */
+	  "Request/Probe Response/Beacon frame",	/* 17 */
+	"Invalid group cipher",					/* 18 */
+	"Invalid pairwise cipher",				/* 19 */
+	"Invalid AKMP",							/* 20 */
+	"Unsupported RSNE version",				/* 21 */
+	"Invalid RSNE capabilities",				/* 22 */
+	"IEEE 802.1X authentication failed",			/* 23 */
+	"Cipher suite rejected because of the security policy",		/* 24 */
+	"TDLS direct-link teardown due to TDLS peer STA "
+	  "unreachable via the TDLS direct link",				/* 25 */
+	"TDLS direct-link teardown for unspecified reason",		/* 26 */
+	"Disassociated because session terminated by SSP request",/* 27 */
+	"Disassociated because of lack of SSP roaming agreement",/* 28 */
+	"Requested service rejected because of SSP cipher suite or "
+	  "AKM requirement",						/* 29 */
+	"Requested service not authorized in this location",	/* 30 */
 	"TS deleted because QoS AP lacks sufficient bandwidth for this "
 	  "QoS STA due to a change in BSS service characteristics or "
 	  "operational mode (e.g. an HT BSS change from 40 MHz channel "
@@ -1050,7 +1055,7 @@ static const char *reason_text[] = {
 	"Disassociated because QoS AP lacks sufficient bandwidth for this "
 	  "QoS STA",						/* 33 */
 	"Disassociated because of excessive number of frames that need to be "
-	  "acknowledged, but are not acknowledged for AP transmissions "
+	  "acknowledged, but are not acknowledged due to AP transmissions "
 	  "and/or poor channel conditions",			/* 34 */
 	"Disassociated because STA is transmitting outside the limits "
 	  "of its TXOPs",					/* 35 */
@@ -1067,8 +1072,47 @@ static const char *reason_text[] = {
 	"Reserved",						/* 43 */
 	"Reserved",						/* 44 */
 	"Peer STA does not support the requested cipher suite",	/* 45 */
-	"Association denied due to requesting STA not supporting HT "
-	  "features",						/* 46 */
+	"In a DLS Teardown frame: The teardown was initiated by the "
+	  "DLS peer. In a Disassociation frame: Disassociated because "
+	  "authorized access limit reached",					/* 46 */
+	"In a DLS Teardown frame: The teardown was initiated by the "
+	  "AP. In a Disassociation frame: Disassociated due to external "
+	  "service requirements",								/* 47 */
+	"Invalid FT Action frame count",						/* 48 */
+	"Invalid pairwise master key identifier (PMKID)",		/* 49 */
+	"Invalid MDE",											/* 50 */
+	"Invalid FTE",											/* 51 */
+	"Mesh peering canceled for unknown reasons",			/* 52 */
+	"The mesh STA has reached the supported maximum number of "
+	  "peer mesh STAs",										/* 53 */
+	"The received information violates the Mesh Configuration "
+	  "policy configured in the mesh STA profile",			/* 54 */
+	"The mesh STA has received a Mesh Peering Close frame "
+	  "requesting to close the mesh peering",				/* 55 */
+	"The mesh STA has resent dot11MeshMaxRetries Mesh "
+	  "Peering Open frames, without receiving a Mesh Peering "
+	  "Confirm frame"										/* 56 */
+	"The confirmTimer for the mesh peering instance times out",	/* 57 */
+	"The mesh STA fails to unwrap the GTK or the values in the "
+	  "wrapped contents do not match",						/* 58 */
+	"The mesh STA receives inconsistent information about the "
+	  "mesh parameters between mesh peering Management frames",	/* 59 */
+	"The mesh STA fails the authenticated mesh peering exchange "
+	  "because due to failure in selecting either the pairwise "
+	  "ciphersuite or group ciphersuite",					/* 60 */
+	"The mesh STA does not have proxy information for this "
+	  "external destination",								/* 61 */
+	"The mesh STA does not have forwarding information for this "
+	  "destination",										/* 62 */
+	"The mesh STA determines that the link to the next hop of an "
+	  "active path in its forwarding information is no longer "
+	  "usable",												/* 63 */
+	"The Deauthentication frame was sent because the MAC "
+	  "address of the STA already exists in the mesh BSS",	/* 64 */
+	"The mesh STA performs channel switch to meet regulatory "
+	  "requirements",										/* 65 */
+	"The mesh STA performs channel switching with unspecified "
+	  "reason",												/* 66 */
 };
 #define NUM_REASONS	(sizeof(reason_text) / sizeof(reason_text[0]))
 
