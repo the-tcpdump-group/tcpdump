@@ -740,14 +740,14 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		} else if (IS_SRC_OR_DST_PORT(SOMEIP_PORT))
 			someip_print(ndo, (const u_char *)(up + 1), length);
 		else {
-			if (ulen > length)
+			if (ulen > length && !fragmented)
 				ND_PRINT("UDP, bad length %u > %u",
 				    ulen, length);
 			else
 				ND_PRINT("UDP, length %u", ulen);
 		}
 	} else {
-		if (ulen > length)
+		if (ulen > length && !fragmented)
 			ND_PRINT("UDP, bad length %u > %u",
 			    ulen, length);
 		else
