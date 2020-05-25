@@ -952,7 +952,7 @@ nbt_tcp_print(netdissect_options *ndo,
 	goto trunc;
     if (ndo->ndo_snapend < data)
 	goto trunc;
-    caplen = ndo->ndo_snapend - data;
+    caplen = ND_BYTES_AVAILABLE_AFTER(data);
     if (caplen < 4)
 	goto trunc;
     maxbuf = data + caplen;
@@ -1269,7 +1269,7 @@ smb_tcp_print(netdissect_options *ndo,
 	goto trunc;
     if (ndo->ndo_snapend < data)
 	goto trunc;
-    caplen = ndo->ndo_snapend - data;
+    caplen = ND_BYTES_AVAILABLE_AFTER(data);
     if (caplen < 4)
 	goto trunc;
     maxbuf = data + caplen;

@@ -1413,7 +1413,7 @@ static void
 ppp_hdlc(netdissect_options *ndo,
          const u_char *p, u_int length)
 {
-	u_int caplen = ndo->ndo_snapend - p;
+	u_int caplen = ND_BYTES_AVAILABLE_AFTER(p);
 	u_char *b, *t, c;
 	const u_char *s;
 	u_int i, proto;

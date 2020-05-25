@@ -169,13 +169,13 @@ static const u_char *
 zmtp1_print_intermediate_part(netdissect_options *ndo, const u_char *cp, const u_int len)
 {
 	u_int frame_offset;
-	uint64_t remaining_len;
+	u_int remaining_len;
 
 	ND_TCHECK_2(cp);
 	frame_offset = GET_BE_U_2(cp);
 	ND_PRINT("\n\t frame offset 0x%04x", frame_offset);
 	cp += 2;
-	remaining_len = ndo->ndo_snapend - cp; /* without the frame length */
+	remaining_len = ND_BYTES_AVAILABLE_AFTER(cp); /* without the frame length */
 
 	if (frame_offset == 0xFFFF)
 		frame_offset = len - 2; /* always within the declared length */
@@ -188,14 +188,14 @@ zmtp1_print_intermediate_part(netdissect_options *ndo, const u_char *cp, const u
 	if (frame_offset) {
 		ND_PRINT("\n\t frame intermediate part, %u bytes", frame_offset);
 		if (frame_offset > remaining_len)
-			ND_PRINT(" (%"PRIu64" captured)", remaining_len);
+			ND_PRINT(" (%u captured)", remaining_len);
 		if (ndo->ndo_vflag) {
-			uint64_t len_printed = min(frame_offset, remaining_len);
+			u_int len_printed = min(frame_offset, remaining_len);
 
 			if (ndo->ndo_vflag == 1)
 				len_printed = min(VBYTES, len_printed);
 			if (len_printed > 1) {
-				ND_PRINT(", first %"PRIu64" byte(s):", len_printed);
+				ND_PRINT(", first %u byte(s):", len_printed);
 				hex_and_ascii_print(ndo, "\n\t ", cp, len_printed);
 			}
 		}
