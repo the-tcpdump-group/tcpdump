@@ -568,14 +568,14 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	}
 
 	if (ndo->ndo_vflag && !ndo->ndo_Kflag && !fragmented) {
-                /* Check the checksum, if possible. */
-                uint16_t sum, udp_sum;
+		/* Check the checksum, if possible. */
+		uint16_t sum, udp_sum;
 
 		/*
 		 * XXX - do this even if vflag == 1?
 		 * TCP does, and we do so for UDP-over-IPv6.
 		 */
-	        if (IP_V(ip) == 4 && (ndo->ndo_vflag > 1)) {
+		if (IP_V(ip) == 4 && (ndo->ndo_vflag > 1)) {
 			ND_TCHECK_2(up->uh_sum);
 			udp_sum = GET_BE_U_2(up->uh_sum);
 			if (udp_sum == 0) {
@@ -583,7 +583,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			} else if (ND_TTEST_LEN(cp, length)) {
 				sum = udp_cksum(ndo, ip, up, length + sizeof(struct udphdr));
 
-	                        if (sum != 0) {
+				if (sum != 0) {
 					ND_PRINT("[bad udp cksum 0x%04x -> 0x%04x!] ",
 					    udp_sum,
 					    in_cksum_shouldbe(udp_sum, sum));
@@ -598,7 +598,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 				ND_TCHECK_2(up->uh_sum);
 				udp_sum = GET_BE_U_2(up->uh_sum);
 
-	                        if (sum != 0) {
+				if (sum != 0) {
 					ND_PRINT("[bad udp cksum 0x%04x -> 0x%04x!] ",
 					    udp_sum,
 					    in_cksum_shouldbe(udp_sum, sum));
@@ -624,11 +624,11 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		else if (IS_SRC_OR_DST_PORT(AODV_PORT))
 			aodv_print(ndo, (const u_char *)(up + 1), length,
 			    ip6 != NULL);
-	        else if (IS_SRC_OR_DST_PORT(ISAKMP_PORT))
+		else if (IS_SRC_OR_DST_PORT(ISAKMP_PORT))
 			 isakmp_print(ndo, (const u_char *)(up + 1), length, bp2);
-	        else if (IS_SRC_OR_DST_PORT(ISAKMP_PORT_NATT))
+		else if (IS_SRC_OR_DST_PORT(ISAKMP_PORT_NATT))
 			 isakmp_rfc3948_print(ndo, (const u_char *)(up + 1), length, bp2, IP_V(ip), fragmented, ttl_hl);
-	        else if (IS_SRC_OR_DST_PORT(ISAKMP_PORT_USER1) || IS_SRC_OR_DST_PORT(ISAKMP_PORT_USER2))
+		else if (IS_SRC_OR_DST_PORT(ISAKMP_PORT_USER1) || IS_SRC_OR_DST_PORT(ISAKMP_PORT_USER2))
 			isakmp_print(ndo, (const u_char *)(up + 1), length, bp2);
 		else if (IS_SRC_OR_DST_PORT(SNMP_PORT) || IS_SRC_OR_DST_PORT(SNMPTRAP_PORT))
 			snmp_print(ndo, (const u_char *)(up + 1), length);
@@ -698,27 +698,27 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			 dport == BFD_LAG_PORT ||
 			 dport == BFD_ECHO_PORT )
 			bfd_print(ndo, (const u_char *)(up+1), length, dport);
-                else if (IS_SRC_OR_DST_PORT(LMP_PORT))
+		else if (IS_SRC_OR_DST_PORT(LMP_PORT))
 			lmp_print(ndo, (const u_char *)(up + 1), length);
 		else if (IS_SRC_OR_DST_PORT(VQP_PORT))
 			vqp_print(ndo, (const u_char *)(up + 1), length);
-                else if (IS_SRC_OR_DST_PORT(SFLOW_PORT))
-                        sflow_print(ndo, (const u_char *)(up + 1), length);
-	        else if (dport == LWAPP_CONTROL_PORT)
+		else if (IS_SRC_OR_DST_PORT(SFLOW_PORT))
+			sflow_print(ndo, (const u_char *)(up + 1), length);
+		else if (dport == LWAPP_CONTROL_PORT)
 			lwapp_control_print(ndo, (const u_char *)(up + 1), length, 1);
-                else if (sport == LWAPP_CONTROL_PORT)
-                        lwapp_control_print(ndo, (const u_char *)(up + 1), length, 0);
-                else if (IS_SRC_OR_DST_PORT(LWAPP_DATA_PORT))
-                        lwapp_data_print(ndo, (const u_char *)(up + 1), length);
-                else if (IS_SRC_OR_DST_PORT(SIP_PORT))
+		else if (sport == LWAPP_CONTROL_PORT)
+			lwapp_control_print(ndo, (const u_char *)(up + 1), length, 0);
+		else if (IS_SRC_OR_DST_PORT(LWAPP_DATA_PORT))
+			lwapp_data_print(ndo, (const u_char *)(up + 1), length);
+		else if (IS_SRC_OR_DST_PORT(SIP_PORT))
 			sip_print(ndo, (const u_char *)(up + 1), length);
-                else if (IS_SRC_OR_DST_PORT(SYSLOG_PORT))
+		else if (IS_SRC_OR_DST_PORT(SYSLOG_PORT))
 			syslog_print(ndo, (const u_char *)(up + 1), length);
-                else if (IS_SRC_OR_DST_PORT(OTV_PORT))
+		else if (IS_SRC_OR_DST_PORT(OTV_PORT))
 			otv_print(ndo, (const u_char *)(up + 1), length);
-                else if (IS_SRC_OR_DST_PORT(VXLAN_PORT))
+		else if (IS_SRC_OR_DST_PORT(VXLAN_PORT))
 			vxlan_print(ndo, (const u_char *)(up + 1), length);
-                else if (IS_SRC_OR_DST_PORT(GENEVE_PORT))
+		else if (IS_SRC_OR_DST_PORT(GENEVE_PORT))
 			geneve_print(ndo, (const u_char *)(up + 1), length);
 		else if (IS_SRC_OR_DST_PORT(LISP_CONTROL_PORT))
 			lisp_print(ndo, (const u_char *)(up + 1), length);
@@ -734,12 +734,12 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			if (ndo->ndo_vflag)
 				ND_PRINT("kip ");
 			llap_print(ndo, cp, length);
-                } else if (IS_SRC_OR_DST_PORT(PTP_EVENT_PORT) ||
-                        IS_SRC_OR_DST_PORT(PTP_GENERAL_PORT)) {
-                        ptp_print(ndo, cp, length);
-                } else if (IS_SRC_OR_DST_PORT(SOMEIP_PORT))
-                        someip_print(ndo, (const u_char *)(up + 1), length);
-                else {
+		} else if (IS_SRC_OR_DST_PORT(PTP_EVENT_PORT) ||
+			IS_SRC_OR_DST_PORT(PTP_GENERAL_PORT)) {
+			ptp_print(ndo, cp, length);
+		} else if (IS_SRC_OR_DST_PORT(SOMEIP_PORT))
+			someip_print(ndo, (const u_char *)(up + 1), length);
+		else {
 			if (ulen > length)
 				ND_PRINT("UDP, bad length %u > %u",
 				    ulen, length);
