@@ -376,14 +376,14 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	if (xtr_present) {
 		if (!ND_TTEST_LEN(packet_iterator + packet_offset, 24))
 			goto invalid;
-		hex_print_with_offset(ndo, "\n    xTR-ID: ", packet_iterator + packet_offset, 16, 0);
+		hex_print(ndo, "\n    xTR-ID: ", packet_iterator + packet_offset, 16);
 		ND_PRINT("\n    SITE-ID: %" PRIu64,
 			GET_BE_U_8(packet_iterator + packet_offset + 16));
 	} else {
 		/* Check if packet isn't over yet */
 		if (packet_iterator + packet_offset < ndo->ndo_snapend) {
-			hex_print_with_offset(ndo, "\n    Data: ", packet_iterator + packet_offset,
-				ND_BYTES_AVAILABLE_AFTER(packet_iterator + packet_offset), 0);
+			hex_print(ndo, "\n    Data: ", packet_iterator + packet_offset,
+				ND_BYTES_AVAILABLE_AFTER(packet_iterator + packet_offset));
 		}
 	}
 	return;
