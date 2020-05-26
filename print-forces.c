@@ -710,7 +710,7 @@ fdatatlv_print(netdissect_options *ndo,
 	if (ndo->ndo_vflag >= 3) {
 		char *ib = indent_pr(indent + 2, 1);
 		ND_PRINT("%s[", ib + 1);
-		hex_print_with_offset(ndo, ib, tdp, rlen, 0);
+		hex_print(ndo, ib, tdp, rlen);
 		ND_PRINT("\n%s]", ib + 1);
 	}
 	return 0;
@@ -745,7 +745,7 @@ sdatailv_print(netdissect_options *ndo,
 		invilv = ilv_valid(ndo, ilv, rlen);
 		if (invilv) {
 			ND_PRINT("%s[", ib + 1);
-			hex_print_with_offset(ndo, ib, tdp, rlen, 0);
+			hex_print(ndo, ib, tdp, rlen);
 			ND_PRINT("\n%s]\n", ib + 1);
 			return -1;
 		}
@@ -753,7 +753,7 @@ sdatailv_print(netdissect_options *ndo,
 			u_int ilvl = GET_BE_U_4(ilv->length);
 			ND_PRINT("\n%s ILV: type %x length %u\n", ib + 1,
 				  GET_BE_U_4(ilv->type), ilvl);
-			hex_print_with_offset(ndo, "\t\t[", tdp, ilvl-ILV_HDRL, 0);
+			hex_print(ndo, "\t\t[", tdp, ilvl-ILV_HDRL);
 		}
 
 		ilv = GO_NXT_ILV(ilv, rlen);
@@ -979,8 +979,8 @@ pdatacnt_print(netdissect_options *ndo,
 			       type, tlvl);
 pd_err:
 			if (tlvl) {
-                                hex_print_with_offset(ndo, "Bad Data val\n\t  [",
-						      pptr, len, 0);
+                                hex_print(ndo, "Bad Data val\n\t  [",
+					  pptr, len);
 				ND_PRINT("]\n");
 
 				return -1;
@@ -1034,7 +1034,7 @@ pdata_print(netdissect_options *ndo,
 	if (len < minsize) {
 		ND_PRINT("\t\t\ttruncated IDs expected %uB got %uB\n", minsize,
 		       len);
-		hex_print_with_offset(ndo, "\t\t\tID Data[", pptr, len, 0);
+		hex_print(ndo, "\t\t\tID Data[", pptr, len);
 		ND_PRINT("]\n");
 		return -1;
 	}
@@ -1169,7 +1169,7 @@ invoptlv_print(netdissect_options *ndo,
 
 	if (ndo->ndo_vflag >= 3) {
 		ND_PRINT("%sData[", ib + 1);
-		hex_print_with_offset(ndo, ib, pptr, len, 0);
+		hex_print(ndo, ib, pptr, len);
 		ND_PRINT("%s]\n", ib);
 	}
 	return -1;
@@ -1369,7 +1369,7 @@ print_metailv(netdissect_options *ndo,
 	ND_PRINT("%sMetaID 0x%x length %u\n", ib, GET_BE_U_4(ilv->type),
 		  GET_BE_U_4(ilv->length));
 	if (ndo->ndo_vflag >= 3) {
-		hex_print_with_offset(ndo, "\t\t[", ILV_DATA(ilv), rlen, 0);
+		hex_print(ndo, "\t\t[", ILV_DATA(ilv), rlen);
 		ND_PRINT(" ]\n");
 	}
 	return 0;
@@ -1436,7 +1436,7 @@ print_reddata(netdissect_options *ndo,
 
 	if (ndo->ndo_vflag >= 3) {
 		ND_PRINT("\t\t[");
-		hex_print_with_offset(ndo, "\n\t\t", pptr, rlen, 0);
+		hex_print(ndo, "\n\t\t", pptr, rlen);
 		ND_PRINT("\n\t\t]");
 	}
 
@@ -1758,14 +1758,14 @@ forces_print(netdissect_options *ndo,
 	rc = forces_type_print(ndo, pptr, fhdr, mlen, tops);
 	if (rc < 0) {
 error:
-		hex_print_with_offset(ndo, "\n\t[", pptr, len, 0);
+		hex_print(ndo, "\n\t[", pptr, len);
 		ND_PRINT("\n\t]");
 		return;
 	}
 
 	if (ndo->ndo_vflag >= 4) {
 		ND_PRINT("\n\t  Raw ForCES message\n\t [");
-		hex_print_with_offset(ndo, "\n\t ", pptr, len, 0);
+		hex_print(ndo, "\n\t ", pptr, len);
 		ND_PRINT("\n\t ]");
 	}
 	return;
