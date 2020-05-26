@@ -499,7 +499,7 @@ static int	rx_cache_find(netdissect_options *, const struct rx_header *,
 
 static void fs_print(netdissect_options *, const u_char *, u_int);
 static void fs_reply_print(netdissect_options *, const u_char *, u_int, uint32_t);
-static void acl_print(netdissect_options *, u_char *, int, u_char *);
+static void acl_print(netdissect_options *, u_char *, u_char *);
 static void cb_print(netdissect_options *, const u_char *, u_int);
 static void cb_reply_print(netdissect_options *, const u_char *, u_int, uint32_t);
 static void prot_print(netdissect_options *, const u_char *, u_int);
@@ -961,7 +961,7 @@ fs_print(netdissect_options *ndo,
 			i = min(AFSOPAQUEMAX, i);
 			strncpy(a, (const char *) bp, i);
 			a[i] = '\0';
-			acl_print(ndo, (u_char *) a, sizeof(a), (u_char *) a + i);
+			acl_print(ndo, (u_char *) a, (u_char *) a + i);
 			break;
 		}
 		case 137:	/* Create file */
@@ -1097,7 +1097,7 @@ fs_reply_print(netdissect_options *ndo,
 			i = min(AFSOPAQUEMAX, i);
 			strncpy(a, (const char *) bp, i);
 			a[i] = '\0';
-			acl_print(ndo, (u_char *) a, sizeof(a), (u_char *) a + i);
+			acl_print(ndo, (u_char *) a, (u_char *) a + i);
 			break;
 		}
 		case 137:	/* Create file */
@@ -1150,25 +1150,23 @@ trunc:
  * representing a logical OR of all the ACL permission bits
  */
 
+#define NUMSTRINGIFY(x)	XSTRINGIFY(x)
+
 static void
 acl_print(netdissect_options *ndo,
-          u_char *s, int maxsize, u_char *end)
+          u_char *s, u_char *end)
 {
 	int pos, neg, acl;
 	int n, i;
-	char *user;
-	char fmt[1024];
-
-	if ((user = (char *)malloc(maxsize)) == NULL)
-		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC, "acl_print: malloc");
+	char user[AFSOPAQUEMAX+1];
 
 	if (sscanf((char *) s, "%d %d\n%n", &pos, &neg, &n) != 2)
-		goto finish;
+		return;
 
 	s += n;
 
 	if (s > end)
-		goto finish;
+		return;
 
 	/*
 	 * This wacky order preserves the order used by the "fs" command
@@ -1185,9 +1183,8 @@ acl_print(netdissect_options *ndo,
 	          acl & PRSFS_ADMINISTER ? "a" : "");
 
 	for (i = 0; i < pos; i++) {
-		snprintf(fmt, sizeof(fmt), "%%%ds %%d\n%%n", maxsize - 1);
-		if (sscanf((char *) s, fmt, user, &acl, &n) != 2)
-			goto finish;
+		if (sscanf((char *) s, "%" NUMSTRINGIFY(AFSOPAQUEMAX) "s %d\n%n", user, &acl, &n) != 2)
+			return;
 		s += n;
 		ND_PRINT(" +{");
 		fn_print_str(ndo, (u_char *)user);
@@ -1195,13 +1192,12 @@ acl_print(netdissect_options *ndo,
 		ACLOUT(acl);
 		ND_PRINT("}");
 		if (s > end)
-			goto finish;
+			return;
 	}
 
 	for (i = 0; i < neg; i++) {
-		snprintf(fmt, sizeof(fmt), "%%%ds %%d\n%%n", maxsize - 1);
-		if (sscanf((char *) s, fmt, user, &acl, &n) != 2)
-			goto finish;
+		if (sscanf((char *) s, "%" NUMSTRINGIFY(AFSOPAQUEMAX) "s %d\n%n", user, &acl, &n) != 2)
+			return;
 		s += n;
 		ND_PRINT(" -{");
 		fn_print_str(ndo, (u_char *)user);
@@ -1209,12 +1205,8 @@ acl_print(netdissect_options *ndo,
 		ACLOUT(acl);
 		ND_PRINT("}");
 		if (s > end)
-			goto finish;
+			return;
 	}
-
-finish:
-	free(user);
-	return;
 }
 
 #undef ACLOUT
