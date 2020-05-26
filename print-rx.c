@@ -65,6 +65,7 @@
 #define VLNAMEMAX 65
 #define KANAMEMAX 64
 #define BOSNAMEMAX 256
+#define USERNAMEMAX 1024		/* AFSOPAQUEMAX was used for this; does it need to be this big? */
 
 #define	PRSFS_READ		1 /* Read files */
 #define	PRSFS_WRITE		2 /* Write files */
@@ -1158,7 +1159,7 @@ acl_print(netdissect_options *ndo,
 {
 	int pos, neg, acl;
 	int n, i;
-	char user[AFSOPAQUEMAX+1];
+	char user[USERNAMEMAX+1];
 
 	if (sscanf((char *) s, "%d %d\n%n", &pos, &neg, &n) != 2)
 		return;
@@ -1183,7 +1184,7 @@ acl_print(netdissect_options *ndo,
 	          acl & PRSFS_ADMINISTER ? "a" : "");
 
 	for (i = 0; i < pos; i++) {
-		if (sscanf((char *) s, "%" NUMSTRINGIFY(AFSOPAQUEMAX) "s %d\n%n", user, &acl, &n) != 2)
+		if (sscanf((char *) s, "%" NUMSTRINGIFY(USERNAMEMAX) "s %d\n%n", user, &acl, &n) != 2)
 			return;
 		s += n;
 		ND_PRINT(" +{");
@@ -1196,7 +1197,7 @@ acl_print(netdissect_options *ndo,
 	}
 
 	for (i = 0; i < neg; i++) {
-		if (sscanf((char *) s, "%" NUMSTRINGIFY(AFSOPAQUEMAX) "s %d\n%n", user, &acl, &n) != 2)
+		if (sscanf((char *) s, "%" NUMSTRINGIFY(USERNAMEMAX) "s %d\n%n", user, &acl, &n) != 2)
 			return;
 		s += n;
 		ND_PRINT(" -{");
