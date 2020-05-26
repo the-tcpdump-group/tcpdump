@@ -305,6 +305,14 @@ static const struct tok rsvp_ctype_values[] = {
     { 0, NULL}
 };
 
+/*
+ * XXX - this assumes a 16-byte digest, which is true for HMAC-MD5, but
+ * isn't necessarily the case for other hash algorithms.
+ *
+ * Unless I've missed something, there's nothing in RFC 2747 to indicate
+ * the hash algorithm being used, so it's presumably something set up
+ * out-of-band, or negotiated by other RSVP objects.
+ */
 struct rsvp_obj_integrity_t {
     uint8_t flags;
     uint8_t res;
