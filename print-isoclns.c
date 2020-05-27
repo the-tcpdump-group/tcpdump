@@ -1382,6 +1382,10 @@ esis_print(netdissect_options *ndo,
 
 	default:
 		if (ndo->ndo_vflag <= 1) {
+			/*
+			 * If there's at least one byte to print, print
+			 * it/them.
+			 */
 			if (ND_TTEST_LEN(pptr, 1))
 				print_unknown_data(ndo, pptr, "\n\t  ", ND_BYTES_AVAILABLE_AFTER(pptr));
 		}
