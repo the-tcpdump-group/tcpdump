@@ -301,7 +301,7 @@ ospf_te_lsa_print(netdissect_options *ndo,
 
         switch(tlv_type) {
         case LS_OPAQUE_TE_TLV_LINK:
-            while (tlv_length >= sizeof(subtlv_type) + sizeof(subtlv_length)) {
+            while (tlv_length != 0) {
                 if (tlv_length < 4) {
                     ND_PRINT("\n\t    Remaining TLV length %u < 4",
                            tlv_length);
@@ -322,6 +322,11 @@ ospf_te_lsa_print(netdissect_options *ndo,
                        subtlv_type,
                        subtlv_length);
 
+                if (tlv_length < subtlv_length) {
+                    ND_PRINT("\n\t    Remaining TLV length %u < %u",
+                           tlv_length + 4, subtlv_length + 4);
+                    return -1;
+                }
                 ND_TCHECK_LEN(tptr, subtlv_length);
                 switch(subtlv_type) {
                 case LS_OPAQUE_TE_LINK_SUBTLV_ADMIN_GROUP:
@@ -471,6 +476,11 @@ ospf_te_lsa_print(netdissect_options *ndo,
                 if (subtlv_length%4 != 0)
                     subtlv_length+=4-(subtlv_length%4);
 
+                if (tlv_length < subtlv_length) {
+                    ND_PRINT("\n\t    Remaining TLV length %u < %u",
+                           tlv_length + 4, subtlv_length + 4);
+                    return -1;
+                }
                 tlv_length-=subtlv_length;
                 tptr+=subtlv_length;
 
@@ -496,6 +506,11 @@ ospf_te_lsa_print(netdissect_options *ndo,
         /* in OSPF everything has to be 32-bit aligned, including TLVs */
         if (tlv_length%4 != 0)
             tlv_length+=4-(tlv_length%4);
+        if (tlv_length > ls_length) {
+            ND_PRINT("\n\t    Bogus padded length %u > %u", tlv_length,
+                   ls_length);
+            return -1;
+        }
         ls_length-=tlv_length;
         tptr+=tlv_length;
     }
