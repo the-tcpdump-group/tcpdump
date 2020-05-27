@@ -1382,8 +1382,8 @@ esis_print(netdissect_options *ndo,
 
 	default:
 		if (ndo->ndo_vflag <= 1) {
-			if (pptr < ndo->ndo_snapend)
-				print_unknown_data(ndo, pptr, "\n\t  ", (int)(ndo->ndo_snapend - pptr));
+			if (ND_TTEST_LEN(pptr, 1))
+				print_unknown_data(ndo, pptr, "\n\t  ", ND_BYTES_AVAILABLE_AFTER(pptr));
 		}
 		return;
 	}
