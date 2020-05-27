@@ -148,12 +148,15 @@ vsock_virtio_hdr_print(netdissect_options *ndo, const struct virtio_vsock_hdr *h
 	ND_PRINT(", fwd_cnt %u", u32_v);
 }
 
-static size_t
+/*
+ * This size had better fit in a u_int.
+ */
+static u_int
 vsock_transport_hdr_size(uint16_t transport)
 {
 	switch (transport) {
 		case AF_VSOCK_TRANSPORT_VIRTIO:
-			return sizeof(struct virtio_vsock_hdr);
+			return (u_int)sizeof(struct virtio_vsock_hdr);
 		default:
 			return 0;
 	}
@@ -164,7 +167,7 @@ static int
 vsock_transport_hdr_print(netdissect_options *ndo, uint16_t transport,
                           const u_char *p, const u_int len)
 {
-	size_t transport_size = vsock_transport_hdr_size(transport);
+	u_int transport_size = vsock_transport_hdr_size(transport);
 	const void *hdr;
 
 	if (len < sizeof(struct af_vsockmon_hdr) + transport_size) {
@@ -191,7 +194,7 @@ vsock_hdr_print(netdissect_options *ndo, const u_char *p, const u_int len)
 	uint16_t hdr_transport, hdr_op;
 	uint32_t hdr_src_port, hdr_dst_port;
 	uint64_t hdr_src_cid, hdr_dst_cid;
-	size_t total_hdr_size;
+	u_int total_hdr_size;
 	int ret = 0;
 
 	hdr_transport = GET_LE_U_2(hdr->transport);
@@ -222,7 +225,8 @@ vsock_hdr_print(netdissect_options *ndo, const u_char *p, const u_int len)
 		goto trunc;
 
 	/* If debug level is more than 1 print payload contents */
-	total_hdr_size = sizeof(struct af_vsockmon_hdr) +
+	/* This size had better fit in a u_int */
+	total_hdr_size = (u_int)sizeof(struct af_vsockmon_hdr) +
 			 vsock_transport_hdr_size(hdr_transport);
 	if (ndo->ndo_vflag > 1 && hdr_op == AF_VSOCK_OP_PAYLOAD) {
 		if (len > total_hdr_size) {
