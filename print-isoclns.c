@@ -1135,9 +1135,9 @@ clnp_print(netdissect_options *ndo,
 
         default:
             /* dump the PDU specific data */
-            if (length-(pptr-optr) > 0) {
+            if (length > ND_BYTES_BETWEEN(pptr, optr)) {
                 ND_PRINT("\n\t  undecoded non-header data, length %u", length-li);
-                print_unknown_data(ndo, pptr, "\n\t  ", length - (int)(pptr - optr));
+                print_unknown_data(ndo, pptr, "\n\t  ", length - ND_BYTES_BETWEEN(pptr, optr));
             }
         }
 
