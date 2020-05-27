@@ -806,25 +806,26 @@ ospf_print_lsa(netdissect_options *ndo,
             case LS_OPAQUE_TYPE_RI:
 		tptr = (const uint8_t *)(lsap->lsa_un.un_ri_tlv);
 
-		while (ls_length != 0) {
+		int ls_length_remaining = ls_length;
+		while (ls_length_remaining != 0) {
                     ND_TCHECK_4(tptr);
-		    if (ls_length < 4) {
-                        ND_PRINT("\n\t    Remaining LS length %u < 4", ls_length);
+		    if (ls_length_remaining < 4) {
+                        ND_PRINT("\n\t    Remaining LS length %u < 4", ls_length_remaining);
                         return(ls_end);
                     }
                     tlv_type = GET_BE_U_2(tptr);
                     tlv_length = GET_BE_U_2(tptr + 2);
                     tptr+=4;
-                    ls_length-=4;
+                    ls_length_remaining-=4;
 
                     ND_PRINT("\n\t    %s TLV (%u), length: %u, value: ",
                            tok2str(lsa_opaque_ri_tlv_values,"unknown",tlv_type),
                            tlv_type,
                            tlv_length);
 
-                    if (tlv_length > ls_length) {
-                        ND_PRINT("\n\t    Bogus length %u > %u", tlv_length,
-                            ls_length);
+                    if (tlv_length > ls_length_remaining) {
+                        ND_PRINT("\n\t    Bogus length %u > remaining LS length %u", tlv_length,
+                            ls_length_remaining);
                         return(ls_end);
                     }
                     ND_TCHECK_LEN(tptr, tlv_length);
@@ -847,7 +848,7 @@ ospf_print_lsa(netdissect_options *ndo,
 
                     }
                     tptr+=tlv_length;
-                    ls_length-=tlv_length;
+                    ls_length_remaining-=tlv_length;
                 }
                 break;
 
