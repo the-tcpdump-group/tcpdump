@@ -473,17 +473,13 @@ void nd_print_invalid(netdissect_options *ndo)
  */
 
 int
-print_unknown_data(netdissect_options *ndo, const u_char *cp,const char *ident,int len)
+print_unknown_data(netdissect_options *ndo, const u_char *cp,
+                   const char *ident, u_int len)
 {
 	u_int len_to_print;
 
-	if (len < 0) {
-		ND_PRINT("%sDissector error: print_unknown_data called with negative length",
-		    ident);
-		return(0);
-	}
 	len_to_print = len;
-	if (ndo->ndo_snapend < cp) {
+	if (!ND_TTEST_LEN(cp, 0)) {
 		ND_PRINT("%sDissector error: print_unknown_data called with pointer past end of packet",
 		    ident);
 		return(0);
