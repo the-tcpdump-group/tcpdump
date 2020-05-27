@@ -354,8 +354,8 @@ ldp_tlv_print(netdissect_options *ndo,
 	case LDP_FEC_PREFIX:
 	    TLV_TCHECK(2);
 	    af = GET_BE_U_2(tptr);
-	    tptr+=LDP_TLV_ADDRESS_LIST_AFNUM_LEN;
-	    tlv_tlen-=LDP_TLV_ADDRESS_LIST_AFNUM_LEN;
+	    tptr+=2;
+	    tlv_tlen-=2;
 	    if (af == AFNUM_INET) {
 		i=decode_prefix4(ndo, tptr, tlv_tlen, buf, sizeof(buf));
 		if (i == -2)
