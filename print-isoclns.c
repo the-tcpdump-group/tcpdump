@@ -1921,10 +1921,14 @@ isis_print_ip_reach_subtlv(netdissect_options *ndo,
 	    algo = GET_U_1(tptr+1);
 
 	    if (flags & ISIS_PREFIX_SID_FLAG_V) {
+	        if (subl < 5)
+	            goto trunc;
 		sid = GET_BE_U_3(tptr+2);
 		tptr+=5;
 		subl-=5;
 	    } else {
+	        if (subl < 6)
+	            goto trunc;
 		sid = GET_BE_U_4(tptr+2);
 		tptr+=6;
 		subl-=6;
