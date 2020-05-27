@@ -1237,7 +1237,7 @@ nbt_udp137_print(netdissect_options *ndo,
 		} else {
 		    if (p >= maxbuf)
 		        goto out;
-		    smb_data_print(ndo, p, min(rdlen, length - (p - data)));
+		    smb_data_print(ndo, p, min(rdlen, length - ND_BYTES_BETWEEN(p, data)));
 		    p += rdlen;
 		}
 	    }
