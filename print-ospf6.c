@@ -574,6 +574,11 @@ ospf6_print_lsa(netdissect_options *ndo,
 			bytelen = ospf6_print_lsaprefix(ndo, tptr, lsa_length);
 			if (bytelen < 0)
 				goto trunc;
+			/*
+			 * ospf6_print_lsaprefix() will return -1 if
+			 * the length is too high, so this will not
+			 * underflow.
+			 */
 			lsa_length -= bytelen;
 			tptr += bytelen;
 		}
@@ -596,6 +601,11 @@ ospf6_print_lsa(netdissect_options *ndo,
 		bytelen = ospf6_print_lsaprefix(ndo, tptr, lsa_length);
 		if (bytelen < 0)
 			goto trunc;
+		/*
+		 * ospf6_print_lsaprefix() will return -1 if
+		 * the length is too high, so this will not
+		 * underflow.
+		 */
 		lsa_length -= bytelen;
 		tptr += bytelen;
 
@@ -657,6 +667,11 @@ ospf6_print_lsa(netdissect_options *ndo,
 			if (bytelen < 0)
 				goto trunc;
 			prefixes--;
+			/*
+			 * ospf6_print_lsaprefix() will return -1 if
+			 * the length is too high, so this will not
+			 * underflow.
+			 */
 			lsa_length -= bytelen;
 			tptr += bytelen;
 		}
@@ -685,6 +700,11 @@ ospf6_print_lsa(netdissect_options *ndo,
 			if (bytelen < 0)
 				goto trunc;
 			prefixes--;
+			/*
+			 * ospf6_print_lsaprefix() will return -1 if
+			 * the length is too high, so this will not
+			 * underflow.
+			 */
 			lsa_length -= bytelen;
 			tptr += bytelen;
 		}
