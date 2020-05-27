@@ -1429,7 +1429,8 @@ static int
 icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 {
 	const struct nd_opt_hdr *op;
-	uint8_t opt_type, opt_len;
+	uint8_t opt_type;
+	u_int opt_len;
 	const struct nd_opt_prefix_info *opp;
 	const struct nd_opt_mtu *opm;
 	const struct nd_opt_rdnss *oprd;
