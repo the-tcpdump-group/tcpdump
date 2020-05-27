@@ -639,15 +639,21 @@ ospf_print_lsa(netdissect_options *ndo,
 	const struct aslametric *almp;
 	const struct mcla *mcp;
 	const uint8_t *lp;
-	int j, tlv_type, tlv_length, topology;
-	int ls_length;
+	u_int tlv_type, tlv_length, rla_count, topology;
+	int ospf_print_lshdr_ret;
+	u_int ls_length;
 	const uint8_t *tptr;
 
 	tptr = (const uint8_t *)lsap->lsa_un.un_unknown; /* squelch compiler warnings */
-        ls_length = ospf_print_lshdr(ndo, &lsap->ls_hdr);
-        if (ls_length == -1)
-                return(NULL);
+	ospf_print_lshdr_ret = ospf_print_lshdr(ndo, &lsap->ls_hdr);
+	if (ospf_print_lshdr_ret < 0)
+		return(NULL);
+	ls_length = (u_int)ospf_print_lshdr_ret;
 	ls_end = (const uint8_t *)lsap + ls_length;
+	/*
+	 * ospf_print_lshdr() returns -1 if the length is too short,
+	 * so we know ls_length is >= sizeof(struct lsa_hdr).
+	 */
 	ls_length -= sizeof(struct lsa_hdr);
 
 	switch (GET_U_1(lsap->ls_hdr.ls_type)) {
@@ -658,10 +664,10 @@ ospf_print_lsa(netdissect_options *ndo,
 		          bittok2str(ospf_rla_flag_values, "none", GET_U_1(lsap->lsa_un.un_rla.rla_flags)));
 
 		ND_TCHECK_2(lsap->lsa_un.un_rla.rla_count);
-		j = GET_BE_U_2(lsap->lsa_un.un_rla.rla_count);
+		rla_count = GET_BE_U_2(lsap->lsa_un.un_rla.rla_count);
 		ND_TCHECK_SIZE(lsap->lsa_un.un_rla.rla_link);
 		rlp = lsap->lsa_un.un_rla.rla_link;
-		while (j--) {
+		for (u_int i = rla_count; i != 0; i--) {
 			ND_TCHECK_SIZE(rlp);
 			switch (GET_U_1(rlp->un_tos.link.link_type)) {
 
@@ -821,7 +827,7 @@ ospf_print_lsa(netdissect_options *ndo,
             case LS_OPAQUE_TYPE_RI:
 		tptr = (const uint8_t *)(lsap->lsa_un.un_ri_tlv);
 
-		int ls_length_remaining = ls_length;
+		u_int ls_length_remaining = ls_length;
 		while (ls_length_remaining != 0) {
                     ND_TCHECK_4(tptr);
 		    if (ls_length_remaining < 4) {
