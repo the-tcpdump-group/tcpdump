@@ -211,10 +211,13 @@ recurse:
 		 */
 		int ret = macsec_print(ndo, &p, &length, &caplen, &hdrlen, &length_type);
 
-		if (ret == 0)
-			goto raw;
-		else if (ret > 0)
-			return ret;
+		if (ret == 0) {
+			/* Payload is encrypted; just quit. */
+			return (hdrlen + caplen);
+		} else if (ret > 0) {
+			/* Problem printing the header; just quit. */
+			return (ret);
+		}
 	}
 
 	/*
