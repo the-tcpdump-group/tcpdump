@@ -136,12 +136,12 @@ int macsec_print(netdissect_options *ndo, const u_char **bp,
 	u_int len;
 
 	if (!macsec_check_length(sectag, length, caplen)) {
-		ND_PRINT((ndo, tstr));
+		ND_PRINT(tstr);
 		return hdrlen + caplen;
 	}
 
 	if (sectag->unused || sectag->tci_an & MACSEC_TCI_VERSION) {
-		ND_PRINT((ndo, "%s", istr));
+		ND_PRINT("%s", istr);
 		return hdrlen + caplen;
 	}
 
@@ -174,13 +174,13 @@ int macsec_print(netdissect_options *ndo, const u_char **bp,
 			n += r;
 		}
 
-		ND_PRINT((ndo, "%s, ", buf));
+		ND_PRINT("%s, ", buf);
 	}
 
 	len = ieee8021ae_sectag_len(ndo, sectag);
 	*length_type = GET_BE_U_2(*bp + len);
 	if (ndo->ndo_eflag && *length_type > ETHERMTU && !(GET_U_1(sectag->tci_an) & MACSEC_TCI_E))
-		ND_PRINT((ndo, "ethertype %s, ", tok2str(ethertype_values,"0x%04x", *length_type)));
+		ND_PRINT("ethertype %s, ", tok2str(ethertype_values,"0x%04x", *length_type));
 
 	if ((GET_U_1(sectag->tci_an) & MACSEC_TCI_CONFID)) {
 		*bp += len;
