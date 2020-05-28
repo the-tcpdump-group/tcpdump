@@ -219,14 +219,11 @@ recurse:
 			printed_length = 1;
 		}
 
-		int ret = macsec_print(ndo, &p, &length, &caplen, &hdrlen);
+		int ret = macsec_print(ndo, &p, &length, &caplen, &hdrlen,
+		    &src, &dst);
 
 		if (ret == 0) {
 			/* Payload is encrypted; print it as raw data. */
-			if (!ndo->ndo_eflag) {
-				ether_type_print(ndo, length_type);
-				ND_PRINT(", length %u: ", orig_length);
-			}
 			if (!ndo->ndo_suppress_default_print)
 				ND_DEFAULTPRINT(p, caplen);
 			return (hdrlen);

@@ -89,9 +89,29 @@ static const struct tok macsec_flag_values[] = {
 	{ 0, NULL }
 };
 
+static void macsec_print_header(netdissect_options *ndo,
+				const struct macsec_sectag *sectag,
+				u_int short_length)
+{
+	ND_PRINT("an %u, pn %u, flags %s",
+		 GET_U_1(sectag->tci_an) & MACSEC_AN_MASK,
+		 GET_BE_U_4(sectag->packet_number),
+		 bittok2str_nosep(macsec_flag_values, "none",
+				  GET_U_1(sectag->tci_an) & MACSEC_TCI_FLAGS));
+
+	if (short_length != 0)
+		ND_PRINT(", sl %u", short_length);
+
+	if (GET_U_1(sectag->tci_an) & MACSEC_TCI_SC)
+		ND_PRINT(", sci " SCI_FMT, GET_BE_U_8(sectag->secure_channel_id));
+		
+	ND_PRINT(", ");
+}
+
 /* returns < 0 iff the packet can be decoded completely */
 int macsec_print(netdissect_options *ndo, const u_char **bp,
-		 u_int *lengthp, u_int *caplenp, u_int *hdrlenp)
+		 u_int *lengthp, u_int *caplenp, u_int *hdrlenp,
+		 const struct lladdr_info *src, const struct lladdr_info *dst)
 {
 	const char *save_protocol;
 	const u_char *p = *bp;
@@ -140,21 +160,8 @@ int macsec_print(netdissect_options *ndo, const u_char **bp,
 	}
 
 	short_length = GET_U_1(sectag->short_length) & MACSEC_SL_MASK;
-	if (ndo->ndo_eflag) {
-		ND_PRINT("an %u, pn %u, flags %s",
-			 GET_U_1(sectag->tci_an) & MACSEC_AN_MASK,
-			 GET_BE_U_4(sectag->packet_number),
-			 bittok2str_nosep(macsec_flag_values, "none",
-					  GET_U_1(sectag->tci_an) & MACSEC_TCI_FLAGS));
-
-		if (short_length != 0)
-			ND_PRINT(", sl %u", short_length);
-
-		if (GET_U_1(sectag->tci_an) & MACSEC_TCI_SC)
-			ND_PRINT(", sci " SCI_FMT, GET_BE_U_8(sectag->secure_channel_id));
-		
-		ND_PRINT(", ");
-	}
+	if (ndo->ndo_eflag)
+		macsec_print_header(ndo, sectag, short_length);
 
 	/* Skip the MACsec header. */
 	*bp += sectag_len;
@@ -166,8 +173,30 @@ int macsec_print(netdissect_options *ndo, const u_char **bp,
 
 	if ((GET_U_1(sectag->tci_an) & MACSEC_TCI_CONFID)) {
 		/*
-		 * The payload is encrypted.  Tell our
-		 * caller it can't be dissected.
+		 * The payload is encrypted.  Print link-layer
+		 * information, if it hasn't already been printed.
+		 */
+		if (!ndo->ndo_eflag) {
+			/*
+			 * Nobody printed the link-layer addresses,
+			 * so print them, if we have any.
+			 */
+			if (src != NULL && dst != NULL) {
+				ND_PRINT("%s > %s ",
+					(src->addr_string)(ndo, src->addr),
+					(dst->addr_string)(ndo, dst->addr));
+			}
+
+			ND_PRINT("802.1AE MACsec, ");
+
+			/*
+			 * Print the MACsec header.
+			 */
+			macsec_print_header(ndo, sectag, short_length);
+		}
+
+		/*
+		 * Tell our caller it can't be dissected.
 		 */
 		ndo->ndo_protocol = save_protocol;
 		return 0;
