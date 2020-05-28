@@ -157,7 +157,7 @@ int macsec_print(netdissect_options *ndo, const u_char **bp,
 			return hdrlen + caplen;
 
 
-		if (sectag->short_length) {
+		if ((GET_U_1(sectag->short_length) & MACSEC_SL_MASK) != 0 {
 			int r = snprintf(buf + n, sizeof(buf) - n, ", sl %u",
 					 GET_U_1(sectag->short_length) & MACSEC_SL_MASK);
 			if (r < 0)
@@ -165,7 +165,7 @@ int macsec_print(netdissect_options *ndo, const u_char **bp,
 			n += r;
 		}
 
-		if (sectag->tci_an & MACSEC_TCI_SC) {
+		if (GET_U_1(sectag->tci_an) & MACSEC_TCI_SC) {
 			uint64_t sci;
 			int r;
 			sci = GET_BE_U_8(sectag->secure_channel_id);
@@ -180,7 +180,7 @@ int macsec_print(netdissect_options *ndo, const u_char **bp,
 
 	len = ieee8021ae_sectag_len(ndo, sectag);
 	*length_type = GET_BE_U_2(*bp + len);
-	if (ndo->ndo_eflag && *length_type > ETHERMTU && !(sectag->tci_an & MACSEC_TCI_E))
+	if (ndo->ndo_eflag && *length_type > ETHERMTU && !(GET_U_1(sectag->tci_an) & MACSEC_TCI_E))
 		ND_PRINT((ndo, "ethertype %s, ", tok2str(ethertype_values,"0x%04x", *length_type)));
 
 	if ((GET_U_1(sectag->tci_an) & MACSEC_TCI_CONFID)) {
