@@ -209,7 +209,7 @@ recurse:
 		 * MACsec, aka IEEE 802.1AE-2006
 		 * Print the header, and try to print the payload if it's not encrypted
 		 */
-		int ret = macsec_print(ndo, &p, &length, &caplen, &hdrlen, &length_type);
+		int ret = macsec_print(ndo, &p, &length, &caplen, &hdrlen);
 
 		if (ret == 0) {
 			/* Payload is encrypted; just quit. */
@@ -217,6 +217,11 @@ recurse:
 		} else if (ret > 0) {
 			/* Problem printing the header; just quit. */
 			return (ret);
+		} else {
+			/*
+			 * Keep processing type/length fields.
+			 */
+			goto recurse;
 		}
 	}
 

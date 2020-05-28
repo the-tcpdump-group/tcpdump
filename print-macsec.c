@@ -34,8 +34,6 @@
 #include "ethertype.h"
 #include "extract.h"
 
-static const char tstr[] = "[|MACsec]";
-
 #define MACSEC_DEFAULT_ICV_LEN 16
 
 /* Header format (SecTAG), following an Ethernet header
@@ -77,40 +75,8 @@ struct macsec_sectag {
 #define MACSEC_TCI_CONFID  (MACSEC_TCI_E | MACSEC_TCI_C)
 #define MACSEC_SL_MASK     0x3F /* short length */
 
-#define MACSEC_SECTAG_LEN_NOSCI 6
-#define MACSEC_SECTAG_LEN_SCI 14
-static int
-ieee8021ae_sectag_len(netdissect_options *ndo, const struct macsec_sectag *sectag)
-{
-	return (GET_U_1(sectag->tci_an) & MACSEC_TCI_SC) ?
-	       MACSEC_SECTAG_LEN_SCI :
-	       MACSEC_SECTAG_LEN_NOSCI;
-}
-
-static int macsec_check_length(netdissect_options *ndo, const struct macsec_sectag *sectag, u_int length, u_int caplen)
-{
-	u_int len;
-
-	/* we need the full MACsec header in the capture */
-	if (caplen < (MACSEC_SECTAG_LEN_NOSCI + 2))
-		return 0;
-
-	len = ieee8021ae_sectag_len(ndo, sectag);
-	if (caplen < (len + 2))
-		return 0;
-
-	if ((GET_U_1(sectag->short_length) & MACSEC_SL_MASK) != 0) {
-		/* original packet must have exact length */
-		u_int exact = ETHER_HDRLEN + len + 2 + (GET_U_1(sectag->short_length) & MACSEC_SL_MASK);
-		return exact == length;
-	} else {
-		/* original packet must not be short */
-		u_int minlen = ETHER_HDRLEN + len + 2 + 48;
-		return length >= minlen;
-	}
-
-	return 1;
-}
+#define MACSEC_SECTAG_LEN_NOSCI 6  /* length of MACsec header without SCI */
+#define MACSEC_SECTAG_LEN_SCI   14 /* length of MACsec header with SCI */
 
 #define SCI_FMT "%016" PRIx64
 
@@ -125,24 +91,40 @@ static const struct tok macsec_flag_values[] = {
 
 /* returns < 0 iff the packet can be decoded completely */
 int macsec_print(netdissect_options *ndo, const u_char **bp,
-		 u_int *lengthp, u_int *caplenp, u_int *hdrlenp,
-		 u_short *length_type)
+		 u_int *lengthp, u_int *caplenp, u_int *hdrlenp)
 {
+	const char *save_protocol;
 	const u_char *p = *bp;
 	u_int length = *lengthp;
 	u_int caplen = *caplenp;
 	u_int hdrlen = *hdrlenp;
 	const struct macsec_sectag *sectag = (const struct macsec_sectag *)p;
-	u_int len;
+	u_int sectag_len;
 
-	if (!macsec_check_length(sectag, length, caplen)) {
+	save_protocol = ndo->ndo_protocol;
+	ndo->ndo_protocol = "MACsec";
+
+	/* we need the full MACsec header in the capture */
+	if (caplen < MACSEC_SECTAG_LEN_NOSCI) {
 		nd_print_trunc(ndo);
+		ndo->ndo_protocol = save_protocol;
 		return hdrlen + caplen;
 	}
+
+	if (GET_U_1(sectag->tci_an) & MACSEC_TCI_SC) {
+		sectag_len = MACSEC_SECTAG_LEN_SCI;
+		if (caplen < MACSEC_SECTAG_LEN_SCI) {
+			nd_print_trunc(ndo);
+			ndo->ndo_protocol = save_protocol;
+			return hdrlen + caplen;
+		}
+	} else
+		sectag_len = MACSEC_SECTAG_LEN_NOSCI;
 
 	if ((GET_U_1(sectag->short_length) & ~MACSEC_SL_MASK) != 0 || 
 	    GET_U_1(sectag->tci_an) & MACSEC_TCI_VERSION) {
 		nd_print_invalid(ndo);
+		ndo->ndo_protocol = save_protocol;
 		return hdrlen + caplen;
 	}
 
@@ -162,21 +144,20 @@ int macsec_print(netdissect_options *ndo, const u_char **bp,
 		ND_PRINT(", ");
 	}
 
-	len = ieee8021ae_sectag_len(ndo, sectag);
-
 	/* Skip the MACsec header. */
-	*bp += len;
-	*hdrlenp += len;
+	*bp += sectag_len;
+	*hdrlenp += sectag_len;
 
 	/* Remove it from the lengths, as it's been processed. */
-	*lengthp -= len;
-	*caplenp -= len;
+	*lengthp -= sectag_len;
+	*caplenp -= sectag_len;
 
 	if ((GET_U_1(sectag->tci_an) & MACSEC_TCI_CONFID)) {
 		/*
 		 * The payload is encrypted.  Tell our
 		 * caller it can't be dissected.
 		 */
+		ndo->ndo_protocol = save_protocol;
 		return 0;
 	} else {
 		/*
@@ -186,6 +167,7 @@ int macsec_print(netdissect_options *ndo, const u_char **bp,
 		 */
 		*lengthp -= MACSEC_DEFAULT_ICV_LEN;
 		*caplenp -= MACSEC_DEFAULT_ICV_LEN;
+		ndo->ndo_protocol = save_protocol;
 		return -1;
 	}
 }
