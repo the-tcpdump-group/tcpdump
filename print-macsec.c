@@ -60,17 +60,11 @@ static const char tstr[] = "[|MACsec]";
  *     composed of a MAC address + 16-bit port number
  */
 struct macsec_sectag {
-	u_char  tci_an;
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-	u_char short_length:6,
-		     unused:2;
-#else /* __BYTE_ORDER == __BIG_ENDIAN */
-	u_char        unused:2,
-		short_length:6;
-#endif
-	uint32_t packet_number;
-	u_char secure_channel_id[8]; /* optional */
-} __attribute__((packed));
+	nd_uint8_t  tci_an;
+	nd_uint8_t  short_length;
+	nd_uint32_t packet_number;
+	nd_uint8_t  secure_channel_id[8]; /* optional */
+};
 
 /* IEEE 802.1AE-2006 9.5 */
 #define MACSEC_TCI_VERSION 0x80
@@ -82,18 +76,19 @@ struct macsec_sectag {
 #define MACSEC_AN_MASK     0x03 /* association number */
 #define MACSEC_TCI_FLAGS   (MACSEC_TCI_ES | MACSEC_TCI_SC | MACSEC_TCI_SCB | MACSEC_TCI_E | MACSEC_TCI_C)
 #define MACSEC_TCI_CONFID  (MACSEC_TCI_E | MACSEC_TCI_C)
+#define MACSEC_SL_MASK     0x3F /* short length */
 
 #define MACSEC_SECTAG_LEN_NOSCI 6
 #define MACSEC_SECTAG_LEN_SCI 14
 static int
-ieee8021ae_sectag_len(const struct macsec_sectag *sectag)
+ieee8021ae_sectag_len(netdissect_options *ndo, const struct macsec_sectag *sectag)
 {
-	return (sectag->tci_an & MACSEC_TCI_SC) ?
+	return (GET_U_1(sectag->tci_an) & MACSEC_TCI_SC) ?
 	       MACSEC_SECTAG_LEN_SCI :
 	       MACSEC_SECTAG_LEN_NOSCI;
 }
 
-static int macsec_check_length(const struct macsec_sectag *sectag, u_int length, u_int caplen)
+static int macsec_check_length(netdissect_options *ndo, cconst struct macsec_sectag *sectag, u_int length, u_int caplen)
 {
 	u_int len;
 
@@ -101,13 +96,13 @@ static int macsec_check_length(const struct macsec_sectag *sectag, u_int length,
 	if (caplen < (MACSEC_SECTAG_LEN_NOSCI + 2))
 		return 0;
 
-	len = ieee8021ae_sectag_len(sectag);
+	len = ieee8021ae_sectag_len(ndo, sectag);
 	if (caplen < (len + 2))
 		return 0;
 
-	if (sectag->short_length != 0) {
+	if ((GET_U_1(sectag->short_length) & MACSEC_SL_MASK) != 0) {
 		/* original packet must have exact length */
-		u_int exact = ETHER_HDRLEN + len + 2 + sectag->short_length;
+		u_int exact = ETHER_HDRLEN + len + 2 + (GET_U_1(sectag->short_length) & MACSEC_SL_MASK);
 		return exact == length;
 	} else {
 		/* original packet must not be short */
@@ -153,18 +148,18 @@ int macsec_print(netdissect_options *ndo, const u_char **bp,
 
 	if (ndo->ndo_eflag) {
 		char buf[128];
-		int n = snprintf(buf, sizeof(buf), "an %d, pn %d, flags %s",
-				 sectag->tci_an & MACSEC_AN_MASK,
-				 EXTRACT_32BITS(&sectag->packet_number),
+		int n = snprintf(buf, sizeof(buf), "an %u, pn %u, flags %s",
+				 GET_U_1(sectag->tci_an) & MACSEC_AN_MASK,
+				 GET_BE_U_4(sectag->packet_number),
 				 bittok2str_nosep(macsec_flag_values, "none",
-						  sectag->tci_an & MACSEC_TCI_FLAGS));
+						  GET_U_1(sectag->tci_an) & MACSEC_TCI_FLAGS));
 		if (n < 0)
 			return hdrlen + caplen;
 
 
 		if (sectag->short_length) {
-			int r = snprintf(buf + n, sizeof(buf) - n, ", sl %d",
-					 sectag->short_length);
+			int r = snprintf(buf + n, sizeof(buf) - n, ", sl %u",
+					 GET_U_1(sectag->short_length) & MACSEC_SL_MASK);
 			if (r < 0)
 				return hdrlen + caplen;
 			n += r;
@@ -173,7 +168,7 @@ int macsec_print(netdissect_options *ndo, const u_char **bp,
 		if (sectag->tci_an & MACSEC_TCI_SC) {
 			uint64_t sci;
 			int r;
-			sci = EXTRACT_64BITS(sectag->secure_channel_id);
+			sci = GET_BE_U_8(sectag->secure_channel_id);
 			r = snprintf(buf + n, sizeof(buf) - n, ", sci " SCI_FMT, sci);
 			if (r < 0)
 				return hdrlen + caplen;
@@ -183,12 +178,12 @@ int macsec_print(netdissect_options *ndo, const u_char **bp,
 		ND_PRINT((ndo, "%s, ", buf));
 	}
 
-	len = ieee8021ae_sectag_len(sectag);
-	*length_type = EXTRACT_16BITS(*bp + len);
+	len = ieee8021ae_sectag_len(ndo, sectag);
+	*length_type = GET_BE_U_2(*bp + len);
 	if (ndo->ndo_eflag && *length_type > ETHERMTU && !(sectag->tci_an & MACSEC_TCI_E))
 		ND_PRINT((ndo, "ethertype %s, ", tok2str(ethertype_values,"0x%04x", *length_type)));
 
-	if ((sectag->tci_an & MACSEC_TCI_CONFID)) {
+	if ((GET_U_1(sectag->tci_an) & MACSEC_TCI_CONFID)) {
 		*bp += len;
 		*hdrlenp += len;
 
