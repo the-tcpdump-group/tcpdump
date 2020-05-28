@@ -87,7 +87,7 @@ ieee8021ae_sectag_len(netdissect_options *ndo, const struct macsec_sectag *secta
 	       MACSEC_SECTAG_LEN_NOSCI;
 }
 
-static int macsec_check_length(netdissect_options *ndo, cconst struct macsec_sectag *sectag, u_int length, u_int caplen)
+static int macsec_check_length(netdissect_options *ndo, const struct macsec_sectag *sectag, u_int length, u_int caplen)
 {
 	u_int len;
 
@@ -136,12 +136,13 @@ int macsec_print(netdissect_options *ndo, const u_char **bp,
 	u_int len;
 
 	if (!macsec_check_length(sectag, length, caplen)) {
-		ND_PRINT(tstr);
+		nd_print_trunc(ndo);
 		return hdrlen + caplen;
 	}
 
-	if (sectag->unused || sectag->tci_an & MACSEC_TCI_VERSION) {
-		ND_PRINT("%s", istr);
+	if ((GET_U_1(sectag->short_length) & ~MACSEC_SL_MASK) != 0 || 
+	    GET_U_1(sectag->tci_an) & MACSEC_TCI_VERSION) {
+		nd_print_invalid(ndo);
 		return hdrlen + caplen;
 	}
 
@@ -156,7 +157,7 @@ int macsec_print(netdissect_options *ndo, const u_char **bp,
 			return hdrlen + caplen;
 
 
-		if ((GET_U_1(sectag->short_length) & MACSEC_SL_MASK) != 0 {
+		if ((GET_U_1(sectag->short_length) & MACSEC_SL_MASK) != 0) {
 			int r = snprintf(buf + n, sizeof(buf) - n, ", sl %u",
 					 GET_U_1(sectag->short_length) & MACSEC_SL_MASK);
 			if (r < 0)
