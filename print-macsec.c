@@ -110,10 +110,20 @@ int macsec_print(netdissect_options *ndo, const u_char **bp,
 		ndo->ndo_protocol = save_protocol;
 		return hdrlen + caplen;
 	}
+	if (length < MACSEC_SECTAG_LEN_NOSCI) {
+		nd_print_trunc(ndo);
+		ndo->ndo_protocol = save_protocol;
+		return hdrlen + caplen;
+	}
 
 	if (GET_U_1(sectag->tci_an) & MACSEC_TCI_SC) {
 		sectag_len = MACSEC_SECTAG_LEN_SCI;
 		if (caplen < MACSEC_SECTAG_LEN_SCI) {
+			nd_print_trunc(ndo);
+			ndo->ndo_protocol = save_protocol;
+			return hdrlen + caplen;
+		}
+		if (length < MACSEC_SECTAG_LEN_SCI) {
 			nd_print_trunc(ndo);
 			ndo->ndo_protocol = save_protocol;
 			return hdrlen + caplen;
@@ -165,8 +175,10 @@ int macsec_print(netdissect_options *ndo, const u_char **bp,
 		 * ICV length from the lengths, so our caller
 		 * doesn't treat it as payload.
 		 */
-		*lengthp -= MACSEC_DEFAULT_ICV_LEN;
-		*caplenp -= MACSEC_DEFAULT_ICV_LEN;
+		if (*lengthp >= MACSEC_DEFAULT_ICV_LEN)
+			*lengthp -= MACSEC_DEFAULT_ICV_LEN;
+		if (*caplenp >= MACSEC_DEFAULT_ICV_LEN)
+			*caplenp -= MACSEC_DEFAULT_ICV_LEN;
 		ndo->ndo_protocol = save_protocol;
 		return -1;
 	}
