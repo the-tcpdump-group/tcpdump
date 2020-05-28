@@ -100,6 +100,7 @@ int macsec_print(netdissect_options *ndo, const u_char **bp,
 	u_int hdrlen = *hdrlenp;
 	const struct macsec_sectag *sectag = (const struct macsec_sectag *)p;
 	u_int sectag_len;
+	u_int short_length;
 
 	save_protocol = ndo->ndo_protocol;
 	ndo->ndo_protocol = "MACsec";
@@ -138,6 +139,7 @@ int macsec_print(netdissect_options *ndo, const u_char **bp,
 		return hdrlen + caplen;
 	}
 
+	short_length = GET_U_1(sectag->short_length) & MACSEC_SL_MASK;
 	if (ndo->ndo_eflag) {
 		ND_PRINT("an %u, pn %u, flags %s",
 			 GET_U_1(sectag->tci_an) & MACSEC_AN_MASK,
@@ -145,8 +147,8 @@ int macsec_print(netdissect_options *ndo, const u_char **bp,
 			 bittok2str_nosep(macsec_flag_values, "none",
 					  GET_U_1(sectag->tci_an) & MACSEC_TCI_FLAGS));
 
-		if ((GET_U_1(sectag->short_length) & MACSEC_SL_MASK) != 0)
-			ND_PRINT(", sl %u", GET_U_1(sectag->short_length) & MACSEC_SL_MASK);
+		if (short_length != 0)
+			ND_PRINT(", sl %u", short_length);
 
 		if (GET_U_1(sectag->tci_an) & MACSEC_TCI_SC)
 			ND_PRINT(", sci " SCI_FMT, GET_BE_U_8(sectag->secure_channel_id));
@@ -169,17 +171,52 @@ int macsec_print(netdissect_options *ndo, const u_char **bp,
 		 */
 		ndo->ndo_protocol = save_protocol;
 		return 0;
-	} else {
-		/*
-		 * The payload isn't encrypted; remove the
-		 * ICV length from the lengths, so our caller
-		 * doesn't treat it as payload.
-		 */
-		if (*lengthp >= MACSEC_DEFAULT_ICV_LEN)
-			*lengthp -= MACSEC_DEFAULT_ICV_LEN;
-		if (*caplenp >= MACSEC_DEFAULT_ICV_LEN)
-			*caplenp -= MACSEC_DEFAULT_ICV_LEN;
-		ndo->ndo_protocol = save_protocol;
-		return -1;
 	}
+
+	/*
+	 * The payload isn't encrypted; remove the
+	 * ICV length from the lengths, so our caller
+	 * doesn't treat it as payload.
+	 */
+	if (*lengthp < MACSEC_DEFAULT_ICV_LEN) {
+		nd_print_trunc(ndo);
+		ndo->ndo_protocol = save_protocol;
+		return hdrlen + caplen;
+	}
+	if (*caplenp < MACSEC_DEFAULT_ICV_LEN) {
+		nd_print_trunc(ndo);
+		ndo->ndo_protocol = save_protocol;
+		return hdrlen + caplen;
+	}
+	*lengthp -= MACSEC_DEFAULT_ICV_LEN;
+	*caplenp -= MACSEC_DEFAULT_ICV_LEN;
+
+	/*
+	 * If the SL field is non-zero, then it's the length of the
+	 * Secure Data; otherwise, the Secure Data is what's left
+	 * ver after the MACsec header and ICV are removed.
+	 */
+	if (short_length != 0) {
+		/*
+		 * If the short length is more than we *have*,
+		 * that's an error.
+		 */
+		if (short_length > *lengthp) {
+			nd_print_trunc(ndo);
+			ndo->ndo_protocol = save_protocol;
+			return hdrlen + caplen;
+		}
+		if (short_length > *caplenp) {
+			nd_print_trunc(ndo);
+			ndo->ndo_protocol = save_protocol;
+			return hdrlen + caplen;
+		}
+		if (*lengthp > short_length)
+			*lengthp = short_length;
+		if (*caplenp > short_length)
+			*caplenp = short_length;
+	}
+		
+	ndo->ndo_protocol = save_protocol;
+	return -1;
 }
