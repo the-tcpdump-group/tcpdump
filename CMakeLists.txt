@@ -1017,6 +1017,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-lwapp.c
     print-lwres.c
     print-m3ua.c
+    print-macsec.c
     print-mobile.c
     print-mobility.c
     print-mpcp.c
