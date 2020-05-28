@@ -147,35 +147,19 @@ int macsec_print(netdissect_options *ndo, const u_char **bp,
 	}
 
 	if (ndo->ndo_eflag) {
-		char buf[128];
-		int n = snprintf(buf, sizeof(buf), "an %u, pn %u, flags %s",
-				 GET_U_1(sectag->tci_an) & MACSEC_AN_MASK,
-				 GET_BE_U_4(sectag->packet_number),
-				 bittok2str_nosep(macsec_flag_values, "none",
-						  GET_U_1(sectag->tci_an) & MACSEC_TCI_FLAGS));
-		if (n < 0)
-			return hdrlen + caplen;
+		ND_PRINT("an %u, pn %u, flags %s",
+			 GET_U_1(sectag->tci_an) & MACSEC_AN_MASK,
+			 GET_BE_U_4(sectag->packet_number),
+			 bittok2str_nosep(macsec_flag_values, "none",
+					  GET_U_1(sectag->tci_an) & MACSEC_TCI_FLAGS));
 
+		if ((GET_U_1(sectag->short_length) & MACSEC_SL_MASK) != 0)
+			ND_PRINT(", sl %u", GET_U_1(sectag->short_length) & MACSEC_SL_MASK);
 
-		if ((GET_U_1(sectag->short_length) & MACSEC_SL_MASK) != 0) {
-			int r = snprintf(buf + n, sizeof(buf) - n, ", sl %u",
-					 GET_U_1(sectag->short_length) & MACSEC_SL_MASK);
-			if (r < 0)
-				return hdrlen + caplen;
-			n += r;
-		}
-
-		if (GET_U_1(sectag->tci_an) & MACSEC_TCI_SC) {
-			uint64_t sci;
-			int r;
-			sci = GET_BE_U_8(sectag->secure_channel_id);
-			r = snprintf(buf + n, sizeof(buf) - n, ", sci " SCI_FMT, sci);
-			if (r < 0)
-				return hdrlen + caplen;
-			n += r;
-		}
-
-		ND_PRINT("%s, ", buf);
+		if (GET_U_1(sectag->tci_an) & MACSEC_TCI_SC)
+			ND_PRINT(", sci " SCI_FMT, GET_BE_U_8(sectag->secure_channel_id));
+		
+		ND_PRINT(", ");
 	}
 
 	len = ieee8021ae_sectag_len(ndo, sectag);
