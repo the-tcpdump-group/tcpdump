@@ -29,10 +29,10 @@
 /* \summary: Multi-Protocol Label Switching (MPLS) printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include "netdissect.h"
 #include "extract.h"
@@ -64,26 +64,25 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	uint16_t label_stack_depth = 0;
 	enum mpls_packet_type pt = PT_UNKNOWN;
 
+	ndo->ndo_protocol = "mpls";
 	p = bp;
-	ND_PRINT((ndo, "MPLS"));
+	nd_print_protocol_caps(ndo);
 	do {
-		ND_TCHECK2(*p, sizeof(label_entry));
-		if (length < sizeof(label_entry)) {
-			ND_PRINT((ndo, "[|MPLS], length %u", length));
-			return;
-		}
-		label_entry = EXTRACT_32BITS(p);
-		ND_PRINT((ndo, "%s(label %u",
+		ND_TCHECK_LEN(p, sizeof(label_entry));
+		if (length < sizeof(label_entry))
+			goto trunc;
+		label_entry = GET_BE_U_4(p);
+		ND_PRINT("%s(label %u",
 		       (label_stack_depth && ndo->ndo_vflag) ? "\n\t" : " ",
-       		       MPLS_LABEL(label_entry)));
+       		       MPLS_LABEL(label_entry));
 		label_stack_depth++;
 		if (ndo->ndo_vflag &&
 		    MPLS_LABEL(label_entry) < sizeof(mpls_labelname) / sizeof(mpls_labelname[0]))
-			ND_PRINT((ndo, " (%s)", mpls_labelname[MPLS_LABEL(label_entry)]));
-		ND_PRINT((ndo, ", exp %u", MPLS_EXP(label_entry)));
+			ND_PRINT(" (%s)", mpls_labelname[MPLS_LABEL(label_entry)]);
+		ND_PRINT(", exp %u", MPLS_EXP(label_entry));
 		if (MPLS_STACK(label_entry))
-			ND_PRINT((ndo, ", [S]"));
-		ND_PRINT((ndo, ", ttl %u)", MPLS_TTL(label_entry)));
+			ND_PRINT(", [S]");
+		ND_PRINT(", ttl %u)", MPLS_TTL(label_entry));
 
 		p += sizeof(label_entry);
 		length -= sizeof(label_entry);
@@ -129,12 +128,12 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		 * Cisco sends control-plane traffic MPLS-encapsulated in
 		 * this fashion.
 		 */
-		ND_TCHECK(*p);
+		ND_TCHECK_1(p);
 		if (length < 1) {
 			/* nothing to print */
 			return;
 		}
-		switch(*p) {
+		switch(GET_U_1(p)) {
 
 		case 0x45:
 		case 0x46:
@@ -189,7 +188,7 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			ND_DEFAULTPRINT(p, length);
 		return;
 	}
-	ND_PRINT((ndo, ndo->ndo_vflag ? "\n\t" : " "));
+	ND_PRINT(ndo->ndo_vflag ? "\n\t" : " ");
 	switch (pt) {
 
 	case PT_IPV4:
@@ -201,7 +200,7 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		break;
 
 	case PT_OSI:
-		isoclns_print(ndo, p, length, length);
+		isoclns_print(ndo, p, length);
 		break;
 
 	default:
@@ -210,13 +209,5 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	return;
 
 trunc:
-	ND_PRINT((ndo, "[|MPLS]"));
+	nd_print_trunc(ndo);
 }
-
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

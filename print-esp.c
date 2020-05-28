@@ -24,10 +24,10 @@
 /* \summary: IPSEC Encapsulating Security Payload (ESP) printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -45,10 +45,12 @@
 #endif
 
 #include "netdissect.h"
-#include "strtoaddr.h"
 #include "extract.h"
 
+#ifdef HAVE_LIBCRYPTO
+#include "strtoaddr.h"
 #include "ascii_strcasecmp.h"
+#endif
 
 #include "ip.h"
 #include "ip6.h"
@@ -87,8 +89,8 @@
  */
 
 struct newesp {
-	uint32_t	esp_spi;	/* ESP */
-	uint32_t	esp_seq;	/* Sequence number */
+	nd_uint32_t	esp_spi;	/* ESP */
+	nd_uint32_t	esp_seq;	/* Sequence number */
 	/*variable size*/		/* (IV and) Payload data */
 	/*variable size*/		/* padding */
 	/*8bit*/			/* pad size */
@@ -99,8 +101,8 @@ struct newesp {
 
 #ifdef HAVE_LIBCRYPTO
 union inaddr_u {
-	struct in_addr in4;
-	struct in6_addr in6;
+	nd_ipv4 in4;
+	nd_ipv6 in6;
 };
 struct sa_list {
 	struct sa_list	*next;
@@ -111,7 +113,7 @@ struct sa_list {
 	u_char          spii[8];      /* for IKEv2 */
 	u_char          spir[8];
 	const EVP_CIPHER *evp;
-	int		ivlen;
+	u_int		ivlen;
 	int		authlen;
 	u_char          authsecret[256];
 	int             authsecret_len;
@@ -145,19 +147,149 @@ EVP_CIPHER_CTX_free(EVP_CIPHER_CTX *ctx)
 }
 #endif
 
+#ifdef HAVE_EVP_DECRYPTINIT_EX
 /*
- * this will adjust ndo_packetp and ndo_snapend to new buffer!
+ * Initialize the cipher by calling EVP_DecryptInit_ex(), because
+ * calling EVP_DecryptInit() will reset the cipher context, clearing
+ * the cipher, so calling it twice, with the second call having a
+ * null cipher, will clear the already-set cipher.  EVP_DecryptInit_ex(),
+ * however, won't reset the cipher context, so you can use it to specify
+ * the IV in a second call after a first call to EVP_DecryptInit_ex()
+ * to set the cipher and the key.
+ *
+ * XXX - is there some reason why we need to make two calls?
+ */
+static int
+set_cipher_parameters(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher,
+		      const unsigned char *key,
+		      const unsigned char *iv)
+{
+	return EVP_DecryptInit_ex(ctx, cipher, NULL, key, iv);
+}
+#else
+/*
+ * Initialize the cipher by calling EVP_DecryptInit(), because we don't
+ * have EVP_DecryptInit_ex(); we rely on it not trashing the context.
+ */
+static int
+set_cipher_parameters(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher,
+		      const unsigned char *key,
+		      const unsigned char *iv)
+{
+	return EVP_DecryptInit(ctx, cipher, key, iv);
+}
+#endif
+
+static u_char *
+do_decrypt(netdissect_options *ndo, const char *caller, struct sa_list *sa,
+    const u_char *iv, const u_char *ct, unsigned int ctlen)
+{
+	EVP_CIPHER_CTX *ctx;
+	unsigned int block_size;
+	unsigned int ptlen;
+	u_char *pt;
+	int len;
+
+	ctx = EVP_CIPHER_CTX_new();
+	if (ctx == NULL) {
+		/*
+		 * Failed to initialize the cipher context.
+		 * From a look at the OpenSSL code, this appears to
+		 * mean "couldn't allocate memory for the cipher context";
+		 * note that we're not passing any parameters, so there's
+		 * not much else it can mean.
+		 */
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+		    "%s: can't allocate memory for cipher context", caller);
+		return NULL;
+	}
+
+	if (set_cipher_parameters(ctx, sa->evp, sa->secret, NULL) < 0) {
+		EVP_CIPHER_CTX_free(ctx);
+		(*ndo->ndo_warning)(ndo, "%s: espkey init failed", caller);
+		return NULL;
+	}
+	if (set_cipher_parameters(ctx, NULL, NULL, iv) < 0) {
+		EVP_CIPHER_CTX_free(ctx);
+		(*ndo->ndo_warning)(ndo, "%s: IV init failed", caller);
+		return NULL;
+	}
+
+	/*
+	 * At least as I read RFC 5996 section 3.14 and RFC 4303 section 2.4,
+	 * if the cipher has a block size of which the ciphertext's size must
+	 * be a multiple, the payload must be padded to make that happen, so
+	 * the ciphertext length must be a multiple of the block size.  Fail
+	 * if that's not the case.
+	 */
+	block_size = (unsigned int)EVP_CIPHER_CTX_block_size(ctx);
+	if ((ctlen % block_size) != 0) {
+		EVP_CIPHER_CTX_free(ctx);
+		(*ndo->ndo_warning)(ndo,
+		    "%s: ciphertext size %u is not a multiple of the cipher block size %u",
+		    caller, ctlen, block_size);
+		return NULL;
+	}
+
+	/*
+	 * Attempt to allocate a buffer for the decrypted data, because
+	 * we can't decrypt on top of the input buffer.
+	 */
+	ptlen = ctlen;
+	pt = (u_char *)malloc(ptlen);
+	if (pt == NULL) {
+		EVP_CIPHER_CTX_free(ctx);
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+		    "%s: can't allocate memory for decryption buffer", caller);
+		return NULL;
+	}
+
+	/*
+	 * The size of the ciphertext handed to us is a multiple of the
+	 * cipher block size, so we don't need to worry about padding.
+	 */
+	if (!EVP_CIPHER_CTX_set_padding(ctx, 0)) {
+		free(pt);
+		EVP_CIPHER_CTX_free(ctx);
+		(*ndo->ndo_warning)(ndo,
+		    "%s: EVP_CIPHER_CTX_set_padding failed", caller);
+		return NULL;
+	}
+	if (!EVP_DecryptUpdate(ctx, pt, &len, ct, ctlen)) {
+		free(pt);
+		EVP_CIPHER_CTX_free(ctx);
+		(*ndo->ndo_warning)(ndo, "%s: EVP_DecryptUpdate failed",
+		    caller);
+		return NULL;
+	}
+	EVP_CIPHER_CTX_free(ctx);
+	return pt;
+}
+
+/*
+ * This will allocate a new buffer containing the decrypted data.
+ * It returns 1 on success and 0 on failure.
+ *
+ * It will push the new buffer and the values of ndo->ndo_packetp and
+ * ndo->ndo_snapend onto the buffer stack, and change ndo->ndo_packetp
+ * and ndo->ndo_snapend to refer to the new buffer.
+ *
+ * Our caller must pop the buffer off the stack when it's finished
+ * dissecting anything in it and before it does any dissection of
+ * anything in the old buffer.  That will free the new buffer.
  */
 USES_APPLE_DEPRECATED_API
-int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
+int esp_decrypt_buffer_by_ikev2_print(netdissect_options *ndo,
 				      int initiator,
-				      u_char spii[8], u_char spir[8],
+				      const u_char spii[8],
+				      const u_char spir[8],
 				      const u_char *buf, const u_char *end)
 {
 	struct sa_list *sa;
 	const u_char *iv;
-	int len;
-	EVP_CIPHER_CTX *ctx;
+	const u_char *ct;
+	unsigned int ctlen;
+	u_char *pt;
 
 	/* initiator arg is any non-zero value */
 	if(initiator) initiator=1;
@@ -180,25 +312,27 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 	 */
 	end = end - sa->authlen;
 	iv  = buf;
-	buf = buf + sa->ivlen;
-	len = end-buf;
+	ct = iv + sa->ivlen;
+	ctlen = end-ct;
 
-	if(end <= buf) return 0;
+	if(end <= ct) return 0;
 
-	ctx = EVP_CIPHER_CTX_new();
-	if (ctx == NULL)
+	pt = do_decrypt(ndo, "esp_decrypt_buffer_by_ikev2_print", sa, iv,
+	    ct, ctlen);
+	if (pt == NULL)
 		return 0;
-	if (EVP_CipherInit(ctx, sa->evp, sa->secret, NULL, 0) < 0)
-		(*ndo->ndo_warning)(ndo, "espkey init failed");
-	EVP_CipherInit(ctx, NULL, NULL, iv, 0);
-	EVP_Cipher(ctx, buf, buf, len);
-	EVP_CIPHER_CTX_free(ctx);
 
-	ndo->ndo_packetp = buf;
-	ndo->ndo_snapend = end;
+	/*
+	 * Switch to the output buffer for dissection, and save it
+	 * on the buffer stack so it can be freed; our caller must
+	 * pop it when done.
+	 */
+	if (!nd_push_buffer(ndo, pt, pt, pt + ctlen)) {
+		free(pt);
+		return 0;
+	}
 
 	return 1;
-
 }
 USES_APPLE_RST
 
@@ -209,9 +343,11 @@ static void esp_print_addsa(netdissect_options *ndo,
 
 	struct sa_list *nsa;
 
+	/* malloc() return used in a 'struct sa_list': do not free() */
 	nsa = (struct sa_list *)malloc(sizeof(struct sa_list));
 	if (nsa == NULL)
-		(*ndo->ndo_error)(ndo, "ran out of memory to allocate sa structure");
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+				  "esp_print_addsa: malloc");
 
 	*nsa = *sa;
 
@@ -232,8 +368,8 @@ static u_int hexdigit(netdissect_options *ndo, char hex)
 	else if (hex >= 'a' && hex <= 'f')
 		return (hex - 'a' + 10);
 	else {
-		(*ndo->ndo_error)(ndo, "invalid hex digit %c in espsecret\n", hex);
-		return 0;
+		(*ndo->ndo_error)(ndo, S_ERR_ND_ESP_SECRET,
+				  "invalid hex digit %c in espsecret\n", hex);
 	}
 }
 
@@ -259,7 +395,7 @@ int espprint_decode_hex(netdissect_options *ndo,
 	len = strlen(hex) / 2;
 
 	if (len > binbuf_len) {
-		(*ndo->ndo_warning)(ndo, "secret is too big: %d\n", len);
+		(*ndo->ndo_warning)(ndo, "secret is too big: %u\n", len);
 		return 0;
 	}
 
@@ -318,6 +454,7 @@ espprint_decode_encalgo(netdissect_options *ndo,
 
 	sa->evp = evp;
 	sa->authlen = authlen;
+	/* This returns an int, but it should never be negative */
 	sa->ivlen = EVP_CIPHER_iv_length(evp);
 
 	colon++;
@@ -344,7 +481,7 @@ espprint_decode_encalgo(netdissect_options *ndo,
 USES_APPLE_RST
 
 /*
- * for the moment, ignore the auth algorith, just hard code the authenticator
+ * for the moment, ignore the auth algorithm, just hard code the authenticator
  * length. Need to research how openssl looks up HMAC stuff.
  */
 static int
@@ -360,8 +497,8 @@ espprint_decode_authalgo(netdissect_options *ndo,
 	}
 	*colon = '\0';
 
-	if(ascii_strcasecmp(colon,"sha1") == 0 ||
-	   ascii_strcasecmp(colon,"md5") == 0) {
+	if(ascii_strcasecmp(decode,"sha1") == 0 ||
+	   ascii_strcasecmp(decode,"md5") == 0) {
 		sa->authlen = 12;
 	}
 	return 1;
@@ -465,9 +602,9 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 
 		secretfile = fopen(filename, FOPEN_READ_TXT);
 		if (secretfile == NULL) {
-			(*ndo->ndo_error)(ndo, "print_esp: can't open %s: %s\n",
-			    filename, strerror(errno));
-			return;
+			(*ndo->ndo_error)(ndo, S_ERR_ND_OPEN_FILE,
+					  "print_esp: can't open %s: %s\n",
+					  filename, strerror(errno));
 		}
 
 		while (fgets(fileline, sizeof(fileline)-1, secretfile) != NULL) {
@@ -497,6 +634,10 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 		uint32_t spino;
 
 		spistr = strsep(&spikey, "@");
+		if (spistr == NULL) {
+			(*ndo->ndo_warning)(ndo, "print_esp: failed to find the @ token");
+			return;
+		}
 
 		spino = strtoul(spistr, &foo, 0);
 		if (spistr == foo || !spikey) {
@@ -518,7 +659,7 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 
 	if (decode) {
 		/* skip any blank spaces */
-		while (isspace((unsigned char)*decode))
+		while (*decode == ' ' || *decode == '\t' || *decode == '\r' || *decode == '\n')
 			decode++;
 
 		if(!espprint_decode_encalgo(ndo, decode, &sa1)) {
@@ -544,7 +685,7 @@ static void esp_init(netdissect_options *ndo _U_)
 }
 USES_APPLE_RST
 
-void esp_print_decodesecret(netdissect_options *ndo)
+void esp_decodesecret_print(netdissect_options *ndo)
 {
 	char *line;
 	char *p;
@@ -573,116 +714,100 @@ void esp_print_decodesecret(netdissect_options *ndo)
 #endif
 
 #ifdef HAVE_LIBCRYPTO
+#define USED_IF_LIBCRYPTO
+#else
+#define USED_IF_LIBCRYPTO _U_
+#endif
+
+#ifdef HAVE_LIBCRYPTO
 USES_APPLE_DEPRECATED_API
 #endif
-int
+void
 esp_print(netdissect_options *ndo,
-	  const u_char *bp, const int length, const u_char *bp2
-#ifndef HAVE_LIBCRYPTO
-	_U_
-#endif
-	,
-	int *nhdr
-#ifndef HAVE_LIBCRYPTO
-	_U_
-#endif
-	,
-	int *padlen
-#ifndef HAVE_LIBCRYPTO
-	_U_
-#endif
-	)
+	  const u_char *bp, u_int length,
+	  const u_char *bp2 USED_IF_LIBCRYPTO,
+	  u_int ver USED_IF_LIBCRYPTO,
+	  int fragmented USED_IF_LIBCRYPTO,
+	  u_int ttl_hl USED_IF_LIBCRYPTO)
 {
-	register const struct newesp *esp;
-	register const u_char *ep;
+	const struct newesp *esp;
+	const u_char *ep;
 #ifdef HAVE_LIBCRYPTO
 	const struct ip *ip;
 	struct sa_list *sa = NULL;
 	const struct ip6_hdr *ip6 = NULL;
-	int advance;
-	int len;
-	u_char *secret;
-	int ivlen = 0;
-	const u_char *ivoff;
-	const u_char *p;
-	EVP_CIPHER_CTX *ctx;
+	const u_char *iv;
+	u_int ivlen;
+	u_int payloadlen;
+	const u_char *ct;
+	u_char *pt;
+	u_int padlen;
+	u_int nh;
 #endif
 
+	ndo->ndo_protocol = "esp";
 	esp = (const struct newesp *)bp;
-
-#ifdef HAVE_LIBCRYPTO
-	secret = NULL;
-	advance = 0;
-#endif
-
-#if 0
-	/* keep secret out of a register */
-	p = (u_char *)&secret;
-#endif
 
 	/* 'ep' points to the end of available data. */
 	ep = ndo->ndo_snapend;
 
 	if ((const u_char *)(esp + 1) >= ep) {
-		ND_PRINT((ndo, "[|ESP]"));
-		goto fail;
+		nd_print_trunc(ndo);
+		return;
 	}
-	ND_PRINT((ndo, "ESP(spi=0x%08x", EXTRACT_32BITS(&esp->esp_spi)));
-	ND_PRINT((ndo, ",seq=0x%x)", EXTRACT_32BITS(&esp->esp_seq)));
-	ND_PRINT((ndo, ", length %u", length));
+	ND_PRINT("ESP(spi=0x%08x", GET_BE_U_4(esp->esp_spi));
+	ND_PRINT(",seq=0x%x)", GET_BE_U_4(esp->esp_seq));
+	ND_PRINT(", length %u", length);
 
-#ifndef HAVE_LIBCRYPTO
-	goto fail;
-#else
+#ifdef HAVE_LIBCRYPTO
 	/* initiailize SAs */
 	if (ndo->ndo_sa_list_head == NULL) {
 		if (!ndo->ndo_espsecret)
-			goto fail;
+			return;
 
-		esp_print_decodesecret(ndo);
+		esp_decodesecret_print(ndo);
 	}
 
 	if (ndo->ndo_sa_list_head == NULL)
-		goto fail;
+		return;
 
 	ip = (const struct ip *)bp2;
-	switch (IP_V(ip)) {
+	switch (ver) {
 	case 6:
 		ip6 = (const struct ip6_hdr *)bp2;
 		/* we do not attempt to decrypt jumbograms */
-		if (!EXTRACT_16BITS(&ip6->ip6_plen))
-			goto fail;
+		if (!GET_BE_U_2(ip6->ip6_plen))
+			return;
+		/* XXX - check whether it's fragmented? */
 		/* if we can't get nexthdr, we do not need to decrypt it */
-		len = sizeof(struct ip6_hdr) + EXTRACT_16BITS(&ip6->ip6_plen);
 
 		/* see if we can find the SA, and if so, decode it */
 		for (sa = ndo->ndo_sa_list_head; sa != NULL; sa = sa->next) {
-			if (sa->spi == EXTRACT_32BITS(&esp->esp_spi) &&
+			if (sa->spi == GET_BE_U_4(esp->esp_spi) &&
 			    sa->daddr_version == 6 &&
 			    UNALIGNED_MEMCMP(&sa->daddr.in6, &ip6->ip6_dst,
-				   sizeof(struct in6_addr)) == 0) {
+				   sizeof(nd_ipv6)) == 0) {
 				break;
 			}
 		}
 		break;
 	case 4:
 		/* nexthdr & padding are in the last fragment */
-		if (EXTRACT_16BITS(&ip->ip_off) & IP_MF)
-			goto fail;
-		len = EXTRACT_16BITS(&ip->ip_len);
+		if (fragmented)
+			return;
 
 		/* see if we can find the SA, and if so, decode it */
 		for (sa = ndo->ndo_sa_list_head; sa != NULL; sa = sa->next) {
-			if (sa->spi == EXTRACT_32BITS(&esp->esp_spi) &&
+			if (sa->spi == GET_BE_U_4(esp->esp_spi) &&
 			    sa->daddr_version == 4 &&
 			    UNALIGNED_MEMCMP(&sa->daddr.in4, &ip->ip_dst,
-				   sizeof(struct in_addr)) == 0) {
+				   sizeof(nd_ipv4)) == 0) {
 				break;
 			}
 		}
 		break;
 	default:
-		goto fail;
+		return;
 	}
 
 	/* if we didn't find the specific one, then look for
@@ -693,61 +818,99 @@ esp_print(netdissect_options *ndo,
 
 	/* if not found fail */
 	if (sa == NULL)
-		goto fail;
+		return;
 
-	/* if we can't get nexthdr, we do not need to decrypt it */
-	if (ep - bp2 < len)
-		goto fail;
-	if (ep - bp2 > len) {
-		/* FCS included at end of frame (NetBSD 1.6 or later) */
-		ep = bp2 + len;
-	}
-
-	ivoff = (const u_char *)(esp + 1) + 0;
+	/* pointer to the IV, if there is one */
+	iv = (const u_char *)(esp + 1) + 0;
+	/* length of the IV, if there is one; 0, if there isn't */
 	ivlen = sa->ivlen;
-	secret = sa->secret;
+
+	/*
+	 * Get a pointer to the ciphertext.
+	 *
+	 * p points to the beginning of the payload, i.e. to the
+	 * initialization vector, so if we skip past the initialization
+	 * vector, it points to the beginning of the ciphertext.
+	 */
+	ct = iv + ivlen;
+
+	/*
+	 * Make sure the authentication data/integrity check value length
+	 * isn't bigger than the total amount of data available after
+	 * the ESP header and initialization vector is removed and,
+	 * if not, slice the authentication data/ICV off.
+	 */
+	if (ep - ct < sa->authlen) {
+		nd_print_trunc(ndo);
+		return;
+	}
 	ep = ep - sa->authlen;
 
-	if (sa->evp) {
-		ctx = EVP_CIPHER_CTX_new();
-		if (ctx != NULL) {
-			if (EVP_CipherInit(ctx, sa->evp, secret, NULL, 0) < 0)
-				(*ndo->ndo_warning)(ndo, "espkey init failed");
+	/*
+	 * Calculate the length of the ciphertext.  ep points to
+	 * the beginning of the authentication data/integrity check
+	 * value, i.e. right past the end of the ciphertext;
+	 */
+	payloadlen = ep - ct;
 
-			p = ivoff;
-			EVP_CipherInit(ctx, NULL, NULL, p, 0);
-			EVP_Cipher(ctx, p + ivlen, p + ivlen, ep - (p + ivlen));
-			EVP_CIPHER_CTX_free(ctx);
-			advance = ivoff - (const u_char *)esp + ivlen;
-		} else
-			advance = sizeof(struct newesp);
-	} else
-		advance = sizeof(struct newesp);
+	if (sa->evp == NULL)
+		return;
 
-	/* sanity check for pad length */
-	if (ep - bp < *(ep - 2))
-		goto fail;
+	/*
+	 * If the next header value is past the end of the available
+	 * data, we won't be able to fetch it once we've decrypted
+	 * the ciphertext, so there's no point in decrypting the data.
+	 *
+	 * Report it as truncation.
+	 */
+	if (!ND_TTEST_1(ep - 1)) {
+		nd_print_trunc(ndo);
+		return;
+	}
 
-	if (padlen)
-		*padlen = *(ep - 2) + 2;
+	pt = do_decrypt(ndo, "esp_print", sa, iv, ct, payloadlen);
+	if (pt == NULL)
+		return;
 
-	if (nhdr)
-		*nhdr = *(ep - 1);
+	/*
+	 * Switch to the output buffer for dissection, and
+	 * save it on the buffer stack so it can be freed.
+	 */
+	ep = pt + payloadlen;
+	if (!nd_push_buffer(ndo, pt, pt, ep)) {
+		free(pt);
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+			"esp_print: can't push buffer on buffer stack");
+	}
 
-	ND_PRINT((ndo, ": "));
-	return advance;
+	/*
+	 * Sanity check for pad length; if it, plus 2 for the pad
+	 * length and next header fields, is bigger than the ciphertext
+	 * length (which is also the plaintext length), it's too big.
+	 *
+	 * XXX - the check can fail if the packet is corrupt *or* if
+	 * it was not decrypted with the correct key, so that the
+	 * "plaintext" is not what was being sent.
+	 */
+	padlen = GET_U_1(ep - 2);
+	if (padlen + 2 > payloadlen) {
+		nd_print_trunc(ndo);
+		return;
+	}
+
+	/* Get the next header */
+	nh = GET_U_1(ep - 1);
+
+	ND_PRINT(": ");
+
+	/* Now dissect the plaintext. */
+	ip_demux_print(ndo, pt, payloadlen - (padlen + 2), ver, fragmented,
+	    ttl_hl, nh, bp2);
+
+	/* Pop the buffer, freeing it. */
+	nd_pop_packet_info(ndo);
 #endif
-
-fail:
-	return -1;
 }
 #ifdef HAVE_LIBCRYPTO
 USES_APPLE_RST
 #endif
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

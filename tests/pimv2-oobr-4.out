@@ -1,0 +1,10 @@
+    1  00:00:00.000000 c2:02:52:72:00:00 > 01:00:5e:00:00:0d, ethertype IPv4 (0x0800), length 65535: (tos 0xc0, ttl 1, id 123, offset 0, flags [none], proto PIM (103), length 65521)
+    10.0.0.2 > 224.0.0.13: PIMv2, length 65501
+	Hello, cksum 0x4fce (incorrect)
+	  Hold Time Option (1), length 2, Value: 1m45s
+	    0x0000:  0069
+	  Generation ID Option (20), length 4, Value: 0xd767b714
+	    0x0000:  d767 b714
+	  Unknown Option (0), length 4, Value: 
+	    0x0000:  0000 0001
+	  State Refresh Capability Option (21), length 0, Value: [option length 0 != 4] (invalid)

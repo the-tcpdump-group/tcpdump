@@ -22,7 +22,7 @@
 /* \summary: OpenBSD packet filter log file printer */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #ifndef HAVE_NET_PFVAR_H
@@ -34,12 +34,11 @@
 #include <net/pfvar.h>
 #include <net/if_pflog.h>
 
-#include <netdissect-stdinc.h>
+#include "netdissect-stdinc.h"
 
 #include "netdissect.h"
 #include "extract.h"
 
-static const char tstr[] = "[|pflog]";
 
 static const struct tok pf_reasons[] = {
 	{ 0,	"0(match)" },
@@ -90,23 +89,24 @@ pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
 {
 	uint32_t rulenr, subrulenr;
 
-	rulenr = EXTRACT_32BITS(&hdr->rulenr);
-	subrulenr = EXTRACT_32BITS(&hdr->subrulenr);
+	ndo->ndo_protocol = "pflog";
+	rulenr = GET_BE_U_4(&hdr->rulenr);
+	subrulenr = GET_BE_U_4(&hdr->subrulenr);
 	if (subrulenr == (uint32_t)-1)
-		ND_PRINT((ndo, "rule %u/", rulenr));
+		ND_PRINT("rule %u/", rulenr);
 	else
-		ND_PRINT((ndo, "rule %u.%s.%u/", rulenr, hdr->ruleset, subrulenr));
+		ND_PRINT("rule %u.%s.%u/", rulenr, hdr->ruleset, subrulenr);
 
-	ND_PRINT((ndo, "%s: %s %s on %s: ",
-	    tok2str(pf_reasons, "unkn(%u)", hdr->reason),
-	    tok2str(pf_actions, "unkn(%u)", hdr->action),
-	    tok2str(pf_directions, "unkn(%u)", hdr->dir),
-	    hdr->ifname));
+	ND_PRINT("%s: %s %s on %s: ",
+	    tok2str(pf_reasons, "unkn(%u)", GET_U_1(&hdr->reason)),
+	    tok2str(pf_actions, "unkn(%u)", GET_U_1(&hdr->action)),
+	    tok2str(pf_directions, "unkn(%u)", GET_U_1(&hdr->dir)),
+	    hdr->ifname);
 }
 
 u_int
 pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
-               register const u_char *p)
+               const u_char *p)
 {
 	u_int length = h->len;
 	u_int hdrlen;
@@ -114,32 +114,33 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	const struct pfloghdr *hdr;
 	uint8_t af;
 
+	ndo->ndo_protocol = "pflog_if";
 	/* check length */
 	if (caplen < sizeof(uint8_t)) {
-		ND_PRINT((ndo, "%s", tstr));
+		nd_print_trunc(ndo);
 		return (caplen);
 	}
 
 #define MIN_PFLOG_HDRLEN	45
 	hdr = (const struct pfloghdr *)p;
 	if (hdr->length < MIN_PFLOG_HDRLEN) {
-		ND_PRINT((ndo, "[pflog: invalid header length!]"));
+		ND_PRINT("[pflog: invalid header length!]");
 		return (hdr->length);	/* XXX: not really */
 	}
 	hdrlen = BPF_WORDALIGN(hdr->length);
 
 	if (caplen < hdrlen) {
-		ND_PRINT((ndo, "%s", tstr));
+		nd_print_trunc(ndo);
 		return (hdrlen);	/* XXX: true? */
 	}
 
 	/* print what we know */
-	ND_TCHECK(*hdr);
+	ND_TCHECK_SIZE(hdr);
 	if (ndo->ndo_eflag)
 		pflog_print(ndo, hdr);
 
 	/* skip to the real packet */
-	af = hdr->af;
+	af = GET_U_1(&hdr->af);
 	length -= hdrlen;
 	caplen -= hdrlen;
 	p += hdrlen;
@@ -173,13 +174,6 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 
 	return (hdrlen);
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	nd_print_trunc(ndo);
 	return (hdrlen);
 }
-
-/*
- * Local Variables:
- * c-style: whitesmith
- * c-basic-offset: 8
- * End:
- */

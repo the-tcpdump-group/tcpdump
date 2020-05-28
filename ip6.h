@@ -76,19 +76,19 @@
 struct ip6_hdr {
 	union {
 		struct ip6_hdrctl {
-			uint32_t ip6_un1_flow;	/* 20 bits of flow-ID */
-			uint16_t ip6_un1_plen;	/* payload length */
-			uint8_t  ip6_un1_nxt;	/* next header */
-			uint8_t  ip6_un1_hlim;	/* hop limit */
+			nd_uint32_t ip6_un1_flow;	/* 20 bits of flow-ID */
+			nd_uint16_t ip6_un1_plen;	/* payload length */
+			nd_uint8_t  ip6_un1_nxt;	/* next header */
+			nd_uint8_t  ip6_un1_hlim;	/* hop limit */
 		} ip6_un1;
-		uint8_t ip6_un2_vfc;	/* 4 bits version, top 4 bits class */
+		nd_uint8_t ip6_un2_vfc;	/* 4 bits version, top 4 bits class */
 	} ip6_ctlun;
-	struct in6_addr ip6_src;	/* source address */
-	struct in6_addr ip6_dst;	/* destination address */
-} UNALIGNED;
+	nd_ipv6 ip6_src;	/* source address */
+	nd_ipv6 ip6_dst;	/* destination address */
+};
 
 #define ip6_vfc		ip6_ctlun.ip6_un2_vfc
-#define IP6_VERSION(ip6_hdr)	(((ip6_hdr)->ip6_vfc & 0xf0) >> 4)
+#define IP6_VERSION(ip6_hdr)	((GET_U_1((ip6_hdr)->ip6_vfc) & 0xf0) >> 4)
 #define ip6_flow	ip6_ctlun.ip6_un1.ip6_un1_flow
 #define ip6_plen	ip6_ctlun.ip6_un1.ip6_un1_plen
 #define ip6_nxt		ip6_ctlun.ip6_un1.ip6_un1_nxt
@@ -98,36 +98,31 @@ struct ip6_hdr {
 /* in network endian */
 #define IPV6_FLOWINFO_MASK	((uint32_t)htonl(0x0fffffff))	/* flow info (28 bits) */
 #define IPV6_FLOWLABEL_MASK	((uint32_t)htonl(0x000fffff))	/* flow label (20 bits) */
-#if 1
-/* ECN bits proposed by Sally Floyd */
-#define IP6TOS_CE		0x01	/* congestion experienced */
-#define IP6TOS_ECT		0x02	/* ECN-capable transport */
-#endif
 
 /*
  * Extension Headers
  */
 
 struct	ip6_ext {
-	uint8_t ip6e_nxt;
-	uint8_t ip6e_len;
-} UNALIGNED;
+	nd_uint8_t ip6e_nxt;
+	nd_uint8_t ip6e_len;
+};
 
 /* Hop-by-Hop options header */
 struct ip6_hbh {
-	uint8_t ip6h_nxt;	/* next header */
-	uint8_t ip6h_len;	/* length in units of 8 octets */
+	nd_uint8_t ip6h_nxt;	/* next header */
+	nd_uint8_t ip6h_len;	/* length in units of 8 octets */
 	/* followed by options */
-} UNALIGNED;
+};
 
 /* Destination options header */
 struct ip6_dest {
-	uint8_t ip6d_nxt;	/* next header */
-	uint8_t ip6d_len;	/* length in units of 8 octets */
+	nd_uint8_t ip6d_nxt;	/* next header */
+	nd_uint8_t ip6d_len;	/* length in units of 8 octets */
 	/* followed by options */
-} UNALIGNED;
+};
 
-/* http://www.iana.org/assignments/ipv6-parameters/ipv6-parameters.xhtml */
+/* https://www.iana.org/assignments/ipv6-parameters/ipv6-parameters.xhtml */
 
 /* Option types and related macros */
 #define IP6OPT_PAD1		0x00	/* 00 0 00000 */
@@ -165,35 +160,50 @@ struct ip6_dest {
 
 /* Routing header */
 struct ip6_rthdr {
-	uint8_t  ip6r_nxt;	/* next header */
-	uint8_t  ip6r_len;	/* length in units of 8 octets */
-	uint8_t  ip6r_type;	/* routing type */
-	uint8_t  ip6r_segleft;	/* segments left */
+	nd_uint8_t  ip6r_nxt;		/* next header */
+	nd_uint8_t  ip6r_len;		/* length in units of 8 octets */
+	nd_uint8_t  ip6r_type;		/* routing type */
+	nd_uint8_t  ip6r_segleft;	/* segments left */
 	/* followed by routing type specific data */
-} UNALIGNED;
+};
 
 #define IPV6_RTHDR_TYPE_0 0
 #define IPV6_RTHDR_TYPE_2 2
+#define IPV6_RTHDR_TYPE_4 4
 
 /* Type 0 Routing header */
 /* Also used for Type 2 */
 struct ip6_rthdr0 {
-	uint8_t  ip6r0_nxt;		/* next header */
-	uint8_t  ip6r0_len;		/* length in units of 8 octets */
-	uint8_t  ip6r0_type;		/* always zero */
-	uint8_t  ip6r0_segleft;	/* segments left */
-	uint8_t  ip6r0_reserved;	/* reserved field */
-	uint8_t  ip6r0_slmap[3];	/* strict/loose bit map */
-	struct in6_addr ip6r0_addr[1];	/* up to 23 addresses */
-} UNALIGNED;
+	nd_uint8_t  ip6r0_nxt;		/* next header */
+	nd_uint8_t  ip6r0_len;		/* length in units of 8 octets */
+	nd_uint8_t  ip6r0_type;		/* always zero */
+	nd_uint8_t  ip6r0_segleft;	/* segments left */
+	nd_uint32_t ip6r0_reserved;	/* reserved field */
+	nd_ipv6     ip6r0_addr[1];	/* up to 23 addresses */
+};
+
+/**
+ * Type 4 Routing header
+ * known as Segment Routing Header 'SRH'
+ */
+struct ip6_srh {
+	nd_uint8_t	srh_nxt;		/* next header */
+	nd_uint8_t	srh_len;		/* length in units of 8 octets */
+	nd_uint8_t	srh_type;		/* Routing Type 4 */
+	nd_uint8_t	srh_segleft;		/* segments left */
+	nd_uint8_t	srh_last_ent;		/* Last Entry*/
+	nd_uint8_t	srh_flags;		/* Flags */
+	nd_uint16_t	srh_tag;		/* Tag */
+	nd_ipv6		srh_segments[1];	/* SRH segments list*/
+};
 
 /* Fragment header */
 struct ip6_frag {
-	uint8_t  ip6f_nxt;		/* next header */
-	uint8_t  ip6f_reserved;	/* reserved field */
-	uint16_t ip6f_offlg;		/* offset, reserved, and flag */
-	uint32_t ip6f_ident;		/* identification */
-} UNALIGNED;
+	nd_uint8_t  ip6f_nxt;		/* next header */
+	nd_uint8_t  ip6f_reserved;	/* reserved field */
+	nd_uint16_t ip6f_offlg;		/* offset, reserved, and flag */
+	nd_uint32_t ip6f_ident;		/* identification */
+};
 
 #define IP6F_OFF_MASK		0xfff8	/* mask out offset from ip6f_offlg */
 #define IP6F_RESERVED_MASK	0x0006	/* reserved bits in ip6f_offlg */

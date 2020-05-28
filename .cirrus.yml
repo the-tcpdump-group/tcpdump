@@ -1,0 +1,21 @@
+# The internal git client reads CIRRUS_CLONE_DEPTH.
+env:
+  CIRRUS_CLONE_DEPTH: 3
+  MAXJOBS: 2
+  IGNORE_OSVERSION: yes
+
+task:
+  freebsd_instance:
+    matrix:
+      - image_family: freebsd-11-3-snap
+      - image_family: freebsd-12-1-snap
+      - image_family: freebsd-13-0-snap
+  script:
+    - freebsd-version
+    - pkg update -f
+    - pkg install -qy git autoconf
+    - (cd .. && git clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure --prefix=/tmp && make -s -j${MAXJOBS})
+    - touch .devel
+    - ./configure
+    - make -s -j${MAXJOBS} CFLAGS=-Werror all
+    - make check

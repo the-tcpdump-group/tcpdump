@@ -425,7 +425,7 @@
 			</FileConfiguration>
 		</File>
 		<File
-			RelativePath="..\..\gmpls.c"
+			RelativePath="..\..\ntp.c"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
@@ -447,7 +447,7 @@
 			</FileConfiguration>
 		</File>
 		<File
-			RelativePath="..\..\gmt2local.c"
+			RelativePath="..\..\gmpls.c"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
@@ -3197,6 +3197,28 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath="..\..\print-ssh.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
 			RelativePath="..\..\print-stp.c"
 			>
 			<FileConfiguration
@@ -3571,6 +3593,28 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath="..\..\print-vsock.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
 			RelativePath="..\..\print-vtp.c"
 			>
 			<FileConfiguration
@@ -3638,6 +3682,28 @@
 		</File>
 		<File
 			RelativePath="..\..\print-zephyr.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\print-someip.c"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
@@ -3791,7 +3857,7 @@
 			</FileConfiguration>
 		</File>
 
-		<File RelativePath="..\Src\ether_ntohost.c">
+		<File RelativePath="..\..\missing\win_ether_ntohost.c">
 			<FileConfiguration
 				Name="Debug|Win32"
 				>
