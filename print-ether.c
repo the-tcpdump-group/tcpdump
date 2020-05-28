@@ -57,6 +57,7 @@ const struct tok ethertype_values[] = {
     { ETHERTYPE_8021Q9100,	"802.1Q-9100" },
     { ETHERTYPE_8021QinQ,	"802.1Q-QinQ" },
     { ETHERTYPE_8021Q9200,	"802.1Q-9200" },
+    { ETHERTYPE_MACSEC,		"802.1AE MACsec" },
     { ETHERTYPE_VMAN,		"VMAN" },
     { ETHERTYPE_PUP,            "PUP" },
     { ETHERTYPE_ARP,            "ARP"},
@@ -204,9 +205,46 @@ recurse:
 	hdrlen += 2;
 
 	/*
-	 * Process VLAN tag types.
+	 * Process 802.1AE MACsec headers.
 	 */
 	printed_length = 0;
+	if (length_type == ETHERTYPE_MACSEC) {
+		/*
+		 * MACsec, aka IEEE 802.1AE-2006
+		 * Print the header, and try to print the payload if it's not encrypted
+		 */
+		if (ndo->ndo_eflag) {
+			ether_type_print(ndo, length_type);
+			ND_PRINT(", length %u: ", orig_length);
+			printed_length = 1;
+		}
+
+		int ret = macsec_print(ndo, &p, &length, &caplen, &hdrlen);
+
+		if (ret == 0) {
+			/* Payload is encrypted; print it as raw data. */
+			if (!ndo->ndo_suppress_default_print)
+				ND_DEFAULTPRINT(p, caplen);
+			return (hdrlen);
+		} else if (ret > 0) {
+			/* Problem printing the header; just quit. */
+			return (ret);
+		} else {
+			/*
+			 * Keep processing type/length fields.
+			 */
+			length_type = GET_BE_U_2(p);
+
+			length -= 2;
+			caplen -= 2;
+			p += 2;
+			hdrlen += 2;
+		}
+	}
+
+	/*
+	 * Process VLAN tag types.
+	 */
 	while (length_type == ETHERTYPE_8021Q  ||
 		length_type == ETHERTYPE_8021Q9100 ||
 		length_type == ETHERTYPE_8021Q9200 ||
