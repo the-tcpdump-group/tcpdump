@@ -163,25 +163,29 @@ int macsec_print(netdissect_options *ndo, const u_char **bp,
 	}
 
 	len = ieee8021ae_sectag_len(ndo, sectag);
-	*length_type = GET_BE_U_2(*bp + len);
-	if (ndo->ndo_eflag && *length_type > ETHERMTU && !(GET_U_1(sectag->tci_an) & MACSEC_TCI_E))
-		ND_PRINT("ethertype %s, ", tok2str(ethertype_values,"0x%04x", *length_type));
+
+	/* Skip the MACsec header. */
+	*bp += len;
+	*hdrlenp += len;
+
+	/* Remove it from the lengths, as it's been processed. */
+	*lengthp -= len;
+	*caplenp -= len;
 
 	if ((GET_U_1(sectag->tci_an) & MACSEC_TCI_CONFID)) {
-		*bp += len;
-		*hdrlenp += len;
-
-		*lengthp -= len;
-		*caplenp -= len;
+		/*
+		 * The payload is encrypted.  Tell our
+		 * caller it can't be dissected.
+		 */
 		return 0;
 	} else {
-		len += 2;
-		*bp += len;
-		*hdrlenp += len;
-
-		len += MACSEC_DEFAULT_ICV_LEN;
-		*lengthp -= len;
-		*caplenp -= len;
+		/*
+		 * The payload isn't encrypted; remove the
+		 * ICV length from the lengths, so our caller
+		 * doesn't treat it as payload.
+		 */
+		*lengthp -= MACSEC_DEFAULT_ICV_LEN;
+		*caplenp -= MACSEC_DEFAULT_ICV_LEN;
 		return -1;
 	}
 }
