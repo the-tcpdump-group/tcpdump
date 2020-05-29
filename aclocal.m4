@@ -919,6 +919,7 @@ AC_DEFUN(AC_LBL_DEVEL,
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wassign-enum)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wcast-qual)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wmissing-prototypes)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wmissing-variable-declarations)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wold-style-definition)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wpedantic)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wpointer-arith)
