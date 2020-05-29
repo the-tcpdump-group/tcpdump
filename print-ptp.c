@@ -259,9 +259,9 @@ static const struct tok ptp_flag_values[] = {
             ND_PRINT("(%s)", tok2str(ptp_msg_type, "unknown", e)); \
         }
 
-const char *p_porigin_ts = "preciseOriginTimeStamp";
-const char *p_origin_ts = "originTimeStamp";
-const char *p_recv_ts = "receiveTimeStamp";
+static const char *p_porigin_ts = "preciseOriginTimeStamp";
+static const char *p_origin_ts = "originTimeStamp";
+static const char *p_recv_ts = "receiveTimeStamp";
 
 #define PTP_VER_1 0x1
 #define PTP_VER_2 0x2
@@ -340,7 +340,8 @@ ptp_print_1(netdissect_options *ndo)
     ND_PRINT(" (not implemented)");
 }
 
-static void ptp_print_2(netdissect_options *ndo, const u_char *bp, u_int length)
+static void
+ptp_print_2(netdissect_options *ndo, const u_char *bp, u_int length)
 {
     u_int len = length;
     uint16_t msg_len, flags, port_id, seq_id;
