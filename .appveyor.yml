@@ -37,6 +37,22 @@ environment:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       GENERATOR: "Visual Studio 15 2017 Win64"
       SDK: npcap-sdk-1.05
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      GENERATOR: "Visual Studio 16 2019"
+      PLATFORM: Win32
+      SDK: WpdPack
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      GENERATOR: "Visual Studio 16 2019"
+      PLATFORM: x64
+      SDK: WpdPack
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      GENERATOR: "Visual Studio 16 2019"
+      PLATFORM: Win32
+      SDK: npcap-sdk-1.05
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      GENERATOR: "Visual Studio 16 2019"
+      PLATFORM: x64
+      SDK: npcap-sdk-1.05
 
 build_script:
   #
@@ -45,5 +61,6 @@ build_script:
   - type NUL >.devel
   - md build
   - cd build
-  - cmake -DPCAP_ROOT=c:\projects\libpcap\Win32\%SDK% -G"%GENERATOR%" ..
+  - if NOT DEFINED PLATFORM cmake -DPCAP_ROOT=c:\projects\libpcap\Win32\%SDK% -G"%GENERATOR%" ..
+  - if DEFINED PLATFORM cmake -DPCAP_ROOT=c:\projects\libpcap\Win32\%SDK% -G"%GENERATOR%" -A %PLATFORM% ..
   - msbuild /m /nologo /p:Configuration=Release tcpdump.sln
