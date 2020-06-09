@@ -763,11 +763,9 @@ tcp_print(netdissect_options *ndo,
                 msdp_print(ndo, bp, length);
         } else if (IS_SRC_OR_DST_PORT(RPKI_RTR_PORT)) {
                 rpki_rtr_print(ndo, bp, length);
-        }
-        else if (length > 0 && (IS_SRC_OR_DST_PORT(LDP_PORT))) {
+        } else if (length > 0 && (IS_SRC_OR_DST_PORT(LDP_PORT))) {
                 ldp_print(ndo, bp, length);
-        }
-        else if ((IS_SRC_OR_DST_PORT(NFS_PORT)) &&
+        } else if ((IS_SRC_OR_DST_PORT(NFS_PORT)) &&
                  length >= 4 && ND_TTEST_4(bp)) {
                 /*
                  * If data present, header length valid, and NFS port used,
@@ -801,12 +799,12 @@ tcp_print(netdissect_options *ndo,
         }
 
         return;
- bad:
+bad:
         ND_PRINT("[bad opt]");
         if (ch != '\0')
                 ND_PRINT("]");
         return;
- trunc:
+trunc:
         nd_print_trunc(ndo);
         if (ch != '\0')
                 ND_PRINT(">");
