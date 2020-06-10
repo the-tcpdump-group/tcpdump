@@ -260,6 +260,16 @@ nflog-e nflog.pcap nflog-e.out -e
 # syslog test case
 syslog-v	syslog_udp.pcap		syslog-v.out		-v
 
+# DNS test cases
+dns_tcp dns_tcp.pcap dns_tcp.out
+dns_tcp-v dns_tcp.pcap dns_tcp-v.out -v
+dns_tcp-vv dns_tcp.pcap dns_tcp-vv.out -vv
+dns_tcp-vvv dns_tcp.pcap dns_tcp-vvv.out -vvv
+dns_udp dns_udp.pcap dns_udp.out
+dns_udp-v dns_udp.pcap dns_udp-v.out -v
+dns_udp-vv dns_udp.pcap dns_udp-vv.out -vv
+dns_udp-vvv dns_udp.pcap dns_udp-vvv.out -vvv
+
 # DNS on non-standard ports.
 dns_tcp_8053 dns_tcp_8053.pcap dns_tcp_8053.out -vv
 dns_tcp_8053-T dns_tcp_8053.pcap dns_tcp_8053-T.out -vv -T domain
