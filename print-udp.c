@@ -530,7 +530,8 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			break;
 		case PT_DOMAIN:
 			udpipaddr_print(ndo, ip, sport, dport);
-			domain_print(ndo, cp, length, 0);
+			/* over_tcp: FALSE, is_mdns: FALSE */
+			domain_print(ndo, cp, length, FALSE, FALSE);
 			break;
 		}
 		return;
@@ -610,9 +611,11 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 
 	if (!ndo->ndo_qflag) {
 		if (IS_SRC_OR_DST_PORT(NAMESERVER_PORT))
-			domain_print(ndo, cp, length, 0);
+			/* over_tcp: FALSE, is_mdns: FALSE */
+			domain_print(ndo, cp, length, FALSE, FALSE);
 		else if (IS_SRC_OR_DST_PORT(MULTICASTDNS_PORT))
-			domain_print(ndo, cp, length, 1);
+			/* over_tcp: FALSE, is_mdns: TRUE */
+			domain_print(ndo, cp, length, FALSE, TRUE);
 		else if (IS_SRC_OR_DST_PORT(TIMED_PORT))
 			timed_print(ndo, (const u_char *)cp);
 		else if (IS_SRC_OR_DST_PORT(TFTP_PORT))

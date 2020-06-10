@@ -842,7 +842,7 @@ ns_rprint(netdissect_options *ndo,
 
 void
 domain_print(netdissect_options *ndo,
-         const u_char *bp, u_int length, int is_mdns)
+             const u_char *bp, u_int length, int over_tcp, int is_mdns)
 {
 	const dns_header_t *np;
 	uint16_t flags, rcode, rdlen, type;
@@ -852,6 +852,34 @@ domain_print(netdissect_options *ndo,
 	uint16_t b2;
 
 	ndo->ndo_protocol = "domain";
+
+	if (over_tcp) {
+		/*
+		 * The message is prefixed with a two byte length field
+		 * which gives the message length, excluding the two byte
+		 * length field. (RFC 1035 - 4.2.2. TCP usage)
+		 */
+		if (length < 2) {
+			ND_PRINT(" [DNS over TCP: length %u < 2]", length);
+			nd_print_invalid(ndo);
+			return;
+		} else {
+			length -= 2; /* excluding the two byte length field */
+			if (GET_BE_U_2(bp) != length) {
+				ND_PRINT(" [prefix length(%u) != length(%u)]",
+					 GET_BE_U_2(bp), length);
+				nd_print_invalid(ndo);
+				return;
+			} else {
+				bp += 2;
+				/* in over TCP case, we need to prepend a space
+				 * (not needed in over UDP case)
+				 */
+				ND_PRINT(" ");
+			}
+		}
+	}
+
 	np = (const dns_header_t *)bp;
 
 	if(length < sizeof(*np)) {

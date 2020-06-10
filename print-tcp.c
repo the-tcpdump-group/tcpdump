@@ -703,8 +703,8 @@ tcp_print(netdissect_options *ndo,
                         resp_print(ndo, bp, length);
                         break;
                 case PT_DOMAIN:
-                        ND_PRINT(" ");
-                        domain_print(ndo, bp + 2, length - 2, 0);
+                        /* over_tcp: TRUE, is_mdns: FALSE */
+                        domain_print(ndo, bp, length, TRUE, FALSE);
                         break;
                 }
                 return;
@@ -746,19 +746,9 @@ tcp_print(netdissect_options *ndo,
         } else if (IS_SRC_OR_DST_PORT(RTSP_PORT) || IS_SRC_OR_DST_PORT(RTSP_PORT_ALT)) {
                 ND_PRINT(": ");
                 rtsp_print(ndo, bp, length);
-        } else if (length > 2 &&
-                 (IS_SRC_OR_DST_PORT(NAMESERVER_PORT))) {
-                /* domain_print() assumes it does not have to prepend a space before its
-                 * own output to separate it from the output of the calling function. This
-                 * works well with udp_print(), but requires a small prop here.
-                 */
-                ND_PRINT(" ");
-
-                /*
-                 * TCP DNS query has 2byte length at the head.
-                 * XXX packet could be unaligned, it can go strange
-                 */
-                domain_print(ndo, bp + 2, length - 2, 0);
+        } else if (IS_SRC_OR_DST_PORT(NAMESERVER_PORT)) {
+                /* over_tcp: TRUE, is_mdns: FALSE */
+                domain_print(ndo, bp, length, TRUE, FALSE);
         } else if (IS_SRC_OR_DST_PORT(MSDP_PORT)) {
                 msdp_print(ndo, bp, length);
         } else if (IS_SRC_OR_DST_PORT(RPKI_RTR_PORT)) {
