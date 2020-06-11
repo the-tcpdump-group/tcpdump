@@ -1,6 +1,22 @@
 #!/usr/bin/env perl
 
-$TCPDUMP = "./tcpdump" if (!($TCPDUMP = $ENV{TCPDUMP_BIN}));
+#
+# Were we told where to find tcpdump?
+#
+if (!($TCPDUMP = $ENV{TCPDUMP_BIN})) {
+    #
+    # No.  Use the appropriate path.
+    #
+    if ($^O eq 'MSWin32') {
+        #
+        # XXX - assume, for now, a Visual Studio debug build, so that
+        # tcpdump is in the Debug subdirectory.
+        #
+        $TCPDUMP = "Debug\\tcpdump"
+    } else {
+        $TCPDUMP = "./tcpdump"
+    }
+}
 
 use File::Basename;
 use POSIX qw( WEXITSTATUS WIFEXITED);
@@ -16,6 +32,11 @@ mkpath($newdir);
 mkpath($diffdir);
 my $origdir = getcwd();
 my $srcdir  = $ENV{'srcdir'} || ".";
+if ($^O eq 'MSWin32') {
+    $printcmd = "type";
+} else {
+    $printcmd = "cat";
+}
 
 #
 # Force UTC, so time stamps are printed in a standard time zone, and
@@ -62,7 +83,7 @@ sub runtest {
     my $errdiffstat = 0;
 
     if ($^O eq 'MSWin32') {
-        $r = system "..\\windump -# -n -r $input $options 2>NUL | sed 's/\\r//' | tee tests/NEW/$outputbase | diff $output - >tests/DIFF/$outputbase.diff";
+        $r = system "$TCPDUMP -# -n -r $input $options 2>NUL | sed 's/\\r//' | tee tests/NEW/$outputbase | diff $output - >tests/DIFF/$outputbase.diff";
         # need to do same as below for Cygwin.
     }
     else {
@@ -94,7 +115,7 @@ sub runtest {
             $r = 0;
         }
         if($r == 0) {
-            $r = system "cat tests/NEW/$outputbase | diff $output - >tests/DIFF/$outputbase.diff";
+            $r = system "${printcmd} tests/NEW/$outputbase | diff $output - >tests/DIFF/$outputbase.diff";
             $diffstat = WEXITSTATUS($r);
         }
 
@@ -116,7 +137,7 @@ sub runtest {
         close(ERRORRAW);
 
         if ( -f "$output.stderr" ) {
-            $nr = system "cat $stderrlog | diff $output.stderr - >tests/DIFF/$outputbase.stderr.diff";
+            $nr = system "${printcmd} $stderrlog | diff $output.stderr - >tests/DIFF/$outputbase.stderr.diff";
             if($r == 0) {
                 $r = $nr;
             }
@@ -139,7 +160,7 @@ sub runtest {
             printf "    %-40s: passed\n", $name;
         } else {
             printf "    %-40s: passed with error messages:\n", $name;
-            system "cat $stderrlog";
+            system "${printcmd} $stderrlog";
         }
         unlink "tests/DIFF/$outputbase.diff";
         return 0;
@@ -150,7 +171,7 @@ sub runtest {
     printf FOUT "\nFailed test: $name\n\n";
     close FOUT;
     if(-f "tests/DIFF/$outputbase.diff") {
-        system "cat tests/DIFF/$outputbase.diff >> tests/failure-outputs.txt";
+        system "${printcmd} tests/DIFF/$outputbase.diff >> tests/failure-outputs.txt";
     }
 
     if($r == -1) {
@@ -173,7 +194,7 @@ sub runtest {
             print "\n";
         } else {
             print " with error messages:\n";
-            system "cat $stderrlog";
+            system "${printcmd} $stderrlog";
         }
         return(($r & 128) ? 10 : 20);
     }
@@ -181,7 +202,7 @@ sub runtest {
         print "\n";
     } else {
         print " with error messages:\n";
-        system "cat $stderrlog";
+        system "${printcmd} $stderrlog";
     }
 }
 
@@ -207,7 +228,7 @@ sub loadconfighash {
     # also run tcpdump --fp-type to get the type of floating-point
     # arithmetic we're doing, setting a HAVE_{fptype} key based
     # on the value it prints
-    open(FPTYPE_PIPE, "./tcpdump --fp-type |") or die("piping tcpdump --fp-type failed\n");
+    open(FPTYPE_PIPE, "$TCPDUMP --fp-type |") or die("piping tcpdump --fp-type failed\n");
     my $fptype_val = <FPTYPE_PIPE>;
     close(FPTYPE_PIPE);
     my $have_fptype;
@@ -338,5 +359,5 @@ print "------------------------------------------------\n";
 printf("%4u tests failed\n",$failedcount);
 printf("%4u tests passed\n",$passedcount);
 
-system("cat ${failureoutput}");
+system("${printcmd} ${failureoutput}");
 exit $failedcount;
