@@ -124,6 +124,16 @@ The Regents of the University of California.  All rights reserved.\n";
 #include <grp.h>
 #endif /* _WIN32 */
 
+/*
+ * Pathname separator.
+ * Use this in pathnames, but do *not* use it in URLs.
+ */
+#ifdef _WIN32
+#define PATH_SEPARATOR	'\\'
+#else
+#define PATH_SEPARATOR	'/'
+#endif
+
 /* capabilities convenience library */
 /* If a code depends on HAVE_LIBCAP_NG, it depends also on HAVE_CAP_NG_H.
  * If HAVE_CAP_NG_H is not defined, undefine HAVE_LIBCAP_NG.
@@ -1498,7 +1508,7 @@ main(int argc, char **argv)
 	VFile = NULL;
 	WFileName = NULL;
 	dlt = -1;
-	if ((cp = strrchr(argv[0], '/')) != NULL)
+	if ((cp = strrchr(argv[0], PATH_SEPARATOR)) != NULL)
 		ndo->program_name = program_name = cp + 1;
 	else
 		ndo->program_name = program_name = argv[0];
