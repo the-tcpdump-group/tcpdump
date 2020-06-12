@@ -810,3 +810,7 @@ someip2		someip2.pcap	someip2.out
 edns-opts       edns-opts.pcap      edns-opts.out
 edns-opts-v     edns-opts.pcap      edns-opts-v.out     -v
 edns-opts-vv    edns-opts.pcap      edns-opts-vv.out    -vv
+
+# unsupported link types
+unsupported-link-type-160 unsupported-link-type-160.pcap unsupported-link-type-160.out
+unsupported-link-type-dbus unsupported-link-type-dbus.pcap unsupported-link-type-dbus.out
