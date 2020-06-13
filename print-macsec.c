@@ -104,7 +104,7 @@ static void macsec_print_header(netdissect_options *ndo,
 
 	if (GET_U_1(sectag->tci_an) & MACSEC_TCI_SC)
 		ND_PRINT(", sci " SCI_FMT, GET_BE_U_8(sectag->secure_channel_id));
-		
+
 	ND_PRINT(", ");
 }
 
@@ -152,7 +152,7 @@ int macsec_print(netdissect_options *ndo, const u_char **bp,
 	} else
 		sectag_len = MACSEC_SECTAG_LEN_NOSCI;
 
-	if ((GET_U_1(sectag->short_length) & ~MACSEC_SL_MASK) != 0 || 
+	if ((GET_U_1(sectag->short_length) & ~MACSEC_SL_MASK) != 0 ||
 	    GET_U_1(sectag->tci_an) & MACSEC_TCI_VERSION) {
 		nd_print_invalid(ndo);
 		ndo->ndo_protocol = save_protocol;
@@ -245,7 +245,7 @@ int macsec_print(netdissect_options *ndo, const u_char **bp,
 		if (*caplenp > short_length)
 			*caplenp = short_length;
 	}
-		
+
 	ndo->ndo_protocol = save_protocol;
 	return -1;
 }

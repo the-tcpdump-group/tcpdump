@@ -50,7 +50,6 @@
 #include "addrtoname.h"
 #include "extract.h"
 
-
 static void babel_print_v2(netdissect_options *, const u_char *cp, u_int length);
 
 void
@@ -386,7 +385,7 @@ babel_print_v2_tlvs(netdissect_options *ndo,
     u_char v4_prefix[16] =
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF, 0, 0, 0, 0 };
     u_char v6_prefix[16] = {0};
- 
+
     i = 0;
     while(i < tlvs_length) {
         const u_char *message;
@@ -759,7 +758,7 @@ babel_print_v2_tlvs(netdissect_options *ndo,
         case MESSAGE_MAC: {
             if (!ndo->ndo_vflag)
                 ND_PRINT(" mac");
-            else { 
+            else {
                 ND_PRINT("\n\tMAC ");
                 ND_PRINT("len %u", len);
             }
@@ -847,8 +846,8 @@ babel_print_v2(netdissect_options *ndo,
 
     /* If there's a trailer, process the TLVs in the trailer */
     if (length != 0) {
-    	if(ndo->ndo_vflag) ND_PRINT("\n\t----");
-    	else ND_PRINT(" |");
+	if(ndo->ndo_vflag) ND_PRINT("\n\t----");
+	else ND_PRINT(" |");
         ret = babel_print_v2_tlvs(ndo, cp, length, length);
         if (ret == -1)
             goto trunc;
