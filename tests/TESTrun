@@ -394,5 +394,5 @@ print "------------------------------------------------\n";
 printf("%4u tests failed\n",$failedcount);
 printf("%4u tests passed\n",$passedcount);
 
-system("${printcmd} ${failureoutput}");
+showfile(${failureoutput});
 exit $failedcount;
