@@ -239,6 +239,7 @@ sub runtest {
         print " with error messages:\n";
         showfile($stderrlog);
     }
+    return(5);
 }
 
 sub loadconfighash {
