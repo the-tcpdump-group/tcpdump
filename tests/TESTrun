@@ -92,96 +92,90 @@ sub runtest {
     my $diffstat = 0;
     my $errdiffstat = 0;
 
-    if ($^O eq 'MSWin32') {
-        $r = system "$TCPDUMP -# -n -r $input $options 2>NUL | sed 's/\\r//' | tee tests/NEW/$outputbase | diff $output - >tests/DIFF/$outputbase.diff";
-        # need to do same as below for Cygwin.
+    # we used to do this as a nice pipeline, but the problem is that $r fails to
+    # to be set properly if the tcpdump core dumps.
+    $r = system "$TCPDUMP 2>${rawstderrlog} -# -n -r $input $options >tests/NEW/${outputbase}";
+    if($r == -1) {
+        # failed to start due to error.
+        $status = $!;
     }
-    else {
-        # we used to do this as a nice pipeline, but the problem is that $r fails to
-        # to be set properly if the tcpdump core dumps.
-        $r = system "$TCPDUMP 2>${rawstderrlog} -# -n -r $input $options >tests/NEW/${outputbase}";
-        if($r == -1) {
-            # failed to start due to error.
-            $status = $!;
+    if($r != 0) {
+        $coredump = false;
+        $status = 0;
+        # this means tcpdump failed.
+        open(OUTPUT, ">>"."tests/NEW/$outputbase") || die "fail to open $outputbase\n";
+        if( $r & 128 ) {
+            $coredump = $r & 127;
         }
-        if($r != 0) {
-            $coredump = false;
-            $status = 0;
-            # this means tcpdump failed.
-            open(OUTPUT, ">>"."tests/NEW/$outputbase") || die "fail to open $outputbase\n";
-            if( $r & 128 ) {
-                $coredump = $r & 127;
-            }
-            if( WIFEXITED($r)) {
-                $status = WEXITSTATUS($r);
-            }
+        if( WIFEXITED($r)) {
+            $status = WEXITSTATUS($r);
+        }
 
-            if($coredump || $status) {
-                printf OUTPUT "EXIT CODE %08x: dump:%d code: %d\n", $r, $coredump, $status;
-            } else {
-                printf OUTPUT "EXIT CODE %08x\n", $r;
-            }
-            close(OUTPUT);
-            $r = 0;
+        if($coredump || $status) {
+            printf OUTPUT "EXIT CODE %08x: dump:%d code: %d\n", $r, $coredump, $status;
+        } else {
+            printf OUTPUT "EXIT CODE %08x\n", $r;
+        }
+        close(OUTPUT);
+        $r = 0;
+    }
+    if($r == 0) {
+        #
+        # Compare tcpdump's output with what we think it should be.
+        # If tcpdump failed to produce output, we've produced our own
+        # "output" above, with the exit status.
+        #
+        if ($^O eq 'MSWin32') {
+            my $winoutput = File::Spec->canonpath($output);
+            $r = system "fc/lb1000/t/1 $winoutput tests\\NEW\\$outputbase >tests\\DIFF\\$outputbase.diff";
+        } else {
+            $r = system "diff $output tests/NEW/$outputbase >tests/DIFF/$outputbase.diff";
+        }
+        $diffstat = WEXITSTATUS($r);
+    }
+
+    # process the file, sanitize "reading from" line, and count lines
+    $linecount = 0;
+    open(ERRORRAW, "<" . $rawstderrlog);
+    open(ERROROUT, ">" . $stderrlog);
+    while(<ERRORRAW>) {
+        next if /^$/;  # blank lines are boring
+        if(/^(reading from file )(.*)(,.*)$/) {
+            my $filename = basename($2);
+            print ERROROUT "${1}${filename}${3}\n";
+            next;
+        }
+        print ERROROUT;
+        $linecount++;
+    }
+    close(ERROROUT);
+    close(ERRORRAW);
+
+    if ( -f "$output.stderr" ) {
+        #
+        # Compare the standard error with what we think it should be.
+        #
+        if ($^O eq 'MSWin32') {
+            my $canonstderrlog = File::Spec->canonpath($stderrlog);
+            $nr = system "fc/lb1000/t/1 $output.stderr $canonstderrlog >tests/DIFF/$outputbase.stderr.diff";
+        } else {
+            $nr = system "diff $output.stderr $stderrlog >tests/DIFF/$outputbase.stderr.diff";
         }
         if($r == 0) {
-            #
-            # Compare tcpdump's output with what we think it should be.
-            # If tcpdump failed to produce output, we've produced our own
-            # "output" above, with the exit status.
-            #
-            if ($^O eq 'MSWin32') {
-                my $winoutput = File::Spec->canonpath($output);
-                $r = system "fc/lb1000/t/1 $winoutput tests\\NEW\\$outputbase >tests\\DIFF\\$outputbase.diff";
-            } else {
-                $r = system "diff $output tests/NEW/$outputbase >tests/DIFF/$outputbase.diff";
-            }
-            $diffstat = WEXITSTATUS($r);
+            $r = $nr;
         }
-
-        # process the file, sanitize "reading from" line, and count lines
-        $linecount = 0;
-        open(ERRORRAW, "<" . $rawstderrlog);
-        open(ERROROUT, ">" . $stderrlog);
-        while(<ERRORRAW>) {
-            next if /^$/;  # blank lines are boring
-            if(/^(reading from file )(.*)(,.*)$/) {
-                my $filename = basename($2);
-                print ERROROUT "${1}${filename}${3}\n";
-                next;
-            }
-            print ERROROUT;
-            $linecount++;
-        }
-        close(ERROROUT);
-        close(ERRORRAW);
-
-        if ( -f "$output.stderr" ) {
-            #
-            # Compare the standard error with what we think it should be.
-            #
-            if ($^O eq 'MSWin32') {
-                my $canonstderrlog = File::Spec->canonpath($stderrlog);
-                $nr = system "fc/lb1000/t/1 $output.stderr $canonstderrlog >tests/DIFF/$outputbase.stderr.diff";
-            } else {
-                $nr = system "diff $output.stderr $stderrlog >tests/DIFF/$outputbase.stderr.diff";
-            }
-            if($r == 0) {
-                $r = $nr;
-            }
-            $errdiffstat = WEXITSTATUS($nr);
-        }
-
-        if($r == 0) {
-            if($linecount == 0 && $status == 0) {
-                unlink($stderrlog);
-            } else {
-                $errdiffstat = 1;
-            }
-        }
-
-        #print sprintf("END: %08x\n", $r);
+        $errdiffstat = WEXITSTATUS($nr);
     }
+
+    if($r == 0) {
+        if($linecount == 0 && $status == 0) {
+            unlink($stderrlog);
+        } else {
+            $errdiffstat = 1;
+        }
+    }
+
+    #print sprintf("END: %08x\n", $r);
 
     if($r == 0) {
         if($linecount == 0) {
