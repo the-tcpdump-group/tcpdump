@@ -125,7 +125,17 @@ sub runtest {
             $r = 0;
         }
         if($r == 0) {
-            $r = system "diff $output tests/NEW/$outputbase >tests/DIFF/$outputbase.diff";
+            #
+            # Compare tcpdump's output with what we think it should be.
+            # If tcpdump failed to produce output, we've produced our own
+            # "output" above, with the exit status.
+            #
+            if ($^O eq 'MSWin32') {
+                my $winoutput = File::Spec->canonpath($output);
+                $r = system "fc/lb1000/t/1 $winoutput tests\\NEW\\$outputbase >tests\\DIFF\\$outputbase.diff";
+            } else {
+                $r = system "diff $output tests/NEW/$outputbase >tests/DIFF/$outputbase.diff";
+            }
             $diffstat = WEXITSTATUS($r);
         }
 
@@ -147,7 +157,15 @@ sub runtest {
         close(ERRORRAW);
 
         if ( -f "$output.stderr" ) {
-            $nr = system "diff $output.stderr $stderrlog >tests/DIFF/$outputbase.stderr.diff";
+            #
+            # Compare the standard error with what we think it should be.
+            #
+            if ($^O eq 'MSWin32') {
+                my $canonstderrlog = File::Spec->canonpath($stderrlog);
+                $nr = system "fc/lb1000/t/1 $output.stderr $canonstderrlog >tests/DIFF/$outputbase.stderr.diff";
+            } else {
+                $nr = system "diff $output.stderr $stderrlog >tests/DIFF/$outputbase.stderr.diff";
+            }
             if($r == 0) {
                 $r = $nr;
             }
