@@ -22,6 +22,7 @@ use File::Basename;
 use POSIX qw( WEXITSTATUS WIFEXITED);
 use Cwd qw(abs_path getcwd);
 use File::Path qw(mkpath);   # mkpath works with ancient perl, as well as newer perl
+use File::Spec;
 use Data::Dumper;            # for debugging.
 
 # these are created in the directory where we are run, which might be
@@ -32,11 +33,6 @@ mkpath($newdir);
 mkpath($diffdir);
 my $origdir = getcwd();
 my $srcdir  = $ENV{'srcdir'} || ".";
-if ($^O eq 'MSWin32') {
-    $printcmd = "type";
-} else {
-    $printcmd = "cat";
-}
 
 #
 # Force UTC, so time stamps are printed in a standard time zone, and
@@ -68,6 +64,20 @@ open(FAILUREOUTPUT, ">" . $failureoutput);
 close(FAILUREOUTPUT);
 
 $confighhash = undef;
+
+sub showfile {
+    local($path) = @_;
+
+    #
+    # XXX - just do this directly in Perl?
+    #
+    if ($^O eq 'MSWin32') {
+        my $winpath = File::Spec->canonpath($path);
+        system "type $winpath";
+    } else {
+        system "cat $path";
+    }
+}
 
 sub runtest {
     local($name, $input, $output, $options) = @_;
@@ -115,7 +125,7 @@ sub runtest {
             $r = 0;
         }
         if($r == 0) {
-            $r = system "${printcmd} tests/NEW/$outputbase | diff $output - >tests/DIFF/$outputbase.diff";
+            $r = system "diff $output tests/NEW/$outputbase >tests/DIFF/$outputbase.diff";
             $diffstat = WEXITSTATUS($r);
         }
 
@@ -137,7 +147,7 @@ sub runtest {
         close(ERRORRAW);
 
         if ( -f "$output.stderr" ) {
-            $nr = system "${printcmd} $stderrlog | diff $output.stderr - >tests/DIFF/$outputbase.stderr.diff";
+            $nr = system "diff $output.stderr $stderrlog >tests/DIFF/$outputbase.stderr.diff";
             if($r == 0) {
                 $r = $nr;
             }
@@ -160,7 +170,7 @@ sub runtest {
             printf "    %-40s: passed\n", $name;
         } else {
             printf "    %-40s: passed with error messages:\n", $name;
-            system "${printcmd} $stderrlog";
+            showfile($stderrlog);
         }
         unlink "tests/DIFF/$outputbase.diff";
         return 0;
@@ -171,7 +181,14 @@ sub runtest {
     printf FOUT "\nFailed test: $name\n\n";
     close FOUT;
     if(-f "tests/DIFF/$outputbase.diff") {
-        system "${printcmd} tests/DIFF/$outputbase.diff >> tests/failure-outputs.txt";
+        #
+        # XXX - just do this directly in Perl?
+        #
+        if ($^O eq 'MSWin32') {
+            system "type tests\\DIFF\\$outputbase.diff >> tests\\failure-outputs.txt";
+        } else {
+            system "cat tests/DIFF/$outputbase.diff >> tests/failure-outputs.txt";
+        }
     }
 
     if($r == -1) {
@@ -194,7 +211,7 @@ sub runtest {
             print "\n";
         } else {
             print " with error messages:\n";
-            system "${printcmd} $stderrlog";
+            showfile($stderrlog);
         }
         return(($r & 128) ? 10 : 20);
     }
@@ -202,7 +219,7 @@ sub runtest {
         print "\n";
     } else {
         print " with error messages:\n";
-        system "${printcmd} $stderrlog";
+        showfile($stderrlog);
     }
 }
 
