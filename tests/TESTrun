@@ -98,13 +98,7 @@ sub runtest {
     # Furthermore, on Windows, fc can't read the standard input, so we
     # can't do it as a pipeline in any case.
     $r = system "$TCPDUMP -# -n -r $input $options >tests/NEW/${outputbase} 2>${rawstderrlog}";
-    if($r == -1) {
-        # failed to start due to error.
-        $status = $!;
-    }
     if($r != 0) {
-        $coredump = false;
-        $status = 0;
         #
         # Something other than "tcpdump opened the file, read it, and
         # dissected all the packets".  What happened?
@@ -114,20 +108,104 @@ sub runtest {
         # with it.
         #
         open(OUTPUT, ">>"."tests/NEW/$outputbase") || die "fail to open $outputbase\n";
-        if( $r & 128 ) {
-            $coredump = $r & 127;
-        }
-        if( WIFEXITED($r)) {
-            $status = WEXITSTATUS($r);
-        }
-
-        if($coredump || $status) {
-            printf OUTPUT "EXIT CODE %08x: dump:%d code: %d\n", $r, $coredump, $status;
+        if($r == -1) {
+            # failed to start due to error.
+            $status = $!;
+            printf OUTPUT "FAILED TO RUN: status: %d\n", $status;
         } else {
-            printf OUTPUT "EXIT CODE %08x\n", $r;
+            if ($^O eq 'MSWin32') {
+                #
+                # On Windows, the return value of system is the lower 8
+                # bits of the exit status of the process, shifted left
+                # 8 bits.
+                #
+                # If the process crashed, rather than exiting, the
+                # exit status will be one of the EXCEPTION_ values
+                # listed in the documentation for the GetExceptionCode()
+                # macro.
+                #
+                # Those are defined as STATUS_ values, which should have
+                # 0xC in the topmost 4 bits (being fatal error
+                # statuses); some of them have a value that fits in
+                # the lower 8 bits.  We could, I guess, assume that
+                # any value that 1) isn't returned by tcpdump and 2)
+                # corresponds to the lower 8 bits of a STATUS_ value
+                # used as an EXCEPTION_ value indicates that tcpdump
+                # exited with that exception.
+                #
+                # However, as we're running tcpdump with system, which
+                # runs the command through cmd.exe, and as cmd.exe
+                # doesn't map the command's exit code to its own exit
+                # code in any straightforward manner, we can't get
+                # that information in any case, so there's no point
+                # in trying to interpret it in that fashion.
+                #
+                $status = $r >> 8;
+            } else {
+                #
+                # On UN*Xes, the return status is a POSIX as filled in
+                # by wait() or waitpid().
+                #
+                # POSIX offers some calls for analyzing it, such as
+                # WIFSIGNALED() to test whether it indicates that the
+                # process was terminated by a signal, WTERMSIG() to
+                # get the signal number from it, WIFEXITED() to test
+                # whether it indicates that the process exited normally,
+                # and WEXITSTATUS() to get the exit status from it.
+                #
+                # POSIX doesn't standardize core dumps, so the POSIX
+                # calls can't test whether a core dump occurred.
+                # However, all the UN*Xes we are likely to encounter
+                # follow Research UNIX in this regard, with the exit
+                # status containing either 0 or a signal number in
+                # the lower 7 bits, with 0 meaning "exited rather
+                # than being terminated by a signal", the "core dumped"
+                # flag in the 0x80 bit, and, if the signal number is
+                # 0, the exit status in the next 8 bits up.
+                #
+                # This should be cleaned up to use the POSIX calls
+                # from the Perl library - and to define an additional
+                # WCOREDUMP() call to test the "core dumped" bit and
+                # use that.
+                #
+                # But note also that, as we're running tcpdump with
+                # system, which runs the command through a shell, if
+                # tcpdump crashes, we'll only know that if the shell
+                # maps the signal indication and uses that as its
+                # exit status.
+                #
+                # The good news is that the Bourne shell, and compatible
+                # shells, have traditionally done that.  If the process
+                # for which the shell reports the exit status terminates
+                # with a signal, it adds 128 to the signal number and
+                # returns that as its exit status.  (This is why the
+                # "this is now working right" behavior described in a
+                # comment below is occurring.)
+                #
+                # As tcpdump itself never returns with an exit status
+                # >= 128, we can try checking for an exit status with
+                # the 0x80 bit set and, if we have one, get the signal
+                # number from the lower 7 bits of the exit status.  We
+                # can't get the "core dumped" indication from the
+                # shell's exit status; all we can do is check whether
+                # there's a core file.
+                #
+                if( $r & 128 ) {
+                    $coredump = $r & 127;
+                }
+                if( WIFEXITED($r)) {
+                    $status = WEXITSTATUS($r);
+                }
+            }
+
+            if($coredump || $status) {
+                printf OUTPUT "EXIT CODE %08x: dump:%d code: %d\n", $r, $coredump, $status;
+            } else {
+                printf OUTPUT "EXIT CODE %08x\n", $r;
+            }
+            $r = 0;
         }
         close(OUTPUT);
-        $r = 0;
     }
     if($r == 0) {
         #
@@ -138,10 +216,11 @@ sub runtest {
         if ($^O eq 'MSWin32') {
             my $winoutput = File::Spec->canonpath($output);
             $r = system "fc /lb1000 /t /1 $winoutput tests\\NEW\\$outputbase >tests\\DIFF\\$outputbase.diff";
+            $status = $r >> 8;
         } else {
             $r = system "diff $output tests/NEW/$outputbase >tests/DIFF/$outputbase.diff";
+            $diffstat = WEXITSTATUS($r);
         }
-        $diffstat = WEXITSTATUS($r);
     }
 
     # process the standard error file, sanitize "reading from" line,
@@ -170,13 +249,14 @@ sub runtest {
             my $winoutput = File::Spec->canonpath($output);
             my $canonstderrlog = File::Spec->canonpath($stderrlog);
             $nr = system "fc /lb1000 /t /1 $winoutput.stderr $canonstderrlog >tests\DIFF\$outputbase.stderr.diff";
+            $errdiffstat = $nr >> 8;
         } else {
             $nr = system "diff $output.stderr $stderrlog >tests/DIFF/$outputbase.stderr.diff";
+            $errdiffstat = WEXITSTATUS($nr);
         }
         if($r == 0) {
             $r = $nr;
         }
-        $errdiffstat = WEXITSTATUS($nr);
     }
 
     if($r == 0) {
