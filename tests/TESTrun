@@ -94,7 +94,7 @@ sub runtest {
 
     # we used to do this as a nice pipeline, but the problem is that $r fails to
     # to be set properly if the tcpdump core dumps.
-    $r = system "$TCPDUMP 2>${rawstderrlog} -# -n -r $input $options >tests/NEW/${outputbase}";
+    $r = system "$TCPDUMP -# -n -r $input $options >tests/NEW/${outputbase} 2>${rawstderrlog}";
     if($r == -1) {
         # failed to start due to error.
         $status = $!;
