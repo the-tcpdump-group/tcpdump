@@ -1037,8 +1037,8 @@ decode_rt_routing_info(netdissect_options *ndo,
      */
     memset(&route_target, 0, sizeof(route_target));
     num_octets = (plen + 7) / 8;
-    ND_TCHECK_LEN(pptr[5], num_octets);
-    memcpy(&route_target, &pptr[5], num_octets);
+    ND_TCHECK_LEN(pptr + 5, num_octets);
+    memcpy(&route_target, pptr + 5, num_octets);
     /* If mask-len is not on octet boundary, ensure all extra bits are 0 */
     if (plen % 8) {
         ((u_char *)&route_target)[num_octets - 1] &=
