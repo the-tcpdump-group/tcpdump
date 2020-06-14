@@ -216,7 +216,7 @@ sub runtest {
         if ($^O eq 'MSWin32') {
             my $winoutput = File::Spec->canonpath($output);
             $r = system "fc /lb1000 /t /1 $winoutput tests\\NEW\\$outputbase >tests\\DIFF\\$outputbase.diff";
-            $status = $r >> 8;
+            $diffstat = $r >> 8;
         } else {
             $r = system "diff $output tests/NEW/$outputbase >tests/DIFF/$outputbase.diff";
             $diffstat = WEXITSTATUS($r);
