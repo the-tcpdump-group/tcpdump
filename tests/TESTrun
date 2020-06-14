@@ -169,7 +169,7 @@ sub runtest {
         if ($^O eq 'MSWin32') {
             my $winoutput = File::Spec->canonpath($output);
             my $canonstderrlog = File::Spec->canonpath($stderrlog);
-            $nr = system "fc/lb1000/t/1 $winoutput.stderr $canonstderrlog >tests/DIFF/$outputbase.stderr.diff";
+            $nr = system "fc/lb1000/t/1 $winoutput.stderr $canonstderrlog >tests\DIFF\$outputbase.stderr.diff";
         } else {
             $nr = system "diff $output.stderr $stderrlog >tests/DIFF/$outputbase.stderr.diff";
         }
