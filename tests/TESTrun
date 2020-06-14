@@ -94,6 +94,9 @@ sub runtest {
 
     # we used to do this as a nice pipeline, but the problem is that $r fails to
     # to be set properly if the tcpdump core dumps.
+    #
+    # Furthermore, on Windows, fc can't read the standard input, so we
+    # can't do it as a pipeline in any case.
     $r = system "$TCPDUMP -# -n -r $input $options >tests/NEW/${outputbase} 2>${rawstderrlog}";
     if($r == -1) {
         # failed to start due to error.
@@ -102,7 +105,14 @@ sub runtest {
     if($r != 0) {
         $coredump = false;
         $status = 0;
-        # this means tcpdump failed.
+        #
+        # Something other than "tcpdump opened the file, read it, and
+        # dissected all the packets".  What happened?
+        #
+        # We write out an exit status after whatever the subprocess
+        # wrote out, so it shows up when we diff the expected output
+        # with it.
+        #
         open(OUTPUT, ">>"."tests/NEW/$outputbase") || die "fail to open $outputbase\n";
         if( $r & 128 ) {
             $coredump = $r & 127;
@@ -134,7 +144,8 @@ sub runtest {
         $diffstat = WEXITSTATUS($r);
     }
 
-    # process the file, sanitize "reading from" line, and count lines
+    # process the standard error file, sanitize "reading from" line,
+    # and count lines
     $linecount = 0;
     open(ERRORRAW, "<" . $rawstderrlog);
     open(ERROROUT, ">" . $stderrlog);
