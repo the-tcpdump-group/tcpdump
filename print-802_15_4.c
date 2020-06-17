@@ -655,11 +655,11 @@ ieee802_15_4_print_pending_addresses(netdissect_options *ndo,
 		}
 		ND_PRINT("]");
 	}
-	if (s_cnt != 0) {
+	if (e_cnt != 0) {
 		ND_PRINT(", Extended address list = [ ");
 		for(i = 0; i < e_cnt; i++) {
 			ieee802_15_4_print_addr(ndo, p + 1 + s_cnt * 2 +
-						e_cnt * 8, 8);
+						i * 8, 8);
 			ND_PRINT(" ");
 		}
 		ND_PRINT("]");
