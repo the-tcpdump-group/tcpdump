@@ -1002,6 +1002,16 @@ tcpdump 'tcp[tcpflags] & (tcp-syn|tcp-fin) != 0 and not src and dst net \fIlocal
 .fi
 .RE
 .LP
+To print the TCP packets with flags RST and ACK both set.
+(i.e. select only the RST and ACK flags in the flags field, and if the result
+is "RST and ACK both set", match)
+.RS
+.nf
+.B
+tcpdump 'tcp[tcpflags] & (tcp-rst|tcp-ack) == (tcp-rst|tcp-ack)'
+.fi
+.RE
+.LP
 To print all IPv4 HTTP packets to and from port 80, i.e. print only
 packets that contain data, not, for example, SYN and FIN packets and
 ACK-only packets.  (IPv6 is left as an exercise for the reader.)
