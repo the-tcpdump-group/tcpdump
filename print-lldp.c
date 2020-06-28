@@ -136,6 +136,7 @@ static const struct tok lldp_cap_values[] = {
 #define LLDP_PRIVATE_8021_SUBTYPE_PROTOCOL_VLAN_ID	2
 #define LLDP_PRIVATE_8021_SUBTYPE_VLAN_NAME		3
 #define LLDP_PRIVATE_8021_SUBTYPE_PROTOCOL_IDENTITY	4
+#define LLDP_PRIVATE_8021_SUBTYPE_LINKAGGR		7
 #define LLDP_PRIVATE_8021_SUBTYPE_CONGESTION_NOTIFICATION 8
 #define LLDP_PRIVATE_8021_SUBTYPE_ETS_CONFIGURATION       9
 #define LLDP_PRIVATE_8021_SUBTYPE_ETS_RECOMMENDATION     10
@@ -149,6 +150,7 @@ static const struct tok lldp_8021_subtype_values[] = {
     { LLDP_PRIVATE_8021_SUBTYPE_PROTOCOL_VLAN_ID, "Port and Protocol VLAN ID"},
     { LLDP_PRIVATE_8021_SUBTYPE_VLAN_NAME, "VLAN name"},
     { LLDP_PRIVATE_8021_SUBTYPE_PROTOCOL_IDENTITY, "Protocol Identity"},
+    { LLDP_PRIVATE_8021_SUBTYPE_LINKAGGR, "Link aggregation"},
     { LLDP_PRIVATE_8021_SUBTYPE_CONGESTION_NOTIFICATION, "Congestion Notification"},
     { LLDP_PRIVATE_8021_SUBTYPE_ETS_CONFIGURATION, "ETS Configuration"},
     { LLDP_PRIVATE_8021_SUBTYPE_ETS_RECOMMENDATION, "ETS Recommendation"},
@@ -712,6 +714,16 @@ lldp_private_8021_print(netdissect_options *ndo,
         ND_PRINT("\n\t    protocol identity: ");
         (void)nd_printzp(ndo, tptr + 5, sublen, NULL);
         break;
+
+    case LLDP_PRIVATE_8021_SUBTYPE_LINKAGGR:
+        if (tlv_len < 9) {
+            return hexdump;
+        }
+        ND_PRINT("\n\t    aggregation status [%s], aggregation port ID %u",
+               bittok2str(lldp_aggregation_values, "none", GET_U_1((tptr + 4))),
+               GET_BE_U_4(tptr + 5));
+        break;
+
     case LLDP_PRIVATE_8021_SUBTYPE_CONGESTION_NOTIFICATION:
         if(tlv_len<LLDP_PRIVATE_8021_SUBTYPE_CONGESTION_NOTIFICATION_LENGTH){
 		return hexdump;
