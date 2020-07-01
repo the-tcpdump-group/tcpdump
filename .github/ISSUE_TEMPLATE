@@ -6,3 +6,6 @@ CONTRIBUTING in the tcpdump source tree root.
 
 When reporting bugs and other problems, give tcpdump and libpcap version
 with 'tcpdump --version' or './tcpdump --version'
+
+If needed, you can attach to a comment a POC pcap file as a gzip compressed
+file or in a zip archive.
