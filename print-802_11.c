@@ -2642,7 +2642,7 @@ enum ieee80211_radiotap_type {
 
 static void
 print_chaninfo(netdissect_options *ndo,
-	       uint16_t freq, int flags, int presentflags)
+	       uint16_t freq, uint32_t flags, uint32_t presentflags)
 {
 	ND_PRINT("%u MHz", freq);
 	if (presentflags & (1 << IEEE80211_RADIOTAP_MCS)) {
