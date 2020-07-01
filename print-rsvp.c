@@ -341,7 +341,7 @@ struct rsvp_obj_frr_t {
 #define RSVP_OBJ_XRO_MASK_SUBOBJ(x)   ((x)&0x7f)
 #define RSVP_OBJ_XRO_MASK_LOOSE(x)    ((x)&0x80)
 
-#define RSVP_OBJ_CAPABILITY_FLAGS_MASK  0x7
+#define RSVP_OBJ_CAPABILITY_FLAGS_MASK  0x7U
 
 #define	RSVP_OBJ_XRO_RES       0
 #define	RSVP_OBJ_XRO_IPV4      1
