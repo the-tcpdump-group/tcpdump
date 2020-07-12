@@ -113,7 +113,7 @@ lane_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 	 * Now print the encapsulated frame, under the assumption
 	 * that it's an Ethernet frame.
 	 */
-	ether_print(ndo, p, length, caplen, lane_hdr_print, p - 2);
+	ether_print(ndo, p, length, caplen, lane_hdr_print, p - 2, FALSE);
 }
 
 u_int

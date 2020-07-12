@@ -92,7 +92,7 @@ vxlan_gpe_print(netdissect_options *ndo, const u_char *bp, u_int len)
         ip6_print(ndo, bp, len - VXLAN_GPE_HDR_LEN);
         break;
     case 0x3:
-        ether_print(ndo, bp, len - VXLAN_GPE_HDR_LEN, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL);
+        ether_print(ndo, bp, len - VXLAN_GPE_HDR_LEN, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL, FALSE);
         break;
     case 0x4:
         nsh_print(ndo, bp, len - VXLAN_GPE_HDR_LEN);

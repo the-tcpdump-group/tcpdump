@@ -196,24 +196,24 @@ edsa_tag_print(netdissect_options *ndo, const u_char *bp)
 	tag_common_print(ndo, p);
 }
 
-u_int
+void
 dsa_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
 
 	ndo->ndo_protocol = "dsa";
-	return (ether_switch_tag_print(ndo, p, length, caplen,
-	    dsa_tag_print, DSA_LEN));
+	ndo->ndo_ll_hdr_len += 0;
+	ether_switch_tag_print(ndo, p, length, caplen, dsa_tag_print, DSA_LEN, TRUE);
 }
 
-u_int
+void
 edsa_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
 
 	ndo->ndo_protocol = "edsa";
-	return (ether_switch_tag_print(ndo, p, length, caplen,
-	    edsa_tag_print, EDSA_LEN));
+	ndo->ndo_ll_hdr_len += 0;
+	ether_switch_tag_print(ndo, p, length, caplen, edsa_tag_print, EDSA_LEN, TRUE);
 }

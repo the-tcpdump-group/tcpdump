@@ -1128,7 +1128,7 @@ of10_packet_data_print(netdissect_options *ndo,
 	ND_TCHECK_LEN(cp, len);
 	ndo->ndo_vflag -= 3;
 	ND_PRINT(", frame decoding below\n");
-	ether_print(ndo, cp, len, ND_BYTES_AVAILABLE_AFTER(cp), NULL, NULL);
+	ether_print(ndo, cp, len, ND_BYTES_AVAILABLE_AFTER(cp), NULL, NULL, FALSE);
 	ndo->ndo_vflag += 3;
 	return cp + len;
 

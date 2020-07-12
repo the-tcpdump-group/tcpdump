@@ -694,7 +694,7 @@ juniper_pppoe_if_print(netdissect_options *ndo,
 
         p+=l2info.header_len;
         /* this DLT contains nothing but raw ethernet frames */
-        ether_print(ndo, p, l2info.length, l2info.caplen, NULL, NULL);
+        ether_print(ndo, p, l2info.length, l2info.caplen, NULL, NULL, FALSE);
         return l2info.header_len;
 }
 #endif
@@ -713,7 +713,7 @@ juniper_ether_if_print(netdissect_options *ndo,
 
         p+=l2info.header_len;
         /* this DLT contains nothing but raw Ethernet frames */
-        ether_print(ndo, p, l2info.length, l2info.caplen, NULL, NULL);
+        ether_print(ndo, p, l2info.length, l2info.caplen, NULL, NULL, FALSE);
         return l2info.header_len;
 }
 #endif
@@ -1071,7 +1071,7 @@ juniper_atm2_if_print(netdissect_options *ndo,
         if (l2info.direction != JUNIPER_BPF_PKT_IN && /* ether-over-1483 encaps ? */
             /* use EXTRACT_, not GET_ (not packet buffer pointer) */
             (EXTRACT_BE_U_4(l2info.cookie) & ATM2_GAP_COUNT_MASK)) {
-            ether_print(ndo, p, l2info.length, l2info.caplen, NULL, NULL);
+            ether_print(ndo, p, l2info.length, l2info.caplen, NULL, NULL, FALSE);
             return l2info.header_len;
         }
 

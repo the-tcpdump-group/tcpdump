@@ -53,7 +53,6 @@ struct void_printer {
 };
 
 static const struct uint_printer uint_printers[] = {
-	{ ether_if_print,	DLT_EN10MB },
 #ifdef DLT_IEEE802_15_4
 	{ ieee802_15_4_if_print, DLT_IEEE802_15_4 },
 #endif
@@ -62,12 +61,6 @@ static const struct uint_printer uint_printers[] = {
 #endif
 #ifdef DLT_IEEE802_15_4_TAP
 	{ ieee802_15_4_tap_if_print, DLT_IEEE802_15_4_TAP },
-#endif
-#ifdef DLT_NETANALYZER
-	{ netanalyzer_if_print, DLT_NETANALYZER },
-#endif
-#ifdef DLT_NETANALYZER_TRANSPARENT
-	{ netanalyzer_transparent_if_print, DLT_NETANALYZER_TRANSPARENT },
 #endif
 #ifdef DLT_CIP
 	{ cip_if_print,		DLT_CIP },
@@ -184,20 +177,8 @@ static const struct uint_printer uint_printers[] = {
 #ifdef DLT_PPP_SERIAL
 	{ ppp_hdlc_if_print,	DLT_PPP_SERIAL },
 #endif
-#ifdef DLT_DSA_TAG_BRCM
-	{ brcm_tag_if_print,	DLT_DSA_TAG_BRCM },
-#endif
-#ifdef DLT_DSA_TAG_BRCM_PREPEND
-	{ brcm_tag_prepend_if_print, DLT_DSA_TAG_BRCM_PREPEND },
-#endif
 #ifdef DLT_VSOCK
 	{ vsock_if_print,	DLT_VSOCK },
-#endif
-#ifdef DLT_DSA_TAG_DSA
-	{ dsa_if_print,	DLT_DSA_TAG_DSA },
-#endif
-#ifdef DLT_DSA_TAG_EDSA
-	{ edsa_if_print,	DLT_DSA_TAG_EDSA },
 #endif
 	{ NULL,			0 },
 };
@@ -210,14 +191,33 @@ static const struct void_printer void_printers[] = {
 #ifdef DLT_ARCNET_LINUX
 	{ arcnet_linux_if_print, DLT_ARCNET_LINUX },
 #endif
+#ifdef DLT_DSA_TAG_BRCM
+	{ brcm_tag_if_print,	DLT_DSA_TAG_BRCM },
+#endif
+#ifdef DLT_DSA_TAG_BRCM_PREPEND
+	{ brcm_tag_prepend_if_print, DLT_DSA_TAG_BRCM_PREPEND },
+#endif
 #ifdef DLT_BLUETOOTH_HCI_H4_WITH_PHDR
 	{ bt_if_print,		DLT_BLUETOOTH_HCI_H4_WITH_PHDR},
+#endif
+#ifdef DLT_DSA_TAG_DSA
+	{ dsa_if_print,		DLT_DSA_TAG_DSA },
+#endif
+#ifdef DLT_DSA_TAG_EDSA
+	{ edsa_if_print,	DLT_DSA_TAG_EDSA },
 #endif
 #ifdef DLT_ENC
 	{ enc_if_print,		DLT_ENC },
 #endif
+	{ ether_if_print,	DLT_EN10MB },
 #ifdef DLT_IPNET
 	{ ipnet_if_print,	DLT_IPNET },
+#endif
+#ifdef DLT_NETANALYZER
+	{ netanalyzer_if_print, DLT_NETANALYZER },
+#endif
+#ifdef DLT_NETANALYZER_TRANSPARENT
+	{ netanalyzer_transparent_if_print, DLT_NETANALYZER_TRANSPARENT },
 #endif
 #ifdef DLT_NFLOG
 	{ nflog_if_print,	DLT_NFLOG},

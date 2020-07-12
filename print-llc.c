@@ -525,7 +525,7 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 			/*
 			 * What remains is an Ethernet packet.
 			 */
-			ether_print(ndo, p, length, caplen, NULL, NULL);
+			ether_print(ndo, p, length, caplen, NULL, NULL, FALSE);
 			return (1);
 
 		case PID_RFC2684_802_5_FCS:
