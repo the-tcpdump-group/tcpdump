@@ -135,11 +135,6 @@ brcm_tag_prepend_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 		return (caplen);
 	}
 
-	if (length < BRCM_TAG_LEN) {
-		nd_print_trunc(ndo);
-		return (length);
-	}
-
 	if (ndo->ndo_eflag) {
 		/* Print the prepended Broadcom tag. */
 		brcm_tag_print(ndo, p);
