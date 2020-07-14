@@ -253,11 +253,11 @@ usb_linux_48_byte_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 {
 	ndo->ndo_protocol = "usb_linux_48_byte";
 	if (h->caplen < sizeof(pcap_usb_header)) {
-		ndo->ndo_ll_header_length += h->caplen;
+		ndo->ndo_ll_hdr_len += h->caplen;
 		nd_print_trunc(ndo);
 		return;
 	}
-	ndo->ndo_ll_header_length += sizeof (pcap_usb_header);
+	ndo->ndo_ll_hdr_len += sizeof (pcap_usb_header);
 
 	usb_header_print(ndo, (const pcap_usb_header *) p);
 
@@ -279,11 +279,11 @@ usb_linux_64_byte_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 {
 	ndo->ndo_protocol = "usb_linux_64_byte";
 	if (h->caplen < sizeof(pcap_usb_header_mmapped)) {
-		ndo->ndo_ll_header_length += h->caplen;
+		ndo->ndo_ll_hdr_len += h->caplen;
 		nd_print_trunc(ndo);
 		return;
 	}
-	ndo->ndo_ll_header_length += sizeof (pcap_usb_header_mmapped);
+	ndo->ndo_ll_hdr_len += sizeof (pcap_usb_header_mmapped);
 
 	usb_header_print(ndo, (const pcap_usb_header *) p);
 

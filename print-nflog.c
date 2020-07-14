@@ -145,10 +145,10 @@ nflog_if_print(netdissect_options *ndo,
 	ndo->ndo_protocol = "nflog";
 	if (caplen < NFLOG_HDR_LEN) {
 		nd_print_trunc(ndo);
-		ndo->ndo_ll_header_length += caplen;
+		ndo->ndo_ll_hdr_len += caplen;
 		return;
 	}
-	ndo->ndo_ll_header_length += NFLOG_HDR_LEN;
+	ndo->ndo_ll_hdr_len += NFLOG_HDR_LEN;
 
 	ND_TCHECK_SIZE(hdr);
 	if (GET_U_1(hdr->nflog_version) != 0) {
@@ -225,11 +225,11 @@ nflog_if_print(netdissect_options *ndo,
 		break;
 	}
 
-	ndo->ndo_ll_header_length += h_size - NFLOG_HDR_LEN;
+	ndo->ndo_ll_hdr_len += h_size - NFLOG_HDR_LEN;
 	return;
 trunc:
 	nd_print_trunc(ndo);
-	ndo->ndo_ll_header_length += h_size - NFLOG_HDR_LEN;
+	ndo->ndo_ll_hdr_len += h_size - NFLOG_HDR_LEN;
 	return;
 }
 

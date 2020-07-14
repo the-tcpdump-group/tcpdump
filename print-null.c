@@ -83,11 +83,11 @@ null_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 
 	ndo->ndo_protocol = "null";
 	if (caplen < NULL_HDRLEN) {
-		ndo->ndo_ll_header_length += caplen;
+		ndo->ndo_ll_hdr_len += caplen;
 		nd_print_trunc(ndo);
 		return;
 	}
-	ndo->ndo_ll_header_length += NULL_HDRLEN;
+	ndo->ndo_ll_hdr_len += NULL_HDRLEN;
 
 	family = GET_HE_U_4(p);
 

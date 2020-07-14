@@ -65,10 +65,10 @@ sl_if_print(netdissect_options *ndo,
 	ndo->ndo_protocol = "slip";
 	if (caplen < SLIP_HDRLEN) {
 		nd_print_trunc(ndo);
-		ndo->ndo_ll_header_length += caplen;
+		ndo->ndo_ll_hdr_len += caplen;
 		return;
 	}
-	ndo->ndo_ll_header_length += SLIP_HDRLEN;
+	ndo->ndo_ll_hdr_len += SLIP_HDRLEN;
 
 	caplen -= SLIP_HDRLEN;
 	length -= SLIP_HDRLEN;
@@ -106,10 +106,10 @@ sl_bsdos_if_print(netdissect_options *ndo,
 	ndo->ndo_protocol = "slip_bsdos";
 	if (caplen < SLIP_HDRLEN) {
 		nd_print_trunc(ndo);
-		ndo->ndo_ll_header_length += caplen;
+		ndo->ndo_ll_hdr_len += caplen;
 		return;
 	}
-	ndo->ndo_ll_header_length += SLIP_HDRLEN;
+	ndo->ndo_ll_hdr_len += SLIP_HDRLEN;
 
 	length -= SLIP_HDRLEN;
 

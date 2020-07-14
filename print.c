@@ -461,18 +461,18 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	ndo->ndo_snapend = sp + h->caplen;
 
 	ndo->ndo_protocol = "";
-	ndo->ndo_ll_header_length = 0;
+	ndo->ndo_ll_hdr_len = 0;
 	if (setjmp(ndo->ndo_truncated) == 0) {
 		/* Print the packet. */
 		if (ndo->ndo_void_printer == TRUE) {
 			(ndo->ndo_if_printer.void_printer)(ndo, h, sp);
-			hdrlen = ndo->ndo_ll_header_length;
+			hdrlen = ndo->ndo_ll_hdr_len;
 		} else
 			hdrlen = (ndo->ndo_if_printer.uint_printer)(ndo, h, sp);
 	} else {
 		/* A printer quit because the packet was truncated; report it */
 		ND_PRINT(" [|%s]", ndo->ndo_protocol);
-		hdrlen = ndo->ndo_ll_header_length;
+		hdrlen = ndo->ndo_ll_hdr_len;
 	}
 
 	/*

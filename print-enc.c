@@ -105,11 +105,11 @@ enc_if_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "enc";
 	if (caplen < ENC_HDRLEN) {
-		ndo->ndo_ll_header_length += caplen;
+		ndo->ndo_ll_hdr_len += caplen;
 		nd_print_trunc(ndo);
 		return;
 	}
-	ndo->ndo_ll_header_length += ENC_HDRLEN;
+	ndo->ndo_ll_hdr_len += ENC_HDRLEN;
 
 	hdr = (const struct enchdr *)p;
 	/*

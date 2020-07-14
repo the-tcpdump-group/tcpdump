@@ -56,11 +56,11 @@ bt_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *
 	ndo->ndo_protocol = "bluetooth";
 	nd_print_protocol(ndo);
 	if (caplen < BT_HDRLEN) {
-		ndo->ndo_ll_header_length += caplen;
+		ndo->ndo_ll_hdr_len += caplen;
 		nd_print_trunc(ndo);
 		return;
 	}
-	ndo->ndo_ll_header_length += BT_HDRLEN;
+	ndo->ndo_ll_hdr_len += BT_HDRLEN;
 	caplen -= BT_HDRLEN;
 	length -= BT_HDRLEN;
 	p += BT_HDRLEN;

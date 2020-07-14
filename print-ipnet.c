@@ -66,11 +66,11 @@ ipnet_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 	const ipnet_hdr_t *hdr;
 
 	if (caplen < sizeof(ipnet_hdr_t)) {
-		ndo->ndo_ll_header_length += caplen;
+		ndo->ndo_ll_hdr_len += caplen;
 		nd_print_trunc(ndo);
 		return;
 	}
-	ndo->ndo_ll_header_length += sizeof(ipnet_hdr_t);
+	ndo->ndo_ll_hdr_len += sizeof(ipnet_hdr_t);
 
 	if (ndo->ndo_eflag)
 		ipnet_hdr_print(ndo, p, length);

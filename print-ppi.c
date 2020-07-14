@@ -79,7 +79,7 @@ ppi_if_print(netdissect_options *ndo,
 	ndo->ndo_protocol = "ppi";
 	if (caplen < sizeof(ppi_header_t)) {
 		nd_print_trunc(ndo);
-		ndo->ndo_ll_header_length += caplen;
+		ndo->ndo_ll_hdr_len += caplen;
 		return;
 	}
 
@@ -90,7 +90,7 @@ ppi_if_print(netdissect_options *ndo,
 		ND_PRINT(" [length %u < %zu or > 65532]", len,
 			 sizeof(ppi_header_t));
 		nd_print_invalid(ndo);
-		ndo->ndo_ll_header_length += caplen;
+		ndo->ndo_ll_hdr_len += caplen;
 		return;
 	}
 	if (caplen < len) {
@@ -99,7 +99,7 @@ ppi_if_print(netdissect_options *ndo,
 		 * bother.
 		 */
 		nd_print_trunc(ndo);
-		ndo->ndo_ll_header_length += caplen;
+		ndo->ndo_ll_hdr_len += caplen;
 		return;
 	}
 	dlt = GET_LE_U_4(hdr->ppi_dlt);
@@ -118,7 +118,7 @@ ppi_if_print(netdissect_options *ndo,
 		nhdr.len = length;
 		if (ndo->ndo_void_printer == TRUE) {
 			printer.void_printer(ndo, &nhdr, p);
-			hdrlen = ndo->ndo_ll_header_length;
+			hdrlen = ndo->ndo_ll_hdr_len;
 		} else
 			hdrlen = printer.uint_printer(ndo, &nhdr, p);
 	} else {
@@ -129,7 +129,7 @@ ppi_if_print(netdissect_options *ndo,
 			ND_DEFAULTPRINT(p, caplen);
 		hdrlen = 0;
 	}
-	ndo->ndo_ll_header_length += len + hdrlen;
+	ndo->ndo_ll_hdr_len += len + hdrlen;
 	return;
 }
 #endif /* DLT_PPI */

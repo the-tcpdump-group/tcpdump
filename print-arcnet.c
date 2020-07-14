@@ -193,7 +193,7 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 	ndo->ndo_protocol = "arcnet_if";
 	if (caplen < ARC_HDRLEN) {
 		nd_print_trunc(ndo);
-		ndo->ndo_ll_header_length += caplen;
+		ndo->ndo_ll_hdr_len += caplen;
 		return;
 	}
 
@@ -217,7 +217,7 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 			arcnet_print(ndo, p, length, 0, 0, 0);
 			ND_PRINT(" phds");
 			nd_print_trunc(ndo);
-			ndo->ndo_ll_header_length += caplen;
+			ndo->ndo_ll_hdr_len += caplen;
 			return;
 		}
 
@@ -227,7 +227,7 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 				arcnet_print(ndo, p, length, 0, 0, 0);
 				ND_PRINT(" phds extended");
 				nd_print_trunc(ndo);
-				ndo->ndo_ll_header_length += caplen;
+				ndo->ndo_ll_hdr_len += caplen;
 				return;
 			}
 			flag = GET_U_1(ap->arc_flag2);
@@ -254,14 +254,14 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 		/*
 		 * This is a middle fragment.
 		 */
-		ndo->ndo_ll_header_length += archdrlen;
+		ndo->ndo_ll_hdr_len += archdrlen;
 		return;
 	}
 
 	if (!arcnet_encap_print(ndo, arc_type, p, length, caplen))
 		ND_DEFAULTPRINT(p, caplen);
 
-	ndo->ndo_ll_header_length += archdrlen;
+	ndo->ndo_ll_hdr_len += archdrlen;
 }
 
 /*
@@ -287,7 +287,7 @@ arcnet_linux_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, cons
 	ndo->ndo_protocol = "arcnet_linux_if";
 	if (caplen < ARC_LINUX_HDRLEN) {
 		nd_print_trunc(ndo);
-		ndo->ndo_ll_header_length += caplen;
+		ndo->ndo_ll_hdr_len += caplen;
 		return;
 	}
 
@@ -299,7 +299,7 @@ arcnet_linux_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, cons
 		archdrlen = ARC_LINUX_HDRNEWLEN;
 		if (caplen < ARC_LINUX_HDRNEWLEN) {
 			nd_print_trunc(ndo);
-			ndo->ndo_ll_header_length += caplen;
+			ndo->ndo_ll_hdr_len += caplen;
 			return;
 		}
 		break;
@@ -323,7 +323,7 @@ arcnet_linux_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, cons
 	if (!arcnet_encap_print(ndo, arc_type, p, length, caplen))
 		ND_DEFAULTPRINT(p, caplen);
 
-	ndo->ndo_ll_header_length += archdrlen;
+	ndo->ndo_ll_hdr_len += archdrlen;
 }
 
 /*

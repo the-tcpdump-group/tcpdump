@@ -79,12 +79,12 @@ symantec_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_
 
 	ndo->ndo_protocol = "symantec";
 	if (caplen < sizeof (struct symantec_header)) {
-		ndo->ndo_ll_header_length += caplen;
+		ndo->ndo_ll_hdr_len += caplen;
 		nd_print_trunc(ndo);
 		return;
 	}
 
-	ndo->ndo_ll_header_length += sizeof (struct symantec_header);
+	ndo->ndo_ll_hdr_len += sizeof (struct symantec_header);
 	if (ndo->ndo_eflag)
 		symantec_hdr_print(ndo, p, length);
 

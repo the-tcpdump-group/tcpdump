@@ -235,7 +235,7 @@ struct netdissect_options {
   int   ndo_packettype;	/* as specified by -T */
 
   int   ndo_snaplen;
-  int   ndo_ll_header_length;	/* link-layer header length */
+  int   ndo_ll_hdr_len;	/* link-layer header length */
 
   /*global pointers to beginning and end of current packet (during printing) */
   const u_char *ndo_packetp;

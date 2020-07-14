@@ -37,7 +37,7 @@ void
 raw_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
 	ndo->ndo_protocol = "raw";
-	ndo->ndo_ll_header_length += 0;
+	ndo->ndo_ll_hdr_len += 0;
 	if (ndo->ndo_eflag)
 		ND_PRINT("ip: ");
 

@@ -109,7 +109,7 @@ pktap_if_print(netdissect_options *ndo,
 	ndo->ndo_protocol = "pktap";
 	if (caplen < sizeof(pktap_header_t)) {
 		nd_print_trunc(ndo);
-		ndo->ndo_ll_header_length += caplen;
+		ndo->ndo_ll_hdr_len += caplen;
 		return;
 	}
 	hdr = (const pktap_header_t *)p;
@@ -124,12 +124,12 @@ pktap_if_print(netdissect_options *ndo,
 		 * be expanded in the future)?
 		 */
 		nd_print_trunc(ndo);
-		ndo->ndo_ll_header_length += caplen;
+		ndo->ndo_ll_hdr_len += caplen;
 		return;
 	}
 	if (caplen < hdrlen) {
 		nd_print_trunc(ndo);
-		ndo->ndo_ll_header_length += caplen;
+		ndo->ndo_ll_hdr_len += caplen;
 		return;
 	}
 
@@ -155,7 +155,7 @@ pktap_if_print(netdissect_options *ndo,
 			nhdr.len = length;
 			if (ndo->ndo_void_printer == TRUE) {
 				printer.void_printer(ndo, &nhdr, p);
-				hdrlen += ndo->ndo_ll_header_length;
+				hdrlen += ndo->ndo_ll_hdr_len;
 			} else
 				hdrlen += printer.uint_printer(ndo, &nhdr, p);
 		} else {
@@ -169,7 +169,7 @@ pktap_if_print(netdissect_options *ndo,
 		break;
 	}
 
-	ndo->ndo_ll_header_length += hdrlen;
+	ndo->ndo_ll_hdr_len += hdrlen;
 	return;
 }
 #endif /* DLT_PKTAP */

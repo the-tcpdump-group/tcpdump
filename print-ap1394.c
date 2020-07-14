@@ -96,11 +96,11 @@ ap1394_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 
 	ndo->ndo_protocol = "ap1394";
 	if (caplen < FIREWIRE_HDRLEN) {
-		ndo->ndo_ll_header_length += caplen;
+		ndo->ndo_ll_hdr_len += caplen;
 		nd_print_trunc(ndo);
 		return;
 	}
-	ndo->ndo_ll_header_length += FIREWIRE_HDRLEN;
+	ndo->ndo_ll_hdr_len += FIREWIRE_HDRLEN;
 
 	if (ndo->ndo_eflag)
 		ap1394_hdr_print(ndo, p, length);
