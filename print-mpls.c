@@ -183,27 +183,25 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	/*
 	 * Print the payload.
 	 */
-	if (pt == PT_UNKNOWN) {
+	switch (pt) {
+	case PT_UNKNOWN:
 		if (!ndo->ndo_suppress_default_print)
 			ND_DEFAULTPRINT(p, length);
-		return;
-	}
-	ND_PRINT(ndo->ndo_vflag ? "\n\t" : " ");
-	switch (pt) {
+		break;
 
 	case PT_IPV4:
+		ND_PRINT(ndo->ndo_vflag ? "\n\t" : " ");
 		ip_print(ndo, p, length);
 		break;
 
 	case PT_IPV6:
+		ND_PRINT(ndo->ndo_vflag ? "\n\t" : " ");
 		ip6_print(ndo, p, length);
 		break;
 
 	case PT_OSI:
+		ND_PRINT(ndo->ndo_vflag ? "\n\t" : " ");
 		isoclns_print(ndo, p, length);
-		break;
-
-	default:
 		break;
 	}
 	return;
