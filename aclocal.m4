@@ -472,52 +472,61 @@ AC_DEFUN(AC_LBL_LIBPCAP,
         fi
     fi
     libpcap=FAIL
-    AC_ARG_WITH([system-libpcap],
-        [AS_HELP_STRING([--with-system-libpcap], [don't use local pcap library])],
-        [
-            #
-            # Don't look for a local libpcap.
-            #
-            using_local_libpcap=no
-        ],
-        [
-            #
-            # Look for a local pcap library.
-            #
-            AC_MSG_CHECKING(for local pcap library)
-            lastdir=FAIL
-            places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
-                egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT)?$'`
-            places2=`ls .. | sed -e 's,/$,,' -e "s,^,../," | \
-                egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT)?$'`
-            for dir in $places $srcdir/../libpcap ../libpcap $srcdir/libpcap $places2 ; do
-                basedir=`echo $dir | sed -e 's/[[ab]][[0-9]]*$//' | \
-                    sed -e 's/-PRE-GIT$//' `
-                if test $lastdir = $basedir ; then
-                    dnl skip alphas when an actual release is present
-                    continue;
-                fi
-                lastdir=$dir
-                if test -r $dir/libpcap.a ; then
-                    libpcap=$dir/libpcap.a
-                    local_pcap_dir=$dir
-                    dnl continue and select the last one that exists
-                fi
-            done
-            if test $libpcap = FAIL ; then
-                #
-                # We didn't find a local libpcap.
-                #
-                AC_MSG_RESULT(not found)
-                using_local_libpcap=no;
-            else
-                #
-                # We found a local libpcap.
-                #
-                AC_MSG_RESULT($libpcap)
-                using_local_libpcap=yes
+    AC_MSG_CHECKING([whether to look for a local libpcap])
+    AC_ARG_ENABLE(local-libpcap,
+        AS_HELP_STRING([--disable-local-libpcap],
+                       [don't look for a local libpcap @<:@default=check for a local libpcap@:>@]),,
+        enableval=yes)
+    case "$enableval" in
+
+    no)
+        AC_MSG_RESULT(no)
+        #
+        # Don't look for a local libpcap.
+        #
+        using_local_libpcap=no
+        ;;
+	
+    *)
+        AC_MSG_RESULT(yes)
+        #
+        # Look for a local pcap library.
+        #
+        AC_MSG_CHECKING(for local pcap library)
+        lastdir=FAIL
+        places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
+            egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT)?$'`
+        places2=`ls .. | sed -e 's,/$,,' -e "s,^,../," | \
+            egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT)?$'`
+        for dir in $places $srcdir/../libpcap ../libpcap $srcdir/libpcap $places2 ; do
+            basedir=`echo $dir | sed -e 's/[[ab]][[0-9]]*$//' | \
+                sed -e 's/-PRE-GIT$//' `
+            if test $lastdir = $basedir ; then
+                dnl skip alphas when an actual release is present
+                continue;
             fi
-        ])
+            lastdir=$dir
+            if test -r $dir/libpcap.a ; then
+                libpcap=$dir/libpcap.a
+                local_pcap_dir=$dir
+                dnl continue and select the last one that exists
+            fi
+        done
+        if test $libpcap = FAIL ; then
+            #
+            # We didn't find a local libpcap.
+            #
+            AC_MSG_RESULT(not found)
+            using_local_libpcap=no;
+        else
+            #
+            # We found a local libpcap.
+            #
+            AC_MSG_RESULT($libpcap)
+            using_local_libpcap=yes
+        fi
+        ;;
+    esac
 
     if test $using_local_libpcap = no ; then
         #
