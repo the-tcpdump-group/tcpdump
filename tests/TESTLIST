@@ -50,6 +50,7 @@ dsa-e		dsa.pcap		dsa-e.out	-e
 
 # EAP tests
 eapon1		eapon1.pcap		eapon1.out
+eapon1-v	eapon1.pcap		eapon1-v.out	-v
 
 # Marvell DSA tag tests
 edsa		edsa.pcap		edsa.out
