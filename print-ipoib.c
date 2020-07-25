@@ -94,6 +94,7 @@ ipoib_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 	}
 	orig_length = length;
 
+	ndo->ndo_ll_hdr_len += IPOIB_HDRLEN;
 	length -= IPOIB_HDRLEN;
 	caplen -= IPOIB_HDRLEN;
 	ether_type = GET_BE_U_2(p + 40);
