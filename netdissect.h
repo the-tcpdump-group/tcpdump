@@ -484,7 +484,7 @@ extern u_int ieee802_11_radio_if_print IF_PRINTER_ARGS;
 extern u_int ieee802_15_4_if_print IF_PRINTER_ARGS;
 extern u_int ieee802_15_4_tap_if_print IF_PRINTER_ARGS;
 extern u_int ipfc_if_print IF_PRINTER_ARGS;
-extern u_int ipoib_if_print IF_PRINTER_ARGS;
+extern void ipoib_if_print IF_PRINTER_ARGS;
 extern void ipnet_if_print IF_PRINTER_ARGS;
 extern u_int juniper_atm1_if_print IF_PRINTER_ARGS;
 extern u_int juniper_atm2_if_print IF_PRINTER_ARGS;

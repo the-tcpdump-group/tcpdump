@@ -74,9 +74,6 @@ static const struct uint_printer uint_printers[] = {
 #ifdef DLT_LANE8023
 	{ lane_if_print,	DLT_LANE8023 },
 #endif
-#ifdef DLT_IPOIB
-	{ ipoib_if_print,       DLT_IPOIB },
-#endif
 #ifdef DLT_C_HDLC
 	{ chdlc_if_print,	DLT_C_HDLC },
 #endif
@@ -212,6 +209,9 @@ static const struct void_printer void_printers[] = {
 	{ ether_if_print,	DLT_EN10MB },
 #ifdef DLT_IPNET
 	{ ipnet_if_print,	DLT_IPNET },
+#endif
+#ifdef DLT_IPOIB
+	{ ipoib_if_print,       DLT_IPOIB },
 #endif
 #ifdef DLT_NETANALYZER
 	{ netanalyzer_if_print, DLT_NETANALYZER },
