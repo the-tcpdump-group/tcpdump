@@ -190,7 +190,7 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 	u_int seqid = 0;
 	u_char arc_type;
 
-	ndo->ndo_protocol = "arcnet_if";
+	ndo->ndo_protocol = "arcnet";
 	if (caplen < ARC_HDRLEN) {
 		nd_print_trunc(ndo);
 		ndo->ndo_ll_hdr_len += caplen;
@@ -284,7 +284,7 @@ arcnet_linux_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, cons
 	int archdrlen = 0;
 	u_char arc_type;
 
-	ndo->ndo_protocol = "arcnet_linux_if";
+	ndo->ndo_protocol = "arcnet_linux";
 	if (caplen < ARC_LINUX_HDRLEN) {
 		nd_print_trunc(ndo);
 		ndo->ndo_ll_hdr_len += caplen;
