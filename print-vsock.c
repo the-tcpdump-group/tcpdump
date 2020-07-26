@@ -165,12 +165,12 @@ vsock_transport_hdr_size(uint16_t transport)
 /* Returns 0 on success, -1 on truncation */
 static int
 vsock_transport_hdr_print(netdissect_options *ndo, uint16_t transport,
-                          const u_char *p, const u_int len)
+                          const u_char *p, const u_int caplen)
 {
 	u_int transport_size = vsock_transport_hdr_size(transport);
 	const void *hdr;
 
-	if (len < sizeof(struct af_vsockmon_hdr) + transport_size) {
+	if (caplen < sizeof(struct af_vsockmon_hdr) + transport_size) {
 		return -1;
 	}
 
@@ -188,7 +188,7 @@ vsock_transport_hdr_print(netdissect_options *ndo, uint16_t transport,
 }
 
 static void
-vsock_hdr_print(netdissect_options *ndo, const u_char *p, const u_int len)
+vsock_hdr_print(netdissect_options *ndo, const u_char *p, const u_int caplen)
 {
 	const struct af_vsockmon_hdr *hdr = (const struct af_vsockmon_hdr *)p;
 	uint16_t hdr_transport, hdr_op;
@@ -204,7 +204,7 @@ vsock_hdr_print(netdissect_options *ndo, const u_char *p, const u_int len)
 
 	/* If verbose level is more than 0 print transport details */
 	if (ndo->ndo_vflag) {
-		ret = vsock_transport_hdr_print(ndo, hdr_transport, p, len);
+		ret = vsock_transport_hdr_print(ndo, hdr_transport, p, caplen);
 		if (ret == 0)
 			ND_PRINT("\n\t");
 	} else
@@ -219,7 +219,7 @@ vsock_hdr_print(netdissect_options *ndo, const u_char *p, const u_int len)
 		 hdr_src_cid, hdr_src_port,
 		 hdr_dst_cid, hdr_dst_port,
 		 tok2str(vsock_op, " invalid op (%u)", hdr_op),
-		 len);
+		 caplen);
 
 	if (ret < 0)
 		goto trunc;
@@ -229,12 +229,12 @@ vsock_hdr_print(netdissect_options *ndo, const u_char *p, const u_int len)
 	total_hdr_size = (u_int)sizeof(struct af_vsockmon_hdr) +
 			 vsock_transport_hdr_size(hdr_transport);
 	if (ndo->ndo_vflag > 1 && hdr_op == AF_VSOCK_OP_PAYLOAD) {
-		if (len > total_hdr_size) {
+		if (caplen > total_hdr_size) {
 			const u_char *payload = p + total_hdr_size;
 
 			ND_PRINT("\n");
 			print_unknown_data(ndo, payload, "\t",
-					   len - total_hdr_size);
+					   caplen - total_hdr_size);
 		} else
 			goto trunc;
 	}
@@ -244,18 +244,19 @@ trunc:
 	nd_print_trunc(ndo);
 }
 
-u_int
+void
 vsock_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	       const u_char *cp)
 {
-	u_int len = h->caplen;
+	u_int caplen = h->caplen;
 
 	ndo->ndo_protocol = "vsock";
 
-	if (len < sizeof(struct af_vsockmon_hdr))
+	if (caplen < sizeof(struct af_vsockmon_hdr)) {
 		nd_print_trunc(ndo);
-	else
-		vsock_hdr_print(ndo, cp, len);
-
-	return len;
+		ndo->ndo_ll_hdr_len += caplen;
+		return;
+	}
+	ndo->ndo_ll_hdr_len += sizeof(struct af_vsockmon_hdr);
+	vsock_hdr_print(ndo, cp, caplen);
 }

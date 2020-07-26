@@ -174,9 +174,6 @@ static const struct uint_printer uint_printers[] = {
 #ifdef DLT_PPP_SERIAL
 	{ ppp_hdlc_if_print,	DLT_PPP_SERIAL },
 #endif
-#ifdef DLT_VSOCK
-	{ vsock_if_print,	DLT_VSOCK },
-#endif
 	{ NULL,			0 },
 };
 
@@ -255,6 +252,9 @@ static const struct void_printer void_printers[] = {
 #ifdef DLT_USB_LINUX_MMAPPED
 	{ usb_linux_64_byte_if_print, DLT_USB_LINUX_MMAPPED},
 #endif /* DLT_USB_LINUX_MMAPPED */
+#ifdef DLT_VSOCK
+	{ vsock_if_print,	DLT_VSOCK },
+#endif
 	{ NULL,                 0 },
 };
 
