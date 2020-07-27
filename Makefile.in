@@ -385,11 +385,7 @@ EXTRA_DIST = \
 	send-ack.awk \
 	smbutil.c \
 	stime.awk \
-	tcpdump.1.in \
-	win32/prj/WinDump.dsp \
-	win32/prj/WinDump.dsw \
-	win32/prj/WinDump.sln \
-	win32/prj/WinDump.vcproj
+	tcpdump.1.in
 
 TEST_DIST= `git ls-files tests | grep -v 'tests/\..*'`
 
