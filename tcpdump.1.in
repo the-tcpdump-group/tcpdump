@@ -1941,8 +1941,13 @@ The `*' on the request
 indicates that XO (`exactly once') was \fInot\fP set.
 
 .SH "SEE ALSO"
-stty(1), pcap(3PCAP), bpf(4), nit(4P), \%pcap-savefile(@MAN_FILE_FORMATS@),
-\%pcap-filter(@MAN_MISC_INFO@), \%pcap-tstamp(@MAN_MISC_INFO@)
+.BR stty (1),
+.BR pcap (3PCAP),
+.BR bpf (4),
+.BR nit (4P),
+.BR \%pcap-savefile (@MAN_FILE_FORMATS@),
+.BR \%pcap-filter (@MAN_MISC_INFO@),
+.BR \%pcap-tstamp (@MAN_MISC_INFO@)
 .LP
 .RS
 .na
