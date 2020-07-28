@@ -847,26 +847,18 @@ static const struct eproto {
 	const char *s;
 	u_short p;
 } eproto_db[] = {
+	{ "aarp", ETHERTYPE_AARP },
 	{ "arp", ETHERTYPE_ARP },
 	{ "atalk", ETHERTYPE_ATALK },
-	{ "atalkarp", ETHERTYPE_AARP },
-	{ "decdns", ETHERTYPE_DECDNS },
-	{ "decdts", ETHERTYPE_DECDTS },
 	{ "decnet", ETHERTYPE_DN },
 	{ "ip", ETHERTYPE_IP },
 	{ "ip6", ETHERTYPE_IPV6 },
-	{ "lanbridge", ETHERTYPE_LANBRIDGE },
 	{ "lat", ETHERTYPE_LAT },
 	{ "loopback", ETHERTYPE_LOOPBACK },
 	{ "mopdl", ETHERTYPE_MOPDL },
 	{ "moprc", ETHERTYPE_MOPRC },
-	{ "pup", ETHERTYPE_PUP },
 	{ "rarp", ETHERTYPE_REVARP },
 	{ "sca", ETHERTYPE_SCA },
-	{ "sprite", ETHERTYPE_SPRITE },
-	{ "vexp", ETHERTYPE_VEXP },
-	{ "vprod", ETHERTYPE_VPROD },
-	{ "xns", ETHERTYPE_NS },
 	{ (char *)0, 0 }
 };
 
