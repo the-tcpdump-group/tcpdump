@@ -260,7 +260,7 @@ rtcp_print(netdissect_options *ndo, const u_char *hdr, const u_char *ep)
 		ND_TCHECK_SIZE(sr);
 		ts = (double)(GET_BE_U_4(sr->sr_ntp.upper)) +
 		    ((double)(GET_BE_U_4(sr->sr_ntp.lower)) /
-		     4294967296.0);
+		     FMAXINT);
 		ND_PRINT(" @%.2f %u %up %ub", ts, GET_BE_U_4(sr->sr_ts),
 			  GET_BE_U_4(sr->sr_np), GET_BE_U_4(sr->sr_nb));
 		rr = (const struct rtcp_rr *)(sr + 1);

@@ -61,6 +61,8 @@ typedef signed char nd_int8_t[1];
 typedef unsigned char nd_int32_t[4];
 typedef unsigned char nd_int64_t[8];
 
+#define	FMAXINT	(4294967296.0)	/* floating point rep. of MAXINT */
+
 /*
  * Use this for IPv4 addresses and netmasks.
  *

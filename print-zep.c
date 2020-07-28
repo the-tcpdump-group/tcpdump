@@ -57,7 +57,6 @@
  *------------------------------------------------------------
  */
 
-#define     FMAXINT (4294967296.0)  /* floating point rep. of MAXINT */
 #define     JAN_1970        2208988800U
 
 /* Print timestamp */
