@@ -730,7 +730,7 @@ juniper_ether_if_print(netdissect_options *ndo,
 
         p+=l2info.header_len;
         /* this DLT contains nothing but raw Ethernet frames */
-        ether_print(ndo, p, l2info.length, l2info.caplen, NULL, NULL, FALSE);
+        ether_print(ndo, p, l2info.length, l2info.caplen, NULL, NULL, TRUE);
         ndo->ndo_ll_hdr_len += l2info.header_len;
 }
 #endif
