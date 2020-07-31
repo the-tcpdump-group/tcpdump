@@ -80,9 +80,6 @@ static const struct uint_printer uint_printers[] = {
 #ifdef DLT_HDLC
 	{ chdlc_if_print,	DLT_HDLC },
 #endif
-#ifdef DLT_PPP_ETHER
-	{ pppoe_if_print,	DLT_PPP_ETHER },
-#endif
 #if defined(DLT_PFLOG) && defined(HAVE_NET_IF_PFLOG_H)
 	{ pflog_if_print,	DLT_PFLOG },
 #endif
@@ -228,6 +225,9 @@ static const struct void_printer void_printers[] = {
 #endif
 #ifdef DLT_PPI
 	{ ppi_if_print,		DLT_PPI },
+#endif
+#ifdef DLT_PPP_ETHER
+	{ pppoe_if_print,	DLT_PPP_ETHER },
 #endif
 	{ raw_if_print,		DLT_RAW },
 #ifdef DLT_IPV4

@@ -86,24 +86,29 @@ static const struct tok pppoetag2str[] = {
 #define PPPOE_HDRLEN 6
 #define MAXTAGPRINT 80
 
-u_int
+void
 pppoe_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
-	ndo->ndo_protocol = "pppoe_if";
-	return (pppoe_print(ndo, p, h->len));
+	ndo->ndo_protocol = "pppoe";
+	ndo->ndo_ll_hdr_len += pppoe_print(ndo, p, h->len);
 }
 
 u_int
 pppoe_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	uint16_t pppoe_ver, pppoe_type, pppoe_code, pppoe_sessionid;
-	u_int pppoe_length;
+	u_int pppoe_length, caplen;
 	const u_char *pppoe_packet, *pppoe_payload;
 
 	ndo->ndo_protocol = "pppoe";
+	caplen = ndo->ndo_snapend - bp;
+	if (caplen < PPPOE_HDRLEN) {
+		nd_print_trunc(ndo);
+		return caplen;
+	}
 	if (length < PPPOE_HDRLEN) {
-		ND_PRINT("truncated-pppoe %u", length);
-		return (length);
+		nd_print_trunc(ndo);
+		return length;
 	}
 	length -= PPPOE_HDRLEN;
 	pppoe_packet = bp;
@@ -192,7 +197,7 @@ pppoe_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			p += tag_len;
 			/* p points to next tag */
 		}
-		return (0);
+		return PPPOE_HDRLEN;
 	} else {
 		/* PPPoE data */
 		ND_PRINT(" ");
@@ -201,5 +206,5 @@ pppoe_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 trunc:
 	nd_print_trunc(ndo);
-	return (PPPOE_HDRLEN);
+	return PPPOE_HDRLEN;
 }
