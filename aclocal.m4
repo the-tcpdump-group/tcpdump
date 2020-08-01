@@ -486,7 +486,7 @@ AC_DEFUN(AC_LBL_LIBPCAP,
         #
         using_local_libpcap=no
         ;;
-	
+
     *)
         AC_MSG_RESULT(yes)
         #
