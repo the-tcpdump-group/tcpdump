@@ -67,7 +67,7 @@ otv_print(netdissect_options *ndo, const u_char *bp, u_int len)
     ND_TCHECK_1(bp);
     bp += 1;
 
-    ether_print(ndo, bp, len - OTV_HDR_LEN, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL, FALSE);
+    ether_print(ndo, bp, len - OTV_HDR_LEN, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL);
     return;
 
 trunc:

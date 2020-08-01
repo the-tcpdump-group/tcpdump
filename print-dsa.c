@@ -203,8 +203,8 @@ dsa_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 	u_int length = h->len;
 
 	ndo->ndo_protocol = "dsa";
-	ndo->ndo_ll_hdr_len += 0;
-	ether_switch_tag_print(ndo, p, length, caplen, dsa_tag_print, DSA_LEN, TRUE);
+	ndo->ndo_ll_hdr_len +=
+		ether_switch_tag_print(ndo, p, length, caplen, dsa_tag_print, DSA_LEN);
 }
 
 void
@@ -214,6 +214,6 @@ edsa_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 	u_int length = h->len;
 
 	ndo->ndo_protocol = "edsa";
-	ndo->ndo_ll_hdr_len += 0;
-	ether_switch_tag_print(ndo, p, length, caplen, edsa_tag_print, EDSA_LEN, TRUE);
+	ndo->ndo_ll_hdr_len +=
+		ether_switch_tag_print(ndo, p, length, caplen, edsa_tag_print, EDSA_LEN);
 }

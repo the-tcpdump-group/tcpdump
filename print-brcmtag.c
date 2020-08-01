@@ -118,9 +118,9 @@ brcm_tag_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	u_int length = h->len;
 
 	ndo->ndo_protocol = "brcm-tag";
-	ndo->ndo_ll_hdr_len += 0;
-	ether_switch_tag_print(ndo, p, length, caplen,
-			       brcm_tag_print, BRCM_TAG_LEN, TRUE);
+	ndo->ndo_ll_hdr_len +=
+		ether_switch_tag_print(ndo, p, length, caplen,
+				       brcm_tag_print, BRCM_TAG_LEN);
 }
 
 void
@@ -148,5 +148,6 @@ brcm_tag_prepend_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	/*
 	 * Now print the Ethernet frame following it.
 	 */
-	ether_print(ndo, p, length, caplen, NULL, NULL, TRUE);
+	ndo->ndo_ll_hdr_len +=
+		ether_print(ndo, p, length, caplen, NULL, NULL);
 }
