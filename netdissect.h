@@ -478,7 +478,7 @@ extern void dsa_if_print IF_PRINTER_ARGS;
 extern void edsa_if_print IF_PRINTER_ARGS;
 extern void enc_if_print IF_PRINTER_ARGS;
 extern void ether_if_print IF_PRINTER_ARGS;
-extern u_int fddi_if_print IF_PRINTER_ARGS;
+extern void fddi_if_print IF_PRINTER_ARGS;
 extern u_int fr_if_print IF_PRINTER_ARGS;
 extern void ieee802_11_if_print IF_PRINTER_ARGS;
 extern void ieee802_11_radio_avs_if_print IF_PRINTER_ARGS;

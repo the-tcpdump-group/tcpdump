@@ -342,9 +342,9 @@ fddi_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
+void
 fddi_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
-	ndo->ndo_protocol = "fddi_if";
-	return (fddi_print(ndo, p, h->len, h->caplen));
+	ndo->ndo_protocol = "fddi";
+	ndo->ndo_ll_hdr_len += fddi_print(ndo, p, h->len, h->caplen);
 }
