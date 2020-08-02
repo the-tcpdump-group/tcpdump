@@ -53,15 +53,6 @@ struct void_printer {
 };
 
 static const struct uint_printer uint_printers[] = {
-#ifdef DLT_IEEE802_15_4
-	{ ieee802_15_4_if_print, DLT_IEEE802_15_4 },
-#endif
-#ifdef DLT_IEEE802_15_4_NOFCS
-	{ ieee802_15_4_if_print, DLT_IEEE802_15_4_NOFCS },
-#endif
-#ifdef DLT_IEEE802_15_4_TAP
-	{ ieee802_15_4_tap_if_print, DLT_IEEE802_15_4_TAP },
-#endif
 #ifdef DLT_CIP
 	{ cip_if_print,		DLT_CIP },
 #endif
@@ -152,6 +143,15 @@ static const struct void_printer void_printers[] = {
 #endif
 #ifdef DLT_IEEE802_11_RADIO
 	{ ieee802_11_radio_if_print,	DLT_IEEE802_11_RADIO },
+#endif
+#ifdef DLT_IEEE802_15_4
+	{ ieee802_15_4_if_print, DLT_IEEE802_15_4 },
+#endif
+#ifdef DLT_IEEE802_15_4_NOFCS
+	{ ieee802_15_4_if_print, DLT_IEEE802_15_4_NOFCS },
+#endif
+#ifdef DLT_IEEE802_15_4_TAP
+	{ ieee802_15_4_tap_if_print, DLT_IEEE802_15_4_TAP },
 #endif
 #ifdef DLT_IPNET
 	{ ipnet_if_print,	DLT_IPNET },
