@@ -69,12 +69,6 @@ static const struct uint_printer uint_printers[] = {
 	{ pflog_if_print,	DLT_PFLOG },
 #endif
 	{ token_if_print,	DLT_IEEE802 },
-#ifdef DLT_LINUX_SLL
-	{ sll_if_print,		DLT_LINUX_SLL },
-#endif
-#ifdef DLT_LINUX_SLL2
-	{ sll2_if_print,	DLT_LINUX_SLL2 },
-#endif
 #ifdef DLT_FR
 	{ fr_if_print,		DLT_FR },
 #endif
@@ -240,6 +234,12 @@ static const struct void_printer void_printers[] = {
 	{ sl_bsdos_if_print,	DLT_SLIP_BSDOS },
 #endif
 	{ sl_if_print,		DLT_SLIP },
+#ifdef DLT_LINUX_SLL
+	{ sll_if_print,		DLT_LINUX_SLL },
+#endif
+#ifdef DLT_LINUX_SLL2
+	{ sll2_if_print,	DLT_LINUX_SLL2 },
+#endif
 #ifdef DLT_SUNATM
 	{ sunatm_if_print,	DLT_SUNATM },
 #endif

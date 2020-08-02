@@ -211,7 +211,7 @@ sll_print(netdissect_options *ndo, const struct sll_header *sllp, u_int length)
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
+void
 sll_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
@@ -222,7 +222,7 @@ sll_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 	int llc_hdrlen;
 	u_int hdrlen;
 
-	ndo->ndo_protocol = "sll_if";
+	ndo->ndo_protocol = "sll";
 	if (caplen < SLL_HDR_LEN) {
 		/*
 		 * XXX - this "can't happen" because "pcap-linux.c" always
@@ -230,7 +230,8 @@ sll_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 		 * cooked socket capture.
 		 */
 		nd_print_trunc(ndo);
-		return (caplen);
+		ndo->ndo_ll_hdr_len += caplen;
+		return;
 	}
 
 	sllp = (const struct sll_header *)p;
@@ -254,7 +255,9 @@ sll_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 		 * This is an packet with a radiotap header;
 		 * just dissect the payload as such.
 		 */
-		return (SLL_HDR_LEN + ieee802_11_radio_print(ndo, p, length, caplen));
+		ndo->ndo_ll_hdr_len += SLL_HDR_LEN;
+		ndo->ndo_ll_hdr_len += ieee802_11_radio_print(ndo, p, length, caplen);
+		return;
 	}
 	ether_type = GET_BE_U_2(sllp->sll_protocol);
 
@@ -304,7 +307,8 @@ recurse:
 		if (caplen < 4) {
 			ndo->ndo_protocol = "vlan";
 			nd_print_trunc(ndo);
-			return (hdrlen + caplen);
+			ndo->ndo_ll_hdr_len += hdrlen + caplen;
+			return;
 		}
 	        if (ndo->ndo_eflag) {
 			uint16_t tag = GET_BE_U_2(p);
@@ -334,7 +338,7 @@ recurse:
 		}
 	}
 
-	return (hdrlen);
+	ndo->ndo_ll_hdr_len += hdrlen;
 }
 
 static void
@@ -399,7 +403,7 @@ sll2_print(netdissect_options *ndo, const struct sll2_header *sllp, u_int length
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
+void
 sll2_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
@@ -414,7 +418,7 @@ sll2_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 	char ifname[IF_NAMESIZE];
 #endif
 
-	ndo->ndo_protocol = "sll2_if";
+	ndo->ndo_protocol = "sll2";
 	if (caplen < SLL2_HDR_LEN) {
 		/*
 		 * XXX - this "can't happen" because "pcap-linux.c" always
@@ -422,7 +426,8 @@ sll2_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 		 * cooked socket capture.
 		 */
 		nd_print_trunc(ndo);
-		return (caplen);
+		ndo->ndo_ll_hdr_len += caplen;
+		return;
 	}
 
 	sllp = (const struct sll2_header *)p;
@@ -455,7 +460,9 @@ sll2_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 		 * This is an packet with a radiotap header;
 		 * just dissect the payload as such.
 		 */
-		return (SLL_HDR_LEN + ieee802_11_radio_print(ndo, p, length, caplen));
+		ndo->ndo_ll_hdr_len += SLL2_HDR_LEN;
+		ndo->ndo_ll_hdr_len += ieee802_11_radio_print(ndo, p, length, caplen);
+		return;
 	}
 	ether_type = GET_BE_U_2(sllp->sll2_protocol);
 
@@ -505,7 +512,8 @@ recurse:
 		if (caplen < 4) {
 			ndo->ndo_protocol = "vlan";
 			nd_print_trunc(ndo);
-			return (hdrlen + caplen);
+			ndo->ndo_ll_hdr_len += hdrlen + caplen;
+			return;
 		}
 	        if (ndo->ndo_eflag) {
 			uint16_t tag = GET_BE_U_2(p);
@@ -529,11 +537,11 @@ recurse:
 		if (ethertype_print(ndo, ether_type, p, length, caplen, NULL, NULL) == 0) {
 			/* ether_type not known, print raw packet */
 			if (!ndo->ndo_eflag)
-				sll2_print(ndo, sllp, length + SLL_HDR_LEN);
+				sll2_print(ndo, sllp, length + SLL2_HDR_LEN);
 			if (!ndo->ndo_suppress_default_print)
 				ND_DEFAULTPRINT(p, caplen);
 		}
 	}
 
-	return (hdrlen);
+	ndo->ndo_ll_hdr_len += hdrlen;
 }
