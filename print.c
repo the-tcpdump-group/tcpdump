@@ -53,9 +53,6 @@ struct void_printer {
 };
 
 static const struct uint_printer uint_printers[] = {
-#ifdef DLT_IP_OVER_FC
-	{ ipfc_if_print,	DLT_IP_OVER_FC },
-#endif
 #ifdef DLT_LANE8023
 	{ lane_if_print,	DLT_LANE8023 },
 #endif
@@ -145,6 +142,9 @@ static const struct void_printer void_printers[] = {
 #endif
 #ifdef DLT_IEEE802_15_4_TAP
 	{ ieee802_15_4_tap_if_print, DLT_IEEE802_15_4_TAP },
+#endif
+#ifdef DLT_IP_OVER_FC
+	{ ipfc_if_print,	DLT_IP_OVER_FC },
 #endif
 #ifdef DLT_IPNET
 	{ ipnet_if_print,	DLT_IPNET },

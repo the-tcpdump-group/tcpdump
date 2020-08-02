@@ -485,7 +485,7 @@ extern void ieee802_11_radio_avs_if_print IF_PRINTER_ARGS;
 extern void ieee802_11_radio_if_print IF_PRINTER_ARGS;
 extern void ieee802_15_4_if_print IF_PRINTER_ARGS;
 extern void ieee802_15_4_tap_if_print IF_PRINTER_ARGS;
-extern u_int ipfc_if_print IF_PRINTER_ARGS;
+extern void ipfc_if_print IF_PRINTER_ARGS;
 extern void ipoib_if_print IF_PRINTER_ARGS;
 extern void ipnet_if_print IF_PRINTER_ARGS;
 extern void juniper_atm1_if_print IF_PRINTER_ARGS;

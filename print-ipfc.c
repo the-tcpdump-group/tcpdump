@@ -139,9 +139,9 @@ trunc:
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
+void
 ipfc_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
-	ndo->ndo_protocol = "ipfc_if";
-	return (ipfc_print(ndo, p, h->len, h->caplen));
+	ndo->ndo_protocol = "ipfc";
+	ndo->ndo_ll_hdr_len += ipfc_print(ndo, p, h->len, h->caplen);
 }
