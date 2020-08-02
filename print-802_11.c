@@ -2269,7 +2269,7 @@ void
 ieee802_11_if_print(netdissect_options *ndo,
 		    const struct pcap_pkthdr *h, const u_char *p)
 {
-	ndo->ndo_protocol = "802.11_if";
+	ndo->ndo_protocol = "802.11";
 	ndo->ndo_ll_hdr_len += ieee802_11_print(ndo, p, h->len, h->caplen, 0, 0);
 }
 
@@ -3466,7 +3466,7 @@ prism_if_print(netdissect_options *ndo,
 	u_int length = h->len;
 	uint32_t msgcode;
 
-	ndo->ndo_protocol = "prism_if";
+	ndo->ndo_protocol = "prism";
 	if (caplen < 4) {
 		nd_print_trunc(ndo);
 		ndo->ndo_ll_hdr_len += caplen;
@@ -3501,7 +3501,7 @@ void
 ieee802_11_radio_if_print(netdissect_options *ndo,
 			  const struct pcap_pkthdr *h, const u_char *p)
 {
-	ndo->ndo_protocol = "802.11_radio_if";
+	ndo->ndo_protocol = "802.11_radio";
 	ndo->ndo_ll_hdr_len += ieee802_11_radio_print(ndo, p, h->len, h->caplen);
 }
 
@@ -3514,6 +3514,6 @@ void
 ieee802_11_radio_avs_if_print(netdissect_options *ndo,
 			      const struct pcap_pkthdr *h, const u_char *p)
 {
-	ndo->ndo_protocol = "802.11_radio_avs_if";
+	ndo->ndo_protocol = "802.11_radio_avs";
 	ndo->ndo_ll_hdr_len += ieee802_11_radio_avs_print(ndo, p, h->len, h->caplen);
 }
