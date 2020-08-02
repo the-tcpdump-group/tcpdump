@@ -56,7 +56,7 @@ cip_print(netdissect_options *ndo, u_int length)
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
+void
 cip_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
@@ -64,7 +64,7 @@ cip_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 	size_t cmplen;
 	int llc_hdrlen;
 
-	ndo->ndo_protocol = "cip_if";
+	ndo->ndo_protocol = "cip";
 	cmplen = sizeof(rfcllc);
 	if (cmplen > caplen)
 		cmplen = caplen;
@@ -76,7 +76,7 @@ cip_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 
 	if (cmplen == 0) {
 		nd_print_trunc(ndo);
-		return 0;
+		return;
 	}
 	if (memcmp(rfcllc, p, cmplen) == 0) {
 		/*
@@ -97,5 +97,5 @@ cip_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 		ip_print(ndo, p, length);
 	}
 
-	return (llc_hdrlen);
+	ndo->ndo_ll_hdr_len += llc_hdrlen;
 }
