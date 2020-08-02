@@ -2265,12 +2265,12 @@ ieee802_11_print(netdissect_options *ndo,
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
+void
 ieee802_11_if_print(netdissect_options *ndo,
 		    const struct pcap_pkthdr *h, const u_char *p)
 {
 	ndo->ndo_protocol = "802.11_if";
-	return ieee802_11_print(ndo, p, h->len, h->caplen, 0, 0);
+	ndo->ndo_ll_hdr_len += ieee802_11_print(ndo, p, h->len, h->caplen, 0, 0);
 }
 
 
@@ -3458,7 +3458,7 @@ ieee802_11_radio_avs_print(netdissect_options *ndo,
  * the AVS header, and the first 4 bytes of the header are used to
  * indicate whether it's a Prism header or an AVS header).
  */
-u_int
+void
 prism_if_print(netdissect_options *ndo,
 	       const struct pcap_pkthdr *h, const u_char *p)
 {
@@ -3469,33 +3469,39 @@ prism_if_print(netdissect_options *ndo,
 	ndo->ndo_protocol = "prism_if";
 	if (caplen < 4) {
 		nd_print_trunc(ndo);
-		return caplen;
+		ndo->ndo_ll_hdr_len += caplen;
+		return;
 	}
 
 	msgcode = GET_BE_U_4(p);
 	if (msgcode == WLANCAP_MAGIC_COOKIE_V1 ||
-	    msgcode == WLANCAP_MAGIC_COOKIE_V2)
-		return ieee802_11_radio_avs_print(ndo, p, length, caplen);
+	    msgcode == WLANCAP_MAGIC_COOKIE_V2) {
+		ndo->ndo_ll_hdr_len += ieee802_11_radio_avs_print(ndo, p, length, caplen);
+		return;
+	}
 
 	if (caplen < PRISM_HDR_LEN) {
 		nd_print_trunc(ndo);
-		return caplen;
+		ndo->ndo_ll_hdr_len += caplen;
+		return;
 	}
 
-	return PRISM_HDR_LEN + ieee802_11_print(ndo, p + PRISM_HDR_LEN,
-	    length - PRISM_HDR_LEN, caplen - PRISM_HDR_LEN, 0, 0);
+	p += PRISM_HDR_LEN;
+	length -= PRISM_HDR_LEN;
+	caplen -= PRISM_HDR_LEN;
+	ndo->ndo_ll_hdr_len += PRISM_HDR_LEN + ieee802_11_print(ndo, p, length, caplen, 0, 0);
 }
 
 /*
  * For DLT_IEEE802_11_RADIO; like DLT_IEEE802_11, but with an extra
  * header, containing information such as radio information.
  */
-u_int
+void
 ieee802_11_radio_if_print(netdissect_options *ndo,
 			  const struct pcap_pkthdr *h, const u_char *p)
 {
 	ndo->ndo_protocol = "802.11_radio_if";
-	return ieee802_11_radio_print(ndo, p, h->len, h->caplen);
+	ndo->ndo_ll_hdr_len += ieee802_11_radio_print(ndo, p, h->len, h->caplen);
 }
 
 /*
@@ -3503,10 +3509,10 @@ ieee802_11_radio_if_print(netdissect_options *ndo,
  * extra header, containing information such as radio information,
  * which we currently ignore.
  */
-u_int
+void
 ieee802_11_radio_avs_if_print(netdissect_options *ndo,
 			      const struct pcap_pkthdr *h, const u_char *p)
 {
 	ndo->ndo_protocol = "802.11_radio_avs_if";
-	return ieee802_11_radio_avs_print(ndo, p, h->len, h->caplen);
+	ndo->ndo_ll_hdr_len += ieee802_11_radio_avs_print(ndo, p, h->len, h->caplen);
 }

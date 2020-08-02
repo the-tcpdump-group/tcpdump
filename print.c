@@ -104,18 +104,6 @@ static const struct uint_printer uint_printers[] = {
 #ifdef DLT_LTALK
 	{ ltalk_if_print,	DLT_LTALK },
 #endif
-#ifdef DLT_IEEE802_11_RADIO
-	{ ieee802_11_radio_if_print,	DLT_IEEE802_11_RADIO },
-#endif
-#ifdef DLT_IEEE802_11
-	{ ieee802_11_if_print,	DLT_IEEE802_11},
-#endif
-#ifdef DLT_IEEE802_11_RADIO_AVS
-	{ ieee802_11_radio_avs_if_print,	DLT_IEEE802_11_RADIO_AVS },
-#endif
-#ifdef DLT_PRISM_HEADER
-	{ prism_if_print,	DLT_PRISM_HEADER },
-#endif
 	{ ppp_if_print,		DLT_PPP },
 #ifdef DLT_PPP_WITHDIRECTION
 	{ ppp_if_print,		DLT_PPP_WITHDIRECTION },
@@ -156,6 +144,15 @@ static const struct void_printer void_printers[] = {
 	{ enc_if_print,		DLT_ENC },
 #endif
 	{ ether_if_print,	DLT_EN10MB },
+#ifdef DLT_IEEE802_11
+	{ ieee802_11_if_print,	DLT_IEEE802_11},
+#endif
+#ifdef DLT_IEEE802_11_RADIO_AVS
+	{ ieee802_11_radio_avs_if_print, DLT_IEEE802_11_RADIO_AVS },
+#endif
+#ifdef DLT_IEEE802_11_RADIO
+	{ ieee802_11_radio_if_print,	DLT_IEEE802_11_RADIO },
+#endif
 #ifdef DLT_IPNET
 	{ ipnet_if_print,	DLT_IPNET },
 #endif
@@ -228,6 +225,9 @@ static const struct void_printer void_printers[] = {
 #endif
 #ifdef DLT_PPP_ETHER
 	{ pppoe_if_print,	DLT_PPP_ETHER },
+#endif
+#ifdef DLT_PRISM_HEADER
+	{ prism_if_print,	DLT_PRISM_HEADER },
 #endif
 	{ raw_if_print,		DLT_RAW },
 #ifdef DLT_IPV4
