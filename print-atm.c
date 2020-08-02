@@ -243,7 +243,7 @@ atm_llc_print(netdissect_options *ndo,
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
+void
 atm_if_print(netdissect_options *ndo,
              const struct pcap_pkthdr *h, const u_char *p)
 {
@@ -252,10 +252,11 @@ atm_if_print(netdissect_options *ndo,
 	uint32_t llchdr;
 	u_int hdrlen = 0;
 
-	ndo->ndo_protocol = "atm_if";
+	ndo->ndo_protocol = "atm";
 	if (caplen < 1) {
 		nd_print_trunc(ndo);
-		return (caplen);
+		ndo->ndo_ll_hdr_len += caplen;
+		return;
 	}
 
         /* Cisco Style NLPID ? */
@@ -263,7 +264,8 @@ atm_if_print(netdissect_options *ndo,
             if (ndo->ndo_eflag)
                 ND_PRINT("CNLPID ");
             isoclns_print(ndo, p + 1, length - 1);
-            return hdrlen;
+            ndo->ndo_ll_hdr_len += hdrlen;
+            return;
         }
 
 	/*
@@ -272,7 +274,8 @@ atm_if_print(netdissect_options *ndo,
 	 */
 	if (caplen < 3) {
 		nd_print_trunc(ndo);
-		return (caplen);
+		ndo->ndo_ll_hdr_len += caplen;
+		return;
 	}
 
 	/*
@@ -304,7 +307,8 @@ atm_if_print(netdissect_options *ndo,
 		 */
 		if (caplen < 20) {
 			nd_print_trunc(ndo);
-			return (caplen);
+			ndo->ndo_ll_hdr_len += caplen;
+			return;
 		}
 		if (ndo->ndo_eflag)
 			ND_PRINT("%08x%08x %08x%08x ",
@@ -318,7 +322,7 @@ atm_if_print(netdissect_options *ndo,
 		hdrlen += 20;
 	}
 	hdrlen += atm_llc_print(ndo, p, length, caplen);
-	return (hdrlen);
+	ndo->ndo_ll_hdr_len += hdrlen;
 }
 
 /*

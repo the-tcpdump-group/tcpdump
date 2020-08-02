@@ -74,7 +74,6 @@ static const struct uint_printer uint_printers[] = {
 #ifdef DLT_MFR
 	{ mfr_if_print,		DLT_MFR },
 #endif
-	{ atm_if_print,		DLT_ATM_RFC1483 },
 #ifdef DLT_LTALK
 	{ ltalk_if_print,	DLT_LTALK },
 #endif
@@ -99,6 +98,7 @@ static const struct void_printer void_printers[] = {
 #ifdef DLT_ARCNET_LINUX
 	{ arcnet_linux_if_print, DLT_ARCNET_LINUX },
 #endif
+	{ atm_if_print,		DLT_ATM_RFC1483 },
 #ifdef DLT_DSA_TAG_BRCM
 	{ brcm_tag_if_print,	DLT_DSA_TAG_BRCM },
 #endif

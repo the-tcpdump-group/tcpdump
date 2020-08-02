@@ -468,7 +468,7 @@ extern if_printer_t lookup_printer(netdissect_options *, int);
 extern void ap1394_if_print IF_PRINTER_ARGS;
 extern void arcnet_if_print IF_PRINTER_ARGS;
 extern void arcnet_linux_if_print IF_PRINTER_ARGS;
-extern u_int atm_if_print IF_PRINTER_ARGS;
+extern void atm_if_print IF_PRINTER_ARGS;
 extern void bt_if_print IF_PRINTER_ARGS;
 extern void brcm_tag_if_print IF_PRINTER_ARGS;
 extern void brcm_tag_prepend_if_print IF_PRINTER_ARGS;
