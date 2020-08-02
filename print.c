@@ -68,7 +68,6 @@ static const struct uint_printer uint_printers[] = {
 #if defined(DLT_PFLOG) && defined(HAVE_NET_IF_PFLOG_H)
 	{ pflog_if_print,	DLT_PFLOG },
 #endif
-	{ token_if_print,	DLT_IEEE802 },
 #ifdef DLT_FR
 	{ fr_if_print,		DLT_FR },
 #endif
@@ -246,6 +245,7 @@ static const struct void_printer void_printers[] = {
 #ifdef DLT_SYMANTEC_FIREWALL
 	{ symantec_if_print,	DLT_SYMANTEC_FIREWALL },
 #endif
+	{ token_if_print,	DLT_IEEE802 },
 #ifdef DLT_USB_LINUX
 	{ usb_linux_48_byte_if_print, DLT_USB_LINUX},
 #endif /* DLT_USB_LINUX */
