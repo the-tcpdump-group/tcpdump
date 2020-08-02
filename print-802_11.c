@@ -3489,7 +3489,8 @@ prism_if_print(netdissect_options *ndo,
 	p += PRISM_HDR_LEN;
 	length -= PRISM_HDR_LEN;
 	caplen -= PRISM_HDR_LEN;
-	ndo->ndo_ll_hdr_len += PRISM_HDR_LEN + ieee802_11_print(ndo, p, length, caplen, 0, 0);
+	ndo->ndo_ll_hdr_len += PRISM_HDR_LEN;
+	ndo->ndo_ll_hdr_len += ieee802_11_print(ndo, p, length, caplen, 0, 0);
 }
 
 /*
