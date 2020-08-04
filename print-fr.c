@@ -212,23 +212,22 @@ fr_hdr_print(netdissect_options *ndo, int length, u_int addr_len,
     }
 }
 
-u_int
+/* Frame Relay */
+void
 fr_if_print(netdissect_options *ndo,
             const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int length = h->len;
 	u_int caplen = h->caplen;
 
-	ndo->ndo_protocol = "fr_if";
-        ND_TCHECK_4(p); /* minimum frame header length */
+	ndo->ndo_protocol = "fr";
+	if (caplen < 4) {	/* minimum frame header length */
+		nd_print_trunc(ndo);
+		ndo->ndo_ll_hdr_len += caplen;
+		return;
+	}
 
-        if ((length = fr_print(ndo, p, length)) == 0)
-            return (0);
-        else
-            return length;
-trunc:
-        nd_print_trunc(ndo);
-        return caplen;
+	ndo->ndo_ll_hdr_len += fr_print(ndo, p, length);
 }
 
 u_int
@@ -370,23 +369,22 @@ trunc:
 
 }
 
-u_int
+/* Multi Link Frame Relay (FRF.16) */
+void
 mfr_if_print(netdissect_options *ndo,
              const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int length = h->len;
 	u_int caplen = h->caplen;
 
-	ndo->ndo_protocol = "mfr_if";
-        ND_TCHECK_2(p); /* minimum frame header length */
+	ndo->ndo_protocol = "mfr";
+	if (caplen < 2) {	/* minimum frame header length */
+		nd_print_trunc(ndo);
+		ndo->ndo_ll_hdr_len += caplen;
+		return;
+	}
 
-        if ((length = mfr_print(ndo, p, length)) == 0)
-            return (0);
-        else
-            return length;
-trunc:
-        nd_print_trunc(ndo);
-        return caplen;
+	ndo->ndo_ll_hdr_len += mfr_print(ndo, p, length);
 }
 
 

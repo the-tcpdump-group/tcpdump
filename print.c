@@ -65,15 +65,6 @@ static const struct uint_printer uint_printers[] = {
 #if defined(DLT_PFLOG) && defined(HAVE_NET_IF_PFLOG_H)
 	{ pflog_if_print,	DLT_PFLOG },
 #endif
-#ifdef DLT_FR
-	{ fr_if_print,		DLT_FR },
-#endif
-#ifdef DLT_FRELAY
-	{ fr_if_print,		DLT_FRELAY },
-#endif
-#ifdef DLT_MFR
-	{ mfr_if_print,		DLT_MFR },
-#endif
 #ifdef DLT_LTALK
 	{ ltalk_if_print,	DLT_LTALK },
 #endif
@@ -125,6 +116,12 @@ static const struct void_printer void_printers[] = {
 #endif
 	{ ether_if_print,	DLT_EN10MB },
 	{ fddi_if_print,	DLT_FDDI },
+#ifdef DLT_FR
+	{ fr_if_print,		DLT_FR },
+#endif
+#ifdef DLT_FRELAY
+	{ fr_if_print,		DLT_FRELAY },
+#endif
 #ifdef DLT_IEEE802_11
 	{ ieee802_11_if_print,	DLT_IEEE802_11},
 #endif
@@ -196,6 +193,9 @@ static const struct void_printer void_printers[] = {
 #endif
 #ifdef DLT_JUNIPER_SERVICES
 	{ juniper_services_if_print, DLT_JUNIPER_SERVICES },
+#endif
+#ifdef DLT_MFR
+	{ mfr_if_print,		DLT_MFR },
 #endif
 #ifdef DLT_NETANALYZER
 	{ netanalyzer_if_print, DLT_NETANALYZER },
