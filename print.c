@@ -53,9 +53,6 @@ struct void_printer {
 };
 
 static const struct uint_printer uint_printers[] = {
-#ifdef DLT_LANE8023
-	{ lane_if_print,	DLT_LANE8023 },
-#endif
 #ifdef DLT_C_HDLC
 	{ chdlc_if_print,	DLT_C_HDLC },
 #endif

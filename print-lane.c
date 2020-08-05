@@ -115,12 +115,3 @@ lane_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 	 */
 	ether_print(ndo, p, length, caplen, lane_hdr_print, p - 2, FALSE);
 }
-
-u_int
-lane_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
-{
-	ndo->ndo_protocol = "lane_if";
-	lane_print(ndo, p, h->len, h->caplen);
-
-	return (sizeof(struct lecdatahdr_8023));
-}
