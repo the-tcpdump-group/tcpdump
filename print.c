@@ -53,9 +53,6 @@ struct void_printer {
 };
 
 static const struct uint_printer uint_printers[] = {
-#if defined(DLT_PFLOG) && defined(HAVE_NET_IF_PFLOG_H)
-	{ pflog_if_print,	DLT_PFLOG },
-#endif
 	{ NULL,			0 },
 };
 
@@ -196,6 +193,9 @@ static const struct void_printer void_printers[] = {
 	{ null_if_print,	DLT_NULL },
 #ifdef DLT_LOOP
 	{ null_if_print,	DLT_LOOP },
+#endif
+#if defined(DLT_PFLOG) && defined(HAVE_NET_IF_PFLOG_H)
+	{ pflog_if_print,	DLT_PFLOG },
 #endif
 #ifdef DLT_PKTAP
 	{ pktap_if_print,	DLT_PKTAP },

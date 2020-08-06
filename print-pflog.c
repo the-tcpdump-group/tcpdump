@@ -104,7 +104,7 @@ pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
 	    hdr->ifname);
 }
 
-u_int
+void
 pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
                const u_char *p)
 {
@@ -114,24 +114,27 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	const struct pfloghdr *hdr;
 	uint8_t af;
 
-	ndo->ndo_protocol = "pflog_if";
+	ndo->ndo_protocol = "pflog";
 	/* check length */
 	if (caplen < sizeof(uint8_t)) {
 		nd_print_trunc(ndo);
-		return (caplen);
+		ndo->ndo_ll_hdr_len += h->caplen;
+		return;
 	}
 
 #define MIN_PFLOG_HDRLEN	45
 	hdr = (const struct pfloghdr *)p;
-	if (hdr->length < MIN_PFLOG_HDRLEN) {
+	if (GET_U_1(&hdr->length) < MIN_PFLOG_HDRLEN) {
 		ND_PRINT("[pflog: invalid header length!]");
-		return (hdr->length);	/* XXX: not really */
+		ndo->ndo_ll_hdr_len += GET_U_1(&hdr->length);	/* XXX: not really */
+		return;
 	}
 	hdrlen = BPF_WORDALIGN(hdr->length);
 
 	if (caplen < hdrlen) {
 		nd_print_trunc(ndo);
-		return (hdrlen);	/* XXX: true? */
+		ndo->ndo_ll_hdr_len += hdrlen;	/* XXX: true? */
+		return;
 	}
 
 	/* print what we know */
@@ -172,8 +175,10 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 			ND_DEFAULTPRINT(p, caplen);
 	}
 
-	return (hdrlen);
+	ndo->ndo_ll_hdr_len += hdrlen;
+	return;
 trunc:
 	nd_print_trunc(ndo);
-	return (hdrlen);
+	ndo->ndo_ll_hdr_len += hdrlen;
+	return;
 }

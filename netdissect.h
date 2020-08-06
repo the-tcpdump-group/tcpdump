@@ -509,7 +509,7 @@ extern void netanalyzer_if_print IF_PRINTER_ARGS;
 extern void netanalyzer_transparent_if_print IF_PRINTER_ARGS;
 extern void nflog_if_print IF_PRINTER_ARGS;
 extern void null_if_print IF_PRINTER_ARGS;
-extern u_int pflog_if_print IF_PRINTER_ARGS;
+extern void pflog_if_print IF_PRINTER_ARGS;
 extern void pktap_if_print IF_PRINTER_ARGS;
 extern void ppi_if_print IF_PRINTER_ARGS;
 extern void ppp_bsdos_if_print IF_PRINTER_ARGS;
