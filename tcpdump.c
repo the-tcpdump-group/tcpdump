@@ -2410,7 +2410,7 @@ DIAG_ON_CLANG(assign-enum)
 		}
 		if (print) {
 			dlt = pcap_datalink(pd);
-			ndo->ndo_if_printer = get_if_printer(ndo, dlt);
+			ndo->ndo_if_printer = get_if_printer(dlt);
 			dumpinfo.ndo = ndo;
 		} else
 			dumpinfo.ndo = NULL;
@@ -2421,7 +2421,7 @@ DIAG_ON_CLANG(assign-enum)
 #endif
 	} else {
 		dlt = pcap_datalink(pd);
-		ndo->ndo_if_printer = get_if_printer(ndo, dlt);
+		ndo->ndo_if_printer = get_if_printer(dlt);
 		callback = print_packet;
 		pcap_userdata = (u_char *)ndo;
 	}
@@ -2594,7 +2594,7 @@ DIAG_ON_CLANG(assign-enum)
 					 * the new DLT.
 					 */
 					dlt = new_dlt;
-					ndo->ndo_if_printer = get_if_printer(ndo, dlt);
+					ndo->ndo_if_printer = get_if_printer(dlt);
 					if (pcap_compile(pd, &fcode, cmdbuf, Oflag, netmask) < 0)
 						error("%s", pcap_geterr(pd));
 				}
