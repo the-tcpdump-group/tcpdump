@@ -53,12 +53,6 @@ struct void_printer {
 };
 
 static const struct uint_printer uint_printers[] = {
-#ifdef DLT_C_HDLC
-	{ chdlc_if_print,	DLT_C_HDLC },
-#endif
-#ifdef DLT_HDLC
-	{ chdlc_if_print,	DLT_HDLC },
-#endif
 #if defined(DLT_PFLOG) && defined(HAVE_NET_IF_PFLOG_H)
 	{ pflog_if_print,	DLT_PFLOG },
 #endif
@@ -85,6 +79,12 @@ static const struct void_printer void_printers[] = {
 #endif
 #ifdef DLT_BLUETOOTH_HCI_H4_WITH_PHDR
 	{ bt_if_print,		DLT_BLUETOOTH_HCI_H4_WITH_PHDR},
+#endif
+#ifdef DLT_C_HDLC
+	{ chdlc_if_print,	DLT_C_HDLC },
+#endif
+#ifdef DLT_HDLC
+	{ chdlc_if_print,	DLT_HDLC },
 #endif
 #ifdef DLT_ATM_CLIP
 	{ cip_if_print,		DLT_ATM_CLIP },

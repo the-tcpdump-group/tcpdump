@@ -472,7 +472,7 @@ extern void atm_if_print IF_PRINTER_ARGS;
 extern void bt_if_print IF_PRINTER_ARGS;
 extern void brcm_tag_if_print IF_PRINTER_ARGS;
 extern void brcm_tag_prepend_if_print IF_PRINTER_ARGS;
-extern u_int chdlc_if_print IF_PRINTER_ARGS;
+extern void chdlc_if_print IF_PRINTER_ARGS;
 extern void cip_if_print IF_PRINTER_ARGS;
 extern void dsa_if_print IF_PRINTER_ARGS;
 extern void edsa_if_print IF_PRINTER_ARGS;

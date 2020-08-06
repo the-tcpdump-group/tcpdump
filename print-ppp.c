@@ -1743,7 +1743,7 @@ ppp_hdlc_if_print(netdissect_options *ndo,
 
 	case CHDLC_UNICAST:
 	case CHDLC_BCAST:
-		ndo->ndo_ll_hdr_len += chdlc_if_print(ndo, h, p);
+		chdlc_if_print(ndo, h, p);
 		return;
 
 	default:

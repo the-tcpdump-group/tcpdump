@@ -44,11 +44,11 @@ static const struct tok chdlc_cast_values[] = {
 
 
 /* Standard CHDLC printer */
-u_int
+void
 chdlc_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
-	ndo->ndo_protocol = "chdlc_if";
-	return chdlc_print(ndo, p, h->len);
+	ndo->ndo_protocol = "chdlc";
+	ndo->ndo_ll_hdr_len += chdlc_print(ndo, p, h->len);
 }
 
 u_int
