@@ -72,19 +72,20 @@ static const char *ddpskt_string(netdissect_options *, u_int);
 /*
  * Print LLAP packets received on a physical LocalTalk interface.
  */
-u_int
+void
 ltalk_if_print(netdissect_options *ndo,
                const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int hdrlen;
 
-	ndo->ndo_protocol = "ltalk_if";
+	ndo->ndo_protocol = "ltalk";
 	hdrlen = llap_print(ndo, p, h->len);
 	if (hdrlen == 0) {
 		/* Cut short by the snapshot length. */
-		return (h->caplen);
+		ndo->ndo_ll_hdr_len += h->caplen;
+		return;
 	}
-	return (hdrlen);
+	ndo->ndo_ll_hdr_len += hdrlen;
 }
 
 /*

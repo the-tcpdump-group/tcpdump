@@ -503,7 +503,7 @@ extern void juniper_ppp_if_print IF_PRINTER_ARGS;
 extern void juniper_pppoe_atm_if_print IF_PRINTER_ARGS;
 extern void juniper_pppoe_if_print IF_PRINTER_ARGS;
 extern void juniper_services_if_print IF_PRINTER_ARGS;
-extern u_int ltalk_if_print IF_PRINTER_ARGS;
+extern void ltalk_if_print IF_PRINTER_ARGS;
 extern void mfr_if_print IF_PRINTER_ARGS;
 extern void netanalyzer_if_print IF_PRINTER_ARGS;
 extern void netanalyzer_transparent_if_print IF_PRINTER_ARGS;

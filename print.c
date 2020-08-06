@@ -56,9 +56,6 @@ static const struct uint_printer uint_printers[] = {
 #if defined(DLT_PFLOG) && defined(HAVE_NET_IF_PFLOG_H)
 	{ pflog_if_print,	DLT_PFLOG },
 #endif
-#ifdef DLT_LTALK
-	{ ltalk_if_print,	DLT_LTALK },
-#endif
 	{ NULL,			0 },
 };
 
@@ -180,6 +177,9 @@ static const struct void_printer void_printers[] = {
 #endif
 #ifdef DLT_JUNIPER_SERVICES
 	{ juniper_services_if_print, DLT_JUNIPER_SERVICES },
+#endif
+#ifdef DLT_LTALK
+	{ ltalk_if_print,	DLT_LTALK },
 #endif
 #ifdef DLT_MFR
 	{ mfr_if_print,		DLT_MFR },
