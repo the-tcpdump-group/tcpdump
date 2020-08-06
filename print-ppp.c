@@ -1631,18 +1631,20 @@ trunc:
 
 
 /* PPP I/F printer */
-u_int
+void
 ppp_if_print(netdissect_options *ndo,
              const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int length = h->len;
 	u_int caplen = h->caplen;
 
-	ndo->ndo_protocol = "ppp_if";
+	ndo->ndo_protocol = "ppp";
 	if (caplen < PPP_HDRLEN) {
 		nd_print_trunc(ndo);
-		return (caplen);
+		ndo->ndo_ll_hdr_len += caplen;
+		return;
 	}
+	ndo->ndo_ll_hdr_len += PPP_HDRLEN;
 
 #if 0
 	/*
@@ -1687,8 +1689,6 @@ ppp_if_print(netdissect_options *ndo,
 #endif
 
 	ppp_print(ndo, p, length);
-
-	return (0);
 }
 
 /*
@@ -1700,7 +1700,7 @@ ppp_if_print(netdissect_options *ndo,
  *
  * This handles, for example, DLT_PPP_SERIAL in NetBSD.
  */
-u_int
+void
 ppp_hdlc_if_print(netdissect_options *ndo,
                   const struct pcap_pkthdr *h, const u_char *p)
 {
@@ -1709,10 +1709,11 @@ ppp_hdlc_if_print(netdissect_options *ndo,
 	u_int proto;
 	u_int hdrlen = 0;
 
-	ndo->ndo_protocol = "ppp_hdlc_if";
+	ndo->ndo_protocol = "ppp_hdlc";
 	if (caplen < 2) {
 		nd_print_trunc(ndo);
-		return (caplen);
+		ndo->ndo_ll_hdr_len += caplen;
+		return;
 	}
 
 	switch (GET_U_1(p)) {
@@ -1720,7 +1721,8 @@ ppp_hdlc_if_print(netdissect_options *ndo,
 	case PPP_ADDRESS:
 		if (caplen < 4) {
 			nd_print_trunc(ndo);
-			return (caplen);
+			ndo->ndo_ll_hdr_len += caplen;
+			return;
 		}
 
 		if (ndo->ndo_eflag)
@@ -1741,12 +1743,14 @@ ppp_hdlc_if_print(netdissect_options *ndo,
 
 	case CHDLC_UNICAST:
 	case CHDLC_BCAST:
-		return (chdlc_if_print(ndo, h, p));
+		ndo->ndo_ll_hdr_len += chdlc_if_print(ndo, h, p);
+		return;
 
 	default:
 		if (caplen < 4) {
 			nd_print_trunc(ndo);
-			return (caplen);
+			ndo->ndo_ll_hdr_len += caplen;
+			return;
 		}
 
 		if (ndo->ndo_eflag)
@@ -1765,14 +1769,14 @@ ppp_hdlc_if_print(netdissect_options *ndo,
 		break;
 	}
 
-	return (hdrlen);
+	ndo->ndo_ll_hdr_len += hdrlen;
 }
 
 #define PPP_BSDI_HDRLEN 24
 
 /* BSD/OS specific PPP printer */
-u_int
-ppp_bsdos_if_print(netdissect_options *ndo _U_,
+void
+ppp_bsdos_if_print(netdissect_options *ndo,
                    const struct pcap_pkthdr *h _U_, const u_char *p _U_)
 {
 	u_int hdrlength;
@@ -1784,10 +1788,11 @@ ppp_bsdos_if_print(netdissect_options *ndo _U_,
 	const u_char *q;
 	u_int i;
 
-	ndo->ndo_protocol = "ppp_bsdos_if";
+	ndo->ndo_protocol = "ppp_bsdos";
 	if (caplen < PPP_BSDI_HDRLEN) {
 		nd_print_trunc(ndo);
-		return (caplen);
+		ndo->ndo_ll_hdr_len += caplen;
+		return;
 	}
 
 	hdrlength = 0;
@@ -1927,5 +1932,5 @@ printx:
 #else /* __bsdi */
 	hdrlength = 0;
 #endif /* __bsdi__ */
-	return (hdrlength);
+	ndo->ndo_ll_hdr_len += hdrlength;
 }
