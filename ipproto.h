@@ -140,3 +140,6 @@ extern const char *netdb_protoname (const uint8_t);
 #ifndef IPPROTO_MOBILITY
 #define IPPROTO_MOBILITY	135
 #endif
+#ifndef IPPROTO_ETHERNET
+#define IPPROTO_ETHERNET	143 /* TEMPORARY - registered 2020-01-31, expires 2021-01-31 */
+#endif

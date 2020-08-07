@@ -208,6 +208,16 @@ again:
 		pgm_print(ndo, bp, length, iph);
 		break;
 
+	case IPPROTO_ETHERNET:
+		if (ver == 6)
+			ether_print(ndo, bp, length, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL);
+		else {
+			ND_PRINT("[%s requires IPv6]",
+				 tok2str(ipproto_values,"unknown",nh));
+			nd_print_invalid(ndo);
+		}
+		break;
+
 	case IPPROTO_NONE:
 		ND_PRINT("no next header");
 		break;
