@@ -95,7 +95,7 @@ bcm_li_print(netdissect_options *ndo, const u_char *p, u_int length)
 
 	switch (pkt_type) {
 	case BCM_LI_PKT_TYPE_ETHERNET:
-	    ether_print(ndo, bp, length, length, NULL, NULL);
+	    ether_print(ndo, bp, length, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL);
 	    break;
 	case BCM_LI_PKT_TYPE_IPV4:
 	    ip_print(ndo, bp, length);
