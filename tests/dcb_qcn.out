@@ -3,25 +3,25 @@
 	  Client-Ethernet-Address 08:00:27:46:e8:84
 	  Vendor-rfc1048 Extensions
 	    Magic Cookie 0x63825363
-	    DHCP-Message Option 53, length 1: Discover
-	    Parameter-Request Option 55, length 17: 
-	      Subnet-Mask, BR, Time-Zone, Classless-Static-Route
-	      Domain-Name, Domain-Name-Server, Hostname, YD
-	      YS, NTP, MTU, Option 119
-	      Default-Gateway, Classless-Static-Route, Classless-Static-Route-Microsoft, Option 252
-	      NTP
+	    DHCP-Message (53), length 1: Discover
+	    Parameter-Request (55), length 17: 
+	      Subnet-Mask (1), BR (28), Time-Zone (2), Classless-Static-Route (121)
+	      Domain-Name (15), Domain-Name-Server (6), Hostname (12), YD (40)
+	      YS (41), NTP (42), MTU (26), Unknown (119)
+	      Default-Gateway (3), Classless-Static-Route (121), Classless-Static-Route-Microsoft (249), Unknown (252)
+	      NTP (42)
     2  06:05:25.354704 IP (tos 0x10, ttl 128, id 0, offset 0, flags [none], proto UDP (17), length 328)
     0.0.0.0.68 > 255.255.255.255.67: [udp sum ok] BOOTP/DHCP, Request from 08:00:27:46:e8:84, length 300, xid 0xfddb5251, secs 17, Flags [none] (0x0000)
 	  Client-Ethernet-Address 08:00:27:46:e8:84
 	  Vendor-rfc1048 Extensions
 	    Magic Cookie 0x63825363
-	    DHCP-Message Option 53, length 1: Discover
-	    Parameter-Request Option 55, length 17: 
-	      Subnet-Mask, BR, Time-Zone, Classless-Static-Route
-	      Domain-Name, Domain-Name-Server, Hostname, YD
-	      YS, NTP, MTU, Option 119
-	      Default-Gateway, Classless-Static-Route, Classless-Static-Route-Microsoft, Option 252
-	      NTP
+	    DHCP-Message (53), length 1: Discover
+	    Parameter-Request (55), length 17: 
+	      Subnet-Mask (1), BR (28), Time-Zone (2), Classless-Static-Route (121)
+	      Domain-Name (15), Domain-Name-Server (6), Hostname (12), YD (40)
+	      YS (41), NTP (42), MTU (26), Unknown (119)
+	      Default-Gateway (3), Classless-Static-Route (121), Classless-Static-Route-Microsoft (249), Unknown (252)
+	      NTP (42)
     3  06:05:30.544746 LLDP, length 86
 	Chassis ID TLV (1), length 7
 	  Subtype MAC address (4): 08:00:27:42:ba:59
@@ -89,13 +89,13 @@
 	  Client-Ethernet-Address 08:00:27:46:e8:84
 	  Vendor-rfc1048 Extensions
 	    Magic Cookie 0x63825363
-	    DHCP-Message Option 53, length 1: Discover
-	    Parameter-Request Option 55, length 17: 
-	      Subnet-Mask, BR, Time-Zone, Classless-Static-Route
-	      Domain-Name, Domain-Name-Server, Hostname, YD
-	      YS, NTP, MTU, Option 119
-	      Default-Gateway, Classless-Static-Route, Classless-Static-Route-Microsoft, Option 252
-	      NTP
+	    DHCP-Message (53), length 1: Discover
+	    Parameter-Request (55), length 17: 
+	      Subnet-Mask (1), BR (28), Time-Zone (2), Classless-Static-Route (121)
+	      Domain-Name (15), Domain-Name-Server (6), Hostname (12), YD (40)
+	      YS (41), NTP (42), MTU (26), Unknown (119)
+	      Default-Gateway (3), Classless-Static-Route (121), Classless-Static-Route-Microsoft (249), Unknown (252)
+	      NTP (42)
     6  06:05:37.009281 LLDP, length 94
 	Chassis ID TLV (1), length 7
 	  Subtype MAC address (4): 08:00:27:0d:f1:3c
@@ -181,26 +181,26 @@
 	  Client-Ethernet-Address 08:00:27:46:e8:84
 	  Vendor-rfc1048 Extensions
 	    Magic Cookie 0x63825363
-	    DHCP-Message Option 53, length 1: Discover
-	    Parameter-Request Option 55, length 17: 
-	      Subnet-Mask, BR, Time-Zone, Classless-Static-Route
-	      Domain-Name, Domain-Name-Server, Hostname, YD
-	      YS, NTP, MTU, Option 119
-	      Default-Gateway, Classless-Static-Route, Classless-Static-Route-Microsoft, Option 252
-	      NTP
+	    DHCP-Message (53), length 1: Discover
+	    Parameter-Request (55), length 17: 
+	      Subnet-Mask (1), BR (28), Time-Zone (2), Classless-Static-Route (121)
+	      Domain-Name (15), Domain-Name-Server (6), Hostname (12), YD (40)
+	      YS (41), NTP (42), MTU (26), Unknown (119)
+	      Default-Gateway (3), Classless-Static-Route (121), Classless-Static-Route-Microsoft (249), Unknown (252)
+	      NTP (42)
     9  06:05:56.022134 IP6 (hlim 1, next-header Options (0) payload length: 76) :: > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 3 group record(s) [gaddr ff02::1:ff46:e884 to_ex { }] [gaddr ff02::2 to_ex { }] [gaddr ff02::202 to_ex { }]
    10  06:05:56.373478 IP (tos 0x10, ttl 128, id 0, offset 0, flags [none], proto UDP (17), length 328)
     0.0.0.0.68 > 255.255.255.255.67: [udp sum ok] BOOTP/DHCP, Request from 08:00:27:46:e8:84, length 300, xid 0xbb58bf40, Flags [none] (0x0000)
 	  Client-Ethernet-Address 08:00:27:46:e8:84
 	  Vendor-rfc1048 Extensions
 	    Magic Cookie 0x63825363
-	    DHCP-Message Option 53, length 1: Discover
-	    Parameter-Request Option 55, length 17: 
-	      Subnet-Mask, BR, Time-Zone, Classless-Static-Route
-	      Domain-Name, Domain-Name-Server, Hostname, YD
-	      YS, NTP, MTU, Option 119
-	      Default-Gateway, Classless-Static-Route, Classless-Static-Route-Microsoft, Option 252
-	      NTP
+	    DHCP-Message (53), length 1: Discover
+	    Parameter-Request (55), length 17: 
+	      Subnet-Mask (1), BR (28), Time-Zone (2), Classless-Static-Route (121)
+	      Domain-Name (15), Domain-Name-Server (6), Hostname (12), YD (40)
+	      YS (41), NTP (42), MTU (26), Unknown (119)
+	      Default-Gateway (3), Classless-Static-Route (121), Classless-Static-Route-Microsoft (249), Unknown (252)
+	      NTP (42)
    11  06:05:56.498519 IP6 (hlim 255, next-header ICMPv6 (58) payload length: 24) :: > ff02::1:ff46:e884: [icmp6 sum ok] ICMP6, neighbor solicitation, length 24, who has fe80::a00:27ff:fe46:e884
    12  06:05:57.500560 IP6 (hlim 255, next-header ICMPv6 (58) payload length: 16) fe80::a00:27ff:fe46:e884 > ff02::2: [icmp6 sum ok] ICMP6, router solicitation, length 16
 	  source link-address option (1), length 8 (1): 08:00:27:46:e8:84
@@ -273,13 +273,13 @@
 	  Client-Ethernet-Address 08:00:27:46:e8:84
 	  Vendor-rfc1048 Extensions
 	    Magic Cookie 0x63825363
-	    DHCP-Message Option 53, length 1: Discover
-	    Parameter-Request Option 55, length 17: 
-	      Subnet-Mask, BR, Time-Zone, Classless-Static-Route
-	      Domain-Name, Domain-Name-Server, Hostname, YD
-	      YS, NTP, MTU, Option 119
-	      Default-Gateway, Classless-Static-Route, Classless-Static-Route-Microsoft, Option 252
-	      NTP
+	    DHCP-Message (53), length 1: Discover
+	    Parameter-Request (55), length 17: 
+	      Subnet-Mask (1), BR (28), Time-Zone (2), Classless-Static-Route (121)
+	      Domain-Name (15), Domain-Name-Server (6), Hostname (12), YD (40)
+	      YS (41), NTP (42), MTU (26), Unknown (119)
+	      Default-Gateway (3), Classless-Static-Route (121), Classless-Static-Route-Microsoft (249), Unknown (252)
+	      NTP (42)
    17  06:06:04.106458 IP6 (hlim 1, next-header Options (0) payload length: 36) fe80::a00:27ff:fe46:e884 > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 1 group record(s) [gaddr ff02::1:ff00:0 to_ex { }]
    18  06:06:07.011961 LLDP, length 94
 	Chassis ID TLV (1), length 7

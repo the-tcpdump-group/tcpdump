@@ -26,9 +26,9 @@
 	  Client-Ethernet-Address 00:04:23:57:a5:7a
 	  Vendor-rfc1048 Extensions
 	    Magic Cookie 0x63825363
-	    DHCP-Message Option 53, length 1: Release
-	    Server-ID Option 54, length 4: 192.168.1.1
-	    Client-ID Option 61, length 7: ether 00:04:23:57:a5:7a
+	    DHCP-Message (53), length 1: Release
+	    Server-ID (54), length 4: 192.168.1.1
+	    Client-ID (61), length 7: ether 00:04:23:57:a5:7a
    14  15:17:35.622870 EAP packet (0) v1, len 5, Request (1), id 1, len 5
 		 Type Identity (1)
    15  15:17:35.666378 IP (tos 0x0, ttl 128, id 14495, offset 0, flags [none], proto UDP (17), length 328)
@@ -36,31 +36,31 @@
 	  Client-Ethernet-Address 00:04:23:57:a5:7a
 	  Vendor-rfc1048 Extensions
 	    Magic Cookie 0x63825363
-	    DHCP-Message Option 53, length 1: Discover
-	    NOAUTO Option 116, length 1: Y
-	    Client-ID Option 61, length 7: ether 00:04:23:57:a5:7a
-	    Requested-IP Option 50, length 4: 192.168.1.249
-	    Hostname Option 12, length 8: "DJP95S0J"
-	    Vendor-Class Option 60, length 8: "MSFT 5.0"
-	    Parameter-Request Option 55, length 11: 
-	      Subnet-Mask, Domain-Name, Default-Gateway, Domain-Name-Server
-	      Netbios-Name-Server, Netbios-Node, Netbios-Scope, Router-Discovery
-	      Static-Route, Classless-Static-Route-Microsoft, Vendor-Option
+	    DHCP-Message (53), length 1: Discover
+	    NOAUTO (116), length 1: Y
+	    Client-ID (61), length 7: ether 00:04:23:57:a5:7a
+	    Requested-IP (50), length 4: 192.168.1.249
+	    Hostname (12), length 8: "DJP95S0J"
+	    Vendor-Class (60), length 8: "MSFT 5.0"
+	    Parameter-Request (55), length 11: 
+	      Subnet-Mask (1), Domain-Name (15), Default-Gateway (3), Domain-Name-Server (6)
+	      Netbios-Name-Server (44), Netbios-Node (46), Netbios-Scope (47), Router-Discovery (31)
+	      Static-Route (33), Classless-Static-Route-Microsoft (249), Vendor-Option (43)
    16  15:17:35.851486 IP (tos 0x0, ttl 128, id 14497, offset 0, flags [none], proto UDP (17), length 328)
     0.0.0.0.68 > 255.255.255.255.67: BOOTP/DHCP, Request from 00:04:23:57:a5:7a, length 300, xid 0xd5037d2e, Flags [none]
 	  Client-Ethernet-Address 00:04:23:57:a5:7a
 	  Vendor-rfc1048 Extensions
 	    Magic Cookie 0x63825363
-	    DHCP-Message Option 53, length 1: Discover
-	    NOAUTO Option 116, length 1: Y
-	    Client-ID Option 61, length 7: ether 00:04:23:57:a5:7a
-	    Requested-IP Option 50, length 4: 192.168.1.249
-	    Hostname Option 12, length 8: "DJP95S0J"
-	    Vendor-Class Option 60, length 8: "MSFT 5.0"
-	    Parameter-Request Option 55, length 11: 
-	      Subnet-Mask, Domain-Name, Default-Gateway, Domain-Name-Server
-	      Netbios-Name-Server, Netbios-Node, Netbios-Scope, Router-Discovery
-	      Static-Route, Classless-Static-Route-Microsoft, Vendor-Option
+	    DHCP-Message (53), length 1: Discover
+	    NOAUTO (116), length 1: Y
+	    Client-ID (61), length 7: ether 00:04:23:57:a5:7a
+	    Requested-IP (50), length 4: 192.168.1.249
+	    Hostname (12), length 8: "DJP95S0J"
+	    Vendor-Class (60), length 8: "MSFT 5.0"
+	    Parameter-Request (55), length 11: 
+	      Subnet-Mask (1), Domain-Name (15), Default-Gateway (3), Domain-Name-Server (6)
+	      Netbios-Name-Server (44), Netbios-Node (46), Netbios-Scope (47), Router-Discovery (31)
+	      Static-Route (33), Classless-Static-Route-Microsoft (249), Vendor-Option (43)
    17  15:17:36.156548 EAPOL start (1) v1, len 0
    18  15:17:36.158698 EAP packet (0) v1, len 5, Request (1), id 2, len 5
 		 Type Identity (1)
@@ -82,46 +82,46 @@
 	  Client-Ethernet-Address 00:04:23:57:a5:7a
 	  Vendor-rfc1048 Extensions
 	    Magic Cookie 0x63825363
-	    DHCP-Message Option 53, length 1: Discover
-	    NOAUTO Option 116, length 1: Y
-	    Client-ID Option 61, length 7: ether 00:04:23:57:a5:7a
-	    Requested-IP Option 50, length 4: 192.168.1.249
-	    Hostname Option 12, length 8: "DJP95S0J"
-	    Vendor-Class Option 60, length 8: "MSFT 5.0"
-	    Parameter-Request Option 55, length 11: 
-	      Subnet-Mask, Domain-Name, Default-Gateway, Domain-Name-Server
-	      Netbios-Name-Server, Netbios-Node, Netbios-Scope, Router-Discovery
-	      Static-Route, Classless-Static-Route-Microsoft, Vendor-Option
+	    DHCP-Message (53), length 1: Discover
+	    NOAUTO (116), length 1: Y
+	    Client-ID (61), length 7: ether 00:04:23:57:a5:7a
+	    Requested-IP (50), length 4: 192.168.1.249
+	    Hostname (12), length 8: "DJP95S0J"
+	    Vendor-Class (60), length 8: "MSFT 5.0"
+	    Parameter-Request (55), length 11: 
+	      Subnet-Mask (1), Domain-Name (15), Default-Gateway (3), Domain-Name-Server (6)
+	      Netbios-Name-Server (44), Netbios-Node (46), Netbios-Scope (47), Router-Discovery (31)
+	      Static-Route (33), Classless-Static-Route-Microsoft (249), Vendor-Option (43)
    28  15:17:46.852719 IP (tos 0x0, ttl 128, id 14511, offset 0, flags [none], proto UDP (17), length 328)
     0.0.0.0.68 > 255.255.255.255.67: BOOTP/DHCP, Request from 00:04:23:57:a5:7a, length 300, xid 0xd5037d2e, secs 26881, Flags [none]
 	  Client-Ethernet-Address 00:04:23:57:a5:7a
 	  Vendor-rfc1048 Extensions
 	    Magic Cookie 0x63825363
-	    DHCP-Message Option 53, length 1: Discover
-	    NOAUTO Option 116, length 1: Y
-	    Client-ID Option 61, length 7: ether 00:04:23:57:a5:7a
-	    Requested-IP Option 50, length 4: 192.168.1.249
-	    Hostname Option 12, length 8: "DJP95S0J"
-	    Vendor-Class Option 60, length 8: "MSFT 5.0"
-	    Parameter-Request Option 55, length 11: 
-	      Subnet-Mask, Domain-Name, Default-Gateway, Domain-Name-Server
-	      Netbios-Name-Server, Netbios-Node, Netbios-Scope, Router-Discovery
-	      Static-Route, Classless-Static-Route-Microsoft, Vendor-Option
+	    DHCP-Message (53), length 1: Discover
+	    NOAUTO (116), length 1: Y
+	    Client-ID (61), length 7: ether 00:04:23:57:a5:7a
+	    Requested-IP (50), length 4: 192.168.1.249
+	    Hostname (12), length 8: "DJP95S0J"
+	    Vendor-Class (60), length 8: "MSFT 5.0"
+	    Parameter-Request (55), length 11: 
+	      Subnet-Mask (1), Domain-Name (15), Default-Gateway (3), Domain-Name-Server (6)
+	      Netbios-Name-Server (44), Netbios-Node (46), Netbios-Scope (47), Router-Discovery (31)
+	      Static-Route (33), Classless-Static-Route-Microsoft (249), Vendor-Option (43)
    29  15:18:02.852731 IP (tos 0x0, ttl 128, id 14514, offset 0, flags [none], proto UDP (17), length 328)
     0.0.0.0.68 > 255.255.255.255.67: BOOTP/DHCP, Request from 00:04:23:57:a5:7a, length 300, xid 0xd5037d2e, secs 26881, Flags [none]
 	  Client-Ethernet-Address 00:04:23:57:a5:7a
 	  Vendor-rfc1048 Extensions
 	    Magic Cookie 0x63825363
-	    DHCP-Message Option 53, length 1: Discover
-	    NOAUTO Option 116, length 1: Y
-	    Client-ID Option 61, length 7: ether 00:04:23:57:a5:7a
-	    Requested-IP Option 50, length 4: 192.168.1.249
-	    Hostname Option 12, length 8: "DJP95S0J"
-	    Vendor-Class Option 60, length 8: "MSFT 5.0"
-	    Parameter-Request Option 55, length 11: 
-	      Subnet-Mask, Domain-Name, Default-Gateway, Domain-Name-Server
-	      Netbios-Name-Server, Netbios-Node, Netbios-Scope, Router-Discovery
-	      Static-Route, Classless-Static-Route-Microsoft, Vendor-Option
+	    DHCP-Message (53), length 1: Discover
+	    NOAUTO (116), length 1: Y
+	    Client-ID (61), length 7: ether 00:04:23:57:a5:7a
+	    Requested-IP (50), length 4: 192.168.1.249
+	    Hostname (12), length 8: "DJP95S0J"
+	    Vendor-Class (60), length 8: "MSFT 5.0"
+	    Parameter-Request (55), length 11: 
+	      Subnet-Mask (1), Domain-Name (15), Default-Gateway (3), Domain-Name-Server (6)
+	      Netbios-Name-Server (44), Netbios-Node (46), Netbios-Scope (47), Router-Discovery (31)
+	      Static-Route (33), Classless-Static-Route-Microsoft (249), Vendor-Option (43)
    30  15:18:08.689384 EAPOL start (1) v1, len 0
    31  15:18:08.696826 EAP packet (0) v1, len 5, Request (1), id 3, len 5
 		 Type Identity (1)
@@ -158,16 +158,16 @@
 	  Client-Ethernet-Address 00:04:23:57:a5:7a
 	  Vendor-rfc1048 Extensions
 	    Magic Cookie 0x63825363
-	    DHCP-Message Option 53, length 1: Discover
-	    NOAUTO Option 116, length 1: Y
-	    Client-ID Option 61, length 7: ether 00:04:23:57:a5:7a
-	    Requested-IP Option 50, length 4: 192.168.1.249
-	    Hostname Option 12, length 8: "DJP95S0J"
-	    Vendor-Class Option 60, length 8: "MSFT 5.0"
-	    Parameter-Request Option 55, length 11: 
-	      Subnet-Mask, Domain-Name, Default-Gateway, Domain-Name-Server
-	      Netbios-Name-Server, Netbios-Node, Netbios-Scope, Router-Discovery
-	      Static-Route, Classless-Static-Route-Microsoft, Vendor-Option
+	    DHCP-Message (53), length 1: Discover
+	    NOAUTO (116), length 1: Y
+	    Client-ID (61), length 7: ether 00:04:23:57:a5:7a
+	    Requested-IP (50), length 4: 192.168.1.249
+	    Hostname (12), length 8: "DJP95S0J"
+	    Vendor-Class (60), length 8: "MSFT 5.0"
+	    Parameter-Request (55), length 11: 
+	      Subnet-Mask (1), Domain-Name (15), Default-Gateway (3), Domain-Name-Server (6)
+	      Netbios-Name-Server (44), Netbios-Node (46), Netbios-Scope (47), Router-Discovery (31)
+	      Static-Route (33), Classless-Static-Route-Microsoft (249), Vendor-Option (43)
    50  15:18:40.214836 IP (tos 0x0, ttl 128, id 14536, offset 0, flags [none], proto UDP (17), length 96)
     169.254.67.194.137 > 169.254.255.255.137: NBT UDP PACKET(137): REGISTRATION; REQUEST; BROADCAST
    51  15:18:40.909196 IP (tos 0x0, ttl 1, id 14538, offset 0, flags [none], proto UDP (17), length 161)
@@ -201,16 +201,16 @@
 	  Client-Ethernet-Address 00:04:23:57:a5:7a
 	  Vendor-rfc1048 Extensions
 	    Magic Cookie 0x63825363
-	    DHCP-Message Option 53, length 1: Discover
-	    NOAUTO Option 116, length 1: Y
-	    Client-ID Option 61, length 7: ether 00:04:23:57:a5:7a
-	    Requested-IP Option 50, length 4: 192.168.1.249
-	    Hostname Option 12, length 8: "DJP95S0J"
-	    Vendor-Class Option 60, length 8: "MSFT 5.0"
-	    Parameter-Request Option 55, length 11: 
-	      Subnet-Mask, Domain-Name, Default-Gateway, Domain-Name-Server
-	      Netbios-Name-Server, Netbios-Node, Netbios-Scope, Router-Discovery
-	      Static-Route, Classless-Static-Route-Microsoft, Vendor-Option
+	    DHCP-Message (53), length 1: Discover
+	    NOAUTO (116), length 1: Y
+	    Client-ID (61), length 7: ether 00:04:23:57:a5:7a
+	    Requested-IP (50), length 4: 192.168.1.249
+	    Hostname (12), length 8: "DJP95S0J"
+	    Vendor-Class (60), length 8: "MSFT 5.0"
+	    Parameter-Request (55), length 11: 
+	      Subnet-Mask (1), Domain-Name (15), Default-Gateway (3), Domain-Name-Server (6)
+	      Netbios-Name-Server (44), Netbios-Node (46), Netbios-Scope (47), Router-Discovery (31)
+	      Static-Route (33), Classless-Static-Route-Microsoft (249), Vendor-Option (43)
    67  15:18:43.909719 IP (tos 0x0, ttl 1, id 14546, offset 0, flags [none], proto UDP (17), length 161)
     169.254.67.194.4299 > 239.255.255.250.1900: UDP, length 133
    68  15:18:43.967353 IP (tos 0x0, ttl 128, id 14548, offset 0, flags [none], proto UDP (17), length 96)
@@ -244,16 +244,16 @@
 	  Client-Ethernet-Address 00:04:23:57:a5:7a
 	  Vendor-rfc1048 Extensions
 	    Magic Cookie 0x63825363
-	    DHCP-Message Option 53, length 1: Discover
-	    NOAUTO Option 116, length 1: Y
-	    Client-ID Option 61, length 7: ether 00:04:23:57:a5:7a
-	    Requested-IP Option 50, length 4: 192.168.1.249
-	    Hostname Option 12, length 8: "DJP95S0J"
-	    Vendor-Class Option 60, length 8: "MSFT 5.0"
-	    Parameter-Request Option 55, length 11: 
-	      Subnet-Mask, Domain-Name, Default-Gateway, Domain-Name-Server
-	      Netbios-Name-Server, Netbios-Node, Netbios-Scope, Router-Discovery
-	      Static-Route, Classless-Static-Route-Microsoft, Vendor-Option
+	    DHCP-Message (53), length 1: Discover
+	    NOAUTO (116), length 1: Y
+	    Client-ID (61), length 7: ether 00:04:23:57:a5:7a
+	    Requested-IP (50), length 4: 192.168.1.249
+	    Hostname (12), length 8: "DJP95S0J"
+	    Vendor-Class (60), length 8: "MSFT 5.0"
+	    Parameter-Request (55), length 11: 
+	      Subnet-Mask (1), Domain-Name (15), Default-Gateway (3), Domain-Name-Server (6)
+	      Netbios-Name-Server (44), Netbios-Node (46), Netbios-Scope (47), Router-Discovery (31)
+	      Static-Route (33), Classless-Static-Route-Microsoft (249), Vendor-Option (43)
    82  15:18:52.972547 IP (tos 0x0, ttl 128, id 14570, offset 0, flags [none], proto UDP (17), length 219)
     169.254.67.194.138 > 169.254.255.255.138: NBT UDP PACKET(138)
    83  15:18:53.972751 IP (tos 0x0, ttl 128, id 14571, offset 0, flags [none], proto UDP (17), length 219)
@@ -301,16 +301,16 @@
 	  Client-Ethernet-Address 00:04:23:57:a5:7a
 	  Vendor-rfc1048 Extensions
 	    Magic Cookie 0x63825363
-	    DHCP-Message Option 53, length 1: Discover
-	    NOAUTO Option 116, length 1: Y
-	    Client-ID Option 61, length 7: ether 00:04:23:57:a5:7a
-	    Requested-IP Option 50, length 4: 192.168.1.249
-	    Hostname Option 12, length 8: "DJP95S0J"
-	    Vendor-Class Option 60, length 8: "MSFT 5.0"
-	    Parameter-Request Option 55, length 11: 
-	      Subnet-Mask, Domain-Name, Default-Gateway, Domain-Name-Server
-	      Netbios-Name-Server, Netbios-Node, Netbios-Scope, Router-Discovery
-	      Static-Route, Classless-Static-Route-Microsoft, Vendor-Option
+	    DHCP-Message (53), length 1: Discover
+	    NOAUTO (116), length 1: Y
+	    Client-ID (61), length 7: ether 00:04:23:57:a5:7a
+	    Requested-IP (50), length 4: 192.168.1.249
+	    Hostname (12), length 8: "DJP95S0J"
+	    Vendor-Class (60), length 8: "MSFT 5.0"
+	    Parameter-Request (55), length 11: 
+	      Subnet-Mask (1), Domain-Name (15), Default-Gateway (3), Domain-Name-Server (6)
+	      Netbios-Name-Server (44), Netbios-Node (46), Netbios-Scope (47), Router-Discovery (31)
+	      Static-Route (33), Classless-Static-Route-Microsoft (249), Vendor-Option (43)
   104  15:19:13.696821 EAPOL start (1) v1, len 0
   105  15:19:13.704581 EAP packet (0) v1, len 5, Request (1), id 5, len 5
 		 Type Identity (1)

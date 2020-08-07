@@ -3,13 +3,13 @@
 	  Client-Ethernet-Address 08:00:27:46:e8:84
 	  Vendor-rfc1048 Extensions
 	    Magic Cookie 0x63825363
-	    DHCP-Message Option 53, length 1: Discover
-	    Parameter-Request Option 55, length 17: 
-	      Subnet-Mask, BR, Time-Zone, Classless-Static-Route
-	      Domain-Name, Domain-Name-Server, Hostname, YD
-	      YS, NTP, MTU, Option 119
-	      Default-Gateway, Classless-Static-Route, Classless-Static-Route-Microsoft, Option 252
-	      NTP
+	    DHCP-Message (53), length 1: Discover
+	    Parameter-Request (55), length 17: 
+	      Subnet-Mask (1), BR (28), Time-Zone (2), Classless-Static-Route (121)
+	      Domain-Name (15), Domain-Name-Server (6), Hostname (12), YD (40)
+	      YS (41), NTP (42), MTU (26), Unknown (119)
+	      Default-Gateway (3), Classless-Static-Route (121), Classless-Static-Route-Microsoft (249), Unknown (252)
+	      NTP (42)
     2  05:02:46.292912 LLDP, length 87
 	Chassis ID TLV (1), length 7
 	  Subtype MAC address (4): 08:00:27:42:ba:59

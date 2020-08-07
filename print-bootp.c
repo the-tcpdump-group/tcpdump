@@ -605,7 +605,7 @@ rfc1048_print(netdissect_options *ndo,
 			continue;
 		if (tag == TAG_END && ndo->ndo_vflag < 3)
 			return;
-		cp = tok2str(tag2str, "?T%u", tag);
+		cp = tok2str(tag2str, "?Unknown", tag);
 		c = *cp++;
 
 		if (tag == TAG_PAD || tag == TAG_END)
@@ -617,7 +617,7 @@ rfc1048_print(netdissect_options *ndo,
 			bp++;
 		}
 
-		ND_PRINT("\n\t    %s Option %u, length %u%s", cp, tag, len,
+		ND_PRINT("\n\t    %s (%u), length %u%s", cp, tag, len,
 			  len > 0 ? ": " : "");
 
 		if (tag == TAG_PAD && ndo->ndo_vflag > 2) {
@@ -643,15 +643,15 @@ rfc1048_print(netdissect_options *ndo,
 		if (tag == TAG_PARM_REQUEST) {
 			idx = 0;
 			while (len > 0) {
-				cp = tok2str(tag2str, "?Option %u",
-					     GET_U_1(bp));
+				uint8_t innertag = GET_U_1(bp);
 				bp++;
 				len--;
+				cp = tok2str(tag2str, "?Unknown", innertag);
 				if (idx % 4 == 0)
 					ND_PRINT("\n\t      ");
 				else
 					ND_PRINT(", ");
-				ND_PRINT("%s", cp + 1);
+				ND_PRINT("%s (%u)", cp + 1, innertag);
 				idx++;
 			}
 			continue;
