@@ -285,7 +285,8 @@ ipv6-bad-version	ipv6-bad-version.pcap 	ipv6-bad-version.out
 ipv6-routing-header	ipv6-routing-header.pcap	ipv6-routing-header.out -v
 ipv6-srh-ext-header	ipv6-srh-ext-header.pcap 	ipv6-srh-ext-header.out -v
 ipv6-srh-insert-cksum	ipv6-srh-insert-cksum.pcap	ipv6-srh-insert-cksum.out -v
-ipv6-srh-ipproto-ether	ipv6-srh-ipproto-ether.pcap	ipv6-srh-ipproto-ether.out -ev
+ipv6-srh-ipproto-ether-v ipv6-srh-ipproto-ether.pcap ipv6-srh-ipproto-ether-v.out -v
+ipv6-srh-ipproto-ether-ev ipv6-srh-ipproto-ether.pcap ipv6-srh-ipproto-ether-ev.out -ev
 # Loopback/CTP test case
 loopback	loopback.pcap		loopback.out
 
