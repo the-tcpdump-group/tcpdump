@@ -200,7 +200,6 @@ struct bootp {
 #define	TAG_CLIENT_FQDN		((uint8_t)  81)
 #define	TAG_AGENT_CIRCUIT	((uint8_t)  82)
 #define	TAG_AGENT_REMOTE	((uint8_t)  83)
-#define	TAG_AGENT_MASK		((uint8_t)  84)
 #define	TAG_TZ_STRING		((uint8_t)  88)
 #define	TAG_FQDN_OPTION		((uint8_t)  89)
 #define	TAG_AUTH		((uint8_t)  90)
@@ -210,17 +209,12 @@ struct bootp {
 #define	TAG_CLIENT_NDI		((uint8_t)  94)
 #define	TAG_CLIENT_GUID		((uint8_t)  97)
 #define	TAG_LDAP_URL		((uint8_t)  95)
-#define	TAG_6OVER4		((uint8_t)  96)
 /* RFC 4833, TZ codes */
 #define	TAG_TZ_PCODE    	((uint8_t) 100)
 #define	TAG_TZ_TCODE    	((uint8_t) 101)
-#define	TAG_IPX_COMPAT		((uint8_t) 110)
 #define	TAG_NETINFO_PARENT	((uint8_t) 112)
 #define	TAG_NETINFO_PARENT_TAG	((uint8_t) 113)
 #define	TAG_URL			((uint8_t) 114)
-#define	TAG_FAILOVER		((uint8_t) 115)
-#define	TAG_EXTENDED_REQUEST	((uint8_t) 126)
-#define	TAG_EXTENDED_OPTION	((uint8_t) 127)
 #define TAG_MUDURL              ((uint8_t) 161)
 
 /* DHCP Message types (values for TAG_DHCP_MESSAGE option) */
@@ -517,7 +511,6 @@ static const struct tok tag2str[] = {
 	{ TAG_CLIENT_FQDN,	"$FQDN" },
 	{ TAG_AGENT_CIRCUIT,	"$Agent-Information" },
 	{ TAG_AGENT_REMOTE,	"bARMT" },
-	{ TAG_AGENT_MASK,	"bAMSK" },
 	{ TAG_TZ_STRING,	"aTZSTR" },
 	{ TAG_FQDN_OPTION,	"bFQDNS" },	/* XXX 'b' */
 	{ TAG_AUTH,		"bAUTH" },	/* XXX 'b' */
@@ -527,19 +520,12 @@ static const struct tok tag2str[] = {
 	{ TAG_CLIENT_NDI,	"bNDI" },	/* XXX 'b' */
 	{ TAG_CLIENT_GUID,	"bGUID" },	/* XXX 'b' */
 	{ TAG_LDAP_URL,		"aLDAP" },
-	{ TAG_6OVER4,		"i6o4" },
 	{ TAG_TZ_PCODE, 	"aPOSIX-TZ" },
 	{ TAG_TZ_TCODE, 	"aTZ-Name" },
-	{ TAG_IPX_COMPAT,	"bIPX" },	/* XXX 'b' */
 	{ TAG_NETINFO_PARENT,	"iNI" },
 	{ TAG_NETINFO_PARENT_TAG, "aNITAG" },
 	{ TAG_URL,		"aURL" },
-	{ TAG_FAILOVER,		"bFAIL" },	/* XXX 'b' */
 	{ TAG_MUDURL,           "aMUD-URL" },
-	{ 0, NULL }
-};
-/* 2-byte extended tags */
-static const struct tok xtag2str[] = {
 	{ 0, NULL }
 };
 
@@ -619,16 +605,7 @@ rfc1048_print(netdissect_options *ndo,
 			continue;
 		if (tag == TAG_END && ndo->ndo_vflag < 3)
 			return;
-		if (tag == TAG_EXTENDED_OPTION) {
-			ND_TCHECK_2(bp + 1);
-			tag = GET_BE_U_2(bp + 1);
-			/* XXX we don't know yet if the IANA will
-			 * preclude overlap of 1-byte and 2-byte spaces.
-			 * If not, we need to offset tag after this step.
-			 */
-			cp = tok2str(xtag2str, "?xT%u", tag);
-		} else
-			cp = tok2str(tag2str, "?T%u", tag);
+		cp = tok2str(tag2str, "?T%u", tag);
 		c = *cp++;
 
 		if (tag == TAG_PAD || tag == TAG_END)
@@ -676,21 +653,6 @@ rfc1048_print(netdissect_options *ndo,
 					ND_PRINT(", ");
 				ND_PRINT("%s", cp + 1);
 				idx++;
-			}
-			continue;
-		}
-
-		if (tag == TAG_EXTENDED_REQUEST) {
-			first = 1;
-			while (len > 1) {
-				cp = tok2str(xtag2str, "?xT%u",
-					     GET_BE_U_2(bp));
-				bp += 2;
-				len -= 2;
-				if (!first)
-					ND_PRINT("+");
-				ND_PRINT("%s", cp + 1);
-				first = 0;
 			}
 			continue;
 		}
