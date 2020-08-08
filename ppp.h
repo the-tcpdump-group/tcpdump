@@ -34,9 +34,9 @@
 #define PPP_BRPDU	0x0031	/* Bridging PDU */
 #define PPP_STII	0x0033	/* Stream Protocol (ST-II) */
 #define PPP_VINES	0x0035	/* Banyan Vines */
-#define PPP_ML          0x003d  /* Multi-Link PPP */
+#define PPP_ML		0x003d  /* Multi-Link PPP */
 #define PPP_IPV6	0x0057	/* IPv6 */
-#define	PPP_COMP	0x00fd	/* Compressed Datagram */
+#define PPP_COMP	0x00fd	/* Compressed Datagram */
 
 #define PPP_HELLO	0x0201	/* 802.1d Hello Packets */
 #define PPP_LUXCOM	0x0231	/* Luxcom */
