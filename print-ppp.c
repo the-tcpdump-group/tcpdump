@@ -1578,13 +1578,13 @@ ppp_print(netdissect_options *ndo,
         ppp_header = GET_BE_U_2(p);
 
         switch(ppp_header) {
-        case (PPP_WITHDIRECTION_IN  << 8 | PPP_CONTROL):
+        case (PPP_PPPD_IN  << 8 | PPP_CONTROL):
             if (ndo->ndo_eflag) ND_PRINT("In  ");
             p += 2;
             length -= 2;
             hdr_len += 2;
             break;
-        case (PPP_WITHDIRECTION_OUT << 8 | PPP_CONTROL):
+        case (PPP_PPPD_OUT << 8 | PPP_CONTROL):
             if (ndo->ndo_eflag) ND_PRINT("Out ");
             p += 2;
             length -= 2;

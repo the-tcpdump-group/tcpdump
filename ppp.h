@@ -19,8 +19,8 @@
 #define PPP_ADDRESS	0xff	/* The address byte value */
 #define PPP_CONTROL	0x03	/* The control byte value */
 
-#define PPP_WITHDIRECTION_IN  0x00 /* non-standard for DLT_PPP_WITHDIRECTION */
-#define PPP_WITHDIRECTION_OUT 0x01 /* non-standard for DLT_PPP_WITHDIRECTION */
+#define PPP_PPPD_IN  0x00 /* non-standard for DLT_PPP_PPPD */
+#define PPP_PPPD_OUT 0x01 /* non-standard for DLT_PPP_PPPD */
 
 /* Protocol numbers */
 #define PPP_IP		0x0021	/* Raw IP */
