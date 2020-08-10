@@ -89,8 +89,9 @@ static int resp_get_length(netdissect_options *, const u_char *, int, const u_ch
 #define FIND_CRLF(_ptr, _len)                   \
     for (;;) {                                  \
         LCHECK2(_len, 2);                       \
-        ND_TCHECK_2(_ptr);                   \
-        if (*_ptr == '\r' && *(_ptr+1) == '\n') \
+        ND_TCHECK_2(_ptr);                      \
+        if (GET_U_1(_ptr) == '\r' &&            \
+            GET_U_1(_ptr+1) == '\n')            \
             break;                              \
         _ptr++;                                 \
         _len--;                                 \
@@ -116,7 +117,8 @@ static int resp_get_length(netdissect_options *, const u_char *, int, const u_ch
     for (;;) {                              \
         LCHECK(_len);                       \
         ND_TCHECK_1(_ptr);                  \
-        if (*_ptr == '\r' || *_ptr == '\n') \
+        if (GET_U_1(_ptr) == '\r' ||        \
+            GET_U_1(_ptr) == '\n')          \
             break;                          \
         _ptr++;                             \
         _len--;                             \
@@ -151,7 +153,8 @@ static int resp_get_length(netdissect_options *, const u_char *, int, const u_ch
                  */                              \
                 goto trunc;                      \
             }                                    \
-            if (*_ptr != '\r' && *_ptr != '\n')  \
+            if (GET_U_1(_ptr) != '\r' &&         \
+                GET_U_1(_ptr) != '\n')           \
                 break;                           \
             _found_cr_or_lf = 1;                 \
             _ptr++;                              \
