@@ -422,7 +422,7 @@ static const char *mac_c_names[] = {
  * See secton 7.2.10 of 802.15.4-2015 for more information.
  */
 static uint16_t
-ieee802_15_4_crc16(const u_char *p,
+ieee802_15_4_crc16(netdissect_options *ndo, const u_char *p,
 		   u_int data_len)
 {
 	uint16_t crc;
@@ -431,7 +431,8 @@ ieee802_15_4_crc16(const u_char *p,
 	crc = 0x0000; /* Note, initial value is 0x0000 not 0xffff. */
 
 	while (data_len != 0){
-		y = *p++;
+		y = GET_U_1(p);
+		p++;
 		/* Reverse bits on input */
 		y = (((y & 0xaa) >> 1) | ((y & 0x55) << 1));
 		y = (((y & 0xcc) >> 2) | ((y & 0x33) << 2));
@@ -473,7 +474,7 @@ ieee802_15_4_reverse32(uint32_t x)
  * in and out. See secton 7.2.10 of 802.15.4-2015 for more information.
  */
 static uint32_t
-ieee802_15_4_crc32(const u_char *p,
+ieee802_15_4_crc32(netdissect_options *ndo, const u_char *p,
 		   u_int data_len)
 {
 	uint32_t crc, byte;
@@ -482,7 +483,8 @@ ieee802_15_4_crc32(const u_char *p,
 	crc = 0x00000000; /* Note, initial value is 0x00000000 not 0xffffffff */
 
 	while (data_len != 0){
-		byte = *p++;
+		byte = GET_U_1(p);
+		p++;
 		/* Reverse bits on input */
 		byte = ieee802_15_4_reverse32(byte);
 		/* Update CRC */
@@ -1814,14 +1816,14 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 	} else {
 		/* Test for 4 octet FCS. */
 		fcs = GET_LE_U_4(p + caplen - 4);
-		crc_check = ieee802_15_4_crc32(p, caplen - 4);
+		crc_check = ieee802_15_4_crc32(ndo, p, caplen - 4);
 		if (crc_check == fcs) {
 			/* Remove FCS */
 			caplen -= 4;
 		} else {
 			/* Test for 2 octet FCS. */
 			fcs = GET_LE_U_2(p + caplen - 2);
-			crc_check = ieee802_15_4_crc16(p, caplen - 2);
+			crc_check = ieee802_15_4_crc16(ndo, p, caplen - 2);
 			if (crc_check == fcs) {
 				/* Remove FCS */
 				caplen -= 2;
@@ -2215,13 +2217,13 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 		if (caplen > 4) {
 			/* Test for 4 octet FCS. */
 			fcs = GET_LE_U_4(p + caplen - 4);
-			crc_check = ieee802_15_4_crc32(p, caplen - 4);
+			crc_check = ieee802_15_4_crc32(ndo, p, caplen - 4);
 			if (crc_check == fcs) {
 				/* Remove FCS */
 				caplen -= 4;
 			} else {
 				fcs = GET_LE_U_2(p + caplen - 2);
-				crc_check = ieee802_15_4_crc16(p, caplen - 2);
+				crc_check = ieee802_15_4_crc16(ndo, p, caplen - 2);
 				if (crc_check == fcs) {
 					/* Remove FCS */
 					caplen -= 2;
@@ -2229,7 +2231,7 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 			}
 		} else {
 			fcs = GET_LE_U_2(p + caplen - 2);
-			crc_check = ieee802_15_4_crc16(p, caplen - 2);
+			crc_check = ieee802_15_4_crc16(ndo, p, caplen - 2);
 			if (crc_check == fcs) {
 				/* Remove FCS */
 				caplen -= 2;
