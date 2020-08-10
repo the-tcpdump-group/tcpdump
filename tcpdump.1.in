@@ -20,7 +20,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "2 Mar 2020"
+.TH TCPDUMP 1  "10 Aug 2020"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -271,6 +271,33 @@ not 1,048,576 bytes).
 .B \-d
 Dump the compiled packet-matching code in a human readable form to
 standard output and stop.
+.IP
+Please mind that although code compilation is always DLT-specific,
+typically it is impossible (and unnecessary) to specify which DLT to use
+for the dump because \fItcpdump\fP uses either the DLT of the input pcap
+file specified with
+.BR -r ,
+or the default DLT of the network interface specified with
+.BR -i ,
+or the particular DLT of the network interface specified with
+.B -y
+and
+.B -i
+respectively. In these cases the dump shows the same exact code that
+would filter the input file or the network interface without
+.BR -d .
+.IP
+However, when neither
+.B -r
+nor
+.B -i
+is specified, specifying
+.B -d
+prevents \fItcpdump\fP from guessing a suitable network interface (see
+.BR -i ).
+In this case the DLT defaults to EN10MB and can be set to another valid
+value manually with
+.BR -y .
 .TP
 .B \-dd
 Dump packet-matching code as a
@@ -407,7 +434,9 @@ Attempt to detect 802.11s draft mesh headers.
 .PD
 Listen, report the list of link-layer types, report the list of time
 stamp types, or report the results of compiling a filter expression on
-\fIinterface\fP.  If unspecified, \fItcpdump\fP searches the system
+\fIinterface\fP.  If unspecified and if the
+.B -d
+flag is not given, \fItcpdump\fP searches the system
 interface list for the lowest numbered, configured up interface
 (excluding loopback), which may turn out to be, for example, ``eth0''.
 .IP
@@ -883,7 +912,11 @@ its link level header, in hex and ASCII.
 .TP
 .BI \-\-linktype= datalinktype
 .PD
-Set the data link type to use while capturing packets to \fIdatalinktype\fP.
+Set the data link type to use while capturing packets (see
+.BR -L )
+or just compiling and dumping packet-matching code (see
+.BR -d )
+to \fIdatalinktype\fP.
 .TP
 .BI \-z " postrotate-command"
 Used in conjunction with the
