@@ -928,7 +928,7 @@ domain_print(netdissect_options *ndo,
 		if (cp + 1 > ndo->ndo_snapend)
 			goto print;
 		if (type == T_OPT) {
-			rcode |= (*cp << 4);
+			rcode |= (GET_U_1(cp) << 4);
 			goto print;
 		}
 		cp += 4;
