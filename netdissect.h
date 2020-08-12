@@ -668,7 +668,7 @@ extern void rrcp_print(netdissect_options *, const u_char *, u_int, const struct
 extern void rsvp_print(netdissect_options *, const u_char *, u_int);
 extern int rt6_print(netdissect_options *, const u_char *, const u_char *);
 extern void rtsp_print(netdissect_options *, const u_char *, u_int);
-extern void rx_print(netdissect_options *, const u_char *, u_int, u_int, u_int, const u_char *);
+extern void rx_print(netdissect_options *, const u_char *, u_int, uint16_t, uint16_t, const u_char *);
 extern void sctp_print(netdissect_options *, const u_char *, const u_char *, u_int);
 extern void sflow_print(netdissect_options *, const u_char *, u_int);
 extern void ssh_print(netdissect_options *, const u_char *, u_int);

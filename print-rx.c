@@ -483,7 +483,7 @@ struct rx_cache_entry {
 	uint32_t	callnum;	/* Call number (net order) */
 	uint32_t	client;		/* client IP address (net order) */
 	uint32_t	server;		/* server IP address (net order) */
-	u_int		dport;		/* server port (host order) */
+	uint16_t	dport;		/* server UDP port (host order) */
 	uint16_t	serviceId;	/* Service identifier (net order) */
 	uint32_t	opcode;		/* RX opcode (host order) */
 };
@@ -494,9 +494,9 @@ static struct rx_cache_entry	rx_cache[RX_CACHE_SIZE];
 
 static uint32_t	rx_cache_next = 0;
 static uint32_t	rx_cache_hint = 0;
-static void	rx_cache_insert(netdissect_options *, const u_char *, const struct ip *, u_int);
+static void	rx_cache_insert(netdissect_options *, const u_char *, const struct ip *, uint16_t);
 static int	rx_cache_find(netdissect_options *, const struct rx_header *,
-			      const struct ip *, uint32_t, uint32_t *);
+			      const struct ip *, uint16_t, uint32_t *);
 
 static void fs_print(netdissect_options *, const u_char *, u_int);
 static void fs_reply_print(netdissect_options *, const u_char *, u_int, uint32_t);
@@ -527,7 +527,7 @@ static int is_ubik(uint32_t);
 
 void
 rx_print(netdissect_options *ndo,
-         const u_char *bp, u_int length, u_int sport, u_int dport,
+         const u_char *bp, u_int length, uint16_t sport, uint16_t dport,
          const u_char *bp2)
 {
 	const struct rx_header *rxh;
@@ -685,7 +685,7 @@ rx_print(netdissect_options *ndo,
 
 static void
 rx_cache_insert(netdissect_options *ndo,
-                const u_char *bp, const struct ip *ip, u_int dport)
+                const u_char *bp, const struct ip *ip, uint16_t dport)
 {
 	struct rx_cache_entry *rxent;
 	const struct rx_header *rxh = (const struct rx_header *) bp;
@@ -715,7 +715,7 @@ rx_cache_insert(netdissect_options *ndo,
 
 static int
 rx_cache_find(netdissect_options *ndo, const struct rx_header *rxh,
-	      const struct ip *ip, u_int sport, uint32_t *opcode)
+	      const struct ip *ip, uint16_t sport, uint32_t *opcode)
 {
 	uint32_t i;
 	struct rx_cache_entry *rxent;
