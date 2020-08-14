@@ -557,7 +557,8 @@ static const struct tok bgp_add_path_recvsend[] = {
     { 0, NULL },
 };
 
-static char astostr[20];
+/* allocate space for the largest possible string */
+static char astostr[sizeof("xxxxx.xxxxx")];
 
 /*
  * as_printf
@@ -769,7 +770,7 @@ bgp_vpn_rd_print(netdissect_options *ndo,
                  const u_char *pptr)
 {
     /* allocate space for the largest possible string */
-    static char rd[sizeof("xxxxxxxxxx:xxxxx (xxx.xxx.xxx.xxx:xxxxx)")];
+    static char rd[sizeof("xxxxx.xxxxx:xxxxx (xxx.xxx.xxx.xxx:xxxxx)")];
     char *pos = rd;
 
     /* ok lets load the RD format */
