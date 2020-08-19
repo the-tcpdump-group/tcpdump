@@ -1,7 +1,6 @@
-# The internal git client reads CIRRUS_CLONE_DEPTH.
 env:
-  CIRRUS_CLONE_DEPTH: 3
-  MAXJOBS: 2
+  CIRRUS_CLONE_DEPTH: 3 # The internal git client reads CIRRUS_CLONE_DEPTH.
+  MAKEFLAGS: '-j 2' # The build VMs currently have two CPU cores.
   IGNORE_OSVERSION: yes
 
 task:
@@ -14,8 +13,10 @@ task:
     - freebsd-version
     - pkg update -f
     - pkg install -qy git autoconf
-    - (cd .. && git clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure --prefix=/tmp && make -s -j${MAXJOBS})
+    - (cd .. && git clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure --prefix=/tmp && make -s)
     - touch .devel
-    - ./configure
-    - make -s -j${MAXJOBS} CFLAGS=-Werror all
+    - ./configure --prefix=/tmp
+    - make -s CFLAGS=-Werror all
     - make check
+    - make install
+    - make releasetar
