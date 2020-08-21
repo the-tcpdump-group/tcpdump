@@ -5,10 +5,13 @@ env:
 
 task:
   freebsd_instance:
+    image_family: $IMAGE_FAMILY
+  allow_failures: $IMAGE_FAMILY == "freebsd-13-0-snap" # currently broken
+  env:
     matrix:
-      - image_family: freebsd-11-3-snap
-      - image_family: freebsd-12-1-snap
-      - image_family: freebsd-13-0-snap
+      - IMAGE_FAMILY: freebsd-11-3-snap
+      - IMAGE_FAMILY: freebsd-12-1-snap
+      - IMAGE_FAMILY: freebsd-13-0-snap
   script:
     - freebsd-version
     - pkg update -f
