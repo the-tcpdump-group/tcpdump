@@ -152,7 +152,7 @@ tcpdump \- dump traffic on a network
 .SH DESCRIPTION
 .LP
 \fITcpdump\fP prints out a description of the contents of packets on a
-network interface that match the boolean \fIexpression\fP; the
+network interface that match the Boolean \fIexpression\fP; the
 description is preceded by a time stamp, printed, by default, as hours,
 minutes, seconds, and fractions of a second since midnight.  It can also
 be run with the
@@ -1603,7 +1603,7 @@ UDP Name Server Requests
 the Domain Service protocol described in RFC-1035.
 If you are not familiar
 with the protocol, the following description will appear to be written
-in greek.)\fP
+in Greek.)\fP
 .LP
 Name server requests are formatted as
 .RS
