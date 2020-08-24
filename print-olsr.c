@@ -340,7 +340,7 @@ olsr_print(netdissect_options *ndo,
     ND_TCHECK_LEN(tptr, sizeof(struct olsr_common));
 
     ptr.common = (const struct olsr_common *)tptr;
-    length = min(length, GET_BE_U_2(ptr.common->packet_len));
+    length = ND_MIN(length, GET_BE_U_2(ptr.common->packet_len));
 
     ND_PRINT("OLSRv%i, seq 0x%04x, length %u",
             (is_ipv6 == 0) ? 4 : 6,

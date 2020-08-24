@@ -959,7 +959,7 @@ fs_print(netdissect_options *ndo,
 			i = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 			ND_TCHECK_LEN(bp, i);
-			i = min(AFSOPAQUEMAX, i);
+			i = ND_MIN(AFSOPAQUEMAX, i);
 			strncpy(a, (const char *) bp, i);
 			a[i] = '\0';
 			acl_print(ndo, (u_char *) a, (u_char *) a + i);
@@ -1095,7 +1095,7 @@ fs_reply_print(netdissect_options *ndo,
 			i = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 			ND_TCHECK_LEN(bp, i);
-			i = min(AFSOPAQUEMAX, i);
+			i = ND_MIN(AFSOPAQUEMAX, i);
 			strncpy(a, (const char *) bp, i);
 			a[i] = '\0';
 			acl_print(ndo, (u_char *) a, (u_char *) a + i);

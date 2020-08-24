@@ -103,7 +103,7 @@ zmtp1_print_frame(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 	ND_PRINT(", flags 0x%02x", flags);
 
 	if (ndo->ndo_vflag) {
-		uint64_t body_len_printed = min(body_len_captured, body_len_declared);
+		uint64_t body_len_printed = ND_MIN(body_len_captured, body_len_declared);
 
 		ND_PRINT(" (%s|%s|%s|%s|%s|%s|%s|%s)",
 			flags & 0x80 ? "MBZ" : "-",
@@ -116,7 +116,7 @@ zmtp1_print_frame(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 			flags & 0x01 ? "MORE" : "-");
 
 		if (ndo->ndo_vflag == 1)
-			body_len_printed = min(VBYTES + 1, body_len_printed);
+			body_len_printed = ND_MIN(VBYTES + 1, body_len_printed);
 		if (body_len_printed > 1) {
 			ND_PRINT(", first %" PRIu64 " byte(s) of body:", body_len_printed - 1);
 			hex_and_ascii_print(ndo, "\n\t ", cp + header_len + 1, body_len_printed - 1);
@@ -141,7 +141,7 @@ trunc:
 void
 zmtp1_print(netdissect_options *ndo, const u_char *cp, u_int len)
 {
-	const u_char *ep = min(ndo->ndo_snapend, cp + len);
+	const u_char *ep = ND_MIN(ndo->ndo_snapend, cp + len);
 
 	ndo->ndo_protocol = "zmtp1";
 	ND_PRINT(": ZMTP/1.0");
@@ -190,10 +190,10 @@ zmtp1_print_intermediate_part(netdissect_options *ndo, const u_char *cp, const u
 		if (frame_offset > remaining_len)
 			ND_PRINT(" (%u captured)", remaining_len);
 		if (ndo->ndo_vflag) {
-			u_int len_printed = min(frame_offset, remaining_len);
+			u_int len_printed = ND_MIN(frame_offset, remaining_len);
 
 			if (ndo->ndo_vflag == 1)
-				len_printed = min(VBYTES, len_printed);
+				len_printed = ND_MIN(VBYTES, len_printed);
 			if (len_printed > 1) {
 				ND_PRINT(", first %u byte(s):", len_printed);
 				hex_and_ascii_print(ndo, "\n\t ", cp, len_printed);
@@ -210,7 +210,7 @@ trunc:
 void
 zmtp1_datagram_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 {
-	const u_char *ep = min(ndo->ndo_snapend, cp + len);
+	const u_char *ep = ND_MIN(ndo->ndo_snapend, cp + len);
 
 	ndo->ndo_protocol = "zmtp1";
 	cp = zmtp1_print_intermediate_part(ndo, cp, len);

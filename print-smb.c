@@ -365,7 +365,7 @@ print_trans(netdissect_options *ndo,
     }
 
     smb_fdata(ndo, words + 1, f1,
-              min(words + 1 + 2 * GET_U_1(words), maxbuf),
+              ND_MIN(words + 1 + 2 * GET_U_1(words), maxbuf),
               unicodestr);
 
     ND_TCHECK_2(data1);
@@ -391,9 +391,9 @@ print_trans(netdissect_options *ndo,
 #undef PIPE_LANMAN_STR
 
 	if (paramlen)
-	    smb_fdata(ndo, param, f3, min(param + paramlen, maxbuf), unicodestr);
+	    smb_fdata(ndo, param, f3, ND_MIN(param + paramlen, maxbuf), unicodestr);
 	if (datalen)
-	    smb_fdata(ndo, data, f4, min(data + datalen, maxbuf), unicodestr);
+	    smb_fdata(ndo, data, f4, ND_MIN(data + datalen, maxbuf), unicodestr);
     }
     return;
 trunc:
@@ -422,21 +422,21 @@ print_negprot(netdissect_options *ndo,
     }
 
     if (f1)
-	smb_fdata(ndo, words + 1, f1, min(words + 1 + wct * 2, maxbuf),
+	smb_fdata(ndo, words + 1, f1, ND_MIN(words + 1 + wct * 2, maxbuf),
 	    unicodestr);
     else
-	smb_data_print(ndo, words + 1, min(wct * 2, ND_BYTES_BETWEEN(maxbuf, words + 1)));
+	smb_data_print(ndo, words + 1, ND_MIN(wct * 2, ND_BYTES_BETWEEN(maxbuf, words + 1)));
 
     ND_TCHECK_2(data);
     bcc = GET_LE_U_2(data);
     ND_PRINT("smb_bcc=%u\n", bcc);
     if (bcc > 0) {
 	if (f2)
-	    smb_fdata(ndo, data + 2, f2, min(data + 2 + GET_LE_U_2(data),
+	    smb_fdata(ndo, data + 2, f2, ND_MIN(data + 2 + GET_LE_U_2(data),
                                              maxbuf), unicodestr);
 	else
 	    smb_data_print(ndo, data + 2,
-                           min(GET_LE_U_2(data), ND_BYTES_BETWEEN(maxbuf, data + 2)));
+                           ND_MIN(GET_LE_U_2(data), ND_BYTES_BETWEEN(maxbuf, data + 2)));
     }
     return;
 trunc:
@@ -467,21 +467,21 @@ print_sesssetup(netdissect_options *ndo,
     }
 
     if (f1)
-	smb_fdata(ndo, words + 1, f1, min(words + 1 + wct * 2, maxbuf),
+	smb_fdata(ndo, words + 1, f1, ND_MIN(words + 1 + wct * 2, maxbuf),
 	    unicodestr);
     else
-	smb_data_print(ndo, words + 1, min(wct * 2, ND_BYTES_BETWEEN(maxbuf, words + 1)));
+	smb_data_print(ndo, words + 1, ND_MIN(wct * 2, ND_BYTES_BETWEEN(maxbuf, words + 1)));
 
     ND_TCHECK_2(data);
     bcc = GET_LE_U_2(data);
     ND_PRINT("smb_bcc=%u\n", bcc);
     if (bcc > 0) {
 	if (f2)
-	    smb_fdata(ndo, data + 2, f2, min(data + 2 + GET_LE_U_2(data),
+	    smb_fdata(ndo, data + 2, f2, ND_MIN(data + 2 + GET_LE_U_2(data),
                                              maxbuf), unicodestr);
 	else
 	    smb_data_print(ndo, data + 2,
-                           min(GET_LE_U_2(data), ND_BYTES_BETWEEN(maxbuf, data + 2)));
+                           ND_MIN(GET_LE_U_2(data), ND_BYTES_BETWEEN(maxbuf, data + 2)));
     }
     return;
 trunc:
@@ -509,7 +509,7 @@ print_lockingandx(netdissect_options *ndo,
 	f1 = "Com2=[w]\nOff2=[u]\n";
     }
 
-    maxwords = min(words + 1 + wct * 2, maxbuf);
+    maxwords = ND_MIN(words + 1 + wct * 2, maxbuf);
     if (wct)
 	smb_fdata(ndo, words + 1, f1, maxwords, unicodestr);
 
@@ -518,11 +518,11 @@ print_lockingandx(netdissect_options *ndo,
     ND_PRINT("smb_bcc=%u\n", bcc);
     if (bcc > 0) {
 	if (f2)
-	    smb_fdata(ndo, data + 2, f2, min(data + 2 + GET_LE_U_2(data),
+	    smb_fdata(ndo, data + 2, f2, ND_MIN(data + 2 + GET_LE_U_2(data),
                                              maxbuf), unicodestr);
 	else
 	    smb_data_print(ndo, data + 2,
-                           min(GET_LE_U_2(data), ND_BYTES_BETWEEN(maxbuf, data + 2)));
+                           ND_MIN(GET_LE_U_2(data), ND_BYTES_BETWEEN(maxbuf, data + 2)));
     }
     return;
 trunc:
@@ -864,7 +864,7 @@ print_smb(netdissect_options *ndo,
 	ND_TCHECK_1(words);
 	wct = GET_U_1(words);
 	data = words + 1 + wct * 2;
-	maxwords = min(data, maxbuf);
+	maxwords = ND_MIN(data, maxbuf);
 
 	if (request) {
 	    f1 = fn->descript.req_f1;
@@ -902,7 +902,7 @@ print_smb(netdissect_options *ndo,
 	    } else {
 		if (bcc > 0) {
 		    ND_PRINT("smb_buf[]=\n");
-		    smb_data_print(ndo, data + 2, min(bcc, ND_BYTES_BETWEEN(maxbuf, data + 2)));
+		    smb_data_print(ndo, data + 2, ND_MIN(bcc, ND_BYTES_BETWEEN(maxbuf, data + 2)));
 		}
 	    }
 	}
@@ -1237,7 +1237,7 @@ nbt_udp137_print(netdissect_options *ndo,
 		} else {
 		    if (p >= maxbuf)
 		        goto out;
-		    smb_data_print(ndo, p, min(rdlen, length - ND_BYTES_BETWEEN(p, data)));
+		    smb_data_print(ndo, p, ND_MIN(rdlen, length - ND_BYTES_BETWEEN(p, data)));
 		    p += rdlen;
 		}
 	    }

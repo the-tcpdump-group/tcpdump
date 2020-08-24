@@ -320,7 +320,7 @@ smb_data_print(netdissect_options *ndo, const u_char *buf, u_int len)
 	while (n--)
 	    ND_PRINT("   ");
 
-	n = min(8, i % 16);
+	n = ND_MIN(8, i % 16);
 	print_asc(ndo, buf + i - (i % 16), n);
 	ND_PRINT(" ");
 	n = (i % 16) - n;

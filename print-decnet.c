@@ -530,7 +530,7 @@ decnet_print(netdissect_options *ndo,
 
 	if (mflags & RMF_FVER) {
 		ND_PRINT("future-version-decnet");
-		ND_DEFAULTPRINT(ap, min(length, caplen));
+		ND_DEFAULTPRINT(ap, ND_MIN(length, caplen));
 		return;
 	}
 
@@ -566,7 +566,7 @@ decnet_print(netdissect_options *ndo,
 	    break;
 	default:
 	    ND_PRINT("unknown message flags under mask");
-	    ND_DEFAULTPRINT((const u_char *)ap, min(length, caplen));
+	    ND_DEFAULTPRINT((const u_char *)ap, ND_MIN(length, caplen));
 	    return;
 	}
 
@@ -711,7 +711,7 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 
 	default:
 	    ND_PRINT("unknown control message");
-	    ND_DEFAULTPRINT((const u_char *)rhp, min(length, caplen));
+	    ND_DEFAULTPRINT((const u_char *)rhp, ND_MIN(length, caplen));
 	    ret = 1;
 	    break;
 	}
