@@ -6,8 +6,8 @@
 	  Operator-Name Attribute (126), length: 17, Value: [E212] namespace E212
 	  Operator-Name Attribute (126), length: 16, Value: [ICC] namespace ICC
 	  Operator-Name Attribute (126), length: 20, Value: [unknown namespace 52] namespace INVALID
-	  Location-Information Attribute (127), length: 25, Value: index 1, code Civic, entity User, sighting time 19088743.537777777 (1900-08-09T22:25:43Z), time to live 19088743.537777777 (1900-08-09T22:25:43Z), method "GPS"
+	  Location-Information Attribute (127), length: 25, Value: index 1, code Civic, entity User, sighting time 3803408743.537777777 (2020-07-10T22:25:43Z), time to live 3803451943.537777777 (2020-07-11T10:25:43Z), method "GPS"
 	  Location-Data Attribute (128), length: 15, Value: index 1, location
 	    0x0000:  6d79 206c 6f63 6174 696f 6e              my.location
-	  Basic-Location-Policy-Rules Attribute (129), length: 17, Value: flags [none], retention expires 19088743.537777777 (1900-08-09T22:25:43Z), note well "test1"
-	  Basic-Location-Policy-Rules Attribute (129), length: 17, Value: flags [Retransmission Allowed], retention expires 19088743.537777777 (1900-08-09T22:25:43Z), note well "test2"
+	  Basic-Location-Policy-Rules Attribute (129), length: 17, Value: flags [none], retention expires 3803581543.537777777 (2020-07-12T22:25:43Z), note well "test1"
+	  Basic-Location-Policy-Rules Attribute (129), length: 17, Value: flags [Retransmission Allowed], retention expires 3803581543.537777777 (2020-07-12T22:25:43Z), note well "test2"
