@@ -96,6 +96,7 @@
 #include "addrtoname.h"
 #include "extract.h"
 #include "oui.h"
+#include "ntp.h"
 
 
 #define TAM_SIZE(x) (sizeof(x)/sizeof(x[0]) )
@@ -509,6 +510,26 @@ static const struct tok location_information_code_vector[] = {
 static const struct tok location_information_entity_vector[] = {
                                  { LOCATION_INFORMATION_ENTITY_USER,   "User"   },
                                  { LOCATION_INFORMATION_ENTITY_RADIUS, "RADIUS" },
+                                 { 0, NULL }
+                               };
+
+static const struct tok blpr_bm[] = {
+                                 { 0x0001, "MBZ-15" },
+                                 { 0x0002, "MBZ-14" },
+                                 { 0x0004, "MBZ-13" },
+                                 { 0x0008, "MBZ-12" },
+                                 { 0x0010, "MBZ-11" },
+                                 { 0x0020, "MBZ-10" },
+                                 { 0x0040, "MBZ-9" },
+                                 { 0x0080, "MBZ-8" },
+                                 { 0x0100, "MBZ-7" },
+                                 { 0x0200, "MBZ-6" },
+                                 { 0x0400, "MBZ-5" },
+                                 { 0x0800, "MBZ-4" },
+                                 { 0x1000, "MBZ-3" },
+                                 { 0x2000, "MBZ-2" },
+                                 { 0x4000, "MBZ-1" },
+                                 { 0x8000, "Retransmission Allowed" },
                                  { 0, NULL }
                                };
 
@@ -1041,7 +1062,6 @@ static void
 print_attr_operator_name(netdissect_options *ndo,
                     const u_char *data, u_int length, u_short attr_code _U_)
 {
-   u_int i;
    u_int namespace_value;
 
    ND_TCHECK_LEN(data, length);
@@ -1050,12 +1070,11 @@ print_attr_operator_name(netdissect_options *ndo,
       ND_PRINT("ERROR: length %u < 2", length);
       return;
    }
-   namespace_value = EXTRACT_U_1(data);
+   namespace_value = GET_U_1(data);
    data++;
-   ND_PRINT("[%s] ", tok2str(operator_name_vector, "Namespace %u not known", namespace_value));
+   ND_PRINT("[%s] ", tok2str(operator_name_vector, "unknown namespace %u", namespace_value));
 
-   for (i=0; i < length-1 && EXTRACT_U_1(data); i++, data++)
-      ND_PRINT("%c", ND_ASCII_ISPRINT(EXTRACT_U_1(data)) ? EXTRACT_U_1(data) : '.');
+   nd_printn(ndo, data, length - 1, NULL);
 
    return;
 
@@ -1067,10 +1086,8 @@ static void
 print_attr_location_information(netdissect_options *ndo,
                     const u_char *data, u_int length, u_short attr_code _U_)
 {
-   u_int i;
-   u_int16_t index;
-   u_int8_t code, entity;
-   u_int64_t sighting_time, time_to_live;
+   uint16_t index;
+   uint8_t code, entity;
 
    ND_TCHECK_LEN(data, length);
    if (length < 21)
@@ -1079,31 +1096,34 @@ print_attr_location_information(netdissect_options *ndo,
       return;
    }
 
-   index = EXTRACT_BE_U_2(data);
+   index = GET_BE_U_2(data);
    data += 2;
 
-   code = EXTRACT_U_1(data);
+   code = GET_U_1(data);
    data++;
 
-   entity = EXTRACT_U_1(data);
+   entity = GET_U_1(data);
    data++;
 
-   sighting_time = EXTRACT_BE_U_8(data);
-   data += 8;
-
-   time_to_live = EXTRACT_BE_U_8(data);
-   data += 8;
-
-   ND_PRINT("Index %u, code %s, entity %s, sighting time %llu, time to live %llu: ",
+   ND_PRINT("index %u, code %s, entity %s, ",
        index,
-       tok2str(location_information_code_vector, "Code %u not known", code),
-       tok2str(location_information_entity_vector, "Entity %u not known", entity),
-       sighting_time, // FIXME: NTP format, should share code from print-ntp.c?
-       time_to_live // FIXME: NTP format, should share code from print-ntp.c?
+       tok2str(location_information_code_vector, "Unknown (%u)", code),
+       tok2str(location_information_entity_vector, "Unknown (%u)", entity)
    );
 
-   for (i=0; i < length-20 && EXTRACT_U_1(data); i++, data++)
-      ND_PRINT("%c", ND_ASCII_ISPRINT(EXTRACT_U_1(data)) ? EXTRACT_U_1(data) : '.');
+   ND_PRINT("sighting time ");
+   p_ntp_time(ndo, (const struct l_fixedpt *)data);
+   ND_PRINT(", ");
+   data += 8;
+
+   ND_PRINT("time to live ");
+   p_ntp_time(ndo, (const struct l_fixedpt *)data);
+   ND_PRINT(", ");
+   data += 8;
+
+   ND_PRINT("method \"");
+   nd_printn(ndo, data, length - 20, NULL);
+   ND_PRINT("\"");
 
    return;
 
@@ -1115,8 +1135,7 @@ static void
 print_attr_location_data(netdissect_options *ndo,
                     const u_char *data, u_int length, u_short attr_code _U_)
 {
-   u_int i;
-   u_int16_t index;
+   uint16_t index;
 
    ND_TCHECK_LEN(data, length);
    if (length < 3)
@@ -1125,12 +1144,18 @@ print_attr_location_data(netdissect_options *ndo,
       return;
    }
 
-   index = EXTRACT_BE_U_2(data);
+   index = GET_BE_U_2(data);
    data += 2;
-   ND_PRINT("Index %u: ", index);
+   ND_PRINT("index %u, location", index);
 
-   for (i=0; i < length-2 && EXTRACT_U_1(data); i++, data++)
-      ND_PRINT("%c", ND_ASCII_ISPRINT(EXTRACT_U_1(data)) ? EXTRACT_U_1(data) : '.');
+   /* The Location field of the String field of the Location-Data attribute
+    * can have two completely different structures depending on the value of
+    * the Code field of a Location-Info attribute, which supposedly precedes
+    * the current attribute. Unfortunately, this choice of encoding makes it
+    * non-trivial to decode the Location field without preserving some state
+    * between the attributes.
+    */
+   hex_and_ascii_print(ndo, "\n\t    ", data, length - 2);
 
    return;
 
@@ -1142,9 +1167,7 @@ static void
 print_basic_location_policy_rules(netdissect_options *ndo,
                     const u_char *data, u_int length, u_short attr_code _U_)
 {
-   u_int i;
-   u_int16_t flags;
-   u_int64_t retention_expires;
+   uint16_t flags;
 
    ND_TCHECK_LEN(data, length);
    if (length < 10)
@@ -1153,19 +1176,19 @@ print_basic_location_policy_rules(netdissect_options *ndo,
       return;
    }
 
-   flags = EXTRACT_BE_U_2(data);
+   flags = GET_BE_U_2(data);
    data += 2;
+   ND_PRINT("flags [%s], ", bittok2str(blpr_bm, "none", flags));
 
-   retention_expires = EXTRACT_BE_U_8(data);
+   ND_PRINT("retention expires ");
+   p_ntp_time(ndo, (const struct l_fixedpt *)data);
    data += 8;
 
-   ND_PRINT("Flags: %s, retention expires %llu: ",
-       flags & 0x8000 ? "Retransmission Allowed" : "none",
-       retention_expires
-   );
-
-   for (i=0; i < length-10 && EXTRACT_U_1(data); i++, data++)
-      ND_PRINT("%c", ND_ASCII_ISPRINT(EXTRACT_U_1(data)) ? EXTRACT_U_1(data) : '.');
+   if (length > 10) {
+      ND_PRINT(", note well \"");
+      nd_printn(ndo, data, length - 10, NULL);
+      ND_PRINT("\"");
+   }
 
    return;
 
