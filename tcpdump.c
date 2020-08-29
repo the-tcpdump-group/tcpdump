@@ -2438,11 +2438,14 @@ DIAG_ON_CLANG(assign-enum)
 	(void)setsignal(SIGNAL_FLUSH_PCAP, flushpcap);
 #endif
 
-	if (ndo->ndo_vflag > 0 && WFileName && !print) {
+	if (ndo->ndo_vflag > 0 && WFileName && RFileName == NULL && !print) {
 		/*
 		 * When capturing to a file, if "--print" wasn't specified,
 		 *"-v" means tcpdump should, once per second,
 		 * "v"erbosely report the number of packets captured.
+		 * Except when reading from a file, because -r, -w and -v
+		 * together used to make a corner case, in which pcap_loop()
+		 * errored due to EINTR (see GH #155 for details).
 		 */
 #ifdef _WIN32
 		/*

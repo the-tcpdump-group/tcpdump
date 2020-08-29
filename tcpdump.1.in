@@ -20,7 +20,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "10 Aug 2020"
+.TH TCPDUMP 1  "29 Aug 2020"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -808,6 +808,8 @@ IP and ICMP header checksum.
 .IP
 When writing to a file with the
 .B \-w
+option and at the same time not reading from a file with the
+.B \-r
 option, report, once per second, the number of packets captured.
 .TP
 .B \-vv
