@@ -403,7 +403,7 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 		(ndo->ndo_if_printer)(ndo, h, sp);
 	} else {
 		/* A printer quit because the packet was truncated; report it */
-		ND_PRINT(" [|%s]", ndo->ndo_protocol);
+		nd_print_trunc(ndo);
 	}
 	hdrlen = ndo->ndo_ll_hdr_len;
 
