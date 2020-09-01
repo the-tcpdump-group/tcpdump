@@ -111,6 +111,7 @@
 
 
 /* Radius packet codes */
+/* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-27 */
 #define RADCMD_ACCESS_REQ   1 /* Access-Request      */
 #define RADCMD_ACCESS_ACC   2 /* Access-Accept       */
 #define RADCMD_ACCESS_REJ   3 /* Access-Reject       */
@@ -231,6 +232,7 @@ struct radius_attr { nd_uint8_t type; /* Attribute type   */
 
 
 /* Service-Type Attribute standard values */
+/* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-4 */
 static const char *serv_type[]={ NULL,
                                 "Login",
                                 "Framed",
@@ -241,11 +243,22 @@ static const char *serv_type[]={ NULL,
                                 "NAS Prompt",
                                 "Authenticate Only",
                                 "Callback NAS Prompt",
+                                /* ^ [0, 9] ^ */
                                 "Call Check",
                                 "Callback Administrative",
+                                "Voice",
+                                "Fax",
+                                "Modem Relay",
+                                "IAPP-Register",
+                                "IAPP-AP-Check",
+                                "Authorize Only",
+                                "Framed-Management",
+                                "Additional-Authorization",
+                                /* ^ [10, 19] ^ */
                                };
 
 /* Framed-Protocol Attribute standard values */
+/* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-5 */
 static const char *frm_proto[]={ NULL,
                                  "PPP",
                                  "SLIP",
@@ -253,9 +266,11 @@ static const char *frm_proto[]={ NULL,
                                  "Gandalf proprietary",
                                  "Xylogics IPX/SLIP",
                                  "X.75 Synchronous",
+                                 "GPRS PDP Context",
                                };
 
 /* Framed-Routing Attribute standard values */
+/* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-6 */
 static const char *frm_routing[]={ "None",
                                    "Send",
                                    "Listen",
@@ -263,6 +278,7 @@ static const char *frm_routing[]={ "None",
                                  };
 
 /* Framed-Compression Attribute standard values */
+/* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-7 */
 static const char *frm_comp[]={ "None",
                                 "VJ TCP/IP",
                                 "IPX",
@@ -270,6 +286,7 @@ static const char *frm_comp[]={ "None",
                               };
 
 /* Login-Service Attribute standard values */
+/* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-8 */
 static const char *login_serv[]={ "Telnet",
                                   "Rlogin",
                                   "TCP Clear",
@@ -283,6 +300,7 @@ static const char *login_serv[]={ "Telnet",
 
 
 /* Termination-Action Attribute standard values */
+/* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-9 */
 static const char *term_action[]={ "Default",
                                    "RADIUS-Request",
                                  };
@@ -294,6 +312,7 @@ static const char *ingress_filters[]={ NULL,
                                      };
 
 /* NAS-Port-Type Attribute standard values */
+/* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-13 */
 static const char *nas_port_type[]={ "Async",
                                      "Sync",
                                      "ISDN Sync",
@@ -304,6 +323,7 @@ static const char *nas_port_type[]={ "Async",
                                      "HDLC Clear Channel",
                                      "X.25",
                                      "X.75",
+                                     /* ^ [0, 9] ^ */
                                      "G.3 Fax",
                                      "SDSL",
                                      "ADSL-CAP",
@@ -314,9 +334,37 @@ static const char *nas_port_type[]={ "Async",
                                      "Cable",
                                      "Wireless - Other",
                                      "Wireless - IEEE 802.11",
+                                     /* ^ [10, 19] ^ */
+                                     "Token-Ring",
+                                     "FDDI",
+                                     "Wireless - CDMA200",
+                                     "Wireless - UMTS",
+                                     "Wireless - 1X-EV",
+                                     "IAPP",
+                                     "FTTP",
+                                     "Wireless - IEEE 802.16",
+                                     "Wireless - IEEE 802.20",
+                                     "Wireless - IEEE 802.22",
+                                     /* ^ [20, 29] ^ */
+                                     "PPPoA",
+                                     "PPPoEoA",
+                                     "PPPoEoE",
+                                     "PPPoEoVLAN",
+                                     "PPPoEoQinQ",
+                                     "xPON",
+                                     "Wireless - XGP",
+                                     "WiMAX Pre-Release 8 IWK Function",
+                                     "WIMAX-WIFI-IWK",
+                                     "WIMAX-SFF",
+                                     /* ^ [30, 39] ^ */
+                                     "WIMAX-HA-LMA",
+                                     "WIMAX-DHCP",
+                                     "WIMAX-LBS",
+                                     "WIMAX-WVS",
                                    };
 
 /* Acct-Status-Type Accounting Attribute standard values */
+/* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-10 */
 static const char *acct_status[]={ NULL,
                                    "Start",
                                    "Stop",
@@ -327,6 +375,7 @@ static const char *acct_status[]={ NULL,
                                    "Accounting-On",
                                    "Accounting-Off",
                                    "Tunnel-Start",
+                                     /* ^ [0, 9] ^ */
                                    "Tunnel-Stop",
                                    "Tunnel-Reject",
                                    "Tunnel-Link-Start",
@@ -336,13 +385,16 @@ static const char *acct_status[]={ NULL,
                                  };
 
 /* Acct-Authentic Accounting Attribute standard values */
+/* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-11 */
 static const char *acct_auth[]={ NULL,
                                  "RADIUS",
                                  "Local",
                                  "Remote",
+                                 "Diameter",
                                };
 
 /* Acct-Terminate-Cause Accounting Attribute standard values */
+/* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-12 */
 static const char *acct_term[]={ NULL,
                                  "User Request",
                                  "Lost Carrier",
@@ -353,6 +405,7 @@ static const char *acct_term[]={ NULL,
                                  "Admin Reboot",
                                  "Port Error",
                                  "NAS Error",
+                                 /* ^ [0, 9] ^ */
                                  "NAS Request",
                                  "NAS Reboot",
                                  "Port Unneeded",
@@ -362,9 +415,16 @@ static const char *acct_term[]={ NULL,
                                  "Callback",
                                  "User Error",
                                  "Host Request",
+                                 "Supplicant Restart",
+                                 /* ^ [10, 19] ^ */
+                                 "Reauthentication Failure",
+                                 "Port Reinitialized",
+                                 "Port Administratively Disabled",
+                                 "Lost Power",
                                };
 
 /* Tunnel-Type Attribute standard values */
+/* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-14 */
 static const char *tunnel_type[]={ NULL,
                                    "PPTP",
                                    "L2F",
@@ -375,6 +435,7 @@ static const char *tunnel_type[]={ NULL,
                                    "IP-IP",
                                    "MIN-IP-IP",
                                    "ESP",
+                                   /* ^ [0, 9] ^ */
                                    "GRE",
                                    "DVS",
                                    "IP-in-IP Tunneling",
@@ -382,6 +443,7 @@ static const char *tunnel_type[]={ NULL,
                                  };
 
 /* Tunnel-Medium-Type Attribute standard values */
+/* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-15 */
 static const char *tunnel_medium[]={ NULL,
                                      "IPv4",
                                      "IPv6",
@@ -392,6 +454,7 @@ static const char *tunnel_medium[]={ NULL,
                                      "E.163",
                                      "E.164",
                                      "F.69",
+                                     /* ^ [0, 9] ^ */
                                      "X.121",
                                      "IPX",
                                      "Appletalk",
@@ -401,6 +464,7 @@ static const char *tunnel_medium[]={ NULL,
                                    };
 
 /* ARAP-Zone-Access Attribute standard values */
+/* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-16 */
 static const char *arap_zone[]={ NULL,
                                  "Only access to dfl zone",
                                  "Use zone filter inc.",
@@ -408,11 +472,13 @@ static const char *arap_zone[]={ NULL,
                                  "Use zone filter exc.",
                                };
 
+/* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-17 */
 static const char *prompt[]={ "No Echo",
                               "Echo",
                             };
 
 /* Error-Cause standard values */
+/* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-18 */
 #define ERROR_CAUSE_RESIDUAL_CONTEXT_REMOVED 201
 #define ERROR_CAUSE_INVALID_EAP_PACKET 202
 #define ERROR_CAUSE_UNSUPPORTED_ATTRIBUTE 401
@@ -485,6 +551,7 @@ static const struct mip6_feature_vector {
                                  { INTER_MAG_ROUTING_SUPPORTED, "INTER_MAG_ROUTING_SUPPORTED" },
                                };
 
+/* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-19 */
 #define OPERATOR_NAME_TADIG 0x30
 #define OPERATOR_NAME_REALM 0x31
 #define OPERATOR_NAME_E212  0x32
@@ -497,6 +564,7 @@ static const struct tok operator_name_vector[] = {
                                  { 0, NULL }
                                };
 
+/* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-20 */
 #define LOCATION_INFORMATION_CODE_CIVIC      0
 #define LOCATION_INFORMATION_CODE_GEOSPATIAL 1
 static const struct tok location_information_code_vector[] = {
@@ -505,6 +573,7 @@ static const struct tok location_information_code_vector[] = {
                                  { 0, NULL }
                                };
 
+/* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-21 */
 #define LOCATION_INFORMATION_ENTITY_USER   0
 #define LOCATION_INFORMATION_ENTITY_RADIUS 1
 static const struct tok location_information_entity_vector[] = {
@@ -513,6 +582,7 @@ static const struct tok location_information_entity_vector[] = {
                                  { 0, NULL }
                                };
 
+/* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-22 */
 static const struct tok blpr_bm[] = {
                                  { 0x0001, "MBZ-15" },
                                  { 0x0002, "MBZ-14" },
@@ -533,6 +603,7 @@ static const struct tok blpr_bm[] = {
                                  { 0, NULL }
                                };
 
+/* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-2 */
 static const struct attrtype {
                   const char *name;      /* Attribute name                 */
                   const char **subtypes; /* Standard Values (if any)       */
@@ -551,6 +622,7 @@ static const struct attrtype {
      { "Framed-Protocol",                 frm_proto, TAM_SIZE(frm_proto)-1, 1, print_attr_num },
      { "Framed-IP-Address",               NULL, 0, 0, print_attr_address },
      { "Framed-IP-Netmask",               NULL, 0, 0, print_attr_address },
+     /* ^ [0, 9] ^ */
      { "Framed-Routing",                  frm_routing, TAM_SIZE(frm_routing), 0, print_attr_num },
      { "Filter-Id",                       NULL, 0, 0, print_attr_string  },
      { "Framed-MTU",                      NULL, 0, 0, print_attr_num     },
@@ -561,6 +633,7 @@ static const struct attrtype {
      { "Unassigned",                      NULL, 0, 0, NULL }, /*17*/
      { "Reply-Message",                   NULL, 0, 0, print_attr_string },
      { "Callback-Number",                 NULL, 0, 0, print_attr_string },
+     /* ^ [10, 19] ^ */
      { "Callback-Id",                     NULL, 0, 0, print_attr_string },
      { "Unassigned",                      NULL, 0, 0, NULL }, /*21*/
      { "Framed-Route",                    NULL, 0, 0, print_attr_string },
@@ -571,6 +644,7 @@ static const struct attrtype {
      { "Session-Timeout",                 NULL, 0, 0, print_attr_num    },
      { "Idle-Timeout",                    NULL, 0, 0, print_attr_num    },
      { "Termination-Action",              term_action, TAM_SIZE(term_action), 0, print_attr_num },
+     /* ^ [20, 29] ^ */
      { "Called-Station-Id",               NULL, 0, 0, print_attr_string },
      { "Calling-Station-Id",              NULL, 0, 0, print_attr_string },
      { "NAS-Identifier",                  NULL, 0, 0, print_attr_string },
@@ -581,6 +655,7 @@ static const struct attrtype {
      { "Framed-AppleTalk-Link",           NULL, 0, 0, print_attr_num    },
      { "Framed-AppleTalk-Network",        NULL, 0, 0, print_attr_num    },
      { "Framed-AppleTalk-Zone",           NULL, 0, 0, print_attr_string },
+     /* ^ [30, 39] ^ */
      { "Acct-Status-Type",                acct_status, TAM_SIZE(acct_status)-1, 1, print_attr_num },
      { "Acct-Delay-Time",                 NULL, 0, 0, print_attr_num    },
      { "Acct-Input-Octets",               NULL, 0, 0, print_attr_num    },
@@ -591,6 +666,7 @@ static const struct attrtype {
      { "Acct-Input-Packets",              NULL, 0, 0, print_attr_num },
      { "Acct-Output-Packets",             NULL, 0, 0, print_attr_num },
      { "Acct-Terminate-Cause",            acct_term, TAM_SIZE(acct_term)-1, 1, print_attr_num },
+     /* ^ [40, 49] ^ */
      { "Acct-Multi-Session-Id",           NULL, 0, 0, print_attr_string },
      { "Acct-Link-Count",                 NULL, 0, 0, print_attr_num },
      { "Acct-Input-Gigawords",            NULL, 0, 0, print_attr_num },
@@ -601,6 +677,7 @@ static const struct attrtype {
      { "Ingress-Filters",                 ingress_filters, TAM_SIZE(ingress_filters)-1, 1, print_attr_num },
      { "Egress-VLAN-Name",                NULL, 0, 0, print_attr_string },
      { "User-Priority-Table",             NULL, 0, 0, NULL },
+     /* ^ [50, 59] ^ */
      { "CHAP-Challenge",                  NULL, 0, 0, print_attr_string },
      { "NAS-Port-Type",                   nas_port_type, TAM_SIZE(nas_port_type), 0, print_attr_num },
      { "Port-Limit",                      NULL, 0, 0, print_attr_num },
@@ -611,6 +688,7 @@ static const struct attrtype {
      { "Tunnel-Server-Endpoint",          NULL, 0, 0, print_attr_string },
      { "Acct-Tunnel-Connection",          NULL, 0, 0, print_attr_string },
      { "Tunnel-Password",                 NULL, 0, 0, print_attr_string  },
+     /* ^ [60, 69] ^ */
      { "ARAP-Password",                   NULL, 0, 0, print_attr_strange },
      { "ARAP-Features",                   NULL, 0, 0, print_attr_strange },
      { "ARAP-Zone-Access",                arap_zone, TAM_SIZE(arap_zone)-1, 1, print_attr_num }, /*72*/
@@ -621,6 +699,7 @@ static const struct attrtype {
      { "Connect-Info",                    NULL, 0, 0, print_attr_string   },
      { "Configuration-Token",             NULL, 0, 0, print_attr_string   },
      { "EAP-Message",                     NULL, 0, 0, print_attr_string   },
+     /* ^ [70, 79] ^ */
      { "Message-Authenticator",           NULL, 0, 0, print_attr_string }, /*80*/
      { "Tunnel-Private-Group-ID",         NULL, 0, 0, print_attr_string },
      { "Tunnel-Assignment-ID",            NULL, 0, 0, print_attr_string },
@@ -631,6 +710,7 @@ static const struct attrtype {
      { "NAS-Port-Id",                     NULL, 0, 0, print_attr_string },
      { "Framed-Pool",                     NULL, 0, 0, print_attr_string },
      { "CUI",                             NULL, 0, 0, print_attr_string },
+     /* ^ [80, 89] ^ */
      { "Tunnel-Client-Auth-ID",           NULL, 0, 0, print_attr_string },
      { "Tunnel-Server-Auth-ID",           NULL, 0, 0, print_attr_string },
      { "NAS-Filter-Rule",                 NULL, 0, 0, print_attr_string },
@@ -641,6 +721,7 @@ static const struct attrtype {
      { "Framed-IPv6-Prefix",              NULL, 0, 0, print_attr_netmask6 },
      { "Login-IPv6-Host",                 NULL, 0, 0, print_attr_address6 },
      { "Framed-IPv6-Route",               NULL, 0, 0, print_attr_string },
+     /* ^ [90, 99] ^ */
      { "Framed-IPv6-Pool",                NULL, 0, 0, print_attr_string },
      { "Error-Cause",                     NULL, 0, 0, print_attr_strange },
      { "EAP-Key-Name",                    NULL, 0, 0, NULL },
@@ -651,6 +732,7 @@ static const struct attrtype {
      { "Digest-Nextnonce",                NULL, 0, 0, print_attr_string },
      { "Digest-Method",                   NULL, 0, 0, print_attr_string },
      { "Digest-URI",                      NULL, 0, 0, print_attr_string },
+     /* ^ [100, 109] ^ */
      { "Digest-Qop",                      NULL, 0, 0, print_attr_string },
      { "Digest-Algorithm",                NULL, 0, 0, print_attr_string },
      { "Digest-Entity-Body-Hash",         NULL, 0, 0, print_attr_string },
@@ -661,6 +743,7 @@ static const struct attrtype {
      { "Digest-Auth-Param",               NULL, 0, 0, print_attr_string },
      { "Digest-AKA-Auts",                 NULL, 0, 0, print_attr_string },
      { "Digest-Domain",                   NULL, 0, 0, print_attr_string },
+     /* ^ [110, 119] ^ */
      { "Digest-Stale",                    NULL, 0, 0, print_attr_string },
      { "Digest-HA1",                      NULL, 0, 0, print_attr_string },
      { "SIP-AOR",                         NULL, 0, 0, print_attr_string },
@@ -671,6 +754,7 @@ static const struct attrtype {
      { "Location-Information",            NULL, 0, 0, print_attr_location_information },
      { "Location-Data",                   NULL, 0, 0, print_attr_location_data },
      { "Basic-Location-Policy-Rules",     NULL, 0, 0, print_basic_location_policy_rules }
+     /* ^ [120, 129] ^ */
   };
 
 
