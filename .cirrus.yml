@@ -6,15 +6,13 @@ env:
 task:
   freebsd_instance:
     image_family: $IMAGE_FAMILY
-  allow_failures: $IMAGE_FAMILY == "freebsd-13-0-snap" # currently broken
   env:
     matrix:
-      - IMAGE_FAMILY: freebsd-11-3-snap
-      - IMAGE_FAMILY: freebsd-12-1-snap
+      - IMAGE_FAMILY: freebsd-11-4
+      - IMAGE_FAMILY: freebsd-12-1
       - IMAGE_FAMILY: freebsd-13-0-snap
   script:
     - freebsd-version
-    - pkg update -f
     - pkg install -qy git autoconf
     - (cd .. && git clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure --prefix=/tmp && make -s)
     - touch .devel
