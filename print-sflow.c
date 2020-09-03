@@ -65,6 +65,16 @@ struct sflow_datagram_t {
     nd_uint32_t	samples;
 };
 
+struct sflow_v6_datagram_t {
+    nd_uint32_t version;
+    nd_uint32_t ip_version;
+    nd_ipv6     agent;
+    nd_uint32_t	agent_id;
+    nd_uint32_t	seqnum;
+    nd_uint32_t	uptime;
+    nd_uint32_t	samples;
+};
+
 struct sflow_sample_header {
     nd_uint32_t	format;
     nd_uint32_t	len;
@@ -806,18 +816,24 @@ sflow_print(netdissect_options *ndo,
             const u_char *pptr, u_int len)
 {
     const struct sflow_datagram_t *sflow_datagram;
+    const struct sflow_v6_datagram_t *sflow_v6_datagram;
     const struct sflow_sample_header *sflow_sample;
 
     const u_char *tptr;
     u_int tlen;
     uint32_t sflow_sample_type, sflow_sample_len;
     uint32_t nsamples;
+    uint32_t ip_version;
 
     ndo->ndo_protocol = "sflow";
     tptr = pptr;
     tlen = len;
     sflow_datagram = (const struct sflow_datagram_t *)pptr;
-    if (len < sizeof(struct sflow_datagram_t)) {
+    sflow_v6_datagram = (const struct sflow_v6_datagram_t *)pptr;
+    ip_version = GET_BE_U_4(sflow_datagram->ip_version);
+
+    if ((len < sizeof(struct sflow_datagram_t) && (ip_version == 1)) ||
+        (len < sizeof(struct sflow_v6_datagram_t) && (ip_version == 2))) {
         ND_PRINT("sFlowv%u", GET_BE_U_4(sflow_datagram->version));
         ND_PRINT(" [length %u < %zu]", len, sizeof(struct sflow_datagram_t));
         nd_print_invalid(ndo);
@@ -837,29 +853,47 @@ sflow_print(netdissect_options *ndo,
     if (ndo->ndo_vflag < 1) {
         ND_PRINT("sFlowv%u, %s agent %s, agent-id %u, length %u",
                GET_BE_U_4(sflow_datagram->version),
-               GET_BE_U_4(sflow_datagram->ip_version) == 1 ? "IPv4" : "IPv6",
-               GET_IPADDR_STRING(sflow_datagram->agent),
-               GET_BE_U_4(sflow_datagram->agent_id),
+               ip_version == 1 ? "IPv4" : "IPv6",
+               ip_version == 1 ? GET_IPADDR_STRING(sflow_datagram->agent) :
+                                 GET_IP6ADDR_STRING( sflow_v6_datagram->agent),
+               ip_version == 1 ? GET_BE_U_4(sflow_datagram->agent_id) :
+                                 GET_BE_U_4(sflow_v6_datagram->agent_id),
                len);
         return;
     }
 
     /* ok they seem to want to know everything - lets fully decode it */
-    nsamples=GET_BE_U_4(sflow_datagram->samples);
-    ND_PRINT("sFlowv%u, %s agent %s, agent-id %u, seqnum %u, uptime %u, samples %u, length %u",
-           GET_BE_U_4(sflow_datagram->version),
-           GET_BE_U_4(sflow_datagram->ip_version) == 1 ? "IPv4" : "IPv6",
-           GET_IPADDR_STRING(sflow_datagram->agent),
-           GET_BE_U_4(sflow_datagram->agent_id),
-           GET_BE_U_4(sflow_datagram->seqnum),
-           GET_BE_U_4(sflow_datagram->uptime),
-           nsamples,
-           len);
+    if (ip_version == 1) {
+        nsamples=GET_BE_U_4(sflow_datagram->samples);
+        ND_PRINT("sFlowv%u, %s agent %s, agent-id %u, seqnum %u, uptime %u, samples %u, length %u",
+               GET_BE_U_4(sflow_datagram->version),
+               "IPv4",
+               GET_IPADDR_STRING(sflow_datagram->agent),
+               GET_BE_U_4(sflow_datagram->agent_id),
+               GET_BE_U_4(sflow_datagram->seqnum),
+               GET_BE_U_4(sflow_datagram->uptime),
+               nsamples,
+               len);
 
-    /* skip Common header */
-    tptr += sizeof(struct sflow_datagram_t);
-    tlen -= sizeof(struct sflow_datagram_t);
+        /* skip Common header */
+        tptr += sizeof(struct sflow_datagram_t);
+        tlen -= sizeof(struct sflow_datagram_t);
+    } else {
+        nsamples=GET_BE_U_4(sflow_v6_datagram->samples);
+        ND_PRINT("sFlowv%u, %s agent %s, agent-id %u, seqnum %u, uptime %u, samples %u, length %u",
+               GET_BE_U_4(sflow_v6_datagram->version),
+               "IPv6",
+               GET_IP6ADDR_STRING(sflow_v6_datagram->agent),
+               GET_BE_U_4(sflow_v6_datagram->agent_id),
+               GET_BE_U_4(sflow_v6_datagram->seqnum),
+               GET_BE_U_4(sflow_v6_datagram->uptime),
+               nsamples,
+               len);
 
+        /* skip Common header */
+        tptr += sizeof(struct sflow_v6_datagram_t);
+        tlen -= sizeof(struct sflow_v6_datagram_t);
+    }
     while (nsamples > 0 && tlen > 0) {
         sflow_sample = (const struct sflow_sample_header *)tptr;
 
