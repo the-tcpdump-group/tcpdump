@@ -318,7 +318,6 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 	ip = (const struct ip *)bp2;
 	str = buf;
 
-	ND_TCHECK_1(dp->icmp_code);
 	icmp_type = GET_U_1(dp->icmp_type);
 	icmp_code = GET_U_1(dp->icmp_code);
 	switch (icmp_type) {
@@ -362,7 +361,6 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			oip = &dp->icmp_ip;
 			hlen = IP_HL(oip) * 4;
 			ouh = (const struct udphdr *)(((const u_char *)oip) + hlen);
-			ND_TCHECK_2(ouh->uh_dport);
 			dport = GET_BE_U_2(ouh->uh_dport);
 			ip_proto = GET_U_1(oip->ip_p);
 			switch (ip_proto) {
@@ -607,7 +605,6 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		break;
 
 	case ICMP_MASKREPLY:
-		ND_TCHECK_4(dp->icmp_mask);
 		(void)snprintf(buf, sizeof(buf), "address mask is 0x%08x",
 		    GET_BE_U_4(dp->icmp_mask));
 		break;
@@ -664,7 +661,6 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		ND_PRINT("\n\t");
 		ip = (const struct ip *)bp;
                 snapend_save = ndo->ndo_snapend;
-		ND_TCHECK_2(ip->ip_len);
 		ip_print(ndo, bp, GET_BE_U_2(ip->ip_len));
                 ndo->ndo_snapend = snapend_save;
 	}
@@ -747,7 +743,6 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                 case 1:
                     switch(obj_ctype) {
                     case 1:
-                        ND_TCHECK_4(obj_tptr);
                         raw_label = GET_BE_U_4(obj_tptr);
                         ND_PRINT("\n\t    label %u, exp %u", MPLS_LABEL(raw_label), MPLS_EXP(raw_label));
                         if (MPLS_STACK(raw_label))

@@ -180,7 +180,6 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
 
                 if (length >= SLARP_MAX_LEN) { /* uptime-stamp is optional */
                         cp += SLARP_MIN_LEN;
-                        ND_TCHECK_4(cp);
                         sec = GET_BE_U_4(cp) / 1000;
                         min = sec / 60; sec -= min * 60;
                         hrs = min / 60; min -= hrs * 60;

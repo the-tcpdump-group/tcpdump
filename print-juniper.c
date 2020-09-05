@@ -816,7 +816,6 @@ juniper_pppoe_atm_if_print(netdissect_options *ndo,
 
         p+=l2info.header_len;
 
-        ND_TCHECK_2(p);
         extracted_ethertype = GET_BE_U_2(p);
         /* this DLT contains nothing but raw PPPoE frames,
          * prepended with a type field*/
@@ -828,11 +827,6 @@ juniper_pppoe_atm_if_print(netdissect_options *ndo,
             /* ether_type not known, probably it wasn't one */
             ND_PRINT("unknown ethertype 0x%04x", extracted_ethertype);
 
-        ndo->ndo_ll_hdr_len += l2info.header_len;
-        return;
-
-trunc:
-        nd_print_trunc(ndo);
         ndo->ndo_ll_hdr_len += l2info.header_len;
 }
 #endif
@@ -1050,7 +1044,6 @@ juniper_atm1_if_print(netdissect_options *ndo,
             return;
         }
 
-        ND_TCHECK_3(p);
         if (GET_BE_U_3(p) == 0xfefe03 || /* NLPID encaps ? */
             GET_BE_U_3(p) == 0xaaaa03) { /* SNAP encaps ? */
 
@@ -1073,11 +1066,6 @@ juniper_atm1_if_print(netdissect_options *ndo,
             return;
         }
 
-        ndo->ndo_ll_hdr_len += l2info.header_len;
-        return;
-
-trunc:
-        nd_print_trunc(ndo);
         ndo->ndo_ll_hdr_len += l2info.header_len;
 }
 #endif
@@ -1114,7 +1102,6 @@ juniper_atm2_if_print(netdissect_options *ndo,
             return;
         }
 
-        ND_TCHECK_3(p);
         if (GET_BE_U_3(p) == 0xfefe03 || /* NLPID encaps ? */
             GET_BE_U_3(p) == 0xaaaa03) { /* SNAP encaps ? */
 
@@ -1150,11 +1137,6 @@ juniper_atm2_if_print(netdissect_options *ndo,
             return;
         }
 
-        ndo->ndo_ll_hdr_len += l2info.header_len;
-        return;
-
-trunc:
-        nd_print_trunc(ndo);
         ndo->ndo_ll_hdr_len += l2info.header_len;
 }
 
@@ -1326,7 +1308,6 @@ juniper_parse_header(netdissect_options *ndo,
         tptr = p+jnx_header_len;
 
         /* ok to read extension length ? */
-        ND_TCHECK_2(tptr);
         jnx_ext_len = GET_BE_U_2(tptr);
         jnx_header_len += 2;
         tptr +=2;
@@ -1481,7 +1462,6 @@ juniper_parse_header(netdissect_options *ndo,
             if (ndo->ndo_eflag) ND_PRINT(": "); /* print demarc b/w L2/L3*/
 
 
-            ND_TCHECK_2(p + l2info->cookie_len);
             l2info->proto = GET_BE_U_2(p + l2info->cookie_len);
             break;
         }
@@ -1512,7 +1492,6 @@ juniper_parse_header(netdissect_options *ndo,
     case DLT_JUNIPER_MLFR:
         switch (l2info->cookie_type) {
         case LS_COOKIE_ID:
-            ND_TCHECK_2(p);
             l2info->bundle = l2info->cookie[1];
             l2info->proto = GET_BE_U_2(p);
             l2info->header_len += 2;
@@ -1537,7 +1516,6 @@ juniper_parse_header(netdissect_options *ndo,
     case DLT_JUNIPER_MFR:
         switch (l2info->cookie_type) {
         case LS_COOKIE_ID:
-            ND_TCHECK_2(p);
             l2info->bundle = l2info->cookie[1];
             l2info->proto = GET_BE_U_2(p);
             l2info->header_len += 2;

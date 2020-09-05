@@ -145,7 +145,6 @@ name_interpret(netdissect_options *ndo,
 
     if (in >= maxbuf)
 	return(-1);	/* name goes past the end of the buffer */
-    ND_TCHECK_1(in);
     len = GET_U_1(in) / 2;
     in++;
 
@@ -190,7 +189,6 @@ name_ptr(netdissect_options *ndo,
     p = buf + ofs;
     if (p >= maxbuf)
 	return(NULL);	/* name goes past the end of the buffer */
-    ND_TCHECK_1(p);
 
     c = GET_U_1(p);
 
@@ -244,14 +242,12 @@ name_len(netdissect_options *ndo,
 
     if (s >= maxbuf)
 	return(-1);	/* name goes past the end of the buffer */
-    ND_TCHECK_1(s);
     c = GET_U_1(s);
     if ((c & 0xC0) == 0xC0)
 	return(2);
     while (GET_U_1(s)) {
 	if (s >= maxbuf)
 	    return(-1);	/* name goes past the end of the buffer */
-	ND_TCHECK_1(s);
 	s += GET_U_1(s) + 1;
 	ND_TCHECK_1(s);
     }
@@ -296,7 +292,6 @@ smb_data_print(netdissect_options *ndo, const u_char *buf, u_int len)
 	return;
     ND_PRINT("[%03X] ", i);
     for (i = 0; i < len; /*nothing*/) {
-        ND_TCHECK_1(buf + i);
 	ND_PRINT("%02X ", GET_U_1(buf + i) & 0xff);
 	i++;
 	if (i%8 == 0)
@@ -328,10 +323,6 @@ smb_data_print(netdissect_options *ndo, const u_char *buf, u_int len)
 	    print_asc(ndo, buf + i - n, n);
 	ND_PRINT("\n");
     }
-    return;
-
-trunc:
-    nd_print_trunc(ndo);
 }
 
 
@@ -380,7 +371,6 @@ unistr(netdissect_options *ndo, char (*buf)[MAX_UNISTR_SIZE+1],
 	sp = s;
 	if (!use_unicode) {
 	    for (;;) {
-		ND_TCHECK_1(sp);
 		c = GET_U_1(sp);
 		sp++;
 		strsize++;
@@ -389,7 +379,6 @@ unistr(netdissect_options *ndo, char (*buf)[MAX_UNISTR_SIZE+1],
 	    }
 	} else {
 	    for (;;) {
-		ND_TCHECK_2(sp);
 		c = GET_LE_U_2(sp);
 		sp += 2;
 		strsize += 2;
@@ -400,7 +389,6 @@ unistr(netdissect_options *ndo, char (*buf)[MAX_UNISTR_SIZE+1],
     }
     if (!use_unicode) {
     	while (strsize != 0) {
-	    ND_TCHECK_1(s);
 	    c = GET_U_1(s);
 	    s++;
 	    strsize--;
@@ -432,7 +420,6 @@ unistr(netdissect_options *ndo, char (*buf)[MAX_UNISTR_SIZE+1],
 	}
     } else {
 	while (strsize > 1) {
-	    ND_TCHECK_2(s);
 	    c = GET_LE_U_2(s);
 	    s += 2;
 	    strsize -= 2;
@@ -488,14 +475,12 @@ smb_fdata1(netdissect_options *ndo,
     while (*fmt && buf<maxbuf) {
 	switch (*fmt) {
 	case 'a':
-	    ND_TCHECK_1(buf);
 	    write_bits(ndo, GET_U_1(buf), attrib_fmt);
 	    buf++;
 	    fmt++;
 	    break;
 
 	case 'A':
-	    ND_TCHECK_2(buf);
 	    write_bits(ndo, GET_LE_U_2(buf), attrib_fmt);
 	    buf += 2;
 	    fmt++;
@@ -516,7 +501,6 @@ smb_fdata1(netdissect_options *ndo,
 	    strncpy(bitfmt, fmt, l);
 	    bitfmt[l] = '\0';
 	    fmt = p + 1;
-	    ND_TCHECK_1(buf);
 	    write_bits(ndo, GET_U_1(buf), bitfmt);
 	    buf++;
 	    break;
@@ -539,7 +523,6 @@ smb_fdata1(netdissect_options *ndo,
 	case 'b':
 	  {
 	    unsigned int x;
-	    ND_TCHECK_1(buf);
 	    x = GET_U_1(buf);
 	    ND_PRINT("%u (0x%x)", x, x);
 	    buf += 1;
@@ -549,7 +532,6 @@ smb_fdata1(netdissect_options *ndo,
 	case 'd':
 	  {
 	    int x;
-	    ND_TCHECK_2(buf);
 	    x = reverse ? GET_BE_S_2(buf) :
 			  GET_LE_S_2(buf);
 	    ND_PRINT("%d (0x%x)", x, x);
@@ -560,7 +542,6 @@ smb_fdata1(netdissect_options *ndo,
 	case 'D':
 	  {
 	    int x;
-	    ND_TCHECK_4(buf);
 	    x = reverse ? GET_BE_S_4(buf) :
 			  GET_LE_S_4(buf);
 	    ND_PRINT("%d (0x%x)", x, x);
@@ -571,7 +552,6 @@ smb_fdata1(netdissect_options *ndo,
 	case 'L':
 	  {
 	    uint64_t x;
-	    ND_TCHECK_8(buf);
 	    x = reverse ? GET_BE_U_8(buf) :
 			  GET_LE_U_8(buf);
 	    ND_PRINT("%" PRIu64 " (0x%" PRIx64 ")", x, x);
@@ -582,7 +562,6 @@ smb_fdata1(netdissect_options *ndo,
 	case 'u':
 	  {
 	    unsigned int x;
-	    ND_TCHECK_2(buf);
 	    x = reverse ? GET_BE_U_2(buf) :
 			  GET_LE_U_2(buf);
 	    ND_PRINT("%u (0x%x)", x, x);
@@ -593,7 +572,6 @@ smb_fdata1(netdissect_options *ndo,
 	case 'U':
 	  {
 	    unsigned int x;
-	    ND_TCHECK_4(buf);
 	    x = reverse ? GET_BE_U_4(buf) :
 			  GET_LE_U_4(buf);
 	    ND_PRINT("%u (0x%x)", x, x);
@@ -620,7 +598,6 @@ smb_fdata1(netdissect_options *ndo,
 	case 'B':
 	  {
 	    unsigned int x;
-	    ND_TCHECK_1(buf);
 	    x = GET_U_1(buf);
 	    ND_PRINT("0x%X", x);
 	    buf += 1;
@@ -630,7 +607,6 @@ smb_fdata1(netdissect_options *ndo,
 	case 'w':
 	  {
 	    unsigned int x;
-	    ND_TCHECK_2(buf);
 	    x = reverse ? GET_BE_U_2(buf) :
 			  GET_LE_U_2(buf);
 	    ND_PRINT("0x%X", x);
@@ -641,7 +617,6 @@ smb_fdata1(netdissect_options *ndo,
 	case 'W':
 	  {
 	    unsigned int x;
-	    ND_TCHECK_4(buf);
 	    x = reverse ? GET_BE_U_4(buf) :
 			  GET_LE_U_4(buf);
 	    ND_PRINT("0x%X", x);
@@ -655,7 +630,6 @@ smb_fdata1(netdissect_options *ndo,
 	    switch (*fmt) {
 
 	    case 'b':
-		ND_TCHECK_1(buf);
 		stringlen = GET_U_1(buf);
 		stringlen_is_set = 1;
 		ND_PRINT("%u", stringlen);
@@ -664,7 +638,6 @@ smb_fdata1(netdissect_options *ndo,
 
 	    case 'd':
 	    case 'u':
-		ND_TCHECK_2(buf);
 		stringlen = reverse ? GET_BE_U_2(buf) :
 				      GET_LE_U_2(buf);
 		stringlen_is_set = 1;
@@ -674,7 +647,6 @@ smb_fdata1(netdissect_options *ndo,
 
 	    case 'D':
 	    case 'U':
-		ND_TCHECK_4(buf);
 		stringlen = reverse ? GET_BE_U_4(buf) :
 				      GET_LE_U_4(buf);
 		stringlen_is_set = 1;
@@ -699,7 +671,6 @@ smb_fdata1(netdissect_options *ndo,
 	case 'Z':
 	case 'Y':	/* like 'Z', but always ASCII */
 	  {
-	    ND_TCHECK_1(buf);
 	    if (GET_U_1(buf) != 4 && GET_U_1(buf) != 2) {
 		ND_PRINT("Error! ASCIIZ buffer of type %u", GET_U_1(buf));
 		return maxbuf;	/* give up */
@@ -783,7 +754,6 @@ smb_fdata1(netdissect_options *ndo,
 		    name_type_str(name_type));
 		break;
 	    case 2:
-		ND_TCHECK_1(buf + 15);
 		name_type = GET_U_1(buf + 15);
 		ND_PRINT("%-15.15s NameType=0x%02X (%s)", buf, name_type,
 		    name_type_str(name_type));
@@ -804,7 +774,6 @@ smb_fdata1(netdissect_options *ndo,
 
 	    switch (atoi(fmt + 1)) {
 	    case 1:
-		ND_TCHECK_4(buf);
 		x = GET_LE_U_4(buf);
 		if (x == 0 || x == 0xFFFFFFFF)
 		    t = 0;
@@ -813,7 +782,6 @@ smb_fdata1(netdissect_options *ndo,
 		buf += 4;
 		break;
 	    case 2:
-		ND_TCHECK_4(buf);
 		x = GET_LE_U_4(buf);
 		if (x == 0 || x == 0xFFFFFFFF)
 		    t = 0;

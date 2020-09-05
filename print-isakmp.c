@@ -914,11 +914,9 @@ ikev1_attrmap_print(netdissect_options *ndo,
 	u_int totlen;
 	uint32_t t, v;
 
-	ND_TCHECK_1(p);
 	if (GET_U_1(p) & 0x80)
 		totlen = 4;
 	else {
-		ND_TCHECK_2(p + 2);
 		totlen = 4 + GET_BE_U_2(p + 2);
 	}
 	if (ep2 < p + totlen) {
@@ -926,7 +924,6 @@ ikev1_attrmap_print(netdissect_options *ndo,
 		return ep2 + 1;
 	}
 
-	ND_TCHECK_2(p);
 	ND_PRINT("(");
 	t = GET_BE_U_2(p) & 0x7fff;
 	if (map && t < nmap && map[t].type)
@@ -935,7 +932,6 @@ ikev1_attrmap_print(netdissect_options *ndo,
 		ND_PRINT("type=#%u ", t);
 	if (GET_U_1(p) & 0x80) {
 		ND_PRINT("value=");
-		ND_TCHECK_2(p + 2);
 		v = GET_BE_U_2(p + 2);
 		if (map && t < nmap && v < map[t].nvalue && map[t].value[v])
 			ND_PRINT("%s", map[t].value[v]);
@@ -965,11 +961,9 @@ ikev1_attr_print(netdissect_options *ndo, const u_char *p, const u_char *ep2)
 	u_int totlen;
 	uint32_t t;
 
-	ND_TCHECK_1(p);
 	if (GET_U_1(p) & 0x80)
 		totlen = 4;
 	else {
-		ND_TCHECK_2(p + 2);
 		totlen = 4 + GET_BE_U_2(p + 2);
 	}
 	if (ep2 < p + totlen) {
@@ -977,7 +971,6 @@ ikev1_attr_print(netdissect_options *ndo, const u_char *p, const u_char *ep2)
 		return ep2 + 1;
 	}
 
-	ND_TCHECK_2(p);
 	ND_PRINT("(");
 	t = GET_BE_U_2(p) & 0x7fff;
 	ND_PRINT("type=#%u ", t);
@@ -1042,7 +1035,6 @@ ikev1_sa_print(netdissect_options *ndo, u_char tpay _U_,
 
 	np = (const u_char *)ext + sizeof(struct ikev1_pl_sa);
 	if (sit != 0x01) {
-		ND_TCHECK_4(ext + 1);
 		ident = GET_BE_U_4(ext + 1);
 		ND_PRINT(" ident=%u", ident);
 		np += sizeof(ident);
@@ -3111,7 +3103,6 @@ isakmp_rfc3948_print(netdissect_options *ndo,
 		     const u_char *bp2, int ver, int fragmented, u_int ttl_hl)
 {
 	ndo->ndo_protocol = "isakmp_rfc3948";
-	ND_TCHECK_1(bp);
 	if(length == 1 && GET_U_1(bp)==0xff) {
 		ND_PRINT("isakmp-nat-keep-alive");
 		return;

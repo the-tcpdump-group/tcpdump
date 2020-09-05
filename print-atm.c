@@ -353,14 +353,12 @@ sig_print(netdissect_options *ndo,
 {
 	uint32_t call_ref;
 
-	ND_TCHECK_1(p + PROTO_POS);
 	if (GET_U_1(p + PROTO_POS) == Q2931) {
 		/*
 		 * protocol:Q.2931 for User to Network Interface
 		 * (UNI 3.1) signalling
 		 */
 		ND_PRINT("Q.2931");
-		ND_TCHECK_1(p + MSG_TYPE_POS);
 		ND_PRINT(":%s ",
 		    tok2str(msgtype2str, "msgtype#%u", GET_U_1(p + MSG_TYPE_POS)));
 
@@ -376,10 +374,6 @@ sig_print(netdissect_options *ndo,
 		/* SSCOP with some unknown protocol atop it */
 		ND_PRINT("SSCOP, proto %u ", GET_U_1(p + PROTO_POS));
 	}
-	return;
-
-trunc:
-	nd_print_trunc(ndo);
 }
 
 /*
@@ -547,7 +541,6 @@ oam_print(netdissect_options *ndo,
     }
 
     /* crc10 checksum verification */
-    ND_TCHECK_2(p + OAM_CELLTYPE_FUNCTYPE_LEN + OAM_FUNCTION_SPECIFIC_LEN);
     cksum = GET_BE_U_2(p + OAM_CELLTYPE_FUNCTYPE_LEN + OAM_FUNCTION_SPECIFIC_LEN)
         & OAM_CRC10_MASK;
     cksum_shouldbe = verify_crc10_cksum(0, p, OAM_PAYLOAD_LEN);

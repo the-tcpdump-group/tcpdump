@@ -188,7 +188,6 @@ egpnr_print(netdissect_options *ndo,
 		length -= 4 - netlen;
 		if (length < 1)
 			goto trunc;
-		ND_TCHECK_1(cp);
 		distances = GET_U_1(cp);
 		cp++;
 		length--;
@@ -212,14 +211,12 @@ egpnr_print(netdissect_options *ndo,
 				/* Pickup network number */
 				if (length < 1)
 					goto trunc;
-				ND_TCHECK_1(cp);
 				addr = ((uint32_t) GET_U_1(cp)) << 24;
 				cp++;
 				length--;
 				if (IN_CLASSB(addr)) {
 					if (length < 1)
 						goto trunc;
-					ND_TCHECK_1(cp);
 					addr |= ((uint32_t) GET_U_1(cp)) << 16;
 					cp++;
 					length--;

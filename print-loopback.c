@@ -61,7 +61,6 @@ loopback_message_print(netdissect_options *ndo, const u_char *cp, const u_int le
 	if (len < 2)
 		goto invalid;
 	/* function */
-	ND_TCHECK_2(cp);
 	function = GET_LE_U_2(cp);
 	cp += 2;
 	ND_PRINT(", %s", tok2str(fcode_str, " invalid (%u)", function));
@@ -71,7 +70,6 @@ loopback_message_print(netdissect_options *ndo, const u_char *cp, const u_int le
 			if (len < 4)
 				goto invalid;
 			/* receipt number */
-			ND_TCHECK_2(cp);
 			ND_PRINT(", receipt number %u", GET_LE_U_2(cp));
 			cp += 2;
 			/* data */
@@ -114,7 +112,6 @@ loopback_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 	if (len < 2)
 		goto invalid;
 	/* skipCount */
-	ND_TCHECK_2(cp);
 	skipCount = GET_LE_U_2(cp);
 	cp += 2;
 	ND_PRINT(", skipCount %u", skipCount);

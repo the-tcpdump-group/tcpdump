@@ -507,7 +507,6 @@ decnet_print(netdissect_options *ndo,
 	length = pktlen;
 
 	rhp = (const union routehdr *)(ap + sizeof(short));
-	ND_TCHECK_1(rhp->rh_short.sh_flags);
 	mflags = GET_U_1(rhp->rh_short.sh_flags);
 
 	if (mflags & RMF_PAD) {
@@ -524,7 +523,6 @@ decnet_print(netdissect_options *ndo,
 	    length -= padlen;
 	    caplen -= padlen;
 	    rhp = (const union routehdr *)(ap + sizeof(short));
-	    ND_TCHECK_1(rhp->rh_short.sh_flags);
 	    mflags = GET_U_1(rhp->rh_short.sh_flags);
 	}
 
@@ -855,7 +853,6 @@ print_nsp(netdissect_options *ndo,
 
 		    if (nsplen < data_off)
 			goto trunc;
-		    ND_TCHECK_2(shp->sh_seq[0]);
 		    ack = GET_LE_U_2(shp->sh_seq[0]);
 		    if (ack & SGQ_ACK) {	/* acknum field */
 			if ((ack & SGQ_NAK) == SGQ_NAK)
@@ -865,7 +862,6 @@ print_nsp(netdissect_options *ndo,
 			data_off += sizeof(short);
 			if (nsplen < data_off)
 			    goto trunc;
-			ND_TCHECK_2(shp->sh_seq[1]);
 		        ack = GET_LE_U_2(shp->sh_seq[1]);
 			if (ack & SGQ_OACK) {	/* ackoth field */
 			    if ((ack & SGQ_ONAK) == SGQ_ONAK)
@@ -875,7 +871,6 @@ print_nsp(netdissect_options *ndo,
 			    data_off += sizeof(short);
 			    if (nsplen < data_off)
 				goto trunc;
-			    ND_TCHECK_2(shp->sh_seq[2]);
 			    ack = GET_LE_U_2(shp->sh_seq[2]);
 			}
 		    }
@@ -891,7 +886,6 @@ print_nsp(netdissect_options *ndo,
 
 		    if (nsplen < data_off)
 			goto trunc;
-		    ND_TCHECK_2(shp->sh_seq[0]);
 		    ack = GET_LE_U_2(shp->sh_seq[0]);
 		    if (ack & SGQ_ACK) {	/* acknum field */
 			if ((ack & SGQ_NAK) == SGQ_NAK)
@@ -901,7 +895,6 @@ print_nsp(netdissect_options *ndo,
 			data_off += sizeof(short);
 			if (nsplen < data_off)
 			    goto trunc;
-			ND_TCHECK_2(shp->sh_seq[1]);
 		        ack = GET_LE_U_2(shp->sh_seq[1]);
 			if (ack & SGQ_OACK) {	/* ackdat field */
 			    if ((ack & SGQ_ONAK) == SGQ_ONAK)
@@ -911,7 +904,6 @@ print_nsp(netdissect_options *ndo,
 			    data_off += sizeof(short);
 			    if (nsplen < data_off)
 				goto trunc;
-			    ND_TCHECK_2(shp->sh_seq[2]);
 			    ack = GET_LE_U_2(shp->sh_seq[2]);
 			}
 		    }
@@ -929,21 +921,18 @@ print_nsp(netdissect_options *ndo,
 
 		    if (nsplen < sizeof(struct seghdr) + sizeof(struct lsmsg))
 			goto trunc;
-		    ND_TCHECK_2(shp->sh_seq[0]);
 		    ack = GET_LE_U_2(shp->sh_seq[0]);
 		    if (ack & SGQ_ACK) {	/* acknum field */
 			if ((ack & SGQ_NAK) == SGQ_NAK)
 			    ND_PRINT("nak %u ", ack & SGQ_MASK);
 			else
 			    ND_PRINT("ack %u ", ack & SGQ_MASK);
-			ND_TCHECK_2(shp->sh_seq[1]);
 		        ack = GET_LE_U_2(shp->sh_seq[1]);
 			if (ack & SGQ_OACK) {	/* ackdat field */
 			    if ((ack & SGQ_ONAK) == SGQ_ONAK)
 				ND_PRINT("nakdat %u ", ack & SGQ_MASK);
 			    else
 				ND_PRINT("ackdat %u ", ack & SGQ_MASK);
-			    ND_TCHECK_2(shp->sh_seq[2]);
 			    ack = GET_LE_U_2(shp->sh_seq[2]);
 			}
 		    }
@@ -1024,7 +1013,6 @@ print_nsp(netdissect_options *ndo,
 			    ND_PRINT("nak %u ", ack & SGQ_MASK);
 			else
 			    ND_PRINT("ack %u ", ack & SGQ_MASK);
-			ND_TCHECK_2(amp->ak_acknum[1]);
 		        ack = GET_LE_U_2(amp->ak_acknum[1]);
 			if (ack & SGQ_OACK) {	/* ackdat field */
 			    if ((ack & SGQ_ONAK) == SGQ_ONAK)

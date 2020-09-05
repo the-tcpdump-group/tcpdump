@@ -106,12 +106,10 @@ stp_print_config_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
 {
     uint8_t bpdu_flags;
 
-    ND_TCHECK_1(stp_bpdu->flags);
     bpdu_flags = GET_U_1(stp_bpdu->flags);
     ND_PRINT(", Flags [%s]",
            bittok2str(stp_bpdu_flag_values, "none", bpdu_flags));
 
-    ND_TCHECK_2(stp_bpdu->port_id);
     ND_PRINT(", bridge-id %s.%04x, length %u",
            stp_print_bridge_id(ndo, stp_bpdu->bridge_id),
            GET_BE_U_2(stp_bpdu->port_id), length);
@@ -252,7 +250,6 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
     u_int	    offset;
 
     ptr = (const u_char *)stp_bpdu;
-    ND_TCHECK_1(stp_bpdu->flags);
     bpdu_flags = GET_U_1(stp_bpdu->flags);
     ND_PRINT(", CIST Flags [%s], length %u",
            bittok2str(stp_bpdu_flag_values, "none", bpdu_flags), length);
@@ -268,7 +265,6 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
            tok2str(rstp_obj_port_role_values, "Unknown",
                    RSTP_EXTRACT_PORT_ROLE(bpdu_flags)));
 
-    ND_TCHECK_4(stp_bpdu->root_path_cost);
     ND_PRINT("CIST root-id %s, CIST ext-pathcost %u",
            stp_print_bridge_id(ndo, stp_bpdu->root_id),
            GET_BE_U_4(stp_bpdu->root_path_cost));
@@ -277,7 +273,6 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
     ND_PRINT("\n\tCIST regional-root-id %s, ",
            stp_print_bridge_id(ndo, stp_bpdu->bridge_id));
 
-    ND_TCHECK_2(stp_bpdu->port_id);
     ND_PRINT("CIST port-id %04x,", GET_BE_U_2(stp_bpdu->port_id));
 
     ND_TCHECK_2(stp_bpdu->forward_delay);
@@ -288,7 +283,6 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
            (float) GET_BE_U_2(stp_bpdu->hello_time) / STP_TIME_BASE,
            (float) GET_BE_U_2(stp_bpdu->forward_delay) / STP_TIME_BASE);
 
-    ND_TCHECK_2(ptr + MST_BPDU_VER3_LEN_OFFSET);
     ND_PRINT("\n\tv3len %u, ", GET_BE_U_2(ptr + MST_BPDU_VER3_LEN_OFFSET));
     ND_TCHECK_4(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 12);
     ND_PRINT("MCID Name ");
@@ -302,7 +296,6 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
 	          GET_BE_U_4(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 8),
 	          GET_BE_U_4(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 12));
 
-    ND_TCHECK_4(ptr + MST_BPDU_CIST_INT_PATH_COST_OFFSET);
     ND_PRINT("CIST int-root-pathcost %u,",
             GET_BE_U_4(ptr + MST_BPDU_CIST_INT_PATH_COST_OFFSET));
 
@@ -310,12 +303,10 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
     ND_PRINT("\n\tCIST bridge-id %s, ",
            stp_print_bridge_id(ndo, ptr + MST_BPDU_CIST_BRIDGE_ID_OFFSET));
 
-    ND_TCHECK_1(ptr + MST_BPDU_CIST_REMAIN_HOPS_OFFSET);
     ND_PRINT("CIST remaining-hops %u",
              GET_U_1(ptr + MST_BPDU_CIST_REMAIN_HOPS_OFFSET));
 
     /* Dump all MSTI's */
-    ND_TCHECK_2(ptr + MST_BPDU_VER3_LEN_OFFSET);
     v3len = GET_BE_U_2(ptr + MST_BPDU_VER3_LEN_OFFSET);
     if (v3len > MST_BPDU_CONFIG_INFO_LENGTH) {
         len = v3len - MST_BPDU_CONFIG_INFO_LENGTH;
@@ -421,13 +412,11 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
     if (length < 4)
         goto trunc;
 
-    ND_TCHECK_2(stp_bpdu->protocol_id);
     if (GET_BE_U_2(stp_bpdu->protocol_id)) {
         ND_PRINT("unknown STP version, length %u", length);
         return;
     }
 
-    ND_TCHECK_1(stp_bpdu->protocol_version);
     protocol_version = GET_U_1(stp_bpdu->protocol_version);
     ND_PRINT("STP %s", tok2str(stp_proto_values, "Unknown STP protocol (0x%02x)",
                          protocol_version));
@@ -442,7 +431,6 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
         return;
     }
 
-    ND_TCHECK_1(stp_bpdu->bpdu_type);
     bpdu_type = GET_U_1(stp_bpdu->bpdu_type);
     ND_PRINT(", %s", tok2str(stp_bpdu_type_values, "Unknown BPDU Type (0x%02x)",
                            bpdu_type));
@@ -469,14 +457,12 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
                 goto trunc;
             }
 
-            ND_TCHECK_1(stp_bpdu->v1_length);
             if (GET_U_1(stp_bpdu->v1_length) != 0) {
                 /* FIX ME: Emit a message here ? */
                 goto trunc;
             }
 
             /* Validate v3 length */
-            ND_TCHECK_2(p + MST_BPDU_VER3_LEN_OFFSET);
             mstp_len = GET_BE_U_2(p + MST_BPDU_VER3_LEN_OFFSET);
             mstp_len += 2;  /* length encoding itself is 2 bytes */
             if (length < (sizeof(struct stp_bpdu_) + mstp_len)) {
@@ -488,7 +474,6 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
             if (protocol_version == STP_PROTO_SPB)
             {
               /* Validate v4 length */
-              ND_TCHECK_2(p + MST_BPDU_VER3_LEN_OFFSET + mstp_len);
               spb_len = GET_BE_U_2(p + MST_BPDU_VER3_LEN_OFFSET + mstp_len);
               spb_len += 2;
               if (length < (sizeof(struct stp_bpdu_) + mstp_len + spb_len) ||

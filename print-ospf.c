@@ -529,22 +529,17 @@ ospf_print_lshdr(netdissect_options *ndo,
         u_int ls_type;
         u_int ls_length;
 
-        ND_TCHECK_2(lshp->ls_length);
         ls_length = GET_BE_U_2(lshp->ls_length);
         if (ls_length < sizeof(struct lsa_hdr)) {
                 ND_PRINT("\n\t    Bogus length %u < header (%zu)", ls_length,
                     sizeof(struct lsa_hdr));
                 return(-1);
         }
-
-        ND_TCHECK_4(lshp->ls_seq); /* XXX - ls_length check checked this */
         ND_PRINT("\n\t  Advertising Router %s, seq 0x%08x, age %us, length %u",
                   GET_IPADDR_STRING(lshp->ls_router),
                   GET_BE_U_4(lshp->ls_seq),
                   GET_BE_U_2(lshp->ls_age),
                   ls_length - (u_int)sizeof(struct lsa_hdr));
-
-        ND_TCHECK_1(lshp->ls_type); /* XXX - ls_length check checked this */
         ls_type = GET_U_1(lshp->ls_type);
         switch (ls_type) {
         /* the LSA header for opaque LSAs was slightly changed */
@@ -572,14 +567,10 @@ ospf_print_lshdr(netdissect_options *ndo,
                    GET_IPADDR_STRING(lshp->un_lsa_id.lsa_id));
             break;
         }
-
-        ND_TCHECK_1(lshp->ls_options); /* XXX - ls_length check checked this */
         ND_PRINT("\n\t    Options: [%s]",
 		 bittok2str(ospf_option_values, "none", GET_U_1(lshp->ls_options)));
 
         return (ls_length);
-trunc:
-	return (-1);
 }
 
 /* draft-ietf-ospf-mt-09 */
@@ -659,11 +650,9 @@ ospf_print_lsa(netdissect_options *ndo,
 	switch (GET_U_1(lsap->ls_hdr.ls_type)) {
 
 	case LS_TYPE_ROUTER:
-		ND_TCHECK_1(lsap->lsa_un.un_rla.rla_flags);
 		ND_PRINT("\n\t    Router LSA Options: [%s]",
 		          bittok2str(ospf_rla_flag_values, "none", GET_U_1(lsap->lsa_un.un_rla.rla_flags)));
 
-		ND_TCHECK_2(lsap->lsa_un.un_rla.rla_count);
 		rla_count = GET_BE_U_2(lsap->lsa_un.un_rla.rla_count);
 		ND_TCHECK_SIZE(lsap->lsa_un.un_rla.rla_link);
 		rlp = lsap->lsa_un.un_rla.rla_link;
@@ -730,7 +719,6 @@ ospf_print_lsa(netdissect_options *ndo,
 		while (lp < ls_end) {
 			uint32_t ul;
 
-			ND_TCHECK_4(lp);
 			ul = GET_BE_U_4(lp);
                         topology = (ul & SLA_MASK_TOS) >> SLA_SHIFT_TOS;
 			ND_PRINT("\n\t\ttopology %s (%u) metric %u",
@@ -747,7 +735,6 @@ ospf_print_lsa(netdissect_options *ndo,
 		while (lp < ls_end) {
 			uint32_t ul;
 
-			ND_TCHECK_4(lp);
 			ul = GET_BE_U_4(lp);
                         topology = (ul & SLA_MASK_TOS) >> SLA_SHIFT_TOS;
 			ND_PRINT("\n\t\ttopology %s (%u) metric %u",
@@ -769,7 +756,6 @@ ospf_print_lsa(netdissect_options *ndo,
 		while ((const u_char *)almp < ls_end) {
 			uint32_t ul;
 
-			ND_TCHECK_4(almp->asla_tosmetric);
 			ul = GET_BE_U_4(almp->asla_tosmetric);
                         topology = ((ul & ASLA_MASK_TOS) >> ASLA_SHIFT_TOS);
 			ND_PRINT("\n\t\ttopology %s (%u), type %u, metric",
@@ -948,24 +934,20 @@ ospf_decode_lls(netdissect_options *ndo,
         ND_PRINT("\n\t[LLS truncated]");
         return (1);
     }
-    ND_TCHECK_2(dptr);
     ND_PRINT("\n\t  LLS: checksum: 0x%04x", (u_int) GET_BE_U_2(dptr));
 
     dptr += 2;
-    ND_TCHECK_2(dptr);
     length2 = GET_BE_U_2(dptr);
     ND_PRINT(", length: %u", length2);
 
     dptr += 2;
     ND_TCHECK_1(dptr);
     while (dptr < dataend) {
-        ND_TCHECK_2(dptr);
         lls_type = GET_BE_U_2(dptr);
         ND_PRINT("\n\t    %s (%u)",
                tok2str(ospf_lls_tlv_values,"Unknown TLV",lls_type),
                lls_type);
         dptr += 2;
-        ND_TCHECK_2(dptr);
         lls_len = GET_BE_U_2(dptr);
         ND_PRINT(", length: %u", lls_len);
         dptr += 2;
@@ -976,7 +958,6 @@ ospf_decode_lls(netdissect_options *ndo,
                 ND_PRINT(" [should be 4]");
                 lls_len = 4;
             }
-            ND_TCHECK_4(dptr);
             lls_flags = GET_BE_U_4(dptr);
             ND_PRINT("\n\t      Options: 0x%08x [%s]", lls_flags,
                    bittok2str(ospf_lls_eo_options, "?", lls_flags));
@@ -988,7 +969,6 @@ ospf_decode_lls(netdissect_options *ndo,
                 ND_PRINT(" [should be 20]");
                 lls_len = 20;
             }
-            ND_TCHECK_4(dptr);
             ND_PRINT("\n\t      Sequence number: 0x%08x", GET_BE_U_4(dptr));
             break;
         }
@@ -1014,11 +994,9 @@ ospf_decode_v2(netdissect_options *ndo,
 	switch (GET_U_1(op->ospf_type)) {
 
 	case OSPF_TYPE_HELLO:
-		ND_TCHECK_1(op->ospf_hello.hello_options);
 		ND_PRINT("\n\tOptions [%s]",
 		          bittok2str(ospf_option_values,"none",GET_U_1(op->ospf_hello.hello_options)));
 
-		ND_TCHECK_4(op->ospf_hello.hello_deadint);
 		ND_PRINT("\n\t  Hello Timer %us, Dead Timer %us, Mask %s, Priority %u",
 		          GET_BE_U_2(op->ospf_hello.hello_helloint),
 		          GET_BE_U_4(op->ospf_hello.hello_deadint),
@@ -1046,18 +1024,14 @@ ospf_decode_v2(netdissect_options *ndo,
 		break;	/* HELLO */
 
 	case OSPF_TYPE_DD:
-		ND_TCHECK_1(op->ospf_db.db_options);
 		ND_PRINT("\n\tOptions [%s]",
 		          bittok2str(ospf_option_values, "none", GET_U_1(op->ospf_db.db_options)));
-		ND_TCHECK_1(op->ospf_db.db_flags);
 		ND_PRINT(", DD Flags [%s]",
 		          bittok2str(ospf_dd_flag_values, "none", GET_U_1(op->ospf_db.db_flags)));
-		ND_TCHECK_2(op->ospf_db.db_ifmtu);
 		if (GET_BE_U_2(op->ospf_db.db_ifmtu)) {
 			ND_PRINT(", MTU: %u",
 				 GET_BE_U_2(op->ospf_db.db_ifmtu));
 		}
-		ND_TCHECK_4(op->ospf_db.db_seq);
 		ND_PRINT(", Sequence: 0x%08x", GET_BE_U_4(op->ospf_db.db_seq));
 
 		/* Print all the LS adv's */
@@ -1099,7 +1073,6 @@ ospf_decode_v2(netdissect_options *ndo,
 
 	case OSPF_TYPE_LS_UPDATE:
                 lsap = op->ospf_lsu.lsu_lsa;
-                ND_TCHECK_4(op->ospf_lsu.lsu_count);
                 lsa_count_max = GET_BE_U_4(op->ospf_lsu.lsu_count);
                 ND_PRINT(", %u LSA%s", lsa_count_max, PLURAL_SUFFIX(lsa_count_max));
                 for (lsa_count=1;lsa_count <= lsa_count_max;lsa_count++) {
@@ -1138,7 +1111,6 @@ ospf_print(netdissect_options *ndo,
 	op = (const struct ospfhdr *)bp;
 
 	/* XXX Before we do anything else, strip off the MD5 trailer */
-	ND_TCHECK_2(op->ospf_authtype);
 	if (GET_BE_U_2(op->ospf_authtype) == OSPF_AUTH_MD5) {
 		length -= OSPF_AUTH_MD5_LEN;
 		ndo->ndo_snapend -= OSPF_AUTH_MD5_LEN;
@@ -1146,7 +1118,6 @@ ospf_print(netdissect_options *ndo,
 
 	/* If the type is valid translate it, or just print the type */
 	/* value.  If it's not valid, say so and return */
-	ND_TCHECK_1(op->ospf_type);
 	cp = tok2str(type2str, "unknown LS-type %u", GET_U_1(op->ospf_type));
 	ND_PRINT("OSPFv%u, %s, length %u", GET_U_1(op->ospf_version), cp,
 		 length);
@@ -1157,7 +1128,6 @@ ospf_print(netdissect_options *ndo,
 		return;
 	}
 
-	ND_TCHECK_2(op->ospf_len);
 	if (length != GET_BE_U_2(op->ospf_len)) {
 		ND_PRINT(" [len %u]", GET_BE_U_2(op->ospf_len));
 	}

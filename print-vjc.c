@@ -89,7 +89,6 @@ vjc_print(netdissect_options *ndo, const u_char *bp, u_short proto _U_)
 	int i;
 
 	ndo->ndo_protocol = "vjc";
-	ND_TCHECK_1(bp);
 	switch (GET_U_1(bp) & 0xf0) {
 	case TYPE_IP:
 		if (ndo->ndo_eflag)
@@ -103,15 +102,12 @@ vjc_print(netdissect_options *ndo, const u_char *bp, u_short proto _U_)
 		if (ndo->ndo_eflag)
 			ND_PRINT("(vjc type=compressed TCP) ");
 		for (i = 0; i < 8; i++) {
-			ND_TCHECK_1(bp + 1);
 			if (GET_U_1(bp + 1) & (0x80 >> i))
 				ND_PRINT("%c", "?CI?SAWU"[i]);
 		}
 		if (GET_U_1(bp + 1))
 			ND_PRINT(" ");
-		ND_TCHECK_1(bp + 2);
 		ND_PRINT("C=0x%02x ", GET_U_1(bp + 2));
-		ND_TCHECK_2(bp + 3);
 		ND_PRINT("sum=0x%04x ", GET_HE_U_2(bp + 3));
 		return -1;
 	case TYPE_ERROR:
@@ -123,7 +119,4 @@ vjc_print(netdissect_options *ndo, const u_char *bp, u_short proto _U_)
 			ND_PRINT("(vjc type=0x%02x) ", GET_U_1(bp) & 0xf0);
 		return -1;
 	}
-
-trunc:
-	return -1;
 }

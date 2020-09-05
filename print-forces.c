@@ -1239,7 +1239,6 @@ asttlv_print(netdissect_options *ndo,
 		ND_PRINT("illegal ASTresult-TLV: %u bytes!\n", dlen);
 		return -1;
 	}
-	ND_TCHECK_4(pptr);
 	rescode = GET_BE_U_4(pptr);
 	if (rescode > ASTMCD) {
 		ND_PRINT("illegal ASTresult result code: %u!\n", rescode);
@@ -1271,10 +1270,6 @@ asttlv_print(netdissect_options *ndo,
 		ND_PRINT("(%x)\n%s", rescode, ib);
 	}
 	return 0;
-
-trunc:
-	nd_print_trunc(ndo);
-	return -1;
 }
 
 #define ASRDLN	4
@@ -1297,7 +1292,6 @@ asrtlv_print(netdissect_options *ndo,
 		ND_PRINT("illegal ASRresult-TLV: %u bytes!\n", dlen);
 		return -1;
 	}
-	ND_TCHECK_4(pptr);
 	rescode = GET_BE_U_4(pptr);
 
 	if (rescode > ASRMCD) {
@@ -1324,10 +1318,6 @@ asrtlv_print(netdissect_options *ndo,
 		ND_PRINT("(%x)\n%s", rescode, ib);
 	}
 	return 0;
-
-trunc:
-	nd_print_trunc(ndo);
-	return -1;
 }
 
 #if 0
@@ -1730,7 +1720,6 @@ forces_print(netdissect_options *ndo,
 		goto error;
 	}
 
-	ND_TCHECK_4(pptr + 20);
 	flg_raw = GET_BE_U_4(pptr + 20);
 	if (ndo->ndo_vflag >= 1) {
 		ND_PRINT("\n\tForCES Version %u len %uB flags 0x%08x ",

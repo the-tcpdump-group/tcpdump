@@ -396,7 +396,6 @@ telnet_parse(netdissect_options *ndo, const u_char *sp, u_int length, int print)
 	do { \
 		if (length < 1) \
 			goto pktend; \
-		ND_TCHECK_1(sp); \
 		c = GET_U_1(sp); \
 		sp++; \
 		length--; \
@@ -443,7 +442,6 @@ telnet_parse(netdissect_options *ndo, const u_char *sp, u_int length, int print)
 				break;
 			p++;
 		}
-		ND_TCHECK_1(p);
 		if (GET_U_1(p) != IAC)
 			goto pktend;
 
@@ -516,7 +514,6 @@ telnet_print(netdissect_options *ndo, const u_char *sp, u_int length)
 	ndo->ndo_protocol = "telnet";
 	osp = sp;
 
-	ND_TCHECK_1(sp);
 	while (length > 0 && GET_U_1(sp) == IAC) {
 		/*
 		 * Parse the Telnet command without printing it,

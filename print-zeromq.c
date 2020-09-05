@@ -79,9 +79,8 @@ zmtp1_print_frame(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 	uint8_t flags;
 
 	ND_PRINT("\n\t");
-	ND_TCHECK_1(cp); /* length/0xFF */
 
-	if (GET_U_1(cp) != 0xFF) {
+	if (GET_U_1(cp) != 0xFF) {	/* length/0xFF */
 		header_len = 1; /* length */
 		body_len_declared = GET_U_1(cp);
 		ND_PRINT(" frame flags+body  (8-bit) length %" PRIu64, body_len_declared);
@@ -171,7 +170,6 @@ zmtp1_print_intermediate_part(netdissect_options *ndo, const u_char *cp, const u
 	u_int frame_offset;
 	u_int remaining_len;
 
-	ND_TCHECK_2(cp);
 	frame_offset = GET_BE_U_2(cp);
 	ND_PRINT("\n\t frame offset 0x%04x", frame_offset);
 	cp += 2;

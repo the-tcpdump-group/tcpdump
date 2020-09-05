@@ -845,7 +845,6 @@ print_vendor_attr(netdissect_options *ndo,
 
     if (length < 4)
         goto trunc;
-    ND_TCHECK_4(data);
     vendor_id = GET_BE_U_4(data);
     data+=4;
     length-=4;
@@ -1302,17 +1301,11 @@ print_attr_time(netdissect_options *ndo,
        return;
    }
 
-   ND_TCHECK_4(data);
-
    attr_time = GET_BE_U_4(data);
    strlcpy(string, ctime(&attr_time), sizeof(string));
    /* Get rid of the newline */
    string[24] = '\0';
    ND_PRINT("%.24s", string);
-   return;
-
-   trunc:
-     nd_print_trunc(ndo);
 }
 
 static void
@@ -1386,13 +1379,11 @@ print_attr_strange(netdissect_options *ndo,
                ND_PRINT("ERROR: length %u != 14", length);
                return;
            }
-           ND_TCHECK_1(data);
            if (GET_U_1(data))
               ND_PRINT("User can change password");
            else
               ND_PRINT("User cannot change password");
            data++;
-           ND_TCHECK_1(data);
            ND_PRINT(", Min password length: %u", GET_U_1(data));
            data++;
            ND_PRINT(", created at: ");
@@ -1426,7 +1417,6 @@ print_attr_strange(netdissect_options *ndo,
                ND_PRINT("Error: length %u != 4", length);
                return;
            }
-           ND_TCHECK_4(data);
 
            error_cause_value = GET_BE_U_4(data);
            ND_PRINT("Error cause %u: %s", error_cause_value, tok2str(errorcausetype, "Error-Cause %u not known", error_cause_value));

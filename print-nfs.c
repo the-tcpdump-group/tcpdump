@@ -260,43 +260,34 @@ static const uint32_t *
 parse_sattr3(netdissect_options *ndo,
              const uint32_t *dp, struct nfsv3_sattr *sa3)
 {
-	ND_TCHECK_4(dp);
 	sa3->sa_modeset = GET_BE_U_4(dp);
 	dp++;
 	if (sa3->sa_modeset) {
-		ND_TCHECK_4(dp);
 		sa3->sa_mode = GET_BE_U_4(dp);
 		dp++;
 	}
 
-	ND_TCHECK_4(dp);
 	sa3->sa_uidset = GET_BE_U_4(dp);
 	dp++;
 	if (sa3->sa_uidset) {
-		ND_TCHECK_4(dp);
 		sa3->sa_uid = GET_BE_U_4(dp);
 		dp++;
 	}
 
-	ND_TCHECK_4(dp);
 	sa3->sa_gidset = GET_BE_U_4(dp);
 	dp++;
 	if (sa3->sa_gidset) {
-		ND_TCHECK_4(dp);
 		sa3->sa_gid = GET_BE_U_4(dp);
 		dp++;
 	}
 
-	ND_TCHECK_4(dp);
 	sa3->sa_sizeset = GET_BE_U_4(dp);
 	dp++;
 	if (sa3->sa_sizeset) {
-		ND_TCHECK_4(dp);
 		sa3->sa_size = GET_BE_U_4(dp);
 		dp++;
 	}
 
-	ND_TCHECK_4(dp);
 	sa3->sa_atimetype = GET_BE_U_4(dp);
 	dp++;
 	if (sa3->sa_atimetype == NFSV3SATTRTIME_TOCLIENT) {
@@ -307,7 +298,6 @@ parse_sattr3(netdissect_options *ndo,
 		dp++;
 	}
 
-	ND_TCHECK_4(dp);
 	sa3->sa_mtimetype = GET_BE_U_4(dp);
 	dp++;
 	if (sa3->sa_mtimetype == NFSV3SATTRTIME_TOCLIENT) {
@@ -452,7 +442,6 @@ parsereq(netdissect_options *ndo,
 	dp = (const uint32_t *)&rp->rm_call.cb_cred;
 	if (length < 2 * sizeof(*dp))
 		goto trunc;
-	ND_TCHECK_4(dp + 1);
 	len = GET_BE_U_4(dp + 1);
 	rounded_len = roundup2(len, 4);
 	ND_TCHECK_LEN(dp + 2, rounded_len);
@@ -472,7 +461,6 @@ parsereq(netdissect_options *ndo,
 		 */
 		if (length < 2 * sizeof(*dp))
 			goto trunc;
-		ND_TCHECK_4(dp + 1);
 		len = GET_BE_U_4(dp + 1);
 		rounded_len = roundup2(len, 4);
 		ND_TCHECK_LEN(dp + 2, rounded_len);
@@ -502,7 +490,6 @@ parsefh(netdissect_options *ndo,
 	u_int len;
 
 	if (v3) {
-		ND_TCHECK_4(dp);
 		len = GET_BE_U_4(dp) / 4;
 		dp++;
 	} else
@@ -511,9 +498,8 @@ parsefh(netdissect_options *ndo,
 	if (ND_TTEST_LEN(dp, len * sizeof(*dp))) {
 		nfs_printfh(ndo, dp, len);
 		return (dp + len);
-	}
-trunc:
-	return (NULL);
+	} else
+		return NULL;
 }
 
 /*
@@ -526,9 +512,6 @@ parsefn(netdissect_options *ndo,
 {
 	uint32_t len, rounded_len;
 	const u_char *cp;
-
-	/* Bail if we don't have the string length */
-	ND_TCHECK_4(dp);
 
 	/* Fetch big-endian string length */
 	len = GET_BE_U_4(dp);
@@ -635,7 +618,6 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 		dp = parsefh(ndo, dp, v3);
 		if (dp == NULL)
 			goto trunc;
-		ND_TCHECK_4(dp);
 		access_flags = GET_BE_U_4(dp);
 		if (access_flags & ~NFSV3ACCESS_FULL) {
 			/* NFSV3ACCESS definitions aren't up to date */
@@ -677,12 +659,10 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 		if (dp == NULL)
 			goto trunc;
 		if (v3) {
-			ND_TCHECK_4(dp + 2);
 			ND_PRINT(" %u bytes @ %" PRIu64,
 			       GET_BE_U_4(dp + 2),
 			       GET_BE_U_8(dp));
 		} else {
-			ND_TCHECK_4(dp + 1);
 			ND_PRINT(" %u bytes @ %u",
 			    GET_BE_U_4(dp + 1),
 			    GET_BE_U_4(dp));
@@ -697,7 +677,6 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 		if (dp == NULL)
 			goto trunc;
 		if (v3) {
-			ND_TCHECK_4(dp + 4);
 			ND_PRINT(" %u (%u) bytes @ %" PRIu64,
 					GET_BE_U_4(dp + 4),
 					GET_BE_U_4(dp + 2),
@@ -708,7 +687,6 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 						NULL, GET_BE_U_4(dp + 3)));
 			}
 		} else {
-			ND_TCHECK_4(dp + 3);
 			ND_PRINT(" %u (%u) bytes @ %u (%u)",
 					GET_BE_U_4(dp + 3),
 					GET_BE_U_4(dp + 2),
@@ -740,7 +718,6 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 		dp = parsefhn(ndo, dp, v3);
 		if (dp == NULL)
 			goto trunc;
-		ND_TCHECK_4(dp);
 		type = (nfs_type) GET_BE_U_4(dp);
 		dp++;
 		dp = parse_sattr3(ndo, dp, &sa3);
@@ -748,7 +725,6 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 			goto trunc;
 		ND_PRINT(" %s", tok2str(type2str, "unk-ft %u", type));
 		if (ndo->ndo_vflag && (type == NFCHR || type == NFBLK)) {
-			ND_TCHECK_4(dp + 1);
 			ND_PRINT(" %u/%u",
 			       GET_BE_U_4(dp),
 			       GET_BE_U_4(dp + 1));
@@ -790,7 +766,6 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 		if (dp == NULL)
 			goto trunc;
 		if (v3) {
-			ND_TCHECK_4(dp + 4);
 			/*
 			 * We shouldn't really try to interpret the
 			 * offset cookie here.
@@ -810,7 +785,6 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 					  GET_BE_U_4(dp + 3));
 			}
 		} else {
-			ND_TCHECK_4(dp + 1);
 			/*
 			 * Print the offset as signed, since -1 is
 			 * common, but offsets > 2^31 aren't.
@@ -828,7 +802,6 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 		dp = parsefh(ndo, dp, v3);
 		if (dp == NULL)
 			goto trunc;
-		ND_TCHECK_4(dp + 4);
 		/*
 		 * We don't try to interpret the offset
 		 * cookie here.
@@ -837,7 +810,6 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 			GET_BE_U_4(dp + 4),
 			GET_BE_U_8(dp));
 		if (ndo->ndo_vflag) {
-			ND_TCHECK_4(dp + 5);
 			/*
 			 * This displays the 8 bytes
 			 * of the verifier in order,
@@ -858,7 +830,6 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 		dp = parsefh(ndo, dp, v3);
 		if (dp == NULL)
 			goto trunc;
-		ND_TCHECK_4(dp + 2);
 		ND_PRINT(" %u bytes @ %" PRIu64,
 			GET_BE_U_4(dp + 2),
 			GET_BE_U_8(dp));
@@ -1113,7 +1084,6 @@ parserep(netdissect_options *ndo,
 	 * which is an "enum" and so occupies one 32-bit word.
 	 */
 	dp = ((const uint32_t *)&rp->rm_reply) + 1;
-	ND_TCHECK_4(dp + 1);
 	len = GET_BE_U_4(dp + 1);
 	if (len >= length)
 		return (NULL);
@@ -1125,7 +1095,6 @@ parserep(netdissect_options *ndo,
 	/*
 	 * now we can check the ar_stat field
 	 */
-	ND_TCHECK_4(dp);
 	astat = (enum sunrpc_accept_stat) GET_BE_U_4(dp);
 	if (astat != SUNRPC_SUCCESS) {
 		ND_PRINT(" %s", tok2str(sunrpc_str, "ar_stat %u", astat));
@@ -1145,8 +1114,6 @@ parsestatus(netdissect_options *ndo,
 {
 	u_int errnum;
 
-	ND_TCHECK_4(dp);
-
 	errnum = GET_BE_U_4(dp);
 	if (er)
 		*er = errnum;
@@ -1157,8 +1124,6 @@ parsestatus(netdissect_options *ndo,
 		*nfserrp = 1;
 	}
 	return (dp + 1);
-trunc:
-	return NULL;
 }
 
 static const uint32_t *
@@ -1183,11 +1148,9 @@ parsefattr(netdissect_options *ndo,
 		    GET_BE_S_4(fap->fa_uid),
 		    GET_BE_S_4(fap->fa_gid));
 		if (v3) {
-			ND_TCHECK_8(fap->fa3_size);
 			ND_PRINT(" sz %" PRIu64,
 				GET_BE_U_8(fap->fa3_size));
 		} else {
-			ND_TCHECK_4(fap->fa2_size);
 			ND_PRINT(" sz %u", GET_BE_U_4(fap->fa2_size));
 		}
 	}
@@ -1388,7 +1351,6 @@ static const uint32_t *
 parse_pre_op_attr(netdissect_options *ndo,
                   const uint32_t *dp, int verbose)
 {
-	ND_TCHECK_4(dp);
 	if (!GET_BE_U_4(dp))
 		return (dp + 1);
 	dp++;
@@ -1410,7 +1372,6 @@ static const uint32_t *
 parse_post_op_attr(netdissect_options *ndo,
                    const uint32_t *dp, int verbose)
 {
-	ND_TCHECK_4(dp);
 	if (!GET_BE_U_4(dp))
 		return (dp + 1);
 	dp++;
@@ -1418,8 +1379,6 @@ parse_post_op_attr(netdissect_options *ndo,
 		return parsefattr(ndo, dp, verbose, 1);
 	} else
 		return (dp + (NFSX_V3FATTR / sizeof (uint32_t)));
-trunc:
-	return (NULL);
 }
 
 static const uint32_t *
@@ -1449,7 +1408,6 @@ parsecreateopres(netdissect_options *ndo,
 	if (er)
 		dp = parse_wcc_data(ndo, dp, verbose);
 	else {
-		ND_TCHECK_4(dp);
 		if (!GET_BE_U_4(dp))
 			return (dp + 1);
 		dp++;
@@ -1467,8 +1425,6 @@ parsecreateopres(netdissect_options *ndo,
 		}
 	}
 	return (dp);
-trunc:
-	return (NULL);
 }
 
 static const uint32_t *
@@ -1500,7 +1456,6 @@ parsev3rddirres(netdissect_options *ndo,
 	if (er)
 		return dp;
 	if (ndo->ndo_vflag) {
-		ND_TCHECK_4(dp + 1);
 		/*
 		 * This displays the 8 bytes of the verifier in order,
 		 * from the low-order byte to the high-order byte.
@@ -1510,8 +1465,6 @@ parsev3rddirres(netdissect_options *ndo,
 		dp += 2;
 	}
 	return dp;
-trunc:
-	return (NULL);
 }
 
 static int
@@ -1674,7 +1627,6 @@ interp_reply(netdissect_options *ndo,
 		if (dp == NULL)
 			goto trunc;
 		if (!er) {
-			ND_TCHECK_4(dp);
 			ND_PRINT(" c %04x", GET_BE_U_4(dp));
 		}
 		break;
@@ -1700,7 +1652,6 @@ interp_reply(netdissect_options *ndo,
 				goto trunc;
 			if (!er) {
 				if (ndo->ndo_vflag) {
-					ND_TCHECK_4(dp + 1);
 					ND_PRINT(" %u bytes", GET_BE_U_4(dp));
 					if (GET_BE_U_4(dp + 1))
 						ND_PRINT(" EOF");
@@ -1725,16 +1676,13 @@ interp_reply(netdissect_options *ndo,
 				goto trunc;
 			if (!er) {
 				if (ndo->ndo_vflag) {
-					ND_TCHECK_4(dp);
 					ND_PRINT(" %u bytes", GET_BE_U_4(dp));
 					if (ndo->ndo_vflag > 1) {
-						ND_TCHECK_4(dp + 1);
 						ND_PRINT(" <%s>",
 							tok2str(nfsv3_writemodes,
 								NULL, GET_BE_U_4(dp + 1)));
 
 						/* write-verf-cookie */
-						ND_TCHECK_8(dp + 2);
 						ND_PRINT(" verf %" PRIx64,
 						         GET_BE_U_8(dp + 2));
 					}
@@ -1899,7 +1847,6 @@ interp_reply(netdissect_options *ndo,
 			goto trunc;
 		if (ndo->ndo_vflag > 1) {
 			/* write-verf-cookie */
-			ND_TCHECK_8(dp);
 			ND_PRINT(" verf %" PRIx64, GET_BE_U_8(dp));
 		}
 		break;

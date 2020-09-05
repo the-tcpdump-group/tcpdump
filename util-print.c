@@ -778,7 +778,6 @@ print_txt_line(netdissect_options *ndo, const char *prefix,
 
 	startidx = idx;
 	while (idx < len) {
-		ND_TCHECK_1(pptr + idx);
 		c = GET_U_1(pptr + idx);
 		if (c == '\n') {
 			/*
@@ -795,7 +794,6 @@ print_txt_line(netdissect_options *ndo, const char *prefix,
 				/* not in this packet */
 				return (0);
 			}
-			ND_TCHECK_1(pptr + idx + 1);
 			if (GET_U_1(pptr + idx + 1) == '\n') {
 				/*
 				 * CR-LF; end of line.
@@ -828,7 +826,6 @@ print_txt_line(netdissect_options *ndo, const char *prefix,
 	 * All printable ASCII, but no line ending after that point
 	 * in the buffer; treat this as if it were truncated.
 	 */
-trunc:
 	linelen = idx - startidx;
 	ND_PRINT("%s%.*s", prefix, (int)linelen, pptr + startidx);
 	nd_print_trunc(ndo);

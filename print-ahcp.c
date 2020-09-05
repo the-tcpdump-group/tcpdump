@@ -105,7 +105,6 @@ ahcp_time_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 
 	if (cp + 4 != ep)
 		goto invalid;
-	ND_TCHECK_4(cp);
 	t = GET_BE_U_4(cp);
 	if (NULL == (tm = gmtime(&t)))
 		ND_PRINT(": gmtime() error");
@@ -129,7 +128,6 @@ ahcp_seconds_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 {
 	if (cp + 4 != ep)
 		goto invalid;
-	ND_TCHECK_4(cp);
 	ND_PRINT(": %us", GET_BE_U_4(cp));
 	return 0;
 
@@ -266,7 +264,6 @@ ahcp1_options_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 
 	while (cp < ep) {
 		/* Option no */
-		ND_TCHECK_1(cp);
 		option_no = GET_U_1(cp);
 		cp += 1;
 		ND_PRINT("\n\t %s", tok2str(ahcp1_opt_str, "Unknown-%u", option_no));
@@ -275,7 +272,6 @@ ahcp1_options_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 		/* Length */
 		if (cp + 1 > ep)
 			goto invalid;
-		ND_TCHECK_1(cp);
 		option_len = GET_U_1(cp);
 		cp += 1;
 		if (cp + option_len > ep)
@@ -309,15 +305,12 @@ ahcp1_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 	if (cp + AHCP1_BODY_MIN_LEN > ep)
 		goto invalid;
 	/* Type */
-	ND_TCHECK_1(cp);
 	type = GET_U_1(cp);
 	cp += 1;
 	/* MBZ */
-	ND_TCHECK_1(cp);
 	mbz = GET_U_1(cp);
 	cp += 1;
 	/* Length */
-	ND_TCHECK_2(cp);
 	body_len = GET_BE_U_2(cp);
 	cp += 2;
 
@@ -356,12 +349,10 @@ ahcp_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 	if (len < 2)
 		goto invalid;
 	/* Magic */
-	ND_TCHECK_1(cp);
 	if (GET_U_1(cp) != AHCP_MAGIC_NUMBER)
 		goto invalid;
 	cp += 1;
 	/* Version */
-	ND_TCHECK_1(cp);
 	version = GET_U_1(cp);
 	cp += 1;
 	switch (version) {
@@ -374,16 +365,13 @@ ahcp_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 				cp += AHCP1_HEADER_FIX_LEN - 2;
 			} else {
 				/* Hopcount */
-				ND_TCHECK_1(cp);
 				ND_PRINT("\n\tHopcount %u", GET_U_1(cp));
 				cp += 1;
 				/* Original Hopcount */
-				ND_TCHECK_1(cp);
 				ND_PRINT(", Original Hopcount %u",
 					 GET_U_1(cp));
 				cp += 1;
 				/* Nonce */
-				ND_TCHECK_4(cp);
 				ND_PRINT(", Nonce 0x%08x", GET_BE_U_4(cp));
 				cp += 4;
 				/* Source Id */

@@ -176,7 +176,6 @@ mpcp_print(netdissect_options *ndo, const u_char *pptr, u_int length)
             tptr += sizeof(struct mpcp_grant_t);
         }
 
-        ND_TCHECK_2(tptr);
         ND_PRINT("\n\tSync-Time %u ticks", GET_BE_U_2(tptr));
         break;
 
@@ -198,7 +197,6 @@ mpcp_print(netdissect_options *ndo, const u_char *pptr, u_int length)
             report=1;
             while (report_bitmap != 0) {
                 if (report_bitmap & 1) {
-                    ND_TCHECK_2(tptr);
                     ND_PRINT("\n\t    Q%u Report, Duration %u ticks",
                            report,
                            GET_BE_U_2(tptr));

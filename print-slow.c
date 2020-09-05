@@ -251,7 +251,6 @@ slow_print(netdissect_options *ndo,
     ndo->ndo_protocol = "slow";
     if (len < 1)
         goto tooshort;
-    ND_TCHECK_1(pptr);
     subtype = GET_U_1(pptr);
 
     /*
@@ -261,7 +260,6 @@ slow_print(netdissect_options *ndo,
     case SLOW_PROTO_LACP:
         if (len < 2)
             goto tooshort;
-        ND_TCHECK_1(pptr + 1);
         if (GET_U_1(pptr + 1) != LACP_VERSION) {
             ND_PRINT("LACP version %u packet not supported",
                      GET_U_1(pptr + 1));
@@ -273,7 +271,6 @@ slow_print(netdissect_options *ndo,
     case SLOW_PROTO_MARKER:
         if (len < 2)
             goto tooshort;
-        ND_TCHECK_1(pptr + 1);
         if (GET_U_1(pptr + 1) != MARKER_VERSION) {
             ND_PRINT("MARKER version %u packet not supported",
                      GET_U_1(pptr + 1));
@@ -339,10 +336,6 @@ tooshort:
         ND_PRINT(" (packet is too short)");
     else
         ND_PRINT("\n\t\t packet is too short");
-    return;
-
-trunc:
-    nd_print_trunc(ndo);
 }
 
 static void
@@ -628,7 +621,6 @@ slow_oam_print(netdissect_options *ndo,
         /* Sequence number */
         if (tlen < 2)
             goto tooshort;
-        ND_TCHECK_2(tptr);
         ND_PRINT("\n\t  Sequence Number %u", GET_BE_U_2(tptr));
         tlen -= 2;
         tptr += 2;

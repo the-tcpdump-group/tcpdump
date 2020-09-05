@@ -50,16 +50,13 @@ otv_print(netdissect_options *ndo, const u_char *bp, u_int len)
     if (len < OTV_HDR_LEN)
         goto trunc;
 
-    ND_TCHECK_1(bp);
     flags = GET_U_1(bp);
     ND_PRINT("flags [%s] (0x%02x), ", flags & 0x08 ? "I" : ".", flags);
     bp += 1;
 
-    ND_TCHECK_3(bp);
     ND_PRINT("overlay %u, ", GET_BE_U_3(bp));
     bp += 3;
 
-    ND_TCHECK_3(bp);
     ND_PRINT("instance %u\n", GET_BE_U_3(bp));
     bp += 3;
 

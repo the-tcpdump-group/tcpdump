@@ -520,9 +520,7 @@ rsvp_intserv_print(netdissect_options *ndo,
 
     if (obj_tlen < 4)
         return 0;
-    ND_TCHECK_1(tptr);
     parameter_id = GET_U_1(tptr);
-    ND_TCHECK_2(tptr + 2);
     parameter_length = GET_BE_U_2(tptr + 2)<<2; /* convert wordcount to bytecount */
 
     ND_PRINT("\n\t      Parameter ID: %s (%u), length: %u, Flags: [0x%02x]",
@@ -544,7 +542,6 @@ rsvp_intserv_print(netdissect_options *ndo,
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
         if (parameter_length == 4) {
-	    ND_TCHECK_4(tptr + 4);
             ND_PRINT("\n\t\tIS hop count: %u", GET_BE_U_4(tptr + 4));
         }
         break;
@@ -558,7 +555,6 @@ rsvp_intserv_print(netdissect_options *ndo,
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
         if (parameter_length == 4) {
-	    ND_TCHECK_4(tptr + 4);
             bw.i = GET_BE_U_4(tptr + 4);
             ND_PRINT("\n\t\tPath b/w estimate: %.10g Mbps", bw.f / 125000);
         }
@@ -573,7 +569,6 @@ rsvp_intserv_print(netdissect_options *ndo,
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
         if (parameter_length == 4) {
-	    ND_TCHECK_4(tptr + 4);
             ND_PRINT("\n\t\tMinimum path latency: ");
             if (GET_BE_U_4(tptr + 4) == 0xffffffff)
                 ND_PRINT("don't care");
@@ -592,7 +587,6 @@ rsvp_intserv_print(netdissect_options *ndo,
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
         if (parameter_length == 4) {
-	    ND_TCHECK_4(tptr + 4);
             ND_PRINT("\n\t\tComposed MTU: %u bytes", GET_BE_U_4(tptr + 4));
         }
         break;
@@ -652,7 +646,6 @@ rsvp_intserv_print(netdissect_options *ndo,
     case 135:
     case 136:
         if (parameter_length == 4) {
-	    ND_TCHECK_4(tptr + 4);
             ND_PRINT("\n\t\tValue: %u", GET_BE_U_4(tptr + 4));
         }
         break;

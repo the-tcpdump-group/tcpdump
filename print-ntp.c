@@ -236,17 +236,14 @@ ntp_time_print(netdissect_options *ndo,
 	if (length < NTP_TIMEMSG_MINLEN)
 		goto invalid;
 
-	ND_TCHECK_1(bp->stratum);
 	stratum = GET_U_1(bp->stratum);
 	ND_PRINT(", Stratum %u (%s)",
 		stratum,
 		tok2str(ntp_stratum_values, (stratum >=2 && stratum<=15) ? "secondary reference" : "reserved", stratum));
 
-	ND_TCHECK_1(bp->ppoll);
 	ND_PRINT(", poll %d", GET_S_1(bp->ppoll));
 	p_poll(ndo, GET_S_1(bp->ppoll));
 
-	ND_TCHECK_1(bp->precision);
 	ND_PRINT(", precision %d", GET_S_1(bp->precision));
 
 	ND_TCHECK_SIZE(&bp->root_delay);
@@ -312,10 +309,8 @@ ntp_time_print(netdissect_options *ndo,
 
 	/* FIXME: this code is not aware of any extension fields */
 	if (length == NTP_TIMEMSG_MINLEN + 4) { 	/* Optional: key-id (crypto-NAK) */
-		ND_TCHECK_4(bp->key_id);
 		ND_PRINT("\n\tKey id: %u", GET_BE_U_4(bp->key_id));
 	} else if (length == NTP_TIMEMSG_MINLEN + 4 + 16) { 	/* Optional: key-id + 128-bit digest */
-		ND_TCHECK_4(bp->key_id);
 		ND_PRINT("\n\tKey id: %u", GET_BE_U_4(bp->key_id));
 		ND_TCHECK_LEN(bp->message_digest, 16);
 		ND_PRINT("\n\tAuthentication: %08x%08x%08x%08x",
@@ -324,7 +319,6 @@ ntp_time_print(netdissect_options *ndo,
 			 GET_BE_U_4(bp->message_digest + 8),
 			 GET_BE_U_4(bp->message_digest + 12));
 	} else if (length == NTP_TIMEMSG_MINLEN + 4 + 20) { 	/* Optional: key-id + 160-bit digest */
-		ND_TCHECK_4(bp->key_id);
 		ND_PRINT("\n\tKey id: %u", GET_BE_U_4(bp->key_id));
 		ND_TCHECK_LEN(bp->message_digest, 20);
 		ND_PRINT("\n\tAuthentication: %08x%08x%08x%08x%08x",
@@ -360,7 +354,6 @@ ntp_control_print(netdissect_options *ndo,
 	if (length < NTP_CTRLMSG_MINLEN)
 		goto invalid;
 
-	ND_TCHECK_1(cd->control);
 	control = GET_U_1(cd->control);
 	R = (control & 0x80) != 0;
 	E = (control & 0x40) != 0;
@@ -370,23 +363,18 @@ ntp_control_print(netdissect_options *ndo,
 		  R ? "Response" : "Request", E ? "Error" : "OK",
 		  M ? "More" : "Last", opcode);
 
-	ND_TCHECK_2(cd->sequence);
 	sequence = GET_BE_U_2(cd->sequence);
 	ND_PRINT("\tSequence=%hu", sequence);
 
-	ND_TCHECK_2(cd->status);
 	status = GET_BE_U_2(cd->status);
 	ND_PRINT(", Status=%#hx", status);
 
-	ND_TCHECK_2(cd->assoc);
 	assoc = GET_BE_U_2(cd->assoc);
 	ND_PRINT(", Assoc.=%hu", assoc);
 
-	ND_TCHECK_2(cd->offset);
 	offset = GET_BE_U_2(cd->offset);
 	ND_PRINT(", Offset=%hu", offset);
 
-	ND_TCHECK_2(cd->count);
 	count = GET_BE_U_2(cd->count);
 	ND_PRINT(", Count=%hu", count);
 
@@ -424,7 +412,6 @@ ntp_print(netdissect_options *ndo,
 	uint8_t status;
 
 	ndo->ndo_protocol = "ntp";
-	ND_TCHECK_1(bp->td.status);
 	status = GET_U_1(bp->td.status);
 
 	version = (status & VERSIONMASK) >> VERSIONSHIFT;
@@ -465,10 +452,6 @@ ntp_print(netdissect_options *ndo,
 	default:
 		break;			/* XXX: not implemented! */
 	}
-	return;
-
-trunc:
-	nd_print_trunc(ndo);
 }
 
 static void

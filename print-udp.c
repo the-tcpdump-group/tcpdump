@@ -118,9 +118,7 @@ vat_print(netdissect_options *ndo, const u_char *hdr, u_int length)
 			ND_PRINT("udp/vat, length %u < 8", length);
 			return;
 		}
-		ND_TCHECK_4(&((const u_int *)hdr)[0]);
 		i0 = GET_BE_U_4(&((const u_int *)hdr)[0]);
-		ND_TCHECK_4(&((const u_int *)hdr)[1]);
 		i1 = GET_BE_U_4(&((const u_int *)hdr)[1]);
 		ND_PRINT("udp/vat %u c%u %u%s",
 			length - 8,
@@ -152,9 +150,7 @@ rtp_print(netdissect_options *ndo, const u_char *hdr, u_int len)
 		ND_PRINT("udp/rtp, length %u < 8", len);
 		return;
 	}
-	ND_TCHECK_4(&((const u_int *)hdr)[0]);
 	i0 = GET_BE_U_4(&((const u_int *)hdr)[0]);
-	ND_TCHECK_4(&((const u_int *)hdr)[1]);
 	i1 = GET_BE_U_4(&((const u_int *)hdr)[1]);
 	dlen = len - 8;
 	ip += 2;
@@ -191,12 +187,10 @@ rtp_print(netdissect_options *ndo, const u_char *hdr, u_int len)
 		i0 & 0xffff,
 		i1);
 	if (ndo->ndo_vflag) {
-		ND_TCHECK_4(&((const u_int *)hdr)[2]);
 		ND_PRINT(" %u", GET_BE_U_4(&((const u_int *)hdr)[2]));
 		if (hasopt) {
 			u_int i2, optlen;
 			do {
-				ND_TCHECK_4(ip);
 				i2 = GET_BE_U_4(ip);
 				optlen = (i2 >> 16) & 0xff;
 				if (optlen == 0 || optlen > len) {
@@ -209,7 +203,6 @@ rtp_print(netdissect_options *ndo, const u_char *hdr, u_int len)
 		}
 		if (hasext) {
 			u_int i2, extlen;
-			ND_TCHECK_4(ip);
 			i2 = GET_BE_U_4(ip);
 			extlen = (i2 & 0xffff) + 1;
 			if (extlen > len) {
@@ -218,14 +211,9 @@ rtp_print(netdissect_options *ndo, const u_char *hdr, u_int len)
 			}
 			ip += extlen;
 		}
-		ND_TCHECK_4(ip);
 		if (contype == 0x1f) /*XXX H.261 */
 			ND_PRINT(" 0x%04x", GET_BE_U_4(ip) >> 16);
 	}
-	return;
-
-trunc:
-	nd_print_trunc(ndo);
 }
 
 static const u_char *
@@ -459,7 +447,6 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 
 		case PT_RPC:
 			rp = (const struct sunrpc_msg *)cp;
-			ND_TCHECK_4(rp->rm_direction);
 			direction = (enum sunrpc_msg_type) GET_BE_U_4(rp->rm_direction);
 			if (direction == SUNRPC_CALL)
 				sunrpc_print(ndo, (const u_char *)rp, length,
@@ -577,7 +564,6 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		 * TCP does, and we do so for UDP-over-IPv6.
 		 */
 		if (IP_V(ip) == 4 && (ndo->ndo_vflag > 1)) {
-			ND_TCHECK_2(up->uh_sum);
 			udp_sum = GET_BE_U_2(up->uh_sum);
 			if (udp_sum == 0) {
 				ND_PRINT("[no cksum] ");
@@ -596,7 +582,6 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			/* for IPv6, UDP checksum is mandatory */
 			if (ND_TTEST_LEN(cp, length)) {
 				sum = udp6_cksum(ndo, ip6, up, length + sizeof(struct udphdr));
-				ND_TCHECK_2(up->uh_sum);
 				udp_sum = GET_BE_U_2(up->uh_sum);
 
 				if (sum != 0) {

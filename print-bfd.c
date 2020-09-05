@@ -248,7 +248,6 @@ auth_print(netdissect_options *ndo, const u_char *pptr)
                     break;
                 }
                 pptr += 2;
-                ND_TCHECK_4(pptr);
                 ND_PRINT(", Sequence Number: 0x%08x", GET_BE_U_4(pptr));
                 pptr += 4;
                 ND_TCHECK_LEN(pptr, AUTH_MD5_HASH_LEN);
@@ -279,7 +278,6 @@ auth_print(netdissect_options *ndo, const u_char *pptr)
                     break;
                 }
                 pptr += 2;
-                ND_TCHECK_4(pptr);
                 ND_PRINT(", Sequence Number: 0x%08x", GET_BE_U_4(pptr));
                 pptr += 4;
                 ND_TCHECK_LEN(pptr, AUTH_SHA1_HASH_LEN);

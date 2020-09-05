@@ -223,7 +223,6 @@ hbhopt_process(netdissect_options *ndo, const u_char *bp, int *found_jumbo,
     u_int hbhlen = 0;
 
     ndo->ndo_protocol = "hbhopt";
-    ND_TCHECK_1(dp->ip6h_len);
     hbhlen = (GET_U_1(dp->ip6h_len) + 1) << 3;
     ND_TCHECK_LEN(dp, hbhlen);
     ND_PRINT("HBH ");
@@ -244,7 +243,6 @@ dstopt_process(netdissect_options *ndo, const u_char *bp)
     u_int dstoptlen = 0;
 
     ndo->ndo_protocol = "dstopt";
-    ND_TCHECK_1(dp->ip6d_len);
     dstoptlen = (GET_U_1(dp->ip6d_len) + 1) << 3;
     ND_TCHECK_LEN(dp, dstoptlen);
     ND_PRINT("DSTOPT ");

@@ -271,7 +271,6 @@ lwres_printaddr(netdissect_options *ndo,
 
 	p = p0;
 	ap = (const lwres_addr_t *)p;
-	ND_TCHECK_2(ap->length);
 	l = GET_BE_U_2(ap->length);
 	p += LWRES_ADDR_LEN;
 	ND_TCHECK_LEN(p, l);

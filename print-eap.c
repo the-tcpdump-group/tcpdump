@@ -154,9 +154,7 @@ eap_print(netdissect_options *ndo,
     u_int type, subtype, len;
     int count;
 
-    ND_TCHECK_1(cp);
     type = GET_U_1(cp);
-    ND_TCHECK_2(cp + 2);
     len = GET_BE_U_2(cp + 2);
     if(len != length) {
        goto trunc;
@@ -171,7 +169,6 @@ eap_print(netdissect_options *ndo,
 
     if (type == EAP_REQUEST || type == EAP_RESPONSE) {
         /* RFC 3748 Section 4.1 */
-        ND_TCHECK_1(cp + 4);
         subtype = GET_U_1(cp + 4);
         ND_PRINT("\n\t\t Type %s (%u)",
                 tok2str(eap_type_values, "unknown", subtype),
@@ -201,7 +198,6 @@ eap_print(netdissect_options *ndo,
                  * type one octet per type
                  */
                 while (count < (int)len) {
-                    ND_TCHECK_1(cp + count);
                     ND_PRINT(" %s (%u),",
                            tok2str(eap_type_values, "unknown", GET_U_1((cp + count))),
                            GET_U_1(cp + count));
@@ -220,7 +216,6 @@ eap_print(netdissect_options *ndo,
                        GET_U_1(cp + 5));
 
                 if (EAP_TLS_EXTRACT_BIT_L(GET_U_1(cp + 5))) {
-                    ND_TCHECK_4(cp + 6);
                     ND_PRINT(" len %u", GET_BE_U_4(cp + 6));
                 }
                 break;
@@ -234,7 +229,6 @@ eap_print(netdissect_options *ndo,
                        GET_U_1(cp + 5));
 
                 if (EAP_TLS_EXTRACT_BIT_L(GET_U_1(cp + 5))) {
-                    ND_TCHECK_4(cp + 6);
                     ND_PRINT(" len %u", GET_BE_U_4(cp + 6));
                 }
 
@@ -243,7 +237,6 @@ eap_print(netdissect_options *ndo,
 
             case EAP_TYPE_AKA:
             case EAP_TYPE_SIM:
-                ND_TCHECK_1(cp + 5);
                 ND_PRINT(" subtype [%s] 0x%02x,",
                        tok2str(eap_aka_subtype_values, "unknown", GET_U_1((cp + 5))),
                        GET_U_1(cp + 5));

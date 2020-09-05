@@ -50,7 +50,6 @@ ah_print(netdissect_options *ndo, const u_char *bp)
 	ND_PRINT("AH(spi=0x%08x", GET_BE_U_4(ah->ah_spi));
 	if (ndo->ndo_vflag)
 		ND_PRINT(",sumlen=%u", sumlen);
-	ND_TCHECK_4(ah + 1);
 	ND_PRINT(",seq=0x%x", GET_BE_U_4(ah + 1));
 	ND_TCHECK_LEN(bp, sizeof(struct ah) + sumlen);
 	ND_PRINT("): ");

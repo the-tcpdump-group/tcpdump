@@ -273,7 +273,6 @@ pimv1_print(netdissect_options *ndo,
 	u_char type;
 
 	ndo->ndo_protocol = "pimv1";
-	ND_TCHECK_1(bp + 1);
 	type = GET_U_1(bp + 1);
 
 	ND_PRINT(" %s", tok2str(pimv1_type_str, "[type %u]", type));
@@ -296,7 +295,6 @@ pimv1_print(netdissect_options *ndo,
 			}
 		}
 		if (ndo->ndo_vflag) {
-			ND_TCHECK_2(bp + 10);
 			ND_PRINT(" (Hold-time ");
 			unsigned_relts_print(ndo, GET_BE_U_2(bp + 10));
 			ND_PRINT(")");
@@ -329,7 +327,6 @@ pimv1_print(netdissect_options *ndo,
 			  GET_IPADDR_STRING(bp + 8));
 		if (GET_BE_U_4(bp + 12) != 0xffffffff)
 			ND_PRINT("/%s", GET_IPADDR_STRING(bp + 12));
-		ND_TCHECK_4(bp + 24);
 		ND_PRINT(" %s pref %u metric %u",
 		    (GET_U_1(bp + 20) & 0x80) ? "RP-tree" : "SPT",
 		    GET_BE_U_4(bp + 20) & 0x7fffffff,
@@ -345,7 +342,6 @@ pimv1_print(netdissect_options *ndo,
 		}
 		break;
 	}
-	ND_TCHECK_1(bp + 4);
 	if ((GET_U_1(bp + 4) >> 4) != 1)
 		ND_PRINT(" [v%u]", GET_U_1(bp + 4) >> 4);
 	return;
@@ -372,7 +368,6 @@ cisco_autorp_print(netdissect_options *ndo,
 	ndo->ndo_protocol = "cisco_autorp";
 	if (len < 8)
 		goto trunc;
-	ND_TCHECK_1(bp);
 	ND_PRINT(" auto-rp ");
 	type = GET_U_1(bp);
 	switch (type) {
@@ -387,10 +382,8 @@ cisco_autorp_print(netdissect_options *ndo,
 		break;
 	}
 
-	ND_TCHECK_1(bp + 1);
 	numrps = GET_U_1(bp + 1);
 
-	ND_TCHECK_2(bp + 2);
 	ND_PRINT(" Hold ");
 	hold = GET_BE_U_2(bp + 2);
 	if (hold)
@@ -427,7 +420,6 @@ cisco_autorp_print(netdissect_options *ndo,
 		len -= 4;
 		if (len < 1)
 			goto trunc;
-		ND_TCHECK_1(bp);
 		switch (GET_U_1(bp) & 0x3) {
 		case 0: ND_PRINT(" PIMv?");
 			break;
@@ -444,7 +436,6 @@ cisco_autorp_print(netdissect_options *ndo,
 		len -= 1;
 		if (len < 1)
 			goto trunc;
-		ND_TCHECK_1(bp);
 		nentries = GET_U_1(bp);
 		bp += 1;
 		len -= 1;
@@ -486,7 +477,6 @@ pim_print(netdissect_options *ndo,
 	ND_TCHECK_1(pim->pim_rsv);
 #endif
 
-	ND_TCHECK_1(pim->pim_typever);
 	pim_typever = GET_U_1(pim->pim_typever);
 	switch (PIM_VER(pim_typever)) {
 	case 2:
@@ -510,11 +500,6 @@ pim_print(netdissect_options *ndo,
 		          len);
 		break;
 	}
-	return;
-
-trunc:
-	nd_print_trunc(ndo);
-	return;
 }
 
 /*
@@ -746,7 +731,6 @@ pimv2_print(netdissect_options *ndo,
 		nd_print_invalid(ndo);
 		return;
 	}
-	ND_TCHECK_2(pim->pim_cksum);
 	ND_PRINT(", cksum 0x%04x ", GET_BE_U_2(pim->pim_cksum));
 	if (GET_BE_U_2(pim->pim_cksum) == 0) {
 		ND_PRINT("(unverified)");
@@ -1072,13 +1056,11 @@ pimv2_print(netdissect_options *ndo,
 		/* Fragment Tag, Hash Mask len, and BSR-priority */
 		if (len < 2)
 			goto trunc;
-		ND_TCHECK_2(bp);
 		ND_PRINT(" tag=%x", GET_BE_U_2(bp));
 		bp += 2;
 		len -= 2;
 		if (len < 1)
 			goto trunc;
-		ND_TCHECK_1(bp);
 		ND_PRINT(" hashmlen=%u", GET_U_1(bp));
 		if (len < 2)
 			goto trunc;
@@ -1105,11 +1087,9 @@ pimv2_print(netdissect_options *ndo,
 			/* RP-Count, Frag RP-Cnt, and rsvd */
 			if (len < 1)
 				goto trunc;
-			ND_TCHECK_1(bp);
 			ND_PRINT(" RPcnt=%u", GET_U_1(bp));
 			if (len < 2)
 				goto trunc;
-			ND_TCHECK_1(bp + 1);
 			frpcnt = GET_U_1(bp + 1);
 			ND_PRINT(" FRPcnt=%u", frpcnt);
 			if (len < 4)
@@ -1136,7 +1116,6 @@ pimv2_print(netdissect_options *ndo,
 						     GET_BE_U_2(bp));
 				if (len < 3)
 					goto trunc;
-				ND_TCHECK_1(bp + 2);
 				ND_PRINT(",prio=%u", GET_U_1(bp + 2));
 				if (len < 4)
 					goto trunc;
@@ -1172,16 +1151,13 @@ pimv2_print(netdissect_options *ndo,
 		/* Prefix-Cnt, Priority, and Holdtime */
 		if (len < 1)
 			goto trunc;
-		ND_TCHECK_1(bp);
 		ND_PRINT(" prefix-cnt=%u", GET_U_1(bp));
 		pfxcnt = GET_U_1(bp);
 		if (len < 2)
 			goto trunc;
-		ND_TCHECK_1(bp + 1);
 		ND_PRINT(" prio=%u", GET_U_1(bp + 1));
 		if (len < 4)
 			goto trunc;
-		ND_TCHECK_2(bp + 2);
 		ND_PRINT(" holdtime=");
 		unsigned_relts_print(ndo, GET_BE_U_2(bp + 2));
 		bp += 4;
@@ -1223,7 +1199,6 @@ pimv2_print(netdissect_options *ndo,
 		len -= advance;
 		if (len < 2)
 			goto trunc;
-		ND_TCHECK_2(bp);
 		ND_PRINT(" TUNR ");
 		unsigned_relts_print(ndo, GET_BE_U_2(bp));
 		break;

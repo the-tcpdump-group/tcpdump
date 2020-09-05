@@ -542,10 +542,7 @@ dccp_print_option(netdissect_options *ndo, const u_char *option, u_int hlen)
 {
 	uint8_t optlen, i;
 
-	ND_TCHECK_1(option);
-
 	if (GET_U_1(option) >= 32) {
-		ND_TCHECK_1(option + 1);
 		optlen = GET_U_1(option + 1);
 		if (optlen < 2) {
 			if (GET_U_1(option) >= 128)

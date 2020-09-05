@@ -111,7 +111,6 @@ vrrp_print(netdissect_options *ndo,
 	const char *type_s;
 
 	ndo->ndo_protocol = "vrrp";
-	ND_TCHECK_1(bp);
 	version = (GET_U_1(bp) & 0xf0) >> 4;
 	type = GET_U_1(bp) & 0x0f;
 	type_s = tok2str(type2str, "unknown type (%u)", type);
@@ -120,7 +119,6 @@ vrrp_print(netdissect_options *ndo,
 		ND_PRINT(", (ttl %u)", ttl);
 	if (version < 2 || version > 3 || type != VRRP_TYPE_ADVERTISEMENT)
 		return;
-	ND_TCHECK_1(bp + 2);
 	ND_PRINT(", vrid %u, prio %u", GET_U_1(bp + 1), GET_U_1(bp + 2));
 	ND_TCHECK_1(bp + 5);
 

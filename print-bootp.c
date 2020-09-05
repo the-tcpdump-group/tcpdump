@@ -283,12 +283,10 @@ bootp_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "bootp";
 	bp = (const struct bootp *)cp;
-	ND_TCHECK_1(bp->bp_op);
 	bp_op = GET_U_1(bp->bp_op);
 	ND_PRINT("BOOTP/DHCP, %s",
 		  tok2str(bootp_op_values, "unknown (0x%02x)", bp_op));
 
-	ND_TCHECK_1(bp->bp_hlen);
 	bp_htype = GET_U_1(bp->bp_htype);
 	bp_hlen = GET_U_1(bp->bp_hlen);
 	if (bp_htype == 1 && bp_hlen == 6 && bp_op == BOOTPREQUEST) {
@@ -319,7 +317,6 @@ bootp_print(netdissect_options *ndo,
 	if (GET_BE_U_2(bp->bp_secs))
 		ND_PRINT(", secs %u", GET_BE_U_2(bp->bp_secs));
 
-	ND_TCHECK_2(bp->bp_flags);
 	ND_PRINT(", Flags [%s]",
 		  bittok2str(bootp_flag_values, "none", GET_BE_U_2(bp->bp_flags)));
 	if (ndo->ndo_vflag > 1)
@@ -351,8 +348,7 @@ bootp_print(netdissect_options *ndo,
 		ND_PRINT("\n\t  Client-Ethernet-Address %s", GET_ETHERADDR_STRING(bp->bp_chaddr));
 	}
 
-	ND_TCHECK_1(bp->bp_sname);		/* check first char only */
-	if (GET_U_1(bp->bp_sname)) {
+	if (GET_U_1(bp->bp_sname)) {	/* get first char only */
 		ND_PRINT("\n\t  sname \"");
 		if (nd_printztn(ndo, bp->bp_sname, (u_int)sizeof(bp->bp_sname),
 				ndo->ndo_snapend) == 0) {
@@ -362,8 +358,7 @@ bootp_print(netdissect_options *ndo,
 		}
 		ND_PRINT("\"");
 	}
-	ND_TCHECK_1(bp->bp_file);		/* check first char only */
-	if (GET_U_1(bp->bp_file)) {
+	if (GET_U_1(bp->bp_file)) {	/* get first char only */
 		ND_PRINT("\n\t  file \"");
 		if (nd_printztn(ndo, bp->bp_file, (u_int)sizeof(bp->bp_file),
 				ndo->ndo_snapend) == 0) {
@@ -612,7 +607,6 @@ rfc1048_print(netdissect_options *ndo,
 			len = 0;
 		else {
 			/* Get the length; check for truncation */
-			ND_TCHECK_1(bp);
 			len = GET_U_1(bp);
 			bp++;
 		}

@@ -189,7 +189,6 @@ print_payload(netdissect_options *ndo, const struct payload_tipc_pkthdr *ap)
 		    tok2str(tipcuser_values, "unknown", user),
 		    tok2str(tipcmtype_values, "Unknown", mtype));
 	} else {
-		ND_TCHECK_4(ap->dest_node);
 		orig_node = GET_BE_U_4(ap->orig_node);
 		dest_node = GET_BE_U_4(ap->dest_node);
 		ND_PRINT("TIPC v%u.0 %u.%u.%u:%u > %u.%u.%u:%u, headerlength %u bytes, MessageSize %u bytes, %s, messageType %s",
@@ -342,7 +341,6 @@ tipc_print(netdissect_options *ndo, const u_char *bp, u_int length _U_,
 
 	ndo->ndo_protocol = "tipc";
 	ap = (const struct tipc_pkthdr *)bp;
-	ND_TCHECK_4(ap->w0);
 	w0 = GET_BE_U_4(ap->w0);
 	user = TIPC_USER(w0);
 
@@ -370,8 +368,4 @@ tipc_print(netdissect_options *ndo, const u_char *bp, u_int length _U_,
 			break;
 
 	}
-	return;
-
-trunc:
-	nd_print_trunc(ndo);
 }

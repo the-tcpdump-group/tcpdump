@@ -572,8 +572,7 @@ l2tp_avp_print(netdissect_options *ndo, const u_char *dat, u_int length)
 	int hidden = FALSE;
 
 	ND_PRINT(" ");
-
-	ND_TCHECK_2(dat);	/* Flags & Length */
+	/* Flags & Length */
 	len = GET_BE_U_2(dat) & L2TP_AVP_HDR_LEN_MASK;
 
 	/* If it is not long enough to contain the header, we'll give up. */
@@ -746,7 +745,6 @@ l2tp_print(netdissect_options *ndo, const u_char *dat, u_int length)
 	ndo->ndo_protocol = "l2tp";
 	flag_t = flag_l = flag_s = flag_o = FALSE;
 
-	ND_TCHECK_2(ptr);	/* Flags & Version */
 	if ((GET_BE_U_2(ptr) & L2TP_VERSION_MASK) == L2TP_VERSION_L2TP) {
 		ND_PRINT(" l2tp:");
 	} else if ((GET_BE_U_2(ptr) & L2TP_VERSION_MASK) == L2TP_VERSION_L2F) {
@@ -782,36 +780,31 @@ l2tp_print(netdissect_options *ndo, const u_char *dat, u_int length)
 	cnt += 2;
 
 	if (flag_l) {
-		ND_TCHECK_2(ptr);	/* Length */
 		l2tp_len = GET_BE_U_2(ptr);
 		ptr += 2;
 		cnt += 2;
 	} else {
 		l2tp_len = 0;
 	}
-
-	ND_TCHECK_2(ptr);		/* Tunnel ID */
+	/* Tunnel ID */
 	ND_PRINT("(%u/", GET_BE_U_2(ptr));
 	ptr += 2;
 	cnt += 2;
-	ND_TCHECK_2(ptr);		/* Session ID */
+	/* Session ID */
 	ND_PRINT("%u)",  GET_BE_U_2(ptr));
 	ptr += 2;
 	cnt += 2;
 
 	if (flag_s) {
-		ND_TCHECK_2(ptr);	/* Ns */
 		ND_PRINT("Ns=%u,", GET_BE_U_2(ptr));
 		ptr += 2;
 		cnt += 2;
-		ND_TCHECK_2(ptr);	/* Nr */
 		ND_PRINT("Nr=%u",  GET_BE_U_2(ptr));
 		ptr += 2;
 		cnt += 2;
 	}
 
-	if (flag_o) {
-		ND_TCHECK_2(ptr);	/* Offset Size */
+	if (flag_o) {	/* Offset Size */
 		pad =  GET_BE_U_2(ptr);
 		ptr += (2 + pad);
 		cnt += (2 + pad);
@@ -858,9 +851,4 @@ l2tp_print(netdissect_options *ndo, const u_char *dat, u_int length)
 		ppp_print(ndo, ptr, length - cnt);
 		ND_PRINT("}");
 	}
-
-	return;
-
- trunc:
-	nd_print_trunc(ndo);
 }

@@ -62,7 +62,6 @@ msdp_print(netdissect_options *ndo, const u_char *sp, u_int length)
 				ND_PRINT(" SA");
 			else
 				ND_PRINT(" SA-Response");
-			ND_TCHECK_1(sp);
 			ND_PRINT(" %u entries", GET_U_1(sp));
 			if ((u_int)((GET_U_1(sp) * 12) + 8) < len) {
 				ND_PRINT(" [w/data]");

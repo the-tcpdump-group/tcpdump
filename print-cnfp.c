@@ -468,7 +468,6 @@ cnfp_print(netdissect_options *ndo, const u_char *cp)
 	 * First 2 bytes are the version number.
 	 */
 	ndo->ndo_protocol = "cnfp";
-	ND_TCHECK_2(cp);
 	ver = GET_BE_U_2(cp);
 	switch (ver) {
 
@@ -488,9 +487,4 @@ cnfp_print(netdissect_options *ndo, const u_char *cp)
 		ND_PRINT("NetFlow v%x", ver);
 		break;
 	}
-	return;
-
-trunc:
-	nd_print_trunc(ndo);
-	return;
 }

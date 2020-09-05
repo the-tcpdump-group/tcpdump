@@ -223,7 +223,6 @@ vtp_print(netdissect_options *ndo,
 	 *
 	 */
 
-	ND_TCHECK_4(tptr);
 	ND_PRINT(", Config Rev %x", GET_BE_U_4(tptr));
 
 	/*
@@ -244,7 +243,6 @@ vtp_print(netdissect_options *ndo,
 	tptr += 4;
 	while ((unsigned)(tptr - pptr) < length) {
 
-	    ND_TCHECK_1(tptr);
 	    len = GET_U_1(tptr);
 	    if (len == 0)
 		break;
@@ -378,7 +376,6 @@ vtp_print(netdissect_options *ndo,
 	 *
 	 */
 
-	ND_TCHECK_4(tptr);
 	ND_PRINT("\n\tStart value: %u", GET_BE_U_4(tptr));
 	break;
 

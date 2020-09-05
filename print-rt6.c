@@ -60,7 +60,6 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 	case IPV6_RTHDR_TYPE_2:			/* Mobile IPv6 ID-20 */
 		dp0 = (const struct ip6_rthdr0 *)dp;
 
-		ND_TCHECK_4(dp0->ip6r0_reserved);
 		if (GET_BE_U_4(dp0->ip6r0_reserved) || ndo->ndo_vflag) {
 			ND_PRINT(", rsv=0x%0x",
 			    GET_BE_U_4(dp0->ip6r0_reserved));
@@ -81,16 +80,13 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 		break;
 	case IPV6_RTHDR_TYPE_4:
 		srh = (const struct ip6_srh *)dp;
-		ND_TCHECK_1(srh->srh_last_ent);
 		ND_PRINT(", last-entry=%u", GET_U_1(srh->srh_last_ent));
 
-		ND_TCHECK_1(srh->srh_flags);
 		if (GET_U_1(srh->srh_flags) || ndo->ndo_vflag) {
 			ND_PRINT(", flags=0x%0x",
 				GET_U_1(srh->srh_flags));
 		}
 
-		ND_TCHECK_2(srh->srh_tag);
 		ND_PRINT(", tag=%x", GET_BE_U_2(srh->srh_tag));
 
 		if (len % 2 == 1)

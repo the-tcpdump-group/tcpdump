@@ -364,7 +364,6 @@ pgm_print(netdissect_options *ndo,
 	     * and stopping if we don't have enough.
 	     */
 	    bp += (2 * sizeof(uint16_t));
-	    ND_TCHECK_2(bp);
 	    switch (GET_BE_U_2(bp)) {
 	    case AFNUM_INET:
 		ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
@@ -515,7 +514,6 @@ pgm_print(netdissect_options *ndo,
 			    ND_PRINT("[Option length not a multiple of 4]");
 			    return;
 			}
-			ND_TCHECK_4(bp);
 			ND_PRINT(" %u", GET_BE_U_4(bp));
 			bp += 4;
 			opt_len -= 4;

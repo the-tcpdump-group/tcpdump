@@ -52,7 +52,6 @@ carp_print(netdissect_options *ndo, const u_char *bp, u_int len, u_int ttl)
 	const char *type_s;
 
 	ndo->ndo_protocol = "carp";
-	ND_TCHECK_1(bp);
 	version = (GET_U_1(bp) & 0xf0) >> 4;
 	type = GET_U_1(bp) & 0x0f;
 	if (type == 1)
@@ -64,8 +63,6 @@ carp_print(netdissect_options *ndo, const u_char *bp, u_int len, u_int ttl)
 		ND_PRINT("[ttl=%u!] ", ttl);
 	if (version != 2 || type != 1)
 		return;
-	ND_TCHECK_1(bp + 2);
-	ND_TCHECK_1(bp + 5);
 	ND_PRINT("vhid=%u advbase=%u advskew=%u authlen=%u ",
 	    GET_U_1(bp + 1), GET_U_1(bp + 5), GET_U_1(bp + 2),
 	    GET_U_1(bp + 3));
@@ -78,8 +75,4 @@ carp_print(netdissect_options *ndo, const u_char *bp, u_int len, u_int ttl)
 				GET_BE_U_2(bp + 6));
 	}
 	ND_PRINT("counter=%" PRIu64, GET_BE_U_8(bp + 8));
-
-	return;
-trunc:
-	nd_print_trunc(ndo);
 }

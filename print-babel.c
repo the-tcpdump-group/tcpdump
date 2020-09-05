@@ -395,7 +395,6 @@ babel_print_v2_tlvs(netdissect_options *ndo,
         message = cp + i;
 
         ICHECK(i, 1);
-        ND_TCHECK_1(message);
         if((type = GET_U_1(message)) == MESSAGE_PAD1) {
             ND_PRINT(ndo->ndo_vflag ? "\n\tPad 1" : " pad1");
             i += 1;

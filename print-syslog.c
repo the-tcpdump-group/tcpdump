@@ -90,16 +90,13 @@ syslog_print(netdissect_options *ndo,
      * severity and facility values
      */
 
-    ND_TCHECK_1(pptr);
-    if (GET_U_1(pptr + msg_off) == '<') {
+    if (GET_U_1(pptr) == '<') {
         msg_off++;
-        ND_TCHECK_1(pptr + msg_off);
         while (msg_off <= SYSLOG_MAX_DIGITS &&
                GET_U_1(pptr + msg_off) >= '0' &&
                GET_U_1(pptr + msg_off) <= '9') {
             pri = pri * 10 + (GET_U_1(pptr + msg_off) - '0');
             msg_off++;
-            ND_TCHECK_1(pptr + msg_off);
         }
         if (GET_U_1(pptr + msg_off) != '>') {
             nd_print_trunc(ndo);
@@ -132,15 +129,9 @@ syslog_print(netdissect_options *ndo,
 
     /* print the syslog text in verbose mode */
     for (; msg_off < len; msg_off++) {
-        ND_TCHECK_1(pptr + msg_off);
         fn_print_char(ndo, GET_U_1(pptr + msg_off));
     }
 
     if (ndo->ndo_vflag > 1)
         print_unknown_data(ndo, pptr, "\n\t", len);
-
-    return;
-
-trunc:
-    nd_print_trunc(ndo);
 }

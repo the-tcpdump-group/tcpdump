@@ -116,7 +116,6 @@ static int resp_get_length(netdissect_options *, const u_char *, int, const u_ch
 #define FIND_CR_OR_LF(_ptr, _len)           \
     for (;;) {                              \
         LCHECK(_len);                       \
-        ND_TCHECK_1(_ptr);                  \
         if (GET_U_1(_ptr) == '\r' ||        \
             GET_U_1(_ptr) == '\n')          \
             break;                          \
@@ -250,7 +249,6 @@ resp_parse(netdissect_options *ndo, const u_char *bp, int length)
     int ret_len;
 
     LCHECK2(length, 1);
-    ND_TCHECK_1(bp);
     op = GET_U_1(bp);
 
     /* bp now points to the op, so these routines must skip it */
@@ -481,7 +479,6 @@ resp_get_length(netdissect_options *ndo, const u_char *bp, int len, const u_char
     for (;;) {
         if (len == 0)
             goto trunc;
-        ND_TCHECK_1(bp);
         c = GET_U_1(bp);
         if (!(c >= '0' && c <= '9')) {
             if (!saw_digit) {
@@ -519,7 +516,6 @@ resp_get_length(netdissect_options *ndo, const u_char *bp, int len, const u_char
     len--;
     if (len == 0)
         goto trunc;
-    ND_TCHECK_1(bp);
     if (GET_U_1(bp) != '\n') {
         bp++;
         goto invalid;
