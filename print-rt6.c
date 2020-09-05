@@ -70,7 +70,6 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 		len >>= 1;
 		p = (const u_char *) dp0->ip6r0_addr;
 		for (i = 0; i < len; i++) {
-			ND_TCHECK_16(p);
 			ND_PRINT(", [%u]%s", i, GET_IP6ADDR_STRING(p));
 			p += 16;
 		}
@@ -94,7 +93,6 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 		len >>= 1;
 		p  = (const u_char *) srh->srh_segments;
 		for (i = 0; i < len; i++) {
-			ND_TCHECK_16(p);
 			ND_PRINT(", [%u]%s", i, GET_IP6ADDR_STRING(p));
 			p += 16;
 		}

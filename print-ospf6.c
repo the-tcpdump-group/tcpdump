@@ -608,7 +608,6 @@ ospf6_print_lsa(netdissect_options *ndo,
 			if (lsa_length < sizeof (nd_ipv6))
 				return (1);
 			lsa_length -= sizeof (nd_ipv6);
-			ND_TCHECK_16(tptr);
 			ND_PRINT(" forward %s",
 				 GET_IP6ADDR_STRING(tptr));
 			tptr += sizeof(nd_ipv6);

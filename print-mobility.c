@@ -155,7 +155,6 @@ mobility_opt_print(netdissect_options *ndo,
 				ND_PRINT("(altcoa: trunc)");
 				goto trunc;
 			}
-			ND_TCHECK_16(bp + i + 2);
 			ND_PRINT("(alt-CoA: %s)", GET_IP6ADDR_STRING(bp + i + 2));
 			break;
 		case IP6MOPT_NONCEID:
@@ -308,7 +307,6 @@ mobility_print(netdissect_options *ndo,
 		ND_PRINT(" status=%u", GET_U_1(mh->ip6m_data8[0]));
 		/* Reserved */
 		hlen = IP6M_MINLEN;
-		ND_TCHECK_16(bp + hlen);
 		ND_PRINT(" homeaddr %s", GET_IP6ADDR_STRING(bp + hlen));
 		hlen += 16;
 		break;

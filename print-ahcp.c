@@ -148,7 +148,6 @@ ahcp_ipv6_addresses_print(netdissect_options *ndo, const u_char *cp, const u_cha
 	while (cp < ep) {
 		if (cp + 16 > ep)
 			goto invalid;
-		ND_TCHECK_16(cp);
 		ND_PRINT("%s%s", sep, GET_IP6ADDR_STRING(cp));
 		cp += 16;
 		sep = ", ";

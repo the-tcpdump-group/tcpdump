@@ -314,7 +314,6 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			packet_offset += 4;
 			break;
 		case IPv6_AFI:
-			ND_TCHECK_16(packet_iterator + packet_offset);
 			ND_PRINT(" EID %s/%u,",
 				GET_IP6ADDR_STRING(packet_iterator + packet_offset),
 				mask_len);

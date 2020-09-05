@@ -1074,14 +1074,7 @@ print_attr_address6(netdissect_options *ndo,
        return;
    }
 
-   ND_TCHECK_16(data);
-
    ND_PRINT("%s", GET_IP6ADDR_STRING(data));
-
-   return;
-
-   trunc:
-     nd_print_trunc(ndo);
 }
 
 static void

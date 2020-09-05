@@ -826,8 +826,6 @@ dhcp6_print(netdissect_options *ndo,
 		extp = (const u_char *)(dh6 + 1);
 		dhcp6opt_print(ndo, extp, ep);
 	} else {		/* relay messages */
-		ND_TCHECK_16(dh6relay->dh6relay_peeraddr);
-
 		ND_PRINT("linkaddr=%s", GET_IP6ADDR_STRING(dh6relay->dh6relay_linkaddr));
 
 		ND_PRINT(" peeraddr=%s", GET_IP6ADDR_STRING(dh6relay->dh6relay_peeraddr));
