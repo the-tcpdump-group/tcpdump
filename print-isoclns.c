@@ -3110,8 +3110,6 @@ isis_print(netdissect_options *ndo,
 	    while (tlen != 0) {
                 if (tlen < sizeof(nd_ipv6))
                     goto tlv_trunc;
-		ND_TCHECK_LEN(tptr, sizeof(nd_ipv6));
-
                 ND_PRINT("\n\t      IPv6 interface address: %s",
 		       GET_IP6ADDR_STRING(tptr));
 

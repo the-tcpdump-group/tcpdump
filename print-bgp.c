@@ -688,7 +688,6 @@ bgp_vpn_ip_print(netdissect_options *ndo,
         snprintf(pos, sizeof(addr), "%s", GET_IPADDR_STRING(pptr));
         break;
     case (sizeof(nd_ipv6) << 3): /* 128 */
-        ND_TCHECK_LEN(pptr, sizeof(nd_ipv6));
         snprintf(pos, sizeof(addr), "%s", GET_IP6ADDR_STRING(pptr));
         break;
     default:
@@ -2168,7 +2167,6 @@ bgp_attr_print(netdissect_options *ndo,
                         tlen -= tnhlen;
                         tnhlen = 0;
                     } else {
-                        ND_TCHECK_LEN(tptr, sizeof(nd_ipv6));
                         ND_PRINT("%s", GET_IP6ADDR_STRING(tptr));
                         tptr += sizeof(nd_ipv6);
                         tlen -= sizeof(nd_ipv6);

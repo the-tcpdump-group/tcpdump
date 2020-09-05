@@ -1596,7 +1596,6 @@ mldv2_report_print(netdissect_options *ndo, const u_char *bp, u_int len)
                     ND_PRINT(" [invalid number of groups]");
                     return;
 	    }
-            ND_TCHECK_LEN(bp + 4 + group, sizeof(nd_ipv6));
             ND_PRINT(" [gaddr %s", GET_IP6ADDR_STRING(bp + group + 4));
 	    ND_PRINT(" %s", tok2str(mldv2report2str, " [v2-report-#%u]",
                                          GET_U_1(bp + group)));
@@ -1612,8 +1611,6 @@ mldv2_report_print(netdissect_options *ndo, const u_char *bp, u_int len)
 		/* Print the sources */
                     ND_PRINT(" {");
                 for (j = 0; j < nsrcs; j++) {
-                    ND_TCHECK_LEN(bp + group + 20 + (j * sizeof(nd_ipv6)),
-                                  sizeof(nd_ipv6));
 		    ND_PRINT(" %s", GET_IP6ADDR_STRING(bp + group + 20 + (j * sizeof(nd_ipv6))));
 		}
                 ND_PRINT(" }");
@@ -1623,10 +1620,6 @@ mldv2_report_print(netdissect_options *ndo, const u_char *bp, u_int len)
 	    ND_PRINT("]");
         }
     }
-    return;
-trunc:
-    nd_print_trunc(ndo);
-    return;
 }
 
 static void
@@ -1652,7 +1645,6 @@ mldv2_query_print(netdissect_options *ndo, const u_char *bp, u_int len)
     if (ndo->ndo_vflag) {
             ND_PRINT(" [max resp delay=%u]", mrt);
     }
-    ND_TCHECK_LEN(bp + 8, sizeof(nd_ipv6));
     ND_PRINT(" [gaddr %s", GET_IP6ADDR_STRING(bp + 8));
 
     if (ndo->ndo_vflag) {
@@ -1679,8 +1671,6 @@ mldv2_query_print(netdissect_options *ndo, const u_char *bp, u_int len)
 	else if (ndo->ndo_vflag > 1) {
 	    ND_PRINT(" {");
 	    for (i = 0; i < nsrcs; i++) {
-		ND_TCHECK_LEN(bp + 28 + (i * sizeof(nd_ipv6)),
-                              sizeof(nd_ipv6));
 		ND_PRINT(" %s", GET_IP6ADDR_STRING(bp + 28 + (i * sizeof(nd_ipv6))));
 	    }
 	    ND_PRINT(" }");

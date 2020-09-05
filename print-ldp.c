@@ -317,7 +317,6 @@ ldp_tlv_print(netdissect_options *ndo,
             break;
         case AFNUM_INET6:
 	    while(tlv_tlen >= sizeof(nd_ipv6)) {
-		ND_TCHECK_LEN(tptr, sizeof(nd_ipv6));
 		ND_PRINT(" %s", GET_IP6ADDR_STRING(tptr));
 		tlv_tlen-=sizeof(nd_ipv6);
 		tptr+=sizeof(nd_ipv6);
