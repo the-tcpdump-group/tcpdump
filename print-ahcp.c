@@ -171,7 +171,6 @@ ahcp_ipv4_addresses_print(netdissect_options *ndo, const u_char *cp, const u_cha
 	while (cp < ep) {
 		if (cp + 4 > ep)
 			goto invalid;
-		ND_TCHECK_4(cp);
 		ND_PRINT("%s%s", sep, GET_IPADDR_STRING(cp));
 		cp += 4;
 		sep = ", ";

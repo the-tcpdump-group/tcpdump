@@ -333,7 +333,6 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		break;
 
 	case ICMP_UNREACH:
-		ND_TCHECK_4(dp->icmp_ip.ip_dst);
 		switch (icmp_code) {
 
 		case ICMP_UNREACH_NET:
@@ -481,7 +480,6 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		break;
 
 	case ICMP_REDIRECT:
-		ND_TCHECK_4(dp->icmp_ip.ip_dst);
 		switch (icmp_code) {
 
 		case ICMP_REDIRECT_NET:

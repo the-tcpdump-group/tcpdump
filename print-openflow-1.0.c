@@ -808,7 +808,6 @@ of10_bsn_message_print(netdissect_options *ndo,
 		/* pad */
 		cp += 3;
 		/* mask */
-		ND_TCHECK_4(cp);
 		ND_PRINT(", mask %s", GET_IPADDR_STRING(cp));
 		cp += 4;
 		break;
@@ -1378,13 +1377,11 @@ of10_match_print(netdissect_options *ndo,
 	ND_TCHECK_2(cp);
 	cp += 2;
 	/* nw_src */
-	ND_TCHECK_4(cp);
 	nw_bits = (wildcards & OFPFW_NW_SRC_MASK) >> OFPFW_NW_SRC_SHIFT;
 	if (nw_bits < 32)
 		ND_PRINT("%smatch nw_src %s/%u", pfx, GET_IPADDR_STRING(cp), 32 - nw_bits);
 	cp += 4;
 	/* nw_dst */
-	ND_TCHECK_4(cp);
 	nw_bits = (wildcards & OFPFW_NW_DST_MASK) >> OFPFW_NW_DST_SHIFT;
 	if (nw_bits < 32)
 		ND_PRINT("%smatch nw_dst %s/%u", pfx, GET_IPADDR_STRING(cp), 32 - nw_bits);
@@ -1514,7 +1511,6 @@ of10_actions_print(netdissect_options *ndo,
 		case OFPAT_SET_NW_SRC:
 		case OFPAT_SET_NW_DST:
 			/* nw_addr */
-			ND_TCHECK_4(cp);
 			ND_PRINT(", nw_addr %s", GET_IPADDR_STRING(cp));
 			cp += 4;
 			break;

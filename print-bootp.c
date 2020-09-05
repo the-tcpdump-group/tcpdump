@@ -322,22 +322,18 @@ bootp_print(netdissect_options *ndo,
 		ND_PRINT(" (0x%04x)", GET_BE_U_2(bp->bp_flags));
 
 	/* Client's ip address */
-	ND_TCHECK_4(bp->bp_ciaddr);
 	if (GET_IPV4_TO_NETWORK_ORDER(bp->bp_ciaddr))
 		ND_PRINT("\n\t  Client-IP %s", GET_IPADDR_STRING(bp->bp_ciaddr));
 
 	/* 'your' ip address (bootp client) */
-	ND_TCHECK_4(bp->bp_yiaddr);
 	if (GET_IPV4_TO_NETWORK_ORDER(bp->bp_yiaddr))
 		ND_PRINT("\n\t  Your-IP %s", GET_IPADDR_STRING(bp->bp_yiaddr));
 
 	/* Server's ip address */
-	ND_TCHECK_4(bp->bp_siaddr);
 	if (GET_IPV4_TO_NETWORK_ORDER(bp->bp_siaddr))
 		ND_PRINT("\n\t  Server-IP %s", GET_IPADDR_STRING(bp->bp_siaddr));
 
 	/* Gateway's ip address */
-	ND_TCHECK_4(bp->bp_giaddr);
 	if (GET_IPV4_TO_NETWORK_ORDER(bp->bp_giaddr))
 		ND_PRINT("\n\t  Gateway-IP %s", GET_IPADDR_STRING(bp->bp_giaddr));
 

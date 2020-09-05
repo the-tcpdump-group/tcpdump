@@ -288,13 +288,11 @@ igmp_print(netdissect_options *ndo,
 	}
         break;
     case 0x12:
-        ND_TCHECK_4(bp + 4);
         ND_PRINT("igmp v1 report %s", GET_IPADDR_STRING(bp + 4));
         if (len != 8)
             ND_PRINT(" [len %u]", len);
         break;
     case 0x16:
-        ND_TCHECK_4(bp + 4);
         ND_PRINT("igmp v2 report %s", GET_IPADDR_STRING(bp + 4));
         break;
     case 0x22:
@@ -302,7 +300,6 @@ igmp_print(netdissect_options *ndo,
 	print_igmpv3_report(ndo, bp, len);
         break;
     case 0x17:
-        ND_TCHECK_4(bp + 4);
         ND_PRINT("igmp leave %s", GET_IPADDR_STRING(bp + 4));
         break;
     case 0x13:
@@ -334,7 +331,4 @@ igmp_print(netdissect_options *ndo,
         if (in_cksum(vec, 1))
             ND_PRINT(" bad igmp cksum %x!", GET_BE_U_2(bp + 2));
     }
-    return;
-trunc:
-    nd_print_trunc(ndo);
 }

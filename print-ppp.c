@@ -731,7 +731,6 @@ print_lcp_config_options(netdissect_options *ndo,
 				ND_PRINT(" (length bogus, should be = 7)");
 				return 0;
 			}
-			ND_TCHECK_4(p + 3);
 			ND_PRINT(": IPv4 %s", GET_IPADDR_STRING(p + 3));
 			break;
 		case MEDCLASS_MAC:
@@ -1038,7 +1037,6 @@ print_ipcp_config_options(netdissect_options *ndo,
 			ND_PRINT(" (length bogus, should be = 10)");
 			return len;
 		}
-		ND_TCHECK_4(p + 6);
 		ND_PRINT(": src %s, dst %s",
 		       GET_IPADDR_STRING(p + 2),
 		       GET_IPADDR_STRING(p + 6));
@@ -1124,7 +1122,6 @@ print_ipcp_config_options(netdissect_options *ndo,
 			ND_PRINT(" (length bogus, should be = 6)");
 			return 0;
 		}
-		ND_TCHECK_4(p + 2);
 		ND_PRINT(": %s", GET_IPADDR_STRING(p + 2));
 		break;
 	default:

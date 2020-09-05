@@ -388,7 +388,6 @@ ospf6_print_lshdr(netdissect_options *ndo,
 {
 	if ((const u_char *)(lshp + 1) > dataend)
 		goto trunc;
-	ND_TCHECK_4(lshp->ls_router);
 
 	ND_PRINT("\n\t  Advertising Router %s, seq 0x%08x, age %us, length %u",
                GET_IPADDR_STRING(lshp->ls_router),
@@ -617,7 +616,6 @@ ospf6_print_lsa(netdissect_options *ndo,
 			if (lsa_length < sizeof (uint32_t))
 				return (1);
 			lsa_length -= sizeof (uint32_t);
-			ND_TCHECK_4(tptr);
 			ND_PRINT(" tag %s",
 			       GET_IPADDR_STRING(tptr));
 			tptr += sizeof(uint32_t);
@@ -627,7 +625,6 @@ ospf6_print_lsa(netdissect_options *ndo,
 			if (lsa_length < sizeof (uint32_t))
 				return (1);
 			lsa_length -= sizeof (uint32_t);
-			ND_TCHECK_4(tptr);
 			ND_PRINT(" RefLSID: %s",
 			       GET_IPADDR_STRING(tptr));
 			tptr += sizeof(uint32_t);
@@ -980,7 +977,6 @@ ospf6_print(netdissect_options *ndo,
 	}
 	dataend = bp + datalen;
 
-	ND_TCHECK_4(op->ospf6_routerid);
 	ND_PRINT("\n\tRouter-ID %s", GET_IPADDR_STRING(op->ospf6_routerid));
 
 	if (GET_BE_U_4(op->ospf6_areaid) != 0)

@@ -337,7 +337,6 @@ cdp_print_addr(netdissect_options *ndo,
 			 */
 			p += 3;
 
-			ND_TCHECK_4(p);
 			if (p + 4 > endp)
 				goto trunc;
 			ND_PRINT("IPv4 (%u) %s", num, GET_IPADDR_STRING(p));

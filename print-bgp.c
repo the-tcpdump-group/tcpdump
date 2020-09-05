@@ -1980,7 +1980,6 @@ bgp_attr_print(netdissect_options *ndo,
         if (len != 4)
             ND_PRINT("invalid len");
         else {
-            ND_TCHECK_4(tptr);
             ND_PRINT("%s", GET_IPADDR_STRING(tptr));
         }
         break;
@@ -2063,7 +2062,6 @@ bgp_attr_print(netdissect_options *ndo,
             ND_PRINT("invalid len");
             break;
         }
-        ND_TCHECK_4(tptr);
         ND_PRINT("%s",GET_IPADDR_STRING(tptr));
         break;
     case BGPTYPE_CLUSTER_LIST:
@@ -2072,7 +2070,6 @@ bgp_attr_print(netdissect_options *ndo,
             break;
         }
         while (tlen != 0) {
-            ND_TCHECK_4(tptr);
             if (tlen < 4)
                 goto trunc;
             ND_PRINT("%s%s",
@@ -2382,7 +2379,6 @@ bgp_attr_print(netdissect_options *ndo,
                       GET_IPADDR_STRING(tptr+4));
             break;
         case BGP_PMSI_TUNNEL_INGRESS:
-            ND_TCHECK_4(tptr);
             ND_PRINT("\n\t      Tunnel-Endpoint %s",
                       GET_IPADDR_STRING(tptr));
             break;

@@ -491,7 +491,6 @@ ospf_te_lsa_print(netdissect_options *ndo,
                 ND_PRINT("\n\t    TLV length %u < 4", tlv_length);
                 return -1;
             }
-            ND_TCHECK_4(tptr);
             ND_PRINT(", %s", GET_IPADDR_STRING(tptr));
             break;
 
@@ -698,7 +697,6 @@ ospf_print_lsa(netdissect_options *ndo,
 		break;
 
 	case LS_TYPE_NETWORK:
-		ND_TCHECK_4(lsap->lsa_un.un_nla.nla_mask);
 		ND_PRINT("\n\t    Mask %s\n\t    Connected Routers:",
 		    GET_IPADDR_STRING(lsap->lsa_un.un_nla.nla_mask));
 		ap = lsap->lsa_un.un_nla.nla_router;
@@ -766,11 +764,9 @@ ospf_print_lsa(netdissect_options *ndo,
 			else
 				ND_PRINT(" %u", (ul & ASLA_MASK_METRIC));
 
-			ND_TCHECK_4(almp->asla_forward);
 			if (GET_IPV4_TO_NETWORK_ORDER(almp->asla_forward) != 0) {
 				ND_PRINT(", forward %s", GET_IPADDR_STRING(almp->asla_forward));
 			}
-			ND_TCHECK_4(almp->asla_tag);
 			if (GET_IPV4_TO_NETWORK_ORDER(almp->asla_tag) != 0) {
 				ND_PRINT(", tag %s", GET_IPADDR_STRING(almp->asla_tag));
 			}
@@ -782,7 +778,6 @@ ospf_print_lsa(netdissect_options *ndo,
 		/* Multicast extensions as of 23 July 1991 */
 		mcp = lsap->lsa_un.un_mcla;
 		while ((const u_char *)mcp < ls_end) {
-			ND_TCHECK_4(mcp->mcla_vid);
 			switch (GET_BE_U_4(mcp->mcla_vtype)) {
 
 			case MCLA_VERTEX_ROUTER:
@@ -999,12 +994,10 @@ ospf_decode_v2(netdissect_options *ndo,
 		          GET_IPADDR_STRING(op->ospf_hello.hello_mask),
 		          GET_U_1(op->ospf_hello.hello_priority));
 
-		ND_TCHECK_4(op->ospf_hello.hello_dr);
 		if (GET_IPV4_TO_NETWORK_ORDER(op->ospf_hello.hello_dr) != 0)
 			ND_PRINT("\n\t  Designated Router %s",
 			    GET_IPADDR_STRING(op->ospf_hello.hello_dr));
 
-		ND_TCHECK_4(op->ospf_hello.hello_bdr);
 		if (GET_IPV4_TO_NETWORK_ORDER(op->ospf_hello.hello_bdr) != 0)
 			ND_PRINT(", Backup Designated Router %s",
 			          GET_IPADDR_STRING(op->ospf_hello.hello_bdr));
@@ -1134,10 +1127,8 @@ ospf_print(netdissect_options *ndo,
 		dataend = bp + length;
 	}
 
-	ND_TCHECK_4(op->ospf_routerid);
 	ND_PRINT("\n\tRouter-ID %s", GET_IPADDR_STRING(op->ospf_routerid));
 
-	ND_TCHECK_4(op->ospf_areaid);
 	if (GET_IPV4_TO_NETWORK_ORDER(op->ospf_areaid) != 0)
 		ND_PRINT(", Area %s", GET_IPADDR_STRING(op->ospf_areaid));
 	else

@@ -114,7 +114,6 @@ hsrp_print(netdissect_options *ndo, const u_char *bp, u_int len)
 	if (GET_U_1(hp->hsrp_reserved) != 0) {
 		ND_PRINT("[reserved=%u!] ", GET_U_1(hp->hsrp_reserved));
 	}
-	ND_TCHECK_4(hp->hsrp_virtaddr);
 	ND_PRINT("addr=%s", GET_IPADDR_STRING(hp->hsrp_virtaddr));
 	if (ndo->ndo_vflag) {
 		ND_PRINT(" hellotime=");

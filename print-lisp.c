@@ -307,7 +307,6 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 		switch (eid_afi) {
 		case IPv4_AFI:
-			ND_TCHECK_4(packet_iterator + packet_offset);
 			ND_PRINT(" EID %s/%u,",
 				GET_IPADDR_STRING(packet_iterator + packet_offset),
 				mask_len);

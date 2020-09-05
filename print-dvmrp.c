@@ -237,7 +237,6 @@ print_probe(netdissect_options *ndo,
 		return (0);
 
 	while ((len > 0) && (bp < ep)) {
-		ND_TCHECK_4(bp);
 		ND_PRINT("\n\tneighbor %s", GET_IPADDR_STRING(bp));
 		bp += 4; len -= 4;
 	}
@@ -268,7 +267,6 @@ print_neighbors(netdissect_options *ndo,
 		bp++;
 		len -= 7;
 		while (--ncount >= 0) {
-			ND_TCHECK_4(bp);
 			ND_PRINT(" [%s ->", GET_IPADDR_STRING(laddr));
 			ND_PRINT(" %s, (%u/%u)]",
 				   GET_IPADDR_STRING(bp), metric, thresh);

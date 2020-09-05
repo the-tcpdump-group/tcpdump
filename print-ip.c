@@ -71,15 +71,11 @@ ip_printroute(netdissect_options *ndo,
 		ND_PRINT(" [bad ptr %u]", GET_U_1(cp + 2));
 
 	for (len = 3; len < length; len += 4) {
-		ND_TCHECK_4(cp + len);
 		ND_PRINT(" %s", GET_IPADDR_STRING(cp + len));
 		if (ptr > len)
 			ND_PRINT(",");
 	}
 	return (0);
-
-trunc:
-	return (-1);
 }
 
 /*

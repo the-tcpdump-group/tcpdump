@@ -410,7 +410,6 @@ cisco_autorp_print(netdissect_options *ndo,
 
 		if (len < 4)
 			goto trunc;
-		ND_TCHECK_4(bp);
 		ND_PRINT(" RP %s", GET_IPADDR_STRING(bp));
 		bp += 4;
 		len -= 4;
@@ -913,7 +912,6 @@ pimv2_print(netdissect_options *ndo,
 		ip = (const struct ip *)bp;
 		switch (IP_V(ip)) {
                 case 0: /* Null header */
-			ND_TCHECK_4(ip->ip_dst);
 			ND_PRINT("IP-Null-header %s > %s",
 			          GET_IPADDR_STRING(ip->ip_src),
 			          GET_IPADDR_STRING(ip->ip_dst));
