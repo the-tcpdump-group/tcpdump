@@ -1,5 +1,5 @@
 # The options -# and -n are useless in TESTLIST. They are already set
-# in TESTonce.
+# in TESTrun.
 
 # Various flags applied to a TCP session.
 #
