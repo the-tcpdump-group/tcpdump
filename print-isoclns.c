@@ -3236,7 +3236,6 @@ isis_print(netdissect_options *ndo,
 	case ISIS_TLV_TE_ROUTER_ID:
 	    if (tlen < sizeof(nd_ipv4))
 	        goto tlv_trunc;
-	    ND_TCHECK_LEN(pptr, sizeof(nd_ipv4));
 	    ND_PRINT("\n\t      Traffic Engineering Router ID: %s", GET_IPADDR_STRING(pptr));
 	    break;
 
@@ -3244,7 +3243,6 @@ isis_print(netdissect_options *ndo,
 	    while (tlen != 0) {
                 if (tlen < sizeof(nd_ipv4))
                     goto tlv_trunc;
-		ND_TCHECK_LEN(tptr, sizeof(nd_ipv4));
 		ND_PRINT("\n\t      IPv4 interface address: %s", GET_IPADDR_STRING(tptr));
 		tptr += sizeof(nd_ipv4);
 		tlen -= sizeof(nd_ipv4);
@@ -3274,14 +3272,12 @@ isis_print(netdissect_options *ndo,
 
 	    if (tlen < sizeof(nd_ipv4))
 	        break;
-	    ND_TCHECK_LEN(tptr, sizeof(nd_ipv4));
 	    ND_PRINT("\n\t      IPv4 interface address: %s", GET_IPADDR_STRING(tptr));
 	    tptr+=sizeof(nd_ipv4);
 	    tlen-=sizeof(nd_ipv4);
 
 	    if (tlen < sizeof(nd_ipv4))
 	        break;
-	    ND_TCHECK_LEN(tptr, sizeof(nd_ipv4));
 	    ND_PRINT("\n\t      IPv4 neighbor address: %s", GET_IPADDR_STRING(tptr));
 	    tptr+=sizeof(nd_ipv4);
 	    tlen-=sizeof(nd_ipv4);

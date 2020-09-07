@@ -294,10 +294,7 @@ olsr_print_neighbor(netdissect_options *ndo,
     neighbor = 1;
 
     while (hello_len >= sizeof(nd_ipv4)) {
-
-        ND_TCHECK_LEN(msg_data, sizeof(nd_ipv4));
         /* print 4 neighbors per line */
-
         ND_PRINT("%s%s", GET_IPADDR_STRING(msg_data),
                neighbor % 4 == 0 ? "\n\t\t" : " ");
 
@@ -305,8 +302,6 @@ olsr_print_neighbor(netdissect_options *ndo,
         hello_len -= sizeof(nd_ipv4);
     }
     return (0);
-trunc:
-    return -1;
 }
 
 

@@ -309,7 +309,6 @@ ldp_tlv_print(netdissect_options *ndo,
         switch (af) {
         case AFNUM_INET:
 	    while(tlv_tlen >= sizeof(nd_ipv4)) {
-		ND_TCHECK_LEN(tptr, sizeof(nd_ipv4));
 		ND_PRINT(" %s", GET_IPADDR_STRING(tptr));
 		tlv_tlen-=sizeof(nd_ipv4);
 		tptr+=sizeof(nd_ipv4);

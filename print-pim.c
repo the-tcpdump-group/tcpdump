@@ -189,7 +189,6 @@ pimv1_join_prune_print(netdissect_options *ndo,
 
 	if (len < sizeof(nd_ipv4))
 		goto trunc;
-	ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 	if (ndo->ndo_vflag > 1)
 		ND_PRINT("\n");
 	ND_PRINT(" Upstream Nbr: %s", GET_IPADDR_STRING(bp));
@@ -218,13 +217,11 @@ pimv1_join_prune_print(netdissect_options *ndo,
 		 */
 		if (len < 4)
 			goto trunc;
-		ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 		ND_PRINT("\n\tGroup: %s", GET_IPADDR_STRING(bp));
 		bp += 4;
 		len -= 4;
 		if (len < 4)
 			goto trunc;
-		ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 		if (GET_BE_U_4(bp) != 0xffffffff)
 			ND_PRINT("/%s", GET_IPADDR_STRING(bp));
 		bp += 4;
@@ -303,7 +300,6 @@ pimv1_print(netdissect_options *ndo,
 			  GET_IPADDR_STRING(bp + 24));
 		break;
 	case PIMV1_TYPE_REGISTER_STOP:
-		ND_TCHECK_LEN(bp + 12, sizeof(nd_ipv4));
 		ND_PRINT(" for %s > %s", GET_IPADDR_STRING(bp + 8),
 			  GET_IPADDR_STRING(bp + 12));
 		break;
@@ -318,7 +314,6 @@ pimv1_print(netdissect_options *ndo,
 		}
 		break;
 	case PIMV1_TYPE_ASSERT:
-		ND_TCHECK_LEN(bp + 16, sizeof(nd_ipv4));
 		ND_PRINT(" for %s > %s", GET_IPADDR_STRING(bp + 16),
 			  GET_IPADDR_STRING(bp + 8));
 		if (GET_BE_U_4(bp + 12) != 0xffffffff)
