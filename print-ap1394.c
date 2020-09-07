@@ -52,7 +52,7 @@ struct firewire_header {
 static const char *
 fwaddr_string(netdissect_options *ndo, const u_char *addr)
 {
-	return (linkaddr_string(ndo, addr, LINKADDR_IEEE1394, FIREWIRE_EUI64_LEN));
+	return GET_LINKADDR_STRING(addr, LINKADDR_IEEE1394, FIREWIRE_EUI64_LEN);
 }
 
 static void
