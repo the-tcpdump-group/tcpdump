@@ -1508,6 +1508,7 @@ decode_clnp_prefix(netdissect_options *ndo,
         addr[(plen + 7) / 8 - 1] &=
             ((0xff00 >> (plen % 8)) & 0xff);
     }
+    /* Cannot use GET_ISONSAP_STRING (not packet buffer pointer) */
     snprintf(buf, buflen, "%s/%u",
                 isonsap_string(ndo, addr,(plen + 7) / 8),
                 plen);
@@ -1542,6 +1543,7 @@ decode_labeled_vpn_clnp_prefix(netdissect_options *ndo,
         addr[(plen + 7) / 8 - 1] &= ((0xff00 >> (plen % 8)) & 0xff);
     }
     /* the label may get offsetted by 4 bits so lets shift it right */
+    /* Cannot use GET_ISONSAP_STRING (not packet buffer pointer) */
     snprintf(buf, buflen, "RD: %s, %s/%u, label:%u %s",
                 bgp_vpn_rd_print(ndo, pptr+4),
                 isonsap_string(ndo, addr,(plen + 7) / 8),
