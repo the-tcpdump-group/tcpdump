@@ -462,9 +462,6 @@ pim_print(netdissect_options *ndo,
 	uint8_t pim_typever;
 
 	ndo->ndo_protocol = "pim";
-#ifdef notyet			/* currently we see only version and type */
-	ND_TCHECK_1(pim->pim_rsv);
-#endif
 
 	pim_typever = GET_U_1(pim->pim_typever);
 	switch (PIM_VER(pim_typever)) {
