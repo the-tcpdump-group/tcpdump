@@ -628,7 +628,7 @@ frf15_print(netdissect_options *ndo,
  * dig as deep as we can - e.g. on the first (B) fragment
  * there is enough payload to print the IP header
  * on non (B) fragments it depends if the fragmentation
- * model is end-to-end or interface based wether we want to print
+ * model is end-to-end or interface based whether we want to print
  * another Q.922 header
  */
     return;
