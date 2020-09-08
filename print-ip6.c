@@ -77,7 +77,6 @@ ip6_finddst(netdissect_options *ndo, nd_ipv6 *dst,
 			 * the header, in units of 8 octets, excluding
 			 * the first 8 octets.
 			 */
-			ND_TCHECK_2(cp);
 			advance = (GET_U_1(cp + 1) + 1) << 3;
 			nh = GET_U_1(cp);
 			break;

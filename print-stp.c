@@ -119,7 +119,6 @@ stp_print_config_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
         return 1;
     }
 
-    ND_TCHECK_2(stp_bpdu->forward_delay);
     ND_PRINT("\n\tmessage-age %.2fs, max-age %.2fs"
            ", hello-time %.2fs, forwarding-delay %.2fs",
            (float) GET_BE_U_2(stp_bpdu->message_age) / STP_TIME_BASE,
@@ -138,9 +137,6 @@ stp_print_config_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
                        RSTP_EXTRACT_PORT_ROLE(bpdu_flags)));
     }
     return 1;
-
-trunc:
-    return 0;
 }
 
 /*
@@ -275,7 +271,6 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
 
     ND_PRINT("CIST port-id %04x,", GET_BE_U_2(stp_bpdu->port_id));
 
-    ND_TCHECK_2(stp_bpdu->forward_delay);
     ND_PRINT("\n\tmessage-age %.2fs, max-age %.2fs"
            ", hello-time %.2fs, forwarding-delay %.2fs",
            (float) GET_BE_U_2(stp_bpdu->message_age) / STP_TIME_BASE,

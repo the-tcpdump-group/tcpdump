@@ -104,7 +104,6 @@ hsrp_print(netdissect_options *ndo, const u_char *bp, u_int len)
 	ND_PRINT("HSRPv%u", version);
 	if (version != 0)
 		return;
-	ND_TCHECK_1(hp->hsrp_op_code);
 	ND_PRINT("-");
 	ND_PRINT("%s ",
 		 tok2strary(op_code_str, "unknown (%u)", GET_U_1(hp->hsrp_op_code)));

@@ -458,7 +458,6 @@ pgm_print(netdissect_options *ndo,
 		    ND_PRINT("[Total option length leaves no room for final option]");
 		    return;
 		}
-		ND_TCHECK_2(bp);
 		opt_type = GET_U_1(bp);
 		bp++;
 		opt_len = GET_U_1(bp);

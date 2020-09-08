@@ -103,7 +103,6 @@ vat_print(netdissect_options *ndo, const u_char *hdr, u_int length)
 		ND_PRINT("udp/va/vat, length %u < 2", length);
 		return;
 	}
-	ND_TCHECK_2((const u_int *)hdr);
 	ts = GET_BE_U_2(hdr);
 	if ((ts & 0xf060) != 0) {
 		/* probably vt */
@@ -130,10 +129,6 @@ vat_print(netdissect_options *ndo, const u_char *hdr, u_int length)
 		if (i0 & 0x3f000000)
 			ND_PRINT(" s%u", (i0 >> 24) & 0x3f);
 	}
-	return;
-
-trunc:
-	nd_print_trunc(ndo);
 }
 
 static void

@@ -1283,7 +1283,6 @@ juniper_parse_header(netdissect_options *ndo,
 
     l2info->length = h->len;
     l2info->caplen = h->caplen;
-    ND_TCHECK_4(p);
     l2info->flags = GET_U_1(p + 3);
     l2info->direction = GET_U_1(p + 3) & JUNIPER_BPF_PKT_IN;
 

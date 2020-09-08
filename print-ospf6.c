@@ -894,7 +894,6 @@ ospf6_decode_at(netdissect_options *ndo,
 		goto trunc;
 	cp += 2;
 	/* Reserved */
-	ND_TCHECK_2(cp);
 	cp += 2;
 	/* Security Association ID */
 	ND_PRINT(", SAID %u", GET_BE_U_2(cp));

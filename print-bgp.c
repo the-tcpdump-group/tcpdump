@@ -1159,7 +1159,6 @@ decode_multicast_vpn(netdissect_options *ndo,
     u_int addr_length, sg_length;
     u_int offset;
 
-    ND_TCHECK_2(pptr);
     route_type = GET_U_1(pptr);
     pptr++;
     route_length = GET_U_1(pptr);
@@ -1310,7 +1309,6 @@ decode_labeled_vpn_l2(netdissect_options *ndo,
                 }
                 return plen + 2;
             }
-            ND_TCHECK_3(pptr);
             tlv_type = GET_U_1(pptr);
             pptr++;
             tlv_len = GET_BE_U_2(pptr);  /* length, in *bits* */
@@ -1583,8 +1581,6 @@ bgp_attr_get_as_size(netdissect_options *ndo,
      * each.
      */
     while (tptr < pptr + len) {
-        ND_TCHECK_1(tptr);
-
         /*
          * If we do not find a valid segment type, our guess might be wrong.
          */
@@ -2026,7 +2022,6 @@ bgp_attr_print(netdissect_options *ndo,
             ND_PRINT("invalid len");
             break;
         }
-        ND_TCHECK_8(tptr);
         ND_PRINT(" AS #%s, origin %s",
                   as_printf(ndo, astostr, sizeof(astostr), GET_BE_U_4(tptr)),
                   GET_IPADDR_STRING(tptr + 4));
@@ -2378,14 +2373,12 @@ bgp_attr_print(netdissect_options *ndo,
         switch (tunnel_type) {
         case BGP_PMSI_TUNNEL_PIM_SM: /* fall through */
         case BGP_PMSI_TUNNEL_PIM_BIDIR:
-            ND_TCHECK_8(tptr);
             ND_PRINT("\n\t      Sender %s, P-Group %s",
                       GET_IPADDR_STRING(tptr),
                       GET_IPADDR_STRING(tptr+4));
             break;
 
         case BGP_PMSI_TUNNEL_PIM_SSM:
-            ND_TCHECK_8(tptr);
             ND_PRINT("\n\t      Root-Node %s, P-Group %s",
                       GET_IPADDR_STRING(tptr),
                       GET_IPADDR_STRING(tptr+4));
@@ -2397,13 +2390,11 @@ bgp_attr_print(netdissect_options *ndo,
             break;
         case BGP_PMSI_TUNNEL_LDP_P2MP: /* fall through */
         case BGP_PMSI_TUNNEL_LDP_MP2MP:
-            ND_TCHECK_8(tptr);
             ND_PRINT("\n\t      Root-Node %s, LSP-ID 0x%08x",
                       GET_IPADDR_STRING(tptr),
                       GET_BE_U_4(tptr + 4));
             break;
         case BGP_PMSI_TUNNEL_RSVP_P2MP:
-            ND_TCHECK_8(tptr);
             ND_PRINT("\n\t      Extended-Tunnel-ID %s, P2MP-ID 0x%08x",
                       GET_IPADDR_STRING(tptr),
                       GET_BE_U_4(tptr + 4));
@@ -2421,9 +2412,6 @@ bgp_attr_print(netdissect_options *ndo,
         uint16_t length;
 
         while (tlen >= 3) {
-
-            ND_TCHECK_3(tptr);
-
             type = GET_U_1(tptr);
             length = GET_BE_U_2(tptr + 1);
             tptr += 3;
@@ -2544,7 +2532,6 @@ bgp_attr_print(netdissect_options *ndo,
         }
         ND_PRINT("\n\t    ");
         while (len != 0) {
-            ND_TCHECK_LEN(tptr, 12);
             ND_PRINT("%u:%u:%u%s",
                       GET_BE_U_4(tptr),
                       GET_BE_U_4(tptr + 4),
@@ -3030,7 +3017,6 @@ bgp_notification_print(netdissect_options *ndo,
          */
         if(bgpn_minor == BGP_NOTIFY_MINOR_CEASE_MAXPRFX && length >= BGP_NOTIFICATION_SIZE + 7) {
             tptr = dat + BGP_NOTIFICATION_SIZE;
-            ND_TCHECK_7(tptr);
             ND_PRINT(", AFI %s (%u), SAFI %s (%u), Max Prefixes: %u",
                       tok2str(af_values, "Unknown", GET_BE_U_2(tptr)),
                       GET_BE_U_2(tptr),

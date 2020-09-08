@@ -806,7 +806,6 @@ of10_bsn_message_print(netdissect_options *ndo,
 		ND_PRINT(", index %u", GET_U_1(cp));
 		cp += 1;
 		/* pad */
-		ND_TCHECK_3(cp);
 		cp += 3;
 		/* mask */
 		ND_TCHECK_4(cp);
@@ -1357,7 +1356,6 @@ of10_match_print(netdissect_options *ndo,
 		ND_PRINT("%smatch dl_vlan_pcp %s", pfx, pcp_str(GET_U_1(cp)));
 	cp += 1;
 	/* pad1 */
-	ND_TCHECK_1(cp);
 	cp += 1;
 	/* dl_type */
 	dl_type = GET_BE_U_2(cp);
@@ -1589,7 +1587,6 @@ of10_features_reply_print(netdissect_options *ndo,
 	ND_PRINT(", n_tables %u", GET_U_1(cp));
 	cp += 1;
 	/* pad */
-	ND_TCHECK_3(cp);
 	cp += 3;
 	/* capabilities */
 	ND_PRINT("\n\t capabilities 0x%08x", GET_BE_U_4(cp));
@@ -1602,10 +1599,6 @@ of10_features_reply_print(netdissect_options *ndo,
 	cp += 4;
 	/* ports */
 	return of10_phy_ports_print(ndo, cp, ep, len - OF_SWITCH_FEATURES_LEN);
-
-trunc:
-	nd_print_trunc(ndo);
-	return ep;
 }
 
 /* [OF10] Section 5.3.3 */
@@ -1665,7 +1658,6 @@ of10_port_mod_print(netdissect_options *ndo,
 	ND_PRINT("\n\t port_no %s", tok2str(ofpp_str, "%u", GET_BE_U_2(cp)));
 	cp += 2;
 	/* hw_addr */
-	ND_TCHECK_LEN(cp, MAC_ADDR_LEN);
 	ND_PRINT(", hw_addr %s", GET_ETHERADDR_STRING(cp));
 	cp += MAC_ADDR_LEN;
 	/* config */
@@ -1727,7 +1719,6 @@ of10_stats_request_print(netdissect_options *ndo,
 			 tok2str(tableid_str, "%u", GET_U_1(cp)));
 		cp += 1;
 		/* pad */
-		ND_TCHECK_1(cp);
 		cp += 1;
 		/* out_port */
 		ND_PRINT(", out_port %s",
@@ -1862,7 +1853,6 @@ of10_flow_stats_reply_print(netdissect_options *ndo,
 		ND_PRINT(", hard_timeout %u", GET_BE_U_2(cp));
 		cp += 2;
 		/* pad2 */
-		ND_TCHECK_6(cp);
 		cp += 6;
 		/* cookie */
 		ND_PRINT(", cookie 0x%016" PRIx64, GET_BE_U_8(cp));
@@ -1996,7 +1986,6 @@ of10_port_stats_reply_print(netdissect_options *ndo,
 			goto next_port;
 		}
 		/* pad */
-		ND_TCHECK_6(cp);
 		cp += 6;
 		/* rx_packets */
 		ND_PRINT(", rx_packets %" PRIu64, GET_BE_U_8(cp));
@@ -2064,7 +2053,6 @@ of10_queue_stats_reply_print(netdissect_options *ndo,
 			 tok2str(ofpp_str, "%u", GET_BE_U_2(cp)));
 		cp += 2;
 		/* pad */
-		ND_TCHECK_2(cp);
 		cp += 2;
 		/* queue_id */
 		ND_PRINT(", queue_id %u", GET_BE_U_4(cp));
@@ -2217,7 +2205,6 @@ of10_flow_removed_print(netdissect_options *ndo,
 		 tok2str(ofprr_str, "unknown (0x%02x)", GET_U_1(cp)));
 	cp += 1;
 	/* pad */
-	ND_TCHECK_1(cp);
 	cp += 1;
 	/* duration_sec */
 	ND_PRINT(", duration_sec %u", GET_BE_U_4(cp));
@@ -2230,7 +2217,6 @@ of10_flow_removed_print(netdissect_options *ndo,
 		ND_PRINT(", idle_timeout %u", GET_BE_U_2(cp));
 	cp += 2;
 	/* pad2 */
-	ND_TCHECK_2(cp);
 	cp += 2;
 	/* packet_count */
 	ND_PRINT(", packet_count %" PRIu64, GET_BE_U_8(cp));
@@ -2238,10 +2224,6 @@ of10_flow_removed_print(netdissect_options *ndo,
 	/* byte_count */
 	ND_PRINT(", byte_count %" PRIu64, GET_BE_U_8(cp));
 	return cp + 8;
-
-trunc:
-	nd_print_trunc(ndo);
-	return ep;
 }
 
 /* [OF10] Section 5.4.4 */
@@ -2257,7 +2239,6 @@ of10_error_print(netdissect_options *ndo,
 	cp += 2;
 	ND_PRINT("\n\t type %s", tok2str(ofpet_str, "invalid (0x%04x)", type));
 	/* code */
-	ND_TCHECK_2(cp);
 	code_str =
 		type == OFPET_HELLO_FAILED    ? ofphfc_str  :
 		type == OFPET_BAD_REQUEST     ? ofpbrc_str  :
@@ -2271,10 +2252,6 @@ of10_error_print(netdissect_options *ndo,
 	cp += 2;
 	/* data */
 	return of10_data_print(ndo, cp, ep, len - OF_ERROR_MSG_LEN);
-
-trunc:
-	nd_print_trunc(ndo);
-	return ep;
 }
 
 const u_char *

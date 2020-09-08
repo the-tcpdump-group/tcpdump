@@ -239,7 +239,6 @@ ipx_rip_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	if (length != 0) {
 	    if (length < 8)
 		goto trunc;
-	    ND_TCHECK_8(ipx);
 	    ND_PRINT(" %08x/%u.%u", GET_BE_U_4(ipx),
 			 GET_BE_U_2(ipx + 4), GET_BE_U_2(ipx + 6));
 	}
@@ -249,7 +248,6 @@ ipx_rip_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	for (i = 0; i < 50 && length != 0; i++) {
 	    if (length < 8)
 		goto trunc;
-	    ND_TCHECK_8(ipx);
 	    ND_PRINT(" %08x/%u.%u", GET_BE_U_4(ipx),
 			 GET_BE_U_2(ipx + 4), GET_BE_U_2(ipx + 6));
 

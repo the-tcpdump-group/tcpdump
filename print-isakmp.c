@@ -3111,7 +3111,6 @@ isakmp_rfc3948_print(netdissect_options *ndo,
 	if(length < 4) {
 		goto trunc;
 	}
-	ND_TCHECK_1(bp + 3);
 
 	/*
 	 * see if this is an IKE packet

@@ -964,7 +964,6 @@ clnp_print(netdissect_options *ndo,
                 ND_PRINT(", bad opts/li");
                 return (0);
             }
-            ND_TCHECK_2(pptr);
             op = GET_U_1(pptr);
             opli = GET_U_1(pptr + 1);
             pptr += 2;
@@ -1394,7 +1393,6 @@ esis_print(netdissect_options *ndo,
                 ND_PRINT(", bad opts/li");
                 return;
             }
-            ND_TCHECK_2(pptr);
             op = GET_U_1(pptr);
             opli = GET_U_1(pptr + 1);
             pptr += 2;
@@ -1494,7 +1492,6 @@ isis_print_mt_port_cap_subtlv(netdissect_options *ndo,
 
   while (len > 2)
   {
-    ND_TCHECK_2(tptr);
     stlv_type = GET_U_1(tptr);
     stlv_len  = GET_U_1(tptr + 1);
 
@@ -1627,7 +1624,6 @@ isis_print_mt_capability_subtlv(netdissect_options *ndo,
 
   while (len > 2)
   {
-    ND_TCHECK_2(tptr);
     stlv_type = GET_U_1(tptr);
     stlv_len  = GET_U_1(tptr + 1);
     tptr += 2;
@@ -2252,7 +2248,6 @@ isis_print_mtid(netdissect_options *ndo,
 {
     if (tlv_remaining < 2)
         goto trunc;
-    ND_TCHECK_2(tptr);
 
     ND_PRINT("%s%s",
            ident,
@@ -2300,7 +2295,6 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
         }
         processed++;
     } else if (afi == AF_INET6) {
-        ND_TCHECK_2(tptr);
         status_byte=GET_U_1(tptr);
         bit_length=GET_U_1(tptr + 1);
         if (bit_length > 128) {
@@ -2357,7 +2351,6 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
         ND_PRINT(" (%u)", sublen);   /* print out subTLV length */
 
         while (sublen>0) {
-            ND_TCHECK_2(tptr);
             subtlvtype=GET_U_1(tptr);
             subtlvlen=GET_U_1(tptr + 1);
             tptr+=2;
@@ -2380,7 +2373,6 @@ isis_print_router_cap_subtlv(netdissect_options *ndo, const uint8_t *tptr, uint8
     uint8_t subt, subl;
 
     while (tlen >= 2) {
-	ND_TCHECK_LEN(tptr, 2);
 	subt = GET_U_1(tptr);
 	subl = GET_U_1(tptr+1);
 	tlen -= 2;
@@ -3210,7 +3202,6 @@ isis_print(netdissect_options *ndo,
         {
             if (tlen < 2)
                 goto tlv_trunc;
-            ND_TCHECK_2(tptr);
 
             ND_PRINT("\n\t       RES: %u, MTID(s): %u",
                     (GET_BE_U_2(tptr) >> 12),
@@ -3492,7 +3483,6 @@ isis_print(netdissect_options *ndo,
                 nd_print_invalid(ndo);
                 break;
             }
-            ND_TCHECK_5(tptr); /* router-id + flags */
             ND_PRINT("\n\t      Router-ID %s", GET_IPADDR_STRING(tptr));
             ND_PRINT(", Flags [%s]",
 		     bittok2str(isis_tlv_router_capability_flags, "none", GET_U_1(tptr+4)));

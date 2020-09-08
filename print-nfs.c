@@ -291,7 +291,6 @@ parse_sattr3(netdissect_options *ndo,
 	sa3->sa_atimetype = GET_BE_U_4(dp);
 	dp++;
 	if (sa3->sa_atimetype == NFSV3SATTRTIME_TOCLIENT) {
-		ND_TCHECK_4(dp + 1);
 		sa3->sa_atime.nfsv3_sec = GET_BE_U_4(dp);
 		dp++;
 		sa3->sa_atime.nfsv3_nsec = GET_BE_U_4(dp);
@@ -301,7 +300,6 @@ parse_sattr3(netdissect_options *ndo,
 	sa3->sa_mtimetype = GET_BE_U_4(dp);
 	dp++;
 	if (sa3->sa_mtimetype == NFSV3SATTRTIME_TOCLIENT) {
-		ND_TCHECK_4(dp + 1);
 		sa3->sa_mtime.nfsv3_sec = GET_BE_U_4(dp);
 		dp++;
 		sa3->sa_mtime.nfsv3_nsec = GET_BE_U_4(dp);
@@ -309,8 +307,6 @@ parse_sattr3(netdissect_options *ndo,
 	}
 
 	return dp;
-trunc:
-	return NULL;
 }
 
 static void

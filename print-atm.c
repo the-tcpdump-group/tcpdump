@@ -459,7 +459,6 @@ oam_print(netdissect_options *ndo,
     } oam_ptr;
 
     ndo->ndo_protocol = "oam";
-    ND_TCHECK_1(p + ATM_HDR_LEN_NOHEC + hec);
     cell_header = GET_BE_U_4(p + hec);
     cell_type = (GET_U_1((p + ATM_HDR_LEN_NOHEC + hec)) >> 4) & 0x0f;
     func_type = GET_U_1((p + ATM_HDR_LEN_NOHEC + hec)) & 0x0f;

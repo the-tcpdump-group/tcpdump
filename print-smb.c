@@ -1085,7 +1085,6 @@ nbt_udp137_print(netdissect_options *ndo,
     u_int total, i;
 
     ndo->ndo_protocol = "nbt_udp137";
-    ND_TCHECK_2(data + 10);
     name_trn_id = GET_BE_U_2(data);
     response = (GET_U_1(data + 2) >> 7);
     opcode = (GET_U_1(data + 2) >> 3) & 0xF;

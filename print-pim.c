@@ -197,7 +197,6 @@ pimv1_join_prune_print(netdissect_options *ndo,
 	len -= 4;
 	if (len < 4)
 		goto trunc;
-	ND_TCHECK_2(bp + 2);
 	if (ndo->ndo_vflag > 1)
 		ND_PRINT("\n");
 	ND_PRINT(" Hold time: ");
@@ -209,7 +208,6 @@ pimv1_join_prune_print(netdissect_options *ndo,
 
 	if (len < 4)
 		goto trunc;
-	ND_TCHECK_4(bp);
 	ngroups = GET_U_1(bp + 3);
 	bp += 4;
 	len -= 4;
@@ -233,7 +231,6 @@ pimv1_join_prune_print(netdissect_options *ndo,
 		len -= 4;
 		if (len < 4)
 			goto trunc;
-		ND_TCHECK_4(bp);
 		njoin = GET_BE_U_2(bp);
 		nprune = GET_BE_U_2(bp + 2);
 		ND_PRINT(" joined: %u pruned: %u", njoin, nprune);
@@ -248,7 +245,6 @@ pimv1_join_prune_print(netdissect_options *ndo,
 				type = "Prune";
 			if (len < 6)
 				goto trunc;
-			ND_TCHECK_6(bp);
 			ND_PRINT("\n\t%s %s%s%s%s/%u", type,
 			    (GET_U_1(bp) & 0x01) ? "Sparse " : "Dense ",
 			    (GET_U_1(bp + 1) & 0x80) ? "WC " : "",
@@ -443,7 +439,6 @@ cisco_autorp_print(netdissect_options *ndo,
 		while (nentries != 0) {
 			if (len < 6)
 				goto trunc;
-			ND_TCHECK_6(bp);
 			ND_PRINT("%c%s%s/%u", s, GET_U_1(bp) & 1 ? "!" : "",
 			          GET_IPADDR_STRING(bp + 2), GET_U_1(bp + 1));
 			if (GET_U_1(bp) & 0x02) {
@@ -577,7 +572,6 @@ pimv2_addr_print(netdissect_options *ndo,
 	if (addr_len == 0) {
 		if (len < 2)
 			goto trunc;
-		ND_TCHECK_1(bp + 1);
 		switch (GET_U_1(bp)) {
 		case 1:
 			af = AF_INET;
@@ -719,7 +713,6 @@ pimv2_print(netdissect_options *ndo,
 		nd_print_invalid(ndo);
 		return;
 	}
-	ND_TCHECK_1(pim->pim_rsv);
 	pim_typever = GET_U_1(pim->pim_typever);
 	/* RFC5015 allocates the high 4 bits of pim_rsv for "subtype". */
 	pimv2_addr_len = GET_U_1(pim->pim_rsv) & 0x0f;
@@ -781,7 +774,6 @@ pimv2_print(netdissect_options *ndo,
 		while (len > 0) {
 			if (len < 4)
 				goto trunc;
-			ND_TCHECK_4(bp);
 			otype = GET_BE_U_2(bp);
 			olen = GET_BE_U_2(bp + 2);
 			ND_PRINT("\n\t  %s Option (%u), length %u, Value: ",
@@ -919,7 +911,6 @@ pimv2_print(netdissect_options *ndo,
 		if (len == 0)
 			goto trunc;
 		ip = (const struct ip *)bp;
-		ND_TCHECK_1(ip->ip_vhl);
 		switch (IP_V(ip)) {
                 case 0: /* Null header */
 			ND_TCHECK_4(ip->ip_dst);

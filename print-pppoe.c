@@ -150,7 +150,6 @@ pppoe_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		 * tag_type is previous tag or 0xffff for first iteration
 		 */
 		while (tag_type && p < pppoe_payload + pppoe_length) {
-			ND_TCHECK_4(p);
 			tag_type = GET_BE_U_2(p);
 			tag_len = GET_BE_U_2(p + 2);
 			p += 4;

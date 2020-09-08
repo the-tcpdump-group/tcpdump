@@ -290,7 +290,6 @@ bootp_print(netdissect_options *ndo,
 	bp_htype = GET_U_1(bp->bp_htype);
 	bp_hlen = GET_U_1(bp->bp_hlen);
 	if (bp_htype == 1 && bp_hlen == 6 && bp_op == BOOTPREQUEST) {
-		ND_TCHECK_6(bp->bp_chaddr);
 		ND_PRINT(" from %s", GET_ETHERADDR_STRING(bp->bp_chaddr));
 	}
 
@@ -344,7 +343,6 @@ bootp_print(netdissect_options *ndo,
 
 	/* Client's Ethernet address */
 	if (bp_htype == 1 && bp_hlen == 6) {
-		ND_TCHECK_6(bp->bp_chaddr);
 		ND_PRINT("\n\t  Client-Ethernet-Address %s", GET_ETHERADDR_STRING(bp->bp_chaddr));
 	}
 

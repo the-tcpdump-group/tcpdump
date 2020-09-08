@@ -629,7 +629,6 @@ olsr_print(netdissect_options *ndo,
 
             if (msg_tlen < 4)
                 goto trunc;
-            ND_TCHECK_4(msg_data);
 
             name_entries = GET_BE_U_2(msg_data + 2);
             addr_size = 4;
@@ -656,7 +655,6 @@ olsr_print(netdissect_options *ndo,
 
                 if (msg_tlen < 4)
                     break;
-                ND_TCHECK_4(msg_data);
 
                 name_entry_type = GET_BE_U_2(msg_data);
                 name_entry_len = GET_BE_U_2(msg_data + 2);

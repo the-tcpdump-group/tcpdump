@@ -1648,7 +1648,6 @@ mldv2_query_print(netdissect_options *ndo, const u_char *bp, u_int len)
     ND_PRINT(" [gaddr %s", GET_IP6ADDR_STRING(bp + 8));
 
     if (ndo->ndo_vflag) {
-        ND_TCHECK_1(bp + 25);
 	if (GET_U_1(bp + 24) & 0x08) {
 		ND_PRINT(" sflag");
 	}
@@ -1678,10 +1677,6 @@ mldv2_query_print(netdissect_options *ndo, const u_char *bp, u_int len)
                 ND_PRINT(", %u source(s)", nsrcs);
     }
     ND_PRINT("]");
-    return;
-trunc:
-    nd_print_trunc(ndo);
-    return;
 }
 
 static void

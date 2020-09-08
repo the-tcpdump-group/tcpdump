@@ -161,7 +161,6 @@ vrrp_print(netdissect_options *ndo,
 		c = ' ';
 		bp += 8;
 		for (i = 0; i < naddrs; i++) {
-			ND_TCHECK_1(bp + 3);
 			ND_PRINT("%c%s", c, GET_IPADDR_STRING(bp));
 			c = ',';
 			bp += 4;

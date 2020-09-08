@@ -854,8 +854,6 @@ print_vendor_attr(netdissect_options *ndo,
            vendor_id);
 
     while (length >= 2) {
-	ND_TCHECK_2(data);
-
         vendor_type = GET_U_1(data);
         vendor_length = GET_U_1(data + 1);
 
@@ -910,7 +908,6 @@ print_attr_num(netdissect_options *ndo,
        return;
    }
 
-   ND_TCHECK_4(data);
                           /* This attribute has standard values */
    if (attr_type[attr_code].siz_subtypes)
    {
@@ -1007,11 +1004,6 @@ print_attr_num(netdissect_options *ndo,
       } /* switch */
 
    } /* if-else */
-
-   return;
-
-   trunc:
-     nd_print_trunc(ndo);
 }
 
 /*****************************/
@@ -1031,8 +1023,6 @@ print_attr_address(netdissect_options *ndo,
        return;
    }
 
-   ND_TCHECK_4(data);
-
    switch(attr_code)
    {
       case FRM_IPADDR:
@@ -1050,11 +1040,6 @@ print_attr_address(netdissect_options *ndo,
           ND_PRINT("%s", GET_IPADDR_STRING(data));
       break;
    }
-
-   return;
-
-   trunc:
-     nd_print_trunc(ndo);
 }
 
 /*****************************/

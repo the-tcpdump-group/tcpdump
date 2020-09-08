@@ -200,7 +200,6 @@ egpnr_print(netdissect_options *ndo,
 		while (distances != 0) {
 			if (length < 2)
 				goto trunc;
-			ND_TCHECK_2(cp);
 			ND_PRINT("%sd%u:", comma, GET_U_1(cp));
 			cp++;
 			comma = ", ";
@@ -223,7 +222,6 @@ egpnr_print(netdissect_options *ndo,
 				} else if (!IN_CLASSA(addr)) {
 					if (length < 2)
 						goto trunc;
-					ND_TCHECK_2(cp);
 					addr |= ((uint32_t) GET_U_1(cp)) << 16;
 					cp++;
 					addr |= ((uint32_t) GET_U_1(cp)) << 8;

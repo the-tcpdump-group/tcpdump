@@ -221,7 +221,6 @@ eap_print(netdissect_options *ndo,
                 break;
 
             case EAP_TYPE_FAST:
-                ND_TCHECK_1(cp + 5);
                 ND_PRINT(" FASTv%u",
                        EAP_TTLS_VERSION(GET_U_1((cp + 5))));
                 ND_PRINT(" flags [%s] 0x%02x,",

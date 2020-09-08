@@ -252,16 +252,12 @@ static void dccp_print_ack_no(netdissect_options *ndo, const u_char *bp)
 	uint64_t ackno;
 
 	if (DCCPH_X(dh) != 0) {
-		ND_TCHECK_8(ackp);
 		ackno = GET_BE_U_6(ackp + 2);
 	} else {
-		ND_TCHECK_4(ackp);
 		ackno = GET_BE_U_3(ackp + 1);
 	}
 
 	ND_PRINT("(ack=%" PRIu64 ") ", ackno);
-trunc:
-	return;
 }
 
 static u_int dccp_print_option(netdissect_options *, const u_char *, u_int);

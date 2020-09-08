@@ -248,7 +248,6 @@ aoev1_mac_print(netdissect_options *ndo,
 	if (len < AOEV1_MAC_ARG_LEN)
 		goto invalid;
 	/* Reserved */
-	ND_TCHECK_1(cp);
 	cp += 1;
 	/* MCmd */
 	ND_PRINT("\n\tMCmd: %s",
@@ -267,14 +266,12 @@ aoev1_mac_print(netdissect_options *ndo,
 	/* directives */
 	for (i = 0; i < dircount; i++) {
 		/* Reserved */
-		ND_TCHECK_1(cp);
 		cp += 1;
 		/* DCmd */
 		ND_PRINT("\n\t DCmd: %s",
 			 tok2str(aoev1_dcmd_str, "Unknown (0x%02x)", GET_U_1(cp)));
 		cp += 1;
 		/* Ethernet Address */
-		ND_TCHECK_LEN(cp, MAC_ADDR_LEN);
 		ND_PRINT(", Ethernet Address: %s", GET_ETHERADDR_STRING(cp));
 		cp += MAC_ADDR_LEN;
 	}
@@ -309,7 +306,6 @@ aoev1_reserve_print(netdissect_options *ndo,
 		goto invalid;
 	/* addresses */
 	for (i = 0; i < nmacs; i++) {
-		ND_TCHECK_LEN(cp, MAC_ADDR_LEN);
 		ND_PRINT("\n\tEthernet Address %u: %s", i, GET_ETHERADDR_STRING(cp));
 		cp += MAC_ADDR_LEN;
 	}

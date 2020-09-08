@@ -129,7 +129,6 @@ udld_print(netdissect_options *ndo, const u_char *pptr, u_int length)
 
     while (tptr < (pptr+length)) {
 
-        ND_TCHECK_4(tptr);
 	type = GET_BE_U_2(tptr);
         len  = GET_BE_U_2(tptr + 2);
 

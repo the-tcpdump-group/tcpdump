@@ -307,7 +307,6 @@ ospf_te_lsa_print(netdissect_options *ndo,
                            tlv_length);
                     return -1;
                 }
-                ND_TCHECK_4(tptr);
                 subtlv_type = GET_BE_U_2(tptr);
                 subtlv_length = GET_BE_U_2(tptr + 2);
                 tptr+=4;
@@ -941,7 +940,6 @@ ospf_decode_lls(netdissect_options *ndo,
     ND_PRINT(", length: %u", length2);
 
     dptr += 2;
-    ND_TCHECK_1(dptr);
     while (dptr < dataend) {
         lls_type = GET_BE_U_2(dptr);
         ND_PRINT("\n\t    %s (%u)",
@@ -977,8 +975,6 @@ ospf_decode_lls(netdissect_options *ndo,
     }
 
     return (0);
-trunc:
-    return (1);
 }
 
 static int

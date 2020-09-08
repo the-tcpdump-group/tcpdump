@@ -613,7 +613,6 @@ frf15_print(netdissect_options *ndo,
 
     if (length < 2)
         goto trunc;
-    ND_TCHECK_2(p);
 
     flags = GET_U_1(p)&MFR_BEC_MASK;
     sequence_num = (GET_U_1(p)&0x1e)<<7 | GET_U_1(p + 1);

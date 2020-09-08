@@ -437,7 +437,6 @@ telnet_parse(netdissect_options *ndo, const u_char *sp, u_int length, int print)
 		/* IAC SB .... IAC SE */
 		p = sp;
 		while (length > (u_int)(p + 1 - sp)) {
-			ND_TCHECK_2(p);
 			if (GET_U_1(p) == IAC && GET_U_1(p + 1) == SE)
 				break;
 			p++;
@@ -497,8 +496,6 @@ telnet_parse(netdissect_options *ndo, const u_char *sp, u_int length, int print)
 done:
 	return (int)(sp - osp);
 
-trunc:
-	nd_print_trunc(ndo);
 pktend:
 	return -1;
 #undef FETCH

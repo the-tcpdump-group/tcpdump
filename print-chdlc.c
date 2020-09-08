@@ -60,7 +60,6 @@ chdlc_print(netdissect_options *ndo, const u_char *p, u_int length)
 	ndo->ndo_protocol = "chdlc";
 	if (length < CHDLC_HDRLEN)
 		goto trunc;
-	ND_TCHECK_LEN(p, CHDLC_HDRLEN);
 	proto = GET_BE_U_2(p + 2);
 	if (ndo->ndo_eflag) {
                 ND_PRINT("%s, ethertype %s (0x%04x), length %u: ",
@@ -96,7 +95,6 @@ chdlc_print(netdissect_options *ndo, const u_char *p, u_int length)
                 /* is the fudge byte set ? lets verify by spotting ISO headers */
                 if (length < 2)
                     goto trunc;
-                ND_TCHECK_2(p);
                 if (GET_U_1(p + 1) == NLPID_CLNP ||
                     GET_U_1(p + 1) == NLPID_ESIS ||
                     GET_U_1(p + 1) == NLPID_ISIS)

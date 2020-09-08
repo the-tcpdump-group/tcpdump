@@ -88,17 +88,13 @@ print_long_pos_vector(netdissect_options *ndo,
 {
 	uint32_t lat, lon;
 
-	ND_TCHECK_LEN(bp, GEONET_ADDR_LEN);
 	ND_PRINT("GN_ADDR:%s ", GET_LINKADDR_STRING(bp, LINKADDR_OTHER, GEONET_ADDR_LEN));
 
-	ND_TCHECK_8(bp + 12);
 	lat = GET_BE_U_4(bp + 12);
 	ND_PRINT("lat:%u ", lat);
 	lon = GET_BE_U_4(bp + 16);
 	ND_PRINT("lon:%u", lon);
 	return (0);
-trunc:
-	return -1;
 }
 
 

@@ -465,7 +465,6 @@ resp_get_length(netdissect_options *ndo, const u_char *bp, int len, const u_char
 
     if (len == 0)
         goto trunc;
-    ND_TCHECK_1(bp);
     too_large = 0;
     neg = 0;
     if (GET_U_1(bp) == '-') {
