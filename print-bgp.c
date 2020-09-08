@@ -2133,8 +2133,6 @@ bgp_attr_print(netdissect_options *ndo,
                         tlen -= tnhlen;
                         tnhlen = 0;
                     } else {
-                        ND_TCHECK_LEN(tptr,
-                                      sizeof(nd_ipv4) + BGP_VPN_RD_LEN);
                         ND_PRINT("RD: %s, %s",
                                   bgp_vpn_rd_print(ndo, tptr),
                                   GET_IPADDR_STRING(tptr+BGP_VPN_RD_LEN));
