@@ -1022,8 +1022,6 @@ clnp_print(netdissect_options *ndo,
                             }
                             if (source_address_length > 0) {
                                     source_address=(tptr+1);
-                                    ND_TCHECK_LEN(source_address,
-                                                  source_address_length);
                                     ND_PRINT("\n\t    NSAP address (length %u): %s",
                                            source_address_length,
                                            GET_ISONSAP_STRING(source_address, source_address_length));
@@ -2891,7 +2889,6 @@ isis_print(netdissect_options *ndo,
 		tlen--;
 		if (tlen < alen)
 		    goto tlv_trunc;
-	        ND_TCHECK_LEN(tptr, alen);
 		ND_PRINT("\n\t      Area address (length: %u): %s",
                        alen,
                        GET_ISONSAP_STRING(tptr, alen));
@@ -3459,7 +3456,6 @@ isis_print(netdissect_options *ndo,
                 }
                 if (tlen < prefix_len/2)
                     break;
-                ND_TCHECK_LEN(tptr, prefix_len / 2);
                 ND_PRINT("\n\t\tAddress: %s/%u",
                        GET_ISONSAP_STRING(tptr, prefix_len / 2), prefix_len * 4);
                 tptr+=prefix_len/2;

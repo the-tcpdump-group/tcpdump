@@ -120,7 +120,6 @@ vrrp_print(netdissect_options *ndo,
 	if (version < 2 || version > 3 || type != VRRP_TYPE_ADVERTISEMENT)
 		return;
 	ND_PRINT(", vrid %u, prio %u", GET_U_1(bp + 1), GET_U_1(bp + 2));
-	ND_TCHECK_1(bp + 5);
 
 	if (version == 2) {
 		auth_type = GET_U_1(bp + 4);

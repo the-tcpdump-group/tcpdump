@@ -2193,7 +2193,6 @@ bgp_attr_print(netdissect_options *ndo,
                 case (AFNUM_NSAP<<8 | SAFNUM_UNICAST):
                 case (AFNUM_NSAP<<8 | SAFNUM_MULTICAST):
                 case (AFNUM_NSAP<<8 | SAFNUM_UNIMULTICAST):
-                    ND_TCHECK_LEN(tptr, tnhlen);
                     ND_PRINT("%s", GET_ISONSAP_STRING(tptr, tnhlen));
                     tptr += tnhlen;
                     tlen -= tnhlen;
