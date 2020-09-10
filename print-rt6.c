@@ -49,8 +49,6 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 	nd_print_protocol_caps(ndo);
 	dp = (const struct ip6_rthdr *)bp;
 
-	ND_TCHECK_1(dp->ip6r_segleft);
-
 	len = GET_U_1(dp->ip6r_len);
 	ND_PRINT(" (len=%u", len);	/*)*/
 	type = GET_U_1(dp->ip6r_type);
