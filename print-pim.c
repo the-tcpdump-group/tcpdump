@@ -305,7 +305,6 @@ pimv1_print(netdissect_options *ndo,
 		break;
 	case PIMV1_TYPE_RP_REACHABILITY:
 		if (ndo->ndo_vflag) {
-			ND_TCHECK_2(bp + 22);
 			ND_PRINT(" group %s", GET_IPADDR_STRING(bp + 8));
 			if (GET_BE_U_4(bp + 12) != 0xffffffff)
 				ND_PRINT("/%s", GET_IPADDR_STRING(bp + 12));
@@ -1091,7 +1090,6 @@ pimv2_print(netdissect_options *ndo,
 
 				if (len < 2)
 					goto trunc;
-				ND_TCHECK_2(bp);
 				ND_PRINT(",holdtime=");
 				unsigned_relts_print(ndo,
 						     GET_BE_U_2(bp));

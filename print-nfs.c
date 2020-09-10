@@ -340,7 +340,6 @@ nfsreply_print(netdissect_options *ndo,
 	ndo->ndo_protocol = "nfs";
 	rp = (const struct sunrpc_msg *)bp;
 
-	ND_TCHECK_4(rp->rm_xid);
 	if (!ndo->ndo_nflag) {
 		strlcpy(srcid, "nfs", sizeof(srcid));
 		snprintf(dstid, sizeof(dstid), "%u",
@@ -353,10 +352,6 @@ nfsreply_print(netdissect_options *ndo,
 	print_nfsaddr(ndo, bp2, srcid, dstid);
 
 	nfsreply_noaddr_print(ndo, bp, length, bp2);
-	return;
-
-trunc:
-	nd_print_trunc(ndo);
 }
 
 void
@@ -1317,15 +1312,12 @@ parserddires(netdissect_options *ndo,
 	if (ndo->ndo_qflag)
 		return (1);
 
-	ND_TCHECK_4(dp + 2);
 	ND_PRINT(" offset 0x%x size %u ",
 	       GET_BE_U_4(dp), GET_BE_U_4(dp + 1));
 	if (GET_BE_U_4(dp + 2) != 0)
 		ND_PRINT(" eof");
 
 	return (1);
-trunc:
-	return (0);
 }
 
 static const uint32_t *

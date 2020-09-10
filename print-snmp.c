@@ -473,7 +473,6 @@ asn1_parse(netdissect_options *ndo,
 			len--;
 			hdr++;
 			p++;
-			ND_TCHECK_1(p);
 		}
 		if (len < 1) {
 			ND_PRINT("[Xtagfield?]");

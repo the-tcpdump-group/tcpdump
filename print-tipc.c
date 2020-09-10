@@ -317,7 +317,6 @@ print_link_conf(netdissect_options *ndo, const struct link_conf_tipc_pkthdr *ap)
 	    tok2str(tipcuser_values, "unknown", user),
 	    tok2str(tipc_linkconf_mtype_values, "Unknown", mtype));
 	if (ndo->ndo_vflag) {
-		ND_TCHECK_4(ap->w5);
 		node_sig = TIPC_NODE_SIG(w1);
 		ntwrk_id = GET_BE_U_4(ap->ntwrk_id);
 		w5 = GET_BE_U_4(ap->w5);

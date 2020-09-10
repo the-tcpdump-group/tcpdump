@@ -207,7 +207,6 @@ eap_print(netdissect_options *ndo,
 
             case EAP_TYPE_TTLS:
             case EAP_TYPE_TLS:
-                ND_TCHECK_1(cp + 5);
                 if (subtype == EAP_TYPE_TTLS)
                     ND_PRINT(" TTLSv%u",
                            EAP_TTLS_VERSION(GET_U_1((cp + 5))));

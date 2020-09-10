@@ -1387,7 +1387,6 @@ of10_match_print(netdissect_options *ndo,
 		ND_PRINT("%smatch nw_dst %s/%u", pfx, GET_IPADDR_STRING(cp), 32 - nw_bits);
 	cp += 4;
 	/* tp_src */
-	ND_TCHECK_2(cp);
 	if (! (wildcards & OFPFW_TP_SRC)) {
 		field_name = ! (wildcards & OFPFW_DL_TYPE) && dl_type == ETHERTYPE_IP
 		  && ! (wildcards & OFPFW_NW_PROTO) && nw_proto == IPPROTO_ICMP
@@ -1396,7 +1395,6 @@ of10_match_print(netdissect_options *ndo,
 	}
 	cp += 2;
 	/* tp_dst */
-	ND_TCHECK_2(cp);
 	if (! (wildcards & OFPFW_TP_DST)) {
 		field_name = ! (wildcards & OFPFW_DL_TYPE) && dl_type == ETHERTYPE_IP
 		  && ! (wildcards & OFPFW_NW_PROTO) && nw_proto == IPPROTO_ICMP

@@ -324,7 +324,6 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 
 	case ICMP_ECHO:
 	case ICMP_ECHOREPLY:
-		ND_TCHECK_2(dp->icmp_seq);
 		(void)snprintf(buf, sizeof(buf), "echo %s, id %u, seq %u",
                                icmp_type == ICMP_ECHO ?
                                "request" : "reply",
@@ -348,7 +347,6 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			break;
 
 		case ICMP_UNREACH_PROTOCOL:
-			ND_TCHECK_1(dp->icmp_ip.ip_p);
 			(void)snprintf(buf, sizeof(buf),
 			    "%s protocol %u unreachable",
 			    GET_IPADDR_STRING(dp->icmp_ip.ip_dst),
@@ -595,7 +593,6 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			(void)snprintf(buf, sizeof(buf),
 			    "parameter problem - code %u", icmp_code);
 		else {
-			ND_TCHECK_1(dp->icmp_pptr);
 			(void)snprintf(buf, sizeof(buf),
 			    "parameter problem - octet %u",
 			    GET_U_1(dp->icmp_pptr));
@@ -608,7 +605,6 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		break;
 
 	case ICMP_TSTAMP:
-		ND_TCHECK_2(dp->icmp_seq);
 		(void)snprintf(buf, sizeof(buf),
 		    "time stamp query id %u seq %u",
 		    GET_BE_U_2(dp->icmp_id),
