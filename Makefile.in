@@ -26,7 +26,7 @@ prefix = @prefix@
 exec_prefix = @exec_prefix@
 datarootdir = @datarootdir@
 # Pathname of directory to install the binary
-sbindir = @sbindir@
+bindir = @bindir@
 # Pathname of directory to install the man page
 mandir = @mandir@
 
@@ -422,16 +422,16 @@ pcap_dump_ftell.o: $(srcdir)/missing/pcap_dump_ftell.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/pcap_dump_ftell.c
 
 install: all
-	[ -d $(DESTDIR)$(sbindir) ] || \
-	    (mkdir -p $(DESTDIR)$(sbindir); chmod 755 $(DESTDIR)$(sbindir))
-	$(INSTALL_PROGRAM) $(PROG) $(DESTDIR)$(sbindir)/$(PROG)
-	$(INSTALL_PROGRAM) $(PROG) $(DESTDIR)$(sbindir)/$(PROG).`cat ${srcdir}/VERSION`
+	[ -d $(DESTDIR)$(bindir) ] || \
+	    (mkdir -p $(DESTDIR)$(bindir); chmod 755 $(DESTDIR)$(bindir))
+	$(INSTALL_PROGRAM) $(PROG) $(DESTDIR)$(bindir)/$(PROG)
+	$(INSTALL_PROGRAM) $(PROG) $(DESTDIR)$(bindir)/$(PROG).`cat ${srcdir}/VERSION`
 	[ -d $(DESTDIR)$(mandir)/man1 ] || \
 	    (mkdir -p $(DESTDIR)$(mandir)/man1; chmod 755 $(DESTDIR)$(mandir)/man1)
 	$(INSTALL_DATA) $(PROG).1 $(DESTDIR)$(mandir)/man1/$(PROG).1
 
 uninstall:
-	rm -f $(DESTDIR)$(sbindir)/$(PROG)
+	rm -f $(DESTDIR)$(bindir)/$(PROG)
 	rm -f $(DESTDIR)$(mandir)/man1/$(PROG).1
 
 lint: $(GENSRC)

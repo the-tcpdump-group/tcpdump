@@ -1174,7 +1174,7 @@ set(MAN1_EXPAND tcpdump.1.in)
 if(WIN32)
     # XXX TODO where to install on Windows?
 else(WIN32)
-    install(TARGETS tcpdump DESTINATION sbin)
+    install(TARGETS tcpdump DESTINATION bin)
 endif(WIN32)
 
 # On UN*X, and on Windows when not using MSVC, process man pages and
