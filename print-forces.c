@@ -741,7 +741,6 @@ sdatailv_print(netdissect_options *ndo,
 #endif
 		char *ib = indent_pr(indent, 1);
 		const u_char *tdp = (const u_char *) ILV_DATA(ilv);
-		ND_TCHECK_SIZE(ilv);
 		invilv = ilv_valid(ndo, ilv, rlen);
 		if (invilv) {
 			ND_PRINT("%s[", ib + 1);
@@ -760,10 +759,6 @@ sdatailv_print(netdissect_options *ndo,
 	}
 
 	return 0;
-
-trunc:
-	nd_print_trunc(ndo);
-	return -1;
 }
 
 static int
@@ -809,10 +804,8 @@ pkeyitlv_print(netdissect_options *ndo,
 	uint16_t type, tll;
 	u_int invtlv;
 
-	ND_TCHECK_1(tdp);
 	id = GET_BE_U_4(tdp);
 	ND_PRINT("%sKeyinfo: Key 0x%x\n", ib, id);
-	ND_TCHECK_SIZE(kdtlv);
 	type = GET_BE_U_2(kdtlv->type);
 	tll = GET_BE_U_2(kdtlv->length);
 	invtlv = tlv_valid(tll, len);
@@ -831,10 +824,6 @@ pkeyitlv_print(netdissect_options *ndo,
 	tll = GET_BE_U_2(kdtlv->length);
 	dp = (const u_char *) TLV_DATA(kdtlv);
 	return fdatatlv_print(ndo, dp, tll, op_msk, indent);
-
-trunc:
-	nd_print_trunc(ndo);
-	return -1;
 }
 
 #define PTH_DESC_SIZE 12
@@ -930,7 +919,6 @@ pdatacnt_print(netdissect_options *ndo,
 		u_int aln;
 		u_int invtlv;
 
-		ND_TCHECK_SIZE(pdtlv);
 		type = GET_BE_U_2(pdtlv->type);
 		tlvl = GET_BE_U_2(pdtlv->length);
 		invtlv = tlv_valid(tlvl, len);
@@ -1070,7 +1058,6 @@ genoptlv_print(netdissect_options *ndo,
 	u_int invtlv;
 	char *ib = indent_pr(indent, 0);
 
-	ND_TCHECK_SIZE(pdtlv);
 	type = GET_BE_U_2(pdtlv->type);
 	tlvl = GET_BE_U_2(pdtlv->length);
 	invtlv = tlv_valid(tlvl, len);
@@ -1100,10 +1087,6 @@ genoptlv_print(netdissect_options *ndo,
 		ND_PRINT("\t\t\tInvalid ForCES TLV type=%x", type);
 		return -1;
 	}
-
-trunc:
-	nd_print_trunc(ndo);
-	return -1;
 }
 
 static int
@@ -1119,7 +1102,6 @@ recpdoptlv_print(netdissect_options *ndo,
 		char *ib;
 		const u_char *dp;
 
-		ND_TCHECK_SIZE(pdtlv);
 		tlvl = GET_BE_U_2(pdtlv->length);
 		invtlv = tlv_valid(tlvl, len);
 		if (invtlv) {
@@ -1154,10 +1136,6 @@ recpdoptlv_print(netdissect_options *ndo,
 	}
 
 	return 0;
-
-trunc:
-	nd_print_trunc(ndo);
-	return -1;
 }
 
 static int
@@ -1190,7 +1168,6 @@ otlv_print(netdissect_options *ndo,
 	 * lfbselect_print() has ensured that GET_BE_U_2(otlv->length)
 	 * >= TLV_HDRL.
 	 */
-	ND_TCHECK_SIZE(otlv);
 	type = GET_BE_U_2(otlv->type);
 	tll = GET_BE_U_2(otlv->length) - TLV_HDRL;
 	ops = get_forces_optlv_h(type);
@@ -1213,10 +1190,6 @@ otlv_print(netdissect_options *ndo,
                 rc = ops->print(ndo, dp, tll, ops->op_msk, indent + 1);
         }
 	return rc;
-
-trunc:
-	nd_print_trunc(ndo);
-	return -1;
 }
 
 #define ASTDLN	4
@@ -1355,7 +1328,6 @@ print_metailv(netdissect_options *ndo,
 	 * ILV) >= ILV_HDRL.
 	 */
 	rlen = GET_BE_U_4(ilv->length) - ILV_HDRL;
-	ND_TCHECK_SIZE(ilv);
 	ND_PRINT("%sMetaID 0x%x length %u\n", ib, GET_BE_U_4(ilv->type),
 		  GET_BE_U_4(ilv->length));
 	if (ndo->ndo_vflag >= 3) {
@@ -1363,10 +1335,6 @@ print_metailv(netdissect_options *ndo,
 		ND_PRINT(" ]\n");
 	}
 	return 0;
-
-trunc:
-	nd_print_trunc(ndo);
-	return -1;
 }
 
 static int
@@ -1388,7 +1356,6 @@ print_metatlv(netdissect_options *ndo,
 	rlen = dlen;
 	ND_PRINT("\n%s METADATA length %u\n", ib, rlen);
 	while (rlen != 0) {
-		ND_TCHECK_SIZE(ilv);
 		invilv = ilv_valid(ndo, ilv, rlen);
 		if (invilv) {
 			break;
@@ -1404,10 +1371,6 @@ print_metatlv(netdissect_options *ndo,
 	}
 
 	return 0;
-
-trunc:
-	nd_print_trunc(ndo);
-	return -1;
 }
 
 
@@ -1459,7 +1422,6 @@ redirect_print(netdissect_options *ndo,
 	while (rlen != 0) {
 		uint16_t type, tlvl;
 
-		ND_TCHECK_SIZE(tlv);
 		type = GET_BE_U_2(tlv->type);
 		tlvl = GET_BE_U_2(tlv->length);
 		invtlv = tlv_valid(tlvl, rlen);
@@ -1498,10 +1460,6 @@ redirect_print(netdissect_options *ndo,
 	}
 
 	return 0;
-
-trunc:
-	nd_print_trunc(ndo);
-	return -1;
 }
 
 #define OP_OFF 8
@@ -1552,7 +1510,6 @@ lfbselect_print(netdissect_options *ndo,
 	while (rlen != 0) {
 		uint16_t type, tlvl;
 
-		ND_TCHECK_SIZE(otlv);
 		type = GET_BE_U_2(otlv->type);
 		tlvl = GET_BE_U_2(otlv->length);
 		invtlv = tlv_valid(tlvl, rlen);
@@ -1633,7 +1590,6 @@ forces_type_print(netdissect_options *ndo,
 	while (rlen != 0) {
 		uint16_t type, tlvl;
 
-		ND_TCHECK_SIZE(tltlv);
 		type = GET_BE_U_2(tltlv->type);
 		tlvl = GET_BE_U_2(tltlv->length);
 		invtlv = tlv_valid(tlvl, rlen);
@@ -1679,10 +1635,6 @@ forces_type_print(netdissect_options *ndo,
 	}
 
 	return 0;
-
-trunc:
-	nd_print_trunc(ndo);
-	return -1;
 }
 
 void
