@@ -248,8 +248,8 @@ static NORETURN void exit_tcpdump(int);
 static void (*setsignal (int sig, void (*func)(int)))(int);
 static void cleanup(int);
 static void child_cleanup(int);
-static void print_version(void);
-static void print_usage(void);
+static void print_version(FILE *);
+static void print_usage(FILE *);
 #ifdef HAVE_PCAP_SET_TSTAMP_TYPE
 static NORETURN void show_tstamp_types_and_exit(pcap_t *, const char *device);
 #endif
@@ -1638,7 +1638,7 @@ main(int argc, char **argv)
 			break;
 
 		case 'h':
-			print_usage();
+			print_usage(stdout);
 			exit_tcpdump(S_SUCCESS);
 			break;
 
@@ -1880,7 +1880,7 @@ main(int argc, char **argv)
 			break;
 
 		case OPTION_VERSION:
-			print_version();
+			print_version(stdout);
 			exit_tcpdump(S_SUCCESS);
 			break;
 
@@ -1928,7 +1928,7 @@ main(int argc, char **argv)
 			break;
 
 		default:
-			print_usage();
+			print_usage(stderr);
 			exit_tcpdump(S_ERR_HOST_PROGRAM);
 			/* NOTREACHED */
 		}
@@ -3120,7 +3120,7 @@ static void verbose_stats_dump(int sig _U_)
 
 USES_APPLE_DEPRECATED_API
 static void
-print_version(void)
+print_version(FILE *f)
 {
 #ifndef HAVE_PCAP_LIB_VERSION
   #ifdef HAVE_PCAP_VERSION
@@ -3131,61 +3131,61 @@ print_version(void)
 #endif /* HAVE_PCAP_LIB_VERSION */
 	const char *smi_version_string;
 
-	(void)fprintf(stderr, "%s version " PACKAGE_VERSION "\n", program_name);
+	(void)fprintf(f, "%s version " PACKAGE_VERSION "\n", program_name);
 #ifdef HAVE_PCAP_LIB_VERSION
-	(void)fprintf(stderr, "%s\n", pcap_lib_version());
+	(void)fprintf(f, "%s\n", pcap_lib_version());
 #else /* HAVE_PCAP_LIB_VERSION */
-	(void)fprintf(stderr, "libpcap version %s\n", pcap_version);
+	(void)fprintf(f, "libpcap version %s\n", pcap_version);
 #endif /* HAVE_PCAP_LIB_VERSION */
 
 #if defined(HAVE_LIBCRYPTO) && defined(SSLEAY_VERSION)
-	(void)fprintf (stderr, "%s\n", SSLeay_version(SSLEAY_VERSION));
+	(void)fprintf (f, "%s\n", SSLeay_version(SSLEAY_VERSION));
 #endif
 
 	smi_version_string = nd_smi_version_string();
 	if (smi_version_string != NULL)
-		(void)fprintf (stderr, "SMI-library: %s\n", smi_version_string);
+		(void)fprintf (f, "SMI-library: %s\n", smi_version_string);
 
 #if defined(__SANITIZE_ADDRESS__)
-	(void)fprintf (stderr, "Compiled with AddressSanitizer/GCC.\n");
+	(void)fprintf (f, "Compiled with AddressSanitizer/GCC.\n");
 #elif defined(__has_feature)
 #  if __has_feature(address_sanitizer)
-	(void)fprintf (stderr, "Compiled with AddressSanitizer/Clang.\n");
+	(void)fprintf (f, "Compiled with AddressSanitizer/Clang.\n");
 #  elif __has_feature(memory_sanitizer)
-	(void)fprintf (stderr, "Compiled with MemorySanitizer/Clang.\n");
+	(void)fprintf (f, "Compiled with MemorySanitizer/Clang.\n");
 #  endif
 #endif /* __SANITIZE_ADDRESS__ or __has_feature */
 }
 USES_APPLE_RST
 
 static void
-print_usage(void)
+print_usage(FILE *f)
 {
-	print_version();
-	(void)fprintf(stderr,
+	print_version(f);
+	(void)fprintf(f,
 "Usage: %s [-Abd" D_FLAG "efhH" I_FLAG J_FLAG "KlLnNOpqStu" U_FLAG "vxX#]" B_FLAG_USAGE " [ -c count ] [--count]\n", program_name);
-	(void)fprintf(stderr,
+	(void)fprintf(f,
 "\t\t[ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]\n");
-	(void)fprintf(stderr,
+	(void)fprintf(f,
 "\t\t[ -i interface ]" IMMEDIATE_MODE_USAGE j_FLAG_USAGE "\n");
 #ifdef HAVE_PCAP_FINDALLDEVS_EX
-	(void)fprintf(stderr,
+	(void)fprintf(f,
 "\t\t" LIST_REMOTE_INTERFACES_USAGE "\n");
 #endif
 #ifdef USE_LIBSMI
-	(void)fprintf(stderr,
+	(void)fprintf(f,
 "\t\t" m_FLAG_USAGE "\n");
 #endif
-	(void)fprintf(stderr,
+	(void)fprintf(f,
 "\t\t[ -M secret ] [ --number ] [ --print ]" Q_FLAG_USAGE "\n");
-	(void)fprintf(stderr,
+	(void)fprintf(f,
 "\t\t[ -r file ] [ -s snaplen ] [ -T type ] [ --version ]\n");
-	(void)fprintf(stderr,
+	(void)fprintf(f,
 "\t\t[ -V file ] [ -w file ] [ -W filecount ] [ -y datalinktype ]\n");
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
-	(void)fprintf(stderr,
+	(void)fprintf(f,
 "\t\t[ --time-stamp-precision precision ] [ --micro ] [ --nano ]\n");
 #endif
-	(void)fprintf(stderr,
+	(void)fprintf(f,
 "\t\t[ -z postrotate-command ] [ -Z user ] [ expression ]\n");
 }
