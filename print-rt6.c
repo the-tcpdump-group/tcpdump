@@ -55,6 +55,8 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 	ND_PRINT(" (len=%u", len);	/*)*/
 	type = GET_U_1(dp->ip6r_type);
 	ND_PRINT(", type=%u", type);
+	if (type == IPV6_RTHDR_TYPE_0)
+		ND_PRINT(" [Deprecated]");
 	ND_PRINT(", segleft=%u", GET_U_1(dp->ip6r_segleft));
 
 	switch (type) {
