@@ -1534,6 +1534,7 @@ juniper_parse_header(netdissect_options *ndo,
 #endif
 #ifdef DLT_JUNIPER_ATM2
     case DLT_JUNIPER_ATM2:
+        ND_TCHECK_4(p);
         /* ATM cell relay control word present ? */
         if (l2info->cookie[7] & ATM2_PKT_TYPE_MASK) {
             control_word = GET_BE_U_4(p);

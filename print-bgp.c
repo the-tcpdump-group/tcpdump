@@ -1326,6 +1326,7 @@ decode_labeled_vpn_l2(netdissect_options *ndo,
                         }
                         return plen + 2;
                     }
+                    ND_TCHECK_1(pptr);
                     if (buflen != 0) {
                         stringlen=snprintf(buf,buflen, "%02x",
                                               GET_U_1(pptr));
