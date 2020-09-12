@@ -224,7 +224,6 @@ print_probe(netdissect_options *ndo,
 
 	ND_TCHECK_4(bp);
 	if ((len < 4) || ((bp + 4) > ep)) {
-		/* { (ctags) */
 		ND_PRINT(" [|}");
 		return (0);
 	}
