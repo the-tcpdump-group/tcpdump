@@ -34,8 +34,8 @@
  * RFC1826/2402 authentication header.
  */
 
-#ifndef _NETINET6_AH_H_
-#define _NETINET6_AH_H_
+#ifndef ND_AH_H_
+#define ND_AH_H_
 
 struct ah {
 	nd_uint8_t	ah_nxt;		/* Next Header */
@@ -54,4 +54,4 @@ struct newah {
 	/* variable size, 32bit bound*/	/* Authentication data */
 };
 
-#endif /*_NETINET6_AH_H_*/
+#endif /* ND_AH_H_ */

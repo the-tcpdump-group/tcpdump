@@ -65,8 +65,8 @@
  *	@(#)ip.h	8.1 (Berkeley) 6/10/93
  */
 
-#ifndef _NETINET_IP6_H_
-#define _NETINET_IP6_H_
+#ifndef ND_IP6_H_
+#define ND_IP6_H_
 
 /*
  * Definition for internet protocol version 6.
@@ -209,4 +209,4 @@ struct ip6_frag {
 #define IP6F_RESERVED_MASK	0x0006	/* reserved bits in ip6f_offlg */
 #define IP6F_MORE_FRAG		0x0001	/* more-fragments flag */
 
-#endif /* not _NETINET_IP6_H_ */
+#endif /* not ND_IP6_H_ */

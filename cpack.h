@@ -27,8 +27,8 @@
  * OF SUCH DAMAGE.
  */
 
-#ifndef _CPACK_H
-#define _CPACK_H
+#ifndef ND_CPACK_H
+#define ND_CPACK_H
 
 #include "netdissect.h"
 
@@ -54,4 +54,4 @@ const uint8_t *cpack_align_and_reserve(struct cpack_state *cs, size_t wordsize);
 
 extern int cpack_advance(struct cpack_state *, const size_t);
 
-#endif /* _CPACK_H */
+#endif /* ND_CPACK_H */
