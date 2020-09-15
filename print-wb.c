@@ -180,7 +180,7 @@ wb_id(netdissect_options *ndo,
       const struct pkt_id *id, u_int len)
 {
 	u_int i;
-	const char *cp;
+	const u_char *sitename;
 	const struct id_off *io;
 	char c;
 	u_int nid;
@@ -199,14 +199,11 @@ wb_id(netdissect_options *ndo,
 	       GET_BE_U_4(id->pi_mpage.p_uid));
 
 	nid = GET_BE_U_2(id->pi_ps.nid);
+	if (len < sizeof(*io) * nid)
+		return (-1);
 	len -= sizeof(*io) * nid;
 	io = (const struct id_off *)(id + 1);
-	cp = (const char *)(io + nid);
-	if (ND_TTEST_LEN(cp, len)) {
-		ND_PRINT("\"");
-		nd_print(ndo, (const u_char *)cp, (const u_char *)cp + len);
-		ND_PRINT("\"");
-	}
+	sitename = (const u_char *)(io + nid);
 
 	c = '<';
 	for (i = 0; i < nid && ND_TTEST_SIZE(io); ++io, ++i) {
@@ -215,7 +212,9 @@ wb_id(netdissect_options *ndo,
 		c = ',';
 	}
 	if (i >= nid) {
-		ND_PRINT(">");
+		ND_PRINT("> \"");
+		(void)nd_print(ndo, sitename, sitename + len);
+		ND_PRINT("\"");
 		return (0);
 	}
 	return (-1);
