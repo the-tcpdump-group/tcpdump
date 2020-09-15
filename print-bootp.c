@@ -195,7 +195,7 @@ struct bootp {
 #define TAG_CLASSLESS_STA_RT_MS	((uint8_t) 249)
 /* RFC 5859 - TFTP Server Address Option for DHCPv4 */
 #define	TAG_TFTP_SERVER_ADDRESS	((uint8_t) 150)
-/* ftp://ftp.isi.edu/.../assignments/bootp-dhcp-extensions */
+/* https://www.iana.org/assignments/bootp-dhcp-parameters/bootp-dhcp-parameters.xhtml */
 #define	TAG_SLP_NAMING_AUTH	((uint8_t)  80)
 #define	TAG_CLIENT_FQDN		((uint8_t)  81)
 #define	TAG_AGENT_CIRCUIT	((uint8_t)  82)
@@ -203,8 +203,8 @@ struct bootp {
 #define	TAG_TZ_STRING		((uint8_t)  88)
 #define	TAG_FQDN_OPTION		((uint8_t)  89)
 #define	TAG_AUTH		((uint8_t)  90)
-#define	TAG_VINES_SERVERS	((uint8_t)  91)
-#define	TAG_SERVER_RANK		((uint8_t)  92)
+#define	TAG_CLIENT_LAST_TRANSACTION_TIME	((uint8_t)  91)
+#define	TAG_ASSOCIATED_IP			((uint8_t)  92)
 #define	TAG_CLIENT_ARCH		((uint8_t)  93)
 #define	TAG_CLIENT_NDI		((uint8_t)  94)
 #define	TAG_CLIENT_GUID		((uint8_t)  97)
@@ -226,6 +226,12 @@ struct bootp {
 #define DHCPNAK		6
 #define DHCPRELEASE	7
 #define DHCPINFORM	8
+/* Defined in RFC4388 */
+#define DHCPLEASEQUERY       10
+#define DHCPLEASEUNASSIGNED  11
+#define DHCPLEASEUNKNOWN     12
+#define DHCPLEASEACTIVE      13
+
 
 /*
  * "vendor" data permitted for CMU bootp clients.
@@ -503,8 +509,8 @@ static const struct tok tag2str[] = {
 	{ TAG_TZ_STRING,	"aTZSTR" },
 	{ TAG_FQDN_OPTION,	"bFQDNS" },	/* XXX 'b' */
 	{ TAG_AUTH,		"bAUTH" },	/* XXX 'b' */
-	{ TAG_VINES_SERVERS,	"iVINES" },
-	{ TAG_SERVER_RANK,	"sRANK" },
+	{ TAG_CLIENT_LAST_TRANSACTION_TIME, "LLast-Transaction-Time" },
+	{ TAG_ASSOCIATED_IP,	"iAssociated-IP" },
 	{ TAG_CLIENT_ARCH,	"sARCH" },
 	{ TAG_CLIENT_NDI,	"bNDI" },	/* XXX 'b' */
 	{ TAG_CLIENT_GUID,	"bGUID" },	/* XXX 'b' */
@@ -547,14 +553,18 @@ static const struct tok arp2str[] = {
 };
 
 static const struct tok dhcp_msg_values[] = {
-	{ DHCPDISCOVER,	"Discover" },
-	{ DHCPOFFER,	"Offer" },
-	{ DHCPREQUEST,	"Request" },
-	{ DHCPDECLINE,	"Decline" },
-	{ DHCPACK,	"ACK" },
-	{ DHCPNAK,	"NACK" },
-	{ DHCPRELEASE,	"Release" },
-	{ DHCPINFORM,	"Inform" },
+	{ DHCPDISCOVER,	       "Discover" },
+	{ DHCPOFFER,	       "Offer" },
+	{ DHCPREQUEST,	       "Request" },
+	{ DHCPDECLINE,	       "Decline" },
+	{ DHCPACK,	       "ACK" },
+	{ DHCPNAK,	       "NACK" },
+	{ DHCPRELEASE,	       "Release" },
+	{ DHCPINFORM,	       "Inform" },
+	{ DHCPLEASEQUERY,      "LeaseQuery" },
+	{ DHCPLEASEUNASSIGNED, "LeaseUnassigned" },
+	{ DHCPLEASEUNKNOWN,    "LeaseUnknown" },
+	{ DHCPLEASEACTIVE,     "LeaseActive" },
 	{ 0, NULL }
 };
 
