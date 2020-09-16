@@ -575,13 +575,19 @@ EXTRACT_IPV4_TO_NETWORK_ORDER(const void *p)
 #define ND_TTEST_16(p) ND_TTEST_LEN((p), 16)
 #define ND_TCHECK_16(p) ND_TCHECK_LEN((p), 16)
 
+static inline NORETURN void
+nd_trunc(netdissect_options *ndo)
+{
+	longjmp(ndo->ndo_truncated, 1);
+}
+
 /* get_u_1 and get_s_1 */
 
 static inline uint8_t
 get_u_1(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_1(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_U_1(p);
 }
 
@@ -589,7 +595,7 @@ static inline int8_t
 get_s_1(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_1(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_S_1(p);
 }
 
@@ -599,7 +605,7 @@ static inline uint16_t
 get_be_u_2(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_2(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_BE_U_2(p);
 }
 
@@ -607,7 +613,7 @@ static inline uint32_t
 get_be_u_3(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_3(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_BE_U_3(p);
 }
 
@@ -615,7 +621,7 @@ static inline uint32_t
 get_be_u_4(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_4(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_BE_U_4(p);
 }
 
@@ -623,7 +629,7 @@ static inline uint64_t
 get_be_u_5(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_5(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_BE_U_5(p);
 }
 
@@ -631,7 +637,7 @@ static inline uint64_t
 get_be_u_6(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_6(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_BE_U_6(p);
 }
 
@@ -639,7 +645,7 @@ static inline uint64_t
 get_be_u_7(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_7(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_BE_U_7(p);
 }
 
@@ -647,7 +653,7 @@ static inline uint64_t
 get_be_u_8(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_8(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_BE_U_8(p);
 }
 
@@ -657,7 +663,7 @@ static inline int16_t
 get_be_s_2(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_2(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_BE_S_2(p);
 }
 
@@ -665,7 +671,7 @@ static inline int32_t
 get_be_s_3(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_3(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_BE_S_3(p);
 }
 
@@ -673,7 +679,7 @@ static inline int32_t
 get_be_s_4(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_4(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_BE_S_4(p);
 }
 
@@ -681,7 +687,7 @@ static inline int64_t
 get_be_s_5(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_5(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_BE_S_5(p);
 }
 
@@ -689,7 +695,7 @@ static inline int64_t
 get_be_s_6(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_6(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_BE_S_6(p);
 }
 
@@ -697,7 +703,7 @@ static inline int64_t
 get_be_s_7(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_7(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_BE_S_7(p);
 }
 
@@ -705,7 +711,7 @@ static inline int64_t
 get_be_s_8(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_8(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_BE_S_8(p);
 }
 
@@ -715,7 +721,7 @@ static inline uint16_t
 get_he_u_2(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_2(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_HE_U_2(p);
 }
 
@@ -723,7 +729,7 @@ static inline uint32_t
 get_he_u_4(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_4(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_HE_U_4(p);
 }
 
@@ -733,7 +739,7 @@ static inline int16_t
 get_he_s_2(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_2(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_HE_S_2(p);
 }
 
@@ -741,7 +747,7 @@ static inline int32_t
 get_he_s_4(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_4(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_HE_S_4(p);
 }
 
@@ -751,7 +757,7 @@ static inline uint16_t
 get_le_u_2(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_2(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_LE_U_2(p);
 }
 
@@ -759,7 +765,7 @@ static inline uint32_t
 get_le_u_3(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_3(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_LE_U_3(p);
 }
 
@@ -767,7 +773,7 @@ static inline uint32_t
 get_le_u_4(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_4(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_LE_U_4(p);
 }
 
@@ -775,7 +781,7 @@ static inline uint64_t
 get_le_u_5(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_5(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_LE_U_5(p);
 }
 
@@ -783,7 +789,7 @@ static inline uint64_t
 get_le_u_6(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_6(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_LE_U_6(p);
 }
 
@@ -791,7 +797,7 @@ static inline uint64_t
 get_le_u_7(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_7(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_LE_U_7(p);
 }
 
@@ -799,7 +805,7 @@ static inline uint64_t
 get_le_u_8(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_8(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_LE_U_8(p);
 }
 
@@ -809,7 +815,7 @@ static inline int16_t
 get_le_s_2(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_2(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_LE_S_2(p);
 }
 
@@ -817,7 +823,7 @@ static inline int32_t
 get_le_s_3(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_3(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_LE_S_3(p);
 }
 
@@ -825,7 +831,7 @@ static inline int32_t
 get_le_s_4(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_4(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_LE_S_4(p);
 }
 
@@ -833,7 +839,7 @@ static inline int64_t
 get_le_s_8(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_8(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_LE_S_8(p);
 }
 
@@ -843,7 +849,7 @@ static inline uint32_t
 get_ipv4_to_host_order(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_4(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_IPV4_TO_HOST_ORDER(p);
 }
 
@@ -851,7 +857,7 @@ static inline uint32_t
 get_ipv4_to_network_order(netdissect_options *ndo, const u_char *p)
 {
 	if (!ND_TTEST_4(p))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	return EXTRACT_IPV4_TO_NETWORK_ORDER(p);
 }
 
@@ -859,7 +865,7 @@ static inline void
 get_cpy_bytes(netdissect_options *ndo, u_char *dst, const u_char *p, size_t len)
 {
 	if (!ND_TTEST_LEN(p, len))
-		longjmp(ndo->ndo_truncated, 1);
+		nd_trunc(ndo);
 	UNALIGNED_MEMCPY(dst, p, len);
 }
 
