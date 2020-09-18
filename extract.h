@@ -578,7 +578,7 @@ EXTRACT_IPV4_TO_NETWORK_ORDER(const void *p)
 static inline NORETURN void
 nd_trunc(netdissect_options *ndo)
 {
-	longjmp(ndo->ndo_truncated, 1);
+	longjmp(ndo->ndo_early_end, ND_TRUNCATED);
 }
 
 /* get_u_1 and get_s_1 */

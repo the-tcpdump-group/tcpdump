@@ -398,12 +398,15 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 
 	ndo->ndo_protocol = "";
 	ndo->ndo_ll_hdr_len = 0;
-	if (setjmp(ndo->ndo_truncated) == 0) {
+	switch (setjmp(ndo->ndo_early_end)) {
+	case 0:
 		/* Print the packet. */
 		(ndo->ndo_if_printer)(ndo, h, sp);
-	} else {
+		break;
+	case ND_TRUNCATED:
 		/* A printer quit because the packet was truncated; report it */
 		nd_print_trunc(ndo);
+		break;
 	}
 	hdrlen = ndo->ndo_ll_hdr_len;
 

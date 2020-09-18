@@ -194,6 +194,9 @@ struct netdissect_saved_packet_info {
   struct netdissect_saved_packet_info *ndspi_prev;	/* previous buffer on the stack */
 };
 
+/* 'val' value(s) for longjmp */
+#define ND_TRUNCATED 1
+
 struct netdissect_options {
   int ndo_bflag;		/* print 4 byte ASes in ASDOT notation */
   int ndo_eflag;		/* print ethernet header */
@@ -213,7 +216,7 @@ struct netdissect_options {
 				 */
   int ndo_Hflag;		/* dissect 802.11s draft mesh standard */
   const char *ndo_protocol;	/* protocol */
-  jmp_buf ndo_truncated;	/* jmp_buf for setjmp()/longjmp() */
+  jmp_buf ndo_early_end;	/* jmp_buf for setjmp()/longjmp() */
   void *ndo_last_mem_p;		/* pointer to the last allocated memory chunk */
   int ndo_packet_number;	/* print a packet number in the beginning of line */
   int ndo_suppress_default_print; /* don't use default_print() for unknown packet types */
