@@ -612,7 +612,7 @@ extern u_int llap_print(netdissect_options *, const u_char *, u_int);
 extern int llc_print(netdissect_options *, const u_char *, u_int, u_int, const struct lladdr_info *, const struct lladdr_info *);
 extern void lldp_print(netdissect_options *, const u_char *, u_int);
 extern void lmp_print(netdissect_options *, const u_char *, u_int);
-extern void loopback_print(netdissect_options *, const u_char *, const u_int);
+extern void loopback_print(netdissect_options *, const u_char *, u_int);
 extern void lspping_print(netdissect_options *, const u_char *, u_int);
 extern void lwapp_control_print(netdissect_options *, const u_char *, u_int, int);
 extern void lwapp_data_print(netdissect_options *, const u_char *, u_int);
