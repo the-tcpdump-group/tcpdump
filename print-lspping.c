@@ -15,7 +15,7 @@
 
 /* \summary: MPLS LSP PING printer */
 
-/* specification: RFC 4349 */
+/* specification: RFC 4379 */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
