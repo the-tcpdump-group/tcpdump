@@ -101,10 +101,12 @@ env:
     - BUILD_LIBPCAP=yes CMAKE=no  REMOTE=disable CRYPTO=yes
     - BUILD_LIBPCAP=yes CMAKE=no  REMOTE=enable  CRYPTO=no
     - BUILD_LIBPCAP=yes CMAKE=no  REMOTE=enable  CRYPTO=yes
-    - BUILD_LIBPCAP=yes CMAKE=yes REMOTE=disable CRYPTO=no
-    - BUILD_LIBPCAP=yes CMAKE=yes REMOTE=disable CRYPTO=yes
-    - BUILD_LIBPCAP=yes CMAKE=yes REMOTE=enable  CRYPTO=no
-    - BUILD_LIBPCAP=yes CMAKE=yes REMOTE=enable  CRYPTO=yes
+      # CMAKE + BUILD_LIBPCAP is broken in master, so
+      # get rid of the noise by not trying
+    #- BUILD_LIBPCAP=yes CMAKE=yes REMOTE=disable CRYPTO=no
+    #- BUILD_LIBPCAP=yes CMAKE=yes REMOTE=disable CRYPTO=yes
+    #- BUILD_LIBPCAP=yes CMAKE=yes REMOTE=enable  CRYPTO=no
+    #- BUILD_LIBPCAP=yes CMAKE=yes REMOTE=enable  CRYPTO=yes
 
 addons:
   coverity_scan:
