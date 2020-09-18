@@ -26,6 +26,7 @@
 #include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
+#include "ntp.h"
 
 #include "l2vpn.h"
 #include "oui.h"
@@ -68,10 +69,8 @@ struct lspping_common_header {
     nd_uint8_t  return_subcode;
     nd_uint32_t sender_handle;
     nd_uint32_t seq_number;
-    nd_uint32_t ts_sent_sec;
-    nd_uint32_t ts_sent_usec;
-    nd_uint32_t ts_rcvd_sec;
-    nd_uint32_t ts_rcvd_usec;
+    struct l_fixedpt ts_sent;
+    struct l_fixedpt ts_rcvd;
 };
 
 #define LSPPING_VERSION            1
@@ -498,7 +497,7 @@ lspping_print(netdissect_options *ndo,
     u_int tlen,lspping_tlv_len,lspping_tlv_type,tlv_tlen;
     int tlv_hexdump,subtlv_hexdump;
     u_int lspping_subtlv_len,lspping_subtlv_type;
-    struct timeval timestamp;
+    uint32_t int_part, fraction;
     u_int address_type;
 
     union {
@@ -589,16 +588,15 @@ lspping_print(netdissect_options *ndo,
            GET_BE_U_4(lspping_com_header->sender_handle),
            GET_BE_U_4(lspping_com_header->seq_number));
 
-    timestamp.tv_sec=GET_BE_U_4(lspping_com_header->ts_sent_sec);
-    timestamp.tv_usec=GET_BE_U_4(lspping_com_header->ts_sent_usec);
     ND_PRINT("\n\t  Sender Timestamp: ");
-    ts_print(ndo, &timestamp);
+    p_ntp_time(ndo, &lspping_com_header->ts_sent);
+    ND_PRINT(" ");
 
-    timestamp.tv_sec=GET_BE_U_4(lspping_com_header->ts_rcvd_sec);
-    timestamp.tv_usec=GET_BE_U_4(lspping_com_header->ts_rcvd_usec);
+    int_part=GET_BE_U_4(lspping_com_header->ts_rcvd.int_part);
+    fraction=GET_BE_U_4(lspping_com_header->ts_rcvd.fraction);
     ND_PRINT("Receiver Timestamp: ");
-    if ((timestamp.tv_sec != 0) && (timestamp.tv_usec != 0))
-        ts_print(ndo, &timestamp);
+    if ((int_part != 0) && (fraction != 0))
+        p_ntp_time(ndo, &lspping_com_header->ts_rcvd);
     else
         ND_PRINT("no timestamp");
 
