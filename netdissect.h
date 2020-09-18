@@ -537,7 +537,7 @@ struct lladdr_info {
 
 extern void aarp_print(netdissect_options *, const u_char *, u_int);
 extern int ah_print(netdissect_options *, const u_char *);
-extern void ahcp_print(netdissect_options *, const u_char *, const u_int);
+extern void ahcp_print(netdissect_options *, const u_char *, u_int);
 extern void aodv_print(netdissect_options *, const u_char *, u_int, int);
 extern void aoe_print(netdissect_options *, const u_char *, const u_int);
 extern int  arista_ethertype_print(netdissect_options *,const u_char *, u_int);

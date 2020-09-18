@@ -96,14 +96,15 @@ static const struct tok ahcp1_opt_str[] = {
 	{ 0, NULL }
 };
 
-static int
-ahcp_time_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
+static void
+ahcp_time_print(netdissect_options *ndo,
+                const u_char *cp, uint8_t len)
 {
 	time_t t;
 	struct tm *tm;
 	char buf[BUFSIZE];
 
-	if (cp + 4 != ep)
+	if (len != 4)
 		goto invalid;
 	t = GET_BE_U_4(cp);
 	if (NULL == (tm = gmtime(&t)))
@@ -112,133 +113,131 @@ ahcp_time_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 		ND_PRINT(": strftime() error");
 	else
 		ND_PRINT(": %s UTC", buf);
-	return 0;
+	return;
 
 invalid:
 	nd_print_invalid(ndo);
-	ND_TCHECK_LEN(cp, ep - cp);
-	return 0;
+	ND_TCHECK_LEN(cp, len);
+	return;
 trunc:
-	nd_print_trunc(ndo);
-	return -1;
+	nd_trunc(ndo);
 }
 
-static int
-ahcp_seconds_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
+static void
+ahcp_seconds_print(netdissect_options *ndo,
+                   const u_char *cp, uint8_t len)
 {
-	if (cp + 4 != ep)
+	if (len != 4)
 		goto invalid;
 	ND_PRINT(": %us", GET_BE_U_4(cp));
-	return 0;
+	return;
 
 invalid:
 	nd_print_invalid(ndo);
-	ND_TCHECK_LEN(cp, ep - cp);
-	return 0;
+	ND_TCHECK_LEN(cp, len);
+	return;
 trunc:
-	nd_print_trunc(ndo);
-	return -1;
+	nd_trunc(ndo);
 }
 
-static int
-ahcp_ipv6_addresses_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
+static void
+ahcp_ipv6_addresses_print(netdissect_options *ndo,
+                          const u_char *cp, uint8_t len)
 {
 	const char *sep = ": ";
 
-	while (cp < ep) {
-		if (cp + 16 > ep)
+	while (len) {
+		if (len < 16)
 			goto invalid;
 		ND_PRINT("%s%s", sep, GET_IP6ADDR_STRING(cp));
 		cp += 16;
+		len -= 16;
 		sep = ", ";
 	}
-	return 0;
+	return;
 
 invalid:
 	nd_print_invalid(ndo);
-	ND_TCHECK_LEN(cp, ep - cp);
-	return 0;
+	ND_TCHECK_LEN(cp, len);
+	return;
 trunc:
-	nd_print_trunc(ndo);
-	return -1;
+	nd_trunc(ndo);
 }
 
-static int
-ahcp_ipv4_addresses_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
+static void
+ahcp_ipv4_addresses_print(netdissect_options *ndo,
+                          const u_char *cp, uint8_t len)
 {
 	const char *sep = ": ";
 
-	while (cp < ep) {
-		if (cp + 4 > ep)
+	while (len) {
+		if (len < 4)
 			goto invalid;
 		ND_PRINT("%s%s", sep, GET_IPADDR_STRING(cp));
 		cp += 4;
+		len -= 4;
 		sep = ", ";
 	}
-	return 0;
+	return;
 
 invalid:
 	nd_print_invalid(ndo);
-	ND_TCHECK_LEN(cp, ep - cp);
-	return 0;
+	ND_TCHECK_LEN(cp, len);
+	return;
 trunc:
-	nd_print_trunc(ndo);
-	return -1;
+	nd_trunc(ndo);
 }
 
-static int
-ahcp_ipv6_prefixes_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
+static void
+ahcp_ipv6_prefixes_print(netdissect_options *ndo,
+                         const u_char *cp, uint8_t len)
 {
 	const char *sep = ": ";
 
-	while (cp < ep) {
-		if (cp + 17 > ep)
+	while (len) {
+		if (len < 17)
 			goto invalid;
-		ND_TCHECK_LEN(cp, 17);
-		ND_PRINT("%s%s/%u", sep, GET_IP6ADDR_STRING(cp),
-			 GET_U_1(cp + 16));
+		ND_PRINT("%s%s/%u", sep, GET_IP6ADDR_STRING(cp), GET_U_1(cp + 16));
 		cp += 17;
+		len -= 17;
 		sep = ", ";
 	}
-	return 0;
+	return;
 
 invalid:
 	nd_print_invalid(ndo);
-	ND_TCHECK_LEN(cp, ep - cp);
-	return 0;
+	ND_TCHECK_LEN(cp, len);
+	return;
 trunc:
-	nd_print_trunc(ndo);
-	return -1;
+	nd_trunc(ndo);
 }
 
-static int
-ahcp_ipv4_prefixes_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
+static void
+ahcp_ipv4_prefixes_print(netdissect_options *ndo,
+                         const u_char *cp, uint8_t len)
 {
 	const char *sep = ": ";
 
-	while (cp < ep) {
-		if (cp + 5 > ep)
+	while (len) {
+		if (len < 5)
 			goto invalid;
-		ND_TCHECK_5(cp);
-		ND_PRINT("%s%s/%u", sep, GET_IPADDR_STRING(cp),
-			 GET_U_1(cp + 4));
+		ND_PRINT("%s%s/%u", sep, GET_IPADDR_STRING(cp), GET_U_1(cp + 4));
 		cp += 5;
+		len -= 5;
 		sep = ", ";
 	}
-	return 0;
+	return;
 
 invalid:
 	nd_print_invalid(ndo);
-	ND_TCHECK_LEN(cp, ep - cp);
-	return 0;
+	ND_TCHECK_LEN(cp, len);
+	return;
 trunc:
-	nd_print_trunc(ndo);
-	return -1;
+	nd_trunc(ndo);
 }
 
-/* Data decoders signal truncated data with -1. */
-static int
-(* const data_decoders[AHCP1_OPT_MAX + 1])(netdissect_options *, const u_char *, const u_char *) = {
+static void
+(* const data_decoders[AHCP1_OPT_MAX + 1])(netdissect_options *, const u_char *, uint8_t) = {
 	/* [AHCP1_OPT_PAD]                    = */  NULL,
 	/* [AHCP1_OPT_MANDATORY]              = */  NULL,
 	/* [AHCP1_OPT_ORIGIN_TIME]            = */  ahcp_time_print,
@@ -256,61 +255,68 @@ static int
 };
 
 static void
-ahcp1_options_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
+ahcp1_options_print(netdissect_options *ndo,
+                    const u_char *cp, uint16_t len)
 {
-	uint8_t option_no, option_len;
+	while (len) {
+		uint8_t option_no, option_len;
 
-	while (cp < ep) {
 		/* Option no */
 		option_no = GET_U_1(cp);
 		cp += 1;
+		len -= 1;
 		ND_PRINT("\n\t %s", tok2str(ahcp1_opt_str, "Unknown-%u", option_no));
 		if (option_no == AHCP1_OPT_PAD || option_no == AHCP1_OPT_MANDATORY)
 			continue;
 		/* Length */
-		if (cp + 1 > ep)
+		if (!len)
 			goto invalid;
 		option_len = GET_U_1(cp);
 		cp += 1;
-		if (cp + option_len > ep)
+		len -= 1;
+		if (option_len > len)
 			goto invalid;
 		/* Value */
 		if (option_no <= AHCP1_OPT_MAX && data_decoders[option_no] != NULL) {
-			if (data_decoders[option_no](ndo, cp, cp + option_len) < 0)
-				break; /* truncated and already marked up */
+			data_decoders[option_no](ndo, cp, option_len);
 		} else {
 			ND_PRINT(" (Length %u)", option_len);
 			ND_TCHECK_LEN(cp, option_len);
 		}
 		cp += option_len;
+		len -= option_len;
 	}
 	return;
 
 invalid:
 	nd_print_invalid(ndo);
-	ND_TCHECK_LEN(cp, ep - cp);
+	ND_TCHECK_LEN(cp, len);
 	return;
 trunc:
-	nd_print_trunc(ndo);
+	nd_trunc(ndo);
 }
 
 static void
-ahcp1_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
+ahcp1_body_print(netdissect_options *ndo,
+                 const u_char *cp, u_int len)
 {
 	uint8_t type, mbz;
 	uint16_t body_len;
 
-	if (cp + AHCP1_BODY_MIN_LEN > ep)
+	if (len < AHCP1_BODY_MIN_LEN)
 		goto invalid;
 	/* Type */
 	type = GET_U_1(cp);
 	cp += 1;
+	len -= 1;
 	/* MBZ */
 	mbz = GET_U_1(cp);
 	cp += 1;
+	len -= 1;
 	/* Length */
 	body_len = GET_BE_U_2(cp);
 	cp += 2;
+	len -= 2;
 
 	if (ndo->ndo_vflag) {
 		ND_PRINT("\n\t%s", tok2str(ahcp1_msg_str, "Unknown-%u", type));
@@ -318,28 +324,29 @@ ahcp1_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 			ND_PRINT(", MBZ %u", mbz);
 		ND_PRINT(", Length %u", body_len);
 	}
-	if (cp + body_len > ep)
+	if (body_len > len)
 		goto invalid;
 
 	/* Options */
+	/* Here use "body_len", not "len" (ignore any extra data). */
 	if (ndo->ndo_vflag >= 2)
-		ahcp1_options_print(ndo, cp, cp + body_len); /* not ep (ignore extra data) */
+		ahcp1_options_print(ndo, cp, body_len);
 	else
 		ND_TCHECK_LEN(cp, body_len);
 	return;
 
 invalid:
 	nd_print_invalid(ndo);
-	ND_TCHECK_LEN(cp, ep - cp);
+	ND_TCHECK_LEN(cp, len);
 	return;
 trunc:
-	nd_print_trunc(ndo);
+	nd_trunc(ndo);
 }
 
 void
-ahcp_print(netdissect_options *ndo, const u_char *cp, const u_int len)
+ahcp_print(netdissect_options *ndo,
+           const u_char *cp, u_int len)
 {
-	const u_char *ep = ndo->ndo_snapend;
 	uint8_t version;
 
 	ndo->ndo_protocol = "ahcp";
@@ -350,49 +357,57 @@ ahcp_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 	if (GET_U_1(cp) != AHCP_MAGIC_NUMBER)
 		goto invalid;
 	cp += 1;
+	len -= 1;
 	/* Version */
 	version = GET_U_1(cp);
 	cp += 1;
+	len -= 1;
 	switch (version) {
 		case AHCP_VERSION_1: {
 			ND_PRINT(" Version 1");
-			if (len < AHCP1_HEADER_FIX_LEN)
+			if (len < AHCP1_HEADER_FIX_LEN - 2)
 				goto invalid;
 			if (!ndo->ndo_vflag) {
 				ND_TCHECK_LEN(cp, AHCP1_HEADER_FIX_LEN - 2);
 				cp += AHCP1_HEADER_FIX_LEN - 2;
+				len -= AHCP1_HEADER_FIX_LEN - 2;
 			} else {
 				/* Hopcount */
 				ND_PRINT("\n\tHopcount %u", GET_U_1(cp));
 				cp += 1;
+				len -= 1;
 				/* Original Hopcount */
-				ND_PRINT(", Original Hopcount %u",
-					 GET_U_1(cp));
+				ND_PRINT(", Original Hopcount %u", GET_U_1(cp));
 				cp += 1;
+				len -= 1;
 				/* Nonce */
 				ND_PRINT(", Nonce 0x%08x", GET_BE_U_4(cp));
 				cp += 4;
+				len -= 4;
 				/* Source Id */
 				ND_PRINT(", Source Id %s", GET_LINKADDR_STRING(cp, LINKADDR_OTHER, 8));
 				cp += 8;
+				len -= 8;
 				/* Destination Id */
 				ND_PRINT(", Destination Id %s", GET_LINKADDR_STRING(cp, LINKADDR_OTHER, 8));
 				cp += 8;
+				len -= 8;
 			}
 			/* Body */
-			ahcp1_body_print(ndo, cp, ep);
+			ahcp1_body_print(ndo, cp, len);
 			break;
 		}
 		default:
 			ND_PRINT(" Version %u (unknown)", version);
+			ND_TCHECK_LEN(cp, len);
 			break;
 	}
 	return;
 
 invalid:
 	nd_print_invalid(ndo);
-	ND_TCHECK_LEN(cp, ep - cp);
+	ND_TCHECK_LEN(cp, len);
 	return;
 trunc:
-	nd_print_trunc(ndo);
+	nd_trunc(ndo);
 }
