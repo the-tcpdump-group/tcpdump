@@ -1137,7 +1137,6 @@ of10_phy_ports_print(netdissect_options *ndo,
 			 tok2str(ofpp_str, "%u", GET_BE_U_2(cp)));
 		cp += 2;
 		/* hw_addr */
-		ND_TCHECK_LEN(cp, MAC_ADDR_LEN);
 		ND_PRINT(", hw_addr %s", GET_ETHERADDR_STRING(cp));
 		cp += MAC_ADDR_LEN;
 		/* name */
@@ -1330,12 +1329,10 @@ of10_match_print(netdissect_options *ndo,
 		         tok2str(ofpp_str, "%u", GET_BE_U_2(cp)));
 	cp += 2;
 	/* dl_src */
-	ND_TCHECK_LEN(cp, MAC_ADDR_LEN);
 	if (! (wildcards & OFPFW_DL_SRC))
 		ND_PRINT("%smatch dl_src %s", pfx, GET_ETHERADDR_STRING(cp));
 	cp += MAC_ADDR_LEN;
 	/* dl_dst */
-	ND_TCHECK_LEN(cp, MAC_ADDR_LEN);
 	if (! (wildcards & OFPFW_DL_DST))
 		ND_PRINT("%smatch dl_dst %s", pfx, GET_ETHERADDR_STRING(cp));
 	cp += MAC_ADDR_LEN;
@@ -1494,7 +1491,6 @@ of10_actions_print(netdissect_options *ndo,
 		case OFPAT_SET_DL_SRC:
 		case OFPAT_SET_DL_DST:
 			/* dl_addr */
-			ND_TCHECK_LEN(cp, MAC_ADDR_LEN);
 			ND_PRINT(", dl_addr %s", GET_ETHERADDR_STRING(cp));
 			cp += MAC_ADDR_LEN;
 			/* pad */
