@@ -407,7 +407,7 @@ cfm_print(netdissect_options *ndo,
                 break;
 
             case CFM_CCM_MD_FORMAT_MAC:
-                if (md_namelength == 6) {
+                if (md_namelength == MAC_ADDR_LEN) {
                     ND_PRINT("\n\t  MAC %s", GET_ETHERADDR_STRING(md_name));
                 } else {
                     ND_PRINT("\n\t  MAC (length invalid)");

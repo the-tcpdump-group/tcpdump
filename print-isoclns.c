@@ -1298,7 +1298,7 @@ esis_print(netdissect_options *ndo,
 		pptr += netal;
                 li -= netal;
 
-		if (snpal == 6)
+		if (snpal == MAC_ADDR_LEN)
 			ND_PRINT("\n\t  SNPA (length: %u): %s",
 			       snpal,
 			       GET_ETHERADDR_STRING(snpa));
