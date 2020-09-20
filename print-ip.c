@@ -190,16 +190,7 @@ ip_printts(netdissect_options *ndo,
 	case IPOPT_TS_TSANDADDR:
 		ND_PRINT("TS+ADDR");
 		break;
-	/*
-	 * prespecified should really be 3, but some ones might send 2
-	 * instead, and the IPOPT_TS_PRESPEC constant can apparently
-	 * have both values, so we have to hard-code it here.
-	 */
-
-	case 2:
-		ND_PRINT("PRESPEC2.0");
-		break;
-	case 3:			/* IPOPT_TS_PRESPEC */
+	case IPOPT_TS_PRESPEC:
 		ND_PRINT("PRESPEC");
 		break;
 	default:
