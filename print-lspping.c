@@ -595,7 +595,7 @@ lspping_print(netdissect_options *ndo,
     int_part=GET_BE_U_4(lspping_com_header->ts_rcvd.int_part);
     fraction=GET_BE_U_4(lspping_com_header->ts_rcvd.fraction);
     ND_PRINT("Receiver Timestamp: ");
-    if ((int_part != 0) && (fraction != 0))
+    if (! (int_part == 0 && fraction == 0))
         p_ntp_time(ndo, &lspping_com_header->ts_rcvd);
     else
         ND_PRINT("no timestamp");
