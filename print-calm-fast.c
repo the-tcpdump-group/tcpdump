@@ -65,5 +65,4 @@ calm_fast_print(netdissect_options *ndo, const u_char *bp, u_int length, const s
 
 trunc:
 	nd_print_trunc(ndo);
-	return;
 }

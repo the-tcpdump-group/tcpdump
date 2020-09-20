@@ -548,7 +548,6 @@ ieee802_15_4_print_addr(netdissect_options *ndo, const u_char *p,
 		ND_PRINT("%s", GET_LE64ADDR_STRING(p));
 		break;
 	}
-	return;
 }
 
 /*
@@ -1300,7 +1299,6 @@ ieee802_15_4_print_mlme_ie_list(netdissect_options *ndo,
 		p += sub_ie_len;
 		ie_len -= 2 + sub_ie_len;
 	} while (ie_len > 0);
-	return;
 }
 
 /*

@@ -127,6 +127,5 @@ ppi_if_print(netdissect_options *ndo,
 		hdrlen = 0;
 	}
 	ndo->ndo_ll_hdr_len += len + hdrlen;
-	return;
 }
 #endif /* DLT_PPI */

@@ -230,7 +230,6 @@ nflog_if_print(netdissect_options *ndo,
 trunc:
 	nd_print_trunc(ndo);
 	ndo->ndo_ll_hdr_len += h_size - NFLOG_HDR_LEN;
-	return;
 }
 
 #endif /* DLT_NFLOG */

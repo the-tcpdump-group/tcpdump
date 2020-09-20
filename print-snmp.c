@@ -1380,7 +1380,6 @@ snmppdu_print(netdissect_options *ndo,
 	np += count;
 
 	varbind_print(ndo, pduid, np, length);
-	return;
 }
 
 /*
@@ -1471,7 +1470,6 @@ trappdu_print(netdissect_options *ndo,
 	np += count;
 
 	varbind_print(ndo, TRAP, np, length);
-	return;
 }
 
 /*

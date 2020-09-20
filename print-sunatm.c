@@ -103,6 +103,4 @@ sunatm_if_print(netdissect_options *ndo,
 	caplen -= PKT_BEGIN_POS;
 	length -= PKT_BEGIN_POS;
 	atm_print(ndo, vpi, vci, traftype, p, length, caplen);
-
-	return;
 }

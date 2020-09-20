@@ -247,7 +247,6 @@ cnfp_v1_print(netdissect_options *ndo, const u_char *cp)
 
 trunc:
 	nd_print_trunc(ndo);
-	return;
 }
 
 static void
@@ -350,7 +349,6 @@ cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 
 trunc:
 	nd_print_trunc(ndo);
-	return;
 }
 
 static void
@@ -456,7 +454,6 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 
 trunc:
 	nd_print_trunc(ndo);
-	return;
 }
 
 void

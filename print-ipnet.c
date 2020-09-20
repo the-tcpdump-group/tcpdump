@@ -99,7 +99,6 @@ ipnet_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 			ND_DEFAULTPRINT(p, caplen);
 		break;
 	}
-	return;
 }
 
 /*

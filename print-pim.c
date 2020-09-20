@@ -256,7 +256,6 @@ pimv1_join_prune_print(netdissect_options *ndo,
 	return;
 trunc:
 	nd_print_trunc(ndo);
-	return;
 }
 
 void
@@ -338,7 +337,6 @@ pimv1_print(netdissect_options *ndo,
 
 trunc:
 	nd_print_trunc(ndo);
-	return;
 }
 
 /*
@@ -450,7 +448,6 @@ cisco_autorp_print(netdissect_options *ndo,
 
 trunc:
 	nd_print_trunc(ndo);
-	return;
 }
 
 void

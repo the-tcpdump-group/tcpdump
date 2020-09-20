@@ -510,7 +510,6 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 	return;
 trunc:
 	nd_print_trunc(ndo);
-	return;
 }
 
 static const struct tok dccp_option_values[] = {

@@ -81,7 +81,6 @@ babel_print(netdissect_options *ndo,
 
  trunc:
     nd_print_trunc(ndo);
-    return;
 }
 
 /* TLVs */
@@ -861,5 +860,4 @@ babel_print_v2(netdissect_options *ndo,
 
  invalid:
     nd_print_invalid(ndo);
-    return;
 }

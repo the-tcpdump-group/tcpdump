@@ -843,7 +843,6 @@ rpl_printopts(netdissect_options *ndo, const uint8_t *opts, u_int length)
         return;
 trunc:
 	nd_print_trunc(ndo);
-	return;
 }
 
 static void
@@ -872,7 +871,6 @@ rpl_dio_print(netdissect_options *ndo,
 	return;
 trunc:
 	nd_print_trunc(ndo);
-	return;
 }
 
 static void
@@ -918,7 +916,6 @@ trunc:
 
 tooshort:
 	ND_PRINT(" [|length too short]");
-	return;
 }
 
 static void
@@ -961,7 +958,6 @@ trunc:
 
 tooshort:
 	ND_PRINT(" [|dao-length too short]");
-	return;
 }
 
 static void

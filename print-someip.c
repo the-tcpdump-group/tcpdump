@@ -132,5 +132,4 @@ someip_print(netdissect_options *ndo, const u_char *bp, const u_int len)
 	     interface_version,
 	     tok2str(message_type_values, "Unknown", message_type),
 	     tok2str(return_code_values, "Unknown", return_code));
-    return;
 }

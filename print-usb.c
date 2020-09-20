@@ -260,8 +260,6 @@ usb_linux_48_byte_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	ndo->ndo_ll_hdr_len += sizeof (pcap_usb_header);
 
 	usb_header_print(ndo, (const pcap_usb_header *) p);
-
-	return;
 }
 
 #ifdef DLT_USB_LINUX_MMAPPED
@@ -286,8 +284,6 @@ usb_linux_64_byte_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	ndo->ndo_ll_hdr_len += sizeof (pcap_usb_header_mmapped);
 
 	usb_header_print(ndo, (const pcap_usb_header *) p);
-
-	return;
 }
 #endif /* DLT_USB_LINUX_MMAPPED */
 
