@@ -53,7 +53,7 @@ static const struct tok ip_option_values[] = {
 /*
  * print the recorded route in an IP RR, LSRR or SSRR option.
  */
-static int
+static void
 ip_printroute(netdissect_options *ndo,
               const u_char *cp, u_int length)
 {
@@ -62,7 +62,7 @@ ip_printroute(netdissect_options *ndo,
 
 	if (length < 3) {
 		ND_PRINT(" [bad length %u]", length);
-		return (0);
+		return;
 	}
 	if ((length + 1) & 3)
 		ND_PRINT(" [bad length %u]", length);
@@ -75,7 +75,6 @@ ip_printroute(netdissect_options *ndo,
 		if (ptr > len)
 			ND_PRINT(",");
 	}
-	return (0);
 }
 
 /*
@@ -274,8 +273,7 @@ ip_optprint(netdissect_options *ndo,
 		case IPOPT_RR:       /* fall through */
 		case IPOPT_SSRR:
 		case IPOPT_LSRR:
-			if (ip_printroute(ndo, cp, option_len) == -1)
-				goto trunc;
+			ip_printroute(ndo, cp, option_len);
 			break;
 
 		case IPOPT_RA:
