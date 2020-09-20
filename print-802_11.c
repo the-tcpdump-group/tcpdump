@@ -1122,7 +1122,6 @@ wep_print(netdissect_options *ndo,
 {
 	uint32_t iv;
 
-	ND_TCHECK_LEN(p, IEEE802_11_IV_LEN + IEEE802_11_KID_LEN);
 	iv = GET_LE_U_4(p);
 
 	ND_PRINT(" IV:%3x Pad %x KeyID %x", IV_IV(iv), IV_PAD(iv),
@@ -1158,25 +1157,23 @@ parse_elements(netdissect_options *ndo,
 
 	while (length != 0) {
 		/* Make sure we at least have the element ID and length. */
-		ND_TCHECK_2(p + offset);
 		if (length < 2)
 			goto trunc;
 		elementlen = GET_U_1(p + offset + 1);
 
 		/* Make sure we have the entire element. */
-		ND_TCHECK_LEN(p + offset + 2, elementlen);
 		if (length < elementlen + 2)
 			goto trunc;
 
 		switch (GET_U_1(p + offset)) {
 		case E_SSID:
-			memcpy(&ssid, p + offset, 2);
+                        GET_CPY_BYTES(&ssid, p+offset, 2);
 			offset += 2;
 			length -= 2;
 			if (ssid.length != 0) {
 				if (ssid.length > sizeof(ssid.ssid) - 1)
 					return 0;
-				memcpy(&ssid.ssid, p + offset, ssid.length);
+                                GET_CPY_BYTES(&ssid.ssid, p + offset, ssid.length);
 				offset += ssid.length;
 				length -= ssid.length;
 			}
@@ -1194,15 +1191,14 @@ parse_elements(netdissect_options *ndo,
 			}
 			break;
 		case E_CHALLENGE:
-			memcpy(&challenge, p + offset, 2);
+                        GET_CPY_BYTES(&challenge, p+offset, 2);
 			offset += 2;
 			length -= 2;
 			if (challenge.length != 0) {
 				if (challenge.length >
 				    sizeof(challenge.text) - 1)
 					return 0;
-				memcpy(&challenge.text, p + offset,
-				    challenge.length);
+                                GET_CPY_BYTES(&challenge.text, p+offset, challenge.length);
 				offset += challenge.length;
 				length -= challenge.length;
 			}
@@ -1220,13 +1216,15 @@ parse_elements(netdissect_options *ndo,
 			}
 			break;
 		case E_RATES:
-			memcpy(&rates, p + offset, 2);
+                        GET_CPY_BYTES(&challenge.text, p + offset,
+                                      challenge.length);
+			GET_CPY_BYTES(&rates, p + offset, 2);
 			offset += 2;
 			length -= 2;
 			if (rates.length != 0) {
 				if (rates.length > sizeof(rates.rate))
 					return 0;
-				memcpy(&rates.rate, p + offset, rates.length);
+				GET_CPY_BYTES(&rates.rate, p + offset, rates.length);
 				offset += rates.length;
 				length -= rates.length;
 			}
@@ -1252,7 +1250,7 @@ parse_elements(netdissect_options *ndo,
 			}
 			break;
 		case E_DS:
-			memcpy(&ds, p + offset, 2);
+                        GET_CPY_BYTES(&ds, p + offset, 2);
 			offset += 2;
 			length -= 2;
 			if (ds.length != 1) {
@@ -1276,7 +1274,7 @@ parse_elements(netdissect_options *ndo,
 			}
 			break;
 		case E_CF:
-			memcpy(&cf, p + offset, 2);
+			GET_CPY_BYTES(&cf, p + offset, 2);
 			offset += 2;
 			length -= 2;
 			if (cf.length != 6) {
@@ -1284,7 +1282,7 @@ parse_elements(netdissect_options *ndo,
 				length -= cf.length;
 				break;
 			}
-			memcpy(&cf.count, p + offset, 6);
+			GET_CPY_BYTES(&cf.count, p + offset, 6);
 			offset += 6;
 			length -= 6;
 			/*
@@ -1300,7 +1298,7 @@ parse_elements(netdissect_options *ndo,
 			}
 			break;
 		case E_TIM:
-			memcpy(&tim, p + offset, 2);
+			GET_CPY_BYTES(&tim, p + offset, 2);
 			offset += 2;
 			length -= 2;
 			if (tim.length <= 3U) {
@@ -1310,11 +1308,11 @@ parse_elements(netdissect_options *ndo,
 			}
 			if (tim.length - 3U > sizeof(tim.bitmap))
 				return 0;
-			memcpy(&tim.count, p + offset, 3);
+			GET_CPY_BYTES(&tim.count, p + offset, 3);
 			offset += 3;
 			length -= 3;
 
-			memcpy(tim.bitmap, p + offset, tim.length - 3);
+			GET_CPY_BYTES(tim.bitmap, p + offset, tim.length - 3);
 			offset += tim.length - 3;
 			length -= tim.length - 3;
 			/*
@@ -1360,12 +1358,7 @@ handle_beacon(netdissect_options *ndo,
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	ND_TCHECK_LEN(p, IEEE802_11_TSTAMP_LEN + IEEE802_11_BCNINT_LEN +
-		      IEEE802_11_CAPINFO_LEN);
-	if (length < IEEE802_11_TSTAMP_LEN + IEEE802_11_BCNINT_LEN +
-	    IEEE802_11_CAPINFO_LEN)
-		goto trunc;
-	memcpy(&pbody.timestamp, p, IEEE802_11_TSTAMP_LEN);
+	GET_CPY_BYTES(&pbody.timestamp, p, IEEE802_11_TSTAMP_LEN);
 	offset += IEEE802_11_TSTAMP_LEN;
 	length -= IEEE802_11_TSTAMP_LEN;
 	pbody.beacon_interval = GET_LE_U_2(p + offset);
@@ -1398,9 +1391,6 @@ handle_assoc_request(netdissect_options *ndo,
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	ND_TCHECK_LEN(p, IEEE802_11_CAPINFO_LEN + IEEE802_11_LISTENINT_LEN);
-	if (length < IEEE802_11_CAPINFO_LEN + IEEE802_11_LISTENINT_LEN)
-		goto trunc;
 	pbody.capability_info = GET_LE_U_2(p);
 	offset += IEEE802_11_CAPINFO_LEN;
 	length -= IEEE802_11_CAPINFO_LEN;
@@ -1427,11 +1417,6 @@ handle_assoc_response(netdissect_options *ndo,
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	ND_TCHECK_LEN(p, IEEE802_11_CAPINFO_LEN + IEEE802_11_STATUS_LEN +
-		      IEEE802_11_AID_LEN);
-	if (length < IEEE802_11_CAPINFO_LEN + IEEE802_11_STATUS_LEN +
-	    IEEE802_11_AID_LEN)
-		goto trunc;
 	pbody.capability_info = GET_LE_U_2(p);
 	offset += IEEE802_11_CAPINFO_LEN;
 	length -= IEEE802_11_CAPINFO_LEN;
@@ -1465,18 +1450,13 @@ handle_reassoc_request(netdissect_options *ndo,
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	ND_TCHECK_LEN(p, IEEE802_11_CAPINFO_LEN + IEEE802_11_LISTENINT_LEN +
-		      IEEE802_11_AP_LEN);
-	if (length < IEEE802_11_CAPINFO_LEN + IEEE802_11_LISTENINT_LEN +
-	    IEEE802_11_AP_LEN)
-		goto trunc;
 	pbody.capability_info = GET_LE_U_2(p);
 	offset += IEEE802_11_CAPINFO_LEN;
 	length -= IEEE802_11_CAPINFO_LEN;
 	pbody.listen_interval = GET_LE_U_2(p + offset);
 	offset += IEEE802_11_LISTENINT_LEN;
 	length -= IEEE802_11_LISTENINT_LEN;
-	memcpy(&pbody.ap, p+offset, IEEE802_11_AP_LEN);
+	GET_CPY_BYTES(&pbody.ap, p+offset, IEEE802_11_AP_LEN);
 	offset += IEEE802_11_AP_LEN;
 	length -= IEEE802_11_AP_LEN;
 
@@ -1526,12 +1506,7 @@ handle_probe_response(netdissect_options *ndo,
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	ND_TCHECK_LEN(p, IEEE802_11_TSTAMP_LEN + IEEE802_11_BCNINT_LEN +
-		      IEEE802_11_CAPINFO_LEN);
-	if (length < IEEE802_11_TSTAMP_LEN + IEEE802_11_BCNINT_LEN +
-	    IEEE802_11_CAPINFO_LEN)
-		goto trunc;
-	memcpy(&pbody.timestamp, p, IEEE802_11_TSTAMP_LEN);
+	GET_CPY_BYTES(&pbody.timestamp, p, IEEE802_11_TSTAMP_LEN);
 	offset += IEEE802_11_TSTAMP_LEN;
 	length -= IEEE802_11_TSTAMP_LEN;
 	pbody.beacon_interval = GET_LE_U_2(p + offset);
@@ -1567,9 +1542,6 @@ handle_disassoc(netdissect_options *ndo,
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	ND_TCHECK_LEN(p, IEEE802_11_REASON_LEN);
-	if (length < IEEE802_11_REASON_LEN)
-		goto trunc;
 	pbody.reason_code = GET_LE_U_2(p);
 
 	ND_PRINT(": %s",
@@ -1592,9 +1564,6 @@ handle_auth(netdissect_options *ndo,
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	ND_TCHECK_6(p);
-	if (length < 6)
-		goto trunc;
 	pbody.auth_alg = GET_LE_U_2(p);
 	offset += 2;
 	length -= 2;
@@ -1646,9 +1615,6 @@ handle_deauth(netdissect_options *ndo,
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	ND_TCHECK_LEN(p, IEEE802_11_REASON_LEN);
-	if (length < IEEE802_11_REASON_LEN)
-		goto trunc;
 	pbody.reason_code = GET_LE_U_2(p);
 
 	reason = (pbody.reason_code < NUM_REASONS)
@@ -1719,9 +1685,6 @@ static int
 handle_action(netdissect_options *ndo,
 	      const uint8_t *src, const u_char *p, u_int length)
 {
-	ND_TCHECK_2(p);
-	if (length < 2)
-		goto trunc;
 	if (ndo->ndo_eflag) {
 		ND_PRINT(": ");
 	} else {
@@ -1810,7 +1773,6 @@ ctrl_body_print(netdissect_options *ndo,
 		/* XXX - requires special handling */
 		break;
 	case CTRL_BAR:
-		ND_TCHECK_LEN(p, CTRL_BAR_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s TA:%s CTL(%x) SEQ(%u) ",
 			    GET_ETHERADDR_STRING(((const struct ctrl_bar_hdr_t *)p)->ra),
@@ -1819,42 +1781,35 @@ ctrl_body_print(netdissect_options *ndo,
 			    GET_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->seq));
 		break;
 	case CTRL_BA:
-		ND_TCHECK_LEN(p, CTRL_BA_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
 			    GET_ETHERADDR_STRING(((const struct ctrl_ba_hdr_t *)p)->ra));
 		break;
 	case CTRL_PS_POLL:
-		ND_TCHECK_LEN(p, CTRL_PS_POLL_HDRLEN);
 		ND_PRINT(" AID(%x)",
 		    GET_LE_U_2(((const struct ctrl_ps_poll_hdr_t *)p)->aid));
 		break;
 	case CTRL_RTS:
-		ND_TCHECK_LEN(p, CTRL_RTS_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" TA:%s ",
 			    GET_ETHERADDR_STRING(((const struct ctrl_rts_hdr_t *)p)->ta));
 		break;
 	case CTRL_CTS:
-		ND_TCHECK_LEN(p, CTRL_CTS_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
 			    GET_ETHERADDR_STRING(((const struct ctrl_cts_hdr_t *)p)->ra));
 		break;
 	case CTRL_ACK:
-		ND_TCHECK_LEN(p, CTRL_ACK_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
 			    GET_ETHERADDR_STRING(((const struct ctrl_ack_hdr_t *)p)->ra));
 		break;
 	case CTRL_CF_END:
-		ND_TCHECK_LEN(p, CTRL_END_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
 			    GET_ETHERADDR_STRING(((const struct ctrl_end_hdr_t *)p)->ra));
 		break;
 	case CTRL_END_ACK:
-		ND_TCHECK_LEN(p, CTRL_END_ACK_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
 			    GET_ETHERADDR_STRING(((const struct ctrl_end_ack_hdr_t *)p)->ra));
