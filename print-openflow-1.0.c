@@ -6,7 +6,7 @@
  * up bogus values of selected message fields and decodes partially captured
  * messages up to the snapshot end. It is based on the specification below:
  *
- * [OF10] https://web.archive.org/web/20160402132157/http://archive.openflow.org/documents/openflow-spec-v1.0.0.pdf
+ * [OF10] https://www.opennetworking.org/wp-content/uploads/2013/04/openflow-spec-v1.0.0.pdf
  *
  * Most functions in this file take 3 arguments into account:
  * * cp -- the pointer to the first octet to decode
@@ -729,7 +729,7 @@ of10_bitmap_print(netdissect_options *ndo,
 			sep = ", ";
 		}
 	/* unassigned bits? */
-	ND_PRINT(v & u ? ") (bogus)" : ")");
+	ND_PRINT((v & u) ? ") (bogus)" : ")");
 }
 
 static const u_char *
@@ -1195,9 +1195,9 @@ of10_queue_props_print(netdissect_options *ndo,
 {
 	const u_char *cp0 = cp;
 	const u_int len0 = len;
-	uint16_t property, plen, rate;
 
 	while (len) {
+		uint16_t property, plen;
 		u_char plen_bogus = 0, skip = 0;
 
 		if (len < OF_QUEUE_PROP_HEADER_LEN)
@@ -1237,7 +1237,7 @@ of10_queue_props_print(netdissect_options *ndo,
 		}
 		if (property == OFPQT_MIN_RATE) { /* the only case of property decoding */
 			/* rate */
-			rate = GET_BE_U_2(cp);
+			uint16_t rate = GET_BE_U_2(cp);
 			cp += 2;
 			if (rate > 1000)
 				ND_PRINT(", rate disabled");
@@ -1268,9 +1268,10 @@ of10_queues_print(netdissect_options *ndo,
 {
 	const u_char *cp0 = cp;
 	const u_int len0 = len;
-	uint16_t desclen;
 
 	while (len) {
+		uint16_t desclen;
+
 		if (len < OF_PACKET_QUEUE_LEN)
 			goto invalid;
 		/* queue_id */
@@ -1408,9 +1409,9 @@ of10_actions_print(netdissect_options *ndo,
 {
 	const u_char *cp0 = cp;
 	const u_int len0 = len;
-	uint16_t type, alen, output_port;
 
 	while (len) {
+		uint16_t type, alen, output_port;
 		u_char alen_bogus = 0, skip = 0;
 
 		if (len < OF_ACTION_HEADER_LEN)
@@ -1795,9 +1796,10 @@ of10_flow_stats_reply_print(netdissect_options *ndo,
 {
 	const u_char *cp0 = cp;
 	const u_int len0 = len;
-	uint16_t entry_len;
 
 	while (len) {
+		uint16_t entry_len;
+
 		if (len < OF_FLOW_STATS_LEN)
 			goto invalid;
 		/* length */
