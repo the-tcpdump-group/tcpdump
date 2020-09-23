@@ -730,9 +730,10 @@ of10_data_print(netdissect_options *ndo,
 		return cp;
 	/* data */
 	ND_PRINT("\n\t data (%u octets)", len);
-	ND_TCHECK_LEN(cp, len);
 	if (ndo->ndo_vflag >= 2)
 		hex_and_ascii_print(ndo, "\n\t  ", cp, len);
+	else
+		ND_TCHECK_LEN(cp, len);
 	return cp + len;
 
 trunc:
@@ -773,6 +774,7 @@ of10_bsn_message_print(netdissect_options *ndo,
 		ND_PRINT(", index %u", GET_U_1(cp));
 		cp += 1;
 		/* pad */
+		/* Always the last field, check bounds. */
 		ND_TCHECK_7(cp);
 		cp += 7;
 		break;
@@ -821,6 +823,7 @@ of10_bsn_message_print(netdissect_options *ndo,
 			 tok2str(bsn_onoff_str, "bogus (%u)", GET_U_1(cp)));
 		cp += 1;
 		/* pad */
+		/* Always the last field, check bounds. */
 		ND_TCHECK_3(cp);
 		cp += 3;
 		break;
@@ -989,6 +992,7 @@ of10_bsn_actions_print(netdissect_options *ndo,
 			 tok2str(bsn_mirror_copy_stage_str, "unknown (%u)", GET_U_1(cp)));
 		cp += 1;
 		/* pad */
+		/* Always the last field, check bounds. */
 		ND_TCHECK_3(cp);
 		cp += 3;
 		break;
@@ -1097,9 +1101,10 @@ of10_packet_data_print(netdissect_options *ndo,
 		return cp;
 	/* data */
 	ND_PRINT("\n\t data (%u octets)", len);
-	if (ndo->ndo_vflag < 3)
+	if (ndo->ndo_vflag < 3) {
+		ND_TCHECK_LEN(cp, len);
 		return cp + len;
-	ND_TCHECK_LEN(cp, len);
+	}
 	ndo->ndo_vflag -= 3;
 	ND_PRINT(", frame decoding below\n");
 	ether_print(ndo, cp, len, ND_BYTES_AVAILABLE_AFTER(cp), NULL, NULL);
@@ -1203,6 +1208,7 @@ of10_queue_props_print(netdissect_options *ndo,
 		if (plen < OF_QUEUE_PROP_MINLEN || plen > len)
 			goto invalid;
 		/* pad */
+		/* Sometimes the last field, check bounds. */
 		ND_TCHECK_4(cp);
 		cp += 4;
 		/* property-specific constraints and decoding */
@@ -1238,6 +1244,7 @@ of10_queue_props_print(netdissect_options *ndo,
 			else
 				ND_PRINT(", rate %u.%u%%", rate / 10, rate % 10);
 			/* pad */
+			/* Sometimes the last field, check bounds. */
 			ND_TCHECK_6(cp);
 			cp += 6;
 		}
@@ -1278,6 +1285,7 @@ of10_queues_print(netdissect_options *ndo,
 		if (desclen < OF_PACKET_QUEUE_MINLEN || desclen > len)
 			goto invalid;
 		/* pad */
+		/* Sometimes the last field, check bounds. */
 		ND_TCHECK_2(cp);
 		cp += 2;
 		/* properties */
@@ -1359,7 +1367,6 @@ of10_match_print(netdissect_options *ndo,
 		ND_PRINT("%smatch %s %u", pfx, field_name, nw_proto);
 	}
 	/* pad2 */
-	ND_TCHECK_2(cp);
 	cp += 2;
 	/* nw_src */
 	nw_bits = (wildcards & OFPFW_NW_SRC_MASK) >> OFPFW_NW_SRC_SHIFT;
@@ -1372,7 +1379,6 @@ of10_match_print(netdissect_options *ndo,
 		ND_PRINT("%smatch nw_dst %s/%u", pfx, GET_IPADDR_STRING(cp), 32 - nw_bits);
 	cp += 4;
 	/* tp_src */
-	ND_TCHECK_2(cp);
 	if (! (wildcards & OFPFW_TP_SRC)) {
 		field_name = ! (wildcards & OFPFW_DL_TYPE) && dl_type == ETHERTYPE_IP
 		  && ! (wildcards & OFPFW_NW_PROTO) && nw_proto == IPPROTO_ICMP
@@ -1381,13 +1387,15 @@ of10_match_print(netdissect_options *ndo,
 	}
 	cp += 2;
 	/* tp_dst */
-	ND_TCHECK_2(cp);
+	/* The last unconditional check was at nw_proto, so have an "else" here. */
 	if (! (wildcards & OFPFW_TP_DST)) {
 		field_name = ! (wildcards & OFPFW_DL_TYPE) && dl_type == ETHERTYPE_IP
 		  && ! (wildcards & OFPFW_NW_PROTO) && nw_proto == IPPROTO_ICMP
 		  ? "icmp_code" : "tp_dst";
 		ND_PRINT("%smatch %s %u", pfx, field_name, GET_BE_U_2(cp));
 	}
+	else
+		ND_TCHECK_2(cp);
 	return cp + 2;
 
 trunc:
@@ -1479,6 +1487,8 @@ of10_actions_print(netdissect_options *ndo,
 			/* max_len */
 			if (output_port == OFPP_CONTROLLER)
 				ND_PRINT(", max_len %u", GET_BE_U_2(cp));
+			else
+				ND_TCHECK_2(cp);
 			cp += 2;
 			break;
 		case OFPAT_SET_VLAN_VID:
@@ -1486,6 +1496,7 @@ of10_actions_print(netdissect_options *ndo,
 			ND_PRINT(", vlan_vid %s", vlan_str(GET_BE_U_2(cp)));
 			cp += 2;
 			/* pad */
+			/* Sometimes the last field, check bounds. */
 			ND_TCHECK_2(cp);
 			cp += 2;
 			break;
@@ -1494,6 +1505,7 @@ of10_actions_print(netdissect_options *ndo,
 			ND_PRINT(", vlan_pcp %s", pcp_str(GET_U_1(cp)));
 			cp += 1;
 			/* pad */
+			/* Sometimes the last field, check bounds. */
 			ND_TCHECK_3(cp);
 			cp += 3;
 			break;
@@ -1503,6 +1515,7 @@ of10_actions_print(netdissect_options *ndo,
 			ND_PRINT(", dl_addr %s", GET_ETHERADDR_STRING(cp));
 			cp += MAC_ADDR_LEN;
 			/* pad */
+			/* Sometimes the last field, check bounds. */
 			ND_TCHECK_6(cp);
 			cp += 6;
 			break;
@@ -1517,6 +1530,7 @@ of10_actions_print(netdissect_options *ndo,
 			ND_PRINT(", nw_tos 0x%02x", GET_U_1(cp));
 			cp += 1;
 			/* pad */
+			/* Sometimes the last field, check bounds. */
 			ND_TCHECK_3(cp);
 			cp += 3;
 			break;
@@ -1526,6 +1540,7 @@ of10_actions_print(netdissect_options *ndo,
 			ND_PRINT(", tp_port %u", GET_BE_U_2(cp));
 			cp += 2;
 			/* pad */
+			/* Sometimes the last field, check bounds. */
 			ND_TCHECK_2(cp);
 			cp += 2;
 			break;
@@ -1548,6 +1563,7 @@ of10_actions_print(netdissect_options *ndo,
 			break;
 		case OFPAT_STRIP_VLAN:
 			/* pad */
+			/* Sometimes the last field, check bounds. */
 			ND_TCHECK_4(cp);
 			cp += 4;
 			break;
@@ -1666,6 +1682,7 @@ of10_port_mod_print(netdissect_options *ndo,
 	of10_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
 	cp += 4;
 	/* pad */
+	/* Always the last field, check bounds. */
 	ND_TCHECK_4(cp);
 	return cp + 4;
 
@@ -1725,6 +1742,7 @@ of10_stats_request_print(netdissect_options *ndo,
 			 tok2str(ofpp_str, "%u", GET_BE_U_2(cp)));
 		cp += 2;
 		/* pad */
+		/* Always the last field, check bounds. */
 		ND_TCHECK_6(cp);
 		return cp + 6;
 	case OFPST_QUEUE:
@@ -1735,7 +1753,6 @@ of10_stats_request_print(netdissect_options *ndo,
 			 tok2str(ofpp_str, "%u", GET_BE_U_2(cp)));
 		cp += 2;
 		/* pad */
-		ND_TCHECK_2(cp);
 		cp += 2;
 		/* queue_id */
 		ND_PRINT(", queue_id %s",
@@ -1821,7 +1838,6 @@ of10_flow_stats_reply_print(netdissect_options *ndo,
 			 tok2str(tableid_str, "%u", GET_U_1(cp)));
 		cp += 1;
 		/* pad */
-		ND_TCHECK_1(cp);
 		cp += 1;
 		/* match */
 		if (ep == (cp = of10_match_print(ndo, "\n\t  ", cp, ep)))
@@ -1887,6 +1903,7 @@ of10_aggregate_stats_reply_print(netdissect_options *ndo,
 	ND_PRINT(", flow_count %u", GET_BE_U_4(cp));
 	cp += 4;
 	/* pad */
+	/* Always the last field, check bounds. */
 	ND_TCHECK_4(cp);
 	return cp + 4;
 
@@ -1915,7 +1932,6 @@ of10_table_stats_reply_print(netdissect_options *ndo,
 		         tok2str(tableid_str, "%u", GET_U_1(cp)));
 		cp += 1;
 		/* pad */
-		ND_TCHECK_3(cp);
 		cp += 3;
 		/* name */
 		ND_PRINT(", name '");
@@ -2160,6 +2176,7 @@ of10_packet_in_print(netdissect_options *ndo,
 		 tok2str(ofpr_str, "invalid (0x%02x)", GET_U_1(cp)));
 	cp += 1;
 	/* pad */
+	/* Sometimes the last field, check bounds. */
 	ND_TCHECK_1(cp);
 	cp += 1;
 	/* data */
@@ -2298,6 +2315,7 @@ of10_header_body_print(netdissect_options *ndo,
 		         tok2str(ofpp_str, "%u", GET_BE_U_2(cp)));
 		cp += 2;
 		/* pad */
+		/* Always the last field, check bounds. */
 		ND_TCHECK_2(cp);
 		return cp + 2;
 	case OFPT_FLOW_REMOVED:
@@ -2316,7 +2334,7 @@ of10_header_body_print(netdissect_options *ndo,
 		         tok2str(ofppr_str, "invalid (0x%02x)", GET_U_1(cp)));
 		cp += 1;
 		/* pad */
-		ND_TCHECK_7(cp);
+		/* No need to check bounds, more data follows. */
 		cp += 7;
 		/* desc */
 		return of10_phy_ports_print(ndo, cp, ep, OF_PHY_PORT_FIXLEN);
@@ -2407,6 +2425,7 @@ of10_header_body_print(netdissect_options *ndo,
 			 tok2str(ofpp_str, "%u", GET_BE_U_2(cp)));
 		cp += 2;
 		/* pad */
+		/* Sometimes the last field, check bounds. */
 		ND_TCHECK_6(cp);
 		cp += 6;
 		/* queues */
