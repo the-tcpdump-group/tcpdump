@@ -1231,8 +1231,12 @@ of10_queue_props_print(netdissect_options *ndo,
 			skip = 1;
 		}
 		if (skip) {
-			ND_TCHECK_LEN(cp, plen - 4);
-			cp += plen - 4;
+			/*
+			 * plen >= OF_QUEUE_PROP_HEADER_LEN
+			 * cp is OF_QUEUE_PROP_HEADER_LEN bytes in
+			 */
+			ND_TCHECK_LEN(cp, plen - OF_QUEUE_PROP_HEADER_LEN);
+			cp += plen - OF_QUEUE_PROP_HEADER_LEN;
 			goto next_property;
 		}
 		if (property == OFPQT_MIN_RATE) { /* the only case of property decoding */
@@ -1424,11 +1428,21 @@ of10_actions_print(netdissect_options *ndo,
 		alen = GET_BE_U_2(cp);
 		cp += 2;
 		ND_PRINT(", len %u", alen);
+		/*
+		 * The 4-byte "pad" in the specification is not a field of the
+		 * action header, but a placeholder to illustrate the 64-bit
+		 * alignment requirement. Action type specific case blocks
+		 * below fetch these 4 bytes.
+		 */
+
 		/* On action size underrun/overrun skip the rest of the action list. */
 		if (alen < OF_ACTION_HEADER_LEN || alen > len)
 			goto invalid;
-		/* On action size inappropriate for the given type or invalid type just skip
-		 * the current action, as the basic length constraint has been met. */
+		/*
+		 * After validating the basic length constraint it will be safe
+		 * to skip the current action if the action size is not valid
+		 * for the type or the type is invalid.
+		 */
 		switch (type) {
 		case OFPAT_OUTPUT:
 		case OFPAT_SET_VLAN_VID:
@@ -1457,6 +1471,10 @@ of10_actions_print(netdissect_options *ndo,
 			skip = 1;
 		}
 		if (skip) {
+			/*
+			 * alen >= OF_ACTION_HEADER_LEN
+			 * cp is 4 bytes in
+			 */
 			ND_TCHECK_LEN(cp, alen - 4);
 			cp += alen - 4;
 			goto next_action;

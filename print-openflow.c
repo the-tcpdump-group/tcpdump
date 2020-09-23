@@ -99,7 +99,13 @@ of_header_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep
 	 * the basic header. A message length underrun fails decoding of the rest of
 	 * the current packet. At the same time, try decoding as much of the current
 	 * message as possible even when it does not end within the current TCP
-	 * segment. */
+	 * segment.
+	 *
+	 * That is, do NOT require the header "length" to be small enough for
+	 * the full declared OpenFlow message to fit into the remainder of the
+	 * declared TCP segment given to this function, same as the full declared
+	 * TCP segment is not required to fit into the captured packet buffer.
+	 */
 	if (length < OF_HEADER_LEN) {
 		of_header_print(ndo, version, type, length, xid);
 		goto invalid;
