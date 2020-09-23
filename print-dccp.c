@@ -315,12 +315,12 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 
 	if (ip6) {
 		ND_PRINT("%s.%u > %s.%u: ",
-			  ip6addr_string(ndo, ip6->ip6_src), sport,
-			  ip6addr_string(ndo, ip6->ip6_dst), dport);
+			  GET_IP6ADDR_STRING(ip6->ip6_src), sport,
+			  GET_IP6ADDR_STRING(ip6->ip6_dst), dport);
 	} else {
 		ND_PRINT("%s.%u > %s.%u: ",
-			  ipaddr_string(ndo, ip->ip_src), sport,
-			  ipaddr_string(ndo, ip->ip_dst), dport);
+			  GET_IPADDR_STRING(ip->ip_src), sport,
+			  GET_IPADDR_STRING(ip->ip_dst), dport);
 	}
 
 	nd_print_protocol_caps(ndo);
