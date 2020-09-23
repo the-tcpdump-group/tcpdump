@@ -81,7 +81,7 @@ of_header_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep
 	uint16_t length;
 	uint32_t xid;
 
-	if (ep < cp + OF_HEADER_LEN)
+	if (ep < cp + OF_HEADER_FIXLEN)
 		goto invalid;
 	/* version */
 	version = GET_U_1(cp);
@@ -106,7 +106,7 @@ of_header_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep
 	 * declared TCP segment given to this function, same as the full declared
 	 * TCP segment is not required to fit into the captured packet buffer.
 	 */
-	if (length < OF_HEADER_LEN) {
+	if (length < OF_HEADER_FIXLEN) {
 		of_header_print(ndo, version, type, length, xid);
 		goto invalid;
 	}
@@ -117,8 +117,8 @@ of_header_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep
 		return of10_header_body_print(ndo, cp, ep, type, length, xid);
 	default:
 		of_header_print(ndo, version, type, length, xid);
-		ND_TCHECK_LEN(cp, length - OF_HEADER_LEN);
-		return cp + length - OF_HEADER_LEN; /* done with current message */
+		ND_TCHECK_LEN(cp, length - OF_HEADER_FIXLEN);
+		return cp + length - OF_HEADER_FIXLEN; /* done with current message */
 	}
 
 invalid: /* fail current packet */
