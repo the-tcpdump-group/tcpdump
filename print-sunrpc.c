@@ -185,14 +185,14 @@ sunrpc_print(netdissect_options *ndo, const u_char *bp,
 	case 4:
 		ip = (const struct ip *)bp2;
 		ND_PRINT("%s.%s > %s.%s: %u",
-		    ipaddr_string(ndo, ip->ip_src), srcid,
-		    ipaddr_string(ndo, ip->ip_dst), dstid, length);
+		    GET_IPADDR_STRING(ip->ip_src), srcid,
+		    GET_IPADDR_STRING(ip->ip_dst), dstid, length);
 		break;
 	case 6:
 		ip6 = (const struct ip6_hdr *)bp2;
 		ND_PRINT("%s.%s > %s.%s: %u",
-		    ip6addr_string(ndo, ip6->ip6_src), srcid,
-		    ip6addr_string(ndo, ip6->ip6_dst), dstid, length);
+		    GET_IP6ADDR_STRING(ip6->ip6_src), srcid,
+		    GET_IP6ADDR_STRING(ip6->ip6_dst), dstid, length);
 		break;
 	default:
 		ND_PRINT("%s.%s > %s.%s: %u", "?", srcid, "?", dstid, length);
