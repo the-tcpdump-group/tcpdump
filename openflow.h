@@ -30,6 +30,17 @@
 /* for netdissect_options */
 #include "netdissect.h"
 
+#define OF_FWD(n) { \
+	cp += (n); \
+	len -= (n); \
+}
+
+#define OF_CHK_FWD(n) { \
+	ND_TCHECK_LEN(cp, (n)); \
+	cp += (n); \
+	len -= (n); \
+}
+
 #define OF_HEADER_FIXLEN 8
 
 #define ONF_EXP_ONF               0x4f4e4600
@@ -45,7 +56,6 @@ extern const struct tok onf_exp_str[];
 /*
  * Routines to print packets for various versions of OpenFlow.
  */
-extern const u_char *of10_header_body_print(netdissect_options *ndo,
-	const u_char *, const u_char *,
-	const uint8_t, const uint16_t, const uint32_t);
+extern void of10_header_body_print(netdissect_options *ndo,
+	const u_char *, const uint8_t, uint16_t, const uint32_t);
 extern const char * of_vendor_name(const uint32_t);

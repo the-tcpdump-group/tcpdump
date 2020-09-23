@@ -73,70 +73,72 @@ of_header_print(netdissect_options *ndo, const uint8_t version, const uint8_t ty
 	       version, type, length, xid);
 }
 
-/* Print a single OpenFlow message. */
-static const u_char *
-of_header_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
-{
-	uint8_t version, type;
-	uint16_t length;
-	uint32_t xid;
-
-	if (ep < cp + OF_HEADER_FIXLEN)
-		goto invalid;
-	/* version */
-	version = GET_U_1(cp);
-	cp += 1;
-	/* type */
-	type = GET_U_1(cp);
-	cp += 1;
-	/* length */
-	length = GET_BE_U_2(cp);
-	cp += 2;
-	/* xid */
-	xid = GET_BE_U_4(cp);
-	cp += 4;
-	/* Message length includes the header length and a message always includes
-	 * the basic header. A message length underrun fails decoding of the rest of
-	 * the current packet. At the same time, try decoding as much of the current
-	 * message as possible even when it does not end within the current TCP
-	 * segment.
-	 *
-	 * That is, do NOT require the header "length" to be small enough for
-	 * the full declared OpenFlow message to fit into the remainder of the
-	 * declared TCP segment given to this function, same as the full declared
-	 * TCP segment is not required to fit into the captured packet buffer.
-	 */
-	if (length < OF_HEADER_FIXLEN) {
-		of_header_print(ndo, version, type, length, xid);
-		goto invalid;
-	}
-	/* Decode known protocol versions further without printing the header (the
-	 * type decoding is version-specific. */
-	switch (version) {
-	case OF_VER_1_0:
-		return of10_header_body_print(ndo, cp, ep, type, length, xid);
-	default:
-		of_header_print(ndo, version, type, length, xid);
-		ND_TCHECK_LEN(cp, length - OF_HEADER_FIXLEN);
-		return cp + length - OF_HEADER_FIXLEN; /* done with current message */
-	}
-
-invalid: /* fail current packet */
-	nd_print_invalid(ndo);
-	ND_TCHECK_LEN(cp, ep - cp);
-	return ep;
-trunc:
-	nd_print_trunc(ndo);
-	return ep;
-}
-
 /* Print a TCP segment worth of OpenFlow messages presuming the segment begins
  * on a message boundary. */
 void
-openflow_print(netdissect_options *ndo, const u_char *cp, const u_int len _U_)
+openflow_print(netdissect_options *ndo, const u_char *cp, u_int len)
 {
 	ndo->ndo_protocol = "openflow";
 	ND_PRINT(": OpenFlow");
-	while (cp < ndo->ndo_snapend)
-		cp = of_header_body_print(ndo, cp, ndo->ndo_snapend);
+	while (len) {
+		/* Print a single OpenFlow message. */
+		uint8_t version, type;
+		uint16_t length;
+		uint32_t xid;
+
+		if (len < OF_HEADER_FIXLEN)
+			goto invalid;
+		/* version */
+		version = GET_U_1(cp);
+		OF_FWD(1);
+		/* type */
+		type = GET_U_1(cp);
+		OF_FWD(1);
+		/* length */
+		length = GET_BE_U_2(cp);
+		OF_FWD(2);
+		/* xid */
+		xid = GET_BE_U_4(cp);
+		OF_FWD(4);
+		/*
+		 * Message length includes the header length and a message
+		 * always includes the basic header. A message length underrun
+		 * fails decoding of the rest of the current packet. At the
+		 * same time, try decoding as much of the current message as
+		 * possible even when it does not end within the current TCP
+		 * segment.
+		 *
+		 * That is, do NOT require the header "length" to be small
+		 * enough for the full declared OpenFlow message to fit into
+		 * the remainder of the declared TCP segment, same as the full
+		 * declared TCP segment is not required to fit into the
+		 * captured packet buffer.
+		 */
+		if (length < OF_HEADER_FIXLEN) {
+			of_header_print(ndo, version, type, length, xid);
+			goto invalid;
+		}
+		/*
+		 * Decode known protocol versions further without printing the
+		 * header (the type decoding is version-specific).
+		 */
+		switch (version) {
+		case OF_VER_1_0:
+			of10_header_body_print(ndo, cp, type,
+			                       length - OF_HEADER_FIXLEN, xid);
+			break;
+		default:
+			of_header_print(ndo, version, type, length, xid);
+			ND_TCHECK_LEN(cp, length - OF_HEADER_FIXLEN);
+		}
+		OF_FWD(length - OF_HEADER_FIXLEN);
+	} /* while (len) */
+	return;
+
+invalid: /* fail the current packet */
+	nd_print_invalid(ndo);
+	ND_TCHECK_LEN(cp, len);
+	return;
+trunc:
+	nd_trunc(ndo);
 }
