@@ -267,8 +267,7 @@ extern cap_channel_t *capdns;
  * Return a name for the IP address pointed to by ap.  This address
  * is assumed to be in network byte order.
  *
- * NOTE: ap is *NOT* necessarily part of the packet data (not even if
- * this is being called with the "ipaddr_string()" macro), so you
+ * NOTE: ap is *NOT* necessarily part of the packet data, so you
  * *CANNOT* use the ND_TCHECK_* or ND_TTEST_* macros on it.  Furthermore,
  * even in cases where it *is* part of the packet data, the caller
  * would still have to check for a null return value, even if it's
