@@ -167,12 +167,12 @@ pgm_print(netdissect_options *ndo,
 	if (!ND_TTEST_2(pgm->pgm_dport)) {
 		if (ip6) {
 			ND_PRINT("%s > %s:",
-				ip6addr_string(ndo, ip6->ip6_src),
-				ip6addr_string(ndo, ip6->ip6_dst));
+				GET_IP6ADDR_STRING(ip6->ip6_src),
+				GET_IP6ADDR_STRING(ip6->ip6_dst));
 		} else {
 			ND_PRINT("%s > %s:",
-				ipaddr_string(ndo, ip->ip_src),
-				ipaddr_string(ndo, ip->ip_dst));
+				GET_IPADDR_STRING(ip->ip_src),
+				GET_IPADDR_STRING(ip->ip_dst));
 		}
 		nd_print_trunc(ndo);
 		return;
@@ -184,9 +184,9 @@ pgm_print(netdissect_options *ndo,
 	if (ip6) {
 		if (GET_U_1(ip6->ip6_nxt) == IPPROTO_PGM) {
 			ND_PRINT("%s.%s > %s.%s: ",
-				ip6addr_string(ndo, ip6->ip6_src),
+				GET_IP6ADDR_STRING(ip6->ip6_src),
 				tcpport_string(ndo, sport),
-				ip6addr_string(ndo, ip6->ip6_dst),
+				GET_IP6ADDR_STRING(ip6->ip6_dst),
 				tcpport_string(ndo, dport));
 		} else {
 			ND_PRINT("%s > %s: ",
@@ -195,9 +195,9 @@ pgm_print(netdissect_options *ndo,
 	} else {
 		if (GET_U_1(ip->ip_p) == IPPROTO_PGM) {
 			ND_PRINT("%s.%s > %s.%s: ",
-				ipaddr_string(ndo, ip->ip_src),
+				GET_IPADDR_STRING(ip->ip_src),
 				tcpport_string(ndo, sport),
-				ipaddr_string(ndo, ip->ip_dst),
+				GET_IPADDR_STRING(ip->ip_dst),
 				tcpport_string(ndo, dport));
 		} else {
 			ND_PRINT("%s > %s: ",
