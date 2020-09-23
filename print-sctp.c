@@ -486,16 +486,15 @@ sctp_print(netdissect_options *ndo,
 
   if (ip6) {
     ND_PRINT("%s.%u > %s.%u: sctp",
-      ip6addr_string(ndo, ip6->ip6_src),
+      GET_IP6ADDR_STRING(ip6->ip6_src),
       sourcePort,
-      ip6addr_string(ndo, ip6->ip6_dst),
+      GET_IP6ADDR_STRING(ip6->ip6_dst),
       destPort);
-  } else
-  {
+  } else {
     ND_PRINT("%s.%u > %s.%u: sctp",
-      ipaddr_string(ndo, ip->ip_src),
+      GET_IPADDR_STRING(ip->ip_src),
       sourcePort,
-      ipaddr_string(ndo, ip->ip_dst),
+      GET_IPADDR_STRING(ip->ip_dst),
       destPort);
   }
 
