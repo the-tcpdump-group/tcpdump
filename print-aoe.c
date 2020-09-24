@@ -191,7 +191,7 @@ aoev1_issue_print(netdissect_options *ndo,
 	cp += 2;
 	len -= 2;
 	/* Data */
-	if (len > AOEV1_ISSUE_ARG_LEN)
+	if (len)
 		ND_PRINT("\n\tData: %u bytes", len);
 	return;
 
