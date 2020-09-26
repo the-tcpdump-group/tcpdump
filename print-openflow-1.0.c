@@ -456,6 +456,7 @@ static const struct tok ofpet_str[] = {
 	{ OFPET_QUEUE_OP_FAILED, "QUEUE_OP_FAILED" },
 	{ 0, NULL }
 };
+#define OFPET_MAX OFPET_QUEUE_OP_FAILED /* for of10_error_print() */
 
 #define OFPHFC_INCOMPATIBLE 0x0000U
 #define OFPHFC_EPERM        0x0001U
@@ -540,10 +541,6 @@ static const struct tok ofpqofc_str[] = {
 	{ OFPQOFC_BAD_PORT,  "BAD_PORT"  },
 	{ OFPQOFC_BAD_QUEUE, "BAD_QUEUE" },
 	{ OFPQOFC_EPERM,     "EPERM"     },
-	{ 0, NULL }
-};
-
-static const struct tok empty_str[] = {
 	{ 0, NULL }
 };
 
@@ -2060,25 +2057,28 @@ static void
 of10_error_print(netdissect_options *ndo,
                  const u_char *cp, u_int len)
 {
-	uint16_t type;
-	const struct tok *code_str;
+	uint16_t type, code;
+	const struct tok *code_str[OFPET_MAX + 1] = {
+		/* [OFPET_HELLO_FAILED   ] = */ ofphfc_str,
+		/* [OFPET_BAD_REQUEST    ] = */ ofpbrc_str,
+		/* [OFPET_BAD_ACTION     ] = */ ofpbac_str,
+		/* [OFPET_FLOW_MOD_FAILED] = */ ofpfmfc_str,
+		/* [OFPET_PORT_MOD_FAILED] = */ ofppmfc_str,
+		/* [OFPET_QUEUE_OP_FAILED] = */ ofpqofc_str,
+	};
 
 	/* type */
 	type = GET_BE_U_2(cp);
 	OF_FWD(2);
 	ND_PRINT("\n\t type %s", tok2str(ofpet_str, "invalid (0x%04x)", type));
 	/* code */
-	code_str =
-		type == OFPET_HELLO_FAILED    ? ofphfc_str  :
-		type == OFPET_BAD_REQUEST     ? ofpbrc_str  :
-		type == OFPET_BAD_ACTION      ? ofpbac_str  :
-		type == OFPET_FLOW_MOD_FAILED ? ofpfmfc_str :
-		type == OFPET_PORT_MOD_FAILED ? ofppmfc_str :
-		type == OFPET_QUEUE_OP_FAILED ? ofpqofc_str :
-		empty_str;
-	ND_PRINT(", code %s",
-	         tok2str(code_str, "invalid (0x%04x)", GET_BE_U_2(cp)));
+	code = GET_BE_U_2(cp);
 	OF_FWD(2);
+	if (type <= OFPET_MAX && code_str[type] != NULL)
+		ND_PRINT(", code %s",
+		         tok2str(code_str[type], "invalid (0x%04x)", code));
+	else
+		ND_PRINT(", code invalid (0x%04x)", code);
 	/* data */
 	of10_data_print(ndo, cp, len);
 }
