@@ -722,20 +722,6 @@ of10_bitmap_print(netdissect_options *ndo,
 }
 
 static void
-of10_data_print(netdissect_options *ndo,
-                const u_char *cp, const u_int len)
-{
-	if (len == 0)
-		return;
-	/* data */
-	ND_PRINT("\n\t data (%u octets)", len);
-	if (ndo->ndo_vflag >= 2)
-		hex_and_ascii_print(ndo, "\n\t  ", cp, len);
-	else
-		ND_TCHECK_LEN(cp, len);
-}
-
-static void
 of10_bsn_message_print(netdissect_options *ndo,
                        const u_char *cp, u_int len)
 {
@@ -995,7 +981,7 @@ of10_vendor_action_print(netdissect_options *ndo,
 	/* data */
 	decoder =
 		vendor == OUI_BSN         ? of10_bsn_actions_print         :
-		of10_data_print;
+		of_data_print;
 	decoder(ndo, cp, len);
 	return;
 
@@ -1020,7 +1006,7 @@ of10_vendor_message_print(netdissect_options *ndo,
 	/* data */
 	decoder =
 		vendor == OUI_BSN         ? of10_bsn_message_print         :
-		of10_data_print;
+		of_data_print;
 	decoder(ndo, cp, len);
 	return;
 
@@ -1043,7 +1029,7 @@ of10_vendor_data_print(netdissect_options *ndo,
 	OF_FWD(4);
 	ND_PRINT(", vendor 0x%08x (%s)", vendor, of_vendor_name(vendor));
 	/* data */
-	of10_data_print(ndo, cp, len);
+	of_data_print(ndo, cp, len);
 	return;
 
 invalid: /* skip the undersized data */
@@ -2080,7 +2066,7 @@ of10_error_print(netdissect_options *ndo,
 	else
 		ND_PRINT(", code invalid (0x%04x)", code);
 	/* data */
-	of10_data_print(ndo, cp, len);
+	of_data_print(ndo, cp, len);
 }
 
 void
@@ -2190,7 +2176,7 @@ of10_header_body_print(netdissect_options *ndo,
 	case OFPT_ECHO_REPLY: /* [OF10] Section 5.5.3 */
 		if (ndo->ndo_vflag < 1)
 			break;
-		of10_data_print(ndo, cp, len);
+		of_data_print(ndo, cp, len);
 		return;
 
 	/* OpenFlow header, fixed-size message body and variable-size data. */

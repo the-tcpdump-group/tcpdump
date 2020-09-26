@@ -53,9 +53,12 @@
 #define ONF_EXP_OTRANS            0xff000007
 extern const struct tok onf_exp_str[];
 
+extern const char * of_vendor_name(const uint32_t);
+extern void of_data_print(netdissect_options *ndo,
+	const u_char *, const u_int);
+
 /*
  * Routines to print packets for various versions of OpenFlow.
  */
 extern void of10_header_body_print(netdissect_options *ndo,
 	const u_char *, const uint8_t, uint16_t, const uint32_t);
-extern const char * of_vendor_name(const uint32_t);

@@ -66,6 +66,20 @@ of_vendor_name(const uint32_t vendor)
 	return tok2str(table, "unknown", vendor);
 }
 
+void
+of_data_print(netdissect_options *ndo,
+              const u_char *cp, const u_int len)
+{
+	if (len == 0)
+		return;
+	/* data */
+	ND_PRINT("\n\t data (%u octets)", len);
+	if (ndo->ndo_vflag >= 2)
+		hex_and_ascii_print(ndo, "\n\t  ", cp, len);
+	else
+		ND_TCHECK_LEN(cp, len);
+}
+
 static void
 of_header_print(netdissect_options *ndo, const uint8_t version, const uint8_t type,
                       const uint16_t length, const uint32_t xid)
