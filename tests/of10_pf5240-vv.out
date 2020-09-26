@@ -121,14 +121,14 @@
    21  12:21:14.029852 IP (tos 0x0, ttl 64, id 16036, offset 0, flags [DF], proto TCP (6), length 84)
     172.16.1.51.6633 > 172.16.1.101.62221: Flags [P.], cksum 0x5aff (incorrect -> 0x95e2), seq 129:161, ack 1509, win 139, options [nop,nop,TS val 2256458060 ecr 1], length 32: OpenFlow
 	version 1.0, type QUEUE_GET_CONFIG_REQUEST, length 12, xid 0x00000008
-	 port_no 1
+	 port 1
 	version 1.0, type QUEUE_GET_CONFIG_REQUEST, length 12, xid 0x00000009
-	 port_no 2
+	 port 2
 	version 1.0, type BARRIER_REQUEST, length 8, xid 0x0000000a
    22  12:21:14.030813 IP (tos 0xa0, ttl 64, id 10687, offset 0, flags [DF], proto TCP (6), length 196)
     172.16.1.101.62221 > 172.16.1.51.6633: Flags [P.], cksum 0x8b77 (correct), seq 1509:1653, ack 161, win 2900, options [nop,nop,TS val 1 ecr 2256458060], length 144: OpenFlow
 	version 1.0, type QUEUE_GET_CONFIG_REPLY, length 144, xid 0x00000008
-	 port_no 1
+	 port 1
 	  queue_id 0, len 16
 	   property NONE, len 8
 	  queue_id 1, len 16
@@ -150,7 +150,7 @@
    24  12:21:14.071040 IP (tos 0xa0, ttl 64, id 10688, offset 0, flags [DF], proto TCP (6), length 204)
     172.16.1.101.62221 > 172.16.1.51.6633: Flags [P.], cksum 0x89a4 (correct), seq 1653:1805, ack 161, win 2920, options [nop,nop,TS val 1 ecr 2256458060], length 152: OpenFlow
 	version 1.0, type QUEUE_GET_CONFIG_REPLY, length 144, xid 0x00000009
-	 port_no 2
+	 port 2
 	  queue_id 0, len 16
 	   property NONE, len 8
 	  queue_id 1, len 16

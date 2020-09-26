@@ -255,32 +255,32 @@
    41  16:11:54.461743 IP (tos 0x0, ttl 64, id 60710, offset 0, flags [DF], proto TCP (6), length 120)
     109.74.202.168.6653 > 88.150.169.52.4756: Flags [P.], cksum 0x3a28 (incorrect -> 0x9a6c), seq 273:341, ack 1293, win 252, options [nop,nop,TS val 590230863 ecr 50526774], length 68: OpenFlow
 	version 1.0, type QUEUE_GET_CONFIG_REQUEST, length 12, xid 0x00000014
-	 port_no 16
+	 port 16
 	version 1.0, type QUEUE_GET_CONFIG_REQUEST, length 12, xid 0x00000015
-	 port_no 20
+	 port 20
 	version 1.0, type QUEUE_GET_CONFIG_REQUEST, length 12, xid 0x00000016
-	 port_no 18
+	 port 18
 	version 1.0, type QUEUE_GET_CONFIG_REQUEST, length 12, xid 0x00000017
-	 port_no 22
+	 port 22
 	version 1.0, type QUEUE_GET_CONFIG_REQUEST, length 12, xid 0x00000018
-	 port_no 17
+	 port 17
 	version 1.0, type BARRIER_REQUEST, length 8, xid 0x00000019
    42  16:11:54.464033 IP (tos 0x0, ttl 55, id 49513, offset 0, flags [DF], proto TCP (6), length 68)
     88.150.169.52.4756 > 109.74.202.168.6653: Flags [P.], cksum 0xa139 (correct), seq 1293:1309, ack 341, win 115, options [nop,nop,TS val 50526775 ecr 590230863], length 16: OpenFlow
 	version 1.0, type QUEUE_GET_CONFIG_REPLY, length 16, xid 0x00000014
-	 port_no 16
+	 port 16
    43  16:11:54.501564 IP (tos 0x0, ttl 64, id 60711, offset 0, flags [DF], proto TCP (6), length 52)
     109.74.202.168.6653 > 88.150.169.52.4756: Flags [.], cksum 0x39e4 (incorrect -> 0xa1f5), seq 341, ack 1309, win 252, options [nop,nop,TS val 590230875 ecr 50526775], length 0
    44  16:11:54.504038 IP (tos 0x0, ttl 55, id 49514, offset 0, flags [DF], proto TCP (6), length 124)
     88.150.169.52.4756 > 109.74.202.168.6653: Flags [P.], cksum 0x9bb5 (correct), seq 1309:1381, ack 341, win 115, options [nop,nop,TS val 50526785 ecr 590230875], length 72: OpenFlow
 	version 1.0, type QUEUE_GET_CONFIG_REPLY, length 16, xid 0x00000015
-	 port_no 20
+	 port 20
 	version 1.0, type QUEUE_GET_CONFIG_REPLY, length 16, xid 0x00000016
-	 port_no 18
+	 port 18
 	version 1.0, type QUEUE_GET_CONFIG_REPLY, length 16, xid 0x00000017
-	 port_no 22
+	 port 22
 	version 1.0, type QUEUE_GET_CONFIG_REPLY, length 16, xid 0x00000018
-	 port_no 17
+	 port 17
 	version 1.0, type BARRIER_REPLY, length 8, xid 0x00000019
    45  16:11:54.504155 IP (tos 0x0, ttl 64, id 60712, offset 0, flags [DF], proto TCP (6), length 52)
     109.74.202.168.6653 > 88.150.169.52.4756: Flags [.], cksum 0x39e4 (incorrect -> 0xa1a3), seq 341, ack 1381, win 252, options [nop,nop,TS val 590230875 ecr 50526785], length 0

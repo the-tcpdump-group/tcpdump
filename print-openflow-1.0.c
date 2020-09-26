@@ -2115,7 +2115,7 @@ of10_header_body_print(netdissect_options *ndo,
 	case OFPT_BARRIER_REPLY: /* ibid */
 		if (len)
 			goto invalid;
-		break;
+		return;
 
 	/* OpenFlow header and fixed-size message body. */
 	case OFPT_SET_CONFIG: /* [OF10] Section 5.3.2 */
@@ -2123,7 +2123,7 @@ of10_header_body_print(netdissect_options *ndo,
 		if (len != OF_SWITCH_CONFIG_FIXLEN - OF_HEADER_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
-			goto next_message;
+			break;
 		/* flags */
 		ND_PRINT("\n\t flags %s",
 		         tok2str(ofp_config_str, "invalid (0x%04x)",
@@ -2136,16 +2136,16 @@ of10_header_body_print(netdissect_options *ndo,
 		if (len != OF_PORT_MOD_FIXLEN - OF_HEADER_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
-			goto next_message;
+			break;
 		of10_port_mod_print(ndo, cp);
 		return;
 	case OFPT_QUEUE_GET_CONFIG_REQUEST: /* [OF10] Section 5.3.4 */
 		if (len != OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN - OF_HEADER_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
-			goto next_message;
+			break;
 		/* port */
-		ND_PRINT("\n\t port_no %s",
+		ND_PRINT("\n\t port %s",
 		         tok2str(ofpp_str, "%u", GET_BE_U_2(cp)));
 		OF_FWD(2);
 		/* pad */
@@ -2156,14 +2156,14 @@ of10_header_body_print(netdissect_options *ndo,
 		if (len != OF_FLOW_REMOVED_FIXLEN - OF_HEADER_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
-			goto next_message;
+			break;
 		of10_flow_removed_print(ndo, cp);
 		return;
 	case OFPT_PORT_STATUS: /* [OF10] Section 5.4.3 */
 		if (len != OF_PORT_STATUS_FIXLEN - OF_HEADER_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
-			goto next_message;
+			break;
 		/* reason */
 		ND_PRINT("\n\t reason %s",
 		         tok2str(ofppr_str, "invalid (0x%02x)", GET_U_1(cp)));
@@ -2180,7 +2180,7 @@ of10_header_body_print(netdissect_options *ndo,
 		if (len < OF_FEATURES_REPLY_MINLEN - OF_HEADER_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
-			goto next_message;
+			break;
 		of10_features_reply_print(ndo, cp, len);
 		return;
 
@@ -2189,7 +2189,7 @@ of10_header_body_print(netdissect_options *ndo,
 	case OFPT_ECHO_REQUEST: /* [OF10] Section 5.5.2 */
 	case OFPT_ECHO_REPLY: /* [OF10] Section 5.5.3 */
 		if (ndo->ndo_vflag < 1)
-			goto next_message;
+			break;
 		of10_data_print(ndo, cp, len);
 		return;
 
@@ -2198,7 +2198,7 @@ of10_header_body_print(netdissect_options *ndo,
 		if (len < OF_ERROR_MSG_MINLEN - OF_HEADER_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
-			goto next_message;
+			break;
 		of10_error_print(ndo, cp, len);
 		return;
 	case OFPT_VENDOR:
@@ -2206,7 +2206,7 @@ of10_header_body_print(netdissect_options *ndo,
 		if (len < OF_VENDOR_MINLEN - OF_HEADER_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
-			goto next_message;
+			break;
 		of10_vendor_message_print(ndo, cp, len);
 		return;
 	case OFPT_PACKET_IN:
@@ -2214,7 +2214,7 @@ of10_header_body_print(netdissect_options *ndo,
 		if (len < OF_PACKET_IN_MINLEN - 2 - OF_HEADER_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
-			goto next_message;
+			break;
 		of10_packet_in_print(ndo, cp, len);
 		return;
 
@@ -2225,7 +2225,7 @@ of10_header_body_print(netdissect_options *ndo,
 		if (len < OF_STATS_REQUEST_MINLEN - OF_HEADER_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
-			goto next_message;
+			break;
 		of10_stats_request_print(ndo, cp, len);
 		return;
 
@@ -2237,7 +2237,7 @@ of10_header_body_print(netdissect_options *ndo,
 		if (len < OF_STATS_REPLY_MINLEN - OF_HEADER_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
-			goto next_message;
+			break;
 		of10_stats_reply_print(ndo, cp, len);
 		return;
 
@@ -2246,7 +2246,7 @@ of10_header_body_print(netdissect_options *ndo,
 		if (len < OF_PACKET_OUT_MINLEN - OF_HEADER_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
-			goto next_message;
+			break;
 		of10_packet_out_print(ndo, cp, len);
 		return;
 
@@ -2255,7 +2255,7 @@ of10_header_body_print(netdissect_options *ndo,
 		if (len < OF_FLOW_MOD_MINLEN - OF_HEADER_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
-			goto next_message;
+			break;
 		of10_flow_mod_print(ndo, cp, len);
 		return;
 
@@ -2264,9 +2264,9 @@ of10_header_body_print(netdissect_options *ndo,
 		if (len < OF_QUEUE_GET_CONFIG_REPLY_MINLEN - OF_HEADER_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
-			goto next_message;
+			break;
 		/* port */
-		ND_PRINT("\n\t port_no %s",
+		ND_PRINT("\n\t port %s",
 			 tok2str(ofpp_str, "%u", GET_BE_U_2(cp)));
 		OF_FWD(2);
 		/* pad */
@@ -2276,10 +2276,14 @@ of10_header_body_print(netdissect_options *ndo,
 		of10_queues_print(ndo, cp, len);
 		return;
 	} /* switch (type) */
-	goto next_message;
+	/*
+	 * Not a recognised type or did not print the details, fall back to
+	 * a bounds check.
+	 */
+	ND_TCHECK_LEN(cp, len);
+	return;
 
 invalid: /* skip the message body */
 	nd_print_invalid(ndo);
-next_message:
 	ND_TCHECK_LEN(cp, len);
 }
