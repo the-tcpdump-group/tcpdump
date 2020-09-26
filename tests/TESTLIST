@@ -827,3 +827,7 @@ unsupported-link-type-dbus unsupported-link-type-dbus.pcap unsupported-link-type
 
 # LSP Ping
 lsp-ping-timestamp	lsp-ping-timestamp.pcap		lsp-ping-timestamp.out	-vv
+
+# ICMP Extended Echo IPv4 test
+icmp-ext-ipv4	icmp-ext-ipv4.pcap icmp-ext-ipv4.out
+icmp-ext-ipv4-v icmp-ext-ipv4.pcap icmp-ext-ipv4-v.out  -v

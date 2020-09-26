@@ -38,6 +38,7 @@
 #include "udp.h"
 #include "ipproto.h"
 #include "mpls.h"
+#include "af.h"
 
 /*
  * Interface Control Message Protocol Definitions.
@@ -56,14 +57,28 @@ struct icmp {
 		nd_ipv4 ih_gwaddr;	/* ICMP_REDIRECT */
 		struct ih_idseq {
 			nd_uint16_t icd_id;
-			nd_uint16_t icd_seq;
+			union {
+				nd_uint16_t icd_seq;
+				struct {
+					nd_uint8_t icd_seq_ext;
+					union {
+						nd_uint8_t icd_local_ext;
+						struct {
+							nd_uint8_t icd_state_ext;
+						} ih_ext_reply_state;
+					} ih_ext_rest;
+				} ih_seq_ext;
+			} ih_seq;
 		} ih_idseq;
 		nd_uint32_t ih_void;
 	} icmp_hun;
 #define	icmp_pptr	icmp_hun.ih_pptr
 #define	icmp_gwaddr	icmp_hun.ih_gwaddr
 #define	icmp_id		icmp_hun.ih_idseq.icd_id
-#define	icmp_seq	icmp_hun.ih_idseq.icd_seq
+#define	icmp_seq	icmp_hun.ih_idseq.ih_seq.icd_seq
+#define icmp_seq_ext    icmp_hun.ih_idseq.ih_seq.ih_seq_ext.icd_seq_ext
+#define icmp_ext_lbit   icmp_hun.ih_idseq.ih_seq.ih_seq_ext.ih_ext_rest.icd_local_ext
+#define icmp_ext_state  icmp_hun.ih_idseq.ih_seq.ih_seq_ext.ih_ext_rest.ih_ext_reply_state.icd_state_ext
 #define	icmp_void	icmp_hun.ih_void
 	union {
 		struct id_ts {
@@ -143,8 +158,8 @@ struct icmp {
 #define	ICMP_IREQREPLY		16		/* information reply */
 #define	ICMP_MASKREQ		17		/* address mask request */
 #define	ICMP_MASKREPLY		18		/* address mask reply */
-
-#define	ICMP_MAXTYPE		18
+#define ICMP_EXT_ECHO		42		/* IPv4 extended echo request */
+#define ICMP_EXT_ECHOREPLY	43		/* IPv4 extended echo reply */
 
 #define ICMP_ERRTYPE(type) \
 	((type) == ICMP_UNREACH || (type) == ICMP_SOURCEQUENCH || \
@@ -219,6 +234,51 @@ struct id_rdiscovery {
 	nd_uint32_t ird_addr;
 	nd_uint32_t ird_pref;
 };
+
+struct icmp_ext_header {
+	nd_uint8_t icmp_ext_version;
+	nd_uint8_t icmp_ext_reserved;
+	nd_uint16_t icmp_ext_checksum;
+};
+
+#define INTERFACE_NAME    1 /* identifies interface by name */
+#define INTERFACE_INDEX   2 /* identifies interface by index */
+#define INTERFACE_ADDRESS 3 /* identifies interface by address */
+
+struct icmp_ext_obj_hdr {
+	nd_uint16_t icmp_ext_length;
+	nd_uint8_t icmp_ext_classnum;
+	nd_uint8_t icmp_ext_ctype;
+};
+
+struct icmp_ext_obj_ctype3 { /* When ctype value in ext echo obj header is 3 */
+	nd_uint16_t icmp_ext_obj_afi;      /* Address family identifier */
+	nd_uint8_t icmp_ext_obj_addrlen;   /* Length of probed address */
+	nd_uint8_t icmp_ext_obj_reserved;  /* reserved bits */
+};
+
+/* cases for code value of ICMP EXT ECHO Reply */
+#define ICMP_CODE_NOERROR 0		/* no error in response */
+#define ICMP_CODE_MALQUERY 1		/* malformed query */
+#define ICMP_CODE_NOINTERFACE 2		/* no such interface */
+#define ICMP_CODE_NOTABLEENTRY 3	/* no such table entry */
+#define ICMP_CODE_MULTIPLEINTERFACES 4	/* multiple interfaces satisfy query */
+
+/* RFC 8335 describes the state field of the ICMP Ext Echo reply as reflecting
+ * the state of ARP table or neighbor cache entry associated with the probed
+ * interface
+ */
+#define STATE_MASK 0xe0			/* masks first 3 bits of last byte in reply */
+#define STATE_RESERVED (0 << 5)         /* ignored upon receipt */
+#define STATE_INCOMPLETE (1 << 5)
+#define STATE_REACHABLE (2 << 5)
+#define STATE_STALE (3 << 5)
+#define STATE_DELAY (4 << 5)
+#define STATE_PROBE (5 << 5)
+#define STATE_FAILED (6 << 5)
+#define ABIT_MASK 0x01
+#define ABIT_SET (1 << 7)
+
 
 /*
  * draft-bonica-internet-icmp-08
@@ -330,7 +390,17 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                                GET_BE_U_2(dp->icmp_id),
                                GET_BE_U_2(dp->icmp_seq));
 		break;
-
+	
+	case ICMP_EXT_ECHO:
+	case ICMP_EXT_ECHOREPLY:
+		ND_TCHECK_1(dp->icmp_seq_ext);
+		(void)snprintf(buf, sizeof(buf), "IPv4 extended echo %s, id %u, seq %u",
+                               icmp_type == ICMP_EXT_ECHO ?
+                               "request" : "reply",
+                               GET_BE_U_2(dp->icmp_id),
+                               GET_U_1(dp->icmp_seq_ext));
+		break;
+		
 	case ICMP_UNREACH:
 		switch (icmp_code) {
 
@@ -662,6 +732,161 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 	/* ndo_protocol reassignment after ip_print() call */
 	ndo->ndo_protocol = "icmp";
 
+	/* print out icmp extended echo request from RFC 8335 */	
+	if (icmp_type == ICMP_EXT_ECHO) {
+		const struct icmp_ext_header *ext_hdr;
+	        ext_hdr	= (const struct icmp_ext_header*)&dp->icmp_data;
+		const struct icmp_ext_obj_hdr *ext_obj_hdr;
+		ext_obj_hdr = (const struct icmp_ext_obj_hdr*)(ext_hdr + 1);
+		const char* payload = (const char*)(ext_obj_hdr + 1); 
+		uint8_t ctype = GET_U_1(ext_obj_hdr->icmp_ext_ctype);
+		uint8_t local = GET_U_1(dp->icmp_ext_lbit);
+		ND_PRINT(", local %u", local);
+
+		if (GET_U_1(ext_hdr->icmp_ext_version) != 0x20) { /* error */
+			ND_PRINT(", Packet version not supported");				
+			return;
+		}
+		if (GET_U_1(ext_hdr->icmp_ext_reserved) != 0) { /* error */
+			ND_PRINT(", Error: Reserved bits of extension header != 0");
+			return;
+
+		}
+		/* Checking packet length */
+		ND_TCHECK_SIZE(ext_obj_hdr);
+		uint16_t payloadLen;
+		payloadLen = GET_BE_U_2(ext_obj_hdr->icmp_ext_length) - sizeof(*ext_obj_hdr);
+		ND_TCHECK_LEN(ext_obj_hdr, payloadLen);
+
+		/* validate checksum in extended object header */
+		if (ndo->ndo_vflag) {
+			if (ND_TTEST_LEN(bp, plen)) {
+				uint16_t sum;
+
+				vec[0].ptr = (const uint8_t *)(const void *)ext_hdr;
+				vec[0].len = ((const uint8_t *)dp + plen) - (const uint8_t *)ext_hdr;
+				sum = in_cksum(vec, 1);
+				if (sum != 0) {
+					uint16_t icmp_sum = GET_BE_U_2(ext_hdr->icmp_ext_checksum);
+					ND_PRINT(" (wrong icmp ext cksum %x (->%x)!)",
+						     icmp_sum,
+						     in_cksum_shouldbe(icmp_sum, sum));
+				}
+			}
+		}
+		switch (ctype) {
+		case INTERFACE_NAME:  /* identifies interface by name */
+			if (local) {
+				ND_PRINT(", Type 1: Address Name %.*s", payloadLen, payload);
+			} else {
+				ND_PRINT(", Error: Must identify interface by address if local unset");
+			}
+			break;
+
+		case INTERFACE_INDEX:  /* identifies interface by index */
+			{
+			uint32_t ifIndex = GET_BE_U_4((const uint32_t*)payload);
+				if (local) {
+					ND_PRINT(", Type 2: Address Index %u", ifIndex);
+				} else {
+					ND_PRINT(", Error: Must identify interface by address if local unset");
+				}
+			break;
+			}
+		case INTERFACE_ADDRESS:  /* identifies interface by address */
+			{
+			const struct icmp_ext_obj_ctype3 *ext_obj_ctype3;
+			ext_obj_ctype3 = (const struct icmp_ext_obj_ctype3*)(ext_obj_hdr + 1); 
+			uint16_t afi = GET_BE_U_2((const uint16_t*)payload);
+			const char *name = tok2str(af_values, "Unknown", afi);
+			const int* addr = (const int*)(ext_obj_ctype3 + 1);
+
+			switch(afi) {
+			case AFNUM_INET:
+				{
+				ND_PRINT(", Type 3: Address %s %s", name, GET_IPADDR_STRING(addr));
+				break;
+				}
+			case AFNUM_INET6:
+				ND_PRINT(", Type 3: Address %s %s", name, GET_IP6ADDR_STRING(addr));
+				break;
+			default:
+				ND_PRINT(", Unknown name: %s", name);
+				break;
+				}
+			break;
+		default:
+			printf("Unrecognized ctype value");
+			break;
+			}
+		}
+	}
+	
+	/* decode icmp ext echo reply */
+	if (icmp_type == ICMP_EXT_ECHOREPLY) {
+		uint8_t reply_state = GET_U_1(dp->icmp_ext_state);
+		if (icmp_code != 0) {
+			switch (icmp_code) {
+			case ICMP_CODE_MALQUERY:
+				ND_PRINT(", Error: Malformed Query");
+				break;
+			case ICMP_CODE_NOINTERFACE:
+				ND_PRINT(", Error: No such interface");
+				break;
+			case ICMP_CODE_NOTABLEENTRY:
+				ND_PRINT(", Error: No such table entry");
+				break;
+			case ICMP_CODE_MULTIPLEINTERFACES:
+				ND_PRINT(", Error: Multiple interfaces satisfy query");
+				break;
+			default:
+				ND_PRINT(", Error: Code value not recognized");
+				break;
+			}	
+			if ((reply_state & STATE_MASK) == 0) {
+				ND_PRINT(", Error: State not zero while code was zero");
+			} 
+		} else {
+			ND_PRINT(", Reply recognized");
+			switch (reply_state & STATE_MASK) {
+			case STATE_RESERVED:
+				ND_PRINT(", State 0: Disregarded");
+				break;
+			case STATE_INCOMPLETE:
+				ND_PRINT(", State: Incomplete");
+				break;
+			case STATE_REACHABLE:
+				ND_PRINT(", State: Reachable");
+				break;
+			case STATE_STALE: 
+				ND_PRINT(", State: Stale");
+				break;
+			case STATE_DELAY: 
+				ND_PRINT(", State: delay");
+				break;
+			case STATE_PROBE:
+				ND_PRINT(", State: probe");
+				break;
+			case STATE_FAILED:
+				ND_PRINT(", State: Failed");
+				break;
+			default:
+				ND_PRINT(", State: Unknown");
+				break;
+			}
+
+			if ((reply_state & (1 << 2)) != 0) {
+				ND_PRINT(", A-bit: %d", 1);
+				if ((reply_state & (1 << 1)) != 0) {
+					ND_PRINT(", 4-bit: %d", 1);
+				}
+				if ((reply_state & 1) != 0) {
+					ND_PRINT(", 6-bit: %d", 1);
+				}
+			}
+		}
+	}
+
         /*
          * Attempt to decode the MPLS extensions only for some ICMP types.
          */
@@ -768,3 +993,4 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 trunc:
 	nd_print_trunc(ndo);
 }
+
