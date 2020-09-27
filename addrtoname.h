@@ -68,7 +68,7 @@ get_linkaddr_string(netdissect_options *ndo, const uint8_t *p,
     const unsigned int type, const unsigned int len)
 {
         if (!ND_TTEST_LEN(p, len))
-                nd_trunc(ndo);
+                nd_trunc_longjmp(ndo);
         return linkaddr_string(ndo, p, type, len);
 }
 
@@ -76,7 +76,7 @@ static inline const char *
 get_etheraddr_string(netdissect_options *ndo, const uint8_t *p)
 {
         if (!ND_TTEST_LEN(p, MAC_ADDR_LEN))
-                nd_trunc(ndo);
+                nd_trunc_longjmp(ndo);
         return etheraddr_string(ndo, p);
 }
 
@@ -84,7 +84,7 @@ static inline const char *
 get_le64addr_string(netdissect_options *ndo, const u_char *p)
 {
         if (!ND_TTEST_8(p))
-                nd_trunc(ndo);
+                nd_trunc_longjmp(ndo);
         return le64addr_string(ndo, p);
 }
 
@@ -93,7 +93,7 @@ get_isonsap_string(netdissect_options *ndo, const uint8_t *nsap,
     u_int nsap_length)
 {
 	if (!ND_TTEST_LEN(nsap, nsap_length))
-                nd_trunc(ndo);
+                nd_trunc_longjmp(ndo);
         return isonsap_string(ndo, nsap, nsap_length);
 }
 
@@ -101,7 +101,7 @@ static inline const char *
 get_ipaddr_string(netdissect_options *ndo, const u_char *p)
 {
         if (!ND_TTEST_4(p))
-                nd_trunc(ndo);
+                nd_trunc_longjmp(ndo);
         return ipaddr_string(ndo, p);
 }
 
@@ -109,7 +109,7 @@ static inline const char *
 get_ip6addr_string(netdissect_options *ndo, const u_char *p)
 {
         if (!ND_TTEST_16(p))
-                nd_trunc(ndo);
+                nd_trunc_longjmp(ndo);
         return ip6addr_string(ndo, p);
 }
 
