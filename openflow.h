@@ -41,7 +41,7 @@
 	len -= (n); \
 }
 
-#define OF_HEADER_FIXLEN 8
+#define OF_HEADER_FIXLEN 8U
 
 #define ONF_EXP_ONF               0x4f4e4600
 #define ONF_EXP_BUTE              0xff000001

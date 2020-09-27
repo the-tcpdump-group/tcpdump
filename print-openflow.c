@@ -101,6 +101,11 @@ openflow_print(netdissect_options *ndo, const u_char *cp, u_int len)
 		xid = GET_BE_U_4(cp);
 		OF_FWD(4);
 		/*
+		 * When a TCP packet can contain several protocol messages,
+		 * and at the same time a protocol message can span several
+		 * TCP packets, decoding an incomplete message at the end of
+		 * a TCP packet requires attention to detail in this loop.
+		 *
 		 * Message length includes the header length and a message
 		 * always includes the basic header. A message length underrun
 		 * fails decoding of the rest of the current packet. At the
@@ -108,11 +113,18 @@ openflow_print(netdissect_options *ndo, const u_char *cp, u_int len)
 		 * possible even when it does not end within the current TCP
 		 * segment.
 		 *
-		 * That is, do NOT require the header "length" to be small
+		 * Specifically, to try to process the message body in this
+		 * iteration do NOT require the header "length" to be small
 		 * enough for the full declared OpenFlow message to fit into
 		 * the remainder of the declared TCP segment, same as the full
 		 * declared TCP segment is not required to fit into the
 		 * captured packet buffer.
+		 *
+		 * But DO require the same at the end of this iteration to
+		 * decrement "len" and to proceed to the next iteration.
+		 * (Ideally the declared TCP payload end will be at or after
+		 * the captured packet buffer end, but stay safe even when
+		 * that's somehow not the case.)
 		 */
 		if (length < OF_HEADER_FIXLEN) {
 			of_header_print(ndo, version, type, length, xid);
@@ -131,6 +143,8 @@ openflow_print(netdissect_options *ndo, const u_char *cp, u_int len)
 			of_header_print(ndo, version, type, length, xid);
 			ND_TCHECK_LEN(cp, length - OF_HEADER_FIXLEN);
 		}
+		if (length - OF_HEADER_FIXLEN > len)
+			break;
 		OF_FWD(length - OF_HEADER_FIXLEN);
 	} /* while (len) */
 	return;
