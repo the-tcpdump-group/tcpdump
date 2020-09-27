@@ -14,7 +14,7 @@
  * The convention is that a printer function returns iff the given structure is
  * completely within the packet buffer; otherwise it processes the part that is
  * within the buffer, sooner of later takes the "truncated packet" shortcut via
- * nd_trunc() and never returns. With that in mind, the function may return
+ * longjmp() and never returns. With that in mind, the function may return
  * without printing the structure completely if it is invalid or the ndo_vflag
  * value is not high enough. This way the calling function can try to decode
  * the next data item.
@@ -65,6 +65,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
@@ -735,10 +736,6 @@ of10_data_print(netdissect_options *ndo,
 		hex_and_ascii_print(ndo, "\n\t  ", cp, len);
 	else
 		ND_TCHECK_LEN(cp, len);
-	return;
-
-trunc:
-	nd_trunc(ndo);
 }
 
 static void
@@ -919,9 +916,6 @@ of10_bsn_message_print(netdissect_options *ndo,
 invalid: /* skip the undersized data */
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
 
 static void
@@ -986,9 +980,6 @@ of10_bsn_actions_print(netdissect_options *ndo,
 invalid:
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
 
 static void
@@ -1014,9 +1005,6 @@ of10_vendor_action_print(netdissect_options *ndo,
 invalid: /* skip the undersized data */
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
 
 static void
@@ -1042,9 +1030,6 @@ of10_vendor_message_print(netdissect_options *ndo,
 invalid: /* skip the undersized data */
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
 
 /* Vendor ID is mandatory, data is optional. */
@@ -1067,9 +1052,6 @@ of10_vendor_data_print(netdissect_options *ndo,
 invalid: /* skip the undersized data */
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
 
 static void
@@ -1088,10 +1070,6 @@ of10_packet_data_print(netdissect_options *ndo,
 	ND_PRINT(", frame decoding below\n");
 	ether_print(ndo, cp, len, ND_BYTES_AVAILABLE_AFTER(cp), NULL, NULL);
 	ndo->ndo_vflag += 3;
-	return;
-
-trunc:
-	nd_trunc(ndo);
 }
 
 /* [OF10] Section 5.2.1 */
@@ -1149,9 +1127,6 @@ of10_phy_ports_print(netdissect_options *ndo,
 invalid: /* skip the undersized trailing data */
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
 
 /* [OF10] Section 5.2.2 */
@@ -1219,9 +1194,6 @@ of10_queue_props_print(netdissect_options *ndo,
 invalid: /* skip the rest of queue properties */
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
 
 /* ibid */
@@ -1258,9 +1230,6 @@ of10_queues_print(netdissect_options *ndo,
 invalid: /* skip the rest of queues */
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
 
 /* [OF10] Section 5.2.3 */
@@ -1349,10 +1318,6 @@ of10_match_print(netdissect_options *ndo,
 	}
 	else
 		ND_TCHECK_2(cp);
-	return;
-
-trunc:
-	nd_trunc(ndo);
 }
 
 /* [OF10] Section 5.2.4 */
@@ -1514,9 +1479,6 @@ of10_actions_print(netdissect_options *ndo,
 invalid: /* skip the rest of actions */
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
 
 /* [OF10] Section 5.3.1 */
@@ -1621,10 +1583,6 @@ of10_port_mod_print(netdissect_options *ndo,
 	/* pad */
 	/* Always the last field, check bounds. */
 	ND_TCHECK_4(cp);
-	return;
-
-trunc:
-	nd_trunc(ndo);
 }
 
 /* [OF10] Section 5.3.5 */
@@ -1700,9 +1658,6 @@ of10_stats_request_print(netdissect_options *ndo,
 invalid: /* skip the message body */
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
 
 /* ibid */
@@ -1741,9 +1696,6 @@ of10_desc_stats_reply_print(netdissect_options *ndo,
 invalid: /* skip the message body */
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
 
 /* ibid */
@@ -1806,9 +1758,6 @@ of10_flow_stats_reply_print(netdissect_options *ndo,
 invalid: /* skip the rest of flow statistics entries */
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
 
 /* ibid */
@@ -1835,9 +1784,6 @@ of10_aggregate_stats_reply_print(netdissect_options *ndo,
 invalid: /* skip the message body */
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
 
 /* ibid */
@@ -1881,9 +1827,6 @@ of10_table_stats_reply_print(netdissect_options *ndo,
 invalid: /* skip the undersized trailing data */
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
 
 /* ibid */
@@ -1946,9 +1889,6 @@ of10_port_stats_reply_print(netdissect_options *ndo,
 invalid: /* skip the undersized trailing data */
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
 
 /* ibid */
@@ -1983,9 +1923,6 @@ of10_queue_stats_reply_print(netdissect_options *ndo,
 invalid: /* skip the undersized trailing data */
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
 
 /* ibid */
@@ -2020,10 +1957,6 @@ of10_stats_reply_print(netdissect_options *ndo,
 		}
 	}
 	ND_TCHECK_LEN(cp, len);
-	return;
-
-trunc:
-	nd_trunc(ndo);
 }
 
 /* [OF10] Section 5.3.6 */
@@ -2054,9 +1987,6 @@ of10_packet_out_print(netdissect_options *ndo,
 invalid: /* skip the rest of the message body */
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
 
 /* [OF10] Section 5.4.1 */
@@ -2083,10 +2013,6 @@ of10_packet_in_print(netdissect_options *ndo,
 	OF_CHK_FWD(1);
 	/* data */
 	of10_packet_data_print(ndo, cp, len);
-	return;
-
-trunc:
-	nd_trunc(ndo);
 }
 
 /* [OF10] Section 5.4.2 */
@@ -2356,7 +2282,4 @@ invalid: /* skip the message body */
 	nd_print_invalid(ndo);
 next_message:
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }

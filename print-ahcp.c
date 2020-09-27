@@ -35,6 +35,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
@@ -118,9 +119,6 @@ ahcp_time_print(netdissect_options *ndo,
 invalid:
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
 
 static void
@@ -135,9 +133,6 @@ ahcp_seconds_print(netdissect_options *ndo,
 invalid:
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
 
 static void
@@ -159,9 +154,6 @@ ahcp_ipv6_addresses_print(netdissect_options *ndo,
 invalid:
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
 
 static void
@@ -183,9 +175,6 @@ ahcp_ipv4_addresses_print(netdissect_options *ndo,
 invalid:
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
 
 static void
@@ -207,9 +196,6 @@ ahcp_ipv6_prefixes_print(netdissect_options *ndo,
 invalid:
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
 
 static void
@@ -231,9 +217,6 @@ ahcp_ipv4_prefixes_print(netdissect_options *ndo,
 invalid:
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
 
 static void
@@ -291,9 +274,6 @@ ahcp1_options_print(netdissect_options *ndo,
 invalid:
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
 
 static void
@@ -338,9 +318,7 @@ ahcp1_body_print(netdissect_options *ndo,
 invalid:
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
+
 }
 
 void
@@ -407,7 +385,4 @@ ahcp_print(netdissect_options *ndo,
 invalid:
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }

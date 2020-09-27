@@ -362,7 +362,11 @@ extern void nd_pop_all_packet_info(netdissect_options *);
 #define ND_TTEST_SIZE(p) ND_TTEST_LEN(p, sizeof(*(p)))
 
 /* Bail out if "l" bytes from "p" were not captured */
+#ifdef ND_LONGJMP_FROM_TCHECK
+#define ND_TCHECK_LEN(p, l) if (!ND_TTEST_LEN(p, l)) nd_trunc(ndo)
+#else
 #define ND_TCHECK_LEN(p, l) if (!ND_TTEST_LEN(p, l)) goto trunc
+#endif
 
 /* Bail out if "*(p)" was not captured */
 #define ND_TCHECK_SIZE(p) ND_TCHECK_LEN(p, sizeof(*(p)))

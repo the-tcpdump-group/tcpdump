@@ -38,6 +38,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 #include "openflow.h"
@@ -152,7 +153,4 @@ openflow_print(netdissect_options *ndo, const u_char *cp, u_int len)
 invalid: /* fail the current packet */
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
-	return;
-trunc:
-	nd_trunc(ndo);
 }
