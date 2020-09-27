@@ -1033,6 +1033,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-null.c
     print-olsr.c
     print-openflow-1.0.c
+    print-openflow-1.3.c
     print-openflow.c
     print-ospf.c
     print-ospf6.c

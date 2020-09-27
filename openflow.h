@@ -62,6 +62,8 @@ extern void of_data_print(netdissect_options *ndo,
  */
 extern void of10_message_print(netdissect_options *ndo,
 	const u_char *, uint16_t, const uint8_t);
+extern void of13_message_print(netdissect_options *ndo,
+	const u_char *, uint16_t, const uint8_t);
 
 /*
  * Use this instead of ofpt_str[] and OFPT_ constants because OpenFlow
@@ -69,3 +71,4 @@ extern void of10_message_print(netdissect_options *ndo,
  * versions clash on many names, including the OFPT_ constants.
  */
 extern const char * of10_msgtype_str(const uint8_t);
+extern const char * of13_msgtype_str(const uint8_t);

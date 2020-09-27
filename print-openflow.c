@@ -124,6 +124,10 @@ openflow_print(netdissect_options *ndo, const u_char *cp, u_int len)
 			ND_PRINT(", type %s", of10_msgtype_str(type));
 			decoder = of10_message_print;
 			break;
+		case OF_VER_1_3:
+			ND_PRINT(", type %s", of13_msgtype_str(type));
+			decoder = of13_message_print;
+			break;
 		default:
 			ND_PRINT(", type unknown (0x%02x)", type);
 		}
