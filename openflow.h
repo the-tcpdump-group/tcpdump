@@ -58,7 +58,14 @@ extern void of_data_print(netdissect_options *ndo,
 	const u_char *, const u_int);
 
 /*
- * Routines to print packets for various versions of OpenFlow.
+ * Routines to handle various versions of OpenFlow.
  */
-extern void of10_header_body_print(netdissect_options *ndo,
-	const u_char *, const uint8_t, uint16_t, const uint32_t);
+extern void of10_message_print(netdissect_options *ndo,
+	const u_char *, uint16_t, const uint8_t);
+
+/*
+ * Use this instead of ofpt_str[] and OFPT_ constants because OpenFlow
+ * specifications define protocol encoding in C syntax, and different
+ * versions clash on many names, including the OFPT_ constants.
+ */
+extern const char * of10_msgtype_str(const uint8_t);

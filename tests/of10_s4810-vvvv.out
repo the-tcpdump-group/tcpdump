@@ -377,7 +377,7 @@
 	 match dl_dst 00:11:22:33:00:15 [|openflow]
    20  12:51:39.554402 IP (tos 0x0, ttl 64, id 53104, offset 0, flags [DF], proto TCP (6), length 180)
     10.0.0.20.6633 > 10.0.0.81.56068: Flags [P.], cksum 0x150b (incorrect -> 0x8ec7), seq 4241:4369, ack 677, win 139, options [nop,nop,TS val 47836527 ecr 1], length 128: OpenFlow
-	version unknown (0x00), type 0x00, length 0, xid 0x00000000 (invalid)
+	version unknown (0x00), type unknown (0x00), length 0 (too short!), xid 0x00000000 (invalid)
    21  12:51:39.555118 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 52)
     10.0.0.81.56068 > 10.0.0.20.6633: Flags [.], cksum 0xfaa7 (correct), seq 677, ack 2873, win 952, options [nop,nop,TS val 1 ecr 47836527], length 0
    22  12:51:39.555156 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 52)
@@ -858,7 +858,7 @@
 	  duration_sec 0, duration_nsec 0, priority 65535, idle_timeout 0, hard_timeout 0, cookie 0x0000000000000025, packet_count 0 [|openflow]
    41  12:51:40.028159 IP (tos 0x0, ttl 64, id 53582, offset 0, flags [DF], proto TCP (6), length 1040)
     10.0.0.81.56068 > 10.0.0.20.6633: Flags [P.], cksum 0x395e (correct), seq 8113:9101, ack 4545, win 1035, options [nop,nop,TS val 2 ecr 47837000], length 988: OpenFlow
-	version unknown (0x00), type 0x00, length 0, xid 0x00000000 (invalid)
+	version unknown (0x00), type unknown (0x00), length 0 (too short!), xid 0x00000000 (invalid)
    42  12:51:40.028172 IP (tos 0x0, ttl 64, id 53111, offset 0, flags [DF], proto TCP (6), length 52)
     10.0.0.20.6633 > 10.0.0.81.56068: Flags [.], cksum 0x148b (incorrect -> 0xd387), seq 4641, ack 9101, win 302, options [nop,nop,TS val 47837000 ecr 2], length 0
    43  12:51:40.226408 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 52)

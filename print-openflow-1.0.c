@@ -682,6 +682,12 @@ static const struct tok bsn_onoff_str[] = {
 	{ 0, NULL },
 };
 
+/* [OF10] Section 5.1 */
+const char * of10_msgtype_str(const uint8_t type)
+{
+	return tok2str(ofpt_str, "invalid (0x%02x)", type);
+}
+
 static const char *
 vlan_str(const uint16_t vid)
 {
@@ -2070,17 +2076,15 @@ of10_error_print(netdissect_options *ndo,
 }
 
 void
-of10_header_body_print(netdissect_options *ndo,
-                       const u_char *cp, const uint8_t type,
-                       uint16_t len, const uint32_t xid)
+of10_message_print(netdissect_options *ndo,
+                   const u_char *cp, uint16_t len, const uint8_t type)
 {
 	/*
 	 * Here "cp" and "len" stand for the message part beyond the common
-	 * OpenFlow 1.0 header, if any. Add OF_HEADER_FIXLEN when printing the
-	 * message header. Subtract OF_HEADER_FIXLEN from the type-specific
-	 * lengths, which include the header length, when (and only when)
-	 * validating the length in this function, which is the only one in
-	 * this file that needs to know about OF_HEADER_FIXLEN.
+	 * OpenFlow 1.0 header, if any. Subtract OF_HEADER_FIXLEN from the
+	 * type-specific lengths, which include the header length, when (and
+	 * only when) validating the length in this function. No other code
+	 * in this file needs to take OF_HEADER_FIXLEN into account.
 	 *
 	 * Most message types are longer than just the header, and the length
 	 * constraints may be complex. When possible, validate the constraint
@@ -2088,11 +2092,6 @@ of10_header_body_print(netdissect_options *ndo,
 	 * begin the decoding and let the lower-layer function do any remaining
 	 * validation.
 	 */
-
-	/* [OF10] Section 5.1 */
-	ND_PRINT("\n\tversion 1.0, type %s, length %u, xid 0x%08x",
-	         tok2str(ofpt_str, "invalid (0x%02x)", type),
-	         OF_HEADER_FIXLEN + len, xid);
 	switch (type) {
 	/* OpenFlow header only. */
 	case OFPT_FEATURES_REQUEST: /* [OF10] Section 5.3.1 */

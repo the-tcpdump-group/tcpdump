@@ -46,6 +46,21 @@
 
 
 #define OF_VER_1_0    0x01
+#define OF_VER_1_1    0x02
+#define OF_VER_1_2    0x03
+#define OF_VER_1_3    0x04
+#define OF_VER_1_4    0x05
+#define OF_VER_1_5    0x06
+
+static const struct tok ofver_str[] = {
+	{ OF_VER_1_0,	"1.0" },
+	{ OF_VER_1_1,	"1.1" },
+	{ OF_VER_1_2,	"1.2" },
+	{ OF_VER_1_3,	"1.3" },
+	{ OF_VER_1_4,	"1.4" },
+	{ OF_VER_1_5,	"1.5" },
+	{ 0, NULL }
+};
 
 const struct tok onf_exp_str[] = {
 	{ ONF_EXP_ONF,               "ONF Extensions"                                  },
@@ -80,14 +95,6 @@ of_data_print(netdissect_options *ndo,
 		ND_TCHECK_LEN(cp, len);
 }
 
-static void
-of_header_print(netdissect_options *ndo, const uint8_t version, const uint8_t type,
-                      const uint16_t length, const uint32_t xid)
-{
-	ND_PRINT("\n\tversion unknown (0x%02x), type 0x%02x, length %u, xid 0x%08x",
-	       version, type, length, xid);
-}
-
 /* Print a TCP segment worth of OpenFlow messages presuming the segment begins
  * on a message boundary. */
 void
@@ -99,22 +106,40 @@ openflow_print(netdissect_options *ndo, const u_char *cp, u_int len)
 		/* Print a single OpenFlow message. */
 		uint8_t version, type;
 		uint16_t length;
-		uint32_t xid;
+		void (*decoder)(struct netdissect_options *,
+		                const u_char *, u_int16_t, const uint8_t) = NULL;
 
-		if (len < OF_HEADER_FIXLEN)
-			goto invalid;
 		/* version */
 		version = GET_U_1(cp);
 		OF_FWD(1);
+		ND_PRINT("\n\tversion %s",
+		         tok2str(ofver_str, "unknown (0x%02x)", version));
 		/* type */
+		if (len < 1)
+			goto partial_header;
 		type = GET_U_1(cp);
 		OF_FWD(1);
+		switch (version) {
+		case OF_VER_1_0:
+			ND_PRINT(", type %s", of10_msgtype_str(type));
+			decoder = of10_message_print;
+			break;
+		default:
+			ND_PRINT(", type unknown (0x%02x)", type);
+		}
 		/* length */
+		if (len < 2)
+			goto partial_header;
 		length = GET_BE_U_2(cp);
 		OF_FWD(2);
+		ND_PRINT(", length %u%s", length,
+		         length < OF_HEADER_FIXLEN ? " (too short!)" : "");
 		/* xid */
-		xid = GET_BE_U_4(cp);
+		if (len < 4)
+			goto partial_header;
+		ND_PRINT(", xid 0x%08x", GET_BE_U_4(cp));
 		OF_FWD(4);
+
 		/*
 		 * When a TCP packet can contain several protocol messages,
 		 * and at the same time a protocol message can span several
@@ -141,29 +166,23 @@ openflow_print(netdissect_options *ndo, const u_char *cp, u_int len)
 		 * the captured packet buffer end, but stay safe even when
 		 * that's somehow not the case.)
 		 */
-		if (length < OF_HEADER_FIXLEN) {
-			of_header_print(ndo, version, type, length, xid);
+		if (length < OF_HEADER_FIXLEN)
 			goto invalid;
-		}
-		/*
-		 * Decode known protocol versions further without printing the
-		 * header (the type decoding is version-specific).
-		 */
-		switch (version) {
-		case OF_VER_1_0:
-			of10_header_body_print(ndo, cp, type,
-			                       length - OF_HEADER_FIXLEN, xid);
-			break;
-		default:
-			of_header_print(ndo, version, type, length, xid);
+
+		if (decoder != NULL)
+			decoder(ndo, cp, length - OF_HEADER_FIXLEN, type);
+		else
 			ND_TCHECK_LEN(cp, length - OF_HEADER_FIXLEN);
-		}
 		if (length - OF_HEADER_FIXLEN > len)
 			break;
 		OF_FWD(length - OF_HEADER_FIXLEN);
 	} /* while (len) */
 	return;
 
+partial_header:
+	ND_PRINT(" (end of TCP payload)");
+	ND_TCHECK_LEN(cp, len);
+	return;
 invalid: /* fail the current packet */
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cp, len);
