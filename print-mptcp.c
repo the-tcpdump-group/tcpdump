@@ -113,6 +113,13 @@ struct mp_dss {
 #define MP_DSS_a                        0x02
 #define MP_DSS_A                        0x01
 
+static const struct tok mptcp_addr_subecho_bits[] = {
+        { 0x6, "v0-ip6" },
+        { 0x4, "v0-ip4" },
+        { 0x1, "v1-echo" },
+        { 0x0, "v1" }
+};
+
 struct mp_add_addr {
         nd_uint8_t     kind;
         nd_uint8_t     len;
@@ -354,6 +361,9 @@ add_addr_print(netdissect_options *ndo,
             opt_len == 20 || opt_len == 22 || opt_len == 28 || opt_len == 30))
                 return 0;
 
+        ND_PRINT(" %s",
+                 tok2str(mptcp_addr_subecho_bits, "[bad version/echo]",
+                         GET_U_1(add_addr->sub_echo) & 0xF));
         ND_PRINT(" id %u", GET_U_1(add_addr->addr_id));
         if (opt_len == 8 || opt_len == 10 || opt_len == 16 || opt_len == 18) {
                 ND_PRINT(" %s", GET_IPADDR_STRING(add_addr->u.v4.addr));
