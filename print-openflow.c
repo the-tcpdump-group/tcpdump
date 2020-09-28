@@ -107,7 +107,7 @@ openflow_print(netdissect_options *ndo, const u_char *cp, u_int len)
 		uint8_t version, type;
 		uint16_t length;
 		void (*decoder)(struct netdissect_options *,
-		                const u_char *, u_int16_t, const uint8_t) = NULL;
+		                const u_char *, uint16_t, const uint8_t) = NULL;
 
 		/* version */
 		version = GET_U_1(cp);
