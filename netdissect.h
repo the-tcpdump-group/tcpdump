@@ -451,6 +451,15 @@ extern int unaligned_memcmp(const void *, const void *, size_t);
 extern const char *tok2strary_internal(const char **, int, const char *, int);
 #define	tok2strary(a,f,i) tok2strary_internal(a, sizeof(a)/sizeof(a[0]),f,i)
 
+struct uint_tokary
+{
+	u_int uintval;
+	const struct tok *tokary;
+};
+
+extern const struct tok *uint2tokary_internal(const struct uint_tokary[], const size_t, const u_int);
+#define uint2tokary(a, i) uint2tokary_internal(a, sizeof(a)/sizeof(a[0]), i)
+
 extern if_printer lookup_printer(int);
 
 #define ND_DEBUG {printf(" [%s:%d %s] ", __FILE__, __LINE__, __FUNCTION__); fflush(stdout);}

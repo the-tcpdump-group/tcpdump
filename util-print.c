@@ -625,6 +625,20 @@ tok2strary_internal(const char **lp, int n, const char *fmt,
 	return (buf);
 }
 
+const struct tok *
+uint2tokary_internal(const struct uint_tokary dict[], const size_t size,
+                     const u_int val)
+{
+	size_t i;
+	/* Try a direct lookup before the full scan. */
+	if (val < size && dict[val].uintval == val)
+		return dict[val].tokary; /* OK if NULL */
+	for (i = 0; i < size; i++)
+		if (dict[i].uintval == val)
+			return dict[i].tokary; /* OK if NULL */
+	return NULL;
+}
+
 /*
  * Convert a 32-bit netmask to prefixlen if possible
  * the function returns the prefix-len; if plen == -1

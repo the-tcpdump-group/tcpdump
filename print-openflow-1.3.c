@@ -208,11 +208,6 @@ static const struct tok ofpet_str[] = {
 	{ OFPET_EXPERIMENTER,          "EXPERIMENTER"          },
 	{ 0, NULL }
 };
-/*
- * As far as of13_error_print() is concerned, OFPET_EXPERIMENTER is too large
- * and defines no codes anyway.
- */
-#define OFPET_MAX OFPET_TABLE_FEATURES_FAILED
 
 #define OFPHFC_INCOMPATIBLE 0U
 #define OFPHFC_EPERM        1U
@@ -492,6 +487,25 @@ static const struct tok ofptffc_str[] = {
 	{ 0, NULL }
 };
 
+static const struct uint_tokary of13_ofpet2tokary[] = {
+	{ OFPET_HELLO_FAILED,          ofphfc_str  },
+	{ OFPET_BAD_REQUEST,           ofpbrc_str  },
+	{ OFPET_BAD_ACTION,            ofpbac_str  },
+	{ OFPET_BAD_INSTRUCTION,       ofpbic_str  },
+	{ OFPET_BAD_MATCH,             ofpbmc_str  },
+	{ OFPET_FLOW_MOD_FAILED,       ofpfmfc_str },
+	{ OFPET_GROUP_MOD_FAILED,      ofpgmfc_str },
+	{ OFPET_PORT_MOD_FAILED,       ofppmfc_str },
+	{ OFPET_TABLE_MOD_FAILED,      ofptmfc_str },
+	{ OFPET_QUEUE_OP_FAILED,       ofpqofc_str },
+	{ OFPET_SWITCH_CONFIG_FAILED,  ofpscfc_str },
+	{ OFPET_ROLE_REQUEST_FAILED,   ofprrfc_str },
+	{ OFPET_METER_MOD_FAILED,      ofpmmfc_str },
+	{ OFPET_TABLE_FEATURES_FAILED, ofptffc_str },
+	{ OFPET_EXPERIMENTER,          NULL        }, /* defines no codes */
+	/* uint2tokary() does not use array termination. */
+};
+
 /* lengths (fixed or minimal) of particular protocol structures */
 #define OF_HELLO_ELEM_MINSIZE                 4U
 #define OF_ERROR_MSG_MINLEN                   12U
@@ -592,22 +606,7 @@ of13_error_print(netdissect_options *ndo,
                  const u_char *cp, u_int len)
 {
 	uint16_t type, code;
-	const struct tok *code_str[OFPET_MAX + 1] = {
-		/* [OFPET_HELLO_FAILED         ] = */ ofphfc_str,
-		/* [OFPET_BAD_REQUEST          ] = */ ofpbrc_str,
-		/* [OFPET_BAD_ACTION           ] = */ ofpbac_str,
-		/* [OFPET_BAD_INSTRUCTION      ] = */ ofpbic_str,
-		/* [OFPET_BAD_MATCH            ] = */ ofpbmc_str,
-		/* [OFPET_FLOW_MOD_FAILED      ] = */ ofpfmfc_str,
-		/* [OFPET_GROUP_MOD_FAILED     ] = */ ofpgmfc_str,
-		/* [OFPET_PORT_MOD_FAILED      ] = */ ofppmfc_str,
-		/* [OFPET_TABLE_MOD_FAILED     ] = */ ofptmfc_str,
-		/* [OFPET_QUEUE_OP_FAILED      ] = */ ofpqofc_str,
-		/* [OFPET_SWITCH_CONFIG_FAILED ] = */ ofpscfc_str,
-		/* [OFPET_ROLE_REQUEST_FAILED  ] = */ ofprrfc_str,
-		/* [OFPET_METER_MOD_FAILED     ] = */ ofpmmfc_str,
-		/* [OFPET_TABLE_FEATURES_FAILED] = */ ofptffc_str,
-	};
+	const struct tok *code_str;
 
 	/* type */
 	type = GET_BE_U_2(cp);
@@ -616,9 +615,10 @@ of13_error_print(netdissect_options *ndo,
 	/* code */
 	code = GET_BE_U_2(cp);
 	OF_FWD(2);
-	if (type <= OFPET_MAX && code_str[type] != NULL)
+	code_str = uint2tokary(of13_ofpet2tokary, type);
+	if (code_str != NULL)
 		ND_PRINT(", code %s",
-		         tok2str(code_str[type], "invalid (0x%04x)", code));
+		         tok2str(code_str, "invalid (0x%04x)", code));
 	else
 		ND_PRINT(", code invalid (0x%04x)", code);
 	/* data */
