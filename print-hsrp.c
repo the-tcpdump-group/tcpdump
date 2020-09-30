@@ -122,14 +122,12 @@ hsrp_print(netdissect_options *ndo, const u_char *bp, u_int len)
 		unsigned_relts_print(ndo, GET_U_1(hp->hsrp_holdtime));
 		ND_PRINT(" priority=%u", GET_U_1(hp->hsrp_priority));
 		ND_PRINT(" auth=\"");
-		if (nd_printn(ndo, hp->hsrp_authdata, sizeof(hp->hsrp_authdata),
-			      ndo->ndo_snapend)) {
-			ND_PRINT("\"");
-			goto trunc;
-		}
+		/*
+		 * RFC 2281 Section 5.1 does not specify the encoding of
+		 * Authentication Data explicitly, but zero padding can be
+		 * inferred from the "recommended default value".
+		 */
+		(void)nd_print(ndo, hp->hsrp_authdata, hp->hsrp_authdata + HSRP_AUTH_SIZE);
 		ND_PRINT("\"");
 	}
-	return;
-trunc:
-	nd_print_trunc(ndo);
 }
