@@ -41,6 +41,13 @@
 	len -= (n); \
 }
 
+#define OF_VER_1_0 0x01U
+#define OF_VER_1_1 0x02U
+#define OF_VER_1_2 0x03U
+#define OF_VER_1_3 0x04U
+#define OF_VER_1_4 0x05U
+#define OF_VER_1_5 0x06U
+
 #define OF_HEADER_FIXLEN 8U
 
 #define ONF_EXP_ONF               0x4f4e4600

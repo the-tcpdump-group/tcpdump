@@ -108,6 +108,12 @@ static const struct tok ofpt_str[] = {
 	{ 0, NULL }
 };
 
+#define OFPHET_VERSIONBITMAP 1U
+static const struct tok ofphet_str[] = {
+	{ OFPHET_VERSIONBITMAP, "VERSIONBITMAP" },
+	{ 0, NULL }
+};
+
 #define OFPP_MAX        0xffffff00U
 #define OFPP_IN_PORT    0xfffffff8U
 #define OFPP_TABLE      0xfffffff9U
@@ -129,6 +135,24 @@ static const struct tok ofpp_str[] = {
 	{ OFPP_ANY,        "ANY"        },
 	{ 0, NULL }
 };
+
+#define OF_BIT_VER_1_0 (1U << (OF_VER_1_0 - 1))
+#define OF_BIT_VER_1_1 (1U << (OF_VER_1_1 - 1))
+#define OF_BIT_VER_1_2 (1U << (OF_VER_1_2 - 1))
+#define OF_BIT_VER_1_3 (1U << (OF_VER_1_3 - 1))
+#define OF_BIT_VER_1_4 (1U << (OF_VER_1_4 - 1))
+#define OF_BIT_VER_1_5 (1U << (OF_VER_1_5 - 1))
+static const struct tok ofverbm_str[] = {
+	{ OF_BIT_VER_1_0, "1.0" },
+	{ OF_BIT_VER_1_1, "1.1" },
+	{ OF_BIT_VER_1_2, "1.2" },
+	{ OF_BIT_VER_1_3, "1.3" },
+	{ OF_BIT_VER_1_4, "1.4" },
+	{ OF_BIT_VER_1_5, "1.5" },
+	{ 0, NULL }
+};
+#define OF_BIT_VER_U (~(OF_BIT_VER_1_0 | OF_BIT_VER_1_1 | OF_BIT_VER_1_2 | \
+                        OF_BIT_VER_1_3 | OF_BIT_VER_1_4 | OF_BIT_VER_1_5))
 
 #define OFPET_HELLO_FAILED           0U
 #define OFPET_BAD_REQUEST            1U
@@ -448,6 +472,7 @@ static const struct tok ofptffc_str[] = {
 };
 
 /* lengths (fixed or minimal) of particular protocol structures */
+#define OF_HELLO_ELEM_MINSIZE                 4U
 #define OF_ERROR_MSG_MINLEN                   12U
 #define OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN    16U
 
@@ -456,6 +481,60 @@ const char *
 of13_msgtype_str(const uint8_t type)
 {
 	return tok2str(ofpt_str, "invalid (0x%02x)", type);
+}
+
+/* [OF13] Section 7.5.1 */
+static void
+of13_hello_elements_print(netdissect_options *ndo,
+                          const u_char *cp, u_int len)
+{
+	while (len) {
+		uint16_t type, bmlen;
+
+		if (len < OF_HELLO_ELEM_MINSIZE)
+			goto invalid;
+		/* type */
+		type = GET_BE_U_2(cp);
+		OF_FWD(2);
+		ND_PRINT("\n\t type %s",
+		         tok2str(ofphet_str, "unknown (0x%04x)", type));
+		/* length */
+		bmlen = GET_BE_U_2(cp);
+		OF_FWD(2);
+		ND_PRINT(", length %u", bmlen);
+		/* cp is OF_HELLO_ELEM_MINSIZE bytes in */
+		if (bmlen < OF_HELLO_ELEM_MINSIZE ||
+		    bmlen > OF_HELLO_ELEM_MINSIZE + len)
+			goto invalid;
+		switch (type) {
+		case OFPHET_VERSIONBITMAP:
+			/*
+			 * The specification obviously overprovisions the space
+			 * for version bitmaps in this element ("ofp versions
+			 * 32 to 63 are encoded in the second bitmap and so
+			 * on"). Keep this code simple for now and recognize
+			 * only a single bitmap with no padding.
+			 */
+			if (bmlen == OF_HELLO_ELEM_MINSIZE + 4) {
+				uint32_t bitmap = GET_BE_U_4(cp);
+				ND_PRINT(", bitmap 0x%08x", bitmap);
+				of_bitmap_print(ndo, ofverbm_str, bitmap,
+				                OF_BIT_VER_U);
+			} else {
+				ND_PRINT(" (bogus)");
+				ND_TCHECK_LEN(cp, bmlen - OF_HELLO_ELEM_MINSIZE);
+			}
+			break;
+		default:
+			ND_TCHECK_LEN(cp, bmlen - OF_HELLO_ELEM_MINSIZE);
+		}
+		OF_FWD(bmlen - OF_HELLO_ELEM_MINSIZE);
+	}
+	return;
+
+invalid:
+	nd_print_invalid(ndo);
+	ND_TCHECK_LEN(cp, len);
 }
 
 /* [OF13] Section A.4.4 */
@@ -528,12 +607,18 @@ of13_message_print(netdissect_options *ndo,
 		return;
 
 	/* OpenFlow header and variable-size data. */
-	case OFPT_HELLO: /* [OF13] Section A.5.1 */
 	case OFPT_ECHO_REQUEST: /* [OF13] Section A.5.2 */
 	case OFPT_ECHO_REPLY: /* [OF13] Section A.5.3 */
 		if (ndo->ndo_vflag < 1)
 			break;
 		of_data_print(ndo, cp, len);
+		return;
+
+	/* OpenFlow header and n * variable-size data units. */
+	case OFPT_HELLO: /* [OF13] Section A.5.1 */
+		if (ndo->ndo_vflag < 1)
+			break;
+		of13_hello_elements_print(ndo, cp, len);
 		return;
 
 	/* OpenFlow header, fixed-size message body and variable-size data. */

@@ -85,7 +85,7 @@
    33  20:23:03.674363 IP (tos 0x0, ttl 64, id 5825, offset 0, flags [DF], proto TCP (6), length 68)
     127.0.0.1.6633 > 127.0.0.1.37123: Flags [P.], cksum 0xfe38 (incorrect -> 0xc315), seq 16:32, ack 9, win 94, options [nop,nop,TS val 683431 ecr 683336], length 16: OpenFlow
 	version 1.3, type HELLO, length 16, xid 0x00000161
-	 data (8 octets)
+	 type VERSIONBITMAP, length 8, bitmap 0x00000015 (1.0, 1.2, 1.4)
    34  20:23:03.711246 IP (tos 0x0, ttl 64, id 544, offset 0, flags [DF], proto TCP (6), length 52)
     127.0.0.1.37123 > 127.0.0.1.6633: Flags [.], cksum 0xfe28 (incorrect -> 0xc84b), ack 32, win 86, options [nop,nop,TS val 683441 ecr 683431], length 0
    35  09:18:28.508689 IP (tos 0x0, ttl 64, id 8726, offset 0, flags [DF], proto TCP (6), length 60)

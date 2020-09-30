@@ -45,13 +45,6 @@
 #include "oui.h"
 
 
-#define OF_VER_1_0    0x01
-#define OF_VER_1_1    0x02
-#define OF_VER_1_2    0x03
-#define OF_VER_1_3    0x04
-#define OF_VER_1_4    0x05
-#define OF_VER_1_5    0x06
-
 static const struct tok ofver_str[] = {
 	{ OF_VER_1_0,	"1.0" },
 	{ OF_VER_1_1,	"1.1" },
