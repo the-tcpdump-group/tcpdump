@@ -184,7 +184,11 @@
   /*
    * Windows doesn't have ssize_t; routines such as _read() return int.
    */
-  typedef int ssize_t;
+  #ifdef _WIN64
+    typedef __int64 ssize_t;
+  #else
+    typedef int ssize_t;
+  #endif  
 #endif  /* _MSC_VER */
 
 /*
