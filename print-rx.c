@@ -790,7 +790,6 @@ rx_cache_find(netdissect_options *ndo, const struct rx_header *rxh,
 		}
 
 #define UINT64OUT() { uint64_t _i; \
-			ND_TCHECK_LEN(bp, sizeof(uint64_t)); \
 			_i = GET_BE_U_8(bp); \
 			bp += sizeof(uint64_t); \
 			ND_PRINT(" %" PRIu64, _i); \
