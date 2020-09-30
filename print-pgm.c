@@ -276,15 +276,12 @@ pgm_print(netdissect_options *ndo,
 		break;
 	    }
 
-	    ND_TCHECK_LEN(bp, sizeof(uint32_t));
 	    ivl = GET_BE_U_4(bp);
 	    bp += sizeof(uint32_t);
 
-	    ND_TCHECK_LEN(bp, sizeof(uint32_t));
 	    rnd = GET_BE_U_4(bp);
 	    bp += sizeof(uint32_t);
 
-	    ND_TCHECK_LEN(bp, sizeof(uint32_t));
 	    mask = GET_BE_U_4(bp);
 	    bp += sizeof(uint32_t);
 
