@@ -165,16 +165,13 @@ vrrp_print(netdissect_options *ndo,
 			bp += 4;
 		}
 		if (version == 2 && auth_type == VRRP_AUTH_SIMPLE) { /* simple text password */
-			ND_TCHECK_1(bp + 7);
 			ND_PRINT(" auth \"");
-			if (nd_printn(ndo, bp, 8, ndo->ndo_snapend)) {
-				ND_PRINT("\"");
-				goto trunc;
-			}
+			/*
+			 * RFC 2338 Section 5.3.10: "If the configured authentication string
+			 * is shorter than 8 bytes, the remaining space MUST be zero-filled.
+			 */
+			(void)nd_print(ndo, bp, bp + 8);
 			ND_PRINT("\"");
 		}
 	}
-	return;
-trunc:
-	nd_print_trunc(ndo);
 }
