@@ -54,6 +54,8 @@
 extern const struct tok onf_exp_str[];
 
 extern const char * of_vendor_name(const uint32_t);
+extern void of_bitmap_print(netdissect_options *ndo,
+	const struct tok *, const uint32_t, const uint32_t);
 extern void of_data_print(netdissect_options *ndo,
 	const u_char *, const u_int);
 

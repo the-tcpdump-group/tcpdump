@@ -710,24 +710,6 @@ pcp_str(const uint8_t pcp)
 }
 
 static void
-of10_bitmap_print(netdissect_options *ndo,
-                  const struct tok *t, const uint32_t v, const uint32_t u)
-{
-	const char *sep = " (";
-
-	if (v == 0)
-		return;
-	/* assigned bits */
-	for (; t->s != NULL; t++)
-		if (v & t->v) {
-			ND_PRINT("%s%s", sep, t->s);
-			sep = ", ";
-		}
-	/* unassigned bits? */
-	ND_PRINT((v & u) ? ") (bogus)" : ")");
-}
-
-static void
 of10_bsn_message_print(netdissect_options *ndo,
                        const u_char *cp, u_int len)
 {
@@ -1088,27 +1070,27 @@ of10_phy_ports_print(netdissect_options *ndo,
 		}
 		/* config */
 		ND_PRINT("\n\t   config 0x%08x", GET_BE_U_4(cp));
-		of10_bitmap_print(ndo, ofppc_bm, GET_BE_U_4(cp), OFPPC_U);
+		of_bitmap_print(ndo, ofppc_bm, GET_BE_U_4(cp), OFPPC_U);
 		OF_FWD(4);
 		/* state */
 		ND_PRINT("\n\t   state 0x%08x", GET_BE_U_4(cp));
-		of10_bitmap_print(ndo, ofpps_bm, GET_BE_U_4(cp), OFPPS_U);
+		of_bitmap_print(ndo, ofpps_bm, GET_BE_U_4(cp), OFPPS_U);
 		OF_FWD(4);
 		/* curr */
 		ND_PRINT("\n\t   curr 0x%08x", GET_BE_U_4(cp));
-		of10_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
+		of_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
 		OF_FWD(4);
 		/* advertised */
 		ND_PRINT("\n\t   advertised 0x%08x", GET_BE_U_4(cp));
-		of10_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
+		of_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
 		OF_FWD(4);
 		/* supported */
 		ND_PRINT("\n\t   supported 0x%08x", GET_BE_U_4(cp));
-		of10_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
+		of_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
 		OF_FWD(4);
 		/* peer */
 		ND_PRINT("\n\t   peer 0x%08x", GET_BE_U_4(cp));
-		of10_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
+		of_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
 		OF_FWD(4);
 	} /* while */
 	return;
@@ -1488,11 +1470,11 @@ of10_features_reply_print(netdissect_options *ndo,
 	OF_FWD(3);
 	/* capabilities */
 	ND_PRINT("\n\t capabilities 0x%08x", GET_BE_U_4(cp));
-	of10_bitmap_print(ndo, ofp_capabilities_bm, GET_BE_U_4(cp), OFPCAP_U);
+	of_bitmap_print(ndo, ofp_capabilities_bm, GET_BE_U_4(cp), OFPCAP_U);
 	OF_FWD(4);
 	/* actions */
 	ND_PRINT("\n\t actions 0x%08x", GET_BE_U_4(cp));
-	of10_bitmap_print(ndo, ofpat_bm, GET_BE_U_4(cp), OFPAT_U);
+	of_bitmap_print(ndo, ofpat_bm, GET_BE_U_4(cp), OFPAT_U);
 	OF_FWD(4);
 	/* ports */
 	of10_phy_ports_print(ndo, cp, len);
@@ -1540,7 +1522,7 @@ of10_flow_mod_print(netdissect_options *ndo,
 	OF_FWD(2);
 	/* flags */
 	ND_PRINT(", flags 0x%04x", GET_BE_U_2(cp));
-	of10_bitmap_print(ndo, ofpff_bm, GET_BE_U_2(cp), OFPFF_U);
+	of_bitmap_print(ndo, ofpff_bm, GET_BE_U_2(cp), OFPFF_U);
 	OF_FWD(2);
 	/* actions */
 	of10_actions_print(ndo, "\n\t ", cp, len);
@@ -1559,15 +1541,15 @@ of10_port_mod_print(netdissect_options *ndo,
 	cp += MAC_ADDR_LEN;
 	/* config */
 	ND_PRINT("\n\t config 0x%08x", GET_BE_U_4(cp));
-	of10_bitmap_print(ndo, ofppc_bm, GET_BE_U_4(cp), OFPPC_U);
+	of_bitmap_print(ndo, ofppc_bm, GET_BE_U_4(cp), OFPPC_U);
 	cp += 4;
 	/* mask */
 	ND_PRINT("\n\t mask 0x%08x", GET_BE_U_4(cp));
-	of10_bitmap_print(ndo, ofppc_bm, GET_BE_U_4(cp), OFPPC_U);
+	of_bitmap_print(ndo, ofppc_bm, GET_BE_U_4(cp), OFPPC_U);
 	cp += 4;
 	/* advertise */
 	ND_PRINT("\n\t advertise 0x%08x", GET_BE_U_4(cp));
-	of10_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
+	of_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
 	cp += 4;
 	/* pad */
 	/* Always the last field, check bounds. */
@@ -1796,7 +1778,7 @@ of10_table_stats_reply_print(netdissect_options *ndo,
 		OF_FWD(OFP_MAX_TABLE_NAME_LEN);
 		/* wildcards */
 		ND_PRINT("\n\t  wildcards 0x%08x", GET_BE_U_4(cp));
-		of10_bitmap_print(ndo, ofpfw_bm, GET_BE_U_4(cp), OFPFW_U);
+		of_bitmap_print(ndo, ofpfw_bm, GET_BE_U_4(cp), OFPFW_U);
 		OF_FWD(4);
 		/* max_entries */
 		ND_PRINT("\n\t  max_entries %u", GET_BE_U_4(cp));
@@ -1927,7 +1909,7 @@ of10_stats_reply_print(netdissect_options *ndo,
 	OF_FWD(2);
 	/* flags */
 	ND_PRINT(", flags 0x%04x", GET_BE_U_2(cp));
-	of10_bitmap_print(ndo, ofpsf_reply_bm, GET_BE_U_2(cp), OFPSF_REPLY_U);
+	of_bitmap_print(ndo, ofpsf_reply_bm, GET_BE_U_2(cp), OFPSF_REPLY_U);
 	OF_FWD(2);
 
 	if (ndo->ndo_vflag > 0) {
