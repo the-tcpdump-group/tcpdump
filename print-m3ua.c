@@ -32,6 +32,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 
@@ -218,22 +219,18 @@ tag_value_print(netdissect_options *ndo,
     /* buf and size don't include the header */
     if (size < 4)
       goto invalid;
-    ND_TCHECK_LEN(buf, size);
     ND_PRINT("0x%08x", GET_BE_U_4(buf));
     break;
   /* ... */
   default:
     ND_PRINT("(length %u)", size + (u_int)sizeof(struct m3ua_param_header));
-    ND_TCHECK_LEN(buf, size);
   }
+  ND_TCHECK_LEN(buf, size);
   return;
 
 invalid:
   nd_print_invalid(ndo);
   ND_TCHECK_LEN(buf, size);
-  return;
-trunc:
-  nd_print_trunc(ndo);
 }
 
 /*
@@ -259,7 +256,6 @@ m3ua_tags_print(netdissect_options *ndo,
   while (p < buf + size) {
     if (p + sizeof(struct m3ua_param_header) > buf + size)
       goto invalid;
-    ND_TCHECK_LEN(p, sizeof(struct m3ua_param_header));
     /* Parameter Tag */
     hdr_tag = GET_BE_U_2(p);
     ND_PRINT("\n\t\t\t%s: ", tok2str(ParamName, "Unknown Parameter (0x%04x)", hdr_tag));
@@ -279,9 +275,6 @@ m3ua_tags_print(netdissect_options *ndo,
 invalid:
   nd_print_invalid(ndo);
   ND_TCHECK_LEN(buf, size);
-  return;
-trunc:
-  nd_print_trunc(ndo);
 }
 
 /*
@@ -337,8 +330,5 @@ m3ua_print(netdissect_options *ndo,
 invalid:
   nd_print_invalid(ndo);
   ND_TCHECK_LEN(buf, size);
-  return;
-trunc:
-  nd_print_trunc(ndo);
 }
 
