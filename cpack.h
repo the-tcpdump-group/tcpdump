@@ -38,20 +38,20 @@ struct cpack_state {
 	size_t						 c_len;
 };
 
-int cpack_init(struct cpack_state *, const uint8_t *, size_t);
+int nd_cpack_init(struct cpack_state *, const uint8_t *, size_t);
 
-int cpack_uint8(netdissect_options *, struct cpack_state *, uint8_t *);
-int cpack_int8(netdissect_options *, struct cpack_state *, int8_t *);
-int cpack_uint16(netdissect_options *, struct cpack_state *, uint16_t *);
-int cpack_int16(netdissect_options *, struct cpack_state *, int16_t *);
-int cpack_uint32(netdissect_options *, struct cpack_state *, uint32_t *);
-int cpack_int32(netdissect_options *, struct cpack_state *, int32_t *);
-int cpack_uint64(netdissect_options *, struct cpack_state *, uint64_t *);
-int cpack_int64(netdissect_options *, struct cpack_state *, int64_t *);
+int nd_cpack_uint8(netdissect_options *, struct cpack_state *, uint8_t *);
+int nd_cpack_int8(netdissect_options *, struct cpack_state *, int8_t *);
+int nd_cpack_uint16(netdissect_options *, struct cpack_state *, uint16_t *);
+int nd_cpack_int16(netdissect_options *, struct cpack_state *, int16_t *);
+int nd_cpack_uint32(netdissect_options *, struct cpack_state *, uint32_t *);
+int nd_cpack_int32(netdissect_options *, struct cpack_state *, int32_t *);
+int nd_cpack_uint64(netdissect_options *, struct cpack_state *, uint64_t *);
+int nd_cpack_int64(netdissect_options *, struct cpack_state *, int64_t *);
 
-const uint8_t *cpack_next_boundary(const uint8_t *buf, const uint8_t *p, size_t alignment);
-const uint8_t *cpack_align_and_reserve(struct cpack_state *cs, size_t wordsize);
+const uint8_t *nd_cpack_next_boundary(const uint8_t *buf, const uint8_t *p, size_t alignment);
+const uint8_t *nd_cpack_align_and_reserve(struct cpack_state *cs, size_t wordsize);
 
-extern int cpack_advance(struct cpack_state *, const size_t);
+extern int nd_cpack_advance(struct cpack_state *, const size_t);
 
 #endif /* ND_CPACK_H */

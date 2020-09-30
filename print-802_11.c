@@ -2699,7 +2699,7 @@ print_radiotap_field(netdissect_options *ndo,
 	case IEEE80211_RADIOTAP_TSFT: {
 		uint64_t tsft;
 
-		rc = cpack_uint64(ndo, s, &tsft);
+		rc = nd_cpack_uint64(ndo, s, &tsft);
 		if (rc != 0)
 			goto trunc;
 		ND_PRINT("%" PRIu64 "us tsft ", tsft);
@@ -2709,7 +2709,7 @@ print_radiotap_field(netdissect_options *ndo,
 	case IEEE80211_RADIOTAP_FLAGS: {
 		uint8_t flagsval;
 
-		rc = cpack_uint8(ndo, s, &flagsval);
+		rc = nd_cpack_uint8(ndo, s, &flagsval);
 		if (rc != 0)
 			goto trunc;
 		*flagsp = flagsval;
@@ -2729,7 +2729,7 @@ print_radiotap_field(netdissect_options *ndo,
 	case IEEE80211_RADIOTAP_RATE: {
 		uint8_t rate;
 
-		rc = cpack_uint8(ndo, s, &rate);
+		rc = nd_cpack_uint8(ndo, s, &rate);
 		if (rc != 0)
 			goto trunc;
 		/*
@@ -2780,10 +2780,10 @@ print_radiotap_field(netdissect_options *ndo,
 		uint16_t frequency;
 		uint16_t flags;
 
-		rc = cpack_uint16(ndo, s, &frequency);
+		rc = nd_cpack_uint16(ndo, s, &frequency);
 		if (rc != 0)
 			goto trunc;
-		rc = cpack_uint16(ndo, s, &flags);
+		rc = nd_cpack_uint16(ndo, s, &flags);
 		if (rc != 0)
 			goto trunc;
 		/*
@@ -2800,10 +2800,10 @@ print_radiotap_field(netdissect_options *ndo,
 		uint8_t hopset;
 		uint8_t hoppat;
 
-		rc = cpack_uint8(ndo, s, &hopset);
+		rc = nd_cpack_uint8(ndo, s, &hopset);
 		if (rc != 0)
 			goto trunc;
-		rc = cpack_uint8(ndo, s, &hoppat);
+		rc = nd_cpack_uint8(ndo, s, &hoppat);
 		if (rc != 0)
 			goto trunc;
 		ND_PRINT("fhset %u fhpat %u ", hopset, hoppat);
@@ -2813,7 +2813,7 @@ print_radiotap_field(netdissect_options *ndo,
 	case IEEE80211_RADIOTAP_DBM_ANTSIGNAL: {
 		int8_t dbm_antsignal;
 
-		rc = cpack_int8(ndo, s, &dbm_antsignal);
+		rc = nd_cpack_int8(ndo, s, &dbm_antsignal);
 		if (rc != 0)
 			goto trunc;
 		ND_PRINT("%ddBm signal ", dbm_antsignal);
@@ -2823,7 +2823,7 @@ print_radiotap_field(netdissect_options *ndo,
 	case IEEE80211_RADIOTAP_DBM_ANTNOISE: {
 		int8_t dbm_antnoise;
 
-		rc = cpack_int8(ndo, s, &dbm_antnoise);
+		rc = nd_cpack_int8(ndo, s, &dbm_antnoise);
 		if (rc != 0)
 			goto trunc;
 		ND_PRINT("%ddBm noise ", dbm_antnoise);
@@ -2833,7 +2833,7 @@ print_radiotap_field(netdissect_options *ndo,
 	case IEEE80211_RADIOTAP_LOCK_QUALITY: {
 		uint16_t lock_quality;
 
-		rc = cpack_uint16(ndo, s, &lock_quality);
+		rc = nd_cpack_uint16(ndo, s, &lock_quality);
 		if (rc != 0)
 			goto trunc;
 		ND_PRINT("%u sq ", lock_quality);
@@ -2843,7 +2843,7 @@ print_radiotap_field(netdissect_options *ndo,
 	case IEEE80211_RADIOTAP_TX_ATTENUATION: {
 		int16_t tx_attenuation;
 
-		rc = cpack_int16(ndo, s, &tx_attenuation);
+		rc = nd_cpack_int16(ndo, s, &tx_attenuation);
 		if (rc != 0)
 			goto trunc;
 		ND_PRINT("%d tx power ", -tx_attenuation);
@@ -2853,7 +2853,7 @@ print_radiotap_field(netdissect_options *ndo,
 	case IEEE80211_RADIOTAP_DB_TX_ATTENUATION: {
 		int8_t db_tx_attenuation;
 
-		rc = cpack_int8(ndo, s, &db_tx_attenuation);
+		rc = nd_cpack_int8(ndo, s, &db_tx_attenuation);
 		if (rc != 0)
 			goto trunc;
 		ND_PRINT("%ddB tx attenuation ", -db_tx_attenuation);
@@ -2863,7 +2863,7 @@ print_radiotap_field(netdissect_options *ndo,
 	case IEEE80211_RADIOTAP_DBM_TX_POWER: {
 		int8_t dbm_tx_power;
 
-		rc = cpack_int8(ndo, s, &dbm_tx_power);
+		rc = nd_cpack_int8(ndo, s, &dbm_tx_power);
 		if (rc != 0)
 			goto trunc;
 		ND_PRINT("%ddBm tx power ", dbm_tx_power);
@@ -2873,7 +2873,7 @@ print_radiotap_field(netdissect_options *ndo,
 	case IEEE80211_RADIOTAP_ANTENNA: {
 		uint8_t antenna;
 
-		rc = cpack_uint8(ndo, s, &antenna);
+		rc = nd_cpack_uint8(ndo, s, &antenna);
 		if (rc != 0)
 			goto trunc;
 		ND_PRINT("antenna %u ", antenna);
@@ -2883,7 +2883,7 @@ print_radiotap_field(netdissect_options *ndo,
 	case IEEE80211_RADIOTAP_DB_ANTSIGNAL: {
 		uint8_t db_antsignal;
 
-		rc = cpack_uint8(ndo, s, &db_antsignal);
+		rc = nd_cpack_uint8(ndo, s, &db_antsignal);
 		if (rc != 0)
 			goto trunc;
 		ND_PRINT("%udB signal ", db_antsignal);
@@ -2893,7 +2893,7 @@ print_radiotap_field(netdissect_options *ndo,
 	case IEEE80211_RADIOTAP_DB_ANTNOISE: {
 		uint8_t db_antnoise;
 
-		rc = cpack_uint8(ndo, s, &db_antnoise);
+		rc = nd_cpack_uint8(ndo, s, &db_antnoise);
 		if (rc != 0)
 			goto trunc;
 		ND_PRINT("%udB noise ", db_antnoise);
@@ -2903,7 +2903,7 @@ print_radiotap_field(netdissect_options *ndo,
 	case IEEE80211_RADIOTAP_RX_FLAGS: {
 		uint16_t rx_flags;
 
-		rc = cpack_uint16(ndo, s, &rx_flags);
+		rc = nd_cpack_uint16(ndo, s, &rx_flags);
 		if (rc != 0)
 			goto trunc;
 		/* Do nothing for now */
@@ -2916,16 +2916,16 @@ print_radiotap_field(netdissect_options *ndo,
 		uint8_t channel;
 		uint8_t maxpower;
 
-		rc = cpack_uint32(ndo, s, &flags);
+		rc = nd_cpack_uint32(ndo, s, &flags);
 		if (rc != 0)
 			goto trunc;
-		rc = cpack_uint16(ndo, s, &frequency);
+		rc = nd_cpack_uint16(ndo, s, &frequency);
 		if (rc != 0)
 			goto trunc;
-		rc = cpack_uint8(ndo, s, &channel);
+		rc = nd_cpack_uint8(ndo, s, &channel);
 		if (rc != 0)
 			goto trunc;
-		rc = cpack_uint8(ndo, s, &maxpower);
+		rc = nd_cpack_uint8(ndo, s, &maxpower);
 		if (rc != 0)
 			goto trunc;
 		print_chaninfo(ndo, frequency, flags, presentflags);
@@ -2944,13 +2944,13 @@ print_radiotap_field(netdissect_options *ndo,
 		};
 		float htrate;
 
-		rc = cpack_uint8(ndo, s, &known);
+		rc = nd_cpack_uint8(ndo, s, &known);
 		if (rc != 0)
 			goto trunc;
-		rc = cpack_uint8(ndo, s, &flags);
+		rc = nd_cpack_uint8(ndo, s, &flags);
 		if (rc != 0)
 			goto trunc;
-		rc = cpack_uint8(ndo, s, &mcs_index);
+		rc = nd_cpack_uint8(ndo, s, &mcs_index);
 		if (rc != 0)
 			goto trunc;
 		if (known & IEEE80211_RADIOTAP_MCS_MCS_INDEX_KNOWN) {
@@ -3032,16 +3032,16 @@ print_radiotap_field(netdissect_options *ndo,
 		uint8_t delim_crc;
 		uint8_t reserved;
 
-		rc = cpack_uint32(ndo, s, &reference_num);
+		rc = nd_cpack_uint32(ndo, s, &reference_num);
 		if (rc != 0)
 			goto trunc;
-		rc = cpack_uint16(ndo, s, &flags);
+		rc = nd_cpack_uint16(ndo, s, &flags);
 		if (rc != 0)
 			goto trunc;
-		rc = cpack_uint8(ndo, s, &delim_crc);
+		rc = nd_cpack_uint8(ndo, s, &delim_crc);
 		if (rc != 0)
 			goto trunc;
-		rc = cpack_uint8(ndo, s, &reserved);
+		rc = nd_cpack_uint8(ndo, s, &reserved);
 		if (rc != 0)
 			goto trunc;
 		/* Do nothing for now */
@@ -3091,27 +3091,27 @@ print_radiotap_field(netdissect_options *ndo,
 			"unknown (31)"
 		};
 
-		rc = cpack_uint16(ndo, s, &known);
+		rc = nd_cpack_uint16(ndo, s, &known);
 		if (rc != 0)
 			goto trunc;
-		rc = cpack_uint8(ndo, s, &flags);
+		rc = nd_cpack_uint8(ndo, s, &flags);
 		if (rc != 0)
 			goto trunc;
-		rc = cpack_uint8(ndo, s, &bandwidth);
+		rc = nd_cpack_uint8(ndo, s, &bandwidth);
 		if (rc != 0)
 			goto trunc;
 		for (i = 0; i < 4; i++) {
-			rc = cpack_uint8(ndo, s, &mcs_nss[i]);
+			rc = nd_cpack_uint8(ndo, s, &mcs_nss[i]);
 			if (rc != 0)
 				goto trunc;
 		}
-		rc = cpack_uint8(ndo, s, &coding);
+		rc = nd_cpack_uint8(ndo, s, &coding);
 		if (rc != 0)
 			goto trunc;
-		rc = cpack_uint8(ndo, s, &group_id);
+		rc = nd_cpack_uint8(ndo, s, &group_id);
 		if (rc != 0)
 			goto trunc;
-		rc = cpack_uint16(ndo, s, &partial_aid);
+		rc = nd_cpack_uint16(ndo, s, &partial_aid);
 		if (rc != 0)
 			goto trunc;
 		for (i = 0; i < 4; i++) {
@@ -3252,13 +3252,13 @@ ieee802_11_radio_print(netdissect_options *ndo,
 		nd_print_trunc(ndo);
 		return caplen;
 	}
-	cpack_init(&cpacker, (const uint8_t *)hdr, len); /* align against header start */
-	cpack_advance(&cpacker, sizeof(*hdr)); /* includes the 1st bitmap */
+	nd_cpack_init(&cpacker, (const uint8_t *)hdr, len); /* align against header start */
+	nd_cpack_advance(&cpacker, sizeof(*hdr)); /* includes the 1st bitmap */
 	for (last_presentp = &hdr->it_present;
 	     (const u_char*)(last_presentp + 1) <= p + len &&
 	     IS_EXTENDED(last_presentp);
 	     last_presentp++)
-	  cpack_advance(&cpacker, sizeof(hdr->it_present)); /* more bitmaps */
+	  nd_cpack_advance(&cpacker, sizeof(hdr->it_present)); /* more bitmaps */
 
 	/* are there more bitmap extensions than bytes in header? */
 	if ((const u_char*)(last_presentp + 1) > p + len) {
@@ -3294,7 +3294,7 @@ ieee802_11_radio_print(netdissect_options *ndo,
 			 * it'd be added here; use vendor_oui and
 			 * vendor_subnamespace to interpret the fields.
 			 */
-			if (cpack_advance(&cpacker, skip_length) != 0) {
+			if (nd_cpack_advance(&cpacker, skip_length) != 0) {
 				/*
 				 * Ran out of space in the packet.
 				 */
@@ -3357,27 +3357,27 @@ ieee802_11_radio_print(netdissect_options *ndo,
 			 */
 			bit0 = 0;
 			vendor_namespace = 1;
-			if ((cpack_align_and_reserve(&cpacker, 2)) == NULL) {
+			if ((nd_cpack_align_and_reserve(&cpacker, 2)) == NULL) {
 				nd_print_trunc(ndo);
 				break;
 			}
-			if (cpack_uint8(ndo, &cpacker, &vendor_oui[0]) != 0) {
+			if (nd_cpack_uint8(ndo, &cpacker, &vendor_oui[0]) != 0) {
 				nd_print_trunc(ndo);
 				break;
 			}
-			if (cpack_uint8(ndo, &cpacker, &vendor_oui[1]) != 0) {
+			if (nd_cpack_uint8(ndo, &cpacker, &vendor_oui[1]) != 0) {
 				nd_print_trunc(ndo);
 				break;
 			}
-			if (cpack_uint8(ndo, &cpacker, &vendor_oui[2]) != 0) {
+			if (nd_cpack_uint8(ndo, &cpacker, &vendor_oui[2]) != 0) {
 				nd_print_trunc(ndo);
 				break;
 			}
-			if (cpack_uint8(ndo, &cpacker, &vendor_subnamespace) != 0) {
+			if (nd_cpack_uint8(ndo, &cpacker, &vendor_subnamespace) != 0) {
 				nd_print_trunc(ndo);
 				break;
 			}
-			if (cpack_uint16(ndo, &cpacker, &skip_length) != 0) {
+			if (nd_cpack_uint16(ndo, &cpacker, &skip_length) != 0) {
 				nd_print_trunc(ndo);
 				break;
 			}
