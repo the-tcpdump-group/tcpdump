@@ -183,6 +183,8 @@
    51  15:47:18.962238 IP (tos 0x0, ttl 64, id 51478, offset 0, flags [DF], proto TCP (6), length 84)
     127.0.0.1.58445 > 127.0.0.1.6633: Flags [P.], cksum 0xfe48 (incorrect -> 0xbbc3), seq 698:730, ack 657, win 86, options [nop,nop,TS val 267876 ecr 267876], length 32: OpenFlow
 	version 1.3, type FEATURES_REPLY, length 32, xid 0x0000008e
+	 dpid 0x000026a2b46fd9ba, n_buffers 256, n_tables 64, auxiliary_id 0
+	 capabilities 0x0000004f (FLOW_STATS, TABLE_STATS, PORT_STATS, GROUP_STATS, QUEUE_STATS)
    52  15:47:18.962333 IP (tos 0x0, ttl 64, id 14609, offset 0, flags [DF], proto TCP (6), length 52)
     127.0.0.1.6633 > 127.0.0.1.58445: Flags [.], cksum 0xfe28 (incorrect -> 0xb693), seq 657, ack 730, win 94, options [nop,nop,TS val 267876 ecr 267876], length 0
    53  16:32:34.623939 IP (tos 0x0, ttl 64, id 44797, offset 0, flags [DF], proto TCP (6), length 60)

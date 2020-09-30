@@ -108,6 +108,27 @@ static const struct tok ofpt_str[] = {
 	{ 0, NULL }
 };
 
+#define OFPC_FLOW_STATS   (1U <<0)
+#define OFPC_TABLE_STATS  (1U <<1)
+#define OFPC_PORT_STATS   (1U <<2)
+#define OFPC_GROUP_STATS  (1U <<3)
+#define OFPC_IP_REASM     (1U <<5)
+#define OFPC_QUEUE_STATS  (1U <<6)
+#define OFPC_PORT_BLOCKED (1U <<8)
+static const struct tok ofp_capabilities_bm[] = {
+	{ OFPC_FLOW_STATS,   "FLOW_STATS"   },
+	{ OFPC_TABLE_STATS,  "TABLE_STATS"  },
+	{ OFPC_PORT_STATS,   "PORT_STATS"   },
+	{ OFPC_GROUP_STATS,  "GROUP_STATS"  },
+	{ OFPC_IP_REASM,     "IP_REASM"     },
+	{ OFPC_QUEUE_STATS,  "QUEUE_STATS"  },
+	{ OFPC_PORT_BLOCKED, "PORT_BLOCKED" },
+	{ 0, NULL }
+};
+#define OFPCAP_U (~(OFPC_FLOW_STATS | OFPC_TABLE_STATS | OFPC_PORT_STATS | \
+                    OFPC_GROUP_STATS | OFPC_IP_REASM | OFPC_QUEUE_STATS | \
+                    OFPC_PORT_BLOCKED))
+
 #define OFPHET_VERSIONBITMAP 1U
 static const struct tok ofphet_str[] = {
 	{ OFPHET_VERSIONBITMAP, "VERSIONBITMAP" },
@@ -474,6 +495,7 @@ static const struct tok ofptffc_str[] = {
 /* lengths (fixed or minimal) of particular protocol structures */
 #define OF_HELLO_ELEM_MINSIZE                 4U
 #define OF_ERROR_MSG_MINLEN                   12U
+#define OF_FEATURES_REPLY_FIXLEN              32U
 #define OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN    16U
 
 /* [OF13] Section A.1 */
@@ -481,6 +503,33 @@ const char *
 of13_msgtype_str(const uint8_t type)
 {
 	return tok2str(ofpt_str, "invalid (0x%02x)", type);
+}
+
+/* [OF13] Section 7.3.1 */
+static void
+of13_features_reply_print(netdissect_options *ndo,
+                          const u_char *cp, u_int len)
+{
+	/* datapath_id */
+	ND_PRINT("\n\t dpid 0x%016" PRIx64, GET_BE_U_8(cp));
+	OF_FWD(8);
+	/* n_buffers */
+	ND_PRINT(", n_buffers %u", GET_BE_U_4(cp));
+	OF_FWD(4);
+	/* n_tables */
+	ND_PRINT(", n_tables %u", GET_U_1(cp));
+	OF_FWD(1);
+	/* auxiliary_id */
+	ND_PRINT(", auxiliary_id %u", GET_U_1(cp));
+	OF_FWD(1);
+	/* pad */
+	OF_FWD(2);
+	/* capabilities */
+	ND_PRINT("\n\t capabilities 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, ofp_capabilities_bm, GET_BE_U_4(cp), OFPCAP_U);
+	OF_FWD(4);
+	/* reserved */
+	ND_TCHECK_4(cp);
 }
 
 /* [OF13] Section 7.5.1 */
@@ -592,6 +641,13 @@ of13_message_print(netdissect_options *ndo,
 		return;
 
 	/* OpenFlow header and fixed-size message body. */
+	case OFPT_FEATURES_REPLY:
+		if (len != OF_FEATURES_REPLY_FIXLEN - OF_HEADER_FIXLEN)
+			goto invalid;
+		if (ndo->ndo_vflag < 1)
+			break;
+		of13_features_reply_print(ndo, cp, len);
+		return;
 	case OFPT_QUEUE_GET_CONFIG_REQUEST: /* [OF13] Section A.3.6 */
 		if (len != OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN - OF_HEADER_FIXLEN)
 			goto invalid;
