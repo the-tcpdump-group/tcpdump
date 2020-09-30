@@ -766,7 +766,6 @@ rx_cache_find(netdissect_options *ndo, const struct rx_header *rxh,
 		}
 
 #define STROUT(MAX) { uint32_t _i; \
-			ND_TCHECK_LEN(bp, sizeof(uint32_t)); \
 			_i = GET_BE_U_4(bp); \
 			if (_i > (MAX)) \
 				goto trunc; \
