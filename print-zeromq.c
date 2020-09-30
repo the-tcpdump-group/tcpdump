@@ -133,8 +133,7 @@ zmtp1_print_frame(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 	return cp + body_len_declared;
 
 trunc:
-	nd_print_trunc(ndo);
-	return ep;
+	nd_trunc_longjmp(ndo);
 }
 
 void
@@ -201,8 +200,7 @@ zmtp1_print_intermediate_part(netdissect_options *ndo, const u_char *cp, const u
 	return cp + frame_offset;
 
 trunc:
-	nd_print_trunc(ndo);
-	return cp + len;
+	nd_trunc_longjmp(ndo);
 }
 
 void
