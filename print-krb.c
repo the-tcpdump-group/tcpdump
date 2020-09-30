@@ -200,7 +200,6 @@ krb4_print(netdissect_options *ndo,
 		if ((cp = krb4_print_hdr(ndo, cp)) == NULL)
 			return;
 		cp += 10;	/* timestamp + n + exp + kvno */
-		ND_TCHECK_LEN(cp, sizeof(short));
 		len = KTOHSP(kp, cp);
 		ND_PRINT(" (%u)", len);
 		break;
@@ -209,7 +208,6 @@ krb4_print(netdissect_options *ndo,
 		if ((cp = krb4_print_hdr(ndo, cp)) == NULL)
 			return;
 		cp += 4; 	  /* timestamp */
-		ND_TCHECK_LEN(cp, sizeof(short));
 		ND_PRINT(" %s ", tok2str(kerr2str, NULL, KTOHSP(kp, cp)));
 		cp += 4;
 		PRINT;

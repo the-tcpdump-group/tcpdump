@@ -494,7 +494,6 @@ decnet_print(netdissect_options *ndo,
 		return;
 	}
 
-	ND_TCHECK_LEN(ap, sizeof(short));
 	pktlen = GET_LE_U_2(ap);
 	if (pktlen < sizeof(struct shorthdr)) {
 		nd_print_trunc(ndo);
