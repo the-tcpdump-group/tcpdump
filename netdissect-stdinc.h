@@ -149,10 +149,17 @@
 #ifdef _MSC_VER
 #define stat _stat
 #define open _open
-#define fstat _fstat
 #define read _read
 #define close _close
 #define O_RDONLY _O_RDONLY
+
+/*
+ * We define our_fstat64 as _fstati64, and define our_statb as
+ * struct _stati64, so we get 64-bit file sizes.
+ */
+#define our_fstat _fstati64
+#define our_statb struct _stati64
+
 #endif  /* _MSC_VER */
 
 /*
@@ -210,6 +217,13 @@ typedef char* caddr_t;
 #endif
 
 #include <arpa/inet.h>
+
+/*
+ * We should have large file support enabled, if it's available,
+ * so just use fstat as our_fstat and struct stat as our_statb.
+ */
+#define our_fstat fstat
+#define our_statb struct stat
 
 #endif /* _WIN32 */
 
