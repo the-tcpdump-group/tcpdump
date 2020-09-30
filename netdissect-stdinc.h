@@ -166,10 +166,16 @@
   #define stat _stat
   #define strdup _strdup
   #define open _open
-  #define fstat _fstat
   #define read _read
   #define close _close
   #define O_RDONLY _O_RDONLY
+
+  /*
+   * We define our_fstat64 as _fstati64, and define our_statb as
+   * struct _stati64, so we get 64-bit file sizes.
+   */
+  #define our_fstat _fstati64
+  #define our_statb struct _stati64
 
   /*
    * If <crtdbg.h> has been included, and _DEBUG is defined, and
@@ -233,6 +239,13 @@ typedef char* caddr_t;
 #include <arpa/inet.h>
 
 /*
+ * We should have large file support enabled, if it's available,
+ * so just use fstat as our_fstat and struct stat as our_statb.
+ */
+#define our_fstat fstat
+#define our_statb struct stat
+
+/*
  * Assume all UN*Xes have strtoll(), and use it for strtoint64_t().
  */
 #define strtoint64_t	strtoll
@@ -241,7 +254,6 @@ typedef char* caddr_t;
  * Assume LL works.
  */
 #define INT64_T_CONSTANT(constant)	(constant##LL)
-
 #endif /* _WIN32 */
 
 /*
