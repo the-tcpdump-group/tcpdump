@@ -991,6 +991,7 @@ invalid: /* skip the undersized data */
 	ND_TCHECK_LEN(cp, len);
 }
 
+/* [OF10] Section 5.5.4 */
 static void
 of10_vendor_message_print(netdissect_options *ndo,
                           const u_char *cp, u_int len)
@@ -998,8 +999,6 @@ of10_vendor_message_print(netdissect_options *ndo,
 	uint32_t vendor;
 	void (*decoder)(netdissect_options *, const u_char *, u_int);
 
-	if (len < 4)
-		goto invalid;
 	/* vendor */
 	vendor = GET_BE_U_4(cp);
 	OF_FWD(4);
@@ -1009,11 +1008,6 @@ of10_vendor_message_print(netdissect_options *ndo,
 		vendor == OUI_BSN         ? of10_bsn_message_print         :
 		of_data_print;
 	decoder(ndo, cp, len);
-	return;
-
-invalid: /* skip the undersized data */
-	nd_print_invalid(ndo);
-	ND_TCHECK_LEN(cp, len);
 }
 
 /* Vendor ID is mandatory, data is optional. */
