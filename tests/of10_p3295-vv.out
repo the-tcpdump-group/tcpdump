@@ -27,371 +27,371 @@
 	 actions 0x0000003f (OUTPUT, SET_VLAN_VID, SET_VLAN_PCP, STRIP_VLAN, SET_DL_SRC, SET_DL_DST)
 	  port_no 42, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/42'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 33, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/33'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 36, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/36'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 31, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/31'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 48, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/48'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 40, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/40'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 1, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/1'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 28, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/28'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 20, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/20'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 10, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/10'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 22, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/22'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 29, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/29'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 44, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/44'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 41, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/41'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 21, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/21'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 16, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/16'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 45, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/45'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 49, hw_addr 08:9e:01:62:d5:f4, name 'te-1/1/49'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x00000020 (1GB_FD)
 	   supported 0x00000e60 (1GB_FD, 10GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 38, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/38'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 17, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/17'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 27, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/27'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 51, hw_addr 08:9e:01:62:d5:f4, name 'te-1/1/51'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x00000020 (1GB_FD)
 	   supported 0x00000e60 (1GB_FD, 10GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 46, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/46'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 6, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/6'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 50, hw_addr 08:9e:01:62:d5:f4, name 'te-1/1/50'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x00000020 (1GB_FD)
 	   supported 0x00000e60 (1GB_FD, 10GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 43, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/43'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 35, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/35'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 19, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/19'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 47, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/47'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 23, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/23'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 25, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/25'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 37, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/37'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 7, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/7'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 26, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/26'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 32, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/32'
 	   config 0x00000020 (NO_FWD)
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 4, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/4'
 	   config 0x00000000
-	   state 0x00000000
+	   state 0x00000000 (STP_LISTEN)
 	   curr 0x00000020 (1GB_FD)
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	  port_no 3, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/3'
 	   config 0x00000000
-	   state 0x00000000
+	   state 0x00000000 (STP_LISTEN)
 	   curr 0x00000020 (1GB_FD)
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	  port_no 18, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/18'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 39, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/39'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 8, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/8'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 2, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/2'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 14, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/14'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 5, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/5'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 30, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/30'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 11, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/11'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 15, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/15'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 52, hw_addr 08:9e:01:62:d5:f4, name 'te-1/1/52'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x00000020 (1GB_FD)
 	   supported 0x00000e60 (1GB_FD, 10GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 34, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/34'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 13, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/13'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 12, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/12'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 24, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/24'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 9, hw_addr 08:9e:01:62:d5:f4, name 'ge-1/1/9'
 	   config 0x00000000
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x0000042f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, PAUSE)
 	   supported 0x00000e2f (10MB_HD, 10MB_FD, 100MB_HD, 100MB_FD, 1GB_FD, AUTONEG, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no LOCAL, hw_addr 08:9e:01:62:d5:f4, name 'br0'
 	   config 0x00000001 (PORT_DOWN)
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000082 (10MB_FD, COPPER)
 	   advertised 0x00000000
 	   supported 0x00000000

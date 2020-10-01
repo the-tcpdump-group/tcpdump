@@ -29,56 +29,56 @@
 	 actions 0x00000fff (OUTPUT, SET_VLAN_VID, SET_VLAN_PCP, STRIP_VLAN, SET_DL_SRC, SET_DL_DST, SET_NW_SRC, SET_NW_DST, SET_NW_TOS, SET_TP_SRC, SET_TP_DST, ENQUEUE)
 	  port_no 1, hw_addr 00:25:5c:ab:0c:87, name 'GBE0/1'
 	   config 0x00000002 (NO_STP)
-	   state 0x00000200 (STP_FORWARD, STP_BLOCK)
+	   state 0x00000200 (STP_FORWARD)
 	   curr 0x000002a0 (1GB_FD, COPPER, AUTONEG)
 	   advertised 0x00000000
 	   supported 0x00000000
 	   peer 0x00000000
 	  port_no 2, hw_addr 00:25:5c:ab:0c:47, name 'GBE0/2'
 	   config 0x00000002 (NO_STP)
-	   state 0x00000200 (STP_FORWARD, STP_BLOCK)
+	   state 0x00000200 (STP_FORWARD)
 	   curr 0x000002a0 (1GB_FD, COPPER, AUTONEG)
 	   advertised 0x00000000
 	   supported 0x00000000
 	   peer 0x00000000
 	  port_no 3, hw_addr 00:25:5c:ab:0c:c7, name 'GBE0/3'
 	   config 0x00000002 (NO_STP)
-	   state 0x00000200 (STP_FORWARD, STP_BLOCK)
+	   state 0x00000200 (STP_FORWARD)
 	   curr 0x000002a0 (1GB_FD, COPPER, AUTONEG)
 	   advertised 0x00000000
 	   supported 0x00000000
 	   peer 0x00000000
 	  port_no 4, hw_addr 00:25:5c:ab:0c:27, name 'GBE0/4'
 	   config 0x00000002 (NO_STP)
-	   state 0x00000201 (LINK_DOWN, STP_FORWARD, STP_BLOCK)
+	   state 0x00000201 (STP_FORWARD, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x00000000
 	   supported 0x00000000
 	   peer 0x00000000
 	  port_no 5, hw_addr 00:25:5c:ab:0c:a7, name 'GBE0/5'
 	   config 0x00000002 (NO_STP)
-	   state 0x00000201 (LINK_DOWN, STP_FORWARD, STP_BLOCK)
+	   state 0x00000201 (STP_FORWARD, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x00000000
 	   supported 0x00000000
 	   peer 0x00000000
 	  port_no 6, hw_addr 00:25:5c:ab:0c:67, name 'GBE0/6'
 	   config 0x00000002 (NO_STP)
-	   state 0x00000201 (LINK_DOWN, STP_FORWARD, STP_BLOCK)
+	   state 0x00000201 (STP_FORWARD, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x00000000
 	   supported 0x00000000
 	   peer 0x00000000
 	  port_no 7, hw_addr 00:25:5c:ab:0c:e7, name 'GBE0/7'
 	   config 0x00000002 (NO_STP)
-	   state 0x00000201 (LINK_DOWN, STP_FORWARD, STP_BLOCK)
+	   state 0x00000201 (STP_FORWARD, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x00000000
 	   supported 0x00000000
 	   peer 0x00000000
 	  port_no 8, hw_addr 00:25:5c:ab:0c:17, name 'GBE0/8'
 	   config 0x00000002 (NO_STP)
-	   state 0x00000201 (LINK_DOWN, STP_FORWARD, STP_BLOCK)
+	   state 0x00000201 (STP_FORWARD, LINK_DOWN)
 	   curr 0x00000000
 	   advertised 0x00000000
 	   supported 0x00000000

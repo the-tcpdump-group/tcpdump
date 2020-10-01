@@ -144,14 +144,18 @@ static const struct tok ofppc_bm[] = {
                    OFPPC_NO_RECV_STP | OFPPC_NO_FLOOD | OFPPC_NO_FWD | \
                    OFPPC_NO_PACKET_IN))
 
-#define OFPPS_LINK_DOWN   (1U << 0)
-#define OFPPS_STP_LISTEN  (0U << 8)
-#define OFPPS_STP_LEARN   (1U << 8)
-#define OFPPS_STP_FORWARD (2U << 8)
-#define OFPPS_STP_BLOCK   (3U << 8)
-#define OFPPS_STP_MASK    (3U << 8)
-static const struct tok ofpps_bm[] = {
-	{ OFPPS_LINK_DOWN,   "LINK_DOWN"   },
+/*
+ * [OF10] lists all FPPS_ constants in one enum, but they mean a 1-bit bitmap
+ * in the least significant octet and a 2-bit code point in the next octet.
+ * Remember to mix or to separate these two parts as the context requires.
+ */
+#define OFPPS_LINK_DOWN   (1U << 0) /* bitmap             */
+#define OFPPS_STP_LISTEN  (0U << 8) /* code point         */
+#define OFPPS_STP_LEARN   (1U << 8) /* code point         */
+#define OFPPS_STP_FORWARD (2U << 8) /* code point         */
+#define OFPPS_STP_BLOCK   (3U << 8) /* code point         */
+#define OFPPS_STP_MASK    (3U << 8) /* code point bitmask */
+static const struct tok ofpps_stp_str[] = {
 	{ OFPPS_STP_LISTEN,  "STP_LISTEN"  },
 	{ OFPPS_STP_LEARN,   "STP_LEARN"   },
 	{ OFPPS_STP_FORWARD, "STP_FORWARD" },
@@ -1058,6 +1062,8 @@ of10_phy_ports_print(netdissect_options *ndo,
                      const u_char *cp, u_int len)
 {
 	while (len) {
+		uint32_t state;
+
 		if (len < OF_PHY_PORT_FIXLEN)
 			goto invalid;
 		/* port_no */
@@ -1082,8 +1088,16 @@ of10_phy_ports_print(netdissect_options *ndo,
 		of_bitmap_print(ndo, ofppc_bm, GET_BE_U_4(cp), OFPPC_U);
 		OF_FWD(4);
 		/* state */
-		ND_PRINT("\n\t   state 0x%08x", GET_BE_U_4(cp));
-		of_bitmap_print(ndo, ofpps_bm, GET_BE_U_4(cp), OFPPS_U);
+		state = GET_BE_U_4(cp);
+		/*
+		 * Decode the code point and the single bit separately, but
+		 * format the result as a single sequence of comma-separated
+		 * strings (see the comments at the OFPPS_ props).
+		 */
+		ND_PRINT("\n\t   state 0x%08x (%s%s)%s", state,
+		         tok2str(ofpps_stp_str, "", state & OFPPS_STP_MASK),
+		         state & OFPPS_LINK_DOWN ? ", LINK_DOWN" : "",
+		         state & OFPPS_U ? " (bogus)" : "");
 		OF_FWD(4);
 		/* curr */
 		ND_PRINT("\n\t   curr 0x%08x", GET_BE_U_4(cp));

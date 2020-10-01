@@ -76,20 +76,14 @@ of_vendor_name(const uint32_t vendor)
 
 void
 of_bitmap_print(netdissect_options *ndo,
-                  const struct tok *t, const uint32_t v, const uint32_t u)
+                const struct tok *t, const uint32_t v, const uint32_t u)
 {
-	const char *sep = " (";
-
-	if (v == 0)
-		return;
-	/* assigned bits */
-	for (; t->s != NULL; t++)
-		if (v & t->v) {
-			ND_PRINT("%s%s", sep, t->s);
-			sep = ", ";
-		}
-	/* unassigned bits? */
-	ND_PRINT((v & u) ? ") (bogus)" : ")");
+	/* Assigned bits? */
+	if (v & ~u)
+		ND_PRINT(" (%s)", bittok2str(t, "", v));
+	/* Unassigned bits? */
+	if (v & u)
+		ND_PRINT(" (bogus)");
 }
 
 void

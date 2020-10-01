@@ -25,14 +25,14 @@
 	 actions 0x00000137 (OUTPUT, SET_VLAN_VID, SET_VLAN_PCP, SET_DL_SRC, SET_DL_DST, SET_NW_TOS)
 	  port_no 1, hw_addr 00:01:e8:8a:e0:e4, name 'Te 0/0'
 	   config 0x00000000
-	   state 0x00000000
+	   state 0x00000000 (STP_LISTEN)
 	   curr 0x00000340 (10GB_FD, FIBER, AUTONEG)
 	   advertised 0x00000340 (10GB_FD, FIBER, AUTONEG)
 	   supported 0x00000340 (10GB_FD, FIBER, AUTONEG)
 	   peer 0x00000000
 	  port_no 2, hw_addr 00:01:e8:8a:e0:e4, name 'Te 0/1'
 	   config 0x00000001 (PORT_DOWN)
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000300 (FIBER, AUTONEG)
 	   advertised 0x00000300 (FIBER, AUTONEG)
 	   supported 0x00000300 (FIBER, AUTONEG)
@@ -65,14 +65,14 @@
 	 actions 0x00000137 (OUTPUT, SET_VLAN_VID, SET_VLAN_PCP, SET_DL_SRC, SET_DL_DST, SET_NW_TOS)
 	  port_no 1, hw_addr 00:01:e8:8a:e0:e4, name 'Te 0/0'
 	   config 0x00000000
-	   state 0x00000000
+	   state 0x00000000 (STP_LISTEN)
 	   curr 0x00000340 (10GB_FD, FIBER, AUTONEG)
 	   advertised 0x00000340 (10GB_FD, FIBER, AUTONEG)
 	   supported 0x00000340 (10GB_FD, FIBER, AUTONEG)
 	   peer 0x00000000
 	  port_no 2, hw_addr 00:01:e8:8a:e0:e4, name 'Te 0/1'
 	   config 0x00000001 (PORT_DOWN)
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000300 (FIBER, AUTONEG)
 	   advertised 0x00000300 (FIBER, AUTONEG)
 	   supported 0x00000300 (FIBER, AUTONEG)
@@ -1289,14 +1289,14 @@ STP 802.1s, Rapid STP, CIST Flags [Proposal, Learn, Forward, Agreement], length 
 	 actions 0x00000137 (OUTPUT, SET_VLAN_VID, SET_VLAN_PCP, SET_DL_SRC, SET_DL_DST, SET_NW_TOS)
 	  port_no 13, hw_addr 00:01:e8:8a:e0:e4, name 'Te 0/12'
 	   config 0x00000001 (PORT_DOWN)
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000300 (FIBER, AUTONEG)
 	   advertised 0x00000300 (FIBER, AUTONEG)
 	   supported 0x00000300 (FIBER, AUTONEG)
 	   peer 0x00000000
 	  port_no 16, hw_addr 00:01:e8:8a:e0:e4, name 'Te 0/15'
 	   config 0x00008001 (PORT_DOWN) (bogus)
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000300 (FIBER, AUTONEG)
 	   advertised 0x00000300 (FIBER, AUTONEG)
 	   supported 0x00000300 (FIBER, AUTONEG)

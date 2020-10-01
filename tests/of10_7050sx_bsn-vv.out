@@ -31,56 +31,56 @@
 	 actions 0x00000905 (OUTPUT, SET_VLAN_PCP, SET_NW_TOS, ENQUEUE)
 	  port_no 16, hw_addr 00:1c:73:7d:28:1f, name 'Ethernet16'
 	   config 0x00000001 (PORT_DOWN)
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000040 (10GB_FD)
 	   advertised 0x00000000
 	   supported 0x00000c40 (10GB_FD, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 20, hw_addr 00:1c:73:7d:28:23, name 'Ethernet20'
 	   config 0x00000001 (PORT_DOWN)
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000040 (10GB_FD)
 	   advertised 0x00000000
 	   supported 0x00000c40 (10GB_FD, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 18, hw_addr 00:1c:73:7d:28:21, name 'Ethernet18'
 	   config 0x00000001 (PORT_DOWN)
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000040 (10GB_FD)
 	   advertised 0x00000000
 	   supported 0x00000c40 (10GB_FD, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 22, hw_addr 00:1c:73:7d:28:25, name 'Ethernet22'
 	   config 0x00000001 (PORT_DOWN)
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000040 (10GB_FD)
 	   advertised 0x00000000
 	   supported 0x00000c40 (10GB_FD, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 17, hw_addr 00:1c:73:7d:28:20, name 'Ethernet17'
 	   config 0x00000001 (PORT_DOWN)
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000040 (10GB_FD)
 	   advertised 0x00000000
 	   supported 0x00000cc0 (10GB_FD, COPPER, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 21, hw_addr 00:1c:73:7d:28:24, name 'Ethernet21'
 	   config 0x80000001 (PORT_DOWN) (bogus)
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000040 (10GB_FD)
 	   advertised 0x00000000
 	   supported 0x00000cc0 (10GB_FD, COPPER, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 19, hw_addr 00:1c:73:7d:28:22, name 'Ethernet19'
 	   config 0x00000001 (PORT_DOWN)
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000040 (10GB_FD)
 	   advertised 0x00000000
 	   supported 0x00000c40 (10GB_FD, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 23, hw_addr 00:1c:73:7d:28:26, name 'Ethernet23'
 	   config 0x80000001 (PORT_DOWN) (bogus)
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000040 (10GB_FD)
 	   advertised 0x00000000
 	   supported 0x00000c40 (10GB_FD, PAUSE, PAUSE_ASYM)
@@ -150,56 +150,56 @@
 	 actions 0x00000905 (OUTPUT, SET_VLAN_PCP, SET_NW_TOS, ENQUEUE)
 	  port_no 16, hw_addr 00:1c:73:7d:28:1f, name 'Ethernet16'
 	   config 0x00000001 (PORT_DOWN)
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000040 (10GB_FD)
 	   advertised 0x00000000
 	   supported 0x00000c40 (10GB_FD, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 20, hw_addr 00:1c:73:7d:28:23, name 'Ethernet20'
 	   config 0x00000001 (PORT_DOWN)
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000040 (10GB_FD)
 	   advertised 0x00000000
 	   supported 0x00000c40 (10GB_FD, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 18, hw_addr 00:1c:73:7d:28:21, name 'Ethernet18'
 	   config 0x00000001 (PORT_DOWN)
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000040 (10GB_FD)
 	   advertised 0x00000000
 	   supported 0x00000c40 (10GB_FD, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 22, hw_addr 00:1c:73:7d:28:25, name 'Ethernet22'
 	   config 0x00000001 (PORT_DOWN)
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000040 (10GB_FD)
 	   advertised 0x00000000
 	   supported 0x00000c40 (10GB_FD, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 17, hw_addr 00:1c:73:7d:28:20, name 'Ethernet17'
 	   config 0x00000001 (PORT_DOWN)
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000040 (10GB_FD)
 	   advertised 0x00000000
 	   supported 0x00000cc0 (10GB_FD, COPPER, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 21, hw_addr 00:1c:73:7d:28:24, name 'Ethernet21'
 	   config 0x80000001 (PORT_DOWN) (bogus)
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000040 (10GB_FD)
 	   advertised 0x00000000
 	   supported 0x00000cc0 (10GB_FD, COPPER, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 19, hw_addr 00:1c:73:7d:28:22, name 'Ethernet19'
 	   config 0x00000001 (PORT_DOWN)
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000040 (10GB_FD)
 	   advertised 0x00000000
 	   supported 0x00000c40 (10GB_FD, PAUSE, PAUSE_ASYM)
 	   peer 0x00000000
 	  port_no 23, hw_addr 00:1c:73:7d:28:26, name 'Ethernet23'
 	   config 0x80000001 (PORT_DOWN) (bogus)
-	   state 0x00000001 (LINK_DOWN)
+	   state 0x00000001 (STP_LISTEN, LINK_DOWN)
 	   curr 0x00000040 (10GB_FD)
 	   advertised 0x00000000
 	   supported 0x00000c40 (10GB_FD, PAUSE, PAUSE_ASYM)
