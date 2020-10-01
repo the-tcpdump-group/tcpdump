@@ -57,9 +57,15 @@ static const struct tok udld_code_values[] = {
     { 0, NULL}
 };
 
-static const struct tok udld_flags_values[] = {
-    { 0x00, "RT"},
-    { 0x01, "RSY"},
+static const struct tok udld_flags_bitmap_str[] = {
+    { 1U << 0, "RT"    },
+    { 1U << 1, "RSY"   },
+    { 1U << 2, "MBZ-2" },
+    { 1U << 3, "MBZ-3" },
+    { 1U << 4, "MBZ-4" },
+    { 1U << 5, "MBZ-5" },
+    { 1U << 6, "MBZ-6" },
+    { 1U << 7, "MBZ-7" },
     { 0, NULL}
 };
 
@@ -112,7 +118,7 @@ udld_print(netdissect_options *ndo, const u_char *pptr, u_int length)
            UDLD_EXTRACT_VERSION(GET_U_1(tptr)),
            tok2str(udld_code_values, "Reserved", code),
            code,
-           bittok2str(udld_flags_values, "none", GET_U_1((tptr + 1))),
+           bittok2str(udld_flags_bitmap_str, "none", GET_U_1((tptr + 1))),
            GET_U_1((tptr + 1)),
            length);
 

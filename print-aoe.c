@@ -72,8 +72,8 @@ static const struct tok cmdcode_str[] = {
 static const struct tok aoev1_flag_str[] = {
 	{ AOEV1_FLAG_R, "Response" },
 	{ AOEV1_FLAG_E, "Error"    },
-	{ 0x02,         "MBZ-0x02" },
-	{ 0x01,         "MBZ-0x01" },
+	{ 0x02,         "MBZ-1"    },
+	{ 0x01,         "MBZ-0"    },
 	{ 0, NULL }
 };
 
@@ -92,13 +92,13 @@ static const struct tok aoev1_errcode_str[] = {
 #define AOEV1_AFLAG_A 0x02
 #define AOEV1_AFLAG_W 0x01
 
-static const struct tok aoev1_aflag_str[] = {
-	{ 0x08,          "MBZ-0x08" },
+static const struct tok aoev1_aflag_bitmap_str[] = {
+	{ 0x80,          "MBZ-7"    },
 	{ AOEV1_AFLAG_E, "Ext48"    },
-	{ 0x06,          "MBZ-0x06" },
+	{ 0x20,          "MBZ-5"    },
 	{ AOEV1_AFLAG_D, "Device"   },
-	{ 0x04,          "MBZ-0x04" },
-	{ 0x03,          "MBZ-0x03" },
+	{ 0x08,          "MBZ-3"    },
+	{ 0x04,          "MBZ-2"    },
 	{ AOEV1_AFLAG_A, "Async"    },
 	{ AOEV1_AFLAG_W, "Write"    },
 	{ 0, NULL }
@@ -148,7 +148,7 @@ aoev1_issue_print(netdissect_options *ndo,
 		goto invalid;
 	/* AFlags */
 	ND_PRINT("\n\tAFlags: [%s]",
-		 bittok2str(aoev1_aflag_str, "none", GET_U_1(cp)));
+		 bittok2str(aoev1_aflag_bitmap_str, "none", GET_U_1(cp)));
 	cp += 1;
 	len -= 1;
 	/* Err/Feature */
