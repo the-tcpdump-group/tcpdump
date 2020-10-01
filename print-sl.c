@@ -149,9 +149,7 @@ sliplink_print(netdissect_options *ndo,
 			/* Direction is bogus, don't use it */
 			return;
 		}
-		ND_TCHECK_SIZE(ip);
 		hlen = IP_HL(ip);
-		ND_TCHECK_SIZE((const struct tcphdr *)&((const int *)ip)[hlen]);
 		hlen += TH_OFF((const struct tcphdr *)&((const int *)ip)[hlen]);
 		lastlen[dir][lastconn] = length - (hlen << 2);
 		break;
@@ -250,9 +248,7 @@ compressed_sl_print(netdissect_options *ndo,
 	 * 'cp - chdr' is the length of the compressed header.
 	 * 'length - hlen' is the amount of data in the packet.
 	 */
-	ND_TCHECK_SIZE(ip);
 	hlen = IP_HL(ip);
-	ND_TCHECK_SIZE((const struct tcphdr *)&((const int32_t *)ip)[hlen]);
 	hlen += TH_OFF((const struct tcphdr *)&((const int32_t *)ip)[hlen]);
 	lastlen[dir][lastconn] = length - (hlen << 2);
 	ND_PRINT(" %u (%ld)", lastlen[dir][lastconn], (long)(cp - chdr));
