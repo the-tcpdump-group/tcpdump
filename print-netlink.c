@@ -31,6 +31,8 @@
 #include "netdissect.h"
 #include "extract.h"
 
+#define abs_diff(a, b) ((a) > (b) ? (a) - (b) : (b) - (a))
+
 static const struct tok netlink_family[] = {
     { 0, "Route" },
     { 2, "User-mode socket protocols" },
@@ -73,21 +75,30 @@ static u_int
 netlink_msg_print(netdissect_options *ndo, const u_char *p, const u_int caplen)
 {
     const struct netlink_msg *msg = (const struct netlink_msg *)p;
-    uint32_t length;
+    uint8_t le;
+    uint32_t length, length_le, length_be;
 
     if (caplen < sizeof(struct netlink_msg)) {
         return 0;
     }
 
     /**
-     * We do not know the endianness of the capture host.
-     * Let's assume we are on a host with the same endianness for now.
+     * We do not know the endianness of the capture host. We assume
+     * that the reported length approximately matches the captured length.
+     * Usually this assumption holds because packet lengths rarely need
+     * more than 16 bits.
      */
+    length_le = GET_LE_U_4(msg->length);
+    length_be = GET_BE_U_4(msg->length);
+    le = abs_diff(length_le, caplen) < abs_diff(length_be, caplen);
+    length = le ? length_le : length_be;
 
-    length = GET_HE_U_4(msg->length);
     ND_PRINT("\n\ttype %u, length %u, flags 0x%04x, sequence %u, pid %u",
-             GET_HE_U_2(msg->type), length, GET_HE_U_2(msg->flags),
-             GET_HE_U_4(msg->sequence), GET_HE_U_4(msg->pid));
+             le ? GET_LE_U_2(msg->type) : GET_BE_U_2(msg->type),
+             length,
+             le ? GET_LE_U_2(msg->flags) : GET_BE_U_2(msg->flags),
+             le ? GET_LE_U_4(msg->sequence) : GET_BE_U_4(msg->sequence),
+             le ? GET_LE_U_4(msg->pid) : GET_BE_U_4(msg->pid));
 
     if (caplen < length) {
         return 0;
