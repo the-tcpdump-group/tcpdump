@@ -318,14 +318,8 @@ HDR = \
 	varattrs.h
 
 TAGHDR = \
-	/usr/include/arpa/tftp.h \
-	/usr/include/net/if_arp.h \
 	/usr/include/netinet/if_ether.h \
-	/usr/include/netinet/in.h \
-	/usr/include/netinet/ip_icmp.h \
-	/usr/include/netinet/tcp.h \
-	/usr/include/netinet/udp.h \
-	/usr/include/protocols/routed.h
+	/usr/include/netinet/in.h
 
 TAGFILES = $(SRC) $(HDR) $(TAGHDR) $(LIBNETDISSECT_SRC) \
 	print-pflog.c print-smb.c smbutil.c
