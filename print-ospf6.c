@@ -95,7 +95,7 @@
 #define	RLA_FLAG_E	0x02
 #define	RLA_FLAG_V	0x04
 #define	RLA_FLAG_W	0x08
-#define RLA_FLAG_N      0x10
+#define	RLA_FLAG_Nt	0x10
 
 /* lsa_prefix options */
 #define LSA_PREFIX_OPT_NU 0x01
@@ -103,6 +103,7 @@
 #define LSA_PREFIX_OPT_MC 0x04
 #define LSA_PREFIX_OPT_P  0x08
 #define LSA_PREFIX_OPT_DN 0x10
+#define LSA_PREFIX_OPT_N  0x20
 
 /* sla_tosmetric breakdown	*/
 #define	SLA_MASK_TOS		0x7f000000
@@ -302,8 +303,8 @@ static const struct tok ospf6_rla_flag_values[] = {
 	{ RLA_FLAG_B,		"ABR" },
 	{ RLA_FLAG_E,		"External" },
 	{ RLA_FLAG_V,		"Virtual-Link Endpoint" },
-	{ RLA_FLAG_W,		"Wildcard Receiver" },
-        { RLA_FLAG_N,           "NSSA Translator" },
+	{ RLA_FLAG_W,		"Deprecated" },
+	{ RLA_FLAG_Nt,		"NSSA Translator" },
 	{ 0,			NULL }
 };
 
@@ -362,6 +363,7 @@ static const struct tok ospf6_lsa_prefix_option_values[] = {
         { LSA_PREFIX_OPT_MC, "Deprecated" },
         { LSA_PREFIX_OPT_P, "Propagate" },
         { LSA_PREFIX_OPT_DN, "Down" },
+        { LSA_PREFIX_OPT_N, "N-bit" },
 	{ 0, NULL }
 };
 
