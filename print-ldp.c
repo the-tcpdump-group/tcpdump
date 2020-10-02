@@ -538,8 +538,7 @@ ldp_tlv_print(netdissect_options *ndo,
     return(tlv_len+4); /* Type & Length fields not included */
 
 trunc:
-    nd_print_trunc(ndo);
-    return 0;
+    nd_trunc_longjmp(ndo);
 
 invalid:
     return(tlv_len+4); /* Type & Length fields not included */
@@ -697,6 +696,5 @@ ldp_pdu_print(netdissect_options *ndo,
     }
     return pdu_len+4;
 trunc:
-    nd_print_trunc(ndo);
-    return 0;
+    nd_trunc_longjmp(ndo);
 }
