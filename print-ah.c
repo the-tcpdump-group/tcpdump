@@ -38,24 +38,39 @@ int
 ah_print(netdissect_options *ndo, const u_char *bp)
 {
 	const struct ah *ah;
-	u_int sumlen;
+	uint8_t ah_len;
+	u_int ah_hdr_len;
+	uint16_t reserved;
 
 	ndo->ndo_protocol = "ah";
 	ah = (const struct ah *)bp;
 
 	ND_TCHECK_SIZE(ah);
+	nd_print_protocol_caps(ndo);
+/*
+ * RFC4302
+ *
+ * 2.2.  Payload Length
+ *
+ *    This 8-bit field specifies the length of AH in 32-bit words (4-byte
+ *    units), minus "2".
+ */
+	ah_len = GET_U_1(ah->ah_len);
+	ah_hdr_len = (ah_len + 2) * 4;
 
-	sumlen = GET_U_1(ah->ah_len) << 2;
-
-	ND_PRINT("AH(spi=0x%08x", GET_BE_U_4(ah->ah_spi));
+	ND_PRINT("(");
 	if (ndo->ndo_vflag)
-		ND_PRINT(",sumlen=%u", sumlen);
-	ND_PRINT(",seq=0x%x", GET_BE_U_4(ah + 1));
-	ND_TCHECK_LEN(bp, sizeof(struct ah) + sumlen);
+		ND_PRINT("length=%u(%u-bytes),", ah_len, ah_hdr_len);
+	reserved = GET_BE_U_2(ah->ah_reserved);
+	if (reserved)
+		ND_PRINT("reserved=0x%x[MustBeZero],", reserved);
+	ND_PRINT("spi=0x%08x,", GET_BE_U_4(ah->ah_spi));
+	ND_PRINT("seq=0x%x", GET_BE_U_4(ah->ah_seq));
+	ND_TCHECK_LEN(bp, ah_hdr_len);
 	ND_PRINT("): ");
 
-	return sizeof(struct ah) + sumlen;
- trunc:
+	return ah_hdr_len;
+trunc:
 	nd_print_trunc(ndo);
 	return -1;
 }
