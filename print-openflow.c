@@ -64,6 +64,9 @@ const struct tok onf_exp_str[] = {
 	{ ONF_EXP_WMOB,              "Wireless and Mobility Extensions"                },
 	{ ONF_EXP_FABS,              "Forwarding Abstractions Extensions"              },
 	{ ONF_EXP_OTRANS,            "Optical Transport Extensions"                    },
+	{ ONF_EXP_NBLNCTU,           "Network Benchmarking Lab, NCTU"                  },
+	{ ONF_EXP_MPCE,              "Mobile Packet Core Extensions"                   },
+	{ ONF_EXP_MPLSTPSPTN,        "MPLS-TP OpenFlow Extensions for SPTN"            },
 	{ 0, NULL }
 };
 

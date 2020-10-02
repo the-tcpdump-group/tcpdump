@@ -42,6 +42,7 @@
 #define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
+#include "addrtoname.h"
 #include "openflow.h"
 
 #define OFPT_HELLO                     0U
@@ -128,6 +129,79 @@ static const struct tok ofp_capabilities_bm[] = {
 #define OFPCAP_U (~(OFPC_FLOW_STATS | OFPC_TABLE_STATS | OFPC_PORT_STATS | \
                     OFPC_GROUP_STATS | OFPC_IP_REASM | OFPC_QUEUE_STATS | \
                     OFPC_PORT_BLOCKED))
+
+#define OFPC_FRAG_NORMAL 0U
+#define OFPC_FRAG_DROP   1U
+#define OFPC_FRAG_REASM  2U
+static const struct tok ofp_config_str[] = {
+	{ OFPC_FRAG_NORMAL, "FRAG_NORMAL" },
+	{ OFPC_FRAG_DROP,   "FRAG_DROP"   },
+	{ OFPC_FRAG_REASM,  "FRAG_REASM"  },
+	{ 0, NULL }
+};
+
+#define OFPCML_MAX       0xffe5U
+#define OFPCML_NO_BUFFER 0xffffU
+static const struct tok ofpcml_str[] = {
+	{ OFPCML_MAX,       "MAX"       },
+	{ OFPCML_NO_BUFFER, "NO_BUFFER" },
+	{ 0, NULL }
+};
+
+#define OFPPC_PORT_DOWN    (1U <<0)
+#define OFPPC_NO_RECV      (1U <<2)
+#define OFPPC_NO_FWD       (1U <<5)
+#define OFPPC_NO_PACKET_IN (1U <<6)
+static const struct tok ofppc_bm[] = {
+	{ OFPPC_PORT_DOWN,    "PORT_DOWN"    },
+	{ OFPPC_NO_RECV,      "NO_RECV"      },
+	{ OFPPC_NO_FWD,       "NO_FWD"       },
+	{ OFPPC_NO_PACKET_IN, "NO_PACKET_IN" },
+	{ 0, NULL }
+};
+#define OFPPC_U (~(OFPPC_PORT_DOWN | OFPPC_NO_RECV | OFPPC_NO_FWD | \
+                   OFPPC_NO_PACKET_IN))
+
+#define OFPPF_10MB_HD    (1U <<  0)
+#define OFPPF_10MB_FD    (1U <<  1)
+#define OFPPF_100MB_HD   (1U <<  2)
+#define OFPPF_100MB_FD   (1U <<  3)
+#define OFPPF_1GB_HD     (1U <<  4)
+#define OFPPF_1GB_FD     (1U <<  5)
+#define OFPPF_10GB_FD    (1U <<  6)
+#define OFPPF_40GB_FD    (1U <<  7)
+#define OFPPF_100GB_FD   (1U <<  8)
+#define OFPPF_1TB_FD     (1U <<  9)
+#define OFPPF_OTHER      (1U << 10)
+#define OFPPF_COPPER     (1U << 11)
+#define OFPPF_FIBER      (1U << 12)
+#define OFPPF_AUTONEG    (1U << 13)
+#define OFPPF_PAUSE      (1U << 14)
+#define OFPPF_PAUSE_ASYM (1U << 15)
+static const struct tok ofppf_bm[] = {
+	{ OFPPF_10MB_HD,    "10MB_HD"    },
+	{ OFPPF_10MB_FD,    "10MB_FD"    },
+	{ OFPPF_100MB_HD,   "100MB_HD"   },
+	{ OFPPF_100MB_FD,   "100MB_FD"   },
+	{ OFPPF_1GB_HD,     "1GB_HD"     },
+	{ OFPPF_1GB_FD,     "1GB_FD"     },
+	{ OFPPF_10GB_FD,    "10GB_FD"    },
+	{ OFPPF_40GB_FD,    "40GB_FD"    },
+	{ OFPPF_100GB_FD,   "100GB_FD"   },
+	{ OFPPF_1TB_FD,     "1TB_FD"     },
+	{ OFPPF_OTHER,      "OTHER"      },
+	{ OFPPF_COPPER,     "COPPER"     },
+	{ OFPPF_FIBER,      "FIBER"      },
+	{ OFPPF_AUTONEG,    "AUTONEG"    },
+	{ OFPPF_PAUSE,      "PAUSE"      },
+	{ OFPPF_PAUSE_ASYM, "PAUSE_ASYM" },
+	{ 0, NULL }
+};
+#define OFPPF_U (~(OFPPF_10MB_HD | OFPPF_10MB_FD | OFPPF_100MB_HD | \
+                   OFPPF_100MB_FD | OFPPF_1GB_HD | OFPPF_1GB_FD | \
+                   OFPPF_10GB_FD | OFPPF_40GB_FD | OFPPF_100GB_FD | \
+                   OFPPF_1TB_FD | OFPPF_OTHER | OFPPF_COPPER | OFPPF_FIBER | \
+                   OFPPF_AUTONEG | OFPPF_PAUSE | OFPPF_PAUSE_ASYM))
 
 #define OFPHET_VERSIONBITMAP 1U
 static const struct tok ofphet_str[] = {
@@ -510,7 +584,10 @@ static const struct uint_tokary of13_ofpet2tokary[] = {
 #define OF_HELLO_ELEM_MINSIZE                 4U
 #define OF_ERROR_MSG_MINLEN                   12U
 #define OF_FEATURES_REPLY_FIXLEN              32U
+#define OF_PORT_MOD_FIXLEN                    40U
+#define OF_SWITCH_CONFIG_MSG_FIXLEN           12U
 #define OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN    16U
+#define OF_EXPERIMENTER_MSG_MINLEN            16U
 
 /* [OF13] Section A.1 */
 const char *
@@ -543,6 +620,52 @@ of13_features_reply_print(netdissect_options *ndo,
 	of_bitmap_print(ndo, ofp_capabilities_bm, GET_BE_U_4(cp), OFPCAP_U);
 	OF_FWD(4);
 	/* reserved */
+	ND_TCHECK_4(cp);
+}
+
+/* [OF13] Section 7.3.2 */
+static void
+of13_switch_config_msg_print(netdissect_options *ndo,
+                         const u_char *cp, u_int len)
+{
+	/* flags */
+	ND_PRINT("\n\t flags %s",
+	         tok2str(ofp_config_str, "invalid (0x%04x)", GET_BE_U_2(cp)));
+	OF_FWD(2);
+	/* miss_send_len */
+	ND_PRINT(", miss_send_len %s",
+	         tok2str(ofpcml_str, "%u", GET_BE_U_2(cp)));
+}
+
+/* [OF13] Section 7.3.4.3 */
+static void
+of13_port_mod_print(netdissect_options *ndo,
+                    const u_char *cp, u_int len)
+{
+	/* port_no */
+	ND_PRINT("\n\t port_no %s", tok2str(ofpp_str, "%u", GET_BE_U_4(cp)));
+	OF_FWD(4);
+	/* pad */
+	OF_FWD(4);
+	/* hw_addr */
+	ND_PRINT(", hw_addr %s", GET_ETHERADDR_STRING(cp));
+	OF_FWD(MAC_ADDR_LEN);
+	/* pad2 */
+	OF_FWD(2);
+	/* config */
+	ND_PRINT("\n\t  config 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, ofppc_bm, GET_BE_U_4(cp), OFPPC_U);
+	OF_FWD(4);
+	/* mask */
+	ND_PRINT("\n\t  mask 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, ofppc_bm, GET_BE_U_4(cp), OFPPC_U);
+	OF_FWD(4);
+	/* advertise */
+	ND_PRINT("\n\t  advertise 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
+	OF_FWD(4);
+	/* pad3 */
+	/* Always the last field, check bounds. */
 	ND_TCHECK_4(cp);
 }
 
@@ -600,6 +723,25 @@ invalid:
 	ND_TCHECK_LEN(cp, len);
 }
 
+/* [OF13] Section 7.5.4 */
+static void
+of13_experimenter_message_print(netdissect_options *ndo,
+                                const u_char *cp, u_int len)
+{
+	uint32_t experimenter;
+
+	/* experimenter */
+	experimenter = GET_BE_U_4(cp);
+	OF_FWD(4);
+	ND_PRINT("\n\t experimenter 0x%08x (%s)", experimenter,
+	         of_vendor_name(experimenter));
+	/* exp_type */
+	ND_PRINT(", exp_type 0x%08x", GET_BE_U_4(cp));
+	OF_FWD(4);
+	/* data */
+	of_data_print(ndo, cp, len);
+}
+
 /* [OF13] Section A.4.4 */
 static void
 of13_error_print(netdissect_options *ndo,
@@ -636,6 +778,7 @@ of13_message_print(netdissect_options *ndo,
 	case OFPT_GET_CONFIG_REQUEST: /* [OF13] Section A.3.2 */
 	case OFPT_BARRIER_REQUEST: /* [OF13] Section A.3.8 */
 	case OFPT_BARRIER_REPLY: /* ibid */
+	case OFPT_GET_ASYNC_REQUEST: /* [OF13] Section 7.3.10 */
 		if (len)
 			goto invalid;
 		return;
@@ -661,6 +804,21 @@ of13_message_print(netdissect_options *ndo,
 		/* Always the last field, check bounds. */
 		ND_TCHECK_4(cp);
 		return;
+	case OFPT_GET_CONFIG_REPLY: /* [OF13] Section 7.3.2 */
+	case OFPT_SET_CONFIG: /* ibid */
+		if (len != OF_SWITCH_CONFIG_MSG_FIXLEN - OF_HEADER_FIXLEN)
+			goto invalid;
+		if (ndo->ndo_vflag < 1)
+			break;
+		of13_switch_config_msg_print(ndo, cp, len);
+		return;
+	case OFPT_PORT_MOD: /* [OF13] Section 7.3.4.3 */
+		if (len != OF_PORT_MOD_FIXLEN - OF_HEADER_FIXLEN)
+			goto invalid;
+		if (ndo->ndo_vflag < 1)
+			break;
+		of13_port_mod_print(ndo, cp, len);
+		return;
 
 	/* OpenFlow header and variable-size data. */
 	case OFPT_ECHO_REQUEST: /* [OF13] Section A.5.2 */
@@ -684,6 +842,13 @@ of13_message_print(netdissect_options *ndo,
 		if (ndo->ndo_vflag < 1)
 			break;
 		of13_error_print(ndo, cp, len);
+		return;
+	case OFPT_EXPERIMENTER: /* [OF13] Section 7.5.4 */
+		if (len < OF_EXPERIMENTER_MSG_MINLEN - OF_HEADER_FIXLEN)
+			goto invalid;
+		if (ndo->ndo_vflag < 1)
+			break;
+		of13_experimenter_message_print(ndo, cp, len);
 		return;
 	}
 	/*

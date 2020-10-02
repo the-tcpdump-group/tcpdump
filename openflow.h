@@ -58,6 +58,9 @@
 #define ONF_EXP_WMOB              0xff000005
 #define ONF_EXP_FABS              0xff000006
 #define ONF_EXP_OTRANS            0xff000007
+#define ONF_EXP_NBLNCTU           0xff000008
+#define ONF_EXP_MPCE              0xff000009
+#define ONF_EXP_MPLSTPSPTN        0xff00000a
 extern const struct tok onf_exp_str[];
 
 extern const char * of_vendor_name(const uint32_t);
