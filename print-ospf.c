@@ -38,11 +38,11 @@
 
 
 static const struct tok ospf_option_values[] = {
-        { OSPF_OPTION_T,	"MultiTopology" }, /* draft-ietf-ospf-mt-09 */
+	{ OSPF_OPTION_MT,	"MultiTopology" }, /* draft-ietf-ospf-mt-09 */
 	{ OSPF_OPTION_E,	"External" },
 	{ OSPF_OPTION_MC,	"Multicast" },
 	{ OSPF_OPTION_NP,	"NSSA" },
-        { OSPF_OPTION_L,        "LLS" },
+	{ OSPF_OPTION_L,	"LLS" },
 	{ OSPF_OPTION_DC,	"Demand Circuit" },
 	{ OSPF_OPTION_O,	"Opaque" },
 	{ OSPF_OPTION_DN,	"Up/Down" },

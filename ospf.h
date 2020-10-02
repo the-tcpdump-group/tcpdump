@@ -34,11 +34,10 @@
  *
  */
 
-#define OSPF_OPTION_T	0x01	/* T bit: TOS support	*/
-#define OSPF_OPTION_E	0x02	/* E bit: External routes advertised	*/
+#define	OSPF_OPTION_MT	0x01	/* MT bit: multi-topology */
+#define	OSPF_OPTION_E	0x02	/* E bit: External routes advertised */
 #define	OSPF_OPTION_MC	0x04	/* MC bit: Multicast capable */
 #define	OSPF_OPTION_NP	0x08	/* N/P bit: NSSA capable */
-#define	OSPF_OPTION_EA	0x10	/* EA bit: External Attribute capable */
 #define	OSPF_OPTION_L	0x10	/* L bit: Packet contains LLS data block */
 #define	OSPF_OPTION_DC	0x20	/* DC bit: Demand circuit capable */
 #define	OSPF_OPTION_O	0x40	/* O bit: Opaque LSA capable */
