@@ -162,6 +162,17 @@ static const struct tok ofppc_bm[] = {
 #define OFPPC_U (~(OFPPC_PORT_DOWN | OFPPC_NO_RECV | OFPPC_NO_FWD | \
                    OFPPC_NO_PACKET_IN))
 
+#define OFPPS_LINK_DOWN   (1U << 0)
+#define OFPPS_BLOCKED     (1U << 1)
+#define OFPPS_LIVE        (1U << 2)
+static const struct tok ofpps_bm[] = {
+	{ OFPPS_LINK_DOWN, "LINK_DOWN" },
+	{ OFPPS_BLOCKED,   "BLOCKED"   },
+	{ OFPPS_LIVE,      "LIVE"      },
+	{ 0, NULL }
+};
+#define OFPPS_U (~(OFPPS_LINK_DOWN | OFPPS_BLOCKED | OFPPS_LIVE))
+
 #define OFPPF_10MB_HD    (1U <<  0)
 #define OFPPF_10MB_FD    (1U <<  1)
 #define OFPPF_100MB_HD   (1U <<  2)
@@ -231,6 +242,18 @@ static const struct tok ofpp_str[] = {
 	{ 0, NULL }
 };
 
+#define OFPCR_ROLE_NOCHANGE 0U
+#define OFPCR_ROLE_EQUAL    1U
+#define OFPCR_ROLE_MASTER   2U
+#define OFPCR_ROLE_SLAVE    3U
+static const struct tok ofpcr_str[] = {
+	{ OFPCR_ROLE_NOCHANGE, "NOCHANGE" },
+	{ OFPCR_ROLE_EQUAL,    "EQUAL"    },
+	{ OFPCR_ROLE_MASTER,   "MASTER"   },
+	{ OFPCR_ROLE_SLAVE,    "SLAVE"    },
+	{ 0, NULL }
+};
+
 #define OF_BIT_VER_1_0 (1U << (OF_VER_1_0 - 1))
 #define OF_BIT_VER_1_1 (1U << (OF_VER_1_1 - 1))
 #define OF_BIT_VER_1_2 (1U << (OF_VER_1_2 - 1))
@@ -248,6 +271,16 @@ static const struct tok ofverbm_str[] = {
 };
 #define OF_BIT_VER_U (~(OF_BIT_VER_1_0 | OF_BIT_VER_1_1 | OF_BIT_VER_1_2 | \
                         OF_BIT_VER_1_3 | OF_BIT_VER_1_4 | OF_BIT_VER_1_5))
+
+#define OFPPR_ADD    0U
+#define OFPPR_DELETE 1U
+#define OFPPR_MODIFY 2U
+static const struct tok ofppr_str[] = {
+	{ OFPPR_ADD,    "ADD"    },
+	{ OFPPR_DELETE, "DELETE" },
+	{ OFPPR_MODIFY, "MODIFY" },
+	{ 0, NULL }
+};
 
 #define OFPET_HELLO_FAILED           0U
 #define OFPET_BAD_REQUEST            1U
@@ -587,13 +620,76 @@ static const struct uint_tokary of13_ofpet2tokary[] = {
 #define OF_PORT_MOD_FIXLEN                    40U
 #define OF_SWITCH_CONFIG_MSG_FIXLEN           12U
 #define OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN    16U
+#define OF_ROLE_MSG_FIXLEN                    24U
+#define OF_PORT_STATUS_FIXLEN                 80U
 #define OF_EXPERIMENTER_MSG_MINLEN            16U
+
+/* miscellaneous constants from [OF13] */
+#define OFP_MAX_PORT_NAME_LEN                 16U
 
 /* [OF13] Section A.1 */
 const char *
 of13_msgtype_str(const uint8_t type)
 {
 	return tok2str(ofpt_str, "invalid (0x%02x)", type);
+}
+
+/* [OF13] Section 7.2.1 */
+static void
+of13_port_print(netdissect_options *ndo,
+                const u_char *cp)
+{
+	/* port_no */
+	ND_PRINT("\n\t  port_no %s",
+		 tok2str(ofpp_str, "%u", GET_BE_U_4(cp)));
+	cp += 4;
+	/* pad */
+	cp += 4;
+	/* hw_addr */
+	ND_PRINT(", hw_addr %s", GET_ETHERADDR_STRING(cp));
+	cp += MAC_ADDR_LEN;
+	/* pad2 */
+	cp += 2;
+	/* name */
+	ND_PRINT(", name '");
+	(void)nd_print(ndo, cp, cp + OFP_MAX_PORT_NAME_LEN);
+	ND_PRINT("'");
+	cp += OFP_MAX_PORT_NAME_LEN;
+
+	if (ndo->ndo_vflag < 2) {
+		ND_TCHECK_LEN(cp, 32);
+		return;
+	}
+
+	/* config */
+	ND_PRINT("\n\t   config 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, ofppc_bm, GET_BE_U_4(cp), OFPPC_U);
+	cp += 4;
+	/* state */
+	ND_PRINT("\n\t   state 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, ofpps_bm, GET_BE_U_4(cp), OFPPS_U);;
+	cp += 4;
+	/* curr */
+	ND_PRINT("\n\t   curr 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
+	cp += 4;
+	/* advertised */
+	ND_PRINT("\n\t   advertised 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
+	cp += 4;
+	/* supported */
+	ND_PRINT("\n\t   supported 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
+	cp += 4;
+	/* peer */
+	ND_PRINT("\n\t   peer 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
+	cp += 4;
+	/* curr_speed */
+	ND_PRINT("\n\t   curr_speed %ukbps", GET_BE_U_4(cp));
+	cp += 4;
+	/* max_speed */
+	ND_PRINT("\n\t   max_speed %ukbps", GET_BE_U_4(cp));
 }
 
 /* [OF13] Section 7.3.1 */
@@ -637,6 +733,21 @@ of13_switch_config_msg_print(netdissect_options *ndo,
 	         tok2str(ofpcml_str, "%u", GET_BE_U_2(cp)));
 }
 
+/* [OF13] Section 7.3.9 */
+static void
+of13_role_msg_print(netdissect_options *ndo,
+                    const u_char *cp)
+{
+	/* role */
+	ND_PRINT("\n\t role %s",
+	         tok2str(ofpcr_str, "invalid (0x%08x)", GET_BE_U_4(cp)));
+	cp += 4;
+	/* pad */
+	cp += 4;
+	/* generation_id */
+	ND_PRINT(", generation_id 0x%016" PRIx64, GET_BE_U_8(cp));
+}
+
 /* [OF13] Section 7.3.4.3 */
 static void
 of13_port_mod_print(netdissect_options *ndo,
@@ -667,6 +778,21 @@ of13_port_mod_print(netdissect_options *ndo,
 	/* pad3 */
 	/* Always the last field, check bounds. */
 	ND_TCHECK_4(cp);
+}
+
+/* [OF13] Section 7.4.3 */
+static void
+of13_port_status_print(netdissect_options *ndo,
+                       const u_char *cp)
+{
+	/* reason */
+	ND_PRINT("\n\t reason %s",
+	         tok2str(ofppr_str, "invalid (0x02x)", GET_U_1(cp)));
+	cp += 1;
+	/* pad */
+	cp += 7;
+	/* desc */
+	of13_port_print(ndo, cp);
 }
 
 /* [OF13] Section 7.5.1 */
@@ -818,6 +944,21 @@ of13_message_print(netdissect_options *ndo,
 		if (ndo->ndo_vflag < 1)
 			break;
 		of13_port_mod_print(ndo, cp, len);
+		return;
+	case OFPT_ROLE_REQUEST: /* [OF13] Section 7.3.9 */
+	case OFPT_ROLE_REPLY: /* ibid */
+		if (len != OF_ROLE_MSG_FIXLEN - OF_HEADER_FIXLEN)
+			goto invalid;
+		if (ndo->ndo_vflag < 1)
+			break;
+		of13_role_msg_print(ndo, cp);
+		return;
+	case OFPT_PORT_STATUS: /* [OF13] Section 7.4.3 */
+		if (len != OF_PORT_STATUS_FIXLEN - OF_HEADER_FIXLEN)
+			goto invalid;
+		if (ndo->ndo_vflag < 1)
+			break;
+		of13_port_status_print(ndo, cp);
 		return;
 
 	/* OpenFlow header and variable-size data. */
