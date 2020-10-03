@@ -667,9 +667,7 @@ ns_rprint(netdissect_options *ndo,
 	case T_NS:
 	case T_CNAME:
 	case T_PTR:
-#ifdef T_DNAME
 	case T_DNAME:
-#endif
 		ND_PRINT(" ");
 		if (fqdn_print(ndo, cp, bp) == NULL)
 			return(NULL);
