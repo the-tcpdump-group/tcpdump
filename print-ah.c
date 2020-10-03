@@ -46,7 +46,6 @@ ah_print(netdissect_options *ndo, const u_char *bp)
 	ndo->ndo_protocol = "ah";
 	ah = (const struct ah *)bp;
 
-	ND_TCHECK_SIZE(ah);
 	nd_print_protocol_caps(ndo);
 /*
  * RFC4302
@@ -73,7 +72,4 @@ ah_print(netdissect_options *ndo, const u_char *bp)
 	ND_PRINT("): ");
 
 	return ah_hdr_len;
-trunc:
-	nd_print_trunc(ndo);
-	return -1;
 }
