@@ -1052,69 +1052,59 @@ of10_packet_data_print(netdissect_options *ndo,
 
 /* [OF10] Section 5.2.1 */
 static void
-of10_phy_ports_print(netdissect_options *ndo,
-                     const u_char *cp, u_int len)
+of10_phy_port_print(netdissect_options *ndo,
+                    const u_char *cp)
 {
-	while (len) {
-		uint32_t state;
+	uint32_t state;
 
-		if (len < OF_PHY_PORT_FIXLEN)
-			goto invalid;
-		/* port_no */
-		ND_PRINT("\n\t  port_no %s",
-			 tok2str(ofpp_str, "%u", GET_BE_U_2(cp)));
-		OF_FWD(2);
-		/* hw_addr */
-		ND_PRINT(", hw_addr %s", GET_ETHERADDR_STRING(cp));
-		OF_FWD(MAC_ADDR_LEN);
-		/* name */
-		ND_PRINT(", name '");
-		(void)nd_print(ndo, cp, cp + OFP_MAX_PORT_NAME_LEN);
-		ND_PRINT("'");
-		OF_FWD(OFP_MAX_PORT_NAME_LEN);
+	/* port_no */
+	ND_PRINT("\n\t  port_no %s",
+		 tok2str(ofpp_str, "%u", GET_BE_U_2(cp)));
+	cp += 2;
+	/* hw_addr */
+	ND_PRINT(", hw_addr %s", GET_ETHERADDR_STRING(cp));
+	cp += MAC_ADDR_LEN;
+	/* name */
+	ND_PRINT(", name '");
+	(void)nd_print(ndo, cp, cp + OFP_MAX_PORT_NAME_LEN);
+	ND_PRINT("'");
+	cp += OFP_MAX_PORT_NAME_LEN;
 
-		if (ndo->ndo_vflag < 2) {
-			OF_CHK_FWD(24);
-			continue;
-		}
-		/* config */
-		ND_PRINT("\n\t   config 0x%08x", GET_BE_U_4(cp));
-		of_bitmap_print(ndo, ofppc_bm, GET_BE_U_4(cp), OFPPC_U);
-		OF_FWD(4);
-		/* state */
-		state = GET_BE_U_4(cp);
-		/*
-		 * Decode the code point and the single bit separately, but
-		 * format the result as a single sequence of comma-separated
-		 * strings (see the comments at the OFPPS_ props).
-		 */
-		ND_PRINT("\n\t   state 0x%08x (%s%s)%s", state,
-		         tok2str(ofpps_stp_str, "", state & OFPPS_STP_MASK),
-		         state & OFPPS_LINK_DOWN ? ", LINK_DOWN" : "",
-		         state & OFPPS_U ? " (bogus)" : "");
-		OF_FWD(4);
-		/* curr */
-		ND_PRINT("\n\t   curr 0x%08x", GET_BE_U_4(cp));
-		of_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
-		OF_FWD(4);
-		/* advertised */
-		ND_PRINT("\n\t   advertised 0x%08x", GET_BE_U_4(cp));
-		of_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
-		OF_FWD(4);
-		/* supported */
-		ND_PRINT("\n\t   supported 0x%08x", GET_BE_U_4(cp));
-		of_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
-		OF_FWD(4);
-		/* peer */
-		ND_PRINT("\n\t   peer 0x%08x", GET_BE_U_4(cp));
-		of_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
-		OF_FWD(4);
-	} /* while */
-	return;
-
-invalid: /* skip the undersized trailing data */
-	nd_print_invalid(ndo);
-	ND_TCHECK_LEN(cp, len);
+	if (ndo->ndo_vflag < 2) {
+		ND_TCHECK_LEN(cp, 24);
+		return;
+	}
+	/* config */
+	ND_PRINT("\n\t   config 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, ofppc_bm, GET_BE_U_4(cp), OFPPC_U);
+	cp += 4;
+	/* state */
+	state = GET_BE_U_4(cp);
+	/*
+	 * Decode the code point and the single bit separately, but
+	 * format the result as a single sequence of comma-separated
+	 * strings (see the comments at the OFPPS_ props).
+	 */
+	ND_PRINT("\n\t   state 0x%08x (%s%s)%s", state,
+	         tok2str(ofpps_stp_str, "", state & OFPPS_STP_MASK),
+	         state & OFPPS_LINK_DOWN ? ", LINK_DOWN" : "",
+	         state & OFPPS_U ? " (bogus)" : "");
+	cp += 4;
+	/* curr */
+	ND_PRINT("\n\t   curr 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
+	cp += 4;
+	/* advertised */
+	ND_PRINT("\n\t   advertised 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
+	cp += 4;
+	/* supported */
+	ND_PRINT("\n\t   supported 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
+	cp += 4;
+	/* peer */
+	ND_PRINT("\n\t   peer 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
 }
 
 /* [OF10] Section 5.2.2 */
@@ -1494,7 +1484,17 @@ of10_features_reply_print(netdissect_options *ndo,
 	of_bitmap_print(ndo, ofpat_bm, GET_BE_U_4(cp), OFPAT_U);
 	OF_FWD(4);
 	/* ports */
-	of10_phy_ports_print(ndo, cp, len);
+	while (len) {
+		if (len < OF_PHY_PORT_FIXLEN)
+			goto invalid;
+		of10_phy_port_print(ndo, cp);
+		OF_FWD(OF_PHY_PORT_FIXLEN);
+	}
+	return;
+
+invalid: /* skip the undersized trailing data */
+	nd_print_invalid(ndo);
+	ND_TCHECK_LEN(cp, len);
 }
 
 /* [OF10] Section 5.3.3 */
@@ -2150,7 +2150,7 @@ of10_message_print(netdissect_options *ndo,
 		/* No need to check bounds, more data follows. */
 		OF_FWD(7);
 		/* desc */
-		of10_phy_ports_print(ndo, cp, len);
+		of10_phy_port_print(ndo, cp);
 		return;
 
 	/* OpenFlow header, fixed-size message body and n * fixed-size data units. */
