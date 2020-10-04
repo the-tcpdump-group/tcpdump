@@ -97,31 +97,7 @@
 #define OFPT_BARRIER_REPLY            0x13
 #define OFPT_QUEUE_GET_CONFIG_REQUEST 0x14
 #define OFPT_QUEUE_GET_CONFIG_REPLY   0x15
-static const struct tok ofpt_str[] = {
-	{ OFPT_HELLO,                    "HELLO"                    },
-	{ OFPT_ERROR,                    "ERROR"                    },
-	{ OFPT_ECHO_REQUEST,             "ECHO_REQUEST"             },
-	{ OFPT_ECHO_REPLY,               "ECHO_REPLY"               },
-	{ OFPT_VENDOR,                   "VENDOR"                   },
-	{ OFPT_FEATURES_REQUEST,         "FEATURES_REQUEST"         },
-	{ OFPT_FEATURES_REPLY,           "FEATURES_REPLY"           },
-	{ OFPT_GET_CONFIG_REQUEST,       "GET_CONFIG_REQUEST"       },
-	{ OFPT_GET_CONFIG_REPLY,         "GET_CONFIG_REPLY"         },
-	{ OFPT_SET_CONFIG,               "SET_CONFIG"               },
-	{ OFPT_PACKET_IN,                "PACKET_IN"                },
-	{ OFPT_FLOW_REMOVED,             "FLOW_REMOVED"             },
-	{ OFPT_PORT_STATUS,              "PORT_STATUS"              },
-	{ OFPT_PACKET_OUT,               "PACKET_OUT"               },
-	{ OFPT_FLOW_MOD,                 "FLOW_MOD"                 },
-	{ OFPT_PORT_MOD,                 "PORT_MOD"                 },
-	{ OFPT_STATS_REQUEST,            "STATS_REQUEST"            },
-	{ OFPT_STATS_REPLY,              "STATS_REPLY"              },
-	{ OFPT_BARRIER_REQUEST,          "BARRIER_REQUEST"          },
-	{ OFPT_BARRIER_REPLY,            "BARRIER_REPLY"            },
-	{ OFPT_QUEUE_GET_CONFIG_REQUEST, "QUEUE_GET_CONFIG_REQUEST" },
-	{ OFPT_QUEUE_GET_CONFIG_REPLY,   "QUEUE_GET_CONFIG_REPLY"   },
-	{ 0, NULL }
-};
+#define OFPT_MAX                      OFPT_QUEUE_GET_CONFIG_REPLY
 
 #define OFPPC_PORT_DOWN    (1U <<0)
 #define OFPPC_NO_STP       (1U <<1)
@@ -696,12 +672,6 @@ static const struct tok bsn_onoff_str[] = {
 	{ 1, "ON"  },
 	{ 0, NULL },
 };
-
-/* [OF10] Section 5.1 */
-const char * of10_msgtype_str(const uint8_t type)
-{
-	return tok2str(ofpt_str, "invalid (0x%02x)", type);
-}
 
 static const char *
 vlan_str(const uint16_t vid)
@@ -2127,169 +2097,191 @@ of10_error_print(netdissect_options *ndo,
 	of_data_print(ndo, cp, len);
 }
 
-void
-of10_message_print(netdissect_options *ndo,
-                   const u_char *cp, uint16_t len, const uint8_t type)
+static const struct of_msgtypeinfo of10_msgtypeinfo[OFPT_MAX + 1] = {
+	/*
+	 * [OF10] Section 5.5.1
+	 * Variable-size data.
+	 */
+	{
+		"HELLO",                    of_data_print,
+		REQ_MINLEN,                 0
+	},
+	/*
+	 * [OF10] Section 5.4.4
+	 * A fixed-size message body and variable-size data.
+	 */
+	{
+		"ERROR",                    of10_error_print,
+		REQ_MINLEN,                 OF_ERROR_MSG_MINLEN
+	},
+	/*
+	 * [OF10] Section 5.5.2
+	 * Variable-size data.
+	 */
+	{
+		"ECHO_REQUEST",             of_data_print,
+		REQ_MINLEN,                 0
+	},
+	/*
+	 * [OF10] Section 5.5.3
+	 * Variable-size data.
+	 */
+	{
+		"ECHO_REPLY",               of_data_print,
+		REQ_MINLEN,                 0
+	},
+	/*
+	 * [OF10] Section 5.5.4
+	 * A fixed-size message body and variable-size data.
+	 */
+	{
+		"VENDOR",                   of10_vendor_message_print,
+		REQ_MINLEN,                 OF_VENDOR_MINLEN
+	},
+	/*
+	 * [OF10] Section 5.3.1
+	 * No message body.
+	 */
+	{
+		"FEATURES_REQUEST",         NULL,
+		REQ_FIXLEN,                 0
+	},
+	/*
+	 * [OF10] Section 5.3.1
+	 * A fixed-size message body and n * fixed-size data units.
+	 */
+	{
+		"FEATURES_REPLY",           of10_features_reply_print,
+		REQ_MINLEN,                 OF_FEATURES_REPLY_MINLEN
+	},
+	/*
+	 * [OF10] Section 5.3.2
+	 * No message body.
+	 */
+	{
+		"GET_CONFIG_REQUEST",       NULL,
+		REQ_FIXLEN,                 0
+	},
+	/*
+	 * [OF10] Section 5.3.2
+	 * A fixed-size message body.
+	 */
+	{
+		"GET_CONFIG_REPLY",         of10_switch_config_msg_print,
+		REQ_FIXLEN,                 OF_SWITCH_CONFIG_FIXLEN
+	},
+	/*
+	 * [OF10] Section 5.3.2
+	 * A fixed-size message body.
+	 */
+	{
+		"SET_CONFIG",               of10_switch_config_msg_print,
+		REQ_FIXLEN,                 OF_SWITCH_CONFIG_FIXLEN
+	},
+	/*
+	 * [OF10] Section 5.4.1
+	 * A fixed-size message body and variable-size data.
+	 * (The 2 mock octets count in OF_PACKET_IN_MINLEN only.)
+	 */
+	{
+		"PACKET_IN",                of10_packet_in_print,
+		REQ_MINLEN,                 OF_PACKET_IN_MINLEN - 2
+	},
+	/*
+	 * [OF10] Section 5.4.2
+	 * A fixed-size message body.
+	 */
+	{
+		"FLOW_REMOVED",             of10_flow_removed_print,
+		REQ_FIXLEN,                 OF_FLOW_REMOVED_FIXLEN
+	},
+	/*
+	 * [OF10] Section 5.4.3
+	 * A fixed-size message body.
+	 */
+	{
+		"PORT_STATUS",              of10_port_status_print,
+		REQ_FIXLEN,                 OF_PORT_STATUS_FIXLEN
+	},
+	/*
+	 * [OF10] Section 5.3.6
+	 * A fixed-size message body, n * variable-size data units and
+	 * variable-size data.
+	 */
+	{
+		"PACKET_OUT",               of10_packet_out_print,
+		REQ_MINLEN,                 OF_PACKET_OUT_MINLEN
+	},
+	/*
+	 * [OF10] Section 5.3.3
+	 * A fixed-size message body and n * variable-size data units.
+	 */
+	{
+		"FLOW_MOD",                 of10_flow_mod_print,
+		REQ_MINLEN,                 OF_FLOW_MOD_MINLEN
+	},
+	/*
+	 * [OF10] Section 5.3.3
+	 * A fixed-size message body.
+	 */
+	{
+		"PORT_MOD",                 of10_port_mod_print,
+		REQ_FIXLEN,                 OF_PORT_MOD_FIXLEN
+	},
+	/*
+	 * [OF10] Section 5.3.5
+	 * A fixed-size message body and possibly more data of varying size
+	 * and structure.
+	 */
+	{
+		"STATS_REQUEST",            of10_stats_request_print,
+		REQ_MINLEN,                 OF_STATS_REQUEST_MINLEN
+	},
+	/*
+	 * [OF10] Section 5.3.5
+	 * A fixed-size message body and possibly more data of varying size
+	 * and structure.
+	 */
+	{
+		"STATS_REPLY",              of10_stats_reply_print,
+		REQ_MINLEN,                 OF_STATS_REPLY_MINLEN
+	},
+	/*
+	 * [OF10] Section 5.3.7
+	 * No message body.
+	 */
+	{
+		"BARRIER_REQUEST",          NULL,
+		REQ_FIXLEN,                 0
+	},
+	/*
+	 * [OF10] Section 5.3.7
+	 * No message body.
+	 */
+	{
+		"BARRIER_REPLY",            NULL,
+		REQ_FIXLEN,                 0
+	},
+	/*
+	 * [OF10] Section 5.3.4
+	 * A fixed-size message body.
+	 */
+	{
+		"QUEUE_GET_CONFIG_REQUEST", of10_queue_get_config_request_print,
+		REQ_FIXLEN,                 OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN
+	},
+	/*
+	 * [OF10] Section 5.3.4
+	 * A fixed-size message body and n * variable-size data units.
+	 */
+	{
+		"QUEUE_GET_CONFIG_REPLY",   of10_queue_get_config_reply_print,
+		REQ_MINLEN,                 OF_QUEUE_GET_CONFIG_REPLY_MINLEN
+	},
+};
+
+const struct of_msgtypeinfo *
+of10_identify_msgtype(const uint8_t type)
 {
-	/*
-	 * Here "cp" and "len" stand for the message part beyond the common
-	 * OpenFlow 1.0 header, if any.
-	 *
-	 * Most message types are longer than just the header, and the length
-	 * constraints may be complex. When possible, validate the constraint
-	 * completely here, otherwise check that the message is long enough to
-	 * begin the decoding and let the lower-layer function do any remaining
-	 * validation.
-	 */
-	switch (type) {
-	/* OpenFlow header only. */
-	case OFPT_FEATURES_REQUEST: /* [OF10] Section 5.3.1 */
-	case OFPT_GET_CONFIG_REQUEST: /* [OF10] Section 5.3.2 */
-	case OFPT_BARRIER_REQUEST: /* [OF10] Section 5.3.7 */
-	case OFPT_BARRIER_REPLY: /* ibid */
-		if (len)
-			goto invalid;
-		return;
-
-	/* OpenFlow header and fixed-size message body. */
-	case OFPT_SET_CONFIG: /* [OF10] Section 5.3.2 */
-	case OFPT_GET_CONFIG_REPLY: /* ibid */
-		if (len != OF_SWITCH_CONFIG_FIXLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of10_switch_config_msg_print(ndo, cp, len);
-		return;
-	case OFPT_PORT_MOD:
-		if (len != OF_PORT_MOD_FIXLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of10_port_mod_print(ndo, cp, len);
-		return;
-	case OFPT_QUEUE_GET_CONFIG_REQUEST: /* [OF10] Section 5.3.4 */
-		if (len != OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of10_queue_get_config_request_print(ndo, cp, len);
-		return;
-	case OFPT_FLOW_REMOVED:
-		if (len != OF_FLOW_REMOVED_FIXLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of10_flow_removed_print(ndo, cp, len);
-		return;
-	case OFPT_PORT_STATUS: /* [OF10] Section 5.4.3 */
-		if (len != OF_PORT_STATUS_FIXLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of10_port_status_print(ndo, cp, len);
-		return;
-
-	/* OpenFlow header, fixed-size message body and n * fixed-size data units. */
-	case OFPT_FEATURES_REPLY:
-		if (len < OF_FEATURES_REPLY_MINLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of10_features_reply_print(ndo, cp, len);
-		return;
-
-	/* OpenFlow header and variable-size data. */
-	case OFPT_HELLO: /* [OF10] Section 5.5.1 */
-	case OFPT_ECHO_REQUEST: /* [OF10] Section 5.5.2 */
-	case OFPT_ECHO_REPLY: /* [OF10] Section 5.5.3 */
-		if (ndo->ndo_vflag < 1)
-			break;
-		of_data_print(ndo, cp, len);
-		return;
-
-	/* OpenFlow header, fixed-size message body and variable-size data. */
-	case OFPT_ERROR:
-		if (len < OF_ERROR_MSG_MINLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of10_error_print(ndo, cp, len);
-		return;
-	case OFPT_VENDOR:
-		/* [OF10] Section 5.5.4 */
-		if (len < OF_VENDOR_MINLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of10_vendor_message_print(ndo, cp, len);
-		return;
-	case OFPT_PACKET_IN:
-		/* 2 mock octets count in OF_PACKET_IN_MINLEN but not in len */
-		if (len < OF_PACKET_IN_MINLEN - 2)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of10_packet_in_print(ndo, cp, len);
-		return;
-
-	/* a. OpenFlow header. */
-	/* b. OpenFlow header and one of the fixed-size message bodies. */
-	/* c. OpenFlow header, fixed-size message body and variable-size data. */
-	case OFPT_STATS_REQUEST:
-		if (len < OF_STATS_REQUEST_MINLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of10_stats_request_print(ndo, cp, len);
-		return;
-
-	/* a. OpenFlow header and fixed-size message body. */
-	/* b. OpenFlow header and n * fixed-size data units. */
-	/* c. OpenFlow header and n * variable-size data units. */
-	/* d. OpenFlow header, fixed-size message body and variable-size data. */
-	case OFPT_STATS_REPLY:
-		if (len < OF_STATS_REPLY_MINLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of10_stats_reply_print(ndo, cp, len);
-		return;
-
-	/* OpenFlow header and n * variable-size data units and variable-size data. */
-	case OFPT_PACKET_OUT:
-		if (len < OF_PACKET_OUT_MINLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of10_packet_out_print(ndo, cp, len);
-		return;
-
-	/* OpenFlow header, fixed-size message body and n * variable-size data units. */
-	case OFPT_FLOW_MOD:
-		if (len < OF_FLOW_MOD_MINLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of10_flow_mod_print(ndo, cp, len);
-		return;
-
-	/* OpenFlow header, fixed-size message body and n * variable-size data units. */
-	case OFPT_QUEUE_GET_CONFIG_REPLY: /* [OF10] Section 5.3.4 */
-		if (len < OF_QUEUE_GET_CONFIG_REPLY_MINLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of10_queue_get_config_reply_print(ndo, cp, len);
-		return;
-	} /* switch (type) */
-	/*
-	 * Not a recognised type or did not print the details, fall back to
-	 * a bounds check.
-	 */
-	ND_TCHECK_LEN(cp, len);
-	return;
-
-invalid: /* skip the message body */
-	nd_print_invalid(ndo);
-	ND_TCHECK_LEN(cp, len);
+	return type <= OFPT_MAX ? &of10_msgtypeinfo[type] : NULL;
 }

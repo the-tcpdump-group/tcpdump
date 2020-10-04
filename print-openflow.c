@@ -103,6 +103,41 @@ of_data_print(netdissect_options *ndo,
 		ND_TCHECK_LEN(cp, len);
 }
 
+static void
+of_message_print(netdissect_options *ndo,
+                 const u_char *cp, uint16_t len,
+                 const struct of_msgtypeinfo *mti)
+{
+	/*
+	 * Here "cp" and "len" stand for the message part beyond the common
+	 * OpenFlow 1.0 header, if any.
+	 *
+	 * Most message types are longer than just the header, and the length
+	 * constraints may be complex. When possible, validate the constraint
+	 * completely here (REQ_FIXLEN), otherwise check that the message is
+	 * long enough to begin the decoding (REQ_MINLEN) and have the
+	 * type-specific function do any remaining validation.
+	 */
+
+	if (!mti)
+		goto tcheck_remainder;
+
+	if ((mti->req_what == REQ_FIXLEN && len != mti->req_value) ||
+	    (mti->req_what == REQ_MINLEN && len <  mti->req_value))
+		goto invalid;
+
+	if (!ndo->ndo_vflag || !mti->decoder)
+		goto tcheck_remainder;
+
+	mti->decoder(ndo, cp, len);
+	return;
+
+invalid:
+	nd_print_invalid(ndo);
+tcheck_remainder:
+	ND_TCHECK_LEN(cp, len);
+}
+
 /* Print a TCP segment worth of OpenFlow messages presuming the segment begins
  * on a message boundary. */
 void
@@ -114,8 +149,7 @@ openflow_print(netdissect_options *ndo, const u_char *cp, u_int len)
 		/* Print a single OpenFlow message. */
 		uint8_t version, type;
 		uint16_t length;
-		void (*decoder)(struct netdissect_options *,
-		                const u_char *, uint16_t, const uint8_t) = NULL;
+		const struct of_msgtypeinfo *mti;
 
 		/* version */
 		version = GET_U_1(cp);
@@ -127,18 +161,14 @@ openflow_print(netdissect_options *ndo, const u_char *cp, u_int len)
 			goto partial_header;
 		type = GET_U_1(cp);
 		OF_FWD(1);
-		switch (version) {
-		case OF_VER_1_0:
-			ND_PRINT(", type %s", of10_msgtype_str(type));
-			decoder = of10_message_print;
-			break;
-		case OF_VER_1_3:
-			ND_PRINT(", type %s", of13_msgtype_str(type));
-			decoder = of13_message_print;
-			break;
-		default:
+		mti =
+			version == OF_VER_1_0 ? of10_identify_msgtype(type) :
+			version == OF_VER_1_3 ? of13_identify_msgtype(type) :
+			NULL;
+		if (mti && mti->name)
+			ND_PRINT(", type %s", mti->name);
+		else
 			ND_PRINT(", type unknown (0x%02x)", type);
-		}
 		/* length */
 		if (len < 2)
 			goto partial_header;
@@ -181,10 +211,7 @@ openflow_print(netdissect_options *ndo, const u_char *cp, u_int len)
 		if (length < OF_HEADER_FIXLEN)
 			goto invalid;
 
-		if (decoder != NULL)
-			decoder(ndo, cp, length - OF_HEADER_FIXLEN, type);
-		else
-			ND_TCHECK_LEN(cp, length - OF_HEADER_FIXLEN);
+		of_message_print(ndo, cp, length - OF_HEADER_FIXLEN, mti);
 		if (length - OF_HEADER_FIXLEN > len)
 			break;
 		OF_FWD(length - OF_HEADER_FIXLEN);

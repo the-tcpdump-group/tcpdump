@@ -3,7 +3,7 @@
  * protocol 0x04). It is based on the implementation conventions explained in
  * print-openflow-1.0.c.
  *
- * [OF13] https://www.opennetworking.org/wp-content/uploads/2014/10/openflow-switch-v1.3.4.pdf
+ * [OF13] https://www.opennetworking.org/wp-content/uploads/2014/10/openflow-switch-v1.3.5.pdf
  *
  * Copyright (c) 2020 The TCPDUMP project
  * All rights reserved.
@@ -75,39 +75,7 @@
 #define OFPT_GET_ASYNC_REPLY          27U
 #define OFPT_SET_ASYNC                28U
 #define OFPT_METER_MOD                29U
-static const struct tok ofpt_str[] = {
-	{ OFPT_HELLO,                    "HELLO"                    },
-	{ OFPT_ERROR,                    "ERROR"                    },
-	{ OFPT_ECHO_REQUEST,             "ECHO_REQUEST"             },
-	{ OFPT_ECHO_REPLY,               "ECHO_REPLY"               },
-	{ OFPT_EXPERIMENTER,             "EXPERIMENTER"             },
-	{ OFPT_FEATURES_REQUEST,         "FEATURES_REQUEST"         },
-	{ OFPT_FEATURES_REPLY,           "FEATURES_REPLY"           },
-	{ OFPT_GET_CONFIG_REQUEST,       "GET_CONFIG_REQUEST"       },
-	{ OFPT_GET_CONFIG_REPLY,         "GET_CONFIG_REPLY"         },
-	{ OFPT_SET_CONFIG,               "SET_CONFIG"               },
-	{ OFPT_PACKET_IN,                "PACKET_IN"                },
-	{ OFPT_FLOW_REMOVED,             "FLOW_REMOVED"             },
-	{ OFPT_PORT_STATUS,              "PORT_STATUS"              },
-	{ OFPT_PACKET_OUT,               "PACKET_OUT"               },
-	{ OFPT_FLOW_MOD,                 "FLOW_MOD"                 },
-	{ OFPT_GROUP_MOD,                "GROUP_MOD"                },
-	{ OFPT_PORT_MOD,                 "PORT_MOD"                 },
-	{ OFPT_TABLE_MOD,                "TABLE_MOD"                },
-	{ OFPT_MULTIPART_REQUEST,        "MULTIPART_REQUEST"        },
-	{ OFPT_MULTIPART_REPLY,          "MULTIPART_REPLY"          },
-	{ OFPT_BARRIER_REQUEST,          "BARRIER_REQUEST"          },
-	{ OFPT_BARRIER_REPLY,            "BARRIER_REPLY"            },
-	{ OFPT_QUEUE_GET_CONFIG_REQUEST, "QUEUE_GET_CONFIG_REQUEST" },
-	{ OFPT_QUEUE_GET_CONFIG_REPLY,   "QUEUE_GET_CONFIG_REPLY"   },
-	{ OFPT_ROLE_REQUEST,             "ROLE_REQUEST"             },
-	{ OFPT_ROLE_REPLY,               "ROLE_REPLY"               },
-	{ OFPT_GET_ASYNC_REQUEST,        "GET_ASYNC_REQUEST"        },
-	{ OFPT_GET_ASYNC_REPLY,          "GET_ASYNC_REPLY"          },
-	{ OFPT_SET_ASYNC,                "SET_ASYNC"                },
-	{ OFPT_METER_MOD,                "METER_MOD"                },
-	{ 0, NULL }
-};
+#define OFPT_MAX                      OFPT_METER_MOD
 
 #define OFPC_FLOW_STATS   (1U <<0)
 #define OFPC_TABLE_STATS  (1U <<1)
@@ -675,13 +643,6 @@ static const struct uint_tokary of13_ofpet2tokary[] = {
 /* miscellaneous constants from [OF13] */
 #define OFP_MAX_PORT_NAME_LEN                 16U
 
-/* [OF13] Section A.1 */
-const char *
-of13_msgtype_str(const uint8_t type)
-{
-	return tok2str(ofpt_str, "invalid (0x%02x)", type);
-}
-
 /* [OF13] Section 7.2.1 */
 static void
 of13_port_print(netdissect_options *ndo,
@@ -960,7 +921,7 @@ of13_experimenter_message_print(netdissect_options *ndo,
 	of_data_print(ndo, cp, len);
 }
 
-/* [OF13] Section A.3.6 */
+/* [OF13] Section 7.3.6 */
 static void
 of13_queue_get_config_request_print(netdissect_options *ndo,
                                     const u_char *cp, u_int len _U_)
@@ -973,7 +934,7 @@ of13_queue_get_config_request_print(netdissect_options *ndo,
 	ND_TCHECK_4(cp);
 }
 
-/* [OF13] Section A.4.4 */
+/* [OF13] Section 7.4.4 */
 static void
 of13_error_print(netdissect_options *ndo,
                  const u_char *cp, u_int len)
@@ -998,122 +959,251 @@ of13_error_print(netdissect_options *ndo,
 	of_data_print(ndo, cp, len);
 }
 
-void
-of13_message_print(netdissect_options *ndo,
-                   const u_char *cp, uint16_t len, const uint8_t type)
-{
-	/* See the comment at the beginning of of10_message_print(). */
-	switch (type) {
-	/* OpenFlow header only. */
-	case OFPT_FEATURES_REQUEST: /* [OF13] Section A.3.1 */
-	case OFPT_GET_CONFIG_REQUEST: /* [OF13] Section A.3.2 */
-	case OFPT_BARRIER_REQUEST: /* [OF13] Section A.3.8 */
-	case OFPT_BARRIER_REPLY: /* ibid */
-	case OFPT_GET_ASYNC_REQUEST: /* [OF13] Section 7.3.10 */
-		if (len)
-			goto invalid;
-		return;
-
-	/* OpenFlow header and fixed-size message body. */
-	case OFPT_FEATURES_REPLY:
-		if (len != OF_FEATURES_REPLY_FIXLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of13_features_reply_print(ndo, cp, len);
-		return;
-	case OFPT_QUEUE_GET_CONFIG_REQUEST: /* [OF13] Section A.3.6 */
-		if (len != OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of13_queue_get_config_request_print(ndo, cp, len);
-		return;
-	case OFPT_GET_CONFIG_REPLY: /* [OF13] Section 7.3.2 */
-	case OFPT_SET_CONFIG: /* ibid */
-		if (len != OF_SWITCH_CONFIG_MSG_FIXLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of13_switch_config_msg_print(ndo, cp, len);
-		return;
-	case OFPT_PORT_MOD: /* [OF13] Section 7.3.4.3 */
-		if (len != OF_PORT_MOD_FIXLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of13_port_mod_print(ndo, cp, len);
-		return;
-	case OFPT_ROLE_REQUEST: /* [OF13] Section 7.3.9 */
-	case OFPT_ROLE_REPLY: /* ibid */
-		if (len != OF_ROLE_MSG_FIXLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of13_role_msg_print(ndo, cp, len);
-		return;
-	case OFPT_PORT_STATUS: /* [OF13] Section 7.4.3 */
-		if (len != OF_PORT_STATUS_FIXLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of13_port_status_print(ndo, cp, len);
-		return;
-	case OFPT_TABLE_MOD: /* [OF13] Section 7.3.3 */
-		if (len != OF_TABLE_MOD_FIXLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of13_table_mod_print(ndo, cp, len);
-		return;
-	case OFPT_SET_ASYNC: /* [OF13] Section 7.3.10 */
-	case OFPT_GET_ASYNC_REPLY: /* ibid */
-		if (len != OF_ASYNC_MSG_FIXLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of13_async_msg_print(ndo, cp, len);
-		return;
-
-	/* OpenFlow header and variable-size data. */
-	case OFPT_ECHO_REQUEST: /* [OF13] Section A.5.2 */
-	case OFPT_ECHO_REPLY: /* [OF13] Section A.5.3 */
-		if (ndo->ndo_vflag < 1)
-			break;
-		of_data_print(ndo, cp, len);
-		return;
-
-	/* OpenFlow header and n * variable-size data units. */
-	case OFPT_HELLO: /* [OF13] Section A.5.1 */
-		if (ndo->ndo_vflag < 1)
-			break;
-		of13_hello_elements_print(ndo, cp, len);
-		return;
-
-	/* OpenFlow header, fixed-size message body and variable-size data. */
-	case OFPT_ERROR:
-		if (len < OF_ERROR_MSG_MINLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of13_error_print(ndo, cp, len);
-		return;
-	case OFPT_EXPERIMENTER: /* [OF13] Section 7.5.4 */
-		if (len < OF_EXPERIMENTER_MSG_MINLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of13_experimenter_message_print(ndo, cp, len);
-		return;
-	}
+static const struct of_msgtypeinfo of13_msgtypeinfo[OFPT_MAX + 1] = {
 	/*
-	 * Not a recognised type or did not print the details, fall back to
-	 * a bounds check.
+	 * [OF13] Section 7.5.1
+	 * n * variable-size data units.
 	 */
-	ND_TCHECK_LEN(cp, len);
-	return;
+	{
+		"HELLO",                    of13_hello_elements_print,
+		REQ_MINLEN,                 0
+	},
+	/*
+	 * [OF13] Section 7.4.4
+	 * A fixed-size message body and variable-size data.
+	 */
+	{
+		"ERROR",                    of13_error_print,
+		REQ_MINLEN,                 OF_ERROR_MSG_MINLEN
+	},
+	/*
+	 * [OF13] Section 7.5.2
+	 * Variable-size data.
+	 */
+	{
+		"ECHO_REQUEST",             of_data_print,
+		REQ_MINLEN,                 0
+	},
+	/*
+	 * [OF13] Section 7.5.3
+	 * Variable-size data.
+	 */
+	{
+		"ECHO_REPLY",               of_data_print,
+		REQ_MINLEN,                 0
+	},
+	/*
+	 * [OF13] Section 7.5.4
+	 * A fixed-size message body and variable-size data.
+	 */
+	{
+		"EXPERIMENTER",             of13_experimenter_message_print,
+		REQ_MINLEN,                 OF_EXPERIMENTER_MSG_MINLEN
+	},
+	/*
+	 * [OF13] Section 7.3.1
+	 * No message body.
+	 */
+	{
+		"FEATURES_REQUEST",         NULL,
+		REQ_FIXLEN,                 0
+	},
+	/*
+	 * [OF13] Section 7.3.1
+	 * A fixed-size message body.
+	 */
+	{
+		"FEATURES_REPLY",           of13_features_reply_print,
+		REQ_FIXLEN,                 OF_FEATURES_REPLY_FIXLEN
+	},
+	/*
+	 * [OF13] Section 7.3.2
+	 * No message body.
+	 */
+	{
+		"GET_CONFIG_REQUEST",       NULL,
+		REQ_FIXLEN,                 0
+	},
+	/*
+	 * [OF13] Section 7.3.2
+	 * A fixed-size message body.
+	 */
+	{
+		"GET_CONFIG_REPLY",         of13_switch_config_msg_print,
+		REQ_FIXLEN,                 OF_SWITCH_CONFIG_MSG_FIXLEN
+	},
+	/*
+	 * [OF13] Section 7.3.2
+	 * A fixed-size message body.
+	 */
+	{
+		"SET_CONFIG",               of13_switch_config_msg_print,
+		REQ_FIXLEN,                 OF_SWITCH_CONFIG_MSG_FIXLEN
+	},
+	/*
+	 * [OF13] Section 7.4.1
+	 * (to be done)
+	 */
+	{
+		"PACKET_IN",                NULL,
+		REQ_NONE,                   0
+	},
+	/*
+	 * [OF13] Section 7.4.2
+	 * (to be done)
+	 */
+	{
+		"FLOW_REMOVED",             NULL,
+		REQ_NONE,                   0
+	},
+	/*
+	 * [OF13] Section 7.4.3
+	 * A fixed-size message body.
+	 */
+	{
+		"PORT_STATUS",              of13_port_status_print,
+		REQ_FIXLEN,                 OF_PORT_STATUS_FIXLEN
+	},
+	/*
+	 * [OF13] Section 7.3.7
+	 * (to be done)
+	 */
+	{
+		"PACKET_OUT",               NULL,
+		REQ_NONE,                   0
+	},
+	/*
+	 * [OF13] Section 7.3.4.1
+	 * (to be done)
+	 */
+	{
+		"FLOW_MOD",                 NULL,
+		REQ_NONE,                   0
+	},
+	/*
+	 * [OF13] Section 7.3.4.2
+	 * (to be done)
+	 */
+	{
+		"GROUP_MOD",                NULL,
+		REQ_NONE,                   0
+	},
+	/*
+	 * [OF13] Section 7.3.4.3
+	 * A fixed-size message body.
+	 */
+	{
+		"PORT_MOD",                 of13_port_mod_print,
+		REQ_FIXLEN,                 OF_PORT_MOD_FIXLEN
+	},
+	/*
+	 * [OF13] Section 7.3.3
+	 * A fixed-size message body.
+	 */
+	{
+		"TABLE_MOD",                of13_table_mod_print,
+		REQ_FIXLEN,                 OF_TABLE_MOD_FIXLEN
+	},
+	/*
+	 * [OF13] Section 7.3.5
+	 * (to be done)
+	 */
+	{
+		"MULTIPART_REQUEST",        NULL,
+		REQ_NONE,                   0
+	},
+	/*
+	 * [OF13] Section 7.3.5
+	 * (to be done)
+	 */
+	{
+		"MULTIPART_REPLY",          NULL,
+		REQ_NONE,                   0
+	},
+	/*
+	 * [OF13] Section 7.3.8
+	 * No message body.
+	 */
+	{
+		"BARRIER_REQUEST",          NULL,
+		REQ_FIXLEN,                 0
+	},
+	/*
+	 * [OF13] Section 7.3.8
+	 * No message body.
+	 */
+	{
+		"BARRIER_REPLY",            NULL,
+		REQ_FIXLEN,                 0
+	},
+	/*
+	 * [OF13] Section 7.3.6
+	 * A fixed-size message body.
+	 */
+	{
+		"QUEUE_GET_CONFIG_REQUEST", of13_queue_get_config_request_print,
+		REQ_FIXLEN,                 OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN
+	},
+	/*
+	 * [OF13] Section 7.3.6
+	 * (to be done)
+	 */
+	{
+		"QUEUE_GET_CONFIG_REPLY",   NULL,
+		REQ_NONE,                   0
+	},
+	/*
+	 * [OF13] Section 7.3.9
+	 * A fixed-size message body.
+	 */
+	{
+		"ROLE_REQUEST",             of13_role_msg_print,
+		REQ_FIXLEN,                 OF_ROLE_MSG_FIXLEN
+	},
+	/*
+	 * [OF13] Section 7.3.9
+	 * A fixed-size message body.
+	 */
+	{
+		"ROLE_REPLY",               of13_role_msg_print,
+		REQ_FIXLEN,                 OF_ROLE_MSG_FIXLEN
+	},
+	/*
+	 * [OF13] Section 7.3.10
+	 * No message body.
+	 */
+	{
+		"GET_ASYNC_REQUEST",        NULL,
+		REQ_FIXLEN,                 0
+	},
+	/*
+	 * [OF13] Section 7.3.10
+	 * A fixed-size message body.
+	 */
+	{
+		"GET_ASYNC_REPLY",          of13_async_msg_print,
+		REQ_FIXLEN,                 OF_ASYNC_MSG_FIXLEN
+	},
+	/*
+	 * [OF13] Section 7.3.10
+	 * A fixed-size message body.
+	 */
+	{
+		"SET_ASYNC",                of13_async_msg_print,
+		REQ_FIXLEN,                 OF_ASYNC_MSG_FIXLEN
+	},
+	/*
+	 * [OF13] Section 7.3.4.4
+	 * (to be done)
+	 */
+	{
+		"METER_MOD",                NULL,
+		REQ_NONE,                   0
+	},
+};
 
-invalid: /* skip the message body */
-	nd_print_invalid(ndo);
-	ND_TCHECK_LEN(cp, len);
+const struct of_msgtypeinfo *
+of13_identify_msgtype(const uint8_t type)
+{
+	return type <= OFPT_MAX ? &of13_msgtypeinfo[type] : NULL;
 }
