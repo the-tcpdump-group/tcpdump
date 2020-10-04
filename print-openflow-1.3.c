@@ -657,18 +657,20 @@ static const struct uint_tokary of13_ofpet2tokary[] = {
 	/* uint2tokary() does not use array termination. */
 };
 
+/* lengths (fixed or minimal) of particular message types, where not 0 */
+#define OF_ERROR_MSG_MINLEN                   (12U - OF_HEADER_FIXLEN)
+#define OF_FEATURES_REPLY_FIXLEN              (32U - OF_HEADER_FIXLEN)
+#define OF_PORT_MOD_FIXLEN                    (40U - OF_HEADER_FIXLEN)
+#define OF_SWITCH_CONFIG_MSG_FIXLEN           (12U - OF_HEADER_FIXLEN)
+#define OF_TABLE_MOD_FIXLEN                   (16U - OF_HEADER_FIXLEN)
+#define OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN    (16U - OF_HEADER_FIXLEN)
+#define OF_ROLE_MSG_FIXLEN                    (24U - OF_HEADER_FIXLEN)
+#define OF_ASYNC_MSG_FIXLEN                   (32U - OF_HEADER_FIXLEN)
+#define OF_PORT_STATUS_FIXLEN                 (80U - OF_HEADER_FIXLEN)
+#define OF_EXPERIMENTER_MSG_MINLEN            (16U - OF_HEADER_FIXLEN)
+
 /* lengths (fixed or minimal) of particular protocol structures */
 #define OF_HELLO_ELEM_MINSIZE                 4U
-#define OF_ERROR_MSG_MINLEN                   12U
-#define OF_FEATURES_REPLY_FIXLEN              32U
-#define OF_PORT_MOD_FIXLEN                    40U
-#define OF_SWITCH_CONFIG_MSG_FIXLEN           12U
-#define OF_TABLE_MOD_FIXLEN                   16U
-#define OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN    16U
-#define OF_ROLE_MSG_FIXLEN                    24U
-#define OF_ASYNC_MSG_FIXLEN                   32U
-#define OF_PORT_STATUS_FIXLEN                 80U
-#define OF_EXPERIMENTER_MSG_MINLEN            16U
 
 /* miscellaneous constants from [OF13] */
 #define OFP_MAX_PORT_NAME_LEN                 16U
@@ -1014,14 +1016,14 @@ of13_message_print(netdissect_options *ndo,
 
 	/* OpenFlow header and fixed-size message body. */
 	case OFPT_FEATURES_REPLY:
-		if (len != OF_FEATURES_REPLY_FIXLEN - OF_HEADER_FIXLEN)
+		if (len != OF_FEATURES_REPLY_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
 		of13_features_reply_print(ndo, cp);
 		return;
 	case OFPT_QUEUE_GET_CONFIG_REQUEST: /* [OF13] Section A.3.6 */
-		if (len != OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN - OF_HEADER_FIXLEN)
+		if (len != OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
@@ -1029,14 +1031,14 @@ of13_message_print(netdissect_options *ndo,
 		return;
 	case OFPT_GET_CONFIG_REPLY: /* [OF13] Section 7.3.2 */
 	case OFPT_SET_CONFIG: /* ibid */
-		if (len != OF_SWITCH_CONFIG_MSG_FIXLEN - OF_HEADER_FIXLEN)
+		if (len != OF_SWITCH_CONFIG_MSG_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
 		of13_switch_config_msg_print(ndo, cp);
 		return;
 	case OFPT_PORT_MOD: /* [OF13] Section 7.3.4.3 */
-		if (len != OF_PORT_MOD_FIXLEN - OF_HEADER_FIXLEN)
+		if (len != OF_PORT_MOD_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
@@ -1044,21 +1046,21 @@ of13_message_print(netdissect_options *ndo,
 		return;
 	case OFPT_ROLE_REQUEST: /* [OF13] Section 7.3.9 */
 	case OFPT_ROLE_REPLY: /* ibid */
-		if (len != OF_ROLE_MSG_FIXLEN - OF_HEADER_FIXLEN)
+		if (len != OF_ROLE_MSG_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
 		of13_role_msg_print(ndo, cp);
 		return;
 	case OFPT_PORT_STATUS: /* [OF13] Section 7.4.3 */
-		if (len != OF_PORT_STATUS_FIXLEN - OF_HEADER_FIXLEN)
+		if (len != OF_PORT_STATUS_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
 		of13_port_status_print(ndo, cp);
 		return;
 	case OFPT_TABLE_MOD: /* [OF13] Section 7.3.3 */
-		if (len != OF_TABLE_MOD_FIXLEN - OF_HEADER_FIXLEN)
+		if (len != OF_TABLE_MOD_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
@@ -1066,7 +1068,7 @@ of13_message_print(netdissect_options *ndo,
 		return;
 	case OFPT_SET_ASYNC: /* [OF13] Section 7.3.10 */
 	case OFPT_GET_ASYNC_REPLY: /* ibid */
-		if (len != OF_ASYNC_MSG_FIXLEN - OF_HEADER_FIXLEN)
+		if (len != OF_ASYNC_MSG_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
@@ -1090,14 +1092,14 @@ of13_message_print(netdissect_options *ndo,
 
 	/* OpenFlow header, fixed-size message body and variable-size data. */
 	case OFPT_ERROR:
-		if (len < OF_ERROR_MSG_MINLEN - OF_HEADER_FIXLEN)
+		if (len < OF_ERROR_MSG_MINLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
 		of13_error_print(ndo, cp, len);
 		return;
 	case OFPT_EXPERIMENTER: /* [OF13] Section 7.5.4 */
-		if (len < OF_EXPERIMENTER_MSG_MINLEN - OF_HEADER_FIXLEN)
+		if (len < OF_EXPERIMENTER_MSG_MINLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;

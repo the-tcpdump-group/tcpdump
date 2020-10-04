@@ -557,21 +557,26 @@ static const struct uint_tokary of10_ofpet2tokary[] = {
 	/* uint2tokary() does not use array termination. */
 };
 
+/* lengths (fixed or minimal) of particular message types, where not 0 */
+#define OF_SWITCH_CONFIG_FIXLEN            (12U - OF_HEADER_FIXLEN)
+#define OF_FEATURES_REPLY_MINLEN           (32U - OF_HEADER_FIXLEN)
+#define OF_PORT_STATUS_FIXLEN              (64U - OF_HEADER_FIXLEN)
+#define OF_PORT_MOD_FIXLEN                 (32U - OF_HEADER_FIXLEN)
+#define OF_PACKET_IN_MINLEN                (20U - OF_HEADER_FIXLEN) /* with 2 mock octets */
+#define OF_PACKET_OUT_MINLEN               (16U - OF_HEADER_FIXLEN)
+#define OF_FLOW_MOD_MINLEN                 (72U - OF_HEADER_FIXLEN)
+#define OF_FLOW_REMOVED_FIXLEN             (88U - OF_HEADER_FIXLEN)
+#define OF_ERROR_MSG_MINLEN                (12U - OF_HEADER_FIXLEN)
+#define OF_STATS_REQUEST_MINLEN            (12U - OF_HEADER_FIXLEN)
+#define OF_STATS_REPLY_MINLEN              (12U - OF_HEADER_FIXLEN)
+#define OF_VENDOR_MINLEN                   (12U - OF_HEADER_FIXLEN)
+#define OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN (12U - OF_HEADER_FIXLEN)
+#define OF_QUEUE_GET_CONFIG_REPLY_MINLEN   (16U - OF_HEADER_FIXLEN)
+
 /* lengths (fixed or minimal) of particular protocol structures */
-#define OF_SWITCH_CONFIG_FIXLEN               12
 #define OF_PHY_PORT_FIXLEN                    48
-#define OF_FEATURES_REPLY_MINLEN              32
-#define OF_PORT_STATUS_FIXLEN                 64
-#define OF_PORT_MOD_FIXLEN                    32
-#define OF_PACKET_IN_MINLEN                   20 /* with 2 mock octets */
 #define OF_ACTION_MINLEN                       8
-#define OF_PACKET_OUT_MINLEN                  16
 #define OF_MATCH_FIXLEN                       40
-#define OF_FLOW_MOD_MINLEN                    72
-#define OF_FLOW_REMOVED_FIXLEN                88
-#define OF_ERROR_MSG_MINLEN                   12
-#define OF_STATS_REQUEST_MINLEN               12
-#define OF_STATS_REPLY_MINLEN                 12
 #define OF_DESC_STATS_REPLY_FIXLEN          1056
 #define OF_FLOW_STATS_REQUEST_FIXLEN          44
 #define OF_FLOW_STATS_REPLY_MINLEN            88
@@ -579,12 +584,9 @@ static const struct uint_tokary of10_ofpet2tokary[] = {
 #define OF_TABLE_STATS_REPLY_FIXLEN           64
 #define OF_PORT_STATS_REQUEST_FIXLEN           8
 #define OF_PORT_STATS_REPLY_FIXLEN           104
-#define OF_VENDOR_MINLEN                      12
 #define OF_QUEUE_PROP_MINLEN                   8
 #define OF_QUEUE_PROP_MIN_RATE_FIXLEN         16
 #define OF_PACKET_QUEUE_MINLEN                 8
-#define OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN    12
-#define OF_QUEUE_GET_CONFIG_REPLY_MINLEN      16
 #define OF_QUEUE_STATS_REQUEST_FIXLEN          8
 #define OF_QUEUE_STATS_REPLY_FIXLEN           32
 
@@ -2131,10 +2133,7 @@ of10_message_print(netdissect_options *ndo,
 {
 	/*
 	 * Here "cp" and "len" stand for the message part beyond the common
-	 * OpenFlow 1.0 header, if any. Subtract OF_HEADER_FIXLEN from the
-	 * type-specific lengths, which include the header length, when (and
-	 * only when) validating the length in this function. No other code
-	 * in this file needs to take OF_HEADER_FIXLEN into account.
+	 * OpenFlow 1.0 header, if any.
 	 *
 	 * Most message types are longer than just the header, and the length
 	 * constraints may be complex. When possible, validate the constraint
@@ -2155,35 +2154,35 @@ of10_message_print(netdissect_options *ndo,
 	/* OpenFlow header and fixed-size message body. */
 	case OFPT_SET_CONFIG: /* [OF10] Section 5.3.2 */
 	case OFPT_GET_CONFIG_REPLY: /* ibid */
-		if (len != OF_SWITCH_CONFIG_FIXLEN - OF_HEADER_FIXLEN)
+		if (len != OF_SWITCH_CONFIG_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
 		of10_switch_config_msg_print(ndo, cp);
 		return;
 	case OFPT_PORT_MOD:
-		if (len != OF_PORT_MOD_FIXLEN - OF_HEADER_FIXLEN)
+		if (len != OF_PORT_MOD_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
 		of10_port_mod_print(ndo, cp);
 		return;
 	case OFPT_QUEUE_GET_CONFIG_REQUEST: /* [OF10] Section 5.3.4 */
-		if (len != OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN - OF_HEADER_FIXLEN)
+		if (len != OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
 		of10_queue_get_config_request_print(ndo, cp);
 		return;
 	case OFPT_FLOW_REMOVED:
-		if (len != OF_FLOW_REMOVED_FIXLEN - OF_HEADER_FIXLEN)
+		if (len != OF_FLOW_REMOVED_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
 		of10_flow_removed_print(ndo, cp);
 		return;
 	case OFPT_PORT_STATUS: /* [OF10] Section 5.4.3 */
-		if (len != OF_PORT_STATUS_FIXLEN - OF_HEADER_FIXLEN)
+		if (len != OF_PORT_STATUS_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
@@ -2192,7 +2191,7 @@ of10_message_print(netdissect_options *ndo,
 
 	/* OpenFlow header, fixed-size message body and n * fixed-size data units. */
 	case OFPT_FEATURES_REPLY:
-		if (len < OF_FEATURES_REPLY_MINLEN - OF_HEADER_FIXLEN)
+		if (len < OF_FEATURES_REPLY_MINLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
@@ -2210,7 +2209,7 @@ of10_message_print(netdissect_options *ndo,
 
 	/* OpenFlow header, fixed-size message body and variable-size data. */
 	case OFPT_ERROR:
-		if (len < OF_ERROR_MSG_MINLEN - OF_HEADER_FIXLEN)
+		if (len < OF_ERROR_MSG_MINLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
@@ -2218,7 +2217,7 @@ of10_message_print(netdissect_options *ndo,
 		return;
 	case OFPT_VENDOR:
 		/* [OF10] Section 5.5.4 */
-		if (len < OF_VENDOR_MINLEN - OF_HEADER_FIXLEN)
+		if (len < OF_VENDOR_MINLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
@@ -2226,7 +2225,7 @@ of10_message_print(netdissect_options *ndo,
 		return;
 	case OFPT_PACKET_IN:
 		/* 2 mock octets count in OF_PACKET_IN_MINLEN but not in len */
-		if (len < OF_PACKET_IN_MINLEN - 2 - OF_HEADER_FIXLEN)
+		if (len < OF_PACKET_IN_MINLEN - 2)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
@@ -2237,7 +2236,7 @@ of10_message_print(netdissect_options *ndo,
 	/* b. OpenFlow header and one of the fixed-size message bodies. */
 	/* c. OpenFlow header, fixed-size message body and variable-size data. */
 	case OFPT_STATS_REQUEST:
-		if (len < OF_STATS_REQUEST_MINLEN - OF_HEADER_FIXLEN)
+		if (len < OF_STATS_REQUEST_MINLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
@@ -2249,7 +2248,7 @@ of10_message_print(netdissect_options *ndo,
 	/* c. OpenFlow header and n * variable-size data units. */
 	/* d. OpenFlow header, fixed-size message body and variable-size data. */
 	case OFPT_STATS_REPLY:
-		if (len < OF_STATS_REPLY_MINLEN - OF_HEADER_FIXLEN)
+		if (len < OF_STATS_REPLY_MINLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
@@ -2258,7 +2257,7 @@ of10_message_print(netdissect_options *ndo,
 
 	/* OpenFlow header and n * variable-size data units and variable-size data. */
 	case OFPT_PACKET_OUT:
-		if (len < OF_PACKET_OUT_MINLEN - OF_HEADER_FIXLEN)
+		if (len < OF_PACKET_OUT_MINLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
@@ -2267,7 +2266,7 @@ of10_message_print(netdissect_options *ndo,
 
 	/* OpenFlow header, fixed-size message body and n * variable-size data units. */
 	case OFPT_FLOW_MOD:
-		if (len < OF_FLOW_MOD_MINLEN - OF_HEADER_FIXLEN)
+		if (len < OF_FLOW_MOD_MINLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
@@ -2276,7 +2275,7 @@ of10_message_print(netdissect_options *ndo,
 
 	/* OpenFlow header, fixed-size message body and n * variable-size data units. */
 	case OFPT_QUEUE_GET_CONFIG_REPLY: /* [OF10] Section 5.3.4 */
-		if (len < OF_QUEUE_GET_CONFIG_REPLY_MINLEN - OF_HEADER_FIXLEN)
+		if (len < OF_QUEUE_GET_CONFIG_REPLY_MINLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
