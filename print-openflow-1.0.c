@@ -1502,7 +1502,7 @@ invalid: /* skip the undersized trailing data */
 /* [OF10] Section 5.3.2 */
 static void
 of10_switch_config_msg_print(netdissect_options *ndo,
-                             const u_char *cp)
+                             const u_char *cp, u_int len _U_)
 {
 	/* flags */
 	ND_PRINT("\n\t flags %s",
@@ -1563,7 +1563,7 @@ of10_flow_mod_print(netdissect_options *ndo,
 /* ibid */
 static void
 of10_port_mod_print(netdissect_options *ndo,
-                    const u_char *cp)
+                    const u_char *cp, u_int len _U_)
 {
 	/* port_no */
 	ND_PRINT("\n\t port_no %s", tok2str(ofpp_str, "%u", GET_BE_U_2(cp)));
@@ -1591,7 +1591,7 @@ of10_port_mod_print(netdissect_options *ndo,
 /* [OF10] Section 5.3.4 */
 static void
 of10_queue_get_config_request_print(netdissect_options *ndo,
-                                    const u_char *cp)
+                                    const u_char *cp, u_int len _U_)
 {
 	/* port */
 	ND_PRINT("\n\t port %s", tok2str(ofpp_str, "%u", GET_BE_U_2(cp)));
@@ -2049,7 +2049,7 @@ of10_packet_in_print(netdissect_options *ndo,
 /* [OF10] Section 5.4.2 */
 static void
 of10_flow_removed_print(netdissect_options *ndo,
-                        const u_char *cp)
+                        const u_char *cp, u_int len _U_)
 {
 	/* match */
 	of10_match_print(ndo, "\n\t ", cp);
@@ -2089,7 +2089,7 @@ of10_flow_removed_print(netdissect_options *ndo,
 /* [OF10] Section 5.4.3 */
 static void
 of10_port_status_print(netdissect_options *ndo,
-                       const u_char *cp)
+                       const u_char *cp, u_int len _U_)
 {
 	/* reason */
 	ND_PRINT("\n\t reason %s",
@@ -2158,35 +2158,35 @@ of10_message_print(netdissect_options *ndo,
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
-		of10_switch_config_msg_print(ndo, cp);
+		of10_switch_config_msg_print(ndo, cp, len);
 		return;
 	case OFPT_PORT_MOD:
 		if (len != OF_PORT_MOD_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
-		of10_port_mod_print(ndo, cp);
+		of10_port_mod_print(ndo, cp, len);
 		return;
 	case OFPT_QUEUE_GET_CONFIG_REQUEST: /* [OF10] Section 5.3.4 */
 		if (len != OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
-		of10_queue_get_config_request_print(ndo, cp);
+		of10_queue_get_config_request_print(ndo, cp, len);
 		return;
 	case OFPT_FLOW_REMOVED:
 		if (len != OF_FLOW_REMOVED_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
-		of10_flow_removed_print(ndo, cp);
+		of10_flow_removed_print(ndo, cp, len);
 		return;
 	case OFPT_PORT_STATUS: /* [OF10] Section 5.4.3 */
 		if (len != OF_PORT_STATUS_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
-		of10_port_status_print(ndo, cp);
+		of10_port_status_print(ndo, cp, len);
 		return;
 
 	/* OpenFlow header, fixed-size message body and n * fixed-size data units. */

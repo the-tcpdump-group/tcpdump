@@ -743,7 +743,7 @@ of13_port_print(netdissect_options *ndo,
 /* [OF13] Section 7.3.1 */
 static void
 of13_features_reply_print(netdissect_options *ndo,
-                          const u_char *cp)
+                          const u_char *cp, u_int len _U_)
 {
 	/* datapath_id */
 	ND_PRINT("\n\t dpid 0x%016" PRIx64, GET_BE_U_8(cp));
@@ -770,7 +770,7 @@ of13_features_reply_print(netdissect_options *ndo,
 /* [OF13] Section 7.3.2 */
 static void
 of13_switch_config_msg_print(netdissect_options *ndo,
-                             const u_char *cp)
+                             const u_char *cp, u_int len _U_)
 {
 	/* flags */
 	ND_PRINT("\n\t flags %s",
@@ -784,7 +784,7 @@ of13_switch_config_msg_print(netdissect_options *ndo,
 /* [OF13] Section 7.3.3 */
 static void
 of13_table_mod_print(netdissect_options *ndo,
-                     const u_char *cp)
+                     const u_char *cp, u_int len _U_)
 {
 	/* table_id */
 	ND_PRINT("\n\t table_id %s", tok2str(ofptt_str, "%u", GET_U_1(cp)));
@@ -798,7 +798,7 @@ of13_table_mod_print(netdissect_options *ndo,
 /* [OF13] Section 7.3.9 */
 static void
 of13_role_msg_print(netdissect_options *ndo,
-                    const u_char *cp)
+                    const u_char *cp, u_int len _U_)
 {
 	/* role */
 	ND_PRINT("\n\t role %s",
@@ -813,7 +813,7 @@ of13_role_msg_print(netdissect_options *ndo,
 /* [OF13] Section 7.3.10 */
 static void
 of13_async_msg_print(netdissect_options *ndo,
-                    const u_char *cp)
+                    const u_char *cp, u_int len _U_)
 {
 	/* packet_in_mask[0] */
 	ND_PRINT("\n\t packet_in_mask[EM] 0x%08x", GET_BE_U_4(cp));
@@ -843,7 +843,7 @@ of13_async_msg_print(netdissect_options *ndo,
 /* [OF13] Section 7.3.4.3 */
 static void
 of13_port_mod_print(netdissect_options *ndo,
-                    const u_char *cp)
+                    const u_char *cp, u_int len _U_)
 {
 	/* port_no */
 	ND_PRINT("\n\t port_no %s", tok2str(ofpp_str, "%u", GET_BE_U_4(cp)));
@@ -875,7 +875,7 @@ of13_port_mod_print(netdissect_options *ndo,
 /* [OF13] Section 7.4.3 */
 static void
 of13_port_status_print(netdissect_options *ndo,
-                       const u_char *cp)
+                       const u_char *cp, u_int len _U_)
 {
 	/* reason */
 	ND_PRINT("\n\t reason %s",
@@ -963,7 +963,7 @@ of13_experimenter_message_print(netdissect_options *ndo,
 /* [OF13] Section A.3.6 */
 static void
 of13_queue_get_config_request_print(netdissect_options *ndo,
-                                    const u_char *cp)
+                                    const u_char *cp, u_int len _U_)
 {
 	/* port */
 	ND_PRINT("\n\t port %s", tok2str(ofpp_str, "%u", GET_BE_U_4(cp)));
@@ -1020,14 +1020,14 @@ of13_message_print(netdissect_options *ndo,
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
-		of13_features_reply_print(ndo, cp);
+		of13_features_reply_print(ndo, cp, len);
 		return;
 	case OFPT_QUEUE_GET_CONFIG_REQUEST: /* [OF13] Section A.3.6 */
 		if (len != OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
-		of13_queue_get_config_request_print(ndo, cp);
+		of13_queue_get_config_request_print(ndo, cp, len);
 		return;
 	case OFPT_GET_CONFIG_REPLY: /* [OF13] Section 7.3.2 */
 	case OFPT_SET_CONFIG: /* ibid */
@@ -1035,14 +1035,14 @@ of13_message_print(netdissect_options *ndo,
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
-		of13_switch_config_msg_print(ndo, cp);
+		of13_switch_config_msg_print(ndo, cp, len);
 		return;
 	case OFPT_PORT_MOD: /* [OF13] Section 7.3.4.3 */
 		if (len != OF_PORT_MOD_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
-		of13_port_mod_print(ndo, cp);
+		of13_port_mod_print(ndo, cp, len);
 		return;
 	case OFPT_ROLE_REQUEST: /* [OF13] Section 7.3.9 */
 	case OFPT_ROLE_REPLY: /* ibid */
@@ -1050,21 +1050,21 @@ of13_message_print(netdissect_options *ndo,
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
-		of13_role_msg_print(ndo, cp);
+		of13_role_msg_print(ndo, cp, len);
 		return;
 	case OFPT_PORT_STATUS: /* [OF13] Section 7.4.3 */
 		if (len != OF_PORT_STATUS_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
-		of13_port_status_print(ndo, cp);
+		of13_port_status_print(ndo, cp, len);
 		return;
 	case OFPT_TABLE_MOD: /* [OF13] Section 7.3.3 */
 		if (len != OF_TABLE_MOD_FIXLEN)
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
-		of13_table_mod_print(ndo, cp);
+		of13_table_mod_print(ndo, cp, len);
 		return;
 	case OFPT_SET_ASYNC: /* [OF13] Section 7.3.10 */
 	case OFPT_GET_ASYNC_REPLY: /* ibid */
@@ -1072,7 +1072,7 @@ of13_message_print(netdissect_options *ndo,
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
-		of13_async_msg_print(ndo, cp);
+		of13_async_msg_print(ndo, cp, len);
 		return;
 
 	/* OpenFlow header and variable-size data. */
