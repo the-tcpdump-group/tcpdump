@@ -1497,6 +1497,19 @@ invalid: /* skip the undersized trailing data */
 	ND_TCHECK_LEN(cp, len);
 }
 
+/* [OF10] Section 5.3.2 */
+static void
+of10_switch_config_msg_print(netdissect_options *ndo,
+                             const u_char *cp)
+{
+	/* flags */
+	ND_PRINT("\n\t flags %s",
+	         tok2str(ofp_config_str, "invalid (0x%04x)", GET_BE_U_2(cp)));
+	cp += 2;
+	/* miss_send_len */
+	ND_PRINT(", miss_send_len %u", GET_BE_U_2(cp));
+}
+
 /* [OF10] Section 5.3.3 */
 static void
 of10_flow_mod_print(netdissect_options *ndo,
@@ -1571,6 +1584,34 @@ of10_port_mod_print(netdissect_options *ndo,
 	/* pad */
 	/* Always the last field, check bounds. */
 	ND_TCHECK_4(cp);
+}
+
+/* [OF10] Section 5.3.4 */
+static void
+of10_queue_get_config_request_print(netdissect_options *ndo,
+                                    const u_char *cp)
+{
+	/* port */
+	ND_PRINT("\n\t port %s", tok2str(ofpp_str, "%u", GET_BE_U_2(cp)));
+	cp += 2;
+	/* pad */
+	/* Always the last field, check bounds. */
+	ND_TCHECK_2(cp);
+}
+
+/* ibid */
+static void
+of10_queue_get_config_reply_print(netdissect_options *ndo,
+                                  const u_char *cp, u_int len)
+{
+	/* port */
+	ND_PRINT("\n\t port %s", tok2str(ofpp_str, "%u", GET_BE_U_2(cp)));
+	OF_FWD(2);
+	/* pad */
+	/* Sometimes the last field, check bounds. */
+	OF_CHK_FWD(6);
+	/* queues */
+	of10_queues_print(ndo, cp, len);
 }
 
 /* [OF10] Section 5.3.5 */
@@ -2043,6 +2084,22 @@ of10_flow_removed_print(netdissect_options *ndo,
 	ND_PRINT(", byte_count %" PRIu64, GET_BE_U_8(cp));
 }
 
+/* [OF10] Section 5.4.3 */
+static void
+of10_port_status_print(netdissect_options *ndo,
+                       const u_char *cp)
+{
+	/* reason */
+	ND_PRINT("\n\t reason %s",
+	         tok2str(ofppr_str, "invalid (0x%02x)", GET_U_1(cp)));
+	cp += 1;
+	/* pad */
+	/* No need to check bounds, more data follows. */
+	cp += 7;
+	/* desc */
+	of10_phy_port_print(ndo, cp);
+}
+
 /* [OF10] Section 5.4.4 */
 static void
 of10_error_print(netdissect_options *ndo,
@@ -2102,13 +2159,7 @@ of10_message_print(netdissect_options *ndo,
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
-		/* flags */
-		ND_PRINT("\n\t flags %s",
-		         tok2str(ofp_config_str, "invalid (0x%04x)",
-		         GET_BE_U_2(cp)));
-		OF_FWD(2);
-		/* miss_send_len */
-		ND_PRINT(", miss_send_len %u", GET_BE_U_2(cp));
+		of10_switch_config_msg_print(ndo, cp);
 		return;
 	case OFPT_PORT_MOD:
 		if (len != OF_PORT_MOD_FIXLEN - OF_HEADER_FIXLEN)
@@ -2122,13 +2173,7 @@ of10_message_print(netdissect_options *ndo,
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
-		/* port */
-		ND_PRINT("\n\t port %s",
-		         tok2str(ofpp_str, "%u", GET_BE_U_2(cp)));
-		OF_FWD(2);
-		/* pad */
-		/* Always the last field, check bounds. */
-		ND_TCHECK_2(cp);
+		of10_queue_get_config_request_print(ndo, cp);
 		return;
 	case OFPT_FLOW_REMOVED:
 		if (len != OF_FLOW_REMOVED_FIXLEN - OF_HEADER_FIXLEN)
@@ -2142,15 +2187,7 @@ of10_message_print(netdissect_options *ndo,
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
-		/* reason */
-		ND_PRINT("\n\t reason %s",
-		         tok2str(ofppr_str, "invalid (0x%02x)", GET_U_1(cp)));
-		OF_FWD(1);
-		/* pad */
-		/* No need to check bounds, more data follows. */
-		OF_FWD(7);
-		/* desc */
-		of10_phy_port_print(ndo, cp);
+		of10_port_status_print(ndo, cp);
 		return;
 
 	/* OpenFlow header, fixed-size message body and n * fixed-size data units. */
@@ -2243,15 +2280,7 @@ of10_message_print(netdissect_options *ndo,
 			goto invalid;
 		if (ndo->ndo_vflag < 1)
 			break;
-		/* port */
-		ND_PRINT("\n\t port %s",
-			 tok2str(ofpp_str, "%u", GET_BE_U_2(cp)));
-		OF_FWD(2);
-		/* pad */
-		/* Sometimes the last field, check bounds. */
-		OF_CHK_FWD(6);
-		/* queues */
-		of10_queues_print(ndo, cp, len);
+		of10_queue_get_config_reply_print(ndo, cp, len);
 		return;
 	} /* switch (type) */
 	/*
