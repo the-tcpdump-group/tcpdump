@@ -42,8 +42,6 @@ frag6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2)
 	dp = (const struct ip6_frag *)bp;
 	ip6 = (const struct ip6_hdr *)bp2;
 
-	ND_TCHECK_SIZE(dp);
-
 	if (ndo->ndo_vflag) {
 		ND_PRINT("frag (0x%08x:%u|%u)",
 		       GET_BE_U_4(dp->ip6f_ident),
@@ -65,7 +63,4 @@ frag6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2)
 		ND_PRINT(" ");
 		return sizeof(struct ip6_frag);
 	}
-trunc:
-	nd_print_trunc(ndo);
-	return -1;
 }
