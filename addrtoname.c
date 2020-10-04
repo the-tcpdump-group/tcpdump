@@ -84,7 +84,7 @@
         #define NEED_NETINET_IF_ETHER_H
       #else /* HAVE_STRUCT_ETHER_ADDR */
 	struct ether_addr {
-		unsigned char ether_addr_octet[6];
+		unsigned char ether_addr_octet[MAC_ADDR_LEN];
 	};
       #endif /* HAVE_STRUCT_ETHER_ADDR */
     #endif /* what declares ether_ntohost() */
@@ -927,7 +927,7 @@ init_protoidarray(netdissect_options *ndo)
 }
 
 static const struct etherlist {
-	const u_char addr[6];
+	const u_char addr[MAC_ADDR_LEN];
 	const char *name;
 } etherlist[] = {
 	{{ 0xff, 0xff, 0xff, 0xff, 0xff, 0xff }, "Broadcast" },

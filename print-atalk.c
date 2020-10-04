@@ -51,9 +51,9 @@ struct aarp {
 	nd_uint16_t	htype, ptype;
 	nd_uint8_t	halen, palen;
 	nd_uint16_t	op;
-	uint8_t		hsaddr[6];
+	uint8_t		hsaddr[MAC_ADDR_LEN];
 	uint8_t		psaddr[4];
-	uint8_t		hdaddr[6];
+	uint8_t		hdaddr[MAC_ADDR_LEN];
 	uint8_t		pdaddr[4];
 };
 
@@ -238,7 +238,7 @@ aarp_print(netdissect_options *ndo,
 	}
 	if (GET_BE_U_2(ap->htype) == 1 &&
 	    GET_BE_U_2(ap->ptype) == ETHERTYPE_ATALK &&
-	    GET_U_1(ap->halen) == 6 && GET_U_1(ap->palen) == 4 )
+	    GET_U_1(ap->halen) == MAC_ADDR_LEN && GET_U_1(ap->palen) == 4)
 		switch (GET_BE_U_2(ap->op)) {
 
 		case 1:				/* request */
