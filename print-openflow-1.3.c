@@ -140,6 +140,14 @@ static const struct tok ofp_config_str[] = {
 	{ 0, NULL }
 };
 
+#define OFPTT_MAX 0xfeU
+#define OFPTT_ALL 0xffU
+static const struct tok ofptt_str[] = {
+	{ OFPTT_MAX, "MAX" },
+	{ OFPTT_ALL, "ALL" },
+	{ 0, NULL },
+};
+
 #define OFPCML_MAX       0xffe5U
 #define OFPCML_NO_BUFFER 0xffffU
 static const struct tok ofpcml_str[] = {
@@ -272,6 +280,30 @@ static const struct tok ofverbm_str[] = {
 #define OF_BIT_VER_U (~(OF_BIT_VER_1_0 | OF_BIT_VER_1_1 | OF_BIT_VER_1_2 | \
                         OF_BIT_VER_1_3 | OF_BIT_VER_1_4 | OF_BIT_VER_1_5))
 
+#define OFPR_NO_MATCH    0U
+#define OFPR_ACTION      1U
+#define OFPR_INVALID_TTL 2U
+#if 0 /* for OFPT_PACKET_IN */
+static const struct tok ofpr_str[] = {
+	{ OFPR_NO_MATCH,    "NO_MATCH"         },
+	{ OFPR_ACTION,      "ACTION"           },
+	{ OFPR_INVALID_TTL, "OFPR_INVALID_TTL" },
+	{ 0, NULL }
+};
+#endif
+
+#define ASYNC_OFPR_NO_MATCH    (1U << OFPR_NO_MATCH   )
+#define ASYNC_OFPR_ACTION      (1U << OFPR_ACTION     )
+#define ASYNC_OFPR_INVALID_TTL (1U << OFPR_INVALID_TTL)
+static const struct tok async_ofpr_bm[] = {
+	{ ASYNC_OFPR_NO_MATCH,    "NO_MATCH"    },
+	{ ASYNC_OFPR_ACTION,      "ACTION"      },
+	{ ASYNC_OFPR_INVALID_TTL, "INVALID_TTL" },
+	{ 0, NULL }
+};
+#define ASYNC_OFPR_U (~(ASYNC_OFPR_NO_MATCH | ASYNC_OFPR_ACTION | \
+                        ASYNC_OFPR_INVALID_TTL))
+
 #define OFPPR_ADD    0U
 #define OFPPR_DELETE 1U
 #define OFPPR_MODIFY 2U
@@ -281,6 +313,18 @@ static const struct tok ofppr_str[] = {
 	{ OFPPR_MODIFY, "MODIFY" },
 	{ 0, NULL }
 };
+
+#define ASYNC_OFPPR_ADD    (1U << OFPPR_ADD   )
+#define ASYNC_OFPPR_DELETE (1U << OFPPR_DELETE)
+#define ASYNC_OFPPR_MODIFY (1U << OFPPR_MODIFY)
+static const struct tok async_ofppr_bm[] = {
+	{ ASYNC_OFPPR_ADD,    "ADD"    },
+	{ ASYNC_OFPPR_DELETE, "DELETE" },
+	{ ASYNC_OFPPR_MODIFY, "MODIFY" },
+	{ 0, NULL }
+};
+#define ASYNC_OFPPR_U (~(ASYNC_OFPPR_ADD | ASYNC_OFPPR_DELETE | \
+                         ASYNC_OFPPR_MODIFY))
 
 #define OFPET_HELLO_FAILED           0U
 #define OFPET_BAD_REQUEST            1U
@@ -619,8 +663,10 @@ static const struct uint_tokary of13_ofpet2tokary[] = {
 #define OF_FEATURES_REPLY_FIXLEN              32U
 #define OF_PORT_MOD_FIXLEN                    40U
 #define OF_SWITCH_CONFIG_MSG_FIXLEN           12U
+#define OF_TABLE_MOD_FIXLEN                   16U
 #define OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN    16U
 #define OF_ROLE_MSG_FIXLEN                    24U
+#define OF_ASYNC_MSG_FIXLEN                   32U
 #define OF_PORT_STATUS_FIXLEN                 80U
 #define OF_EXPERIMENTER_MSG_MINLEN            16U
 
@@ -733,6 +779,20 @@ of13_switch_config_msg_print(netdissect_options *ndo,
 	         tok2str(ofpcml_str, "%u", GET_BE_U_2(cp)));
 }
 
+/* [OF13] Section 7.3.3 */
+static void
+of13_table_mod_print(netdissect_options *ndo,
+                     const u_char *cp)
+{
+	/* table_id */
+	ND_PRINT("\n\t table_id %s", tok2str(ofptt_str, "%u", GET_U_1(cp)));
+	cp += 1;
+	/* pad */
+	cp += 3;
+	/* config */
+	ND_PRINT(", config 0x%08x", GET_BE_U_4(cp));
+}
+
 /* [OF13] Section 7.3.9 */
 static void
 of13_role_msg_print(netdissect_options *ndo,
@@ -746,6 +806,36 @@ of13_role_msg_print(netdissect_options *ndo,
 	cp += 4;
 	/* generation_id */
 	ND_PRINT(", generation_id 0x%016" PRIx64, GET_BE_U_8(cp));
+}
+
+/* [OF13] Section 7.3.10 */
+static void
+of13_async_msg_print(netdissect_options *ndo,
+                    const u_char *cp)
+{
+	/* packet_in_mask[0] */
+	ND_PRINT("\n\t packet_in_mask[EM] 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, async_ofpr_bm, GET_BE_U_4(cp), ASYNC_OFPR_U);
+	cp += 4;
+	/* packet_in_mask[1] */
+	ND_PRINT("\n\t packet_in_mask[S] 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, async_ofpr_bm, GET_BE_U_4(cp), ASYNC_OFPR_U);
+	cp += 4;
+	/* port_status_mask[0] */
+	ND_PRINT("\n\t port_status_mask[EM] 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, async_ofppr_bm, GET_BE_U_4(cp), ASYNC_OFPPR_U);
+	cp += 4;
+	/* port_status_mask[1] */
+	ND_PRINT("\n\t port_status_mask[S] 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, async_ofppr_bm, GET_BE_U_4(cp), ASYNC_OFPPR_U);
+	cp += 4;
+	/* flow_removed_mask[0] */
+	ND_PRINT("\n\t flow_removed_mask[EM] 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, async_ofppr_bm, GET_BE_U_4(cp), ASYNC_OFPPR_U);
+	cp += 4;
+	/* flow_removed_mask[1] */
+	ND_PRINT("\n\t flow_removed_mask[S] 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, async_ofppr_bm, GET_BE_U_4(cp), ASYNC_OFPPR_U);
 }
 
 /* [OF13] Section 7.3.4.3 */
@@ -959,6 +1049,21 @@ of13_message_print(netdissect_options *ndo,
 		if (ndo->ndo_vflag < 1)
 			break;
 		of13_port_status_print(ndo, cp);
+		return;
+	case OFPT_TABLE_MOD: /* [OF13] Section 7.3.3 */
+		if (len != OF_TABLE_MOD_FIXLEN - OF_HEADER_FIXLEN)
+			goto invalid;
+		if (ndo->ndo_vflag < 1)
+			break;
+		of13_table_mod_print(ndo, cp);
+		return;
+	case OFPT_SET_ASYNC: /* [OF13] Section 7.3.10 */
+	case OFPT_GET_ASYNC_REPLY: /* ibid */
+		if (len != OF_ASYNC_MSG_FIXLEN - OF_HEADER_FIXLEN)
+			goto invalid;
+		if (ndo->ndo_vflag < 1)
+			break;
+		of13_async_msg_print(ndo, cp);
 		return;
 
 	/* OpenFlow header and variable-size data. */
