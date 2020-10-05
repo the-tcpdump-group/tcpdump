@@ -110,6 +110,14 @@ static const unsigned ip6m_hdrlen[IP6M_MAX + 1] = {
 #define IP6MOPT_AUTH          0x5	/* Binding Authorization Data */
 #define IP6MOPT_AUTH_MINLEN    12
 
+static const struct tok ip6m_binding_update_bits [] = {
+	{ 0x08, "A" },
+	{ 0x04, "H" },
+	{ 0x02, "L" },
+	{ 0x01, "K" },
+	{ 0, NULL }
+};
+
 static int
 mobility_opt_print(netdissect_options *ndo,
                    const u_char *bp, const unsigned len)
@@ -269,19 +277,17 @@ mobility_print(netdissect_options *ndo,
 		hlen += 8;
 		break;
 	case IP6M_BINDING_UPDATE:
+	    {
+		int bits;
 		ND_PRINT(" seq#=%u", GET_BE_U_2(mh->ip6m_data16[0]));
 		hlen = IP6M_MINLEN;
 		ND_TCHECK_2(bp + hlen);
-		if (GET_U_1(bp + hlen) & 0xf0) {
+		bits = (GET_U_1(bp + hlen) & 0xf0) >> 4;
+		if (bits) {
 			ND_PRINT(" ");
-			if (GET_U_1(bp + hlen) & 0x80)
-				ND_PRINT("A");
-			if (GET_U_1(bp + hlen) & 0x40)
-				ND_PRINT("H");
-			if (GET_U_1(bp + hlen) & 0x20)
-				ND_PRINT("L");
-			if (GET_U_1(bp + hlen) & 0x10)
-				ND_PRINT("K");
+			ND_PRINT("%s",
+				 bittok2str_nosep(ip6m_binding_update_bits,
+				 "bits-#0x%x", bits));
 		}
 		/* Reserved (4bits) */
 		hlen += 1;
@@ -291,6 +297,7 @@ mobility_print(netdissect_options *ndo,
 		ND_PRINT(" lifetime=%u", GET_BE_U_2(bp + hlen) << 2);
 		hlen += 2;
 		break;
+	    }
 	case IP6M_BINDING_ACK:
 		ND_PRINT(" status=%u", GET_U_1(mh->ip6m_data8[0]));
 		if (GET_U_1(mh->ip6m_data8[1]) & 0x80)
