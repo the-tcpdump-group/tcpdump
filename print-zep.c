@@ -107,8 +107,6 @@ zep_print(netdissect_options *ndo,
 
 	nd_print_protocol_caps(ndo);
 
-	ND_TCHECK_LEN(bp, 8);
-
 	/* Preamble Code (must be "EX") */
 	if (GET_U_1(bp) != 'E' || GET_U_1(bp + 1) != 'X') {
 		ND_PRINT(" [Preamble Code: ");
@@ -124,7 +122,6 @@ zep_print(netdissect_options *ndo,
 
 	if (version == 1) {
 		/* ZEP v1 packet. */
-		ND_TCHECK_LEN(bp, 16);
 		ND_PRINT("Channel ID %u, Device ID 0x%04x, ",
 			 GET_U_1(bp + 3), GET_BE_U_2(bp + 4));
 		if (GET_U_1(bp + 6))
@@ -147,8 +144,6 @@ zep_print(netdissect_options *ndo,
 			len -= 8;
 		} else {
 			/* ZEP v2 data, or some other. */
-			ND_TCHECK_LEN(bp, 32);
-
 			ND_PRINT("Type %u, Channel ID %u, Device ID 0x%04x, ",
 				 GET_U_1(bp + 3), GET_U_1(bp + 4),
 				 GET_BE_U_2(bp + 5));
@@ -178,8 +173,4 @@ zep_print(netdissect_options *ndo,
 
 	if (!ndo->ndo_suppress_default_print)
 		ND_DEFAULTPRINT(bp, len);
-
-	return;
- trunc:
-	nd_print_trunc(ndo);
 }
