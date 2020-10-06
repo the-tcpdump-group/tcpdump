@@ -43,7 +43,6 @@
  ***********************************************************************
  *
  * ZEP v1 Header will have the following format:
- *
  * |Preamble|Version|Channel ID|Device ID|CRC/LQI Mode|LQI Val|Reserved|Length|
  * |2 bytes |1 byte |  1 byte  | 2 bytes |   1 byte   |1 byte |7 bytes |1 byte|
  *
@@ -110,8 +109,15 @@ zep_print(netdissect_options *ndo,
 
 	ND_TCHECK_LEN(bp, 8);
 
-	if (GET_U_1(bp) != 'E' || GET_U_1(bp + 1) != 'X')
-		goto trunc;
+	/* Preamble Code (must be "EX") */
+	if (GET_U_1(bp) != 'E' || GET_U_1(bp + 1) != 'X') {
+		ND_PRINT(" [Preamble Code: ");
+		fn_print_char(ndo, GET_U_1(bp));
+		fn_print_char(ndo, GET_U_1(bp + 1));
+		ND_PRINT("]");
+		nd_print_invalid(ndo);
+		return;
+	}
 
 	version = GET_U_1(bp + 2);
 	ND_PRINT("v%d ", version);
