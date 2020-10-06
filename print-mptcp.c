@@ -201,10 +201,10 @@ mp_capable_print(netdissect_options *ndo,
         switch (MP_CAPABLE_OPT_VERSION(mpc->sub_ver)) {
                 case 0: /* fall through */
                 case 1:
-                        ND_PRINT(" v%d", MP_CAPABLE_OPT_VERSION(mpc->sub_ver));
+                        ND_PRINT(" v%u", MP_CAPABLE_OPT_VERSION(mpc->sub_ver));
                         break;
                 default:
-                        ND_PRINT(" Unknown Version (%d)",
+                        ND_PRINT(" Unknown Version (%u)",
                                   MP_CAPABLE_OPT_VERSION(mpc->sub_ver));
                         return 1;
         }
