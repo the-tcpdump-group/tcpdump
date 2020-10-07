@@ -842,7 +842,7 @@ MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
 {
         char *filename = malloc(PATH_MAX + 1);
         if (filename == NULL)
-            error("Makefilename: malloc");
+            error("%s: malloc", __func__);
 
         /* Process with strftime if Gflag is set. */
         if (Gflag != 0) {
@@ -850,7 +850,7 @@ MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
 
           /* Convert Gflag_time to a usable format */
           if ((local_tm = localtime(&Gflag_time)) == NULL) {
-                  error("MakeTimedFilename: localtime");
+                  error("%s: localtime", __func__);
           }
 
           /* There's no good way to detect an error in strftime since a return
@@ -1036,7 +1036,7 @@ copy_argv(char **argv)
 
 	buf = (char *)malloc(len);
 	if (buf == NULL)
-		error("copy_argv: malloc");
+		error("%s: malloc", __func__);
 
 	p = argv;
 	dst = buf;
@@ -1641,8 +1641,8 @@ main(int argc, char **argv)
 
 			/* Grab the current time for rotation use. */
 			if ((Gflag_time = time(NULL)) == (time_t)-1) {
-				error("main: can't get current time: %s",
-				    pcap_strerror(errno));
+				error("%s: can't get current time: %s",
+				    __func__, pcap_strerror(errno));
 			}
 			break;
 
@@ -2849,8 +2849,8 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 
 		/* Get the current time */
 		if ((t = time(NULL)) == (time_t)-1) {
-			error("dump_and_trunc_packet: can't get current_time: %s",
-			    pcap_strerror(errno));
+			error("%s: can't get current_time: %s",
+			    __func__, pcap_strerror(errno));
 		}
 
 
@@ -2991,7 +2991,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 				free(dump_info->CurrentFileName);
 			dump_info->CurrentFileName = (char *)malloc(PATH_MAX + 1);
 			if (dump_info->CurrentFileName == NULL)
-				error("dump_packet_and_trunc: malloc");
+				error("%s: malloc", __func__);
 			MakeFilename(dump_info->CurrentFileName, dump_info->WFileName, Cflag_count, WflagChars);
 #ifdef HAVE_LIBCAP_NG
 			capng_update(CAPNG_ADD, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);

@@ -1211,7 +1211,7 @@ dnnum_string(netdissect_options *ndo, u_short dnaddr)
 	/* malloc() return used by the 'dnaddrtable' hash table: do not free() */
 	str = (char *)malloc(siz = sizeof("00.0000"));
 	if (str == NULL)
-		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC, "dnnum_string: malloc");
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC, "%s: malloc", __func__);
 	snprintf(str, siz, "%u.%u", area, node);
 	return(str);
 }

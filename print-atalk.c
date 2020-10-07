@@ -636,7 +636,7 @@ ataddr_string(netdissect_options *ndo,
 					if (tp->name == NULL)
 						(*ndo->ndo_error)(ndo,
 						    S_ERR_ND_MEM_ALLOC,
-						    "ataddr_string: strdup(nambuf)");
+						    "%s: strdup(nambuf)", __func__);
 				}
 				fclose(fp);
 			}
@@ -661,7 +661,7 @@ ataddr_string(netdissect_options *ndo,
 			tp->name = strdup(nambuf);
 			if (tp->name == NULL)
 				(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
-					"ataddr_string: strdup(nambuf)");
+					"%s: strdup(nambuf)", __func__);
 			return (tp->name);
 		}
 
@@ -674,7 +674,7 @@ ataddr_string(netdissect_options *ndo,
 	tp->name = strdup(nambuf);
 	if (tp->name == NULL)
 		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
-				  "ataddr_string: strdup(nambuf)");
+				  "%s: strdup(nambuf)", __func__);
 
 	return (tp->name);
 }
