@@ -117,7 +117,8 @@ static const struct tok mptcp_addr_subecho_bits[] = {
         { 0x6, "v0-ip6" },
         { 0x4, "v0-ip4" },
         { 0x1, "v1-echo" },
-        { 0x0, "v1" }
+        { 0x0, "v1" },
+        { 0, NULL }
 };
 
 struct mp_add_addr {
