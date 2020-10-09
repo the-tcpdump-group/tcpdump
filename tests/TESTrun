@@ -405,7 +405,7 @@ sub runOneComplexTest {
     #use Data::Dumper;
     #print Dumper($testconfig);
 
-    # EXPAND any occurances of @TESTDIR@ to $testsdir
+    # EXPAND any occurrences of @TESTDIR@ to $testsdir
     $options =~ s/\@TESTDIR\@/$testsdir/;
 
     my $result = runtest($name,

@@ -360,7 +360,7 @@ Wednesday Jul. 2, 2014 mcr@sandelman.ca
         a number of unaligned access faults fixed
         -A flag does not consider CR to be printable anymore
         fx.lebail took over coverity baby sitting
-        default snapshot size increased to 256K for accomodate USB captures
+        default snapshot size increased to 256K for accommodate USB captures
         WARNING: this release contains a lot of very worthwhile code churn.
 
 Wednesday Jan. 15, 2014 guy@alum.mit.edu
@@ -595,7 +595,7 @@ Wed.	July 23, 2007.  mcr@xelerance.com.  Summary for 3.9.7 libpcap release
 	NFS: from NetBSD; don't interpret the reply as a possible NFS reply
 		if it got MSG_DENIED.
 	BGP: don't print TLV values that didn't fit, from www.digit-labs.org.
-	revised INSTALL.txt about libpcap dependancy.
+	revised INSTALL.txt about libpcap dependency.
 
 Wed.	April 25, 2007. ken@xelerance.com.  Summary for 3.9.6 tcpdump release
 	Update man page to reflect changes to libpcap
@@ -860,7 +860,7 @@ Tuesday January 9, 2001. mcr@sandelman.ottawa.on.ca. Summary for 3.6 release
 
 	libpcap changes provide for exchanging capture files between
 	  systems. Save files now have well known PACKET_ values instead of
-	  depending upon system dependant mappings of DLT_* types.
+	  depending upon system dependent mappings of DLT_* types.
 
 	Support for computing/checking IP and UDP/TCP checksums.
 
@@ -1336,7 +1336,7 @@ v2.2 Fri May 22 17:19:41 PDT 1992
 
 v2.1 Tue Jan 28 11:00:14 PST 1992
 
-- Internal release (never publically exported).
+- Internal release (never publicly exported).
 
 v2.0.1 Sun Jan 26 21:10:10 PDT
 

@@ -374,7 +374,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			 * XXX - we don't use "advance"; RFC 3775 says that
 			 * the next header field in a mobility header
 			 * should be IPPROTO_NONE, but speaks of
-			 * the possiblity of a future extension in
+			 * the possibility of a future extension in
 			 * which payload can be piggybacked atop a
 			 * mobility header.
 			 */

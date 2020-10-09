@@ -1379,7 +1379,7 @@ ppp_hdlc(netdissect_options *ndo,
 
 	/*
 	 * Unescape all the data into a temporary, private, buffer.
-	 * Do this so that we dont overwrite the original packet
+	 * Do this so that we don't overwrite the original packet
 	 * contents.
 	 */
 	for (s = p, t = b, i = caplen; i != 0; i--) {
