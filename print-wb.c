@@ -32,14 +32,13 @@
 #include "extract.h"
 
 
-/* XXX need to add byte-swapping macros! */
-/* XXX - you mean like the ones in "extract.h"? */
-
+#if 0
 /*
  * Largest packet size.  Everything should fit within this space.
  * For instance, multiline objects are sent piecewise.
  */
 #define MAXFRAMESIZE 1024
+#endif
 
 /*
  * Multiple drawing ops can be sent in one packet.  Each one starts on a
@@ -72,6 +71,7 @@ struct pkt_hdr {
 #define PT_PREQ         5       /* page vector request */
 #define PT_PREP         7       /* page vector reply */
 
+#if 0
 #ifdef PF_USER
 #undef PF_USER			/* {Digital,Tru64} UNIX define this, alas */
 #endif
@@ -79,6 +79,7 @@ struct pkt_hdr {
 /* flags */
 #define PF_USER		0x01	/* hint that packet has interactive data */
 #define PF_VIS		0x02	/* only visible ops wanted */
+#endif
 
 struct PageID {
 	nd_uint32_t p_sid;		/* session id of initiator */
@@ -109,7 +110,23 @@ struct dophdr {
 #define DT_REF          13
 #define DT_SKIP         14
 #define DT_HOLE         15
-#define DT_MAXTYPE      15
+static const struct tok dop_str[] = {
+	{ DT_RECT,   "RECT"   },
+	{ DT_LINE,   "LINE"   },
+	{ DT_ML,     "ML"     },
+	{ DT_DEL,    "DEL"    },
+	{ DT_XFORM,  "XFORM"  },
+	{ DT_ELL,    "ELL"    },
+	{ DT_CHAR,   "CHAR"   },
+	{ DT_STR,    "STR"    },
+	{ DT_NOP,    "NOP"    },
+	{ DT_PSCODE, "PSCODE" },
+	{ DT_PSCOMP, "PSCOMP" },
+	{ DT_REF,    "REF"    },
+	{ DT_SKIP,   "SKIP"   },
+	{ DT_HOLE,   "HOLE"   },
+	{ 0, NULL }
+};
 
 /*
  * A drawing operation.
@@ -286,27 +303,7 @@ wb_prep(netdissect_options *ndo,
 	return ((const u_char *)ps <= ep? 0 : -1);
 }
 
-
-static const char *dopstr[] = {
-	"dop-0!",
-	"dop-1!",
-	"RECT",
-	"LINE",
-	"ML",
-	"DEL",
-	"XFORM",
-	"ELL",
-	"CHAR",
-	"STR",
-	"NOP",
-	"PSCODE",
-	"PSCOMP",
-	"REF",
-	"SKIP",
-	"HOLE",
-};
-
-static int
+static void
 wb_dops(netdissect_options *ndo, const struct pkt_dop *dop,
         uint32_t ss, uint32_t es)
 {
@@ -322,25 +319,20 @@ wb_dops(netdissect_options *ndo, const struct pkt_dop *dop,
 		}
 		t = GET_U_1(dh->dh_type);
 
-		if (t > DT_MAXTYPE)
-			ND_PRINT(" dop-%u!", t);
-		else {
-			ND_PRINT(" %s", dopstr[t]);
-			if (t == DT_SKIP || t == DT_HOLE) {
-				uint32_t ts = GET_BE_U_4(dh->dh_ts);
-				ND_PRINT("%u", ts - ss + 1);
-				if (ss > ts || ts > es) {
-					ND_PRINT("[|]");
-					if (ts < ss)
-						return (0);
-				}
-				ss = ts;
+		ND_PRINT(" %s", tok2str(dop_str, "dop-%u!", t));
+		if (t == DT_SKIP || t == DT_HOLE) {
+			uint32_t ts = GET_BE_U_4(dh->dh_ts);
+			ND_PRINT("%u", ts - ss + 1);
+			if (ss > ts || ts > es) {
+				ND_PRINT("[|]");
+				if (ts < ss)
+					return;
 			}
+			ss = ts;
 		}
 		dh = DOP_NEXT(dh);
 	}
 	ND_PRINT(" >");
-	return (0);
 }
 
 static int
@@ -362,9 +354,9 @@ wb_rrep(netdissect_options *ndo,
 	    GET_BE_U_4(dop->pd_eseq));
 
 	if (ndo->ndo_vflag)
-		return (wb_dops(ndo, dop,
-		    GET_BE_U_4(dop->pd_sseq),
-		    GET_BE_U_4(dop->pd_eseq)));
+		wb_dops(ndo, dop,
+		        GET_BE_U_4(dop->pd_sseq),
+		        GET_BE_U_4(dop->pd_eseq));
 	return (0);
 }
 
@@ -384,9 +376,9 @@ wb_drawop(netdissect_options *ndo,
 	    GET_BE_U_4(dop->pd_eseq));
 
 	if (ndo->ndo_vflag)
-		return (wb_dops(ndo, dop,
-				GET_BE_U_4(dop->pd_sseq),
-				GET_BE_U_4(dop->pd_eseq)));
+		wb_dops(ndo, dop,
+		        GET_BE_U_4(dop->pd_sseq),
+		        GET_BE_U_4(dop->pd_eseq));
 	return (0);
 }
 
