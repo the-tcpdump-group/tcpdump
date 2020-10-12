@@ -31,6 +31,7 @@
 
 #include <stdio.h>
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -179,18 +180,15 @@ ipx_sap_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	for (i = 0; i < 8 && length != 0; i++) {
 	    ND_TCHECK_2(ipx);
 	    if (length < 2)
-		goto trunc;
+		goto invalid;
 	    ND_PRINT(" %s '", ipxsap_string(ndo, htons(GET_BE_U_2(ipx))));
 	    ipx += 2;
 	    length -= 2;
 	    if (length < 48) {
 		ND_PRINT("'");
-		goto trunc;
+		goto invalid;
 	    }
-	    if (nd_printzp(ndo, ipx, 48, ndo->ndo_snapend)) {
-		ND_PRINT("'");
-		goto trunc;
-	    }
+	    nd_printzp(ndo, ipx, 48, NULL);
 	    ND_PRINT("'");
 	    ipx += 48;
 	    length -= 48;
@@ -199,7 +197,7 @@ ipx_sap_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	     */
 	    ND_TCHECK_LEN(ipx, 10);
 	    if (length < 10)
-		goto trunc;
+		goto invalid;
 	    ND_PRINT(" addr %s",
 		ipxaddr_string(ndo, GET_BE_U_4(ipx), ipx + 4));
 	    ipx += 10;
@@ -210,7 +208,7 @@ ipx_sap_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	     */
 	    ND_TCHECK_4(ipx);
 	    if (length < 4)
-		goto trunc;
+		goto invalid;
 	    ipx += 4;
 	    length -= 4;
 	}
@@ -220,8 +218,9 @@ ipx_sap_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	break;
     }
     return;
-trunc:
-    nd_print_trunc(ndo);
+
+invalid:
+    nd_print_invalid(ndo);
 }
 
 static void
@@ -238,7 +237,7 @@ ipx_rip_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	ND_PRINT("ipx-rip-req");
 	if (length != 0) {
 	    if (length < 8)
-		goto trunc;
+		goto invalid;
 	    ND_PRINT(" %08x/%u.%u", GET_BE_U_4(ipx),
 			 GET_BE_U_2(ipx + 4), GET_BE_U_2(ipx + 6));
 	}
@@ -247,7 +246,7 @@ ipx_rip_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	ND_PRINT("ipx-rip-resp");
 	for (i = 0; i < 50 && length != 0; i++) {
 	    if (length < 8)
-		goto trunc;
+		goto invalid;
 	    ND_PRINT(" %08x/%u.%u", GET_BE_U_4(ipx),
 			 GET_BE_U_2(ipx + 4), GET_BE_U_2(ipx + 6));
 
@@ -260,6 +259,7 @@ ipx_rip_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	break;
     }
     return;
-trunc:
-    nd_print_trunc(ndo);
+
+invalid:
+    nd_print_invalid(ndo);
 }
