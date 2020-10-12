@@ -59,7 +59,6 @@
 #define resp_print_length_negative(ndo)  ND_PRINT(" length negative and not -1")
 #define resp_print_invalid(ndo)          ND_PRINT(" invalid")
 
-void       resp_print(netdissect_options *, const u_char *, u_int);
 static int resp_parse(netdissect_options *, const u_char *, int);
 static int resp_print_string_error_integer(netdissect_options *, const u_char *, int);
 static int resp_print_simple_string(netdissect_options *, const u_char *, int);
