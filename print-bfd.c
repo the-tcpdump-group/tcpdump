@@ -26,6 +26,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 
@@ -181,7 +182,7 @@ static const struct tok bfd_v1_state_values[] = {
     { 0, NULL }
 };
 
-static int
+static void
 auth_print(netdissect_options *ndo, const u_char *pptr)
 {
         const struct bfd_auth_header_t *bfd_auth_header;
@@ -221,9 +222,7 @@ auth_print(netdissect_options *ndo, const u_char *pptr)
                 pptr++;
                 ND_PRINT(", Password: ");
                 /* the length is equal to the password length plus three */
-                if (nd_printn(ndo, pptr, auth_len - 3,
-                              ndo->ndo_snapend))
-                    goto trunc;
+                nd_printn(ndo, pptr, auth_len - 3, NULL);
                 break;
             case AUTH_MD5:
             case AUTH_MET_MD5:
@@ -286,10 +285,6 @@ auth_print(netdissect_options *ndo, const u_char *pptr)
                     ND_PRINT("%02x", GET_U_1(pptr + i));
                 break;
         }
-        return 0;
-
-trunc:
-        return 1;
 }
 
 void
@@ -350,8 +345,7 @@ bfd_print(netdissect_options *ndo, const u_char *pptr,
                          GET_BE_U_4(bfd_header->required_min_echo_interval)/1000);
 
                 if (flags & BFD_FLAG_AUTH) {
-                    if (auth_print(ndo, pptr))
-                        goto trunc;
+                    auth_print(ndo, pptr);
                 }
                 break;
 
@@ -393,8 +387,7 @@ bfd_print(netdissect_options *ndo, const u_char *pptr,
                          GET_BE_U_4(bfd_header->required_min_echo_interval)/1000);
 
                 if (flags & BFD_FLAG_AUTH) {
-                    if (auth_print(ndo, pptr))
-                        goto trunc;
+                    auth_print(ndo, pptr);
                 }
                 break;
 
@@ -430,8 +423,4 @@ bfd_print(netdissect_options *ndo, const u_char *pptr,
                             return;
             }
         }
-        return;
-
-trunc:
-        nd_print_trunc(ndo);
 }
