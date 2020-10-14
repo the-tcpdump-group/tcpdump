@@ -16,3 +16,4 @@ tcpdump compiles and works on at least the following platforms:
 * OpenBSD
 * OpenWrt
 * Solaris
+* Windows (requires WinPcap or Npcap, and Visual Studio with CMake)
