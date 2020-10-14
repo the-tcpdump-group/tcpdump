@@ -406,6 +406,8 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	case ND_TRUNCATED:
 		/* A printer quit because the packet was truncated; report it */
 		nd_print_trunc(ndo);
+		/* Print the full packet */
+		ndo->ndo_ll_hdr_len = 0;
 		break;
 	}
 	hdrlen = ndo->ndo_ll_hdr_len;
