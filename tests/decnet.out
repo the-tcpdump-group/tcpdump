@@ -4,7 +4,7 @@
     4  19:34:55.597814 endnode-hello endnode vers 2 eco 0 ueco 0 src 1.1 blksize 16434 rtr 0.0 hello 10 data 2
     5  19:35:05.597817 endnode-hello endnode vers 2 eco 0 ueco 0 src 1.1 blksize 16434 rtr 0.0 hello 10 data 2
     6  19:35:11.338778 1.1 > 1.1 34 conn-initiate 8195>0 ver 4.1 segsize 16403 
-    7  19:35:11.339327 1.1 > 1.1 9  [|decnet]
+    7  19:35:11.339327 1.1 > 1.1 9  (nsplen 3 < 5) (invalid)
     8  19:35:11.339336 1.1 > 1.1 16 conn-confirm 8196>8195 ver 4.1 segsize 16403 
     9  19:35:11.339342 1.1 > 1.1 19 link-service 8195>8196 ack 0 ackdat 0 seg 1 dat seg count 0 
    10  19:35:11.339350 1.1 > 1.1 15 ils-ack 8196>8195 ack 1 ackdat 0 
@@ -18,7 +18,7 @@
    18  19:35:11.342876 1.1 > 1.1 15 data-ack 8195>8196 ack 2 oack 0 
    19  19:35:15.597819 endnode-hello endnode vers 2 eco 0 ueco 0 src 1.1 blksize 16434 rtr 0.0 hello 10 data 2
    20  19:35:16.403594 1.1 > 1.1 34 conn-initiate 8197>0 ver 4.1 segsize 16403 
-   21  19:35:16.403633 1.1 > 1.1 9  [|decnet]
+   21  19:35:16.403633 1.1 > 1.1 9  (nsplen 3 < 5) (invalid)
    22  19:35:16.403641 1.1 > 1.1 16 conn-confirm 8198>8197 ver 4.1 segsize 16403 
    23  19:35:16.403647 1.1 > 1.1 19 link-service 8197>8198 ack 0 ackdat 0 seg 1 dat seg count 0 
    24  19:35:16.403656 1.1 > 1.1 15 ils-ack 8198>8197 ack 1 ackdat 0 
