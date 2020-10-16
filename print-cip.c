@@ -30,6 +30,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 
@@ -40,15 +41,6 @@ static const unsigned char rfcllc[] = {
 	0x00,	/* OUI: EtherType */
 	0x00,
 	0x00 };
-
-static void
-cip_print(netdissect_options *ndo, u_int length)
-{
-	/*
-	 * There is no MAC-layer header, so just print the length.
-	 */
-	ND_PRINT("%u: ", length);
-}
 
 /*
  * This is the top level routine of the printer.  'p' points
@@ -61,24 +53,18 @@ cip_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
-	size_t cmplen;
 	int llc_hdrlen;
 
 	ndo->ndo_protocol = "cip";
-	cmplen = sizeof(rfcllc);
-	if (cmplen > caplen)
-		cmplen = caplen;
-	if (cmplen > length)
-		cmplen = length;
 
 	if (ndo->ndo_eflag)
-		cip_print(ndo, length);
+		/*
+		 * There is no MAC-layer header, so just print the length.
+		 */
+		ND_PRINT("%u: ", length);
 
-	if (cmplen == 0) {
-		nd_print_trunc(ndo);
-		return;
-	}
-	if (memcmp(rfcllc, p, cmplen) == 0) {
+	ND_TCHECK_LEN(p, sizeof(rfcllc));
+	if (memcmp(rfcllc, p, sizeof(rfcllc)) == 0) {
 		/*
 		 * LLC header is present.  Try to print it & higher layers.
 		 */
