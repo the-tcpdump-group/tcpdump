@@ -71,8 +71,6 @@ sunatm_if_print(netdissect_options *ndo,
 	u_int traftype;
 
 	ndo->ndo_protocol = "sunatm";
-	ND_TCHECK_LEN(p, PKT_BEGIN_POS);
-	ndo->ndo_ll_hdr_len += PKT_BEGIN_POS;
 
 	if (ndo->ndo_eflag) {
 		ND_PRINT(GET_U_1(p + DIR_POS) & 0x80 ? "Tx: " : "Rx: ");
@@ -99,5 +97,6 @@ sunatm_if_print(netdissect_options *ndo,
 	p += PKT_BEGIN_POS;
 	caplen -= PKT_BEGIN_POS;
 	length -= PKT_BEGIN_POS;
+	ndo->ndo_ll_hdr_len += PKT_BEGIN_POS;
 	atm_print(ndo, vpi, vci, traftype, p, length, caplen);
 }
