@@ -23,6 +23,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
@@ -114,7 +115,7 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
     vqp_common_header = (const struct vqp_common_header_t *)pptr;
     ND_TCHECK_SIZE(vqp_common_header);
     if (sizeof(struct vqp_common_header_t) > tlen)
-        goto trunc;
+        goto invalid;
     version = GET_U_1(vqp_common_header->version);
 
     /*
@@ -157,7 +158,7 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
         vqp_obj_tlv = (const struct vqp_obj_tlv_t *)tptr;
         ND_TCHECK_SIZE(vqp_obj_tlv);
         if (sizeof(struct vqp_obj_tlv_t) > tlen)
-            goto trunc;
+            goto invalid;
         vqp_obj_type = GET_BE_U_4(vqp_obj_tlv->obj_type);
         vqp_obj_len = GET_BE_U_2(vqp_obj_tlv->obj_length);
         tptr+=sizeof(struct vqp_obj_tlv_t);
@@ -175,12 +176,12 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
         /* did we capture enough for fully decoding the object ? */
         ND_TCHECK_LEN(tptr, vqp_obj_len);
         if (vqp_obj_len > tlen)
-            goto trunc;
+            goto invalid;
 
         switch(vqp_obj_type) {
 	case VQP_OBJ_IP_ADDRESS:
             if (vqp_obj_len != 4)
-                goto trunc;
+                goto invalid;
             ND_PRINT("%s (0x%08x)", GET_IPADDR_STRING(tptr),
                      GET_BE_U_4(tptr));
             break;
@@ -195,7 +196,7 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 	case VQP_OBJ_MAC_ADDRESS:
 	case VQP_OBJ_MAC_NULL:
             if (vqp_obj_len != MAC_ADDR_LEN)
-                goto trunc;
+                goto invalid;
 	      ND_PRINT("%s", GET_ETHERADDR_STRING(tptr));
               break;
         default:
@@ -208,6 +209,6 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 	nitems--;
     }
     return;
-trunc:
-    nd_print_trunc(ndo);
+invalid:
+    nd_print_invalid(ndo);
 }
