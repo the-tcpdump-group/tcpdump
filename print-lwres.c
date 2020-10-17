@@ -36,7 +36,6 @@
 #include "netdissect-stdinc.h"
 
 #include <stdio.h>
-#include <string.h>
 
 #define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"

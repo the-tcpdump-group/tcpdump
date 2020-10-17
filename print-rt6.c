@@ -27,8 +27,6 @@
 
 #include "netdissect-stdinc.h"
 
-#include <string.h>
-
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"

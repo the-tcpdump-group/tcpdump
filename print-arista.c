@@ -8,8 +8,6 @@
 
 #include "netdissect-stdinc.h"
 
-#include <string.h>
-
 #include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"

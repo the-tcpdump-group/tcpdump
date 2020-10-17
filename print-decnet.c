@@ -29,7 +29,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
