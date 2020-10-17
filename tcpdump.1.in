@@ -405,7 +405,7 @@ which should include a time format as defined by
 .BR strftime (3).
 If no time format is specified, each new file will overwrite the previous.
 Whenever a generated filename is not unique, tcpdump will overwrite the
-preexisting data; providing a time specification that is coarser than the
+pre-existing data; providing a time specification that is coarser than the
 capture period is therefore not advised.
 .IP
 If used in conjunction with the
@@ -1184,7 +1184,7 @@ data and 6 bytes of compressed header:
 .HD
 ARP/RARP Packets
 .LP
-Arp/rarp output shows the type of request and its arguments.
+ARP/RARP output shows the type of request and its arguments.
 The
 format is intended to be self explanatory.
 Here is a short sample taken from the start of an `rlogin' from
@@ -1197,7 +1197,7 @@ arp reply csam is-at CSAM\fR
 .sp .5
 .fi
 .RE
-The first line says that rtsg sent an arp packet asking
+The first line says that rtsg sent an ARP packet asking
 for the Ethernet address of internet host csam.
 Csam
 replies with its Ethernet address (in this example, Ethernet addresses
@@ -1331,16 +1331,16 @@ The packet sequence number was 768512 and it contained no data.
 (The notation is `first:last' which means `sequence
 numbers \fIfirst\fP
 up to but not including \fIlast\fP'.)
-There was no piggy-backed ack, the available receive window was 4096
-bytes and there was a max-segment-size option requesting an mss of
+There was no piggy-backed ACK, the available receive window was 4096
+bytes and there was a max-segment-size option requesting an MSS of
 1024 bytes.
 .LP
 Csam replies with a similar packet except it includes a piggy-backed
-ack for rtsg's SYN.
-Rtsg then acks csam's SYN.
+ACK for rtsg's SYN.
+Rtsg then ACKs csam's SYN.
 The `.' means the ACK flag was set.
 The packet contained no data so there is no data sequence number or length.
-Note that the ack sequence
+Note that the ACK sequence
 number is a small integer (1).
 The first time \fItcpdump\fP sees a
 TCP `conversation', it prints the sequence number from the packet.
@@ -1592,7 +1592,7 @@ UDP format is illustrated by this rwho packet:
 .sp .5
 .fi
 .RE
-This says that port \fIwho\fP on host \fIactinide\fP sent a udp
+This says that port \fIwho\fP on host \fIactinide\fP sent a UDP
 datagram to port \fIwho\fP on host \fIbroadcast\fP, the Internet
 broadcast address.
 The packet contained 84 bytes of user data.
@@ -1776,7 +1776,7 @@ printed, depending on the filter expression used).
 Because the \-v flag
 is given, some of the file attributes (which are returned in addition
 to the file data) are printed: the file type (``REG'', for regular file),
-the file mode (in octal), the uid and gid, and the file size.
+the file mode (in octal), the UID and GID, and the file size.
 .LP
 If the \-v flag is given more than once, even more details are printed.
 .LP
@@ -1966,7 +1966,7 @@ Helios responds with 8 512-byte packets.
 The `:digit' following the
 transaction id gives the packet sequence number in the transaction
 and the number in parens is the amount of data in the packet,
-excluding the atp header.
+excluding the ATP header.
 The `*' on packet 7 indicates that the
 EOM bit was set.
 .LP
@@ -2021,7 +2021,7 @@ This program uses OpenSSL/LibreSSL, under specific configurations.
 To report a security issue please send an e-mail to \%security@tcpdump.org.
 .LP
 To report bugs and other problems, contribute patches, request a
-feature, provide generic feedback etc please see the file
+feature, provide generic feedback etc. please see the file
 .I CONTRIBUTING
 in the tcpdump source tree root.
 .LP
@@ -2037,7 +2037,7 @@ be copied from the kernel in order to be filtered in user mode;
 .IP
 all of a packet, not just the part that's within the snapshot length,
 will be copied from the kernel (the 2.0[.x] packet capture mechanism, if
-asked to copy only part of a packet to userland, will not report the
+asked to copy only part of a packet to userspace, will not report the
 true length of the packet; this would cause most IP packets to get an
 error from
 .BR tcpdump );
