@@ -23,7 +23,7 @@
 
 /* \summary: Generic Protocol Extension for VXLAN (VXLAN GPE) printer */
 
-/* specification: draft-ietf-nvo3-vxlan-gpe-01 */
+/* specification: draft-ietf-nvo3-vxlan-gpe-10 */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -37,6 +37,7 @@
 static const struct tok vxlan_gpe_flags [] = {
     { 0x08, "I" },
     { 0x04, "P" },
+    { 0x02, "B" },
     { 0x01, "O" },
     { 0, NULL }
 };
@@ -96,9 +97,6 @@ vxlan_gpe_print(netdissect_options *ndo, const u_char *bp, u_int len)
         break;
     case 0x4:
         nsh_print(ndo, bp, len - VXLAN_GPE_HDR_LEN);
-        break;
-    case 0x5:
-        mpls_print(ndo, bp, len - VXLAN_GPE_HDR_LEN);
         break;
     default:
         ND_PRINT("ERROR: unknown-next-protocol");
