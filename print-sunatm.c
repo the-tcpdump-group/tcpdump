@@ -38,6 +38,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 
@@ -70,11 +71,7 @@ sunatm_if_print(netdissect_options *ndo,
 	u_int traftype;
 
 	ndo->ndo_protocol = "sunatm";
-	if (caplen < PKT_BEGIN_POS) {
-		ndo->ndo_ll_hdr_len += caplen;
-		nd_print_trunc(ndo);
-		return;
-	}
+	ND_TCHECK_LEN(p, PKT_BEGIN_POS);
 	ndo->ndo_ll_hdr_len += PKT_BEGIN_POS;
 
 	if (ndo->ndo_eflag) {
