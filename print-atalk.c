@@ -51,9 +51,9 @@ struct aarp {
 	nd_uint16_t	htype, ptype;
 	nd_uint8_t	halen, palen;
 	nd_uint16_t	op;
-	uint8_t		hsaddr[MAC_ADDR_LEN];
+	nd_mac_addr	hsaddr;
 	uint8_t		psaddr[4];
-	uint8_t		hdaddr[MAC_ADDR_LEN];
+	nd_mac_addr	hdaddr;
 	uint8_t		pdaddr[4];
 };
 

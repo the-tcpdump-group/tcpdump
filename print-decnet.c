@@ -52,7 +52,7 @@ typedef nd_uint32_t longword;		/* 4 bytes field */
  * Definitions for DECNET Phase IV protocol headers
  */
 typedef union {
-	nd_byte dne_addr[MAC_ADDR_LEN];	/* full Ethernet address */
+	nd_mac_addr dne_addr;	/* full Ethernet address */
 	struct {
 		nd_byte dne_hiord[4];	/* DECnet HIORD prefix */
 		nd_byte dne_nodeaddr[2]; /* DECnet node address */
