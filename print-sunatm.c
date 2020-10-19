@@ -91,8 +91,8 @@ sunatm_if_print(netdissect_options *ndo,
 		break;
 	}
 
-	vci = GET_BE_U_2(p + VCI_POS);
 	vpi = GET_U_1(p + VPI_POS);
+	vci = GET_BE_U_2(p + VCI_POS);
 
 	p += PKT_BEGIN_POS;
 	caplen -= PKT_BEGIN_POS;
