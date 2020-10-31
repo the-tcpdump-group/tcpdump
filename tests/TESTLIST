@@ -401,6 +401,10 @@ dhcp-mud	dhcp-mud.pcap		dhcp-mud.out	-vv
 # VXLAN tests
 vxlan  vxlan.pcap  vxlan.out -e
 
+# PPTP tests
+pptp pptp.pcap pptp.out
+pptp-v pptp.pcap pptp-v.out -v
+
 # CVEs 2014 malformed packets from Steffen Bauch
 cve-2014-8767-OLSR cve-2014-8767-OLSR.pcap cve-2014-8767-OLSR.out -v
 cve-2014-8768-Geonet cve-2014-8768-Geonet.pcap cve-2014-8768-Geonet.out -v
