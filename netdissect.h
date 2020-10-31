@@ -462,7 +462,7 @@ extern const struct tok *uint2tokary_internal(const struct uint_tokary[], const 
 
 extern if_printer lookup_printer(int);
 
-#define ND_DEBUG {printf(" [%s:%d %s] ", __FILE__, __LINE__, __FUNCTION__); fflush(stdout);}
+#define ND_DEBUG {printf(" [%s:%d %s] ", __FILE__, __LINE__, __func__); fflush(stdout);}
 
 /* The DLT printer routines */
 
