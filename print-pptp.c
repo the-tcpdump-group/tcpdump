@@ -392,7 +392,7 @@ pptp_hostname_print(netdissect_options *ndo,
                     const u_char *hostname)
 {
 	ND_PRINT(" HOSTNAME(");
-	nd_printzp(ndo, hostname, 64, ndo->ndo_snapend);
+	nd_printjnp(ndo, hostname, 64);
 	ND_PRINT(")");
 }
 
@@ -514,7 +514,7 @@ pptp_subaddr_print(netdissect_options *ndo,
                    const u_char *subaddr)
 {
 	ND_PRINT(" SUB_ADDR(");
-	nd_printzp(ndo, subaddr, 64, ndo->ndo_snapend);
+	nd_printjnp(ndo, subaddr, 64);
 	ND_PRINT(")");
 }
 
@@ -523,7 +523,7 @@ pptp_vendor_print(netdissect_options *ndo,
                   const u_char *vendor)
 {
 	ND_PRINT(" VENDOR(");
-	nd_printzp(ndo, vendor, 64, ndo->ndo_snapend);
+	nd_printjnp(ndo, vendor, 64);
 	ND_PRINT(")");
 }
 
@@ -640,9 +640,8 @@ pptp_ocrq_print(netdissect_options *ndo,
 	ND_PRINT(" PHONE_NO_LEN(%u)", GET_BE_U_2(ptr->phone_no_len));
 	PRINT_RESERVED_IF_NOT_ZERO_2(ptr->reserved1);
 	ND_PRINT(" PHONE_NO(");
-	nd_printzp(ndo, ptr->phone_no,
-		   ND_MIN(64, GET_BE_U_2(ptr->phone_no_len)),
-		   ndo->ndo_snapend);
+	nd_printjnp(ndo, ptr->phone_no,
+		    ND_MIN(64, GET_BE_U_2(ptr->phone_no_len)));
 	ND_PRINT(")");
 	pptp_subaddr_print(ndo, ptr->subaddr);
 }
@@ -677,14 +676,12 @@ pptp_icrq_print(netdissect_options *ndo,
 	ND_PRINT(" DIALED_NO_LEN(%u)", GET_BE_U_2(ptr->dialed_no_len));
 	ND_PRINT(" DIALING_NO_LEN(%u)", GET_BE_U_2(ptr->dialing_no_len));
 	ND_PRINT(" DIALED_NO(");
-	nd_printzp(ndo, ptr->dialed_no,
-		   ND_MIN(64, GET_BE_U_2(ptr->dialed_no_len)),
-		   ndo->ndo_snapend);
+	nd_printjnp(ndo, ptr->dialed_no,
+		    ND_MIN(64, GET_BE_U_2(ptr->dialed_no_len)));
 	ND_PRINT(")");
 	ND_PRINT(" DIALING_NO(");
-	nd_printzp(ndo, ptr->dialing_no,
-		   ND_MIN(64, GET_BE_U_2(ptr->dialing_no_len)),
-		   ndo->ndo_snapend);
+	nd_printjnp(ndo, ptr->dialing_no,
+		    ND_MIN(64, GET_BE_U_2(ptr->dialing_no_len)));
 	ND_PRINT(")");
 	pptp_subaddr_print(ndo, ptr->subaddr);
 }
@@ -740,7 +737,7 @@ pptp_cdn_print(netdissect_options *ndo,
 	pptp_cause_code_print(ndo, ptr->cause_code);
 	PRINT_RESERVED_IF_NOT_ZERO_2(ptr->reserved1);
 	ND_PRINT(" CALL_STATS(");
-	nd_printzp(ndo, ptr->call_stats, 128, ndo->ndo_snapend);
+	nd_printjnp(ndo, ptr->call_stats, 128);
 	ND_PRINT(")");
 }
 
