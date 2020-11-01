@@ -229,6 +229,28 @@ nd_printzp(netdissect_options *ndo,
 }
 
 /*
+ * Print a null-padded filename (or other ASCII string), part of
+ * the packet buffer, filtering out non-printable characters.
+ * Stop if truncated (via GET_U_1/longjmp) or after n bytes or before
+ * the null char, whichever occurs first.
+ * The suffix comes from: j:longJmp, n:after N bytes, p:null-Padded.
+ */
+void
+nd_printjnp(netdissect_options *ndo, const u_char *s, u_int n)
+{
+	u_char c;
+
+	while (n > 0) {
+		c = GET_U_1(s);
+		if (c == '\0')
+			break;
+		fn_print_char(ndo, c);
+		n--;
+		s++;
+	}
+}
+
+/*
  * Print the timestamp .FRAC part (Microseconds/nanoseconds)
  */
 static void
