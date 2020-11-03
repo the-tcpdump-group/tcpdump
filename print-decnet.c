@@ -478,13 +478,13 @@ decnet_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "decnet";
 	if (length < sizeof(struct shorthdr)) {
-		ND_PRINT(" (length %u < %u)", length, (unsigned)sizeof(struct shorthdr));
+		ND_PRINT(" (length %u < %zu)", length, sizeof(struct shorthdr));
 		goto invalid;
 	}
 
 	pktlen = GET_LE_U_2(ap);
 	if (pktlen < sizeof(struct shorthdr)) {
-		ND_PRINT(" (pktlen %u < %u)", pktlen, (unsigned)sizeof(struct shorthdr));
+		ND_PRINT(" (pktlen %u < %zu)", pktlen, sizeof(struct shorthdr));
 		goto invalid;
 	}
 	if (pktlen > length) {
@@ -529,7 +529,7 @@ decnet_print(netdissect_options *ndo,
 	switch (mflags & RMF_MASK) {
 	case RMF_LONG:
 	    if (length < sizeof(struct longhdr)) {
-		ND_PRINT(" (length %u < %u)", length, (unsigned)sizeof(struct longhdr));
+		ND_PRINT(" (length %u < %zu)", length, sizeof(struct longhdr));
 		goto invalid;
 	    }
 	    ND_TCHECK_SIZE(&rhp->rh_long);
@@ -799,7 +799,7 @@ print_nsp(netdissect_options *ndo,
 	u_int dst, src, flags;
 
 	if (nsplen < sizeof(struct nsphdr)) {
-		ND_PRINT(" (nsplen %u < %u)", nsplen, (unsigned)sizeof(struct nsphdr));
+		ND_PRINT(" (nsplen %u < %zu)", nsplen, sizeof(struct nsphdr));
 		goto invalid;
 	}
 	flags = GET_U_1(nsphp->nh_flags);
