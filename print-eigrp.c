@@ -236,9 +236,9 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
      * Sanity checking of the header.
      */
     if (GET_U_1(eigrp_com_header->version) != EIGRP_VERSION) {
-	ND_PRINT("EIGRP version %u packet not supported",
+        ND_PRINT("EIGRP version %u packet not supported",
                  GET_U_1(eigrp_com_header->version));
-	return;
+        return;
     }
 
     /* in non-verbose mode just lets print the basic Message Type*/
@@ -252,9 +252,9 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
     /* ok they seem to want to know everything - lets fully decode it */
 
     if (len < sizeof(struct eigrp_common_header)) {
-        ND_PRINT("EIGRP %s, length: %u (too short, < %u)",
+        ND_PRINT("EIGRP %s, length: %u (too short, < %zu)",
                tok2str(eigrp_opcode_values, "unknown (%u)",GET_U_1(eigrp_com_header->opcode)),
-               len, (u_int) sizeof(struct eigrp_common_header));
+               len, sizeof(struct eigrp_common_header));
         return;
     }
     tlen=len-sizeof(struct eigrp_common_header);
@@ -298,8 +298,8 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
                eigrp_tlv_len);
 
         if (eigrp_tlv_len < sizeof(struct eigrp_tlv_header)) {
-                ND_PRINT(" (too short, < %u)",
-                        (u_int) sizeof(struct eigrp_tlv_header));
+                ND_PRINT(" (too short, < %zu)",
+                         sizeof(struct eigrp_tlv_header));
                 break;
         }
         tlv_tptr=tptr+sizeof(struct eigrp_tlv_header);
@@ -313,8 +313,8 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
         case EIGRP_TLV_GENERAL_PARM:
             tlv_ptr.eigrp_tlv_general_parm = (const struct eigrp_tlv_general_parm_t *)tlv_tptr;
             if (tlv_tlen < sizeof(*tlv_ptr.eigrp_tlv_general_parm)) {
-                ND_PRINT(" (too short, < %u)",
-                    (u_int) (sizeof(struct eigrp_tlv_header) + sizeof(*tlv_ptr.eigrp_tlv_general_parm)));
+                ND_PRINT(" (too short, < %zu)",
+        		 sizeof(struct eigrp_tlv_header) + sizeof(*tlv_ptr.eigrp_tlv_general_parm));
                 break;
             }
 
@@ -330,8 +330,8 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
         case EIGRP_TLV_SW_VERSION:
             tlv_ptr.eigrp_tlv_sw_version = (const struct eigrp_tlv_sw_version_t *)tlv_tptr;
             if (tlv_tlen < sizeof(*tlv_ptr.eigrp_tlv_sw_version)) {
-                ND_PRINT(" (too short, < %u)",
-                    (u_int) (sizeof(struct eigrp_tlv_header) + sizeof(*tlv_ptr.eigrp_tlv_sw_version)));
+                ND_PRINT(" (too short, < %zu)",
+                         sizeof(struct eigrp_tlv_header) + sizeof(*tlv_ptr.eigrp_tlv_sw_version));
                 break;
             }
 
@@ -345,8 +345,8 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
         case EIGRP_TLV_IP_INT:
             tlv_ptr.eigrp_tlv_ip_int = (const struct eigrp_tlv_ip_int_t *)tlv_tptr;
             if (tlv_tlen < sizeof(*tlv_ptr.eigrp_tlv_ip_int)) {
-                ND_PRINT(" (too short, < %u)",
-                    (u_int) (sizeof(struct eigrp_tlv_header) + sizeof(*tlv_ptr.eigrp_tlv_ip_int)));
+                ND_PRINT(" (too short, < %zu)",
+                         sizeof(struct eigrp_tlv_header) + sizeof(*tlv_ptr.eigrp_tlv_ip_int));
                 break;
             }
 
@@ -380,8 +380,8 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
         case EIGRP_TLV_IP_EXT:
             tlv_ptr.eigrp_tlv_ip_ext = (const struct eigrp_tlv_ip_ext_t *)tlv_tptr;
             if (tlv_tlen < sizeof(*tlv_ptr.eigrp_tlv_ip_ext)) {
-                ND_PRINT(" (too short, < %u)",
-                    (u_int) (sizeof(struct eigrp_tlv_header) + sizeof(*tlv_ptr.eigrp_tlv_ip_ext)));
+                ND_PRINT(" (too short, < %zu)",
+                         sizeof(struct eigrp_tlv_header) + sizeof(*tlv_ptr.eigrp_tlv_ip_ext));
                 break;
             }
 
@@ -423,8 +423,8 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
         case EIGRP_TLV_AT_CABLE_SETUP:
             tlv_ptr.eigrp_tlv_at_cable_setup = (const struct eigrp_tlv_at_cable_setup_t *)tlv_tptr;
             if (tlv_tlen < sizeof(*tlv_ptr.eigrp_tlv_at_cable_setup)) {
-                ND_PRINT(" (too short, < %u)",
-                    (u_int) (sizeof(struct eigrp_tlv_header) + sizeof(*tlv_ptr.eigrp_tlv_at_cable_setup)));
+                ND_PRINT(" (too short, < %zu)",
+                         sizeof(struct eigrp_tlv_header) + sizeof(*tlv_ptr.eigrp_tlv_at_cable_setup));
                 break;
             }
 
@@ -437,8 +437,8 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
         case EIGRP_TLV_AT_INT:
             tlv_ptr.eigrp_tlv_at_int = (const struct eigrp_tlv_at_int_t *)tlv_tptr;
             if (tlv_tlen < sizeof(*tlv_ptr.eigrp_tlv_at_int)) {
-                ND_PRINT(" (too short, < %u)",
-                    (u_int) (sizeof(struct eigrp_tlv_header) + sizeof(*tlv_ptr.eigrp_tlv_at_int)));
+                ND_PRINT(" (too short, < %zu)",
+                         sizeof(struct eigrp_tlv_header) + sizeof(*tlv_ptr.eigrp_tlv_at_int));
                 break;
             }
 
@@ -465,8 +465,8 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
         case EIGRP_TLV_AT_EXT:
             tlv_ptr.eigrp_tlv_at_ext = (const struct eigrp_tlv_at_ext_t *)tlv_tptr;
             if (tlv_tlen < sizeof(*tlv_ptr.eigrp_tlv_at_ext)) {
-                ND_PRINT(" (too short, < %u)",
-                    (u_int) (sizeof(struct eigrp_tlv_header) + sizeof(*tlv_ptr.eigrp_tlv_at_ext)));
+                ND_PRINT(" (too short, < %zu)",
+                         sizeof(struct eigrp_tlv_header) + sizeof(*tlv_ptr.eigrp_tlv_at_ext));
                 break;
             }
 
