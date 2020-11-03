@@ -109,8 +109,8 @@ pktap_if_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "pktap";
 	if (length < sizeof(pktap_header_t)) {
-		ND_PRINT(" (packet too short, %u < %u)",
-		         length, (unsigned)sizeof(pktap_header_t));
+		ND_PRINT(" (packet too short, %u < %zu)",
+		         length, sizeof(pktap_header_t));
 		goto invalid;
 	}
 	hdr = (const pktap_header_t *)p;
@@ -124,8 +124,8 @@ pktap_if_print(netdissect_options *ndo,
 		 * is the length supplied so that the header can
 		 * be expanded in the future)?
 		 */
-		ND_PRINT(" (pkt_len too small, %u < %u)",
-		         hdrlen, (unsigned)sizeof(pktap_header_t));
+		ND_PRINT(" (pkt_len too small, %u < %zu)",
+		         hdrlen, sizeof(pktap_header_t));
 		goto invalid;
 	}
 	if (hdrlen > length) {
