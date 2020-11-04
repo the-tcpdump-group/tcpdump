@@ -467,8 +467,8 @@ sctp_print(netdissect_options *ndo,
   ndo->ndo_protocol = "sctp";
   if (sctpPacketLength < sizeof(struct sctpHeader))
     {
-      ND_PRINT("truncated-sctp - %ld bytes missing!",
-		   (long)(sizeof(struct sctpHeader) - sctpPacketLength));
+      ND_PRINT("truncated-sctp - %zu bytes missing!",
+               sizeof(struct sctpHeader) - sctpPacketLength);
       return;
     }
   sctpPktHdr = (const struct sctpHeader*) bp;
