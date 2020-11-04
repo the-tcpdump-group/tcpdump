@@ -533,11 +533,11 @@ ospf_print_lshdr(netdissect_options *ndo,
                     sizeof(struct lsa_hdr));
                 return(-1);
         }
-        ND_PRINT("\n\t  Advertising Router %s, seq 0x%08x, age %us, length %u",
+        ND_PRINT("\n\t  Advertising Router %s, seq 0x%08x, age %us, length %zu",
                   GET_IPADDR_STRING(lshp->ls_router),
                   GET_BE_U_4(lshp->ls_seq),
                   GET_BE_U_2(lshp->ls_age),
-                  ls_length - (u_int)sizeof(struct lsa_hdr));
+                  ls_length - sizeof(struct lsa_hdr));
         ls_type = GET_U_1(lshp->ls_type);
         switch (ls_type) {
         /* the LSA header for opaque LSAs was slightly changed */
