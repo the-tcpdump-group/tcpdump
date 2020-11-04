@@ -391,11 +391,11 @@ ospf6_print_lshdr(netdissect_options *ndo,
 	if ((const u_char *)(lshp + 1) > dataend)
 		goto trunc;
 
-	ND_PRINT("\n\t  Advertising Router %s, seq 0x%08x, age %us, length %u",
-               GET_IPADDR_STRING(lshp->ls_router),
-               GET_BE_U_4(lshp->ls_seq),
-               GET_BE_U_2(lshp->ls_age),
-               GET_BE_U_2(lshp->ls_length)-(u_int)sizeof(struct lsa6_hdr));
+	ND_PRINT("\n\t  Advertising Router %s, seq 0x%08x, age %us, length %zu",
+		 GET_IPADDR_STRING(lshp->ls_router),
+		 GET_BE_U_4(lshp->ls_seq),
+		 GET_BE_U_2(lshp->ls_age),
+		 GET_BE_U_2(lshp->ls_length)-sizeof(struct lsa6_hdr));
 
 	ospf6_print_ls_type(ndo, GET_BE_U_2(lshp->ls_type),
 			    &lshp->ls_stateid);
