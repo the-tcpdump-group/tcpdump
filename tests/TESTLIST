@@ -111,6 +111,7 @@ daoack01        rpl-26-senddaoack.pcap      rpl-26-senddaovv.out -v -v -v
 
 # IPNET encapsulated site
 e1000g		e1000g.pcap		e1000g.out
+e1000g-e	e1000g.pcap		e1000g-e.out	-e
 
 # IPX/Netware packets
 ipx		ipx.pcap		ipx.out
