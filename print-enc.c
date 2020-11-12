@@ -29,6 +29,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 #include "af.h"
@@ -104,11 +105,7 @@ enc_if_print(netdissect_options *ndo,
 	const struct enchdr *hdr;
 
 	ndo->ndo_protocol = "enc";
-	if (caplen < ENC_HDRLEN) {
-		ndo->ndo_ll_hdr_len += caplen;
-		nd_print_trunc(ndo);
-		return;
-	}
+	ND_TCHECK_LEN(p, ENC_HDRLEN);
 	ndo->ndo_ll_hdr_len += ENC_HDRLEN;
 
 	hdr = (const struct enchdr *)p;
