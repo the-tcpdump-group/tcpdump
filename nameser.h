@@ -293,8 +293,11 @@ typedef struct {
 /*
  * Defines for handling compressed domain names, EDNS0 labels, etc.
  */
-#define INDIR_MASK	0xc0	/* 11.... */
-#define EDNS0_MASK	0x40	/* 01.... */
+#define TYPE_MASK	0xc0	/* mask for the type bits of the item */
+#define TYPE_INDIR	0xc0	/* 11.... - pointer */
+#define TYPE_RESERVED	0x80	/* 10.... - reserved */
+#define TYPE_EDNS0	0x40	/* 01.... - EDNS(0) label */
+#define TYPE_LABEL	0x00	/* 00.... - regular label */
 #  define EDNS0_ELT_BITLABEL 0x01
 
 #endif /* !_NAMESER_H_ */

@@ -818,6 +818,9 @@ ptp_ethernet	ptp_ethernet.pcap	ptp_ethernet.out	-e
 # bad packets from Jason Xiaole
 ldp_tlv_print-oobr ldp_tlv_print-oobr.pcap ldp_tlv_print-oobr.out -v
 
+# bad packets from Hardik Shah
+dns-badlabel	dns-badlabel.pcap	dns-badlabel.out	-vv
+
 #someip tests
 someip1		someip1.pcap	someip1.out
 someip2		someip2.pcap	someip2.out
