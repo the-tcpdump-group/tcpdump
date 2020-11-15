@@ -60,12 +60,15 @@ ns_nskip(netdissect_options *ndo,
 		return (NULL);
 	i = *cp++;
 	while (i) {
-		if ((i & INDIR_MASK) == INDIR_MASK)
+		switch (i & TYPE_MASK) {
+
+		case TYPE_INDIR:
 			return (cp + 1);
-		if ((i & INDIR_MASK) == EDNS0_MASK) {
+
+		case TYPE_EDNS0: {
 			int bitlen, bytelen;
 
-			if ((i & ~INDIR_MASK) != EDNS0_ELT_BITLABEL)
+			if ((i & ~TYPE_MASK) != EDNS0_ELT_BITLABEL)
 				return(NULL); /* unknown ELT */
 			if (!ND_TTEST2(*cp, 1))
 				return (NULL);
@@ -73,8 +76,16 @@ ns_nskip(netdissect_options *ndo,
 				bitlen = 256;
 			bytelen = (bitlen + 7) / 8;
 			cp += bytelen;
-		} else
+		}
+		break;
+
+		case TYPE_RESERVED:
+			return (NULL);
+
+		case TYPE_LABEL:
 			cp += i;
+			break;
+		}
 		if (!ND_TTEST2(*cp, 1))
 			return (NULL);
 		i = *cp++;
@@ -129,9 +140,11 @@ labellen(netdissect_options *ndo,
 	if (!ND_TTEST2(*cp, 1))
 		return(-1);
 	i = *cp;
-	if ((i & INDIR_MASK) == EDNS0_MASK) {
-		int bitlen, elt;
-		if ((elt = (i & ~INDIR_MASK)) != EDNS0_ELT_BITLABEL) {
+	switch (i & TYPE_MASK) {
+
+	case TYPE_EDNS0: {
+		u_int bitlen, elt;
+		if ((elt = (i & ~TYPE_MASK)) != EDNS0_ELT_BITLABEL) {
 			ND_PRINT((ndo, "<ELT %d>", elt));
 			return(-1);
 		}
@@ -140,8 +153,20 @@ labellen(netdissect_options *ndo,
 		if ((bitlen = *(cp + 1)) == 0)
 			bitlen = 256;
 		return(((bitlen + 7) / 8) + 1);
-	} else
+	}
+
+	case TYPE_INDIR:
+	case TYPE_LABEL:
 		return(i);
+
+	default:
+		/*
+		 * TYPE_RESERVED, but we use default to suppress compiler
+		 * warnings about falling out of the switch statement.
+		 */
+		ND_PRINT((ndo, "<BAD LABEL TYPE>"));
+		return(-1);
+	}
 }
 
 const u_char *
@@ -153,20 +178,23 @@ ns_nprint(netdissect_options *ndo,
 	register int compress = 0;
 	int elt;
 	u_int offset, max_offset;
+	u_int name_chars = 0;
 
 	if ((l = labellen(ndo, cp)) == (u_int)-1)
 		return(NULL);
 	if (!ND_TTEST2(*cp, 1))
 		return(NULL);
 	max_offset = (u_int)(cp - bp);
-	if (((i = *cp++) & INDIR_MASK) != INDIR_MASK) {
+	if (((i = *cp++) & TYPE_MASK) != TYPE_INDIR) {
 		compress = 0;
 		rp = cp + l;
 	}
 
-	if (i != 0)
+	if (i != 0) {
 		while (i && cp < ndo->ndo_snapend) {
-			if ((i & INDIR_MASK) == INDIR_MASK) {
+			switch (i & TYPE_MASK) {
+
+			case TYPE_INDIR:
 				if (!compress) {
 					rp = cp + 1;
 					compress = 1;
@@ -190,15 +218,15 @@ ns_nprint(netdissect_options *ndo,
 				}
 				max_offset = offset;
 				cp = bp + offset;
-				if ((l = labellen(ndo, cp)) == (u_int)-1)
-					return(NULL);
 				if (!ND_TTEST2(*cp, 1))
+					return(NULL);
+				if ((l = labellen(ndo, cp)) == (u_int)-1)
 					return(NULL);
 				i = *cp++;
 				continue;
-			}
-			if ((i & INDIR_MASK) == EDNS0_MASK) {
-				elt = (i & ~INDIR_MASK);
+
+			case TYPE_EDNS0:
+				elt = (i & ~TYPE_MASK);
 				switch(elt) {
 				case EDNS0_ELT_BITLABEL:
 					if (blabel_print(ndo, cp) == NULL)
@@ -209,22 +237,40 @@ ns_nprint(netdissect_options *ndo,
 					ND_PRINT((ndo, "<ELT %d>", elt));
 					return(NULL);
 				}
-			} else {
-				if (fn_printn(ndo, cp, l, ndo->ndo_snapend))
-					return(NULL);
+				break;
+
+			case TYPE_RESERVED:
+				ND_PRINT((ndo, "<BAD LABEL TYPE>"));
+				return(NULL);
+
+			case TYPE_LABEL:
+				if (name_chars + l <= MAXCDNAME) {
+					if (fn_printn(ndo, cp, l, ndo->ndo_snapend))
+						return(NULL);
+				} else if (name_chars < MAXCDNAME) {
+					if (fn_printn(ndo, cp,
+					    MAXCDNAME - name_chars, ndo->ndo_snapend))
+						return(NULL);
+				}
+				name_chars += l;
+				break;
 			}
 
 			cp += l;
-			ND_PRINT((ndo, "."));
-			if ((l = labellen(ndo, cp)) == (u_int)-1)
-				return(NULL);
+			if (name_chars <= MAXCDNAME)
+				ND_PRINT((ndo, "."));
+			name_chars++;
 			if (!ND_TTEST2(*cp, 1))
+				return(NULL);
+			if ((l = labellen(ndo, cp)) == (u_int)-1)
 				return(NULL);
 			i = *cp++;
 			if (!compress)
 				rp += l + 1;
 		}
-	else
+		if (name_chars > MAXCDNAME)
+			ND_PRINT((ndo, "<DOMAIN NAME TOO LONG>"));
+	} else
 		ND_PRINT((ndo, "."));
 	return (rp);
 }

@@ -640,4 +640,5 @@ kh-tcpdump-002          kh-tcpdump-002.pcap     kh-tcpdump-002.out
 # CVE-2018-10105 bad packets from Luis Rocha
 cve-2018-10105-segv-sflowprint           cve-2018-10105-segv-sflowprint.pcapng    cve-2018-10105-segv-sflowprint.out -v
 
-
+# bad packets from Hardik Shah
+dns-badlabel	dns-badlabel.pcap	dns-badlabel.out	-vv
