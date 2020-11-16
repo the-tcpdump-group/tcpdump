@@ -27,6 +27,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
@@ -474,11 +475,7 @@ netanalyzer_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	 * Fail if we don't have enough data for the Hilscher pseudo-header.
 	 */
 	ndo->ndo_protocol = "netanalyzer";
-	if (h->caplen < 4) {
-		ndo->ndo_ll_hdr_len += h->caplen;
-		nd_print_trunc(ndo);
-		return;
-	}
+	ND_TCHECK_LEN(p, 4);
 
 	/* Skip the pseudo-header. */
 	ndo->ndo_ll_hdr_len += 4;
@@ -506,11 +503,7 @@ netanalyzer_transparent_if_print(netdissect_options *ndo,
 	 * preamble, and SOF.
 	 */
 	ndo->ndo_protocol = "netanalyzer_transparent";
-	if (h->caplen < 12) {
-		ndo->ndo_ll_hdr_len += h->caplen;
-		nd_print_trunc(ndo);
-		return;
-	}
+	ND_TCHECK_LEN(p, 12);
 
 	/* Skip the pseudo-header, preamble, and SOF. */
 	ndo->ndo_ll_hdr_len += 12;
