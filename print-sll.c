@@ -31,6 +31,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "ethertype.h"
@@ -223,16 +224,7 @@ sll_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 	u_int hdrlen;
 
 	ndo->ndo_protocol = "sll";
-	if (caplen < SLL_HDR_LEN) {
-		/*
-		 * XXX - this "can't happen" because "pcap-linux.c" always
-		 * adds this many bytes of header to every packet in a
-		 * cooked socket capture.
-		 */
-		nd_print_trunc(ndo);
-		ndo->ndo_ll_hdr_len += caplen;
-		return;
-	}
+	ND_TCHECK_LEN(p, SLL_HDR_LEN);
 
 	sllp = (const struct sll_header *)p;
 
@@ -419,16 +411,7 @@ sll2_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 #endif
 
 	ndo->ndo_protocol = "sll2";
-	if (caplen < SLL2_HDR_LEN) {
-		/*
-		 * XXX - this "can't happen" because "pcap-linux.c" always
-		 * adds this many bytes of header to every packet in a
-		 * cooked socket capture.
-		 */
-		nd_print_trunc(ndo);
-		ndo->ndo_ll_hdr_len += caplen;
-		return;
-	}
+	ND_TCHECK_LEN(p, SLL2_HDR_LEN);
 
 	sllp = (const struct sll2_header *)p;
 #ifdef HAVE_NET_IF_H
