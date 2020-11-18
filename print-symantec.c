@@ -27,6 +27,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 #include "ethertype.h"
@@ -78,11 +79,7 @@ symantec_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_
 	u_short ether_type;
 
 	ndo->ndo_protocol = "symantec";
-	if (caplen < sizeof (struct symantec_header)) {
-		ndo->ndo_ll_hdr_len += caplen;
-		nd_print_trunc(ndo);
-		return;
-	}
+	ND_TCHECK_LEN(p, sizeof(struct symantec_header));
 
 	ndo->ndo_ll_hdr_len += sizeof (struct symantec_header);
 	if (ndo->ndo_eflag)
