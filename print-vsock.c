@@ -30,6 +30,7 @@
 #include "netdissect-stdinc.h"
 #include <stddef.h>
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 
@@ -248,15 +249,9 @@ void
 vsock_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	       const u_char *cp)
 {
-	u_int caplen = h->caplen;
-
 	ndo->ndo_protocol = "vsock";
 
-	if (caplen < sizeof(struct af_vsockmon_hdr)) {
-		nd_print_trunc(ndo);
-		ndo->ndo_ll_hdr_len += caplen;
-		return;
-	}
+	ND_TCHECK_LEN(cp, sizeof(struct af_vsockmon_hdr));
 	ndo->ndo_ll_hdr_len += sizeof(struct af_vsockmon_hdr);
-	vsock_hdr_print(ndo, cp, caplen);
+	vsock_hdr_print(ndo, cp, h->caplen);
 }
