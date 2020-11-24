@@ -186,6 +186,9 @@ igmpv3-queries  igmpv3-queries.pcap     igmpv3-queries.out
 mtrace		mtrace.pcap		mtrace.out
 dvmrp		mrinfo_query.pcap	dvmrp.out
 
+# ICMPv4 -- pcap from https://bugs.wireshark.org/bugzilla/show_bug.cgi?id=6632
+rfc5837    icmp-rfc5837.pcap icmp-rfc5837.out -v
+
 # ICMPv6
 icmpv6          icmpv6.pcap             icmpv6.out      -vv
 icmpv6_opt24-v	icmpv6_opt24.pcap	icmpv6_opt24-v.out	-v
