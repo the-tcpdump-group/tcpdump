@@ -36,8 +36,6 @@
 #include "netdissect-stdinc.h"
 #include "netdissect.h"
 #include <limits.h>
-#include <stdlib.h>
-#include <errno.h>
 
 #include "extract.h"
 

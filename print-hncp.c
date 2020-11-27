@@ -34,7 +34,6 @@
 
 #include "netdissect-stdinc.h"
 
-#include <stdlib.h>
 #include <string.h>
 
 #include "netdissect.h"

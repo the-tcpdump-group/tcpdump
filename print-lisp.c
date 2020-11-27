@@ -100,7 +100,6 @@
 
 #include "netdissect-stdinc.h"
 #include "netdissect.h"
-#include <stdlib.h>
 
 #include "ip.h"
 #include "ip6.h"
