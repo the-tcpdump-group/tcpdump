@@ -52,6 +52,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -133,10 +134,6 @@
  */
 
 #define SUNRPC_PMAPPORT		((uint16_t)111)
-#define SUNRPC_PMAPPROG		((uint32_t)100000)
-#define SUNRPC_PMAPVERS		((uint32_t)2)
-#define SUNRPC_PMAPVERS_PROTO	((uint32_t)2)
-#define SUNRPC_PMAPVERS_ORIG	((uint32_t)1)
 #define SUNRPC_PMAPPROC_NULL	((uint32_t)0)
 #define SUNRPC_PMAPPROC_SET	((uint32_t)1)
 #define SUNRPC_PMAPPROC_UNSET	((uint32_t)2)
@@ -202,7 +199,7 @@ sunrpc_print(netdissect_options *ndo, const u_char *bp,
 	ND_PRINT(" %s", tok2str(proc2str, " proc #%u",
 	    GET_BE_U_4(rp->rm_call.cb_proc)));
 	x = GET_BE_U_4(rp->rm_call.cb_rpcvers);
-	if (x != 2)
+	if (x != SUNRPC_MSG_VERSION)
 		ND_PRINT(" [rpcver %u]", x);
 
 	switch (GET_BE_U_4(rp->rm_call.cb_proc)) {
@@ -219,10 +216,6 @@ sunrpc_print(netdissect_options *ndo, const u_char *bp,
 		ND_PRINT(".%u", GET_BE_U_4(rp->rm_call.cb_vers));
 		break;
 	}
-	return;
-
-trunc:
-	nd_print_trunc(ndo);
 }
 
 static char *
@@ -238,12 +231,11 @@ progstr(uint32_t prog)
 		return (buf);
 #if defined(HAVE_GETRPCBYNUMBER) && defined(HAVE_RPC_RPC_H)
 	rp = getrpcbynumber(prog);
-	if (rp == NULL)
+	if (rp != NULL)
+		strlcpy(buf, rp->r_name, sizeof(buf));
+	else
 #endif
 		(void) snprintf(buf, sizeof(buf), "#%u", prog);
-#if defined(HAVE_GETRPCBYNUMBER) && defined(HAVE_RPC_RPC_H)
-	else
-		strlcpy(buf, rp->r_name, sizeof(buf));
-#endif
+	lastprog = prog;
 	return (buf);
 }
