@@ -23,6 +23,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 
@@ -47,8 +48,10 @@ otv_print(netdissect_options *ndo, const u_char *bp, u_int len)
 
     ndo->ndo_protocol = "otv";
     ND_PRINT("OTV, ");
-    if (len < OTV_HDR_LEN)
-        goto trunc;
+    if (len < OTV_HDR_LEN) {
+        ND_PRINT("[length %u < %u]", len, OTV_HDR_LEN);
+        goto invalid;
+    }
 
     flags = GET_U_1(bp);
     ND_PRINT("flags [%s] (0x%02x), ", flags & 0x08 ? "I" : ".", flags);
@@ -67,6 +70,7 @@ otv_print(netdissect_options *ndo, const u_char *bp, u_int len)
     ether_print(ndo, bp, len - OTV_HDR_LEN, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL);
     return;
 
-trunc:
-    nd_print_trunc(ndo);
+invalid:
+    nd_print_invalid(ndo);
+    ND_TCHECK_LEN(bp, len);
 }
