@@ -170,7 +170,6 @@ print_payload(netdissect_options *ndo, const struct payload_tipc_pkthdr *ap)
 	u_int orig_node;
 	u_int dest_node;
 
-	ND_TCHECK_4(ap->dest_port);
 	w0 = GET_BE_U_4(ap->w0);
 	user = TIPC_USER(w0);
 	hsize = TIPC_HSIZE(w0);
@@ -211,10 +210,6 @@ print_payload(netdissect_options *ndo, const struct payload_tipc_pkthdr *ap)
 			    broadcast_ack, link_ack, link_seq);
 		}
 	}
-	return;
-
-trunc:
-	nd_print_trunc(ndo);
 }
 
 static void
@@ -239,7 +234,6 @@ print_internal(netdissect_options *ndo, const struct internal_tipc_pkthdr *ap)
 	u_int msg_cnt;
 	u_int link_tol;
 
-	ND_TCHECK_4(ap->dest_node);
 	w0 = GET_BE_U_4(ap->w0);
 	user = TIPC_USER(w0);
 	hsize = TIPC_HSIZE(w0);
@@ -257,7 +251,6 @@ print_internal(netdissect_options *ndo, const struct internal_tipc_pkthdr *ap)
 	    tok2str(tipcmtype_values, "Unknown", mtype), w1);
 
 	if (ndo->ndo_vflag) {
-		ND_TCHECK_SIZE(ap);
 		seq_gap = TIPC_SEQ_GAP(w1);
 		broadcast_ack = TIPC_BROADCAST_ACK(w1);
 		w2 = GET_BE_U_4(ap->w2);
@@ -279,10 +272,6 @@ print_internal(netdissect_options *ndo, const struct internal_tipc_pkthdr *ap)
 		    last_sent_frag, next_sent_frag, trans_seq, msg_cnt,
 		    link_tol);
 	}
-	return;
-
-trunc:
-	nd_print_trunc(ndo);
 }
 
 static void
@@ -299,7 +288,6 @@ print_link_conf(netdissect_options *ndo, const struct link_conf_tipc_pkthdr *ap)
 	u_int ntwrk_id;
 	u_int media_id;
 
-	ND_TCHECK_4(ap->prev_node);
 	w0 = GET_BE_U_4(ap->w0);
 	user = TIPC_USER(w0);
 	hsize = TIPC_HSIZE(w0);
@@ -324,10 +312,6 @@ print_link_conf(netdissect_options *ndo, const struct link_conf_tipc_pkthdr *ap)
 		ND_PRINT("\n\tNodeSignature %u, network_id %u, media_id %u",
 		    node_sig, ntwrk_id, media_id);
 	}
-	return;
-
-trunc:
-	nd_print_trunc(ndo);
 }
 
 void
