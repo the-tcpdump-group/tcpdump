@@ -120,30 +120,27 @@ static const struct tok mpcp_reg_ack_flag_values[] = {
 void
 mpcp_print(netdissect_options *ndo, const u_char *pptr, u_int length)
 {
-    union {
-        const struct mpcp_common_header_t *common_header;
-        const struct mpcp_grant_t *grant;
-        const struct mpcp_reg_req_t *reg_req;
-        const struct mpcp_reg_t *reg;
-        const struct mpcp_reg_ack_t *reg_ack;
-    } mpcp;
+    const struct mpcp_common_header_t *mpcp_common_header;
+    const struct mpcp_reg_req_t *mpcp_reg_req;
+    const struct mpcp_reg_t *mpcp_reg;
+    const struct mpcp_reg_ack_t *mpcp_reg_ack;
 
 
     const u_char *tptr;
     uint16_t opcode;
+    uint32_t timestamp;
     uint8_t grant_numbers, grant;
     uint8_t queue_sets, queue_set, report_bitmap, report;
 
     ndo->ndo_protocol = "mpcp";
     tptr=pptr;
-    mpcp.common_header = (const struct mpcp_common_header_t *)pptr;
+    mpcp_common_header = (const struct mpcp_common_header_t *)pptr;
 
-    ND_TCHECK_LEN(tptr, sizeof(struct mpcp_common_header_t));
-    opcode = GET_BE_U_2(mpcp.common_header->opcode);
+    opcode = GET_BE_U_2(mpcp_common_header->opcode);
+    timestamp = GET_BE_U_4(mpcp_common_header->timestamp);
     ND_PRINT("MPCP, Opcode %s", tok2str(mpcp_opcode_values, "Unknown (%u)", opcode));
     if (opcode != MPCP_OPCODE_PAUSE) {
-        ND_PRINT(", Timestamp %u ticks",
-                 GET_BE_U_4(mpcp.common_header->timestamp));
+        ND_PRINT(", Timestamp %u ticks", timestamp);
     }
     ND_PRINT(", length %u", length);
 
@@ -157,7 +154,6 @@ mpcp_print(netdissect_options *ndo, const u_char *pptr, u_int length)
         break;
 
     case MPCP_OPCODE_GATE:
-        ND_TCHECK_LEN(tptr, MPCP_GRANT_NUMBER_LEN);
         grant_numbers = GET_U_1(tptr) & MPCP_GRANT_NUMBER_MASK;
         ND_PRINT("\n\tGrant Numbers %u, Flags [ %s ]",
                grant_numbers,
@@ -167,12 +163,11 @@ mpcp_print(netdissect_options *ndo, const u_char *pptr, u_int length)
         tptr++;
 
         for (grant = 1; grant <= grant_numbers; grant++) {
-            ND_TCHECK_LEN(tptr, sizeof(struct mpcp_grant_t));
-            mpcp.grant = (const struct mpcp_grant_t *)tptr;
+            const struct mpcp_grant_t *mpcp_grant = (const struct mpcp_grant_t *)tptr;
             ND_PRINT("\n\tGrant #%u, Start-Time %u ticks, duration %u ticks",
                    grant,
-                   GET_BE_U_4(mpcp.grant->starttime),
-                   GET_BE_U_2(mpcp.grant->duration));
+                   GET_BE_U_4(mpcp_grant->starttime),
+                   GET_BE_U_2(mpcp_grant->duration));
             tptr += sizeof(struct mpcp_grant_t);
         }
 
@@ -181,13 +176,11 @@ mpcp_print(netdissect_options *ndo, const u_char *pptr, u_int length)
 
 
     case MPCP_OPCODE_REPORT:
-        ND_TCHECK_LEN(tptr, MPCP_REPORT_QUEUESETS_LEN);
         queue_sets = GET_U_1(tptr);
         tptr+=MPCP_REPORT_QUEUESETS_LEN;
         ND_PRINT("\n\tTotal Queue-Sets %u", queue_sets);
 
         for (queue_set = 1; queue_set < queue_sets; queue_set++) {
-            ND_TCHECK_LEN(tptr, MPCP_REPORT_REPORTBITMAP_LEN);
             report_bitmap = GET_U_1(tptr);
             ND_PRINT("\n\t  Queue-Set #%u, Report-Bitmap [ %s ]",
                    queue_sets,
@@ -209,32 +202,29 @@ mpcp_print(netdissect_options *ndo, const u_char *pptr, u_int length)
         break;
 
     case MPCP_OPCODE_REG_REQ:
-        ND_TCHECK_LEN(tptr, sizeof(struct mpcp_reg_req_t));
-        mpcp.reg_req = (const struct mpcp_reg_req_t *)tptr;
+        mpcp_reg_req = (const struct mpcp_reg_req_t *)tptr;
         ND_PRINT("\n\tFlags [ %s ], Pending-Grants %u",
-               bittok2str(mpcp_reg_req_flag_values, "Reserved", GET_U_1(mpcp.reg_req->flags)),
-               GET_U_1(mpcp.reg_req->pending_grants));
+               bittok2str(mpcp_reg_req_flag_values, "Reserved", GET_U_1(mpcp_reg_req->flags)),
+               GET_U_1(mpcp_reg_req->pending_grants));
         break;
 
     case MPCP_OPCODE_REG:
-        ND_TCHECK_LEN(tptr, sizeof(struct mpcp_reg_t));
-        mpcp.reg = (const struct mpcp_reg_t *)tptr;
+        mpcp_reg = (const struct mpcp_reg_t *)tptr;
         ND_PRINT("\n\tAssigned-Port %u, Flags [ %s ]"
                "\n\tSync-Time %u ticks, Echoed-Pending-Grants %u",
-               GET_BE_U_2(mpcp.reg->assigned_port),
-               bittok2str(mpcp_reg_flag_values, "Reserved", GET_U_1(mpcp.reg->flags)),
-               GET_BE_U_2(mpcp.reg->sync_time),
-               GET_U_1(mpcp.reg->echoed_pending_grants));
+               GET_BE_U_2(mpcp_reg->assigned_port),
+               bittok2str(mpcp_reg_flag_values, "Reserved", GET_U_1(mpcp_reg->flags)),
+               GET_BE_U_2(mpcp_reg->sync_time),
+               GET_U_1(mpcp_reg->echoed_pending_grants));
         break;
 
     case MPCP_OPCODE_REG_ACK:
-        ND_TCHECK_LEN(tptr, sizeof(struct mpcp_reg_ack_t));
-        mpcp.reg_ack = (const struct mpcp_reg_ack_t *)tptr;
+        mpcp_reg_ack = (const struct mpcp_reg_ack_t *)tptr;
         ND_PRINT("\n\tEchoed-Assigned-Port %u, Flags [ %s ]"
                "\n\tEchoed-Sync-Time %u ticks",
-               GET_BE_U_2(mpcp.reg_ack->echoed_assigned_port),
-               bittok2str(mpcp_reg_ack_flag_values, "Reserved", GET_U_1(mpcp.reg_ack->flags)),
-               GET_BE_U_2(mpcp.reg_ack->echoed_sync_time));
+               GET_BE_U_2(mpcp_reg_ack->echoed_assigned_port),
+               bittok2str(mpcp_reg_ack_flag_values, "Reserved", GET_U_1(mpcp_reg_ack->flags)),
+               GET_BE_U_2(mpcp_reg_ack->echoed_sync_time));
         break;
 
     default:
@@ -242,9 +232,4 @@ mpcp_print(netdissect_options *ndo, const u_char *pptr, u_int length)
         print_unknown_data(ndo,pptr, "\n\t", length);
         break;
     }
-
-    return;
-
-trunc:
-    nd_print_trunc(ndo);
 }
