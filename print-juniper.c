@@ -1584,7 +1584,7 @@ juniper_parse_header(netdissect_options *ndo,
         break;
     }
 
-    if (ndo->ndo_eflag > 1)
+    if (ndo->ndo_eflag)
         ND_PRINT("hlen %u, proto 0x%04x, ", l2info->header_len, l2info->proto);
 
     return 1; /* everything went ok so far. continue parsing */
