@@ -121,16 +121,20 @@ igrp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	length -= sizeof(*hdr);
 	while (length >= IGRP_RTE_SIZE) {
 		const struct igrprte *igr = (const struct igrprte *)cp;
+		uint8_t net0 = GET_U_1(&igr->igr_net[0]);
+		uint8_t net1 = GET_U_1(&igr->igr_net[1]);
+		uint8_t net2 = GET_U_1(&igr->igr_net[2]);
+
 		if (nint > 0) {
-			ND_PRINT(" *.%u.%u.%u", igr->igr_net[0], igr->igr_net[1], igr->igr_net[2]);
+			ND_PRINT(" *.%u.%u.%u", net0, net1, net2);
 			igrp_entry_print(ndo, igr);
 			--nint;
 		} else if (nsys > 0) {
-			ND_PRINT(" %u.%u.%u.0", igr->igr_net[0], igr->igr_net[1], igr->igr_net[2]);
+			ND_PRINT(" %u.%u.%u.0", net0, net1, net2);
 			igrp_entry_print(ndo, igr);
 			--nsys;
 		} else if (next > 0) {
-			ND_PRINT(" X%u.%u.%u.0", igr->igr_net[0], igr->igr_net[1], igr->igr_net[2]);
+			ND_PRINT(" X%u.%u.%u.0", net0, net1, net2);
 			igrp_entry_print(ndo, igr);
 			--next;
 		} else {

@@ -820,6 +820,7 @@ ldp_tlv_print-oobr ldp_tlv_print-oobr.pcap ldp_tlv_print-oobr.out -v
 
 # bad packets from Hardik Shah
 dns-badlabel	dns-badlabel.pcap	dns-badlabel.out	-vv
+igrp-oobr	igrp-oobr.pcap		igrp-oobr.out		-v
 
 #someip tests
 someip1		someip1.pcap	someip1.out
