@@ -530,7 +530,6 @@ telnet_print(netdissect_options *ndo, const u_char *sp, u_int length)
 
 		sp += l;
 		length -= l;
-		ND_TCHECK_1(sp);
 	}
 	if (!first) {
 		if (ndo->ndo_Xflag && 2 < ndo->ndo_vflag)
@@ -538,7 +537,4 @@ telnet_print(netdissect_options *ndo, const u_char *sp, u_int length)
 		else
 			ND_PRINT("]");
 	}
-	return;
-trunc:
-	nd_print_trunc(ndo);
 }
