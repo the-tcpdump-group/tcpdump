@@ -82,11 +82,6 @@ chdlc_print(netdissect_options *ndo, const u_char *p, u_int length)
 	case CHDLC_TYPE_SLARP:
 		chdlc_slarp_print(ndo, p, length);
 		break;
-#if 0
-	case CHDLC_TYPE_CDP:
-		chdlc_cdp_print(p, length);
-		break;
-#endif
         case ETHERTYPE_MPLS:
         case ETHERTYPE_MPLS_MULTI:
                 mpls_print(ndo, p, length);

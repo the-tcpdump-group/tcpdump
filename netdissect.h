@@ -568,7 +568,7 @@ extern const char *bgp_vpn_rd_print(netdissect_options *, const u_char *);
 extern void bootp_print(netdissect_options *, const u_char *, u_int);
 extern void calm_fast_print(netdissect_options *, const u_char *, u_int, const struct lladdr_info *);
 extern void carp_print(netdissect_options *, const u_char *, u_int, u_int);
-extern void cdp_print(netdissect_options *, const u_char *, u_int, u_int);
+extern void cdp_print(netdissect_options *, const u_char *, u_int);
 extern void cfm_print(netdissect_options *, const u_char *, u_int);
 extern u_int chdlc_print(netdissect_options *, const u_char *, u_int);
 extern void cisco_autorp_print(netdissect_options *, const u_char *, u_int);
