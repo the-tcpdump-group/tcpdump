@@ -31,6 +31,7 @@
 
 #include <string.h>
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 
@@ -95,12 +96,10 @@ ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 	int llc_hdrlen;
 
 	ndo->ndo_protocol = "ipfc";
-	if (caplen < IPFC_HDRLEN)
-		goto trunc;
+	ND_TCHECK_LEN(p, IPFC_HDRLEN);
 	/*
 	 * Get the network addresses into a canonical form
 	 */
-	ND_TCHECK_SIZE(ipfcp);
 	extract_ipfc_addrs(ipfcp, (char *)srcmac, (char *)dstmac);
 
 	if (ndo->ndo_eflag)
@@ -128,9 +127,6 @@ ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 		llc_hdrlen = -llc_hdrlen;
 	}
 	return (IPFC_HDRLEN + llc_hdrlen);
-trunc:
-	nd_print_trunc(ndo);
-	return caplen;
 }
 
 /*
