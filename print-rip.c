@@ -234,8 +234,7 @@ rip_entry_print_v2(netdissect_options *ndo, const u_char *p,
 		remaining -= sizeof(*eh);
 		if (auth_type == 2) {
 			ND_PRINT("\n\t  Simple Text Authentication data: ");
-			if (nd_printzp(ndo, p, RIP_AUTHLEN, p + remaining))
-				return (0);
+			nd_printjnp(ndo, p, RIP_AUTHLEN);
 		} else if (auth_type == 3) {
 			const struct rip_auth_crypto_v2 *ch;
 
