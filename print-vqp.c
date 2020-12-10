@@ -190,7 +190,7 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 	case VQP_OBJ_VLAN_NAME:
 	case VQP_OBJ_VTP_DOMAIN:
 	case VQP_OBJ_ETHERNET_PKT:
-            (void)nd_printzp(ndo, tptr, vqp_obj_len, NULL);
+            nd_printjnp(ndo, tptr, vqp_obj_len);
             break;
             /* those objects have similar semantics - fall through */
 	case VQP_OBJ_MAC_ADDRESS:

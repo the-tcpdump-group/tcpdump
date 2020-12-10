@@ -401,7 +401,7 @@ cfm_print(netdissect_options *ndo,
             switch (md_nameformat) {
             case CFM_CCM_MD_FORMAT_DNS:
             case CFM_CCM_MD_FORMAT_CHAR:
-                (void)nd_printzp(ndo, md_name, md_namelength, NULL);
+                nd_printjnp(ndo, md_name, md_namelength);
                 break;
 
             case CFM_CCM_MD_FORMAT_MAC:
@@ -452,7 +452,7 @@ cfm_print(netdissect_options *ndo,
         ND_PRINT("\n\t  MA Name: ");
         switch (ma_nameformat) {
         case CFM_CCM_MA_FORMAT_CHAR:
-            (void)nd_printzp(ndo, ma_name, ma_namelength, NULL);
+            nd_printjnp(ndo, ma_name, ma_namelength);
             break;
 
             /* FIXME add printers for those MA formats - hexdump for now */
@@ -657,7 +657,7 @@ cfm_print(netdissect_options *ndo,
                 case CFM_CHASSIS_ID_LOCAL:
                 case CFM_CHASSIS_ID_CHASSIS_COMPONENT:
                 case CFM_CHASSIS_ID_PORT_COMPONENT:
-                    (void)nd_printzp(ndo, tptr + 1, chassis_id_length, NULL);
+                    nd_printjnp(ndo, tptr + 1, chassis_id_length);
                     break;
 
                 default:

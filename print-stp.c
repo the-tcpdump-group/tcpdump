@@ -276,7 +276,7 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
 
     ND_PRINT("\n\tv3len %u, ", GET_BE_U_2(ptr + MST_BPDU_VER3_LEN_OFFSET));
     ND_PRINT("MCID Name ");
-    (void)nd_printzp(ndo, ptr + MST_BPDU_CONFIG_NAME_OFFSET, 32, NULL);
+    nd_printjnp(ndo, ptr + MST_BPDU_CONFIG_NAME_OFFSET, 32);
     ND_PRINT(", rev %u,"
             "\n\t\tdigest %08x%08x%08x%08x, ",
 	          GET_BE_U_2(ptr + MST_BPDU_CONFIG_NAME_OFFSET + 32),
@@ -340,7 +340,7 @@ stp_print_spb_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
 
     ND_PRINT("\n\tv4len %u, ", GET_BE_U_2(ptr + offset));
     ND_PRINT("AUXMCID Name ");
-    (void)nd_printzp(ndo, ptr + offset + SPB_BPDU_CONFIG_NAME_OFFSET, 32, NULL);
+    nd_printjnp(ndo, ptr + offset + SPB_BPDU_CONFIG_NAME_OFFSET, 32);
     ND_PRINT(", Rev %u,\n\t\tdigest %08x%08x%08x%08x",
             GET_BE_U_2(ptr + offset + SPB_BPDU_CONFIG_REV_OFFSET),
             GET_BE_U_4(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET),

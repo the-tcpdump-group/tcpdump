@@ -178,14 +178,14 @@ eap_print(netdissect_options *ndo,
             case EAP_TYPE_IDENTITY:
                 if (len - 5 > 0) {
                     ND_PRINT(", Identity: ");
-                    (void)nd_printzp(ndo, cp + 5, len - 5, NULL);
+                    nd_printjnp(ndo, cp + 5, len - 5);
                 }
                 break;
 
             case EAP_TYPE_NOTIFICATION:
                 if (len - 5 > 0) {
                     ND_PRINT(", Notification: ");
-                    (void)nd_printzp(ndo, cp + 5, len - 5, NULL);
+                    nd_printjnp(ndo, cp + 5, len - 5);
                 }
                 break;
 

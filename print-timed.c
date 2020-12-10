@@ -149,5 +149,5 @@ timed_print(netdissect_options *ndo,
 		break;
 	}
 	ND_PRINT(" name ");
-	(void)nd_printzp(ndo, tsp->tsp_name, sizeof(tsp->tsp_name), NULL);
+	nd_printjnp(ndo, tsp->tsp_name, sizeof(tsp->tsp_name));
 }
