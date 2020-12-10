@@ -193,20 +193,21 @@ mp_capable_print(netdissect_options *ndo,
                  const u_char *opt, u_int opt_len, u_char flags)
 {
         const struct mp_capable *mpc = (const struct mp_capable *) opt;
+        uint8_t version;
 
         if (!((opt_len == 12 || opt_len == 4) && flags & TH_SYN) &&
             !((opt_len == 20 || opt_len == 22) && (flags & (TH_SYN | TH_ACK)) ==
               TH_ACK))
                 return 0;
 
-        switch (MP_CAPABLE_OPT_VERSION(mpc->sub_ver)) {
+        version = MP_CAPABLE_OPT_VERSION(mpc->sub_ver); /* uses GET_U_1() */
+        switch (version) {
                 case 0: /* fall through */
                 case 1:
-                        ND_PRINT(" v%u", MP_CAPABLE_OPT_VERSION(mpc->sub_ver));
+                        ND_PRINT(" v%u", version);
                         break;
                 default:
-                        ND_PRINT(" Unknown Version (%u)",
-                                  MP_CAPABLE_OPT_VERSION(mpc->sub_ver));
+                        ND_PRINT(" Unknown Version (%u)", version);
                         return 1;
         }
 
@@ -474,13 +475,9 @@ mptcp_print(netdissect_options *ndo,
                 return 0;
 
         opt = (const struct mptcp_option *) cp;
-        ND_TCHECK_SIZE(opt);
-        subtype = ND_MIN(MPTCP_OPT_SUBTYPE(opt->sub_etc), MPTCP_SUB_FCLOSE + 1);
+        subtype = MPTCP_OPT_SUBTYPE(opt->sub_etc); /* uses GET_U_1() */
+        subtype = ND_MIN(subtype, MPTCP_SUB_FCLOSE + 1);
 
         ND_PRINT(" %s", mptcp_options[subtype].name);
         return mptcp_options[subtype].print(ndo, cp, len, flags);
-
-trunc:
-        nd_print_trunc(ndo);
-        return 0;
 }
