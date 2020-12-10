@@ -394,7 +394,6 @@ extern void fn_print_str(netdissect_options *, const u_char *);
 extern int nd_print(netdissect_options *, const u_char *, const u_char *);
 extern u_int nd_printztn(netdissect_options *, const u_char *, u_int, const u_char *);
 extern int nd_printn(netdissect_options *, const u_char *, u_int, const u_char *);
-extern int nd_printzp(netdissect_options *, const u_char *, u_int, const u_char *);
 extern void nd_printjnp(netdissect_options *, const u_char *, u_int);
 
 /*

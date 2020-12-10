@@ -199,36 +199,6 @@ nd_printn(netdissect_options *ndo,
 }
 
 /*
- * Print out a null-padded filename (or other ASCII string), part of
- * the packet buffer.
- * If ep is NULL, assume no truncation check is needed.
- * Return true if truncated.
- * Stop at ep (if given) or after n bytes or before the null char,
- * whichever is first.
- */
-int
-nd_printzp(netdissect_options *ndo,
-           const u_char *s, u_int n,
-           const u_char *ep)
-{
-	int ret;
-	u_char c;
-
-	ret = 1;			/* assume truncated */
-	while (n > 0 && (ep == NULL || s < ep)) {
-		n--;
-		c = GET_U_1(s);
-		s++;
-		if (c == '\0') {
-			ret = 0;
-			break;
-		}
-		fn_print_char(ndo, c);
-	}
-	return (n == 0) ? 0 : ret;
-}
-
-/*
  * Print a null-padded filename (or other ASCII string), part of
  * the packet buffer, filtering out non-printable characters.
  * Stop if truncated (via GET_U_1/longjmp) or after n bytes or before
