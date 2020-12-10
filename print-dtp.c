@@ -91,7 +91,7 @@ dtp_print(netdissect_options *ndo, const u_char *tptr, u_int length)
         switch (type) {
 	case DTP_DOMAIN_TLV:
 		ND_PRINT(", ");
-		nd_printzp(ndo, tptr+4, len-4, NULL);
+		nd_printjnp(ndo, tptr+4, len-4);
 		break;
 
 	case DTP_STATUS_TLV:

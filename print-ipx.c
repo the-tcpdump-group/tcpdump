@@ -188,7 +188,7 @@ ipx_sap_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 		ND_PRINT("'");
 		goto invalid;
 	    }
-	    nd_printzp(ndo, ipx, 48, NULL);
+	    nd_printjnp(ndo, ipx, 48);
 	    ND_PRINT("'");
 	    ipx += 48;
 	    length -= 48;

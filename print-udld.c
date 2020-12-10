@@ -169,7 +169,7 @@ udld_print(netdissect_options *ndo,
         case UDLD_PORT_ID_TLV:
         case UDLD_DEVICE_NAME_TLV:
             ND_PRINT(", ");
-            nd_printzp(ndo, tptr, len, NULL);
+            nd_printjnp(ndo, tptr, len);
             break;
 
         case UDLD_ECHO_TLV:
