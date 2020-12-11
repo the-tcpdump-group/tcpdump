@@ -738,7 +738,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                     switch(obj_ctype) {
                     case 1:
                         raw_label = GET_BE_U_4(obj_tptr);
-                        ND_PRINT("\n\t    label %u, exp %u", MPLS_LABEL(raw_label), MPLS_EXP(raw_label));
+                        ND_PRINT("\n\t    label %u, tc %u", MPLS_LABEL(raw_label), MPLS_TC(raw_label));
                         if (MPLS_STACK(raw_label))
                             ND_PRINT(", [S]");
                         ND_PRINT(", ttl %u", MPLS_TTL(raw_label));
