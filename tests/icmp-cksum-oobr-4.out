@@ -4,4 +4,4 @@
     10.0.12.1.49215 > 10.255.255.4.33435: [udp sum ok] UDP, length 0
 	MPLS extension v2
 	  MPLS Stack Entry Object (1), Class-Type: 1, length 8
-	    label 16, exp 0, [S], ttl 1 [|icmp]
+	    label 16, tc 0, [S], ttl 1 [|icmp]

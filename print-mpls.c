@@ -80,7 +80,7 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		if (ndo->ndo_vflag &&
 		    MPLS_LABEL(label_entry) < sizeof(mpls_labelname) / sizeof(mpls_labelname[0]))
 			ND_PRINT(" (%s)", mpls_labelname[MPLS_LABEL(label_entry)]);
-		ND_PRINT(", exp %u", MPLS_EXP(label_entry));
+		ND_PRINT(", tc %u", MPLS_TC(label_entry));
 		if (MPLS_STACK(label_entry))
 			ND_PRINT(", [S]");
 		ND_PRINT(", ttl %u)", MPLS_TTL(label_entry));
