@@ -661,7 +661,7 @@ of13_port_print(netdissect_options *ndo,
 	cp += 2;
 	/* name */
 	ND_PRINT(", name '");
-	(void)nd_print(ndo, cp, cp + OFP_MAX_PORT_NAME_LEN);
+	nd_printjnp(ndo, cp, OFP_MAX_PORT_NAME_LEN);
 	ND_PRINT("'");
 	cp += OFP_MAX_PORT_NAME_LEN;
 

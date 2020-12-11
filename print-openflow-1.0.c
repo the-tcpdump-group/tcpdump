@@ -1038,7 +1038,7 @@ of10_phy_port_print(netdissect_options *ndo,
 	cp += MAC_ADDR_LEN;
 	/* name */
 	ND_PRINT(", name '");
-	(void)nd_print(ndo, cp, cp + OFP_MAX_PORT_NAME_LEN);
+	nd_printjnp(ndo, cp, OFP_MAX_PORT_NAME_LEN);
 	ND_PRINT("'");
 	cp += OFP_MAX_PORT_NAME_LEN;
 
@@ -1670,27 +1670,27 @@ of10_desc_stats_reply_print(netdissect_options *ndo,
 		goto invalid;
 	/* mfr_desc */
 	ND_PRINT("\n\t  mfr_desc '");
-	(void)nd_print(ndo, cp, cp + DESC_STR_LEN);
+	nd_printjnp(ndo, cp, DESC_STR_LEN);
 	ND_PRINT("'");
 	OF_FWD(DESC_STR_LEN);
 	/* hw_desc */
 	ND_PRINT("\n\t  hw_desc '");
-	(void)nd_print(ndo, cp, cp + DESC_STR_LEN);
+	nd_printjnp(ndo, cp, DESC_STR_LEN);
 	ND_PRINT("'");
 	OF_FWD(DESC_STR_LEN);
 	/* sw_desc */
 	ND_PRINT("\n\t  sw_desc '");
-	(void)nd_print(ndo, cp, cp + DESC_STR_LEN);
+	nd_printjnp(ndo, cp, DESC_STR_LEN);
 	ND_PRINT("'");
 	OF_FWD(DESC_STR_LEN);
 	/* serial_num */
 	ND_PRINT("\n\t  serial_num '");
-	(void)nd_print(ndo, cp, cp + SERIAL_NUM_LEN);
+	nd_printjnp(ndo, cp, SERIAL_NUM_LEN);
 	ND_PRINT("'");
 	OF_FWD(SERIAL_NUM_LEN);
 	/* dp_desc */
 	ND_PRINT("\n\t  dp_desc '");
-	(void)nd_print(ndo, cp, cp + DESC_STR_LEN);
+	nd_printjnp(ndo, cp, DESC_STR_LEN);
 	ND_PRINT("'");
 	return;
 
@@ -1803,7 +1803,7 @@ of10_table_stats_reply_print(netdissect_options *ndo,
 		OF_FWD(3);
 		/* name */
 		ND_PRINT(", name '");
-		(void)nd_print(ndo, cp, cp + OFP_MAX_TABLE_NAME_LEN);
+		nd_printjnp(ndo, cp, OFP_MAX_TABLE_NAME_LEN);
 		ND_PRINT("'");
 		OF_FWD(OFP_MAX_TABLE_NAME_LEN);
 		/* wildcards */

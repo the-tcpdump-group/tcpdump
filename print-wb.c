@@ -232,7 +232,7 @@ wb_id(netdissect_options *ndo,
 		c = ',';
 	}
 	ND_PRINT("> \"");
-	(void)nd_print(ndo, sitename, sitename + len);
+	nd_printjnp(ndo, sitename, len);
 	ND_PRINT("\"");
 	return (0);
 }
