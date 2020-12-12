@@ -92,7 +92,7 @@ struct icmp {
 /*
  * Lower bounds on packet lengths for various types.
  * For the error advice packets must first insure that the
- * packet is large enought to contain the returned ip header.
+ * packet is large enough to contain the returned ip header.
  * Only then can we do the check to see if 64 bits of packet
  * data have been returned, since we need to check the returned
  * ip header length.
@@ -648,7 +648,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 
         /*
          * print the remnants of the IP packet.
-         * save the snaplength as this may get overidden in the IP printer.
+         * save the snaplength as this may get overridden in the IP printer.
          */
 	if (ndo->ndo_vflag >= 1 && ICMP_ERRTYPE(icmp_type)) {
 		bp += 8;

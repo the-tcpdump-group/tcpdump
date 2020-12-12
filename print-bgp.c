@@ -671,7 +671,7 @@ badtlv:
 /*
  * bgp_vpn_ip_print
  *
- * print an ipv4 or ipv6 address into a buffer dependend on address length.
+ * print an ipv4 or ipv6 address into a buffer dependent on address length.
  */
 static char *
 bgp_vpn_ip_print(netdissect_options *ndo,

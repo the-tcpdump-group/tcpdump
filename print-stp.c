@@ -203,7 +203,7 @@ stp_print_config_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
 #define MST_BPDU_MSTI_LENGTH		    16
 #define MST_BPDU_CONFIG_INFO_LENGTH	    64
 
-/* Offsets of fields from the begginning for the packet */
+/* Offsets of fields from the beginning for the packet */
 #define MST_BPDU_VER3_LEN_OFFSET	    36
 #define MST_BPDU_CONFIG_NAME_OFFSET	    39
 #define MST_BPDU_CONFIG_DIGEST_OFFSET	    73

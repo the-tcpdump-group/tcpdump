@@ -500,7 +500,7 @@ Tue.    July 20, 2010.  guy@alum.mit.edu.
   Summary for 4.1.2 tcpdump release
 	If -U is specified, flush the file after creating it, so it's
 	  not zero-length
-	Fix TCP flags output description, and some typoes, in the man
+	Fix TCP flags output description, and some typos, in the man
 	  page
 	Add a -h flag, and only attempt to recognize 802.11s mesh
 	  headers if it's set
@@ -1171,7 +1171,7 @@ v3.1 Thu Jun 13 20:59:32 PDT 1996
 
 - Print out a little more information for sun rpc packets.
 
-- Add suport for Kerberos 4 thanks to John Hawkinson (jhawk@mit.edu).
+- Add support for Kerberos 4 thanks to John Hawkinson (jhawk@mit.edu).
 
 - Fixed the Fix EXTRACT_SHORT() and EXTRACT_LONG() macros (which were
   wrong on little endian machines).

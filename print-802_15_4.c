@@ -719,7 +719,7 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 		break;
 	case 0x1c: /* DSME PAN Descriptor IE */
 		/*FALLTHROUGH*/
-	case 0x21: /* Extended DSME PAN descriptior IE */
+	case 0x21: /* Extended DSME PAN descriptor IE */
 		if (ie_len < 2) {
 			ND_PRINT("[ERROR: Truncated DSME PAN IE]");
 		} else {
@@ -1785,7 +1785,7 @@ ieee802_15_4_print_command_data(netdissect_options *ndo,
 }
 
 /*
- * Parse and print frames folloing standard format.
+ * Parse and print frames following standard format.
  *
  * Returns FALSE in case of error.
  */
@@ -1846,7 +1846,7 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 		if (CHECK_BIT(fc, 9)) { ND_PRINT("IE present, "); }
 	}
 
-	/* Check for the sequence number supression. */
+	/* Check for the sequence number suppression. */
 	if (CHECK_BIT(fc, 8)) {
 		/* Sequence number is suppressed. */
 		if (frame_version < 2) {
@@ -2259,7 +2259,7 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 			if (ie_present) { ND_PRINT("IE present, "); }
 		}
 
-		/* Check for the sequence number supression. */
+		/* Check for the sequence number suppression. */
 		if (CHECK_BIT(fc, 10)) {
 			/* Sequence number is suppressed, but long version. */
 			p += 2;

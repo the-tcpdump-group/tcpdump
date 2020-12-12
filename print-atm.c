@@ -115,7 +115,7 @@
 #define CALL_REF_POS    2	/* offset of call reference value */
 #define MSG_TYPE_POS    5	/* offset of message type */
 #if 0
-#define MSG_LEN_POS     7	/* offset of mesage length */
+#define MSG_LEN_POS     7	/* offset of message length */
 #define IE_BEGIN_POS    9	/* offset of first information element */
 
 /* format of signalling messages */

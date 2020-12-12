@@ -94,7 +94,7 @@ typedef struct lwres_addr lwres_addr_t;
 struct lwres_addr {
 	nd_uint32_t			family;
 	nd_uint16_t			length;
-	/* address folows */
+	/* address follows */
 };
 #define LWRES_ADDR_LEN			6
 
