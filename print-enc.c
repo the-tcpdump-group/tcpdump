@@ -81,9 +81,9 @@ struct enchdr {
 	nd_uint32_t flags;
 };
 
-#define ENC_PRINT_TYPE(wh, xf, nam) \
+#define ENC_PRINT_TYPE(wh, xf, name) \
 	if ((wh) & (xf)) { \
-		ND_PRINT("%s%s", nam, (wh) == (xf) ? "): " : ","); \
+		ND_PRINT("%s%s", name, (wh) == (xf) ? "): " : ","); \
 		(wh) &= ~(xf); \
 	}
 
