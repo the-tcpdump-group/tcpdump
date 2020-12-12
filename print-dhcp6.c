@@ -764,7 +764,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			ND_PRINT("=");
+			ND_PRINT(" ");
 			nd_printjnp(ndo, tp, optlen);
 			ND_PRINT(")");
 			break;
