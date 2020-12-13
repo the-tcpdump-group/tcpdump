@@ -3,7 +3,7 @@ language: c
 #
 # Try building on these 4 architectures; all are 64-bit, and all but
 # "s390x", a/k/a z/Architecture, are little-endian. The crypto library
-# on Litle-endian PowerPC/Power ISA does some things that require more
+# on little-endian PowerPC/Power ISA does some things that require more
 # careful adherence to the documentation, so it's useful for testing
 # that.
 #

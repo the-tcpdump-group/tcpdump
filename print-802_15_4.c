@@ -256,7 +256,7 @@ static const char *p_mlme_short_names[] = {
 	"CTM IE",					/* 0x32 */
 	"Timestamp IE",					/* 0x33 */
 	"Timestamp Difference IE",			/* 0x34 */
-	"TMCTP Sepcification IE",			/* 0x35 */
+	"TMCTP Specification IE",			/* 0x35 */
 	"RCC PHY Operating Mode IE",			/* 0x36 */
 	"Reserved 0x37",				/* 0x37 */
 	"Reserved 0x38",				/* 0x38 */
@@ -2438,7 +2438,7 @@ ieee802_15_4_frag_frame(netdissect_options *ndo _U_,
 }
 
 /*
- * Interal call to dissector taking packet + len instead of pcap_pkthdr.
+ * Internal call to dissector taking packet + len instead of pcap_pkthdr.
  *
  * Returns FALSE in case of error.
  */
