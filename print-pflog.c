@@ -100,11 +100,12 @@ pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
 		ND_PRINT(".%u/", subrulenr);
 	}
 
-	ND_PRINT("%s: %s %s on %s: ",
+	ND_PRINT("%s: %s %s on ",
 	    tok2str(pf_reasons, "unkn(%u)", GET_U_1(&hdr->reason)),
 	    tok2str(pf_actions, "unkn(%u)", GET_U_1(&hdr->action)),
-	    tok2str(pf_directions, "unkn(%u)", GET_U_1(&hdr->dir)),
-	    hdr->ifname);
+	    tok2str(pf_directions, "unkn(%u)", GET_U_1(&hdr->dir)));
+	nd_printjnp(ndo, (const u_char*)hdr->ifname, IFNAMSIZ);
+	ND_PRINT(": ");
 }
 
 void
