@@ -96,7 +96,7 @@ pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
 		ND_PRINT("rule %u/", rulenr);
 	else {
 		ND_PRINT("rule %u.", rulenr);
-		nd_printjnp(ndo, hdr->ruleset, PFLOG_RULESET_NAME_SIZE);
+		nd_printjnp(ndo, (const u_char*)hdr->ruleset, PFLOG_RULESET_NAME_SIZE);
 		ND_PRINT(".%u/", subrulenr);
 	}
 
