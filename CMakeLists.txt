@@ -115,6 +115,7 @@ option(WITH_CRYPTO "Build with OpenSSL/libressl libcrypto, if available" ON)
 option(WITH_CAPSICUM "Build with Capsicum security functions, if available" ON)
 option(WITH_CAP_NG "Use libcap-ng, if available" ON)
 option(ENABLE_SMB "Build with the SMB dissector" ON)
+option(WITH_COVERAGE "Enable coverage if using gcc" OFF)
 
 #
 # String parameters.  Neither of them are set, initially; only if the
@@ -1151,6 +1152,13 @@ add_executable(tcpdump ${TCPDUMP_SOURCE_LIST_C})
 if(NOT C_ADDITIONAL_FLAGS STREQUAL "")
     set_target_properties(tcpdump PROPERTIES COMPILE_FLAGS ${C_ADDITIONAL_FLAGS})
 endif()
+if(WITH_COVERAGE AND "${CMAKE_COMPILER_IS_GNUCC}")
+    target_compile_options(tcpdump PUBLIC --coverage)
+    target_link_options(tcpdump PUBLIC --coverage)
+    target_compile_options(netdissect PUBLIC --coverage)
+    target_link_options(netdissect PUBLIC --coverage)
+endif()
+
 target_link_libraries(tcpdump netdissect ${TCPDUMP_LINK_LIBRARIES})
 
 ######################################
