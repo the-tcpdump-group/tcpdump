@@ -484,6 +484,7 @@ juniper_ggsn_if_print(netdissect_options *ndo,
         uint8_t proto;
 
         ndo->ndo_protocol = "juniper_ggsn";
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_GGSN;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0) {
             ndo->ndo_ll_hdr_len += l2info.header_len;
@@ -541,6 +542,7 @@ juniper_es_if_print(netdissect_options *ndo,
         const struct juniper_ipsec_header *ih;
 
         ndo->ndo_protocol = "juniper_es";
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_ES;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0) {
             ndo->ndo_ll_hdr_len += l2info.header_len;
@@ -620,6 +622,7 @@ juniper_monitor_if_print(netdissect_options *ndo,
         const struct juniper_monitor_header *mh;
 
         ndo->ndo_protocol = "juniper_monitor";
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_MONITOR;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0) {
             ndo->ndo_ll_hdr_len += l2info.header_len;
@@ -664,6 +667,7 @@ juniper_services_if_print(netdissect_options *ndo,
         const struct juniper_services_header *sh;
 
         ndo->ndo_protocol = "juniper_services";
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_SERVICES;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0) {
             ndo->ndo_ll_hdr_len += l2info.header_len;
@@ -701,6 +705,7 @@ juniper_pppoe_if_print(netdissect_options *ndo,
         struct juniper_l2info_t l2info;
 
         ndo->ndo_protocol = "juniper_pppoe";
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_PPPOE;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0) {
             ndo->ndo_ll_hdr_len += l2info.header_len;
@@ -722,6 +727,7 @@ juniper_ether_if_print(netdissect_options *ndo,
         struct juniper_l2info_t l2info;
 
         ndo->ndo_protocol = "juniper_ether";
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_ETHER;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0) {
             ndo->ndo_ll_hdr_len += l2info.header_len;
@@ -744,6 +750,7 @@ juniper_ppp_if_print(netdissect_options *ndo,
         struct juniper_l2info_t l2info;
 
         ndo->ndo_protocol = "juniper_ppp";
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_PPP;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0) {
             ndo->ndo_ll_hdr_len += l2info.header_len;
@@ -765,6 +772,7 @@ juniper_frelay_if_print(netdissect_options *ndo,
         struct juniper_l2info_t l2info;
 
         ndo->ndo_protocol = "juniper_frelay";
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_FRELAY;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0) {
             ndo->ndo_ll_hdr_len += l2info.header_len;
@@ -786,6 +794,7 @@ juniper_chdlc_if_print(netdissect_options *ndo,
         struct juniper_l2info_t l2info;
 
         ndo->ndo_protocol = "juniper_chdlc";
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_CHDLC;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0) {
             ndo->ndo_ll_hdr_len += l2info.header_len;
@@ -808,6 +817,7 @@ juniper_pppoe_atm_if_print(netdissect_options *ndo,
         uint16_t extracted_ethertype;
 
         ndo->ndo_protocol = "juniper_pppoe_atm";
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_PPPOE_ATM;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0) {
             ndo->ndo_ll_hdr_len += l2info.header_len;
@@ -839,6 +849,7 @@ juniper_mlppp_if_print(netdissect_options *ndo,
         struct juniper_l2info_t l2info;
 
         ndo->ndo_protocol = "juniper_mlppp";
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_MLPPP;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0) {
             ndo->ndo_ll_hdr_len += l2info.header_len;
@@ -981,6 +992,7 @@ juniper_mlfr_if_print(netdissect_options *ndo,
         struct juniper_l2info_t l2info;
 
         ndo->ndo_protocol = "juniper_mlfr";
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_MLFR;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0) {
             ndo->ndo_ll_hdr_len += l2info.header_len;
@@ -1030,6 +1042,7 @@ juniper_atm1_if_print(netdissect_options *ndo,
         struct juniper_l2info_t l2info;
 
         ndo->ndo_protocol = "juniper_atm1";
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_ATM1;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0) {
             ndo->ndo_ll_hdr_len += l2info.header_len;
@@ -1088,6 +1101,7 @@ juniper_atm2_if_print(netdissect_options *ndo,
         struct juniper_l2info_t l2info;
 
         ndo->ndo_protocol = "juniper_atm2";
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_ATM2;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0) {
             ndo->ndo_ll_hdr_len += l2info.header_len;
