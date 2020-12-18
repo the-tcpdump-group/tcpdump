@@ -465,6 +465,7 @@ juniper_ggsn_print(netdissect_options *ndo,
         };
         const struct juniper_ggsn_header *gh;
 
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_GGSN;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0)
             return l2info.header_len;
@@ -517,6 +518,7 @@ juniper_es_print(netdissect_options *ndo,
         u_int rewrite_len,es_type_bundle;
         const struct juniper_ipsec_header *ih;
 
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_ES;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0)
             return l2info.header_len;
@@ -591,6 +593,7 @@ juniper_monitor_print(netdissect_options *ndo,
         };
         const struct juniper_monitor_header *mh;
 
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_MONITOR;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0)
             return l2info.header_len;
@@ -630,6 +633,7 @@ juniper_services_print(netdissect_options *ndo,
         };
         const struct juniper_services_header *sh;
 
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_SERVICES;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0)
             return l2info.header_len;
@@ -663,6 +667,7 @@ juniper_pppoe_print(netdissect_options *ndo,
 {
         struct juniper_l2info_t l2info;
 
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_PPPOE;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0)
             return l2info.header_len;
@@ -681,6 +686,7 @@ juniper_ether_print(netdissect_options *ndo,
 {
         struct juniper_l2info_t l2info;
 
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_ETHER;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0)
             return l2info.header_len;
@@ -699,6 +705,7 @@ juniper_ppp_print(netdissect_options *ndo,
 {
         struct juniper_l2info_t l2info;
 
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_PPP;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0)
             return l2info.header_len;
@@ -717,6 +724,7 @@ juniper_frelay_print(netdissect_options *ndo,
 {
         struct juniper_l2info_t l2info;
 
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_FRELAY;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0)
             return l2info.header_len;
@@ -735,6 +743,7 @@ juniper_chdlc_print(netdissect_options *ndo,
 {
         struct juniper_l2info_t l2info;
 
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_CHDLC;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0)
             return l2info.header_len;
@@ -754,6 +763,7 @@ juniper_pppoe_atm_print(netdissect_options *ndo,
         struct juniper_l2info_t l2info;
 	uint16_t extracted_ethertype;
 
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_PPPOE_ATM;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0)
             return l2info.header_len;
@@ -787,6 +797,7 @@ juniper_mlppp_print(netdissect_options *ndo,
 {
         struct juniper_l2info_t l2info;
 
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_MLPPP;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0)
             return l2info.header_len;
@@ -909,6 +920,7 @@ juniper_mlfr_print(netdissect_options *ndo,
 {
         struct juniper_l2info_t l2info;
 
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_MLFR;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0)
             return l2info.header_len;
@@ -954,6 +966,7 @@ juniper_atm1_print(netdissect_options *ndo,
 
         struct juniper_l2info_t l2info;
 
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_ATM1;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0)
             return l2info.header_len;
@@ -1008,6 +1021,7 @@ juniper_atm2_print(netdissect_options *ndo,
 
         struct juniper_l2info_t l2info;
 
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_ATM2;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0)
             return l2info.header_len;
