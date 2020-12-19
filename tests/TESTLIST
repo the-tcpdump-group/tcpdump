@@ -49,8 +49,7 @@ dsa		dsa.pcap		dsa.out
 dsa-e		dsa.pcap		dsa-e.out	-e
 
 # EAP tests
-eapon1		eapon1.pcap		eapon1.out
-eapon1-v	eapon1.pcap		eapon1-v.out	-v
+# now in smb.tests
 
 # Marvell DSA tag tests
 edsa		edsa.pcap		edsa.out
@@ -114,7 +113,7 @@ e1000g		e1000g.pcap		e1000g.out
 e1000g-e	e1000g.pcap		e1000g-e.out	-e
 
 # IPX/Netware packets
-ipx		ipx.pcap		ipx.out
+# now in smb.tests
 
 # IPX/Netware invalid
 ipx-invalid-length ipx-invalid-length.pcap ipx-invalid-length.out
@@ -573,7 +572,7 @@ slip-compressed_sl_print-oobr slip-compressed_sl_print-oobr.pcap slip-compressed
 slip-sliplink_print-oobr slip-sliplink_print-oobr.pcap slip-sliplink_print-oobr.out -e
 
 # bad packets from Otto Airamo and Antti Levomäki
-nbns-valgrind		nbns-valgrind.pcap		nbns-valgrind.out	-vvv -e
+# one more in smb.tests
 arp-oobr		arp-oobr.pcap			arp-oobr.out	-vvv -e
 icmp-cksum-oobr-1	icmp-cksum-oobr-1.pcap		icmp-cksum-oobr-1.out	-vvv -e
 icmp-cksum-oobr-2	icmp-cksum-oobr-2.pcap		icmp-cksum-oobr-2.out	-vvv -e
@@ -708,14 +707,14 @@ babel_update_oobr	babel_update_oobr.pcap		babel_update_oobr.out
 ospf6_print_lshdr-oobr ospf6_print_lshdr-oobr.pcap ospf6_print_lshdr-oobr.out -vv
 rpl-dao-oobr rpl-dao-oobr.pcap rpl-dao-oobr.out -vv
 hncp_prefix-oobr hncp_prefix-oobr.pcap hncp_prefix-oobr.out -vvv
-smb_print_trans-oobr1 smb_print_trans-oobr1.pcap smb_print_trans-oobr1.out -vv
+# one more in smb.tests
 
 # bad packets from Ryan Ackroyd
 ieee802.11_meshhdr-oobr ieee802.11_meshhdr-oobr.pcap ieee802.11_meshhdr-oobr.out -H
 dccp_options-oobr dccp_options-oobr.pcap dccp_options-oobr.out -vv
 
 # bad packets from Philippe Antoine
-smb_print_trans-oobr2 smb_print_trans-oobr2.pcap smb_print_trans-oobr2.out -vv
+# now in smb.tests
 
 # RTP tests
 # fuzzed pcap
@@ -809,8 +808,8 @@ huge-tipc-messages	huge-tipc-messages.pcap	huge-tipc-messages.out
 
 # CVE-2018-10105 bad packets from Luis Rocha
 sflow_print-segv sflow_print-segv.pcap sflow_print-segv.out -v
-smb_data_print-oobr smb_data_print-oobr.pcapng smb_data_print-oobr.out -vv
-smb_data_print-segv smb_data_print-segv.pcapng smb_data_print-segv.out -vv
+# two more in smb.tests
+
 #ptp tests
 ptp         ptp.pcap    ptp.out
 ptp_ethernet	ptp_ethernet.pcap	ptp_ethernet.out	-e
