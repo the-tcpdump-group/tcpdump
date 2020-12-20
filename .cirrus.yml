@@ -9,7 +9,7 @@ task:
   env:
     matrix:
       - IMAGE_FAMILY: freebsd-11-4
-      - IMAGE_FAMILY: freebsd-12-1
+      - IMAGE_FAMILY: freebsd-12-2
       - IMAGE_FAMILY: freebsd-13-0-snap
   script:
     - freebsd-version
