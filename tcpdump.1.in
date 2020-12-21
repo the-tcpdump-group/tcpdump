@@ -20,7 +20,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "15 September 2020"
+.TH TCPDUMP 1  "21 December 2020"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -891,6 +891,9 @@ bytes will be printed.  Note that this is the entire link-layer
 packet, so for link layers that pad (e.g. Ethernet), the padding bytes
 will also be printed when the higher layer packet is shorter than the
 required padding.
+In the current implementation this flag may have the same effect as
+.B \-xx
+if the packet is truncated.
 .TP
 .B \-xx
 When parsing and printing,
@@ -904,6 +907,9 @@ When parsing and printing,
 in addition to printing the headers of each packet, print the data of
 each packet (minus its link level header) in hex and ASCII.
 This is very handy for analysing new protocols.
+In the current implementation this flag may have the same effect as
+.B \-XX
+if the packet is truncated.
 .TP
 .B \-XX
 When parsing and printing,
