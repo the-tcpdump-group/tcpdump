@@ -1,7 +1,7 @@
 Some Information for Contributors
 ---------------------------------
-You want to contribute to Tcpdump, Thanks!
-Please, read these lines.
+Thank you for considering to make a contribution to tcpdump! Please use the
+guidelines below to achieve the best results and experience for everyone.
 
 
 How to report bugs and other problems
@@ -23,13 +23,13 @@ a new issue and provide the following details:
 * tcpdump and libpcap version (tcpdump --version)
 * operating system name and version and any other details that may be relevant
   (uname -a, compiler name and version, CPU type etc.)
-* configure flags if any were used
+* custom configure/CMake flags, if any
 * statement of the problem
 * steps to reproduce
 
 Please note that if you know exactly how to solve the problem and the solution
 would not be too intrusive, it would be best to contribute some development time
-and open a pull request instead as discussed below.
+and to open a pull request instead as discussed below.
 
 Still not sure how to do? Feel free to [subscribe](https://www.tcpdump.org/#mailing-lists)
 to the mailing list tcpdump-workers@lists.tcpdump.org and ask!
@@ -45,10 +45,10 @@ How to add new code and to update existing code
    https://github.com/the-tcpdump-group/tcpdump
    (See https://help.github.com/articles/fork-a-repo/)
 
-2) Setup optional Travis CI build and AppVeyor builds
-   You can setup Travis CI and AppVeyor builds for your fork, so you can
-   test your changes on Linux, macOS, and Windows before sending pull
-   requests.
+2) Setup optional continuous integration (CI) builds
+   You can setup Travis CI, Cirrus CI and AppVeyor builds for your fork to
+   test your changes on Linux, FreeBSD, macOS and Windows before opening a
+   pull request.
    (See https://docs.travis-ci.com/user/tutorial/ for information
    on setting up Travis CI; go to https://ci.appveyor.com/login and log
    in with your GitHub account and select "NEW PROJECT" to set up an
@@ -70,8 +70,8 @@ How to add new code and to update existing code
 5) Configure and build
    ./configure && make -s && make check
 
-6) Add/update sample.pcap files
-   We use tests directory to do regression tests on the dissection of captured
+6) Add/update tests
+   The tests directory contains regression tests of the dissection of captured
    packets.  Those captured packets were saved running tcpdump with option "-w
    sample.pcap".  Additional options, such as "-n", are used to create relevant
    and reproducible output; "-#" is used to indicate which particular packets
@@ -88,7 +88,7 @@ How to add new code and to update existing code
    Each line in this file has the following format:
    test-name   sample.pcap   sample.out   tcpdump-options
 
-   The sample.out file can be build by:
+   The sample.out file can be produced as follows:
    (cd tests && TZ=GMT0 ../tcpdump -# -n -r sample.pcap tcpdump-options > sample.out)
 
    Or, for convenience, use "./update-test.sh test-name"
@@ -106,13 +106,11 @@ How to add new code and to update existing code
 
 9) Once 100% happy, put your work into your forked repository.
    git push
-   This will trigger both Travis CI and AppVeyor builds.
+   This will trigger your fork CI tests, if set up in step 2.
 
 10) Initiate and send a pull request
     (See https://help.github.com/articles/using-pull-requests/)
-    Note that creating the pull request will cause your code to be
-    tested on Linux and macOS with Travis CI and on Windows with
-    AppVeyor.
+    This will trigger the upstream repository CI tests.
 
 
 Code style and generic remarks
@@ -126,20 +124,23 @@ c) Put the format of packets/headers/options as comments if there is no
 
 d) The printer may receive incomplete packet in the buffer, truncated at any
    random position, for example by capturing with '-s size' option.
-   Thus use, for bounds checking, one of the following macros (defined in
-   netdissect.h or extract.h):
+   If your code reads and decodes every byte of the protocol packet, then to
+   ensure proper and complete bounds checks it would be sufficient to read all
+   packet data using the GET_*() macros, typically:
+    GET_U_1(p)
+    GET_S_1(p)
+    GET_BE_U_n(p), n in { 2, 3, 4, 5, 6, 7, 8 }
+    GET_BE_S_n(p), n in { 2, 3, 4, 5, 6, 7, 8 }
+   If your code uses the macros above only on some packet data, then the gaps
+   would have to be bounds-checked using the ND_TCHECK_*() macros:
     ND_TCHECK_n(p), n in { 1, 2, 3, 4, 5, 6, 7, 8, 16 }
     ND_TCHECK_SIZE(p)
     ND_TCHECK_LEN(p, l)
-
-    ND_TTEST_n(p), n in { 1, 2, 3, 4, 5, 6, 7, 8, 16 }
-    ND_TTEST_SIZE(p)
-    ND_TTEST_LEN(p, l)
-
    For the ND_TCHECK_* macros (if not already done):
      Assign: ndo->ndo_protocol = "protocol";
-     Define a label: trunc
-     Print with: nd_print_trunc(ndo);
+     Define: ND_LONGJMP_FROM_TCHECK before including netdissect.h
+     Make sure that the intersection of GET_*() and ND_TCHECK_*() is minimal,
+     but at the same time their union covers all packet data in all cases.
    You can test the code via:
      sudo ./tcpdump -s snaplen [-v][v][...] -i lo # in a terminal
      sudo tcpreplay -i lo sample.pcap             # in another terminal
