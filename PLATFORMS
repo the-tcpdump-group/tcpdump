@@ -9,8 +9,7 @@ tcpdump compiles and works on at least the following platforms:
 * DragonFly BSD
 * FreeBSD
 * HP-UX 11i
-* Linux (any) with glibc (usually just works)
-* Linux (any) with musl libc (sometimes fails to compile, please report any bugs)
+* GNU/Linux
 * {Mac} OS X / macOS
 * NetBSD
 * OpenBSD
