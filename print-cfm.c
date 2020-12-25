@@ -221,7 +221,7 @@ cfm_network_addr_print(netdissect_options *ndo,
     u_int hexdump =  FALSE;
 
     /*
-     * Although AFIs are typically 2 octects wide,
+     * Although AFIs are typically 2 octets wide,
      * 802.1ab specifies that this field width
      * is only one octet.
      */
