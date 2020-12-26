@@ -33,13 +33,6 @@
 
 #include "netdissect-stdinc.h"
 
-#ifndef NTOHL
-#define NTOHL(x)	(x) = ntohl(x)
-#define NTOHS(x)	(x) = ntohs(x)
-#define HTONL(x)	(x) = htonl(x)
-#define HTONS(x)	(x) = htons(x)
-#endif
-
 #ifdef _WIN32
   /*
    * We have our own ether_ntohost(), reading from the system's
@@ -235,7 +228,7 @@ intoa(uint32_t addr)
 	int n;
 	static char buf[sizeof(".xxx.xxx.xxx.xxx")];
 
-	NTOHL(addr);
+	addr = ntohl(addr);
 	cp = buf + sizeof(buf);
 	*--cp = '\0';
 
@@ -794,7 +787,7 @@ ipxsap_string(netdissect_options *ndo, u_short port)
 	tp->nxt = newhnamemem(ndo);
 
 	cp = buf;
-	NTOHS(port);
+	port = ntohs(port);
 	*cp++ = hex[port >> 12 & 0xf];
 	*cp++ = hex[port >> 8 & 0xf];
 	*cp++ = hex[port >> 4 & 0xf];
