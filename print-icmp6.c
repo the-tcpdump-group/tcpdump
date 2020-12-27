@@ -1164,7 +1164,6 @@ icmp6_print(netdissect_options *ndo,
 		break;
 	case ICMP6_ECHO_REQUEST:
 	case ICMP6_ECHO_REPLY:
-                /* The check below covers both icmp6_id and icmp6_seq. */
                 ND_PRINT(", id %u, seq %u", GET_BE_U_2(dp->icmp6_id),
 			 GET_BE_U_2(dp->icmp6_seq));
 		break;
