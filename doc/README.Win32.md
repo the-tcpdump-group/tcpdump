@@ -180,6 +180,6 @@ top-level source directory for tcpdump.
 
 Run the command
 
-	msbuild/m tcpdump.sln
+	msbuild /m tcpdump.sln
 
 to compile tcpdump.
