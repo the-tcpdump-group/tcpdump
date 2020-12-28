@@ -1,6 +1,71 @@
 (TBC)
   Summary for 4.99.0 tcpdump release
-    print-arista.c : Print Arista Specific Protocol.
+    Improve the contents, wording and formatting of the man page.
+    Print unsupported link-layer protocol packets in hex.
+    Add support for new network protocols and DLTs: Arista, Autosar SOME/IP,
+      Broadcom LI and Ethernet switches tag, IEEE 802.15.9, IP-over-InfiniBand
+      (IPoIB), Linux SLL2, Linux vsockmon, MACsec, Marvell Distributed Switch
+      Architecture, OpenFlow 1.3, Precision Time Protocol (PTP), SSH, WHOIS,
+      ZigBee Encapsulation Protocol (ZEP).
+    Make protocol-specific updates for: AH, DHCP, DNS, ESP, FRF.16, HNCP,
+      ICMP6, IEEE 802.15.4, IPv6, IS-IS, Linux SLL, LLDP, LSP ping, MPTCP, NFS,
+      NSH, NTP, OSPF, OSPF6, PGM, PIM, PPTP, RADIUS, RSVP, Rx, SMB, UDLD,
+      VXLAN-GPE.
+    User interface:
+      Make SLL2 the default for Linux "any" pseudo-device.
+      Add --micro and --nano shorthands.
+      Add --count to print a counter only instead of decoding.
+      Add --print, to cause packet printing even with -w.
+      Add support for remote capture if libpcap supports it.
+      Display the "wireless" flag and connection status.
+      Flush the output packet buffer on a SIGUSR2.
+      Add the snapshot length to the "reading from file ..." message.
+      Fix local time printing (DST offset in timestamps).
+      Allow -C arguments > 2^31-1 GB if they can fit into a long.
+      Handle very large -f files by rejecting them.
+      Report periodic stats only when safe to do so.
+      Print the number of packets captured only as often as necessary.
+      With no -s, or with -s 0, don't specify the snapshot length with newer
+        versions of libpcap.
+      Improve version and usage message printing.
+    Building and testing:
+      Install into bindir, not sbindir.
+      autoconf: replace --with-system-libpcap with --disable-local-libpcap.
+      Require the compiler to support C99.
+      Better detect and use various C compilers and their features.
+      Add CMake as the second build system.
+      Make out-of-tree builds more reliable.
+      Use pkg-config to detect libpcap if available.
+      Improve Windows support.
+      Add more tests and improve the scripts that run them.
+      Test both with "normal" and "x87" floating-point.
+      Eliminate dependency on libdnet.
+    FreeBSD:
+      Print a proper error message about monitor mode VAP.
+      Use libcasper if available.
+      Fix failure to capture on RDMA device.
+      Include the correct capsicum header.
+    Source code:
+      Start the transition to longjmp() for packet truncation handling.
+      Introduce new helper functions, including GET_*(), nd_print_protocol(),
+        nd_print_invalid(), nd_print_trunc(), nd_trunc_longjmp() and others.
+      Put integer signedness right in many cases.
+      Introduce nd_uint*, nd_mac_addr, nd_ipv4 and nd_ipv6 types to fix
+        alignment issues, especially on SPARC.
+      Fix many C compiler, Coverity, UBSan and cppcheck warnings.
+      Fix issues detected with AddressSanitizer.
+      Remove many workarounds for older compilers and OSes.
+      Add a sanity check on packet header length.
+      Add and remove plenty of bounds checks.
+      Clean up pcap_findalldevs() call to find the first interface.
+      Use a short timeout, rather than immediate mode, for text output.
+      Handle DLT_ENC files *not* written on the same OS and byte-order host.
+      Add, and use, macros to do locale-independent case mapping.
+      Use a table instead of getprotobynumber().
+      Get rid of ND_UNALIGNED and ND_TCHECK().
+      Make roundup2() generally available.
+      Resync SMI list against Wireshark.
+      Fix many typos.
 
 Friday, September 20, 2019, by mcr@sandelman.ca
   A huge thank you to Denis, Francois-Xavier and Guy who did much of the heavy lifting.
