@@ -97,9 +97,9 @@ Additional people who have contributed patches (in alphabetical order):
     James Ko                      <jck at exegin dot com>
     Jan Oravec                    <wsx at wsx6 dot net>
     Jason R. Thorpe               <thorpej at netbsd dot org>
+    Jean-Raphaël Gaglione         <jr dot gaglione at yahoo dot fr>
     Jefferson Ogata               <jogata at nodc dot noaa dot gov>
     Jeffrey Hutzelman             <jhutz at cmu dot edu>
-    Jean-Raphaël Gaglione         <jr dot gaglione at yahoo dot fr>
     Jesper Peterson               <jesper at endace dot com>
     Jesse Gross                   <jesse at nicira dot com>
     Jim Hutchins                  <jim at ca dot sandia dot gov>
@@ -194,7 +194,7 @@ Additional people who have contributed patches (in alphabetical order):
     Ruben Kerkhof                 <ruben at rubenkerkhof dot com>
     Sagun Shakya                  <sagun dot shakya at sun dot com>
     Sami Farin                    <safari at iki dot fi>
-    Sawssen Hadded                <saw.hadded at gmail dot com>
+    Sawssen Hadded                <saw dot hadded at gmail dot com>
     Scott Mcmillan                <scott dot a dot mcmillan at intel dot com>
     Scott Rose                    <syberpunk at users dot sourceforge dot net>
     Sebastian Krahmer             <krahmer at cs dot uni-potsdam dot de>
@@ -206,8 +206,8 @@ Additional people who have contributed patches (in alphabetical order):
     Simon Ruderich                <simon at ruderich dot org>
     Steinar Haug                  <sthaug at nethelp dot no>
     Stephane Bortzmeyer           <stephane+github at bortzmeyer dot org>
-    Swaminathan Chandrasekaran    <chander at juniper dot net>
     Swaathi Vetrivel              <swaathiv at juniper dot net>
+    Swaminathan Chandrasekaran    <chander at juniper dot net>
     Takashi Yamamoto              <yamt at mwd dot biglobe dot ne dot jp>
     Tatuya Jinmei                 <jinmei at kame dot net>
     Terry Kennedy                 <terry at tmk dot com>
