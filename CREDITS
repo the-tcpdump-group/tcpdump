@@ -3,7 +3,7 @@ This file lists people who have contributed to tcpdump.
 The current maintainers (in alphabetical order):
     Denis Ovsienko                <denis at ovsienko dot info>
     Francois-Xavier Le Bail       <devel dot fx dot lebail at orange dot fr>
-    Guy Harris                    <guy at alum dot mit dot edu>
+    Guy Harris                    <gharris at sonic dot net>
     Michael Richardson            <mcr at sandelman dot ottawa dot on dot ca>
 
 Additional people who have contributed patches (in alphabetical order):
