@@ -25,6 +25,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
@@ -518,8 +519,10 @@ rsvp_intserv_print(netdissect_options *ndo,
 	uint32_t i;
     } bw;
 
-    if (obj_tlen < 4)
-        return 0;
+    if (obj_tlen < 4) {
+        ND_PRINT(" (obj_tlen %u < 4)", obj_tlen);
+        goto invalid;
+    }
     parameter_id = GET_U_1(tptr);
     parameter_length = GET_BE_U_2(tptr + 2)<<2; /* convert wordcount to bytecount */
 
@@ -529,8 +532,10 @@ rsvp_intserv_print(netdissect_options *ndo,
            parameter_length,
            GET_U_1(tptr + 1));
 
-    if (obj_tlen < parameter_length+4)
-        return 0;
+    if (obj_tlen < parameter_length + 4) {
+        ND_PRINT(" (obj_tlen %u < %u)", obj_tlen, parameter_length + 4);
+        goto invalid;
+    }
     switch(parameter_id) { /* parameter_id */
 
     case 4:
@@ -608,7 +613,6 @@ rsvp_intserv_print(netdissect_options *ndo,
         */
 
         if (parameter_length == 20) {
-	    ND_TCHECK_LEN(tptr + 4, 20);
             bw.i = GET_BE_U_4(tptr + 4);
             ND_PRINT("\n\t\tToken Bucket Rate: %.10g Mbps", bw.f / 125000);
             bw.i = GET_BE_U_4(tptr + 8);
@@ -634,7 +638,6 @@ rsvp_intserv_print(netdissect_options *ndo,
         */
 
         if (parameter_length == 8) {
-	    ND_TCHECK_8(tptr + 4);
             bw.i = GET_BE_U_4(tptr + 4);
             ND_PRINT("\n\t\tRate: %.10g Mbps", bw.f / 125000);
             ND_PRINT("\n\t\tSlack Term: %u", GET_BE_U_4(tptr + 8));
@@ -656,8 +659,8 @@ rsvp_intserv_print(netdissect_options *ndo,
     }
     return (parameter_length+4); /* header length 4 bytes */
 
-trunc:
-    nd_print_trunc(ndo);
+invalid:
+    nd_print_invalid(ndo);
     return 0;
 }
 
@@ -699,9 +702,6 @@ rsvp_obj_print(netdissect_options *ndo,
     u_int action, subchannel;
 
     while(tlen>=sizeof(struct rsvp_object_header)) {
-        /* did we capture enough for fully decoding the object header ? */
-        ND_TCHECK_LEN(tptr, sizeof(struct rsvp_object_header));
-
         rsvp_obj_header = (const struct rsvp_object_header *)tptr;
         rsvp_obj_len=GET_BE_U_2(rsvp_obj_header->length);
         rsvp_obj_ctype=GET_U_1(rsvp_obj_header->ctype);
@@ -1133,7 +1133,6 @@ rsvp_obj_print(netdissect_options *ndo,
 				ND_PRINT(" ERROR: length != 8");
 				goto invalid;
 			}
-			ND_TCHECK_8(obj_tptr);
                         ND_PRINT(", Flags: [%s] (%#x), Class-Type: %s (%u), %u",
                                bittok2str(rsvp_obj_rro_label_flag_values,
                                    "none",
@@ -1911,9 +1910,6 @@ obj_tooshort:
 invalid:
     nd_print_invalid(ndo);
     return -1;
-trunc:
-    nd_print_trunc(ndo);
-    return -1;
 }
 
 void
@@ -2062,8 +2058,4 @@ rsvp_print(netdissect_options *ndo,
         print_unknown_data(ndo, tptr, "\n\t    ", tlen);
         break;
     }
-
-    return;
-trunc:
-    nd_print_trunc(ndo);
 }
