@@ -17,7 +17,7 @@ os:
   - linux
   - osx
 
-dist: bionic
+dist: focal
 
 compiler:
   - gcc
@@ -132,7 +132,6 @@ addons:
       - libnl-genl-3-dev
       - libibverbs-dev
       - libssl-dev
-      - libssl1.0.0
       - libsmi2-dev
       - libcap-ng-dev
       - libpcap-dev
