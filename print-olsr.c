@@ -27,6 +27,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -231,7 +232,7 @@ static uint32_t deserialize_gw_speed(uint8_t value) {
 /*
  * print a neighbor list with LQ extensions.
  */
-static int
+static void
 olsr_print_lq_neighbor4(netdissect_options *ndo,
                         const u_char *msg_data, u_int hello_len)
 {
@@ -251,12 +252,9 @@ olsr_print_lq_neighbor4(netdissect_options *ndo,
         msg_data += sizeof(struct olsr_lq_neighbor4);
         hello_len -= sizeof(struct olsr_lq_neighbor4);
     }
-    return (0);
-trunc:
-    return -1;
 }
 
-static int
+static void
 olsr_print_lq_neighbor6(netdissect_options *ndo,
                         const u_char *msg_data, u_int hello_len)
 {
@@ -276,15 +274,12 @@ olsr_print_lq_neighbor6(netdissect_options *ndo,
         msg_data += sizeof(struct olsr_lq_neighbor6);
         hello_len -= sizeof(struct olsr_lq_neighbor6);
     }
-    return (0);
-trunc:
-    return -1;
 }
 
 /*
  * print a neighbor list.
  */
-static int
+static void
 olsr_print_neighbor(netdissect_options *ndo,
                     const u_char *msg_data, u_int hello_len)
 {
@@ -301,7 +296,6 @@ olsr_print_neighbor(netdissect_options *ndo,
         msg_data += sizeof(nd_ipv4);
         hello_len -= sizeof(nd_ipv4);
     }
-    return (0);
 }
 
 
@@ -329,10 +323,9 @@ olsr_print(netdissect_options *ndo,
     tptr = pptr;
 
     if (length < sizeof(struct olsr_common)) {
-        goto trunc;
+        ND_PRINT(" (packet length < %lu)", sizeof(struct olsr_common));
+        goto invalid;
     }
-
-    ND_TCHECK_LEN(tptr, sizeof(struct olsr_common));
 
     ptr.common = (const struct olsr_common *)tptr;
     length = ND_MIN(length, GET_BE_U_2(ptr.common->packet_len));
@@ -425,9 +418,10 @@ olsr_print(netdissect_options *ndo,
         switch (msg_type) {
         case OLSR_HELLO_MSG:
         case OLSR_HELLO_LQ_MSG:
-            if (msg_tlen < sizeof(struct olsr_hello))
-                goto trunc;
-            ND_TCHECK_LEN(msg_data, sizeof(struct olsr_hello));
+            if (msg_tlen < sizeof(struct olsr_hello)) {
+                ND_PRINT(" (message length < %lu)", sizeof(struct olsr_hello));
+                goto invalid;
+            }
 
             ptr.hello = (const struct olsr_hello *)msg_data;
             ND_PRINT("\n\t  hello-time %.3fs, MPR willingness %u",
@@ -469,15 +463,12 @@ olsr_print(netdissect_options *ndo,
 
                 ND_TCHECK_LEN(msg_data, hello_len);
                 if (msg_type == OLSR_HELLO_MSG) {
-                    if (olsr_print_neighbor(ndo, msg_data, hello_len) == -1)
-                        goto trunc;
+                    olsr_print_neighbor(ndo, msg_data, hello_len);
                 } else {
                     if (is_ipv6) {
-                        if (olsr_print_lq_neighbor6(ndo, msg_data, hello_len) == -1)
-                            goto trunc;
+                        olsr_print_lq_neighbor6(ndo, msg_data, hello_len);
                     } else {
-                        if (olsr_print_lq_neighbor4(ndo, msg_data, hello_len) == -1)
-                            goto trunc;
+                        olsr_print_lq_neighbor4(ndo, msg_data, hello_len);
                     }
                 }
 
@@ -488,8 +479,10 @@ olsr_print(netdissect_options *ndo,
 
         case OLSR_TC_MSG:
         case OLSR_TC_LQ_MSG:
-            if (msg_tlen < sizeof(struct olsr_tc))
-                goto trunc;
+            if (msg_tlen < sizeof(struct olsr_tc)) {
+                goto invalid;
+                ND_PRINT(" (message length < %lu)", sizeof(struct olsr_tc));
+            }
             ND_TCHECK_LEN(msg_data, sizeof(struct olsr_tc));
 
             ptr.tc = (const struct olsr_tc *)msg_data;
@@ -499,15 +492,12 @@ olsr_print(netdissect_options *ndo,
             msg_tlen -= sizeof(struct olsr_tc);
 
             if (msg_type == OLSR_TC_MSG) {
-                if (olsr_print_neighbor(ndo, msg_data, msg_tlen) == -1)
-                    goto trunc;
+                olsr_print_neighbor(ndo, msg_data, msg_tlen);
             } else {
                 if (is_ipv6) {
-                    if (olsr_print_lq_neighbor6(ndo, msg_data, msg_tlen) == -1)
-                        goto trunc;
+                    olsr_print_lq_neighbor6(ndo, msg_data, msg_tlen);
                 } else {
-                    if (olsr_print_lq_neighbor4(ndo, msg_data, msg_tlen) == -1)
-                        goto trunc;
+                    olsr_print_lq_neighbor4(ndo, msg_data, msg_tlen);
                 }
             }
             break;
@@ -622,8 +612,10 @@ olsr_print(netdissect_options *ndo,
             int name_entries_valid;
             u_int i;
 
-            if (msg_tlen < 4)
-                goto trunc;
+            if (msg_tlen < 4) {
+                ND_PRINT(" (message length < 4)");
+                goto invalid;
+            }
 
             name_entries = GET_BE_U_2(msg_data + 2);
             addr_size = 4;
@@ -672,8 +664,10 @@ olsr_print(netdissect_options *ndo,
                 if (name_entry_len%4 != 0)
                     name_entry_padding = 4-(name_entry_len%4);
 
-                if (msg_tlen < addr_size + name_entry_len + name_entry_padding)
-                    goto trunc;
+                if (msg_tlen < addr_size + name_entry_len + name_entry_padding) {
+                    ND_PRINT(" (oversized name entry)");
+                    goto invalid;
+                }
 
                 ND_TCHECK_LEN(msg_data,
                               addr_size + name_entry_len + name_entry_padding);
@@ -707,6 +701,6 @@ olsr_print(netdissect_options *ndo,
 
     return;
 
- trunc:
-    nd_print_trunc(ndo);
+invalid:
+    nd_print_invalid(ndo);
 }
