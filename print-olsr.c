@@ -323,7 +323,7 @@ olsr_print(netdissect_options *ndo,
     tptr = pptr;
 
     if (length < sizeof(struct olsr_common)) {
-        ND_PRINT(" (packet length < %lu)", sizeof(struct olsr_common));
+        ND_PRINT(" (packet length < %zu)", sizeof(struct olsr_common));
         goto invalid;
     }
 
@@ -419,7 +419,7 @@ olsr_print(netdissect_options *ndo,
         case OLSR_HELLO_MSG:
         case OLSR_HELLO_LQ_MSG:
             if (msg_tlen < sizeof(struct olsr_hello)) {
-                ND_PRINT(" (message length < %lu)", sizeof(struct olsr_hello));
+                ND_PRINT(" (message length < %zu)", sizeof(struct olsr_hello));
                 goto invalid;
             }
 
@@ -481,7 +481,7 @@ olsr_print(netdissect_options *ndo,
         case OLSR_TC_LQ_MSG:
             if (msg_tlen < sizeof(struct olsr_tc)) {
                 goto invalid;
-                ND_PRINT(" (message length < %lu)", sizeof(struct olsr_tc));
+                ND_PRINT(" (message length < %zu)", sizeof(struct olsr_tc));
             }
             ND_TCHECK_LEN(msg_data, sizeof(struct olsr_tc));
 
