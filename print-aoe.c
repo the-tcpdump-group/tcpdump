@@ -270,7 +270,7 @@ aoev1_mac_print(netdissect_options *ndo,
 	cp += 1;
 	len -= 1;
 	ND_PRINT(", Dir Count: %u", dircount);
-	if (dircount * 8 > len)
+	if (dircount * 8U > len)
 		goto invalid;
 	/* directives */
 	for (i = 0; i < dircount; i++) {
