@@ -176,7 +176,7 @@ script:
   - ./tcpdump -D
   - sudo ./tcpdump -J
   - sudo ./tcpdump -L
-  - if [ "$TRAVIS_OS_NAME" = linux -a "$TRAVIS_CPU_ARCH" != ppc64le -a "$TRAVIS_CPU_ARCH" != s390x ]; then sudo ./tcpdump -#n -c 10; fi
+  - if [ "$TRAVIS_OS_NAME" = linux -a "$TRAVIS_CPU_ARCH" != ppc64le -a "$TRAVIS_CPU_ARCH" != s390x -a "$TRAVIS_CPU_ARCH" != arm64 ]; then sudo ./tcpdump -#n -c 10; fi
   - if [ "$CMAKE" = no ]; then make releasetar; fi
   - echo '$ cat Makefile [...]'; echo travis_fold:start:script.cat_makefile
   - if [ "$CMAKE" = no ]; then cat Makefile | sed -n '1,/DO NOT DELETE THIS LINE -- mkdep uses it/p'; fi
