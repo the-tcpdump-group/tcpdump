@@ -39,6 +39,8 @@
 #ifndef netdissect_stdinc_h
 #define netdissect_stdinc_h
 
+#include "ftmacros.h"
+
 #include <errno.h>
 
 #include "compiler-tests.h"
