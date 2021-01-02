@@ -113,7 +113,10 @@
   #ifndef _DEFAULT_SOURCE
     #define _DEFAULT_SOURCE
   #endif
-  #define _BSD_SOURCE
+  /* Avoid redefining _BSD_SOURCE if it's already defined as for ex. 1 */
+  #ifndef _BSD_SOURCE
+    #define _BSD_SOURCE
+  #endif
 #endif
 
 #endif
