@@ -278,6 +278,7 @@ HDR = \
 	ethertype.h \
 	extract.h \
 	fptype.h \
+	ftmacros.h \
 	funcattrs.h \
 	getservent.h \
 	gmpls.h \
