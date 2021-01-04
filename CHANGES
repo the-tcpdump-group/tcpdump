@@ -1,3 +1,11 @@
+Monthday, Month DD, YYYY by gharris
+  Summary for 4.99.1 tcpdump release (so far!)
+    Source code:
+      Squelch some compiler warnings
+      Rebuild configure script when building release
+    Solaris:
+      Fix a compile error with Sun C
+
 Wednesday, December 30, 2020, by mcr@sandelman.ca, denis and fxl.
   Summary for 4.99.0 tcpdump release
     Improve the contents, wording and formatting of the man page.
