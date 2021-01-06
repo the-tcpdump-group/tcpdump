@@ -167,6 +167,9 @@ script:
   - echo '$ make install [...]' && echo travis_fold:start:script.make_install
   - PATH=$PATH make install
   - echo -n travis_fold:end:script.make_install
+  - if [ "$TRAVIS_OS_NAME" = linux ]; then echo '$ ldd tcpdump' && echo travis_fold:start:script.ldd_tcpdump; fi
+  - if [ "$TRAVIS_OS_NAME" = linux ]; then ldd tcpdump; fi
+  - if [ "$TRAVIS_OS_NAME" = linux ]; then echo -n travis_fold:end:script.ldd_tcpdump; fi
   - if [ "$BUILD_LIBPCAP" = yes ]; then make check; fi
   - ./tcpdump --version
   - ./tcpdump -h
