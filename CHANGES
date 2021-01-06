@@ -2,7 +2,7 @@ Monthday, Month DD, YYYY by gharris
   Summary for 5.0.0 tcpdump release (so far!)
     Source code:
       Use %zu when printing a sizeof to squelch compiler warnings
-      OLSR, PGM, RSVP: Modernize packet parsing style
+      Geneve, OLSR, PGM, RSVP: Modernize packet parsing style
       EGP: Replace custom code with tok2str()
 
 Monthday, Month DD, YYYY by gharris

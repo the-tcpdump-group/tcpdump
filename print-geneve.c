@@ -16,6 +16,7 @@
  */
 
 /* \summary: Generic Network Virtualization Encapsulation (Geneve) printer */
+/* specification: RFC 8926 */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -23,12 +24,13 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 #include "ethertype.h"
 
 /*
- * Geneve header, draft-ietf-nvo3-geneve
+ * Geneve header:
  *
  *    0                   1                   2                   3
  *    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -37,14 +39,20 @@
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *    |        Virtual Network Identifier (VNI)       |    Reserved   |
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *    |                    Variable Length Options                    |
+ *    |                                                               |
+ *    ~                    Variable-Length Options                    ~
+ *    |                                                               |
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
  * Options:
+ *    0                   1                   2                   3
+ *    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *    |          Option Class         |      Type     |R|R|R| Length  |
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *    |                      Variable Option Data                     |
+ *    |                                                               |
+ *    ~                  Variable-Length Option Data                  ~
+ *    |                                                               |
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 
@@ -76,7 +84,7 @@ static const struct tok geneve_flag_values[] = {
 };
 
 static const char *
-format_opt_class(uint16_t opt_class)
+format_opt_class(const uint16_t opt_class)
 {
     switch (opt_class) {
     case 0x0100:
@@ -99,7 +107,7 @@ format_opt_class(uint16_t opt_class)
     return "Unknown";
 }
 
-static void
+static unsigned
 geneve_opts_print(netdissect_options *ndo, const u_char *bp, u_int len)
 {
     const char *sep = "";
@@ -109,6 +117,10 @@ geneve_opts_print(netdissect_options *ndo, const u_char *bp, u_int len)
         uint8_t opt_type;
         uint8_t opt_len;
 
+        if (len < 4) {
+            ND_PRINT(" (remaining options length %u < 4)", len);
+            goto invalid;
+        }
         ND_PRINT("%s", sep);
         sep = ", ";
 
@@ -122,7 +134,7 @@ geneve_opts_print(netdissect_options *ndo, const u_char *bp, u_int len)
 
         if (opt_len > len) {
             ND_PRINT(" [bad length]");
-            return;
+            goto invalid;
         }
 
         if (ndo->ndo_vflag > 1 && opt_len > 4) {
@@ -140,6 +152,10 @@ geneve_opts_print(netdissect_options *ndo, const u_char *bp, u_int len)
         bp += opt_len;
         len -= opt_len;
     }
+    return 1;
+invalid:
+    ND_TCHECK_LEN(bp, len);
+    return 0;
 }
 
 void
@@ -158,11 +174,8 @@ geneve_print(netdissect_options *ndo, const u_char *bp, u_int len)
 
     if (len < 8) {
         ND_PRINT(" [length %u < 8]", len);
-        nd_print_invalid(ndo);
-        return;
+        goto invalid;
     }
-
-    ND_TCHECK_8(bp);
 
     ver_opt = GET_U_1(bp);
     bp += 1;
@@ -171,7 +184,7 @@ geneve_print(netdissect_options *ndo, const u_char *bp, u_int len)
     version = ver_opt >> VER_SHIFT;
     if (version != 0) {
         ND_PRINT(" ERROR: unknown-version %u", version);
-        return;
+        goto invalid;
     }
 
     flags = GET_U_1(bp);
@@ -204,20 +217,21 @@ geneve_print(netdissect_options *ndo, const u_char *bp, u_int len)
     opts_len = (ver_opt & HDR_OPTS_LEN_MASK) * 4;
 
     if (len < opts_len) {
-        ND_PRINT(" truncated-geneve - %u bytes missing",
-                  opts_len - len);
-        return;
+        ND_PRINT(" (opts_len %u > %u", opts_len, len);
+        goto invalid;
     }
-
-    ND_TCHECK_LEN(bp, opts_len);
 
     if (opts_len > 0) {
         ND_PRINT(", options [");
 
-        if (ndo->ndo_vflag)
-            geneve_opts_print(ndo, bp, opts_len);
-        else
+        if (ndo->ndo_vflag) {
+            if (! geneve_opts_print(ndo, bp, opts_len))
+                goto invalid;
+        }
+        else {
+            ND_TCHECK_LEN(bp, opts_len);
             ND_PRINT("%u bytes", opts_len);
+        }
 
         ND_PRINT("]");
     }
@@ -233,12 +247,14 @@ geneve_print(netdissect_options *ndo, const u_char *bp, u_int len)
     if (ethertype_print(ndo, prot, bp, len, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL) == 0) {
         if (prot == ETHERTYPE_TEB)
             ether_print(ndo, bp, len, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL);
-        else
+        else {
             ND_PRINT("geneve-proto-0x%x", prot);
+            ND_TCHECK_LEN(bp, len);
+        }
     }
 
     return;
 
-trunc:
-    nd_print_trunc(ndo);
+invalid:
+    nd_print_invalid(ndo);
 }
