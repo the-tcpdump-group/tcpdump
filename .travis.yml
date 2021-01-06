@@ -160,7 +160,7 @@ script:
   - if [ "$CMAKE" = no ]; then echo -n travis_fold:end:script.configure; fi
   - if [ "$CMAKE" = yes ]; then mkdir build; fi
   - if [ "$CMAKE" = yes ]; then cd build; fi
-  - if [ "$CMAKE" = yes ]; then echo travis_fold:start:script.cmake; fi
+  - if [ "$CMAKE" = yes ]; then echo '$ cmake [...]' && echo travis_fold:start:script.cmake; fi
   - if [ "$CMAKE" = yes ]; then cmake -DWITH_CRYPTO="$CRYPTO" -DCMAKE_PREFIX_PATH=/tmp -DCMAKE_INSTALL_PREFIX=/tmp ..; fi
   - if [ "$CMAKE" = yes ]; then echo -n travis_fold:end:script.cmake; fi
   - make -s CFLAGS=-Werror
