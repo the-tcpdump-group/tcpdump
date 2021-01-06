@@ -31,6 +31,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 
@@ -576,13 +577,17 @@ l2tp_avp_print(netdissect_options *ndo, const u_char *dat, u_int length)
 	len = GET_BE_U_2(dat) & L2TP_AVP_HDR_LEN_MASK;
 
 	/* If it is not long enough to contain the header, we'll give up. */
-	if (len < 6)
-		goto trunc;
+	if (len < 6) {
+		ND_PRINT(" (AVP length %u < 6)", len);
+		goto invalid;
+	}
 
 	/* If it goes past the end of the remaining length of the packet,
 	   we'll give up. */
-	if (len > (u_int)length)
-		goto trunc;
+	if (len > length) {
+		ND_PRINT(" (len > %u)", length);
+		goto invalid;
+	}
 
 	/* If it goes past the end of the remaining length of the captured
 	   data, we'll give up. */
@@ -727,8 +732,7 @@ l2tp_avp_print(netdissect_options *ndo, const u_char *dat, u_int length)
 
 	return (len);
 
- trunc:
-	nd_print_trunc(ndo);
+invalid:
 	return (0);
 }
 
@@ -813,18 +817,18 @@ l2tp_print(netdissect_options *ndo, const u_char *dat, u_int length)
 	if (flag_l) {
 		if (length < l2tp_len) {
 			ND_PRINT(" Length %u larger than packet", l2tp_len);
-			return;
+			goto invalid;
 		}
 		length = l2tp_len;
 	}
 	if (length < cnt) {
 		ND_PRINT(" Length %u smaller than header length", length);
-		return;
+		goto invalid;
 	}
 	if (flag_t) {
 		if (!flag_l) {
 			ND_PRINT(" No length");
-			return;
+			goto invalid;
 		}
 		if (length - cnt == 0) {
 			ND_PRINT(" ZLB");
@@ -837,10 +841,7 @@ l2tp_print(netdissect_options *ndo, const u_char *dat, u_int length)
 
 				avp_length = l2tp_avp_print(ndo, ptr, length - cnt);
 				if (avp_length == 0) {
-					/*
-					 * Truncated.
-					 */
-					break;
+					goto invalid;
 				}
 				cnt += avp_length;
 				ptr += avp_length;
@@ -851,4 +852,7 @@ l2tp_print(netdissect_options *ndo, const u_char *dat, u_int length)
 		ppp_print(ndo, ptr, length - cnt);
 		ND_PRINT("}");
 	}
+	return;
+invalid:
+	nd_print_invalid(ndo);
 }
