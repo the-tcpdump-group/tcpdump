@@ -56,6 +56,8 @@ my $testsdir = dirname($0);
 #
 $testsdir = abs_path($testsdir);
 print "Running tests from ${testsdir}\n";
+print "with ${TCPDUMP}, version:\n";
+system "${TCPDUMP} --version";
 
 unshift(@INC, $testsdir);
 
