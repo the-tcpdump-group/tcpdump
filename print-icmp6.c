@@ -1514,12 +1514,10 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			case 1:
 				break;
 			case 2:
-				ND_TCHECK_8(opri + 1);
-				memcpy(&in6, opri + 1, 8);
+				GET_CPY_BYTES(&in6, opri + 1, 8);
 				break;
 			case 3:
-				ND_TCHECK_16(opri + 1);
-				memcpy(&in6, opri + 1, 16);
+				GET_CPY_BYTES(&in6, opri + 1, 16);
 				break;
 			default:
 				goto trunc;
