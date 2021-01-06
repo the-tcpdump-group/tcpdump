@@ -2307,9 +2307,8 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
 
     byte_length = (bit_length + 7) / 8; /* prefix has variable length encoding */
 
-    ND_TCHECK_LEN(tptr, byte_length);
     memset(prefix, 0, sizeof(prefix));   /* clear the copy buffer */
-    memcpy(prefix,tptr,byte_length);    /* copy as much as is stored in the TLV */
+    GET_CPY_BYTES(prefix,tptr,byte_length);    /* copy as much as is stored in the TLV */
     tptr+=byte_length;
     processed+=byte_length;
 
@@ -2360,8 +2359,6 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
         }
     }
     return (processed);
-trunc:
-    return 0;
 }
 
 static void

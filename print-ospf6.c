@@ -425,9 +425,8 @@ ospf6_print_lsaprefix(netdissect_options *ndo,
 	if (lsa_length < wordlen * 4)
 		goto trunc;
 	lsa_length -= wordlen * 4;
-	ND_TCHECK_LEN(lsapp->lsa_p_prefix, wordlen * 4);
 	memset(prefix, 0, sizeof(prefix));
-	memcpy(prefix, lsapp->lsa_p_prefix, wordlen * 4);
+	GET_CPY_BYTES(prefix, lsapp->lsa_p_prefix, wordlen * 4);
 	ND_PRINT("\n\t\t%s/%u", ip6addr_string(ndo, prefix), /* local buffer, not packet data; don't use GET_IP6ADDR_STRING() */
 		 GET_U_1(lsapp->lsa_p_len));
         if (GET_U_1(lsapp->lsa_p_opt)) {

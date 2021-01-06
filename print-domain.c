@@ -796,10 +796,8 @@ ns_rprint(netdissect_options *ndo,
 			ND_PRINT(" %u(bad plen)", pbit);
 			break;
 		} else if (pbit < 128) {
-			if (!ND_TTEST_LEN(cp + 1, sizeof(a) - pbyte))
-				return(NULL);
 			memset(a, 0, sizeof(a));
-			memcpy(a + pbyte, cp + 1, sizeof(a) - pbyte);
+			GET_CPY_BYTES(a + pbyte, cp + 1, sizeof(a) - pbyte);
 			ND_PRINT(" %u %s", pbit,
 			    addrtostr6(&a, ntop_buf, sizeof(ntop_buf)));
 		}
