@@ -1,4 +1,4 @@
-Monthday, Month DD, YYYY by gharris
+Monthday, Month DD, YYYY by gharris and denis
   Summary for 5.0.0 tcpdump release (so far!)
     Source code:
       Use %zu when printing a sizeof to squelch compiler warnings
