@@ -226,7 +226,7 @@ struct id_rdiscovery {
  * The Destination Unreachable, Time Exceeded
  * and Parameter Problem messages are slightly changed as per
  * the above draft. A new Length field gets added to give
- * the caller an idea about the length of the piggypacked
+ * the caller an idea about the length of the piggybacked
  * IP packet before the MPLS extension header starts.
  *
  * The Length field represents length of the padded "original datagram"
