@@ -100,11 +100,10 @@ env:
     - BUILD_LIBPCAP=yes CMAKE=no  REMOTE=disable CRYPTO=yes
     - BUILD_LIBPCAP=yes CMAKE=no  REMOTE=enable  CRYPTO=no
     - BUILD_LIBPCAP=yes CMAKE=no  REMOTE=enable  CRYPTO=yes
-# The 'BUILD_LIBPCAP=yes CMAKE=yes' builds currently fail
-#   - BUILD_LIBPCAP=yes CMAKE=yes REMOTE=disable CRYPTO=no
-#   - BUILD_LIBPCAP=yes CMAKE=yes REMOTE=disable CRYPTO=yes
-#   - BUILD_LIBPCAP=yes CMAKE=yes REMOTE=enable  CRYPTO=no
-#   - BUILD_LIBPCAP=yes CMAKE=yes REMOTE=enable  CRYPTO=yes
+    - BUILD_LIBPCAP=yes CMAKE=yes REMOTE=disable CRYPTO=no
+    - BUILD_LIBPCAP=yes CMAKE=yes REMOTE=disable CRYPTO=yes
+    - BUILD_LIBPCAP=yes CMAKE=yes REMOTE=enable  CRYPTO=no
+    - BUILD_LIBPCAP=yes CMAKE=yes REMOTE=enable  CRYPTO=yes
 
 addons:
   coverity_scan:
@@ -162,7 +161,7 @@ script:
   - if [ "$CMAKE" = yes ]; then mkdir build; fi
   - if [ "$CMAKE" = yes ]; then cd build; fi
   - if [ "$CMAKE" = yes ]; then echo travis_fold:start:script.cmake; fi
-  - if [ "$CMAKE" = yes ]; then cmake -DWITH_CRYPTO="$CRYPTO" -DCMAKE_PREFIX_PATH=/tmp -DCMAKE_INSTALL_PREFIX=/tmp ..; fi
+  - if [ "$CMAKE" = yes ]; then PKG_CONFIG_PATH=/tmp/lib/pkgconfig cmake -DWITH_CRYPTO="$CRYPTO" -DCMAKE_PREFIX_PATH=/tmp -DCMAKE_INSTALL_PREFIX=/tmp ..; fi
   - if [ "$CMAKE" = yes ]; then echo -n travis_fold:end:script.cmake; fi
   - make -s CFLAGS=-Werror
   - echo '$ make install [...]' && echo travis_fold:start:script.make_install
