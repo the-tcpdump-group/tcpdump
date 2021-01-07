@@ -24,10 +24,9 @@ compiler:
   - clang
 
 #
-# Linux runs on all of the architectures listed above; macOS currently
-# runs only on 64-bit x86, although the Spaceshipologists are all in a
-# tizzy about the possibility of Arm-based Macs.  Suppress the macOS
-# builds that don't work.
+# Linux runs on all of the architectures listed above; macOS runs on
+# 64-bit x86 and 64-bit ARM, but Travis doesn't currently have a 64-bit
+# ARM macOS build evironment.  Suppress the macOS builds that don't work.
 #
 # In addition, with newer versions of macOS, Apple ships a "gcc" that's
 # just another front end to Clang, presumably for backwards
