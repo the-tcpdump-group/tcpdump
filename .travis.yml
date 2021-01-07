@@ -156,7 +156,7 @@ script:
   - if [ "$TRAVIS_OS_NAME" = osx ]; then OSX_SSL_DIR=$(ls /usr/local/Cellar/openssl); echo "OSX_SSL_DIR=$OSX_SSL_DIR"; fi
   - touch .devel configure
   - if [ "$CMAKE" = no ]; then echo '$ ./configure [...]' && echo travis_fold:start:script.configure; fi
-  - if [ "$CMAKE" = no ]; then ./configure --with-crypto=${CRYPTO} CPPFLAGS="-I/usr/local/Cellar/openssl/$OSX_SSL_DIR/include/" --prefix=/tmp; fi
+  - if [ "$CMAKE" = no ]; then PKG_CONFIG_PATH=/tmp/lib/pkgconfig ./configure --with-crypto=${CRYPTO} CPPFLAGS="-I/usr/local/Cellar/openssl/$OSX_SSL_DIR/include/" --prefix=/tmp; fi
   - if [ "$CMAKE" = no ]; then echo -n travis_fold:end:script.configure; fi
   - if [ "$CMAKE" = yes ]; then mkdir build; fi
   - if [ "$CMAKE" = yes ]; then cd build; fi
