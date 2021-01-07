@@ -74,6 +74,15 @@ jobs:
     arch: s390x
   - if: branch = coverity_scan
     arch: arm64
+  include:
+  - name: Linux amd64 coverage gcc
+    os: linux
+    arch: amd64
+    compiler: gcc
+    env: BUILD_LIBPCAP=yes CMAKE=no  REMOTE=disable CRYPTO=yes COVERAGE=yes
+    # Coverage depends on running tests, so we use CMAKE=no because
+    # that is the only time that we can run tests.  Once running tests
+    # with cmake is supported again, we can make this CMAKE=yes.
 
 cache: ccache
 
@@ -146,6 +155,7 @@ before_install:
   - gem install travis-conditions
   - if [ "$TRAVIS_OS_NAME" = osx ]; then brew update >/dev/null; fi
   - if [ "$TRAVIS_OS_NAME" = linux ]; then apt list --installed 'lib*-dev'; fi
+  - if [ "$COVERAGE" = yes ]; then pip install --user cpp-coveralls; fi
 
 install:
   - if [ "$TRAVIS_OS_NAME" = osx ]; then brew install libsmi | grep -v '%'; fi
@@ -153,17 +163,21 @@ install:
 before_script:
   - if [ "$BUILD_LIBPCAP" = yes ]; then (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth 3 --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure "--${REMOTE}-remote" --prefix=/tmp && make && make install); fi
 
+after_success:
+  - if [ "$COVERAGE" = yes ]; then coveralls --gcov-options '\-lp'; fi
+
 script:
   - if [ "$COVERITY_SCAN_BRANCH" = 1 ]; then exit 0; fi
   - if [ "$TRAVIS_OS_NAME" = osx ]; then OSX_SSL_DIR=$(ls /usr/local/Cellar/openssl); echo "OSX_SSL_DIR=$OSX_SSL_DIR"; fi
   - touch .devel configure
   - if [ "$CMAKE" = no ]; then echo '$ ./configure [...]' && echo travis_fold:start:script.configure; fi
+  - if [ "$CMAKE" = no -a "$COVERAGE" = yes ]; then export CFLAGS=--coverage LDFLAGS=--coverage; fi
   - if [ "$CMAKE" = no ]; then ./configure --with-crypto=${CRYPTO} CPPFLAGS="-I/usr/local/Cellar/openssl/$OSX_SSL_DIR/include/" --prefix=/tmp; fi
   - if [ "$CMAKE" = no ]; then echo -n travis_fold:end:script.configure; fi
   - if [ "$CMAKE" = yes ]; then mkdir build; fi
   - if [ "$CMAKE" = yes ]; then cd build; fi
   - if [ "$CMAKE" = yes ]; then echo travis_fold:start:script.cmake; fi
-  - if [ "$CMAKE" = yes ]; then cmake -DWITH_CRYPTO="$CRYPTO" -DCMAKE_PREFIX_PATH=/tmp -DCMAKE_INSTALL_PREFIX=/tmp ..; fi
+  - if [ "$CMAKE" = yes ]; then cmake -DWITH_CRYPTO="$CRYPTO" -DCMAKE_PREFIX_PATH=/tmp -DCMAKE_INSTALL_PREFIX=/tmp -DWITH_COVERAGE="COVERAGE" ..; fi
   - if [ "$CMAKE" = yes ]; then echo -n travis_fold:end:script.cmake; fi
   - make -s CFLAGS=-Werror
   - echo '$ make install [...]' && echo travis_fold:start:script.make_install
