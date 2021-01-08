@@ -79,9 +79,106 @@ else(WIN32)
 
   #
   # First, try pkg-config.
+  # Before doing so, set the PKG_CONFIG_PATH environment variable
+  # to include all the directories in CMAKE_PREFIX_PATH.
+  #
+  # *If* we were to require CMake 3.1 or later on UN*X,
+  # pkg_search_module() would do this for us, but, for now,
+  # we're not doing that, in case somebody's building with
+  # CMake on some "long-term support" version, predating
+  # CMake 3.1, of an OS that that supplies an earlier
+  # version as a package.
+  #
+  # If we ever set a minimum of 3.1 or later on UN*X, we should
+  # remove the environment variable changes.
+  #
+  # This is based on code in the CMake 3.12.4 FindPkgConfig.cmake,
+  # which is "Distributed under the OSI-approved BSD 3-Clause License."
   #
   find_package(PkgConfig)
+
+  #
+  # Get the current PKG_CONFIG_PATH setting.
+  #
+  set(_pkg_config_path "$ENV{PKG_CONFIG_PATH}")
+
+  #
+  # Save it, so we can restore it after we run pkg-config.
+  #
+  set(_saved_pkg_config_path "${_pkg_config_path}")
+
+  if(NOT "${CMAKE_PREFIX_PATH}" STREQUAL "")
+    #
+    # Convert it to a CMake-style path, before we add additional
+    # values to it.
+    #
+    if(NOT "${_pkg_config_path}" STREQUAL "")
+      file(TO_CMAKE_PATH "${_pkg_config_path}" _pkg_config_path)
+    endif()
+
+    #
+    # Turn CMAKE_PREFIX_PATH into a list of extra paths to add
+    # to _pkg_config_path.
+    #
+    set(_extra_paths "")
+    list(APPEND _extra_paths ${CMAKE_PREFIX_PATH})
+
+    # Create a list of the possible pkgconfig subfolder (depending on
+    # the system
+    set(_lib_dirs)
+    if(NOT DEFINED CMAKE_SYSTEM_NAME
+        OR (CMAKE_SYSTEM_NAME MATCHES "^(Linux|kFreeBSD|GNU)$"
+            AND NOT CMAKE_CROSSCOMPILING))
+      if(EXISTS "/etc/debian_version") # is this a debian system ?
+        if(CMAKE_LIBRARY_ARCHITECTURE)
+          list(APPEND _lib_dirs "lib/${CMAKE_LIBRARY_ARCHITECTURE}/pkgconfig")
+        endif()
+      else()
+        # not debian, check the FIND_LIBRARY_USE_LIB32_PATHS and FIND_LIBRARY_USE_LIB64_PATHS properties
+        get_property(uselib32 GLOBAL PROPERTY FIND_LIBRARY_USE_LIB32_PATHS)
+        if(uselib32 AND CMAKE_SIZEOF_VOID_P EQUAL 4)
+          list(APPEND _lib_dirs "lib32/pkgconfig")
+        endif()
+        get_property(uselib64 GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)
+        if(uselib64 AND CMAKE_SIZEOF_VOID_P EQUAL 8)
+          list(APPEND _lib_dirs "lib64/pkgconfig")
+        endif()
+        get_property(uselibx32 GLOBAL PROPERTY FIND_LIBRARY_USE_LIBX32_PATHS)
+        if(uselibx32 AND CMAKE_INTERNAL_PLATFORM_ABI STREQUAL "ELF X32")
+          list(APPEND _lib_dirs "libx32/pkgconfig")
+        endif()
+      endif()
+    endif()
+    if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD" AND NOT CMAKE_CROSSCOMPILING)
+      list(APPEND _lib_dirs "libdata/pkgconfig")
+    endif()
+    list(APPEND _lib_dirs "lib/pkgconfig")
+    list(APPEND _lib_dirs "share/pkgconfig")
+
+    # Check if directories exist and eventually append them to the
+    # pkgconfig path list
+    foreach(_prefix_dir ${_extra_paths})
+      foreach(_lib_dir ${_lib_dirs})
+        if(EXISTS "${_prefix_dir}/${_lib_dir}")
+          list(APPEND _pkg_config_path "${_prefix_dir}/${_lib_dir}")
+          list(REMOVE_DUPLICATES _pkg_config_path)
+        endif()
+      endforeach()
+    endforeach()
+
+    if(NOT "${_pkg_config_path}" STREQUAL "")
+      # remove empty values from the list
+      list(REMOVE_ITEM _pkg_config_path "")
+      file(TO_NATIVE_PATH "${_pkg_config_path}" _pkg_config_path)
+      if(UNIX)
+        string(REPLACE ";" ":" _pkg_config_path "${_pkg_config_path}")
+        string(REPLACE "\\ " " " _pkg_config_path "${_pkg_config_path}")
+      endif()
+      set(ENV{PKG_CONFIG_PATH} "${_pkg_config_path}")
+    endif()
+  endif()
   pkg_search_module(CONFIG_PCAP ${_quiet} libpcap)
+  set(ENV{PKG_CONFIG_PATH} "${_saved_pkg_config_path}")
 
   if(NOT CONFIG_PCAP_FOUND)
     #
