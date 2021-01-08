@@ -172,6 +172,23 @@ nd_printn(netdissect_options *ndo,
 }
 
 /*
+ * Print a counted filename (or other ASCII string), part of
+ * the packet buffer, filtering out non-printable characters.
+ * Stop if truncated (via GET_U_1/longjmp) or after n bytes,
+ * whichever is first.
+ * The suffix comes from: j:longJmp, n:after N bytes.
+ */
+void
+nd_printjn(netdissect_options *ndo, const u_char *s, u_int n)
+{
+	while (n > 0) {
+		fn_print_char(ndo, GET_U_1(s));
+		n--;
+		s++;
+	}
+}
+
+/*
  * Print a null-padded filename (or other ASCII string), part of
  * the packet buffer, filtering out non-printable characters.
  * Stop if truncated (via GET_U_1/longjmp) or after n bytes or before
