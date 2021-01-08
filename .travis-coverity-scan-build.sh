@@ -17,8 +17,6 @@ TOOL_BASE=/tmp/coverity-scan-analysis
 UPLOAD_URL="https://scan.coverity.com/builds"
 SCAN_URL="https://scan.coverity.com"
 
-echo -e "\033[33;1mTest point 1\033[0m"
-
 # Verify Coverity Scan run condition
 COVERITY_SCAN_RUN_CONDITION=${coverity_scan_run_condition:-true}
 echo -ne "\033[33;1mTesting '${COVERITY_SCAN_RUN_CONDITION}' condition... "
@@ -29,15 +27,11 @@ else
   exit 0
 fi
 
-echo -e "\033[33;1mTest point 2\033[0m"
-
 # Do not run on pull requests
 if [ "${TRAVIS_PULL_REQUEST}" = "true" ]; then
   echo -e "\033[33;1mINFO: Skipping Coverity Analysis: branch is a pull request.\033[0m"
   exit 0
 fi
-
-echo -e "\033[33;1mTest point 3\033[0m"
 
 # Verify this branch should run
 IS_COVERITY_SCAN_BRANCH=`ruby -e "puts '${TRAVIS_BRANCH}' =~ /\\A$COVERITY_SCAN_BRANCH_PATTERN\\z/ ? 1 : 0"`
@@ -47,8 +41,6 @@ else
   echo -e "\033[33;1mCoverity Scan NOT configured to run on branch ${TRAVIS_BRANCH}\033[0m"
   exit 1
 fi
-
-echo -e "\033[33;1mTest point 4\033[0m"
 
 # Verify upload is permitted
 AUTH_RES=`curl -s --form project="$COVERITY_SCAN_PROJECT_NAME" --form token="$COVERITY_SCAN_TOKEN" $SCAN_URL/api/upload_permitted`
@@ -65,8 +57,6 @@ else
     exit 0
   fi
 fi
-
-echo -e "\033[33;1mTest point 5\033[0m"
 
 if [ ! -d $TOOL_BASE ]; then
   # Download Coverity Scan Analysis Tool
