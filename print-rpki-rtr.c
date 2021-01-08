@@ -347,9 +347,8 @@ rpki_rtr_pdu_print(netdissect_options *ndo, const u_char *tptr, const u_int len,
 	    if (text_length) {
 		if (pdu_len < tlen + text_length)
 		    goto invalid;
-		/* nd_printn() makes the bounds check */
 		ND_PRINT("%sError text: ", indent_string(indent+2));
-		(void)nd_printn(ndo, tptr + tlen, text_length, NULL);
+		nd_printjn(ndo, tptr + tlen, text_length);
 	    }
 	}
 	break;

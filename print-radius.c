@@ -1135,7 +1135,7 @@ print_attr_operator_name(netdissect_options *ndo,
    data++;
    ND_PRINT("[%s] ", tok2str(operator_name_vector, "unknown namespace %u", namespace_value));
 
-   (void)nd_printn(ndo, data, length - 1, NULL);
+   nd_printjn(ndo, data, length - 1);
 
    return;
 
@@ -1183,7 +1183,7 @@ print_attr_location_information(netdissect_options *ndo,
    data += 8;
 
    ND_PRINT("method \"");
-   (void)nd_printn(ndo, data, length - 20, NULL);
+   nd_printjn(ndo, data, length - 20);
    ND_PRINT("\"");
 
    return;
@@ -1247,7 +1247,7 @@ print_basic_location_policy_rules(netdissect_options *ndo,
 
    if (length > 10) {
       ND_PRINT(", note well \"");
-      (void)nd_printn(ndo, data, length - 10, NULL);
+      nd_printjn(ndo, data, length - 10);
       ND_PRINT("\"");
    }
 

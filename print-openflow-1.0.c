@@ -828,7 +828,7 @@ of10_bsn_message_print(netdissect_options *ndo,
 		OF_FWD(4);
 		/* data */
 		ND_PRINT(", data '");
-		(void)nd_printn(ndo, cp, len, NULL);
+		nd_printjn(ndo, cp, len);
 		ND_PRINT("'");
 		break;
 	case BSN_SHELL_OUTPUT:
@@ -845,7 +845,7 @@ of10_bsn_message_print(netdissect_options *ndo,
 		/* already checked that len >= 4 */
 		/* data */
 		ND_PRINT(", data '");
-		(void)nd_printn(ndo, cp, len, NULL);
+		nd_printjn(ndo, cp, len);
 		ND_PRINT("'");
 		break;
 	case BSN_SHELL_STATUS:

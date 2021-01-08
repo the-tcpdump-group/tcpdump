@@ -194,7 +194,7 @@ lwres_printname(netdissect_options *ndo,
                 size_t l, const u_char *p0)
 {
 	ND_PRINT(" ");
-	(void)nd_printn(ndo, p0, l, NULL);
+	nd_printjn(ndo, p0, l);
 	p0 += l;
 	if (GET_U_1(p0))
 		ND_PRINT(" (not NUL-terminated!)");

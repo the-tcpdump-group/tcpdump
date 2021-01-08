@@ -235,7 +235,7 @@ aoev1_query_print(netdissect_options *ndo,
 	/* Config String */
 	if (cslen) {
 		ND_PRINT("\n\tConfig String (length %u): ", cslen);
-		(void)nd_printn(ndo, cp, cslen, NULL);
+		nd_printjn(ndo, cp, cslen);
 	}
 	return;
 

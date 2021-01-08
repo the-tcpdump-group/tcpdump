@@ -678,7 +678,7 @@ rfc1048_print(netdissect_options *ndo,
 		case 'a':
 			/* ASCII strings */
 			ND_PRINT("\"");
-			(void)nd_printn(ndo, bp, len, NULL);
+			nd_printjn(ndo, bp, len);
 			ND_PRINT("\"");
 			bp += len;
 			len = 0;
@@ -822,7 +822,7 @@ rfc1048_print(netdissect_options *ndo,
 						 GET_U_1(bp + 1));
 				bp += 2;
 				ND_PRINT("\"");
-				(void)nd_printn(ndo, bp, len - 3, NULL);
+				nd_printjn(ndo, bp, len - 3);
 				ND_PRINT("\"");
 				bp += len - 3;
 				len = 0;
@@ -842,7 +842,7 @@ rfc1048_print(netdissect_options *ndo,
 				len--;
 				if (type == 0) {
 					ND_PRINT("\"");
-					(void)nd_printn(ndo, bp, len, NULL);
+					nd_printjn(ndo, bp, len);
 					ND_PRINT("\"");
 					bp += len;
 					len = 0;
@@ -885,7 +885,7 @@ rfc1048_print(netdissect_options *ndo,
 					case AGENT_SUBOPTION_CIRCUIT_ID: /* fall through */
 					case AGENT_SUBOPTION_REMOTE_ID:
 					case AGENT_SUBOPTION_SUBSCRIBER_ID:
-						(void)nd_printn(ndo, bp, suboptlen, NULL);
+						nd_printjn(ndo, bp, suboptlen);
 						break;
 
 					default:
@@ -983,7 +983,7 @@ rfc1048_print(netdissect_options *ndo,
 						break;
 					}
 					ND_PRINT("\"");
-					(void)nd_printn(ndo, bp, suboptlen, NULL);
+					nd_printjn(ndo, bp, suboptlen);
 					ND_PRINT("\"");
 					ND_PRINT(", length %u", suboptlen);
 					suboptnumber++;

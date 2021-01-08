@@ -222,7 +222,7 @@ auth_print(netdissect_options *ndo, const u_char *pptr)
                 pptr++;
                 ND_PRINT(", Password: ");
                 /* the length is equal to the password length plus three */
-                (void)nd_printn(ndo, pptr, auth_len - 3, NULL);
+                nd_printjn(ndo, pptr, auth_len - 3);
                 break;
             case AUTH_MD5:
             case AUTH_MET_MD5:

@@ -69,7 +69,7 @@ cdp_print_string(netdissect_options *ndo,
                  const u_char *cp, const u_int len)
 {
 	ND_PRINT("'");
-	(void)nd_printn(ndo, cp, len, NULL);
+	nd_printjn(ndo, cp, len);
 	ND_PRINT("'");
 }
 
@@ -178,7 +178,7 @@ cdp_print_phys_loc(netdissect_options *ndo,
 	ND_PRINT("0x%02x", GET_U_1(cp));
 	if (len > 1) {
 		ND_PRINT("/");
-		(void)nd_printn(ndo, cp + 1, len - 1, NULL);
+		nd_printjn(ndo, cp + 1, len - 1);
 	}
 }
 

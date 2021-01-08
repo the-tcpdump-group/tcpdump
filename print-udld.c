@@ -174,7 +174,7 @@ udld_print(netdissect_options *ndo,
 
         case UDLD_ECHO_TLV:
             ND_PRINT(", ");
-            (void)nd_printn(ndo, tptr, len, NULL);
+            nd_printjn(ndo, tptr, len);
             break;
 
         case UDLD_MESSAGE_INTERVAL_TLV:
