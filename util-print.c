@@ -95,33 +95,6 @@ fn_print_str(netdissect_options *ndo, const u_char *s)
 }
 
 /*
- * Print out a null-terminated filename (or other ASCII string), part of
- * the packet buffer.
- * If ep is NULL, assume no truncation check is needed.
- * Return true if truncated.
- * Stop at ep (if given) or before the null char, whichever is first.
- */
-int
-nd_print(netdissect_options *ndo,
-         const u_char *s, const u_char *ep)
-{
-	int ret;
-	u_char c;
-
-	ret = 1;			/* assume truncated */
-	while (ep == NULL || s < ep) {
-		c = GET_U_1(s);
-		s++;
-		if (c == '\0') {
-			ret = 0;
-			break;
-		}
-		fn_print_char(ndo, c);
-	}
-	return(ret);
-}
-
-/*
  * Print out a null-terminated filename (or other ASCII string) from
  * a fixed-length field in the packet buffer, or from what remains of
  * the packet.
