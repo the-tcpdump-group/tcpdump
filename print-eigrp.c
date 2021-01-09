@@ -43,7 +43,8 @@ struct eigrp_common_header {
     nd_uint32_t flags;
     nd_uint32_t seq;
     nd_uint32_t ack;
-    nd_uint32_t asn;
+    nd_uint16_t vrid;
+    nd_uint16_t asn;
 };
 
 #define	EIGRP_VERSION                        2
@@ -68,6 +69,8 @@ static const struct tok eigrp_opcode_values[] = {
 static const struct tok eigrp_common_header_flag_values[] = {
     { 0x01, "Init" },
     { 0x02, "Conditionally Received" },
+    { 0x04, "Restart" },
+    { 0x08, "End-of-Table" },
     { 0, NULL}
 };
 
@@ -259,18 +262,19 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
     }
     tlen=len-sizeof(struct eigrp_common_header);
 
-    /* FIXME print other header info */
-    ND_PRINT("\n\tEIGRP v%u, opcode: %s (%u), chksum: 0x%04x, Flags: [%s]\n\tseq: 0x%08x, ack: 0x%08x, AS: %u, length: %u",
+    ND_PRINT("\n\tEIGRP v%u, opcode: %s (%u), chksum: 0x%04x, Flags: [%s]"
+             "\n\tseq: 0x%08x, ack: 0x%08x, VRID: %u, AS: %u, length: %u",
            GET_U_1(eigrp_com_header->version),
            tok2str(eigrp_opcode_values, "unknown, type: %u",GET_U_1(eigrp_com_header->opcode)),
            GET_U_1(eigrp_com_header->opcode),
            GET_BE_U_2(eigrp_com_header->checksum),
-           tok2str(eigrp_common_header_flag_values,
+           bittok2str(eigrp_common_header_flag_values,
                    "none",
                    GET_BE_U_4(eigrp_com_header->flags)),
            GET_BE_U_4(eigrp_com_header->seq),
            GET_BE_U_4(eigrp_com_header->ack),
-           GET_BE_U_4(eigrp_com_header->asn),
+           GET_BE_U_2(eigrp_com_header->vrid),
+           GET_BE_U_2(eigrp_com_header->asn),
            tlen);
 
     tptr+=sizeof(struct eigrp_common_header);
