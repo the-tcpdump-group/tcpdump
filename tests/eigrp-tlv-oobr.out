@@ -4132,4 +4132,5 @@
 	  Software Version TLV (0x0004), length: 4 (too short, < 8)
 	  Software Version TLV (0x0004), length: 4 (too short, < 8)
 	  Software Version TLV (0x0004), length: 4 (too short, < 8)
-	  Software Version TLV (0x0004), length: 4 (too short, < 8) [|eigrp]
+	  Software Version TLV (0x0004), length: 4 (too short, < 8)
+	  (only 1 bytes of data) (invalid)
