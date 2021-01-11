@@ -26,6 +26,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -177,7 +178,7 @@ egpnr_print(netdissect_options *ndo,
 		/* Pickup host part of gateway address */
 		addr = 0;
 		if (length < 4 - netlen)
-			goto trunc;
+			goto invalid;
 		ND_TCHECK_LEN(cp, 4 - netlen);
 		switch (netlen) {
 
@@ -197,7 +198,7 @@ egpnr_print(netdissect_options *ndo,
 		addr |= net;
 		length -= 4 - netlen;
 		if (length < 1)
-			goto trunc;
+			goto invalid;
 		distances = GET_U_1(cp);
 		cp++;
 		length--;
@@ -209,7 +210,7 @@ egpnr_print(netdissect_options *ndo,
 		ND_PRINT("(");
 		while (distances != 0) {
 			if (length < 2)
-				goto trunc;
+				goto invalid;
 			ND_PRINT("%sd%u:", comma, GET_U_1(cp));
 			cp++;
 			comma = ", ";
@@ -219,19 +220,19 @@ egpnr_print(netdissect_options *ndo,
 			while (networks != 0) {
 				/* Pickup network number */
 				if (length < 1)
-					goto trunc;
+					goto invalid;
 				addr = ((uint32_t) GET_U_1(cp)) << 24;
 				cp++;
 				length--;
 				if (IN_CLASSB(addr)) {
 					if (length < 1)
-						goto trunc;
+						goto invalid;
 					addr |= ((uint32_t) GET_U_1(cp)) << 16;
 					cp++;
 					length--;
 				} else if (!IN_CLASSA(addr)) {
 					if (length < 2)
-						goto trunc;
+						goto invalid;
 					addr |= ((uint32_t) GET_U_1(cp)) << 16;
 					cp++;
 					addr |= ((uint32_t) GET_U_1(cp)) << 8;
@@ -246,8 +247,8 @@ egpnr_print(netdissect_options *ndo,
 		ND_PRINT(")");
 	}
 	return;
-trunc:
-	nd_print_trunc(ndo);
+invalid:
+	nd_print_invalid(ndo);
 }
 
 void
@@ -262,10 +263,11 @@ egp_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "egp";
 	egp = (const struct egp_packet *)bp;
-	if (length < sizeof(*egp) || !ND_TTEST_SIZE(egp)) {
-		nd_print_trunc(ndo);
-		return;
+	if (length < sizeof(*egp)) {
+		ND_PRINT(" packet length %u < %zu", length, sizeof(*egp));
+		goto invalid;
 	}
+	ND_TCHECK_SIZE(egp);
 
 	version = GET_U_1(egp->egp_version);
         if (!ndo->ndo_vflag) {
@@ -367,4 +369,7 @@ egp_print(netdissect_options *ndo,
 		ND_PRINT(" %s", tok2str(egp_reasons_str, "[reason %u]", GET_BE_U_2(egp->egp_reason)));
 		break;
 	}
+	return;
+invalid:
+	nd_print_invalid(ndo);
 }
