@@ -312,55 +312,41 @@ static uint16_t udp6_cksum(netdissect_options *ndo, const struct ip6_hdr *ip6,
 }
 
 static void
-udpipaddr_print(netdissect_options *ndo, const struct ip *ip, int sport, int dport)
+udpipaddr_print(netdissect_options *ndo,
+                const struct ip *ip, const uint16_t sport, const uint16_t dport)
 {
-	const struct ip6_hdr *ip6;
+	const struct ip6_hdr *ip6 = (const struct ip6_hdr *)ip;
 
-	if (IP_V(ip) == 6)
-		ip6 = (const struct ip6_hdr *)ip;
-	else
-		ip6 = NULL;
+	if (IP_V(ip) == 4 && GET_U_1(ip->ip_p) == IPPROTO_UDP) {
+		ND_PRINT("%s.%s > %s.%s: ",
+			GET_IPADDR_STRING(ip->ip_src),
+			udpport_string(ndo, sport),
+			GET_IPADDR_STRING(ip->ip_dst),
+			udpport_string(ndo, dport));
+	} else if (IP_V(ip) == 6 && GET_U_1(ip6->ip6_nxt) == IPPROTO_UDP) {
+		ND_PRINT("%s.%s > %s.%s: ",
+			GET_IP6ADDR_STRING(ip6->ip6_src),
+			udpport_string(ndo, sport),
+			GET_IP6ADDR_STRING(ip6->ip6_dst),
+			udpport_string(ndo, dport));
+	} else
+		ND_PRINT("%s > %s: ",
+			udpport_string(ndo, sport), udpport_string(ndo, dport));
+}
 
-	if (ip6) {
-		if (GET_U_1(ip6->ip6_nxt) == IPPROTO_UDP) {
-			if (sport == -1) {
-				ND_PRINT("%s > %s: ",
-					GET_IP6ADDR_STRING(ip6->ip6_src),
-					GET_IP6ADDR_STRING(ip6->ip6_dst));
-			} else {
-				ND_PRINT("%s.%s > %s.%s: ",
-					GET_IP6ADDR_STRING(ip6->ip6_src),
-					udpport_string(ndo, (uint16_t)sport),
-					GET_IP6ADDR_STRING(ip6->ip6_dst),
-					udpport_string(ndo, (uint16_t)dport));
-			}
-		} else {
-			if (sport != -1) {
-				ND_PRINT("%s > %s: ",
-					udpport_string(ndo, (uint16_t)sport),
-					udpport_string(ndo, (uint16_t)dport));
-			}
-		}
-	} else {
-		if (GET_U_1(ip->ip_p) == IPPROTO_UDP) {
-			if (sport == -1) {
-				ND_PRINT("%s > %s: ",
-					GET_IPADDR_STRING(ip->ip_src),
-					GET_IPADDR_STRING(ip->ip_dst));
-			} else {
-				ND_PRINT("%s.%s > %s.%s: ",
-					GET_IPADDR_STRING(ip->ip_src),
-					udpport_string(ndo, (uint16_t)sport),
-					GET_IPADDR_STRING(ip->ip_dst),
-					udpport_string(ndo, (uint16_t)dport));
-			}
-		} else {
-			if (sport != -1) {
-				ND_PRINT("%s > %s: ",
-					udpport_string(ndo, (uint16_t)sport),
-					udpport_string(ndo, (uint16_t)dport));
-			}
-		}
+static void
+udpipaddr_noport_print(netdissect_options *ndo, const struct ip *ip)
+{
+	const struct ip6_hdr *ip6 = (const struct ip6_hdr *)ip;
+
+	if (IP_V(ip) == 4 && GET_U_1(ip->ip_p) == IPPROTO_UDP) {
+		ND_PRINT("%s > %s: ",
+			GET_IPADDR_STRING(ip->ip_src),
+			GET_IPADDR_STRING(ip->ip_dst));
+	} else if (IP_V(ip) == 6 && GET_U_1(ip6->ip6_nxt) == IPPROTO_UDP) {
+		ND_PRINT("%s > %s: ",
+			GET_IP6ADDR_STRING(ip6->ip6_src),
+			GET_IP6ADDR_STRING(ip6->ip6_dst));
 	}
 }
 
@@ -384,20 +370,20 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	else
 		ip6 = NULL;
 	if (!ND_TTEST_2(up->uh_dport)) {
-		udpipaddr_print(ndo, ip, -1, -1);
+		udpipaddr_noport_print(ndo, ip);
 		goto trunc;
 	}
 
 	sport = GET_BE_U_2(up->uh_sport);
 	dport = GET_BE_U_2(up->uh_dport);
+	if (ndo->ndo_packettype != PT_RPC)
+		udpipaddr_print(ndo, ip, sport, dport);
 
 	if (length < sizeof(struct udphdr)) {
-		udpipaddr_print(ndo, ip, sport, dport);
 		ND_PRINT("truncated-udp %u", length);
 		return;
 	}
 	if (!ND_TTEST_2(up->uh_ulen)) {
-		udpipaddr_print(ndo, ip, sport, dport);
 		goto trunc;
 	}
 	ulen = GET_BE_U_2(up->uh_ulen);
@@ -409,7 +395,6 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	if (ulen == 0 && length > 65535)
 		ulen = length;
 	if (ulen < sizeof(struct udphdr)) {
-		udpipaddr_print(ndo, ip, sport, dport);
 		ND_PRINT("truncated-udplength %u", ulen);
 		return;
 	}
@@ -420,7 +405,6 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 
 	cp = (const u_char *)(up + 1);
 	if (cp > ndo->ndo_snapend) {
-		udpipaddr_print(ndo, ip, sport, dport);
 		goto trunc;
 	}
 
@@ -431,12 +415,10 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		switch (ndo->ndo_packettype) {
 
 		case PT_VAT:
-			udpipaddr_print(ndo, ip, sport, dport);
 			vat_print(ndo, cp, length);
 			break;
 
 		case PT_WB:
-			udpipaddr_print(ndo, ip, sport, dport);
 			wb_print(ndo, cp, length);
 			break;
 
@@ -452,66 +434,53 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			break;
 
 		case PT_RTP:
-			udpipaddr_print(ndo, ip, sport, dport);
 			rtp_print(ndo, cp, length);
 			break;
 
 		case PT_RTCP:
-			udpipaddr_print(ndo, ip, sport, dport);
 			while (cp < ep)
 				cp = rtcp_print(ndo, cp, ep);
 			break;
 
 		case PT_SNMP:
-			udpipaddr_print(ndo, ip, sport, dport);
 			snmp_print(ndo, cp, length);
 			break;
 
 		case PT_CNFP:
-			udpipaddr_print(ndo, ip, sport, dport);
 			cnfp_print(ndo, cp);
 			break;
 
 		case PT_TFTP:
-			udpipaddr_print(ndo, ip, sport, dport);
 			tftp_print(ndo, cp, length);
 			break;
 
 		case PT_AODV:
-			udpipaddr_print(ndo, ip, sport, dport);
 			aodv_print(ndo, cp, length,
 			    ip6 != NULL);
 			break;
 
 		case PT_RADIUS:
-			udpipaddr_print(ndo, ip, sport, dport);
 			radius_print(ndo, cp, length);
 			break;
 
 		case PT_VXLAN:
-			udpipaddr_print(ndo, ip, sport, dport);
 			vxlan_print(ndo, cp, length);
 			break;
 
 		case PT_PGM:
 		case PT_PGM_ZMTP1:
-			udpipaddr_print(ndo, ip, sport, dport);
 			pgm_print(ndo, cp, length, bp2);
 			break;
 		case PT_LMP:
-			udpipaddr_print(ndo, ip, sport, dport);
 			lmp_print(ndo, cp, length);
 			break;
 		case PT_PTP:
-			udpipaddr_print(ndo, ip, sport, dport);
 			ptp_print(ndo, cp, length);
 			break;
 		case PT_SOMEIP:
-			udpipaddr_print(ndo, ip, sport, dport);
 			someip_print(ndo, cp, length);
 			break;
 		case PT_DOMAIN:
-			udpipaddr_print(ndo, ip, sport, dport);
 			/* over_tcp: FALSE, is_mdns: FALSE */
 			domain_print(ndo, cp, length, FALSE, FALSE);
 			break;
@@ -519,7 +488,6 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		return;
 	}
 
-	udpipaddr_print(ndo, ip, sport, dport);
 	if (!ndo->ndo_qflag) {
 		const struct sunrpc_msg *rp;
 		enum sunrpc_msg_type direction;
