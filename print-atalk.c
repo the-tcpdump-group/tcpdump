@@ -36,7 +36,74 @@
 #include "extract.h"
 #include "appletalk.h"
 
+/* Datagram Delivery Protocol */
 
+struct atDDP {
+	nd_uint16_t	length;
+	nd_uint16_t	checksum;
+	nd_uint16_t	dstNet;
+	nd_uint16_t	srcNet;
+	nd_uint8_t	dstNode;
+	nd_uint8_t	srcNode;
+	nd_uint8_t	dstSkt;
+	nd_uint8_t	srcSkt;
+	nd_uint8_t	type;
+};
+#define	ddpSize		13
+
+struct atShortDDP {
+	nd_uint16_t	length;
+	nd_uint8_t	dstSkt;
+	nd_uint8_t	srcSkt;
+	nd_uint8_t	type;
+};
+#define	ddpSSize	5
+
+/* AppleTalk Transaction Protocol */
+
+struct atATP {
+	nd_uint8_t	control;
+	nd_uint8_t	bitmap;
+	nd_uint16_t	transID;
+	nd_uint32_t	userData;
+};
+
+#define	atpReqCode	0x40
+#define	atpRspCode	0x80
+#define	atpRelCode	0xC0
+#define	atpXO		0x20
+#define	atpEOM		0x10
+#define	atpSTS		0x08
+
+/* Name Binding Protocol */
+
+struct atNBP {
+	nd_uint8_t	control;
+	nd_uint8_t	id;
+};
+#define	nbpHeaderSize	2
+
+struct atNBPtuple {
+	nd_uint16_t	net;
+	nd_uint8_t	node;
+	nd_uint8_t	skt;
+	nd_uint8_t	enumerator;
+};
+#define	nbpTupleSize	5
+
+#define	nbpBrRq		0x10
+#define	nbpLkUp		0x20
+#define	nbpLkUpReply	0x30
+
+#define	ddpRTMP		1	/* RTMP type */
+#define	ddpNBP		2	/* NBP type */
+#define	ddpATP		3	/* ATP type */
+#define	ddpECHO		4	/* ECHO type */
+#define	ddpRTMPrequest	5	/* RTMP request type */
+#define	ddpIP		22	/* IP type */
+#define	ddpARP		23	/* ARP type */
+#define	ddpKLAP		0x4b	/* Kinetics KLAP type */
+#define	ddpEIGRP        88      /* EIGRP over Appletalk */
 static const struct tok type2str[] = {
 	{ ddpRTMP,		"rtmp" },
 	{ ddpRTMPrequest,	"rtmpReq" },
@@ -162,12 +229,6 @@ llap_print(netdissect_options *ndo,
 		ddp_print(ndo, bp, length, GET_U_1(dp->type), snet,
 			  GET_U_1(dp->srcNode), GET_U_1(dp->srcSkt));
 		break;
-
-#ifdef notdef
-	case lapKLAP:
-		klap_print(bp, length);
-		break;
-#endif
 
 	default:
 		ND_PRINT("%u > %u at-lap#%u %u",
@@ -679,6 +740,10 @@ ataddr_string(netdissect_options *ndo,
 	return (tp->name);
 }
 
+#define rtmpSkt 1
+#define nbpSkt  2
+#define echoSkt 4
+#define zipSkt  6
 static const struct tok skt2str[] = {
 	{ rtmpSkt,	"rtmp" },	/* routing table maintenance */
 	{ nbpSkt,	"nis" },	/* name info socket */
