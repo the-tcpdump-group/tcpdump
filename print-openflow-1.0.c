@@ -318,7 +318,6 @@ static const struct tok ofp_capabilities_bm[] = {
 #define OFPC_FRAG_NORMAL 0x0000U
 #define OFPC_FRAG_DROP   0x0001U
 #define OFPC_FRAG_REASM  0x0002U
-#define OFPC_FRAG_MASK   0x0003U
 static const struct tok ofp_config_str[] = {
 	{ OFPC_FRAG_NORMAL, "FRAG_NORMAL" },
 	{ OFPC_FRAG_DROP,   "FRAG_DROP"   },
@@ -1552,15 +1551,15 @@ of10_port_mod_print(netdissect_options *ndo,
 	ND_PRINT(", hw_addr %s", GET_ETHERADDR_STRING(cp));
 	cp += MAC_ADDR_LEN;
 	/* config */
-	ND_PRINT("\n\t config 0x%08x", GET_BE_U_4(cp));
+	ND_PRINT("\n\t  config 0x%08x", GET_BE_U_4(cp));
 	of_bitmap_print(ndo, ofppc_bm, GET_BE_U_4(cp), OFPPC_U);
 	cp += 4;
 	/* mask */
-	ND_PRINT("\n\t mask 0x%08x", GET_BE_U_4(cp));
+	ND_PRINT("\n\t  mask 0x%08x", GET_BE_U_4(cp));
 	of_bitmap_print(ndo, ofppc_bm, GET_BE_U_4(cp), OFPPC_U);
 	cp += 4;
 	/* advertise */
-	ND_PRINT("\n\t advertise 0x%08x", GET_BE_U_4(cp));
+	ND_PRINT("\n\t  advertise 0x%08x", GET_BE_U_4(cp));
 	of_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
 	cp += 4;
 	/* pad */
