@@ -491,17 +491,12 @@ int
 print_unknown_data(netdissect_options *ndo, const u_char *cp,
                    const char *ident, u_int len)
 {
-	u_int len_to_print;
-
-	len_to_print = len;
 	if (!ND_TTEST_LEN(cp, 0)) {
-		ND_PRINT("%sDissector error: print_unknown_data called with pointer past end of packet",
-		    ident);
+		ND_PRINT("%sDissector error: %s() called with pointer past end of packet",
+		    ident, __func__);
 		return(0);
 	}
-	if (ND_BYTES_AVAILABLE_AFTER(cp) < len_to_print)
-		len_to_print = ND_BYTES_AVAILABLE_AFTER(cp);
-	hex_print(ndo, ident, cp, len_to_print);
+	hex_print(ndo, ident, cp, ND_MIN(len, ND_BYTES_AVAILABLE_AFTER(cp)));
 	return(1); /* everything is ok */
 }
 
