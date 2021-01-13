@@ -7,6 +7,7 @@ Monthday, Month DD, YYYY by gharris and denis
       EIGRP: Get the packet header fields right.
       UDP: Clean up address and port printing.
       AppleTalk: Declutter appletalk.h.
+      OpenFlow 1.0: Fix indentation of PORT_MOD.
 
 Monthday, Month DD, YYYY by gharris
   Summary for 4.99.1 tcpdump release (so far!)
