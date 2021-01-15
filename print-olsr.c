@@ -322,6 +322,9 @@ olsr_print(netdissect_options *ndo,
     ndo->ndo_protocol = "olsr";
     tptr = pptr;
 
+    nd_print_protocol_caps(ndo);
+    ND_PRINT("v%u", (is_ipv6) ? 6 : 4);
+
     if (length < sizeof(struct olsr_common)) {
         ND_PRINT(" (packet length < %zu)", sizeof(struct olsr_common));
         goto invalid;
@@ -330,8 +333,7 @@ olsr_print(netdissect_options *ndo,
     ptr.common = (const struct olsr_common *)tptr;
     length = ND_MIN(length, GET_BE_U_2(ptr.common->packet_len));
 
-    ND_PRINT("OLSRv%i, seq 0x%04x, length %u",
-            (is_ipv6 == 0) ? 4 : 6,
+    ND_PRINT(", seq 0x%04x, length %u",
             GET_BE_U_2(ptr.common->packet_seq),
             length);
 
