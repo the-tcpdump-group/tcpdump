@@ -2,7 +2,7 @@ Monthday, Month DD, YYYY by gharris and denis
   Summary for 5.0.0 tcpdump release (so far!)
     Source code:
       Use %zu when printing a sizeof to squelch compiler warnings
-      AppleTalk, BOOTP, EGP, EIGRP, Geneve, L2TP, OLSR, PGM, RIP, RSVP, UDP: Modernize packet parsing style
+      AODV, AppleTalk, BOOTP, EGP, EIGRP, Geneve, L2TP, OLSR, PGM, RIP, RSVP, UDP: Modernize packet parsing style
       EGP: Replace custom code with tok2str()
       EIGRP: Get the packet header fields right.
       UDP: Clean up address and port printing.
