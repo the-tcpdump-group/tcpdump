@@ -101,7 +101,7 @@ struct tcp_seq_hash6 {
 static struct tcp_seq_hash tcp_seq_hash4[TSEQ_HASHSIZE];
 static struct tcp_seq_hash6 tcp_seq_hash6[TSEQ_HASHSIZE];
 
-static const struct tok tcp_flag_values[] = {
+const struct tok tcp_flag_values[] = {
         { TH_FIN, "F" },
         { TH_SYN, "S" },
         { TH_RST, "R" },

@@ -60,6 +60,7 @@ struct tcphdr {
 #define	TH_URG	   0x20
 #define TH_ECNECHO 0x40	/* ECN Echo */
 #define TH_CWR	   0x80	/* ECN Cwnd Reduced */
+extern const struct tok tcp_flag_values[];
 
 
 #define	TCPOPT_EOL		0

@@ -1,5 +1,7 @@
 DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
   Summary for 4.99.7 tcpdump release (so far!)
+    Source code:
+      NetFlow: Use tcp_flag_values[] for TCP flags.
     Refine protocol decoding for:
       MPTCP: parse MPC data_len field, print flags from MP_CAPABLE option,
         dissect the MP_TCPRST sub-option.

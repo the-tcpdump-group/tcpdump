@@ -224,14 +224,8 @@ cnfp_v1_print(netdissect_options *ndo, const u_char *cp)
 		if (proto == IPPROTO_TCP) {
 			u_int flags;
 			flags = GET_U_1(nr->tcp_flags);
-			ND_PRINT("%s%s%s%s%s%s%s",
-				flags & TH_FIN  ? "F" : "",
-				flags & TH_SYN  ? "S" : "",
-				flags & TH_RST  ? "R" : "",
-				flags & TH_PUSH ? "P" : "",
-				flags & TH_ACK  ? "A" : "",
-				flags & TH_URG  ? "U" : "",
-				flags           ? " " : "");
+			if (flags)
+				ND_PRINT("%s ", bittok2str_nosep(tcp_flag_values, "", flags));
 		}
 
 		buf[0]='\0';
@@ -326,14 +320,8 @@ cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 		if (proto == IPPROTO_TCP) {
 			u_int flags;
 			flags = GET_U_1(nr->tcp_flags);
-			ND_PRINT("%s%s%s%s%s%s%s",
-				flags & TH_FIN  ? "F" : "",
-				flags & TH_SYN  ? "S" : "",
-				flags & TH_RST  ? "R" : "",
-				flags & TH_PUSH ? "P" : "",
-				flags & TH_ACK  ? "A" : "",
-				flags & TH_URG  ? "U" : "",
-				flags           ? " " : "");
+			if (flags)
+				ND_PRINT("%s ", bittok2str_nosep(tcp_flag_values, "", flags));
 		}
 
 		buf[0]='\0';
@@ -428,14 +416,8 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 		if (proto == IPPROTO_TCP) {
 			u_int flags;
 			flags = GET_U_1(nr->tcp_flags);
-			ND_PRINT("%s%s%s%s%s%s%s",
-				flags & TH_FIN  ? "F" : "",
-				flags & TH_SYN  ? "S" : "",
-				flags & TH_RST  ? "R" : "",
-				flags & TH_PUSH ? "P" : "",
-				flags & TH_ACK  ? "A" : "",
-				flags & TH_URG  ? "U" : "",
-				flags           ? " " : "");
+			if (flags)
+				ND_PRINT("%s ", bittok2str_nosep(tcp_flag_values, "", flags));
 		}
 
 		buf[0]='\0';
