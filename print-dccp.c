@@ -509,23 +509,42 @@ trunc:
 	nd_print_trunc(ndo);
 }
 
+enum dccp_option_type {
+	DCCP_OPTION_PADDING = 0,
+	DCCP_OPTION_MANDATORY = 1,
+	DCCP_OPTION_SLOW_RECEIVER = 2,
+	DCCP_OPTION_CHANGE_L = 32,
+	DCCP_OPTION_CONFIRM_L = 33,
+	DCCP_OPTION_CHANGE_R = 34,
+	DCCP_OPTION_CONFIRM_R = 35,
+	DCCP_OPTION_INIT_COOKIE = 36,
+	DCCP_OPTION_NDP_COUNT = 37,
+	DCCP_OPTION_ACK_VECTOR_NONCE_0 = 38,
+	DCCP_OPTION_ACK_VECTOR_NONCE_1 = 39,
+	DCCP_OPTION_DATA_DROPPED = 40,
+	DCCP_OPTION_TIMESTAMP = 41,
+	DCCP_OPTION_TIMESTAMP_ECHO = 42,
+	DCCP_OPTION_ELAPSED_TIME = 43,
+	DCCP_OPTION_DATA_CHECKSUM = 44
+};
+
 static const struct tok dccp_option_values[] = {
-	{ 0, "nop" },
-	{ 1, "mandatory" },
-	{ 2, "slowreceiver" },
-	{ 32, "change_l" },
-	{ 33, "confirm_l" },
-	{ 34, "change_r" },
-	{ 35, "confirm_r" },
-	{ 36, "initcookie" },
-	{ 37, "ndp_count" },
-	{ 38, "ack_vector0" },
-	{ 39, "ack_vector1" },
-	{ 40, "data_dropped" },
-	{ 41, "timestamp" },
-	{ 42, "timestamp_echo" },
-	{ 43, "elapsed_time" },
-	{ 44, "data_checksum" },
+	{ DCCP_OPTION_PADDING, "nop" },
+	{ DCCP_OPTION_MANDATORY, "mandatory" },
+	{ DCCP_OPTION_SLOW_RECEIVER, "slowreceiver" },
+	{ DCCP_OPTION_CHANGE_L, "change_l" },
+	{ DCCP_OPTION_CONFIRM_L, "confirm_l" },
+	{ DCCP_OPTION_CHANGE_R, "change_r" },
+	{ DCCP_OPTION_CONFIRM_R, "confirm_r" },
+	{ DCCP_OPTION_INIT_COOKIE, "initcookie" },
+	{ DCCP_OPTION_NDP_COUNT, "ndp_count" },
+	{ DCCP_OPTION_ACK_VECTOR_NONCE_0, "ack_vector0" },
+	{ DCCP_OPTION_ACK_VECTOR_NONCE_1, "ack_vector1" },
+	{ DCCP_OPTION_DATA_DROPPED, "data_dropped" },
+	{ DCCP_OPTION_TIMESTAMP, "timestamp" },
+	{ DCCP_OPTION_TIMESTAMP_ECHO, "timestamp_echo" },
+	{ DCCP_OPTION_ELAPSED_TIME, "elapsed_time" },
+	{ DCCP_OPTION_DATA_CHECKSUM, "data_checksum" },
 	{ 0, NULL }
 };
 
@@ -575,10 +594,10 @@ dccp_print_option(netdissect_options *ndo, const u_char *option, u_int hlen)
 		ND_PRINT("%s",
 			 tok2str(dccp_option_values, "Option %u", GET_U_1(option)));
 		switch (GET_U_1(option)) {
-		case 32:
-		case 33:
-		case 34:
-		case 35:
+		case DCCP_OPTION_CHANGE_L:
+		case DCCP_OPTION_CONFIRM_L:
+		case DCCP_OPTION_CHANGE_R:
+		case DCCP_OPTION_CONFIRM_R:
 			if (optlen < 3) {
 				ND_PRINT(" optlen too short");
 				return optlen;
@@ -591,7 +610,7 @@ dccp_print_option(netdissect_options *ndo, const u_char *option, u_int hlen)
 						 GET_U_1(option + 3 + i));
 			}
 			break;
-		case 36:
+		case DCCP_OPTION_INIT_COOKIE:
 			if (optlen > 2) {
 				ND_PRINT(" 0x");
 				for (i = 0; i < optlen - 2; i++)
@@ -599,11 +618,11 @@ dccp_print_option(netdissect_options *ndo, const u_char *option, u_int hlen)
 						 GET_U_1(option + 2 + i));
 			}
 			break;
-		case 37:
+		case DCCP_OPTION_NDP_COUNT:
 			for (i = 0; i < optlen - 2; i++)
 				ND_PRINT(" %u", GET_U_1(option + 2 + i));
 			break;
-		case 38:
+		case DCCP_OPTION_ACK_VECTOR_NONCE_0:
 			if (optlen > 2) {
 				ND_PRINT(" 0x");
 				for (i = 0; i < optlen - 2; i++)
@@ -611,7 +630,7 @@ dccp_print_option(netdissect_options *ndo, const u_char *option, u_int hlen)
 						 GET_U_1(option + 2 + i));
 			}
 			break;
-		case 39:
+		case DCCP_OPTION_ACK_VECTOR_NONCE_1:
 			if (optlen > 2) {
 				ND_PRINT(" 0x");
 				for (i = 0; i < optlen - 2; i++)
@@ -619,7 +638,7 @@ dccp_print_option(netdissect_options *ndo, const u_char *option, u_int hlen)
 						 GET_U_1(option + 2 + i));
 			}
 			break;
-		case 40:
+		case DCCP_OPTION_DATA_DROPPED:
 			if (optlen > 2) {
 				ND_PRINT(" 0x");
 				for (i = 0; i < optlen - 2; i++)
@@ -627,7 +646,7 @@ dccp_print_option(netdissect_options *ndo, const u_char *option, u_int hlen)
 						 GET_U_1(option + 2 + i));
 			}
 			break;
-		case 41:
+		case DCCP_OPTION_TIMESTAMP:
 		/*
 		 * 13.1.  Timestamp Option
 		 *
@@ -641,7 +660,7 @@ dccp_print_option(netdissect_options *ndo, const u_char *option, u_int hlen)
 			else
 				ND_PRINT(" [optlen != 6]");
 			break;
-		case 42:
+		case DCCP_OPTION_TIMESTAMP_ECHO:
 		/*
 		 * 13.3.  Timestamp Echo Option
 		 *
@@ -679,7 +698,7 @@ dccp_print_option(netdissect_options *ndo, const u_char *option, u_int hlen)
 				break;
 			}
 			break;
-		case 43:
+		case DCCP_OPTION_ELAPSED_TIME:
 			if (optlen == 6)
 				ND_PRINT(" %u", GET_BE_U_4(option + 2));
 			else if (optlen == 4)
@@ -687,7 +706,7 @@ dccp_print_option(netdissect_options *ndo, const u_char *option, u_int hlen)
 			else
 				ND_PRINT(" [optlen != 4 or 6]");
 			break;
-		case 44:
+		case DCCP_OPTION_DATA_CHECKSUM:
 			if (optlen > 2) {
 				ND_PRINT(" ");
 				for (i = 0; i < optlen - 2; i++)
