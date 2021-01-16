@@ -63,7 +63,7 @@ struct mptcp_option {
         nd_uint8_t     sub_etc;        /* subtype upper 4 bits, other stuff lower 4 bits */
 };
 
-#define MPTCP_OPT_SUBTYPE(sub_etc)      ((GET_U_1(sub_etc) >> 4) & 0xF)
+#define MPTCP_OPT_SUBTYPE(sub_etc)      (((sub_etc) >> 4) & 0xF)
 
 struct mp_capable {
         nd_uint8_t     kind;
@@ -74,7 +74,7 @@ struct mp_capable {
         nd_uint64_t    receiver_key;
 };
 
-#define MP_CAPABLE_OPT_VERSION(sub_ver) ((GET_U_1(sub_ver) >> 0) & 0xF)
+#define MP_CAPABLE_OPT_VERSION(sub_ver) (((sub_ver) >> 0) & 0xF)
 #define MP_CAPABLE_C                    0x80
 #define MP_CAPABLE_S                    0x01
 
@@ -200,7 +200,7 @@ mp_capable_print(netdissect_options *ndo,
               TH_ACK))
                 return 0;
 
-        version = MP_CAPABLE_OPT_VERSION(mpc->sub_ver); /* uses GET_U_1() */
+        version = MP_CAPABLE_OPT_VERSION(GET_U_1(mpc->sub_ver));
         switch (version) {
                 case 0: /* fall through */
                 case 1:
@@ -310,7 +310,7 @@ mp_dss_print(netdissect_options *ndo,
                  * Data-Level Length present, and Checksum possibly present.
                  */
                 ND_PRINT(" seq ");
-		/*
+                /*
                  * If the m flag is set, we have an 8-byte NDS; if it's clear,
                  * we have a 4-byte DSN.
                  */
@@ -395,7 +395,7 @@ remove_addr_print(netdissect_options *ndo,
                   const u_char *opt, u_int opt_len, u_char flags _U_)
 {
         const struct mp_remove_addr *remove_addr = (const struct mp_remove_addr *) opt;
-	u_int i;
+        u_int i;
 
         if (opt_len < 4)
                 return 0;
@@ -452,7 +452,7 @@ static const struct {
         const char *name;
         int (*print)(netdissect_options *, const u_char *, u_int, u_char);
 } mptcp_options[] = {
-        { "capable", mp_capable_print},
+        { "capable",    mp_capable_print },
         { "join",       mp_join_print },
         { "dss",        mp_dss_print },
         { "add-addr",   add_addr_print },
@@ -470,12 +470,12 @@ mptcp_print(netdissect_options *ndo,
         const struct mptcp_option *opt;
         u_int subtype;
 
-	ndo->ndo_protocol = "mptcp";
+        ndo->ndo_protocol = "mptcp";
         if (len < 3)
                 return 0;
 
         opt = (const struct mptcp_option *) cp;
-        subtype = MPTCP_OPT_SUBTYPE(opt->sub_etc); /* uses GET_U_1() */
+        subtype = MPTCP_OPT_SUBTYPE(GET_U_1(opt->sub_etc));
         subtype = ND_MIN(subtype, MPTCP_SUB_FCLOSE + 1);
 
         ND_PRINT(" %s", mptcp_options[subtype].name);
