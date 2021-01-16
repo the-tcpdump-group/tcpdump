@@ -382,6 +382,28 @@ extern void nd_pop_all_packet_info(netdissect_options *);
  */
 #define ND_BYTES_AVAILABLE_AFTER(p) ND_BYTES_BETWEEN(ndo->ndo_snapend, (p))
 
+/* Check length < minimum for invalid packet with a custom message, format %u */
+#define ND_LCHECKMSG_U(length, minimum, what) \
+if ((length) < (minimum)) { \
+ND_PRINT(" [%s %u < %u]", (what), (length), (minimum)); \
+goto invalid; \
+}
+
+/* Check length < minimum for invalid packet with #length message, format %u */
+#define ND_LCHECK_U(length, minimum) \
+ND_LCHECKMSG_U((length), (minimum), (#length))
+
+/* Check length < minimum for invalid packet with a custom message, format %zu */
+#define ND_LCHECKMSG_ZU(length, minimum, what) \
+if ((length) < (minimum)) { \
+ND_PRINT(" [%s %u < %zu]", (what), (length), (minimum)); \
+goto invalid; \
+}
+
+/* Check length < minimum for invalid packet with #length message, format %zu */
+#define ND_LCHECK_ZU(length, minimum) \
+ND_LCHECKMSG_U((length), (minimum), (#length))
+
 #define ND_PRINT(...) (ndo->ndo_printf)(ndo, __VA_ARGS__)
 #define ND_DEFAULTPRINT(ap, length) (*ndo->ndo_default_print)(ndo, ap, length)
 
