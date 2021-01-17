@@ -519,10 +519,7 @@ rsvp_intserv_print(netdissect_options *ndo,
 	uint32_t i;
     } bw;
 
-    if (obj_tlen < 4) {
-        ND_PRINT(" (obj_tlen %u < 4)", obj_tlen);
-        goto invalid;
-    }
+    ND_LCHECK_U(obj_tlen, 4);
     parameter_id = GET_U_1(tptr);
     parameter_length = GET_BE_U_2(tptr + 2)<<2; /* convert wordcount to bytecount */
 
@@ -532,10 +529,7 @@ rsvp_intserv_print(netdissect_options *ndo,
            parameter_length,
            GET_U_1(tptr + 1));
 
-    if (obj_tlen < parameter_length + 4) {
-        ND_PRINT(" (obj_tlen %u < %u)", obj_tlen, parameter_length + 4);
-        goto invalid;
-    }
+    ND_LCHECK_U(obj_tlen, parameter_length + 4);
     switch(parameter_id) { /* parameter_id */
 
     case 4:
@@ -1258,8 +1252,7 @@ rsvp_obj_print(netdissect_options *ndo,
                      * each iteration subobj_len may happen to be a multiple of 1
                      * and test it and total_subobj_len respectively.
                      */
-                    if (total_subobj_len < 4)
-                        goto invalid;
+                    ND_LCHECK_U(total_subobj_len, 4);
                     subobj_len  = GET_BE_U_2(obj_tptr);
                     subobj_type = (GET_BE_U_2(obj_tptr + 2))>>8;
                     af = (GET_BE_U_2(obj_tptr + 2))&0x00FF;

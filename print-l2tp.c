@@ -577,10 +577,7 @@ l2tp_avp_print(netdissect_options *ndo, const u_char *dat, u_int length)
 	len = GET_BE_U_2(dat) & L2TP_AVP_HDR_LEN_MASK;
 
 	/* If it is not long enough to contain the header, we'll give up. */
-	if (len < 6) {
-		ND_PRINT(" (AVP length %u < 6)", len);
-		goto invalid;
-	}
+	ND_LCHECKMSG_U(len, 6, "AVP length");
 
 	/* If it goes past the end of the remaining length of the packet,
 	   we'll give up. */

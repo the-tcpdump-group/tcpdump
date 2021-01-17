@@ -161,10 +161,7 @@ aodv_extension(netdissect_options *ndo,
 	switch (ext_type) {
 	case AODV_EXT_HELLO:
 		ah = (const struct aodv_hello *)(const void *)ep;
-		if (length < sizeof(struct aodv_hello)) {
-			ND_PRINT(" (ext data length %u < %zu)", length, sizeof(struct aodv_hello));
-			goto invalid;
-		}
+		ND_LCHECKMSG_ZU(length, sizeof(struct aodv_hello), "ext data length");
 		if (ext_length < 4) {
 			ND_PRINT("\n\text HELLO - bad length %u", ext_length);
 			goto invalid;
@@ -189,10 +186,7 @@ aodv_rreq(netdissect_options *ndo, const u_char *dat, u_int length)
 	u_int i;
 	const struct aodv_rreq *ap = (const struct aodv_rreq *)dat;
 
-	if (length < sizeof(*ap)) {
-		ND_PRINT(" (message length %u)", length);
-		goto invalid;
-	}
+	ND_LCHECKMSG_ZU(length, sizeof(*ap), "message length");
 	ND_PRINT(" %u %s%s%s%s%shops %u id 0x%08x\n"
 	    "\tdst %s seq %u src %s seq %u", length,
 	    GET_U_1(ap->rreq_type) & RREQ_JOIN ? "[J]" : "",
@@ -221,10 +215,7 @@ aodv_rrep(netdissect_options *ndo, const u_char *dat, u_int length)
 	u_int i;
 	const struct aodv_rrep *ap = (const struct aodv_rrep *)dat;
 
-	if (length < sizeof(*ap)) {
-		ND_PRINT(" (message length %u)", length);
-		goto invalid;
-	}
+	ND_LCHECKMSG_ZU(length, sizeof(*ap), "message length");
 	ND_PRINT(" %u %s%sprefix %u hops %u\n"
 	    "\tdst %s dseq %u src %s %u ms", length,
 	    GET_U_1(ap->rrep_type) & RREP_REPAIR ? "[R]" : "",
@@ -251,20 +242,14 @@ aodv_rerr(netdissect_options *ndo, const u_char *dat, u_int length)
 	const struct aodv_rerr *ap = (const struct aodv_rerr *)dat;
 	const struct rerr_unreach *dp;
 
-	if (length < sizeof(*ap)) {
-		ND_PRINT(" (message length %u)", length);
-		goto invalid;
-	}
+	ND_LCHECKMSG_ZU(length, sizeof(*ap), "message length");
 	ND_PRINT(" %s [items %u] [%u]:",
 	    GET_U_1(ap->rerr_flags) & RERR_NODELETE ? "[D]" : "",
 	    GET_U_1(ap->rerr_dc), length);
 	dp = (const struct rerr_unreach *)(dat + sizeof(*ap));
 	i = length - sizeof(*ap);
 	for (dc = GET_U_1(ap->rerr_dc); dc != 0; dc--) {
-		if (i < sizeof(*dp)) {
-			ND_PRINT(" (remaining length %u)", i);
-			goto invalid;
-		}
+		ND_LCHECKMSG_ZU(i, sizeof(*dp), "remaining length");
 		ND_PRINT(" {%s}(%u)", GET_IPADDR_STRING(dp->u_da),
 		    GET_BE_U_4(dp->u_ds));
 		dp++;
@@ -282,10 +267,7 @@ aodv_v6_rreq(netdissect_options *ndo, const u_char *dat, u_int length)
 	u_int i;
 	const struct aodv_rreq6 *ap = (const struct aodv_rreq6 *)dat;
 
-	if (length < sizeof(*ap)) {
-		ND_PRINT(" (message length %u)", length);
-		goto invalid;
-	}
+	ND_LCHECKMSG_ZU(length, sizeof(*ap), "message length");
 	ND_PRINT(" %u %s%s%s%s%shops %u id 0x%08x\n"
 	    "\tdst %s seq %u src %s seq %u", length,
 	    GET_U_1(ap->rreq_type) & RREQ_JOIN ? "[J]" : "",
@@ -314,10 +296,7 @@ aodv_v6_rrep(netdissect_options *ndo, const u_char *dat, u_int length)
 	u_int i;
 	const struct aodv_rrep6 *ap = (const struct aodv_rrep6 *)dat;
 
-	if (length < sizeof(*ap)) {
-		ND_PRINT(" (message length %u)", length);
-		goto invalid;
-	}
+	ND_LCHECKMSG_ZU(length, sizeof(*ap), "message length");
 	ND_PRINT(" %u %s%sprefix %u hops %u\n"
 	   "\tdst %s dseq %u src %s %u ms", length,
 	    GET_U_1(ap->rrep_type) & RREP_REPAIR ? "[R]" : "",
@@ -344,20 +323,14 @@ aodv_v6_rerr(netdissect_options *ndo, const u_char *dat, u_int length)
 	const struct aodv_rerr *ap = (const struct aodv_rerr *)dat;
 	const struct rerr_unreach6 *dp6;
 
-	if (length < sizeof(*ap)) {
-		ND_PRINT(" (message length %u)", length);
-		goto invalid;
-	}
+	ND_LCHECKMSG_ZU(length, sizeof(*ap), "message length");
 	ND_PRINT(" %s [items %u] [%u]:",
 	    GET_U_1(ap->rerr_flags) & RERR_NODELETE ? "[D]" : "",
 	    GET_U_1(ap->rerr_dc), length);
 	dp6 = (const struct rerr_unreach6 *)(const void *)(ap + 1);
 	i = length - sizeof(*ap);
 	for (dc = GET_U_1(ap->rerr_dc); dc != 0; dc--) {
-		if (i < sizeof(*dp6)) {
-			ND_PRINT(" (remaining length %u)", i);
-			goto invalid;
-		}
+		ND_LCHECKMSG_ZU(i, sizeof(*dp6), "remaining length");
 		ND_PRINT(" {%s}(%u)", GET_IP6ADDR_STRING(dp6->u_da),
 			 GET_BE_U_4(dp6->u_ds));
 		dp6++;

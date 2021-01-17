@@ -369,10 +369,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	if (ndo->ndo_packettype != PT_RPC)
 		udpipaddr_print(ndo, ip, sport, dport);
 
-	if (length < sizeof(struct udphdr)) {
-		ND_PRINT("undersized-udp %u", length);
-		goto invalid;
-	}
+	ND_LCHECKMSG_ZU(length, sizeof(struct udphdr), "undersized-udp");
 	ulen = GET_BE_U_2(up->uh_ulen);
 	udp_sum = GET_BE_U_2(up->uh_sum);
 	/*
@@ -382,10 +379,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	 */
 	if (ulen == 0 && length > 65535)
 		ulen = length;
-	if (ulen < sizeof(struct udphdr)) {
-		ND_PRINT("undersized-udplength %u", ulen);
-		goto invalid;
-	}
+	ND_LCHECKMSG_ZU(ulen, sizeof(struct udphdr), "undersized-udplength");
 	ulen -= sizeof(struct udphdr);
 	length -= sizeof(struct udphdr);
 	if (ulen < length)

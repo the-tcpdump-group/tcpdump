@@ -195,8 +195,7 @@ rip_entry_print_v1(netdissect_options *ndo, const u_char *p,
 	const struct rip_netinfo_v1 *ni = (const struct rip_netinfo_v1 *)p;
 
 	/* RFC 1058 */
-	if (remaining < RIP_ROUTELEN)
-		goto invalid;
+	ND_LCHECKMSG_U(remaining, RIP_ROUTELEN, "remaining data length");
 	ND_TCHECK_SIZE(ni);
 	family = GET_BE_U_2(ni->rip_family);
 	if (family != BSD_AFNUM_INET && family != 0) {
@@ -233,8 +232,7 @@ rip_entry_print_v2(netdissect_options *ndo, const u_char *p,
 	u_short family;
 	const struct rip_netinfo_v2 *ni;
 
-	if (remaining < sizeof(*eh))
-		goto invalid;
+	ND_LCHECKMSG_ZU(remaining, sizeof(*eh), "remaining data length");
 	ND_TCHECK_SIZE(eh);
 	family = GET_BE_U_2(eh->rip_family);
 	if (family == 0xFFFF) { /* variable-sized authentication structures */
@@ -249,8 +247,7 @@ rip_entry_print_v2(netdissect_options *ndo, const u_char *p,
 			const struct rip_auth_crypto_v2 *ch;
 
 			ch = (const struct rip_auth_crypto_v2 *)p;
-			if (remaining < sizeof(*ch))
-				goto invalid;
+			ND_LCHECKMSG_ZU(remaining, sizeof(*ch), "remaining data length");
 			ND_PRINT("\n\t  Auth header:");
 			ND_PRINT(" Packet Len %u,",
 				 GET_BE_U_2(ch->rip_packet_len));
@@ -275,8 +272,7 @@ rip_entry_print_v2(netdissect_options *ndo, const u_char *p,
 		print_unknown_data(ndo, p + sizeof(*eh), "\n\t  ", RIP_ROUTELEN - sizeof(*eh));
 	} else { /* BSD_AFNUM_INET or AFI 0 */
 		ni = (const struct rip_netinfo_v2 *)p;
-		if (remaining < sizeof(*ni))
-			goto invalid;
+		ND_LCHECKMSG_ZU(remaining, sizeof(*ni), "remaining data length");
 		ND_PRINT("\n\t  AFI %s, %15s/%-2d, tag 0x%04x, metric: %u, next-hop: ",
 			 tok2str(bsd_af_values, "%u", family),
 			 GET_IPADDR_STRING(ni->rip_dest),
@@ -302,10 +298,7 @@ rip_print(netdissect_options *ndo,
 	unsigned entry_size;
 
 	ndo->ndo_protocol = "rip";
-	if (len < sizeof(*rp)) {
-		ND_PRINT(" (packet length %u)", len);
-		goto invalid;
-	}
+	ND_LCHECKMSG_ZU(len, sizeof(*rp), "packet length");
 
 	rp = (const struct rip *)p;
 
@@ -340,11 +333,7 @@ rip_print(netdissect_options *ndo,
 					/* Error */
 					goto invalid;
 				}
-				if (len < entry_size) {
-					ND_PRINT(" [remaining entries length %u < %u]",
-						 len, entry_size);
-					goto invalid;
-				}
+				ND_LCHECKMSG_U(len, entry_size, "remaining entries length");
 				p += entry_size;
 				len -= entry_size;
 			}
@@ -358,11 +347,7 @@ rip_print(netdissect_options *ndo,
 					/* Error */
 					goto invalid;
 				}
-				if (len < entry_size) {
-					ND_PRINT(" [remaining entries length %u < %u]",
-						 len, entry_size);
-					goto invalid;
-				}
+				ND_LCHECKMSG_U(len, entry_size, "remaining entries length");
 				p += entry_size;
 				len -= entry_size;
 			}

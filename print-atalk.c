@@ -166,10 +166,7 @@ llap_print(netdissect_options *ndo,
 	u_int hdrlen;
 
 	ndo->ndo_protocol = "llap";
-	if (length < sizeof(*lp)) {
-		ND_PRINT(" (LLAP length %u is too small)", length);
-		goto invalid;
-	}
+	ND_LCHECKMSG_ZU(length, sizeof(*lp), "LLAP length");
 	lp = (const struct LAP *)bp;
 	bp += sizeof(*lp);
 	length -= sizeof(*lp);
@@ -178,10 +175,7 @@ llap_print(netdissect_options *ndo,
 
 	case lapShortDDP:
 		ndo->ndo_protocol = "sddp";
-		if (length < ddpSSize) {
-			ND_PRINT(" (SDDP length %u is too small)", length);
-			goto invalid;
-		}
+		ND_LCHECKMSG_U(length, ddpSSize, "SDDP length");
 		sdp = (const struct atShortDDP *)bp;
 		ND_PRINT("%s.%s",
 		    ataddr_string(ndo, 0, GET_U_1(lp->src)),
@@ -198,10 +192,7 @@ llap_print(netdissect_options *ndo,
 
 	case lapDDP:
 		ndo->ndo_protocol = "ddp";
-		if (length < ddpSize) {
-			ND_PRINT(" (DDP length %u is too small)", length);
-			goto invalid;
-		}
+		ND_LCHECKMSG_U(length, ddpSize, "DDP length");
 		dp = (const struct atDDP *)bp;
 		snet = GET_BE_U_2(dp->srcNet);
 		ND_PRINT("%s.%s",
@@ -245,10 +236,7 @@ atalk_print(netdissect_options *ndo,
         if(!ndo->ndo_eflag)
             ND_PRINT("AT ");
 
-	if (length < ddpSize) {
-		ND_PRINT(" (length %u is too small)", length);
-		goto invalid;
-	}
+	ND_LCHECK_U(length, ddpSize);
 	dp = (const struct atDDP *)bp;
 	snet = GET_BE_U_2(dp->srcNet);
 	ND_PRINT("%s.%s", ataddr_string(ndo, snet, GET_U_1(dp->srcNode)),
@@ -279,10 +267,7 @@ aarp_print(netdissect_options *ndo,
 	ndo->ndo_protocol = "aarp";
 	ND_PRINT("aarp ");
 	ap = (const struct aarp *)bp;
-	if (length < sizeof(*ap)) {
-		ND_PRINT(" (length %u is too small)", length);
-		goto invalid;
-	}
+	ND_LCHECK_ZU(length, sizeof(*ap));
 	ND_TCHECK_SIZE(ap);
 	if (GET_BE_U_2(ap->htype) == 1 &&
 	    GET_BE_U_2(ap->ptype) == ETHERTYPE_ATALK &&
@@ -346,10 +331,7 @@ atp_print(netdissect_options *ndo,
 	uint32_t data;
 
 	ndo->ndo_protocol = "atp";
-	if (length < sizeof(*ap)) {
-		ND_PRINT(" (ATP length %u is too small)", length);
-		goto invalid;
-	}
+	ND_LCHECKMSG_ZU(length, sizeof(*ap), "ATP length");
 	length -= sizeof(*ap);
 	control = GET_U_1(ap->control);
 	switch (control & 0xc0) {
@@ -476,11 +458,8 @@ nbp_print(netdissect_options *ndo,
 	uint8_t control;
 	u_int i;
 
-	if (length < nbpHeaderSize + 8) {
-		/* must be room for at least one tuple */
-		ND_PRINT(" undersized-nbp %u", length);
-		goto invalid;
-	}
+	/* must be room for at least one tuple */
+	ND_LCHECKMSG_U(length, nbpHeaderSize + 8, "undersized-nbp");
 	length -= nbpHeaderSize;
 	control = GET_U_1(np->control);
 	ND_PRINT(" nbp-%s", tok2str(nbp_str, "0x%x", control & 0xf0));
