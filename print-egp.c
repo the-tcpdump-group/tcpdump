@@ -263,10 +263,7 @@ egp_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "egp";
 	egp = (const struct egp_packet *)bp;
-	if (length < sizeof(*egp)) {
-		ND_PRINT(" packet length %u < %zu", length, sizeof(*egp));
-		goto invalid;
-	}
+	ND_ICHECKMSG_ZU("packet length", length, <, sizeof(*egp));
 	ND_TCHECK_SIZE(egp);
 
 	version = GET_U_1(egp->egp_version);
