@@ -402,7 +402,7 @@ goto invalid; \
 
 /* Check length < minimum for invalid packet with #length message, format %zu */
 #define ND_LCHECK_ZU(length, minimum) \
-ND_LCHECKMSG_U((length), (minimum), (#length))
+ND_LCHECKMSG_ZU((length), (minimum), (#length))
 
 #define ND_PRINT(...) (ndo->ndo_printf)(ndo, __VA_ARGS__)
 #define ND_DEFAULTPRINT(ap, length) (*ndo->ndo_default_print)(ndo, ap, length)
