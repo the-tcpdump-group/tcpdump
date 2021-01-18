@@ -19,6 +19,9 @@ print-XX	print-flags.pcap	print-capXX.out	-XX
 print-A		print-flags.pcap	print-A.out	-A
 print-AA	print-flags.pcap	print-AA.out	-AA
 
+# TCP with data in the RST segment
+tcp_rst_data tcp_rst_data.pcap tcp_rst_data.out -v
+
 # BGP tests
 bgp_vpn_attrset bgp_vpn_attrset.pcap bgp_vpn_attrset.out -v
 mpbgp-linklocal-nexthop mpbgp-linklocal-nexthop.pcap mpbgp-linklocal-nexthop.out -v
