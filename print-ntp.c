@@ -42,6 +42,7 @@
 #include <time.h>
 #endif
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -246,26 +247,23 @@ ntp_time_print(netdissect_options *ndo,
 
 	ND_PRINT(", precision %d", GET_S_1(bp->precision));
 
-	ND_TCHECK_SIZE(&bp->root_delay);
 	ND_PRINT("\n\tRoot Delay: ");
 	p_sfix(ndo, &bp->root_delay);
 
-	ND_TCHECK_SIZE(&bp->root_dispersion);
 	ND_PRINT(", Root dispersion: ");
 	p_sfix(ndo, &bp->root_dispersion);
 
-	ND_TCHECK_4(bp->refid);
 	ND_PRINT(", Reference-ID: ");
 	/* Interpretation depends on stratum */
 	switch (stratum) {
 
 	case UNSPECIFIED:
 		ND_PRINT("(unspec)");
+		ND_TCHECK_4(bp->refid);
 		break;
 
 	case PRIM_REF:
-		if (nd_printn(ndo, (const u_char *)&(bp->refid), 4, ndo->ndo_snapend))
-			goto trunc;
+		nd_printjn(ndo, (const u_char *)&(bp->refid), 4);
 		break;
 
 	case INFO_QUERY:
@@ -285,19 +283,15 @@ ntp_time_print(netdissect_options *ndo,
 		break;
 	}
 
-	ND_TCHECK_SIZE(&bp->ref_timestamp);
 	ND_PRINT("\n\t  Reference Timestamp:  ");
 	p_ntp_time(ndo, &(bp->ref_timestamp));
 
-	ND_TCHECK_SIZE(&bp->org_timestamp);
 	ND_PRINT("\n\t  Originator Timestamp: ");
 	p_ntp_time(ndo, &(bp->org_timestamp));
 
-	ND_TCHECK_SIZE(&bp->rec_timestamp);
 	ND_PRINT("\n\t  Receive Timestamp:    ");
 	p_ntp_time(ndo, &(bp->rec_timestamp));
 
-	ND_TCHECK_SIZE(&bp->xmt_timestamp);
 	ND_PRINT("\n\t  Transmit Timestamp:   ");
 	p_ntp_time(ndo, &(bp->xmt_timestamp));
 
@@ -312,7 +306,6 @@ ntp_time_print(netdissect_options *ndo,
 		ND_PRINT("\n\tKey id: %u", GET_BE_U_4(bp->key_id));
 	} else if (length == NTP_TIMEMSG_MINLEN + 4 + 16) { 	/* Optional: key-id + 128-bit digest */
 		ND_PRINT("\n\tKey id: %u", GET_BE_U_4(bp->key_id));
-		ND_TCHECK_LEN(bp->message_digest, 16);
 		ND_PRINT("\n\tAuthentication: %08x%08x%08x%08x",
 			 GET_BE_U_4(bp->message_digest),
 			 GET_BE_U_4(bp->message_digest + 4),
@@ -320,7 +313,6 @@ ntp_time_print(netdissect_options *ndo,
 			 GET_BE_U_4(bp->message_digest + 12));
 	} else if (length == NTP_TIMEMSG_MINLEN + 4 + 20) { 	/* Optional: key-id + 160-bit digest */
 		ND_PRINT("\n\tKey id: %u", GET_BE_U_4(bp->key_id));
-		ND_TCHECK_LEN(bp->message_digest, 20);
 		ND_PRINT("\n\tAuthentication: %08x%08x%08x%08x%08x",
 			 GET_BE_U_4(bp->message_digest),
 			 GET_BE_U_4(bp->message_digest + 4),
@@ -335,10 +327,6 @@ ntp_time_print(netdissect_options *ndo,
 invalid:
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(bp, length);
-	return;
-
-trunc:
-	nd_print_trunc(ndo);
 }
 
 /*
@@ -389,10 +377,6 @@ ntp_control_print(netdissect_options *ndo,
 invalid:
 	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cd, length);
-	return;
-
-trunc:
-	nd_print_trunc(ndo);
 }
 
 union ntpdata {
