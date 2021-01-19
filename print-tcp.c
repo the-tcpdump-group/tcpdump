@@ -730,7 +730,7 @@ tcp_print(netdissect_options *ndo,
         }
         bp += header_len;
         if (flags & TH_RST) {
-                if(ndo->ndo_vflag)
+                if (ndo->ndo_vflag)
                         print_tcp_rst_data(ndo, bp, length);
                 else
                         ND_TCHECK_LEN(bp, length);
@@ -867,14 +867,13 @@ static void
 print_tcp_rst_data(netdissect_options *ndo,
                    const u_char *sp, u_int length)
 {
-        ND_PRINT(ND_TTEST_LEN(sp, length) ? " [RST" : " [!RST");
-        if (length > MAX_RST_DATA_LEN) {
-                length = MAX_RST_DATA_LEN;	/* can use -X for longer */
+        ND_PRINT(" [RST");
+        if (length > MAX_RST_DATA_LEN)		/* can use -X for longer */
                 ND_PRINT("+");			/* indicate we truncate */
-        }
         ND_PRINT(" ");
-        (void)nd_printn(ndo, sp, length, ndo->ndo_snapend);
+        nd_printjn(ndo, sp, ND_MIN(length, MAX_RST_DATA_LEN));
         ND_PRINT("]");
+        ND_TCHECK_LEN(sp, length);
 }
 
 static void
