@@ -41,6 +41,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -469,7 +470,7 @@ sctp_print(netdissect_options *ndo,
     {
       ND_PRINT("truncated-sctp - %zu bytes missing!",
                sizeof(struct sctpHeader) - sctpPacketLength);
-      return;
+      goto invalid;
     }
   sctpPktHdr = (const struct sctpHeader*) bp;
   ND_TCHECK_SIZE(sctpPktHdr);
@@ -580,7 +581,7 @@ sctp_print(netdissect_options *ndo,
 
 	    if (chunkLengthRemaining < sizeof(*dataHdrPtr)) {
 		ND_PRINT("bogus chunk length %u]", chunkLength);
-		return;
+		goto invalid;
 	    }
 	    dataHdrPtr=(const struct sctpDataPart*)bp;
 
@@ -603,7 +604,7 @@ sctp_print(netdissect_options *ndo,
 	    payload_size = chunkLengthRemaining;
 	    if (payload_size == 0) {
 		ND_PRINT("bogus chunk length %u]", chunkLength);
-		return;
+		goto invalid;
 	    }
 
 	    if (isforces) {
@@ -639,7 +640,7 @@ sctp_print(netdissect_options *ndo,
 
 	    if (chunkLengthRemaining < sizeof(*init)) {
 		ND_PRINT("bogus chunk length %u]", chunkLength);
-		return;
+		goto invalid;
 	    }
 	    init=(const struct sctpInitiation*)bp;
 	    ND_PRINT("[init tag: %u] ", GET_BE_U_4(init->initTag));
@@ -667,7 +668,7 @@ sctp_print(netdissect_options *ndo,
 
 	    if (chunkLengthRemaining < sizeof(*init)) {
 		ND_PRINT("bogus chunk length %u]", chunkLength);
-		return;
+		goto invalid;
 	    }
 	    init=(const struct sctpInitiation*)bp;
 	    ND_PRINT("[init tag: %u] ", GET_BE_U_4(init->initTag));
@@ -698,7 +699,7 @@ sctp_print(netdissect_options *ndo,
 
 	    if (chunkLengthRemaining < sizeof(*sack)) {
 	      ND_PRINT("bogus chunk length %u]", chunkLength);
-	      return;
+	      goto invalid;
 	    }
 	    sack=(const struct sctpSelectiveAck*)bp;
 	    ND_PRINT("[cum ack %u] ", GET_BE_U_4(sack->highestConseqTSN));
@@ -716,7 +717,7 @@ sctp_print(netdissect_options *ndo,
 		 bp += sizeof(*frag), sctpPacketLengthRemaining -= sizeof(*frag), chunkLengthRemaining -= sizeof(*frag), fragNo++) {
 	      if (chunkLengthRemaining < sizeof(*frag)) {
 		ND_PRINT("bogus chunk length %u]", chunkLength);
-		return;
+		goto invalid;
 	      }
 	      frag = (const struct sctpSelectiveFrag *)bp;
 	      ND_PRINT("\n\t\t[gap ack block #%u: start = %u, end = %u] ",
@@ -731,7 +732,7 @@ sctp_print(netdissect_options *ndo,
 		 bp += 4, sctpPacketLengthRemaining -= 4, chunkLengthRemaining -= 4, tsnNo++) {
 	      if (chunkLengthRemaining < 4) {
 		ND_PRINT("bogus chunk length %u]", chunkLength);
-		return;
+		goto invalid;
 	      }
 	      dupTSN = (const u_char *)bp;
 	      ND_PRINT("\n\t\t[dup TSN #%u: %u] ", tsnNo+1,
@@ -769,7 +770,6 @@ sctp_print(netdissect_options *ndo,
       }
     }
     return;
-
-trunc:
-    nd_print_trunc(ndo);
+invalid:
+    nd_print_invalid(ndo);
 }

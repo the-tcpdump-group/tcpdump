@@ -8,7 +8,7 @@ Monthday, Month DD, YYYY by gharris and denis
     Source code:
       Use %zu when printing a sizeof to squelch compiler warnings
       (FIXME: somebody please wrap the line below just before the release)
-      AODV, AppleTalk, BOOTP, EGP, EIGRP, Geneve, L2TP, NTP, OLSR, PGM, RIP, RSVP, TCP, UDP: Modernize packet parsing style
+      AODV, AppleTalk, BOOTP, EGP, EIGRP, Geneve, L2TP, NTP, OLSR, PGM, RIP, RSVP, SCTP, TCP, UDP: Modernize packet parsing style
       EGP: Replace custom code with tok2str()
       UDP: Clean up address and port printing.
       AppleTalk: Declutter appletalk.h.
