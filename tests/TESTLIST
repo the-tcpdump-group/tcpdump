@@ -21,6 +21,8 @@ print-AA	print-flags.pcap	print-AA.out	-AA
 
 # TCP with data in the RST segment
 tcp_rst_data tcp_rst_data.pcap tcp_rst_data.out -v
+# TCP with data in the RST segment, truncated example
+tcp_rst_data-trunc tcp_rst_data-trunc.pcap tcp_rst_data-trunc.out -v
 
 # BGP tests
 bgp_vpn_attrset bgp_vpn_attrset.pcap bgp_vpn_attrset.out -v
