@@ -73,6 +73,7 @@
 
 #include "netdissect-ctype.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 
@@ -428,7 +429,7 @@ asn1_parse(netdissect_options *ndo,
 	elem->type = BE_ANY;
 	if (len < 1) {
 		ND_PRINT("[nothing to parse]");
-		return -1;
+		goto invalid;
 	}
 
 	/*
@@ -467,7 +468,7 @@ asn1_parse(netdissect_options *ndo,
 		while (GET_U_1(p) & ASN_BIT8) {
 			if (len < 1) {
 				ND_PRINT("[Xtagfield?]");
-				return -1;
+				goto invalid;
 			}
 			id = (id << 7) | (GET_U_1(p) & ~ASN_BIT8);
 			len--;
@@ -476,7 +477,7 @@ asn1_parse(netdissect_options *ndo,
 		}
 		if (len < 1) {
 			ND_PRINT("[Xtagfield?]");
-			return -1;
+			goto invalid;
 		}
 		elem->id = id = (id << 7) | GET_U_1(p);
 		--len;
@@ -485,7 +486,7 @@ asn1_parse(netdissect_options *ndo,
 	}
 	if (len < 1) {
 		ND_PRINT("[no asnlen]");
-		return -1;
+		goto invalid;
 	}
 	elem->asnlen = GET_U_1(p);
 	p++; len--; hdr++;
@@ -494,9 +495,8 @@ asn1_parse(netdissect_options *ndo,
 		elem->asnlen = 0;
 		if (len < noct) {
 			ND_PRINT("[asnlen? %d<%d]", len, noct);
-			return -1;
+			goto invalid;
 		}
-		ND_TCHECK_LEN(p, noct);
 		for (; noct != 0; len--, hdr++, noct--) {
 			elem->asnlen = (elem->asnlen << ASN_SHIFT8) | GET_U_1(p);
 			p++;
@@ -504,19 +504,19 @@ asn1_parse(netdissect_options *ndo,
 	}
 	if (len < elem->asnlen) {
 		ND_PRINT("[len%d<asnlen%u]", len, elem->asnlen);
-		return -1;
+		goto invalid;
 	}
 	if (form >= sizeof(Form)/sizeof(Form[0])) {
 		ND_PRINT("[form?%d]", form);
-		return -1;
+		goto invalid;
 	}
 	if (class >= sizeof(Class)/sizeof(Class[0])) {
 		ND_PRINT("[class?%c/%d]", *Form[form], class);
-		return -1;
+		goto invalid;
 	}
 	if ((int)id >= Class[class].numIDs) {
 		ND_PRINT("[id?%c/%s/%d]", *Form[form], Class[class].name, id);
-		return -1;
+		goto invalid;
 	}
 	ND_TCHECK_LEN(p, elem->asnlen);
 
@@ -537,7 +537,7 @@ asn1_parse(netdissect_options *ndo,
 
 				if (elem->asnlen == 0) {
 					ND_PRINT("[asnlen=0]");
-					return -1;
+					goto invalid;
 				}
 				if (GET_U_1(p) & ASN_BIT8)	/* negative */
 					data = -1;
@@ -664,29 +664,22 @@ asn1_parse(netdissect_options *ndo,
 	len -= elem->asnlen;
 	return elem->asnlen + hdr;
 
-trunc:
-	nd_print_trunc(ndo);
+invalid:
 	return -1;
 }
 
-static int
+static void
 asn1_print_octets(netdissect_options *ndo, struct be *elem)
 {
 	const u_char *p = (const u_char *)elem->data.raw;
 	uint32_t asnlen = elem->asnlen;
 	uint32_t i;
 
-	ND_TCHECK_LEN(p, asnlen);
 	for (i = asnlen; i != 0; p++, i--)
 		ND_PRINT("_%.2x", GET_U_1(p));
-	return 0;
-
-trunc:
-	nd_print_trunc(ndo);
-	return -1;
 }
 
-static int
+static void
 asn1_print_string(netdissect_options *ndo, struct be *elem)
 {
 	int printable = 1, first = 1;
@@ -695,16 +688,12 @@ asn1_print_string(netdissect_options *ndo, struct be *elem)
 	uint32_t i;
 
 	p = elem->data.str;
-	ND_TCHECK_LEN(p, asnlen);
 	for (i = asnlen; printable && i != 0; p++, i--)
 		printable = ND_ASCII_ISPRINT(GET_U_1(p));
 	p = elem->data.str;
 	if (printable) {
 		ND_PRINT("\"");
-		if (nd_printn(ndo, p, asnlen, ndo->ndo_snapend)) {
-			ND_PRINT("\"");
-			goto trunc;
-		}
+		nd_printjn(ndo, p, asnlen);
 		ND_PRINT("\"");
 	} else {
 		for (i = asnlen; i != 0; p++, i--) {
@@ -712,11 +701,6 @@ asn1_print_string(netdissect_options *ndo, struct be *elem)
 			first = 0;
 		}
 	}
-	return 0;
-
-trunc:
-	nd_print_trunc(ndo);
-	return -1;
 }
 
 /*
@@ -735,8 +719,7 @@ asn1_print(netdissect_options *ndo,
 	switch (elem->type) {
 
 	case BE_OCTET:
-		if (asn1_print_octets(ndo, elem) == -1)
-			return -1;
+		asn1_print_octets(ndo, elem);
 		break;
 
 	case BE_NULL:
@@ -752,8 +735,7 @@ asn1_print(netdissect_options *ndo,
 			for (; a->node; a++) {
 				if (i < a->oid_len)
 					continue;
-				if (!ND_TTEST_LEN(p, a->oid_len))
-					continue;
+				ND_TCHECK_LEN(p, a->oid_len);
 				if (memcmp(a->oid, p, a->oid_len) == 0) {
 					objp = a->node->child;
 					i -= a->oid_len;
@@ -806,8 +788,7 @@ asn1_print(netdissect_options *ndo,
 		break;
 
 	case BE_STR:
-		if (asn1_print_string(ndo, elem) == -1)
-			return -1;
+		asn1_print_string(ndo, elem);
 		break;
 
 	case BE_SEQ:
@@ -818,7 +799,6 @@ asn1_print(netdissect_options *ndo,
 		if (asnlen != ASNLEN_INETADDR)
 			ND_PRINT("[inetaddr len!=%d]", ASNLEN_INETADDR);
 		p = (const u_char *)elem->data.raw;
-		ND_TCHECK_LEN(p, asnlen);
 		for (i = asnlen; i != 0; p++, i--) {
 			ND_PRINT((i == asnlen) ? "%u" : ".%u", GET_U_1(p));
 		}
@@ -842,11 +822,11 @@ asn1_print(netdissect_options *ndo,
 		ND_PRINT("[be!?]");
 		break;
 	}
+	/* This function now always returns 0. Don't make it void yet, as other
+	 * code checks for negative result and this function might need to signal
+	 * invalid data later.
+	 */
 	return 0;
-
-trunc:
-	nd_print_trunc(ndo);
-	return -1;
 }
 
 #ifdef notdef
@@ -1567,8 +1547,7 @@ scopedpdu_print(netdissect_options *ndo,
 	np += count;
 
 	ND_PRINT("E=");
-	if (asn1_print_octets(ndo, &elem) == -1)
-		return;
+	asn1_print_octets(ndo, &elem);
 	ND_PRINT(" ");
 
 	/* contextName (OCTET STRING) */
@@ -1583,8 +1562,7 @@ scopedpdu_print(netdissect_options *ndo,
 	np += count;
 
 	ND_PRINT("C=");
-	if (asn1_print_string(ndo, &elem) == -1)
-		return;
+	asn1_print_string(ndo, &elem);
 	ND_PRINT(" ");
 
 	pdu_print(ndo, np, length, version);
@@ -1614,8 +1592,7 @@ community_print(netdissect_options *ndo,
 	            sizeof(DEF_COMMUNITY) - 1) == 0)) {
 		/* ! "public" */
 		ND_PRINT("C=");
-		if (asn1_print_string(ndo, &elem) == -1)
-			return;
+		asn1_print_string(ndo, &elem);
 		ND_PRINT(" ");
 	}
 	length -= count;
@@ -1694,8 +1671,7 @@ usm_print(netdissect_options *ndo,
         np += count;
 
 	ND_PRINT("U=");
-	if (asn1_print_string(ndo, &elem) == -1)
-		return;
+	asn1_print_string(ndo, &elem);
 	ND_PRINT(" ");
 
 	/* msgAuthenticationParameters (OCTET STRING) */
