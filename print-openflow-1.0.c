@@ -1017,7 +1017,19 @@ of10_packet_data_print(netdissect_options *ndo,
 	}
 	ndo->ndo_vflag -= 3;
 	ND_PRINT(", frame decoding below\n");
+	/*
+	 * The encapsulated Ethernet frame is not necessarily the last
+	 * data of this packet (i.e. there may be more OpenFlow messages
+	 * after the current OFPT_PACKET_IN/OFPT_PACKET_OUT message, in
+	 * which case the current (outer) packet's snapshot end is not
+	 * what ether_print() needs to decode an Ethernet frame nested in
+	 * the middle of a TCP payload.
+	 */
+	if (!nd_push_snapend(ndo, cp + len))
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+		                  "%s: failed to adjust snapend", __func__);
 	ether_print(ndo, cp, len, ND_BYTES_AVAILABLE_AFTER(cp), NULL, NULL);
+	nd_pop_packet_info(ndo);
 	ndo->ndo_vflag += 3;
 }
 

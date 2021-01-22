@@ -14,6 +14,7 @@ Monthday, Month DD, YYYY by gharris and denis
       AppleTalk: Declutter appletalk.h.
       Introduce new ND_LCHECK*() macros to deduplicate more code.
       IEEE 802.11: Simplify handle_action().
+      OpenFlow 1.0: Get snapend right for nested frames.
 
 Monthday, Month DD, YYYY by gharris
   Summary for 4.99.1 tcpdump release (so far!)
