@@ -1665,60 +1665,78 @@ trunc:
 	return 0;
 }
 
-#define	PRINT_HT_ACTION(v) (\
-	(v) == 0 ? ND_PRINT("TxChWidth"): \
-	(v) == 1 ? ND_PRINT("MIMOPwrSave"): \
-		   ND_PRINT("Act#%u", (v)))
-#define	PRINT_BA_ACTION(v) (\
-	(v) == 0 ? ND_PRINT("ADDBA Request"): \
-	(v) == 1 ? ND_PRINT("ADDBA Response"): \
-	(v) == 2 ? ND_PRINT("DELBA"): \
-		   ND_PRINT("Act#%u", (v)))
-#define	PRINT_MESHLINK_ACTION(v) (\
-	(v) == 0 ? ND_PRINT("Request"): \
-	(v) == 1 ? ND_PRINT("Report"): \
-		   ND_PRINT("Act#%u", (v)))
-#define	PRINT_MESHPEERING_ACTION(v) (\
-	(v) == 0 ? ND_PRINT("Open"): \
-	(v) == 1 ? ND_PRINT("Confirm"): \
-	(v) == 2 ? ND_PRINT("Close"): \
-		   ND_PRINT("Act#%u", (v)))
-#define	PRINT_MESHPATH_ACTION(v) (\
-	(v) == 0 ? ND_PRINT("Request"): \
-	(v) == 1 ? ND_PRINT("Report"): \
-	(v) == 2 ? ND_PRINT("Error"): \
-	(v) == 3 ? ND_PRINT("RootAnnouncement"): \
-		   ND_PRINT("Act#%u", (v)))
+static const struct tok category_str[] = {
+	{ 0,   "Spectrum Management" },
+	{ 1,   "QoS"                 },
+	{ 2,   "DLS"                 },
+	{ 3,   "BA"                  },
+	{ 7,   "HT"                  },
+	{ 13,  "MeshAction"          },
+	{ 14,  "MultiohopAction"     },
+	{ 15,  "SelfprotectAction"   },
+	{ 127, "Vendor"              },
+	{ 0, NULL }
+};
 
-#define PRINT_MESH_ACTION(v) (\
-	(v) == 0 ? ND_PRINT("MeshLink"): \
-	(v) == 1 ? ND_PRINT("HWMP"): \
-	(v) == 2 ? ND_PRINT("Gate Announcement"): \
-	(v) == 3 ? ND_PRINT("Congestion Control"): \
-	(v) == 4 ? ND_PRINT("MCCA Setup Request"): \
-	(v) == 5 ? ND_PRINT("MCCA Setup Reply"): \
-	(v) == 6 ? ND_PRINT("MCCA Advertisement Request"): \
-	(v) == 7 ? ND_PRINT("MCCA Advertisement"): \
-	(v) == 8 ? ND_PRINT("MCCA Teardown"): \
-	(v) == 9 ? ND_PRINT("TBTT Adjustment Request"): \
-	(v) == 10 ? ND_PRINT("TBTT Adjustment Response"): \
-		   ND_PRINT("Act#%u", (v)))
-#define PRINT_MULTIHOP_ACTION(v) (\
-	(v) == 0 ? ND_PRINT("Proxy Update"): \
-	(v) == 1 ? ND_PRINT("Proxy Update Confirmation"): \
-		   ND_PRINT("Act#%u", (v)))
-#define PRINT_SELFPROT_ACTION(v) (\
-	(v) == 1 ? ND_PRINT("Peering Open"): \
-	(v) == 2 ? ND_PRINT("Peering Confirm"): \
-	(v) == 3 ? ND_PRINT("Peering Close"): \
-	(v) == 4 ? ND_PRINT("Group Key Inform"): \
-	(v) == 5 ? ND_PRINT("Group Key Acknowledge"): \
-		   ND_PRINT("Act#%u", (v)))
+static const struct tok act_ba_str[] = {
+	{ 0, "ADDBA Request"  },
+	{ 1, "ADDBA Response" },
+	{ 2, "DELBA"          },
+	{ 0, NULL }
+};
+
+static const struct tok act_ht_str[] = {
+	{ 0, "TxChWidth"   },
+	{ 1, "MIMOPwrSave" },
+	{ 0, NULL }
+};
+
+static const struct tok act_mesh_str[] = {
+	{ 0,  "MeshLink"                   },
+	{ 1,  "HWMP"                       },
+	{ 2,  "Gate Announcement"          },
+	{ 3,  "Congestion Control"         },
+	{ 4,  "MCCA Setup Request"         },
+	{ 5,  "MCCA Setup Reply"           },
+	{ 6,  "MCCA Advertisement Request" },
+	{ 7,  "MCCA Advertisement"         },
+	{ 8,  "MCCA Teardown"              },
+	{ 9,  "TBTT Adjustment Request"    },
+	{ 10, "TBTT Adjustment Response"   },
+	{ 0, NULL }
+};
+
+static const struct tok act_mhop_str[] = {
+	{ 0, "Proxy Update" },
+	{ 1, "Proxy Update Confirmation" },
+	{ 0, NULL }
+};
+
+static const struct tok act_selfpr_str[] = {
+	{ 1, "Peering Open"          },
+	{ 2, "Peering Confirm"       },
+	{ 3, "Peering Close"         },
+	{ 4, "Group Key Inform"      },
+	{ 5, "Group Key Acknowledge" },
+	{ 0, NULL }
+};
+
+static const struct uint_tokary category2tokary[] = {
+	{ 3,   act_ba_str     },
+	{ 7,   act_ht_str     },
+	{ 13,  act_mesh_str   },
+	{ 14,  act_mhop_str   },
+	{ 15,  act_selfpr_str },
+	/* uint2tokary() does not use array termination. */
+};
 
 static int
 handle_action(netdissect_options *ndo,
 	      const uint8_t *src, const u_char *p, u_int length)
 {
+	uint8_t category, action;
+	const struct tok *action_str;
+
 	ND_TCHECK_2(p);
 	if (length < 2)
 		goto trunc;
@@ -1727,24 +1745,15 @@ handle_action(netdissect_options *ndo,
 	} else {
 		ND_PRINT(" (%s): ", GET_ETHERADDR_STRING(src));
 	}
-	switch (GET_U_1(p)) {
-	case 0: ND_PRINT("Spectrum Management Act#%u", GET_U_1(p + 1)); break;
-	case 1: ND_PRINT("QoS Act#%u", GET_U_1(p + 1)); break;
-	case 2: ND_PRINT("DLS Act#%u", GET_U_1(p + 1)); break;
-	case 3: ND_PRINT("BA "); PRINT_BA_ACTION(GET_U_1(p + 1)); break;
-	case 7: ND_PRINT("HT "); PRINT_HT_ACTION(GET_U_1(p + 1)); break;
-	case 13: ND_PRINT("MeshAction "); PRINT_MESH_ACTION(GET_U_1(p + 1)); break;
-	case 14:
-		ND_PRINT("MultiohopAction ");
-		PRINT_MULTIHOP_ACTION(GET_U_1(p + 1)); break;
-	case 15:
-		ND_PRINT("SelfprotectAction ");
-		PRINT_SELFPROT_ACTION(GET_U_1(p + 1)); break;
-	case 127: ND_PRINT("Vendor Act#%u", GET_U_1(p + 1)); break;
-	default:
-		ND_PRINT("Reserved(%u) Act#%u", GET_U_1(p), GET_U_1(p + 1));
-		break;
-	}
+	category = GET_U_1(p);
+	ND_PRINT("%s ", tok2str(category_str, "Reserved(%u)", category));
+	action = GET_U_1(p + 1);
+	action_str = uint2tokary(category2tokary, category);
+	if (!action_str)
+		ND_PRINT("Act#%u", action);
+	else
+		ND_PRINT("%s", tok2str(action_str, "Act#%u", action));
+
 	return 1;
 trunc:
 	return 0;
