@@ -46,8 +46,7 @@
 
 #include "netdissect-stdinc.h"
 
-#include <stdio.h>
-
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -166,7 +165,6 @@ cnfp_v1_print(netdissect_options *ndo, const u_char *cp)
 #endif
 
 	nh = (const struct nfhdr_v1 *)cp;
-	ND_TCHECK_SIZE(nh);
 
 	ver = GET_BE_U_2(nh->version);
 	nrecs = GET_BE_U_4(nh->count);
@@ -189,28 +187,18 @@ cnfp_v1_print(netdissect_options *ndo, const u_char *cp)
 	ND_PRINT("%2u recs", nrecs);
 
 	for (; nrecs != 0; nr++, nrecs--) {
-		char buf[20];
-		char asbuf[20];
-
-		/*
-		 * Make sure we have the entire record.
-		 */
-		ND_TCHECK_SIZE(nr);
 		ND_PRINT("\n  started %u.%03u, last %u.%03u",
 		       GET_BE_U_4(nr->start_time)/1000,
 		       GET_BE_U_4(nr->start_time)%1000,
 		       GET_BE_U_4(nr->last_time)/1000,
 		       GET_BE_U_4(nr->last_time)%1000);
 
-		asbuf[0] = buf[0] = '\0';
-		ND_PRINT("\n    %s%s%s:%u ",
+		ND_PRINT("\n    %s:%u ",
 			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->src_ina)),
-			buf, asbuf,
 			GET_BE_U_2(nr->srcport));
 
-		ND_PRINT("> %s%s%s:%u ",
+		ND_PRINT("> %s:%u ",
 			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->dst_ina)),
-			buf, asbuf,
 			GET_BE_U_2(nr->dstport));
 
 		ND_PRINT(">> %s\n    ",
@@ -230,16 +218,13 @@ cnfp_v1_print(netdissect_options *ndo, const u_char *cp)
 				ND_PRINT("%s ", bittok2str_nosep(tcp_flag_values, "", flags));
 		}
 
-		buf[0]='\0';
-		ND_PRINT("tos %u, %u (%u octets) %s",
+		ND_PRINT("tos %u, %u (%u octets)",
 		       GET_U_1(nr->tos),
 		       GET_BE_U_4(nr->packets),
-		       GET_BE_U_4(nr->octets), buf);
+		       GET_BE_U_4(nr->octets));
+		/* This was not all of struct nfrec_v1. */
+		ND_TCHECK_SIZE(nr);
 	}
-	return;
-
-trunc:
-	nd_print_trunc(ndo);
 }
 
 static void
@@ -255,7 +240,6 @@ cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 #endif
 
 	nh = (const struct nfhdr_v5 *)cp;
-	ND_TCHECK_SIZE(nh);
 
 	ver = GET_BE_U_2(nh->version);
 	nrecs = GET_BE_U_4(nh->count);
@@ -274,39 +258,27 @@ cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 	       GET_BE_U_4(nh->utc_sec), GET_BE_U_4(nh->utc_nsec));
 
 	ND_PRINT("#%u, ", GET_BE_U_4(nh->sequence));
+	/* This was not all of struct nfhdr_v5. */
+	ND_TCHECK_SIZE(nh);
 	nr = (const struct nfrec_v5 *)&nh[1];
 
 	ND_PRINT("%2u recs", nrecs);
 
 	for (; nrecs != 0; nr++, nrecs--) {
-		char buf[20];
-		char asbuf[20];
-
-		/*
-		 * Make sure we have the entire record.
-		 */
-		ND_TCHECK_SIZE(nr);
 		ND_PRINT("\n  started %u.%03u, last %u.%03u",
 		       GET_BE_U_4(nr->start_time)/1000,
 		       GET_BE_U_4(nr->start_time)%1000,
 		       GET_BE_U_4(nr->last_time)/1000,
 		       GET_BE_U_4(nr->last_time)%1000);
 
-		asbuf[0] = buf[0] = '\0';
-		snprintf(buf, sizeof(buf), "/%u", GET_U_1(nr->src_mask));
-		snprintf(asbuf, sizeof(asbuf), ":%u",
-			GET_BE_U_2(nr->src_as));
-		ND_PRINT("\n    %s%s%s:%u ",
+		ND_PRINT("\n    %s/%u:%u:%u ",
 			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->src_ina)),
-			buf, asbuf,
+			GET_U_1(nr->src_mask), GET_BE_U_2(nr->src_as),
 			GET_BE_U_2(nr->srcport));
 
-		snprintf(buf, sizeof(buf), "/%u", GET_U_1(nr->dst_mask));
-		snprintf(asbuf, sizeof(asbuf), ":%u",
-			 GET_BE_U_2(nr->dst_as));
-		ND_PRINT("> %s%s%s:%u ",
+		ND_PRINT("> %s/%u:%u:%u ",
 			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->dst_ina)),
-			buf, asbuf,
+			GET_U_1(nr->dst_mask), GET_BE_U_2(nr->dst_as),
 			GET_BE_U_2(nr->dstport));
 
 		ND_PRINT(">> %s\n    ",
@@ -326,16 +298,13 @@ cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 				ND_PRINT("%s ", bittok2str_nosep(tcp_flag_values, "", flags));
 		}
 
-		buf[0]='\0';
-		ND_PRINT("tos %u, %u (%u octets) %s",
+		ND_PRINT("tos %u, %u (%u octets)",
 		       GET_U_1(nr->tos),
 		       GET_BE_U_4(nr->packets),
-		       GET_BE_U_4(nr->octets), buf);
+		       GET_BE_U_4(nr->octets));
+		/* This was not all of struct nfrec_v5. */
+		ND_TCHECK_SIZE(nr);
 	}
-	return;
-
-trunc:
-	nd_print_trunc(ndo);
 }
 
 static void
@@ -351,7 +320,6 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 #endif
 
 	nh = (const struct nfhdr_v6 *)cp;
-	ND_TCHECK_SIZE(nh);
 
 	ver = GET_BE_U_2(nh->version);
 	nrecs = GET_BE_U_4(nh->count);
@@ -370,39 +338,27 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 	       GET_BE_U_4(nh->utc_sec), GET_BE_U_4(nh->utc_nsec));
 
 	ND_PRINT("#%u, ", GET_BE_U_4(nh->sequence));
+	/* This was not all of struct nfhdr_v6. */
+	ND_TCHECK_SIZE(nh);
 	nr = (const struct nfrec_v6 *)&nh[1];
 
 	ND_PRINT("%2u recs", nrecs);
 
 	for (; nrecs != 0; nr++, nrecs--) {
-		char buf[20];
-		char asbuf[20];
-
-		/*
-		 * Make sure we have the entire record.
-		 */
-		ND_TCHECK_SIZE(nr);
 		ND_PRINT("\n  started %u.%03u, last %u.%03u",
 		       GET_BE_U_4(nr->start_time)/1000,
 		       GET_BE_U_4(nr->start_time)%1000,
 		       GET_BE_U_4(nr->last_time)/1000,
 		       GET_BE_U_4(nr->last_time)%1000);
 
-		asbuf[0] = buf[0] = '\0';
-		snprintf(buf, sizeof(buf), "/%u", GET_U_1(nr->src_mask));
-		snprintf(asbuf, sizeof(asbuf), ":%u",
-			GET_BE_U_2(nr->src_as));
-		ND_PRINT("\n    %s%s%s:%u ",
+		ND_PRINT("\n    %s/%u:%u:%u ",
 			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->src_ina)),
-			buf, asbuf,
+			GET_U_1(nr->src_mask), GET_BE_U_2(nr->src_as),
 			GET_BE_U_2(nr->srcport));
 
-		snprintf(buf, sizeof(buf), "/%u", GET_U_1(nr->dst_mask));
-		snprintf(asbuf, sizeof(asbuf), ":%u",
-			 GET_BE_U_2(nr->dst_as));
-		ND_PRINT("> %s%s%s:%u ",
+		ND_PRINT("> %s/%u:%u:%u ",
 			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->dst_ina)),
-			buf, asbuf,
+			GET_U_1(nr->dst_mask), GET_BE_U_2(nr->dst_as),
 			GET_BE_U_2(nr->dstport));
 
 		ND_PRINT(">> %s\n    ",
@@ -422,19 +378,15 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 				ND_PRINT("%s ", bittok2str_nosep(tcp_flag_values, "", flags));
 		}
 
-		buf[0]='\0';
-		snprintf(buf, sizeof(buf), "(%u<>%u encaps)",
-			 (GET_BE_U_2(nr->flags) >> 8) & 0xff,
-			 (GET_BE_U_2(nr->flags)) & 0xff);
-		ND_PRINT("tos %u, %u (%u octets) %s",
+		ND_PRINT("tos %u, %u (%u octets) (%u<>%u encaps)",
 		       GET_U_1(nr->tos),
 		       GET_BE_U_4(nr->packets),
-		       GET_BE_U_4(nr->octets), buf);
+		       GET_BE_U_4(nr->octets),
+		       (GET_BE_U_2(nr->flags) >> 8) & 0xff,
+		       (GET_BE_U_2(nr->flags)) & 0xff);
+		/* This was not all of struct nfrec_v6. */
+		ND_TCHECK_SIZE(nr);
 	}
-	return;
-
-trunc:
-	nd_print_trunc(ndo);
 }
 
 void
