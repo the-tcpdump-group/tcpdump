@@ -59,9 +59,10 @@ static const struct tok ospf_authtype_values[] = {
 static const struct tok ospf_rla_flag_values[] = {
 	{ RLA_FLAG_B,		"ABR" },
 	{ RLA_FLAG_E,		"ASBR" },
-	{ RLA_FLAG_W1,		"Virtual" },
-	{ RLA_FLAG_W2,		"W2" },
+	{ RLA_FLAG_V,		"Virtual" },
+	{ RLA_FLAG_W,		"Wildcard" },
 	{ RLA_FLAG_NT,		"Nt" },
+	{ RLA_FLAG_H,		"Host" },
 	{ 0,			NULL }
 };
 
