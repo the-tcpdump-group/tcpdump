@@ -115,9 +115,10 @@
 /* rla_flags	*/
 #define	RLA_FLAG_B	0x01
 #define	RLA_FLAG_E	0x02
-#define	RLA_FLAG_W1	0x04
-#define	RLA_FLAG_W2	0x08
+#define	RLA_FLAG_V	0x04
+#define	RLA_FLAG_W	0x08
 #define	RLA_FLAG_NT	0x10 /* RFC3101 Appendix B */
+#define	RLA_FLAG_H	0x80
 
 /* sla_tosmetric breakdown	*/
 #define	SLA_MASK_TOS		0x7f000000
