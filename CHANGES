@@ -3,6 +3,7 @@ Monthday, Month DD, YYYY by gharris
     Source code:
       Squelch some compiler warnings
       Rebuild configure script when building release
+      ICMP: Update the snapend for some nested IP packets.
     Solaris:
       Fix a compile error with Sun C
 
