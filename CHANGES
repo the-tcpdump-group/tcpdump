@@ -4,6 +4,7 @@ Monthday, Month DD, YYYY by gharris
       Squelch some compiler warnings
       Rebuild configure script when building release
       ICMP: Update the snapend for some nested IP packets.
+      MACsec: Update the snapend thus the ICV field is not payload for the caller.
     Solaris:
       Fix a compile error with Sun C
 
