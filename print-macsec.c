@@ -219,6 +219,7 @@ macsec_print(netdissect_options *ndo, const u_char **bp,
 	}
 	*lengthp -= MACSEC_DEFAULT_ICV_LEN;
 	*caplenp -= MACSEC_DEFAULT_ICV_LEN;
+	ndo->ndo_snapend -= MACSEC_DEFAULT_ICV_LEN;
 
 	/*
 	 * If the SL field is non-zero, then it's the length of the

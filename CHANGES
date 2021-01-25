@@ -18,6 +18,7 @@ Monthday, Month DD, YYYY by gharris and denis
       OpenFlow 1.0: Get snapend right for nested frames.
       ICMP: Update the snapend for some nested IP packets.
       RPKI-Router: Refine length and bounds checks.
+      MACsec: Update the snapend thus the ICV field is not payload for the caller
 
 Monthday, Month DD, YYYY by gharris
   Summary for 4.99.1 tcpdump release (so far!)
