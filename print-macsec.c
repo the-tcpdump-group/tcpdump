@@ -219,6 +219,12 @@ macsec_print(netdissect_options *ndo, const u_char **bp,
 	}
 	*lengthp -= MACSEC_DEFAULT_ICV_LEN;
 	*caplenp -= MACSEC_DEFAULT_ICV_LEN;
+	/*
+	 * Update the snapend thus the ICV field is not in the payload for
+	 * the caller.
+	 * The ICV (Integrity Check Value) is at the end of the frame, after
+	 * the secure data.
+	 */
 	ndo->ndo_snapend -= MACSEC_DEFAULT_ICV_LEN;
 
 	/*
