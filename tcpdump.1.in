@@ -1705,8 +1705,7 @@ may take up a page or more, so only use -v if you really want all the
 gory details.
 .LP
 For information on SMB packet formats and what all the fields mean see
-www.cifs.org or the pub/samba/specs/ directory on your favorite
-samba.org mirror site.
+\%https://download.samba.org/pub/samba/specs/ and other online resources.
 The SMB patches were written by Andrew Tridgell
 (tridge@samba.org).
 .HD
