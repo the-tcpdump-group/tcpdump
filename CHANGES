@@ -7,6 +7,7 @@ Monthday, Month DD, YYYY by gharris and denis
       NetFlow: Use tcp_flag_values[] for TCP flags.
       OSPF: Update to match the Router Properties registry.
       MPLS: Rename the "exp" field to "tc".
+      VQP: Do not print unknown error codes twice.
     Source code:
       Use %zu when printing a sizeof to squelch compiler warnings
       (FIXME: somebody please wrap the line below just before the release)

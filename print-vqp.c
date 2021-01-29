@@ -132,7 +132,7 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
         ND_PRINT("VQPv%u %s Message, error-code %s (%u), length %u",
                version,
                tok2str(vqp_msg_type_values, "unknown (%u)",GET_U_1(vqp_common_header->msg_type)),
-               tok2str(vqp_error_code_values, "unknown (%u)",GET_U_1(vqp_common_header->error_code)),
+               tok2str(vqp_error_code_values, "unknown", GET_U_1(vqp_common_header->error_code)),
                GET_U_1(vqp_common_header->error_code),
                len);
         return;
@@ -143,7 +143,7 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
     ND_PRINT("\n\tVQPv%u, %s Message, error-code %s (%u), seq 0x%08x, items %u, length %u",
            version,
 	   tok2str(vqp_msg_type_values, "unknown (%u)",GET_U_1(vqp_common_header->msg_type)),
-	   tok2str(vqp_error_code_values, "unknown (%u)",GET_U_1(vqp_common_header->error_code)),
+	   tok2str(vqp_error_code_values, "unknown", GET_U_1(vqp_common_header->error_code)),
 	   GET_U_1(vqp_common_header->error_code),
 	   GET_BE_U_4(vqp_common_header->sequence),
 	   nitems,
