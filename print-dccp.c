@@ -155,36 +155,36 @@ enum dccp_reset_codes {
 	DCCP_RESET_CODE_TOO_BUSY,
 	DCCP_RESET_CODE_BAD_INIT_COOKIE,
 	DCCP_RESET_CODE_AGGRESSION_PENALTY,
-	__DCCP_RESET_CODE_LAST
 };
 
-
-static const char *dccp_reset_codes[] = {
-	"unspecified",
-	"closed",
-	"aborted",
-	"no_connection",
-	"packet_error",
-	"option_error",
-	"mandatory_error",
-	"connection_refused",
-	"bad_service_code",
-	"too_busy",
-	"bad_init_cookie",
-	"aggression_penalty",
+static const struct tok dccp_reset_code_str[] = {
+	{ DCCP_RESET_CODE_UNSPECIFIED, "unspecified" },
+	{ DCCP_RESET_CODE_CLOSED, "closed" },
+	{ DCCP_RESET_CODE_ABORTED, "aborted" },
+	{ DCCP_RESET_CODE_NO_CONNECTION, "no_connection" },
+	{ DCCP_RESET_CODE_PACKET_ERROR, "packet_error" },
+	{ DCCP_RESET_CODE_OPTION_ERROR, "option_error" },
+	{ DCCP_RESET_CODE_MANDATORY_ERROR, "mandatory_error" },
+	{ DCCP_RESET_CODE_CONNECTION_REFUSED, "connection_refused" },
+	{ DCCP_RESET_CODE_BAD_SERVICE_CODE, "bad_service_code" },
+	{ DCCP_RESET_CODE_TOO_BUSY, "too_busy" },
+	{ DCCP_RESET_CODE_BAD_INIT_COOKIE, "bad_init_cookie" },
+	{ DCCP_RESET_CODE_AGGRESSION_PENALTY, "aggression_penalty" },
+	{ 0, NULL }
 };
 
-static const char *dccp_feature_nums[] = {
-	"reserved",
-	"ccid",
-	"allow_short_seqno",
-	"sequence_window",
-	"ecn_incapable",
-	"ack_ratio",
-	"send_ack_vector",
-	"send_ndp_count",
-	"minimum checksum coverage",
-	"check data checksum",
+static const struct tok dccp_feature_num_str[] = {
+	{ 0, "reserved" },
+	{ 1, "ccid" },
+	{ 2, "allow_short_seqno" },
+	{ 3, "sequence_window" },
+	{ 4, "ecn_incapable" },
+	{ 5, "ack_ratio" },
+	{ 6, "send_ack_vector" },
+	{ 7, "send_ndp_count" },
+	{ 8, "minimum checksum coverage" },
+	{ 9, "check data checksum" },
+	{ 0, NULL }
 };
 
 static u_int
@@ -211,13 +211,6 @@ static uint16_t dccp6_cksum(netdissect_options *ndo, const struct ip6_hdr *ip6,
 {
 	return nextproto6_cksum(ndo, ip6, (const uint8_t *)(const void *)dh, len,
 				dccp_csum_coverage(ndo, dh, len), IPPROTO_DCCP);
-}
-
-static const char *dccp_reset_code(uint8_t code)
-{
-	if (code >= __DCCP_RESET_CODE_LAST)
-		return "invalid";
-	return dccp_reset_codes[code];
 }
 
 static uint64_t
@@ -448,7 +441,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 		ND_TCHECK_SIZE(dhr);
 		ND_PRINT("%s (code=%s) ",
 			  tok2str(dccp_pkt_type_str, "", dccph_type),
-			  dccp_reset_code(GET_U_1(dhr->dccph_reset_code)));
+			  tok2str(dccp_reset_code_str, "invalid", GET_U_1(dhr->dccph_reset_code)));
 		break;
 	}
 	case DCCP_PKT_SYNC:
@@ -602,13 +595,10 @@ dccp_print_option(netdissect_options *ndo, const u_char *option, u_int hlen)
 				ND_PRINT(" optlen too short");
 				return optlen;
 			}
-			if (GET_U_1(option + 2) < 10){
-				ND_PRINT(" %s",
-					 dccp_feature_nums[GET_U_1(option + 2)]);
-				for (i = 0; i < optlen - 3; i++)
-					ND_PRINT(" %u",
-						 GET_U_1(option + 3 + i));
-			}
+			ND_PRINT(" %s", tok2str(dccp_feature_num_str,
+			                        "invalid (%u)", GET_U_1(option + 2)));
+			for (i = 0; i < optlen - 3; i++)
+				ND_PRINT(" %u", GET_U_1(option + 3 + i));
 			break;
 		case DCCP_OPTION_INIT_COOKIE:
 			if (optlen > 2) {
