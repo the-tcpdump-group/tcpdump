@@ -11,6 +11,7 @@ TBD
       RRCP: support more Realtek protocols than just RRCP.
       MPLS: show the EXP field as TC, as per RFC 5462.
       ICMP: redo MPLS Extension code as general ICMP Extension code.
+      VQP: Do not print unknown error codes twice.
     Building and testing:
       Update config.guess and config.sub.
       Handle some Autoconf/make errors better.
