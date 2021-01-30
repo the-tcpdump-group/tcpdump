@@ -214,7 +214,7 @@ static void print_attr_location_information(netdissect_options *, const u_char *
 static void print_attr_location_data(netdissect_options *, const u_char *, u_int, u_short);
 static void print_basic_location_policy_rules(netdissect_options *, const u_char *, u_int, u_short);
 static void print_attr_time(netdissect_options *, const u_char *, u_int, u_short);
-static void print_attr_vector64(netdissect_options *, register const u_char *, u_int, u_short);
+static void print_attr_vector64(netdissect_options *, const u_char *, u_int, u_short);
 static void print_attr_strange(netdissect_options *, const u_char *, u_int, u_short);
 
 
@@ -1264,7 +1264,7 @@ print_attr_time(netdissect_options *ndo,
 
 static void
 print_attr_vector64(netdissect_options *ndo,
-                 register const u_char *data, u_int length, u_short attr_code _U_)
+		    const u_char *data, u_int length, u_short attr_code _U_)
 {
    uint64_t data_value, i;
    const char *sep = "";
