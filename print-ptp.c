@@ -431,14 +431,12 @@ ptp_print_2(netdissect_options *ndo, const u_char *bp, u_int length)
  * PTP general message
  */
 void
-ptp_print(netdissect_options *ndo, const u_char *bp, u_int len)
+ptp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
     u_int vers;
 
     ndo->ndo_protocol = "ptp";
-    if (len < PTP_HDR_LEN) {
-        goto trunc;
-    }
+    ND_LCHECK_U(length, PTP_HDR_LEN);
     vers = GET_BE_U_2(bp) & PTP_VERS_MASK;
     ND_PRINT("PTPv%u",vers);
     switch(vers) {
@@ -446,7 +444,7 @@ ptp_print(netdissect_options *ndo, const u_char *bp, u_int len)
             ptp_print_1(ndo);
             break;
         case PTP_VER_2:
-            ptp_print_2(ndo, bp, len);
+            ptp_print_2(ndo, bp, length);
             break;
         default:
             //ND_PRINT("ERROR: unknown-version\n");
@@ -454,8 +452,8 @@ ptp_print(netdissect_options *ndo, const u_char *bp, u_int len)
     }
     return;
 
-trunc:
-    nd_print_trunc(ndo);
+invalid:
+    nd_print_invalid(ndo);
 }
 
 static void
