@@ -147,6 +147,7 @@ static const struct tok bfd_port_values[] = {
     { BFD_CONTROL_PORT,  "Control" },
     { BFD_MULTIHOP_PORT, "Multihop" },
     { BFD_LAG_PORT,      "Lag" },
+    { SBFD_PORT,         "Sbfd" },
     { 0, NULL }
 };
 
@@ -294,7 +295,8 @@ bfd_print(netdissect_options *ndo, const u_char *pptr,
 	ndo->ndo_protocol = "bfd";
         if (port == BFD_CONTROL_PORT ||
             port == BFD_MULTIHOP_PORT ||
-            port == BFD_LAG_PORT) {
+            port == BFD_LAG_PORT ||
+            port == SBFD_PORT) {
             /*
              * Control packet.
              */

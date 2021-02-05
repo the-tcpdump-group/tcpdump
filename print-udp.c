@@ -624,8 +624,11 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		else if (dport == BFD_CONTROL_PORT ||
 			 dport == BFD_MULTIHOP_PORT ||
 			 dport == BFD_LAG_PORT ||
+			 dport == SBFD_PORT ||
 			 dport == BFD_ECHO_PORT )
 			bfd_print(ndo, cp, length, dport);
+		else if (sport == SBFD_PORT)
+			bfd_print(ndo, cp, length, sport);
 		else if (IS_SRC_OR_DST_PORT(LMP_PORT))
 			lmp_print(ndo, cp, length);
 		else if (IS_SRC_OR_DST_PORT(VQP_PORT))

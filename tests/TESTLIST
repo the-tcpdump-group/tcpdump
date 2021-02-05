@@ -821,6 +821,8 @@ bfd-multihop	bfd-multihop.pcap	bfd-multihop.out
 bfd-multihop-v	bfd-multihop.pcap	bfd-multihop-v.out	-v
 bfd-lag		bfd-lag.pcap		bfd-lag.out
 bfd-lag-v	bfd-lag.pcap		bfd-lag-v.out		-v
+bfd-sbfd	bfd-sbfd.pcap		bfd-sbfd.out
+bfd-sbfd-v	bfd-sbfd.pcap		bfd-sbfd-v.out		-v
 
 # Arista Vendor Specific Tests
 arista-ether             arista_ether.pcap        arista_ether.out
