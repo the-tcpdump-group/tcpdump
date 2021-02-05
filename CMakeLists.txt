@@ -126,7 +126,7 @@ option(WITH_SMI "Build with libsmi, if available" ON)
 option(WITH_CRYPTO "Build with OpenSSL/libressl libcrypto, if available" ON)
 option(WITH_CAPSICUM "Build with Capsicum security functions, if available" ON)
 option(WITH_CAP_NG "Use libcap-ng, if available" ON)
-option(ENABLE_SMB "Build with the SMB dissector" ON)
+option(ENABLE_SMB "Build with the SMB dissector" OFF)
 
 #
 # String parameters.  Neither of them are set, initially; only if the
