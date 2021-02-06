@@ -259,11 +259,11 @@ LIBNETDISSECT_OBJ=$(LIBNETDISSECT_SRC:.c=.o) ${LOCALSRC:.c=.o} ${LIBOBJS}
 LIBNETDISSECT=libnetdissect.a
 
 
-SRC =	$(CSRC) $(GENSRC) $(LOCALSRC)
+SRC =	$(CSRC) $(LOCALSRC)
 
 # We would like to say "OBJ = $(SRC:.c=.o)" but Ultrix's make cannot
 # hack the extra indirection
-OBJ =	$(CSRC:.c=.o) $(GENSRC:.c=.o)
+OBJ =	$(CSRC:.c=.o)
 HDR = \
 	addrtoname.h \
 	addrtostr.h \
@@ -325,7 +325,7 @@ TAGHDR = \
 TAGFILES = $(SRC) $(HDR) $(TAGHDR) $(LIBNETDISSECT_SRC) \
 	print-pflog.c print-smb.c smbutil.c
 
-CLEANFILES = $(PROG) $(OBJ) $(GENSRC) $(LIBNETDISSECT_OBJ)
+CLEANFILES = $(PROG) $(OBJ) $(LIBNETDISSECT_OBJ)
 
 EXTRA_DIST = \
 	CHANGES \
@@ -430,7 +430,7 @@ uninstall:
 	rm -f $(DESTDIR)$(bindir)/$(PROG)
 	rm -f $(DESTDIR)$(mandir)/man1/$(PROG).1
 
-lint: $(GENSRC)
+lint:
 	lint -hbxn $(SRC) $(LIBNETDISSECT_SRC) | \
 	    grep -v 'struct/union .* never defined' | \
 	    grep -v 'possible pointer alignment problem'
@@ -468,5 +468,5 @@ releasetar:
 testlist:
 	echo $(TEST_DIST)
 
-depend: $(GENSRC)
+depend:
 	$(MKDEP) -c "$(CC)" -m "$(DEPENDENCY_CFLAG)" -s "$(srcdir)" $(DEFS) $(INCLS) $(SRC) $(LIBNETDISSECT_SRC)
