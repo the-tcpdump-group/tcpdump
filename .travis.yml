@@ -15,7 +15,6 @@ arch:
 
 os:
   - linux
-  - osx
 
 dist: focal
 
@@ -55,14 +54,6 @@ dist: focal
 jobs:
   fast_finish: true
   exclude:
-  - arch: ppc64le
-    os: osx
-  - arch: s390x
-    os: osx
-  - arch: arm64
-    os: osx
-  - compiler: gcc
-    os: osx
   - if: branch = coverity_scan
     arch: ppc64le
   - if: branch = coverity_scan
@@ -122,11 +113,7 @@ before_install:
   - uname -a
   - date
   - gem install travis-conditions
-  - if [ "$TRAVIS_OS_NAME" = osx ]; then brew update >/dev/null; fi
   - if [ "$TRAVIS_OS_NAME" = linux ]; then apt list --installed 'lib*-dev'; fi
-
-install:
-  - if [ "$TRAVIS_OS_NAME" = osx ]; then brew install libsmi | grep -v '%'; fi
 
 before_script:
   - (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth 3 --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git)
@@ -137,4 +124,3 @@ script:
   #
   - if [ "$COVERITY_SCAN_BRANCH" = 1 ]; then if [ "$TRAVIS_OS_NAME" = linux ]; then travis_terminate 0; else exit 0; fi; fi
   - ./build_matrix.sh
-  - if [ "$TRAVIS_OS_NAME" = osx ]; then sleep 10; fi
