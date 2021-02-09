@@ -24,6 +24,23 @@ freebsd_task:
     - make install
     - make releasetar
 
+linux_task:
+  name: LNX+BM
+  container:
+    cpu: 8 # allows one concurrent Linux task
+    image: ubuntu:20.04
+  env:
+    DEBIAN_FRONTEND: noninteractive
+    MAKEFLAGS: -j 8
+  script:
+    - apt-get -qy update
+    - apt-get -qy install git autoconf make cmake clang gcc
+    - apt-get -qy install flex bison libdbus-1-dev libbluetooth-dev libnl-genl-3-dev libibverbs-dev # for libpcap
+    - apt-get -qy install libssl-dev libsmi2-dev libcap-ng-dev libpcap-dev
+    - apt list --installed 'lib*-dev'
+    - (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT})
+    - ./build_matrix.sh
+
 macos_task:
   name: MAC+BM
   macos_instance:
