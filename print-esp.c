@@ -903,11 +903,19 @@ esp_print(netdissect_options *ndo,
 
 	ND_PRINT(": ");
 
+	/*
+	 * Don't put padding + padding length(1 byte) + next header(1 byte)
+	 * in the buffer because they are not part of the plaintext to decode.
+	 */
+	nd_push_snapend(ndo, ep - (padlen + 2));
+
 	/* Now dissect the plaintext. */
 	ip_demux_print(ndo, pt, payloadlen - (padlen + 2), ver, fragmented,
-	    ttl_hl, nh, bp2);
+		       ttl_hl, nh, bp2);
 
 	/* Pop the buffer, freeing it. */
+	nd_pop_packet_info(ndo);
+	/* Pop the nd_push_snapend */
 	nd_pop_packet_info(ndo);
 #endif
 }
