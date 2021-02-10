@@ -5,14 +5,15 @@ env:
 freebsd_task:
   name: FBSD+BM
   freebsd_instance:
-    cpu: 4 # allows two concurrent FreeBSD tasks
+    cpu: 2 # up to 4 concurrent FreeBSD tasks
+    memory: 2G # fails to start with 1 GB
     matrix:
       - image_family: freebsd-11-4
       - image_family: freebsd-12-2
       - image_family: freebsd-13-0-snap
   env:
     IGNORE_OSVERSION: yes
-    MAKEFLAGS: -j 4
+    MAKEFLAGS: -j 3
     MATRIX_CC: clang gcc10
   script:
     - freebsd-version
@@ -25,11 +26,15 @@ freebsd_task:
 linux_task:
   name: LNX+BM
   container:
-    cpu: 8 # allows one concurrent Linux task
+    cpu: 4 # up to 2 concurrent Linux tasks
+    memory: 1G
     image: ubuntu:20.04
   env:
     DEBIAN_FRONTEND: noninteractive
-    MAKEFLAGS: -j 8
+    MAKEFLAGS: -j 5
+    matrix:
+      - MATRIX_CC: gcc
+      - MATRIX_CC: clang
   script:
     - apt-get -qy update
     - apt-get -qy install git autoconf make cmake clang gcc
@@ -43,8 +48,9 @@ macos_task:
   name: MAC+BM
   macos_instance:
     image: big-sur-xcode
+    # "cpu" and "memory" are invalid keywords for macOS tasks now
   env:
-    MAKEFLAGS: '-j 12' # macOS VMs always run on 12 cores
+    MAKEFLAGS: '-j 12'
     MATRIX_CC: clang # GCC is a symlink to Clang in macOS
   script:
     - brew update >/dev/null
