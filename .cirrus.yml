@@ -3,7 +3,7 @@ env:
   LIBPCAP_GIT: https://github.com/the-tcpdump-group/libpcap.git
 
 freebsd_task:
-  name: FBSD
+  name: FBSD+BM
   freebsd_instance:
     cpu: 4 # allows two concurrent FreeBSD tasks
     matrix:
@@ -13,16 +13,14 @@ freebsd_task:
   env:
     IGNORE_OSVERSION: yes
     MAKEFLAGS: -j 4
+    MATRIX_CC: clang gcc10
   script:
     - freebsd-version
-    - pkg install -qy git autoconf
-    - (cd .. && git clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT} && cd libpcap && ./configure --prefix=/tmp && make -s)
-    - touch .devel
-    - ./configure --prefix=/tmp
-    - make -s CFLAGS=-Werror all
-    - make check
-    - make install
-    - make releasetar
+    - pkg install -qy git autoconf gcc10
+    - pkg install -qy bash cmake # for build_matrix.sh and build.sh
+    - pkg install -qy pkgconf # for cmake, replaces pkg-config
+    - (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT})
+    - ./build_matrix.sh
 
 linux_task:
   name: LNX+BM
