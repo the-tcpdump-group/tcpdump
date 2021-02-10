@@ -7,11 +7,6 @@ language: c
 # careful adherence to the documentation, so it's useful for testing
 # that.
 #
-arch:
-  - amd64
-  - ppc64le
-  - s390x
-  - arm64
 
 os:
   - linux
@@ -51,15 +46,22 @@ dist: focal
 #
 # but we *have* no allow_failures jobs.
 #
+
 jobs:
   fast_finish: true
-  exclude:
-  - if: branch = coverity_scan
-    arch: ppc64le
-  - if: branch = coverity_scan
-    arch: s390x
-  - if: branch = coverity_scan
+  include:
+  - name: "amd64"
+    arch: amd64
+    if: branch = coverity_scan
+  - name: "arm64"
     arch: arm64
+    if: branch != coverity_scan
+  - name: "ppc64le"
+    arch: ppc64le
+    if: branch != coverity_scan
+  - name: "s390x"
+    arch: s390x
+    if: branch != coverity_scan
 
 cache: ccache
 
@@ -70,7 +72,7 @@ env:
     - secure: "DwUeukcRGl1vXNZDDt2237zCA58ZzmzWpCkPcb/Hpeh8OvRw1eBZJiu4L8iD2qtY4A/dPDvOeBiml5MF6bVri9Dui1yPkvkvFqIXzbK5CWS6Ye+NgSBNMwqnAjhTMv/x8I4Bvy9IhDGwj/2JXVUvjBddRMLRyr/ag+MDRB1IVAI="
     # Coverity run condition (avoid matrix multiple runs), need customized
     # build script. Need an update if new matrix cases.
-    - coverity_scan_run_condition='"$TRAVIS_CPU_ARCH" = amd64 -a "$TRAVIS_OS_NAME" = linux -a "$CC" = gcc -a "$REMOTE" = enable -a "$CMAKE" = no -a "$CRYPTO" = yes -a "$BUILD_LIBPCAP" = yes'
+    - coverity_scan_run_condition='"$TRAVIS_CPU_ARCH" = amd64 -a "$TRAVIS_OS_NAME" = linux -a "$CC" = gcc'
     # Coverity script test mode (if true no uploading, avoid reaching the quota)
     # usual processing: false.
     - coverity_scan_script_test_mode=false
