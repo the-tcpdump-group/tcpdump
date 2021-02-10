@@ -47,7 +47,7 @@ build_tcpdump() {
                 for SMB in ${MATRIX_SMB:-no yes}; do
                     export SMB
                     COUNT=$((COUNT+1))
-                    echo_magenta "===== SETUP $COUNT: build_libpcap=$BUILD_LIBPCAP remote:${REMOTE:-?} compiler:$CC cmake:$CMAKE crypto=$CRYPTO smb=$SMB ====="
+                    echo_magenta "===== SETUP $COUNT: build_libpcap:$BUILD_LIBPCAP remote:${REMOTE:-?} compiler:$CC cmake:$CMAKE crypto:$CRYPTO smb:$SMB ====="
                     # LABEL is needed to build the travis fold labels
                     LABEL="$BUILD_LIBPCAP.$REMOTE.$CC.$CMAKE.$CRYPTO.$SMB"
                     # Run one build with setup environment variables:
