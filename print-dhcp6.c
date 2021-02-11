@@ -408,11 +408,26 @@ dhcp6opt_print(netdissect_options *ndo,
 			ND_PRINT(" %u)", GET_BE_U_2(tp));
 			break;
 		case DH6OPT_RELAY_MSG:
+		    {
+			const u_char *snapend_save;
+
 			ND_PRINT(" (");
 			tp = (const u_char *)(dh6o + 1);
+			/*
+			 * Update the snapend to the end of the option before
+			 * calling recursively dhcp6_print() for the nested
+			 * packet. Other options may be present after the
+			 * nested DHCPv6 packet. This prevents that, in
+			 * dhcp6_print(), for the nested DHCPv6 packet, the
+			 * remaining length < remaining caplen.
+			 */
+			snapend_save = ndo->ndo_snapend;
+			ndo->ndo_snapend = ND_MIN(tp + optlen, ndo->ndo_snapend);
 			dhcp6_print(ndo, tp, optlen);
+			ndo->ndo_snapend = snapend_save;
 			ND_PRINT(")");
 			break;
+		    }
 		case DH6OPT_AUTH:
 			if (optlen < 11) {
 				ND_PRINT(" ?)");
