@@ -410,7 +410,17 @@ dhcp6opt_print(netdissect_options *ndo,
 		case DH6OPT_RELAY_MSG:
 			ND_PRINT(" (");
 			tp = (const u_char *)(dh6o + 1);
+			/*
+			 * Update the snapend to the end of the option before
+			 * calling recursively dhcp6_print() for the nested
+			 * packet. Other options may be present after the
+			 * nested DHCPv6 packet. This prevents that, in
+			 * dhcp6_print(), for the nested DHCPv6 packet, the
+			 * remaining length < remaining caplen.
+			 */
+			nd_push_snapend(ndo, tp + optlen);
 			dhcp6_print(ndo, tp, optlen);
+			nd_pop_packet_info(ndo);
 			ND_PRINT(")");
 			break;
 		case DH6OPT_AUTH:
