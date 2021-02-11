@@ -612,6 +612,10 @@ tcp_print(netdissect_options *ndo,
                                 break;
 
                         case TCPOPT_MPTCP:
+			    {
+                                const u_char *snapend_save;
+                                int ret;
+
                                 datalen = len - 2;
                                 LENCHECK(datalen);
                                 /* FIXME: Proof-read mptcp_print() and if it
@@ -619,9 +623,15 @@ tcp_print(netdissect_options *ndo,
                                  * only do ND_TCHECK_LEN() if it returned 0.
                                  */
                                 ND_TCHECK_LEN(cp, datalen);
-                                if (!mptcp_print(ndo, cp-2, len, flags))
+                                snapend_save = ndo->ndo_snapend;
+                                ndo->ndo_snapend = ND_MIN(cp - 2 + len,
+                                                          ndo->ndo_snapend);
+                                ret = mptcp_print(ndo, cp - 2, len, flags);
+                                ndo->ndo_snapend = snapend_save;
+                                if (!ret)
                                         goto bad;
                                 break;
+                            }
 
                         case TCPOPT_FASTOPEN:
                                 datalen = len - 2;
