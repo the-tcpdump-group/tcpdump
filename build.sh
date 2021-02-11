@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 
 # This script runs one build with setup environment variables: BUILD_LIBPCAP,
-# CC, CMAKE, CRYPTO and SMB
-# (default: BUILD_LIBPCAP=no, CC=gcc, CMAKE=no, CRYPTO=no, SMB=no).
+# REMOTE, CC, CMAKE, CRYPTO and SMB
+# (default: BUILD_LIBPCAP=no, REMOTE=no, CC=gcc, CMAKE=no, CRYPTO=no, SMB=no).
 
 set -e
 
 # BUILD_LIBPCAP: no or yes
 BUILD_LIBPCAP=${BUILD_LIBPCAP:-no}
+# REMOTE: no or yes
+REMOTE=${REMOTE:-no}
 # CC: gcc or clang
 CC=${CC:-gcc}
 # CMAKE: no or yes
@@ -37,7 +39,7 @@ run_after_echo() {
 }
 
 # LABEL is needed to build the travis fold labels
-LABEL="$BUILD_LIBPCAP.$CC.$CMAKE.$CRYPTO.$SMB"
+LABEL="$BUILD_LIBPCAP.$REMOTE.$CC.$CMAKE.$CRYPTO.$SMB"
 if [ "$CMAKE" = no ]; then
     echo '$ ./configure [...]'
     travis_fold start configure

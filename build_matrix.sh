@@ -2,12 +2,12 @@
 
 # This script executes the matrix loops, exclude tests and cleaning.
 # It calls the build.sh script which runs one build with setup environment
-# variables: BUILD_LIBPCAP, CC, CMAKE, CRYPTO and SMB
-# (default: BUILD_LIBPCAP=no, CC=gcc, CMAKE=no, CRYPTO=no, SMB=no).
+# variables: BUILD_LIBPCAP, REMOTE, CC, CMAKE, CRYPTO and SMB
+# (default: BUILD_LIBPCAP=no, REMOTE=no, CC=gcc, CMAKE=no, CRYPTO=no, SMB=no).
 # The matrix can be configured with environment variables
-# MATRIX_BUILD_LIBPCAP, MATRIX_CC, MATRIX_CMAKE, MATRIX_CRYPTO
+# MATRIX_BUILD_LIBPCAP, MATRIX_REMOTE, MATRIX_CC, MATRIX_CMAKE, MATRIX_CRYPTO
 # and MATRIX_SMB
-# (default: MATRIX_BUILD_LIBPCAP='no yes',
+# (default: MATRIX_BUILD_LIBPCAP='no yes', MATRIX_REMOTE='no yes',
 # MATRIX_CC='gcc clang', MATRIX_CMAKE='no yes', MATRIX_CRYPTO='no yes',
 # MATRIX_SMB='no yes').
 
@@ -47,11 +47,11 @@ build_tcpdump() {
                 for SMB in ${MATRIX_SMB:-no yes}; do
                     export SMB
                     COUNT=$((COUNT+1))
-                    echo_magenta "===== SETUP $COUNT: BUILD_LIBPCAP=$BUILD_LIBPCAP CC=$CC CMAKE=$CMAKE CRYPTO=$CRYPTO SMB=$SMB ====="
+                    echo_magenta "===== SETUP $COUNT: BUILD_LIBPCAP=$BUILD_LIBPCAP REMOTE=${REMOTE:-?} CC=$CC CMAKE=$CMAKE CRYPTO=$CRYPTO SMB=$SMB ====="
                     # LABEL is needed to build the travis fold labels
-                    LABEL="$BUILD_LIBPCAP.$CC.$CMAKE.$CRYPTO.$SMB"
+                    LABEL="$BUILD_LIBPCAP.$REMOTE.$CC.$CMAKE.$CRYPTO.$SMB"
                     # Run one build with setup environment variables:
-                    # BUILD_LIBPCAP, CC, CMAKE, CRYPTO and SMB
+                    # BUILD_LIBPCAP, REMOTE, CC, CMAKE, CRYPTO and SMB
                     ./build.sh
                     echo 'Cleaning...'
                     travis_fold start cleaning
@@ -75,7 +75,7 @@ choose_libpcap() {
         # Build libpcap with autoconf
         CMAKE_SAVE=$CMAKE
         CMAKE=no
-        echo_magenta "Build libpcap (CMAKE=$CMAKE)"
+        echo_magenta "Build libpcap (CMAKE=$CMAKE REMOTE=$REMOTE)"
         (cd ../libpcap && ./build.sh && make distclean)
         CMAKE=$CMAKE_SAVE
     fi
@@ -84,14 +84,20 @@ choose_libpcap() {
 touch .devel configure
 for BUILD_LIBPCAP in ${MATRIX_BUILD_LIBPCAP:-no yes}; do
 export BUILD_LIBPCAP
-    choose_libpcap
     if [ "$BUILD_LIBPCAP" = yes ]; then
-        # Set PKG_CONFIG_PATH for configure when building libpcap
-        if [ "$CMAKE" != no ]; then
-            export PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig
-        fi
+        for REMOTE in ${MATRIX_REMOTE:-no}; do
+            export REMOTE
+            choose_libpcap
+            # Set PKG_CONFIG_PATH for configure when building libpcap
+            if [ "$CMAKE" != no ]; then
+                export PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig
+            fi
+            build_tcpdump
+        done
+    else
+        choose_libpcap
+        build_tcpdump
     fi
-    build_tcpdump
 done
 
 rm -rf $PREFIX
