@@ -5,15 +5,21 @@ env:
 freebsd_task:
   name: FBSD+BM
   freebsd_instance:
-    cpu: 2 # up to 4 concurrent FreeBSD tasks
-    memory: 2G # fails to start with 1 GB
+    # FreeBSD fails to start with 1 GB. 8 CPUs max concurrency.
     matrix:
       - image_family: freebsd-11-4
+        cpu: 2
+        memory: 2G
       - image_family: freebsd-12-2
+        cpu: 2
+        memory: 2G
       - image_family: freebsd-13-0-snap
+        # This one is much slower than the others.
+        cpu: 4
+        memory: 4G
   env:
     IGNORE_OSVERSION: yes
-    MAKEFLAGS: -j 3
+    MAKEFLAGS: -j 4
     MATRIX_CC: clang gcc10
   script:
     - freebsd-version
@@ -26,7 +32,8 @@ freebsd_task:
 linux_task:
   name: LNX+BM
   container:
-    cpu: 4 # up to 2 concurrent Linux tasks
+    # Linux works just fine with 1 GB. 16 CPUs max concurrency.
+    cpu: 4
     memory: 1G
     image: ubuntu:20.04
   env:
