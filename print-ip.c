@@ -471,8 +471,18 @@ ip_print(netdissect_options *ndo,
 				     GET_IPADDR_STRING(ip->ip_src),
 				     GET_IPADDR_STRING(ip->ip_dst));
 		}
+		/*
+		 * Do a bounds check before calling ip_demux_print().
+		 * At least the header data is required.
+		 */
+		if (!ND_TTEST_LEN((const u_char *)ip, hlen)) {
+			ND_PRINT(" [remaining caplen(%u) < header length(%u)]",
+				 ND_BYTES_AVAILABLE_AFTER((const u_char *)ip),
+				 hlen);
+			nd_trunc_longjmp(ndo);
+		}
 		ip_demux_print(ndo, (const u_char *)ip + hlen, len, 4,
-		    off & IP_MF, GET_U_1(ip->ip_ttl), nh, bp);
+			       off & IP_MF, GET_U_1(ip->ip_ttl), nh, bp);
 	} else {
 		/*
 		 * Ultra quiet now means that all this stuff should be
