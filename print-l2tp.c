@@ -807,6 +807,8 @@ l2tp_print(netdissect_options *ndo, const u_char *dat, u_int length)
 
 	if (flag_o) {	/* Offset Size */
 		pad =  GET_BE_U_2(ptr);
+		/* Offset padding octets in packet buffer? */
+		ND_TCHECK_LEN(ptr + 2, pad);
 		ptr += (2 + pad);
 		cnt += (2 + pad);
 	}
