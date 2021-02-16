@@ -146,8 +146,8 @@ static const struct tok bfd_diag_values[] = {
 static const struct tok bfd_port_values[] = {
     { BFD_CONTROL_PORT,  "Control" },
     { BFD_MULTIHOP_PORT, "Multihop" },
-    { BFD_LAG_PORT,      "Lag" },
-    { SBFD_PORT,         "Sbfd" },
+    { BFD_LAG_PORT,      "LAG" },
+    { SBFD_PORT,         "S-BFD" },
     { 0, NULL }
 };
 

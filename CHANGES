@@ -9,6 +9,7 @@ Monthday, Month DD, YYYY by gharris and denis
       MPLS: Rename the "exp" field to "tc".
       VQP: Do not print unknown error codes twice.
       ZMTP: Replace custom code with bittok2str().
+      BFD: Add support for S-BFD and spell LAG in uppercase.
     Source code:
       Use %zu when printing a sizeof to squelch compiler warnings
       (FIXME: somebody please wrap the line below just before the release)
