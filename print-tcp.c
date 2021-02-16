@@ -624,6 +624,13 @@ tcp_print(netdissect_options *ndo,
                                  * only do ND_TCHECK_LEN() if it returned 0.
                                  */
                                 ND_TCHECK_LEN(cp, datalen);
+                                /* Update the snapend to the end of the option
+                                 * before calling mptcp_print(). Some options
+                                 * (MPTCP or others) may be present after a
+                                 * MPTCP option. This prevents that, in
+                                 * mptcp_print(), the remaining length < the
+                                 * remaining caplen.
+                                 */
                                 snapend_save = ndo->ndo_snapend;
                                 ndo->ndo_snapend = ND_MIN(cp - 2 + len,
                                                           ndo->ndo_snapend);
