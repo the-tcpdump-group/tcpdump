@@ -1,23 +1,66 @@
 env:
   CIRRUS_CLONE_DEPTH: 3 # The internal git client reads CIRRUS_CLONE_DEPTH.
-  MAKEFLAGS: '-j 2' # The build VMs currently have two CPU cores.
-  IGNORE_OSVERSION: yes
+  LIBPCAP_GIT: https://github.com/the-tcpdump-group/libpcap.git
 
-task:
+freebsd_task:
+  name: FBSD+BM
   freebsd_instance:
-    image_family: $IMAGE_FAMILY
-  env:
+    # FreeBSD fails to start with 1 GB. 8 CPUs max concurrency.
     matrix:
-      - IMAGE_FAMILY: freebsd-11-4
-      - IMAGE_FAMILY: freebsd-12-2
-      - IMAGE_FAMILY: freebsd-13-0-snap
+      - image_family: freebsd-11-4
+        cpu: 2
+        memory: 2G
+      - image_family: freebsd-12-2
+        cpu: 2
+        memory: 2G
+      - image_family: freebsd-13-0-snap
+        # This one is much slower than the others.
+        cpu: 4
+        memory: 4G
+  env:
+    IGNORE_OSVERSION: yes
+    MAKEFLAGS: -j 4
+    MATRIX_CC: clang gcc10
   script:
     - freebsd-version
-    - pkg install -qy git autoconf
-    - (cd .. && git clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure --prefix=/tmp && make -s)
-    - touch .devel
-    - ./configure --prefix=/tmp
-    - make -s CFLAGS=-Werror all
-    - make check
-    - make install
-    - make releasetar
+    - pkg install -qy git autoconf gcc10
+    - pkg install -qy bash cmake # for build_matrix.sh and build.sh
+    - pkg install -qy pkgconf # for cmake, replaces pkg-config
+    - (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT})
+    - ./build_matrix.sh
+
+linux_task:
+  name: LNX+BM
+  container:
+    # Linux works just fine with 1 GB. 16 CPUs max concurrency.
+    cpu: 4
+    memory: 1G
+    image: ubuntu:20.04
+  env:
+    DEBIAN_FRONTEND: noninteractive
+    MAKEFLAGS: -j 5
+    matrix:
+      - MATRIX_CC: gcc
+      - MATRIX_CC: clang
+  script:
+    - apt-get -qy update
+    - apt-get -qy install git autoconf make cmake clang gcc
+    - apt-get -qy install flex bison libdbus-1-dev libbluetooth-dev libnl-genl-3-dev libibverbs-dev # for libpcap
+    - apt-get -qy install libssl-dev libsmi2-dev libcap-ng-dev libpcap-dev
+    - apt list --installed 'lib*-dev'
+    - (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT})
+    - ./build_matrix.sh
+
+macos_task:
+  name: MAC+BM
+  macos_instance:
+    image: big-sur-xcode
+    # "cpu" and "memory" are invalid keywords for macOS tasks now
+  env:
+    MAKEFLAGS: '-j 12'
+    MATRIX_CC: clang # GCC is a symlink to Clang in macOS
+  script:
+    - brew update >/dev/null
+    - brew install libsmi | grep -v '%'
+    - (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT})
+    - ./build_matrix.sh
