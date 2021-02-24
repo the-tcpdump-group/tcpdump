@@ -196,6 +196,13 @@ ip6_opt_process(netdissect_options *ndo, const u_char *bp, int len,
 		ND_PRINT(")");
 	    }
 	    break;
+	case IP6OPT_TPF:
+	    if (GET_U_1(bp + 1) != 4) {
+		ND_PRINT("Tunnel Payload Forwarding option: invalid len");
+		goto trunc;
+	    }
+	    ND_PRINT("Tunnel Payload Forwarding (TPF) option");
+	    break;
 	default:
 	    if (len - i < IP6OPT_MINLEN) {
 		ND_PRINT("(type %u: trunc)", GET_U_1(bp + i));
