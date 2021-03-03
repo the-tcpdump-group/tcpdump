@@ -1,58 +1,23 @@
+git:
+  quiet: true
+  depth: 3
+
+os: linux
+dist: focal # Ubuntu 20.04
 language: c
+cache: ccache
 
 #
-# Try building on these 4 architectures; all are 64-bit, and all but
+# Try building on these architectures; all are 64-bit, and all but
 # "s390x", a/k/a z/Architecture, are little-endian. The crypto library
 # on little-endian PowerPC/Power ISA does some things that require more
 # careful adherence to the documentation, so it's useful for testing
 # that.
 #
 
-os:
-  - linux
-
-dist: focal
-
-#
-# Linux runs on all of the architectures listed above; macOS runs on
-# 64-bit x86 and 64-bit ARM, but Travis doesn't currently have a 64-bit
-# ARM macOS build environment.  Suppress the macOS builds that don't work.
-#
-# In addition, with newer versions of macOS, Apple ships a "gcc" that's
-# just another front end to Clang, presumably for backwards
-# compatibility with build scripts etc. that expect the compiler to be
-# "gcc", so don't bother doing "gcc" builds on macOS.
-#
-# Furthermore, the Coverity-branch builds seem to time out on the
-# non-x86 platforms, so suppress them as well.  (Are they supported
-# at all?)
-#
-# XXX - what is the fast_finish clause there for?  According to
-#
-#    https://docs.travis-ci.com/user/build-matrix/#fast-finishing
-#
-# "If some rows in the build matrix are allowed to fail, the build
-# won't be marked as finished until they have completed.
-#
-# To mark the build as finished as soon as possible, add fast_finish:
-# true to the jobs section of your .travis.yml like this:
-#
-# jobs:
-#   fast_finish: true
-#
-# Now, the build result will be determined as soon as all the required
-# jobs finish, based on these results, while the rest of the
-# allow_failures jobs continue to run."
-#
-# but we *have* no allow_failures jobs.
-#
-
 jobs:
   fast_finish: true
   include:
-  - name: "arm64"
-    arch: arm64
-    if: branch IN (master, tcpdump-4.99)
   - name: "ppc64le"
     arch: ppc64le
     if: branch IN (master, tcpdump-4.99)
@@ -61,8 +26,6 @@ jobs:
     if: branch IN (master, tcpdump-4.99)
   allow_failures:
     - arch: ppc64le # Since 20 Feb 2021 often times out trying to boot.
-
-cache: ccache
 
 env:
   global:
@@ -80,18 +43,10 @@ addons:
       - libcap-ng-dev
       - libpcap-dev
 
-git:
-  quiet: true
-  depth: 3
-
-before_install:
+script:
   - uname -a
   - date
   - gem install travis-conditions
-  - if [ "$TRAVIS_OS_NAME" = linux ]; then apt list --installed 'lib*-dev'; fi
-
-before_script:
+  - apt list --installed 'lib*-dev'
   - (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth 3 --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git)
-
-script:
   - ./build_matrix.sh
