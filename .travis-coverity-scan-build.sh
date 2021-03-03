@@ -109,8 +109,8 @@ response=$(curl \
   --form description="$VERSION_SHA" \
   $UPLOAD_URL)
 status_code=$(echo "$response" | sed -n '$p')
-if [ "$status_code" != "201" ]; then
+if [ "$status_code" != "200" ] && [ "$status_code" != "201" ]; then
   TEXT=$(echo "$response" | sed '$d')
-  echo -e "\033[33;1mCoverity Scan upload failed: $TEXT.\033[0m"
+  echo -e "\033[33;1mCoverity Scan upload failed with HTTP status code '$status_code': $TEXT.\033[0m"
   exit 1
 fi
