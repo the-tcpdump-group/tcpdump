@@ -4,6 +4,7 @@ env:
 
 freebsd_task:
   name: FBSD+BM
+  only_if: $CIRRUS_BRANCH == master || $CIRRUS_BRANCH == tcpdump-4.99
   freebsd_instance:
     # FreeBSD fails to start with 1 GB. 8 CPUs max concurrency.
     matrix:
@@ -31,6 +32,7 @@ freebsd_task:
 
 linux_task:
   name: LNX+BM
+  only_if: $CIRRUS_BRANCH == master || $CIRRUS_BRANCH == tcpdump-4.99
   container:
     # Linux works just fine with 1 GB. 16 CPUs max concurrency.
     cpu: 4
@@ -53,6 +55,7 @@ linux_task:
 
 macos_task:
   name: MAC+BM
+  only_if: $CIRRUS_BRANCH == master || $CIRRUS_BRANCH == tcpdump-4.99
   macos_instance:
     image: big-sur-xcode
     # "cpu" and "memory" are invalid keywords for macOS tasks now
@@ -64,3 +67,28 @@ macos_task:
     - brew install libsmi | grep -v '%'
     - (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT})
     - ./build_matrix.sh
+
+coverity_task:
+  name: Coverity Scan
+  only_if: $CIRRUS_BRANCH == coverity_scan
+  container:
+    cpu: 4
+    memory: 2G
+    image: ubuntu:20.04
+  env:
+    DEBIAN_FRONTEND: noninteractive
+    MAKEFLAGS: -j 5
+    COVERITY_SCAN_PROJECT_NAME: $CIRRUS_REPO_FULL_NAME
+    COVERITY_SCAN_TOKEN: ENCRYPTED[1b6f994cabfe74267ce2dce81fd9e49f694e9cfe69fb99f7d1580907bec1266efd7b38df3a47ccab53d5af98636f8e9c]
+    COVERITY_SCAN_BUILD_COMMAND_PREPEND: ./configure
+    COVERITY_SCAN_BUILD_COMMAND: make
+    COVERITY_SCAN_BRANCH_PATTERN: $CIRRUS_BRANCH
+    TRAVIS_BRANCH: $CIRRUS_BRANCH
+    TRAVIS_PULL_REQUEST: ${CIRRUS_BASE_BRANCH:+true}
+  script:
+    - apt-get -qy update
+    - apt-get -qy install autoconf make gcc
+    - apt-get -qy install libssl-dev libsmi2-dev libcap-ng-dev libpcap-dev
+    - apt-get -qy install git curl wget ruby rubygems ruby-json # for the coverity script
+    - apt list --installed 'lib*-dev'
+    - /bin/bash .travis-coverity-scan-build.sh # Not executable, depends on bashisms.
