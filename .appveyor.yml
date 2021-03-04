@@ -2,6 +2,11 @@ version: '{build}'
 
 clone_depth: 5
 
+branches:
+  only:
+    - master
+    - tcpdump-4.99
+
 matrix:
   fast_finish: true
 
