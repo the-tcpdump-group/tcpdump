@@ -20,10 +20,10 @@ jobs:
   include:
   - name: "ppc64le"
     arch: ppc64le
-    if: branch IN (master, tcpdump-4.99)
+    if: branch != coverity_scan
   - name: "s390x"
     arch: s390x
-    if: branch IN (master, tcpdump-4.99)
+    if: branch != coverity_scan
   allow_failures:
     - arch: ppc64le # Since 20 Feb 2021 often times out trying to boot.
 
