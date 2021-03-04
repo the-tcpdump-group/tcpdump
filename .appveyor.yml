@@ -3,9 +3,8 @@ version: '{build}'
 clone_depth: 5
 
 branches:
-  only:
-    - master
-    - tcpdump-4.99
+  except:
+    - coverity_scan
 
 matrix:
   fast_finish: true

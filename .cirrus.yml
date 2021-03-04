@@ -4,7 +4,7 @@ env:
 
 freebsd_task:
   name: FBSD+BM
-  only_if: $CIRRUS_BRANCH == master || $CIRRUS_BRANCH == tcpdump-4.99
+  only_if: $CIRRUS_BRANCH != coverity_scan
   freebsd_instance:
     # FreeBSD fails to start with 1 GB. 8 CPUs max concurrency.
     matrix:
@@ -32,7 +32,7 @@ freebsd_task:
 
 linux_task:
   name: LNX+BM
-  only_if: $CIRRUS_BRANCH == master || $CIRRUS_BRANCH == tcpdump-4.99
+  only_if: $CIRRUS_BRANCH != coverity_scan
   container:
     # Linux works just fine with 1 GB. 16 CPUs max concurrency.
     cpu: 4
@@ -55,7 +55,7 @@ linux_task:
 
 macos_task:
   name: MAC+BM
-  only_if: $CIRRUS_BRANCH == master || $CIRRUS_BRANCH == tcpdump-4.99
+  only_if: $CIRRUS_BRANCH != coverity_scan
   macos_instance:
     image: big-sur-xcode
     # "cpu" and "memory" are invalid keywords for macOS tasks now
