@@ -21,7 +21,7 @@ SMB=${SMB:-no}
 # Install directory prefix
 PREFIX=/tmp/local
 # For TESTrun
-export TCPDUMP_BIN=/tmp/local/bin/tcpdump
+export TCPDUMP_BIN=$PREFIX/bin/tcpdump
 
 travis_fold() {
     local action="$1"
