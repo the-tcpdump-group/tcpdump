@@ -428,6 +428,7 @@ install: all
 
 uninstall:
 	rm -f $(DESTDIR)$(bindir)/$(PROG)
+	rm -f $(DESTDIR)$(bindir)/$(PROG).`cat ${srcdir}/VERSION`
 	rm -f $(DESTDIR)$(mandir)/man1/$(PROG).1
 
 lint:
