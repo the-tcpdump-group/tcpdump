@@ -70,7 +70,7 @@ build_tcpdump() {
 choose_libpcap() {
     if [ "$BUILD_LIBPCAP" = no ]; then
         echo_magenta 'Use system libpcap'
-        rm -rf /tmp/local
+        rm -rf $PREFIX
     else
         # Build libpcap with autoconf
         CMAKE_SAVE=$CMAKE
