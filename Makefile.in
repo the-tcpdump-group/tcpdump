@@ -436,7 +436,7 @@ lint:
 	    grep -v 'possible pointer alignment problem'
 
 clean:
-	rm -f $(CLEANFILES) $(PROG)-`cat VERSION`.tar.gz
+	rm -f $(CLEANFILES) $(PROG)-`cat ${srcdir}/VERSION`.tar.gz
 
 distclean:
 	rm -f $(CLEANFILES) Makefile config.cache config.log config.status \
