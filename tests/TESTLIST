@@ -508,7 +508,7 @@ bfd-raw-auth-sha1 bfd-raw-auth-sha1.pcap bfd-raw-auth-sha1.out
 bfd-raw-auth-sha1-v bfd-raw-auth-sha1.pcap bfd-raw-auth-sha1-v.out -v
 
 # bad packets from Hanno Böck
-heap-overflow-1	heap-overflow-1.pcap		heap-overflow-1.out	-v
+# heap-overflow-1 is in non-bsd.tests
 heap-overflow-2	heap-overflow-2.pcap		heap-overflow-2.out	-v
 heapoverflow-atalk_print	heapoverflow-atalk_print.pcap	heapoverflow-atalk_print.out	-v
 heapoverflow-EXTRACT_16BITS	heapoverflow-EXTRACT_16BITS.pcap	heapoverflow-EXTRACT_16BITS.out	-v
