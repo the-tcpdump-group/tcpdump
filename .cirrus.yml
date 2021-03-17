@@ -3,7 +3,7 @@ env:
   LIBPCAP_GIT: https://github.com/the-tcpdump-group/libpcap.git
 
 freebsd_task:
-  name: FBSD+BM
+  name: freebsd-amd64
   only_if: $CIRRUS_BRANCH != 'coverity_scan'
   freebsd_instance:
     # FreeBSD fails to start with 1 GB. 8 CPUs max concurrency.
@@ -31,7 +31,7 @@ freebsd_task:
     - ./build_matrix.sh
 
 linux_task:
-  name: LNX+BM
+  name: linux-amd64
   only_if: $CIRRUS_BRANCH != 'coverity_scan'
   container:
     # Linux works just fine with 1 GB. 16 CPUs max concurrency.
@@ -54,7 +54,7 @@ linux_task:
     - ./build_matrix.sh
 
 macos_task:
-  name: MAC+BM
+  name: macos-amd64
   only_if: $CIRRUS_BRANCH != 'coverity_scan'
   macos_instance:
     image: big-sur-xcode
