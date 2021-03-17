@@ -77,6 +77,7 @@
         #define NEED_NETINET_IF_ETHER_H
       #else /* HAVE_STRUCT_ETHER_ADDR */
 	struct ether_addr {
+		/* Beware FreeBSD calls this "octet". */
 		unsigned char ether_addr_octet[MAC_ADDR_LEN];
 	};
       #endif /* HAVE_STRUCT_ETHER_ADDR */
@@ -601,8 +602,15 @@ etheraddr_string(netdissect_options *ndo, const uint8_t *ep)
 #ifdef USE_ETHER_NTOHOST
 	if (!ndo->ndo_nflag) {
 		char buf2[BUFSIZE];
+		/*
+		 * This is a non-const copy of ep for ether_ntohost(), which
+		 * has its second argument non-const in OpenBSD. Also saves a
+		 * type cast.
+		 */
+		struct ether_addr ea;
 
-		if (ether_ntohost(buf2, (const struct ether_addr *)ep) == 0) {
+		memcpy (&ea, ep, MAC_ADDR_LEN);
+		if (ether_ntohost(buf2, &ea) == 0) {
 			tp->e_name = strdup(buf2);
 			if (tp->e_name == NULL)
 				(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
@@ -977,7 +985,10 @@ init_etherarray(netdissect_options *ndo)
 		/*
 		 * Use YP/NIS version of name if available.
 		 */
-		if (ether_ntohost(name, (const struct ether_addr *)el->addr) == 0) {
+		/* Same workaround as in etheraddr_string(). */
+		struct ether_addr ea;
+		memcpy (&ea, el->addr, MAC_ADDR_LEN);
+		if (ether_ntohost(name, &ea) == 0) {
 			tp->e_name = strdup(name);
 			if (tp->e_name == NULL)
 				(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
