@@ -386,7 +386,16 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	 * bigger lengths.
 	 */
 
-	ts_print(ndo, &h->ts);
+	/*
+	 * The header /usr/include/pcap/pcap.h in OpenBSD declares h->ts as
+	 * struct bpf_timeval, not struct timeval. The former comes from
+	 * /usr/include/net/bpf.h and uses 32-bit unsigned types instead of
+	 * the types used in struct timeval.
+	 */
+	struct timeval tvbuf;
+	tvbuf.tv_sec = h->ts.tv_sec;
+	tvbuf.tv_usec = h->ts.tv_usec;
+	ts_print(ndo, &tvbuf);
 
 	/*
 	 * Printers must check that they're not walking off the end of
