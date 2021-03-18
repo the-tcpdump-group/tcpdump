@@ -71,12 +71,13 @@ choose_libpcap() {
     if [ "$BUILD_LIBPCAP" = no ]; then
         echo_magenta 'Use system libpcap'
         rm -rf $PREFIX
+        make -C ../libpcap distclean || :
     else
         # Build libpcap with autoconf
         CMAKE_SAVE=$CMAKE
         CMAKE=no
         echo_magenta "Build libpcap (CMAKE=$CMAKE REMOTE=$REMOTE)"
-        (cd ../libpcap && ./build.sh && make distclean)
+        (cd ../libpcap && ./build.sh)
         CMAKE=$CMAKE_SAVE
     fi
 }
