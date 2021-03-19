@@ -478,6 +478,8 @@ mptcp_print(netdissect_options *ndo,
         subtype = MPTCP_OPT_SUBTYPE(GET_U_1(opt->sub_etc));
         subtype = ND_MIN(subtype, MPTCP_SUB_FCLOSE + 1);
 
+        ND_PRINT(" %u", len);
+
         ND_PRINT(" %s", mptcp_options[subtype].name);
         return mptcp_options[subtype].print(ndo, cp, len, flags);
 }
