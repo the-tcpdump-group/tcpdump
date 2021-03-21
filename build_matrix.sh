@@ -16,13 +16,19 @@ set -e
 # ANSI color escape sequences
 ANSI_MAGENTA="\\033[35;1m"
 ANSI_RESET="\\033[0m"
+uname -a
+date
 # Install directory prefix
-PREFIX=/tmp/local
+if [ -z "$PREFIX" ]; then
+    PREFIX=$(mktemp -d -t tcpdump_build_matrix_XXXXXXXX)
+    echo "PREFIX set to '$PREFIX'"
+    export PREFIX
+fi
 COUNT=0
 
 travis_fold() {
-    local action="$1"
-    local name="$2"
+    local action=${1:?}
+    local name=${2:?}
     if [ "$TRAVIS" != true ]; then return; fi
     echo -ne "travis_fold:$action:$LABEL.script.$name\\r"
     sleep 1
@@ -38,8 +44,11 @@ echo_magenta() {
 build_tcpdump() {
     for CC in ${MATRIX_CC:-gcc clang}; do
         export CC
-        # Exclude gcc on OSX (it is just an alias for clang)
-        if [ "$CC" = gcc ] && [ "$TRAVIS_OS_NAME" = osx ]; then continue; fi
+        # Exclude gcc on macOS (it is just an alias for clang).
+        if [ "$CC" = gcc ] && [ "$(uname -s)" = Darwin ]; then
+            echo '(skipped)'
+            continue
+        fi
         for CMAKE in ${MATRIX_CMAKE:-no yes}; do
             export CMAKE
             for CRYPTO in ${MATRIX_CRYPTO:-no yes}; do
@@ -56,7 +65,7 @@ build_tcpdump() {
                     echo 'Cleaning...'
                     travis_fold start cleaning
                     if [ "$CMAKE" = yes ]; then rm -rf build; else make distclean; fi
-                    rm -rf $PREFIX/bin/tcpdump*
+                    rm -rf "$PREFIX"/bin/tcpdump*
                     git status -suall
                     # Cancel changes in configure
                     git checkout configure
@@ -70,7 +79,7 @@ build_tcpdump() {
 choose_libpcap() {
     if [ "$BUILD_LIBPCAP" = no ]; then
         echo_magenta 'Use system libpcap'
-        rm -rf $PREFIX
+        rm -rf "$PREFIX"/*
         make -C ../libpcap distclean || :
     else
         # Build libpcap with autoconf
@@ -91,7 +100,7 @@ export BUILD_LIBPCAP
             choose_libpcap
             # Set PKG_CONFIG_PATH for configure when building libpcap
             if [ "$CMAKE" != no ]; then
-                export PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig
+                export PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig"
             fi
             build_tcpdump
         done
@@ -101,6 +110,6 @@ export BUILD_LIBPCAP
     fi
 done
 
-rm -rf $PREFIX
+rm -rf "$PREFIX"
 echo_magenta "Tested setup count: $COUNT"
 # vi: set tabstop=4 softtabstop=0 expandtab shiftwidth=4 smarttab autoindent :

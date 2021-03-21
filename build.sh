@@ -12,6 +12,9 @@ BUILD_LIBPCAP=${BUILD_LIBPCAP:-no}
 REMOTE=${REMOTE:-no}
 # CC: gcc or clang
 CC=${CC:-gcc}
+# GCC and Clang recognize --version and print to stdout. Sun compilers
+# recognize -V and print to stderr.
+"$CC" --version 2>/dev/null || "$CC" -V || :
 # CMAKE: no or yes
 CMAKE=${CMAKE:-no}
 # CRYPTO: no or yes
@@ -19,13 +22,16 @@ CRYPTO=${CRYPTO:-no}
 # SMB: no or yes
 SMB=${SMB:-no}
 # Install directory prefix
-PREFIX=/tmp/local
+if [ -z "$PREFIX" ]; then
+    PREFIX=$(mktemp -d -t tcpdump_build_XXXXXXXX)
+    echo "PREFIX set to '$PREFIX'"
+fi
 # For TESTrun
-export TCPDUMP_BIN=$PREFIX/bin/tcpdump
+export TCPDUMP_BIN="$PREFIX/bin/tcpdump"
 
 travis_fold() {
-    local action="$1"
-    local name="$2"
+    local action=${1:?}
+    local name=${2:?}
     if [ "$TRAVIS" != true ]; then return; fi
     echo -ne "travis_fold:$action:$LABEL.script.$name\\r"
     sleep 1
@@ -45,10 +51,10 @@ if [ "$CMAKE" = no ]; then
     travis_fold start configure
     if [ "$BUILD_LIBPCAP" = yes ]; then
         echo "Using PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
-        ./configure --with-crypto="$CRYPTO" --enable-smb="$SMB" --prefix=$PREFIX
-        export LD_LIBRARY_PATH=$PREFIX/lib
+        ./configure --with-crypto="$CRYPTO" --enable-smb="$SMB" --prefix="$PREFIX"
+        export LD_LIBRARY_PATH="$PREFIX/lib"
     else
-        ./configure --disable-local-libpcap --with-crypto="$CRYPTO" --enable-smb="$SMB" --prefix=$PREFIX
+        ./configure --disable-local-libpcap --with-crypto="$CRYPTO" --enable-smb="$SMB" --prefix="$PREFIX"
     fi
     travis_fold end configure
 else
@@ -58,10 +64,10 @@ else
     echo '$ cmake [...]'
     travis_fold start cmake
     if [ "$BUILD_LIBPCAP" = yes ]; then
-        cmake -DWITH_CRYPTO="$CRYPTO" -DENABLE_SMB="$SMB" -DCMAKE_PREFIX_PATH=$PREFIX -DCMAKE_INSTALL_PREFIX=$PREFIX ..
-        export LD_LIBRARY_PATH=$PREFIX/lib
+        cmake -DWITH_CRYPTO="$CRYPTO" -DENABLE_SMB="$SMB" -DCMAKE_PREFIX_PATH="$PREFIX" -DCMAKE_INSTALL_PREFIX="$PREFIX" ..
+        export LD_LIBRARY_PATH="$PREFIX/lib"
     else
-        cmake -DWITH_CRYPTO="$CRYPTO" -DENABLE_SMB="$SMB" -DCMAKE_INSTALL_PREFIX=$PREFIX ..
+        cmake -DWITH_CRYPTO="$CRYPTO" -DENABLE_SMB="$SMB" -DCMAKE_INSTALL_PREFIX="$PREFIX" ..
     fi
     travis_fold end cmake
 fi
@@ -111,11 +117,7 @@ fi
 if [ "$TRAVIS" = true ] && [ -n "$DEBUG_BUILD" ] ; then
     echo '$ cat Makefile [...]'
     travis_fold start cat_makefile
-    if [ "$CMAKE" = no ]; then
-        sed -n '1,/DO NOT DELETE THIS LINE -- mkdep uses it/p' < Makefile
-    else
-        cat Makefile
-    fi
+    sed '/DO NOT DELETE THIS LINE -- mkdep uses it/q' < Makefile
     travis_fold end cat_makefile
     echo '$ cat config.h'
     travis_fold start cat_config_h
@@ -127,5 +129,8 @@ if [ "$TRAVIS" = true ] && [ -n "$DEBUG_BUILD" ] ; then
         cat config.log
         travis_fold end cat_config_log
     fi
+fi
+if [ "$DELETE_PREFIX" = yes ]; then
+    rm -rf "$PREFIX"
 fi
 # vi: set tabstop=4 softtabstop=0 expandtab shiftwidth=4 smarttab autoindent :
