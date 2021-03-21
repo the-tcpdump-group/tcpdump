@@ -23,7 +23,6 @@ freebsd_task:
     MAKEFLAGS: -j 4
     MATRIX_CC: clang gcc10
   script:
-    - freebsd-version
     - pkg install -qy git autoconf gcc10
     - pkg install -qy bash cmake # for build_matrix.sh and build.sh
     - pkg install -qy pkgconf # for cmake, replaces pkg-config
@@ -61,7 +60,6 @@ macos_task:
     # "cpu" and "memory" are invalid keywords for macOS tasks now
   env:
     MAKEFLAGS: '-j 12'
-    MATRIX_CC: clang # GCC is a symlink to Clang in macOS
   script:
     - brew update >/dev/null
     - brew install libsmi | grep -v '%'
