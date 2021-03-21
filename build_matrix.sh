@@ -76,28 +76,15 @@ build_tcpdump() {
     done
 }
 
-choose_libpcap() {
-    if [ "$BUILD_LIBPCAP" = no ]; then
-        echo_magenta 'Use system libpcap'
-        rm -rf "$PREFIX"/*
-        make -C ../libpcap distclean || :
-    else
-        # Build libpcap with autoconf
-        CMAKE_SAVE=$CMAKE
-        CMAKE=no
-        echo_magenta "Build libpcap (CMAKE=$CMAKE REMOTE=$REMOTE)"
-        (cd ../libpcap && ./build.sh)
-        CMAKE=$CMAKE_SAVE
-    fi
-}
-
 touch .devel configure
 for BUILD_LIBPCAP in ${MATRIX_BUILD_LIBPCAP:-no yes}; do
-export BUILD_LIBPCAP
+    export BUILD_LIBPCAP
     if [ "$BUILD_LIBPCAP" = yes ]; then
         for REMOTE in ${MATRIX_REMOTE:-no}; do
             export REMOTE
-            choose_libpcap
+            # Build libpcap with Autoconf.
+            echo_magenta "Build libpcap (CMAKE=no REMOTE=$REMOTE)"
+            (cd ../libpcap && CMAKE=no ./build.sh)
             # Set PKG_CONFIG_PATH for configure when building libpcap
             if [ "$CMAKE" != no ]; then
                 export PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig"
@@ -105,7 +92,9 @@ export BUILD_LIBPCAP
             build_tcpdump
         done
     else
-        choose_libpcap
+        echo_magenta 'Use system libpcap'
+        rm -rf "$PREFIX"/*
+        make -C ../libpcap distclean || :
         build_tcpdump
     fi
 done
