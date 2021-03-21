@@ -92,4 +92,4 @@ coverity_task:
     - apt-get -qy install libssl-dev libsmi2-dev libcap-ng-dev libpcap-dev
     - apt-get -qy install git curl wget ruby rubygems ruby-json # for the coverity script
     - apt list --installed 'lib*-dev'
-    - /bin/bash .travis-coverity-scan-build.sh # Not executable, depends on bashisms.
+    - ./.travis-coverity-scan-build.sh
