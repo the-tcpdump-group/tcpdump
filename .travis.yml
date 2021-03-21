@@ -44,7 +44,7 @@ addons:
       - libpcap-dev
 
 script:
-  - gem install travis-conditions
   - apt list --installed 'lib*-dev'
-  - (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth 3 --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git)
+  - echo '$ git clone [...] libpcap.git'
+  - git -C .. clone --depth 3 --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git
   - ./build_matrix.sh

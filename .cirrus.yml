@@ -26,7 +26,8 @@ freebsd_task:
     - pkg install -qy git autoconf gcc10
     - pkg install -qy bash cmake # for build_matrix.sh and build.sh
     - pkg install -qy pkgconf # for cmake, replaces pkg-config
-    - (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT})
+    - echo '$ git clone [...] libpcap.git'
+    - git -C .. clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT}
     - ./build_matrix.sh
 
 linux_task:
@@ -49,7 +50,8 @@ linux_task:
     - apt-get -qy install flex bison libdbus-1-dev libbluetooth-dev libnl-genl-3-dev libibverbs-dev # for libpcap
     - apt-get -qy install libssl-dev libsmi2-dev libcap-ng-dev libpcap-dev
     - apt list --installed 'lib*-dev'
-    - (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT})
+    - echo '$ git clone [...] libpcap.git'
+    - git -C .. clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT}
     - ./build_matrix.sh
 
 macos_task:
@@ -63,7 +65,8 @@ macos_task:
   script:
     - brew update >/dev/null
     - brew install libsmi | grep -v '%'
-    - (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT})
+    - echo '$ git clone [...] libpcap.git'
+    - git -C .. clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT}
     - ./build_matrix.sh
 
 coverity_task:
