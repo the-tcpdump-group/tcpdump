@@ -71,6 +71,7 @@ struct mp_capable {
         nd_uint8_t     flags;
         nd_uint64_t    sender_key;
         nd_uint64_t    receiver_key;
+        nd_uint16_t    data_len;
 };
 
 #define MP_CAPABLE_OPT_VERSION(sub_ver) (((sub_ver) >> 0) & 0xF)
@@ -218,10 +219,10 @@ mp_capable_print(netdissect_options *ndo,
                  const u_char *opt, u_int opt_len, u_char flags)
 {
         const struct mp_capable *mpc = (const struct mp_capable *) opt;
-        uint8_t version;
+        uint8_t version, csum_enabled;
 
         if (!((opt_len == 12 || opt_len == 4) && flags & TH_SYN) &&
-            !((opt_len == 20 || opt_len == 22) && (flags & (TH_SYN | TH_ACK)) ==
+            !((opt_len == 20 || opt_len == 22 || opt_len == 24) && (flags & (TH_SYN | TH_ACK)) ==
               TH_ACK))
                 return 0;
 
@@ -236,12 +237,17 @@ mp_capable_print(netdissect_options *ndo,
                         return 1;
         }
 
-        if (GET_U_1(mpc->flags) & MP_CAPABLE_C)
+        csum_enabled = GET_U_1(mpc->flags) & MP_CAPABLE_C;
+        if (csum_enabled)
                 ND_PRINT(" csum");
         if (opt_len == 12 || opt_len >= 20) {
                 ND_PRINT(" {0x%" PRIx64, GET_BE_U_8(mpc->sender_key));
                 if (opt_len >= 20)
                         ND_PRINT(",0x%" PRIx64, GET_BE_U_8(mpc->receiver_key));
+
+                /* RFC 8684 Section 3.1 */
+                if ((opt_len == 22 && !csum_enabled) || opt_len == 24)
+                        ND_PRINT(",data_len=%u", GET_BE_U_2(mpc->data_len));
                 ND_PRINT("}");
         }
         return 1;
