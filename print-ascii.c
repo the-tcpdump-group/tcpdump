@@ -64,11 +64,14 @@ ascii_print(netdissect_options *ndo,
 {
 	u_int caplength;
 	u_char s;
+	int truncated = FALSE;
 
 	ndo->ndo_protocol = "ascii";
 	caplength = (ndo->ndo_snapend > cp) ? ND_BYTES_AVAILABLE_AFTER(cp) : 0;
-	if (length > caplength)
+	if (length > caplength) {
 		length = caplength;
+		truncated = TRUE;
+	}
 	ND_PRINT("\n");
 	while (length > 0) {
 		s = GET_U_1(cp);
@@ -94,6 +97,8 @@ ascii_print(netdissect_options *ndo,
 				ND_PRINT("%c", s);
 		}
 	}
+	if (truncated)
+		nd_trunc_longjmp(ndo);
 }
 
 static void
@@ -104,12 +109,15 @@ hex_and_ascii_print_with_offset(netdissect_options *ndo, const char *ident,
 	u_int i;
 	u_int s1, s2;
 	u_int nshorts;
+	int truncated = FALSE;
 	char hexstuff[HEXDUMP_SHORTS_PER_LINE*HEXDUMP_HEXSTUFF_PER_SHORT+1], *hsp;
 	char asciistuff[ASCII_LINELENGTH+1], *asp;
 
 	caplength = (ndo->ndo_snapend > cp) ? ND_BYTES_AVAILABLE_AFTER(cp) : 0;
-	if (length > caplength)
+	if (length > caplength) {
 		length = caplength;
+		truncated = TRUE;
+	}
 	nshorts = length / sizeof(u_short);
 	i = 0;
 	hsp = hexstuff; asp = asciistuff;
@@ -149,6 +157,8 @@ hex_and_ascii_print_with_offset(netdissect_options *ndo, const char *ident,
 		     ident, oset, HEXDUMP_HEXSTUFF_PER_LINE,
 		     hexstuff, asciistuff);
 	}
+	if (truncated)
+		nd_trunc_longjmp(ndo);
 }
 
 void
@@ -169,10 +179,13 @@ hex_print_with_offset(netdissect_options *ndo,
 	u_int caplength;
 	u_int i, s;
 	u_int nshorts;
+	int truncated = FALSE;
 
 	caplength = (ndo->ndo_snapend > cp) ? ND_BYTES_AVAILABLE_AFTER(cp) : 0;
-	if (length > caplength)
+	if (length > caplength) {
 		length = caplength;
+		truncated = TRUE;
+	}
 	nshorts = length / sizeof(u_short);
 	i = 0;
 	while (nshorts != 0) {
@@ -191,15 +204,15 @@ hex_print_with_offset(netdissect_options *ndo,
 			ND_PRINT("%s0x%04x: ", ident, oset);
 		ND_PRINT(" %02x", GET_U_1(cp));
 	}
+	if (truncated)
+		nd_trunc_longjmp(ndo);
 }
 
-/*
- * just for completeness
- */
 void
-hex_print(netdissect_options *ndo,const char *ident, const u_char *cp, u_int length)
+hex_print(netdissect_options *ndo,
+	  const char *ident, const u_char *cp, u_int length)
 {
-  hex_print_with_offset(ndo, ident, cp, length, 0);
+	hex_print_with_offset(ndo, ident, cp, length, 0);
 }
 
 #ifdef MAIN
