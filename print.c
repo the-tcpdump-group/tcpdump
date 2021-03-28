@@ -246,21 +246,6 @@ static const struct printer printers[] = {
 	{ NULL,                 0 },
 };
 
-static void	ndo_default_print(netdissect_options *ndo, const u_char *bp,
-		    u_int length);
-
-static void NORETURN ndo_error(netdissect_options *ndo,
-		     status_exit_codes_t status,
-		     FORMAT_STRING(const char *fmt), ...)
-		     PRINTFLIKE(3, 4);
-static void	ndo_warning(netdissect_options *ndo,
-		    FORMAT_STRING(const char *fmt), ...)
-		    PRINTFLIKE(2, 3);
-
-static int	ndo_printf(netdissect_options *ndo,
-		     FORMAT_STRING(const char *fmt), ...)
-		     PRINTFLIKE(2, 3);
-
 void
 init_print(netdissect_options *ndo, uint32_t localnet, uint32_t mask)
 {
@@ -505,10 +490,9 @@ ndo_default_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	hex_and_ascii_print(ndo, "\n\t", bp, length); /* pass on lf and indentation string */
 }
 
-/* VARARGS */
-static void
+static void NORETURN PRINTFLIKE(3, 4)
 ndo_error(netdissect_options *ndo, status_exit_codes_t status,
-	  const char *fmt, ...)
+          FORMAT_STRING(const char *fmt), ...)
 {
 	va_list ap;
 
@@ -527,9 +511,8 @@ ndo_error(netdissect_options *ndo, status_exit_codes_t status,
 	/* NOTREACHED */
 }
 
-/* VARARGS */
-static void
-ndo_warning(netdissect_options *ndo, const char *fmt, ...)
+static void PRINTFLIKE(2, 3)
+ndo_warning(netdissect_options *ndo, FORMAT_STRING(const char *fmt), ...)
 {
 	va_list ap;
 
@@ -546,8 +529,8 @@ ndo_warning(netdissect_options *ndo, const char *fmt, ...)
 	}
 }
 
-static int
-ndo_printf(netdissect_options *ndo, const char *fmt, ...)
+static int PRINTFLIKE(2, 3)
+ndo_printf(netdissect_options *ndo, FORMAT_STRING(const char *fmt), ...)
 {
 	va_list args;
 	int ret;
