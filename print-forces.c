@@ -748,9 +748,8 @@ sdatailv_print(netdissect_options *ndo,
 		const u_char *tdp = (const u_char *) ILV_DATA(ilv);
 		invilv = ilv_valid(ndo, ilv, rlen);
 		if (invilv) {
-			ND_PRINT("%s[", ib + 1);
-			hex_print(ndo, ib, tdp, rlen);
-			ND_PRINT("\n%s]\n", ib + 1);
+			ND_PRINT("Error: %s, rlen %u\n",
+			         tok2str(ForCES_TLV_err, NULL, invilv), rlen);
 			goto invalid;
 		}
 		if (ndo->ndo_vflag >= 3) {
