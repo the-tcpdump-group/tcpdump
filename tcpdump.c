@@ -243,29 +243,15 @@ cap_channel_t *capdns;
 #endif
 
 /* Forwards */
-static NORETURN void error(FORMAT_STRING(const char *), ...) PRINTFLIKE(1, 2);
-static void warning(FORMAT_STRING(const char *), ...) PRINTFLIKE(1, 2);
-static NORETURN void exit_tcpdump(int);
 static void (*setsignal (int sig, void (*func)(int)))(int);
 static void cleanup(int);
 static void child_cleanup(int);
 static void print_version(FILE *);
 static void print_usage(FILE *);
-#ifdef HAVE_PCAP_SET_TSTAMP_TYPE
-static NORETURN void show_tstamp_types_and_exit(pcap_t *, const char *device);
-#endif
-static NORETURN void show_dlts_and_exit(pcap_t *, const char *device);
-#ifdef HAVE_PCAP_FINDALLDEVS
-static NORETURN void show_devices_and_exit(void);
-#endif
-#ifdef HAVE_PCAP_FINDALLDEVS_EX
-static NORETURN void show_remote_devices_and_exit(void);
-#endif
 
 static void print_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void dump_packet_and_trunc(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void dump_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
-static void droproot(const char *, const char *);
 
 #ifdef SIGNAL_REQ_INFO
 static void requestinfo(int);
@@ -372,9 +358,16 @@ extern
 void pcap_set_optimizer_debug(int);
 #endif
 
+static void NORETURN
+exit_tcpdump(const int status)
+{
+	nd_cleanup();
+	exit(status);
+}
+
 /* VARARGS */
-static void
-error(const char *fmt, ...)
+static void NORETURN PRINTFLIKE(1, 2)
+error(FORMAT_STRING(const char *fmt), ...)
 {
 	va_list ap;
 
@@ -392,8 +385,8 @@ error(const char *fmt, ...)
 }
 
 /* VARARGS */
-static void
-warning(const char *fmt, ...)
+static void PRINTFLIKE(1, 2)
+warning(FORMAT_STRING(const char *fmt), ...)
 {
 	va_list ap;
 
@@ -408,15 +401,8 @@ warning(const char *fmt, ...)
 	}
 }
 
-static void
-exit_tcpdump(int status)
-{
-	nd_cleanup();
-	exit(status);
-}
-
 #ifdef HAVE_PCAP_SET_TSTAMP_TYPE
-static void
+static void NORETURN
 show_tstamp_types_and_exit(pcap_t *pc, const char *device)
 {
 	int n_tstamp_types;
@@ -449,7 +435,7 @@ show_tstamp_types_and_exit(pcap_t *pc, const char *device)
 }
 #endif
 
-static void
+static void NORETURN
 show_dlts_and_exit(pcap_t *pc, const char *device)
 {
 	int n_dlts, i;
@@ -502,7 +488,7 @@ show_dlts_and_exit(pcap_t *pc, const char *device)
 }
 
 #ifdef HAVE_PCAP_FINDALLDEVS
-static void
+static void NORETURN
 show_devices_and_exit(void)
 {
 	pcap_if_t *dev, *devlist;
@@ -567,7 +553,7 @@ show_devices_and_exit(void)
 #endif /* HAVE_PCAP_FINDALLDEVS */
 
 #ifdef HAVE_PCAP_FINDALLDEVS_EX
-static void
+static void NORETURN
 show_remote_devices_and_exit(void)
 {
 	pcap_if_t *dev, *devlist;

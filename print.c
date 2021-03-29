@@ -490,6 +490,7 @@ ndo_default_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	hex_and_ascii_print(ndo, "\n\t", bp, length); /* pass on lf and indentation string */
 }
 
+/* VARARGS */
 static void NORETURN PRINTFLIKE(3, 4)
 ndo_error(netdissect_options *ndo, status_exit_codes_t status,
           FORMAT_STRING(const char *fmt), ...)
@@ -511,6 +512,7 @@ ndo_error(netdissect_options *ndo, status_exit_codes_t status,
 	/* NOTREACHED */
 }
 
+/* VARARGS */
 static void PRINTFLIKE(2, 3)
 ndo_warning(netdissect_options *ndo, FORMAT_STRING(const char *fmt), ...)
 {
@@ -529,6 +531,7 @@ ndo_warning(netdissect_options *ndo, FORMAT_STRING(const char *fmt), ...)
 	}
 }
 
+/* VARARGS */
 static int PRINTFLIKE(2, 3)
 ndo_printf(netdissect_options *ndo, FORMAT_STRING(const char *fmt), ...)
 {
