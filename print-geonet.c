@@ -169,6 +169,7 @@ geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	print_long_pos_vector(ndo, bp + 8);
 
 	/* Skip Common Header */
+	ND_TCHECK_LEN(bp, 36);
 	length -= 36;
 	bp += 36;
 
