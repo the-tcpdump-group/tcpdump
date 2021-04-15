@@ -14,7 +14,7 @@ freebsd_task:
       - image_family: freebsd-12-2
         cpu: 2
         memory: 2G
-      - image_family: freebsd-13-0-snap
+      - image_family: freebsd-13-0
         # This one is much slower than the others.
         cpu: 4
         memory: 4G
