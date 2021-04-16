@@ -3,7 +3,7 @@ installed, install libpcap first.  Your system might provide a version
 of libpcap that can be installed; if so, to compile tcpdump you might
 need to install a "developer" version of libpcap as well as the
 "run-time" version.  You can also install tcpdump.org's version of
-libpcap; see the README file in this directory for the ftp location.
+libpcap; see the README.md file in this directory for the location.
 
 You will need an ANSI C compiler to build tcpdump. The configure script
 will abort if your compiler is not ANSI compliant. If this happens, use
@@ -31,7 +31,7 @@ If your system is not one which we have tested tcpdump on, you may have
 to modify the configure script and Makefile.in. Please send us patches
 for any modifications you need to make.
 
-Please see "PLATFORMS" for notes about tested platforms.
+Please see "README.md" for notes about tested platforms.
 
 
 FILES
@@ -42,7 +42,7 @@ CREDITS		- people that have helped tcpdump along
 INSTALL.txt	- this file
 LICENSE		- the license under which tcpdump is distributed
 Makefile.in	- compilation rules (input to the configure script)
-README		- description of distribution
+README.md	- description of distribution
 Readme.Win32	- notes on building tcpdump on Win32 systems (with WinPcap)
 VERSION		- version of this release
 aclocal.m4	- autoconf macros

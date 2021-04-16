@@ -1,8 +1,5 @@
 # TCPDUMP 4.x.y by [The Tcpdump Group](https://www.tcpdump.org/)
 
-[![Build Status](https://api.travis-ci.com/the-tcpdump-group/tcpdump.svg?branch=master)](https://travis-ci.com/github/the-tcpdump-group/tcpdump)
-[![Build Status](https://ci.appveyor.com/api/projects/status/github/the-tcpdump-group/tcpdump?branch=master&svg=true)](https://ci.appveyor.com/project/guyharris/tcpdump)
-
 **To report a security issue please send an e-mail to security@tcpdump.org.**
 
 To report bugs and other problems, contribute patches, request a
@@ -19,6 +16,26 @@ monitoring and data acquisition.
 Over the past few years, tcpdump has been steadily improved by the
 excellent contributions from the Internet community (just browse
 through the [change log](CHANGES)).  We are grateful for all the input.
+
+### Supported platforms
+In many operating systems tcpdump is available as a native package or port,
+which simplifies installation of updates and long-term maintenance. However,
+the native packages are sometimes a few versions behind and to try a more
+recent snapshot it will take to compile tcpdump from the source code.
+
+tcpdump compiles and works on at least the following platforms:
+
+* AIX
+* DragonFly BSD
+* FreeBSD
+* HP-UX 11i
+* GNU/Linux
+* {Mac} OS X / macOS
+* NetBSD
+* OpenBSD
+* OpenWrt
+* Solaris
+* Windows (requires WinPcap or Npcap, and Visual Studio with CMake)
 
 ### Dependency on libpcap
 Tcpdump uses libpcap, a system-independent interface for user-level
@@ -48,9 +65,6 @@ formerly from 	Lawrence Berkeley National Laboratory
 Richard Stevens gives an excellent treatment of the Internet protocols
 in his book *"TCP/IP Illustrated, Volume 1"*. If you want to learn more
 about tcpdump and how to interpret its output, pick up this book.
-
-Some tools for viewing and analyzing tcpdump trace files are available
-from the [Internet Traffic Archive](http://ita.ee.lbl.gov/).
 
 Another tool that tcpdump users might find useful is
 [tcpslice](https://github.com/the-tcpdump-group/tcpslice).
