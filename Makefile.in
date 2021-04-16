@@ -336,8 +336,6 @@ EXTRA_DIST = \
 	LICENSE \
 	Makefile.in \
 	Makefile-devel-adds \
-	PLATFORMS \
-	README \
 	README.md \
 	Readme.Win32 \
 	VERSION \
