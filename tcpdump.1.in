@@ -1608,7 +1608,7 @@ port number) and the higher level protocol information printed.
 In particular, Domain Name service requests (RFC-1034/1035) and Sun
 RPC calls (RFC-1050) to NFS.
 .HD
-UDP Name Server Requests
+TCP or UDP Name Server Requests
 .LP
 \fI(N.B.:The following description assumes familiarity with
 the Domain Service protocol described in RFC-1035.
@@ -1631,7 +1631,7 @@ address record (qtype=A) associated with the name \fIucbvax.berkeley.edu.\fP
 The query id was `3'.
 The `+' indicates the \fIrecursion desired\fP flag
 was set.
-The query length was 37 bytes, not including the UDP and
+The query length was 37 bytes, excluding the TCP or UDP and
 IP protocol headers.
 The query operation was the normal one, \fIQuery\fP,
 so the op field was omitted.
@@ -1655,7 +1655,7 @@ If any of the response bits are set (AA, RA or rcode) or any of the
 `must be zero' bits are set in bytes two and three, `[b2&3=\fIx\fP]'
 is printed, where \fIx\fP is the hex value of header bytes two and three.
 .HD
-UDP Name Server Responses
+TCP or UDP Name Server Responses
 .LP
 Name server responses are formatted as
 .RS
@@ -1673,7 +1673,7 @@ with 3 answer records, 3 name server records and 7 additional records.
 The first answer record is type A (address) and its data is internet
 address 128.32.137.3.
 The total size of the response was 273 bytes,
-excluding UDP and IP headers.
+excluding TCP or UDP and IP headers.
 The op (Query) and response code
 (NoError) were omitted, as was the class (C_IN) of the A record.
 .LP
