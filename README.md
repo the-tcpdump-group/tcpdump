@@ -28,6 +28,7 @@ tcpdump compiles and works on at least the following platforms:
 * AIX
 * DragonFly BSD
 * FreeBSD
+* Haiku
 * HP-UX 11i
 * GNU/Linux
 * {Mac} OS X / macOS
