@@ -1,0 +1,2 @@
+    1  2021-05-12 14:27:19.175792 IP 192.0.2.1.55739 > 192.168.76.28.8080: Flags [R.], seq 1, ack 2176696966, win 256, options [mptcp 4 tcprst flags [none] reason Unspecified error], length 0
+    2  2021-05-12 14:27:19.175964 IP 192.0.2.1.55739 > 192.168.76.28.8080: Flags [R.], seq 0, ack 1, win 256, options [mptcp 4 tcprst flags [T] reason MPTCP-specific error], length 0

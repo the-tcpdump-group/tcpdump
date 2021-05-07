@@ -54,6 +54,7 @@
 #define MPTCP_SUB_PRIO          0x5
 #define MPTCP_SUB_FAIL          0x6
 #define MPTCP_SUB_FCLOSE        0x7
+#define MPTCP_SUB_TCPRST        0x8
 
 struct mptcp_option {
         nd_uint8_t     kind;
@@ -178,6 +179,32 @@ struct mp_prio {
 };
 
 #define MP_PRIO_B                       0x01
+
+static const struct tok mp_tcprst_flags[] = {
+        { 0x08, "U" },
+        { 0x04, "V" },
+        { 0x02, "W" },
+        { 0x01, "T" },
+        { 0, NULL }
+};
+
+static const struct tok mp_tcprst_reasons[] = {
+        { 0x06, "Middlebox interference" },
+        { 0x05, "Unacceptable performance" },
+        { 0x04, "Too much outstanding data" },
+        { 0x03, "Administratively prohibited" },
+        { 0x02, "Lack of resources" },
+        { 0x01, "MPTCP-specific error" },
+        { 0x00, "Unspecified error" },
+        { 0, NULL }
+};
+
+struct mp_tcprst {
+        nd_uint8_t     kind;
+        nd_uint8_t     len;
+        nd_uint8_t     sub_b;
+        nd_uint8_t     reason;
+};
 
 static int
 dummy_print(netdissect_options *ndo _U_,
@@ -446,6 +473,23 @@ mp_fast_close_print(netdissect_options *ndo,
         return 1;
 }
 
+static int
+mp_tcprst_print(netdissect_options *ndo,
+                const u_char *opt, u_int opt_len, u_char flags _U_)
+{
+        const struct mp_tcprst *mpr = (const struct mp_tcprst *)opt;
+
+        if (opt_len != 4)
+                return 0;
+
+        ND_PRINT(" flags [%s]", bittok2str_nosep(mp_tcprst_flags, "none",
+                 GET_U_1(mpr->sub_b)));
+
+        ND_PRINT(" reason %s", tok2str(mp_tcprst_reasons, "unknown (0x%02x)",
+                 GET_U_1(mpr->reason)));
+        return 1;
+}
+
 static const struct {
         const char *name;
         int (*print)(netdissect_options *, const u_char *, u_int, u_char);
@@ -458,6 +502,7 @@ static const struct {
         { "prio",       mp_prio_print },
         { "fail",       mp_fail_print },
         { "fast-close", mp_fast_close_print },
+        { "tcprst",     mp_tcprst_print },
         { "unknown",    dummy_print },
 };
 
@@ -474,7 +519,7 @@ mptcp_print(netdissect_options *ndo,
 
         opt = (const struct mptcp_option *) cp;
         subtype = MPTCP_OPT_SUBTYPE(GET_U_1(opt->sub_etc));
-        subtype = ND_MIN(subtype, MPTCP_SUB_FCLOSE + 1);
+        subtype = ND_MIN(subtype, MPTCP_SUB_TCPRST + 1);
 
         ND_PRINT(" %u", len);
 

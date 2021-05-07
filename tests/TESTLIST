@@ -263,6 +263,7 @@ mptcp-v1	mptcp-v1.pcap		mptcp-v1.out
 mptcp-fclose	mptcp-fclose.pcap	mptcp-fclose.out
 mptcp-aa-v1	mptcp-aa-v1.pcap	mptcp-aa-v1.out
 mptcp-aa-echo	mptcp-aa-echo.pcap	mptcp-aa-echo.out
+mptcp-tcprst	mptcp-tcprst.pcap	mptcp-tcprst.out
 
 # TFO tests
 tfo		tfo-5c1fa7f9ae91.pcap	tfo.out
