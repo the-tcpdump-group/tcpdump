@@ -1522,6 +1522,7 @@ main(int argc, char **argv)
 	int yflag_dlt = -1;
 	const char *yflag_dlt_name = NULL;
 	int print = 0;
+	long Cflagmult = 1000000;
 
 	netdissect_options Ndo;
 	netdissect_options *ndo = &Ndo;
@@ -1756,6 +1757,18 @@ main(int argc, char **argv)
 
 		case 'C':
 			errno = 0;
+			if (optarg[strlen(optarg)-1] == 'k') {
+				Cflagmult = 1024;
+				optarg[strlen(optarg)-1] = '\0';
+			}
+			if (optarg[strlen(optarg)-1] == 'm') {
+				Cflagmult = 1024*1024;
+				optarg[strlen(optarg)-1] = '\0';
+			}
+			if (optarg[strlen(optarg)-1] == 'g') {
+				Cflagmult = 1024*1024*1024;
+				optarg[strlen(optarg)-1] = '\0';
+			}
 #ifdef HAVE_PCAP_DUMP_FTELL64
 			Cflag = strtoint64_t(optarg, &endp, 10);
 #else
@@ -1765,15 +1778,15 @@ main(int argc, char **argv)
 			    || Cflag <= 0)
 				error("invalid file size %s", optarg);
 			/*
-			 * Will multiplying it by 1000000 overflow?
+			 * Will multiplying it by multiplier overflow?
 			 */
 #ifdef HAVE_PCAP_DUMP_FTELL64
-			if (Cflag > INT64_T_CONSTANT(0x7fffffffffffffff) / 1000000)
+			if (Cflag > INT64_T_CONSTANT(0x7fffffffffffffff) / Cflagmult)
 #else
-			if (Cflag > LONG_MAX / 1000000)
+			if (Cflag > LONG_MAX / Cflagmult)
 #endif
 				error("file size %s is too large", optarg);
-			Cflag *= 1000000;
+			Cflag *= Cflagmult;
 			break;
 
 		case 'd':
