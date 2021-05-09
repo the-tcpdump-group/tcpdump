@@ -27,6 +27,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 
 #include "extract.h"
@@ -166,6 +167,7 @@ zep_print(netdissect_options *ndo,
 		/* Call 802.15.4 dissector. */
 		ND_PRINT("\n\t");
 		if (ieee802_15_4_print(ndo, bp, inner_len)) {
+			ND_TCHECK_LEN(bp, len);
 			bp += len;
 			len = 0;
 		}
