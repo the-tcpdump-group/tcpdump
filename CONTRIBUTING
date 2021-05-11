@@ -45,14 +45,9 @@ How to add new code and to update existing code
    https://github.com/the-tcpdump-group/tcpdump
    (See https://help.github.com/articles/fork-a-repo/)
 
-2) Setup optional continuous integration (CI) builds
-   You can setup Travis CI, Cirrus CI and AppVeyor builds for your fork to
-   test your changes on Linux, FreeBSD, macOS and Windows before opening a
-   pull request.
-   (See https://docs.travis-ci.com/user/tutorial/ for information
-   on setting up Travis CI; go to https://ci.appveyor.com/login and log
-   in with your GitHub account and select "NEW PROJECT" to set up an
-   AppVeyor build.)
+2) The easiest way to test your changes on multiple operating systems and
+   architectures is to let the upstream CI test your pull request (more on
+   this below).
 
 3) Setup your git working copy
    git clone https://github.com/<username>/tcpdump.git
@@ -106,7 +101,6 @@ How to add new code and to update existing code
 
 9) Once 100% happy, put your work into your forked repository.
    git push
-   This will trigger your fork CI tests, if set up in step 2.
 
 10) Initiate and send a pull request
     (See https://help.github.com/articles/using-pull-requests/)
