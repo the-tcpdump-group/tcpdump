@@ -28,6 +28,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 
@@ -2138,6 +2139,7 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 				if (len < 0) {
 					break;
 				}
+				ND_TCHECK_LEN(p, len);
 				p += len;
 				caplen -= len;
 			}
@@ -2331,6 +2333,7 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 		if (len < 0) {
 			return 0;
 		}
+		ND_TCHECK_LEN(p, len);
 		p += len;
 		caplen -= len;
 	} else {
