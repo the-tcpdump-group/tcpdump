@@ -862,3 +862,7 @@ unsupported-link-type-dbus unsupported-link-type-dbus.pcap unsupported-link-type
 
 # LSP Ping
 lsp-ping-timestamp	lsp-ping-timestamp.pcap		lsp-ping-timestamp.out	-vv
+
+
+# Compact routing header
+crh-16          ipv6-compact-routing-header.pcap	ipv6-compact-routing-header.out
