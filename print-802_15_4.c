@@ -2021,6 +2021,7 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 		if (len < 0) {
 			return 0;
 		}
+		ND_TCHECK_LEN(p, len);
 		p += len;
 		caplen -= len;
 	} else {
