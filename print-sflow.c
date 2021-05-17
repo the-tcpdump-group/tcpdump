@@ -864,7 +864,7 @@ sflow_print(netdissect_options *ndo,
 
     /* ok they seem to want to know everything - lets fully decode it */
     if (ip_version == 1) {
-        nsamples=GET_BE_U_4(sflow_datagram->samples);
+        nsamples = GET_BE_U_4(sflow_datagram->samples);
         ND_PRINT("sFlowv%u, %s agent %s, agent-id %u, seqnum %u, uptime %u, samples %u, length %u",
                GET_BE_U_4(sflow_datagram->version),
                "IPv4",
@@ -879,7 +879,7 @@ sflow_print(netdissect_options *ndo,
         tptr += sizeof(struct sflow_datagram_t);
         tlen -= sizeof(struct sflow_datagram_t);
     } else {
-        nsamples=GET_BE_U_4(sflow_v6_datagram->samples);
+        nsamples = GET_BE_U_4(sflow_v6_datagram->samples);
         ND_PRINT("sFlowv%u, %s agent %s, agent-id %u, seqnum %u, uptime %u, samples %u, length %u",
                GET_BE_U_4(sflow_v6_datagram->version),
                "IPv6",
@@ -912,7 +912,7 @@ sflow_print(netdissect_options *ndo,
                sflow_sample_len);
 
         /* basic sanity check */
-        if (sflow_sample_type == 0 || sflow_sample_len ==0) {
+        if (sflow_sample_type == 0 || sflow_sample_len == 0) {
             return;
         }
 
