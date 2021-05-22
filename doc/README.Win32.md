@@ -47,7 +47,7 @@ Required build tools
 The Developer's Kit is a ZIP archive; it contains a folder named
 WpdPack, which you should place on your C: drive, e.g. C:\WpdPack.
 
-Building tcpdumpp on Windows requires Visual Studio 2015 or later.  The
+Building tcpdump on Windows requires Visual Studio 2015 or later.  The
 Community Edition of Visual Studio can be downloaded at no cost from
 
   https://visualstudio.microsoft.com
