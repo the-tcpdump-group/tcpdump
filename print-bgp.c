@@ -557,9 +557,6 @@ static const struct tok bgp_add_path_recvsend[] = {
     { 0, NULL },
 };
 
-/* allocate space for the largest possible string */
-static char astostr[sizeof("xxxxx.xxxxx")];
-
 /*
  * as_printf
  *
@@ -761,6 +758,8 @@ bgp_vpn_rd_print(netdissect_options *ndo,
     /* allocate space for the largest possible string */
     static char rd[sizeof("xxxxx.xxxxx:xxxxx (xxx.xxx.xxx.xxx:xxxxx)")];
     char *pos = rd;
+    /* allocate space for the largest possible string */
+    char astostr[sizeof("xxxxx.xxxxx")];
 
     /* ok lets load the RD format */
     switch (GET_BE_U_2(pptr)) {
@@ -810,6 +809,8 @@ bgp_extended_community_print(netdissect_options *ndo,
         float f;
         uint32_t i;
     } bw;
+    /* allocate space for the largest possible string */
+    char astostr[sizeof("xxxxx.xxxxx")];
 
     switch (GET_BE_U_2(pptr)) {
 
@@ -915,6 +916,8 @@ bgp_rt_prefix_print(netdissect_options *ndo,
     char rtc_prefix_in_hex[20] = "";
     u_int rtc_prefix_in_hex_len = 0;
     static char output[61]; /* max response string */
+    /* allocate space for the largest possible string */
+    char astostr[sizeof("xxxxx.xxxxx")];
     uint16_t ec_type = 0;
     u_int octet_count;
     u_int i;
@@ -988,7 +991,8 @@ decode_rt_routing_info(netdissect_options *ndo,
 {
     uint8_t route_target[8];
     u_int plen;
-    char asbuf[sizeof(astostr)]; /* bgp_vpn_rd_print() overwrites astostr */
+    /* allocate space for the largest possible string */
+    char astostr[sizeof("xxxxx.xxxxx")];
     u_int num_octets;
 
     /* NLRI "prefix length" from RFC 2858 Section 4. */
@@ -1010,7 +1014,7 @@ decode_rt_routing_info(netdissect_options *ndo,
     }
 
     /* With at least "origin AS", possibly with "route target". */
-    as_printf(ndo, asbuf, sizeof(asbuf), GET_BE_U_4(pptr + 1));
+    as_printf(ndo, astostr, sizeof(astostr), GET_BE_U_4(pptr + 1));
 
     plen -= 32; /* adjust prefix length */
 
@@ -1032,7 +1036,7 @@ decode_rt_routing_info(netdissect_options *ndo,
             ((0xff00 >> (plen % 8)) & 0xff);
     }
     ND_PRINT("\n\t      origin AS: %s, %s",
-             asbuf,
+             astostr,
              bgp_rt_prefix_print(ndo, (u_char *)&route_target, plen));
 
     return 5 + num_octets;
@@ -1138,6 +1142,8 @@ static int
 decode_multicast_vpn(netdissect_options *ndo,
                      const u_char *pptr, char *buf, size_t buflen)
 {
+    /* allocate space for the largest possible string */
+    char astostr[sizeof("xxxxx.xxxxx")];
     uint8_t route_type, route_length;
     u_int addr_length, sg_length;
     u_int offset;
@@ -1863,6 +1869,8 @@ bgp_attr_print(netdissect_options *ndo,
                uint8_t atype, const u_char *pptr, u_int len,
                const unsigned attr_set_level)
 {
+    /* allocate space for the largest possible string */
+    char astostr[sizeof("xxxxx.xxxxx")];
     u_int i;
     uint16_t af;
     uint8_t safi, snpa, nhlen;
@@ -2508,6 +2516,8 @@ static void
 bgp_capabilities_print(netdissect_options *ndo,
                        const u_char *opt, u_int caps_len)
 {
+    /* allocate space for the largest possible string */
+    char astostr[sizeof("xxxxx.xxxxx")];
     u_int cap_type, cap_len, tcap_len, cap_offset;
     u_int i = 0;
 
@@ -2636,6 +2646,8 @@ static void
 bgp_open_print(netdissect_options *ndo,
                const u_char *dat, u_int length)
 {
+    /* allocate space for the largest possible string */
+    char astostr[sizeof("xxxxx.xxxxx")];
     const struct bgp_open *bgp_open_header;
     u_int optslen;
     const struct bgp_opt *bgpopt;
