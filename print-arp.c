@@ -424,8 +424,16 @@ arp_print(netdissect_options *ndo,
 		break;
 
 	case ARPOP_REVREQUEST:
-		ND_PRINT("who-is %s tell %s",
-			  GET_LINKADDR_STRING(THA(ap), linkaddr, HRD_LEN(ap)),
+		/*
+		 * XXX - GET_LINKADDR_STRING() may return a pointer to
+		 * a static buffer, so we only have one call to it per
+		 * ND_PRINT() call.
+		 *
+		 * This should be done in a cleaner fashion.
+		 */
+		ND_PRINT("who-is %s",
+			  GET_LINKADDR_STRING(THA(ap), linkaddr, HRD_LEN(ap)));
+		ND_PRINT(" tell %s",
 			  GET_LINKADDR_STRING(SHA(ap), linkaddr, HRD_LEN(ap)));
 		break;
 
@@ -436,8 +444,16 @@ arp_print(netdissect_options *ndo,
 		break;
 
 	case ARPOP_INVREQUEST:
-		ND_PRINT("who-is %s tell %s",
-			  GET_LINKADDR_STRING(THA(ap), linkaddr, HRD_LEN(ap)),
+		/*
+		 * XXX - GET_LINKADDR_STRING() may return a pointer to
+		 * a static buffer, so we only have one call to it per
+		 * ND_PRINT() call.
+		 *
+		 * This should be done in a cleaner fashion.
+		 */
+		ND_PRINT("who-is %s",
+			  GET_LINKADDR_STRING(THA(ap), linkaddr, HRD_LEN(ap)));
+		ND_PRINT(" tell %s",
 			  GET_LINKADDR_STRING(SHA(ap), linkaddr, HRD_LEN(ap)));
 		break;
 
