@@ -43,6 +43,7 @@ Monthday, Month DD, YYYY by gharris
       Replace ND_TCHECK_/memcpy() pairs with GET_CPY_BYTES().
       BGP: Fix overwrites of global 'astostr' temporary buffer
       ARP: fix overwrites of static buffer in q922_string().
+      Frame Relay: have q922_string() handle errors better.
     Building and testing:
       Rebuild configure script when building release
       Fix "make clean" for out-of-tree autotools builds
