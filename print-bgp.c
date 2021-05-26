@@ -557,6 +557,8 @@ static const struct tok bgp_add_path_recvsend[] = {
     { 0, NULL },
 };
 
+#define AS_STR_SIZE sizeof("xxxxx.xxxxx")
+
 /*
  * as_printf
  *
@@ -759,7 +761,7 @@ bgp_vpn_rd_print(netdissect_options *ndo,
     static char rd[sizeof("xxxxx.xxxxx:xxxxx (xxx.xxx.xxx.xxx:xxxxx)")];
     char *pos = rd;
     /* allocate space for the largest possible string */
-    char astostr[sizeof("xxxxx.xxxxx")];
+    char astostr[AS_STR_SIZE];
 
     /* ok lets load the RD format */
     switch (GET_BE_U_2(pptr)) {
@@ -810,7 +812,7 @@ bgp_extended_community_print(netdissect_options *ndo,
         uint32_t i;
     } bw;
     /* allocate space for the largest possible string */
-    char astostr[sizeof("xxxxx.xxxxx")];
+    char astostr[AS_STR_SIZE];
 
     switch (GET_BE_U_2(pptr)) {
 
@@ -917,7 +919,7 @@ bgp_rt_prefix_print(netdissect_options *ndo,
     u_int rtc_prefix_in_hex_len = 0;
     static char output[61]; /* max response string */
     /* allocate space for the largest possible string */
-    char astostr[sizeof("xxxxx.xxxxx")];
+    char astostr[AS_STR_SIZE];
     uint16_t ec_type = 0;
     u_int octet_count;
     u_int i;
@@ -992,7 +994,7 @@ decode_rt_routing_info(netdissect_options *ndo,
     uint8_t route_target[8];
     u_int plen;
     /* allocate space for the largest possible string */
-    char astostr[sizeof("xxxxx.xxxxx")];
+    char astostr[AS_STR_SIZE];
     u_int num_octets;
 
     /* NLRI "prefix length" from RFC 2858 Section 4. */
@@ -1143,7 +1145,7 @@ decode_multicast_vpn(netdissect_options *ndo,
                      const u_char *pptr, char *buf, size_t buflen)
 {
     /* allocate space for the largest possible string */
-    char astostr[sizeof("xxxxx.xxxxx")];
+    char astostr[AS_STR_SIZE];
     uint8_t route_type, route_length;
     u_int addr_length, sg_length;
     u_int offset;
@@ -1870,7 +1872,7 @@ bgp_attr_print(netdissect_options *ndo,
                const unsigned attr_set_level)
 {
     /* allocate space for the largest possible string */
-    char astostr[sizeof("xxxxx.xxxxx")];
+    char astostr[AS_STR_SIZE];
     u_int i;
     uint16_t af;
     uint8_t safi, snpa, nhlen;
@@ -2517,7 +2519,7 @@ bgp_capabilities_print(netdissect_options *ndo,
                        const u_char *opt, u_int caps_len)
 {
     /* allocate space for the largest possible string */
-    char astostr[sizeof("xxxxx.xxxxx")];
+    char astostr[AS_STR_SIZE];
     u_int cap_type, cap_len, tcap_len, cap_offset;
     u_int i = 0;
 
@@ -2647,7 +2649,7 @@ bgp_open_print(netdissect_options *ndo,
                const u_char *dat, u_int length)
 {
     /* allocate space for the largest possible string */
-    char astostr[sizeof("xxxxx.xxxxx")];
+    char astostr[AS_STR_SIZE];
     const struct bgp_open *bgp_open_header;
     u_int optslen;
     const struct bgp_opt *bgpopt;
