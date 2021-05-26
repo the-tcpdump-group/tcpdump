@@ -147,7 +147,7 @@ q922_string(netdissect_options *ndo, const u_char *p, u_int length)
 
     static u_int dlci, addr_len;
     static uint32_t flags;
-    static char buffer[sizeof("DLCI xxxxxxxxxx")];
+    static char buffer[sizeof("parse_q922_header() returned XXXXXXXXXXX")];
     int ret;
     memset(buffer, 0, sizeof(buffer));
 
