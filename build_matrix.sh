@@ -93,7 +93,7 @@ for BUILD_LIBPCAP in ${MATRIX_BUILD_LIBPCAP:-no yes}; do
         done
     else
         echo_magenta 'Use system libpcap'
-        rm -rf "$PREFIX"/*
+        rm -rf "${PREFIX:?}"/*
         make -C ../libpcap distclean || :
         build_tcpdump
     fi
