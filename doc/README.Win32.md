@@ -172,14 +172,29 @@ of the tcpdump source directory.
 
 Run the command
 
-	cmake "-DPacket_ROOT={path-to-sdk}" {path-to-tcpdump-source}
+    cmake "-DPacket_ROOT={path-to-sdk}" -G {generator} {path-to-tcpdump-source}
 
-where {path-to-sdk} is the path of the directory containing the Npcap or
-WinPcap SDK and {path-to-tcpdump-source} is the pathname of the
-top-level source directory for tcpdump.
+{path-to-sdk} is the path of the directory containing the Npcap or
+WinPcap SDK.
+
+{generator} is the string "Visual Studio N YYYY", where "N" is the
+version of Visual Studio and "YYYY" is the year number for that version;
+if you are building a 64-bit version of tcpdump, YYYY must be followed
+by a space and "Win64".  For example, to build a 32-bit version of
+tcpdump with Visual Studio 2017, "{generator}" would be "Visual Studio
+15 2017" and to build a 64-bit version of tcpdump with Visual Studio
+2017, "{generator}" would be "Visual Studio 15 2017 Win64".
+
+{path-to-tcpdump-source} is the pathname of the top-level source
+directory for tcpdump.
 
 Run the command
 
-	msbuild /m tcpdump.sln
+    msbuild /m /nologo /p:Configuration={configuration} tcpdump.sln
 
-to compile tcpdump.
+where {configuration} can be "Release", "Debug", or "RelWithDebInfo".
+
+Building with MinGW
+-------------------
+
+(XXX - this should be added)

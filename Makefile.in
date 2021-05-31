@@ -337,7 +337,6 @@ EXTRA_DIST = \
 	Makefile.in \
 	Makefile-devel-adds \
 	README.md \
-	Readme.Win32 \
 	VERSION \
 	aclocal.m4 \
 	atime.awk \
