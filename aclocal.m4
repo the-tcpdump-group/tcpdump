@@ -495,9 +495,9 @@ AC_DEFUN(AC_LBL_LIBPCAP,
         AC_MSG_CHECKING(for local pcap library)
         lastdir=FAIL
         places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
-            egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT)?$'`
+            egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT|rc.)?$'`
         places2=`ls .. | sed -e 's,/$,,' -e "s,^,../," | \
-            egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT)?$'`
+            egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT|rc.)?$'`
         for dir in $places $srcdir/../libpcap ../libpcap $srcdir/libpcap $places2 ; do
             basedir=`echo $dir | sed -e 's/[[ab]][[0-9]]*$//' | \
                 sed -e 's/-PRE-GIT$//' `
