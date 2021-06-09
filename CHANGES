@@ -1,5 +1,5 @@
-Monthday, Month DD, YYYY by gharris
-  Summary for 4.99.1 tcpdump release (so far!)
+Wednesday, June 9, 2021 by gharris
+  Summary for 4.99.1 tcpdump release:
     Source code:
       Squelch some compiler warnings
       ICMP: Update the snapend for some nested IP packets.
