@@ -30,6 +30,7 @@ __RCSID("NetBSD: print-juniper.c,v 1.3 2007/07/25 06:31:32 dogcow Exp ");
 
 #include <string.h>
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -516,11 +517,6 @@ juniper_ggsn_if_print(netdissect_options *ndo,
         }
 
         ndo->ndo_ll_hdr_len += l2info.header_len;
-        return;
-
-trunc:
-        nd_print_trunc(ndo);
-        ndo->ndo_ll_hdr_len += l2info.header_len;
 }
 #endif
 
@@ -599,11 +595,6 @@ juniper_es_if_print(netdissect_options *ndo,
 
         ip_print(ndo, p, l2info.length);
         ndo->ndo_ll_hdr_len += l2info.header_len;
-        return;
-
-trunc:
-        nd_print_trunc(ndo);
-        ndo->ndo_ll_hdr_len += l2info.header_len;
 }
 #endif
 
@@ -642,11 +633,6 @@ juniper_monitor_if_print(netdissect_options *ndo,
         /* no proto field - lets guess by first byte of IP header*/
         ip_heuristic_guess (ndo, p, l2info.length);
 
-        ndo->ndo_ll_hdr_len += l2info.header_len;
-        return;
-
-trunc:
-        nd_print_trunc(ndo);
         ndo->ndo_ll_hdr_len += l2info.header_len;
 }
 #endif
@@ -688,11 +674,6 @@ juniper_services_if_print(netdissect_options *ndo,
         /* no proto field - lets guess by first byte of IP header*/
         ip_heuristic_guess (ndo, p, l2info.length);
 
-        ndo->ndo_ll_hdr_len += l2info.header_len;
-        return;
-
-trunc:
-        nd_print_trunc(ndo);
         ndo->ndo_ll_hdr_len += l2info.header_len;
 }
 #endif
@@ -968,6 +949,8 @@ juniper_mfr_if_print(netdissect_options *ndo,
             ND_PRINT("Bundle-ID %u, ", l2info.bundle);
         switch (l2info.proto) {
         case (LLCSAP_ISONS<<8 | LLCSAP_ISONS):
+            /* At least one byte is required */
+            ND_TCHECK_LEN(p, 1);
             isoclns_print(ndo, p + 1, l2info.length - 1);
             break;
         case (LLC_UI<<8 | NLPID_Q933):
@@ -1068,6 +1051,8 @@ juniper_atm1_if_print(netdissect_options *ndo,
         }
 
         if (GET_U_1(p) == 0x03) { /* Cisco style NLPID encaps ? */
+            /* At least one byte is required */
+            ND_TCHECK_LEN(p, 1);
             isoclns_print(ndo, p + 1, l2info.length - 1);
             /* FIXME check if frame was recognized */
             ndo->ndo_ll_hdr_len += l2info.header_len;
@@ -1135,6 +1120,8 @@ juniper_atm2_if_print(netdissect_options *ndo,
         }
 
         if (GET_U_1(p) == 0x03) { /* Cisco style NLPID encaps ? */
+            /* At least one byte is required */
+            ND_TCHECK_LEN(p, 1);
             isoclns_print(ndo, p + 1, l2info.length - 1);
             /* FIXME check if frame was recognized */
             ndo->ndo_ll_hdr_len += l2info.header_len;
