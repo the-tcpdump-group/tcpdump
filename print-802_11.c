@@ -1913,7 +1913,7 @@ get_data_src_dst_mac(uint16_t fc, const u_char *p, const uint8_t **srcp,
 		}
 	} else {
 		if (!FC_FROM_DS(fc)) {
-			/* From DS and not To DS */
+			/* To DS and not From DS */
 			*srcp = ADDR2;
 			*dstp = ADDR3;
 		} else {
