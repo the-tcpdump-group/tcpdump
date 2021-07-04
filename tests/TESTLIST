@@ -270,6 +270,7 @@ scps_invalid	scps_invalid.pcap	scps_invalid.out
 # IEEE 802.11 tests
 802.11_exthdr	ieee802.11_exthdr.pcap	ieee802.11_exthdr.out	-v
 802.11_rx-stbc	ieee802.11_rx-stbc.pcap	ieee802.11_rx-stbc.out
+802.11_meshid	ieee802.11_meshid.pcap	ieee802.11_meshid.out
 
 # OpenFlow tests
 of10_p3295-vv	of10_p3295.pcap		of10_p3295-vv.out	-vv
