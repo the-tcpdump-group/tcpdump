@@ -21,14 +21,6 @@ if [ -z "$PREFIX" ]; then
 fi
 COUNT=0
 
-travis_fold() {
-    tf_action=${1:?}
-    tf_name=${2:?}
-    if [ "$TRAVIS" != true ]; then return; fi
-    printf 'travis_fold:%s:%s.script.%s\r' "$tf_action" "$LABEL" "$tf_name"
-    sleep 1
-}
-
 # Display text in magenta
 echo_magenta() {
     printf '\033[35;1m' # ANSI magenta
@@ -52,19 +44,15 @@ build_tcpdump() {
                     export SMB
                     COUNT=$((COUNT+1))
                     echo_magenta "===== SETUP $COUNT: BUILD_LIBPCAP=$BUILD_LIBPCAP REMOTE=${REMOTE:-?} CC=$CC CMAKE=$CMAKE CRYPTO=$CRYPTO SMB=$SMB ====="
-                    # LABEL is needed to build the travis fold labels
-                    LABEL="$BUILD_LIBPCAP.$REMOTE.$CC.$CMAKE.$CRYPTO.$SMB"
                     # Run one build with setup environment variables:
                     # BUILD_LIBPCAP, REMOTE, CC, CMAKE, CRYPTO and SMB
                     ./build.sh
                     echo 'Cleaning...'
-                    travis_fold start cleaning
                     if [ "$CMAKE" = yes ]; then rm -rf build; else make distclean; fi
                     rm -rf "$PREFIX"/bin/tcpdump*
                     git status -suall
                     # Cancel changes in configure
                     git checkout configure
-                    travis_fold end cleaning
                 done
             done
         done

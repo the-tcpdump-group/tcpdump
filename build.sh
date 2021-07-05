@@ -27,14 +27,6 @@ fi
 # For TESTrun
 export TCPDUMP_BIN="$PREFIX/bin/tcpdump"
 
-travis_fold() {
-    tf_action=${1:?}
-    tf_name=${2:?}
-    if [ "$TRAVIS" != true ]; then return; fi
-    printf 'travis_fold:%s:%s.script.%s\r' "$tf_action" "$LABEL" "$tf_name"
-    sleep 1
-}
-
 # Run a command after displaying it
 run_after_echo() {
     printf '$ '
@@ -43,11 +35,8 @@ run_after_echo() {
     $@
 }
 
-# LABEL is needed to build the travis fold labels
-LABEL="$BUILD_LIBPCAP.$REMOTE.$CC.$CMAKE.$CRYPTO.$SMB"
 if [ "$CMAKE" = no ]; then
     echo '$ ./configure [...]'
-    travis_fold start configure
     if [ "$BUILD_LIBPCAP" = yes ]; then
         echo "Using PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
         ./configure --with-crypto="$CRYPTO" --enable-smb="$SMB" --prefix="$PREFIX"
@@ -55,27 +44,22 @@ if [ "$CMAKE" = no ]; then
     else
         ./configure --disable-local-libpcap --with-crypto="$CRYPTO" --enable-smb="$SMB" --prefix="$PREFIX"
     fi
-    travis_fold end configure
 else
     rm -rf build
     mkdir build
     cd build
     echo '$ cmake [...]'
-    travis_fold start cmake
     if [ "$BUILD_LIBPCAP" = yes ]; then
         cmake -DWITH_CRYPTO="$CRYPTO" -DENABLE_SMB="$SMB" -DCMAKE_PREFIX_PATH="$PREFIX" -DCMAKE_INSTALL_PREFIX="$PREFIX" ..
         export LD_LIBRARY_PATH="$PREFIX/lib"
     else
         cmake -DWITH_CRYPTO="$CRYPTO" -DENABLE_SMB="$SMB" -DCMAKE_INSTALL_PREFIX="$PREFIX" ..
     fi
-    travis_fold end cmake
 fi
 run_after_echo "make -s clean"
 run_after_echo "make -s CFLAGS=-Werror"
 echo '$ make install'
-travis_fold start make_install
 make install
-travis_fold end make_install
 run_after_echo "$TCPDUMP_BIN --version"
 run_after_echo "$TCPDUMP_BIN -h"
 run_after_echo "$TCPDUMP_BIN -D"
@@ -113,20 +97,14 @@ fi
 # The DEBUG_BUILD variable is not set by default to avoid Travis error message:
 # "The job exceeded the maximum log length, and has been terminated."
 # Setting it needs to reduce the matrix cases.
-if [ "$TRAVIS" = true ] && [ -n "$DEBUG_BUILD" ] ; then
+if [ "$MATRIX_DEBUG" = true ] && [ -n "$DEBUG_BUILD" ] ; then
     echo '$ cat Makefile [...]'
-    travis_fold start cat_makefile
     sed '/DO NOT DELETE THIS LINE -- mkdep uses it/q' < Makefile
-    travis_fold end cat_makefile
     echo '$ cat config.h'
-    travis_fold start cat_config_h
     cat config.h
-    travis_fold end cat_config_h
     if [ "$CMAKE" = no ]; then
         echo '$ cat config.log'
-        travis_fold start cat_config_log
         cat config.log
-        travis_fold end cat_config_log
     fi
 fi
 if [ "$DELETE_PREFIX" = yes ]; then
