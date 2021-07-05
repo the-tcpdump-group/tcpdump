@@ -64,9 +64,14 @@ run_after_echo "$TCPDUMP_BIN --version"
 run_after_echo "$TCPDUMP_BIN -h"
 run_after_echo "$TCPDUMP_BIN -D"
 system=$(uname -s)
-if [ "$system" = Linux ]; then
+case "$system" in
+Linux|FreeBSD|NetBSD|OpenBSD)
     run_after_echo "ldd $TCPDUMP_BIN"
-fi
+    ;;
+Darwin)
+    run_after_echo "otool -L $TCPDUMP_BIN"
+    ;;
+esac
 if [ "$TRAVIS" = true ]; then
     if [ -n "$LD_LIBRARY_PATH" ]; then
         run_after_echo "sudo LD_LIBRARY_PATH=$LD_LIBRARY_PATH $TCPDUMP_BIN -J"
