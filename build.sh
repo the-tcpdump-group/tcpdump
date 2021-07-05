@@ -72,15 +72,6 @@ Darwin)
     run_after_echo "otool -L $TCPDUMP_BIN"
     ;;
 esac
-if [ "$TRAVIS" = true ]; then
-    if [ -n "$LD_LIBRARY_PATH" ]; then
-        run_after_echo "sudo LD_LIBRARY_PATH=$LD_LIBRARY_PATH $TCPDUMP_BIN -J"
-        run_after_echo "sudo LD_LIBRARY_PATH=$LD_LIBRARY_PATH $TCPDUMP_BIN -L"
-    else
-        run_after_echo "sudo $TCPDUMP_BIN -J"
-        run_after_echo "sudo $TCPDUMP_BIN -L"
-    fi
-fi
 if [ "$BUILD_LIBPCAP" = yes ]; then
     run_after_echo "make check"
 fi
@@ -90,19 +81,11 @@ if [ "$CMAKE" = no ]; then
         run_after_echo "make releasetar"
     fi
 fi
-if [ "$TRAVIS" = true ]; then
-    if [ "$TRAVIS_OS_NAME" = linux ] && [ "$TRAVIS_CPU_ARCH" != ppc64le ] && [ "$TRAVIS_CPU_ARCH" != s390x ] && [ "$TRAVIS_CPU_ARCH" != arm64 ]; then
-        if [ -n "$LD_LIBRARY_PATH" ]; then
-            run_after_echo "sudo LD_LIBRARY_PATH=$LD_LIBRARY_PATH $TCPDUMP_BIN -#n -c 10"
-        else
-            run_after_echo "sudo $TCPDUMP_BIN -#n -c 10"
-        fi
-    fi
-fi
-# The DEBUG_BUILD variable is not set by default to avoid Travis error message:
-# "The job exceeded the maximum log length, and has been terminated."
-# Setting it needs to reduce the matrix cases.
-if [ "$MATRIX_DEBUG" = true ] && [ -n "$DEBUG_BUILD" ] ; then
+# Beware that setting MATRIX_DEBUG will produce A LOT of additional output
+# here and in any nested libpcap builds. Multiplied by the matrix size, the
+# full output log size might exceed limits of some CI systems (as previously
+# happened with Travis CI). Use with caution on a reduced matrix.
+if [ "$MATRIX_DEBUG" = true ]; then
     echo '$ cat Makefile [...]'
     sed '/DO NOT DELETE THIS LINE -- mkdep uses it/q' < Makefile
     echo '$ cat config.h'
