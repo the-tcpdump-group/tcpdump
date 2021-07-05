@@ -24,7 +24,7 @@ freebsd_task:
     MATRIX_CC: clang gcc10
   script:
     - pkg install -qy git autoconf gcc10
-    - pkg install -qy bash cmake # for build_matrix.sh and build.sh
+    - pkg install -qy cmake # for build_matrix.sh and build.sh
     - pkg install -qy pkgconf # for cmake, replaces pkg-config
     - echo '$ git clone [...] libpcap.git'
     - git -C .. clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT}
