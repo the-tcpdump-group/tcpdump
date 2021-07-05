@@ -6,7 +6,6 @@ set -e
 printf "\033[33;1mNote: COVERITY_SCAN_PROJECT_NAME and COVERITY_SCAN_TOKEN are available on Project Settings page on scan.coverity.com\033[0m\n"
 [ -z "$COVERITY_SCAN_PROJECT_NAME" ] && echo "ERROR: COVERITY_SCAN_PROJECT_NAME must be set" && exit 1
 #[ -z "$COVERITY_SCAN_NOTIFICATION_EMAIL" ] && echo "ERROR: COVERITY_SCAN_NOTIFICATION_EMAIL must be set" && exit 1
-[ -z "$COVERITY_SCAN_BRANCH_PATTERN" ] && echo "ERROR: COVERITY_SCAN_BRANCH_PATTERN must be set" && exit 1
 [ -z "$COVERITY_SCAN_BUILD_COMMAND" ] && echo "ERROR: COVERITY_SCAN_BUILD_COMMAND must be set" && exit 1
 [ -z "$COVERITY_SCAN_TOKEN" ] && echo "ERROR: COVERITY_SCAN_TOKEN must be set" && exit 1
 
@@ -16,31 +15,6 @@ TOOL_URL=https://scan.coverity.com/download/cxx/${PLATFORM}
 TOOL_BASE=/tmp/coverity-scan-analysis
 UPLOAD_URL="https://scan.coverity.com/builds"
 SCAN_URL="https://scan.coverity.com"
-
-# Verify Coverity Scan run condition
-COVERITY_SCAN_RUN_CONDITION=${coverity_scan_run_condition:-true}
-printf "\033[33;1mTesting '%s' condition... " "$COVERITY_SCAN_RUN_CONDITION"
-if eval [ "$COVERITY_SCAN_RUN_CONDITION" ]; then
-  printf "True.\033[0m\n"
-else
-  printf "False. Exit.\033[0m\n"
-  exit 0
-fi
-
-# Do not run on pull requests
-if [ "${TRAVIS_PULL_REQUEST}" = "true" ]; then
-  printf "\033[33;1mINFO: Skipping Coverity Analysis: branch is a pull request.\033[0m\n"
-  exit 0
-fi
-
-# Verify this branch should run
-IS_COVERITY_SCAN_BRANCH=$(ruby -e "puts '${TRAVIS_BRANCH}' =~ /\\A$COVERITY_SCAN_BRANCH_PATTERN\\z/ ? 1 : 0")
-if [ "$IS_COVERITY_SCAN_BRANCH" = "1" ]; then
-  printf "\033[33;1mCoverity Scan configured to run on branch %s\033[0m\n" "$TRAVIS_BRANCH"
-else
-  printf "\033[33;1mCoverity Scan NOT configured to run on branch %s\033[0m\n" "$TRAVIS_BRANCH"
-  exit 1
-fi
 
 # Verify upload is permitted
 AUTH_RES=$(curl -s --form project="$COVERITY_SCAN_PROJECT_NAME" --form token="$COVERITY_SCAN_TOKEN" $SCAN_URL/api/upload_permitted)
@@ -82,6 +56,7 @@ RESULTS_DIR="cov-int"
 eval "${COVERITY_SCAN_BUILD_COMMAND_PREPEND}"
 # Do not quote COV_BUILD_OPTIONS so it collapses when it is empty and expands
 # when it is not.
+# shellcheck disable=SC2086
 COVERITY_UNSUPPORTED=1 cov-build --dir "$RESULTS_DIR" $COV_BUILD_OPTIONS "$COVERITY_SCAN_BUILD_COMMAND"
 cov-import-scm --dir $RESULTS_DIR --scm git --log $RESULTS_DIR/scm_log.txt 2>&1
 

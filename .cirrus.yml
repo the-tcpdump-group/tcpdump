@@ -83,13 +83,10 @@ coverity_task:
     COVERITY_SCAN_TOKEN: ENCRYPTED[1b6f994cabfe74267ce2dce81fd9e49f694e9cfe69fb99f7d1580907bec1266efd7b38df3a47ccab53d5af98636f8e9c]
     COVERITY_SCAN_BUILD_COMMAND_PREPEND: ./configure
     COVERITY_SCAN_BUILD_COMMAND: make
-    COVERITY_SCAN_BRANCH_PATTERN: $CIRRUS_BRANCH
-    TRAVIS_BRANCH: $CIRRUS_BRANCH
-    TRAVIS_PULL_REQUEST: ${CIRRUS_BASE_BRANCH:+true}
   script:
     - apt-get -qy update
     - apt-get -qy install autoconf make gcc
     - apt-get -qy install libssl-dev libsmi2-dev libcap-ng-dev libpcap-dev
     - apt-get -qy install git curl wget ruby rubygems ruby-json # for the coverity script
     - apt list --installed 'lib*-dev'
-    - ./.travis-coverity-scan-build.sh
+    - ./.ci-coverity-scan-build.sh
