@@ -193,22 +193,22 @@ struct mgmt_header_t {
 #define	CAPABILITY_PRIVACY(cap)	((cap) & 0x0010)
 
 struct ssid_t {
-	uint8_t		length;
+	u_int		length;
 	u_char		ssid[33];  /* 32 + 1 for null */
 };
 
 struct rates_t {
-	uint8_t		length;
+	u_int		length;
 	uint8_t		rate[16];
 };
 
 struct challenge_t {
-	uint8_t		length;
+	u_int		length;
 	uint8_t		text[254]; /* 1-253 + 1 for null */
 };
 
 struct fh_t {
-	uint8_t		length;
+	u_int		length;
 	uint16_t	dwell_time;
 	uint8_t		hop_set;
 	uint8_t	hop_pattern;
@@ -216,12 +216,12 @@ struct fh_t {
 };
 
 struct ds_t {
-	uint8_t		length;
+	u_int		length;
 	uint8_t		channel;
 };
 
 struct cf_t {
-	uint8_t		length;
+	u_int		length;
 	uint8_t		count;
 	uint8_t		period;
 	uint16_t	max_duration;
@@ -229,7 +229,7 @@ struct cf_t {
 };
 
 struct tim_t {
-	uint8_t		length;
+	u_int		length;
 	uint8_t		count;
 	uint8_t		period;
 	uint8_t		bitmap_control;
@@ -403,15 +403,15 @@ struct meshcntl_t {
 	ND_PRINT("%s%2.1f%s", _sep, (.5 * ((_r) & 0x7f)), _suf)
 #define PRINT_RATES(p) \
 	if (p.rates_present) { \
-		int z; \
 		const char *sep = " ["; \
-		for (z = 0; z < p.rates.length ; z++) { \
-			PRINT_RATE(sep, p.rates.rate[z], \
-				(p.rates.rate[z] & 0x80 ? "*" : "")); \
-			sep = " "; \
-		} \
-		if (p.rates.length != 0) \
+		if (p.rates.length != 0) { \
+			for (u_int z = 0; z < p.rates.length ; z++) { \
+				PRINT_RATE(sep, p.rates.rate[z], \
+					(p.rates.rate[z] & 0x80 ? "*" : "")); \
+				sep = " "; \
+			} \
 			ND_PRINT(" Mbit]"); \
+		} \
 	}
 
 #define PRINT_DS_CHANNEL(p) \
