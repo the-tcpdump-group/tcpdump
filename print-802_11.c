@@ -193,25 +193,21 @@ struct mgmt_header_t {
 #define	CAPABILITY_PRIVACY(cap)	((cap) & 0x0010)
 
 struct ssid_t {
-	uint8_t		element_id;
 	uint8_t		length;
 	u_char		ssid[33];  /* 32 + 1 for null */
 };
 
 struct rates_t {
-	uint8_t		element_id;
 	uint8_t		length;
 	uint8_t		rate[16];
 };
 
 struct challenge_t {
-	uint8_t		element_id;
 	uint8_t		length;
 	uint8_t		text[254]; /* 1-253 + 1 for null */
 };
 
 struct fh_t {
-	uint8_t		element_id;
 	uint8_t		length;
 	uint16_t	dwell_time;
 	uint8_t		hop_set;
@@ -220,13 +216,11 @@ struct fh_t {
 };
 
 struct ds_t {
-	uint8_t		element_id;
 	uint8_t		length;
 	uint8_t		channel;
 };
 
 struct cf_t {
-	uint8_t		element_id;
 	uint8_t		length;
 	uint8_t		count;
 	uint8_t		period;
@@ -235,7 +229,6 @@ struct cf_t {
 };
 
 struct tim_t {
-	uint8_t		element_id;
 	uint8_t		length;
 	uint8_t		count;
 	uint8_t		period;
@@ -1170,7 +1163,7 @@ parse_elements(netdissect_options *ndo,
 
 		switch (GET_U_1(p + offset)) {
 		case E_SSID:
-			memcpy(&ssid, p + offset, 2);
+			ssid.length = elementlen;
 			offset += 2;
 			length -= 2;
 			if (ssid.length != 0) {
@@ -1194,7 +1187,7 @@ parse_elements(netdissect_options *ndo,
 			}
 			break;
 		case E_CHALLENGE:
-			memcpy(&challenge, p + offset, 2);
+			challenge.length = elementlen;
 			offset += 2;
 			length -= 2;
 			if (challenge.length != 0) {
@@ -1220,7 +1213,7 @@ parse_elements(netdissect_options *ndo,
 			}
 			break;
 		case E_RATES:
-			memcpy(&rates, p + offset, 2);
+			rates.length = elementlen;
 			offset += 2;
 			length -= 2;
 			if (rates.length != 0) {
@@ -1252,7 +1245,7 @@ parse_elements(netdissect_options *ndo,
 			}
 			break;
 		case E_DS:
-			memcpy(&ds, p + offset, 2);
+			ds.length = elementlen;
 			offset += 2;
 			length -= 2;
 			if (ds.length != 1) {
@@ -1276,7 +1269,7 @@ parse_elements(netdissect_options *ndo,
 			}
 			break;
 		case E_CF:
-			memcpy(&cf, p + offset, 2);
+			cf.length = elementlen;
 			offset += 2;
 			length -= 2;
 			if (cf.length != 6) {
@@ -1309,7 +1302,7 @@ parse_elements(netdissect_options *ndo,
 			}
 			break;
 		case E_TIM:
-			memcpy(&tim, p + offset, 2);
+			tim.length = elementlen;
 			offset += 2;
 			length -= 2;
 			if (tim.length <= 3U) {
