@@ -471,27 +471,27 @@ show_dlts_and_exit(pcap_t *pc, const char *device)
 	 * not in monitor mode).
 	 */
 	if (supports_monitor_mode)
-		(void) fprintf(stderr, "Data link types for %s %s (use option -y to set):\n",
+		(void) fprintf(stdout, "Data link types for %s %s (use option -y to set):\n",
 		    device,
 		    Iflag ? "when in monitor mode" : "when not in monitor mode");
 	else
-		(void) fprintf(stderr, "Data link types for %s (use option -y to set):\n",
+		(void) fprintf(stdout, "Data link types for %s (use option -y to set):\n",
 		    device);
 
 	for (i = 0; i < n_dlts; i++) {
 		dlt_name = pcap_datalink_val_to_name(dlts[i]);
 		if (dlt_name != NULL) {
-			(void) fprintf(stderr, "  %s (%s)", dlt_name,
+			(void) fprintf(stdout, "  %s (%s)", dlt_name,
 			    pcap_datalink_val_to_description(dlts[i]));
 
 			/*
 			 * OK, does tcpdump handle that type?
 			 */
 			if (!has_printer(dlts[i]))
-				(void) fprintf(stderr, " (printing not supported)");
-			fprintf(stderr, "\n");
+				(void) fprintf(stdout, " (printing not supported)");
+			fprintf(stdout, "\n");
 		} else {
-			(void) fprintf(stderr, "  DLT %d (printing not supported)\n",
+			(void) fprintf(stdout, "  DLT %d (printing not supported)\n",
 			    dlts[i]);
 		}
 	}
