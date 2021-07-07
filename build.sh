@@ -72,6 +72,15 @@ Darwin)
     run_after_echo "otool -L $TCPDUMP_BIN"
     ;;
 esac
+if [ "$CIRRUS_CI" = true ]; then
+    if [ -n "$LD_LIBRARY_PATH" ]; then
+        run_after_echo "sudo LD_LIBRARY_PATH=$LD_LIBRARY_PATH $TCPDUMP_BIN -J"
+        run_after_echo "sudo LD_LIBRARY_PATH=$LD_LIBRARY_PATH $TCPDUMP_BIN -L"
+    else
+        run_after_echo "sudo $TCPDUMP_BIN -J"
+        run_after_echo "sudo $TCPDUMP_BIN -L"
+    fi
+fi
 if [ "$BUILD_LIBPCAP" = yes ]; then
     run_after_echo "make check"
 fi
@@ -79,6 +88,13 @@ if [ "$CMAKE" = no ]; then
     system=$(uname -s)
     if [ "$system" = Darwin ] || [ "$system" = Linux ]; then
         run_after_echo "make releasetar"
+    fi
+fi
+if [ "$CIRRUS_CI" = true ]; then
+    if [ -n "$LD_LIBRARY_PATH" ]; then
+        run_after_echo "sudo LD_LIBRARY_PATH=$LD_LIBRARY_PATH $TCPDUMP_BIN -#n -c 10"
+    else
+        run_after_echo "sudo $TCPDUMP_BIN -#n -c 10"
     fi
 fi
 # Beware that setting MATRIX_DEBUG will produce A LOT of additional output
