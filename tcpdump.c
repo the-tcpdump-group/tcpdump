@@ -470,13 +470,15 @@ show_dlts_and_exit(pcap_t *pc, const char *device)
 	 * monitor mode might be different from the ones available when
 	 * not in monitor mode).
 	 */
+	(void) fprintf(stdout, "Data link types for ");
 	if (supports_monitor_mode)
-		(void) fprintf(stdout, "Data link types for %s %s (use option -y to set):\n",
+		(void) fprintf(stdout, "%s %s",
 		    device,
 		    Iflag ? "when in monitor mode" : "when not in monitor mode");
 	else
-		(void) fprintf(stdout, "Data link types for %s (use option -y to set):\n",
+		(void) fprintf(stdout, "%s",
 		    device);
+	(void) fprintf(stdout, " (use option -y to set):\n");
 
 	for (i = 0; i < n_dlts; i++) {
 		dlt_name = pcap_datalink_val_to_name(dlts[i]);
