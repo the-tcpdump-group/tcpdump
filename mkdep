@@ -112,7 +112,7 @@ awk '{
 		prev = $1;
 	}
 	else {
-		if (length(rec $2) > 78) {
+		if (length(rec $2) > 58) {
 			print rec;
 			rec = $0;
 		}
