@@ -157,6 +157,7 @@ struct ip6_dest {
 #define IP6OPT_TYPE_ICMP	0xC0
 
 #define IP6OPT_MUTABLE		0x20
+#define IP6OPT_TPF		0x41	/* 01 0 00001 */
 
 /* Routing header */
 struct ip6_rthdr {
