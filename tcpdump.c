@@ -1522,7 +1522,7 @@ main(int argc, char **argv)
 	int yflag_dlt = -1;
 	const char *yflag_dlt_name = NULL;
 	int print = 0;
-	long Cflagmult = 1000000;
+	long Cflagmult;
 
 	netdissect_options Ndo;
 	netdissect_options *ndo = &Ndo;
@@ -1757,26 +1757,72 @@ main(int argc, char **argv)
 
 		case 'C':
 			errno = 0;
-			if (optarg[strlen(optarg)-1] == 'k') {
-				Cflagmult = 1024;
-				optarg[strlen(optarg)-1] = '\0';
-			}
-			if (optarg[strlen(optarg)-1] == 'm') {
-				Cflagmult = 1024*1024;
-				optarg[strlen(optarg)-1] = '\0';
-			}
-			if (optarg[strlen(optarg)-1] == 'g') {
-				Cflagmult = 1024*1024*1024;
-				optarg[strlen(optarg)-1] = '\0';
-			}
 #ifdef HAVE_PCAP_DUMP_FTELL64
 			Cflag = strtoint64_t(optarg, &endp, 10);
 #else
 			Cflag = strtol(optarg, &endp, 10);
 #endif
-			if (endp == optarg || *endp != '\0' || errno != 0
-			    || Cflag <= 0)
+			if (endp == optarg || errno != 0 || Cflag <= 0)
 				error("invalid file size %s", optarg);
+
+			if (*endp == '\0') {
+				/*
+				 * There's nothing after the file size,
+				 * so the size is in units of 1 MB
+				 * (1,000,000 bytes).
+				 */
+				Cflagmult = 1000000;
+			} else {
+				/*
+				 * There's something after the file
+				 * size.
+				 *
+				 * If it's a single letter, then:
+				 *
+				 *   if the letter is k or K, the size
+				 *   is in units of 1 KiB (1024 bytes);
+				 *
+				 *   if the letter is m or M, the size
+				 *   is in units of 1 MiB (1,048,576 bytes);
+				 *
+				 *   if the letter is g or G, the size
+				 *   is in units of 1 GiB (1,073,741,824 bytes).
+				 *
+				 * Otherwise, it's an error.
+				 */
+				switch (*endp) {
+
+				case 'k':
+				case 'K':
+					Cflagmult = 1024;
+					break;
+
+				case 'm':
+				case 'M':
+					Cflagmult = 1024*1024;
+					break;
+
+				case 'g':
+				case 'G':
+					Cflagmult = 1024*1024*1024;
+					break;
+
+				default:
+					error("invalid file size %s", optarg);
+				}
+
+				/*
+				 * OK, there was a letter that we treat
+				 * as a units indication; was there
+				 * anything after it?
+				 */
+				endp++;
+				if (*endp != '\0') {
+					/* Yes - error */
+					error("invalid file size %s", optarg);
+				}
+			}
+
 			/*
 			 * Will multiplying it by multiplier overflow?
 			 */
