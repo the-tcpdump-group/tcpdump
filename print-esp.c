@@ -410,7 +410,7 @@ int espprint_decode_hex(netdissect_options *ndo,
 }
 
 static int
-strendswith(char *str, char *end)
+strendswith(const char *str, const char *end)
 {
 	char *p;
 	const size_t str_len = strlen(str);
