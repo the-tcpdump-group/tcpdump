@@ -31,10 +31,10 @@
 
 #include <string.h>
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 
-static const char tstr[] = " [|ipfc]";
 
 struct ipfc_header {
 	nd_byte ipfc_dhost[2+MAC_ADDR_LEN];
@@ -96,12 +96,10 @@ ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 	int llc_hdrlen;
 
 	ndo->ndo_protocol = "ipfc";
-	if (caplen < IPFC_HDRLEN)
-		goto trunc;
+	ND_TCHECK_LEN(p, IPFC_HDRLEN);
 	/*
 	 * Get the network addresses into a canonical form
 	 */
-	ND_TCHECK_SIZE(ipfcp);
 	extract_ipfc_addrs(ipfcp, (char *)srcmac, (char *)dstmac);
 
 	if (ndo->ndo_eflag)
@@ -129,9 +127,6 @@ ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 		llc_hdrlen = -llc_hdrlen;
 	}
 	return (IPFC_HDRLEN + llc_hdrlen);
-trunc:
-	ND_PRINT("%s", tstr);
-	return caplen;
 }
 
 /*
@@ -140,9 +135,9 @@ trunc:
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
+void
 ipfc_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
-	ndo->ndo_protocol = "ipfc_if";
-	return (ipfc_print(ndo, p, h->len, h->caplen));
+	ndo->ndo_protocol = "ipfc";
+	ndo->ndo_ll_hdr_len += ipfc_print(ndo, p, h->len, h->caplen);
 }

@@ -50,6 +50,7 @@ const struct tok ipproto_values[] = {
     { IPPROTO_PGM, "PGM" },
     { IPPROTO_SCTP, "SCTP" },
     { IPPROTO_MOBILITY, "Mobility" },
+    { IPPROTO_ETHERNET, "Ethernet" },
     { 0, NULL }
 };
 

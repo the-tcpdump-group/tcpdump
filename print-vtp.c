@@ -13,8 +13,8 @@
  * FOR A PARTICULAR PURPOSE.
  *
  * Reference documentation:
- *  http://www.cisco.com/c/en/us/support/docs/lan-switching/vtp/10558-21.html
- *  http://docstore.mik.ua/univercd/cc/td/doc/product/lan/trsrb/frames.htm
+ *  https://www.cisco.com/c/en/us/support/docs/lan-switching/vtp/10558-21.html
+ *  https://docstore.mik.ua/univercd/cc/td/doc/product/lan/trsrb/frames.htm
  *
  * Original code ode by Carles Kishimoto <carles.kishimoto@gmail.com>
  */
@@ -27,6 +27,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -116,8 +117,8 @@ static const struct tok vtp_stp_type_values[] = {
 };
 
 void
-vtp_print (netdissect_options *ndo,
-           const u_char *pptr, u_int length)
+vtp_print(netdissect_options *ndo,
+          const u_char *pptr, const u_int length)
 {
     u_int type, len, name_len, tlv_len, tlv_value, mgmtd_len;
     const u_char *tptr;
@@ -125,35 +126,35 @@ vtp_print (netdissect_options *ndo,
 
     ndo->ndo_protocol = "vtp";
     if (length < VTP_HEADER_LEN)
-        goto trunc;
+        goto invalid;
 
     tptr = pptr;
 
     ND_TCHECK_LEN(tptr, VTP_HEADER_LEN);
 
-    type = EXTRACT_U_1(tptr + 1);
+    type = GET_U_1(tptr + 1);
     ND_PRINT("VTPv%u, Message %s (0x%02x), length %u",
-	   EXTRACT_U_1(tptr),
+	   GET_U_1(tptr),
 	   tok2str(vtp_message_type_values,"Unknown message type", type),
 	   type,
 	   length);
 
     /* In non-verbose mode, just print version and message type */
     if (ndo->ndo_vflag < 1) {
-        return;
+        goto tcheck_full_packet;
     }
 
     /* verbose mode print all fields */
     ND_PRINT("\n\tDomain name: ");
-    mgmtd_len = EXTRACT_U_1(tptr + 3);
-    if (mgmtd_len < 1 ||  mgmtd_len > 32) {
+    mgmtd_len = GET_U_1(tptr + 3);
+    if (mgmtd_len < 1 ||  mgmtd_len > VTP_DOMAIN_NAME_LEN) {
 	ND_PRINT(" [invalid MgmtD Len %u]", mgmtd_len);
-	return;
+	goto invalid;
     }
-    fn_printzp(ndo, tptr + 4, mgmtd_len, NULL);
+    nd_printjnp(ndo, tptr + 4, mgmtd_len);
     ND_PRINT(", %s: %u",
 	   tok2str(vtp_header_values, "Unknown", type),
-	   EXTRACT_U_1(tptr + 2));
+	   GET_U_1(tptr + 2));
 
     tptr += VTP_HEADER_LEN;
 
@@ -181,23 +182,20 @@ vtp_print (netdissect_options *ndo,
 	 *
 	 */
 
-	ND_TCHECK_8(tptr);
 	ND_PRINT("\n\t  Config Rev %x, Updater %s",
-	       EXTRACT_BE_U_4(tptr),
-	       ipaddr_string(ndo, tptr+4));
+	       GET_BE_U_4(tptr),
+	       GET_IPADDR_STRING(tptr+4));
 	tptr += 8;
-	ND_TCHECK_LEN(tptr, VTP_UPDATE_TIMESTAMP_LEN);
 	ND_PRINT(", Timestamp 0x%08x 0x%08x 0x%08x",
-	       EXTRACT_BE_U_4(tptr),
-	       EXTRACT_BE_U_4(tptr + 4),
-	       EXTRACT_BE_U_4(tptr + 8));
+	       GET_BE_U_4(tptr),
+	       GET_BE_U_4(tptr + 4),
+	       GET_BE_U_4(tptr + 8));
 	tptr += VTP_UPDATE_TIMESTAMP_LEN;
-	ND_TCHECK_LEN(tptr, VTP_MD5_DIGEST_LEN);
 	ND_PRINT(", MD5 digest: %08x%08x%08x%08x",
-	       EXTRACT_BE_U_4(tptr),
-	       EXTRACT_BE_U_4(tptr + 4),
-	       EXTRACT_BE_U_4(tptr + 8),
-	       EXTRACT_BE_U_4(tptr + 12));
+	       GET_BE_U_4(tptr),
+	       GET_BE_U_4(tptr + 4),
+	       GET_BE_U_4(tptr + 8),
+	       GET_BE_U_4(tptr + 12));
 	tptr += VTP_MD5_DIGEST_LEN;
 	break;
 
@@ -223,8 +221,7 @@ vtp_print (netdissect_options *ndo,
 	 *
 	 */
 
-	ND_TCHECK_4(tptr);
-	ND_PRINT(", Config Rev %x", EXTRACT_BE_U_4(tptr));
+	ND_PRINT(", Config Rev %x", GET_BE_U_4(tptr));
 
 	/*
 	 *  VLAN INFORMATION
@@ -242,10 +239,9 @@ vtp_print (netdissect_options *ndo,
 	 */
 
 	tptr += 4;
-	while (tptr < (pptr+length)) {
+	while ((unsigned)(tptr - pptr) < length) {
 
-	    ND_TCHECK_1(tptr);
-	    len = EXTRACT_U_1(tptr);
+	    len = GET_U_1(tptr);
 	    if (len == 0)
 		break;
 
@@ -253,21 +249,19 @@ vtp_print (netdissect_options *ndo,
 
 	    vtp_vlan = (const struct vtp_vlan_*)tptr;
 	    if (len < VTP_VLAN_INFO_FIXED_PART_LEN)
-		goto trunc;
-	    ND_TCHECK_SIZE(vtp_vlan);
+		goto invalid;
 	    ND_PRINT("\n\tVLAN info status %s, type %s, VLAN-id %u, MTU %u, SAID 0x%08x, Name ",
-		   tok2str(vtp_vlan_status,"Unknown",EXTRACT_U_1(vtp_vlan->status)),
-		   tok2str(vtp_vlan_type_values,"Unknown",EXTRACT_U_1(vtp_vlan->type)),
-		   EXTRACT_BE_U_2(vtp_vlan->vlanid),
-		   EXTRACT_BE_U_2(vtp_vlan->mtu),
-		   EXTRACT_BE_U_4(vtp_vlan->index));
+		   tok2str(vtp_vlan_status,"Unknown",GET_U_1(vtp_vlan->status)),
+		   tok2str(vtp_vlan_type_values,"Unknown",GET_U_1(vtp_vlan->type)),
+		   GET_BE_U_2(vtp_vlan->vlanid),
+		   GET_BE_U_2(vtp_vlan->mtu),
+		   GET_BE_U_4(vtp_vlan->index));
 	    len  -= VTP_VLAN_INFO_FIXED_PART_LEN;
 	    tptr += VTP_VLAN_INFO_FIXED_PART_LEN;
-	    name_len = EXTRACT_U_1(vtp_vlan->name_len);
+	    name_len = GET_U_1(vtp_vlan->name_len);
 	    if (len < 4*((name_len + 3)/4))
-		goto trunc;
-	    ND_TCHECK_LEN(tptr, name_len);
-	    fn_printzp(ndo, tptr, name_len, NULL);
+		goto invalid;
+	    nd_printjnp(ndo, tptr, name_len);
 
 	    /*
 	     * Vlan names are aligned to 32-bit boundaries.
@@ -281,16 +275,15 @@ vtp_print (netdissect_options *ndo,
 
                 /*
                  * Cisco specs say 2 bytes for type + 2 bytes for length;
-                 * see http://docstore.mik.ua/univercd/cc/td/doc/product/lan/trsrb/frames.htm
+                 * see https://docstore.mik.ua/univercd/cc/td/doc/product/lan/trsrb/frames.htm
                  * However, actual packets on the wire appear to use 1
                  * byte for the type and 1 byte for the length, so that's
                  * what we do.
                  */
                 if (len < 2)
-                    goto trunc;
-                ND_TCHECK_2(tptr);
-                type = EXTRACT_U_1(tptr);
-                tlv_len = EXTRACT_U_1(tptr + 1);
+                    goto invalid;
+                type = GET_U_1(tptr);
+                tlv_len = GET_U_1(tptr + 1);
 
                 ND_PRINT("\n\t\t%s (0x%04x) TLV",
                        tok2str(vtp_vlan_tlv_values, "Unknown", type),
@@ -298,7 +291,7 @@ vtp_print (netdissect_options *ndo,
 
                 if (len < tlv_len * 2 + 2) {
                     ND_PRINT(" (TLV goes past the end of the packet)");
-                    return;
+                    goto invalid;
                 }
                 ND_TCHECK_LEN(tptr, tlv_len * 2 + 2);
 
@@ -308,9 +301,9 @@ vtp_print (netdissect_options *ndo,
                  */
                 if (tlv_len != 1) {
                     ND_PRINT(" (invalid TLV length %u != 1)", tlv_len);
-                    return;
+                    goto invalid;
                 } else {
-                    tlv_value = EXTRACT_BE_U_2(tptr + 2);
+                    tlv_value = GET_BE_U_2(tptr + 2);
 
                     switch (type) {
                     case VTP_VLAN_STE_HOP_COUNT:
@@ -378,8 +371,7 @@ vtp_print (netdissect_options *ndo,
 	 *
 	 */
 
-	ND_TCHECK_4(tptr);
-	ND_PRINT("\n\tStart value: %u", EXTRACT_BE_U_4(tptr));
+	ND_PRINT("\n\tStart value: %u", GET_BE_U_4(tptr));
 	break;
 
     case VTP_JOIN_MESSAGE:
@@ -393,6 +385,8 @@ vtp_print (netdissect_options *ndo,
 
     return;
 
- trunc:
-    ND_PRINT("[|vtp]");
+invalid:
+    nd_print_invalid(ndo);
+tcheck_full_packet:
+    ND_TCHECK_LEN(pptr, length);
 }

@@ -30,17 +30,14 @@
 /* Define to 1 if you have the declaration of `ether_ntohost' */
 #undef HAVE_DECL_ETHER_NTOHOST
 
-/* define if you have the dnet_htoa function */
-#undef HAVE_DNET_HTOA
-
 /* Define to 1 if you have the `ether_ntohost' function. */
 #undef HAVE_ETHER_NTOHOST
 
-/* Define to 1 if you have the `EVP_CipherInit_ex' function. */
-#undef HAVE_EVP_CIPHERINIT_EX
-
 /* Define to 1 if you have the `EVP_CIPHER_CTX_new' function. */
 #undef HAVE_EVP_CIPHER_CTX_NEW
+
+/* Define to 1 if you have the `EVP_DecryptInit_ex' function. */
+#undef HAVE_EVP_DECRYPTINIT_EX
 
 /* Define to 1 if you have the <fcntl.h> header file. */
 #undef HAVE_FCNTL_H
@@ -72,11 +69,8 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
-/* Define to 1 if you have the <netdnet/dnetdb.h> header file. */
-#undef HAVE_NETDNET_DNETDB_H
-
-/* Define to 1 if you have the <netdnet/dn.h> header file. */
-#undef HAVE_NETDNET_DN_H
+/* Define to 1 if you have the <net/if.h> header file. */
+#undef HAVE_NET_IF_H
 
 /* Define to 1 if you have the <net/if_pflog.h> header file. */
 #undef HAVE_NET_IF_PFLOG_H
@@ -96,9 +90,6 @@
 /* if there's an os_proto.h for this platform, to use additional prototypes */
 #undef HAVE_OS_PROTO_H
 
-/* Define to 1 if you have the <pcap/bluetooth.h> header file. */
-#undef HAVE_PCAP_BLUETOOTH_H
-
 /* Define to 1 if you have the `pcap_breakloop' function. */
 #undef HAVE_PCAP_BREAKLOOP
 
@@ -117,7 +108,7 @@
 /* Define to 1 if you have the `pcap_dump_flush' function. */
 #undef HAVE_PCAP_DUMP_FLUSH
 
-/* define if libpcap has pcap_dump_ftell() */
+/* Define to 1 if you have the `pcap_dump_ftell' function. */
 #undef HAVE_PCAP_DUMP_FTELL
 
 /* Define to 1 if you have the `pcap_dump_ftell64' function. */
@@ -140,9 +131,6 @@
 
 /* define if libpcap has pcap_list_datalinks() */
 #undef HAVE_PCAP_LIST_DATALINKS
-
-/* Define to 1 if you have the <pcap/nflog.h> header file. */
-#undef HAVE_PCAP_NFLOG_H
 
 /* Define to 1 if you have the `pcap_open' function. */
 #undef HAVE_PCAP_OPEN
@@ -186,9 +174,6 @@
 /* Define to 1 if you have the `setlinebuf' function. */
 #undef HAVE_SETLINEBUF
 
-/* Define to 1 if you have the `snprintf' function. */
-#undef HAVE_SNPRINTF
-
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
 
@@ -216,9 +201,6 @@
 /* Define to 1 if you have the `strsep' function. */
 #undef HAVE_STRSEP
 
-/* Define to 1 if the system has the type `struct dn_naddr'. */
-#undef HAVE_STRUCT_DN_NADDR
-
 /* Define to 1 if the system has the type `struct ether_addr'. */
 #undef HAVE_STRUCT_ETHER_ADDR
 
@@ -237,14 +219,8 @@
 /* Define to 1 if you have the `vfork' function. */
 #undef HAVE_VFORK
 
-/* Define to 1 if you have the `vsnprintf' function. */
-#undef HAVE_VSNPRINTF
-
 /* define if libpcap has yydebug */
 #undef HAVE_YYDEBUG
-
-/* Define to 1 if netenet/dnetdb.h declares `dnet_htoa' */
-#undef NETDNET_DNETDB_H_DECLARES_DNET_HTOA
 
 /* Define to 1 if netinet/ether.h declares `ether_ntohost' */
 #undef NETINET_ETHER_H_DECLARES_ETHER_NTOHOST

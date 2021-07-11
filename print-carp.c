@@ -52,9 +52,8 @@ carp_print(netdissect_options *ndo, const u_char *bp, u_int len, u_int ttl)
 	const char *type_s;
 
 	ndo->ndo_protocol = "carp";
-	ND_TCHECK_1(bp);
-	version = (EXTRACT_U_1(bp) & 0xf0) >> 4;
-	type = EXTRACT_U_1(bp) & 0x0f;
+	version = (GET_U_1(bp) & 0xf0) >> 4;
+	type = GET_U_1(bp) & 0x0f;
 	if (type == 1)
 		type_s = "advertise";
 	else
@@ -64,21 +63,16 @@ carp_print(netdissect_options *ndo, const u_char *bp, u_int len, u_int ttl)
 		ND_PRINT("[ttl=%u!] ", ttl);
 	if (version != 2 || type != 1)
 		return;
-	ND_TCHECK_1(bp + 2);
-	ND_TCHECK_1(bp + 5);
 	ND_PRINT("vhid=%u advbase=%u advskew=%u authlen=%u ",
-	    EXTRACT_U_1(bp + 1), EXTRACT_U_1(bp + 5), EXTRACT_U_1(bp + 2), EXTRACT_U_1(bp + 3));
+	    GET_U_1(bp + 1), GET_U_1(bp + 5), GET_U_1(bp + 2),
+	    GET_U_1(bp + 3));
 	if (ndo->ndo_vflag) {
 		struct cksum_vec vec[1];
 		vec[0].ptr = (const uint8_t *)bp;
 		vec[0].len = len;
 		if (ND_TTEST_LEN(bp, len) && in_cksum(vec, 1))
 			ND_PRINT(" (bad carp cksum %x!)",
-				EXTRACT_BE_U_2(bp + 6));
+				GET_BE_U_2(bp + 6));
 	}
-	ND_PRINT("counter=%" PRIu64, EXTRACT_BE_U_8(bp + 8));
-
-	return;
-trunc:
-	ND_PRINT("[|carp]");
+	ND_PRINT("counter=%" PRIu64, GET_BE_U_8(bp + 8));
 }

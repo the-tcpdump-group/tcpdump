@@ -1,3 +1,161 @@
+Monthday, Month DD, YYYY by gharris and denis
+  Summary for 5.0.0 tcpdump release (so far!)
+    Refine protocol decoding for:
+      EIGRP: Get the packet header fields right.
+      OpenFlow 1.0: Fix indentation of PORT_MOD.
+      RIP: Make a couple trivial protocol updates.
+      NetFlow: Use tcp_flag_values[] for TCP flags.
+      OSPF: Update to match the Router Properties registry.
+      MPLS: Rename the "exp" field to "tc".
+      VQP: Do not print unknown error codes twice.
+      ZMTP: Replace custom code with bittok2str().
+      BFD: Add support for S-BFD and spell LAG in uppercase.
+    Source code:
+      Use %zu when printing a sizeof to squelch compiler warnings
+      (FIXME: somebody please wrap the line below just before the release)
+      AODV, AppleTalk, BOOTP, EGP, EIGRP, ForCES, Geneve, L2TP, NetFlow, NTP, OLSR, PGM, RIP, RSVP, SCTP, SNMP, TCP, UDP: Modernize packet parsing style
+      DCCP, EGP: Replace custom code with tok2str()
+      UDP: Clean up address and port printing.
+      AppleTalk: Declutter appletalk.h.
+      Introduce new ND_LCHECK*() macros to deduplicate more code.
+      IEEE 802.11: Simplify handle_action().
+      RPKI-Router: Refine length and bounds checks.
+
+Wednesday, June 9, 2021 by gharris
+  Summary for 4.99.1 tcpdump release
+    Source code:
+      Squelch some compiler warnings
+      ICMP: Update the snapend for some nested IP packets.
+      MACsec: Update the snapend thus the ICV field is not payload
+        for the caller.
+      EIGRP: Fix packet header fields
+      SMB: Disable printer by default in CMake builds
+      OLSR: Print the protocol name even if the packet is invalid
+      MSDP: Print ": " before the protocol name
+      ESP: Remove padding, padding length and next header from the buffer
+      DHCPv6: Update the snapend for nested DHCPv6 packets
+      OpenFlow 1.0: Get snapend right for nested frames.
+      TCP: Update the snapend before decoding a MPTCP option
+      Ethernet, IEEE 802.15.4, IP, L2TP, TCP, ZEP: Add bounds checks
+      ForCES: Refine SPARSEDATA-TLV length check.
+      ASCII/hex: Use nd_trunc_longjmp() in truncation cases
+      GeoNet: Add a ND_TCHECK_LEN() call
+      Replace ND_TCHECK_/memcpy() pairs with GET_CPY_BYTES().
+      BGP: Fix overwrites of global 'astostr' temporary buffer
+      ARP: fix overwrites of static buffer in q922_string().
+      Frame Relay: have q922_string() handle errors better.
+    Building and testing:
+      Rebuild configure script when building release
+      Fix "make clean" for out-of-tree autotools builds
+      CMake: add stuff from CMAKE_PREFIX_PATH to PKG_CONFIG_PATH.
+    Documentation:
+      man: Update a reference as www.cifs.org is gone. [skip ci]
+      man: Update DNS sections
+    Solaris:
+      Fix a compile error with Sun C
+
+Wednesday, December 30, 2020, by mcr@sandelman.ca, denis and fxl.
+  Summary for 4.99.0 tcpdump release
+    Improve the contents, wording and formatting of the man page.
+    Print unsupported link-layer protocol packets in hex.
+    Add support for new network protocols and DLTs: Arista, Autosar SOME/IP,
+      Broadcom LI and Ethernet switches tag, IEEE 802.15.9, IP-over-InfiniBand
+      (IPoIB), Linux SLL2, Linux vsockmon, MACsec, Marvell Distributed Switch
+      Architecture, OpenFlow 1.3, Precision Time Protocol (PTP), SSH, WHOIS,
+      ZigBee Encapsulation Protocol (ZEP).
+    Make protocol-specific updates for: AH, DHCP, DNS, ESP, FRF.16, HNCP,
+      ICMP6, IEEE 802.15.4, IPv6, IS-IS, Linux SLL, LLDP, LSP ping, MPTCP, NFS,
+      NSH, NTP, OSPF, OSPF6, PGM, PIM, PPTP, RADIUS, RSVP, Rx, SMB, UDLD,
+      VXLAN-GPE.
+    User interface:
+      Make SLL2 the default for Linux "any" pseudo-device.
+      Add --micro and --nano shorthands.
+      Add --count to print a counter only instead of decoding.
+      Add --print, to cause packet printing even with -w.
+      Add support for remote capture if libpcap supports it.
+      Display the "wireless" flag and connection status.
+      Flush the output packet buffer on a SIGUSR2.
+      Add the snapshot length to the "reading from file ..." message.
+      Fix local time printing (DST offset in timestamps).
+      Allow -C arguments > 2^31-1 GB if they can fit into a long.
+      Handle very large -f files by rejecting them.
+      Report periodic stats only when safe to do so.
+      Print the number of packets captured only as often as necessary.
+      With no -s, or with -s 0, don't specify the snapshot length with newer
+        versions of libpcap.
+      Improve version and usage message printing.
+    Building and testing:
+      Install into bindir, not sbindir.
+      autoconf: replace --with-system-libpcap with --disable-local-libpcap.
+      Require the compiler to support C99.
+      Better detect and use various C compilers and their features.
+      Add CMake as the second build system.
+      Make out-of-tree builds more reliable.
+      Use pkg-config to detect libpcap if available.
+      Improve Windows support.
+      Add more tests and improve the scripts that run them.
+      Test both with "normal" and "x87" floating-point.
+      Eliminate dependency on libdnet.
+    FreeBSD:
+      Print a proper error message about monitor mode VAP.
+      Use libcasper if available.
+      Fix failure to capture on RDMA device.
+      Include the correct capsicum header.
+    Source code:
+      Start the transition to longjmp() for packet truncation handling.
+      Introduce new helper functions, including GET_*(), nd_print_protocol(),
+        nd_print_invalid(), nd_print_trunc(), nd_trunc_longjmp() and others.
+      Put integer signedness right in many cases.
+      Introduce nd_uint*, nd_mac_addr, nd_ipv4 and nd_ipv6 types to fix
+        alignment issues, especially on SPARC.
+      Fix many C compiler, Coverity, UBSan and cppcheck warnings.
+      Fix issues detected with AddressSanitizer.
+      Remove many workarounds for older compilers and OSes.
+      Add a sanity check on packet header length.
+      Add and remove plenty of bounds checks.
+      Clean up pcap_findalldevs() call to find the first interface.
+      Use a short timeout, rather than immediate mode, for text output.
+      Handle DLT_ENC files *not* written on the same OS and byte-order host.
+      Add, and use, macros to do locale-independent case mapping.
+      Use a table instead of getprotobynumber().
+      Get rid of ND_UNALIGNED and ND_TCHECK().
+      Make roundup2() generally available.
+      Resync SMI list against Wireshark.
+      Fix many typos.
+
+Friday, September 20, 2019, by mcr@sandelman.ca
+  A huge thank you to Denis, Francois-Xavier and Guy who did much of the heavy lifting.
+  Summary for 4.9.3 tcpdump release
+    Fix buffer overflow/overread vulnerabilities:
+      CVE-2017-16808 (AoE)
+      CVE-2018-14468 (FrameRelay)
+      CVE-2018-14469 (IKEv1)
+      CVE-2018-14470 (BABEL)
+      CVE-2018-14466 (AFS/RX)
+      CVE-2018-14461 (LDP)
+      CVE-2018-14462 (ICMP)
+      CVE-2018-14465 (RSVP)
+      CVE-2018-14881 (BGP)
+      CVE-2018-14464 (LMP)
+      CVE-2018-14463 (VRRP)
+      CVE-2018-14467 (BGP)
+      CVE-2018-10103 (SMB - partially fixed, but SMB printing disabled)
+      CVE-2018-10105 (SMB - too unreliably reproduced, SMB printing disabled)
+      CVE-2018-14880 (OSPF6)
+      CVE-2018-16451 (SMB)
+      CVE-2018-14882 (RPL)
+      CVE-2018-16227 (802.11)
+      CVE-2018-16229 (DCCP)
+      CVE-2018-16301 (was fixed in libpcap)
+      CVE-2018-16230 (BGP)
+      CVE-2018-16452 (SMB)
+      CVE-2018-16300 (BGP)
+      CVE-2018-16228 (HNCP)
+      CVE-2019-15166 (LMP)
+      CVE-2019-15167 (VRRP)
+    Fix for cmdline argument/local issues:
+      CVE-2018-14879 (tcpdump -V)
+
 Sunday September 3, 2017 denis@ovsienko.info
   Summary for 4.9.2 tcpdump release
     Do not use getprotobynumber() for protocol name resolution.  Do not do
@@ -33,8 +191,6 @@ Sunday September 3, 2017 denis@ovsienko.info
       CVE-2017-12991 (BGP)
       CVE-2017-12992 (RIPng)
       CVE-2017-12993 (Juniper)
-      CVE-2017-11542 (PIMv1)
-      CVE-2017-11541 (safeputs)
       CVE-2017-12994 (BGP)
       CVE-2017-12996 (PIMv2)
       CVE-2017-12998 (ISO IS-IS)
@@ -360,7 +516,7 @@ Wednesday Jul. 2, 2014 mcr@sandelman.ca
         a number of unaligned access faults fixed
         -A flag does not consider CR to be printable anymore
         fx.lebail took over coverity baby sitting
-        default snapshot size increased to 256K for accomodate USB captures
+        default snapshot size increased to 256K for accommodate USB captures
         WARNING: this release contains a lot of very worthwhile code churn.
 
 Wednesday Jan. 15, 2014 guy@alum.mit.edu
@@ -500,7 +656,7 @@ Tue.    July 20, 2010.  guy@alum.mit.edu.
   Summary for 4.1.2 tcpdump release
 	If -U is specified, flush the file after creating it, so it's
 	  not zero-length
-	Fix TCP flags output description, and some typoes, in the man
+	Fix TCP flags output description, and some typos, in the man
 	  page
 	Add a -h flag, and only attempt to recognize 802.11s mesh
 	  headers if it's set
@@ -595,7 +751,7 @@ Wed.	July 23, 2007.  mcr@xelerance.com.  Summary for 3.9.7 libpcap release
 	NFS: from NetBSD; don't interpret the reply as a possible NFS reply
 		if it got MSG_DENIED.
 	BGP: don't print TLV values that didn't fit, from www.digit-labs.org.
-	revised INSTALL.txt about libpcap dependancy.
+	revised INSTALL.txt about libpcap dependency.
 
 Wed.	April 25, 2007. ken@xelerance.com.  Summary for 3.9.6 tcpdump release
 	Update man page to reflect changes to libpcap
@@ -615,7 +771,7 @@ Wed.	April 25, 2007. ken@xelerance.com.  Summary for 3.9.6 tcpdump release
 	Add support for CFM Link-trace msg, Link-trace-Reply msg,
 	 Sender-ID tlv, private tlv, port, interface status
 	Add support for unidirectional link detection as per
-	 http://www.ietf.org/internet-drafts/draft-foschiano-udld-02.txt
+	 https://tools.ietf.org/id/draft-foschiano-udld-02.txt
 	Add support for the olsr protocol as per RFC 3626 plus the LQ
 	 extensions from olsr.org
 	Add support for variable-length checksum in DCCP, as per section 9 of
@@ -720,7 +876,7 @@ Tue.   March 30, 2004. mcr@sandelman.ottawa.on.ca. Summary for 3.8.3 release
 Mon.   March 29, 2004. mcr@sandelman.ottawa.on.ca. Summary for 3.8.2 release
 
 	Fixes for print-isakmp.c      CVE:    CAN-2004-0183, CAN-2004-0184
-	  		     http://www.rapid7.com/advisories/R7-0017.html
+	https://web.archive.org/web/20160328035955/https://www.rapid7.com/resources/advisories/R7-0017.jsp
 	IP-over-IEEE1394 printing.
 	some MINGW32 changes.
 	updates for autoconf 2.5
@@ -793,7 +949,6 @@ Tuesday, February 25, 2003. fenner@research.att.com.  3.7.2 release
 	 2.100.3 to be misrepresented as 4.20.3 .
 
 Monday, January 21, 2002. mcr@sandelman.ottawa.on.ca. Summary for 3.7 release
-see http://www.tcpdump.org/cvs-log/2002-01-21.10:16:48.html for commit log.
 	keyword "ipx" added.
 	Better OSI/802.2 support on Linux.
 	IEEE 802.11 support, from clenahan@fortresstech.com, achirica@ttd.net.
@@ -861,7 +1016,7 @@ Tuesday January 9, 2001. mcr@sandelman.ottawa.on.ca. Summary for 3.6 release
 
 	libpcap changes provide for exchanging capture files between
 	  systems. Save files now have well known PACKET_ values instead of
-	  depending upon system dependant mappings of DLT_* types.
+	  depending upon system dependent mappings of DLT_* types.
 
 	Support for computing/checking IP and UDP/TCP checksums.
 
@@ -1172,7 +1327,7 @@ v3.1 Thu Jun 13 20:59:32 PDT 1996
 
 - Print out a little more information for sun rpc packets.
 
-- Add suport for Kerberos 4 thanks to John Hawkinson (jhawk@mit.edu).
+- Add support for Kerberos 4 thanks to John Hawkinson (jhawk@mit.edu).
 
 - Fixed the Fix EXTRACT_SHORT() and EXTRACT_LONG() macros (which were
   wrong on little endian machines).
@@ -1337,7 +1492,7 @@ v2.2 Fri May 22 17:19:41 PDT 1992
 
 v2.1 Tue Jan 28 11:00:14 PST 1992
 
-- Internal release (never publically exported).
+- Internal release (never publicly exported).
 
 v2.0.1 Sun Jan 26 21:10:10 PDT
 

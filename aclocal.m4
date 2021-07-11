@@ -102,14 +102,6 @@ AC_DEFUN(AC_LBL_C_INIT,
 	    # -Werror forces warnings to be errors.
 	    #
 	    ac_lbl_cc_force_warning_errors=-Werror
-
-	    #
-	    # Use -ffloat-store so that, on 32-bit x86, we don't
-	    # do 80-bit arithmetic with the FPU; that way we should
-	    # get the same results for floating-point calculations
-	    # on x86-32 and x86-64.
-	    #
-	    AC_LBL_CHECK_COMPILER_OPT($1, -ffloat-store)
     else
 	    $2="$$2 -I/usr/local/include"
 	    LDFLAGS="$LDFLAGS -L/usr/local/lib"
@@ -169,7 +161,7 @@ AC_DEFUN(AC_LBL_C_INIT,
 		    ;;
 
 	    osf*)
-	    	    #
+		    #
 		    # Presumed to be DEC OSF/1, Digital UNIX, or
 		    # Tru64 UNIX.
 		    #
@@ -374,7 +366,7 @@ AC_DEFUN(AC_LBL_CHECK_DEPENDENCY_GENERATION_OPT,
 		if AC_RUN_LOG([eval "$CC $ac_lbl_dependency_flag conftest.c >/dev/null 2>&1"]); then
 			AC_MSG_RESULT([yes, with $ac_lbl_dependency_flag])
 			DEPENDENCY_CFLAG="$ac_lbl_dependency_flag"
-			MKDEP='${srcdir}/mkdep'
+			MKDEP='${top_srcdir}/mkdep'
 		else
 			AC_MSG_RESULT([no])
 			#
@@ -480,62 +472,101 @@ AC_DEFUN(AC_LBL_LIBPCAP,
         fi
     fi
     libpcap=FAIL
-    AC_ARG_WITH([system-libpcap],
-        [AS_HELP_STRING([--with-system-libpcap], [don't use local pcap library])],
-        [
-            #
-            # Don't look for a local libpcap.
-            #
-            using_local_libpcap=no
-        ],
-        [
-            #
-            # Look for a local pcap library.
-            #
-            AC_MSG_CHECKING(for local pcap library)
-            lastdir=FAIL
-            places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
-                egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT)?$'`
-            places2=`ls .. | sed -e 's,/$,,' -e "s,^,../," | \
-                egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT)?$'`
-            for dir in $places $srcdir/../libpcap ../libpcap $srcdir/libpcap $places2 ; do
-                basedir=`echo $dir | sed -e 's/[[ab]][[0-9]]*$//' | \
-                    sed -e 's/-PRE-GIT$//' `
-                if test $lastdir = $basedir ; then
-                    dnl skip alphas when an actual release is present
-                    continue;
-                fi
-                lastdir=$dir
-                if test -r $dir/libpcap.a ; then
-                    libpcap=$dir/libpcap.a
-                    local_pcap_dir=$dir
-                    dnl continue and select the last one that exists
-                fi
-            done
-            if test $libpcap = FAIL ; then
-                #
-                # We didn't find a local libpcap.
-                #
-                AC_MSG_RESULT(not found)
-                using_local_libpcap=no;
-            else
-                #
-                # We found a local libpcap.
-                #
-                AC_MSG_RESULT($libpcap)
-                using_local_libpcap=yes
+    AC_MSG_CHECKING([whether to look for a local libpcap])
+    AC_ARG_ENABLE(local-libpcap,
+        AS_HELP_STRING([--disable-local-libpcap],
+                       [don't look for a local libpcap @<:@default=check for a local libpcap@:>@]),,
+        enableval=yes)
+    case "$enableval" in
+
+    no)
+        AC_MSG_RESULT(no)
+        #
+        # Don't look for a local libpcap.
+        #
+        using_local_libpcap=no
+        ;;
+
+    *)
+        AC_MSG_RESULT(yes)
+        #
+        # Look for a local pcap library.
+        #
+        AC_MSG_CHECKING(for local pcap library)
+        lastdir=FAIL
+        places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
+            egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT|rc.)?$'`
+        places2=`ls .. | sed -e 's,/$,,' -e "s,^,../," | \
+            egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT|rc.)?$'`
+        for dir in $places $srcdir/../libpcap ../libpcap $srcdir/libpcap $places2 ; do
+            basedir=`echo $dir | sed -e 's/[[ab]][[0-9]]*$//' | \
+                sed -e 's/-PRE-GIT$//' `
+            if test $lastdir = $basedir ; then
+                dnl skip alphas when an actual release is present
+                continue;
             fi
-        ])
+            lastdir=$dir
+            if test -r $dir/libpcap.a ; then
+                libpcap=$dir/libpcap.a
+                local_pcap_dir=$dir
+                dnl continue and select the last one that exists
+            fi
+        done
+        if test $libpcap = FAIL ; then
+            #
+            # We didn't find a local libpcap.
+            #
+            AC_MSG_RESULT(not found)
+            using_local_libpcap=no;
+        else
+            #
+            # We found a local libpcap.
+            #
+            AC_MSG_RESULT($libpcap)
+            using_local_libpcap=yes
+        fi
+        ;;
+    esac
 
     if test $using_local_libpcap = no ; then
         #
         # We didn't find a local libpcap.
-        # Look for an installed pcap-config.
+        # Look for an installed pkg-config.
         #
-        AC_PATH_TOOL(PCAP_CONFIG, pcap-config)
-        if test -n "$PCAP_CONFIG" ; then
+        AC_PATH_TOOL(PKG_CONFIG, pkg-config)
+        if test -n "$PKG_CONFIG" ; then
             #
-            # Found - use it to get the include flags for
+            # We have it.  Are there .pc files for libpcap?
+            #
+            # --exists was introduced in pkg-config 0.4.0; that
+            # dates back to late 2000, so we won't worry about
+            # earlier releases that lack it.
+            #
+            AC_MSG_CHECKING(whether there are .pc files for libpcap)
+            if "$PKG_CONFIG" libpcap --exists ; then
+                #
+                # Yes, so we can use pkg-config to get configuration
+                # information for libpcap.
+                #
+                AC_MSG_RESULT(yes)
+                pkg_config_usable=yes
+            else
+                #
+                # No, so we can't use pkg-config to get configuration
+                # information for libpcap.
+                #
+                AC_MSG_RESULT(no)
+                pkg_config_usable=no
+            fi
+        else
+            #
+            # We don't have it, so we obviously can't use it.
+            #
+            pkg_config_usable=no
+        fi
+        if test "$pkg_config_usable" = "yes" ; then
+            #
+            # Found both - use pkg-config to get the include flags for
             # libpcap and the flags to link with libpcap.
             #
             # Please read section 11.6 "Shell Substitutions"
@@ -545,50 +576,72 @@ AC_DEFUN(AC_LBL_LIBPCAP,
             # double-quoted strings inside double-quoted back-quoted
             # expressions (pfew!)."
             #
-            cflags=`"$PCAP_CONFIG" --cflags`
+            cflags=`"$PKG_CONFIG" libpcap --cflags`
             $2="$cflags $$2"
-            libpcap=`"$PCAP_CONFIG" --libs`
+            libpcap=`"$PKG_CONFIG" libpcap --libs`
         else
             #
-            # Not found; look for an installed pcap.
+            # No pkg-config
+            # Look for an installed pcap-config.
             #
-            AC_CHECK_LIB(pcap, main, libpcap="-lpcap")
-            if test $libpcap = FAIL ; then
-                AC_MSG_ERROR(see the INSTALL doc for more info)
-            fi
-            dnl
-            dnl Some versions of Red Hat Linux put "pcap.h" in
-            dnl "/usr/include/pcap"; had the LBL folks done so,
-            dnl that would have been a good idea, but for
-            dnl the Red Hat folks to do so just breaks source
-            dnl compatibility with other systems.
-            dnl
-            dnl We work around this by assuming that, as we didn't
-            dnl find a local libpcap, libpcap is in /usr/lib or
-            dnl /usr/local/lib and that the corresponding header
-            dnl file is under one of those directories; if we don't
-            dnl find it in either of those directories, we check to
-            dnl see if it's in a "pcap" subdirectory of them and,
-            dnl if so, add that subdirectory to the "-I" list.
-            dnl
-            dnl (We now also put pcap.h in /usr/include/pcap, but we
-            dnl leave behind a /usr/include/pcap.h that includes it,
-            dnl so you can still just include <pcap.h>.)
-            dnl
-            AC_MSG_CHECKING(for extraneous pcap header directories)
-            if test \( ! -r /usr/local/include/pcap.h \) -a \
-                    \( ! -r /usr/include/pcap.h \); then
-                if test -r /usr/local/include/pcap/pcap.h; then
-                    d="/usr/local/include/pcap"
-                elif test -r /usr/include/pcap/pcap.h; then
-                    d="/usr/include/pcap"
-                fi
-            fi
-            if test -z "$d" ; then
-                AC_MSG_RESULT(not found)
+            AC_PATH_TOOL(PCAP_CONFIG, pcap-config)
+            if test -n "$PCAP_CONFIG" ; then
+                #
+                # Found - use it to get the include flags for
+                # libpcap and the flags to link with libpcap.
+                #
+                # Please read section 11.6 "Shell Substitutions"
+                # in the autoconf manual before doing anything
+                # to this that involves quoting.  Especially note
+                # the statement "There is just no portable way to use
+                # double-quoted strings inside double-quoted back-quoted
+                # expressions (pfew!)."
+                #
+                cflags=`"$PCAP_CONFIG" --cflags`
+                $2="$cflags $$2"
+                libpcap=`"$PCAP_CONFIG" --libs`
             else
-                $2="-I$d $$2"
-                AC_MSG_RESULT(found -- -I$d added)
+                #
+                # Not found; look for an installed pcap.
+                #
+                AC_CHECK_LIB(pcap, main, libpcap="-lpcap")
+                if test $libpcap = FAIL ; then
+                    AC_MSG_ERROR(see the INSTALL doc for more info)
+                fi
+                dnl
+                dnl Some versions of Red Hat Linux put "pcap.h" in
+                dnl "/usr/include/pcap"; had the LBL folks done so,
+                dnl that would have been a good idea, but for
+                dnl the Red Hat folks to do so just breaks source
+                dnl compatibility with other systems.
+                dnl
+                dnl We work around this by assuming that, as we didn't
+                dnl find a local libpcap, libpcap is in /usr/lib or
+                dnl /usr/local/lib and that the corresponding header
+                dnl file is under one of those directories; if we don't
+                dnl find it in either of those directories, we check to
+                dnl see if it's in a "pcap" subdirectory of them and,
+                dnl if so, add that subdirectory to the "-I" list.
+                dnl
+                dnl (We now also put pcap.h in /usr/include/pcap, but we
+                dnl leave behind a /usr/include/pcap.h that includes it,
+                dnl so you can still just include <pcap.h>.)
+                dnl
+                AC_MSG_CHECKING(for extraneous pcap header directories)
+                if test \( ! -r /usr/local/include/pcap.h \) -a \
+                        \( ! -r /usr/include/pcap.h \); then
+                    if test -r /usr/local/include/pcap/pcap.h; then
+                        d="/usr/local/include/pcap"
+                    elif test -r /usr/include/pcap/pcap.h; then
+                        d="/usr/include/pcap"
+                    fi
+                fi
+                if test -z "$d" ; then
+                    AC_MSG_RESULT(not found)
+                else
+                    $2="-I$d $$2"
+                    AC_MSG_RESULT(found -- -I$d added)
+                fi
             fi
         fi
     else
@@ -650,11 +703,11 @@ AC_DEFUN(AC_LBL_LIBPCAP,
         fi
     fi
 
-    if test -z "$PCAP_CONFIG"; then
+    if test -z "$PKG_CONFIG" -a -z "$PCAP_CONFIG"; then
         #
-        # We don't have pcap-config; find out any additional link flags
-        # we need.  (If we have pcap-config, we assume it tells us what
-        # we need.)
+        # We don't have pkg-config or pcap-config; find out any additional
+        # link flags we need.  (If we have pkg-config or pcap-config, we
+        # assume it tells us what we need.)
         #
         case "$host_os" in
 
@@ -870,19 +923,22 @@ AC_DEFUN(AC_LBL_DEVEL,
 	    #
 	    if test "$ac_lbl_cc_dont_try_gcc_dashW" != yes; then
 		    AC_LBL_CHECK_UNKNOWN_WARNING_OPTION_ERROR()
-		    AC_LBL_CHECK_COMPILER_OPT($1, -Wall)
-		    AC_LBL_CHECK_COMPILER_OPT($1, -Wmissing-prototypes)
-		    AC_LBL_CHECK_COMPILER_OPT($1, -Wstrict-prototypes)
-		    AC_LBL_CHECK_COMPILER_OPT($1, -Wwrite-strings)
-		    AC_LBL_CHECK_COMPILER_OPT($1, -Wpointer-arith)
-		    AC_LBL_CHECK_COMPILER_OPT($1, -Wcast-qual)
-		    AC_LBL_CHECK_COMPILER_OPT($1, -Wshadow)
-		    AC_LBL_CHECK_COMPILER_OPT($1, -Wdeclaration-after-statement)
-		    AC_LBL_CHECK_COMPILER_OPT($1, -Wpedantic)
-		    AC_LBL_CHECK_COMPILER_OPT($1, -Wold-style-definition)
-		    AC_LBL_CHECK_COMPILER_OPT($1, -Wused-but-marked-unused)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -W)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wall)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wassign-enum)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wcast-qual)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wmissing-prototypes)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wmissing-variable-declarations)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wold-style-definition)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wpedantic)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wpointer-arith)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wpointer-sign)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wshadow)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wsign-compare)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wstrict-prototypes)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wunreachable-code-return)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wused-but-marked-unused)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wwrite-strings)
 	    fi
 	    AC_LBL_CHECK_DEPENDENCY_GENERATION_OPT()
 	    #
@@ -989,11 +1045,11 @@ dnl This test exists so that every application developer does not test
 dnl this in a different, and subtly broken fashion.
 
 dnl It has been argued that this test should be broken up into two
-dnl seperate tests, one for the resolver libraries, and one for the
+dnl separate tests, one for the resolver libraries, and one for the
 dnl libraries necessary for using Sockets API. Unfortunately, the two
 dnl are carefully intertwined and allowing the autoconf user to use
-dnl them independantly potentially results in unfortunate ordering
-dnl dependancies -- as such, such component macros would have to
+dnl them independently potentially results in unfortunate ordering
+dnl dependencies -- as such, such component macros would have to
 dnl carefully use indirection and be aware if the other components were
 dnl executed. Since other autoconf macros do not go to this trouble,
 dnl and almost no applications use sockets without the resolver, this
@@ -1071,9 +1127,9 @@ AC_DEFUN(AC_LBL_SSLEAY,
 	# Or should we just look for "libcrypto.*"?
 	#
 	if test -d "$1/$tmplib" -a \( -f "$1/$tmplib/libcrypto.a" -o \
-		          	    -f "$1/$tmplib/libcrypto.so" -o \
-		          	    -f "$1/$tmplib/libcrypto.sl" -o \
-			  	    -f "$1/$tmplib/libcrypto.dylib" \); then
+				    -f "$1/$tmplib/libcrypto.so" -o \
+				    -f "$1/$tmplib/libcrypto.sl" -o \
+				    -f "$1/$tmplib/libcrypto.dylib" \); then
 		ac_cv_ssleay_path="$1"
 	fi
 

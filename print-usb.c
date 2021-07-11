@@ -27,6 +27,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 
@@ -135,7 +136,6 @@ typedef struct _usb_isodesc {
 	nd_byte		pad[4];
 } usb_isodesc;
 
-static const char tstr[] = "[|usb]";
 
 /* returns direction: 1=inbound 2=outbound -1=invalid */
 static int
@@ -188,7 +188,14 @@ usb_header_print(netdissect_options *ndo, const pcap_usb_header *uh)
 	int direction;
 	uint8_t transfer_type, event_type;
 
-	transfer_type = EXTRACT_U_1(uh->transfer_type);
+	ndo->ndo_protocol = "usb";
+
+	nd_print_protocol_caps(ndo);
+	if (ndo->ndo_qflag)
+		return;
+
+	ND_PRINT(" ");
+	transfer_type = GET_U_1(uh->transfer_type);
 	switch(transfer_type)
 	{
 		case URB_ISOCHRONOUS:
@@ -207,7 +214,7 @@ usb_header_print(netdissect_options *ndo, const pcap_usb_header *uh)
 			ND_PRINT(" ?");
 	}
 
-	event_type = EXTRACT_U_1(uh->event_type);
+	event_type = GET_U_1(uh->event_type);
 	switch(event_type)
 	{
 		case URB_SUBMIT:
@@ -228,7 +235,9 @@ usb_header_print(netdissect_options *ndo, const pcap_usb_header *uh)
 		ND_PRINT(" from");
 	else if(direction == 2)
 		ND_PRINT(" to");
-	ND_PRINT(" %u:%u:%u", EXTRACT_HE_U_2(uh->bus_id), EXTRACT_U_1(uh->device_address), EXTRACT_U_1(uh->endpoint_number) & 0x7f);
+	ND_PRINT(" %u:%u:%u", GET_HE_U_2(uh->bus_id),
+		 GET_U_1(uh->device_address),
+		 GET_U_1(uh->endpoint_number) & 0x7f);
 }
 
 /*
@@ -239,19 +248,15 @@ usb_header_print(netdissect_options *ndo, const pcap_usb_header *uh)
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
-usb_linux_48_byte_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
-                           const u_char *p)
+void
+usb_linux_48_byte_if_print(netdissect_options *ndo,
+                           const struct pcap_pkthdr *h _U_, const u_char *p)
 {
-	ndo->ndo_protocol = "usb_linux_48_byte_if";
-	if (h->caplen < sizeof(pcap_usb_header)) {
-		ND_PRINT("%s", tstr);
-		return(sizeof(pcap_usb_header));
-	}
+	ndo->ndo_protocol = "usb_linux_48_byte";
+	ND_TCHECK_LEN(p, sizeof(pcap_usb_header));
+	ndo->ndo_ll_hdr_len += sizeof (pcap_usb_header);
 
 	usb_header_print(ndo, (const pcap_usb_header *) p);
-
-	return(sizeof(pcap_usb_header));
 }
 
 #ifdef DLT_USB_LINUX_MMAPPED
@@ -263,19 +268,15 @@ usb_linux_48_byte_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
-usb_linux_64_byte_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
-                           const u_char *p)
+void
+usb_linux_64_byte_if_print(netdissect_options *ndo,
+                           const struct pcap_pkthdr *h _U_, const u_char *p)
 {
-	ndo->ndo_protocol = "usb_linux_64_byte_if";
-	if (h->caplen < sizeof(pcap_usb_header_mmapped)) {
-		ND_PRINT("%s", tstr);
-		return(sizeof(pcap_usb_header_mmapped));
-	}
+	ndo->ndo_protocol = "usb_linux_64_byte";
+	ND_TCHECK_LEN(p, sizeof(pcap_usb_header_mmapped));
+	ndo->ndo_ll_hdr_len += sizeof (pcap_usb_header_mmapped);
 
 	usb_header_print(ndo, (const pcap_usb_header *) p);
-
-	return(sizeof(pcap_usb_header_mmapped));
 }
 #endif /* DLT_USB_LINUX_MMAPPED */
 

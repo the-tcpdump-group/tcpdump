@@ -29,6 +29,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 #include "af.h"
@@ -80,9 +81,9 @@ struct enchdr {
 	nd_uint32_t flags;
 };
 
-#define ENC_PRINT_TYPE(wh, xf, nam) \
+#define ENC_PRINT_TYPE(wh, xf, name) \
 	if ((wh) & (xf)) { \
-		ND_PRINT("%s%s", nam, (wh) == (xf) ? "): " : ","); \
+		ND_PRINT("%s%s", name, (wh) == (xf) ? "): " : ","); \
 		(wh) &= ~(xf); \
 	}
 
@@ -94,7 +95,7 @@ struct enchdr {
 #define	SWAPLONG(y) \
 ((((y)&0xff)<<24) | (((y)&0xff00)<<8) | (((y)&0xff0000)>>8) | (((y)>>24)&0xff))
 
-u_int
+void
 enc_if_print(netdissect_options *ndo,
              const struct pcap_pkthdr *h, const u_char *p)
 {
@@ -103,11 +104,9 @@ enc_if_print(netdissect_options *ndo,
 	u_int af, flags;
 	const struct enchdr *hdr;
 
-	ndo->ndo_protocol = "enc_if";
-	if (caplen < ENC_HDRLEN) {
-		ND_PRINT("[|enc]");
-		goto out;
-	}
+	ndo->ndo_protocol = "enc";
+	ND_TCHECK_LEN(p, ENC_HDRLEN);
+	ndo->ndo_ll_hdr_len += ENC_HDRLEN;
 
 	hdr = (const struct enchdr *)p;
 	/*
@@ -142,7 +141,7 @@ enc_if_print(netdissect_options *ndo,
 	ENC_PRINT_TYPE(flags, M_AUTH, "authentic");
 	ENC_PRINT_TYPE(flags, M_CONF, "confidential");
 	/* ENC_PRINT_TYPE(flags, M_TUNNEL, "tunnel"); */
-	ND_PRINT("SPI 0x%08x: ", EXTRACT_BE_U_4(hdr->spi));
+	ND_PRINT("SPI 0x%08x: ", GET_BE_U_4(hdr->spi));
 
 	length -= ENC_HDRLEN;
 	caplen -= ENC_HDRLEN;
@@ -158,7 +157,4 @@ enc_if_print(netdissect_options *ndo,
 		ip6_print(ndo, p, length);
 		break;
 	}
-
-out:
-	return (ENC_HDRLEN);
 }

@@ -92,7 +92,7 @@ struct icmp {
 /*
  * Lower bounds on packet lengths for various types.
  * For the error advice packets must first insure that the
- * packet is large enought to contain the returned ip header.
+ * packet is large enough to contain the returned ip header.
  * Only then can we do the check to see if 64 bits of packet
  * data have been returned, since we need to check the returned
  * ip header length.
@@ -202,42 +202,6 @@ static const struct tok icmp2str[] = {
 	{ 0,				NULL }
 };
 
-/* Formats for most of the ICMP_UNREACH codes */
-static const struct tok unreach2str[] = {
-	{ ICMP_UNREACH_NET,		"net %s unreachable" },
-	{ ICMP_UNREACH_HOST,		"host %s unreachable" },
-	{ ICMP_UNREACH_SRCFAIL,
-	    "%s unreachable - source route failed" },
-	{ ICMP_UNREACH_NET_UNKNOWN,	"net %s unreachable - unknown" },
-	{ ICMP_UNREACH_HOST_UNKNOWN,	"host %s unreachable - unknown" },
-	{ ICMP_UNREACH_ISOLATED,
-	    "%s unreachable - source host isolated" },
-	{ ICMP_UNREACH_NET_PROHIB,
-	    "net %s unreachable - admin prohibited" },
-	{ ICMP_UNREACH_HOST_PROHIB,
-	    "host %s unreachable - admin prohibited" },
-	{ ICMP_UNREACH_TOSNET,
-	    "net %s unreachable - tos prohibited" },
-	{ ICMP_UNREACH_TOSHOST,
-	    "host %s unreachable - tos prohibited" },
-	{ ICMP_UNREACH_FILTER_PROHIB,
-	    "host %s unreachable - admin prohibited filter" },
-	{ ICMP_UNREACH_HOST_PRECEDENCE,
-	    "host %s unreachable - host precedence violation" },
-	{ ICMP_UNREACH_PRECEDENCE_CUTOFF,
-	    "host %s unreachable - precedence cutoff" },
-	{ 0,				NULL }
-};
-
-/* Formats for the ICMP_REDIRECT codes */
-static const struct tok type2str[] = {
-	{ ICMP_REDIRECT_NET,		"redirect %s to net %s" },
-	{ ICMP_REDIRECT_HOST,		"redirect %s to host %s" },
-	{ ICMP_REDIRECT_TOSNET,		"redirect-tos %s to net %s" },
-	{ ICMP_REDIRECT_TOSHOST,	"redirect-tos %s to host %s" },
-	{ 0,				NULL }
-};
-
 /* rfc1191 */
 struct mtu_discovery {
 	nd_uint16_t unused;
@@ -260,9 +224,9 @@ struct id_rdiscovery {
  * draft-bonica-internet-icmp-08
  *
  * The Destination Unreachable, Time Exceeded
- * and Parameter Problem messages are slighly changed as per
+ * and Parameter Problem messages are slightly changed as per
  * the above draft. A new Length field gets added to give
- * the caller an idea about the length of the piggypacked
+ * the caller an idea about the length of the piggybacked
  * IP packet before the MPLS extension header starts.
  *
  * The Length field represents length of the padded "original datagram"
@@ -322,7 +286,7 @@ icmp_tstamp_print(u_int tstamp)
     sec = tstamp / 1000;
     min = sec / 60; sec -= min * 60;
     hrs = min / 60; min -= hrs * 60;
-    nd_snprintf(buf, sizeof(buf), "%02u:%02u:%02u.%03u",hrs,min,sec,msec);
+    snprintf(buf, sizeof(buf), "%02u:%02u:%02u.%03u",hrs,min,sec,msec);
     return buf;
 }
 
@@ -335,15 +299,15 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 	uint8_t icmp_type, icmp_code;
         const struct icmp_ext_t *ext_dp;
 	const struct ip *ip;
-	const char *str, *fmt;
+	const char *str;
 	const struct ip *oip;
 	uint8_t ip_proto;
 	const struct udphdr *ouh;
         const uint8_t *obj_tptr;
         uint32_t raw_label;
-        const u_char *snapend_save;
 	const struct icmp_mpls_ext_object_header_t *icmp_mpls_ext_object_header;
-	u_int hlen, dport, mtu, obj_tlen, obj_class_num, obj_ctype;
+	u_int hlen, mtu, obj_tlen, obj_class_num, obj_ctype;
+	uint16_t dport;
 	char buf[MAXHOSTNAMELEN + 100];
 	struct cksum_vec vec[1];
 
@@ -353,31 +317,39 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 	ip = (const struct ip *)bp2;
 	str = buf;
 
-	ND_TCHECK_1(dp->icmp_code);
-	icmp_type = EXTRACT_U_1(dp->icmp_type);
-	icmp_code = EXTRACT_U_1(dp->icmp_code);
+	icmp_type = GET_U_1(dp->icmp_type);
+	icmp_code = GET_U_1(dp->icmp_code);
 	switch (icmp_type) {
 
 	case ICMP_ECHO:
 	case ICMP_ECHOREPLY:
-		ND_TCHECK_2(dp->icmp_seq);
-		(void)nd_snprintf(buf, sizeof(buf), "echo %s, id %u, seq %u",
+		(void)snprintf(buf, sizeof(buf), "echo %s, id %u, seq %u",
                                icmp_type == ICMP_ECHO ?
                                "request" : "reply",
-                               EXTRACT_BE_U_2(dp->icmp_id),
-                               EXTRACT_BE_U_2(dp->icmp_seq));
+                               GET_BE_U_2(dp->icmp_id),
+                               GET_BE_U_2(dp->icmp_seq));
 		break;
 
 	case ICMP_UNREACH:
-		ND_TCHECK_4(dp->icmp_ip.ip_dst);
 		switch (icmp_code) {
 
+		case ICMP_UNREACH_NET:
+			(void)snprintf(buf, sizeof(buf),
+			    "net %s unreachable",
+			    GET_IPADDR_STRING(dp->icmp_ip.ip_dst));
+			break;
+
+		case ICMP_UNREACH_HOST:
+			(void)snprintf(buf, sizeof(buf),
+			    "host %s unreachable",
+			    GET_IPADDR_STRING(dp->icmp_ip.ip_dst));
+			break;
+
 		case ICMP_UNREACH_PROTOCOL:
-			ND_TCHECK_1(dp->icmp_ip.ip_p);
-			(void)nd_snprintf(buf, sizeof(buf),
+			(void)snprintf(buf, sizeof(buf),
 			    "%s protocol %u unreachable",
-			    ipaddr_string(ndo, dp->icmp_ip.ip_dst),
-			    EXTRACT_U_1(dp->icmp_ip.ip_p));
+			    GET_IPADDR_STRING(dp->icmp_ip.ip_dst),
+			    GET_U_1(dp->icmp_ip.ip_p));
 			break;
 
 		case ICMP_UNREACH_PORT:
@@ -385,29 +357,28 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			oip = &dp->icmp_ip;
 			hlen = IP_HL(oip) * 4;
 			ouh = (const struct udphdr *)(((const u_char *)oip) + hlen);
-			ND_TCHECK_2(ouh->uh_dport);
-			dport = EXTRACT_BE_U_2(ouh->uh_dport);
-			ip_proto = EXTRACT_U_1(oip->ip_p);
+			dport = GET_BE_U_2(ouh->uh_dport);
+			ip_proto = GET_U_1(oip->ip_p);
 			switch (ip_proto) {
 
 			case IPPROTO_TCP:
-				(void)nd_snprintf(buf, sizeof(buf),
+				(void)snprintf(buf, sizeof(buf),
 					"%s tcp port %s unreachable",
-					ipaddr_string(ndo, oip->ip_dst),
+					GET_IPADDR_STRING(oip->ip_dst),
 					tcpport_string(ndo, dport));
 				break;
 
 			case IPPROTO_UDP:
-				(void)nd_snprintf(buf, sizeof(buf),
+				(void)snprintf(buf, sizeof(buf),
 					"%s udp port %s unreachable",
-					ipaddr_string(ndo, oip->ip_dst),
+					GET_IPADDR_STRING(oip->ip_dst),
 					udpport_string(ndo, dport));
 				break;
 
 			default:
-				(void)nd_snprintf(buf, sizeof(buf),
+				(void)snprintf(buf, sizeof(buf),
 					"%s protocol %u port %u unreachable",
-					ipaddr_string(ndo, oip->ip_dst),
+					GET_IPADDR_STRING(oip->ip_dst),
 					ip_proto, dport);
 				break;
 			}
@@ -417,35 +388,132 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		    {
 			const struct mtu_discovery *mp;
 			mp = (const struct mtu_discovery *)(const u_char *)&dp->icmp_void;
-			mtu = EXTRACT_BE_U_2(mp->nexthopmtu);
+			mtu = GET_BE_U_2(mp->nexthopmtu);
 			if (mtu) {
-				(void)nd_snprintf(buf, sizeof(buf),
+				(void)snprintf(buf, sizeof(buf),
 				    "%s unreachable - need to frag (mtu %u)",
-				    ipaddr_string(ndo, dp->icmp_ip.ip_dst), mtu);
+				    GET_IPADDR_STRING(dp->icmp_ip.ip_dst), mtu);
 			} else {
-				(void)nd_snprintf(buf, sizeof(buf),
+				(void)snprintf(buf, sizeof(buf),
 				    "%s unreachable - need to frag",
-				    ipaddr_string(ndo, dp->icmp_ip.ip_dst));
+				    GET_IPADDR_STRING(dp->icmp_ip.ip_dst));
 			}
 		    }
 			break;
 
+		case ICMP_UNREACH_SRCFAIL:
+			(void)snprintf(buf, sizeof(buf),
+			    "%s unreachable - source route failed",
+			    GET_IPADDR_STRING(dp->icmp_ip.ip_dst));
+			break;
+
+		case ICMP_UNREACH_NET_UNKNOWN:
+			(void)snprintf(buf, sizeof(buf),
+			    "net %s unreachable - unknown",
+			    GET_IPADDR_STRING(dp->icmp_ip.ip_dst));
+			break;
+
+		case ICMP_UNREACH_HOST_UNKNOWN:
+			(void)snprintf(buf, sizeof(buf),
+			    "host %s unreachable - unknown",
+			    GET_IPADDR_STRING(dp->icmp_ip.ip_dst));
+			break;
+
+		case ICMP_UNREACH_ISOLATED:
+			(void)snprintf(buf, sizeof(buf),
+			    "%s unreachable - source host isolated",
+			    GET_IPADDR_STRING(dp->icmp_ip.ip_dst));
+			break;
+
+		case ICMP_UNREACH_NET_PROHIB:
+			(void)snprintf(buf, sizeof(buf),
+			    "net %s unreachable - admin prohibited",
+			    GET_IPADDR_STRING(dp->icmp_ip.ip_dst));
+			break;
+
+		case ICMP_UNREACH_HOST_PROHIB:
+			(void)snprintf(buf, sizeof(buf),
+			    "host %s unreachable - admin prohibited",
+			    GET_IPADDR_STRING(dp->icmp_ip.ip_dst));
+			break;
+
+		case ICMP_UNREACH_TOSNET:
+			(void)snprintf(buf, sizeof(buf),
+			    "net %s unreachable - tos prohibited",
+			    GET_IPADDR_STRING(dp->icmp_ip.ip_dst));
+			break;
+
+		case ICMP_UNREACH_TOSHOST:
+			(void)snprintf(buf, sizeof(buf),
+			    "host %s unreachable - tos prohibited",
+			    GET_IPADDR_STRING(dp->icmp_ip.ip_dst));
+			break;
+
+		case ICMP_UNREACH_FILTER_PROHIB:
+			(void)snprintf(buf, sizeof(buf),
+			    "host %s unreachable - admin prohibited filter",
+			    GET_IPADDR_STRING(dp->icmp_ip.ip_dst));
+			break;
+
+		case ICMP_UNREACH_HOST_PRECEDENCE:
+			(void)snprintf(buf, sizeof(buf),
+			    "host %s unreachable - host precedence violation",
+			    GET_IPADDR_STRING(dp->icmp_ip.ip_dst));
+			break;
+
+		case ICMP_UNREACH_PRECEDENCE_CUTOFF:
+			(void)snprintf(buf, sizeof(buf),
+			    "host %s unreachable - precedence cutoff",
+			    GET_IPADDR_STRING(dp->icmp_ip.ip_dst));
+			break;
+
 		default:
-			fmt = tok2str(unreach2str, "#%u %%s unreachable",
+			(void)snprintf(buf, sizeof(buf),
+			    "%s unreachable - #%u",
+			    GET_IPADDR_STRING(dp->icmp_ip.ip_dst),
 			    icmp_code);
-			(void)nd_snprintf(buf, sizeof(buf), fmt,
-			    ipaddr_string(ndo, dp->icmp_ip.ip_dst));
 			break;
 		}
 		break;
 
 	case ICMP_REDIRECT:
-		ND_TCHECK_4(dp->icmp_ip.ip_dst);
-		fmt = tok2str(type2str, "redirect-#%u %%s to net %%s",
-		    icmp_code);
-		(void)nd_snprintf(buf, sizeof(buf), fmt,
-		    ipaddr_string(ndo, dp->icmp_ip.ip_dst),
-		    ipaddr_string(ndo, dp->icmp_gwaddr));
+		switch (icmp_code) {
+
+		case ICMP_REDIRECT_NET:
+			(void)snprintf(buf, sizeof(buf),
+			    "redirect %s to net %s",
+			    GET_IPADDR_STRING(dp->icmp_ip.ip_dst),
+			    GET_IPADDR_STRING(dp->icmp_gwaddr));
+			break;
+
+		case ICMP_REDIRECT_HOST:
+			(void)snprintf(buf, sizeof(buf),
+			    "redirect %s to host %s",
+			    GET_IPADDR_STRING(dp->icmp_ip.ip_dst),
+			    GET_IPADDR_STRING(dp->icmp_gwaddr));
+			break;
+
+		case ICMP_REDIRECT_TOSNET:
+			(void)snprintf(buf, sizeof(buf),
+			    "redirect-tos %s to net %s",
+			    GET_IPADDR_STRING(dp->icmp_ip.ip_dst),
+			    GET_IPADDR_STRING(dp->icmp_gwaddr));
+			break;
+
+		case ICMP_REDIRECT_TOSHOST:
+			(void)snprintf(buf, sizeof(buf),
+			    "redirect-tos %s to host %s",
+			    GET_IPADDR_STRING(dp->icmp_ip.ip_dst),
+			    GET_IPADDR_STRING(dp->icmp_gwaddr));
+			break;
+
+		default:
+			(void)snprintf(buf, sizeof(buf),
+			    "redirect-#%u %s to %s", icmp_code,
+			    GET_IPADDR_STRING(dp->icmp_ip.ip_dst),
+			    GET_IPADDR_STRING(dp->icmp_gwaddr));
+			break;
+		}
 		break;
 
 	case ICMP_ROUTERADVERT:
@@ -454,22 +522,22 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		const struct id_rdiscovery *idp;
 		u_int lifetime, num, size;
 
-		(void)nd_snprintf(buf, sizeof(buf), "router advertisement");
+		(void)snprintf(buf, sizeof(buf), "router advertisement");
 		cp = buf + strlen(buf);
 
 		ihp = (const struct ih_rdiscovery *)&dp->icmp_void;
 		ND_TCHECK_SIZE(ihp);
 		(void)strncpy(cp, " lifetime ", sizeof(buf) - (cp - buf));
 		cp = buf + strlen(buf);
-		lifetime = EXTRACT_BE_U_2(ihp->ird_lifetime);
+		lifetime = GET_BE_U_2(ihp->ird_lifetime);
 		if (lifetime < 60) {
-			(void)nd_snprintf(cp, sizeof(buf) - (cp - buf), "%u",
+			(void)snprintf(cp, sizeof(buf) - (cp - buf), "%u",
 			    lifetime);
 		} else if (lifetime < 60 * 60) {
-			(void)nd_snprintf(cp, sizeof(buf) - (cp - buf), "%u:%02u",
+			(void)snprintf(cp, sizeof(buf) - (cp - buf), "%u:%02u",
 			    lifetime / 60, lifetime % 60);
 		} else {
-			(void)nd_snprintf(cp, sizeof(buf) - (cp - buf),
+			(void)snprintf(cp, sizeof(buf) - (cp - buf),
 			    "%u:%02u:%02u",
 			    lifetime / 3600,
 			    (lifetime % 3600) / 60,
@@ -477,24 +545,25 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		}
 		cp = buf + strlen(buf);
 
-		num = EXTRACT_U_1(ihp->ird_addrnum);
-		(void)nd_snprintf(cp, sizeof(buf) - (cp - buf), " %u:", num);
+		num = GET_U_1(ihp->ird_addrnum);
+		(void)snprintf(cp, sizeof(buf) - (cp - buf), " %u:", num);
 		cp = buf + strlen(buf);
 
-		size = EXTRACT_U_1(ihp->ird_addrsiz);
+		size = GET_U_1(ihp->ird_addrsiz);
 		if (size != 2) {
-			(void)nd_snprintf(cp, sizeof(buf) - (cp - buf),
+			(void)snprintf(cp, sizeof(buf) - (cp - buf),
 			    " [size %u]", size);
 			break;
 		}
 		idp = (const struct id_rdiscovery *)&dp->icmp_data;
-		while (num-- > 0) {
+		while (num > 0) {
 			ND_TCHECK_SIZE(idp);
-			(void)nd_snprintf(cp, sizeof(buf) - (cp - buf), " {%s %u}",
-			    ipaddr_string(ndo, idp->ird_addr),
-			    EXTRACT_BE_U_4(idp->ird_pref));
+			(void)snprintf(cp, sizeof(buf) - (cp - buf), " {%s %u}",
+			    GET_IPADDR_STRING(idp->ird_addr),
+			    GET_BE_U_4(idp->ird_pref));
 			cp = buf + strlen(buf);
 			++idp;
+		num--;
 		}
 	    }
 		break;
@@ -512,7 +581,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			break;
 
 		default:
-			(void)nd_snprintf(buf, sizeof(buf), "time exceeded-#%u",
+			(void)snprintf(buf, sizeof(buf), "time exceeded-#%u",
 			    icmp_code);
 			break;
 		}
@@ -520,41 +589,39 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 
 	case ICMP_PARAMPROB:
 		if (icmp_code)
-			(void)nd_snprintf(buf, sizeof(buf),
+			(void)snprintf(buf, sizeof(buf),
 			    "parameter problem - code %u", icmp_code);
 		else {
-			ND_TCHECK_1(dp->icmp_pptr);
-			(void)nd_snprintf(buf, sizeof(buf),
-			    "parameter problem - octet %u", EXTRACT_U_1(dp->icmp_pptr));
+			(void)snprintf(buf, sizeof(buf),
+			    "parameter problem - octet %u",
+			    GET_U_1(dp->icmp_pptr));
 		}
 		break;
 
 	case ICMP_MASKREPLY:
-		ND_TCHECK_4(dp->icmp_mask);
-		(void)nd_snprintf(buf, sizeof(buf), "address mask is 0x%08x",
-		    EXTRACT_BE_U_4(dp->icmp_mask));
+		(void)snprintf(buf, sizeof(buf), "address mask is 0x%08x",
+		    GET_BE_U_4(dp->icmp_mask));
 		break;
 
 	case ICMP_TSTAMP:
-		ND_TCHECK_2(dp->icmp_seq);
-		(void)nd_snprintf(buf, sizeof(buf),
+		(void)snprintf(buf, sizeof(buf),
 		    "time stamp query id %u seq %u",
-		    EXTRACT_BE_U_2(dp->icmp_id),
-		    EXTRACT_BE_U_2(dp->icmp_seq));
+		    GET_BE_U_2(dp->icmp_id),
+		    GET_BE_U_2(dp->icmp_seq));
 		break;
 
 	case ICMP_TSTAMPREPLY:
 		ND_TCHECK_4(dp->icmp_ttime);
-		(void)nd_snprintf(buf, sizeof(buf),
+		(void)snprintf(buf, sizeof(buf),
 		    "time stamp reply id %u seq %u: org %s",
-                               EXTRACT_BE_U_2(dp->icmp_id),
-                               EXTRACT_BE_U_2(dp->icmp_seq),
-                               icmp_tstamp_print(EXTRACT_BE_U_4(dp->icmp_otime)));
+                               GET_BE_U_2(dp->icmp_id),
+                               GET_BE_U_2(dp->icmp_seq),
+                               icmp_tstamp_print(GET_BE_U_4(dp->icmp_otime)));
 
-                (void)nd_snprintf(buf+strlen(buf),sizeof(buf)-strlen(buf),", recv %s",
-                         icmp_tstamp_print(EXTRACT_BE_U_4(dp->icmp_rtime)));
-                (void)nd_snprintf(buf+strlen(buf),sizeof(buf)-strlen(buf),", xmit %s",
-                         icmp_tstamp_print(EXTRACT_BE_U_4(dp->icmp_ttime)));
+                (void)snprintf(buf+strlen(buf),sizeof(buf)-strlen(buf),", recv %s",
+                         icmp_tstamp_print(GET_BE_U_4(dp->icmp_rtime)));
+                (void)snprintf(buf+strlen(buf),sizeof(buf)-strlen(buf),", xmit %s",
+                         icmp_tstamp_print(GET_BE_U_4(dp->icmp_ttime)));
                 break;
 
 	default:
@@ -570,7 +637,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			vec[0].len = plen;
 			sum = in_cksum(vec, 1);
 			if (sum != 0) {
-				uint16_t icmp_sum = EXTRACT_BE_U_2(dp->icmp_cksum);
+				uint16_t icmp_sum = GET_BE_U_2(dp->icmp_cksum);
 				ND_PRINT(" (wrong icmp cksum %x (->%x)!)",
 					     icmp_sum,
 					     in_cksum_shouldbe(icmp_sum, sum));
@@ -580,17 +647,32 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 
         /*
          * print the remnants of the IP packet.
-         * save the snaplength as this may get overidden in the IP printer.
+         * save the snaplength as this may get overridden in the IP printer.
          */
 	if (ndo->ndo_vflag >= 1 && ICMP_ERRTYPE(icmp_type)) {
+		const u_char *snapend_save;
+
 		bp += 8;
 		ND_PRINT("\n\t");
 		ip = (const struct ip *)bp;
-                snapend_save = ndo->ndo_snapend;
-		ND_TCHECK_2(ip->ip_len);
-		ip_print(ndo, bp, EXTRACT_BE_U_2(ip->ip_len));
-                ndo->ndo_snapend = snapend_save;
+		snapend_save = ndo->ndo_snapend;
+		/*
+		 * Update the snapend because extensions (MPLS, ...) may be
+		 * present after the IP packet. In this case the current
+		 * (outer) packet's snapend is not what ip_print() needs to
+		 * decode an IP packet nested in the middle of an ICMP payload.
+		 *
+		 * This prevents that, in ip_print(), for the nested IP packet,
+		 * the remaining length < remaining caplen.
+		 */
+		ndo->ndo_snapend = ND_MIN(bp + GET_BE_U_2(ip->ip_len),
+					  ndo->ndo_snapend);
+		ip_print(ndo, bp, GET_BE_U_2(ip->ip_len));
+		ndo->ndo_snapend = snapend_save;
 	}
+
+	/* ndo_protocol reassignment after ip_print() call */
+	ndo->ndo_protocol = "icmp";
 
         /*
          * Attempt to decode the MPLS extensions only for some ICMP types.
@@ -605,7 +687,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
              * to check if an extension header is present. This is expedient,
              * however not all implementations set the length field proper.
              */
-            if (EXTRACT_U_1(ext_dp->icmp_length) == 0 &&
+            if (GET_U_1(ext_dp->icmp_length) == 0 &&
                 ND_TTEST_LEN(ext_dp->icmp_ext_version_res, plen - ICMP_EXTD_MINLEN)) {
                 vec[0].ptr = (const uint8_t *)(const void *)&ext_dp->icmp_ext_version_res;
                 vec[0].len = plen - ICMP_EXTD_MINLEN;
@@ -631,7 +713,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                 vec[0].ptr = (const uint8_t *)(const void *)&ext_dp->icmp_ext_version_res;
                 vec[0].len = hlen;
                 ND_PRINT(", checksum 0x%04x (%scorrect), length %u",
-                       EXTRACT_BE_U_2(ext_dp->icmp_ext_checksum),
+                       GET_BE_U_2(ext_dp->icmp_ext_checksum),
                        in_cksum(vec, 1) ? "in" : "",
                        hlen);
             }
@@ -643,9 +725,9 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 
                 icmp_mpls_ext_object_header = (const struct icmp_mpls_ext_object_header_t *)obj_tptr;
                 ND_TCHECK_SIZE(icmp_mpls_ext_object_header);
-                obj_tlen = EXTRACT_BE_U_2(icmp_mpls_ext_object_header->length);
-                obj_class_num = EXTRACT_U_1(icmp_mpls_ext_object_header->class_num);
-                obj_ctype = EXTRACT_U_1(icmp_mpls_ext_object_header->ctype);
+                obj_tlen = GET_BE_U_2(icmp_mpls_ext_object_header->length);
+                obj_class_num = GET_U_1(icmp_mpls_ext_object_header->class_num);
+                obj_ctype = GET_U_1(icmp_mpls_ext_object_header->ctype);
                 obj_tptr += sizeof(struct icmp_mpls_ext_object_header_t);
 
                 ND_PRINT("\n\t  %s Object (%u), Class-Type: %u, length %u",
@@ -667,9 +749,8 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                 case 1:
                     switch(obj_ctype) {
                     case 1:
-                        ND_TCHECK_4(obj_tptr);
-                        raw_label = EXTRACT_BE_U_4(obj_tptr);
-                        ND_PRINT("\n\t    label %u, exp %u", MPLS_LABEL(raw_label), MPLS_EXP(raw_label));
+                        raw_label = GET_BE_U_4(obj_tptr);
+                        ND_PRINT("\n\t    label %u, tc %u", MPLS_LABEL(raw_label), MPLS_TC(raw_label));
                         if (MPLS_STACK(raw_label))
                             ND_PRINT(", [S]");
                         ND_PRINT(", ttl %u", MPLS_TTL(raw_label));
@@ -697,5 +778,5 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 
 	return;
 trunc:
-	ND_PRINT("[|icmp]");
+	nd_print_trunc(ndo);
 }

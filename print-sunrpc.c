@@ -52,6 +52,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -133,10 +134,6 @@
  */
 
 #define SUNRPC_PMAPPORT		((uint16_t)111)
-#define SUNRPC_PMAPPROG		((uint32_t)100000)
-#define SUNRPC_PMAPVERS		((uint32_t)2)
-#define SUNRPC_PMAPVERS_PROTO	((uint32_t)2)
-#define SUNRPC_PMAPVERS_ORIG	((uint32_t)1)
 #define SUNRPC_PMAPPROC_NULL	((uint32_t)0)
 #define SUNRPC_PMAPPROC_SET	((uint32_t)1)
 #define SUNRPC_PMAPPROC_UNSET	((uint32_t)2)
@@ -169,29 +166,30 @@ sunrpc_print(netdissect_options *ndo, const u_char *bp,
 
 	ndo->ndo_protocol = "sunrpc";
 	rp = (const struct sunrpc_msg *)bp;
+	ND_TCHECK_SIZE(rp);
 
 	if (!ndo->ndo_nflag) {
-		nd_snprintf(srcid, sizeof(srcid), "0x%x",
-		    EXTRACT_BE_U_4(rp->rm_xid));
+		snprintf(srcid, sizeof(srcid), "0x%x",
+		    GET_BE_U_4(rp->rm_xid));
 		strlcpy(dstid, "sunrpc", sizeof(dstid));
 	} else {
-		nd_snprintf(srcid, sizeof(srcid), "0x%x",
-		    EXTRACT_BE_U_4(rp->rm_xid));
-		nd_snprintf(dstid, sizeof(dstid), "0x%x", SUNRPC_PMAPPORT);
+		snprintf(srcid, sizeof(srcid), "0x%x",
+		    GET_BE_U_4(rp->rm_xid));
+		snprintf(dstid, sizeof(dstid), "0x%x", SUNRPC_PMAPPORT);
 	}
 
 	switch (IP_V((const struct ip *)bp2)) {
 	case 4:
 		ip = (const struct ip *)bp2;
 		ND_PRINT("%s.%s > %s.%s: %u",
-		    ipaddr_string(ndo, ip->ip_src), srcid,
-		    ipaddr_string(ndo, ip->ip_dst), dstid, length);
+		    GET_IPADDR_STRING(ip->ip_src), srcid,
+		    GET_IPADDR_STRING(ip->ip_dst), dstid, length);
 		break;
 	case 6:
 		ip6 = (const struct ip6_hdr *)bp2;
 		ND_PRINT("%s.%s > %s.%s: %u",
-		    ip6addr_string(ndo, ip6->ip6_src), srcid,
-		    ip6addr_string(ndo, ip6->ip6_dst), dstid, length);
+		    GET_IP6ADDR_STRING(ip6->ip6_src), srcid,
+		    GET_IP6ADDR_STRING(ip6->ip6_dst), dstid, length);
 		break;
 	default:
 		ND_PRINT("%s.%s > %s.%s: %u", "?", srcid, "?", dstid, length);
@@ -199,23 +197,23 @@ sunrpc_print(netdissect_options *ndo, const u_char *bp,
 	}
 
 	ND_PRINT(" %s", tok2str(proc2str, " proc #%u",
-	    EXTRACT_BE_U_4(rp->rm_call.cb_proc)));
-	x = EXTRACT_BE_U_4(rp->rm_call.cb_rpcvers);
-	if (x != 2)
+	    GET_BE_U_4(rp->rm_call.cb_proc)));
+	x = GET_BE_U_4(rp->rm_call.cb_rpcvers);
+	if (x != SUNRPC_MSG_VERSION)
 		ND_PRINT(" [rpcver %u]", x);
 
-	switch (EXTRACT_BE_U_4(rp->rm_call.cb_proc)) {
+	switch (GET_BE_U_4(rp->rm_call.cb_proc)) {
 
 	case SUNRPC_PMAPPROC_SET:
 	case SUNRPC_PMAPPROC_UNSET:
 	case SUNRPC_PMAPPROC_GETPORT:
 	case SUNRPC_PMAPPROC_CALLIT:
-		x = EXTRACT_BE_U_4(rp->rm_call.cb_prog);
+		x = GET_BE_U_4(rp->rm_call.cb_prog);
 		if (!ndo->ndo_nflag)
 			ND_PRINT(" %s", progstr(x));
 		else
 			ND_PRINT(" %u", x);
-		ND_PRINT(".%u", EXTRACT_BE_U_4(rp->rm_call.cb_vers));
+		ND_PRINT(".%u", GET_BE_U_4(rp->rm_call.cb_vers));
 		break;
 	}
 }
@@ -233,12 +231,11 @@ progstr(uint32_t prog)
 		return (buf);
 #if defined(HAVE_GETRPCBYNUMBER) && defined(HAVE_RPC_RPC_H)
 	rp = getrpcbynumber(prog);
-	if (rp == NULL)
-#endif
-		(void) nd_snprintf(buf, sizeof(buf), "#%u", prog);
-#if defined(HAVE_GETRPCBYNUMBER) && defined(HAVE_RPC_RPC_H)
-	else
+	if (rp != NULL)
 		strlcpy(buf, rp->r_name, sizeof(buf));
+	else
 #endif
+		(void) snprintf(buf, sizeof(buf), "#%u", prog);
+	lastprog = prog;
 	return (buf);
 }

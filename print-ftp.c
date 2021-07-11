@@ -19,15 +19,11 @@
 
 #include "netdissect-stdinc.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "netdissect.h"
-#include "extract.h"
 
 void
 ftp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 {
 	ndo->ndo_protocol = "ftp";
-	txtproto_print(ndo, pptr, len, "ftp", NULL, 0);
+	txtproto_print(ndo, pptr, len, NULL, 0);
 }

@@ -45,7 +45,7 @@
 /*
  * This was introduced by Clang:
  *
- *     http://clang.llvm.org/docs/LanguageExtensions.html#has-attribute
+ *     https://clang.llvm.org/docs/LanguageExtensions.html#has-attribute
  *
  * in some version (which version?); it has been picked up by GCC 5.0.
  */
@@ -138,13 +138,9 @@
 /*
  * For flagging arguments as format strings in MSVC.
  */
-#if _MSC_VER >= 1400
+#ifdef _MSC_VER
  #include <sal.h>
- #if _MSC_VER > 1400
-  #define FORMAT_STRING(p) _Printf_format_string_ p
- #else
-  #define FORMAT_STRING(p) __format_string p
- #endif
+ #define FORMAT_STRING(p) _Printf_format_string_ p
 #else
  #define FORMAT_STRING(p) p
 #endif

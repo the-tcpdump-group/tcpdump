@@ -58,10 +58,6 @@
 #include "netdissect.h"
 #include "extract.h"
 
-static const char tstr[] = " [|telnet]";
-
-#define TELCMDS
-#define TELOPTS
 
 /*	NetBSD: telnet.h,v 1.9 2001/06/11 01:50:50 wiz Exp 	*/
 
@@ -91,15 +87,11 @@ static const char tstr[] = " [|telnet]";
 
 #define SYNCH	242		/* for telfunc calls */
 
-#ifdef TELCMDS
 static const char *telcmds[] = {
 	"EOF", "SUSP", "ABORT", "EOR",
 	"SE", "NOP", "DMARK", "BRK", "IP", "AO", "AYT", "EC",
 	"EL", "GA", "SB", "WILL", "WONT", "DO", "DONT", "IAC", 0,
 };
-#else
-extern char *telcmds[];
-#endif
 
 #define	TELCMD_FIRST	xEOF
 #define	TELCMD_LAST	IAC
@@ -152,7 +144,6 @@ extern char *telcmds[];
 
 
 #define	NTELOPTS	(1+TELOPT_NEW_ENVIRON)
-#ifdef TELOPTS
 static const char *telopts[NTELOPTS+1] = {
 	"BINARY", "ECHO", "RCP", "SUPPRESS GO AHEAD", "NAME",
 	"STATUS", "TIMING MARK", "RCTE", "NAOL", "NAOP",
@@ -170,7 +161,6 @@ static const char *telopts[NTELOPTS+1] = {
 #define	TELOPT_LAST	TELOPT_NEW_ENVIRON
 #define	TELOPT_OK(x)	((unsigned int)(x) <= TELOPT_LAST)
 #define	TELOPT(x)	telopts[(x)-TELOPT_FIRST]
-#endif
 
 /* sub-option qualifiers */
 #define	TELQUAL_IS	0	/* option is... */
@@ -382,7 +372,7 @@ numstr(int x)
 {
 	static char buf[20];
 
-	nd_snprintf(buf, sizeof(buf), "%#x", x);
+	snprintf(buf, sizeof(buf), "%#x", x);
 	return buf;
 }
 
@@ -397,8 +387,7 @@ telnet_parse(netdissect_options *ndo, const u_char *sp, u_int length, int print)
 	do { \
 		if (length < 1) \
 			goto pktend; \
-		ND_TCHECK_1(sp); \
-		c = EXTRACT_U_1(sp); \
+		c = GET_U_1(sp); \
 		sp++; \
 		length--; \
 	} while (0)
@@ -439,13 +428,11 @@ telnet_parse(netdissect_options *ndo, const u_char *sp, u_int length, int print)
 		/* IAC SB .... IAC SE */
 		p = sp;
 		while (length > (u_int)(p + 1 - sp)) {
-			ND_TCHECK_2(p);
-			if (EXTRACT_U_1(p) == IAC && EXTRACT_U_1(p + 1) == SE)
+			if (GET_U_1(p) == IAC && GET_U_1(p + 1) == SE)
 				break;
 			p++;
 		}
-		ND_TCHECK_1(p);
-		if (EXTRACT_U_1(p) != IAC)
+		if (GET_U_1(p) != IAC)
 			goto pktend;
 
 		switch (x) {
@@ -498,10 +485,8 @@ telnet_parse(netdissect_options *ndo, const u_char *sp, u_int length, int print)
 	}
 
 done:
-	return sp - osp;
+	return (int)(sp - osp);
 
-trunc:
-	ND_PRINT("%s", tstr);
 pktend:
 	return -1;
 #undef FETCH
@@ -517,8 +502,7 @@ telnet_print(netdissect_options *ndo, const u_char *sp, u_int length)
 	ndo->ndo_protocol = "telnet";
 	osp = sp;
 
-	ND_TCHECK_1(sp);
-	while (length > 0 && EXTRACT_U_1(sp) == IAC) {
+	while (length > 0 && GET_U_1(sp) == IAC) {
 		/*
 		 * Parse the Telnet command without printing it,
 		 * to determine its length.
@@ -533,7 +517,7 @@ telnet_print(netdissect_options *ndo, const u_char *sp, u_int length)
 		if (ndo->ndo_Xflag && 2 < ndo->ndo_vflag) {
 			if (first)
 				ND_PRINT("\nTelnet:");
-			hex_print_with_offset(ndo, "\n", sp, l, sp - osp);
+			hex_print_with_offset(ndo, "\n", sp, l, (u_int)(sp - osp));
 			if (l > 8)
 				ND_PRINT("\n\t\t\t\t");
 			else
@@ -546,7 +530,6 @@ telnet_print(netdissect_options *ndo, const u_char *sp, u_int length)
 
 		sp += l;
 		length -= l;
-		ND_TCHECK_1(sp);
 	}
 	if (!first) {
 		if (ndo->ndo_Xflag && 2 < ndo->ndo_vflag)
@@ -554,7 +537,4 @@ telnet_print(netdissect_options *ndo, const u_char *sp, u_int length)
 		else
 			ND_PRINT("]");
 	}
-	return;
-trunc:
-	ND_PRINT("%s", tstr);
 }

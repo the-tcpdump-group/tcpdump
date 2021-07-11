@@ -16,6 +16,7 @@
  */
 
 /* \summary: Generic Network Virtualization Encapsulation (Geneve) printer */
+/* specification: RFC 8926 */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -23,12 +24,13 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 #include "ethertype.h"
 
 /*
- * Geneve header, draft-ietf-nvo3-geneve
+ * Geneve header:
  *
  *    0                   1                   2                   3
  *    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -37,14 +39,20 @@
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *    |        Virtual Network Identifier (VNI)       |    Reserved   |
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *    |                    Variable Length Options                    |
+ *    |                                                               |
+ *    ~                    Variable-Length Options                    ~
+ *    |                                                               |
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
  * Options:
+ *    0                   1                   2                   3
+ *    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *    |          Option Class         |      Type     |R|R|R| Length  |
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *    |                      Variable Option Data                     |
+ *    |                                                               |
+ *    ~                  Variable-Length Option Data                  ~
+ *    |                                                               |
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 
@@ -76,7 +84,7 @@ static const struct tok geneve_flag_values[] = {
 };
 
 static const char *
-format_opt_class(uint16_t opt_class)
+format_opt_class(const uint16_t opt_class)
 {
     switch (opt_class) {
     case 0x0100:
@@ -99,7 +107,7 @@ format_opt_class(uint16_t opt_class)
     return "Unknown";
 }
 
-static void
+static unsigned
 geneve_opts_print(netdissect_options *ndo, const u_char *bp, u_int len)
 {
     const char *sep = "";
@@ -109,12 +117,13 @@ geneve_opts_print(netdissect_options *ndo, const u_char *bp, u_int len)
         uint8_t opt_type;
         uint8_t opt_len;
 
+        ND_LCHECKMSG_U(len, 4, "remaining options length");
         ND_PRINT("%s", sep);
         sep = ", ";
 
-        opt_class = EXTRACT_BE_U_2(bp);
-        opt_type = EXTRACT_U_1(bp + 2);
-        opt_len = 4 + ((EXTRACT_U_1(bp + 3) & OPT_LEN_MASK) * 4);
+        opt_class = GET_BE_U_2(bp);
+        opt_type = GET_U_1(bp + 2);
+        opt_len = 4 + ((GET_U_1(bp + 3) & OPT_LEN_MASK) * 4);
 
         ND_PRINT("class %s (0x%x) type 0x%x%s len %u",
                   format_opt_class(opt_class), opt_class, opt_type,
@@ -122,7 +131,7 @@ geneve_opts_print(netdissect_options *ndo, const u_char *bp, u_int len)
 
         if (opt_len > len) {
             ND_PRINT(" [bad length]");
-            return;
+            goto invalid;
         }
 
         if (ndo->ndo_vflag > 1 && opt_len > 4) {
@@ -132,7 +141,7 @@ geneve_opts_print(netdissect_options *ndo, const u_char *bp, u_int len)
             ND_PRINT(" data");
 
             for (i = 4; i < opt_len; i += 4) {
-                ND_PRINT(" %08x", EXTRACT_BE_U_4(data));
+                ND_PRINT(" %08x", GET_BE_U_4(data));
                 data++;
             }
         }
@@ -140,6 +149,10 @@ geneve_opts_print(netdissect_options *ndo, const u_char *bp, u_int len)
         bp += opt_len;
         len -= opt_len;
     }
+    return 1;
+invalid:
+    ND_TCHECK_LEN(bp, len);
+    return 0;
 }
 
 void
@@ -156,31 +169,31 @@ geneve_print(netdissect_options *ndo, const u_char *bp, u_int len)
     ndo->ndo_protocol = "geneve";
     ND_PRINT("Geneve");
 
-    ND_TCHECK_8(bp);
+    ND_LCHECK_U(len, 8);
 
-    ver_opt = EXTRACT_U_1(bp);
+    ver_opt = GET_U_1(bp);
     bp += 1;
     len -= 1;
 
     version = ver_opt >> VER_SHIFT;
     if (version != 0) {
         ND_PRINT(" ERROR: unknown-version %u", version);
-        return;
+        goto invalid;
     }
 
-    flags = EXTRACT_U_1(bp);
+    flags = GET_U_1(bp);
     bp += 1;
     len -= 1;
 
-    prot = EXTRACT_BE_U_2(bp);
+    prot = GET_BE_U_2(bp);
     bp += 2;
     len -= 2;
 
-    vni = EXTRACT_BE_U_3(bp);
+    vni = GET_BE_U_3(bp);
     bp += 3;
     len -= 3;
 
-    reserved = EXTRACT_U_1(bp);
+    reserved = GET_U_1(bp);
     bp += 1;
     len -= 1;
 
@@ -198,20 +211,21 @@ geneve_print(netdissect_options *ndo, const u_char *bp, u_int len)
     opts_len = (ver_opt & HDR_OPTS_LEN_MASK) * 4;
 
     if (len < opts_len) {
-        ND_PRINT(" truncated-geneve - %u bytes missing",
-                  opts_len - len);
-        return;
+        ND_PRINT(" (opts_len %u > %u", opts_len, len);
+        goto invalid;
     }
-
-    ND_TCHECK_LEN(bp, opts_len);
 
     if (opts_len > 0) {
         ND_PRINT(", options [");
 
-        if (ndo->ndo_vflag)
-            geneve_opts_print(ndo, bp, opts_len);
-        else
+        if (ndo->ndo_vflag) {
+            if (! geneve_opts_print(ndo, bp, opts_len))
+                goto invalid;
+        }
+        else {
+            ND_TCHECK_LEN(bp, opts_len);
             ND_PRINT("%u bytes", opts_len);
+        }
 
         ND_PRINT("]");
     }
@@ -224,15 +238,17 @@ geneve_print(netdissect_options *ndo, const u_char *bp, u_int len)
     else
         ND_PRINT("\n\t");
 
-    if (ethertype_print(ndo, prot, bp, len, ndo->ndo_snapend - bp, NULL, NULL) == 0) {
+    if (ethertype_print(ndo, prot, bp, len, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL) == 0) {
         if (prot == ETHERTYPE_TEB)
-            ether_print(ndo, bp, len, ndo->ndo_snapend - bp, NULL, NULL);
-        else
+            ether_print(ndo, bp, len, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL);
+        else {
             ND_PRINT("geneve-proto-0x%x", prot);
+            ND_TCHECK_LEN(bp, len);
+        }
     }
 
     return;
 
-trunc:
-    ND_PRINT(" [|geneve]");
+invalid:
+    nd_print_invalid(ndo);
 }

@@ -113,8 +113,8 @@
 #endif
 
 /* see:
-        http://en.wikipedia.org/wiki/IEEE_802.1Q
-    and http://en.wikipedia.org/wiki/QinQ
+        https://en.wikipedia.org/wiki/IEEE_802.1Q
+    and https://en.wikipedia.org/wiki/QinQ
 */
 #ifndef	ETHERTYPE_8021Q9100
 #define	ETHERTYPE_8021Q9100	0x9100
@@ -124,6 +124,9 @@
 #endif
 #ifndef	ETHERTYPE_8021QinQ
 #define	ETHERTYPE_8021QinQ      0x88a8
+#endif
+#ifndef ETHERTYPE_MACSEC
+#define ETHERTYPE_MACSEC	0x88e5
 #endif
 #ifndef ETHERTYPE_IPX
 #define ETHERTYPE_IPX		0x8137
@@ -179,6 +182,9 @@
 #ifndef ETHERTYPE_AOE
 #define ETHERTYPE_AOE  		0x88a2
 #endif
+#ifndef ETHERTYPE_PTP
+#define ETHERTYPE_PTP  		0x88f7
+#endif
 #ifndef	ETHERTYPE_LOOPBACK
 #define	ETHERTYPE_LOOPBACK	0x9000
 #endif
@@ -206,8 +212,8 @@
 #ifndef	ETHERTYPE_GEONET
 #define	ETHERTYPE_GEONET        0x8947  /* ETSI GeoNetworking (Official IEEE registration from Jan 2013) */
 #endif
-#ifndef	ETHERTYPE_MEDSA
-#define	ETHERTYPE_MEDSA		0xdada	/* Marvel Distributed Switch Architecture */
+#ifndef	ETHERTYPE_ARISTA
+#define	ETHERTYPE_ARISTA        0xd28b /*  Arista Networks vendor specific EtherType */
 #endif
 
 extern const struct tok ethertype_values[];

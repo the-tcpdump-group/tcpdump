@@ -36,16 +36,12 @@
 #include "netdissect-stdinc.h"
 #include "netdissect.h"
 #include <limits.h>
-#include <string.h>
-#include <stdlib.h>
-#include <errno.h>
 
 #include "extract.h"
 
-static const char tstr[] = " [|RESP]";
 
 /*
- * For information regarding RESP, see: http://redis.io/topics/protocol
+ * For information regarding RESP, see: https://redis.io/topics/protocol
  */
 
 #define RESP_SIMPLE_STRING    '+'
@@ -60,7 +56,6 @@ static const char tstr[] = " [|RESP]";
 #define resp_print_length_negative(ndo)  ND_PRINT(" length negative and not -1")
 #define resp_print_invalid(ndo)          ND_PRINT(" invalid")
 
-void       resp_print(netdissect_options *, const u_char *, u_int);
 static int resp_parse(netdissect_options *, const u_char *, int);
 static int resp_print_string_error_integer(netdissect_options *, const u_char *, int);
 static int resp_print_simple_string(netdissect_options *, const u_char *, int);
@@ -90,8 +85,9 @@ static int resp_get_length(netdissect_options *, const u_char *, int, const u_ch
 #define FIND_CRLF(_ptr, _len)                   \
     for (;;) {                                  \
         LCHECK2(_len, 2);                       \
-        ND_TCHECK_2(_ptr);                   \
-        if (*_ptr == '\r' && *(_ptr+1) == '\n') \
+        ND_TCHECK_2(_ptr);                      \
+        if (GET_U_1(_ptr) == '\r' &&            \
+            GET_U_1(_ptr+1) == '\n')            \
             break;                              \
         _ptr++;                                 \
         _len--;                                 \
@@ -116,8 +112,8 @@ static int resp_get_length(netdissect_options *, const u_char *, int, const u_ch
 #define FIND_CR_OR_LF(_ptr, _len)           \
     for (;;) {                              \
         LCHECK(_len);                       \
-        ND_TCHECK_1(_ptr);                  \
-        if (*_ptr == '\r' || *_ptr == '\n') \
+        if (GET_U_1(_ptr) == '\r' ||        \
+            GET_U_1(_ptr) == '\n')          \
             break;                          \
         _ptr++;                             \
         _len--;                             \
@@ -152,7 +148,8 @@ static int resp_get_length(netdissect_options *, const u_char *, int, const u_ch
                  */                              \
                 goto trunc;                      \
             }                                    \
-            if (*_ptr != '\r' && *_ptr != '\n')  \
+            if (GET_U_1(_ptr) != '\r' &&         \
+                GET_U_1(_ptr) != '\n')           \
                 break;                           \
             _found_cr_or_lf = 1;                 \
             _ptr++;                              \
@@ -205,7 +202,7 @@ static int resp_get_length(netdissect_options *, const u_char *, int, const u_ch
  */
 #define RESP_PRINT_SEGMENT(_ndo, _bp, _len)            \
     ND_PRINT(" \"");                                   \
-    if (fn_printn(_ndo, _bp, _len, _ndo->ndo_snapend)) \
+    if (nd_printn(_ndo, _bp, _len, _ndo->ndo_snapend)) \
         goto trunc;                                    \
     fn_print_char(_ndo, '"');
 
@@ -238,7 +235,7 @@ resp_print(netdissect_options *ndo, const u_char *bp, u_int length)
     return;
 
 trunc:
-    ND_PRINT("%s", tstr);
+    nd_print_trunc(ndo);
 }
 
 static int
@@ -248,8 +245,7 @@ resp_parse(netdissect_options *ndo, const u_char *bp, int length)
     int ret_len;
 
     LCHECK2(length, 1);
-    ND_TCHECK_1(bp);
-    op = EXTRACT_U_1(bp);
+    op = GET_U_1(bp);
 
     /* bp now points to the op, so these routines must skip it */
     switch(op) {
@@ -312,7 +308,7 @@ resp_print_string_error_integer(netdissect_options *ndo, const u_char *bp, int l
      * preceding the \r\n.  That includes the opcode, so don't print
      * that.
      */
-    len = (bp_ptr - bp);
+    len = ND_BYTES_BETWEEN(bp_ptr, bp);
     RESP_PRINT_SEGMENT(ndo, bp, len);
     ret_len = 1 /*<opcode>*/ + len /*<string>*/ + 2 /*<CRLF>*/;
 
@@ -435,9 +431,9 @@ resp_print_inline(netdissect_options *ndo, const u_char *bp, int length) {
 
     /*
      * Found it; bp_ptr points to the \r or \n, so bp_ptr - bp is the
-     * Length of the line text that preceeds it.  Print it.
+     * Length of the line text that precedes it.  Print it.
      */
-    len = (bp_ptr - bp);
+    len = ND_BYTES_BETWEEN(bp_ptr, bp);
     RESP_PRINT_SEGMENT(ndo, bp, len);
 
     /*
@@ -465,10 +461,9 @@ resp_get_length(netdissect_options *ndo, const u_char *bp, int len, const u_char
 
     if (len == 0)
         goto trunc;
-    ND_TCHECK_1(bp);
     too_large = 0;
     neg = 0;
-    if (EXTRACT_U_1(bp) == '-') {
+    if (GET_U_1(bp) == '-') {
         neg = 1;
         bp++;
         len--;
@@ -479,8 +474,7 @@ resp_get_length(netdissect_options *ndo, const u_char *bp, int len, const u_char
     for (;;) {
         if (len == 0)
             goto trunc;
-        ND_TCHECK_1(bp);
-        c = EXTRACT_U_1(bp);
+        c = GET_U_1(bp);
         if (!(c >= '0' && c <= '9')) {
             if (!saw_digit) {
                 bp++;
@@ -509,7 +503,7 @@ resp_get_length(netdissect_options *ndo, const u_char *bp, int len, const u_char
      * OK, we found a non-digit character.  It should be a \r, followed
      * by a \n.
      */
-    if (EXTRACT_U_1(bp) != '\r') {
+    if (GET_U_1(bp) != '\r') {
         bp++;
         goto invalid;
     }
@@ -517,8 +511,7 @@ resp_get_length(netdissect_options *ndo, const u_char *bp, int len, const u_char
     len--;
     if (len == 0)
         goto trunc;
-    ND_TCHECK_1(bp);
-    if (EXTRACT_U_1(bp) != '\n') {
+    if (GET_U_1(bp) != '\n') {
         bp++;
         goto invalid;
     }

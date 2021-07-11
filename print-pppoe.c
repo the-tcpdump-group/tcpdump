@@ -29,6 +29,9 @@
 
 #include "netdissect-stdinc.h"
 
+#include "netdissect-ctype.h"
+
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 
@@ -84,11 +87,11 @@ static const struct tok pppoetag2str[] = {
 #define PPPOE_HDRLEN 6
 #define MAXTAGPRINT 80
 
-u_int
+void
 pppoe_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
-	ndo->ndo_protocol = "pppoe_if";
-	return (pppoe_print(ndo, p, h->len));
+	ndo->ndo_protocol = "pppoe";
+	ndo->ndo_ll_hdr_len += pppoe_print(ndo, p, h->len);
 }
 
 u_int
@@ -100,17 +103,17 @@ pppoe_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	ndo->ndo_protocol = "pppoe";
 	if (length < PPPOE_HDRLEN) {
-		ND_PRINT("truncated-pppoe %u", length);
-		return (length);
+		ND_PRINT(" (length %u < %u)", length, PPPOE_HDRLEN);
+		goto invalid;
 	}
 	length -= PPPOE_HDRLEN;
 	pppoe_packet = bp;
 	ND_TCHECK_LEN(pppoe_packet, PPPOE_HDRLEN);
-	pppoe_ver  = (EXTRACT_U_1(pppoe_packet) & 0xF0) >> 4;
-	pppoe_type  = (EXTRACT_U_1(pppoe_packet) & 0x0F);
-	pppoe_code = EXTRACT_U_1(pppoe_packet + 1);
-	pppoe_sessionid = EXTRACT_BE_U_2(pppoe_packet + 2);
-	pppoe_length    = EXTRACT_BE_U_2(pppoe_packet + 4);
+	pppoe_ver  = (GET_U_1(pppoe_packet) & 0xF0) >> 4;
+	pppoe_type  = (GET_U_1(pppoe_packet) & 0x0F);
+	pppoe_code = GET_U_1(pppoe_packet + 1);
+	pppoe_sessionid = GET_BE_U_2(pppoe_packet + 2);
+	pppoe_length    = GET_BE_U_2(pppoe_packet + 4);
 	pppoe_payload = pppoe_packet + PPPOE_HDRLEN;
 
 	if (pppoe_ver != 1) {
@@ -143,9 +146,8 @@ pppoe_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		 * tag_type is previous tag or 0xffff for first iteration
 		 */
 		while (tag_type && p < pppoe_payload + pppoe_length) {
-			ND_TCHECK_4(p);
-			tag_type = EXTRACT_BE_U_2(p);
-			tag_len = EXTRACT_BE_U_2(p + 2);
+			tag_type = GET_BE_U_2(p);
+			tag_len = GET_BE_U_2(p + 2);
 			p += 4;
 			/* p points to tag_value */
 
@@ -158,8 +160,8 @@ pppoe_print(netdissect_options *ndo, const u_char *bp, u_int length)
 				/* TODO print UTF-8 decoded text */
 				ND_TCHECK_LEN(p, tag_len);
 				for (v = p; v < p + tag_len && tag_str_len < MAXTAGPRINT-1; v++)
-					if (ND_ISPRINT(EXTRACT_U_1(v))) {
-						tag_str[tag_str_len++] = EXTRACT_U_1(v);
+					if (ND_ASCII_ISPRINT(GET_U_1(v))) {
+						tag_str[tag_str_len++] = GET_U_1(v);
 						ascii_count++;
 					} else {
 						tag_str[tag_str_len++] = '.';
@@ -177,7 +179,7 @@ pppoe_print(netdissect_options *ndo, const u_char *bp, u_int length)
 					/* Print hex, not fast to abuse printf but this doesn't get used much */
 					ND_PRINT(" [%s 0x", tok2str(pppoetag2str, "TAG-0x%x", tag_type));
 					for (v=p; v<p+tag_len; v++) {
-						ND_PRINT("%02X", EXTRACT_U_1(v));
+						ND_PRINT("%02X", GET_U_1(v));
 					}
 					ND_PRINT("]");
 				}
@@ -190,14 +192,15 @@ pppoe_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			p += tag_len;
 			/* p points to next tag */
 		}
-		return (0);
+		return PPPOE_HDRLEN;
 	} else {
 		/* PPPoE data */
 		ND_PRINT(" ");
 		return (PPPOE_HDRLEN + ppp_print(ndo, pppoe_payload, pppoe_length));
 	}
+	/* NOTREACHED */
 
-trunc:
-	ND_PRINT("[|pppoe]");
-	return (PPPOE_HDRLEN);
+invalid:
+	nd_print_invalid(ndo);
+	return 0;
 }

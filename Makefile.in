@@ -26,12 +26,13 @@ prefix = @prefix@
 exec_prefix = @exec_prefix@
 datarootdir = @datarootdir@
 # Pathname of directory to install the binary
-sbindir = @sbindir@
+bindir = @bindir@
 # Pathname of directory to install the man page
 mandir = @mandir@
 
 # VPATH
 srcdir = @srcdir@
+top_srcdir = @top_srcdir@
 VPATH = @srcdir@
 
 #
@@ -70,7 +71,7 @@ DEPENDENCY_CFLAG = @DEPENDENCY_CFLAG@
 	@rm -f $@
 	$(CC) $(FULL_CFLAGS) -c $(srcdir)/$*.c
 
-CSRC =	tcpdump.c
+CSRC =	fptype.c tcpdump.c
 
 LIBNETDISSECT_SRC=\
 	addrtoname.c \
@@ -80,7 +81,6 @@ LIBNETDISSECT_SRC=\
 	checksum.c \
 	cpack.c \
 	gmpls.c \
-	gmt2local.c \
 	in_cksum.c \
 	ipproto.c \
 	l2vpn.c \
@@ -88,6 +88,7 @@ LIBNETDISSECT_SRC=\
 	netdissect.c \
 	netdissect-alloc.c \
 	nlpid.c \
+	ntp.c \
 	oui.c \
 	parsenfsfh.c \
 	print.c \
@@ -99,15 +100,18 @@ LIBNETDISSECT_SRC=\
 	print-aoe.c \
 	print-ap1394.c \
 	print-arcnet.c \
+	print-arista.c \
 	print-arp.c \
 	print-ascii.c \
 	print-atalk.c \
 	print-atm.c \
 	print-babel.c \
+	print-bcm-li.c \
 	print-beep.c \
 	print-bfd.c \
 	print-bgp.c \
 	print-bootp.c \
+	print-brcmtag.c \
 	print-bt.c \
 	print-calm-fast.c \
 	print-carp.c \
@@ -120,6 +124,7 @@ LIBNETDISSECT_SRC=\
 	print-decnet.c \
 	print-dhcp6.c \
 	print-domain.c \
+	print-dsa.c \
 	print-dtp.c \
 	print-dvmrp.c \
 	print-eap.c \
@@ -143,12 +148,14 @@ LIBNETDISSECT_SRC=\
 	print-icmp6.c \
 	print-igmp.c \
 	print-igrp.c \
+	print-ip-demux.c \
 	print-ip.c \
 	print-ip6.c \
 	print-ip6opts.c \
 	print-ipcomp.c \
 	print-ipfc.c \
 	print-ipnet.c \
+	print-ipoib.c \
 	print-ipx.c \
 	print-isakmp.c \
 	print-isoclns.c \
@@ -166,7 +173,7 @@ LIBNETDISSECT_SRC=\
 	print-lwapp.c \
 	print-lwres.c \
 	print-m3ua.c \
-	print-medsa.c \
+	print-macsec.c \
 	print-mobile.c \
 	print-mobility.c \
 	print-mpcp.c \
@@ -181,6 +188,7 @@ LIBNETDISSECT_SRC=\
 	print-null.c \
 	print-olsr.c \
 	print-openflow-1.0.c \
+	print-openflow-1.3.c \
 	print-openflow.c \
 	print-ospf.c \
 	print-ospf6.c \
@@ -192,6 +200,7 @@ LIBNETDISSECT_SRC=\
 	print-ppp.c \
 	print-pppoe.c \
 	print-pptp.c \
+	print-ptp.c \
 	print-radius.c \
 	print-raw.c \
 	print-resp.c \
@@ -211,6 +220,8 @@ LIBNETDISSECT_SRC=\
 	print-slow.c \
 	print-smtp.c \
 	print-snmp.c \
+	print-someip.c \
+	print-ssh.c \
 	print-stp.c \
 	print-sunatm.c \
 	print-sunrpc.c \
@@ -224,14 +235,17 @@ LIBNETDISSECT_SRC=\
 	print-token.c \
 	print-udld.c \
 	print-udp.c \
+	print-unsupported.c \
 	print-usb.c \
 	print-vjc.c \
 	print-vqp.c \
 	print-vrrp.c \
+	print-vsock.c \
 	print-vtp.c \
-	print-vxlan.c \
 	print-vxlan-gpe.c \
+	print-vxlan.c \
 	print-wb.c \
+	print-zep.c \
 	print-zephyr.c \
 	print-zeromq.c \
 	signature.c \
@@ -245,11 +259,11 @@ LIBNETDISSECT_OBJ=$(LIBNETDISSECT_SRC:.c=.o) ${LOCALSRC:.c=.o} ${LIBOBJS}
 LIBNETDISSECT=libnetdissect.a
 
 
-SRC =	$(CSRC) $(GENSRC) $(LOCALSRC)
+SRC =	$(CSRC) $(LOCALSRC)
 
 # We would like to say "OBJ = $(SRC:.c=.o)" but Ultrix's make cannot
 # hack the extra indirection
-OBJ =	$(CSRC:.c=.o) $(GENSRC:.c=.o)
+OBJ =	$(CSRC:.c=.o)
 HDR = \
 	addrtoname.h \
 	addrtostr.h \
@@ -263,11 +277,11 @@ HDR = \
 	cpack.h \
 	ethertype.h \
 	extract.h \
+	fptype.h \
+	ftmacros.h \
 	funcattrs.h \
-	getopt_long.h \
 	getservent.h \
 	gmpls.h \
-	gmt2local.h \
 	interface.h \
 	ip.h \
 	ip6.h \
@@ -280,10 +294,12 @@ HDR = \
 	nameser.h \
 	netdissect.h \
 	netdissect-alloc.h \
+	netdissect-ctype.h \
 	netdissect-stdinc.h \
 	nfs.h \
 	nfsfh.h \
 	nlpid.h \
+	ntp.h \
 	openflow.h \
 	ospf.h \
 	oui.h \
@@ -303,18 +319,13 @@ HDR = \
 	varattrs.h
 
 TAGHDR = \
-	/usr/include/arpa/tftp.h \
-	/usr/include/net/if_arp.h \
 	/usr/include/netinet/if_ether.h \
-	/usr/include/netinet/in.h \
-	/usr/include/netinet/ip_icmp.h \
-	/usr/include/netinet/tcp.h \
-	/usr/include/netinet/udp.h \
-	/usr/include/protocols/routed.h
+	/usr/include/netinet/in.h
 
-TAGFILES = $(SRC) $(HDR) $(TAGHDR) $(LIBNETDISSECT_SRC)
+TAGFILES = $(SRC) $(HDR) $(TAGHDR) $(LIBNETDISSECT_SRC) \
+	print-pflog.c print-smb.c smbutil.c
 
-CLEANFILES = $(PROG) $(OBJ) $(GENSRC) $(LIBNETDISSECT_OBJ)
+CLEANFILES = $(PROG) $(OBJ) $(LIBNETDISSECT_OBJ)
 
 EXTRA_DIST = \
 	CHANGES \
@@ -325,10 +336,7 @@ EXTRA_DIST = \
 	LICENSE \
 	Makefile.in \
 	Makefile-devel-adds \
-	PLATFORMS \
-	README \
 	README.md \
-	Readme.Win32 \
 	VERSION \
 	aclocal.m4 \
 	atime.awk \
@@ -343,6 +351,7 @@ EXTRA_DIST = \
 	config.sub \
 	configure \
 	configure.ac \
+	doc/README.Win32.md \
 	install-sh \
 	lbl/os-osf4.h \
 	lbl/os-solaris2.h \
@@ -351,6 +360,7 @@ EXTRA_DIST = \
 	makemib \
 	missing/dlnames.c \
 	missing/datalinks.c \
+	missing/getopt_long.h \
 	missing/getopt_long.c \
 	missing/getservent.c \
 	missing/pcap_dump_ftell.c \
@@ -363,20 +373,14 @@ EXTRA_DIST = \
 	missing/win_ether_ntohost.h \
 	mkdep \
 	packetdat.awk \
-	pcap_dump_ftell.c \
 	print-pflog.c \
 	print-smb.c \
 	send-ack.awk \
 	smbutil.c \
 	stime.awk \
-	tcpdump.1.in \
-	win32/prj/GNUmakefile \
-	win32/prj/WinDump.dsp \
-	win32/prj/WinDump.dsw \
-	win32/prj/WinDump.sln \
-	win32/prj/WinDump.vcproj
+	tcpdump.1.in
 
-TEST_DIST= `find tests \( -name 'DIFF' -prune \) -o \( -name NEW -prune \) -o -type f \! -name '.*' \! -name '*~' -print`
+TEST_DIST= `git ls-files tests | grep -v 'tests/\..*'`
 
 all: $(PROG)
 
@@ -407,27 +411,30 @@ strlcpy.o: $(srcdir)/missing/strlcpy.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/strlcpy.c
 strsep.o: $(srcdir)/missing/strsep.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/strsep.c
+pcap_dump_ftell.o: $(srcdir)/missing/pcap_dump_ftell.c
+	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/pcap_dump_ftell.c
 
 install: all
-	[ -d $(DESTDIR)$(sbindir) ] || \
-	    (mkdir -p $(DESTDIR)$(sbindir); chmod 755 $(DESTDIR)$(sbindir))
-	$(INSTALL_PROGRAM) $(PROG) $(DESTDIR)$(sbindir)/$(PROG)
-	$(INSTALL_PROGRAM) $(PROG) $(DESTDIR)$(sbindir)/$(PROG).`cat ${srcdir}/VERSION`
+	[ -d $(DESTDIR)$(bindir) ] || \
+	    (mkdir -p $(DESTDIR)$(bindir); chmod 755 $(DESTDIR)$(bindir))
+	$(INSTALL_PROGRAM) $(PROG) $(DESTDIR)$(bindir)/$(PROG)
+	$(INSTALL_PROGRAM) $(PROG) $(DESTDIR)$(bindir)/$(PROG).`cat ${srcdir}/VERSION`
 	[ -d $(DESTDIR)$(mandir)/man1 ] || \
 	    (mkdir -p $(DESTDIR)$(mandir)/man1; chmod 755 $(DESTDIR)$(mandir)/man1)
 	$(INSTALL_DATA) $(PROG).1 $(DESTDIR)$(mandir)/man1/$(PROG).1
 
 uninstall:
-	rm -f $(DESTDIR)$(sbindir)/$(PROG)
+	rm -f $(DESTDIR)$(bindir)/$(PROG)
+	rm -f $(DESTDIR)$(bindir)/$(PROG).`cat ${srcdir}/VERSION`
 	rm -f $(DESTDIR)$(mandir)/man1/$(PROG).1
 
-lint: $(GENSRC)
+lint:
 	lint -hbxn $(SRC) $(LIBNETDISSECT_SRC) | \
 	    grep -v 'struct/union .* never defined' | \
 	    grep -v 'possible pointer alignment problem'
 
 clean:
-	rm -f $(CLEANFILES) $(PROG)-`cat VERSION`.tar.gz
+	rm -f $(CLEANFILES) $(PROG)-`cat ${srcdir}/VERSION`.tar.gz
 
 distclean:
 	rm -f $(CLEANFILES) Makefile config.cache config.log config.status \
@@ -437,7 +444,7 @@ distclean:
 	rm -rf autom4te.cache tests/DIFF tests/NEW
 
 check: tcpdump
-	(cd tests && ./TESTrun.sh)
+	$(srcdir)/tests/TESTrun
 
 extags: $(TAGFILES)
 	ctags $(TAGFILES)
@@ -449,14 +456,24 @@ TAGS: $(TAGFILES)
 	etags $(TAGFILES)
 
 releasetar:
-	@cwd=`pwd` ; dir=`basename $$cwd` ; name=$(PROG)-`cat VERSION` ; \
+	@autoreconf -f; \
+	name=$(PROG)-`cat VERSION` ; \
 	   mkdir $$name; \
 	   tar cf - $(CSRC) $(HDR) $(LIBNETDISSECT_SRC) $(EXTRA_DIST) $(TEST_DIST) | (cd $$name; tar xf -); \
 	   tar -c -z -f $$name.tar.gz $$name; \
 	   rm -rf $$name
 
+rc1 rc2 rc3 rc4 rc5:
+	@VER=`cat $(srcdir)/VERSION`; \
+	sed -i "s/$$VER/$${VER}$@/" VERSION ; \
+	make releasetar; \
+	git checkout VERSION configure
+
 testlist:
 	echo $(TEST_DIST)
 
-depend: $(GENSRC)
-	$(MKDEP) -c "$(CC)" -m "$(DEPENDENCY_CFLAG)" $(DEFS) $(INCLS) $(SRC) $(LIBNETDISSECT_SRC)
+depend:
+	$(MKDEP) -c "$(CC)" -m "$(DEPENDENCY_CFLAG)" -s "$(srcdir)" $(DEFS) $(INCLS) $(SRC) $(LIBNETDISSECT_SRC)
+
+shellcheck:
+	shellcheck -f gcc build.sh build_matrix.sh

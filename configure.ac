@@ -7,7 +7,7 @@ dnl
 #
 # See
 #
-#	http://ftp.gnu.org/gnu/config/README
+#	https://ftp.gnu.org/gnu/config/README
 #
 # for the URLs to use to fetch new versions of config.guess and
 # config.sub.
@@ -20,11 +20,18 @@ AC_CONFIG_SRCDIR(tcpdump.c)
 AC_CANONICAL_HOST
 
 AC_LBL_C_INIT_BEFORE_CC(V_INCLS)
+#
+# Try to enable as many C99 features as we can.
+# At minimum, we want C++/C99-style // comments.
+#
 AC_PROG_CC_C99
+if test "$ac_cv_prog_cc_c99" = "no"; then
+	AC_MSG_WARN([The C compiler does not support C99; there may be compiler errors])
+fi
 AC_LBL_C_INIT(V_CCOPT, V_INCLS)
 AC_LBL_C_INLINE
 
-AC_CHECK_HEADERS(fcntl.h rpc/rpc.h rpc/rpcent.h)
+AC_CHECK_HEADERS(fcntl.h rpc/rpc.h rpc/rpcent.h net/if.h)
 AC_CHECK_HEADERS(net/pfvar.h, , , [#include <sys/types.h>
 #include <sys/socket.h>
 #include <net/if.h>])
@@ -140,12 +147,11 @@ fi
 
 AC_MSG_CHECKING([whether to enable the possibly-buggy SMB printer])
 AC_ARG_ENABLE(smb,
-[  --enable-smb            enable possibly-buggy SMB printer [default=yes]
+[  --enable-smb            enable possibly-buggy SMB printer [default=no]
   --disable-smb           disable possibly-buggy SMB printer],,
-   enableval=yes)
+   enableval=no)
 case "$enableval" in
 yes)	AC_MSG_RESULT(yes)
-	AC_WARN([The SMB printer may have exploitable buffer overflows!!!])
 	AC_DEFINE(ENABLE_SMB, 1,
 	    [define if you want to build the possibly-buggy SMB printer])
 	LOCALSRC="print-smb.c smbutil.c $LOCALSRC"
@@ -192,10 +198,19 @@ AC_ARG_WITH(sandbox-capsicum,
 # XXX - do we need to check for all of them, or are there some that, if
 # present, imply others are present?
 #
-if test ! -z "$with_sandbox-capsicum" && test "$with_sandbox-capsicum" != "no" ; then
-	AC_CHECK_FUNCS(cap_enter cap_rights_limit cap_ioctls_limit openat,
-	    ac_lbl_capsicum_function_seen=yes,
-	    ac_lbl_capsicum_function_not_seen=yes)
+if test ! -z "$with_sandbox_capsicum" && test "$with_sandbox_capsicum" != "no" ; then
+	#
+	# First, make sure we have the required header.
+	#
+	AC_CHECK_HEADER(sys/capsicum.h,
+	[
+		#
+		# We do; now make sure we have the required functions.
+		#
+		AC_CHECK_FUNCS(cap_enter cap_rights_limit cap_ioctls_limit openat,
+		    ac_lbl_capsicum_function_seen=yes,
+		    ac_lbl_capsicum_function_not_seen=yes)
+	])
 	AC_CHECK_LIB(casper, cap_init, LIBS="$LIBS -lcasper")
 	AC_CHECK_LIB(cap_dns, cap_gethostbyaddr, LIBS="$LIBS -lcap_dns")
 fi
@@ -370,55 +385,17 @@ if test "$ipv6" = "yes" -a "$ipv6lib" != "none"; then
 	fi
 fi
 
-AC_SEARCH_LIBS(dnet_htoa, dnet,
-[
-	AC_DEFINE(HAVE_DNET_HTOA, 1,
-	    [define if you have the dnet_htoa function])
-	#
-	# OK, we have dnet_htoa().  Do we have netdnet/dnetdb.h?
-	#
-	AC_CHECK_HEADERS(netdnet/dnetdb.h)
-	if test "$ac_cv_header_netdnet_dnetdb_h" = "yes"; then
-		#
-		# Yes.  Does it declare dnet_htoa()?
-		#
-		AC_CHECK_DECL(dnet_htoa,
-		[
-			# Yes.
-			AC_DEFINE(NETDNET_DNETDB_H_DECLARES_DNET_HTOA,,
-			    [Define to 1 if netenet/dnetdb.h declares `dnet_htoa'])
-		],,
-		[
-AC_INCLUDES_DEFAULT
-#include <netdnet/dnetdb.h>
-		])
-	fi
-
-	#
-	# Do we have netdnet/dn.h?
-	#
-	AC_CHECK_HEADERS(netdnet/dn.h)
-	if test "$ac_cv_header_netdnet_dn_h" = "yes"; then
-		#
-		# Yes.  Does it declare struct dn_naddr?
-		#
-		AC_CHECK_TYPES(struct dn_naddr,,,
-		[
-#include <netdnet/dn.h>
-		])
-	fi
-])
-
 AC_REPLACE_FUNCS(strlcat strlcpy strdup strsep getservent getopt_long)
 AC_CHECK_FUNCS(fork vfork strftime)
 AC_CHECK_FUNCS(setlinebuf)
 
-needsnprintf=no
-AC_CHECK_FUNCS(vsnprintf snprintf,,
-	[needsnprintf=yes])
-if test $needsnprintf = yes; then
-	AC_LIBOBJ(snprintf)
-fi
+#
+# Make sure we have vsnprintf() and snprintf(); we require them.
+#
+AC_CHECK_FUNC(vsnprintf,,
+    AC_MSG_ERROR([vsnprintf() is required but wasn't found]))
+AC_CHECK_FUNC(snprintf,,
+    AC_MSG_ERROR([snprintf() is required but wasn't found]))
 
 AC_CHECK_LIB(rpc, main)		dnl It's unclear why we might need -lrpc
 
@@ -543,7 +520,7 @@ if test "$ac_cv_func_ether_ntohost" = yes -a \
 		# This test fails if we don't have <arpa/inet.h>
 		# (if we have ether_ntohost(), we should have
 		# networking, and if we have networking, we should
-		# have <arapa/inet.h>) or if we do but it doesn't
+		# have <arpa/inet.h>) or if we do but it doesn't
 		# declare ether_ntohost().
 		#
 		# Unset ac_cv_have_decl_ether_ntohost so we don't
@@ -672,17 +649,6 @@ dnl so just define the HAVE_ value if it's there.
 dnl
 AC_CHECK_FUNCS(pcap_breakloop)
 
-dnl
-dnl Check for "pcap_dump_ftell()" and use a substitute version
-dnl if it's not present.
-dnl
-AC_CHECK_FUNC(pcap_dump_ftell,
-	AC_DEFINE(HAVE_PCAP_DUMP_FTELL, 1,
-	    [define if libpcap has pcap_dump_ftell()]),
-	[
-	    AC_LIBOBJ(pcap_dump_ftell)
-	])
-
 #
 # Do we have the new open API?  Check for pcap_create, and assume that,
 # if we do, we also have pcap_activate() and the other new routines
@@ -737,6 +703,7 @@ if test $ac_cv_func_pcap_lib_version = "no" ; then
 fi
 AC_CHECK_FUNCS(pcap_setdirection pcap_set_immediate_mode pcap_dump_ftell64)
 AC_CHECK_FUNCS(pcap_open pcap_findalldevs_ex)
+AC_REPLACE_FUNCS(pcap_dump_ftell)
 
 #
 # Check for special debugging functions
@@ -888,19 +855,6 @@ AC_CHECK_TYPE([u_int64_t], ,
 #include <sys/types.h>
 ])
 
-#
-# Check for some headers introduced in later versions of libpcap
-# and used by some printers.
-#
-# Those headers might use the {u_}intN_t types, so we must do this
-# after we check for what's needed to get them defined.
-#
-savedcppflags="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $V_INCLS"
-AC_CHECK_HEADERS(pcap/bluetooth.h,,,[#include "netdissect-stdinc.h"])
-AC_CHECK_HEADERS(pcap/nflog.h,,,[#include "netdissect-stdinc.h"])
-CPPFLAGS="$savedcppflags"
-
 AC_PROG_RANLIB
 AC_CHECK_TOOL([AR], [ar])
 
@@ -970,19 +924,19 @@ if test "$want_libcrypto" != "no"; then
 			# EVP_CIPHER_CTX, as EVP_CIPHER_CTX may be
 			# opaque; otherwise, we allocate it ourselves.
 			#
-			# 2) do we have EVP_CipherInit_ex()?
+			# 2) do we have EVP_DecryptInit_ex()?
 			# If so, we use it, because we need to be
 			# able to make two "initialize the cipher"
 			# calls, one with the cipher and key, and
 			# one with the IV, and, as of OpenSSL 1.1,
-			# You Can't Do That with EVP_CipherInit(),
-			# because a call to EVP_CipherInit() will
+			# You Can't Do That with EVP_DecryptInit(),
+			# because a call to EVP_DecryptInit() will
 			# unconditionally clear the context, and
 			# if you don't supply a cipher, it'll
 			# clear the cipher, rendering the context
 			# unusable and causing a crash.
 			#
-			AC_CHECK_FUNCS(EVP_CIPHER_CTX_new EVP_CipherInit_ex)
+			AC_CHECK_FUNCS(EVP_CIPHER_CTX_new EVP_DecryptInit_ex)
 		fi
 	])
 fi
@@ -1038,7 +992,7 @@ AC_CONFIG_HEADER(config.h)
 
 AC_OUTPUT_COMMANDS([if test -f .devel; then
 	echo timestamp > stamp-h
-	cat Makefile-devel-adds >> Makefile
+	cat $srcdir/Makefile-devel-adds >> Makefile
 	make depend
 fi])
 AC_OUTPUT(Makefile tcpdump.1)

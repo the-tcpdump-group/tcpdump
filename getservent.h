@@ -34,8 +34,8 @@
 * SUCH DAMAGE.
 */
 
-#ifndef _GETSERVENT_H
-#define _GETSERVENT_H
+#ifndef ND_GETSERVENT_H
+#define ND_GETSERVENT_H
 
 #ifdef _NETDB_H_
 /* Just in case... */
@@ -64,4 +64,4 @@ void endservent (void);
 struct servent *getservent(void);
 void setservent (int f);
 
-#endif /* !_GETSERVENT_H */
+#endif /* ! ND_GETSERVENT_H */

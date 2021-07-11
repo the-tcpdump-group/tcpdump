@@ -44,8 +44,7 @@ ipcomp_print(netdissect_options *ndo, const u_char *bp)
 
 	ndo->ndo_protocol = "ipcomp";
 	ipcomp = (const struct ipcomp *)bp;
-	ND_TCHECK_SIZE(ipcomp);
-	cpi = EXTRACT_BE_U_2(ipcomp->comp_cpi);
+	cpi = GET_BE_U_2(ipcomp->comp_cpi);
 
 	ND_PRINT("IPComp(cpi=0x%04x)", cpi);
 
@@ -62,9 +61,4 @@ ipcomp_print(netdissect_options *ndo, const u_char *bp)
 	 * stops - there's nothing more it can do with a compressed
 	 * payload.
 	 */
-	return;
-
-trunc:
-	ND_PRINT("[|IPCOMP]");
-	return;
 }

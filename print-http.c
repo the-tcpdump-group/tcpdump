@@ -19,11 +19,7 @@
 
 #include "netdissect-stdinc.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "netdissect.h"
-#include "extract.h"
 
 /*
  * Includes WebDAV requests.
@@ -74,5 +70,5 @@ void
 http_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 {
 	ndo->ndo_protocol = "http";
-	txtproto_print(ndo, pptr, len, "http", httpcmds, RESP_CODE_SECOND_TOKEN);
+	txtproto_print(ndo, pptr, len, httpcmds, RESP_CODE_SECOND_TOKEN);
 }

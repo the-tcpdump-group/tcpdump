@@ -49,9 +49,6 @@
 
 #include "netdissect-stdinc.h"
 
-#include <stdio.h>
-#include <string.h>
-
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -301,10 +298,10 @@ dhcp6opt_print(netdissect_options *ndo,
 			goto trunc;
 		dh6o = (const struct dhcp6opt *)cp;
 		ND_TCHECK_SIZE(dh6o);
-		optlen = EXTRACT_BE_U_2(dh6o->dh6opt_len);
+		optlen = GET_BE_U_2(dh6o->dh6opt_len);
 		if (ep < cp + sizeof(*dh6o) + optlen)
 			goto trunc;
-		opttype = EXTRACT_BE_U_2(dh6o->dh6opt_type);
+		opttype = GET_BE_U_2(dh6o->dh6opt_type);
 		ND_PRINT(" (%s", tok2str(dh6opt_str, "opt_%u", opttype));
 		ND_TCHECK_LEN(cp + sizeof(*dh6o), optlen);
 		switch (opttype) {
@@ -316,14 +313,15 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			switch (EXTRACT_BE_U_2(tp)) {
+			switch (GET_BE_U_2(tp)) {
 			case 1:
 				if (optlen >= 2 + 6) {
 					ND_PRINT(" hwaddr/time type %u time %u ",
-					    EXTRACT_BE_U_2(tp + 2),
-					    EXTRACT_BE_U_4(tp + 4));
+					    GET_BE_U_2(tp + 2),
+					    GET_BE_U_4(tp + 4));
 					for (i = 8; i < optlen; i++)
-						ND_PRINT("%02x", EXTRACT_U_1(tp + i));
+						ND_PRINT("%02x",
+							 GET_U_1(tp + i));
 					/*(*/
 					ND_PRINT(")");
 				} else {
@@ -335,7 +333,8 @@ dhcp6opt_print(netdissect_options *ndo,
 				if (optlen >= 2 + 8) {
 					ND_PRINT(" vid ");
 					for (i = 2; i < 2 + 8; i++)
-						ND_PRINT("%02x", EXTRACT_U_1(tp + i));
+						ND_PRINT("%02x",
+							 GET_U_1(tp + i));
 					/*(*/
 					ND_PRINT(")");
 				} else {
@@ -346,9 +345,10 @@ dhcp6opt_print(netdissect_options *ndo,
 			case 3:
 				if (optlen >= 2 + 2) {
 					ND_PRINT(" hwaddr type %u ",
-					    EXTRACT_BE_U_2(tp + 2));
+					    GET_BE_U_2(tp + 2));
 					for (i = 4; i < optlen; i++)
-						ND_PRINT("%02x", EXTRACT_U_1(tp + i));
+						ND_PRINT("%02x",
+							 GET_U_1(tp + i));
 					/*(*/
 					ND_PRINT(")");
 				} else {
@@ -357,7 +357,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				}
 				break;
 			default:
-				ND_PRINT(" type %u)", EXTRACT_BE_U_2(tp));
+				ND_PRINT(" type %u)", GET_BE_U_2(tp));
 				break;
 			}
 			break;
@@ -368,10 +368,10 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			ND_PRINT(" %s", ip6addr_string(ndo, tp));
+			ND_PRINT(" %s", GET_IP6ADDR_STRING(tp));
 			ND_PRINT(" pltime:%u vltime:%u",
-			    EXTRACT_BE_U_4(tp + 16),
-			    EXTRACT_BE_U_4(tp + 20));
+			    GET_BE_U_4(tp + 16),
+			    GET_BE_U_4(tp + 20));
 			if (optlen > 24) {
 				/* there are sub-options */
 				dhcp6opt_print(ndo, tp + 24, tp + optlen);
@@ -387,7 +387,7 @@ dhcp6opt_print(netdissect_options *ndo,
 			tp = (const u_char *)(dh6o + 1);
 			for (i = 0; i < optlen; i += 2) {
 				ND_PRINT(" %s",
-				    tok2str(dh6opt_str, "opt_%u", EXTRACT_BE_U_2(tp + i)));
+				    tok2str(dh6opt_str, "opt_%u", GET_BE_U_2(tp + i)));
 			}
 			ND_PRINT(")");
 			break;
@@ -397,7 +397,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			ND_PRINT(" %u)", EXTRACT_U_1(tp));
+			ND_PRINT(" %u)", GET_U_1(tp));
 			break;
 		case DH6OPT_ELAPSED_TIME:
 			if (optlen != 2) {
@@ -405,21 +405,36 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			ND_PRINT(" %u)", EXTRACT_BE_U_2(tp));
+			ND_PRINT(" %u)", GET_BE_U_2(tp));
 			break;
 		case DH6OPT_RELAY_MSG:
+		    {
+			const u_char *snapend_save;
+
 			ND_PRINT(" (");
 			tp = (const u_char *)(dh6o + 1);
+			/*
+			 * Update the snapend to the end of the option before
+			 * calling recursively dhcp6_print() for the nested
+			 * packet. Other options may be present after the
+			 * nested DHCPv6 packet. This prevents that, in
+			 * dhcp6_print(), for the nested DHCPv6 packet, the
+			 * remaining length < remaining caplen.
+			 */
+			snapend_save = ndo->ndo_snapend;
+			ndo->ndo_snapend = ND_MIN(tp + optlen, ndo->ndo_snapend);
 			dhcp6_print(ndo, tp, optlen);
+			ndo->ndo_snapend = snapend_save;
 			ND_PRINT(")");
 			break;
+		    }
 		case DH6OPT_AUTH:
 			if (optlen < 11) {
 				ND_PRINT(" ?)");
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			auth_proto = EXTRACT_U_1(tp);
+			auth_proto = GET_U_1(tp);
 			switch (auth_proto) {
 			case DH6OPT_AUTHPROTO_DELAYED:
 				ND_PRINT(" proto: delayed");
@@ -432,7 +447,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp++;
-			auth_alg = EXTRACT_U_1(tp);
+			auth_alg = GET_U_1(tp);
 			switch (auth_alg) {
 			case DH6OPT_AUTHALG_HMACMD5:
 				/* XXX: may depend on the protocol */
@@ -443,7 +458,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp++;
-			auth_rdm = EXTRACT_U_1(tp);
+			auth_rdm = GET_U_1(tp);
 			switch (auth_rdm) {
 			case DH6OPT_AUTHRDM_MONOCOUNTER:
 				ND_PRINT(", RDM: mono");
@@ -455,7 +470,7 @@ dhcp6opt_print(netdissect_options *ndo,
 			tp++;
 			ND_PRINT(", RD:");
 			for (i = 0; i < 4; i++, tp += 2)
-				ND_PRINT(" %04x", EXTRACT_BE_U_2(tp));
+				ND_PRINT(" %04x", GET_BE_U_2(tp));
 
 			/* protocol dependent part */
 			authinfolen = optlen - 11;
@@ -472,19 +487,19 @@ dhcp6opt_print(netdissect_options *ndo,
 					ND_PRINT(", realm: ");
 				}
 				for (i = 0; i < authrealmlen; i++, tp++)
-					ND_PRINT("%02x", EXTRACT_U_1(tp));
-				ND_PRINT(", key ID: %08x", EXTRACT_BE_U_4(tp));
+					ND_PRINT("%02x", GET_U_1(tp));
+				ND_PRINT(", key ID: %08x", GET_BE_U_4(tp));
 				tp += 4;
 				ND_PRINT(", HMAC-MD5:");
 				for (i = 0; i < 4; i++, tp+= 4)
-					ND_PRINT(" %08x", EXTRACT_BE_U_4(tp));
+					ND_PRINT(" %08x", GET_BE_U_4(tp));
 				break;
 			case DH6OPT_AUTHPROTO_RECONFIG:
 				if (authinfolen != 17) {
 					ND_PRINT(" ??");
 					break;
 				}
-				switch (EXTRACT_U_1(tp)) {
+				switch (GET_U_1(tp)) {
 				case DH6OPT_AUTHRECONFIG_KEY:
 					ND_PRINT(" reconfig-key");
 					break;
@@ -498,7 +513,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				tp++;
 				ND_PRINT(" value:");
 				for (i = 0; i < 4; i++, tp+= 4)
-					ND_PRINT(" %08x", EXTRACT_BE_U_4(tp));
+					ND_PRINT(" %08x", GET_BE_U_4(tp));
 				break;
 			default:
 				ND_PRINT(" ??");
@@ -519,7 +534,7 @@ dhcp6opt_print(netdissect_options *ndo,
 			tp = (const u_char *)(dh6o + 1);
 			ND_PRINT(" ");
 			for (i = 0; i < optlen && i < 10; i++)
-				ND_PRINT("%02x", EXTRACT_U_1(tp + i));
+				ND_PRINT("%02x", GET_U_1(tp + i));
 			ND_PRINT("...)");
 			break;
 		case DH6OPT_RECONF_MSG:
@@ -528,7 +543,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			dh6_reconf_type = EXTRACT_U_1(tp);
+			dh6_reconf_type = GET_U_1(tp);
 			switch (dh6_reconf_type) {
 			case DH6_RENEW:
 				ND_PRINT(" for renew)");
@@ -558,7 +573,7 @@ dhcp6opt_print(netdissect_options *ndo,
 			}
 			tp = (const u_char *)(dh6o + 1);
 			for (i = 0; i < optlen; i += 16)
-				ND_PRINT(" %s", ip6addr_string(ndo, tp + i));
+				ND_PRINT(" %s", GET_IP6ADDR_STRING(tp + i));
 			ND_PRINT(")");
 			break;
 		case DH6OPT_SIP_SERVER_D:
@@ -566,7 +581,7 @@ dhcp6opt_print(netdissect_options *ndo,
 			tp = (const u_char *)(dh6o + 1);
 			while (tp < cp + sizeof(*dh6o) + optlen) {
 				ND_PRINT(" ");
-				if ((tp = ns_nprint(ndo, tp, cp + sizeof(*dh6o) + optlen)) == NULL)
+				if ((tp = fqdn_print(ndo, tp, cp + sizeof(*dh6o) + optlen)) == NULL)
 					goto trunc;
 			}
 			ND_PRINT(")");
@@ -577,7 +592,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			ND_PRINT(" %s)", dhcp6stcode(EXTRACT_BE_U_2(tp)));
+			ND_PRINT(" %s)", dhcp6stcode(GET_BE_U_2(tp)));
 			break;
 		case DH6OPT_IA_NA:
 		case DH6OPT_IA_PD:
@@ -587,9 +602,9 @@ dhcp6opt_print(netdissect_options *ndo,
 			}
 			tp = (const u_char *)(dh6o + 1);
 			ND_PRINT(" IAID:%u T1:%u T2:%u",
-			    EXTRACT_BE_U_4(tp),
-			    EXTRACT_BE_U_4(tp + 4),
-			    EXTRACT_BE_U_4(tp + 8));
+			    GET_BE_U_4(tp),
+			    GET_BE_U_4(tp + 4),
+			    GET_BE_U_4(tp + 8));
 			if (optlen > 12) {
 				/* there are sub-options */
 				dhcp6opt_print(ndo, tp + 12, tp + optlen);
@@ -602,7 +617,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			ND_PRINT(" IAID:%u", EXTRACT_BE_U_4(tp));
+			ND_PRINT(" IAID:%u", GET_BE_U_4(tp));
 			if (optlen > 4) {
 				/* there are sub-options */
 				dhcp6opt_print(ndo, tp + 4, tp + optlen);
@@ -615,10 +630,11 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			ND_PRINT(" %s/%u", ip6addr_string(ndo, tp + 9), EXTRACT_U_1(tp + 8));
+			ND_PRINT(" %s/%u", GET_IP6ADDR_STRING(tp + 9),
+				 GET_U_1(tp + 8));
 			ND_PRINT(" pltime:%u vltime:%u",
-			    EXTRACT_BE_U_4(tp),
-			    EXTRACT_BE_U_4(tp + 4));
+			    GET_BE_U_4(tp),
+			    GET_BE_U_4(tp + 4));
 			if (optlen > 25) {
 				/* there are sub-options */
 				dhcp6opt_print(ndo, tp + 25, tp + optlen);
@@ -632,7 +648,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			ND_PRINT(" %u)", EXTRACT_BE_U_4(tp));
+			ND_PRINT(" %u)", GET_BE_U_4(tp));
 			break;
 		case DH6OPT_REMOTE_ID:
 			if (optlen < 4) {
@@ -640,12 +656,12 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			ND_PRINT(" %u ", EXTRACT_BE_U_4(tp));
+			ND_PRINT(" %u ", GET_BE_U_4(tp));
 			/*
 			 * Print hex dump first 10 characters.
 			 */
 			for (i = 4; i < optlen && i < 14; i++)
-				ND_PRINT("%02x", EXTRACT_U_1(tp + i));
+				ND_PRINT("%02x", GET_U_1(tp + i));
 			ND_PRINT("...)");
 			break;
 		case DH6OPT_LQ_QUERY:
@@ -654,7 +670,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			dh6_lq_query_type = EXTRACT_U_1(tp);
+			dh6_lq_query_type = GET_U_1(tp);
 			switch (dh6_lq_query_type) {
 			case 1:
 				ND_PRINT(" by-address");
@@ -666,7 +682,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				ND_PRINT(" type_%u", dh6_lq_query_type);
 				break;
 			}
-			ND_PRINT(" %s", ip6addr_string(ndo, tp + 1));
+			ND_PRINT(" %s", GET_IP6ADDR_STRING(tp + 1));
 			if (optlen > 17) {
 				/* there are query-options */
 				dhcp6opt_print(ndo, tp + 17, tp + optlen);
@@ -687,12 +703,12 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			ND_PRINT(" %s ", ip6addr_string(ndo, tp));
+			ND_PRINT(" %s ", GET_IP6ADDR_STRING(tp));
 			/*
 			 * Print hex dump first 10 characters.
 			 */
 			for (i = 16; i < optlen && i < 26; i++)
-				ND_PRINT("%02x", EXTRACT_U_1(tp + i));
+				ND_PRINT("%02x", GET_U_1(tp + i));
 			ND_PRINT("...)");
 			break;
 		case DH6OPT_NTP_SERVER:
@@ -702,9 +718,9 @@ dhcp6opt_print(netdissect_options *ndo,
 			}
 			tp = (const u_char *)(dh6o + 1);
 			while (tp < cp + sizeof(*dh6o) + optlen - 4) {
-				subopt_code = EXTRACT_BE_U_2(tp);
+				subopt_code = GET_BE_U_2(tp);
 				tp += 2;
-				subopt_len = EXTRACT_BE_U_2(tp);
+				subopt_len = GET_BE_U_2(tp);
 				tp += 2;
 				if (tp + subopt_len > cp + sizeof(*dh6o) + optlen)
 					goto trunc;
@@ -716,11 +732,11 @@ dhcp6opt_print(netdissect_options *ndo,
 						ND_PRINT(" ?");
 						break;
 					}
-					ND_PRINT(" %s", ip6addr_string(ndo, tp));
+					ND_PRINT(" %s", GET_IP6ADDR_STRING(tp));
 					break;
 				case DH6OPT_NTP_SUBOPTION_SRV_FQDN:
 					ND_PRINT(" ");
-					if (ns_nprint(ndo, tp, tp + subopt_len) == NULL)
+					if (fqdn_print(ndo, tp, tp + subopt_len) == NULL)
 						goto trunc;
 					break;
 				default:
@@ -740,14 +756,14 @@ dhcp6opt_print(netdissect_options *ndo,
 			remain_len = optlen;
 			ND_PRINT(" ");
 			/* Encoding is described in section 3.1 of RFC 1035 */
-			while (remain_len && EXTRACT_U_1(tp)) {
-				label_len = EXTRACT_U_1(tp);
+			while (remain_len && GET_U_1(tp)) {
+				label_len = GET_U_1(tp);
 				tp++;
 				if (label_len < remain_len - 1) {
-					(void)fn_printn(ndo, tp, label_len, NULL);
+					nd_printjnp(ndo, tp, label_len);
 					tp += label_len;
 					remain_len -= (label_len + 1);
-					if(EXTRACT_U_1(tp)) ND_PRINT(".");
+					if(GET_U_1(tp)) ND_PRINT(".");
 				} else {
 					ND_PRINT(" ?");
 					break;
@@ -763,8 +779,8 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			ND_PRINT("=");
-			(void)fn_printn(ndo, tp, (u_int)optlen, NULL);
+			ND_PRINT(" ");
+			nd_printjnp(ndo, tp, optlen);
 			ND_PRINT(")");
 			break;
 
@@ -778,7 +794,7 @@ dhcp6opt_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("[|dhcp6ext]");
+	nd_print_trunc(ndo);
 }
 
 /*
@@ -805,7 +821,7 @@ dhcp6_print(netdissect_options *ndo,
 	dh6 = (const struct dhcp6 *)cp;
 	dh6relay = (const struct dhcp6_relay *)cp;
 	ND_TCHECK_4(dh6->dh6_msgtypexid.xid);
-	msgtype = EXTRACT_U_1(dh6->dh6_msgtypexid.msgtype);
+	msgtype = GET_U_1(dh6->dh6_msgtypexid.msgtype);
 	name = tok2str(dh6_msgtype_str, "msgtype-%u", msgtype);
 
 	if (!ndo->ndo_vflag) {
@@ -818,15 +834,13 @@ dhcp6_print(netdissect_options *ndo,
 	ND_PRINT(" %s (", name);	/*)*/
 	if (msgtype != DH6_RELAY_FORW && msgtype != DH6_RELAY_REPLY) {
 		ND_PRINT("xid=%x",
-			 EXTRACT_BE_U_4(dh6->dh6_msgtypexid.xid) & DH6_XIDMASK);
+			 GET_BE_U_4(dh6->dh6_msgtypexid.xid) & DH6_XIDMASK);
 		extp = (const u_char *)(dh6 + 1);
 		dhcp6opt_print(ndo, extp, ep);
 	} else {		/* relay messages */
-		ND_TCHECK_16(dh6relay->dh6relay_peeraddr);
+		ND_PRINT("linkaddr=%s", GET_IP6ADDR_STRING(dh6relay->dh6relay_linkaddr));
 
-		ND_PRINT("linkaddr=%s", ip6addr_string(ndo, dh6relay->dh6relay_linkaddr));
-
-		ND_PRINT(" peeraddr=%s", ip6addr_string(ndo, dh6relay->dh6relay_peeraddr));
+		ND_PRINT(" peeraddr=%s", GET_IP6ADDR_STRING(dh6relay->dh6relay_peeraddr));
 
 		dhcp6opt_print(ndo, (const u_char *)(dh6relay + 1), ep);
 	}
@@ -835,5 +849,5 @@ dhcp6_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT("[|dhcp6]");
+	nd_print_trunc(ndo);
 }

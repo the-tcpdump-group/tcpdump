@@ -27,6 +27,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 
@@ -76,8 +77,8 @@ pktap_header_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	hdr = (const pktap_header_t *)bp;
 
-	dlt = EXTRACT_LE_U_4(hdr->pkt_dlt);
-	hdrlen = EXTRACT_LE_U_4(hdr->pkt_len);
+	dlt = GET_LE_U_4(hdr->pkt_dlt);
+	hdrlen = GET_LE_U_4(hdr->pkt_len);
 	dltname = pcap_datalink_val_to_name(dlt);
 	if (!ndo->ndo_qflag) {
 		ND_PRINT("DLT %s (%u) len %u",
@@ -95,7 +96,7 @@ pktap_header_print(netdissect_options *ndo, const u_char *bp, u_int length)
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
+void
 pktap_if_print(netdissect_options *ndo,
                const struct pcap_pkthdr *h, const u_char *p)
 {
@@ -106,14 +107,15 @@ pktap_if_print(netdissect_options *ndo,
 	const pktap_header_t *hdr;
 	struct pcap_pkthdr nhdr;
 
-	ndo->ndo_protocol = "pktap_if";
-	if (caplen < sizeof(pktap_header_t) || length < sizeof(pktap_header_t)) {
-		ND_PRINT("[|pktap]");
-		return (caplen);
+	ndo->ndo_protocol = "pktap";
+	if (length < sizeof(pktap_header_t)) {
+		ND_PRINT(" (packet too short, %u < %zu)",
+		         length, sizeof(pktap_header_t));
+		goto invalid;
 	}
 	hdr = (const pktap_header_t *)p;
-	dlt = EXTRACT_LE_U_4(hdr->pkt_dlt);
-	hdrlen = EXTRACT_LE_U_4(hdr->pkt_len);
+	dlt = GET_LE_U_4(hdr->pkt_dlt);
+	hdrlen = GET_LE_U_4(hdr->pkt_len);
 	if (hdrlen < sizeof(pktap_header_t)) {
 		/*
 		 * Claimed header length < structure length.
@@ -122,13 +124,16 @@ pktap_if_print(netdissect_options *ndo,
 		 * is the length supplied so that the header can
 		 * be expanded in the future)?
 		 */
-		ND_PRINT("[|pktap]");
-		return (caplen);
+		ND_PRINT(" (pkt_len too small, %u < %zu)",
+		         hdrlen, sizeof(pktap_header_t));
+		goto invalid;
 	}
-	if (caplen < hdrlen || length < hdrlen) {
-		ND_PRINT("[|pktap]");
-		return (caplen);
+	if (hdrlen > length) {
+		ND_PRINT(" (pkt_len too big, %u > %u)",
+		         hdrlen, length);
+		goto invalid;
 	}
+	ND_TCHECK_LEN(p, hdrlen);
 
 	if (ndo->ndo_eflag)
 		pktap_header_print(ndo, p, length);
@@ -137,7 +142,7 @@ pktap_if_print(netdissect_options *ndo,
 	caplen -= hdrlen;
 	p += hdrlen;
 
-	rectype = EXTRACT_LE_U_4(hdr->pkt_rectype);
+	rectype = GET_LE_U_4(hdr->pkt_rectype);
 	switch (rectype) {
 
 	case PKT_REC_NONE:
@@ -145,11 +150,13 @@ pktap_if_print(netdissect_options *ndo,
 		break;
 
 	case PKT_REC_PACKET:
-		if ((printer = lookup_printer(dlt)) != NULL) {
+		printer = lookup_printer(dlt);
+		if (printer != NULL) {
 			nhdr = *h;
 			nhdr.caplen = caplen;
 			nhdr.len = length;
-			hdrlen += printer(ndo, &nhdr, p);
+			printer(ndo, &nhdr, p);
+			hdrlen += ndo->ndo_ll_hdr_len;
 		} else {
 			if (!ndo->ndo_eflag)
 				pktap_header_print(ndo, (const u_char *)hdr,
@@ -161,6 +168,10 @@ pktap_if_print(netdissect_options *ndo,
 		break;
 	}
 
-	return (hdrlen);
+	ndo->ndo_ll_hdr_len += hdrlen;
+	return;
+
+invalid:
+	nd_print_invalid(ndo);
 }
 #endif /* DLT_PKTAP */

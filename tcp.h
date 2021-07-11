@@ -49,7 +49,7 @@ struct tcphdr {
 	nd_uint16_t	th_urp;			/* urgent pointer */
 };
 
-#define TH_OFF(th)	((EXTRACT_U_1((th)->th_offx2) & 0xf0) >> 4)
+#define TH_OFF(th)	((GET_U_1((th)->th_offx2) & 0xf0) >> 4)
 
 /* TCP flags */
 #define	TH_FIN     0x01
@@ -60,6 +60,7 @@ struct tcphdr {
 #define	TH_URG	   0x20
 #define TH_ECNECHO 0x40	/* ECN Echo */
 #define TH_CWR	   0x80	/* ECN Cwnd Reduced */
+extern const struct tok tcp_flag_values[];
 
 
 #define	TCPOPT_EOL		0
@@ -111,9 +112,6 @@ struct tcphdr {
 #endif
 #ifndef HTTP_PORT
 #define HTTP_PORT		80
-#endif
-#ifndef NETBIOS_NS_PORT
-#define NETBIOS_NS_PORT		137	/* RFC 1001, RFC 1002 */
 #endif
 #ifndef NETBIOS_SSN_PORT
 #define NETBIOS_SSN_PORT	139	/* RFC 1001, RFC 1002 */

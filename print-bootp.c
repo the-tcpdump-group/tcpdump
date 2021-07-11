@@ -29,11 +29,11 @@
 
 #include <string.h>
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
 
-static const char tstr[] = " [|bootp]";
 
 /*
  * Bootstrap Protocol (BOOTP).  RFC951 and RFC1048.
@@ -196,32 +196,26 @@ struct bootp {
 #define TAG_CLASSLESS_STA_RT_MS	((uint8_t) 249)
 /* RFC 5859 - TFTP Server Address Option for DHCPv4 */
 #define	TAG_TFTP_SERVER_ADDRESS	((uint8_t) 150)
-/* ftp://ftp.isi.edu/.../assignments/bootp-dhcp-extensions */
+/* https://www.iana.org/assignments/bootp-dhcp-parameters/bootp-dhcp-parameters.xhtml */
 #define	TAG_SLP_NAMING_AUTH	((uint8_t)  80)
 #define	TAG_CLIENT_FQDN		((uint8_t)  81)
 #define	TAG_AGENT_CIRCUIT	((uint8_t)  82)
 #define	TAG_AGENT_REMOTE	((uint8_t)  83)
-#define	TAG_AGENT_MASK		((uint8_t)  84)
 #define	TAG_TZ_STRING		((uint8_t)  88)
 #define	TAG_FQDN_OPTION		((uint8_t)  89)
 #define	TAG_AUTH		((uint8_t)  90)
-#define	TAG_VINES_SERVERS	((uint8_t)  91)
-#define	TAG_SERVER_RANK		((uint8_t)  92)
+#define	TAG_CLIENT_LAST_TRANSACTION_TIME	((uint8_t)  91)
+#define	TAG_ASSOCIATED_IP			((uint8_t)  92)
 #define	TAG_CLIENT_ARCH		((uint8_t)  93)
 #define	TAG_CLIENT_NDI		((uint8_t)  94)
 #define	TAG_CLIENT_GUID		((uint8_t)  97)
 #define	TAG_LDAP_URL		((uint8_t)  95)
-#define	TAG_6OVER4		((uint8_t)  96)
 /* RFC 4833, TZ codes */
 #define	TAG_TZ_PCODE    	((uint8_t) 100)
 #define	TAG_TZ_TCODE    	((uint8_t) 101)
-#define	TAG_IPX_COMPAT		((uint8_t) 110)
 #define	TAG_NETINFO_PARENT	((uint8_t) 112)
 #define	TAG_NETINFO_PARENT_TAG	((uint8_t) 113)
 #define	TAG_URL			((uint8_t) 114)
-#define	TAG_FAILOVER		((uint8_t) 115)
-#define	TAG_EXTENDED_REQUEST	((uint8_t) 126)
-#define	TAG_EXTENDED_OPTION	((uint8_t) 127)
 #define TAG_MUDURL              ((uint8_t) 161)
 
 /* DHCP Message types (values for TAG_DHCP_MESSAGE option) */
@@ -233,6 +227,12 @@ struct bootp {
 #define DHCPNAK		6
 #define DHCPRELEASE	7
 #define DHCPINFORM	8
+/* Defined in RFC4388 */
+#define DHCPLEASEQUERY       10
+#define DHCPLEASEUNASSIGNED  11
+#define DHCPLEASEUNKNOWN     12
+#define DHCPLEASEACTIVE      13
+
 
 /*
  * "vendor" data permitted for CMU bootp clients.
@@ -261,9 +261,16 @@ struct cmu_vend {
 #define CLIENT_FQDN_FLAGS_N	0x08
 /* end of original bootp.h */
 
+static const struct tok fqdn_flags_bm[] = {
+	{ CLIENT_FQDN_FLAGS_S, "S" },
+	{ CLIENT_FQDN_FLAGS_O, "O" },
+	{ CLIENT_FQDN_FLAGS_E, "E" },
+	{ CLIENT_FQDN_FLAGS_N, "N" },
+	{ 0, NULL }
+};
+
 static void rfc1048_print(netdissect_options *, const u_char *);
 static void cmu_print(netdissect_options *, const u_char *);
-static char *client_fqdn_flags(u_int flags);
 
 static const struct tok bootp_flag_values[] = {
 	{ 0x8000,	"Broadcast" },
@@ -290,17 +297,14 @@ bootp_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "bootp";
 	bp = (const struct bootp *)cp;
-	ND_TCHECK_1(bp->bp_op);
-	bp_op = EXTRACT_U_1(bp->bp_op);
+	bp_op = GET_U_1(bp->bp_op);
 	ND_PRINT("BOOTP/DHCP, %s",
 		  tok2str(bootp_op_values, "unknown (0x%02x)", bp_op));
 
-	ND_TCHECK_1(bp->bp_hlen);
-	bp_htype = EXTRACT_U_1(bp->bp_htype);
-	bp_hlen = EXTRACT_U_1(bp->bp_hlen);
-	if (bp_htype == 1 && bp_hlen == 6 && bp_op == BOOTPREQUEST) {
-		ND_TCHECK_6(bp->bp_chaddr);
-		ND_PRINT(" from %s", etheraddr_string(ndo, bp->bp_chaddr));
+	bp_htype = GET_U_1(bp->bp_htype);
+	bp_hlen = GET_U_1(bp->bp_hlen);
+	if (bp_htype == 1 && bp_hlen == MAC_ADDR_LEN && bp_op == BOOTPREQUEST) {
+		ND_PRINT(" from %s", GET_ETHERADDR_STRING(bp->bp_chaddr));
 	}
 
 	ND_PRINT(", length %u", length);
@@ -315,68 +319,60 @@ bootp_print(netdissect_options *ndo,
 		ND_PRINT(", htype %u", bp_htype);
 
 	/* The usual length for 10Mb Ethernet address is 6 bytes */
-	if (bp_htype != 1 || bp_hlen != 6)
+	if (bp_htype != 1 || bp_hlen != MAC_ADDR_LEN)
 		ND_PRINT(", hlen %u", bp_hlen);
 
 	/* Only print interesting fields */
-	if (EXTRACT_U_1(bp->bp_hops))
-		ND_PRINT(", hops %u", EXTRACT_U_1(bp->bp_hops));
-	if (EXTRACT_BE_U_4(bp->bp_xid))
-		ND_PRINT(", xid 0x%x", EXTRACT_BE_U_4(bp->bp_xid));
-	if (EXTRACT_BE_U_2(bp->bp_secs))
-		ND_PRINT(", secs %u", EXTRACT_BE_U_2(bp->bp_secs));
+	if (GET_U_1(bp->bp_hops))
+		ND_PRINT(", hops %u", GET_U_1(bp->bp_hops));
+	if (GET_BE_U_4(bp->bp_xid))
+		ND_PRINT(", xid 0x%x", GET_BE_U_4(bp->bp_xid));
+	if (GET_BE_U_2(bp->bp_secs))
+		ND_PRINT(", secs %u", GET_BE_U_2(bp->bp_secs));
 
-	ND_TCHECK_2(bp->bp_flags);
 	ND_PRINT(", Flags [%s]",
-		  bittok2str(bootp_flag_values, "none", EXTRACT_BE_U_2(bp->bp_flags)));
+		  bittok2str(bootp_flag_values, "none", GET_BE_U_2(bp->bp_flags)));
 	if (ndo->ndo_vflag > 1)
-		ND_PRINT(" (0x%04x)", EXTRACT_BE_U_2(bp->bp_flags));
+		ND_PRINT(" (0x%04x)", GET_BE_U_2(bp->bp_flags));
 
 	/* Client's ip address */
-	ND_TCHECK_4(bp->bp_ciaddr);
-	if (EXTRACT_IPV4_TO_NETWORK_ORDER(bp->bp_ciaddr))
-		ND_PRINT("\n\t  Client-IP %s", ipaddr_string(ndo, bp->bp_ciaddr));
+	if (GET_IPV4_TO_NETWORK_ORDER(bp->bp_ciaddr))
+		ND_PRINT("\n\t  Client-IP %s", GET_IPADDR_STRING(bp->bp_ciaddr));
 
 	/* 'your' ip address (bootp client) */
-	ND_TCHECK_4(bp->bp_yiaddr);
-	if (EXTRACT_IPV4_TO_NETWORK_ORDER(bp->bp_yiaddr))
-		ND_PRINT("\n\t  Your-IP %s", ipaddr_string(ndo, bp->bp_yiaddr));
+	if (GET_IPV4_TO_NETWORK_ORDER(bp->bp_yiaddr))
+		ND_PRINT("\n\t  Your-IP %s", GET_IPADDR_STRING(bp->bp_yiaddr));
 
 	/* Server's ip address */
-	ND_TCHECK_4(bp->bp_siaddr);
-	if (EXTRACT_IPV4_TO_NETWORK_ORDER(bp->bp_siaddr))
-		ND_PRINT("\n\t  Server-IP %s", ipaddr_string(ndo, bp->bp_siaddr));
+	if (GET_IPV4_TO_NETWORK_ORDER(bp->bp_siaddr))
+		ND_PRINT("\n\t  Server-IP %s", GET_IPADDR_STRING(bp->bp_siaddr));
 
 	/* Gateway's ip address */
-	ND_TCHECK_4(bp->bp_giaddr);
-	if (EXTRACT_IPV4_TO_NETWORK_ORDER(bp->bp_giaddr))
-		ND_PRINT("\n\t  Gateway-IP %s", ipaddr_string(ndo, bp->bp_giaddr));
+	if (GET_IPV4_TO_NETWORK_ORDER(bp->bp_giaddr))
+		ND_PRINT("\n\t  Gateway-IP %s", GET_IPADDR_STRING(bp->bp_giaddr));
 
 	/* Client's Ethernet address */
-	if (bp_htype == 1 && bp_hlen == 6) {
-		ND_TCHECK_6(bp->bp_chaddr);
-		ND_PRINT("\n\t  Client-Ethernet-Address %s", etheraddr_string(ndo, bp->bp_chaddr));
+	if (bp_htype == 1 && bp_hlen == MAC_ADDR_LEN) {
+		ND_PRINT("\n\t  Client-Ethernet-Address %s", GET_ETHERADDR_STRING(bp->bp_chaddr));
 	}
 
-	ND_TCHECK_1(bp->bp_sname);		/* check first char only */
-	if (EXTRACT_U_1(bp->bp_sname)) {
+	if (GET_U_1(bp->bp_sname)) {	/* get first char only */
 		ND_PRINT("\n\t  sname \"");
-		if (fn_printztn(ndo, bp->bp_sname, (u_int)sizeof(bp->bp_sname),
-		    ndo->ndo_snapend)) {
+		if (nd_printztn(ndo, bp->bp_sname, (u_int)sizeof(bp->bp_sname),
+				NULL) == 0) {
+			/* Within the buffer, but not NUL-terminated. */
 			ND_PRINT("\"");
-			ND_PRINT("%s", tstr + 1);
-			return;
+			goto invalid;
 		}
 		ND_PRINT("\"");
 	}
-	ND_TCHECK_1(bp->bp_file);		/* check first char only */
-	if (EXTRACT_U_1(bp->bp_file)) {
+	if (GET_U_1(bp->bp_file)) {	/* get first char only */
 		ND_PRINT("\n\t  file \"");
-		if (fn_printztn(ndo, bp->bp_file, (u_int)sizeof(bp->bp_file),
-		    ndo->ndo_snapend)) {
+		if (nd_printztn(ndo, bp->bp_file, (u_int)sizeof(bp->bp_file),
+				NULL) == 0) {
+			/* Ditto. */
 			ND_PRINT("\"");
-			ND_PRINT("%s", tstr + 1);
-			return;
+			goto invalid;
 		}
 		ND_PRINT("\"");
 	}
@@ -392,14 +388,13 @@ bootp_print(netdissect_options *ndo,
 	else {
 		uint32_t ul;
 
-		ul = EXTRACT_BE_U_4(bp->bp_vend);
+		ul = GET_BE_U_4(bp->bp_vend);
 		if (ul != 0)
 			ND_PRINT("\n\t  Vendor-#0x%x", ul);
 	}
-
 	return;
-trunc:
-	ND_PRINT("%s", tstr);
+invalid:
+	nd_print_invalid(ndo);
 }
 
 /*
@@ -409,8 +404,8 @@ trunc:
  *     l - long (32 bits)
  *     L - unsigned long (32 bits)
  *     s - short (16 bits)
- *     b - period-seperated decimal bytes (variable length)
- *     x - colon-seperated hex bytes (variable length)
+ *     b - period-separated decimal bytes (variable length)
+ *     x - colon-separated hex bytes (variable length)
  *     a - ASCII string (variable length)
  *     B - on/off (8 bits)
  *     $ - special (explicit code to handle)
@@ -513,34 +508,26 @@ static const struct tok tag2str[] = {
 	{ TAG_CLASSLESS_STA_RT_MS, "$Classless-Static-Route-Microsoft" },
 /* RFC 5859 - TFTP Server Address Option for DHCPv4 */
 	{ TAG_TFTP_SERVER_ADDRESS, "iTFTP-Server-Address" },
-/* http://www.iana.org/assignments/bootp-dhcp-extensions/index.htm */
+/* https://www.iana.org/assignments/bootp-dhcp-parameters/bootp-dhcp-parameters.xhtml#options */
 	{ TAG_SLP_NAMING_AUTH,	"aSLP-NA" },
 	{ TAG_CLIENT_FQDN,	"$FQDN" },
 	{ TAG_AGENT_CIRCUIT,	"$Agent-Information" },
 	{ TAG_AGENT_REMOTE,	"bARMT" },
-	{ TAG_AGENT_MASK,	"bAMSK" },
 	{ TAG_TZ_STRING,	"aTZSTR" },
 	{ TAG_FQDN_OPTION,	"bFQDNS" },	/* XXX 'b' */
 	{ TAG_AUTH,		"bAUTH" },	/* XXX 'b' */
-	{ TAG_VINES_SERVERS,	"iVINES" },
-	{ TAG_SERVER_RANK,	"sRANK" },
+	{ TAG_CLIENT_LAST_TRANSACTION_TIME, "LLast-Transaction-Time" },
+	{ TAG_ASSOCIATED_IP,	"iAssociated-IP" },
 	{ TAG_CLIENT_ARCH,	"sARCH" },
 	{ TAG_CLIENT_NDI,	"bNDI" },	/* XXX 'b' */
 	{ TAG_CLIENT_GUID,	"bGUID" },	/* XXX 'b' */
 	{ TAG_LDAP_URL,		"aLDAP" },
-	{ TAG_6OVER4,		"i6o4" },
 	{ TAG_TZ_PCODE, 	"aPOSIX-TZ" },
 	{ TAG_TZ_TCODE, 	"aTZ-Name" },
-	{ TAG_IPX_COMPAT,	"bIPX" },	/* XXX 'b' */
 	{ TAG_NETINFO_PARENT,	"iNI" },
 	{ TAG_NETINFO_PARENT_TAG, "aNITAG" },
 	{ TAG_URL,		"aURL" },
-	{ TAG_FAILOVER,		"bFAIL" },	/* XXX 'b' */
 	{ TAG_MUDURL,           "aMUD-URL" },
-	{ 0, NULL }
-};
-/* 2-byte extended tags */
-static const struct tok xtag2str[] = {
 	{ 0, NULL }
 };
 
@@ -573,14 +560,18 @@ static const struct tok arp2str[] = {
 };
 
 static const struct tok dhcp_msg_values[] = {
-	{ DHCPDISCOVER,	"Discover" },
-	{ DHCPOFFER,	"Offer" },
-	{ DHCPREQUEST,	"Request" },
-	{ DHCPDECLINE,	"Decline" },
-	{ DHCPACK,	"ACK" },
-	{ DHCPNAK,	"NACK" },
-	{ DHCPRELEASE,	"Release" },
-	{ DHCPINFORM,	"Inform" },
+	{ DHCPDISCOVER,	       "Discover" },
+	{ DHCPOFFER,	       "Offer" },
+	{ DHCPREQUEST,	       "Request" },
+	{ DHCPDECLINE,	       "Decline" },
+	{ DHCPACK,	       "ACK" },
+	{ DHCPNAK,	       "NACK" },
+	{ DHCPRELEASE,	       "Release" },
+	{ DHCPINFORM,	       "Inform" },
+	{ DHCPLEASEQUERY,      "LeaseQuery" },
+	{ DHCPLEASEUNASSIGNED, "LeaseUnassigned" },
+	{ DHCPLEASEUNKNOWN,    "LeaseUnknown" },
+	{ DHCPLEASEACTIVE,     "LeaseActive" },
 	{ 0, NULL }
 };
 
@@ -609,45 +600,35 @@ rfc1048_print(netdissect_options *ndo,
 	ND_PRINT("\n\t  Vendor-rfc1048 Extensions");
 
 	/* Step over magic cookie */
-	ND_PRINT("\n\t    Magic Cookie 0x%08x", EXTRACT_BE_U_4(bp));
+	ND_PRINT("\n\t    Magic Cookie 0x%08x", GET_BE_U_4(bp));
 	bp += sizeof(int32_t);
 
 	/* Loop while we there is a tag left in the buffer */
 	while (ND_TTEST_1(bp)) {
-		tag = EXTRACT_U_1(bp);
+		tag = GET_U_1(bp);
 		bp++;
 		if (tag == TAG_PAD && ndo->ndo_vflag < 3)
 			continue;
 		if (tag == TAG_END && ndo->ndo_vflag < 3)
 			return;
-		if (tag == TAG_EXTENDED_OPTION) {
-			ND_TCHECK_2(bp + 1);
-			tag = EXTRACT_BE_U_2(bp + 1);
-			/* XXX we don't know yet if the IANA will
-			 * preclude overlap of 1-byte and 2-byte spaces.
-			 * If not, we need to offset tag after this step.
-			 */
-			cp = tok2str(xtag2str, "?xT%u", tag);
-		} else
-			cp = tok2str(tag2str, "?T%u", tag);
+		cp = tok2str(tag2str, "?Unknown", tag);
 		c = *cp++;
 
 		if (tag == TAG_PAD || tag == TAG_END)
 			len = 0;
 		else {
 			/* Get the length; check for truncation */
-			ND_TCHECK_1(bp);
-			len = EXTRACT_U_1(bp);
+			len = GET_U_1(bp);
 			bp++;
 		}
 
-		ND_PRINT("\n\t    %s Option %u, length %u%s", cp, tag, len,
+		ND_PRINT("\n\t    %s (%u), length %u%s", cp, tag, len,
 			  len > 0 ? ": " : "");
 
 		if (tag == TAG_PAD && ndo->ndo_vflag > 2) {
 			u_int ntag = 1;
 			while (ND_TTEST_1(bp) &&
-			       EXTRACT_U_1(bp) == TAG_PAD) {
+			       GET_U_1(bp) == TAG_PAD) {
 				bp++;
 				ntag++;
 			}
@@ -655,13 +636,11 @@ rfc1048_print(netdissect_options *ndo,
 				ND_PRINT(", occurs %u", ntag);
 		}
 
-		if (!ND_TTEST_LEN(bp, len)) {
-			ND_PRINT("[|rfc1048 %u]", len);
-			return;
-		}
+		ND_TCHECK_LEN(bp, len);
 
 		if (tag == TAG_DHCP_MESSAGE && len == 1) {
-			ND_PRINT("%s", tok2str(dhcp_msg_values, "Unknown (%u)", EXTRACT_U_1(bp)));
+			ND_PRINT("%s",
+				 tok2str(dhcp_msg_values, "Unknown (%u)", GET_U_1(bp)));
 			bp++;
 			continue;
 		}
@@ -669,29 +648,16 @@ rfc1048_print(netdissect_options *ndo,
 		if (tag == TAG_PARM_REQUEST) {
 			idx = 0;
 			while (len > 0) {
-				cp = tok2str(tag2str, "?Option %u", EXTRACT_U_1(bp));
+				uint8_t innertag = GET_U_1(bp);
 				bp++;
 				len--;
+				cp = tok2str(tag2str, "?Unknown", innertag);
 				if (idx % 4 == 0)
 					ND_PRINT("\n\t      ");
 				else
 					ND_PRINT(", ");
-				ND_PRINT("%s", cp + 1);
+				ND_PRINT("%s (%u)", cp + 1, innertag);
 				idx++;
-			}
-			continue;
-		}
-
-		if (tag == TAG_EXTENDED_REQUEST) {
-			first = 1;
-			while (len > 1) {
-				cp = tok2str(xtag2str, "?xT%u", EXTRACT_BE_U_2(bp));
-				bp += 2;
-				len -= 2;
-				if (!first)
-					ND_PRINT("+");
-				ND_PRINT("%s", cp + 1);
-				first = 0;
 			}
 			continue;
 		}
@@ -712,10 +678,7 @@ rfc1048_print(netdissect_options *ndo,
 		case 'a':
 			/* ASCII strings */
 			ND_PRINT("\"");
-			if (fn_printn(ndo, bp, len, ndo->ndo_snapend)) {
-				ND_PRINT("\"");
-				goto trunc;
-			}
+			nd_printjn(ndo, bp, len);
 			ND_PRINT("\"");
 			bp += len;
 			len = 0;
@@ -729,11 +692,11 @@ rfc1048_print(netdissect_options *ndo,
 				if (!first)
 					ND_PRINT(",");
 				if (c == 'i')
-					ND_PRINT("%s", ipaddr_string(ndo, bp));
+					ND_PRINT("%s", GET_IPADDR_STRING(bp));
 				else if (c == 'L')
-					ND_PRINT("%d", EXTRACT_BE_S_4(bp));
+					ND_PRINT("%d", GET_BE_S_4(bp));
 				else
-					ND_PRINT("%u", EXTRACT_BE_U_4(bp));
+					ND_PRINT("%u", GET_BE_U_4(bp));
 				bp += 4;
 				len -= 4;
 				first = 0;
@@ -745,10 +708,10 @@ rfc1048_print(netdissect_options *ndo,
 			while (len >= 2*4) {
 				if (!first)
 					ND_PRINT(",");
-				ND_PRINT("(%s:", ipaddr_string(ndo, bp));
+				ND_PRINT("(%s:", GET_IPADDR_STRING(bp));
 				bp += 4;
 				len -= 4;
-				ND_PRINT("%s)", ipaddr_string(ndo, bp));
+				ND_PRINT("%s)", GET_IPADDR_STRING(bp));
 				bp += 4;
 				len -= 4;
 				first = 0;
@@ -760,7 +723,7 @@ rfc1048_print(netdissect_options *ndo,
 			while (len >= 2) {
 				if (!first)
 					ND_PRINT(",");
-				ND_PRINT("%u", EXTRACT_BE_U_2(bp));
+				ND_PRINT("%u", GET_BE_U_2(bp));
 				bp += 2;
 				len -= 2;
 				first = 0;
@@ -773,7 +736,7 @@ rfc1048_print(netdissect_options *ndo,
 				uint8_t bool_value;
 				if (!first)
 					ND_PRINT(",");
-				bool_value = EXTRACT_U_1(bp);
+				bool_value = GET_U_1(bp);
 				switch (bool_value) {
 				case 0:
 					ND_PRINT("N");
@@ -799,7 +762,7 @@ rfc1048_print(netdissect_options *ndo,
 				uint8_t byte_value;
 				if (!first)
 					ND_PRINT(c == 'x' ? ":" : ".");
-				byte_value = EXTRACT_U_1(bp);
+				byte_value = GET_U_1(bp);
 				if (c == 'x')
 					ND_PRINT("%02x", byte_value);
 				else
@@ -817,10 +780,10 @@ rfc1048_print(netdissect_options *ndo,
 			case TAG_NETBIOS_NODE:
 				/* this option should be at least 1 byte long */
 				if (len < 1) {
-					ND_PRINT("ERROR: length < 1 bytes");
+					ND_PRINT("[ERROR: length < 1 bytes]");
 					break;
 				}
-				tag = EXTRACT_U_1(bp);
+				tag = GET_U_1(bp);
 				++bp;
 				--len;
 				ND_PRINT("%s", tok2str(nbo2str, NULL, tag));
@@ -829,10 +792,10 @@ rfc1048_print(netdissect_options *ndo,
 			case TAG_OPT_OVERLOAD:
 				/* this option should be at least 1 byte long */
 				if (len < 1) {
-					ND_PRINT("ERROR: length < 1 bytes");
+					ND_PRINT("[ERROR: length < 1 bytes]");
 					break;
 				}
-				tag = EXTRACT_U_1(bp);
+				tag = GET_U_1(bp);
 				++bp;
 				--len;
 				ND_PRINT("%s", tok2str(oo2str, NULL, tag));
@@ -841,22 +804,25 @@ rfc1048_print(netdissect_options *ndo,
 			case TAG_CLIENT_FQDN:
 				/* this option should be at least 3 bytes long */
 				if (len < 3) {
-					ND_PRINT("ERROR: length < 3 bytes");
+					ND_PRINT("[ERROR: length < 3 bytes]");
 					bp += len;
 					len = 0;
 					break;
 				}
-				if (EXTRACT_U_1(bp))
-					ND_PRINT("[%s] ", client_fqdn_flags(EXTRACT_U_1(bp)));
+				if (GET_U_1(bp) & 0xf0) {
+					ND_PRINT("[ERROR: MBZ nibble 0x%x != 0] ",
+						 (GET_U_1(bp) & 0xf0) >> 4);
+				}
+				if (GET_U_1(bp) & 0x0f)
+					ND_PRINT("[%s] ",
+						 bittok2str_nosep(fqdn_flags_bm, "", (GET_U_1(bp))));
 				bp++;
-				if (EXTRACT_U_1(bp) || EXTRACT_U_1(bp + 1))
-					ND_PRINT("%u/%u ", EXTRACT_U_1(bp), EXTRACT_U_1(bp + 1));
+				if (GET_U_1(bp) || GET_U_1(bp + 1))
+					ND_PRINT("%u/%u ", GET_U_1(bp),
+						 GET_U_1(bp + 1));
 				bp += 2;
 				ND_PRINT("\"");
-				if (fn_printn(ndo, bp, len - 3, ndo->ndo_snapend)) {
-					ND_PRINT("\"");
-					goto trunc;
-				}
+				nd_printjn(ndo, bp, len - 3);
 				ND_PRINT("\"");
 				bp += len - 3;
 				len = 0;
@@ -868,18 +834,15 @@ rfc1048_print(netdissect_options *ndo,
 
 				/* this option should be at least 1 byte long */
 				if (len < 1) {
-					ND_PRINT("ERROR: length < 1 bytes");
+					ND_PRINT("[ERROR: length < 1 bytes]");
 					break;
 				}
-				type = EXTRACT_U_1(bp);
+				type = GET_U_1(bp);
 				bp++;
 				len--;
 				if (type == 0) {
 					ND_PRINT("\"");
-					if (fn_printn(ndo, bp, len, ndo->ndo_snapend)) {
-						ND_PRINT("\"");
-						goto trunc;
-					}
+					nd_printjn(ndo, bp, len);
 					ND_PRINT("\"");
 					bp += len;
 					len = 0;
@@ -889,7 +852,7 @@ rfc1048_print(netdissect_options *ndo,
 					while (len > 0) {
 						if (!first)
 							ND_PRINT(":");
-						ND_PRINT("%02x", EXTRACT_U_1(bp));
+						ND_PRINT("%02x", GET_U_1(bp));
 						++bp;
 						--len;
 						first = 0;
@@ -900,8 +863,8 @@ rfc1048_print(netdissect_options *ndo,
 
 			case TAG_AGENT_CIRCUIT:
 				while (len >= 2) {
-					subopt = EXTRACT_U_1(bp);
-					suboptlen = EXTRACT_U_1(bp + 1);
+					subopt = GET_U_1(bp);
+					suboptlen = GET_U_1(bp + 1);
 					bp += 2;
 					len -= 2;
 					if (suboptlen > len) {
@@ -922,8 +885,7 @@ rfc1048_print(netdissect_options *ndo,
 					case AGENT_SUBOPTION_CIRCUIT_ID: /* fall through */
 					case AGENT_SUBOPTION_REMOTE_ID:
 					case AGENT_SUBOPTION_SUBSCRIBER_ID:
-						if (fn_printn(ndo, bp, suboptlen, ndo->ndo_snapend))
-							goto trunc;
+						nd_printjn(ndo, bp, suboptlen);
 						break;
 
 					default:
@@ -942,7 +904,7 @@ rfc1048_print(netdissect_options *ndo,
 
 				/* this option should be at least 5 bytes long */
 				if (len < 5) {
-					ND_PRINT("ERROR: length < 5 bytes");
+					ND_PRINT("[ERROR: length < 5 bytes]");
 					bp += len;
 					len = 0;
 					break;
@@ -950,7 +912,7 @@ rfc1048_print(netdissect_options *ndo,
 				while (len > 0) {
 					if (!first)
 						ND_PRINT(",");
-					mask_width = EXTRACT_U_1(bp);
+					mask_width = GET_U_1(bp);
 					bp++;
 					len--;
 					/* mask_width <= 32 */
@@ -975,14 +937,15 @@ rfc1048_print(netdissect_options *ndo,
 						for (i = 0; i < significant_octets ; i++) {
 							if (i > 0)
 								ND_PRINT(".");
-							ND_PRINT("%u", EXTRACT_U_1(bp));
+							ND_PRINT("%u",
+								 GET_U_1(bp));
 							bp++;
 						}
 						for (i = significant_octets ; i < 4 ; i++)
 							ND_PRINT(".0");
 						ND_PRINT("/%u", mask_width);
 					}
-					ND_PRINT(":%s)", ipaddr_string(ndo, bp));
+					ND_PRINT(":%s)", GET_IPADDR_STRING(bp));
 					bp += 4;
 					len -= (significant_octets + 4);
 					first = 0;
@@ -996,34 +959,31 @@ rfc1048_print(netdissect_options *ndo,
 
 				first = 1;
 				if (len < 2) {
-					ND_PRINT("ERROR: length < 2 bytes");
+					ND_PRINT("[ERROR: length < 2 bytes]");
 					bp += len;
 					len = 0;
 					break;
 				}
 				while (len > 0) {
-					suboptlen = EXTRACT_U_1(bp);
+					suboptlen = GET_U_1(bp);
 					bp++;
 					len--;
 					ND_PRINT("\n\t      ");
 					ND_PRINT("instance#%u: ", suboptnumber);
 					if (suboptlen == 0) {
-						ND_PRINT("ERROR: suboption length must be non-zero");
+						ND_PRINT("[ERROR: suboption length must be non-zero]");
 						bp += len;
 						len = 0;
 						break;
 					}
 					if (len < suboptlen) {
-						ND_PRINT("ERROR: invalid option");
+						ND_PRINT("[ERROR: invalid option]");
 						bp += len;
 						len = 0;
 						break;
 					}
 					ND_PRINT("\"");
-					if (fn_printn(ndo, bp, suboptlen, ndo->ndo_snapend)) {
-						ND_PRINT("\"");
-						goto trunc;
-					}
+					nd_printjn(ndo, bp, suboptlen);
 					ND_PRINT("\"");
 					ND_PRINT(", length %u", suboptlen);
 					suboptnumber++;
@@ -1048,14 +1008,11 @@ rfc1048_print(netdissect_options *ndo,
 			bp += len;
 		}
 	}
-	return;
-trunc:
-	ND_PRINT("|[rfc1048]");
 }
 
-#define PRINTCMUADDR(m, s) { ND_TCHECK_4(&cmu->m); \
-    if (EXTRACT_IPV4_TO_NETWORK_ORDER(cmu->m) != 0) \
-	ND_PRINT(" %s:%s", s, ipaddr_string(ndo, cmu->m)); }
+#define PRINTCMUADDR(m, s) { ND_TCHECK_4(cmu->m); \
+    if (GET_IPV4_TO_NETWORK_ORDER(cmu->m) != 0) \
+	ND_PRINT(" %s:%s", s, GET_IPADDR_STRING(cmu->m)); }
 
 static void
 cmu_print(netdissect_options *ndo,
@@ -1069,7 +1026,7 @@ cmu_print(netdissect_options *ndo,
 
 	/* Only print if there are unknown bits */
 	ND_TCHECK_4(cmu->v_flags);
-	v_flags = EXTRACT_U_1(cmu->v_flags);
+	v_flags = GET_U_1(cmu->v_flags);
 	if ((v_flags & ~(VF_SMASK)) != 0)
 		ND_PRINT(" F:0x%x", v_flags);
 	PRINTCMUADDR(v_dgate, "DG");
@@ -1080,29 +1037,6 @@ cmu_print(netdissect_options *ndo,
 	PRINTCMUADDR(v_ins2, "IEN2");
 	PRINTCMUADDR(v_ts1, "TS1");
 	PRINTCMUADDR(v_ts2, "TS2");
-	return;
-
-trunc:
-	ND_PRINT("%s", tstr);
 }
 
 #undef PRINTCMUADDR
-
-static char *
-client_fqdn_flags(u_int flags)
-{
-	static char buf[8+1];
-	int i = 0;
-
-	if (flags & CLIENT_FQDN_FLAGS_S)
-		buf[i++] = 'S';
-	if (flags & CLIENT_FQDN_FLAGS_O)
-		buf[i++] = 'O';
-	if (flags & CLIENT_FQDN_FLAGS_E)
-		buf[i++] = 'E';
-	if (flags & CLIENT_FQDN_FLAGS_N)
-		buf[i++] = 'N';
-	buf[i] = '\0';
-
-	return buf;
-}

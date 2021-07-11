@@ -74,13 +74,13 @@ mobile_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	mob = (const struct mobile_ip *)bp;
 
 	if (length < MOBILE_SIZE || !ND_TTEST_SIZE(mob)) {
-		ND_PRINT("[|mobile]");
+		nd_print_trunc(ndo);
 		return;
 	}
 	ND_PRINT("mobile: ");
 
-	proto = EXTRACT_BE_U_2(mob->proto);
-	crc =  EXTRACT_BE_U_2(mob->hcheck);
+	proto = GET_BE_U_2(mob->proto);
+	crc =  GET_BE_U_2(mob->hcheck);
 	if (proto & OSRC_PRES) {
 		osp=1;
 	}
@@ -88,12 +88,12 @@ mobile_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	if (osp)  {
 		ND_PRINT("[S] ");
 		if (ndo->ndo_vflag)
-			ND_PRINT("%s ", ipaddr_string(ndo, mob->osrc));
+			ND_PRINT("%s ", GET_IPADDR_STRING(mob->osrc));
 	} else {
 		ND_PRINT("[] ");
 	}
 	if (ndo->ndo_vflag) {
-		ND_PRINT("> %s ", ipaddr_string(ndo, mob->odst));
+		ND_PRINT("> %s ", GET_IPADDR_STRING(mob->odst));
 		ND_PRINT("(oproto=%u)", proto>>8);
 	}
 	vec[0].ptr = (const uint8_t *)(const void *)mob;

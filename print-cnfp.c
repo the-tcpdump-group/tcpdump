@@ -37,7 +37,7 @@
  *
  * See
  *
- *    http://www.cisco.com/c/en/us/td/docs/net_mgmt/netflow_collection_engine/3-6/user/guide/format.html#wp1005892
+ *    https://www.cisco.com/c/en/us/td/docs/net_mgmt/netflow_collection_engine/3-6/user/guide/format.html#wp1005892
  */
 
 #ifdef HAVE_CONFIG_H
@@ -46,9 +46,7 @@
 
 #include "netdissect-stdinc.h"
 
-#include <stdio.h>
-#include <string.h>
-
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -167,57 +165,46 @@ cnfp_v1_print(netdissect_options *ndo, const u_char *cp)
 #endif
 
 	nh = (const struct nfhdr_v1 *)cp;
-	ND_TCHECK_SIZE(nh);
 
-	ver = EXTRACT_BE_U_2(nh->version);
-	nrecs = EXTRACT_BE_U_4(nh->count);
+	ver = GET_BE_U_2(nh->version);
+	nrecs = GET_BE_U_4(nh->count);
 #if 0
 	/*
 	 * This is seconds since the UN*X epoch, and is followed by
 	 * nanoseconds.  XXX - format it, rather than just dumping the
 	 * raw seconds-since-the-Epoch.
 	 */
-	t = EXTRACT_BE_U_4(nh->utc_sec);
+	t = GET_BE_U_4(nh->utc_sec);
 #endif
 
 	ND_PRINT("NetFlow v%x, %u.%03u uptime, %u.%09u, ", ver,
-	       EXTRACT_BE_U_4(nh->msys_uptime)/1000,
-	       EXTRACT_BE_U_4(nh->msys_uptime)%1000,
-	       EXTRACT_BE_U_4(nh->utc_sec), EXTRACT_BE_U_4(nh->utc_nsec));
+	       GET_BE_U_4(nh->msys_uptime)/1000,
+	       GET_BE_U_4(nh->msys_uptime)%1000,
+	       GET_BE_U_4(nh->utc_sec), GET_BE_U_4(nh->utc_nsec));
 
 	nr = (const struct nfrec_v1 *)&nh[1];
 
 	ND_PRINT("%2u recs", nrecs);
 
 	for (; nrecs != 0; nr++, nrecs--) {
-		char buf[20];
-		char asbuf[20];
-
-		/*
-		 * Make sure we have the entire record.
-		 */
-		ND_TCHECK_SIZE(nr);
 		ND_PRINT("\n  started %u.%03u, last %u.%03u",
-		       EXTRACT_BE_U_4(nr->start_time)/1000,
-		       EXTRACT_BE_U_4(nr->start_time)%1000,
-		       EXTRACT_BE_U_4(nr->last_time)/1000,
-		       EXTRACT_BE_U_4(nr->last_time)%1000);
+		       GET_BE_U_4(nr->start_time)/1000,
+		       GET_BE_U_4(nr->start_time)%1000,
+		       GET_BE_U_4(nr->last_time)/1000,
+		       GET_BE_U_4(nr->last_time)%1000);
 
-		asbuf[0] = buf[0] = '\0';
-		ND_PRINT("\n    %s%s%s:%u ",
-			intoa(EXTRACT_IPV4_TO_NETWORK_ORDER(nr->src_ina)),
-			buf, asbuf,
-			EXTRACT_BE_U_2(nr->srcport));
+		ND_PRINT("\n    %s:%u ",
+			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->src_ina)),
+			GET_BE_U_2(nr->srcport));
 
-		ND_PRINT("> %s%s%s:%u ",
-			intoa(EXTRACT_IPV4_TO_NETWORK_ORDER(nr->dst_ina)),
-			buf, asbuf,
-			EXTRACT_BE_U_2(nr->dstport));
+		ND_PRINT("> %s:%u ",
+			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->dst_ina)),
+			GET_BE_U_2(nr->dstport));
 
 		ND_PRINT(">> %s\n    ",
-			intoa(EXTRACT_IPV4_TO_NETWORK_ORDER(nr->nhop_ina)));
+			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->nhop_ina)));
 
-		proto = EXTRACT_U_1(nr->proto);
+		proto = GET_U_1(nr->proto);
 		if (!ndo->ndo_nflag && (p_name = netdb_protoname(proto)) != NULL)
 			ND_PRINT("%s ", p_name);
 		else
@@ -226,28 +213,18 @@ cnfp_v1_print(netdissect_options *ndo, const u_char *cp)
 		/* tcp flags for tcp only */
 		if (proto == IPPROTO_TCP) {
 			u_int flags;
-			flags = EXTRACT_U_1(nr->tcp_flags);
-			ND_PRINT("%s%s%s%s%s%s%s",
-				flags & TH_FIN  ? "F" : "",
-				flags & TH_SYN  ? "S" : "",
-				flags & TH_RST  ? "R" : "",
-				flags & TH_PUSH ? "P" : "",
-				flags & TH_ACK  ? "A" : "",
-				flags & TH_URG  ? "U" : "",
-				flags           ? " " : "");
+			flags = GET_U_1(nr->tcp_flags);
+			if (flags)
+				ND_PRINT("%s ", bittok2str_nosep(tcp_flag_values, "", flags));
 		}
 
-		buf[0]='\0';
-		ND_PRINT("tos %u, %u (%u octets) %s",
-		       EXTRACT_U_1(nr->tos),
-		       EXTRACT_BE_U_4(nr->packets),
-		       EXTRACT_BE_U_4(nr->octets), buf);
+		ND_PRINT("tos %u, %u (%u octets)",
+		       GET_U_1(nr->tos),
+		       GET_BE_U_4(nr->packets),
+		       GET_BE_U_4(nr->octets));
+		/* This was not all of struct nfrec_v1. */
+		ND_TCHECK_SIZE(nr);
 	}
-	return;
-
-trunc:
-	ND_PRINT("[|cnfp]");
-	return;
 }
 
 static void
@@ -263,64 +240,51 @@ cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 #endif
 
 	nh = (const struct nfhdr_v5 *)cp;
-	ND_TCHECK_SIZE(nh);
 
-	ver = EXTRACT_BE_U_2(nh->version);
-	nrecs = EXTRACT_BE_U_4(nh->count);
+	ver = GET_BE_U_2(nh->version);
+	nrecs = GET_BE_U_4(nh->count);
 #if 0
 	/*
 	 * This is seconds since the UN*X epoch, and is followed by
 	 * nanoseconds.  XXX - format it, rather than just dumping the
 	 * raw seconds-since-the-Epoch.
 	 */
-	t = EXTRACT_BE_U_4(nh->utc_sec);
+	t = GET_BE_U_4(nh->utc_sec);
 #endif
 
 	ND_PRINT("NetFlow v%x, %u.%03u uptime, %u.%09u, ", ver,
-	       EXTRACT_BE_U_4(nh->msys_uptime)/1000,
-	       EXTRACT_BE_U_4(nh->msys_uptime)%1000,
-	       EXTRACT_BE_U_4(nh->utc_sec), EXTRACT_BE_U_4(nh->utc_nsec));
+	       GET_BE_U_4(nh->msys_uptime)/1000,
+	       GET_BE_U_4(nh->msys_uptime)%1000,
+	       GET_BE_U_4(nh->utc_sec), GET_BE_U_4(nh->utc_nsec));
 
-	ND_PRINT("#%u, ", EXTRACT_BE_U_4(nh->sequence));
+	ND_PRINT("#%u, ", GET_BE_U_4(nh->sequence));
+	/* This was not all of struct nfhdr_v5. */
+	ND_TCHECK_SIZE(nh);
 	nr = (const struct nfrec_v5 *)&nh[1];
 
 	ND_PRINT("%2u recs", nrecs);
 
 	for (; nrecs != 0; nr++, nrecs--) {
-		char buf[20];
-		char asbuf[20];
-
-		/*
-		 * Make sure we have the entire record.
-		 */
-		ND_TCHECK_SIZE(nr);
 		ND_PRINT("\n  started %u.%03u, last %u.%03u",
-		       EXTRACT_BE_U_4(nr->start_time)/1000,
-		       EXTRACT_BE_U_4(nr->start_time)%1000,
-		       EXTRACT_BE_U_4(nr->last_time)/1000,
-		       EXTRACT_BE_U_4(nr->last_time)%1000);
+		       GET_BE_U_4(nr->start_time)/1000,
+		       GET_BE_U_4(nr->start_time)%1000,
+		       GET_BE_U_4(nr->last_time)/1000,
+		       GET_BE_U_4(nr->last_time)%1000);
 
-		asbuf[0] = buf[0] = '\0';
-		nd_snprintf(buf, sizeof(buf), "/%u", EXTRACT_U_1(nr->src_mask));
-		nd_snprintf(asbuf, sizeof(asbuf), ":%u",
-			EXTRACT_BE_U_2(nr->src_as));
-		ND_PRINT("\n    %s%s%s:%u ",
-			intoa(EXTRACT_IPV4_TO_NETWORK_ORDER(nr->src_ina)),
-			buf, asbuf,
-			EXTRACT_BE_U_2(nr->srcport));
+		ND_PRINT("\n    %s/%u:%u:%u ",
+			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->src_ina)),
+			GET_U_1(nr->src_mask), GET_BE_U_2(nr->src_as),
+			GET_BE_U_2(nr->srcport));
 
-		nd_snprintf(buf, sizeof(buf), "/%u", EXTRACT_U_1(nr->dst_mask));
-		nd_snprintf(asbuf, sizeof(asbuf), ":%u",
-			 EXTRACT_BE_U_2(nr->dst_as));
-		ND_PRINT("> %s%s%s:%u ",
-			intoa(EXTRACT_IPV4_TO_NETWORK_ORDER(nr->dst_ina)),
-			buf, asbuf,
-			EXTRACT_BE_U_2(nr->dstport));
+		ND_PRINT("> %s/%u:%u:%u ",
+			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->dst_ina)),
+			GET_U_1(nr->dst_mask), GET_BE_U_2(nr->dst_as),
+			GET_BE_U_2(nr->dstport));
 
 		ND_PRINT(">> %s\n    ",
-			intoa(EXTRACT_IPV4_TO_NETWORK_ORDER(nr->nhop_ina)));
+			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->nhop_ina)));
 
-		proto = EXTRACT_U_1(nr->proto);
+		proto = GET_U_1(nr->proto);
 		if (!ndo->ndo_nflag && (p_name = netdb_protoname(proto)) != NULL)
 			ND_PRINT("%s ", p_name);
 		else
@@ -329,28 +293,18 @@ cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 		/* tcp flags for tcp only */
 		if (proto == IPPROTO_TCP) {
 			u_int flags;
-			flags = EXTRACT_U_1(nr->tcp_flags);
-			ND_PRINT("%s%s%s%s%s%s%s",
-				flags & TH_FIN  ? "F" : "",
-				flags & TH_SYN  ? "S" : "",
-				flags & TH_RST  ? "R" : "",
-				flags & TH_PUSH ? "P" : "",
-				flags & TH_ACK  ? "A" : "",
-				flags & TH_URG  ? "U" : "",
-				flags           ? " " : "");
+			flags = GET_U_1(nr->tcp_flags);
+			if (flags)
+				ND_PRINT("%s ", bittok2str_nosep(tcp_flag_values, "", flags));
 		}
 
-		buf[0]='\0';
-		ND_PRINT("tos %u, %u (%u octets) %s",
-		       EXTRACT_U_1(nr->tos),
-		       EXTRACT_BE_U_4(nr->packets),
-		       EXTRACT_BE_U_4(nr->octets), buf);
+		ND_PRINT("tos %u, %u (%u octets)",
+		       GET_U_1(nr->tos),
+		       GET_BE_U_4(nr->packets),
+		       GET_BE_U_4(nr->octets));
+		/* This was not all of struct nfrec_v5. */
+		ND_TCHECK_SIZE(nr);
 	}
-	return;
-
-trunc:
-	ND_PRINT("[|cnfp]");
-	return;
 }
 
 static void
@@ -366,64 +320,51 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 #endif
 
 	nh = (const struct nfhdr_v6 *)cp;
-	ND_TCHECK_SIZE(nh);
 
-	ver = EXTRACT_BE_U_2(nh->version);
-	nrecs = EXTRACT_BE_U_4(nh->count);
+	ver = GET_BE_U_2(nh->version);
+	nrecs = GET_BE_U_4(nh->count);
 #if 0
 	/*
 	 * This is seconds since the UN*X epoch, and is followed by
 	 * nanoseconds.  XXX - format it, rather than just dumping the
 	 * raw seconds-since-the-Epoch.
 	 */
-	t = EXTRACT_BE_U_4(nh->utc_sec);
+	t = GET_BE_U_4(nh->utc_sec);
 #endif
 
 	ND_PRINT("NetFlow v%x, %u.%03u uptime, %u.%09u, ", ver,
-	       EXTRACT_BE_U_4(nh->msys_uptime)/1000,
-	       EXTRACT_BE_U_4(nh->msys_uptime)%1000,
-	       EXTRACT_BE_U_4(nh->utc_sec), EXTRACT_BE_U_4(nh->utc_nsec));
+	       GET_BE_U_4(nh->msys_uptime)/1000,
+	       GET_BE_U_4(nh->msys_uptime)%1000,
+	       GET_BE_U_4(nh->utc_sec), GET_BE_U_4(nh->utc_nsec));
 
-	ND_PRINT("#%u, ", EXTRACT_BE_U_4(nh->sequence));
+	ND_PRINT("#%u, ", GET_BE_U_4(nh->sequence));
+	/* This was not all of struct nfhdr_v6. */
+	ND_TCHECK_SIZE(nh);
 	nr = (const struct nfrec_v6 *)&nh[1];
 
 	ND_PRINT("%2u recs", nrecs);
 
 	for (; nrecs != 0; nr++, nrecs--) {
-		char buf[20];
-		char asbuf[20];
-
-		/*
-		 * Make sure we have the entire record.
-		 */
-		ND_TCHECK_SIZE(nr);
 		ND_PRINT("\n  started %u.%03u, last %u.%03u",
-		       EXTRACT_BE_U_4(nr->start_time)/1000,
-		       EXTRACT_BE_U_4(nr->start_time)%1000,
-		       EXTRACT_BE_U_4(nr->last_time)/1000,
-		       EXTRACT_BE_U_4(nr->last_time)%1000);
+		       GET_BE_U_4(nr->start_time)/1000,
+		       GET_BE_U_4(nr->start_time)%1000,
+		       GET_BE_U_4(nr->last_time)/1000,
+		       GET_BE_U_4(nr->last_time)%1000);
 
-		asbuf[0] = buf[0] = '\0';
-		nd_snprintf(buf, sizeof(buf), "/%u", EXTRACT_U_1(nr->src_mask));
-		nd_snprintf(asbuf, sizeof(asbuf), ":%u",
-			EXTRACT_BE_U_2(nr->src_as));
-		ND_PRINT("\n    %s%s%s:%u ",
-			intoa(EXTRACT_IPV4_TO_NETWORK_ORDER(nr->src_ina)),
-			buf, asbuf,
-			EXTRACT_BE_U_2(nr->srcport));
+		ND_PRINT("\n    %s/%u:%u:%u ",
+			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->src_ina)),
+			GET_U_1(nr->src_mask), GET_BE_U_2(nr->src_as),
+			GET_BE_U_2(nr->srcport));
 
-		nd_snprintf(buf, sizeof(buf), "/%u", EXTRACT_U_1(nr->dst_mask));
-		nd_snprintf(asbuf, sizeof(asbuf), ":%u",
-			 EXTRACT_BE_U_2(nr->dst_as));
-		ND_PRINT("> %s%s%s:%u ",
-			intoa(EXTRACT_IPV4_TO_NETWORK_ORDER(nr->dst_ina)),
-			buf, asbuf,
-			EXTRACT_BE_U_2(nr->dstport));
+		ND_PRINT("> %s/%u:%u:%u ",
+			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->dst_ina)),
+			GET_U_1(nr->dst_mask), GET_BE_U_2(nr->dst_as),
+			GET_BE_U_2(nr->dstport));
 
 		ND_PRINT(">> %s\n    ",
-			intoa(EXTRACT_IPV4_TO_NETWORK_ORDER(nr->nhop_ina)));
+			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->nhop_ina)));
 
-		proto = EXTRACT_U_1(nr->proto);
+		proto = GET_U_1(nr->proto);
 		if (!ndo->ndo_nflag && (p_name = netdb_protoname(proto)) != NULL)
 			ND_PRINT("%s ", p_name);
 		else
@@ -432,31 +373,20 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 		/* tcp flags for tcp only */
 		if (proto == IPPROTO_TCP) {
 			u_int flags;
-			flags = EXTRACT_U_1(nr->tcp_flags);
-			ND_PRINT("%s%s%s%s%s%s%s",
-				flags & TH_FIN  ? "F" : "",
-				flags & TH_SYN  ? "S" : "",
-				flags & TH_RST  ? "R" : "",
-				flags & TH_PUSH ? "P" : "",
-				flags & TH_ACK  ? "A" : "",
-				flags & TH_URG  ? "U" : "",
-				flags           ? " " : "");
+			flags = GET_U_1(nr->tcp_flags);
+			if (flags)
+				ND_PRINT("%s ", bittok2str_nosep(tcp_flag_values, "", flags));
 		}
 
-		buf[0]='\0';
-		nd_snprintf(buf, sizeof(buf), "(%u<>%u encaps)",
-			 (EXTRACT_BE_U_2(nr->flags) >> 8) & 0xff,
-			 (EXTRACT_BE_U_2(nr->flags)) & 0xff);
-		ND_PRINT("tos %u, %u (%u octets) %s",
-		       EXTRACT_U_1(nr->tos),
-		       EXTRACT_BE_U_4(nr->packets),
-		       EXTRACT_BE_U_4(nr->octets), buf);
+		ND_PRINT("tos %u, %u (%u octets) (%u<>%u encaps)",
+		       GET_U_1(nr->tos),
+		       GET_BE_U_4(nr->packets),
+		       GET_BE_U_4(nr->octets),
+		       (GET_BE_U_2(nr->flags) >> 8) & 0xff,
+		       (GET_BE_U_2(nr->flags)) & 0xff);
+		/* This was not all of struct nfrec_v6. */
+		ND_TCHECK_SIZE(nr);
 	}
-	return;
-
-trunc:
-	ND_PRINT("[|cnfp]");
-	return;
 }
 
 void
@@ -468,8 +398,7 @@ cnfp_print(netdissect_options *ndo, const u_char *cp)
 	 * First 2 bytes are the version number.
 	 */
 	ndo->ndo_protocol = "cnfp";
-	ND_TCHECK_2(cp);
-	ver = EXTRACT_BE_U_2(cp);
+	ver = GET_BE_U_2(cp);
 	switch (ver) {
 
 	case 1:
@@ -488,9 +417,4 @@ cnfp_print(netdissect_options *ndo, const u_char *cp)
 		ND_PRINT("NetFlow v%x", ver);
 		break;
 	}
-	return;
-
-trunc:
-	ND_PRINT("[|cnfp]");
-	return;
 }

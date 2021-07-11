@@ -16,12 +16,25 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "netdissect-ctype.h"
+
 #include "netdissect.h"
 #include "extract.h"
 #include "smb.h"
 
+static int stringlen_is_set;
 static uint32_t stringlen;
 extern const u_char *startbuf;
+
+/*
+ * Reset SMB state.
+ */
+void
+smb_reset(void)
+{
+    stringlen_is_set = 0;
+    stringlen = 0;
+}
 
 /*
  * interpret a 32 bit dos packed date/time to some parameters
@@ -69,11 +82,11 @@ int_unix_date(uint32_t dos_date)
  * in network byte order
  */
 static time_t
-make_unix_date(const u_char *date_ptr)
+make_unix_date(netdissect_options *ndo, const u_char *date_ptr)
 {
     uint32_t dos_date = 0;
 
-    dos_date = EXTRACT_LE_U_4(date_ptr);
+    dos_date = GET_LE_U_4(date_ptr);
 
     return int_unix_date(dos_date);
 }
@@ -83,11 +96,11 @@ make_unix_date(const u_char *date_ptr)
  * in halfword-swapped network byte order!
  */
 static time_t
-make_unix_date2(const u_char *date_ptr)
+make_unix_date2(netdissect_options *ndo, const u_char *date_ptr)
 {
     uint32_t x, x2;
 
-    x = EXTRACT_LE_U_4(date_ptr);
+    x = GET_LE_U_4(date_ptr);
     x2 = ((x & 0xFFFF) << 16) | ((x & 0xFFFF0000) >> 16);
     return int_unix_date(x2);
 }
@@ -97,13 +110,13 @@ make_unix_date2(const u_char *date_ptr)
  * It's originally in "100ns units since jan 1st 1601"
  */
 static time_t
-interpret_long_date(const u_char *p)
+interpret_long_date(netdissect_options *ndo, const u_char *p)
 {
     double d;
     time_t ret;
 
     /* this gives us seconds since jan 1st 1601 (approx) */
-    d = (EXTRACT_LE_U_4(p + 4) * 256.0 + EXTRACT_U_1(p + 3)) * (1.0e-7 * (1 << 24));
+    d = (GET_LE_U_4(p + 4) * 256.0 + GET_U_1(p + 3)) * (1.0e-7 * (1 << 24));
 
     /* now adjust by 369 years to make the secs since 1970 */
     d -= 369.0 * 365.25 * 24 * 60 * 60;
@@ -132,8 +145,7 @@ name_interpret(netdissect_options *ndo,
 
     if (in >= maxbuf)
 	return(-1);	/* name goes past the end of the buffer */
-    ND_TCHECK_1(in);
-    len = EXTRACT_U_1(in) / 2;
+    len = GET_U_1(in) / 2;
     in++;
 
     *out=0;
@@ -145,12 +157,12 @@ name_interpret(netdissect_options *ndo,
 	ND_TCHECK_2(in);
 	if (in + 1 >= maxbuf)
 	    return(-1);	/* name goes past the end of the buffer */
-	if (EXTRACT_U_1(in) < 'A' || EXTRACT_U_1(in) > 'P' ||
-	    EXTRACT_U_1(in + 1) < 'A' || EXTRACT_U_1(in + 1) > 'P') {
+	if (GET_U_1(in) < 'A' || GET_U_1(in) > 'P' ||
+	    GET_U_1(in + 1) < 'A' || GET_U_1(in + 1) > 'P') {
 	    *out = 0;
 	    return(0);
 	}
-	*out = ((EXTRACT_U_1(in) - 'A') << 4) + (EXTRACT_U_1(in + 1) - 'A');
+	*out = ((GET_U_1(in) - 'A') << 4) + (GET_U_1(in + 1) - 'A');
 	in += 2;
 	out++;
 	len--;
@@ -177,9 +189,8 @@ name_ptr(netdissect_options *ndo,
     p = buf + ofs;
     if (p >= maxbuf)
 	return(NULL);	/* name goes past the end of the buffer */
-    ND_TCHECK_1(p);
 
-    c = EXTRACT_U_1(p);
+    c = GET_U_1(p);
 
     /* XXX - this should use the same code that the DNS dissector does */
     if ((c & 0xC0) == 0xC0) {
@@ -188,7 +199,7 @@ name_ptr(netdissect_options *ndo,
 	ND_TCHECK_2(p);
 	if ((p + 1) >= maxbuf)
 	    return(NULL);	/* name goes past the end of the buffer */
-	l = EXTRACT_BE_U_2(p) & 0x3FFF;
+	l = GET_BE_U_2(p) & 0x3FFF;
 	if (l == 0) {
 	    /* We have a pointer that points to itself. */
 	    return(NULL);
@@ -231,18 +242,16 @@ name_len(netdissect_options *ndo,
 
     if (s >= maxbuf)
 	return(-1);	/* name goes past the end of the buffer */
-    ND_TCHECK_1(s);
-    c = EXTRACT_U_1(s);
+    c = GET_U_1(s);
     if ((c & 0xC0) == 0xC0)
 	return(2);
-    while (*s) {
+    while (GET_U_1(s)) {
 	if (s >= maxbuf)
 	    return(-1);	/* name goes past the end of the buffer */
-	ND_TCHECK_1(s);
-	s += (*s) + 1;
+	s += GET_U_1(s) + 1;
 	ND_TCHECK_1(s);
     }
-    return(PTR_DIFF(s, s0) + 1);
+    return(ND_BYTES_BETWEEN(s, s0) + 1);
 
 trunc:
     return(-1);	/* name goes past the end of the buffer */
@@ -254,7 +263,7 @@ print_asc(netdissect_options *ndo,
 {
     u_int i;
     for (i = 0; i < len; i++)
-        safeputchar(ndo, EXTRACT_U_1(buf + i));
+        fn_print_char(ndo, GET_U_1(buf + i));
 }
 
 static const char *
@@ -283,8 +292,7 @@ smb_data_print(netdissect_options *ndo, const u_char *buf, u_int len)
 	return;
     ND_PRINT("[%03X] ", i);
     for (i = 0; i < len; /*nothing*/) {
-        ND_TCHECK_1(buf + i);
-	ND_PRINT("%02X ", EXTRACT_U_1(buf + i) & 0xff);
+	ND_PRINT("%02X ", GET_U_1(buf + i) & 0xff);
 	i++;
 	if (i%8 == 0)
 	    ND_PRINT(" ");
@@ -307,7 +315,7 @@ smb_data_print(netdissect_options *ndo, const u_char *buf, u_int len)
 	while (n--)
 	    ND_PRINT("   ");
 
-	n = min(8, i % 16);
+	n = ND_MIN(8, i % 16);
 	print_asc(ndo, buf + i - (i % 16), n);
 	ND_PRINT(" ");
 	n = (i % 16) - n;
@@ -315,11 +323,6 @@ smb_data_print(netdissect_options *ndo, const u_char *buf, u_int len)
 	    print_asc(ndo, buf + i - n, n);
 	ND_PRINT("\n");
     }
-    return;
-
-trunc:
-    ND_PRINT("\n");
-    ND_PRINT("WARNING: Short packet. Try increasing the snap length\n");
 }
 
 
@@ -331,7 +334,7 @@ write_bits(netdissect_options *ndo,
     u_int i = 0;
 
     while ((p = strchr(fmt, '|'))) {
-	size_t l = PTR_DIFF(p, fmt);
+	u_int l = ND_BYTES_BETWEEN(p, fmt);
 	if (l && (val & (1 << i)))
 	    ND_PRINT("%.*s ", (int)l, fmt);
 	fmt = p + 1;
@@ -341,13 +344,13 @@ write_bits(netdissect_options *ndo,
 
 /* convert a UCS-2 string into an ASCII string */
 #define MAX_UNISTR_SIZE	1000
-static const char *
-unistr(netdissect_options *ndo,
-       const u_char *s, uint32_t *len, int use_unicode)
+static const u_char *
+unistr(netdissect_options *ndo, char (*buf)[MAX_UNISTR_SIZE+1],
+       const u_char *s, uint32_t strsize, int is_null_terminated,
+       int use_unicode)
 {
-    static char buf[MAX_UNISTR_SIZE+1];
+    u_int c;
     size_t l = 0;
-    uint32_t strsize;
     const u_char *sp;
 
     if (use_unicode) {
@@ -359,78 +362,104 @@ unistr(netdissect_options *ndo,
 	    s++;
 	}
     }
-    if (*len == 0) {
+    if (is_null_terminated) {
 	/*
 	 * Null-terminated string.
+	 * Find the length, counting the terminating NUL.
 	 */
 	strsize = 0;
 	sp = s;
 	if (!use_unicode) {
 	    for (;;) {
-		ND_TCHECK_1(sp);
-		*len += 1;
-		if (EXTRACT_U_1(sp) == 0)
-		    break;
+		c = GET_U_1(sp);
 		sp++;
+		strsize++;
+		if (c == '\0')
+		    break;
 	    }
-	    strsize = *len - 1;
 	} else {
 	    for (;;) {
-		ND_TCHECK_2(sp);
-		*len += 2;
-		if (EXTRACT_U_1(sp) == 0 && EXTRACT_U_1(sp + 1) == 0)
-		    break;
+		c = GET_LE_U_2(sp);
 		sp += 2;
+		strsize += 2;
+		if (c == '\0')
+		    break;
 	    }
-	    strsize = *len - 2;
 	}
-    } else {
-	/*
-	 * Counted string.
-	 */
-	strsize = *len;
     }
     if (!use_unicode) {
     	while (strsize != 0) {
-          ND_TCHECK_1(s);
-	    if (l >= MAX_UNISTR_SIZE)
-		break;
-	    if (ND_ISPRINT(EXTRACT_U_1(s)))
-		buf[l] = EXTRACT_U_1(s);
-	    else {
-		if (EXTRACT_U_1(s) == 0)
-		    break;
-		buf[l] = '.';
-	    }
-	    l++;
+	    c = GET_U_1(s);
 	    s++;
 	    strsize--;
+	    if (c == 0) {
+		/*
+		 * Even counted strings may have embedded null
+		 * terminators, so quit here, and skip past
+		 * the rest of the data.
+		 *
+		 * Make sure, however, that the rest of the data
+		 * is there, so we don't overflow the buffer when
+		 * skipping past it.
+		 */
+		ND_TCHECK_LEN(s, strsize);
+		s += strsize;
+		strsize = 0;
+		break;
+	    }
+	    if (l < MAX_UNISTR_SIZE) {
+		if (ND_ASCII_ISPRINT(c)) {
+		    /* It's a printable ASCII character */
+		    (*buf)[l] = (char)c;
+		} else {
+		    /* It's a non-ASCII character or a non-printable ASCII character */
+		    (*buf)[l] = '.';
+		}
+		l++;
+	    }
 	}
     } else {
-	while (strsize != 0) {
-	    ND_TCHECK_2(s);
-	    if (l >= MAX_UNISTR_SIZE)
-		break;
-	    if (EXTRACT_U_1(s + 1) == 0 && ND_ISPRINT(EXTRACT_U_1(s))) {
-		/* It's a printable ASCII character */
-		buf[l] = EXTRACT_U_1(s);
-	    } else {
-		/* It's a non-ASCII character or a non-printable ASCII character */
-		if (EXTRACT_U_1(s) == 0 && EXTRACT_U_1(s + 1) == 0)
-		    break;
-		buf[l] = '.';
-	    }
-	    l++;
+	while (strsize > 1) {
+	    c = GET_LE_U_2(s);
 	    s += 2;
-	    if (strsize == 1)
-		break;
 	    strsize -= 2;
+	    if (c == 0) {
+		/*
+		 * Even counted strings may have embedded null
+		 * terminators, so quit here, and skip past
+		 * the rest of the data.
+		 *
+		 * Make sure, however, that the rest of the data
+		 * is there, so we don't overflow the buffer when
+		 * skipping past it.
+		 */
+		ND_TCHECK_LEN(s, strsize);
+		s += strsize;
+		strsize = 0;
+		break;
+	    }
+	    if (l < MAX_UNISTR_SIZE) {
+		if (ND_ASCII_ISPRINT(c)) {
+		    /* It's a printable ASCII character */
+		    (*buf)[l] = (char)c;
+		} else {
+		    /* It's a non-ASCII character or a non-printable ASCII character */
+		    (*buf)[l] = '.';
+		}
+		l++;
+	    }
+	}
+	if (strsize == 1) {
+	    /* We have half of a code point; skip past it */
+	    ND_TCHECK_1(s);
+	    s++;
 	}
     }
-    buf[l] = 0;
-    return buf;
+    (*buf)[l] = 0;
+    return s;
 
 trunc:
+    (*buf)[l] = 0;
     return NULL;
 }
 
@@ -441,19 +470,18 @@ smb_fdata1(netdissect_options *ndo,
 {
     int reverse = 0;
     const char *attrib_fmt = "READONLY|HIDDEN|SYSTEM|VOLUME|DIR|ARCHIVE|";
+    char strbuf[MAX_UNISTR_SIZE+1];
 
     while (*fmt && buf<maxbuf) {
 	switch (*fmt) {
 	case 'a':
-	    ND_TCHECK_1(buf);
-	    write_bits(ndo, EXTRACT_U_1(buf), attrib_fmt);
+	    write_bits(ndo, GET_U_1(buf), attrib_fmt);
 	    buf++;
 	    fmt++;
 	    break;
 
 	case 'A':
-	    ND_TCHECK_2(buf);
-	    write_bits(ndo, EXTRACT_LE_U_2(buf), attrib_fmt);
+	    write_bits(ndo, GET_LE_U_2(buf), attrib_fmt);
 	    buf += 2;
 	    fmt++;
 	    break;
@@ -465,16 +493,15 @@ smb_fdata1(netdissect_options *ndo,
 	    u_int l;
 
 	    p = strchr(++fmt, '}');
-	    l = PTR_DIFF(p, fmt);
+	    l = ND_BYTES_BETWEEN(p, fmt);
 
 	    if (l > sizeof(bitfmt) - 1)
-		    l = sizeof(bitfmt)-1;
+		l = sizeof(bitfmt)-1;
 
 	    strncpy(bitfmt, fmt, l);
 	    bitfmt[l] = '\0';
 	    fmt = p + 1;
-	    ND_TCHECK_1(buf);
-	    write_bits(ndo, EXTRACT_U_1(buf), bitfmt);
+	    write_bits(ndo, GET_U_1(buf), bitfmt);
 	    buf++;
 	    break;
 	  }
@@ -485,7 +512,7 @@ smb_fdata1(netdissect_options *ndo,
 	    ND_TCHECK_LEN(buf, l);
 	    buf += l;
 	    fmt++;
-	    while (isdigit((unsigned char)*fmt))
+	    while (ND_ASCII_ISDIGIT(*fmt))
 		fmt++;
 	    break;
 	  }
@@ -496,8 +523,7 @@ smb_fdata1(netdissect_options *ndo,
 	case 'b':
 	  {
 	    unsigned int x;
-	    ND_TCHECK_1(buf);
-	    x = EXTRACT_U_1(buf);
+	    x = GET_U_1(buf);
 	    ND_PRINT("%u (0x%x)", x, x);
 	    buf += 1;
 	    fmt++;
@@ -506,9 +532,8 @@ smb_fdata1(netdissect_options *ndo,
 	case 'd':
 	  {
 	    int x;
-	    ND_TCHECK_2(buf);
-	    x = reverse ? EXTRACT_BE_S_2(buf) :
-			  EXTRACT_LE_S_2(buf);
+	    x = reverse ? GET_BE_S_2(buf) :
+			  GET_LE_S_2(buf);
 	    ND_PRINT("%d (0x%x)", x, x);
 	    buf += 2;
 	    fmt++;
@@ -517,9 +542,8 @@ smb_fdata1(netdissect_options *ndo,
 	case 'D':
 	  {
 	    int x;
-	    ND_TCHECK_4(buf);
-	    x = reverse ? EXTRACT_BE_S_4(buf) :
-			  EXTRACT_LE_S_4(buf);
+	    x = reverse ? GET_BE_S_4(buf) :
+			  GET_LE_S_4(buf);
 	    ND_PRINT("%d (0x%x)", x, x);
 	    buf += 4;
 	    fmt++;
@@ -528,9 +552,8 @@ smb_fdata1(netdissect_options *ndo,
 	case 'L':
 	  {
 	    uint64_t x;
-	    ND_TCHECK_8(buf);
-	    x = reverse ? EXTRACT_BE_U_8(buf) :
-			  EXTRACT_LE_U_8(buf);
+	    x = reverse ? GET_BE_U_8(buf) :
+			  GET_LE_U_8(buf);
 	    ND_PRINT("%" PRIu64 " (0x%" PRIx64 ")", x, x);
 	    buf += 8;
 	    fmt++;
@@ -539,9 +562,8 @@ smb_fdata1(netdissect_options *ndo,
 	case 'u':
 	  {
 	    unsigned int x;
-	    ND_TCHECK_2(buf);
-	    x = reverse ? EXTRACT_BE_U_2(buf) :
-			  EXTRACT_LE_U_2(buf);
+	    x = reverse ? GET_BE_U_2(buf) :
+			  GET_LE_U_2(buf);
 	    ND_PRINT("%u (0x%x)", x, x);
 	    buf += 2;
 	    fmt++;
@@ -550,9 +572,8 @@ smb_fdata1(netdissect_options *ndo,
 	case 'U':
 	  {
 	    unsigned int x;
-	    ND_TCHECK_4(buf);
-	    x = reverse ? EXTRACT_BE_U_4(buf) :
-			  EXTRACT_LE_U_4(buf);
+	    x = reverse ? GET_BE_U_4(buf) :
+			  GET_LE_U_4(buf);
 	    ND_PRINT("%u (0x%x)", x, x);
 	    buf += 4;
 	    fmt++;
@@ -564,10 +585,10 @@ smb_fdata1(netdissect_options *ndo,
 	    uint32_t x1, x2;
 	    uint64_t x;
 	    ND_TCHECK_8(buf);
-	    x1 = reverse ? EXTRACT_BE_U_4(buf) :
-			   EXTRACT_LE_U_4(buf);
-	    x2 = reverse ? EXTRACT_BE_U_4(buf + 4) :
-			   EXTRACT_LE_U_4(buf + 4);
+	    x1 = reverse ? GET_BE_U_4(buf) :
+			   GET_LE_U_4(buf);
+	    x2 = reverse ? GET_BE_U_4(buf + 4) :
+			   GET_LE_U_4(buf + 4);
 	    x = (((uint64_t)x1) << 32) | x2;
 	    ND_PRINT("%" PRIu64 " (0x%" PRIx64 ")", x, x);
 	    buf += 8;
@@ -577,8 +598,7 @@ smb_fdata1(netdissect_options *ndo,
 	case 'B':
 	  {
 	    unsigned int x;
-	    ND_TCHECK_1(buf);
-	    x = EXTRACT_U_1(buf);
+	    x = GET_U_1(buf);
 	    ND_PRINT("0x%X", x);
 	    buf += 1;
 	    fmt++;
@@ -587,9 +607,8 @@ smb_fdata1(netdissect_options *ndo,
 	case 'w':
 	  {
 	    unsigned int x;
-	    ND_TCHECK_2(buf);
-	    x = reverse ? EXTRACT_BE_U_2(buf) :
-			  EXTRACT_LE_U_2(buf);
+	    x = reverse ? GET_BE_U_2(buf) :
+			  GET_LE_U_2(buf);
 	    ND_PRINT("0x%X", x);
 	    buf += 2;
 	    fmt++;
@@ -598,9 +617,8 @@ smb_fdata1(netdissect_options *ndo,
 	case 'W':
 	  {
 	    unsigned int x;
-	    ND_TCHECK_4(buf);
-	    x = reverse ? EXTRACT_BE_U_4(buf) :
-			  EXTRACT_LE_U_4(buf);
+	    x = reverse ? GET_BE_U_4(buf) :
+			  GET_LE_U_4(buf);
 	    ND_PRINT("0x%X", x);
 	    buf += 4;
 	    fmt++;
@@ -612,26 +630,26 @@ smb_fdata1(netdissect_options *ndo,
 	    switch (*fmt) {
 
 	    case 'b':
-		ND_TCHECK_1(buf);
-		stringlen = EXTRACT_U_1(buf);
+		stringlen = GET_U_1(buf);
+		stringlen_is_set = 1;
 		ND_PRINT("%u", stringlen);
 		buf += 1;
 		break;
 
 	    case 'd':
 	    case 'u':
-		ND_TCHECK_2(buf);
-		stringlen = reverse ? EXTRACT_BE_U_2(buf) :
-				      EXTRACT_LE_U_2(buf);
+		stringlen = reverse ? GET_BE_U_2(buf) :
+				      GET_LE_U_2(buf);
+		stringlen_is_set = 1;
 		ND_PRINT("%u", stringlen);
 		buf += 2;
 		break;
 
 	    case 'D':
 	    case 'U':
-		ND_TCHECK_4(buf);
-		stringlen = reverse ? EXTRACT_BE_U_4(buf) :
-				      EXTRACT_LE_U_4(buf);
+		stringlen = reverse ? GET_BE_U_4(buf) :
+				      GET_LE_U_4(buf);
+		stringlen_is_set = 1;
 		ND_PRINT("%u", stringlen);
 		buf += 4;
 		break;
@@ -643,35 +661,24 @@ smb_fdata1(netdissect_options *ndo,
 	case 'R':	/* like 'S', but always ASCII */
 	  {
 	    /*XXX unistr() */
-	    const char *s;
-	    uint32_t len;
-
-	    len = 0;
-	    s = unistr(ndo, buf, &len, (*fmt == 'R') ? 0 : unicodestr);
-	    if (s == NULL)
+	    buf = unistr(ndo, &strbuf, buf, 0, 1, (*fmt == 'R') ? 0 : unicodestr);
+	    ND_PRINT("%s", strbuf);
+	    if (buf == NULL)
 		goto trunc;
-	    ND_PRINT("%s", s);
-	    buf += len;
 	    fmt++;
 	    break;
 	  }
 	case 'Z':
 	case 'Y':	/* like 'Z', but always ASCII */
 	  {
-	    const char *s;
-	    uint32_t len;
-
-	    ND_TCHECK_1(buf);
-	    if (EXTRACT_U_1(buf) != 4 && EXTRACT_U_1(buf) != 2) {
-		ND_PRINT("Error! ASCIIZ buffer of type %u", EXTRACT_U_1(buf));
+	    if (GET_U_1(buf) != 4 && GET_U_1(buf) != 2) {
+		ND_PRINT("Error! ASCIIZ buffer of type %u", GET_U_1(buf));
 		return maxbuf;	/* give up */
 	    }
-	    len = 0;
-	    s = unistr(ndo, buf + 1, &len, (*fmt == 'Y') ? 0 : unicodestr);
-	    if (s == NULL)
+	    buf = unistr(ndo, &strbuf, buf + 1, 0, 1, (*fmt == 'Y') ? 0 : unicodestr);
+	    ND_PRINT("%s", strbuf);
+	    if (buf == NULL)
 		goto trunc;
-	    ND_PRINT("%s", s);
-	    buf += len + 1;
 	    fmt++;
 	    break;
 	  }
@@ -682,28 +689,34 @@ smb_fdata1(netdissect_options *ndo,
 	    ND_PRINT("%-*.*s", l, l, buf);
 	    buf += l;
 	    fmt++;
-	    while (isdigit((unsigned char)*fmt))
+	    while (ND_ASCII_ISDIGIT(*fmt))
 		fmt++;
 	    break;
 	  }
 	case 'c':
 	  {
+            if (!stringlen_is_set) {
+                ND_PRINT("{stringlen not set}");
+                goto trunc;
+            }
 	    ND_TCHECK_LEN(buf, stringlen);
 	    ND_PRINT("%-*.*s", (int)stringlen, (int)stringlen, buf);
 	    buf += stringlen;
 	    fmt++;
-	    while (isdigit((unsigned char)*fmt))
+	    while (ND_ASCII_ISDIGIT(*fmt))
 		fmt++;
 	    break;
 	  }
 	case 'C':
 	  {
-	    const char *s;
-	    s = unistr(ndo, buf, &stringlen, unicodestr);
-	    if (s == NULL)
+            if (!stringlen_is_set) {
+                ND_PRINT("{stringlen not set}");
+                goto trunc;
+            }
+	    buf = unistr(ndo, &strbuf, buf, stringlen, 0, unicodestr);
+	    ND_PRINT("%s", strbuf);
+	    if (buf == NULL)
 		goto trunc;
-	    ND_PRINT("%s", s);
-	    buf += stringlen;
 	    fmt++;
 	    break;
 	  }
@@ -712,11 +725,11 @@ smb_fdata1(netdissect_options *ndo,
 	    int l = atoi(fmt + 1);
 	    ND_TCHECK_LEN(buf, l);
 	    while (l--) {
-		ND_PRINT("%02x", EXTRACT_U_1(buf));
+		ND_PRINT("%02x", GET_U_1(buf));
 		buf++;
 	    }
 	    fmt++;
-	    while (isdigit((unsigned char)*fmt))
+	    while (ND_ASCII_ISDIGIT(*fmt))
 		fmt++;
 	    break;
 	  }
@@ -729,7 +742,7 @@ smb_fdata1(netdissect_options *ndo,
 
 	    switch (t) {
 	    case 1:
-		name_type = name_extract(ndo, startbuf, PTR_DIFF(buf, startbuf),
+		name_type = name_extract(ndo, startbuf, ND_BYTES_BETWEEN(buf, startbuf),
 		    maxbuf, nbuf);
 		if (name_type < 0)
 		    goto trunc;
@@ -741,15 +754,14 @@ smb_fdata1(netdissect_options *ndo,
 		    name_type_str(name_type));
 		break;
 	    case 2:
-		ND_TCHECK_1(buf + 15);
-		name_type = EXTRACT_U_1(buf + 15);
+		name_type = GET_U_1(buf + 15);
 		ND_PRINT("%-15.15s NameType=0x%02X (%s)", buf, name_type,
 		    name_type_str(name_type));
 		buf += 16;
 		break;
 	    }
 	    fmt++;
-	    while (isdigit((unsigned char)*fmt))
+	    while (ND_ASCII_ISDIGIT(*fmt))
 		fmt++;
 	    break;
 	  }
@@ -762,26 +774,24 @@ smb_fdata1(netdissect_options *ndo,
 
 	    switch (atoi(fmt + 1)) {
 	    case 1:
-		ND_TCHECK_4(buf);
-		x = EXTRACT_LE_U_4(buf);
+		x = GET_LE_U_4(buf);
 		if (x == 0 || x == 0xFFFFFFFF)
 		    t = 0;
 		else
-		    t = make_unix_date(buf);
+		    t = make_unix_date(ndo, buf);
 		buf += 4;
 		break;
 	    case 2:
-		ND_TCHECK_4(buf);
-		x = EXTRACT_LE_U_4(buf);
+		x = GET_LE_U_4(buf);
 		if (x == 0 || x == 0xFFFFFFFF)
 		    t = 0;
 		else
-		    t = make_unix_date2(buf);
+		    t = make_unix_date2(ndo, buf);
 		buf += 4;
 		break;
 	    case 3:
 		ND_TCHECK_8(buf);
-		t = interpret_long_date(buf);
+		t = interpret_long_date(ndo, buf);
 		buf += 8;
 		break;
 	    default:
@@ -798,7 +808,7 @@ smb_fdata1(netdissect_options *ndo,
 		tstring = "NULL\n";
 	    ND_PRINT("%s", tstring);
 	    fmt++;
-	    while (isdigit((unsigned char)*fmt))
+	    while (ND_ASCII_ISDIGIT(*fmt))
 		fmt++;
 	    break;
 	  }
@@ -815,8 +825,7 @@ smb_fdata1(netdissect_options *ndo,
     return(buf);
 
 trunc:
-    ND_PRINT("\n");
-    ND_PRINT("WARNING: Short packet. Try increasing the snap length\n");
+    nd_print_trunc(ndo);
     return(NULL);
 }
 
@@ -832,11 +841,26 @@ smb_fdata(netdissect_options *ndo,
     while (*fmt) {
 	switch (*fmt) {
 	case '*':
+	    /*
+	     * List of multiple instances of something described by the
+	     * remainder of the string (which may itself include a list
+	     * of multiple instances of something, so we recurse).
+	     */
 	    fmt++;
 	    while (buf < maxbuf) {
 		const u_char *buf2;
 		depth++;
-		buf2 = smb_fdata(ndo, buf, fmt, maxbuf, unicodestr);
+		/*
+		 * In order to avoid stack exhaustion recurse at most 10
+		 * levels; that "should not happen", as no SMB structure
+		 * should be nested *that* deeply, and we thus shouldn't
+		 * have format strings with that level of nesting.
+		 */
+		if (depth == 10) {
+			ND_PRINT("(too many nested levels, not recursing)");
+			buf2 = buf;
+		} else
+			buf2 = smb_fdata(ndo, buf, fmt, maxbuf, unicodestr);
 		depth--;
 		if (buf2 == NULL)
 		    return(NULL);
@@ -847,22 +871,35 @@ smb_fdata(netdissect_options *ndo,
 	    return(buf);
 
 	case '|':
+	    /*
+	     * Just do a bounds check.
+	     */
 	    fmt++;
 	    if (buf >= maxbuf)
 		return(buf);
 	    break;
 
 	case '%':
+	    /*
+	     * XXX - unused?
+	     */
 	    fmt++;
 	    buf = maxbuf;
 	    break;
 
 	case '#':
+	    /*
+	     * Done?
+	     */
 	    fmt++;
 	    return(buf);
 	    break;
 
 	case '[':
+	    /*
+	     * Format of an item, enclosed in square brackets; dissect
+	     * the item with smb_fdata1().
+	     */
 	    fmt++;
 	    if (buf >= maxbuf)
 		return(buf);
@@ -876,19 +913,31 @@ smb_fdata(netdissect_options *ndo,
 	    s[p - fmt] = '\0';
 	    fmt = p + 1;
 	    buf = smb_fdata1(ndo, buf, s, maxbuf, unicodestr);
-	    if (buf == NULL)
+	    if (buf == NULL) {
+		/*
+		 * Truncated.
+		 * Is the next character a newline?
+		 * If so, print it before quitting, so we don't
+		 * get stuff in the middle of the line.
+		 */
+		if (*fmt == '\n')
+		    ND_PRINT("\n");
 		return(NULL);
+	    }
 	    break;
 
 	default:
+	    /*
+	     * Not a formatting character, so just print it.
+	     */
 	    ND_PRINT("%c", *fmt);
 	    fmt++;
 	    break;
 	}
     }
     if (!depth && buf < maxbuf) {
-	size_t len = PTR_DIFF(maxbuf, buf);
-	ND_PRINT("Data: (%lu bytes)\n", (unsigned long)len);
+	u_int len = ND_BYTES_BETWEEN(maxbuf, buf);
+	ND_PRINT("Data: (%u bytes)\n", len);
 	smb_data_print(ndo, buf, len);
 	return(buf + len);
     }
@@ -1026,17 +1075,17 @@ smb_errstr(int class, int num)
 		const err_code_struct *err = err_classes[i].err_msgs;
 		for (j = 0; err[j].name; j++)
 		    if (num == err[j].code) {
-			nd_snprintf(ret, sizeof(ret), "%s - %s (%s)",
+			snprintf(ret, sizeof(ret), "%s - %s (%s)",
 			    err_classes[i].class, err[j].name, err[j].message);
 			return ret;
 		    }
 	    }
 
-	    nd_snprintf(ret, sizeof(ret), "%s - %d", err_classes[i].class, num);
+	    snprintf(ret, sizeof(ret), "%s - %d", err_classes[i].class, num);
 	    return ret;
 	}
 
-    nd_snprintf(ret, sizeof(ret), "ERROR: Unknown error (%d,%d)", class, num);
+    snprintf(ret, sizeof(ret), "ERROR: Unknown error (%d,%d)", class, num);
     return(ret);
 }
 
@@ -1861,7 +1910,7 @@ static const nt_err_code_struct nt_errors[] = {
   { 0xC002100A, "RPC_P_SEND_FAILED" },
   { 0xC002100B, "RPC_P_TIMEOUT" },
   { 0xC002100C, "RPC_P_SERVER_TRANSPORT_ERROR" },
-  { 0xC002100E, "RPC_P_EXCEPTION_OCCURED" },
+  { 0xC002100E, "RPC_P_EXCEPTION_OCCURRED" },
   { 0xC0021012, "RPC_P_CONNECTION_SHUTDOWN" },
   { 0xC0021015, "RPC_P_THREAD_LISTENING" },
   { 0xC0030001, "RPC_NT_NO_MORE_ENTRIES" },
@@ -1917,6 +1966,6 @@ nt_errstr(uint32_t err)
 	    return nt_errors[i].name;
     }
 
-    nd_snprintf(ret, sizeof(ret), "0x%08x", err);
+    snprintf(ret, sizeof(ret), "0x%08x", err);
     return ret;
 }

@@ -100,8 +100,6 @@
 
 #include "netdissect-stdinc.h"
 #include "netdissect.h"
-#include <string.h>
-#include <stdlib.h>
 
 #include "ip.h"
 #include "ip6.h"
@@ -109,7 +107,6 @@
 #include "extract.h"
 #include "addrtoname.h"
 
-static const char tstr[] = " [|LISP]";
 
 #define IPv4_AFI			1
 #define IPv6_AFI			2
@@ -256,7 +253,7 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	lisp_hdr = (const lisp_map_register_hdr *) bp;
 	lisp_hdr_flag(ndo, lisp_hdr);
 	/* Supporting only MAP NOTIFY and MAP REGISTER LISP packets */
-	type_and_flag = EXTRACT_U_1(lisp_hdr->type_and_flag);
+	type_and_flag = GET_U_1(lisp_hdr->type_and_flag);
 	type = extract_lisp_type(type_and_flag);
 	if ((type != LISP_MAP_REGISTER) && (type != LISP_MAP_NOTIFY))
 		return;
@@ -265,13 +262,13 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	xtr_present = is_xtr_data_present(type, type_and_flag);
 
 	/* Extract the number of EID records present */
-	auth_data_len = EXTRACT_BE_U_2(lisp_hdr->auth_data_len);
+	auth_data_len = GET_BE_U_2(lisp_hdr->auth_data_len);
 	packet_iterator = (const u_char *)(lisp_hdr);
 	packet_offset = MAP_REGISTER_HDR_LEN;
-	record_count = EXTRACT_U_1(lisp_hdr->record_count);
+	record_count = GET_U_1(lisp_hdr->record_count);
 
 	if (ndo->ndo_vflag) {
-		key_id = EXTRACT_BE_U_2(lisp_hdr->key_id);
+		key_id = GET_BE_U_2(lisp_hdr->key_id);
 		ND_PRINT("\n    %u record(s), ", record_count);
 		ND_PRINT("Authentication %s,",
 			tok2str(auth_type, "unknown-type", key_id));
@@ -294,29 +291,29 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		lisp_eid = (const lisp_map_register_eid *)
 				((const u_char *)lisp_hdr + packet_offset);
 		packet_offset += MAP_REGISTER_EID_LEN;
-		mask_len = EXTRACT_U_1(lisp_eid->eid_prefix_mask_length);
-		eid_afi = EXTRACT_BE_U_2(lisp_eid->eid_prefix_afi);
-		loc_count = EXTRACT_U_1(lisp_eid->locator_count);
+		mask_len = GET_U_1(lisp_eid->eid_prefix_mask_length);
+		eid_afi = GET_BE_U_2(lisp_eid->eid_prefix_afi);
+		loc_count = GET_U_1(lisp_eid->locator_count);
 
 		if (ndo->ndo_vflag) {
-			ttl = EXTRACT_BE_U_4(lisp_eid->ttl);
+			ttl = GET_BE_U_4(lisp_eid->ttl);
 			ND_PRINT("      Record TTL %u,", ttl);
-			action_flag(ndo, EXTRACT_U_1(lisp_eid->act_auth_inc_res));
-			map_version = EXTRACT_BE_U_2(lisp_eid->reserved_and_version) & 0x0FFF;
+			action_flag(ndo, GET_U_1(lisp_eid->act_auth_inc_res));
+			map_version = GET_BE_U_2(lisp_eid->reserved_and_version) & 0x0FFF;
 			ND_PRINT(" Map Version: %u,", map_version);
 		}
 
 		switch (eid_afi) {
 		case IPv4_AFI:
-			ND_TCHECK_4(packet_iterator + packet_offset);
-			ND_PRINT(" EID %s/%u,", ipaddr_string(ndo,
-				packet_iterator + packet_offset), mask_len);
+			ND_PRINT(" EID %s/%u,",
+				GET_IPADDR_STRING(packet_iterator + packet_offset),
+				mask_len);
 			packet_offset += 4;
 			break;
 		case IPv6_AFI:
-			ND_TCHECK_16(packet_iterator + packet_offset);
-			ND_PRINT(" EID %s/%u,", ip6addr_string(ndo,
-				packet_iterator + packet_offset), mask_len);
+			ND_PRINT(" EID %s/%u,",
+				GET_IP6ADDR_STRING(packet_iterator + packet_offset),
+				mask_len);
 			packet_offset += 16;
 			break;
 		default:
@@ -335,7 +332,7 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			lisp_loc = (const lisp_map_register_loc *) (packet_iterator + packet_offset);
 			loc_ip_pointer = (const u_char *) (lisp_loc + 1);
 			packet_offset += MAP_REGISTER_LOC_LEN;
-			loc_afi = EXTRACT_BE_U_2(lisp_loc->locator_afi);
+			loc_afi = GET_BE_U_2(lisp_loc->locator_afi);
 
 			if (ndo->ndo_vflag)
 				ND_PRINT("\n       ");
@@ -343,12 +340,12 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			switch (loc_afi) {
 			case IPv4_AFI:
 				ND_TCHECK_4(packet_iterator + packet_offset);
-				ND_PRINT(" LOC %s", ipaddr_string(ndo, loc_ip_pointer));
+				ND_PRINT(" LOC %s", GET_IPADDR_STRING(loc_ip_pointer));
 				packet_offset += 4;
 				break;
 			case IPv6_AFI:
 				ND_TCHECK_16(packet_iterator + packet_offset);
-				ND_PRINT(" LOC %s", ip6addr_string(ndo, loc_ip_pointer));
+				ND_PRINT(" LOC %s", GET_IP6ADDR_STRING(loc_ip_pointer));
 				packet_offset += 16;
 				break;
 			default:
@@ -357,12 +354,12 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			if (ndo->ndo_vflag) {
 				ND_PRINT("\n          Priority/Weight %u/%u,"
 						" Multicast Priority/Weight %u/%u,",
-						EXTRACT_U_1(lisp_loc->priority),
-						EXTRACT_U_1(lisp_loc->weight),
-						EXTRACT_U_1(lisp_loc->m_priority),
-						EXTRACT_U_1(lisp_loc->m_weight));
+						GET_U_1(lisp_loc->priority),
+						GET_U_1(lisp_loc->weight),
+						GET_U_1(lisp_loc->m_priority),
+						GET_U_1(lisp_loc->m_weight));
 				loc_hdr_flag(ndo,
-					     EXTRACT_BE_U_2(lisp_loc->unused_and_flag));
+					     GET_BE_U_2(lisp_loc->unused_and_flag));
 			}
 		}
 	}
@@ -375,23 +372,22 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	if (xtr_present) {
 		if (!ND_TTEST_LEN(packet_iterator + packet_offset, 24))
 			goto invalid;
-		hex_print_with_offset(ndo, "\n    xTR-ID: ", packet_iterator + packet_offset, 16, 0);
+		hex_print(ndo, "\n    xTR-ID: ", packet_iterator + packet_offset, 16);
 		ND_PRINT("\n    SITE-ID: %" PRIu64,
-			EXTRACT_BE_U_8(packet_iterator + packet_offset + 16));
+			GET_BE_U_8(packet_iterator + packet_offset + 16));
 	} else {
 		/* Check if packet isn't over yet */
 		if (packet_iterator + packet_offset < ndo->ndo_snapend) {
-			hex_print_with_offset(ndo, "\n    Data: ", packet_iterator + packet_offset,
-				(ndo->ndo_snapend - (packet_iterator + packet_offset)), 0);
+			hex_print(ndo, "\n    Data: ", packet_iterator + packet_offset,
+				ND_BYTES_AVAILABLE_AFTER(packet_iterator + packet_offset));
 		}
 	}
 	return;
 trunc:
-	ND_PRINT("\n   %s", tstr);
+	nd_print_trunc(ndo);
 	return;
 invalid:
-	ND_PRINT("\n   %s", istr);
-	return;
+	nd_print_invalid(ndo);
 }
 
 static uint8_t
@@ -415,7 +411,7 @@ is_xtr_data_present(uint8_t type, uint8_t lisp_hdr_flags)
 
 static void lisp_hdr_flag(netdissect_options *ndo, const lisp_map_register_hdr *lisp_hdr)
 {
-	uint8_t type = extract_lisp_type(EXTRACT_U_1(lisp_hdr->type_and_flag));
+	uint8_t type = extract_lisp_type(GET_U_1(lisp_hdr->type_and_flag));
 
 	if (!ndo->ndo_vflag) {
 		ND_PRINT("%s,", tok2str(lisp_type, "unknown-type-%u", type));
@@ -426,13 +422,11 @@ static void lisp_hdr_flag(netdissect_options *ndo, const lisp_map_register_hdr *
 
 	if (type == LISP_MAP_REGISTER) {
 		ND_PRINT(" flags [%s],", bittok2str(map_register_hdr_flag,
-			 "none", EXTRACT_BE_U_4(lisp_hdr)));
+			 "none", GET_BE_U_4(lisp_hdr)));
 	} else if (type == LISP_MAP_NOTIFY) {
 		ND_PRINT(" flags [%s],", bittok2str(map_notify_hdr_flag,
-			 "none", EXTRACT_BE_U_4(lisp_hdr)));
+			 "none", GET_BE_U_4(lisp_hdr)));
 	}
-
-	return;
 }
 
 static void action_flag(netdissect_options *ndo, uint8_t act_auth_inc_res)

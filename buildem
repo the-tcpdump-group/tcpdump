@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# this script builds libpcap and tcpdump using the matrix of compilers and architectures
+# that travis also buildsd.
+
+if [ -f Makefile.in ]; then cd ..; fi
+here=`pwd`
+mkdir -p builds
+cd builds
+
+export CFLAGS='-fno-omit-frame-pointer -fsanitize=address -fno-optimize-sibling-calls -fPIC -Wextra -g3 -ggdb3 -O0 -Werror'
+for arch in i386 x86_64
+do
+        case $arch in
+        i386) CFLAGS="-m32 $CFLAGS"; export LDFLAGS="-m32"; export CXXFLAGS=-m32; target="i686-pc-linux-gnu" ;;
+        esac
+        (
+        for compiler in clang-6.0 gcc
+        do
+                mkdir -p $arch/$compiler
+                set -x
+                (cd $arch/$compiler && mkdir -p libpcap tcpdump &&
+                  (cd libpcap && CC=$compiler $here/libpcap/configure --target=$target && make ) &&
+                  (cd tcpdump && CC=$compiler $here/tcpdump/configure --target=$target && make && make check))
+        done
+        )
+done
+

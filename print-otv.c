@@ -23,6 +23,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 
@@ -47,29 +48,29 @@ otv_print(netdissect_options *ndo, const u_char *bp, u_int len)
 
     ndo->ndo_protocol = "otv";
     ND_PRINT("OTV, ");
-    if (len < OTV_HDR_LEN)
-        goto trunc;
+    if (len < OTV_HDR_LEN) {
+        ND_PRINT("[length %u < %u]", len, OTV_HDR_LEN);
+        goto invalid;
+    }
 
-    ND_TCHECK_1(bp);
-    flags = EXTRACT_U_1(bp);
+    flags = GET_U_1(bp);
     ND_PRINT("flags [%s] (0x%02x), ", flags & 0x08 ? "I" : ".", flags);
     bp += 1;
 
-    ND_TCHECK_3(bp);
-    ND_PRINT("overlay %u, ", EXTRACT_BE_U_3(bp));
+    ND_PRINT("overlay %u, ", GET_BE_U_3(bp));
     bp += 3;
 
-    ND_TCHECK_3(bp);
-    ND_PRINT("instance %u\n", EXTRACT_BE_U_3(bp));
+    ND_PRINT("instance %u\n", GET_BE_U_3(bp));
     bp += 3;
 
     /* Reserved */
     ND_TCHECK_1(bp);
     bp += 1;
 
-    ether_print(ndo, bp, len - OTV_HDR_LEN, ndo->ndo_snapend - bp, NULL, NULL);
+    ether_print(ndo, bp, len - OTV_HDR_LEN, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL);
     return;
 
-trunc:
-    ND_PRINT(" [|OTV]");
+invalid:
+    nd_print_invalid(ndo);
+    ND_TCHECK_LEN(bp, len);
 }

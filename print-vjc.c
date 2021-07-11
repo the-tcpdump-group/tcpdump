@@ -77,7 +77,7 @@
  * unused argument remind us that we should fix this some day.
  *
  * XXX - also, it fetches the TCP checksum field in COMPRESSED_TCP
- * packets directly, rather than with EXTRACT_BE_U_2(); RFC 1144 says
+ * packets with GET_HE_U_2, rather than with GET_BE_U_2(); RFC 1144 says
  * it's "the unmodified TCP checksum", which would imply that it's
  * big-endian, but perhaps, on the platform where this was developed,
  * the packets were munged by the networking stack before being handed
@@ -89,7 +89,7 @@ vjc_print(netdissect_options *ndo, const u_char *bp, u_short proto _U_)
 	int i;
 
 	ndo->ndo_protocol = "vjc";
-	switch (EXTRACT_U_1(bp) & 0xf0) {
+	switch (GET_U_1(bp) & 0xf0) {
 	case TYPE_IP:
 		if (ndo->ndo_eflag)
 			ND_PRINT("(vjc type=IP) ");
@@ -102,13 +102,13 @@ vjc_print(netdissect_options *ndo, const u_char *bp, u_short proto _U_)
 		if (ndo->ndo_eflag)
 			ND_PRINT("(vjc type=compressed TCP) ");
 		for (i = 0; i < 8; i++) {
-			if (EXTRACT_U_1(bp + 1) & (0x80 >> i))
+			if (GET_U_1(bp + 1) & (0x80 >> i))
 				ND_PRINT("%c", "?CI?SAWU"[i]);
 		}
-		if (EXTRACT_U_1(bp + 1))
+		if (GET_U_1(bp + 1))
 			ND_PRINT(" ");
-		ND_PRINT("C=0x%02x ", EXTRACT_U_1(bp + 2));
-		ND_PRINT("sum=0x%04x ", *(const u_short *)(bp + 3));
+		ND_PRINT("C=0x%02x ", GET_U_1(bp + 2));
+		ND_PRINT("sum=0x%04x ", GET_HE_U_2(bp + 3));
 		return -1;
 	case TYPE_ERROR:
 		if (ndo->ndo_eflag)
@@ -116,7 +116,7 @@ vjc_print(netdissect_options *ndo, const u_char *bp, u_short proto _U_)
 		return -1;
 	default:
 		if (ndo->ndo_eflag)
-			ND_PRINT("(vjc type=0x%02x) ", EXTRACT_U_1(bp) & 0xf0);
+			ND_PRINT("(vjc type=0x%02x) ", GET_U_1(bp) & 0xf0);
 		return -1;
 	}
 }

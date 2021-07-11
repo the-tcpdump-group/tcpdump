@@ -1,7 +1,7 @@
 /*
  * Decode and print Zephyr packets.
  *
- *	http://web.mit.edu/zephyr/doc/protocol
+ *	https://web.mit.edu/zephyr/doc/protocol
  *
  * Copyright (c) 2001 Nickolai Zeldovich <kolya@MIT.EDU>
  * All rights reserved.
@@ -32,7 +32,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "netdissect-ctype.h"
+
 #include "netdissect.h"
+#include "extract.h"
 
 struct z_packet {
     const char *version;
@@ -83,7 +86,7 @@ static const struct tok z_types[] = {
 static char z_buf[256];
 
 static const char *
-parse_field(netdissect_options *ndo, const char **pptr, int *len, int *truncated)
+parse_field(netdissect_options *ndo, const char **pptr, int *len)
 {
     const char *s;
 
@@ -95,12 +98,7 @@ parse_field(netdissect_options *ndo, const char **pptr, int *len, int *truncated
 	    /* Ran out of packet data without finding it */
 	    return NULL;
 	}
-	if (!ND_TTEST_SIZE(*pptr)) {
-	    /* Ran out of captured data without finding it */
-	    *truncated = 1;
-	    return NULL;
-	}
-	if (**pptr == '\0') {
+	if (GET_U_1(*pptr) == '\0') {
 	    /* Found it */
 	    break;
 	}
@@ -119,7 +117,7 @@ z_triple(const char *class, const char *inst, const char *recipient)
 {
     if (!*recipient)
 	recipient = "*";
-    nd_snprintf(z_buf, sizeof(z_buf), "<%s,%s,%s>", class, inst, recipient);
+    snprintf(z_buf, sizeof(z_buf), "<%s,%s,%s>", class, inst, recipient);
     z_buf[sizeof(z_buf)-1] = '\0';
     return z_buf;
 }
@@ -134,7 +132,7 @@ str_to_lower(const char *string)
 
     zb_string = z_buf;
     while (*zb_string) {
-	*zb_string = tolower((unsigned char)(*zb_string));
+	*zb_string = ND_ASCII_TOLOWER(*zb_string);
 	zb_string++;
     }
 
@@ -142,7 +140,7 @@ str_to_lower(const char *string)
 }
 
 void
-zephyr_print(netdissect_options *ndo, const u_char *cp, int length)
+zephyr_print(netdissect_options *ndo, const u_char *cp, u_int length)
 {
     struct z_packet z = {
         NULL,	/* version */
@@ -167,14 +165,12 @@ zephyr_print(netdissect_options *ndo, const u_char *cp, int length)
     int parselen = length;
     const char *s;
     int lose = 0;
-    int truncated = 0;
 
     ndo->ndo_protocol = "zephyr";
     /* squelch compiler warnings */
 
 #define PARSE_STRING						\
-	s = parse_field(ndo, &parse, &parselen, &truncated);	\
-	if (truncated) goto trunc;				\
+	s = parse_field(ndo, &parse, &parselen);	\
 	if (!s) lose = 1;
 
 #define PARSE_FIELD_INT(field)			\
@@ -186,7 +182,9 @@ zephyr_print(netdissect_options *ndo, const u_char *cp, int length)
 	if (!lose) field = s;
 
     PARSE_FIELD_STR(z.version);
-    if (lose) return;
+    if (lose)
+        goto invalid;
+
     if (strncmp(z.version, "ZEPH", 4))
 	return;
 
@@ -208,7 +206,7 @@ zephyr_print(netdissect_options *ndo, const u_char *cp, int length)
     PARSE_FIELD_STR(z.multi_uid);
 
     if (lose)
-        goto trunc;
+        goto invalid;
 
     ND_PRINT(" zephyr");
     if (strncmp(z.version+4, "0.2", 3)) {
@@ -342,7 +340,6 @@ zephyr_print(netdissect_options *ndo, const u_char *cp, int length)
 	ND_PRINT(" op %s", z.opcode);
     return;
 
-trunc:
-    ND_PRINT(" [|zephyr] (%d)", length);
-    return;
+invalid:
+    nd_print_invalid(ndo);
 }

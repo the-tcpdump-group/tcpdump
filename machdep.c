@@ -23,13 +23,7 @@
 #include <config.h>
 #endif
 
-/*
- * XXX - all we need, on platforms other than DEC OSF/1 (a/k/a Digital UNIX,
- * a/k/a Tru64 UNIX), is "size_t", which is a standard C type; what do we
- * need to do to get it defined?  This is clearly wrong, as we shouldn't
- * have to include UNIX or Windows system header files to get it.
- */
-#include "netdissect-stdinc.h"
+#include <stddef.h>
 
 #ifdef __osf__
 #include <stdio.h>
@@ -37,6 +31,7 @@
 #include <sys/proc.h>
 #endif /* __osf__ */
 
+#include "varattrs.h"
 #include "machdep.h"
 
 /*

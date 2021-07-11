@@ -27,6 +27,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
@@ -52,7 +53,7 @@ struct firewire_header {
 static const char *
 fwaddr_string(netdissect_options *ndo, const u_char *addr)
 {
-	return (linkaddr_string(ndo, addr, LINKADDR_IEEE1394, FIREWIRE_EUI64_LEN));
+	return GET_LINKADDR_STRING(addr, LINKADDR_IEEE1394, FIREWIRE_EUI64_LEN);
 }
 
 static void
@@ -67,7 +68,7 @@ ap1394_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		     fwaddr_string(ndo, fp->firewire_shost),
 		     fwaddr_string(ndo, fp->firewire_dhost));
 
-	firewire_type = EXTRACT_BE_U_2(fp->firewire_type);
+	firewire_type = GET_BE_U_2(fp->firewire_type);
 	if (!ndo->ndo_qflag) {
 		ND_PRINT(", ethertype %s (0x%04x)",
 			       tok2str(ethertype_values,"Unknown", firewire_type),
@@ -85,7 +86,7 @@ ap1394_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
+void
 ap1394_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int length = h->len;
@@ -94,11 +95,9 @@ ap1394_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 	u_short ether_type;
 	struct lladdr_info src, dst;
 
-	ndo->ndo_protocol = "ap1394_if";
-	if (caplen < FIREWIRE_HDRLEN) {
-		ND_PRINT("[|ap1394]");
-		return FIREWIRE_HDRLEN;
-	}
+	ndo->ndo_protocol = "ap1394";
+	ND_TCHECK_LEN(p, FIREWIRE_HDRLEN);
+	ndo->ndo_ll_hdr_len += FIREWIRE_HDRLEN;
 
 	if (ndo->ndo_eflag)
 		ap1394_hdr_print(ndo, p, length);
@@ -108,7 +107,7 @@ ap1394_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 	fp = (const struct firewire_header *)p;
 	p += FIREWIRE_HDRLEN;
 
-	ether_type = EXTRACT_BE_U_2(fp->firewire_type);
+	ether_type = GET_BE_U_2(fp->firewire_type);
 	src.addr = fp->firewire_shost;
 	src.addr_string = fwaddr_string;
 	dst.addr = fp->firewire_dhost;
@@ -121,6 +120,4 @@ ap1394_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 		if (!ndo->ndo_suppress_default_print)
 			ND_DEFAULTPRINT(p, caplen);
 	}
-
-	return FIREWIRE_HDRLEN;
 }

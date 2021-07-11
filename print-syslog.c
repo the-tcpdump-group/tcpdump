@@ -15,6 +15,7 @@
  */
 
 /* \summary: Syslog protocol printer */
+/* specification: RFC 3164 (not RFC 5424) */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -25,7 +26,6 @@
 #include "netdissect.h"
 #include "extract.h"
 
-static const char tstr[] = "[|syslog]";
 
 /*
  * tokenlists and #defines taken from Ethereal - Network traffic analyzer
@@ -34,7 +34,7 @@ static const char tstr[] = "[|syslog]";
 
 #define SYSLOG_SEVERITY_MASK 0x0007  /* 0000 0000 0000 0111 */
 #define SYSLOG_FACILITY_MASK 0x03f8  /* 0000 0011 1111 1000 */
-#define SYSLOG_MAX_DIGITS 3 /* The maximum number if priority digits to read in. */
+#define SYSLOG_MAX_DIGITS 3 /* The maximum number of priority digits to read in. */
 
 static const struct tok syslog_severity_values[] = {
   { 0,      "emergency" },
@@ -91,26 +91,20 @@ syslog_print(netdissect_options *ndo,
      * severity and facility values
      */
 
-    ND_TCHECK_1(pptr);
-    if (EXTRACT_U_1(pptr + msg_off) == '<') {
+    if (GET_U_1(pptr) != '<')
+        goto invalid;
+    msg_off++;
+
+    while (msg_off <= SYSLOG_MAX_DIGITS &&
+           GET_U_1(pptr + msg_off) >= '0' &&
+           GET_U_1(pptr + msg_off) <= '9') {
+        pri = pri * 10 + (GET_U_1(pptr + msg_off) - '0');
         msg_off++;
-        ND_TCHECK_1(pptr + msg_off);
-        while (msg_off <= SYSLOG_MAX_DIGITS &&
-               EXTRACT_U_1(pptr + msg_off) >= '0' &&
-               EXTRACT_U_1(pptr + msg_off) <= '9') {
-            pri = pri * 10 + (EXTRACT_U_1(pptr + msg_off) - '0');
-            msg_off++;
-            ND_TCHECK_1(pptr + msg_off);
-        }
-        if (EXTRACT_U_1(pptr + msg_off) != '>') {
-            ND_PRINT("%s", tstr);
-            return;
-        }
-        msg_off++;
-    } else {
-        ND_PRINT("%s", tstr);
-        return;
     }
+
+    if (GET_U_1(pptr + msg_off) != '>')
+        goto invalid;
+    msg_off++;
 
     facility = (pri & SYSLOG_FACILITY_MASK) >> 3;
     severity = pri & SYSLOG_SEVERITY_MASK;
@@ -132,16 +126,25 @@ syslog_print(netdissect_options *ndo,
            severity);
 
     /* print the syslog text in verbose mode */
-    for (; msg_off < len; msg_off++) {
-        ND_TCHECK_1(pptr + msg_off);
-        safeputchar(ndo, EXTRACT_U_1(pptr + msg_off));
-    }
+    /*
+     * RFC 3164 Section 4.1.3: "There is no ending delimiter to this part.
+     * The MSG part of the syslog packet MUST contain visible (printing)
+     * characters."
+     *
+     * RFC 5424 Section 8.2: "This document does not impose any mandatory
+     * restrictions on the MSG or PARAM-VALUE content.  As such, they MAY
+     * contain control characters, including the NUL character."
+     *
+     * Hence, to aid in protocol debugging, print the full MSG without
+     * beautification to make it clear what was transmitted on the wire.
+     */
+    if (len > msg_off)
+        nd_printjn(ndo, pptr + msg_off, len - msg_off);
 
     if (ndo->ndo_vflag > 1)
         print_unknown_data(ndo, pptr, "\n\t", len);
-
     return;
 
-trunc:
-    ND_PRINT("%s", tstr);
+invalid:
+    nd_print_invalid(ndo);
 }

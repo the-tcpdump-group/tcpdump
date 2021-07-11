@@ -65,8 +65,8 @@
  *	@(#)ip.h	8.1 (Berkeley) 6/10/93
  */
 
-#ifndef _NETINET_IP6_H_
-#define _NETINET_IP6_H_
+#ifndef ND_IP6_H_
+#define ND_IP6_H_
 
 /*
  * Definition for internet protocol version 6.
@@ -88,7 +88,7 @@ struct ip6_hdr {
 };
 
 #define ip6_vfc		ip6_ctlun.ip6_un2_vfc
-#define IP6_VERSION(ip6_hdr)	((EXTRACT_U_1((ip6_hdr)->ip6_vfc) & 0xf0) >> 4)
+#define IP6_VERSION(ip6_hdr)	((GET_U_1((ip6_hdr)->ip6_vfc) & 0xf0) >> 4)
 #define ip6_flow	ip6_ctlun.ip6_un1.ip6_un1_flow
 #define ip6_plen	ip6_ctlun.ip6_un1.ip6_un1_plen
 #define ip6_nxt		ip6_ctlun.ip6_un1.ip6_un1_nxt
@@ -98,11 +98,6 @@ struct ip6_hdr {
 /* in network endian */
 #define IPV6_FLOWINFO_MASK	((uint32_t)htonl(0x0fffffff))	/* flow info (28 bits) */
 #define IPV6_FLOWLABEL_MASK	((uint32_t)htonl(0x000fffff))	/* flow label (20 bits) */
-#if 1
-/* ECN bits proposed by Sally Floyd */
-#define IP6TOS_CE		0x01	/* congestion experienced */
-#define IP6TOS_ECT		0x02	/* ECN-capable transport */
-#endif
 
 /*
  * Extension Headers
@@ -127,7 +122,7 @@ struct ip6_dest {
 	/* followed by options */
 };
 
-/* http://www.iana.org/assignments/ipv6-parameters/ipv6-parameters.xhtml */
+/* https://www.iana.org/assignments/ipv6-parameters/ipv6-parameters.xhtml */
 
 /* Option types and related macros */
 #define IP6OPT_PAD1		0x00	/* 00 0 00000 */
@@ -214,4 +209,4 @@ struct ip6_frag {
 #define IP6F_RESERVED_MASK	0x0006	/* reserved bits in ip6f_offlg */
 #define IP6F_MORE_FRAG		0x0001	/* more-fragments flag */
 
-#endif /* not _NETINET_IP6_H_ */
+#endif /* not ND_IP6_H_ */

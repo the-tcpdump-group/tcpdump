@@ -40,7 +40,6 @@
 #endif
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include "netdissect-stdinc.h"
 
@@ -59,12 +58,13 @@
 #define ERROR_RX_PORT	7006		/* Doesn't seem to be used */
 #define BOS_RX_PORT	7007
 
-#define AFSNAMEMAX 256
 #define AFSOPAQUEMAX 1024
+#define AFSNAMEMAX 256			/* Must be >= PRNAMEMAX + 1, VLNAMEMAX + 1, and 32 + 1 */
 #define PRNAMEMAX 64
 #define VLNAMEMAX 65
 #define KANAMEMAX 64
 #define BOSNAMEMAX 256
+#define USERNAMEMAX 1024		/* AFSOPAQUEMAX was used for this; does it need to be this big? */
 
 #define	PRSFS_READ		1 /* Read files */
 #define	PRSFS_WRITE		2 /* Write files */
@@ -480,9 +480,9 @@ static const struct tok rx_ack_reasons[] = {
 
 struct rx_cache_entry {
 	uint32_t	callnum;	/* Call number (net order) */
-	struct in_addr	client;		/* client IP address (net order) */
-	struct in_addr	server;		/* server IP address (net order) */
-	u_int		dport;		/* server port (host order) */
+	uint32_t	client;		/* client IP address (net order) */
+	uint32_t	server;		/* server IP address (net order) */
+	uint16_t	dport;		/* server UDP port (host order) */
 	uint16_t	serviceId;	/* Service identifier (net order) */
 	uint32_t	opcode;		/* RX opcode (host order) */
 };
@@ -493,13 +493,13 @@ static struct rx_cache_entry	rx_cache[RX_CACHE_SIZE];
 
 static uint32_t	rx_cache_next = 0;
 static uint32_t	rx_cache_hint = 0;
-static void	rx_cache_insert(netdissect_options *, const u_char *, const struct ip *, u_int);
-static int	rx_cache_find(const struct rx_header *, const struct ip *,
-			      uint32_t, uint32_t *);
+static void	rx_cache_insert(netdissect_options *, const u_char *, const struct ip *, uint16_t);
+static int	rx_cache_find(netdissect_options *, const struct rx_header *,
+			      const struct ip *, uint16_t, uint32_t *);
 
 static void fs_print(netdissect_options *, const u_char *, u_int);
 static void fs_reply_print(netdissect_options *, const u_char *, u_int, uint32_t);
-static void acl_print(netdissect_options *, u_char *, int, u_char *);
+static void acl_print(netdissect_options *, u_char *, u_char *);
 static void cb_print(netdissect_options *, const u_char *, u_int);
 static void cb_reply_print(netdissect_options *, const u_char *, u_int, uint32_t);
 static void prot_print(netdissect_options *, const u_char *, u_int);
@@ -526,7 +526,7 @@ static int is_ubik(uint32_t);
 
 void
 rx_print(netdissect_options *ndo,
-         const u_char *bp, u_int length, u_int sport, u_int dport,
+         const u_char *bp, u_int length, uint16_t sport, uint16_t dport,
          const u_char *bp2)
 {
 	const struct rx_header *rxh;
@@ -542,26 +542,26 @@ rx_print(netdissect_options *ndo,
 
 	rxh = (const struct rx_header *) bp;
 
-	type = EXTRACT_U_1(rxh->type);
+	type = GET_U_1(rxh->type);
 	ND_PRINT(" rx %s", tok2str(rx_types, "type %u", type));
 
-	flags = EXTRACT_U_1(rxh->flags);
+	flags = GET_U_1(rxh->flags);
 	if (ndo->ndo_vflag) {
 		int firstflag = 0;
 
 		if (ndo->ndo_vflag > 1)
 			ND_PRINT(" cid %08x call# %u",
-			       EXTRACT_BE_U_4(rxh->cid),
-			       EXTRACT_BE_U_4(rxh->callNumber));
+			       GET_BE_U_4(rxh->cid),
+			       GET_BE_U_4(rxh->callNumber));
 
 		ND_PRINT(" seq %u ser %u",
-		       EXTRACT_BE_U_4(rxh->seq),
-		       EXTRACT_BE_U_4(rxh->serial));
+		       GET_BE_U_4(rxh->seq),
+		       GET_BE_U_4(rxh->serial));
 
 		if (ndo->ndo_vflag > 2)
 			ND_PRINT(" secindex %u serviceid %hu",
-				EXTRACT_U_1(rxh->securityIndex),
-				EXTRACT_BE_U_2(rxh->serviceId));
+				GET_U_1(rxh->securityIndex),
+				GET_BE_U_2(rxh->serviceId));
 
 		if (ndo->ndo_vflag > 1)
 			for (i = 0; i < NUM_RX_FLAGS; i++) {
@@ -589,7 +589,7 @@ rx_print(netdissect_options *ndo,
 	 */
 
 	if (type == RX_PACKET_TYPE_DATA &&
-	    EXTRACT_BE_U_4(rxh->seq) == 1 &&
+	    GET_BE_U_4(rxh->seq) == 1 &&
 	    flags & RX_CLIENT_INITIATED) {
 
 		/*
@@ -633,10 +633,10 @@ rx_print(netdissect_options *ndo,
 	 */
 
 	} else if (((type == RX_PACKET_TYPE_DATA &&
-					EXTRACT_BE_U_4(rxh->seq) == 1) ||
+					GET_BE_U_4(rxh->seq) == 1) ||
 		    type == RX_PACKET_TYPE_ABORT) &&
 		   (flags & RX_CLIENT_INITIATED) == 0 &&
-		   rx_cache_find(rxh, (const struct ip *) bp2,
+		   rx_cache_find(ndo, rxh, (const struct ip *) bp2,
 				 sport, &opcode)) {
 
 		switch (sport) {
@@ -684,7 +684,7 @@ rx_print(netdissect_options *ndo,
 
 static void
 rx_cache_insert(netdissect_options *ndo,
-                const u_char *bp, const struct ip *ip, u_int dport)
+                const u_char *bp, const struct ip *ip, uint16_t dport)
 {
 	struct rx_cache_entry *rxent;
 	const struct rx_header *rxh = (const struct rx_header *) bp;
@@ -697,12 +697,12 @@ rx_cache_insert(netdissect_options *ndo,
 	if (++rx_cache_next >= RX_CACHE_SIZE)
 		rx_cache_next = 0;
 
-	rxent->callnum = EXTRACT_BE_U_4(rxh->callNumber);
-	UNALIGNED_MEMCPY(&rxent->client, ip->ip_src, sizeof(uint32_t));
-	UNALIGNED_MEMCPY(&rxent->server, ip->ip_dst, sizeof(uint32_t));
+	rxent->callnum = GET_BE_U_4(rxh->callNumber);
+	rxent->client = GET_IPV4_TO_NETWORK_ORDER(ip->ip_src);
+	rxent->server = GET_IPV4_TO_NETWORK_ORDER(ip->ip_dst);
 	rxent->dport = dport;
-	rxent->serviceId = EXTRACT_BE_U_4(rxh->serviceId);
-	rxent->opcode = EXTRACT_BE_U_4(bp + sizeof(struct rx_header));
+	rxent->serviceId = GET_BE_U_2(rxh->serviceId);
+	rxent->opcode = GET_BE_U_4(bp + sizeof(struct rx_header));
 }
 
 /*
@@ -713,26 +713,26 @@ rx_cache_insert(netdissect_options *ndo,
  */
 
 static int
-rx_cache_find(const struct rx_header *rxh, const struct ip *ip, u_int sport,
-	      uint32_t *opcode)
+rx_cache_find(netdissect_options *ndo, const struct rx_header *rxh,
+	      const struct ip *ip, uint16_t sport, uint32_t *opcode)
 {
 	uint32_t i;
 	struct rx_cache_entry *rxent;
 	uint32_t clip;
 	uint32_t sip;
 
-	UNALIGNED_MEMCPY(&clip, ip->ip_dst, sizeof(uint32_t));
-	UNALIGNED_MEMCPY(&sip, ip->ip_src, sizeof(uint32_t));
+	clip = GET_IPV4_TO_NETWORK_ORDER(ip->ip_dst);
+	sip = GET_IPV4_TO_NETWORK_ORDER(ip->ip_src);
 
 	/* Start the search where we last left off */
 
 	i = rx_cache_hint;
 	do {
 		rxent = &rx_cache[i];
-		if (rxent->callnum == EXTRACT_BE_U_4(rxh->callNumber) &&
-		    rxent->client.s_addr == clip &&
-		    rxent->server.s_addr == sip &&
-		    rxent->serviceId == EXTRACT_BE_U_4(rxh->serviceId) &&
+		if (rxent->callnum == GET_BE_U_4(rxh->callNumber) &&
+		    rxent->client == clip &&
+		    rxent->server == sip &&
+		    rxent->serviceId == GET_BE_U_2(rxh->serviceId) &&
 		    rxent->dport == sport) {
 
 			/* We got a match! */
@@ -750,57 +750,52 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, u_int sport,
 }
 
 /*
- * These extrememly grody macros handle the printing of various AFS stuff.
+ * These extremely grody macros handle the printing of various AFS stuff.
  */
 
 #define FIDOUT() { uint32_t n1, n2, n3; \
 			ND_TCHECK_LEN(bp, sizeof(uint32_t) * 3); \
-			n1 = EXTRACT_BE_U_4(bp); \
+			n1 = GET_BE_U_4(bp); \
 			bp += sizeof(uint32_t); \
-			n2 = EXTRACT_BE_U_4(bp); \
+			n2 = GET_BE_U_4(bp); \
 			bp += sizeof(uint32_t); \
-			n3 = EXTRACT_BE_U_4(bp); \
+			n3 = GET_BE_U_4(bp); \
 			bp += sizeof(uint32_t); \
 			ND_PRINT(" fid %u/%u/%u", n1, n2, n3); \
 		}
 
 #define STROUT(MAX) { uint32_t _i; \
-			ND_TCHECK_LEN(bp, sizeof(uint32_t)); \
-			_i = EXTRACT_BE_U_4(bp); \
+			_i = GET_BE_U_4(bp); \
 			if (_i > (MAX)) \
 				goto trunc; \
 			bp += sizeof(uint32_t); \
 			ND_PRINT(" \""); \
-			if (fn_printn(ndo, bp, _i, ndo->ndo_snapend)) \
+			if (nd_printn(ndo, bp, _i, ndo->ndo_snapend)) \
 				goto trunc; \
 			ND_PRINT("\""); \
 			bp += ((_i + sizeof(uint32_t) - 1) / sizeof(uint32_t)) * sizeof(uint32_t); \
 		}
 
 #define INTOUT() { int32_t _i; \
-			ND_TCHECK_4(bp); \
-			_i = EXTRACT_BE_S_4(bp); \
+			_i = GET_BE_S_4(bp); \
 			bp += sizeof(int32_t); \
 			ND_PRINT(" %d", _i); \
 		}
 
 #define UINTOUT() { uint32_t _i; \
-			ND_TCHECK_4(bp); \
-			_i = EXTRACT_BE_U_4(bp); \
+			_i = GET_BE_U_4(bp); \
 			bp += sizeof(uint32_t); \
 			ND_PRINT(" %u", _i); \
 		}
 
 #define UINT64OUT() { uint64_t _i; \
-			ND_TCHECK_LEN(bp, sizeof(uint64_t)); \
-			_i = EXTRACT_BE_U_8(bp); \
+			_i = GET_BE_U_8(bp); \
 			bp += sizeof(uint64_t); \
 			ND_PRINT(" %" PRIu64, _i); \
 		}
 
 #define DATEOUT() { time_t _t; struct tm *tm; char str[256]; \
-			ND_TCHECK_4(bp); \
-			_t = (time_t) EXTRACT_BE_S_4(bp); \
+			_t = (time_t) GET_BE_S_4(bp); \
 			bp += sizeof(int32_t); \
 			tm = localtime(&_t); \
 			strftime(str, 256, "%Y/%m/%d %H:%M:%S", tm); \
@@ -809,17 +804,17 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, u_int sport,
 
 #define STOREATTROUT() { uint32_t mask, _i; \
 			ND_TCHECK_LEN(bp, (sizeof(uint32_t) * 6)); \
-			mask = EXTRACT_BE_U_4(bp); bp += sizeof(uint32_t); \
+			mask = GET_BE_U_4(bp); bp += sizeof(uint32_t); \
 			if (mask) ND_PRINT(" StoreStatus"); \
 		        if (mask & 1) { ND_PRINT(" date"); DATEOUT(); } \
 			else bp += sizeof(uint32_t); \
-			_i = EXTRACT_BE_U_4(bp); bp += sizeof(uint32_t); \
+			_i = GET_BE_U_4(bp); bp += sizeof(uint32_t); \
 		        if (mask & 2) ND_PRINT(" owner %u", _i);  \
-			_i = EXTRACT_BE_U_4(bp); bp += sizeof(uint32_t); \
+			_i = GET_BE_U_4(bp); bp += sizeof(uint32_t); \
 		        if (mask & 4) ND_PRINT(" group %u", _i); \
-			_i = EXTRACT_BE_U_4(bp); bp += sizeof(uint32_t); \
+			_i = GET_BE_U_4(bp); bp += sizeof(uint32_t); \
 		        if (mask & 8) ND_PRINT(" mode %o", _i & 07777); \
-			_i = EXTRACT_BE_U_4(bp); bp += sizeof(uint32_t); \
+			_i = GET_BE_U_4(bp); bp += sizeof(uint32_t); \
 		        if (mask & 16) ND_PRINT(" segsize %u", _i); \
 			/* undocumented in 3.3 docu */ \
 		        if (mask & 1024) ND_PRINT(" fsync");  \
@@ -827,26 +822,26 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, u_int sport,
 
 #define UBIK_VERSIONOUT() {uint32_t epoch; uint32_t counter; \
 			ND_TCHECK_LEN(bp, sizeof(uint32_t) * 2); \
-			epoch = EXTRACT_BE_U_4(bp); \
+			epoch = GET_BE_U_4(bp); \
 			bp += sizeof(uint32_t); \
-			counter = EXTRACT_BE_U_4(bp); \
+			counter = GET_BE_U_4(bp); \
 			bp += sizeof(uint32_t); \
 			ND_PRINT(" %u.%u", epoch, counter); \
 		}
 
 #define AFSUUIDOUT() {uint32_t temp; int _i; \
 			ND_TCHECK_LEN(bp, 11 * sizeof(uint32_t)); \
-			temp = EXTRACT_BE_U_4(bp); \
+			temp = GET_BE_U_4(bp); \
 			bp += sizeof(uint32_t); \
 			ND_PRINT(" %08x", temp); \
-			temp = EXTRACT_BE_U_4(bp); \
+			temp = GET_BE_U_4(bp); \
 			bp += sizeof(uint32_t); \
 			ND_PRINT("%04x", temp); \
-			temp = EXTRACT_BE_U_4(bp); \
+			temp = GET_BE_U_4(bp); \
 			bp += sizeof(uint32_t); \
 			ND_PRINT("%04x", temp); \
 			for (_i = 0; _i < 8; _i++) { \
-				temp = EXTRACT_BE_U_4(bp); \
+				temp = GET_BE_U_4(bp); \
 				bp += sizeof(uint32_t); \
 				ND_PRINT("%02x", (unsigned char) temp); \
 			} \
@@ -854,32 +849,31 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, u_int sport,
 
 /*
  * This is the sickest one of all
+ * MAX is expected to be a constant here
  */
 
 #define VECOUT(MAX) { u_char *sp; \
-			u_char s[AFSNAMEMAX]; \
+			u_char s[(MAX) + 1]; \
 			uint32_t k; \
-			if ((MAX) + 1 > sizeof(s)) \
-				goto trunc; \
 			ND_TCHECK_LEN(bp, (MAX) * sizeof(uint32_t)); \
 			sp = s; \
 			for (k = 0; k < (MAX); k++) { \
-				*sp++ = (u_char) EXTRACT_BE_U_4(bp); \
+				*sp++ = (u_char) GET_BE_U_4(bp); \
 				bp += sizeof(uint32_t); \
 			} \
 			s[(MAX)] = '\0'; \
 			ND_PRINT(" \""); \
-			fn_print(ndo, s, NULL); \
+			fn_print_str(ndo, s); \
 			ND_PRINT("\""); \
 		}
 
 #define DESTSERVEROUT() { uint32_t n1, n2, n3; \
 			ND_TCHECK_LEN(bp, sizeof(uint32_t) * 3); \
-			n1 = EXTRACT_BE_U_4(bp); \
+			n1 = GET_BE_U_4(bp); \
 			bp += sizeof(uint32_t); \
-			n2 = EXTRACT_BE_U_4(bp); \
+			n2 = GET_BE_U_4(bp); \
 			bp += sizeof(uint32_t); \
-			n3 = EXTRACT_BE_U_4(bp); \
+			n3 = GET_BE_U_4(bp); \
 			bp += sizeof(uint32_t); \
 			ND_PRINT(" server %u:%u:%u", n1, n2, n3); \
 		}
@@ -903,8 +897,7 @@ fs_print(netdissect_options *ndo,
 	 * gleaned from fsint/afsint.xg
 	 */
 
-	ND_TCHECK_4(bp + sizeof(struct rx_header));
-	fs_op = EXTRACT_BE_U_4(bp + sizeof(struct rx_header));
+	fs_op = GET_BE_U_4(bp + sizeof(struct rx_header));
 
 	ND_PRINT(" fs call %s", tok2str(fs_req, "op#%u", fs_op));
 
@@ -955,14 +948,13 @@ fs_print(netdissect_options *ndo,
 		{
 			char a[AFSOPAQUEMAX+1];
 			FIDOUT();
-			ND_TCHECK_4(bp);
-			i = EXTRACT_BE_U_4(bp);
+			i = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 			ND_TCHECK_LEN(bp, i);
-			i = min(AFSOPAQUEMAX, i);
+			i = ND_MIN(AFSOPAQUEMAX, i);
 			strncpy(a, (const char *) bp, i);
 			a[i] = '\0';
-			acl_print(ndo, (u_char *) a, sizeof(a), (u_char *) a + i);
+			acl_print(ndo, (u_char *) a, (u_char *) a + i);
 			break;
 		}
 		case 137:	/* Create file */
@@ -1012,8 +1004,7 @@ fs_print(netdissect_options *ndo,
 		case 65536:     /* Inline bulk stat */
 		{
 			uint32_t j;
-			ND_TCHECK_4(bp);
-			j = EXTRACT_BE_U_4(bp);
+			j = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 
 			for (i = 0; i < j; i++) {
@@ -1023,6 +1014,7 @@ fs_print(netdissect_options *ndo,
 			}
 			if (j == 0)
 				ND_PRINT(" <none!>");
+			break;
 		}
 		case 65537:	/* Fetch data 64 */
 			FIDOUT();
@@ -1078,7 +1070,7 @@ fs_reply_print(netdissect_options *ndo,
 
 	ND_PRINT(" fs reply %s", tok2str(fs_req, "op#%u", opcode));
 
-	type = EXTRACT_U_1(rxh->type);
+	type = GET_U_1(rxh->type);
 	bp += sizeof(struct rx_header);
 
 	/*
@@ -1090,14 +1082,13 @@ fs_reply_print(netdissect_options *ndo,
 		case 131:	/* Fetch ACL */
 		{
 			char a[AFSOPAQUEMAX+1];
-			ND_TCHECK_4(bp);
-			i = EXTRACT_BE_U_4(bp);
+			i = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 			ND_TCHECK_LEN(bp, i);
-			i = min(AFSOPAQUEMAX, i);
+			i = ND_MIN(AFSOPAQUEMAX, i);
 			strncpy(a, (const char *) bp, i);
 			a[i] = '\0';
-			acl_print(ndo, (u_char *) a, sizeof(a), (u_char *) a + i);
+			acl_print(ndo, (u_char *) a, (u_char *) a + i);
 			break;
 		}
 		case 137:	/* Create file */
@@ -1121,8 +1112,7 @@ fs_reply_print(netdissect_options *ndo,
 		 */
 		int32_t errcode;
 
-		ND_TCHECK_4(bp);
-		errcode = EXTRACT_BE_S_4(bp);
+		errcode = GET_BE_S_4(bp);
 		bp += sizeof(int32_t);
 
 		ND_PRINT(" error %s", tok2str(afs_fs_errors, "#%d", errcode));
@@ -1150,25 +1140,23 @@ trunc:
  * representing a logical OR of all the ACL permission bits
  */
 
+#define NUMSTRINGIFY(x)	XSTRINGIFY(x)
+
 static void
 acl_print(netdissect_options *ndo,
-          u_char *s, int maxsize, u_char *end)
+          u_char *s, u_char *end)
 {
 	int pos, neg, acl;
 	int n, i;
-	char *user;
-	char fmt[1024];
-
-	if ((user = (char *)malloc(maxsize)) == NULL)
-		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC, "acl_print: malloc");
+	char user[USERNAMEMAX+1];
 
 	if (sscanf((char *) s, "%d %d\n%n", &pos, &neg, &n) != 2)
-		goto finish;
+		return;
 
 	s += n;
 
 	if (s > end)
-		goto finish;
+		return;
 
 	/*
 	 * This wacky order preserves the order used by the "fs" command
@@ -1185,36 +1173,30 @@ acl_print(netdissect_options *ndo,
 	          acl & PRSFS_ADMINISTER ? "a" : "");
 
 	for (i = 0; i < pos; i++) {
-		nd_snprintf(fmt, sizeof(fmt), "%%%ds %%d\n%%n", maxsize - 1);
-		if (sscanf((char *) s, fmt, user, &acl, &n) != 2)
-			goto finish;
+		if (sscanf((char *) s, "%" NUMSTRINGIFY(USERNAMEMAX) "s %d\n%n", user, &acl, &n) != 2)
+			return;
 		s += n;
 		ND_PRINT(" +{");
-		fn_print(ndo, (u_char *)user, NULL);
+		fn_print_str(ndo, (u_char *)user);
 		ND_PRINT(" ");
 		ACLOUT(acl);
 		ND_PRINT("}");
 		if (s > end)
-			goto finish;
+			return;
 	}
 
 	for (i = 0; i < neg; i++) {
-		nd_snprintf(fmt, sizeof(fmt), "%%%ds %%d\n%%n", maxsize - 1);
-		if (sscanf((char *) s, fmt, user, &acl, &n) != 2)
-			goto finish;
+		if (sscanf((char *) s, "%" NUMSTRINGIFY(USERNAMEMAX) "s %d\n%n", user, &acl, &n) != 2)
+			return;
 		s += n;
 		ND_PRINT(" -{");
-		fn_print(ndo, (u_char *)user, NULL);
+		fn_print_str(ndo, (u_char *)user);
 		ND_PRINT(" ");
 		ACLOUT(acl);
 		ND_PRINT("}");
 		if (s > end)
-			goto finish;
+			return;
 	}
-
-finish:
-	free(user);
-	return;
 }
 
 #undef ACLOUT
@@ -1238,8 +1220,7 @@ cb_print(netdissect_options *ndo,
 	 * gleaned from fsint/afscbint.xg
 	 */
 
-	ND_TCHECK_4(bp + sizeof(struct rx_header));
-	cb_op = EXTRACT_BE_U_4(bp + sizeof(struct rx_header));
+	cb_op = GET_BE_U_4(bp + sizeof(struct rx_header));
 
 	ND_PRINT(" cb call %s", tok2str(cb_req, "op#%u", cb_op));
 
@@ -1254,8 +1235,7 @@ cb_print(netdissect_options *ndo,
 		case 204:		/* Callback */
 		{
 			uint32_t j, t;
-			ND_TCHECK_4(bp);
-			j = EXTRACT_BE_U_4(bp);
+			j = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 
 			for (i = 0; i < j; i++) {
@@ -1267,8 +1247,7 @@ cb_print(netdissect_options *ndo,
 			if (j == 0)
 				ND_PRINT(" <none!>");
 
-			ND_TCHECK_4(bp);
-			j = EXTRACT_BE_U_4(bp);
+			j = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 
 			if (j != 0)
@@ -1279,11 +1258,11 @@ cb_print(netdissect_options *ndo,
 				INTOUT();
 				ND_PRINT(" expires");
 				DATEOUT();
-				ND_TCHECK_4(bp);
-				t = EXTRACT_BE_U_4(bp);
+				t = GET_BE_U_4(bp);
 				bp += sizeof(uint32_t);
 				tok2str(cb_types, "type %u", t);
 			}
+			break;
 		}
 		case 214: {
 			ND_PRINT(" afsuuid");
@@ -1323,7 +1302,7 @@ cb_reply_print(netdissect_options *ndo,
 
 	ND_PRINT(" cb reply %s", tok2str(cb_req, "op#%u", opcode));
 
-	type = EXTRACT_U_1(rxh->type);
+	type = GET_U_1(rxh->type);
 	bp += sizeof(struct rx_header);
 
 	/*
@@ -1371,8 +1350,7 @@ prot_print(netdissect_options *ndo,
 	 * gleaned from ptserver/ptint.xg
 	 */
 
-	ND_TCHECK_4(bp + sizeof(struct rx_header));
-	pt_op = EXTRACT_BE_U_4(bp + sizeof(struct rx_header));
+	pt_op = GET_BE_U_4(bp + sizeof(struct rx_header));
 
 	ND_PRINT(" pt");
 
@@ -1424,8 +1402,7 @@ prot_print(netdissect_options *ndo,
 		case 504:	/* Name to ID */
 		{
 			uint32_t j;
-			ND_TCHECK_4(bp);
-			j = EXTRACT_BE_U_4(bp);
+			j = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 
 			/*
@@ -1446,8 +1423,7 @@ prot_print(netdissect_options *ndo,
 		{
 			uint32_t j;
 			ND_PRINT(" ids:");
-			ND_TCHECK_4(bp);
-			i = EXTRACT_BE_U_4(bp);
+			i = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 			for (j = 0; j < i; j++)
 				INTOUT();
@@ -1525,7 +1501,7 @@ prot_reply_print(netdissect_options *ndo,
 
 	ND_PRINT(" reply %s", tok2str(pt_req, "op#%u", opcode));
 
-	type = EXTRACT_U_1(rxh->type);
+	type = GET_U_1(rxh->type);
 	bp += sizeof(struct rx_header);
 
 	/*
@@ -1538,8 +1514,7 @@ prot_reply_print(netdissect_options *ndo,
 		{
 			uint32_t j;
 			ND_PRINT(" ids:");
-			ND_TCHECK_4(bp);
-			i = EXTRACT_BE_U_4(bp);
+			i = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 			for (j = 0; j < i; j++)
 				INTOUT();
@@ -1550,8 +1525,7 @@ prot_reply_print(netdissect_options *ndo,
 		case 505:		/* ID to name */
 		{
 			uint32_t j;
-			ND_TCHECK_4(bp);
-			j = EXTRACT_BE_U_4(bp);
+			j = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 
 			/*
@@ -1575,8 +1549,7 @@ prot_reply_print(netdissect_options *ndo,
 		case 519:		/* Get host CPS */
 		{
 			uint32_t j;
-			ND_TCHECK_4(bp);
-			j = EXTRACT_BE_U_4(bp);
+			j = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 			for (i = 0; i < j; i++) {
 				INTOUT();
@@ -1627,8 +1600,7 @@ vldb_print(netdissect_options *ndo,
 	 * gleaned from vlserver/vldbint.xg
 	 */
 
-	ND_TCHECK_4(bp + sizeof(struct rx_header));
-	vldb_op = EXTRACT_BE_U_4(bp + sizeof(struct rx_header));
+	vldb_op = GET_BE_U_4(bp + sizeof(struct rx_header));
 
 	ND_PRINT(" vldb");
 
@@ -1657,8 +1629,7 @@ vldb_print(netdissect_options *ndo,
 		case 518:	/* Get entry by ID N */
 			ND_PRINT(" volid");
 			INTOUT();
-			ND_TCHECK_4(bp);
-			i = EXTRACT_BE_U_4(bp);
+			i = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 			if (i <= 2)
 				ND_PRINT(" type %s", voltype[i]);
@@ -1677,8 +1648,7 @@ vldb_print(netdissect_options *ndo,
 		case 520:	/* Replace entry N */
 			ND_PRINT(" volid");
 			INTOUT();
-			ND_TCHECK_4(bp);
-			i = EXTRACT_BE_U_4(bp);
+			i = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 			if (i <= 2)
 				ND_PRINT(" type %s", voltype[i]);
@@ -1731,7 +1701,7 @@ vldb_reply_print(netdissect_options *ndo,
 
 	ND_PRINT(" reply %s", tok2str(vldb_req, "op#%u", opcode));
 
-	type = EXTRACT_U_1(rxh->type);
+	type = GET_U_1(rxh->type);
 	bp += sizeof(struct rx_header);
 
 	/*
@@ -1745,6 +1715,7 @@ vldb_reply_print(netdissect_options *ndo,
 			INTOUT();
 			ND_PRINT(" nextindex");
 			INTOUT();
+			ND_FALL_THROUGH;
 		case 503:	/* Get entry by id */
 		case 504:	/* Get entry by name */
 		{	uint32_t nservers, j;
@@ -1752,8 +1723,7 @@ vldb_reply_print(netdissect_options *ndo,
 			ND_TCHECK_4(bp);
 			bp += sizeof(uint32_t);
 			ND_PRINT(" numservers");
-			ND_TCHECK_4(bp);
-			nservers = EXTRACT_BE_U_4(bp);
+			nservers = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 			ND_PRINT(" %u", nservers);
 			ND_PRINT(" servers");
@@ -1761,13 +1731,12 @@ vldb_reply_print(netdissect_options *ndo,
 				ND_TCHECK_4(bp);
 				if (i < nservers)
 					ND_PRINT(" %s",
-					   intoa(EXTRACT_IPV4_TO_NETWORK_ORDER(bp)));
+					   intoa(GET_IPV4_TO_NETWORK_ORDER(bp)));
 				bp += sizeof(nd_ipv4);
 			}
 			ND_PRINT(" partitions");
 			for (i = 0; i < 8; i++) {
-				ND_TCHECK_4(bp);
-				j = EXTRACT_BE_U_4(bp);
+				j = GET_BE_U_4(bp);
 				if (i < nservers && j <= 26)
 					ND_PRINT(" %c", 'a' + j);
 				else if (i < nservers)
@@ -1794,13 +1763,13 @@ vldb_reply_print(netdissect_options *ndo,
 			INTOUT();
 			ND_PRINT(" nextindex");
 			INTOUT();
+			ND_FALL_THROUGH;
 		case 518:	/* Get entry by ID N */
 		case 519:	/* Get entry by name N */
 		{	uint32_t nservers, j;
 			VECOUT(VLNAMEMAX);
 			ND_PRINT(" numservers");
-			ND_TCHECK_4(bp);
-			nservers = EXTRACT_BE_U_4(bp);
+			nservers = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 			ND_PRINT(" %u", nservers);
 			ND_PRINT(" servers");
@@ -1808,13 +1777,12 @@ vldb_reply_print(netdissect_options *ndo,
 				ND_TCHECK_4(bp);
 				if (i < nservers)
 					ND_PRINT(" %s",
-					   intoa(EXTRACT_IPV4_TO_NETWORK_ORDER(bp)));
+					   intoa(GET_IPV4_TO_NETWORK_ORDER(bp)));
 				bp += sizeof(nd_ipv4);
 			}
 			ND_PRINT(" partitions");
 			for (i = 0; i < 13; i++) {
-				ND_TCHECK_4(bp);
-				j = EXTRACT_BE_U_4(bp);
+				j = GET_BE_U_4(bp);
 				if (i < nservers && j <= 26)
 					ND_PRINT(" %c", 'a' + j);
 				else if (i < nservers)
@@ -1836,8 +1804,7 @@ vldb_reply_print(netdissect_options *ndo,
 		{	uint32_t nservers, j;
 			VECOUT(VLNAMEMAX);
 			ND_PRINT(" numservers");
-			ND_TCHECK_4(bp);
-			nservers = EXTRACT_BE_U_4(bp);
+			nservers = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 			ND_PRINT(" %u", nservers);
 			ND_PRINT(" servers");
@@ -1854,8 +1821,7 @@ vldb_reply_print(netdissect_options *ndo,
 			bp += 4 * 13;
 			ND_PRINT(" partitions");
 			for (i = 0; i < 13; i++) {
-				ND_TCHECK_4(bp);
-				j = EXTRACT_BE_U_4(bp);
+				j = GET_BE_U_4(bp);
 				if (i < nservers && j <= 26)
 					ND_PRINT(" %c", 'a' + j);
 				else if (i < nservers)
@@ -1907,8 +1873,7 @@ kauth_print(netdissect_options *ndo,
 	 * gleaned from kauth/kauth.rg
 	 */
 
-	ND_TCHECK_4(bp + sizeof(struct rx_header));
-	kauth_op = EXTRACT_BE_U_4(bp + sizeof(struct rx_header));
+	kauth_op = GET_BE_U_4(bp + sizeof(struct rx_header));
 
 	ND_PRINT(" kauth");
 
@@ -1949,8 +1914,7 @@ kauth_print(netdissect_options *ndo,
 			INTOUT();
 			ND_PRINT(" domain");
 			STROUT(KANAMEMAX);
-			ND_TCHECK_4(bp);
-			i = EXTRACT_BE_U_4(bp);
+			i = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 			ND_TCHECK_LEN(bp, i);
 			bp += i;
@@ -2010,7 +1974,7 @@ kauth_reply_print(netdissect_options *ndo,
 
 	ND_PRINT(" reply %s", tok2str(kauth_req, "op#%u", opcode));
 
-	type = EXTRACT_U_1(rxh->type);
+	type = GET_U_1(rxh->type);
 	bp += sizeof(struct rx_header);
 
 	/*
@@ -2027,11 +1991,6 @@ kauth_reply_print(netdissect_options *ndo,
 		ND_PRINT(" errcode");
 		INTOUT();
 	}
-
-	return;
-
-trunc:
-	ND_PRINT(" [|kauth]");
 }
 
 /*
@@ -2052,8 +2011,7 @@ vol_print(netdissect_options *ndo,
 	 * gleaned from volser/volint.xg
 	 */
 
-	ND_TCHECK_4(bp + sizeof(struct rx_header));
-	vol_op = EXTRACT_BE_U_4(bp + sizeof(struct rx_header));
+	vol_op = GET_BE_U_4(bp + sizeof(struct rx_header));
 
 	ND_PRINT(" vol call %s", tok2str(vol_req, "op#%u", vol_op));
 
@@ -2204,8 +2162,7 @@ vol_print(netdissect_options *ndo,
 			DATEOUT();
 			{
 				uint32_t i, j;
-				ND_TCHECK_4(bp);
-				j = EXTRACT_BE_U_4(bp);
+				j = GET_BE_U_4(bp);
 				bp += sizeof(uint32_t);
 				for (i = 0; i < j; i++) {
 					DESTSERVEROUT();
@@ -2256,7 +2213,7 @@ vol_reply_print(netdissect_options *ndo,
 
 	ND_PRINT(" vol reply %s", tok2str(vol_req, "op#%u", opcode));
 
-	type = EXTRACT_U_1(rxh->type);
+	type = GET_U_1(rxh->type);
 	bp += sizeof(struct rx_header);
 
 	/*
@@ -2334,8 +2291,7 @@ vol_reply_print(netdissect_options *ndo,
 			case 121:	/* List one volume */
 				{
 					uint32_t i, j;
-					ND_TCHECK_4(bp);
-					j = EXTRACT_BE_U_4(bp);
+					j = GET_BE_U_4(bp);
 					bp += sizeof(uint32_t);
 					for (i = 0; i < j; i++) {
 						ND_PRINT(" name");
@@ -2388,8 +2344,7 @@ bos_print(netdissect_options *ndo,
 	 * gleaned from bozo/bosint.xg
 	 */
 
-	ND_TCHECK_4(bp + sizeof(struct rx_header));
-	bos_op = EXTRACT_BE_U_4(bp + sizeof(struct rx_header));
+	bos_op = GET_BE_U_4(bp + sizeof(struct rx_header));
 
 	ND_PRINT(" bos call %s", tok2str(bos_req, "op#%u", bos_op));
 
@@ -2482,7 +2437,7 @@ bos_reply_print(netdissect_options *ndo,
 
 	ND_PRINT(" bos reply %s", tok2str(bos_req, "op#%u", opcode));
 
-	type = EXTRACT_U_1(rxh->type);
+	type = GET_U_1(rxh->type);
 	bp += sizeof(struct rx_header);
 
 	/*
@@ -2499,11 +2454,6 @@ bos_reply_print(netdissect_options *ndo,
 		ND_PRINT(" errcode");
 		INTOUT();
 	}
-
-	return;
-
-trunc:
-	ND_PRINT(" [|bos]");
 }
 
 /*
@@ -2540,7 +2490,7 @@ ubik_print(netdissect_options *ndo,
 	 * for (sizeof(rx_header) + 4) bytes, so long as it remains this way
 	 * the line below will not over-read.
 	 */
-	ubik_op = EXTRACT_BE_U_4(bp + sizeof(struct rx_header));
+	ubik_op = GET_BE_U_4(bp + sizeof(struct rx_header));
 
 	ND_PRINT(" ubik call %s", tok2str(ubik_req, "op#%u", ubik_op));
 
@@ -2552,8 +2502,7 @@ ubik_print(netdissect_options *ndo,
 
 	switch (ubik_op) {
 		case 10000:		/* Beacon */
-			ND_TCHECK_4(bp);
-			temp = EXTRACT_BE_U_4(bp);
+			temp = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 			ND_PRINT(" syncsite %s", temp ? "yes" : "no");
 			ND_PRINT(" votestart");
@@ -2584,8 +2533,7 @@ ubik_print(netdissect_options *ndo,
 			INTOUT();
 			ND_PRINT(" length");
 			INTOUT();
-			ND_TCHECK_4(bp);
-			temp = EXTRACT_BE_U_4(bp);
+			temp = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 			tok2str(ubik_lock_types, "type %u", temp);
 			break;
@@ -2658,7 +2606,7 @@ ubik_reply_print(netdissect_options *ndo,
 
 	ND_PRINT(" ubik reply %s", tok2str(ubik_req, "op#%u", opcode));
 
-	type = EXTRACT_U_1(rxh->type);
+	type = GET_U_1(rxh->type);
 	bp += sizeof(struct rx_header);
 
 	/*
@@ -2679,7 +2627,7 @@ ubik_reply_print(netdissect_options *ndo,
 		}
 
 	/*
-	 * Otherwise, print out "yes" it it was a beacon packet (because
+	 * Otherwise, print out "yes" if it was a beacon packet (because
 	 * that's how yes votes are returned, go figure), otherwise
 	 * just print out the error code.
 	 */
@@ -2730,13 +2678,13 @@ rx_ack_print(netdissect_options *ndo,
 
 	if (ndo->ndo_vflag > 2)
 		ND_PRINT(" bufspace %u maxskew %u",
-		       EXTRACT_BE_U_2(rxa->bufferSpace),
-		       EXTRACT_BE_U_2(rxa->maxSkew));
+		       GET_BE_U_2(rxa->bufferSpace),
+		       GET_BE_U_2(rxa->maxSkew));
 
-	firstPacket = EXTRACT_BE_U_4(rxa->firstPacket);
+	firstPacket = GET_BE_U_4(rxa->firstPacket);
 	ND_PRINT(" first %u serial %u reason %s",
-	       firstPacket, EXTRACT_BE_U_4(rxa->serial),
-	       tok2str(rx_ack_reasons, "#%u", EXTRACT_U_1(rxa->reason)));
+	       firstPacket, GET_BE_U_4(rxa->serial),
+	       tok2str(rx_ack_reasons, "#%u", GET_U_1(rxa->reason)));
 
 	/*
 	 * Okay, now we print out the ack array.  The way _this_ works
@@ -2757,7 +2705,7 @@ rx_ack_print(netdissect_options *ndo,
 	 * to bp after this, so bp ends up at the right spot.  Go figure.
 	 */
 
-	nAcks = EXTRACT_U_1(rxa->nAcks);
+	nAcks = GET_U_1(rxa->nAcks);
 	if (nAcks != 0) {
 
 		ND_TCHECK_LEN(bp, nAcks);
@@ -2768,7 +2716,7 @@ rx_ack_print(netdissect_options *ndo,
 		 */
 
 		for (i = 0, start = last = -2; i < nAcks; i++)
-			if (EXTRACT_U_1(bp + i) == RX_ACK_TYPE_ACK) {
+			if (GET_U_1(bp + i) == RX_ACK_TYPE_ACK) {
 
 				/*
 				 * I figured this deserved _some_ explanation.
@@ -2787,7 +2735,7 @@ rx_ack_print(netdissect_options *ndo,
 				 * the range (such as an nacked packet in
 				 * the middle of some acked packets),
 				 * then print the current packet number
-				 * seperated from the last number by
+				 * separated from the last number by
 				 * a comma.
 				 */
 
@@ -2810,7 +2758,7 @@ rx_ack_print(netdissect_options *ndo,
 				 * we hit a nack ... in _this_ case we
 				 * want to print out the range of packets
 				 * that were acked, so we need to print
-				 * the _previous_ packet number seperated
+				 * the _previous_ packet number separated
 				 * from the first by a dash (-).  Since we
 				 * already printed the first packet above,
 				 * just print the final packet.  Don't
@@ -2839,7 +2787,7 @@ rx_ack_print(netdissect_options *ndo,
 		 */
 
 		for (i = 0, start = last = -2; i < nAcks; i++)
-			if (EXTRACT_U_1(bp + i) == RX_ACK_TYPE_NACK) {
+			if (GET_U_1(bp + i) == RX_ACK_TYPE_NACK) {
 				if (last == -2) {
 					ND_PRINT(" nacked %u", firstPacket + i);
 					start = i;

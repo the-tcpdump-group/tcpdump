@@ -169,13 +169,35 @@
 #define T_RRSIG		46		/* new security signature */
 #define T_NSEC		47		/* provable insecure information */
 #define T_DNSKEY	48		/* new security key */
+#define T_DHCID		49		/* DHCP IDentifier */
+#define T_NSEC3		50		/* Next SECure record v3 */
+#define T_NSEC3PARAM	51		/* NSEC3 PARAMeter */
+#define T_TLSA		52		/* TLS Authentication */
+#define T_SMIMEA	53		/* S/MIME Authentication */
+/* Unassigned */
+#define T_HIP		55		/* Host Identity Protocol */
+#define T_NINFO		56		/* zone status information */
+#define T_RKEY		57		/* Record encryption KEY */
+#define T_TALINK	58		/* Trust Anchor LINK */
+#define T_CDS		59		/* Child Delegation Signer */
+#define T_CDNSKEY	60		/* Child DNSKEY */
+#define T_OPENPGPKEY	61		/* OpenPGP KEY */
+#define T_CSYNC		62		/* Child to parent SYNCronization */
+#define T_ZONEMD	63		/* ZONE data Message Digest */
+#define T_SVCB		64		/* SerViCe Binding */
+#define T_HTTPS		65		/* HTTPS binding */
 	/* non standard */
 #define T_SPF		99		/* sender policy framework */
 #define T_UINFO		100		/* user (finger) information */
 #define T_UID		101		/* user ID */
 #define T_GID		102		/* group ID */
 #define T_UNSPEC	103		/* Unspecified format (binary data) */
-#define T_UNSPECA	104		/* "unspecified ASCII". Ugly MIT hack */
+#define T_NID		104		/* Node IDentifier */
+#define T_L32		105		/* Locator 32-bit */
+#define T_L64		106		/* Locator 64-bit */
+#define T_LP		107		/* Locator Pointer */
+#define T_EUI48		108		/* an EUI-48 address */
+#define T_EUI64		109		/* an EUI-64 address */
 	/* Query type values which do not appear in resource records */
 #define T_TKEY		249		/* Transaction Key [RFC2930] */
 #define T_TSIG		250		/* Transaction Signature [RFC2845] */
@@ -184,6 +206,13 @@
 #define T_MAILB		253		/* transfer mailbox records */
 #define T_MAILA		254		/* transfer mail agent records */
 #define T_ANY		255		/* wildcard match */
+#define T_URI		256		/* uri records [RFC7553] */
+#define T_CAA		257		/* Certification Authority Authorization */
+#define T_AVC		258		/* Application Visibility and Control */
+#define T_DOA		259		/* Digital Object Architecture */
+#define T_AMTRELAY	260		/* Automatic Multicast Tunneling RELAY */
+#define T_TA		32768		/* DNSSEC Trust Authorities */
+#define T_DLV		32769		/* DNSSEC Lookaside Validation */
 
 /*
  * Values for class field
@@ -196,6 +225,64 @@
 #define C_ANY		255		/* wildcard match */
 #define C_QU		0x8000		/* mDNS QU flag in queries */
 #define C_CACHE_FLUSH	0x8000		/* mDNS cache flush flag in replies */
+
+/*
+ * Values for EDNS option types
+ */
+#define E_LLQ           1       /* long lived queries protocol */
+#define E_UL            2       /* dynamic dns update leases */
+#define E_NSID          3       /* name server identifier */
+#define E_DAU           5       /* signal DNSSEC algorithm understood */
+#define E_DHU           6       /* signal DS hash understood */
+#define E_N3U           7       /* signal NSEC3 hash understood */
+#define E_ECS           8       /* EDNS client subnet */
+#define E_EXPIRE        9       /* zone expiration */
+#define E_COOKIE        10      /* DNS cookies */
+#define E_KEEPALIVE     11      /* TCP keepalive */
+#define E_PADDING       12      /* pad DNS messages */
+#define E_CHAIN         13      /* chain DNS queries */
+#define E_KEYTAG        14      /* EDNS key tag */
+#define E_CLIENTTAG     16      /* EDNS client tag */
+#define E_SERVERTAG     17      /* EDNS server tag */
+
+/*
+ * Values for DNSSEC Algorithms
+ * https://www.iana.org/assignments/dns-sec-alg-numbers/dns-sec-alg-numbers.xhtml
+ */
+
+#define A_DELETE                0
+#define A_RSAMD5                1
+#define A_DH                    2
+#define A_DSA                   3
+#define A_RSASHA1               5
+#define A_DSA_NSEC3_SHA1        6
+#define A_RSASHA1_NSEC3_SHA1    7
+#define A_RSASHA256             8
+#define A_RSASHA512             10
+#define A_ECC_GOST              12
+#define A_ECDSAP256SHA256       13
+#define A_ECDSAP384SHA384       14
+#define A_ED25519               15
+#define A_ED448                 16
+#define A_INDIRECT              252
+#define A_PRIVATEDNS            253
+#define A_PRIVATEOID            254
+
+/*
+ * Values for NSEC3 algorithms
+ * https://www.iana.org/assignments/dnssec-nsec3-parameters/dnssec-nsec3-parameters.xhtml
+ */
+#define NSEC_SHA1   1
+
+/*
+ * Values for delegation signer algorithms
+ * https://www.iana.org/assignments/ds-rr-types/ds-rr-types.xhtml
+ */
+#define DS_SHA1     1
+#define DS_SHA256   2
+#define DS_GOST     3
+#define DS_SHA384   4
+
 
 /*
  * Status return codes for T_UNSPEC conversion routines
@@ -234,8 +321,11 @@ typedef struct {
 /*
  * Defines for handling compressed domain names, EDNS0 labels, etc.
  */
-#define INDIR_MASK	0xc0	/* 11.... */
-#define EDNS0_MASK	0x40	/* 01.... */
+#define TYPE_MASK	0xc0	/* mask for the type bits of the item */
+#define TYPE_INDIR	0xc0	/* 11.... - pointer */
+#define TYPE_RESERVED	0x80	/* 10.... - reserved */
+#define TYPE_EDNS0	0x40	/* 01.... - EDNS(0) label */
+#define TYPE_LABEL	0x00	/* 00.... - regular label */
 #  define EDNS0_ELT_BITLABEL 0x01
 
 #endif /* !_NAMESER_H_ */

@@ -23,6 +23,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
@@ -114,8 +115,8 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
     vqp_common_header = (const struct vqp_common_header_t *)pptr;
     ND_TCHECK_SIZE(vqp_common_header);
     if (sizeof(struct vqp_common_header_t) > tlen)
-        goto trunc;
-    version = EXTRACT_U_1(vqp_common_header->version);
+        goto invalid;
+    version = GET_U_1(vqp_common_header->version);
 
     /*
      * Sanity checking of the header.
@@ -130,22 +131,22 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
     if (ndo->ndo_vflag < 1) {
         ND_PRINT("VQPv%u %s Message, error-code %s (%u), length %u",
                version,
-               tok2str(vqp_msg_type_values, "unknown (%u)",EXTRACT_U_1(vqp_common_header->msg_type)),
-               tok2str(vqp_error_code_values, "unknown (%u)",EXTRACT_U_1(vqp_common_header->error_code)),
-	       EXTRACT_U_1(vqp_common_header->error_code),
+               tok2str(vqp_msg_type_values, "unknown (%u)",GET_U_1(vqp_common_header->msg_type)),
+               tok2str(vqp_error_code_values, "unknown", GET_U_1(vqp_common_header->error_code)),
+               GET_U_1(vqp_common_header->error_code),
                len);
         return;
     }
 
     /* ok they seem to want to know everything - lets fully decode it */
-    nitems = EXTRACT_U_1(vqp_common_header->nitems);
+    nitems = GET_U_1(vqp_common_header->nitems);
     ND_PRINT("\n\tVQPv%u, %s Message, error-code %s (%u), seq 0x%08x, items %u, length %u",
            version,
-	   tok2str(vqp_msg_type_values, "unknown (%u)",EXTRACT_U_1(vqp_common_header->msg_type)),
-	   tok2str(vqp_error_code_values, "unknown (%u)",EXTRACT_U_1(vqp_common_header->error_code)),
-	   EXTRACT_U_1(vqp_common_header->error_code),
-           EXTRACT_BE_U_4(vqp_common_header->sequence),
-           nitems,
+	   tok2str(vqp_msg_type_values, "unknown (%u)",GET_U_1(vqp_common_header->msg_type)),
+	   tok2str(vqp_error_code_values, "unknown", GET_U_1(vqp_common_header->error_code)),
+	   GET_U_1(vqp_common_header->error_code),
+	   GET_BE_U_4(vqp_common_header->sequence),
+	   nitems,
            len);
 
     /* skip VQP Common header */
@@ -157,9 +158,9 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
         vqp_obj_tlv = (const struct vqp_obj_tlv_t *)tptr;
         ND_TCHECK_SIZE(vqp_obj_tlv);
         if (sizeof(struct vqp_obj_tlv_t) > tlen)
-            goto trunc;
-        vqp_obj_type = EXTRACT_BE_U_4(vqp_obj_tlv->obj_type);
-        vqp_obj_len = EXTRACT_BE_U_2(vqp_obj_tlv->obj_length);
+            goto invalid;
+        vqp_obj_type = GET_BE_U_4(vqp_obj_tlv->obj_type);
+        vqp_obj_len = GET_BE_U_2(vqp_obj_tlv->obj_length);
         tptr+=sizeof(struct vqp_obj_tlv_t);
         tlen-=sizeof(struct vqp_obj_tlv_t);
 
@@ -175,27 +176,28 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
         /* did we capture enough for fully decoding the object ? */
         ND_TCHECK_LEN(tptr, vqp_obj_len);
         if (vqp_obj_len > tlen)
-            goto trunc;
+            goto invalid;
 
         switch(vqp_obj_type) {
 	case VQP_OBJ_IP_ADDRESS:
             if (vqp_obj_len != 4)
-                goto trunc;
-            ND_PRINT("%s (0x%08x)", ipaddr_string(ndo, tptr), EXTRACT_BE_U_4(tptr));
+                goto invalid;
+            ND_PRINT("%s (0x%08x)", GET_IPADDR_STRING(tptr),
+                     GET_BE_U_4(tptr));
             break;
             /* those objects have similar semantics - fall through */
         case VQP_OBJ_PORT_NAME:
 	case VQP_OBJ_VLAN_NAME:
 	case VQP_OBJ_VTP_DOMAIN:
 	case VQP_OBJ_ETHERNET_PKT:
-            safeputs(ndo, tptr, vqp_obj_len);
+            nd_printjnp(ndo, tptr, vqp_obj_len);
             break;
             /* those objects have similar semantics - fall through */
 	case VQP_OBJ_MAC_ADDRESS:
 	case VQP_OBJ_MAC_NULL:
             if (vqp_obj_len != MAC_ADDR_LEN)
-                goto trunc;
-	      ND_PRINT("%s", etheraddr_string(ndo, tptr));
+                goto invalid;
+	      ND_PRINT("%s", GET_ETHERADDR_STRING(tptr));
               break;
         default:
             if (ndo->ndo_vflag <= 1)
@@ -207,6 +209,6 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 	nitems--;
     }
     return;
-trunc:
-    ND_PRINT("\n\t[|VQP]");
+invalid:
+    nd_print_invalid(ndo);
 }

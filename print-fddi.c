@@ -261,7 +261,7 @@ fddi_hdr_print(netdissect_options *ndo,
 	dstname = etheraddr_string(ndo, fdst);
 
 	if (!ndo->ndo_qflag)
-		print_fddi_fc(ndo, EXTRACT_U_1(fddip->fddi_fc));
+		print_fddi_fc(ndo, GET_U_1(fddip->fddi_fc));
 	ND_PRINT("%s > %s, length %u: ",
 	       srcname, dstname,
 	       length);
@@ -284,11 +284,11 @@ fddi_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 
 	ndo->ndo_protocol = "fddi";
 	if (caplen < FDDI_HDRLEN) {
-		ND_PRINT("[|fddi]");
+		nd_print_trunc(ndo);
 		return (caplen);
 	}
 
-	fc = EXTRACT_U_1(fddip->fddi_fc);
+	fc = GET_U_1(fddip->fddi_fc);
 
 	/*
 	 * Get the FDDI addresses into a canonical form
@@ -342,9 +342,9 @@ fddi_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
+void
 fddi_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
-	ndo->ndo_protocol = "fddi_if";
-	return (fddi_print(ndo, p, h->len, h->caplen));
+	ndo->ndo_protocol = "fddi";
+	ndo->ndo_ll_hdr_len += fddi_print(ndo, p, h->len, h->caplen);
 }

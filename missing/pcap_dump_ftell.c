@@ -38,5 +38,9 @@
 long
 pcap_dump_ftell(pcap_dumper_t *p)
 {
-	return (ftell(pcap_dump_file(p)));
+	/* FIXME: Using pcap_dump_file(p) would be a better style. That would
+	 * require to test if pcap_dump_file() is available, and to substitute it,
+	 * if it is not.
+	 */
+	return (ftell((FILE *)p));
 }

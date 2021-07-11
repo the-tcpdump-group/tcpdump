@@ -44,11 +44,11 @@ static const struct tok chdlc_cast_values[] = {
 
 
 /* Standard CHDLC printer */
-u_int
+void
 chdlc_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
-	ndo->ndo_protocol = "chdlc_if";
-	return chdlc_print(ndo, p, h->len);
+	ndo->ndo_protocol = "chdlc";
+	ndo->ndo_ll_hdr_len += chdlc_print(ndo, p, h->len);
 }
 
 u_int
@@ -60,11 +60,10 @@ chdlc_print(netdissect_options *ndo, const u_char *p, u_int length)
 	ndo->ndo_protocol = "chdlc";
 	if (length < CHDLC_HDRLEN)
 		goto trunc;
-	ND_TCHECK_LEN(p, CHDLC_HDRLEN);
-	proto = EXTRACT_BE_U_2(p + 2);
+	proto = GET_BE_U_2(p + 2);
 	if (ndo->ndo_eflag) {
                 ND_PRINT("%s, ethertype %s (0x%04x), length %u: ",
-                       tok2str(chdlc_cast_values, "0x%02x", EXTRACT_U_1(p)),
+                       tok2str(chdlc_cast_values, "0x%02x", GET_U_1(p)),
                        tok2str(ethertype_values, "Unknown", proto),
                        proto,
                        length);
@@ -83,11 +82,6 @@ chdlc_print(netdissect_options *ndo, const u_char *p, u_int length)
 	case CHDLC_TYPE_SLARP:
 		chdlc_slarp_print(ndo, p, length);
 		break;
-#if 0
-	case CHDLC_TYPE_CDP:
-		chdlc_cdp_print(p, length);
-		break;
-#endif
         case ETHERTYPE_MPLS:
         case ETHERTYPE_MPLS_MULTI:
                 mpls_print(ndo, p, length);
@@ -96,10 +90,9 @@ chdlc_print(netdissect_options *ndo, const u_char *p, u_int length)
                 /* is the fudge byte set ? lets verify by spotting ISO headers */
                 if (length < 2)
                     goto trunc;
-                ND_TCHECK_2(p);
-                if (EXTRACT_U_1(p + 1) == NLPID_CLNP ||
-                    EXTRACT_U_1(p + 1) == NLPID_ESIS ||
-                    EXTRACT_U_1(p + 1) == NLPID_ISIS)
+                if (GET_U_1(p + 1) == NLPID_CLNP ||
+                    GET_U_1(p + 1) == NLPID_ESIS ||
+                    GET_U_1(p + 1) == NLPID_ISIS)
                     isoclns_print(ndo, p + 1, length - 1);
                 else
                     isoclns_print(ndo, p, length);
@@ -113,8 +106,8 @@ chdlc_print(netdissect_options *ndo, const u_char *p, u_int length)
 	return (CHDLC_HDRLEN);
 
 trunc:
-	ND_PRINT("[|chdlc]");
-	return ndo->ndo_snapend - bp;
+	nd_print_trunc(ndo);
+	return (ND_BYTES_AVAILABLE_AFTER(bp));
 }
 
 /*
@@ -147,20 +140,21 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
 	const struct cisco_slarp *slarp;
         u_int sec,min,hrs,days;
 
+	ndo->ndo_protocol = "chdlc_slarp";
 	ND_PRINT("SLARP (length: %u), ",length);
 	if (length < SLARP_MIN_LEN)
 		goto trunc;
 
 	slarp = (const struct cisco_slarp *)cp;
 	ND_TCHECK_LEN(slarp, SLARP_MIN_LEN);
-	switch (EXTRACT_BE_U_4(slarp->code)) {
+	switch (GET_BE_U_4(slarp->code)) {
 	case SLARP_REQUEST:
 		ND_PRINT("request");
 		/*
 		 * At least according to William "Chops" Westfield's
 		 * message in
 		 *
-		 *	http://www.nethelp.no/net/cisco-hdlc.txt
+		 *	https://web.archive.org/web/20190725151313/www.nethelp.no/net/cisco-hdlc.txt
 		 *
 		 * the address and mask aren't used in requests -
 		 * they're just zero.
@@ -168,19 +162,18 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
 		break;
 	case SLARP_REPLY:
 		ND_PRINT("reply %s/%s",
-			ipaddr_string(ndo, slarp->un.addr.addr),
-			ipaddr_string(ndo, slarp->un.addr.mask));
+			GET_IPADDR_STRING(slarp->un.addr.addr),
+			GET_IPADDR_STRING(slarp->un.addr.mask));
 		break;
 	case SLARP_KEEPALIVE:
 		ND_PRINT("keepalive: mineseen=0x%08x, yourseen=0x%08x, reliability=0x%04x",
-                       EXTRACT_BE_U_4(slarp->un.keep.myseq),
-                       EXTRACT_BE_U_4(slarp->un.keep.yourseq),
-                       EXTRACT_BE_U_2(slarp->un.keep.rel));
+                       GET_BE_U_4(slarp->un.keep.myseq),
+                       GET_BE_U_4(slarp->un.keep.yourseq),
+                       GET_BE_U_2(slarp->un.keep.rel));
 
                 if (length >= SLARP_MAX_LEN) { /* uptime-stamp is optional */
                         cp += SLARP_MIN_LEN;
-                        ND_TCHECK_4(cp);
-                        sec = EXTRACT_BE_U_4(cp) / 1000;
+                        sec = GET_BE_U_4(cp) / 1000;
                         min = sec / 60; sec -= min * 60;
                         hrs = min / 60; min -= hrs * 60;
                         days = hrs / 24; hrs -= days * 24;
@@ -188,7 +181,7 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
                 }
 		break;
 	default:
-		ND_PRINT("0x%02x unknown", EXTRACT_BE_U_4(slarp->code));
+		ND_PRINT("0x%02x unknown", GET_BE_U_4(slarp->code));
                 if (ndo->ndo_vflag <= 1)
                     print_unknown_data(ndo,cp+4,"\n\t",length-4);
 		break;
@@ -201,5 +194,5 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
 	return;
 
 trunc:
-	ND_PRINT("[|slarp]");
+	nd_print_trunc(ndo);
 }

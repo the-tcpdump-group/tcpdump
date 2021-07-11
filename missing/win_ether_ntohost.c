@@ -85,9 +85,9 @@ const char *etc_path (const char *file)
     return (file);
 
   if (win9x)
-    nd_snprintf (path, sizeof(path), "%s\\etc\\%s", env, file);
+    snprintf (path, sizeof(path), "%s\\etc\\%s", env, file);
   else
-    nd_snprintf (path, sizeof(path), "%s\\system32\\drivers\\etc\\%s", env, file);
+    snprintf (path, sizeof(path), "%s\\system32\\drivers\\etc\\%s", env, file);
 
   return (path);
 }

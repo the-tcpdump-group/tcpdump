@@ -40,7 +40,7 @@
  * Kerberos Authentication and Authorization System
  * by S. P. Miller, B. C. Neuman, J. I. Schiller, and J. H. Saltzer
  *
- * http://web.mit.edu/Saltzer/www/publications/athenaplan/e.2.1.pdf
+ * https://web.mit.edu/Saltzer/www/publications/athenaplan/e.2.1.pdf
  *
  * 7. Appendix I Design Specifications
  *
@@ -49,7 +49,6 @@
  * RFC 1510, RFC 2630, etc.
  */
 
-static const char tstr[] = " [|kerberos]";
 
 static const u_char *c_print(netdissect_options *, const u_char *, const u_char *);
 static const u_char *krb4_print_hdr(netdissect_options *, const u_char *);
@@ -119,7 +118,7 @@ c_print(netdissect_options *ndo,
 
 	flag = 1;
 	while (s < ep) {
-		c = EXTRACT_U_1(s);
+		c = GET_U_1(s);
 		s++;
 		if (c == '\0') {
 			flag = 0;
@@ -148,7 +147,7 @@ krb4_print_hdr(netdissect_options *ndo,
 	return (cp);
 
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 	return (NULL);
 
 #undef PRINT
@@ -164,17 +163,12 @@ krb4_print(netdissect_options *ndo,
 
 #define PRINT		if ((cp = c_print(ndo, cp, ndo->ndo_snapend)) == NULL) goto trunc
 /*  True if struct krb is little endian */
-#define IS_LENDIAN(kp)	((EXTRACT_U_1((kp)->type) & 0x01) != 0)
-#define KTOHSP(kp, cp)	(IS_LENDIAN(kp) ? EXTRACT_LE_U_2(cp) : EXTRACT_BE_U_2(cp))
+#define IS_LENDIAN(kp)	((GET_U_1((kp)->type) & 0x01) != 0)
+#define KTOHSP(kp, cp)	(IS_LENDIAN(kp) ? GET_LE_U_2(cp) : GET_BE_U_2(cp))
 
 	kp = (const struct krb *)cp;
 
-	if (!ND_TTEST_1(kp->type)) {
-		ND_PRINT("%s", tstr);
-		return;
-	}
-
-	type = EXTRACT_U_1(kp->type) & (0xFF << 1);
+	type = GET_U_1(kp->type) & (0xFF << 1);
 
 	ND_PRINT(" %s %s: ",
 	    IS_LENDIAN(kp) ? "le" : "be", tok2str(type2str, NULL, type));
@@ -185,8 +179,7 @@ krb4_print(netdissect_options *ndo,
 		if ((cp = krb4_print_hdr(ndo, cp)) == NULL)
 			return;
 		cp += 4;	/* ctime */
-		ND_TCHECK_1(cp);
-		ND_PRINT(" %umin ", EXTRACT_U_1(cp) * 5);
+		ND_PRINT(" %umin ", GET_U_1(cp) * 5);
 		cp++;
 		PRINT;
 		ND_PRINT(".");
@@ -195,22 +188,18 @@ krb4_print(netdissect_options *ndo,
 
 	case AUTH_MSG_APPL_REQUEST:
 		cp += 2;
-		ND_TCHECK_1(cp);
-		ND_PRINT("v%u ", EXTRACT_U_1(cp));
+		ND_PRINT("v%u ", GET_U_1(cp));
 		cp++;
 		PRINT;
-		ND_TCHECK_1(cp);
-		ND_PRINT(" (%u)", EXTRACT_U_1(cp));
+		ND_PRINT(" (%u)", GET_U_1(cp));
 		cp++;
-		ND_TCHECK_1(cp);
-		ND_PRINT(" (%u)", EXTRACT_U_1(cp));
+		ND_PRINT(" (%u)", GET_U_1(cp));
 		break;
 
 	case AUTH_MSG_KDC_REPLY:
 		if ((cp = krb4_print_hdr(ndo, cp)) == NULL)
 			return;
 		cp += 10;	/* timestamp + n + exp + kvno */
-		ND_TCHECK_LEN(cp, sizeof(short));
 		len = KTOHSP(kp, cp);
 		ND_PRINT(" (%u)", len);
 		break;
@@ -219,7 +208,6 @@ krb4_print(netdissect_options *ndo,
 		if ((cp = krb4_print_hdr(ndo, cp)) == NULL)
 			return;
 		cp += 4; 	  /* timestamp */
-		ND_TCHECK_LEN(cp, sizeof(short));
 		ND_PRINT(" %s ", tok2str(kerr2str, NULL, KTOHSP(kp, cp)));
 		cp += 4;
 		PRINT;
@@ -232,7 +220,7 @@ krb4_print(netdissect_options *ndo,
 
 	return;
 trunc:
-	ND_PRINT("%s", tstr);
+	nd_print_trunc(ndo);
 }
 
 void
@@ -245,20 +233,20 @@ krb_print(netdissect_options *ndo,
 	kp = (const struct krb *)dat;
 
 	if (dat >= ndo->ndo_snapend) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return;
 	}
 
-	switch (EXTRACT_U_1(kp->pvno)) {
+	switch (GET_U_1(kp->pvno)) {
 
 	case 1:
 	case 2:
 	case 3:
-		ND_PRINT(" v%u", EXTRACT_U_1(kp->pvno));
+		ND_PRINT(" v%u", GET_U_1(kp->pvno));
 		break;
 
 	case 4:
-		ND_PRINT(" v%u", EXTRACT_U_1(kp->pvno));
+		ND_PRINT(" v%u", GET_U_1(kp->pvno));
 		krb4_print(ndo, (const u_char *)kp);
 		break;
 
@@ -268,5 +256,4 @@ krb_print(netdissect_options *ndo,
 		/* Decode ASN.1 here "someday" */
 		break;
 	}
-	return;
 }

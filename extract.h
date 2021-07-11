@@ -19,13 +19,16 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#ifndef EXTRACT_H
+#define EXTRACT_H
+
 #include <string.h>
 
 /*
  * For 8-bit values; needed to fetch a one-byte value.  Byte order
  * isn't relevant, and alignment isn't an issue.
  */
-#define EXTRACT_U_1(p)	(*(p))
+#define EXTRACT_U_1(p)	((uint8_t)(*(p)))
 #define EXTRACT_S_1(p)	((int8_t)(*(p)))
 
 /*
@@ -33,6 +36,7 @@
  * integral values.
  */
 #include "funcattrs.h"
+#include "netdissect.h"
 
 /*
  * If we have versions of GCC or Clang that support an __attribute__
@@ -65,7 +69,6 @@
 #endif
 
 #if (defined(__i386__) || defined(_M_IX86) || defined(__X86__) || defined(__x86_64__) || defined(_M_X64)) || \
-    (defined(__arm__) || defined(_M_ARM) || defined(__aarch64__)) || \
     (defined(__m68k__) && (!defined(__mc68000__) && !defined(__mc68010__))) || \
     (defined(__ppc__) || defined(__ppc64__) || defined(_M_PPC) || defined(_ARCH_PPC) || defined(_ARCH_PPC64)) || \
     (defined(__s390__) || defined(__s390x__) || defined(__zarch__))
@@ -74,9 +77,6 @@
  * cast the pointer and fetch through it.
  *
  * XXX - are those all the x86 tests we need?
- * XXX - do we need to worry about ARMv1 through ARMv5, which didn't
- * support unaligned loads, and, if so, do we need to worry about all
- * of them, or just some of them, e.g. ARMv5?
  * XXX - are those the only 68k tests we need not to generated
  * unaligned accesses if the target is the 68000 or 68010?
  * XXX - are there any tests we don't need, because some definitions are for
@@ -152,7 +152,7 @@ EXTRACT_IPV4_TO_HOST_ORDER(const void *p)
  *
  * We do this in case the compiler can generate code using those
  * instructions to do an unaligned load and pass stuff to "ntohs()" or
- * "ntohl()", which might be better than than the code to fetch the
+ * "ntohl()", which might be better than the code to fetch the
  * bytes one at a time and assemble them.  (That might not be the
  * case on a little-endian platform, such as DEC's MIPS machines and
  * Alpha machines, where "ntohs()" and "ntohl()" might not be done
@@ -259,6 +259,16 @@ EXTRACT_IPV4_TO_HOST_ORDER(const void *p)
  * set to do unaligned loads, so do unaligned loads of big-endian
  * quantities the hard way - fetch the bytes one at a time and
  * assemble them.
+ *
+ * XXX - ARM is a special case.  ARMv1 through ARMv5 didn't suppory
+ * unaligned loads; ARMv6 and later support it *but* have a bit in
+ * the system control register that the OS can set and that causes
+ * unaligned loads to fault rather than succeeding.
+ *
+ * At least some OSes may set that flag, so we do *not* treat ARM
+ * as supporting unaligned loads.  If your OS supports them on ARM,
+ * and you want to use them, please update the tests in the #if above
+ * to check for ARM *and* for your OS.
  */
 #define EXTRACT_BE_U_2(p) \
 	((uint16_t)(((uint16_t)(*((const uint8_t *)(p) + 0)) << 8) | \
@@ -329,7 +339,7 @@ EXTRACT_HE_U_2(const void *p)
 	return val;
 }
 
-static inline uint16_t
+static inline int16_t
 EXTRACT_HE_S_2(const void *p)
 {
 	int16_t val;
@@ -338,7 +348,7 @@ EXTRACT_HE_S_2(const void *p)
 	return val;
 }
 
-static inline uint16_t
+static inline uint32_t
 EXTRACT_HE_U_4(const void *p)
 {
 	uint32_t val;
@@ -347,7 +357,7 @@ EXTRACT_HE_U_4(const void *p)
 	return val;
 }
 
-static inline uint16_t
+static inline int32_t
 EXTRACT_HE_S_4(const void *p)
 {
 	int32_t val;
@@ -421,7 +431,7 @@ EXTRACT_IPV4_TO_NETWORK_ORDER(const void *p)
 
 #define EXTRACT_BE_S_6(p) \
 	(((*((const uint8_t *)(p) + 0)) & 0x80) ? \
-	  ((uint64_t)(((uint64_t)(*((const uint8_t *)(p) + 0)) << 40) | \
+	   ((int64_t)(((uint64_t)(*((const uint8_t *)(p) + 0)) << 40) | \
 	              ((uint64_t)(*((const uint8_t *)(p) + 1)) << 32) | \
 	              ((uint64_t)(*((const uint8_t *)(p) + 2)) << 24) | \
 	              ((uint64_t)(*((const uint8_t *)(p) + 3)) << 16) | \
@@ -482,14 +492,6 @@ EXTRACT_IPV4_TO_NETWORK_ORDER(const void *p)
 	           ((uint32_t)(*((const uint8_t *)(p) + 2)) << 16) | \
 	           ((uint32_t)(*((const uint8_t *)(p) + 1)) << 8) | \
 	           ((uint32_t)(*((const uint8_t *)(p) + 0)) << 0)))
-#define EXTRACT_LE_U_3(p) \
-	((uint32_t)(((uint32_t)(*((const uint8_t *)(p) + 2)) << 16) | \
-	            ((uint32_t)(*((const uint8_t *)(p) + 1)) << 8) | \
-	            ((uint32_t)(*((const uint8_t *)(p) + 0)) << 0)))
-#define EXTRACT_LE_S_3(p) \
-	((int32_t)(((uint32_t)(*((const uint8_t *)(p) + 2)) << 16) | \
-	           ((uint32_t)(*((const uint8_t *)(p) + 1)) << 8) | \
-	           ((uint32_t)(*((const uint8_t *)(p) + 0)) << 0)))
 #define EXTRACT_LE_U_8(p) \
 	((uint64_t)(((uint64_t)(*((const uint8_t *)(p) + 7)) << 56) | \
 	            ((uint64_t)(*((const uint8_t *)(p) + 6)) << 48) | \
@@ -508,6 +510,40 @@ EXTRACT_IPV4_TO_NETWORK_ORDER(const void *p)
 	           ((uint64_t)(*((const uint8_t *)(p) + 2)) << 16) | \
 	           ((uint64_t)(*((const uint8_t *)(p) + 1)) << 8) | \
 	           ((uint64_t)(*((const uint8_t *)(p) + 0)) << 0)))
+
+/*
+ * Non-power-of-2 sizes.
+ */
+
+#define EXTRACT_LE_U_3(p) \
+	((uint32_t)(((uint32_t)(*((const uint8_t *)(p) + 2)) << 16) | \
+	            ((uint32_t)(*((const uint8_t *)(p) + 1)) << 8) | \
+	            ((uint32_t)(*((const uint8_t *)(p) + 0)) << 0)))
+#define EXTRACT_LE_S_3(p) \
+	((int32_t)(((uint32_t)(*((const uint8_t *)(p) + 2)) << 16) | \
+	           ((uint32_t)(*((const uint8_t *)(p) + 1)) << 8) | \
+	           ((uint32_t)(*((const uint8_t *)(p) + 0)) << 0)))
+#define EXTRACT_LE_U_5(p) \
+	((uint64_t)(((uint64_t)(*((const uint8_t *)(p) + 4)) << 32) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 3)) << 24) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 2)) << 16) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 1)) << 8) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 0)) << 0)))
+#define EXTRACT_LE_U_6(p) \
+	((uint64_t)(((uint64_t)(*((const uint8_t *)(p) + 5)) << 40) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 4)) << 32) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 3)) << 24) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 2)) << 16) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 1)) << 8) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 0)) << 0)))
+#define EXTRACT_LE_U_7(p) \
+	((uint64_t)(((uint64_t)(*((const uint8_t *)(p) + 6)) << 48) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 5)) << 40) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 4)) << 32) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 3)) << 24) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 2)) << 16) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 1)) << 8) |	\
+		    ((uint64_t)(*((const uint8_t *)(p) + 0)) << 0)))
 
 /*
  * Macros to check the presence of the values in question.
@@ -538,3 +574,342 @@ EXTRACT_IPV4_TO_NETWORK_ORDER(const void *p)
 
 #define ND_TTEST_16(p) ND_TTEST_LEN((p), 16)
 #define ND_TCHECK_16(p) ND_TCHECK_LEN((p), 16)
+
+static inline NORETURN void
+nd_trunc_longjmp(netdissect_options *ndo)
+{
+	longjmp(ndo->ndo_early_end, ND_TRUNCATED);
+}
+
+/* get_u_1 and get_s_1 */
+
+static inline uint8_t
+get_u_1(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_1(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_U_1(p);
+}
+
+static inline int8_t
+get_s_1(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_1(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_S_1(p);
+}
+
+/* get_be_u_N */
+
+static inline uint16_t
+get_be_u_2(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_2(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_BE_U_2(p);
+}
+
+static inline uint32_t
+get_be_u_3(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_3(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_BE_U_3(p);
+}
+
+static inline uint32_t
+get_be_u_4(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_4(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_BE_U_4(p);
+}
+
+static inline uint64_t
+get_be_u_5(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_5(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_BE_U_5(p);
+}
+
+static inline uint64_t
+get_be_u_6(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_6(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_BE_U_6(p);
+}
+
+static inline uint64_t
+get_be_u_7(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_7(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_BE_U_7(p);
+}
+
+static inline uint64_t
+get_be_u_8(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_8(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_BE_U_8(p);
+}
+
+/* get_be_s_N  */
+
+static inline int16_t
+get_be_s_2(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_2(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_BE_S_2(p);
+}
+
+static inline int32_t
+get_be_s_3(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_3(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_BE_S_3(p);
+}
+
+static inline int32_t
+get_be_s_4(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_4(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_BE_S_4(p);
+}
+
+static inline int64_t
+get_be_s_5(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_5(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_BE_S_5(p);
+}
+
+static inline int64_t
+get_be_s_6(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_6(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_BE_S_6(p);
+}
+
+static inline int64_t
+get_be_s_7(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_7(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_BE_S_7(p);
+}
+
+static inline int64_t
+get_be_s_8(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_8(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_BE_S_8(p);
+}
+
+/* get_he_u_N */
+
+static inline uint16_t
+get_he_u_2(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_2(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_HE_U_2(p);
+}
+
+static inline uint32_t
+get_he_u_4(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_4(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_HE_U_4(p);
+}
+
+/* get_he_s_N */
+
+static inline int16_t
+get_he_s_2(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_2(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_HE_S_2(p);
+}
+
+static inline int32_t
+get_he_s_4(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_4(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_HE_S_4(p);
+}
+
+/* get_le_u_N */
+
+static inline uint16_t
+get_le_u_2(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_2(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_LE_U_2(p);
+}
+
+static inline uint32_t
+get_le_u_3(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_3(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_LE_U_3(p);
+}
+
+static inline uint32_t
+get_le_u_4(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_4(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_LE_U_4(p);
+}
+
+static inline uint64_t
+get_le_u_5(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_5(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_LE_U_5(p);
+}
+
+static inline uint64_t
+get_le_u_6(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_6(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_LE_U_6(p);
+}
+
+static inline uint64_t
+get_le_u_7(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_7(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_LE_U_7(p);
+}
+
+static inline uint64_t
+get_le_u_8(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_8(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_LE_U_8(p);
+}
+
+/* get_le_s_N */
+
+static inline int16_t
+get_le_s_2(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_2(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_LE_S_2(p);
+}
+
+static inline int32_t
+get_le_s_3(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_3(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_LE_S_3(p);
+}
+
+static inline int32_t
+get_le_s_4(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_4(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_LE_S_4(p);
+}
+
+static inline int64_t
+get_le_s_8(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_8(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_LE_S_8(p);
+}
+
+/* get_ipv4_to_{host|network]_order */
+
+static inline uint32_t
+get_ipv4_to_host_order(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_4(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_IPV4_TO_HOST_ORDER(p);
+}
+
+static inline uint32_t
+get_ipv4_to_network_order(netdissect_options *ndo, const u_char *p)
+{
+	if (!ND_TTEST_4(p))
+		nd_trunc_longjmp(ndo);
+	return EXTRACT_IPV4_TO_NETWORK_ORDER(p);
+}
+
+static inline void
+get_cpy_bytes(netdissect_options *ndo, u_char *dst, const u_char *p, size_t len)
+{
+	if (!ND_TTEST_LEN(p, len))
+		nd_trunc_longjmp(ndo);
+	UNALIGNED_MEMCPY(dst, p, len);
+}
+
+#define GET_U_1(p) get_u_1(ndo, (const u_char *)(p))
+#define GET_S_1(p) get_s_1(ndo, (const u_char *)(p))
+
+#define GET_BE_U_2(p) get_be_u_2(ndo, (const u_char *)(p))
+#define GET_BE_U_3(p) get_be_u_3(ndo, (const u_char *)(p))
+#define GET_BE_U_4(p) get_be_u_4(ndo, (const u_char *)(p))
+#define GET_BE_U_5(p) get_be_u_5(ndo, (const u_char *)(p))
+#define GET_BE_U_6(p) get_be_u_6(ndo, (const u_char *)(p))
+#define GET_BE_U_7(p) get_be_u_7(ndo, (const u_char *)(p))
+#define GET_BE_U_8(p) get_be_u_8(ndo, (const u_char *)(p))
+
+#define GET_BE_S_2(p) get_be_s_2(ndo, (const u_char *)(p))
+#define GET_BE_S_3(p) get_be_s_3(ndo, (const u_char *)(p))
+#define GET_BE_S_4(p) get_be_s_4(ndo, (const u_char *)(p))
+#define GET_BE_S_5(p) get_be_s_5(ndo, (const u_char *)(p))
+#define GET_BE_S_6(p) get_be_s_6(ndo, (const u_char *)(p))
+#define GET_BE_S_7(p) get_be_s_7(ndo, (const u_char *)(p))
+#define GET_BE_S_8(p) get_be_s_8(ndo, (const u_char *)(p))
+
+#define GET_HE_U_2(p) get_he_u_2(ndo, (const u_char *)(p))
+#define GET_HE_U_4(p) get_he_u_4(ndo, (const u_char *)(p))
+
+#define GET_HE_S_2(p) get_he_s_2(ndo, (const u_char *)(p))
+#define GET_HE_S_4(p) get_he_s_4(ndo, (const u_char *)(p))
+
+#define GET_LE_U_2(p) get_le_u_2(ndo, (const u_char *)(p))
+#define GET_LE_U_3(p) get_le_u_3(ndo, (const u_char *)(p))
+#define GET_LE_U_4(p) get_le_u_4(ndo, (const u_char *)(p))
+#define GET_LE_U_5(p) get_le_u_5(ndo, (const u_char *)(p))
+#define GET_LE_U_6(p) get_le_u_6(ndo, (const u_char *)(p))
+#define GET_LE_U_7(p) get_le_u_7(ndo, (const u_char *)(p))
+#define GET_LE_U_8(p) get_le_u_8(ndo, (const u_char *)(p))
+
+#define GET_LE_S_2(p) get_le_s_2(ndo, (const u_char *)(p))
+#define GET_LE_S_3(p) get_le_s_3(ndo, (const u_char *)(p))
+#define GET_LE_S_4(p) get_le_s_4(ndo, (const u_char *)(p))
+#define GET_LE_S_8(p) get_le_s_8(ndo, (const u_char *)(p))
+
+#define GET_IPV4_TO_HOST_ORDER(p) get_ipv4_to_host_order(ndo, (const u_char *)(p))
+#define GET_IPV4_TO_NETWORK_ORDER(p) get_ipv4_to_network_order(ndo, (const u_char *)(p))
+
+#define GET_CPY_BYTES(dst, p, len) get_cpy_bytes(ndo, (u_char *)(dst), (const u_char *)(p), len)
+
+#endif /* EXTRACT_H */

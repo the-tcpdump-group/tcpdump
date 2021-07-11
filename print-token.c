@@ -69,15 +69,15 @@
 #define TOKEN_HDRLEN		14
 #define ROUTING_SEGMENT_MAX	16
 #define IS_SOURCE_ROUTED(trp)	((trp)->token_shost[0] & 0x80)
-#define FRAME_TYPE(trp)		((EXTRACT_U_1((trp)->token_fc) & 0xC0) >> 6)
+#define FRAME_TYPE(trp)		((GET_U_1((trp)->token_fc) & 0xC0) >> 6)
 #define TOKEN_FC_LLC		1
 
-#define BROADCAST(trp)		((EXTRACT_BE_U_2((trp)->token_rcf) & 0xE000) >> 13)
-#define RIF_LENGTH(trp)		((EXTRACT_BE_U_2((trp)->token_rcf) & 0x1f00) >> 8)
-#define DIRECTION(trp)		((EXTRACT_BE_U_2((trp)->token_rcf) & 0x0080) >> 7)
-#define LARGEST_FRAME(trp)	((EXTRACT_BE_U_2((trp)->token_rcf) & 0x0070) >> 4)
-#define RING_NUMBER(trp, x)	((EXTRACT_BE_U_2((trp)->token_rseg[x]) & 0xfff0) >> 4)
-#define BRIDGE_NUMBER(trp, x)	((EXTRACT_BE_U_2((trp)->token_rseg[x]) & 0x000f))
+#define BROADCAST(trp)		((GET_BE_U_2((trp)->token_rcf) & 0xE000) >> 13)
+#define RIF_LENGTH(trp)		((GET_BE_U_2((trp)->token_rcf) & 0x1f00) >> 8)
+#define DIRECTION(trp)		((GET_BE_U_2((trp)->token_rcf) & 0x0080) >> 7)
+#define LARGEST_FRAME(trp)	((GET_BE_U_2((trp)->token_rcf) & 0x0070) >> 4)
+#define RING_NUMBER(trp, x)	((GET_BE_U_2((trp)->token_rseg[x]) & 0xfff0) >> 4)
+#define BRIDGE_NUMBER(trp, x)	(GET_BE_U_2((trp)->token_rseg[x]) & 0x000f)
 #define SEGMENT_COUNT(trp)	((int)((RIF_LENGTH(trp) - 2) / 2))
 
 struct token_header {
@@ -89,7 +89,6 @@ struct token_header {
 	nd_uint16_t  token_rseg[ROUTING_SEGMENT_MAX];
 };
 
-static const char tstr[] = "[|token-ring]";
 
 /* Extract src, dst addresses */
 static void
@@ -114,8 +113,8 @@ token_hdr_print(netdissect_options *ndo,
 
 	if (!ndo->ndo_qflag)
 		ND_PRINT("%02x %02x ",
-		       EXTRACT_U_1(trp->token_ac),
-		       EXTRACT_U_1(trp->token_fc));
+		       GET_U_1(trp->token_ac),
+		       GET_U_1(trp->token_fc));
 	ND_PRINT("%s > %s, length %u: ",
 	       srcname, dstname,
 	       length);
@@ -153,11 +152,11 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 	u_int route_len = 0, hdr_len = TOKEN_HDRLEN;
 	int seg;
 
-	ndo->ndo_protocol = "token";
+	ndo->ndo_protocol = "token-ring";
 	trp = (const struct token_header *)p;
 
 	if (caplen < TOKEN_HDRLEN) {
-		ND_PRINT("%s", tstr);
+		nd_print_trunc(ndo);
 		return hdr_len;
 	}
 
@@ -175,13 +174,13 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 			token_hdr_print(ndo, trp, length, srcmac, dstmac);
 
 		if (caplen < TOKEN_HDRLEN + 2) {
-			ND_PRINT("%s", tstr);
+			nd_print_trunc(ndo);
 			return hdr_len;
 		}
 		route_len = RIF_LENGTH(trp);
 		hdr_len += route_len;
 		if (caplen < hdr_len) {
-			ND_PRINT("%s", tstr);
+			nd_print_trunc(ndo);
 			return hdr_len;
 		}
 		if (ndo->ndo_vflag) {
@@ -192,10 +191,11 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 				ND_PRINT(" [%u:%u]", RING_NUMBER(trp, seg),
 				    BRIDGE_NUMBER(trp, seg));
 		} else {
-			ND_PRINT("rt = %x", EXTRACT_BE_U_2(trp->token_rcf));
+			ND_PRINT("rt = %x", GET_BE_U_2(trp->token_rcf));
 
 			for (seg = 0; seg < SEGMENT_COUNT(trp); seg++)
-				ND_PRINT(":%x", EXTRACT_BE_U_2(trp->token_rseg[seg]));
+				ND_PRINT(":%x",
+					 GET_BE_U_2(trp->token_rseg[seg]));
 		}
 		ND_PRINT(" (%s) ", largest_frame[LARGEST_FRAME(trp)]);
 	} else {
@@ -242,9 +242,9 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
+void
 token_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
-	ndo->ndo_protocol = "token_if";
-	return (token_print(ndo, p, h->len, h->caplen));
+	ndo->ndo_protocol = "token-ring";
+	ndo->ndo_ll_hdr_len += token_print(ndo, p, h->len, h->caplen);
 }

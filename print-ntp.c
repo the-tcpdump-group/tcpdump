@@ -42,48 +42,17 @@
 #include <time.h>
 #endif
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
 
-static const char tstr[] = " [|ntp]";
+#include "ntp.h"
 
 /*
  * Based on ntp.h from the U of MD implementation
  *	This file is based on Version 2 of the NTP spec (RFC1119).
  */
-
-/*
- *  Definitions for the masses
- */
-#define	JAN_1970	INT64_T_CONSTANT(2208988800)	/* 1970 - 1900 in seconds */
-
-/*
- * Structure definitions for NTP fixed point values
- *
- *    0			  1		      2			  3
- *    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *   |			       Integer Part			     |
- *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *   |			       Fraction Part			     |
- *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *
- *    0			  1		      2			  3
- *    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *   |		  Integer Part	     |	   Fraction Part	     |
- *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-*/
-struct l_fixedpt {
-	nd_uint32_t int_part;
-	nd_uint32_t fraction;
-};
-
-struct s_fixedpt {
-	nd_uint16_t int_part;
-	nd_uint16_t fraction;
-};
 
 /* rfc2030
  *                      1                   2                   3
@@ -187,7 +156,6 @@ struct ntp_time_data {
 #define	INFO_REPLY	63	/* **** THIS implementation dependent **** */
 
 static void p_sfix(netdissect_options *ndo, const struct s_fixedpt *);
-static void p_ntp_time(netdissect_options *, const struct l_fixedpt *);
 static void p_ntp_delta(netdissect_options *, const struct l_fixedpt *, const struct l_fixedpt *);
 static void p_poll(netdissect_options *, const int);
 
@@ -269,71 +237,61 @@ ntp_time_print(netdissect_options *ndo,
 	if (length < NTP_TIMEMSG_MINLEN)
 		goto invalid;
 
-	ND_TCHECK_1(bp->stratum);
-	stratum = EXTRACT_U_1(bp->stratum);
+	stratum = GET_U_1(bp->stratum);
 	ND_PRINT(", Stratum %u (%s)",
 		stratum,
 		tok2str(ntp_stratum_values, (stratum >=2 && stratum<=15) ? "secondary reference" : "reserved", stratum));
 
-	ND_TCHECK_1(bp->ppoll);
-	ND_PRINT(", poll %d", EXTRACT_S_1(bp->ppoll));
-	p_poll(ndo, EXTRACT_U_1(bp->ppoll));
+	ND_PRINT(", poll %d", GET_S_1(bp->ppoll));
+	p_poll(ndo, GET_S_1(bp->ppoll));
 
-	ND_TCHECK_1(bp->precision);
-	ND_PRINT(", precision %d", EXTRACT_S_1(bp->precision));
+	ND_PRINT(", precision %d", GET_S_1(bp->precision));
 
-	ND_TCHECK_SIZE(&bp->root_delay);
 	ND_PRINT("\n\tRoot Delay: ");
 	p_sfix(ndo, &bp->root_delay);
 
-	ND_TCHECK_SIZE(&bp->root_dispersion);
 	ND_PRINT(", Root dispersion: ");
 	p_sfix(ndo, &bp->root_dispersion);
 
-	ND_TCHECK_4(bp->refid);
 	ND_PRINT(", Reference-ID: ");
 	/* Interpretation depends on stratum */
 	switch (stratum) {
 
 	case UNSPECIFIED:
 		ND_PRINT("(unspec)");
+		ND_TCHECK_4(bp->refid);
 		break;
 
 	case PRIM_REF:
-		if (fn_printn(ndo, (const u_char *)&(bp->refid), 4, ndo->ndo_snapend))
-			goto trunc;
+		nd_printjn(ndo, (const u_char *)&(bp->refid), 4);
 		break;
 
 	case INFO_QUERY:
-		ND_PRINT("%s INFO_QUERY", ipaddr_string(ndo, bp->refid));
+		ND_PRINT("%s INFO_QUERY", GET_IPADDR_STRING(bp->refid));
 		/* this doesn't have more content */
 		return;
 
 	case INFO_REPLY:
-		ND_PRINT("%s INFO_REPLY", ipaddr_string(ndo, bp->refid));
+		ND_PRINT("%s INFO_REPLY", GET_IPADDR_STRING(bp->refid));
 		/* this is too complex to be worth printing */
 		return;
 
 	default:
 		/* In NTPv4 (RFC 5905) refid is an IPv4 address or first 32 bits of
 		   MD5 sum of IPv6 address */
-		ND_PRINT("0x%08x", EXTRACT_BE_U_4(bp->refid));
+		ND_PRINT("0x%08x", GET_BE_U_4(bp->refid));
 		break;
 	}
 
-	ND_TCHECK_SIZE(&bp->ref_timestamp);
 	ND_PRINT("\n\t  Reference Timestamp:  ");
 	p_ntp_time(ndo, &(bp->ref_timestamp));
 
-	ND_TCHECK_SIZE(&bp->org_timestamp);
 	ND_PRINT("\n\t  Originator Timestamp: ");
 	p_ntp_time(ndo, &(bp->org_timestamp));
 
-	ND_TCHECK_SIZE(&bp->rec_timestamp);
 	ND_PRINT("\n\t  Receive Timestamp:    ");
 	p_ntp_time(ndo, &(bp->rec_timestamp));
 
-	ND_TCHECK_SIZE(&bp->xmt_timestamp);
 	ND_PRINT("\n\t  Transmit Timestamp:   ");
 	p_ntp_time(ndo, &(bp->xmt_timestamp));
 
@@ -345,39 +303,30 @@ ntp_time_print(netdissect_options *ndo,
 
 	/* FIXME: this code is not aware of any extension fields */
 	if (length == NTP_TIMEMSG_MINLEN + 4) { 	/* Optional: key-id (crypto-NAK) */
-		ND_TCHECK_4(bp->key_id);
-		ND_PRINT("\n\tKey id: %u", EXTRACT_BE_U_4(bp->key_id));
+		ND_PRINT("\n\tKey id: %u", GET_BE_U_4(bp->key_id));
 	} else if (length == NTP_TIMEMSG_MINLEN + 4 + 16) { 	/* Optional: key-id + 128-bit digest */
-		ND_TCHECK_4(bp->key_id);
-		ND_PRINT("\n\tKey id: %u", EXTRACT_BE_U_4(bp->key_id));
-		ND_TCHECK_LEN(bp->message_digest, 16);
-                ND_PRINT("\n\tAuthentication: %08x%08x%08x%08x",
-        		       EXTRACT_BE_U_4(bp->message_digest),
-        		       EXTRACT_BE_U_4(bp->message_digest + 4),
-        		       EXTRACT_BE_U_4(bp->message_digest + 8),
-        		       EXTRACT_BE_U_4(bp->message_digest + 12));
+		ND_PRINT("\n\tKey id: %u", GET_BE_U_4(bp->key_id));
+		ND_PRINT("\n\tAuthentication: %08x%08x%08x%08x",
+			 GET_BE_U_4(bp->message_digest),
+			 GET_BE_U_4(bp->message_digest + 4),
+			 GET_BE_U_4(bp->message_digest + 8),
+			 GET_BE_U_4(bp->message_digest + 12));
 	} else if (length == NTP_TIMEMSG_MINLEN + 4 + 20) { 	/* Optional: key-id + 160-bit digest */
-		ND_TCHECK_4(bp->key_id);
-		ND_PRINT("\n\tKey id: %u", EXTRACT_BE_U_4(bp->key_id));
-		ND_TCHECK_LEN(bp->message_digest, 20);
+		ND_PRINT("\n\tKey id: %u", GET_BE_U_4(bp->key_id));
 		ND_PRINT("\n\tAuthentication: %08x%08x%08x%08x%08x",
-		               EXTRACT_BE_U_4(bp->message_digest),
-		               EXTRACT_BE_U_4(bp->message_digest + 4),
-		               EXTRACT_BE_U_4(bp->message_digest + 8),
-		               EXTRACT_BE_U_4(bp->message_digest + 12),
-		               EXTRACT_BE_U_4(bp->message_digest + 16));
+			 GET_BE_U_4(bp->message_digest),
+			 GET_BE_U_4(bp->message_digest + 4),
+			 GET_BE_U_4(bp->message_digest + 8),
+			 GET_BE_U_4(bp->message_digest + 12),
+			 GET_BE_U_4(bp->message_digest + 16));
 	} else if (length > NTP_TIMEMSG_MINLEN) {
 		ND_PRINT("\n\t(%u more bytes after the header)", length - NTP_TIMEMSG_MINLEN);
 	}
 	return;
 
 invalid:
-	ND_PRINT(" %s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(bp, length);
-	return;
-
-trunc:
-	ND_PRINT(" %s", tstr);
 }
 
 /*
@@ -393,8 +342,7 @@ ntp_control_print(netdissect_options *ndo,
 	if (length < NTP_CTRLMSG_MINLEN)
 		goto invalid;
 
-	ND_TCHECK_1(cd->control);
-	control = EXTRACT_U_1(cd->control);
+	control = GET_U_1(cd->control);
 	R = (control & 0x80) != 0;
 	E = (control & 0x40) != 0;
 	M = (control & 0x20) != 0;
@@ -403,24 +351,19 @@ ntp_control_print(netdissect_options *ndo,
 		  R ? "Response" : "Request", E ? "Error" : "OK",
 		  M ? "More" : "Last", opcode);
 
-	ND_TCHECK_2(cd->sequence);
-	sequence = EXTRACT_BE_U_2(cd->sequence);
+	sequence = GET_BE_U_2(cd->sequence);
 	ND_PRINT("\tSequence=%hu", sequence);
 
-	ND_TCHECK_2(cd->status);
-	status = EXTRACT_BE_U_2(cd->status);
+	status = GET_BE_U_2(cd->status);
 	ND_PRINT(", Status=%#hx", status);
 
-	ND_TCHECK_2(cd->assoc);
-	assoc = EXTRACT_BE_U_2(cd->assoc);
+	assoc = GET_BE_U_2(cd->assoc);
 	ND_PRINT(", Assoc.=%hu", assoc);
 
-	ND_TCHECK_2(cd->offset);
-	offset = EXTRACT_BE_U_2(cd->offset);
+	offset = GET_BE_U_2(cd->offset);
 	ND_PRINT(", Offset=%hu", offset);
 
-	ND_TCHECK_2(cd->count);
-	count = EXTRACT_BE_U_2(cd->count);
+	count = GET_BE_U_2(cd->count);
 	ND_PRINT(", Count=%hu", count);
 
 	if (NTP_CTRLMSG_MINLEN + count > length)
@@ -432,12 +375,8 @@ ntp_control_print(netdissect_options *ndo,
 	return;
 
 invalid:
-	ND_PRINT(" %s", istr);
+	nd_print_invalid(ndo);
 	ND_TCHECK_LEN(cd, length);
-	return;
-
-trunc:
-	ND_PRINT(" %s", tstr);
 }
 
 union ntpdata {
@@ -450,15 +389,14 @@ union ntpdata {
  */
 void
 ntp_print(netdissect_options *ndo,
-          const u_char *cp, u_int length)
+	  const u_char *cp, u_int length)
 {
 	const union ntpdata *bp = (const union ntpdata *)cp;
 	u_int mode, version, leapind;
 	uint8_t status;
 
 	ndo->ndo_protocol = "ntp";
-	ND_TCHECK_1(bp->td.status);
-	status = EXTRACT_U_1(bp->td.status);
+	status = GET_U_1(bp->td.status);
 
 	version = (status & VERSIONMASK) >> VERSIONSHIFT;
 	ND_PRINT("NTPv%u", version);
@@ -466,19 +404,19 @@ ntp_print(netdissect_options *ndo,
 	mode = (status & MODEMASK) >> MODESHIFT;
 	if (!ndo->ndo_vflag) {
 		ND_PRINT(", %s, length %u",
-		          tok2str(ntp_mode_values, "Unknown mode", mode),
-		          length);
+			 tok2str(ntp_mode_values, "Unknown mode", mode),
+			 length);
 		return;
 	}
 
 	ND_PRINT(", %s, length %u\n",
-	          tok2str(ntp_mode_values, "Unknown mode", mode), length);
+		  tok2str(ntp_mode_values, "Unknown mode", mode), length);
 
 	/* leapind = (status & LEAPMASK) >> LEAPSHIFT; */
 	leapind = (status & LEAPMASK);
 	ND_PRINT("\tLeap indicator: %s (%u)",
-	          tok2str(ntp_leapind_values, "Unknown", leapind),
-	          leapind);
+		 tok2str(ntp_leapind_values, "Unknown", leapind),
+		 leapind);
 
 	switch (mode) {
 
@@ -498,10 +436,6 @@ ntp_print(netdissect_options *ndo,
 	default:
 		break;			/* XXX: not implemented! */
 	}
-	return;
-
-trunc:
-	ND_PRINT(" %s", tstr);
 }
 
 static void
@@ -512,74 +446,18 @@ p_sfix(netdissect_options *ndo,
 	int f;
 	double ff;
 
-	i = EXTRACT_BE_U_2(sfp->int_part);
-	f = EXTRACT_BE_U_2(sfp->fraction);
+	i = GET_BE_U_2(sfp->int_part);
+	f = GET_BE_U_2(sfp->fraction);
 	ff = f / 65536.0;		/* shift radix point by 16 bits */
 	f = (int)(ff * 1000000.0);	/* Treat fraction as parts per million */
 	ND_PRINT("%d.%06d", i, f);
 }
 
-#define	FMAXINT	(4294967296.0)	/* floating point rep. of MAXINT */
-
-static void
-p_ntp_time(netdissect_options *ndo,
-           const struct l_fixedpt *lfp)
-{
-	uint32_t i;
-	uint32_t uf;
-	uint32_t f;
-	double ff;
-
-	i = EXTRACT_BE_U_4(lfp->int_part);
-	uf = EXTRACT_BE_U_4(lfp->fraction);
-	ff = uf;
-	if (ff < 0.0)		/* some compilers are buggy */
-		ff += FMAXINT;
-	ff = ff / FMAXINT;			/* shift radix point by 32 bits */
-	f = (uint32_t)(ff * 1000000000.0);	/* treat fraction as parts per billion */
-	ND_PRINT("%u.%09u", i, f);
-
-#ifdef HAVE_STRFTIME
-	/*
-	 * print the UTC time in human-readable format.
-	 */
-	if (i) {
-	    int64_t seconds_64bit = (int64_t)i - JAN_1970;
-	    time_t seconds;
-	    struct tm *tm;
-	    char time_buf[128];
-
-	    seconds = (time_t)seconds_64bit;
-	    if (seconds != seconds_64bit) {
-		/*
-		 * It doesn't fit into a time_t, so we can't hand it
-		 * to gmtime.
-		 */
-		ND_PRINT(" (unrepresentable)");
-	    } else {
-		tm = gmtime(&seconds);
-		if (tm == NULL) {
-		    /*
-		     * gmtime() can't handle it.
-		     * (Yes, that might happen with some version of
-		     * Microsoft's C library.)
-		     */
-		    ND_PRINT(" (unrepresentable)");
-		} else {
-		    /* use ISO 8601 (RFC3339) format */
-		    strftime(time_buf, sizeof (time_buf), "%Y-%m-%dT%H:%M:%S", tm);
-		    ND_PRINT(" (%s)", time_buf);
-		}
-	    }
-	}
-#endif
-}
-
 /* Prints time difference between *lfp and *olfp */
 static void
 p_ntp_delta(netdissect_options *ndo,
-            const struct l_fixedpt *olfp,
-            const struct l_fixedpt *lfp)
+	    const struct l_fixedpt *olfp,
+	    const struct l_fixedpt *lfp)
 {
 	uint32_t u, uf;
 	uint32_t ou, ouf;
@@ -588,10 +466,10 @@ p_ntp_delta(netdissect_options *ndo,
 	double ff;
 	int signbit;
 
-	u = EXTRACT_BE_U_4(lfp->int_part);
-	ou = EXTRACT_BE_U_4(olfp->int_part);
-	uf = EXTRACT_BE_U_4(lfp->fraction);
-	ouf = EXTRACT_BE_U_4(olfp->fraction);
+	u = GET_BE_U_4(lfp->int_part);
+	ou = GET_BE_U_4(olfp->int_part);
+	uf = GET_BE_U_4(lfp->fraction);
+	ouf = GET_BE_U_4(olfp->fraction);
 	if (ou == 0 && ouf == 0) {
 		p_ntp_time(ndo, lfp);
 		return;

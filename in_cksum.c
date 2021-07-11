@@ -196,5 +196,5 @@ in_cksum_shouldbe(uint16_t sum, uint16_t computed_sum)
 	shouldbe += ntohs(computed_sum);
 	shouldbe = (shouldbe & 0xFFFF) + (shouldbe >> 16);
 	shouldbe = (shouldbe & 0xFFFF) + (shouldbe >> 16);
-	return shouldbe;
+	return (uint16_t)shouldbe;
 }

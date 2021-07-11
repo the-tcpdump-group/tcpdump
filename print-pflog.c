@@ -39,7 +39,6 @@
 #include "netdissect.h"
 #include "extract.h"
 
-static const char tstr[] = "[|pflog]";
 
 static const struct tok pf_reasons[] = {
 	{ 0,	"0(match)" },
@@ -91,21 +90,25 @@ pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
 	uint32_t rulenr, subrulenr;
 
 	ndo->ndo_protocol = "pflog";
-	rulenr = EXTRACT_BE_U_4(&hdr->rulenr);
-	subrulenr = EXTRACT_BE_U_4(&hdr->subrulenr);
+	rulenr = GET_BE_U_4(&hdr->rulenr);
+	subrulenr = GET_BE_U_4(&hdr->subrulenr);
 	if (subrulenr == (uint32_t)-1)
 		ND_PRINT("rule %u/", rulenr);
-	else
-		ND_PRINT("rule %u.%s.%u/", rulenr, hdr->ruleset, subrulenr);
+	else {
+		ND_PRINT("rule %u.", rulenr);
+		nd_printjnp(ndo, (const u_char*)hdr->ruleset, PFLOG_RULESET_NAME_SIZE);
+		ND_PRINT(".%u/", subrulenr);
+	}
 
-	ND_PRINT("%s: %s %s on %s: ",
-	    tok2str(pf_reasons, "unkn(%u)", EXTRACT_U_1(&hdr->reason)),
-	    tok2str(pf_actions, "unkn(%u)", EXTRACT_U_1(&hdr->action)),
-	    tok2str(pf_directions, "unkn(%u)", EXTRACT_U_1(&hdr->dir)),
-	    hdr->ifname);
+	ND_PRINT("%s: %s %s on ",
+	    tok2str(pf_reasons, "unkn(%u)", GET_U_1(&hdr->reason)),
+	    tok2str(pf_actions, "unkn(%u)", GET_U_1(&hdr->action)),
+	    tok2str(pf_directions, "unkn(%u)", GET_U_1(&hdr->dir)));
+	nd_printjnp(ndo, (const u_char*)hdr->ifname, IFNAMSIZ);
+	ND_PRINT(": ");
 }
 
-u_int
+void
 pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
                const u_char *p)
 {
@@ -115,24 +118,27 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	const struct pfloghdr *hdr;
 	uint8_t af;
 
-	ndo->ndo_protocol = "pflog_if";
+	ndo->ndo_protocol = "pflog";
 	/* check length */
 	if (caplen < sizeof(uint8_t)) {
-		ND_PRINT("%s", tstr);
-		return (caplen);
+		nd_print_trunc(ndo);
+		ndo->ndo_ll_hdr_len += h->caplen;
+		return;
 	}
 
 #define MIN_PFLOG_HDRLEN	45
 	hdr = (const struct pfloghdr *)p;
-	if (hdr->length < MIN_PFLOG_HDRLEN) {
+	if (GET_U_1(&hdr->length) < MIN_PFLOG_HDRLEN) {
 		ND_PRINT("[pflog: invalid header length!]");
-		return (hdr->length);	/* XXX: not really */
+		ndo->ndo_ll_hdr_len += GET_U_1(&hdr->length);	/* XXX: not really */
+		return;
 	}
 	hdrlen = BPF_WORDALIGN(hdr->length);
 
 	if (caplen < hdrlen) {
-		ND_PRINT("%s", tstr);
-		return (hdrlen);	/* XXX: true? */
+		nd_print_trunc(ndo);
+		ndo->ndo_ll_hdr_len += hdrlen;	/* XXX: true? */
+		return;
 	}
 
 	/* print what we know */
@@ -141,7 +147,7 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 		pflog_print(ndo, hdr);
 
 	/* skip to the real packet */
-	af = EXTRACT_U_1(&hdr->af);
+	af = GET_U_1(&hdr->af);
 	length -= hdrlen;
 	caplen -= hdrlen;
 	p += hdrlen;
@@ -173,8 +179,9 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 			ND_DEFAULTPRINT(p, caplen);
 	}
 
-	return (hdrlen);
+	ndo->ndo_ll_hdr_len += hdrlen;
+	return;
 trunc:
-	ND_PRINT("%s", tstr);
-	return (hdrlen);
+	nd_print_trunc(ndo);
+	ndo->ndo_ll_hdr_len += hdrlen;
 }

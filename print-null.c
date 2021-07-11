@@ -27,13 +27,11 @@
 
 #include "netdissect-stdinc.h"
 
-#include <string.h>
-
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 #include "af.h"
 
-static const char tstr[] = " [|null]";
 
 /*
  * The DLT_NULL packet header is 4 bytes long. It contains a host-byte-order
@@ -56,7 +54,7 @@ static const char tstr[] = " [|null]";
 ((((y)&0xff)<<24) | (((y)&0xff00)<<8) | (((y)&0xff0000)>>8) | (((y)>>24)&0xff))
 
 static void
-null_hdr_print(netdissect_options *ndo, u_int family, u_int length)
+null_hdr_print(netdissect_options *ndo, uint32_t family, u_int length)
 {
 	if (!ndo->ndo_qflag) {
 		ND_PRINT("AF %s (%u)",
@@ -75,19 +73,18 @@ null_hdr_print(netdissect_options *ndo, u_int family, u_int length)
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-u_int
+void
 null_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int length = h->len;
 	u_int caplen = h->caplen;
 	uint32_t family;
 
-	ndo->ndo_protocol = "null_if";
-	if (caplen < NULL_HDRLEN)
-		goto trunc;
+	ndo->ndo_protocol = "null";
+	ND_TCHECK_LEN(p, NULL_HDRLEN);
+	ndo->ndo_ll_hdr_len += NULL_HDRLEN;
 
-	ND_TCHECK_4(p);
-	memcpy((char *)&family, (const char *)p, sizeof(family));
+	family = GET_HE_U_4(p);
 
 	/*
 	 * This isn't necessarily in our host byte order; if this is
@@ -138,9 +135,4 @@ null_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 		if (!ndo->ndo_suppress_default_print)
 			ND_DEFAULTPRINT(p, caplen);
 	}
-
-	return (NULL_HDRLEN);
-trunc:
-	ND_PRINT("%s", tstr);
-	return (NULL_HDRLEN);
 }
