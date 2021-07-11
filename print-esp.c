@@ -413,9 +413,14 @@ static int
 strendswith(char *str, char *end)
 {
 	char *p;
+	const size_t str_len = strlen(str);
+	const size_t end_len = strlen(end);
 
-	if (strlen(str) > strlen(end) &&
-	    !strcmp(str + strlen(str) - strlen(end), end)) {
+	/*
+	 * Find substring at the end of given substring. If present,
+	 * cut str by placing '\0' right before ending substring.
+	 */
+	if (str_len > end_len && !strcmp(str + str_len - end_len, end)) {
 		p = strstr(str, end);
 		*p = '\0';
 		return 1;
