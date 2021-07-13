@@ -530,6 +530,7 @@ extern void ltalk_if_print IF_PRINTER_ARGS;
 extern void mfr_if_print IF_PRINTER_ARGS;
 extern void netanalyzer_if_print IF_PRINTER_ARGS;
 extern void netanalyzer_transparent_if_print IF_PRINTER_ARGS;
+extern void netlink_if_print IF_PRINTER_ARGS;
 extern void nflog_if_print IF_PRINTER_ARGS;
 extern void null_if_print IF_PRINTER_ARGS;
 extern void pflog_if_print IF_PRINTER_ARGS;

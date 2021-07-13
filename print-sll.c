@@ -117,10 +117,10 @@ struct sll2_header {
 #define LINUX_SLL_OUTGOING	4
 
 /*
- * The LINUX_SLL_ values for "sll_protocol"; these correspond to the
- * ETH_P_ values on Linux, but are defined here so that they're
- * available even on systems other than Linux.  We assume, for now,
- * that the ETH_P_ values won't change in Linux; if they do, then:
+ * The LINUX_SLL_ and LINUX_ARPHRD_ values for "sll_protocol"; these
+ * correspond to the values defined on Linux, but are repeated here so
+ * that they're available even on systems other than Linux. We assume, for
+ * now, that the ETH_P_ values won't change in Linux; if they do, then:
  *
  *	if we don't translate them in "pcap-linux.c", capture files
  *	won't necessarily be readable if captured on a system that
@@ -139,6 +139,9 @@ struct sll2_header {
  */
 #define LINUX_SLL_P_802_3	0x0001	/* Novell 802.3 frames without 802.2 LLC header */
 #define LINUX_SLL_P_802_2	0x0004	/* 802.2 frames (not D/I/X Ethernet) */
+
+#define LINUX_ARPHRD_IEEE80211_RADIOTAP	803 /* Radiotap header followed by a 802.11 frame */
+#define LINUX_ARPHRD_NETLINK		824 /* Linux netlink packets */
 
 static const struct tok sll_pkttype_values[] = {
     { LINUX_SLL_HOST, "In" },
@@ -227,6 +230,15 @@ sll_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 	ND_TCHECK_LEN(p, SLL_HDR_LEN);
 
 	sllp = (const struct sll_header *)p;
+	hatype = GET_BE_U_2(sllp->sll_hatype);
+
+	if (hatype == LINUX_ARPHRD_NETLINK) {
+		/*
+		 * This is a netlink packet and is handled separately.
+		 */
+		netlink_if_print(ndo, h, p);
+		return;
+	}
 
 	if (ndo->ndo_eflag)
 		sll_print(ndo, sllp, length);
@@ -239,10 +251,9 @@ sll_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 	p += SLL_HDR_LEN;
 	hdrlen = SLL_HDR_LEN;
 
-	hatype = GET_BE_U_2(sllp->sll_hatype);
 	switch (hatype) {
 
-	case 803:
+	case LINUX_ARPHRD_IEEE80211_RADIOTAP:
 		/*
 		 * This is an packet with a radiotap header;
 		 * just dissect the payload as such.
@@ -438,7 +449,7 @@ sll2_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 	hatype = GET_BE_U_2(sllp->sll2_hatype);
 	switch (hatype) {
 
-	case 803:
+	case LINUX_ARPHRD_IEEE80211_RADIOTAP:
 		/*
 		 * This is an packet with a radiotap header;
 		 * just dissect the payload as such.

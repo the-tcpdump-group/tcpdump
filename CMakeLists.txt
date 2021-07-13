@@ -1038,6 +1038,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-mptcp.c
     print-msdp.c
     print-msnlb.c
+    print-netlink.c
     print-nflog.c
     print-nfs.c
     print-nsh.c
