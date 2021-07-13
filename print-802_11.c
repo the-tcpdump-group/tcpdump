@@ -362,9 +362,11 @@ struct ctrl_ba_hdr_t {
 	nd_uint16_t	fc;
 	nd_uint16_t	duration;
 	nd_mac_addr	ra;
+	nd_mac_addr	ta;
 };
 
-#define	CTRL_BA_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+IEEE802_11_RA_LEN)
+#define	CTRL_BA_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
+			 IEEE802_11_RA_LEN+IEEE802_11_TA_LEN)
 
 struct ctrl_bar_hdr_t {
 	nd_uint16_t	fc;
@@ -2010,8 +2012,9 @@ ctrl_header_print(netdissect_options *ndo, uint16_t fc, const u_char *p)
 		    GET_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->seq));
 		break;
 	case CTRL_BA:
-		ND_PRINT("RA:%s ",
-		    GET_ETHERADDR_STRING(((const struct ctrl_ba_hdr_t *)p)->ra));
+		ND_PRINT("RA:%s TA:%s ",
+		    GET_ETHERADDR_STRING(((const struct ctrl_ba_hdr_t *)p)->ra),
+		    GET_ETHERADDR_STRING(((const struct ctrl_ba_hdr_t *)p)->ta));
 		break;
 	case CTRL_PS_POLL:
 		ND_PRINT("BSSID:%s TA:%s ",
