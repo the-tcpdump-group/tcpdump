@@ -1,0 +1,4 @@
+    1  20:42:53.959853 IP 192.168.0.35 > 10.10.10.10: ICMP IPv4 extended echo reply, id 200, seq 100, length 8, Reply recognized, State: Stale, A-bit: 1, 4-bit: 1
+    2  20:42:53.959854 IP 192.168.0.35 > 10.10.10.10: ICMP IPv4 extended echo request, id 200, seq 100, length 20, local 1, Type 2: Address Index 911
+    3  20:42:53.959871 IP 192.168.0.35 > 10.10.10.10: ICMP IPv4 extended echo request, id 200, seq 100, length 24, local 1, Type 1: Address Name en101
+    4  20:42:53.959892 IP 192.168.0.35 > 10.10.10.10: ICMP IPv4 extended echo request, id 200, seq 100, length 24, local 1, Type 3: Address IPv4 192.168.0.1
