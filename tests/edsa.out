@@ -1,10 +1,4 @@
-    1  22:21:44.604675 EDSA 0xdada, Forward port 0.0, VLAN 0u, IP 192.168.20.1 > 192.168.20.2: ICMP echo request, id 13583, seq 1, length 64
-    2  22:21:44.604995 EDSA 0xdada, CPU > port 0.0, VLAN 0u, IP 192.168.20.2 > 192.168.20.1: ICMP echo reply, id 13583, seq 1, length 64
-    3  22:21:45.622749 EDSA 0xdada, Forward port 0.0, VLAN 0u, IP 192.168.20.1 > 192.168.20.2: ICMP echo request, id 13583, seq 2, length 64
-    4  22:21:45.622883 EDSA 0xdada, CPU > port 0.0, VLAN 0u, IP 192.168.20.2 > 192.168.20.1: ICMP echo reply, id 13583, seq 2, length 64
-    5  22:21:46.636035 EDSA 0xdada, Forward port 0.0, VLAN 0u, IP 192.168.20.1 > 192.168.20.2: ICMP echo request, id 13583, seq 3, length 64
-    6  22:21:46.636142 EDSA 0xdada, CPU > port 0.0, VLAN 0u, IP 192.168.20.2 > 192.168.20.1: ICMP echo reply, id 13583, seq 3, length 64
-    7  22:21:49.680084 EDSA 0xdada, CPU > port 0.0, VLAN 0u, ARP, Request who-has 192.168.20.1 tell 192.168.20.2, length 28
-    8  22:21:49.680474 EDSA 0xdada, Forward port 0.0, VLAN 0u, ARP, Reply 192.168.20.1 is-at 00:50:b6:29:10:7e, length 46
-    9  22:21:49.809266 EDSA 0xdada, Forward port 0.0, VLAN 0u, ARP, Request who-has 192.168.20.2 tell 192.168.20.1, length 46
-   10  22:21:49.809342 EDSA 0xdada, CPU > port 0.0, VLAN 0u, ARP, Reply 192.168.20.2 is-at c6:e8:9f:7d:69:da, length 28
+    1  00:08:39.888043 EDSA 0xdada, Forward port 0.2, VLAN 1337u, IP 198.18.10.1 > 198.18.10.2: ICMP echo request, id 120, seq 1, length 64
+    2  00:08:39.888132 EDSA 0xdada, CPU > port 0.2, VLAN 0u, IP 198.18.10.2 > 198.18.10.1: ICMP echo reply, id 120, seq 1, length 64
+    3  00:08:39.893713 EDSA 0xdada, Forward port 0.2, VLAN 1337u, IP 198.18.10.1 > 198.18.10.2: ICMP echo request, id 121, seq 1, length 64
+    4  00:08:39.893737 EDSA 0xdada, CPU > port 0.2, VLAN 0u, IP 198.18.10.2 > 198.18.10.1: ICMP echo reply, id 121, seq 1, length 64
