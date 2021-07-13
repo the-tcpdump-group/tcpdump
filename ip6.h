@@ -170,6 +170,8 @@ struct ip6_rthdr {
 #define IPV6_RTHDR_TYPE_0 0
 #define IPV6_RTHDR_TYPE_2 2
 #define IPV6_RTHDR_TYPE_4 4
+#define IPV6_RTHDR_TYPE_5 5
+#define IPV6_RTHDR_TYPE_6 6
 
 /* Type 0 Routing header */
 /* Also used for Type 2 */
@@ -208,5 +210,27 @@ struct ip6_frag {
 #define IP6F_OFF_MASK		0xfff8	/* mask out offset from ip6f_offlg */
 #define IP6F_RESERVED_MASK	0x0006	/* reserved bits in ip6f_offlg */
 #define IP6F_MORE_FRAG		0x0001	/* more-fragments flag */
+
+/* Type 5 Routing Header */
+/* CRH-16: Compact Routing Header w/ 16 bit SID's */
+struct ip6_crh16 {
+	nd_uint8_t crh16_nxt;
+	nd_uint8_t crh16_len;
+	nd_uint8_t crh16_type;
+	nd_uint8_t crh16_segleft;
+	/* SIDs */
+	nd_uint16_t crh16_sids;
+};
+
+/* Type 6 Routing Header */
+/* CRH-32: Compact Routing Header w/ 32 bit SID's */
+struct ip6_crh32 {
+	nd_uint8_t crh32_nxt;
+	nd_uint8_t crh32_len;
+	nd_uint8_t crh32_type;
+	nd_uint8_t crh32_segleft;
+	/* SIDs */
+	nd_uint32_t crh32_sids;
+};
 
 #endif /* not ND_IP6_H_ */

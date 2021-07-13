@@ -1,0 +1,1 @@
+    1  08:52:00.000000 IP6 ::1.1.1.1 > ::6.6.6.6: RT6 (len=1, type=5, segleft=1, CRH-16, Segment Identifiers: SID[0] = 700, SID[1] = 600, SID[2] = 200, SID[3] = 0, SID[4] = 0, SID[5] = 0) IP6 ::1.1.1.1 > ::7.7.7.7: ICMP6, echo request, id 31608, seq 14, length 16
