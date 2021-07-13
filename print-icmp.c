@@ -282,7 +282,7 @@ static const struct tok icmp_interface_identification_role_values[] = {
     { 1, "the sub-IP component of an IP interface upon which a datagram arrived"},
     { 2, "the IP interface through which the datagram would have been forwarded had it been forwardable"},
     { 3, "the IP next hop to which the datagram would have been forwarded"},
-	{ 0, NULL }
+    { 0, NULL }
 };
 
 /*
