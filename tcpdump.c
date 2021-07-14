@@ -2286,8 +2286,12 @@ main(int argc, char **argv)
 		error("%s", pcap_geterr(pd));
 	if (dflag) {
 		bpf_dump(&fcode, dflag);
-		pcap_close(pd);
+		/* Clear pd so our signal handler won't use-after-free it. */
+		pcap_t *to_free = pd;
+		pd = NULL;
+		pcap_close(to_free);
 		free(cmdbuf);
+		free(device);
 		pcap_freecode(&fcode);
 		exit_tcpdump(S_SUCCESS);
 	}
@@ -2606,7 +2610,10 @@ DIAG_ON_CLANG(assign-enum)
 			 */
 			info(1);
 		}
-		pcap_close(pd);
+		/* Clear pd so our signal handler won't use-after-free it. */
+		pcap_t *to_free = pd;
+		pd = NULL;
+		pcap_close(to_free);
 		if (VFileName != NULL) {
 			ret = get_next_file(VFile, VFileLine);
 			if (ret) {
@@ -2687,6 +2694,7 @@ DIAG_ON_CLANG(assign-enum)
 			PLURAL_SUFFIX(packets_captured));
 
 	free(cmdbuf);
+	free(device);
 	pcap_freecode(&fcode);
 	exit_tcpdump(status == -1 ? 1 : 0);
 }
@@ -2739,7 +2747,8 @@ cleanup(int signo _U_)
 	 * to do anything with standard I/O streams in a signal handler -
 	 * the ANSI C standard doesn't say it is).
 	 */
-	pcap_breakloop(pd);
+	if (pd != NULL)
+		pcap_breakloop(pd);
 #else
 	/*
 	 * We don't have "pcap_breakloop()"; this isn't safe, but
