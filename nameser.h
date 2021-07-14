@@ -182,7 +182,7 @@
 #define T_CDS		59		/* Child Delegation Signer */
 #define T_CDNSKEY	60		/* Child DNSKEY */
 #define T_OPENPGPKEY	61		/* OpenPGP KEY */
-#define T_CSYNC		62		/* Child to parent SYNCronization */
+#define T_CSYNC		62		/* Child to parent SYNChronization */
 #define T_ZONEMD	63		/* ZONE data Message Digest */
 #define T_SVCB		64		/* SerViCe Binding */
 #define T_HTTPS		65		/* HTTPS binding */
