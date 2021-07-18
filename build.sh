@@ -86,9 +86,7 @@ if [ "$BUILD_LIBPCAP" = yes ]; then
 fi
 if [ "$CMAKE" = no ]; then
     system=$(uname -s)
-    if [ "$system" = Darwin ] || [ "$system" = Linux ]; then
-        run_after_echo "make releasetar"
-    fi
+    run_after_echo "make releasetar"
 fi
 if [ "$CIRRUS_CI" = true ]; then
     if [ -n "$LD_LIBRARY_PATH" ]; then
