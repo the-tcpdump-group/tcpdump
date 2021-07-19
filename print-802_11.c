@@ -1284,9 +1284,18 @@ parse_elements(netdissect_options *ndo,
 				length -= cf.length;
 				break;
 			}
-			memcpy(&cf.count, p + offset, 6);
-			offset += 6;
-			length -= 6;
+			cf.count = GET_U_1(p + offset);
+			offset += 1;
+			length -= 1;
+			cf.period = GET_U_1(p + offset);
+			offset += 1;
+			length -= 1;
+			cf.max_duration = GET_LE_U_2(p + offset);
+			offset += 2;
+			length -= 2;
+			cf.dur_remaining = GET_LE_U_2(p + offset);
+			offset += 2;
+			length -= 2;
 			/*
 			 * Present and not truncated.
 			 *
@@ -1310,10 +1319,15 @@ parse_elements(netdissect_options *ndo,
 			}
 			if (tim.length - 3U > sizeof(tim.bitmap))
 				return 0;
-			memcpy(&tim.count, p + offset, 3);
-			offset += 3;
-			length -= 3;
-
+			tim.count = GET_U_1(p + offset);
+			offset += 1;
+			length -= 1;
+			tim.period = GET_U_1(p + offset);
+			offset += 1;
+			length -= 1;
+			tim.bitmap_control = GET_U_1(p + offset);
+			offset += 1;
+			length -= 1;
 			memcpy(tim.bitmap, p + offset, tim.length - 3);
 			offset += tim.length - 3;
 			length -= tim.length - 3;
