@@ -2313,88 +2313,6 @@ main(int argc, char **argv)
 		(void)setsignal(SIGHUP, oldhandler);
 #endif /* _WIN32 */
 
-#ifndef _WIN32
-	/*
-	 * If a user name was specified with "-Z", attempt to switch to
-	 * that user's UID.  This would probably be used with sudo,
-	 * to allow tcpdump to be run in a special restricted
-	 * account (if you just want to allow users to open capture
-	 * devices, and can't just give users that permission,
-	 * you'd make tcpdump set-UID or set-GID).
-	 *
-	 * Tcpdump doesn't necessarily write only to one savefile;
-	 * the general only way to allow a -Z instance to write to
-	 * savefiles as the user under whose UID it's run, rather
-	 * than as the user specified with -Z, would thus be to switch
-	 * to the original user ID before opening a capture file and
-	 * then switch back to the -Z user ID after opening the savefile.
-	 * Switching to the -Z user ID only after opening the first
-	 * savefile doesn't handle the general case.
-	 */
-
-	if (getuid() == 0 || geteuid() == 0) {
-#ifdef HAVE_LIBCAP_NG
-		/* Initialize capng */
-		capng_clear(CAPNG_SELECT_BOTH);
-		if (username) {
-DIAG_OFF_CLANG(assign-enum)
-			capng_updatev(
-				CAPNG_ADD,
-				CAPNG_PERMITTED | CAPNG_EFFECTIVE,
-				CAP_SETUID,
-				CAP_SETGID,
-				-1);
-DIAG_ON_CLANG(assign-enum)
-		}
-		if (chroot_dir) {
-DIAG_OFF_CLANG(assign-enum)
-			capng_update(
-				CAPNG_ADD,
-				CAPNG_PERMITTED | CAPNG_EFFECTIVE,
-				CAP_SYS_CHROOT
-				);
-DIAG_ON_CLANG(assign-enum)
-		}
-
-		if (WFileName) {
-DIAG_OFF_CLANG(assign-enum)
-			capng_update(
-				CAPNG_ADD,
-				CAPNG_PERMITTED | CAPNG_EFFECTIVE,
-				CAP_DAC_OVERRIDE
-				);
-DIAG_ON_CLANG(assign-enum)
-		}
-		capng_apply(CAPNG_SELECT_BOTH);
-#endif /* HAVE_LIBCAP_NG */
-		if (username || chroot_dir)
-			droproot(username, chroot_dir);
-
-	}
-#endif /* _WIN32 */
-
-	if (pcap_setfilter(pd, &fcode) < 0)
-		error("%s", pcap_geterr(pd));
-#ifdef HAVE_CAPSICUM
-	if (RFileName == NULL && VFileName == NULL && pcap_fileno(pd) != -1) {
-		static const unsigned long cmds[] = { BIOCGSTATS, BIOCROTZBUF };
-
-		/*
-		 * The various libpcap devices use a combination of
-		 * read (bpf), ioctl (bpf, netmap), poll (netmap)
-		 * so we add the relevant access rights.
-		 */
-		cap_rights_init(&rights, CAP_IOCTL, CAP_READ, CAP_EVENT);
-		if (cap_rights_limit(pcap_fileno(pd), &rights) < 0 &&
-		    errno != ENOSYS) {
-			error("unable to limit pcap descriptor");
-		}
-		if (cap_ioctls_limit(pcap_fileno(pd), cmds,
-		    sizeof(cmds) / sizeof(cmds[0])) < 0 && errno != ENOSYS) {
-			error("unable to limit ioctls on pcap descriptor");
-		}
-	}
-#endif
 	if (WFileName) {
 		/* Do not exceed the default PATH_MAX for files. */
 		dumpinfo.CurrentFileName = (char *)malloc(PATH_MAX + 1);
@@ -2482,6 +2400,88 @@ DIAG_ON_CLANG(assign-enum)
 		pcap_userdata = (u_char *)ndo;
 	}
 
+#ifndef _WIN32
+	/*
+	 * If a user name was specified with "-Z", attempt to switch to
+	 * that user's UID.  This would probably be used with sudo,
+	 * to allow tcpdump to be run in a special restricted
+	 * account (if you just want to allow users to open capture
+	 * devices, and can't just give users that permission,
+	 * you'd make tcpdump set-UID or set-GID).
+	 *
+	 * Tcpdump doesn't necessarily write only to one savefile;
+	 * the general only way to allow a -Z instance to write to
+	 * savefiles as the user under whose UID it's run, rather
+	 * than as the user specified with -Z, would thus be to switch
+	 * to the original user ID before opening a capture file and
+	 * then switch back to the -Z user ID after opening the savefile.
+	 * Switching to the -Z user ID only after opening the first
+	 * savefile doesn't handle the general case.
+	 */
+
+	if (getuid() == 0 || geteuid() == 0) {
+#ifdef HAVE_LIBCAP_NG
+		/* Initialize capng */
+		capng_clear(CAPNG_SELECT_BOTH);
+		if (username) {
+DIAG_OFF_CLANG(assign-enum)
+			capng_updatev(
+				CAPNG_ADD,
+				CAPNG_PERMITTED | CAPNG_EFFECTIVE,
+				CAP_SETUID,
+				CAP_SETGID,
+				-1);
+DIAG_ON_CLANG(assign-enum)
+		}
+		if (chroot_dir) {
+DIAG_OFF_CLANG(assign-enum)
+			capng_update(
+				CAPNG_ADD,
+				CAPNG_PERMITTED | CAPNG_EFFECTIVE,
+				CAP_SYS_CHROOT
+				);
+DIAG_ON_CLANG(assign-enum)
+		}
+
+		if (WFileName) {
+DIAG_OFF_CLANG(assign-enum)
+			capng_update(
+				CAPNG_ADD,
+				CAPNG_PERMITTED | CAPNG_EFFECTIVE,
+				CAP_DAC_OVERRIDE
+				);
+DIAG_ON_CLANG(assign-enum)
+		}
+		capng_apply(CAPNG_SELECT_BOTH);
+#endif /* HAVE_LIBCAP_NG */
+		if (username || chroot_dir)
+			droproot(username, chroot_dir);
+
+	}
+#endif /* _WIN32 */
+
+	if (pcap_setfilter(pd, &fcode) < 0)
+		error("%s", pcap_geterr(pd));
+#ifdef HAVE_CAPSICUM
+	if (RFileName == NULL && VFileName == NULL && pcap_fileno(pd) != -1) {
+		static const unsigned long cmds[] = { BIOCGSTATS, BIOCROTZBUF };
+
+		/*
+		 * The various libpcap devices use a combination of
+		 * read (bpf), ioctl (bpf, netmap), poll (netmap)
+		 * so we add the relevant access rights.
+		 */
+		cap_rights_init(&rights, CAP_IOCTL, CAP_READ, CAP_EVENT);
+		if (cap_rights_limit(pcap_fileno(pd), &rights) < 0 &&
+		    errno != ENOSYS) {
+			error("unable to limit pcap descriptor");
+		}
+		if (cap_ioctls_limit(pcap_fileno(pd), cmds,
+		    sizeof(cmds) / sizeof(cmds[0])) < 0 && errno != ENOSYS) {
+			error("unable to limit ioctls on pcap descriptor");
+		}
+	}
+#endif
 #ifdef SIGNAL_REQ_INFO
 	/*
 	 * We can't get statistics when reading from a file rather
