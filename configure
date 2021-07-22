@@ -9192,7 +9192,7 @@ $as_echo "$as_me: executing $ac_file commands" >&6;}
     "default-1":C) if test -f .devel; then
 	echo timestamp > stamp-h
 	cat $srcdir/Makefile-devel-adds >> Makefile
-	make depend
+	make depend || exit 1
 fi ;;
 
   esac
