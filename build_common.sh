@@ -105,6 +105,7 @@ run_after_echo() {
 }
 
 print_so_deps() {
+    # shellcheck disable=SC2006
     case `uname -s` in
     Darwin)
         run_after_echo otool -L "${1:?}"
