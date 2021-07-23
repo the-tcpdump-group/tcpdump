@@ -47,7 +47,7 @@ linux_task:
       - MATRIX_CC: clang
   script:
     - apt-get -qy update
-    - apt-get -qy install git autoconf make cmake clang gcc
+    - apt-get -qy install git autoconf make cmake clang gcc bc
     - apt-get -qy install flex bison libdbus-1-dev libbluetooth-dev libnl-genl-3-dev libibverbs-dev # for libpcap
     - apt-get -qy install libssl-dev libsmi2-dev libcap-ng-dev libpcap-dev
     - apt-get -qy install sudo # for some tcpdump commands
