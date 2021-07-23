@@ -21,7 +21,8 @@ if (!($TCPDUMP = $ENV{TCPDUMP_BIN})) {
 #
 # Make true and false work as Booleans.
 #
-use constant { true => 1, false => 0 };
+use constant true => 1;
+use constant false => 0;
 
 use File::Basename;
 use POSIX qw( WEXITSTATUS WIFEXITED);
