@@ -13,6 +13,7 @@
 . ./build_common.sh
 # Install directory prefix
 if [ -z "$PREFIX" ]; then
+    # shellcheck disable=SC2006
     PREFIX=`mktempdir tcpdump_build`
     echo "PREFIX set to '$PREFIX'"
 fi
@@ -51,11 +52,13 @@ run_after_echo make -s clean
 # are not warning-free for one or another reason. If you manage to fix one of
 # these cases, please remember to raise the bar here so if the warnings appear
 # again, it will trigger an error.
+# shellcheck disable=SC2006
 case `uname -s` in
     AIX)
         CFLAGS=
         ;;
     SunOS)
+        # shellcheck disable=SC2006
         case `uname -r` in
         5.10|5.11)
             CFLAGS=-Werror
