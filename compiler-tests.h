@@ -88,6 +88,18 @@
 #endif
 
 /*
+ * Check whether this is Clang major.minor or a later release.
+ */
+
+#if !defined(__clang__)
+#define ND_IS_AT_LEAST_CLANG_VERSION(major, minor) 0
+#else
+#define ND_IS_AT_LEAST_CLANG_VERSION(major, minor) \
+	(__clang_major__ > (major) || \
+	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
+#endif
+
+/*
  * Check whether this is Sun C/SunPro C/Oracle Studio major.minor
  * or a later release.
  *

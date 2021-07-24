@@ -47,6 +47,8 @@
 #include "netdissect.h"
 #include "extract.h"
 
+#include "diag-control.h"
+
 #ifdef HAVE_LIBCRYPTO
 #include "strtoaddr.h"
 #include "ascii_strcasecmp.h"
@@ -278,7 +280,7 @@ do_decrypt(netdissect_options *ndo, const char *caller, struct sa_list *sa,
  * dissecting anything in it and before it does any dissection of
  * anything in the old buffer.  That will free the new buffer.
  */
-USES_APPLE_DEPRECATED_API
+DIAG_OFF_DEPRECATION
 int esp_decrypt_buffer_by_ikev2_print(netdissect_options *ndo,
 				      int initiator,
 				      const u_char spii[8],
@@ -334,7 +336,7 @@ int esp_decrypt_buffer_by_ikev2_print(netdissect_options *ndo,
 
 	return 1;
 }
-USES_APPLE_RST
+DIAG_ON_DEPRECATION
 
 static void esp_print_addsa(netdissect_options *ndo,
 			    struct sa_list *sa, int sa_def)
@@ -413,7 +415,7 @@ int espprint_decode_hex(netdissect_options *ndo,
  * decode the form:    SPINUM@IP <tab> ALGONAME:0xsecret
  */
 
-USES_APPLE_DEPRECATED_API
+DIAG_OFF_DEPRECATION
 static int
 espprint_decode_encalgo(netdissect_options *ndo,
 			char *decode, struct sa_list *sa)
@@ -478,7 +480,7 @@ espprint_decode_encalgo(netdissect_options *ndo,
 
 	return 1;
 }
-USES_APPLE_RST
+DIAG_ON_DEPRECATION
 
 /*
  * for the moment, ignore the auth algorithm, just hard code the authenticator
@@ -670,7 +672,7 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 	esp_print_addsa(ndo, &sa1, sa_def);
 }
 
-USES_APPLE_DEPRECATED_API
+DIAG_OFF_DEPRECATION
 static void esp_init(netdissect_options *ndo _U_)
 {
 	/*
@@ -683,7 +685,7 @@ static void esp_init(netdissect_options *ndo _U_)
 #endif
 	EVP_add_cipher_alias(SN_des_ede3_cbc, "3des");
 }
-USES_APPLE_RST
+DIAG_ON_DEPRECATION
 
 void esp_decodesecret_print(netdissect_options *ndo)
 {
@@ -720,7 +722,7 @@ void esp_decodesecret_print(netdissect_options *ndo)
 #endif
 
 #ifdef HAVE_LIBCRYPTO
-USES_APPLE_DEPRECATED_API
+DIAG_OFF_DEPRECATION
 #endif
 void
 esp_print(netdissect_options *ndo,
@@ -920,5 +922,5 @@ esp_print(netdissect_options *ndo,
 #endif
 }
 #ifdef HAVE_LIBCRYPTO
-USES_APPLE_RST
+DIAG_ON_DEPRECATION
 #endif

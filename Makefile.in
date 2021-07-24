@@ -275,6 +275,7 @@ HDR = \
 	chdlc.h \
 	compiler-tests.h \
 	cpack.h \
+	diag-control.h \
 	ethertype.h \
 	extract.h \
 	fptype.h \

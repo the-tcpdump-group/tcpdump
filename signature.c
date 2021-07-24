@@ -26,6 +26,7 @@
 
 #include "netdissect.h"
 #include "signature.h"
+#include "diag-control.h"
 
 #ifdef HAVE_LIBCRYPTO
 #include <openssl/md5.h>
@@ -45,7 +46,7 @@ const struct tok signature_check_values[] = {
  * Compute a HMAC MD5 sum.
  * Taken from rfc2104, Appendix.
  */
-USES_APPLE_DEPRECATED_API
+DIAG_OFF_DEPRECATION
 static void
 signature_compute_hmac_md5(const uint8_t *text, int text_len, unsigned char *key,
                            unsigned int key_len, uint8_t *digest)
@@ -108,7 +109,7 @@ signature_compute_hmac_md5(const uint8_t *text, int text_len, unsigned char *key
     MD5_Update(&context, digest, 16);     /* then results of 1st hash */
     MD5_Final(digest, &context);          /* finish up 2nd pass */
 }
-USES_APPLE_RST
+DIAG_ON_DEPRECATION
 
 /*
  * Verify a cryptographic signature of the packet.
