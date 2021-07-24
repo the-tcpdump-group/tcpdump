@@ -44,6 +44,8 @@ __RCSID("$NetBSD: print-tcp.c,v 1.8 2007/07/24 11:53:48 drochner Exp $");
 #include "addrtoname.h"
 #include "extract.h"
 
+#include "diag-control.h"
+
 #include "tcp.h"
 
 #include "ip.h"
@@ -883,7 +885,7 @@ print_tcp_fastopen_option(netdissect_options *ndo, const u_char *cp,
 }
 
 #ifdef HAVE_LIBCRYPTO
-USES_APPLE_DEPRECATED_API
+DIAG_OFF_DEPRECATION
 static int
 tcp_verify_signature(netdissect_options *ndo,
                      const struct ip *ip, const struct tcphdr *tp,
@@ -963,5 +965,5 @@ tcp_verify_signature(netdissect_options *ndo,
         else
                 return (SIGNATURE_INVALID);
 }
-USES_APPLE_RST
+DIAG_ON_DEPRECATION
 #endif /* HAVE_LIBCRYPTO */

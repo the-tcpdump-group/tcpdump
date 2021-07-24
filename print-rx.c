@@ -1140,6 +1140,7 @@ trunc:
  * representing a logical OR of all the ACL permission bits
  */
 
+#define XSTRINGIFY(x) #x
 #define NUMSTRINGIFY(x)	XSTRINGIFY(x)
 
 static void

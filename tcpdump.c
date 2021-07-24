@@ -161,6 +161,8 @@ The Regents of the University of California.  All rights reserved.\n";
 
 #include "print.h"
 
+#include "diag-control.h"
+
 #include "fptype.h"
 
 #ifndef PATH_MAX
@@ -795,7 +797,7 @@ droproot(const char *username, const char *chroot_dir)
 		error("Couldn't find user '%.32s'", username);
 #ifdef HAVE_LIBCAP_NG
 	/* We don't need CAP_SETUID, CAP_SETGID and CAP_SYS_CHROOT any more. */
-DIAG_OFF_CLANG(assign-enum)
+DIAG_OFF_ASSIGN_ENUM
 	capng_updatev(
 		CAPNG_DROP,
 		CAPNG_EFFECTIVE | CAPNG_PERMITTED,
@@ -803,7 +805,7 @@ DIAG_OFF_CLANG(assign-enum)
 		CAP_SETGID,
 		CAP_SYS_CHROOT,
 		-1);
-DIAG_ON_CLANG(assign-enum)
+DIAG_ON_ASSIGN_ENUM
 	capng_apply(CAPNG_SELECT_BOTH);
 #endif /* HAVE_LIBCAP_NG */
 
@@ -2337,33 +2339,33 @@ main(int argc, char **argv)
 		/* Initialize capng */
 		capng_clear(CAPNG_SELECT_BOTH);
 		if (username) {
-DIAG_OFF_CLANG(assign-enum)
+DIAG_OFF_ASSIGN_ENUM
 			capng_updatev(
 				CAPNG_ADD,
 				CAPNG_PERMITTED | CAPNG_EFFECTIVE,
 				CAP_SETUID,
 				CAP_SETGID,
 				-1);
-DIAG_ON_CLANG(assign-enum)
+DIAG_ON_ASSIGN_ENUM
 		}
 		if (chroot_dir) {
-DIAG_OFF_CLANG(assign-enum)
+DIAG_OFF_ASSIGN_ENUM
 			capng_update(
 				CAPNG_ADD,
 				CAPNG_PERMITTED | CAPNG_EFFECTIVE,
 				CAP_SYS_CHROOT
 				);
-DIAG_ON_CLANG(assign-enum)
+DIAG_ON_ASSIGN_ENUM
 		}
 
 		if (WFileName) {
-DIAG_OFF_CLANG(assign-enum)
+DIAG_OFF_ASSIGN_ENUM
 			capng_update(
 				CAPNG_ADD,
 				CAPNG_PERMITTED | CAPNG_EFFECTIVE,
 				CAP_DAC_OVERRIDE
 				);
-DIAG_ON_CLANG(assign-enum)
+DIAG_ON_ASSIGN_ENUM
 		}
 		capng_apply(CAPNG_SELECT_BOTH);
 #endif /* HAVE_LIBCAP_NG */
@@ -3174,7 +3176,7 @@ static void verbose_stats_dump(int sig _U_)
 }
 #endif /* _WIN32 */
 
-USES_APPLE_DEPRECATED_API
+DIAG_OFF_DEPRECATION
 static void
 print_version(FILE *f)
 {
@@ -3212,7 +3214,7 @@ print_version(FILE *f)
 #  endif
 #endif /* __SANITIZE_ADDRESS__ or __has_feature */
 }
-USES_APPLE_RST
+DIAG_ON_DEPRECATION
 
 static void
 print_usage(FILE *f)
