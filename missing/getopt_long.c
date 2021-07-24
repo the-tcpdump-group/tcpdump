@@ -565,11 +565,11 @@ start:
 			++optind;
 	} else {				/* takes (optional) argument */
 		optarg = NULL;
+		if (*place) {			/* no white space */
 DIAG_OFF_CAST_QUAL
-		if (*place)			/* no white space */
 			optarg = (char *)place;
 DIAG_ON_CAST_QUAL
-		else if (oli[1] != ':') {	/* arg not optional */
+		} else if (oli[1] != ':') {	/* arg not optional */
 			if (++optind >= nargc) {	/* no arg */
 				place = EMSG;
 				if (PRINT_ERROR)
