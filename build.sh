@@ -54,22 +54,8 @@ run_after_echo make -s clean
 # again, it will trigger an error.
 # shellcheck disable=SC2006
 case `uname -s` in
-    AIX)
-        CFLAGS=
-        ;;
-    SunOS)
-        # shellcheck disable=SC2006
-        case `uname -r` in
-        5.10|5.11)
-            CFLAGS=-Werror
-            ;;
-        *)
-            CFLAGS=
-            ;;
-        esac
-        ;;
     *)
-        CFLAGS=-Werror
+        CFLAGS=`cc_werr_cflags`
         ;;
 esac
 run_after_echo make -s ${CFLAGS:+CFLAGS="$CFLAGS"}
