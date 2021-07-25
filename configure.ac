@@ -397,6 +397,35 @@ AC_CHECK_FUNC(vsnprintf,,
 AC_CHECK_FUNC(snprintf,,
     AC_MSG_ERROR([snprintf() is required but wasn't found]))
 
+#
+# Define HAVE_NO_PRINTF_Z to make it possible to disable test cases that
+# depend on %zu.
+#
+AC_MSG_CHECKING([whether printf(3) supports the z length modifier])
+AC_RUN_IFELSE(
+    [
+        AC_LANG_SOURCE([[
+#include <stdio.h>
+#include <string.h>
+
+int main()
+{
+  char buf[100];
+  snprintf(buf, sizeof(buf), "%zu", sizeof(buf));
+  return strncmp(buf, "100", sizeof(buf)) ? 1 : 0;
+}
+        ]])
+    ],
+    [
+        AC_MSG_RESULT(yes)
+    ],
+    [
+        AC_MSG_RESULT(no)
+        AC_DEFINE(HAVE_NO_PRINTF_Z, 1,
+            [Define to 1 if printf(3) does not support the z length modifier.])
+    ]
+)
+
 AC_CHECK_LIB(rpc, main)		dnl It's unclear why we might need -lrpc
 
 dnl Some platforms may need -lnsl for getrpcbynumber.
