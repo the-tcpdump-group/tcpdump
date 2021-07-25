@@ -6721,47 +6721,23 @@ $as_echo_n "checking whether the compiler supports the -W option... " >&6; }
 	save_ac_c_werror_flag="$ac_c_werror_flag"
 	ac_c_werror_flag=yes
 	#
-	# XXX - with autoconf 2.69, at least, the test program that this
-	# tries to compile is:
+	# We use AC_LANG_SOURCE() so that we can control the complete
+	# content of the program being compiled.  We do not, for example,
+	# want the default "int main()" that AC_LANG_PROGRAM() generates,
+	# as it will generate a warning with -Wold-style-definition, meaning
+	# that we would treat it as not working, as the test will fail if
+	# *any* error output, including a warning due to the flag we're
+	# testing, is generated; see
 	#
-	# int
-	# main ()
-	# {
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
 	#
-	#   ;
-	#   return 0;
-	# }
-	#
-	# Hopefully, neither the empty statement nor the old-style
-	# definition of main() will, with any command-line flag
-	# whatsoever with which we test, on any compiler we test,
-	# will produce any warnings whatsoever; if it does, the
-	# command-line flag with which we test will be treated as
-	# not being supported even if it is supported.
-	#
-	# Thanks, autoconf, for making it *so* difficult to generate
-	# an absolute minimum valid C-with-everything-prototyped
-	# program as a test program, such as
-	#
-	#	int main(void) { return 0; }.
-	#
-	# (with autoconf 2.69, at least, using AC_LANG_CONFTEST() with
-	# AC_LANG_SOURCE([<code>]) produces the same function boilerplate
-	# as AC_LANG_PROGRAM([],[<code>]), complete with the main()
-	# function wrapper, the extra semicolon, and the return 0;,
-	# raising the question of "why, then, do both AC_LANG_SOURCE()
-	# and AC_LANG_PROGRAM() exist?").
+	# This may, as per those two messages, be fixed in autoonf 2.70,
+	# but we only require 2.64 or newer for now.
 	#
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
+int main(void) { return 0; }
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -6797,47 +6773,23 @@ $as_echo_n "checking whether the compiler supports the -Wall option... " >&6; }
 	save_ac_c_werror_flag="$ac_c_werror_flag"
 	ac_c_werror_flag=yes
 	#
-	# XXX - with autoconf 2.69, at least, the test program that this
-	# tries to compile is:
+	# We use AC_LANG_SOURCE() so that we can control the complete
+	# content of the program being compiled.  We do not, for example,
+	# want the default "int main()" that AC_LANG_PROGRAM() generates,
+	# as it will generate a warning with -Wold-style-definition, meaning
+	# that we would treat it as not working, as the test will fail if
+	# *any* error output, including a warning due to the flag we're
+	# testing, is generated; see
 	#
-	# int
-	# main ()
-	# {
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
 	#
-	#   ;
-	#   return 0;
-	# }
-	#
-	# Hopefully, neither the empty statement nor the old-style
-	# definition of main() will, with any command-line flag
-	# whatsoever with which we test, on any compiler we test,
-	# will produce any warnings whatsoever; if it does, the
-	# command-line flag with which we test will be treated as
-	# not being supported even if it is supported.
-	#
-	# Thanks, autoconf, for making it *so* difficult to generate
-	# an absolute minimum valid C-with-everything-prototyped
-	# program as a test program, such as
-	#
-	#	int main(void) { return 0; }.
-	#
-	# (with autoconf 2.69, at least, using AC_LANG_CONFTEST() with
-	# AC_LANG_SOURCE([<code>]) produces the same function boilerplate
-	# as AC_LANG_PROGRAM([],[<code>]), complete with the main()
-	# function wrapper, the extra semicolon, and the return 0;,
-	# raising the question of "why, then, do both AC_LANG_SOURCE()
-	# and AC_LANG_PROGRAM() exist?").
+	# This may, as per those two messages, be fixed in autoonf 2.70,
+	# but we only require 2.64 or newer for now.
 	#
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
+int main(void) { return 0; }
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -6873,47 +6825,23 @@ $as_echo_n "checking whether the compiler supports the -Wassign-enum option... "
 	save_ac_c_werror_flag="$ac_c_werror_flag"
 	ac_c_werror_flag=yes
 	#
-	# XXX - with autoconf 2.69, at least, the test program that this
-	# tries to compile is:
+	# We use AC_LANG_SOURCE() so that we can control the complete
+	# content of the program being compiled.  We do not, for example,
+	# want the default "int main()" that AC_LANG_PROGRAM() generates,
+	# as it will generate a warning with -Wold-style-definition, meaning
+	# that we would treat it as not working, as the test will fail if
+	# *any* error output, including a warning due to the flag we're
+	# testing, is generated; see
 	#
-	# int
-	# main ()
-	# {
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
 	#
-	#   ;
-	#   return 0;
-	# }
-	#
-	# Hopefully, neither the empty statement nor the old-style
-	# definition of main() will, with any command-line flag
-	# whatsoever with which we test, on any compiler we test,
-	# will produce any warnings whatsoever; if it does, the
-	# command-line flag with which we test will be treated as
-	# not being supported even if it is supported.
-	#
-	# Thanks, autoconf, for making it *so* difficult to generate
-	# an absolute minimum valid C-with-everything-prototyped
-	# program as a test program, such as
-	#
-	#	int main(void) { return 0; }.
-	#
-	# (with autoconf 2.69, at least, using AC_LANG_CONFTEST() with
-	# AC_LANG_SOURCE([<code>]) produces the same function boilerplate
-	# as AC_LANG_PROGRAM([],[<code>]), complete with the main()
-	# function wrapper, the extra semicolon, and the return 0;,
-	# raising the question of "why, then, do both AC_LANG_SOURCE()
-	# and AC_LANG_PROGRAM() exist?").
+	# This may, as per those two messages, be fixed in autoonf 2.70,
+	# but we only require 2.64 or newer for now.
 	#
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
+int main(void) { return 0; }
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -6949,47 +6877,23 @@ $as_echo_n "checking whether the compiler supports the -Wcast-qual option... " >
 	save_ac_c_werror_flag="$ac_c_werror_flag"
 	ac_c_werror_flag=yes
 	#
-	# XXX - with autoconf 2.69, at least, the test program that this
-	# tries to compile is:
+	# We use AC_LANG_SOURCE() so that we can control the complete
+	# content of the program being compiled.  We do not, for example,
+	# want the default "int main()" that AC_LANG_PROGRAM() generates,
+	# as it will generate a warning with -Wold-style-definition, meaning
+	# that we would treat it as not working, as the test will fail if
+	# *any* error output, including a warning due to the flag we're
+	# testing, is generated; see
 	#
-	# int
-	# main ()
-	# {
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
 	#
-	#   ;
-	#   return 0;
-	# }
-	#
-	# Hopefully, neither the empty statement nor the old-style
-	# definition of main() will, with any command-line flag
-	# whatsoever with which we test, on any compiler we test,
-	# will produce any warnings whatsoever; if it does, the
-	# command-line flag with which we test will be treated as
-	# not being supported even if it is supported.
-	#
-	# Thanks, autoconf, for making it *so* difficult to generate
-	# an absolute minimum valid C-with-everything-prototyped
-	# program as a test program, such as
-	#
-	#	int main(void) { return 0; }.
-	#
-	# (with autoconf 2.69, at least, using AC_LANG_CONFTEST() with
-	# AC_LANG_SOURCE([<code>]) produces the same function boilerplate
-	# as AC_LANG_PROGRAM([],[<code>]), complete with the main()
-	# function wrapper, the extra semicolon, and the return 0;,
-	# raising the question of "why, then, do both AC_LANG_SOURCE()
-	# and AC_LANG_PROGRAM() exist?").
+	# This may, as per those two messages, be fixed in autoonf 2.70,
+	# but we only require 2.64 or newer for now.
 	#
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
+int main(void) { return 0; }
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -7025,47 +6929,23 @@ $as_echo_n "checking whether the compiler supports the -Wmissing-prototypes opti
 	save_ac_c_werror_flag="$ac_c_werror_flag"
 	ac_c_werror_flag=yes
 	#
-	# XXX - with autoconf 2.69, at least, the test program that this
-	# tries to compile is:
+	# We use AC_LANG_SOURCE() so that we can control the complete
+	# content of the program being compiled.  We do not, for example,
+	# want the default "int main()" that AC_LANG_PROGRAM() generates,
+	# as it will generate a warning with -Wold-style-definition, meaning
+	# that we would treat it as not working, as the test will fail if
+	# *any* error output, including a warning due to the flag we're
+	# testing, is generated; see
 	#
-	# int
-	# main ()
-	# {
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
 	#
-	#   ;
-	#   return 0;
-	# }
-	#
-	# Hopefully, neither the empty statement nor the old-style
-	# definition of main() will, with any command-line flag
-	# whatsoever with which we test, on any compiler we test,
-	# will produce any warnings whatsoever; if it does, the
-	# command-line flag with which we test will be treated as
-	# not being supported even if it is supported.
-	#
-	# Thanks, autoconf, for making it *so* difficult to generate
-	# an absolute minimum valid C-with-everything-prototyped
-	# program as a test program, such as
-	#
-	#	int main(void) { return 0; }.
-	#
-	# (with autoconf 2.69, at least, using AC_LANG_CONFTEST() with
-	# AC_LANG_SOURCE([<code>]) produces the same function boilerplate
-	# as AC_LANG_PROGRAM([],[<code>]), complete with the main()
-	# function wrapper, the extra semicolon, and the return 0;,
-	# raising the question of "why, then, do both AC_LANG_SOURCE()
-	# and AC_LANG_PROGRAM() exist?").
+	# This may, as per those two messages, be fixed in autoonf 2.70,
+	# but we only require 2.64 or newer for now.
 	#
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
+int main(void) { return 0; }
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -7101,47 +6981,23 @@ $as_echo_n "checking whether the compiler supports the -Wmissing-variable-declar
 	save_ac_c_werror_flag="$ac_c_werror_flag"
 	ac_c_werror_flag=yes
 	#
-	# XXX - with autoconf 2.69, at least, the test program that this
-	# tries to compile is:
+	# We use AC_LANG_SOURCE() so that we can control the complete
+	# content of the program being compiled.  We do not, for example,
+	# want the default "int main()" that AC_LANG_PROGRAM() generates,
+	# as it will generate a warning with -Wold-style-definition, meaning
+	# that we would treat it as not working, as the test will fail if
+	# *any* error output, including a warning due to the flag we're
+	# testing, is generated; see
 	#
-	# int
-	# main ()
-	# {
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
 	#
-	#   ;
-	#   return 0;
-	# }
-	#
-	# Hopefully, neither the empty statement nor the old-style
-	# definition of main() will, with any command-line flag
-	# whatsoever with which we test, on any compiler we test,
-	# will produce any warnings whatsoever; if it does, the
-	# command-line flag with which we test will be treated as
-	# not being supported even if it is supported.
-	#
-	# Thanks, autoconf, for making it *so* difficult to generate
-	# an absolute minimum valid C-with-everything-prototyped
-	# program as a test program, such as
-	#
-	#	int main(void) { return 0; }.
-	#
-	# (with autoconf 2.69, at least, using AC_LANG_CONFTEST() with
-	# AC_LANG_SOURCE([<code>]) produces the same function boilerplate
-	# as AC_LANG_PROGRAM([],[<code>]), complete with the main()
-	# function wrapper, the extra semicolon, and the return 0;,
-	# raising the question of "why, then, do both AC_LANG_SOURCE()
-	# and AC_LANG_PROGRAM() exist?").
+	# This may, as per those two messages, be fixed in autoonf 2.70,
+	# but we only require 2.64 or newer for now.
 	#
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
+int main(void) { return 0; }
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -7177,47 +7033,23 @@ $as_echo_n "checking whether the compiler supports the -Wold-style-definition op
 	save_ac_c_werror_flag="$ac_c_werror_flag"
 	ac_c_werror_flag=yes
 	#
-	# XXX - with autoconf 2.69, at least, the test program that this
-	# tries to compile is:
+	# We use AC_LANG_SOURCE() so that we can control the complete
+	# content of the program being compiled.  We do not, for example,
+	# want the default "int main()" that AC_LANG_PROGRAM() generates,
+	# as it will generate a warning with -Wold-style-definition, meaning
+	# that we would treat it as not working, as the test will fail if
+	# *any* error output, including a warning due to the flag we're
+	# testing, is generated; see
 	#
-	# int
-	# main ()
-	# {
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
 	#
-	#   ;
-	#   return 0;
-	# }
-	#
-	# Hopefully, neither the empty statement nor the old-style
-	# definition of main() will, with any command-line flag
-	# whatsoever with which we test, on any compiler we test,
-	# will produce any warnings whatsoever; if it does, the
-	# command-line flag with which we test will be treated as
-	# not being supported even if it is supported.
-	#
-	# Thanks, autoconf, for making it *so* difficult to generate
-	# an absolute minimum valid C-with-everything-prototyped
-	# program as a test program, such as
-	#
-	#	int main(void) { return 0; }.
-	#
-	# (with autoconf 2.69, at least, using AC_LANG_CONFTEST() with
-	# AC_LANG_SOURCE([<code>]) produces the same function boilerplate
-	# as AC_LANG_PROGRAM([],[<code>]), complete with the main()
-	# function wrapper, the extra semicolon, and the return 0;,
-	# raising the question of "why, then, do both AC_LANG_SOURCE()
-	# and AC_LANG_PROGRAM() exist?").
+	# This may, as per those two messages, be fixed in autoonf 2.70,
+	# but we only require 2.64 or newer for now.
 	#
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
+int main(void) { return 0; }
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -7253,47 +7085,23 @@ $as_echo_n "checking whether the compiler supports the -Wpedantic option... " >&
 	save_ac_c_werror_flag="$ac_c_werror_flag"
 	ac_c_werror_flag=yes
 	#
-	# XXX - with autoconf 2.69, at least, the test program that this
-	# tries to compile is:
+	# We use AC_LANG_SOURCE() so that we can control the complete
+	# content of the program being compiled.  We do not, for example,
+	# want the default "int main()" that AC_LANG_PROGRAM() generates,
+	# as it will generate a warning with -Wold-style-definition, meaning
+	# that we would treat it as not working, as the test will fail if
+	# *any* error output, including a warning due to the flag we're
+	# testing, is generated; see
 	#
-	# int
-	# main ()
-	# {
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
 	#
-	#   ;
-	#   return 0;
-	# }
-	#
-	# Hopefully, neither the empty statement nor the old-style
-	# definition of main() will, with any command-line flag
-	# whatsoever with which we test, on any compiler we test,
-	# will produce any warnings whatsoever; if it does, the
-	# command-line flag with which we test will be treated as
-	# not being supported even if it is supported.
-	#
-	# Thanks, autoconf, for making it *so* difficult to generate
-	# an absolute minimum valid C-with-everything-prototyped
-	# program as a test program, such as
-	#
-	#	int main(void) { return 0; }.
-	#
-	# (with autoconf 2.69, at least, using AC_LANG_CONFTEST() with
-	# AC_LANG_SOURCE([<code>]) produces the same function boilerplate
-	# as AC_LANG_PROGRAM([],[<code>]), complete with the main()
-	# function wrapper, the extra semicolon, and the return 0;,
-	# raising the question of "why, then, do both AC_LANG_SOURCE()
-	# and AC_LANG_PROGRAM() exist?").
+	# This may, as per those two messages, be fixed in autoonf 2.70,
+	# but we only require 2.64 or newer for now.
 	#
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
+int main(void) { return 0; }
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -7329,47 +7137,23 @@ $as_echo_n "checking whether the compiler supports the -Wpointer-arith option...
 	save_ac_c_werror_flag="$ac_c_werror_flag"
 	ac_c_werror_flag=yes
 	#
-	# XXX - with autoconf 2.69, at least, the test program that this
-	# tries to compile is:
+	# We use AC_LANG_SOURCE() so that we can control the complete
+	# content of the program being compiled.  We do not, for example,
+	# want the default "int main()" that AC_LANG_PROGRAM() generates,
+	# as it will generate a warning with -Wold-style-definition, meaning
+	# that we would treat it as not working, as the test will fail if
+	# *any* error output, including a warning due to the flag we're
+	# testing, is generated; see
 	#
-	# int
-	# main ()
-	# {
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
 	#
-	#   ;
-	#   return 0;
-	# }
-	#
-	# Hopefully, neither the empty statement nor the old-style
-	# definition of main() will, with any command-line flag
-	# whatsoever with which we test, on any compiler we test,
-	# will produce any warnings whatsoever; if it does, the
-	# command-line flag with which we test will be treated as
-	# not being supported even if it is supported.
-	#
-	# Thanks, autoconf, for making it *so* difficult to generate
-	# an absolute minimum valid C-with-everything-prototyped
-	# program as a test program, such as
-	#
-	#	int main(void) { return 0; }.
-	#
-	# (with autoconf 2.69, at least, using AC_LANG_CONFTEST() with
-	# AC_LANG_SOURCE([<code>]) produces the same function boilerplate
-	# as AC_LANG_PROGRAM([],[<code>]), complete with the main()
-	# function wrapper, the extra semicolon, and the return 0;,
-	# raising the question of "why, then, do both AC_LANG_SOURCE()
-	# and AC_LANG_PROGRAM() exist?").
+	# This may, as per those two messages, be fixed in autoonf 2.70,
+	# but we only require 2.64 or newer for now.
 	#
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
+int main(void) { return 0; }
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -7405,47 +7189,23 @@ $as_echo_n "checking whether the compiler supports the -Wpointer-sign option... 
 	save_ac_c_werror_flag="$ac_c_werror_flag"
 	ac_c_werror_flag=yes
 	#
-	# XXX - with autoconf 2.69, at least, the test program that this
-	# tries to compile is:
+	# We use AC_LANG_SOURCE() so that we can control the complete
+	# content of the program being compiled.  We do not, for example,
+	# want the default "int main()" that AC_LANG_PROGRAM() generates,
+	# as it will generate a warning with -Wold-style-definition, meaning
+	# that we would treat it as not working, as the test will fail if
+	# *any* error output, including a warning due to the flag we're
+	# testing, is generated; see
 	#
-	# int
-	# main ()
-	# {
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
 	#
-	#   ;
-	#   return 0;
-	# }
-	#
-	# Hopefully, neither the empty statement nor the old-style
-	# definition of main() will, with any command-line flag
-	# whatsoever with which we test, on any compiler we test,
-	# will produce any warnings whatsoever; if it does, the
-	# command-line flag with which we test will be treated as
-	# not being supported even if it is supported.
-	#
-	# Thanks, autoconf, for making it *so* difficult to generate
-	# an absolute minimum valid C-with-everything-prototyped
-	# program as a test program, such as
-	#
-	#	int main(void) { return 0; }.
-	#
-	# (with autoconf 2.69, at least, using AC_LANG_CONFTEST() with
-	# AC_LANG_SOURCE([<code>]) produces the same function boilerplate
-	# as AC_LANG_PROGRAM([],[<code>]), complete with the main()
-	# function wrapper, the extra semicolon, and the return 0;,
-	# raising the question of "why, then, do both AC_LANG_SOURCE()
-	# and AC_LANG_PROGRAM() exist?").
+	# This may, as per those two messages, be fixed in autoonf 2.70,
+	# but we only require 2.64 or newer for now.
 	#
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
+int main(void) { return 0; }
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -7481,47 +7241,23 @@ $as_echo_n "checking whether the compiler supports the -Wshadow option... " >&6;
 	save_ac_c_werror_flag="$ac_c_werror_flag"
 	ac_c_werror_flag=yes
 	#
-	# XXX - with autoconf 2.69, at least, the test program that this
-	# tries to compile is:
+	# We use AC_LANG_SOURCE() so that we can control the complete
+	# content of the program being compiled.  We do not, for example,
+	# want the default "int main()" that AC_LANG_PROGRAM() generates,
+	# as it will generate a warning with -Wold-style-definition, meaning
+	# that we would treat it as not working, as the test will fail if
+	# *any* error output, including a warning due to the flag we're
+	# testing, is generated; see
 	#
-	# int
-	# main ()
-	# {
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
 	#
-	#   ;
-	#   return 0;
-	# }
-	#
-	# Hopefully, neither the empty statement nor the old-style
-	# definition of main() will, with any command-line flag
-	# whatsoever with which we test, on any compiler we test,
-	# will produce any warnings whatsoever; if it does, the
-	# command-line flag with which we test will be treated as
-	# not being supported even if it is supported.
-	#
-	# Thanks, autoconf, for making it *so* difficult to generate
-	# an absolute minimum valid C-with-everything-prototyped
-	# program as a test program, such as
-	#
-	#	int main(void) { return 0; }.
-	#
-	# (with autoconf 2.69, at least, using AC_LANG_CONFTEST() with
-	# AC_LANG_SOURCE([<code>]) produces the same function boilerplate
-	# as AC_LANG_PROGRAM([],[<code>]), complete with the main()
-	# function wrapper, the extra semicolon, and the return 0;,
-	# raising the question of "why, then, do both AC_LANG_SOURCE()
-	# and AC_LANG_PROGRAM() exist?").
+	# This may, as per those two messages, be fixed in autoonf 2.70,
+	# but we only require 2.64 or newer for now.
 	#
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
+int main(void) { return 0; }
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -7557,47 +7293,23 @@ $as_echo_n "checking whether the compiler supports the -Wsign-compare option... 
 	save_ac_c_werror_flag="$ac_c_werror_flag"
 	ac_c_werror_flag=yes
 	#
-	# XXX - with autoconf 2.69, at least, the test program that this
-	# tries to compile is:
+	# We use AC_LANG_SOURCE() so that we can control the complete
+	# content of the program being compiled.  We do not, for example,
+	# want the default "int main()" that AC_LANG_PROGRAM() generates,
+	# as it will generate a warning with -Wold-style-definition, meaning
+	# that we would treat it as not working, as the test will fail if
+	# *any* error output, including a warning due to the flag we're
+	# testing, is generated; see
 	#
-	# int
-	# main ()
-	# {
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
 	#
-	#   ;
-	#   return 0;
-	# }
-	#
-	# Hopefully, neither the empty statement nor the old-style
-	# definition of main() will, with any command-line flag
-	# whatsoever with which we test, on any compiler we test,
-	# will produce any warnings whatsoever; if it does, the
-	# command-line flag with which we test will be treated as
-	# not being supported even if it is supported.
-	#
-	# Thanks, autoconf, for making it *so* difficult to generate
-	# an absolute minimum valid C-with-everything-prototyped
-	# program as a test program, such as
-	#
-	#	int main(void) { return 0; }.
-	#
-	# (with autoconf 2.69, at least, using AC_LANG_CONFTEST() with
-	# AC_LANG_SOURCE([<code>]) produces the same function boilerplate
-	# as AC_LANG_PROGRAM([],[<code>]), complete with the main()
-	# function wrapper, the extra semicolon, and the return 0;,
-	# raising the question of "why, then, do both AC_LANG_SOURCE()
-	# and AC_LANG_PROGRAM() exist?").
+	# This may, as per those two messages, be fixed in autoonf 2.70,
+	# but we only require 2.64 or newer for now.
 	#
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
+int main(void) { return 0; }
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -7633,47 +7345,23 @@ $as_echo_n "checking whether the compiler supports the -Wstrict-prototypes optio
 	save_ac_c_werror_flag="$ac_c_werror_flag"
 	ac_c_werror_flag=yes
 	#
-	# XXX - with autoconf 2.69, at least, the test program that this
-	# tries to compile is:
+	# We use AC_LANG_SOURCE() so that we can control the complete
+	# content of the program being compiled.  We do not, for example,
+	# want the default "int main()" that AC_LANG_PROGRAM() generates,
+	# as it will generate a warning with -Wold-style-definition, meaning
+	# that we would treat it as not working, as the test will fail if
+	# *any* error output, including a warning due to the flag we're
+	# testing, is generated; see
 	#
-	# int
-	# main ()
-	# {
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
 	#
-	#   ;
-	#   return 0;
-	# }
-	#
-	# Hopefully, neither the empty statement nor the old-style
-	# definition of main() will, with any command-line flag
-	# whatsoever with which we test, on any compiler we test,
-	# will produce any warnings whatsoever; if it does, the
-	# command-line flag with which we test will be treated as
-	# not being supported even if it is supported.
-	#
-	# Thanks, autoconf, for making it *so* difficult to generate
-	# an absolute minimum valid C-with-everything-prototyped
-	# program as a test program, such as
-	#
-	#	int main(void) { return 0; }.
-	#
-	# (with autoconf 2.69, at least, using AC_LANG_CONFTEST() with
-	# AC_LANG_SOURCE([<code>]) produces the same function boilerplate
-	# as AC_LANG_PROGRAM([],[<code>]), complete with the main()
-	# function wrapper, the extra semicolon, and the return 0;,
-	# raising the question of "why, then, do both AC_LANG_SOURCE()
-	# and AC_LANG_PROGRAM() exist?").
+	# This may, as per those two messages, be fixed in autoonf 2.70,
+	# but we only require 2.64 or newer for now.
 	#
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
+int main(void) { return 0; }
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -7709,47 +7397,23 @@ $as_echo_n "checking whether the compiler supports the -Wunreachable-code-return
 	save_ac_c_werror_flag="$ac_c_werror_flag"
 	ac_c_werror_flag=yes
 	#
-	# XXX - with autoconf 2.69, at least, the test program that this
-	# tries to compile is:
+	# We use AC_LANG_SOURCE() so that we can control the complete
+	# content of the program being compiled.  We do not, for example,
+	# want the default "int main()" that AC_LANG_PROGRAM() generates,
+	# as it will generate a warning with -Wold-style-definition, meaning
+	# that we would treat it as not working, as the test will fail if
+	# *any* error output, including a warning due to the flag we're
+	# testing, is generated; see
 	#
-	# int
-	# main ()
-	# {
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
 	#
-	#   ;
-	#   return 0;
-	# }
-	#
-	# Hopefully, neither the empty statement nor the old-style
-	# definition of main() will, with any command-line flag
-	# whatsoever with which we test, on any compiler we test,
-	# will produce any warnings whatsoever; if it does, the
-	# command-line flag with which we test will be treated as
-	# not being supported even if it is supported.
-	#
-	# Thanks, autoconf, for making it *so* difficult to generate
-	# an absolute minimum valid C-with-everything-prototyped
-	# program as a test program, such as
-	#
-	#	int main(void) { return 0; }.
-	#
-	# (with autoconf 2.69, at least, using AC_LANG_CONFTEST() with
-	# AC_LANG_SOURCE([<code>]) produces the same function boilerplate
-	# as AC_LANG_PROGRAM([],[<code>]), complete with the main()
-	# function wrapper, the extra semicolon, and the return 0;,
-	# raising the question of "why, then, do both AC_LANG_SOURCE()
-	# and AC_LANG_PROGRAM() exist?").
+	# This may, as per those two messages, be fixed in autoonf 2.70,
+	# but we only require 2.64 or newer for now.
 	#
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
+int main(void) { return 0; }
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -7785,47 +7449,23 @@ $as_echo_n "checking whether the compiler supports the -Wused-but-marked-unused 
 	save_ac_c_werror_flag="$ac_c_werror_flag"
 	ac_c_werror_flag=yes
 	#
-	# XXX - with autoconf 2.69, at least, the test program that this
-	# tries to compile is:
+	# We use AC_LANG_SOURCE() so that we can control the complete
+	# content of the program being compiled.  We do not, for example,
+	# want the default "int main()" that AC_LANG_PROGRAM() generates,
+	# as it will generate a warning with -Wold-style-definition, meaning
+	# that we would treat it as not working, as the test will fail if
+	# *any* error output, including a warning due to the flag we're
+	# testing, is generated; see
 	#
-	# int
-	# main ()
-	# {
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
 	#
-	#   ;
-	#   return 0;
-	# }
-	#
-	# Hopefully, neither the empty statement nor the old-style
-	# definition of main() will, with any command-line flag
-	# whatsoever with which we test, on any compiler we test,
-	# will produce any warnings whatsoever; if it does, the
-	# command-line flag with which we test will be treated as
-	# not being supported even if it is supported.
-	#
-	# Thanks, autoconf, for making it *so* difficult to generate
-	# an absolute minimum valid C-with-everything-prototyped
-	# program as a test program, such as
-	#
-	#	int main(void) { return 0; }.
-	#
-	# (with autoconf 2.69, at least, using AC_LANG_CONFTEST() with
-	# AC_LANG_SOURCE([<code>]) produces the same function boilerplate
-	# as AC_LANG_PROGRAM([],[<code>]), complete with the main()
-	# function wrapper, the extra semicolon, and the return 0;,
-	# raising the question of "why, then, do both AC_LANG_SOURCE()
-	# and AC_LANG_PROGRAM() exist?").
+	# This may, as per those two messages, be fixed in autoonf 2.70,
+	# but we only require 2.64 or newer for now.
 	#
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
+int main(void) { return 0; }
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -7861,47 +7501,23 @@ $as_echo_n "checking whether the compiler supports the -Wwrite-strings option...
 	save_ac_c_werror_flag="$ac_c_werror_flag"
 	ac_c_werror_flag=yes
 	#
-	# XXX - with autoconf 2.69, at least, the test program that this
-	# tries to compile is:
+	# We use AC_LANG_SOURCE() so that we can control the complete
+	# content of the program being compiled.  We do not, for example,
+	# want the default "int main()" that AC_LANG_PROGRAM() generates,
+	# as it will generate a warning with -Wold-style-definition, meaning
+	# that we would treat it as not working, as the test will fail if
+	# *any* error output, including a warning due to the flag we're
+	# testing, is generated; see
 	#
-	# int
-	# main ()
-	# {
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
 	#
-	#   ;
-	#   return 0;
-	# }
-	#
-	# Hopefully, neither the empty statement nor the old-style
-	# definition of main() will, with any command-line flag
-	# whatsoever with which we test, on any compiler we test,
-	# will produce any warnings whatsoever; if it does, the
-	# command-line flag with which we test will be treated as
-	# not being supported even if it is supported.
-	#
-	# Thanks, autoconf, for making it *so* difficult to generate
-	# an absolute minimum valid C-with-everything-prototyped
-	# program as a test program, such as
-	#
-	#	int main(void) { return 0; }.
-	#
-	# (with autoconf 2.69, at least, using AC_LANG_CONFTEST() with
-	# AC_LANG_SOURCE([<code>]) produces the same function boilerplate
-	# as AC_LANG_PROGRAM([],[<code>]), complete with the main()
-	# function wrapper, the extra semicolon, and the return 0;,
-	# raising the question of "why, then, do both AC_LANG_SOURCE()
-	# and AC_LANG_PROGRAM() exist?").
+	# This may, as per those two messages, be fixed in autoonf 2.70,
+	# but we only require 2.64 or newer for now.
 	#
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
+int main(void) { return 0; }
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 

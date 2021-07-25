@@ -232,40 +232,22 @@ AC_DEFUN(AC_LBL_CHECK_COMPILER_OPT,
 	save_ac_c_werror_flag="$ac_c_werror_flag"
 	ac_c_werror_flag=yes
 	#
-	# XXX - with autoconf 2.69, at least, the test program that this
-	# tries to compile is:
+	# We use AC_LANG_SOURCE() so that we can control the complete
+	# content of the program being compiled.  We do not, for example,
+	# want the default "int main()" that AC_LANG_PROGRAM() generates,
+	# as it will generate a warning with -Wold-style-definition, meaning
+	# that we would treat it as not working, as the test will fail if
+	# *any* error output, including a warning due to the flag we're
+	# testing, is generated; see
 	#
-	# int
-	# main ()
-	# {
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
 	#
-	#   ;
-	#   return 0;
-	# }
+	# This may, as per those two messages, be fixed in autoonf 2.70,
+	# but we only require 2.64 or newer for now.
 	#
-	# Hopefully, neither the empty statement nor the old-style
-	# definition of main() will, with any command-line flag
-	# whatsoever with which we test, on any compiler we test,
-	# will produce any warnings whatsoever; if it does, the
-	# command-line flag with which we test will be treated as
-	# not being supported even if it is supported.
-	#
-	# Thanks, autoconf, for making it *so* difficult to generate
-	# an absolute minimum valid C-with-everything-prototyped
-	# program as a test program, such as
-	#
-	#	int main(void) { return 0; }.
-	#
-	# (with autoconf 2.69, at least, using AC_LANG_CONFTEST() with
-	# AC_LANG_SOURCE([<code>]) produces the same function boilerplate
-	# as AC_LANG_PROGRAM([],[<code>]), complete with the main()
-	# function wrapper, the extra semicolon, and the return 0;,
-	# raising the question of "why, then, do both AC_LANG_SOURCE()
-	# and AC_LANG_PROGRAM() exist?").
-	#
-	AC_TRY_COMPILE(
-	    [],
-	    [],
+	AC_COMPILE_IFELSE(
+	    [AC_LANG_SOURCE([[int main(void) { return 0; }]])],
 	    [
 		AC_MSG_RESULT([yes])
 		CFLAGS="$save_CFLAGS"
