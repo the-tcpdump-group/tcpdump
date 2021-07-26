@@ -60,10 +60,9 @@ case `uname -s` in
 esac
 run_after_echo make -s ${CFLAGS:+CFLAGS="$CFLAGS"}
 run_after_echo make install
-run_after_echo "$TCPDUMP_BIN" --version
+print_so_deps "$TCPDUMP_BIN"
 run_after_echo "$TCPDUMP_BIN" -h
 run_after_echo "$TCPDUMP_BIN" -D
-print_so_deps "$TCPDUMP_BIN"
 if [ "$CIRRUS_CI" = true ]; then
     run_after_echo sudo \
         ${LD_LIBRARY_PATH:+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"} \
