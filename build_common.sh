@@ -69,7 +69,7 @@ print_sysinfo() {
 # shellcheck disable=SC2006
 print_cc_version() {
     case `basename "$CC"` in
-    gcc*|clang*)
+    gcc*|egcc*|clang*)
         # GCC and Clang recognize --version, print to stdout and exit with 0.
         "$CC" --version
         ;;
