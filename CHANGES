@@ -24,6 +24,7 @@ Monthday, Month DD, YYYY by gharris and denis
       Handle some Autoconf/make errors better.
       Fix "make releasetar" on AIX and Solaris.
       Mend "make check" on Solaris 9 with Autoconf.
+      Address assorted compiler warnings.
 
 Wednesday, June 9, 2021 by gharris
   Summary for 4.99.1 tcpdump release

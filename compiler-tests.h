@@ -133,11 +133,20 @@
  *
  * The version number in __xlC__ has the major version in the
  * upper 8 bits and the minor version in the lower 8 bits.
+ * On AIX __xlC__ is always defined, __ibmxl__ becomes defined in XL C 16.1.
+ * On Linux since XL C 13.1.6 __xlC__ is not defined by default anymore, but
+ * __ibmxl__ is defined since at least XL C 13.1.1.
  */
 
 #if ! defined(__xlC__)
+#if ! defined(__ibmxl__)
 #define ND_IS_AT_LEAST_XL_C_VERSION(major,minor) 0
 #else
+#define ND_IS_AT_LEAST_XL_C_VERSION(major, minor) \
+	(__ibmxl_version__ > (major) || \
+	 (__ibmxl_version__ == (major) && __ibmxl_release__ >= (minor)))
+#endif /* ! __ibmxl__ */
+#else /* ! __xlC__ */
 #define ND_IS_AT_LEAST_XL_C_VERSION(major, minor) \
 	(__xlC__ >= (((major) << 8) | (minor)))
 #endif
