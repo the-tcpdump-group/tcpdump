@@ -74,9 +74,12 @@ print_cc_version() {
         "$CC" --version
         ;;
     xl*)
-        # XL C for AIX recognizes -qversion, prints to stdout and exits with 0,
-        # but on an unknown command-line flag displays its man page and waits.
-        "$CC" -qversion
+        # XL C 12.1 and 13.1 recognize "-qversion", print to stdout and exit
+        # with 0. XL C 12.1 on an unknown command-line flag displays its man
+        # page and waits.
+        # XL C 16.1 recognizes "-qversion" and "--version", prints to stdout
+        # and exits with 0. Community Edition also prints a banner to stderr.
+        "$CC" -qversion 2>/dev/null
         ;;
     sun*)
         # Sun compilers recognize -V, print to stderr and exit with an error.
@@ -116,7 +119,7 @@ cc_id() {
         return
     fi
 
-    cc_id_guessed=`echo "$cc_id_firstline" | sed 's/^IBM XL C.* for AIX, V\([0-9\.]*\).*$/xlc-\1/'`
+    cc_id_guessed=`echo "$cc_id_firstline" | sed 's/^IBM XL C.*, V\([0-9\.]*\).*$/xlc-\1/'`
     if [ "$cc_id_firstline" != "$cc_id_guessed" ]; then
         echo "$cc_id_guessed"
         return
@@ -144,6 +147,8 @@ cc_werr_cflags() {
         echo '-Werror'
         ;;
     xlc-*)
+        # XL C 12.1 and 13.1 recognize "-qhalt=w". XL C 16.1 recognizes that
+        # and "-Werror".
         echo '-qhalt=w'
         ;;
     suncc-*)

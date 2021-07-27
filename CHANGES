@@ -28,6 +28,7 @@ Wednesday, June 9, 2021 by gharris
       Handle some Autoconf/make errors better.
       Fix "make releasetar" on AIX and Solaris.
       Mend "make check" on Solaris 9 with Autoconf.
+      Address assorted compiler warnings.
     Documentation:
       man: Update a reference as www.cifs.org is gone. [skip ci]
       man: Update DNS sections

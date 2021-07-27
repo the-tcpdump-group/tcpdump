@@ -48,10 +48,28 @@
 #endif
 
 /*
+ * XL C 12.1 and 13.1 for AIX require no attention in this department.
+ * XL C 16.1 defines both __GNUC__ and __clang__, so has to be tested first.
+ */
+#if ND_IS_AT_LEAST_XL_C_VERSION(16,1)
+  /*
+   * See respective Clang note below.
+   */
+  #define DIAG_OFF_ASSIGN_ENUM \
+    DIAG_DO_PRAGMA(clang diagnostic push) \
+    DIAG_DO_PRAGMA(clang diagnostic ignored "-Wassign-enum")
+  #define DIAG_ON_ASSIGN_ENUM \
+    DIAG_DO_PRAGMA(clang diagnostic pop)
+
+  #define DIAG_OFF_CAST_QUAL
+  #define DIAG_ON_CAST_QUAL
+  #define DIAG_OFF_DEPRECATION
+  #define DIAG_ON_DEPRECATION
+/*
  * The current clang compilers also define __GNUC__ and __GNUC_MINOR__
  * thus we need to test the clang case before the GCC one
  */
-#if ND_IS_AT_LEAST_CLANG_VERSION(2,8)
+#elif ND_IS_AT_LEAST_CLANG_VERSION(2,8)
   /*
    * Clang complains if you OR together multiple enum values of a
    * given enum type and them pass it as an argument of that enum

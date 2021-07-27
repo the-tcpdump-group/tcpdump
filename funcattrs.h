@@ -124,8 +124,12 @@
   /*
    * However, GCC didn't support that for function *pointers* until GCC
    * 4.1.0; see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3481.
+   * XL C 16.1 (and possibly some earlier versions, but not 12.1 or 13.1) has
+   * a similar bug, a bugfix for which should be available later:
+   * https://www.ibm.com/support/pages/apar/LI81402
    */
-  #if (defined(__GNUC__) && ((__GNUC__ * 100 + __GNUC_MINOR__) < 401))
+  #if (defined(__GNUC__) && ((__GNUC__ * 100 + __GNUC_MINOR__) < 401)) || \
+      (ND_IS_AT_LEAST_XL_C_VERSION(16,1) && !ND_IS_AT_LEAST_XL_C_VERSION(16,2))
     #define PRINTFLIKE_FUNCPTR(x,y)
   #else
     #define PRINTFLIKE_FUNCPTR(x,y) __attribute__((__format__(__printf__,x,y)))
