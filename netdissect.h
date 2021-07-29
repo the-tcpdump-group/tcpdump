@@ -31,6 +31,7 @@
 #include <sys/types.h>
 #include <setjmp.h>
 #include "status-exit-codes.h"
+#include "funcattrs.h" /* for PRINTFLIKE_FUNCPTR() */
 
 /*
  * Data types corresponding to multi-byte integral values within data
