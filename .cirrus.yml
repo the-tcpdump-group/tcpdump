@@ -9,15 +9,14 @@ freebsd_task:
     # FreeBSD fails to start with 1 GB. 8 CPUs max concurrency.
     matrix:
       - image_family: freebsd-11-4
-        cpu: 2
+        cpu: 3
         memory: 2G
       - image_family: freebsd-12-2
-        cpu: 2
+        cpu: 3
         memory: 2G
       - image_family: freebsd-13-0
-        # This one is much slower than the others.
-        cpu: 4
-        memory: 4G
+        cpu: 2
+        memory: 2G
   env:
     IGNORE_OSVERSION: yes
     MAKEFLAGS: -j 4
