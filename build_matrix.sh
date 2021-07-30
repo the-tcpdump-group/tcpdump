@@ -13,6 +13,12 @@
 : "${MATRIX_CMAKE:=no yes}"
 : "${MATRIX_CRYPTO:=no yes}"
 : "${MATRIX_SMB:=no yes}"
+# Set this variable to "yes" before calling this script to disregard all
+# warnings in a particular environment (CI or a local working copy).  Set it
+# to "yes" in this script or in build.sh when a matrix subset is known to be
+# not warning-free because of the OS, the compiler or whatever other factor
+# that the scripts can detect both in and out of CI.
+: "${TCPDUMP_TAINTED:=no}"
 
 . ./build_common.sh
 print_sysinfo
@@ -24,6 +30,7 @@ if [ -z "$PREFIX" ]; then
     export PREFIX
 fi
 COUNT=0
+export TCPDUMP_TAINTED
 
 build_tcpdump() {
     for CMAKE in $MATRIX_CMAKE; do
@@ -34,7 +41,7 @@ build_tcpdump() {
                 export SMB
                 # shellcheck disable=SC2006
                 COUNT=`increment $COUNT`
-                echo_magenta "===== SETUP $COUNT: BUILD_LIBPCAP=$BUILD_LIBPCAP REMOTE=${REMOTE:-?} CC=$CC CMAKE=$CMAKE CRYPTO=$CRYPTO SMB=$SMB ====="
+                echo_magenta "===== SETUP $COUNT: BUILD_LIBPCAP=$BUILD_LIBPCAP REMOTE=${REMOTE:-?} CC=$CC CMAKE=$CMAKE CRYPTO=$CRYPTO SMB=$SMB =====" >&2
                 # Run one build with setup environment variables:
                 # BUILD_LIBPCAP, REMOTE, CC, CMAKE, CRYPTO and SMB
                 run_after_echo ./build.sh
@@ -56,9 +63,8 @@ build_tcpdump() {
 touch .devel configure
 for CC in $MATRIX_CC; do
     export CC
-    # Exclude gcc on macOS (it is just an alias for clang).
-    # shellcheck disable=SC2006
-    if [ "$CC" = gcc ] && [ "`uname -s`" = Darwin ]; then
+    discard_cc_cache
+    if gcc_is_clang_in_disguise; then
         echo '(skipped)'
         continue
     fi
@@ -68,7 +74,7 @@ for CC in $MATRIX_CC; do
             for REMOTE in $MATRIX_REMOTE; do
                 export REMOTE
                 # Build libpcap with Autoconf.
-                echo_magenta "Build libpcap (CMAKE=no REMOTE=$REMOTE)"
+                echo_magenta "Build libpcap (CMAKE=no REMOTE=$REMOTE)" >&2
                 (cd ../libpcap && CMAKE=no ./build.sh)
                 # Set PKG_CONFIG_PATH for configure when building libpcap
                 if [ "$CMAKE" != no ]; then
@@ -78,7 +84,7 @@ for CC in $MATRIX_CC; do
                 build_tcpdump
             done
         else
-            echo_magenta 'Use system libpcap'
+            echo_magenta 'Use system libpcap' >&2
             purge_directory "$PREFIX"
             (cd ../libpcap; make distclean || echo '(Ignoring the make error.)')
             build_tcpdump
@@ -87,5 +93,5 @@ for CC in $MATRIX_CC; do
 done
 
 run_after_echo rm -rf "$PREFIX"
-echo_magenta "Tested setup count: $COUNT"
+echo_magenta "Tested setup count: $COUNT" >&2
 # vi: set tabstop=4 softtabstop=0 expandtab shiftwidth=4 smarttab autoindent :

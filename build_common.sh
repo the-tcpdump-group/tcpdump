@@ -30,26 +30,19 @@ mktempdir_diy() {
 mktempdir() {
     mktempdir_prefix=${1:-tmp}
     # shellcheck disable=SC2006
-    case `uname -s` in
-    Darwin|FreeBSD|NetBSD)
+    case `os_id` in
+    Darwin-*|FreeBSD-*|NetBSD-*)
         # In these operating systems mktemp(1) always appends an implicit
         # ".XXXXXXXX" suffix to the requested template when creating a
         # temporary directory.
         mktemp -d -t "$mktempdir_prefix"
         ;;
-    AIX)
-        mktempdir_diy "$mktempdir_prefix"
+    SunOS-5.10|SunOS-5.11)
+        # Although the suffix is optional, specify it for consistent results.
+        mktemp -d -t "${mktempdir_prefix}.XXXXXXXX"
         ;;
-    SunOS)
-        # shellcheck disable=SC2006
-        case `uname -r` in
-        5.10|5.11)
-            mktemp -d -t "${mktempdir_prefix}.XXXXXXXX"
-            ;;
-        *)
-            mktempdir_diy "$mktempdir_prefix"
-            ;;
-        esac
+    SunOS-*|AIX-*)
+        mktempdir_diy "$mktempdir_prefix"
         ;;
     *)
         # At least Linux and OpenBSD implementations require explicit trailing
@@ -61,13 +54,16 @@ mktempdir() {
 
 print_sysinfo() {
     uname -a
+    printf 'OS identification: '
+    os_id
     date
 }
 
 # Try to make the current C compiler print its version information (usually
 # multi-line) to stdout.
 # shellcheck disable=SC2006
-print_cc_version() {
+cc_version_nocache() {
+    : "${CC:?}"
     case `basename "$CC"` in
     gcc*|egcc*|clang*)
         # GCC and Clang recognize --version, print to stdout and exit with 0.
@@ -86,16 +82,16 @@ print_cc_version() {
         "$CC" -V 2>&1 || :
         ;;
     cc)
-        case `uname -s` in
-        SunOS)
+        case `os_id` in
+        SunOS-*)
             # Most likely Sun C.
             "$CC" -V 2>&1 || :
             ;;
-        Darwin)
+        Darwin-*)
             # Most likely Clang.
             "$CC" --version
             ;;
-        Linux|FreeBSD|NetBSD|OpenBSD)
+        Linux-*|FreeBSD-*|NetBSD-*|OpenBSD-*)
             # Most likely Clang or GCC.
             "$CC" --version
             ;;
@@ -107,11 +103,23 @@ print_cc_version() {
     esac
 }
 
+# shellcheck disable=SC2006
+cc_version() {
+    echo "${cc_version_cached:=`cc_version_nocache`}"
+}
+
+print_cc_version() {
+    cc_version
+    printf 'Compiler identification: '
+    cc_id
+}
+
 # For the current C compiler try to print a short and uniform identification
 # string (such as "gcc-9.3.0") that is convenient to use in a case statement.
 # shellcheck disable=SC2006
-cc_id() {
-    cc_id_firstline=`print_cc_version | head -1`
+cc_id_nocache() {
+    cc_id_firstline=`cc_version | head -1`
+    : "${cc_id_firstline:?}"
 
     cc_id_guessed=`echo "$cc_id_firstline" | sed 's/^.*clang version \([0-9\.]*\).*$/clang-\1/'`
     if [ "$cc_id_firstline" != "$cc_id_guessed" ]; then
@@ -138,6 +146,17 @@ cc_id() {
     fi
 }
 
+# shellcheck disable=SC2006
+cc_id() {
+    echo "${cc_id_cached:=`cc_id_nocache`}"
+}
+
+# Call this function each time CC has changed.
+discard_cc_cache() {
+    cc_version_cached=
+    cc_id_cached=
+}
+
 # For the current C compiler try to print CFLAGS value that tells to treat
 # warnings as errors.
 # shellcheck disable=SC2006
@@ -153,6 +172,42 @@ cc_werr_cflags() {
         ;;
     suncc-*)
         echo '-errwarn=%all'
+        ;;
+    esac
+}
+
+# Tell whether "gcc" is a symlink to Clang (this is the case on macOS).
+# shellcheck disable=SC2006
+gcc_is_clang_in_disguise() {
+    case `cc_id`/`basename "${CC:?}"` in
+    clang-*/gcc)
+        return 0
+        ;;
+    esac
+    return 1
+}
+
+# shellcheck disable=SC2006
+os_id() {
+    # OS does not change between builds or in the middle of a build, so it is
+    # fine to cache uname output.
+    : "${os_id_sysname:=`uname -s`}"
+    printf '%s-' "$os_id_sysname"
+    : "${os_id_release:=`uname -r`}"
+    case "$os_id_sysname" in
+    AIX)
+        : "${os_id_version:=`uname -v`}"
+        echo "${os_id_version}.${os_id_release}"
+        ;;
+    Darwin|NetBSD|OpenBSD|SunOS)
+        echo "$os_id_release"
+        ;;
+    FreeBSD|Linux)
+        # Meaningful version is usually the substring before the first dash.
+        echo "$os_id_release" | sed 's/^\([0-9\.]*\).*$/\1/'
+        ;;
+    *)
+        echo 'UNKNOWN'
         ;;
     esac
 }
@@ -177,8 +232,8 @@ run_after_echo() {
 
 print_so_deps() {
     # shellcheck disable=SC2006
-    case `uname -s` in
-    Darwin)
+    case `os_id` in
+    Darwin-*)
         run_after_echo otool -L "${1:?}"
         ;;
     *)
@@ -202,7 +257,7 @@ handle_matrix_debug() {
 
 purge_directory() {
     # shellcheck disable=SC2006
-    if [ "`uname -s`" = SunOS ] && [ "`uname -r`" = 5.11 ]; then
+    if [ "`os_id`" = SunOS-5.11 ]; then
         # In Solaris 11 /bin/sh the pathname expansion of "*" always includes
         # "." and "..", so the straightforward rm would always fail.
         (
