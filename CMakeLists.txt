@@ -917,6 +917,18 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/.devel OR EXISTS ${CMAKE_BINARY_DIR}/.devel)
     endif()
 endif()
 
+#
+# Extra compiler options for the build matrix scripts to request -Werror or
+# its equivalent if required.  The CMake variable name cannot be CFLAGS
+# because that is already used for a different purpose in CMake.  Example
+# usage: cmake -DEXTRA_CFLAGS='-Wall -Wextra -Werror' ...
+#
+if(NOT "${EXTRA_CFLAGS}" STREQUAL "")
+    string(REPLACE " " ";" _extra_cflags_list ${EXTRA_CFLAGS})
+    add_compile_options(${_extra_cflags_list})
+    message(STATUS "Added extra compile options (${EXTRA_CFLAGS})")
+endif()
+
 ######################################
 # Input files
 ######################################
