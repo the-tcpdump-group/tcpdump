@@ -9,6 +9,7 @@
 : "${CMAKE:=no}"
 : "${CRYPTO:=no}"
 : "${SMB:=no}"
+: "${TCPDUMP_TAINTED:=no}"
 
 . ./build_common.sh
 # Install directory prefix
@@ -53,11 +54,7 @@ run_after_echo make -s clean
 # these cases, please remember to raise the bar here so if the warnings appear
 # again, it will trigger an error.
 # shellcheck disable=SC2006
-case `uname -s` in
-    *)
-        CFLAGS=`cc_werr_cflags`
-        ;;
-esac
+[ "$TCPDUMP_TAINTED" != yes ] && CFLAGS=`cc_werr_cflags`
 run_after_echo make -s ${CFLAGS:+CFLAGS="$CFLAGS"}
 run_after_echo make install
 print_so_deps "$TCPDUMP_BIN"
