@@ -924,8 +924,9 @@ endif()
 # usage: cmake -DEXTRA_CFLAGS='-Wall -Wextra -Werror' ...
 #
 if(NOT "${EXTRA_CFLAGS}" STREQUAL "")
-    string(REPLACE " " ";" _extra_cflags_list ${EXTRA_CFLAGS})
-    add_compile_options(${_extra_cflags_list})
+    foreach(_extra_cflag ${EXTRA_CFLAGS})
+        check_and_add_compiler_option(_extra_cflag)
+    endforeach(_extra_cflag)
     message(STATUS "Added extra compile options (${EXTRA_CFLAGS})")
 endif()
 
