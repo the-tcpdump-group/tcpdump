@@ -109,8 +109,6 @@
     DIAG_DO_PRAGMA(clang diagnostic ignored "-Wdeprecated-declarations")
   #define DIAG_ON_DEPRECATION \
     DIAG_DO_PRAGMA(clang diagnostic pop)
-  #define DIAG_OFF_FORMAT_TRUNCATION
-  #define DIAG_ON_FORMAT_TRUNCATION
 #elif ND_IS_AT_LEAST_GNUC_VERSION(4,2)
   /* GCC apparently doesn't complain about ORing enums together. */
   #define DIAG_OFF_ASSIGN_ENUM
