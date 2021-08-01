@@ -240,10 +240,6 @@ static int infoprint;
 
 char *program_name;
 
-#ifdef HAVE_CASPER
-cap_channel_t *capdns;
-#endif
-
 /* Forwards */
 static NORETURN void error(FORMAT_STRING(const char *), ...) PRINTFLIKE(1, 2);
 static void warning(FORMAT_STRING(const char *), ...) PRINTFLIKE(1, 2);
