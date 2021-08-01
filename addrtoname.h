@@ -21,6 +21,11 @@
 
 #include "extract.h"
 
+#ifdef HAVE_CASPER
+#include <libcasper.h>
+extern cap_channel_t *capdns;
+#endif
+
 /*
  * Definition to let us compile most of the IPv6 code even on systems
  * without IPv6 support.

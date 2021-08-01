@@ -254,7 +254,7 @@ intoa(uint32_t addr)
 static uint32_t f_netmask;
 static uint32_t f_localnet;
 #ifdef HAVE_CASPER
-extern cap_channel_t *capdns;
+cap_channel_t *capdns;
 #endif
 
 /*

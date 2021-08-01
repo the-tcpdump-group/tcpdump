@@ -42,8 +42,6 @@ FreeBSD-*/yes)
         #   [-Werror,-Wc11-extensions]
         # tcpdump.c:2443:9: error: '_Generic' is a C11 extension
         #   [-Werror,-Wc11-extensions]
-        # tcpdump.c:244:16: error: no previous extern declaration for non-static variable
-        #   'capdns' [-Werror,-Wmissing-variable-declarations]
         TCPDUMP_TAINTED=yes
         ;;
     esac

@@ -240,10 +240,6 @@ static int infoprint;
 
 char *program_name;
 
-#ifdef HAVE_CASPER
-cap_channel_t *capdns;
-#endif
-
 /* Forwards */
 static void (*setsignal (int sig, void (*func)(int)))(int);
 static void cleanup(int);
