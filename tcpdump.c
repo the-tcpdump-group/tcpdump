@@ -78,7 +78,9 @@ The Regents of the University of California.  All rights reserved.\n";
 #endif
 /* Capsicum-specific code requires macros from <net/bpf.h>, which will fail
  * to compile if <pcap.h> has already been included; including the headers
- * in the opposite order works fine.
+ * in the opposite order works fine. For the most part anyway, because in
+ * FreeBSD <pcap/pcap.h> declares bpf_dump() instead of <net/bpf.h>. Thus
+ * interface.h takes care of it later to avoid a compiler warning.
  */
 #ifdef HAVE_CAPSICUM
 #include <sys/capsicum.h>

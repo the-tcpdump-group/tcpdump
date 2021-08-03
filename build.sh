@@ -31,9 +31,6 @@ print_cc_version
 # shellcheck disable=SC2006
 case `os_id`/"$CMAKE" in
 FreeBSD-*/yes)
-    # tcpdump.c:2290:3: error: implicit declaration of function 'bpf_dump'
-    #   [-Werror=implicit-function-declaration]
-    [ "$BUILD_LIBPCAP" = yes ] && TCPDUMP_TAINTED=yes
     case `cc_id` in
     clang-*)
         # tcpdump.c:2434:32: error: '_Generic' is a C11 extension
