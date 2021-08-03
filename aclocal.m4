@@ -575,6 +575,32 @@ AC_DEFUN(AC_LBL_LIBPCAP,
                 # Found - use it to get the include flags for
                 # libpcap and the flags to link with libpcap.
                 #
+                # If this is a system-supplied pcap-config, which
+                # we define as being "a pcap-config in /usr/bin",
+                # there are some issues.  Work around them.
+                #
+                if test "$PCAP_CONFIG" = "/usr/bin/pcap-config" ; then
+                    #
+                    # It's /usr/bin/pcap-config.
+                    #
+                    case "$host_os" in
+
+                    darwin*)
+                        #
+                        # This is macOS or another Darwin-based OS.
+                        #
+                        # That means that /usr/bin/pcap-config it
+                        # may provide -I/usr/local/include with --cflags
+                        # and -L/usr/local/lib with --libs, rather than
+                        # pointing to the OS-supplied library and
+                        # Xcode-supplied headers.  Remember that, so we
+                        # ignore those values.
+                        #
+                        _broken_apple_pcap_config=yes
+                        ;;
+                    esac
+                fi
+                #
                 # Please read section 11.6 "Shell Substitutions"
                 # in the autoconf manual before doing anything
                 # to this that involves quoting.  Especially note
@@ -583,8 +609,30 @@ AC_DEFUN(AC_LBL_LIBPCAP,
                 # expressions (pfew!)."
                 #
                 cflags=`"$PCAP_CONFIG" --cflags`
+                #
+                # Work around macOS (and probably other Darwin) brokenness,
+                # by not adding /usr/local/include if it's from the broken
+                # Apple pcap-config.
+                #
+                if test "$_broken_apple_pcap_config" = "yes" ; then
+                    #
+                    # Strip -I/usr/local/include with sed.
+                    #
+                    cflags=`echo $cflags | sed 's;-I/usr/local/include;;'`
+                fi
                 $2="$cflags $$2"
                 libpcap=`"$PCAP_CONFIG" --libs`
+                #
+                # Work around macOS (and probably other Darwin) brokenness,
+                # by not adding /usr/local/lib if it's from the broken
+                # Apple pcap-config.
+                #
+                if test "$_broken_apple_pcap_config" = "yes" ; then
+                    #
+                    # Strip -L/usr/local/lib with sed.
+                    #
+                    libpcap=`echo $libpcap | sed 's;-L/usr/local/lib;;'`
+                fi
             else
                 #
                 # Not found; look for an installed pcap.
