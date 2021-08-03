@@ -12,7 +12,7 @@ mktempdir_diy() {
         # /bin/sh implements $RANDOM in AIX 7, but not in Solaris before 11,
         # thus use dd and od instead.
         # shellcheck disable=SC2006
-        mktempdir_diy_suffix=`dd if=/dev/urandom bs=1 count=4 2>/dev/null | od -t x -A n | head -1 | tr -d '\t '`
+        mktempdir_diy_suffix=`dd if=/dev/urandom bs=4 count=1 2>/dev/null | od -t x -A n | head -1 | tr -d '\t '`
         [ -z "$mktempdir_diy_suffix" ] && return 1
         mktempdir_diy_path="${TMPDIR:-/tmp}/${1:?}.${mktempdir_diy_suffix}"
         # "test -e" would be more appropriate, but it is not available in
@@ -23,7 +23,7 @@ mktempdir_diy() {
             echo "$mktempdir_diy_path"
             break
         fi
-        # Try again (AIX /dev/urandom returns zeroes quite often).
+        # Try again (very unlikely, just in case).
     done
 }
 
