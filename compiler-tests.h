@@ -141,14 +141,21 @@
 #if ! defined(__xlC__)
 #if ! defined(__ibmxl__)
 #define ND_IS_AT_LEAST_XL_C_VERSION(major,minor) 0
+#define ND_IS_AT_LEAST_XL_C_MODFIX(modification, fixlevel) 0
 #else
 #define ND_IS_AT_LEAST_XL_C_VERSION(major, minor) \
 	(__ibmxl_version__ > (major) || \
 	 (__ibmxl_version__ == (major) && __ibmxl_release__ >= (minor)))
+#define ND_IS_AT_LEAST_XL_C_MODFIX(modification, fixlevel) \
+  (__ibmxl_modification__ > (modification) || \
+   (__ibmxl_modification__ == (modification) && \
+    __ibmxl_ptf_fix_level__ >= (fixlevel)))
 #endif /* ! __ibmxl__ */
 #else /* ! __xlC__ */
 #define ND_IS_AT_LEAST_XL_C_VERSION(major, minor) \
 	(__xlC__ >= (((major) << 8) | (minor)))
+#define ND_IS_AT_LEAST_XL_C_MODFIX(modification, fixlevel) \
+  ((((modification) << 8) | (fixlevel)) >= __xlC_ver__)
 #endif
 
 /*

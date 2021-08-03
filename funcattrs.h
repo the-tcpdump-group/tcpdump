@@ -125,18 +125,29 @@
    * However, GCC didn't support that for function *pointers* until GCC
    * 4.1.0; see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3481.
    * XL C 16.1 (and possibly some earlier versions, but not 12.1 or 13.1) has
-   * a similar bug, a bugfix for which should be available later:
-   * https://www.ibm.com/support/pages/apar/LI81402
+   * a similar bug, the bugfix for which was made in:
+   * * version 16.1.1.8 for Linux (25 June 2020), which fixes
+   *   https://www.ibm.com/support/pages/apar/LI81402
+   * * version 16.1.0.5 for AIX (5 May 2020), which fixes
+   *   https://www.ibm.com/support/pages/apar/IJ24678
+   *
+   * When testing versions, keep in mind that XL C 16.1 pretends to be both
+   * GCC 4.2 and Clang 4.0 at once.
    */
-  #if (defined(__GNUC__) && ((__GNUC__ * 100 + __GNUC_MINOR__) < 401)) || \
-      (ND_IS_AT_LEAST_XL_C_VERSION(16,1) && !ND_IS_AT_LEAST_XL_C_VERSION(16,2))
-    #define PRINTFLIKE_FUNCPTR(x,y)
-  #else
+  #if (ND_IS_AT_LEAST_GNUC_VERSION(4,1) \
+       && !ND_IS_AT_LEAST_XL_C_VERSION(10,1)) \
+      || (ND_IS_AT_LEAST_XL_C_VERSION(16,1) \
+          && (ND_IS_AT_LEAST_XL_C_MODFIX(1, 8) && defined(__linux__)) \
+              || (ND_IS_AT_LEAST_XL_C_MODFIX(0, 5) && defined(_AIX)))
     #define PRINTFLIKE_FUNCPTR(x,y) __attribute__((__format__(__printf__,x,y)))
   #endif
-#else
-  #define PRINTFLIKE(x,y)
-  #define PRINTFLIKE_FUNCPTR(x,y)
+#endif
+
+#if !defined(PRINTFLIKE)
+#define PRINTFLIKE(x,y)
+#endif
+#if !defined(PRINTFLIKE_FUNCPTR)
+#define PRINTFLIKE_FUNCPTR(x,y)
 #endif
 
 /*
