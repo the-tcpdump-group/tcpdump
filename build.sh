@@ -18,8 +18,8 @@ if [ -z "$PREFIX" ]; then
     PREFIX=`mktempdir tcpdump_build`
     echo "PREFIX set to '$PREFIX'"
 fi
-# For TESTrun
 TCPDUMP_BIN="$PREFIX/bin/tcpdump"
+# For TESTrun
 export TCPDUMP_BIN
 
 print_cc_version
