@@ -109,6 +109,21 @@
     DIAG_DO_PRAGMA(clang diagnostic ignored "-Wdeprecated-declarations")
   #define DIAG_ON_DEPRECATION \
     DIAG_DO_PRAGMA(clang diagnostic pop)
+
+  /*
+   * Clang supports the generic C11 extension even if run with the -std=gnu99
+   * flag, which leads FreeBSD <sys/cdefs.h> to use the extension, which
+   * results in Clang emitting a -Wc11-extensions warning. The warning is not
+   * documented in the user manual, but it happens with Clang 10.0.1 on
+   * FreeBSD 12.2, so let's use that as a reference.
+   */
+  #if ND_IS_AT_LEAST_CLANG_VERSION(10,0)
+    #define DIAG_OFF_C11_EXTENSIONS \
+      DIAG_DO_PRAGMA(clang diagnostic push) \
+      DIAG_DO_PRAGMA(clang diagnostic ignored "-Wc11-extensions")
+    #define DIAG_ON_C11_EXTENSIONS \
+      DIAG_DO_PRAGMA(clang diagnostic pop)
+  #endif
 #elif ND_IS_AT_LEAST_GNUC_VERSION(4,2)
   /* GCC apparently doesn't complain about ORing enums together. */
   #define DIAG_OFF_ASSIGN_ENUM
@@ -132,6 +147,10 @@
     DIAG_DO_PRAGMA(GCC diagnostic ignored "-Wdeprecated-declarations")
   #define DIAG_ON_DEPRECATION \
     DIAG_DO_PRAGMA(GCC diagnostic pop)
+  /*
+   * GCC supports -Wc99-c11-compat since version 5.1.0, but the warning does
+   * not trigger for now, so let's just leave it be.
+   */
 #else
   #define DIAG_OFF_ASSIGN_ENUM
   #define DIAG_ON_ASSIGN_ENUM
@@ -139,6 +158,13 @@
   #define DIAG_ON_CAST_QUAL
   #define DIAG_OFF_DEPRECATION
   #define DIAG_ON_DEPRECATION
+#endif
+
+#ifndef DIAG_OFF_C11_EXTENSIONS
+#define DIAG_OFF_C11_EXTENSIONS
+#endif
+#ifndef DIAG_ON_C11_EXTENSIONS
+#define DIAG_ON_C11_EXTENSIONS
 #endif
 
 #endif /* _diag_control_h */
