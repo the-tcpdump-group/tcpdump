@@ -2429,17 +2429,44 @@ DIAG_ON_ASSIGN_ENUM
 #endif
 		if (Cflag != 0 || Gflag != 0) {
 #ifdef HAVE_CAPSICUM
-			dumpinfo.WFileName = strdup(basename(WFileName));
+			/*
+			 * basename() and dirname() may modify their input buffer
+			 * and they do since FreeBSD 12.0, but they didn't before.
+			 * Hence use the return value only, but always assume the
+			 * input buffer has been modified and would need to be
+			 * reset before the next use.
+			 */
+			char *WFileName_copy;
+
+			if ((WFileName_copy = strdup(WFileName)) == NULL) {
+				error("Unable to allocate memory for file %s",
+				    WFileName);
+			}
+			DIAG_OFF_C11_EXTENSIONS
+			dumpinfo.WFileName = strdup(basename(WFileName_copy));
+			DIAG_ON_C11_EXTENSIONS
 			if (dumpinfo.WFileName == NULL) {
 				error("Unable to allocate memory for file %s",
 				    WFileName);
 			}
-			dumpinfo.dirfd = open(dirname(WFileName),
+			free(WFileName_copy);
+
+			if ((WFileName_copy = strdup(WFileName)) == NULL) {
+				error("Unable to allocate memory for file %s",
+				    WFileName);
+			}
+			DIAG_OFF_C11_EXTENSIONS
+			char *WFileName_dirname = dirname(WFileName_copy);
+			DIAG_ON_C11_EXTENSIONS
+			dumpinfo.dirfd = open(WFileName_dirname,
 			    O_DIRECTORY | O_RDONLY);
 			if (dumpinfo.dirfd < 0) {
 				error("unable to open directory %s",
-				    dirname(WFileName));
+				    WFileName_dirname);
 			}
+			free(WFileName_dirname);
+			free(WFileName_copy);
+
 			cap_rights_init(&rights, CAP_CREATE, CAP_FCNTL,
 			    CAP_FTRUNCATE, CAP_LOOKUP, CAP_SEEK, CAP_WRITE);
 			if (cap_rights_limit(dumpinfo.dirfd, &rights) < 0 &&

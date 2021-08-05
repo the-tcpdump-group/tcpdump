@@ -28,22 +28,9 @@ print_cc_version
 # are not warning-free for one or another reason.  If you manage to fix one of
 # these cases, please remember to remove respective exemption below to help any
 # later warnings in the same matrix subset trigger an error.
-# shellcheck disable=SC2006
-case `os_id`/"$CMAKE" in
-FreeBSD-*/yes)
-    case `cc_id` in
-    clang-*)
-        # tcpdump.c:2434:32: error: '_Generic' is a C11 extension
-        #   [-Werror,-Wc11-extensions]
-        # tcpdump.c:2439:26: error: '_Generic' is a C11 extension
-        #   [-Werror,-Wc11-extensions]
-        # tcpdump.c:2443:9: error: '_Generic' is a C11 extension
-        #   [-Werror,-Wc11-extensions]
-        TCPDUMP_TAINTED=yes
-        ;;
-    esac
-    ;;
-esac
+
+# (There are no exemptions right now.)
+
 # shellcheck disable=SC2006
 [ "$TCPDUMP_TAINTED" != yes ] && CFLAGS=`cc_werr_cflags`
 
