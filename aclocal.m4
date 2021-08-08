@@ -575,13 +575,16 @@ AC_DEFUN(AC_LBL_LIBPCAP,
                 # Found - use it to get the include flags for
                 # libpcap and the flags to link with libpcap.
                 #
-                # If this is a system-supplied pcap-config, which
-                # we define as being "a pcap-config in /usr/bin",
-                # there are some issues.  Work around them.
+                # If this is a vendor-supplied pcap-config, which
+                # we define as being "a pcap-config in /usr/bin
+                # or /usr/ccs/bin" (the latter is for Solaris and
+                # Sun/Oracle Studio), there are some issues.  Work
+                # around them.
                 #
-                if test "$PCAP_CONFIG" = "/usr/bin/pcap-config" ; then
+                if test \( "$PCAP_CONFIG" = "/usr/bin/pcap-config" \) -o \
+                        \( "$PCAP_CONFIG" = "/usr/ccs/bin/pcap-config" \) ; then
                     #
-                    # It's /usr/bin/pcap-config.
+                    # It's vendor-supplied.
                     #
                     case "$host_os" in
 
@@ -597,6 +600,37 @@ AC_DEFUN(AC_LBL_LIBPCAP,
                         # ignore those values.
                         #
                         _broken_apple_pcap_config=yes
+                        ;;
+
+                    solaris*)
+                        #
+                        # This is Solaris 2 or later, i.e. SunOS 5.x.
+                        #
+                        # At least on Solaris 11; there's /usr/bin/pcap-config,
+                        # which reports -L/usr/lib with --libs, causing
+                        # the 32-bit libraries to be found, and there's
+                        # /usr/bin/{64bitarch}/pcap-config, where {64bitarch}
+                        # is a name for the 64-bit version of the instruction
+                        # set, which reports -L /usr/lib/{64bitarch}, causing
+                        # the 64-bit libraries to be found.
+                        #
+                        # So if we're building 64-bit targets, we replace
+                        # PCAP_CONFIG with /usr/bin/{64bitarch}; we get
+                        # {64bitarch} as the output of "isainfo -n".
+                        #
+                        # Are we building 32-bit or 64-bit?  Get the
+                        # size of void *, and check that.
+                        #
+                        AC_CHECK_SIZEOF([void *])
+                        if test ac_cv_sizeof_void_p -eq 8 ; then
+                            isainfo_output=`isainfo -n`
+                            if test ! -z "$isainfo_output" ; then
+                                #
+                                # Success - change PCAP_CONFIG.
+                                #
+                                PCAP_CONFIG=`echo $PCAP_CONFIG | sed "s;/bin/;/bin/$isainfo_output/;"`
+                            fi
+                        fi
                         ;;
                     esac
                 fi
