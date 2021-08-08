@@ -30,8 +30,6 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
-project(tcpdump)
-
 #
 # OK, this is a royal pain.
 #
@@ -52,15 +50,17 @@ project(tcpdump)
 # but *not* in CXXFLAGS, the size for C++ will win, and hilarity
 # will ensue.
 #
-# Make sure CMAKE_C_SIZEOF_DATA_PTR and CMAKE_CXX_SIZEOF_DATA_PTR
-# have the same value, and warn if they don't.
+# Or if, at least on Solaris, you have a newer version of GCC
+# installed, but *not* a newer version of G++, and you have Oracle
+# Studio installed, it will find GCC, which will default to building
+# 64-bit, and Oracle Studio's C++ compiler, which will default to
+# building 32-bit, the size for C++ will win, and, again, hilarity
+# will ensue.
 #
-# Yes, we have to do this even though there is currently *NO* C++
-# code in tcpdump....
+# So we *explicitly* state that only C is used; there is currently no
+# C++ code in tcpdump.
 #
-if(NOT "${CMAKE_C_SIZEOF_DATA_PTR}" EQUAL "${CMAKE_CXX_SIZEOF_DATA_PTR}")
-    message(FATAL_ERROR "Architecture flags must be set in both CFLAGS and CXXFLAGS")
-endif()
+project(tcpdump C)
 
 #
 # For checking if a compiler flag works and adding it if it does.
