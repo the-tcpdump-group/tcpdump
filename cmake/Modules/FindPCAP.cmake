@@ -194,17 +194,57 @@ else(WIN32)
       endif()
 
       #
-      # if this is macOS or some other Darwin-based OS, check whether
-      # it's the system-supplied one.
+      # If this is a vendor-supplied pcap-config, which we define as
+      # being "a pcap-config in /usr/bin or /usr/ccs/bin" (the latter
+      # is for Solaris and Sun/Oracle Studio), there are some issues.
+      # Work around them.
       #
-      if(APPLE AND "${PCAP_CONFIG}" STREQUAL /usr/bin/pcap-config)
+      if("${PCAP_CONFIG}" STREQUAL /usr/bin/pcap-config OR
+         "${PCAP_CONFIG}" STREQUAL /usr/ccs/bin/pcap-config)
         #
-        # It is - remember that, so that if it provides -I/usr/local/include
-        # with --cflags, or -L/usr/local/lib with --libs, we ignore it;
-        # the macOS pcap-config does that even though the headers aren't
-        # under /usr/local/include and the library isn't in /usr/local/lib.
+        # It's vendor-supplied.
         #
-        set(_broken_apple_pcap_config TRUE)
+        if(APPLE)
+          #
+          # This is macOS or another Darwin-based OS.
+          #
+          # That means that /usr/bin/pcap-config it may provide
+          # -I/usr/local/include with --cflags and -L/usr/local/lib
+          # with --libs; if there's no pcap installed under /usr/local,
+          # that will cause the build to fail, and if there is a pcap
+          # installed there, you'll get that pcap even if you don't
+          # want it.  Remember that, so we ignore those values.
+          #
+          set(_broken_apple_pcap_config TRUE)
+        elseif(CMAKE_SYSTEM_NAME STREQUAL "SunOS" AND CMAKE_SYSTEM_VERSION MATCHES "5[.][0-9.]*")
+          #
+          # This is Solaris 2 or later, i.e. SunOS 5.x.
+          #
+          # At least on Solaris 11; there's /usr/bin/pcap-config, which
+          # reports -L/usr/lib with --libs, causing the 32-bit libraries
+          # to be found, and there's /usr/bin/{64bitarch}/pcap-config,
+          # where {64bitarch} is a name for the 64-bit version of the
+          # instruction set, which reports -L /usr/lib/{64bitarch},
+          # causing the 64-bit libraries to be found.
+          #
+          # So if we're building 64-bit targets, we replace PCAP_CONFIG
+          # with /usr/bin/{64bitarch}; we get {64bitarch} as the
+          # output of "isainfo -n".
+          #
+          if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+            execute_process(COMMAND "isainfo" "-n"
+              RESULT_VARIABLE ISAINFO_RESULT
+              OUTPUT_VARIABLE ISAINFO_OUTPUT
+              OUTPUT_STRIP_TRAILING_WHITESPACE
+            )
+            if(ISAINFO_RESULT EQUAL 0)
+              #
+              # Success - change PCAP_CONFIG.
+              #
+              string(REPLACE "/bin/" "/bin/${ISAINFO_OUTPUT}/" PCAP_CONFIG "${PCAP_CONFIG}")
+            endif()
+          endif()
+        endif()
       endif()
 
       #
