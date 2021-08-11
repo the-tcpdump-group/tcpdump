@@ -43,24 +43,6 @@
  */
 
 /*
- * This was introduced by Clang:
- *
- *     https://clang.llvm.org/docs/LanguageExtensions.html#has-attribute
- *
- * in some version (which version?); it has been picked up by GCC 5.0.
- */
-#ifndef __has_attribute
-  /*
-   * It's a macro, so you can check whether it's defined to check
-   * whether it's supported.
-   *
-   * If it's not, define it to always return 0, so that we move on to
-   * the fallback checks.
-   */
-  #define __has_attribute(x) 0
-#endif
-
-/*
  * NORETURN, before a function declaration, means "this function
  * never returns".  (It must go before the function declaration, e.g.
  * "extern NORETURN func(...)" rather than after the function
