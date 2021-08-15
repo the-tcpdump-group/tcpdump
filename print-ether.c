@@ -566,7 +566,7 @@ ethertype_print(netdissect_options *ndo,
 		}
 		/* At least one byte is required */
 		/* FIXME: Reference for this byte? */
-		ND_TCHECK_LEN(p, 1);
+		ND_TCHECK_1(p);
 		isoclns_print(ndo, p + 1, length - 1);
 		return(1);
 
