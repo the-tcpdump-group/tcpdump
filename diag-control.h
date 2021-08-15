@@ -167,4 +167,20 @@
 #define DIAG_ON_C11_EXTENSIONS
 #endif
 
+/*
+ * GCC needs this on AIX for longjmp().
+ */
+#if ND_IS_AT_LEAST_GNUC_VERSION(5,1)
+  /*
+   * Beware that the effect of this builtin is more than just squelching the
+   * warning! GCC trusts it enough for the process to segfault if the control
+   * flow reaches the builtin (an infinite empty loop in the same context would
+   * squelch the warning and ruin the process too, albeit in a different way).
+   * So please remember to use this very carefully.
+   */
+  #define ND_UNREACHABLE __builtin_unreachable();
+#else
+  #define ND_UNREACHABLE
+#endif
+
 #endif /* _diag_control_h */
