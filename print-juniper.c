@@ -950,7 +950,7 @@ juniper_mfr_if_print(netdissect_options *ndo,
         switch (l2info.proto) {
         case (LLCSAP_ISONS<<8 | LLCSAP_ISONS):
             /* At least one byte is required */
-            ND_TCHECK_LEN(p, 1);
+            ND_TCHECK_1(p);
             isoclns_print(ndo, p + 1, l2info.length - 1);
             break;
         case (LLC_UI<<8 | NLPID_Q933):
@@ -1052,7 +1052,7 @@ juniper_atm1_if_print(netdissect_options *ndo,
 
         if (GET_U_1(p) == 0x03) { /* Cisco style NLPID encaps ? */
             /* At least one byte is required */
-            ND_TCHECK_LEN(p, 1);
+            ND_TCHECK_1(p);
             isoclns_print(ndo, p + 1, l2info.length - 1);
             /* FIXME check if frame was recognized */
             ndo->ndo_ll_hdr_len += l2info.header_len;
@@ -1121,7 +1121,7 @@ juniper_atm2_if_print(netdissect_options *ndo,
 
         if (GET_U_1(p) == 0x03) { /* Cisco style NLPID encaps ? */
             /* At least one byte is required */
-            ND_TCHECK_LEN(p, 1);
+            ND_TCHECK_1(p);
             isoclns_print(ndo, p + 1, l2info.length - 1);
             /* FIXME check if frame was recognized */
             ndo->ndo_ll_hdr_len += l2info.header_len;
