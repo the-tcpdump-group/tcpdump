@@ -37,6 +37,7 @@
  */
 #include "funcattrs.h"
 #include "netdissect.h"
+#include "diag-control.h"
 
 /*
  * If we have versions of GCC or Clang that support an __attribute__
@@ -585,7 +586,7 @@ nd_trunc_longjmp(netdissect_options *ndo)
 	 * XL C that the function is noreturn, but GCC remains unaware of that and
 	 * yields a "'noreturn' function does return" warning.
 	 */
-	while (1);
+	ND_UNREACHABLE
 #endif /* _AIX */
 }
 
