@@ -64,6 +64,20 @@ struct mptcp_option {
 
 #define MPTCP_OPT_SUBTYPE(sub_etc)      (((sub_etc) >> 4) & 0xF)
 
+#define MP_CAPABLE_A                    0x80
+
+static const struct tok mp_capable_flags[] = {
+        { MP_CAPABLE_A, "A" },
+        { 0x40, "B" },
+        { 0x20, "C" },
+        { 0x10, "D" },
+        { 0x08, "E" },
+        { 0x04, "F" },
+        { 0x02, "G" },
+        { 0x01, "H" },
+        { 0, NULL }
+};
+
 struct mp_capable {
         nd_uint8_t     kind;
         nd_uint8_t     len;
@@ -75,8 +89,6 @@ struct mp_capable {
 };
 
 #define MP_CAPABLE_OPT_VERSION(sub_ver) (((sub_ver) >> 0) & 0xF)
-#define MP_CAPABLE_C                    0x80
-#define MP_CAPABLE_S                    0x01
 
 struct mp_join {
         nd_uint8_t     kind;
@@ -237,7 +249,10 @@ mp_capable_print(netdissect_options *ndo,
                         return 1;
         }
 
-        csum_enabled = GET_U_1(mpc->flags) & MP_CAPABLE_C;
+        ND_PRINT(" flags [%s]", bittok2str_nosep(mp_capable_flags, "none",
+                 GET_U_1(mpc->flags)));
+
+        csum_enabled = GET_U_1(mpc->flags) & MP_CAPABLE_A;
         if (csum_enabled)
                 ND_PRINT(" csum");
         if (opt_len == 12 || opt_len >= 20) {
