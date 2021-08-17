@@ -10,6 +10,7 @@
 : "${CRYPTO:=no}"
 : "${SMB:=no}"
 : "${TCPDUMP_TAINTED:=no}"
+: "${MAKE_BIN:=make}"
 
 . ./build_common.sh
 # Install directory prefix
@@ -71,14 +72,14 @@ else
             -DCMAKE_INSTALL_PREFIX="$PREFIX" ..
     fi
 fi
-run_after_echo make -s clean
+run_after_echo "$MAKE_BIN" -s clean
 if [ "$CMAKE" = no ]; then
-    run_after_echo make -s ${CFLAGS:+CFLAGS="$CFLAGS"}
+    run_after_echo "$MAKE_BIN" -s ${CFLAGS:+CFLAGS="$CFLAGS"}
 else
     # The "-s" flag is a no-op and CFLAGS is set using -DEXTRA_CFLAGS above.
-    run_after_echo make
+    run_after_echo "$MAKE_BIN"
 fi
-run_after_echo make install
+run_after_echo "$MAKE_BIN" install
 print_so_deps "$TCPDUMP_BIN"
 run_after_echo "$TCPDUMP_BIN" -h
 # The "-D" flag depends on HAVE_PCAP_FINDALLDEVS and it would not be difficult
@@ -98,10 +99,10 @@ if [ "$CIRRUS_CI" = true ]; then
         "$TCPDUMP_BIN" -L
 fi
 if [ "$BUILD_LIBPCAP" = yes ]; then
-    run_after_echo make check
+    run_after_echo "$MAKE_BIN" check
 fi
 if [ "$CMAKE" = no ]; then
-    run_after_echo make releasetar
+    run_after_echo "$MAKE_BIN" releasetar
 fi
 if [ "$CIRRUS_CI" = true ]; then
     run_after_echo sudo \

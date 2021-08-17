@@ -19,6 +19,9 @@
 # not warning-free because of the OS, the compiler or whatever other factor
 # that the scripts can detect both in and out of CI.
 : "${TCPDUMP_TAINTED:=no}"
+# Some OSes have native make without parallel jobs support and sometimes have
+# GNU Make available as "gmake".
+: "${MAKE_BIN:=make}"
 
 . ./build_common.sh
 print_sysinfo
@@ -31,6 +34,7 @@ if [ -z "$PREFIX" ]; then
 fi
 COUNT=0
 export TCPDUMP_TAINTED
+export MAKE_BIN
 
 build_tcpdump() {
     for CMAKE in $MATRIX_CMAKE; do
@@ -49,7 +53,7 @@ build_tcpdump() {
                 if [ "$CMAKE" = yes ]; then
                     run_after_echo rm -rf build
                 else
-                    run_after_echo make distclean
+                    run_after_echo "$MAKE_BIN" distclean
                 fi
                 run_after_echo rm -rf "$PREFIX"/bin/tcpdump*
                 run_after_echo git status -suall
@@ -87,7 +91,7 @@ for CC in $MATRIX_CC; do
             echo_magenta 'Use system libpcap' >&2
             purge_directory "$PREFIX"
             if [ -d ../libpcap ]; then
-                (cd ../libpcap; make distclean || echo '(Ignoring the make error.)')
+                (cd ../libpcap; "$MAKE_BIN" distclean || echo '(Ignoring the make error.)')
             fi
             build_tcpdump
         fi
