@@ -29,7 +29,17 @@ print_cc_version
 # these cases, please remember to remove respective exemption below to help any
 # later warnings in the same matrix subset trigger an error.
 
-# (There are no exemptions right now.)
+# shellcheck disable=SC2006
+case `cc_id`/`os_id` in
+clang-9.*/SunOS-5.11)
+    # (OpenIndiana)
+    # tcpdump.c:2312:51: warning: this function declaration is not a prototype
+    #   [-Wstrict-prototypes]
+    # tcpdump.c:2737:11: warning: this function declaration is not a prototype
+    #   [-Wstrict-prototypes]
+    [ "`uname -o`" = illumos ] && TCPDUMP_TAINTED=yes
+    ;;
+esac
 
 # shellcheck disable=SC2006
 [ "$TCPDUMP_TAINTED" != yes ] && CFLAGS=`cc_werr_cflags`
