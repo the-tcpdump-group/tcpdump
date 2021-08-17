@@ -86,7 +86,9 @@ for CC in $MATRIX_CC; do
         else
             echo_magenta 'Use system libpcap' >&2
             purge_directory "$PREFIX"
-            (cd ../libpcap; make distclean || echo '(Ignoring the make error.)')
+            if [ -d ../libpcap ]; then
+                (cd ../libpcap; make distclean || echo '(Ignoring the make error.)')
+            fi
             build_tcpdump
         fi
     done
