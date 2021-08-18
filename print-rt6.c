@@ -39,7 +39,9 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 	const struct ip6_rthdr *dp;
 	const struct ip6_rthdr0 *dp0;
 	const struct ip6_srh *srh;
-	u_int i, len, type;
+	const struct ip6_crh16 *crh16;
+	const struct ip6_crh32 *crh32;
+	u_int i, len, type, sids_per_word, sid_count, min_crh_len;
 	const u_char *p;
 
 	ndo->ndo_protocol = "rt6";
@@ -54,6 +56,7 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 	if (type == IPV6_RTHDR_TYPE_0)
 		ND_PRINT(" [Deprecated]");
 	ND_PRINT(", segleft=%u", GET_U_1(dp->ip6r_segleft));
+	min_crh_len = -1;
 
 	switch (type) {
 	case IPV6_RTHDR_TYPE_0:
@@ -104,6 +107,73 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 		ND_PRINT(") ");
 		return((GET_U_1(srh->srh_len) + 1) << 3);
 		break;
+
+	case IPV6_RTHDR_TYPE_5:
+		/* Length is measured in 8-octet units, excluding the first 8 octets */
+		crh16 = (const struct ip6_crh16 *)dp;
+		sids_per_word = 4;
+		sid_count = len * 4 + 2; /* CRH must terminate on 64-bit boundary */
+
+		if (GET_U_1(crh16->crh16_segleft) <= 2) {
+			min_crh_len = 0;
+		}
+		ND_PRINT(", CRH-16, Segment Identifiers: ");
+
+		if (min_crh_len) {
+			min_crh_len = ((GET_U_1(crh16->crh16_segleft) - 2) / sids_per_word);
+			if ((GET_U_1(crh16->crh16_segleft) - 2) % sids_per_word) {
+				min_crh_len++;
+			}
+		}
+
+		if (min_crh_len > len) {
+			ND_PRINT("IPv6 CRH min length must not exceed header length of %u", len);
+		}
+
+		/* Grab & print each 16 bit Segment ID (SID) */
+		for (i = 0; i < sid_count; i++) {
+			ND_PRINT("SID[%d] = %d", i, GET_BE_U_2(crh16->crh16_sids + i*2));
+			if (i != sid_count - 1) {
+				ND_PRINT(", ");
+			}
+		}
+		ND_PRINT(") ");
+		return((GET_U_1(crh16->crh16_len) + 1) << 3);
+		break;
+
+	case IPV6_RTHDR_TYPE_6:
+		/* Length is measured in 8-octet units, excluding the first 8 octets */
+		crh32 = (const struct ip6_crh32 *)dp;
+		sids_per_word = 2;
+		sid_count = len * 2 + 1; /* CRH must terminate on 64-bit boundary */
+		if (GET_U_1(crh32->crh32_segleft) <= 1) {
+			min_crh_len = 0;
+		}
+		ND_PRINT(", CRH-32, Segment Identifiers: ");
+
+		if (min_crh_len) {
+			min_crh_len = ((GET_U_1(crh32->crh32_segleft) - 1) / sids_per_word);
+			if ((GET_U_1(crh32->crh32_segleft) - 1) % sids_per_word) {
+				min_crh_len++;
+			}
+		}
+
+		if (min_crh_len > len) {
+			ND_PRINT("IPv6 CRH min length must not exceed header length of %u", len);
+		}
+
+		/* Grab & print each 32 bit Segment ID (SID) */
+		for (i = 0; i < sid_count; i++) {
+			ND_PRINT("SID[%d] = %d", i, GET_BE_U_4(crh32->crh32_sids + i*4));
+			if (i != sid_count - 1) {
+				ND_PRINT(", ");
+			}
+		}
+
+		ND_PRINT(") ");
+		return((GET_U_1(crh32->crh32_len) + 1) << 3);
+		break;
+
 	default:
 		ND_PRINT(" (unknown type)");
 		goto invalid;
