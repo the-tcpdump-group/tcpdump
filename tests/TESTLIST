@@ -876,3 +876,22 @@ unsupported-link-type-dbus unsupported-link-type-dbus.pcap unsupported-link-type
 
 # LSP Ping
 lsp-ping-timestamp	lsp-ping-timestamp.pcap		lsp-ping-timestamp.out	-vv
+
+# B.A.T.M.A.N. Advanced
+batman-adv-15-iv-unicast-ip6mc		batman-adv-15-iv.pcap	batman-adv-15-iv-unicast-ip6mc.out	"batadv 15 unicast and ip6 dst ff02::1 and icmp6 and icmp6[icmp6type] = icmp6-echo"
+batman-adv-15-iv-bcast-ip6mc		batman-adv-15-iv.pcap	batman-adv-15-iv-bcast-ip6mc.out	"batadv 15 bcast and ip6 dst ff02::1 and icmp6 and icmp6[icmp6type] = icmp6-echo"
+batman-adv-15-iv-unicast-ip6u		batman-adv-15-iv.pcap	batman-adv-15-iv-unicast-ip6uc.out	"batadv 15 unicast and ip6 dst fe80::ff:fe00:102 and icmp6 and icmp6[icmp6type] = icmp6-echo"
+batman-adv-15-iv-ucastfrag-ip6uc	batman-adv-15-iv.pcap	batman-adv-15-iv-ucastfrag-ip6uc.out	"batadv 15 unicast_frag"
+batman-adv-15-iv-ucast4addr-dhcp4	batman-adv-15-iv.pcap	batman-adv-15-iv-ucast4addr-dhcp4.out	"batadv 15 unicast_4addr and ip and udp dst port 67"
+batman-adv-15-iv-ogm			batman-adv-15-iv.pcap	batman-adv-15-iv-ogm.out		"batadv 15 iv_ogm && ether[22:2] = 0x0200 and ether[24:2] = 0x0000 and ether[26:2] = 0x0001"
+batman-adv-15-iv-ogm2			batman-adv-15-iv.pcap	batman-adv-15-iv-ogm2.out		"batadv 15 ogm2 && ether[22:2] = 0x0200 and ether[24:2] = 0x0000 and ether[26:2] = 0x0002"
+batman-adv-15-iv-elp			batman-adv-15-iv.pcap	batman-adv-15-iv-elp.out		"batadv 15 elp && ether[16:2] = 0x0200 and ether[18:2] = 0x0000 and ether[20:2] = 0x0002"
+
+batman-adv-15-v-unicast-ip6mc		batman-adv-15-v.pcap	batman-adv-15-v-unicast-ip6mc.out	"batadv 15 unicast and ip6 dst ff02::1 and icmp6 and icmp6[icmp6type] = icmp6-echo"
+batman-adv-15-v-bcast-ip6mc		batman-adv-15-v.pcap	batman-adv-15-v-bcast-ip6mc.out		"batadv 15 bcast and ip6 dst ff02::1 and icmp6 and icmp6[icmp6type] = icmp6-echo"
+batman-adv-15-v-unicast-ip6u		batman-adv-15-v.pcap	batman-adv-15-v-unicast-ip6uc.out	"batadv 15 unicast and ip6 dst fe80::ff:fe00:102 and icmp6 and icmp6[icmp6type] = icmp6-echo"
+batman-adv-15-v-ucastfrag-ip6uc		batman-adv-15-v.pcap	batman-adv-15-v-ucastfrag-ip6uc.out	"batadv 15 unicast_frag"
+batman-adv-15-v-ucast4addr-dhcp4	batman-adv-15-v.pcap	batman-adv-15-v-ucast4addr-dhcp4.out	"batadv 15 unicast_4addr and ip and udp dst port 67"
+batman-adv-15-v-ogm			batman-adv-15-v.pcap	batman-adv-15-v-ogm.out			"batadv 15 iv_ogm && ether[22:2] = 0x0200 and ether[24:2] = 0x0000 and ether[26:2] = 0x0001"
+batman-adv-15-v-ogm2			batman-adv-15-v.pcap	batman-adv-15-v-ogm2.out		"batadv 15 ogm2 && ether[22:2] = 0x0200 and ether[24:2] = 0x0000 and ether[26:2] = 0x0002"
+batman-adv-15-v-elp			batman-adv-15-v.pcap	batman-adv-15-v-elp.out			"batadv 15 elp && ether[16:2] = 0x0200 and ether[18:2] = 0x0000 and ether[20:2] = 0x0002"
