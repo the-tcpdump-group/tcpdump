@@ -236,6 +236,11 @@ struct tim_t {
 	uint8_t		bitmap[251];
 };
 
+struct meshid_t {
+	u_int		length;
+	u_char		meshid[33];  /* 32 + 1 for null */
+};
+
 #define	E_SSID		0
 #define	E_RATES	1
 #define	E_FH		2
@@ -260,6 +265,7 @@ struct tim_t {
 /* reserved		19 */
 /* reserved		16 */
 /* reserved		16 */
+#define E_MESHID	114
 
 
 struct mgmt_body_t {
@@ -287,6 +293,8 @@ struct mgmt_body_t {
 	struct fh_t	fh;
 	int		tim_present;
 	struct tim_t	tim;
+	int		meshid_present;
+	struct meshid_t	meshid;
 };
 
 struct ctrl_control_wrapper_hdr_t {
@@ -419,6 +427,13 @@ struct meshcntl_t {
 		ND_PRINT(" CH: %u", p.ds.channel); \
 	ND_PRINT("%s", \
 	    CAPABILITY_PRIVACY(p.capability_info) ? ", PRIVACY" : "");
+
+#define PRINT_MESHID(p) \
+	if (p.meshid_present) { \
+		ND_PRINT(" (MESHID: "); \
+		fn_print_str(ndo, p.meshid.meshid); \
+		ND_PRINT(")"); \
+	}
 
 #define MAX_MCS_INDEX	76
 
@@ -1138,6 +1153,7 @@ parse_elements(netdissect_options *ndo,
 	struct ds_t ds;
 	struct cf_t cf;
 	struct tim_t tim;
+	struct meshid_t meshid;
 
 	/*
 	 * We haven't seen any elements yet.
@@ -1148,6 +1164,7 @@ parse_elements(netdissect_options *ndo,
 	pbody->ds_present = 0;
 	pbody->cf_present = 0;
 	pbody->tim_present = 0;
+	pbody->meshid_present = 0;
 
 	while (length != 0) {
 		/* Make sure we at least have the element ID and length. */
@@ -1336,6 +1353,30 @@ parse_elements(netdissect_options *ndo,
 				pbody->tim_present = 1;
 			}
 			break;
+		case E_MESHID:
+			meshid.length = elementlen;
+			offset += 2;
+			length -= 2;
+			if (meshid.length != 0) {
+				if (meshid.length > sizeof(meshid.meshid) - 1)
+					return 0;
+				memcpy(&meshid.meshid, p + offset, meshid.length);
+				offset += meshid.length;
+				length -= meshid.length;
+			}
+			meshid.meshid[meshid.length] = '\0';
+			/*
+			 * Present and not truncated.
+			 *
+			 * If we haven't already seen a MESHID IE,
+			 * copy this one, otherwise ignore this one,
+			 * so we later report the first one we saw.
+			 */
+			if (!pbody->meshid_present) {
+				pbody->meshid = meshid;
+				pbody->meshid_present = 1;
+			}
+			break;
 		default:
 #if 0
 			ND_PRINT("(1) unhandled element_id (%u)  ",
@@ -1389,6 +1430,7 @@ handle_beacon(netdissect_options *ndo,
 	ND_PRINT(" %s",
 	    CAPABILITY_ESS(pbody.capability_info) ? "ESS" : "IBSS");
 	PRINT_DS_CHANNEL(pbody);
+	PRINT_MESHID(pbody);
 
 	return ret;
 trunc:
@@ -1553,6 +1595,7 @@ handle_probe_response(netdissect_options *ndo,
 	PRINT_SSID(pbody);
 	PRINT_RATES(pbody);
 	PRINT_DS_CHANNEL(pbody);
+	PRINT_MESHID(pbody);
 
 	return ret;
 trunc:
