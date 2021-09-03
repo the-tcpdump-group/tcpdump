@@ -809,7 +809,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 					/*
 
 					Ctype in a INTERFACE_INFORMATION_OBJECT_CLASS object:
-					
+
 					Bit     0       1       2       3       4       5       6       7
 					+-------+-------+-------+-------+-------+-------+-------+-------+
 					| Interface Role| Rsvd1 | Rsvd2 |ifIndex| IPAddr|  name |  MTU  |

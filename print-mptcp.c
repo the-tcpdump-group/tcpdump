@@ -250,7 +250,7 @@ mp_capable_print(netdissect_options *ndo,
                         ND_PRINT(" Unknown Version (%u)", version);
                         return 1;
         }
- 
+
         ND_PRINT(" flags [%s]", bittok2str_nosep(mp_capable_flags, "none",
                  GET_U_1(mpc->flags)));
 
