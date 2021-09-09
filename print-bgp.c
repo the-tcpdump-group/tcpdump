@@ -224,6 +224,7 @@ static const struct tok bgp_opt_values[] = {
 #define BGP_CAPCODE_ADD_PATH           69 /* RFC7911 */
 #define BGP_CAPCODE_ENH_RR             70 /* draft-keyur-bgp-enhanced-route-refresh */
 #define BGP_CAPCODE_LLGR               71 /* draft-uttaro-idr-bgp-persistence-05 */
+#define BGP_CAPCODE_FQDN               73 /* draft-walton-bgp-hostname-capability-02 */
 #define BGP_CAPCODE_RR_CISCO          128
 
 static const struct tok bgp_capcode_values[] = {
@@ -240,6 +241,7 @@ static const struct tok bgp_capcode_values[] = {
     { BGP_CAPCODE_ADD_PATH,     "Multiple Paths"},
     { BGP_CAPCODE_ENH_RR,       "Enhanced Route Refresh"},
     { BGP_CAPCODE_LLGR,         "Long-lived Graceful Restart"},
+    { BGP_CAPCODE_FQDN,         "FQDN Capability"},
     { BGP_CAPCODE_RR_CISCO,     "Route Refresh (Cisco)"},
     { 0, NULL}
 };
@@ -558,6 +560,42 @@ static const struct tok bgp_add_path_recvsend[] = {
 };
 
 #define AS_STR_SIZE sizeof("xxxxx.xxxxx")
+
+#define BGP_MAX_HOSTNAME 64
+
+/* decode FQDN capability (hostname/domainname)
+ */
+static void decode_fqdn(netdissect_options *ndo, const u_char *pptr,
+                        char *hostname, char *domainname)
+{
+        uint8_t len;
+
+        /* Hostname length */
+        len = GET_U_1(pptr);
+        pptr++;
+
+        /* Hostname */
+        if (len > BGP_MAX_HOSTNAME)
+                len = BGP_MAX_HOSTNAME;
+
+        if (len) {
+                snprintf(hostname, len + 1, "%s", pptr);
+                pptr += len;
+        }
+
+        /* Domainname length */
+        len = GET_U_1(pptr);
+        pptr++;
+
+        /* Domainname */
+        if (len > BGP_MAX_HOSTNAME)
+                len = BGP_MAX_HOSTNAME;
+
+        if (len) {
+                snprintf(domainname, len + 1, "%s", pptr);
+                pptr += len;
+        }
+}
 
 /*
  * as_printf
@@ -2590,6 +2628,26 @@ bgp_capabilities_print(netdissect_options *ndo,
         case BGP_CAPCODE_LLGR:
         case BGP_CAPCODE_RR_CISCO:
             break;
+        case BGP_CAPCODE_FQDN: {
+            char hostname[BGP_MAX_HOSTNAME + 1] = {0};
+            size_t hostname_len;
+            char domainname[BGP_MAX_HOSTNAME + 1] = {0};
+            size_t domainname_len;
+
+            if (cap_len < 4) {
+                ND_PRINT(" (too short, < 4)");
+                return;
+            }
+
+            decode_fqdn(ndo, opt + i + 2, hostname, domainname);
+            hostname_len = strlen(hostname);
+            domainname_len = strlen(domainname);
+
+            ND_PRINT("\n\t\tHostname Length: %d", (int)hostname_len);
+            ND_PRINT("\n\t\tHostname: %s", hostname);
+            ND_PRINT("\n\t\tDomain Name Length: %d", (int)domainname_len);
+            ND_PRINT("\n\t\tDomain Name: %s", domainname);
+        } break;
         case BGP_CAPCODE_AS_NEW:
             /*
              * Extract the 4 byte AS number encoded.
