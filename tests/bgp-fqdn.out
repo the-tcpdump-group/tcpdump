@@ -1,0 +1,33 @@
+    1  05:58:57.826374 IP (tos 0xc0, ttl 1, id 17738, offset 0, flags [DF], proto TCP (6), length 160)
+    192.168.10.249.51634 > 192.168.10.252.179: Flags [P.], cksum 0xe23f (correct), seq 4290826663:4290826771, ack 2704128942, win 229, options [nop,nop,TS val 4294939886 ecr 4213766555], length 108: BGP
+	Open Message (1), length: 108
+	  Version 4, my AS 65000, Holdtime 180s, ID 10.10.10.200
+	  Optional parameters, length: 79
+	    Option Capabilities Advertisement (2), length: 6
+	      Multiprotocol Extensions (1), length: 4
+		AFI IPv4 (1), SAFI Unicast (1)
+	    Option Capabilities Advertisement (2), length: 2
+	      Route Refresh (Cisco) (128), length: 0
+	    Option Capabilities Advertisement (2), length: 2
+	      Route Refresh (2), length: 0
+	    Option Capabilities Advertisement (2), length: 2
+	      Enhanced Route Refresh (70), length: 0
+		no decoder for Capability 70
+	    Option Capabilities Advertisement (2), length: 6
+	      32-Bit AS Number (65), length: 4
+		 4 Byte AS 65000
+	    Option Capabilities Advertisement (2), length: 2
+	      Unknown (6), length: 0
+		no decoder for Capability 6
+	    Option Capabilities Advertisement (2), length: 6
+	      Multiple Paths (69), length: 4
+		AFI IPv4 (1), SAFI Unicast (1), Send/Receive: Receive
+	    Option Capabilities Advertisement (2), length: 31
+	      FQDN Capability (73), length: 29
+		Hostname Length: 27
+		Hostname: spine1-debian-9.donatas.net
+		Domain Name Length: 0
+		Domain Name: 
+	    Option Capabilities Advertisement (2), length: 4
+	      Graceful Restart (64), length: 2
+		Restart Flags: [none], Restart Time 120s
