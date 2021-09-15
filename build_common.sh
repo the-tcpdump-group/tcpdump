@@ -139,7 +139,22 @@ cc_id_nocache() {
         return
     fi
 
-    cc_id_guessed=`echo "$cc_id_firstline" | sed 's/^.* (.*) \([0-9\.]*\)$/gcc-\1/'`
+    # OpenBSD default GCC:
+    # "gcc (GCC) 4.2.1 20070719"
+    # RedHat GCC:
+    # "gcc (GCC) 8.3.1 20190223 (Red Hat 8.3.1-2)"
+    # "gcc (GCC) 10.3.1 20210422 (Red Hat 10.3.1-1)"
+    # other GCC packages:
+    # "sparc-sun-solaris2.9-gcc (GCC) 4.2.0 (gccfss)"
+    # "gcc (GCC) 5.5.0"
+    # "gcc (nb4 20200810) 7.5.0"
+    # "gcc (OpenIndiana 7.5.0-il-0) 7.5.0"
+    # "gcc (Debian 8.3.0-6) 8.3.0"
+    # "gcc (Raspbian 8.3.0-6+rpi1) 8.3.0"
+    # "egcc (GCC) 8.4.0"
+    # "gcc (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"
+    # "gcc (FreeBSD Ports Collection) 10.3.0"
+    cc_id_guessed=`echo "$cc_id_firstline" | sed 's/^.* (.*) \([0-9\.]*\).*$/gcc-\1/'`
     if [ "$cc_id_firstline" != "$cc_id_guessed" ]; then
         echo "$cc_id_guessed"
         return
