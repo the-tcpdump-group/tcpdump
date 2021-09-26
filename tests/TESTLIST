@@ -70,6 +70,7 @@ bgp-cease-hard-reset		bgp-cease-hard-reset.pcap	bgp-cease-hard-reset.out	-v
 bgp-malformed-hard-reset	bgp-malformed-hard-reset.pcap	bgp-malformed-hard-reset.out	-v
 bgp-bfd-cease			bgp-bfd-cease.pcap		bgp-bfd-cease.out		-v
 bgp-orf			bgp-orf.pcapng		bgp-orf.out		-v
+bgp-bgpsec	bgp-bgpsec.pcap		bgp-bgpsec.out		-v
 
 # Broadcom tag tests
 brcmtag		brcm-tag.pcap		brcm-tag.out
