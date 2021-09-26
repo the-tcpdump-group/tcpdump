@@ -173,6 +173,7 @@ static const struct tok bgp_route_refresh_subtype_values[] = {
 #define BGPTYPE_PE_DISTINGUISHER_LABEL  27    /* RFC6514 */
 #define BGPTYPE_ENTROPY_LABEL           28    /* RFC6790 */
 #define BGPTYPE_LARGE_COMMUNITY         32    /* draft-ietf-idr-large-community-05 */
+#define BGPTYPE_BGPSEC_PATH             33    /* RFC8205 */
 #define BGPTYPE_ATTR_SET               128    /* RFC6368 */
 
 #define BGP_MP_NLRI_MINSIZE              3    /* End of RIB Marker detection */
@@ -201,6 +202,7 @@ static const struct tok bgp_attr_values[] = {
     { BGPTYPE_PE_DISTINGUISHER_LABEL, "PE Distinguisher Label"},
     { BGPTYPE_ENTROPY_LABEL,    "Entropy Label"},
     { BGPTYPE_LARGE_COMMUNITY,  "Large Community"},
+    { BGPTYPE_BGPSEC_PATH,      "BGPsec Path"},
     { BGPTYPE_ATTR_SET,         "Attribute Set"},
     { 255,                      "Reserved for development"},
     { 0, NULL}
@@ -245,6 +247,7 @@ static const struct tok bgp_opt_values[] = {
 #define BGP_CAPCODE_MR                  4 /* RFC3107 */
 #define BGP_CAPCODE_EXT_NH              5 /* RFC5549 */
 #define BGP_CAPCODE_EXT_MSG             6 /* RFC8654 */
+#define BGP_CAPCODE_BGPSEC              7 /* RFC8205 */
 #define BGP_CAPCODE_ML                  8 /* RFC8277 */
 #define BGP_CAPCODE_RESTART            64 /* RFC4724  */
 #define BGP_CAPCODE_AS_NEW             65 /* RFC6793 */
@@ -262,6 +265,7 @@ static const struct tok bgp_capcode_values[] = {
     { BGP_CAPCODE_MR,           "Multiple Routes to a Destination"},
     { BGP_CAPCODE_EXT_NH,       "Extended Next Hop Encoding"},
     { BGP_CAPCODE_EXT_MSG,      "BGP Extended Message"},
+    { BGP_CAPCODE_BGPSEC,       "BGPsec"},
     { BGP_CAPCODE_ML,           "Multiple Labels"},
     { BGP_CAPCODE_RESTART,      "Graceful Restart"},
     { BGP_CAPCODE_AS_NEW,       "32-Bit AS Number"},
@@ -598,6 +602,18 @@ static const struct tok bgp_add_path_recvsend[] = {
     { 2, "Send" },
     { 3, "Both" },
     { 0, NULL },
+};
+
+static const struct tok bgp_bgpsec_bitmap_str[] = {
+    { 1U << 0, "MBZ-0" },
+    { 1U << 1, "MBZ-1" },
+    { 1U << 2, "MBZ-2" },
+    { 1U << 3, "MBZ-3" },
+    { 1U << 4, "MBZ-4" },
+    { 1U << 5, "MBZ-5" },
+    { 1U << 6, "MBZ-6" },
+    { 1U << 7, "C" },
+    { 0, NULL}
 };
 
 #define AS_STR_SIZE sizeof("xxxxx.xxxxx")
@@ -2543,6 +2559,74 @@ bgp_attr_print(netdissect_options *ndo,
             len -= 12;
         }
         break;
+    case BGPTYPE_BGPSEC_PATH:
+    {
+        uint16_t sblen, splen;
+
+        splen = GET_BE_U_2(tptr);
+
+        /*
+         * A secure path has a minimum length of 8 bytes:
+         * 2 bytes length field
+         * 6 bytes per secure path segment
+         */
+        ND_ICHECKMSG_U("secure path length", splen, <, 8);
+
+        ND_PRINT("\n\t    Secure Path Length: %u", splen);
+
+        tptr += 2;
+        splen -= 2;
+        /* Make sure the secure path length does not signal trailing bytes */
+        if (splen % 6) {
+            ND_PRINT(" [invalid total segments len %u]", splen);
+            break;
+        }
+
+        /* Parse secure path segments */
+        while (splen != 0) {
+            uint8_t pcount = GET_U_1(tptr);
+            uint8_t flags = GET_U_1(tptr + 1);
+            uint32_t asn = GET_BE_U_4(tptr + 2);
+            ND_PRINT("\n\t      Secure Path Segment: pCount: %u, Flags: [%s] (0x%02x), AS: %u",
+                     pcount,
+                     bittok2str(bgp_bgpsec_bitmap_str, "none", flags),
+                     flags,
+                     asn);
+            tptr += 6;
+            splen -= 6;
+        }
+
+        sblen = GET_BE_U_2(tptr);
+
+        ND_PRINT("\n\t    Signature Block: Length: %u, Algo ID: %u",
+                 sblen,
+                 GET_U_1(tptr + 2));
+
+        tptr += 3;
+        sblen -= 3;
+        /* Parse signature segments */
+        while (sblen > 0) {
+            uint16_t siglen;
+
+            ND_PRINT("\n\t      Signature Segment:\n\t        SKI: ");
+            ND_ICHECKMSG_U("remaining length", sblen, <, 20);
+            hex_print(ndo, "\n\t          ", tptr, 20);
+            tptr += 20;
+            sblen -= 20;
+            ND_ICHECKMSG_U("remaining length", sblen, <, 2);
+            siglen = GET_BE_U_2(tptr);
+            tptr += 2;
+            sblen -= 2;
+
+            ND_PRINT("\n\t        Length: %u", siglen);
+            ND_ICHECKMSG_U("remaining length", sblen, <, siglen);
+            ND_PRINT("\n\t        Signature:");
+            hex_print(ndo, "\n\t          ", tptr, siglen);
+            tptr += siglen;
+            sblen -= siglen;
+        }
+        break;
+    }
     default:
         ND_TCHECK_LEN(pptr, len);
         ND_PRINT("\n\t    no Attribute %u decoder", atype); /* we have no decoder for the attribute */
@@ -2555,6 +2639,10 @@ done:
         ND_TCHECK_LEN(pptr, len);
         print_unknown_data(ndo, pptr, "\n\t    ", len);
     }
+    return 1;
+
+invalid:
+    nd_print_invalid(ndo);
     return 1;
 
 trunc:
@@ -2591,6 +2679,23 @@ bgp_capabilities_print(netdissect_options *ndo,
                GET_BE_U_2(opt + i + 2),
                tok2str(bgp_safi_values, "Unknown", GET_U_1(opt + i + 5)),
                GET_U_1(opt + i + 5));
+            break;
+        case BGP_CAPCODE_BGPSEC:
+            /* Version (4 bits), Direction (1 bit), Flags (3 bits), AFI (16 bits) */
+            cap_offset = 1;
+            /* The capability length [...] MUST be set to 3. */
+            if (cap_len != 3) {
+                ND_PRINT(" [%u != 3]", cap_len);
+                return;
+            }
+
+            ND_PRINT("\n\t\tVersion %u, Direction %s (%u), AFI %s (%u)",
+                      GET_U_1(opt + i + 2)&0xf0,
+                      (GET_U_1(opt + i + 2)&0x08) ? "Send" : "Receive",
+                      (GET_U_1(opt + i + 2)&0x08)>>3,
+                      bittok2str(af_values, "Unknown",
+                                  GET_BE_U_2(opt + i + cap_offset + 2)),
+                      GET_BE_U_2(opt + i + cap_offset + 2));
             break;
         case BGP_CAPCODE_ML:
             cap_offset = 2;
