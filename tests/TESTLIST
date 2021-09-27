@@ -836,3 +836,6 @@ unsupported-link-type-dbus unsupported-link-type-dbus.pcap unsupported-link-type
 
 # LSP Ping
 lsp-ping-timestamp	lsp-ping-timestamp.pcap		lsp-ping-timestamp.out	-vv
+
+# lwres with "extra" bytes
+lwres_with_extra lwres_with_extra.pcap lwres_with_extra.out
