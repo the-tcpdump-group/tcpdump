@@ -1,3 +1,12 @@
+TBD
+  Summary for 4.99.2 tcpdump release: (so far)
+    Building and testing:
+      Handle some Autoconf/make errors better.
+      Fix "make releasetar" on AIX and Solaris.
+      Mend "make check" on Solaris 9 with Autoconf.
+      Address assorted compiler warnings.
+      Fix auto-enabling of Capsicum on FreeBSD with Autoconf.
+
 Wednesday, June 9, 2021 by gharris
   Summary for 4.99.1 tcpdump release:
     Source code:
@@ -25,11 +34,6 @@ Wednesday, June 9, 2021 by gharris
       Rebuild configure script when building release
       Fix "make clean" for out-of-tree autotools builds
       CMake: add stuff from CMAKE_PREFIX_PATH to PKG_CONFIG_PATH.
-      Handle some Autoconf/make errors better.
-      Fix "make releasetar" on AIX and Solaris.
-      Mend "make check" on Solaris 9 with Autoconf.
-      Address assorted compiler warnings.
-      Fix auto-enabling of Capsicum on FreeBSD with Autoconf.
     Documentation:
       man: Update a reference as www.cifs.org is gone. [skip ci]
       man: Update DNS sections
