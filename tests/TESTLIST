@@ -885,3 +885,9 @@ lsp-ping-timestamp	lsp-ping-timestamp.pcap		lsp-ping-timestamp.out	-vv
 
 # lwres with "extra" bytes
 lwres_with_extra lwres_with_extra.pcap lwres_with_extra.out
+
+# QUIC tests
+quic_vn				quic_vn.pcap			quic_vn.out	-v
+quic_handshake			quic_handshake.pcap		quic_handshake.out	-v
+quic_handshake_truncated	quic_handshake_truncated.pcap	quic_handshake_truncated.out	-v
+gquic				gquic.pcap			gquic.out	-v

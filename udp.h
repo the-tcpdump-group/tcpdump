@@ -251,3 +251,6 @@ struct udphdr {
 #ifndef SOMEIP_PORT
 #define SOMEIP_PORT			30490	/* https://www.autosar.org/standards/foundation */
 #endif
+#ifndef HTTPS_PORT
+#define	HTTPS_PORT			443
+#endif
