@@ -390,9 +390,18 @@ sub runOneComplexTest {
 
     if(defined($configset)) {
         $foundit = ($ch->{$configset} == 1);
+        # If a test should be run when using OpenSSL (libcrypto), then it should
+        # be run when using wolfSSL, too. Similar logic if a test SHOULDN'T be
+        # run with OpenSSL (see configunset below).
+        if ($configset eq "HAVE_LIBCRYPTO") {
+            $foundit = ($ch->{"HAVE_LIBWOLFSSL"} == 1);
+        }
     }
     if(defined($configunset)) {
         $unfoundit=($ch->{$configunset} != 1);
+        if ($configunset eq "HAVE_LIBCRYPTO") {
+            $unfoundit = ($ch->{"HAVE_LIBWOLFSSL"} != 1);
+        }
     }
 
     if(!$foundit) {

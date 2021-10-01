@@ -889,6 +889,39 @@ AC_CHECK_TOOL([AR], [ar])
 
 AC_LBL_DEVEL(V_CCOPT)
 
+AC_MSG_CHECKING(whether to use wolfSSL)
+AC_ARG_WITH(wolfssl,
+    AS_HELP_STRING([--with-wolfssl]=DIR,
+		   [use wolfSSL (located in directory DIR, if specified) @<:@default=no@:>@]),
+[
+	if test "${withval}" = "no"
+	then
+		AC_MSG_RESULT(no)
+	else
+		if test "${withval}" != "yes"
+		then
+			CPPFLAGS="$CPPFLAGS -I${withval}/include/"
+			LDFLAGS="$LDFLAGS -L${withval}/lib"
+		fi
+
+		AC_MSG_RESULT(yes)
+		use_wolfssl=yes
+	fi
+],
+[
+	AC_MSG_RESULT(no)
+	use_wolfssl=no
+])
+
+if test "$use_wolfssl" != "no"
+then
+	AC_CHECK_LIB(wolfssl, wolfSSL_Init)
+	if test "$ac_cv_lib_wolfssl_wolfSSL_Init" != "yes"
+	then
+		AC_MSG_ERROR([--with-wolfssl specified but unable to find libwolfssl.])
+	fi
+fi
+
 # Check for OpenSSL/libressl libcrypto
 AC_MSG_CHECKING(whether to use OpenSSL/libressl libcrypto)
 # Specify location for both includes and libraries.
@@ -897,7 +930,11 @@ AC_ARG_WITH(crypto,
     AS_HELP_STRING([--with-crypto]@<:@=DIR@:>@,
 		   [use OpenSSL/libressl libcrypto (located in directory DIR, if specified) @<:@default=yes, if available@:>@]),
 [
-	if test $withval = no
+	if test "$use_wolfssl" = "yes"
+	then
+		want_libcrypto=no
+		AC_MSG_RESULT([no, using wolfSSL])
+	elif test $withval = no
 	then
 		# User doesn't want to link with libcrypto.
 		want_libcrypto=no
@@ -923,12 +960,18 @@ AC_ARG_WITH(crypto,
 		LIBS="-L$withval/lib $LIBS"
 	fi
 ],[
-	#
-	# Use libcrypto if it's present, otherwise don't; no directory
-	# was specified.
-	#
-	want_libcrypto=ifavailable
-	AC_MSG_RESULT([yes, if available])
+	if test "$use_wolfssl" = "yes"
+	then
+		want_libcrypto=no
+		AC_MSG_RESULT([no, using wolfSSL])
+ 	#
+ 	# Use libcrypto if it's present, otherwise don't; no directory
+ 	# was specified.
+ 	#
+	else
+		want_libcrypto=ifavailable
+		AC_MSG_RESULT([yes, if available])
+	fi
 ])
 if test "$want_libcrypto" != "no"; then
 	#

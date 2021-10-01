@@ -154,6 +154,7 @@ set(LIBRARY_NAME netdissect)
 
 option(WITH_SMI "Build with libsmi, if available" ON)
 option(WITH_CRYPTO "Build with OpenSSL/libressl libcrypto, if available" ON)
+option(WITH_WOLFSSL "Build with wolfSSL, if available" OFF)
 option(WITH_CAPSICUM "Build with Capsicum security functions, if available" ON)
 option(WITH_CAP_NG "Use libcap-ng, if available" ON)
 option(ENABLE_SMB "Build with the SMB dissector" OFF)
@@ -738,9 +739,21 @@ if(WITH_SMI)
 endif(WITH_SMI)
 
 #
+# wolfSSL.
+#
+if(WITH_WOLFSSL)
+    find_package(WOLFSSL)
+    if(WOLFSSL_FOUND)
+        set(CMAKE_REQUIRED_LIBRARIES "${WOLFSSL_LIBRARIES}")
+        include_directories(SYSTEM ${WOLFSSL_INCLUDE_DIRS})
+        set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} ${WOLFSSL_LIBRARIES})
+        set(HAVE_LIBWOLFSSL ON)
+    endif(WOLFSSL_FOUND)
+endif(WITH_WOLFSSL)
+#
 # OpenSSL/libressl libcrypto.
 #
-if(WITH_CRYPTO)
+if(NOT WITH_WOLFSSL AND WITH_CRYPTO)
     find_package(CRYPTO)
     if(CRYPTO_FOUND)
         #
@@ -780,7 +793,7 @@ if(WITH_CRYPTO)
         set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} ${CRYPTO_LIBRARIES})
         set(HAVE_LIBCRYPTO ON)
     endif(CRYPTO_FOUND)
-endif(WITH_CRYPTO)
+endif(NOT WITH_WOLFSSL AND WITH_CRYPTO)
 
 #
 # Capsicum sandboxing.
