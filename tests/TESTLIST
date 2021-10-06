@@ -70,6 +70,8 @@ bcm-li-v bcm-li.pcap bcm-li-v.out -v
 # Marvell DSA tag tests
 dsa		dsa.pcap		dsa.out
 dsa-e		dsa.pcap		dsa-e.out	-e
+dsa-high-vid	dsa-high-vid.pcap	dsa-high-vid.out
+dsa-high-vid-e	dsa-high-vid.pcap	dsa-high-vid-e.out	-e
 
 # EAP tests
 # now in smb.tests
@@ -77,6 +79,8 @@ dsa-e		dsa.pcap		dsa-e.out	-e
 # Marvell DSA tag tests
 edsa		edsa.pcap		edsa.out
 edsa-e		edsa.pcap		edsa-e.out	-e
+edsa-high-vid	edsa-high-vid.pcap	edsa-high-vid.out
+edsa-high-vid-e	edsa-high-vid.pcap	edsa-high-vid-e.out	-e
 
 # ESP tests
 esp0		02-sunrise-sunset-esp.pcap	esp0.out
