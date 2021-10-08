@@ -137,7 +137,7 @@ static const struct tok pimv2_df_election_flag_values[] = {
 
 /*
  * XXX: We consider a case where IPv6 is not ready yet for portability,
- * but PIM dependent defintions should be independent of IPv6...
+ * but PIM dependent definitions should be independent of IPv6...
  */
 
 struct pim {

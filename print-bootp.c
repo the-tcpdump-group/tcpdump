@@ -29,6 +29,7 @@
 
 #include <string.h>
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -260,9 +261,16 @@ struct cmu_vend {
 #define CLIENT_FQDN_FLAGS_N	0x08
 /* end of original bootp.h */
 
+static const struct tok fqdn_flags_bm[] = {
+	{ CLIENT_FQDN_FLAGS_S, "S" },
+	{ CLIENT_FQDN_FLAGS_O, "O" },
+	{ CLIENT_FQDN_FLAGS_E, "E" },
+	{ CLIENT_FQDN_FLAGS_N, "N" },
+	{ 0, NULL }
+};
+
 static void rfc1048_print(netdissect_options *, const u_char *);
 static void cmu_print(netdissect_options *, const u_char *);
-static char *client_fqdn_flags(u_int flags);
 
 static const struct tok bootp_flag_values[] = {
 	{ 0x8000,	"Broadcast" },
@@ -295,7 +303,7 @@ bootp_print(netdissect_options *ndo,
 
 	bp_htype = GET_U_1(bp->bp_htype);
 	bp_hlen = GET_U_1(bp->bp_hlen);
-	if (bp_htype == 1 && bp_hlen == 6 && bp_op == BOOTPREQUEST) {
+	if (bp_htype == 1 && bp_hlen == MAC_ADDR_LEN && bp_op == BOOTPREQUEST) {
 		ND_PRINT(" from %s", GET_ETHERADDR_STRING(bp->bp_chaddr));
 	}
 
@@ -311,7 +319,7 @@ bootp_print(netdissect_options *ndo,
 		ND_PRINT(", htype %u", bp_htype);
 
 	/* The usual length for 10Mb Ethernet address is 6 bytes */
-	if (bp_htype != 1 || bp_hlen != 6)
+	if (bp_htype != 1 || bp_hlen != MAC_ADDR_LEN)
 		ND_PRINT(", hlen %u", bp_hlen);
 
 	/* Only print interesting fields */
@@ -344,27 +352,27 @@ bootp_print(netdissect_options *ndo,
 		ND_PRINT("\n\t  Gateway-IP %s", GET_IPADDR_STRING(bp->bp_giaddr));
 
 	/* Client's Ethernet address */
-	if (bp_htype == 1 && bp_hlen == 6) {
+	if (bp_htype == 1 && bp_hlen == MAC_ADDR_LEN) {
 		ND_PRINT("\n\t  Client-Ethernet-Address %s", GET_ETHERADDR_STRING(bp->bp_chaddr));
 	}
 
 	if (GET_U_1(bp->bp_sname)) {	/* get first char only */
 		ND_PRINT("\n\t  sname \"");
 		if (nd_printztn(ndo, bp->bp_sname, (u_int)sizeof(bp->bp_sname),
-				ndo->ndo_snapend) == 0) {
+				NULL) == 0) {
+			/* Within the buffer, but not NUL-terminated. */
 			ND_PRINT("\"");
-			nd_print_trunc(ndo);
-			return;
+			goto invalid;
 		}
 		ND_PRINT("\"");
 	}
 	if (GET_U_1(bp->bp_file)) {	/* get first char only */
 		ND_PRINT("\n\t  file \"");
 		if (nd_printztn(ndo, bp->bp_file, (u_int)sizeof(bp->bp_file),
-				ndo->ndo_snapend) == 0) {
+				NULL) == 0) {
+			/* Ditto. */
 			ND_PRINT("\"");
-			nd_print_trunc(ndo);
-			return;
+			goto invalid;
 		}
 		ND_PRINT("\"");
 	}
@@ -384,10 +392,9 @@ bootp_print(netdissect_options *ndo,
 		if (ul != 0)
 			ND_PRINT("\n\t  Vendor-#0x%x", ul);
 	}
-
 	return;
-trunc:
-	nd_print_trunc(ndo);
+invalid:
+	nd_print_invalid(ndo);
 }
 
 /*
@@ -671,10 +678,7 @@ rfc1048_print(netdissect_options *ndo,
 		case 'a':
 			/* ASCII strings */
 			ND_PRINT("\"");
-			if (nd_printn(ndo, bp, len, ndo->ndo_snapend)) {
-				ND_PRINT("\"");
-				goto trunc;
-			}
+			nd_printjn(ndo, bp, len);
 			ND_PRINT("\"");
 			bp += len;
 			len = 0;
@@ -811,17 +815,14 @@ rfc1048_print(netdissect_options *ndo,
 				}
 				if (GET_U_1(bp) & 0x0f)
 					ND_PRINT("[%s] ",
-						 client_fqdn_flags(GET_U_1(bp)));
+						 bittok2str_nosep(fqdn_flags_bm, "", (GET_U_1(bp))));
 				bp++;
 				if (GET_U_1(bp) || GET_U_1(bp + 1))
 					ND_PRINT("%u/%u ", GET_U_1(bp),
 						 GET_U_1(bp + 1));
 				bp += 2;
 				ND_PRINT("\"");
-				if (nd_printn(ndo, bp, len - 3, ndo->ndo_snapend)) {
-					ND_PRINT("\"");
-					goto trunc;
-				}
+				nd_printjn(ndo, bp, len - 3);
 				ND_PRINT("\"");
 				bp += len - 3;
 				len = 0;
@@ -841,10 +842,7 @@ rfc1048_print(netdissect_options *ndo,
 				len--;
 				if (type == 0) {
 					ND_PRINT("\"");
-					if (nd_printn(ndo, bp, len, ndo->ndo_snapend)) {
-						ND_PRINT("\"");
-						goto trunc;
-					}
+					nd_printjn(ndo, bp, len);
 					ND_PRINT("\"");
 					bp += len;
 					len = 0;
@@ -887,8 +885,7 @@ rfc1048_print(netdissect_options *ndo,
 					case AGENT_SUBOPTION_CIRCUIT_ID: /* fall through */
 					case AGENT_SUBOPTION_REMOTE_ID:
 					case AGENT_SUBOPTION_SUBSCRIBER_ID:
-						if (nd_printn(ndo, bp, suboptlen, ndo->ndo_snapend))
-							goto trunc;
+						nd_printjn(ndo, bp, suboptlen);
 						break;
 
 					default:
@@ -986,10 +983,7 @@ rfc1048_print(netdissect_options *ndo,
 						break;
 					}
 					ND_PRINT("\"");
-					if (nd_printn(ndo, bp, suboptlen, ndo->ndo_snapend)) {
-						ND_PRINT("\"");
-						goto trunc;
-					}
+					nd_printjn(ndo, bp, suboptlen);
 					ND_PRINT("\"");
 					ND_PRINT(", length %u", suboptlen);
 					suboptnumber++;
@@ -1014,9 +1008,6 @@ rfc1048_print(netdissect_options *ndo,
 			bp += len;
 		}
 	}
-	return;
-trunc:
-	nd_print_trunc(ndo);
 }
 
 #define PRINTCMUADDR(m, s) { ND_TCHECK_4(cmu->m); \
@@ -1046,29 +1037,6 @@ cmu_print(netdissect_options *ndo,
 	PRINTCMUADDR(v_ins2, "IEN2");
 	PRINTCMUADDR(v_ts1, "TS1");
 	PRINTCMUADDR(v_ts2, "TS2");
-	return;
-
-trunc:
-	nd_print_trunc(ndo);
 }
 
 #undef PRINTCMUADDR
-
-static char *
-client_fqdn_flags(u_int flags)
-{
-	static char buf[8+1];
-	int i = 0;
-
-	if (flags & CLIENT_FQDN_FLAGS_S)
-		buf[i++] = 'S';
-	if (flags & CLIENT_FQDN_FLAGS_O)
-		buf[i++] = 'O';
-	if (flags & CLIENT_FQDN_FLAGS_E)
-		buf[i++] = 'E';
-	if (flags & CLIENT_FQDN_FLAGS_N)
-		buf[i++] = 'N';
-	buf[i] = '\0';
-
-	return buf;
-}

@@ -4,6 +4,18 @@ if(WIN32)
     # below.
     cmake_minimum_required(VERSION 3.12)
 else(WIN32)
+    #
+    # For now, require only 2.8.6, just in case somebody is
+    # configuring with CMake on a "long-term support" version
+    # of some OS and that version supplies an older version of
+    # CMake.
+    #
+    # If this is ever updated to CMake 3.1 or later, remove the
+    # stuff in cmake/Modules/FindPCAP.cmake that appends subdirectories
+    # of directories from CMAKE_PREFIX_PATH to the PKG_CONFIG_PATH
+    # environment variable when running pkg-config, to make sure
+    # it finds any .pc file from there.
+    #
     cmake_minimum_required(VERSION 2.8.6)
 endif(WIN32)
 
@@ -18,7 +30,37 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
-project(tcpdump)
+#
+# OK, this is a royal pain.
+#
+# CMake will try to determine the sizes of some data types, including
+# void *, early in the process of configuration; apparently, it's done
+# as part of processing the project() command.
+#
+# At least as of CMake 2.8.6, it does so by checking the size of
+# "void *" in C, setting CMAKE_C_SIZEOF_DATA_PTR based on that,
+# setting CMAKE_SIZEOF_VOID_P to that, and then checking the size
+# of "void *" in C++, setting CMAKE_CXX_SIZEOF_DATA_PTR based on
+# that, and then setting CMAKE_SIZEOF_VOID_P to *that*.
+#
+# The compile tests include whatever C flags may have been provided
+# to CMake in the CFLAGS and CXXFLAGS environment variables.
+#
+# If you set an architecture flag such as -m32 or -m64 in CFLAGS
+# but *not* in CXXFLAGS, the size for C++ will win, and hilarity
+# will ensue.
+#
+# Or if, at least on Solaris, you have a newer version of GCC
+# installed, but *not* a newer version of G++, and you have Oracle
+# Studio installed, it will find GCC, which will default to building
+# 64-bit, and Oracle Studio's C++ compiler, which will default to
+# building 32-bit, the size for C++ will win, and, again, hilarity
+# will ensue.
+#
+# So we *explicitly* state that only C is used; there is currently no
+# C++ code in tcpdump.
+#
+project(tcpdump C)
 
 #
 # For checking if a compiler flag works and adding it if it does.
@@ -114,7 +156,7 @@ option(WITH_SMI "Build with libsmi, if available" ON)
 option(WITH_CRYPTO "Build with OpenSSL/libressl libcrypto, if available" ON)
 option(WITH_CAPSICUM "Build with Capsicum security functions, if available" ON)
 option(WITH_CAP_NG "Use libcap-ng, if available" ON)
-option(ENABLE_SMB "Build with the SMB dissector" ON)
+option(ENABLE_SMB "Build with the SMB dissector" OFF)
 
 #
 # String parameters.  Neither of them are set, initially; only if the
@@ -903,6 +945,19 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/.devel OR EXISTS ${CMAKE_BINARY_DIR}/.devel)
         check_and_add_compiler_option(-Wused-but-marked-unused)
         check_and_add_compiler_option(-Wwrite-strings)
     endif()
+endif()
+
+#
+# Extra compiler options for the build matrix scripts to request -Werror or
+# its equivalent if required.  The CMake variable name cannot be CFLAGS
+# because that is already used for a different purpose in CMake.  Example
+# usage: cmake -DEXTRA_CFLAGS='-Wall -Wextra -Werror' ...
+#
+if(NOT "${EXTRA_CFLAGS}" STREQUAL "")
+    foreach(_extra_cflag ${EXTRA_CFLAGS})
+        check_and_add_compiler_option("${_extra_cflag}")
+    endforeach(_extra_cflag)
+    message(STATUS "Added extra compile options (${EXTRA_CFLAGS})")
 endif()
 
 ######################################

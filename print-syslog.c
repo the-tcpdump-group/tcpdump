@@ -139,7 +139,7 @@ syslog_print(netdissect_options *ndo,
      * beautification to make it clear what was transmitted on the wire.
      */
     if (len > msg_off)
-        (void)nd_printn(ndo, pptr + msg_off, len - msg_off, NULL);
+        nd_printjn(ndo, pptr + msg_off, len - msg_off);
 
     if (ndo->ndo_vflag > 1)
         print_unknown_data(ndo, pptr, "\n\t", len);

@@ -21,6 +21,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
@@ -174,8 +175,7 @@ pgm_print(netdissect_options *ndo,
 				GET_IPADDR_STRING(ip->ip_src),
 				GET_IPADDR_STRING(ip->ip_dst));
 		}
-		nd_print_trunc(ndo);
-		return;
+		nd_trunc_longjmp(ndo);
 	}
 
 	sport = GET_BE_U_2(pgm->pgm_sport);
@@ -240,7 +240,7 @@ pgm_print(netdissect_options *ndo,
 		bp += sizeof(nd_ipv6);
 		break;
 	    default:
-		goto trunc;
+		goto invalid;
 		break;
 	    }
 
@@ -272,7 +272,7 @@ pgm_print(netdissect_options *ndo,
 		bp += sizeof(nd_ipv6);
 		break;
 	    default:
-		goto trunc;
+		goto invalid;
 		break;
 	    }
 
@@ -306,7 +306,6 @@ pgm_print(netdissect_options *ndo,
 	    const struct pgm_data *odata;
 
 	    odata = (const struct pgm_data *)(pgm + 1);
-	    ND_TCHECK_SIZE(odata);
 	    ND_PRINT("ODATA trail %u seq %u",
 			 GET_BE_U_4(odata->pgmd_trailseq),
 			 GET_BE_U_4(odata->pgmd_seq));
@@ -318,7 +317,6 @@ pgm_print(netdissect_options *ndo,
 	    const struct pgm_data *rdata;
 
 	    rdata = (const struct pgm_data *)(pgm + 1);
-	    ND_TCHECK_SIZE(rdata);
 	    ND_PRINT("RDATA trail %u seq %u",
 			 GET_BE_U_4(rdata->pgmd_trailseq),
 			 GET_BE_U_4(rdata->pgmd_seq));
@@ -352,7 +350,7 @@ pgm_print(netdissect_options *ndo,
 		bp += sizeof(nd_ipv6);
 		break;
 	    default:
-		goto trunc;
+		goto invalid;
 		break;
 	    }
 
@@ -373,7 +371,7 @@ pgm_print(netdissect_options *ndo,
 		bp += sizeof(nd_ipv6);
 		break;
 	    default:
-		goto trunc;
+		goto invalid;
 		break;
 	    }
 
@@ -597,7 +595,7 @@ pgm_print(netdissect_options *ndo,
 			opts_len -= PGM_OPT_REDIRECT_FIXED_LEN + sizeof(nd_ipv6);
 			break;
 		    default:
-			goto trunc;
+			goto invalid;
 			break;
 		    }
 
@@ -754,7 +752,7 @@ pgm_print(netdissect_options *ndo,
 			opts_len -= PGM_OPT_PGMCC_DATA_FIXED_LEN + sizeof(nd_ipv6);
 			break;
 		    default:
-			goto trunc;
+			goto invalid;
 			break;
 		    }
 
@@ -797,7 +795,7 @@ pgm_print(netdissect_options *ndo,
 			opts_len -= PGM_OPT_PGMCC_FEEDBACK_FIXED_LEN + sizeof(nd_ipv6);
 			break;
 		    default:
-			goto trunc;
+			goto invalid;
 			break;
 		    }
 
@@ -823,7 +821,6 @@ pgm_print(netdissect_options *ndo,
 				     GET_BE_U_2(pgm->pgm_length));
 
 	return;
-
-trunc:
-	nd_print_trunc(ndo);
+invalid:
+	nd_print_invalid(ndo);
 }

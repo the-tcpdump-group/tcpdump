@@ -193,26 +193,22 @@ struct mgmt_header_t {
 #define	CAPABILITY_PRIVACY(cap)	((cap) & 0x0010)
 
 struct ssid_t {
-	uint8_t		element_id;
-	uint8_t		length;
+	u_int		length;
 	u_char		ssid[33];  /* 32 + 1 for null */
 };
 
 struct rates_t {
-	uint8_t		element_id;
-	uint8_t		length;
+	u_int		length;
 	uint8_t		rate[16];
 };
 
 struct challenge_t {
-	uint8_t		element_id;
-	uint8_t		length;
+	u_int		length;
 	uint8_t		text[254]; /* 1-253 + 1 for null */
 };
 
 struct fh_t {
-	uint8_t		element_id;
-	uint8_t		length;
+	u_int		length;
 	uint16_t	dwell_time;
 	uint8_t		hop_set;
 	uint8_t	hop_pattern;
@@ -220,14 +216,12 @@ struct fh_t {
 };
 
 struct ds_t {
-	uint8_t		element_id;
-	uint8_t		length;
+	u_int		length;
 	uint8_t		channel;
 };
 
 struct cf_t {
-	uint8_t		element_id;
-	uint8_t		length;
+	u_int		length;
 	uint8_t		count;
 	uint8_t		period;
 	uint16_t	max_duration;
@@ -235,12 +229,16 @@ struct cf_t {
 };
 
 struct tim_t {
-	uint8_t		element_id;
-	uint8_t		length;
+	u_int		length;
 	uint8_t		count;
 	uint8_t		period;
 	uint8_t		bitmap_control;
 	uint8_t		bitmap[251];
+};
+
+struct meshid_t {
+	u_int		length;
+	u_char		meshid[33];  /* 32 + 1 for null */
 };
 
 #define	E_SSID		0
@@ -267,6 +265,7 @@ struct tim_t {
 /* reserved		19 */
 /* reserved		16 */
 /* reserved		16 */
+#define E_MESHID	114
 
 
 struct mgmt_body_t {
@@ -294,6 +293,8 @@ struct mgmt_body_t {
 	struct fh_t	fh;
 	int		tim_present;
 	struct tim_t	tim;
+	int		meshid_present;
+	struct meshid_t	meshid;
 };
 
 struct ctrl_control_wrapper_hdr_t {
@@ -369,9 +370,11 @@ struct ctrl_ba_hdr_t {
 	nd_uint16_t	fc;
 	nd_uint16_t	duration;
 	nd_mac_addr	ra;
+	nd_mac_addr	ta;
 };
 
-#define	CTRL_BA_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+IEEE802_11_RA_LEN)
+#define	CTRL_BA_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
+			 IEEE802_11_RA_LEN+IEEE802_11_TA_LEN)
 
 struct ctrl_bar_hdr_t {
 	nd_uint16_t	fc;
@@ -410,15 +413,15 @@ struct meshcntl_t {
 	ND_PRINT("%s%2.1f%s", _sep, (.5 * ((_r) & 0x7f)), _suf)
 #define PRINT_RATES(p) \
 	if (p.rates_present) { \
-		int z; \
 		const char *sep = " ["; \
-		for (z = 0; z < p.rates.length ; z++) { \
-			PRINT_RATE(sep, p.rates.rate[z], \
-				(p.rates.rate[z] & 0x80 ? "*" : "")); \
-			sep = " "; \
-		} \
-		if (p.rates.length != 0) \
+		if (p.rates.length != 0) { \
+			for (u_int z = 0; z < p.rates.length ; z++) { \
+				PRINT_RATE(sep, p.rates.rate[z], \
+					(p.rates.rate[z] & 0x80 ? "*" : "")); \
+				sep = " "; \
+			} \
 			ND_PRINT(" Mbit]"); \
+		} \
 	}
 
 #define PRINT_DS_CHANNEL(p) \
@@ -426,6 +429,13 @@ struct meshcntl_t {
 		ND_PRINT(" CH: %u", p.ds.channel); \
 	ND_PRINT("%s", \
 	    CAPABILITY_PRIVACY(p.capability_info) ? ", PRIVACY" : "");
+
+#define PRINT_MESHID(p) \
+	if (p.meshid_present) { \
+		ND_PRINT(" (MESHID: "); \
+		fn_print_str(ndo, p.meshid.meshid); \
+		ND_PRINT(")"); \
+	}
 
 #define MAX_MCS_INDEX	76
 
@@ -1145,6 +1155,7 @@ parse_elements(netdissect_options *ndo,
 	struct ds_t ds;
 	struct cf_t cf;
 	struct tim_t tim;
+	struct meshid_t meshid;
 
 	/*
 	 * We haven't seen any elements yet.
@@ -1155,6 +1166,7 @@ parse_elements(netdissect_options *ndo,
 	pbody->ds_present = 0;
 	pbody->cf_present = 0;
 	pbody->tim_present = 0;
+	pbody->meshid_present = 0;
 
 	while (length != 0) {
 		/* Make sure we at least have the element ID and length. */
@@ -1170,7 +1182,7 @@ parse_elements(netdissect_options *ndo,
 
 		switch (GET_U_1(p + offset)) {
 		case E_SSID:
-			memcpy(&ssid, p + offset, 2);
+			ssid.length = elementlen;
 			offset += 2;
 			length -= 2;
 			if (ssid.length != 0) {
@@ -1194,7 +1206,7 @@ parse_elements(netdissect_options *ndo,
 			}
 			break;
 		case E_CHALLENGE:
-			memcpy(&challenge, p + offset, 2);
+			challenge.length = elementlen;
 			offset += 2;
 			length -= 2;
 			if (challenge.length != 0) {
@@ -1220,7 +1232,7 @@ parse_elements(netdissect_options *ndo,
 			}
 			break;
 		case E_RATES:
-			memcpy(&rates, p + offset, 2);
+			rates.length = elementlen;
 			offset += 2;
 			length -= 2;
 			if (rates.length != 0) {
@@ -1252,7 +1264,7 @@ parse_elements(netdissect_options *ndo,
 			}
 			break;
 		case E_DS:
-			memcpy(&ds, p + offset, 2);
+			ds.length = elementlen;
 			offset += 2;
 			length -= 2;
 			if (ds.length != 1) {
@@ -1276,7 +1288,7 @@ parse_elements(netdissect_options *ndo,
 			}
 			break;
 		case E_CF:
-			memcpy(&cf, p + offset, 2);
+			cf.length = elementlen;
 			offset += 2;
 			length -= 2;
 			if (cf.length != 6) {
@@ -1284,9 +1296,18 @@ parse_elements(netdissect_options *ndo,
 				length -= cf.length;
 				break;
 			}
-			memcpy(&cf.count, p + offset, 6);
-			offset += 6;
-			length -= 6;
+			cf.count = GET_U_1(p + offset);
+			offset += 1;
+			length -= 1;
+			cf.period = GET_U_1(p + offset);
+			offset += 1;
+			length -= 1;
+			cf.max_duration = GET_LE_U_2(p + offset);
+			offset += 2;
+			length -= 2;
+			cf.dur_remaining = GET_LE_U_2(p + offset);
+			offset += 2;
+			length -= 2;
 			/*
 			 * Present and not truncated.
 			 *
@@ -1300,7 +1321,7 @@ parse_elements(netdissect_options *ndo,
 			}
 			break;
 		case E_TIM:
-			memcpy(&tim, p + offset, 2);
+			tim.length = elementlen;
 			offset += 2;
 			length -= 2;
 			if (tim.length <= 3U) {
@@ -1310,10 +1331,15 @@ parse_elements(netdissect_options *ndo,
 			}
 			if (tim.length - 3U > sizeof(tim.bitmap))
 				return 0;
-			memcpy(&tim.count, p + offset, 3);
-			offset += 3;
-			length -= 3;
-
+			tim.count = GET_U_1(p + offset);
+			offset += 1;
+			length -= 1;
+			tim.period = GET_U_1(p + offset);
+			offset += 1;
+			length -= 1;
+			tim.bitmap_control = GET_U_1(p + offset);
+			offset += 1;
+			length -= 1;
 			memcpy(tim.bitmap, p + offset, tim.length - 3);
 			offset += tim.length - 3;
 			length -= tim.length - 3;
@@ -1327,6 +1353,30 @@ parse_elements(netdissect_options *ndo,
 			if (!pbody->tim_present) {
 				pbody->tim = tim;
 				pbody->tim_present = 1;
+			}
+			break;
+		case E_MESHID:
+			meshid.length = elementlen;
+			offset += 2;
+			length -= 2;
+			if (meshid.length != 0) {
+				if (meshid.length > sizeof(meshid.meshid) - 1)
+					return 0;
+				memcpy(&meshid.meshid, p + offset, meshid.length);
+				offset += meshid.length;
+				length -= meshid.length;
+			}
+			meshid.meshid[meshid.length] = '\0';
+			/*
+			 * Present and not truncated.
+			 *
+			 * If we haven't already seen a MESHID IE,
+			 * copy this one, otherwise ignore this one,
+			 * so we later report the first one we saw.
+			 */
+			if (!pbody->meshid_present) {
+				pbody->meshid = meshid;
+				pbody->meshid_present = 1;
 			}
 			break;
 		default:
@@ -1382,6 +1432,7 @@ handle_beacon(netdissect_options *ndo,
 	ND_PRINT(" %s",
 	    CAPABILITY_ESS(pbody.capability_info) ? "ESS" : "IBSS");
 	PRINT_DS_CHANNEL(pbody);
+	PRINT_MESHID(pbody);
 
 	return ret;
 trunc:
@@ -1546,6 +1597,7 @@ handle_probe_response(netdissect_options *ndo,
 	PRINT_SSID(pbody);
 	PRINT_RATES(pbody);
 	PRINT_DS_CHANNEL(pbody);
+	PRINT_MESHID(pbody);
 
 	return ret;
 trunc:
@@ -1665,60 +1717,78 @@ trunc:
 	return 0;
 }
 
-#define	PRINT_HT_ACTION(v) (\
-	(v) == 0 ? ND_PRINT("TxChWidth"): \
-	(v) == 1 ? ND_PRINT("MIMOPwrSave"): \
-		   ND_PRINT("Act#%u", (v)))
-#define	PRINT_BA_ACTION(v) (\
-	(v) == 0 ? ND_PRINT("ADDBA Request"): \
-	(v) == 1 ? ND_PRINT("ADDBA Response"): \
-	(v) == 2 ? ND_PRINT("DELBA"): \
-		   ND_PRINT("Act#%u", (v)))
-#define	PRINT_MESHLINK_ACTION(v) (\
-	(v) == 0 ? ND_PRINT("Request"): \
-	(v) == 1 ? ND_PRINT("Report"): \
-		   ND_PRINT("Act#%u", (v)))
-#define	PRINT_MESHPEERING_ACTION(v) (\
-	(v) == 0 ? ND_PRINT("Open"): \
-	(v) == 1 ? ND_PRINT("Confirm"): \
-	(v) == 2 ? ND_PRINT("Close"): \
-		   ND_PRINT("Act#%u", (v)))
-#define	PRINT_MESHPATH_ACTION(v) (\
-	(v) == 0 ? ND_PRINT("Request"): \
-	(v) == 1 ? ND_PRINT("Report"): \
-	(v) == 2 ? ND_PRINT("Error"): \
-	(v) == 3 ? ND_PRINT("RootAnnouncement"): \
-		   ND_PRINT("Act#%u", (v)))
+static const struct tok category_str[] = {
+	{ 0,   "Spectrum Management" },
+	{ 1,   "QoS"                 },
+	{ 2,   "DLS"                 },
+	{ 3,   "BA"                  },
+	{ 7,   "HT"                  },
+	{ 13,  "MeshAction"          },
+	{ 14,  "MultiohopAction"     },
+	{ 15,  "SelfprotectAction"   },
+	{ 127, "Vendor"              },
+	{ 0, NULL }
+};
 
-#define PRINT_MESH_ACTION(v) (\
-	(v) == 0 ? ND_PRINT("MeshLink"): \
-	(v) == 1 ? ND_PRINT("HWMP"): \
-	(v) == 2 ? ND_PRINT("Gate Announcement"): \
-	(v) == 3 ? ND_PRINT("Congestion Control"): \
-	(v) == 4 ? ND_PRINT("MCCA Setup Request"): \
-	(v) == 5 ? ND_PRINT("MCCA Setup Reply"): \
-	(v) == 6 ? ND_PRINT("MCCA Advertisement Request"): \
-	(v) == 7 ? ND_PRINT("MCCA Advertisement"): \
-	(v) == 8 ? ND_PRINT("MCCA Teardown"): \
-	(v) == 9 ? ND_PRINT("TBTT Adjustment Request"): \
-	(v) == 10 ? ND_PRINT("TBTT Adjustment Response"): \
-		   ND_PRINT("Act#%u", (v)))
-#define PRINT_MULTIHOP_ACTION(v) (\
-	(v) == 0 ? ND_PRINT("Proxy Update"): \
-	(v) == 1 ? ND_PRINT("Proxy Update Confirmation"): \
-		   ND_PRINT("Act#%u", (v)))
-#define PRINT_SELFPROT_ACTION(v) (\
-	(v) == 1 ? ND_PRINT("Peering Open"): \
-	(v) == 2 ? ND_PRINT("Peering Confirm"): \
-	(v) == 3 ? ND_PRINT("Peering Close"): \
-	(v) == 4 ? ND_PRINT("Group Key Inform"): \
-	(v) == 5 ? ND_PRINT("Group Key Acknowledge"): \
-		   ND_PRINT("Act#%u", (v)))
+static const struct tok act_ba_str[] = {
+	{ 0, "ADDBA Request"  },
+	{ 1, "ADDBA Response" },
+	{ 2, "DELBA"          },
+	{ 0, NULL }
+};
+
+static const struct tok act_ht_str[] = {
+	{ 0, "TxChWidth"   },
+	{ 1, "MIMOPwrSave" },
+	{ 0, NULL }
+};
+
+static const struct tok act_mesh_str[] = {
+	{ 0,  "MeshLink"                   },
+	{ 1,  "HWMP"                       },
+	{ 2,  "Gate Announcement"          },
+	{ 3,  "Congestion Control"         },
+	{ 4,  "MCCA Setup Request"         },
+	{ 5,  "MCCA Setup Reply"           },
+	{ 6,  "MCCA Advertisement Request" },
+	{ 7,  "MCCA Advertisement"         },
+	{ 8,  "MCCA Teardown"              },
+	{ 9,  "TBTT Adjustment Request"    },
+	{ 10, "TBTT Adjustment Response"   },
+	{ 0, NULL }
+};
+
+static const struct tok act_mhop_str[] = {
+	{ 0, "Proxy Update" },
+	{ 1, "Proxy Update Confirmation" },
+	{ 0, NULL }
+};
+
+static const struct tok act_selfpr_str[] = {
+	{ 1, "Peering Open"          },
+	{ 2, "Peering Confirm"       },
+	{ 3, "Peering Close"         },
+	{ 4, "Group Key Inform"      },
+	{ 5, "Group Key Acknowledge" },
+	{ 0, NULL }
+};
+
+static const struct uint_tokary category2tokary[] = {
+	{ 3,   act_ba_str     },
+	{ 7,   act_ht_str     },
+	{ 13,  act_mesh_str   },
+	{ 14,  act_mhop_str   },
+	{ 15,  act_selfpr_str },
+	/* uint2tokary() does not use array termination. */
+};
 
 static int
 handle_action(netdissect_options *ndo,
 	      const uint8_t *src, const u_char *p, u_int length)
 {
+	uint8_t category, action;
+	const struct tok *action_str;
+
 	ND_TCHECK_2(p);
 	if (length < 2)
 		goto trunc;
@@ -1727,24 +1797,15 @@ handle_action(netdissect_options *ndo,
 	} else {
 		ND_PRINT(" (%s): ", GET_ETHERADDR_STRING(src));
 	}
-	switch (GET_U_1(p)) {
-	case 0: ND_PRINT("Spectrum Management Act#%u", GET_U_1(p + 1)); break;
-	case 1: ND_PRINT("QoS Act#%u", GET_U_1(p + 1)); break;
-	case 2: ND_PRINT("DLS Act#%u", GET_U_1(p + 1)); break;
-	case 3: ND_PRINT("BA "); PRINT_BA_ACTION(GET_U_1(p + 1)); break;
-	case 7: ND_PRINT("HT "); PRINT_HT_ACTION(GET_U_1(p + 1)); break;
-	case 13: ND_PRINT("MeshAction "); PRINT_MESH_ACTION(GET_U_1(p + 1)); break;
-	case 14:
-		ND_PRINT("MultiohopAction ");
-		PRINT_MULTIHOP_ACTION(GET_U_1(p + 1)); break;
-	case 15:
-		ND_PRINT("SelfprotectAction ");
-		PRINT_SELFPROT_ACTION(GET_U_1(p + 1)); break;
-	case 127: ND_PRINT("Vendor Act#%u", GET_U_1(p + 1)); break;
-	default:
-		ND_PRINT("Reserved(%u) Act#%u", GET_U_1(p), GET_U_1(p + 1));
-		break;
-	}
+	category = GET_U_1(p);
+	ND_PRINT("%s ", tok2str(category_str, "Reserved(%u)", category));
+	action = GET_U_1(p + 1);
+	action_str = uint2tokary(category2tokary, category);
+	if (!action_str)
+		ND_PRINT("Act#%u", action);
+	else
+		ND_PRINT("%s", tok2str(action_str, "Act#%u", action));
+
 	return 1;
 trunc:
 	return 0;
@@ -1899,7 +1960,7 @@ get_data_src_dst_mac(uint16_t fc, const u_char *p, const uint8_t **srcp,
 		}
 	} else {
 		if (!FC_FROM_DS(fc)) {
-			/* From DS and not To DS */
+			/* To DS and not From DS */
 			*srcp = ADDR2;
 			*dstp = ADDR3;
 		} else {
@@ -2003,8 +2064,9 @@ ctrl_header_print(netdissect_options *ndo, uint16_t fc, const u_char *p)
 		    GET_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->seq));
 		break;
 	case CTRL_BA:
-		ND_PRINT("RA:%s ",
-		    GET_ETHERADDR_STRING(((const struct ctrl_ba_hdr_t *)p)->ra));
+		ND_PRINT("RA:%s TA:%s ",
+		    GET_ETHERADDR_STRING(((const struct ctrl_ba_hdr_t *)p)->ra),
+		    GET_ETHERADDR_STRING(((const struct ctrl_ba_hdr_t *)p)->ta));
 		break;
 	case CTRL_PS_POLL:
 		ND_PRINT("BSSID:%s TA:%s ",

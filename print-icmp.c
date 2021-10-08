@@ -86,13 +86,13 @@ struct icmp {
 #define	icmp_data	icmp_dun.id_data
 };
 
-#define ICMP_MPLS_EXT_EXTRACT_VERSION(x) (((x)&0xf0)>>4)
+#define ICMP_EXT_EXTRACT_VERSION(x) (((x)&0xf0)>>4)
 #define ICMP_MPLS_EXT_VERSION 2
 
 /*
  * Lower bounds on packet lengths for various types.
  * For the error advice packets must first insure that the
- * packet is large enought to contain the returned ip header.
+ * packet is large enough to contain the returned ip header.
  * Only then can we do the check to see if 64 bits of packet
  * data have been returned, since we need to check the returned
  * ip header length.
@@ -150,7 +150,7 @@ struct icmp {
 	((type) == ICMP_UNREACH || (type) == ICMP_SOURCEQUENCH || \
 	(type) == ICMP_REDIRECT || (type) == ICMP_TIMXCEED || \
 	(type) == ICMP_PARAMPROB)
-#define	ICMP_MPLS_EXT_TYPE(type) \
+#define	ICMP_MULTIPART_EXT_TYPE(type) \
 	((type) == ICMP_UNREACH || \
          (type) == ICMP_TIMXCEED || \
          (type) == ICMP_PARAMPROB)
@@ -187,6 +187,11 @@ struct icmp {
 #ifndef ICMP_UNREACH_PRECEDENCE_CUTOFF
 #define ICMP_UNREACH_PRECEDENCE_CUTOFF	15	/* precedence cutoff */
 #endif
+
+/* rfc4950  */
+#define MPLS_STACK_ENTRY_OBJECT_CLASS            1
+/* rfc5837 */
+#define INTERFACE_INFORMATION_OBJECT_CLASS       2
 
 /* Most of the icmp types */
 static const struct tok icmp2str[] = {
@@ -226,7 +231,7 @@ struct id_rdiscovery {
  * The Destination Unreachable, Time Exceeded
  * and Parameter Problem messages are slightly changed as per
  * the above draft. A new Length field gets added to give
- * the caller an idea about the length of the piggypacked
+ * the caller an idea about the length of the piggybacked
  * IP packet before the MPLS extension header starts.
  *
  * The Length field represents length of the padded "original datagram"
@@ -259,17 +264,53 @@ struct icmp_ext_t {
     nd_byte     icmp_ext_data[1];
 };
 
-struct icmp_mpls_ext_object_header_t {
+struct icmp_multipart_ext_object_header_t {
     nd_uint16_t length;
     nd_uint8_t  class_num;
     nd_uint8_t  ctype;
 };
 
-static const struct tok icmp_mpls_ext_obj_values[] = {
+static const struct tok icmp_multipart_ext_obj_values[] = {
     { 1, "MPLS Stack Entry" },
-    { 2, "Extended Payload" },
+    { 2, "Interface Identification" },
     { 0, NULL}
 };
+
+/* rfc5837 */
+static const struct tok icmp_interface_identification_role_values[] = {
+    { 0, "the IP interface upon which a datagram arrived"},
+    { 1, "the sub-IP component of an IP interface upon which a datagram arrived"},
+    { 2, "the IP interface through which the datagram would have been forwarded had it been forwardable"},
+    { 3, "the IP next hop to which the datagram would have been forwarded"},
+    { 0, NULL }
+};
+
+/*
+Interface IP Address Sub-Object
+0                            31
++-------+-------+-------+-------+
+|      AFI      |    Reserved   |
++-------+-------+-------+-------+
+|         IP Address   ....
+*/
+struct icmp_interface_identification_ipaddr_subobject_t {
+    nd_uint16_t  afi;
+    nd_uint16_t  reserved;
+    nd_uint32_t  ip_addr;
+};
+
+/*
+Interface Name Sub-Object
+octet    0        1                                   63
+        +--------+-----------................-----------------+
+        | length |   interface name octets 1-63               |
+        +--------+-----------................-----------------+
+*/
+struct icmp_interface_identification_ifname_subobject_t {
+    nd_uint8_t  length;
+    nd_byte     if_name[63];
+};
+
 
 /* prototypes */
 const char *icmp_tstamp_print(u_int);
@@ -305,8 +346,11 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 	const struct udphdr *ouh;
         const uint8_t *obj_tptr;
         uint32_t raw_label;
-        const u_char *snapend_save;
-	const struct icmp_mpls_ext_object_header_t *icmp_mpls_ext_object_header;
+	const struct icmp_multipart_ext_object_header_t *icmp_multipart_ext_object_header;
+		u_int interface_role, if_index_flag, ipaddr_flag, name_flag, mtu_flag;
+        const uint8_t *offset;
+		const struct icmp_interface_identification_ipaddr_subobject_t *ipaddr_subobj;
+		const struct icmp_interface_identification_ifname_subobject_t *ifname_subobj;
 	u_int hlen, mtu, obj_tlen, obj_class_num, obj_ctype;
 	uint16_t dport;
 	char buf[MAXHOSTNAMELEN + 100];
@@ -648,29 +692,42 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 
         /*
          * print the remnants of the IP packet.
-         * save the snaplength as this may get overidden in the IP printer.
+         * save the snaplength as this may get overridden in the IP printer.
          */
 	if (ndo->ndo_vflag >= 1 && ICMP_ERRTYPE(icmp_type)) {
+		const u_char *snapend_save;
+
 		bp += 8;
 		ND_PRINT("\n\t");
 		ip = (const struct ip *)bp;
-                snapend_save = ndo->ndo_snapend;
+		snapend_save = ndo->ndo_snapend;
+		/*
+		 * Update the snapend because extensions (MPLS, ...) may be
+		 * present after the IP packet. In this case the current
+		 * (outer) packet's snapend is not what ip_print() needs to
+		 * decode an IP packet nested in the middle of an ICMP payload.
+		 *
+		 * This prevents that, in ip_print(), for the nested IP packet,
+		 * the remaining length < remaining caplen.
+		 */
+		ndo->ndo_snapend = ND_MIN(bp + GET_BE_U_2(ip->ip_len),
+					  ndo->ndo_snapend);
 		ip_print(ndo, bp, GET_BE_U_2(ip->ip_len));
-                ndo->ndo_snapend = snapend_save;
+		ndo->ndo_snapend = snapend_save;
 	}
 
 	/* ndo_protocol reassignment after ip_print() call */
 	ndo->ndo_protocol = "icmp";
 
         /*
-         * Attempt to decode the MPLS extensions only for some ICMP types.
+         * Attempt to decode multi-part message extensions (rfc4884) only for some ICMP types.
          */
-        if (ndo->ndo_vflag >= 1 && plen > ICMP_EXTD_MINLEN && ICMP_MPLS_EXT_TYPE(icmp_type)) {
+        if (ndo->ndo_vflag >= 1 && plen > ICMP_EXTD_MINLEN && ICMP_MULTIPART_EXT_TYPE(icmp_type)) {
 
             ND_TCHECK_SIZE(ext_dp);
 
             /*
-             * Check first if the mpls extension header shows a non-zero length.
+             * Check first if the multi-part extension header shows a non-zero length.
              * If the length field is not set then silently verify the checksum
              * to check if an extension header is present. This is expedient,
              * however not all implementations set the length field proper.
@@ -684,13 +741,13 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                 }
             }
 
-            ND_PRINT("\n\tMPLS extension v%u",
-                   ICMP_MPLS_EXT_EXTRACT_VERSION(*(ext_dp->icmp_ext_version_res)));
+            ND_PRINT("\n\tICMP Multi-Part extension v%u",
+                   ICMP_EXT_EXTRACT_VERSION(*(ext_dp->icmp_ext_version_res)));
 
             /*
              * Sanity checking of the header.
              */
-            if (ICMP_MPLS_EXT_EXTRACT_VERSION(*(ext_dp->icmp_ext_version_res)) !=
+            if (ICMP_EXT_EXTRACT_VERSION(*(ext_dp->icmp_ext_version_res)) !=
                 ICMP_MPLS_EXT_VERSION) {
                 ND_PRINT(" packet not supported");
                 return;
@@ -709,36 +766,36 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
             hlen -= 4; /* subtract common header size */
             obj_tptr = (const uint8_t *)ext_dp->icmp_ext_data;
 
-            while (hlen > sizeof(struct icmp_mpls_ext_object_header_t)) {
+            while (hlen > sizeof(struct icmp_multipart_ext_object_header_t)) {
 
-                icmp_mpls_ext_object_header = (const struct icmp_mpls_ext_object_header_t *)obj_tptr;
-                ND_TCHECK_SIZE(icmp_mpls_ext_object_header);
-                obj_tlen = GET_BE_U_2(icmp_mpls_ext_object_header->length);
-                obj_class_num = GET_U_1(icmp_mpls_ext_object_header->class_num);
-                obj_ctype = GET_U_1(icmp_mpls_ext_object_header->ctype);
-                obj_tptr += sizeof(struct icmp_mpls_ext_object_header_t);
+                icmp_multipart_ext_object_header = (const struct icmp_multipart_ext_object_header_t *)obj_tptr;
+                ND_TCHECK_SIZE(icmp_multipart_ext_object_header);
+                obj_tlen = GET_BE_U_2(icmp_multipart_ext_object_header->length);
+                obj_class_num = GET_U_1(icmp_multipart_ext_object_header->class_num);
+                obj_ctype = GET_U_1(icmp_multipart_ext_object_header->ctype);
+                obj_tptr += sizeof(struct icmp_multipart_ext_object_header_t);
 
                 ND_PRINT("\n\t  %s Object (%u), Class-Type: %u, length %u",
-                       tok2str(icmp_mpls_ext_obj_values,"unknown",obj_class_num),
+                       tok2str(icmp_multipart_ext_obj_values,"unknown",obj_class_num),
                        obj_class_num,
                        obj_ctype,
                        obj_tlen);
 
-                hlen-=sizeof(struct icmp_mpls_ext_object_header_t); /* length field includes tlv header */
+                hlen-=sizeof(struct icmp_multipart_ext_object_header_t); /* length field includes tlv header */
 
                 /* infinite loop protection */
                 if ((obj_class_num == 0) ||
-                    (obj_tlen < sizeof(struct icmp_mpls_ext_object_header_t))) {
+                    (obj_tlen < sizeof(struct icmp_multipart_ext_object_header_t))) {
                     return;
                 }
-                obj_tlen-=sizeof(struct icmp_mpls_ext_object_header_t);
+                obj_tlen-=sizeof(struct icmp_multipart_ext_object_header_t);
 
                 switch (obj_class_num) {
-                case 1:
+                case MPLS_STACK_ENTRY_OBJECT_CLASS:
                     switch(obj_ctype) {
                     case 1:
                         raw_label = GET_BE_U_4(obj_tptr);
-                        ND_PRINT("\n\t    label %u, exp %u", MPLS_LABEL(raw_label), MPLS_EXP(raw_label));
+                        ND_PRINT("\n\t    label %u, tc %u", MPLS_LABEL(raw_label), MPLS_TC(raw_label));
                         if (MPLS_STACK(raw_label))
                             ND_PRINT(", [S]");
                         ND_PRINT(", ttl %u", MPLS_TTL(raw_label));
@@ -748,11 +805,64 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                     }
                     break;
 
-               /*
-                *  FIXME those are the defined objects that lack a decoder
-                *  you are welcome to contribute code ;-)
-                */
-                case 2:
+                case INTERFACE_INFORMATION_OBJECT_CLASS:
+					/*
+
+					Ctype in a INTERFACE_INFORMATION_OBJECT_CLASS object:
+
+					Bit     0       1       2       3       4       5       6       7
+					+-------+-------+-------+-------+-------+-------+-------+-------+
+					| Interface Role| Rsvd1 | Rsvd2 |ifIndex| IPAddr|  name |  MTU  |
+					+-------+-------+-------+-------+-------+-------+-------+-------+
+
+					*/
+					interface_role = (obj_ctype & 0xc0) >> 6;
+					if_index_flag  = (obj_ctype & 0x8) >> 3;
+					ipaddr_flag    = (obj_ctype & 0x4) >> 2;
+					name_flag      = (obj_ctype & 0x2) >> 1;
+					mtu_flag       = (obj_ctype & 0x1);
+
+					ND_PRINT("\n\t\t This object describes %s",
+                       tok2str(icmp_interface_identification_role_values,"an unknown interface role",interface_role));
+
+					offset = obj_tptr;
+
+					if (if_index_flag) {
+						ND_PRINT("\n\t\t Interface Index: %u", GET_BE_U_4(offset));
+						offset += 4;
+					}
+
+					if (ipaddr_flag) {
+						ND_PRINT("\n\t\t IP Address sub-object: ");
+						ipaddr_subobj = (const struct icmp_interface_identification_ipaddr_subobject_t *) offset;
+						switch (GET_BE_U_2(ipaddr_subobj->afi)) {
+							case 1:
+								ND_PRINT("%s", GET_IPADDR_STRING(ipaddr_subobj->ip_addr));
+								offset += 4;
+								break;
+							case 2:
+								ND_PRINT("%s", GET_IP6ADDR_STRING(ipaddr_subobj->ip_addr));
+								offset += 16;
+								break;
+							default:
+								ND_PRINT("Unknown Address Family Identifier");
+								return;
+						}
+						offset += 4;
+					}
+
+					if (name_flag) {
+						ifname_subobj = (const struct icmp_interface_identification_ifname_subobject_t *) offset;
+						ND_PRINT("\n\t\t Interface Name: %.*s", GET_U_1(ifname_subobj->length), ifname_subobj->if_name);
+						offset += 1 + GET_U_1(ifname_subobj->length);
+					}
+					if (mtu_flag) {
+						ND_PRINT("\n\t\t MTU: %u", GET_BE_U_4(offset));
+						offset += 4;
+					}
+
+					break;
+
                 default:
                     print_unknown_data(ndo, obj_tptr, "\n\t    ", obj_tlen);
                     break;

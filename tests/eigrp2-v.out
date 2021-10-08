@@ -1,7 +1,7 @@
     1  01:04:16.103886 IP (tos 0xc0, ttl 2, id 0, offset 0, flags [none], proto EIGRP (88), length 60)
     10.0.0.2 > 224.0.0.10: 
 	EIGRP v2, opcode: Hello (5), chksum: 0xee68, Flags: [none]
-	seq: 0x00000000, ack: 0x00000000, AS: 100, length: 20
+	seq: 0x00000000, ack: 0x00000000, VRID: 0, AS: 100, length: 20
 	  General Parameters TLV (0x0001), length: 12
 	    holdtime: 15s, k1 1, k2 0, k3 1, k4 0, k5 0
 	  Software Version TLV (0x0004), length: 8
@@ -9,7 +9,7 @@
     2  01:04:17.134010 IP (tos 0xc0, ttl 2, id 0, offset 0, flags [none], proto EIGRP (88), length 60)
     10.0.0.1 > 224.0.0.10: 
 	EIGRP v2, opcode: Hello (5), chksum: 0xee68, Flags: [none]
-	seq: 0x00000000, ack: 0x00000000, AS: 100, length: 20
+	seq: 0x00000000, ack: 0x00000000, VRID: 0, AS: 100, length: 20
 	  General Parameters TLV (0x0001), length: 12
 	    holdtime: 15s, k1 1, k2 0, k3 1, k4 0, k5 0
 	  Software Version TLV (0x0004), length: 8
@@ -17,7 +17,7 @@
     3  01:04:20.518585 IP (tos 0xc0, ttl 2, id 0, offset 0, flags [none], proto EIGRP (88), length 60)
     10.0.0.2 > 224.0.0.10: 
 	EIGRP v2, opcode: Hello (5), chksum: 0xee68, Flags: [none]
-	seq: 0x00000000, ack: 0x00000000, AS: 100, length: 20
+	seq: 0x00000000, ack: 0x00000000, VRID: 0, AS: 100, length: 20
 	  General Parameters TLV (0x0001), length: 12
 	    holdtime: 15s, k1 1, k2 0, k3 1, k4 0, k5 0
 	  Software Version TLV (0x0004), length: 8
@@ -25,7 +25,7 @@
     4  01:04:21.962280 IP (tos 0xc0, ttl 2, id 0, offset 0, flags [none], proto EIGRP (88), length 60)
     10.0.0.1 > 224.0.0.10: 
 	EIGRP v2, opcode: Hello (5), chksum: 0xee68, Flags: [none]
-	seq: 0x00000000, ack: 0x00000000, AS: 100, length: 20
+	seq: 0x00000000, ack: 0x00000000, VRID: 0, AS: 100, length: 20
 	  General Parameters TLV (0x0001), length: 12
 	    holdtime: 15s, k1 1, k2 0, k3 1, k4 0, k5 0
 	  Software Version TLV (0x0004), length: 8
@@ -33,7 +33,7 @@
     5  01:04:25.242510 IP (tos 0xc0, ttl 2, id 0, offset 0, flags [none], proto EIGRP (88), length 60)
     10.0.0.2 > 224.0.0.10: 
 	EIGRP v2, opcode: Hello (5), chksum: 0xee68, Flags: [none]
-	seq: 0x00000000, ack: 0x00000000, AS: 100, length: 20
+	seq: 0x00000000, ack: 0x00000000, VRID: 0, AS: 100, length: 20
 	  General Parameters TLV (0x0001), length: 12
 	    holdtime: 15s, k1 1, k2 0, k3 1, k4 0, k5 0
 	  Software Version TLV (0x0004), length: 8
@@ -41,7 +41,7 @@
     6  01:04:26.370559 IP (tos 0xc0, ttl 2, id 0, offset 0, flags [none], proto EIGRP (88), length 60)
     10.0.0.1 > 224.0.0.10: 
 	EIGRP v2, opcode: Hello (5), chksum: 0xee68, Flags: [none]
-	seq: 0x00000000, ack: 0x00000000, AS: 100, length: 20
+	seq: 0x00000000, ack: 0x00000000, VRID: 0, AS: 100, length: 20
 	  General Parameters TLV (0x0001), length: 12
 	    holdtime: 15s, k1 1, k2 0, k3 1, k4 0, k5 0
 	  Software Version TLV (0x0004), length: 8
@@ -49,7 +49,7 @@
     7  01:04:30.194834 IP (tos 0xc0, ttl 2, id 0, offset 0, flags [none], proto EIGRP (88), length 60)
     10.0.0.2 > 224.0.0.10: 
 	EIGRP v2, opcode: Hello (5), chksum: 0xee68, Flags: [none]
-	seq: 0x00000000, ack: 0x00000000, AS: 100, length: 20
+	seq: 0x00000000, ack: 0x00000000, VRID: 0, AS: 100, length: 20
 	  General Parameters TLV (0x0001), length: 12
 	    holdtime: 15s, k1 1, k2 0, k3 1, k4 0, k5 0
 	  Software Version TLV (0x0004), length: 8
@@ -57,7 +57,7 @@
     8  01:04:30.994865 IP (tos 0xc0, ttl 2, id 0, offset 0, flags [none], proto EIGRP (88), length 60)
     10.0.0.1 > 224.0.0.10: 
 	EIGRP v2, opcode: Hello (5), chksum: 0xee68, Flags: [none]
-	seq: 0x00000000, ack: 0x00000000, AS: 100, length: 20
+	seq: 0x00000000, ack: 0x00000000, VRID: 0, AS: 100, length: 20
 	  General Parameters TLV (0x0001), length: 12
 	    holdtime: 15s, k1 1, k2 0, k3 1, k4 0, k5 0
 	  Software Version TLV (0x0004), length: 8
@@ -65,7 +65,7 @@
     9  01:04:32.803002 IP (tos 0xc0, ttl 2, id 0, offset 0, flags [none], proto EIGRP (88), length 60)
     10.0.0.2 > 224.0.0.10: 
 	EIGRP v2, opcode: Hello (5), chksum: 0xf167, Flags: [none]
-	seq: 0x00000000, ack: 0x00000000, AS: 100, length: 20
+	seq: 0x00000000, ack: 0x00000000, VRID: 0, AS: 100, length: 20
 	  General Parameters TLV (0x0001), length: 12
 	    holdtime: 15s, k1 255, k2 255, k3 255, k4 255, k5 255
 	  Software Version TLV (0x0004), length: 8
@@ -73,7 +73,7 @@
    10  01:04:35.319118 IP (tos 0xc0, ttl 2, id 0, offset 0, flags [none], proto EIGRP (88), length 60)
     10.0.0.1 > 224.0.0.10: 
 	EIGRP v2, opcode: Hello (5), chksum: 0xee68, Flags: [none]
-	seq: 0x00000000, ack: 0x00000000, AS: 100, length: 20
+	seq: 0x00000000, ack: 0x00000000, VRID: 0, AS: 100, length: 20
 	  General Parameters TLV (0x0001), length: 12
 	    holdtime: 15s, k1 1, k2 0, k3 1, k4 0, k5 0
 	  Software Version TLV (0x0004), length: 8
@@ -81,7 +81,7 @@
    11  01:04:40.177355 IP (tos 0xc0, ttl 2, id 0, offset 0, flags [none], proto EIGRP (88), length 60)
     10.0.0.1 > 224.0.0.10: 
 	EIGRP v2, opcode: Hello (5), chksum: 0xee68, Flags: [none]
-	seq: 0x00000000, ack: 0x00000000, AS: 100, length: 20
+	seq: 0x00000000, ack: 0x00000000, VRID: 0, AS: 100, length: 20
 	  General Parameters TLV (0x0001), length: 12
 	    holdtime: 15s, k1 1, k2 0, k3 1, k4 0, k5 0
 	  Software Version TLV (0x0004), length: 8
@@ -89,7 +89,7 @@
    12  01:04:44.865678 IP (tos 0xc0, ttl 2, id 0, offset 0, flags [none], proto EIGRP (88), length 60)
     10.0.0.1 > 224.0.0.10: 
 	EIGRP v2, opcode: Hello (5), chksum: 0xee68, Flags: [none]
-	seq: 0x00000000, ack: 0x00000000, AS: 100, length: 20
+	seq: 0x00000000, ack: 0x00000000, VRID: 0, AS: 100, length: 20
 	  General Parameters TLV (0x0001), length: 12
 	    holdtime: 15s, k1 1, k2 0, k3 1, k4 0, k5 0
 	  Software Version TLV (0x0004), length: 8
@@ -97,7 +97,7 @@
    13  01:04:49.801931 IP (tos 0xc0, ttl 2, id 0, offset 0, flags [none], proto EIGRP (88), length 60)
     10.0.0.1 > 224.0.0.10: 
 	EIGRP v2, opcode: Hello (5), chksum: 0xee68, Flags: [none]
-	seq: 0x00000000, ack: 0x00000000, AS: 100, length: 20
+	seq: 0x00000000, ack: 0x00000000, VRID: 0, AS: 100, length: 20
 	  General Parameters TLV (0x0001), length: 12
 	    holdtime: 15s, k1 1, k2 0, k3 1, k4 0, k5 0
 	  Software Version TLV (0x0004), length: 8
@@ -105,7 +105,7 @@
    14  01:04:54.236229 IP (tos 0xc0, ttl 2, id 0, offset 0, flags [none], proto EIGRP (88), length 60)
     10.0.0.1 > 224.0.0.10: 
 	EIGRP v2, opcode: Hello (5), chksum: 0xee68, Flags: [none]
-	seq: 0x00000000, ack: 0x00000000, AS: 100, length: 20
+	seq: 0x00000000, ack: 0x00000000, VRID: 0, AS: 100, length: 20
 	  General Parameters TLV (0x0001), length: 12
 	    holdtime: 15s, k1 1, k2 0, k3 1, k4 0, k5 0
 	  Software Version TLV (0x0004), length: 8
@@ -113,7 +113,7 @@
    15  01:04:58.956522 IP (tos 0xc0, ttl 2, id 0, offset 0, flags [none], proto EIGRP (88), length 60)
     10.0.0.1 > 224.0.0.10: 
 	EIGRP v2, opcode: Hello (5), chksum: 0xee68, Flags: [none]
-	seq: 0x00000000, ack: 0x00000000, AS: 100, length: 20
+	seq: 0x00000000, ack: 0x00000000, VRID: 0, AS: 100, length: 20
 	  General Parameters TLV (0x0001), length: 12
 	    holdtime: 15s, k1 1, k2 0, k3 1, k4 0, k5 0
 	  Software Version TLV (0x0004), length: 8

@@ -43,24 +43,6 @@
  */
 
 /*
- * This was introduced by Clang:
- *
- *     https://clang.llvm.org/docs/LanguageExtensions.html#has-attribute
- *
- * in some version (which version?); it has been picked up by GCC 5.0.
- */
-#ifndef __has_attribute
-  /*
-   * It's a macro, so you can check whether it's defined to check
-   * whether it's supported.
-   *
-   * If it's not, define it to always return 0, so that we move on to
-   * the fallback checks.
-   */
-  #define __has_attribute(x) 0
-#endif
-
-/*
  * NORETURN, before a function declaration, means "this function
  * never returns".  (It must go before the function declaration, e.g.
  * "extern NORETURN func(...)" rather than after the function
@@ -73,9 +55,10 @@
     || ND_IS_AT_LEAST_HP_C_VERSION(6,10)
   /*
    * Compiler with support for __attribute((noreturn)), or GCC 2.5 and
+   * later, or some compiler asserting compatibility with GCC 2.5 and
    * later, or Solaris Studio 12 (Sun C 5.9) and later, or IBM XL C 10.1
-   * and later (do any earlier versions of XL C support this?), or
-   * HP aCC A.06.10 and later.
+   * and later (do any earlier versions of XL C support this?), or HP aCC
+   * A.06.10 and later.
    */
   #define NORETURN __attribute((noreturn))
 
@@ -115,7 +98,8 @@
     || ND_IS_AT_LEAST_XL_C_VERSION(10,1) \
     || ND_IS_AT_LEAST_HP_C_VERSION(6,10)
   /*
-   * Compiler with support for it, or GCC 2.3 and later, or IBM XL C 10.1
+   * Compiler with support for it, or GCC 2.3 and later, or some compiler
+   * asserting compatibility with GCC 2.3 and later, or IBM XL C 10.1
    * and later (do any earlier versions of XL C support this?),
    * or HP aCC A.06.10 and later.
    */
@@ -124,15 +108,30 @@
   /*
    * However, GCC didn't support that for function *pointers* until GCC
    * 4.1.0; see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3481.
+   * XL C 16.1 (and possibly some earlier versions, but not 12.1 or 13.1) has
+   * a similar bug, the bugfix for which was made in:
+   * * version 16.1.1.8 for Linux (25 June 2020), which fixes
+   *   https://www.ibm.com/support/pages/apar/LI81402
+   * * version 16.1.0.5 for AIX (5 May 2020), which fixes
+   *   https://www.ibm.com/support/pages/apar/IJ24678
+   *
+   * When testing versions, keep in mind that XL C 16.1 pretends to be both
+   * GCC 4.2 and Clang 4.0 at once.
    */
-  #if (defined(__GNUC__) && ((__GNUC__ * 100 + __GNUC_MINOR__) < 401))
-    #define PRINTFLIKE_FUNCPTR(x,y)
-  #else
+  #if (ND_IS_AT_LEAST_GNUC_VERSION(4,1) \
+       && !ND_IS_AT_LEAST_XL_C_VERSION(10,1)) \
+      || (ND_IS_AT_LEAST_XL_C_VERSION(16,1) \
+          && (ND_IS_AT_LEAST_XL_C_MODFIX(1, 8) && defined(__linux__)) \
+              || (ND_IS_AT_LEAST_XL_C_MODFIX(0, 5) && defined(_AIX)))
     #define PRINTFLIKE_FUNCPTR(x,y) __attribute__((__format__(__printf__,x,y)))
   #endif
-#else
-  #define PRINTFLIKE(x,y)
-  #define PRINTFLIKE_FUNCPTR(x,y)
+#endif
+
+#if !defined(PRINTFLIKE)
+#define PRINTFLIKE(x,y)
+#endif
+#if !defined(PRINTFLIKE_FUNCPTR)
+#define PRINTFLIKE_FUNCPTR(x,y)
 #endif
 
 /*

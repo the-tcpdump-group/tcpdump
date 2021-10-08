@@ -59,9 +59,6 @@
 #include "extract.h"
 
 
-#define TELCMDS
-#define TELOPTS
-
 /*	NetBSD: telnet.h,v 1.9 2001/06/11 01:50:50 wiz Exp 	*/
 
 /*
@@ -90,15 +87,11 @@
 
 #define SYNCH	242		/* for telfunc calls */
 
-#ifdef TELCMDS
 static const char *telcmds[] = {
 	"EOF", "SUSP", "ABORT", "EOR",
 	"SE", "NOP", "DMARK", "BRK", "IP", "AO", "AYT", "EC",
 	"EL", "GA", "SB", "WILL", "WONT", "DO", "DONT", "IAC", 0,
 };
-#else
-extern char *telcmds[];
-#endif
 
 #define	TELCMD_FIRST	xEOF
 #define	TELCMD_LAST	IAC
@@ -151,7 +144,6 @@ extern char *telcmds[];
 
 
 #define	NTELOPTS	(1+TELOPT_NEW_ENVIRON)
-#ifdef TELOPTS
 static const char *telopts[NTELOPTS+1] = {
 	"BINARY", "ECHO", "RCP", "SUPPRESS GO AHEAD", "NAME",
 	"STATUS", "TIMING MARK", "RCTE", "NAOL", "NAOP",
@@ -169,7 +161,6 @@ static const char *telopts[NTELOPTS+1] = {
 #define	TELOPT_LAST	TELOPT_NEW_ENVIRON
 #define	TELOPT_OK(x)	((unsigned int)(x) <= TELOPT_LAST)
 #define	TELOPT(x)	telopts[(x)-TELOPT_FIRST]
-#endif
 
 /* sub-option qualifiers */
 #define	TELQUAL_IS	0	/* option is... */
@@ -539,7 +530,6 @@ telnet_print(netdissect_options *ndo, const u_char *sp, u_int length)
 
 		sp += l;
 		length -= l;
-		ND_TCHECK_1(sp);
 	}
 	if (!first) {
 		if (ndo->ndo_Xflag && 2 < ndo->ndo_vflag)
@@ -547,7 +537,4 @@ telnet_print(netdissect_options *ndo, const u_char *sp, u_int length)
 		else
 			ND_PRINT("]");
 	}
-	return;
-trunc:
-	nd_print_trunc(ndo);
 }

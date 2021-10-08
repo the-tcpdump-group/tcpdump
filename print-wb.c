@@ -27,19 +27,19 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
 
 
-/* XXX need to add byte-swapping macros! */
-/* XXX - you mean like the ones in "extract.h"? */
-
+#if 0
 /*
  * Largest packet size.  Everything should fit within this space.
  * For instance, multiline objects are sent piecewise.
  */
 #define MAXFRAMESIZE 1024
+#endif
 
 /*
  * Multiple drawing ops can be sent in one packet.  Each one starts on a
@@ -72,6 +72,7 @@ struct pkt_hdr {
 #define PT_PREQ         5       /* page vector request */
 #define PT_PREP         7       /* page vector reply */
 
+#if 0
 #ifdef PF_USER
 #undef PF_USER			/* {Digital,Tru64} UNIX define this, alas */
 #endif
@@ -79,6 +80,7 @@ struct pkt_hdr {
 /* flags */
 #define PF_USER		0x01	/* hint that packet has interactive data */
 #define PF_VIS		0x02	/* only visible ops wanted */
+#endif
 
 struct PageID {
 	nd_uint32_t p_sid;		/* session id of initiator */
@@ -109,7 +111,23 @@ struct dophdr {
 #define DT_REF          13
 #define DT_SKIP         14
 #define DT_HOLE         15
-#define DT_MAXTYPE      15
+static const struct tok dop_str[] = {
+	{ DT_RECT,   "RECT"   },
+	{ DT_LINE,   "LINE"   },
+	{ DT_ML,     "ML"     },
+	{ DT_DEL,    "DEL"    },
+	{ DT_XFORM,  "XFORM"  },
+	{ DT_ELL,    "ELL"    },
+	{ DT_CHAR,   "CHAR"   },
+	{ DT_STR,    "STR"    },
+	{ DT_NOP,    "NOP"    },
+	{ DT_PSCODE, "PSCODE" },
+	{ DT_PSCOMP, "PSCOMP" },
+	{ DT_REF,    "REF"    },
+	{ DT_SKIP,   "SKIP"   },
+	{ DT_HOLE,   "HOLE"   },
+	{ 0, NULL }
+};
 
 /*
  * A drawing operation.
@@ -186,7 +204,7 @@ wb_id(netdissect_options *ndo,
 	u_int nid;
 
 	ND_PRINT(" wb-id:");
-	if (len < sizeof(*id) || !ND_TTEST_SIZE(id))
+	if (len < sizeof(*id))
 		return (-1);
 	len -= sizeof(*id);
 
@@ -197,6 +215,8 @@ wb_id(netdissect_options *ndo,
 	       GET_BE_U_4(id->pi_mslot),
 	       GET_IPADDR_STRING(id->pi_mpage.p_sid),
 	       GET_BE_U_4(id->pi_mpage.p_uid));
+	/* now the rest of the fixed-size part of struct pkt_id */
+	ND_TCHECK_SIZE(id);
 
 	nid = GET_BE_U_2(id->pi_ps.nid);
 	if (len < sizeof(*io) * nid)
@@ -206,18 +226,15 @@ wb_id(netdissect_options *ndo,
 	sitename = (const u_char *)(io + nid);
 
 	c = '<';
-	for (i = 0; i < nid && ND_TTEST_SIZE(io); ++io, ++i) {
+	for (i = 0; i < nid; ++io, ++i) {
 		ND_PRINT("%c%s:%u",
 		    c, GET_IPADDR_STRING(io->id), GET_BE_U_4(io->off));
 		c = ',';
 	}
-	if (i >= nid) {
-		ND_PRINT("> \"");
-		(void)nd_print(ndo, sitename, sitename + len);
-		ND_PRINT("\"");
-		return (0);
-	}
-	return (-1);
+	ND_PRINT("> \"");
+	nd_printjnp(ndo, sitename, len);
+	ND_PRINT("\"");
+	return (0);
 }
 
 static int
@@ -225,7 +242,7 @@ wb_rreq(netdissect_options *ndo,
         const struct pkt_rreq *rreq, u_int len)
 {
 	ND_PRINT(" wb-rreq:");
-	if (len < sizeof(*rreq) || !ND_TTEST_SIZE(rreq))
+	if (len < sizeof(*rreq))
 		return (-1);
 
 	ND_PRINT(" please repair %s %s:%u<%u:%u>",
@@ -242,13 +259,15 @@ wb_preq(netdissect_options *ndo,
         const struct pkt_preq *preq, u_int len)
 {
 	ND_PRINT(" wb-preq:");
-	if (len < sizeof(*preq) || !ND_TTEST_SIZE(preq))
+	if (len < sizeof(*preq))
 		return (-1);
 
 	ND_PRINT(" need %u/%s:%u",
 	       GET_BE_U_4(preq->pp_low),
 	       GET_IPADDR_STRING(preq->pp_page.p_sid),
 	       GET_BE_U_4(preq->pp_page.p_uid));
+	/* now the rest of the fixed-size part of struct pkt_req */
+	ND_TCHECK_SIZE(preq);
 	return (0);
 }
 
@@ -258,14 +277,13 @@ wb_prep(netdissect_options *ndo,
 {
 	u_int n;
 	const struct pgstate *ps;
-	const u_char *ep = ndo->ndo_snapend;
 
 	ND_PRINT(" wb-prep:");
-	if (len < sizeof(*prep) || !ND_TTEST_SIZE(prep))
+	if (len < sizeof(*prep))
 		return (-1);
 	n = GET_BE_U_4(prep->pp_n);
 	ps = (const struct pgstate *)(prep + 1);
-	while (n != 0 && ND_TTEST_SIZE(ps)) {
+	while (n != 0) {
 		const struct id_off *io, *ie;
 		char c = '<';
 
@@ -273,8 +291,10 @@ wb_prep(netdissect_options *ndo,
 		    GET_BE_U_4(ps->slot),
 		    GET_IPADDR_STRING(ps->page.p_sid),
 		    GET_BE_U_4(ps->page.p_uid));
+		/* now the rest of the fixed-size part of struct pgstate */
+		ND_TCHECK_SIZE(ps);
 		io = (const struct id_off *)(ps + 1);
-		for (ie = io + GET_U_1(ps->nid); io < ie && ND_TTEST_SIZE(io); ++io) {
+		for (ie = io + GET_U_1(ps->nid); io < ie; ++io) {
 			ND_PRINT("%c%s:%u", c, GET_IPADDR_STRING(io->id),
 			    GET_BE_U_4(io->off));
 			c = ',';
@@ -283,30 +303,10 @@ wb_prep(netdissect_options *ndo,
 		ps = (const struct pgstate *)io;
 		n--;
 	}
-	return ((const u_char *)ps <= ep? 0 : -1);
+	return 0;
 }
 
-
-static const char *dopstr[] = {
-	"dop-0!",
-	"dop-1!",
-	"RECT",
-	"LINE",
-	"ML",
-	"DEL",
-	"XFORM",
-	"ELL",
-	"CHAR",
-	"STR",
-	"NOP",
-	"PSCODE",
-	"PSCOMP",
-	"REF",
-	"SKIP",
-	"HOLE",
-};
-
-static int
+static void
 wb_dops(netdissect_options *ndo, const struct pkt_dop *dop,
         uint32_t ss, uint32_t es)
 {
@@ -316,31 +316,22 @@ wb_dops(netdissect_options *ndo, const struct pkt_dop *dop,
 	for ( ; ss <= es; ++ss) {
 		u_int t;
 
-		if (!ND_TTEST_SIZE(dh)) {
-			nd_print_trunc(ndo);
-			break;
-		}
 		t = GET_U_1(dh->dh_type);
 
-		if (t > DT_MAXTYPE)
-			ND_PRINT(" dop-%u!", t);
-		else {
-			ND_PRINT(" %s", dopstr[t]);
-			if (t == DT_SKIP || t == DT_HOLE) {
-				uint32_t ts = GET_BE_U_4(dh->dh_ts);
-				ND_PRINT("%u", ts - ss + 1);
-				if (ss > ts || ts > es) {
-					ND_PRINT("[|]");
-					if (ts < ss)
-						return (0);
-				}
-				ss = ts;
+		ND_PRINT(" %s", tok2str(dop_str, "dop-%u!", t));
+		if (t == DT_SKIP || t == DT_HOLE) {
+			uint32_t ts = GET_BE_U_4(dh->dh_ts);
+			ND_PRINT("%u", ts - ss + 1);
+			if (ss > ts || ts > es) {
+				ND_PRINT("[|]");
+				if (ts < ss)
+					return;
 			}
+			ss = ts;
 		}
 		dh = DOP_NEXT(dh);
 	}
 	ND_PRINT(" >");
-	return (0);
 }
 
 static int
@@ -350,7 +341,7 @@ wb_rrep(netdissect_options *ndo,
 	const struct pkt_dop *dop = &rrep->pr_dop;
 
 	ND_PRINT(" wb-rrep:");
-	if (len < sizeof(*rrep) || !ND_TTEST_SIZE(rrep))
+	if (len < sizeof(*rrep))
 		return (-1);
 	len -= sizeof(*rrep);
 
@@ -362,9 +353,9 @@ wb_rrep(netdissect_options *ndo,
 	    GET_BE_U_4(dop->pd_eseq));
 
 	if (ndo->ndo_vflag)
-		return (wb_dops(ndo, dop,
-		    GET_BE_U_4(dop->pd_sseq),
-		    GET_BE_U_4(dop->pd_eseq)));
+		wb_dops(ndo, dop,
+		        GET_BE_U_4(dop->pd_sseq),
+		        GET_BE_U_4(dop->pd_eseq));
 	return (0);
 }
 
@@ -373,7 +364,7 @@ wb_drawop(netdissect_options *ndo,
           const struct pkt_dop *dop, u_int len)
 {
 	ND_PRINT(" wb-dop:");
-	if (len < sizeof(*dop) || !ND_TTEST_SIZE(dop))
+	if (len < sizeof(*dop))
 		return (-1);
 	len -= sizeof(*dop);
 
@@ -384,9 +375,9 @@ wb_drawop(netdissect_options *ndo,
 	    GET_BE_U_4(dop->pd_eseq));
 
 	if (ndo->ndo_vflag)
-		return (wb_dops(ndo, dop,
-				GET_BE_U_4(dop->pd_sseq),
-				GET_BE_U_4(dop->pd_eseq)));
+		wb_dops(ndo, dop,
+		        GET_BE_U_4(dop->pd_sseq),
+		        GET_BE_U_4(dop->pd_eseq));
 	return (0);
 }
 
@@ -399,13 +390,13 @@ wb_print(netdissect_options *ndo,
 {
 	const struct pkt_hdr *ph;
 	uint8_t type;
+	int print_result;
 
 	ndo->ndo_protocol = "wb";
 	ph = (const struct pkt_hdr *)hdr;
-	if (len < sizeof(*ph) || !ND_TTEST_SIZE(ph)) {
-		nd_print_trunc(ndo);
-		return;
-	}
+	if (len < sizeof(*ph))
+		goto invalid;
+	ND_TCHECK_SIZE(ph);
 	len -= sizeof(*ph);
 
 	if (GET_U_1(ph->ph_flags))
@@ -418,43 +409,37 @@ wb_print(netdissect_options *ndo,
 		return;
 
 	case PT_ID:
-		if (wb_id(ndo, (const struct pkt_id *)(ph + 1), len) >= 0)
-			return;
-		nd_print_trunc(ndo);
+		print_result = wb_id(ndo, (const struct pkt_id *)(ph + 1), len);
 		break;
 
 	case PT_RREQ:
-		if (wb_rreq(ndo, (const struct pkt_rreq *)(ph + 1), len) >= 0)
-			return;
-		nd_print_trunc(ndo);
+		print_result = wb_rreq(ndo, (const struct pkt_rreq *)(ph + 1), len);
 		break;
 
 	case PT_RREP:
-		if (wb_rrep(ndo, (const struct pkt_rrep *)(ph + 1), len) >= 0)
-			return;
-		nd_print_trunc(ndo);
+		print_result = wb_rrep(ndo, (const struct pkt_rrep *)(ph + 1), len);
 		break;
 
 	case PT_DRAWOP:
-		if (wb_drawop(ndo, (const struct pkt_dop *)(ph + 1), len) >= 0)
-			return;
-		nd_print_trunc(ndo);
+		print_result = wb_drawop(ndo, (const struct pkt_dop *)(ph + 1), len);
 		break;
 
 	case PT_PREQ:
-		if (wb_preq(ndo, (const struct pkt_preq *)(ph + 1), len) >= 0)
-			return;
-		nd_print_trunc(ndo);
+		print_result = wb_preq(ndo, (const struct pkt_preq *)(ph + 1), len);
 		break;
 
 	case PT_PREP:
-		if (wb_prep(ndo, (const struct pkt_prep *)(ph + 1), len) >= 0)
-			return;
-		nd_print_trunc(ndo);
+		print_result = wb_prep(ndo, (const struct pkt_prep *)(ph + 1), len);
 		break;
 
 	default:
 		ND_PRINT(" wb-%u!", type);
-		return;
+		print_result = -1;
 	}
+	if (print_result < 0)
+		goto invalid;
+	return;
+
+invalid:
+	nd_print_invalid(ndo);
 }

@@ -39,9 +39,12 @@ __RCSID("$NetBSD: print-tcp.c,v 1.8 2007/07/24 11:53:48 drochner Exp $");
 #include <stdlib.h>
 #include <string.h>
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
+
+#include "diag-control.h"
 
 #include "tcp.h"
 
@@ -62,7 +65,7 @@ static int tcp_verify_signature(netdissect_options *ndo,
 
 static void print_tcp_rst_data(netdissect_options *, const u_char *sp, u_int length);
 static void print_tcp_fastopen_option(netdissect_options *ndo, const u_char *cp,
-                                      u_int datalen, int exp);
+                                      u_int datalen);
 
 #define MAX_RST_DATA_LEN	30
 
@@ -102,7 +105,7 @@ struct tcp_seq_hash6 {
 static struct tcp_seq_hash tcp_seq_hash4[TSEQ_HASHSIZE];
 static struct tcp_seq_hash6 tcp_seq_hash6[TSEQ_HASHSIZE];
 
-static const struct tok tcp_flag_values[] = {
+const struct tok tcp_flag_values[] = {
         { TH_FIN, "F" },
         { TH_SYN, "S" },
         { TH_RST, "R" },
@@ -177,6 +180,7 @@ tcp_print(netdissect_options *ndo,
  	static char fname[2048];
  	FILE *dfile;
         const struct ip6_hdr *ip6;
+        u_int header_len;	/* Header length in bytes */
 
         ndo->ndo_protocol = "tcp";
         tp = (const struct tcphdr *)bp;
@@ -196,8 +200,7 @@ tcp_print(netdissect_options *ndo,
                                  GET_IPADDR_STRING(ip->ip_src),
                                  GET_IPADDR_STRING(ip->ip_dst));
                 }
-                nd_print_trunc(ndo);
-                return;
+                nd_trunc_longjmp(ndo);
         }
 
         sport = GET_BE_U_2(tp->th_sport);
@@ -227,14 +230,12 @@ tcp_print(netdissect_options *ndo,
                 }
         }
 
-        ND_TCHECK_SIZE(tp);
-
         hlen = TH_OFF(tp) * 4;
 
         if (hlen < sizeof(*tp)) {
                 ND_PRINT(" tcp %u [bad hdr length %u - too short, < %zu]",
                          length - hlen, hlen, sizeof(*tp));
-                return;
+                goto invalid;
         }
 
 	if (dumpSessions) {
@@ -267,6 +268,7 @@ tcp_print(netdissect_options *ndo,
                 if (hlen > length) {
                         ND_PRINT(" [bad hdr length %u - too long, > %u]",
                                  hlen, length);
+                        goto invalid;
                 }
                 return;
         }
@@ -323,7 +325,7 @@ tcp_print(netdissect_options *ndo,
                                         if (th->nxt == NULL)
                                                 (*ndo->ndo_error)(ndo,
                                                         S_ERR_ND_MEM_ALLOC,
-                                                        "tcp_print: calloc");
+                                                        "%s: calloc", __func__);
                                 }
                                 th->addr = tha;
                                 if (rev)
@@ -381,7 +383,7 @@ tcp_print(netdissect_options *ndo,
                                         if (th->nxt == NULL)
                                                 (*ndo->ndo_error)(ndo,
                                                         S_ERR_ND_MEM_ALLOC,
-                                                        "tcp_print: calloc");
+                                                        "%s: calloc", __func__);
                                 }
                                 th->addr = tha;
                                 if (rev)
@@ -405,7 +407,7 @@ tcp_print(netdissect_options *ndo,
         if (hlen > length) {
                 ND_PRINT(" [bad hdr length %u - too long, > %u]",
                          hlen, length);
-                return;
+                goto invalid;
         }
 
         if (ndo->ndo_vflag && !ndo->ndo_Kflag && !fragmented) {
@@ -486,7 +488,7 @@ tcp_print(netdissect_options *ndo,
                         datalen = 0;
 
 /* Bail if "l" bytes of data are not left or were not captured  */
-#define LENCHECK(l) { if ((l) > hlen) goto bad; ND_TCHECK_LEN(cp, l); }
+#define LENCHECK(l) { if ((l) > hlen) goto bad; }
 
 
                         ND_PRINT("%s", tok2str(tcp_option_values, "unknown-%u", opt));
@@ -556,6 +558,7 @@ tcp_print(netdissect_options *ndo,
                         case TCPOPT_SIGNATURE:
                                 datalen = TCP_SIGLEN;
                                 LENCHECK(datalen);
+                                ND_TCHECK_LEN(cp, datalen);
                                 ND_PRINT(" ");
 #ifdef HAVE_LIBCRYPTO
                                 switch (tcp_verify_signature(ndo, ip, tp,
@@ -637,22 +640,46 @@ tcp_print(netdissect_options *ndo,
                                 break;
 
                         case TCPOPT_MPTCP:
+                            {
+                                const u_char *snapend_save;
+                                int ret;
+
                                 datalen = len - 2;
                                 LENCHECK(datalen);
-                                if (!mptcp_print(ndo, cp-2, len, flags))
+                                /* FIXME: Proof-read mptcp_print() and if it
+                                 * always covers all bytes when it returns 1,
+                                 * only do ND_TCHECK_LEN() if it returned 0.
+                                 */
+                                ND_TCHECK_LEN(cp, datalen);
+                                /* Update the snapend to the end of the option
+                                 * before calling mptcp_print(). Some options
+                                 * (MPTCP or others) may be present after a
+                                 * MPTCP option. This prevents that, in
+                                 * mptcp_print(), the remaining length < the
+                                 * remaining caplen.
+                                 */
+                                snapend_save = ndo->ndo_snapend;
+                                ndo->ndo_snapend = ND_MIN(cp - 2 + len,
+                                                          ndo->ndo_snapend);
+                                ret = mptcp_print(ndo, cp - 2, len, flags);
+                                ndo->ndo_snapend = snapend_save;
+                                if (!ret)
                                         goto bad;
                                 break;
+                            }
 
                         case TCPOPT_FASTOPEN:
                                 datalen = len - 2;
                                 LENCHECK(datalen);
+                                ND_TCHECK_LEN(cp, datalen);
                                 ND_PRINT(" ");
-                                print_tcp_fastopen_option(ndo, cp, datalen, FALSE);
+                                print_tcp_fastopen_option(ndo, cp, datalen);
                                 break;
 
                         case TCPOPT_EXPERIMENT2:
                                 datalen = len - 2;
                                 LENCHECK(datalen);
+                                ND_TCHECK_LEN(cp, datalen);
                                 if (datalen < 2)
                                         goto bad;
                                 /* RFC6994 */
@@ -662,7 +689,8 @@ tcp_print(netdissect_options *ndo,
                                 switch(magic) {
 
                                 case 0xf989: /* TCP Fast Open RFC 7413 */
-                                        print_tcp_fastopen_option(ndo, cp + 2, datalen - 2, TRUE);
+                                        ND_PRINT("tfo");
+                                        print_tcp_fastopen_option(ndo, cp + 2, datalen - 2);
                                         break;
 
                                 default:
@@ -711,7 +739,17 @@ tcp_print(netdissect_options *ndo,
         /*
          * Decode payload if necessary.
          */
-        bp += TH_OFF(tp) * 4;
+        header_len = TH_OFF(tp) * 4;
+        /*
+         * Do a bounds check before decoding the payload.
+         * At least the header data is required.
+         */
+        if (!ND_TTEST_LEN(bp, header_len)) {
+                ND_PRINT(" [remaining caplen(%u) < header length(%u)]",
+                         ND_BYTES_AVAILABLE_AFTER(bp), header_len);
+                nd_trunc_longjmp(ndo);
+        }
+        bp += header_len;
         if ((flags & TH_RST) && ndo->ndo_vflag) {
                 print_tcp_rst_data(ndo, bp, length);
                 return;
@@ -779,7 +817,7 @@ tcp_print(netdissect_options *ndo,
         } else if (IS_SRC_OR_DST_PORT(LDP_PORT)) {
                 ldp_print(ndo, bp, length);
         } else if ((IS_SRC_OR_DST_PORT(NFS_PORT)) &&
-                 length >= 4 && ND_TTEST_4(bp)) {
+                 length >= 4) {
                 /*
                  * If data present, header length valid, and NFS port used,
                  * assume NFS.
@@ -817,10 +855,8 @@ bad:
         if (ch != '\0')
                 ND_PRINT("]");
         return;
-trunc:
-        nd_print_trunc(ndo);
-        if (ch != '\0')
-                ND_PRINT(">");
+invalid:
+        nd_print_invalid(ndo);
 }
 
 /*
@@ -842,31 +878,21 @@ static void
 print_tcp_rst_data(netdissect_options *ndo,
                    const u_char *sp, u_int length)
 {
-        u_char c;
-
         ND_PRINT(ND_TTEST_LEN(sp, length) ? " [RST" : " [!RST");
         if (length > MAX_RST_DATA_LEN) {
                 length = MAX_RST_DATA_LEN;	/* can use -X for longer */
                 ND_PRINT("+");			/* indicate we truncate */
         }
         ND_PRINT(" ");
-        while (length && sp < ndo->ndo_snapend) {
-                c = GET_U_1(sp);
-                sp++;
-                fn_print_char(ndo, c);
-                length--;
-        }
+        (void)nd_printn(ndo, sp, length, ndo->ndo_snapend);
         ND_PRINT("]");
 }
 
 static void
 print_tcp_fastopen_option(netdissect_options *ndo, const u_char *cp,
-                          u_int datalen, int exp)
+                          u_int datalen)
 {
         u_int i;
-
-        if (exp)
-                ND_PRINT("tfo");
 
         if (datalen == 0) {
                 /* Fast Open Cookie Request */
@@ -884,7 +910,7 @@ print_tcp_fastopen_option(netdissect_options *ndo, const u_char *cp,
 }
 
 #ifdef HAVE_LIBCRYPTO
-USES_APPLE_DEPRECATED_API
+DIAG_OFF_DEPRECATION
 static int
 tcp_verify_signature(netdissect_options *ndo,
                      const struct ip *ip, const struct tcphdr *tp,
@@ -899,7 +925,7 @@ tcp_verify_signature(netdissect_options *ndo,
         uint32_t len32;
         uint8_t nxt;
 
-        if (data + length > ndo->ndo_snapend) {
+        if (!ND_TTEST_LEN(data, length)) {
                 ND_PRINT("snaplen too short, ");
                 return (CANT_CHECK_SIGNATURE);
         }
@@ -964,5 +990,5 @@ tcp_verify_signature(netdissect_options *ndo,
         else
                 return (SIGNATURE_INVALID);
 }
-USES_APPLE_RST
+DIAG_ON_DEPRECATION
 #endif /* HAVE_LIBCRYPTO */

@@ -127,7 +127,7 @@ hsrp_print(netdissect_options *ndo, const u_char *bp, u_int len)
 		 * Authentication Data explicitly, but zero padding can be
 		 * inferred from the "recommended default value".
 		 */
-		(void)nd_print(ndo, hp->hsrp_authdata, hp->hsrp_authdata + HSRP_AUTH_SIZE);
+		nd_printjnp(ndo, hp->hsrp_authdata, HSRP_AUTH_SIZE);
 		ND_PRINT("\"");
 	}
 }

@@ -78,7 +78,9 @@ The Regents of the University of California.  All rights reserved.\n";
 #endif
 /* Capsicum-specific code requires macros from <net/bpf.h>, which will fail
  * to compile if <pcap.h> has already been included; including the headers
- * in the opposite order works fine.
+ * in the opposite order works fine. For the most part anyway, because in
+ * FreeBSD <pcap/pcap.h> declares bpf_dump() instead of <net/bpf.h>. Thus
+ * interface.h takes care of it later to avoid a compiler warning.
  */
 #ifdef HAVE_CAPSICUM
 #include <sys/capsicum.h>
@@ -161,6 +163,8 @@ The Regents of the University of California.  All rights reserved.\n";
 
 #include "print.h"
 
+#include "diag-control.h"
+
 #include "fptype.h"
 
 #ifndef PATH_MAX
@@ -239,34 +243,16 @@ static int infoprint;
 
 char *program_name;
 
-#ifdef HAVE_CASPER
-cap_channel_t *capdns;
-#endif
-
 /* Forwards */
-static NORETURN void error(FORMAT_STRING(const char *), ...) PRINTFLIKE(1, 2);
-static void warning(FORMAT_STRING(const char *), ...) PRINTFLIKE(1, 2);
-static NORETURN void exit_tcpdump(int);
 static void (*setsignal (int sig, void (*func)(int)))(int);
 static void cleanup(int);
 static void child_cleanup(int);
 static void print_version(FILE *);
 static void print_usage(FILE *);
-#ifdef HAVE_PCAP_SET_TSTAMP_TYPE
-static NORETURN void show_tstamp_types_and_exit(pcap_t *, const char *device);
-#endif
-static NORETURN void show_dlts_and_exit(pcap_t *, const char *device);
-#ifdef HAVE_PCAP_FINDALLDEVS
-static NORETURN void show_devices_and_exit(void);
-#endif
-#ifdef HAVE_PCAP_FINDALLDEVS_EX
-static NORETURN void show_remote_devices_and_exit(void);
-#endif
 
 static void print_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void dump_packet_and_trunc(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void dump_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
-static void droproot(const char *, const char *);
 
 #ifdef SIGNAL_REQ_INFO
 static void requestinfo(int);
@@ -373,9 +359,16 @@ extern
 void pcap_set_optimizer_debug(int);
 #endif
 
+static void NORETURN
+exit_tcpdump(const int status)
+{
+	nd_cleanup();
+	exit(status);
+}
+
 /* VARARGS */
-static void
-error(const char *fmt, ...)
+static void NORETURN PRINTFLIKE(1, 2)
+error(FORMAT_STRING(const char *fmt), ...)
 {
 	va_list ap;
 
@@ -393,8 +386,8 @@ error(const char *fmt, ...)
 }
 
 /* VARARGS */
-static void
-warning(const char *fmt, ...)
+static void PRINTFLIKE(1, 2)
+warning(FORMAT_STRING(const char *fmt), ...)
 {
 	va_list ap;
 
@@ -409,15 +402,8 @@ warning(const char *fmt, ...)
 	}
 }
 
-static void
-exit_tcpdump(int status)
-{
-	nd_cleanup();
-	exit(status);
-}
-
 #ifdef HAVE_PCAP_SET_TSTAMP_TYPE
-static void
+static void NORETURN
 show_tstamp_types_and_exit(pcap_t *pc, const char *device)
 {
 	int n_tstamp_types;
@@ -434,15 +420,15 @@ show_tstamp_types_and_exit(pcap_t *pc, const char *device)
 		    device);
 		exit_tcpdump(S_SUCCESS);
 	}
-	fprintf(stderr, "Time stamp types for %s (use option -j to set):\n",
+	fprintf(stdout, "Time stamp types for %s (use option -j to set):\n",
 	    device);
 	for (i = 0; i < n_tstamp_types; i++) {
 		tstamp_type_name = pcap_tstamp_type_val_to_name(tstamp_types[i]);
 		if (tstamp_type_name != NULL) {
-			(void) fprintf(stderr, "  %s (%s)\n", tstamp_type_name,
+			(void) fprintf(stdout, "  %s (%s)\n", tstamp_type_name,
 			    pcap_tstamp_type_val_to_description(tstamp_types[i]));
 		} else {
-			(void) fprintf(stderr, "  %d\n", tstamp_types[i]);
+			(void) fprintf(stdout, "  %d\n", tstamp_types[i]);
 		}
 	}
 	pcap_free_tstamp_types(tstamp_types);
@@ -450,7 +436,7 @@ show_tstamp_types_and_exit(pcap_t *pc, const char *device)
 }
 #endif
 
-static void
+static void NORETURN
 show_dlts_and_exit(pcap_t *pc, const char *device)
 {
 	int n_dlts, i;
@@ -471,28 +457,30 @@ show_dlts_and_exit(pcap_t *pc, const char *device)
 	 * monitor mode might be different from the ones available when
 	 * not in monitor mode).
 	 */
+	(void) fprintf(stdout, "Data link types for ");
 	if (supports_monitor_mode)
-		(void) fprintf(stderr, "Data link types for %s %s (use option -y to set):\n",
+		(void) fprintf(stdout, "%s %s",
 		    device,
 		    Iflag ? "when in monitor mode" : "when not in monitor mode");
 	else
-		(void) fprintf(stderr, "Data link types for %s (use option -y to set):\n",
+		(void) fprintf(stdout, "%s",
 		    device);
+	(void) fprintf(stdout, " (use option -y to set):\n");
 
 	for (i = 0; i < n_dlts; i++) {
 		dlt_name = pcap_datalink_val_to_name(dlts[i]);
 		if (dlt_name != NULL) {
-			(void) fprintf(stderr, "  %s (%s)", dlt_name,
+			(void) fprintf(stdout, "  %s (%s)", dlt_name,
 			    pcap_datalink_val_to_description(dlts[i]));
 
 			/*
 			 * OK, does tcpdump handle that type?
 			 */
 			if (!has_printer(dlts[i]))
-				(void) fprintf(stderr, " (printing not supported)");
-			fprintf(stderr, "\n");
+				(void) fprintf(stdout, " (printing not supported)");
+			fprintf(stdout, "\n");
 		} else {
-			(void) fprintf(stderr, "  DLT %d (printing not supported)\n",
+			(void) fprintf(stdout, "  DLT %d (printing not supported)\n",
 			    dlts[i]);
 		}
 	}
@@ -503,7 +491,7 @@ show_dlts_and_exit(pcap_t *pc, const char *device)
 }
 
 #ifdef HAVE_PCAP_FINDALLDEVS
-static void
+static void NORETURN
 show_devices_and_exit(void)
 {
 	pcap_if_t *dev, *devlist;
@@ -568,7 +556,7 @@ show_devices_and_exit(void)
 #endif /* HAVE_PCAP_FINDALLDEVS */
 
 #ifdef HAVE_PCAP_FINDALLDEVS_EX
-static void
+static void NORETURN
 show_remote_devices_and_exit(void)
 {
 	pcap_if_t *dev, *devlist;
@@ -808,7 +796,7 @@ droproot(const char *username, const char *chroot_dir)
 		error("Couldn't find user '%.32s'", username);
 #ifdef HAVE_LIBCAP_NG
 	/* We don't need CAP_SETUID, CAP_SETGID and CAP_SYS_CHROOT any more. */
-DIAG_OFF_CLANG(assign-enum)
+DIAG_OFF_ASSIGN_ENUM
 	capng_updatev(
 		CAPNG_DROP,
 		CAPNG_EFFECTIVE | CAPNG_PERMITTED,
@@ -816,7 +804,7 @@ DIAG_OFF_CLANG(assign-enum)
 		CAP_SETGID,
 		CAP_SYS_CHROOT,
 		-1);
-DIAG_ON_CLANG(assign-enum)
+DIAG_ON_ASSIGN_ENUM
 	capng_apply(CAPNG_SELECT_BOTH);
 #endif /* HAVE_LIBCAP_NG */
 
@@ -843,7 +831,7 @@ MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
 {
         char *filename = malloc(PATH_MAX + 1);
         if (filename == NULL)
-            error("Makefilename: malloc");
+            error("%s: malloc", __func__);
 
         /* Process with strftime if Gflag is set. */
         if (Gflag != 0) {
@@ -851,7 +839,7 @@ MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
 
           /* Convert Gflag_time to a usable format */
           if ((local_tm = localtime(&Gflag_time)) == NULL) {
-                  error("MakeTimedFilename: localtime");
+                  error("%s: localtime", __func__);
           }
 
           /* There's no good way to detect an error in strftime since a return
@@ -1037,7 +1025,7 @@ copy_argv(char **argv)
 
 	buf = (char *)malloc(len);
 	if (buf == NULL)
-		error("copy_argv: malloc");
+		error("%s: malloc", __func__);
 
 	p = argv;
 	dst = buf;
@@ -1497,6 +1485,7 @@ main(int argc, char **argv)
 	int yflag_dlt = -1;
 	const char *yflag_dlt_name = NULL;
 	int print = 0;
+	long Cflagmult;
 
 	netdissect_options Ndo;
 	netdissect_options *ndo = &Ndo;
@@ -1578,19 +1567,77 @@ main(int argc, char **argv)
 #else
 			Cflag = strtol(optarg, &endp, 10);
 #endif
-			if (endp == optarg || *endp != '\0' || errno != 0
-			    || Cflag <= 0)
+			if (endp == optarg || errno != 0 || Cflag <= 0)
 				error("invalid file size %s", optarg);
+
+			if (*endp == '\0') {
+				/*
+				 * There's nothing after the file size,
+				 * so the size is in units of 1 MB
+				 * (1,000,000 bytes).
+				 */
+				Cflagmult = 1000000;
+			} else {
+				/*
+				 * There's something after the file
+				 * size.
+				 *
+				 * If it's a single letter, then:
+				 *
+				 *   if the letter is k or K, the size
+				 *   is in units of 1 KiB (1024 bytes);
+				 *
+				 *   if the letter is m or M, the size
+				 *   is in units of 1 MiB (1,048,576 bytes);
+				 *
+				 *   if the letter is g or G, the size
+				 *   is in units of 1 GiB (1,073,741,824 bytes).
+				 *
+				 * Otherwise, it's an error.
+				 */
+				switch (*endp) {
+
+				case 'k':
+				case 'K':
+					Cflagmult = 1024;
+					break;
+
+				case 'm':
+				case 'M':
+					Cflagmult = 1024*1024;
+					break;
+
+				case 'g':
+				case 'G':
+					Cflagmult = 1024*1024*1024;
+					break;
+
+				default:
+					error("invalid file size %s", optarg);
+				}
+
+				/*
+				 * OK, there was a letter that we treat
+				 * as a units indication; was there
+				 * anything after it?
+				 */
+				endp++;
+				if (*endp != '\0') {
+					/* Yes - error */
+					error("invalid file size %s", optarg);
+				}
+			}
+
 			/*
-			 * Will multiplying it by 1000000 overflow?
+			 * Will multiplying it by multiplier overflow?
 			 */
 #ifdef HAVE_PCAP_DUMP_FTELL64
-			if (Cflag > INT64_T_CONSTANT(0x7fffffffffffffff) / 1000000)
+			if (Cflag > INT64_T_CONSTANT(0x7fffffffffffffff) / Cflagmult)
 #else
-			if (Cflag > LONG_MAX / 1000000)
+			if (Cflag > LONG_MAX / Cflagmult)
 #endif
 				error("file size %s is too large", optarg);
-			Cflag *= 1000000;
+			Cflag *= Cflagmult;
 			break;
 
 		case 'd':
@@ -1642,8 +1689,8 @@ main(int argc, char **argv)
 
 			/* Grab the current time for rotation use. */
 			if ((Gflag_time = time(NULL)) == (time_t)-1) {
-				error("main: can't get current time: %s",
-				    pcap_strerror(errno));
+				error("%s: can't get current time: %s",
+				    __func__, pcap_strerror(errno));
 			}
 			break;
 
@@ -2295,33 +2342,33 @@ main(int argc, char **argv)
 		/* Initialize capng */
 		capng_clear(CAPNG_SELECT_BOTH);
 		if (username) {
-DIAG_OFF_CLANG(assign-enum)
+DIAG_OFF_ASSIGN_ENUM
 			capng_updatev(
 				CAPNG_ADD,
 				CAPNG_PERMITTED | CAPNG_EFFECTIVE,
 				CAP_SETUID,
 				CAP_SETGID,
 				-1);
-DIAG_ON_CLANG(assign-enum)
+DIAG_ON_ASSIGN_ENUM
 		}
 		if (chroot_dir) {
-DIAG_OFF_CLANG(assign-enum)
+DIAG_OFF_ASSIGN_ENUM
 			capng_update(
 				CAPNG_ADD,
 				CAPNG_PERMITTED | CAPNG_EFFECTIVE,
 				CAP_SYS_CHROOT
 				);
-DIAG_ON_CLANG(assign-enum)
+DIAG_ON_ASSIGN_ENUM
 		}
 
 		if (WFileName) {
-DIAG_OFF_CLANG(assign-enum)
+DIAG_OFF_ASSIGN_ENUM
 			capng_update(
 				CAPNG_ADD,
 				CAPNG_PERMITTED | CAPNG_EFFECTIVE,
 				CAP_DAC_OVERRIDE
 				);
-DIAG_ON_CLANG(assign-enum)
+DIAG_ON_ASSIGN_ENUM
 		}
 		capng_apply(CAPNG_SELECT_BOTH);
 #endif /* HAVE_LIBCAP_NG */
@@ -2387,17 +2434,44 @@ DIAG_ON_CLANG(assign-enum)
 #endif
 		if (Cflag != 0 || Gflag != 0) {
 #ifdef HAVE_CAPSICUM
-			dumpinfo.WFileName = strdup(basename(WFileName));
+			/*
+			 * basename() and dirname() may modify their input buffer
+			 * and they do since FreeBSD 12.0, but they didn't before.
+			 * Hence use the return value only, but always assume the
+			 * input buffer has been modified and would need to be
+			 * reset before the next use.
+			 */
+			char *WFileName_copy;
+
+			if ((WFileName_copy = strdup(WFileName)) == NULL) {
+				error("Unable to allocate memory for file %s",
+				    WFileName);
+			}
+			DIAG_OFF_C11_EXTENSIONS
+			dumpinfo.WFileName = strdup(basename(WFileName_copy));
+			DIAG_ON_C11_EXTENSIONS
 			if (dumpinfo.WFileName == NULL) {
 				error("Unable to allocate memory for file %s",
 				    WFileName);
 			}
-			dumpinfo.dirfd = open(dirname(WFileName),
+			free(WFileName_copy);
+
+			if ((WFileName_copy = strdup(WFileName)) == NULL) {
+				error("Unable to allocate memory for file %s",
+				    WFileName);
+			}
+			DIAG_OFF_C11_EXTENSIONS
+			char *WFileName_dirname = dirname(WFileName_copy);
+			DIAG_ON_C11_EXTENSIONS
+			dumpinfo.dirfd = open(WFileName_dirname,
 			    O_DIRECTORY | O_RDONLY);
 			if (dumpinfo.dirfd < 0) {
 				error("unable to open directory %s",
-				    dirname(WFileName));
+				    WFileName_dirname);
 			}
+			free(WFileName_dirname);
+			free(WFileName_copy);
+
 			cap_rights_init(&rights, CAP_CREATE, CAP_FCNTL,
 			    CAP_FTRUNCATE, CAP_LOOKUP, CAP_SEEK, CAP_WRITE);
 			if (cap_rights_limit(dumpinfo.dirfd, &rights) < 0 &&
@@ -2641,7 +2715,7 @@ DIAG_ON_CLANG(assign-enum)
 	while (ret != NULL);
 
 	if (count_mode && RFileName != NULL)
-		fprintf(stderr, "%u packet%s\n", packets_captured,
+		fprintf(stdout, "%u packet%s\n", packets_captured,
 			PLURAL_SUFFIX(packets_captured));
 
 	free(cmdbuf);
@@ -2854,8 +2928,8 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 
 		/* Get the current time */
 		if ((t = time(NULL)) == (time_t)-1) {
-			error("dump_and_trunc_packet: can't get current_time: %s",
-			    pcap_strerror(errno));
+			error("%s: can't get current_time: %s",
+			    __func__, pcap_strerror(errno));
 		}
 
 
@@ -2996,7 +3070,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 				free(dump_info->CurrentFileName);
 			dump_info->CurrentFileName = (char *)malloc(PATH_MAX + 1);
 			if (dump_info->CurrentFileName == NULL)
-				error("dump_packet_and_trunc: malloc");
+				error("%s: malloc", __func__);
 			MakeFilename(dump_info->CurrentFileName, dump_info->WFileName, Cflag_count, WflagChars);
 #ifdef HAVE_LIBCAP_NG
 			capng_update(CAPNG_ADD, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
@@ -3132,7 +3206,7 @@ static void verbose_stats_dump(int sig _U_)
 }
 #endif /* _WIN32 */
 
-USES_APPLE_DEPRECATED_API
+DIAG_OFF_DEPRECATION
 static void
 print_version(FILE *f)
 {
@@ -3170,7 +3244,7 @@ print_version(FILE *f)
 #  endif
 #endif /* __SANITIZE_ADDRESS__ or __has_feature */
 }
-USES_APPLE_RST
+DIAG_ON_DEPRECATION
 
 static void
 print_usage(FILE *f)

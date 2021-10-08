@@ -31,6 +31,7 @@
 
 #include "netdissect-ctype.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 
@@ -97,18 +98,13 @@ u_int
 pppoe_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	uint16_t pppoe_ver, pppoe_type, pppoe_code, pppoe_sessionid;
-	u_int pppoe_length, caplen;
+	u_int pppoe_length;
 	const u_char *pppoe_packet, *pppoe_payload;
 
 	ndo->ndo_protocol = "pppoe";
-	caplen = ndo->ndo_snapend - bp;
-	if (caplen < PPPOE_HDRLEN) {
-		nd_print_trunc(ndo);
-		return caplen;
-	}
 	if (length < PPPOE_HDRLEN) {
-		nd_print_trunc(ndo);
-		return length;
+		ND_PRINT(" (length %u < %u)", length, PPPOE_HDRLEN);
+		goto invalid;
 	}
 	length -= PPPOE_HDRLEN;
 	pppoe_packet = bp;
@@ -202,8 +198,9 @@ pppoe_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		ND_PRINT(" ");
 		return (PPPOE_HDRLEN + ppp_print(ndo, pppoe_payload, pppoe_length));
 	}
+	/* NOTREACHED */
 
-trunc:
-	nd_print_trunc(ndo);
-	return PPPOE_HDRLEN;
+invalid:
+	nd_print_invalid(ndo);
+	return 0;
 }

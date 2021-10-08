@@ -93,10 +93,10 @@ someip_print(netdissect_options *ndo, const u_char *bp, const u_int len)
     uint8_t return_code;
 
     ndo->ndo_protocol = "someip";
+    nd_print_protocol_caps(ndo);
 
     if (len < 16) {
-        nd_print_trunc(ndo);
-        return;
+        goto invalid;
     }
 
     message_id = GET_BE_U_4(bp);
@@ -104,32 +104,39 @@ someip_print(netdissect_options *ndo, const u_char *bp, const u_int len)
     event_flag = (message_id & 0x00008000) >> 15;
     method_or_event_id = message_id & 0x00007FFF;
     bp += 4;
+    ND_PRINT(", service %u, %s %u",
+             service_id, event_flag ? "event" : "method", method_or_event_id);
 
     message_len = GET_BE_U_4(bp);
     bp += 4;
+    ND_PRINT(", len %u", message_len);
 
     request_id = GET_BE_U_4(bp);
     client_id = request_id >> 16;
     session_id = request_id & 0x0000FFFF;
     bp += 4;
+    ND_PRINT(", client %u, session %u", client_id, session_id);
 
     protocol_version = GET_U_1(bp);
     bp += 1;
+    ND_PRINT(", pver %u", protocol_version);
 
     interface_version = GET_U_1(bp);
     bp += 1;
+    ND_PRINT(", iver %u", interface_version);
 
     message_type = GET_U_1(bp);
     bp += 1;
+    ND_PRINT(", msgtype %s",
+             tok2str(message_type_values, "Unknown", message_type));
 
     return_code = GET_U_1(bp);
     bp += 1;
-
-    ND_PRINT("SOMEIP, service %u, %s %u, len %u, client %u, session %u, "
-	     "pver %u, iver %u, msgtype %s, retcode %s\n",
-	     service_id, event_flag ? "event" : "method", method_or_event_id,
-	     message_len, client_id, session_id, protocol_version,
-	     interface_version,
-	     tok2str(message_type_values, "Unknown", message_type),
+    ND_PRINT(", retcode %s\n",
 	     tok2str(return_code_values, "Unknown", return_code));
+
+    return;
+
+invalid:
+    nd_print_invalid(ndo);
 }

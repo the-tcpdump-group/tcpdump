@@ -24,7 +24,6 @@
 #include "netdissect-stdinc.h"
 
 #include "netdissect.h"
-#include "extract.h"
 
 static const char *sipcmds[] = {
 	"ACK",

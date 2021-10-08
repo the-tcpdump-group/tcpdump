@@ -78,6 +78,9 @@
 /* Define to 1 if you have the <net/pfvar.h> header file. */
 #undef HAVE_NET_PFVAR_H
 
+/* Define to 1 if printf(3) does not support the z length modifier. */
+#undef HAVE_NO_PRINTF_Z
+
 /* Define to 1 if you have the `openat' function. */
 #undef HAVE_OPENAT
 
@@ -248,6 +251,9 @@
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
+
+/* The size of `void *', as computed by sizeof. */
+#undef SIZEOF_VOID_P
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS

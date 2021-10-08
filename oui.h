@@ -40,6 +40,9 @@ extern const struct tok smi_values[];
 #define OUI_ONLAB             0xa42305  /* Open Networking Lab */
 #define OUI_FREESCALE         0x00049f  /* Freescale */
 #define OUI_NETRONOME         0x0015ad  /* Netronome */
+#define OUI_BROADCOM          0x001018  /* Broadcom */
+#define OUI_PMC_SIERRA        0x00e004  /* PMC-Sierra */
+#define OUI_ERICSSON          0xd0f0db  /* Ericsson */
 
 /*
  * These are SMI Network Management Private Enterprise Codes for

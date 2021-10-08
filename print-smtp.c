@@ -19,11 +19,7 @@
 
 #include "netdissect-stdinc.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "netdissect.h"
-#include "extract.h"
 
 void
 smtp_print(netdissect_options *ndo, const u_char *pptr, u_int len)

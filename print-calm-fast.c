@@ -23,6 +23,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
@@ -40,29 +41,31 @@
 void
 calm_fast_print(netdissect_options *ndo, const u_char *bp, u_int length, const struct lladdr_info *src)
 {
-	u_int srcNwref;
-	u_int dstNwref;
-
 	ndo->ndo_protocol = "calm_fast";
-	ND_TCHECK_2(bp);
-	if (length < 2)
-		goto trunc;
-	srcNwref = GET_U_1(bp);
-	dstNwref = GET_U_1(bp + 1);
-	length -= 2;
-	bp += 2;
 
 	ND_PRINT("CALM FAST");
 	if (src != NULL)
 		ND_PRINT(" src:%s", (src->addr_string)(ndo, src->addr));
 	ND_PRINT("; ");
-	ND_PRINT("SrcNwref:%u; ", srcNwref);
-	ND_PRINT("DstNwref:%u; ", dstNwref);
+
+	if (length < 2) {
+		ND_PRINT(" (length %u < 2)", length);
+		goto invalid;
+	}
+
+	ND_PRINT("SrcNwref:%u; ", GET_U_1(bp));
+	length -= 1;
+	bp += 1;
+
+	ND_PRINT("DstNwref:%u; ", GET_U_1(bp));
+	length -= 1;
+	bp += 1;
 
 	if (ndo->ndo_vflag)
 		ND_DEFAULTPRINT(bp, length);
 	return;
 
-trunc:
-	nd_print_trunc(ndo);
+invalid:
+	nd_print_invalid(ndo);
+	ND_TCHECK_LEN(bp, length);
 }

@@ -211,36 +211,6 @@ AC_DEFUN(AC_LBL_C_INIT,
 ])
 
 dnl
-dnl Check whether, if you pass an unknown warning option to the
-dnl compiler, it fails or just prints a warning message and succeeds.
-dnl Set ac_lbl_unknown_warning_option_error to the appropriate flag
-dnl to force an error if it would otherwise just print a warning message
-dnl and succeed.
-dnl
-AC_DEFUN(AC_LBL_CHECK_UNKNOWN_WARNING_OPTION_ERROR,
-    [
-	AC_MSG_CHECKING([whether the compiler fails when given an unknown warning option])
-	save_CFLAGS="$CFLAGS"
-	CFLAGS="$CFLAGS -Wxyzzy-this-will-never-succeed-xyzzy"
-	AC_TRY_COMPILE(
-	    [],
-	    [return 0],
-	    [
-		AC_MSG_RESULT([no])
-		#
-		# We're assuming this is clang, where
-		# -Werror=unknown-warning-option is the appropriate
-		# option to force the compiler to fail.
-		#
-		ac_lbl_unknown_warning_option_error="-Werror=unknown-warning-option"
-	    ],
-	    [
-		AC_MSG_RESULT([yes])
-	    ])
-	CFLAGS="$save_CFLAGS"
-    ])
-
-dnl
 dnl Check whether the compiler option specified as the second argument
 dnl is supported by the compiler and, if so, add it to the macro
 dnl specified as the first argument
@@ -249,21 +219,35 @@ AC_DEFUN(AC_LBL_CHECK_COMPILER_OPT,
     [
 	AC_MSG_CHECKING([whether the compiler supports the $2 option])
 	save_CFLAGS="$CFLAGS"
-	if expr "x$2" : "x-W.*" >/dev/null
-	then
-	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error $2"
-	elif expr "x$2" : "x-f.*" >/dev/null
-	then
-	    CFLAGS="$CFLAGS -Werror $2"
-	elif expr "x$2" : "x-m.*" >/dev/null
-	then
-	    CFLAGS="$CFLAGS -Werror $2"
-	else
-	    CFLAGS="$CFLAGS $2"
-	fi
-	AC_TRY_COMPILE(
-	    [],
-	    [return 0],
+	CFLAGS="$CFLAGS $2"
+	#
+	# XXX - yes, this depends on the way AC_LANG_WERROR works,
+	# but no mechanism is provided to turn AC_LANG_WERROR on
+	# *and then turn it back off*, so that we *only* do it when
+	# testing compiler options - 15 years after somebody asked
+	# for it:
+	#
+	#     https://autoconf.gnu.narkive.com/gTAVmfKD/how-to-cancel-flags-set-by-ac-lang-werror
+	#
+	save_ac_c_werror_flag="$ac_c_werror_flag"
+	ac_c_werror_flag=yes
+	#
+	# We use AC_LANG_SOURCE() so that we can control the complete
+	# content of the program being compiled.  We do not, for example,
+	# want the default "int main()" that AC_LANG_PROGRAM() generates,
+	# as it will generate a warning with -Wold-style-definition, meaning
+	# that we would treat it as not working, as the test will fail if
+	# *any* error output, including a warning due to the flag we're
+	# testing, is generated; see
+	#
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
+	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
+	#
+	# This may, as per those two messages, be fixed in autoonf 2.70,
+	# but we only require 2.64 or newer for now.
+	#
+	AC_COMPILE_IFELSE(
+	    [AC_LANG_SOURCE([[int main(void) { return 0; }]])],
 	    [
 		AC_MSG_RESULT([yes])
 		CFLAGS="$save_CFLAGS"
@@ -273,6 +257,7 @@ AC_DEFUN(AC_LBL_CHECK_COMPILER_OPT,
 		AC_MSG_RESULT([no])
 		CFLAGS="$save_CFLAGS"
 	    ])
+	ac_c_werror_flag="$save_ac_c_werror_flag"
     ])
 
 dnl
@@ -495,9 +480,9 @@ AC_DEFUN(AC_LBL_LIBPCAP,
         AC_MSG_CHECKING(for local pcap library)
         lastdir=FAIL
         places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
-            egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT)?$'`
+            egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT|rc.)?$'`
         places2=`ls .. | sed -e 's,/$,,' -e "s,^,../," | \
-            egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT)?$'`
+            egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT|rc.)?$'`
         for dir in $places $srcdir/../libpcap ../libpcap $srcdir/libpcap $places2 ; do
             basedir=`echo $dir | sed -e 's/[[ab]][[0-9]]*$//' | \
                 sed -e 's/-PRE-GIT$//' `
@@ -590,6 +575,66 @@ AC_DEFUN(AC_LBL_LIBPCAP,
                 # Found - use it to get the include flags for
                 # libpcap and the flags to link with libpcap.
                 #
+                # If this is a vendor-supplied pcap-config, which
+                # we define as being "a pcap-config in /usr/bin
+                # or /usr/ccs/bin" (the latter is for Solaris and
+                # Sun/Oracle Studio), there are some issues.  Work
+                # around them.
+                #
+                if test \( "$PCAP_CONFIG" = "/usr/bin/pcap-config" \) -o \
+                        \( "$PCAP_CONFIG" = "/usr/ccs/bin/pcap-config" \) ; then
+                    #
+                    # It's vendor-supplied.
+                    #
+                    case "$host_os" in
+
+                    darwin*)
+                        #
+                        # This is macOS or another Darwin-based OS.
+                        #
+                        # That means that /usr/bin/pcap-config it
+                        # may provide -I/usr/local/include with --cflags
+                        # and -L/usr/local/lib with --libs, rather than
+                        # pointing to the OS-supplied library and
+                        # Xcode-supplied headers.  Remember that, so we
+                        # ignore those values.
+                        #
+                        _broken_apple_pcap_config=yes
+                        ;;
+
+                    solaris*)
+                        #
+                        # This is Solaris 2 or later, i.e. SunOS 5.x.
+                        #
+                        # At least on Solaris 11; there's /usr/bin/pcap-config,
+                        # which reports -L/usr/lib with --libs, causing
+                        # the 32-bit libraries to be found, and there's
+                        # /usr/bin/{64bitarch}/pcap-config, where {64bitarch}
+                        # is a name for the 64-bit version of the instruction
+                        # set, which reports -L /usr/lib/{64bitarch}, causing
+                        # the 64-bit libraries to be found.
+                        #
+                        # So if we're building 64-bit targets, we replace
+                        # PCAP_CONFIG with /usr/bin/{64bitarch}; we get
+                        # {64bitarch} as the output of "isainfo -n".
+                        #
+                        # Are we building 32-bit or 64-bit?  Get the
+                        # size of void *, and check that.
+                        #
+                        AC_CHECK_SIZEOF([void *])
+                        if test ac_cv_sizeof_void_p -eq 8 ; then
+                            isainfo_output=`isainfo -n`
+                            if test ! -z "$isainfo_output" ; then
+                                #
+                                # Success - change PCAP_CONFIG.
+                                #
+                                PCAP_CONFIG=`echo $PCAP_CONFIG | sed "s;/bin/;/bin/$isainfo_output/;"`
+                            fi
+                        fi
+                        ;;
+                    esac
+                fi
+                #
                 # Please read section 11.6 "Shell Substitutions"
                 # in the autoconf manual before doing anything
                 # to this that involves quoting.  Especially note
@@ -598,8 +643,30 @@ AC_DEFUN(AC_LBL_LIBPCAP,
                 # expressions (pfew!)."
                 #
                 cflags=`"$PCAP_CONFIG" --cflags`
+                #
+                # Work around macOS (and probably other Darwin) brokenness,
+                # by not adding /usr/local/include if it's from the broken
+                # Apple pcap-config.
+                #
+                if test "$_broken_apple_pcap_config" = "yes" ; then
+                    #
+                    # Strip -I/usr/local/include with sed.
+                    #
+                    cflags=`echo $cflags | sed 's;-I/usr/local/include;;'`
+                fi
                 $2="$cflags $$2"
                 libpcap=`"$PCAP_CONFIG" --libs`
+                #
+                # Work around macOS (and probably other Darwin) brokenness,
+                # by not adding /usr/local/lib if it's from the broken
+                # Apple pcap-config.
+                #
+                if test "$_broken_apple_pcap_config" = "yes" ; then
+                    #
+                    # Strip -L/usr/local/lib with sed.
+                    #
+                    libpcap=`echo $libpcap | sed 's;-L/usr/local/lib;;'`
+                fi
             else
                 #
                 # Not found; look for an installed pcap.
@@ -922,7 +989,6 @@ AC_DEFUN(AC_LBL_DEVEL,
 	    # Skip all the warning option stuff on some compilers.
 	    #
 	    if test "$ac_lbl_cc_dont_try_gcc_dashW" != yes; then
-		    AC_LBL_CHECK_UNKNOWN_WARNING_OPTION_ERROR()
 		    AC_LBL_CHECK_COMPILER_OPT($1, -W)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wall)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wassign-enum)

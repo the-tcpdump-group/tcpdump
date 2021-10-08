@@ -259,11 +259,11 @@ LIBNETDISSECT_OBJ=$(LIBNETDISSECT_SRC:.c=.o) ${LOCALSRC:.c=.o} ${LIBOBJS}
 LIBNETDISSECT=libnetdissect.a
 
 
-SRC =	$(CSRC) $(GENSRC) $(LOCALSRC)
+SRC =	$(CSRC) $(LOCALSRC)
 
 # We would like to say "OBJ = $(SRC:.c=.o)" but Ultrix's make cannot
 # hack the extra indirection
-OBJ =	$(CSRC:.c=.o) $(GENSRC:.c=.o)
+OBJ =	$(CSRC:.c=.o)
 HDR = \
 	addrtoname.h \
 	addrtostr.h \
@@ -275,9 +275,11 @@ HDR = \
 	chdlc.h \
 	compiler-tests.h \
 	cpack.h \
+	diag-control.h \
 	ethertype.h \
 	extract.h \
 	fptype.h \
+	ftmacros.h \
 	funcattrs.h \
 	getservent.h \
 	gmpls.h \
@@ -324,7 +326,7 @@ TAGHDR = \
 TAGFILES = $(SRC) $(HDR) $(TAGHDR) $(LIBNETDISSECT_SRC) \
 	print-pflog.c print-smb.c smbutil.c
 
-CLEANFILES = $(PROG) $(OBJ) $(GENSRC) $(LIBNETDISSECT_OBJ)
+CLEANFILES = $(PROG) $(OBJ) $(LIBNETDISSECT_OBJ)
 
 EXTRA_DIST = \
 	CHANGES \
@@ -335,10 +337,7 @@ EXTRA_DIST = \
 	LICENSE \
 	Makefile.in \
 	Makefile-devel-adds \
-	PLATFORMS \
-	README \
 	README.md \
-	Readme.Win32 \
 	VERSION \
 	aclocal.m4 \
 	atime.awk \
@@ -427,15 +426,16 @@ install: all
 
 uninstall:
 	rm -f $(DESTDIR)$(bindir)/$(PROG)
+	rm -f $(DESTDIR)$(bindir)/$(PROG).`cat ${srcdir}/VERSION`
 	rm -f $(DESTDIR)$(mandir)/man1/$(PROG).1
 
-lint: $(GENSRC)
+lint:
 	lint -hbxn $(SRC) $(LIBNETDISSECT_SRC) | \
 	    grep -v 'struct/union .* never defined' | \
 	    grep -v 'possible pointer alignment problem'
 
 clean:
-	rm -f $(CLEANFILES) $(PROG)-`cat VERSION`.tar.gz
+	rm -f $(CLEANFILES) $(PROG)-`cat ${srcdir}/VERSION`.tar.gz
 
 distclean:
 	rm -f $(CLEANFILES) Makefile config.cache config.log config.status \
@@ -457,14 +457,24 @@ TAGS: $(TAGFILES)
 	etags $(TAGFILES)
 
 releasetar:
-	@name=$(PROG)-`cat VERSION` ; \
-	   mkdir $$name; \
-	   tar cf - $(CSRC) $(HDR) $(LIBNETDISSECT_SRC) $(EXTRA_DIST) $(TEST_DIST) | (cd $$name; tar xf -); \
-	   tar -c -z -f $$name.tar.gz $$name; \
+	@autoreconf -f && \
+	name=$(PROG)-`cat VERSION` && \
+	   mkdir $$name && \
+	   tar cf - $(CSRC) $(HDR) $(LIBNETDISSECT_SRC) $(EXTRA_DIST) $(TEST_DIST) | (cd $$name; tar xf -) && \
+	   tar cf - $$name | gzip >$$name.tar.gz && \
 	   rm -rf $$name
+
+rc1 rc2 rc3 rc4 rc5:
+	@VER=`cat $(srcdir)/VERSION`; \
+	sed -i "s/$$VER/$${VER}$@/" VERSION ; \
+	make releasetar; \
+	git checkout VERSION configure
 
 testlist:
 	echo $(TEST_DIST)
 
-depend: $(GENSRC)
+depend:
 	$(MKDEP) -c "$(CC)" -m "$(DEPENDENCY_CFLAG)" -s "$(srcdir)" $(DEFS) $(INCLS) $(SRC) $(LIBNETDISSECT_SRC)
+
+shellcheck:
+	shellcheck -f gcc build.sh build_matrix.sh build_common.sh

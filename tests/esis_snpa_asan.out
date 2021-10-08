@@ -9,4 +9,4 @@
 	  SNPA (length: 0): <empty>, bad opts/li
     3  12:03:12.1048576 Q.922, hdr-len 2, DLCI 0, Flags [DE, FECN], NLPID unknown (0x22), length 72482: 
 	0x0000:  0082 1000 5542 5343 70a1 0200 0400 0000  ....UBSCp.......
-	0x0010:  007e                                     .~
+	0x0010:  007e                                     .~ [|fr]

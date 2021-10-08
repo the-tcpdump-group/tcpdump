@@ -27,8 +27,7 @@
 
 #include "netdissect-stdinc.h"
 
-#include <string.h>
-
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "ethertype.h"
@@ -266,11 +265,7 @@ atmarp_print(netdissect_options *ndo,
 	pro = ATMPRO(ap);
 	op = ATMOP(ap);
 
-	if (!ND_TTEST_LEN(aar_tpa(ap), ATMTPROTO_LEN(ap))) {
-		nd_print_trunc(ndo);
-		ND_DEFAULTPRINT((const u_char *)ap, length);
-		return;
-	}
+	ND_TCHECK_LEN(ATMTPA(ap), ATMTPROTO_LEN(ap));
 
         if (!ndo->ndo_eflag) {
             ND_PRINT("ARP, ");
@@ -347,10 +342,6 @@ atmarp_print(netdissect_options *ndo,
 
  out:
         ND_PRINT(", length %u", length);
-        return;
-
-trunc:
-	nd_print_trunc(ndo);
 }
 
 void
@@ -386,11 +377,7 @@ arp_print(netdissect_options *ndo,
             break;
 	}
 
-	if (!ND_TTEST_LEN(TPA(ap), PROTO_LEN(ap))) {
-		nd_print_trunc(ndo);
-		ND_DEFAULTPRINT((const u_char *)ap, length);
-		return;
-	}
+	ND_TCHECK_LEN(TPA(ap), PROTO_LEN(ap));
 
         if (!ndo->ndo_eflag) {
             ND_PRINT("ARP, ");
@@ -437,8 +424,16 @@ arp_print(netdissect_options *ndo,
 		break;
 
 	case ARPOP_REVREQUEST:
-		ND_PRINT("who-is %s tell %s",
-			  GET_LINKADDR_STRING(THA(ap), linkaddr, HRD_LEN(ap)),
+		/*
+		 * XXX - GET_LINKADDR_STRING() may return a pointer to
+		 * a static buffer, so we only have one call to it per
+		 * ND_PRINT() call.
+		 *
+		 * This should be done in a cleaner fashion.
+		 */
+		ND_PRINT("who-is %s",
+			  GET_LINKADDR_STRING(THA(ap), linkaddr, HRD_LEN(ap)));
+		ND_PRINT(" tell %s",
 			  GET_LINKADDR_STRING(SHA(ap), linkaddr, HRD_LEN(ap)));
 		break;
 
@@ -449,8 +444,16 @@ arp_print(netdissect_options *ndo,
 		break;
 
 	case ARPOP_INVREQUEST:
-		ND_PRINT("who-is %s tell %s",
-			  GET_LINKADDR_STRING(THA(ap), linkaddr, HRD_LEN(ap)),
+		/*
+		 * XXX - GET_LINKADDR_STRING() may return a pointer to
+		 * a static buffer, so we only have one call to it per
+		 * ND_PRINT() call.
+		 *
+		 * This should be done in a cleaner fashion.
+		 */
+		ND_PRINT("who-is %s",
+			  GET_LINKADDR_STRING(THA(ap), linkaddr, HRD_LEN(ap)));
+		ND_PRINT(" tell %s",
 			  GET_LINKADDR_STRING(SHA(ap), linkaddr, HRD_LEN(ap)));
 		break;
 
@@ -467,8 +470,4 @@ arp_print(netdissect_options *ndo,
 
  out:
         ND_PRINT(", length %u", length);
-
-	return;
-trunc:
-	nd_print_trunc(ndo);
 }

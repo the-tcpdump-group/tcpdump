@@ -3,7 +3,7 @@
  * protocol 0x04). It is based on the implementation conventions explained in
  * print-openflow-1.0.c.
  *
- * [OF13] https://www.opennetworking.org/wp-content/uploads/2014/10/openflow-switch-v1.3.4.pdf
+ * [OF13] https://www.opennetworking.org/wp-content/uploads/2014/10/openflow-switch-v1.3.5.pdf
  *
  * Copyright (c) 2020 The TCPDUMP project
  * All rights reserved.
@@ -42,6 +42,7 @@
 #define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
+#include "addrtoname.h"
 #include "openflow.h"
 
 #define OFPT_HELLO                     0U
@@ -74,39 +75,7 @@
 #define OFPT_GET_ASYNC_REPLY          27U
 #define OFPT_SET_ASYNC                28U
 #define OFPT_METER_MOD                29U
-static const struct tok ofpt_str[] = {
-	{ OFPT_HELLO,                    "HELLO"                    },
-	{ OFPT_ERROR,                    "ERROR"                    },
-	{ OFPT_ECHO_REQUEST,             "ECHO_REQUEST"             },
-	{ OFPT_ECHO_REPLY,               "ECHO_REPLY"               },
-	{ OFPT_EXPERIMENTER,             "EXPERIMENTER"             },
-	{ OFPT_FEATURES_REQUEST,         "FEATURES_REQUEST"         },
-	{ OFPT_FEATURES_REPLY,           "FEATURES_REPLY"           },
-	{ OFPT_GET_CONFIG_REQUEST,       "GET_CONFIG_REQUEST"       },
-	{ OFPT_GET_CONFIG_REPLY,         "GET_CONFIG_REPLY"         },
-	{ OFPT_SET_CONFIG,               "SET_CONFIG"               },
-	{ OFPT_PACKET_IN,                "PACKET_IN"                },
-	{ OFPT_FLOW_REMOVED,             "FLOW_REMOVED"             },
-	{ OFPT_PORT_STATUS,              "PORT_STATUS"              },
-	{ OFPT_PACKET_OUT,               "PACKET_OUT"               },
-	{ OFPT_FLOW_MOD,                 "FLOW_MOD"                 },
-	{ OFPT_GROUP_MOD,                "GROUP_MOD"                },
-	{ OFPT_PORT_MOD,                 "PORT_MOD"                 },
-	{ OFPT_TABLE_MOD,                "TABLE_MOD"                },
-	{ OFPT_MULTIPART_REQUEST,        "MULTIPART_REQUEST"        },
-	{ OFPT_MULTIPART_REPLY,          "MULTIPART_REPLY"          },
-	{ OFPT_BARRIER_REQUEST,          "BARRIER_REQUEST"          },
-	{ OFPT_BARRIER_REPLY,            "BARRIER_REPLY"            },
-	{ OFPT_QUEUE_GET_CONFIG_REQUEST, "QUEUE_GET_CONFIG_REQUEST" },
-	{ OFPT_QUEUE_GET_CONFIG_REPLY,   "QUEUE_GET_CONFIG_REPLY"   },
-	{ OFPT_ROLE_REQUEST,             "ROLE_REQUEST"             },
-	{ OFPT_ROLE_REPLY,               "ROLE_REPLY"               },
-	{ OFPT_GET_ASYNC_REQUEST,        "GET_ASYNC_REQUEST"        },
-	{ OFPT_GET_ASYNC_REPLY,          "GET_ASYNC_REPLY"          },
-	{ OFPT_SET_ASYNC,                "SET_ASYNC"                },
-	{ OFPT_METER_MOD,                "METER_MOD"                },
-	{ 0, NULL }
-};
+#define OFPT_MAX                      OFPT_METER_MOD
 
 #define OFPC_FLOW_STATS   (1U <<0)
 #define OFPC_TABLE_STATS  (1U <<1)
@@ -128,6 +97,98 @@ static const struct tok ofp_capabilities_bm[] = {
 #define OFPCAP_U (~(OFPC_FLOW_STATS | OFPC_TABLE_STATS | OFPC_PORT_STATS | \
                     OFPC_GROUP_STATS | OFPC_IP_REASM | OFPC_QUEUE_STATS | \
                     OFPC_PORT_BLOCKED))
+
+#define OFPC_FRAG_NORMAL 0U
+#define OFPC_FRAG_DROP   1U
+#define OFPC_FRAG_REASM  2U
+static const struct tok ofp_config_str[] = {
+	{ OFPC_FRAG_NORMAL, "FRAG_NORMAL" },
+	{ OFPC_FRAG_DROP,   "FRAG_DROP"   },
+	{ OFPC_FRAG_REASM,  "FRAG_REASM"  },
+	{ 0, NULL }
+};
+
+#define OFPTT_MAX 0xfeU
+#define OFPTT_ALL 0xffU
+static const struct tok ofptt_str[] = {
+	{ OFPTT_MAX, "MAX" },
+	{ OFPTT_ALL, "ALL" },
+	{ 0, NULL },
+};
+
+#define OFPCML_MAX       0xffe5U
+#define OFPCML_NO_BUFFER 0xffffU
+static const struct tok ofpcml_str[] = {
+	{ OFPCML_MAX,       "MAX"       },
+	{ OFPCML_NO_BUFFER, "NO_BUFFER" },
+	{ 0, NULL }
+};
+
+#define OFPPC_PORT_DOWN    (1U <<0)
+#define OFPPC_NO_RECV      (1U <<2)
+#define OFPPC_NO_FWD       (1U <<5)
+#define OFPPC_NO_PACKET_IN (1U <<6)
+static const struct tok ofppc_bm[] = {
+	{ OFPPC_PORT_DOWN,    "PORT_DOWN"    },
+	{ OFPPC_NO_RECV,      "NO_RECV"      },
+	{ OFPPC_NO_FWD,       "NO_FWD"       },
+	{ OFPPC_NO_PACKET_IN, "NO_PACKET_IN" },
+	{ 0, NULL }
+};
+#define OFPPC_U (~(OFPPC_PORT_DOWN | OFPPC_NO_RECV | OFPPC_NO_FWD | \
+                   OFPPC_NO_PACKET_IN))
+
+#define OFPPS_LINK_DOWN   (1U << 0)
+#define OFPPS_BLOCKED     (1U << 1)
+#define OFPPS_LIVE        (1U << 2)
+static const struct tok ofpps_bm[] = {
+	{ OFPPS_LINK_DOWN, "LINK_DOWN" },
+	{ OFPPS_BLOCKED,   "BLOCKED"   },
+	{ OFPPS_LIVE,      "LIVE"      },
+	{ 0, NULL }
+};
+#define OFPPS_U (~(OFPPS_LINK_DOWN | OFPPS_BLOCKED | OFPPS_LIVE))
+
+#define OFPPF_10MB_HD    (1U <<  0)
+#define OFPPF_10MB_FD    (1U <<  1)
+#define OFPPF_100MB_HD   (1U <<  2)
+#define OFPPF_100MB_FD   (1U <<  3)
+#define OFPPF_1GB_HD     (1U <<  4)
+#define OFPPF_1GB_FD     (1U <<  5)
+#define OFPPF_10GB_FD    (1U <<  6)
+#define OFPPF_40GB_FD    (1U <<  7)
+#define OFPPF_100GB_FD   (1U <<  8)
+#define OFPPF_1TB_FD     (1U <<  9)
+#define OFPPF_OTHER      (1U << 10)
+#define OFPPF_COPPER     (1U << 11)
+#define OFPPF_FIBER      (1U << 12)
+#define OFPPF_AUTONEG    (1U << 13)
+#define OFPPF_PAUSE      (1U << 14)
+#define OFPPF_PAUSE_ASYM (1U << 15)
+static const struct tok ofppf_bm[] = {
+	{ OFPPF_10MB_HD,    "10MB_HD"    },
+	{ OFPPF_10MB_FD,    "10MB_FD"    },
+	{ OFPPF_100MB_HD,   "100MB_HD"   },
+	{ OFPPF_100MB_FD,   "100MB_FD"   },
+	{ OFPPF_1GB_HD,     "1GB_HD"     },
+	{ OFPPF_1GB_FD,     "1GB_FD"     },
+	{ OFPPF_10GB_FD,    "10GB_FD"    },
+	{ OFPPF_40GB_FD,    "40GB_FD"    },
+	{ OFPPF_100GB_FD,   "100GB_FD"   },
+	{ OFPPF_1TB_FD,     "1TB_FD"     },
+	{ OFPPF_OTHER,      "OTHER"      },
+	{ OFPPF_COPPER,     "COPPER"     },
+	{ OFPPF_FIBER,      "FIBER"      },
+	{ OFPPF_AUTONEG,    "AUTONEG"    },
+	{ OFPPF_PAUSE,      "PAUSE"      },
+	{ OFPPF_PAUSE_ASYM, "PAUSE_ASYM" },
+	{ 0, NULL }
+};
+#define OFPPF_U (~(OFPPF_10MB_HD | OFPPF_10MB_FD | OFPPF_100MB_HD | \
+                   OFPPF_100MB_FD | OFPPF_1GB_HD | OFPPF_1GB_FD | \
+                   OFPPF_10GB_FD | OFPPF_40GB_FD | OFPPF_100GB_FD | \
+                   OFPPF_1TB_FD | OFPPF_OTHER | OFPPF_COPPER | OFPPF_FIBER | \
+                   OFPPF_AUTONEG | OFPPF_PAUSE | OFPPF_PAUSE_ASYM))
 
 #define OFPHET_VERSIONBITMAP 1U
 static const struct tok ofphet_str[] = {
@@ -157,6 +218,18 @@ static const struct tok ofpp_str[] = {
 	{ 0, NULL }
 };
 
+#define OFPCR_ROLE_NOCHANGE 0U
+#define OFPCR_ROLE_EQUAL    1U
+#define OFPCR_ROLE_MASTER   2U
+#define OFPCR_ROLE_SLAVE    3U
+static const struct tok ofpcr_str[] = {
+	{ OFPCR_ROLE_NOCHANGE, "NOCHANGE" },
+	{ OFPCR_ROLE_EQUAL,    "EQUAL"    },
+	{ OFPCR_ROLE_MASTER,   "MASTER"   },
+	{ OFPCR_ROLE_SLAVE,    "SLAVE"    },
+	{ 0, NULL }
+};
+
 #define OF_BIT_VER_1_0 (1U << (OF_VER_1_0 - 1))
 #define OF_BIT_VER_1_1 (1U << (OF_VER_1_1 - 1))
 #define OF_BIT_VER_1_2 (1U << (OF_VER_1_2 - 1))
@@ -174,6 +247,52 @@ static const struct tok ofverbm_str[] = {
 };
 #define OF_BIT_VER_U (~(OF_BIT_VER_1_0 | OF_BIT_VER_1_1 | OF_BIT_VER_1_2 | \
                         OF_BIT_VER_1_3 | OF_BIT_VER_1_4 | OF_BIT_VER_1_5))
+
+#define OFPR_NO_MATCH    0U
+#define OFPR_ACTION      1U
+#define OFPR_INVALID_TTL 2U
+#if 0 /* for OFPT_PACKET_IN */
+static const struct tok ofpr_str[] = {
+	{ OFPR_NO_MATCH,    "NO_MATCH"         },
+	{ OFPR_ACTION,      "ACTION"           },
+	{ OFPR_INVALID_TTL, "OFPR_INVALID_TTL" },
+	{ 0, NULL }
+};
+#endif
+
+#define ASYNC_OFPR_NO_MATCH    (1U << OFPR_NO_MATCH   )
+#define ASYNC_OFPR_ACTION      (1U << OFPR_ACTION     )
+#define ASYNC_OFPR_INVALID_TTL (1U << OFPR_INVALID_TTL)
+static const struct tok async_ofpr_bm[] = {
+	{ ASYNC_OFPR_NO_MATCH,    "NO_MATCH"    },
+	{ ASYNC_OFPR_ACTION,      "ACTION"      },
+	{ ASYNC_OFPR_INVALID_TTL, "INVALID_TTL" },
+	{ 0, NULL }
+};
+#define ASYNC_OFPR_U (~(ASYNC_OFPR_NO_MATCH | ASYNC_OFPR_ACTION | \
+                        ASYNC_OFPR_INVALID_TTL))
+
+#define OFPPR_ADD    0U
+#define OFPPR_DELETE 1U
+#define OFPPR_MODIFY 2U
+static const struct tok ofppr_str[] = {
+	{ OFPPR_ADD,    "ADD"    },
+	{ OFPPR_DELETE, "DELETE" },
+	{ OFPPR_MODIFY, "MODIFY" },
+	{ 0, NULL }
+};
+
+#define ASYNC_OFPPR_ADD    (1U << OFPPR_ADD   )
+#define ASYNC_OFPPR_DELETE (1U << OFPPR_DELETE)
+#define ASYNC_OFPPR_MODIFY (1U << OFPPR_MODIFY)
+static const struct tok async_ofppr_bm[] = {
+	{ ASYNC_OFPPR_ADD,    "ADD"    },
+	{ ASYNC_OFPPR_DELETE, "DELETE" },
+	{ ASYNC_OFPPR_MODIFY, "MODIFY" },
+	{ 0, NULL }
+};
+#define ASYNC_OFPPR_U (~(ASYNC_OFPPR_ADD | ASYNC_OFPPR_DELETE | \
+                         ASYNC_OFPPR_MODIFY))
 
 #define OFPET_HELLO_FAILED           0U
 #define OFPET_BAD_REQUEST            1U
@@ -506,44 +625,227 @@ static const struct uint_tokary of13_ofpet2tokary[] = {
 	/* uint2tokary() does not use array termination. */
 };
 
+/* lengths (fixed or minimal) of particular message types, where not 0 */
+#define OF_ERROR_MSG_MINLEN                   (12U - OF_HEADER_FIXLEN)
+#define OF_FEATURES_REPLY_FIXLEN              (32U - OF_HEADER_FIXLEN)
+#define OF_PORT_MOD_FIXLEN                    (40U - OF_HEADER_FIXLEN)
+#define OF_SWITCH_CONFIG_MSG_FIXLEN           (12U - OF_HEADER_FIXLEN)
+#define OF_TABLE_MOD_FIXLEN                   (16U - OF_HEADER_FIXLEN)
+#define OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN    (16U - OF_HEADER_FIXLEN)
+#define OF_ROLE_MSG_FIXLEN                    (24U - OF_HEADER_FIXLEN)
+#define OF_ASYNC_MSG_FIXLEN                   (32U - OF_HEADER_FIXLEN)
+#define OF_PORT_STATUS_FIXLEN                 (80U - OF_HEADER_FIXLEN)
+#define OF_EXPERIMENTER_MSG_MINLEN            (16U - OF_HEADER_FIXLEN)
+
 /* lengths (fixed or minimal) of particular protocol structures */
 #define OF_HELLO_ELEM_MINSIZE                 4U
-#define OF_ERROR_MSG_MINLEN                   12U
-#define OF_FEATURES_REPLY_FIXLEN              32U
-#define OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN    16U
 
-/* [OF13] Section A.1 */
-const char *
-of13_msgtype_str(const uint8_t type)
+/* miscellaneous constants from [OF13] */
+#define OFP_MAX_PORT_NAME_LEN                 16U
+
+/* [OF13] Section 7.2.1 */
+static void
+of13_port_print(netdissect_options *ndo,
+                const u_char *cp)
 {
-	return tok2str(ofpt_str, "invalid (0x%02x)", type);
+	/* port_no */
+	ND_PRINT("\n\t  port_no %s",
+		 tok2str(ofpp_str, "%u", GET_BE_U_4(cp)));
+	cp += 4;
+	/* pad */
+	cp += 4;
+	/* hw_addr */
+	ND_PRINT(", hw_addr %s", GET_ETHERADDR_STRING(cp));
+	cp += MAC_ADDR_LEN;
+	/* pad2 */
+	cp += 2;
+	/* name */
+	ND_PRINT(", name '");
+	nd_printjnp(ndo, cp, OFP_MAX_PORT_NAME_LEN);
+	ND_PRINT("'");
+	cp += OFP_MAX_PORT_NAME_LEN;
+
+	if (ndo->ndo_vflag < 2) {
+		ND_TCHECK_LEN(cp, 32);
+		return;
+	}
+
+	/* config */
+	ND_PRINT("\n\t   config 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, ofppc_bm, GET_BE_U_4(cp), OFPPC_U);
+	cp += 4;
+	/* state */
+	ND_PRINT("\n\t   state 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, ofpps_bm, GET_BE_U_4(cp), OFPPS_U);;
+	cp += 4;
+	/* curr */
+	ND_PRINT("\n\t   curr 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
+	cp += 4;
+	/* advertised */
+	ND_PRINT("\n\t   advertised 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
+	cp += 4;
+	/* supported */
+	ND_PRINT("\n\t   supported 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
+	cp += 4;
+	/* peer */
+	ND_PRINT("\n\t   peer 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
+	cp += 4;
+	/* curr_speed */
+	ND_PRINT("\n\t   curr_speed %ukbps", GET_BE_U_4(cp));
+	cp += 4;
+	/* max_speed */
+	ND_PRINT("\n\t   max_speed %ukbps", GET_BE_U_4(cp));
 }
 
 /* [OF13] Section 7.3.1 */
 static void
 of13_features_reply_print(netdissect_options *ndo,
-                          const u_char *cp, u_int len)
+                          const u_char *cp, u_int len _U_)
 {
 	/* datapath_id */
 	ND_PRINT("\n\t dpid 0x%016" PRIx64, GET_BE_U_8(cp));
-	OF_FWD(8);
+	cp += 8;
 	/* n_buffers */
 	ND_PRINT(", n_buffers %u", GET_BE_U_4(cp));
-	OF_FWD(4);
+	cp += 4;
 	/* n_tables */
 	ND_PRINT(", n_tables %u", GET_U_1(cp));
-	OF_FWD(1);
+	cp += 1;
 	/* auxiliary_id */
 	ND_PRINT(", auxiliary_id %u", GET_U_1(cp));
-	OF_FWD(1);
+	cp += 1;
 	/* pad */
-	OF_FWD(2);
+	cp += 2;
 	/* capabilities */
 	ND_PRINT("\n\t capabilities 0x%08x", GET_BE_U_4(cp));
 	of_bitmap_print(ndo, ofp_capabilities_bm, GET_BE_U_4(cp), OFPCAP_U);
-	OF_FWD(4);
+	cp += 4;
 	/* reserved */
 	ND_TCHECK_4(cp);
+}
+
+/* [OF13] Section 7.3.2 */
+static void
+of13_switch_config_msg_print(netdissect_options *ndo,
+                             const u_char *cp, u_int len _U_)
+{
+	/* flags */
+	ND_PRINT("\n\t flags %s",
+	         tok2str(ofp_config_str, "invalid (0x%04x)", GET_BE_U_2(cp)));
+	cp += 2;
+	/* miss_send_len */
+	ND_PRINT(", miss_send_len %s",
+	         tok2str(ofpcml_str, "%u", GET_BE_U_2(cp)));
+}
+
+/* [OF13] Section 7.3.3 */
+static void
+of13_table_mod_print(netdissect_options *ndo,
+                     const u_char *cp, u_int len _U_)
+{
+	/* table_id */
+	ND_PRINT("\n\t table_id %s", tok2str(ofptt_str, "%u", GET_U_1(cp)));
+	cp += 1;
+	/* pad */
+	cp += 3;
+	/* config */
+	ND_PRINT(", config 0x%08x", GET_BE_U_4(cp));
+}
+
+/* [OF13] Section 7.3.9 */
+static void
+of13_role_msg_print(netdissect_options *ndo,
+                    const u_char *cp, u_int len _U_)
+{
+	/* role */
+	ND_PRINT("\n\t role %s",
+	         tok2str(ofpcr_str, "invalid (0x%08x)", GET_BE_U_4(cp)));
+	cp += 4;
+	/* pad */
+	cp += 4;
+	/* generation_id */
+	ND_PRINT(", generation_id 0x%016" PRIx64, GET_BE_U_8(cp));
+}
+
+/* [OF13] Section 7.3.10 */
+static void
+of13_async_msg_print(netdissect_options *ndo,
+                    const u_char *cp, u_int len _U_)
+{
+	/* packet_in_mask[0] */
+	ND_PRINT("\n\t packet_in_mask[EM] 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, async_ofpr_bm, GET_BE_U_4(cp), ASYNC_OFPR_U);
+	cp += 4;
+	/* packet_in_mask[1] */
+	ND_PRINT("\n\t packet_in_mask[S] 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, async_ofpr_bm, GET_BE_U_4(cp), ASYNC_OFPR_U);
+	cp += 4;
+	/* port_status_mask[0] */
+	ND_PRINT("\n\t port_status_mask[EM] 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, async_ofppr_bm, GET_BE_U_4(cp), ASYNC_OFPPR_U);
+	cp += 4;
+	/* port_status_mask[1] */
+	ND_PRINT("\n\t port_status_mask[S] 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, async_ofppr_bm, GET_BE_U_4(cp), ASYNC_OFPPR_U);
+	cp += 4;
+	/* flow_removed_mask[0] */
+	ND_PRINT("\n\t flow_removed_mask[EM] 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, async_ofppr_bm, GET_BE_U_4(cp), ASYNC_OFPPR_U);
+	cp += 4;
+	/* flow_removed_mask[1] */
+	ND_PRINT("\n\t flow_removed_mask[S] 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, async_ofppr_bm, GET_BE_U_4(cp), ASYNC_OFPPR_U);
+}
+
+/* [OF13] Section 7.3.4.3 */
+static void
+of13_port_mod_print(netdissect_options *ndo,
+                    const u_char *cp, u_int len _U_)
+{
+	/* port_no */
+	ND_PRINT("\n\t port_no %s", tok2str(ofpp_str, "%u", GET_BE_U_4(cp)));
+	cp += 4;
+	/* pad */
+	cp += 4;
+	/* hw_addr */
+	ND_PRINT(", hw_addr %s", GET_ETHERADDR_STRING(cp));
+	cp += MAC_ADDR_LEN;
+	/* pad2 */
+	cp += 2;
+	/* config */
+	ND_PRINT("\n\t  config 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, ofppc_bm, GET_BE_U_4(cp), OFPPC_U);
+	cp += 4;
+	/* mask */
+	ND_PRINT("\n\t  mask 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, ofppc_bm, GET_BE_U_4(cp), OFPPC_U);
+	cp += 4;
+	/* advertise */
+	ND_PRINT("\n\t  advertise 0x%08x", GET_BE_U_4(cp));
+	of_bitmap_print(ndo, ofppf_bm, GET_BE_U_4(cp), OFPPF_U);
+	cp += 4;
+	/* pad3 */
+	/* Always the last field, check bounds. */
+	ND_TCHECK_4(cp);
+}
+
+/* [OF13] Section 7.4.3 */
+static void
+of13_port_status_print(netdissect_options *ndo,
+                       const u_char *cp, u_int len _U_)
+{
+	/* reason */
+	ND_PRINT("\n\t reason %s",
+	         tok2str(ofppr_str, "invalid (0x02x)", GET_U_1(cp)));
+	cp += 1;
+	/* pad */
+	cp += 7;
+	/* desc */
+	of13_port_print(ndo, cp);
 }
 
 /* [OF13] Section 7.5.1 */
@@ -600,7 +902,39 @@ invalid:
 	ND_TCHECK_LEN(cp, len);
 }
 
-/* [OF13] Section A.4.4 */
+/* [OF13] Section 7.5.4 */
+static void
+of13_experimenter_message_print(netdissect_options *ndo,
+                                const u_char *cp, u_int len)
+{
+	uint32_t experimenter;
+
+	/* experimenter */
+	experimenter = GET_BE_U_4(cp);
+	OF_FWD(4);
+	ND_PRINT("\n\t experimenter 0x%08x (%s)", experimenter,
+	         of_vendor_name(experimenter));
+	/* exp_type */
+	ND_PRINT(", exp_type 0x%08x", GET_BE_U_4(cp));
+	OF_FWD(4);
+	/* data */
+	of_data_print(ndo, cp, len);
+}
+
+/* [OF13] Section 7.3.6 */
+static void
+of13_queue_get_config_request_print(netdissect_options *ndo,
+                                    const u_char *cp, u_int len _U_)
+{
+	/* port */
+	ND_PRINT("\n\t port %s", tok2str(ofpp_str, "%u", GET_BE_U_4(cp)));
+	cp += 4;
+	/* pad */
+	/* Always the last field, check bounds. */
+	ND_TCHECK_4(cp);
+}
+
+/* [OF13] Section 7.4.4 */
 static void
 of13_error_print(netdissect_options *ndo,
                  const u_char *cp, u_int len)
@@ -625,75 +959,251 @@ of13_error_print(netdissect_options *ndo,
 	of_data_print(ndo, cp, len);
 }
 
-void
-of13_message_print(netdissect_options *ndo,
-                   const u_char *cp, uint16_t len, const uint8_t type)
-{
-	/* See the comment at the beginning of of10_message_print(). */
-	switch (type) {
-	/* OpenFlow header only. */
-	case OFPT_FEATURES_REQUEST: /* [OF13] Section A.3.1 */
-	case OFPT_GET_CONFIG_REQUEST: /* [OF13] Section A.3.2 */
-	case OFPT_BARRIER_REQUEST: /* [OF13] Section A.3.8 */
-	case OFPT_BARRIER_REPLY: /* ibid */
-		if (len)
-			goto invalid;
-		return;
-
-	/* OpenFlow header and fixed-size message body. */
-	case OFPT_FEATURES_REPLY:
-		if (len != OF_FEATURES_REPLY_FIXLEN - OF_HEADER_FIXLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of13_features_reply_print(ndo, cp, len);
-		return;
-	case OFPT_QUEUE_GET_CONFIG_REQUEST: /* [OF13] Section A.3.6 */
-		if (len != OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN - OF_HEADER_FIXLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		/* port */
-		ND_PRINT("\n\t port %s",
-		         tok2str(ofpp_str, "%u", GET_BE_U_4(cp)));
-		OF_FWD(4);
-		/* pad */
-		/* Always the last field, check bounds. */
-		ND_TCHECK_4(cp);
-		return;
-
-	/* OpenFlow header and variable-size data. */
-	case OFPT_ECHO_REQUEST: /* [OF13] Section A.5.2 */
-	case OFPT_ECHO_REPLY: /* [OF13] Section A.5.3 */
-		if (ndo->ndo_vflag < 1)
-			break;
-		of_data_print(ndo, cp, len);
-		return;
-
-	/* OpenFlow header and n * variable-size data units. */
-	case OFPT_HELLO: /* [OF13] Section A.5.1 */
-		if (ndo->ndo_vflag < 1)
-			break;
-		of13_hello_elements_print(ndo, cp, len);
-		return;
-
-	/* OpenFlow header, fixed-size message body and variable-size data. */
-	case OFPT_ERROR:
-		if (len < OF_ERROR_MSG_MINLEN - OF_HEADER_FIXLEN)
-			goto invalid;
-		if (ndo->ndo_vflag < 1)
-			break;
-		of13_error_print(ndo, cp, len);
-		return;
-	}
+static const struct of_msgtypeinfo of13_msgtypeinfo[OFPT_MAX + 1] = {
 	/*
-	 * Not a recognised type or did not print the details, fall back to
-	 * a bounds check.
+	 * [OF13] Section 7.5.1
+	 * n * variable-size data units.
 	 */
-	ND_TCHECK_LEN(cp, len);
-	return;
+	{
+		"HELLO",                    of13_hello_elements_print,
+		REQ_MINLEN,                 0
+	},
+	/*
+	 * [OF13] Section 7.4.4
+	 * A fixed-size message body and variable-size data.
+	 */
+	{
+		"ERROR",                    of13_error_print,
+		REQ_MINLEN,                 OF_ERROR_MSG_MINLEN
+	},
+	/*
+	 * [OF13] Section 7.5.2
+	 * Variable-size data.
+	 */
+	{
+		"ECHO_REQUEST",             of_data_print,
+		REQ_MINLEN,                 0
+	},
+	/*
+	 * [OF13] Section 7.5.3
+	 * Variable-size data.
+	 */
+	{
+		"ECHO_REPLY",               of_data_print,
+		REQ_MINLEN,                 0
+	},
+	/*
+	 * [OF13] Section 7.5.4
+	 * A fixed-size message body and variable-size data.
+	 */
+	{
+		"EXPERIMENTER",             of13_experimenter_message_print,
+		REQ_MINLEN,                 OF_EXPERIMENTER_MSG_MINLEN
+	},
+	/*
+	 * [OF13] Section 7.3.1
+	 * No message body.
+	 */
+	{
+		"FEATURES_REQUEST",         NULL,
+		REQ_FIXLEN,                 0
+	},
+	/*
+	 * [OF13] Section 7.3.1
+	 * A fixed-size message body.
+	 */
+	{
+		"FEATURES_REPLY",           of13_features_reply_print,
+		REQ_FIXLEN,                 OF_FEATURES_REPLY_FIXLEN
+	},
+	/*
+	 * [OF13] Section 7.3.2
+	 * No message body.
+	 */
+	{
+		"GET_CONFIG_REQUEST",       NULL,
+		REQ_FIXLEN,                 0
+	},
+	/*
+	 * [OF13] Section 7.3.2
+	 * A fixed-size message body.
+	 */
+	{
+		"GET_CONFIG_REPLY",         of13_switch_config_msg_print,
+		REQ_FIXLEN,                 OF_SWITCH_CONFIG_MSG_FIXLEN
+	},
+	/*
+	 * [OF13] Section 7.3.2
+	 * A fixed-size message body.
+	 */
+	{
+		"SET_CONFIG",               of13_switch_config_msg_print,
+		REQ_FIXLEN,                 OF_SWITCH_CONFIG_MSG_FIXLEN
+	},
+	/*
+	 * [OF13] Section 7.4.1
+	 * (to be done)
+	 */
+	{
+		"PACKET_IN",                NULL,
+		REQ_NONE,                   0
+	},
+	/*
+	 * [OF13] Section 7.4.2
+	 * (to be done)
+	 */
+	{
+		"FLOW_REMOVED",             NULL,
+		REQ_NONE,                   0
+	},
+	/*
+	 * [OF13] Section 7.4.3
+	 * A fixed-size message body.
+	 */
+	{
+		"PORT_STATUS",              of13_port_status_print,
+		REQ_FIXLEN,                 OF_PORT_STATUS_FIXLEN
+	},
+	/*
+	 * [OF13] Section 7.3.7
+	 * (to be done)
+	 */
+	{
+		"PACKET_OUT",               NULL,
+		REQ_NONE,                   0
+	},
+	/*
+	 * [OF13] Section 7.3.4.1
+	 * (to be done)
+	 */
+	{
+		"FLOW_MOD",                 NULL,
+		REQ_NONE,                   0
+	},
+	/*
+	 * [OF13] Section 7.3.4.2
+	 * (to be done)
+	 */
+	{
+		"GROUP_MOD",                NULL,
+		REQ_NONE,                   0
+	},
+	/*
+	 * [OF13] Section 7.3.4.3
+	 * A fixed-size message body.
+	 */
+	{
+		"PORT_MOD",                 of13_port_mod_print,
+		REQ_FIXLEN,                 OF_PORT_MOD_FIXLEN
+	},
+	/*
+	 * [OF13] Section 7.3.3
+	 * A fixed-size message body.
+	 */
+	{
+		"TABLE_MOD",                of13_table_mod_print,
+		REQ_FIXLEN,                 OF_TABLE_MOD_FIXLEN
+	},
+	/*
+	 * [OF13] Section 7.3.5
+	 * (to be done)
+	 */
+	{
+		"MULTIPART_REQUEST",        NULL,
+		REQ_NONE,                   0
+	},
+	/*
+	 * [OF13] Section 7.3.5
+	 * (to be done)
+	 */
+	{
+		"MULTIPART_REPLY",          NULL,
+		REQ_NONE,                   0
+	},
+	/*
+	 * [OF13] Section 7.3.8
+	 * No message body.
+	 */
+	{
+		"BARRIER_REQUEST",          NULL,
+		REQ_FIXLEN,                 0
+	},
+	/*
+	 * [OF13] Section 7.3.8
+	 * No message body.
+	 */
+	{
+		"BARRIER_REPLY",            NULL,
+		REQ_FIXLEN,                 0
+	},
+	/*
+	 * [OF13] Section 7.3.6
+	 * A fixed-size message body.
+	 */
+	{
+		"QUEUE_GET_CONFIG_REQUEST", of13_queue_get_config_request_print,
+		REQ_FIXLEN,                 OF_QUEUE_GET_CONFIG_REQUEST_FIXLEN
+	},
+	/*
+	 * [OF13] Section 7.3.6
+	 * (to be done)
+	 */
+	{
+		"QUEUE_GET_CONFIG_REPLY",   NULL,
+		REQ_NONE,                   0
+	},
+	/*
+	 * [OF13] Section 7.3.9
+	 * A fixed-size message body.
+	 */
+	{
+		"ROLE_REQUEST",             of13_role_msg_print,
+		REQ_FIXLEN,                 OF_ROLE_MSG_FIXLEN
+	},
+	/*
+	 * [OF13] Section 7.3.9
+	 * A fixed-size message body.
+	 */
+	{
+		"ROLE_REPLY",               of13_role_msg_print,
+		REQ_FIXLEN,                 OF_ROLE_MSG_FIXLEN
+	},
+	/*
+	 * [OF13] Section 7.3.10
+	 * No message body.
+	 */
+	{
+		"GET_ASYNC_REQUEST",        NULL,
+		REQ_FIXLEN,                 0
+	},
+	/*
+	 * [OF13] Section 7.3.10
+	 * A fixed-size message body.
+	 */
+	{
+		"GET_ASYNC_REPLY",          of13_async_msg_print,
+		REQ_FIXLEN,                 OF_ASYNC_MSG_FIXLEN
+	},
+	/*
+	 * [OF13] Section 7.3.10
+	 * A fixed-size message body.
+	 */
+	{
+		"SET_ASYNC",                of13_async_msg_print,
+		REQ_FIXLEN,                 OF_ASYNC_MSG_FIXLEN
+	},
+	/*
+	 * [OF13] Section 7.3.4.4
+	 * (to be done)
+	 */
+	{
+		"METER_MOD",                NULL,
+		REQ_NONE,                   0
+	},
+};
 
-invalid: /* skip the message body */
-	nd_print_invalid(ndo);
-	ND_TCHECK_LEN(cp, len);
+const struct of_msgtypeinfo *
+of13_identify_msgtype(const uint8_t type)
+{
+	return type <= OFPT_MAX ? &of13_msgtypeinfo[type] : NULL;
 }

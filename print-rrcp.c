@@ -98,7 +98,6 @@ rrcp_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "rrcp";
 	rrcp_proto = GET_U_1(cp + RRCP_PROTO_OFFSET);
-	ND_TCHECK_1(cp + RRCP_OPCODE_ISREPLY_OFFSET);
 	rrcp_opcode = GET_U_1((cp + RRCP_OPCODE_ISREPLY_OFFSET)) & RRCP_OPCODE_MASK;
 	if (src != NULL && dst != NULL) {
 		ND_PRINT("%s > %s, ",
@@ -113,7 +112,6 @@ rrcp_print(netdissect_options *ndo,
 		     tok2str(opcode_values,"unknown opcode (0x%02x)",rrcp_opcode));
 	}
 	if (rrcp_opcode==1 || rrcp_opcode==2){
-	    ND_TCHECK_6(cp + RRCP_REG_ADDR_OFFSET);
     	    ND_PRINT(" addr=0x%04x, data=0x%08x",
 		     GET_LE_U_2(cp + RRCP_REG_ADDR_OFFSET),
 		     GET_LE_U_4(cp + RRCP_REG_DATA_OFFSET));
@@ -135,8 +133,4 @@ rrcp_print(netdissect_options *ndo,
 		    GET_BE_U_4(cp + RRCP_COOKIE2_OFFSET),
 		    GET_BE_U_4(cp + RRCP_COOKIE1_OFFSET));
 	}
-	return;
-
-trunc:
-	nd_print_trunc(ndo);
 }

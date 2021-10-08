@@ -26,6 +26,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
@@ -427,7 +428,6 @@ lmp_print(netdissect_options *ndo,
           const u_char *pptr, u_int length)
 {
     const struct lmp_common_header *lmp_com_header;
-    const struct lmp_object_header *lmp_obj_header;
     const u_char *tptr,*obj_tptr;
     u_int version_res, tlen, lmp_obj_len, lmp_obj_ctype, obj_tlen;
     int hexdump;
@@ -486,10 +486,8 @@ lmp_print(netdissect_options *ndo,
     tlen-=sizeof(struct lmp_common_header);
 
     while(tlen>0) {
-        /* did we capture enough for fully decoding the object header ? */
-        ND_TCHECK_LEN(tptr, sizeof(struct lmp_object_header));
-
-        lmp_obj_header = (const struct lmp_object_header *)tptr;
+        const struct lmp_object_header *lmp_obj_header =
+            (const struct lmp_object_header *)tptr;
         lmp_obj_len=GET_BE_U_2(lmp_obj_header->length);
         lmp_obj_ctype=GET_U_1(lmp_obj_header->ctype)&0x7f;
 
@@ -1136,7 +1134,4 @@ lmp_print(netdissect_options *ndo,
         tptr+=lmp_obj_len;
         tlen-=lmp_obj_len;
     }
-    return;
-trunc:
-    nd_print_trunc(ndo);
 }

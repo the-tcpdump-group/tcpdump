@@ -27,6 +27,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -61,16 +62,17 @@ static const struct tok bcm_li_pkt_subtype_values[] = {
 };
 
 void
-bcm_li_print(netdissect_options *ndo, const u_char *p, u_int length)
+bcm_li_print(netdissect_options *ndo,
+             const u_char *bp, u_int length)
 {
-    u_int shim, direction, pkt_type, pkt_subtype, li_id;
-	const u_char *bp = p;
+	u_int shim, direction, pkt_type, pkt_subtype, li_id;
 
 	ndo->ndo_protocol = "bcm_li";
-	if (length < BCM_LI_SHIM_LEN)
-		goto trunc;
-	ND_TCHECK_LEN(p, BCM_LI_SHIM_LEN);
-	shim = GET_BE_U_4(p);
+	if (length < BCM_LI_SHIM_LEN) {
+	    ND_PRINT(" (length %u < %u)", length, BCM_LI_SHIM_LEN);
+	    goto invalid;
+	}
+	shim = GET_BE_U_4(bp);
 
 	direction = (shim >> 29) & 0x7;
 	pkt_type = (shim >> 25) & 0xf;
@@ -80,16 +82,16 @@ bcm_li_print(netdissect_options *ndo, const u_char *p, u_int length)
 	length -= BCM_LI_SHIM_LEN;
 	bp += BCM_LI_SHIM_LEN;
 
-	ND_PRINT("%sBCM-LI-SHIM: direction %s, pkt-type %s, pkt-subtype %s, li-id %u",
+	ND_PRINT("%sBCM-LI-SHIM: direction %s, pkt-type %s, pkt-subtype %s, li-id %u%s",
 		 ndo->ndo_vflag ? "\n    " : "",
 		 tok2str(bcm_li_direction_values, "unknown", direction),
 		 tok2str(bcm_li_pkt_type_values, "unknown", pkt_type),
 		 tok2str(bcm_li_pkt_subtype_values, "unknown", pkt_subtype),
-		 li_id);
+		 li_id,
+		 ndo->ndo_vflag ? "\n    ": "");
 
-	if (ndo->ndo_vflag) {
-	    ND_PRINT("\n    ");
-	} else {
+	if (!ndo->ndo_vflag) {
+	    ND_TCHECK_LEN(bp, length);
 	    return;
 	}
 
@@ -118,11 +120,11 @@ bcm_li_print(netdissect_options *ndo, const u_char *p, u_int length)
 	    break;
 
 	default:
-	    break;
+	    goto invalid;
 	}
 
 	return;
-trunc:
-	nd_print_trunc(ndo);
+invalid:
+	nd_print_invalid(ndo);
 }
 

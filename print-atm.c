@@ -27,6 +27,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
@@ -113,13 +114,15 @@
 #define PROTO_POS       0	/* offset of protocol discriminator */
 #define CALL_REF_POS    2	/* offset of call reference value */
 #define MSG_TYPE_POS    5	/* offset of message type */
-#define MSG_LEN_POS     7	/* offset of mesage length */
+#if 0
+#define MSG_LEN_POS     7	/* offset of message length */
 #define IE_BEGIN_POS    9	/* offset of first information element */
 
 /* format of signalling messages */
 #define TYPE_POS	0
 #define LEN_POS		2
 #define FIELD_BEGIN_POS 4
+#endif
 
 /* end of the original atmuni31.h */
 
@@ -193,23 +196,11 @@ static const struct tok oam_fm_loopback_indicator_values[] = {
     { 0, NULL }
 };
 
-static const struct tok *oam_functype_values[16] = {
-    NULL,
-    oam_fm_functype_values, /* 1 */
-    oam_pm_functype_values, /* 2 */
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    oam_ad_functype_values, /* 8 */
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL
+static const struct uint_tokary oam_celltype2tokary[] = {
+	{ OAM_CELLTYPE_FM, oam_fm_functype_values },
+	{ OAM_CELLTYPE_PM, oam_pm_functype_values },
+	{ OAM_CELLTYPE_AD, oam_ad_functype_values },
+	/* uint2tokary() does not use array termination. */
 };
 
 /*
@@ -253,18 +244,13 @@ atm_if_print(netdissect_options *ndo,
 	u_int hdrlen = 0;
 
 	ndo->ndo_protocol = "atm";
-	if (caplen < 1) {
-		nd_print_trunc(ndo);
-		ndo->ndo_ll_hdr_len += caplen;
-		return;
-	}
 
         /* Cisco Style NLPID ? */
         if (GET_U_1(p) == LLC_UI) {
             if (ndo->ndo_eflag)
                 ND_PRINT("CNLPID ");
+            ndo->ndo_ll_hdr_len += 1;
             isoclns_print(ndo, p + 1, length - 1);
-            ndo->ndo_ll_hdr_len += hdrlen;
             return;
         }
 
@@ -272,11 +258,6 @@ atm_if_print(netdissect_options *ndo,
 	 * Must have at least a DSAP, an SSAP, and the first byte of the
 	 * control field.
 	 */
-	if (caplen < 3) {
-		nd_print_trunc(ndo);
-		ndo->ndo_ll_hdr_len += caplen;
-		return;
-	}
 
 	/*
 	 * Extract the presumed LLC header into a variable, for quick
@@ -305,24 +286,21 @@ atm_if_print(netdissect_options *ndo,
 		 * packets?  If so, could it be changed to use a
 		 * new DLT_IEEE802_6 value if we added it?
 		 */
-		if (caplen < 20) {
-			nd_print_trunc(ndo);
-			ndo->ndo_ll_hdr_len += caplen;
-			return;
-		}
 		if (ndo->ndo_eflag)
 			ND_PRINT("%08x%08x %08x%08x ",
 			       GET_BE_U_4(p),
 			       GET_BE_U_4(p + 4),
 			       GET_BE_U_4(p + 8),
 			       GET_BE_U_4(p + 12));
+		/* Always cover the full header. */
+		ND_TCHECK_LEN(p, 20);
 		p += 20;
 		length -= 20;
 		caplen -= 20;
 		hdrlen += 20;
 	}
-	hdrlen += atm_llc_print(ndo, p, length, caplen);
 	ndo->ndo_ll_hdr_len += hdrlen;
+	ndo->ndo_ll_hdr_len += atm_llc_print(ndo, p, length, caplen);
 }
 
 /*
@@ -452,6 +430,7 @@ oam_print(netdissect_options *ndo,
     uint32_t cell_header;
     uint16_t vpi, vci, cksum, cksum_shouldbe, idx;
     uint8_t  cell_type, func_type, payload, clp;
+    const struct tok *oam_functype_str;
 
     union {
         const struct oam_fm_loopback_t *oam_fm_loopback;
@@ -482,11 +461,12 @@ oam_print(netdissect_options *ndo,
            tok2str(oam_celltype_values, "unknown", cell_type),
            cell_type);
 
-    if (oam_functype_values[cell_type] == NULL)
+    oam_functype_str = uint2tokary(oam_celltype2tokary, cell_type);
+    if (oam_functype_str == NULL)
         ND_PRINT(", func-type unknown (%u)", func_type);
     else
         ND_PRINT(", func-type %s (%u)",
-               tok2str(oam_functype_values[cell_type],"none",func_type),
+               tok2str(oam_functype_str, "none", func_type),
                func_type);
 
     p += ATM_HDR_LEN_NOHEC + hec;
@@ -547,9 +527,4 @@ oam_print(netdissect_options *ndo,
     ND_PRINT("\n\tcksum 0x%03x (%scorrect)",
            cksum,
            cksum_shouldbe == 0 ? "" : "in");
-
-    return;
-
-trunc:
-    nd_print_trunc(ndo);
 }

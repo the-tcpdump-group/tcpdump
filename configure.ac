@@ -147,9 +147,9 @@ fi
 
 AC_MSG_CHECKING([whether to enable the possibly-buggy SMB printer])
 AC_ARG_ENABLE(smb,
-[  --enable-smb            enable possibly-buggy SMB printer [default=yes]
+[  --enable-smb            enable possibly-buggy SMB printer [default=no]
   --disable-smb           disable possibly-buggy SMB printer],,
-   enableval=yes)
+   enableval=no)
 case "$enableval" in
 yes)	AC_MSG_RESULT(yes)
 	AC_DEFINE(ENABLE_SMB, 1,
@@ -198,7 +198,7 @@ AC_ARG_WITH(sandbox-capsicum,
 # XXX - do we need to check for all of them, or are there some that, if
 # present, imply others are present?
 #
-if test ! -z "$with_sandbox_capsicum" && test "$with_sandbox_capsicum" != "no" ; then
+if test -z "$with_sandbox_capsicum" || test "$with_sandbox_capsicum" != "no" ; then
 	#
 	# First, make sure we have the required header.
 	#
@@ -396,6 +396,35 @@ AC_CHECK_FUNC(vsnprintf,,
     AC_MSG_ERROR([vsnprintf() is required but wasn't found]))
 AC_CHECK_FUNC(snprintf,,
     AC_MSG_ERROR([snprintf() is required but wasn't found]))
+
+#
+# Define HAVE_NO_PRINTF_Z to make it possible to disable test cases that
+# depend on %zu.
+#
+AC_MSG_CHECKING([whether printf(3) supports the z length modifier])
+AC_RUN_IFELSE(
+    [
+        AC_LANG_SOURCE([[
+#include <stdio.h>
+#include <string.h>
+
+int main()
+{
+  char buf[100];
+  snprintf(buf, sizeof(buf), "%zu", sizeof(buf));
+  return strncmp(buf, "100", sizeof(buf)) ? 1 : 0;
+}
+        ]])
+    ],
+    [
+        AC_MSG_RESULT(yes)
+    ],
+    [
+        AC_MSG_RESULT(no)
+        AC_DEFINE(HAVE_NO_PRINTF_Z, 1,
+            [Define to 1 if printf(3) does not support the z length modifier.])
+    ]
+)
 
 AC_CHECK_LIB(rpc, main)		dnl It's unclear why we might need -lrpc
 
@@ -993,7 +1022,7 @@ AC_CONFIG_HEADER(config.h)
 AC_OUTPUT_COMMANDS([if test -f .devel; then
 	echo timestamp > stamp-h
 	cat $srcdir/Makefile-devel-adds >> Makefile
-	make depend
+	make depend || exit 1
 fi])
 AC_OUTPUT(Makefile tcpdump.1)
 exit 0

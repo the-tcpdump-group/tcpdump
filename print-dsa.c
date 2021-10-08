@@ -83,7 +83,7 @@
 #define DSA_RX_SNIFF(tag) TOK(tag, 1, 0x04, 2)
 #define DSA_CFI(tag) TOK(tag, 1, 0x01, 0)
 #define DSA_PRI(tag) TOK(tag, 2, 0xe0, 5)
-#define DSA_VID(tag) ((u_short)((TOK(tag, 2, 0xe0, 5) << 8) | (TOK(tag, 3, 0xff, 0))))
+#define DSA_VID(tag) ((u_short)((TOK(tag, 2, 0x0f, 0) << 8) | (TOK(tag, 3, 0xff, 0))))
 #define DSA_CODE(tag) ((TOK(tag, 1, 0x06, 1) << 1) | TOK(tag, 2, 0x10, 4))
 
 #define EDSA_LEN 8

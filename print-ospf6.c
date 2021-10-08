@@ -95,7 +95,7 @@
 #define	RLA_FLAG_E	0x02
 #define	RLA_FLAG_V	0x04
 #define	RLA_FLAG_W	0x08
-#define RLA_FLAG_N      0x10
+#define	RLA_FLAG_Nt	0x10
 
 /* lsa_prefix options */
 #define LSA_PREFIX_OPT_NU 0x01
@@ -103,6 +103,7 @@
 #define LSA_PREFIX_OPT_MC 0x04
 #define LSA_PREFIX_OPT_P  0x08
 #define LSA_PREFIX_OPT_DN 0x10
+#define LSA_PREFIX_OPT_N  0x20
 
 /* sla_tosmetric breakdown	*/
 #define	SLA_MASK_TOS		0x7f000000
@@ -302,8 +303,8 @@ static const struct tok ospf6_rla_flag_values[] = {
 	{ RLA_FLAG_B,		"ABR" },
 	{ RLA_FLAG_E,		"External" },
 	{ RLA_FLAG_V,		"Virtual-Link Endpoint" },
-	{ RLA_FLAG_W,		"Wildcard Receiver" },
-        { RLA_FLAG_N,           "NSSA Translator" },
+	{ RLA_FLAG_W,		"Deprecated" },
+	{ RLA_FLAG_Nt,		"NSSA Translator" },
 	{ 0,			NULL }
 };
 
@@ -362,6 +363,7 @@ static const struct tok ospf6_lsa_prefix_option_values[] = {
         { LSA_PREFIX_OPT_MC, "Deprecated" },
         { LSA_PREFIX_OPT_P, "Propagate" },
         { LSA_PREFIX_OPT_DN, "Down" },
+        { LSA_PREFIX_OPT_N, "N-bit" },
 	{ 0, NULL }
 };
 
@@ -389,11 +391,11 @@ ospf6_print_lshdr(netdissect_options *ndo,
 	if ((const u_char *)(lshp + 1) > dataend)
 		goto trunc;
 
-	ND_PRINT("\n\t  Advertising Router %s, seq 0x%08x, age %us, length %u",
-               GET_IPADDR_STRING(lshp->ls_router),
-               GET_BE_U_4(lshp->ls_seq),
-               GET_BE_U_2(lshp->ls_age),
-               GET_BE_U_2(lshp->ls_length)-(u_int)sizeof(struct lsa6_hdr));
+	ND_PRINT("\n\t  Advertising Router %s, seq 0x%08x, age %us, length %zu",
+		 GET_IPADDR_STRING(lshp->ls_router),
+		 GET_BE_U_4(lshp->ls_seq),
+		 GET_BE_U_2(lshp->ls_age),
+		 GET_BE_U_2(lshp->ls_length)-sizeof(struct lsa6_hdr));
 
 	ospf6_print_ls_type(ndo, GET_BE_U_2(lshp->ls_type),
 			    &lshp->ls_stateid);
@@ -423,9 +425,8 @@ ospf6_print_lsaprefix(netdissect_options *ndo,
 	if (lsa_length < wordlen * 4)
 		goto trunc;
 	lsa_length -= wordlen * 4;
-	ND_TCHECK_LEN(lsapp->lsa_p_prefix, wordlen * 4);
 	memset(prefix, 0, sizeof(prefix));
-	memcpy(prefix, lsapp->lsa_p_prefix, wordlen * 4);
+	GET_CPY_BYTES(prefix, lsapp->lsa_p_prefix, wordlen * 4);
 	ND_PRINT("\n\t\t%s/%u", ip6addr_string(ndo, prefix), /* local buffer, not packet data; don't use GET_IP6ADDR_STRING() */
 		 GET_U_1(lsapp->lsa_p_len));
         if (GET_U_1(lsapp->lsa_p_opt)) {

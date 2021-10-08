@@ -557,8 +557,7 @@ static const struct tok bgp_add_path_recvsend[] = {
     { 0, NULL },
 };
 
-/* allocate space for the largest possible string */
-static char astostr[sizeof("xxxxx.xxxxx")];
+#define AS_STR_SIZE sizeof("xxxxx.xxxxx")
 
 /*
  * as_printf
@@ -598,20 +597,16 @@ decode_prefix4(netdissect_options *ndo,
 
     memset(&addr, 0, sizeof(addr));
     plenbytes = (plen + 7) / 8;
-    ND_TCHECK_LEN(pptr + 1, plenbytes);
     ITEMCHECK(plenbytes);
-    memcpy(&addr, pptr + 1, plenbytes);
+    GET_CPY_BYTES(&addr, pptr + 1, plenbytes);
     if (plen % 8) {
         ((u_char *)&addr)[plenbytes - 1] &= ((0xff00 >> (plen % 8)) & 0xff);
     }
     snprintf(buf, buflen, "%s/%u", ipaddr_string(ndo, (const u_char *)&addr), plen);
     return 1 + plenbytes;
 
-trunc:
-    return -2;
-
 badtlv:
-    return -3;
+    return -2;
 }
 
 static int
@@ -646,9 +641,8 @@ decode_labeled_prefix4(netdissect_options *ndo,
 
     memset(&addr, 0, sizeof(addr));
     plenbytes = (plen + 7) / 8;
-    ND_TCHECK_LEN(pptr + 4, plenbytes);
     ITEMCHECK(plenbytes);
-    memcpy(&addr, pptr + 4, plenbytes);
+    GET_CPY_BYTES(&addr, pptr + 4, plenbytes);
     if (plen % 8) {
         ((u_char *)&addr)[plenbytes - 1] &= ((0xff00 >> (plen % 8)) & 0xff);
     }
@@ -671,7 +665,7 @@ badtlv:
 /*
  * bgp_vpn_ip_print
  *
- * print an ipv4 or ipv6 address into a buffer dependend on address length.
+ * print an ipv4 or ipv6 address into a buffer dependent on address length.
  */
 static char *
 bgp_vpn_ip_print(netdissect_options *ndo,
@@ -766,6 +760,8 @@ bgp_vpn_rd_print(netdissect_options *ndo,
     /* allocate space for the largest possible string */
     static char rd[sizeof("xxxxx.xxxxx:xxxxx (xxx.xxx.xxx.xxx:xxxxx)")];
     char *pos = rd;
+    /* allocate space for the largest possible string */
+    char astostr[AS_STR_SIZE];
 
     /* ok lets load the RD format */
     switch (GET_BE_U_2(pptr)) {
@@ -815,6 +811,8 @@ bgp_extended_community_print(netdissect_options *ndo,
         float f;
         uint32_t i;
     } bw;
+    /* allocate space for the largest possible string */
+    char astostr[AS_STR_SIZE];
 
     switch (GET_BE_U_2(pptr)) {
 
@@ -920,6 +918,8 @@ bgp_rt_prefix_print(netdissect_options *ndo,
     char rtc_prefix_in_hex[20] = "";
     u_int rtc_prefix_in_hex_len = 0;
     static char output[61]; /* max response string */
+    /* allocate space for the largest possible string */
+    char astostr[AS_STR_SIZE];
     uint16_t ec_type = 0;
     u_int octet_count;
     u_int i;
@@ -993,7 +993,8 @@ decode_rt_routing_info(netdissect_options *ndo,
 {
     uint8_t route_target[8];
     u_int plen;
-    char asbuf[sizeof(astostr)]; /* bgp_vpn_rd_print() overwrites astostr */
+    /* allocate space for the largest possible string */
+    char astostr[AS_STR_SIZE];
     u_int num_octets;
 
     /* NLRI "prefix length" from RFC 2858 Section 4. */
@@ -1015,7 +1016,7 @@ decode_rt_routing_info(netdissect_options *ndo,
     }
 
     /* With at least "origin AS", possibly with "route target". */
-    as_printf(ndo, asbuf, sizeof(asbuf), GET_BE_U_4(pptr + 1));
+    as_printf(ndo, astostr, sizeof(astostr), GET_BE_U_4(pptr + 1));
 
     plen -= 32; /* adjust prefix length */
 
@@ -1030,20 +1031,17 @@ decode_rt_routing_info(netdissect_options *ndo,
      */
     memset(&route_target, 0, sizeof(route_target));
     num_octets = (plen + 7) / 8;
-    ND_TCHECK_LEN(pptr + 5, num_octets);
-    memcpy(&route_target, pptr + 5, num_octets);
+    GET_CPY_BYTES(&route_target, pptr + 5, num_octets);
     /* If mask-len is not on octet boundary, ensure all extra bits are 0 */
     if (plen % 8) {
         ((u_char *)&route_target)[num_octets - 1] &=
             ((0xff00 >> (plen % 8)) & 0xff);
     }
     ND_PRINT("\n\t      origin AS: %s, %s",
-             asbuf,
+             astostr,
              bgp_rt_prefix_print(ndo, (u_char *)&route_target, plen));
 
     return 5 + num_octets;
-trunc:
-    return -2;
 }
 
 static int
@@ -1064,8 +1062,7 @@ decode_labeled_vpn_prefix4(netdissect_options *ndo,
         return -1;
 
     memset(&addr, 0, sizeof(addr));
-    ND_TCHECK_LEN(pptr + 12, (plen + 7) / 8);
-    memcpy(&addr, pptr + 12, (plen + 7) / 8);
+    GET_CPY_BYTES(&addr, pptr + 12, (plen + 7) / 8);
     if (plen % 8) {
         ((u_char *)&addr)[(plen + 7) / 8 - 1] &=
             ((0xff00 >> (plen % 8)) & 0xff);
@@ -1079,9 +1076,6 @@ decode_labeled_vpn_prefix4(netdissect_options *ndo,
                 ((GET_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
 
     return 12 + (plen + 7) / 8;
-
-trunc:
-    return -2;
 }
 
 /*
@@ -1150,6 +1144,8 @@ static int
 decode_multicast_vpn(netdissect_options *ndo,
                      const u_char *pptr, char *buf, size_t buflen)
 {
+    /* allocate space for the largest possible string */
+    char astostr[AS_STR_SIZE];
     uint8_t route_type, route_length;
     u_int addr_length, sg_length;
     u_int offset;
@@ -1381,9 +1377,8 @@ decode_prefix6(netdissect_options *ndo,
 
     memset(&addr, 0, sizeof(addr));
     plenbytes = (plen + 7) / 8;
-    ND_TCHECK_LEN(pd + 1, plenbytes);
     ITEMCHECK(plenbytes);
-    memcpy(&addr, pd + 1, plenbytes);
+    GET_CPY_BYTES(&addr, pd + 1, plenbytes);
     if (plen % 8) {
         addr[plenbytes - 1] &=
             ((0xff00 >> (plen % 8)) & 0xff);
@@ -1391,11 +1386,8 @@ decode_prefix6(netdissect_options *ndo,
     snprintf(buf, buflen, "%s/%u", ip6addr_string(ndo, (const u_char *)&addr), plen);
     return 1 + plenbytes;
 
-trunc:
-    return -2;
-
 badtlv:
-    return -3;
+    return -2;
 }
 
 static int
@@ -1421,8 +1413,7 @@ decode_labeled_prefix6(netdissect_options *ndo,
 
     memset(&addr, 0, sizeof(addr));
     plenbytes = (plen + 7) / 8;
-    ND_TCHECK_LEN(pptr + 4, plenbytes);
-    memcpy(&addr, pptr + 4, plenbytes);
+    GET_CPY_BYTES(&addr, pptr + 4, plenbytes);
     if (plen % 8) {
         addr[plenbytes - 1] &=
             ((0xff00 >> (plen % 8)) & 0xff);
@@ -1461,8 +1452,7 @@ decode_labeled_vpn_prefix6(netdissect_options *ndo,
         return -1;
 
     memset(&addr, 0, sizeof(addr));
-    ND_TCHECK_LEN(pptr + 12, (plen + 7) / 8);
-    memcpy(&addr, pptr + 12, (plen + 7) / 8);
+    GET_CPY_BYTES(&addr, pptr + 12, (plen + 7) / 8);
     if (plen % 8) {
         addr[(plen + 7) / 8 - 1] &=
             ((0xff00 >> (plen % 8)) & 0xff);
@@ -1476,9 +1466,6 @@ decode_labeled_vpn_prefix6(netdissect_options *ndo,
                 ((GET_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
 
     return 12 + (plen + 7) / 8;
-
-trunc:
-    return -2;
 }
 
 static int
@@ -1494,8 +1481,7 @@ decode_clnp_prefix(netdissect_options *ndo,
         return -1;
 
     memset(&addr, 0, sizeof(addr));
-    ND_TCHECK_LEN(pptr + 4, (plen + 7) / 8);
-    memcpy(&addr, pptr + 4, (plen + 7) / 8);
+    GET_CPY_BYTES(&addr, pptr + 4, (plen + 7) / 8);
     if (plen % 8) {
         addr[(plen + 7) / 8 - 1] &=
             ((0xff00 >> (plen % 8)) & 0xff);
@@ -1506,9 +1492,6 @@ decode_clnp_prefix(netdissect_options *ndo,
                 plen);
 
     return 1 + (plen + 7) / 8;
-
-trunc:
-    return -2;
 }
 
 static int
@@ -1529,8 +1512,7 @@ decode_labeled_vpn_clnp_prefix(netdissect_options *ndo,
         return -1;
 
     memset(&addr, 0, sizeof(addr));
-    ND_TCHECK_LEN(pptr + 12, (plen + 7) / 8);
-    memcpy(&addr, pptr + 12, (plen + 7) / 8);
+    GET_CPY_BYTES(&addr, pptr + 12, (plen + 7) / 8);
     if (plen % 8) {
         addr[(plen + 7) / 8 - 1] &= ((0xff00 >> (plen % 8)) & 0xff);
     }
@@ -1544,9 +1526,6 @@ decode_labeled_vpn_clnp_prefix(netdissect_options *ndo,
                 ((GET_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
 
     return 12 + (plen + 7) / 8;
-
-trunc:
-    return -2;
 }
 
 /*
@@ -1753,8 +1732,6 @@ bgp_nlri_print(netdissect_options *ndo, uint16_t af, uint8_t safi,
                 if (advance == -1)
                     ND_PRINT("\n\t    (illegal prefix length)");
                 else if (advance == -2)
-                    goto trunc;
-                else if (advance == -3)
                     break; /* bytes left, but not enough */
                 else
                     ND_PRINT("\n\t      %s", buf);
@@ -1780,15 +1757,11 @@ bgp_nlri_print(netdissect_options *ndo, uint16_t af, uint8_t safi,
                 advance = decode_labeled_vpn_prefix4(ndo, tptr, buf, buflen);
                 if (advance == -1)
                     ND_PRINT("\n\t    (illegal prefix length)");
-                else if (advance == -2)
-                    goto trunc;
                 else
                     ND_PRINT("\n\t      %s", buf);
                 break;
             case (AFNUM_INET<<8 | SAFNUM_RT_ROUTING_INFO):
                 advance = decode_rt_routing_info(ndo, tptr);
-                if (advance == -2)
-                    goto trunc;
                 break;
             case (AFNUM_INET<<8 | SAFNUM_MULTICAST_VPN): /* fall through */
             case (AFNUM_INET6<<8 | SAFNUM_MULTICAST_VPN):
@@ -1821,8 +1794,6 @@ bgp_nlri_print(netdissect_options *ndo, uint16_t af, uint8_t safi,
                 if (advance == -1)
                     ND_PRINT("\n\t    (illegal prefix length)");
                 else if (advance == -2)
-                    goto trunc;
-                else if (advance == -3)
                     break; /* bytes left, but not enough */
                 else
                     ND_PRINT("\n\t      %s", buf);
@@ -1848,8 +1819,6 @@ bgp_nlri_print(netdissect_options *ndo, uint16_t af, uint8_t safi,
                 advance = decode_labeled_vpn_prefix6(ndo, tptr, buf, buflen);
                 if (advance == -1)
                     ND_PRINT("\n\t    (illegal prefix length)");
-                else if (advance == -2)
-                    goto trunc;
                 else
                     ND_PRINT("\n\t      %s", buf);
                 break;
@@ -1871,8 +1840,6 @@ bgp_nlri_print(netdissect_options *ndo, uint16_t af, uint8_t safi,
                 advance = decode_clnp_prefix(ndo, tptr, buf, buflen);
                 if (advance == -1)
                     ND_PRINT("\n\t    (illegal prefix length)");
-                else if (advance == -2)
-                    goto trunc;
                 else
                     ND_PRINT("\n\t      %s", buf);
                 break;
@@ -1882,8 +1849,6 @@ bgp_nlri_print(netdissect_options *ndo, uint16_t af, uint8_t safi,
                 advance = decode_labeled_vpn_clnp_prefix(ndo, tptr, buf, buflen);
                 if (advance == -1)
                     ND_PRINT("\n\t    (illegal prefix length)");
-                else if (advance == -2)
-                    goto trunc;
                 else
                     ND_PRINT("\n\t      %s", buf);
                 break;
@@ -1906,6 +1871,8 @@ bgp_attr_print(netdissect_options *ndo,
                uint8_t atype, const u_char *pptr, u_int len,
                const unsigned attr_set_level)
 {
+    /* allocate space for the largest possible string */
+    char astostr[AS_STR_SIZE];
     u_int i;
     uint16_t af;
     uint8_t safi, snpa, nhlen;
@@ -2551,6 +2518,8 @@ static void
 bgp_capabilities_print(netdissect_options *ndo,
                        const u_char *opt, u_int caps_len)
 {
+    /* allocate space for the largest possible string */
+    char astostr[AS_STR_SIZE];
     u_int cap_type, cap_len, tcap_len, cap_offset;
     u_int i = 0;
 
@@ -2679,6 +2648,8 @@ static void
 bgp_open_print(netdissect_options *ndo,
                const u_char *dat, u_int length)
 {
+    /* allocate space for the largest possible string */
+    char astostr[AS_STR_SIZE];
     const struct bgp_open *bgp_open_header;
     u_int optslen;
     const struct bgp_opt *bgpopt;
@@ -2800,8 +2771,6 @@ bgp_update_print(netdissect_options *ndo,
                 ND_PRINT("\n\t    (illegal prefix length)");
                 break;
             } else if (wpfx == -2)
-                goto trunc;
-            else if (wpfx == -3)
                 goto trunc; /* bytes left, but not enough */
             else {
                 ND_PRINT("\n\t    %s", buf);
@@ -2917,8 +2886,6 @@ bgp_update_print(netdissect_options *ndo,
                 ND_PRINT("\n\t    (illegal prefix length)");
                 break;
             } else if (i == -2)
-                goto trunc;
-            else if (i == -3)
                 goto trunc; /* bytes left, but not enough */
             else {
                 ND_PRINT("\n\t    %s", buf);
@@ -3031,7 +2998,7 @@ bgp_notification_print(netdissect_options *ndo,
             else {
                 ND_TCHECK_LEN(tptr + 1, shutdown_comm_length);
                 ND_PRINT(", Shutdown Communication (length: %u): \"", shutdown_comm_length);
-                (void)nd_printn(ndo, tptr+1, shutdown_comm_length, NULL);
+                nd_printjn(ndo, tptr+1, shutdown_comm_length);
                 ND_PRINT("\"");
                 remainder_offset += shutdown_comm_length + 1;
             }

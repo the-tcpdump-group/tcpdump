@@ -54,13 +54,9 @@ msnlb_print(netdissect_options *ndo, const u_char *bp)
 
 	ndo->ndo_protocol = "msnlb";
 	hb = (const struct msnlb_heartbeat_pkt *)bp;
-	ND_TCHECK_SIZE(hb);
 
-	ND_PRINT("MS NLB heartbeat, host priority: %u,",
-		GET_LE_U_4((hb->host_prio)));
-	ND_PRINT(" cluster IP: %s,", GET_IPADDR_STRING(hb->virtual_ip));
-	ND_PRINT(" host IP: %s", GET_IPADDR_STRING(hb->host_ip));
-	return;
-trunc:
-	nd_print_trunc(ndo);
+	ND_PRINT("MS NLB heartbeat");
+	ND_PRINT(", host priority: %u", GET_LE_U_4((hb->host_prio)));
+	ND_PRINT(", cluster IP: %s", GET_IPADDR_STRING(hb->virtual_ip));
+	ND_PRINT(", host IP: %s", GET_IPADDR_STRING(hb->host_ip));
 }

@@ -29,6 +29,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 #include "af.h"
@@ -80,9 +81,9 @@ struct enchdr {
 	nd_uint32_t flags;
 };
 
-#define ENC_PRINT_TYPE(wh, xf, nam) \
+#define ENC_PRINT_TYPE(wh, xf, name) \
 	if ((wh) & (xf)) { \
-		ND_PRINT("%s%s", nam, (wh) == (xf) ? "): " : ","); \
+		ND_PRINT("%s%s", name, (wh) == (xf) ? "): " : ","); \
 		(wh) &= ~(xf); \
 	}
 
@@ -104,11 +105,7 @@ enc_if_print(netdissect_options *ndo,
 	const struct enchdr *hdr;
 
 	ndo->ndo_protocol = "enc";
-	if (caplen < ENC_HDRLEN) {
-		ndo->ndo_ll_hdr_len += caplen;
-		nd_print_trunc(ndo);
-		return;
-	}
+	ND_TCHECK_LEN(p, ENC_HDRLEN);
 	ndo->ndo_ll_hdr_len += ENC_HDRLEN;
 
 	hdr = (const struct enchdr *)p;

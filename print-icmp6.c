@@ -1164,7 +1164,6 @@ icmp6_print(netdissect_options *ndo,
 		break;
 	case ICMP6_ECHO_REQUEST:
 	case ICMP6_ECHO_REPLY:
-                /* The check below covers both icmp6_id and icmp6_seq. */
                 ND_PRINT(", id %u, seq %u", GET_BE_U_2(dp->icmp6_id),
 			 GET_BE_U_2(dp->icmp6_seq));
 		break;
@@ -1515,12 +1514,10 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			case 1:
 				break;
 			case 2:
-				ND_TCHECK_8(opri + 1);
-				memcpy(&in6, opri + 1, 8);
+				GET_CPY_BYTES(&in6, opri + 1, 8);
 				break;
 			case 3:
-				ND_TCHECK_16(opri + 1);
-				memcpy(&in6, opri + 1, 16);
+				GET_CPY_BYTES(&in6, opri + 1, 16);
 				break;
 			default:
 				goto trunc;

@@ -246,21 +246,6 @@ static const struct printer printers[] = {
 	{ NULL,                 0 },
 };
 
-static void	ndo_default_print(netdissect_options *ndo, const u_char *bp,
-		    u_int length);
-
-static void NORETURN ndo_error(netdissect_options *ndo,
-		     status_exit_codes_t status,
-		     FORMAT_STRING(const char *fmt), ...)
-		     PRINTFLIKE(3, 4);
-static void	ndo_warning(netdissect_options *ndo,
-		    FORMAT_STRING(const char *fmt), ...)
-		    PRINTFLIKE(2, 3);
-
-static int	ndo_printf(netdissect_options *ndo,
-		     FORMAT_STRING(const char *fmt), ...)
-		     PRINTFLIKE(2, 3);
-
 void
 init_print(netdissect_options *ndo, uint32_t localnet, uint32_t mask)
 {
@@ -386,7 +371,16 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	 * bigger lengths.
 	 */
 
-	ts_print(ndo, &h->ts);
+	/*
+	 * The header /usr/include/pcap/pcap.h in OpenBSD declares h->ts as
+	 * struct bpf_timeval, not struct timeval. The former comes from
+	 * /usr/include/net/bpf.h and uses 32-bit unsigned types instead of
+	 * the types used in struct timeval.
+	 */
+	struct timeval tvbuf;
+	tvbuf.tv_sec = h->ts.tv_sec;
+	tvbuf.tv_usec = h->ts.tv_usec;
+	ts_print(ndo, &tvbuf);
 
 	/*
 	 * Printers must check that they're not walking off the end of
@@ -406,6 +400,8 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	case ND_TRUNCATED:
 		/* A printer quit because the packet was truncated; report it */
 		nd_print_trunc(ndo);
+		/* Print the full packet */
+		ndo->ndo_ll_hdr_len = 0;
 		break;
 	}
 	hdrlen = ndo->ndo_ll_hdr_len;
@@ -495,9 +491,9 @@ ndo_default_print(netdissect_options *ndo, const u_char *bp, u_int length)
 }
 
 /* VARARGS */
-static void
+static void NORETURN PRINTFLIKE(3, 4)
 ndo_error(netdissect_options *ndo, status_exit_codes_t status,
-	  const char *fmt, ...)
+          FORMAT_STRING(const char *fmt), ...)
 {
 	va_list ap;
 
@@ -517,8 +513,8 @@ ndo_error(netdissect_options *ndo, status_exit_codes_t status,
 }
 
 /* VARARGS */
-static void
-ndo_warning(netdissect_options *ndo, const char *fmt, ...)
+static void PRINTFLIKE(2, 3)
+ndo_warning(netdissect_options *ndo, FORMAT_STRING(const char *fmt), ...)
 {
 	va_list ap;
 
@@ -535,8 +531,9 @@ ndo_warning(netdissect_options *ndo, const char *fmt, ...)
 	}
 }
 
-static int
-ndo_printf(netdissect_options *ndo, const char *fmt, ...)
+/* VARARGS */
+static int PRINTFLIKE(2, 3)
+ndo_printf(netdissect_options *ndo, FORMAT_STRING(const char *fmt), ...)
 {
 	va_list args;
 	int ret;

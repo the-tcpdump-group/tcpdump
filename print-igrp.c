@@ -63,30 +63,17 @@ struct igrprte {
 	nd_uint8_t igr_hct;	/* hop count */
 };
 
-#define IGRP_RTE_SIZE	14	/* don't believe sizeof ! */
+#define IGRP_RTE_SIZE	14	/* sizeof() is accurate now */
 
 static void
-igrp_entry_print(netdissect_options *ndo, const struct igrprte *igr,
-    int is_interior, int is_exterior)
+igrp_entry_print(netdissect_options *ndo, const struct igrprte *igr)
 {
 	u_int delay, bandwidth;
 	u_int metric, mtu;
 
-	if (is_interior)
-		ND_PRINT(" *.%u.%u.%u", igr->igr_net[0],
-		    igr->igr_net[1], igr->igr_net[2]);
-	else if (is_exterior)
-		ND_PRINT(" X%u.%u.%u.0", igr->igr_net[0],
-		    igr->igr_net[1], igr->igr_net[2]);
-	else
-		ND_PRINT(" %u.%u.%u.0", igr->igr_net[0],
-		    igr->igr_net[1], igr->igr_net[2]);
-
 	delay = GET_BE_U_3(igr->igr_dly);
 	bandwidth = GET_BE_U_3(igr->igr_bw);
-	metric = bandwidth + delay;
-	if (metric > 0xffffff)
-		metric = 0xffffff;
+	metric = ND_MIN(bandwidth + delay, 0xffffff);
 	mtu = GET_BE_U_2(igr->igr_mtu);
 
 	ND_PRINT(" d=%u b=%u r=%u l=%u M=%u mtu=%u in %u hops",
@@ -107,6 +94,7 @@ igrp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	const struct igrphdr *hdr;
 	const u_char *cp;
 	u_int nint, nsys, next;
+	uint16_t cksum;
 
 	ndo->ndo_protocol = "igrp";
 	hdr = (const struct igrphdr *)bp;
@@ -114,7 +102,6 @@ igrp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	ND_PRINT("igrp:");
 
 	/* Header */
-	ND_TCHECK_SIZE(hdr);
 	nint = GET_BE_U_2(hdr->ig_ni);
 	nsys = GET_BE_U_2(hdr->ig_ns);
 	next = GET_BE_U_2(hdr->ig_nx);
@@ -127,20 +114,28 @@ igrp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	    nint,
 	    nsys,
 	    next);
+	cksum = GET_BE_U_2(hdr->ig_sum);
+	if (ndo->ndo_vflag)
+		ND_PRINT(" checksum=0x%04x", cksum);
 
 	length -= sizeof(*hdr);
 	while (length >= IGRP_RTE_SIZE) {
+		const struct igrprte *igr = (const struct igrprte *)cp;
+		uint8_t net0 = GET_U_1(&igr->igr_net[0]);
+		uint8_t net1 = GET_U_1(&igr->igr_net[1]);
+		uint8_t net2 = GET_U_1(&igr->igr_net[2]);
+
 		if (nint > 0) {
-			ND_TCHECK_LEN(cp, IGRP_RTE_SIZE);
-			igrp_entry_print(ndo, (const struct igrprte *)cp, 1, 0);
+			ND_PRINT(" *.%u.%u.%u", net0, net1, net2);
+			igrp_entry_print(ndo, igr);
 			--nint;
 		} else if (nsys > 0) {
-			ND_TCHECK_LEN(cp, IGRP_RTE_SIZE);
-			igrp_entry_print(ndo, (const struct igrprte *)cp, 0, 0);
+			ND_PRINT(" %u.%u.%u.0", net0, net1, net2);
+			igrp_entry_print(ndo, igr);
 			--nsys;
 		} else if (next > 0) {
-			ND_TCHECK_LEN(cp, IGRP_RTE_SIZE);
-			igrp_entry_print(ndo, (const struct igrprte *)cp, 0, 1);
+			ND_PRINT(" X%u.%u.%u.0", net0, net1, net2);
+			igrp_entry_print(ndo, igr);
 			--next;
 		} else {
 			ND_PRINT(" [extra bytes %u]", length);
@@ -149,8 +144,6 @@ igrp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		cp += IGRP_RTE_SIZE;
 		length -= IGRP_RTE_SIZE;
 	}
-	if (nint == 0 && nsys == 0 && next == 0)
-		return;
-trunc:
-	nd_print_trunc(ndo);
+	if (nint || nsys || next || length)
+		nd_print_invalid(ndo);
 }

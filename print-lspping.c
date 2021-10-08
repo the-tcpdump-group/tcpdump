@@ -23,6 +23,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
@@ -608,9 +609,6 @@ lspping_print(netdissect_options *ndo,
         if (tlen < sizeof(struct lspping_tlv_header))
             goto tooshort;
 
-        /* did we capture enough for fully decoding the tlv header ? */
-        ND_TCHECK_LEN(tptr, sizeof(struct lspping_tlv_header));
-
         lspping_tlv_header = (const struct lspping_tlv_header *)tptr;
         lspping_tlv_type=GET_BE_U_2(lspping_tlv_header->type);
         lspping_tlv_len=GET_BE_U_2(lspping_tlv_header->length);
@@ -648,8 +646,6 @@ lspping_print(netdissect_options *ndo,
                     tlv_hexdump = TRUE;
                     goto tlv_tooshort;
                 }
-                /* did we capture enough for fully decoding the subtlv header ? */
-                ND_TCHECK_LEN(tlv_tptr, sizeof(struct lspping_tlv_header));
                 subtlv_hexdump=FALSE;
 
                 lspping_subtlv_header = (const struct lspping_tlv_header *)tlv_tptr;
@@ -1026,8 +1022,7 @@ lspping_print(netdissect_options *ndo,
                 tlv_hexdump = TRUE;
                 goto tlv_tooshort;
             } else {
-                ND_TCHECK_LEN(tptr, LSPPING_TLV_BFD_DISCRIMINATOR_LEN);
-                ND_PRINT("\n\t    BFD Discriminator 0x%08x", GET_BE_U_4(tptr));
+                ND_PRINT("\n\t    BFD Discriminator 0x%08x", GET_BE_U_4(tlv_tptr));
             }
             break;
 
@@ -1040,7 +1035,6 @@ lspping_print(netdissect_options *ndo,
                 tlv_hexdump = TRUE;
                 goto tlv_tooshort;
             } else {
-                ND_TCHECK_LEN(tptr, LSPPING_TLV_VENDOR_ENTERPRISE_LEN);
                 vendor_id = GET_BE_U_4(tlv_tptr);
                 ND_PRINT("\n\t    Vendor: %s (0x%04x)",
                        tok2str(smi_values, "Unknown", vendor_id),
@@ -1083,7 +1077,4 @@ lspping_print(netdissect_options *ndo,
     return;
 tooshort:
     ND_PRINT("\n\t\t packet is too short");
-    return;
-trunc:
-    nd_print_trunc(ndo);
 }

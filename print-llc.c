@@ -485,7 +485,7 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 	case OUI_CISCO:
                 switch (et) {
                 case PID_CISCO_CDP:
-                        cdp_print(ndo, p, length, caplen);
+                        cdp_print(ndo, p, length);
                         return (1);
                 case PID_CISCO_DTP:
                         dtp_print(ndo, p, length);

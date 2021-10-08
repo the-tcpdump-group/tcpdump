@@ -58,6 +58,9 @@
 #define ONF_EXP_WMOB              0xff000005
 #define ONF_EXP_FABS              0xff000006
 #define ONF_EXP_OTRANS            0xff000007
+#define ONF_EXP_NBLNCTU           0xff000008
+#define ONF_EXP_MPCE              0xff000009
+#define ONF_EXP_MPLSTPSPTN        0xff00000a
 extern const struct tok onf_exp_str[];
 
 extern const char * of_vendor_name(const uint32_t);
@@ -69,15 +72,19 @@ extern void of_data_print(netdissect_options *ndo,
 /*
  * Routines to handle various versions of OpenFlow.
  */
-extern void of10_message_print(netdissect_options *ndo,
-	const u_char *, uint16_t, const uint8_t);
-extern void of13_message_print(netdissect_options *ndo,
-	const u_char *, uint16_t, const uint8_t);
 
-/*
- * Use this instead of ofpt_str[] and OFPT_ constants because OpenFlow
- * specifications define protocol encoding in C syntax, and different
- * versions clash on many names, including the OFPT_ constants.
- */
-extern const char * of10_msgtype_str(const uint8_t);
-extern const char * of13_msgtype_str(const uint8_t);
+struct of_msgtypeinfo {
+	/* Should not be NULL. */
+	const char *name;
+	/* May be NULL to mean "message body printing is not implemented". */
+	void (*decoder)(netdissect_options *ndo, const u_char *, const u_int);
+	enum {
+		REQ_NONE,   /* Message body length may be anything. */
+		REQ_FIXLEN, /* Message body length must be == req_value. */
+		REQ_MINLEN, /* Message body length must be >= req_value. */
+	} req_what;
+	uint16_t req_value;
+};
+
+extern const struct of_msgtypeinfo *of10_identify_msgtype(const uint8_t);
+extern const struct of_msgtypeinfo *of13_identify_msgtype(const uint8_t);

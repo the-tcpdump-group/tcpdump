@@ -37,6 +37,7 @@
  */
 #include "funcattrs.h"
 #include "netdissect.h"
+#include "diag-control.h"
 
 /*
  * If we have versions of GCC or Clang that support an __attribute__
@@ -579,6 +580,14 @@ static inline NORETURN void
 nd_trunc_longjmp(netdissect_options *ndo)
 {
 	longjmp(ndo->ndo_early_end, ND_TRUNCATED);
+#ifdef _AIX
+	/*
+	 * In AIX <setjmp.h> decorates longjmp() with "#pragma leaves", which tells
+	 * XL C that the function is noreturn, but GCC remains unaware of that and
+	 * yields a "'noreturn' function does return" warning.
+	 */
+	ND_UNREACHABLE
+#endif /* _AIX */
 }
 
 /* get_u_1 and get_s_1 */

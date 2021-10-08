@@ -216,7 +216,10 @@ struct udphdr {
 #define BABEL_PORT_OLD			6697	/* RFC 6126 */
 #endif
 #ifndef BFD_LAG_PORT
-#define BFD_LAG_PORT			6784	/* RFC 7310 */
+#define BFD_LAG_PORT			6784	/* RFC 7130 */
+#endif
+#ifndef SBFD_PORT
+#define SBFD_PORT			7784	/* SBFD RFC 7880 */
 #endif
 #ifndef RX_PORT_LOW
 #define RX_PORT_LOW			7000	/*XXX*/

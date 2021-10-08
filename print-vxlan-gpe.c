@@ -23,7 +23,7 @@
 
 /* \summary: Generic Protocol Extension for VXLAN (VXLAN GPE) printer */
 
-/* specification: draft-ietf-nvo3-vxlan-gpe-01 */
+/* specification: draft-ietf-nvo3-vxlan-gpe-10 */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -31,12 +31,14 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 
 static const struct tok vxlan_gpe_flags [] = {
     { 0x08, "I" },
     { 0x04, "P" },
+    { 0x02, "B" },
     { 0x01, "O" },
     { 0, NULL }
 };
@@ -64,50 +66,59 @@ vxlan_gpe_print(netdissect_options *ndo, const u_char *bp, u_int len)
     uint32_t vni;
 
     ndo->ndo_protocol = "vxlan_gpe";
-    if (len < VXLAN_GPE_HDR_LEN)
-        goto trunc;
-
-    ND_TCHECK_LEN(bp, VXLAN_GPE_HDR_LEN);
+    ND_PRINT("VXLAN-GPE, ");
+    if (len < VXLAN_GPE_HDR_LEN) {
+        ND_PRINT(" (len %u < %u)", len, VXLAN_GPE_HDR_LEN);
+        goto invalid;
+    }
 
     flags = GET_U_1(bp);
-    bp += 3;
+    bp += 1;
+    len -= 1;
+    ND_PRINT("flags [%s], ",
+              bittok2str_nosep(vxlan_gpe_flags, "none", flags));
+
+    /* Reserved */
+    bp += 2;
+    len -= 2;
 
     next_protocol = GET_U_1(bp);
     bp += 1;
+    len -= 1;
 
     vni = GET_BE_U_3(bp);
-    bp += 4;
+    bp += 3;
+    len -= 3;
 
-    ND_PRINT("VXLAN-GPE, ");
-    ND_PRINT("flags [%s], ",
-              bittok2str_nosep(vxlan_gpe_flags, "none", flags));
+    /* Reserved */
+    ND_TCHECK_1(bp);
+    bp += 1;
+    len -= 1;
+
     ND_PRINT("vni %u", vni);
     ND_PRINT(ndo->ndo_vflag ? "\n    " : ": ");
 
     switch (next_protocol) {
     case 0x1:
-        ip_print(ndo, bp, len - VXLAN_GPE_HDR_LEN);
+        ip_print(ndo, bp, len);
         break;
     case 0x2:
-        ip6_print(ndo, bp, len - VXLAN_GPE_HDR_LEN);
+        ip6_print(ndo, bp, len);
         break;
     case 0x3:
-        ether_print(ndo, bp, len - VXLAN_GPE_HDR_LEN, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL);
+        ether_print(ndo, bp, len, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL);
         break;
     case 0x4:
-        nsh_print(ndo, bp, len - VXLAN_GPE_HDR_LEN);
-        break;
-    case 0x5:
-        mpls_print(ndo, bp, len - VXLAN_GPE_HDR_LEN);
+        nsh_print(ndo, bp, len);
         break;
     default:
         ND_PRINT("ERROR: unknown-next-protocol");
-        return;
+        goto invalid;
     }
 
 	return;
 
-trunc:
-	nd_print_trunc(ndo);
+invalid:
+    nd_print_invalid(ndo);
 }
 

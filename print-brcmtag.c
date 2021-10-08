@@ -27,6 +27,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "ethertype.h"
 #include "addrtoname.h"
@@ -131,11 +132,8 @@ brcm_tag_prepend_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	u_int length = h->len;
 
 	ndo->ndo_protocol = "brcm-tag-prepend";
-	if (caplen < BRCM_TAG_LEN) {
-		ndo->ndo_ll_hdr_len += caplen;
-		nd_print_trunc(ndo);
-		return;
-	}
+	ND_TCHECK_LEN(p, BRCM_TAG_LEN);
+	ndo->ndo_ll_hdr_len += BRCM_TAG_LEN;
 
 	if (ndo->ndo_eflag) {
 		/* Print the prepended Broadcom tag. */

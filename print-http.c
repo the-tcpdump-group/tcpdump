@@ -19,11 +19,7 @@
 
 #include "netdissect-stdinc.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "netdissect.h"
-#include "extract.h"
 
 /*
  * Includes WebDAV requests.

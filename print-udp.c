@@ -212,7 +212,7 @@ rtp_print(netdissect_options *ndo, const u_char *hdr, u_int len)
 }
 
 static const u_char *
-rtcp_print(netdissect_options *ndo, const u_char *hdr, const u_char *ep)
+rtcp_print(netdissect_options *ndo, const u_char *hdr)
 {
 	/* rtp v2 control (rtcp) */
 	const struct rtcp_rr *rr = 0;
@@ -220,16 +220,15 @@ rtcp_print(netdissect_options *ndo, const u_char *hdr, const u_char *ep)
 	const struct rtcphdr *rh = (const struct rtcphdr *)hdr;
 	u_int len;
 	uint16_t flags;
+	uint32_t ssrc;
 	u_int cnt;
 	double ts, dts;
 
 	ndo->ndo_protocol = "rtcp";
-	if ((const u_char *)(rh + 1) > ep)
-		goto trunc;
-	ND_TCHECK_SIZE(rh);
 	len = (GET_BE_U_2(rh->rh_len) + 1) * 4;
 	flags = GET_BE_U_2(rh->rh_flags);
 	cnt = (flags >> 8) & 0x1f;
+	ssrc = GET_BE_U_4(rh->rh_ssrc);
 	switch (flags & 0xff) {
 	case RTCP_PT_SR:
 		sr = (const struct rtcp_sr *)(rh + 1);
@@ -237,10 +236,7 @@ rtcp_print(netdissect_options *ndo, const u_char *hdr, const u_char *ep)
 		if (len != cnt * sizeof(*rr) + sizeof(*sr) + sizeof(*rh))
 			ND_PRINT(" [%u]", len);
 		if (ndo->ndo_vflag)
-			ND_PRINT(" %u", GET_BE_U_4(rh->rh_ssrc));
-		if ((const u_char *)(sr + 1) > ep)
-			goto trunc;
-		ND_TCHECK_SIZE(sr);
+			ND_PRINT(" %u", ssrc);
 		ts = (double)(GET_BE_U_4(sr->sr_ntp.upper)) +
 		    ((double)(GET_BE_U_4(sr->sr_ntp.lower)) /
 		     FMAXINT);
@@ -254,18 +250,18 @@ rtcp_print(netdissect_options *ndo, const u_char *hdr, const u_char *ep)
 			ND_PRINT(" [%u]", len);
 		rr = (const struct rtcp_rr *)(rh + 1);
 		if (ndo->ndo_vflag)
-			ND_PRINT(" %u", GET_BE_U_4(rh->rh_ssrc));
+			ND_PRINT(" %u", ssrc);
 		break;
 	case RTCP_PT_SDES:
 		ND_PRINT(" sdes %u", len);
 		if (ndo->ndo_vflag)
-			ND_PRINT(" %u", GET_BE_U_4(rh->rh_ssrc));
+			ND_PRINT(" %u", ssrc);
 		cnt = 0;
 		break;
 	case RTCP_PT_BYE:
 		ND_PRINT(" bye %u", len);
 		if (ndo->ndo_vflag)
-			ND_PRINT(" %u", GET_BE_U_4(rh->rh_ssrc));
+			ND_PRINT(" %u", ssrc);
 		cnt = 0;
 		break;
 	default:
@@ -276,9 +272,6 @@ rtcp_print(netdissect_options *ndo, const u_char *hdr, const u_char *ep)
 	if (cnt > 1)
 		ND_PRINT(" c%u", cnt);
 	while (cnt != 0) {
-		if ((const u_char *)(rr + 1) > ep)
-			goto trunc;
-		ND_TCHECK_SIZE(rr);
 		if (ndo->ndo_vflag)
 			ND_PRINT(" %u", GET_BE_U_4(rr->rr_srcid));
 		ts = (double)(GET_BE_U_4(rr->rr_lsr)) / 65536.;
@@ -290,10 +283,6 @@ rtcp_print(netdissect_options *ndo, const u_char *hdr, const u_char *ep)
 		cnt--;
 	}
 	return (hdr + len);
-
-trunc:
-	nd_print_trunc(ndo);
-	return ep;
 }
 
 static uint16_t udp_cksum(netdissect_options *ndo, const struct ip *ip,
@@ -312,55 +301,41 @@ static uint16_t udp6_cksum(netdissect_options *ndo, const struct ip6_hdr *ip6,
 }
 
 static void
-udpipaddr_print(netdissect_options *ndo, const struct ip *ip, int sport, int dport)
+udpipaddr_print(netdissect_options *ndo,
+                const struct ip *ip, const uint16_t sport, const uint16_t dport)
 {
-	const struct ip6_hdr *ip6;
+	const struct ip6_hdr *ip6 = (const struct ip6_hdr *)ip;
 
-	if (IP_V(ip) == 6)
-		ip6 = (const struct ip6_hdr *)ip;
-	else
-		ip6 = NULL;
+	if (IP_V(ip) == 4 && GET_U_1(ip->ip_p) == IPPROTO_UDP) {
+		ND_PRINT("%s.%s > %s.%s: ",
+			GET_IPADDR_STRING(ip->ip_src),
+			udpport_string(ndo, sport),
+			GET_IPADDR_STRING(ip->ip_dst),
+			udpport_string(ndo, dport));
+	} else if (IP_V(ip) == 6 && GET_U_1(ip6->ip6_nxt) == IPPROTO_UDP) {
+		ND_PRINT("%s.%s > %s.%s: ",
+			GET_IP6ADDR_STRING(ip6->ip6_src),
+			udpport_string(ndo, sport),
+			GET_IP6ADDR_STRING(ip6->ip6_dst),
+			udpport_string(ndo, dport));
+	} else
+		ND_PRINT("%s > %s: ",
+			udpport_string(ndo, sport), udpport_string(ndo, dport));
+}
 
-	if (ip6) {
-		if (GET_U_1(ip6->ip6_nxt) == IPPROTO_UDP) {
-			if (sport == -1) {
-				ND_PRINT("%s > %s: ",
-					GET_IP6ADDR_STRING(ip6->ip6_src),
-					GET_IP6ADDR_STRING(ip6->ip6_dst));
-			} else {
-				ND_PRINT("%s.%s > %s.%s: ",
-					GET_IP6ADDR_STRING(ip6->ip6_src),
-					udpport_string(ndo, (uint16_t)sport),
-					GET_IP6ADDR_STRING(ip6->ip6_dst),
-					udpport_string(ndo, (uint16_t)dport));
-			}
-		} else {
-			if (sport != -1) {
-				ND_PRINT("%s > %s: ",
-					udpport_string(ndo, (uint16_t)sport),
-					udpport_string(ndo, (uint16_t)dport));
-			}
-		}
-	} else {
-		if (GET_U_1(ip->ip_p) == IPPROTO_UDP) {
-			if (sport == -1) {
-				ND_PRINT("%s > %s: ",
-					GET_IPADDR_STRING(ip->ip_src),
-					GET_IPADDR_STRING(ip->ip_dst));
-			} else {
-				ND_PRINT("%s.%s > %s.%s: ",
-					GET_IPADDR_STRING(ip->ip_src),
-					udpport_string(ndo, (uint16_t)sport),
-					GET_IPADDR_STRING(ip->ip_dst),
-					udpport_string(ndo, (uint16_t)dport));
-			}
-		} else {
-			if (sport != -1) {
-				ND_PRINT("%s > %s: ",
-					udpport_string(ndo, (uint16_t)sport),
-					udpport_string(ndo, (uint16_t)dport));
-			}
-		}
+static void
+udpipaddr_noport_print(netdissect_options *ndo, const struct ip *ip)
+{
+	const struct ip6_hdr *ip6 = (const struct ip6_hdr *)ip;
+
+	if (IP_V(ip) == 4 && GET_U_1(ip->ip_p) == IPPROTO_UDP) {
+		ND_PRINT("%s > %s: ",
+			GET_IPADDR_STRING(ip->ip_src),
+			GET_IPADDR_STRING(ip->ip_dst));
+	} else if (IP_V(ip) == 6 && GET_U_1(ip6->ip6_nxt) == IPPROTO_UDP) {
+		ND_PRINT("%s > %s: ",
+			GET_IP6ADDR_STRING(ip6->ip6_src),
+			GET_IP6ADDR_STRING(ip6->ip6_dst));
 	}
 }
 
@@ -374,6 +349,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	const u_char *ep = ndo->ndo_snapend;
 	uint16_t sport, dport;
 	u_int ulen;
+	uint16_t udp_sum;
 	const struct ip6_hdr *ip6;
 
 	ndo->ndo_protocol = "udp";
@@ -384,23 +360,18 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	else
 		ip6 = NULL;
 	if (!ND_TTEST_2(up->uh_dport)) {
-		udpipaddr_print(ndo, ip, -1, -1);
-		goto trunc;
+		udpipaddr_noport_print(ndo, ip);
+		nd_trunc_longjmp(ndo);
 	}
 
 	sport = GET_BE_U_2(up->uh_sport);
 	dport = GET_BE_U_2(up->uh_dport);
+	if (ndo->ndo_packettype != PT_RPC)
+		udpipaddr_print(ndo, ip, sport, dport);
 
-	if (length < sizeof(struct udphdr)) {
-		udpipaddr_print(ndo, ip, sport, dport);
-		ND_PRINT("truncated-udp %u", length);
-		return;
-	}
-	if (!ND_TTEST_2(up->uh_ulen)) {
-		udpipaddr_print(ndo, ip, sport, dport);
-		goto trunc;
-	}
+	ND_LCHECKMSG_ZU(length, sizeof(struct udphdr), "undersized-udp");
 	ulen = GET_BE_U_2(up->uh_ulen);
+	udp_sum = GET_BE_U_2(up->uh_sum);
 	/*
 	 * IPv6 Jumbo Datagrams; see RFC 2675.
 	 * If the length is zero, and the length provided to us is
@@ -408,21 +379,13 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	 */
 	if (ulen == 0 && length > 65535)
 		ulen = length;
-	if (ulen < sizeof(struct udphdr)) {
-		udpipaddr_print(ndo, ip, sport, dport);
-		ND_PRINT("truncated-udplength %u", ulen);
-		return;
-	}
+	ND_LCHECKMSG_ZU(ulen, sizeof(struct udphdr), "undersized-udplength");
 	ulen -= sizeof(struct udphdr);
 	length -= sizeof(struct udphdr);
 	if (ulen < length)
 		length = ulen;
 
 	cp = (const u_char *)(up + 1);
-	if (cp > ndo->ndo_snapend) {
-		udpipaddr_print(ndo, ip, sport, dport);
-		goto trunc;
-	}
 
 	if (ndo->ndo_packettype) {
 		const struct sunrpc_msg *rp;
@@ -431,12 +394,10 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		switch (ndo->ndo_packettype) {
 
 		case PT_VAT:
-			udpipaddr_print(ndo, ip, sport, dport);
 			vat_print(ndo, cp, length);
 			break;
 
 		case PT_WB:
-			udpipaddr_print(ndo, ip, sport, dport);
 			wb_print(ndo, cp, length);
 			break;
 
@@ -452,66 +413,53 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			break;
 
 		case PT_RTP:
-			udpipaddr_print(ndo, ip, sport, dport);
 			rtp_print(ndo, cp, length);
 			break;
 
 		case PT_RTCP:
-			udpipaddr_print(ndo, ip, sport, dport);
 			while (cp < ep)
-				cp = rtcp_print(ndo, cp, ep);
+				cp = rtcp_print(ndo, cp);
 			break;
 
 		case PT_SNMP:
-			udpipaddr_print(ndo, ip, sport, dport);
 			snmp_print(ndo, cp, length);
 			break;
 
 		case PT_CNFP:
-			udpipaddr_print(ndo, ip, sport, dport);
 			cnfp_print(ndo, cp);
 			break;
 
 		case PT_TFTP:
-			udpipaddr_print(ndo, ip, sport, dport);
 			tftp_print(ndo, cp, length);
 			break;
 
 		case PT_AODV:
-			udpipaddr_print(ndo, ip, sport, dport);
 			aodv_print(ndo, cp, length,
 			    ip6 != NULL);
 			break;
 
 		case PT_RADIUS:
-			udpipaddr_print(ndo, ip, sport, dport);
 			radius_print(ndo, cp, length);
 			break;
 
 		case PT_VXLAN:
-			udpipaddr_print(ndo, ip, sport, dport);
 			vxlan_print(ndo, cp, length);
 			break;
 
 		case PT_PGM:
 		case PT_PGM_ZMTP1:
-			udpipaddr_print(ndo, ip, sport, dport);
 			pgm_print(ndo, cp, length, bp2);
 			break;
 		case PT_LMP:
-			udpipaddr_print(ndo, ip, sport, dport);
 			lmp_print(ndo, cp, length);
 			break;
 		case PT_PTP:
-			udpipaddr_print(ndo, ip, sport, dport);
 			ptp_print(ndo, cp, length);
 			break;
 		case PT_SOMEIP:
-			udpipaddr_print(ndo, ip, sport, dport);
 			someip_print(ndo, cp, length);
 			break;
 		case PT_DOMAIN:
-			udpipaddr_print(ndo, ip, sport, dport);
 			/* over_tcp: FALSE, is_mdns: FALSE */
 			domain_print(ndo, cp, length, FALSE, FALSE);
 			break;
@@ -519,7 +467,6 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		return;
 	}
 
-	udpipaddr_print(ndo, ip, sport, dport);
 	if (!ndo->ndo_qflag) {
 		const struct sunrpc_msg *rp;
 		enum sunrpc_msg_type direction;
@@ -552,14 +499,13 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 
 	if (ndo->ndo_vflag && !ndo->ndo_Kflag && !fragmented) {
 		/* Check the checksum, if possible. */
-		uint16_t sum, udp_sum;
+		uint16_t sum;
 
 		/*
 		 * XXX - do this even if vflag == 1?
 		 * TCP does, and we do so for UDP-over-IPv6.
 		 */
 		if (IP_V(ip) == 4 && (ndo->ndo_vflag > 1)) {
-			udp_sum = GET_BE_U_2(up->uh_sum);
 			if (udp_sum == 0) {
 				ND_PRINT("[no cksum] ");
 			} else if (ND_TTEST_LEN(cp, length)) {
@@ -577,7 +523,6 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			/* for IPv6, UDP checksum is mandatory */
 			if (ND_TTEST_LEN(cp, length)) {
 				sum = udp6_cksum(ndo, ip6, up, length + sizeof(struct udphdr));
-				udp_sum = GET_BE_U_2(up->uh_sum);
 
 				if (sum != 0) {
 					ND_PRINT("[bad udp cksum 0x%04x -> 0x%04x!] ",
@@ -679,8 +624,11 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		else if (dport == BFD_CONTROL_PORT ||
 			 dport == BFD_MULTIHOP_PORT ||
 			 dport == BFD_LAG_PORT ||
+			 dport == SBFD_PORT ||
 			 dport == BFD_ECHO_PORT )
 			bfd_print(ndo, cp, length, dport);
+		else if (sport == SBFD_PORT)
+			bfd_print(ndo, cp, length, sport);
 		else if (IS_SRC_OR_DST_PORT(LMP_PORT))
 			lmp_print(ndo, cp, length);
 		else if (IS_SRC_OR_DST_PORT(VQP_PORT))
@@ -711,9 +659,8 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			zep_print(ndo, cp, length);
 		else if (IS_SRC_OR_DST_PORT(MPLS_PORT))
 			mpls_print(ndo, cp, length);
-		else if (ND_TTEST_1(((const struct LAP *)cp)->type) &&
-			 GET_U_1(((const struct LAP *)cp)->type) == lapDDP &&
-			 (atalk_port(sport) || atalk_port(dport))) {
+		else if ((atalk_port(sport) || atalk_port(dport)) &&
+			 GET_U_1(((const struct LAP *)cp)->type) == lapDDP) {
 			if (ndo->ndo_vflag)
 				ND_PRINT("kip ");
 			llap_print(ndo, cp, length);
@@ -738,6 +685,6 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	}
 	return;
 
-trunc:
-	nd_print_trunc(ndo);
+invalid:
+	nd_print_invalid(ndo);
 }

@@ -39,8 +39,6 @@
 
 #include "netdissect-stdinc.h"
 
-#include <string.h>
-
 #include "netdissect.h"
 #include "addrtostr.h"
 #include "extract.h"
@@ -52,7 +50,6 @@
 #define	GRE_KP		0x2000		/* key present */
 #define	GRE_SP		0x1000		/* sequence# present */
 #define	GRE_sP		0x0800		/* source routing */
-#define	GRE_RECRS	0x0700		/* recursion count */
 #define	GRE_AP		0x0080		/* acknowledgment# present */
 
 static const struct tok gre_flag_values[] = {
@@ -61,11 +58,11 @@ static const struct tok gre_flag_values[] = {
     { GRE_KP, "key present"},
     { GRE_SP, "sequence# present"},
     { GRE_sP, "source routing present"},
-    { GRE_RECRS, "recursion count"},
     { GRE_AP, "ack present"},
     { 0, NULL }
 };
 
+#define	GRE_RECRS_MASK	0x0700		/* recursion count */
 #define	GRE_VERS_MASK	0x0007		/* protocol version */
 
 /* source route entry types */

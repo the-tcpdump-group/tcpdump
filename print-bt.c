@@ -25,6 +25,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 
@@ -55,11 +56,7 @@ bt_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *
 
 	ndo->ndo_protocol = "bluetooth";
 	nd_print_protocol(ndo);
-	if (caplen < BT_HDRLEN) {
-		ndo->ndo_ll_hdr_len += caplen;
-		nd_print_trunc(ndo);
-		return;
-	}
+	ND_TCHECK_LEN(p, BT_HDRLEN);
 	ndo->ndo_ll_hdr_len += BT_HDRLEN;
 	caplen -= BT_HDRLEN;
 	length -= BT_HDRLEN;

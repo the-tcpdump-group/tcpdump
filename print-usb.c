@@ -27,6 +27,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 
@@ -248,15 +249,11 @@ usb_header_print(netdissect_options *ndo, const pcap_usb_header *uh)
  * is the number of bytes actually captured.
  */
 void
-usb_linux_48_byte_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
-                           const u_char *p)
+usb_linux_48_byte_if_print(netdissect_options *ndo,
+                           const struct pcap_pkthdr *h _U_, const u_char *p)
 {
 	ndo->ndo_protocol = "usb_linux_48_byte";
-	if (h->caplen < sizeof(pcap_usb_header)) {
-		ndo->ndo_ll_hdr_len += h->caplen;
-		nd_print_trunc(ndo);
-		return;
-	}
+	ND_TCHECK_LEN(p, sizeof(pcap_usb_header));
 	ndo->ndo_ll_hdr_len += sizeof (pcap_usb_header);
 
 	usb_header_print(ndo, (const pcap_usb_header *) p);
@@ -272,15 +269,11 @@ usb_linux_48_byte_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
  * is the number of bytes actually captured.
  */
 void
-usb_linux_64_byte_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
-                           const u_char *p)
+usb_linux_64_byte_if_print(netdissect_options *ndo,
+                           const struct pcap_pkthdr *h _U_, const u_char *p)
 {
 	ndo->ndo_protocol = "usb_linux_64_byte";
-	if (h->caplen < sizeof(pcap_usb_header_mmapped)) {
-		ndo->ndo_ll_hdr_len += h->caplen;
-		nd_print_trunc(ndo);
-		return;
-	}
+	ND_TCHECK_LEN(p, sizeof(pcap_usb_header_mmapped));
 	ndo->ndo_ll_hdr_len += sizeof (pcap_usb_header_mmapped);
 
 	usb_header_print(ndo, (const pcap_usb_header *) p);

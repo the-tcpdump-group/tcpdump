@@ -23,10 +23,14 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 
-
+static const struct tok vxlan_flags [] = {
+    { 0x08, "I" },
+    { 0, NULL }
+};
 #define VXLAN_HDR_LEN 8
 
 /*
@@ -50,25 +54,30 @@ vxlan_print(netdissect_options *ndo, const u_char *bp, u_int len)
     uint32_t vni;
 
     ndo->ndo_protocol = "vxlan";
+    nd_print_protocol_caps(ndo);
     if (len < VXLAN_HDR_LEN)
-        goto trunc;
-
-    ND_TCHECK_LEN(bp, VXLAN_HDR_LEN);
+        goto invalid;
 
     flags = GET_U_1(bp);
-    bp += 4;
+    bp += 1;
+    ND_PRINT(", flags [%s] (0x%02x), ",
+             bittok2str_nosep(vxlan_flags, "invalid", flags), flags);
+
+    /* 1st Reserved */
+    bp += 3;
 
     vni = GET_BE_U_3(bp);
-    bp += 4;
-
-    ND_PRINT("VXLAN, ");
-    ND_PRINT("flags [%s] (0x%02x), ", flags & 0x08 ? "I" : ".", flags);
+    bp += 3;
     ND_PRINT("vni %u\n", vni);
+
+    /* 2nd Reserved */
+    ND_TCHECK_1(bp);
+    bp += 1;
 
     ether_print(ndo, bp, len - VXLAN_HDR_LEN, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL);
 
     return;
 
-trunc:
-    nd_print_trunc(ndo);
+invalid:
+    nd_print_invalid(ndo);
 }

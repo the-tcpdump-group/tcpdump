@@ -1,13 +1,13 @@
     1  10:39:19.323246 DTPv1, length 31
-	Domain TLV (0x0001) TLV, length 10, cisco
-	Status TLV (0x0002) TLV, length 5, 0x81
-	DTP type TLV (0x0003) TLV, length 5, 0xa5
-	Neighbor TLV (0x0004) TLV, length 10, 00:1f:6d:96:ec:04
+	Domain (0x0001) TLV, length 10, cisco
+	Status (0x0002) TLV, length 5, 0x81
+	DTP type (0x0003) TLV, length 5, 0xa5
+	Neighbor (0x0004) TLV, length 10, 00:1f:6d:96:ec:04
     2  10:39:20.329871 DTPv1, length 31
-	Domain TLV (0x0001) TLV, length 10, cisco
-	Status TLV (0x0002) TLV, length 5, 0x81
-	DTP type TLV (0x0003) TLV, length 5, 0xa5
-	Neighbor TLV (0x0004) TLV, length 10, 00:1f:6d:96:ec:04
+	Domain (0x0001) TLV, length 10, cisco
+	Status (0x0002) TLV, length 5, 0x81
+	DTP type (0x0003) TLV, length 5, 0xa5
+	Neighbor (0x0004) TLV, length 10, 00:1f:6d:96:ec:04
     3  10:39:21.327398 STP 802.1w, Rapid STP, Flags [Proposal], bridge-id 8001.00:1f:6d:96:ec:00.8004, length 42
 	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
 	root-id 8001.00:1f:6d:96:ec:00, root-pathcost 0, port-role Designated

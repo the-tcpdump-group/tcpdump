@@ -34,7 +34,6 @@
 
 #include "netdissect-stdinc.h"
 
-#include <stdlib.h>
 #include <string.h>
 
 #include "netdissect.h"
@@ -253,11 +252,11 @@ print_dns_label(netdissect_options *ndo,
             ND_PRINT(".");
         if (length+lab_length > max_length) {
             if (print)
-                (void)nd_printzp(ndo, cp+length, max_length-length, NULL);
+                nd_printjnp(ndo, cp+length, max_length-length);
             break;
         }
         if (print)
-            (void)nd_printzp(ndo, cp+length, lab_length, NULL);
+            nd_printjnp(ndo, cp+length, lab_length);
         length += lab_length;
     }
     if (print)
@@ -587,7 +586,7 @@ hncp_print_rec(netdissect_options *ndo,
             ND_PRINT(" Verdict: %u Fingerprint: %s Common Name: ",
                 GET_U_1(value),
                 format_256(ndo, value + 4));
-            (void)nd_printzp(ndo, value + 36, bodylen - 36, NULL);
+            nd_printjnp(ndo, value + 36, bodylen - 36);
         }
             break;
 
@@ -606,7 +605,7 @@ hncp_print_rec(netdissect_options *ndo,
             ND_PRINT(" M: %u P: %u H: %u L: %u User-agent: ",
                 M, P, H, L
             );
-            (void)nd_printzp(ndo, value + 4, bodylen - 4, NULL);
+            nd_printjnp(ndo, value + 4, bodylen - 4);
         }
             break;
 
@@ -691,7 +690,7 @@ hncp_print_rec(netdissect_options *ndo,
                 print_dns_label(ndo, value+1, bodylen-1, 1);
             } else if (policy == 130) {
                 ND_PRINT("Opaque UTF-8: ");
-                (void)nd_printzp(ndo, value + 1, bodylen - 1, NULL);
+                nd_printjnp(ndo, value + 1, bodylen - 1);
             } else if (policy == 131) {
                 if (bodylen != 1) {
                     nd_print_invalid(ndo);
@@ -821,7 +820,7 @@ hncp_print_rec(netdissect_options *ndo,
             );
             if (l < 64) {
                 ND_PRINT("\"");
-                (void)nd_printzp(ndo, value + 17, l, NULL);
+                nd_printjnp(ndo, value + 17, l);
                 ND_PRINT("\"");
             } else {
                 nd_print_invalid(ndo);

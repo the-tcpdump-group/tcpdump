@@ -170,7 +170,7 @@ vrrp_print(netdissect_options *ndo,
 			 * RFC 2338 Section 5.3.10: "If the configured authentication string
 			 * is shorter than 8 bytes, the remaining space MUST be zero-filled.
 			 */
-			(void)nd_print(ndo, bp, bp + 8);
+			nd_printjnp(ndo, bp, 8);
 			ND_PRINT("\"");
 		}
 	}

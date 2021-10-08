@@ -3,6 +3,9 @@
 Makefile
 *~
 *.o
+*.gcda
+*.gcno
+*.gcov
 libnetdissect.a
 config.h
 config.log

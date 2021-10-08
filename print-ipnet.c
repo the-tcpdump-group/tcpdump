@@ -6,6 +6,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 
@@ -38,7 +39,6 @@ ipnet_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	const ipnet_hdr_t *hdr;
 	hdr = (const ipnet_hdr_t *)bp;
 
-	ND_TCHECK_SIZE(hdr);
 	ND_PRINT("%u > %u", GET_BE_U_4(hdr->iph_zsrc),
 		  GET_BE_U_4(hdr->iph_zdst));
 
@@ -55,9 +55,6 @@ ipnet_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
         }
 
 	ND_PRINT(", length %u: ", length);
-	return;
-trunc:
-	nd_print_trunc(ndo);
 }
 
 static void
@@ -65,11 +62,7 @@ ipnet_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 {
 	const ipnet_hdr_t *hdr;
 
-	if (caplen < sizeof(ipnet_hdr_t)) {
-		ndo->ndo_ll_hdr_len += caplen;
-		nd_print_trunc(ndo);
-		return;
-	}
+	ND_TCHECK_LEN(p, sizeof(ipnet_hdr_t));
 	ndo->ndo_ll_hdr_len += sizeof(ipnet_hdr_t);
 
 	if (ndo->ndo_eflag)

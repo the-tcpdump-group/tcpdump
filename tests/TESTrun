@@ -21,7 +21,8 @@ if (!($TCPDUMP = $ENV{TCPDUMP_BIN})) {
 #
 # Make true and false work as Booleans.
 #
-use constant { true => 1, false => 0 };
+use constant true => 1;
+use constant false => 0;
 
 use File::Basename;
 use POSIX qw( WEXITSTATUS WIFEXITED);
@@ -56,6 +57,8 @@ my $testsdir = dirname($0);
 #
 $testsdir = abs_path($testsdir);
 print "Running tests from ${testsdir}\n";
+print "with ${TCPDUMP}, version:\n";
+system "${TCPDUMP} --version";
 
 unshift(@INC, $testsdir);
 
@@ -405,7 +408,7 @@ sub runOneComplexTest {
     #use Data::Dumper;
     #print Dumper($testconfig);
 
-    # EXPAND any occurances of @TESTDIR@ to $testsdir
+    # EXPAND any occurrences of @TESTDIR@ to $testsdir
     $options =~ s/\@TESTDIR\@/$testsdir/;
 
     my $result = runtest($name,

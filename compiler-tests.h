@@ -80,11 +80,27 @@
  */
 
 #if ! defined(__GNUC__)
-#define ND_IS_AT_LEAST_GNUC_VERSION(major, minor) 0
+  /* Not GCC and not "just like GCC" */
+  #define ND_IS_AT_LEAST_GNUC_VERSION(major, minor) 0
 #else
-#define ND_IS_AT_LEAST_GNUC_VERSION(major, minor) \
+  /* GCC or "just like GCC" */
+  #define ND_IS_AT_LEAST_GNUC_VERSION(major, minor) \
 	(__GNUC__ > (major) || \
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#endif
+
+/*
+ * Check whether this is Clang major.minor or a later release.
+ */
+
+#if !defined(__clang__)
+  /* Not Clang */
+  #define ND_IS_AT_LEAST_CLANG_VERSION(major, minor) 0
+#else
+  /* Clang */
+  #define ND_IS_AT_LEAST_CLANG_VERSION(major, minor) \
+	(__clang_major__ > (major) || \
+	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #endif
 
 /*
@@ -106,13 +122,15 @@
  */
 
 #if ! defined(__SUNPRO_C)
-#define ND_IS_AT_LEAST_SUNC_VERSION(major,minor) 0
+  /* Not Sun/Oracle C */
+  #define ND_IS_AT_LEAST_SUNC_VERSION(major,minor) 0
 #else
-#define ND_SUNPRO_VERSION_TO_BCD(major, minor) \
+  /* Sun/Oracle C */
+  #define ND_SUNPRO_VERSION_TO_BCD(major, minor) \
 	(((minor) >= 10) ? \
 	    (((major) << 12) | (((minor)/10) << 8) | (((minor)%10) << 4)) : \
 	    (((major) << 8) | ((minor) << 4)))
-#define ND_IS_AT_LEAST_SUNC_VERSION(major,minor) \
+  #define ND_IS_AT_LEAST_SUNC_VERSION(major,minor) \
 	(__SUNPRO_C >= ND_SUNPRO_VERSION_TO_BCD((major), (minor)))
 #endif
 
@@ -121,13 +139,38 @@
  *
  * The version number in __xlC__ has the major version in the
  * upper 8 bits and the minor version in the lower 8 bits.
+ * On AIX __xlC__ is always defined, __ibmxl__ becomes defined in XL C 16.1.
+ * On Linux since XL C 13.1.6 __xlC__ is not defined by default anymore, but
+ * __ibmxl__ is defined since at least XL C 13.1.1.
  */
 
-#if ! defined(__xlC__)
-#define ND_IS_AT_LEAST_XL_C_VERSION(major,minor) 0
+#if ! defined(__xlC__) && ! defined(__ibmxl__)
+  /* Not XL C */
+  #define ND_IS_AT_LEAST_XL_C_VERSION(major,minor) 0
+  #define ND_IS_AT_LEAST_XL_C_MODFIX(modification, fixlevel) 0
 #else
-#define ND_IS_AT_LEAST_XL_C_VERSION(major, minor) \
+  /* XL C */
+  #if defined(__ibmxl__)
+    /*
+     * Later Linux version of XL C; use __ibmxl_version__ to test
+     * the version.
+     */
+    #define ND_IS_AT_LEAST_XL_C_VERSION(major, minor) \
+	(__ibmxl_version__ > (major) || \
+	 (__ibmxl_version__ == (major) && __ibmxl_release__ >= (minor)))
+    #define ND_IS_AT_LEAST_XL_C_MODFIX(modification, fixlevel) \
+	(__ibmxl_modification__ > (modification) || \
+	 (__ibmxl_modification__ == (modification) && \
+	  __ibmxl_ptf_fix_level__ >= (fixlevel)))
+  #else /* __ibmxl__ */
+    /*
+     * __ibmxl__ not defined; use __xlC__ to test the version.
+     */
+    #define ND_IS_AT_LEAST_XL_C_VERSION(major, minor) \
 	(__xlC__ >= (((major) << 8) | (minor)))
+    #define ND_IS_AT_LEAST_XL_C_MODFIX(modification, fixlevel) \
+	((((modification) << 8) | (fixlevel)) >= __xlC_ver__)
+  #endif /* __ibmxl__ */
 #endif
 
 /*
@@ -142,9 +185,11 @@
  */
 
 #if ! defined(__HP_aCC)
-#define ND_IS_AT_LEAST_HP_C_VERSION(major,minor) 0
+  /* Not HP C */
+  #define ND_IS_AT_LEAST_HP_C_VERSION(major,minor) 0
 #else
-#define ND_IS_AT_LEAST_HP_C_VERSION(major,minor) \
+  /* HP C */
+  #define ND_IS_AT_LEAST_HP_C_VERSION(major,minor) \
 	(__HP_aCC >= ((major)*10000 + (minor)*100))
 #endif
 

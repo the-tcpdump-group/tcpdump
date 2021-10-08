@@ -28,6 +28,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 
@@ -72,11 +73,6 @@ lane_hdr_print(netdissect_options *ndo, const u_char *bp)
 }
 
 /*
- * This is the top level routine of the printer.  'p' points
- * to the LANE header of the packet, 'h->ts' is the timestamp,
- * 'h->len' is the length of the packet off the wire, and 'h->caplen'
- * is the number of bytes actually captured.
- *
  * This assumes 802.3, not 802.5, LAN emulation.
  */
 void
@@ -85,10 +81,6 @@ lane_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 	const struct lane_controlhdr *lec;
 
 	ndo->ndo_protocol = "lane";
-	if (caplen < sizeof(struct lane_controlhdr)) {
-		nd_print_trunc(ndo);
-		return;
-	}
 
 	lec = (const struct lane_controlhdr *)p;
 	if (GET_BE_U_2(lec->lec_header) == 0xff00) {
@@ -96,15 +88,16 @@ lane_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 		 * LE Control.
 		 */
 		ND_PRINT("lec: proto %x vers %x %s",
-		    GET_U_1(lec->lec_proto),
-		    GET_U_1(lec->lec_vers),
-		    tok2str(lecop2str, "opcode-#%u", GET_BE_U_2(lec->lec_opcode)));
+			 GET_U_1(lec->lec_proto),
+			 GET_U_1(lec->lec_vers),
+			 tok2str(lecop2str, "opcode-#%u", GET_BE_U_2(lec->lec_opcode)));
 		return;
 	}
 
 	/*
 	 * Go past the LE header.
 	 */
+	ND_TCHECK_2(p); /* Needed */
 	length -= 2;
 	caplen -= 2;
 	p += 2;

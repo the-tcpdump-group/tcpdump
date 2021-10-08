@@ -235,7 +235,7 @@ aoev1_query_print(netdissect_options *ndo,
 	/* Config String */
 	if (cslen) {
 		ND_PRINT("\n\tConfig String (length %u): ", cslen);
-		(void)nd_printn(ndo, cp, cslen, NULL);
+		nd_printjn(ndo, cp, cslen);
 	}
 	return;
 
@@ -270,7 +270,7 @@ aoev1_mac_print(netdissect_options *ndo,
 	cp += 1;
 	len -= 1;
 	ND_PRINT(", Dir Count: %u", dircount);
-	if (dircount * 8 > len)
+	if (dircount * 8U > len)
 		goto invalid;
 	/* directives */
 	for (i = 0; i < dircount; i++) {

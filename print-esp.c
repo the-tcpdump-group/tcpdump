@@ -47,6 +47,8 @@
 #include "netdissect.h"
 #include "extract.h"
 
+#include "diag-control.h"
+
 #ifdef HAVE_LIBCRYPTO
 #include "strtoaddr.h"
 #include "ascii_strcasecmp.h"
@@ -278,7 +280,7 @@ do_decrypt(netdissect_options *ndo, const char *caller, struct sa_list *sa,
  * dissecting anything in it and before it does any dissection of
  * anything in the old buffer.  That will free the new buffer.
  */
-USES_APPLE_DEPRECATED_API
+DIAG_OFF_DEPRECATION
 int esp_decrypt_buffer_by_ikev2_print(netdissect_options *ndo,
 				      int initiator,
 				      const u_char spii[8],
@@ -334,7 +336,7 @@ int esp_decrypt_buffer_by_ikev2_print(netdissect_options *ndo,
 
 	return 1;
 }
-USES_APPLE_RST
+DIAG_ON_DEPRECATION
 
 static void esp_print_addsa(netdissect_options *ndo,
 			    struct sa_list *sa, int sa_def)
@@ -347,7 +349,7 @@ static void esp_print_addsa(netdissect_options *ndo,
 	nsa = (struct sa_list *)malloc(sizeof(struct sa_list));
 	if (nsa == NULL)
 		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
-				  "esp_print_addsa: malloc");
+				  "%s: malloc", __func__);
 
 	*nsa = *sa;
 
@@ -413,7 +415,7 @@ int espprint_decode_hex(netdissect_options *ndo,
  * decode the form:    SPINUM@IP <tab> ALGONAME:0xsecret
  */
 
-USES_APPLE_DEPRECATED_API
+DIAG_OFF_DEPRECATION
 static int
 espprint_decode_encalgo(netdissect_options *ndo,
 			char *decode, struct sa_list *sa)
@@ -478,7 +480,7 @@ espprint_decode_encalgo(netdissect_options *ndo,
 
 	return 1;
 }
-USES_APPLE_RST
+DIAG_ON_DEPRECATION
 
 /*
  * for the moment, ignore the auth algorithm, just hard code the authenticator
@@ -603,8 +605,8 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 		secretfile = fopen(filename, FOPEN_READ_TXT);
 		if (secretfile == NULL) {
 			(*ndo->ndo_error)(ndo, S_ERR_ND_OPEN_FILE,
-					  "print_esp: can't open %s: %s\n",
-					  filename, strerror(errno));
+					  "%s: can't open %s: %s\n",
+					  __func__, filename, strerror(errno));
 		}
 
 		while (fgets(fileline, sizeof(fileline)-1, secretfile) != NULL) {
@@ -670,7 +672,7 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 	esp_print_addsa(ndo, &sa1, sa_def);
 }
 
-USES_APPLE_DEPRECATED_API
+DIAG_OFF_DEPRECATION
 static void esp_init(netdissect_options *ndo _U_)
 {
 	/*
@@ -683,7 +685,7 @@ static void esp_init(netdissect_options *ndo _U_)
 #endif
 	EVP_add_cipher_alias(SN_des_ede3_cbc, "3des");
 }
-USES_APPLE_RST
+DIAG_ON_DEPRECATION
 
 void esp_decodesecret_print(netdissect_options *ndo)
 {
@@ -720,7 +722,7 @@ void esp_decodesecret_print(netdissect_options *ndo)
 #endif
 
 #ifdef HAVE_LIBCRYPTO
-USES_APPLE_DEPRECATED_API
+DIAG_OFF_DEPRECATION
 #endif
 void
 esp_print(netdissect_options *ndo,
@@ -880,7 +882,7 @@ esp_print(netdissect_options *ndo,
 	if (!nd_push_buffer(ndo, pt, pt, ep)) {
 		free(pt);
 		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
-			"esp_print: can't push buffer on buffer stack");
+			"%s: can't push buffer on buffer stack", __func__);
 	}
 
 	/*
@@ -903,14 +905,22 @@ esp_print(netdissect_options *ndo,
 
 	ND_PRINT(": ");
 
+	/*
+	 * Don't put padding + padding length(1 byte) + next header(1 byte)
+	 * in the buffer because they are not part of the plaintext to decode.
+	 */
+	nd_push_snapend(ndo, ep - (padlen + 2));
+
 	/* Now dissect the plaintext. */
 	ip_demux_print(ndo, pt, payloadlen - (padlen + 2), ver, fragmented,
-	    ttl_hl, nh, bp2);
+		       ttl_hl, nh, bp2);
 
 	/* Pop the buffer, freeing it. */
+	nd_pop_packet_info(ndo);
+	/* Pop the nd_push_snapend */
 	nd_pop_packet_info(ndo);
 #endif
 }
 #ifdef HAVE_LIBCRYPTO
-USES_APPLE_RST
+DIAG_ON_DEPRECATION
 #endif

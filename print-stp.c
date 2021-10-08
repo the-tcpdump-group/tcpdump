@@ -84,8 +84,6 @@ static const struct tok rstp_obj_port_role_values[] = {
     { 0, NULL}
 };
 
-#define ND_TCHECK_BRIDGE_ID(p) ND_TCHECK_8(p)
-
 static char *
 stp_print_bridge_id(netdissect_options *ndo, const u_char *p)
 {
@@ -100,7 +98,7 @@ stp_print_bridge_id(netdissect_options *ndo, const u_char *p)
     return bridge_id_str;
 }
 
-static int
+static void
 stp_print_config_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
                       u_int length)
 {
@@ -116,7 +114,7 @@ stp_print_config_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
 
     /* in non-verbose mode just print the bridge-id */
     if (!ndo->ndo_vflag) {
-        return 1;
+        return;
     }
 
     ND_PRINT("\n\tmessage-age %.2fs, max-age %.2fs"
@@ -136,7 +134,6 @@ stp_print_config_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
                tok2str(rstp_obj_port_role_values, "Unknown",
                        RSTP_EXTRACT_PORT_ROLE(bpdu_flags)));
     }
-    return 1;
 }
 
 /*
@@ -206,7 +203,7 @@ stp_print_config_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
 #define MST_BPDU_MSTI_LENGTH		    16
 #define MST_BPDU_CONFIG_INFO_LENGTH	    64
 
-/* Offsets of fields from the begginning for the packet */
+/* Offsets of fields from the beginning for the packet */
 #define MST_BPDU_VER3_LEN_OFFSET	    36
 #define MST_BPDU_CONFIG_NAME_OFFSET	    39
 #define MST_BPDU_CONFIG_DIGEST_OFFSET	    73
@@ -234,7 +231,7 @@ stp_print_config_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
 #define SPB_BPDU_AGREEMENT_RES2_OFFSET    SPB_BPDU_AGREEMENT_RES1_OFFSET + 4
 #define SPB_BPDU_AGREEMENT_DIGEST_OFFSET  SPB_BPDU_AGREEMENT_RES2_OFFSET + 4
 
-static int
+static void
 stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
                     u_int length)
 {
@@ -254,7 +251,7 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
      * in non-verbose mode just print the flags.
      */
     if (!ndo->ndo_vflag) {
-        return 1;
+        return;
     }
 
     ND_PRINT("\n\tport-role %s, ",
@@ -265,7 +262,6 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
            stp_print_bridge_id(ndo, stp_bpdu->root_id),
            GET_BE_U_4(stp_bpdu->root_path_cost));
 
-    ND_TCHECK_SIZE(&stp_bpdu->bridge_id);
     ND_PRINT("\n\tCIST regional-root-id %s, ",
            stp_print_bridge_id(ndo, stp_bpdu->bridge_id));
 
@@ -279,10 +275,8 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
            (float) GET_BE_U_2(stp_bpdu->forward_delay) / STP_TIME_BASE);
 
     ND_PRINT("\n\tv3len %u, ", GET_BE_U_2(ptr + MST_BPDU_VER3_LEN_OFFSET));
-    ND_TCHECK_4(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 12);
     ND_PRINT("MCID Name ");
-    if (nd_printzp(ndo, ptr + MST_BPDU_CONFIG_NAME_OFFSET, 32, ndo->ndo_snapend))
-	goto trunc;
+    nd_printjnp(ndo, ptr + MST_BPDU_CONFIG_NAME_OFFSET, 32);
     ND_PRINT(", rev %u,"
             "\n\t\tdigest %08x%08x%08x%08x, ",
 	          GET_BE_U_2(ptr + MST_BPDU_CONFIG_NAME_OFFSET + 32),
@@ -294,7 +288,6 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
     ND_PRINT("CIST int-root-pathcost %u,",
             GET_BE_U_4(ptr + MST_BPDU_CIST_INT_PATH_COST_OFFSET));
 
-    ND_TCHECK_BRIDGE_ID(ptr + MST_BPDU_CIST_BRIDGE_ID_OFFSET);
     ND_PRINT("\n\tCIST bridge-id %s, ",
            stp_print_bridge_id(ndo, ptr + MST_BPDU_CIST_BRIDGE_ID_OFFSET));
 
@@ -307,8 +300,6 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
         len = v3len - MST_BPDU_CONFIG_INFO_LENGTH;
         offset = MST_BPDU_MSTI_OFFSET;
         while (len >= MST_BPDU_MSTI_LENGTH) {
-            ND_TCHECK_LEN(ptr + offset, MST_BPDU_MSTI_LENGTH);
-
             msti = GET_BE_U_2(ptr + offset + MST_BPDU_MSTI_ROOT_PRIO_OFFSET);
             msti = msti & 0x0FFF;
 
@@ -330,13 +321,9 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
             offset += MST_BPDU_MSTI_LENGTH;
         }
     }
-    return 1;
-
-trunc:
-    return 0;
 }
 
-static int
+static void
 stp_print_spb_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
                    u_int offset)
 {
@@ -346,17 +333,14 @@ stp_print_spb_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
      * in non-verbose mode don't print anything.
      */
     if (!ndo->ndo_vflag) {
-        return 1;
+        return;
     }
 
     ptr = (const u_char *)stp_bpdu;
-    ND_TCHECK_4(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET + 16);
 
     ND_PRINT("\n\tv4len %u, ", GET_BE_U_2(ptr + offset));
     ND_PRINT("AUXMCID Name ");
-    if (nd_printzp(ndo, ptr + offset + SPB_BPDU_CONFIG_NAME_OFFSET, 32,
-		   ndo->ndo_snapend))
-	goto trunc;
+    nd_printjnp(ndo, ptr + offset + SPB_BPDU_CONFIG_NAME_OFFSET, 32);
     ND_PRINT(", Rev %u,\n\t\tdigest %08x%08x%08x%08x",
             GET_BE_U_2(ptr + offset + SPB_BPDU_CONFIG_REV_OFFSET),
             GET_BE_U_4(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET),
@@ -382,10 +366,6 @@ stp_print_spb_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
             GET_BE_U_4(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET + 8),
             GET_BE_U_4(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET + 12),
             GET_BE_U_4(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET + 16));
-    return 1;
-
-trunc:
-    return 0;
 }
 
 /*
@@ -405,7 +385,7 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
 
     /* Minimum STP Frame size. */
     if (length < 4)
-        goto trunc;
+        goto invalid;
 
     if (GET_BE_U_2(stp_bpdu->protocol_id)) {
         ND_PRINT("unknown STP version, length %u", length);
@@ -433,38 +413,35 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
     switch (bpdu_type) {
     case STP_BPDU_TYPE_CONFIG:
         if (length < sizeof(struct stp_bpdu_) - 1) {
-            goto trunc;
+            goto invalid;
         }
-        if (!stp_print_config_bpdu(ndo, stp_bpdu, length))
-            goto trunc;
+        stp_print_config_bpdu(ndo, stp_bpdu, length);
         break;
 
     case STP_BPDU_TYPE_RSTP:
         if (protocol_version == STP_PROTO_RAPID) {
             if (length < sizeof(struct stp_bpdu_)) {
-                goto trunc;
+                goto invalid;
             }
-            if (!stp_print_config_bpdu(ndo, stp_bpdu, length))
-                goto trunc;
+            stp_print_config_bpdu(ndo, stp_bpdu, length);
         } else if (protocol_version == STP_PROTO_MSTP ||
                    protocol_version == STP_PROTO_SPB) {
             if (length < STP_BPDU_MSTP_MIN_LEN) {
-                goto trunc;
+                goto invalid;
             }
 
             if (GET_U_1(stp_bpdu->v1_length) != 0) {
                 /* FIX ME: Emit a message here ? */
-                goto trunc;
+                goto invalid;
             }
 
             /* Validate v3 length */
             mstp_len = GET_BE_U_2(p + MST_BPDU_VER3_LEN_OFFSET);
             mstp_len += 2;  /* length encoding itself is 2 bytes */
             if (length < (sizeof(struct stp_bpdu_) + mstp_len)) {
-                goto trunc;
+                goto invalid;
             }
-            if (!stp_print_mstp_bpdu(ndo, stp_bpdu, length))
-                goto trunc;
+            stp_print_mstp_bpdu(ndo, stp_bpdu, length);
 
             if (protocol_version == STP_PROTO_SPB)
             {
@@ -473,10 +450,9 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
               spb_len += 2;
               if (length < (sizeof(struct stp_bpdu_) + mstp_len + spb_len) ||
                   spb_len < SPB_BPDU_MIN_LEN) {
-                goto trunc;
+                goto invalid;
               }
-              if (!stp_print_spb_bpdu(ndo, stp_bpdu, (sizeof(struct stp_bpdu_) + mstp_len)))
-                goto trunc;
+              stp_print_spb_bpdu(ndo, stp_bpdu, (sizeof(struct stp_bpdu_) + mstp_len));
             }
         }
         break;
@@ -488,8 +464,8 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
     default:
         break;
     }
-
     return;
-trunc:
-    nd_print_trunc(ndo);
+
+invalid:
+    nd_print_invalid(ndo);
 }

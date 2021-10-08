@@ -79,15 +79,34 @@ struct tsp {
 #define	TSP_SETDATE		22	/* New from date command */
 #define	TSP_SETDATEREQ		23	/* New remote for above */
 #define	TSP_LOOP		24	/* loop detection packet */
-
-#define	TSPTYPENUMBER		25
-
-
-static const char *tsptype[TSPTYPENUMBER] =
-  { "ANY", "ADJTIME", "ACK", "MASTERREQ", "MASTERACK", "SETTIME", "MASTERUP",
-  "SLAVEUP", "ELECTION", "ACCEPT", "REFUSE", "CONFLICT", "RESOLVE", "QUIT",
-  "DATE", "DATEREQ", "DATEACK", "TRACEON", "TRACEOFF", "MSITE", "MSITEREQ",
-  "TEST", "SETDATE", "SETDATEREQ", "LOOP" };
+static const struct tok tsptype_str[] = {
+	{ TSP_ANY,        "TSP_ANY"        },
+	{ TSP_ADJTIME,    "TSP_ADJTIME"    },
+	{ TSP_ACK,        "TSP_ACK"        },
+	{ TSP_MASTERREQ,  "TSP_MASTERREQ"  },
+	{ TSP_MASTERACK,  "TSP_MASTERACK"  },
+	{ TSP_SETTIME,    "TSP_SETTIME"    },
+	{ TSP_MASTERUP,   "TSP_MASTERUP"   },
+	{ TSP_SLAVEUP,    "TSP_SLAVEUP"    },
+	{ TSP_ELECTION,   "TSP_ELECTION"   },
+	{ TSP_ACCEPT,     "TSP_ACCEPT"     },
+	{ TSP_REFUSE,     "TSP_REFUSE"     },
+	{ TSP_CONFLICT,   "TSP_CONFLICT"   },
+	{ TSP_RESOLVE,    "TSP_RESOLVE"    },
+	{ TSP_QUIT,       "TSP_QUIT"       },
+	{ TSP_DATE,       "TSP_DATE"       },
+	{ TSP_DATEREQ,    "TSP_DATEREQ"    },
+	{ TSP_DATEACK,    "TSP_DATEACK"    },
+	{ TSP_TRACEON,    "TSP_TRACEON"    },
+	{ TSP_TRACEOFF,   "TSP_TRACEOFF"   },
+	{ TSP_MSITE,      "TSP_MSITE"      },
+	{ TSP_MSITEREQ,   "TSP_MSITEREQ"   },
+	{ TSP_TEST,       "TSP_TEST"       },
+	{ TSP_SETDATE,    "TSP_SETDATE"    },
+	{ TSP_SETDATEREQ, "TSP_SETDATEREQ" },
+	{ TSP_LOOP,       "TSP_LOOP"       },
+	{ 0, NULL }
+};
 
 void
 timed_print(netdissect_options *ndo,
@@ -99,10 +118,7 @@ timed_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "timed";
 	tsp_type = GET_U_1(tsp->tsp_type);
-	if (tsp_type < TSPTYPENUMBER)
-		ND_PRINT("TSP_%s", tsptype[tsp_type]);
-	else
-		ND_PRINT("(tsp_type %#x)", tsp_type);
+	ND_PRINT("%s", tok2str(tsptype_str, "(tsp_type %#x)", tsp_type));
 
 	ND_PRINT(" vers %u", GET_U_1(tsp->tsp_vers));
 
@@ -133,11 +149,5 @@ timed_print(netdissect_options *ndo,
 		break;
 	}
 	ND_PRINT(" name ");
-	if (nd_printzp(ndo, tsp->tsp_name, sizeof(tsp->tsp_name),
-		       ndo->ndo_snapend))
-		goto trunc;
-	return;
-
-trunc:
-	nd_print_trunc(ndo);
+	nd_printjnp(ndo, tsp->tsp_name, sizeof(tsp->tsp_name));
 }

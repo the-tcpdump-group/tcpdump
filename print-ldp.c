@@ -538,8 +538,7 @@ ldp_tlv_print(netdissect_options *ndo,
     return(tlv_len+4); /* Type & Length fields not included */
 
 trunc:
-    nd_print_trunc(ndo);
-    return 0;
+    nd_trunc_longjmp(ndo);
 
 invalid:
     return(tlv_len+4); /* Type & Length fields not included */
@@ -594,10 +593,10 @@ ldp_pdu_print(netdissect_options *ndo,
     pdu_len = GET_BE_U_2(ldp_com_header->pdu_length);
     if (pdu_len < sizeof(struct ldp_common_header)-4) {
         /* length too short */
-        ND_PRINT("%sLDP, pdu-length: %u (too short, < %u)",
-               (ndo->ndo_vflag < 1) ? "" : "\n\t",
-               pdu_len,
-               (u_int)(sizeof(struct ldp_common_header)-4));
+        ND_PRINT("%sLDP, pdu-length: %u (too short, < %zu)",
+                 (ndo->ndo_vflag < 1) ? "" : "\n\t",
+                 pdu_len,
+                 sizeof(struct ldp_common_header)-4);
         return 0;
     }
 
@@ -627,13 +626,13 @@ ldp_pdu_print(netdissect_options *ndo,
         if (msg_len < sizeof(struct ldp_msg_header)-4) {
             /* length too short */
             /* FIXME vendor private / experimental check */
-            ND_PRINT("\n\t  %s Message (0x%04x), length: %u (too short, < %u)",
-                   tok2str(ldp_msg_values,
-                           "Unknown",
-                           msg_type),
-                   msg_type,
-                   msg_len,
-                   (u_int)(sizeof(struct ldp_msg_header)-4));
+            ND_PRINT("\n\t  %s Message (0x%04x), length: %u (too short, < %zu)",
+                     tok2str(ldp_msg_values,
+                             "Unknown",
+                             msg_type),
+                     msg_type,
+                     msg_len,
+                     sizeof(struct ldp_msg_header)-4);
             return 0;
         }
 
@@ -697,6 +696,5 @@ ldp_pdu_print(netdissect_options *ndo,
     }
     return pdu_len+4;
 trunc:
-    nd_print_trunc(ndo);
-    return 0;
+    nd_trunc_longjmp(ndo);
 }

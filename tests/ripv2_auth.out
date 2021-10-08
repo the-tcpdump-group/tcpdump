@@ -40,7 +40,7 @@
 	  0x0010:  3375 fc89
     7  15:49:00.891527 IP (tos 0xc0, ttl 1, id 0, offset 0, flags [DF], proto UDP (17), length 108)
     10.0.0.20.520 > 224.0.0.9.520: 
-	RIPv2, Request, length: 80, routes: 4 or less
+	RIPv2, Request, length: 80, routes: 3 or less
 	  Auth header: Packet Len 44, Key-ID 45, Auth Data Len 32, SeqNo 1339429740, MBZ 0, MBZ 0
 	  AFI 0,         0.0.0.0/0 , tag 0x0000, metric: 16, next-hop: self
 	  Auth trailer:
@@ -48,7 +48,7 @@
 	  0x0010:  451a bd20 cee4 8a3d a466 17a0 e550 5b4b
     8  15:49:04.890122 IP (tos 0xc0, ttl 1, id 0, offset 0, flags [DF], proto UDP (17), length 108)
     10.0.0.20.520 > 224.0.0.9.520: 
-	RIPv2, Response, length: 80, routes: 4 or less
+	RIPv2, Response, length: 80, routes: 3 or less
 	  Auth header: Packet Len 44, Key-ID 45, Auth Data Len 32, SeqNo 1339429744, MBZ 0, MBZ 0
 	  AFI IPv4,     10.70.178.0/24, tag 0x0000, metric: 1, next-hop: self
 	  Auth trailer:

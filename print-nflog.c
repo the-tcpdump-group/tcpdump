@@ -105,9 +105,7 @@ typedef struct nflog_timestamp {
 
 static const struct tok nflog_values[] = {
 	{ AF_INET,		"IPv4" },
-#ifdef AF_INET6
 	{ AF_INET6,		"IPv6" },
-#endif /*AF_INET6*/
 	{ 0,			NULL }
 };
 
@@ -209,11 +207,9 @@ nflog_if_print(netdissect_options *ndo,
 		ip_print(ndo, p, length);
 		break;
 
-#ifdef AF_INET6
 	case AF_INET6:
 		ip6_print(ndo, p, length);
 		break;
-#endif /* AF_INET6 */
 
 	default:
 		if (!ndo->ndo_eflag)

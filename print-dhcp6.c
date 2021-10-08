@@ -49,9 +49,6 @@
 
 #include "netdissect-stdinc.h"
 
-#include <stdio.h>
-#include <string.h>
-
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -411,11 +408,26 @@ dhcp6opt_print(netdissect_options *ndo,
 			ND_PRINT(" %u)", GET_BE_U_2(tp));
 			break;
 		case DH6OPT_RELAY_MSG:
+		    {
+			const u_char *snapend_save;
+
 			ND_PRINT(" (");
 			tp = (const u_char *)(dh6o + 1);
+			/*
+			 * Update the snapend to the end of the option before
+			 * calling recursively dhcp6_print() for the nested
+			 * packet. Other options may be present after the
+			 * nested DHCPv6 packet. This prevents that, in
+			 * dhcp6_print(), for the nested DHCPv6 packet, the
+			 * remaining length < remaining caplen.
+			 */
+			snapend_save = ndo->ndo_snapend;
+			ndo->ndo_snapend = ND_MIN(tp + optlen, ndo->ndo_snapend);
 			dhcp6_print(ndo, tp, optlen);
+			ndo->ndo_snapend = snapend_save;
 			ND_PRINT(")");
 			break;
+		    }
 		case DH6OPT_AUTH:
 			if (optlen < 11) {
 				ND_PRINT(" ?)");
@@ -748,7 +760,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				label_len = GET_U_1(tp);
 				tp++;
 				if (label_len < remain_len - 1) {
-					(void)nd_printn(ndo, tp, label_len, NULL);
+					nd_printjnp(ndo, tp, label_len);
 					tp += label_len;
 					remain_len -= (label_len + 1);
 					if(GET_U_1(tp)) ND_PRINT(".");
@@ -767,8 +779,8 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			ND_PRINT("=");
-			(void)nd_printn(ndo, tp, (u_int)optlen, NULL);
+			ND_PRINT(" ");
+			nd_printjnp(ndo, tp, optlen);
 			ND_PRINT(")");
 			break;
 

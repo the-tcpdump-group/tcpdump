@@ -29,8 +29,7 @@
 
 #include "netdissect-stdinc.h"
 
-#include <stdio.h>
-
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -57,16 +56,25 @@ struct rip {
 #define	RIPCMD_RESPONSE		2	/* responding to request */
 #define	RIPCMD_TRACEON		3	/* turn tracing on */
 #define	RIPCMD_TRACEOFF		4	/* turn it off */
-#define	RIPCMD_POLL		5	/* want info from everybody */
-#define	RIPCMD_POLLENTRY	6	/* poll for entry */
+/* 5 is reserved */
+#define RIPCMD_TRIGREQ		6
+#define RIPCMD_TRIGRESP		7
+#define RIPCMD_TRIGACK		8
+#define RIPCMD_UPDREQ		9
+#define RIPCMD_UPDRESP		10
+#define RIPCMD_UPDACK		11
 
 static const struct tok rip_cmd_values[] = {
     { RIPCMD_REQUEST,	        "Request" },
     { RIPCMD_RESPONSE,	        "Response" },
     { RIPCMD_TRACEON,	        "Trace on" },
     { RIPCMD_TRACEOFF,	        "Trace off" },
-    { RIPCMD_POLL,	        "Poll" },
-    { RIPCMD_POLLENTRY,	        "Poll Entry" },
+    { RIPCMD_TRIGREQ,	        "Triggered Request" },
+    { RIPCMD_TRIGRESP,	        "Triggered Response" },
+    { RIPCMD_TRIGACK,	        "Triggered Acknowledgement" },
+    { RIPCMD_UPDREQ,	        "Update Request" },
+    { RIPCMD_UPDRESP,	        "Update Response" },
+    { RIPCMD_UPDACK,	        "Update Acknowledge" },
     { 0, NULL}
 };
 
@@ -187,8 +195,7 @@ rip_entry_print_v1(netdissect_options *ndo, const u_char *p,
 	const struct rip_netinfo_v1 *ni = (const struct rip_netinfo_v1 *)p;
 
 	/* RFC 1058 */
-	if (remaining < RIP_ROUTELEN)
-		return (0);
+	ND_LCHECKMSG_U(remaining, RIP_ROUTELEN, "remaining data length");
 	ND_TCHECK_SIZE(ni);
 	family = GET_BE_U_2(ni->rip_family);
 	if (family != BSD_AFNUM_INET && family != 0) {
@@ -213,7 +220,7 @@ rip_entry_print_v1(netdissect_options *ndo, const u_char *p,
 		 GET_IPADDR_STRING(ni->rip_dest),
 		 GET_BE_U_4(ni->rip_metric));
 	return (RIP_ROUTELEN);
-trunc:
+invalid:
 	return 0;
 }
 
@@ -225,8 +232,7 @@ rip_entry_print_v2(netdissect_options *ndo, const u_char *p,
 	u_short family;
 	const struct rip_netinfo_v2 *ni;
 
-	if (remaining < sizeof(*eh))
-		return (0);
+	ND_LCHECKMSG_ZU(remaining, sizeof(*eh), "remaining data length");
 	ND_TCHECK_SIZE(eh);
 	family = GET_BE_U_2(eh->rip_family);
 	if (family == 0xFFFF) { /* variable-sized authentication structures */
@@ -236,15 +242,12 @@ rip_entry_print_v2(netdissect_options *ndo, const u_char *p,
 		remaining -= sizeof(*eh);
 		if (auth_type == 2) {
 			ND_PRINT("\n\t  Simple Text Authentication data: ");
-			if (nd_printzp(ndo, p, RIP_AUTHLEN, p + remaining))
-				return (0);
+			nd_printjnp(ndo, p, RIP_AUTHLEN);
 		} else if (auth_type == 3) {
 			const struct rip_auth_crypto_v2 *ch;
 
 			ch = (const struct rip_auth_crypto_v2 *)p;
-			ND_TCHECK_SIZE(ch);
-			if (remaining < sizeof(*ch))
-				return (0);
+			ND_LCHECKMSG_ZU(remaining, sizeof(*ch), "remaining data length");
 			ND_PRINT("\n\t  Auth header:");
 			ND_PRINT(" Packet Len %u,",
 				 GET_BE_U_2(ch->rip_packet_len));
@@ -269,9 +272,7 @@ rip_entry_print_v2(netdissect_options *ndo, const u_char *p,
 		print_unknown_data(ndo, p + sizeof(*eh), "\n\t  ", RIP_ROUTELEN - sizeof(*eh));
 	} else { /* BSD_AFNUM_INET or AFI 0 */
 		ni = (const struct rip_netinfo_v2 *)p;
-		ND_TCHECK_SIZE(ni);
-		if (remaining < sizeof(*ni))
-			return (0);
+		ND_LCHECKMSG_ZU(remaining, sizeof(*ni), "remaining data length");
 		ND_PRINT("\n\t  AFI %s, %15s/%-2d, tag 0x%04x, metric: %u, next-hop: ",
 			 tok2str(bsd_af_values, "%u", family),
 			 GET_IPADDR_STRING(ni->rip_dest),
@@ -284,66 +285,39 @@ rip_entry_print_v2(netdissect_options *ndo, const u_char *p,
 			ND_PRINT("self");
 	}
 	return (RIP_ROUTELEN);
-trunc:
+invalid:
 	return 0;
 }
 
 void
 rip_print(netdissect_options *ndo,
-	  const u_char *dat, u_int length)
+	  const u_char *p, u_int len)
 {
 	const struct rip *rp;
 	uint8_t vers, cmd;
-	const u_char *p;
-	u_int len, routecount;
 	unsigned entry_size;
 
 	ndo->ndo_protocol = "rip";
-	if (ndo->ndo_snapend < dat) {
-		nd_print_trunc(ndo);
-		return;
-	}
-	len = ND_BYTES_AVAILABLE_AFTER(dat);
-	if (len > length)
-		len = length;
-	if (len < sizeof(*rp)) {
-		nd_print_trunc(ndo);
-		return;
-	}
-	len -= sizeof(*rp);
+	ND_LCHECKMSG_ZU(len, sizeof(*rp), "packet length");
 
-	rp = (const struct rip *)dat;
+	rp = (const struct rip *)p;
 
-	ND_TCHECK_SIZE(rp);
 	vers = GET_U_1(rp->rip_vers);
 	ND_PRINT("%sRIPv%u",
 		 (ndo->ndo_vflag >= 1) ? "\n\t" : "",
 		 vers);
 
-	if (vers == 0) {
-		/*
-		 * RFC 1058.
-		 *
-		 * XXX - RFC 1058 says
-		 *
-		 * 0  Datagrams whose version number is zero are to be ignored.
-		 *    These are from a previous version of the protocol, whose
-		 *    packet format was machine-specific.
-		 *
-		 * so perhaps we should just dump the packet, in hex.
-		 */
-		print_unknown_data(ndo, (const uint8_t *)&rp->rip_cmd, "\n\t", length);
-		return;
-	}
-
 	/* dump version and lets see if we know the commands name*/
 	cmd = GET_U_1(rp->rip_cmd);
 	ND_PRINT(", %s, length: %u",
 		tok2str(rip_cmd_values, "unknown command (%u)", cmd),
-		length);
+		len);
 
+	ND_TCHECK_SIZE(rp);
 	if (ndo->ndo_vflag < 1)
 		return;
+	p += sizeof(*rp);
+	len -= sizeof(*rp);
 
 	switch (cmd) {
 
@@ -352,44 +326,28 @@ rip_print(netdissect_options *ndo,
 		switch (vers) {
 
 		case 1:
-			routecount = length / RIP_ROUTELEN;
-			ND_PRINT(", routes: %u", routecount);
-			p = (const u_char *)(rp + 1);
+			ND_PRINT(", routes: %u", len / RIP_ROUTELEN);
 			while (len != 0) {
 				entry_size = rip_entry_print_v1(ndo, p, len);
 				if (entry_size == 0) {
 					/* Error */
-					nd_print_trunc(ndo);
-					break;
+					goto invalid;
 				}
-				if (len < entry_size) {
-					ND_PRINT(" [remaining entries length %u < %u]",
-						 len, entry_size);
-					nd_print_invalid(ndo);
-					break;
-				}
+				ND_LCHECKMSG_U(len, entry_size, "remaining entries length");
 				p += entry_size;
 				len -= entry_size;
 			}
 			break;
 
 		case 2:
-			routecount = length / RIP_ROUTELEN;
-			ND_PRINT(", routes: %u or less", routecount);
-			p = (const u_char *)(rp + 1);
+			ND_PRINT(", routes: %u or less", len / RIP_ROUTELEN);
 			while (len != 0) {
 				entry_size = rip_entry_print_v2(ndo, p, len);
 				if (entry_size == 0) {
 					/* Error */
-					nd_print_trunc(ndo);
-					break;
+					goto invalid;
 				}
-				if (len < entry_size) {
-					ND_PRINT(" [remaining entries length %u < %u]",
-						 len, entry_size);
-					nd_print_invalid(ndo);
-					break;
-				}
+				ND_LCHECKMSG_U(len, entry_size, "remaining entries length");
 				p += entry_size;
 				len -= entry_size;
 			}
@@ -401,25 +359,30 @@ rip_print(netdissect_options *ndo,
 		}
 		break;
 
+	case RIPCMD_TRACEON:
 	case RIPCMD_TRACEOFF:
-	case RIPCMD_POLL:
-	case RIPCMD_POLLENTRY:
+	case RIPCMD_TRIGREQ:
+	case RIPCMD_TRIGRESP:
+	case RIPCMD_TRIGACK:
+	case RIPCMD_UPDREQ:
+	case RIPCMD_UPDRESP:
+	case RIPCMD_UPDACK:
 		break;
 
-	case RIPCMD_TRACEON:
-		/* fall through */
 	default:
 		if (ndo->ndo_vflag <= 1) {
-			if (!print_unknown_data(ndo, (const uint8_t *)rp, "\n\t", length))
+			if (!print_unknown_data(ndo, p, "\n\t", len))
 				return;
 		}
 		break;
 	}
 	/* do we want to see an additionally hexdump ? */
 	if (ndo->ndo_vflag> 1) {
-		if (!print_unknown_data(ndo, (const uint8_t *)rp, "\n\t", length))
+		if (!print_unknown_data(ndo, p, "\n\t", len))
 			return;
 	}
-trunc:
 	return;
+invalid:
+	nd_print_invalid(ndo);
+	ND_TCHECK_LEN(p, len);
 }

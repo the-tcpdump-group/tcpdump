@@ -109,6 +109,7 @@
    41  15:41:10.777155 IP (tos 0x0, ttl 64, id 14454, offset 0, flags [DF], proto TCP (6), length 68)
     127.0.0.1.6633 > 127.0.0.1.58445: Flags [P.], cksum 0xfe38 (incorrect -> 0x994a), seq 2142345193:2142345209, ack 115176160, win 94, options [nop,nop,TS val 175830 ecr 174634], length 16: OpenFlow
 	version 1.3, type EXPERIMENTER, length 16, xid 0x00000041
+	 experimenter 0x00d0f0db (Ericsson), exp_type 0x00000065
    42  15:41:10.782182 IP (tos 0x0, ttl 64, id 51401, offset 0, flags [DF], proto TCP (6), length 80)
     127.0.0.1.58445 > 127.0.0.1.6633: Flags [P.], cksum 0xfe44 (incorrect -> 0x9024), seq 1:29, ack 16, win 86, options [nop,nop,TS val 175831 ecr 175830], length 28: OpenFlow
 	version 1.3, type ERROR, length 28, xid 0x00000041
@@ -127,6 +128,8 @@
    47  15:41:11.640555 IP (tos 0x0, ttl 64, id 14458, offset 0, flags [DF], proto TCP (6), length 85)
     127.0.0.1.6633 > 127.0.0.1.58445: Flags [P.], cksum 0xfe49 (incorrect -> 0x4af3), seq 24:57, ack 37, win 94, options [nop,nop,TS val 176046 ecr 175881], length 33: OpenFlow
 	version 1.3, type EXPERIMENTER, length 33, xid 0x00000043
+	 experimenter 0x00d0f0db (Ericsson), exp_type 0x00000065
+	 data (17 octets)
    48  15:41:11.649632 IP (tos 0x0, ttl 64, id 51403, offset 0, flags [DF], proto TCP (6), length 97)
     127.0.0.1.58445 > 127.0.0.1.6633: Flags [P.], cksum 0xfe55 (incorrect -> 0x45af), seq 37:82, ack 57, win 86, options [nop,nop,TS val 176048 ecr 176046], length 45: OpenFlow
 	version 1.3, type ERROR, length 45, xid 0x00000043
@@ -155,6 +158,7 @@
    56  16:32:34.844806 IP (tos 0x0, ttl 64, id 44799, offset 0, flags [DF], proto TCP (6), length 64)
     127.0.0.1.6633 > 127.0.0.1.58447: Flags [P.], cksum 0xfe34 (incorrect -> 0x3760), seq 8:20, ack 9, win 94, options [nop,nop,TS val 946847 ecr 946792], length 12: OpenFlow
 	version 1.3, type SET_CONFIG, length 12, xid 0x0000002f
+	 flags FRAG_REASM, miss_send_len 200
    57  16:32:34.883698 IP (tos 0x0, ttl 64, id 3494, offset 0, flags [DF], proto TCP (6), length 52)
     127.0.0.1.58447 > 127.0.0.1.6633: Flags [.], cksum 0xfe28 (incorrect -> 0x3c3d), ack 20, win 86, options [nop,nop,TS val 946857 ecr 946847], length 0
    58  16:32:36.376083 IP (tos 0x0, ttl 64, id 44800, offset 0, flags [DF], proto TCP (6), length 60)
@@ -165,6 +169,7 @@
    60  16:32:36.378403 IP (tos 0x0, ttl 64, id 3496, offset 0, flags [DF], proto TCP (6), length 64)
     127.0.0.1.58447 > 127.0.0.1.6633: Flags [P.], cksum 0xfe34 (incorrect -> 0x3420), seq 9:21, ack 28, win 86, options [nop,nop,TS val 947230 ecr 947230], length 12: OpenFlow
 	version 1.3, type GET_CONFIG_REPLY, length 12, xid 0x00000030
+	 flags FRAG_DROP, miss_send_len 200
    61  16:32:36.378465 IP (tos 0x0, ttl 64, id 44801, offset 0, flags [DF], proto TCP (6), length 52)
     127.0.0.1.6633 > 127.0.0.1.58447: Flags [.], cksum 0xfe28 (incorrect -> 0x392d), ack 21, win 94, options [nop,nop,TS val 947230 ecr 947230], length 0
    62  17:39:10.589931 IP (tos 0x0, ttl 64, id 28700, offset 0, flags [DF], proto TCP (6), length 60)
@@ -204,6 +209,8 @@
    75  13:15:24.725748 IP (tos 0x0, ttl 64, id 51120, offset 0, flags [DF], proto TCP (6), length 132)
     127.0.0.1.38906 > 127.0.0.1.6633: Flags [P.], cksum 0xfe78 (incorrect -> 0xadc3), seq 2781543975:2781544055, ack 1865664008, win 86, options [nop,nop,TS val 1794904 ecr 1794249], length 80: OpenFlow
 	version 1.3, type PORT_STATUS, length 80, xid 0x00000000
+	 reason ADD
+	  port_no 2, hw_addr ca:02:9f:af:e9:1c, name 'veth0'
    76  13:15:24.725788 IP (tos 0x0, ttl 64, id 64306, offset 0, flags [DF], proto TCP (6), length 52)
     127.0.0.1.6633 > 127.0.0.1.38906: Flags [.], cksum 0xfe28 (incorrect -> 0x2614), ack 80, win 94, options [nop,nop,TS val 1794904 ecr 1794904], length 0
    77  16:37:49.792852 IP (tos 0x0, ttl 64, id 32480, offset 0, flags [DF], proto TCP (6), length 68)
@@ -394,14 +401,21 @@
   147  19:45:17.176752 IP (tos 0x0, ttl 64, id 17714, offset 0, flags [DF], proto TCP (6), length 68)
     127.0.0.1.6633 > 127.0.0.1.51984: Flags [P.], cksum 0xfe38 (incorrect -> 0xe026), seq 8:24, ack 9, win 94, options [nop,nop,TS val 6181593 ecr 6181423], length 16: OpenFlow
 	version 1.3, type TABLE_MOD, length 16, xid 0x0000006e
+	 table_id 1, config 0x00000000
   148  19:45:17.215970 IP (tos 0x0, ttl 64, id 23687, offset 0, flags [DF], proto TCP (6), length 52)
     127.0.0.1.51984 > 127.0.0.1.6633: Flags [.], cksum 0xfe28 (incorrect -> 0xe511), ack 24, win 86, options [nop,nop,TS val 6181603 ecr 6181593], length 0
   149  19:53:23.472776 IP (tos 0x0, ttl 64, id 17917, offset 0, flags [DF], proto TCP (6), length 92)
     127.0.0.1.6633 > 127.0.0.1.51984: Flags [P.], cksum 0xfe50 (incorrect -> 0xb18a), seq 936:976, ack 1361, win 98, options [nop,nop,TS val 6303167 ecr 6302673], length 40: OpenFlow
 	version 1.3, type PORT_MOD, length 40, xid 0x000000d4
+	 port_no 1, hw_addr 0a:ea:83:10:db:09
+	  config 0x00000040 (NO_PACKET_IN)
+	  mask 0x00000040 (NO_PACKET_IN)
+	  advertise 0x0000080a (10MB_FD, 100MB_FD, COPPER)
   150  19:53:23.473744 IP (tos 0x0, ttl 64, id 23790, offset 0, flags [DF], proto TCP (6), length 132)
     127.0.0.1.51984 > 127.0.0.1.6633: Flags [P.], cksum 0xfe78 (incorrect -> 0x92a0), seq 1361:1441, ack 976, win 86, options [nop,nop,TS val 6303167 ecr 6303167], length 80: OpenFlow
 	version 1.3, type PORT_STATUS, length 80, xid 0x00000000
+	 reason MODIFY
+	  port_no 1, hw_addr 0a:ea:83:10:db:09, name 'veth0'
   151  19:53:23.473777 IP (tos 0x0, ttl 64, id 17918, offset 0, flags [DF], proto TCP (6), length 52)
     127.0.0.1.6633 > 127.0.0.1.51984: Flags [.], cksum 0xfe28 (incorrect -> 0x25f0), ack 1441, win 98, options [nop,nop,TS val 6303167 ecr 6303167], length 0
   152  19:55:19.511983 IP (tos 0x0, ttl 64, id 17967, offset 0, flags [DF], proto TCP (6), length 60)
@@ -432,9 +446,11 @@
   161  20:24:40.574081 IP (tos 0x0, ttl 64, id 45979, offset 0, flags [DF], proto TCP (6), length 76)
     127.0.0.1.6633 > 127.0.0.1.51987: Flags [P.], cksum 0xfe40 (incorrect -> 0xba52), seq 1432:1456, ack 1497, win 96, options [nop,nop,TS val 6772442 ecr 6771701], length 24: OpenFlow
 	version 1.3, type ROLE_REQUEST, length 24, xid 0x0000012f
+	 role MASTER, generation_id 0x00000000012e248a
   162  20:24:40.574726 IP (tos 0x0, ttl 64, id 49382, offset 0, flags [DF], proto TCP (6), length 76)
     127.0.0.1.51987 > 127.0.0.1.6633: Flags [P.], cksum 0xfe40 (incorrect -> 0xb75e), seq 1497:1521, ack 1456, win 86, options [nop,nop,TS val 6772442 ecr 6772442], length 24: OpenFlow
 	version 1.3, type ROLE_REPLY, length 24, xid 0x0000012f
+	 role MASTER, generation_id 0x00000000012e248a
   163  20:24:40.574748 IP (tos 0x0, ttl 64, id 45980, offset 0, flags [DF], proto TCP (6), length 52)
     127.0.0.1.6633 > 127.0.0.1.51987: Flags [.], cksum 0xfe28 (incorrect -> 0xe276), ack 1521, win 96, options [nop,nop,TS val 6772442 ecr 6772442], length 0
   164  20:28:52.608224 IP (tos 0x0, ttl 64, id 46086, offset 0, flags [DF], proto TCP (6), length 60)
@@ -448,6 +464,12 @@
   167  20:28:54.103683 IP (tos 0x0, ttl 64, id 46088, offset 0, flags [DF], proto TCP (6), length 84)
     127.0.0.1.6633 > 127.0.0.1.51987: Flags [P.], cksum 0xfe48 (incorrect -> 0xeb3a), seq 1912:1944, ack 1993, win 96, options [nop,nop,TS val 6835824 ecr 6835451], length 32: OpenFlow
 	version 1.3, type SET_ASYNC, length 32, xid 0x00000166
+	 packet_in_mask[EM] 0x00000003 (NO_MATCH, ACTION)
+	 packet_in_mask[S] 0x00000002 (ACTION)
+	 port_status_mask[EM] 0x00000007 (ADD, DELETE, MODIFY)
+	 port_status_mask[S] 0x00000002 (DELETE)
+	 flow_removed_mask[EM] 0x00000007 (ADD, DELETE, MODIFY)
+	 flow_removed_mask[S] 0x00000004 (MODIFY)
   168  20:28:54.140673 IP (tos 0x0, ttl 64, id 49438, offset 0, flags [DF], proto TCP (6), length 52)
     127.0.0.1.51987 > 127.0.0.1.6633: Flags [.], cksum 0xfe28 (incorrect -> 0xef88), ack 1944, win 86, options [nop,nop,TS val 6835834 ecr 6835824], length 0
   169  20:28:56.308694 IP (tos 0x0, ttl 64, id 46089, offset 0, flags [DF], proto TCP (6), length 60)
@@ -458,6 +480,12 @@
   171  20:28:56.309209 IP (tos 0x0, ttl 64, id 49440, offset 0, flags [DF], proto TCP (6), length 84)
     127.0.0.1.51987 > 127.0.0.1.6633: Flags [P.], cksum 0xfe48 (incorrect -> 0xe557), seq 1993:2025, ack 1952, win 86, options [nop,nop,TS val 6836376 ecr 6836376], length 32: OpenFlow
 	version 1.3, type GET_ASYNC_REPLY, length 32, xid 0x00000167
+	 packet_in_mask[EM] 0x00000003 (NO_MATCH, ACTION)
+	 packet_in_mask[S] 0x00000002 (ACTION)
+	 port_status_mask[EM] 0x00000007 (ADD, DELETE, MODIFY)
+	 port_status_mask[S] 0x00000002 (DELETE)
+	 flow_removed_mask[EM] 0x00000007 (ADD, DELETE, MODIFY)
+	 flow_removed_mask[S] 0x00000004 (MODIFY)
   172  20:28:56.309230 IP (tos 0x0, ttl 64, id 46090, offset 0, flags [DF], proto TCP (6), length 52)
     127.0.0.1.6633 > 127.0.0.1.51987: Flags [.], cksum 0xfe28 (incorrect -> 0xeb10), ack 2025, win 96, options [nop,nop,TS val 6836376 ecr 6836376], length 0
   173  20:37:22.358712 IP (tos 0x0, ttl 64, id 18246, offset 0, flags [DF], proto TCP (6), length 100)

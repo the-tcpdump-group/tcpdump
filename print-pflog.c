@@ -94,14 +94,18 @@ pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
 	subrulenr = GET_BE_U_4(&hdr->subrulenr);
 	if (subrulenr == (uint32_t)-1)
 		ND_PRINT("rule %u/", rulenr);
-	else
-		ND_PRINT("rule %u.%s.%u/", rulenr, hdr->ruleset, subrulenr);
+	else {
+		ND_PRINT("rule %u.", rulenr);
+		nd_printjnp(ndo, (const u_char*)hdr->ruleset, PFLOG_RULESET_NAME_SIZE);
+		ND_PRINT(".%u/", subrulenr);
+	}
 
-	ND_PRINT("%s: %s %s on %s: ",
+	ND_PRINT("%s: %s %s on ",
 	    tok2str(pf_reasons, "unkn(%u)", GET_U_1(&hdr->reason)),
 	    tok2str(pf_actions, "unkn(%u)", GET_U_1(&hdr->action)),
-	    tok2str(pf_directions, "unkn(%u)", GET_U_1(&hdr->dir)),
-	    hdr->ifname);
+	    tok2str(pf_directions, "unkn(%u)", GET_U_1(&hdr->dir)));
+	nd_printjnp(ndo, (const u_char*)hdr->ifname, IFNAMSIZ);
+	ND_PRINT(": ");
 }
 
 void

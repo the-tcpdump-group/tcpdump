@@ -147,14 +147,22 @@ q922_string(netdissect_options *ndo, const u_char *p, u_int length)
 
     static u_int dlci, addr_len;
     static uint32_t flags;
-    static char buffer[sizeof("DLCI xxxxxxxxxx")];
+    static char buffer[sizeof("parse_q922_header() returned XXXXXXXXXXX")];
+    int ret;
     memset(buffer, 0, sizeof(buffer));
 
-    if (parse_q922_header(ndo, p, &dlci, &addr_len, &flags, length) == 1){
+    ret = parse_q922_header(ndo, p, &dlci, &addr_len, &flags, length);
+    if (ret == 1) {
         snprintf(buffer, sizeof(buffer), "DLCI %u", dlci);
+        return buffer;
+    } else if (ret == 0) {
+        return "<Invalid DLCI>";
+    } else if (ret == -1) {
+        return "<Truncated>";
+    } else {
+        snprintf(buffer, sizeof(buffer), "parse_q922_header() returned %d", ret);
+        return buffer;
     }
-
-    return buffer;
 }
 
 

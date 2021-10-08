@@ -11,9 +11,6 @@
    11  22:15:42.069443 00:21:d8:35:03:45 > 00:08:02:7e:b2:36, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Reply 192.168.0.1 is-at 00:21:d8:01:03:45, length 46
    12  22:15:42.394609 00:16:17:e0:67:e7 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.33, length 46
    13  22:15:47.244689 00:61:29:da:f8:fb > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 8604 0001 001f 29da f8fb c0a8  ..........).....
-	0x0010:  0025 0000 0000 0000 c0a8 0025 0000 0000  .%.........%....
-	0x0020:  0000 0000 0000 0000 006b 0000 0000       .........k....
    14  22:15:47.992392 00:1f:29:da:f8:fb > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.37 tell 192.168.0.37, length 46
    15  22:15:48.992464 00:1f:29:da:f8:fb > ff:ff:ff:ff:fb:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Unknown (29953) 
 	0x0000:  0001 0800 0604 7501 001f 29da f8fb c0a8  ......u...).....
@@ -60,9 +57,6 @@
    45  22:17:46.056743 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
    46  22:17:50.052979 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
    47  22:17:54.052939 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 0624 0001 001f 29da 2d79 c0a8  .....$....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
    48  22:18:11.783100 00:13:20:13:db:6f > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.31, length 46
    49  22:18:13.305136 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
    50  22:18:17.302719 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -120,14 +114,8 @@
   102  22:22:34.550521 00:1f:25:00:2d:79 > ff:30:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   103  22:22:38.550508 70:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.149.104, length 46
   104  22:22:41.914091 6a:16:17:e0:67:e7 > ff:ff:ff:fe:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 06aa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0010:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0020:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa       ..............
   105  22:22:42.553310 00:1f:29:da:25:00 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), Unknown Protocol (0x3100) (len 4), Request who-has <wrong proto type> tell <wrong proto type>, length 46
   106  22:22:46.550441 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 3304 0001 001f 29da 2d79 c0a8  ....3.....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
   107  22:22:50.550370 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   108  22:23:02.552431 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (00:00:00:00:00:77) tell 192.168.1.104, length 46
   109  22:23:06.550250 00:1f:29:da:2d:79 > ff:ff:54:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -137,9 +125,6 @@
   113  22:23:12.884204 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (00:4a:00:00:00:00) tell 192.168.1.104, length 46
   114  22:23:16.878263 00:25:00:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   115  22:23:20.878208 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 7804 0001 0034 29da 2d79 c0a8  ....x....4).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
   116  22:23:29.054528 00:1f:29:da:2d:79 > ff:ff:49:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   117  22:23:33.050072 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   118  22:23:37.049993 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -167,9 +152,6 @@
   140  22:25:38.048930 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.53.1.104, length 46
   141  22:25:42.048910 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   142  22:25:53.073765 00:1f:2d:da:f8:fb > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0030 0800 06aa aaaa aaaa aaaa aaaa aaaa  .0..............
-	0x0010:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0020:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa       ..............
   143  22:25:54.050878 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Unknown (37) 
 	0x0000:  0001 0800 0604 0025 001f 29da 2d79 c0a8  .......%..).-y..
 	0x0010:  0168 0000 6200 0000 c0a8 0101 0000 0000  .h..b...........
@@ -198,18 +180,12 @@
   162  22:26:51.798332 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   163  22:26:55.798241 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (00:00:00:01:00:00) tell 192.168.37.0, length 46
   164  22:26:59.801241 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  00aa aaaa aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0010:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0020:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa       ..............
   165  22:27:03.798195 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (f5:00:00:00:00:00) tell 192.168.37.0, length 46
   166  22:27:07.798148 00:70:29:da:2d:79 > ff:ff:25:00:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   167  22:27:09.703316 00:13:20:13:db:6f > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.31, length 46
   168  22:27:19.800341 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), Unknown Protocol (0xbc00) (len 4), Request who-has <wrong proto type> tell <wrong proto type>, length 46
   169  22:27:23.798018 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   170  22:27:27.797977 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 1604 0001 001f 29da 2d33 c0a8  ..........).-3..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
   171  22:27:29.052575 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Unknown Hardware (117) (len 6), IPv4 (len 4), Unknown (9472) 
 	0x0000:  0075 0800 0604 2500 001f 29da 2d79 c0a8  .u....%...).-y..
 	0x0010:  0168 0000 0000 0000 c0ac 0101 0000 0000  .h..............
@@ -224,9 +200,6 @@
 	0x0010:  0021 0000 0000 0000 c0a8 0001 0000 0000  .!..............
 	0x0020:  0000 0000 0000 0000 0000 0000 0020       ..............
   178  22:27:42.969765 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 06af 0001 001f 29da 2d79 c0a8  ..........).-y..
-	0x0010:  0168 0000 0000 0001 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
   179  22:27:46.301633 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   180  22:27:54.297766 00:1f:29:da:2d:79 > 00:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   181  22:28:13.549906 00:1f:29:9b:2d:79 > ff:ff:ff:ea:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -242,9 +215,6 @@
   191  22:28:58.797213 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   192  22:29:02.053090 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   193  22:29:04.047118 00:1f:29:da:2d:79 > ff:ff:ff:d5:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 08aa aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0010:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0020:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa       ..............
   194  22:29:07.076129 00:21:5a:21:9e:fd > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Unknown (57) 
 	0x0000:  0001 0800 0604 0039 0021 5a21 9efd c0a8  .......9.!Z!....
 	0x0010:  0023 0000 0000 0000 c0a8 0001 0000 0000  .#..............
@@ -277,25 +247,16 @@
   220  22:31:35.323433 00:21:5a:21:9e:fd > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Unknown Hardware (155) (len 6), IPv4 (len 4), Request who-has 192.168.0.35 tell 192.168.0.35, length 46
   221  22:31:37.048078 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (00:00:00:00:00:b8) tell 192.168.1.104, length 46
   222  22:31:43.353288 00:19:db:2b:57:d7 > ff:ff:ff:ae:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 5c04 0001 0019 df2b 57d7 c0a8  ....\......+W...
-	0x0010:  0022 0000 0000 0000 c0a8 0001 0000 0000  ."..............
-	0x0020:  0000 0004 0000 0000 0000 0000 0000       ..............
   223  22:31:45.045747 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   224  22:31:45.361842 00:21:5a:21:9e:fd > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.35, length 46
   225  22:31:46.300377 00:1f:29:da:2d:79 > ff:70:fe:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.68 (00:00:94:00:00:00) tell 192.168.1.104, length 46
   226  22:31:48.295664 00:1f:29:da:29:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  6601 0800 0640 0001 001f 29da 2d79 c0a8  f....@....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
   227  22:31:54.295753 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.113.1 tell 192.168.1.104, length 46
   228  22:31:58.145164 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   229  22:32:00.139363 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   230  22:32:03.549761 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.37.0 tell 192.168.1.104, length 46
   231  22:32:07.545603 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   232  22:32:08.087716 00:21:5a:21:9e:fd > 73:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 0614 0001 0021 5a21 9efd c0a8  .........!Z!....
-	0x0010:  0023 0000 0000 0000 c0a8 0023 0000 0000  .#.........#....
-	0x0020:  0000 0000 0000 0001 0000 0000 0000       ..............
   233  22:32:08.527007 00:21:5a:21:9e:fd > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.35 tell 192.168.0.35, length 46
   234  22:32:09.527100 00:21:5a:21:9e:fd > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Unknown (8193) 
 	0x0000:  0001 0800 0604 2001 0021 5a21 9efd c0a8  .........!Z!....
@@ -351,9 +312,6 @@
 	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
   274  22:34:55.047793 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   275  22:34:59.044107 00:1f:29:25:00:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 2500 0001 001f 29da 2d79 69a8  ....%.....).-yi.
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
   276  22:35:03.044048 00:1f:29:da:2d:79 > ff:ff:ff:ef:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   277  22:35:22.296359 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.17 tell 192.168.1.104, length 46
   278  22:35:26.293854 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -386,9 +344,6 @@
   305  22:37:04.042989 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 12), Request who-has <wrong len> (01:01:00:00:00:00) tell <wrong len>, length 46
   306  22:37:08.043256 40:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   307  22:37:20.044962 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 6204 0001 001f 29da 2d79 c0a8  ....b.....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
   308  22:37:24.042815 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.37.0 tell 192.168.1.104, length 46
   309  22:37:28.042796 00:1f:29:ca:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   310  22:37:29.298706 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.88 tell 192.168.1.104, length 46
@@ -473,16 +428,10 @@
   383  22:42:37.805739 00:1f:29:da:78:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), Unknown Protocol (0x08ae) (len 4), Request who-has <wrong proto type> tell <wrong proto type>, length 46
   384  22:42:39.352780 00:19:db:2b:57:d7 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.34, length 46
   385  22:42:41.805675 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 f204 0001 001f 29da 2d79 c0a8  ..........).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0072 0000 0000 0000 0000       .....r........
   386  22:42:45.808434 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   387  22:42:53.805549 00:1f:29:da:2d:79 > ff:ff:ff:ff:33:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   388  22:43:05.807552 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   389  22:43:09.805440 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0010:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0020:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa       ..............
   390  22:43:13.805416 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Unknown Hardware (9472) (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   391  22:43:15.060010 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Unknown (20225) 
 	0x0000:  0001 0800 0604 4f01 001f 29da 2d79 c0a8  ......O...).-y..
@@ -514,9 +463,6 @@
   409  22:45:15.411375 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   410  22:45:19.398069 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.37, length 46
   411  22:45:23.398037 00:1f:62:da:2d:79 > ff:4c:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 064a 0001 001f 29da 2d79 c0a8  .....J....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
   412  22:45:25.306660 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   413  22:45:27.304288 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (02:00:00:00:00:00) tell 192.168.1.104, length 46
   414  22:45:30.400504 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -535,9 +481,6 @@
   424  22:45:47.022864 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.242.1.104, length 46
   425  22:45:48.647906 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   426  22:45:50.022885 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 6704 0063 001f 29da 2d79 c0a8  ....g..c..).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
   427  22:45:51.054092 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   428  22:45:54.022767 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 4), IPv4 (len 4), Unknown (7169) 
 	0x0000:  0001 0800 0404 1c01 001f 29da 2d79 c0a8  ..........).-y..
@@ -546,9 +489,6 @@
   429  22:45:55.647750 00:1f:2b:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   430  22:45:57.306144 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   431  22:45:59.058333 00:1f:29:da:f8:fb > ff:ff:ef:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 0664 0001 001f 29da f8fb c0a8  .....d....).....
-	0x0010:  0025 0000 0000 0000 c0a8 0001 0000 0000  .%..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
   432  22:46:01.304034 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 170.170.170.170 (00:00:aa:aa:aa:aa) tell 192.168.1.104, length 46
   433  22:46:02.649596 00:1f:29:da:2d:79 > ff:ff:ff:ff:0c:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   434  22:46:06.053981 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), Unknown Protocol (0x0801) (len 4), Request who-has <wrong proto type> tell <wrong proto type>, length 46
@@ -590,9 +530,6 @@
   464  22:47:43.045611 00:13:20:13:db:6f > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.33 tell 192.168.0.31, length 46
   465  22:47:49.556733 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   466  22:47:53.553013 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 0656 0001 001f efaa aaaa aaaa  .....V..........
-	0x0010:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0020:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa       ..............
   467  22:47:57.552991 00:1f:21:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Unknown (222) 
 	0x0000:  0001 0800 0604 00de 001f 29da 2d79 c0a8  ..........).-y..
 	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
@@ -609,28 +546,16 @@
 	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
 	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
   476  22:48:35.115126 00:1f:29:da:2d:79 > ff:71:ff:ff:ff:b8, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 9e04 0001 001f 29da 2d79 c0a8  ..........).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
   477  22:48:36.802626 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   478  22:48:48.804622 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.37 tell 192.168.1.104, length 46
   479  22:48:52.802523 00:1f:29:da:2f:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   480  22:48:58.057040 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   481  22:49:02.052411 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 06ef 7101 001f 29da 2d79 c0a8  ......q...).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0100 0000 0000 0000 0000       ..............
   482  22:49:15.306201 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   483  22:49:19.302305 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   484  22:49:23.302228 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (58:00:00:00:00:00) tell 192.168.1.104, length 46
   485  22:49:27.814844 00:16:17:e0:67:e7 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  00aa aaaa aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0010:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0020:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa       ..............
   486  22:49:42.246589 00:0f:fe:3a:7f:20 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  00aa aaaa aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0010:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0020:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa       ..............
   487  22:49:42.554420 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   488  22:49:46.552070 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Unknown Hardware (2049) (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   489  22:49:54.130129 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), Unknown Protocol (0x2500) (len 4), Request who-has <wrong proto type> tell <wrong proto type>, length 46
@@ -655,9 +580,6 @@
   508  22:51:16.301443 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   509  22:51:20.145280 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   510  22:51:21.301320 00:1f:29:da:2d:79 > ff:ff:ff:ff:79:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  c901 0800 0683 0001 001f 29da 2d79 c0a8  ..........).-y..
-	0x0010:  0168 0000 0000 0001 c0a8 0101 0000 0000  .h..............
-	0x0020:  0033 0000 0000 0000 0000 0000 0000       .3............
   511  22:51:24.301213 00:1f:46:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (00:00:00:00:38:00) tell 192.168.1.104, length 46
   512  22:51:27.144910 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 99.168.1.104, length 46
   513  22:51:28.301160 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.9 tell 192.168.1.104, length 46
@@ -672,18 +594,9 @@
   522  22:52:10.800795 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (00:00:00:80:00:00) tell 192.168.1.104, length 46
   523  22:52:14.800777 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   524  22:52:16.623489 00:21:5a:21:9e:fd > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 5204 0001 0021 5a21 9efd c0a8  ....R....!Z!....
-	0x0010:  0023 0000 0000 0000 c0a8 0001 0001 0000  .#..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
   525  22:52:34.052917 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (00:00:00:00:25:00) tell 192.168.1.104, length 46
   526  22:52:38.050603 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 0624 0001 001f 29da 2d79 c0a8  .....$....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 aaaa aaaa aaaa       ..............
   527  22:52:42.050563 00:1f:29:da:25:00 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 aaaa aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0010:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0020:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa       ..............
   528  22:52:46.053310 00:1f:29:da:2d:79 > ff:fb:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   529  22:52:47.159886 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   530  22:52:50.050516 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -717,9 +630,6 @@
   558  22:55:12.054044 00:0f:fe:3a:7f:20 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.32, length 46
   559  22:55:14.500575 00:16:17:e0:67:e7 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 170.170.170.170 (aa:aa:aa:aa:aa:aa) tell 170.170.170.170, length 46
   560  22:55:18.294167 00:13:20:13:db:6f > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 4804 0001 0013 2013 db6f c0a8  ....H........o..
-	0x0010:  001f 0000 0000 0000 c0a8 0001 0000 6f10  ..............o.
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
   561  22:55:25.551619 00:1f:76:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 224.168.1.1 tell 192.168.1.104, length 46
   562  22:55:29.548998 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   563  22:55:33.548968 00:1f:29:da:2d:79 > ff:ff:65:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -791,9 +701,6 @@
   623  22:59:52.343782 00:13:20:13:db:6f > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.31, length 46
   624  22:59:54.799665 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   625  22:59:58.796804 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 7600 2500 0001 001f 29da 2d79 c0a8  ..v.%.....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 aaaa aaaa  .h..............
-	0x0020:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa       ..............
   626  23:00:02.344349 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   627  23:00:09.343573 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   628  23:00:14.798740 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -824,9 +731,6 @@
   650  23:01:49.800641 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   651  23:01:57.795820 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   652  23:02:07.049584 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 0625 0001 001f 29da 2d79 c0a8  .....%....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 b000 0000 0000 0000       ..............
   653  23:02:11.045680 00:1f:29:da:2d:79 > ff:ff:ff:ff:72:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   654  23:02:15.045663 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.33 tell 192.168.1.104, length 46
   655  23:02:19.552957 00:21:5a:21:9e:fd > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.35, length 46
@@ -860,9 +764,6 @@
   683  23:04:36.044423 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   684  23:04:41.299174 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (00:00:00:25:00:00) tell 192.168.1.104, length 46
   685  23:04:43.294345 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 8604 0001 001f 29da 2de7 c0a8  ..........).-...
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
   686  23:04:49.294351 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (00:00:20:00:00:00) tell 192.168.1.104, length 46
   687  23:05:02.544223 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   688  23:05:06.544192 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -976,9 +877,6 @@
   784  23:12:41.272880 00:19:db:2b:57:d7 > ff:45:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.34, length 46
   785  23:12:42.540224 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   786  23:12:46.543016 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 aaaa aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0010:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0020:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa       ..............
   787  23:12:50.540165 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   788  23:12:54.540126 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.122.104, length 46
   789  23:13:06.542201 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -1005,9 +903,6 @@
 	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
 	0x0020:  6b00 0000 0000 0000 0000 0000 0000       k.............
   809  23:14:58.792680 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  2500 0800 4e04 0001 001f 29da 2d79 c0a8  %...N.....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
   810  23:15:02.789006 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (00:00:00:00:00:38) tell 192.168.1.104, length 46
   811  23:15:06.788976 00:1f:29:da:2d:79 > ff:ff:ff:f7:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   812  23:15:26.023931 00:0f:fe:3a:7f:20 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.32, length 46
@@ -1049,9 +944,6 @@
   848  23:17:58.287486 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   849  23:18:11.147267 00:19:db:2b:57:d7 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.34, length 46
   850  23:18:17.539655 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 062a 0001 001f 29da 2d79 c0a8  .....*....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
   851  23:18:21.537309 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 37.0.1.104, length 46
   852  23:18:25.537273 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   853  23:18:29.540017 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Unknown Hardware (33) (len 6), IPv4 (len 4), Request who-has 192.168.1.65 tell 192.168.1.104, length 46
@@ -1200,17 +1092,11 @@
   981  23:28:49.784125 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   982  23:28:53.781805 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.83 (00:00:00:61:00:00) tell 192.168.1.104, length 46
   983  23:28:57.781775 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 6004 0057 001f 29da 2d79 c0a8  ....`..W..).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
   984  23:28:59.036394 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   985  23:29:03.031715 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 205.168.1.1 tell 192.168.1.104, length 46
   986  23:29:07.031730 00:1f:29:da:2d:79 > ff:ff:ff:ff:ef:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   987  23:29:13.047275 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   988  23:29:16.285493 00:1f:29:da:2d:79 > fb:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 0679 0001 001f 29da 2d79 c0a8  .....y....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 00aa aaaa  .h..............
-	0x0020:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa       ..............
   989  23:29:20.281572 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   990  23:29:24.281537 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
   991  23:29:42.365395 00:13:20:13:db:6f > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.31, length 46
@@ -1326,9 +1212,6 @@
  1089  23:36:45.027751 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (00:33:00:00:00:00) tell 70.168.1.104, length 46
  1090  23:36:52.295689 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1091  23:36:56.293285 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0010:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0020:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa       ..............
  1092  23:37:04.296276 00:1f:29:da:2d:79 > ff:3d:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1093  23:37:08.293103 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 0.168.1.104, length 46
  1094  23:37:12.293159 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -1347,9 +1230,6 @@
 	0x0020:  0000 0000 0000 0000 0000 5400 0000       ..........T...
  1105  23:38:26.042497 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1106  23:38:30.045290 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 0624 0001 001f 29da 2d79 c0a8  .....$....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  1107  23:38:34.042422 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1108  23:38:38.042407 00:1f:29:da:25:00 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (00:00:00:00:56:00) tell 192.168.1.104, length 46
  1109  23:38:50.044341 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -1416,9 +1296,6 @@
  1164  23:43:11.290037 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1165  23:43:15.289976 00:1f:2d:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1166  23:43:16.544683 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0013 0800 0604 0001 001f 29da 2d79 c0a8  ..........).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  1167  23:43:20.539979 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.72.104, length 46
  1168  23:43:24.539964 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), Unknown Protocol (0x08b2) (len 4), Request who-has <wrong proto type> tell <wrong proto type>, length 46
  1169  23:43:28.352467 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -1426,9 +1303,6 @@
  1171  23:43:35.352308 00:1f:29:da:2d:79 > ff:ff:fe:ff:ff:ff, ethertype ARP (0x0806), length 60: Unknown Hardware (103) (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1172  23:43:37.789802 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1173  23:43:41.790095 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 0658 0001 001f 29da 2d79 c0a8  .....X....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  1174  23:43:43.352326 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (00:00:00:00:00:05) tell 192.168.1.104, length 46
  1175  23:43:50.352249 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1176  23:43:59.609287 00:1f:75:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -1461,9 +1335,6 @@
  1197  23:44:46.867551 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1198  23:44:48.851882 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.11.1 tell 192.168.1.104, length 46
  1199  23:44:50.867322 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 8604 0001 001f 29da 2d79 c0a8  ..........).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  1200  23:44:56.443048 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1201  23:44:57.869220 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1202  23:44:59.101629 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -1501,9 +1372,6 @@
  1234  23:47:06.241170 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1235  23:47:11.100437 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1236  23:47:23.102526 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 3604 0001 001f 29da 2d79 c0a8  ....6.....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  1237  23:47:27.100299 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1238  23:47:31.100265 00:1f:29:da:99:79 > ff:ff:ff:ff:ff:7f, ethertype ARP (0x0806), length 60: Ethernet (len 6), Unknown Protocol (0x08b5) (len 4), Request who-has <wrong proto type> tell <wrong proto type>, length 46
  1239  23:47:34.350384 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -1605,9 +1473,6 @@
  1332  23:54:45.096489 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1333  23:54:49.096510 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1334  23:54:58.350285 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 d804 0001 001f 29da 2d79 c0a8  ..........).-y..
-	0x0010:  0168 0000 0000 0001 c0a8 0101 0000 0080  .h..............
-	0x0020:  00aa aaaa aaaa aaaa aaaa aaaa aaaa       ..............
  1335  23:55:02.346499 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1336  23:55:06.346409 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1337  23:55:25.598506 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -1620,9 +1485,6 @@
  1344  23:55:52.470945 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Unknown Hardware (257) (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1345  23:55:57.597995 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1346  23:56:01.595837 25:00:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 9225 0001 001f 29da 2d79 c0a8  .....%....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  1347  23:56:05.595820 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1348  23:56:06.850440 00:4d:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1349  23:56:10.845762 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 0), Unknown Protocol (0x0825) (len 4), Request who-has <wrong proto type> tell <wrong proto type>, length 46
@@ -1635,9 +1497,6 @@
  1356  23:56:28.095644 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.77, length 46
  1357  23:56:32.095568 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (52:00:00:63:00:00) tell 192.168.1.104, length 46
  1358  23:56:41.348006 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 6a04 0001 001f 29da 2d79 c0a8  ....j.....).-y..
-	0x0010:  0168 0000 4400 0000 c0a8 aaaa aaaa aaaa  .h..D...........
-	0x0020:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa       ..............
  1359  23:56:41.845957 00:19:db:2b:57:d7 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.34, length 46
  1360  23:56:45.345611 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), Unknown Protocol (0x0870) (len 4), Request who-has <wrong proto type> tell <wrong proto type>, length 46
  1361  23:56:49.345548 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -1657,9 +1516,6 @@
  1372  23:57:31.345164 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1373  23:57:32.599733 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1374  23:57:36.595043 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 2500 0001 001f 29da 2d79 c0a8  ....%.....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  1375  23:57:40.595068 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1376  23:57:53.844917 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1377  23:57:57.844940 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -1701,9 +1557,6 @@
  1410  00:00:28.093521 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1411  00:00:41.347170 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1412  00:00:45.343376 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 4604 0001 001f 29da 2d79 c0a8  ....F.....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  1413  00:00:49.343338 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1414  00:01:12.593153 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1415  00:01:16.593129 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -1719,9 +1572,6 @@
  1425  00:01:49.847487 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), Unknown Protocol (0x5700) (len 4), Request who-has <wrong proto type> tell <wrong proto type>, length 46
  1426  00:01:57.842810 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1427  00:02:07.096332 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 f404 0001 001f 29da 2d79 c0a8  ..........).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  1428  00:02:11.092646 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1429  00:02:11.861554 00:19:db:2b:57:d7 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.34, length 46
  1430  00:02:15.092633 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -1739,9 +1589,6 @@
  1436  00:02:50.342326 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 53.168.1.104, length 46
  1437  00:02:54.342336 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.121.1 tell 192.168.1.104, length 46
  1438  00:02:59.644822 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 6d04 0001 001f 29da 2d79 c0a8  ....m.....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  1439  00:03:03.639032 00:1f:29:64:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1440  00:03:07.342129 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (00:00:00:00:65:00) tell 192.168.1.104, length 46
  1441  00:03:14.342206 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), Unknown Protocol (0x0a00) (len 4), Request who-has <wrong proto type> tell <wrong proto type>, length 46
@@ -1777,9 +1624,6 @@
  1468  00:05:29.841188 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1469  00:05:33.840938 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1470  00:05:37.843716 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 0648 0001 001f 29da 2d79 c0a8  .....H....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  1471  00:05:45.840821 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1472  00:05:54.706732 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1473  00:05:57.842879 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (00:00:00:00:00:f2) tell 192.168.1.104, length 46
@@ -1824,9 +1668,6 @@
  1509  00:07:31.589892 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1510  00:07:32.844674 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1511  00:07:33.715647 00:21:d8:01:03:45 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 06aa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0010:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0020:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa       ..............
  1512  00:07:34.839871 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1513  00:07:38.716052 00:21:d8:01:03:45 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.160 tell 192.168.0.1, length 46
  1514  00:07:40.839884 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 170.170.170.170 (00:00:00:00:aa:aa) tell 192.37.0.104, length 46
@@ -1867,9 +1708,6 @@
  1549  00:09:23.839011 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1550  00:09:34.775136 00:13:20:13:db:6f > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.38 tell 192.168.0.31, length 46
  1551  00:09:43.091169 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  00aa aaaa aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0010:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0020:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa       ..............
  1552  00:09:47.088714 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1553  00:09:51.088754 ce:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1554  00:09:55.091386 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -1937,9 +1775,6 @@
  1613  00:15:06.836005 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Unknown Hardware (16385) (len 6), IPv4 (len 4), Request who-has 192.168.1.117 tell 192.168.1.104, length 46
  1614  00:15:26.088103 00:1f:29:da:2d:79 > ff:ff:ff:ff:7f:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1615  00:15:30.085783 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 0636 0001 001f beda 2d79 c0a8  .....6......-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0121 7300 0000  .h.........!s...
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  1616  00:15:30.606939 00:13:20:13:db:6f > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.38 tell 192.168.0.31, length 46
  1617  00:15:34.085758 00:1f:ef:da:2d:79 > ff:ff:ff:ff:ff:df, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1618  00:15:38.088564 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), Unknown Protocol (0x0900) (len 4), Request who-has <wrong proto type> tell <wrong proto type>, length 46
@@ -2025,9 +1860,6 @@
  1692  00:21:30.611602 00:13:20:13:db:6f > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.38 tell 192.168.0.31, length 46
  1693  00:21:41.084761 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.37.0.1 tell 192.168.1.104, length 46
  1694  00:21:45.082547 00:1f:29:da:2d:79 > ff:ff:ff:ff:28:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 064b 0001 001f 29da 2d79 c0a8  .....K....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  1695  00:21:48.807138 00:1f:29:da:2d:79 > ef:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1696  00:21:50.337538 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (00:00:80:00:00:00) tell 192.168.1.104, length 46
  1697  00:21:52.332560 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -2044,18 +1876,12 @@
  1708  00:22:42.738291 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1709  00:22:46.835022 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (00:00:00:00:00:31) tell 192.168.1.104, length 46
  1710  00:22:48.738288 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 0676 0001 001f 29da 2d79 c0a8  .....v....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  1711  00:22:50.831977 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.37 tell 192.168.65.104, length 46
  1712  00:22:54.832084 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), Unknown Protocol (0x0844) (len 4), Request who-has <wrong proto type> tell <wrong proto type>, length 46
  1713  00:23:06.834010 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (41:00:00:00:00:00) tell 192.168.1.104, length 46
  1714  00:23:10.831821 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1715  00:23:14.831784 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (be:00:00:00:00:4c) tell 192.168.1.104, length 46
  1716  00:23:15.868788 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 b704 0001 001f 29da 2d79 c0a8  ..........).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 4801 0000 0000  .h........H.....
-	0x0020:  0000 0000 0000 0000 00aa aaaa aaaa       ..............
  1717  00:23:17.081785 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1718  00:23:23.862938 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 37.0.1.1 tell 192.168.1.104, length 46
  1719  00:23:32.551577 00:0f:fe:3a:7f:20 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.32, length 46
@@ -2063,8 +1889,6 @@
  1721  00:23:37.331574 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1722  00:23:41.331568 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1723  00:23:41.823867 00:08:02:7e:b2:36 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 42:  [|arp]
-	0x0000:  0001 0800 c004 3601 0008 027e b236 c0a8  ......6....~.6..
-	0x0010:  001e 0000 0000 0000 2500 0001            ........%...
  1724  00:23:41.824153 00:21:d8:01:03:45 > 00:08:02:7e:b2:36, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Reply 192.168.0.1 is-at 00:21:d8:01:03:45, length 46
  1725  00:23:43.310811 00:13:20:13:db:6f > ff:ff:71:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 0), Unknown Protocol (0x0825) (len 4), Request who-has <wrong proto type> tell <wrong proto type>, length 46
  1726  00:24:00.583893 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -2126,9 +1950,6 @@
 	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  1771  00:27:37.023201 00:1f:29:da:2d:79 > ff:ff:ff:ff:bf:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1772  00:27:45.016922 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 4404 0001 001f 29da 2d79 c0a8  ....D.....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0025 0000 0000 0000       .......%......
  1773  00:27:49.117083 00:08:02:7e:b2:36 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 42: Ethernet (len 6), IPv4 (len 4), Unknown (85) 
 	0x0000:  0001 0800 0604 0055 0008 027e b236 c0a8  .......U...~.6..
 	0x0010:  001e 0000 0000 0000 c0a8 0001            ............
@@ -2136,9 +1957,6 @@
  1775  00:27:50.583253 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1776  00:27:54.579379 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1777  00:27:58.579345 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 0657 0001 001f 29da 2d79 c0a8  .....W....).-y..
-	0x0010:  0168 0049 0000 0000 c0a8 0101 0000 0000  .h.I............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  1778  00:28:17.831572 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1779  00:28:18.827538 00:16:17:e0:67:e7 > 54:55:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.33, length 46
  1780  00:28:21.829283 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -2151,9 +1969,6 @@
  1784  00:28:37.574349 00:19:db:2b:57:d7 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.34, length 46
  1785  00:28:37.828980 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1786  00:28:49.831066 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 06b6 0001 001f 29da 2d79 c0a8  ..........).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  1787  00:28:53.828871 00:1f:29:da:2d:79 > 25:00:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1788  00:28:57.828821 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1789  00:28:59.083464 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -2204,9 +2019,6 @@
  1831  00:32:07.108278 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1832  00:32:08.827231 00:1f:29:da:2d:79 > ff:ff:ff:25:00:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1833  00:32:15.827101 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 2500 0001 001f 29da 2d79 c0a8  ....%.....).-y..
-	0x0010:  0168 0000 00aa aaaa aaaa aaaa aaaa aaaa  .h..............
-	0x0020:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa       ..............
  1834  00:32:35.079201 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1835  00:32:39.076901 00:1f:29:77:2d:79 > ff:ff:ff:50:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1836  00:32:43.076856 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -2216,9 +2028,6 @@
  1840  00:33:07.078795 00:1f:29:da:33:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1841  00:33:11.076609 00:1f:29:da:2d:79 > ff:ff:ff:58:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1842  00:33:15.076598 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 5104 0001 001f 29da 2d79 c0a8  ....Q.....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 002c 0000 0000 0000       .......,......
  1843  00:33:16.331461 00:1f:29:da:2d:79 > ff:fb:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (00:00:00:00:45:00) tell 192.168.1.104, length 46
  1844  00:33:18.326645 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1845  00:33:24.326811 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -2245,9 +2054,6 @@
  1863  00:34:59.450710 00:13:20:13:db:6f > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 170.170.170.170 (00:00:aa:aa:aa:aa) tell 192.168.0.31, length 46
  1864  00:35:00.325892 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.105, length 46
  1865  00:35:03.325663 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 5004 0001 001f 29da 2d79 c0a8  ....P.....).-y..
-	0x0010:  0168 0074 0000 0000 c0a8 0101 0000 0000  .h.t............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  1866  00:35:07.325601 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (00:00:00:00:00:94) tell 192.168.1.40, length 46
  1867  00:35:11.879302 00:19:db:2b:57:d7 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.34, length 46
  1868  00:35:26.577990 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -2275,14 +2081,8 @@
  1887  00:36:50.324801 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.232.1.1 tell 192.168.1.104, length 46
  1888  00:36:54.324767 00:1f:29:da:2d:79 > ff:ff:ff:25:00:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1889  00:37:00.324819 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 5304 0001 001f 29da 2d79 c0a8  ....S.....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  1890  00:37:04.327936 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1891  00:37:08.324580 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 1104 0001 001f 29da 2d79 c0a8  ..........).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  1892  00:37:12.324867 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1893  00:37:24.326849 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1894  00:37:28.324463 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -2314,18 +2114,9 @@
  1920  00:39:43.825654 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (00:00:00:c5:00:00) tell 192.168.1.104, length 46
  1921  00:39:47.823200 00:1f:29:da:25:00 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1922  00:39:51.823168 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0010:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0020:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa       ..............
  1923  00:39:55.826072 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1924  00:39:59.823095 00:1f:29:da:2d:79 > ff:8a:f7:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 06aa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0010:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0020:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa       ..............
  1925  00:40:02.692647 6a:2f:fe:3a:7f:20 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 1604 0001 000f fe3a 7f20 c0a8  ...........:....
-	0x0010:  0054 0000 0000 0000 c0a8 0001 0000 0000  .T..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  1926  00:40:03.823061 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1927  00:40:11.850281 00:08:02:7e:b2:36 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 42: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.30, length 28
  1928  00:40:11.850599 00:21:d8:01:03:45 > 00:08:02:7e:b2:36, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Reply 192.168.0.1 is-at 00:21:d8:01:03:45, length 46
@@ -2342,9 +2133,6 @@
  1939  00:41:09.574894 00:1f:29:da:2d:79 > ff:ff:ff:ff:fd:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1940  00:41:11.906611 00:13:20:13:db:6f > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 (00:00:00:00:60:00) tell 192.168.0.31, length 46
  1941  00:41:17.572447 00:1f:29:da:2d:79 > ff:ff:32:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 4b04 0001 001f 29da 2d79 c0a8  ....K.....).-y..
-	0x0010:  0168 0000 0000 0000 c032 0101 aaaa aaaa  .h.......2......
-	0x0020:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa       ..............
  1942  00:41:21.575235 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1943  00:41:23.223316 00:1f:29:da:f8:fb > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Unknown (14081) 
 	0x0000:  0001 0800 0604 3701 001f 29da f8fb c0a8  ......7...).....
@@ -2375,9 +2163,6 @@
  1966  00:43:15.321407 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1967  00:43:16.576024 00:1f:29:da:2d:79 > ff:ff:ff:fe:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 43.168.1.1 tell 192.168.1.104, length 46
  1968  00:43:24.571349 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 060f 0001 001f 29da 2d79 c0b8  ..........).-y..
-	0x0010:  0168 0000 6600 0000 c0a8 0101 0000 0000  .h..f...........
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  1969  00:43:31.092891 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 170.170.170.170 (00:aa:aa:aa:aa:aa) tell 192.168.1.104, length 46
  1970  00:43:34.821302 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), Unknown Protocol (0x0a00) (len 4), Request who-has <wrong proto type> tell <wrong proto type>, length 46
  1971  00:43:39.086937 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -2409,9 +2194,6 @@
  1997  00:45:38.823261 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  1998  00:45:42.149019 00:08:02:7e:b2:36 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 42: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.30, length 28
  1999  00:45:42.149367 00:21:d8:01:03:45 > 00:08:02:7e:b2:36, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 064b 0002 0021 d801 0345 c0a8  .....K...!...E..
-	0x0010:  0001 0008 027e b236 c0a8 bb1e 0000 0000  .....~.6........
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  2000  00:45:42.545795 00:1f:29:da:2d:79 > ff:ff:ff:7a:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  2001  00:45:46.011017 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  2002  00:45:48.007621 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (00:00:00:00:00:49) tell 192.168.1.104, length 46
@@ -2435,9 +2217,6 @@
  2020  00:46:39.038385 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  2021  00:46:41.869451 00:13:20:13:db:6f > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.31, length 46
  2022  00:46:42.572243 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 0637 0001 001f 29da 2d79 c0a8  .....7....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  2023  00:46:43.805929 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  2024  00:46:47.803941 00:1f:29:da:2d:79 > ff:45:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (00:66:00:00:00:00) tell 192.168.1.104, length 46
  2025  00:46:51.803925 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -2552,9 +2331,6 @@
  2122  00:54:37.315602 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  2123  00:54:41.315784 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  2124  00:54:46.565443 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 6e04 0001 001f 29da 2d79 c0a8  ....n.....).-y..
-	0x0010:  0168 5000 0000 0000 25aa aaaa aaaa aaaa  .hP.....%.......
-	0x0020:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa       ..............
  2125  00:54:50.565483 00:1f:4d:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 170.170.170.170 (00:00:00:aa:aa:aa) tell 192.168.1.104, length 46
  2126  00:54:59.819122 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (00:00:00:eb:42:00) tell 192.168.1.104, length 46
  2127  00:55:03.815332 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -2624,8 +2400,6 @@
  2179  00:59:08.821686 00:16:17:e0:67:e7 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.33, length 46
  2180  00:59:17.066900 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  2181  00:59:19.805272 00:08:02:7e:b2:36 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 42:  [|arp]
-	0x0000:  0001 0800 aaaa aaaa aaaa aaaa aaaa aaaa  ................
-	0x0010:  aaaa aaaa aaaa aaaa aaaa aaaa            ............
  2182  00:59:19.805710 00:21:d8:ee:03:45 > 00:08:02:7e:b2:36, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Reply 170.170.170.170 is-at 00:21:d8:01:03:aa, length 46
  2183  00:59:21.063175 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  2184  00:59:24.713775 00:21:5a:21:9e:fd > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.35, length 46
@@ -2636,15 +2410,9 @@
  2189  00:59:56.315804 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  2190  01:00:00.312773 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (00:00:00:00:20:00) tell 192.168.1.104, length 46
  2191  01:00:04.312748 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 065b 0001 001b 29da 2d79 c0a8  .....[....).-y..
-	0x0010:  0168 0400 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  2192  01:00:09.265816 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 170.170.170.170 (aa:aa:aa:aa:aa:aa) tell 170.170.170.170, length 46
  2193  01:00:16.315052 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), Unknown Protocol (0x2500) (len 4), Request who-has <wrong proto type> tell <wrong proto type>, length 46
  2194  01:00:20.312645 00:1f:29:da:2d:39 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 06d1 0001 001f 29da 2d79 c0a8  ..........).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0001       ..............
  2195  01:00:24.312656 00:1f:47:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), Unknown Protocol (0x0808) (len 4), Request who-has <wrong proto type> tell <wrong proto type>, length 46
  2196  01:00:25.567200 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), Unknown Protocol (0x086f) (len 4), Request who-has <wrong proto type> tell <wrong proto type>, length 46
  2197  01:00:29.562516 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -2657,9 +2425,6 @@
  2204  01:01:18.062085 00:1f:29:da:2d:79 > e3:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  2205  01:01:22.064996 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  2206  01:01:26.061993 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 066e 0001 001f 29da 2d79 c0a8  .....n....).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  2207  01:01:27.333690 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  2208  01:01:29.237987 00:1f:29:da:f8:fb > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.37, length 46
  2209  01:01:29.327584 00:1f:29:da:2d:79 > ff:ff:ff:ff:49:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -2683,9 +2448,6 @@
 	0x0020:  0000 0000 0000 0000 0000 0000 0000       ..............
  2225  01:02:41.306154 00:19:db:2b:57:d7 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.0.34, length 46
  2226  01:02:43.811398 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 06d6 0001 101f 29da 2d79 c0a8  ..........).-y..
-	0x0010:  0168 0000 0000 0000 c0aa aaaa aaaa aaaa  .h..............
-	0x0020:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa       ..............
  2227  01:02:47.814258 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  2228  01:02:51.811304 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  2229  01:02:55.342504 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
@@ -2700,9 +2462,6 @@
  2238  01:03:38.311018 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  2239  01:03:42.310914 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  2240  01:04:01.563050 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 8b04 0001 001f 29da 2d79 c0a8  ..........).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0000 00b7 0000 4d00 0000 0000       ........M.....
  2241  01:04:05.560619 00:1f:2d:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  2242  01:04:09.560577 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  2243  01:04:13.563376 00:1f:29:da:2d:47 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Unknown (33) 
@@ -2724,9 +2483,6 @@
  2256  01:05:08.060025 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  2257  01:05:27.312518 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  2258  01:05:30.779756 00:0f:fe:3a:7f:20 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 0625 0001 000f fe77 7f20 c0a8  .....%.....w....
-	0x0010:  0020 0000 0000 0000 c0a8 0001 0000 0000  ................
-	0x0020:  0000 0000 0000 4500 0000 0000 0000       ......E.......
  2259  01:05:31.309919 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  2260  01:05:35.309896 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  2261  01:05:36.822896 00:19:db:2b:57:d7 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.0.1 tell 192.168.68.34, length 46
@@ -2737,9 +2493,6 @@
  2266  01:05:59.311875 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 (ab:00:00:00:00:00) tell 192.168.1.104, length 46
  2267  01:06:03.309642 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.17.1 (00:00:02:00:00:00) tell 192.168.1.104, length 46
  2268  01:06:07.309597 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60:  [|arp]
-	0x0000:  0001 0800 0684 0001 001f 29da 2d79 c0a8  ..........).-y..
-	0x0010:  0168 0000 0000 0000 c0a8 0101 0000 0000  .h..............
-	0x0020:  0000 0040 0000 0000 0000 0000 0000       ...@..........
  2269  01:06:08.564127 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  2270  01:06:12.559548 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.1.1 tell 192.168.1.104, length 46
  2271  01:06:16.559535 00:1f:29:da:2d:79 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 60: Ethernet (len 6), Unknown Protocol (0x082e) (len 4), Request who-has <wrong proto type> tell <wrong proto type>, length 46

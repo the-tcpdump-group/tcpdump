@@ -7,7 +7,7 @@
     4  16:21:12.548313 IP (tos 0xb8, ttl 16, id 0, offset 0, flags [DF], proto PGM (113), length 1480)
     10.0.0.45 > 239.255.0.16: 10.0.0.45.13320 > 239.255.0.16.5563: PGM, length 1436 0x3329041eba74 ODATA trail 21618 seq 54951 [1460]
 	 frame offset 0x0000
-	 frame flags+body  (8-bit) length 116, flags 0x00 (-|-|-|-|-|-|-|-), first 115 byte(s) of body:
+	 frame flags+body  (8-bit) length 116, flags 0x00 (none), first 115 byte(s) of body:
 	 0x0000:  5468 6973 2069 7320 6120 7368 6f72 7420  This.is.a.short.
 	 0x0010:  4153 4349 4920 6d65 7373 6167 6520 666f  ASCII.message.fo
 	 0x0020:  6c6c 6f77 6564 2062 7920 6120 7368 6f72  llowed.by.a.shor
@@ -16,9 +16,9 @@
 	 0x0050:  206d 6573 7361 6765 2061 6e64 2061 2073  .message.and.a.s
 	 0x0060:  686f 7274 2041 5343 4949 206d 6573 7361  hort.ASCII.messa
 	 0x0070:  6765 2e                                  ge.
-	 frame flags+body  (8-bit) length 17, flags 0x00 (-|-|-|-|-|-|-|-), first 16 byte(s) of body:
+	 frame flags+body  (8-bit) length 17, flags 0x00 (none), first 16 byte(s) of body:
 	 0x0000:  0001 0203 0405 0607 0809 0a0b 0c0d 0e0f  ................
-	 frame flags+body (64-bit) length 2790 (1290 captured), flags 0x00 (-|-|-|-|-|-|-|-), first 128 byte(s) of body:
+	 frame flags+body (64-bit) length 2790 (1290 captured), flags 0x00 (none), first 128 byte(s) of body:
 	 0x0000:  5468 6520 7175 6963 6b20 6272 6f77 6e20  The.quick.brown.
 	 0x0010:  666f 7820 6a75 6d70 7320 6f76 6572 2074  fox.jumps.over.t
 	 0x0020:  6865 206c 617a 7920 646f 672e 2054 6865  he.lazy.dog..The
@@ -48,7 +48,7 @@
 	 0x0020:  6272 6f77 6e20 666f 7820 6a75 6d70 7320  brown.fox.jumps.
 	 0x0030:  6f76 6572 2074 6865 206c 617a 7920 646f  over.the.lazy.do
 	 0x0040:  672e                                     g.
-	 frame flags+body  (8-bit) length 36, flags 0x00 (-|-|-|-|-|-|-|-), first 35 byte(s) of body:
+	 frame flags+body  (8-bit) length 36, flags 0x00 (none), first 35 byte(s) of body:
 	 0x0000:  5468 6973 2069 7320 7468 6520 7472 6169  This.is.the.trai
 	 0x0010:  6c69 6e67 2041 5343 4949 206d 6573 7361  ling.ASCII.messa
 	 0x0020:  6765 2e                                  ge.
