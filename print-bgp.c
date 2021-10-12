@@ -842,7 +842,7 @@ bgp_extended_community_print(netdissect_options *ndo,
             break;
 
     case BGP_EXT_COM_LINKBAND:
-            bw.i = GET_BE_U_4(pptr + 2);
+            bw.i = GET_BE_U_4(pptr + 4);
             ND_PRINT("bandwidth: %.3f Mbps",
                      bw.f*8/1000000);
             break;
