@@ -349,6 +349,10 @@ ipv6-srh-ipproto-ether-v ipv6-srh-ipproto-ether.pcap ipv6-srh-ipproto-ether-v.ou
 ipv6-srh-ipproto-ether-ev ipv6-srh-ipproto-ether.pcap ipv6-srh-ipproto-ether-ev.out -ev
 ipv6-too-long-jumbo	ipv6-too-long-jumbo.pcap	ipv6-too-long-jumbo.out -v
 ipv6_jumbogram_1	ipv6_jumbogram_1.pcap	ipv6_jumbogram_1.out -ev
+ipv6-srh-tlv-hmac ipv6-srh-tlv-hmac.pcap ipv6-srh-tlv-hmac.out
+ipv6-srh-tlv-hmac-v ipv6-srh-tlv-hmac.pcap ipv6-srh-tlv-hmac-v.out -v
+ipv6-srh-tlv-pad1-padn-5 ipv6-srh-tlv-pad1-padn-5.pcap ipv6-srh-tlv-pad1-padn-5.out
+ipv6-srh-tlv-pad1-padn-5-v ipv6-srh-tlv-pad1-padn-5.pcap ipv6-srh-tlv-pad1-padn-5-v.out -v
 
 # Loopback/CTP test case
 loopback	loopback.pcap		loopback.out
