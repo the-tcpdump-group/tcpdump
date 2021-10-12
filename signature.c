@@ -32,6 +32,12 @@
 #include <openssl/md5.h>
 #endif
 
+#ifdef HAVE_LIBWOLFSSL
+#include <wolfssl/options.h>
+#include <wolfssl/openssl/md5.h>
+#endif
+
+
 const struct tok signature_check_values[] = {
     { SIGNATURE_VALID, "valid"},
     { SIGNATURE_INVALID, "invalid"},

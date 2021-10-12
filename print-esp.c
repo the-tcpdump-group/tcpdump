@@ -37,19 +37,28 @@
  * is the simplest way of handling the dependency.
  */
 #ifdef HAVE_LIBCRYPTO
-#ifdef HAVE_OPENSSL_EVP_H
+
+#if HAVE_OPENSSL_EVP_H
 #include <openssl/evp.h>
 #else
 #undef HAVE_LIBCRYPTO
 #endif
+
+#else
+
+#ifdef HAVE_LIBWOLFSSL
+#include <wolfssl/options.h>
+#include <wolfssl/openssl/ssl.h>
 #endif
+
+#endif /* HAVE_LIBCRYPTO */
 
 #include "netdissect.h"
 #include "extract.h"
 
 #include "diag-control.h"
 
-#ifdef HAVE_LIBCRYPTO
+#if defined(HAVE_LIBCRYPTO) || defined(HAVE_LIBWOLFSSL)
 #include "strtoaddr.h"
 #include "ascii_strcasecmp.h"
 #endif
@@ -101,7 +110,7 @@ struct newesp {
 	/*variable size, 32bit bound*/	/* Authentication data */
 };
 
-#ifdef HAVE_LIBCRYPTO
+#if defined(HAVE_LIBCRYPTO) || defined(HAVE_LIBWOLFSSL)
 union inaddr_u {
 	nd_ipv4 in4;
 	nd_ipv6 in6;
@@ -123,7 +132,7 @@ struct sa_list {
 	int		secretlen;
 };
 
-#ifndef HAVE_EVP_CIPHER_CTX_NEW
+#if !defined(HAVE_EVP_CIPHER_CTX_NEW) && !defined(HAVE_LIBWOLFSSL)
 /*
  * Allocate an EVP_CIPHER_CTX.
  * Used if we have an older version of OpenSSL that doesn't provide
@@ -149,6 +158,8 @@ EVP_CIPHER_CTX_free(EVP_CIPHER_CTX *ctx)
 }
 #endif
 
+/* With wolfSSL, EVP_DecryptInit_ex and EVP_DecryptInit are mapped to the same
+ * underlying function, so it doesn't matter which one gets used below. */
 #ifdef HAVE_EVP_DECRYPTINIT_EX
 /*
  * Initialize the cipher by calling EVP_DecryptInit_ex(), because
@@ -680,10 +691,15 @@ static void esp_init(netdissect_options *ndo _U_)
 	 * we check whether it's undefined or it's less than the
 	 * value for 1.1.0.
 	 */
-#if !defined(OPENSSL_API_COMPAT) || OPENSSL_API_COMPAT < 0x10100000L
+#if !defined(OPENSSL_API_COMPAT) || OPENSSL_API_COMPAT < 0x10100000L || \
+	defined(HAVE_LIBWOLFSSL)
 	OpenSSL_add_all_algorithms();
 #endif
+/* wolfSSL doesn't support EVP_add_cipher_alias, and "3des" is already mapped
+ * correctly in wolfSSL_EVP_get_cipherbyname. */
+#ifndef HAVE_LIBWOLFSSL
 	EVP_add_cipher_alias(SN_des_ede3_cbc, "3des");
+#endif
 }
 DIAG_ON_DEPRECATION
 
@@ -715,13 +731,13 @@ void esp_decodesecret_print(netdissect_options *ndo)
 
 #endif
 
-#ifdef HAVE_LIBCRYPTO
+#if defined(HAVE_LIBCRYPTO) || defined(HAVE_LIBWOLFSSL)
 #define USED_IF_LIBCRYPTO
 #else
 #define USED_IF_LIBCRYPTO _U_
 #endif
 
-#ifdef HAVE_LIBCRYPTO
+#if defined(HAVE_LIBCRYPTO) || defined(HAVE_LIBWOLFSSL)
 DIAG_OFF_DEPRECATION
 #endif
 void
@@ -734,7 +750,7 @@ esp_print(netdissect_options *ndo,
 {
 	const struct newesp *esp;
 	const u_char *ep;
-#ifdef HAVE_LIBCRYPTO
+#if defined(HAVE_LIBCRYPTO) || defined(HAVE_LIBWOLFSSL)
 	const struct ip *ip;
 	struct sa_list *sa = NULL;
 	const struct ip6_hdr *ip6 = NULL;
@@ -761,7 +777,7 @@ esp_print(netdissect_options *ndo,
 	ND_PRINT(",seq=0x%x)", GET_BE_U_4(esp->esp_seq));
 	ND_PRINT(", length %u", length);
 
-#ifdef HAVE_LIBCRYPTO
+#if defined(HAVE_LIBCRYPTO) || defined(HAVE_LIBWOLFSSL)
 	/* initiailize SAs */
 	if (ndo->ndo_sa_list_head == NULL) {
 		if (!ndo->ndo_espsecret)
@@ -921,6 +937,6 @@ esp_print(netdissect_options *ndo,
 	nd_pop_packet_info(ndo);
 #endif
 }
-#ifdef HAVE_LIBCRYPTO
+#if defined(HAVE_LIBCRYPTO) || defined(HAVE_LIBWOLFSSL)
 DIAG_ON_DEPRECATION
 #endif

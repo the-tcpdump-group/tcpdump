@@ -45,15 +45,26 @@ esac
 # shellcheck disable=SC2006
 [ "$TCPDUMP_TAINTED" != yes ] && CFLAGS=`cc_werr_cflags`
 
+# Determine if and how to enable crypto support.
+configure_crypto_option="--with-crypto=no"
+cmake_crypto_option="-DWITH_CRYPTO=no"
+if [ "$CRYPTO" = "wolfssl" ]; then
+    configure_crypto_option="--with-wolfssl=yes"
+    cmake_crypto_option="-DWITH_WOLFSSL=yes"
+elif [ "$CRYPTO" = "openssl" -o "$CRYPTO" = "yes" ]; then
+    configure_crypto_option="--with-crypto=yes"
+    cmake_crypto_option="-DWITH_CRYPTO=yes"
+fi
+
 if [ "$CMAKE" = no ]; then
     if [ "$BUILD_LIBPCAP" = yes ]; then
         echo "Using PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
-        run_after_echo ./configure --with-crypto="$CRYPTO" \
+        run_after_echo ./configure $configure_crypto_option \
             --enable-smb="$SMB" --prefix="$PREFIX"
         LD_LIBRARY_PATH="$PREFIX/lib"
         export LD_LIBRARY_PATH
     else
-        run_after_echo ./configure --with-crypto="$CRYPTO" \
+        run_after_echo ./configure $configure_crypto_option \
             --enable-smb="$SMB" --prefix="$PREFIX" --disable-local-libpcap
     fi
 else
@@ -61,13 +72,13 @@ else
     run_after_echo mkdir build
     run_after_echo cd build
     if [ "$BUILD_LIBPCAP" = yes ]; then
-        run_after_echo cmake -DWITH_CRYPTO="$CRYPTO" -DENABLE_SMB="$SMB" \
+        run_after_echo cmake $cmake_crypto_option -DENABLE_SMB="$SMB" \
             ${CFLAGS:+-DEXTRA_CFLAGS="$CFLAGS"} \
             -DCMAKE_INSTALL_PREFIX="$PREFIX" -DCMAKE_PREFIX_PATH="$PREFIX" ..
         LD_LIBRARY_PATH="$PREFIX/lib"
         export LD_LIBRARY_PATH
     else
-        run_after_echo cmake -DWITH_CRYPTO="$CRYPTO" -DENABLE_SMB="$SMB" \
+        run_after_echo cmake $cmake_crypto_option -DENABLE_SMB="$SMB" \
              ${CFLAGS:+-DEXTRA_CFLAGS="$CFLAGS"} \
             -DCMAKE_INSTALL_PREFIX="$PREFIX" ..
     fi

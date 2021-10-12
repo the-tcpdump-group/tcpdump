@@ -2632,33 +2632,33 @@ ikev2_TS_print(netdissect_options *ndo, u_char tpay,
 
 static const u_char *
 ikev2_e_print(netdissect_options *ndo,
-#ifndef HAVE_LIBCRYPTO
+#if !defined(HAVE_LIBCRYPTO) && !defined(HAVE_LIBWOLFSSL)
 	      _U_
 #endif
 	      const struct isakmp *base,
 	      u_char tpay,
 	      const struct isakmp_gen *ext,
 	      u_int item_len, const u_char *ep _U_,
-#ifndef HAVE_LIBCRYPTO
+#if !defined(HAVE_LIBCRYPTO) && !defined(HAVE_LIBWOLFSSL)
 	      _U_
 #endif
 	      uint32_t phase,
-#ifndef HAVE_LIBCRYPTO
+#if !defined(HAVE_LIBCRYPTO) && !defined(HAVE_LIBWOLFSSL)
 	      _U_
 #endif
 	      uint32_t doi,
-#ifndef HAVE_LIBCRYPTO
+#if !defined(HAVE_LIBCRYPTO) && !defined(HAVE_LIBWOLFSSL)
 	      _U_
 #endif
 	      uint32_t proto,
-#ifndef HAVE_LIBCRYPTO
+#if !defined(HAVE_LIBCRYPTO) && !defined(HAVE_LIBWOLFSSL)
 	      _U_
 #endif
 	      int depth)
 {
 	const u_char *dat;
 	u_int dlen;
-#ifdef HAVE_LIBCRYPTO
+#if defined(HAVE_LIBCRYPTO) || defined(HAVE_LIBWOLFSSL)
 	uint8_t np;
 #endif
 
@@ -2677,7 +2677,7 @@ ikev2_e_print(netdissect_options *ndo,
 	dat = (const u_char *)(ext+1);
 	ND_TCHECK_LEN(dat, dlen);
 
-#ifdef HAVE_LIBCRYPTO
+#if defined(HAVE_LIBCRYPTO) || defined(HAVE_LIBWOLFSSL)
 	np = GET_U_1(ext->np);
 
 	/* try to decrypt it! */
@@ -3047,7 +3047,7 @@ isakmp_print(netdissect_options *ndo,
 	u_int major, minor;
 
 	ndo->ndo_protocol = "isakmp";
-#ifdef HAVE_LIBCRYPTO
+#if defined(HAVE_LIBCRYPTO) || defined(HAVE_LIBWOLFSSL)
 	/* initialize SAs */
 	if (ndo->ndo_sa_list_head == NULL) {
 		if (ndo->ndo_espsecret)

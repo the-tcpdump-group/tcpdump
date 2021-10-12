@@ -54,14 +54,20 @@ __RCSID("$NetBSD: print-tcp.c,v 1.8 2007/07/24 11:53:48 drochner Exp $");
 #include "rpc_auth.h"
 #include "rpc_msg.h"
 
+#if defined(HAVE_LIBCRYPTO) || defined(HAVE_LIBWOLFSSL)
 #ifdef HAVE_LIBCRYPTO
 #include <openssl/md5.h>
+#else
+#include <wolfssl/options.h>
+#include <wolfssl/openssl/md5.h>
+#endif
+
 #include "signature.h"
 
 static int tcp_verify_signature(netdissect_options *ndo,
                                 const struct ip *ip, const struct tcphdr *tp,
                                 const u_char *data, u_int length, const u_char *rcvsig);
-#endif
+#endif /* HAVE_LIBCRYPTO || HAVE_LIBWOLFSSL */
 
 static void print_tcp_rst_data(netdissect_options *, const u_char *sp, u_int length);
 static void print_tcp_fastopen_option(netdissect_options *ndo, const u_char *cp,
@@ -535,7 +541,7 @@ tcp_print(netdissect_options *ndo,
                                 LENCHECK(datalen);
                                 ND_TCHECK_LEN(cp, datalen);
                                 ND_PRINT(" ");
-#ifdef HAVE_LIBCRYPTO
+#if defined(HAVE_LIBCRYPTO) || defined(HAVE_LIBWOLFSSL)
                                 switch (tcp_verify_signature(ndo, ip, tp,
                                                              bp + TH_OFF(tp) * 4, length, cp)) {
 
@@ -884,7 +890,7 @@ print_tcp_fastopen_option(netdissect_options *ndo, const u_char *cp,
         }
 }
 
-#ifdef HAVE_LIBCRYPTO
+#if defined(HAVE_LIBCRYPTO) || defined(HAVE_LIBWOLFSSL)
 DIAG_OFF_DEPRECATION
 static int
 tcp_verify_signature(netdissect_options *ndo,
@@ -966,4 +972,4 @@ tcp_verify_signature(netdissect_options *ndo,
                 return (SIGNATURE_INVALID);
 }
 DIAG_ON_DEPRECATION
-#endif /* HAVE_LIBCRYPTO */
+#endif /* HAVE_LIBCRYPTO || HAVE_LIBWOLFSSL */

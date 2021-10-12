@@ -71,6 +71,12 @@ The Regents of the University of California.  All rights reserved.\n";
 #include <openssl/crypto.h>
 #endif
 
+#ifdef HAVE_LIBWOLFSSL
+#include <wolfssl/options.h>
+#include <wolfssl/openssl/ssl.h>
+#include <wolfssl/openssl/crypto.h>
+#endif
+
 #ifdef HAVE_GETOPT_LONG
 #include <getopt.h>
 #else
@@ -1664,7 +1670,7 @@ main(int argc, char **argv)
 			break;
 
 		case 'E':
-#ifndef HAVE_LIBCRYPTO
+#if !defined(HAVE_LIBCRYPTO) && !defined(HAVE_LIBWOLFSSL)
 			warning("crypto code not compiled in");
 #endif
 			ndo->ndo_espsecret = optarg;
@@ -1763,7 +1769,7 @@ main(int argc, char **argv)
 
 		case 'M':
 			/* TCP-MD5 shared secret */
-#ifndef HAVE_LIBCRYPTO
+#if !defined(HAVE_LIBCRYPTO) && !defined(HAVE_LIBWOLFSSL)
 			warning("crypto code not compiled in");
 #endif
 			ndo->ndo_sigsecret = optarg;
@@ -3221,7 +3227,8 @@ print_version(FILE *f)
 	(void)fprintf(f, "libpcap version %s\n", pcap_version);
 #endif /* HAVE_PCAP_LIB_VERSION */
 
-#if defined(HAVE_LIBCRYPTO) && defined(SSLEAY_VERSION)
+#if (defined(HAVE_LIBCRYPTO) && defined(SSLEAY_VERSION)) || \
+	 defined(HAVE_LIBWOLFSSL)
 	(void)fprintf (f, "%s\n", SSLeay_version(SSLEAY_VERSION));
 #endif
 

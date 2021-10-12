@@ -63,6 +63,9 @@
 /* Define to 1 if you have the `crypto' library (-lcrypto). */
 #cmakedefine HAVE_LIBCRYPTO 1
 
+/* Define to 1 if you have the `wolfssl' library (-lwolfssl). */
+#cmakedefine HAVE_LIBWOLFSSL 1
+
 /* Define to 1 if you have the `rpc' library (-lrpc). */
 #cmakedefine HAVE_LIBRPC 1
 

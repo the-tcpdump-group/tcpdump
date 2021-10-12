@@ -11,7 +11,7 @@
 : "${MATRIX_REMOTE:=no}"
 : "${MATRIX_CC:=gcc clang}"
 : "${MATRIX_CMAKE:=no yes}"
-: "${MATRIX_CRYPTO:=no yes}"
+: "${MATRIX_CRYPTO:=no openssl wolfssl}"
 : "${MATRIX_SMB:=no yes}"
 # Set this variable to "yes" before calling this script to disregard all
 # warnings in a particular environment (CI or a local working copy).  Set it
@@ -40,6 +40,19 @@ build_tcpdump() {
     for CMAKE in $MATRIX_CMAKE; do
         export CMAKE
         for CRYPTO in $MATRIX_CRYPTO; do
+            if [ "$CRYPTO" = "wolfssl" ]; then
+                if [ ! -d "wolfssl_src" ]; then
+                    echo "Building and installing wolfSSL"
+                    run_after_echo git  clone --depth 1 --branch=master --quiet https://github.com/wolfSSL/wolfssl.git wolfssl_src
+                    run_after_echo cd wolfssl_src
+                    run_after_echo ./autogen.sh
+                    run_after_echo ./configure --enable-tcpdump
+                    run_after_echo make
+                    run_after_echo make install
+                    run_after_echo cd ..
+                fi
+            fi
+
             export CRYPTO
             for SMB in $MATRIX_SMB; do
                 export SMB
