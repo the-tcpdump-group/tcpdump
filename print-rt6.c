@@ -34,12 +34,47 @@
 #include "ip6.h"
 
 int
+rt6_tlv_print(netdissect_options *ndo, const u_char *p, int bytes_left)
+{
+	int tlv_type, tlv_len;
+	u_int8_t parse_next = 1;
+	
+	while (parse_next)
+	{
+		tlv_type = GET_S_1(p);
+		ND_PRINT(", TLV-type=%u", tlv_type);
+		p += 1;
+		bytes_left -= 1;
+		if (tlv_type == IPV6_RTHDR_TLV_TYPE_0)
+			continue;
+		if (bytes_left == 0) /* but it is not supposed to end with a padding TLV */
+			break;
+		tlv_len = GET_S_1(p);
+		ND_PRINT(", TLV-len=%u", tlv_len);
+		p += 1;
+		if (tlv_len > bytes_left)
+		{
+			ND_PRINT(" (invalid TLV length %u)", tlv_len);
+			return -1;
+		}
+		/////// to remove ///////
+		parse_next = 0;
+		////////////////////////
+	}
+	
+
+	return 0;
+}
+
+
+int
 rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 {
 	const struct ip6_rthdr *dp;
 	const struct ip6_rthdr0 *dp0;
 	const struct ip6_srh *srh;
-	u_int i, len, type;
+	u_int i, len, type, seg_list_len, last_entry;
+	int err;
 	const u_char *p;
 
 	ndo->ndo_protocol = "rt6";
@@ -81,7 +116,8 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 		break;
 	case IPV6_RTHDR_TYPE_4:
 		srh = (const struct ip6_srh *)dp;
-		ND_PRINT(", last-entry=%u", GET_U_1(srh->srh_last_ent));
+		last_entry = GET_U_1(srh->srh_last_ent);
+		ND_PRINT(", last-entry=%u", last_entry);
 
 		if (GET_U_1(srh->srh_flags) || ndo->ndo_vflag) {
 			ND_PRINT(", flags=0x%0x",
@@ -89,17 +125,23 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 		}
 
 		ND_PRINT(", tag=%x", GET_BE_U_2(srh->srh_tag));
-
-		if (len % 2 == 1) {
-			ND_PRINT(" (invalid length %u)", len);
-			goto invalid;
-		}
-		len >>= 1;
 		p  = (const u_char *) srh->srh_segments;
-		for (i = 0; i < len; i++) {
+		for (i = 0; i < last_entry + 1; i++)
+		{
 			ND_PRINT(", [%u]%s", i, GET_IP6ADDR_STRING(p));
 			p += 16;
 		}
+		seg_list_len = (last_entry + 1) * 2;
+		if (seg_list_len < len)
+		{
+			/* there is TLV */
+			int bytes_left;
+			bytes_left = (len - seg_list_len) * 8;
+			err = rt6_tlv_print(ndo, p, bytes_left);
+			if (err)
+				goto invalid;
+		}
+		
 		/*(*/
 		ND_PRINT(") ");
 		return((GET_U_1(srh->srh_len) + 1) << 3);
