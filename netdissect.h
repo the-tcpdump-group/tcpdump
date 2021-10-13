@@ -700,7 +700,7 @@ extern void rpki_rtr_print(netdissect_options *, const u_char *, u_int);
 extern void rrcp_print(netdissect_options *, const u_char *, u_int, const struct lladdr_info *, const struct lladdr_info *);
 extern void rsvp_print(netdissect_options *, const u_char *, u_int);
 extern int rt6_print(netdissect_options *, const u_char *, const u_char *);
-extern int rt6_tlv_print(netdissect_options *, const u_char *, int);
+extern int rt6_tlv_print(netdissect_options *, const u_char *, u_int);
 extern void rtsp_print(netdissect_options *, const u_char *, u_int);
 extern void rx_print(netdissect_options *, const u_char *, u_int, uint16_t, uint16_t, const u_char *);
 extern void sctp_print(netdissect_options *, const u_char *, const u_char *, u_int);

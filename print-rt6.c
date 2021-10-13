@@ -34,29 +34,83 @@
 #include "ip6.h"
 
 int
-rt6_tlv_print(netdissect_options *ndo, const u_char *p, int bytes_left)
+rt6_tlv_print(netdissect_options *ndo, const u_char *p, u_int bytes_left)
 {
-	int tlv_type, tlv_len;
+	u_int tlv_type, tlv_len;
 	u_int8_t parse_next = 1;
 	
 	while (parse_next)
 	{
-		tlv_type = GET_S_1(p);
+		tlv_type = GET_U_1(p);
 		ND_PRINT(", TLV-type=%u", tlv_type);
 		p += 1;
 		bytes_left -= 1;
-		if (tlv_type == IPV6_RTHDR_TLV_TYPE_0)
-			continue;
-		if (bytes_left == 0) /* but it is not supposed to end with a padding TLV */
+		if (bytes_left == 0)
 			break;
-		tlv_len = GET_S_1(p);
+		if (tlv_type == IPV6_RTHDR_TLV_TYPE_0)	/* Pad1 */
+		{
+			continue;
+		}
+		tlv_len = GET_U_1(p);
 		ND_PRINT(", TLV-len=%u", tlv_len);
 		p += 1;
+		bytes_left -= 1;
+
+
 		if (tlv_len > bytes_left)
 		{
-			ND_PRINT(" (invalid TLV length %u)", tlv_len);
+			ND_PRINT(" (invalid TLV length %u, bytes left %u)", tlv_len, bytes_left);
 			return -1;
 		}
+
+
+		switch (tlv_type)
+		{
+		case IPV6_RTHDR_TLV_TYPE_4:		/* PadN */
+			p += tlv_len;
+			bytes_left -= tlv_len;
+			if (bytes_left == 0)
+			{
+				parse_next = 0;
+				break;
+			}
+			break;
+		case IPV6_RTHDR_TLV_TYPE_5:		/* HMAC */
+			if (tlv_len + 6 > bytes_left)
+			{
+				ND_PRINT(" (invalid TLV length %u, bytes left %u)", tlv_len, bytes_left);
+				return -1;
+			}
+			u_int16_t reserved;
+			u_int32_t key_id;
+
+			reserved = GET_BE_U_2(p);
+			p += 2;
+			ND_PRINT(", D=%u", reserved >> 15);
+			key_id = GET_BE_U_4(p);
+			p += 4;
+			ND_PRINT(", HMAC-key-ID=0x%x", key_id);
+			bytes_left -= 6;
+			if (bytes_left == 0)
+			{
+				parse_next = 0;
+				break;
+			}
+
+			// for (size_t i = 0; i < count; i++)
+			// {
+			// 	/* code */
+			// }
+			
+
+			// GET_CPY_BYTES()
+			break;
+		default:						/* Unknown type */
+			break;
+		}
+
+		if (bytes_left == 0)
+			break;
 		/////// to remove ///////
 		parse_next = 0;
 		////////////////////////
@@ -135,7 +189,7 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 		if (seg_list_len < len)
 		{
 			/* there is TLV */
-			int bytes_left;
+			u_int bytes_left;
 			bytes_left = (len - seg_list_len) * 8;
 			err = rt6_tlv_print(ndo, p, bytes_left);
 			if (err)
