@@ -49,10 +49,10 @@ rt6_tlv_print(netdissect_options *ndo, const u_char *p, u_int bytes_left)
 			break;
 		if (tlv_type == IPV6_RTHDR_TLV_TYPE_0)	/* Pad1 */
 		{
+			ND_PRINT(" Pad1");
 			continue;
 		}
 		tlv_len = GET_U_1(p);
-		ND_PRINT(", TLV-len=%u", tlv_len);
 		p += 1;
 		bytes_left -= 1;
 
@@ -67,6 +67,8 @@ rt6_tlv_print(netdissect_options *ndo, const u_char *p, u_int bytes_left)
 		switch (tlv_type)
 		{
 		case IPV6_RTHDR_TLV_TYPE_4:		/* PadN */
+			ND_PRINT(" PadN");
+			ND_PRINT(", TLV-len=%u", tlv_len);
 			p += tlv_len;
 			bytes_left -= tlv_len;
 			if (bytes_left == 0)
@@ -76,6 +78,8 @@ rt6_tlv_print(netdissect_options *ndo, const u_char *p, u_int bytes_left)
 			}
 			break;
 		case IPV6_RTHDR_TLV_TYPE_5:		/* HMAC */
+			ND_PRINT(" HMAC");
+			ND_PRINT(", TLV-len=%u", tlv_len);
 			if (tlv_len + 6 > bytes_left)
 			{
 				ND_PRINT(" (invalid TLV length %u, bytes left %u)", tlv_len, bytes_left);
@@ -83,37 +87,53 @@ rt6_tlv_print(netdissect_options *ndo, const u_char *p, u_int bytes_left)
 			}
 			u_int16_t reserved;
 			u_int32_t key_id;
+			u_int8_t hmac_byte;
 
 			reserved = GET_BE_U_2(p);
 			p += 2;
 			ND_PRINT(", D=%u", reserved >> 15);
 			key_id = GET_BE_U_4(p);
 			p += 4;
-			ND_PRINT(", HMAC-key-ID=0x%x", key_id);
+			ND_PRINT(", HMAC-key-ID=%02x", key_id);
 			bytes_left -= 6;
+			ND_PRINT(", HMAC=");
+			
+			for (u_int i = 0; i < tlv_len; i++)
+			{
+				hmac_byte = GET_U_1(p);
+				p += 1;
+				bytes_left -= 1;
+				ND_PRINT("%02x", hmac_byte);
+			}
+
 			if (bytes_left == 0)
 			{
 				parse_next = 0;
 				break;
 			}
-
-			// for (size_t i = 0; i < count; i++)
-			// {
-			// 	/* code */
-			// }
-			
-
-			// GET_CPY_BYTES()
 			break;
 		default:						/* Unknown type */
+			ND_PRINT(" Unknown");
+			ND_PRINT(", TLV-len=%u", tlv_len);
+			ND_PRINT(", TLV-value=");
+			u_int8_t tlv_byte;
+			for (u_int i = 0; i < tlv_len; i++)
+			{
+				tlv_byte = GET_U_1(p);
+				p += 1;
+				bytes_left -= 1;
+				ND_PRINT("%02x", tlv_byte);
+			}
+
+			if (bytes_left == 0)
+			{
+				parse_next = 0;
+				break;
+			}
 			break;
 		}
-
 		if (bytes_left == 0)
 			break;
-		/////// to remove ///////
-		parse_next = 0;
-		////////////////////////
 	}
 	
 
