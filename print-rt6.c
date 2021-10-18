@@ -38,7 +38,6 @@ rt6_tlv_print(netdissect_options *ndo, const u_char *p, u_int bytes_left)
 {
 	u_int tlv_type, tlv_len;
 	u_int8_t parse_next = 1;
-	
 	while (parse_next)
 	{
 		tlv_type = GET_U_1(p);
@@ -52,17 +51,15 @@ rt6_tlv_print(netdissect_options *ndo, const u_char *p, u_int bytes_left)
 			ND_PRINT(" Pad1");
 			continue;
 		}
+		
 		tlv_len = GET_U_1(p);
 		p += 1;
 		bytes_left -= 1;
-
-
 		if (tlv_len > bytes_left)
 		{
 			ND_PRINT(" (invalid TLV length %u, bytes left %u)", tlv_len, bytes_left);
 			return -1;
 		}
-
 
 		switch (tlv_type)
 		{
@@ -88,7 +85,6 @@ rt6_tlv_print(netdissect_options *ndo, const u_char *p, u_int bytes_left)
 			u_int16_t reserved;
 			u_int32_t key_id;
 			u_int8_t hmac_byte;
-
 			reserved = GET_BE_U_2(p);
 			p += 2;
 			ND_PRINT(", D=%u", reserved >> 15);
@@ -97,7 +93,6 @@ rt6_tlv_print(netdissect_options *ndo, const u_char *p, u_int bytes_left)
 			ND_PRINT(", HMAC-key-ID=%02x", key_id);
 			bytes_left -= 6;
 			ND_PRINT(", HMAC=");
-			
 			for (u_int i = 0; i < tlv_len; i++)
 			{
 				hmac_byte = GET_U_1(p);
@@ -105,7 +100,6 @@ rt6_tlv_print(netdissect_options *ndo, const u_char *p, u_int bytes_left)
 				bytes_left -= 1;
 				ND_PRINT("%02x", hmac_byte);
 			}
-
 			if (bytes_left == 0)
 			{
 				parse_next = 0;
@@ -124,7 +118,6 @@ rt6_tlv_print(netdissect_options *ndo, const u_char *p, u_int bytes_left)
 				bytes_left -= 1;
 				ND_PRINT("%02x", tlv_byte);
 			}
-
 			if (bytes_left == 0)
 			{
 				parse_next = 0;
@@ -135,8 +128,6 @@ rt6_tlv_print(netdissect_options *ndo, const u_char *p, u_int bytes_left)
 		if (bytes_left == 0)
 			break;
 	}
-	
-
 	return 0;
 }
 
