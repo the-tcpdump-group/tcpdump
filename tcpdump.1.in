@@ -335,7 +335,7 @@ flag will not be supported if
 was built with an older version of
 .I libpcap
 that lacks the
-.BR pcap_findalldevs(3PCAP)
+.BR pcap_findalldevs (3PCAP)
 function.
 .TP
 .B \-e
@@ -796,7 +796,7 @@ flag will not be supported if
 was built with an older version of
 .I libpcap
 that lacks the
-.BR pcap_dump_flush(3PCAP)
+.BR pcap_dump_flush (3PCAP)
 function.
 .TP
 .B \-v
@@ -855,7 +855,7 @@ operating systems and applications will use the extension if it is
 present and adding one (e.g. .pcap) is recommended.
 .IP
 See
-.BR pcap-savefile (@MAN_FILE_FORMATS@)
+.BR \%pcap-savefile (@MAN_FILE_FORMATS@)
 for a description of the file format.
 .TP
 .BI \-W " filecount"
@@ -977,7 +977,7 @@ Otherwise,
 only packets for which \fIexpression\fP is `true' will be dumped.
 .LP
 For the \fIexpression\fP syntax, see
-.BR pcap-filter (@MAN_MISC_INFO@).
+.BR \%pcap-filter (@MAN_MISC_INFO@).
 .LP
 The \fIexpression\fP argument can be passed to \fItcpdump\fP as either a single
 Shell argument, or as multiple Shell arguments, whichever is more convenient.
