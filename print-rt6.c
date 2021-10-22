@@ -37,7 +37,7 @@ int
 rt6_tlv_print(netdissect_options *ndo, const u_char *p, u_int bytes_left)
 {
 	u_int tlv_type, tlv_len;
-	u_int8_t parse_next = 1;
+	uint8_t parse_next = 1;
 	while (parse_next)
 	{
 		tlv_type = GET_U_1(p);
@@ -81,9 +81,9 @@ rt6_tlv_print(netdissect_options *ndo, const u_char *p, u_int bytes_left)
 				ND_PRINT(" (invalid TLV length %u, bytes left %u)", tlv_len, bytes_left);
 				return -1;
 			}
-			u_int16_t reserved;
-			u_int32_t key_id;
-			u_int8_t hmac_byte;
+			uint16_t reserved;
+			uint32_t key_id;
+			uint8_t hmac_byte;
 			reserved = GET_BE_U_2(p);
 			p += 2;
 			if (ndo->ndo_vflag)
@@ -114,7 +114,7 @@ rt6_tlv_print(netdissect_options *ndo, const u_char *p, u_int bytes_left)
 			ND_PRINT(", TLV-len=%u", tlv_len);
 			if (ndo->ndo_vflag)
 				ND_PRINT(", TLV-value=0x");
-			u_int8_t tlv_byte;
+			uint8_t tlv_byte;
 			for (u_int i = 0; i < tlv_len; i++)
 			{
 				tlv_byte = GET_U_1(p);
