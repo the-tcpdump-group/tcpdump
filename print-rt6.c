@@ -41,14 +41,13 @@ rt6_tlv_print(netdissect_options *ndo, const u_char *p, u_int bytes_left)
 	while (parse_next)
 	{
 		tlv_type = GET_U_1(p);
-		ND_PRINT(", TLV-type=%u", tlv_type);
 		p += 1;
 		bytes_left -= 1;
 		if (bytes_left == 0)
 			break;
 		if (tlv_type == IPV6_RTHDR_TLV_TYPE_0)	/* Pad1 */
 		{
-			ND_PRINT(" Pad1");
+			ND_PRINT(", TLV-type=Pad1(%u)", tlv_type);
 			continue;
 		}
 		
@@ -64,7 +63,7 @@ rt6_tlv_print(netdissect_options *ndo, const u_char *p, u_int bytes_left)
 		switch (tlv_type)
 		{
 		case IPV6_RTHDR_TLV_TYPE_4:		/* PadN */
-			ND_PRINT(" PadN");
+			ND_PRINT(", TLV-type=PadN(%u)", tlv_type);
 			ND_PRINT(", TLV-len=%u", tlv_len);
 			p += tlv_len;
 			bytes_left -= tlv_len;
@@ -75,7 +74,7 @@ rt6_tlv_print(netdissect_options *ndo, const u_char *p, u_int bytes_left)
 			}
 			break;
 		case IPV6_RTHDR_TLV_TYPE_5:		/* HMAC */
-			ND_PRINT(" HMAC");
+			ND_PRINT(", TLV-type=HMAC(%u)", tlv_type);
 			ND_PRINT(", TLV-len=%u", tlv_len);
 			if (tlv_len + 6 > bytes_left)
 			{
@@ -87,18 +86,22 @@ rt6_tlv_print(netdissect_options *ndo, const u_char *p, u_int bytes_left)
 			u_int8_t hmac_byte;
 			reserved = GET_BE_U_2(p);
 			p += 2;
-			ND_PRINT(", D=%u", reserved >> 15);
+			if (ndo->ndo_vflag)
+				ND_PRINT(", D=%u", reserved >> 15);
 			key_id = GET_BE_U_4(p);
 			p += 4;
-			ND_PRINT(", HMAC-key-ID=%02x", key_id);
+			if (ndo->ndo_vflag)
+				ND_PRINT(", HMAC-key-ID=0x%02x", key_id);
 			bytes_left -= 6;
-			ND_PRINT(", HMAC=");
+			if (ndo->ndo_vflag)
+				ND_PRINT(", HMAC=0x");
 			for (u_int i = 0; i < tlv_len; i++)
 			{
 				hmac_byte = GET_U_1(p);
 				p += 1;
 				bytes_left -= 1;
-				ND_PRINT("%02x", hmac_byte);
+				if (ndo->ndo_vflag)
+					ND_PRINT("%02x", hmac_byte);
 			}
 			if (bytes_left == 0)
 			{
@@ -109,14 +112,16 @@ rt6_tlv_print(netdissect_options *ndo, const u_char *p, u_int bytes_left)
 		default:						/* Unknown type */
 			ND_PRINT(" Unknown");
 			ND_PRINT(", TLV-len=%u", tlv_len);
-			ND_PRINT(", TLV-value=");
+			if (ndo->ndo_vflag)
+				ND_PRINT(", TLV-value=0x");
 			u_int8_t tlv_byte;
 			for (u_int i = 0; i < tlv_len; i++)
 			{
 				tlv_byte = GET_U_1(p);
 				p += 1;
 				bytes_left -= 1;
-				ND_PRINT("%02x", tlv_byte);
+				if (ndo->ndo_vflag)
+					ND_PRINT("%02x", tlv_byte);
 			}
 			if (bytes_left == 0)
 			{
