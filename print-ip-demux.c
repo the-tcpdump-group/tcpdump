@@ -198,7 +198,7 @@ again:
 		if (ndo->ndo_packettype == PT_CARP) {
 			carp_print(ndo, bp, length, ttl_hl);
 		} else {
-			vrrp_print(ndo, bp, length, iph, ttl_hl);
+			vrrp_print(ndo, bp, length, iph, ttl_hl, ver);
 		}
 		break;
 
