@@ -105,7 +105,8 @@ static const struct tok auth2str[] = {
 void
 vrrp_print(netdissect_options *ndo,
            const u_char *bp, u_int len,
-           const u_char *bp2, int ttl)
+           const u_char *bp2, int ttl,
+	   int ver)
 {
 	int version, type, auth_type = VRRP_AUTH_NONE; /* keep compiler happy */
 	const char *type_s;
@@ -147,8 +148,14 @@ vrrp_print(netdissect_options *ndo,
 		}
 
 		if (version == 3 && ND_TTEST_LEN(bp, len)) {
-			uint16_t cksum = nextproto4_cksum(ndo, (const struct ip *)bp2, bp,
-				len, len, IPPROTO_VRRP);
+			uint16_t cksum;
+
+			if (ver == 4)
+				cksum = nextproto4_cksum(ndo, (const struct ip *)bp2, bp,
+					len, len, IPPROTO_VRRP);
+			else
+				cksum = nextproto6_cksum(ndo, (const struct ip6_hdr *)bp2, bp,
+					len, len, IPPROTO_VRRP);
 			if (cksum)
 				ND_PRINT(", (bad vrrp cksum %x)",
 					GET_BE_U_2(bp + 6));
@@ -161,9 +168,14 @@ vrrp_print(netdissect_options *ndo,
 		c = ' ';
 		bp += 8;
 		for (i = 0; i < naddrs; i++) {
-			ND_PRINT("%c%s", c, GET_IPADDR_STRING(bp));
+			if (ver == 4) {
+				ND_PRINT("%c%s", c, GET_IPADDR_STRING(bp));
+				bp += 4;
+			} else {
+				ND_PRINT("%c%s", c, GET_IP6ADDR_STRING(bp));
+				bp += 16;
+			}
 			c = ',';
-			bp += 4;
 		}
 		if (version == 2 && auth_type == VRRP_AUTH_SIMPLE) { /* simple text password */
 			ND_PRINT(" auth \"");
