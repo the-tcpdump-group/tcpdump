@@ -216,6 +216,7 @@ static const struct tok bgp_opt_values[] = {
 #define BGP_CAPCODE_ORF                 3 /* RFC5291 */
 #define BGP_CAPCODE_MR                  4 /* RFC3107 */
 #define BGP_CAPCODE_EXT_NH              5 /* RFC5549 */
+#define BGP_CAPCODE_EXT_MSG             6 /* RFC8654 */
 #define BGP_CAPCODE_ML                  8 /* RFC8277 */
 #define BGP_CAPCODE_RESTART            64 /* RFC4724  */
 #define BGP_CAPCODE_AS_NEW             65 /* RFC6793 */
@@ -232,6 +233,7 @@ static const struct tok bgp_capcode_values[] = {
     { BGP_CAPCODE_ORF,          "Cooperative Route Filtering"},
     { BGP_CAPCODE_MR,           "Multiple Routes to a Destination"},
     { BGP_CAPCODE_EXT_NH,       "Extended Next Hop Encoding"},
+    { BGP_CAPCODE_EXT_MSG,      "BGP Extended Message"},
     { BGP_CAPCODE_ML,           "Multiple Labels"},
     { BGP_CAPCODE_RESTART,      "Graceful Restart"},
     { BGP_CAPCODE_AS_NEW,       "32-Bit AS Number"},
@@ -2589,6 +2591,7 @@ bgp_capabilities_print(netdissect_options *ndo,
         case BGP_CAPCODE_RR:
         case BGP_CAPCODE_LLGR:
         case BGP_CAPCODE_RR_CISCO:
+        case BGP_CAPCODE_EXT_MSG:
             break;
         case BGP_CAPCODE_AS_NEW:
             /*
