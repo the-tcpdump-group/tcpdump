@@ -12,7 +12,6 @@
 	      Route Refresh (2), length: 0
 	    Option Capabilities Advertisement (2), length: 2
 	      Enhanced Route Refresh (70), length: 0
-		no decoder for Capability 70
 	    Option Capabilities Advertisement (2), length: 6
 	      32-Bit AS Number (65), length: 4
 		 4 Byte AS 65001

@@ -217,7 +217,7 @@ static const struct tok bgp_opt_values[] = {
 #define BGP_CAPCODE_DYN_CAP            67 /* draft-ietf-idr-dynamic-cap */
 #define BGP_CAPCODE_MULTISESS          68 /* draft-ietf-idr-bgp-multisession */
 #define BGP_CAPCODE_ADD_PATH           69 /* RFC7911 */
-#define BGP_CAPCODE_ENH_RR             70 /* draft-keyur-bgp-enhanced-route-refresh */
+#define BGP_CAPCODE_ENH_RR             70 /* RFC7313 */
 #define BGP_CAPCODE_LLGR               71 /* draft-uttaro-idr-bgp-persistence-05 */
 #define BGP_CAPCODE_RR_CISCO          128
 
@@ -2586,6 +2586,7 @@ bgp_capabilities_print(netdissect_options *ndo,
         case BGP_CAPCODE_LLGR:
         case BGP_CAPCODE_RR_CISCO:
         case BGP_CAPCODE_EXT_MSG:
+        case BGP_CAPCODE_ENH_RR:
             break;
         case BGP_CAPCODE_AS_NEW:
             /*
