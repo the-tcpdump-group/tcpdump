@@ -319,7 +319,7 @@ int esp_decrypt_buffer_by_ikev2_print(netdissect_options *ndo,
 
 	if(end <= ct) return 0;
 
-	pt = do_decrypt(ndo, "esp_decrypt_buffer_by_ikev2_print", sa, iv,
+	pt = do_decrypt(ndo, __func__, sa, iv,
 	    ct, ctlen);
 	if (pt == NULL)
 		return 0;
@@ -869,7 +869,7 @@ esp_print(netdissect_options *ndo,
 		return;
 	}
 
-	pt = do_decrypt(ndo, "esp_print", sa, iv, ct, payloadlen);
+	pt = do_decrypt(ndo, __func__, sa, iv, ct, payloadlen);
 	if (pt == NULL)
 		return;
 
