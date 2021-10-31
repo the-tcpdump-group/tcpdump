@@ -106,10 +106,22 @@ struct bgp_route_refresh {
     nd_uint16_t len;
     nd_uint8_t  type;   /* No padding after this; afi is, in fact, not aligned */
     nd_uint16_t afi;
-    nd_uint8_t  res;
+    nd_uint8_t  subtype;
     nd_uint8_t  safi;
 };
 #define BGP_ROUTE_REFRESH_SIZE          23
+#define BGP_ROUTE_REFRESH_SUBTYPE_NORMAL 0
+#define BGP_ROUTE_REFRESH_SUBTYPE_BORR 1
+#define BGP_ROUTE_REFRESH_SUBTYPE_EORR 2
+#define BGP_ROUTE_REFRESH_SUBTYPE_RESERVED 255
+
+static const struct tok bgp_route_refresh_subtype_values[] = {
+    {BGP_ROUTE_REFRESH_SUBTYPE_NORMAL, "Normal route refresh request"},
+    {BGP_ROUTE_REFRESH_SUBTYPE_BORR,
+     "Demarcation of the beginning of a route refresh"},
+    {BGP_ROUTE_REFRESH_SUBTYPE_EORR,
+     "Demarcation of the ending of a route refresh"},
+    {0, NULL}};
 
 #define bgp_attr_lenlen(flags, p) \
     (((flags) & 0x10) ? 2U : 1U)
@@ -3033,13 +3045,16 @@ bgp_route_refresh_print(netdissect_options *ndo,
 
     bgp_route_refresh_header = (const struct bgp_route_refresh *)pptr;
 
-    ND_PRINT("\n\t  AFI %s (%u), SAFI %s (%u)",
-              tok2str(af_values,"Unknown",
-                      GET_BE_U_2(bgp_route_refresh_header->afi)),
-              GET_BE_U_2(bgp_route_refresh_header->afi),
-              tok2str(bgp_safi_values,"Unknown",
-                      GET_U_1(bgp_route_refresh_header->safi)),
-              GET_U_1(bgp_route_refresh_header->safi));
+    ND_PRINT("\n\t  AFI %s (%u), SAFI %s (%u), Subtype %s (%u)",
+             tok2str(af_values, "Unknown",
+                     GET_BE_U_2(bgp_route_refresh_header->afi)),
+             GET_BE_U_2(bgp_route_refresh_header->afi),
+             tok2str(bgp_safi_values, "Unknown",
+                     GET_U_1(bgp_route_refresh_header->safi)),
+             GET_U_1(bgp_route_refresh_header->safi),
+             tok2str(bgp_route_refresh_subtype_values, "Unknown",
+                     GET_U_1(bgp_route_refresh_header->subtype)),
+             GET_U_1(bgp_route_refresh_header->subtype));
 
     if (ndo->ndo_vflag > 1) {
         ND_TCHECK_LEN(pptr, len);
