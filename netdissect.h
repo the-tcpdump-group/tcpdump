@@ -725,7 +725,7 @@ extern void udld_print(netdissect_options *, const u_char *, u_int);
 extern void udp_print(netdissect_options *, const u_char *, u_int, const u_char *, int, u_int);
 extern int vjc_print(netdissect_options *, const u_char *, u_short);
 extern void vqp_print(netdissect_options *, const u_char *, u_int);
-extern void vrrp_print(netdissect_options *, const u_char *, u_int, const u_char *, int);
+extern void vrrp_print(netdissect_options *, const u_char *, u_int, const u_char *, int, int);
 extern void vtp_print(netdissect_options *, const u_char *, const u_int);
 extern void vxlan_gpe_print(netdissect_options *, const u_char *, u_int);
 extern void vxlan_print(netdissect_options *, const u_char *, u_int);
