@@ -389,6 +389,7 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	 * of the netdissect_options structure.
 	 */
 	ndo->ndo_snapend = sp + h->caplen;
+	ndo->ndo_packetp = sp;
 
 	ndo->ndo_protocol = "";
 	ndo->ndo_ll_hdr_len = 0;
