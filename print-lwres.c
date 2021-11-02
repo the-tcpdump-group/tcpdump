@@ -191,7 +191,7 @@ extern const struct tok ns_class2str[];
 
 static unsigned
 lwres_printname(netdissect_options *ndo,
-                size_t l, const u_char *p0)
+                u_int l, const u_char *p0)
 {
 	ND_PRINT(" ");
 	nd_printjn(ndo, p0, l);
