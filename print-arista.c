@@ -63,9 +63,11 @@ arista_ethertype_print(netdissect_options *ndo, const u_char *bp, u_int len _U_)
 
 	ND_PRINT("SubType: 0x%1x, Version: 0x%04x, ", subTypeId, version);
 
-	// TapAgg Header Timestamping
+	/* TapAgg Header Timestamping */
 	if (subTypeId == ARISTA_SUBTYPE_TIMESTAMP) {
-		// Timestamp has 32-bit lsb in nanosec and remaining msb in sec
+		/* Lower 4 bits are reserved for HW info */
+		version &= 0xfff0;
+		/* Timestamp has 32-bit lsb in nanosec and remaining msb in sec */
 		ND_PRINT("Timestamp %s", tok2str(ts_version_name,
 					"Unknown timestamp Version 0x%04x ", version));
 		switch (version) {
