@@ -423,6 +423,9 @@ int main()
         AC_MSG_RESULT(no)
         AC_DEFINE(HAVE_NO_PRINTF_Z, 1,
             [Define to 1 if printf(3) does not support the z length modifier.])
+    ],
+    [
+        AC_MSG_RESULT(not while cross-compiling)
     ]
 )
 
