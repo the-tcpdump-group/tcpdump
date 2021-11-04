@@ -176,14 +176,14 @@ eap_print(netdissect_options *ndo,
 
         switch (subtype) {
             case EAP_TYPE_IDENTITY:
-                if (len - 5 > 0) {
+                if (len > 5 ) {
                     ND_PRINT(", Identity: ");
                     nd_printjnp(ndo, cp + 5, len - 5);
                 }
                 break;
 
             case EAP_TYPE_NOTIFICATION:
-                if (len - 5 > 0) {
+                if (len > 5) {
                     ND_PRINT(", Notification: ");
                     nd_printjnp(ndo, cp + 5, len - 5);
                 }
