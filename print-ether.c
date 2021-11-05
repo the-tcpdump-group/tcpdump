@@ -222,7 +222,7 @@ recurse:
 		}
 
 		int ret = macsec_print(ndo, &p, &length, &caplen, &hdrlen,
-		    &src, &dst);
+				       &src, &dst);
 
 		if (ret == 0) {
 			/* Payload is encrypted; print it as raw data. */
@@ -238,6 +238,7 @@ recurse:
 			 */
 			length_type = GET_BE_U_2(p);
 
+			ND_LCHECK_U(caplen, 2);
 			length -= 2;
 			caplen -= 2;
 			p += 2;
@@ -403,6 +404,7 @@ recurse:
 				ND_DEFAULTPRINT(p, caplen);
 		}
 	}
+invalid:
 	return hdrlen;
 }
 
