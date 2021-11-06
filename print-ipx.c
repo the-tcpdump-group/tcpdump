@@ -156,6 +156,7 @@ ipx_sap_print(netdissect_options *ndo, const u_char *ipx, u_int length)
     int command, i;
 
     command = GET_BE_U_2(ipx);
+    ND_LCHECK_U(length, 2);
     ipx += 2;
     length -= 2;
 
@@ -229,6 +230,7 @@ ipx_rip_print(netdissect_options *ndo, const u_char *ipx, u_int length)
     int command, i;
 
     command = GET_BE_U_2(ipx);
+    ND_LCHECK_U(length, 2);
     ipx += 2;
     length -= 2;
 
