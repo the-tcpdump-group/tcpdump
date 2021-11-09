@@ -721,6 +721,7 @@ Currently known types are
 \fBpgm\fR (Pragmatic General Multicast),
 \fBpgm_zmtp1\fR (ZMTP/1.0 inside PGM/EPGM),
 \fBptp\fR (Precision Time Protocol),
+\fBquic\fR (QUIC),
 \fBradius\fR (RADIUS),
 \fBresp\fR (REdis Serialization Protocol),
 \fBrpc\fR (Remote Procedure Call),
