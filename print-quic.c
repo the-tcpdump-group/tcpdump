@@ -164,7 +164,7 @@ quic_print_packet(netdissect_options *ndo, const u_char *bp, const u_char *end)
 	bp += 1;
 	if (first_octet & 0x80) {
 		/* Long Header */
-		packet_type = (first_octet >> 4) & 0x02;
+		packet_type = (first_octet >> 4) & 0x03;
 		version = GET_BE_U_4(bp);
 		bp += 4;
 
