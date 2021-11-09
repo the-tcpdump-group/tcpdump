@@ -291,6 +291,7 @@ extern void nd_pop_all_packet_info(netdissect_options *);
 #define PT_PTP		18	/* PTP */
 #define PT_SOMEIP	19	/* Autosar SOME/IP Protocol */
 #define PT_DOMAIN	20	/* Domain Name System (DNS) */
+#define PT_QUIC		21	/* QUIC */
 
 #define ND_MIN(a,b) ((a)>(b)?(b):(a))
 #define ND_MAX(a,b) ((b)>(a)?(b):(a))
@@ -692,6 +693,8 @@ extern int print_unknown_data(netdissect_options *, const u_char *, const char *
 extern void ptp_print(netdissect_options *, const u_char *, u_int);
 extern const char *q922_string(netdissect_options *, const u_char *, u_int);
 extern void q933_print(netdissect_options *, const u_char *, u_int);
+extern int quic_detect(netdissect_options *, const u_char *, const u_int);
+extern void quic_print(netdissect_options *, const u_char *, const u_int);
 extern void radius_print(netdissect_options *, const u_char *, u_int);
 extern void resp_print(netdissect_options *, const u_char *, u_int);
 extern void rip_print(netdissect_options *, const u_char *, u_int);

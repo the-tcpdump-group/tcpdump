@@ -463,6 +463,9 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			/* over_tcp: FALSE, is_mdns: FALSE */
 			domain_print(ndo, cp, length, FALSE, FALSE);
 			break;
+		case PT_QUIC:
+			quic_print(ndo, cp, length);
+			break;
 		}
 		return;
 	}
@@ -669,6 +672,9 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			ptp_print(ndo, cp, length);
 		} else if (IS_SRC_OR_DST_PORT(SOMEIP_PORT))
 			someip_print(ndo, cp, length);
+		else if (IS_SRC_OR_DST_PORT(HTTPS_PORT) &&
+			 quic_detect(ndo, cp, length))
+			quic_print(ndo, cp, length);
 		else {
 			if (ulen > length && !fragmented)
 				ND_PRINT("UDP, bad length %u > %u",
