@@ -156,7 +156,7 @@ eap_print(netdissect_options *ndo,
 
     type = GET_U_1(cp);
     len = GET_BE_U_2(cp + 2);
-    if(len != length) {
+    if (len != length) {
         /*
          * Probably a fragment; in some cases the fragmentation might
          * not put an EAP header on every packet, if reassembly can
@@ -192,7 +192,7 @@ eap_print(netdissect_options *ndo,
         switch (subtype) {
             case EAP_TYPE_IDENTITY:
                 /* According to RFC 3748, the message is optional */
-                if (len > 5 ) {
+                if (len > 5) {
                     ND_PRINT(", Identity: ");
                     nd_printjnp(ndo, cp + 5, len - 5);
                 }
