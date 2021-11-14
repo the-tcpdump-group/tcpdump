@@ -77,9 +77,9 @@ static const struct tok eap_code_values[] = {
 #define		EAP_TYPE_MD5_CHALLENGE	4
 #define		EAP_TYPE_OTP		5
 #define		EAP_TYPE_GTC		6
-#define		EAP_TYPE_TLS		13		/* RFC 2716 */
+#define		EAP_TYPE_TLS		13		/* RFC 5216 */
 #define		EAP_TYPE_SIM		18		/* RFC 4186 */
-#define		EAP_TYPE_TTLS		21		/* draft-funk-eap-ttls-v0-01.txt */
+#define		EAP_TYPE_TTLS		21		/* RFC 5281, draft-funk-eap-ttls-v0-01.txt */
 #define		EAP_TYPE_AKA		23		/* RFC 4187 */
 #define		EAP_TYPE_FAST		43		/* RFC 4851 */
 #define		EAP_TYPE_EXPANDED_TYPES	254
@@ -105,7 +105,7 @@ static const struct tok eap_type_values[] = {
 
 #define EAP_TLS_EXTRACT_BIT_L(x) 	(((x)&0x80)>>7)
 
-/* RFC 2716 - EAP TLS bits */
+/* RFC 5216 - EAP TLS bits */
 #define EAP_TLS_FLAGS_LEN_INCLUDED		(1 << 7)
 #define EAP_TLS_FLAGS_MORE_FRAGMENTS		(1 << 6)
 #define EAP_TLS_FLAGS_START			(1 << 5)
