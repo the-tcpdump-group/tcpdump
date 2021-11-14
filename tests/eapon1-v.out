@@ -67,13 +67,13 @@
    19  15:17:37.766046 EAP packet (0) v1, len 45, Response (2), id 2, len 45
 		 Type Identity (1), Identity: 1295023820005391@mnc023.mcc295.owlan.org
    20  15:17:37.790625 EAP packet (0) v1, len 20, Request (1), id 16, len 20
-		 Type SIM (18) subtype [Start] 0x0a,
+		 Type SIM (18) subtype [Start] 0x0a
    21  15:17:37.830669 EAP packet (0) v1, len 76, Response (2), id 16, len 76
-		 Type SIM (18) subtype [Start] 0x0a,
+		 Type SIM (18) subtype [Start] 0x0a
    22  15:17:37.848577 EAP packet (0) v1, len 80, Request (1), id 17, len 80
-		 Type SIM (18) subtype [Challenge] 0x0b,
+		 Type SIM (18) subtype [Challenge] 0x0b
    23  15:17:38.661939 EAP packet (0) v1, len 28, Response (2), id 17, len 28
-		 Type SIM (18) subtype [Challenge] 0x0b,
+		 Type SIM (18) subtype [Challenge] 0x0b
    24  15:17:38.685352 EAP packet (0) v1, len 4, Success (3), id 0, len 4
    25  15:17:38.686358 EAPOL key (3) v1, len 57
    26  15:17:38.687182 EAPOL key (3) v1, len 44
@@ -128,13 +128,13 @@
    32  15:18:08.713116 EAP packet (0) v1, len 45, Response (2), id 3, len 45
 		 Type Identity (1), Identity: 1295023820005391@mnc023.mcc295.owlan.org
    33  15:18:08.787664 EAP packet (0) v1, len 20, Request (1), id 47, len 20
-		 Type SIM (18) subtype [Start] 0x0a,
+		 Type SIM (18) subtype [Start] 0x0a
    34  15:18:10.344628 EAP packet (0) v1, len 76, Response (2), id 47, len 76
-		 Type SIM (18) subtype [Start] 0x0a,
+		 Type SIM (18) subtype [Start] 0x0a
    35  15:18:10.473292 EAP packet (0) v1, len 80, Request (1), id 48, len 80
-		 Type SIM (18) subtype [Challenge] 0x0b,
+		 Type SIM (18) subtype [Challenge] 0x0b
    36  15:18:11.152435 EAP packet (0) v1, len 28, Response (2), id 48, len 28
-		 Type SIM (18) subtype [Challenge] 0x0b,
+		 Type SIM (18) subtype [Challenge] 0x0b
    37  15:18:11.251425 EAP packet (0) v1, len 4, Success (3), id 0, len 4
    38  15:18:11.252509 EAPOL key (3) v1, len 57
    39  15:18:11.253336 EAPOL key (3) v1, len 44
@@ -180,19 +180,19 @@
    55  15:18:41.275901 EAP packet (0) v1, len 45, Response (2), id 4, len 45
 		 Type Identity (1), Identity: 1295023820005391@mnc023.mcc295.owlan.org
    56  15:18:41.388857 EAP packet (0) v1, len 20, Request (1), id 80, len 20
-		 Type SIM (18) subtype [Start] 0x0a,
+		 Type SIM (18) subtype [Start] 0x0a
    57  15:18:41.715620 IP (tos 0x0, ttl 128, id 14541, offset 0, flags [none], proto UDP (17), length 96)
     169.254.67.194.137 > 169.254.255.255.137: NBT UDP PACKET(137): REGISTRATION; REQUEST; BROADCAST
    58  15:18:42.466013 IP (tos 0x0, ttl 128, id 14542, offset 0, flags [none], proto UDP (17), length 96)
     169.254.67.194.137 > 169.254.255.255.137: NBT UDP PACKET(137): REGISTRATION; REQUEST; BROADCAST
    59  15:18:42.963175 EAP packet (0) v1, len 76, Response (2), id 80, len 76
-		 Type SIM (18) subtype [Start] 0x0a,
+		 Type SIM (18) subtype [Start] 0x0a
    60  15:18:42.987906 EAP packet (0) v1, len 80, Request (1), id 81, len 80
-		 Type SIM (18) subtype [Challenge] 0x0b,
+		 Type SIM (18) subtype [Challenge] 0x0b
    61  15:18:43.216408 IP (tos 0x0, ttl 128, id 14543, offset 0, flags [none], proto UDP (17), length 96)
     169.254.67.194.137 > 169.254.255.255.137: NBT UDP PACKET(137): REGISTRATION; REQUEST; BROADCAST
    62  15:18:43.675053 EAP packet (0) v1, len 28, Response (2), id 81, len 28
-		 Type SIM (18) subtype [Challenge] 0x0b,
+		 Type SIM (18) subtype [Challenge] 0x0b
    63  15:18:43.695554 EAP packet (0) v1, len 4, Success (3), id 0, len 4
    64  15:18:43.696547 EAPOL key (3) v1, len 57
    65  15:18:43.697368 EAPOL key (3) v1, len 44
@@ -317,15 +317,15 @@
   106  15:19:13.718221 EAP packet (0) v1, len 45, Response (2), id 5, len 45
 		 Type Identity (1), Identity: 1295023820005391@mnc023.mcc295.owlan.org
   107  15:19:13.734974 EAP packet (0) v1, len 20, Request (1), id 112, len 20
-		 Type SIM (18) subtype [Start] 0x0a,
+		 Type SIM (18) subtype [Start] 0x0a
   108  15:19:14.801245 IP (tos 0x0, ttl 128, id 14604, offset 0, flags [none], proto UDP (17), length 229)
     169.254.67.194.138 > 169.254.255.255.138: NBT UDP PACKET(138)
   109  15:19:15.293800 EAP packet (0) v1, len 76, Response (2), id 112, len 76
-		 Type SIM (18) subtype [Start] 0x0a,
+		 Type SIM (18) subtype [Start] 0x0a
   110  15:19:15.312531 EAP packet (0) v1, len 80, Request (1), id 113, len 80
-		 Type SIM (18) subtype [Challenge] 0x0b,
+		 Type SIM (18) subtype [Challenge] 0x0b
   111  15:19:15.997763 EAP packet (0) v1, len 28, Response (2), id 113, len 28
-		 Type SIM (18) subtype [Challenge] 0x0b,
+		 Type SIM (18) subtype [Challenge] 0x0b
   112  15:19:16.022323 EAP packet (0) v1, len 4, Success (3), id 0, len 4
   113  15:19:16.023335 EAPOL key (3) v1, len 57
   114  15:19:16.024149 EAPOL key (3) v1, len 44
