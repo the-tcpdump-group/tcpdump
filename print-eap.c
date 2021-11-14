@@ -157,7 +157,14 @@ eap_print(netdissect_options *ndo,
     type = GET_U_1(cp);
     len = GET_BE_U_2(cp + 2);
     if(len != length) {
-       goto trunc;
+        /*
+         * Probably a fragment; in some cases the fragmentation might
+         * not put an EAP header on every packet, if reassembly can
+         * be done without that (e.g., fragmentation to make a message
+         * fit in multiple TLVs in a RADIUS packet).
+         */
+        ND_PRINT("EAP fragment?");
+        return;
     }
     ND_PRINT("%s (%u), id %u, len %u",
             tok2str(eap_code_values, "unknown", type),
