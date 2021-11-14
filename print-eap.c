@@ -153,7 +153,6 @@ eap_print(netdissect_options *ndo,
 {
     u_int type, subtype, len;
     u_int count;
-    const char *sep;
 
     type = GET_U_1(cp);
     len = GET_BE_U_2(cp + 2);
@@ -219,12 +218,10 @@ eap_print(netdissect_options *ndo,
                     ND_PRINT(" (too short for EAP Legacy NAK request/response)");
                     return;
                 }
-                sep = "";
                 for (count = 5; count < len; count++) {
-                    ND_PRINT("%s %s (%u)", sep,
+                    ND_PRINT(" %s (%u),",
                            tok2str(eap_type_values, "unknown", GET_U_1((cp + count))),
                            GET_U_1(cp + count));
-                    sep = ",";
                 }
                 break;
 
@@ -237,7 +234,7 @@ eap_print(netdissect_options *ndo,
                 if (subtype == EAP_TYPE_TTLS)
                     ND_PRINT(" TTLSv%u",
                            EAP_TTLS_VERSION(GET_U_1((cp + 5))));
-                ND_PRINT(" flags [%s] 0x%02x",
+                ND_PRINT(" flags [%s] 0x%02x,",
                        bittok2str(eap_tls_flags_values, "none", GET_U_1((cp + 5))),
                        GET_U_1(cp + 5));
 
@@ -246,7 +243,7 @@ eap_print(netdissect_options *ndo,
                         ND_PRINT(" (too short for EAP TLS/TTLS request/response with length)");
                         return;
                     }
-                    ND_PRINT(", len %u", GET_BE_U_4(cp + 6));
+                    ND_PRINT(" len %u", GET_BE_U_4(cp + 6));
                 }
                 break;
 
@@ -257,7 +254,7 @@ eap_print(netdissect_options *ndo,
                 }
                 ND_PRINT(" FASTv%u",
                        EAP_TTLS_VERSION(GET_U_1((cp + 5))));
-                ND_PRINT(" flags [%s] 0x%02x",
+                ND_PRINT(" flags [%s] 0x%02x,",
                        bittok2str(eap_tls_flags_values, "none", GET_U_1((cp + 5))),
                        GET_U_1(cp + 5));
 
@@ -266,7 +263,7 @@ eap_print(netdissect_options *ndo,
                         ND_PRINT(" (too short for EAP FAST request/response with length)");
                         return;
                     }
-                    ND_PRINT(", len %u", GET_BE_U_4(cp + 6));
+                    ND_PRINT(" len %u", GET_BE_U_4(cp + 6));
                 }
 
                 /* FIXME - TLV attributes follow */
@@ -278,7 +275,7 @@ eap_print(netdissect_options *ndo,
                     ND_PRINT(" (too short for EAP SIM/AKA request/response)");
                     return;
                 }
-                ND_PRINT(" subtype [%s] 0x%02x",
+                ND_PRINT(" subtype [%s] 0x%02x,",
                        tok2str(eap_aka_subtype_values, "unknown", GET_U_1((cp + 5))),
                        GET_U_1(cp + 5));
 
