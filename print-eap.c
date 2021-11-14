@@ -152,7 +152,7 @@ eap_print(netdissect_options *ndo,
           u_int length)
 {
     u_int type, subtype, len;
-    int count;
+    u_int count;
 
     type = GET_U_1(cp);
     len = GET_BE_U_2(cp + 2);
@@ -190,18 +190,15 @@ eap_print(netdissect_options *ndo,
                 break;
 
             case EAP_TYPE_NAK:
-                count = 5;
-
                 /*
                  * one or more octets indicating
                  * the desired authentication
                  * type one octet per type
                  */
-                while (count < (int)len) {
+                for (count = 5; count < len; count++) {
                     ND_PRINT(" %s (%u),",
                            tok2str(eap_type_values, "unknown", GET_U_1((cp + count))),
                            GET_U_1(cp + count));
-                    count++;
                 }
                 break;
 
