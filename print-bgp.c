@@ -2803,6 +2803,9 @@ bgp_update_print(netdissect_options *ndo,
     }
 
     if (len) {
+        /* Make sure the path attributes don't go past the end of the packet */
+        if (length < len)
+            goto trunc;
         /* do something more useful!*/
         while (len) {
             uint8_t aflags, atype, alenlen;
