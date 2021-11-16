@@ -959,7 +959,7 @@ ieee802_15_4_print_header_ie_list(netdissect_options *ndo,
 					 h_ie_names[element_id], ie_len);
 			}
 		}
-		if (caplen < 2 + ie_len) {
+		if (caplen < 2U + ie_len) {
 			ND_PRINT("[ERROR: Truncated IE data]");
 			return -1;
 		}
@@ -1441,7 +1441,7 @@ ieee802_15_4_print_payload_ie_list(netdissect_options *ndo,
 			ND_PRINT("\n\t%s [ length = %d, ",
 				 p_ie_names[group_id], ie_len);
 		}
-		if (caplen < 2 + ie_len) {
+		if (caplen < 2U + ie_len) {
 			ND_PRINT("[ERROR: Truncated IE data]");
 			return -1;
 		}
