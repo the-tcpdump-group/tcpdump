@@ -2,25 +2,19 @@
     241.0.128.39.179 > 239.0.0.1.0: Flags [none], seq 4144029695:4144095150, win 65535, options [eol], length 65455: BGP [|bgp]
 	Update Message (2), length: 45
 	  Withdrawn routes:
-	    (illegal prefix length)
-	  Unknown Attribute (195), length: 45823, Flags [TPE+b]:  [|bgp] [|bgp]
+	    (illegal prefix length) [|bgp] [|bgp]
 	Update Message (2), length: 45
 	  Withdrawn routes:
-	    (illegal prefix length)
-	  Unknown Attribute (195), length: 45823, Flags [TPE+b]:  [|bgp] [|bgp]
+	    (illegal prefix length) [|bgp] [|bgp]
 	Update Message (2), length: 45
 	  Withdrawn routes:
-	    (illegal prefix length)
-	  Unknown Attribute (195), length: 45823, Flags [TPE+b]:  [|bgp] [|bgp]
+	    (illegal prefix length) [|bgp] [|bgp]
 	Update Message (2), length: 45
 	  Withdrawn routes:
-	    (illegal prefix length)
-	  Unknown Attribute (195), length: 45823, Flags [TPE+b]:  [|bgp] [|bgp]
+	    (illegal prefix length) [|bgp] [|bgp]
 	Update Message (2), length: 45
 	  Withdrawn routes:
-	    (illegal prefix length)
-	  Unknown Attribute (195), length: 45571, Flags [TPE+b]:  [|bgp] [|bgp]
+	    (illegal prefix length) [|bgp] [|bgp]
 	Update Message (2), length: 45
 	  Withdrawn routes:
-	    (illegal prefix length)
-	  Unknown Attribute (195), length: 45823, Flags [TPE+b]:  [|bgp]
+	    (illegal prefix length) [|bgp]

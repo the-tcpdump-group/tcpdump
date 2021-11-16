@@ -53,7 +53,4 @@
 	    AFI: IPv4 (1), SAFI: labeled VPN Unicast (128)
 	      End-of-Rib Marker (empty NLRI)
 	    0x0000:  0001 80
-	Update Message (2), length: 30
-	  Unknown Attribute (0), length: 3, Flags [+f]: 
-	    no Attribute 0 decoder
-	    0x0000:  0001 05 [|bgp]
+	Update Message (2), length: 30 [|bgp]

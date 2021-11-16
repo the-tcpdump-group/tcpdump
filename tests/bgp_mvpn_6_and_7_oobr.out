@@ -2,8 +2,4 @@
     241.0.93.20.179 > 255.247.0.1.200: Flags [none], seq 2146691977:2146692450, win 56026, options [unknown-161,eol], length 473: BGP
 	Update Message (2), length: 45
 	  Withdrawn routes:
-	    255.123.0.0/16
-	  Attribute Set (128), length: 7, Flags [OTPE+f]: 
-	    Origin AS: 148
-	      Multi-Protocol Reach NLRI (14), length: 71, Flags [T+6]:  [path attr too short]
-	  Origin (1), length: 5invalid len [|bgp]
+	    255.123.0.0/16 [|bgp]

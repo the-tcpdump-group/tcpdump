@@ -96,40 +96,7 @@
 	Update Message (2), length: 202
 	  Withdrawn routes:
 	    0.0.0.0/0
-	    (illegal prefix length)
-	  Origin (1), length: 2, Flags [+1]: invalid len
-	    0x0000:  4002
-	  Attribute Set (128), length: 4
-	    Origin AS: 67108864
-	  Unknown Attribute (64), length: 5
-	    no Attribute 64 decoder
-	    0x0000:  0400 0000 64
-	  Extended Community (16), length: 8, Flags [OT]: 
-	    target (0x0002), Flags [none]: 19338:650 (= 0.0.2.138)
-	    0x0000:  0002 4b8a 0000 028a
-	  Cluster List (10), length: 4, Flags [O]: 172.17.0.0
-	    0x0000:  ac11 0000
-	  Originator ID (9), length: 4, Flags [O]: 172.17.0.5
-	    0x0000:  ac11 0005
-	  Multi-Protocol Reach NLRI (14), length: 129, Flags [OE]: 
-	    AFI: IPv4 (1), SAFI: labeled VPN Unicast (128)
-	    nexthop: RD: 0:0 (= 0.0.0.0), 172.17.0.5, nh-length: 12, no SNPA
-	      RD: 18826:650 (= 0.0.2.138), 172.17.33.0/27, label:1029 (bottom)
-	      RD: 18826:650 (= 0.0.2.138), 172.17.105.0/28, label:1029 (bottom)
-	      RD: 18826:650 (= 0.0.2.138), 172.17.105.32/28, label:1029 (bottom)
-	      RD: 18826:650 (= 0.0.2.138), 172.17.105.48/28, label:1029 (bottom)
-	      RD: 18826:650 (= 0.0.2.138), 172.17.192.128/28, label:1029 (bottom)
-	      RD: 18826:650 (= 0.0.2.138), 172.17.192.144/28, label:1029 (bottom)
-	      RD: 18826:650 (= 0.0.2.138), 172.17.30.64/26, label:1034 (bottom)
-	    0x0000:  0001 800c 0000 0000 0000 0000 ac11 0005
-	    0x0010:  0073 0040 5100 0049 8a00 0002 8aac 1121
-	    0x0020:  0074 0040 5100 0049 8a00 0002 8aac 1169
-	    0x0030:  0074 0040 5100 0049 8a00 0002 8aac 1169
-	    0x0040:  2074 0040 5100 0049 8a00 0002 8aac 1169
-	    0x0050:  3074 0040 5100 0049 8a00 0002 8aac 11c0
-	    0x0060:  8074 0040 5100 0049 8a00 0002 8aac 11c0
-	    0x0070:  9072 0040 a100 0049 8a00 0002 8aac 111e
-	    0x0080:  40 [|bgp]
+	    (illegal prefix length) [|bgp]
 	Update Message (2), length: 106
 	  Origin (1), length: 1, Flags [T]: Incomplete
 	    0x0000:  02
