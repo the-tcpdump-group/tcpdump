@@ -283,8 +283,8 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		goto invalid;
 
 	/* Print all the EID records */
-	while ((length > packet_offset) && (record_count--)) {
-
+	while ((length > packet_offset) && (record_count != 0)) {
+		record_count--;
 		ND_TCHECK_LEN(packet_iterator + packet_offset,
 			      MAP_REGISTER_EID_LEN);
 		ND_PRINT("\n");
@@ -326,7 +326,8 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 		ND_PRINT(" %u locator(s)", loc_count);
 
-		while (loc_count--) {
+		while (loc_count != 0) {
+			loc_count--;
 			ND_TCHECK_LEN(packet_iterator + packet_offset,
 				      MAP_REGISTER_LOC_LEN);
 			lisp_loc = (const lisp_map_register_loc *) (packet_iterator + packet_offset);
