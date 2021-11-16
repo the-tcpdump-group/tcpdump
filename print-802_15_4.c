@@ -959,7 +959,7 @@ ieee802_15_4_print_header_ie_list(netdissect_options *ndo,
 					 h_ie_names[element_id], ie_len);
 			}
 		}
-		if (caplen < ie_len) {
+		if (caplen < 2 + ie_len) {
 			ND_PRINT("[ERROR: Truncated IE data]");
 			return -1;
 		}
@@ -989,7 +989,7 @@ ieee802_15_4_print_header_ie_list(netdissect_options *ndo,
 		if (element_id == 0x7f) {
 			break;
 		}
-	} while (caplen > 0);
+	} while (caplen != 0);
 	return len;
 }
 
@@ -1282,7 +1282,7 @@ ieee802_15_4_print_mlme_ie_list(netdissect_options *ndo,
 				 p_mlme_long_names[sub_id], sub_ie_len);
 		}
 
-		if (ie_len < sub_ie_len) {
+		if (ie_len < 2 + sub_ie_len) {
 			ND_PRINT("[ERROR: Truncated IE data]");
 			return;
 		}
@@ -1441,7 +1441,7 @@ ieee802_15_4_print_payload_ie_list(netdissect_options *ndo,
 			ND_PRINT("\n\t%s [ length = %d, ",
 				 p_ie_names[group_id], ie_len);
 		}
-		if (caplen < ie_len) {
+		if (caplen < 2 + ie_len) {
 			ND_PRINT("[ERROR: Truncated IE data]");
 			return -1;
 		}
@@ -1798,7 +1798,8 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 	int len, frame_version, pan_id_comp;
 	int frame_type;
 	int src_pan, dst_pan, src_addr_len, dst_addr_len;
-	int security_level, miclen = 0;
+	int security_level;
+	u_int miclen = 0;
 	int payload_ie_present;
 	uint8_t seq;
 	uint32_t fcs, crc_check;
@@ -1857,14 +1858,22 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 		}
 		if (ndo->ndo_vflag)
 			ND_PRINT("seq suppressed ");
+		if (caplen < 2) {
+			nd_print_trunc(ndo);
+			return 0;
+		}
 		p += 2;
 		caplen -= 2;
 	} else {
 		seq = GET_U_1(p + 2);
-		p += 3;
-		caplen -= 3;
 		if (ndo->ndo_vflag)
 			ND_PRINT("seq %02x ", seq);
+		if (caplen < 3) {
+			nd_print_trunc(ndo);
+			return 0;
+		}
+		p += 3;
+		caplen -= 3;
 	}
 
 	/* See which parts of addresses we have. */
@@ -2048,8 +2057,8 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 	}
 
 	/* Remove MIC */
-	if (miclen > 0) {
-		if (caplen < (u_int) miclen) {
+	if (miclen != 0) {
+		if (caplen < miclen) {
 			ND_PRINT("[ERROR: Truncated before MIC]");
 			return 0;
 		}
@@ -2086,8 +2095,8 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 	if (ndo->ndo_vflag > 2 && miclen != 0) {
 		ND_PRINT("\n\tMIC ");
 
-		for(len = 0; len < miclen; len++) {
-			ND_PRINT("%02x", GET_U_1(mic_start + len));
+		for (u_int micoffset = 0; micoffset < miclen; micoffset++) {
+			ND_PRINT("%02x", GET_U_1(mic_start + micoffset));
 		}
 		ND_PRINT(" ");
 	}
@@ -2197,7 +2206,8 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 {
 	int len, frame_version, pan_id_present;
 	int src_addr_len, dst_addr_len;
-	int security_level, miclen = 0;
+	int security_level;
+	u_int miclen = 0;
 	int ie_present, payload_ie_present, security_enabled;
 	uint8_t seq;
 	uint32_t fcs, crc_check;
@@ -2265,14 +2275,22 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 		/* Check for the sequence number suppression. */
 		if (CHECK_BIT(fc, 10)) {
 			/* Sequence number is suppressed, but long version. */
+			if (caplen < 2) {
+				nd_print_trunc(ndo);
+				return 0;
+			}
 			p += 2;
 			caplen -= 2;
 		} else {
 			seq = GET_U_1(p + 2);
-			p += 3;
-			caplen -= 3;
 			if (ndo->ndo_vflag)
 				ND_PRINT("seq %02x ", seq);
+			if (caplen < 3) {
+				nd_print_trunc(ndo);
+				return 0;
+			}
+			p += 3;
+			caplen -= 3;
 		}
 	} else {
 		/* Short format of header, but with seq no */
@@ -2361,8 +2379,8 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 	}
 
 	/* Remove MIC */
-	if (miclen > 0) {
-		if (caplen < (u_int) miclen) {
+	if (miclen != 0) {
+		if (caplen < miclen) {
 			ND_PRINT("[ERROR: Truncated before MIC]");
 			return 0;
 		}
@@ -2400,8 +2418,8 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 	if (ndo->ndo_vflag > 2 && miclen != 0) {
 		ND_PRINT("\n\tMIC ");
 
-		for(len = 0; len < miclen; len++) {
-			ND_PRINT("%02x", GET_U_1(mic_start + len));
+		for (u_int micoffset = 0; micoffset < miclen; micoffset++) {
+			ND_PRINT("%02x", GET_U_1(mic_start + micoffset));
 		}
 		ND_PRINT(" ");
 	}
