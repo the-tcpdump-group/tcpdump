@@ -457,7 +457,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			ptp_print(ndo, cp, length);
 			break;
 		case PT_SOMEIP:
-			someip_print(ndo, cp, length);
+			someip_print(ndo, cp);
 			break;
 		case PT_DOMAIN:
 			/* over_tcp: FALSE, is_mdns: FALSE */
@@ -671,7 +671,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			IS_SRC_OR_DST_PORT(PTP_GENERAL_PORT)) {
 			ptp_print(ndo, cp, length);
 		} else if (IS_SRC_OR_DST_PORT(SOMEIP_PORT))
-			someip_print(ndo, cp, length);
+			someip_print(ndo, cp);
 		else if (IS_SRC_OR_DST_PORT(HTTPS_PORT) &&
 			 quic_detect(ndo, cp, length))
 			quic_print(ndo, cp, length);

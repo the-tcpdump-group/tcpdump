@@ -1,0 +1,54 @@
+    1  21:02:53.265970 IP6 fd00::eb:2.30490 > ff02::1.30490: SOMEIP, service 65535, event 256, len 60, client 0, session 1, pver 1, iver 1, msgtype NOTIFICATION, retcode E_OK
+	SOME/IP service discovery message, flags: 0xC0 (reboot) (unicast)
+	  OFFER_SERVICE: service_id 0x0080, instance_id 0x00C8, major_version 4, ttl 10, minor version 3
+    2  21:02:53.347051 IP6 fd00::eb:3.30490 > ff02::1.30490: SOMEIP, service 65535, event 256, len 36, client 0, session 1, pver 1, iver 1, msgtype NOTIFICATION, retcode E_OK
+	SOME/IP service discovery message, flags: 0xC0 (reboot) (unicast)
+	  FIND_SERVICE: service_id 0x0140, instance_id 0x0064, major_version 3, ttl 10, minor version 2
+    3  21:02:53.670119 IP6 fd00::eb:3.30490 > fd00::eb:2.30490: SOMEIP, service 65535, event 256, len 76, client 0, session 1, pver 1, iver 1, msgtype NOTIFICATION, retcode E_OK
+	SOME/IP service discovery message, flags: 0xC0 (reboot) (unicast)
+	  SUBSCRIBE: service_id 0x0080, instance_id 0x00C8, major_version 4, ttl 2, counter 0, eventgroup_id 0x0017
+	  SUBSCRIBE: service_id 0x0080, instance_id 0x00C8, major_version 4, ttl 2, counter 0, eventgroup_id 0x0018
+    4  21:02:53.672105 IP6 fd00::eb:2.30490 > fd00::eb:3.30490: SOMEIP, service 65535, event 256, len 76, client 0, session 1, pver 1, iver 1, msgtype NOTIFICATION, retcode E_OK
+	SOME/IP service discovery message, flags: 0xC0 (reboot) (unicast)
+	  SUBSCRIBE_ACK: service_id 0x0080, instance_id 0x00C8, major_version 4, ttl 2, counter 0, eventgroup_id 0x0017
+	  SUBSCRIBE_ACK: service_id 0x0080, instance_id 0x00C8, major_version 4, ttl 2, counter 0, eventgroup_id 0x0018
+    5  21:02:54.266221 IP6 fd00::eb:2.30490 > ff02::1.30490: SOMEIP, service 65535, event 256, len 60, client 0, session 2, pver 1, iver 1, msgtype NOTIFICATION, retcode E_OK
+	SOME/IP service discovery message, flags: 0xC0 (reboot) (unicast)
+	  OFFER_SERVICE: service_id 0x0080, instance_id 0x00C8, major_version 4, ttl 10, minor version 3
+    6  21:02:54.267753 IP6 fd00::eb:3.30490 > fd00::eb:2.30490: SOMEIP, service 65535, event 256, len 76, client 0, session 2, pver 1, iver 1, msgtype NOTIFICATION, retcode E_OK
+	SOME/IP service discovery message, flags: 0xC0 (reboot) (unicast)
+	  SUBSCRIBE: service_id 0x0080, instance_id 0x00C8, major_version 4, ttl 2, counter 0, eventgroup_id 0x0017
+	  SUBSCRIBE: service_id 0x0080, instance_id 0x00C8, major_version 4, ttl 2, counter 0, eventgroup_id 0x0018
+    7  21:02:54.268295 IP6 fd00::eb:2.30490 > fd00::eb:3.30490: SOMEIP, service 65535, event 256, len 76, client 0, session 2, pver 1, iver 1, msgtype NOTIFICATION, retcode E_OK
+	SOME/IP service discovery message, flags: 0xC0 (reboot) (unicast)
+	  SUBSCRIBE_ACK: service_id 0x0080, instance_id 0x00C8, major_version 4, ttl 2, counter 0, eventgroup_id 0x0017
+	  SUBSCRIBE_ACK: service_id 0x0080, instance_id 0x00C8, major_version 4, ttl 2, counter 0, eventgroup_id 0x0018
+    8  21:02:54.395051 IP6 fd00::eb:2.55309 > ff02::1.30490: SOMEIP, service 128, event 25, len 12, client 0, session 0, pver 1, iver 4, msgtype NOTIFICATION, retcode E_OK
+    9  21:02:54.395351 IP6 fd00::eb:2.55309 > ff02::1.30490: SOMEIP, service 128, event 30, len 12, client 0, session 0, pver 1, iver 4, msgtype NOTIFICATION, retcode E_OK
+   10  21:02:55.266937 IP6 fd00::eb:2.30490 > ff02::1.30490: SOMEIP, service 65535, event 256, len 60, client 0, session 3, pver 1, iver 1, msgtype NOTIFICATION, retcode E_OK
+	SOME/IP service discovery message, flags: 0xC0 (reboot) (unicast)
+	  OFFER_SERVICE: service_id 0x0080, instance_id 0x00C8, major_version 4, ttl 10, minor version 3
+   11  21:02:55.267563 IP6 fd00::eb:3.30490 > fd00::eb:2.30490: SOMEIP, service 65535, event 256, len 76, client 0, session 3, pver 1, iver 1, msgtype NOTIFICATION, retcode E_OK
+	SOME/IP service discovery message, flags: 0xC0 (reboot) (unicast)
+	  SUBSCRIBE: service_id 0x0080, instance_id 0x00C8, major_version 4, ttl 2, counter 0, eventgroup_id 0x0017
+	  SUBSCRIBE: service_id 0x0080, instance_id 0x00C8, major_version 4, ttl 2, counter 0, eventgroup_id 0x0018
+   12  21:02:55.267925 IP6 fd00::eb:2.30490 > fd00::eb:3.30490: SOMEIP, service 65535, event 256, len 76, client 0, session 3, pver 1, iver 1, msgtype NOTIFICATION, retcode E_OK
+	SOME/IP service discovery message, flags: 0xC0 (reboot) (unicast)
+	  SUBSCRIBE_ACK: service_id 0x0080, instance_id 0x00C8, major_version 4, ttl 2, counter 0, eventgroup_id 0x0017
+	  SUBSCRIBE_ACK: service_id 0x0080, instance_id 0x00C8, major_version 4, ttl 2, counter 0, eventgroup_id 0x0018
+   13  21:02:56.268317 IP6 fd00::eb:2.30490 > ff02::1.30490: SOMEIP, service 65535, event 256, len 60, client 0, session 4, pver 1, iver 1, msgtype NOTIFICATION, retcode E_OK
+	SOME/IP service discovery message, flags: 0xC0 (reboot) (unicast)
+	  OFFER_SERVICE: service_id 0x0080, instance_id 0x00C8, major_version 4, ttl 10, minor version 3
+   14  21:02:56.271193 IP6 fd00::eb:3.30490 > fd00::eb:2.30490: SOMEIP, service 65535, event 256, len 76, client 0, session 4, pver 1, iver 1, msgtype NOTIFICATION, retcode E_OK
+	SOME/IP service discovery message, flags: 0xC0 (reboot) (unicast)
+	  SUBSCRIBE: service_id 0x0080, instance_id 0x00C8, major_version 4, ttl 2, counter 0, eventgroup_id 0x0017
+	  SUBSCRIBE: service_id 0x0080, instance_id 0x00C8, major_version 4, ttl 2, counter 0, eventgroup_id 0x0018
+   15  21:02:56.271527 IP6 fd00::eb:2.30490 > fd00::eb:3.30490: SOMEIP, service 65535, event 256, len 76, client 0, session 4, pver 1, iver 1, msgtype NOTIFICATION, retcode E_OK
+	SOME/IP service discovery message, flags: 0xC0 (reboot) (unicast)
+	  SUBSCRIBE_ACK: service_id 0x0080, instance_id 0x00C8, major_version 4, ttl 2, counter 0, eventgroup_id 0x0017
+	  SUBSCRIBE_ACK: service_id 0x0080, instance_id 0x00C8, major_version 4, ttl 2, counter 0, eventgroup_id 0x0018
+   16  21:02:56.442223 IP6 fd00::eb:2.55309 > ff02::1.30490: SOMEIP, service 128, event 25, len 12, client 0, session 0, pver 1, iver 4, msgtype NOTIFICATION, retcode E_OK
+   17  21:02:56.442235 IP6 fd00::eb:2.55309 > ff02::1.30490: SOMEIP, service 128, event 30, len 12, client 0, session 0, pver 1, iver 4, msgtype NOTIFICATION, retcode E_OK
+   18  21:02:57.031126 IP6 fd00::eb:2.30490 > ff02::1.30490: SOMEIP, service 65535, event 256, len 60, client 0, session 5, pver 1, iver 1, msgtype NOTIFICATION, retcode E_OK
+	SOME/IP service discovery message, flags: 0xC0 (reboot) (unicast)
+	  OFFER_SERVICE(STOP): service_id 0x0080, instance_id 0x00C8, major_version 4, ttl 0, minor version 3

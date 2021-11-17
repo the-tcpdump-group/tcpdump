@@ -1,6 +1,10 @@
     1  17:47:06.889447 IP 192.168.88.8.30490 > 192.168.88.8.31490: SOMEIP, service 65535, event 256, len 64, client 0, session 0, pver 1, iver 1, msgtype NOTIFICATION, retcode E_OK
-
+	SOME/IP service discovery message, flags: 0x80 (reboot)
+	  FIND_SERVICE: service_id 0x4711, instance_id 0xFFFF, major_version 255 (all), ttl 3600, minor version 4294967295 (all)
+	  OFFER_SERVICE: service_id 0x1234, instance_id 0x0001, major_version 1, ttl 3, minor version 50
     2  17:47:08.944638 IP 192.168.88.8.31490 > 192.168.88.8.30490: SOMEIP, service 65535, event 256, len 48, client 0, session 0, pver 1, iver 1, msgtype NOTIFICATION, retcode E_OK
-
+	SOME/IP service discovery message, flags: 0x00
+	  SUBSCRIBE: service_id 0x1111, instance_id 0x2222, major_version 3, ttl 5, counter 0, eventgroup_id 0x0004
     3  17:47:10.935734 IP 192.168.88.8.30490 > 192.168.88.8.31490: SOMEIP, service 65535, event 256, len 48, client 0, session 0, pver 1, iver 1, msgtype NOTIFICATION, retcode E_OK
-
+	SOME/IP service discovery message, flags: 0x00
+	  SUBSCRIBE_ACK: service_id 0x1111, instance_id 0x2222, major_version 3, ttl 5, counter 0, eventgroup_id 0x0004

@@ -870,6 +870,7 @@ igrp-oobr	igrp-oobr.pcap		igrp-oobr.out		-v
 #someip tests
 someip1		someip1.pcap	someip1.out
 someip2		someip2.pcap	someip2.out
+someip3		someip3.pcap    someip3.out
 
 # EDNS Options
 edns-opts       edns-opts.pcap      edns-opts.out
