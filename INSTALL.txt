@@ -5,9 +5,9 @@ need to install a "developer" version of libpcap as well as the
 "run-time" version.  You can also install tcpdump.org's version of
 libpcap; see the README.md file in this directory for the location.
 
-You will need an ANSI C compiler to build tcpdump. The configure script
-will abort if your compiler is not ANSI compliant. If this happens, use
-the generally available GNU C compiler (GCC).
+You will need a C99 compiler to build tcpdump.  The build system
+will abort if your compiler is not C99 compliant.  If this happens, use
+the generally available GNU C compiler (GCC) or Clang.
 
 After libpcap has been built (either install it with "make install" or
 make sure both the libpcap and tcpdump source trees are in the same
@@ -25,7 +25,11 @@ utilities such as tcpdump to capture any traffic on your net, including
 passwords.
 
 Note that most systems ship tcpdump, but usually an older version.
-Remember to remove or rename the installed binary when upgrading.
+Building tcpdump from source as explained above will usually install the
+binary as "/usr/local/bin/tcpdump".  If your system has other tcpdump
+binaries, you might need to deinstall these or to set the PATH environment
+variable if you need the "tcpdump" command to run the new binary
+("tcpdump --version" can be used to tell different versions apart).
 
 If your system is not one which we have tested tcpdump on, you may have
 to modify the configure script and Makefile.in. Please send us patches
