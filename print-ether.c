@@ -150,13 +150,14 @@ ether_common_print(netdissect_options *ndo, const u_char *p, u_int length,
 	int llc_hdrlen;
 	struct lladdr_info src, dst;
 
+	if (length < caplen) {
+		ND_PRINT("[length %u < caplen %u]", length, caplen);
+		nd_print_invalid(ndo);
+		return length;
+	}
 	if (caplen < ETHER_HDRLEN + switch_tag_len) {
 		nd_print_trunc(ndo);
 		return caplen;
-	}
-	if (length < ETHER_HDRLEN + switch_tag_len) {
-		nd_print_trunc(ndo);
-		return length;
 	}
 
 	if (print_encap_header != NULL)
