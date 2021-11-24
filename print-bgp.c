@@ -915,7 +915,7 @@ bgp_rt_prefix_print(netdissect_options *ndo,
                     u_int plen)
 {
     /* allocate space for the largest possible string */
-    char rtc_prefix_in_hex[20] = "";
+    char rtc_prefix_in_hex[sizeof("0000 0000 0000 0000")] = "";
     u_int rtc_prefix_in_hex_len = 0;
     static char output[61]; /* max response string */
     /* allocate space for the largest possible string */
