@@ -253,7 +253,7 @@ units of KiB (1024 bytes).
 Exit after receiving \fIcount\fP packets.
 .TP
 .BI \-\-count
-Print only on stderr the packet count when reading capture file(s) instead
+Print only on stdout the packet count when reading capture file(s) instead
 of parsing/printing the packets. If a filter is specified on the command
 line, \fItcpdump\fP counts only packets that were matched by the filter
 expression.
