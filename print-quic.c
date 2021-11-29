@@ -226,7 +226,8 @@ quic_print_packet(netdissect_options *ndo, const u_char *bp, const u_char *end)
 			}
 			if (packet_type == QUIC_LH_TYPE_RETRY) {
 				ND_PRINT(", token ");
-				if (end > bp && end - bp > 16) {
+				if (end > bp && end - bp > 16 &&
+				    ND_TTEST_LEN(bp, end - bp - 16)) {
 					token_length = end - bp - 16;
 					token = nd_malloc(ndo, (size_t)token_length);
 					GET_CPY_BYTES(token, bp, (size_t)token_length);
@@ -252,7 +253,8 @@ quic_print_packet(netdissect_options *ndo, const u_char *bp, const u_char *end)
 	} else {
 		/* Short Header */
 		ND_PRINT(", protected");
-		if (ND_TTEST_LEN(bp, 16)) {
+		if (end > bp && end - bp > 16 &&
+		    ND_TTEST_LEN(bp, end - bp)) {
 			struct quic_cid_array *cid_array =
 				lookup_quic_cid(bp, end - bp);
 			if (cid_array != NULL) {
