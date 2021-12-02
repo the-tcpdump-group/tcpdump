@@ -121,7 +121,7 @@ sub runtest {
             $status = $!;
             printf OUTPUT "FAILED TO RUN: status: %d\n", $status;
         } else {
-            if ($^O eq 'MSWin32') {
+            if ($^O eq 'MSWin32' or $^O eq 'msys') {
                 #
                 # On Windows, the return value of system is the lower 8
                 # bits of the exit status of the process, shifted left
