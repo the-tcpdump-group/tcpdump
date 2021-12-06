@@ -368,7 +368,7 @@ with cryptography enabled.
 \fIsecret\fP is the ASCII text for ESP secret key.
 If preceded by 0x, then a hex value will be read.
 .IP
-The option assumes RFC2406 ESP, not RFC1827 ESP.
+The option assumes RFC 2406 ESP, not RFC 1827 ESP.
 The option is only for debugging purposes, and
 the use of this option with a true `secret' key is discouraged.
 By presenting IPsec secret key onto command line
@@ -1163,7 +1163,7 @@ As on FDDI networks,
 packets are assumed to contain an LLC packet.
 .LP
 \fI(N.B.: The following description assumes familiarity with
-the SLIP compression algorithm described in RFC-1144.)\fP
+the SLIP compression algorithm described in RFC 1144.)\fP
 .LP
 On SLIP links, a direction indicator (``I'' for inbound, ``O'' for outbound),
 packet type, and compression information are printed out.
@@ -1284,7 +1284,7 @@ flag, in the IP header information, as described above.
 TCP Packets
 .LP
 \fI(N.B.:The following description assumes familiarity with
-the TCP protocol described in RFC-793.
+the TCP protocol described in RFC 793.
 If you are not familiar
 with the protocol, this description will not
 be of much use to you.)\fP
@@ -1610,13 +1610,13 @@ The packet contained 84 bytes of user data.
 .LP
 Some UDP services are recognized (from the source or destination
 port number) and the higher level protocol information printed.
-In particular, Domain Name service requests (RFC-1034/1035) and Sun
-RPC calls (RFC-1050) to NFS.
+In particular, Domain Name service requests (RFC 1034/1035) and Sun
+RPC calls (RFC 1050) to NFS.
 .HD
 TCP or UDP Name Server Requests
 .LP
 \fI(N.B.:The following description assumes familiarity with
-the Domain Service protocol described in RFC-1035.
+the Domain Service protocol described in RFC 1035.
 If you are not familiar
 with the protocol, the following description will appear to be written
 in Greek.)\fP
