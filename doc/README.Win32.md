@@ -26,48 +26,43 @@ only if there is some other requirement to use it rather than Npcap,
 such as a requirement to support versions of Windows earlier than
 Windows Vista, which is the earliest version supported by Npcap.
 
-Npcap and its SDK can be downloaded from its home page:
-
-  https://npcap.org
-
-The SDK is a ZIP archive; create a folder on your C: drive, e.g.
-C:\npcap-sdk, and put the contents of the ZIP archive into that folder.
+Npcap and its SDK can be downloaded from its [home page](https://npcap.org).
+The SDK is a ZIP archive; create a folder on your `C:` drive, e.g.
+`C:\npcap-sdk`, and put the contents of the ZIP archive into that folder.
 
 The WinPcap installer can be downloaded from
-
-  https://www.winpcap.org/install/default.htm
-
+[here](https://www.winpcap.org/install/default.htm)
 and the WinPcap Developer's Kit can be downloaded from
-
-  https://www.winpcap.org/devel.htm
+[here](https://www.winpcap.org/devel.htm).
 
 Required build tools
 --------------------
 
 The Developer's Kit is a ZIP archive; it contains a folder named
-WpdPack, which you should place on your C: drive, e.g. C:\WpdPack.
+`WpdPack`, which you should place on your `C:` drive, e.g. `C:\WpdPack`.
 
 Building tcpdump on Windows requires Visual Studio 2015 or later.  The
 Community Edition of Visual Studio can be downloaded at no cost from
-
-  https://visualstudio.microsoft.com
+[here](https://visualstudio.microsoft.com).
 
 Additional tools are also required.  Chocolatey is a package manager for
 Windows with which those tools, and other tools, can be installed; it
-can be downloaded from
-
-  https://chocolatey.org
+can be downloaded from [here](https://chocolatey.org).
 
 It is a command-line tool; a GUI tool, Chocolatey GUI, is provided as a
 Chocolatey package, which can be installed from the command line:
 
-	choco install chocolateygui
+```
+choco install chocolateygui
+```
 
-For convenience, the "choco install" command can be run with the "-y"
+For convenience, the `choco install` command can be run with the `-y`
 flag, forcing it to automatically answer all questions asked of the user
 with "yes":
 
-	choco install -y chocolateygui
+```
+choco install -y chocolateygui
+```
 
 The required tools are:
 
@@ -77,27 +72,26 @@ libpcap does not provide supported project files for Visual Studio
 (there are currently unsupported project files provided, but we do not
 guarantee that they will work or that we will continue to provide them).
 It does provide files for CMake, which is a cross-platform tool that
-runs on UN*Xes and on Windows and that can generate project files for
-UN*X Make, the Ninja build system, and Visual Studio, among other build
+runs on UN\*Xes and on Windows and that can generate project files for
+UN\*X Make, the Ninja build system, and Visual Studio, among other build
 systems.
 
 Visual Studio 2015 does not provide CMake; an installer can be
-downloaded from
-
-  https://cmake.org/download/
+downloaded from [here](https://cmake.org/download/).
 
 When you run the installer, you should choose to add CMake to the system
-PATH for all users and to create the desktop icon.
+`PATH` for all users and to create the desktop icon.
 
-CMake can also be installed as the Chocolatey package "cmake":
+CMake can also be installed as the Chocolatey package `cmake`:
 
-	choco install -y cmake
+```
+choco install -y cmake
+```
 
 Visual Studio 2017 and later provide CMake, so you will not need to
 install CMake if you have installed Visual Studio 2017 or later.  They
-include built-in support for CMake-based projects:
-
-  https://devblogs.microsoft.com/cppblog/cmake-support-in-visual-studio/
+include built-in support for CMake-based projects as described
+[here](https://devblogs.microsoft.com/cppblog/cmake-support-in-visual-studio/).
 
 For Visual Studio 2017, make sure "Visual C++ tools for CMake" is
 installed; for Visual Studio 2019, make sure "C++ CMake tools for
@@ -127,14 +121,16 @@ Debug build.
 
 In the CMakeSettings.json tab, change cmakeCommandArgs to include
 
-	-DPacket_ROOT={path-to-sdk}
+```
+-DPacket_ROOT={path-to-sdk}
+```
 
-where {path-to-sdk} is the path of the directory containing the Npcap or
+where `{path-to-sdk}` is the path of the directory containing the Npcap or
 WinPcap SDK.  Note that backslashes in the path must be specified as two
 backslashes.
 
 Save the configuration changes with File > "Save CMakeSettings.json" or
-with control-S.
+with Control-S.
 
 Visual Studio will then re-run CMake.  If that completes without errors,
 you can build with CMake > "Build All".
@@ -156,7 +152,7 @@ the directory containing the Npcap or WinPcap SDK or use the "Browse..."
 button to browse for that directory.
 
 Save the configuration changes with File > "Save CMakeSettings.json" or
-with control-S.
+with Control-S.
 
 Visual Studio will then re-run CMake.  If that completes without errors,
 you can build with Build > "Build All".
@@ -172,27 +168,31 @@ of the tcpdump source directory.
 
 Run the command
 
-    cmake "-DPacket_ROOT={path-to-sdk}" -G {generator} {path-to-tcpdump-source}
+```
+cmake "-DPacket_ROOT={path-to-sdk}" -G {generator} {path-to-tcpdump-source}
+```
 
-{path-to-sdk} is the path of the directory containing the Npcap or
+`{path-to-sdk}` is the path of the directory containing the Npcap or
 WinPcap SDK.
 
-{generator} is the string "Visual Studio N YYYY", where "N" is the
-version of Visual Studio and "YYYY" is the year number for that version;
-if you are building a 64-bit version of tcpdump, YYYY must be followed
+`{generator}` is the string "Visual Studio N YYYY", where `N` is the
+version of Visual Studio and `YYYY` is the year number for that version;
+if you are building a 64-bit version of tcpdump, `YYYY` must be followed
 by a space and "Win64".  For example, to build a 32-bit version of
-tcpdump with Visual Studio 2017, "{generator}" would be "Visual Studio
+tcpdump with Visual Studio 2017, `{generator}` would be "Visual Studio
 15 2017" and to build a 64-bit version of tcpdump with Visual Studio
-2017, "{generator}" would be "Visual Studio 15 2017 Win64".
+2017, `{generator}` would be "Visual Studio 15 2017 Win64".
 
-{path-to-tcpdump-source} is the pathname of the top-level source
+`{path-to-tcpdump-source}` is the pathname of the top-level source
 directory for tcpdump.
 
 Run the command
 
-    msbuild /m /nologo /p:Configuration={configuration} tcpdump.sln
+```
+msbuild /m /nologo /p:Configuration={configuration} tcpdump.sln
+```
 
-where {configuration} can be "Release", "Debug", or "RelWithDebInfo".
+where `{configuration}` can be "Release", "Debug", or "RelWithDebInfo".
 
 Building with MinGW
 -------------------
