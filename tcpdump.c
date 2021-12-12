@@ -2065,7 +2065,9 @@ main(int argc, char **argv)
 	/* if run as root, prepare for dropping root privileges */
 	if (getuid() == 0 || geteuid() == 0) {
 		/* Run with '-Z root' to restore old behaviour */
-		if (!username)
+		if (username && strcmp(username, "root") == 0)
+			username = NULL;
+		else if (!username)
 			username = WITH_USER;
 	}
 #endif
