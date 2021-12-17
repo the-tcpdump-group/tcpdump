@@ -236,6 +236,7 @@ static int timeout = 1000;		/* default timeout = 1000 ms = 1 s */
 static int immediate_mode;
 #endif
 static int count_mode;
+static int capture_sampling_nth = 1;	/* Capture of 1 every N packets received */
 
 static int infodelay;
 static int infoprint;
@@ -249,6 +250,9 @@ static void child_cleanup(int);
 static void print_version(FILE *);
 static void print_usage(FILE *);
 
+
+static void capture_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp);
+static pcap_handler process_callback;		/* process packets with one of the following three functions: */
 static void print_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void dump_packet_and_trunc(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void dump_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
@@ -269,6 +273,7 @@ static void flushpcap(int);
 #endif /* _WIN32 */
 
 static void info(int);
+static u_int packets_received;
 static u_int packets_captured;
 
 #ifdef HAVE_PCAP_FINDALLDEVS
@@ -692,6 +697,7 @@ show_remote_devices_and_exit(void)
 #define OPTION_FP_TYPE			135
 #define OPTION_COUNT			136
 #define OPTION_PRINT_SAMPLING		137
+#define OPTION_CAPTURE_SAMPLING		138
 
 static const struct option longopts[] = {
 #if defined(HAVE_PCAP_CREATE) || defined(_WIN32)
@@ -740,6 +746,7 @@ static const struct option longopts[] = {
 	{ "number", no_argument, NULL, '#' },
 	{ "print", no_argument, NULL, OPTION_PRINT },
 	{ "print-sampling", required_argument, NULL, OPTION_PRINT_SAMPLING },
+	{ "sampling", required_argument, NULL, OPTION_CAPTURE_SAMPLING },
 	{ "version", no_argument, NULL, OPTION_VERSION },
 	{ NULL, 0, NULL, 0 }
 };
@@ -1455,7 +1462,6 @@ main(int argc, char **argv)
 	bpf_u_int32 localnet = 0, netmask = 0;
 	char *cp, *infile, *cmdbuf, *device, *RFileName, *VFileName, *WFileName;
 	char *endp;
-	pcap_handler callback;
 	int dlt;
 	const char *dlt_name;
 	struct bpf_program fcode;
@@ -1995,6 +2001,14 @@ main(int argc, char **argv)
 			count_mode = 1;
 			break;
 
+		case OPTION_CAPTURE_SAMPLING:
+			/* -S is enabled automatically */
+			++ndo->ndo_Sflag;
+			capture_sampling_nth = atoi(optarg);
+			if (capture_sampling_nth <= 0)
+				error("invalid capture sampling %s", optarg);
+			break;
+
 		default:
 			print_usage(stderr);
 			exit_tcpdump(S_ERR_HOST_PROGRAM);
@@ -2492,12 +2506,12 @@ DIAG_ON_ASSIGN_ENUM
 #else	/* !HAVE_CAPSICUM */
 			dumpinfo.WFileName = WFileName;
 #endif
-			callback = dump_packet_and_trunc;
+			process_callback = dump_packet_and_trunc;
 			dumpinfo.pd = pd;
 			dumpinfo.pdd = pdd;
 			pcap_userdata = (u_char *)&dumpinfo;
 		} else {
-			callback = dump_packet;
+			process_callback = dump_packet;
 			dumpinfo.WFileName = WFileName;
 			dumpinfo.pd = pd;
 			dumpinfo.pdd = pdd;
@@ -2517,7 +2531,7 @@ DIAG_ON_ASSIGN_ENUM
 	} else {
 		dlt = pcap_datalink(pd);
 		ndo->ndo_if_printer = get_if_printer(dlt);
-		callback = print_packet;
+		process_callback = print_packet;
 		pcap_userdata = (u_char *)ndo;
 	}
 
@@ -2607,7 +2621,7 @@ DIAG_ON_ASSIGN_ENUM
 #endif	/* HAVE_CAPSICUM */
 
 	do {
-		status = pcap_loop(pd, cnt, callback, pcap_userdata);
+		status = pcap_loop(pd, cnt, capture_packet, pcap_userdata);
 		if (WFileName == NULL) {
 			/*
 			 * We're printing packets.  Flush the printed output,
@@ -2911,13 +2925,34 @@ compress_savefile(const char *filename)
 #endif /* HAVE_FORK && HAVE_VFORK */
 
 static void
+capture_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
+{
+	/*
+	 * Apply 1 in N capture sampling to received packets.
+	 * For a given value N, the first N-1 packets are discarded.
+	 * The default value for capture_sampling_nth is 1, meaning
+	 * all packets are captured.
+	 */
+	++packets_received;
+	if (packets_received % capture_sampling_nth != 0)
+		return;
+
+	/* Capture the received packet  */
+
+	++packets_captured;
+	++infodelay;
+
+	process_callback(user, h, sp);
+
+	--infodelay;
+	if (infoprint)
+		info(0);
+}
+
+static void
 dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
 	struct dump_info *dump_info;
-
-	++packets_captured;
-
-	++infodelay;
 
 	dump_info = (struct dump_info *)user;
 
@@ -3119,20 +3154,12 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 
 	if (dump_info->ndo != NULL)
 		pretty_print_packet(dump_info->ndo, h, sp, packets_captured);
-
-	--infodelay;
-	if (infoprint)
-		info(0);
 }
 
 static void
 dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
 	struct dump_info *dump_info;
-
-	++packets_captured;
-
-	++infodelay;
 
 	dump_info = (struct dump_info *)user;
 
@@ -3144,25 +3171,13 @@ dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 
 	if (dump_info->ndo != NULL)
 		pretty_print_packet(dump_info->ndo, h, sp, packets_captured);
-
-	--infodelay;
-	if (infoprint)
-		info(0);
 }
 
 static void
 print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
-	++packets_captured;
-
-	++infodelay;
-
 	if (!count_mode)
 		pretty_print_packet((netdissect_options *)user, h, sp, packets_captured);
-
-	--infodelay;
-	if (infoprint)
-		info(0);
 }
 
 #ifdef SIGNAL_REQ_INFO
