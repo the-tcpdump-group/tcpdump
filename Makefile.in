@@ -334,7 +334,7 @@ EXTRA_DIST = \
 	CONTRIBUTING \
 	CREDITS \
 	CMakeLists.txt \
-	INSTALL.txt \
+	INSTALL.md \
 	LICENSE \
 	Makefile.in \
 	Makefile-devel-adds \
