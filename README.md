@@ -46,7 +46,7 @@ build libpcap.
 
 Once libpcap is built (either install it or make sure it's in
 `../libpcap`), you can build tcpdump using the procedure in the
-[installation guide](INSTALL.txt).
+[installation notes](INSTALL.md).
 
 ### Origins of tcpdump
 The program is loosely based on SMI's "etherfind" although none of the
