@@ -39,6 +39,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtostr.h"
 #include "extract.h"
@@ -81,9 +82,7 @@ gre_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	u_int len = length, vers;
 
 	ndo->ndo_protocol = "gre";
-	ND_TCHECK_2(bp);
-	if (len < 2)
-		goto trunc;
+	ND_LCHECK_U(len, 2);
 	vers = GET_BE_U_2(bp) & GRE_VERS_MASK;
 	ND_PRINT("GREv%u",vers);
 
@@ -100,8 +99,8 @@ gre_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	}
 	return;
 
-trunc:
-	nd_print_trunc(ndo);
+invalid:
+	nd_print_invalid(ndo);
 }
 
 static void
@@ -110,7 +109,7 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 	u_int len = length;
 	uint16_t flags, prot;
 
-	/* 16 bits ND_TCHECKed in gre_print() */
+	ND_LCHECK_U(len, 2);
 	flags = GET_BE_U_2(bp);
 	if (ndo->ndo_vflag)
 		ND_PRINT(", Flags [%s]",
@@ -119,43 +118,36 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 	len -= 2;
 	bp += 2;
 
-	ND_TCHECK_2(bp);
-	if (len < 2)
-		goto trunc;
+	ND_LCHECK_U(len, 2);
 	prot = GET_BE_U_2(bp);
 	len -= 2;
 	bp += 2;
 
 	if ((flags & GRE_CP) | (flags & GRE_RP)) {
-		ND_TCHECK_2(bp);
-		if (len < 2)
-			goto trunc;
+		uint16_t sum;
+
+		ND_LCHECK_U(len, 2);
+		sum =  GET_BE_U_2(bp);
 		if (ndo->ndo_vflag)
-			ND_PRINT(", sum 0x%x", GET_BE_U_2(bp));
+			ND_PRINT(", sum 0x%x", sum);
 		bp += 2;
 		len -= 2;
 
-		ND_TCHECK_2(bp);
-		if (len < 2)
-			goto trunc;
+		ND_LCHECK_U(len, 2);
 		ND_PRINT(", off 0x%x", GET_BE_U_2(bp));
 		bp += 2;
 		len -= 2;
 	}
 
 	if (flags & GRE_KP) {
-		ND_TCHECK_4(bp);
-		if (len < 4)
-			goto trunc;
+		ND_LCHECK_U(len, 4);
 		ND_PRINT(", key=0x%x", GET_BE_U_4(bp));
 		bp += 4;
 		len -= 4;
 	}
 
 	if (flags & GRE_SP) {
-		ND_TCHECK_4(bp);
-		if (len < 4)
-			goto trunc;
+		ND_LCHECK_U(len, 4);
 		ND_PRINT(", seq %u", GET_BE_U_4(bp));
 		bp += 4;
 		len -= 4;
@@ -167,9 +159,7 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 			uint8_t sreoff;
 			uint8_t srelen;
 
-			ND_TCHECK_4(bp);
-			if (len < 4)
-				goto trunc;
+			ND_LCHECK_U(len, 4);
 			af = GET_BE_U_2(bp);
 			sreoff = GET_U_1(bp + 2);
 			srelen = GET_U_1(bp + 3);
@@ -180,10 +170,9 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 				break;
 
 			if (!gre_sre_print(ndo, af, sreoff, srelen, bp, len))
-				goto trunc;
+				goto invalid;
 
-			if (len < srelen)
-				goto trunc;
+			ND_LCHECK_U(len, srelen);
 			bp += srelen;
 			len -= srelen;
 		}
@@ -227,8 +216,8 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 	}
 	return;
 
-trunc:
-	nd_print_trunc(ndo);
+invalid:
+	nd_print_invalid(ndo);
 }
 
 static void
@@ -237,7 +226,7 @@ gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 	u_int len = length;
 	uint16_t flags, prot;
 
-	/* 16 bits ND_TCHECKed in gre_print() */
+	ND_LCHECK_U(len, 2);
 	flags = GET_BE_U_2(bp);
 	len -= 2;
 	bp += 2;
@@ -246,9 +235,7 @@ gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 		ND_PRINT(", Flags [%s]",
 			 bittok2str(gre_flag_values,"none",flags));
 
-	ND_TCHECK_2(bp);
-	if (len < 2)
-		goto trunc;
+	ND_LCHECK_U(len, 2);
 	prot = GET_BE_U_2(bp);
 	len -= 2;
 	bp += 2;
@@ -257,9 +244,7 @@ gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 	if (flags & GRE_KP) {
 		uint32_t k;
 
-		ND_TCHECK_4(bp);
-		if (len < 4)
-			goto trunc;
+		ND_LCHECK_U(len, 4);
 		k = GET_BE_U_4(bp);
 		ND_PRINT(", call %u", k & 0xffff);
 		len -= 4;
@@ -267,18 +252,14 @@ gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 	}
 
 	if (flags & GRE_SP) {
-		ND_TCHECK_4(bp);
-		if (len < 4)
-			goto trunc;
+		ND_LCHECK_U(len, 4);
 		ND_PRINT(", seq %u", GET_BE_U_4(bp));
 		bp += 4;
 		len -= 4;
 	}
 
 	if (flags & GRE_AP) {
-		ND_TCHECK_4(bp);
-		if (len < 4)
-			goto trunc;
+		ND_LCHECK_U(len, 4);
 		ND_PRINT(", ack %u", GET_BE_U_4(bp));
 		bp += 4;
 		len -= 4;
@@ -311,8 +292,8 @@ gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 	}
 	return;
 
-trunc:
-	nd_print_trunc(ndo);
+invalid:
+	nd_print_invalid(ndo);
 }
 
 static int
@@ -348,22 +329,21 @@ gre_sre_ip_print(netdissect_options *ndo, uint8_t sreoff, uint8_t srelen,
 
 	if (sreoff & 3) {
 		ND_PRINT(", badoffset=%u", sreoff);
-		return (1);
+		goto invalid;
 	}
 	if (srelen & 3) {
 		ND_PRINT(", badlength=%u", srelen);
-		return (1);
+		goto invalid;
 	}
 	if (sreoff >= srelen) {
 		ND_PRINT(", badoff/len=%u/%u", sreoff, srelen);
-		return (1);
+		goto invalid;
 	}
 
 	while (srelen != 0) {
-		ND_TCHECK_4(bp);
-		if (len < 4)
-			return (0);
+		ND_LCHECK_U(len, 4);
 
+		ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 		addrtostr(bp, buf, sizeof(buf));
 		ND_PRINT(" %s%s",
 			 ((bp - up) == sreoff) ? "*" : "", buf);
@@ -372,8 +352,9 @@ gre_sre_ip_print(netdissect_options *ndo, uint8_t sreoff, uint8_t srelen,
 		len -= 4;
 		srelen -= 4;
 	}
-	return (1);
-trunc:
+	return 1;
+
+invalid:
 	return 0;
 }
 
@@ -385,21 +366,19 @@ gre_sre_asn_print(netdissect_options *ndo, uint8_t sreoff, uint8_t srelen,
 
 	if (sreoff & 1) {
 		ND_PRINT(", badoffset=%u", sreoff);
-		return (1);
+		goto invalid;
 	}
 	if (srelen & 1) {
 		ND_PRINT(", badlength=%u", srelen);
-		return (1);
+		goto invalid;
 	}
 	if (sreoff >= srelen) {
 		ND_PRINT(", badoff/len=%u/%u", sreoff, srelen);
-		return (1);
+		goto invalid;
 	}
 
 	while (srelen != 0) {
-		ND_TCHECK_2(bp);
-		if (len < 2)
-			return (0);
+		ND_LCHECK_U(len, 2);
 
 		ND_PRINT(" %s%x",
 			 ((bp - up) == sreoff) ? "*" : "", GET_BE_U_2(bp));
@@ -408,7 +387,8 @@ gre_sre_asn_print(netdissect_options *ndo, uint8_t sreoff, uint8_t srelen,
 		len -= 2;
 		srelen -= 2;
 	}
-	return (1);
-trunc:
+	return 1;
+
+invalid:
 	return 0;
 }
