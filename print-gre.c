@@ -79,19 +79,20 @@ static int gre_sre_asn_print(netdissect_options *, uint8_t, uint8_t, const u_cha
 void
 gre_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
-	u_int len = length, vers;
+	u_int vers;
 
 	ndo->ndo_protocol = "gre";
-	ND_LCHECK_U(len, 2);
+	nd_print_protocol_caps(ndo);
+	ND_LCHECK_U(length, 2);
 	vers = GET_BE_U_2(bp) & GRE_VERS_MASK;
-	ND_PRINT("GREv%u",vers);
+	ND_PRINT("v%u",vers);
 
 	switch(vers) {
 	case 0:
-		gre_print_0(ndo, bp, len);
+		gre_print_0(ndo, bp, length);
 		break;
 	case 1:
-		gre_print_1(ndo, bp, len);
+		gre_print_1(ndo, bp, length);
 		break;
 	default:
 		ND_PRINT(" ERROR: unknown-version");
