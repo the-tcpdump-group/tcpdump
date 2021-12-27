@@ -1268,7 +1268,7 @@ juniper_parse_header(netdissect_options *ndo,
                      const u_char *p, const struct pcap_pkthdr *h, struct juniper_l2info_t *l2info)
 {
     const struct juniper_cookie_table_t *lp = juniper_cookie_table;
-    u_int idx, jnx_ext_len, jnx_header_len = 0;
+    u_int idx, extension_length, jnx_header_len = 0;
     uint8_t tlv_type,tlv_len;
 #ifdef DLT_JUNIPER_ATM2
     uint32_t control_word;
@@ -1308,20 +1308,20 @@ juniper_parse_header(netdissect_options *ndo,
         tptr = p+jnx_header_len;
 
         /* ok to read extension length ? */
-        jnx_ext_len = GET_BE_U_2(tptr);
+        extension_length = GET_BE_U_2(tptr);
         jnx_header_len += 2;
         tptr +=2;
 
         /* nail up the total length -
          * just in case something goes wrong
          * with TLV parsing */
-        jnx_header_len += jnx_ext_len;
+        jnx_header_len += extension_length;
 
         if (ndo->ndo_vflag > 1)
-            ND_PRINT(", PCAP Extension(s) total length %u", jnx_ext_len);
+            ND_PRINT(", PCAP Extension(s) total length %u", extension_length);
 
-        ND_TCHECK_LEN(tptr, jnx_ext_len);
-        while (jnx_ext_len > JUNIPER_EXT_TLV_OVERHEAD) {
+        ND_TCHECK_LEN(tptr, extension_length);
+        while (extension_length > JUNIPER_EXT_TLV_OVERHEAD) {
             tlv_type = GET_U_1(tptr);
             tptr++;
             tlv_len = GET_U_1(tptr);
@@ -1331,7 +1331,7 @@ juniper_parse_header(netdissect_options *ndo,
             /* sanity checks */
             if (tlv_type == 0 || tlv_len == 0)
                 break;
-            if (tlv_len+JUNIPER_EXT_TLV_OVERHEAD > jnx_ext_len)
+            if (tlv_len+JUNIPER_EXT_TLV_OVERHEAD > extension_length)
                 goto trunc;
 
             if (ndo->ndo_vflag > 1)
@@ -1375,7 +1375,7 @@ juniper_parse_header(netdissect_options *ndo,
             }
 
             tptr+=tlv_len;
-            jnx_ext_len -= tlv_len+JUNIPER_EXT_TLV_OVERHEAD;
+            extension_length -= tlv_len+JUNIPER_EXT_TLV_OVERHEAD;
         }
 
         if (ndo->ndo_vflag > 1)
