@@ -140,6 +140,9 @@ extern const struct tok tcp_flag_values[];
 #ifndef NFS_PORT
 #define NFS_PORT		2049
 #endif
+#ifndef TARANTOOL_PORT
+#define TARANTOOL_PORT	3301
+#endif
 #ifndef REDIS_PORT
 #define REDIS_PORT		6379
 #endif

@@ -748,6 +748,7 @@ Currently known types are
 \fBrtp\fR (Real-Time Applications protocol),
 \fBsnmp\fR (Simple Network Management Protocol),
 \fBsomeip\fR (SOME/IP),
+\fBtarantool\fR (Tarantool binary protocol),
 \fBtftp\fR (Trivial File Transfer Protocol),
 \fBvat\fR (Visual Audio Tool),
 \fBvxlan\fR (Virtual eXtensible Local Area Network),

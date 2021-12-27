@@ -742,6 +742,11 @@ tcp_print(netdissect_options *ndo,
                         /* over_tcp: TRUE, is_mdns: FALSE */
                         domain_print(ndo, bp, length, TRUE, FALSE);
                         break;
+#ifdef HAVE_MSGPUCK
+                case PT_IPROTO:
+                        tarantool_print(ndo, bp, length);
+                        break;
+#endif
                 }
                 return;
         }
@@ -798,6 +803,10 @@ tcp_print(netdissect_options *ndo,
         } else if (IS_SRC_OR_DST_PORT(RTSP_PORT_ALT)) {
                 ND_PRINT(": ");
                 rtsp_print(ndo, bp, length);
+#ifdef HAVE_MSGPUCK
+        } else if (IS_SRC_OR_DST_PORT(TARANTOOL_PORT)) {
+                tarantool_print(ndo, bp, length);
+#endif
         } else if ((IS_SRC_OR_DST_PORT(NFS_PORT)) &&
                  length >= 4) {
                 /*

@@ -69,6 +69,9 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #cmakedefine HAVE_MEMORY_H 1
 
+/* Define to 1 if you have the `msgpuck` library (-lmsgpuck) */
+#cmakedefine HAVE_MSGPUCK 1
+
 /* Define to 1 if you have the <net/if.h> header file. */
 #cmakedefine HAVE_NET_IF_H 1
 

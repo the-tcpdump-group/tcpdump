@@ -305,6 +305,7 @@ NORETURN void nd_trunc_longjmp(netdissect_options *ndo);
 #define PT_SOMEIP	19	/* Autosar SOME/IP Protocol */
 #define PT_DOMAIN	20	/* Domain Name System (DNS) */
 #define PT_QUIC		21	/* QUIC */
+#define PT_IPROTO	22	/* Tarantool binary protocol */
 
 #define ND_MIN(a,b) ((a)>(b)?(b):(a))
 #define ND_MAX(a,b) ((b)>(a)?(b):(a))
@@ -748,6 +749,7 @@ extern void ssh_print(netdissect_options *, const u_char *, u_int);
 extern void stp_print(netdissect_options *, const u_char *, u_int);
 extern void sunrpc_print(netdissect_options *, const u_char *, u_int, const u_char *);
 extern void syslog_print(netdissect_options *, const u_char *, u_int);
+extern void tarantool_print(netdissect_options *, const u_char *, u_int);
 extern void tcp_print(netdissect_options *, const u_char *, u_int, const u_char *, int);
 extern void telnet_print(netdissect_options *, const u_char *, u_int);
 extern void tftp_print(netdissect_options *, const u_char *, u_int);

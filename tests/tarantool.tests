@@ -1,0 +1,33 @@
+# -*- perl -*-
+
+# Only attempt Tarantool-specific tests when compiled with the msgpuck library.
+
+$testlist = [
+
+    {
+        config_set => 'HAVE_MSGPUCK',
+        name => 'tarantool',
+        input => 'tarantool.pcap',
+        output => 'tarantool.out',
+        args => '-T tarantool',
+    },
+
+    {
+        config_set => 'HAVE_MSGPUCK',
+        name => 'tarantool-v',
+        input => 'tarantool.pcap',
+        output => 'tarantool-v.out',
+        args => '-T tarantool -v',
+    },
+
+    {
+        config_set => 'HAVE_MSGPUCK',
+        name => 'tarantool-truncated',
+        input => 'tarantool-truncated.pcap',
+        output => 'tarantool-truncated.out',
+        args => '-T tarantool -v',
+    },
+
+];
+
+1;
