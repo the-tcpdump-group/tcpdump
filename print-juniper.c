@@ -1331,8 +1331,7 @@ juniper_parse_header(netdissect_options *ndo,
             /* sanity checks */
             if (tlv_type == 0 || tlv_len == 0)
                 break;
-            if (tlv_len+JUNIPER_EXT_TLV_OVERHEAD > extension_length)
-                goto trunc;
+            ND_LCHECK_U(extension_length, tlv_len + JUNIPER_EXT_TLV_OVERHEAD);
 
             if (ndo->ndo_vflag > 1)
                 ND_PRINT("\n\t  %s Extension TLV #%u, length %u, value ",
@@ -1589,8 +1588,8 @@ juniper_parse_header(netdissect_options *ndo,
         ND_PRINT("hlen %u, proto 0x%04x, ", l2info->header_len, l2info->proto);
 
     return 1; /* everything went ok so far. continue parsing */
-trunc:
-    nd_print_trunc(ndo);
+invalid:
+    nd_print_invalid(ndo);
     return 0;
 }
 #endif /* defined(DLT_JUNIPER_GGSN) || defined(DLT_JUNIPER_ES) || \
