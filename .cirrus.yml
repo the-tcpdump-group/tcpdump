@@ -8,10 +8,7 @@ freebsd_task:
   freebsd_instance:
     # FreeBSD fails to start with 1 GB. 8 CPUs max concurrency.
     matrix:
-      - image_family: freebsd-11-4
-        cpu: 2
-        memory: 2G
-      - image_family: freebsd-12-2
+      - image_family: freebsd-12-3
         cpu: 2
         memory: 2G
       - image_family: freebsd-13-0
