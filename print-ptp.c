@@ -452,7 +452,7 @@ ptp_print(netdissect_options *ndo, const u_char *bp, u_int length)
     u_int vers;
 
     ndo->ndo_protocol = "ptp";
-    ND_LCHECK_U(length, PTP_HDR_LEN);
+    ND_ICHECK_U(length, <, PTP_HDR_LEN);
     vers = GET_BE_U_2(bp) & PTP_VERS_MASK;
     ND_PRINT("PTPv%u",vers);
     switch(vers) {

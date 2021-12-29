@@ -120,7 +120,7 @@ zep_print(netdissect_options *ndo,
 
 	if (version == 1) {
 		/* ZEP v1 packet. */
-		ND_LCHECK_U(len, 16);
+		ND_ICHECK_U(len, <, 16);
 		ND_PRINT("Channel ID %u, Device ID 0x%04x, ",
 			 GET_U_1(bp + 3), GET_BE_U_2(bp + 4));
 		if (GET_U_1(bp + 6))
@@ -136,7 +136,7 @@ zep_print(netdissect_options *ndo,
 		/* ZEP v2 packet. */
 		if (GET_U_1(bp + 3) == 2) {
 			/* ZEP v2 ack. */
-			ND_LCHECK_U(len, 8);
+			ND_ICHECK_U(len, <, 8);
 			seq_no = GET_BE_U_4(bp + 4);
 			ND_PRINT("ACK, seq# = %u", seq_no);
 			inner_len = 0;
@@ -144,7 +144,7 @@ zep_print(netdissect_options *ndo,
 			len -= 8;
 		} else {
 			/* ZEP v2 data, or some other. */
-			ND_LCHECK_U(len, 32);
+			ND_ICHECK_U(len, <, 32);
 			ND_PRINT("Type %u, Channel ID %u, Device ID 0x%04x, ",
 				 GET_U_1(bp + 3), GET_U_1(bp + 4),
 				 GET_BE_U_2(bp + 5));

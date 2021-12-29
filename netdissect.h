@@ -394,27 +394,39 @@ nd_trunc_longjmp(netdissect_options *ndo)
  */
 #define ND_BYTES_AVAILABLE_AFTER(p) ((const u_char *)(p) < ndo->ndo_packetp ? 0 : ND_BYTES_BETWEEN((p), ndo->ndo_snapend))
 
-/* Check length < minimum for invalid packet with a custom message, format %u */
-#define ND_LCHECKMSG_U(length, minimum, what) \
-if ((length) < (minimum)) { \
-ND_PRINT(" [%s %u < %u]", (what), (length), (minimum)); \
+/*
+ * Check (expression_1 operator expression_2) for invalid packet with
+ * a custom message, format %u
+ */
+#define ND_ICHECKMSG_U(message, expression_1, operator, expression_2) \
+if ((expression_1) operator (expression_2)) { \
+ND_PRINT(" [%s %u %s %u]", (message), (expression_1), (#operator), (expression_2)); \
 goto invalid; \
 }
 
-/* Check length < minimum for invalid packet with #length message, format %u */
-#define ND_LCHECK_U(length, minimum) \
-ND_LCHECKMSG_U((length), (minimum), (#length))
+/*
+ * Check (expression_1 operator expression_2) for invalid packet with
+ * "expression_1" message, format %u
+ */
+#define ND_ICHECK_U(expression_1, operator, expression_2) \
+ND_ICHECKMSG_U((#expression_1), (expression_1), operator, (expression_2))
 
-/* Check length < minimum for invalid packet with a custom message, format %zu */
-#define ND_LCHECKMSG_ZU(length, minimum, what) \
-if ((length) < (minimum)) { \
-ND_PRINT(" [%s %u < %zu]", (what), (length), (minimum)); \
+/*
+ * Check (expression_1 operator expression_2) for invalid packet with
+ * a custom message, format %zu
+ */
+#define ND_ICHECKMSG_ZU(message, expression_1, operator, expression_2) \
+if ((expression_1) operator (expression_2)) { \
+ND_PRINT(" [%s %u %s %zu]", (message), (expression_1), (#operator), (expression_2)); \
 goto invalid; \
 }
 
-/* Check length < minimum for invalid packet with #length message, format %zu */
-#define ND_LCHECK_ZU(length, minimum) \
-ND_LCHECKMSG_ZU((length), (minimum), (#length))
+/*
+ * Check (expression_1 operator expression_2) for invalid packet with
+ * "expression_1" message, format %zu
+ */
+#define ND_ICHECK_ZU(expression_1, operator, expression_2) \
+ND_ICHECKMSG_ZU((#expression_1), (expression_1), operator, (expression_2))
 
 #define ND_PRINT(...) (ndo->ndo_printf)(ndo, __VA_ARGS__)
 #define ND_DEFAULTPRINT(ap, length) (*ndo->ndo_default_print)(ndo, ap, length)

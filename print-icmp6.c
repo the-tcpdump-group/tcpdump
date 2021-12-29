@@ -841,7 +841,7 @@ rpl_dio_print(netdissect_options *ndo,
 {
         const struct nd_rpl_dio *dio = (const struct nd_rpl_dio *)bp;
 
-        ND_LCHECK_ZU(length, sizeof(struct nd_rpl_dio));
+        ND_ICHECK_ZU(length, <, sizeof(struct nd_rpl_dio));
         ND_PRINT(" [dagid:%s,seq:%u,instance:%u,rank:%u,%smop:%s,prf:%u]",
                   GET_IP6ADDR_STRING(dio->rpl_dagid),
                   GET_U_1(dio->rpl_dtsn),
