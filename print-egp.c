@@ -265,7 +265,7 @@ egp_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "egp";
 	egp = (const struct egp_packet *)bp;
-	ND_LCHECKMSG_ZU(length, sizeof(*egp), "packet length");
+	ND_ICHECKMSG_ZU("packet length", length, <, sizeof(*egp));
 	ND_TCHECK_SIZE(egp);
 
 	version = GET_U_1(egp->egp_version);

@@ -238,7 +238,7 @@ recurse:
 			 */
 			length_type = GET_BE_U_2(p);
 
-			ND_LCHECK_U(caplen, 2);
+			ND_ICHECK_U(caplen, <, 2);
 			length -= 2;
 			caplen -= 2;
 			p += 2;

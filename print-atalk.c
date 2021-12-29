@@ -166,7 +166,7 @@ llap_print(netdissect_options *ndo,
 	u_int hdrlen;
 
 	ndo->ndo_protocol = "llap";
-	ND_LCHECKMSG_ZU(length, sizeof(*lp), "LLAP length");
+	ND_ICHECKMSG_ZU("LLAP length", length, <, sizeof(*lp));
 	lp = (const struct LAP *)bp;
 	bp += sizeof(*lp);
 	length -= sizeof(*lp);
@@ -175,7 +175,7 @@ llap_print(netdissect_options *ndo,
 
 	case lapShortDDP:
 		ndo->ndo_protocol = "sddp";
-		ND_LCHECKMSG_U(length, ddpSSize, "SDDP length");
+		ND_ICHECKMSG_U("SDDP length", length, <, ddpSSize);
 		sdp = (const struct atShortDDP *)bp;
 		ND_PRINT("%s.%s",
 		    ataddr_string(ndo, 0, GET_U_1(lp->src)),
@@ -192,7 +192,7 @@ llap_print(netdissect_options *ndo,
 
 	case lapDDP:
 		ndo->ndo_protocol = "ddp";
-		ND_LCHECKMSG_U(length, ddpSize, "DDP length");
+		ND_ICHECKMSG_U("DDP length", length, <, ddpSize);
 		dp = (const struct atDDP *)bp;
 		snet = GET_BE_U_2(dp->srcNet);
 		ND_PRINT("%s.%s",
@@ -236,7 +236,7 @@ atalk_print(netdissect_options *ndo,
         if(!ndo->ndo_eflag)
             ND_PRINT("AT ");
 
-	ND_LCHECK_U(length, ddpSize);
+	ND_ICHECK_U(length, <, ddpSize);
 	dp = (const struct atDDP *)bp;
 	snet = GET_BE_U_2(dp->srcNet);
 	ND_PRINT("%s.%s", ataddr_string(ndo, snet, GET_U_1(dp->srcNode)),
@@ -267,7 +267,7 @@ aarp_print(netdissect_options *ndo,
 	ndo->ndo_protocol = "aarp";
 	ND_PRINT("aarp ");
 	ap = (const struct aarp *)bp;
-	ND_LCHECK_ZU(length, sizeof(*ap));
+	ND_ICHECK_ZU(length, <, sizeof(*ap));
 	ND_TCHECK_SIZE(ap);
 	if (GET_BE_U_2(ap->htype) == 1 &&
 	    GET_BE_U_2(ap->ptype) == ETHERTYPE_ATALK &&
@@ -331,7 +331,7 @@ atp_print(netdissect_options *ndo,
 	uint32_t data;
 
 	ndo->ndo_protocol = "atp";
-	ND_LCHECKMSG_ZU(length, sizeof(*ap), "ATP length");
+	ND_ICHECKMSG_ZU("ATP length", length, <, sizeof(*ap));
 	length -= sizeof(*ap);
 	control = GET_U_1(ap->control);
 	switch (control & 0xc0) {
@@ -459,7 +459,7 @@ nbp_print(netdissect_options *ndo,
 	u_int i;
 
 	/* must be room for at least one tuple */
-	ND_LCHECKMSG_U(length, nbpHeaderSize + 8, "undersized-nbp");
+	ND_ICHECKMSG_U("undersized-nbp", length, <, nbpHeaderSize + 8);
 	length -= nbpHeaderSize;
 	control = GET_U_1(np->control);
 	ND_PRINT(" nbp-%s", tok2str(nbp_str, "0x%x", control & 0xf0));

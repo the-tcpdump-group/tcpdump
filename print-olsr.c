@@ -325,7 +325,7 @@ olsr_print(netdissect_options *ndo,
     nd_print_protocol_caps(ndo);
     ND_PRINT("v%u", (is_ipv6) ? 6 : 4);
 
-    ND_LCHECKMSG_ZU(length, sizeof(struct olsr_common), "packet length");
+    ND_ICHECKMSG_ZU("packet length", length, <, sizeof(struct olsr_common));
 
     ptr.common = (const struct olsr_common *)tptr;
     length = ND_MIN(length, GET_BE_U_2(ptr.common->packet_len));
@@ -417,7 +417,8 @@ olsr_print(netdissect_options *ndo,
         switch (msg_type) {
         case OLSR_HELLO_MSG:
         case OLSR_HELLO_LQ_MSG:
-            ND_LCHECKMSG_ZU(msg_tlen, sizeof(struct olsr_hello), "message length");
+            ND_ICHECKMSG_ZU("message length", msg_tlen, <,
+                            sizeof(struct olsr_hello));
 
             ptr.hello = (const struct olsr_hello *)msg_data;
             ND_PRINT("\n\t  hello-time %.3fs, MPR willingness %u",
@@ -475,7 +476,8 @@ olsr_print(netdissect_options *ndo,
 
         case OLSR_TC_MSG:
         case OLSR_TC_LQ_MSG:
-            ND_LCHECKMSG_ZU(msg_tlen, sizeof(struct olsr_tc), "message length");
+            ND_ICHECKMSG_ZU("message length", msg_tlen, <,
+                            sizeof(struct olsr_tc));
             ND_TCHECK_LEN(msg_data, sizeof(struct olsr_tc));
 
             ptr.tc = (const struct olsr_tc *)msg_data;
@@ -605,7 +607,7 @@ olsr_print(netdissect_options *ndo,
             int name_entries_valid;
             u_int i;
 
-            ND_LCHECKMSG_U(msg_tlen, 4, "message length");
+            ND_ICHECKMSG_U("message length", msg_tlen, <, 4);
 
             name_entries = GET_BE_U_2(msg_data + 2);
             addr_size = 4;
@@ -654,8 +656,8 @@ olsr_print(netdissect_options *ndo,
                 if (name_entry_len%4 != 0)
                     name_entry_padding = 4-(name_entry_len%4);
 
-                ND_LCHECKMSG_U(msg_tlen, addr_size + name_entry_len + name_entry_padding,
-                               "name entry length");
+                ND_ICHECKMSG_U("name entry length", msg_tlen, <,
+                               addr_size + name_entry_len + name_entry_padding);
 
                 ND_TCHECK_LEN(msg_data,
                               addr_size + name_entry_len + name_entry_padding);

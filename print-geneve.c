@@ -117,7 +117,7 @@ geneve_opts_print(netdissect_options *ndo, const u_char *bp, u_int len)
         uint8_t opt_type;
         uint8_t opt_len;
 
-        ND_LCHECKMSG_U(len, 4, "remaining options length");
+        ND_ICHECKMSG_U("remaining options length", len, <, 4);
         ND_PRINT("%s", sep);
         sep = ", ";
 
@@ -169,7 +169,7 @@ geneve_print(netdissect_options *ndo, const u_char *bp, u_int len)
     ndo->ndo_protocol = "geneve";
     ND_PRINT("Geneve");
 
-    ND_LCHECK_U(len, 8);
+    ND_ICHECK_U(len, <, 8);
 
     ver_opt = GET_U_1(bp);
     bp += 1;
