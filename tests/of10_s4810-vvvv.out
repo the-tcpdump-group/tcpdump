@@ -1232,7 +1232,7 @@ STP 802.1s, Rapid STP, CIST Flags [Proposal, Learn, Forward, Agreement], length 
   110  12:51:40.431060 IP (tos 0x0, ttl 64, id 53123, offset 0, flags [DF], proto TCP (6), length 144)
     10.0.0.20.6633 > 10.0.0.81.56068: Flags [P.], cksum 0x14e7 (incorrect -> 0x2671), seq 4729:4821, ack 14734, win 331, options [nop,nop,TS val 47837403 ecr 3], length 92: OpenFlow
 	version 1.0, type PACKET_OUT, length 84, xid 0x00000044
-	 buffer_id 0xffffffff, in_port CONTROLLER
+	 buffer_id 0xffffffff, in_port CONTROLLER, actions_len 8
 	 action type OUTPUT, len 8, port 1
 	 data (60 octets), frame decoding below
  [|llc]
