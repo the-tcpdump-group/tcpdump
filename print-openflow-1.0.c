@@ -550,7 +550,7 @@ static const struct uint_tokary of10_ofpet2tokary[] = {
 
 /* lengths (fixed or minimal) of particular protocol structures */
 #define OF_PHY_PORT_FIXLEN                    48
-#define OF_ACTION_MINLEN                       8
+#define OF_ACTION_MINLEN                       8U
 #define OF_MATCH_FIXLEN                       40
 #define OF_DESC_STATS_REPLY_FIXLEN          1056
 #define OF_FLOW_STATS_REQUEST_FIXLEN          44
@@ -1288,12 +1288,12 @@ of10_actions_print(netdissect_options *ndo,
 		uint16_t type, alen, output_port;
 		u_char alen_bogus = 0, skip = 0;
 
-		if (len < OF_ACTION_MINLEN)
-			goto invalid;
+		ND_PRINT("%saction", pfx);
+		ND_ICHECKMSG_U("remaining length", len, <, OF_ACTION_MINLEN);
 		/* type */
 		type = GET_BE_U_2(cp);
 		OF_FWD(2);
-		ND_PRINT("%saction type %s", pfx, tok2str(ofpat_str, "invalid (0x%04x)", type));
+		ND_PRINT(" type %s", tok2str(ofpat_str, "invalid (0x%04x)", type));
 		/* length */
 		alen = GET_BE_U_2(cp);
 		OF_FWD(2);
@@ -1306,8 +1306,8 @@ of10_actions_print(netdissect_options *ndo,
 		 */
 
 		/* On action size underrun/overrun skip the rest of the action list. */
-		if (alen < OF_ACTION_MINLEN || alen > len + 4)
-			goto invalid;
+		ND_ICHECK_U(alen, <, OF_ACTION_MINLEN);
+		ND_ICHECK_U(len, <, alen - 4U);
 		/*
 		 * After validating the basic length constraint it will be safe
 		 * to skip the current action if the action size is not valid
@@ -1716,13 +1716,13 @@ of10_flow_stats_reply_print(netdissect_options *ndo,
 	while (len) {
 		uint16_t entry_len;
 
-		if (len < OF_FLOW_STATS_REPLY_MINLEN)
-			goto invalid;
+		ND_PRINT("\n\t");
+		ND_ICHECKMSG_U("remaining length", len, <, OF_FLOW_STATS_REPLY_MINLEN);
 		/* length */
 		entry_len = GET_BE_U_2(cp);
-		ND_PRINT("\n\t length %u", entry_len);
-		if (entry_len < OF_FLOW_STATS_REPLY_MINLEN || entry_len > len)
-			goto invalid;
+		ND_PRINT(" length %u", entry_len);
+		ND_ICHECK_U(entry_len, <, OF_FLOW_STATS_REPLY_MINLEN);
+		ND_ICHECK_U(len, <, entry_len);
 		OF_FWD(2);
 		/* table_id */
 		ND_PRINT(", table_id %s",
@@ -1984,9 +1984,9 @@ of10_packet_out_print(netdissect_options *ndo,
 	OF_FWD(2);
 	/* actions_len */
 	actions_len = GET_BE_U_2(cp);
+	ND_PRINT(", actions_len %u", actions_len);
 	OF_FWD(2);
-	if (actions_len > len)
-		goto invalid;
+	ND_ICHECK_U(len, <, actions_len);
 	/* actions */
 	of10_actions_print(ndo, "\n\t ", cp, actions_len);
 	OF_FWD(actions_len);
