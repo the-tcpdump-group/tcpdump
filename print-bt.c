@@ -52,7 +52,7 @@ bt_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *
 {
 	u_int length = h->len;
 	u_int caplen = h->caplen;
-	const bluetooth_h4_header* hdr = (const bluetooth_h4_header*)p;
+	const bluetooth_h4_header *hdr = (const bluetooth_h4_header *)p;
 
 	ndo->ndo_protocol = "bluetooth";
 	nd_print_protocol(ndo);

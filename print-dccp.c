@@ -189,7 +189,7 @@ static const struct tok dccp_feature_num_str[] = {
 
 static u_int
 dccp_csum_coverage(netdissect_options *ndo,
-		   const struct dccp_hdr* dh, u_int len)
+		   const struct dccp_hdr *dh, u_int len)
 {
 	u_int cov;
 

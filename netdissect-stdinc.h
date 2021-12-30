@@ -217,7 +217,7 @@
 #endif
 
 #ifndef caddr_t
-typedef char* caddr_t;
+typedef char *caddr_t;
 #endif /* caddr_t */
 
 #define MAXHOSTNAMELEN	64

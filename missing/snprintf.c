@@ -411,7 +411,7 @@ xyzprintf (struct state *state, const char *char_format, va_list ap)
 	break;
       }
       case 'n' : {
-	int *arg = va_arg(ap, int*);
+	int *arg = va_arg(ap, int *);
 	*arg = state->s - state->str;
 	break;
       }

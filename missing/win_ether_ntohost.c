@@ -106,7 +106,7 @@ int parse_ether_buf (const char *buf, char **result, struct ether_addr *e)
 {
   const char *fmt;
   char       *name;
-  char       *str = (char*)buf;
+  char       *str = (char *)buf;
   unsigned    eth [sizeof(*e)];
   int         i;
 

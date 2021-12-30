@@ -2309,7 +2309,7 @@ ikev2_auth_print(netdissect_options *ndo, u_char tpay,
 	const struct ikev2_auth *p;
 	const char *v2_auth[]={ "invalid", "rsasig",
 				"shared-secret", "dsssig" };
-	const u_char *authdata = (const u_char*)ext + sizeof(struct ikev2_auth);
+	const u_char *authdata = (const u_char *)ext + sizeof(struct ikev2_auth);
 
 	ND_TCHECK_LEN(ext, sizeof(struct ikev2_auth));
 	p = (const struct ikev2_auth *)ext;
