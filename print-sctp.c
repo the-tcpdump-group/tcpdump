@@ -452,7 +452,7 @@ void
 sctp_print(netdissect_options *ndo,
 	   const u_char *bp,        /* beginning of sctp packet */
 	   const u_char *bp2,       /* beginning of enclosing */
-	   u_int sctpPacketLength)  /* ip packet */
+	   u_int sctpPacketLength)  /* sctp packet */
 {
   u_int sctpPacketLengthRemaining;
   const struct sctpHeader *sctpPktHdr;
@@ -466,12 +466,7 @@ sctp_print(netdissect_options *ndo,
   int isforces = 0;
 
   ndo->ndo_protocol = "sctp";
-  if (sctpPacketLength < sizeof(struct sctpHeader))
-    {
-      ND_PRINT("truncated-sctp - %zu bytes missing!",
-               sizeof(struct sctpHeader) - sctpPacketLength);
-      goto invalid;
-    }
+  ND_ICHECKMSG_ZU("length", sctpPacketLength, <, sizeof(struct sctpHeader));
   sctpPktHdr = (const struct sctpHeader*) bp;
   ND_TCHECK_SIZE(sctpPktHdr);
   sctpPacketLengthRemaining = sctpPacketLength;
@@ -579,10 +574,8 @@ sctp_print(netdissect_options *ndo,
 		((chunkFlg & SCTP_DATA_LAST_FRAG) == SCTP_DATA_LAST_FRAG) )
 	      ND_PRINT(" ");
 
-	    if (chunkLengthRemaining < sizeof(*dataHdrPtr)) {
-		ND_PRINT("bogus chunk length %u]", chunkLength);
-		goto invalid;
-	    }
+	    ND_ICHECKMSG_ZU("chunk length", chunkLengthRemaining, <,
+			    sizeof(*dataHdrPtr));
 	    dataHdrPtr=(const struct sctpDataPart*)bp;
 
 	    ppid = GET_BE_U_4(dataHdrPtr->payloadtype);
@@ -601,11 +594,8 @@ sctp_print(netdissect_options *ndo,
 	    bp += sizeof(*dataHdrPtr);
 	    sctpPacketLengthRemaining -= sizeof(*dataHdrPtr);
 	    chunkLengthRemaining -= sizeof(*dataHdrPtr);
+	    ND_ICHECKMSG_U("chunk length", chunkLengthRemaining, ==, 0);
 	    payload_size = chunkLengthRemaining;
-	    if (payload_size == 0) {
-		ND_PRINT("bogus chunk length %u]", chunkLength);
-		goto invalid;
-	    }
 
 	    if (isforces) {
 		forces_print(ndo, bp, payload_size);
@@ -638,10 +628,8 @@ sctp_print(netdissect_options *ndo,
 	  {
 	    const struct sctpInitiation *init;
 
-	    if (chunkLengthRemaining < sizeof(*init)) {
-		ND_PRINT("bogus chunk length %u]", chunkLength);
-		goto invalid;
-	    }
+	    ND_ICHECKMSG_ZU("chunk length", chunkLengthRemaining, <,
+			    sizeof(*init));
 	    init=(const struct sctpInitiation*)bp;
 	    ND_PRINT("[init tag: %u] ", GET_BE_U_4(init->initTag));
 	    ND_PRINT("[rwnd: %u] ", GET_BE_U_4(init->rcvWindowCredit));
@@ -666,10 +654,8 @@ sctp_print(netdissect_options *ndo,
 	  {
 	    const struct sctpInitiation *init;
 
-	    if (chunkLengthRemaining < sizeof(*init)) {
-		ND_PRINT("bogus chunk length %u]", chunkLength);
-		goto invalid;
-	    }
+	    ND_ICHECKMSG_ZU("chunk length", chunkLengthRemaining, <,
+			    sizeof(*init));
 	    init=(const struct sctpInitiation*)bp;
 	    ND_PRINT("[init tag: %u] ", GET_BE_U_4(init->initTag));
 	    ND_PRINT("[rwnd: %u] ", GET_BE_U_4(init->rcvWindowCredit));
@@ -697,10 +683,8 @@ sctp_print(netdissect_options *ndo,
 	    u_int fragNo, tsnNo;
 	    const u_char *dupTSN;
 
-	    if (chunkLengthRemaining < sizeof(*sack)) {
-	      ND_PRINT("bogus chunk length %u]", chunkLength);
-	      goto invalid;
-	    }
+	    ND_ICHECKMSG_ZU("chunk length", chunkLengthRemaining, <,
+			    sizeof(*sack));
 	    sack=(const struct sctpSelectiveAck*)bp;
 	    ND_PRINT("[cum ack %u] ", GET_BE_U_4(sack->highestConseqTSN));
 	    ND_PRINT("[a_rwnd %u] ", GET_BE_U_4(sack->updatedRwnd));
@@ -715,10 +699,8 @@ sctp_print(netdissect_options *ndo,
 	    for (fragNo=0;
 		 chunkLengthRemaining != 0 && fragNo < GET_BE_U_2(sack->numberOfdesc);
 		 bp += sizeof(*frag), sctpPacketLengthRemaining -= sizeof(*frag), chunkLengthRemaining -= sizeof(*frag), fragNo++) {
-	      if (chunkLengthRemaining < sizeof(*frag)) {
-		ND_PRINT("bogus chunk length %u]", chunkLength);
-		goto invalid;
-	      }
+	      ND_ICHECKMSG_ZU("chunk length", chunkLengthRemaining, <,
+			    sizeof(*frag));
 	      frag = (const struct sctpSelectiveFrag *)bp;
 	      ND_PRINT("\n\t\t[gap ack block #%u: start = %u, end = %u] ",
 		     fragNo+1,
@@ -730,10 +712,7 @@ sctp_print(netdissect_options *ndo,
 	    for (tsnNo=0;
 		 chunkLengthRemaining != 0 && tsnNo<GET_BE_U_2(sack->numDupTsns);
 		 bp += 4, sctpPacketLengthRemaining -= 4, chunkLengthRemaining -= 4, tsnNo++) {
-	      if (chunkLengthRemaining < 4) {
-		ND_PRINT("bogus chunk length %u]", chunkLength);
-		goto invalid;
-	      }
+	      ND_ICHECKMSG_U("chunk length", chunkLengthRemaining, <, 4);
 	      dupTSN = (const u_char *)bp;
 	      ND_PRINT("\n\t\t[dup TSN #%u: %u] ", tsnNo+1,
 		       GET_BE_U_4(dupTSN));
