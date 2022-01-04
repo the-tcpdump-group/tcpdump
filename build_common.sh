@@ -4,14 +4,13 @@
 # To make CI scripts maintenance simpler, copies of this file in the
 # libpcap, tcpdump and tcpslice git repositories should be identical.
 # Please mind that Solaris /bin/sh before 11 does not support the $()
-# command substitution syntax, hence the SC2006 directives.
+# command substitution syntax, hence the "-e SC2006" flag in Makefile.
 
 # A poor man's mktemp(1) for OSes that don't have one (e.g. AIX 7, Solaris 9).
 mktempdir_diy() {
     while true; do
         # /bin/sh implements $RANDOM in AIX 7, but not in Solaris before 11,
         # thus use dd and od instead.
-        # shellcheck disable=SC2006
         mktempdir_diy_suffix=`dd if=/dev/urandom bs=4 count=1 2>/dev/null | od -t x -A n | head -1 | tr -d '\t '`
         [ -z "$mktempdir_diy_suffix" ] && return 1
         mktempdir_diy_path="${TMPDIR:-/tmp}/${1:?}.${mktempdir_diy_suffix}"
@@ -29,7 +28,6 @@ mktempdir_diy() {
 
 mktempdir() {
     mktempdir_prefix=${1:-tmp}
-    # shellcheck disable=SC2006
     case `os_id` in
     Darwin-*|FreeBSD-*|NetBSD-*)
         # In these operating systems mktemp(1) always appends an implicit
@@ -61,7 +59,6 @@ print_sysinfo() {
 
 # Try to make the current C compiler print its version information (usually
 # multi-line) to stdout.
-# shellcheck disable=SC2006
 cc_version_nocache() {
     : "${CC:?}"
     case `basename "$CC"` in
@@ -103,7 +100,6 @@ cc_version_nocache() {
     esac
 }
 
-# shellcheck disable=SC2006
 cc_version() {
     echo "${cc_version_cached:=`cc_version_nocache`}"
 }
@@ -116,7 +112,6 @@ print_cc_version() {
 
 # For the current C compiler try to print a short and uniform identification
 # string (such as "gcc-9.3.0") that is convenient to use in a case statement.
-# shellcheck disable=SC2006
 cc_id_nocache() {
     cc_id_firstline=`cc_version | head -1`
     : "${cc_id_firstline:?}"
@@ -161,7 +156,6 @@ cc_id_nocache() {
     fi
 }
 
-# shellcheck disable=SC2006
 cc_id() {
     echo "${cc_id_cached:=`cc_id_nocache`}"
 }
@@ -174,7 +168,6 @@ discard_cc_cache() {
 
 # For the current C compiler try to print CFLAGS value that tells to treat
 # warnings as errors.
-# shellcheck disable=SC2006
 cc_werr_cflags() {
     case `cc_id` in
     gcc-*|clang-*)
@@ -192,7 +185,6 @@ cc_werr_cflags() {
 }
 
 # Tell whether "gcc" is a symlink to Clang (this is the case on macOS).
-# shellcheck disable=SC2006
 gcc_is_clang_in_disguise() {
     case `cc_id`/`basename "${CC:?}"` in
     clang-*/gcc)
@@ -202,7 +194,6 @@ gcc_is_clang_in_disguise() {
     return 1
 }
 
-# shellcheck disable=SC2006
 os_id() {
     # OS does not change between builds or in the middle of a build, so it is
     # fine to cache uname output.
@@ -246,7 +237,6 @@ run_after_echo() {
 }
 
 print_so_deps() {
-    # shellcheck disable=SC2006
     case `os_id` in
     Darwin-*)
         run_after_echo otool -L "${1:?}"
@@ -271,7 +261,6 @@ handle_matrix_debug() {
 }
 
 purge_directory() {
-    # shellcheck disable=SC2006
     if [ "`os_id`" = SunOS-5.11 ]; then
         # In Solaris 11 /bin/sh the pathname expansion of "*" always includes
         # "." and "..", so the straightforward rm would always fail.
