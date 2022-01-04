@@ -27,7 +27,6 @@
 print_sysinfo
 # Install directory prefix
 if [ -z "$PREFIX" ]; then
-    # shellcheck disable=SC2006
     PREFIX=`mktempdir tcpdump_build_matrix`
     echo "PREFIX set to '$PREFIX'"
     export PREFIX
@@ -43,7 +42,6 @@ build_tcpdump() {
             export CRYPTO
             for SMB in $MATRIX_SMB; do
                 export SMB
-                # shellcheck disable=SC2006
                 COUNT=`increment $COUNT`
                 echo_magenta "===== SETUP $COUNT: BUILD_LIBPCAP=$BUILD_LIBPCAP REMOTE=${REMOTE:-?} CC=$CC CMAKE=$CMAKE CRYPTO=$CRYPTO SMB=$SMB =====" >&2
                 # Run one build with setup environment variables:

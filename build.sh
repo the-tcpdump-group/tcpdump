@@ -15,7 +15,6 @@
 . ./build_common.sh
 # Install directory prefix
 if [ -z "$PREFIX" ]; then
-    # shellcheck disable=SC2006
     PREFIX=`mktempdir tcpdump_build`
     echo "PREFIX set to '$PREFIX'"
 fi
@@ -30,7 +29,6 @@ print_cc_version
 # these cases, please remember to remove respective exemption below to help any
 # later warnings in the same matrix subset trigger an error.
 
-# shellcheck disable=SC2006
 case `cc_id`/`os_id` in
 clang-9.*/SunOS-5.11)
     # (OpenIndiana)
@@ -42,7 +40,6 @@ clang-9.*/SunOS-5.11)
     ;;
 esac
 
-# shellcheck disable=SC2006
 [ "$TCPDUMP_TAINTED" != yes ] && CFLAGS=`cc_werr_cflags`
 
 if [ "$CMAKE" = no ]; then
