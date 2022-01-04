@@ -39,6 +39,8 @@ mkpath($newdir);
 mkpath($diffdir);
 my $origdir = getcwd();
 my $srcdir  = $ENV{'srcdir'} || ".";
+# Default to unified diff and allow to fall back to basic diff if necessary.
+my $diff_flags = defined $ENV{'DIFF_FLAGS'} ? $ENV{'DIFF_FLAGS'} : '-u';
 
 #
 # Force UTC, so time stamps are printed in a standard time zone, and
@@ -226,7 +228,7 @@ sub runtest {
             $r = system "fc /lb1000 /t /1 $winoutput tests\\NEW\\$outputbase >tests\\DIFF\\$outputbase.diff";
             $diffstat = $r >> 8;
         } else {
-            $r = system "diff $output tests/NEW/$outputbase >tests/DIFF/$outputbase.diff";
+            $r = system "diff $diff_flags $output tests/NEW/$outputbase >tests/DIFF/$outputbase.diff";
             $diffstat = WEXITSTATUS($r);
         }
     }

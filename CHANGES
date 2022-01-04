@@ -22,6 +22,7 @@ Monthday, Month DD, YYYY by gharris and denis
       RPKI-Router: Refine length and bounds checks.
     Building and testing:
       Treat "msys" as Windows for test exit statuses.
+      Use unified diff by default.
 
 TBD
   Summary for 4.99.2 tcpdump release: (so far)
