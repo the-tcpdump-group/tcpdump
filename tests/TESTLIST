@@ -266,6 +266,7 @@ of13_ericsson		of13_ericsson.pcapng	of13_ericsson.out
 of13_ericsson-v		of13_ericsson.pcapng	of13_ericsson-v.out	-v
 of13_ericsson-vv	of13_ericsson.pcapng	of13_ericsson-vv.out	-vv
 of10_inv_OFPST_FLOW-v	of10_inv_OFPST_FLOW.pcap	of10_inv_OFPST_FLOW-v.out -v
+of10_inv_QUEUE_GET_CONFIG_REPLY-vv	of10_inv_QUEUE_GET_CONFIG_REPLY.pcap	of10_inv_QUEUE_GET_CONFIG_REPLY-vv.out	-vv
 
 # GeoNetworking and CALM FAST tests
 geonet-calm-fast	geonet_and_calm_fast.pcap	geonet_and_calm_fast.out	-vv

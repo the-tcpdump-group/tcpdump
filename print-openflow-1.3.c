@@ -856,21 +856,20 @@ of13_hello_elements_print(netdissect_options *ndo,
 	while (len) {
 		uint16_t type, bmlen;
 
-		if (len < OF_HELLO_ELEM_MINSIZE)
-			goto invalid;
+		ND_PRINT("\n\t");
+		ND_ICHECKMSG_U("remaining length", len, <, OF_HELLO_ELEM_MINSIZE);
 		/* type */
 		type = GET_BE_U_2(cp);
 		OF_FWD(2);
-		ND_PRINT("\n\t type %s",
+		ND_PRINT(" type %s",
 		         tok2str(ofphet_str, "unknown (0x%04x)", type));
 		/* length */
 		bmlen = GET_BE_U_2(cp);
 		OF_FWD(2);
 		ND_PRINT(", length %u", bmlen);
 		/* cp is OF_HELLO_ELEM_MINSIZE bytes in */
-		if (bmlen < OF_HELLO_ELEM_MINSIZE ||
-		    bmlen > OF_HELLO_ELEM_MINSIZE + len)
-			goto invalid;
+		ND_ICHECKMSG_U("bitmap length", bmlen, <, OF_HELLO_ELEM_MINSIZE);
+		ND_ICHECKMSG_U("bitmap length", bmlen, >, OF_HELLO_ELEM_MINSIZE + len);
 		switch (type) {
 		case OFPHET_VERSIONBITMAP:
 			/*
