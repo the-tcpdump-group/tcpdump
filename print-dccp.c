@@ -542,51 +542,54 @@ static const struct tok dccp_option_values[] = {
 };
 
 static u_int
-dccp_print_option(netdissect_options *ndo, const u_char *option, u_int hlen)
+dccp_print_option(netdissect_options *ndo, const u_char *bp, u_int hlen)
 {
-	uint8_t optlen, i;
+	uint8_t option, optlen, i;
 
-	if (GET_U_1(option) >= 32) {
-		optlen = GET_U_1(option + 1);
+	option = GET_U_1(bp);
+	if (option >= 32) {
+		optlen = GET_U_1(bp + 1);
 		if (optlen < 2) {
-			if (GET_U_1(option) >= 128)
+			if (option >= 128)
 				ND_PRINT("CCID option %u optlen too short",
-					 GET_U_1(option));
+					 option);
 			else
 				ND_PRINT("%s optlen too short",
-					  tok2str(dccp_option_values, "Option %u", GET_U_1(option)));
+					  tok2str(dccp_option_values,
+					  	  "Option %u", option));
 			return 0;
 		}
 	} else
 		optlen = 1;
 
 	if (hlen < optlen) {
-		if (GET_U_1(option) >= 128)
+		if (option >= 128)
 			ND_PRINT("CCID option %u optlen goes past header length",
-				  GET_U_1(option));
+				  option);
 		else
 			ND_PRINT("%s optlen goes past header length",
-				  tok2str(dccp_option_values, "Option %u", GET_U_1(option)));
+				  tok2str(dccp_option_values, "Option %u",
+					  option));
 		return 0;
 	}
-	ND_TCHECK_LEN(option, optlen);
+	ND_TCHECK_LEN(bp, optlen);
 
-	if (GET_U_1(option) >= 128) {
-		ND_PRINT("CCID option %u", GET_U_1(option));
+	if (option >= 128) {
+		ND_PRINT("CCID option %u", option);
 		switch (optlen) {
 			case 4:
-				ND_PRINT(" %u", GET_BE_U_2(option + 2));
+				ND_PRINT(" %u", GET_BE_U_2(bp + 2));
 				break;
 			case 6:
-				ND_PRINT(" %u", GET_BE_U_4(option + 2));
+				ND_PRINT(" %u", GET_BE_U_4(bp + 2));
 				break;
 			default:
 				break;
 		}
 	} else {
 		ND_PRINT("%s",
-			 tok2str(dccp_option_values, "Option %u", GET_U_1(option)));
-		switch (GET_U_1(option)) {
+			 tok2str(dccp_option_values, "Option %u", option));
+		switch (option) {
 		case DCCP_OPTION_CHANGE_L:
 		case DCCP_OPTION_CONFIRM_L:
 		case DCCP_OPTION_CHANGE_R:
@@ -596,28 +599,28 @@ dccp_print_option(netdissect_options *ndo, const u_char *option, u_int hlen)
 				return optlen;
 			}
 			ND_PRINT(" %s", tok2str(dccp_feature_num_str,
-			                        "invalid (%u)", GET_U_1(option + 2)));
+			                        "invalid (%u)", GET_U_1(bp + 2)));
 			for (i = 0; i < optlen - 3; i++)
-				ND_PRINT(" %u", GET_U_1(option + 3 + i));
+				ND_PRINT(" %u", GET_U_1(bp + 3 + i));
 			break;
 		case DCCP_OPTION_INIT_COOKIE:
 			if (optlen > 2) {
 				ND_PRINT(" 0x");
 				for (i = 0; i < optlen - 2; i++)
 					ND_PRINT("%02x",
-						 GET_U_1(option + 2 + i));
+						 GET_U_1(bp + 2 + i));
 			}
 			break;
 		case DCCP_OPTION_NDP_COUNT:
 			for (i = 0; i < optlen - 2; i++)
-				ND_PRINT(" %u", GET_U_1(option + 2 + i));
+				ND_PRINT(" %u", GET_U_1(bp + 2 + i));
 			break;
 		case DCCP_OPTION_ACK_VECTOR_NONCE_0:
 			if (optlen > 2) {
 				ND_PRINT(" 0x");
 				for (i = 0; i < optlen - 2; i++)
 					ND_PRINT("%02x",
-						 GET_U_1(option + 2 + i));
+						 GET_U_1(bp + 2 + i));
 			}
 			break;
 		case DCCP_OPTION_ACK_VECTOR_NONCE_1:
@@ -625,7 +628,7 @@ dccp_print_option(netdissect_options *ndo, const u_char *option, u_int hlen)
 				ND_PRINT(" 0x");
 				for (i = 0; i < optlen - 2; i++)
 					ND_PRINT("%02x",
-						 GET_U_1(option + 2 + i));
+						 GET_U_1(bp + 2 + i));
 			}
 			break;
 		case DCCP_OPTION_DATA_DROPPED:
@@ -633,7 +636,7 @@ dccp_print_option(netdissect_options *ndo, const u_char *option, u_int hlen)
 				ND_PRINT(" 0x");
 				for (i = 0; i < optlen - 2; i++)
 					ND_PRINT("%02x",
-						 GET_U_1(option + 2 + i));
+						 GET_U_1(bp + 2 + i));
 			}
 			break;
 		case DCCP_OPTION_TIMESTAMP:
@@ -646,7 +649,7 @@ dccp_print_option(netdissect_options *ndo, const u_char *option, u_int hlen)
 		 *   Type=41  Length=6
 		 */
 			if (optlen == 6)
-				ND_PRINT(" %u", GET_BE_U_4(option + 2));
+				ND_PRINT(" %u", GET_BE_U_4(bp + 2));
 			else
 				ND_PRINT(" [optlen != 6]");
 			break;
@@ -671,17 +674,17 @@ dccp_print_option(netdissect_options *ndo, const u_char *option, u_int hlen)
 		 */
 			switch (optlen) {
 			case 6:
-				ND_PRINT(" %u", GET_BE_U_4(option + 2));
+				ND_PRINT(" %u", GET_BE_U_4(bp + 2));
 				break;
 			case 8:
-				ND_PRINT(" %u", GET_BE_U_4(option + 2));
+				ND_PRINT(" %u", GET_BE_U_4(bp + 2));
 				ND_PRINT(" (elapsed time %u)",
-					 GET_BE_U_2(option + 6));
+					 GET_BE_U_2(bp + 6));
 				break;
 			case 10:
-				ND_PRINT(" %u", GET_BE_U_4(option + 2));
+				ND_PRINT(" %u", GET_BE_U_4(bp + 2));
 				ND_PRINT(" (elapsed time %u)",
-					 GET_BE_U_4(option + 6));
+					 GET_BE_U_4(bp + 6));
 				break;
 			default:
 				ND_PRINT(" [optlen != 6 or 8 or 10]");
@@ -690,9 +693,9 @@ dccp_print_option(netdissect_options *ndo, const u_char *option, u_int hlen)
 			break;
 		case DCCP_OPTION_ELAPSED_TIME:
 			if (optlen == 6)
-				ND_PRINT(" %u", GET_BE_U_4(option + 2));
+				ND_PRINT(" %u", GET_BE_U_4(bp + 2));
 			else if (optlen == 4)
-				ND_PRINT(" %u", GET_BE_U_2(option + 2));
+				ND_PRINT(" %u", GET_BE_U_2(bp + 2));
 			else
 				ND_PRINT(" [optlen != 4 or 6]");
 			break;
@@ -701,7 +704,7 @@ dccp_print_option(netdissect_options *ndo, const u_char *option, u_int hlen)
 				ND_PRINT(" ");
 				for (i = 0; i < optlen - 2; i++)
 					ND_PRINT("%02x",
-						 GET_U_1(option + 2 + i));
+						 GET_U_1(bp + 2 + i));
 			}
 			break;
 		}
