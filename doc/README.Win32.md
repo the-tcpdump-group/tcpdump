@@ -26,7 +26,7 @@ only if there is some other requirement to use it rather than Npcap,
 such as a requirement to support versions of Windows earlier than
 Windows Vista, which is the earliest version supported by Npcap.
 
-Npcap and its SDK can be downloaded from its [home page](https://npcap.org).
+Npcap and its SDK can be downloaded from its [home page](https://npcap.com).
 The SDK is a ZIP archive; create a folder on your `C:` drive, e.g.
 `C:\npcap-sdk`, and put the contents of the ZIP archive into that folder.
 
