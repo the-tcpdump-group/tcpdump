@@ -126,9 +126,6 @@ struct bgp_route_refresh {
 #define BGPTYPE_COMMUNITIES              8    /* RFC1997 */
 #define BGPTYPE_ORIGINATOR_ID            9    /* RFC4456 */
 #define BGPTYPE_CLUSTER_LIST            10    /* RFC4456 */
-#define BGPTYPE_DPA                     11    /* deprecated, draft-ietf-idr-bgp-dpa */
-#define BGPTYPE_ADVERTISERS             12    /* deprecated RFC1863 */
-#define BGPTYPE_RCID_PATH               13    /* deprecated RFC1863 */
 #define BGPTYPE_MP_REACH_NLRI           14    /* RFC4760 */
 #define BGPTYPE_MP_UNREACH_NLRI         15    /* RFC4760 */
 #define BGPTYPE_EXTD_COMMUNITIES        16    /* RFC4360 */
@@ -159,9 +156,6 @@ static const struct tok bgp_attr_values[] = {
     { BGPTYPE_COMMUNITIES,      "Community"},
     { BGPTYPE_ORIGINATOR_ID,    "Originator ID"},
     { BGPTYPE_CLUSTER_LIST,     "Cluster List"},
-    { BGPTYPE_DPA,              "DPA"},
-    { BGPTYPE_ADVERTISERS,      "Advertisers"},
-    { BGPTYPE_RCID_PATH,        "RCID Path / Cluster ID"},
     { BGPTYPE_MP_REACH_NLRI,    "Multi-Protocol Reach NLRI"},
     { BGPTYPE_MP_UNREACH_NLRI,  "Multi-Protocol Unreach NLRI"},
     { BGPTYPE_EXTD_COMMUNITIES, "Extended Community"},
