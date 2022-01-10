@@ -356,6 +356,7 @@ EXTRA_DIST = \
 	configure.ac \
 	doc/README.Win32.md \
 	install-sh \
+	instrument-functions.c \
 	lbl/os-osf4.h \
 	lbl/os-solaris2.h \
 	lbl/os-sunos4.h \

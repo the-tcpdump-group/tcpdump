@@ -701,6 +701,7 @@ enable_option_checking
 with_gcc
 enable_universal
 with_smi
+enable_instrument_functions
 enable_smb
 with_user
 with_chroot
@@ -1332,6 +1333,8 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-universal     don't build universal on macOS
+  --enable-instrument-functions
+                          enable instrument functions code [default=no]
   --enable-smb            enable possibly-buggy SMB printer [default=no]
   --disable-local-libpcap don't look for a local libpcap [default=check for a
                           local libpcap]
@@ -4379,6 +4382,31 @@ fi
 
 
 fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable the instrument functions code" >&5
+$as_echo_n "checking whether to enable the instrument functions code... " >&6; }
+# Check whether --enable-instrument-functions was given.
+if test "${enable_instrument_functions+set}" = set; then :
+  enableval=$enable_instrument_functions;
+else
+  enableval=no
+fi
+
+case "$enableval" in
+yes)	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define ENABLE_INSTRUMENT_FUNCTIONS 1" >>confdefs.h
+
+	LOCALSRC="$LOCALSRC instrument-functions.c"
+	CFLAGS="$CFLAGS -finstrument-functions"
+	LDFLAGS="$LDFLAGS -Wl,--export-dynamic"
+	LIBS="$LIBS -ldl"
+	;;
+*)	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+	;;
+esac
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable the possibly-buggy SMB printer" >&5
 $as_echo_n "checking whether to enable the possibly-buggy SMB printer... " >&6; }

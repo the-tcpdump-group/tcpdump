@@ -146,6 +146,25 @@ main()
 	])
 fi
 
+AC_MSG_CHECKING([whether to enable the instrument functions code])
+AC_ARG_ENABLE([instrument-functions],
+   [AS_HELP_STRING([--enable-instrument-functions],
+     [enable instrument functions code [default=no]])],
+   [],
+   [enableval=no])
+case "$enableval" in
+yes)	AC_MSG_RESULT(yes)
+	AC_DEFINE(ENABLE_INSTRUMENT_FUNCTIONS, 1,
+	    [define if you want to build the instrument functions code])
+	LOCALSRC="$LOCALSRC instrument-functions.c"
+	CFLAGS="$CFLAGS -finstrument-functions"
+	LDFLAGS="$LDFLAGS -Wl,--export-dynamic"
+	LIBS="$LIBS -ldl"
+	;;
+*)	AC_MSG_RESULT(no)
+	;;
+esac
+
 AC_MSG_CHECKING([whether to enable the possibly-buggy SMB printer])
 AC_ARG_ENABLE([smb],
    [AS_HELP_STRING([--enable-smb],
