@@ -3,6 +3,9 @@
 /* Define to 1 if arpa/inet.h declares `ether_ntohost' */
 #undef ARPA_INET_H_DECLARES_ETHER_NTOHOST
 
+/* define if you want to build the instrument functions code */
+#undef ENABLE_INSTRUMENT_FUNCTIONS
+
 /* define if you want to build the possibly-buggy SMB printer */
 #undef ENABLE_SMB
 

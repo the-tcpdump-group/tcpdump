@@ -119,12 +119,50 @@ and ask!
 ## Code style and generic remarks
 1) A thorough reading of some other printers code is useful.
 
-2) Put the normative reference if any as comments (RFC, etc.).
+2) To help learn how tcpdump works or to help debugging:
+   You can configure and build tcpdump with the instrumentation of functions:
+   ```
+   $ ./configure --enable-instrument-functions
+   $ make -s clean all
+   ```
 
-3) Put the format of packets/headers/options as comments if there is no
+   This generates instrumentation calls for entry and exit to functions.
+   Just after function entry and just before function exit, these
+   profiling functions are called and print the function names with
+   indentation and call level.
+
+   If entering in a function, it prints also the calling function name with
+   file name and line number. There may be a small shift in the line number.
+
+   In some cases, with Clang 11, the file number is unknown (printed '??')
+   or the line number is unknown (printed '?'). In this case, use GCC.
+
+   If the environment variable INSTRUMENT is
+   - unset or set to an empty string, print nothing, like with no
+     instrumentation
+   - set to "all" or "a", print all the functions names
+   - set to "global" or "g", print only the global functions names
+
+   This allows to run:
+   ```
+   $ INSTRUMENT=a ./tcpdump ...
+   $ INSTRUMENT=g ./tcpdump ...
+   $ INSTRUMENT= ./tcpdump ...
+   ```
+   or
+   ```
+   $ export INSTRUMENT=global
+   $ ./tcpdump ...
+   ```
+
+   The library libbfd is used, therefore the binutils-dev package is required.
+
+3) Put the normative reference if any as comments (RFC, etc.).
+
+4) Put the format of packets/headers/options as comments if there is no
    published normative reference.
 
-4) The printer may receive incomplete packet in the buffer, truncated at any
+5) The printer may receive incomplete packet in the buffer, truncated at any
    random position, for example by capturing with `-s size` option.
    This means that an attempt to fetch packet data based on the expected
    format of the packet may run the risk of overrunning the buffer.
@@ -285,7 +323,7 @@ and ask!
    the string is a sequence of XX:XX:... values for the bytes
    of the address.
 
-5) When defining a structure corresponding to a packet or part of a
+6) When defining a structure corresponding to a packet or part of a
    packet, so that a pointer to packet data can be cast to a pointer to
    that structure and that structure pointer used to refer to fields in
    the packet, use the `nd_*` types for the structure members.
@@ -318,20 +356,20 @@ and ask!
    The `nd_*` type for a byte in a sequence of bytes is `nd_byte`; an
    *N*-byte sequence should be declared as `nd_byte[N]`.
 
-6) Do invalid packet checks in code: Think that your code can receive in input
+7) Do invalid packet checks in code: Think that your code can receive in input
    not only a valid packet but any arbitrary random sequence of octets (packet
    * built malformed originally by the sender or by a fuzz tester,
    * became corrupted in transit or for some other reason).
 
    Print with: `nd_print_invalid(ndo);	/* to print " (invalid)" */`
 
-7) Use `struct tok` for indexed strings and print them with
+8) Use `struct tok` for indexed strings and print them with
    `tok2str()` or `bittok2str()` (for flags).
    All `struct tok` must end with `{ 0, NULL }`.
 
-8) Avoid empty lines in output of printers.
+9) Avoid empty lines in output of printers.
 
-9) A commit message must have:
+10) A commit message must have:
    ```
    First line: Capitalized short summary in the imperative (50 chars or less)
 
@@ -343,14 +381,14 @@ and ask!
    the body.
    ```
 
-10) Avoid non-ASCII characters in code and commit messages.
+11) Avoid non-ASCII characters in code and commit messages.
 
-11) Use the style of the modified sources.
+12) Use the style of the modified sources.
 
-12) Don't mix declarations and code.
+13) Don't mix declarations and code.
 
-13) tcpdump requires a compiler that supports C99 or later, so C99
+14) tcpdump requires a compiler that supports C99 or later, so C99
    features may be used in code, but C11 or later features should not be
    used.
 
-14) Avoid trailing tabs/spaces
+15) Avoid trailing tabs/spaces

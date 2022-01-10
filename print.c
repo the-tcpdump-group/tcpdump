@@ -321,12 +321,22 @@ get_if_printer(int type)
 	return printer;
 }
 
+#ifdef ENABLE_INSTRUMENT_FUNCTIONS
+extern int profile_func_level;
+static int pretty_print_packet_level = -1;
+#endif
+
 void
 pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 		    const u_char *sp, u_int packets_captured)
 {
 	u_int hdrlen = 0;
 	int invalid_header = 0;
+
+#ifdef ENABLE_INSTRUMENT_FUNCTIONS
+	if (pretty_print_packet_level == -1)
+		pretty_print_packet_level = profile_func_level;
+#endif
 
 	if (ndo->ndo_packet_number)
 		ND_PRINT("%5u  ", packets_captured);
@@ -416,6 +426,10 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 		nd_print_trunc(ndo);
 		/* Print the full packet */
 		ndo->ndo_ll_hdr_len = 0;
+#ifdef ENABLE_INSTRUMENT_FUNCTIONS
+		/* truncation => reassignment */
+		profile_func_level = pretty_print_packet_level;
+#endif
 		break;
 	}
 	hdrlen = ndo->ndo_ll_hdr_len;

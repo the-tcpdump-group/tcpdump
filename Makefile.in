@@ -329,7 +329,8 @@ TAGHDR = \
 TAGFILES = $(SRC) $(HDR) $(TAGHDR) $(LIBNETDISSECT_SRC) \
 	print-smb.c smbutil.c
 
-CLEANFILES = $(PROG) $(OBJ) $(LIBNETDISSECT_OBJ) print-smb.o smbutil.o
+CLEANFILES = $(PROG) $(OBJ) $(LIBNETDISSECT_OBJ) \
+	print-smb.o smbutil.o instrument-functions.o
 
 EXTRA_DIST = \
 	CHANGES \
@@ -360,6 +361,7 @@ EXTRA_DIST = \
 	doc/README.solaris.md \
 	doc/README.Win32.md \
 	install-sh \
+	instrument-functions.c \
 	lbl/os-osf4.h \
 	lbl/os-solaris2.h \
 	lbl/os-sunos4.h \
