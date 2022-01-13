@@ -100,7 +100,6 @@ enc_if_print(netdissect_options *ndo,
              const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int length = h->len;
-	u_int caplen = h->caplen;
 	u_int af, flags;
 	const struct enchdr *hdr;
 
@@ -144,7 +143,6 @@ enc_if_print(netdissect_options *ndo,
 	ND_PRINT("SPI 0x%08x: ", GET_BE_U_4(hdr->spi));
 
 	length -= ENC_HDRLEN;
-	caplen -= ENC_HDRLEN;
 	p += ENC_HDRLEN;
 
 	switch (af) {
