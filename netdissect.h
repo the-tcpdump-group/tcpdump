@@ -741,6 +741,7 @@ extern void vtp_print(netdissect_options *, const u_char *, const u_int);
 extern void vxlan_gpe_print(netdissect_options *, const u_char *, u_int);
 extern void vxlan_print(netdissect_options *, const u_char *, u_int);
 extern void wb_print(netdissect_options *, const u_char *, u_int);
+extern void whois_print(netdissect_options *, const u_char *, u_int);
 extern void zep_print(netdissect_options *, const u_char *, u_int);
 extern void zephyr_print(netdissect_options *, const u_char *, u_int);
 extern void zmtp1_print(netdissect_options *, const u_char *, u_int);

@@ -1191,6 +1191,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-vxlan-gpe.c
     print-vxlan.c
     print-wb.c
+    print-whois.c
     print-zep.c
     print-zephyr.c
     print-zeromq.c
