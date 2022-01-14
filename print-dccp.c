@@ -333,7 +333,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 
 	/* other variables in generic header */
 	if (ndo->ndo_vflag) {
-		ND_PRINT(" (CCVal %u, CsCov %u, ", DCCPH_CCVAL(dh), DCCPH_CSCOV(dh));
+		ND_PRINT(" (CCVal %u, CsCov %u", DCCPH_CCVAL(dh), DCCPH_CSCOV(dh));
 	}
 
 	/* checksum calculation */
@@ -341,7 +341,7 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 		uint16_t sum = 0, dccp_sum;
 
 		dccp_sum = GET_BE_U_2(dh->dccph_checksum);
-		ND_PRINT("cksum 0x%04x ", dccp_sum);
+		ND_PRINT(", cksum 0x%04x ", dccp_sum);
 		if (IP_V(ip) == 4)
 			sum = dccp_cksum(ndo, ip, dh, len);
 		else if (IP_V(ip) == 6)
