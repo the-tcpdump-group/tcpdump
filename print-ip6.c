@@ -246,12 +246,12 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		return;
 	}
 
-        if (!ndo->ndo_eflag)
-            ND_PRINT("IP6 ");
+	if (!ndo->ndo_eflag)
+	    ND_PRINT("IP6 ");
 
 	if (IP6_VERSION(ip6) != 6) {
-          ND_PRINT("version error: %u != 6", IP6_VERSION(ip6));
-          return;
+	  ND_PRINT("version error: %u != 6", IP6_VERSION(ip6));
+	  return;
 	}
 
 	payload_len = GET_BE_U_2(ip6->ip6_plen);
@@ -285,30 +285,22 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	} else
 		len = length + sizeof(struct ip6_hdr);
 
-        nh = GET_U_1(ip6->ip6_nxt);
-        if (ndo->ndo_vflag) {
-            flow = GET_BE_U_4(ip6->ip6_flow);
-            ND_PRINT("(");
-#if 0
-            /* rfc1883 */
-            if (flow & 0x0f000000)
-		ND_PRINT("pri 0x%02x, ", (flow & 0x0f000000) >> 24);
-            if (flow & 0x00ffffff)
-		ND_PRINT("flowlabel 0x%06x, ", flow & 0x00ffffff);
-#else
-            /* RFC 2460 */
-            if (flow & 0x0ff00000)
-		ND_PRINT("class 0x%02x, ", (flow & 0x0ff00000) >> 20);
-            if (flow & 0x000fffff)
-		ND_PRINT("flowlabel 0x%05x, ", flow & 0x000fffff);
-#endif
+	nh = GET_U_1(ip6->ip6_nxt);
+	if (ndo->ndo_vflag) {
+	    flow = GET_BE_U_4(ip6->ip6_flow);
+	    ND_PRINT("(");
+	    /* RFC 2460 */
+	    if (flow & 0x0ff00000)
+	        ND_PRINT("class 0x%02x, ", (flow & 0x0ff00000) >> 20);
+	    if (flow & 0x000fffff)
+	        ND_PRINT("flowlabel 0x%05x, ", flow & 0x000fffff);
 
-            ND_PRINT("hlim %u, next-header %s (%u) payload length: %u) ",
-                         GET_U_1(ip6->ip6_hlim),
-                         tok2str(ipproto_values,"unknown",nh),
-                         nh,
-                         payload_len);
-        }
+	    ND_PRINT("hlim %u, next-header %s (%u) payload length: %u) ",
+	                 GET_U_1(ip6->ip6_hlim),
+	                 tok2str(ipproto_values,"unknown",nh),
+	                 nh,
+	                 payload_len);
+	}
 
 	/*
 	 * Cut off the snapshot length to the end of the IP payload.
