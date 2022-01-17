@@ -21,12 +21,14 @@
 #include <stdlib.h>
 #include "netdissect-alloc.h"
 
+static void nd_add_alloc_list(netdissect_options *, nd_mem_chunk_t *);
+
 /*
  * nd_free_all() is intended to be used after a packet printing
  */
 
 /* Add a memory chunk in allocation linked list */
-void
+static void
 nd_add_alloc_list(netdissect_options *ndo, nd_mem_chunk_t *chunkp)
 {
 	if (ndo->ndo_last_mem_p == NULL)	/* first memory allocation */
