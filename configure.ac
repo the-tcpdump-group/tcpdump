@@ -49,7 +49,7 @@ case "$host_os" in
 
 darwin*)
 	AC_ARG_ENABLE(universal,
-	AC_HELP_STRING([--disable-universal],[don't build universal on macOS]))
+	AS_HELP_STRING([--disable-universal],[don't build universal on macOS]))
 	if test "$enable_universal" != "no"; then
 		case "$host_os" in
 
