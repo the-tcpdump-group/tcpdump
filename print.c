@@ -315,6 +315,9 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	u_int hdrlen = 0;
 	int invalid_header = 0;
 
+	if (ndo->ndo_print_sampling && packets_captured % ndo->ndo_print_sampling != 0)
+		return;
+
 	if (ndo->ndo_packet_number)
 		ND_PRINT("%5u  ", packets_captured);
 

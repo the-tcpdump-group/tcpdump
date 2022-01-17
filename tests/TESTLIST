@@ -18,6 +18,7 @@ print-X		print-flags.pcap	print-capX.out	-X
 print-XX	print-flags.pcap	print-capXX.out	-XX
 print-A		print-flags.pcap	print-A.out	-A
 print-AA	print-flags.pcap	print-AA.out	-AA
+print-sampling print-flags.pcap print-sampling.out --print-sampling=3
 
 # TCP 3-Way Handshake test, nano precision
 # Use "no -t", -t, -tt, -ttt, -tttt, -ttttt options for more code coverage

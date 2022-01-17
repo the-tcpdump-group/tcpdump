@@ -20,7 +20,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "29 November 2021"
+.TH TCPDUMP 1  "17 January 2022"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -86,15 +86,20 @@ tcpdump \- dump traffic on a network
 [
 .B \-\-print
 ]
+.ti +8
+[
+.B \-\-print\-sampling
+.I nth
+]
 [
 .B \-Q
 .I in|out|inout
 ]
-.ti +8
 [
 .B \-r
 .I file
 ]
+.ti +8
 [
 .B \-s
 .I snaplen
@@ -106,11 +111,11 @@ tcpdump \- dump traffic on a network
 [
 .B \-\-version
 ]
-.ti +8
 [
 .B \-V
 .I file
 ]
+.ti +8
 [
 .B \-w
 .I file
@@ -652,6 +657,17 @@ Print parsed packet output, even if the raw packets are being saved to a
 file with the
 .B \-w
 flag.
+.TP
+.BI \-\-print\-sampling= nth
+.PD
+Print every \fInth\fP packet. This option enables the \fB--print\fP flag.
+.IP
+Unprinted packets are not parsed, which decreases processing time. Setting
+\fInth\fP to \fB100\fP for example, will (counting from 1) parse and print the
+100th packet, 200th patcket, 300th packet, and so on.
+.IP
+This option also enables the \fB-S\fP flag, as relative TCP sequence
+numbers are not tracked for unprinted packets.
 .TP
 .BI \-Q " direction"
 .PD 0
