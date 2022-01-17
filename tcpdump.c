@@ -691,6 +691,7 @@ show_remote_devices_and_exit(void)
 #define OPTION_TSTAMP_NANO		134
 #define OPTION_FP_TYPE			135
 #define OPTION_COUNT			136
+#define OPTION_PRINT_SAMPLING		137
 
 static const struct option longopts[] = {
 #if defined(HAVE_PCAP_CREATE) || defined(_WIN32)
@@ -738,6 +739,7 @@ static const struct option longopts[] = {
 	{ "fp-type", no_argument, NULL, OPTION_FP_TYPE },
 	{ "number", no_argument, NULL, '#' },
 	{ "print", no_argument, NULL, OPTION_PRINT },
+	{ "print-sampling", required_argument, NULL, OPTION_PRINT_SAMPLING },
 	{ "version", no_argument, NULL, OPTION_VERSION },
 	{ NULL, 0, NULL, 0 }
 };
@@ -1958,6 +1960,14 @@ main(int argc, char **argv)
 
 		case OPTION_PRINT:
 			print = 1;
+			break;
+
+		case OPTION_PRINT_SAMPLING:
+			print = 1;
+			++ndo->ndo_Sflag;
+			ndo->ndo_print_sampling = atoi(optarg);
+			if (ndo->ndo_print_sampling <= 0)
+				error("invalid print sampling %s", optarg);
 			break;
 
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
@@ -3262,9 +3272,11 @@ print_usage(FILE *f)
 "\t\t" m_FLAG_USAGE "\n");
 #endif
 	(void)fprintf(f,
-"\t\t[ -M secret ] [ --number ] [ --print ]" Q_FLAG_USAGE "\n");
+"\t\t[ -M secret ] [ --number ] [ --print ]\n");
 	(void)fprintf(f,
-"\t\t[ -r file ] [ -s snaplen ] [ -T type ] [ --version ]\n");
+"\t\t[ --print-sampling nth ]" Q_FLAG_USAGE " [ -r file ]\n");
+	(void)fprintf(f,
+"\t\t[ -s snaplen ] [ -T type ] [ --version ]\n");
 	(void)fprintf(f,
 "\t\t[ -V file ] [ -w file ] [ -W filecount ] [ -y datalinktype ]\n");
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
