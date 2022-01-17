@@ -333,23 +333,23 @@ CLEANFILES = $(PROG) $(OBJ) $(LIBNETDISSECT_OBJ)
 
 EXTRA_DIST = \
 	CHANGES \
+	CMakeLists.txt \
 	CONTRIBUTING \
 	CREDITS \
-	CMakeLists.txt \
 	INSTALL.md \
 	LICENSE \
-	Makefile.in \
 	Makefile-devel-adds \
+	Makefile.in \
 	README.md \
 	VERSION \
 	aclocal.m4 \
 	atime.awk \
 	bpf_dump.c \
-	cmake_uninstall.cmake.in \
-	cmakeconfig.h.in \
 	cmake/Modules/FindCRYPTO.cmake \
 	cmake/Modules/FindPCAP.cmake \
 	cmake/Modules/FindSMI.cmake \
+	cmake_uninstall.cmake.in \
+	cmakeconfig.h.in \
 	config.guess \
 	config.h.in \
 	config.sub \
@@ -364,10 +364,10 @@ EXTRA_DIST = \
 	lbl/os-sunos4.h \
 	lbl/os-ultrix4.h \
 	makemib \
-	missing/dlnames.c \
 	missing/datalinks.c \
-	missing/getopt_long.h \
+	missing/dlnames.c \
 	missing/getopt_long.c \
+	missing/getopt_long.h \
 	missing/getservent.c \
 	missing/pcap_dump_ftell.c \
 	missing/snprintf.c \
