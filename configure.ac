@@ -146,10 +146,11 @@ main()
 fi
 
 AC_MSG_CHECKING([whether to enable the possibly-buggy SMB printer])
-AC_ARG_ENABLE(smb,
-[  --enable-smb            enable possibly-buggy SMB printer [default=no]
-  --disable-smb           disable possibly-buggy SMB printer],,
-   enableval=no)
+AC_ARG_ENABLE([smb],
+   [AS_HELP_STRING([--enable-smb],
+     [enable possibly-buggy SMB printer [default=no]])],
+   [],
+   [enableval=no])
 case "$enableval" in
 yes)	AC_MSG_RESULT(yes)
 	AC_DEFINE(ENABLE_SMB, 1,

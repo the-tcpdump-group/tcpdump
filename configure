@@ -1332,8 +1332,7 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-universal     don't build universal on macOS
-  --enable-smb            enable possibly-buggy SMB printer default=no
-  --disable-smb           disable possibly-buggy SMB printer
+  --enable-smb            enable possibly-buggy SMB printer [default=no]
   --disable-local-libpcap don't look for a local libpcap [default=check for a
                           local libpcap]
 
