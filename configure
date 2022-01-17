@@ -1340,8 +1340,8 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --without-gcc           don't use gcc
-  --with-smi              link with libsmi (allows to load MIBs on the fly to decode SNMP packets. default=yes
-  --without-smi           don't link with libsmi
+  --with-smi              link with libsmi (allows to load MIBs on the fly to
+                          decode SNMP packets) [default=yes, if available]
   --with-user=USERNAME    drop privileges by default to USERNAME
   --with-chroot=DIRECTORY when dropping privileges, chroot to DIRECTORY
   --with-sandbox-capsicum use Capsicum security functions [default=yes, if

@@ -76,10 +76,11 @@ darwin*)
 esac
 
 
-AC_ARG_WITH(smi,
-[  --with-smi              link with libsmi (allows to load MIBs on the fly to decode SNMP packets. [default=yes]
-  --without-smi           don't link with libsmi],,
-   with_smi=yes)
+AC_ARG_WITH([smi],
+   [AS_HELP_STRING([--with-smi],
+     [link with libsmi (allows to load MIBs on the fly to decode SNMP packets) [default=yes, if available]])],
+   [],
+   [with_smi=yes])
 
 if test "x$with_smi" != "xno" ; then
 	AC_CHECK_HEADER(smi.h,
