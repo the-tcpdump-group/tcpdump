@@ -26,7 +26,6 @@ typedef struct nd_mem_chunk {
 	/* variable size data */
 } nd_mem_chunk_t;
 
-void nd_add_alloc_list(netdissect_options *, nd_mem_chunk_t *);
 void * nd_malloc(netdissect_options *, size_t);
 void nd_free_all(netdissect_options *);
 
