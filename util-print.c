@@ -470,7 +470,7 @@ print_unknown_data(netdissect_options *ndo, const u_char *cp,
 /*
  * Convert a token value to a string; use "fmt" if not found.
  */
-const char *
+static const char *
 tok2strbuf(const struct tok *lp, const char *fmt,
 	   u_int v, char *buf, size_t bufsize)
 {
