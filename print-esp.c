@@ -386,10 +386,9 @@ static u_int hex2byte(netdissect_options *ndo, char *hexstring)
 /*
  * returns size of binary, 0 on failure.
  */
-static
-int espprint_decode_hex(netdissect_options *ndo,
-			u_char *binbuf, unsigned int binbuf_len,
-			char *hex)
+static int
+espprint_decode_hex(netdissect_options *ndo,
+		    u_char *binbuf, unsigned int binbuf_len, char *hex)
 {
 	unsigned int len;
 	int i;
