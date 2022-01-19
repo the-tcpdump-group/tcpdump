@@ -370,8 +370,6 @@ EXTRA_DIST = \
 	missing/strlcat.c \
 	missing/strlcpy.c \
 	missing/strsep.c \
-	missing/win_ether_ntohost.c \
-	missing/win_ether_ntohost.h \
 	mkdep \
 	packetdat.awk \
 	print-pflog.c \
