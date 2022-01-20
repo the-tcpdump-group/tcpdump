@@ -18,9 +18,9 @@ freebsd_task:
   env:
     IGNORE_OSVERSION: yes
     MAKEFLAGS: -j 3
-    MATRIX_CC: clang gcc10
+    MATRIX_CC: clang gcc11
   script:
-    - pkg install -qy git autoconf gcc10
+    - pkg install -qy git autoconf gcc11
     - pkg install -qy cmake # for build_matrix.sh and build.sh
     - pkg install -qy pkgconf # for cmake, replaces pkg-config
     - pkg install -qy sudo # for some tcpdump commands
