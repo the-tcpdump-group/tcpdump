@@ -389,6 +389,13 @@ all: $(PROG)
 $(PROG): $(OBJ) @V_PCAPDEP@ $(LIBNETDISSECT)
 	@rm -f $@
 	$(CC) $(FULL_CFLAGS) $(LDFLAGS) -o $@ $(OBJ) $(LIBNETDISSECT) $(LIBS)
+	nm $(PROG) | grep ' [tT] ' > $(PROG)_instrument_functions.nm
+
+instrument_all: $(PROG)
+	nm $(PROG) | grep ' [tT] ' > $(PROG)_instrument_functions.nm
+
+instrument_global: $(PROG)
+	nm $(PROG) | grep ' [T] ' > $(PROG)_instrument_functions.nm
 
 $(LIBNETDISSECT): $(LIBNETDISSECT_OBJ)
 	@rm -f $@

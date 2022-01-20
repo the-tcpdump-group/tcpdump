@@ -157,9 +157,11 @@ yes)	AC_MSG_RESULT(yes)
 	AC_DEFINE(ENABLE_INSTRUMENT_FUNCTIONS, 1,
 	    [define if you want to build the instrument functions code])
 	LOCALSRC="$LOCALSRC instrument-functions.c"
-	CFLAGS="$CFLAGS -finstrument-functions"
-	LDFLAGS="$LDFLAGS -Wl,--export-dynamic"
-	LIBS="$LIBS -ldl"
+	# Add '-finstrument-functions' instrumentation option to generate
+	# instrumentation calls for entry and exit to functions.
+	# Try to avoid Address Space Layout Randomization (ALSR).
+	CFLAGS="$CFLAGS -finstrument-functions -fno-stack-protector -fno-pic"
+	LDFLAGS="$LDFLAGS -fno-stack-protector -no-pie"
 	;;
 *)	AC_MSG_RESULT(no)
 	;;

@@ -310,6 +310,7 @@ get_if_printer(int type)
 
 #ifdef ENABLE_INSTRUMENT_FUNCTIONS
 extern int profile_func_level;
+static int pretty_print_packet_level = -1;
 #endif
 
 void
@@ -321,6 +322,11 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 
 	if (ndo->ndo_print_sampling && packets_captured % ndo->ndo_print_sampling != 0)
 		return;
+
+#ifdef ENABLE_INSTRUMENT_FUNCTIONS
+	if (pretty_print_packet_level == -1)
+		pretty_print_packet_level = profile_func_level;
+#endif
 
 	if (ndo->ndo_packet_number)
 		ND_PRINT("%5u  ", packets_captured);
@@ -411,8 +417,8 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 		/* Print the full packet */
 		ndo->ndo_ll_hdr_len = 0;
 #ifdef ENABLE_INSTRUMENT_FUNCTIONS
-		/* truncation => reassignment, currently: 1 (main is 0) */
-		profile_func_level = 1;
+		/* truncation => reassignment */
+		profile_func_level = pretty_print_packet_level;
 #endif
 		break;
 	}

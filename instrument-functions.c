@@ -36,30 +36,82 @@ int profile_func_level = -1;
  * To instument a static function, remove temporarily the static specifier.
  */
 
-void __cyg_profile_func_enter(void *this_fn, void *call_site)
-			      __attribute__((no_instrument_function));
+#ifndef ND_NO_INSTRUMENT
+#define ND_NO_INSTRUMENT __attribute__((no_instrument_function))
+#endif
 
-void __cyg_profile_func_exit(void *this_fn, void *call_site)
-			     __attribute__((no_instrument_function));
+void __cyg_profile_func_enter(void *this_fn, void *call_site) ND_NO_INSTRUMENT;
+
+void __cyg_profile_func_exit(void *this_fn, void *call_site) ND_NO_INSTRUMENT;
 
 /*
- * The get_function_name() get the function name by calling dladdr()
+ * Structure table to store the functions data from FILE_NAME.
+ * FILE_NAME is generated via:
+ * $ nm $(PROG) | grep ' [tT] '
+ * or
+ * $ nm $(PROG) | grep ' [T] '
  */
 
-static const char *get_function_name(void *func)
-			      __attribute__((no_instrument_function));
+#define MAX_FUNCTIONS 20000
+static struct {
+	void *addr;
+	char type;
+	char name[128];
+} functions[MAX_FUNCTIONS] ;
+static int functions_count;
+static int initialization_done;
+
+/*
+ * Read the result of nm in functions[]
+ */
+
+#define FILE_NAME "tcpdump_instrument_functions.nm"
+
+void read_functions_table(void) ND_NO_INSTRUMENT;
+
+void
+read_functions_table(void)
+{
+	FILE *fp;
+	int i = 0;
+	if ((fp = fopen(FILE_NAME, "r")) == NULL) {
+	printf("Warning: Cannot open \"%s\" file\n", FILE_NAME);
+		return;
+	}
+	while (i < MAX_FUNCTIONS && fscanf(fp, "%p %c %s", &functions[i].addr,
+		      &functions[i].type, functions[i].name) != EOF)
+
+		i++;
+	fclose(fp);
+	functions_count = i;
+}
+
+/*
+ * Get the function name by searching in functions[]
+ */
+
+static const char * get_function_name(void *func) ND_NO_INSTRUMENT;
 
 static const char *
 get_function_name(void *func)
 {
-	Dl_info info;
-	const char *function_name;
-
-	if (dladdr(func, &info))
-		function_name = info.dli_sname;
+	int i = 0;
+	int found = 0;
+	if (!initialization_done) {
+		read_functions_table();
+		initialization_done = 1;
+	}
+	while (i < functions_count) {
+		if (functions[i].addr == func) {
+			found = 1;
+			break;
+		}
+		i++;
+	}
+	if (found)
+		return (functions[i].name);
 	else
-		function_name = NULL;
-	return function_name;
+		return NULL;
 }
 
 void
