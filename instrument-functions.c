@@ -55,7 +55,7 @@ get_function_name(void *func)
 	Dl_info info;
 	const char *function_name;
 
-	if(dladdr(func, &info))
+	if (dladdr(func, &info))
 		function_name = info.dli_sname;
 	else
 		function_name = NULL;
@@ -69,7 +69,7 @@ __cyg_profile_func_enter(void *this_fn,
 	int i;
 	const char *function_name;
 
-	if((function_name = get_function_name(this_fn)) != NULL) {
+	if ((function_name = get_function_name(this_fn)) != NULL) {
 		profile_func_level += 1;
 		for (i = 0 ; i < profile_func_level ; i++)
 			putchar(' ');
@@ -85,7 +85,7 @@ __cyg_profile_func_exit(void *this_fn,
 	int i;
 	const char *function_name;
 
-	if((function_name = get_function_name(this_fn)) != NULL) {
+	if ((function_name = get_function_name(this_fn)) != NULL) {
 		for (i = 0 ; i < profile_func_level ; i++)
 			putchar(' ');
 		printf ("[<< %s (%d)]\n", function_name, profile_func_level);
