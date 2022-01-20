@@ -152,7 +152,9 @@ tcpdump \- dump traffic on a network
 .SH DESCRIPTION
 .LP
 \fITcpdump\fP prints out a description of the contents of packets on a
-network interface that match the Boolean \fIexpression\fP; the
+network interface that match the Boolean \fIexpression\fP (see
+.BR pcap-filter (7)
+for the \fIexpression\fP syntax); the
 description is preceded by a time stamp, printed, by default, as hours,
 minutes, seconds, and fractions of a second since midnight.  It can also
 be run with the
