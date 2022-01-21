@@ -2780,7 +2780,7 @@ cleanup(int signo _U_)
 static void
 child_cleanup(int signo _U_)
 {
-  wait(NULL);
+  while (waitpid(-1, NULL, WNOHANG) >= 0);
 }
 #endif /* HAVE_FORK && HAVE_VFORK */
 
