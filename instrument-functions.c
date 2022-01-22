@@ -75,12 +75,11 @@ read_functions_table(void)
 	FILE *fp;
 	int i = 0;
 	if ((fp = fopen(FILE_NAME, "r")) == NULL) {
-	printf("Warning: Cannot open \"%s\" file\n", FILE_NAME);
+		printf("Warning: Cannot open \"%s\" file\n", FILE_NAME);
 		return;
 	}
 	while (i < MAX_FUNCTIONS && fscanf(fp, "%p %c %s", &functions[i].addr,
 		      &functions[i].type, functions[i].name) != EOF)
-
 		i++;
 	fclose(fp);
 	functions_count = i;
