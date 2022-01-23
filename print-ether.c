@@ -86,7 +86,7 @@ const struct tok ethertype_values[] = {
     { ETHERTYPE_PPPOED,         "PPPoE D" },
     { ETHERTYPE_PPPOES,         "PPPoE S" },
     { ETHERTYPE_EAPOL,          "EAPOL" },
-    { ETHERTYPE_RRCP,           "RRCP" },
+    { ETHERTYPE_REALTEK,        "Realtek protocols" },
     { ETHERTYPE_MS_NLB_HB,      "MS NLB heartbeat" },
     { ETHERTYPE_JUMBO,          "Jumbo" },
     { ETHERTYPE_NSH,            "NSH" },
@@ -584,8 +584,8 @@ ethertype_print(netdissect_options *ndo,
 		eapol_print(ndo, p);
 		return (1);
 
-	case ETHERTYPE_RRCP:
-		rrcp_print(ndo, p, length, src, dst);
+	case ETHERTYPE_REALTEK:
+		rtl_print(ndo, p, length, src, dst);
 		return (1);
 
 	case ETHERTYPE_PPP:

@@ -176,8 +176,8 @@
 #ifndef ETHERTYPE_EAPOL
 #define ETHERTYPE_EAPOL  	0x888e
 #endif
-#ifndef ETHERTYPE_RRCP
-#define ETHERTYPE_RRCP  	0x8899
+#ifndef ETHERTYPE_REALTEK
+#define ETHERTYPE_REALTEK  	0x8899	/* Realtek layer 2 protocols and switch tags */
 #endif
 #ifndef ETHERTYPE_AOE
 #define ETHERTYPE_AOE  		0x88a2
