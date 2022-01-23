@@ -1104,11 +1104,11 @@ set(NETDISSECT_SOURCE_LIST_C
     print-quic.c
     print-radius.c
     print-raw.c
+    print-realtek.c
     print-resp.c
     print-rip.c
     print-ripng.c
     print-rpki-rtr.c
-    print-rrcp.c
     print-rsvp.c
     print-rt6.c
     print-rtsp.c
