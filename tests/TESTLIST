@@ -60,8 +60,8 @@ bgp-encap	bgp-encap.pcap		bgp-encap.out		-v
 bgp-rt-prefix	bgp-rt-prefix.pcap	bgp-rt-prefix.out	-v
 bgp-link-bw-extcommunity	bgp-link-bw-extcommunity.pcapng	bgp-link-bw-extcommunity.out	-v
 bgp-extended-msg	bgp-extended-msg.pcapng	bgp-extended-msg.out	-v
-bgp-enhanced-route-refresh	bgp-enhanced-route-refresh.pcap	bgp-enhanced-route-refresh.out	-v
-bgp-enhanced-route-refresh-subtype	bgp-enhanced-route-refresh-subtype.pcap	bgp-enhanced-route-refresh-subtype.out	-v
+bgp-enhanced-route-refresh	bgp-enhanced-route-refresh.pcapng	bgp-enhanced-route-refresh.out	-v
+bgp-enhanced-route-refresh-subtype	bgp-enhanced-route-refresh-subtype.pcapng	bgp-enhanced-route-refresh-subtype.out	-v
 
 # Broadcom tag tests
 brcmtag		brcm-tag.pcap		brcm-tag.out
