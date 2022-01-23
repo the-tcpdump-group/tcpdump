@@ -16,7 +16,6 @@
 #endif
 
 #include <stdio.h>
-#include <dlfcn.h>
 
 extern int profile_func_level;
 int profile_func_level = -1;
