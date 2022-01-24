@@ -154,14 +154,20 @@ AC_ARG_ENABLE([instrument-functions],
    [enableval=no])
 case "$enableval" in
 yes)	AC_MSG_RESULT(yes)
+	AC_CHECK_LIB([bfd], [bfd_init],
+	    [true],
+	    [AC_MSG_ERROR(
+	       [--enable-instrument-functions was given, but test for library libbfd failed. Please install the 'binutils-dev' package.])],
+	    [])
 	AC_DEFINE(ENABLE_INSTRUMENT_FUNCTIONS, 1,
 	    [define if you want to build the instrument functions code])
 	LOCALSRC="$LOCALSRC instrument-functions.c"
 	# Add '-finstrument-functions' instrumentation option to generate
 	# instrumentation calls for entry and exit to functions.
 	# Try to avoid Address Space Layout Randomization (ALSR).
-	CFLAGS="$CFLAGS -finstrument-functions -fno-stack-protector -fno-pic"
-	LDFLAGS="$LDFLAGS -fno-stack-protector -no-pie"
+	CFLAGS="$CFLAGS -O0 -ggdb -finstrument-functions -fno-stack-protector -fno-pic"
+	LDFLAGS="$LDFLAGS -O0 -ggdb -fno-stack-protector -no-pie"
+	LIBS="$LIBS -lbfd"
 	;;
 *)	AC_MSG_RESULT(no)
 	;;

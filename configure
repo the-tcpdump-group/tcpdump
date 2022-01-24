@@ -4395,6 +4395,48 @@ fi
 case "$enableval" in
 yes)	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for bfd_init in -lbfd" >&5
+$as_echo_n "checking for bfd_init in -lbfd... " >&6; }
+if ${ac_cv_lib_bfd_bfd_init+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lbfd  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char bfd_init ();
+int
+main ()
+{
+return bfd_init ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_bfd_bfd_init=yes
+else
+  ac_cv_lib_bfd_bfd_init=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_bfd_bfd_init" >&5
+$as_echo "$ac_cv_lib_bfd_bfd_init" >&6; }
+if test "x$ac_cv_lib_bfd_bfd_init" = xyes; then :
+  true
+else
+  as_fn_error $? "--enable-instrument-functions was given, but test for library libbfd failed. Please install the 'binutils-dev' package." "$LINENO" 5
+fi
+
 
 $as_echo "#define ENABLE_INSTRUMENT_FUNCTIONS 1" >>confdefs.h
 
@@ -4402,8 +4444,9 @@ $as_echo "#define ENABLE_INSTRUMENT_FUNCTIONS 1" >>confdefs.h
 	# Add '-finstrument-functions' instrumentation option to generate
 	# instrumentation calls for entry and exit to functions.
 	# Try to avoid Address Space Layout Randomization (ALSR).
-	CFLAGS="$CFLAGS -finstrument-functions -fno-stack-protector -fno-pic"
-	LDFLAGS="$LDFLAGS -fno-stack-protector -no-pie"
+	CFLAGS="$CFLAGS -O0 -ggdb -finstrument-functions -fno-stack-protector -fno-pic"
+	LDFLAGS="$LDFLAGS -O0 -ggdb -fno-stack-protector -no-pie"
+	LIBS="$LIBS -lbfd"
 	;;
 *)	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }

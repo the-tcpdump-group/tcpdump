@@ -43,3 +43,5 @@ tcpdump.sln
 .vs/
 .passed
 .failed
+tcpdump_instrument_functions_global.devel
+tcpdump_instrument_functions_off.devel
