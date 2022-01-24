@@ -43,3 +43,4 @@ tcpdump.sln
 .vs/
 .passed
 .failed
+tcpdump_instrument_functions.nm
