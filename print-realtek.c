@@ -25,52 +25,6 @@
 
 /* \summary: printer for various Realtek protocols */
 
-/*
- * See, for example, section 8.20 "Realtek Remote Control Protocol" of
- *
- *    http://realtek.info/pdf/rtl8324.pdf
- *
- * and section 7.22 "Realtek Remote Control Protocol" of
- *
- *    http://realtek.info/pdf/rtl8326.pdf
- *
- * and this page on the OpenRRCP Wiki:
- *
- *    http://openrrcp.org.ru/wiki/rrcp_protocol
- *
- * for information on RRCP.
- *
- * See, for example, section 8.21 "Network Loop Connection Fault
- * Detection" of
- *
- *    http://realtek.info/pdf/rtl8324.pdf
- *
- * and section 7.23 "Network Loop Connection Fault Detection" of
- *
- *    http://realtek.info/pdf/rtl8326.pdf
- *
- * for information on RLDP.
- *
- * See, for example, section 8.22 "Realtek Echo Protocol" of
- *
- *    http://realtek.info/pdf/rtl8324.pdf
- *
- * and section 7.24 "Realtek Echo Protocol" of
- *
- *    http://realtek.info/pdf/rtl8326.pdf
- *
- * for information on REP.
- *
- * NOTE: none of them indicate the byte order of multi-byte fields in any
- * obvious fashion.
- *
- * See section 8.10 "CPU Tag Function" of
- *
- *    http://realtek.info/pdf/rtl8306sd%28m%29_datasheet_1.1.pdf
- *
- * for the RTL8306 DSA protocol tag format.
- */
-
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -81,26 +35,26 @@
 #include "addrtoname.h"
 #include "extract.h"
 
-#define RTL_FRAME_TYPE_OFFSET		0	/* frame type and other data - 1 byte */
+#define RTL_PROTOCOL_OFFSET	0	/* Protocol and possibly other data - 1 byte */
+
+#define RTL_PROTOCOL_RRCP	0x01	/* RRCP */
+#define RTL_PROTOCOL_REP	0x02	/* REP */
+#define RTL_PROTOCOL_RLDP	0x03	/* RLDP */
+#define RTL_PROTOCOL_RLDP2	0x23	/* also RLDP */
+#define RTL_PROTOCOL_XXX_DSA	0x04	/* DSA protocol for some chip(s) */
 
 /*
- * The upper 4 bits of the first octet of Realtek 0x8899 frames indicates
- * the frame type.
+ * Values for the upper 4 bits of the protocol field, for
+ * protocols where the lower 4 bits contain protocol data.
+ *
+ * See section 8.10 "CPU Tag Function" of
+ *
+ *    http://realtek.info/pdf/rtl8306sd%28m%29_datasheet_1.1.pdf
+ *
+ * for the RTL8306 DSA protocol tag format.
  */
-#define RTL_FRAME_TYPE_MASK		0xF0
-#define RTL_FRAME_TYPE_SUBTYPE		0x00	/* lower 4 bits are a subtype */
-#define RTL_FRAME_TYPE_8306_DSA		0x90	/* RTL8306 DSA protocol */
-#define RTL_FRAME_TYPE_8366RB_DSA	0xA0	/* RTL8366RB DSA protocol */
-#define RTL_FRAME_TYPE_SHIFT		4
-
-/*
- * The lower 4 bits are a subtype if the upper 4 bits are 0.
- */
-#define RTL_FRAME_SUBTYPE_MASK		0x0F
-#define RTL_FRAME_SUBTYPE_RRCP		0x01	/* RRCP */
-#define RTL_FRAME_SUBTYPE_REP		0x02	/* REP */
-#define RTL_FRAME_SUBTYPE_RLDP		0x03	/* RLDP */
-#define RTL_FRAME_SUBTYPE_XXX_DSA	0x04	/* DSA protocol for some chip(s) */
+#define RTL_PROTOCOL_8306_DSA		0x90	/* RTL8306 DSA protocol */
+#define RTL_PROTOCOL_8366RB_DSA		0xA0	/* RTL8366RB DSA protocol */
 
 #define RRCP_OPCODE_ISREPLY_OFFSET	1	/* opcode and isreply flag - 1 byte */
 
@@ -134,7 +88,21 @@ static const struct tok opcode_values[] = {
 };
 
 /*
- * Print RRCP packets
+ * Print RRCP packets.
+ *
+ * See, for example, section 8.20 "Realtek Remote Control Protocol" of
+ *
+ *    http://realtek.info/pdf/rtl8324.pdf
+ *
+ * and section 7.22 "Realtek Remote Control Protocol" of
+ *
+ *    http://realtek.info/pdf/rtl8326.pdf
+ *
+ * and this page on the OpenRRCP Wiki:
+ *
+ *    http://openrrcp.org.ru/wiki/rrcp_protocol
+ *
+ * for information on RRCP.
  */
 static void
 rrcp_print(netdissect_options *ndo,
@@ -172,7 +140,69 @@ rrcp_print(netdissect_options *ndo,
 }
 
 /*
- * Print Realtek packets
+ * Print Realtek packets.
+ *
+ * See, for example, section 8.22 "Realtek Echo Protocol" of
+ *
+ *    http://realtek.info/pdf/rtl8324.pdf
+ *
+ * and section 7.24 "Realtek Echo Protocol" of
+ *
+ *    http://realtek.info/pdf/rtl8326.pdf
+ *
+ * for information on REP.
+ *
+ * See section 8.21 "Network Loop Connection Fault Detection" of
+ *
+ *    http://realtek.info/pdf/rtl8324.pdf
+ *
+ * and section 7.23 "Network Loop Connection Fault Detection" of
+ *
+ *    http://realtek.info/pdf/rtl8326.pdf
+ *
+ * for information on RLDP.
+ *
+ * See also section 7.3.8 "Loop Detection" of
+ *
+ *    http://www.ibselectronics.com/ibsstore/datasheet/RTL8306E-CG.pdf
+ *
+ * (revision 1.1 of the RTL8306E-CG datasheet), which describes a loop
+ * detection protocol for which the payload has a 16-bit (presumably
+ * big-endian) field containing the value 0x0300, followed by what is
+ * presumably a 16-bit big-endian field the upper 12 bits of which are 0
+ * and the lower 4 bits of which are a TTL value, followed by zeroes to
+ * pad the packet out to the minimum Ethernet packet size.
+ *
+ * See also section 7.3.13 "Loop Detection" of
+ *
+ *    http://realtek.info/pdf/rtl8305sb.pdf
+ *
+ * (revision 1.3 of the RTL8305SB datasheet), which describes a similar
+ * loop detection protocol that lacks the TTL field - all the bytes
+ * after 0x0300 are zero.
+ *
+ * See also section 7.3.7 "Loop Detection" of
+ *
+ *    https://datasheet.lcsc.com/lcsc/1810221720_Realtek-Semicon-RTL8305NB-CG_C52146.pdf
+ *
+ * (revision 1.0 of the RTL8305NB-CT datasheet), which describes a loop
+ * detection protocol similar to the one from the RTL8306E-CG datasheet,
+ * except that the first value is 0x2300, not 0x0300.
+ *
+ * And, on top of all that, I've seen packets where the first octet of
+ * the packet is 0x23, and that's followed by 6 unknown octets (a MAC
+ * address of some sort?  It differs from packet to packet in a capture),
+ * followed by the MAC address that appears in the source address in the
+ * Ethernet header (possibly the originator, in case the packet is forwarded,
+ * in which case the forwarded packets won't have the source address from
+ * the Ethernet header there), followed by unknown stuff (0x0d followed by
+ * zeroes for all such packets in one capture, 0x01 followed by zeroes for
+ * all such packets in another capture, 0x07 followed by 0x20's for all
+ * such packets in yet another capture).  The OpenRRCP issue at
+ * https://github.com/illarionov/OpenRRCP/issues/3 shows a capture
+ * similar to the last of those, but with 0x02 instead of 0x07.  Or is that
+ * just crap in the buffer in which the chip constructed the packet, left
+ * over from something else?
  */
 void
 rtl_print(netdissect_options *ndo,
@@ -191,56 +221,28 @@ rtl_print(netdissect_options *ndo,
 			(dst->addr_string)(ndo, dst->addr));
 	}
 
-	rtl_proto = GET_U_1(cp + RTL_FRAME_TYPE_OFFSET);
+	rtl_proto = GET_U_1(cp + RTL_PROTOCOL_OFFSET);
 
-	switch (rtl_proto & RTL_FRAME_TYPE_MASK) {
-
-	case RTL_FRAME_TYPE_SUBTYPE:
+	if (rtl_proto == RTL_PROTOCOL_RRCP)
+		rrcp_print(ndo, cp);
+	else if (rtl_proto == RTL_PROTOCOL_REP) {
 		/*
-		 * Test the subtype.
+		 * REP packets have no payload.
 		 */
-		switch (rtl_proto & RTL_FRAME_SUBTYPE_MASK) {
-
-		case RTL_FRAME_SUBTYPE_RRCP:
-			rrcp_print(ndo, cp);
-			break;
-
-		case RTL_FRAME_SUBTYPE_REP:
-			/*
-			 * REP packets have no payload.
-			 */
-			ND_PRINT("REP");
-			break;
-
-		case RTL_FRAME_SUBTYPE_RLDP:
-			/*
-			 * RLDP packets have no payload.
-			 */
-			ND_PRINT("RLDP");
-			break;
-
-		case RTL_FRAME_SUBTYPE_XXX_DSA:
-			ND_PRINT("Realtek 8-byte DSA tag");
-			break;
-
-		default:
-			ND_PRINT("Realtek unknown subtype 0x%01x",
-			    rtl_proto & RTL_FRAME_SUBTYPE_MASK);
-			break;
-		}
-		break;
-
-	case RTL_FRAME_TYPE_8306_DSA:
+		ND_PRINT("REP");
+	} else if (rtl_proto == RTL_PROTOCOL_RLDP ||
+	           rtl_proto == RTL_PROTOCOL_RLDP2) {
+		/*
+		 * RLDP packets have no payload.
+		 * (XXX - except when they do?  See above.)
+		 */
+		ND_PRINT("RLDP");
+	} else if (rtl_proto == RTL_PROTOCOL_XXX_DSA)
+		ND_PRINT("Realtek 8-byte DSA tag");
+	else if ((rtl_proto & 0xF0) == RTL_PROTOCOL_8306_DSA)
 		ND_PRINT("Realtek RTL8306 4-byte DSA tag");
-		break;
-
-	case RTL_FRAME_TYPE_8366RB_DSA:
+	else if ((rtl_proto & 0xF0) == RTL_PROTOCOL_8366RB_DSA)
 		ND_PRINT("Realtek RTL8366RB 4-byte DSA tag");
-		break;
-
-	default:
-		ND_PRINT("Realtek unknown type 0x%01x",
-		    (rtl_proto & RTL_FRAME_TYPE_MASK) >> RTL_FRAME_TYPE_SHIFT);
-		break;
-	}
+	else
+		ND_PRINT("Realtek unknown type 0x%02x", rtl_proto);
 }
