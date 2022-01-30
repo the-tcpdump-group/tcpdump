@@ -193,6 +193,7 @@ LIBNETDISSECT_SRC=\
 	print-ospf.c \
 	print-ospf6.c \
 	print-otv.c \
+	print-pflog.c \
 	print-pgm.c \
 	print-pim.c \
 	print-pktap.c \
@@ -305,6 +306,7 @@ HDR = \
 	ospf.h \
 	oui.h \
 	pcap-missing.h \
+	pflog.h \
 	ppp.h \
 	print.h \
 	rpc_auth.h \

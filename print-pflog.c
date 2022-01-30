@@ -19,43 +19,46 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-/* \summary: OpenBSD packet filter log file printer */
+/* \summary: *BSD/Darwin packet filter log file printer */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
 
-#ifndef HAVE_NET_PFVAR_H
-#error "No pf headers available"
-#endif
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <net/if.h>
-#include <net/pfvar.h>
-#include <net/if_pflog.h>
-
 #include "netdissect-stdinc.h"
 
 #include "netdissect.h"
 #include "extract.h"
+#include "af.h"
 
+#include "pflog.h"
 
 static const struct tok pf_reasons[] = {
-	{ 0,	"0(match)" },
-	{ 1,	"1(bad-offset)" },
-	{ 2,	"2(fragment)" },
-	{ 3,	"3(short)" },
-	{ 4,	"4(normalize)" },
-	{ 5,	"5(memory)" },
-	{ 6,	"6(bad-timestamp)" },
-	{ 7,	"7(congestion)" },
-	{ 8,	"8(ip-option)" },
-	{ 9,	"9(proto-cksum)" },
-	{ 10,	"10(state-mismatch)" },
-	{ 11,	"11(state-insert)" },
-	{ 12,	"12(state-limit)" },
-	{ 13,	"13(src-limit)" },
-	{ 14,	"14(synproxy)" },
+	{ PFRES_MATCH,		"0(match)" },
+	{ PFRES_BADOFF,		"1(bad-offset)" },
+	{ PFRES_FRAG,		"2(fragment)" },
+	{ PFRES_NORM,		"3(short)" },
+	{ PFRES_NORM,		"4(normalize)" },
+	{ PFRES_MEMORY,		"5(memory)" },
+	{ PFRES_TS,		"6(bad-timestamp)" },
+	{ PFRES_CONGEST,	"7(congestion)" },
+	{ PFRES_IPOPTIONS,	"8(ip-option)" },
+	{ PFRES_PROTCKSUM,	"9(proto-cksum)" },
+	{ PFRES_BADSTATE,	"10(state-mismatch)" },
+	{ PFRES_STATEINS,	"11(state-insert)" },
+	{ PFRES_MAXSTATES,	"12(state-limit)" },
+	{ PFRES_SRCLIMIT,	"13(src-limit)" },
+	{ PFRES_SYNPROXY,	"14(synproxy)" },
+#if defined(__FreeBSD__)
+	{ PFRES_MAPFAILED,	"15(map-failed)" },
+#elif defined(__NetBSD__)
+	{ PFRES_STATELOCKED,	"15(state-locked)" },
+#elif defined(__OpenBSD__)
+	{ PFRES_TRANSLATE,	"15(translate)" },
+	{ PFRES_NOROUTE,	"16(no-route)" },
+#elif defined(__APPLE__)
+	{ PFRES_DUMMYNET,	"15(dummynet)" },
+#endif
 	{ 0,	NULL }
 };
 
@@ -70,6 +73,20 @@ static const struct tok pf_actions[] = {
 	{ PF_RDR,		"rdr" },
 	{ PF_NORDR,		"rdr" },
 	{ PF_SYNPROXY_DROP,	"synproxy-drop" },
+#if defined(__FreeBSD__)
+	{ PF_DEFER,		"defer" },
+#elif defined(__OpenBSD__)
+	{ PF_DEFER,		"defer" },
+	{ PF_MATCH,		"match" },
+	{ PF_DIVERT,		"divert" },
+	{ PF_RT,		"rt" },
+	{ PF_AFRT,		"afrt" },
+#elif defined(__APPLE__)
+	{ PF_DUMMYNET,		"dummynet" },
+	{ PF_NODUMMYNET,	"nodummynet" },
+	{ PF_NAT64,		"nat64" },
+	{ PF_NONAT64,		"nonat64" },
+#endif
 	{ 0,			NULL }
 };
 
@@ -77,12 +94,11 @@ static const struct tok pf_directions[] = {
 	{ PF_INOUT,	"in/out" },
 	{ PF_IN,	"in" },
 	{ PF_OUT,	"out" },
+#if defined(__OpenBSD__)
+	{ PF_FWD,	"fwd" },
+#endif
 	{ 0,		NULL }
 };
-
-/* For reading capture files on other systems */
-#define	OPENBSD_AF_INET		2
-#define	OPENBSD_AF_INET6	24
 
 static void
 pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
@@ -104,7 +120,7 @@ pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
 	    tok2str(pf_reasons, "unkn(%u)", GET_U_1(&hdr->reason)),
 	    tok2str(pf_actions, "unkn(%u)", GET_U_1(&hdr->action)),
 	    tok2str(pf_directions, "unkn(%u)", GET_U_1(&hdr->dir)));
-	nd_printjnp(ndo, (const u_char*)hdr->ifname, IFNAMSIZ);
+	nd_printjnp(ndo, (const u_char*)hdr->ifname, PFLOG_IFNAMSIZ);
 	ND_PRINT(": ");
 }
 
@@ -133,7 +149,7 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 		ndo->ndo_ll_hdr_len += GET_U_1(&hdr->length);	/* XXX: not really */
 		return;
 	}
-	hdrlen = BPF_WORDALIGN(hdr->length);
+	hdrlen = roundup2(hdr->length, 4);
 
 	if (caplen < hdrlen) {
 		nd_print_trunc(ndo);
@@ -153,23 +169,26 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	p += hdrlen;
 	switch (af) {
 
-		case AF_INET:
-#if OPENBSD_AF_INET != AF_INET
-		case OPENBSD_AF_INET:		/* XXX: read pcap files */
-#endif
+		/*
+		 * If there's a system that doesn't use the AF_INET
+		 * from 4.2BSD, feel free to add its value to af.h
+		 * and use it here.
+		 *
+		 * Hopefully, there isn't.
+		 */
+		case AFNUM_INET:
 		        ip_print(ndo, p, length);
 			break;
 
-#if defined(AF_INET6) || defined(OPENBSD_AF_INET6)
-#ifdef AF_INET6
-		case AF_INET6:
-#endif /* AF_INET6 */
-#if !defined(AF_INET6) || OPENBSD_AF_INET6 != AF_INET6
-		case OPENBSD_AF_INET6:		/* XXX: read pcap files */
-#endif /* !defined(AF_INET6) || OPENBSD_AF_INET6 != AF_INET6 */
+		/*
+		 * Try all AF_INET6 values for all systems with pflog,
+		 * including Darwin.
+		 */
+		case BSD_AFNUM_INET6_BSD:
+		case BSD_AFNUM_INET6_FREEBSD:
+		case BSD_AFNUM_INET6_DARWIN:
 			ip6_print(ndo, p, length);
 			break;
-#endif /* defined(AF_INET6) || defined(OPENBSD_AF_INET6) */
 
 	default:
 		/* address family not handled, print raw packet */

@@ -72,12 +72,6 @@
 /* Define to 1 if you have the <net/if.h> header file. */
 #cmakedefine HAVE_NET_IF_H 1
 
-/* Define to 1 if you have the <net/if_pflog.h> header file. */
-#cmakedefine HAVE_NET_IF_PFLOG_H 1
-
-/* Define to 1 if you have the <net/pfvar.h> header file. */
-#cmakedefine HAVE_NET_PFVAR_H 1
-
 /* Define to 1 if you have the `openat' function. */
 #cmakedefine HAVE_OPENAT 1
 
