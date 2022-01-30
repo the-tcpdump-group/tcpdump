@@ -2,9 +2,9 @@
 
 $testlist = [
     # This specific test fails on OpenBSD because the .pcap file uses DLT_RAW,
-    # which OpenBSD treats as DLT_LOOP. The macro is set on all three BSDs.
+    # which OpenBSD treats as DLT_LOOP.
     {
-        config_unset => 'HAVE_NET_IF_PFLOG_H',
+        config_unset => 'IS_OPENBSD',
         name => 'heap-overflow-1',
         input => 'heap-overflow-1.pcap',
         output => 'heap-overflow-1.out',

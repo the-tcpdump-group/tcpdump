@@ -371,6 +371,13 @@ sub loadconfighash {
     }
     $main::confighhash->{$have_fptype} = 1;
 
+    # and check whether this is OpenBSD, as one test fails in OpenBSD
+    # due to the sad hellscape of low-numbered DLT_ values, due to
+    # 12 meaning "OpenBSD loopback" rather than "raw IP" on OpenBSD
+    if($^O eq "openbsd") {
+        $main::confighhash->{"IS_OPENBSD"} = 1;
+    }
+
     return $main::confighhash;
 }
 
