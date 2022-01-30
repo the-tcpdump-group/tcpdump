@@ -4183,42 +4183,6 @@ fi
 
 done
 
-for ac_header in net/pfvar.h
-do :
-  ac_fn_c_check_header_compile "$LINENO" "net/pfvar.h" "ac_cv_header_net_pfvar_h" "#include <sys/types.h>
-#include <sys/socket.h>
-#include <net/if.h>
-"
-if test "x$ac_cv_header_net_pfvar_h" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_NET_PFVAR_H 1
-_ACEOF
-
-fi
-
-done
-
-if test "$ac_cv_header_net_pfvar_h" = yes; then
-	for ac_header in net/if_pflog.h
-do :
-  ac_fn_c_check_header_compile "$LINENO" "net/if_pflog.h" "ac_cv_header_net_if_pflog_h" "#include <sys/types.h>
-	#include <sys/socket.h>
-	#include <net/if.h>
-	#include <net/pfvar.h>
-"
-if test "x$ac_cv_header_net_if_pflog_h" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_NET_IF_PFLOG_H 1
-_ACEOF
-
-fi
-
-done
-
-	if test "$ac_cv_header_net_if_pflog_h" = yes; then
-		LOCALSRC="print-pflog.c $LOCALSRC"
-	fi
-fi
 
 case "$host_os" in
 

@@ -75,12 +75,6 @@
 /* Define to 1 if you have the <net/if.h> header file. */
 #undef HAVE_NET_IF_H
 
-/* Define to 1 if you have the <net/if_pflog.h> header file. */
-#undef HAVE_NET_IF_PFLOG_H
-
-/* Define to 1 if you have the <net/pfvar.h> header file. */
-#undef HAVE_NET_PFVAR_H
-
 /* Define to 1 if printf(3) does not support the z length modifier. */
 #undef HAVE_NO_PRINTF_Z
 

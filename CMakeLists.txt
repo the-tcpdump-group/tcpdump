@@ -275,15 +275,6 @@ check_include_file(net/if.h HAVE_NET_IF_H)
 if(HAVE_RPC_RPC_H)
     check_include_files("rpc/rpc.h;rpc/rpcent.h" HAVE_RPC_RPCENT_H)
 endif(HAVE_RPC_RPC_H)
-if(NOT WIN32)
-    check_include_files("sys/types.h;sys/socket.h;net/if.h;net/pfvar.h" HAVE_NET_PFVAR_H)
-    if(HAVE_NET_PFVAR_H)
-        check_include_files("sys/types.h;sys/socket.h;net/if.h;net/pfvar.h;net/if_pflog.h" HAVE_NET_IF_PFLOG_H)
-        if(HAVE_NET_IF_PFLOG_H)
-            set(LOCALSRC print-pflog.c ${LOCALSRC})
-        endif(HAVE_NET_IF_PFLOG_H)
-    endif(HAVE_NET_PFVAR_H)
-endif(NOT WIN32)
 
 #
 # Functions.
@@ -1093,6 +1084,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-ospf.c
     print-ospf6.c
     print-otv.c
+    print-pflog.c
     print-pgm.c
     print-pim.c
     print-pktap.c
