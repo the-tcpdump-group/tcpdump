@@ -74,10 +74,10 @@ __cyg_profile_func_exit(void *this_fn, void *call_site)
 }
 
 /* If this file exists, print only the global functions */
-#define ND_FILE_FLAG_GLOBAL "tcpdump_instrument_functions_global.devel"
+#define ND_FILE_FLAG_GLOBAL "instrument_functions_global.devel"
 
 /* If this file exists, print nothing, like with no instrumentation */
-#define ND_FILE_FLAG_OFF "tcpdump_instrument_functions_off.devel"
+#define ND_FILE_FLAG_OFF "instrument_functions_off.devel"
 
 static void print_debug(void *this_fn, void *call_site, action_type action)
 {
