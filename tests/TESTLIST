@@ -62,6 +62,7 @@ bgp-link-bw-extcommunity	bgp-link-bw-extcommunity.pcapng	bgp-link-bw-extcommunit
 bgp-extended-msg	bgp-extended-msg.pcapng	bgp-extended-msg.out	-v
 bgp-enhanced-route-refresh	bgp-enhanced-route-refresh.pcapng	bgp-enhanced-route-refresh.out	-v
 bgp-enhanced-route-refresh-subtype	bgp-enhanced-route-refresh-subtype.pcapng	bgp-enhanced-route-refresh-subtype.out	-v
+bgp-extended-optional-parameters-length	bgp-extended-optional-parameters-length.pcap	bgp-extended-optional-parameters-length.out	-v
 
 # Broadcom tag tests
 brcmtag		brcm-tag.pcap		brcm-tag.out

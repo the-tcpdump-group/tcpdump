@@ -80,13 +80,15 @@ struct bgp_open {
     nd_uint16_t bgpo_holdtime;
     nd_uint32_t bgpo_id;
     nd_uint8_t  bgpo_optlen;
+    nd_uint8_t  bgpo_opttype;         /* RFC9072 */
+    nd_uint16_t bgpo_optlen_extended; /* RFC9072 */
     /* options should follow */
 };
 #define BGP_OPEN_SIZE        29    /* unaligned */
 
 struct bgp_opt {
-    nd_uint8_t bgpopt_type;
-    nd_uint8_t bgpopt_len;
+    nd_uint8_t  bgpopt_type;
+    nd_uint16_t bgpopt_len; /* Can be one or two bytes, depending on RFC9072 */
     /* variable length */
 };
 #define BGP_OPT_SIZE           2    /* some compilers may pad to 4 bytes */
@@ -460,6 +462,9 @@ static const struct tok bgp_safi_values[] = {
 #define BGP_EXT_COM_EIGRP_METRIC_LOAD_MTU        0x8803
 #define BGP_EXT_COM_EIGRP_EXT_REMAS_REMID        0x8804
 #define BGP_EXT_COM_EIGRP_EXT_REMPROTO_REMMETRIC 0x8805
+
+/* Optional Parameters */
+#define BGP_OPEN_NON_EXT_OPT_TYPE_EXTENDED_LENGTH 255 /* Non-Ext OP Type */
 
 static const struct tok bgp_extd_comm_flag_values[] = {
     { 0x8000,                  "vendor-specific"},
@@ -2662,9 +2667,13 @@ bgp_open_print(netdissect_options *ndo,
     char astostr[AS_STR_SIZE];
     const struct bgp_open *bgp_open_header;
     u_int optslen;
+    uint8_t opsttype;
     const struct bgp_opt *bgpopt;
     const u_char *opt;
     u_int i;
+    uint8_t extended_opt_params = 0;
+    u_int open_size = BGP_OPEN_SIZE;
+    u_int opt_size = BGP_OPT_SIZE;
 
     ND_TCHECK_LEN(dat, BGP_OPEN_SIZE);
     if (length < BGP_OPEN_SIZE)
@@ -2680,22 +2689,32 @@ bgp_open_print(netdissect_options *ndo,
         GET_BE_U_2(bgp_open_header->bgpo_holdtime));
     ND_PRINT("ID %s", GET_IPADDR_STRING(bgp_open_header->bgpo_id));
     optslen = GET_U_1(bgp_open_header->bgpo_optlen);
-    ND_PRINT("\n\t  Optional parameters, length: %u", optslen);
+    opsttype = GET_U_1(bgp_open_header->bgpo_opttype);
+    if (opsttype == BGP_OPEN_NON_EXT_OPT_TYPE_EXTENDED_LENGTH) {
+        optslen = GET_BE_U_2(bgp_open_header->bgpo_optlen_extended);
+        extended_opt_params = 1;
+        open_size += 3;
+        opt_size += 1;
+    }
+    ND_PRINT("\n\t  Optional parameters%s, length: %u",
+             extended_opt_params ? " (Extended)" : "", optslen);
 
-    opt = dat + BGP_OPEN_SIZE;
-    length -= BGP_OPEN_SIZE;
+    opt = dat + open_size;
+    length -= open_size;
 
     i = 0;
     while (i < optslen) {
-        uint8_t opt_type, opt_len;
+        uint8_t opt_type;
+        uint16_t opt_len;
 
-        ND_TCHECK_LEN(opt + i, BGP_OPT_SIZE);
-        if (length < BGP_OPT_SIZE + i)
+        ND_TCHECK_LEN(opt + i, opt_size);
+        if (length < opt_size + i)
             goto trunc;
         bgpopt = (const struct bgp_opt *)(opt + i);
         opt_type = GET_U_1(bgpopt->bgpopt_type);
-        opt_len = GET_U_1(bgpopt->bgpopt_len);
-        if (BGP_OPT_SIZE + i + opt_len > optslen) {
+        opt_len = extended_opt_params ? GET_BE_U_2(bgpopt->bgpopt_len)
+                                      : GET_U_1(bgpopt->bgpopt_len);
+        if (opt_size + i + opt_len > optslen) {
             ND_PRINT("\n\t     Option %u, length: %u, goes past the end of the options",
                       opt_type, opt_len);
             break;
@@ -2710,7 +2729,7 @@ bgp_open_print(netdissect_options *ndo,
         switch(opt_type) {
 
         case BGP_OPT_CAP:
-            bgp_capabilities_print(ndo, opt + BGP_OPT_SIZE + i,
+            bgp_capabilities_print(ndo, opt + opt_size + i,
                                    opt_len);
             break;
 
@@ -2720,7 +2739,7 @@ bgp_open_print(netdissect_options *ndo,
                opt_type);
                break;
         }
-        i += BGP_OPT_SIZE + opt_len;
+        i += opt_size + opt_len;
     }
     return;
 trunc:
