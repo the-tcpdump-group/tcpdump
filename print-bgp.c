@@ -278,7 +278,6 @@ static const struct tok bgp_notify_major_values[] = {
 /* draft-ietf-idr-shutdown-07 */
 #define BGP_NOTIFY_MINOR_CEASE_SHUT     2
 #define BGP_NOTIFY_MINOR_CEASE_RESET    4
-#define BGP_NOTIFY_MINOR_CEASE_ADMIN_SHUTDOWN_LEN   128
 static const struct tok bgp_notify_minor_cease_values[] = {
     { BGP_NOTIFY_MINOR_CEASE_MAXPRFX, "Maximum Number of Prefixes Reached"},
     { BGP_NOTIFY_MINOR_CEASE_SHUT,    "Administrative Shutdown"},
@@ -3017,8 +3016,7 @@ bgp_notification_print(netdissect_options *ndo,
             shutdown_comm_length = GET_U_1(tptr);
             remainder_offset = 0;
             /* garbage, hexdump it all */
-            if (shutdown_comm_length > BGP_NOTIFY_MINOR_CEASE_ADMIN_SHUTDOWN_LEN ||
-                shutdown_comm_length > length - (BGP_NOTIFICATION_SIZE + 1)) {
+            if (shutdown_comm_length > length - (BGP_NOTIFICATION_SIZE + 1)) {
                 ND_PRINT(", invalid Shutdown Communication length");
             }
             else if (shutdown_comm_length == 0) {
