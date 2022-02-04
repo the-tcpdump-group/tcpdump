@@ -2668,7 +2668,7 @@ DIAG_ON_ASSIGN_ENUM
 
 	free(cmdbuf);
 	pcap_freecode(&fcode);
-	exit_tcpdump(status == -1 ? 1 : 0);
+	exit_tcpdump(status == -1 ? S_ERR_HOST_PROGRAM : S_SUCCESS);
 }
 
 /*
