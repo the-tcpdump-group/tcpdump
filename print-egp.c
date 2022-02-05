@@ -191,7 +191,7 @@ egpnr_print(netdissect_options *ndo,
 		length--;
 		ND_PRINT(" %s %s ",
 		       gateways < intgw ? "int" : "ext",
-		       ipaddr_string(ndo, (const u_char *)&addr));
+		       ipaddr_string(ndo, (const u_char *)&addr)); /* local buffer, not packet data; don't use GET_IPADDR_STRING() */
 
 		comma = "";
 		ND_PRINT("(");
@@ -226,7 +226,7 @@ egpnr_print(netdissect_options *ndo,
 					cp++;
 					length -= 2;
 				}
-				ND_PRINT(" %s", ipaddr_string(ndo, (const u_char *)&addr));
+				ND_PRINT(" %s", ipaddr_string(ndo, (const u_char *)&addr)); /* local buffer, not packet data; don't use GET_IPADDR_STRING() */
 				networks--;
 			}
 			distances--;
