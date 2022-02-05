@@ -226,7 +226,7 @@ print_prefix(netdissect_options *ndo, const u_char *prefix, u_int max_length)
 		((u_char *)&addr)[plenbytes - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
 	}
-	snprintf(buf, sizeof(buf), "%s/%u", ipaddr_string(ndo, (const u_char *)&addr), plen);
+	snprintf(buf, sizeof(buf), "%s/%u", ipaddr_string(ndo, (const u_char *)&addr), plen); /* local buffer, not packet data; don't use GET_IPADDR_STRING() */
         plenbytes += 1 + IPV4_MAPPED_HEADING_LEN;
     } else {
         plenbytes = decode_prefix6(ndo, prefix, max_length, buf, sizeof(buf));
