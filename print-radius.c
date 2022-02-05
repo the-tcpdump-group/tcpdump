@@ -1084,7 +1084,7 @@ print_attr_netmask6(netdissect_options *ndo,
    if (length > 2)
       memcpy(data2, data+2, length-2);
 
-   ND_PRINT("%s/%u", ip6addr_string(ndo, data2), GET_U_1(data + 1));
+   ND_PRINT("%s/%u", ip6addr_string(ndo, data2), GET_U_1(data + 1)); /* local buffer, not packet data; don't use GET_IP6ADDR_STRING() */
 
    if (GET_U_1(data + 1) > 8 * (length - 2))
       ND_PRINT(" (inconsistent prefix length)");
