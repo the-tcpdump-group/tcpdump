@@ -850,27 +850,21 @@ rpl_dio_print(netdissect_options *ndo,
               const u_char *bp, u_int length)
 {
         const struct nd_rpl_dio *dio = (const struct nd_rpl_dio *)bp;
-        const char *dagid_str;
-
-        ND_TCHECK_SIZE(dio);
-        dagid_str = ip6addr_string (ndo, dio->rpl_dagid);
 
         ND_PRINT(" [dagid:%s,seq:%u,instance:%u,rank:%u,%smop:%s,prf:%u]",
-                  dagid_str,
+                  GET_IP6ADDR_STRING(dio->rpl_dagid),
                   GET_U_1(dio->rpl_dtsn),
                   GET_U_1(dio->rpl_instanceid),
                   GET_BE_U_2(dio->rpl_dagrank),
                   RPL_DIO_GROUNDED(GET_U_1(dio->rpl_mopprf)) ? "grounded,":"",
-                  tok2str(rpl_mop_values, "mop%u", RPL_DIO_MOP(GET_U_1(dio->rpl_mopprf))),
+                  tok2str(rpl_mop_values, "mop%u",
+                          RPL_DIO_MOP(GET_U_1(dio->rpl_mopprf))),
                   RPL_DIO_PRF(GET_U_1(dio->rpl_mopprf)));
 
         if(ndo->ndo_vflag > 1) {
                 rpl_printopts(ndo, bp + sizeof(struct nd_rpl_dio),
                               length - sizeof(struct nd_rpl_dio));
         }
-	return;
-trunc:
-	nd_print_trunc(ndo);
 }
 
 static void
