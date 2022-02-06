@@ -914,17 +914,13 @@ rpl_daoack_print(netdissect_options *ndo,
         const struct nd_rpl_daoack *daoack = (const struct nd_rpl_daoack *)bp;
         const char *dagid_str = "<elided>";
 
-        ND_TCHECK_LEN(daoack, ND_RPL_DAOACK_MIN_LEN);
-        if (length < ND_RPL_DAOACK_MIN_LEN)
-		goto tooshort;
+        ND_ICHECK_U(length, <, ND_RPL_DAOACK_MIN_LEN);
 
         bp += ND_RPL_DAOACK_MIN_LEN;
         length -= ND_RPL_DAOACK_MIN_LEN;
         if(RPL_DAOACK_D(GET_U_1(daoack->rpl_flags))) {
-                ND_TCHECK_LEN(daoack->rpl_dagid, DAGID_LEN);
-                if (length < DAGID_LEN)
-                	goto tooshort;
-                dagid_str = ip6addr_string (ndo, daoack->rpl_dagid);
+                ND_ICHECK_U(length, <, DAGID_LEN);
+                dagid_str = GET_IP6ADDR_STRING(daoack->rpl_dagid);
                 bp += DAGID_LEN;
                 length -= DAGID_LEN;
         }
@@ -939,14 +935,9 @@ rpl_daoack_print(netdissect_options *ndo,
         if(ndo->ndo_vflag > 1) {
                 rpl_printopts(ndo, bp, length);
         }
-	return;
-
-trunc:
-	nd_print_trunc(ndo);
-	return;
-
-tooshort:
-	ND_PRINT(" [|dao-length too short]");
+        return;
+invalid:
+        nd_print_invalid(ndo);
 }
 
 static void
