@@ -1502,7 +1502,7 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			default:
 				goto trunc;
 			}
-			ND_PRINT(" %s/%u", ip6addr_string(ndo, (const u_char *)&in6),
+			ND_PRINT(" %s/%u", ip6addr_string(ndo, (const u_char *)&in6), /* local buffer, not packet data; don't use GET_IP6ADDR_STRING() */
                                   GET_U_1(opri->nd_opt_rti_prefixlen));
 			ND_PRINT(", pref=%s",
 				 get_rtpref(GET_U_1(opri->nd_opt_rti_flags)));
