@@ -879,18 +879,14 @@ rpl_dao_print(netdissect_options *ndo,
         const char *dagid_str = "<elided>";
         uint8_t rpl_flags;
 
-        ND_TCHECK_SIZE(dao);
-        if (length < ND_RPL_DAO_MIN_LEN)
-		goto tooshort;
+        ND_ICHECK_U(length, <, ND_RPL_DAO_MIN_LEN);
 
         bp += ND_RPL_DAO_MIN_LEN;
         length -= ND_RPL_DAO_MIN_LEN;
         rpl_flags = GET_U_1(dao->rpl_flags);
         if(RPL_DAO_D(rpl_flags)) {
-                ND_TCHECK_LEN(dao->rpl_dagid, DAGID_LEN);
-                if (length < DAGID_LEN)
-                	goto tooshort;
-                dagid_str = ip6addr_string (ndo, dao->rpl_dagid);
+                ND_ICHECK_U(length, <, DAGID_LEN);
+                dagid_str = GET_IP6ADDR_STRING(dao->rpl_dagid);
                 bp += DAGID_LEN;
                 length -= DAGID_LEN;
         }
@@ -906,14 +902,9 @@ rpl_dao_print(netdissect_options *ndo,
         if(ndo->ndo_vflag > 1) {
                 rpl_printopts(ndo, bp, length);
         }
-	return;
-
-trunc:
-	nd_print_trunc(ndo);
-	return;
-
-tooshort:
-	ND_PRINT(" [|length too short]");
+        return;
+invalid:
+        nd_print_invalid(ndo);
 }
 
 static void
