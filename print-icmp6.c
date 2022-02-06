@@ -895,7 +895,7 @@ rpl_dao_print(netdissect_options *ndo,
                 length -= DAGID_LEN;
         }
 
-        ND_PRINT(" [dagid:%s,seq:%u,instance:%u%s%s,%02x]",
+        ND_PRINT(" [dagid:%s,seq:%u,instance:%u%s%s,flags:%02x]",
                   dagid_str,
                   GET_U_1(dao->rpl_daoseq),
                   GET_U_1(dao->rpl_instanceid),
