@@ -806,62 +806,60 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                     break;
 
                 case INTERFACE_INFORMATION_OBJECT_CLASS:
-					/*
+                    /*
+                    Ctype in a INTERFACE_INFORMATION_OBJECT_CLASS object:
 
-					Ctype in a INTERFACE_INFORMATION_OBJECT_CLASS object:
+                    Bit     0       1       2       3       4       5       6       7
+                    +-------+-------+-------+-------+-------+-------+-------+-------+
+                    | Interface Role| Rsvd1 | Rsvd2 |ifIndex| IPAddr|  name |  MTU  |
+                    +-------+-------+-------+-------+-------+-------+-------+-------+
+                    */
+                    interface_role = (obj_ctype & 0xc0) >> 6;
+                    if_index_flag  = (obj_ctype & 0x8) >> 3;
+                    ipaddr_flag    = (obj_ctype & 0x4) >> 2;
+                    name_flag      = (obj_ctype & 0x2) >> 1;
+                    mtu_flag       = (obj_ctype & 0x1);
 
-					Bit     0       1       2       3       4       5       6       7
-					+-------+-------+-------+-------+-------+-------+-------+-------+
-					| Interface Role| Rsvd1 | Rsvd2 |ifIndex| IPAddr|  name |  MTU  |
-					+-------+-------+-------+-------+-------+-------+-------+-------+
+                    ND_PRINT("\n\t\t This object describes %s",
+                             tok2str(icmp_interface_identification_role_values,
+                             "an unknown interface role",interface_role));
 
-					*/
-					interface_role = (obj_ctype & 0xc0) >> 6;
-					if_index_flag  = (obj_ctype & 0x8) >> 3;
-					ipaddr_flag    = (obj_ctype & 0x4) >> 2;
-					name_flag      = (obj_ctype & 0x2) >> 1;
-					mtu_flag       = (obj_ctype & 0x1);
+                    offset = obj_tptr;
 
-					ND_PRINT("\n\t\t This object describes %s",
-                       tok2str(icmp_interface_identification_role_values,"an unknown interface role",interface_role));
-
-					offset = obj_tptr;
-
-					if (if_index_flag) {
-						ND_PRINT("\n\t\t Interface Index: %u", GET_BE_U_4(offset));
-						offset += 4;
-					}
-
-					if (ipaddr_flag) {
-						ND_PRINT("\n\t\t IP Address sub-object: ");
-						ipaddr_subobj = (const struct icmp_interface_identification_ipaddr_subobject_t *) offset;
-						switch (GET_BE_U_2(ipaddr_subobj->afi)) {
-							case 1:
-								ND_PRINT("%s", GET_IPADDR_STRING(ipaddr_subobj->ip_addr));
-								offset += 4;
-								break;
-							case 2:
-								ND_PRINT("%s", GET_IP6ADDR_STRING(ipaddr_subobj->ip_addr));
-								offset += 16;
-								break;
-							default:
-								ND_PRINT("Unknown Address Family Identifier");
-								return;
-						}
-						offset += 4;
-					}
-
-					if (name_flag) {
-						ifname_subobj = (const struct icmp_interface_identification_ifname_subobject_t *) offset;
-						ND_PRINT("\n\t\t Interface Name: %.*s", GET_U_1(ifname_subobj->length), ifname_subobj->if_name);
-						offset += 1 + GET_U_1(ifname_subobj->length);
-					}
-					if (mtu_flag) {
-						ND_PRINT("\n\t\t MTU: %u", GET_BE_U_4(offset));
-						offset += 4;
-					}
-
-					break;
+                    if (if_index_flag) {
+                        ND_PRINT("\n\t\t Interface Index: %u", GET_BE_U_4(offset));
+                        offset += 4;
+                    }
+                    if (ipaddr_flag) {
+                        ND_PRINT("\n\t\t IP Address sub-object: ");
+                        ipaddr_subobj = (const struct icmp_interface_identification_ipaddr_subobject_t *) offset;
+                        switch (GET_BE_U_2(ipaddr_subobj->afi)) {
+                            case 1:
+                                ND_PRINT("%s", GET_IPADDR_STRING(ipaddr_subobj->ip_addr));
+                                offset += 4;
+                                break;
+                            case 2:
+                                ND_PRINT("%s", GET_IP6ADDR_STRING(ipaddr_subobj->ip_addr));
+                                offset += 16;
+                                break;
+                            default:
+                                ND_PRINT("Unknown Address Family Identifier");
+                                return;
+                        }
+                        offset += 4;
+                    }
+                    if (name_flag) {
+                        ifname_subobj = (const struct icmp_interface_identification_ifname_subobject_t *) offset;
+                        ND_PRINT("\n\t\t Interface Name: %.*s",
+                                 GET_U_1(ifname_subobj->length),
+                                         ifname_subobj->if_name);
+                        offset += 1 + GET_U_1(ifname_subobj->length);
+                    }
+                    if (mtu_flag) {
+                        ND_PRINT("\n\t\t MTU: %u", GET_BE_U_4(offset));
+                        offset += 4;
+                    }
+                    break;
 
                 default:
                     print_unknown_data(ndo, obj_tptr, "\n\t    ", obj_tlen);
