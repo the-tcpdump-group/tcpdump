@@ -161,7 +161,6 @@ Friday, September 20, 2019, by mcr@sandelman.ca
       CVE-2018-14882 (RPL)
       CVE-2018-16227 (802.11)
       CVE-2018-16229 (DCCP)
-      CVE-2018-16301 (was fixed in libpcap)
       CVE-2018-16230 (BGP)
       CVE-2018-16452 (SMB)
       CVE-2018-16300 (BGP)
