@@ -853,11 +853,23 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 
                         ifname_subobj = (const struct icmp_interface_identification_ifname_subobject_t *) offset;
                         inft_name_length_field = GET_U_1(ifname_subobj->length);
-                        ND_PRINT("\n\t\t Interface Name, length %u: %.*s",
-                                 inft_name_length_field,
-                                 inft_name_length_field,
+                        ND_PRINT("\n\t\t Interface Name");
+                        if (inft_name_length_field % 4 != 0) {
+                            ND_PRINT(" [length %u != N x 4]", inft_name_length_field);
+                            nd_print_invalid(ndo);
+                            offset += inft_name_length_field;
+                            break;
+                        }
+                        if (inft_name_length_field > 64) {
+                            ND_PRINT(" [length %u > 64]", inft_name_length_field);
+                            nd_print_invalid(ndo);
+                            offset += inft_name_length_field;
+                            break;
+                        }
+                        ND_PRINT(", length %u", inft_name_length_field);
+                        ND_PRINT(": %.*s", inft_name_length_field - 1,
                                  ifname_subobj->if_name);
-                        offset += 1 + inft_name_length_field;
+                        offset += inft_name_length_field;
                     }
                     if (mtu_flag) {
                         ND_PRINT("\n\t\t MTU: %u", GET_BE_U_4(offset));
