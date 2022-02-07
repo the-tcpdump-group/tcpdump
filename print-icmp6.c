@@ -490,10 +490,6 @@ static void dnsname_print(netdissect_options *ndo, const u_char *, const u_char 
 static void icmp6_nodeinfo_print(netdissect_options *ndo, u_int, const u_char *, const u_char *);
 static void icmp6_rrenum_print(netdissect_options *ndo, const u_char *, const u_char *);
 
-#ifndef abs
-#define abs(a)	((0 < (a)) ? (a) : -(a))
-#endif
-
 /*
  * DIO: Updated to RFC6550, as published in 2012: section 6. (page 30)
  */
@@ -710,7 +706,6 @@ static const struct tok icmp6_nd_na_flag_values[] = {
     { ND_NA_FLAG_OVERRIDE, "override" },
     { 0,	NULL }
 };
-
 
 static const struct tok icmp6_opt_values[] = {
    { ND_OPT_SOURCE_LINKADDR, "source link-address"},
@@ -996,7 +991,6 @@ trunc:
 #endif
 
 }
-
 
 void
 icmp6_print(netdissect_options *ndo,
@@ -1757,7 +1751,6 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 			ND_PRINT(")");
 			break;
 		}
-
 
 		/* XXX backward compat, icmp-name-lookup-03 */
 		if (siz == sizeof(*ni6)) {
