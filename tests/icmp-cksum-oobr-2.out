@@ -7,4 +7,4 @@
 		 This object describes the IP interface upon which a datagram arrived
 		 Interface Index: 15
 		 IP Address sub-object: 10.10.10.10
-		 Interface Name: This-is-the-name-of-the-Interface-that-we-are-looking-for-[:-)] [|icmp]
+		 Interface Name, length 63: This-is-the-name-of-the-Interface-that-we-are-looking-for-[:-)] [|icmp]
