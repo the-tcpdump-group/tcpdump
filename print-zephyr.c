@@ -143,23 +143,23 @@ void
 zephyr_print(netdissect_options *ndo, const u_char *cp, u_int length)
 {
     struct z_packet z = {
-        NULL,	/* version */
-        0,	/* numfields */
-        0,	/* kind */
-        NULL,	/* uid */
-        0,	/* port */
-        0,	/* auth */
-        0,	/* authlen */
-        NULL,	/* authdata */
-        NULL,	/* class */
-        NULL,	/* inst */
-        NULL,	/* opcode */
-        NULL,	/* sender */
-        NULL,	/* recipient */
-        NULL,	/* format */
-        0,	/* cksum */
-        0,	/* multi */
-        NULL	/* multi_uid */
+	NULL,	/* version */
+	0,	/* numfields */
+	0,	/* kind */
+	NULL,	/* uid */
+	0,	/* port */
+	0,	/* auth */
+	0,	/* authlen */
+	NULL,	/* authdata */
+	NULL,	/* class */
+	NULL,	/* inst */
+	NULL,	/* opcode */
+	NULL,	/* sender */
+	NULL,	/* recipient */
+	NULL,	/* format */
+	0,	/* cksum */
+	0,	/* multi */
+	NULL	/* multi_uid */
     };
     const char *parse = (const char *) cp;
     int parselen = length;
@@ -183,7 +183,7 @@ zephyr_print(netdissect_options *ndo, const u_char *cp, u_int length)
 
     PARSE_FIELD_STR(z.version);
     if (lose)
-        goto invalid;
+	goto invalid;
 
     if (strncmp(z.version, "ZEPH", 4))
 	return;
@@ -206,7 +206,7 @@ zephyr_print(netdissect_options *ndo, const u_char *cp, u_int length)
     PARSE_FIELD_STR(z.multi_uid);
 
     if (lose)
-        goto invalid;
+	goto invalid;
 
     ND_PRINT(" zephyr");
     if (strncmp(z.version+4, "0.2", 3)) {
