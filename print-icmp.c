@@ -866,9 +866,9 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                             offset += inft_name_length_field;
                             break;
                         }
-                        ND_PRINT(", length %u", inft_name_length_field);
-                        ND_PRINT(": %.*s", inft_name_length_field - 1,
-                                 ifname_subobj->if_name);
+                        ND_PRINT(", length %u: ", inft_name_length_field);
+                        nd_printjnp(ndo, ifname_subobj->if_name,
+                                    inft_name_length_field - 1);
                         offset += inft_name_length_field;
                     }
                     if (mtu_flag) {
