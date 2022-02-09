@@ -48,6 +48,7 @@ bgp_vpn_attrset bgp_vpn_attrset.pcap bgp_vpn_attrset.out -v
 mpbgp-linklocal-nexthop mpbgp-linklocal-nexthop.pcap mpbgp-linklocal-nexthop.out -v
 bgp_infloop-v		bgp-infinite-loop.pcap		bgp_infloop-v.out	-v
 bgp-aigp	bgp-aigp.pcap	bgp-aigp.out	-v
+bgp-aigp-2	bgp-aigp-2.pcap	bgp-aigp-2.out	-v
 bgp-large-community bgp-large-community.pcap bgp-large-community.out -v
 bgp-shutdown-communication bgp-shutdown-communication.pcapng bgp-shutdown-communication.out -v
 bgp-addpath bgp-addpath.pcap bgp-addpath.out -v

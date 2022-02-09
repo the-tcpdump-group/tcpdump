@@ -2392,7 +2392,6 @@ bgp_attr_print(netdissect_options *ndo,
             /*
              * Check if we can read the TLV data.
              */
-            ND_TCHECK_LEN(tptr + 3, length);
             if (tlen < length)
                 goto trunc;
 
