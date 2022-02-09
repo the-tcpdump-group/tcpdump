@@ -140,8 +140,7 @@ str_to_lower(const char *string)
 }
 
 #define ZEPHYR_PRINT(str1,str2) \
-ND_PRINT("%s", str1); \
-fn_print_str(ndo, (const u_char *)str2);
+{ ND_PRINT("%s", (str1)); fn_print_str(ndo, (const u_char *)(str2)); }
 
 void
 zephyr_print(netdissect_options *ndo, const u_char *cp, u_int length)
