@@ -97,6 +97,58 @@ format_opt_class(const uint16_t opt_class)
         return "In-band Network Telemetry (INT)";
     case 0x0104:
         return "VMware";
+    case 0x0105:
+    case 0x0108:
+    case 0x0109:
+    case 0x010A:
+    case 0x010B:
+    case 0x010C:
+    case 0x010D:
+    case 0x010E:
+    case 0x010F:
+    case 0x0110:
+        return "Amazon";
+    case 0x0106:
+    case 0x0130:
+    case 0x0131:
+        return "Cisco";
+    case 0x0107:
+        return "Oracle";
+    case 0x0111:
+    case 0x0112:
+    case 0x0113:
+    case 0x0114:
+    case 0x0115:
+    case 0x0116:
+    case 0x0117:
+    case 0x0118:
+        return "IBM";
+    case 0x0119:
+    case 0x011A:
+    case 0x011B:
+    case 0x011C:
+    case 0x011D:
+    case 0x011E:
+    case 0x011F:
+    case 0x0120:
+    case 0x0121:
+    case 0x0122:
+    case 0x0123:
+    case 0x0124:
+    case 0x0125:
+    case 0x0126:
+    case 0x0127:
+    case 0x0128:
+        return "Ericsson";
+    case 0x0129:
+        return "Oxide";
+    case 0x0132:
+    case 0x0133:
+    case 0x0134:
+    case 0x0135:
+        return "Google";
+    case 0x0136:
+        return "InfoQuick";
     default:
         if (opt_class <= 0x00ff)
             return "Standard";
