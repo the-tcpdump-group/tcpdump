@@ -1,6 +1,7 @@
 TBD
   Summary for 4.99.2 tcpdump release (so far!)
     Updated printers:
+      BGP: Update cease notification decoding to RFC 9003.
       BGP: decode BGP link-bandwidth extended community properly.
       DSA: correctly determine VID.
       EAP: fix some length checks and output issues.
