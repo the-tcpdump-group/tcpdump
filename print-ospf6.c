@@ -381,7 +381,7 @@ ospf6_print_ls_type(netdissect_options *ndo,
                ls_type & LS_TYPE_MASK,
                tok2str(ospf6_ls_scope_values, "Unknown", ls_type & LS_SCOPE_MASK),
                ls_type &0x8000 ? ", transitive" : "", /* U-bit */
-               GET_IPADDR_STRING((const u_char *)ls_stateid));
+               GET_IPADDR_STRING(ls_stateid));
 }
 
 static int
@@ -552,8 +552,7 @@ ospf6_print_lsa(netdissect_options *ndo,
 			if (lsa_length < sizeof (*ap))
 				return (1);
 			lsa_length -= sizeof (*ap);
-			ND_TCHECK_SIZE(ap);
-			ND_PRINT("\n\t\t%s", GET_IPADDR_STRING(*ap));
+			ND_PRINT("\n\t\t%s", GET_IPADDR_STRING(ap));
 			++ap;
 		}
 		break;
@@ -762,8 +761,7 @@ ospf6_decode_v3(netdissect_options *ndo,
 			ND_PRINT("\n\t  Neighbor List:");
 			ap = hellop->hello_neighbor;
 			while ((const u_char *)ap < dataend) {
-				ND_TCHECK_SIZE(ap);
-				ND_PRINT("\n\t    %s", GET_IPADDR_STRING(*ap));
+				ND_PRINT("\n\t    %s", GET_IPADDR_STRING(ap));
 				++ap;
 			}
 		}
