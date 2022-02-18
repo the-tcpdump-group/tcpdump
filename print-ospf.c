@@ -698,8 +698,7 @@ ospf_print_lsa(netdissect_options *ndo,
 		    GET_IPADDR_STRING(lsap->lsa_un.un_nla.nla_mask));
 		ap = lsap->lsa_un.un_nla.nla_router;
 		while ((const u_char *)ap < ls_end) {
-			ND_TCHECK_SIZE(ap);
-			ND_PRINT("\n\t      %s", GET_IPADDR_STRING(*ap));
+			ND_PRINT("\n\t      %s", GET_IPADDR_STRING(ap));
 			++ap;
 		}
 		break;
@@ -1001,8 +1000,7 @@ ospf_decode_v2(netdissect_options *ndo,
 		if ((const u_char *)ap < dataend)
 			ND_PRINT("\n\t  Neighbor List:");
 		while ((const u_char *)ap < dataend) {
-			ND_TCHECK_SIZE(ap);
-			ND_PRINT("\n\t    %s", GET_IPADDR_STRING(*ap));
+			ND_PRINT("\n\t    %s", GET_IPADDR_STRING(ap));
 			++ap;
 		}
 		break;	/* HELLO */
