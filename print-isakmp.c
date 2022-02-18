@@ -741,10 +741,10 @@ static const char *etypestr[] = {
 		? npfunc[(x)] : NULL)
 
 static int
-iszero(const u_char *p, size_t l)
+iszero(netdissect_options *ndo, const u_char *p, size_t l)
 {
 	while (l != 0) {
-		if (*p)
+		if (GET_U_1(p))
 			return 0;
 		p++;
 		l--;
@@ -2841,7 +2841,7 @@ ikev1_print(netdissect_options *ndo,
 
 	i = cookie_find(&base->i_ck);
 	if (i < 0) {
-		if (iszero((const u_char *)&base->r_ck, sizeof(base->r_ck))) {
+		if (iszero(ndo, base->r_ck, sizeof(base->r_ck))) {
 			/* the first packet */
 			ND_PRINT(" I");
 			if (bp2)
