@@ -1393,9 +1393,6 @@ print_attr_strange(netdissect_options *ndo,
         break;
    }
    return;
-
-   trunc:
-     nd_print_trunc(ndo);
 }
 
 static void
