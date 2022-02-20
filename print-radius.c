@@ -104,7 +104,7 @@
 #define PRINT_HEX(bytes_len, ptr_data)                               \
            while(bytes_len)                                          \
            {                                                         \
-              ND_PRINT("%02X", *ptr_data );                   \
+              ND_PRINT("%02X", GET_U_1(ptr_data));                   \
               ptr_data++;                                            \
               bytes_len--;                                           \
            }
@@ -1339,11 +1339,9 @@ print_attr_strange(netdissect_options *ndo,
                return;
            }
            ND_PRINT("User_challenge (");
-           ND_TCHECK_8(data);
            len_data = 8;
            PRINT_HEX(len_data, data);
            ND_PRINT(") User_resp(");
-           ND_TCHECK_8(data);
            len_data = 8;
            PRINT_HEX(len_data, data);
            ND_PRINT(")");
@@ -1363,15 +1361,12 @@ print_attr_strange(netdissect_options *ndo,
            ND_PRINT(", Min password length: %u", GET_U_1(data));
            data++;
            ND_PRINT(", created at: ");
-           ND_TCHECK_4(data);
            len_data = 4;
            PRINT_HEX(len_data, data);
            ND_PRINT(", expires in: ");
-           ND_TCHECK_4(data);
            len_data = 4;
            PRINT_HEX(len_data, data);
            ND_PRINT(", Current Time: ");
-           ND_TCHECK_4(data);
            len_data = 4;
            PRINT_HEX(len_data, data);
         break;
@@ -1382,7 +1377,6 @@ print_attr_strange(netdissect_options *ndo,
                ND_PRINT("ERROR: length %u != 8", length);
                return;
            }
-           ND_TCHECK_8(data);
            len_data = 8;
            PRINT_HEX(len_data, data);
         break;
