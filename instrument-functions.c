@@ -89,7 +89,7 @@ static void print_debug(void *this_fn, void *call_site, action_type action)
 	static int print_only_global;
 	symbol_info syminfo;
 	struct stat statbuf;
-	int i, found;
+	int i;
 
 	if (!stat(ND_FILE_FLAG_OFF, &statbuf))
 		return;
@@ -143,6 +143,8 @@ static void print_debug(void *this_fn, void *call_site, action_type action)
 	}
 
 	if (print_only_global) {
+		int found;
+
 		i = 0;
 		found = 0;
 		while (i < symcount && !found) {
