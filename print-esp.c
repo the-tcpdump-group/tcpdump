@@ -339,7 +339,7 @@ int esp_decrypt_buffer_by_ikev2_print(netdissect_options *ndo,
 DIAG_ON_DEPRECATION
 
 static void esp_print_addsa(netdissect_options *ndo,
-			    struct sa_list *sa, int sa_def)
+			    const struct sa_list *sa, int sa_def)
 {
 	/* copy the "sa" */
 
