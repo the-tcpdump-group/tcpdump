@@ -700,7 +700,7 @@ tcp_print(netdissect_options *ndo,
          */
         ND_PRINT(", length %u", length);
 
-        if (length <= 0)
+        if (length == 0)
                 return;
 
         /*
