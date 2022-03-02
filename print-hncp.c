@@ -206,6 +206,7 @@ print_prefix(netdissect_options *ndo, const u_char *prefix, u_int max_length)
 {
     int plenbytes;
     char buf[sizeof("xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx::/128")];
+    buf[0] = '\0';
 
     if (GET_U_1(prefix) >= 96 && max_length >= IPV4_MAPPED_HEADING_LEN + 1 &&
         is_ipv4_mapped_address(prefix + 1)) {
