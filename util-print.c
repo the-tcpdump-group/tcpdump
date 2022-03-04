@@ -604,7 +604,7 @@ uint2tokary_internal(const struct uint_tokary dict[], const size_t size,
 int
 mask2plen(uint32_t mask)
 {
-	uint32_t bitmasks[33] = {
+	const uint32_t bitmasks[33] = {
 		0x00000000,
 		0x80000000, 0xc0000000, 0xe0000000, 0xf0000000,
 		0xf8000000, 0xfc000000, 0xfe000000, 0xff000000,
