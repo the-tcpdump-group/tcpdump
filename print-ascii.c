@@ -103,7 +103,7 @@ ascii_print(netdissect_options *ndo,
 
 static void
 hex_and_ascii_print_with_offset(netdissect_options *ndo, const char *indent,
-    const u_char *cp, u_int length, u_int oset)
+				const u_char *cp, u_int length, u_int offset)
 {
 	u_int caplength;
 	u_int i;
@@ -135,10 +135,10 @@ hex_and_ascii_print_with_offset(netdissect_options *ndo, const char *indent,
 		if (i >= HEXDUMP_SHORTS_PER_LINE) {
 			*hsp = *asp = '\0';
 			ND_PRINT("%s0x%04x: %-*s  %s",
-			    indent, oset, HEXDUMP_HEXSTUFF_PER_LINE,
+			    indent, offset, HEXDUMP_HEXSTUFF_PER_LINE,
 			    hexstuff, asciistuff);
 			i = 0; hsp = hexstuff; asp = asciistuff;
-			oset += HEXDUMP_BYTES_PER_LINE;
+			offset += HEXDUMP_BYTES_PER_LINE;
 		}
 		nshorts--;
 	}
@@ -154,7 +154,7 @@ hex_and_ascii_print_with_offset(netdissect_options *ndo, const char *indent,
 	if (i > 0) {
 		*hsp = *asp = '\0';
 		ND_PRINT("%s0x%04x: %-*s  %s",
-		     indent, oset, HEXDUMP_HEXSTUFF_PER_LINE,
+		     indent, offset, HEXDUMP_HEXSTUFF_PER_LINE,
 		     hexstuff, asciistuff);
 	}
 	if (truncated)
@@ -163,7 +163,7 @@ hex_and_ascii_print_with_offset(netdissect_options *ndo, const char *indent,
 
 void
 hex_and_ascii_print(netdissect_options *ndo, const char *indent,
-    const u_char *cp, u_int length)
+		    const u_char *cp, u_int length)
 {
 	hex_and_ascii_print_with_offset(ndo, indent, cp, length, 0);
 }
@@ -174,7 +174,7 @@ hex_and_ascii_print(netdissect_options *ndo, const char *indent,
 void
 hex_print_with_offset(netdissect_options *ndo,
                       const char *indent, const u_char *cp, u_int length,
-		      u_int oset)
+		      u_int offset)
 {
 	u_int caplength;
 	u_int i, s;
@@ -190,8 +190,8 @@ hex_print_with_offset(netdissect_options *ndo,
 	i = 0;
 	while (nshorts != 0) {
 		if ((i++ % 8) == 0) {
-			ND_PRINT("%s0x%04x: ", indent, oset);
-			oset += HEXDUMP_BYTES_PER_LINE;
+			ND_PRINT("%s0x%04x: ", indent, offset);
+			offset += HEXDUMP_BYTES_PER_LINE;
 		}
 		s = GET_U_1(cp);
 		cp++;
@@ -201,7 +201,7 @@ hex_print_with_offset(netdissect_options *ndo,
 	}
 	if (length & 1) {
 		if ((i % 8) == 0)
-			ND_PRINT("%s0x%04x: ", indent, oset);
+			ND_PRINT("%s0x%04x: ", indent, offset);
 		ND_PRINT(" %02x", GET_U_1(cp));
 	}
 	if (truncated)
