@@ -1363,7 +1363,7 @@ ppp_hdlc(netdissect_options *ndo,
 	u_char *b, *t, c;
 	const u_char *s;
 	u_int i, proto;
-	const void *se;
+	const void *sb, *se;
 
 	if (caplen == 0)
 		return;
@@ -1395,8 +1395,11 @@ ppp_hdlc(netdissect_options *ndo,
 
 	/*
 	 * Change the end pointer, so bounds checks work.
+	 * Change the pointer to packet data to help debugging.
 	 */
+	sb = ndo->ndo_packetp;
 	se = ndo->ndo_snapend;
+	ndo->ndo_packetp = b;
 	ndo->ndo_snapend = t;
 	length = ND_BYTES_AVAILABLE_AFTER(b);
 
@@ -1433,10 +1436,12 @@ ppp_hdlc(netdissect_options *ndo,
         }
 
 cleanup:
+	ndo->ndo_packetp = sb;
 	ndo->ndo_snapend = se;
         return;
 
 trunc:
+	ndo->ndo_packetp = sb;
 	ndo->ndo_snapend = se;
 	nd_print_trunc(ndo);
 }
