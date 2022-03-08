@@ -1285,7 +1285,7 @@ newhnamemem(netdissect_options *ndo)
 	static struct hnamemem *ptr = NULL;
 	static u_int num = 0;
 
-	if (num  <= 0) {
+	if (num  == 0) {
 		num = 64;
 		ptr = (struct hnamemem *)calloc(num, sizeof (*ptr));
 		if (ptr == NULL)
@@ -1305,7 +1305,7 @@ newh6namemem(netdissect_options *ndo)
 	static struct h6namemem *ptr = NULL;
 	static u_int num = 0;
 
-	if (num  <= 0) {
+	if (num  == 0) {
 		num = 64;
 		ptr = (struct h6namemem *)calloc(num, sizeof (*ptr));
 		if (ptr == NULL)
