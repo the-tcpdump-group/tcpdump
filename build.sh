@@ -30,8 +30,8 @@ print_cc_version
 # later warnings in the same matrix subset trigger an error.
 
 case `cc_id`/`os_id` in
-clang-9.*/SunOS-5.11)
-    # (OpenIndiana)
+clang-*/SunOS-5.11)
+    # (Clang 9 on OpenIndiana, Clang 11 on OmniOS)
     # tcpdump.c:2312:51: warning: this function declaration is not a prototype
     #   [-Wstrict-prototypes]
     # tcpdump.c:2737:11: warning: this function declaration is not a prototype
