@@ -5,6 +5,7 @@ TBD
       DSA: correctly determine VID.
     Building and testing:
       Handle some Autoconf/make errors better.
+      Fix an error when corss-compiling.
       Fix "make releasetar" on AIX and Solaris.
       Mend "make check" on Solaris 9 with Autoconf.
       Address assorted compiler warnings.
