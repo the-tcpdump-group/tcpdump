@@ -28,7 +28,9 @@ Monthday, Month DD, YYYY by gharris and denis
       Use unified diff by default.
 
 TBD
-  Summary for 4.99.2 tcpdump release: (so far)
+  Summary for 4.99.2 tcpdump release (so far!)
+    Updated printers:
+      DSA: correctly determine VID
     Building and testing:
       Handle some Autoconf/make errors better.
       Fix "make releasetar" on AIX and Solaris.
