@@ -30,7 +30,8 @@ Monthday, Month DD, YYYY by gharris and denis
 TBD
   Summary for 4.99.2 tcpdump release (so far!)
     Updated printers:
-      DSA: correctly determine VID
+      BGP: decode BGP link-bandwidth extended community properly.
+      DSA: correctly determine VID.
     Building and testing:
       Handle some Autoconf/make errors better.
       Fix "make releasetar" on AIX and Solaris.
