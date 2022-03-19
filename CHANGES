@@ -32,6 +32,7 @@ TBD
     Updated printers:
       BGP: decode BGP link-bandwidth extended community properly.
       DSA: correctly determine VID.
+      EAP: fix some length checks and output issues.
     Building and testing:
       Handle some Autoconf/make errors better.
       Fix an error when corss-compiling.
