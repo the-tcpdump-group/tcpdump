@@ -38,6 +38,8 @@ TBD
       Mend "make check" on Solaris 9 with Autoconf.
       Address assorted compiler warnings.
       Fix auto-enabling of Capsicum on FreeBSD with Autoconf.
+    Documentation:
+      Some man page cleanups.
 
 Wednesday, June 9, 2021 by gharris
   Summary for 4.99.1 tcpdump release
