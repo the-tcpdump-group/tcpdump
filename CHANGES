@@ -8,7 +8,7 @@ TBD
       Fix auto-enabling of Capsicum on FreeBSD with Autoconf.
 
 Wednesday, June 9, 2021 by gharris
-  Summary for 4.99.1 tcpdump release:
+  Summary for 4.99.1 tcpdump release
     Source code:
       Squelch some compiler warnings
       ICMP: Update the snapend for some nested IP packets.
@@ -42,6 +42,7 @@ Wednesday, June 9, 2021 by gharris
 
 Wednesday, December 30, 2020, by mcr@sandelman.ca, denis and fxl.
   Summary for 4.99.0 tcpdump release
+    CVE-2018-16301: For the -F option handle large input files safely.
     Improve the contents, wording and formatting of the man page.
     Print unsupported link-layer protocol packets in hex.
     Add support for new network protocols and DLTs: Arista, Autosar SOME/IP,
@@ -132,7 +133,6 @@ Friday, September 20, 2019, by mcr@sandelman.ca
       CVE-2018-14882 (RPL)
       CVE-2018-16227 (802.11)
       CVE-2018-16229 (DCCP)
-      CVE-2018-16301 (was fixed in libpcap)
       CVE-2018-16230 (BGP)
       CVE-2018-16452 (SMB)
       CVE-2018-16300 (BGP)
