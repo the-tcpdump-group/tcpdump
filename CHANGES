@@ -2,7 +2,8 @@ Monthday, Month DD, YYYY by gharris and denis
   Summary for 5.0.0 tcpdump release (so far!)
     Refine protocol decoding for:
       EIGRP: Get the packet header fields right.
-      OpenFlow 1.0: Fix indentation of PORT_MOD.
+      OpenFlow 1.0: Fix indentation of PORT_MOD, improve handling of
+          some lengths, and fix handling of snapend.
       RIP: Make a couple trivial protocol updates.
       NetFlow: Use tcp_flag_values[] for TCP flags.
       OSPF: Update to match the Router Properties registry.
