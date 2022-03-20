@@ -20,6 +20,8 @@ Monthday, Month DD, YYYY by gharris and denis
       ICMP: add dissector for ICMP Interface Identification Object
     User interface:
       Add --print-sampling to print every Nth packet instead of all.
+      Print the supported time stamp types (-J) to stdout instead of stderr.
+      Print the list of data link types (-L) to stdout instead of stderr.
     Source code:
       Use %zu when printing a sizeof to squelch compiler warnings
       (FIXME: somebody please wrap the line below just before the release)
