@@ -11,6 +11,13 @@ Monthday, Month DD, YYYY by gharris and denis
       ZMTP: Replace custom code with bittok2str().
       BFD: Add support for S-BFD and spell LAG in uppercase.
       BGP: Update cease notification decoding to RFC 9003.
+      IEEE 802.11: include the Mesh ID field while printing management
+        frames.
+      DNS: sync resource types with IANA.
+      MPTCP: print length before subtype inside MPTCP options, parse MPC
+        data_len field, print flags from MP_CAPABLE option.
+      sFlow: add support for IPv6 agent.
+      VRRP: add support for IPv6.
     User interface:
       Add --print-sampling to print every Nth packet instead of all.
     Source code:
