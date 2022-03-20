@@ -12,6 +12,13 @@ TBD
       MPLS: show the EXP field as TC, as per RFC 5462.
       ICMP: redo MPLS Extension code as general ICMP Extension code.
       VQP: Do not print unknown error codes twice.
+      Juniper: Add some bounds checks.
+      lwres: Fix a length check.
+      EAP: Fix some undefined behaviors at runtime.
+      Ethernet: Rework the length checks.
+      ZEP: Add thren length checks.
+      IPX: Add two length checks.
+      Zephyr: Avoid printing non-ASCII characters.
       VRRP: Print the protocol name before any GET_().
       Use __func__ from C99 in some function calls.
       DCCP: Get rid of trailing commas in lists.
@@ -25,6 +32,7 @@ TBD
       addrtoname.c: Fix two invalid tests.
     Building and testing:
       Update config.guess and config.sub.
+      Use AS_HELP_STRING macro instead of AC_HELP_STRING.
       Handle some Autoconf/make errors better.
       Fix an error when corss-compiling.
       Fix "make releasetar" on AIX and Solaris.
