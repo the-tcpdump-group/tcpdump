@@ -23,8 +23,6 @@ Monthday, Month DD, YYYY by gharris and denis
       Introduce new ND_ICHECK*() macros to deduplicate more code.
       IEEE 802.11: Simplify handle_action().
       RPKI-Router: Refine length and bounds checks.
-    Building and testing:
-      Use unified diff by default.
 
 TBD
   Summary for 4.99.2 tcpdump release (so far!)
@@ -43,6 +41,7 @@ TBD
       Fix auto-enabling of Capsicum on FreeBSD with Autoconf.
       Treat "msys" as Windows for test exit statuses.
       Clean up some help messages in configure.
+      Use unified diff by default.
     Documentation:
       Some man page cleanups.
       Note that we require compilers to support at least some of C99.
