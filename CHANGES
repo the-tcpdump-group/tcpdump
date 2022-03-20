@@ -43,6 +43,7 @@ TBD
         OSes.
       RRCP: support more Realtek protocols than just RRCP.
       MPLS: show the EXP field as TC, as per RFC 5462.
+      ICMP: redo MPLS Extension code as general ICMP Extension code.
     Building and testing:
       Handle some Autoconf/make errors better.
       Fix an error when corss-compiling.
