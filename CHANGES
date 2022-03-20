@@ -32,6 +32,8 @@ TBD
       BGP: decode BGP link-bandwidth extended community properly.
       DSA: correctly determine VID.
       EAP: fix some length checks and output issues.
+      802.15.4, BGP, LISP: fix some length checks, compiler warnings,
+        and undefined behavior warnings.
     Building and testing:
       Handle some Autoconf/make errors better.
       Fix an error when corss-compiling.
@@ -40,8 +42,10 @@ TBD
       Address assorted compiler warnings.
       Fix auto-enabling of Capsicum on FreeBSD with Autoconf.
       Treat "msys" as Windows for test exit statuses.
+      Clean up some help messages in configure.
     Documentation:
       Some man page cleanups.
+      Note that we require compilers to support at least some of C99.
 
 Wednesday, June 9, 2021 by gharris
   Summary for 4.99.1 tcpdump release
