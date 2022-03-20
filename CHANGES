@@ -42,6 +42,7 @@ TBD
       PFLOG: handle LINKTYPE_PFLOG/DLT_PFLOG files from all OSes on all
         OSes.
       RRCP: support more Realtek protocols than just RRCP.
+      MPLS: show the EXP field as TC, as per RFC 5462.
     Building and testing:
       Handle some Autoconf/make errors better.
       Fix an error when corss-compiling.
