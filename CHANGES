@@ -32,6 +32,9 @@ TBD
       EAP: fix some length checks and output issues.
       802.15.4, BGP, LISP: fix some length checks, compiler warnings,
         and undefined behavior warnings.
+      PFLOG: handle LINKTYPE_PFLOG/DLT_PFLOG files from all OSes on all
+        OSes.
+      RRCP: support more Realtek protocols than just RRCP.
     Building and testing:
       Handle some Autoconf/make errors better.
       Fix an error when corss-compiling.
