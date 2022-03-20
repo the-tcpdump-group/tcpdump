@@ -86,9 +86,6 @@ struct icmp {
 #define	icmp_data	icmp_dun.id_data
 };
 
-#define ICMP_EXT_EXTRACT_VERSION(x) (((x)&0xf0)>>4)
-#define ICMP_MPLS_EXT_VERSION 2
-
 /*
  * Lower bounds on packet lengths for various types.
  * For the error advice packets must first insure that the
@@ -188,11 +185,6 @@ struct icmp {
 #define ICMP_UNREACH_PRECEDENCE_CUTOFF	15	/* precedence cutoff */
 #endif
 
-/* rfc4950  */
-#define MPLS_STACK_ENTRY_OBJECT_CLASS            1
-/* rfc5837 */
-#define INTERFACE_INFORMATION_OBJECT_CLASS       2
-
 /* Most of the icmp types */
 static const struct tok icmp2str[] = {
 	{ ICMP_ECHOREPLY,		"echo reply" },
@@ -226,13 +218,17 @@ struct id_rdiscovery {
 };
 
 /*
- * draft-bonica-internet-icmp-08
+ * RFC 4884 - Extended ICMP to Support Multi-Part Messages
+ *
+ * This is a general extension mechanism, based on the mechanism
+ * in draft-bonica-icmp-mpls-02 ICMP Extensions for MultiProtocol
+ * Label Switching.
  *
  * The Destination Unreachable, Time Exceeded
  * and Parameter Problem messages are slightly changed as per
- * the above draft. A new Length field gets added to give
+ * the above RFC. A new Length field gets added to give
  * the caller an idea about the length of the piggybacked
- * IP packet before the MPLS extension header starts.
+ * IP packet before the extension header starts.
  *
  * The Length field represents length of the padded "original datagram"
  * field  measured in 32-bit words.
@@ -263,6 +259,25 @@ struct icmp_ext_t {
     nd_uint16_t icmp_ext_checksum;
     nd_byte     icmp_ext_data[1];
 };
+
+/*
+ * Extract version from the first octet of icmp_ext_version_res.
+ */
+#define ICMP_EXT_EXTRACT_VERSION(x) (((x)&0xf0)>>4)
+
+/*
+ * Current version.
+ */
+#define ICMP_EXT_VERSION 2
+
+/*
+ * Extension object class numbers.
+ *
+ * Class 1 dates back to draft-bonica-icmp-mpls-02.
+ */
+
+/* rfc4950  */
+#define MPLS_STACK_ENTRY_OBJECT_CLASS            1
 
 struct icmp_multipart_ext_object_header_t {
     nd_uint16_t length;
@@ -708,7 +723,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
              * Sanity checking of the header.
              */
             if (ICMP_EXT_EXTRACT_VERSION(*(ext_dp->icmp_ext_version_res)) !=
-                ICMP_MPLS_EXT_VERSION) {
+                ICMP_EXT_VERSION) {
                 ND_PRINT(" packet not supported");
                 return;
             }
@@ -751,7 +766,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                 obj_tlen-=sizeof(struct icmp_multipart_ext_object_header_t);
 
                 switch (obj_class_num) {
-                case 1:
+                case MPLS_STACK_ENTRY_OBJECT_CLASS:
                     switch(obj_ctype) {
                     case 1:
                         raw_label = GET_BE_U_4(obj_tptr);
@@ -765,11 +780,6 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                     }
                     break;
 
-               /*
-                *  FIXME those are the defined objects that lack a decoder
-                *  you are welcome to contribute code ;-)
-                */
-                case 2:
                 default:
                     print_unknown_data(ndo, obj_tptr, "\n\t    ", obj_tlen);
                     break;
