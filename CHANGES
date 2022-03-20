@@ -7,7 +7,6 @@ Monthday, Month DD, YYYY by gharris and denis
       RIP: Make a couple trivial protocol updates.
       NetFlow: Use tcp_flag_values[] for TCP flags.
       OSPF: Update to match the Router Properties registry.
-      VQP: Do not print unknown error codes twice.
       ZMTP: Replace custom code with bittok2str().
       BFD: Add support for S-BFD and spell LAG in uppercase.
       BGP: Update cease notification decoding to RFC 9003.
@@ -49,6 +48,7 @@ TBD
       RRCP: support more Realtek protocols than just RRCP.
       MPLS: show the EXP field as TC, as per RFC 5462.
       ICMP: redo MPLS Extension code as general ICMP Extension code.
+      VQP: Do not print unknown error codes twice.
     Building and testing:
       Update config.guess and config.sub.
       Handle some Autoconf/make errors better.
