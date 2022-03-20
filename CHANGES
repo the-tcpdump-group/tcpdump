@@ -17,6 +17,7 @@ Monthday, Month DD, YYYY by gharris and denis
         data_len field, print flags from MP_CAPABLE option.
       sFlow: add support for IPv6 agent.
       VRRP: add support for IPv6.
+      ICMP: add dissector for ICMP Interface Identification Object
     User interface:
       Add --print-sampling to print every Nth packet instead of all.
     Source code:
