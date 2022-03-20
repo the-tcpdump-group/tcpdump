@@ -19,6 +19,7 @@ Monthday, Month DD, YYYY by gharris and denis
       VRRP: add support for IPv6.
       ICMP: add dissector for ICMP Interface Identification Object
     User interface:
+      Add optional unit suffix on -C file size.
       Add --print-sampling to print every Nth packet instead of all.
       Print the supported time stamp types (-J) to stdout instead of stderr.
       Print the list of data link types (-L) to stdout instead of stderr.
