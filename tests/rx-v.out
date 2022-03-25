@@ -1149,17 +1149,17 @@
 	IP (tos 0x0, ttl 254, id 52264, offset 0, flags [DF], proto UDP (17), length 1384)
     131.151.1.59.7021 > 131.151.32.21.1799: UDP, length 1356
   564  21:48:03.249685 IP (tos 0x0, ttl 64, id 58157, offset 0, flags [none], proto UDP (17), length 171)
-    131.151.32.21.1799 > 131.151.1.60.88:  v5
+    131.151.32.21.1799 > 131.151.1.60.88: kerberos v5
   565  21:48:03.255469 IP (tos 0x0, ttl 254, id 57763, offset 0, flags [DF], proto UDP (17), length 512)
-    131.151.1.60.88 > 131.151.32.21.1799:  v5
+    131.151.1.60.88 > 131.151.32.21.1799: kerberos v5
   566  21:48:03.283149 IP (tos 0x0, ttl 64, id 58158, offset 0, flags [none], proto UDP (17), length 72)
     131.151.32.21.7001 > 131.151.1.60.7000:  rx data seq 1 ser 1 fs call fetch-status fid 536870913/4/3 (44)
   567  21:48:03.284549 IP (tos 0x0, ttl 254, id 57764, offset 0, flags [DF], proto UDP (17), length 176)
     131.151.1.60.7000 > 131.151.32.21.7001:  rx data seq 1 ser 1 fs reply fetch-status (148)
   568  21:48:03.377621 IP (tos 0x0, ttl 64, id 58160, offset 0, flags [none], proto UDP (17), length 547)
-    131.151.32.21.1799 > 131.151.1.60.88: 
+    131.151.32.21.1799 > 131.151.1.60.88: kerberos
   569  21:48:03.410404 IP (tos 0x0, ttl 254, id 57765, offset 0, flags [DF], proto UDP (17), length 466)
-    131.151.1.60.88 > 131.151.32.21.1799: 
+    131.151.1.60.88 > 131.151.32.21.1799: kerberos
   570  21:48:03.413361 IP (tos 0x0, ttl 64, id 58162, offset 0, flags [none], proto UDP (17), length 237)
     131.151.32.21.1799 > 131.151.1.60.4444: UDP, length 209
   571  21:48:03.413986 IP (tos 0x0, ttl 254, id 57766, offset 0, flags [DF], proto ICMP (1), length 112)
