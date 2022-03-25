@@ -16,7 +16,7 @@
 		AFI IPv4 (1), SAFI Unicast (1)
 	      Route Refresh (2), length: 0
 	      Graceful Restart (64), length: 2
-		Restart Flags: [R], Restart Time 300s
+		Restart Flags: [R, N], Restart Time 300s
 	      32-Bit AS Number (65), length: 4
 		 4 Byte AS 2764334674
 	      Multiple Paths (69), length: 4
@@ -92,7 +92,7 @@
 		AFI IPv4 (1), SAFI Unicast (1)
 	      Route Refresh (2), length: 0
 	      Graceful Restart (64), length: 2
-		Restart Flags: [R], Restart Time 300s
+		Restart Flags: [R, N], Restart Time 300s
 	      32-Bit AS Number (65), length: 4
 		 4 Byte AS 2764334674
 	      Multiple Paths (69), length: 4
@@ -161,7 +161,7 @@
 		AFI IPv4 (1), SAFI Unicast (1)
 	      Route Refresh (2), length: 0
 	      Graceful Restart (64), length: 2
-		Restart Flags: [R], Restart Time 300s
+		Restart Flags: [R, N], Restart Time 300s
 	      32-Bit AS Number (65), length: 4
 		 4 Byte AS 2764334674
 	      Multiple Paths (69), length: 4
@@ -277,7 +277,7 @@
 		AFI IPv4 (1), SAFI Unicast (1)
 	      Route Refresh (2), length: 0
 	      Graceful Restart (64), length: 2
-		Restart Flags: [none], Restart Time 300s
+		Restart Flags: [N], Restart Time 300s
 	      32-Bit AS Number (65), length: 4
 		 4 Byte AS 2764334674
 	      Multiple Paths (69), length: 4
