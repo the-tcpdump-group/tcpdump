@@ -15,7 +15,7 @@
 	      Route Refresh (2), length: 0
 	    Option Capabilities Advertisement (2), length: 4
 	      Graceful Restart (64), length: 2
-		Restart Flags: [none], Restart Time 120s
+		Restart Flags: [N], Restart Time 120s
 	    Option Capabilities Advertisement (2), length: 6
 	      32-Bit AS Number (65), length: 4
 		 4 Byte AS 65000

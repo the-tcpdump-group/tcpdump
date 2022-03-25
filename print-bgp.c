@@ -263,12 +263,14 @@ static const struct tok bgp_notify_major_values[] = {
     { 0, NULL}
 };
 
-/* draft-ietf-idr-cease-subcode-02 */
+/* RFC4486 */
 #define BGP_NOTIFY_MINOR_CEASE_MAXPRFX  1
-/* draft-ietf-idr-shutdown-07 */
+/* RFC9003 */
 #define BGP_NOTIFY_MINOR_CEASE_SHUT     2
 #define BGP_NOTIFY_MINOR_CEASE_RESET    4
 #define BGP_NOTIFY_MINOR_CEASE_ADMIN_SHUTDOWN_LEN   128
+/* RFC8538 */
+#define BGP_NOTIFY_MINOR_CEASE_HARDRESET 9
 static const struct tok bgp_notify_minor_cease_values[] = {
     { BGP_NOTIFY_MINOR_CEASE_MAXPRFX, "Maximum Number of Prefixes Reached"},
     { BGP_NOTIFY_MINOR_CEASE_SHUT,    "Administrative Shutdown"},
@@ -277,6 +279,9 @@ static const struct tok bgp_notify_minor_cease_values[] = {
     { 5,                        "Connection Rejected"},
     { 6,                        "Other Configuration Change"},
     { 7,                        "Connection Collision Resolution"},
+    { 8,                        "Out of Resources"},
+    { BGP_NOTIFY_MINOR_CEASE_HARDRESET, "Hard Reset"},
+    { 10,                       "BFD Down"},
     { 0, NULL}
 };
 
@@ -409,6 +414,12 @@ static const struct tok bgp_safi_values[] = {
     { SAFNUM_VPNUNIMULTICAST,   "labeled VPN Unicast+Multicast"},
     { SAFNUM_RT_ROUTING_INFO,   "Route Target Routing Information"},
     { SAFNUM_MULTICAST_VPN,     "Multicast VPN"},
+    { 0, NULL }
+};
+
+static const struct tok bgp_graceful_restart_comm_flag_values[] = {
+    { 0x8,                      "R" },
+    { 0x4,                      "N" },
     { 0, NULL }
 };
 
@@ -2568,7 +2579,8 @@ bgp_capabilities_print(netdissect_options *ndo,
             }
             tcap_len=cap_len;
             ND_PRINT("\n\t\tRestart Flags: [%s], Restart Time %us",
-                      ((GET_U_1(opt + i + 2))&0x80) ? "R" : "none",
+                      bittok2str(bgp_graceful_restart_comm_flag_values,
+                                 "none", GET_U_1(opt + i + 2) >> 4),
                       GET_BE_U_2(opt + i + 2)&0xfff);
             tcap_len-=2;
             cap_offset=4;
@@ -2905,22 +2917,13 @@ trunc:
 }
 
 static void
-bgp_notification_print(netdissect_options *ndo,
-                       const u_char *dat, u_int length)
+bgp_notification_print_code(netdissect_options *ndo,
+                            const u_char *dat, u_int length,
+                            uint8_t bgpn_major, uint8_t bgpn_minor)
 {
-    const struct bgp_notification *bgp_notification_header;
     const u_char *tptr;
-    uint8_t bgpn_major, bgpn_minor;
     uint8_t shutdown_comm_length;
     uint8_t remainder_offset;
-
-    ND_TCHECK_LEN(dat, BGP_NOTIFICATION_SIZE);
-    if (length<BGP_NOTIFICATION_SIZE)
-        return;
-
-    bgp_notification_header = (const struct bgp_notification *)dat;
-    bgpn_major = GET_U_1(bgp_notification_header->bgpn_major);
-    bgpn_minor = GET_U_1(bgp_notification_header->bgpn_minor);
 
     ND_PRINT(", %s (%u)",
               tok2str(bgp_notify_major_values, "Unknown Error",
@@ -2965,11 +2968,11 @@ bgp_notification_print(netdissect_options *ndo,
                           bgpn_minor),
                   bgpn_minor);
 
-        /* draft-ietf-idr-cease-subcode-02 mentions optionally 7 bytes
+        /* RFC4486 mentions optionally 7 bytes
          * for the maxprefix subtype, which may contain AFI, SAFI and MAXPREFIXES
          */
-        if(bgpn_minor == BGP_NOTIFY_MINOR_CEASE_MAXPRFX && length >= BGP_NOTIFICATION_SIZE + 7) {
-            tptr = dat + BGP_NOTIFICATION_SIZE;
+        if(bgpn_minor == BGP_NOTIFY_MINOR_CEASE_MAXPRFX && length >= 7) {
+            tptr = dat;
             ND_PRINT(", AFI %s (%u), SAFI %s (%u), Max Prefixes: %u",
                       tok2str(af_values, "Unknown", GET_BE_U_2(tptr)),
                       GET_BE_U_2(tptr),
@@ -2978,18 +2981,18 @@ bgp_notification_print(netdissect_options *ndo,
                       GET_BE_U_4(tptr + 3));
         }
         /*
-         * draft-ietf-idr-shutdown describes a method to send a communication
+         * RFC9003 describes a method to send a communication
          * intended for human consumption regarding the Administrative Shutdown
          */
         if ((bgpn_minor == BGP_NOTIFY_MINOR_CEASE_SHUT ||
              bgpn_minor == BGP_NOTIFY_MINOR_CEASE_RESET) &&
-             length >= BGP_NOTIFICATION_SIZE + 1) {
-            tptr = dat + BGP_NOTIFICATION_SIZE;
+             length >= 1) {
+            tptr = dat;
             shutdown_comm_length = GET_U_1(tptr);
             remainder_offset = 0;
             /* garbage, hexdump it all */
             if (shutdown_comm_length > BGP_NOTIFY_MINOR_CEASE_ADMIN_SHUTDOWN_LEN ||
-                shutdown_comm_length > length - (BGP_NOTIFICATION_SIZE + 1)) {
+                shutdown_comm_length > length - 1) {
                 ND_PRINT(", invalid Shutdown Communication length");
             }
             else if (shutdown_comm_length == 0) {
@@ -3005,16 +3008,50 @@ bgp_notification_print(netdissect_options *ndo,
                 remainder_offset += shutdown_comm_length + 1;
             }
             /* if there is trailing data, hexdump it */
-            if(length - (remainder_offset + BGP_NOTIFICATION_SIZE) > 0) {
-                ND_PRINT(", Data: (length: %u)", length - (remainder_offset + BGP_NOTIFICATION_SIZE));
-                hex_print(ndo, "\n\t\t", tptr + remainder_offset, length - (remainder_offset + BGP_NOTIFICATION_SIZE));
+            if(length - remainder_offset > 0) {
+                ND_PRINT(", Data: (length: %u)", length - remainder_offset);
+                hex_print(ndo, "\n\t\t", tptr + remainder_offset, length - remainder_offset);
             }
+        }
+        /*
+         * RFC8538 describes the Hard Reset cease subcode, which contains another
+         * notification code and subcode.
+         */
+        if (bgpn_minor == BGP_NOTIFY_MINOR_CEASE_HARDRESET && length >= 2) {
+            bgpn_major = GET_U_1(dat++);
+            bgpn_minor = GET_U_1(dat++);
+            length -= 2;
+            bgp_notification_print_code(ndo, dat, length, bgpn_major, bgpn_minor);
         }
         break;
     default:
+        if (bgpn_minor != 0) {
+            ND_PRINT(", subcode %u", bgpn_minor);
+        }
         break;
     }
 
+    return;
+trunc:
+    nd_print_trunc(ndo);
+}
+
+static void
+bgp_notification_print(netdissect_options *ndo,
+                       const u_char *dat, u_int length)
+{
+    const struct bgp_notification *bgp_notification_header;
+    uint8_t bgpn_major, bgpn_minor;
+
+    ND_TCHECK_LEN(dat, BGP_NOTIFICATION_SIZE);
+    if (length<BGP_NOTIFICATION_SIZE)
+        return;
+
+    bgp_notification_header = (const struct bgp_notification *)dat;
+    bgpn_major = GET_U_1(bgp_notification_header->bgpn_major);
+    bgpn_minor = GET_U_1(bgp_notification_header->bgpn_minor);
+    bgp_notification_print_code(ndo, dat + BGP_NOTIFICATION_SIZE,
+                                length - BGP_NOTIFICATION_SIZE, bgpn_major, bgpn_minor);
     return;
 trunc:
     nd_print_trunc(ndo);
