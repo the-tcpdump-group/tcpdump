@@ -285,6 +285,7 @@ static const struct tok bgp_notify_minor_cease_values[] = {
     { 5,                        "Connection Rejected"},
     { 6,                        "Other Configuration Change"},
     { 7,                        "Connection Collision Resolution"},
+    { 10,                       "BFD Down"},
     { 0, NULL}
 };
 

@@ -66,6 +66,7 @@ bgp-extended-msg	bgp-extended-msg.pcapng	bgp-extended-msg.out	-v
 bgp-enhanced-route-refresh	bgp-enhanced-route-refresh.pcapng	bgp-enhanced-route-refresh.out	-v
 bgp-enhanced-route-refresh-subtype	bgp-enhanced-route-refresh-subtype.pcapng	bgp-enhanced-route-refresh-subtype.out	-v
 bgp-extended-optional-parameters-length	bgp-extended-optional-parameters-length.pcapng	bgp-extended-optional-parameters-length.out	-v
+bgp-bfd-cease			bgp-bfd-cease.pcap		bgp-bfd-cease.out		-v
 
 # Broadcom tag tests
 brcmtag		brcm-tag.pcap		brcm-tag.out
