@@ -1,0 +1,34 @@
+    1  12:14:16.763069 IP (tos 0x0, ttl 64, id 60577, offset 0, flags [DF], proto TCP (6), length 101)
+    1.0.0.1.43091 > 1.0.0.2.179: Flags [P.], cksum 0x0bb1 (correct), seq 188850303:188850352, ack 1774524776, win 128, options [nop,nop,TS val 1197583753 ecr 4291927148], length 49: BGP
+	Open Message (1), length: 49
+	  Version 4, my AS 100, Holdtime 3600s, ID 1.0.1.1
+	  Optional parameters, length: 20
+	    Option Capabilities Advertisement (2), length: 8
+	      Graceful Restart (64), length: 6
+		Restart Flags: [N], Restart Time 60s
+		  AFI IPv4 (1), SAFI Unicast (1), Forwarding state preserved: yes
+	    Option Capabilities Advertisement (2), length: 8
+	      Route Refresh (2), length: 0
+	      Multiprotocol Extensions (1), length: 4
+		AFI IPv4 (1), SAFI Unicast (1)
+    2  12:14:16.763342 IP (tos 0xc0, ttl 255, id 64566, offset 0, flags [DF], proto TCP (6), length 117)
+    1.0.0.2.179 > 1.0.0.1.43091: Flags [P.], cksum 0x0359 (correct), seq 1:66, ack 49, win 128, options [nop,nop,TS val 4291927148 ecr 1197583753], length 65: BGP
+	Open Message (1), length: 65
+	  Version 4, my AS 100, Holdtime 3600s, ID 0.0.0.1
+	  Optional parameters, length: 36
+	    Option Capabilities Advertisement (2), length: 34
+	      Multiprotocol Extensions (1), length: 4
+		AFI IPv4 (1), SAFI Unicast (1)
+	      Multiprotocol Extensions (1), length: 4
+		AFI IPv6 (2), SAFI Unicast (1)
+	      Route Refresh (2), length: 0
+	      Graceful Restart (64), length: 2
+		Restart Flags: [R, N], Restart Time 300s
+	      32-Bit AS Number (65), length: 4
+		 4 Byte AS 100
+	      Multiple Paths (69), length: 8
+		AFI IPv4 (1), SAFI Unicast (1), Send/Receive: Receive
+		AFI IPv6 (2), SAFI Unicast (1), Send/Receive: Receive
+    3  12:14:22.608740 IP (tos 0xc0, ttl 255, id 64572, offset 0, flags [DF], proto TCP (6), length 75)
+    1.0.0.2.179 > 1.0.0.1.43091: Flags [P.], cksum 0xd929 (correct), seq 127:150, ack 155, win 128, options [nop,nop,TS val 4291932994 ecr 1197586507], length 23: BGP
+	Notification Message (3), length: 23, Cease (6), subcode Hard Reset (9), Cease (6), subcode Peer Unconfigured (3)
