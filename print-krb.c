@@ -232,11 +232,6 @@ krb_print(netdissect_options *ndo,
 	ndo->ndo_protocol = "krb";
 	kp = (const struct krb *)dat;
 
-	if (dat >= ndo->ndo_snapend) {
-		nd_print_trunc(ndo);
-		return;
-	}
-
 	switch (GET_U_1(kp->pvno)) {
 
 	case 1:
