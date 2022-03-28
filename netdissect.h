@@ -267,6 +267,20 @@ extern void nd_change_snapend(netdissect_options *, const u_char *);
 extern void nd_pop_packet_info(netdissect_options *);
 extern void nd_pop_all_packet_info(netdissect_options *);
 
+static inline NORETURN void
+nd_trunc_longjmp(netdissect_options *ndo)
+{
+	longjmp(ndo->ndo_early_end, ND_TRUNCATED);
+#ifdef _AIX
+	/*
+	 * In AIX <setjmp.h> decorates longjmp() with "#pragma leaves", which tells
+	 * XL C that the function is noreturn, but GCC remains unaware of that and
+	 * yields a "'noreturn' function does return" warning.
+	 */
+	ND_UNREACHABLE
+#endif /* _AIX */
+}
+
 #define PT_VAT		1	/* Visual Audio Tool */
 #define PT_WB		2	/* distributed White Board */
 #define PT_RPC		3	/* Remote Procedure Call */

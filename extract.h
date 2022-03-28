@@ -576,20 +576,6 @@ EXTRACT_IPV4_TO_NETWORK_ORDER(const void *p)
 #define ND_TTEST_16(p) ND_TTEST_LEN((p), 16)
 #define ND_TCHECK_16(p) ND_TCHECK_LEN((p), 16)
 
-static inline NORETURN void
-nd_trunc_longjmp(netdissect_options *ndo)
-{
-	longjmp(ndo->ndo_early_end, ND_TRUNCATED);
-#ifdef _AIX
-	/*
-	 * In AIX <setjmp.h> decorates longjmp() with "#pragma leaves", which tells
-	 * XL C that the function is noreturn, but GCC remains unaware of that and
-	 * yields a "'noreturn' function does return" warning.
-	 */
-	ND_UNREACHABLE
-#endif /* _AIX */
-}
-
 /* get_u_1 and get_s_1 */
 
 static inline uint8_t
