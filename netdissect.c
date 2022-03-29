@@ -185,9 +185,31 @@ nd_push_snapend(netdissect_options *ndo, const u_char *new_snapend)
 	ndspi->ndspi_snapend = ndo->ndo_snapend;
 	ndspi->ndspi_prev = ndo->ndo_packet_info_stack;
 
-	/* No new packet pointer, either */
-	if (new_snapend < ndo->ndo_snapend)
-		ndo->ndo_snapend = new_snapend;
+	/*
+	 * Make sure the new snapend is sane.
+	 *
+	 * If it's after the current snapend, it's not valid.  We
+	 * silently ignore the new setting; that means that our callers
+	 * don't have to do this check themselves, and also means that
+	 * if the new length is used when dissecting, we'll go past the
+	 * snapend and report an error.
+	 *
+	 * If it's before the beginning of the packet, it's not valid.
+	 * That "should not happen", but might happen with a *very*
+	 * large adjustment to the snapend; our callers *should* check
+	 * for that, so we fail if they haven't done so.
+	 */
+	if (new_snapend <= ndo->ndo_snapend) {
+		/* Snapend isn't past the previous snapend */
+		if (new_snapend >= ndo->ndo_packetp) {
+			/* And it isn't before the beginning of the packet */
+			ndo->ndo_snapend = new_snapend;
+		} else {
+			/* But it's before the beginning of the packet */
+			ND_PRINT(" [new snapend before beginning of packet in nd_push_snapend]");
+			nd_bug_longjmp(ndo);
+		}
+	}
 	ndo->ndo_packet_info_stack = ndspi;
 
 	return (1);	/* success */
@@ -203,14 +225,37 @@ void
 nd_change_snapend(netdissect_options *ndo, const u_char *new_snapend)
 {
 	struct netdissect_saved_packet_info *ndspi;
+	const u_char *previous_snapend;
 
 	ndspi = ndo->ndo_packet_info_stack;
-	if (ndspi->ndspi_prev != NULL) {
-		if (new_snapend <= ndspi->ndspi_prev->ndspi_snapend)
+	if (ndspi->ndspi_prev != NULL)
+		previous_snapend = ndspi->ndspi_prev->ndspi_snapend;
+	else
+		previous_snapend = ndo->ndo_snapend;
+	/*
+	 * Make sure the new snapend is sane.
+	 *
+	 * If it's after the current snapend, it's not valid.  We
+	 * silently ignore the new setting; that means that our callers
+	 * don't have to do this check themselves, and also means that
+	 * if the new length is used when dissecting, we'll go past the
+	 * snapend and report an error.
+	 *
+	 * If it's before the beginning of the packet, it's not valid.
+	 * That "should not happen", but might happen with a *very*
+	 * large adjustment to the snapend; our callers *should* check
+	 * for that, so we fail if they haven't done so.
+	 */
+	if (new_snapend <= previous_snapend) {
+		/* Snapend isn't past the previous snapend */
+		if (new_snapend >= ndo->ndo_packetp) {
+			/* And it isn't before the beginning of the packet */
 			ndo->ndo_snapend = new_snapend;
-	} else {
-		if (new_snapend < ndo->ndo_snapend)
-			ndo->ndo_snapend = new_snapend;
+		} else {
+			/* But it's before the beginning of the packet */
+			ND_PRINT(" [new snapend before beginning of packet in nd_push_snapend]");
+			nd_bug_longjmp(ndo);
+		}
 	}
 }
 

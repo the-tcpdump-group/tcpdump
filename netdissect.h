@@ -193,7 +193,8 @@ struct netdissect_saved_packet_info {
 };
 
 /* 'val' value(s) for longjmp */
-#define ND_TRUNCATED 1
+#define ND_TRUNCATED 1          /* packet data too short */
+#define ND_BUG       2          /* bug of some sort */
 
 struct netdissect_options {
   int ndo_bflag;		/* print 4 byte ASes in ASDOT notation */
@@ -273,6 +274,20 @@ static inline NORETURN void
 nd_trunc_longjmp(netdissect_options *ndo)
 {
 	longjmp(ndo->ndo_early_end, ND_TRUNCATED);
+#ifdef _AIX
+	/*
+	 * In AIX <setjmp.h> decorates longjmp() with "#pragma leaves", which tells
+	 * XL C that the function is noreturn, but GCC remains unaware of that and
+	 * yields a "'noreturn' function does return" warning.
+	 */
+	ND_UNREACHABLE
+#endif /* _AIX */
+}
+
+static inline NORETURN void
+nd_bug_longjmp(netdissect_options *ndo)
+{
+	longjmp(ndo->ndo_early_end, ND_BUG);
 #ifdef _AIX
 	/*
 	 * In AIX <setjmp.h> decorates longjmp() with "#pragma leaves", which tells
