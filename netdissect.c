@@ -149,7 +149,7 @@ nd_smi_version_string(void)
 
 int
 nd_push_buffer(netdissect_options *ndo, u_char *new_buffer,
-    const u_char *new_packetp, const u_char *new_snapend)
+    const u_char *new_packetp, u_int newlen)
 {
 	struct netdissect_saved_packet_info *ndspi;
 
@@ -162,20 +162,30 @@ nd_push_buffer(netdissect_options *ndo, u_char *new_buffer,
 	ndspi->ndspi_prev = ndo->ndo_packet_info_stack;
 
 	ndo->ndo_packetp = new_packetp;
-	ndo->ndo_snapend = new_snapend;
+	ndo->ndo_snapend = new_packetp + newlen;
 	ndo->ndo_packet_info_stack = ndspi;
 
 	return (1);	/* success */
 }
 
+
 /*
- * Set a new snapshot end to the minimum of the existing snapshot end
- * and the new snapshot end.
+ * In a given netdissect_options structure:
+ *
+ *,   push the current packet information onto the packet informaton
+ *    stack;
+ *
+ *    given a pointer into the packet and a length past that point in
+ *    the packet, calculate a new snapshot end that's at the lower
+ *    of the current snapshot end and that point in the packet;
+ *
+ *    set the snapshot end to that new value.
  */
 int
-nd_push_snapend(netdissect_options *ndo, const u_char *new_snapend)
+nd_push_snaplen(netdissect_options *ndo, const u_char *bp, u_int newlen)
 {
 	struct netdissect_saved_packet_info *ndspi;
+	u_int snaplen_remaining;
 
 	ndspi = (struct netdissect_saved_packet_info *)malloc(sizeof(struct netdissect_saved_packet_info));
 	if (ndspi == NULL)
@@ -186,76 +196,86 @@ nd_push_snapend(netdissect_options *ndo, const u_char *new_snapend)
 	ndspi->ndspi_prev = ndo->ndo_packet_info_stack;
 
 	/*
-	 * Make sure the new snapend is sane.
-	 *
-	 * If it's after the current snapend, it's not valid.  We
-	 * silently ignore the new setting; that means that our callers
-	 * don't have to do this check themselves, and also means that
-	 * if the new length is used when dissecting, we'll go past the
-	 * snapend and report an error.
-	 *
-	 * If it's before the beginning of the packet, it's not valid.
-	 * That "should not happen", but might happen with a *very*
-	 * large adjustment to the snapend; our callers *should* check
-	 * for that, so we fail if they haven't done so.
+	 * Push the saved previous data onto the stack.
 	 */
-	if (new_snapend <= ndo->ndo_snapend) {
-		/* Snapend isn't past the previous snapend */
-		if (new_snapend >= ndo->ndo_packetp) {
-			/* And it isn't before the beginning of the packet */
-			ndo->ndo_snapend = new_snapend;
-		} else {
-			/* But it's before the beginning of the packet */
-			ND_PRINT(" [new snapend before beginning of packet in nd_push_snapend]");
-			nd_bug_longjmp(ndo);
-		}
-	}
 	ndo->ndo_packet_info_stack = ndspi;
+
+	/*
+	 * Find out how many bytes remain after the current snapend.
+	 *
+	 * We're restricted to packets with at most UINT_MAX bytes;
+	 * cast the result to u_int, so that we don't get truncation
+	 * warnings on LP64 and LLP64 platforms.  (ptrdiff_t is
+	 * signed and we want an unsigned difference; the pointer
+	 * should at most be equal to snapend, and must *never*
+	 * be past snapend.)
+	 */
+	snaplen_remaining = (u_int)(ndo->ndo_snapend - bp);
+
+	/*
+	 * If the new snapend is smaller than the one calculated
+	 * above, set the snapend to that value, otherwise leave
+	 * it unchanged.
+	 */
+	if (newlen <= snaplen_remaining) {
+		/* Snapend isn't past the previous snapend */
+		ndo->ndo_snapend = bp + newlen;
+	}
 
 	return (1);	/* success */
 }
 
 /*
- * Change an already-pushed snapshot end.  This may increase the
+ * In a given netdissect_options structure:
+ *
+ *    given a pointer into the packet and a length past that point in
+ *    the packet, calculate a new snapshot end that's at the lower
+ *    of the previous snapshot end - or, if there is no previous
+ *    snapshot end, the current snapshot end - and that point in the
+ *    packet;
+ *
+ *    set the snapshot end to that new value.
+ *
+ * This is to change the current snapshot end.  This may increase the
  * snapshot end, as it may be used, for example, for a Jumbo Payload
  * option in IPv6.  It must not increase it past the snapshot length
  * atop which the current one was pushed, however.
  */
 void
-nd_change_snapend(netdissect_options *ndo, const u_char *new_snapend)
+nd_change_snaplen(netdissect_options *ndo, const u_char *bp, u_int newlen)
 {
 	struct netdissect_saved_packet_info *ndspi;
 	const u_char *previous_snapend;
+	u_int snaplen_remaining;
 
 	ndspi = ndo->ndo_packet_info_stack;
 	if (ndspi->ndspi_prev != NULL)
 		previous_snapend = ndspi->ndspi_prev->ndspi_snapend;
 	else
 		previous_snapend = ndo->ndo_snapend;
+
 	/*
-	 * Make sure the new snapend is sane.
+	 * Find out how many bytes remain after the previous
+	 * snapend - or, if there is no previous snapend, after
+	 * the current snapend.
 	 *
-	 * If it's after the current snapend, it's not valid.  We
-	 * silently ignore the new setting; that means that our callers
-	 * don't have to do this check themselves, and also means that
-	 * if the new length is used when dissecting, we'll go past the
-	 * snapend and report an error.
-	 *
-	 * If it's before the beginning of the packet, it's not valid.
-	 * That "should not happen", but might happen with a *very*
-	 * large adjustment to the snapend; our callers *should* check
-	 * for that, so we fail if they haven't done so.
+	 * We're restricted to packets with at most UINT_MAX bytes;
+	 * cast the result to u_int, so that we don't get truncation
+	 * warnings on LP64 and LLP64 platforms.  (ptrdiff_t is
+	 * signed and we want an unsigned difference; the pointer
+	 * should at most be equal to snapend, and must *never*
+	 * be past snapend.)
 	 */
-	if (new_snapend <= previous_snapend) {
+	snaplen_remaining = (u_int)(previous_snapend - bp);
+
+	/*
+	 * If the new snapend is smaller than the one calculated
+	 * above, set the snapend to that value, otherwise leave
+	 * it unchanged.
+	 */
+	if (newlen <= snaplen_remaining) {
 		/* Snapend isn't past the previous snapend */
-		if (new_snapend >= ndo->ndo_packetp) {
-			/* And it isn't before the beginning of the packet */
-			ndo->ndo_snapend = new_snapend;
-		} else {
-			/* But it's before the beginning of the packet */
-			ND_PRINT(" [new snapend before beginning of packet in nd_push_snapend]");
-			nd_bug_longjmp(ndo);
-		}
+		ndo->ndo_snapend = bp + newlen;
 	}
 }
 

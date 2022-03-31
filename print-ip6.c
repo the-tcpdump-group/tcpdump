@@ -305,7 +305,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	/*
 	 * Cut off the snapshot length to the end of the IP payload.
 	 */
-	nd_push_snapend(ndo, bp + len);
+	nd_push_snaplen(ndo, bp, len);
 
 	cp = (const u_char *)ip6;
 	advance = sizeof(struct ip6_hdr);
@@ -413,7 +413,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 				if (length < len)
 					ND_PRINT("truncated-ip6 - %u bytes missing!",
 						len - length);
-				nd_change_snapend(ndo, bp + len);
+				nd_change_snaplen(ndo, bp, len);
 
 				/*
 				 * Now subtract the length of the IPv6
@@ -446,7 +446,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 					 * accordingly.
 					 */
 					len = sizeof(struct ip6_hdr);
-					nd_change_snapend(ndo, bp + len);
+					nd_change_snaplen(ndo, bp, len);
 
 					/*
 					 * Now subtract the length of

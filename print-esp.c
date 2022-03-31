@@ -329,7 +329,7 @@ int esp_decrypt_buffer_by_ikev2_print(netdissect_options *ndo,
 	 * on the buffer stack so it can be freed; our caller must
 	 * pop it when done.
 	 */
-	if (!nd_push_buffer(ndo, pt, pt, pt + ctlen)) {
+	if (!nd_push_buffer(ndo, pt, pt, ctlen)) {
 		free(pt);
 		return 0;
 	}
@@ -877,8 +877,7 @@ esp_print(netdissect_options *ndo,
 	 * Switch to the output buffer for dissection, and
 	 * save it on the buffer stack so it can be freed.
 	 */
-	ep = pt + payloadlen;
-	if (!nd_push_buffer(ndo, pt, pt, ep)) {
+	if (!nd_push_buffer(ndo, pt, pt, payloadlen)) {
 		free(pt);
 		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
 			"%s: can't push buffer on buffer stack", __func__);
@@ -893,14 +892,14 @@ esp_print(netdissect_options *ndo,
 	 * it was not decrypted with the correct key, so that the
 	 * "plaintext" is not what was being sent.
 	 */
-	padlen = GET_U_1(ep - 2);
+	padlen = GET_U_1(pt + payloadlen - 2);
 	if (padlen + 2 > payloadlen) {
 		nd_print_trunc(ndo);
 		return;
 	}
 
 	/* Get the next header */
-	nh = GET_U_1(ep - 1);
+	nh = GET_U_1(pt + payloadlen - 1);
 
 	ND_PRINT(": ");
 
@@ -908,7 +907,7 @@ esp_print(netdissect_options *ndo,
 	 * Don't put padding + padding length(1 byte) + next header(1 byte)
 	 * in the buffer because they are not part of the plaintext to decode.
 	 */
-	nd_push_snapend(ndo, ep - (padlen + 2));
+	nd_push_snaplen(ndo, pt, payloadlen - (padlen + 2));
 
 	/* Now dissect the plaintext. */
 	ip_demux_print(ndo, pt, payloadlen - (padlen + 2), ver, fragmented,
@@ -916,7 +915,7 @@ esp_print(netdissect_options *ndo,
 
 	/* Pop the buffer, freeing it. */
 	nd_pop_packet_info(ndo);
-	/* Pop the nd_push_snapend */
+	/* Pop the nd_push_snaplen */
 	nd_pop_packet_info(ndo);
 #endif
 }
