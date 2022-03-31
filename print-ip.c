@@ -377,7 +377,7 @@ ip_print(netdissect_options *ndo,
 	/*
 	 * Cut off the snapshot length to the end of the IP payload.
 	 */
-	nd_push_snapend(ndo, bp + len);
+	nd_push_snaplen(ndo, bp, len);
 
 	len -= hlen;
 

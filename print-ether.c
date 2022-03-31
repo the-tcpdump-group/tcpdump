@@ -306,7 +306,7 @@ recurse:
 		 * Cut off the snapshot length to the end of the
 		 * payload.
 		 */
-		nd_push_snapend(ndo, p + length);
+		nd_push_snaplen(ndo, p, length);
 
 		if (ndo->ndo_eflag) {
 			ND_PRINT("802.3");

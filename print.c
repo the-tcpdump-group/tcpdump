@@ -418,13 +418,6 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 		/* Print the full packet */
 		ndo->ndo_ll_hdr_len = 0;
 		break;
-	case ND_BUG:
-		/*
-		 * A printer or helper routine quit because a bug was
-		 * detected; report it.
-		 */
-		ND_PRINT(" [Bug in %s protocol printer]", ndo->ndo_protocol);
-		break;
 	}
 	hdrlen = ndo->ndo_ll_hdr_len;
 
