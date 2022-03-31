@@ -80,6 +80,9 @@ TBD
       Treat "msys" as Windows for test exit statuses.
       Clean up some help messages in configure.
       Use unified diff by default.
+    Source code:
+      Fix some snapend-changing routines to protect against pointer
+        underflow.
     Documentation:
       Some man page cleanups.
       Note that we require compilers to support at least some of C99.
