@@ -29,12 +29,9 @@
 /* \summary: Babel Routing Protocol printer */
 /* Specifications:
  *
- * RFC 6126
- * RFC 7298
- * RFC 7557
- * draft-ietf-babel-rfc6126bis-17
- * draft-ietf-babel-hmac-10
- * draft-ietf-babel-source-specific-0
+ * RFC 8966
+ * RFC 8967
+ * RFC 9079
  */
 
 #ifdef HAVE_CONFIG_H
