@@ -88,6 +88,19 @@
 #endif
 
 /*
+ * WARN_UNUSED_RESULT, before a function declaration, means "the caller
+ * should use the result of this function" (even if it's just a success/
+ * failure indication).
+ */
+#if __has_attribute(warn_unused_result) \
+    || ND_IS_AT_LEAST_GNUC_VERSION(3,4) \
+    || ND_IS_AT_LEAST_HP_C_VERSION(6,25)
+  #define WARN_UNUSED_RESULT __attribute((warn_unused_result))
+#else
+  #define WARN_UNUSED_RESULT
+#endif
+
+/*
  * PRINTFLIKE(x,y), after a function declaration, means "this function
  * does printf-style formatting, with the xth argument being the format
  * string and the yth argument being the first argument for the format

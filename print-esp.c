@@ -331,7 +331,8 @@ int esp_decrypt_buffer_by_ikev2_print(netdissect_options *ndo,
 	 */
 	if (!nd_push_buffer(ndo, pt, pt, ctlen)) {
 		free(pt);
-		return 0;
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+			"%s: can't push buffer on buffer stack", __func__);
 	}
 
 	return 1;
@@ -907,7 +908,10 @@ esp_print(netdissect_options *ndo,
 	 * Don't put padding + padding length(1 byte) + next header(1 byte)
 	 * in the buffer because they are not part of the plaintext to decode.
 	 */
-	nd_push_snaplen(ndo, pt, payloadlen - (padlen + 2));
+	if (!nd_push_snaplen(ndo, pt, payloadlen - (padlen + 2))) {
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+			"%s: can't push snaplen on buffer stack", __func__);
+	}
 
 	/* Now dissect the plaintext. */
 	ip_demux_print(ndo, pt, payloadlen - (padlen + 2), ver, fragmented,
