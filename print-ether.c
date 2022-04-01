@@ -306,7 +306,10 @@ recurse:
 		 * Cut off the snapshot length to the end of the
 		 * payload.
 		 */
-		nd_push_snaplen(ndo, p, length);
+		if (!nd_push_snaplen(ndo, p, length)) {
+			(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+				"%s: can't push snaplen on buffer stack", __func__);
+		}
 
 		if (ndo->ndo_eflag) {
 			ND_PRINT("802.3");

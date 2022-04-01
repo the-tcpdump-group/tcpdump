@@ -377,7 +377,10 @@ ip_print(netdissect_options *ndo,
 	/*
 	 * Cut off the snapshot length to the end of the IP payload.
 	 */
-	nd_push_snaplen(ndo, bp, len);
+	if (!nd_push_snaplen(ndo, bp, len)) {
+		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
+			"%s: can't push snaplen on buffer stack", __func__);
+	}
 
 	len -= hlen;
 
