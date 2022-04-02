@@ -149,7 +149,7 @@ nd_smi_version_string(void)
 
 int
 nd_push_buffer(netdissect_options *ndo, u_char *new_buffer,
-	       const u_char *new_packetp, u_int newlen)
+	       const u_char *new_packetp, const u_int newlen)
 {
 	struct netdissect_saved_packet_info *ndspi;
 
@@ -182,7 +182,7 @@ nd_push_buffer(netdissect_options *ndo, u_char *new_buffer,
  *    set the snapshot end to that new value.
  */
 int
-nd_push_snaplen(netdissect_options *ndo, const u_char *bp, u_int newlen)
+nd_push_snaplen(netdissect_options *ndo, const u_char *bp, const u_int newlen)
 {
 	struct netdissect_saved_packet_info *ndspi;
 	u_int snaplen_remaining;
@@ -242,7 +242,7 @@ nd_push_snaplen(netdissect_options *ndo, const u_char *bp, u_int newlen)
  * atop which the current one was pushed, however.
  */
 void
-nd_change_snaplen(netdissect_options *ndo, const u_char *bp, u_int newlen)
+nd_change_snaplen(netdissect_options *ndo, const u_char *bp, const u_int newlen)
 {
 	struct netdissect_saved_packet_info *ndspi;
 	const u_char *previous_snapend;
