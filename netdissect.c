@@ -149,7 +149,7 @@ nd_smi_version_string(void)
 
 int
 nd_push_buffer(netdissect_options *ndo, u_char *new_buffer,
-    const u_char *new_packetp, u_int newlen)
+	       const u_char *new_packetp, u_int newlen)
 {
 	struct netdissect_saved_packet_info *ndspi;
 
@@ -172,7 +172,7 @@ nd_push_buffer(netdissect_options *ndo, u_char *new_buffer,
 /*
  * In a given netdissect_options structure:
  *
- *,   push the current packet information onto the packet informaton
+ *    push the current packet information onto the packet information
  *    stack;
  *
  *    given a pointer into the packet and a length past that point in
