@@ -260,11 +260,9 @@ struct netdissect_options {
 		      PRINTFLIKE_FUNCPTR(2, 3);
 };
 
-extern WARN_UNUSED_RESULT int nd_push_buffer(netdissect_options *, u_char *,
-    const u_char *, u_int);
-extern WARN_UNUSED_RESULT int nd_push_snaplen(netdissect_options *,
-    const u_char *, u_int);
-extern void nd_change_snaplen(netdissect_options *, const u_char *, u_int);
+extern WARN_UNUSED_RESULT int nd_push_buffer(netdissect_options *, u_char *, const u_char *, const u_int);
+extern WARN_UNUSED_RESULT int nd_push_snaplen(netdissect_options *, const u_char *, const u_int);
+extern void nd_change_snaplen(netdissect_options *, const u_char *, const u_int);
 extern void nd_pop_packet_info(netdissect_options *);
 extern void nd_pop_all_packet_info(netdissect_options *);
 
