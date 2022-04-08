@@ -505,7 +505,7 @@ print_unknown_data(netdissect_options *ndo, const u_char *cp,
  */
 static const char *
 tok2strbuf(const struct tok *lp, const char *fmt,
-	   u_int v, char *buf, size_t bufsize)
+	   const u_int v, char *buf, const size_t bufsize)
 {
 	if (lp != NULL) {
 		while (lp->s != NULL) {
@@ -527,8 +527,7 @@ tok2strbuf(const struct tok *lp, const char *fmt,
  * in round-robin fashion.
  */
 const char *
-tok2str(const struct tok *lp, const char *fmt,
-	u_int v)
+tok2str(const struct tok *lp, const char *fmt, const u_int v)
 {
 	static char buf[4][TOKBUFSIZE];
 	static int idx = 0;
@@ -549,7 +548,7 @@ tok2str(const struct tok *lp, const char *fmt,
  */
 static char *
 bittok2str_internal(const struct tok *lp, const char *fmt,
-	   u_int v, const char *sep)
+		    const u_int v, const char *sep)
 {
         static char buf[1024+1]; /* our string buffer */
         char *bufp = buf;
@@ -589,8 +588,7 @@ bittok2str_internal(const struct tok *lp, const char *fmt,
  * this is useful for parsing bitfields, the output strings are not separated.
  */
 char *
-bittok2str_nosep(const struct tok *lp, const char *fmt,
-	   u_int v)
+bittok2str_nosep(const struct tok *lp, const char *fmt, const u_int v)
 {
     return (bittok2str_internal(lp, fmt, v, ""));
 }
@@ -600,8 +598,7 @@ bittok2str_nosep(const struct tok *lp, const char *fmt,
  * this is useful for parsing bitfields, the output strings are comma separated.
  */
 char *
-bittok2str(const struct tok *lp, const char *fmt,
-	   u_int v)
+bittok2str(const struct tok *lp, const char *fmt, const u_int v)
 {
     return (bittok2str_internal(lp, fmt, v, ", "));
 }
@@ -613,8 +610,7 @@ bittok2str(const struct tok *lp, const char *fmt,
  * correct for bounds-checking.
  */
 const char *
-tok2strary_internal(const char **lp, int n, const char *fmt,
-	int v)
+tok2strary_internal(const char **lp, int n, const char *fmt, const int v)
 {
 	static char buf[TOKBUFSIZE];
 
@@ -647,7 +643,7 @@ uint2tokary_internal(const struct uint_tokary dict[], const size_t size,
  */
 
 int
-mask2plen(uint32_t mask)
+mask2plen(const uint32_t mask)
 {
 	const uint32_t bitmasks[33] = {
 		0x00000000,
@@ -715,7 +711,7 @@ mask62plen(const u_char *mask)
  */
 static u_int
 fetch_token(netdissect_options *ndo, const u_char *pptr, u_int idx, u_int len,
-    u_char *tbuf, size_t tbuflen)
+	    u_char *tbuf, size_t tbuflen)
 {
 	size_t toklen = 0;
 	u_char c;
