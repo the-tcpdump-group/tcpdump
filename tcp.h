@@ -122,6 +122,9 @@ extern const struct tok tcp_flag_values[];
 #ifndef RPKI_RTR_PORT
 #define RPKI_RTR_PORT		323
 #endif
+#ifndef HTTPS_PORT
+#define HTTPS_PORT		443
+#endif
 #ifndef SMB_PORT
 #define SMB_PORT		445
 #endif

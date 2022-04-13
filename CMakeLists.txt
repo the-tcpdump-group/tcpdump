@@ -1125,6 +1125,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-tftp.c
     print-timed.c
     print-tipc.c
+    print-tls.c
     print-token.c
     print-udld.c
     print-udp.c
