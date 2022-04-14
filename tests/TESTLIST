@@ -850,6 +850,9 @@ lsp-ping-timestamp	lsp-ping-timestamp.pcap		lsp-ping-timestamp.out	-vv
 # lwres with "extra" bytes
 lwres_with_extra lwres_with_extra.pcap lwres_with_extra.out
 
+# DHCP ZTP(RFC5970) and SZTP(RFC8572) tests
+dhcpv4v6-rfc5970-rfc8572 dhcpv4v6-rfc5970-rfc8572.pcap dhcpv4v6-rfc5970-rfc8572.out -vv
+
 # Undefined behavior tests
 ip-snmp-leftshift-unsigned ip-snmp-leftshift-unsigned.pcap ip-snmp-leftshift-unsigned.out
 ip6-snmp-oid-unsigned ip6-snmp-oid-unsigned.pcap ip6-snmp-oid-unsigned.out
