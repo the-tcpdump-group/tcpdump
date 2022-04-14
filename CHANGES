@@ -18,6 +18,7 @@ Monthday, Month DD, YYYY by gharris and denis
       sFlow: add support for IPv6 agent.
       VRRP: add support for IPv6.
       ICMP: add dissector for ICMP Interface Identification Object
+      Arista: Refine the output format and print HwInfo.
     User interface:
       Add optional unit suffix on -C file size.
       Add --print-sampling to print every Nth packet instead of all.
