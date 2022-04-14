@@ -188,8 +188,10 @@ struct dhcp6_relay {
 #  define DH6OPT_NTP_SUBOPTION_SRV_ADDR 1
 #  define DH6OPT_NTP_SUBOPTION_MC_ADDR 2
 #  define DH6OPT_NTP_SUBOPTION_SRV_FQDN 3
+#define DH6OPT_BOOTFILE_URL 59    /* RFC5970 */
 #define DH6OPT_AFTR_NAME 64
 #define DH6OPT_MUDURL 112
+#define DH6OPT_SZTP_REDIRECT 136  /* RFC8572 */
 
 static const struct tok dh6opt_str[] = {
 	{ DH6OPT_CLIENTID,           "client-ID"            },
@@ -239,8 +241,10 @@ static const struct tok dh6opt_str[] = {
 	{ DH6OPT_LQ_RELAY_DATA,      "LQ-relay-data"        },
 	{ DH6OPT_LQ_CLIENT_LINK,     "LQ-client-link"       },
 	{ DH6OPT_NTP_SERVER,         "NTP-server"           },
+	{ DH6OPT_BOOTFILE_URL,       "Bootfile-URL"         },
 	{ DH6OPT_AFTR_NAME,          "AFTR-Name"            },
 	{ DH6OPT_MUDURL,             "MUD-URL"              },
+	{ DH6OPT_SZTP_REDIRECT,      "SZTP-redirect"        },
 	{ 0, NULL }
 };
 
@@ -290,6 +294,8 @@ dhcp6opt_print(netdissect_options *ndo,
 	uint16_t subopt_len;
 	uint8_t dh6_reconf_type;
 	uint8_t dh6_lq_query_type;
+	u_int first_list_value;
+	uint16_t remainder_len;
 
 	if (cp == ep)
 		return;
@@ -781,6 +787,39 @@ dhcp6opt_print(netdissect_options *ndo,
 			tp = (const u_char *)(dh6o + 1);
 			ND_PRINT(" ");
 			nd_printjnp(ndo, tp, optlen);
+			ND_PRINT(")");
+			break;
+
+		case DH6OPT_BOOTFILE_URL:
+			tp = (const u_char *)(dh6o + 1);
+			ND_PRINT(" ");
+			nd_printjn(ndo, tp, optlen);
+			ND_PRINT(")");
+			break;
+
+		case DH6OPT_SZTP_REDIRECT:
+		case DH6OPT_USER_CLASS:
+			ND_PRINT(" ");
+			tp = (const u_char *)(dh6o + 1);
+			first_list_value = TRUE;
+			remainder_len = optlen;
+			while (remainder_len >= 2) {
+				if (first_list_value == FALSE) {
+					ND_PRINT(",");
+				}
+				first_list_value = FALSE;
+				subopt_len = GET_BE_U_2(tp);
+				if (subopt_len > remainder_len-2) {
+					break;
+				}
+				tp += 2;
+				nd_printjn(ndo, tp, subopt_len);
+				tp += subopt_len;
+				remainder_len -= (subopt_len+2);
+			}
+			if (remainder_len != 0 ) {
+				ND_PRINT(" ?");
+			}
 			ND_PRINT(")");
 			break;
 

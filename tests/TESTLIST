@@ -904,3 +904,6 @@ gquic				gquic.pcap			gquic.out	-v
 
 # GRE keepalives, CDP over GRE
 various_gre			various_gre.pcap		various_gre.out	-v
+
+# DHCP ZTP(RFC5970) and SZTP(RFC8572) tests
+dhcpv4v6-rfc5970-rfc8572        dhcpv4v6-rfc5970-rfc8572.pcap           dhcpv4v6-rfc5970-rfc8572.out    -vv
