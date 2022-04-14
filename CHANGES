@@ -29,6 +29,7 @@ TBD
       RADIUS: Use GET_U_1() to replace a direct dereference.
       TCP: Fix an invalid check.
       RESP: Remove an unnecessary test.
+      Arista: Refine the output format and print HwInfo.
       addrtoname.c: Fix two invalid tests.
     Building and testing:
       Update config.guess and config.sub.
