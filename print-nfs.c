@@ -198,7 +198,7 @@ static const struct tok sunrpc_str[] = {
 };
 
 static void
-print_nfsaddr(netdissect_options *ndo,
+nfsaddr_print(netdissect_options *ndo,
               const u_char *bp, const char *s, const char *d)
 {
 	const struct ip *ip;
@@ -349,7 +349,7 @@ nfsreply_print(netdissect_options *ndo,
 		snprintf(dstid, sizeof(dstid), "%u",
 		    GET_BE_U_4(rp->rm_xid));
 	}
-	print_nfsaddr(ndo, bp2, srcid, dstid);
+	nfsaddr_print(ndo, bp2, srcid, dstid);
 
 	nfsreply_noaddr_print(ndo, bp, length, bp2);
 }
