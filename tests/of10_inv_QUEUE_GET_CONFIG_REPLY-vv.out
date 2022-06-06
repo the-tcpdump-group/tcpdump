@@ -1,8 +1,1 @@
-    1  06:10:40.134396994 : IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 1540, bad cksum 11ce (->4fbd)!)
-    109.74.202.0.6653 > 4.184.169.52.4708: Flags [P.], cksum 0x8000 (incorrect -> 0x4d3b), seq 3422244149:3422245637, ack 774246557, win 0, options [nop,nop,unknown-16 0x112e355c0302fa3b], length 1488: OpenFlow
-	version 1.0, type QUEUE_GET_CONFIG_REPLY, length 278, xid 0xc7ffffff
-	 port 64773
-	  queue_id 0, len 255
-	   property NONE, len 0 [property length 0 < 8] (invalid)
-	  [remaining length 7 < 8] (invalid)
-	version unknown (0x12), type unknown (0x12), length 4626, xid 0x12121212 [|openflow]
+    1  06:10:40.134396994 : (protocol 0x7e7e invalid)

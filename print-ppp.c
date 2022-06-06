@@ -1428,10 +1428,16 @@ ppp_hdlc(netdissect_options *ndo,
             if (length < 4)
                 goto trunc;
             proto = GET_BE_U_2(b + 2); /* load the PPP proto-id */
-            handle_ppp(ndo, proto, b + 4, length - 4);
+            if ((proto & 0xff00) == 0x7e00)
+                ND_PRINT("(protocol 0x%04x invalid)", proto);
+            else
+                handle_ppp(ndo, proto, b + 4, length - 4);
             break;
         default: /* last guess - proto must be a PPP proto-id */
-            handle_ppp(ndo, proto, b + 2, length - 2);
+            if ((proto & 0xff00) == 0x7e00)
+                ND_PRINT("(protocol 0x%04x invalid)", proto);
+            else
+                handle_ppp(ndo, proto, b + 2, length - 2);
             break;
         }
 
