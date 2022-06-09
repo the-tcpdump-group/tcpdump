@@ -44,7 +44,7 @@ Please see [this file](README.md) for notes about tested platforms.
 ## Description of files
 ```
 CHANGES		- description of differences between releases
-CONTRIBUTING	- guidelines for contributing
+CONTRIBUTING.md	- guidelines for contributing
 CREDITS		- people that have helped tcpdump along
 INSTALL.md	- this file
 LICENSE		- the license under which tcpdump is distributed

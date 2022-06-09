@@ -2031,7 +2031,7 @@ To report a security issue please send an e-mail to \%security@tcpdump.org.
 .LP
 To report bugs and other problems, contribute patches, request a
 feature, provide generic feedback etc. please see the file
-.I CONTRIBUTING
+.I CONTRIBUTING.md
 in the tcpdump source tree root.
 .LP
 NIT doesn't let you watch your own outbound traffic, BPF will.
