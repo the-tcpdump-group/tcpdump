@@ -30,11 +30,11 @@ tcpdump compiles and works on at least the following platforms:
 * FreeBSD
 * Haiku
 * HP-UX 11i
+* illumos (OmniOS, OpenIndiana)
 * GNU/Linux
 * {Mac} OS X / macOS
 * NetBSD
 * OpenBSD
-* OpenIndiana
 * OpenWrt
 * Solaris
 * Windows (requires WinPcap or Npcap, and Visual Studio with CMake)
