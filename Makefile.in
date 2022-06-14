@@ -475,7 +475,9 @@ releasetar:
 	@autoreconf -f && \
 	name=$(PROG)-`cat VERSION` && \
 	   mkdir $$name && \
+	   tar cf - $(CSRC) $(HDR) $(LIBNETDISSECT_SRC) $(EXTRA_DIST) $(TEST_DIST) >/dev/null && \
 	   tar cf - $(CSRC) $(HDR) $(LIBNETDISSECT_SRC) $(EXTRA_DIST) $(TEST_DIST) | (cd $$name; tar xf -) && \
+	   tar cf - $$name >/dev/null && \
 	   tar cf - $$name | gzip >$$name.tar.gz && \
 	   rm -rf $$name
 
