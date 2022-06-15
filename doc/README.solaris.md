@@ -2,6 +2,12 @@
 
 * Autoconf works everywhere.
 
+## OmniOS r151042/AMD64
+
+* Both system and local libpcap are suitable.
+* CMake 3.23.1 works.
+* GCC 11.2.0 and Clang 14.0.3 work.
+
 ## OpenIndiana 2021.04/AMD64
 
 * Both system and local libpcap are suitable.

@@ -37,6 +37,8 @@ Monthday, Month DD, YYYY by gharris and denis
     Building and testing:
       Add a configure option to help debugging (--enable-instrument-functions)
       Improve error detection in "make releasetar".
+    Documentation:
+      Update AIX and Solaris-related specifics.
 
 TBD
   Summary for 4.99.2 tcpdump release (so far!)

@@ -356,6 +356,8 @@ EXTRA_DIST = \
 	config.sub \
 	configure \
 	configure.ac \
+	doc/README.aix.md \
+	doc/README.solaris.md \
 	doc/README.Win32.md \
 	install-sh \
 	instrument-functions.c \
