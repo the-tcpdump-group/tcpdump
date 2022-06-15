@@ -51,6 +51,7 @@ TBD
     Documentation:
       Some man page cleanups.
       Note that we require compilers to support at least some of C99.
+      Update AIX and Solaris-related specifics.
 
 Wednesday, June 9, 2021 by gharris
   Summary for 4.99.1 tcpdump release
