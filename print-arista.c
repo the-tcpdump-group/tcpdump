@@ -57,6 +57,9 @@ The two-byte version value is split into 3 fields:
 |   timescale   | format|hw info|
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+
+See also: https://www.arista.com/assets/data/pdf/Whitepapers/Overview_Arista_Timestamps.pdf
+
 */
 
 #define ARISTA_SUBTYPE_TIMESTAMP 0x0001
