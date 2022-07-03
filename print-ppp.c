@@ -1570,11 +1570,18 @@ ppp_print(netdissect_options *ndo,
 		hdr_len += 2;
 	}
 
-	if (ndo->ndo_eflag)
-		ND_PRINT("%s (0x%04x), length %u: ",
-		          tok2str(ppptype2str, "unknown", proto),
+	if (ndo->ndo_eflag) {
+		const char *typestr;
+		typestr = tok2str(ppptype2str, "unknown", proto);
+		ND_PRINT("%s (0x%04x), length %u",
+		          typestr,
 		          proto,
 		          olen);
+		if (*typestr == 'u')	/* "unknown" */
+			return hdr_len;
+
+		ND_PRINT(": ");
+	}
 
 	handle_ppp(ndo, proto, p, length);
 	return (hdr_len);
