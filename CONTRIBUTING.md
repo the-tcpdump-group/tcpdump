@@ -147,7 +147,7 @@ and ask!
    * Define: `ND_LONGJMP_FROM_TCHECK` before including `netdissect.h`
    * Make sure that the intersection of `GET_*()` and `ND_TCHECK_*()` is minimal,
      but at the same time their union covers all packet data in all cases.
-   
+
    You can test the code via:
    ```
    sudo ./tcpdump -s snaplen [-v][v][...] -i lo # in a terminal
@@ -159,7 +159,7 @@ and ask!
    not only a valid packet but any arbitrary random sequence of octets (packet
    * built malformed originally by the sender or by a fuzz tester,
    * became corrupted in transit or for some other reason).
-   
+
    Print with: `nd_print_invalid(ndo);	/* to print " (invalid)" */`
 
 *  Use `struct tok` for indexed strings and print them with
