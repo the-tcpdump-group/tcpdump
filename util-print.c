@@ -925,7 +925,7 @@ txtproto_print(netdissect_options *ndo, const u_char *pptr, u_int len,
     (defined(__s390__) || defined(__s390x__) || defined(__zarch__)) || \
     defined(__vax__)
 /*
- * The procesor natively handles unaligned loads, so just use memcpy()
+ * The processor natively handles unaligned loads, so just use memcpy()
  * and memcmp(), to enable those optimizations.
  *
  * XXX - are those all the x86 tests we need?

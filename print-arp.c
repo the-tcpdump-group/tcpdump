@@ -64,7 +64,7 @@ struct  arp_pkthdr {
 #define ARPOP_REVREPLY  4       /* response giving protocol address */
 #define ARPOP_INVREQUEST 8      /* request to identify peer */
 #define ARPOP_INVREPLY  9       /* response identifying peer */
-#define ARPOP_NAK       10      /* NAK - only valif for ATM ARP */
+#define ARPOP_NAK       10      /* NAK - only valid for ATM ARP */
 
 /*
  * The remaining fields are variable in size,

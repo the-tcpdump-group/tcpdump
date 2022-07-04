@@ -666,7 +666,7 @@ Print every \fInth\fP packet. This option enables the \fB--print\fP flag.
 .IP
 Unprinted packets are not parsed, which decreases processing time. Setting
 \fInth\fP to \fB100\fP for example, will (counting from 1) parse and print the
-100th packet, 200th patcket, 300th packet, and so on.
+100th packet, 200th packet, 300th packet, and so on.
 .IP
 This option also enables the \fB-S\fP flag, as relative TCP sequence
 numbers are not tracked for unprinted packets.
