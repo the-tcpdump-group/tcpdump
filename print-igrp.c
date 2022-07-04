@@ -44,7 +44,7 @@ struct igrphdr {
 	nd_uint16_t ig_as;	/* autonomous system number */
 	nd_uint16_t ig_ni;	/* number of subnet in local net */
 	nd_uint16_t ig_ns;	/* number of networks in AS */
-	nd_uint16_t ig_nx;	/* number of networks ouside AS */
+	nd_uint16_t ig_nx;	/* number of networks outside AS */
 	nd_uint16_t ig_sum;	/* checksum of IGRP header & data */
 };
 

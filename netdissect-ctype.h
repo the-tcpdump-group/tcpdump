@@ -42,7 +42,7 @@
 #define ND_TOASCII(c)		((c) & 0x7F)
 
 /*
- * Locale-independent macros for coverting to upper or lower case.
+ * Locale-independent macros for converting to upper or lower case.
  *
  * Byte values outside the ASCII range are not converted.  Byte values
  * *in* the ASCII range are converted to byte values in the ASCII range;

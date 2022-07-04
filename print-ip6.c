@@ -441,7 +441,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 						goto trunc;
 
 					/*
-					 * OK, we didn't see any extnesion
+					 * OK, we didn't see any extension
 					 * header, but that means we have
 					 * no payload, so set the length
 					 * to the IPv6 header length,

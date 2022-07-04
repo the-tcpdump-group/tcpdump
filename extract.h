@@ -149,7 +149,7 @@ EXTRACT_IPV4_TO_HOST_ORDER(const void *p)
  * cast the pointer to point to one of those, and fetch through it;
  * the GCC manual doesn't appear to explicitly say that
  * __attribute__((packed)) causes the compiler to generate unaligned-safe
- * code, but it apppears to do so.
+ * code, but it appears to do so.
  *
  * We do this in case the compiler can generate code using those
  * instructions to do an unaligned load and pass stuff to "ntohs()" or

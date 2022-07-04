@@ -144,7 +144,7 @@ stp_print_config_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
  *
  * 2 -  bytes Protocol Id
  * 1 -  byte  Protocol Ver.
- * 1 -  byte  BPDU tye
+ * 1 -  byte  BPDU type
  * 1 -  byte  Flags
  * 8 -  bytes CIST Root Identifier
  * 4 -  bytes CIST External Path Cost
