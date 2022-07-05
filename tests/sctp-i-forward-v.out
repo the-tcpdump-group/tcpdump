@@ -1,0 +1,54 @@
+    1  2023-05-13 19:52:04.102869 IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto SCTP (132), length 92)
+    192.168.5.1.46336 > 192.168.5.2.36297: sctp (1) [INIT] [init tag: 3308356620] [rwnd: 106496] [OS: 10] [MIS: 65535] [init TSN: 3700341333] 
+    2  2023-05-13 19:52:04.102890 IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto SCTP (132), length 348)
+    192.168.5.2.36297 > 192.168.5.1.46336: sctp (1) [INIT ACK] [init tag: 2742731420] [rwnd: 106496] [OS: 5] [MIS: 5] [init TSN: 2786592332] 
+    3  2023-05-13 19:52:04.102901 IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto SCTP (132), length 296)
+    192.168.5.1.46336 > 192.168.5.2.36297: sctp (1) [COOKIE ECHO] 
+    4  2023-05-13 19:52:04.102914 IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto SCTP (132), length 36)
+    192.168.5.2.36297 > 192.168.5.1.46336: sctp (1) [COOKIE ACK] 
+    5  2023-05-13 19:52:04.112376 IP (tos 0x2,ECT(0), ttl 64, id 1, offset 0, flags [DF], proto SCTP (132), length 1500)
+    192.168.5.1.46336 > 192.168.5.2.36297: sctp (1) [I-DATA] (B) [TSN: 3700341333] [SID: 0] [MID: 0] [PPID 0x0] 
+    6  2023-05-13 19:52:04.112403 IP (tos 0x2,ECT(0), ttl 64, id 2, offset 0, flags [DF], proto SCTP (132), length 1276)
+    192.168.5.1.46336 > 192.168.5.2.36297: sctp (1) [I-DATA] (E) [TSN: 3700341334] [SID: 0] [MID: 0] [FSN: 0] 
+    7  2023-05-13 19:52:04.112422 IP (tos 0x2,ECT(0), ttl 64, id 3, offset 0, flags [DF], proto SCTP (132), length 1500)
+    192.168.5.1.46336 > 192.168.5.2.36297: sctp (1) [I-DATA] (B) [TSN: 3700341335] [SID: 0] [MID: 1] [PPID 0x0] 
+    8  2023-05-13 19:52:04.112424 IP (tos 0x2,ECT(0), ttl 64, id 4, offset 0, flags [DF], proto SCTP (132), length 1276)
+    192.168.5.1.46336 > 192.168.5.2.36297: sctp (1) [I-DATA] (E) [TSN: 3700341336] [SID: 0] [MID: 1] [FSN: 0] 
+    9  2023-05-13 19:52:07.367974 IP (tos 0x2,ECT(0), ttl 64, id 5, offset 0, flags [DF], proto SCTP (132), length 1500)
+    192.168.5.1.46336 > 192.168.5.2.36297: sctp (1) [I-DATA] (B) [TSN: 3700341333] [SID: 0] [MID: 0] [PPID 0x0] 
+   10  2023-05-13 19:52:08.135725 IP (tos 0x2,ECT(0), ttl 64, id 5499, offset 0, flags [DF], proto SCTP (132), length 92)
+    192.168.5.2.36297 > 192.168.5.3.46336: sctp (1) [HB REQ] 
+   11  2023-05-13 19:52:08.135757 IP (tos 0x2,ECT(0), ttl 64, id 6, offset 0, flags [DF], proto SCTP (132), length 1336)
+    192.168.5.1.46336 > 192.168.5.2.36297: sctp (1) [HB ACK] , (2) [I-DATA] (E) [TSN: 3700341334] [SID: 0] [MID: 0] [FSN: 0] 
+   12  2023-05-13 19:52:08.391999 IP (tos 0x2,ECT(0), ttl 64, id 7, offset 0, flags [DF], proto SCTP (132), length 92)
+    192.168.5.1.46336 > 192.168.5.4.36297: sctp (1) [HB REQ] 
+   13  2023-05-13 19:52:08.392040 IP (tos 0x2,ECT(0), ttl 64, id 5500, offset 0, flags [DF], proto SCTP (132), length 92)
+    192.168.5.2.36297 > 192.168.5.1.46336: sctp (1) [HB ACK] 
+   14  2023-05-13 19:52:08.392061 IP (tos 0x2,ECT(0), ttl 64, id 8, offset 0, flags [DF], proto SCTP (132), length 2744)
+    192.168.5.1.46336 > 192.168.5.4.36297: sctp (1) [I-DATA] (B) [TSN: 3700341335] [SID: 0] [MID: 1] [PPID 0x0] , (2) [I-DATA] (E) [TSN: 3700341336] [SID: 0] [MID: 1] [FSN: 0] 
+   15  2023-05-13 19:52:08.392064 IP (tos 0x2,ECT(0), ttl 64, id 10, offset 0, flags [DF], proto SCTP (132), length 2744)
+    192.168.5.1.46336 > 192.168.5.4.36297: sctp (1) [I-DATA] (B) [TSN: 3700341337] [SID: 0] [MID: 2] [PPID 0x0] , (2) [I-DATA] (E) [TSN: 3700341338] [SID: 0] [MID: 2] [FSN: 0] 
+   16  2023-05-13 19:52:09.895573 IP (tos 0x2,ECT(0), ttl 64, id 5501, offset 0, flags [DF], proto SCTP (132), length 92)
+    192.168.5.2.36297 > 192.168.5.3.46336: sctp (1) [HB REQ] 
+   17  2023-05-13 19:52:09.895587 IP (tos 0x2,ECT(0), ttl 64, id 12, offset 0, flags [DF], proto SCTP (132), length 92)
+    192.168.5.1.46336 > 192.168.5.2.36297: sctp (1) [HB ACK] 
+   18  2023-05-13 19:52:13.511764 IP (tos 0x2,ECT(0), ttl 64, id 13, offset 0, flags [DF], proto SCTP (132), length 1500)
+    192.168.5.1.46336 > 192.168.5.4.36297: sctp (1) [I-DATA] (B) [TSN: 3700341333] [SID: 0] [MID: 0] [PPID 0x0] 
+   19  2023-05-13 19:52:15.531970 IP (tos 0x2,ECT(0), ttl 64, id 14, offset 0, flags [DF], proto SCTP (132), length 48)
+    192.168.5.1.46336 > 192.168.5.2.36297: sctp (1) [I-FORWARD-FSN] [TSN: 3700341333] 
+   20  2023-05-13 19:52:15.531974 IP (tos 0x2,ECT(0), ttl 64, id 15, offset 0, flags [DF], proto SCTP (132), length 1500)
+    192.168.5.1.46336 > 192.168.5.2.36297: sctp (1) [I-DATA] (B) [TSN: 3700341335] [SID: 0] [MID: 1] [PPID 0x0] 
+   21  2023-05-13 19:52:15.531991 IP (tos 0x2,ECT(0), ttl 64, id 5502, offset 0, flags [DF], proto SCTP (132), length 48)
+    192.168.5.2.36297 > 192.168.5.1.46336: sctp (1) [SACK] [cum ack 3700341333] [a_rwnd 106496] [#gap acks 0] [#dup tsns 0] 
+   22  2023-05-13 19:52:15.531997 IP (tos 0x2,ECT(0), ttl 64, id 16, offset 0, flags [DF], proto SCTP (132), length 48)
+    192.168.5.1.46336 > 192.168.5.2.36297: sctp (1) [I-FORWARD-FSN] [TSN: 3700341335] 
+   23  2023-05-13 19:52:15.531998 IP (tos 0x2,ECT(0), ttl 64, id 17, offset 0, flags [DF], proto SCTP (132), length 1500)
+    192.168.5.1.46336 > 192.168.5.2.36297: sctp (1) [I-DATA] (B) [TSN: 3700341337] [SID: 0] [MID: 2] [PPID 0x0] 
+   24  2023-05-13 19:52:15.531999 IP (tos 0x2,ECT(0), ttl 64, id 18, offset 0, flags [DF], proto SCTP (132), length 1276)
+    192.168.5.1.46336 > 192.168.5.2.36297: sctp (1) [I-DATA] (E) [TSN: 3700341338] [SID: 0] [MID: 2] [FSN: 0] 
+   25  2023-05-13 19:52:15.735956 IP (tos 0x2,ECT(0), ttl 64, id 5503, offset 0, flags [DF], proto SCTP (132), length 48)
+    192.168.5.2.36297 > 192.168.5.1.46336: sctp (1) [SACK] [cum ack 3700341335] [a_rwnd 106496] [#gap acks 0] [#dup tsns 0] 
+   26  2023-05-13 19:52:15.735987 IP (tos 0x2,ECT(0), ttl 64, id 19, offset 0, flags [DF], proto SCTP (132), length 48)
+    192.168.5.1.46336 > 192.168.5.2.36297: sctp (1) [I-FORWARD-FSN] [TSN: 3700341336] 
+   27  2023-05-13 19:52:15.939951 IP (tos 0x2,ECT(0), ttl 64, id 5504, offset 0, flags [DF], proto SCTP (132), length 48)
+    192.168.5.2.36297 > 192.168.5.1.46336: sctp (1) [SACK] [cum ack 3700341336] [a_rwnd 106496] [#gap acks 0] [#dup tsns 0] 
