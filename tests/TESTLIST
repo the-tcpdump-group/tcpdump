@@ -76,6 +76,11 @@ sctp-asconf-6 sctp-asconf-6.pcap sctp-asconf-6.out
 sctp-asconf-6-v sctp-asconf-6.pcap sctp-asconf-6-v.out -v
 sctp-asconf-6-vv sctp-asconf-6.pcap sctp-asconf-6-vv.out -vv
 
+# PAD tests
+sctp-pad sctp-pad.pcap sctp-pad.out
+sctp-pad-v sctp-pad.pcap sctp-pad-v.out -v
+sctp-pad-vv sctp-pad.pcap sctp-pad-vv.out -vv
+
 # BGP tests
 bgp_vpn_attrset bgp_vpn_attrset.pcap bgp_vpn_attrset.out -v
 mpbgp-linklocal-nexthop mpbgp-linklocal-nexthop.pcap mpbgp-linklocal-nexthop.out -v
