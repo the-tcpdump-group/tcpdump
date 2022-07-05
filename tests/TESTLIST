@@ -52,6 +52,12 @@ tcp_rst_data-trunc tcp_rst_data-trunc.pcap tcp_rst_data-trunc.out
 # TCP
 tcp_eight_lowest_weight_flags_set tcp_eight_lowest_weight_flags_set.pcap tcp_eight_lowest_weight_flags_set.out
 
+# SCTP tests
+# I-DATA tests
+sctp-i-data sctp-i-data.pcap sctp-i-data.out
+sctp-i-data-v sctp-i-data.pcap sctp-i-data-v.out -v
+sctp-i-data-vv sctp-i-data.pcap sctp-i-data-vv.out -vv
+
 # BGP tests
 bgp_vpn_attrset bgp_vpn_attrset.pcap bgp_vpn_attrset.out -v
 mpbgp-linklocal-nexthop mpbgp-linklocal-nexthop.pcap mpbgp-linklocal-nexthop.out -v
