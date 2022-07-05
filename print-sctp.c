@@ -109,6 +109,7 @@
 #define SCTP_ECN_ECHO		0x0c
 #define SCTP_ECN_CWR		0x0d
 #define SCTP_SHUTDOWN_COMPLETE	0x0e
+#define SCTP_I_DATA		0x40
 #define SCTP_FORWARD_CUM_TSN    0xc0
 #define SCTP_RELIABLE_CNTL      0xc1
 #define SCTP_RELIABLE_CNTL_ACK  0xc2
@@ -129,6 +130,7 @@ static const struct tok sctp_chunkid_str[] = {
 	{ SCTP_ECN_ECHO,          "ECN ECHO"          },
 	{ SCTP_ECN_CWR,           "ECN CWR"           },
 	{ SCTP_SHUTDOWN_COMPLETE, "SHUTDOWN COMPLETE" },
+	{ SCTP_I_DATA,            "I-DATA"            },
 	{ SCTP_FORWARD_CUM_TSN,   "FOR CUM TSN"       },
 	{ SCTP_RELIABLE_CNTL,     "REL CTRL"          },
 	{ SCTP_RELIABLE_CNTL_ACK, "REL CTRL ACK"      },
@@ -142,6 +144,7 @@ static const struct tok sctp_chunkid_str[] = {
 #define SCTP_DATA_FIRST_FRAG	0x02
 #define SCTP_DATA_NOT_FRAG	0x03
 #define SCTP_DATA_UNORDERED	0x04
+#define SCTP_DATA_SACK_IMM	0x08
 
 #define SCTP_ADDRMAX 60
 
@@ -346,6 +349,14 @@ struct sctpDataPart{
   nd_uint16_t streamId;
   nd_uint16_t sequence;
   nd_uint32_t payloadtype;
+};
+
+struct sctpIData{
+  nd_uint32_t TSN;
+  nd_uint16_t streamId;
+  nd_uint16_t reserved;
+  nd_uint32_t MID;
+  nd_uint32_t PPID_FSN;
 };
 
 struct sctpUnifiedDatagram{
@@ -616,6 +627,103 @@ sctp_print(netdissect_options *ndo,
 			break;
 		}
 	    }
+	    bp += payload_size;
+	    sctpPacketLengthRemaining -= payload_size;
+	    chunkLengthRemaining -= payload_size;
+	    break;
+	  }
+	case SCTP_I_DATA :
+	  {
+	    const struct sctpIData *dataHdrPtr;
+	    int Bbit = FALSE;
+	    uint8_t chunkFlg;
+	    uint32_t ppid_fsn;
+	    uint16_t payload_size;
+
+	    chunkFlg = GET_U_1(chunkDescPtr->chunkFlg);
+	    if ((chunkFlg & SCTP_DATA_SACK_IMM) == SCTP_DATA_SACK_IMM)
+		ND_PRINT("(I)");
+
+	    if ((chunkFlg & SCTP_DATA_UNORDERED) == SCTP_DATA_UNORDERED)
+		ND_PRINT("(U)");
+
+	    if ((chunkFlg & SCTP_DATA_FIRST_FRAG) == SCTP_DATA_FIRST_FRAG) {
+		ND_PRINT("(B)");
+		Bbit = TRUE;
+	    }
+
+	    if ((chunkFlg & SCTP_DATA_LAST_FRAG) == SCTP_DATA_LAST_FRAG)
+		ND_PRINT("(E)");
+
+	    if (((chunkFlg & SCTP_DATA_UNORDERED) == SCTP_DATA_UNORDERED)   ||
+		((chunkFlg & SCTP_DATA_FIRST_FRAG) == SCTP_DATA_FIRST_FRAG) ||
+		((chunkFlg & SCTP_DATA_LAST_FRAG) == SCTP_DATA_LAST_FRAG)   ||
+		((chunkFlg & SCTP_DATA_SACK_IMM) == SCTP_DATA_SACK_IMM))
+		ND_PRINT(" ");
+
+	    ND_ICHECKMSG_ZU("chunk length", chunkLengthRemaining, <, sizeof(*dataHdrPtr));
+	    dataHdrPtr = (const struct sctpIData*)bp;
+
+	    ppid_fsn = GET_BE_U_4(dataHdrPtr->PPID_FSN);
+	    ND_PRINT("[TSN: %u] ", GET_BE_U_4(dataHdrPtr->TSN));
+	    ND_PRINT("[SID: %u] ", GET_BE_U_2(dataHdrPtr->streamId));
+	    ND_PRINT("[MID: %u] ", GET_BE_U_4(dataHdrPtr->MID));
+	    if (FALSE == Bbit) { /* print FSN if B bit is NOT set */
+		ND_PRINT("[FSN: %u] ", ppid_fsn);
+	    } else {             /* print PPID if B bit is set */
+		ND_PRINT("[PPID %s] ", tok2str(PayloadProto_idents, "0x%x", ppid_fsn));
+	    }
+
+	    bp += sizeof(*dataHdrPtr);
+	    sctpPacketLengthRemaining -= sizeof(*dataHdrPtr);
+	    chunkLengthRemaining -= sizeof(*dataHdrPtr);
+	    ND_ICHECKMSG_U("chunk length", chunkLengthRemaining, ==, 0);
+	    payload_size = chunkLengthRemaining;
+
+	    if (FALSE == Bbit) {
+		if (ndo->ndo_vflag >= 2) {
+		    ND_PRINT("[Payload");
+			if (!ndo->ndo_suppress_default_print) {
+			    ND_PRINT(": ");
+			    ND_DEFAULTPRINT(bp, payload_size);
+			}
+		    ND_PRINT("]");
+		}
+
+		bp += payload_size;
+		sctpPacketLengthRemaining -= payload_size;
+		chunkLengthRemaining -= payload_size;
+
+		/* do not parse ppid and check for CES when B bit is not set */
+		break;
+	    }
+
+	    if (!isforces) {
+		isforces = (ppid_fsn == SCTP_PPID_FORCES_HP) ||
+			   (ppid_fsn == SCTP_PPID_FORCES_MP) ||
+			   (ppid_fsn == SCTP_PPID_FORCES_LP);
+	    }
+
+	    if (isforces) {
+		forces_print(ndo, bp, payload_size);
+		ndo->ndo_protocol = "sctp";
+	    } else if (ndo->ndo_vflag >= 2) {
+		switch (ppid_fsn) {
+		case SCTP_PPID_M3UA:
+		    m3ua_print(ndo, bp, payload_size);
+		    ndo->ndo_protocol = "sctp";
+		    break;
+		default:
+		    ND_PRINT("[Payload");
+		    if (!ndo->ndo_suppress_default_print) {
+			ND_PRINT(":");
+			ND_DEFAULTPRINT(bp, payload_size);
+		    }
+		    ND_PRINT("]");
+		    break;
+		}
+	    }
+
 	    bp += payload_size;
 	    sctpPacketLengthRemaining -= payload_size;
 	    chunkLengthRemaining -= payload_size;
