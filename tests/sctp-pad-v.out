@@ -1,0 +1,60 @@
+    1  2023-05-21 15:21:08.215897 IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto SCTP (132), length 100)
+    127.0.0.1.57694 > 127.0.0.1.31337: sctp (1) [INIT] [init tag: 413521971] [rwnd: 106496] [OS: 10] [MIS: 65535] [init TSN: 2253051237] 
+    2  2023-05-21 15:21:08.215923 IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto SCTP (132), length 388)
+    127.0.0.1.31337 > 127.0.0.1.57694: sctp (1) [INIT ACK] [init tag: 145384071] [rwnd: 106496] [OS: 10] [MIS: 10] [init TSN: 4266748061] 
+    3  2023-05-21 15:21:08.215940 IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto SCTP (132), length 328)
+    127.0.0.1.57694 > 127.0.0.1.31337: sctp (1) [COOKIE ECHO] 
+    4  2023-05-21 15:21:08.215959 IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto SCTP (132), length 36)
+    127.0.0.1.31337 > 127.0.0.1.57694: sctp (1) [COOKIE ACK] 
+    5  2023-05-21 15:21:09.986643 IP (tos 0x2,ECT(0), ttl 64, id 1, offset 0, flags [DF], proto SCTP (132), length 92)
+    10.0.0.169.57694 > 10.0.0.169.31337: sctp (1) [HB REQ] 
+    6  2023-05-21 15:21:09.986673 IP (tos 0x2,ECT(0), ttl 64, id 31167, offset 0, flags [DF], proto SCTP (132), length 92)
+    10.0.0.169.31337 > 10.0.0.169.57694: sctp (1) [HB ACK] 
+    7  2023-05-21 15:21:10.338722 IP (tos 0x2,ECT(0), ttl 64, id 31168, offset 0, flags [DF], proto SCTP (132), length 92)
+    10.0.0.169.31337 > 10.0.0.169.57694: sctp (1) [HB REQ] 
+    8  2023-05-21 15:21:10.338734 IP (tos 0x2,ECT(0), ttl 64, id 2, offset 0, flags [DF], proto SCTP (132), length 92)
+    10.0.0.169.57694 > 10.0.0.169.31337: sctp (1) [HB ACK] 
+    9  2023-05-21 15:21:11.106508 IP (tos 0x2,ECT(0), ttl 64, id 3, offset 0, flags [DF], proto SCTP (132), length 92)
+    192.168.122.1.57694 > 192.168.122.1.31337: sctp (1) [HB REQ] 
+   10  2023-05-21 15:21:11.106570 IP (tos 0x2,ECT(0), ttl 64, id 31169, offset 0, flags [DF], proto SCTP (132), length 92)
+    192.168.122.1.31337 > 192.168.122.1.57694: sctp (1) [HB ACK] 
+   11  2023-05-21 15:21:11.618660 IP (tos 0x2,ECT(0), ttl 64, id 4, offset 0, flags [DF], proto SCTP (132), length 92)
+    10.0.0.192.57694 > 10.0.0.192.31337: sctp (1) [HB REQ] 
+   12  2023-05-21 15:21:11.618665 IP (tos 0x2,ECT(0), ttl 64, id 31170, offset 0, flags [DF], proto SCTP (132), length 92)
+    192.168.122.1.31337 > 192.168.122.1.57694: sctp (1) [HB REQ] 
+   13  2023-05-21 15:21:11.618678 IP (tos 0x2,ECT(0), ttl 64, id 31171, offset 0, flags [DF], proto SCTP (132), length 92)
+    10.0.0.192.31337 > 10.0.0.192.57694: sctp (1) [HB ACK] 
+   14  2023-05-21 15:21:11.618695 IP (tos 0x2,ECT(0), ttl 64, id 5, offset 0, flags [DF], proto SCTP (132), length 92)
+    192.168.122.1.57694 > 192.168.122.1.31337: sctp (1) [HB ACK] 
+   15  2023-05-21 15:21:12.642329 IP (tos 0x2,ECT(0), ttl 64, id 31172, offset 0, flags [DF], proto SCTP (132), length 92)
+    10.0.0.192.31337 > 10.0.0.192.57694: sctp (1) [HB REQ] 
+   16  2023-05-21 15:21:12.642340 IP (tos 0x2,ECT(0), ttl 64, id 6, offset 0, flags [DF], proto SCTP (132), length 92)
+    10.0.0.192.57694 > 10.0.0.192.31337: sctp (1) [HB ACK] 
+   17  2023-05-21 15:21:13.410696 IP (tos 0x2,ECT(0), ttl 64, id 31173, offset 0, flags [DF], proto SCTP (132), length 1220)
+    127.0.0.1.31337 > 127.0.0.1.57694: sctp (1) [HB REQ] , (2) [PAD] 
+   18  2023-05-21 15:21:13.410716 IP (tos 0x2,ECT(0), ttl 64, id 7, offset 0, flags [DF], proto SCTP (132), length 1220)
+    127.0.0.1.57694 > 127.0.0.1.31337: sctp (1) [HB REQ] , (2) [PAD] 
+   19  2023-05-21 15:21:13.410727 IP (tos 0x2,ECT(0), ttl 64, id 8, offset 0, flags [DF], proto SCTP (132), length 92)
+    127.0.0.1.57694 > 127.0.0.1.31337: sctp (1) [HB ACK] 
+   20  2023-05-21 15:21:13.410732 IP (tos 0x2,ECT(0), ttl 64, id 31174, offset 0, flags [DF], proto SCTP (132), length 92)
+    127.0.0.1.31337 > 127.0.0.1.57694: sctp (1) [HB ACK] 
+   21  2023-05-21 15:21:13.410736 IP (tos 0x2,ECT(0), ttl 64, id 31175, offset 0, flags [DF], proto SCTP (132), length 1252)
+    127.0.0.1.31337 > 127.0.0.1.57694: sctp (1) [HB REQ] , (2) [PAD] 
+   22  2023-05-21 15:21:13.410739 IP (tos 0x2,ECT(0), ttl 64, id 9, offset 0, flags [DF], proto SCTP (132), length 1252)
+    127.0.0.1.57694 > 127.0.0.1.31337: sctp (1) [HB REQ] , (2) [PAD] 
+   23  2023-05-21 15:21:13.410743 IP (tos 0x2,ECT(0), ttl 64, id 10, offset 0, flags [DF], proto SCTP (132), length 92)
+    127.0.0.1.57694 > 127.0.0.1.31337: sctp (1) [HB ACK] 
+   24  2023-05-21 15:21:13.410746 IP (tos 0x2,ECT(0), ttl 64, id 31176, offset 0, flags [DF], proto SCTP (132), length 92)
+    127.0.0.1.31337 > 127.0.0.1.57694: sctp (1) [HB ACK] 
+   25  2023-05-21 15:21:13.410750 IP (tos 0x2,ECT(0), ttl 64, id 31177, offset 0, flags [DF], proto SCTP (132), length 1284)
+    127.0.0.1.31337 > 127.0.0.1.57694: sctp (1) [HB REQ] , (2) [PAD] 
+   26  2023-05-21 15:21:13.410754 IP (tos 0x2,ECT(0), ttl 64, id 11, offset 0, flags [DF], proto SCTP (132), length 1284)
+    127.0.0.1.57694 > 127.0.0.1.31337: sctp (1) [HB REQ] , (2) [PAD] 
+   27  2023-05-21 15:21:13.410757 IP (tos 0x2,ECT(0), ttl 64, id 12, offset 0, flags [DF], proto SCTP (132), length 92)
+    127.0.0.1.57694 > 127.0.0.1.31337: sctp (1) [HB ACK] 
+   28  2023-05-21 15:21:13.410760 IP (tos 0x2,ECT(0), ttl 64, id 31178, offset 0, flags [DF], proto SCTP (132), length 92)
+    127.0.0.1.31337 > 127.0.0.1.57694: sctp (1) [HB ACK] 
+   29  2023-05-21 15:21:13.410763 IP (tos 0x2,ECT(0), ttl 64, id 31179, offset 0, flags [DF], proto SCTP (132), length 1316)
+    127.0.0.1.31337 > 127.0.0.1.57694: sctp (1) [HB REQ] , (2) [PAD] 
+   30  2023-05-21 15:21:13.410767 IP (tos 0x2,ECT(0), ttl 64, id 13, offset 0, flags [DF], proto SCTP (132), length 1316)
+    127.0.0.1.57694 > 127.0.0.1.31337: sctp (1) [HB REQ] , (2) [PAD] 

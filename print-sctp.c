@@ -112,6 +112,7 @@
 #define SCTP_I_DATA		0x40
 #define SCTP_ASCONF_ACK		0x80
 #define SCTP_RE_CONFIG		0x82
+#define SCTP_PAD_CHUNK		0x84
 #define SCTP_FORWARD_CUM_TSN    0xc0
 #define SCTP_ASCONF		0xc1
 #define SCTP_I_FORWARD_TSN	0xc2
@@ -134,6 +135,7 @@ static const struct tok sctp_chunkid_str[] = {
 	{ SCTP_SHUTDOWN_COMPLETE, "SHUTDOWN COMPLETE" },
 	{ SCTP_I_DATA,            "I-DATA"            },
 	{ SCTP_RE_CONFIG,         "RE-CONFIG"         },
+	{ SCTP_PAD_CHUNK,         "PAD"               },
 	{ SCTP_FORWARD_CUM_TSN,   "FOR CUM TSN"       },
 	{ SCTP_ASCONF,            "ASCONF"            },
 	{ SCTP_ASCONF_ACK,        "ASCONF-ACK"        },
