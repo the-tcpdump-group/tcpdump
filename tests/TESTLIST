@@ -58,6 +58,11 @@ sctp-i-data sctp-i-data.pcap sctp-i-data.out
 sctp-i-data-v sctp-i-data.pcap sctp-i-data-v.out -v
 sctp-i-data-vv sctp-i-data.pcap sctp-i-data-vv.out -vv
 
+# I-FORWARD tests
+sctp-i-forward sctp-i-forward.pcap sctp-i-forward.out
+sctp-i-forward-v sctp-i-forward.pcap sctp-i-forward-v.out -v
+sctp-i-forward-vv sctp-i-forward.pcap sctp-i-forward-vv.out -vv
+
 # BGP tests
 bgp_vpn_attrset bgp_vpn_attrset.pcap bgp_vpn_attrset.out -v
 mpbgp-linklocal-nexthop mpbgp-linklocal-nexthop.pcap mpbgp-linklocal-nexthop.out -v
