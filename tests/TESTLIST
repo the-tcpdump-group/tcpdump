@@ -63,6 +63,11 @@ sctp-i-forward sctp-i-forward.pcap sctp-i-forward.out
 sctp-i-forward-v sctp-i-forward.pcap sctp-i-forward-v.out -v
 sctp-i-forward-vv sctp-i-forward.pcap sctp-i-forward-vv.out -vv
 
+# RE-CONFIG tests
+sctp-re-config sctp-re-config.pcap sctp-re-config.out
+sctp-re-config-v sctp-re-config.pcap sctp-re-config-v.out -v
+sctp-re-config-vv sctp-re-config.pcap sctp-re-config-vv.out -vv
+
 # BGP tests
 bgp_vpn_attrset bgp_vpn_attrset.pcap bgp_vpn_attrset.out -v
 mpbgp-linklocal-nexthop mpbgp-linklocal-nexthop.pcap mpbgp-linklocal-nexthop.out -v

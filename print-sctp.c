@@ -110,6 +110,7 @@
 #define SCTP_ECN_CWR		0x0d
 #define SCTP_SHUTDOWN_COMPLETE	0x0e
 #define SCTP_I_DATA		0x40
+#define SCTP_RE_CONFIG		0x82
 #define SCTP_FORWARD_CUM_TSN    0xc0
 #define SCTP_RELIABLE_CNTL      0xc1
 #define SCTP_I_FORWARD_TSN	0xc2
@@ -131,6 +132,7 @@ static const struct tok sctp_chunkid_str[] = {
 	{ SCTP_ECN_CWR,           "ECN CWR"           },
 	{ SCTP_SHUTDOWN_COMPLETE, "SHUTDOWN COMPLETE" },
 	{ SCTP_I_DATA,            "I-DATA"            },
+	{ SCTP_RE_CONFIG,         "RE-CONFIG"         },
 	{ SCTP_FORWARD_CUM_TSN,   "FOR CUM TSN"       },
 	{ SCTP_RELIABLE_CNTL,     "REL CTRL"          },
 	{ SCTP_I_FORWARD_TSN,     "I-FORWARD-FSN"     },
@@ -148,6 +150,14 @@ static const struct tok sctp_chunkid_str[] = {
 
 /* I-Forward-TSN Specific Flag */
 #define SCTP_I_FORWARD_UNORDERED 0x01
+
+/* RE-CONFIG Parameters */
+#define OUT_SSN_RESET		13
+#define IN_SSN_RESET		14
+#define SSN_TSN_RESET		15
+#define RE_CONFIG_RES		16
+#define ADD_OUT_STREAM_REQ	17
+#define ADD_IN_STREAM_REQ	18
 
 #define SCTP_ADDRMAX 60
 
@@ -372,6 +382,33 @@ struct sctpIForwardEntry{
   nd_uint32_t MID;
 };
 
+/* RE-CONFIG Parameters */
+struct sctpReConfigHdr{
+  nd_uint16_t param_type;
+  nd_uint16_t param_len;
+};
+
+struct outGoingSSNReset{
+  nd_uint32_t re_config_req;
+  nd_uint32_t re_config_res;
+  nd_uint32_t last_assigned_TSN;
+};
+
+struct inGoingSSNReset{
+  nd_uint32_t re_config_req;
+};
+
+struct reConfigRes{
+  nd_uint32_t res_seq_num;
+  nd_uint32_t result;
+};
+
+struct addStreamReq{
+  nd_uint32_t res_seq_num;
+  nd_uint16_t num_new_stream;
+  nd_uint16_t reserved;
+};
+
 struct sctpUnifiedDatagram{
   struct sctpChunkDesc uh;
   struct sctpDataPart dp;
@@ -386,6 +423,28 @@ struct sctpECN_echo{
 struct sctpCWR{
   struct sctpChunkDesc uh;
   nd_uint32_t TSN_reduced_at;
+};
+
+/* RE-CONFIG Parameters */
+static const struct tok RE_CONFIG_parameters[] = {
+	{ OUT_SSN_RESET,	"OUT SSN RESET"	},
+	{ IN_SSN_RESET,		"IN SSN RESET"	},
+	{ SSN_TSN_RESET,	"SSN/TSN Reset"	},
+	{ RE_CONFIG_RES,	"RESP"		},
+	{ ADD_OUT_STREAM_REQ,	"ADD OUT STREAM"},
+	{ ADD_IN_STREAM_REQ,	"ADD IN STREAM" },
+	{ 0, NULL }
+};
+
+static const struct tok results[] = {
+	{ 0,	"Success - Nothing to do"		},
+	{ 1,	"Success - Performed"			},
+	{ 2,	"Denied"				},
+	{ 3,	"Error - Wrong SSN"			},
+	{ 4,	"Error - Request already in progress"	},
+	{ 5,	"Error - Bad Sequence Number"		},
+	{ 6,	"In progress"				},
+	{ 0, NULL }
 };
 
 static const struct tok ForCES_channels[] = {
@@ -869,6 +928,196 @@ sctp_print(netdissect_options *ndo,
 	      ND_PRINT("\n\t\t[dup TSN #%u: %u] ", tsnNo+1,
 		       GET_BE_U_4(dupTSN));
 	    }
+	    break;
+	  }
+	case SCTP_RE_CONFIG:
+	  {
+	    const struct sctpReConfigHdr *param;
+	    uint16_t param_len, type;
+	    uint8_t padding_len;
+
+	    sctpPacketLengthRemaining -= chunkLengthRemaining;
+
+	    /* it's a padding if the remaining length is less than 4 */
+	    while (chunkLengthRemaining >= sizeof(uint32_t)) {
+
+		ND_ICHECKMSG_ZU("chunk length", chunkLengthRemaining, <, sizeof(*param));
+		param = (const struct sctpReConfigHdr*)bp;
+		type = GET_BE_U_2(param->param_type);
+		param_len = GET_BE_U_2(param->param_len);
+		padding_len = ((param_len+3) &~ 3) - param_len;
+		ND_ICHECKMSG_ZU("parameter length", param_len, <, sizeof(*param));
+
+		ND_PRINT("[%s", tok2str(RE_CONFIG_parameters, NULL, type));
+
+		param_len -= sizeof(*param);
+		chunkLengthRemaining -= sizeof(*param);
+		bp += sizeof(*param);
+
+		ND_ICHECKMSG_U("chunk length", chunkLengthRemaining, <, param_len);
+
+		/* if verbose level < 2, stop and skip */
+		if (ndo->ndo_vflag < 2) {
+		    ND_PRINT("]");
+
+		    bp += param_len;
+		    chunkLengthRemaining -= param_len;
+		    /* skipping the parameter padding if there are more
+		     * parameters in the remaining length */
+		    if (chunkLengthRemaining > sizeof(uint32_t)) {
+			bp += padding_len;
+			chunkLengthRemaining -= padding_len;
+		    }
+
+		    continue;
+		}
+
+		switch (type) {
+		case OUT_SSN_RESET:
+		  {
+		    uint16_t stream_num = 0;
+		    const struct outGoingSSNReset *content;
+
+		    ND_ICHECKMSG_ZU("parameter length", param_len, <, sizeof(*content));
+
+		    content = (const struct outGoingSSNReset*) bp;
+		    ND_PRINT(": REQ SEQ: %u, ", GET_BE_U_4(content->re_config_req));
+		    ND_PRINT("RES SEQ: %u, ", GET_BE_U_4(content->re_config_res));
+		    ND_PRINT("Last TSN: %u, ", GET_BE_U_4(content->last_assigned_TSN));
+
+		    bp += sizeof(*content);
+		    param_len -= sizeof(*content);
+		    chunkLengthRemaining -= sizeof(*content);
+
+		    ND_PRINT("SID");
+		    while (param_len > 0) {
+			ND_ICHECKMSG_ZU("chunk length", chunkLengthRemaining, <, sizeof(stream_num));
+			ND_ICHECKMSG_ZU("parameter length", param_len , <, sizeof(stream_num));
+			stream_num = GET_BE_U_2(bp);
+			ND_PRINT(" %u", stream_num);
+
+			bp += sizeof(stream_num);
+			param_len -= sizeof(stream_num);
+			chunkLengthRemaining -= sizeof(stream_num);
+		    }
+		    ND_PRINT("]");
+
+		    break;
+		  }
+		case IN_SSN_RESET:
+		  {
+		    uint16_t stream_num = 0;
+		    const struct inGoingSSNReset *content;
+
+		    ND_ICHECKMSG_ZU("parameter length", param_len , <, sizeof(*content));
+
+		    content = (const struct inGoingSSNReset*) bp;
+		    ND_PRINT(": REQ SEQ: %u, ", GET_BE_U_4(content->re_config_req));
+
+		    bp += sizeof(*content);
+		    param_len -= sizeof(*content);
+		    chunkLengthRemaining -= sizeof(*content);
+
+		    ND_PRINT("SID");
+		    while (param_len > 0) {
+			ND_ICHECKMSG_ZU("parameter length", param_len , <, sizeof(stream_num));
+			stream_num = GET_BE_U_2(bp);
+			ND_PRINT(" %u", stream_num);
+
+			bp += sizeof(stream_num);
+			param_len -= sizeof(stream_num);
+			chunkLengthRemaining -= sizeof(stream_num);
+		    }
+		    ND_PRINT("]");
+
+		    break;
+		  }
+		case SSN_TSN_RESET:
+		  {
+		    /* reuse inGoingSSNReset struct as their structure are the same*/
+		    const struct inGoingSSNReset *content;
+
+		    ND_ICHECKMSG_ZU("parameter length", param_len, <, sizeof(*content));
+
+		    content = (const struct inGoingSSNReset*) bp;
+		    ND_PRINT(": REQ SEQ: %u]", GET_BE_U_4(content->re_config_req));
+
+		    bp += sizeof(*content);
+		    chunkLengthRemaining -= sizeof(*content);
+
+		    break;
+		  }
+		case RE_CONFIG_RES:
+		  {
+		    uint32_t optional = 0;
+		    const size_t optional_size = sizeof(optional);
+		    const struct reConfigRes *content;
+
+		    ND_ICHECKMSG_ZU("parameter length", param_len, <, sizeof(*content));
+
+		    content = (const struct reConfigRes*) bp;
+		    ND_PRINT(": REQ SEQ: %u, ", GET_BE_U_4(content->res_seq_num));
+		    ND_PRINT("REQ: %s", tok2str(results, NULL, GET_BE_U_4(content->result)));
+
+		    bp += sizeof(*content);
+		    param_len -= sizeof(*content);
+		    chunkLengthRemaining -= sizeof(*content);
+
+		    if (0 == param_len) {
+			ND_PRINT("]");
+			break;
+		    }
+
+		    /* either both or none must be present */
+		    ND_ICHECKMSG_ZU("parameter length", param_len, <, 2*optional_size);
+		    optional = GET_BE_U_4(bp);
+		    ND_PRINT(", Sender's TSN: %u", optional);
+
+		    bp += optional_size;
+		    param_len -= optional_size;
+		    chunkLengthRemaining -= optional_size;
+
+		    optional = GET_BE_U_4(bp);
+		    ND_PRINT(", Receiver's Next TSN: %u] ", optional);
+
+		    bp += optional_size;
+		    chunkLengthRemaining -= optional_size;
+
+		    break;
+		  }
+		case ADD_OUT_STREAM_REQ:
+		case ADD_IN_STREAM_REQ:
+		  {
+		    const struct addStreamReq *content;
+
+		    ND_ICHECKMSG_ZU("parameter length", param_len, <, sizeof(*content));
+
+		    content = (const struct addStreamReq*) bp;
+		    ND_PRINT(": REQ SEQ: %u, ", GET_BE_U_4(content->res_seq_num));
+		    ND_PRINT("No. of new streams: %u] ", GET_BE_U_2(content->num_new_stream));
+
+		    bp += sizeof(*content);
+		    chunkLengthRemaining -= sizeof(*content);
+
+		    break;
+		  }
+		default:
+		  {
+		    bp += chunkLengthRemaining;
+		    chunkLengthRemaining = 0;
+		    break;
+		  }
+		}
+		/* skipping the parameter padding if there are more parameters
+		 * in the remaining length */
+		if (chunkLengthRemaining > sizeof(uint32_t)) {
+		    bp += padding_len;
+		    chunkLengthRemaining -= padding_len;
+		}
+	    }
+	    bp += chunkLengthRemaining;
+	    chunkLengthRemaining = 0;
+
 	    break;
 	  }
 	default :
