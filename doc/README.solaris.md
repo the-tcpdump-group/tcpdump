@@ -18,3 +18,18 @@ developer/gcc-10
 developer/clang-90
 ENDOFTEXT
 ```
+
+## Oracle Solaris 11.4.42
+
+* Both system and local libpcap are suitable.
+* GCC 11.2 and Clang 11.0 work.
+
+For reference, the tests were done on a VM booted from `sol-11_4-vbox.ova`
+and updated to 11.4.42.111.0 plus the following packages:
+```shell
+xargs -L1 pkg install <<ENDOFTEXT
+developer/build/autoconf
+developer/gcc
+developer/llvm/clang
+ENDOFTEXT
+```
