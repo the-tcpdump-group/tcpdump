@@ -54,7 +54,8 @@ if [ "$CMAKE" = no ]; then
             --enable-smb="$SMB" --prefix="$PREFIX" --disable-local-libpcap
     fi
 else
-    run_after_echo rm -rf build
+    # See libpcap build.sh for the rationale.
+    run_after_echo rm -rf CMakeFiles/ CMakeCache.txt build/
     run_after_echo mkdir build
     run_after_echo cd build
     if [ "$BUILD_LIBPCAP" = yes ]; then
