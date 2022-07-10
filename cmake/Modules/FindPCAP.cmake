@@ -86,7 +86,7 @@ else(WIN32)
   # pkg_search_module() would do this for us, but, for now,
   # we're not doing that, in case somebody's building with
   # CMake on some "long-term support" version, predating
-  # CMake 3.1, of an OS that that supplies an earlier
+  # CMake 3.1, of an OS that supplies an earlier
   # version as a package.
   #
   # If we ever set a minimum of 3.1 or later on UN*X, we should
