@@ -179,9 +179,7 @@ ipx_sap_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	    ND_PRINT("ipx-sap-nearest-resp");
 
 	for (i = 0; i < 8 && length != 0; i++) {
-	    ND_TCHECK_2(ipx);
-	    if (length < 2)
-		goto invalid;
+	    ND_ICHECK_U(length, <, 2);
 	    ND_PRINT(" %s '", ipxsap_string(ndo, htons(GET_BE_U_2(ipx))));
 	    ipx += 2;
 	    length -= 2;
@@ -196,9 +194,7 @@ ipx_sap_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	    /*
 	     * 10 bytes of IPX address.
 	     */
-	    ND_TCHECK_LEN(ipx, 10);
-	    if (length < 10)
-		goto invalid;
+	    ND_ICHECK_U(length, <, 10);
 	    ND_PRINT(" addr %s",
 		ipxaddr_string(ndo, GET_BE_U_4(ipx), ipx + 4));
 	    ipx += 10;
@@ -207,9 +203,8 @@ ipx_sap_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	     * 2 bytes of socket and 2 bytes of number of intermediate
 	     * networks.
 	     */
+	    ND_ICHECK_U(length, <, 4);
 	    ND_TCHECK_4(ipx);
-	    if (length < 4)
-		goto invalid;
 	    ipx += 4;
 	    length -= 4;
 	}
@@ -238,8 +233,7 @@ ipx_rip_print(netdissect_options *ndo, const u_char *ipx, u_int length)
       case 1:
 	ND_PRINT("ipx-rip-req");
 	if (length != 0) {
-	    if (length < 8)
-		goto invalid;
+	    ND_ICHECK_U(length, <, 8);
 	    ND_PRINT(" %08x/%u.%u", GET_BE_U_4(ipx),
 			 GET_BE_U_2(ipx + 4), GET_BE_U_2(ipx + 6));
 	}
@@ -247,8 +241,7 @@ ipx_rip_print(netdissect_options *ndo, const u_char *ipx, u_int length)
       case 2:
 	ND_PRINT("ipx-rip-resp");
 	for (i = 0; i < 50 && length != 0; i++) {
-	    if (length < 8)
-		goto invalid;
+	    ND_ICHECK_U(length, <, 8);
 	    ND_PRINT(" %08x/%u.%u", GET_BE_U_4(ipx),
 			 GET_BE_U_2(ipx + 4), GET_BE_U_2(ipx + 6));
 
