@@ -848,9 +848,7 @@ pdatacnt_print(netdissect_options *ndo,
 		ND_PRINT("%sTABLE APPEND\n", ib);
 	}
 	for (i = 0; i < IDcnt; i++) {
-		ND_TCHECK_4(pptr);
-		if (len < 4)
-			goto invalid;
+		ND_ICHECK_U(len, <, 4);
 		id = GET_BE_U_4(pptr);
 		if (ndo->ndo_vflag >= 3)
 			ND_PRINT("%sID#%02u: %u\n", ib, i + 1, id);
@@ -964,10 +962,9 @@ pdatacnt_print(netdissect_options *ndo,
 
 			chk_op_type(ndo, type, op_msk, ops->op_msk);
 
-			if (ops->print(ndo, (const u_char *)pdtlv,
-					tll + pad + TLV_HDRL, op_msk,
-					indent + 2) == -1)
-				goto invalid;
+			ND_ICHECK_U(ops->print(ndo, (const u_char *)pdtlv,
+				    tll + pad + TLV_HDRL, op_msk, indent + 2),
+				    ==, -1);
 			len -= (TLV_HDRL + pad + tll);
 		} else {
 			ND_PRINT("Invalid path data content type 0x%x len %u\n",
@@ -1000,8 +997,7 @@ pdata_print(netdissect_options *ndo,
 	uint16_t idcnt = 0;
 
 	ND_TCHECK_SIZE(pdh);
-	if (len < sizeof(struct pathdata_h))
-		goto invalid;
+	ND_ICHECK_ZU(len, <, sizeof(struct pathdata_h));
 	if (ndo->ndo_vflag >= 3) {
 		ND_PRINT("\n%sPathdata: Flags 0x%x ID count %u\n",
 		       ib, GET_BE_U_2(pdh->pflags),
@@ -1129,8 +1125,8 @@ recpdoptlv_print(netdissect_options *ndo,
 			          tlvl,
 			          tlvl - TLV_HDRL);
 
-		if (pdata_print(ndo, dp, tlvl - TLV_HDRL, op_msk, indent + 1) == -1)
-			goto invalid;
+		ND_ICHECK_U(pdata_print(ndo, dp, tlvl - TLV_HDRL, op_msk, indent + 1),
+			    ==, -1);
 		pdtlv = GO_NXT_TLV(pdtlv, len);
 	}
 
@@ -1610,9 +1606,7 @@ forces_type_print(netdissect_options *ndo,
 		rc = tops->print(ndo, TLV_DATA(tltlv),
 				 tlvl,
 				 tops->op_msk, 9);
-		if (rc < 0) {
-			goto invalid;
-		}
+		ND_ICHECK_U(rc, <, 0);
 		tltlv = GO_NXT_TLV(tltlv, rlen);
 		ttlv--;
 		if (ttlv <= 0)
@@ -1693,9 +1687,7 @@ forces_print(netdissect_options *ndo,
 		     ForCES_RS1(fhdr), ForCES_RS2(fhdr));
 	}
 	rc = forces_type_print(ndo, pptr, fhdr, mlen, tops);
-	if (rc < 0) {
-		goto invalid;
-	}
+	ND_ICHECK_U(rc, <, 0);
 
 	if (ndo->ndo_vflag >= 4) {
 		ND_PRINT("\n\t  Raw ForCES message\n\t [");
