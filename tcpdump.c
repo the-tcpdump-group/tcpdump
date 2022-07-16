@@ -2743,7 +2743,14 @@ static void
 
 	memset(&new, 0, sizeof(new));
 	new.sa_handler = func;
-	if (sig == SIGCHLD)
+	if ((sig == SIGCHLD)
+# ifdef SIGNAL_REQ_INFO
+		|| (sig == SIGNAL_REQ_INFO)
+# endif
+# ifdef SIGNAL_FLUSH_PCAP
+		|| (sig == SIGNAL_FLUSH_PCAP)
+# endif
+		)
 		new.sa_flags = SA_RESTART;
 	if (sigaction(sig, &new, &old) < 0)
 		return (SIG_ERR);
