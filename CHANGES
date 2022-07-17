@@ -52,8 +52,6 @@ TBD
     Source code:
       Fix some snapend-changing routines to protect against pointer
         underflow.
-    Building and testing:
-      Improve error detection in "make releasetar".
     Documentation:
       Some man page cleanups.
       Note that we require compilers to support at least some of C99.
