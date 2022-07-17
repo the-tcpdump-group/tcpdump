@@ -1,24 +1,18 @@
 Monthday, Month DD, YYYY by gharris and denis
   Summary for 5.0.0 tcpdump release (so far!)
     Refine protocol decoding for:
-      EIGRP: Get the packet header fields right.
       OpenFlow 1.0: Fix indentation of PORT_MOD, improve handling of
           some lengths, and fix handling of snapend.
       RIP: Make a couple trivial protocol updates.
       NetFlow: Use tcp_flag_values[] for TCP flags.
-      OSPF: Update to match the Router Properties registry.
       ZMTP: Replace custom code with bittok2str().
       BFD: Add support for S-BFD and spell LAG in uppercase.
-      BGP: Update cease notification decoding to RFC 9003.
       IEEE 802.11: include the Mesh ID field while printing management
         frames.
       DNS: sync resource types with IANA.
       MPTCP: print length before subtype inside MPTCP options, parse MPC
         data_len field, print flags from MP_CAPABLE option.
-      sFlow: add support for IPv6 agent.
-      VRRP: add support for IPv6.
       ICMP: add dissector for ICMP Interface Identification Object
-      Arista: Refine the output format and print HwInfo.
     User interface:
       Add optional unit suffix on -C file size.
       Add --print-sampling to print every Nth packet instead of all.
@@ -36,13 +30,11 @@ Monthday, Month DD, YYYY by gharris and denis
       RPKI-Router: Refine length and bounds checks.
     Building and testing:
       Add a configure option to help debugging (--enable-instrument-functions)
-      Improve error detection in "make releasetar".
-    Documentation:
-      Update AIX and Solaris-related specifics.
 
 TBD
   Summary for 4.99.2 tcpdump release (so far!)
     Updated printers:
+      BGP: Update cease notification decoding to RFC 9003.
       BGP: decode BGP link-bandwidth extended community properly.
       DSA: correctly determine VID.
       EAP: fix some length checks and output issues.
@@ -71,7 +63,12 @@ TBD
       RADIUS: Use GET_U_1() to replace a direct dereference.
       TCP: Fix an invalid check.
       RESP: Remove an unnecessary test.
+      Arista: Refine the output format and print HwInfo.
       addrtoname.c: Fix two invalid tests.
+      EIGRP: Get the packet header fields right.
+      sFlow: add support for IPv6 agent.
+      VRRP: add support for IPv6.
+      OSPF: Update to match the Router Properties registry.
     Building and testing:
       Update config.guess and config.sub.
       Use AS_HELP_STRING macro instead of AC_HELP_STRING.
@@ -84,12 +81,14 @@ TBD
       Treat "msys" as Windows for test exit statuses.
       Clean up some help messages in configure.
       Use unified diff by default.
+      Improve error detection in "make releasetar".
     Source code:
       Fix some snapend-changing routines to protect against pointer
         underflow.
     Documentation:
       Some man page cleanups.
       Note that we require compilers to support at least some of C99.
+      Update AIX and Solaris-related specifics.
 
 Wednesday, June 9, 2021 by gharris
   Summary for 4.99.1 tcpdump release
