@@ -876,6 +876,7 @@ sflow_print(netdissect_options *ndo,
                len);
 
         /* skip Common header */
+        ND_ICHECK_ZU(tlen, <, sizeof(struct sflow_datagram_t));
         tptr += sizeof(struct sflow_datagram_t);
         tlen -= sizeof(struct sflow_datagram_t);
     } else {
