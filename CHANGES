@@ -33,7 +33,6 @@ TBD
       Arista: Refine the output format and print HwInfo.
       addrtoname.c: Fix two invalid tests.
       EIGRP: Get the packet header fields right.
-      BGP: Update cease notification decoding to RFC 9003.
       sFlow: add support for IPv6 agent.
       VRRP: add support for IPv6.
       OSPF: Update to match the Router Properties registry.
