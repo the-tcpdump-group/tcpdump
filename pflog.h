@@ -107,17 +107,11 @@
 
 struct pf_addr {
 	union {
-		struct in_addr		v4;
-		struct in6_addr		v6;
-		uint8_t			addr8[16];
-		uint16_t		addr16[8];
-		uint32_t		addr32[4];
+		nd_ipv4		v4;
+		nd_ipv6		v6;
 	} pfa;		    /* 128-bit address */
 #define v4	pfa.v4
 #define v6	pfa.v6
-#define addr8	pfa.addr8
-#define addr16	pfa.addr16
-#define addr32	pfa.addr32
 };
 
 struct pfloghdr {
