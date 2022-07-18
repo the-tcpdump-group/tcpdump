@@ -25,7 +25,7 @@ developer/clang-90
 ENDOFTEXT
 ```
 
-## Oracle Solaris 11.4.42
+## Oracle Solaris 11.4.42/AMD64
 
 * Both system and local libpcap are suitable.
 * GCC 11.2 and Clang 11.0 work.
