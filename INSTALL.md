@@ -73,6 +73,7 @@ config.h.in	- autoconf input
 config.sub	- autoconf support
 configure	- configure script (run this first)
 configure.ac	- configure script source
+doc/README.*	- some building documentation
 ethertype.h	- Ethernet type value definitions
 extract.h	- alignment definitions
 gmpls.c		- GMPLS definitions
