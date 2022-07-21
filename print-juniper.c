@@ -1267,7 +1267,7 @@ static int
 juniper_parse_header(netdissect_options *ndo,
                      const u_char *p, const struct pcap_pkthdr *h, struct juniper_l2info_t *l2info)
 {
-    const struct juniper_cookie_table_t *lp = juniper_cookie_table;
+    const struct juniper_cookie_table_t *lp;
     u_int idx, extension_length, jnx_header_len = 0;
     uint8_t tlv_type,tlv_len;
 #ifdef DLT_JUNIPER_ATM2
@@ -1404,68 +1404,72 @@ juniper_parse_header(netdissect_options *ndo,
     l2info->length -= l2info->header_len;
     l2info->caplen -= l2info->header_len;
 
-    /* search through the cookie table and copy values matching for our PIC type */
-    ND_TCHECK_1(p);
-    while (lp->s != NULL) {
-        if (lp->pictype == l2info->pictype) {
+    /* search through the cookie table for one matching our PIC type */
+    lp = NULL;
+    for (const struct juniper_cookie_table_t *table_lp = juniper_cookie_table;
+         table_lp->s != NULL; table_lp++) {
+        if (table_lp->pictype == l2info->pictype) {
+            lp = table_lp;
+            break;
+        }
+    }
 
-            l2info->cookie_len += lp->cookie_len;
+    /* If we found one matching our PIC type, copy its values */
+    if (lp != NULL) {
+        l2info->cookie_len += lp->cookie_len;
 
-            switch (GET_U_1(p)) {
-            case LS_COOKIE_ID:
-                l2info->cookie_type = LS_COOKIE_ID;
-                l2info->cookie_len += 2;
-                break;
-            case AS_COOKIE_ID:
-                l2info->cookie_type = AS_COOKIE_ID;
-                l2info->cookie_len = 8;
-                break;
+        switch (GET_U_1(p)) {
+        case LS_COOKIE_ID:
+            l2info->cookie_type = LS_COOKIE_ID;
+            l2info->cookie_len += 2;
+            break;
+        case AS_COOKIE_ID:
+            l2info->cookie_type = AS_COOKIE_ID;
+            l2info->cookie_len = 8;
+            break;
 
-            default:
-                l2info->bundle = l2info->cookie[0];
-                break;
-            }
+        default:
+            l2info->bundle = l2info->cookie[0];
+            break;
+        }
 
 
 #ifdef DLT_JUNIPER_MFR
-            /* MFR child links don't carry cookies */
-            if (l2info->pictype == DLT_JUNIPER_MFR &&
-                (GET_U_1(p) & MFR_BE_MASK) == MFR_BE_MASK) {
-                l2info->cookie_len = 0;
-            }
+        /* MFR child links don't carry cookies */
+        if (l2info->pictype == DLT_JUNIPER_MFR &&
+            (GET_U_1(p) & MFR_BE_MASK) == MFR_BE_MASK) {
+            l2info->cookie_len = 0;
+        }
 #endif
 
-            l2info->header_len += l2info->cookie_len;
-            l2info->length -= l2info->cookie_len;
-            l2info->caplen -= l2info->cookie_len;
+        l2info->header_len += l2info->cookie_len;
+        l2info->length -= l2info->cookie_len;
+        l2info->caplen -= l2info->cookie_len;
 
-            if (ndo->ndo_eflag)
-                ND_PRINT("%s-PIC, cookie-len %u",
-                       lp->s,
-                       l2info->cookie_len);
+        if (ndo->ndo_eflag)
+            ND_PRINT("%s-PIC, cookie-len %u",
+                   lp->s,
+                   l2info->cookie_len);
 
-            if (l2info->cookie_len > 8) {
-                nd_print_invalid(ndo);
-                return 0;
-            }
-
-            if (l2info->cookie_len > 0) {
-                ND_TCHECK_LEN(p, l2info->cookie_len);
-                if (ndo->ndo_eflag)
-                    ND_PRINT(", cookie 0x");
-                for (idx = 0; idx < l2info->cookie_len; idx++) {
-                    l2info->cookie[idx] = GET_U_1(p + idx); /* copy cookie data */
-                    if (ndo->ndo_eflag) ND_PRINT("%02x", GET_U_1(p + idx));
-                }
-            }
-
-            if (ndo->ndo_eflag) ND_PRINT(": "); /* print demarc b/w L2/L3*/
-
-
-            l2info->proto = GET_BE_U_2(p + l2info->cookie_len);
-            break;
+        if (l2info->cookie_len > 8) {
+            nd_print_invalid(ndo);
+            return 0;
         }
-        ++lp;
+
+        if (l2info->cookie_len > 0) {
+            ND_TCHECK_LEN(p, l2info->cookie_len);
+            if (ndo->ndo_eflag)
+                ND_PRINT(", cookie 0x");
+            for (idx = 0; idx < l2info->cookie_len; idx++) {
+                l2info->cookie[idx] = GET_U_1(p + idx); /* copy cookie data */
+                if (ndo->ndo_eflag) ND_PRINT("%02x", GET_U_1(p + idx));
+            }
+        }
+
+        if (ndo->ndo_eflag) ND_PRINT(": "); /* print demarc b/w L2/L3*/
+
+
+        l2info->proto = GET_BE_U_2(p + l2info->cookie_len);
     }
     p+=l2info->cookie_len;
 
