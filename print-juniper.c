@@ -495,13 +495,13 @@ juniper_ggsn_if_print(netdissect_options *ndo,
         p+=l2info.header_len;
         gh = (struct juniper_ggsn_header *)&l2info.cookie;
 
-        ND_TCHECK_SIZE(gh);
-        proto = GET_U_1(gh->proto);
+        /* use EXTRACT_, not GET_ (not packet buffer pointer) */
+        proto = EXTRACT_U_1(gh->proto);
         if (ndo->ndo_eflag) {
             ND_PRINT("proto %s (%u), vlan %u: ",
                    tok2str(juniper_protocol_values,"Unknown",proto),
                    proto,
-                   GET_BE_U_2(gh->vlan_id));
+                   EXTRACT_BE_U_2(gh->vlan_id));
         }
 
         switch (proto) {
