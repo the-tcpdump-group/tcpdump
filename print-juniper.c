@@ -1558,8 +1558,16 @@ juniper_parse_header(netdissect_options *ndo,
         }
         break;
 #endif
+#ifdef DLT_JUNIPER_ES
+    case DLT_JUNIPER_ES:
+        break;
+#endif
 #ifdef DLT_JUNIPER_GGSN
     case DLT_JUNIPER_GGSN:
+        break;
+#endif
+#ifdef DLT_JUNIPER_SERVICES
+    case DLT_JUNIPER_SERVICES:
         break;
 #endif
 #ifdef DLT_JUNIPER_ATM1
@@ -1580,6 +1588,18 @@ juniper_parse_header(netdissect_options *ndo,
 #endif
 #ifdef DLT_JUNIPER_FRELAY
     case DLT_JUNIPER_FRELAY:
+        break;
+#endif
+#ifdef DLT_JUNIPER_MONITOR
+    case DLT_JUNIPER_MONITOR:
+        break;
+#endif
+#ifdef DLT_JUNIPER_PPPOE
+    case DLT_JUNIPER_PPPOE:
+        break;
+#endif
+#ifdef DLT_JUNIPER_PPPOE_ATM
+    case DLT_JUNIPER_PPPOE_ATM:
         break;
 #endif
 
