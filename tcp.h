@@ -50,6 +50,8 @@ struct tcphdr {
 };
 
 #define TH_OFF(th)	((GET_U_1((th)->th_offx2) & 0xf0) >> 4)
+#define TH_FLAGS(th)	(((GET_U_1((th)->th_offx2) & 0x0f) << 8) | \
+			((GET_U_1((th)->th_flags))))
 
 /* TCP flags */
 #define	TH_FIN     0x01
@@ -58,8 +60,8 @@ struct tcphdr {
 #define	TH_PUSH	   0x08
 #define	TH_ACK	   0x10
 #define	TH_URG	   0x20
-#define TH_ECNECHO 0x40	/* ECN Echo */
-#define TH_CWR	   0x80	/* ECN Cwnd Reduced */
+#define	TH_ECNECHO 0x40	/* ECN Echo */
+#define	TH_CWR	   0x80	/* ECN Cwnd Reduced */
 extern const struct tok tcp_flag_values[];
 
 
@@ -87,6 +89,7 @@ extern const struct tok tcp_flag_values[];
 #define TCPOPT_TCPAO		29	/* TCP authentication option (rfc5925) */
 #define	TCPOPT_MPTCP		30	/* MPTCP options */
 #define TCPOPT_FASTOPEN		34	/* TCP Fast Open (rfc7413) */
+#define TCPOPT_EXPERIMENT1	253	/* experimental headers (rfc4727) */
 #define TCPOPT_EXPERIMENT2	254	/* experimental headers (rfc4727) */
 
 #define TCPOPT_TSTAMP_HDR	\
