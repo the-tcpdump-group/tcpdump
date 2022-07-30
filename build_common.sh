@@ -43,8 +43,8 @@ mktempdir() {
         mktempdir_diy "$mktempdir_prefix"
         ;;
     *)
-        # At least Linux and OpenBSD implementations require explicit trailing
-        # X'es in the template, so make it the same suffix as above.
+        # At least Haiku, Linux and OpenBSD implementations require explicit
+        # trailing X'es in the template, so make it the same suffix as above.
         mktemp -d -t "${mktempdir_prefix}.XXXXXXXX"
         ;;
     esac
@@ -211,6 +211,13 @@ os_id() {
     FreeBSD|Linux)
         # Meaningful version is usually the substring before the first dash.
         echo "$os_id_release" | sed 's/^\([0-9\.]*\).*$/\1/'
+        ;;
+    Haiku)
+        # Meaningful version is the substring before the plus sign.
+        # "hrev55181" stands for "R1/beta3".
+        # "hrev54154" stands for "R1/beta2".
+        : "${os_id_version:=`uname -v`}"
+        echo "$os_id_version" | sed 's/^\(hrev.*\)+.*$/\1/'
         ;;
     *)
         echo 'UNKNOWN'
