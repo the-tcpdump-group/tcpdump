@@ -420,7 +420,7 @@ static const char *mac_c_names[] = {
 /*
  * IEEE 802.15.4 CRC 16 function. This is using CCITT polynomical of 0x1021,
  * but the initial value is 0, and the bits are reversed for both in and out.
- * See secton 7.2.10 of 802.15.4-2015 for more information.
+ * See section 7.2.10 of 802.15.4-2015 for more information.
  */
 static uint16_t
 ieee802_15_4_crc16(netdissect_options *ndo, const u_char *p,
@@ -472,7 +472,7 @@ ieee802_15_4_reverse32(uint32_t x)
 /*
  * IEEE 802.15.4 CRC 32 function. This is using ANSI X3.66-1979 polynomical of
  * 0x04C11DB7, but the initial value is 0, and the bits are reversed for both
- * in and out. See secton 7.2.10 of 802.15.4-2015 for more information.
+ * in and out. See section 7.2.10 of 802.15.4-2015 for more information.
  */
 static uint32_t
 ieee802_15_4_crc32(netdissect_options *ndo, const u_char *p,
@@ -891,7 +891,7 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 			ND_PRINT("Ack time correction = %d, ", timecorr);
 		}
 		break;
-	case 0x22: /* Frament Sequence Content Description IE */
+	case 0x22: /* Fragment Sequence Content Description IE */
 		/* XXX Not implemented */
 	case 0x23: /* Simplified Superframe Specification IE */
 		/* XXX Not implemented */
