@@ -907,7 +907,7 @@ Tue. 	July 5, 2005.  ken@xelerance.com. Summary for 3.9.3 tcpdump release
 		including improved 64bit support
 	Many new testcases
 	Support for sending packets
-	Many compliation fixes on most platforms
+	Many compilation fixes on most platforms
 	Fixes for recent version of GCC to eliminate warnings
 	Improved Unicode support
 

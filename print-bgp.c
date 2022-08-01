@@ -962,7 +962,7 @@ bgp_rt_prefix_print(netdissect_options *ndo,
     /*
      * get the ext-comm type
      * Note: pptr references a static 8 octet buffer with unused bits set to 0,
-     * hense EXTRACT_*() macros are safe.
+     * hence EXTRACT_*() macros are safe.
      */
     ec_type = EXTRACT_BE_U_2(pptr);
     switch (ec_type) {
