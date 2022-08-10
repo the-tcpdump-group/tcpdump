@@ -27,6 +27,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "ethertype.h"
@@ -48,18 +49,18 @@ void
 chdlc_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
 	ndo->ndo_protocol = "chdlc";
-	ndo->ndo_ll_hdr_len += chdlc_print(ndo, p, h->len);
+	ND_TCHECK_LEN(p, CHDLC_HDRLEN);
+	ndo->ndo_ll_hdr_len += CHDLC_HDRLEN;
+	chdlc_print(ndo, p, h->len);
 }
 
-u_int
+void
 chdlc_print(netdissect_options *ndo, const u_char *p, u_int length)
 {
 	u_int proto;
-	const u_char *bp = p;
 
 	ndo->ndo_protocol = "chdlc";
-	if (length < CHDLC_HDRLEN)
-		goto trunc;
+	ND_ICHECK_U(length, <, CHDLC_HDRLEN);
 	proto = GET_BE_U_2(p + 2);
 	if (ndo->ndo_eflag) {
                 ND_PRINT("%s, ethertype %s (0x%04x), length %u: ",
@@ -88,8 +89,7 @@ chdlc_print(netdissect_options *ndo, const u_char *p, u_int length)
 		break;
         case ETHERTYPE_ISO:
                 /* is the fudge byte set ? lets verify by spotting ISO headers */
-                if (length < 2)
-                    goto trunc;
+                ND_ICHECK_U(length, <, 2);
                 if (GET_U_1(p + 1) == NLPID_CLNP ||
                     GET_U_1(p + 1) == NLPID_ESIS ||
                     GET_U_1(p + 1) == NLPID_ISIS)
@@ -103,11 +103,10 @@ chdlc_print(netdissect_options *ndo, const u_char *p, u_int length)
                 break;
 	}
 
-	return (CHDLC_HDRLEN);
+	return;
 
-trunc:
-	nd_print_trunc(ndo);
-	return (ND_BYTES_AVAILABLE_AFTER(bp));
+invalid:
+	nd_print_invalid(ndo);
 }
 
 /*
@@ -141,9 +140,9 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
         u_int sec,min,hrs,days;
 
 	ndo->ndo_protocol = "chdlc_slarp";
-	ND_PRINT("SLARP (length: %u), ",length);
-	if (length < SLARP_MIN_LEN)
-		goto trunc;
+	ND_PRINT("SLARP");
+	ND_ICHECK_U(length, <, SLARP_MIN_LEN);
+	ND_PRINT(" (length: %u), ",length);
 
 	slarp = (const struct cisco_slarp *)cp;
 	ND_TCHECK_LEN(slarp, SLARP_MIN_LEN);
@@ -193,6 +192,6 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
             print_unknown_data(ndo,cp+4,"\n\t",length-4);
 	return;
 
-trunc:
-	nd_print_trunc(ndo);
+invalid:
+	nd_print_invalid(ndo);
 }

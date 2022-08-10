@@ -617,7 +617,7 @@ extern void calm_fast_print(netdissect_options *, const u_char *, u_int, const s
 extern void carp_print(netdissect_options *, const u_char *, u_int, u_int);
 extern void cdp_print(netdissect_options *, const u_char *, u_int);
 extern void cfm_print(netdissect_options *, const u_char *, u_int);
-extern u_int chdlc_print(netdissect_options *, const u_char *, u_int);
+extern void chdlc_print(netdissect_options *, const u_char *, u_int);
 extern void cisco_autorp_print(netdissect_options *, const u_char *, u_int);
 extern void cnfp_print(netdissect_options *, const u_char *);
 extern void dccp_print(netdissect_options *, const u_char *, const u_char *, u_int);
