@@ -231,11 +231,12 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	u_int total_advance;
 	const u_char *cp;
 	uint32_t payload_len;
-	uint8_t nh;
+	uint8_t ph, nh;
 	int fragmented = 0;
 	u_int flow;
 	int found_extension_header;
 	int found_jumbo;
+	int found_hbh;
 
 	ndo->ndo_protocol = "ip6";
 	ip6 = (const struct ip6_hdr *)bp;
@@ -285,6 +286,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	} else
 		len = length + sizeof(struct ip6_hdr);
 
+	ph = 255;
 	nh = GET_U_1(ip6->ip6_nxt);
 	if (ndo->ndo_vflag) {
 	    flow = GET_BE_U_4(ip6->ip6_flow);
@@ -316,6 +318,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	/* Process extension headers */
 	found_extension_header = 0;
 	found_jumbo = 0;
+	found_hbh = 0;
 	while (cp < ndo->ndo_snapend && advance > 0) {
 		if (len < (u_int)advance)
 			goto trunc;
@@ -333,12 +336,27 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		switch (nh) {
 
 		case IPPROTO_HOPOPTS:
+			/*
+			 * The Hop-by-Hop Options header, when present,
+			 * must immediately follow the IPv6 header (RFC 8200)
+			 */
+			if (found_hbh == 1) {
+				ND_PRINT("[The Hop-by-Hop Options header was already found]");
+				nd_print_invalid(ndo);
+				return;
+			}
+			if (ph != 255) {
+				ND_PRINT("[The Hop-by-Hop Options header don't follow the IPv6 header]");
+				nd_print_invalid(ndo);
+				return;
+			}
 			advance = hbhopt_process(ndo, cp, &found_jumbo, &payload_len);
 			if (advance < 0) {
 				nd_pop_packet_info(ndo);
 				return;
 			}
 			found_extension_header = 1;
+			found_hbh = 1;
 			nh = GET_U_1(cp);
 			break;
 
@@ -466,6 +484,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			nd_pop_packet_info(ndo);
 			return;
 		}
+		ph = nh;
 
 		/* ndo_protocol reassignment after xxx_print() calls */
 		ndo->ndo_protocol = "ip6";
