@@ -300,14 +300,18 @@ rip_print(netdissect_options *ndo,
 	unsigned entry_size;
 
 	ndo->ndo_protocol = "rip";
+	ND_PRINT("%s", (ndo->ndo_vflag >= 1) ? "\n\t" : "");
+	nd_print_protocol_caps(ndo);
 	ND_ICHECKMSG_ZU("packet length", len, <, sizeof(*rp));
 
 	rp = (const struct rip *)p;
 
 	vers = GET_U_1(rp->rip_vers);
-	ND_PRINT("%sRIPv%u",
-		 (ndo->ndo_vflag >= 1) ? "\n\t" : "",
-		 vers);
+	ND_PRINT("v%u", vers);
+	if (vers != 1 && vers != 2) {
+		ND_PRINT(" [version != 1 && version != 2]");
+		goto invalid;
+	}
 
 	/* dump version and lets see if we know the commands name*/
 	cmd = GET_U_1(rp->rip_cmd);
