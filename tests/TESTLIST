@@ -827,6 +827,9 @@ ntp			ntp.pcap		ntp.out
 ntp-v			ntp.pcap		ntp-v.out		-v
 ntp-time		ntp-time.pcap		ntp-time.out
 ntp-time--v		ntp-time.pcap		ntp-time--v.out		-v
+ntp-time-ef		ntp-time-ef.pcap	ntp-time-ef.out
+ntp-time-ef--v		ntp-time-ef.pcap	ntp-time-ef--v.out	-v
+ntp-time-ef--vvv	ntp-time-ef.pcap	ntp-time-ef--vvv.out	-vvv
 ntp-control		ntp-control.pcap	ntp-control.out
 ntp-control--v		ntp-control.pcap	ntp-control--v.out	-v
 ntp-mode7		ntp-mode7.pcap		ntp-mode7.out

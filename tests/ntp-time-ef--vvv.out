@@ -1,0 +1,65 @@
+    1  13:23:30.254335 IP (tos 0x0, ttl 64, id 62645, offset 0, flags [DF], proto UDP (17), length 360)
+    10.43.135.229.57551 > 162.159.200.123.123: [udp sum ok] NTPv4, Client, length 332
+	Leap indicator:  (0), Stratum 0 (unspecified), poll 6 (64s), precision 32
+	Root Delay: 0.000000, Root dispersion: 0.000000, Reference-ID: (unspec)
+	  Reference Timestamp:  0.000000000
+	  Originator Timestamp: 0.000000000
+	  Receive Timestamp:    0.000000000
+	  Transmit Timestamp:   3656702015.307509582 (2015-11-16T22:33:35Z)
+	    Originator - Receive Timestamp:  0.000000000
+	    Originator - Transmit Timestamp: 3656702015.307509582 (2015-11-16T22:33:35Z)
+	Extension fields:
+	  Unique Identifier (0x0104), length 36
+	    0x0000:  5cf0 6d70 94cf 5c5e 6ce9 2591 e9f6 7804
+	    0x0010:  132e 43b9 c0fe 6ef8 74ec d7ea b5d3 6ebf
+	  NTS Cookie (0x0204), length 104
+	    0x0000:  00f4 ef40 9e5c 9d23 0bf4 74cb 3998 e81b
+	    0x0010:  86d0 9528 2582 60ae 3bc9 0c75 b072 548d
+	    0x0020:  d975 ff2f dc9c 63c2 add1 9682 31e3 3b7d
+	    0x0030:  a69f 7b4f 52ca b002 468f 8559 62d2 d71c
+	    0x0040:  b597 99fd affc 5c62 1e51 2efc 7f5f 3304
+	    0x0050:  4591 d965 1943 d105 5a1d 651b b943 26a4
+	    0x0060:  da8d c2ac
+	  NTS Cookie Placeholder (0x0304), length 104
+	    0x0000:  0000 0000 0000 0000 0000 0000 0000 0000
+	    0x0010:  0000 0000 0000 0000 0000 0000 0000 0000
+	    0x0020:  0000 0000 0000 0000 0000 0000 0000 0000
+	    0x0030:  0000 0000 0000 0000 0000 0000 0000 0000
+	    0x0040:  0000 0000 0000 0000 0000 0000 0000 0000
+	    0x0050:  0000 0000 0000 0000 0000 0000 0000 0000
+	    0x0060:  0000 0000
+	  NTS Authenticator and Encrypted Extension Fields (0x0404), length 40
+	    0x0000:  0010 0010 be30 1336 d3eb 3cad ce3e 94c1
+	    0x0010:  4fbb d155 35e9 37b9 638d faa3 c4c9 f1b8
+	    0x0020:  1e44 7d3d
+    2  13:23:30.258867 IP (tos 0x0, ttl 55, id 41904, offset 0, flags [DF], proto UDP (17), length 360)
+    162.159.200.123.123 > 10.43.135.229.57551: [udp sum ok] NTPv4, Server, length 332
+	Leap indicator:  (0), Stratum 3 (secondary reference), poll 6 (64s), precision -25
+	Root Delay: 0.017074, Root dispersion: 0.000732, Reference-ID: 0x0a1f0880
+	  Reference Timestamp:  3869212959.224956389 (2022-08-11T13:22:39Z)
+	  Originator Timestamp: 3656702015.307509582 (2015-11-16T22:33:35Z)
+	  Receive Timestamp:    3869213010.188058000 (2022-08-11T13:23:30Z)
+	  Transmit Timestamp:   3869213010.188123546 (2022-08-11T13:23:30Z)
+	    Originator - Receive Timestamp:  +212510994.880548417
+	    Originator - Transmit Timestamp: +212510994.880613963
+	Extension fields:
+	  Unique Identifier (0x0104), length 36
+	    0x0000:  5cf0 6d70 94cf 5c5e 6ce9 2591 e9f6 7804
+	    0x0010:  132e 43b9 c0fe 6ef8 74ec d7ea b5d3 6ebf
+	  NTS Authenticator and Encrypted Extension Fields (0x0404), length 248
+	    0x0000:  0010 00e0 ab9d f862 b575 6321 8cfa 5af5
+	    0x0010:  7fcb 7240 9873 8f06 7226 5215 5b45 c84a
+	    0x0020:  aa20 bc62 0d2a 7b6c 4483 ad56 1748 4449
+	    0x0030:  0388 2a32 1eba 3a45 3333 d221 0e74 52e8
+	    0x0040:  b417 81d4 5108 7718 459d 0c41 b187 89c3
+	    0x0050:  c8d8 4eac 0b4d 59ac 7f4d 17b3 6af5 8cd1
+	    0x0060:  d68f e861 cd62 a2b3 aa8e f59a de35 387f
+	    0x0070:  d0d0 7d8d 4b0c afd7 858f dbfb 6627 8cfc
+	    0x0080:  fff8 90da 1e30 dffe 37fb 8610 98b5 5fca
+	    0x0090:  51cc 6bd7 4402 3568 4107 90bf 42ca 83e9
+	    0x00a0:  03c7 ba3a 99cc fcae ea20 4e82 752d 8e0e
+	    0x00b0:  6b78 1f0d ec76 5b0d 4e66 3e0b d238 d927
+	    0x00c0:  7509 f83d 8930 1b22 1a8e cf64 547e 7728
+	    0x00d0:  28b4 0abb d663 7704 7ed3 a3f1 1f2c 3bde
+	    0x00e0:  ac56 0cf6 3ed7 efbb 17a8 7cf6 bfbb c900
+	    0x00f0:  83a9 00b9

@@ -50,7 +50,7 @@
  *	This file is based on Version 2 of the NTP spec (RFC1119).
  */
 
-/* rfc2030
+/* RFC 5905 updated by RFC 7822
  *                      1                   2                   3
  *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -78,12 +78,10 @@
  * |                    Transmit Timestamp (64)                    |
  * |                                                               |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |                 Key Identifier (optional) (32)                |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * |                                                               |
- * |                                                               |
- * |                 Message Digest (optional) (128)               |
- * |                                                               |
+ * .                                                               .
+ * .                 Optional Extensions (variable)                .
+ * .                                                               .
  * |                                                               |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
@@ -106,9 +104,15 @@ struct ntp_time_data {
 	struct l_fixedpt org_timestamp;
 	struct l_fixedpt rec_timestamp;
 	struct l_fixedpt xmt_timestamp;
-	nd_uint32_t key_id;
-	nd_uint8_t  message_digest[20];
+	/* extension fields and/or MAC follow */
 };
+
+struct ntp_extension_field {
+	nd_uint16_t	type;
+	nd_uint16_t	length;
+	/* body follows */
+};
+
 /*
  *	Leap Second Codes (high order two bits)
  */
@@ -154,6 +158,7 @@ struct ntp_time_data {
 static void p_sfix(netdissect_options *ndo, const struct s_fixedpt *);
 static void p_ntp_delta(netdissect_options *, const struct l_fixedpt *, const struct l_fixedpt *);
 static void p_poll(netdissect_options *, const int);
+static u_int p_ext_fields(netdissect_options *, const u_char *, u_int length);
 
 static const struct tok ntp_mode_values[] = {
     { MODE_UNSPEC,    "unspecified" },
@@ -178,6 +183,15 @@ static const struct tok ntp_leapind_values[] = {
 static const struct tok ntp_stratum_values[] = {
 	{ UNSPECIFIED,	"unspecified" },
 	{ PRIM_REF,	"primary reference" },
+	{ 0, NULL }
+};
+
+static const struct tok ntp_ef_types[] = {
+	{ 0x0104,	"Unique Identifier" },
+	{ 0x0204,	"NTS Cookie" },
+	{ 0x0304,	"NTS Cookie Placeholder" },
+	{ 0x0404,	"NTS Authenticator and Encrypted Extension Fields" },
+	{ 0x2005,	"Checksum Complement" },
 	{ 0, NULL }
 };
 
@@ -226,9 +240,11 @@ struct ntp_control_data {
  */
 static void
 ntp_time_print(netdissect_options *ndo,
-	       const struct ntp_time_data *bp, u_int length)
+	       const struct ntp_time_data *bp, u_int length, u_int version)
 {
+	const u_char *mac;
 	uint8_t stratum;
+	u_int efs_len;
 
 	if (length < NTP_TIMEMSG_MINLEN)
 		goto invalid;
@@ -297,26 +313,33 @@ ntp_time_print(netdissect_options *ndo,
 	ND_PRINT("\n\t    Originator - Transmit Timestamp: ");
 	p_ntp_delta(ndo, &(bp->org_timestamp), &(bp->xmt_timestamp));
 
-	/* FIXME: this code is not aware of any extension fields */
-	if (length == NTP_TIMEMSG_MINLEN + 4) {	/* Optional: key-id (crypto-NAK) */
-		ND_PRINT("\n\tKey id: %u", GET_BE_U_4(bp->key_id));
-	} else if (length == NTP_TIMEMSG_MINLEN + 4 + 16) {	/* Optional: key-id + 128-bit digest */
-		ND_PRINT("\n\tKey id: %u", GET_BE_U_4(bp->key_id));
+	if (version == 4)
+		efs_len = p_ext_fields(ndo, (const u_char *)bp + NTP_TIMEMSG_MINLEN, length - NTP_TIMEMSG_MINLEN);
+	else
+		efs_len = 0;
+
+	mac = (const u_char *)bp + NTP_TIMEMSG_MINLEN + efs_len;
+
+	if (length == NTP_TIMEMSG_MINLEN + efs_len + 4) {	/* Optional: key-id (crypto-NAK) */
+		ND_PRINT("\n\tKey id: %u", GET_BE_U_4(mac));
+	} else if (length == NTP_TIMEMSG_MINLEN + efs_len + 4 + 16) {	/* Optional: key-id + 128-bit digest */
+		ND_PRINT("\n\tKey id: %u", GET_BE_U_4(mac));
 		ND_PRINT("\n\tAuthentication: %08x%08x%08x%08x",
-			 GET_BE_U_4(bp->message_digest),
-			 GET_BE_U_4(bp->message_digest + 4),
-			 GET_BE_U_4(bp->message_digest + 8),
-			 GET_BE_U_4(bp->message_digest + 12));
-	} else if (length == NTP_TIMEMSG_MINLEN + 4 + 20) {	/* Optional: key-id + 160-bit digest */
-		ND_PRINT("\n\tKey id: %u", GET_BE_U_4(bp->key_id));
+			 GET_BE_U_4(mac + 4),
+			 GET_BE_U_4(mac + 8),
+			 GET_BE_U_4(mac + 12),
+			 GET_BE_U_4(mac + 16));
+	} else if (length == NTP_TIMEMSG_MINLEN + efs_len + 4 + 20) {	/* Optional: key-id + 160-bit digest */
+		ND_PRINT("\n\tKey id: %u", GET_BE_U_4(mac));
 		ND_PRINT("\n\tAuthentication: %08x%08x%08x%08x%08x",
-			 GET_BE_U_4(bp->message_digest),
-			 GET_BE_U_4(bp->message_digest + 4),
-			 GET_BE_U_4(bp->message_digest + 8),
-			 GET_BE_U_4(bp->message_digest + 12),
-			 GET_BE_U_4(bp->message_digest + 16));
-	} else if (length > NTP_TIMEMSG_MINLEN) {
-		ND_PRINT("\n\t(%u more bytes after the header)", length - NTP_TIMEMSG_MINLEN);
+			 GET_BE_U_4(mac + 4),
+			 GET_BE_U_4(mac + 8),
+			 GET_BE_U_4(mac + 12),
+			 GET_BE_U_4(mac + 16),
+			 GET_BE_U_4(mac + 20));
+	} else if (length > NTP_TIMEMSG_MINLEN + efs_len) {
+		ND_PRINT("\n\t(%u more bytes after the header and extension fields)",
+				length - NTP_TIMEMSG_MINLEN - efs_len);
 	}
 	return;
 
@@ -422,7 +445,7 @@ ntp_print(netdissect_options *ndo,
 	case MODE_CLIENT:
 	case MODE_SERVER:
 	case MODE_BROADCAST:
-		ntp_time_print(ndo, &bp->td, length);
+		ntp_time_print(ndo, &bp->td, length, version);
 		break;
 
 	case MODE_CONTROL:
@@ -516,3 +539,48 @@ p_poll(netdissect_options *ndo,
 		ND_PRINT(" (1/%us)", 1U << -poll_interval);
 }
 
+/* Prints an NTPv4 extension field */
+static void
+p_ntp_ef(netdissect_options *ndo, u_int type, u_int length, const u_char *ef_body)
+{
+	ND_PRINT("\n\t  %s", tok2str(ntp_ef_types, "Unknown type", type));
+	ND_PRINT(" (0x%04x), length %u", type, length);
+
+	if (ndo->ndo_vflag > 2)
+		hex_print(ndo, "\n\t    ", ef_body, length - 4);
+}
+
+/* Prints list of extension fields per RFC 7822 */
+static u_int
+p_ext_fields(netdissect_options *ndo, const u_char *cp, u_int length)
+{
+	const struct ntp_extension_field *ef;
+	u_int ef_type, ef_len, efs_len;
+	int first_ef;
+
+	first_ef = 1;
+	efs_len = 0;
+
+	/* RFC 7822 requires the last EF in the packet to have at least
+	   28 octets to avoid ambiguity with MACs */
+	while (length - efs_len >= 28) {
+		ef = (const struct ntp_extension_field *)(cp + efs_len);
+		ef_type = GET_BE_U_2(ef->type);
+		ef_len = GET_BE_U_2(ef->length);
+
+		if (efs_len + ef_len > length || ef_len < 4 || ef_len % 4 != 0) {
+			nd_print_invalid(ndo);
+			break;
+		}
+
+		if (first_ef) {
+			ND_PRINT("\n\tExtension fields:");
+			first_ef = 0;
+		}
+
+		p_ntp_ef(ndo, ef_type, ef_len, (const u_char *)(ef + 1));
+		efs_len += ef_len;
+	}
+
+	return efs_len;
+}
