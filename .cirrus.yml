@@ -12,15 +12,15 @@ freebsd_task:
       - image_family: freebsd-12-3
         cpu: 2
         memory: 2G
-      - image_family: freebsd-13-0
+      - image_family: freebsd-13-1
         cpu: 2
         memory: 2G
   env:
     IGNORE_OSVERSION: yes
     MAKEFLAGS: -j 3
-    MATRIX_CC: clang gcc11
+    MATRIX_CC: clang14 gcc12
   script:
-    - pkg install -qy git autoconf gcc11
+    - pkg install -qy git autoconf gcc12 llvm14
     - pkg install -qy cmake # for build_matrix.sh and build.sh
     - pkg install -qy pkgconf # for cmake, replaces pkg-config
     - pkg install -qy sudo # for some tcpdump commands
@@ -36,19 +36,16 @@ linux_task:
     # The number of CPU cores must be either 1 or a multiple of 2.
     cpu: 4
     memory: 1G
-    image: ubuntu:20.04
+    image: ubuntu:22.04
   env:
     DEBIAN_FRONTEND: noninteractive
     MAKEFLAGS: -j 5
-    matrix:
-      - MATRIX_CC: gcc
-      - MATRIX_CC: clang
   script:
-    - apt-get -qy update
-    - apt-get -qy install git autoconf make cmake clang gcc bc
-    - apt-get -qy install flex bison libdbus-1-dev libbluetooth-dev libnl-genl-3-dev libibverbs-dev # for libpcap
-    - apt-get -qy install libssl-dev libsmi2-dev libcap-ng-dev libpcap-dev
-    - apt-get -qy install sudo # for some tcpdump commands
+    - apt-get -qy update >/dev/null
+    - apt-get -qy install git autoconf make cmake clang gcc bc >/dev/null
+    - apt-get -qy install flex bison libdbus-1-dev libbluetooth-dev libnl-genl-3-dev libibverbs-dev >/dev/null # for libpcap
+    - apt-get -qy install libssl-dev libsmi2-dev libcap-ng-dev libpcap-dev >/dev/null
+    - apt-get -qy install sudo >/dev/null # for some tcpdump commands
     - apt list --installed 'lib*-dev'
     - echo '$ git clone [...] libpcap.git'
     - git -C .. clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT}
@@ -75,7 +72,7 @@ coverity_task:
   container:
     cpu: 4
     memory: 2G
-    image: ubuntu:20.04
+    image: ubuntu:22.04
   env:
     DEBIAN_FRONTEND: noninteractive
     MAKEFLAGS: -j 5
@@ -84,9 +81,9 @@ coverity_task:
     COVERITY_SCAN_BUILD_COMMAND_PREPEND: ./configure
     COVERITY_SCAN_BUILD_COMMAND: make
   script:
-    - apt-get -qy update
-    - apt-get -qy install autoconf make gcc
-    - apt-get -qy install libssl-dev libsmi2-dev libcap-ng-dev libpcap-dev
-    - apt-get -qy install git curl wget ruby rubygems ruby-json # for the coverity script
+    - apt-get -qy update >/dev/null
+    - apt-get -qy install autoconf make gcc >/dev/null
+    - apt-get -qy install libssl-dev libsmi2-dev libcap-ng-dev libpcap-dev >/dev/null
+    - apt-get -qy install git curl wget ruby rubygems ruby-json >/dev/null # for the coverity script
     - apt list --installed 'lib*-dev'
     - ./.ci-coverity-scan-build.sh
