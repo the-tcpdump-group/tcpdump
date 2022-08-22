@@ -351,6 +351,11 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 				return;
 			}
 			advance = hbhopt_process(ndo, cp, &found_jumbo, &payload_len);
+			if (payload_len == 0 && found_jumbo == 0) {
+				ND_PRINT("[No valid Jumbo Payload Hop-by-Hop option found]");
+				nd_print_invalid(ndo);
+				return;
+			}
 			if (advance < 0) {
 				nd_pop_packet_info(ndo);
 				return;
