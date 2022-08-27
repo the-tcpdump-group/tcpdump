@@ -2949,8 +2949,6 @@ bgp_notification_print_code(netdissect_options *ndo,
                             const u_char *dat, u_int length,
                             uint8_t bgpn_major, uint8_t bgpn_minor)
 {
-    const u_char *tptr;
-
     ND_PRINT(", %s (%u)",
               tok2str(bgp_notify_major_values, "Unknown Error",
                       bgpn_major),
@@ -2998,13 +2996,12 @@ bgp_notification_print_code(netdissect_options *ndo,
          * for the maxprefix subtype, which may contain AFI, SAFI and MAXPREFIXES
          */
         if(bgpn_minor == BGP_NOTIFY_MINOR_CEASE_MAXPRFX && length >= 7) {
-            tptr = dat;
             ND_PRINT(", AFI %s (%u), SAFI %s (%u), Max Prefixes: %u",
-                      tok2str(af_values, "Unknown", GET_BE_U_2(tptr)),
-                      GET_BE_U_2(tptr),
-                      tok2str(bgp_safi_values, "Unknown", GET_U_1((tptr + 2))),
-                      GET_U_1((tptr + 2)),
-                      GET_BE_U_4(tptr + 3));
+                      tok2str(af_values, "Unknown", GET_BE_U_2(dat)),
+                      GET_BE_U_2(dat),
+                      tok2str(bgp_safi_values, "Unknown", GET_U_1((dat + 2))),
+                      GET_U_1((dat + 2)),
+                      GET_BE_U_4(dat + 3));
         }
         /*
          * RFC 9003 describes a method to send a communication
@@ -3013,8 +3010,7 @@ bgp_notification_print_code(netdissect_options *ndo,
         if ((bgpn_minor == BGP_NOTIFY_MINOR_CEASE_SHUT ||
              bgpn_minor == BGP_NOTIFY_MINOR_CEASE_RESET) &&
              length >= 1) {
-            tptr = dat;
-            uint8_t shutdown_comm_length = GET_U_1(tptr);
+            uint8_t shutdown_comm_length = GET_U_1(dat);
             uint8_t remainder_offset = 0;
             /* garbage, hexdump it all */
             if (shutdown_comm_length > length - 1) {
@@ -3027,14 +3023,14 @@ bgp_notification_print_code(netdissect_options *ndo,
             /* a proper shutdown communication */
             else {
                 ND_PRINT(", Shutdown Communication (length: %u): \"", shutdown_comm_length);
-                nd_printjn(ndo, tptr+1, shutdown_comm_length);
+                nd_printjn(ndo, dat+1, shutdown_comm_length);
                 ND_PRINT("\"");
                 remainder_offset += shutdown_comm_length + 1;
             }
             /* if there is trailing data, hexdump it */
             if(length - remainder_offset > 0) {
                 ND_PRINT(", Data: (length: %u)", length - remainder_offset);
-                hex_print(ndo, "\n\t\t", tptr + remainder_offset, length - remainder_offset);
+                hex_print(ndo, "\n\t\t", dat + remainder_offset, length - remainder_offset);
             }
         }
         /*
