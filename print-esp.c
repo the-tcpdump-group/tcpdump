@@ -762,7 +762,7 @@ esp_print(netdissect_options *ndo,
 	ND_PRINT(", length %u", length);
 
 #ifdef HAVE_LIBCRYPTO
-	/* initiailize SAs */
+	/* initialize SAs */
 	if (ndo->ndo_sa_list_head == NULL) {
 		if (!ndo->ndo_espsecret)
 			return;
