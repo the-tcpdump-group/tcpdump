@@ -1,0 +1,7 @@
+    1  16:12:16.630159 IP6 (class 0xc0, flowlabel 0x4dfd4, hlim 1, next-header TCP (6) payload length: 111) fe80::a00:27ff:fe5e:d19e.34394 > fe80::ca5d:fd0d:cd8:1bb7.179: Flags [P.], cksum 0xa597 (correct), seq 2096048450:2096048529, ack 1967270673, win 506, options [nop,nop,TS val 2145170888 ecr 3487011352], length 79: BGP
+	Route Refresh Message (5), length: 28
+	  AFI IPv4 (1), SAFI Unicast (1), Subtype Normal route refresh request (0)
+	  ORF refresh Defer (2), ORF type Address Prefix ORF (64), ORF length 1
+	Route Refresh Message (5), length: 51
+	  AFI IPv4 (1), SAFI Unicast (1), Subtype Normal route refresh request (0)
+	  ORF refresh Immediate (1), ORF type Address Prefix ORF (64), ORF length 24
