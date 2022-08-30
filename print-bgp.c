@@ -103,6 +103,12 @@ struct bgp_notification {
 };
 #define BGP_NOTIFICATION_SIZE        21    /* unaligned */
 
+struct bgp_route_refresh_orf {
+  nd_uint8_t  refresh;
+  nd_uint8_t  type;
+  nd_uint16_t len;
+};
+
 struct bgp_route_refresh {
     nd_byte     bgp_marker[16];
     nd_uint16_t len;
@@ -111,7 +117,21 @@ struct bgp_route_refresh {
     nd_uint8_t  subtype;
     nd_uint8_t  safi;
 };
+
+static const struct tok bgp_orf_refresh_type[] = {
+    { 1, "Immediate"},
+    { 2, "Defer"},
+    { 0, NULL }
+};
+
+static const struct tok bgp_orf_type[] = {
+    { 64, "Address Prefix ORF"},
+    { 65, "CP-ORF"},
+    { 0, NULL }
+};
+
 #define BGP_ROUTE_REFRESH_SIZE          23
+#define BGP_ROUTE_REFRESH_SIZE_ORF      BGP_ROUTE_REFRESH_SIZE + 5
 #define BGP_ROUTE_REFRESH_SUBTYPE_NORMAL 0
 #define BGP_ROUTE_REFRESH_SUBTYPE_BORR 1
 #define BGP_ROUTE_REFRESH_SUBTYPE_EORR 2
@@ -3081,8 +3101,6 @@ bgp_route_refresh_print(netdissect_options *ndo,
 {
     const struct bgp_route_refresh *bgp_route_refresh_header;
 
-    ND_TCHECK_LEN(pptr, BGP_ROUTE_REFRESH_SIZE);
-
     /* some little sanity checking */
     if (len<BGP_ROUTE_REFRESH_SIZE)
         return;
@@ -3099,6 +3117,21 @@ bgp_route_refresh_print(netdissect_options *ndo,
              tok2str(bgp_route_refresh_subtype_values, "Unknown",
                      GET_U_1(bgp_route_refresh_header->subtype)),
              GET_U_1(bgp_route_refresh_header->subtype));
+
+    /* ORF */
+    if (len >= BGP_ROUTE_REFRESH_SIZE_ORF) {
+        const struct bgp_route_refresh_orf *orf_header;
+
+        orf_header =
+          (const struct bgp_route_refresh_orf *)(pptr + BGP_ROUTE_REFRESH_SIZE);
+
+        ND_PRINT("\n\t  ORF refresh %s (%u), ORF type %s (%u), ORF length %u",
+                 tok2str(bgp_orf_refresh_type, "Unknown",
+                         GET_U_1(orf_header->refresh)),
+                 GET_U_1(orf_header->refresh),
+                 tok2str(bgp_orf_type, "Unknown", GET_U_1(orf_header->type)),
+                 GET_U_1(orf_header->type), GET_BE_U_2(orf_header->len));
+    }
 
     if (ndo->ndo_vflag > 1) {
         ND_TCHECK_LEN(pptr, len);
