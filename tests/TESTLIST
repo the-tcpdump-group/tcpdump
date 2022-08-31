@@ -213,6 +213,7 @@ icmpv6-length-zero icmpv6-length-zero.pcapng icmpv6-length-zero.out
 icmpv6-rfc7112	icmpv6-rfc7112.pcap	icmpv6-rfc7112.out
 icmpv6-RFC2894-RR icmpv6-RFC2894-RR.pcap icmpv6-RFC2894-RR.out
 icmpv6-RFC2894-RR-v icmpv6-RFC2894-RR.pcap icmpv6-RFC2894-RR-v.out -v
+icmpv6-ni-flags	icmpv6-ni-flags.pcap	icmpv6-ni-flags.out
 
 # SPB tests
 spb	            spb.pcap	            spb.out

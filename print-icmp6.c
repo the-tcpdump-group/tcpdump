@@ -394,18 +394,13 @@ struct icmp6_nodeinfo {
 #define NI_QTYPE_NODEADDR	3 /* Node Addresses */
 #define NI_QTYPE_IPV4ADDR	4 /* IPv4 Addresses */
 
-/* network endian */
-#define NI_SUPTYPE_FLAG_COMPRESS	((uint16_t)htons(0x1))
-#define NI_FQDN_FLAG_VALIDTTL		((uint16_t)htons(0x1))
-
-/* network endian */
-#define NI_NODEADDR_FLAG_TRUNCATE	((uint16_t)htons(0x1))
-#define NI_NODEADDR_FLAG_ALL		((uint16_t)htons(0x2))
-#define NI_NODEADDR_FLAG_COMPAT		((uint16_t)htons(0x4))
-#define NI_NODEADDR_FLAG_LINKLOCAL	((uint16_t)htons(0x8))
-#define NI_NODEADDR_FLAG_SITELOCAL	((uint16_t)htons(0x10))
-#define NI_NODEADDR_FLAG_GLOBAL		((uint16_t)htons(0x20))
-#define NI_NODEADDR_FLAG_ANYCAST	((uint16_t)htons(0x40)) /* just experimental. not in spec */
+#define NI_NODEADDR_FLAG_TRUNCATE	0x0001
+#define NI_NODEADDR_FLAG_ALL		0x0002
+#define NI_NODEADDR_FLAG_COMPAT		0x0004
+#define NI_NODEADDR_FLAG_LINKLOCAL	0x0008
+#define NI_NODEADDR_FLAG_SITELOCAL	0x0010
+#define NI_NODEADDR_FLAG_GLOBAL		0x0020
+#define NI_NODEADDR_FLAG_ANYCAST	0x0040 /* just experimental. not in spec */
 
 struct ni_reply_fqdn {
 	nd_uint32_t ni_fqdn_ttl;	/* TTL */
