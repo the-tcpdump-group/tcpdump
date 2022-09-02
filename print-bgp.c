@@ -1889,6 +1889,14 @@ trunc:	/* we rely on the caller to recognize -2 return value */
 	return -2;
 }
 
+static const struct tok bgp_flags[] = {
+	{ 0x80, "O"},
+	{ 0x40, "T"},
+	{ 0x20, "P"},
+	{ 0x10, "E"},
+	{ 0, NULL }
+};
+
 static int
 bgp_attr_print(netdissect_options *ndo,
                uint8_t atype, const u_char *pptr, u_int len,
@@ -2465,11 +2473,8 @@ bgp_attr_print(netdissect_options *ndo,
                       alen);
 
             if (aflags) {
-                ND_PRINT(", Flags [%s%s%s%s",
-                          aflags & 0x80 ? "O" : "",
-                          aflags & 0x40 ? "T" : "",
-                          aflags & 0x20 ? "P" : "",
-                          aflags & 0x10 ? "E" : "");
+                ND_PRINT(", Flags [%s",
+                         bittok2str_nosep(bgp_flags, "", aflags));
                 if (aflags & 0xf)
                     ND_PRINT("+%x", aflags & 0xf);
                 ND_PRINT("]");
@@ -2886,11 +2891,8 @@ bgp_update_print(netdissect_options *ndo,
                       alen);
 
             if (aflags) {
-                ND_PRINT(", Flags [%s%s%s%s",
-                          aflags & 0x80 ? "O" : "",
-                          aflags & 0x40 ? "T" : "",
-                          aflags & 0x20 ? "P" : "",
-                          aflags & 0x10 ? "E" : "");
+                ND_PRINT(", Flags [%s",
+                         bittok2str_nosep(bgp_flags, "", aflags));
                 if (aflags & 0xf)
                     ND_PRINT("+%x", aflags & 0xf);
                 ND_PRINT("]: ");
