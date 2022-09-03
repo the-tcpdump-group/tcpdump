@@ -171,6 +171,9 @@ and ask!
    ```
    First line: Capitalized short summary in the imperative (50 chars or less)
 
+   If the commit concerns a protocol, the summary line must start with
+   "protocol: ".
+
    Body: Detailed explanatory text, if necessary. Fold it to approximately
    72 characters. There must be an empty line separating the summary from
    the body.
