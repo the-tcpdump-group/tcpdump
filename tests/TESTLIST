@@ -274,7 +274,7 @@ of10_inv_OFPST_FLOW-v	of10_inv_OFPST_FLOW.pcap	of10_inv_OFPST_FLOW-v.out -v
 of10_inv_QUEUE_GET_CONFIG_REPLY-vv	of10_inv_QUEUE_GET_CONFIG_REPLY.pcap	of10_inv_QUEUE_GET_CONFIG_REPLY-vv.out	-vv
 
 # GeoNetworking and CALM FAST tests
-geonet-calm-fast	geonet_and_calm_fast.pcap	geonet_and_calm_fast.out	-vv
+geonet_v0_and_calm_fast	geonet_v0_and_calm_fast.pcap	geonet_v0_and_calm_fast.out	-vv
 
 # M3UA tests
 m3ua isup.pcap isup.out
