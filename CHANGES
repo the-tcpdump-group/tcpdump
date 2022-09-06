@@ -49,6 +49,7 @@ TBD
       Clean up some help messages in configure.
       Use unified diff by default.
       Improve error detection in "make releasetar".
+      Remove awk code from mkdep.
     Source code:
       Fix some snapend-changing routines to protect against pointer
         underflow.
