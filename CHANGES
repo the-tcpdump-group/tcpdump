@@ -13,6 +13,14 @@ Monthday, Month DD, YYYY by gharris and denis
       MPTCP: print length before subtype inside MPTCP options, parse MPC
         data_len field, print flags from MP_CAPABLE option.
       ICMP: add dissector for ICMP Interface Identification Object
+      BGP: Parse BGP extended message support capability
+      BGP: Deprecate DPA, ADVERTISER and RCID_PATH path attributes
+      BGP: Print Enhanced route refresh capability
+      BGP: Print enhanced route refresh message subtype
+      BGP: Parse rfc9072 (Extended Optional Parameters Length for BGP OPEN Message)
+      BGP: Add support for BFD cease subcode
+      BGP: Add support for Hard Reset notification and GR N flag
+      BGP: Handle ORF in Route-Refresh messages
     User interface:
       Add optional unit suffix on -C file size.
       Add --print-sampling to print every Nth packet instead of all.
