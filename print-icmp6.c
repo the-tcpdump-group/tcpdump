@@ -1964,16 +1964,16 @@ icmp6_rrenum_print(netdissect_options *ndo, const u_char *bp, const u_char *ep)
 	ND_TCHECK_4(rr6->rr_reserved);
 	switch (GET_U_1(rr6->rr_code)) {
 	case ICMP6_ROUTER_RENUMBERING_COMMAND:
-		ND_PRINT("router renum: command");
+		ND_PRINT(", command");
 		break;
 	case ICMP6_ROUTER_RENUMBERING_RESULT:
-		ND_PRINT("router renum: result");
+		ND_PRINT(", result");
 		break;
 	case ICMP6_ROUTER_RENUMBERING_SEQNUM_RESET:
-		ND_PRINT("router renum: sequence number reset");
+		ND_PRINT(", sequence number reset");
 		break;
 	default:
-		ND_PRINT("router renum: code-#%u", GET_U_1(rr6->rr_code));
+		ND_PRINT(", code-#%u", GET_U_1(rr6->rr_code));
 		break;
 	}
 
