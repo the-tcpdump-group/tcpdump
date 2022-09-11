@@ -36,6 +36,9 @@ TBD
     Updated printers:
       BGP: Update cease notification decoding to RFC 9003.
       BGP: decode BGP link-bandwidth extended community properly.
+      BGP: Fix parsing the AIGP attribute
+      BGP: make sure the path attributes don't go past the end of the packet.
+      BGP: Shutdown message can be up to 255 bytes length according to rfc9003
       DSA: correctly determine VID.
       EAP: fix some length checks and output issues.
       802.15.4, BGP, LISP: fix some length checks, compiler warnings,
@@ -70,6 +73,7 @@ TBD
       VRRP: add support for IPv6.
       OSPF: Update to match the Router Properties registry.
       ICMPv6: Fix output for Router Renumbering messages.
+      IPv6: Add some checks for the Hop-by-Hop Options header
     Building and testing:
       Update config.guess and config.sub.
       Use AS_HELP_STRING macro instead of AC_HELP_STRING.
