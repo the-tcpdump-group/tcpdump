@@ -87,8 +87,11 @@ if test "x$with_smi" != "xno" ; then
 			AC_TRY_RUN(
 				[
 /* libsmi available check */
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <smi.h>
-main()
+int main()
 {
   int current, revision, age, n;
   const int required = 2;
@@ -264,6 +267,7 @@ AC_COMPILE_IFELSE(
     [
       AC_LANG_SOURCE(
 	[[
+#include <string.h>
 /* AF_INET6 available check */
 #include <sys/types.h>
 #ifdef _WIN32
@@ -473,6 +477,8 @@ AC_CHECK_FUNCS(ether_ntohost, [
     AC_CACHE_CHECK(for buggy ether_ntohost, ac_cv_buggy_ether_ntohost, [
 	AC_TRY_RUN([
 		#include <netdb.h>
+		#include <netinet/ether.h>
+		#include <stdlib.h>
 		#include <sys/types.h>
 		#include <sys/param.h>
 		#include <sys/socket.h>
