@@ -40,6 +40,7 @@ TBD
       VRRP: add support for IPv6.
       OSPF: Update to match the Router Properties registry.
       ICMPv6: Fix output for Router Renumbering messages.
+      ICMPv6: Fix the Node Information flags.
       IPv6: Add some checks for the Hop-by-Hop Options header
     Building and testing:
       Update config.guess and config.sub.
