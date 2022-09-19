@@ -56,6 +56,7 @@ TBD
       Use unified diff by default.
       Improve error detection in "make releasetar".
       Remove awk code from mkdep.
+      Fix configure test errors with Clang 15
     Source code:
       Fix some snapend-changing routines to protect against pointer
         underflow.
