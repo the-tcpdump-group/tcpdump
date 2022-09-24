@@ -50,7 +50,6 @@ INSTALL.md	- this file
 LICENSE		- the license under which tcpdump is distributed
 Makefile.in	- compilation rules (input to the configure script)
 README.md	- description of distribution
-Readme.Win32	- notes on building tcpdump on Win32 systems (with WinPcap)
 VERSION		- version of this release
 aclocal.m4	- autoconf macros
 addrtoname.c	- address to hostname routines
