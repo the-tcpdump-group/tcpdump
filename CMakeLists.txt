@@ -28,6 +28,46 @@ if(POLICY CMP0074)
     cmake_policy(SET CMP0074 NEW)
 endif()
 
+#
+# OK, this is a pain.
+#
+# When building on NetBSD, with a libpcap installed from pkgsrc,
+# a -Wl,-rpath,/usr/pkg/lib option is added to the options when
+# linking tcpdump.  This puts /usr/pkg/lib into the run-time path.
+#
+# However, by default, CMake adds a rule to the install CMake script
+# a CMake command (using an undocumented subcommand of file()) that
+# strips /usr/pkg/lib *out* of the run-time path; the message in the
+# output for the "install" target is
+#
+#    -- Set runtime path of "{target-directory}/tcpdump" to ""
+#
+# I am not certain what the rationale is for doing this, but a
+# *consequence* of this is that, when you run the installed tcpdump,
+# it fails to find libpcap.so:
+#
+#    $ {target-directory}/tcpdump -h
+#    {target-directory}/tcpdump: Shared object "libpcap.so.0" not found
+#
+# We suppress this by setting CMAKE_INSTALL_RPATH_USE_LINK_PATH to TRUE;
+# as the documentation for that variable says:
+#
+#    Add paths to linker search and installed rpath.
+#
+#    CMAKE_INSTALL_RPATH_USE_LINK_PATH is a boolean that if set to True
+#    will append to the runtime search path (rpath) of installed
+#    binaries any directories outside the project that are in the linker
+#    search path or contain linked library files. The directories are
+#    appended after the value of the INSTALL_RPATH target property.
+#
+# If, for whatever reason, directories in which we search for external
+# libraries, other than the standard system library directories, are
+# added to the executable's rpath in the build process, we most
+# defintely want them in the installed image's rpath if they are
+# necessary in order to find the libraries at run time.
+#
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
 #
