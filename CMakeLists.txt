@@ -49,6 +49,20 @@ endif()
 #    $ {target-directory}/tcpdump -h
 #    {target-directory}/tcpdump: Shared object "libpcap.so.0" not found
 #
+# It also appears to be the case that, on Ubunto 22.04, FreeBSD 12,
+# DragonFly BSD 5.8, OpenBSD 6.6, and Solaris 11.4, 
+#
+# On Ubuntu and Solaris, even if you have a libpcap in /usr/local, you
+# have to provide not only -I/usr/local/include and -L/usr/local/lib,
+# you also must provide -Wl,-rpath,/usr/local/lib in order to have
+# the run-time linker look in /usr/local/lib for libpcap.  If it's not
+# specified, then, if the shared library major version number of the
+# libpcap in /usr/lib is the same as the shared major version number
+# of the libpcap in /usr/local/lib, the run-time linker will find the
+# libpcap in /usr/lib; if the versions are different, the run-time
+# linker will fail to find the libpcap in /usr/lib, so the program will
+# fail to run.
+#
 # We suppress this by setting CMAKE_INSTALL_RPATH_USE_LINK_PATH to TRUE;
 # as the documentation for that variable says:
 #
