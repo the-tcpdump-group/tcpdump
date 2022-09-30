@@ -5960,8 +5960,44 @@ fi
             # routines in those libraries, so we'll need to link with
             # them, because we'll be linking statically with it.
             #
+            # If it supports --static-pcap-only. use that, as we will be
+            # linking with a static libpcap but won't be linking
+            # statically with any of the libraries on which it depends;
+            # those libraries might not even have static versions
+            # installed.
+            #
+            # That means we need to find out the libraries on which
+            # libpcap directly depends, so we can link with them, but we
+            # don't need to link with the libraries on which those
+            # libraries depend as, on all UN*Xes with which I'm
+            # familiar, the libraries on which a shared library depends
+            # are stored in the library and are automatically loaded by
+            # the run-time linker, without the executable having to be
+            # linked with those libraries.  (This allows a library to be
+            # changed to depend on more libraries without breaking that
+            # library's ABI.)
+            #
+            # The only way to test for that support is to see if the
+            # script contains the string "static-pcap-only"; we can't
+            # try using that flag and checking for errors, as the
+            # versions of the script that didn't have that flag wouldn't
+            # report or return an error for an unsupported command-line
+            # flag.  Those older versions provided, with --static, only
+            # the libraries on which libpcap depends, not the
+            # dependencies of those libraries; the versions with
+            # --static-pcap-only provide all the dependencies with
+            # --static, for the benefit of programs that are completely
+            # statically linked, and provide only the direct
+            # dependencies with --static-pcap-only.
+            #
+            if grep -s -q "static-pcap-only" "$PCAP_CONFIG"
+            then
+                static_opt="--static-pcap-only"
+            else
+                static_opt="--static"
+            fi
             V_INCLS="-I$local_pcap_dir $V_INCLS"
-            additional_libs=`"$PCAP_CONFIG" --static --additional-libs`
+            additional_libs=`"$PCAP_CONFIG" $static_opt --additional-libs`
             libpcap="$libpcap $additional_libs"
         else
             #
