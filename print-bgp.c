@@ -469,6 +469,7 @@ static const struct tok bgp_graceful_restart_comm_flag_values[] = {
 #define BGP_EXT_COM_RO_1        0x0103  /* Route Origin,Format IP address:AN(2bytes) */
 #define BGP_EXT_COM_RO_2        0x0203  /* Route Origin,Format AN(4bytes):local(2bytes) */
 #define BGP_EXT_COM_LINKBAND    0x4004  /* Link Bandwidth,Format AS(2B):Bandwidth(4B) */
+#define BGP_EXT_COM_OVS         0x4300  /* BGP Prefix Origin Validation State Extended Community */
                                         /* rfc2547 bgp-mpls-vpns */
 #define BGP_EXT_COM_VPN_ORIGIN  0x0005  /* OSPF Domain ID / VPN of Origin  - draft-rosen-vpns-ospf-bgp-mpls */
 #define BGP_EXT_COM_VPN_ORIGIN2 0x0105  /* duplicate - keep for backwards compatibility */
@@ -506,6 +507,14 @@ static const struct tok bgp_extd_comm_flag_values[] = {
     { 0, NULL},
 };
 
+/* rfc8097 */
+static const struct tok bgp_prefix_origin_validation_state[] = {
+  { 0, "valid" },
+  { 1, "not found" },
+  { 2, "invalid" },
+  { 0, NULL },
+};
+
 static const struct tok bgp_extd_comm_subtype_values[] = {
     { BGP_EXT_COM_RT_0,        "target"},
     { BGP_EXT_COM_RT_1,        "target"},
@@ -514,6 +523,7 @@ static const struct tok bgp_extd_comm_subtype_values[] = {
     { BGP_EXT_COM_RO_1,        "origin"},
     { BGP_EXT_COM_RO_2,        "origin"},
     { BGP_EXT_COM_LINKBAND,    "link-BW"},
+    { BGP_EXT_COM_OVS,         "origin-validation-state"},
     { BGP_EXT_COM_VPN_ORIGIN,  "ospf-domain"},
     { BGP_EXT_COM_VPN_ORIGIN2, "ospf-domain"},
     { BGP_EXT_COM_VPN_ORIGIN3, "ospf-domain"},
@@ -905,6 +915,23 @@ bgp_extended_community_print(netdissect_options *ndo,
             ND_PRINT("bandwidth: %.3f Mbps",
                      bw.f*8/1000000);
             break;
+
+    case BGP_EXT_COM_OVS:
+        /* The Reserved field MUST be set to 0 and ignored upon the
+         * receipt of this community.
+         */
+        {
+            uint64_t reserved = GET_BE_U_5(pptr + 2);
+
+            if (reserved)
+                ND_PRINT("[the reserved field 0x%" PRIx64 " MUST be 0] ",
+                         reserved);
+            ND_PRINT("ovs: %s",
+                     tok2str(bgp_prefix_origin_validation_state,
+                             "unknown origin validation state",
+                             GET_U_1(pptr + 7)));
+        }
+        break;
 
     case BGP_EXT_COM_VPN_ORIGIN:
     case BGP_EXT_COM_VPN_ORIGIN2:
