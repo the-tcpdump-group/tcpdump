@@ -1,0 +1,42 @@
+    1  09:02:50.838041 IP (tos 0xc0, ttl 255, id 51487, offset 0, flags [DF], proto TCP (6), length 321)
+    192.168.10.17.53084 > 192.168.10.124.179: Flags [P.], cksum 0x9711 (incorrect -> 0xbe28), seq 1852580574:1852580843, ack 3956070749, win 126, options [nop,nop,TS val 429792956 ecr 3755909458], length 269: BGP
+	Update Message (2), length: 68
+	  Origin (1), length: 1, Flags [T]: Incomplete
+	  AS Path (2), length: 0, Flags [TE]: empty
+	  Next Hop (3), length: 4, Flags [T]: 192.168.10.17
+	  Multi Exit Discriminator (4), length: 4, Flags [O]: 0
+	  Local Preference (5), length: 4, Flags [T]: 100
+	  Extended Community (16), length: 8, Flags [OT]: 
+	    origin-validation-state (0x4300), Flags [non-transitive]: ovs: not found
+	  Updated routes:
+	    10.0.103.145/32
+	Update Message (2), length: 68
+	  Origin (1), length: 1, Flags [T]: Incomplete
+	  AS Path (2), length: 0, Flags [TE]: empty
+	  Next Hop (3), length: 4, Flags [T]: 192.168.10.17
+	  Multi Exit Discriminator (4), length: 4, Flags [O]: 0
+	  Local Preference (5), length: 4, Flags [T]: 100
+	  Extended Community (16), length: 8, Flags [OT]: 
+	    origin-validation-state (0x4300), Flags [non-transitive]: ovs: invalid
+	  Updated routes:
+	    10.10.10.10/32
+	Update Message (2), length: 66
+	  Origin (1), length: 1, Flags [T]: Incomplete
+	  AS Path (2), length: 0, Flags [TE]: empty
+	  Next Hop (3), length: 4, Flags [T]: 192.168.10.17
+	  Multi Exit Discriminator (4), length: 4, Flags [O]: 0
+	  Local Preference (5), length: 4, Flags [T]: 100
+	  Extended Community (16), length: 8, Flags [OT]: 
+	    origin-validation-state (0x4300), Flags [non-transitive]: ovs: not found
+	  Updated routes:
+	    172.18.0.0/16
+	Update Message (2), length: 67
+	  Origin (1), length: 1, Flags [T]: Incomplete
+	  AS Path (2), length: 0, Flags [TE]: empty
+	  Next Hop (3), length: 4, Flags [T]: 192.168.10.17
+	  Multi Exit Discriminator (4), length: 4, Flags [O]: 0
+	  Local Preference (5), length: 4, Flags [T]: 100
+	  Extended Community (16), length: 8, Flags [OT]: 
+	    origin-validation-state (0x4300), Flags [non-transitive]: ovs: not found
+	  Updated routes:
+	    192.168.10.0/24
