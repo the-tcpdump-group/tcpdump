@@ -828,6 +828,7 @@ huge-tipc-messages	huge-tipc-messages.pcap	huge-tipc-messages.out
 #ptp tests
 ptp         ptp.pcap    ptp.out
 ptp_ethernet	ptp_ethernet.pcap	ptp_ethernet.out	-e
+ptp_corrections	ptp_corrections.pcap	ptp_corrections.out
 
 # bad packets from Jason Xiaole
 ldp_tlv_print-oobr ldp_tlv_print-oobr.pcap ldp_tlv_print-oobr.out -v

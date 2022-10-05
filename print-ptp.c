@@ -35,7 +35,8 @@
  *    |  domain No    | rsvd1         |   flag Field                  |
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *    |                        Correction NS                          |
- *    |                      Correction Sub NS                        |
+ *    +                               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *    |                               |      Correction Sub NS        |
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *    |                           Reserved2                           |
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -345,7 +346,9 @@ ptp_print_2(netdissect_options *ndo, const u_char *bp, u_int length)
     u_int len = length;
     uint16_t msg_len, flags, port_id, seq_id;
     uint8_t foct, domain_no, msg_type, v1_compat, rsvd1, lm_int, control;
-    uint32_t ns_corr, sns_corr, rsvd2;
+    uint64_t ns_corr;
+    uint16_t sns_corr;
+    uint32_t rsvd2;
     uint64_t clk_id;
 
     foct = GET_U_1(bp);
@@ -367,14 +370,14 @@ ptp_print_2(netdissect_options *ndo, const u_char *bp, u_int length)
     /* flags */
     len -= 2; bp += 2; flags = GET_BE_U_2(bp); ND_PRINT(", Flags [%s]", bittok2str(ptp_flag_values, "none", flags));
 
-    /* correction NS */
-    len -= 2; bp += 2; ns_corr = GET_BE_U_4(bp); ND_PRINT(", NS correction : %u", ns_corr);
+    /* correction NS (48 bits) */
+    len -= 2; bp += 2; ns_corr = GET_BE_U_6(bp); ND_PRINT(", NS correction : %"PRIu64, ns_corr);
 
-    /* correction sub NS */
-    len -= 4; bp += 4; sns_corr = GET_BE_U_4(bp); ND_PRINT(", sub NS correction : %u", sns_corr);
+    /* correction sub NS (16 bits) */
+    len -= 6; bp += 6; sns_corr = GET_BE_U_2(bp); ND_PRINT(", sub NS correction : %u", sns_corr);
 
     /* Reserved 2 */
-    len -= 4; bp += 4; rsvd2 = GET_BE_U_4(bp); ND_PRINT(", reserved2 : %u", rsvd2);
+    len -= 2; bp += 2; rsvd2 = GET_BE_U_4(bp); ND_PRINT(", reserved2 : %u", rsvd2);
 
     /* clock identity */
     len -= 4; bp += 4; clk_id = GET_BE_U_8(bp); ND_PRINT(", clock identity : 0x%"PRIx64, clk_id);
