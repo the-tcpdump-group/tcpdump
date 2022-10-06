@@ -2578,8 +2578,8 @@ bgp_attr_print(netdissect_options *ndo,
         splen -= 2;
         /* Make sure the secure path length does not signal trailing bytes */
         if (splen % 6) {
-            ND_PRINT(" [invalid total segments len %u]", splen);
-            break;
+            ND_PRINT(" [total segments length %u != N x 6]", splen);
+            goto invalid;
         }
 
         /* Parse secure path segments */
