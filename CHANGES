@@ -22,6 +22,7 @@ Monthday, Month DD, YYYY by gharris and denis
       BGP: Add support for Hard Reset notification and GR N flag
       BGP: Handle ORF in Route-Refresh messages
       BGP: add dissector for BGPsec capability and path
+      BGP: Add Origin Validation State extended community
     User interface:
       Add optional unit suffix on -C file size.
       Add --print-sampling to print every Nth packet instead of all.
