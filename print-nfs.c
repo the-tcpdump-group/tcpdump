@@ -906,7 +906,7 @@ nfs_printfh(netdissect_options *ndo,
 		/* Print the undecoded handle */
 		ND_PRINT("%s", fsid.Opaque_Handle);
 	else
-		ND_PRINT("%ld", (long) ino);
+		ND_PRINT("%u", ino);
 }
 
 /*
