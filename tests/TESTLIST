@@ -927,3 +927,4 @@ pb_nhrp_1			pb_nhrp_1.pcap			pb_nhrp_1.out	-v
 # Undefined behavior tests
 ip-snmp-leftshift-unsigned ip-snmp-leftshift-unsigned.pcap ip-snmp-leftshift-unsigned.out
 ip6-snmp-oid-unsigned ip6-snmp-oid-unsigned.pcap ip6-snmp-oid-unsigned.out
+lwres-pointer-arithmetic-ub lwres-pointer-arithmetic-ub.pcap lwres-pointer-arithmetic-ub.out

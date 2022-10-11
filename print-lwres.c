@@ -291,7 +291,9 @@ lwres_print(netdissect_options *ndo,
 	if (ndo->ndo_vflag || v != LWRES_LWPACKETVERSION_0)
 		ND_PRINT(" v%u", v);
 	if (v != LWRES_LWPACKETVERSION_0) {
-		s = bp + GET_BE_U_4(np->length);
+		uint32_t pkt_len = GET_BE_U_4(np->length);
+		ND_TCHECK_LEN(bp, pkt_len);
+		s = bp + pkt_len;
 		goto tail;
 	}
 
