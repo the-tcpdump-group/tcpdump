@@ -1000,6 +1000,7 @@ ip6-snmp-oid-unsigned ip6-snmp-oid-unsigned.pcap ip6-snmp-oid-unsigned.out
 lwres-pointer-arithmetic-ub lwres-pointer-arithmetic-ub.pcap lwres-pointer-arithmetic-ub.out
 ospf-signed-integer-ubsan       ospf-signed-integer-ubsan.pcap          ospf-signed-integer-ubsan.out -vv
 bgp-ub bgp-ub.pcap bgp-ub.out -v
+fletcher-checksum-negative-shift fletcher-checksum-negative-shift.pcap fletcher-checksum-negative-shift.out     -v
 
 # AccECN tests
 accecn_handshake	accecn_handshake.pcap		accecn_handshake.out	-v
