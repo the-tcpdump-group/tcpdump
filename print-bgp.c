@@ -1161,6 +1161,8 @@ decode_multicast_vpn(netdissect_options *ndo,
     switch(route_type) {
     case BGP_MULTICAST_VPN_ROUTE_TYPE_INTRA_AS_I_PMSI:
         ND_TCHECK_LEN(pptr, BGP_VPN_RD_LEN);
+        if (route_length < BGP_VPN_RD_LEN)
+            goto trunc;
         offset = (u_int)strlen(buf);
         snprintf(buf + offset, buflen - offset, ", RD: %s, Originator %s",
                     bgp_vpn_rd_print(ndo, pptr),
