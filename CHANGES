@@ -42,6 +42,7 @@ TBD
       ICMPv6: Fix output for Router Renumbering messages.
       ICMPv6: Fix the Node Information flags.
       IPv6: Add some checks for the Hop-by-Hop Options header
+      NFS: Fix the format for printing an unsigned int
     Building and testing:
       Update config.guess and config.sub.
       Use AS_HELP_STRING macro instead of AC_HELP_STRING.
