@@ -119,6 +119,33 @@ and ask!
 ## Code style and generic remarks
 *  A thorough reading of some other printers code is useful.
 
+* To help learn how tcpdump works or to help debugging:
+  You can configure and build tcpdump with the instrumentation of functions:
+  $ ./configure --enable-instrument-functions
+  $ make -s
+
+  This generates instrumentation calls for entry and exit to functions.
+  Just after function entry and just before function exit, these
+  profiling functions are called and print the function names with
+  indentation and call level.
+
+  If entering in a function, it prints also the calling function name with
+  file name and line number. There may be a small shift in the line number.
+
+  In some cases, with Clang 11, the file number is unknown (printed '??')
+  or the line number is unknown (printed '?'). In this case, use GCC.
+
+  To print nothing, like with no instrumentation:
+  $ make instrument_off
+
+  To configure the printing of only the global functions names:
+  $ make instrument_global
+
+  To go back to print all the functions names:
+  $ make instrument_all
+
+  The library libbfd is used, therefore the binutils-dev package is required.
+
 *  Put the normative reference if any as comments (RFC, etc.).
 
 *  Put the format of packets/headers/options as comments if there is no
