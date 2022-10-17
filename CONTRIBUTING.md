@@ -121,8 +121,10 @@ and ask!
 
 * To help learn how tcpdump works or to help debugging:
   You can configure and build tcpdump with the instrumentation of functions:
+  ```
   $ ./configure --enable-instrument-functions
   $ make -s
+  ```
 
   This generates instrumentation calls for entry and exit to functions.
   Just after function entry and just before function exit, these
@@ -136,13 +138,19 @@ and ask!
   or the line number is unknown (printed '?'). In this case, use GCC.
 
   To print nothing, like with no instrumentation:
+  ```
   $ make instrument_off
+  ```
 
   To configure the printing of only the global functions names:
+  ```
   $ make instrument_global
+  ```
 
   To go back to print all the functions names:
+  ```
   $ make instrument_all
+  ```
 
   The library libbfd is used, therefore the binutils-dev package is required.
 
