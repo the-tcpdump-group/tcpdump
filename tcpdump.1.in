@@ -32,7 +32,6 @@ tcpdump \- dump traffic on a network
 .B \-B
 .I buffer_size
 ]
-.br
 .ti +8
 [
 .B \-c
