@@ -93,6 +93,7 @@ TBD
       Handle some Autoconf/make errors better.
       Fix an error when corss-compiling.
       Fix "make releasetar" on AIX and Solaris.
+      Use "git archive" for the "make releasetar" process.
       Mend "make check" on Solaris 9 with Autoconf.
       Address assorted compiler warnings.
       Fix auto-enabling of Capsicum on FreeBSD with Autoconf.

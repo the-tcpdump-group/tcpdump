@@ -389,6 +389,8 @@ EXTRA_DIST = \
 
 TEST_DIST= `git ls-files tests | grep -v 'tests/\..*'`
 
+RELEASE_FILES = $(CSRC) $(HDR) $(LIBNETDISSECT_SRC) $(EXTRA_DIST) $(TEST_DIST)
+
 all: $(PROG)
 
 $(PROG): $(OBJ) @V_PCAPDEP@ $(LIBNETDISSECT)
@@ -475,14 +477,16 @@ TAGS: $(TAGFILES)
 	etags $(TAGFILES)
 
 releasetar:
-	@autoreconf -f && \
-	name=$(PROG)-`cat VERSION` && \
-	   mkdir $$name && \
-	   tar cf - $(CSRC) $(HDR) $(LIBNETDISSECT_SRC) $(EXTRA_DIST) $(TEST_DIST) >/dev/null && \
-	   tar cf - $(CSRC) $(HDR) $(LIBNETDISSECT_SRC) $(EXTRA_DIST) $(TEST_DIST) | (cd $$name; tar xf -) && \
-	   tar cf - $$name >/dev/null && \
-	   tar cf - $$name | gzip >$$name.tar.gz && \
-	   rm -rf $$name
+	@TAG=$(PROG)-`cat VERSION` && \
+	if git show-ref --tags --quiet --verify -- "refs/tags/$$TAG"; then \
+	    git archive --prefix="$$TAG"/ -o "$$TAG".tar.gz "$$TAG" \
+	    $(RELEASE_FILES) && \
+	    echo "Archive build from tag $$TAG."; \
+	else \
+	    git archive --prefix="$$TAG"/ -o "$$TAG".tar.gz HEAD \
+	    $(RELEASE_FILES) && \
+	    echo "No $$TAG tag. Archive build from HEAD."; \
+	fi
 
 rc1 rc2 rc3 rc4 rc5:
 	@VER=`cat $(srcdir)/VERSION`; \
