@@ -12,7 +12,7 @@ please report a bug as explained in the
 
 * Upstream libpcap works.
 * OS libpcap works.
-* pkgsrc libpcap 1.10.1 works only with Autoconf.
+* pkgsrc libpcap works.
 
 ## NetBSD 9.2, 9.1 and 9.0
 
