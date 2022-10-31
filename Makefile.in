@@ -472,12 +472,6 @@ releasetar:
 	    echo "No $$TAG tag. Archive build from HEAD."; \
 	fi
 
-rc1 rc2 rc3 rc4 rc5:
-	@VER=`cat $(srcdir)/VERSION`; \
-	sed -i "s/$$VER/$${VER}$@/" VERSION ; \
-	make releasetar; \
-	git checkout VERSION configure
-
 testlist:
 	echo $(TEST_DIST)
 
