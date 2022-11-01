@@ -46,7 +46,7 @@ p_ntp_time(netdissect_options *ndo,
 		ff += FMAXINT;
 	ff = ff / FMAXINT;			/* shift radix point by 32 bits */
 	f = (uint32_t)(ff * 1000000000.0);	/* treat fraction as parts per billion */
-	ND_PRINT("%u.%09u", i, f);
+	ND_PRINT(C_RESET, "%u.%09u", i, f);
 
 #ifdef HAVE_STRFTIME
 	/*
@@ -64,7 +64,7 @@ p_ntp_time(netdissect_options *ndo,
 		 * It doesn't fit into a time_t, so we can't hand it
 		 * to gmtime.
 		 */
-		ND_PRINT(" (unrepresentable)");
+		ND_PRINT(C_RESET, " (unrepresentable)");
 	    } else {
 		tm = gmtime(&seconds);
 		if (tm == NULL) {
@@ -73,11 +73,11 @@ p_ntp_time(netdissect_options *ndo,
 		     * (Yes, that might happen with some version of
 		     * Microsoft's C library.)
 		     */
-		    ND_PRINT(" (unrepresentable)");
+		    ND_PRINT(C_RESET, " (unrepresentable)");
 		} else {
 		    /* use ISO 8601 (RFC3339) format */
 		    strftime(time_buf, sizeof (time_buf), "%Y-%m-%dT%H:%M:%SZ", tm);
-		    ND_PRINT(" (%s)", time_buf);
+		    ND_PRINT(C_RESET, " (%s)", time_buf);
 		}
 	    }
 	}

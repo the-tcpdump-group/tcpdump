@@ -329,46 +329,46 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 #endif
 
 	if (ndo->ndo_packet_number)
-		ND_PRINT("%5u  ", packets_captured);
+		ND_PRINT(C_RESET, "%5u  ", packets_captured);
 
 	/* Sanity checks on packet length / capture length */
 	if (h->caplen == 0) {
 		invalid_header = 1;
-		ND_PRINT("[Invalid header: caplen==0");
+		ND_PRINT(C_RESET, "[Invalid header: caplen==0");
 	}
 	if (h->len == 0) {
 		if (!invalid_header) {
 			invalid_header = 1;
-			ND_PRINT("[Invalid header:");
+			ND_PRINT(C_RESET, "[Invalid header:");
 		} else
-			ND_PRINT(",");
-		ND_PRINT(" len==0");
+			ND_PRINT(C_RESET, ",");
+		ND_PRINT(C_RESET, " len==0");
 	} else if (h->len < h->caplen) {
 		if (!invalid_header) {
 			invalid_header = 1;
-			ND_PRINT("[Invalid header:");
+			ND_PRINT(C_RESET, "[Invalid header:");
 		} else
-			ND_PRINT(",");
-		ND_PRINT(" len(%u) < caplen(%u)", h->len, h->caplen);
+			ND_PRINT(C_RESET, ",");
+		ND_PRINT(C_RESET, " len(%u) < caplen(%u)", h->len, h->caplen);
 	}
 	if (h->caplen > MAXIMUM_SNAPLEN) {
 		if (!invalid_header) {
 			invalid_header = 1;
-			ND_PRINT("[Invalid header:");
+			ND_PRINT(C_RESET, "[Invalid header:");
 		} else
-			ND_PRINT(",");
-		ND_PRINT(" caplen(%u) > %u", h->caplen, MAXIMUM_SNAPLEN);
+			ND_PRINT(C_RESET, ",");
+		ND_PRINT(C_RESET, " caplen(%u) > %u", h->caplen, MAXIMUM_SNAPLEN);
 	}
 	if (h->len > MAXIMUM_SNAPLEN) {
 		if (!invalid_header) {
 			invalid_header = 1;
-			ND_PRINT("[Invalid header:");
+			ND_PRINT(C_RESET, "[Invalid header:");
 		} else
-			ND_PRINT(",");
-		ND_PRINT(" len(%u) > %u", h->len, MAXIMUM_SNAPLEN);
+			ND_PRINT(C_RESET, ",");
+		ND_PRINT(C_RESET, " len(%u) > %u", h->len, MAXIMUM_SNAPLEN);
 	}
 	if (invalid_header) {
-		ND_PRINT("]\n");
+		ND_PRINT(C_RESET, "]\n");
 		return;
 	}
 
@@ -495,7 +495,7 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 		}
 	}
 
-	ND_PRINT("\n");
+	ND_PRINT(C_RESET, "\n");
 	nd_free_all(ndo);
 }
 

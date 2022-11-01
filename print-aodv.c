@@ -164,15 +164,15 @@ aodv_extension(netdissect_options *ndo,
 		ND_ICHECKMSG_ZU("ext data length", length, <,
 				sizeof(struct aodv_hello));
 		if (ext_length < 4) {
-			ND_PRINT("\n\text HELLO - bad length %u", ext_length);
+			ND_PRINT(C_RESET, "\n\text HELLO - bad length %u", ext_length);
 			goto invalid;
 		}
-		ND_PRINT("\n\text HELLO %u ms",
+		ND_PRINT(C_RESET, "\n\text HELLO %u ms",
 		    GET_BE_U_4(ah->interval));
 		break;
 
 	default:
-		ND_PRINT("\n\text %u %u", ext_type, ext_length);
+		ND_PRINT(C_RESET, "\n\text %u %u", ext_type, ext_length);
 		break;
 	}
 	return;
@@ -188,7 +188,7 @@ aodv_rreq(netdissect_options *ndo, const u_char *dat, u_int length)
 	const struct aodv_rreq *ap = (const struct aodv_rreq *)dat;
 
 	ND_ICHECKMSG_ZU("message length", length, <, sizeof(*ap));
-	ND_PRINT(" %u %s%s%s%s%shops %u id 0x%08x\n"
+	ND_PRINT(C_RESET, " %u %s%s%s%s%shops %u id 0x%08x\n"
 	    "\tdst %s seq %u src %s seq %u", length,
 	    GET_U_1(ap->rreq_type) & RREQ_JOIN ? "[J]" : "",
 	    GET_U_1(ap->rreq_type) & RREQ_REPAIR ? "[R]" : "",
@@ -217,7 +217,7 @@ aodv_rrep(netdissect_options *ndo, const u_char *dat, u_int length)
 	const struct aodv_rrep *ap = (const struct aodv_rrep *)dat;
 
 	ND_ICHECKMSG_ZU("message length", length, <, sizeof(*ap));
-	ND_PRINT(" %u %s%sprefix %u hops %u\n"
+	ND_PRINT(C_RESET, " %u %s%sprefix %u hops %u\n"
 	    "\tdst %s dseq %u src %s %u ms", length,
 	    GET_U_1(ap->rrep_type) & RREP_REPAIR ? "[R]" : "",
 	    GET_U_1(ap->rrep_type) & RREP_ACK ? "[A] " : " ",
@@ -244,14 +244,14 @@ aodv_rerr(netdissect_options *ndo, const u_char *dat, u_int length)
 	const struct rerr_unreach *dp;
 
 	ND_ICHECKMSG_ZU("message length", length, <, sizeof(*ap));
-	ND_PRINT(" %s [items %u] [%u]:",
+	ND_PRINT(C_RESET, " %s [items %u] [%u]:",
 	    GET_U_1(ap->rerr_flags) & RERR_NODELETE ? "[D]" : "",
 	    GET_U_1(ap->rerr_dc), length);
 	dp = (const struct rerr_unreach *)(dat + sizeof(*ap));
 	i = length - sizeof(*ap);
 	for (dc = GET_U_1(ap->rerr_dc); dc != 0; dc--) {
 		ND_ICHECKMSG_ZU("remaining length", i, <, sizeof(*dp));
-		ND_PRINT(" {%s}(%u)", GET_IPADDR_STRING(dp->u_da),
+		ND_PRINT(C_RESET, " {%s}(%u)", GET_IPADDR_STRING(dp->u_da),
 		    GET_BE_U_4(dp->u_ds));
 		dp++;
 		i -= sizeof(*dp);
@@ -269,7 +269,7 @@ aodv_v6_rreq(netdissect_options *ndo, const u_char *dat, u_int length)
 	const struct aodv_rreq6 *ap = (const struct aodv_rreq6 *)dat;
 
 	ND_ICHECKMSG_ZU("message length", length, <, sizeof(*ap));
-	ND_PRINT(" %u %s%s%s%s%shops %u id 0x%08x\n"
+	ND_PRINT(C_RESET, " %u %s%s%s%s%shops %u id 0x%08x\n"
 	    "\tdst %s seq %u src %s seq %u", length,
 	    GET_U_1(ap->rreq_type) & RREQ_JOIN ? "[J]" : "",
 	    GET_U_1(ap->rreq_type) & RREQ_REPAIR ? "[R]" : "",
@@ -298,7 +298,7 @@ aodv_v6_rrep(netdissect_options *ndo, const u_char *dat, u_int length)
 	const struct aodv_rrep6 *ap = (const struct aodv_rrep6 *)dat;
 
 	ND_ICHECKMSG_ZU("message length", length, <, sizeof(*ap));
-	ND_PRINT(" %u %s%sprefix %u hops %u\n"
+	ND_PRINT(C_RESET, " %u %s%sprefix %u hops %u\n"
 	   "\tdst %s dseq %u src %s %u ms", length,
 	    GET_U_1(ap->rrep_type) & RREP_REPAIR ? "[R]" : "",
 	    GET_U_1(ap->rrep_type) & RREP_ACK ? "[A] " : " ",
@@ -325,14 +325,14 @@ aodv_v6_rerr(netdissect_options *ndo, const u_char *dat, u_int length)
 	const struct rerr_unreach6 *dp6;
 
 	ND_ICHECKMSG_ZU("message length", length, <, sizeof(*ap));
-	ND_PRINT(" %s [items %u] [%u]:",
+	ND_PRINT(C_RESET, " %s [items %u] [%u]:",
 	    GET_U_1(ap->rerr_flags) & RERR_NODELETE ? "[D]" : "",
 	    GET_U_1(ap->rerr_dc), length);
 	dp6 = (const struct rerr_unreach6 *)(const void *)(ap + 1);
 	i = length - sizeof(*ap);
 	for (dc = GET_U_1(ap->rerr_dc); dc != 0; dc--) {
 		ND_ICHECKMSG_ZU("remaining length", i, <, sizeof(*dp6));
-		ND_PRINT(" {%s}(%u)", GET_IP6ADDR_STRING(dp6->u_da),
+		ND_PRINT(C_RESET, " {%s}(%u)", GET_IP6ADDR_STRING(dp6->u_da),
 			 GET_BE_U_4(dp6->u_ds));
 		dp6++;
 		i -= sizeof(*dp6);
@@ -350,14 +350,14 @@ aodv_print(netdissect_options *ndo,
 	uint8_t msg_type;
 
 	ndo->ndo_protocol = "aodv";
-	ND_PRINT(" aodv");
+	ND_PRINT(C_RESET, " aodv");
 
 	/*
 	 * The message type is the first byte; make sure we have it
 	 * and then fetch it.
 	 */
 	msg_type = GET_U_1(dat);
-	ND_PRINT(" %s", tok2str(msg_type_str, "type %u", msg_type));
+	ND_PRINT(C_RESET, " %s", tok2str(msg_type_str, "type %u", msg_type));
 
 	switch (msg_type) {
 
@@ -383,10 +383,10 @@ aodv_print(netdissect_options *ndo,
 		break;
 
 	case AODV_RREP_ACK:
-		ND_PRINT(" %u", length);
+		ND_PRINT(C_RESET, " %u", length);
 		break;
 
 	default:
-		ND_PRINT(" %u", length);
+		ND_PRINT(C_RESET, " %u", length);
 	}
 }

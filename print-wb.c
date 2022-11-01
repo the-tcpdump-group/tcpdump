@@ -203,12 +203,12 @@ wb_id(netdissect_options *ndo,
 	char c;
 	u_int nid;
 
-	ND_PRINT(" wb-id:");
+	ND_PRINT(C_RESET, " wb-id:");
 	if (len < sizeof(*id))
 		return (-1);
 	len -= sizeof(*id);
 
-	ND_PRINT(" %u/%s:%u (max %u/%s:%u) ",
+	ND_PRINT(C_RESET, " %u/%s:%u (max %u/%s:%u) ",
 	       GET_BE_U_4(id->pi_ps.slot),
 	       GET_IPADDR_STRING(id->pi_ps.page.p_sid),
 	       GET_BE_U_4(id->pi_ps.page.p_uid),
@@ -227,13 +227,13 @@ wb_id(netdissect_options *ndo,
 
 	c = '<';
 	for (i = 0; i < nid; ++io, ++i) {
-		ND_PRINT("%c%s:%u",
+		ND_PRINT(C_RESET, "%c%s:%u",
 		    c, GET_IPADDR_STRING(io->id), GET_BE_U_4(io->off));
 		c = ',';
 	}
-	ND_PRINT("> \"");
+	ND_PRINT(C_RESET, "> \"");
 	nd_printjnp(ndo, sitename, len);
-	ND_PRINT("\"");
+	ND_PRINT(C_RESET, "\"");
 	return (0);
 }
 
@@ -241,11 +241,11 @@ static int
 wb_rreq(netdissect_options *ndo,
         const struct pkt_rreq *rreq, u_int len)
 {
-	ND_PRINT(" wb-rreq:");
+	ND_PRINT(C_RESET, " wb-rreq:");
 	if (len < sizeof(*rreq))
 		return (-1);
 
-	ND_PRINT(" please repair %s %s:%u<%u:%u>",
+	ND_PRINT(C_RESET, " please repair %s %s:%u<%u:%u>",
 	       GET_IPADDR_STRING(rreq->pr_id),
 	       GET_IPADDR_STRING(rreq->pr_page.p_sid),
 	       GET_BE_U_4(rreq->pr_page.p_uid),
@@ -258,11 +258,11 @@ static int
 wb_preq(netdissect_options *ndo,
         const struct pkt_preq *preq, u_int len)
 {
-	ND_PRINT(" wb-preq:");
+	ND_PRINT(C_RESET, " wb-preq:");
 	if (len < sizeof(*preq))
 		return (-1);
 
-	ND_PRINT(" need %u/%s:%u",
+	ND_PRINT(C_RESET, " need %u/%s:%u",
 	       GET_BE_U_4(preq->pp_low),
 	       GET_IPADDR_STRING(preq->pp_page.p_sid),
 	       GET_BE_U_4(preq->pp_page.p_uid));
@@ -278,7 +278,7 @@ wb_prep(netdissect_options *ndo,
 	u_int n;
 	const struct pgstate *ps;
 
-	ND_PRINT(" wb-prep:");
+	ND_PRINT(C_RESET, " wb-prep:");
 	if (len < sizeof(*prep))
 		return (-1);
 	n = GET_BE_U_4(prep->pp_n);
@@ -287,7 +287,7 @@ wb_prep(netdissect_options *ndo,
 		const struct id_off *io, *ie;
 		char c = '<';
 
-		ND_PRINT(" %u/%s:%u",
+		ND_PRINT(C_RESET, " %u/%s:%u",
 		    GET_BE_U_4(ps->slot),
 		    GET_IPADDR_STRING(ps->page.p_sid),
 		    GET_BE_U_4(ps->page.p_uid));
@@ -295,11 +295,11 @@ wb_prep(netdissect_options *ndo,
 		ND_TCHECK_SIZE(ps);
 		io = (const struct id_off *)(ps + 1);
 		for (ie = io + GET_U_1(ps->nid); io < ie; ++io) {
-			ND_PRINT("%c%s:%u", c, GET_IPADDR_STRING(io->id),
+			ND_PRINT(C_RESET, "%c%s:%u", c, GET_IPADDR_STRING(io->id),
 			    GET_BE_U_4(io->off));
 			c = ',';
 		}
-		ND_PRINT(">");
+		ND_PRINT(C_RESET, ">");
 		ps = (const struct pgstate *)io;
 		n--;
 	}
@@ -312,18 +312,18 @@ wb_dops(netdissect_options *ndo, const struct pkt_dop *dop,
 {
 	const struct dophdr *dh = (const struct dophdr *)((const u_char *)dop + sizeof(*dop));
 
-	ND_PRINT(" <");
+	ND_PRINT(C_RESET, " <");
 	for ( ; ss <= es; ++ss) {
 		u_int t;
 
 		t = GET_U_1(dh->dh_type);
 
-		ND_PRINT(" %s", tok2str(dop_str, "dop-%u!", t));
+		ND_PRINT(C_RESET, " %s", tok2str(dop_str, "dop-%u!", t));
 		if (t == DT_SKIP || t == DT_HOLE) {
 			uint32_t ts = GET_BE_U_4(dh->dh_ts);
-			ND_PRINT("%u", ts - ss + 1);
+			ND_PRINT(C_RESET, "%u", ts - ss + 1);
 			if (ss > ts || ts > es) {
-				ND_PRINT("[|]");
+				ND_PRINT(C_RESET, "[|]");
 				if (ts < ss)
 					return;
 			}
@@ -331,7 +331,7 @@ wb_dops(netdissect_options *ndo, const struct pkt_dop *dop,
 		}
 		dh = DOP_NEXT(dh);
 	}
-	ND_PRINT(" >");
+	ND_PRINT(C_RESET, " >");
 }
 
 static int
@@ -340,12 +340,12 @@ wb_rrep(netdissect_options *ndo,
 {
 	const struct pkt_dop *dop = &rrep->pr_dop;
 
-	ND_PRINT(" wb-rrep:");
+	ND_PRINT(C_RESET, " wb-rrep:");
 	if (len < sizeof(*rrep))
 		return (-1);
 	len -= sizeof(*rrep);
 
-	ND_PRINT(" for %s %s:%u<%u:%u>",
+	ND_PRINT(C_RESET, " for %s %s:%u<%u:%u>",
 	    GET_IPADDR_STRING(rrep->pr_id),
 	    GET_IPADDR_STRING(dop->pd_page.p_sid),
 	    GET_BE_U_4(dop->pd_page.p_uid),
@@ -363,12 +363,12 @@ static int
 wb_drawop(netdissect_options *ndo,
           const struct pkt_dop *dop, u_int len)
 {
-	ND_PRINT(" wb-dop:");
+	ND_PRINT(C_RESET, " wb-dop:");
 	if (len < sizeof(*dop))
 		return (-1);
 	len -= sizeof(*dop);
 
-	ND_PRINT(" %s:%u<%u:%u>",
+	ND_PRINT(C_RESET, " %s:%u<%u:%u>",
 	    GET_IPADDR_STRING(dop->pd_page.p_sid),
 	    GET_BE_U_4(dop->pd_page.p_uid),
 	    GET_BE_U_4(dop->pd_sseq),
@@ -400,12 +400,12 @@ wb_print(netdissect_options *ndo,
 	len -= sizeof(*ph);
 
 	if (GET_U_1(ph->ph_flags))
-		ND_PRINT("*");
+		ND_PRINT(C_RESET, "*");
 	type = GET_U_1(ph->ph_type);
 	switch (type) {
 
 	case PT_KILL:
-		ND_PRINT(" wb-kill");
+		ND_PRINT(C_RESET, " wb-kill");
 		return;
 
 	case PT_ID:
@@ -433,7 +433,7 @@ wb_print(netdissect_options *ndo,
 		break;
 
 	default:
-		ND_PRINT(" wb-%u!", type);
+		ND_PRINT(C_RESET, " wb-%u!", type);
 		print_result = -1;
 	}
 	if (print_result < 0)

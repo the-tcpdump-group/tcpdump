@@ -39,22 +39,22 @@ ipnet_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	const ipnet_hdr_t *hdr;
 	hdr = (const ipnet_hdr_t *)bp;
 
-	ND_PRINT("%u > %u", GET_BE_U_4(hdr->iph_zsrc),
+	ND_PRINT(C_RESET, "%u > %u", GET_BE_U_4(hdr->iph_zsrc),
 		  GET_BE_U_4(hdr->iph_zdst));
 
 	if (!ndo->ndo_qflag) {
-		ND_PRINT(", family %s (%u)",
+		ND_PRINT(C_RESET, ", family %s (%u)",
                           tok2str(ipnet_values, "Unknown",
                                   GET_U_1(hdr->iph_family)),
                           GET_U_1(hdr->iph_family));
         } else {
-		ND_PRINT(", %s",
+		ND_PRINT(C_RESET, ", %s",
                           tok2str(ipnet_values,
                                   "Unknown Ethertype (0x%04x)",
 				  GET_U_1(hdr->iph_family)));
         }
 
-	ND_PRINT(", length %u: ", length);
+	ND_PRINT(C_RESET, ", length %u: ", length);
 }
 
 static void

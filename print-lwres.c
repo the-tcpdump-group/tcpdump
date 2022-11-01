@@ -193,11 +193,11 @@ static unsigned
 lwres_printname(netdissect_options *ndo,
                 u_int l, const u_char *p0)
 {
-	ND_PRINT(" ");
+	ND_PRINT(C_RESET, " ");
 	nd_printjn(ndo, p0, l);
 	p0 += l;
 	if (GET_U_1(p0))
-		ND_PRINT(" (not NUL-terminated!)");
+		ND_PRINT(C_RESET, " (not NUL-terminated!)");
 	return l + 1;
 }
 
@@ -225,7 +225,7 @@ lwres_printbinlen(netdissect_options *ndo,
 	l = GET_BE_U_2(p);
 	p += 2;
 	for (i = 0; i < l; i++) {
-		ND_PRINT("%02x", GET_U_1(p));
+		ND_PRINT(C_RESET, "%02x", GET_U_1(p));
 		p++;
 	}
 	return 2 + l;
@@ -250,19 +250,19 @@ lwres_printaddr(netdissect_options *ndo,
 	case 1:	/* IPv4 */
 		if (l < 4)
 			return -1;
-		ND_PRINT(" %s", GET_IPADDR_STRING(p));
+		ND_PRINT(C_RESET, " %s", GET_IPADDR_STRING(p));
 		p += sizeof(nd_ipv4);
 		break;
 	case 2:	/* IPv6 */
 		if (l < 16)
 			return -1;
-		ND_PRINT(" %s", GET_IP6ADDR_STRING(p));
+		ND_PRINT(C_RESET, " %s", GET_IP6ADDR_STRING(p));
 		p += sizeof(nd_ipv6);
 		break;
 	default:
-		ND_PRINT(" %u/", GET_BE_U_4(ap->family));
+		ND_PRINT(C_RESET, " %u/", GET_BE_U_4(ap->family));
 		for (i = 0; i < l; i++) {
-			ND_PRINT("%02x", GET_U_1(p));
+			ND_PRINT(C_RESET, "%02x", GET_U_1(p));
 			p++;
 		}
 	}
@@ -286,10 +286,10 @@ lwres_print(netdissect_options *ndo,
 	np = (const struct lwres_lwpacket *)bp;
 	ND_TCHECK_2(np->authlength);
 
-	ND_PRINT(" lwres");
+	ND_PRINT(C_RESET, " lwres");
 	v = GET_BE_U_2(np->version);
 	if (ndo->ndo_vflag || v != LWRES_LWPACKETVERSION_0)
-		ND_PRINT(" v%u", v);
+		ND_PRINT(C_RESET, " v%u", v);
 	if (v != LWRES_LWPACKETVERSION_0) {
 		s = bp + GET_BE_U_4(np->length);
 		goto tail;
@@ -299,25 +299,25 @@ lwres_print(netdissect_options *ndo,
 
 	/* opcode and pktflags */
 	v = GET_BE_U_4(np->opcode);
-	ND_PRINT(" %s%s", tok2str(opcode, "#0x%x", v), response ? "" : "?");
+	ND_PRINT(C_RESET, " %s%s", tok2str(opcode, "#0x%x", v), response ? "" : "?");
 
 	/* pktflags */
 	v = GET_BE_U_2(np->pktflags);
 	if (v & ~LWRES_LWPACKETFLAG_RESPONSE)
-		ND_PRINT("[0x%x]", v);
+		ND_PRINT(C_RESET, "[0x%x]", v);
 
 	if (ndo->ndo_vflag > 1) {
-		ND_PRINT(" (");	/*)*/
-		ND_PRINT("serial:0x%x", GET_BE_U_4(np->serial));
-		ND_PRINT(" result:0x%x", GET_BE_U_4(np->result));
-		ND_PRINT(" recvlen:%u", GET_BE_U_4(np->recvlength));
+		ND_PRINT(C_RESET, " (");	/*)*/
+		ND_PRINT(C_RESET, "serial:0x%x", GET_BE_U_4(np->serial));
+		ND_PRINT(C_RESET, " result:0x%x", GET_BE_U_4(np->result));
+		ND_PRINT(C_RESET, " recvlen:%u", GET_BE_U_4(np->recvlength));
 		/* BIND910: not used */
 		if (ndo->ndo_vflag > 2) {
-			ND_PRINT(" authtype:0x%x", GET_BE_U_2(np->authtype));
-			ND_PRINT(" authlen:%u", GET_BE_U_2(np->authlength));
+			ND_PRINT(C_RESET, " authtype:0x%x", GET_BE_U_2(np->authtype));
+			ND_PRINT(C_RESET, " authlen:%u", GET_BE_U_2(np->authlength));
 		}
 		/*(*/
-		ND_PRINT(")");
+		ND_PRINT(C_RESET, ")");
 	}
 
 	/* per-opcode content */
@@ -345,24 +345,24 @@ lwres_print(netdissect_options *ndo,
 
 			/* BIND910: not used */
 			if (ndo->ndo_vflag > 2) {
-				ND_PRINT(" flags:0x%x",
+				ND_PRINT(C_RESET, " flags:0x%x",
 				    GET_BE_U_4(gabn->flags));
 			}
 
 			v = GET_BE_U_4(gabn->addrtypes);
 			switch (v & (LWRES_ADDRTYPE_V4 | LWRES_ADDRTYPE_V6)) {
 			case LWRES_ADDRTYPE_V4:
-				ND_PRINT(" IPv4");
+				ND_PRINT(C_RESET, " IPv4");
 				break;
 			case LWRES_ADDRTYPE_V6:
-				ND_PRINT(" IPv6");
+				ND_PRINT(C_RESET, " IPv6");
 				break;
 			case LWRES_ADDRTYPE_V4 | LWRES_ADDRTYPE_V6:
-				ND_PRINT(" IPv4/6");
+				ND_PRINT(C_RESET, " IPv4/6");
 				break;
 			}
 			if (v & ~(LWRES_ADDRTYPE_V4 | LWRES_ADDRTYPE_V6))
-				ND_PRINT("[0x%x]", v);
+				ND_PRINT(C_RESET, "[0x%x]", v);
 
 			s = p + LWRES_GABNREQUEST_LEN;
 			l = GET_BE_U_2(gabn->namelen);
@@ -375,7 +375,7 @@ lwres_print(netdissect_options *ndo,
 
 			/* BIND910: not used */
 			if (ndo->ndo_vflag > 2) {
-				ND_PRINT(" flags:0x%x",
+				ND_PRINT(C_RESET, " flags:0x%x",
 				    GET_BE_U_4(gnba->flags));
 			}
 
@@ -392,14 +392,14 @@ lwres_print(netdissect_options *ndo,
 
 			/* BIND910: not used */
 			if (ndo->ndo_vflag > 2) {
-				ND_PRINT(" flags:0x%x",
+				ND_PRINT(C_RESET, " flags:0x%x",
 				    GET_BE_U_4(grbn->flags));
 			}
 
-			ND_PRINT(" %s", tok2str(ns_type2str, "Type%u",
+			ND_PRINT(C_RESET, " %s", tok2str(ns_type2str, "Type%u",
 			    GET_BE_U_2(grbn->rdtype)));
 			if (GET_BE_U_2(grbn->rdclass) != C_IN) {
-				ND_PRINT(" %s", tok2str(ns_class2str, "Class%u",
+				ND_PRINT(C_RESET, " %s", tok2str(ns_class2str, "Class%u",
 				    GET_BE_U_2(grbn->rdclass)));
 			}
 
@@ -438,11 +438,11 @@ lwres_print(netdissect_options *ndo,
 
 			/* BIND910: not used */
 			if (ndo->ndo_vflag > 2) {
-				ND_PRINT(" flags:0x%x",
+				ND_PRINT(C_RESET, " flags:0x%x",
 				    GET_BE_U_4(gabn->flags));
 			}
 
-			ND_PRINT(" %u/%u", GET_BE_U_2(gabn->naliases),
+			ND_PRINT(C_RESET, " %u/%u", GET_BE_U_2(gabn->naliases),
 				  GET_BE_U_2(gabn->naddrs));
 
 			s = p + LWRES_GABNRESPONSE_LEN;
@@ -472,11 +472,11 @@ lwres_print(netdissect_options *ndo,
 
 			/* BIND910: not used */
 			if (ndo->ndo_vflag > 2) {
-				ND_PRINT(" flags:0x%x",
+				ND_PRINT(C_RESET, " flags:0x%x",
 				    GET_BE_U_4(gnba->flags));
 			}
 
-			ND_PRINT(" %u", GET_BE_U_2(gnba->naliases));
+			ND_PRINT(C_RESET, " %u", GET_BE_U_2(gnba->naliases));
 
 			s = p + LWRES_GNBARESPONSE_LEN;
 			l = GET_BE_U_2(gnba->realnamelen);
@@ -497,20 +497,20 @@ lwres_print(netdissect_options *ndo,
 
 			/* BIND910: not used */
 			if (ndo->ndo_vflag > 2) {
-				ND_PRINT(" flags:0x%x",
+				ND_PRINT(C_RESET, " flags:0x%x",
 				    GET_BE_U_4(grbn->flags));
 			}
 
-			ND_PRINT(" %s", tok2str(ns_type2str, "Type%u",
+			ND_PRINT(C_RESET, " %s", tok2str(ns_type2str, "Type%u",
 			    GET_BE_U_2(grbn->rdtype)));
 			if (GET_BE_U_2(grbn->rdclass) != C_IN) {
-				ND_PRINT(" %s", tok2str(ns_class2str, "Class%u",
+				ND_PRINT(C_RESET, " %s", tok2str(ns_class2str, "Class%u",
 				    GET_BE_U_2(grbn->rdclass)));
 			}
-			ND_PRINT(" TTL ");
+			ND_PRINT(C_RESET, " TTL ");
 			unsigned_relts_print(ndo,
 					     GET_BE_U_4(grbn->ttl));
-			ND_PRINT(" %u/%u", GET_BE_U_2(grbn->nrdatas),
+			ND_PRINT(C_RESET, " %u/%u", GET_BE_U_2(grbn->nrdatas),
 				  GET_BE_U_2(grbn->nsigs));
 
 			s = p + LWRES_GRBNRESPONSE_LEN;
@@ -543,11 +543,11 @@ lwres_print(netdissect_options *ndo,
   tail:
 	/* length mismatch */
 	if (GET_BE_U_4(np->length) != length) {
-		ND_PRINT(" [len: %u != %u]", GET_BE_U_4(np->length),
+		ND_PRINT(C_RESET, " [len: %u != %u]", GET_BE_U_4(np->length),
 			  length);
 	}
 	if (!unsupported && ND_BYTES_BETWEEN(s, bp) < GET_BE_U_4(np->length))
-		ND_PRINT("[extra]");
+		ND_PRINT(C_RESET, "[extra]");
 	return;
 
   invalid:

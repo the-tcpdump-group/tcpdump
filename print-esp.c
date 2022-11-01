@@ -757,9 +757,9 @@ esp_print(netdissect_options *ndo,
 		nd_print_trunc(ndo);
 		return;
 	}
-	ND_PRINT("ESP(spi=0x%08x", GET_BE_U_4(esp->esp_spi));
-	ND_PRINT(",seq=0x%x)", GET_BE_U_4(esp->esp_seq));
-	ND_PRINT(", length %u", length);
+	ND_PRINT(C_RESET, "ESP(spi=0x%08x", GET_BE_U_4(esp->esp_spi));
+	ND_PRINT(C_RESET, ",seq=0x%x)", GET_BE_U_4(esp->esp_seq));
+	ND_PRINT(C_RESET, ", length %u", length);
 
 #ifdef HAVE_LIBCRYPTO
 	/* initialize SAs */
@@ -902,7 +902,7 @@ esp_print(netdissect_options *ndo,
 	/* Get the next header */
 	nh = GET_U_1(pt + payloadlen - 1);
 
-	ND_PRINT(": ");
+	ND_PRINT(C_RESET, ": ");
 
 	/*
 	 * Don't put padding + padding length(1 byte) + next header(1 byte)

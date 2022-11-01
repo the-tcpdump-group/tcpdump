@@ -190,14 +190,14 @@ lwapp_control_print(netdissect_options *ndo,
      * Sanity checking of the header.
      */
     if (LWAPP_EXTRACT_VERSION(version) != LWAPP_VERSION) {
-	ND_PRINT("LWAPP version %u packet not supported",
+	ND_PRINT(C_RESET, "LWAPP version %u packet not supported",
                LWAPP_EXTRACT_VERSION(version));
 	return;
     }
 
     /* non-verbose */
     if (ndo->ndo_vflag < 1) {
-        ND_PRINT("LWAPPv%u, %s frame, Flags [%s], length %u",
+        ND_PRINT(C_RESET, "LWAPPv%u, %s frame, Flags [%s], length %u",
                LWAPP_EXTRACT_VERSION(version),
                LWAPP_EXTRACT_CONTROL_BIT(version) ? "Control" : "Data",
                bittok2str(lwapp_header_bits_values,"none",version&0x07),
@@ -208,7 +208,7 @@ lwapp_control_print(netdissect_options *ndo,
     /* ok they seem to want to know everything - lets fully decode it */
     tlen=GET_BE_U_2(lwapp_trans_header->length);
 
-    ND_PRINT("LWAPPv%u, %s frame, Radio-id %u, Flags [%s], Frag-id %u, length %u",
+    ND_PRINT(C_RESET, "LWAPPv%u, %s frame, Radio-id %u, Flags [%s], Frag-id %u, length %u",
            LWAPP_EXTRACT_VERSION(version),
            LWAPP_EXTRACT_CONTROL_BIT(version) ? "Control" : "Data",
            LWAPP_EXTRACT_RID(version),
@@ -217,7 +217,7 @@ lwapp_control_print(netdissect_options *ndo,
 	   tlen);
 
     if (has_ap_ident) {
-        ND_PRINT("\n\tAP identity: %s", GET_ETHERADDR_STRING(tptr));
+        ND_PRINT(C_RESET, "\n\tAP identity: %s", GET_ETHERADDR_STRING(tptr));
         tptr+=sizeof(struct lwapp_transport_header)+6;
     } else {
         tptr+=sizeof(struct lwapp_transport_header);
@@ -228,20 +228,20 @@ lwapp_control_print(netdissect_options *ndo,
         /* did we capture enough for fully decoding the object header ? */
         ND_TCHECK_LEN(tptr, sizeof(struct lwapp_control_header));
         if (tlen < sizeof(struct lwapp_control_header)) {
-            ND_PRINT("\n\t  Msg goes past end of PDU");
+            ND_PRINT(C_RESET, "\n\t  Msg goes past end of PDU");
             break;
         }
 
         lwapp_control_header = (const struct lwapp_control_header *)tptr;
 	msg_tlen = GET_BE_U_2(lwapp_control_header->len);
         if (tlen < sizeof(struct lwapp_control_header) + msg_tlen) {
-            ND_PRINT("\n\t  Msg goes past end of PDU");
+            ND_PRINT(C_RESET, "\n\t  Msg goes past end of PDU");
             break;
         }
 
 	/* print message header */
 	msg_type = GET_U_1(lwapp_control_header->msg_type);
-        ND_PRINT("\n\t  Msg type: %s (%u), Seqnum: %u, Msg len: %u, Session: 0x%08x",
+        ND_PRINT(C_RESET, "\n\t  Msg type: %s (%u), Seqnum: %u, Msg len: %u, Session: 0x%08x",
                tok2str(lwapp_msg_type_values,"Unknown",msg_type),
                msg_type,
                GET_U_1(lwapp_control_header->seq_num),
@@ -319,14 +319,14 @@ lwapp_data_print(netdissect_options *ndo,
      * Sanity checking of the header.
      */
     if (LWAPP_EXTRACT_VERSION(version) != LWAPP_VERSION) {
-        ND_PRINT("LWAPP version %u packet not supported",
+        ND_PRINT(C_RESET, "LWAPP version %u packet not supported",
                LWAPP_EXTRACT_VERSION(version));
         return;
     }
 
     /* non-verbose */
     if (ndo->ndo_vflag < 1) {
-        ND_PRINT("LWAPPv%u, %s frame, Flags [%s], length %u",
+        ND_PRINT(C_RESET, "LWAPPv%u, %s frame, Flags [%s], length %u",
                LWAPP_EXTRACT_VERSION(version),
                LWAPP_EXTRACT_CONTROL_BIT(version) ? "Control" : "Data",
                bittok2str(lwapp_header_bits_values,"none",version&0x07),
@@ -337,7 +337,7 @@ lwapp_data_print(netdissect_options *ndo,
     /* ok they seem to want to know everything - lets fully decode it */
     tlen=GET_BE_U_2(lwapp_trans_header->length);
     if (tlen < sizeof(struct lwapp_transport_header)) {
-        ND_PRINT("LWAPPv%u, %s frame, Radio-id  %u, Flags [%s], length %u < transport header length",
+        ND_PRINT(C_RESET, "LWAPPv%u, %s frame, Radio-id  %u, Flags [%s], length %u < transport header length",
                LWAPP_EXTRACT_VERSION(version),
                LWAPP_EXTRACT_CONTROL_BIT(version) ? "Control" : "Data",
                LWAPP_EXTRACT_RID(version),
@@ -346,7 +346,7 @@ lwapp_data_print(netdissect_options *ndo,
         return;
     }
 
-    ND_PRINT("LWAPPv%u, %s frame, Radio-id  %u, Flags [%s], Frag-id  %u, length %u",
+    ND_PRINT(C_RESET, "LWAPPv%u, %s frame, Radio-id  %u, Flags [%s], Frag-id  %u, length %u",
            LWAPP_EXTRACT_VERSION(version),
            LWAPP_EXTRACT_CONTROL_BIT(version) ? "Control" : "Data",
            LWAPP_EXTRACT_RID(version),

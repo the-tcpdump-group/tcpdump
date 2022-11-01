@@ -226,12 +226,12 @@ cfm_network_addr_print(netdissect_options *ndo,
      * is only one octet.
      */
     if (length < 1) {
-        ND_PRINT("\n\t  Network Address Type (invalid, no data");
+        ND_PRINT(C_RESET, C_RESET "\n\t  Network Address Type (invalid, no data");
         return hexdump;
     }
     /* The calling function must make any due ND_TCHECK calls. */
     network_addr_type = GET_U_1(tptr);
-    ND_PRINT("\n\t  Network Address Type %s (%u)",
+    ND_PRINT(C_RESET, C_RESET "\n\t  Network Address Type %s (%u)",
            tok2str(af_values, "Unknown", network_addr_type),
            network_addr_type);
 
@@ -241,20 +241,20 @@ cfm_network_addr_print(netdissect_options *ndo,
     switch(network_addr_type) {
     case AFNUM_INET:
         if (length != 1 + 4) {
-            ND_PRINT("(invalid IPv4 address length %u)", length - 1);
+            ND_PRINT(C_RESET, C_RESET "(invalid IPv4 address length %u)", length - 1);
             hexdump = TRUE;
             break;
         }
-        ND_PRINT(", %s", GET_IPADDR_STRING(tptr + 1));
+        ND_PRINT(C_RESET, C_RESET ", %s", GET_IPADDR_STRING(tptr + 1));
         break;
 
     case AFNUM_INET6:
         if (length != 1 + 16) {
-            ND_PRINT("(invalid IPv6 address length %u)", length - 1);
+            ND_PRINT(C_RESET, C_RESET "(invalid IPv6 address length %u)", length - 1);
             hexdump = TRUE;
             break;
         }
-        ND_PRINT(", %s", GET_IP6ADDR_STRING(tptr + 1));
+        ND_PRINT(C_RESET, C_RESET ", %s", GET_IP6ADDR_STRING(tptr + 1));
         break;
 
     default:
@@ -301,13 +301,13 @@ cfm_print(netdissect_options *ndo,
      */
     mdlevel_version = GET_U_1(cfm_common_header->mdlevel_version);
     if (CFM_EXTRACT_VERSION(mdlevel_version) != CFM_VERSION) {
-	ND_PRINT("CFMv%u not supported, length %u",
+	ND_PRINT(C_RESET, C_RESET "CFMv%u not supported, length %u",
                CFM_EXTRACT_VERSION(mdlevel_version), length);
 	return;
     }
 
     opcode = GET_U_1(cfm_common_header->opcode);
-    ND_PRINT("CFMv%u %s, MD Level %u, length %u",
+    ND_PRINT(C_RESET, C_RESET "CFMv%u %s, MD Level %u, length %u",
            CFM_EXTRACT_VERSION(mdlevel_version),
            tok2str(cfm_opcode_values, "unknown (%u)", opcode),
            CFM_EXTRACT_MD_LEVEL(mdlevel_version),
@@ -322,7 +322,7 @@ cfm_print(netdissect_options *ndo,
 
     flags = GET_U_1(cfm_common_header->flags);
     first_tlv_offset = GET_U_1(cfm_common_header->first_tlv_offset);
-    ND_PRINT("\n\tFirst TLV offset %u", first_tlv_offset);
+    ND_PRINT(C_RESET, C_RESET "\n\tFirst TLV offset %u", first_tlv_offset);
 
     tptr += sizeof(struct cfm_common_header_t);
     tlen = length - sizeof(struct cfm_common_header_t);
@@ -331,7 +331,7 @@ cfm_print(netdissect_options *ndo,
      * Sanity check the first TLV offset.
      */
     if (first_tlv_offset > tlen) {
-        ND_PRINT(" (too large, must be <= %u)", tlen);
+        ND_PRINT(C_RESET, C_RESET " (too large, must be <= %u)", tlen);
         return;
     }
 
@@ -339,7 +339,7 @@ cfm_print(netdissect_options *ndo,
     case CFM_OPCODE_CCM:
         msg_ptr.cfm_ccm = (const struct cfm_ccm_t *)tptr;
         if (first_tlv_offset < sizeof(*msg_ptr.cfm_ccm)) {
-            ND_PRINT(" (too small 1, must be >= %zu)",
+            ND_PRINT(C_RESET, C_RESET " (too small 1, must be >= %zu)",
                      sizeof(*msg_ptr.cfm_ccm));
             return;
         }
@@ -348,7 +348,7 @@ cfm_print(netdissect_options *ndo,
         ND_TCHECK_SIZE(msg_ptr.cfm_ccm);
 
         ccm_interval = CFM_EXTRACT_CCM_INTERVAL(flags);
-        ND_PRINT(", Flags [CCM Interval %u%s]",
+        ND_PRINT(C_RESET, C_RESET ", Flags [CCM Interval %u%s]",
                ccm_interval,
                flags & CFM_CCM_RDI_FLAG ?
                ", RDI" : "");
@@ -357,14 +357,14 @@ cfm_print(netdissect_options *ndo,
          * Resolve the CCM interval field.
          */
         if (ccm_interval) {
-            ND_PRINT("\n\t  CCM Interval %.3fs"
+            ND_PRINT(C_RESET, C_RESET "\n\t  CCM Interval %.3fs"
                    ", min CCM Lifetime %.3fs, max CCM Lifetime %.3fs",
                    ccm_interval_base[ccm_interval],
                    ccm_interval_base[ccm_interval] * CCM_INTERVAL_MIN_MULTIPLIER,
                    ccm_interval_base[ccm_interval] * CCM_INTERVAL_MAX_MULTIPLIER);
         }
 
-        ND_PRINT("\n\t  Sequence Number 0x%08x, MA-End-Point-ID 0x%04x",
+        ND_PRINT(C_RESET, C_RESET "\n\t  Sequence Number 0x%08x, MA-End-Point-ID 0x%04x",
                GET_BE_U_4(msg_ptr.cfm_ccm->sequence),
                GET_BE_U_2(msg_ptr.cfm_ccm->ma_epi));
 
@@ -381,7 +381,7 @@ cfm_print(netdissect_options *ndo,
             md_namelength = GET_U_1(namesp);
             namesp++;
             names_data_remaining--; /* We know this is !=0 */
-            ND_PRINT("\n\t  MD Name Format %s (%u), MD Name length %u",
+            ND_PRINT(C_RESET, C_RESET "\n\t  MD Name Format %s (%u), MD Name length %u",
                    tok2str(cfm_md_nameformat_values, "Unknown",
                            md_nameformat),
                    md_nameformat,
@@ -392,12 +392,12 @@ cfm_print(netdissect_options *ndo,
              * of MA short name.
              */
             if (md_namelength > names_data_remaining - 3) {
-                ND_PRINT(" (too large, must be <= %u)", names_data_remaining - 2);
+                ND_PRINT(C_RESET, C_RESET " (too large, must be <= %u)", names_data_remaining - 2);
                 return;
             }
 
             md_name = namesp;
-            ND_PRINT("\n\t  MD Name: ");
+            ND_PRINT(C_RESET, C_RESET "\n\t  MD Name: ");
             switch (md_nameformat) {
             case CFM_CCM_MD_FORMAT_DNS:
             case CFM_CCM_MD_FORMAT_CHAR:
@@ -406,9 +406,9 @@ cfm_print(netdissect_options *ndo,
 
             case CFM_CCM_MD_FORMAT_MAC:
                 if (md_namelength == MAC_ADDR_LEN) {
-                    ND_PRINT("\n\t  MAC %s", GET_ETHERADDR_STRING(md_name));
+                    ND_PRINT(C_RESET, C_RESET "\n\t  MAC %s", GET_ETHERADDR_STRING(md_name));
                 } else {
-                    ND_PRINT("\n\t  MAC (length invalid)");
+                    ND_PRINT(C_RESET, C_RESET "\n\t  MAC (length invalid)");
                 }
                 break;
 
@@ -421,7 +421,7 @@ cfm_print(netdissect_options *ndo,
             namesp += md_namelength;
             names_data_remaining -= md_namelength;
         } else {
-            ND_PRINT("\n\t  MD Name Format %s (%u)",
+            ND_PRINT(C_RESET, C_RESET "\n\t  MD Name Format %s (%u)",
                    tok2str(cfm_md_nameformat_values, "Unknown",
                            md_nameformat),
                    md_nameformat);
@@ -437,19 +437,19 @@ cfm_print(netdissect_options *ndo,
         ma_namelength = GET_U_1(namesp);
         namesp++;
         names_data_remaining--; /* We know this is != 0 */
-        ND_PRINT("\n\t  MA Name-Format %s (%u), MA name length %u",
+        ND_PRINT(C_RESET, C_RESET "\n\t  MA Name-Format %s (%u), MA name length %u",
                tok2str(cfm_ma_nameformat_values, "Unknown",
                        ma_nameformat),
                ma_nameformat,
                ma_namelength);
 
         if (ma_namelength > names_data_remaining) {
-            ND_PRINT(" (too large, must be <= %u)", names_data_remaining);
+            ND_PRINT(C_RESET, C_RESET " (too large, must be <= %u)", names_data_remaining);
             return;
         }
 
         ma_name = namesp;
-        ND_PRINT("\n\t  MA Name: ");
+        ND_PRINT(C_RESET, C_RESET "\n\t  MA Name: ");
         switch (ma_nameformat) {
         case CFM_CCM_MA_FORMAT_CHAR:
             nd_printjnp(ndo, ma_name, ma_namelength);
@@ -468,7 +468,7 @@ cfm_print(netdissect_options *ndo,
     case CFM_OPCODE_LTM:
         msg_ptr.cfm_ltm = (const struct cfm_ltm_t *)tptr;
         if (first_tlv_offset < sizeof(*msg_ptr.cfm_ltm)) {
-            ND_PRINT(" (too small 4, must be >= %zu)",
+            ND_PRINT(C_RESET, C_RESET " (too small 4, must be >= %zu)",
                      sizeof(*msg_ptr.cfm_ltm));
             return;
         }
@@ -476,14 +476,14 @@ cfm_print(netdissect_options *ndo,
             goto tooshort;
         ND_TCHECK_SIZE(msg_ptr.cfm_ltm);
 
-        ND_PRINT(", Flags [%s]",
+        ND_PRINT(C_RESET, C_RESET ", Flags [%s]",
                bittok2str(cfm_ltm_flag_values, "none", flags));
 
-        ND_PRINT("\n\t  Transaction-ID 0x%08x, ttl %u",
+        ND_PRINT(C_RESET, C_RESET "\n\t  Transaction-ID 0x%08x, ttl %u",
                GET_BE_U_4(msg_ptr.cfm_ltm->transaction_id),
                GET_U_1(msg_ptr.cfm_ltm->ttl));
 
-        ND_PRINT("\n\t  Original-MAC %s, Target-MAC %s",
+        ND_PRINT(C_RESET, C_RESET "\n\t  Original-MAC %s, Target-MAC %s",
                GET_ETHERADDR_STRING(msg_ptr.cfm_ltm->original_mac),
                GET_ETHERADDR_STRING(msg_ptr.cfm_ltm->target_mac));
         break;
@@ -491,7 +491,7 @@ cfm_print(netdissect_options *ndo,
     case CFM_OPCODE_LTR:
         msg_ptr.cfm_ltr = (const struct cfm_ltr_t *)tptr;
         if (first_tlv_offset < sizeof(*msg_ptr.cfm_ltr)) {
-            ND_PRINT(" (too small 5, must be >= %zu)",
+            ND_PRINT(C_RESET, C_RESET " (too small 5, must be >= %zu)",
                      sizeof(*msg_ptr.cfm_ltr));
             return;
         }
@@ -499,14 +499,14 @@ cfm_print(netdissect_options *ndo,
             goto tooshort;
         ND_TCHECK_SIZE(msg_ptr.cfm_ltr);
 
-        ND_PRINT(", Flags [%s]",
+        ND_PRINT(C_RESET, C_RESET ", Flags [%s]",
                bittok2str(cfm_ltr_flag_values, "none", flags));
 
-        ND_PRINT("\n\t  Transaction-ID 0x%08x, ttl %u",
+        ND_PRINT(C_RESET, C_RESET "\n\t  Transaction-ID 0x%08x, ttl %u",
                GET_BE_U_4(msg_ptr.cfm_ltr->transaction_id),
                GET_U_1(msg_ptr.cfm_ltr->ttl));
 
-        ND_PRINT("\n\t  Replay-Action %s (%u)",
+        ND_PRINT(C_RESET, C_RESET "\n\t  Replay-Action %s (%u)",
                tok2str(cfm_ltr_replay_action_values,
                        "Unknown",
                        GET_U_1(msg_ptr.cfm_ltr->replay_action)),
@@ -534,7 +534,7 @@ cfm_print(netdissect_options *ndo,
         /* Enough to read the tlv type ? */
         cfm_tlv_type = GET_U_1(cfm_tlv_header->type);
 
-        ND_PRINT("\n\t%s TLV (0x%02x)",
+        ND_PRINT(C_RESET, C_RESET "\n\t%s TLV (0x%02x)",
                tok2str(cfm_tlv_values, "Unknown", cfm_tlv_type),
                cfm_tlv_type);
 
@@ -549,7 +549,7 @@ cfm_print(netdissect_options *ndo,
         ND_TCHECK_LEN(tptr, sizeof(struct cfm_tlv_header_t));
         cfm_tlv_len=GET_BE_U_2(cfm_tlv_header->length);
 
-        ND_PRINT(", length %u", cfm_tlv_len);
+        ND_PRINT(C_RESET, C_RESET ", length %u", cfm_tlv_len);
 
         tptr += sizeof(struct cfm_tlv_header_t);
         tlen -= sizeof(struct cfm_tlv_header_t);
@@ -564,30 +564,30 @@ cfm_print(netdissect_options *ndo,
         switch(cfm_tlv_type) {
         case CFM_TLV_PORT_STATUS:
             if (cfm_tlv_len < 1) {
-                ND_PRINT(" (too short, must be >= 1)");
+                ND_PRINT(C_RESET, C_RESET " (too short, must be >= 1)");
                 return;
             }
-            ND_PRINT(", Status: %s (%u)",
+            ND_PRINT(C_RESET, C_RESET ", Status: %s (%u)",
                    tok2str(cfm_tlv_port_status_values, "Unknown", GET_U_1(tptr)),
                    GET_U_1(tptr));
             break;
 
         case CFM_TLV_INTERFACE_STATUS:
             if (cfm_tlv_len < 1) {
-                ND_PRINT(" (too short, must be >= 1)");
+                ND_PRINT(C_RESET, C_RESET " (too short, must be >= 1)");
                 return;
             }
-            ND_PRINT(", Status: %s (%u)",
+            ND_PRINT(C_RESET, C_RESET ", Status: %s (%u)",
                    tok2str(cfm_tlv_interface_status_values, "Unknown", GET_U_1(tptr)),
                    GET_U_1(tptr));
             break;
 
         case CFM_TLV_PRIVATE:
             if (cfm_tlv_len < 4) {
-                ND_PRINT(" (too short, must be >= 4)");
+                ND_PRINT(C_RESET, C_RESET " (too short, must be >= 4)");
                 return;
             }
-            ND_PRINT(", Vendor: %s (%u), Sub-Type %u",
+            ND_PRINT(C_RESET, C_RESET ", Vendor: %s (%u), Sub-Type %u",
                    tok2str(oui_values,"Unknown", GET_BE_U_3(tptr)),
                    GET_BE_U_3(tptr),
                    GET_U_1(tptr + 3));
@@ -600,7 +600,7 @@ cfm_print(netdissect_options *ndo,
             u_int mgmt_addr_length;
 
             if (cfm_tlv_len < 1) {
-                ND_PRINT(" (too short, must be >= 1)");
+                ND_PRINT(C_RESET, C_RESET " (too short, must be >= 1)");
                 goto next_tlv;
             }
 
@@ -620,12 +620,12 @@ cfm_print(netdissect_options *ndo,
                  * IEEE 802.1AB-2016 Section 8.5.2.2: chassis ID subtype
                  */
                 if (cfm_tlv_len < 1) {
-                    ND_PRINT("\n\t  (TLV too short)");
+                    ND_PRINT(C_RESET, C_RESET "\n\t  (TLV too short)");
                     goto next_tlv;
                 }
                 chassis_id_type = GET_U_1(tptr);
                 cfm_tlv_len--;
-                ND_PRINT("\n\t  Chassis-ID Type %s (%u), Chassis-ID length %u",
+                ND_PRINT(C_RESET, C_RESET "\n\t  Chassis-ID Type %s (%u), Chassis-ID length %u",
                        tok2str(cfm_tlv_senderid_chassisid_values,
                                "Unknown",
                                chassis_id_type),
@@ -633,7 +633,7 @@ cfm_print(netdissect_options *ndo,
                        chassis_id_length);
 
                 if (cfm_tlv_len < chassis_id_length) {
-                    ND_PRINT("\n\t  (TLV too short)");
+                    ND_PRINT(C_RESET, C_RESET "\n\t  (TLV too short)");
                     goto next_tlv;
                 }
 
@@ -641,11 +641,11 @@ cfm_print(netdissect_options *ndo,
                 switch (chassis_id_type) {
                 case CFM_CHASSIS_ID_MAC_ADDRESS:
                     if (chassis_id_length != MAC_ADDR_LEN) {
-                        ND_PRINT(" (invalid MAC address length)");
+                        ND_PRINT(C_RESET, C_RESET " (invalid MAC address length)");
                         hexdump = TRUE;
                         break;
                     }
-                    ND_PRINT("\n\t  MAC %s", GET_ETHERADDR_STRING(tptr + 1));
+                    ND_PRINT(C_RESET, C_RESET "\n\t  MAC %s", GET_ETHERADDR_STRING(tptr + 1));
                     break;
 
                 case CFM_CHASSIS_ID_NETWORK_ADDRESS:
@@ -686,11 +686,11 @@ cfm_print(netdissect_options *ndo,
             tptr++;
             tlen--;
             cfm_tlv_len--;
-            ND_PRINT("\n\t  Management Address Domain Length %u", mgmt_addr_length);
+            ND_PRINT(C_RESET, C_RESET "\n\t  Management Address Domain Length %u", mgmt_addr_length);
             if (mgmt_addr_length) {
                 /* IEEE 802.1Q-2014 Section 21.5.3.5: Management Address Domain */
                 if (cfm_tlv_len < mgmt_addr_length) {
-                    ND_PRINT("\n\t  (TLV too short)");
+                    ND_PRINT(C_RESET, C_RESET "\n\t  (TLV too short)");
                     goto next_tlv;
                 }
                 cfm_tlv_len -= mgmt_addr_length;
@@ -706,7 +706,7 @@ cfm_print(netdissect_options *ndo,
                  * This field is present if Management Address Domain Length is not 0.
                  */
                 if (cfm_tlv_len < 1) {
-                    ND_PRINT(" (Management Address Length is missing)");
+                    ND_PRINT(C_RESET, C_RESET " (Management Address Length is missing)");
                     hexdump = TRUE;
                     break;
                 }
@@ -716,11 +716,11 @@ cfm_print(netdissect_options *ndo,
                 tptr++;
                 tlen--;
                 cfm_tlv_len--;
-                ND_PRINT("\n\t  Management Address Length %u", mgmt_addr_length);
+                ND_PRINT(C_RESET, C_RESET "\n\t  Management Address Length %u", mgmt_addr_length);
                 if (mgmt_addr_length) {
                     /* IEEE 802.1Q-2014 Section 21.5.3.7: Management Address */
                     if (cfm_tlv_len < mgmt_addr_length) {
-                        ND_PRINT("\n\t  (TLV too short)");
+                        ND_PRINT(C_RESET, C_RESET "\n\t  (TLV too short)");
                         return;
                     }
                     cfm_tlv_len -= mgmt_addr_length;
@@ -758,7 +758,7 @@ next_tlv:
     return;
 
 tooshort:
-    ND_PRINT("\n\t\t packet is too short");
+    ND_PRINT(C_RESET, C_RESET "\n\t\t packet is too short");
     return;
 
 trunc:

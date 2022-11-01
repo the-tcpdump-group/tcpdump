@@ -112,10 +112,10 @@ token_hdr_print(netdissect_options *ndo,
 	dstname = etheraddr_string(ndo, fdst);
 
 	if (!ndo->ndo_qflag)
-		ND_PRINT("%02x %02x ",
+		ND_PRINT(C_RESET, C_RESET "%02x %02x ",
 		       GET_U_1(trp->token_ac),
 		       GET_U_1(trp->token_fc));
-	ND_PRINT("%s > %s, length %u: ",
+	ND_PRINT(C_RESET, C_RESET "%s > %s, length %u: ",
 	       srcname, dstname,
 	       length);
 }
@@ -184,20 +184,20 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 			return hdr_len;
 		}
 		if (ndo->ndo_vflag) {
-			ND_PRINT("%s ", broadcast_indicator[BROADCAST(trp)]);
-			ND_PRINT("%s", direction[DIRECTION(trp)]);
+			ND_PRINT(C_RESET, C_RESET "%s ", broadcast_indicator[BROADCAST(trp)]);
+			ND_PRINT(C_RESET, C_RESET "%s", direction[DIRECTION(trp)]);
 
 			for (seg = 0; seg < SEGMENT_COUNT(trp); seg++)
-				ND_PRINT(" [%u:%u]", RING_NUMBER(trp, seg),
+				ND_PRINT(C_RESET, C_RESET " [%u:%u]", RING_NUMBER(trp, seg),
 				    BRIDGE_NUMBER(trp, seg));
 		} else {
-			ND_PRINT("rt = %x", GET_BE_U_2(trp->token_rcf));
+			ND_PRINT(C_RESET, C_RESET "rt = %x", GET_BE_U_2(trp->token_rcf));
 
 			for (seg = 0; seg < SEGMENT_COUNT(trp); seg++)
-				ND_PRINT(":%x",
+				ND_PRINT(C_RESET, C_RESET ":%x",
 					 GET_BE_U_2(trp->token_rseg[seg]));
 		}
-		ND_PRINT(" (%s) ", largest_frame[LARGEST_FRAME(trp)]);
+		ND_PRINT(C_RESET, C_RESET " (%s) ", largest_frame[LARGEST_FRAME(trp)]);
 	} else {
 		if (ndo->ndo_eflag)
 			token_hdr_print(ndo, trp, length, srcmac, dstmac);

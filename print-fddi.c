@@ -164,62 +164,62 @@ print_fddi_fc(netdissect_options *ndo, u_char fc)
 	switch (fc) {
 
 	case FDDIFC_VOID:                         /* Void frame */
-		ND_PRINT("void ");
+		ND_PRINT(C_RESET, "void ");
 		break;
 
 	case FDDIFC_NRT:                          /* Nonrestricted token */
-		ND_PRINT("nrt ");
+		ND_PRINT(C_RESET, "nrt ");
 		break;
 
 	case FDDIFC_RT:                           /* Restricted token */
-		ND_PRINT("rt ");
+		ND_PRINT(C_RESET, "rt ");
 		break;
 
 	case FDDIFC_SMT_INFO:                     /* SMT Info */
-		ND_PRINT("info ");
+		ND_PRINT(C_RESET, "info ");
 		break;
 
 	case FDDIFC_SMT_NSA:                      /* SMT Next station adrs */
-		ND_PRINT("nsa ");
+		ND_PRINT(C_RESET, "nsa ");
 		break;
 
 	case FDDIFC_MAC_BEACON:                   /* MAC Beacon frame */
-		ND_PRINT("beacon ");
+		ND_PRINT(C_RESET, "beacon ");
 		break;
 
 	case FDDIFC_MAC_CLAIM:                    /* MAC Claim frame */
-		ND_PRINT("claim ");
+		ND_PRINT(C_RESET, "claim ");
 		break;
 
 	default:
 		switch (fc & FDDIFC_CLFF) {
 
 		case FDDIFC_MAC:
-			ND_PRINT("mac%1x ", fc & FDDIFC_ZZZZ);
+			ND_PRINT(C_RESET, "mac%1x ", fc & FDDIFC_ZZZZ);
 			break;
 
 		case FDDIFC_SMT:
-			ND_PRINT("smt%1x ", fc & FDDIFC_ZZZZ);
+			ND_PRINT(C_RESET, "smt%1x ", fc & FDDIFC_ZZZZ);
 			break;
 
 		case FDDIFC_LLC_ASYNC:
-			ND_PRINT("async%1x ", fc & FDDIFC_ZZZZ);
+			ND_PRINT(C_RESET, "async%1x ", fc & FDDIFC_ZZZZ);
 			break;
 
 		case FDDIFC_LLC_SYNC:
-			ND_PRINT("sync%1x ", fc & FDDIFC_ZZZZ);
+			ND_PRINT(C_RESET, "sync%1x ", fc & FDDIFC_ZZZZ);
 			break;
 
 		case FDDIFC_IMP_ASYNC:
-			ND_PRINT("imp_async%1x ", fc & FDDIFC_ZZZZ);
+			ND_PRINT(C_RESET, "imp_async%1x ", fc & FDDIFC_ZZZZ);
 			break;
 
 		case FDDIFC_IMP_SYNC:
-			ND_PRINT("imp_sync%1x ", fc & FDDIFC_ZZZZ);
+			ND_PRINT(C_RESET, "imp_sync%1x ", fc & FDDIFC_ZZZZ);
 			break;
 
 		default:
-			ND_PRINT("%02x ", fc);
+			ND_PRINT(C_RESET, "%02x ", fc);
 			break;
 		}
 	}
@@ -262,7 +262,7 @@ fddi_hdr_print(netdissect_options *ndo,
 
 	if (!ndo->ndo_qflag)
 		print_fddi_fc(ndo, GET_U_1(fddip->fddi_fc));
-	ND_PRINT("%s > %s, length %u: ",
+	ND_PRINT(C_RESET, "%s > %s, length %u: ",
 	       srcname, dstname,
 	       length);
 }
@@ -270,7 +270,7 @@ fddi_hdr_print(netdissect_options *ndo,
 static void
 fddi_smt_print(netdissect_options *ndo, const u_char *p _U_, u_int length _U_)
 {
-	ND_PRINT("<SMT printer not yet implemented>");
+	ND_PRINT(C_RESET, "<SMT printer not yet implemented>");
 }
 
 u_int

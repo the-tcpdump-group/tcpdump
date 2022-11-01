@@ -61,7 +61,7 @@ cip_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 		/*
 		 * There is no MAC-layer header, so just print the length.
 		 */
-		ND_PRINT("%u: ", length);
+		ND_PRINT(C_RESET, "%u: ", length);
 
 	ND_TCHECK_LEN(p, sizeof(rfcllc));
 	if (memcmp(rfcllc, p, sizeof(rfcllc)) == 0) {

@@ -81,13 +81,13 @@ pktap_header_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	hdrlen = GET_LE_U_4(hdr->pkt_len);
 	dltname = pcap_datalink_val_to_name(dlt);
 	if (!ndo->ndo_qflag) {
-		ND_PRINT("DLT %s (%u) len %u",
+		ND_PRINT(C_RESET, "DLT %s (%u) len %u",
 			  (dltname != NULL ? dltname : "UNKNOWN"), dlt, hdrlen);
         } else {
-		ND_PRINT("%s", (dltname != NULL ? dltname : "UNKNOWN"));
+		ND_PRINT(C_RESET, "%s", (dltname != NULL ? dltname : "UNKNOWN"));
         }
 
-	ND_PRINT(", length %u: ", length);
+	ND_PRINT(C_RESET, ", length %u: ", length);
 }
 
 /*
@@ -109,7 +109,7 @@ pktap_if_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "pktap";
 	if (length < sizeof(pktap_header_t)) {
-		ND_PRINT(" (packet too short, %u < %zu)",
+		ND_PRINT(C_RESET, " (packet too short, %u < %zu)",
 		         length, sizeof(pktap_header_t));
 		goto invalid;
 	}
@@ -124,12 +124,12 @@ pktap_if_print(netdissect_options *ndo,
 		 * is the length supplied so that the header can
 		 * be expanded in the future)?
 		 */
-		ND_PRINT(" (pkt_len too small, %u < %zu)",
+		ND_PRINT(C_RESET, " (pkt_len too small, %u < %zu)",
 		         hdrlen, sizeof(pktap_header_t));
 		goto invalid;
 	}
 	if (hdrlen > length) {
-		ND_PRINT(" (pkt_len too big, %u > %u)",
+		ND_PRINT(C_RESET, " (pkt_len too big, %u > %u)",
 		         hdrlen, length);
 		goto invalid;
 	}
@@ -146,7 +146,7 @@ pktap_if_print(netdissect_options *ndo,
 	switch (rectype) {
 
 	case PKT_REC_NONE:
-		ND_PRINT("no data");
+		ND_PRINT(C_RESET, "no data");
 		break;
 
 	case PKT_REC_PACKET:

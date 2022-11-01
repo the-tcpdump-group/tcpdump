@@ -535,14 +535,14 @@ lspping_print(netdissect_options *ndo,
      * Sanity checking of the header.
      */
     if (GET_BE_U_2(lspping_com_header->version) != LSPPING_VERSION) {
-	ND_PRINT("LSP-PING version %u packet not supported",
+	ND_PRINT(C_RESET, "LSP-PING version %u packet not supported",
                GET_BE_U_2(lspping_com_header->version));
 	return;
     }
 
     /* in non-verbose mode just lets print the basic Message Type*/
     if (ndo->ndo_vflag < 1) {
-        ND_PRINT("LSP-PINGv%u, %s, seq %u, length: %u",
+        ND_PRINT(C_RESET, "LSP-PINGv%u, %s, seq %u, length: %u",
                GET_BE_U_2(lspping_com_header->version),
                tok2str(lspping_msg_type_values, "unknown (%u)",GET_U_1(lspping_com_header->msg_type)),
                GET_BE_U_4(lspping_com_header->seq_number),
@@ -554,7 +554,7 @@ lspping_print(netdissect_options *ndo,
 
     tlen=len;
 
-    ND_PRINT("\n\tLSP-PINGv%u, msg-type: %s (%u), length: %u\n\t  reply-mode: %s (%u)",
+    ND_PRINT(C_RESET, "\n\tLSP-PINGv%u, msg-type: %s (%u), length: %u\n\t  reply-mode: %s (%u)",
            GET_BE_U_2(lspping_com_header->version),
            tok2str(lspping_msg_type_values, "unknown",GET_U_1(lspping_com_header->msg_type)),
            GET_U_1(lspping_com_header->msg_type),
@@ -574,32 +574,32 @@ lspping_print(netdissect_options *ndo,
         return_code == 10 ||
         return_code == 11 ||
         return_code == 12 )
-        ND_PRINT("\n\t  Return Code: %s %u (%u)\n\t  Return Subcode: (%u)",
+        ND_PRINT(C_RESET, "\n\t  Return Code: %s %u (%u)\n\t  Return Subcode: (%u)",
                tok2str(lspping_return_code_values, "unknown",return_code),
                return_subcode,
                return_code,
                return_subcode);
     else
-        ND_PRINT("\n\t  Return Code: %s (%u)\n\t  Return Subcode: (%u)",
+        ND_PRINT(C_RESET, "\n\t  Return Code: %s (%u)\n\t  Return Subcode: (%u)",
                tok2str(lspping_return_code_values, "unknown",return_code),
                return_code,
                return_subcode);
 
-    ND_PRINT("\n\t  Sender Handle: 0x%08x, Sequence: %u",
+    ND_PRINT(C_RESET, "\n\t  Sender Handle: 0x%08x, Sequence: %u",
            GET_BE_U_4(lspping_com_header->sender_handle),
            GET_BE_U_4(lspping_com_header->seq_number));
 
-    ND_PRINT("\n\t  Sender Timestamp: ");
+    ND_PRINT(C_RESET, "\n\t  Sender Timestamp: ");
     p_ntp_time(ndo, &lspping_com_header->ts_sent);
-    ND_PRINT(" ");
+    ND_PRINT(C_RESET, " ");
 
     int_part=GET_BE_U_4(lspping_com_header->ts_rcvd.int_part);
     fraction=GET_BE_U_4(lspping_com_header->ts_rcvd.fraction);
-    ND_PRINT("Receiver Timestamp: ");
+    ND_PRINT(C_RESET, "Receiver Timestamp: ");
     if (! (int_part == 0 && fraction == 0))
         p_ntp_time(ndo, &lspping_com_header->ts_rcvd);
     else
-        ND_PRINT("no timestamp");
+        ND_PRINT(C_RESET, "no timestamp");
 
     tptr+=sizeof(struct lspping_common_header);
     tlen-=sizeof(struct lspping_common_header);
@@ -613,7 +613,7 @@ lspping_print(netdissect_options *ndo,
         lspping_tlv_type=GET_BE_U_2(lspping_tlv_header->type);
         lspping_tlv_len=GET_BE_U_2(lspping_tlv_header->length);
 
-        ND_PRINT("\n\t  %s TLV (%u), length: %u",
+        ND_PRINT(C_RESET, "\n\t  %s TLV (%u), length: %u",
                tok2str(lspping_tlv_values,
                        "Unknown",
                        lspping_tlv_type),
@@ -642,7 +642,7 @@ lspping_print(netdissect_options *ndo,
             while (tlv_tlen != 0) {
                 /* Does the subTLV header go past the end of the TLV? */
                 if (tlv_tlen < sizeof(struct lspping_tlv_header)) {
-                    ND_PRINT("\n\t      TLV is too short");
+                    ND_PRINT(C_RESET, "\n\t      TLV is too short");
                     tlv_hexdump = TRUE;
                     goto tlv_tooshort;
                 }
@@ -655,7 +655,7 @@ lspping_print(netdissect_options *ndo,
 
                 /* Does the subTLV go past the end of the TLV? */
                 if (tlv_tlen < lspping_subtlv_len+sizeof(struct lspping_tlv_header)) {
-                    ND_PRINT("\n\t      TLV is too short");
+                    ND_PRINT(C_RESET, "\n\t      TLV is too short");
                     tlv_hexdump = TRUE;
                     goto tlv_tooshort;
                 }
@@ -663,7 +663,7 @@ lspping_print(netdissect_options *ndo,
                 /* Did we capture enough for fully decoding the subTLV? */
                 ND_TCHECK_LEN(subtlv_tptr, lspping_subtlv_len);
 
-                ND_PRINT("\n\t    %s subTLV (%u), length: %u",
+                ND_PRINT(C_RESET, "\n\t    %s subTLV (%u), length: %u",
                        tok2str(lspping_tlvtargetfec_subtlv_values,
                                "Unknown",
                                lspping_subtlv_type),
@@ -675,12 +675,12 @@ lspping_print(netdissect_options *ndo,
                 case LSPPING_TLV_TARGETFEC_SUBTLV_LDP_IPV4:
                     /* Is the subTLV length correct? */
                     if (lspping_subtlv_len != 5) {
-                        ND_PRINT("\n\t      invalid subTLV length, should be 5");
+                        ND_PRINT(C_RESET, "\n\t      invalid subTLV length, should be 5");
                         subtlv_hexdump=TRUE; /* unknown subTLV just hexdump it */
                     } else {
                         subtlv_ptr.lspping_tlv_targetfec_subtlv_ldp_ipv4 =
                             (const struct lspping_tlv_targetfec_subtlv_ldp_ipv4_t *)subtlv_tptr;
-                        ND_PRINT("\n\t      %s/%u",
+                        ND_PRINT(C_RESET, "\n\t      %s/%u",
                                GET_IPADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_ldp_ipv4->prefix),
                                GET_U_1(subtlv_ptr.lspping_tlv_targetfec_subtlv_ldp_ipv4->prefix_len));
                     }
@@ -689,12 +689,12 @@ lspping_print(netdissect_options *ndo,
                 case LSPPING_TLV_TARGETFEC_SUBTLV_LDP_IPV6:
                     /* Is the subTLV length correct? */
                     if (lspping_subtlv_len != 17) {
-                        ND_PRINT("\n\t      invalid subTLV length, should be 17");
+                        ND_PRINT(C_RESET, "\n\t      invalid subTLV length, should be 17");
                         subtlv_hexdump=TRUE; /* unknown subTLV just hexdump it */
                     } else {
                         subtlv_ptr.lspping_tlv_targetfec_subtlv_ldp_ipv6 =
                             (const struct lspping_tlv_targetfec_subtlv_ldp_ipv6_t *)subtlv_tptr;
-                        ND_PRINT("\n\t      %s/%u",
+                        ND_PRINT(C_RESET, "\n\t      %s/%u",
                                GET_IP6ADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_ldp_ipv6->prefix),
                                GET_U_1(subtlv_ptr.lspping_tlv_targetfec_subtlv_ldp_ipv6->prefix_len));
                     }
@@ -703,12 +703,12 @@ lspping_print(netdissect_options *ndo,
                 case LSPPING_TLV_TARGETFEC_SUBTLV_BGP_IPV4:
                     /* Is the subTLV length correct? */
                     if (lspping_subtlv_len != 5) {
-                        ND_PRINT("\n\t      invalid subTLV length, should be 5");
+                        ND_PRINT(C_RESET, "\n\t      invalid subTLV length, should be 5");
                         subtlv_hexdump=TRUE; /* unknown subTLV just hexdump it */
                     } else {
                         subtlv_ptr.lspping_tlv_targetfec_subtlv_bgp_ipv4 =
                             (const struct lspping_tlv_targetfec_subtlv_bgp_ipv4_t *)subtlv_tptr;
-                        ND_PRINT("\n\t      %s/%u",
+                        ND_PRINT(C_RESET, "\n\t      %s/%u",
                                GET_IPADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_bgp_ipv4->prefix),
                                GET_U_1(subtlv_ptr.lspping_tlv_targetfec_subtlv_bgp_ipv4->prefix_len));
                     }
@@ -717,12 +717,12 @@ lspping_print(netdissect_options *ndo,
                 case LSPPING_TLV_TARGETFEC_SUBTLV_BGP_IPV6:
                     /* Is the subTLV length correct? */
                     if (lspping_subtlv_len != 17) {
-                        ND_PRINT("\n\t      invalid subTLV length, should be 17");
+                        ND_PRINT(C_RESET, "\n\t      invalid subTLV length, should be 17");
                         subtlv_hexdump=TRUE; /* unknown subTLV just hexdump it */
                     } else {
                         subtlv_ptr.lspping_tlv_targetfec_subtlv_bgp_ipv6 =
                             (const struct lspping_tlv_targetfec_subtlv_bgp_ipv6_t *)subtlv_tptr;
-                        ND_PRINT("\n\t      %s/%u",
+                        ND_PRINT(C_RESET, "\n\t      %s/%u",
                                GET_IP6ADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_bgp_ipv6->prefix),
                                GET_U_1(subtlv_ptr.lspping_tlv_targetfec_subtlv_bgp_ipv6->prefix_len));
                     }
@@ -731,12 +731,12 @@ lspping_print(netdissect_options *ndo,
                 case LSPPING_TLV_TARGETFEC_SUBTLV_RSVP_IPV4:
                     /* Is the subTLV length correct? */
                     if (lspping_subtlv_len != 20) {
-                        ND_PRINT("\n\t      invalid subTLV length, should be 20");
+                        ND_PRINT(C_RESET, "\n\t      invalid subTLV length, should be 20");
                         subtlv_hexdump=TRUE; /* unknown subTLV just hexdump it */
                     } else {
                         subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv4 =
                             (const struct lspping_tlv_targetfec_subtlv_rsvp_ipv4_t *)subtlv_tptr;
-                        ND_PRINT("\n\t      tunnel end-point %s, tunnel sender %s, lsp-id 0x%04x"
+                        ND_PRINT(C_RESET, "\n\t      tunnel end-point %s, tunnel sender %s, lsp-id 0x%04x"
                                "\n\t      tunnel-id 0x%04x, extended tunnel-id %s",
                                GET_IPADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv4->tunnel_endpoint),
                                GET_IPADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv4->tunnel_sender),
@@ -749,12 +749,12 @@ lspping_print(netdissect_options *ndo,
                 case LSPPING_TLV_TARGETFEC_SUBTLV_RSVP_IPV6:
                     /* Is the subTLV length correct? */
                     if (lspping_subtlv_len != 56) {
-                        ND_PRINT("\n\t      invalid subTLV length, should be 56");
+                        ND_PRINT(C_RESET, "\n\t      invalid subTLV length, should be 56");
                         subtlv_hexdump=TRUE; /* unknown subTLV just hexdump it */
                     } else {
                         subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv6 =
                             (const struct lspping_tlv_targetfec_subtlv_rsvp_ipv6_t *)subtlv_tptr;
-                        ND_PRINT("\n\t      tunnel end-point %s, tunnel sender %s, lsp-id 0x%04x"
+                        ND_PRINT(C_RESET, "\n\t      tunnel end-point %s, tunnel sender %s, lsp-id 0x%04x"
                                "\n\t      tunnel-id 0x%04x, extended tunnel-id %s",
                                GET_IP6ADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv6->tunnel_endpoint),
                                GET_IP6ADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv6->tunnel_sender),
@@ -767,12 +767,12 @@ lspping_print(netdissect_options *ndo,
                 case LSPPING_TLV_TARGETFEC_SUBTLV_L3VPN_IPV4:
                     /* Is the subTLV length correct? */
                     if (lspping_subtlv_len != 13) {
-                        ND_PRINT("\n\t      invalid subTLV length, should be 13");
+                        ND_PRINT(C_RESET, "\n\t      invalid subTLV length, should be 13");
                         subtlv_hexdump=TRUE; /* unknown subTLV just hexdump it */
                     } else {
                         subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv4 =
                             (const struct lspping_tlv_targetfec_subtlv_l3vpn_ipv4_t *)subtlv_tptr;
-                        ND_PRINT("\n\t      RD: %s, %s/%u",
+                        ND_PRINT(C_RESET, "\n\t      RD: %s, %s/%u",
                                bgp_vpn_rd_print(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv4->rd),
                                GET_IPADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv4->prefix),
                                GET_U_1(subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv4->prefix_len));
@@ -782,12 +782,12 @@ lspping_print(netdissect_options *ndo,
                 case LSPPING_TLV_TARGETFEC_SUBTLV_L3VPN_IPV6:
                     /* Is the subTLV length correct? */
                     if (lspping_subtlv_len != 25) {
-                        ND_PRINT("\n\t      invalid subTLV length, should be 25");
+                        ND_PRINT(C_RESET, "\n\t      invalid subTLV length, should be 25");
                         subtlv_hexdump=TRUE; /* unknown subTLV just hexdump it */
                     } else {
                         subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv6 =
                             (const struct lspping_tlv_targetfec_subtlv_l3vpn_ipv6_t *)subtlv_tptr;
-                        ND_PRINT("\n\t      RD: %s, %s/%u",
+                        ND_PRINT(C_RESET, "\n\t      RD: %s, %s/%u",
                                bgp_vpn_rd_print(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv6->rd),
                                GET_IP6ADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv6->prefix),
                                GET_U_1(subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv6->prefix_len));
@@ -797,12 +797,12 @@ lspping_print(netdissect_options *ndo,
                 case LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_ENDPT:
                     /* Is the subTLV length correct? */
                     if (lspping_subtlv_len != 14) {
-                        ND_PRINT("\n\t      invalid subTLV length, should be 14");
+                        ND_PRINT(C_RESET, "\n\t      invalid subTLV length, should be 14");
                         subtlv_hexdump=TRUE; /* unknown subTLV just hexdump it */
                     } else {
                         subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt =
                             (const struct lspping_tlv_targetfec_subtlv_l2vpn_endpt_t *)subtlv_tptr;
-                        ND_PRINT("\n\t      RD: %s, Sender VE ID: %u, Receiver VE ID: %u"
+                        ND_PRINT(C_RESET, "\n\t      RD: %s, Sender VE ID: %u, Receiver VE ID: %u"
                                "\n\t      Encapsulation Type: %s (%u)",
                                bgp_vpn_rd_print(ndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->rd),
                                GET_BE_U_2(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->sender_ve_id),
@@ -818,12 +818,12 @@ lspping_print(netdissect_options *ndo,
                 case LSPPING_TLV_TARGETFEC_SUBTLV_FEC_128_PW_OLD:
                     /* Is the subTLV length correct? */
                     if (lspping_subtlv_len != 10) {
-                        ND_PRINT("\n\t      invalid subTLV length, should be 10");
+                        ND_PRINT(C_RESET, "\n\t      invalid subTLV length, should be 10");
                         subtlv_hexdump=TRUE; /* unknown subTLV just hexdump it */
                     } else {
                         subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid_old =
                             (const struct lspping_tlv_targetfec_subtlv_fec_128_pw_old *)subtlv_tptr;
-                        ND_PRINT("\n\t      Remote PE: %s"
+                        ND_PRINT(C_RESET, "\n\t      Remote PE: %s"
                                "\n\t      PW ID: 0x%08x, PW Type: %s (%u)",
                                GET_IPADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid_old->remote_pe_address),
                                GET_BE_U_4(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid_old->pw_id),
@@ -837,12 +837,12 @@ lspping_print(netdissect_options *ndo,
                 case LSPPING_TLV_TARGETFEC_SUBTLV_FEC_128_PW:
                     /* Is the subTLV length correct? */
                     if (lspping_subtlv_len != 14) {
-                        ND_PRINT("\n\t      invalid subTLV length, should be 14");
+                        ND_PRINT(C_RESET, "\n\t      invalid subTLV length, should be 14");
                         subtlv_hexdump=TRUE; /* unknown subTLV just hexdump it */
                     } else {
                         subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid =
                             (const struct lspping_tlv_targetfec_subtlv_fec_128_pw *)subtlv_tptr;
-                        ND_PRINT("\n\t      Sender PE: %s, Remote PE: %s"
+                        ND_PRINT(C_RESET, "\n\t      Sender PE: %s, Remote PE: %s"
                                "\n\t      PW ID: 0x%08x, PW Type: %s (%u)",
                                GET_IPADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid->sender_pe_address),
                                GET_IPADDR_STRING(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid->remote_pe_address),
@@ -869,7 +869,7 @@ lspping_print(netdissect_options *ndo,
                     lspping_subtlv_len += 4 - (lspping_subtlv_len % 4);
                     /* Does the subTLV, including padding, go past the end of the TLV? */
                     if (tlv_tlen < lspping_subtlv_len+sizeof(struct lspping_tlv_header)) {
-                        ND_PRINT("\n\t\t TLV is too short");
+                        ND_PRINT(C_RESET, "\n\t\t TLV is too short");
                         return;
                     }
                 }
@@ -881,7 +881,7 @@ lspping_print(netdissect_options *ndo,
         case LSPPING_TLV_DOWNSTREAM_MAPPING:
             /* Does the header go past the end of the TLV? */
             if (tlv_tlen < sizeof(struct lspping_tlv_downstream_map_t)) {
-                ND_PRINT("\n\t      TLV is too short");
+                ND_PRINT(C_RESET, "\n\t      TLV is too short");
                 tlv_hexdump = TRUE;
                 goto tlv_tooshort;
             }
@@ -897,7 +897,7 @@ lspping_print(netdissect_options *ndo,
              * we find the address-type, we recast the tlv_tptr and move on. */
 
             address_type = GET_U_1(tlv_ptr.lspping_tlv_downstream_map->address_type);
-            ND_PRINT("\n\t    MTU: %u, Address-Type: %s (%u)",
+            ND_PRINT(C_RESET, "\n\t    MTU: %u, Address-Type: %s (%u)",
                    GET_BE_U_2(tlv_ptr.lspping_tlv_downstream_map->mtu),
                    tok2str(lspping_tlv_downstream_addr_values,
                            "unknown",
@@ -909,7 +909,7 @@ lspping_print(netdissect_options *ndo,
             case LSPPING_AFI_IPV4:
                 /* Does the data go past the end of the TLV? */
                 if (tlv_tlen < sizeof(struct lspping_tlv_downstream_map_ipv4_t)) {
-                    ND_PRINT("\n\t      TLV is too short");
+                    ND_PRINT(C_RESET, "\n\t      TLV is too short");
                     tlv_hexdump = TRUE;
                     goto tlv_tooshort;
                 }
@@ -919,7 +919,7 @@ lspping_print(netdissect_options *ndo,
 
                 tlv_ptr.lspping_tlv_downstream_map_ipv4=
                     (const struct lspping_tlv_downstream_map_ipv4_t *)tlv_tptr;
-                ND_PRINT("\n\t    Downstream IP: %s"
+                ND_PRINT(C_RESET, "\n\t    Downstream IP: %s"
                        "\n\t    Downstream Interface IP: %s",
                        GET_IPADDR_STRING(tlv_ptr.lspping_tlv_downstream_map_ipv4->downstream_ip),
                        GET_IPADDR_STRING(tlv_ptr.lspping_tlv_downstream_map_ipv4->downstream_interface));
@@ -929,7 +929,7 @@ lspping_print(netdissect_options *ndo,
             case LSPPING_AFI_IPV4_UNMB:
                 /* Does the data go past the end of the TLV? */
                 if (tlv_tlen < sizeof(struct lspping_tlv_downstream_map_ipv4_unmb_t)) {
-                    ND_PRINT("\n\t      TLV is too short");
+                    ND_PRINT(C_RESET, "\n\t      TLV is too short");
                     tlv_hexdump = TRUE;
                     goto tlv_tooshort;
                 }
@@ -939,7 +939,7 @@ lspping_print(netdissect_options *ndo,
 
                 tlv_ptr.lspping_tlv_downstream_map_ipv4_unmb=
                     (const struct lspping_tlv_downstream_map_ipv4_unmb_t *)tlv_tptr;
-                ND_PRINT("\n\t    Downstream IP: %s"
+                ND_PRINT(C_RESET, "\n\t    Downstream IP: %s"
                        "\n\t    Downstream Interface Index: 0x%08x",
                        GET_IPADDR_STRING(tlv_ptr.lspping_tlv_downstream_map_ipv4_unmb->downstream_ip),
                        GET_BE_U_4(tlv_ptr.lspping_tlv_downstream_map_ipv4_unmb->downstream_interface));
@@ -949,7 +949,7 @@ lspping_print(netdissect_options *ndo,
             case LSPPING_AFI_IPV6:
                 /* Does the data go past the end of the TLV? */
                 if (tlv_tlen < sizeof(struct lspping_tlv_downstream_map_ipv6_t)) {
-                    ND_PRINT("\n\t      TLV is too short");
+                    ND_PRINT(C_RESET, "\n\t      TLV is too short");
                     tlv_hexdump = TRUE;
                     goto tlv_tooshort;
                 }
@@ -959,7 +959,7 @@ lspping_print(netdissect_options *ndo,
 
                 tlv_ptr.lspping_tlv_downstream_map_ipv6=
                     (const struct lspping_tlv_downstream_map_ipv6_t *)tlv_tptr;
-                ND_PRINT("\n\t    Downstream IP: %s"
+                ND_PRINT(C_RESET, "\n\t    Downstream IP: %s"
                        "\n\t    Downstream Interface IP: %s",
                        GET_IP6ADDR_STRING(tlv_ptr.lspping_tlv_downstream_map_ipv6->downstream_ip),
                        GET_IP6ADDR_STRING(tlv_ptr.lspping_tlv_downstream_map_ipv6->downstream_interface));
@@ -969,7 +969,7 @@ lspping_print(netdissect_options *ndo,
              case LSPPING_AFI_IPV6_UNMB:
                 /* Does the data go past the end of the TLV? */
                 if (tlv_tlen < sizeof(struct lspping_tlv_downstream_map_ipv6_unmb_t)) {
-                    ND_PRINT("\n\t      TLV is too short");
+                    ND_PRINT(C_RESET, "\n\t      TLV is too short");
                     tlv_hexdump = TRUE;
                     goto tlv_tooshort;
                 }
@@ -979,7 +979,7 @@ lspping_print(netdissect_options *ndo,
 
                 tlv_ptr.lspping_tlv_downstream_map_ipv6_unmb=
                    (const struct lspping_tlv_downstream_map_ipv6_unmb_t *)tlv_tptr;
-                ND_PRINT("\n\t    Downstream IP: %s"
+                ND_PRINT(C_RESET, "\n\t    Downstream IP: %s"
                        "\n\t    Downstream Interface Index: 0x%08x",
                        GET_IP6ADDR_STRING(tlv_ptr.lspping_tlv_downstream_map_ipv6_unmb->downstream_ip),
                        GET_BE_U_4(tlv_ptr.lspping_tlv_downstream_map_ipv6_unmb->downstream_interface));
@@ -994,7 +994,7 @@ lspping_print(netdissect_options *ndo,
 
             /* Does the data go past the end of the TLV? */
             if (tlv_tlen < sizeof(struct lspping_tlv_downstream_map_info_t)) {
-                ND_PRINT("\n\t      TLV is too short");
+                ND_PRINT(C_RESET, "\n\t      TLV is too short");
                 tlv_hexdump = TRUE;
                 goto tlv_tooshort;
             }
@@ -1018,11 +1018,11 @@ lspping_print(netdissect_options *ndo,
 
         case LSPPING_TLV_BFD_DISCRIMINATOR:
             if (tlv_tlen < LSPPING_TLV_BFD_DISCRIMINATOR_LEN) {
-                ND_PRINT("\n\t      TLV is too short");
+                ND_PRINT(C_RESET, "\n\t      TLV is too short");
                 tlv_hexdump = TRUE;
                 goto tlv_tooshort;
             } else {
-                ND_PRINT("\n\t    BFD Discriminator 0x%08x", GET_BE_U_4(tlv_tptr));
+                ND_PRINT(C_RESET, "\n\t    BFD Discriminator 0x%08x", GET_BE_U_4(tlv_tptr));
             }
             break;
 
@@ -1031,12 +1031,12 @@ lspping_print(netdissect_options *ndo,
             uint32_t vendor_id;
 
             if (tlv_tlen < LSPPING_TLV_VENDOR_ENTERPRISE_LEN) {
-                ND_PRINT("\n\t      TLV is too short");
+                ND_PRINT(C_RESET, "\n\t      TLV is too short");
                 tlv_hexdump = TRUE;
                 goto tlv_tooshort;
             } else {
                 vendor_id = GET_BE_U_4(tlv_tptr);
-                ND_PRINT("\n\t    Vendor: %s (0x%04x)",
+                ND_PRINT(C_RESET, "\n\t    Vendor: %s (0x%04x)",
                        tok2str(smi_values, "Unknown", vendor_id),
                        vendor_id);
             }
@@ -1076,5 +1076,5 @@ lspping_print(netdissect_options *ndo,
     }
     return;
 tooshort:
-    ND_PRINT("\n\t\t packet is too short");
+    ND_PRINT(C_RESET, "\n\t\t packet is too short");
 }

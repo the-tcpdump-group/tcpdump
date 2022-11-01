@@ -104,7 +104,7 @@
 #define PRINT_HEX(bytes_len, ptr_data)                               \
            while(bytes_len)                                          \
            {                                                         \
-              ND_PRINT("%02X", GET_U_1(ptr_data));                   \
+              ND_PRINT(C_RESET, "%02X", GET_U_1(ptr_data));                   \
               ptr_data++;                                            \
               bytes_len--;                                           \
            }
@@ -779,12 +779,12 @@ print_attr_string(netdissect_options *ndo,
            if (length < 3)
               goto trunc;
            if (GET_U_1(data) && (GET_U_1(data) <= 0x1F))
-              ND_PRINT("Tag[%u] ", GET_U_1(data));
+              ND_PRINT(C_RESET, "Tag[%u] ", GET_U_1(data));
            else
-              ND_PRINT("Tag[Unused] ");
+              ND_PRINT(C_RESET, "Tag[Unused] ");
            data++;
            length--;
-           ND_PRINT("Salt %u ", GET_BE_U_2(data));
+           ND_PRINT(C_RESET, "Salt %u ", GET_BE_U_2(data));
            data+=2;
            length-=2;
         break;
@@ -799,9 +799,9 @@ print_attr_string(netdissect_options *ndo,
               if (length < 1)
                  goto trunc;
               if (GET_U_1(data))
-                ND_PRINT("Tag[%u] ", GET_U_1(data));
+                ND_PRINT(C_RESET, "Tag[%u] ", GET_U_1(data));
               else
-                ND_PRINT("Tag[Unused] ");
+                ND_PRINT(C_RESET, "Tag[Unused] ");
               data++;
               length--;
            }
@@ -809,7 +809,7 @@ print_attr_string(netdissect_options *ndo,
       case EGRESS_VLAN_NAME:
            if (length < 1)
               goto trunc;
-           ND_PRINT("%s (0x%02x) ",
+           ND_PRINT(C_RESET, "%s (0x%02x) ",
                   tok2str(rfc4675_tagged,"Unknown tag",GET_U_1(data)),
                   GET_U_1(data));
            data++;
@@ -823,7 +823,7 @@ print_attr_string(netdissect_options *ndo,
    }
 
    for (i=0; i < length && GET_U_1(data); i++, data++)
-       ND_PRINT("%c", ND_ASCII_ISPRINT(GET_U_1(data)) ? GET_U_1(data) : '.');
+       ND_PRINT(C_RESET, "%c", ND_ASCII_ISPRINT(GET_U_1(data)) ? GET_U_1(data) : '.');
 
    return;
 
@@ -849,7 +849,7 @@ print_vendor_attr(netdissect_options *ndo,
     data+=4;
     length-=4;
 
-    ND_PRINT("Vendor: %s (%u)",
+    ND_PRINT(C_RESET, "Vendor: %s (%u)",
            tok2str(smi_values,"Unknown",vendor_id),
            vendor_id);
 
@@ -859,14 +859,14 @@ print_vendor_attr(netdissect_options *ndo,
 
         if (vendor_length < 2)
         {
-            ND_PRINT("\n\t    Vendor Attribute: %u, Length: %u (bogus, must be >= 2)",
+            ND_PRINT(C_RESET, "\n\t    Vendor Attribute: %u, Length: %u (bogus, must be >= 2)",
                    vendor_type,
                    vendor_length);
             return;
         }
         if (vendor_length > length)
         {
-            ND_PRINT("\n\t    Vendor Attribute: %u, Length: %u (bogus, goes past end of vendor-specific attribute)",
+            ND_PRINT(C_RESET, "\n\t    Vendor Attribute: %u, Length: %u (bogus, goes past end of vendor-specific attribute)",
                    vendor_type,
                    vendor_length);
             return;
@@ -876,11 +876,11 @@ print_vendor_attr(netdissect_options *ndo,
         length-=2;
 	ND_TCHECK_LEN(data, vendor_length);
 
-        ND_PRINT("\n\t    Vendor Attribute: %u, Length: %u, Value: ",
+        ND_PRINT(C_RESET, "\n\t    Vendor Attribute: %u, Length: %u, Value: ",
                vendor_type,
                vendor_length);
         for (idx = 0; idx < vendor_length ; idx++, data++)
-            ND_PRINT("%c", ND_ASCII_ISPRINT(GET_U_1(data)) ? GET_U_1(data) : '.');
+            ND_PRINT(C_RESET, "%c", ND_ASCII_ISPRINT(GET_U_1(data)) ? GET_U_1(data) : '.');
         length-=vendor_length;
     }
     return;
@@ -904,7 +904,7 @@ print_attr_num(netdissect_options *ndo,
 
    if (length != 4)
    {
-       ND_PRINT("ERROR: length %u != 4", length);
+       ND_PRINT(C_RESET, "ERROR: length %u != 4", length);
        return;
    }
 
@@ -918,9 +918,9 @@ print_attr_num(netdissect_options *ndo,
       if ( (attr_code == TUNNEL_TYPE) || (attr_code == TUNNEL_MEDIUM) )
       {
          if (!GET_U_1(data))
-            ND_PRINT("Tag[Unused] ");
+            ND_PRINT(C_RESET, "Tag[Unused] ");
          else
-            ND_PRINT("Tag[%u] ", GET_U_1(data));
+            ND_PRINT(C_RESET, "Tag[%u] ", GET_U_1(data));
          data++;
          data_value = GET_BE_U_3(data);
       }
@@ -931,9 +931,9 @@ print_attr_num(netdissect_options *ndo,
       if ( data_value <= (uint32_t)(attr_type[attr_code].siz_subtypes - 1 +
             attr_type[attr_code].first_subtype) &&
 	   data_value >= attr_type[attr_code].first_subtype )
-         ND_PRINT("%s", table[data_value]);
+         ND_PRINT(C_RESET, "%s", table[data_value]);
       else
-         ND_PRINT("#%u", data_value);
+         ND_PRINT(C_RESET, "#%u", data_value);
    }
    else
    {
@@ -941,9 +941,9 @@ print_attr_num(netdissect_options *ndo,
       {
         case FRM_IPX:
              if (GET_BE_U_4(data) == 0xFFFFFFFE )
-                ND_PRINT("NAS Select");
+                ND_PRINT(C_RESET, "NAS Select");
              else
-                ND_PRINT("%u", GET_BE_U_4(data));
+                ND_PRINT(C_RESET, "%u", GET_BE_U_4(data));
           break;
 
         case SESSION_TIMEOUT:
@@ -953,14 +953,14 @@ print_attr_num(netdissect_options *ndo,
         case ACCT_INT_INTERVAL:
              timeout = GET_BE_U_4(data);
              if ( timeout < 60 )
-                ND_PRINT("%02d secs", timeout);
+                ND_PRINT(C_RESET, "%02d secs", timeout);
              else
              {
                 if ( timeout < 3600 )
-                   ND_PRINT("%02d:%02d min",
+                   ND_PRINT(C_RESET, "%02d:%02d min",
                           timeout / 60, timeout % 60);
                 else
-                   ND_PRINT("%02d:%02d:%02d hours",
+                   ND_PRINT(C_RESET, "%02d:%02d:%02d hours",
                           timeout / 3600, (timeout % 3600) / 60,
                           timeout % 60);
              }
@@ -968,37 +968,37 @@ print_attr_num(netdissect_options *ndo,
 
         case FRM_ATALK_LINK:
              if (GET_BE_U_4(data))
-                ND_PRINT("%u", GET_BE_U_4(data));
+                ND_PRINT(C_RESET, "%u", GET_BE_U_4(data));
              else
-                ND_PRINT("Unnumbered");
+                ND_PRINT(C_RESET, "Unnumbered");
           break;
 
         case FRM_ATALK_NETWORK:
              if (GET_BE_U_4(data))
-                ND_PRINT("%u", GET_BE_U_4(data));
+                ND_PRINT(C_RESET, "%u", GET_BE_U_4(data));
              else
-                ND_PRINT("NAS assigned");
+                ND_PRINT(C_RESET, "NAS assigned");
           break;
 
         case TUNNEL_PREFERENCE:
             if (GET_U_1(data))
-               ND_PRINT("Tag[%u] ", GET_U_1(data));
+               ND_PRINT(C_RESET, "Tag[%u] ", GET_U_1(data));
             else
-               ND_PRINT("Tag[Unused] ");
+               ND_PRINT(C_RESET, "Tag[Unused] ");
             data++;
-            ND_PRINT("%u", GET_BE_U_3(data));
+            ND_PRINT(C_RESET, "%u", GET_BE_U_3(data));
           break;
 
         case EGRESS_VLAN_ID:
-            ND_PRINT("%s (0x%02x) ",
+            ND_PRINT(C_RESET, "%s (0x%02x) ",
                    tok2str(rfc4675_tagged,"Unknown tag",GET_U_1(data)),
                    GET_U_1(data));
             data++;
-            ND_PRINT("%u", GET_BE_U_3(data));
+            ND_PRINT(C_RESET, "%u", GET_BE_U_3(data));
           break;
 
         default:
-             ND_PRINT("%u", GET_BE_U_4(data));
+             ND_PRINT(C_RESET, "%u", GET_BE_U_4(data));
           break;
 
       } /* switch */
@@ -1019,7 +1019,7 @@ print_attr_address(netdissect_options *ndo,
 {
    if (length != 4)
    {
-       ND_PRINT("ERROR: length %u != 4", length);
+       ND_PRINT(C_RESET, "ERROR: length %u != 4", length);
        return;
    }
 
@@ -1028,16 +1028,16 @@ print_attr_address(netdissect_options *ndo,
       case FRM_IPADDR:
       case LOG_IPHOST:
            if (GET_BE_U_4(data) == 0xFFFFFFFF )
-              ND_PRINT("User Selected");
+              ND_PRINT(C_RESET, "User Selected");
            else
               if (GET_BE_U_4(data) == 0xFFFFFFFE )
-                 ND_PRINT("NAS Select");
+                 ND_PRINT(C_RESET, "NAS Select");
               else
-                 ND_PRINT("%s",GET_IPADDR_STRING(data));
+                 ND_PRINT(C_RESET, "%s",GET_IPADDR_STRING(data));
       break;
 
       default:
-          ND_PRINT("%s", GET_IPADDR_STRING(data));
+          ND_PRINT(C_RESET, "%s", GET_IPADDR_STRING(data));
       break;
    }
 }
@@ -1055,11 +1055,11 @@ print_attr_address6(netdissect_options *ndo,
 {
    if (length != 16)
    {
-       ND_PRINT("ERROR: length %u != 16", length);
+       ND_PRINT(C_RESET, "ERROR: length %u != 16", length);
        return;
    }
 
-   ND_PRINT("%s", GET_IP6ADDR_STRING(data));
+   ND_PRINT(C_RESET, "%s", GET_IP6ADDR_STRING(data));
 }
 
 static void
@@ -1070,13 +1070,13 @@ print_attr_netmask6(netdissect_options *ndo,
 
    if (length < 2 || length > 18)
    {
-       ND_PRINT("ERROR: length %u not in range (2..18)", length);
+       ND_PRINT(C_RESET, "ERROR: length %u not in range (2..18)", length);
        return;
    }
    ND_TCHECK_LEN(data, length);
    if (GET_U_1(data + 1) > 128)
    {
-      ND_PRINT("ERROR: netmask %u not in range (0..128)", GET_U_1(data + 1));
+      ND_PRINT(C_RESET, "ERROR: netmask %u not in range (0..128)", GET_U_1(data + 1));
       return;
    }
 
@@ -1084,10 +1084,10 @@ print_attr_netmask6(netdissect_options *ndo,
    if (length > 2)
       memcpy(data2, data+2, length-2);
 
-   ND_PRINT("%s/%u", ip6addr_string(ndo, data2), GET_U_1(data + 1)); /* local buffer, not packet data; don't use GET_IP6ADDR_STRING() */
+   ND_PRINT(C_RESET, "%s/%u", ip6addr_string(ndo, data2), GET_U_1(data + 1)); /* local buffer, not packet data; don't use GET_IP6ADDR_STRING() */
 
    if (GET_U_1(data + 1) > 8 * (length - 2))
-      ND_PRINT(" (inconsistent prefix length)");
+      ND_PRINT(C_RESET, " (inconsistent prefix length)");
 
    return;
 
@@ -1101,17 +1101,17 @@ print_attr_mip6_home_link_prefix(netdissect_options *ndo,
 {
    if (length != 17)
    {
-      ND_PRINT("ERROR: length %u != 17", length);
+      ND_PRINT(C_RESET, "ERROR: length %u != 17", length);
       return;
    }
    ND_TCHECK_LEN(data, length);
    if (GET_U_1(data) > 128)
    {
-      ND_PRINT("ERROR: netmask %u not in range (0..128)", GET_U_1(data));
+      ND_PRINT(C_RESET, "ERROR: netmask %u not in range (0..128)", GET_U_1(data));
       return;
    }
 
-   ND_PRINT("%s/%u", GET_IP6ADDR_STRING(data + 1), GET_U_1(data));
+   ND_PRINT(C_RESET, "%s/%u", GET_IP6ADDR_STRING(data + 1), GET_U_1(data));
 
    return;
 
@@ -1128,12 +1128,12 @@ print_attr_operator_name(netdissect_options *ndo,
    ND_TCHECK_LEN(data, length);
    if (length < 2)
    {
-      ND_PRINT("ERROR: length %u < 2", length);
+      ND_PRINT(C_RESET, "ERROR: length %u < 2", length);
       return;
    }
    namespace_value = GET_U_1(data);
    data++;
-   ND_PRINT("[%s] ", tok2str(operator_name_vector, "unknown namespace %u", namespace_value));
+   ND_PRINT(C_RESET, "[%s] ", tok2str(operator_name_vector, "unknown namespace %u", namespace_value));
 
    nd_printjn(ndo, data, length - 1);
 
@@ -1153,7 +1153,7 @@ print_attr_location_information(netdissect_options *ndo,
    ND_TCHECK_LEN(data, length);
    if (length < 21)
    {
-     ND_PRINT("ERROR: length %u < 21", length);
+     ND_PRINT(C_RESET, "ERROR: length %u < 21", length);
       return;
    }
 
@@ -1166,25 +1166,25 @@ print_attr_location_information(netdissect_options *ndo,
    entity = GET_U_1(data);
    data++;
 
-   ND_PRINT("index %u, code %s, entity %s, ",
+   ND_PRINT(C_RESET, "index %u, code %s, entity %s, ",
        index,
        tok2str(location_information_code_vector, "Unknown (%u)", code),
        tok2str(location_information_entity_vector, "Unknown (%u)", entity)
    );
 
-   ND_PRINT("sighting time ");
+   ND_PRINT(C_RESET, "sighting time ");
    p_ntp_time(ndo, (const struct l_fixedpt *)data);
-   ND_PRINT(", ");
+   ND_PRINT(C_RESET, ", ");
    data += 8;
 
-   ND_PRINT("time to live ");
+   ND_PRINT(C_RESET, "time to live ");
    p_ntp_time(ndo, (const struct l_fixedpt *)data);
-   ND_PRINT(", ");
+   ND_PRINT(C_RESET, ", ");
    data += 8;
 
-   ND_PRINT("method \"");
+   ND_PRINT(C_RESET, "method \"");
    nd_printjn(ndo, data, length - 20);
-   ND_PRINT("\"");
+   ND_PRINT(C_RESET, "\"");
 
    return;
 
@@ -1201,13 +1201,13 @@ print_attr_location_data(netdissect_options *ndo,
    ND_TCHECK_LEN(data, length);
    if (length < 3)
    {
-     ND_PRINT("ERROR: length %u < 3", length);
+     ND_PRINT(C_RESET, "ERROR: length %u < 3", length);
       return;
    }
 
    index = GET_BE_U_2(data);
    data += 2;
-   ND_PRINT("index %u, location", index);
+   ND_PRINT(C_RESET, "index %u, location", index);
 
    /* The Location field of the String field of the Location-Data attribute
     * can have two completely different structures depending on the value of
@@ -1233,22 +1233,22 @@ print_basic_location_policy_rules(netdissect_options *ndo,
    ND_TCHECK_LEN(data, length);
    if (length < 10)
    {
-     ND_PRINT("ERROR: length %u < 10", length);
+     ND_PRINT(C_RESET, "ERROR: length %u < 10", length);
       return;
    }
 
    flags = GET_BE_U_2(data);
    data += 2;
-   ND_PRINT("flags [%s], ", bittok2str(blpr_bm, "none", flags));
+   ND_PRINT(C_RESET, "flags [%s], ", bittok2str(blpr_bm, "none", flags));
 
-   ND_PRINT("retention expires ");
+   ND_PRINT(C_RESET, "retention expires ");
    p_ntp_time(ndo, (const struct l_fixedpt *)data);
    data += 8;
 
    if (length > 10) {
-      ND_PRINT(", note well \"");
+      ND_PRINT(C_RESET, ", note well \"");
       nd_printjn(ndo, data, length - 10);
-      ND_PRINT("\"");
+      ND_PRINT(C_RESET, "\"");
    }
 
    return;
@@ -1275,7 +1275,7 @@ print_attr_time(netdissect_options *ndo,
 
    if (length != 4)
    {
-       ND_PRINT("ERROR: length %u != 4", length);
+       ND_PRINT(C_RESET, "ERROR: length %u != 4", length);
        return;
    }
 
@@ -1283,7 +1283,7 @@ print_attr_time(netdissect_options *ndo,
    strlcpy(string, ctime(&attr_time), sizeof(string));
    /* Get rid of the newline */
    string[24] = '\0';
-   ND_PRINT("%.24s", string);
+   ND_PRINT(C_RESET, "%.24s", string);
 }
 
 static void
@@ -1295,11 +1295,11 @@ print_attr_vector64(netdissect_options *ndo,
 
    if (length != 8)
    {
-       ND_PRINT("ERROR: length %u != 8", length);
+       ND_PRINT(C_RESET, "ERROR: length %u != 8", length);
        return;
    }
 
-   ND_PRINT("[");
+   ND_PRINT(C_RESET, "[");
 
    data_value = GET_BE_U_8(data);
    /* Print the 64-bit field in a format similar to bittok2str(), less
@@ -1308,12 +1308,12 @@ print_attr_vector64(netdissect_options *ndo,
     */
    for (i = 0; i < TAM_SIZE(mip6_feature_vector); i++) {
        if (data_value & mip6_feature_vector[i].v) {
-           ND_PRINT("%s%s", sep, mip6_feature_vector[i].s);
+           ND_PRINT(C_RESET, "%s%s", sep, mip6_feature_vector[i].s);
            sep = ", ";
        }
    }
 
-   ND_PRINT("]");
+   ND_PRINT(C_RESET, "]");
 }
 
 /***********************************/
@@ -1335,38 +1335,38 @@ print_attr_strange(netdissect_options *ndo,
       case ARAP_PASS:
            if (length != 16)
            {
-               ND_PRINT("ERROR: length %u != 16", length);
+               ND_PRINT(C_RESET, "ERROR: length %u != 16", length);
                return;
            }
-           ND_PRINT("User_challenge (");
+           ND_PRINT(C_RESET, "User_challenge (");
            len_data = 8;
            PRINT_HEX(len_data, data);
-           ND_PRINT(") User_resp(");
+           ND_PRINT(C_RESET, ") User_resp(");
            len_data = 8;
            PRINT_HEX(len_data, data);
-           ND_PRINT(")");
+           ND_PRINT(C_RESET, ")");
         break;
 
       case ARAP_FEATURES:
            if (length != 14)
            {
-               ND_PRINT("ERROR: length %u != 14", length);
+               ND_PRINT(C_RESET, "ERROR: length %u != 14", length);
                return;
            }
            if (GET_U_1(data))
-              ND_PRINT("User can change password");
+              ND_PRINT(C_RESET, "User can change password");
            else
-              ND_PRINT("User cannot change password");
+              ND_PRINT(C_RESET, "User cannot change password");
            data++;
-           ND_PRINT(", Min password length: %u", GET_U_1(data));
+           ND_PRINT(C_RESET, ", Min password length: %u", GET_U_1(data));
            data++;
-           ND_PRINT(", created at: ");
+           ND_PRINT(C_RESET, ", created at: ");
            len_data = 4;
            PRINT_HEX(len_data, data);
-           ND_PRINT(", expires in: ");
+           ND_PRINT(C_RESET, ", expires in: ");
            len_data = 4;
            PRINT_HEX(len_data, data);
-           ND_PRINT(", Current Time: ");
+           ND_PRINT(C_RESET, ", Current Time: ");
            len_data = 4;
            PRINT_HEX(len_data, data);
         break;
@@ -1374,7 +1374,7 @@ print_attr_strange(netdissect_options *ndo,
       case ARAP_CHALLENGE_RESP:
            if (length < 8)
            {
-               ND_PRINT("ERROR: length %u != 8", length);
+               ND_PRINT(C_RESET, "ERROR: length %u != 8", length);
                return;
            }
            len_data = 8;
@@ -1384,12 +1384,12 @@ print_attr_strange(netdissect_options *ndo,
       case ERROR_CAUSE:
            if (length != 4)
            {
-               ND_PRINT("Error: length %u != 4", length);
+               ND_PRINT(C_RESET, "Error: length %u != 4", length);
                return;
            }
 
            error_cause_value = GET_BE_U_4(data);
-           ND_PRINT("Error cause %u: %s", error_cause_value, tok2str(errorcausetype, "Error-Cause %u not known", error_cause_value));
+           ND_PRINT(C_RESET, "Error cause %u: %s", error_cause_value, tok2str(errorcausetype, "Error-Cause %u not known", error_cause_value));
         break;
    }
    return;
@@ -1416,21 +1416,21 @@ radius_attrs_print(netdissect_options *ndo,
      else
 	attr_string = "Unknown";
 
-     ND_PRINT("\n\t  %s Attribute (%u), length: %u",
+     ND_PRINT(C_RESET, "\n\t  %s Attribute (%u), length: %u",
                attr_string,
                type,
                len);
      if (len < 2)
      {
-       ND_PRINT(" (bogus, must be >= 2)");
+       ND_PRINT(C_RESET, " (bogus, must be >= 2)");
        return;
      }
      if (len > length)
      {
-        ND_PRINT(" (bogus, goes past end of packet)");
+        ND_PRINT(C_RESET, " (bogus, goes past end of packet)");
         return;
      }
-     ND_PRINT(", Value: ");
+     ND_PRINT(C_RESET, ", Value: ");
 
      if (type < TAM_SIZE(attr_type))
      {
@@ -1477,7 +1477,7 @@ radius_print(netdissect_options *ndo,
 	  len = length;
 
    if (ndo->ndo_vflag < 1) {
-       ND_PRINT("RADIUS, %s (%u), id: 0x%02x length: %u",
+       ND_PRINT(C_RESET, "RADIUS, %s (%u), id: 0x%02x length: %u",
               tok2str(radius_command_values,"Unknown Command",GET_U_1(rad->code)),
               GET_U_1(rad->code),
               GET_U_1(rad->id),
@@ -1485,14 +1485,14 @@ radius_print(netdissect_options *ndo,
        return;
    }
    else {
-       ND_PRINT("RADIUS, length: %u\n\t%s (%u), id: 0x%02x, Authenticator: ",
+       ND_PRINT(C_RESET, "RADIUS, length: %u\n\t%s (%u), id: 0x%02x, Authenticator: ",
               len,
               tok2str(radius_command_values,"Unknown Command",GET_U_1(rad->code)),
               GET_U_1(rad->code),
               GET_U_1(rad->id));
 
        for(auth_idx=0; auth_idx < 16; auth_idx++)
-            ND_PRINT("%02x", rad->auth[auth_idx]);
+            ND_PRINT(C_RESET, "%02x", rad->auth[auth_idx]);
    }
 
    if (len > MIN_RADIUS_LEN)

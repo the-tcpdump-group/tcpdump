@@ -321,7 +321,8 @@ HDR = \
 	tcp.h \
 	timeval-operations.h \
 	udp.h \
-	varattrs.h
+	varattrs.h \
+	colors.h
 
 TAGHDR = \
 	/usr/include/netinet/if_ether.h \

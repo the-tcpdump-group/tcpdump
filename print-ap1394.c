@@ -64,20 +64,20 @@ ap1394_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	fp = (const struct firewire_header *)bp;
 
-	ND_PRINT("%s > %s",
+	ND_PRINT(C_RESET, "%s > %s",
 		     fwaddr_string(ndo, fp->firewire_shost),
 		     fwaddr_string(ndo, fp->firewire_dhost));
 
 	firewire_type = GET_BE_U_2(fp->firewire_type);
 	if (!ndo->ndo_qflag) {
-		ND_PRINT(", ethertype %s (0x%04x)",
+		ND_PRINT(C_RESET, ", ethertype %s (0x%04x)",
 			       tok2str(ethertype_values,"Unknown", firewire_type),
                                firewire_type);
         } else {
-                ND_PRINT(", %s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", firewire_type));
+                ND_PRINT(C_RESET, ", %s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", firewire_type));
         }
 
-	ND_PRINT(", length %u: ", length);
+	ND_PRINT(C_RESET, ", length %u: ", length);
 }
 
 /*

@@ -110,54 +110,54 @@ static void
 tag_common_print(netdissect_options *ndo, const u_char *p)
 {
 	if (ndo->ndo_eflag) {
-		ND_PRINT("mode %s, ", tok2str(dsa_mode_values, "unknown", DSA_MODE(p)));
+		ND_PRINT(C_RESET, C_RESET "mode %s, ", tok2str(dsa_mode_values, "unknown", DSA_MODE(p)));
 
 		switch (DSA_MODE(p)) {
 		case DSA_MODE_FORWARD:
-			ND_PRINT("dev %u, %s %u, ", DSA_DEV(p),
+			ND_PRINT(C_RESET, C_RESET "dev %u, %s %u, ", DSA_DEV(p),
 				 DSA_TRUNK(p) ? "trunk" : "port", DSA_PORT(p));
 			break;
 		case DSA_MODE_FROM_CPU:
-			ND_PRINT("target dev %u, port %u, ",
+			ND_PRINT(C_RESET, C_RESET "target dev %u, port %u, ",
 				 DSA_DEV(p), DSA_PORT(p));
 			break;
 		case DSA_MODE_TO_CPU:
-			ND_PRINT("source dev %u, port %u, ",
+			ND_PRINT(C_RESET, C_RESET "source dev %u, port %u, ",
 				 DSA_DEV(p), DSA_PORT(p));
-			ND_PRINT("code %s, ",
+			ND_PRINT(C_RESET, C_RESET "code %s, ",
 				 tok2str(dsa_code_values, "reserved", DSA_CODE(p)));
 			break;
 		case DSA_MODE_TO_SNIFFER:
-			ND_PRINT("source dev %u, port %u, ",
+			ND_PRINT(C_RESET, C_RESET "source dev %u, port %u, ",
 				 DSA_DEV(p), DSA_PORT(p));
-			ND_PRINT("%s sniff, ",
+			ND_PRINT(C_RESET, C_RESET "%s sniff, ",
 				 DSA_RX_SNIFF(p) ? "ingress" : "egress");
 			break;
 		default:
 			break;
 		}
 
-		ND_PRINT("%s, ", DSA_TAGGED(p) ? "tagged" : "untagged");
-		ND_PRINT("%s", DSA_CFI(p) ? "CFI, " : "");
-		ND_PRINT("VID %u, ", DSA_VID(p));
-		ND_PRINT("FPri %u, ", DSA_PRI(p));
+		ND_PRINT(C_RESET, C_RESET "%s, ", DSA_TAGGED(p) ? "tagged" : "untagged");
+		ND_PRINT(C_RESET, C_RESET "%s", DSA_CFI(p) ? "CFI, " : "");
+		ND_PRINT(C_RESET, C_RESET "VID %u, ", DSA_VID(p));
+		ND_PRINT(C_RESET, C_RESET "FPri %u, ", DSA_PRI(p));
 	} else {
 		switch (DSA_MODE(p)) {
 		case DSA_MODE_FORWARD:
-			ND_PRINT("Forward %s %u.%u, ",
+			ND_PRINT(C_RESET, C_RESET "Forward %s %u.%u, ",
 				 DSA_TRUNK(p) ? "trunk" : "port",
 				 DSA_DEV(p), DSA_PORT(p));
 			break;
 		case DSA_MODE_FROM_CPU:
-			ND_PRINT("CPU > port %u.%u, ",
+			ND_PRINT(C_RESET, C_RESET "CPU > port %u.%u, ",
 				 DSA_DEV(p), DSA_PORT(p));
 			break;
 		case DSA_MODE_TO_CPU:
-			ND_PRINT("port %u.%u > CPU, ",
+			ND_PRINT(C_RESET, C_RESET "port %u.%u > CPU, ",
 				 DSA_DEV(p), DSA_PORT(p));
 			break;
 		case DSA_MODE_TO_SNIFFER:
-			ND_PRINT("port %u.%u > %s Sniffer, ",
+			ND_PRINT(C_RESET, C_RESET "port %u.%u > %s Sniffer, ",
 				 DSA_DEV(p), DSA_PORT(p),
 				 DSA_RX_SNIFF(p) ? "Rx" : "Tx");
 			break;
@@ -165,7 +165,7 @@ tag_common_print(netdissect_options *ndo, const u_char *p)
 			break;
 		}
 
-		ND_PRINT("VLAN %u%c, ", DSA_VID(p), DSA_TAGGED(p) ? 't' : 'u');
+		ND_PRINT(C_RESET, C_RESET "VLAN %u%c, ", DSA_VID(p), DSA_TAGGED(p) ? 't' : 'u');
 	}
 }
 
@@ -173,9 +173,9 @@ static void
 dsa_tag_print(netdissect_options *ndo, const u_char *bp)
 {
 	if (ndo->ndo_eflag)
-		ND_PRINT("Marvell DSA ");
+		ND_PRINT(C_RESET, C_RESET "Marvell DSA ");
 	else
-		ND_PRINT("DSA ");
+		ND_PRINT(C_RESET, C_RESET "DSA ");
 	tag_common_print(ndo, bp);
 }
 
@@ -187,11 +187,11 @@ edsa_tag_print(netdissect_options *ndo, const u_char *bp)
 
 	edsa_etype = GET_BE_U_2(p);
 	if (ndo->ndo_eflag) {
-		ND_PRINT("Marvell EDSA ethertype 0x%04x (%s), ", edsa_etype,
+		ND_PRINT(C_RESET, C_RESET "Marvell EDSA ethertype 0x%04x (%s), ", edsa_etype,
 			 tok2str(ethertype_values, "Unknown", edsa_etype));
-		ND_PRINT("rsvd %u %u, ", GET_U_1(p + 2), GET_U_1(p + 3));
+		ND_PRINT(C_RESET, C_RESET "rsvd %u %u, ", GET_U_1(p + 2), GET_U_1(p + 3));
 	} else
-		ND_PRINT("EDSA 0x%04x, ", edsa_etype);
+		ND_PRINT(C_RESET, C_RESET "EDSA 0x%04x, ", edsa_etype);
 	p += 4;
 	tag_common_print(ndo, p);
 }

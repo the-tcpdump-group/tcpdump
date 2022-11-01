@@ -54,7 +54,7 @@ hexprint(netdissect_options *ndo, const uint8_t *cp, size_t len)
 	size_t i;
 
 	for (i = 0; i < len; i++)
-		ND_PRINT("%02x", cp[i]);
+		ND_PRINT(C_RESET, "%02x", cp[i]);
 }
 
 #define QUIC_CID_LIST_MAX	512
@@ -169,24 +169,24 @@ quic_print_packet(netdissect_options *ndo, const u_char *bp, const u_char *end)
 		bp += 4;
 
 		if (version == 0)
-			ND_PRINT(", version negotiation");
+			ND_PRINT(C_RESET, ", version negotiation");
 		else if (packet_type == QUIC_LH_TYPE_INITIAL)
-			ND_PRINT(", initial");
+			ND_PRINT(C_RESET, ", initial");
 		else if (packet_type == QUIC_LH_TYPE_0RTT)
-			ND_PRINT(", 0-rtt");
+			ND_PRINT(C_RESET, ", 0-rtt");
 		else if (packet_type == QUIC_LH_TYPE_HANDSHAKE)
-			ND_PRINT(", handshake");
+			ND_PRINT(C_RESET, ", handshake");
 		else if (packet_type == QUIC_LH_TYPE_RETRY)
-			ND_PRINT(", retry");
+			ND_PRINT(C_RESET, ", retry");
 		if (version != 0 && version != 1)
-			ND_PRINT(", v%x", version);
+			ND_PRINT(C_RESET, ", v%x", version);
 		dcil = GET_U_1(bp);
 		bp += 1;
 		if (dcil > 0  && dcil <= QUIC_MAX_CID_LENGTH) {
 			memset(dcid, 0, sizeof(dcid));
 			GET_CPY_BYTES(&dcid, bp, dcil);
 			bp += dcil;
-			ND_PRINT(", dcid ");
+			ND_PRINT(C_RESET, ", dcid ");
 			hexprint(ndo, dcid, dcil);
 			register_quic_cid(dcid, dcil);
 		}
@@ -196,7 +196,7 @@ quic_print_packet(netdissect_options *ndo, const u_char *bp, const u_char *end)
 			memset(scid, 0, sizeof(dcid));
 			GET_CPY_BYTES(&scid, bp, scil);
 			bp += scil;
-			ND_PRINT(", scid ");
+			ND_PRINT(C_RESET, ", scid ");
 			hexprint(ndo, scid, scil);
 			register_quic_cid(scid, scil);
 		}
@@ -209,7 +209,7 @@ quic_print_packet(netdissect_options *ndo, const u_char *bp, const u_char *end)
 				} else {
 					uint32_t vn_version = GET_BE_U_4(bp);
 					bp += 4;
-					ND_PRINT(", version 0x%x", vn_version);
+					ND_PRINT(C_RESET, ", version 0x%x", vn_version);
 				}
 			}
 		} else {
@@ -220,12 +220,12 @@ quic_print_packet(netdissect_options *ndo, const u_char *bp, const u_char *end)
 					token = nd_malloc(ndo, (size_t)token_length);
 					GET_CPY_BYTES(token, bp, (size_t)token_length);
 					bp += token_length;
-					ND_PRINT(", token ");
+					ND_PRINT(C_RESET, ", token ");
 					hexprint(ndo, token, (size_t)token_length);
 				}
 			}
 			if (packet_type == QUIC_LH_TYPE_RETRY) {
-				ND_PRINT(", token ");
+				ND_PRINT(C_RESET, ", token ");
 				if (end > bp && end - bp > 16 &&
 				    ND_TTEST_LEN(bp, end - bp - 16)) {
 					token_length = end - bp - 16;
@@ -242,7 +242,7 @@ quic_print_packet(netdissect_options *ndo, const u_char *bp, const u_char *end)
 				uint64_t payload_length =
 					GET_BE_VLI(bp, &vli_length);
 				bp += vli_length;
-				ND_PRINT(", length %" PRIu64, payload_length);
+				ND_PRINT(C_RESET, ", length %" PRIu64, payload_length);
 				if (!ND_TTEST_LEN(bp, payload_length)) {
 					nd_print_trunc(ndo);
 					bp = end;
@@ -252,13 +252,13 @@ quic_print_packet(netdissect_options *ndo, const u_char *bp, const u_char *end)
 		}
 	} else {
 		/* Short Header */
-		ND_PRINT(", protected");
+		ND_PRINT(C_RESET, ", protected");
 		if (end > bp && end - bp > 16 &&
 		    ND_TTEST_LEN(bp, end - bp)) {
 			struct quic_cid_array *cid_array =
 				lookup_quic_cid(bp, end - bp);
 			if (cid_array != NULL) {
-				ND_PRINT(", dcid ");
+				ND_PRINT(C_RESET, ", dcid ");
 				hexprint(ndo, cid_array->cid,
 					 cid_array->length);
 			}

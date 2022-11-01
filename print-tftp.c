@@ -97,14 +97,14 @@ tftp_print(netdissect_options *ndo,
 	/* Print protocol */
 	nd_print_protocol_caps(ndo);
 	/* Print length */
-	ND_PRINT(", length %u", length);
+	ND_PRINT(C_RESET, ", length %u", length);
 
 	/* Print tftp request type */
 	if (length < 2)
 		goto trunc;
 	opcode = GET_BE_U_2(bp);
 	cp = tok2str(op2str, "tftp-#%u", opcode);
-	ND_PRINT(", %s", cp);
+	ND_PRINT(C_RESET, ", %s", cp);
 	/* Bail if bogus opcode */
 	if (*cp == 't')
 		return;
@@ -117,11 +117,11 @@ tftp_print(netdissect_options *ndo,
 	case WRQ:
 		if (length == 0)
 			goto trunc;
-		ND_PRINT(" ");
+		ND_PRINT(C_RESET, " ");
 		/* Print filename */
-		ND_PRINT("\"");
+		ND_PRINT(C_RESET, "\"");
 		ui = nd_printztn(ndo, bp, length, ndo->ndo_snapend);
-		ND_PRINT("\"");
+		ND_PRINT(C_RESET, "\"");
 		if (ui == 0)
 			goto trunc;
 		bp += ui;
@@ -130,7 +130,7 @@ tftp_print(netdissect_options *ndo,
 		/* Print the mode - RRQ and WRQ only */
 		if (length == 0)
 			goto trunc;	/* no mode */
-		ND_PRINT(" ");
+		ND_PRINT(C_RESET, " ");
 		ui = nd_printztn(ndo, bp, length, ndo->ndo_snapend);
 		if (ui == 0)
 			goto trunc;
@@ -140,7 +140,7 @@ tftp_print(netdissect_options *ndo,
 		/* Print options, if any */
 		while (length != 0) {
 			if (GET_U_1(bp) != '\0')
-				ND_PRINT(" ");
+				ND_PRINT(C_RESET, " ");
 			ui = nd_printztn(ndo, bp, length, ndo->ndo_snapend);
 			if (ui == 0)
 				goto trunc;
@@ -153,7 +153,7 @@ tftp_print(netdissect_options *ndo,
 		/* Print options */
 		while (length != 0) {
 			if (GET_U_1(bp) != '\0')
-				ND_PRINT(" ");
+				ND_PRINT(C_RESET, " ");
 			ui = nd_printztn(ndo, bp, length, ndo->ndo_snapend);
 			if (ui == 0)
 				goto trunc;
@@ -166,30 +166,30 @@ tftp_print(netdissect_options *ndo,
 	case DATA:
 		if (length < 2)
 			goto trunc;	/* no block number */
-		ND_PRINT(" block %u", GET_BE_U_2(bp));
+		ND_PRINT(C_RESET, " block %u", GET_BE_U_2(bp));
 		break;
 
 	case TFTP_ERROR:
 		/* Print error code string */
 		if (length < 2)
 			goto trunc;	/* no error code */
-		ND_PRINT(" %s", tok2str(err2str, "tftp-err-#%u \"",
+		ND_PRINT(C_RESET, " %s", tok2str(err2str, "tftp-err-#%u \"",
 				       GET_BE_U_2(bp)));
 		bp += 2;
 		length -= 2;
 		/* Print error message string */
 		if (length == 0)
 			goto trunc;	/* no error message */
-		ND_PRINT(" \"");
+		ND_PRINT(C_RESET, " \"");
 		ui = nd_printztn(ndo, bp, length, ndo->ndo_snapend);
-		ND_PRINT("\"");
+		ND_PRINT(C_RESET, "\"");
 		if (ui == 0)
 			goto trunc;
 		break;
 
 	default:
 		/* We shouldn't get here */
-		ND_PRINT("(unknown #%u)", opcode);
+		ND_PRINT(C_RESET, "(unknown #%u)", opcode);
 		break;
 	}
 	return;

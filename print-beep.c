@@ -51,19 +51,19 @@ beep_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	ndo->ndo_protocol = "beep";
 	if (l_strnstart(ndo, "MSG", 4, (const char *)bp, length)) /* A REQuest */
-		ND_PRINT(" BEEP MSG");
+		ND_PRINT(C_RESET, " BEEP MSG");
 	else if (l_strnstart(ndo, "RPY ", 4, (const char *)bp, length))
-		ND_PRINT(" BEEP RPY");
+		ND_PRINT(C_RESET, " BEEP RPY");
 	else if (l_strnstart(ndo, "ERR ", 4, (const char *)bp, length))
-		ND_PRINT(" BEEP ERR");
+		ND_PRINT(C_RESET, " BEEP ERR");
 	else if (l_strnstart(ndo, "ANS ", 4, (const char *)bp, length))
-		ND_PRINT(" BEEP ANS");
+		ND_PRINT(C_RESET, " BEEP ANS");
 	else if (l_strnstart(ndo, "NUL ", 4, (const char *)bp, length))
-		ND_PRINT(" BEEP NUL");
+		ND_PRINT(C_RESET, " BEEP NUL");
 	else if (l_strnstart(ndo, "SEQ ", 4, (const char *)bp, length))
-		ND_PRINT(" BEEP SEQ");
+		ND_PRINT(C_RESET, " BEEP SEQ");
 	else if (l_strnstart(ndo, "END", 4, (const char *)bp, length))
-		ND_PRINT(" BEEP END");
+		ND_PRINT(C_RESET, " BEEP END");
 	else
-		ND_PRINT(" BEEP (payload or undecoded)");
+		ND_PRINT(C_RESET, " BEEP (payload or undecoded)");
 }

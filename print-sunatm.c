@@ -73,7 +73,10 @@ sunatm_if_print(netdissect_options *ndo,
 	ndo->ndo_protocol = "sunatm";
 
 	if (ndo->ndo_eflag) {
-		ND_PRINT(GET_U_1(p + DIR_POS) & 0x80 ? "Tx: " : "Rx: ");
+		if(GET_U_1(p + DIR_POS) & 0x80)
+			ND_PRINT(C_RESET, "Tx: ");
+		else
+			ND_PRINT(C_RESET, "Rx: ");
 	}
 
 	switch (GET_U_1(p + DIR_POS) & 0x0f) {

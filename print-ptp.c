@@ -256,7 +256,7 @@ static const struct tok ptp_flag_values[] = {
 
 #define PTP_PRINT_MSG_TYPE(e) \
         { \
-            ND_PRINT("(%s)", tok2str(ptp_msg_type, "unknown", e)); \
+            ND_PRINT(C_RESET, "(%s)", tok2str(ptp_msg_type, "unknown", e)); \
         }
 
 static const char *p_porigin_ts = "preciseOriginTimeStamp";
@@ -295,38 +295,38 @@ print_field(netdissect_options *ndo, const char *st, uint32_t flen,
     switch(flen) {
         case PTP_UCHAR_LEN:
             u8_val = GET_U_1(bp);
-            ND_PRINT(", %s", st);
+            ND_PRINT(C_RESET, ", %s", st);
             if (hex)
-                ND_PRINT(" 0x%x", u8_val);
+                ND_PRINT(C_RESET, " 0x%x", u8_val);
             else
-                ND_PRINT(" %u", u8_val);
+                ND_PRINT(C_RESET, " %u", u8_val);
             *len -= 1; bp += 1;
             break;
         case PTP_UINT16_LEN:
             u16_val = GET_BE_U_2(bp);
-            ND_PRINT(", %s", st);
+            ND_PRINT(C_RESET, ", %s", st);
             if (hex)
-                ND_PRINT(" 0x%x", u16_val);
+                ND_PRINT(C_RESET, " 0x%x", u16_val);
             else
-                ND_PRINT(" %u", u16_val);
+                ND_PRINT(C_RESET, " %u", u16_val);
             *len -= 2; bp += 2;
             break;
         case PTP_UINT32_LEN:
             u32_val = GET_BE_U_4(bp);
-            ND_PRINT(", %s", st);
+            ND_PRINT(C_RESET, ", %s", st);
             if (hex)
-                ND_PRINT(" 0x%x", u32_val);
+                ND_PRINT(C_RESET, " 0x%x", u32_val);
             else
-                ND_PRINT(" %u", u32_val);
+                ND_PRINT(C_RESET, " %u", u32_val);
             *len -= 4; bp += 4;
             break;
         case PTP_UINT64_LEN:
             u64_val = GET_BE_U_8(bp);
-            ND_PRINT(", %s", st);
+            ND_PRINT(C_RESET, ", %s", st);
             if (hex)
-                ND_PRINT(" 0x%"PRIx64, u64_val);
+                ND_PRINT(C_RESET, " 0x%"PRIx64, u64_val);
             else
-                ND_PRINT(" 0x%"PRIu64, u64_val);
+                ND_PRINT(C_RESET, " 0x%"PRIu64, u64_val);
             *len -= 8; bp += 8;
             break;
         default:
@@ -337,7 +337,7 @@ print_field(netdissect_options *ndo, const char *st, uint32_t flen,
 static void
 ptp_print_1(netdissect_options *ndo)
 {
-    ND_PRINT(" (not implemented)");
+    ND_PRINT(C_RESET, " (not implemented)");
 }
 
 static void
@@ -353,47 +353,47 @@ ptp_print_2(netdissect_options *ndo, const u_char *bp, u_int length)
 
     foct = GET_U_1(bp);
     v1_compat = foct & PTP_V1_COMPAT;
-    ND_PRINT(", v1 compat : %s", v1_compat?"yes":"no");
+    ND_PRINT(C_RESET, ", v1 compat : %s", v1_compat?"yes":"no");
     msg_type = foct & PTP_MSG_TYPE_MASK;
-    ND_PRINT(", msg type : %s", tok2str(ptp_msg_type, "none", msg_type));
+    ND_PRINT(C_RESET, ", msg type : %s", tok2str(ptp_msg_type, "none", msg_type));
 
     /* msg length */
-    len -= 2; bp += 2; msg_len = GET_BE_U_2(bp); ND_PRINT(", length : %u", msg_len);
+    len -= 2; bp += 2; msg_len = GET_BE_U_2(bp); ND_PRINT(C_RESET, ", length : %u", msg_len);
 
     /* domain */
-    len -= 2; bp += 2; domain_no = (GET_BE_U_2(bp) & PTP_DOMAIN_MASK) >> 8; ND_PRINT(", domain : %u", domain_no);
+    len -= 2; bp += 2; domain_no = (GET_BE_U_2(bp) & PTP_DOMAIN_MASK) >> 8; ND_PRINT(C_RESET, ", domain : %u", domain_no);
 
     /* rsvd 1*/
     rsvd1 = GET_BE_U_2(bp) & PTP_RSVD1_MASK;
-    ND_PRINT(", reserved1 : %u", rsvd1);
+    ND_PRINT(C_RESET, ", reserved1 : %u", rsvd1);
 
     /* flags */
-    len -= 2; bp += 2; flags = GET_BE_U_2(bp); ND_PRINT(", Flags [%s]", bittok2str(ptp_flag_values, "none", flags));
+    len -= 2; bp += 2; flags = GET_BE_U_2(bp); ND_PRINT(C_RESET, ", Flags [%s]", bittok2str(ptp_flag_values, "none", flags));
 
     /* correction NS (48 bits) */
-    len -= 2; bp += 2; ns_corr = GET_BE_U_6(bp); ND_PRINT(", NS correction : %"PRIu64, ns_corr);
+    len -= 2; bp += 2; ns_corr = GET_BE_U_6(bp); ND_PRINT(C_RESET, ", NS correction : %"PRIu64, ns_corr);
 
     /* correction sub NS (16 bits) */
-    len -= 6; bp += 6; sns_corr = GET_BE_U_2(bp); ND_PRINT(", sub NS correction : %u", sns_corr);
+    len -= 6; bp += 6; sns_corr = GET_BE_U_2(bp); ND_PRINT(C_RESET, ", sub NS correction : %u", sns_corr);
 
     /* Reserved 2 */
-    len -= 2; bp += 2; rsvd2 = GET_BE_U_4(bp); ND_PRINT(", reserved2 : %u", rsvd2);
+    len -= 2; bp += 2; rsvd2 = GET_BE_U_4(bp); ND_PRINT(C_RESET, ", reserved2 : %u", rsvd2);
 
     /* clock identity */
-    len -= 4; bp += 4; clk_id = GET_BE_U_8(bp); ND_PRINT(", clock identity : 0x%"PRIx64, clk_id);
+    len -= 4; bp += 4; clk_id = GET_BE_U_8(bp); ND_PRINT(C_RESET, ", clock identity : 0x%"PRIx64, clk_id);
 
     /* port identity */
-    len -= 8; bp += 8; port_id = GET_BE_U_2(bp); ND_PRINT(", port id : %u", port_id);
+    len -= 8; bp += 8; port_id = GET_BE_U_2(bp); ND_PRINT(C_RESET, ", port id : %u", port_id);
 
     /* sequence ID */
-    len -= 2; bp += 2; seq_id = GET_BE_U_2(bp); ND_PRINT(", seq id : %u", seq_id);
+    len -= 2; bp += 2; seq_id = GET_BE_U_2(bp); ND_PRINT(C_RESET, ", seq id : %u", seq_id);
 
     /* control */
     len -= 2; bp += 2; control = GET_U_1(bp) ;
-    ND_PRINT(", control : %u (%s)", control, tok2str(ptp_msg_type, "none", control));
+    ND_PRINT(C_RESET, ", control : %u (%s)", control, tok2str(ptp_msg_type, "none", control));
 
     /* log message interval */
-    lm_int = GET_BE_U_2(bp) & PTP_LOGMSG_MASK; ND_PRINT(", log message interval : %u", lm_int); len -= 2; bp += 2;
+    lm_int = GET_BE_U_2(bp) & PTP_LOGMSG_MASK; ND_PRINT(C_RESET, ", log message interval : %u", lm_int); len -= 2; bp += 2;
 
     switch(msg_type) {
         case M_SYNC:
@@ -441,7 +441,7 @@ ptp_print(netdissect_options *ndo, const u_char *bp, u_int length)
     ndo->ndo_protocol = "ptp";
     ND_ICHECK_U(length, <, PTP_HDR_LEN);
     vers = GET_BE_U_2(bp) & PTP_VERS_MASK;
-    ND_PRINT("PTPv%u",vers);
+    ND_PRINT(C_RESET, "PTPv%u",vers);
     switch(vers) {
         case PTP_VER_1:
             ptp_print_1(ndo);
@@ -450,7 +450,7 @@ ptp_print(netdissect_options *ndo, const u_char *bp, u_int length)
             ptp_print_2(ndo, bp, length);
             break;
         default:
-            //ND_PRINT("ERROR: unknown-version\n");
+            //ND_PRINT(C_RESET, "ERROR: unknown-version\n");
             break;
     }
     return;
@@ -465,16 +465,16 @@ ptp_print_timestamp(netdissect_options *ndo, const u_char *bp, u_int *len, const
     uint64_t secs;
     uint32_t nsecs;
 
-    ND_PRINT(", %s :", stype);
+    ND_PRINT(C_RESET, ", %s :", stype);
     /* sec time stamp 6 bytes */
     secs = GET_BE_U_6(bp);
-    ND_PRINT(" %"PRIu64" seconds,", secs);
+    ND_PRINT(C_RESET, " %"PRIu64" seconds,", secs);
     *len -= 6;
     bp += 6;
 
     /* NS time stamp 4 bytes */
     nsecs = GET_BE_U_4(bp);
-    ND_PRINT(" %u nanoseconds", nsecs);
+    ND_PRINT(C_RESET, " %u nanoseconds", nsecs);
     *len -= 4;
     bp += 4;
 }
@@ -487,28 +487,28 @@ ptp_print_timestamp_identity(netdissect_options *ndo,
     uint16_t port_id;
     uint64_t port_identity;
 
-    ND_PRINT(", %s :", ttype);
+    ND_PRINT(C_RESET, ", %s :", ttype);
     /* sec time stamp 6 bytes */
     secs = GET_BE_U_6(bp);
-    ND_PRINT(" %"PRIu64" seconds,", secs);
+    ND_PRINT(C_RESET, " %"PRIu64" seconds,", secs);
     *len -= 6;
     bp += 6;
 
     /* NS time stamp 4 bytes */
     nsecs = GET_BE_U_4(bp);
-    ND_PRINT(" %u nanoseconds", nsecs);
+    ND_PRINT(C_RESET, " %u nanoseconds", nsecs);
     *len -= 4;
     bp += 4;
 
     /* port identity*/
     port_identity = GET_BE_U_8(bp);
-    ND_PRINT(", port identity : 0x%"PRIx64, port_identity);
+    ND_PRINT(C_RESET, ", port identity : 0x%"PRIx64, port_identity);
     *len -= 8;
     bp += 8;
 
     /* port id */
     port_id = GET_BE_U_2(bp);
-    ND_PRINT(", port id : %u", port_id);
+    ND_PRINT(C_RESET, ", port id : %u", port_id);
     *len -= 2;
     bp += 2;
 }
@@ -521,71 +521,71 @@ ptp_print_announce_msg(netdissect_options *ndo, const u_char *bp, u_int *len)
     uint64_t secs;
     uint32_t nsecs;
 
-    ND_PRINT(", %s :", p_origin_ts);
+    ND_PRINT(C_RESET, ", %s :", p_origin_ts);
     /* sec time stamp 6 bytes */
     secs = GET_BE_U_6(bp);
-    ND_PRINT(" %"PRIu64" seconds", secs);
+    ND_PRINT(C_RESET, " %"PRIu64" seconds", secs);
     *len -= 6;
     bp += 6;
 
     /* NS time stamp 4 bytes */
     nsecs = GET_BE_U_4(bp);
-    ND_PRINT(" %u nanoseconds", nsecs);
+    ND_PRINT(C_RESET, " %u nanoseconds", nsecs);
     *len -= 4;
     bp += 4;
 
     /* origin cur utc */
     origin_cur_utc = GET_BE_U_2(bp);
-    ND_PRINT(", origin cur utc :%u", origin_cur_utc);
+    ND_PRINT(C_RESET, ", origin cur utc :%u", origin_cur_utc);
     *len -= 2;
     bp += 2;
 
     /* rsvd */
     rsvd = GET_U_1(bp);
-    ND_PRINT(", rsvd : %u", rsvd);
+    ND_PRINT(C_RESET, ", rsvd : %u", rsvd);
     *len -= 1;
     bp += 1;
 
     /* gm prio */
     gm_prio_1 = GET_U_1(bp);
-    ND_PRINT(", gm priority_1 : %u", gm_prio_1);
+    ND_PRINT(C_RESET, ", gm priority_1 : %u", gm_prio_1);
     *len -= 1;
     bp += 1;
 
     /* GM clock class */
     gm_clk_cls = GET_U_1(bp);
-    ND_PRINT(", gm clock class : %u", gm_clk_cls);
+    ND_PRINT(C_RESET, ", gm clock class : %u", gm_clk_cls);
     *len -= 1;
     bp += 1;
     /* GM clock accuracy */
     gm_clk_acc = GET_U_1(bp);
-    ND_PRINT(", gm clock accuracy : %u", gm_clk_acc);
+    ND_PRINT(C_RESET, ", gm clock accuracy : %u", gm_clk_acc);
     *len -= 1;
     bp += 1;
     /* GM clock variance */
     gm_clk_var = GET_BE_U_2(bp);
-    ND_PRINT(", gm clock variance : %u", gm_clk_var);
+    ND_PRINT(C_RESET, ", gm clock variance : %u", gm_clk_var);
     *len -= 2;
     bp += 2;
     /* GM Prio 2 */
     gm_prio_2 = GET_U_1(bp);
-    ND_PRINT(", gm priority_2 : %u", gm_prio_2);
+    ND_PRINT(C_RESET, ", gm priority_2 : %u", gm_prio_2);
     *len -= 1;
     bp += 1;
 
     /* GM Clock Identity */
     gm_clock_id = GET_BE_U_8(bp);
-    ND_PRINT(", gm clock id : 0x%"PRIx64, gm_clock_id);
+    ND_PRINT(C_RESET, ", gm clock id : 0x%"PRIx64, gm_clock_id);
     *len -= 8;
     bp += 8;
     /* steps removed */
     steps_removed = GET_BE_U_2(bp);
-    ND_PRINT(", steps removed : %u", steps_removed);
+    ND_PRINT(C_RESET, ", steps removed : %u", steps_removed);
     *len -= 2;
     bp += 2;
     /* Time source */
     time_src = GET_U_1(bp);
-    ND_PRINT(", time source : 0x%x", time_src);
+    ND_PRINT(C_RESET, ", time source : 0x%x", time_src);
     *len -= 1;
     bp += 1;
 
@@ -598,13 +598,13 @@ ptp_print_port_id(netdissect_options *ndo, const u_char *bp, u_int *len)
 
     /* port identity*/
     port_identity = GET_BE_U_8(bp);
-    ND_PRINT(", port identity : 0x%"PRIx64, port_identity);
+    ND_PRINT(C_RESET, ", port identity : 0x%"PRIx64, port_identity);
     *len -= 8;
     bp += 8;
 
     /* port id */
     port_id = GET_BE_U_2(bp);
-    ND_PRINT(", port id : %u", port_id);
+    ND_PRINT(C_RESET, ", port id : %u", port_id);
     *len -= 2;
     bp += 2;
 

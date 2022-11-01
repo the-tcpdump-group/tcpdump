@@ -129,24 +129,24 @@ vsock_virtio_hdr_print(netdissect_options *ndo, const struct virtio_vsock_hdr *h
 	uint32_t u32_v;
 
 	u32_v = GET_LE_U_4(hdr->len);
-	ND_PRINT("len %u", u32_v);
+	ND_PRINT(C_RESET, "len %u", u32_v);
 
 	u16_v = GET_LE_U_2(hdr->type);
-	ND_PRINT(", type %s",
+	ND_PRINT(C_RESET, ", type %s",
 		 tok2str(virtio_type, "Invalid type (%hu)", u16_v));
 
 	u16_v = GET_LE_U_2(hdr->op);
-	ND_PRINT(", op %s",
+	ND_PRINT(C_RESET, ", op %s",
 		 tok2str(virtio_op, "Invalid op (%hu)", u16_v));
 
 	u32_v = GET_LE_U_4(hdr->flags);
-	ND_PRINT(", flags %x", u32_v);
+	ND_PRINT(C_RESET, ", flags %x", u32_v);
 
 	u32_v = GET_LE_U_4(hdr->buf_alloc);
-	ND_PRINT(", buf_alloc %u", u32_v);
+	ND_PRINT(C_RESET, ", buf_alloc %u", u32_v);
 
 	u32_v = GET_LE_U_4(hdr->fwd_cnt);
-	ND_PRINT(", fwd_cnt %u", u32_v);
+	ND_PRINT(C_RESET, ", fwd_cnt %u", u32_v);
 }
 
 /*
@@ -178,9 +178,9 @@ vsock_transport_hdr_print(netdissect_options *ndo, uint16_t transport,
 	hdr = p + sizeof(struct af_vsockmon_hdr);
 	switch (transport) {
 		case AF_VSOCK_TRANSPORT_VIRTIO:
-			ND_PRINT(" (");
+			ND_PRINT(C_RESET, " (");
 			vsock_virtio_hdr_print(ndo, hdr);
-			ND_PRINT(")");
+			ND_PRINT(C_RESET, ")");
 			break;
 		default:
 			break;
@@ -199,7 +199,7 @@ vsock_hdr_print(netdissect_options *ndo, const u_char *p, const u_int caplen)
 	int ret = 0;
 
 	hdr_transport = GET_LE_U_2(hdr->transport);
-	ND_PRINT("%s",
+	ND_PRINT(C_RESET, "%s",
 		 tok2str(vsock_transport, "Invalid transport (%u)",
 			  hdr_transport));
 
@@ -207,16 +207,16 @@ vsock_hdr_print(netdissect_options *ndo, const u_char *p, const u_int caplen)
 	if (ndo->ndo_vflag) {
 		ret = vsock_transport_hdr_print(ndo, hdr_transport, p, caplen);
 		if (ret == 0)
-			ND_PRINT("\n\t");
+			ND_PRINT(C_RESET, "\n\t");
 	} else
-		ND_PRINT(" ");
+		ND_PRINT(C_RESET, " ");
 
 	hdr_src_cid = GET_LE_U_8(hdr->src_cid);
 	hdr_dst_cid = GET_LE_U_8(hdr->dst_cid);
 	hdr_src_port = GET_LE_U_4(hdr->src_port);
 	hdr_dst_port = GET_LE_U_4(hdr->dst_port);
 	hdr_op = GET_LE_U_2(hdr->op);
-	ND_PRINT("%" PRIu64 ".%u > %" PRIu64 ".%u %s, length %u",
+	ND_PRINT(C_RESET, "%" PRIu64 ".%u > %" PRIu64 ".%u %s, length %u",
 		 hdr_src_cid, hdr_src_port,
 		 hdr_dst_cid, hdr_dst_port,
 		 tok2str(vsock_op, " invalid op (%u)", hdr_op),
@@ -233,7 +233,7 @@ vsock_hdr_print(netdissect_options *ndo, const u_char *p, const u_int caplen)
 		if (caplen > total_hdr_size) {
 			const u_char *payload = p + total_hdr_size;
 
-			ND_PRINT("\n");
+			ND_PRINT(C_RESET, "\n");
 			print_unknown_data(ndo, payload, "\t",
 					   caplen - total_hdr_size);
 		} else

@@ -65,29 +65,29 @@ loopback_message_print(netdissect_options *ndo,
 	function = GET_LE_U_2(cp);
 	cp += 2;
 	len -= 2;
-	ND_PRINT(", %s", tok2str(fcode_str, " invalid (%u)", function));
+	ND_PRINT(C_RESET, ", %s", tok2str(fcode_str, " invalid (%u)", function));
 
 	switch (function) {
 		case LOOPBACK_REPLY:
 			if (len < 2)
 				goto invalid;
 			/* receipt number */
-			ND_PRINT(", receipt number %u", GET_LE_U_2(cp));
+			ND_PRINT(C_RESET, ", receipt number %u", GET_LE_U_2(cp));
 			cp += 2;
 			len -= 2;
 			/* data */
-			ND_PRINT(", data (%u octets)", len);
+			ND_PRINT(C_RESET, ", data (%u octets)", len);
 			ND_TCHECK_LEN(cp, len);
 			break;
 		case LOOPBACK_FWDDATA:
 			if (len < MAC_ADDR_LEN)
 				goto invalid;
 			/* forwarding address */
-			ND_PRINT(", forwarding address %s", GET_ETHERADDR_STRING(cp));
+			ND_PRINT(C_RESET, ", forwarding address %s", GET_ETHERADDR_STRING(cp));
 			cp += MAC_ADDR_LEN;
 			len -= MAC_ADDR_LEN;
 			/* data */
-			ND_PRINT(", data (%u octets)", len);
+			ND_PRINT(C_RESET, ", data (%u octets)", len);
 			ND_TCHECK_LEN(cp, len);
 			break;
 		default:
@@ -108,16 +108,16 @@ loopback_print(netdissect_options *ndo,
 	uint16_t skipCount;
 
 	ndo->ndo_protocol = "loopback";
-	ND_PRINT("Loopback");
+	ND_PRINT(C_RESET, "Loopback");
 	if (len < 2)
 		goto invalid;
 	/* skipCount */
 	skipCount = GET_LE_U_2(cp);
 	cp += 2;
 	len -= 2;
-	ND_PRINT(", skipCount %u", skipCount);
+	ND_PRINT(C_RESET, ", skipCount %u", skipCount);
 	if (skipCount % 8)
-		ND_PRINT(" (bogus)");
+		ND_PRINT(C_RESET, " (bogus)");
 	if (skipCount > len)
 		goto invalid;
 	/* the octets to skip */

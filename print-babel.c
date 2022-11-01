@@ -57,15 +57,15 @@ babel_print(netdissect_options *ndo,
             const u_char *cp, u_int length)
 {
     ndo->ndo_protocol = "babel";
-    ND_PRINT("babel");
+    ND_PRINT(C_RESET, "babel");
 
     ND_TCHECK_4(cp);
 
     if(GET_U_1(cp) != 42) {
-        ND_PRINT(" invalid header");
+        ND_PRINT(C_RESET, " invalid header");
         return;
     } else {
-        ND_PRINT(" %u", GET_U_1(cp + 1));
+        ND_PRINT(C_RESET, " %u", GET_U_1(cp + 1));
     }
 
     switch(GET_U_1(cp + 1)) {
@@ -73,7 +73,7 @@ babel_print(netdissect_options *ndo,
         babel_print_v2(ndo, cp, length);
         break;
     default:
-        ND_PRINT(" unknown version");
+        ND_PRINT(C_RESET, " unknown version");
         break;
     }
 
@@ -307,11 +307,11 @@ subtlvs_print(netdissect_options *ndo,
         subtype = GET_U_1(cp);
         cp++;
         if(subtype == MESSAGE_SUB_PAD1) {
-            ND_PRINT(" sub-pad1");
+            ND_PRINT(C_RESET, " sub-pad1");
             continue;
         }
         if ((MANDATORY_MASK & subtype) != 0)
-            ND_PRINT(" (M)");
+            ND_PRINT(C_RESET, " (M)");
         if(cp == ep)
             goto invalid;
         sublen = GET_U_1(cp);
@@ -321,18 +321,18 @@ subtlvs_print(netdissect_options *ndo,
 
         switch(subtype) {
         case MESSAGE_SUB_PADN:
-            ND_PRINT(" sub-padn");
+            ND_PRINT(C_RESET, " sub-padn");
             cp += sublen;
             break;
         case MESSAGE_SUB_DIVERSITY:
-            ND_PRINT(" sub-diversity");
+            ND_PRINT(C_RESET, " sub-diversity");
             if (sublen == 0) {
-                ND_PRINT(" empty");
+                ND_PRINT(C_RESET, " empty");
                 break;
             }
             sep = " ";
             while (sublen) {
-                ND_PRINT("%s%s", sep,
+                ND_PRINT(C_RESET, "%s%s", sep,
                          tok2str(diversity_str, "%u", GET_U_1(cp)));
                 cp++;
                 sep = "-";
@@ -340,28 +340,28 @@ subtlvs_print(netdissect_options *ndo,
             }
             if(tlv_type != MESSAGE_UPDATE &&
                tlv_type != MESSAGE_UPDATE_SRC_SPECIFIC)
-                ND_PRINT(" (bogus)");
+                ND_PRINT(C_RESET, " (bogus)");
             break;
         case MESSAGE_SUB_TIMESTAMP:
-            ND_PRINT(" sub-timestamp");
+            ND_PRINT(C_RESET, " sub-timestamp");
             if(tlv_type == MESSAGE_HELLO) {
                 if(sublen < 4)
                     goto invalid;
                 t1 = GET_BE_U_4(cp);
-                ND_PRINT(" %s", format_timestamp(t1));
+                ND_PRINT(C_RESET, " %s", format_timestamp(t1));
             } else if(tlv_type == MESSAGE_IHU) {
                 if(sublen < 8)
                     goto invalid;
                 t1 = GET_BE_U_4(cp);
-                ND_PRINT(" %s", format_timestamp(t1));
+                ND_PRINT(C_RESET, " %s", format_timestamp(t1));
                 t2 = GET_BE_U_4(cp + 4);
-                ND_PRINT("|%s", format_timestamp(t2));
+                ND_PRINT(C_RESET, "|%s", format_timestamp(t2));
             } else
-                ND_PRINT(" (bogus)");
+                ND_PRINT(C_RESET, " (bogus)");
             cp += sublen;
             break;
         default:
-            ND_PRINT(" sub-unknown-0x%02x", subtype);
+            ND_PRINT(C_RESET, " sub-unknown-0x%02x", subtype);
             cp += sublen;
         } /* switch */
     } /* while */
@@ -395,7 +395,13 @@ babel_print_v2_tlvs(netdissect_options *ndo,
 
         ICHECK(i, 1);
         if((type = GET_U_1(message)) == MESSAGE_PAD1) {
-            ND_PRINT(ndo->ndo_vflag ? "\n\tPad 1" : " pad1");
+
+            if(ndo->ndo_vflag) {
+                ND_PRINT(C_RESET, "\n\tPad 1");
+            } else {
+                ND_PRINT(C_RESET, " pad1");
+            }
+
             i += 1;
             continue;
         }
@@ -410,22 +416,22 @@ babel_print_v2_tlvs(netdissect_options *ndo,
         switch(type) {
         case MESSAGE_PADN: {
             if (!ndo->ndo_vflag)
-                ND_PRINT(" padN");
+                ND_PRINT(C_RESET, " padN");
             else
-                ND_PRINT("\n\tPad %u", len + 2);
+                ND_PRINT(C_RESET, "\n\tPad %u", len + 2);
         }
             break;
 
         case MESSAGE_ACK_REQ: {
             u_short nonce, interval;
             if (!ndo->ndo_vflag)
-                ND_PRINT(" ack-req");
+                ND_PRINT(C_RESET, " ack-req");
             else {
-                ND_PRINT("\n\tAcknowledgment Request ");
+                ND_PRINT(C_RESET, "\n\tAcknowledgment Request ");
                 if(len < 6) goto invalid;
                 nonce = GET_BE_U_2(message + 4);
                 interval = GET_BE_U_2(message + 6);
-                ND_PRINT("%04x %s", nonce, format_interval(interval));
+                ND_PRINT(C_RESET, "%04x %s", nonce, format_interval(interval));
             }
         }
             break;
@@ -433,12 +439,12 @@ babel_print_v2_tlvs(netdissect_options *ndo,
         case MESSAGE_ACK: {
             u_short nonce;
             if (!ndo->ndo_vflag)
-                ND_PRINT(" ack");
+                ND_PRINT(C_RESET, " ack");
             else {
-                ND_PRINT("\n\tAcknowledgment ");
+                ND_PRINT(C_RESET, "\n\tAcknowledgment ");
                 if(len < 2) goto invalid;
                 nonce = GET_BE_U_2(message + 2);
-                ND_PRINT("%04x", nonce);
+                ND_PRINT(C_RESET, "%04x", nonce);
             }
         }
             break;
@@ -446,20 +452,20 @@ babel_print_v2_tlvs(netdissect_options *ndo,
         case MESSAGE_HELLO:  {
             u_short seqno, interval, unicast;
             if (!ndo->ndo_vflag)
-                ND_PRINT(" hello");
+                ND_PRINT(C_RESET, " hello");
             else {
-                ND_PRINT("\n\tHello ");
+                ND_PRINT(C_RESET, "\n\tHello ");
                 if(len < 6) goto invalid;
                 unicast = (GET_BE_U_2(message + 2) & UNICAST_MASK);
                 seqno = GET_BE_U_2(message + 4);
                 interval = GET_BE_U_2(message + 6);
                 if(unicast)
-                     ND_PRINT("(Unicast) ");
-                ND_PRINT("seqno %u ", seqno);
+                     ND_PRINT(C_RESET, "(Unicast) ");
+                ND_PRINT(C_RESET, "seqno %u ", seqno);
                 if(interval!=0)
-                    ND_PRINT("interval %s", format_interval(interval));
+                    ND_PRINT(C_RESET, "interval %s", format_interval(interval));
                 else
-                    ND_PRINT("unscheduled");
+                    ND_PRINT(C_RESET, "unscheduled");
                 /* Extra data. */
                 if(len > 6)
                     subtlvs_print(ndo, message + 8, message + 2 + len, type);
@@ -470,12 +476,12 @@ babel_print_v2_tlvs(netdissect_options *ndo,
         case MESSAGE_IHU: {
             unsigned short rxcost, interval;
             if (!ndo->ndo_vflag)
-                ND_PRINT(" ihu");
+                ND_PRINT(C_RESET, " ihu");
             else {
                 u_char address[16];
                 u_char ae;
                 int rc;
-                ND_PRINT("\n\tIHU ");
+                ND_PRINT(C_RESET, "\n\tIHU ");
                 if(len < 6) goto invalid;
                 rxcost = GET_BE_U_2(message + 4);
                 interval = GET_BE_U_2(message + 6);
@@ -483,7 +489,7 @@ babel_print_v2_tlvs(netdissect_options *ndo,
                 rc = network_address(ae, message + 8,
                                      len - 6, address);
                 if(rc < 0) { nd_print_trunc(ndo); break; }
-                ND_PRINT("%s rxcost %u interval %s",
+                ND_PRINT(C_RESET, "%s rxcost %u interval %s",
                        ae == 0 ? "any" : format_address(ndo, address),
                        rxcost, format_interval(interval));
                 /* Extra data. */
@@ -496,40 +502,40 @@ babel_print_v2_tlvs(netdissect_options *ndo,
 
         case MESSAGE_ROUTER_ID: {
             if (!ndo->ndo_vflag)
-                ND_PRINT(" router-id");
+                ND_PRINT(C_RESET, " router-id");
             else {
-                ND_PRINT("\n\tRouter Id");
+                ND_PRINT(C_RESET, "\n\tRouter Id");
                 if(len < 10) goto invalid;
-                ND_PRINT(" %s", format_id(ndo, message + 4));
+                ND_PRINT(C_RESET, " %s", format_id(ndo, message + 4));
             }
         }
             break;
 
         case MESSAGE_NH: {
             if (!ndo->ndo_vflag)
-                ND_PRINT(" nh");
+                ND_PRINT(C_RESET, " nh");
             else {
                 int rc;
                 u_char ae;
                 u_char nh[16];
-                ND_PRINT("\n\tNext Hop");
+                ND_PRINT(C_RESET, "\n\tNext Hop");
                 if(len < 2) goto invalid;
                 ae = GET_U_1(message + 2);
                 rc = network_address(ae, message + 4,
                                      len - 2, nh);
                 if(rc < 0) goto invalid;
-                ND_PRINT(" %s", ae == 0 ? "invalid AE 0" : format_address(ndo, nh));
+                ND_PRINT(C_RESET, " %s", ae == 0 ? "invalid AE 0" : format_address(ndo, nh));
             }
         }
             break;
 
         case MESSAGE_UPDATE: {
             if (!ndo->ndo_vflag) {
-                ND_PRINT(" update");
+                ND_PRINT(C_RESET, " update");
                 if(len < 10)
                     goto invalid;
                 else
-                    ND_PRINT("%s%s%s",
+                    ND_PRINT(C_RESET, "%s%s%s",
                            (GET_U_1(message + 3) & 0x80) ? "/prefix": "",
                            (GET_U_1(message + 3) & 0x40) ? "/id" : "",
                            (GET_U_1(message + 3) & 0x3f) ? "/unknown" : "");
@@ -538,7 +544,7 @@ babel_print_v2_tlvs(netdissect_options *ndo,
                 u_char ae, plen;
                 int rc;
                 u_char prefix[16];
-                ND_PRINT("\n\tUpdate");
+                ND_PRINT(C_RESET, "\n\tUpdate");
                 if(len < 10) goto invalid;
                 ae = GET_U_1(message + 2);
                 plen = GET_U_1(message + 4) + (GET_U_1(message + 2) == 1 ? 96 : 0);
@@ -552,7 +558,7 @@ babel_print_v2_tlvs(netdissect_options *ndo,
                 interval = GET_BE_U_2(message + 6);
                 seqno = GET_BE_U_2(message + 8);
                 metric = GET_BE_U_2(message + 10);
-                ND_PRINT("%s%s%s %s metric %u seqno %u interval %s",
+                ND_PRINT(C_RESET, "%s%s%s %s metric %u seqno %u interval %s",
                        (GET_U_1(message + 3) & 0x80) ? "/prefix": "",
                        (GET_U_1(message + 3) & 0x40) ? "/id" : "",
                        (GET_U_1(message + 3) & 0x3f) ? "/unknown" : "",
@@ -573,11 +579,11 @@ babel_print_v2_tlvs(netdissect_options *ndo,
 
         case MESSAGE_ROUTE_REQUEST: {
             if (!ndo->ndo_vflag)
-                ND_PRINT(" route-request");
+                ND_PRINT(C_RESET, " route-request");
             else {
                 int rc;
                 u_char prefix[16], ae, plen;
-                ND_PRINT("\n\tRoute Request ");
+                ND_PRINT(C_RESET, "\n\tRoute Request ");
                 if(len < 2) goto invalid;
                 ae = GET_U_1(message + 2);
                 plen = GET_U_1(message + 3) + (GET_U_1(message + 2) == 1 ? 96 : 0);
@@ -585,7 +591,7 @@ babel_print_v2_tlvs(netdissect_options *ndo,
                                     GET_U_1(message + 3), 0,
                                     message + 4, NULL, len - 2, prefix);
                 if(rc < 0) goto invalid;
-                ND_PRINT("for %s",
+                ND_PRINT(C_RESET, "for %s",
                        ae == 0 ? "any" : format_prefix(ndo, prefix, plen));
             }
         }
@@ -593,12 +599,12 @@ babel_print_v2_tlvs(netdissect_options *ndo,
 
         case MESSAGE_SEQNO_REQUEST : {
             if (!ndo->ndo_vflag)
-                ND_PRINT(" seqno-request");
+                ND_PRINT(C_RESET, " seqno-request");
             else {
                 int rc;
                 u_short seqno;
                 u_char prefix[16], ae, plen;
-                ND_PRINT("\n\tSeqno Request ");
+                ND_PRINT(C_RESET, "\n\tSeqno Request ");
                 if(len < 14) goto invalid;
                 ae = GET_U_1(message + 2);
                 seqno = GET_BE_U_2(message + 4);
@@ -607,7 +613,7 @@ babel_print_v2_tlvs(netdissect_options *ndo,
                                     message + 16, NULL, len - 14, prefix);
                 if(rc < 0) goto invalid;
                 plen = GET_U_1(message + 3) + (GET_U_1(message + 2) == 1 ? 96 : 0);
-                ND_PRINT("(%u hops) for %s seqno %u id %s",
+                ND_PRINT(C_RESET, "(%u hops) for %s seqno %u id %s",
                        GET_U_1(message + 6),
                        ae == 0 ? "invalid AE 0" : format_prefix(ndo, prefix, plen),
                        seqno, format_id(ndo, message + 8));
@@ -616,40 +622,40 @@ babel_print_v2_tlvs(netdissect_options *ndo,
             break;
         case MESSAGE_TSPC :
             if (!ndo->ndo_vflag)
-                ND_PRINT(" tspc");
+                ND_PRINT(C_RESET, " tspc");
             else {
-                ND_PRINT("\n\tTS/PC ");
+                ND_PRINT(C_RESET, "\n\tTS/PC ");
                 if(len < 6) goto invalid;
-                ND_PRINT("timestamp %u packetcounter %u",
+                ND_PRINT(C_RESET, "timestamp %u packetcounter %u",
                           GET_BE_U_4(message + 4),
                           GET_BE_U_2(message + 2));
             }
             break;
         case MESSAGE_HMAC : {
             if (!ndo->ndo_vflag)
-                ND_PRINT(" hmac");
+                ND_PRINT(C_RESET, " hmac");
             else {
                 unsigned j;
-                ND_PRINT("\n\tHMAC ");
+                ND_PRINT(C_RESET, "\n\tHMAC ");
                 if(len < 18) goto invalid;
-                ND_PRINT("key-id %u digest-%u ", GET_BE_U_2(message + 2),
+                ND_PRINT(C_RESET, "key-id %u digest-%u ", GET_BE_U_2(message + 2),
                          len - 2);
                 for (j = 0; j < len - 2; j++)
-                    ND_PRINT("%02X", GET_U_1(message + j + 4));
+                    ND_PRINT(C_RESET, "%02X", GET_U_1(message + j + 4));
             }
         }
             break;
 
         case MESSAGE_UPDATE_SRC_SPECIFIC : {
             if(!ndo->ndo_vflag) {
-                ND_PRINT(" ss-update");
+                ND_PRINT(C_RESET, " ss-update");
             } else {
                 u_char prefix[16], src_prefix[16];
                 u_short interval, seqno, metric;
                 u_char ae, plen, src_plen, omitted;
                 int rc;
                 int parsed_len = 10;
-                ND_PRINT("\n\tSS-Update");
+                ND_PRINT(C_RESET, "\n\tSS-Update");
                 if(len < 10) goto invalid;
                 ae = GET_U_1(message + 2);
                 src_plen = GET_U_1(message + 3);
@@ -672,8 +678,8 @@ babel_print_v2_tlvs(netdissect_options *ndo,
                     src_plen += 96;
                 parsed_len += rc;
 
-                ND_PRINT(" %s from", format_prefix(ndo, prefix, plen));
-                ND_PRINT(" %s metric %u seqno %u interval %s",
+                ND_PRINT(C_RESET, " %s from", format_prefix(ndo, prefix, plen));
+                ND_PRINT(C_RESET, " %s metric %u seqno %u interval %s",
                           format_prefix(ndo, src_prefix, src_plen),
                           metric, seqno, format_interval_update(interval));
                 /* extra data? */
@@ -686,11 +692,11 @@ babel_print_v2_tlvs(netdissect_options *ndo,
 
         case MESSAGE_REQUEST_SRC_SPECIFIC : {
             if(!ndo->ndo_vflag)
-                ND_PRINT(" ss-request");
+                ND_PRINT(C_RESET, " ss-request");
             else {
                 int rc, parsed_len = 3;
                 u_char ae, plen, src_plen, prefix[16], src_prefix[16];
-                ND_PRINT("\n\tSS-Request ");
+                ND_PRINT(C_RESET, "\n\tSS-Request ");
                 if(len < 3) goto invalid;
                 ae = GET_U_1(message + 2);
                 plen = GET_U_1(message + 3);
@@ -708,10 +714,10 @@ babel_print_v2_tlvs(netdissect_options *ndo,
                     src_plen += 96;
                 parsed_len += rc;
                 if(ae == 0) {
-                    ND_PRINT("for any");
+                    ND_PRINT(C_RESET, "for any");
                 } else {
-                    ND_PRINT("for (%s, ", format_prefix(ndo, prefix, plen));
-                    ND_PRINT("%s)", format_prefix(ndo, src_prefix, src_plen));
+                    ND_PRINT(C_RESET, "for (%s, ", format_prefix(ndo, prefix, plen));
+                    ND_PRINT(C_RESET, "%s)", format_prefix(ndo, src_prefix, src_plen));
                 }
             }
         }
@@ -719,13 +725,13 @@ babel_print_v2_tlvs(netdissect_options *ndo,
 
         case MESSAGE_MH_REQUEST_SRC_SPECIFIC : {
             if(!ndo->ndo_vflag)
-                ND_PRINT(" ss-mh-request");
+                ND_PRINT(C_RESET, " ss-mh-request");
             else {
                 int rc, parsed_len = 14;
                 u_short seqno;
                 u_char ae, plen, src_plen, prefix[16], src_prefix[16], hopc;
                 const u_char *router_id = NULL;
-                ND_PRINT("\n\tSS-MH-Request ");
+                ND_PRINT(C_RESET, "\n\tSS-MH-Request ");
                 if(len < 14) goto invalid;
                 ae = GET_U_1(message + 2);
                 plen = GET_U_1(message + 3);
@@ -744,9 +750,9 @@ babel_print_v2_tlvs(netdissect_options *ndo,
                 if(rc < 0) goto invalid;
                 if(ae == 1)
                     src_plen += 96;
-                ND_PRINT("(%u hops) for (%s, ",
+                ND_PRINT(C_RESET, "(%u hops) for (%s, ",
                           hopc, format_prefix(ndo, prefix, plen));
-                ND_PRINT("%s) seqno %u id %s",
+                ND_PRINT(C_RESET, "%s) seqno %u id %s",
                           format_prefix(ndo, src_prefix, src_plen),
                           seqno, format_id(ndo, router_id));
             }
@@ -755,54 +761,54 @@ babel_print_v2_tlvs(netdissect_options *ndo,
 
         case MESSAGE_MAC: {
             if (!ndo->ndo_vflag)
-                ND_PRINT(" mac");
+                ND_PRINT(C_RESET, " mac");
             else {
-                ND_PRINT("\n\tMAC ");
-                ND_PRINT("len %u", len);
+                ND_PRINT(C_RESET, "\n\tMAC ");
+                ND_PRINT(C_RESET, "len %u", len);
             }
         }
             break;
 
         case MESSAGE_PC: {
             if (!ndo->ndo_vflag)
-                ND_PRINT(" pc");
+                ND_PRINT(C_RESET, " pc");
             else {
-                ND_PRINT("\n\tPC");
+                ND_PRINT(C_RESET, "\n\tPC");
                 if(len < 4) goto invalid;
-                ND_PRINT(" value %u",
+                ND_PRINT(C_RESET, " value %u",
                     GET_BE_U_4(message + 2));
-                ND_PRINT(" index len %u", len-4);
+                ND_PRINT(C_RESET, " index len %u", len-4);
             }
         }
             break;
 
         case MESSAGE_CHALLENGE_REQUEST: {
             if (!ndo->ndo_vflag)
-                ND_PRINT(" challenge_request");
+                ND_PRINT(C_RESET, " challenge_request");
             else {
-                ND_PRINT("\n\tChallenge Request");
+                ND_PRINT(C_RESET, "\n\tChallenge Request");
                 if(len > 192) goto invalid;
-                ND_PRINT(" len %u", len);
+                ND_PRINT(C_RESET, " len %u", len);
             }
         }
             break;
 
         case MESSAGE_CHALLENGE_REPLY: {
             if (!ndo->ndo_vflag)
-                ND_PRINT(" challenge_reply");
+                ND_PRINT(C_RESET, " challenge_reply");
             else {
-                ND_PRINT("\n\tChallenge Reply");
+                ND_PRINT(C_RESET, "\n\tChallenge Reply");
                 if (len > 192) goto invalid;
-                ND_PRINT(" len %u", len);
+                ND_PRINT(C_RESET, " len %u", len);
             }
         }
             break;
 
         default:
             if (!ndo->ndo_vflag)
-                ND_PRINT(" unknown");
+                ND_PRINT(C_RESET, " unknown");
             else
-                ND_PRINT("\n\tUnknown message type %u", type);
+                ND_PRINT(C_RESET, "\n\tUnknown message type %u", type);
         }
         i += len + 2;
     }
@@ -827,7 +833,7 @@ babel_print_v2(netdissect_options *ndo,
     if (length < 4)
         goto invalid;
     bodylen = GET_BE_U_2(cp + 2);
-    ND_PRINT(" (%u)", bodylen);
+    ND_PRINT(C_RESET, " (%u)", bodylen);
     length -= 4;
     cp += 4;
 
@@ -844,8 +850,8 @@ babel_print_v2(netdissect_options *ndo,
 
     /* If there's a trailer, process the TLVs in the trailer */
     if (length != 0) {
-	if(ndo->ndo_vflag) ND_PRINT("\n\t----");
-	else ND_PRINT(" |");
+	if(ndo->ndo_vflag) ND_PRINT(C_RESET, "\n\t----");
+	else ND_PRINT(C_RESET, " |");
         ret = babel_print_v2_tlvs(ndo, cp, length, length);
         if (ret == -1)
             goto trunc;

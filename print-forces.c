@@ -533,11 +533,11 @@ chk_op_type(netdissect_options *ndo,
 	if (type != F_TLV_PDAT) {
 		if (msk & B_KEYIN) {
 			if (type != F_TLV_KEYI) {
-				ND_PRINT("Based on flags expected KEYINFO TLV!\n");
+				ND_PRINT(C_RESET, "Based on flags expected KEYINFO TLV!\n");
 			}
 		} else {
 			if (!(msk & omsk)) {
-				ND_PRINT("Illegal DATA encoding for type 0x%x programmed %x got %x\n",
+				ND_PRINT(C_RESET, "Illegal DATA encoding for type 0x%x programmed %x got %x\n",
 				          type, omsk, msk);
 			}
 		}
@@ -672,20 +672,20 @@ prestlv_print(netdissect_options *ndo,
 	 */
 	dlen = len - TLV_HDRL;
 	if (dlen != RESLEN) {
-		ND_PRINT("illegal RESULT-TLV: %u bytes!\n", dlen);
+		ND_PRINT(C_RESET, "illegal RESULT-TLV: %u bytes!\n", dlen);
 		goto invalid;
 	}
 
 	ND_TCHECK_SIZE(r);
 	result = GET_U_1(r->result);
 	if (result >= 0x18 && result <= 0xFE) {
-		ND_PRINT("illegal reserved result code: 0x%x!\n", result);
+		ND_PRINT(C_RESET, "illegal reserved result code: 0x%x!\n", result);
 		goto invalid;
 	}
 
 	if (ndo->ndo_vflag >= 3) {
 		char *ib = indent_pr(indent, 0);
-		ND_PRINT("%s  Result: %s (code 0x%x)\n", ib,
+		ND_PRINT(C_RESET, "%s  Result: %s (code 0x%x)\n", ib,
 		       tok2str(ForCES_errs, NULL, result), result);
 	}
 	return 0;
@@ -712,15 +712,15 @@ fdatatlv_print(netdissect_options *ndo,
 	ND_TCHECK_SIZE(tlv);
 	type = GET_BE_U_2(tlv->type);
 	if (type != F_TLV_FULD) {
-		ND_PRINT("Error: expecting FULLDATA!\n");
+		ND_PRINT(C_RESET, "Error: expecting FULLDATA!\n");
 		goto invalid;
 	}
 
 	if (ndo->ndo_vflag >= 3) {
 		char *ib = indent_pr(indent + 2, 1);
-		ND_PRINT("%s[", ib + 1);
+		ND_PRINT(C_RESET, "%s[", ib + 1);
 		hex_print(ndo, ib, tdp, rlen);
-		ND_PRINT("\n%s]", ib + 1);
+		ND_PRINT(C_RESET, "\n%s]", ib + 1);
 	}
 	return 0;
 
@@ -738,7 +738,7 @@ sdatailv_print(netdissect_options *ndo,
 	int invilv;
 
 	if (len < ILV_HDRL) {
-		ND_PRINT("Error: BAD SPARSEDATA-TLV!\n");
+		ND_PRINT(C_RESET, "Error: BAD SPARSEDATA-TLV!\n");
 		goto invalid;
 	}
 	rlen = len;
@@ -748,13 +748,13 @@ sdatailv_print(netdissect_options *ndo,
 		const u_char *tdp = ILV_DATA(ilv);
 		invilv = ilv_valid(ndo, ilv, rlen);
 		if (invilv) {
-			ND_PRINT("Error: %s, rlen %u\n",
+			ND_PRINT(C_RESET, "Error: %s, rlen %u\n",
 			         tok2str(ForCES_TLV_err, NULL, invilv), rlen);
 			goto invalid;
 		}
 		if (ndo->ndo_vflag >= 3) {
 			u_int ilvl = GET_BE_U_4(ilv->length);
-			ND_PRINT("\n%s ILV: type %x length %u\n", ib + 1,
+			ND_PRINT(C_RESET, "\n%s ILV: type %x length %u\n", ib + 1,
 				  GET_BE_U_4(ilv->type), ilvl);
 			hex_print(ndo, "\t\t[", tdp, ilvl-ILV_HDRL);
 		}
@@ -785,7 +785,7 @@ sdatatlv_print(netdissect_options *ndo,
 	ND_TCHECK_SIZE(tlv);
 	type = GET_BE_U_2(tlv->type);
 	if (type != F_TLV_SPAD) {
-		ND_PRINT("Error: expecting SPARSEDATA!\n");
+		ND_PRINT(C_RESET, "Error: expecting SPARSEDATA!\n");
 		goto invalid;
 	}
 
@@ -810,13 +810,13 @@ pkeyitlv_print(netdissect_options *ndo,
 	u_int invtlv;
 
 	id = GET_BE_U_4(tdp);
-	ND_PRINT("%sKeyinfo: Key 0x%x\n", ib, id);
+	ND_PRINT(C_RESET, "%sKeyinfo: Key 0x%x\n", ib, id);
 	type = GET_BE_U_2(kdtlv->type);
 	tll = GET_BE_U_2(kdtlv->length);
 	invtlv = tlv_valid(tll, len);
 
 	if (invtlv) {
-		ND_PRINT("%s TLV type 0x%x len %u\n",
+		ND_PRINT(C_RESET, "%s TLV type 0x%x len %u\n",
 		       tok2str(ForCES_TLV_err, NULL, invtlv), type,
 		       tll);
 		goto invalid;
@@ -845,13 +845,13 @@ pdatacnt_print(netdissect_options *ndo,
 	char *ib = indent_pr(indent, 0);
 
 	if ((op_msk & B_APPND) && ndo->ndo_vflag >= 3) {
-		ND_PRINT("%sTABLE APPEND\n", ib);
+		ND_PRINT(C_RESET, "%sTABLE APPEND\n", ib);
 	}
 	for (i = 0; i < IDcnt; i++) {
 		ND_ICHECK_U(len, <, 4);
 		id = GET_BE_U_4(pptr);
 		if (ndo->ndo_vflag >= 3)
-			ND_PRINT("%sID#%02u: %u\n", ib, i + 1, id);
+			ND_PRINT(C_RESET, "%sID#%02u: %u\n", ib, i + 1, id);
 		len -= 4;
 		pptr += 4;
 	}
@@ -861,7 +861,7 @@ pdatacnt_print(netdissect_options *ndo,
 			uint32_t starti, endi;
 
 			if (len < PTH_DESC_SIZE) {
-				ND_PRINT("pathlength %u with key/range too short %u\n",
+				ND_PRINT(C_RESET, "pathlength %u with key/range too short %u\n",
 				       len, PTH_DESC_SIZE);
 				goto invalid;
 			}
@@ -878,7 +878,7 @@ pdatacnt_print(netdissect_options *ndo,
 			len -= 4;
 
 			if (ndo->ndo_vflag >= 3)
-				ND_PRINT("%sTable range: [%u,%u]\n", ib, starti, endi);
+				ND_PRINT(C_RESET, "%sTable range: [%u,%u]\n", ib, starti, endi);
 		}
 
 		if (op_msk & B_KEYIN) {
@@ -886,7 +886,7 @@ pdatacnt_print(netdissect_options *ndo,
 			uint16_t tll;
 
 			if (len < PTH_DESC_SIZE) {
-				ND_PRINT("pathlength %u with key/range too short %u\n",
+				ND_PRINT(C_RESET, "pathlength %u with key/range too short %u\n",
 				       len, PTH_DESC_SIZE);
 				goto invalid;
 			}
@@ -901,13 +901,13 @@ pdatacnt_print(netdissect_options *ndo,
 			/* skip key content */
 			tll = GET_BE_U_2(keytlv->length);
 			if (tll < TLV_HDRL) {
-				ND_PRINT("key content length %u < %u\n",
+				ND_PRINT(C_RESET, "key content length %u < %u\n",
 					tll, TLV_HDRL);
 				goto invalid;
 			}
 			tll -= TLV_HDRL;
 			if (len < tll) {
-				ND_PRINT("key content too short\n");
+				ND_PRINT(C_RESET, "key content too short\n");
 				goto invalid;
 			}
 			pptr += tll;
@@ -928,7 +928,7 @@ pdatacnt_print(netdissect_options *ndo,
 		tlvl = GET_BE_U_2(pdtlv->length);
 		invtlv = tlv_valid(tlvl, len);
 		if (invtlv) {
-			ND_PRINT("%s Outstanding bytes %u for TLV type 0x%x TLV len %u\n",
+			ND_PRINT(C_RESET, "%s Outstanding bytes %u for TLV type 0x%x TLV len %u\n",
 			          tok2str(ForCES_TLV_err, NULL, invtlv), len, type,
 			          tlvl);
 			goto pd_err;
@@ -942,7 +942,7 @@ pdatacnt_print(netdissect_options *ndo,
 		aln = F_ALN_LEN(tlvl);
 		if (aln > tlvl) {
 			if (aln > len) {
-				ND_PRINT("Invalid padded pathdata TLV type 0x%x len %u missing %u pad bytes\n",
+				ND_PRINT(C_RESET, "Invalid padded pathdata TLV type 0x%x len %u missing %u pad bytes\n",
 				          type, tlvl, aln - len);
 			} else {
 				pad = aln - tlvl;
@@ -953,10 +953,10 @@ pdatacnt_print(netdissect_options *ndo,
 
 			if (ndo->ndo_vflag >= 3 && ops->v != F_TLV_PDAT) {
 				if (pad)
-					ND_PRINT("%s  %s (Length %u DataLen %u pad %u Bytes)\n",
+					ND_PRINT(C_RESET, "%s  %s (Length %u DataLen %u pad %u Bytes)\n",
 					          ib, ops->s, tlvl, tll, pad);
 				else
-					ND_PRINT("%s  %s (Length %u DataLen %u Bytes)\n",
+					ND_PRINT(C_RESET, "%s  %s (Length %u DataLen %u Bytes)\n",
 					          ib, ops->s, tlvl, tll);
 			}
 
@@ -967,13 +967,13 @@ pdatacnt_print(netdissect_options *ndo,
 				    ==, -1);
 			len -= (TLV_HDRL + pad + tll);
 		} else {
-			ND_PRINT("Invalid path data content type 0x%x len %u\n",
+			ND_PRINT(C_RESET, "Invalid path data content type 0x%x len %u\n",
 			       type, tlvl);
 pd_err:
 			if (tlvl) {
                                 hex_print(ndo, "Bad Data val\n\t  [",
 					  pptr, len);
-				ND_PRINT("]\n");
+				ND_PRINT(C_RESET, "]\n");
 
 				goto invalid;
 			}
@@ -999,7 +999,7 @@ pdata_print(netdissect_options *ndo,
 	ND_TCHECK_SIZE(pdh);
 	ND_ICHECK_ZU(len, <, sizeof(struct pathdata_h));
 	if (ndo->ndo_vflag >= 3) {
-		ND_PRINT("\n%sPathdata: Flags 0x%x ID count %u\n",
+		ND_PRINT(C_RESET, "\n%sPathdata: Flags 0x%x ID count %u\n",
 		       ib, GET_BE_U_2(pdh->pflags),
 		       GET_BE_U_2(pdh->pIDcnt));
 	}
@@ -1022,15 +1022,15 @@ pdata_print(netdissect_options *ndo,
 	idcnt = GET_BE_U_2(pdh->pIDcnt);
 	minsize = idcnt * 4;
 	if (len < minsize) {
-		ND_PRINT("\t\t\ttruncated IDs expected %uB got %uB\n", minsize,
+		ND_PRINT(C_RESET, "\t\t\ttruncated IDs expected %uB got %uB\n", minsize,
 		       len);
 		hex_print(ndo, "\t\t\tID Data[", pptr, len);
-		ND_PRINT("]\n");
+		ND_PRINT(C_RESET, "]\n");
 		goto invalid;
 	}
 
 	if ((op_msk & B_TRNG) && (op_msk & B_KEYIN)) {
-		ND_PRINT("\t\t\tIllegal to have both Table ranges and keys\n");
+		ND_PRINT(C_RESET, "\t\t\tIllegal to have both Table ranges and keys\n");
 		goto invalid;
 	}
 
@@ -1062,10 +1062,10 @@ genoptlv_print(netdissect_options *ndo,
 	type = GET_BE_U_2(pdtlv->type);
 	tlvl = GET_BE_U_2(pdtlv->length);
 	invtlv = tlv_valid(tlvl, len);
-	ND_PRINT("genoptlvprint - %s TLV type 0x%x len %u\n",
+	ND_PRINT(C_RESET, "genoptlvprint - %s TLV type 0x%x len %u\n",
 	       tok2str(ForCES_TLV, NULL, type), type, tlvl);
 	if (invtlv) {
-		ND_PRINT("\t\t\tInvalid ForCES TLV type=%x", type);
+		ND_PRINT(C_RESET, "\t\t\tInvalid ForCES TLV type=%x", type);
 		goto invalid;
 	}
 	/*
@@ -1076,13 +1076,13 @@ genoptlv_print(netdissect_options *ndo,
 	const u_char *dp = TLV_DATA(pdtlv);
 
 	if (!ttlv_valid(type)) {
-		ND_PRINT("%s TLV type 0x%x len %u\n",
+		ND_PRINT(C_RESET, "%s TLV type 0x%x len %u\n",
 		       tok2str(ForCES_TLV_err, NULL, invtlv), type,
 		       tlvl);
 		goto invalid;
 	}
 	if (ndo->ndo_vflag >= 3)
-		ND_PRINT("%s%s, length %u (data length %u Bytes)",
+		ND_PRINT(C_RESET, "%s%s, length %u (data length %u Bytes)",
 		       ib, tok2str(ForCES_TLV, NULL, type),
 		       tlvl, tlvl - TLV_HDRL);
 
@@ -1120,7 +1120,7 @@ recpdoptlv_print(netdissect_options *ndo,
 		dp = TLV_DATA(pdtlv);
 
 		if (ndo->ndo_vflag >= 3)
-			ND_PRINT("%s%s, length %u (data encapsulated %u Bytes)",
+			ND_PRINT(C_RESET, "%s%s, length %u (data encapsulated %u Bytes)",
 			          ib, tok2str(ForCES_TLV, NULL, type),
 			          tlvl,
 			          tlvl - TLV_HDRL);
@@ -1131,7 +1131,7 @@ recpdoptlv_print(netdissect_options *ndo,
 	}
 
 	if (len) {
-		ND_PRINT("\n\t\tMessy PATHDATA TLV header, type (0x%x)\n\t\texcess of %u Bytes ",
+		ND_PRINT(C_RESET, "\n\t\tMessy PATHDATA TLV header, type (0x%x)\n\t\texcess of %u Bytes ",
 		          GET_BE_U_2(pdtlv->type),
 		          len - GET_BE_U_2(pdtlv->length));
 		goto invalid;
@@ -1150,9 +1150,9 @@ invoptlv_print(netdissect_options *ndo,
 	char *ib = indent_pr(indent, 1);
 
 	if (ndo->ndo_vflag >= 3) {
-		ND_PRINT("%sData[", ib + 1);
+		ND_PRINT(C_RESET, "%sData[", ib + 1);
 		hex_print(ndo, ib, pptr, len);
-		ND_PRINT("%s]\n", ib);
+		ND_PRINT(C_RESET, "%s]\n", ib);
 	}
 	return -1;
 }
@@ -1176,14 +1176,14 @@ otlv_print(netdissect_options *ndo,
 	tll = GET_BE_U_2(otlv->length) - TLV_HDRL;
 	ops = get_forces_optlv_h(type);
 	if (ndo->ndo_vflag >= 3) {
-		ND_PRINT("%sOper TLV %s(0x%x) length %u\n", ib, ops->s, type,
+		ND_PRINT(C_RESET, "%sOper TLV %s(0x%x) length %u\n", ib, ops->s, type,
 		       GET_BE_U_2(otlv->length));
 	}
 	/* rest of ops must at least have 12B {pathinfo} */
 	if (tll < OP_MIN_SIZ) {
-		ND_PRINT("\t\tOper TLV %s(0x%x) length %u\n", ops->s, type,
+		ND_PRINT(C_RESET, "\t\tOper TLV %s(0x%x) length %u\n", ops->s, type,
 		       GET_BE_U_2(otlv->length));
-		ND_PRINT("\t\tTruncated data size %u minimum required %u\n", tll,
+		ND_PRINT(C_RESET, "\t\tTruncated data size %u minimum required %u\n", tll,
 		       OP_MIN_SIZ);
 		return invoptlv_print(ndo, dp, tll, ops->op_msk, indent);
 
@@ -1213,19 +1213,19 @@ asttlv_print(netdissect_options *ndo,
 	 */
 	dlen = len - TLV_HDRL;
 	if (dlen != ASTDLN) {
-		ND_PRINT("illegal ASTresult-TLV: %u bytes!\n", dlen);
+		ND_PRINT(C_RESET, "illegal ASTresult-TLV: %u bytes!\n", dlen);
 		goto invalid;
 	}
 	rescode = GET_BE_U_4(pptr);
 	if (rescode > ASTMCD) {
-		ND_PRINT("illegal ASTresult result code: %u!\n", rescode);
+		ND_PRINT(C_RESET, "illegal ASTresult result code: %u!\n", rescode);
 		goto invalid;
 	}
 
 	if (ndo->ndo_vflag >= 3) {
-		ND_PRINT("Teardown reason:\n%s%s", ib,
+		ND_PRINT(C_RESET, "Teardown reason:\n%s%s", ib,
 		         tok2str(tdr_str, "unknown (%u)", rescode));
-		ND_PRINT("(%x)\n%s", rescode, ib);
+		ND_PRINT(C_RESET, "(%x)\n%s", rescode, ib);
 	}
 	return 0;
 invalid:
@@ -1249,33 +1249,33 @@ asrtlv_print(netdissect_options *ndo,
 	 */
 	dlen = len - TLV_HDRL;
 	if (dlen != ASRDLN) {	/* id, instance, oper tlv */
-		ND_PRINT("illegal ASRresult-TLV: %u bytes!\n", dlen);
+		ND_PRINT(C_RESET, "illegal ASRresult-TLV: %u bytes!\n", dlen);
 		goto invalid;
 	}
 	rescode = GET_BE_U_4(pptr);
 
 	if (rescode > ASRMCD) {
-		ND_PRINT("illegal ASRresult result code: %u!\n", rescode);
+		ND_PRINT(C_RESET, "illegal ASRresult result code: %u!\n", rescode);
 		goto invalid;
 	}
 
 	if (ndo->ndo_vflag >= 3) {
-		ND_PRINT("\n%s", ib);
+		ND_PRINT(C_RESET, "\n%s", ib);
 		switch (rescode) {
 		case 0:
-			ND_PRINT("Success ");
+			ND_PRINT(C_RESET, "Success ");
 			break;
 		case 1:
-			ND_PRINT("FE ID invalid ");
+			ND_PRINT(C_RESET, "FE ID invalid ");
 			break;
 		case 2:
-			ND_PRINT("permission denied ");
+			ND_PRINT(C_RESET, "permission denied ");
 			break;
 		default:
-			ND_PRINT("Unknown ");
+			ND_PRINT(C_RESET, "Unknown ");
 			break;
 		}
-		ND_PRINT("(%x)\n%s", rescode, ib);
+		ND_PRINT(C_RESET, "(%x)\n%s", rescode, ib);
 	}
 	return 0;
 invalid:
@@ -1294,7 +1294,7 @@ gentltlv_print(netdissect_options *ndo,
 	u_int dlen = len - TLV_HDRL;
 
 	if (dlen < 4) {		/* at least 32 bits must exist */
-		ND_PRINT("truncated TLV: %u bytes missing! ", 4 - dlen);
+		ND_PRINT(C_RESET, "truncated TLV: %u bytes missing! ", 4 - dlen);
 		return -1;
 	}
 	return 0;
@@ -1317,11 +1317,11 @@ print_metailv(netdissect_options *ndo,
 	 * ILV) >= ILV_HDRL.
 	 */
 	rlen = GET_BE_U_4(ilv->length) - ILV_HDRL;
-	ND_PRINT("%sMetaID 0x%x length %u\n", ib, GET_BE_U_4(ilv->type),
+	ND_PRINT(C_RESET, "%sMetaID 0x%x length %u\n", ib, GET_BE_U_4(ilv->type),
 		  GET_BE_U_4(ilv->length));
 	if (ndo->ndo_vflag >= 3) {
 		hex_print(ndo, "\t\t[", ILV_DATA(ilv), rlen);
-		ND_PRINT(" ]\n");
+		ND_PRINT(C_RESET, " ]\n");
 	}
 	return 0;
 }
@@ -1343,7 +1343,7 @@ print_metatlv(netdissect_options *ndo,
 	 */
 	dlen = len - TLV_HDRL;
 	rlen = dlen;
-	ND_PRINT("\n%s METADATA length %u\n", ib, rlen);
+	ND_PRINT(C_RESET, "\n%s METADATA length %u\n", ib, rlen);
 	while (rlen != 0) {
 		invilv = ilv_valid(ndo, ilv, rlen);
 		if (invilv) {
@@ -1374,12 +1374,12 @@ print_reddata(netdissect_options *ndo,
 
 	dlen = len - TLV_HDRL;
 	rlen = dlen;
-	ND_PRINT("\n%s Redirect Data length %u\n", ib, rlen);
+	ND_PRINT(C_RESET, "\n%s Redirect Data length %u\n", ib, rlen);
 
 	if (ndo->ndo_vflag >= 3) {
-		ND_PRINT("\t\t[");
+		ND_PRINT(C_RESET, "\t\t[");
 		hex_print(ndo, "\n\t\t", pptr, rlen);
-		ND_PRINT("\n\t\t]");
+		ND_PRINT(C_RESET, "\n\t\t]");
 	}
 
 	return 0;
@@ -1401,7 +1401,7 @@ redirect_print(netdissect_options *ndo,
 	 */
 	dlen = len - TLV_HDRL;
 	if (dlen <= RD_MIN) {
-		ND_PRINT("\n\t\ttruncated Redirect TLV: %u bytes missing! ",
+		ND_PRINT(C_RESET, "\n\t\ttruncated Redirect TLV: %u bytes missing! ",
 		       RD_MIN - dlen);
 		goto invalid;
 	}
@@ -1415,7 +1415,7 @@ redirect_print(netdissect_options *ndo,
 		tlvl = GET_BE_U_2(tlv->length);
 		invtlv = tlv_valid(tlvl, rlen);
 		if (invtlv) {
-			ND_PRINT("Bad Redirect data\n");
+			ND_PRINT(C_RESET, "Bad Redirect data\n");
 			break;
 		}
 
@@ -1433,7 +1433,7 @@ redirect_print(netdissect_options *ndo,
 				      tlvl, 0,
 				      indent);
 		} else {
-			ND_PRINT("Unknown REDIRECT TLV 0x%x len %u\n",
+			ND_PRINT(C_RESET, "Unknown REDIRECT TLV 0x%x len %u\n",
 			       type,
 			       tlvl);
 		}
@@ -1442,7 +1442,7 @@ redirect_print(netdissect_options *ndo,
 	}
 
 	if (rlen) {
-		ND_PRINT("\n\t\tMessy Redirect TLV header, type (0x%x)\n\t\texcess of %u Bytes ",
+		ND_PRINT(C_RESET, "\n\t\tMessy Redirect TLV header, type (0x%x)\n\t\texcess of %u Bytes ",
 		          GET_BE_U_2(tlv->type),
 		          rlen - GET_BE_U_2(tlv->length));
 		goto invalid;
@@ -1474,7 +1474,7 @@ lfbselect_print(netdissect_options *ndo,
 	 */
 	dlen = len - TLV_HDRL;
 	if (dlen <= OP_MIN) {	/* id, instance, oper tlv header .. */
-		ND_PRINT("\n\t\tundersized lfb selector: %u bytes missing! ",
+		ND_PRINT(C_RESET, "\n\t\tundersized lfb selector: %u bytes missing! ",
 		       OP_MIN - dlen);
 		goto invalid;
 	}
@@ -1488,7 +1488,7 @@ lfbselect_print(netdissect_options *ndo,
 	lfbs = (const struct forces_lfbsh *)pptr;
 	ND_TCHECK_SIZE(lfbs);
 	if (ndo->ndo_vflag >= 3) {
-		ND_PRINT("\n%s%s(Classid %x) instance %x\n",
+		ND_PRINT(C_RESET, "\n%s%s(Classid %x) instance %x\n",
 		       ib,
 		       tok2str(ForCES_LFBs, NULL, GET_BE_U_4(lfbs->class)),
 		       GET_BE_U_4(lfbs->class),
@@ -1516,8 +1516,8 @@ lfbselect_print(netdissect_options *ndo,
 			otlv_print(ndo, otlv, 0, indent);
 		} else {
 			if (ndo->ndo_vflag < 3)
-				ND_PRINT("\n");
-			ND_PRINT("\t\tINValid oper-TLV type 0x%x length %u for this ForCES message\n",
+				ND_PRINT(C_RESET, "\n");
+			ND_PRINT(C_RESET, "\t\tINValid oper-TLV type 0x%x length %u for this ForCES message\n",
 			          type, tlvl);
 			invoptlv_print(ndo, (const u_char *)otlv, rlen, 0, indent);
 		}
@@ -1525,7 +1525,7 @@ lfbselect_print(netdissect_options *ndo,
 	}
 
 	if (rlen) {
-		ND_PRINT("\n\t\tMessy oper TLV header, type (0x%x)\n\t\texcess of %u Bytes ",
+		ND_PRINT(C_RESET, "\n\t\tMessy oper TLV header, type (0x%x)\n\t\texcess of %u Bytes ",
 		          GET_BE_U_2(otlv->type),
 		          rlen - GET_BE_U_2(otlv->length));
 		goto invalid;
@@ -1556,14 +1556,14 @@ forces_type_print(netdissect_options *ndo,
 
 	if (rlen > TLV_HLN) {
 		if (tops->flags & ZERO_TTLV) {
-			ND_PRINT("<0x%x>Illegal Top level TLV!\n", tops->flags);
+			ND_PRINT(C_RESET, "<0x%x>Illegal Top level TLV!\n", tops->flags);
 			goto invalid;
 		}
 	} else {
 		if (tops->flags & ZERO_MORE_TTLV)
 			return 0;
 		if (tops->flags & ONE_MORE_TTLV) {
-			ND_PRINT("\tTop level TLV Data missing!\n");
+			ND_PRINT(C_RESET, "\tTop level TLV Data missing!\n");
 			goto invalid;
 		}
 	}
@@ -1592,13 +1592,13 @@ forces_type_print(netdissect_options *ndo,
 		 * go past the end of the packet).
 		 */
 		if (!ttlv_valid(type)) {
-			ND_PRINT("\n\tInvalid ForCES Top TLV type=0x%x",
+			ND_PRINT(C_RESET, "\n\tInvalid ForCES Top TLV type=0x%x",
 			       type);
 			goto invalid;
 		}
 
 		if (ndo->ndo_vflag >= 3)
-			ND_PRINT("\t%s, length %u (data length %u Bytes)",
+			ND_PRINT(C_RESET, "\t%s, length %u (data length %u Bytes)",
 			       tok2str(ForCES_TLV, NULL, type),
 			       tlvl,
 			       tlvl - TLV_HDRL);
@@ -1617,7 +1617,7 @@ forces_type_print(netdissect_options *ndo,
 	 * short, and didn't have *enough* TLVs in it?
 	 */
 	if (rlen) {
-		ND_PRINT("\tMess TopTLV header: min %u, total %u advertised %u ",
+		ND_PRINT(C_RESET, "\tMess TopTLV header: min %u, total %u advertised %u ",
 		       TLV_HDRL, rlen, GET_BE_U_2(tltlv->length));
 		goto invalid;
 	}
@@ -1643,7 +1643,7 @@ forces_print(netdissect_options *ndo,
 	ND_TCHECK_SIZE(fhdr);
 	tom = GET_U_1(fhdr->fm_tom);
 	if (!tom_valid(tom)) {
-		ND_PRINT("Invalid ForCES message type %u\n", tom);
+		ND_PRINT(C_RESET, "Invalid ForCES message type %u\n", tom);
 		goto invalid;
 	}
 
@@ -1651,29 +1651,29 @@ forces_print(netdissect_options *ndo,
 
 	tops = get_forces_tom(tom);
 	if (tops->v == TOM_RSVD) {
-		ND_PRINT("\n\tUnknown ForCES message type=0x%x", tom);
+		ND_PRINT(C_RESET, "\n\tUnknown ForCES message type=0x%x", tom);
 		goto invalid;
 	}
 
-	ND_PRINT("\n\tForCES %s ", tops->s);
+	ND_PRINT(C_RESET, "\n\tForCES %s ", tops->s);
 	if (!ForCES_HLN_VALID(mlen, len)) {
-		ND_PRINT("Illegal ForCES pkt len - min %u, total recvd %u, advertised %u ",
+		ND_PRINT(C_RESET, "Illegal ForCES pkt len - min %u, total recvd %u, advertised %u ",
 		          ForCES_HDRL, len, ForCES_BLN(fhdr));
 		goto invalid;
 	}
 
 	flg_raw = GET_BE_U_4(pptr + 20);
 	if (ndo->ndo_vflag >= 1) {
-		ND_PRINT("\n\tForCES Version %u len %uB flags 0x%08x ",
+		ND_PRINT(C_RESET, "\n\tForCES Version %u len %uB flags 0x%08x ",
 		       ForCES_V(fhdr), mlen, flg_raw);
-		ND_PRINT("\n\tSrcID 0x%x(%s) DstID 0x%x(%s) Correlator 0x%" PRIx64,
+		ND_PRINT(C_RESET, "\n\tSrcID 0x%x(%s) DstID 0x%x(%s) Correlator 0x%" PRIx64,
 		       ForCES_SID(fhdr), ForCES_node(ForCES_SID(fhdr)),
 		       ForCES_DID(fhdr), ForCES_node(ForCES_DID(fhdr)),
 		       GET_BE_U_8(fhdr->fm_cor));
 
 	}
 	if (ndo->ndo_vflag >= 2) {
-		ND_PRINT("\n\tForCES flags:\n\t  %s(0x%x), prio=%u, %s(0x%x),\n\t  %s(0x%x), %s(0x%x)\n",
+		ND_PRINT(C_RESET, "\n\tForCES flags:\n\t  %s(0x%x), prio=%u, %s(0x%x),\n\t  %s(0x%x), %s(0x%x)\n",
 		     tok2str(ForCES_ACKs, "ACKUnknown", ForCES_ACK(fhdr)),
 		     ForCES_ACK(fhdr),
 		     ForCES_PRI(fhdr),
@@ -1683,16 +1683,16 @@ forces_print(netdissect_options *ndo,
 		     ForCES_AT(fhdr),
 		     tok2str(ForCES_TPs, "TPUnknown", ForCES_TP(fhdr)),
 		     ForCES_TP(fhdr));
-		ND_PRINT("\t  Extra flags: rsv(b5-7) 0x%x rsv(b13-31) 0x%x\n",
+		ND_PRINT(C_RESET, "\t  Extra flags: rsv(b5-7) 0x%x rsv(b13-31) 0x%x\n",
 		     ForCES_RS1(fhdr), ForCES_RS2(fhdr));
 	}
 	rc = forces_type_print(ndo, pptr, fhdr, mlen, tops);
 	ND_ICHECK_U(rc, <, 0);
 
 	if (ndo->ndo_vflag >= 4) {
-		ND_PRINT("\n\t  Raw ForCES message\n\t [");
+		ND_PRINT(C_RESET, "\n\t  Raw ForCES message\n\t [");
 		hex_print(ndo, "\n\t ", pptr, len);
-		ND_PRINT("\n\t ]");
+		ND_PRINT(C_RESET, "\n\t ]");
 	}
 	return;
 invalid:

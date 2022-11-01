@@ -122,14 +122,14 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
      * Sanity checking of the header.
      */
     if (version != VQP_VERSION) {
-	ND_PRINT("VQP version %u packet not supported",
+	ND_PRINT(C_RESET, "VQP version %u packet not supported",
                version);
 	return;
     }
 
     /* in non-verbose mode just lets print the basic Message Type */
     if (ndo->ndo_vflag < 1) {
-        ND_PRINT("VQPv%u %s Message, error-code %s (%u), length %u",
+        ND_PRINT(C_RESET, "VQPv%u %s Message, error-code %s (%u), length %u",
                version,
                tok2str(vqp_msg_type_values, "unknown (%u)",GET_U_1(vqp_common_header->msg_type)),
                tok2str(vqp_error_code_values, "unknown", GET_U_1(vqp_common_header->error_code)),
@@ -140,7 +140,7 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 
     /* ok they seem to want to know everything - lets fully decode it */
     nitems = GET_U_1(vqp_common_header->nitems);
-    ND_PRINT("\n\tVQPv%u, %s Message, error-code %s (%u), seq 0x%08x, items %u, length %u",
+    ND_PRINT(C_RESET, "\n\tVQPv%u, %s Message, error-code %s (%u), seq 0x%08x, items %u, length %u",
            version,
 	   tok2str(vqp_msg_type_values, "unknown (%u)",GET_U_1(vqp_common_header->msg_type)),
 	   tok2str(vqp_error_code_values, "unknown", GET_U_1(vqp_common_header->error_code)),
@@ -164,7 +164,7 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
         tptr+=sizeof(struct vqp_obj_tlv_t);
         tlen-=sizeof(struct vqp_obj_tlv_t);
 
-        ND_PRINT("\n\t  %s Object (0x%08x), length %u, value: ",
+        ND_PRINT(C_RESET, "\n\t  %s Object (0x%08x), length %u, value: ",
                tok2str(vqp_obj_values, "Unknown", vqp_obj_type),
                vqp_obj_type, vqp_obj_len);
 
@@ -182,7 +182,7 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 	case VQP_OBJ_IP_ADDRESS:
             if (vqp_obj_len != 4)
                 goto invalid;
-            ND_PRINT("%s (0x%08x)", GET_IPADDR_STRING(tptr),
+            ND_PRINT(C_RESET, "%s (0x%08x)", GET_IPADDR_STRING(tptr),
                      GET_BE_U_4(tptr));
             break;
             /* those objects have similar semantics - fall through */
@@ -197,7 +197,7 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 	case VQP_OBJ_MAC_NULL:
             if (vqp_obj_len != MAC_ADDR_LEN)
                 goto invalid;
-	      ND_PRINT("%s", GET_ETHERADDR_STRING(tptr));
+	      ND_PRINT(C_RESET, "%s", GET_ETHERADDR_STRING(tptr));
               break;
         default:
             if (ndo->ndo_vflag <= 1)

@@ -72,7 +72,7 @@ ascii_print(netdissect_options *ndo,
 		length = caplength;
 		truncated = TRUE;
 	}
-	ND_PRINT("\n");
+	ND_PRINT(C_RESET, "\n");
 	while (length > 0) {
 		s = GET_U_1(cp);
 		cp++;
@@ -88,13 +88,13 @@ ascii_print(netdissect_options *ndo,
 			 * In the middle of a line, just print a '.'.
 			 */
 			if (length > 1 && GET_U_1(cp) != '\n')
-				ND_PRINT(".");
+				ND_PRINT(C_RESET, ".");
 		} else {
 			if (!ND_ASCII_ISGRAPH(s) &&
 			    (s != '\t' && s != ' ' && s != '\n'))
-				ND_PRINT(".");
+				ND_PRINT(C_RESET, ".");
 			else
-				ND_PRINT("%c", s);
+				ND_PRINT(C_RESET, "%c", s);
 		}
 	}
 	if (truncated)
@@ -134,7 +134,7 @@ hex_and_ascii_print_with_offset(netdissect_options *ndo, const char *indent,
 		i++;
 		if (i >= HEXDUMP_SHORTS_PER_LINE) {
 			*hsp = *asp = '\0';
-			ND_PRINT("%s0x%04x: %-*s  %s",
+			ND_PRINT(C_RESET, "%s0x%04x: %-*s  %s",
 			    indent, offset, HEXDUMP_HEXSTUFF_PER_LINE,
 			    hexstuff, asciistuff);
 			i = 0; hsp = hexstuff; asp = asciistuff;
@@ -153,7 +153,7 @@ hex_and_ascii_print_with_offset(netdissect_options *ndo, const char *indent,
 	}
 	if (i > 0) {
 		*hsp = *asp = '\0';
-		ND_PRINT("%s0x%04x: %-*s  %s",
+		ND_PRINT(C_RESET, "%s0x%04x: %-*s  %s",
 		     indent, offset, HEXDUMP_HEXSTUFF_PER_LINE,
 		     hexstuff, asciistuff);
 	}
@@ -190,19 +190,19 @@ hex_print_with_offset(netdissect_options *ndo,
 	i = 0;
 	while (nshorts != 0) {
 		if ((i++ % 8) == 0) {
-			ND_PRINT("%s0x%04x: ", indent, offset);
+			ND_PRINT(C_RESET, "%s0x%04x: ", indent, offset);
 			offset += HEXDUMP_BYTES_PER_LINE;
 		}
 		s = GET_U_1(cp);
 		cp++;
-		ND_PRINT(" %02x%02x", s, GET_U_1(cp));
+		ND_PRINT(C_RESET, " %02x%02x", s, GET_U_1(cp));
 		cp++;
 		nshorts--;
 	}
 	if (length & 1) {
 		if ((i % 8) == 0)
-			ND_PRINT("%s0x%04x: ", indent, offset);
-		ND_PRINT(" %02x", GET_U_1(cp));
+			ND_PRINT(C_RESET, "%s0x%04x: ", indent, offset);
+		ND_PRINT(C_RESET, " %02x", GET_U_1(cp));
 	}
 	if (truncated)
 		nd_trunc_longjmp(ndo);

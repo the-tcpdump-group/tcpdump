@@ -240,20 +240,20 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
      * Sanity checking of the header.
      */
     if (len < sizeof(struct eigrp_common_header)) {
-        ND_PRINT("EIGRP %s, length: %u (too short, < %zu)",
+        ND_PRINT(C_RESET, "EIGRP %s, length: %u (too short, < %zu)",
                tok2str(eigrp_opcode_values, "unknown (%u)",GET_U_1(eigrp_com_header->opcode)),
                len, sizeof(struct eigrp_common_header));
         goto check_remainder;
     }
     if (GET_U_1(eigrp_com_header->version) != EIGRP_VERSION) {
-        ND_PRINT("EIGRP version %u packet not supported",
+        ND_PRINT(C_RESET, "EIGRP version %u packet not supported",
                  GET_U_1(eigrp_com_header->version));
         goto check_remainder;
     }
 
     /* in non-verbose mode just lets print the basic Message Type*/
     if (ndo->ndo_vflag < 1) {
-        ND_PRINT("EIGRP %s, length: %u",
+        ND_PRINT(C_RESET, "EIGRP %s, length: %u",
                tok2str(eigrp_opcode_values, "unknown (%u)",GET_U_1(eigrp_com_header->opcode)),
                len);
         goto check_remainder;
@@ -262,7 +262,7 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
     /* ok they seem to want to know everything - lets fully decode it */
     tlen -= sizeof(struct eigrp_common_header);
 
-    ND_PRINT("\n\tEIGRP v%u, opcode: %s (%u), chksum: 0x%04x, Flags: [%s]"
+    ND_PRINT(C_RESET, "\n\tEIGRP v%u, opcode: %s (%u), chksum: 0x%04x, Flags: [%s]"
              "\n\tseq: 0x%08x, ack: 0x%08x, VRID: %u, AS: %u, length: %u",
            GET_U_1(eigrp_com_header->version),
            tok2str(eigrp_opcode_values, "unknown, type: %u",GET_U_1(eigrp_com_header->opcode)),
@@ -281,14 +281,14 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 
     while(tlen>0) {
         if (tlen < sizeof(struct eigrp_tlv_header)) {
-            ND_PRINT("\n\t  (only %u bytes of data)", tlen);
+            ND_PRINT(C_RESET, "\n\t  (only %u bytes of data)", tlen);
             goto invalid;
         }
         eigrp_tlv_header = (const struct eigrp_tlv_header *)tptr;
         eigrp_tlv_len=GET_BE_U_2(eigrp_tlv_header->length);
         eigrp_tlv_type=GET_BE_U_2(eigrp_tlv_header->type);
 
-        ND_PRINT("\n\t  %s TLV (0x%04x), length: %u",
+        ND_PRINT(C_RESET, "\n\t  %s TLV (0x%04x), length: %u",
                tok2str(eigrp_tlv_values,
                        "Unknown",
                        eigrp_tlv_type),
@@ -310,12 +310,12 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
         case EIGRP_TLV_GENERAL_PARM:
             tlv_ptr.eigrp_tlv_general_parm = (const struct eigrp_tlv_general_parm_t *)tlv_tptr;
             if (tlv_tlen < sizeof(*tlv_ptr.eigrp_tlv_general_parm)) {
-                ND_PRINT(" (too short, < %zu)",
+                ND_PRINT(C_RESET, " (too short, < %zu)",
         		 sizeof(struct eigrp_tlv_header) + sizeof(*tlv_ptr.eigrp_tlv_general_parm));
                 break;
             }
 
-            ND_PRINT("\n\t    holdtime: %us, k1 %u, k2 %u, k3 %u, k4 %u, k5 %u",
+            ND_PRINT(C_RESET, "\n\t    holdtime: %us, k1 %u, k2 %u, k3 %u, k4 %u, k5 %u",
                    GET_BE_U_2(tlv_ptr.eigrp_tlv_general_parm->holdtime),
                    GET_U_1(tlv_ptr.eigrp_tlv_general_parm->k1),
                    GET_U_1(tlv_ptr.eigrp_tlv_general_parm->k2),
@@ -327,12 +327,12 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
         case EIGRP_TLV_SW_VERSION:
             tlv_ptr.eigrp_tlv_sw_version = (const struct eigrp_tlv_sw_version_t *)tlv_tptr;
             if (tlv_tlen < sizeof(*tlv_ptr.eigrp_tlv_sw_version)) {
-                ND_PRINT(" (too short, < %zu)",
+                ND_PRINT(C_RESET, " (too short, < %zu)",
                          sizeof(struct eigrp_tlv_header) + sizeof(*tlv_ptr.eigrp_tlv_sw_version));
                 break;
             }
 
-            ND_PRINT("\n\t    IOS version: %u.%u, EIGRP version %u.%u",
+            ND_PRINT(C_RESET, "\n\t    IOS version: %u.%u, EIGRP version %u.%u",
                    GET_U_1(tlv_ptr.eigrp_tlv_sw_version->ios_major),
                    GET_U_1(tlv_ptr.eigrp_tlv_sw_version->ios_minor),
                    GET_U_1(tlv_ptr.eigrp_tlv_sw_version->eigrp_major),
@@ -342,30 +342,30 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
         case EIGRP_TLV_IP_INT:
             tlv_ptr.eigrp_tlv_ip_int = (const struct eigrp_tlv_ip_int_t *)tlv_tptr;
             if (tlv_tlen < sizeof(*tlv_ptr.eigrp_tlv_ip_int)) {
-                ND_PRINT(" (too short, < %zu)",
+                ND_PRINT(C_RESET, " (too short, < %zu)",
                          sizeof(struct eigrp_tlv_header) + sizeof(*tlv_ptr.eigrp_tlv_ip_int));
                 break;
             }
 
             bit_length = GET_U_1(tlv_ptr.eigrp_tlv_ip_int->plen);
             if (bit_length > 32) {
-                ND_PRINT("\n\t    illegal prefix length %u",bit_length);
+                ND_PRINT(C_RESET, "\n\t    illegal prefix length %u",bit_length);
                 break;
             }
             byte_length = (bit_length + 7) / 8; /* variable length encoding */
             memset(prefix, 0, 4);
             GET_CPY_BYTES(prefix, tlv_ptr.eigrp_tlv_ip_int->destination, byte_length);
 
-            ND_PRINT("\n\t    IPv4 prefix: %15s/%u, nexthop: ",
+            ND_PRINT(C_RESET, "\n\t    IPv4 prefix: %15s/%u, nexthop: ",
                    ipaddr_string(ndo, prefix),	/* local buffer, not packet data; don't use GET_IPADDR_STRING() */
                    bit_length);
             if (GET_BE_U_4(tlv_ptr.eigrp_tlv_ip_int->nexthop) == 0)
-                ND_PRINT("self");
+                ND_PRINT(C_RESET, "self");
             else
-                ND_PRINT("%s",
+                ND_PRINT(C_RESET, "%s",
                          GET_IPADDR_STRING(tlv_ptr.eigrp_tlv_ip_int->nexthop));
 
-            ND_PRINT("\n\t      delay %u ms, bandwidth %u Kbps, mtu %u, hop %u, reliability %u, load %u",
+            ND_PRINT(C_RESET, "\n\t      delay %u ms, bandwidth %u Kbps, mtu %u, hop %u, reliability %u, load %u",
                    (GET_BE_U_4(tlv_ptr.eigrp_tlv_ip_int->delay)/100),
                    GET_BE_U_4(tlv_ptr.eigrp_tlv_ip_int->bandwidth),
                    GET_BE_U_3(tlv_ptr.eigrp_tlv_ip_int->mtu),
@@ -377,30 +377,30 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
         case EIGRP_TLV_IP_EXT:
             tlv_ptr.eigrp_tlv_ip_ext = (const struct eigrp_tlv_ip_ext_t *)tlv_tptr;
             if (tlv_tlen < sizeof(*tlv_ptr.eigrp_tlv_ip_ext)) {
-                ND_PRINT(" (too short, < %zu)",
+                ND_PRINT(C_RESET, " (too short, < %zu)",
                          sizeof(struct eigrp_tlv_header) + sizeof(*tlv_ptr.eigrp_tlv_ip_ext));
                 break;
             }
 
             bit_length = GET_U_1(tlv_ptr.eigrp_tlv_ip_ext->plen);
             if (bit_length > 32) {
-                ND_PRINT("\n\t    illegal prefix length %u",bit_length);
+                ND_PRINT(C_RESET, "\n\t    illegal prefix length %u",bit_length);
                 break;
             }
             byte_length = (bit_length + 7) / 8; /* variable length encoding */
             memset(prefix, 0, 4);
             GET_CPY_BYTES(prefix, tlv_ptr.eigrp_tlv_ip_ext->destination, byte_length);
 
-            ND_PRINT("\n\t    IPv4 prefix: %15s/%u, nexthop: ",
+            ND_PRINT(C_RESET, "\n\t    IPv4 prefix: %15s/%u, nexthop: ",
                    ipaddr_string(ndo, prefix),	/* local buffer, not packet data; don't use GET_IPADDR_STRING() */
                    bit_length);
             if (GET_BE_U_4(tlv_ptr.eigrp_tlv_ip_ext->nexthop) == 0)
-                ND_PRINT("self");
+                ND_PRINT(C_RESET, "self");
             else
-                ND_PRINT("%s",
+                ND_PRINT(C_RESET, "%s",
                          GET_IPADDR_STRING(tlv_ptr.eigrp_tlv_ip_ext->nexthop));
 
-            ND_PRINT("\n\t      origin-router %s, origin-as %u, origin-proto %s, flags [0x%02x], tag 0x%08x, metric %u",
+            ND_PRINT(C_RESET, "\n\t      origin-router %s, origin-as %u, origin-proto %s, flags [0x%02x], tag 0x%08x, metric %u",
                    GET_IPADDR_STRING(tlv_ptr.eigrp_tlv_ip_ext->origin_router),
                    GET_BE_U_4(tlv_ptr.eigrp_tlv_ip_ext->origin_as),
                    tok2str(eigrp_ext_proto_id_values,"unknown",GET_U_1(tlv_ptr.eigrp_tlv_ip_ext->proto_id)),
@@ -408,7 +408,7 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
                    GET_BE_U_4(tlv_ptr.eigrp_tlv_ip_ext->tag),
                    GET_BE_U_4(tlv_ptr.eigrp_tlv_ip_ext->metric));
 
-            ND_PRINT("\n\t      delay %u ms, bandwidth %u Kbps, mtu %u, hop %u, reliability %u, load %u",
+            ND_PRINT(C_RESET, "\n\t      delay %u ms, bandwidth %u Kbps, mtu %u, hop %u, reliability %u, load %u",
                    (GET_BE_U_4(tlv_ptr.eigrp_tlv_ip_ext->delay)/100),
                    GET_BE_U_4(tlv_ptr.eigrp_tlv_ip_ext->bandwidth),
                    GET_BE_U_3(tlv_ptr.eigrp_tlv_ip_ext->mtu),
@@ -420,12 +420,12 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
         case EIGRP_TLV_AT_CABLE_SETUP:
             tlv_ptr.eigrp_tlv_at_cable_setup = (const struct eigrp_tlv_at_cable_setup_t *)tlv_tptr;
             if (tlv_tlen < sizeof(*tlv_ptr.eigrp_tlv_at_cable_setup)) {
-                ND_PRINT(" (too short, < %zu)",
+                ND_PRINT(C_RESET, " (too short, < %zu)",
                          sizeof(struct eigrp_tlv_header) + sizeof(*tlv_ptr.eigrp_tlv_at_cable_setup));
                 break;
             }
 
-            ND_PRINT("\n\t    Cable-range: %u-%u, Router-ID %u",
+            ND_PRINT(C_RESET, "\n\t    Cable-range: %u-%u, Router-ID %u",
                    GET_BE_U_2(tlv_ptr.eigrp_tlv_at_cable_setup->cable_start),
                    GET_BE_U_2(tlv_ptr.eigrp_tlv_at_cable_setup->cable_end),
                    GET_BE_U_4(tlv_ptr.eigrp_tlv_at_cable_setup->router_id));
@@ -434,23 +434,23 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
         case EIGRP_TLV_AT_INT:
             tlv_ptr.eigrp_tlv_at_int = (const struct eigrp_tlv_at_int_t *)tlv_tptr;
             if (tlv_tlen < sizeof(*tlv_ptr.eigrp_tlv_at_int)) {
-                ND_PRINT(" (too short, < %zu)",
+                ND_PRINT(C_RESET, " (too short, < %zu)",
                          sizeof(struct eigrp_tlv_header) + sizeof(*tlv_ptr.eigrp_tlv_at_int));
                 break;
             }
 
-            ND_PRINT("\n\t     Cable-Range: %u-%u, nexthop: ",
+            ND_PRINT(C_RESET, "\n\t     Cable-Range: %u-%u, nexthop: ",
                    GET_BE_U_2(tlv_ptr.eigrp_tlv_at_int->cable_start),
                    GET_BE_U_2(tlv_ptr.eigrp_tlv_at_int->cable_end));
 
             if (GET_BE_U_4(tlv_ptr.eigrp_tlv_at_int->nexthop) == 0)
-                ND_PRINT("self");
+                ND_PRINT(C_RESET, "self");
             else
-                ND_PRINT("%u.%u",
+                ND_PRINT(C_RESET, "%u.%u",
                        GET_BE_U_2(&tlv_ptr.eigrp_tlv_at_int->nexthop[0]),
                        GET_BE_U_2(&tlv_ptr.eigrp_tlv_at_int->nexthop[2]));
 
-            ND_PRINT("\n\t      delay %u ms, bandwidth %u Kbps, mtu %u, hop %u, reliability %u, load %u",
+            ND_PRINT(C_RESET, "\n\t      delay %u ms, bandwidth %u Kbps, mtu %u, hop %u, reliability %u, load %u",
                    (GET_BE_U_4(tlv_ptr.eigrp_tlv_at_int->delay)/100),
                    GET_BE_U_4(tlv_ptr.eigrp_tlv_at_int->bandwidth),
                    GET_BE_U_3(tlv_ptr.eigrp_tlv_at_int->mtu),
@@ -462,23 +462,23 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
         case EIGRP_TLV_AT_EXT:
             tlv_ptr.eigrp_tlv_at_ext = (const struct eigrp_tlv_at_ext_t *)tlv_tptr;
             if (tlv_tlen < sizeof(*tlv_ptr.eigrp_tlv_at_ext)) {
-                ND_PRINT(" (too short, < %zu)",
+                ND_PRINT(C_RESET, " (too short, < %zu)",
                          sizeof(struct eigrp_tlv_header) + sizeof(*tlv_ptr.eigrp_tlv_at_ext));
                 break;
             }
 
-            ND_PRINT("\n\t     Cable-Range: %u-%u, nexthop: ",
+            ND_PRINT(C_RESET, "\n\t     Cable-Range: %u-%u, nexthop: ",
                    GET_BE_U_2(tlv_ptr.eigrp_tlv_at_ext->cable_start),
                    GET_BE_U_2(tlv_ptr.eigrp_tlv_at_ext->cable_end));
 
             if (GET_BE_U_4(tlv_ptr.eigrp_tlv_at_ext->nexthop) == 0)
-                ND_PRINT("self");
+                ND_PRINT(C_RESET, "self");
             else
-                ND_PRINT("%u.%u",
+                ND_PRINT(C_RESET, "%u.%u",
                        GET_BE_U_2(&tlv_ptr.eigrp_tlv_at_ext->nexthop[0]),
                        GET_BE_U_2(&tlv_ptr.eigrp_tlv_at_ext->nexthop[2]));
 
-            ND_PRINT("\n\t      origin-router %u, origin-as %u, origin-proto %s, flags [0x%02x], tag 0x%08x, metric %u",
+            ND_PRINT(C_RESET, "\n\t      origin-router %u, origin-as %u, origin-proto %s, flags [0x%02x], tag 0x%08x, metric %u",
                    GET_BE_U_4(tlv_ptr.eigrp_tlv_at_ext->origin_router),
                    GET_BE_U_4(tlv_ptr.eigrp_tlv_at_ext->origin_as),
                    tok2str(eigrp_ext_proto_id_values,"unknown",GET_U_1(tlv_ptr.eigrp_tlv_at_ext->proto_id)),
@@ -486,7 +486,7 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
                    GET_BE_U_4(tlv_ptr.eigrp_tlv_at_ext->tag),
                    GET_BE_U_2(tlv_ptr.eigrp_tlv_at_ext->metric));
 
-            ND_PRINT("\n\t      delay %u ms, bandwidth %u Kbps, mtu %u, hop %u, reliability %u, load %u",
+            ND_PRINT(C_RESET, "\n\t      delay %u ms, bandwidth %u Kbps, mtu %u, hop %u, reliability %u, load %u",
                    (GET_BE_U_4(tlv_ptr.eigrp_tlv_at_ext->delay)/100),
                    GET_BE_U_4(tlv_ptr.eigrp_tlv_at_ext->bandwidth),
                    GET_BE_U_3(tlv_ptr.eigrp_tlv_at_ext->mtu),

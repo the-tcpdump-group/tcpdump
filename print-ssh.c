@@ -84,9 +84,9 @@ ssh_print_version(netdissect_options *ndo, const u_char *pptr, u_int len)
 trunc:
 	return -1;
 print:
-	ND_PRINT(": ");
+	ND_PRINT(C_RESET, ": ");
 	nd_print_protocol_caps(ndo);
-	ND_PRINT(": %.*s", (int)idx, pptr);
+	ND_PRINT(C_RESET, ": %.*s", (int)idx, pptr);
 	return idx;
 }
 

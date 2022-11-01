@@ -91,18 +91,18 @@ zmtp1_print_frame(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 	uint64_t body_len_declared, body_len_captured, header_len;
 	uint8_t flags;
 
-	ND_PRINT("\n\t");
+	ND_PRINT(C_RESET, "\n\t");
 
 	if (GET_U_1(cp) != 0xFF) {	/* length/0xFF */
 		header_len = 1; /* length */
 		body_len_declared = GET_U_1(cp);
-		ND_PRINT(" frame flags+body  (8-bit) length %" PRIu64, body_len_declared);
+		ND_PRINT(C_RESET, " frame flags+body  (8-bit) length %" PRIu64, body_len_declared);
 	} else {
 		header_len = 1 + 8; /* 0xFF, length */
-		ND_PRINT(" frame flags+body (64-bit) length");
+		ND_PRINT(C_RESET, " frame flags+body (64-bit) length");
 		ND_TCHECK_LEN(cp, header_len); /* 0xFF, length */
 		body_len_declared = GET_BE_U_8(cp + 1);
-		ND_PRINT(" %" PRIu64, body_len_declared);
+		ND_PRINT(C_RESET, " %" PRIu64, body_len_declared);
 	}
 	if (body_len_declared == 0)
 		return cp + header_len; /* skip to the next frame */
@@ -111,17 +111,17 @@ zmtp1_print_frame(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 
 	body_len_captured = ep - cp - header_len;
 	if (body_len_declared > body_len_captured)
-		ND_PRINT(" (%" PRIu64 " captured)", body_len_captured);
-	ND_PRINT(", flags 0x%02x", flags);
+		ND_PRINT(C_RESET, " (%" PRIu64 " captured)", body_len_captured);
+	ND_PRINT(C_RESET, ", flags 0x%02x", flags);
 
 	if (ndo->ndo_vflag) {
 		uint64_t body_len_printed = ND_MIN(body_len_captured, body_len_declared);
 
-		ND_PRINT(" (%s)", bittok2str(flags_bm, "none", flags));
+		ND_PRINT(C_RESET, " (%s)", bittok2str(flags_bm, "none", flags));
 		if (ndo->ndo_vflag == 1)
 			body_len_printed = ND_MIN(VBYTES + 1, body_len_printed);
 		if (body_len_printed > 1) {
-			ND_PRINT(", first %" PRIu64 " byte(s) of body:", body_len_printed - 1);
+			ND_PRINT(C_RESET, ", first %" PRIu64 " byte(s) of body:", body_len_printed - 1);
 			hex_and_ascii_print(ndo, "\n\t ", cp + header_len + 1, body_len_printed - 1);
 		}
 	}
@@ -146,7 +146,7 @@ zmtp1_print(netdissect_options *ndo, const u_char *cp, u_int len)
 	const u_char *ep = ND_MIN(ndo->ndo_snapend, cp + len);
 
 	ndo->ndo_protocol = "zmtp1";
-	ND_PRINT(": ZMTP/1.0");
+	ND_PRINT(C_RESET, ": ZMTP/1.0");
 	while (cp < ep)
 		cp = zmtp1_print_frame(ndo, cp, ep);
 }
@@ -174,29 +174,29 @@ zmtp1_print_intermediate_part(netdissect_options *ndo, const u_char *cp, const u
 	u_int remaining_len;
 
 	frame_offset = GET_BE_U_2(cp);
-	ND_PRINT("\n\t frame offset 0x%04x", frame_offset);
+	ND_PRINT(C_RESET, "\n\t frame offset 0x%04x", frame_offset);
 	cp += 2;
 	remaining_len = ND_BYTES_AVAILABLE_AFTER(cp); /* without the frame length */
 
 	if (frame_offset == 0xFFFF)
 		frame_offset = len - 2; /* always within the declared length */
 	else if (2 + frame_offset > len) {
-		ND_PRINT(" (exceeds datagram declared length)");
+		ND_PRINT(C_RESET, " (exceeds datagram declared length)");
 		goto trunc;
 	}
 
 	/* offset within declared length of the datagram */
 	if (frame_offset) {
-		ND_PRINT("\n\t frame intermediate part, %u bytes", frame_offset);
+		ND_PRINT(C_RESET, "\n\t frame intermediate part, %u bytes", frame_offset);
 		if (frame_offset > remaining_len)
-			ND_PRINT(" (%u captured)", remaining_len);
+			ND_PRINT(C_RESET, " (%u captured)", remaining_len);
 		if (ndo->ndo_vflag) {
 			u_int len_printed = ND_MIN(frame_offset, remaining_len);
 
 			if (ndo->ndo_vflag == 1)
 				len_printed = ND_MIN(VBYTES, len_printed);
 			if (len_printed > 1) {
-				ND_PRINT(", first %u byte(s):", len_printed);
+				ND_PRINT(C_RESET, ", first %u byte(s):", len_printed);
 				hex_and_ascii_print(ndo, "\n\t ", cp, len_printed);
 			}
 		}

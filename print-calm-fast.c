@@ -43,21 +43,21 @@ calm_fast_print(netdissect_options *ndo, const u_char *bp, u_int length, const s
 {
 	ndo->ndo_protocol = "calm_fast";
 
-	ND_PRINT("CALM FAST");
+	ND_PRINT(C_RESET, "CALM FAST");
 	if (src != NULL)
-		ND_PRINT(" src:%s", (src->addr_string)(ndo, src->addr));
-	ND_PRINT("; ");
+		ND_PRINT(C_RESET, " src:%s", (src->addr_string)(ndo, src->addr));
+	ND_PRINT(C_RESET, "; ");
 
 	if (length < 2) {
-		ND_PRINT(" (length %u < 2)", length);
+		ND_PRINT(C_RESET, " (length %u < 2)", length);
 		goto invalid;
 	}
 
-	ND_PRINT("SrcNwref:%u; ", GET_U_1(bp));
+	ND_PRINT(C_RESET, "SrcNwref:%u; ", GET_U_1(bp));
 	length -= 1;
 	bp += 1;
 
-	ND_PRINT("DstNwref:%u; ", GET_U_1(bp));
+	ND_PRINT(C_RESET, "DstNwref:%u; ", GET_U_1(bp));
 	length -= 1;
 	bp += 1;
 

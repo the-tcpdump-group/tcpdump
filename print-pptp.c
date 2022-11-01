@@ -264,12 +264,12 @@ struct pptp_msg_sli {
 
 #define PRINT_RESERVED_IF_NOT_ZERO_1(reserved) \
         if (GET_U_1(reserved)) \
-		ND_PRINT(" [ERROR: reserved=%u must be zero]", \
+		ND_PRINT(C_RESET, " [ERROR: reserved=%u must be zero]", \
 			 GET_U_1(reserved));
 
 #define PRINT_RESERVED_IF_NOT_ZERO_2(reserved) \
         if (GET_BE_U_2(reserved)) \
-		ND_PRINT(" [ERROR: reserved=%u must be zero]", \
+		ND_PRINT(C_RESET, " [ERROR: reserved=%u must be zero]", \
 			 GET_BE_U_2(reserved));
 
 /******************************************/
@@ -280,7 +280,7 @@ static void
 pptp_bearer_cap_print(netdissect_options *ndo,
                       const nd_uint32_t bearer_cap)
 {
-	ND_PRINT(" BEARER_CAP(%s%s)",
+	ND_PRINT(C_RESET, " BEARER_CAP(%s%s)",
 	          GET_BE_U_4(bearer_cap) & PPTP_BEARER_CAP_DIGITAL_MASK ? "D" : "",
 	          GET_BE_U_4(bearer_cap) & PPTP_BEARER_CAP_ANALOG_MASK ? "A" : "");
 }
@@ -296,7 +296,7 @@ static void
 pptp_bearer_type_print(netdissect_options *ndo,
                        const nd_uint32_t bearer_type)
 {
-	ND_PRINT(" BEARER_TYPE(%s)",
+	ND_PRINT(C_RESET, " BEARER_TYPE(%s)",
 	          tok2str(pptp_btype_str, "?", GET_BE_U_4(bearer_type)));
 }
 
@@ -304,28 +304,28 @@ static void
 pptp_call_id_print(netdissect_options *ndo,
                    const nd_uint16_t call_id)
 {
-	ND_PRINT(" CALL_ID(%u)", GET_BE_U_2(call_id));
+	ND_PRINT(C_RESET, " CALL_ID(%u)", GET_BE_U_2(call_id));
 }
 
 static void
 pptp_call_ser_print(netdissect_options *ndo,
                     const nd_uint16_t call_ser)
 {
-	ND_PRINT(" CALL_SER_NUM(%u)", GET_BE_U_2(call_ser));
+	ND_PRINT(C_RESET, " CALL_SER_NUM(%u)", GET_BE_U_2(call_ser));
 }
 
 static void
 pptp_cause_code_print(netdissect_options *ndo,
                       const nd_uint16_t cause_code)
 {
-	ND_PRINT(" CAUSE_CODE(%u)", GET_BE_U_2(cause_code));
+	ND_PRINT(C_RESET, " CAUSE_CODE(%u)", GET_BE_U_2(cause_code));
 }
 
 static void
 pptp_conn_speed_print(netdissect_options *ndo,
                       const nd_uint32_t conn_speed)
 {
-	ND_PRINT(" CONN_SPEED(%u)", GET_BE_U_4(conn_speed));
+	ND_PRINT(C_RESET, " CONN_SPEED(%u)", GET_BE_U_4(conn_speed));
 }
 
 static const struct tok pptp_errcode_str[] = {
@@ -343,33 +343,33 @@ static void
 pptp_err_code_print(netdissect_options *ndo,
                     const nd_uint8_t err_code)
 {
-	ND_PRINT(" ERR_CODE(%u", GET_U_1(err_code));
+	ND_PRINT(C_RESET, " ERR_CODE(%u", GET_U_1(err_code));
 	if (ndo->ndo_vflag) {
-		ND_PRINT(":%s",
+		ND_PRINT(C_RESET, ":%s",
 			 tok2str(pptp_errcode_str, "?", GET_U_1(err_code)));
 	}
-	ND_PRINT(")");
+	ND_PRINT(C_RESET, ")");
 }
 
 static void
 pptp_firm_rev_print(netdissect_options *ndo,
                     const nd_uint16_t firm_rev)
 {
-	ND_PRINT(" FIRM_REV(%u)", GET_BE_U_2(firm_rev));
+	ND_PRINT(C_RESET, " FIRM_REV(%u)", GET_BE_U_2(firm_rev));
 }
 
 static void
 pptp_framing_cap_print(netdissect_options *ndo,
                        const nd_uint32_t framing_cap)
 {
-	ND_PRINT(" FRAME_CAP(");
+	ND_PRINT(C_RESET, " FRAME_CAP(");
 	if (GET_BE_U_4(framing_cap) & PPTP_FRAMING_CAP_ASYNC_MASK) {
-                ND_PRINT("A");		/* Async */
+                ND_PRINT(C_RESET, "A");		/* Async */
         }
         if (GET_BE_U_4(framing_cap) & PPTP_FRAMING_CAP_SYNC_MASK) {
-                ND_PRINT("S");		/* Sync */
+                ND_PRINT(C_RESET, "S");		/* Sync */
         }
-	ND_PRINT(")");
+	ND_PRINT(C_RESET, ")");
 }
 
 static const struct tok pptp_ftype_str[] = {
@@ -383,7 +383,7 @@ static void
 pptp_framing_type_print(netdissect_options *ndo,
                         const nd_uint32_t framing_type)
 {
-	ND_PRINT(" FRAME_TYPE(%s)",
+	ND_PRINT(C_RESET, " FRAME_TYPE(%s)",
 	          tok2str(pptp_ftype_str, "?", GET_BE_U_4(framing_type)));
 }
 
@@ -391,51 +391,51 @@ static void
 pptp_hostname_print(netdissect_options *ndo,
                     const u_char *hostname)
 {
-	ND_PRINT(" HOSTNAME(");
+	ND_PRINT(C_RESET, " HOSTNAME(");
 	nd_printjnp(ndo, hostname, 64);
-	ND_PRINT(")");
+	ND_PRINT(C_RESET, ")");
 }
 
 static void
 pptp_id_print(netdissect_options *ndo,
               const nd_uint32_t id)
 {
-	ND_PRINT(" ID(%u)", GET_BE_U_4(id));
+	ND_PRINT(C_RESET, " ID(%u)", GET_BE_U_4(id));
 }
 
 static void
 pptp_max_channel_print(netdissect_options *ndo,
                        const nd_uint16_t max_channel)
 {
-	ND_PRINT(" MAX_CHAN(%u)", GET_BE_U_2(max_channel));
+	ND_PRINT(C_RESET, " MAX_CHAN(%u)", GET_BE_U_2(max_channel));
 }
 
 static void
 pptp_peer_call_id_print(netdissect_options *ndo,
                         const nd_uint16_t peer_call_id)
 {
-	ND_PRINT(" PEER_CALL_ID(%u)", GET_BE_U_2(peer_call_id));
+	ND_PRINT(C_RESET, " PEER_CALL_ID(%u)", GET_BE_U_2(peer_call_id));
 }
 
 static void
 pptp_phy_chan_id_print(netdissect_options *ndo,
                        const nd_uint32_t phy_chan_id)
 {
-	ND_PRINT(" PHY_CHAN_ID(%u)", GET_BE_U_4(phy_chan_id));
+	ND_PRINT(C_RESET, " PHY_CHAN_ID(%u)", GET_BE_U_4(phy_chan_id));
 }
 
 static void
 pptp_pkt_proc_delay_print(netdissect_options *ndo,
                           const nd_uint16_t pkt_proc_delay)
 {
-	ND_PRINT(" PROC_DELAY(%u)", GET_BE_U_2(pkt_proc_delay));
+	ND_PRINT(C_RESET, " PROC_DELAY(%u)", GET_BE_U_2(pkt_proc_delay));
 }
 
 static void
 pptp_proto_ver_print(netdissect_options *ndo,
                      const nd_uint16_t proto_ver)
 {
-	ND_PRINT(" PROTO_VER(%u.%u)",	/* Version.Revision */
+	ND_PRINT(C_RESET, " PROTO_VER(%u.%u)",	/* Version.Revision */
 	       GET_BE_U_2(proto_ver) >> 8,
 	       GET_BE_U_2(proto_ver) & 0xff);
 }
@@ -444,7 +444,7 @@ static void
 pptp_recv_winsiz_print(netdissect_options *ndo,
                        const nd_uint16_t recv_winsiz)
 {
-	ND_PRINT(" RECV_WIN(%u)", GET_BE_U_2(recv_winsiz));
+	ND_PRINT(C_RESET, " RECV_WIN(%u)", GET_BE_U_2(recv_winsiz));
 }
 
 static const struct tok pptp_scrrp_str[] = {
@@ -492,7 +492,7 @@ static void
 pptp_result_code_print(netdissect_options *ndo,
                        const nd_uint8_t result_code, int ctrl_msg_type)
 {
-	ND_PRINT(" RESULT_CODE(%u", GET_U_1(result_code));
+	ND_PRINT(C_RESET, " RESULT_CODE(%u", GET_U_1(result_code));
 	if (ndo->ndo_vflag) {
 		const struct tok *dict =
 			ctrl_msg_type == PPTP_CTRL_MSG_TYPE_SCCRP    ? pptp_scrrp_str :
@@ -503,28 +503,28 @@ pptp_result_code_print(netdissect_options *ndo,
 			ctrl_msg_type == PPTP_CTRL_MSG_TYPE_CDN      ? pptp_cdn_str :
 			NULL; /* assertion error */
 		if (dict != NULL)
-			ND_PRINT(":%s",
+			ND_PRINT(C_RESET, ":%s",
 				 tok2str(dict, "?", GET_U_1(result_code)));
 	}
-	ND_PRINT(")");
+	ND_PRINT(C_RESET, ")");
 }
 
 static void
 pptp_subaddr_print(netdissect_options *ndo,
                    const u_char *subaddr)
 {
-	ND_PRINT(" SUB_ADDR(");
+	ND_PRINT(C_RESET, " SUB_ADDR(");
 	nd_printjnp(ndo, subaddr, 64);
-	ND_PRINT(")");
+	ND_PRINT(C_RESET, ")");
 }
 
 static void
 pptp_vendor_print(netdissect_options *ndo,
                   const u_char *vendor)
 {
-	ND_PRINT(" VENDOR(");
+	ND_PRINT(C_RESET, " VENDOR(");
 	nd_printjnp(ndo, vendor, 64);
-	ND_PRINT(")");
+	ND_PRINT(C_RESET, ")");
 }
 
 /************************************/
@@ -569,24 +569,24 @@ pptp_stopccrq_print(netdissect_options *ndo,
 {
 	const struct pptp_msg_stopccrq *ptr = (const struct pptp_msg_stopccrq *)dat;
 
-	ND_PRINT(" REASON(%u", GET_U_1(ptr->reason));
+	ND_PRINT(C_RESET, " REASON(%u", GET_U_1(ptr->reason));
 	if (ndo->ndo_vflag) {
 		switch (GET_U_1(ptr->reason)) {
 		case 1:
-			ND_PRINT(":None");
+			ND_PRINT(C_RESET, ":None");
 			break;
 		case 2:
-			ND_PRINT(":Stop-Protocol");
+			ND_PRINT(C_RESET, ":Stop-Protocol");
 			break;
 		case 3:
-			ND_PRINT(":Stop-Local-Shutdown");
+			ND_PRINT(C_RESET, ":Stop-Local-Shutdown");
 			break;
 		default:
-			ND_PRINT(":?");
+			ND_PRINT(C_RESET, ":?");
 			break;
 		}
 	}
-	ND_PRINT(")");
+	ND_PRINT(C_RESET, ")");
 	PRINT_RESERVED_IF_NOT_ZERO_1(ptr->reserved1);
 	PRINT_RESERVED_IF_NOT_ZERO_2(ptr->reserved2);
 }
@@ -631,18 +631,18 @@ pptp_ocrq_print(netdissect_options *ndo,
 
 	pptp_call_id_print(ndo, ptr->call_id);
 	pptp_call_ser_print(ndo, ptr->call_ser);
-	ND_PRINT(" MIN_BPS(%u)", GET_BE_U_4(ptr->min_bps));
-	ND_PRINT(" MAX_BPS(%u)", GET_BE_U_4(ptr->max_bps));
+	ND_PRINT(C_RESET, " MIN_BPS(%u)", GET_BE_U_4(ptr->min_bps));
+	ND_PRINT(C_RESET, " MAX_BPS(%u)", GET_BE_U_4(ptr->max_bps));
 	pptp_bearer_type_print(ndo, ptr->bearer_type);
 	pptp_framing_type_print(ndo, ptr->framing_type);
 	pptp_recv_winsiz_print(ndo, ptr->recv_winsiz);
 	pptp_pkt_proc_delay_print(ndo, ptr->pkt_proc_delay);
-	ND_PRINT(" PHONE_NO_LEN(%u)", GET_BE_U_2(ptr->phone_no_len));
+	ND_PRINT(C_RESET, " PHONE_NO_LEN(%u)", GET_BE_U_2(ptr->phone_no_len));
 	PRINT_RESERVED_IF_NOT_ZERO_2(ptr->reserved1);
-	ND_PRINT(" PHONE_NO(");
+	ND_PRINT(C_RESET, " PHONE_NO(");
 	nd_printjnp(ndo, ptr->phone_no,
 		    ND_MIN(64, GET_BE_U_2(ptr->phone_no_len)));
-	ND_PRINT(")");
+	ND_PRINT(C_RESET, ")");
 	pptp_subaddr_print(ndo, ptr->subaddr);
 }
 
@@ -673,16 +673,16 @@ pptp_icrq_print(netdissect_options *ndo,
 	pptp_call_ser_print(ndo, ptr->call_ser);
 	pptp_bearer_type_print(ndo, ptr->bearer_type);
 	pptp_phy_chan_id_print(ndo, ptr->phy_chan_id);
-	ND_PRINT(" DIALED_NO_LEN(%u)", GET_BE_U_2(ptr->dialed_no_len));
-	ND_PRINT(" DIALING_NO_LEN(%u)", GET_BE_U_2(ptr->dialing_no_len));
-	ND_PRINT(" DIALED_NO(");
+	ND_PRINT(C_RESET, " DIALED_NO_LEN(%u)", GET_BE_U_2(ptr->dialed_no_len));
+	ND_PRINT(C_RESET, " DIALING_NO_LEN(%u)", GET_BE_U_2(ptr->dialing_no_len));
+	ND_PRINT(C_RESET, " DIALED_NO(");
 	nd_printjnp(ndo, ptr->dialed_no,
 		    ND_MIN(64, GET_BE_U_2(ptr->dialed_no_len)));
-	ND_PRINT(")");
-	ND_PRINT(" DIALING_NO(");
+	ND_PRINT(C_RESET, ")");
+	ND_PRINT(C_RESET, " DIALING_NO(");
 	nd_printjnp(ndo, ptr->dialing_no,
 		    ND_MIN(64, GET_BE_U_2(ptr->dialing_no_len)));
-	ND_PRINT(")");
+	ND_PRINT(C_RESET, ")");
 	pptp_subaddr_print(ndo, ptr->subaddr);
 }
 
@@ -736,9 +736,9 @@ pptp_cdn_print(netdissect_options *ndo,
 	pptp_err_code_print(ndo, ptr->err_code);
 	pptp_cause_code_print(ndo, ptr->cause_code);
 	PRINT_RESERVED_IF_NOT_ZERO_2(ptr->reserved1);
-	ND_PRINT(" CALL_STATS(");
+	ND_PRINT(C_RESET, " CALL_STATS(");
 	nd_printjnp(ndo, ptr->call_stats, 128);
-	ND_PRINT(")");
+	ND_PRINT(C_RESET, ")");
 }
 
 static void
@@ -749,12 +749,12 @@ pptp_wen_print(netdissect_options *ndo,
 
 	pptp_peer_call_id_print(ndo, ptr->peer_call_id);
 	PRINT_RESERVED_IF_NOT_ZERO_2(ptr->reserved1);
-	ND_PRINT(" CRC_ERR(%u)", GET_BE_U_4(ptr->crc_err));
-	ND_PRINT(" FRAMING_ERR(%u)", GET_BE_U_4(ptr->framing_err));
-	ND_PRINT(" HARDWARE_OVERRUN(%u)", GET_BE_U_4(ptr->hardware_overrun));
-	ND_PRINT(" BUFFER_OVERRUN(%u)", GET_BE_U_4(ptr->buffer_overrun));
-	ND_PRINT(" TIMEOUT_ERR(%u)", GET_BE_U_4(ptr->timeout_err));
-	ND_PRINT(" ALIGN_ERR(%u)", GET_BE_U_4(ptr->align_err));
+	ND_PRINT(C_RESET, " CRC_ERR(%u)", GET_BE_U_4(ptr->crc_err));
+	ND_PRINT(C_RESET, " FRAMING_ERR(%u)", GET_BE_U_4(ptr->framing_err));
+	ND_PRINT(C_RESET, " HARDWARE_OVERRUN(%u)", GET_BE_U_4(ptr->hardware_overrun));
+	ND_PRINT(C_RESET, " BUFFER_OVERRUN(%u)", GET_BE_U_4(ptr->buffer_overrun));
+	ND_PRINT(C_RESET, " TIMEOUT_ERR(%u)", GET_BE_U_4(ptr->timeout_err));
+	ND_PRINT(C_RESET, " ALIGN_ERR(%u)", GET_BE_U_4(ptr->align_err));
 }
 
 static void
@@ -765,8 +765,8 @@ pptp_sli_print(netdissect_options *ndo,
 
 	pptp_peer_call_id_print(ndo, ptr->peer_call_id);
 	PRINT_RESERVED_IF_NOT_ZERO_2(ptr->reserved1);
-	ND_PRINT(" SEND_ACCM(0x%08x)", GET_BE_U_4(ptr->send_accm));
-	ND_PRINT(" RECV_ACCM(0x%08x)", GET_BE_U_4(ptr->recv_accm));
+	ND_PRINT(C_RESET, " SEND_ACCM(0x%08x)", GET_BE_U_4(ptr->send_accm));
+	ND_PRINT(C_RESET, " RECV_ACCM(0x%08x)", GET_BE_U_4(ptr->recv_accm));
 }
 
 void
@@ -778,41 +778,41 @@ pptp_print(netdissect_options *ndo,
 	uint16_t ctrl_msg_type;
 
 	ndo->ndo_protocol = "pptp";
-	ND_PRINT(": ");
+	ND_PRINT(C_RESET, ": ");
 	nd_print_protocol(ndo);
 
 	hdr = (const struct pptp_hdr *)dat;
 
 	if (ndo->ndo_vflag) {
-		ND_PRINT(" Length=%u", GET_BE_U_2(hdr->length));
+		ND_PRINT(C_RESET, " Length=%u", GET_BE_U_2(hdr->length));
 	}
 	if (ndo->ndo_vflag) {
 		switch(GET_BE_U_2(hdr->msg_type)) {
 		case PPTP_MSG_TYPE_CTRL:
-			ND_PRINT(" CTRL-MSG");
+			ND_PRINT(C_RESET, " CTRL-MSG");
 			break;
 		case PPTP_MSG_TYPE_MGMT:
-			ND_PRINT(" MGMT-MSG");
+			ND_PRINT(C_RESET, " MGMT-MSG");
 			break;
 		default:
-			ND_PRINT(" UNKNOWN-MSG-TYPE");
+			ND_PRINT(C_RESET, " UNKNOWN-MSG-TYPE");
 			break;
 		}
 	}
 
 	mc = GET_BE_U_4(hdr->magic_cookie);
 	if (mc != PPTP_MAGIC_COOKIE) {
-		ND_PRINT(" UNEXPECTED Magic-Cookie!!(%08x)", mc);
+		ND_PRINT(C_RESET, " UNEXPECTED Magic-Cookie!!(%08x)", mc);
 	}
 	if (ndo->ndo_vflag || mc != PPTP_MAGIC_COOKIE) {
-		ND_PRINT(" Magic-Cookie=%08x", mc);
+		ND_PRINT(C_RESET, " Magic-Cookie=%08x", mc);
 	}
 	ctrl_msg_type = GET_BE_U_2(hdr->ctrl_msg_type);
 	if (ctrl_msg_type < PPTP_MAX_MSGTYPE_INDEX) {
-		ND_PRINT(" CTRL_MSGTYPE=%s",
+		ND_PRINT(C_RESET, " CTRL_MSGTYPE=%s",
 		       pptp_message_type_string[ctrl_msg_type]);
 	} else {
-		ND_PRINT(" UNKNOWN_CTRL_MSGTYPE(%u)", ctrl_msg_type);
+		ND_PRINT(C_RESET, " UNKNOWN_CTRL_MSGTYPE(%u)", ctrl_msg_type);
 	}
 	PRINT_RESERVED_IF_NOT_ZERO_2(hdr->reserved0);
 

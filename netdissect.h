@@ -33,6 +33,7 @@
 #include "status-exit-codes.h"
 #include "funcattrs.h" /* for PRINTFLIKE_FUNCPTR() */
 #include "diag-control.h" /* for ND_UNREACHABLE */
+#include "colors.h"
 
 /*
  * Data types corresponding to multi-byte integral values within data
@@ -233,6 +234,7 @@ struct netdissect_options {
 
   int   ndo_snaplen;
   int   ndo_ll_hdr_len;	/* link-layer header length */
+  int   ndo_color;	/* print using colors */
 
   /*global pointers to beginning and end of current packet (during printing) */
   const u_char *ndo_packetp;
@@ -402,7 +404,7 @@ nd_trunc_longjmp(netdissect_options *ndo)
  */
 #define ND_ICHECKMSG_U(message, expression_1, operator, expression_2) \
 if ((expression_1) operator (expression_2)) { \
-ND_PRINT(" [%s %u %s %u]", (message), (expression_1), (#operator), (expression_2)); \
+ND_PRINT(C_RESET, " [%s %u %s %u]", (message), (expression_1), (#operator), (expression_2)); \
 goto invalid; \
 }
 
@@ -419,7 +421,7 @@ ND_ICHECKMSG_U((#expression_1), (expression_1), operator, (expression_2))
  */
 #define ND_ICHECKMSG_ZU(message, expression_1, operator, expression_2) \
 if ((expression_1) operator (expression_2)) { \
-ND_PRINT(" [%s %u %s %zu]", (message), (expression_1), (#operator), (expression_2)); \
+ND_PRINT(C_RESET, " [%s %u %s %zu]", (message), (expression_1), (#operator), (expression_2)); \
 goto invalid; \
 }
 
@@ -430,7 +432,9 @@ goto invalid; \
 #define ND_ICHECK_ZU(expression_1, operator, expression_2) \
 ND_ICHECKMSG_ZU((#expression_1), (expression_1), operator, (expression_2))
 
-#define ND_PRINT(...) (ndo->ndo_printf)(ndo, __VA_ARGS__)
+#define ND_PRINT(COLOR, FMT, ...) if(ndo->ndo_color) (ndo->ndo_printf)(ndo, COLOR FMT C_RESET __VA_OPT__(,) __VA_ARGS__); \
+	else (ndo->ndo_printf)(ndo, FMT __VA_OPT__(,) __VA_ARGS__)
+
 #define ND_DEFAULTPRINT(ap, length) (*ndo->ndo_default_print)(ndo, ap, length)
 
 extern void ts_print(netdissect_options *, const struct timeval *);

@@ -169,18 +169,18 @@ pimv1_join_prune_print(netdissect_options *ndo,
 	    ((njoin = GET_BE_U_2(bp + 20)) + GET_BE_U_2(bp + 22)) == 1) {
 		u_int hold;
 
-		ND_PRINT(" RPF %s ", GET_IPADDR_STRING(bp));
+		ND_PRINT(C_RESET, " RPF %s ", GET_IPADDR_STRING(bp));
 		hold = GET_BE_U_2(bp + 6);
 		if (hold != 180) {
-			ND_PRINT("Hold ");
+			ND_PRINT(C_RESET, "Hold ");
 			unsigned_relts_print(ndo, hold);
 		}
-		ND_PRINT("%s (%s/%u, %s", njoin ? "Join" : "Prune",
+		ND_PRINT(C_RESET, "%s (%s/%u, %s", njoin ? "Join" : "Prune",
 		GET_IPADDR_STRING(bp + 26), GET_U_1(bp + 25) & 0x3f,
 		GET_IPADDR_STRING(bp + 12));
 		if (GET_BE_U_4(bp + 16) != 0xffffffff)
-			ND_PRINT("/%s", GET_IPADDR_STRING(bp + 16));
-		ND_PRINT(") %s%s %s",
+			ND_PRINT(C_RESET, "/%s", GET_IPADDR_STRING(bp + 16));
+		ND_PRINT(C_RESET, ") %s%s %s",
 		    (GET_U_1(bp + 24) & 0x01) ? "Sparse" : "Dense",
 		    (GET_U_1(bp + 25) & 0x80) ? " WC" : "",
 		    (GET_U_1(bp + 25) & 0x40) ? "RP" : "SPT");
@@ -190,15 +190,15 @@ pimv1_join_prune_print(netdissect_options *ndo,
 	if (len < sizeof(nd_ipv4))
 		goto trunc;
 	if (ndo->ndo_vflag > 1)
-		ND_PRINT("\n");
-	ND_PRINT(" Upstream Nbr: %s", GET_IPADDR_STRING(bp));
+		ND_PRINT(C_RESET, "\n");
+	ND_PRINT(C_RESET, " Upstream Nbr: %s", GET_IPADDR_STRING(bp));
 	bp += 4;
 	len -= 4;
 	if (len < 4)
 		goto trunc;
 	if (ndo->ndo_vflag > 1)
-		ND_PRINT("\n");
-	ND_PRINT(" Hold time: ");
+		ND_PRINT(C_RESET, "\n");
+	ND_PRINT(C_RESET, " Hold time: ");
 	unsigned_relts_print(ndo, GET_BE_U_2(bp + 2));
 	if (ndo->ndo_vflag < 2)
 		return;
@@ -217,20 +217,20 @@ pimv1_join_prune_print(netdissect_options *ndo,
 		 */
 		if (len < 4)
 			goto trunc;
-		ND_PRINT("\n\tGroup: %s", GET_IPADDR_STRING(bp));
+		ND_PRINT(C_RESET, "\n\tGroup: %s", GET_IPADDR_STRING(bp));
 		bp += 4;
 		len -= 4;
 		if (len < 4)
 			goto trunc;
 		if (GET_BE_U_4(bp) != 0xffffffff)
-			ND_PRINT("/%s", GET_IPADDR_STRING(bp));
+			ND_PRINT(C_RESET, "/%s", GET_IPADDR_STRING(bp));
 		bp += 4;
 		len -= 4;
 		if (len < 4)
 			goto trunc;
 		njoin = GET_BE_U_2(bp);
 		nprune = GET_BE_U_2(bp + 2);
-		ND_PRINT(" joined: %u pruned: %u", njoin, nprune);
+		ND_PRINT(C_RESET, " joined: %u pruned: %u", njoin, nprune);
 		bp += 4;
 		len -= 4;
 		for (njp = 0; njp < (njoin + nprune); njp++) {
@@ -242,7 +242,7 @@ pimv1_join_prune_print(netdissect_options *ndo,
 				type = "Prune";
 			if (len < 6)
 				goto trunc;
-			ND_PRINT("\n\t%s %s%s%s%s/%u", type,
+			ND_PRINT(C_RESET, "\n\t%s %s%s%s%s/%u", type,
 			    (GET_U_1(bp) & 0x01) ? "Sparse " : "Dense ",
 			    (GET_U_1(bp + 1) & 0x80) ? "WC " : "",
 			    (GET_U_1(bp + 1) & 0x40) ? "RP " : "SPT ",
@@ -267,56 +267,56 @@ pimv1_print(netdissect_options *ndo,
 	ndo->ndo_protocol = "pimv1";
 	type = GET_U_1(bp + 1);
 
-	ND_PRINT(" %s", tok2str(pimv1_type_str, "[type %u]", type));
+	ND_PRINT(C_RESET, " %s", tok2str(pimv1_type_str, "[type %u]", type));
 	switch (type) {
 	case PIMV1_TYPE_QUERY:
 		if (ND_TTEST_1(bp + 8)) {
 			switch (GET_U_1(bp + 8) >> 4) {
 			case 0:
-				ND_PRINT(" Dense-mode");
+				ND_PRINT(C_RESET, " Dense-mode");
 				break;
 			case 1:
-				ND_PRINT(" Sparse-mode");
+				ND_PRINT(C_RESET, " Sparse-mode");
 				break;
 			case 2:
-				ND_PRINT(" Sparse-Dense-mode");
+				ND_PRINT(C_RESET, " Sparse-Dense-mode");
 				break;
 			default:
-				ND_PRINT(" mode-%u", GET_U_1(bp + 8) >> 4);
+				ND_PRINT(C_RESET, " mode-%u", GET_U_1(bp + 8) >> 4);
 				break;
 			}
 		}
 		if (ndo->ndo_vflag) {
-			ND_PRINT(" (Hold-time ");
+			ND_PRINT(C_RESET, " (Hold-time ");
 			unsigned_relts_print(ndo, GET_BE_U_2(bp + 10));
-			ND_PRINT(")");
+			ND_PRINT(C_RESET, ")");
 		}
 		break;
 
 	case PIMV1_TYPE_REGISTER:
 		ND_TCHECK_LEN(bp + 8, 20);			/* ip header */
-		ND_PRINT(" for %s > %s", GET_IPADDR_STRING(bp + 20),
+		ND_PRINT(C_RESET, " for %s > %s", GET_IPADDR_STRING(bp + 20),
 			  GET_IPADDR_STRING(bp + 24));
 		break;
 	case PIMV1_TYPE_REGISTER_STOP:
-		ND_PRINT(" for %s > %s", GET_IPADDR_STRING(bp + 8),
+		ND_PRINT(C_RESET, " for %s > %s", GET_IPADDR_STRING(bp + 8),
 			  GET_IPADDR_STRING(bp + 12));
 		break;
 	case PIMV1_TYPE_RP_REACHABILITY:
 		if (ndo->ndo_vflag) {
-			ND_PRINT(" group %s", GET_IPADDR_STRING(bp + 8));
+			ND_PRINT(C_RESET, " group %s", GET_IPADDR_STRING(bp + 8));
 			if (GET_BE_U_4(bp + 12) != 0xffffffff)
-				ND_PRINT("/%s", GET_IPADDR_STRING(bp + 12));
-			ND_PRINT(" RP %s hold ", GET_IPADDR_STRING(bp + 16));
+				ND_PRINT(C_RESET, "/%s", GET_IPADDR_STRING(bp + 12));
+			ND_PRINT(C_RESET, " RP %s hold ", GET_IPADDR_STRING(bp + 16));
 			unsigned_relts_print(ndo, GET_BE_U_2(bp + 22));
 		}
 		break;
 	case PIMV1_TYPE_ASSERT:
-		ND_PRINT(" for %s > %s", GET_IPADDR_STRING(bp + 16),
+		ND_PRINT(C_RESET, " for %s > %s", GET_IPADDR_STRING(bp + 16),
 			  GET_IPADDR_STRING(bp + 8));
 		if (GET_BE_U_4(bp + 12) != 0xffffffff)
-			ND_PRINT("/%s", GET_IPADDR_STRING(bp + 12));
-		ND_PRINT(" %s pref %u metric %u",
+			ND_PRINT(C_RESET, "/%s", GET_IPADDR_STRING(bp + 12));
+		ND_PRINT(C_RESET, " %s pref %u metric %u",
 		    (GET_U_1(bp + 20) & 0x80) ? "RP-tree" : "SPT",
 		    GET_BE_U_4(bp + 20) & 0x7fffffff,
 		    GET_BE_U_4(bp + 24));
@@ -332,7 +332,7 @@ pimv1_print(netdissect_options *ndo,
 		break;
 	}
 	if ((GET_U_1(bp + 4) >> 4) != 1)
-		ND_PRINT(" [v%u]", GET_U_1(bp + 4) >> 4);
+		ND_PRINT(C_RESET, " [v%u]", GET_U_1(bp + 4) >> 4);
 	return;
 
 trunc:
@@ -356,28 +356,28 @@ cisco_autorp_print(netdissect_options *ndo,
 	ndo->ndo_protocol = "cisco_autorp";
 	if (len < 8)
 		goto trunc;
-	ND_PRINT(" auto-rp ");
+	ND_PRINT(C_RESET, " auto-rp ");
 	type = GET_U_1(bp);
 	switch (type) {
 	case 0x11:
-		ND_PRINT("candidate-advert");
+		ND_PRINT(C_RESET, "candidate-advert");
 		break;
 	case 0x12:
-		ND_PRINT("mapping");
+		ND_PRINT(C_RESET, "mapping");
 		break;
 	default:
-		ND_PRINT("type-0x%02x", type);
+		ND_PRINT(C_RESET, "type-0x%02x", type);
 		break;
 	}
 
 	numrps = GET_U_1(bp + 1);
 
-	ND_PRINT(" Hold ");
+	ND_PRINT(C_RESET, " Hold ");
 	hold = GET_BE_U_2(bp + 2);
 	if (hold)
 		unsigned_relts_print(ndo, GET_BE_U_2(bp + 2));
 	else
-		ND_PRINT("FOREVER");
+		ND_PRINT(C_RESET, "FOREVER");
 
 	/* Next 4 bytes are reserved. */
 
@@ -402,23 +402,23 @@ cisco_autorp_print(netdissect_options *ndo,
 
 		if (len < 4)
 			goto trunc;
-		ND_PRINT(" RP %s", GET_IPADDR_STRING(bp));
+		ND_PRINT(C_RESET, " RP %s", GET_IPADDR_STRING(bp));
 		bp += 4;
 		len -= 4;
 		if (len < 1)
 			goto trunc;
 		switch (GET_U_1(bp) & 0x3) {
-		case 0: ND_PRINT(" PIMv?");
+		case 0: ND_PRINT(C_RESET, " PIMv?");
 			break;
-		case 1:	ND_PRINT(" PIMv1");
+		case 1:	ND_PRINT(C_RESET, " PIMv1");
 			break;
-		case 2:	ND_PRINT(" PIMv2");
+		case 2:	ND_PRINT(C_RESET, " PIMv2");
 			break;
-		case 3:	ND_PRINT(" PIMv1+2");
+		case 3:	ND_PRINT(C_RESET, " PIMv1+2");
 			break;
 		}
 		if (GET_U_1(bp) & 0xfc)
-			ND_PRINT(" [rsvd=0x%02x]", GET_U_1(bp) & 0xfc);
+			ND_PRINT(C_RESET, " [rsvd=0x%02x]", GET_U_1(bp) & 0xfc);
 		bp += 1;
 		len -= 1;
 		if (len < 1)
@@ -430,13 +430,13 @@ cisco_autorp_print(netdissect_options *ndo,
 		while (nentries != 0) {
 			if (len < 6)
 				goto trunc;
-			ND_PRINT("%c%s%s/%u", s, GET_U_1(bp) & 1 ? "!" : "",
+			ND_PRINT(C_RESET, "%c%s%s/%u", s, GET_U_1(bp) & 1 ? "!" : "",
 			          GET_IPADDR_STRING(bp + 2), GET_U_1(bp + 1));
 			if (GET_U_1(bp) & 0x02) {
-				ND_PRINT(" bidir");
+				ND_PRINT(C_RESET, " bidir");
 			}
 			if (GET_U_1(bp) & 0xfc) {
-				ND_PRINT("[rsvd=0x%02x]", GET_U_1(bp) & 0xfc);
+				ND_PRINT(C_RESET, "[rsvd=0x%02x]", GET_U_1(bp) & 0xfc);
 			}
 			s = ',';
 			bp += 6; len -= 6;
@@ -463,13 +463,13 @@ pim_print(netdissect_options *ndo,
 	switch (PIM_VER(pim_typever)) {
 	case 2:
 		if (!ndo->ndo_vflag) {
-			ND_PRINT("PIMv%u, %s, length %u",
+			ND_PRINT(C_RESET, "PIMv%u, %s, length %u",
 			          PIM_VER(pim_typever),
 			          tok2str(pimv2_type_values,"Unknown Type",PIM_TYPE(pim_typever)),
 			          len);
 			return;
 		} else {
-			ND_PRINT("PIMv%u, length %u\n\t%s",
+			ND_PRINT(C_RESET, "PIMv%u, length %u\n\t%s",
 			          PIM_VER(pim_typever),
 			          len,
 			          tok2str(pimv2_type_values,"Unknown Type",PIM_TYPE(pim_typever)));
@@ -477,7 +477,7 @@ pim_print(netdissect_options *ndo,
 		}
 		break;
 	default:
-		ND_PRINT("PIMv%u, length %u",
+		ND_PRINT(C_RESET, "PIMv%u, length %u",
 		          PIM_VER(pim_typever),
 		          len);
 		break;
@@ -598,11 +598,11 @@ pimv2_addr_print(netdissect_options *ndo,
 		ND_TCHECK_LEN(bp, addr_len);
 		if (af == AF_INET) {
 			if (!silent)
-				ND_PRINT("%s", GET_IPADDR_STRING(bp));
+				ND_PRINT(C_RESET, "%s", GET_IPADDR_STRING(bp));
 		}
 		else if (af == AF_INET6) {
 			if (!silent)
-				ND_PRINT("%s", GET_IP6ADDR_STRING(bp));
+				ND_PRINT(C_RESET, "%s", GET_IP6ADDR_STRING(bp));
 		}
 		return hdrlen + addr_len;
 	case pimv2_group:
@@ -612,31 +612,31 @@ pimv2_addr_print(netdissect_options *ndo,
 		ND_TCHECK_LEN(bp, addr_len + 2);
 		if (af == AF_INET) {
 			if (!silent) {
-				ND_PRINT("%s", GET_IPADDR_STRING(bp + 2));
+				ND_PRINT(C_RESET, "%s", GET_IPADDR_STRING(bp + 2));
 				if (GET_U_1(bp + 1) != 32)
-					ND_PRINT("/%u", GET_U_1(bp + 1));
+					ND_PRINT(C_RESET, "/%u", GET_U_1(bp + 1));
 			}
 		}
 		else if (af == AF_INET6) {
 			if (!silent) {
-				ND_PRINT("%s", GET_IP6ADDR_STRING(bp + 2));
+				ND_PRINT(C_RESET, "%s", GET_IP6ADDR_STRING(bp + 2));
 				if (GET_U_1(bp + 1) != 128)
-					ND_PRINT("/%u", GET_U_1(bp + 1));
+					ND_PRINT(C_RESET, "/%u", GET_U_1(bp + 1));
 			}
 		}
 		if (GET_U_1(bp) && !silent) {
 			if (at == pimv2_group) {
-				ND_PRINT("(0x%02x)", GET_U_1(bp));
+				ND_PRINT(C_RESET, "(0x%02x)", GET_U_1(bp));
 			} else {
-				ND_PRINT("(%s%s%s",
+				ND_PRINT(C_RESET, "(%s%s%s",
 					GET_U_1(bp) & 0x04 ? "S" : "",
 					GET_U_1(bp) & 0x02 ? "W" : "",
 					GET_U_1(bp) & 0x01 ? "R" : "");
 				if (GET_U_1(bp) & 0xf8) {
-					ND_PRINT("+0x%02x",
+					ND_PRINT(C_RESET, "+0x%02x",
 						 GET_U_1(bp) & 0xf8);
 				}
-				ND_PRINT(")");
+				ND_PRINT(C_RESET, ")");
 			}
 		}
 		return hdrlen + 2 + addr_len;
@@ -696,7 +696,7 @@ pimv2_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "pimv2";
 	if (len < 2) {
-		ND_PRINT("[length %u < 2]", len);
+		ND_PRINT(C_RESET, "[length %u < 2]", len);
 		nd_print_invalid(ndo);
 		return;
 	}
@@ -704,16 +704,16 @@ pimv2_print(netdissect_options *ndo,
 	/* RFC5015 allocates the high 4 bits of pim_rsv for "subtype". */
 	pimv2_addr_len = GET_U_1(pim->pim_rsv) & 0x0f;
 	if (pimv2_addr_len != 0)
-		ND_PRINT(", RFC2117-encoding");
+		ND_PRINT(C_RESET, ", RFC2117-encoding");
 
 	if (len < 4) {
-		ND_PRINT("[length %u < 4]", len);
+		ND_PRINT(C_RESET, "[length %u < 4]", len);
 		nd_print_invalid(ndo);
 		return;
 	}
-	ND_PRINT(", cksum 0x%04x ", GET_BE_U_2(pim->pim_cksum));
+	ND_PRINT(C_RESET, ", cksum 0x%04x ", GET_BE_U_2(pim->pim_cksum));
 	if (GET_BE_U_2(pim->pim_cksum) == 0) {
-		ND_PRINT("(unverified)");
+		ND_PRINT(C_RESET, "(unverified)");
 	} else {
 		if (PIM_TYPE(pim_typever) == PIMV2_TYPE_REGISTER) {
 			/*
@@ -739,15 +739,15 @@ pimv2_print(netdissect_options *ndo,
 		switch (cksum_status) {
 
 		case CORRECT:
-			ND_PRINT("(correct)");
+			ND_PRINT(C_RESET, "(correct)");
 			break;
 
 		case INCORRECT:
-			ND_PRINT("(incorrect)");
+			ND_PRINT(C_RESET, "(incorrect)");
 			break;
 
 		case UNVERIFIED:
-			ND_PRINT("(unverified)");
+			ND_PRINT(C_RESET, "(unverified)");
 			break;
 		}
 	}
@@ -763,7 +763,7 @@ pimv2_print(netdissect_options *ndo,
 				goto trunc;
 			otype = GET_BE_U_2(bp);
 			olen = GET_BE_U_2(bp + 2);
-			ND_PRINT("\n\t  %s Option (%u), length %u, Value: ",
+			ND_PRINT(C_RESET, "\n\t  %s Option (%u), length %u, Value: ",
 			          tok2str(pimv2_hello_option_values, "Unknown", otype),
 			          otype,
 			          olen);
@@ -776,7 +776,7 @@ pimv2_print(netdissect_options *ndo,
 			switch (otype) {
 			case PIMV2_HELLO_OPTION_HOLDTIME:
 				if (olen != 2) {
-					ND_PRINT("[option length %u != 2]", olen);
+					ND_PRINT(C_RESET, "[option length %u != 2]", olen);
 					nd_print_invalid(ndo);
 					return;
 				} else {
@@ -787,7 +787,7 @@ pimv2_print(netdissect_options *ndo,
 
 			case PIMV2_HELLO_OPTION_LANPRUNEDELAY:
 				if (olen != 4) {
-					ND_PRINT("[option length %u != 4]", olen);
+					ND_PRINT(C_RESET, "[option length %u != 4]", olen);
 					nd_print_invalid(ndo);
 					return;
 				} else {
@@ -797,7 +797,7 @@ pimv2_print(netdissect_options *ndo,
 					override_interval = GET_BE_U_2(bp + 2);
 					t_bit = (lan_delay & 0x8000)? 1 : 0;
 					lan_delay &= ~0x8000;
-					ND_PRINT("\n\t    T-bit=%u, LAN delay %ums, Override interval %ums",
+					ND_PRINT(C_RESET, "\n\t    T-bit=%u, LAN delay %ums, Override interval %ums",
 					t_bit, lan_delay, override_interval);
 				}
 				break;
@@ -806,13 +806,13 @@ pimv2_print(netdissect_options *ndo,
 			case PIMV2_HELLO_OPTION_DR_PRIORITY:
 				switch (olen) {
 				case 0:
-					ND_PRINT("Bi-Directional Capability (Old)");
+					ND_PRINT(C_RESET, "Bi-Directional Capability (Old)");
 					break;
 				case 4:
-					ND_PRINT("%u", GET_BE_U_4(bp));
+					ND_PRINT(C_RESET, "%u", GET_BE_U_4(bp));
 					break;
 				default:
-					ND_PRINT("[option length %u != 4]", olen);
+					ND_PRINT(C_RESET, "[option length %u != 4]", olen);
 					nd_print_invalid(ndo);
 					return;
 					break;
@@ -821,28 +821,28 @@ pimv2_print(netdissect_options *ndo,
 
 			case PIMV2_HELLO_OPTION_GENID:
 				if (olen != 4) {
-					ND_PRINT("[option length %u != 4]", olen);
+					ND_PRINT(C_RESET, "[option length %u != 4]", olen);
 					nd_print_invalid(ndo);
 					return;
 				} else {
-					ND_PRINT("0x%08x", GET_BE_U_4(bp));
+					ND_PRINT(C_RESET, "0x%08x", GET_BE_U_4(bp));
 				}
 				break;
 
 			case PIMV2_HELLO_OPTION_REFRESH_CAP:
 				if (olen != 4) {
-					ND_PRINT("[option length %u != 4]", olen);
+					ND_PRINT(C_RESET, "[option length %u != 4]", olen);
 					nd_print_invalid(ndo);
 					return;
 				} else {
-					ND_PRINT("v%u", GET_U_1(bp));
+					ND_PRINT(C_RESET, "v%u", GET_U_1(bp));
 					if (GET_U_1(bp + 1) != 0) {
-						ND_PRINT(", interval ");
+						ND_PRINT(C_RESET, ", interval ");
 						unsigned_relts_print(ndo,
 								     GET_U_1(bp + 1));
 					}
 					if (GET_BE_U_2(bp + 2) != 0) {
-						ND_PRINT(" ?0x%04x?",
+						ND_PRINT(C_RESET, " ?0x%04x?",
 							 GET_BE_U_2(bp + 2));
 					}
 				}
@@ -857,7 +857,7 @@ pimv2_print(netdissect_options *ndo,
 					const u_char *ptr = bp;
 					u_int plen = len;
 					while (ptr < (bp+olen)) {
-						ND_PRINT("\n\t    ");
+						ND_PRINT(C_RESET, "\n\t    ");
 						advance = pimv2_addr_print(ndo, ptr, plen, pimv2_unicast, pimv2_addr_len, 0);
 						if (advance < 0)
 							goto trunc;
@@ -888,7 +888,7 @@ pimv2_print(netdissect_options *ndo,
 			goto trunc;
 		ND_TCHECK_LEN(bp, PIMV2_REGISTER_FLAG_LEN);
 
-		ND_PRINT(", Flags [ %s ]\n\t",
+		ND_PRINT(C_RESET, ", Flags [ %s ]\n\t",
 		          tok2str(pimv2_register_flag_values,
 		          "none",
 		          GET_BE_U_4(bp)));
@@ -900,7 +900,7 @@ pimv2_print(netdissect_options *ndo,
 		ip = (const struct ip *)bp;
 		switch (IP_V(ip)) {
                 case 0: /* Null header */
-			ND_PRINT("IP-Null-header %s > %s",
+			ND_PRINT(C_RESET, "IP-Null-header %s > %s",
 			          GET_IPADDR_STRING(ip->ip_src),
 			          GET_IPADDR_STRING(ip->ip_dst));
 			break;
@@ -914,18 +914,18 @@ pimv2_print(netdissect_options *ndo,
 			break;
 
 		default:
-			ND_PRINT("IP ver %u", IP_V(ip));
+			ND_PRINT(C_RESET, "IP ver %u", IP_V(ip));
 			break;
 		}
 		break;
 	}
 
 	case PIMV2_TYPE_REGISTER_STOP:
-		ND_PRINT(" group=");
+		ND_PRINT(C_RESET, " group=");
 		if ((advance = pimv2_addr_print(ndo, bp, len, pimv2_group, pimv2_addr_len, 0)) < 0)
 			goto trunc;
 		bp += advance; len -= advance;
-		ND_PRINT(" source=");
+		ND_PRINT(C_RESET, " source=");
 		if ((advance = pimv2_addr_print(ndo, bp, len, pimv2_unicast, pimv2_addr_len, 0)) < 0)
 			goto trunc;
 		bp += advance; len -= advance;
@@ -979,7 +979,7 @@ pimv2_print(netdissect_options *ndo,
 		u_int i, j;
 
 		if (PIM_TYPE(pim_typever) != 7) {	/*not for Graft-ACK*/
-			ND_PRINT(", upstream-neighbor: ");
+			ND_PRINT(C_RESET, ", upstream-neighbor: ");
 			if ((advance = pimv2_addr_print(ndo, bp, len, pimv2_unicast, pimv2_addr_len, 0)) < 0)
 				goto trunc;
 			bp += advance; len -= advance;
@@ -989,17 +989,17 @@ pimv2_print(netdissect_options *ndo,
 		ND_TCHECK_4(bp);
 		ngroup = GET_U_1(bp + 1);
 		holdtime = GET_BE_U_2(bp + 2);
-		ND_PRINT("\n\t  %u group(s)", ngroup);
+		ND_PRINT(C_RESET, "\n\t  %u group(s)", ngroup);
 		if (PIM_TYPE(pim_typever) != 7) {	/*not for Graft-ACK*/
-			ND_PRINT(", holdtime: ");
+			ND_PRINT(C_RESET, ", holdtime: ");
 			if (holdtime == 0xffff)
-				ND_PRINT("infinite");
+				ND_PRINT(C_RESET, "infinite");
 			else
 				unsigned_relts_print(ndo, holdtime);
 		}
 		bp += 4; len -= 4;
 		for (i = 0; i < ngroup; i++) {
-			ND_PRINT("\n\t    group #%u: ", i+1);
+			ND_PRINT(C_RESET, "\n\t    group #%u: ", i+1);
 			if ((advance = pimv2_addr_print(ndo, bp, len, pimv2_group, pimv2_addr_len, 0)) < 0)
 				goto trunc;
 			bp += advance; len -= advance;
@@ -1008,16 +1008,16 @@ pimv2_print(netdissect_options *ndo,
 			ND_TCHECK_4(bp);
 			njoin = GET_BE_U_2(bp);
 			nprune = GET_BE_U_2(bp + 2);
-			ND_PRINT(", joined sources: %u, pruned sources: %u", njoin, nprune);
+			ND_PRINT(C_RESET, ", joined sources: %u, pruned sources: %u", njoin, nprune);
 			bp += 4; len -= 4;
 			for (j = 0; j < njoin; j++) {
-				ND_PRINT("\n\t      joined source #%u: ", j+1);
+				ND_PRINT(C_RESET, "\n\t      joined source #%u: ", j+1);
 				if ((advance = pimv2_addr_print(ndo, bp, len, pimv2_source, pimv2_addr_len, 0)) < 0)
 					goto trunc;
 				bp += advance; len -= advance;
 			}
 			for (j = 0; j < nprune; j++) {
-				ND_PRINT("\n\t      pruned source #%u: ", j+1);
+				ND_PRINT(C_RESET, "\n\t      pruned source #%u: ", j+1);
 				if ((advance = pimv2_addr_print(ndo, bp, len, pimv2_source, pimv2_addr_len, 0)) < 0)
 					goto trunc;
 				bp += advance; len -= advance;
@@ -1033,21 +1033,21 @@ pimv2_print(netdissect_options *ndo,
 		/* Fragment Tag, Hash Mask len, and BSR-priority */
 		if (len < 2)
 			goto trunc;
-		ND_PRINT(" tag=%x", GET_BE_U_2(bp));
+		ND_PRINT(C_RESET, " tag=%x", GET_BE_U_2(bp));
 		bp += 2;
 		len -= 2;
 		if (len < 1)
 			goto trunc;
-		ND_PRINT(" hashmlen=%u", GET_U_1(bp));
+		ND_PRINT(C_RESET, " hashmlen=%u", GET_U_1(bp));
 		if (len < 2)
 			goto trunc;
 		ND_TCHECK_1(bp + 2);
-		ND_PRINT(" BSRprio=%u", GET_U_1(bp + 1));
+		ND_PRINT(C_RESET, " BSRprio=%u", GET_U_1(bp + 1));
 		bp += 2;
 		len -= 2;
 
 		/* Encoded-Unicast-BSR-Address */
-		ND_PRINT(" BSR=");
+		ND_PRINT(C_RESET, " BSR=");
 		if ((advance = pimv2_addr_print(ndo, bp, len, pimv2_unicast, pimv2_addr_len, 0)) < 0)
 			goto trunc;
 		bp += advance;
@@ -1055,7 +1055,7 @@ pimv2_print(netdissect_options *ndo,
 
 		for (i = 0; len > 0; i++) {
 			/* Encoded-Group Address */
-			ND_PRINT(" (group%u: ", i);
+			ND_PRINT(C_RESET, " (group%u: ", i);
 			if ((advance = pimv2_addr_print(ndo, bp, len, pimv2_group, pimv2_addr_len, 0)) < 0)
 				goto trunc;
 			bp += advance;
@@ -1064,11 +1064,11 @@ pimv2_print(netdissect_options *ndo,
 			/* RP-Count, Frag RP-Cnt, and rsvd */
 			if (len < 1)
 				goto trunc;
-			ND_PRINT(" RPcnt=%u", GET_U_1(bp));
+			ND_PRINT(C_RESET, " RPcnt=%u", GET_U_1(bp));
 			if (len < 2)
 				goto trunc;
 			frpcnt = GET_U_1(bp + 1);
-			ND_PRINT(" FRPcnt=%u", frpcnt);
+			ND_PRINT(C_RESET, " FRPcnt=%u", frpcnt);
 			if (len < 4)
 				goto trunc;
 			bp += 4;
@@ -1076,7 +1076,7 @@ pimv2_print(netdissect_options *ndo,
 
 			for (j = 0; j < frpcnt && len > 0; j++) {
 				/* each RP info */
-				ND_PRINT(" RP%u=", j);
+				ND_PRINT(C_RESET, " RP%u=", j);
 				if ((advance = pimv2_addr_print(ndo, bp, len,
 								pimv2_unicast,
 								pimv2_addr_len,
@@ -1087,27 +1087,27 @@ pimv2_print(netdissect_options *ndo,
 
 				if (len < 2)
 					goto trunc;
-				ND_PRINT(",holdtime=");
+				ND_PRINT(C_RESET, ",holdtime=");
 				unsigned_relts_print(ndo,
 						     GET_BE_U_2(bp));
 				if (len < 3)
 					goto trunc;
-				ND_PRINT(",prio=%u", GET_U_1(bp + 2));
+				ND_PRINT(C_RESET, ",prio=%u", GET_U_1(bp + 2));
 				if (len < 4)
 					goto trunc;
 				bp += 4;
 				len -= 4;
 			}
-			ND_PRINT(")");
+			ND_PRINT(C_RESET, ")");
 		}
 		break;
 	}
 	case PIMV2_TYPE_ASSERT:
-		ND_PRINT(" group=");
+		ND_PRINT(C_RESET, " group=");
 		if ((advance = pimv2_addr_print(ndo, bp, len, pimv2_group, pimv2_addr_len, 0)) < 0)
 			goto trunc;
 		bp += advance; len -= advance;
-		ND_PRINT(" src=");
+		ND_PRINT(C_RESET, " src=");
 		if ((advance = pimv2_addr_print(ndo, bp, len, pimv2_unicast, pimv2_addr_len, 0)) < 0)
 			goto trunc;
 		bp += advance; len -= advance;
@@ -1115,9 +1115,9 @@ pimv2_print(netdissect_options *ndo,
 			goto trunc;
 		ND_TCHECK_8(bp);
 		if (GET_U_1(bp) & 0x80)
-			ND_PRINT(" RPT");
-		ND_PRINT(" pref=%u", GET_BE_U_4(bp) & 0x7fffffff);
-		ND_PRINT(" metric=%u", GET_BE_U_4(bp + 4));
+			ND_PRINT(C_RESET, " RPT");
+		ND_PRINT(C_RESET, " pref=%u", GET_BE_U_4(bp) & 0x7fffffff);
+		ND_PRINT(C_RESET, " metric=%u", GET_BE_U_4(bp + 4));
 		break;
 
 	case PIMV2_TYPE_CANDIDATE_RP:
@@ -1127,20 +1127,20 @@ pimv2_print(netdissect_options *ndo,
 		/* Prefix-Cnt, Priority, and Holdtime */
 		if (len < 1)
 			goto trunc;
-		ND_PRINT(" prefix-cnt=%u", GET_U_1(bp));
+		ND_PRINT(C_RESET, " prefix-cnt=%u", GET_U_1(bp));
 		pfxcnt = GET_U_1(bp);
 		if (len < 2)
 			goto trunc;
-		ND_PRINT(" prio=%u", GET_U_1(bp + 1));
+		ND_PRINT(C_RESET, " prio=%u", GET_U_1(bp + 1));
 		if (len < 4)
 			goto trunc;
-		ND_PRINT(" holdtime=");
+		ND_PRINT(C_RESET, " holdtime=");
 		unsigned_relts_print(ndo, GET_BE_U_2(bp + 2));
 		bp += 4;
 		len -= 4;
 
 		/* Encoded-Unicast-RP-Address */
-		ND_PRINT(" RP=");
+		ND_PRINT(C_RESET, " RP=");
 		if ((advance = pimv2_addr_print(ndo, bp, len, pimv2_unicast, pimv2_addr_len, 0)) < 0)
 			goto trunc;
 		bp += advance;
@@ -1148,7 +1148,7 @@ pimv2_print(netdissect_options *ndo,
 
 		/* Encoded-Group Addresses */
 		for (i = 0; i < pfxcnt && len > 0; i++) {
-			ND_PRINT(" Group%u=", i);
+			ND_PRINT(C_RESET, " Group%u=", i);
 			if ((advance = pimv2_addr_print(ndo, bp, len, pimv2_group, pimv2_addr_len, 0)) < 0)
 				goto trunc;
 			bp += advance;
@@ -1158,40 +1158,40 @@ pimv2_print(netdissect_options *ndo,
 	}
 
 	case PIMV2_TYPE_PRUNE_REFRESH:
-		ND_PRINT(" src=");
+		ND_PRINT(C_RESET, " src=");
 		if ((advance = pimv2_addr_print(ndo, bp, len, pimv2_unicast, pimv2_addr_len, 0)) < 0)
 			goto trunc;
 		bp += advance;
 		len -= advance;
-		ND_PRINT(" grp=");
+		ND_PRINT(C_RESET, " grp=");
 		if ((advance = pimv2_addr_print(ndo, bp, len, pimv2_group, pimv2_addr_len, 0)) < 0)
 			goto trunc;
 		bp += advance;
 		len -= advance;
-		ND_PRINT(" forwarder=");
+		ND_PRINT(C_RESET, " forwarder=");
 		if ((advance = pimv2_addr_print(ndo, bp, len, pimv2_unicast, pimv2_addr_len, 0)) < 0)
 			goto trunc;
 		bp += advance;
 		len -= advance;
 		if (len < 2)
 			goto trunc;
-		ND_PRINT(" TUNR ");
+		ND_PRINT(C_RESET, " TUNR ");
 		unsigned_relts_print(ndo, GET_BE_U_2(bp));
 		break;
 
 	case PIMV2_TYPE_DF_ELECTION:
 		subtype = PIM_SUBTYPE(GET_U_1(pim->pim_rsv));
-		ND_PRINT("\n\t  %s,", tok2str( pimv2_df_election_flag_values,
+		ND_PRINT(C_RESET, "\n\t  %s,", tok2str( pimv2_df_election_flag_values,
 			 "Unknown", subtype) );
 
-		ND_PRINT(" rpa=");
+		ND_PRINT(C_RESET, " rpa=");
 		if ((advance = pimv2_addr_print(ndo, bp, len, pimv2_unicast, pimv2_addr_len, 0)) < 0) {
 			goto trunc;
 		}
 		bp += advance;
 		len -= advance;
-		ND_PRINT(" sender pref=%u", GET_BE_U_4(bp) );
-		ND_PRINT(" sender metric=%u", GET_BE_U_4(bp + 4));
+		ND_PRINT(C_RESET, " sender pref=%u", GET_BE_U_4(bp) );
+		ND_PRINT(C_RESET, " sender metric=%u", GET_BE_U_4(bp + 4));
 
 		bp += 8;
 		len -= 8;
@@ -1199,21 +1199,21 @@ pimv2_print(netdissect_options *ndo,
 		switch (subtype) {
 		case PIMV2_DF_ELECTION_BACKOFF:
 		case PIMV2_DF_ELECTION_PASS:
-			ND_PRINT("\n\t  %s addr=", PIMV2_DF_ELECTION_PASS_BACKOFF_STR(subtype));
+			ND_PRINT(C_RESET, "\n\t  %s addr=", PIMV2_DF_ELECTION_PASS_BACKOFF_STR(subtype));
 			if ((advance = pimv2_addr_print(ndo, bp, len, pimv2_unicast, pimv2_addr_len, 0)) < 0) {
 				goto trunc;
 			}
 			bp += advance;
 			len -= advance;
 
-			ND_PRINT(" %s pref=%u", PIMV2_DF_ELECTION_PASS_BACKOFF_STR(subtype), GET_BE_U_4(bp) );
-			ND_PRINT(" %s metric=%u", PIMV2_DF_ELECTION_PASS_BACKOFF_STR(subtype), GET_BE_U_4(bp + 4));
+			ND_PRINT(C_RESET, " %s pref=%u", PIMV2_DF_ELECTION_PASS_BACKOFF_STR(subtype), GET_BE_U_4(bp) );
+			ND_PRINT(C_RESET, " %s metric=%u", PIMV2_DF_ELECTION_PASS_BACKOFF_STR(subtype), GET_BE_U_4(bp + 4));
 
 			bp += 8;
 			len -= 8;
 
 			if (subtype == PIMV2_DF_ELECTION_BACKOFF) {
-				ND_PRINT(" interval %dms", GET_BE_U_2(bp));
+				ND_PRINT(C_RESET, " interval %dms", GET_BE_U_2(bp));
 			}
 
 			break;
@@ -1223,7 +1223,7 @@ pimv2_print(netdissect_options *ndo,
 		break;
 
 	 default:
-		ND_PRINT(" [type %u]", PIM_TYPE(pim_typever));
+		ND_PRINT(C_RESET, " [type %u]", PIM_TYPE(pim_typever));
 		break;
 	}
 

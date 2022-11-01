@@ -125,20 +125,20 @@ blabel_print(netdissect_options *ndo,
 	lim = cp + 1 + slen;
 
 	/* print the bit string as a hex string */
-	ND_PRINT("\\[x");
+	ND_PRINT(C_RESET, "\\[x");
 	for (bitp = cp + 1, b = bitlen; bitp < lim && b > 7; b -= 8, bitp++) {
-		ND_PRINT("%02x", GET_U_1(bitp));
+		ND_PRINT(C_RESET, "%02x", GET_U_1(bitp));
 	}
 	if (b > 4) {
 		tc = GET_U_1(bitp);
 		bitp++;
-		ND_PRINT("%02x", tc & (0xff << (8 - b)));
+		ND_PRINT(C_RESET, "%02x", tc & (0xff << (8 - b)));
 	} else if (b > 0) {
 		tc = GET_U_1(bitp);
 		bitp++;
-		ND_PRINT("%1x", ((tc >> 4) & 0x0f) & (0x0f << (4 - b)));
+		ND_PRINT(C_RESET, "%1x", ((tc >> 4) & 0x0f) & (0x0f << (4 - b)));
 	}
-	ND_PRINT("/%u]", bitlen);
+	ND_PRINT(C_RESET, "/%u]", bitlen);
 	return lim;
 }
 
@@ -156,7 +156,7 @@ labellen(netdissect_options *ndo,
 	case TYPE_EDNS0: {
 		u_int bitlen, elt;
 		if ((elt = (i & ~TYPE_MASK)) != EDNS0_ELT_BITLABEL) {
-			ND_PRINT("<ELT %d>", elt);
+			ND_PRINT(C_RESET, "<ELT %d>", elt);
 			return(-1);
 		}
 		if (!ND_TTEST_1(cp + 1))
@@ -175,7 +175,7 @@ labellen(netdissect_options *ndo,
 		 * TYPE_RESERVED, but we use default to suppress compiler
 		 * warnings about falling out of the switch statement.
 		 */
-		ND_PRINT("<BAD LABEL TYPE>");
+		ND_PRINT(C_RESET, "<BAD LABEL TYPE>");
 		return(-1);
 	}
 }
@@ -227,7 +227,7 @@ fqdn_print(netdissect_options *ndo,
 				 * the packet).
 				 */
 				if (offset >= max_offset) {
-					ND_PRINT("<BAD PTR>");
+					ND_PRINT(C_RESET, "<BAD PTR>");
 					return(NULL);
 				}
 				max_offset = offset;
@@ -249,13 +249,13 @@ fqdn_print(netdissect_options *ndo,
 					break;
 				default:
 					/* unknown ELT */
-					ND_PRINT("<ELT %u>", elt);
+					ND_PRINT(C_RESET, "<ELT %u>", elt);
 					return(NULL);
 				}
 				break;
 
 			case TYPE_RESERVED:
-				ND_PRINT("<BAD LABEL TYPE>");
+				ND_PRINT(C_RESET, "<BAD LABEL TYPE>");
 				return(NULL);
 
 			case TYPE_LABEL:
@@ -273,7 +273,7 @@ fqdn_print(netdissect_options *ndo,
 
 			cp += l;
 			if (name_chars <= MAXCDNAME)
-				ND_PRINT(".");
+				ND_PRINT(C_RESET, ".");
 			name_chars++;
 			if (!ND_TTEST_1(cp))
 				return(NULL);
@@ -285,9 +285,9 @@ fqdn_print(netdissect_options *ndo,
 				rp += l + 1;
 		}
 		if (name_chars > MAXCDNAME)
-			ND_PRINT("<DOMAIN NAME TOO LONG>");
+			ND_PRINT(C_RESET, "<DOMAIN NAME TOO LONG>");
 	} else
-		ND_PRINT(".");
+		ND_PRINT(C_RESET, ".");
 	return (rp);
 }
 
@@ -354,10 +354,10 @@ print_eopt_ecs(netdissect_options *ndo, const u_char *cp,
 
 
     if (family == 1)
-        ND_PRINT("%s/%d/%d", addrtostr(padded, addr, INET_ADDRSTRLEN),
+        ND_PRINT(C_RESET, "%s/%d/%d", addrtostr(padded, addr, INET_ADDRSTRLEN),
                 src_len, scope_len);
     else
-        ND_PRINT("%s/%d/%d", addrtostr6(padded, addr, INET6_ADDRSTRLEN),
+        ND_PRINT(C_RESET, "%s/%d/%d", addrtostr6(padded, addr, INET6_ADDRSTRLEN),
                 src_len, scope_len);
 
 }
@@ -379,7 +379,7 @@ eopt_print(netdissect_options *ndo,
         return (NULL);
     opt = GET_BE_U_2(cp);
     cp += 2;
-    ND_PRINT("%s", tok2str(edns_opt2str, "Opt%u", opt));
+    ND_PRINT(C_RESET, "%s", tok2str(edns_opt2str, "Opt%u", opt));
     if (!ND_TTEST_2(cp))
         return (NULL);
     data_len = GET_BE_U_2(cp);
@@ -388,7 +388,7 @@ eopt_print(netdissect_options *ndo,
     ND_TCHECK_LEN(cp, data_len);
 
     if (data_len > 0) {
-        ND_PRINT(" ");
+        ND_PRINT(C_RESET, " ");
         switch (opt) {
 
         case E_ECS:
@@ -401,8 +401,8 @@ eopt_print(netdissect_options *ndo,
                 for (i = 0; i < data_len; ++i) {
                     /* split client and server cookie */
                     if (i == 8)
-                        ND_PRINT(" ");
-                    ND_PRINT("%02x", GET_U_1(cp + i));
+                        ND_PRINT(C_RESET, " ");
+                    ND_PRINT(C_RESET, "%02x", GET_U_1(cp + i));
                 }
             }
             break;
@@ -411,17 +411,17 @@ eopt_print(netdissect_options *ndo,
                 nd_print_invalid(ndo);
             else
                 /* keepalive is in increments of 100ms. Convert to seconds */
-                ND_PRINT("%0.1f sec", (GET_BE_U_2(cp) / 10.0));
+                ND_PRINT(C_RESET, "%0.1f sec", (GET_BE_U_2(cp) / 10.0));
             break;
         case E_EXPIRE:
             if (data_len != 4)
                 nd_print_invalid(ndo);
             else
-                ND_PRINT("%u sec", GET_BE_U_4(cp));
+                ND_PRINT(C_RESET, "%u sec", GET_BE_U_4(cp));
             break;
         case E_PADDING:
             /* ignore contents and just print length */
-            ND_PRINT("(%u)", data_len);
+            ND_PRINT(C_RESET, "(%u)", data_len);
             break;
         case E_KEYTAG:
             if (data_len % 2 != 0)
@@ -429,29 +429,29 @@ eopt_print(netdissect_options *ndo,
             else
                 for (i = 0; i < data_len; i += 2) {
                     if (i > 0)
-                        ND_PRINT(" ");
-                    ND_PRINT("%u", GET_BE_U_2(cp + i));
+                        ND_PRINT(C_RESET, " ");
+                    ND_PRINT(C_RESET, "%u", GET_BE_U_2(cp + i));
                 }
             break;
         case E_DAU:
             for (i = 0; i < data_len; ++i) {
                 if (i > 0)
-                    ND_PRINT(" ");
-                ND_PRINT("%s", tok2str(dau_alg2str, "Alg_%u", GET_U_1(cp + i)));
+                    ND_PRINT(C_RESET, " ");
+                ND_PRINT(C_RESET, "%s", tok2str(dau_alg2str, "Alg_%u", GET_U_1(cp + i)));
             }
             break;
         case E_DHU:
             for (i = 0; i < data_len; ++i) {
                 if (i > 0)
-                    ND_PRINT(" ");
-                ND_PRINT("%s", tok2str(dhu_alg2str, "Alg_%u", GET_U_1(cp + i)));
+                    ND_PRINT(C_RESET, " ");
+                ND_PRINT(C_RESET, "%s", tok2str(dhu_alg2str, "Alg_%u", GET_U_1(cp + i)));
             }
             break;
         case E_N3U:
             for (i = 0; i < data_len; ++i) {
                 if (i > 0)
-                    ND_PRINT(" ");
-                ND_PRINT("%s", tok2str(n3u_alg2str, "Alg_%u", GET_U_1(cp + i)));
+                    ND_PRINT(C_RESET, " ");
+                ND_PRINT(C_RESET, "%s", tok2str(n3u_alg2str, "Alg_%u", GET_U_1(cp + i)));
             }
             break;
         case E_CHAIN:
@@ -461,7 +461,7 @@ eopt_print(netdissect_options *ndo,
             /* intentional fall-through. NSID is an undefined byte string */
         default:
             for (i = 0; i < data_len; ++i)
-                ND_PRINT("%02x", GET_U_1(cp + i));
+                ND_PRINT(C_RESET, "%02x", GET_U_1(cp + i));
             break;
         }
     }
@@ -649,7 +649,7 @@ ns_qprint(netdissect_options *ndo,
 	/* print the qtype */
 	i = GET_BE_U_2(cp);
 	cp += 2;
-	ND_PRINT(" %s", tok2str(ns_type2str, "Type%u", i));
+	ND_PRINT(C_RESET, " %s", tok2str(ns_type2str, "Type%u", i));
 	/* print the qclass (if it's not IN) */
 	i = GET_BE_U_2(cp);
 	cp += 2;
@@ -658,12 +658,15 @@ ns_qprint(netdissect_options *ndo,
 	else
 		class = i;
 	if (class != C_IN)
-		ND_PRINT(" %s", tok2str(ns_class2str, "(Class %u)", class));
+		ND_PRINT(C_RESET, " %s", tok2str(ns_class2str, "(Class %u)", class));
 	if (is_mdns) {
-		ND_PRINT(i & C_QU ? " (QU)" : " (QM)");
+		if(i & C_QU)
+			ND_PRINT(C_RESET, " (QU)");
+		else
+			ND_PRINT(C_RESET, " (QM)");
 	}
 
-	ND_PRINT("? ");
+	ND_PRINT(C_RESET, "? ");
 	cp = fqdn_print(ndo, np, bp);
 	return(cp ? cp + 4 : NULL);
 }
@@ -678,7 +681,7 @@ ns_rprint(netdissect_options *ndo,
 	const u_char *rp;
 
 	if (ndo->ndo_vflag) {
-		ND_PRINT(" ");
+		ND_PRINT(C_RESET, " ");
 		if ((cp = fqdn_print(ndo, cp, bp)) == NULL)
 			return NULL;
 	} else
@@ -698,10 +701,10 @@ ns_rprint(netdissect_options *ndo,
 	else
 		class = i;
 	if (class != C_IN && typ != T_OPT)
-		ND_PRINT(" %s", tok2str(ns_class2str, "(Class %u)", class));
+		ND_PRINT(C_RESET, " %s", tok2str(ns_class2str, "(Class %u)", class));
 	if (is_mdns) {
 		if (i & C_CACHE_FLUSH)
-			ND_PRINT(" (Cache flush)");
+			ND_PRINT(C_RESET, " (Cache flush)");
 	}
 
 	if (typ == T_OPT) {
@@ -712,9 +715,9 @@ ns_rprint(netdissect_options *ndo,
 		cp += 2;
 	} else if (ndo->ndo_vflag > 2) {
 		/* print ttl */
-		ND_PRINT(" [");
+		ND_PRINT(C_RESET, " [");
 		unsigned_relts_print(ndo, GET_BE_U_4(cp));
-		ND_PRINT("]");
+		ND_PRINT(C_RESET, "]");
 		cp += 4;
 	} else {
 		/* ignore ttl */
@@ -726,7 +729,7 @@ ns_rprint(netdissect_options *ndo,
 
 	rp = cp + len;
 
-	ND_PRINT(" %s", tok2str(ns_type2str, "Type%u", typ));
+	ND_PRINT(C_RESET, " %s", tok2str(ns_type2str, "Type%u", typ));
 	if (rp > ndo->ndo_snapend)
 		return(NULL);
 
@@ -734,14 +737,14 @@ ns_rprint(netdissect_options *ndo,
 	case T_A:
 		if (!ND_TTEST_LEN(cp, sizeof(nd_ipv4)))
 			return(NULL);
-		ND_PRINT(" %s", intoa(GET_IPV4_TO_NETWORK_ORDER(cp)));
+		ND_PRINT(C_RESET, " %s", intoa(GET_IPV4_TO_NETWORK_ORDER(cp)));
 		break;
 
 	case T_NS:
 	case T_CNAME:
 	case T_PTR:
 	case T_DNAME:
-		ND_PRINT(" ");
+		ND_PRINT(C_RESET, " ");
 		if (fqdn_print(ndo, cp, bp) == NULL)
 			return(NULL);
 		break;
@@ -749,51 +752,51 @@ ns_rprint(netdissect_options *ndo,
 	case T_SOA:
 		if (!ndo->ndo_vflag)
 			break;
-		ND_PRINT(" ");
+		ND_PRINT(C_RESET, " ");
 		if ((cp = fqdn_print(ndo, cp, bp)) == NULL)
 			return(NULL);
-		ND_PRINT(" ");
+		ND_PRINT(C_RESET, " ");
 		if ((cp = fqdn_print(ndo, cp, bp)) == NULL)
 			return(NULL);
 		if (!ND_TTEST_LEN(cp, 5 * 4))
 			return(NULL);
-		ND_PRINT(" %u", GET_BE_U_4(cp));
+		ND_PRINT(C_RESET, " %u", GET_BE_U_4(cp));
 		cp += 4;
-		ND_PRINT(" %u", GET_BE_U_4(cp));
+		ND_PRINT(C_RESET, " %u", GET_BE_U_4(cp));
 		cp += 4;
-		ND_PRINT(" %u", GET_BE_U_4(cp));
+		ND_PRINT(C_RESET, " %u", GET_BE_U_4(cp));
 		cp += 4;
-		ND_PRINT(" %u", GET_BE_U_4(cp));
+		ND_PRINT(C_RESET, " %u", GET_BE_U_4(cp));
 		cp += 4;
-		ND_PRINT(" %u", GET_BE_U_4(cp));
+		ND_PRINT(C_RESET, " %u", GET_BE_U_4(cp));
 		cp += 4;
 		break;
 	case T_MX:
-		ND_PRINT(" ");
+		ND_PRINT(C_RESET, " ");
 		if (!ND_TTEST_2(cp))
 			return(NULL);
 		if (fqdn_print(ndo, cp + 2, bp) == NULL)
 			return(NULL);
-		ND_PRINT(" %u", GET_BE_U_2(cp));
+		ND_PRINT(C_RESET, " %u", GET_BE_U_2(cp));
 		break;
 
 	case T_TXT:
 		while (cp < rp) {
-			ND_PRINT(" \"");
+			ND_PRINT(C_RESET, " \"");
 			cp = ns_cprint(ndo, cp);
 			if (cp == NULL)
 				return(NULL);
-			ND_PRINT("\"");
+			ND_PRINT(C_RESET, "\"");
 		}
 		break;
 
 	case T_SRV:
-		ND_PRINT(" ");
+		ND_PRINT(C_RESET, " ");
 		if (!ND_TTEST_6(cp))
 			return(NULL);
 		if (fqdn_print(ndo, cp + 6, bp) == NULL)
 			return(NULL);
-		ND_PRINT(":%u %u %u", GET_BE_U_2(cp + 4),
+		ND_PRINT(C_RESET, ":%u %u %u", GET_BE_U_2(cp + 4),
 			  GET_BE_U_2(cp), GET_BE_U_2(cp + 2));
 		break;
 
@@ -803,7 +806,7 @@ ns_rprint(netdissect_options *ndo,
 
 		if (!ND_TTEST_LEN(cp, sizeof(nd_ipv6)))
 			return(NULL);
-		ND_PRINT(" %s",
+		ND_PRINT(C_RESET, " %s",
 		    addrtostr6(cp, ntop_buf, sizeof(ntop_buf)));
 
 		break;
@@ -820,16 +823,16 @@ ns_rprint(netdissect_options *ndo,
 		pbit = GET_U_1(cp);
 		pbyte = (pbit & ~7) / 8;
 		if (pbit > 128) {
-			ND_PRINT(" %u(bad plen)", pbit);
+			ND_PRINT(C_RESET, " %u(bad plen)", pbit);
 			break;
 		} else if (pbit < 128) {
 			memset(a, 0, sizeof(a));
 			GET_CPY_BYTES(a + pbyte, cp + 1, sizeof(a) - pbyte);
-			ND_PRINT(" %u %s", pbit,
+			ND_PRINT(C_RESET, " %u %s", pbit,
 			    addrtostr6(&a, ntop_buf, sizeof(ntop_buf)));
 		}
 		if (pbit > 0) {
-			ND_PRINT(" ");
+			ND_PRINT(C_RESET, " ");
 			if (fqdn_print(ndo, cp + 1 + sizeof(a) - pbyte, bp) == NULL)
 				return(NULL);
 		}
@@ -839,25 +842,25 @@ ns_rprint(netdissect_options *ndo,
 	case T_URI:
 		if (!ND_TTEST_LEN(cp, len))
 			return(NULL);
-		ND_PRINT(" %u %u ", GET_BE_U_2(cp), GET_BE_U_2(cp + 2));
+		ND_PRINT(C_RESET, " %u %u ", GET_BE_U_2(cp), GET_BE_U_2(cp + 2));
 		if (nd_printn(ndo, cp + 4, len - 4, ndo->ndo_snapend))
 			return(NULL);
 		break;
 
 	case T_OPT:
-		ND_PRINT(" UDPsize=%u", class);
+		ND_PRINT(C_RESET, " UDPsize=%u", class);
 		if (opt_flags & 0x8000)
-			ND_PRINT(" DO");
+			ND_PRINT(C_RESET, " DO");
         if (cp < rp) {
-            ND_PRINT(" [");
+            ND_PRINT(C_RESET, " [");
             while (cp < rp) {
                 cp = eopt_print(ndo, cp);
                 if (cp == NULL)
                     return(NULL);
                 if (cp < rp)
-                    ND_PRINT(",");
+                    ND_PRINT(C_RESET, ",");
             }
-            ND_PRINT("]");
+            ND_PRINT(C_RESET, "]");
         }
 		break;
 
@@ -867,29 +870,29 @@ ns_rprint(netdissect_options *ndo,
 			return(NULL);
 		if (!ndo->ndo_vflag)
 			break;
-		ND_PRINT(" ");
+		ND_PRINT(C_RESET, " ");
 		if ((cp = fqdn_print(ndo, cp, bp)) == NULL)
 			return(NULL);
 		cp += 6;
 		if (!ND_TTEST_2(cp))
 			return(NULL);
-		ND_PRINT(" fudge=%u", GET_BE_U_2(cp));
+		ND_PRINT(C_RESET, " fudge=%u", GET_BE_U_2(cp));
 		cp += 2;
 		if (!ND_TTEST_2(cp))
 			return(NULL);
-		ND_PRINT(" maclen=%u", GET_BE_U_2(cp));
+		ND_PRINT(C_RESET, " maclen=%u", GET_BE_U_2(cp));
 		cp += 2 + GET_BE_U_2(cp);
 		if (!ND_TTEST_2(cp))
 			return(NULL);
-		ND_PRINT(" origid=%u", GET_BE_U_2(cp));
+		ND_PRINT(C_RESET, " origid=%u", GET_BE_U_2(cp));
 		cp += 2;
 		if (!ND_TTEST_2(cp))
 			return(NULL);
-		ND_PRINT(" error=%u", GET_BE_U_2(cp));
+		ND_PRINT(C_RESET, " error=%u", GET_BE_U_2(cp));
 		cp += 2;
 		if (!ND_TTEST_2(cp))
 			return(NULL);
-		ND_PRINT(" otherlen=%u", GET_BE_U_2(cp));
+		ND_PRINT(C_RESET, " otherlen=%u", GET_BE_U_2(cp));
 		cp += 2;
 	    }
 	}
@@ -916,13 +919,13 @@ domain_print(netdissect_options *ndo,
 		 * length field. (RFC 1035 - 4.2.2. TCP usage)
 		 */
 		if (length < 2) {
-			ND_PRINT(" [DNS over TCP: length %u < 2]", length);
+			ND_PRINT(C_RESET, " [DNS over TCP: length %u < 2]", length);
 			nd_print_invalid(ndo);
 			return;
 		} else {
 			length -= 2; /* excluding the two byte length field */
 			if (GET_BE_U_2(bp) != length) {
-				ND_PRINT(" [prefix length(%u) != length(%u)]",
+				ND_PRINT(C_RESET, " [prefix length(%u) != length(%u)]",
 					 GET_BE_U_2(bp), length);
 				nd_print_invalid(ndo);
 				return;
@@ -931,7 +934,7 @@ domain_print(netdissect_options *ndo,
 				/* in over TCP case, we need to prepend a space
 				 * (not needed in over UDP case)
 				 */
-				ND_PRINT(" ");
+				ND_PRINT(C_RESET, " ");
 			}
 		}
 	}
@@ -940,7 +943,7 @@ domain_print(netdissect_options *ndo,
 
 	if(length < sizeof(*np)) {
 		nd_print_protocol(ndo);
-		ND_PRINT(" [length %u < %zu]", length, sizeof(*np));
+		ND_PRINT(C_RESET, " [length %u < %zu]", length, sizeof(*np));
 		nd_print_invalid(ndo);
 		return;
 	}
@@ -999,7 +1002,7 @@ domain_print(netdissect_options *ndo,
  print:
 	if (DNS_QR(flags)) {
 		/* this is a response */
-		ND_PRINT("%u%s%s%s%s%s%s",
+		ND_PRINT(C_RESET, "%u%s%s%s%s%s%s",
 			GET_BE_U_2(np->id),
 			ns_ops[DNS_OPCODE(flags)],
 			ns_rcode(rcode),
@@ -1009,14 +1012,14 @@ domain_print(netdissect_options *ndo,
 			DNS_AD(flags)? "$" : "");
 
 		if (qdcount != 1)
-			ND_PRINT(" [%uq]", qdcount);
+			ND_PRINT(C_RESET, " [%uq]", qdcount);
 		/* Print QUESTION section on -vv */
 		cp = (const u_char *)(np + 1);
 		for (i = 0; i < qdcount; i++) {
 			if (i != 0)
-				ND_PRINT(",");
+				ND_PRINT(C_RESET, ",");
 			if (ndo->ndo_vflag > 1) {
-				ND_PRINT(" q:");
+				ND_PRINT(C_RESET, " q:");
 				if ((cp = ns_qprint(ndo, cp, bp, is_mdns)) == NULL)
 					goto trunc;
 			} else {
@@ -1025,13 +1028,13 @@ domain_print(netdissect_options *ndo,
 				cp += 4;	/* skip QTYPE and QCLASS */
 			}
 		}
-		ND_PRINT(" %u/%u/%u", ancount, nscount, arcount);
+		ND_PRINT(C_RESET, " %u/%u/%u", ancount, nscount, arcount);
 		if (ancount) {
 			if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
 				goto trunc;
 			ancount--;
 			while (cp < ndo->ndo_snapend && ancount) {
-				ND_PRINT(",");
+				ND_PRINT(C_RESET, ",");
 				if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
 					goto trunc;
 				ancount--;
@@ -1042,12 +1045,12 @@ domain_print(netdissect_options *ndo,
 		/* Print NS and AR sections on -vv */
 		if (ndo->ndo_vflag > 1) {
 			if (cp < ndo->ndo_snapend && nscount) {
-				ND_PRINT(" ns:");
+				ND_PRINT(C_RESET, " ns:");
 				if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
 					goto trunc;
 				nscount--;
 				while (cp < ndo->ndo_snapend && nscount) {
-					ND_PRINT(",");
+					ND_PRINT(C_RESET, ",");
 					if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
 						goto trunc;
 					nscount--;
@@ -1056,12 +1059,12 @@ domain_print(netdissect_options *ndo,
 			if (nscount)
 				goto trunc;
 			if (cp < ndo->ndo_snapend && arcount) {
-				ND_PRINT(" ar:");
+				ND_PRINT(C_RESET, " ar:");
 				if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
 					goto trunc;
 				arcount--;
 				while (cp < ndo->ndo_snapend && arcount) {
-					ND_PRINT(",");
+					ND_PRINT(C_RESET, ",");
 					if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
 						goto trunc;
 					arcount--;
@@ -1073,7 +1076,7 @@ domain_print(netdissect_options *ndo,
 	}
 	else {
 		/* this is a request */
-		ND_PRINT("%u%s%s%s", GET_BE_U_2(np->id),
+		ND_PRINT(C_RESET, "%u%s%s%s", GET_BE_U_2(np->id),
 			  ns_ops[DNS_OPCODE(flags)],
 			  DNS_RD(flags) ? "+" : "",
 			  DNS_CD(flags) ? "%" : "");
@@ -1081,24 +1084,24 @@ domain_print(netdissect_options *ndo,
 		/* any weirdness? */
 		b2 = GET_BE_U_2(((const u_short *)np) + 1);
 		if (b2 & 0x6cf)
-			ND_PRINT(" [b2&3=0x%x]", b2);
+			ND_PRINT(C_RESET, " [b2&3=0x%x]", b2);
 
 		if (DNS_OPCODE(flags) == IQUERY) {
 			if (qdcount)
-				ND_PRINT(" [%uq]", qdcount);
+				ND_PRINT(C_RESET, " [%uq]", qdcount);
 			if (ancount != 1)
-				ND_PRINT(" [%ua]", ancount);
+				ND_PRINT(C_RESET, " [%ua]", ancount);
 		}
 		else {
 			if (ancount)
-				ND_PRINT(" [%ua]", ancount);
+				ND_PRINT(C_RESET, " [%ua]", ancount);
 			if (qdcount != 1)
-				ND_PRINT(" [%uq]", qdcount);
+				ND_PRINT(C_RESET, " [%uq]", qdcount);
 		}
 		if (nscount)
-			ND_PRINT(" [%un]", nscount);
+			ND_PRINT(C_RESET, " [%un]", nscount);
 		if (arcount)
-			ND_PRINT(" [%uau]", arcount);
+			ND_PRINT(C_RESET, " [%uau]", arcount);
 
 		cp = (const u_char *)(np + 1);
 		if (qdcount) {
@@ -1125,7 +1128,7 @@ domain_print(netdissect_options *ndo,
 					goto trunc;
 				ancount--;
 				while (cp < ndo->ndo_snapend && ancount) {
-					ND_PRINT(",");
+					ND_PRINT(C_RESET, ",");
 					if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
 						goto trunc;
 					ancount--;
@@ -1134,12 +1137,12 @@ domain_print(netdissect_options *ndo,
 			if (ancount)
 				goto trunc;
 			if (cp < ndo->ndo_snapend && nscount) {
-				ND_PRINT(" ns:");
+				ND_PRINT(C_RESET, " ns:");
 				if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
 					goto trunc;
 				nscount--;
 				while (cp < ndo->ndo_snapend && nscount) {
-					ND_PRINT(",");
+					ND_PRINT(C_RESET, ",");
 					if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
 						goto trunc;
 					nscount--;
@@ -1148,12 +1151,12 @@ domain_print(netdissect_options *ndo,
 			if (nscount > 0)
 				goto trunc;
 			if (cp < ndo->ndo_snapend && arcount) {
-				ND_PRINT(" ar:");
+				ND_PRINT(C_RESET, " ar:");
 				if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
 					goto trunc;
 				arcount--;
 				while (cp < ndo->ndo_snapend && arcount) {
-					ND_PRINT(",");
+					ND_PRINT(C_RESET, ",");
 					if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
 						goto trunc;
 					arcount--;
@@ -1163,7 +1166,7 @@ domain_print(netdissect_options *ndo,
 				goto trunc;
 		}
 	}
-	ND_PRINT(" (%u)", length);
+	ND_PRINT(C_RESET, " (%u)", length);
 	return;
 
   trunc:

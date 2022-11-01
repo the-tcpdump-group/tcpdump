@@ -692,6 +692,7 @@ show_remote_devices_and_exit(void)
 #define OPTION_FP_TYPE			135
 #define OPTION_COUNT			136
 #define OPTION_PRINT_SAMPLING		137
+#define OPTION_COLOR	138
 
 static const struct option longopts[] = {
 #if defined(HAVE_PCAP_CREATE) || defined(_WIN32)
@@ -741,6 +742,7 @@ static const struct option longopts[] = {
 	{ "print", no_argument, NULL, OPTION_PRINT },
 	{ "print-sampling", required_argument, NULL, OPTION_PRINT_SAMPLING },
 	{ "version", no_argument, NULL, OPTION_VERSION },
+	{ "color", no_argument, NULL, OPTION_COLOR },
 	{ NULL, 0, NULL, 0 }
 };
 
@@ -1993,6 +1995,10 @@ main(int argc, char **argv)
 
 		case OPTION_COUNT:
 			count_mode = 1;
+			break;
+
+		case OPTION_COLOR:
+			++ndo->ndo_color;
 			break;
 
 		default:
@@ -3292,4 +3298,6 @@ print_usage(FILE *f)
 #endif
 	(void)fprintf(f,
 "\t\t[ -z postrotate-command ] [ -Z user ] [ expression ]\n");
+	(void)fprintf(f,
+"\t\t[ --color ]\n");
 }

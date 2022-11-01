@@ -540,13 +540,13 @@ ieee802_15_4_print_addr(netdissect_options *ndo, const u_char *p,
 {
 	switch (dst_addr_len) {
 	case 0:
-		ND_PRINT("none");
+		ND_PRINT(C_RESET, "none");
 		break;
 	case 2:
-		ND_PRINT("%04x", GET_LE_U_2(p));
+		ND_PRINT(C_RESET, "%04x", GET_LE_U_2(p));
 		break;
 	case 8:
-		ND_PRINT("%s", GET_LE64ADDR_STRING(p));
+		ND_PRINT(C_RESET, "%s", GET_LE64ADDR_STRING(p));
 		break;
 	}
 }
@@ -563,13 +563,13 @@ ieee802_15_4_print_superframe_specification(netdissect_options *ndo,
 	if (ndo->ndo_vflag < 1) {
 		return;
 	}
-	ND_PRINT("\n\tBeacon order = %d, Superframe order = %d, ",
+	ND_PRINT(C_RESET, "\n\tBeacon order = %d, Superframe order = %d, ",
 		 (ss & 0xf), ((ss >> 4) & 0xf));
-	ND_PRINT("Final CAP Slot = %d",
+	ND_PRINT(C_RESET, "Final CAP Slot = %d",
 		 ((ss >> 8) & 0xf));
-	if (CHECK_BIT(ss, 12)) { ND_PRINT(", BLE enabled"); }
-	if (CHECK_BIT(ss, 14)) { ND_PRINT(", PAN Coordinator"); }
-	if (CHECK_BIT(ss, 15)) { ND_PRINT(", Association Permit"); }
+	if (CHECK_BIT(ss, 12)) { ND_PRINT(C_RESET, ", BLE enabled"); }
+	if (CHECK_BIT(ss, 14)) { ND_PRINT(C_RESET, ", PAN Coordinator"); }
+	if (CHECK_BIT(ss, 15)) { ND_PRINT(C_RESET, ", Association Permit"); }
 }
 
 /*
@@ -592,31 +592,31 @@ ieee802_15_4_print_gts_info(netdissect_options *ndo,
 
 	if (gts_cnt == 0) {
 		if (ndo->ndo_vflag > 0) {
-			ND_PRINT("\n\tGTS Descriptor Count = %d, ", gts_cnt);
+			ND_PRINT(C_RESET, "\n\tGTS Descriptor Count = %d, ", gts_cnt);
 		}
 		return 1;
 	}
 	len = 1 + 1 + gts_cnt * 3;
 
 	if (data_len < len) {
-		ND_PRINT(" [ERROR: Truncated GTS Info List]");
+		ND_PRINT(C_RESET, " [ERROR: Truncated GTS Info List]");
 		return -1;
 	}
 	if (ndo->ndo_vflag < 2) {
 		return len;
 	}
-	ND_PRINT("GTS Descriptor Count = %d, ", gts_cnt);
-	ND_PRINT("GTS Directions Mask = %02x, [ ",
+	ND_PRINT(C_RESET, "GTS Descriptor Count = %d, ", gts_cnt);
+	ND_PRINT(C_RESET, "GTS Directions Mask = %02x, [ ",
 		 GET_U_1(p + 1) & 0x7f);
 
 	for(i = 0; i < gts_cnt; i++) {
-		ND_PRINT("[ ");
+		ND_PRINT(C_RESET, "[ ");
 		ieee802_15_4_print_addr(ndo, p + 2 + i * 3, 2);
-		ND_PRINT(", Start slot = %d, Length = %d ] ",
+		ND_PRINT(C_RESET, ", Start slot = %d, Length = %d ] ",
 			 GET_U_1(p + 2 + i * 3 + 1) & 0x0f,
 			 (GET_U_1(p + 2 + i * 3 + 1) >> 4) & 0x0f);
 	}
-	ND_PRINT("]");
+	ND_PRINT(C_RESET, "]");
 	return len;
 }
 
@@ -638,33 +638,33 @@ ieee802_15_4_print_pending_addresses(netdissect_options *ndo,
 	e_cnt = (pas >> 4) & 0x7;
 	len = 1 + s_cnt * 2 + e_cnt * 8;
 	if (ndo->ndo_vflag > 0) {
-		ND_PRINT("\n\tPending address list, "
+		ND_PRINT(C_RESET, "\n\tPending address list, "
 			 "# short addresses = %d, # extended addresses = %d",
 			 s_cnt, e_cnt);
 	}
 	if (data_len < len) {
-		ND_PRINT(" [ERROR: Pending address list truncated]");
+		ND_PRINT(C_RESET, " [ERROR: Pending address list truncated]");
 		return -1;
 	}
 	if (ndo->ndo_vflag < 2) {
 		return len;
 	}
 	if (s_cnt != 0) {
-		ND_PRINT(", Short address list = [ ");
+		ND_PRINT(C_RESET, ", Short address list = [ ");
 		for(i = 0; i < s_cnt; i++) {
 			ieee802_15_4_print_addr(ndo, p + 1 + i * 2, 2);
-			ND_PRINT(" ");
+			ND_PRINT(C_RESET, " ");
 		}
-		ND_PRINT("]");
+		ND_PRINT(C_RESET, "]");
 	}
 	if (e_cnt != 0) {
-		ND_PRINT(", Extended address list = [ ");
+		ND_PRINT(C_RESET, ", Extended address list = [ ");
 		for(i = 0; i < e_cnt; i++) {
 			ieee802_15_4_print_addr(ndo, p + 1 + s_cnt * 2 +
 						i * 8, 8);
-			ND_PRINT(" ");
+			ND_PRINT(C_RESET, " ");
 		}
-		ND_PRINT("]");
+		ND_PRINT(C_RESET, "]");
 	}
 	return len;
 }
@@ -683,36 +683,36 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 	switch (element_id) {
 	case 0x00: /* Vendor Specific Header IE */
 		if (ie_len < 3) {
-			ND_PRINT("[ERROR: Vendor OUI missing]");
+			ND_PRINT(C_RESET, "[ERROR: Vendor OUI missing]");
 		} else {
-			ND_PRINT("OUI = 0x%02x%02x%02x, ", GET_U_1(p),
+			ND_PRINT(C_RESET, "OUI = 0x%02x%02x%02x, ", GET_U_1(p),
 				 GET_U_1(p + 1), GET_U_1(p + 2));
-			ND_PRINT("Data = ");
+			ND_PRINT(C_RESET, "Data = ");
 			for(i = 3; i < ie_len; i++) {
-				ND_PRINT("%02x ", GET_U_1(p + i));
+				ND_PRINT(C_RESET, "%02x ", GET_U_1(p + i));
 			}
 		}
 		break;
 	case 0x1a: /* LE CSL IE */
 		if (ie_len < 4) {
-			ND_PRINT("[ERROR: Truncated CSL IE]");
+			ND_PRINT(C_RESET, "[ERROR: Truncated CSL IE]");
 		} else {
-			ND_PRINT("CSL Phase = %d, CSL Period = %d",
+			ND_PRINT(C_RESET, "CSL Phase = %d, CSL Period = %d",
 				 GET_LE_U_2(p), GET_LE_U_2(p + 2));
 			if (ie_len >= 6) {
-				ND_PRINT(", Rendezvous time = %d",
+				ND_PRINT(C_RESET, ", Rendezvous time = %d",
 					 GET_LE_U_2(p + 4));
 			}
 			if (ie_len != 4 && ie_len != 6) {
-				ND_PRINT(" [ERROR: CSL IE length wrong]");
+				ND_PRINT(C_RESET, " [ERROR: CSL IE length wrong]");
 			}
 		}
 		break;
 	case 0x1b: /* LE RIT IE */
 		if (ie_len < 4) {
-			ND_PRINT("[ERROR: Truncated RIT IE]");
+			ND_PRINT(C_RESET, "[ERROR: Truncated RIT IE]");
 		} else {
-			ND_PRINT("Time to First Listen = %d, # of Repeat Listen = %d, Repeat Listen Interval = %d",
+			ND_PRINT(C_RESET, "Time to First Listen = %d, # of Repeat Listen = %d, Repeat Listen Interval = %d",
 				 GET_U_1(p),
 				 GET_U_1(p + 1),
 				 GET_LE_U_2(p + 2));
@@ -722,7 +722,7 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 		/*FALLTHROUGH*/
 	case 0x21: /* Extended DSME PAN descriptor IE */
 		if (ie_len < 2) {
-			ND_PRINT("[ERROR: Truncated DSME PAN IE]");
+			ND_PRINT(C_RESET, "[ERROR: Truncated DSME PAN IE]");
 		} else {
 			uint16_t ss, ptr, ulen;
 			int16_t len;
@@ -733,7 +733,7 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 			ss = GET_LE_U_2(p);
 			ieee802_15_4_print_superframe_specification(ndo, ss);
 			if (ie_len < 3) {
-				ND_PRINT("[ERROR: Truncated before pending addresses field]");
+				ND_PRINT(C_RESET, "[ERROR: Truncated before pending addresses field]");
 				break;
 			}
 			ptr = 2;
@@ -749,78 +749,78 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 			if (element_id == 0x21) {
 				/* Extended version. */
 				if (ie_len < ptr + 2) {
-					ND_PRINT("[ERROR: Truncated before DSME Superframe Specification]");
+					ND_PRINT(C_RESET, "[ERROR: Truncated before DSME Superframe Specification]");
 					break;
 				}
 				ss = GET_LE_U_2(p + ptr);
 				ptr += 2;
-				ND_PRINT("Multi-superframe Order = %d", ss & 0xff);
-				ND_PRINT(", %s", ((ss & 0x100) ?
+				ND_PRINT(C_RESET, "Multi-superframe Order = %d", ss & 0xff);
+				ND_PRINT(C_RESET, ", %s", ((ss & 0x100) ?
 						  "Channel hopping mode" :
 						  "Channel adaptation mode"));
 				if (ss & 0x400) {
-					ND_PRINT(", CAP reduction enabled");
+					ND_PRINT(C_RESET, ", CAP reduction enabled");
 				}
 				if (ss & 0x800) {
-					ND_PRINT(", Deferred beacon enabled");
+					ND_PRINT(C_RESET, ", Deferred beacon enabled");
 				}
 				if (ss & 0x1000) {
-					ND_PRINT(", Hopping Sequence Present");
+					ND_PRINT(C_RESET, ", Hopping Sequence Present");
 					hopping_present = 1;
 				}
 			} else {
 				if (ie_len < ptr + 1) {
-					ND_PRINT("[ERROR: Truncated before DSME Superframe Specification]");
+					ND_PRINT(C_RESET, "[ERROR: Truncated before DSME Superframe Specification]");
 					break;
 				}
 				ss = GET_U_1(p + ptr);
 				ptr++;
-				ND_PRINT("Multi-superframe Order = %d",
+				ND_PRINT(C_RESET, "Multi-superframe Order = %d",
 					 ss & 0x0f);
-				ND_PRINT(", %s", ((ss & 0x10) ?
+				ND_PRINT(C_RESET, ", %s", ((ss & 0x10) ?
 						  "Channel hopping mode" :
 						  "Channel adaptation mode"));
 				if (ss & 0x40) {
-					ND_PRINT(", CAP reduction enabled");
+					ND_PRINT(C_RESET, ", CAP reduction enabled");
 				}
 				if (ss & 0x80) {
-					ND_PRINT(", Deferred beacon enabled");
+					ND_PRINT(C_RESET, ", Deferred beacon enabled");
 				}
 			}
 			if (ie_len < ptr + 8) {
-				ND_PRINT(" [ERROR: Truncated before Time synchronization specification]");
+				ND_PRINT(C_RESET, " [ERROR: Truncated before Time synchronization specification]");
 				break;
 			}
-			ND_PRINT("Beacon timestamp = %" PRIu64 ", offset = %d",
+			ND_PRINT(C_RESET, "Beacon timestamp = %" PRIu64 ", offset = %d",
 				 GET_LE_U_6(p + ptr),
 				 GET_LE_U_2(p + ptr + 6));
 			ptr += 8;
 			if (ie_len < ptr + 4) {
-				ND_PRINT(" [ERROR: Truncated before Beacon Bitmap]");
+				ND_PRINT(C_RESET, " [ERROR: Truncated before Beacon Bitmap]");
 				break;
 			}
 
 			ulen = GET_LE_U_2(p + ptr + 2);
-			ND_PRINT("SD Index = %d, Bitmap len = %d, ",
+			ND_PRINT(C_RESET, "SD Index = %d, Bitmap len = %d, ",
 				 GET_LE_U_2(p + ptr), ulen);
 			ptr += 4;
 			if (ie_len < ptr + ulen) {
-				ND_PRINT(" [ERROR: Truncated in SD bitmap]");
+				ND_PRINT(C_RESET, " [ERROR: Truncated in SD bitmap]");
 				break;
 			}
-			ND_PRINT(" SD Bitmap = ");
+			ND_PRINT(C_RESET, " SD Bitmap = ");
 			for(i = 0; i < ulen; i++) {
-				ND_PRINT("%02x ", GET_U_1(p + ptr + i));
+				ND_PRINT(C_RESET, "%02x ", GET_U_1(p + ptr + i));
 			}
 			ptr += ulen;
 
 			if (ie_len < ptr + 5) {
-				ND_PRINT(" [ERROR: Truncated before Channel hopping specification]");
+				ND_PRINT(C_RESET, " [ERROR: Truncated before Channel hopping specification]");
 				break;
 			}
 
 			ulen = GET_LE_U_2(p + ptr + 4);
-			ND_PRINT("Hopping Seq ID = %d, PAN Coordinator BSN = %d, "
+			ND_PRINT(C_RESET, "Hopping Seq ID = %d, PAN Coordinator BSN = %d, "
 				 "Channel offset = %d, Bitmap length = %d, ",
 				 GET_U_1(p + ptr),
 				 GET_U_1(p + ptr + 1),
@@ -828,67 +828,67 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 				 ulen);
 			ptr += 5;
 			if (ie_len < ptr + ulen) {
-				ND_PRINT(" [ERROR: Truncated in Channel offset bitmap]");
+				ND_PRINT(C_RESET, " [ERROR: Truncated in Channel offset bitmap]");
 				break;
 			}
-			ND_PRINT(" Channel offset bitmap = ");
+			ND_PRINT(C_RESET, " Channel offset bitmap = ");
 			for(i = 0; i < ulen; i++) {
-				ND_PRINT("%02x ", GET_U_1(p + ptr + i));
+				ND_PRINT(C_RESET, "%02x ", GET_U_1(p + ptr + i));
 			}
 			ptr += ulen;
 			if (hopping_present) {
 				if (ie_len < ptr + 1) {
-					ND_PRINT(" [ERROR: Truncated in Hopping Sequence length]");
+					ND_PRINT(C_RESET, " [ERROR: Truncated in Hopping Sequence length]");
 					break;
 				}
 				ulen = GET_U_1(p + ptr);
 				ptr++;
-				ND_PRINT("Hopping Seq length = %d [ ", ulen);
+				ND_PRINT(C_RESET, "Hopping Seq length = %d [ ", ulen);
 
 				/* The specification is not clear how the
 				   hopping sequence is encoded, I assume two
 				   octet unsigned integers for each channel. */
 
 				if (ie_len < ptr + ulen * 2) {
-					ND_PRINT(" [ERROR: Truncated in Channel offset bitmap]");
+					ND_PRINT(C_RESET, " [ERROR: Truncated in Channel offset bitmap]");
 					break;
 				}
 				for(i = 0; i < ulen; i++) {
-					ND_PRINT("%02x ",
+					ND_PRINT(C_RESET, "%02x ",
 						 GET_LE_U_2(p + ptr + i * 2));
 				}
-				ND_PRINT("]");
+				ND_PRINT(C_RESET, "]");
 				ptr += ulen * 2;
 			}
 		}
 		break;
 	case 0x1d: /* Rendezvous Tome IE */
 		if (ie_len != 4) {
-			ND_PRINT("[ERROR: Length != 2]");
+			ND_PRINT(C_RESET, "[ERROR: Length != 2]");
 		} else {
 			uint16_t r_time, w_u_interval;
 			r_time = GET_LE_U_2(p);
 			w_u_interval = GET_LE_U_2(p + 2);
 
-			ND_PRINT("Rendezvous time = %d, Wake-up Interval = %d",
+			ND_PRINT(C_RESET, "Rendezvous time = %d, Wake-up Interval = %d",
 				 r_time, w_u_interval);
 		}
 		break;
 	case 0x1e: /* Time correction IE */
 		if (ie_len != 2) {
-			ND_PRINT("[ERROR: Length != 2]");
+			ND_PRINT(C_RESET, "[ERROR: Length != 2]");
 		} else {
 			uint16_t val;
 			int16_t timecorr;
 
 			val = GET_LE_U_2(p);
-			if (val & 0x8000) { ND_PRINT("Negative "); }
+			if (val & 0x8000) { ND_PRINT(C_RESET, "Negative "); }
 			val &= 0xfff;
 			val <<= 4;
 			timecorr = val;
 			timecorr >>= 4;
 
-			ND_PRINT("Ack time correction = %d, ", timecorr);
+			ND_PRINT(C_RESET, "Ack time correction = %d, ", timecorr);
 		}
 		break;
 	case 0x22: /* Fragment Sequence Content Description IE */
@@ -910,9 +910,9 @@ ieee802_15_4_print_header_ie(netdissect_options *ndo,
 	case 0x2b: /* DA IE */
 		/* XXX Not implemented */
 	default:
-		ND_PRINT("IE Data = ");
+		ND_PRINT(C_RESET, "IE Data = ");
 		for(i = 0; i < ie_len; i++) {
-			ND_PRINT("%02x ", GET_U_1(p + i));
+			ND_PRINT(C_RESET, "%02x ", GET_U_1(p + i));
 		}
 		break;
 	}
@@ -937,30 +937,30 @@ ieee802_15_4_print_header_ie_list(netdissect_options *ndo,
 	len = 0;
 	do {
 		if (caplen < 2) {
-			ND_PRINT("[ERROR: Truncated header IE]");
+			ND_PRINT(C_RESET, "[ERROR: Truncated header IE]");
 			return -1;
 		}
 		/* Extract IE Header */
 		ie = GET_LE_U_2(p);
 		if (CHECK_BIT(ie, 15)) {
-			ND_PRINT("[ERROR: Header IE with type 1] ");
+			ND_PRINT(C_RESET, "[ERROR: Header IE with type 1] ");
 		}
 		/* Get length and Element ID */
 		ie_len = ie & 0x7f;
 		element_id = (ie >> 7) & 0xff;
 		if (element_id > 127) {
-			ND_PRINT("Reserved Element ID %02x, length = %d ",
+			ND_PRINT(C_RESET, "Reserved Element ID %02x, length = %d ",
 				 element_id, ie_len);
 		} else {
 			if (ie_len == 0) {
-				ND_PRINT("\n\t%s [", h_ie_names[element_id]);
+				ND_PRINT(C_RESET, "\n\t%s [", h_ie_names[element_id]);
 			} else {
-				ND_PRINT("\n\t%s [ length = %d, ",
+				ND_PRINT(C_RESET, "\n\t%s [ length = %d, ",
 					 h_ie_names[element_id], ie_len);
 			}
 		}
 		if (caplen < 2U + ie_len) {
-			ND_PRINT("[ERROR: Truncated IE data]");
+			ND_PRINT(C_RESET, "[ERROR: Truncated IE data]");
 			return -1;
 		}
 		/* Skip header */
@@ -972,13 +972,13 @@ ieee802_15_4_print_header_ie_list(netdissect_options *ndo,
 						     ie_len, element_id);
 		} else {
 			if (ie_len != 0) {
-				ND_PRINT("IE Data = ");
+				ND_PRINT(C_RESET, "IE Data = ");
 				for(i = 0; i < ie_len; i++) {
-					ND_PRINT("%02x ", GET_U_1(p + i));
+					ND_PRINT(C_RESET, "%02x ", GET_U_1(p + i));
 				}
 			}
 		}
-		ND_PRINT("] ");
+		ND_PRINT(C_RESET, "] ");
 		len += 2 + ie_len;
 		p += ie_len;
 		caplen -= 2 + ie_len;
@@ -1010,89 +1010,89 @@ ieee802_15_4_print_mlme_ie(netdissect_options *ndo,
 	switch (sub_id) {
 	case 0x08: /* Vendor Specific Nested IE */
 		if (sub_ie_len < 3) {
-			ND_PRINT("[ERROR: Vendor OUI missing]");
+			ND_PRINT(C_RESET, "[ERROR: Vendor OUI missing]");
 		} else {
-			ND_PRINT("OUI = 0x%02x%02x%02x, ",
+			ND_PRINT(C_RESET, "OUI = 0x%02x%02x%02x, ",
 				 GET_U_1(p),
 				 GET_U_1(p + 1),
 				 GET_U_1(p + 2));
-			ND_PRINT("Data = ");
+			ND_PRINT(C_RESET, "Data = ");
 			for(i = 3; i < sub_ie_len; i++) {
-				ND_PRINT("%02x ", GET_U_1(p + i));
+				ND_PRINT(C_RESET, "%02x ", GET_U_1(p + i));
 			}
 		}
 		break;
 	case 0x09: /* Channel Hopping IE */
 		if (sub_ie_len < 1) {
-			ND_PRINT("[ERROR: Hopping sequence ID missing]");
+			ND_PRINT(C_RESET, "[ERROR: Hopping sequence ID missing]");
 		} else if (sub_ie_len == 1) {
-			ND_PRINT("Hopping Sequence ID = %d", GET_U_1(p));
+			ND_PRINT(C_RESET, "Hopping Sequence ID = %d", GET_U_1(p));
 			p++;
 			sub_ie_len--;
 		} else {
 			uint16_t channel_page, number_of_channels;
 
-			ND_PRINT("Hopping Sequence ID = %d", GET_U_1(p));
+			ND_PRINT(C_RESET, "Hopping Sequence ID = %d", GET_U_1(p));
 			p++;
 			sub_ie_len--;
 			if (sub_ie_len < 7) {
-				ND_PRINT("[ERROR: IE truncated]");
+				ND_PRINT(C_RESET, "[ERROR: IE truncated]");
 				break;
 			}
 			channel_page = GET_U_1(p);
 			number_of_channels = GET_LE_U_2(p + 1);
-			ND_PRINT("Channel Page = %d, Number of Channels = %d, ",
+			ND_PRINT(C_RESET, "Channel Page = %d, Number of Channels = %d, ",
 				 channel_page, number_of_channels);
-			ND_PRINT("Phy Configuration = 0x%08x, ",
+			ND_PRINT(C_RESET, "Phy Configuration = 0x%08x, ",
 				 GET_LE_U_4(p + 3));
 			p += 7;
 			sub_ie_len -= 7;
 			if (channel_page == 9 || channel_page == 10) {
 				len = (number_of_channels + 7) / 8;
 				if (sub_ie_len < len) {
-					ND_PRINT("[ERROR: IE truncated]");
+					ND_PRINT(C_RESET, "[ERROR: IE truncated]");
 					break;
 				}
-				ND_PRINT("Extended bitmap = 0x");
+				ND_PRINT(C_RESET, "Extended bitmap = 0x");
 				for(i = 0; i < len; i++) {
-					ND_PRINT("%02x", GET_U_1(p + i));
+					ND_PRINT(C_RESET, "%02x", GET_U_1(p + i));
 				}
-				ND_PRINT(", ");
+				ND_PRINT(C_RESET, ", ");
 				p += len;
 				sub_ie_len -= len;
 			}
 			if (sub_ie_len < 2) {
-				ND_PRINT("[ERROR: IE truncated]");
+				ND_PRINT(C_RESET, "[ERROR: IE truncated]");
 				break;
 			}
 			len = GET_LE_U_2(p);
 			p += 2;
 			sub_ie_len -= 2;
-			ND_PRINT("Hopping Seq length = %d [ ", len);
+			ND_PRINT(C_RESET, "Hopping Seq length = %d [ ", len);
 
 			if (sub_ie_len < len * 2) {
-				ND_PRINT(" [ERROR: IE truncated]");
+				ND_PRINT(C_RESET, " [ERROR: IE truncated]");
 				break;
 			}
 			for(i = 0; i < len; i++) {
-				ND_PRINT("%02x ", GET_LE_U_2(p + i * 2));
+				ND_PRINT(C_RESET, "%02x ", GET_LE_U_2(p + i * 2));
 			}
-			ND_PRINT("]");
+			ND_PRINT(C_RESET, "]");
 			p += len * 2;
 			sub_ie_len -= len * 2;
 			if (sub_ie_len < 2) {
-				ND_PRINT("[ERROR: IE truncated]");
+				ND_PRINT(C_RESET, "[ERROR: IE truncated]");
 				break;
 			}
-			ND_PRINT("Current hop = %d", GET_LE_U_2(p));
+			ND_PRINT(C_RESET, "Current hop = %d", GET_LE_U_2(p));
 		}
 
 		break;
 	case 0x1a: /* TSCH Synchronization IE. */
 		if (sub_ie_len < 6) {
-			ND_PRINT("[ERROR: Length != 6]");
+			ND_PRINT(C_RESET, "[ERROR: Length != 6]");
 		}
-		ND_PRINT("ASN = %010" PRIx64 ", Join Metric = %d ",
+		ND_PRINT(C_RESET, "ASN = %010" PRIx64 ", Join Metric = %d ",
 			 GET_LE_U_5(p), GET_U_1(p + 5));
 		break;
 	case 0x1b: /* TSCH Slotframe and Link IE. */
@@ -1100,53 +1100,53 @@ ieee802_15_4_print_mlme_ie(netdissect_options *ndo,
 			int sf_num, off, links, opts;
 
 			if (sub_ie_len < 1) {
-				ND_PRINT("[ERROR: Truncated IE]");
+				ND_PRINT(C_RESET, "[ERROR: Truncated IE]");
 				break;
 			}
 			sf_num = GET_U_1(p);
-			ND_PRINT("Slotframes = %d ", sf_num);
+			ND_PRINT(C_RESET, "Slotframes = %d ", sf_num);
 			off = 1;
 			for(i = 0; i < sf_num; i++) {
 				if (sub_ie_len < off + 4) {
-					ND_PRINT("[ERROR: Truncated IE before slotframes]");
+					ND_PRINT(C_RESET, "[ERROR: Truncated IE before slotframes]");
 					break;
 				}
 				links = GET_U_1(p + off + 3);
-				ND_PRINT("\n\t\t\t[ Handle %d, size = %d, links = %d ",
+				ND_PRINT(C_RESET, "\n\t\t\t[ Handle %d, size = %d, links = %d ",
 					 GET_U_1(p + off),
 					 GET_LE_U_2(p + off + 1),
 					 links);
 				off += 4;
 				for(j = 0; j < links; j++) {
 					if (sub_ie_len < off + 5) {
-						ND_PRINT("[ERROR: Truncated IE links]");
+						ND_PRINT(C_RESET, "[ERROR: Truncated IE links]");
 						break;
 					}
 					opts = GET_U_1(p + off + 4);
-					ND_PRINT("\n\t\t\t\t[ Timeslot =  %d, Offset = %d, Options = ",
+					ND_PRINT(C_RESET, "\n\t\t\t\t[ Timeslot =  %d, Offset = %d, Options = ",
 						 GET_LE_U_2(p + off),
 						 GET_LE_U_2(p + off + 2));
-					if (opts & 0x1) { ND_PRINT("TX "); }
-					if (opts & 0x2) { ND_PRINT("RX "); }
-					if (opts & 0x4) { ND_PRINT("Shared "); }
+					if (opts & 0x1) { ND_PRINT(C_RESET, "TX "); }
+					if (opts & 0x2) { ND_PRINT(C_RESET, "RX "); }
+					if (opts & 0x4) { ND_PRINT(C_RESET, "Shared "); }
 					if (opts & 0x8) {
-						ND_PRINT("Timekeeping ");
+						ND_PRINT(C_RESET, "Timekeeping ");
 					}
 					if (opts & 0x10) {
-						ND_PRINT("Priority ");
+						ND_PRINT(C_RESET, "Priority ");
 					}
 					off += 5;
-					ND_PRINT("] ");
+					ND_PRINT(C_RESET, "] ");
 				}
-				ND_PRINT("] ");
+				ND_PRINT(C_RESET, "] ");
 			}
 		}
 		break;
 	case 0x1c: /* TSCH Timeslot IE. */
 		if (sub_ie_len == 1) {
-			ND_PRINT("Time slot ID = %d ", GET_U_1(p));
+			ND_PRINT(C_RESET, "Time slot ID = %d ", GET_U_1(p));
 		} else if (sub_ie_len == 25) {
-			ND_PRINT("Time slot ID = %d, CCA Offset = %d, CCA = %d, TX Offset = %d, RX Offset = %d, RX Ack Delay = %d, TX Ack Delay = %d, RX Wait = %d, Ack Wait = %d, RX TX = %d, Max Ack = %d, Max TX = %d, Time slot Length = %d ",
+			ND_PRINT(C_RESET, "Time slot ID = %d, CCA Offset = %d, CCA = %d, TX Offset = %d, RX Offset = %d, RX Ack Delay = %d, TX Ack Delay = %d, RX Wait = %d, Ack Wait = %d, RX TX = %d, Max Ack = %d, Max TX = %d, Time slot Length = %d ",
 				 GET_U_1(p),
 				 GET_LE_U_2(p + 1),
 				 GET_LE_U_2(p + 3),
@@ -1161,7 +1161,7 @@ ieee802_15_4_print_mlme_ie(netdissect_options *ndo,
 				 GET_LE_U_2(p + 21),
 				 GET_LE_U_2(p + 23));
 		} else if (sub_ie_len == 27) {
-			ND_PRINT("Time slot ID = %d, CCA Offset = %d, CCA = %d, TX Offset = %d, RX Offset = %d, RX Ack Delay = %d, TX Ack Delay = %d, RX Wait = %d, Ack Wait = %d, RX TX = %d, Max Ack = %d, Max TX = %d, Time slot Length = %d ",
+			ND_PRINT(C_RESET, "Time slot ID = %d, CCA Offset = %d, CCA = %d, TX Offset = %d, RX Offset = %d, RX Ack Delay = %d, TX Ack Delay = %d, RX Wait = %d, Ack Wait = %d, RX TX = %d, Max Ack = %d, Max TX = %d, Time slot Length = %d ",
 				 GET_U_1(p),
 				 GET_LE_U_2(p + 1),
 				 GET_LE_U_2(p + 3),
@@ -1176,10 +1176,10 @@ ieee802_15_4_print_mlme_ie(netdissect_options *ndo,
 				 GET_LE_U_3(p + 21),
 				 GET_LE_U_3(p + 24));
 		} else {
-			ND_PRINT("[ERROR: Length not 1, 25, or 27]");
-			ND_PRINT("\n\t\t\tIE Data = ");
+			ND_PRINT(C_RESET, "[ERROR: Length not 1, 25, or 27]");
+			ND_PRINT(C_RESET, "\n\t\t\tIE Data = ");
 			for(i = 0; i < sub_ie_len; i++) {
-				ND_PRINT("%02x ", GET_U_1(p + i));
+				ND_PRINT(C_RESET, "%02x ", GET_U_1(p + i));
 			}
 		}
 		break;
@@ -1234,9 +1234,9 @@ ieee802_15_4_print_mlme_ie(netdissect_options *ndo,
 	case 0x36: /* TCC PHY Operating Mode IE */
 		/* XXX Not implemented */
 	default:
-		ND_PRINT("IE Data = ");
+		ND_PRINT(C_RESET, "IE Data = ");
 		for(i = 0; i < sub_ie_len; i++) {
-			ND_PRINT("%02x ", GET_U_1(p + i));
+			ND_PRINT(C_RESET, "%02x ", GET_U_1(p + i));
 		}
 		break;
 	}
@@ -1256,7 +1256,7 @@ ieee802_15_4_print_mlme_ie_list(netdissect_options *ndo,
 
 	do {
 		if (ie_len < 2) {
-			ND_PRINT("[ERROR: Truncated MLME IE]");
+			ND_PRINT(C_RESET, "[ERROR: Truncated MLME IE]");
 			return;
 		}
 		/* Extract IE header */
@@ -1275,28 +1275,28 @@ ieee802_15_4_print_mlme_ie_list(netdissect_options *ndo,
 		p += 2;
 
 		if (type == 0) {
-			ND_PRINT("\n\t\t%s [ length = %d, ",
+			ND_PRINT(C_RESET, "\n\t\t%s [ length = %d, ",
 				 p_mlme_short_names[sub_id], sub_ie_len);
 		} else {
-			ND_PRINT("\n\t\t%s [ length = %d, ",
+			ND_PRINT(C_RESET, "\n\t\t%s [ length = %d, ",
 				 p_mlme_long_names[sub_id], sub_ie_len);
 		}
 
 		if (ie_len < 2 + sub_ie_len) {
-			ND_PRINT("[ERROR: Truncated IE data]");
+			ND_PRINT(C_RESET, "[ERROR: Truncated IE data]");
 			return;
 		}
 		if (sub_ie_len != 0) {
 			if (ndo->ndo_vflag > 3) {
 				ieee802_15_4_print_mlme_ie(ndo, p, sub_ie_len, sub_id);
 			} else if (ndo->ndo_vflag > 2) {
-				ND_PRINT("IE Data = ");
+				ND_PRINT(C_RESET, "IE Data = ");
 				for(i = 0; i < sub_ie_len; i++) {
-					ND_PRINT("%02x ", GET_U_1(p + i));
+					ND_PRINT(C_RESET, "%02x ", GET_U_1(p + i));
 				}
 			}
 		}
-		ND_PRINT("] ");
+		ND_PRINT(C_RESET, "] ");
 		p += sub_ie_len;
 		ie_len -= 2 + sub_ie_len;
 	} while (ie_len > 0);
@@ -1318,7 +1318,7 @@ ieee802_15_4_print_mpx_ie(netdissect_options *ndo,
 
 	data_start = 0;
 	if (ie_len < 1) {
-		ND_PRINT("[ERROR: Transaction control byte missing]");
+		ND_PRINT(C_RESET, "[ERROR: Transaction control byte missing]");
 		return;
 	}
 
@@ -1327,31 +1327,31 @@ ieee802_15_4_print_mpx_ie(netdissect_options *ndo,
 	switch (transfer_type) {
 	case 0x00: /* Full upper layer frame. */
 	case 0x01: /* Full upper layer frame with small Multiplex ID. */
-		ND_PRINT("Type = Full upper layer fragment%s, ",
+		ND_PRINT(C_RESET, "Type = Full upper layer fragment%s, ",
 			 (transfer_type == 0x01 ?
 			  " with small Multiplex ID" : ""));
 		if (transfer_type == 0x00) {
 			if (ie_len < 3) {
-				ND_PRINT("[ERROR: Multiplex ID missing]");
+				ND_PRINT(C_RESET, "[ERROR: Multiplex ID missing]");
 				return;
 			}
 			data_start = 3;
-			ND_PRINT("tid = 0x%02x, Multiplex ID = 0x%04x, ",
+			ND_PRINT(C_RESET, "tid = 0x%02x, Multiplex ID = 0x%04x, ",
 				 tid, GET_LE_U_2(p + 1));
 		} else {
 			data_start = 1;
-			ND_PRINT("Multiplex ID = 0x%04x, ", tid);
+			ND_PRINT(C_RESET, "Multiplex ID = 0x%04x, ", tid);
 		}
 		break;
 	case 0x02: /* First, or middle, Fragments */
 	case 0x04: /* Last fragment */
 		if (ie_len < 2) {
-			ND_PRINT("[ERROR: fragment number missing]");
+			ND_PRINT(C_RESET, "[ERROR: fragment number missing]");
 			return;
 		}
 
 		fragment_number = GET_U_1(p + 1);
-		ND_PRINT("Type = %s, tid = 0x%02x, fragment = 0x%02x, ",
+		ND_PRINT(C_RESET, "Type = %s, tid = 0x%02x, fragment = 0x%02x, ",
 			 (transfer_type == 0x02 ?
 			  (fragment_number == 0 ?
 			   "First fragment" : "Middle fragment") :
@@ -1362,29 +1362,29 @@ ieee802_15_4_print_mpx_ie(netdissect_options *ndo,
 			int total_size, multiplex_id;
 
 			if (ie_len < 6) {
-				ND_PRINT("[ERROR: Total upper layer size or multiplex ID missing]");
+				ND_PRINT(C_RESET, "[ERROR: Total upper layer size or multiplex ID missing]");
 				return;
 			}
 			total_size = GET_LE_U_2(p + 2);
 			multiplex_id = GET_LE_U_2(p + 4);
-			ND_PRINT("Total upper layer size = 0x%04x, Multiplex ID = 0x%04x, ",
+			ND_PRINT(C_RESET, "Total upper layer size = 0x%04x, Multiplex ID = 0x%04x, ",
 				 total_size, multiplex_id);
 			data_start = 6;
 		}
 		break;
 	case 0x06: /* Abort code */
 		if (ie_len == 1) {
-			ND_PRINT("Type = Abort, tid = 0x%02x, no max size given",
+			ND_PRINT(C_RESET, "Type = Abort, tid = 0x%02x, no max size given",
 				 tid);
 		} else if (ie_len == 3) {
-			ND_PRINT("Type = Abort, tid = 0x%02x, max size = 0x%04x",
+			ND_PRINT(C_RESET, "Type = Abort, tid = 0x%02x, max size = 0x%04x",
 				 tid, GET_LE_U_2(p + 1));
 		} else {
-			ND_PRINT("Type = Abort, tid = 0x%02x, invalid length = %d (not 1 or 3)",
+			ND_PRINT(C_RESET, "Type = Abort, tid = 0x%02x, invalid length = %d (not 1 or 3)",
 				 tid, ie_len);
-			ND_PRINT("Abort data = ");
+			ND_PRINT(C_RESET, "Abort data = ");
 			for(i = 1; i < ie_len; i++) {
-				ND_PRINT("%02x ", GET_U_1(p + i));
+				ND_PRINT(C_RESET, "%02x ", GET_U_1(p + i));
 			}
 		}
 		return;
@@ -1393,15 +1393,15 @@ ieee802_15_4_print_mpx_ie(netdissect_options *ndo,
 	case 0x03: /* Reserved */
 	case 0x05: /* Reserved */
 	case 0x07: /* Reserved */
-		ND_PRINT("Type = %d (Reserved), tid = 0x%02x, ",
+		ND_PRINT(C_RESET, "Type = %d (Reserved), tid = 0x%02x, ",
 			 transfer_type, tid);
 		data_start = 1;
 		break;
 	}
 
-	ND_PRINT("Upper layer data = ");
+	ND_PRINT(C_RESET, "Upper layer data = ");
 	for(i = data_start; i < ie_len; i++) {
-		ND_PRINT("%02x ", GET_U_1(p + i));
+		ND_PRINT(C_RESET, "%02x ", GET_U_1(p + i));
 	}
 }
 
@@ -1422,13 +1422,13 @@ ieee802_15_4_print_payload_ie_list(netdissect_options *ndo,
 	len = 0;
 	do {
 		if (caplen < 2) {
-			ND_PRINT("[ERROR: Truncated header IE]");
+			ND_PRINT(C_RESET, "[ERROR: Truncated header IE]");
 			return -1;
 		}
 		/* Extract IE header */
 		ie = GET_LE_U_2(p);
 		if ((CHECK_BIT(ie, 15)) == 0) {
-			ND_PRINT("[ERROR: Payload IE with type 0] ");
+			ND_PRINT(C_RESET, "[ERROR: Payload IE with type 0] ");
 		}
 		ie_len = ie & 0x3ff;
 		group_id = (ie >> 11) & 0x0f;
@@ -1436,13 +1436,13 @@ ieee802_15_4_print_payload_ie_list(netdissect_options *ndo,
 		/* Skip the IE header */
 		p += 2;
 		if (ie_len == 0) {
-			ND_PRINT("\n\t%s [", p_ie_names[group_id]);
+			ND_PRINT(C_RESET, "\n\t%s [", p_ie_names[group_id]);
 		} else {
-			ND_PRINT("\n\t%s [ length = %d, ",
+			ND_PRINT(C_RESET, "\n\t%s [ length = %d, ",
 				 p_ie_names[group_id], ie_len);
 		}
 		if (caplen < 2U + ie_len) {
-			ND_PRINT("[ERROR: Truncated IE data]");
+			ND_PRINT(C_RESET, "[ERROR: Truncated IE data]");
 			return -1;
 		}
 		if (ndo->ndo_vflag > 3 && ie_len != 0) {
@@ -1452,15 +1452,15 @@ ieee802_15_4_print_payload_ie_list(netdissect_options *ndo,
 				break;
 			case 0x2: /* Vendor Specific Nested IE */
 				if (ie_len < 3) {
-					ND_PRINT("[ERROR: Vendor OUI missing]");
+					ND_PRINT(C_RESET, "[ERROR: Vendor OUI missing]");
 				} else {
-					ND_PRINT("OUI = 0x%02x%02x%02x, ",
+					ND_PRINT(C_RESET, "OUI = 0x%02x%02x%02x, ",
 						 GET_U_1(p),
 						 GET_U_1(p + 1),
 						 GET_U_1(p + 2));
-					ND_PRINT("Data = ");
+					ND_PRINT(C_RESET, "Data = ");
 					for(i = 3; i < ie_len; i++) {
-						ND_PRINT("%02x ",
+						ND_PRINT(C_RESET, "%02x ",
 							 GET_U_1(p + i));
 					}
 				}
@@ -1470,32 +1470,32 @@ ieee802_15_4_print_payload_ie_list(netdissect_options *ndo,
 				break;
 			case 0x5: /* IETF IE */
 				if (ie_len < 1) {
-					ND_PRINT("[ERROR: Subtype ID missing]");
+					ND_PRINT(C_RESET, "[ERROR: Subtype ID missing]");
 				} else {
-					ND_PRINT("Subtype ID = 0x%02x, Subtype content = ",
+					ND_PRINT(C_RESET, "Subtype ID = 0x%02x, Subtype content = ",
 						 GET_U_1(p));
 					for(i = 1; i < ie_len; i++) {
-						ND_PRINT("%02x ",
+						ND_PRINT(C_RESET, "%02x ",
 							 GET_U_1(p + i));
 					}
 				}
 				break;
 			default:
-				ND_PRINT("IE Data = ");
+				ND_PRINT(C_RESET, "IE Data = ");
 				for(i = 0; i < ie_len; i++) {
-					ND_PRINT("%02x ", GET_U_1(p + i));
+					ND_PRINT(C_RESET, "%02x ", GET_U_1(p + i));
 				}
 				break;
 			}
 		} else {
 			if (ie_len != 0) {
-				ND_PRINT("IE Data = ");
+				ND_PRINT(C_RESET, "IE Data = ");
 				for(i = 0; i < ie_len; i++) {
-					ND_PRINT("%02x ", GET_U_1(p + i));
+					ND_PRINT(C_RESET, "%02x ", GET_U_1(p + i));
 				}
 			}
 		}
-		ND_PRINT("]\n\t");
+		ND_PRINT(C_RESET, "]\n\t");
 		len += 2 + ie_len;
 		p += ie_len;
 		caplen -= 2 + ie_len;
@@ -1520,7 +1520,7 @@ ieee802_15_4_print_aux_sec_header(netdissect_options *ndo,
 	int sc, key_id_mode, len;
 
 	if (caplen < 1) {
-		ND_PRINT("[ERROR: Truncated before Aux Security Header]");
+		ND_PRINT(C_RESET, "[ERROR: Truncated before Aux Security Header]");
 		return -1;
 	}
 	sc = GET_U_1(p);
@@ -1532,16 +1532,16 @@ ieee802_15_4_print_aux_sec_header(netdissect_options *ndo,
 	p += 1;
 
 	if (ndo->ndo_vflag > 0) {
-		ND_PRINT("\n\tSecurity Level %d, Key Id Mode %d, ",
+		ND_PRINT(C_RESET, "\n\tSecurity Level %d, Key Id Mode %d, ",
 			 *security_level, key_id_mode);
 	}
 	if ((CHECK_BIT(sc, 5)) == 0) {
 		if (caplen < 4) {
-			ND_PRINT("[ERROR: Truncated before Frame Counter]");
+			ND_PRINT(C_RESET, "[ERROR: Truncated before Frame Counter]");
 			return -1;
 		}
 		if (ndo->ndo_vflag > 1) {
-			ND_PRINT("Frame Counter 0x%08x ",
+			ND_PRINT(C_RESET, "Frame Counter 0x%08x ",
 				 GET_LE_U_4(p));
 		}
 		p += 4;
@@ -1551,7 +1551,7 @@ ieee802_15_4_print_aux_sec_header(netdissect_options *ndo,
 	switch (key_id_mode) {
 	case 0x00: /* Implicit. */
 		if (ndo->ndo_vflag > 1) {
-			ND_PRINT("Implicit");
+			ND_PRINT(C_RESET, "Implicit");
 		}
 		return len;
 		break;
@@ -1559,11 +1559,11 @@ ieee802_15_4_print_aux_sec_header(netdissect_options *ndo,
 		break;
 	case 0x02: /* PAN and Short address Key Source, and Key Index. */
 		if (caplen < 4) {
-			ND_PRINT("[ERROR: Truncated before Key Source]");
+			ND_PRINT(C_RESET, "[ERROR: Truncated before Key Source]");
 			return -1;
 		}
 		if (ndo->ndo_vflag > 1) {
-			ND_PRINT("KeySource 0x%04x:%0x4x, ",
+			ND_PRINT(C_RESET, "KeySource 0x%04x:%0x4x, ",
 				 GET_LE_U_2(p), GET_LE_U_2(p + 2));
 		}
 		p += 4;
@@ -1572,11 +1572,11 @@ ieee802_15_4_print_aux_sec_header(netdissect_options *ndo,
 		break;
 	case 0x03: /* Extended address and Key Index. */
 		if (caplen < 8) {
-			ND_PRINT("[ERROR: Truncated before Key Source]");
+			ND_PRINT(C_RESET, "[ERROR: Truncated before Key Source]");
 			return -1;
 		}
 		if (ndo->ndo_vflag > 1) {
-			ND_PRINT("KeySource %s, ", GET_LE64ADDR_STRING(p));
+			ND_PRINT(C_RESET, "KeySource %s, ", GET_LE64ADDR_STRING(p));
 		}
 		p += 4;
 		caplen -= 4;
@@ -1584,11 +1584,11 @@ ieee802_15_4_print_aux_sec_header(netdissect_options *ndo,
 		break;
 	}
 	if (caplen < 1) {
-		ND_PRINT("[ERROR: Truncated before Key Index]");
+		ND_PRINT(C_RESET, "[ERROR: Truncated before Key Index]");
 		return -1;
 	}
 	if (ndo->ndo_vflag > 1) {
-		ND_PRINT("KeyIndex 0x%02x, ", GET_U_1(p));
+		ND_PRINT(C_RESET, "KeyIndex 0x%02x, ", GET_U_1(p));
 	}
 	caplen -= 1;
 	p += 1;
@@ -1612,12 +1612,12 @@ ieee802_15_4_print_command_data(netdissect_options *ndo,
 	switch (command_id) {
 	case 0x01: /* Association Request */
 		if (caplen != 1) {
-			ND_PRINT("Invalid Association request command length");
+			ND_PRINT(C_RESET, "Invalid Association request command length");
 			return -1;
 		} else {
 			uint8_t cap_info;
 			cap_info = GET_U_1(p);
-			ND_PRINT("%s%s%s%s%s%s",
+			ND_PRINT(C_RESET, "%s%s%s%s%s%s",
 				 ((cap_info & 0x02) ?
 				  "FFD, " : "RFD, "),
 				 ((cap_info & 0x04) ?
@@ -1635,29 +1635,29 @@ ieee802_15_4_print_command_data(netdissect_options *ndo,
 		break;
 	case 0x02: /* Association Response */
 		if (caplen != 3) {
-			ND_PRINT("Invalid Association response command length");
+			ND_PRINT(C_RESET, "Invalid Association response command length");
 			return -1;
 		} else {
-			ND_PRINT("Short address = ");
+			ND_PRINT(C_RESET, "Short address = ");
 			ieee802_15_4_print_addr(ndo, p, 2);
 			switch (GET_U_1(p + 2)) {
 			case 0x00:
-				ND_PRINT(", Association successful");
+				ND_PRINT(C_RESET, ", Association successful");
 				break;
 			case 0x01:
-				ND_PRINT(", PAN at capacity");
+				ND_PRINT(C_RESET, ", PAN at capacity");
 				break;
 			case 0x02:
-				ND_PRINT(", PAN access denied");
+				ND_PRINT(C_RESET, ", PAN access denied");
 				break;
 			case 0x03:
-				ND_PRINT(", Hooping sequence offset duplication");
+				ND_PRINT(C_RESET, ", Hooping sequence offset duplication");
 				break;
 			case 0x80:
-				ND_PRINT(", Fast association successful");
+				ND_PRINT(C_RESET, ", Fast association successful");
 				break;
 			default:
-				ND_PRINT(", Status = 0x%02x",
+				ND_PRINT(C_RESET, ", Status = 0x%02x",
 					 GET_U_1(p + 2));
 				break;
 			}
@@ -1666,21 +1666,21 @@ ieee802_15_4_print_command_data(netdissect_options *ndo,
 		break;
 	case 0x03: /* Diassociation Notification command */
 		if (caplen != 1) {
-			ND_PRINT("Invalid Disassociation Notification command length");
+			ND_PRINT(C_RESET, "Invalid Disassociation Notification command length");
 			return -1;
 		} else {
 			switch (GET_U_1(p)) {
 			case 0x00:
-				ND_PRINT("Reserved");
+				ND_PRINT(C_RESET, "Reserved");
 				break;
 			case 0x01:
-				ND_PRINT("Reason = The coordinator wishes the device to leave PAN");
+				ND_PRINT(C_RESET, "Reason = The coordinator wishes the device to leave PAN");
 				break;
 			case 0x02:
-				ND_PRINT("Reason = The device wishes to leave the PAN");
+				ND_PRINT(C_RESET, "Reason = The device wishes to leave the PAN");
 				break;
 			default:
-				ND_PRINT("Reason = 0x%02x", GET_U_1(p + 2));
+				ND_PRINT(C_RESET, "Reason = 0x%02x", GET_U_1(p + 2));
 				break;
 			}
 			return caplen;
@@ -1695,12 +1695,12 @@ ieee802_15_4_print_command_data(netdissect_options *ndo,
 		return 0;
 	case 0x08: /* Coordinator Realignment command */
 		if (caplen < 7 || caplen > 8) {
-			ND_PRINT("Invalid Coordinator Realignment command length");
+			ND_PRINT(C_RESET, "Invalid Coordinator Realignment command length");
 			return -1;
 		} else {
 			uint16_t channel, page;
 
-			ND_PRINT("Pan ID = 0x%04x, Coordinator short address = ",
+			ND_PRINT(C_RESET, "Pan ID = 0x%04x, Coordinator short address = ",
 				 GET_LE_U_2(p));
 			ieee802_15_4_print_addr(ndo, p + 2, 2);
 			channel = GET_U_1(p + 4);
@@ -1714,25 +1714,25 @@ ieee802_15_4_print_command_data(netdissect_options *ndo,
 				/* No page present, instead we have msb of
 				   channel in the page. */
 				channel |= (page & 0x7f) << 8;
-				ND_PRINT(", Channel Number = %d", channel);
+				ND_PRINT(C_RESET, ", Channel Number = %d", channel);
 			} else {
-				ND_PRINT(", Channel Number = %d, page = %d",
+				ND_PRINT(C_RESET, ", Channel Number = %d, page = %d",
 					 channel, page);
 			}
-			ND_PRINT(", Short address = ");
+			ND_PRINT(C_RESET, ", Short address = ");
 			ieee802_15_4_print_addr(ndo, p + 5, 2);
 			return caplen;
 		}
 		break;
 	case 0x09: /* GTS Request command */
 		if (caplen != 1) {
-			ND_PRINT("Invalid GTS Request command length");
+			ND_PRINT(C_RESET, "Invalid GTS Request command length");
 			return -1;
 		} else {
 			uint8_t gts;
 
 			gts = GET_U_1(p);
-			ND_PRINT("GTS Length = %d, %s, %s",
+			ND_PRINT(C_RESET, "GTS Length = %d, %s, %s",
 				 gts & 0xf,
 				 (CHECK_BIT(gts, 4) ?
 				  "Receive-only GTS" : "Transmit-only GTS"),
@@ -1776,9 +1776,9 @@ ieee802_15_4_print_command_data(netdissect_options *ndo,
 	case 0x0b: /* TRLE Management Response command */
 		/* XXX Not implemented */
 	default:
-		ND_PRINT("Command Data = ");
+		ND_PRINT(C_RESET, "Command Data = ");
 		for(i = 0; i < caplen; i++) {
-			ND_PRINT("%02x ", GET_U_1(p + i));
+			ND_PRINT(C_RESET, "%02x ", GET_U_1(p + i));
 		}
 		break;
 	}
@@ -1837,15 +1837,15 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 	/* Frame version. */
 	frame_version = FC_FRAME_VERSION(fc);
 	frame_type = FC_FRAME_TYPE(fc);
-	ND_PRINT("v%d ", frame_version);
+	ND_PRINT(C_RESET, "v%d ", frame_version);
 
 	if (ndo->ndo_vflag > 2) {
-		if (CHECK_BIT(fc, 3)) { ND_PRINT("Security Enabled, "); }
-		if (CHECK_BIT(fc, 4)) { ND_PRINT("Frame Pending, "); }
-		if (CHECK_BIT(fc, 5)) { ND_PRINT("AR, "); }
-		if (CHECK_BIT(fc, 6)) { ND_PRINT("PAN ID Compression, "); }
-		if (CHECK_BIT(fc, 8)) { ND_PRINT("Sequence Number Suppression, "); }
-		if (CHECK_BIT(fc, 9)) { ND_PRINT("IE present, "); }
+		if (CHECK_BIT(fc, 3)) { ND_PRINT(C_RESET, "Security Enabled, "); }
+		if (CHECK_BIT(fc, 4)) { ND_PRINT(C_RESET, "Frame Pending, "); }
+		if (CHECK_BIT(fc, 5)) { ND_PRINT(C_RESET, "AR, "); }
+		if (CHECK_BIT(fc, 6)) { ND_PRINT(C_RESET, "PAN ID Compression, "); }
+		if (CHECK_BIT(fc, 8)) { ND_PRINT(C_RESET, "Sequence Number Suppression, "); }
+		if (CHECK_BIT(fc, 9)) { ND_PRINT(C_RESET, "IE present, "); }
 	}
 
 	/* Check for the sequence number suppression. */
@@ -1854,10 +1854,10 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 		if (frame_version < 2) {
 			/* Sequence number can only be suppressed for frame
 			   version 2 or higher, this is invalid frame. */
-			ND_PRINT("[ERROR: Sequence number suppressed on frames where version < 2]");
+			ND_PRINT(C_RESET, "[ERROR: Sequence number suppressed on frames where version < 2]");
 		}
 		if (ndo->ndo_vflag)
-			ND_PRINT("seq suppressed ");
+			ND_PRINT(C_RESET, "seq suppressed ");
 		if (caplen < 2) {
 			nd_print_trunc(ndo);
 			return 0;
@@ -1867,7 +1867,7 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 	} else {
 		seq = GET_U_1(p + 2);
 		if (ndo->ndo_vflag)
-			ND_PRINT("seq %02x ", seq);
+			ND_PRINT(C_RESET, "seq %02x ", seq);
 		if (caplen < 3) {
 			nd_print_trunc(ndo);
 			return 0;
@@ -1880,11 +1880,11 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 	dst_addr_len = ieee802_15_4_addr_len((fc >> 10) & 0x3);
 	src_addr_len = ieee802_15_4_addr_len((fc >> 14) & 0x3);
 	if (src_addr_len < 0) {
-		ND_PRINT("[ERROR: Invalid src address mode]");
+		ND_PRINT(C_RESET, "[ERROR: Invalid src address mode]");
 		return 0;
 	}
 	if (dst_addr_len < 0) {
-		ND_PRINT("[ERROR: Invalid dst address mode]");
+		ND_PRINT(C_RESET, "[ERROR: Invalid dst address mode]");
 		return 0;
 	}
 	src_pan = 0;
@@ -1901,7 +1901,7 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 			if (dst_addr_len <= 0 || src_addr_len <= 0) {
 				/* Invalid frame, PAN ID Compression must be 0
 				   if only one address in the frame. */
-				ND_PRINT("[ERROR: PAN ID Compression != 0, and only one address with frame version < 2]");
+				ND_PRINT(C_RESET, "[ERROR: PAN ID Compression != 0, and only one address with frame version < 2]");
 			}
 		} else {
 			src_pan = 1;
@@ -1978,43 +1978,43 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 	/* Print dst PAN and address. */
 	if (dst_pan) {
 		if (caplen < 2) {
-			ND_PRINT("[ERROR: Truncated before dst_pan]");
+			ND_PRINT(C_RESET, "[ERROR: Truncated before dst_pan]");
 			return 0;
 		}
-		ND_PRINT("%04x:", GET_LE_U_2(p));
+		ND_PRINT(C_RESET, "%04x:", GET_LE_U_2(p));
 		p += 2;
 		caplen -= 2;
 	} else {
-		ND_PRINT("-:");
+		ND_PRINT(C_RESET, "-:");
 	}
 	if (caplen < (u_int) dst_addr_len) {
-		ND_PRINT("[ERROR: Truncated before dst_addr]");
+		ND_PRINT(C_RESET, "[ERROR: Truncated before dst_addr]");
 		return 0;
 	}
 	ieee802_15_4_print_addr(ndo, p, dst_addr_len);
 	p += dst_addr_len;
 	caplen -= dst_addr_len;
 
-	ND_PRINT(" < ");
+	ND_PRINT(C_RESET, " < ");
 
 	/* Print src PAN and address. */
 	if (src_pan) {
 		if (caplen < 2) {
-			ND_PRINT("[ERROR: Truncated before dst_pan]");
+			ND_PRINT(C_RESET, "[ERROR: Truncated before dst_pan]");
 			return 0;
 		}
-		ND_PRINT("%04x:", GET_LE_U_2(p));
+		ND_PRINT(C_RESET, "%04x:", GET_LE_U_2(p));
 		p += 2;
 		caplen -= 2;
 	} else {
-		ND_PRINT("-:");
+		ND_PRINT(C_RESET, "-:");
 	}
 	if (caplen < (u_int) src_addr_len) {
-		ND_PRINT("[ERROR: Truncated before dst_addr]");
+		ND_PRINT(C_RESET, "[ERROR: Truncated before dst_addr]");
 		return 0;
 	}
 	ieee802_15_4_print_addr(ndo, p, src_addr_len);
-	ND_PRINT(" ");
+	ND_PRINT(C_RESET, " ");
 	p += src_addr_len;
 	caplen -= src_addr_len;
 	if (CHECK_BIT(fc, 3)) {
@@ -2059,7 +2059,7 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 	/* Remove MIC */
 	if (miclen != 0) {
 		if (caplen < miclen) {
-			ND_PRINT("[ERROR: Truncated before MIC]");
+			ND_PRINT(C_RESET, "[ERROR: Truncated before MIC]");
 			return 0;
 		}
 		caplen -= miclen;
@@ -2080,7 +2080,7 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 
 	if (payload_ie_present) {
 		if (security_level >= 4) {
-			ND_PRINT("Payload IEs present, but encrypted, cannot print ");
+			ND_PRINT(C_RESET, "Payload IEs present, but encrypted, cannot print ");
 		} else {
 			len = ieee802_15_4_print_payload_ie_list(ndo, p, caplen);
 			if (len < 0) {
@@ -2093,20 +2093,20 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 
 	/* Print MIC */
 	if (ndo->ndo_vflag > 2 && miclen != 0) {
-		ND_PRINT("\n\tMIC ");
+		ND_PRINT(C_RESET, "\n\tMIC ");
 
 		for (u_int micoffset = 0; micoffset < miclen; micoffset++) {
-			ND_PRINT("%02x", GET_U_1(mic_start + micoffset));
+			ND_PRINT(C_RESET, "%02x", GET_U_1(mic_start + micoffset));
 		}
-		ND_PRINT(" ");
+		ND_PRINT(C_RESET, " ");
 	}
 
 	/* Print FCS */
 	if (ndo->ndo_vflag > 2) {
 		if (crc_check == fcs) {
-			ND_PRINT("FCS %x ", fcs);
+			ND_PRINT(C_RESET, "FCS %x ", fcs);
 		} else {
-			ND_PRINT("wrong FCS %x vs %x (assume no FCS stored) ",
+			ND_PRINT(C_RESET, "wrong FCS %x vs %x (assume no FCS stored) ",
 				 fcs, crc_check);
 		}
 	}
@@ -2116,7 +2116,7 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 	case 0x00: /* Beacon */
 		if (frame_version < 2) {
 			if (caplen < 2) {
-				ND_PRINT("[ERROR: Truncated before beacon information]");
+				ND_PRINT(C_RESET, "[ERROR: Truncated before beacon information]");
 				break;
 			} else {
 				uint16_t ss;
@@ -2128,7 +2128,7 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 
 				/* GTS */
 				if (caplen < 1) {
-					ND_PRINT("[ERROR: Truncated before GTS info]");
+					ND_PRINT(C_RESET, "[ERROR: Truncated before GTS info]");
 					break;
 				}
 
@@ -2142,7 +2142,7 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 
 				/* Pending Addresses */
 				if (caplen < 1) {
-					ND_PRINT("[ERROR: Truncated before pending addresses]");
+					ND_PRINT(C_RESET, "[ERROR: Truncated before pending addresses]");
 					break;
 				}
 				len = ieee802_15_4_print_pending_addresses(ndo, p, caplen);
@@ -2165,16 +2165,16 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 		break;
 	case 0x03: /* MAC Command */
 		if (caplen < 1) {
-			ND_PRINT("[ERROR: Truncated before Command ID]");
+			ND_PRINT(C_RESET, "[ERROR: Truncated before Command ID]");
 		} else {
 			uint8_t command_id;
 
 			command_id = GET_U_1(p);
 			if (command_id >= 0x30) {
-				ND_PRINT("Command ID = Reserved 0x%02x ",
+				ND_PRINT(C_RESET, "Command ID = Reserved 0x%02x ",
 					 command_id);
 			} else {
-				ND_PRINT("Command ID = %s ",
+				ND_PRINT(C_RESET, "Command ID = %s ",
 					 mac_c_names[command_id]);
 			}
 			p++;
@@ -2255,21 +2255,21 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 
 		/* Frame version. */
 		frame_version = FC_FRAME_VERSION(fc);
-		ND_PRINT("v%d ", frame_version);
+		ND_PRINT(C_RESET, "v%d ", frame_version);
 
 		pan_id_present = CHECK_BIT(fc, 8);
 		ie_present = CHECK_BIT(fc, 15);
 		security_enabled = CHECK_BIT(fc, 9);
 
 		if (ndo->ndo_vflag > 2) {
-			if (security_enabled) { ND_PRINT("Security Enabled, "); }
-			if (CHECK_BIT(fc, 11)) { ND_PRINT("Frame Pending, "); }
-			if (CHECK_BIT(fc, 14)) { ND_PRINT("AR, "); }
-			if (pan_id_present) { ND_PRINT("PAN ID Present, "); }
+			if (security_enabled) { ND_PRINT(C_RESET, "Security Enabled, "); }
+			if (CHECK_BIT(fc, 11)) { ND_PRINT(C_RESET, "Frame Pending, "); }
+			if (CHECK_BIT(fc, 14)) { ND_PRINT(C_RESET, "AR, "); }
+			if (pan_id_present) { ND_PRINT(C_RESET, "PAN ID Present, "); }
 			if (CHECK_BIT(fc, 10)) {
-				ND_PRINT("Sequence Number Suppression, ");
+				ND_PRINT(C_RESET, "Sequence Number Suppression, ");
 			}
-			if (ie_present) { ND_PRINT("IE present, "); }
+			if (ie_present) { ND_PRINT(C_RESET, "IE present, "); }
 		}
 
 		/* Check for the sequence number suppression. */
@@ -2284,7 +2284,7 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 		} else {
 			seq = GET_U_1(p + 2);
 			if (ndo->ndo_vflag)
-				ND_PRINT("seq %02x ", seq);
+				ND_PRINT(C_RESET, "seq %02x ", seq);
 			if (caplen < 3) {
 				nd_print_trunc(ndo);
 				return 0;
@@ -2298,51 +2298,51 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 		p += 2;
 		caplen -= 2;
 		if (ndo->ndo_vflag)
-			ND_PRINT("seq %02x ", seq);
+			ND_PRINT(C_RESET, "seq %02x ", seq);
 	}
 
 	/* See which parts of addresses we have. */
 	dst_addr_len = ieee802_15_4_addr_len((fc >> 4) & 0x3);
 	src_addr_len = ieee802_15_4_addr_len((fc >> 6) & 0x3);
 	if (src_addr_len < 0) {
-		ND_PRINT("[ERROR: Invalid src address mode]");
+		ND_PRINT(C_RESET, "[ERROR: Invalid src address mode]");
 		return 0;
 	}
 	if (dst_addr_len < 0) {
-		ND_PRINT("[ERROR: Invalid dst address mode]");
+		ND_PRINT(C_RESET, "[ERROR: Invalid dst address mode]");
 		return 0;
 	}
 
 	/* Print dst PAN and address. */
 	if (pan_id_present) {
 		if (caplen < 2) {
-			ND_PRINT("[ERROR: Truncated before dst_pan]");
+			ND_PRINT(C_RESET, "[ERROR: Truncated before dst_pan]");
 			return 0;
 		}
-		ND_PRINT("%04x:", GET_LE_U_2(p));
+		ND_PRINT(C_RESET, "%04x:", GET_LE_U_2(p));
 		p += 2;
 		caplen -= 2;
 	} else {
-		ND_PRINT("-:");
+		ND_PRINT(C_RESET, "-:");
 	}
 	if (caplen < (u_int) dst_addr_len) {
-		ND_PRINT("[ERROR: Truncated before dst_addr]");
+		ND_PRINT(C_RESET, "[ERROR: Truncated before dst_addr]");
 		return 0;
 	}
 	ieee802_15_4_print_addr(ndo, p, dst_addr_len);
 	p += dst_addr_len;
 	caplen -= dst_addr_len;
 
-	ND_PRINT(" < ");
+	ND_PRINT(C_RESET, " < ");
 
 	/* Print src PAN and address. */
-	ND_PRINT(" -:");
+	ND_PRINT(C_RESET, " -:");
 	if (caplen < (u_int) src_addr_len) {
-		ND_PRINT("[ERROR: Truncated before dst_addr]");
+		ND_PRINT(C_RESET, "[ERROR: Truncated before dst_addr]");
 		return 0;
 	}
 	ieee802_15_4_print_addr(ndo, p, src_addr_len);
-	ND_PRINT(" ");
+	ND_PRINT(C_RESET, " ");
 	p += src_addr_len;
 	caplen -= src_addr_len;
 
@@ -2381,7 +2381,7 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 	/* Remove MIC */
 	if (miclen != 0) {
 		if (caplen < miclen) {
-			ND_PRINT("[ERROR: Truncated before MIC]");
+			ND_PRINT(C_RESET, "[ERROR: Truncated before MIC]");
 			return 0;
 		}
 		caplen -= miclen;
@@ -2402,7 +2402,7 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 
 	if (payload_ie_present) {
 		if (security_level >= 4) {
-			ND_PRINT("Payload IEs present, but encrypted, cannot print ");
+			ND_PRINT(C_RESET, "Payload IEs present, but encrypted, cannot print ");
 		} else {
 			len = ieee802_15_4_print_payload_ie_list(ndo, p,
 								 caplen);
@@ -2416,21 +2416,21 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 
 	/* Print MIC */
 	if (ndo->ndo_vflag > 2 && miclen != 0) {
-		ND_PRINT("\n\tMIC ");
+		ND_PRINT(C_RESET, "\n\tMIC ");
 
 		for (u_int micoffset = 0; micoffset < miclen; micoffset++) {
-			ND_PRINT("%02x", GET_U_1(mic_start + micoffset));
+			ND_PRINT(C_RESET, "%02x", GET_U_1(mic_start + micoffset));
 		}
-		ND_PRINT(" ");
+		ND_PRINT(C_RESET, " ");
 	}
 
 
 	/* Print FCS */
 	if (ndo->ndo_vflag > 2) {
 		if (crc_check == fcs) {
-			ND_PRINT("FCS %x ", fcs);
+			ND_PRINT(C_RESET, "FCS %x ", fcs);
 		} else {
-			ND_PRINT("wrong FCS %x vs %x (assume no FCS stored) ",
+			ND_PRINT(C_RESET, "wrong FCS %x vs %x (assume no FCS stored) ",
 				 fcs, crc_check);
 		}
 	}
@@ -2485,7 +2485,7 @@ ieee802_15_4_print(netdissect_options *ndo,
 	*/
 
 	frame_type = FC_FRAME_TYPE(fc);
-	ND_PRINT("IEEE 802.15.4 %s packet ", ftypes[frame_type]);
+	ND_PRINT(C_RESET, "IEEE 802.15.4 %s packet ", ftypes[frame_type]);
 
 	switch (frame_type) {
 	case 0x00: /* Beacon */

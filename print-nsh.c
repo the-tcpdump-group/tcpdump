@@ -114,7 +114,7 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
 
     /* print Base Header and Service Path Header */
     if (len < NSH_BASE_HDR_LEN + NSH_SERVICE_PATH_HDR_LEN) {
-        ND_PRINT(" (packet length %u < %u)",
+        ND_PRINT(C_RESET, " (packet length %u < %u)",
                  len, NSH_BASE_HDR_LEN + NSH_SERVICE_PATH_HDR_LEN);
         goto invalid;
     }
@@ -126,27 +126,27 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
     md_type = NSH_MD_TYPE(basehdr);
     next_protocol = NSH_NEXT_PROT(basehdr);
 
-    ND_PRINT("NSH, ");
+    ND_PRINT(C_RESET, "NSH, ");
     if (ndo->ndo_vflag > 1) {
-        ND_PRINT("ver %u, ", ver);
+        ND_PRINT(C_RESET, "ver %u, ", ver);
     }
     if (ver != 0)
         return;
-    ND_PRINT("flags [%s], ",
+    ND_PRINT(C_RESET, "flags [%s], ",
              bittok2str_nosep(nsh_flags, "none", NSH_FLAGS(basehdr)));
     if (ndo->ndo_vflag > 2) {
-        ND_PRINT("TTL %u, ", NSH_TTL(basehdr));
-        ND_PRINT("length %u, ", length);
-        ND_PRINT("md type %s, ", tok2str(md_str, "unknown (0x%02x)", md_type));
+        ND_PRINT(C_RESET, "TTL %u, ", NSH_TTL(basehdr));
+        ND_PRINT(C_RESET, "length %u, ", length);
+        ND_PRINT(C_RESET, "md type %s, ", tok2str(md_str, "unknown (0x%02x)", md_type));
     }
     if (ndo->ndo_vflag > 1) {
-        ND_PRINT("next-protocol %s, ",
+        ND_PRINT(C_RESET, "next-protocol %s, ",
                  tok2str(np_str, "unknown (0x%02x)", next_protocol));
     }
 
     /* Make sure we have all the headers */
     if (len < length * NSH_HDR_WORD_SIZE) {
-        ND_PRINT(" (too many headers for packet length %u)", len);
+        ND_PRINT(C_RESET, " (too many headers for packet length %u)", len);
         goto invalid;
     }
 
@@ -158,9 +158,9 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
      *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
      *
      */
-    ND_PRINT("service-path-id 0x%06x, ", GET_BE_U_3(bp));
+    ND_PRINT(C_RESET, "service-path-id 0x%06x, ", GET_BE_U_3(bp));
     bp += 3;
-    ND_PRINT("service-index 0x%x", GET_U_1(bp));
+    ND_PRINT(C_RESET, "service-index 0x%x", GET_U_1(bp));
     bp += 1;
 
     /*
@@ -168,7 +168,7 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
      * That means it must be at least 2.
      */
     if (length < 2) {
-        ND_PRINT(" (less than two headers)");
+        ND_PRINT(C_RESET, " (less than two headers)");
         goto invalid;
     }
 
@@ -181,11 +181,11 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
 
         if (md_type == MD_TYPE1) {
             if (length != 6) {
-                ND_PRINT(" (invalid length for the MD type)");
+                ND_PRINT(C_RESET, " (invalid length for the MD type)");
                 goto invalid;
             }
             for (n = 0; n < length - 2; n++) {
-                ND_PRINT("\n        Context[%02u]: 0x%08x", n, GET_BE_U_4(bp));
+                ND_PRINT(C_RESET, "\n        Context[%02u]: 0x%08x", n, GET_BE_U_4(bp));
                 bp += NSH_HDR_WORD_SIZE;
             }
             past_headers = 1;
@@ -204,13 +204,13 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
                 bp += 1;
                 tlv_len_padded = roundup2(tlv_len, NSH_HDR_WORD_SIZE);
 
-                ND_PRINT("\n        TLV Class %u, Type %u, Len %u",
+                ND_PRINT(C_RESET, "\n        TLV Class %u, Type %u, Len %u",
                           tlv_class, tlv_type, tlv_len);
 
                 n += 1;
 
                 if (length - 2 < n + tlv_len_padded / NSH_HDR_WORD_SIZE) {
-                    ND_PRINT(" (length too big)");
+                    ND_PRINT(C_RESET, " (length too big)");
                     goto invalid;
                 }
 
@@ -218,9 +218,9 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
                     const char *sep = "0x";
                     u_int vn;
 
-                    ND_PRINT("\n            Value: ");
+                    ND_PRINT(C_RESET, "\n            Value: ");
                     for (vn = 0; vn < tlv_len; vn++) {
-                        ND_PRINT("%s%02x", sep, GET_U_1(bp));
+                        ND_PRINT(C_RESET, "%s%02x", sep, GET_U_1(bp));
                         bp += 1;
                         sep = ":";
                     }
@@ -237,7 +237,11 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
         ND_TCHECK_LEN(bp, (length - 2) * NSH_HDR_WORD_SIZE);
         bp += (length - 2) * NSH_HDR_WORD_SIZE;
     }
-    ND_PRINT(ndo->ndo_vflag ? "\n    " : ": ");
+
+    if(ndo->ndo_vflag)
+        ND_PRINT(C_RESET, "\n    ");
+    else
+        ND_PRINT(C_RESET, ": ");
 
     /* print Next Protocol */
     next_len = len - length * NSH_HDR_WORD_SIZE;
@@ -252,7 +256,7 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
         ether_print(ndo, bp, next_len, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL);
         break;
     default:
-        ND_PRINT("ERROR: unknown-next-protocol");
+        ND_PRINT(C_RESET, "ERROR: unknown-next-protocol");
         return;
     }
 

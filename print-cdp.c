@@ -68,9 +68,9 @@ static void
 cdp_print_string(netdissect_options *ndo,
                  const u_char *cp, const u_int len)
 {
-	ND_PRINT("'");
+	ND_PRINT(C_RESET, C_RESET "'");
 	nd_printjn(ndo, cp, len);
-	ND_PRINT("'");
+	ND_PRINT(C_RESET, C_RESET "'");
 }
 
 static void
@@ -90,7 +90,7 @@ cdp_print_power(netdissect_options *ndo,
 		val = GET_BE_U_3(cp);
 		break;
 	}
-	ND_PRINT("%1.2fW", val / 1000.0);
+	ND_PRINT(C_RESET, C_RESET "%1.2fW", val / 1000.0);
 }
 
 static void
@@ -99,7 +99,7 @@ cdp_print_capability(netdissect_options *ndo,
 {
 	uint32_t val = GET_BE_U_4(cp);
 
-	ND_PRINT("(0x%08x): %s", val,
+	ND_PRINT(C_RESET, C_RESET "(0x%08x): %s", val,
 	         bittok2str(cdp_capability_values, "none", val));
 }
 
@@ -110,12 +110,12 @@ cdp_print_version(netdissect_options *ndo,
 {
 	unsigned i;
 
-	ND_PRINT("\n\t  ");
+	ND_PRINT(C_RESET, C_RESET "\n\t  ");
 	for (i = 0; i < len; i++) {
 		u_char c = GET_U_1(cp + i);
 
 		if (c == '\n')
-			ND_PRINT("\n\t  ");
+			ND_PRINT(C_RESET, C_RESET "\n\t  ");
 		else
 			fn_print_char(ndo, c);
 	}
@@ -125,14 +125,14 @@ static void
 cdp_print_uint16(netdissect_options *ndo,
                  const u_char *cp, const u_int len _U_)
 {
-	ND_PRINT("%u", GET_BE_U_2(cp));
+	ND_PRINT(C_RESET, C_RESET "%u", GET_BE_U_2(cp));
 }
 
 static void
 cdp_print_duplex(netdissect_options *ndo,
                  const u_char *cp, const u_int len _U_)
 {
-	ND_PRINT("%s", GET_U_1(cp) ? "full": "half");
+	ND_PRINT(C_RESET, C_RESET "%s", GET_U_1(cp) ? "full": "half");
 }
 
 /* https://www.cisco.com/c/en/us/td/docs/voice_ip_comm/cata/186/2_12_m/english/release/notes/186rn21m.html
@@ -152,32 +152,32 @@ cdp_print_ata186(netdissect_options *ndo,
                  const u_char *cp, const u_int len)
 {
 	if (len == 2)
-		ND_PRINT("unknown 0x%04x", GET_BE_U_2(cp));
+		ND_PRINT(C_RESET, C_RESET "unknown 0x%04x", GET_BE_U_2(cp));
 	else
-		ND_PRINT("app %u, vlan %u", GET_U_1(cp), GET_BE_U_2(cp + 1));
+		ND_PRINT(C_RESET, C_RESET "app %u, vlan %u", GET_U_1(cp), GET_BE_U_2(cp + 1));
 }
 
 static void
 cdp_print_mtu(netdissect_options *ndo,
               const u_char *cp, const u_int len _U_)
 {
-	ND_PRINT("%u bytes", GET_BE_U_4(cp));
+	ND_PRINT(C_RESET, C_RESET "%u bytes", GET_BE_U_4(cp));
 }
 
 static void
 cdp_print_uint8x(netdissect_options *ndo,
                  const u_char *cp, const u_int len _U_)
 {
-	ND_PRINT("0x%02x", GET_U_1(cp));
+	ND_PRINT(C_RESET, C_RESET "0x%02x", GET_U_1(cp));
 }
 
 static void
 cdp_print_phys_loc(netdissect_options *ndo,
                    const u_char *cp, const u_int len)
 {
-	ND_PRINT("0x%02x", GET_U_1(cp));
+	ND_PRINT(C_RESET, C_RESET "0x%02x", GET_U_1(cp));
 	if (len > 1) {
-		ND_PRINT("/");
+		ND_PRINT(C_RESET, C_RESET "/");
 		nd_printjn(ndo, cp + 1, len - 1);
 	}
 }
@@ -240,15 +240,15 @@ cdp_print(netdissect_options *ndo,
 	ndo->ndo_protocol = "cdp";
 
 	if (length < CDP_HEADER_LEN) {
-		ND_PRINT(" (packet length %u < %u)", length, CDP_HEADER_LEN);
+		ND_PRINT(C_RESET, C_RESET " (packet length %u < %u)", length, CDP_HEADER_LEN);
 		goto invalid;
 	}
-	ND_PRINT("CDPv%u, ttl: %us",
+	ND_PRINT(C_RESET, C_RESET "CDPv%u, ttl: %us",
 	         GET_U_1(tptr + CDP_HEADER_VERSION_OFFSET),
 	         GET_U_1(tptr + CDP_HEADER_TTL_OFFSET));
 	checksum = GET_BE_U_2(tptr + CDP_HEADER_CHECKSUM_OFFSET);
 	if (ndo->ndo_vflag)
-		ND_PRINT(", checksum: 0x%04x (unverified), length %u",
+		ND_PRINT(C_RESET, C_RESET ", checksum: 0x%04x (unverified), length %u",
 		         checksum, orig_length);
 	tptr += CDP_HEADER_LEN;
 	length -= CDP_HEADER_LEN;
@@ -260,7 +260,7 @@ cdp_print(netdissect_options *ndo,
 		u_char covered = 0;
 
 		if (length < CDP_TLV_HEADER_LEN) {
-			ND_PRINT(" (remaining packet length %u < %u)",
+			ND_PRINT(C_RESET, C_RESET " (remaining packet length %u < %u)",
 			         length, CDP_TLV_HEADER_LEN);
 			goto invalid;
 		}
@@ -270,15 +270,15 @@ cdp_print(netdissect_options *ndo,
 		name = (info && info->name) ? info->name : "unknown field type";
 		if (len < CDP_TLV_HEADER_LEN) {
 			if (ndo->ndo_vflag)
-				ND_PRINT("\n\t%s (0x%02x), TLV length: %u byte%s (too short)",
+				ND_PRINT(C_RESET, C_RESET "\n\t%s (0x%02x), TLV length: %u byte%s (too short)",
 				         name, type, len, PLURAL_SUFFIX(len));
 			else
-				ND_PRINT(", %s TLV length %u too short",
+				ND_PRINT(C_RESET, C_RESET ", %s TLV length %u too short",
 				         name, len);
 			goto invalid;
 		}
 		if (len > length) {
-			ND_PRINT(" (TLV length %u > %u)", len, length);
+			ND_PRINT(C_RESET, C_RESET " (TLV length %u > %u)", len, length);
 			goto invalid;
 		}
 		tptr += CDP_TLV_HEADER_LEN;
@@ -287,15 +287,15 @@ cdp_print(netdissect_options *ndo,
 
 		/* In non-verbose mode just print Device-ID. */
 		if (!ndo->ndo_vflag && type == T_DEV_ID)
-			ND_PRINT(", Device-ID ");
+			ND_PRINT(C_RESET, C_RESET ", Device-ID ");
 		else if (ndo->ndo_vflag)
-			ND_PRINT("\n\t%s (0x%02x), value length: %u byte%s: ",
+			ND_PRINT(C_RESET, C_RESET "\n\t%s (0x%02x), value length: %u byte%s: ",
 			         name, type, len, PLURAL_SUFFIX(len));
 
 		if (info) {
 			if ((info->min_len > 0 && len < (unsigned)info->min_len) ||
 			    (info->max_len > 0 && len > (unsigned)info->max_len))
-				ND_PRINT(" (malformed TLV)");
+				ND_PRINT(C_RESET, C_RESET " (malformed TLV)");
 			else if (ndo->ndo_vflag || type == T_DEV_ID) {
 				if (info->printer)
 					info->printer(ndo, tptr, len);
@@ -317,7 +317,7 @@ cdp_print(netdissect_options *ndo,
 		length -= len;
 	}
 	if (ndo->ndo_vflag < 1)
-		ND_PRINT(", length %u", orig_length);
+		ND_PRINT(C_RESET, C_RESET ", length %u", orig_length);
 
 	return;
 invalid:
@@ -346,7 +346,7 @@ cdp_print_addr(netdissect_options *ndo,
 	};
 
 	if (l < 4) {
-		ND_PRINT(" (not enough space for num)");
+		ND_PRINT(C_RESET, C_RESET " (not enough space for num)");
 		goto invalid;
 	}
 	num = GET_BE_U_4(p);
@@ -357,7 +357,7 @@ cdp_print_addr(netdissect_options *ndo,
 		u_int pt, pl, al;
 
 		if (l < 2) {
-			ND_PRINT(" (not enough space for PT+PL)");
+			ND_PRINT(C_RESET, C_RESET " (not enough space for PT+PL)");
 			goto invalid;
 		}
 		pt = GET_U_1(p);		/* type of "protocol" field */
@@ -366,7 +366,7 @@ cdp_print_addr(netdissect_options *ndo,
 		l -= 2;
 
 		if (l < pl + 2) {
-			ND_PRINT(" (not enough space for P+AL)");
+			ND_PRINT(C_RESET, C_RESET " (not enough space for P+AL)");
 			goto invalid;
 		}
 		/* Skip the protocol for now. */
@@ -383,10 +383,10 @@ cdp_print_addr(netdissect_options *ndo,
 			l -= pl + 2;
 			/* p is just beyond al now. */
 			if (l < al) {
-				ND_PRINT(" (not enough space for A)");
+				ND_PRINT(C_RESET, C_RESET " (not enough space for A)");
 				goto invalid;
 			}
-			ND_PRINT("IPv4 (%u) %s", num, GET_IPADDR_STRING(p));
+			ND_PRINT(C_RESET, C_RESET "IPv4 (%u) %s", num, GET_IPADDR_STRING(p));
 			p += al;
 			l -= al;
 		}
@@ -402,10 +402,10 @@ cdp_print_addr(netdissect_options *ndo,
 			l -= pl + 2;
 			/* p is just beyond al now. */
 			if (l < al) {
-				ND_PRINT(" (not enough space for A)");
+				ND_PRINT(C_RESET, C_RESET " (not enough space for A)");
 				goto invalid;
 			}
-			ND_PRINT("IPv6 (%u) %s", num, GET_IP6ADDR_STRING(p));
+			ND_PRINT(C_RESET, C_RESET "IPv6 (%u) %s", num, GET_IP6ADDR_STRING(p));
 			p += al;
 			l -= al;
 		}
@@ -413,23 +413,23 @@ cdp_print_addr(netdissect_options *ndo,
 			/*
 			 * Generic case: just print raw data
 			 */
-			ND_PRINT("pt=0x%02x, pl=%u, pb=", pt, pl);
+			ND_PRINT(C_RESET, C_RESET "pt=0x%02x, pl=%u, pb=", pt, pl);
 			while (pl != 0) {
-				ND_PRINT(" %02x", GET_U_1(p));
+				ND_PRINT(C_RESET, C_RESET " %02x", GET_U_1(p));
 				p++;
 				l--;
 				pl--;
 			}
-			ND_PRINT(", al=%u, a=", al);
+			ND_PRINT(C_RESET, C_RESET ", al=%u, a=", al);
 			p += 2;
 			l -= 2;
 			/* p is just beyond al now. */
 			if (l < al) {
-				ND_PRINT(" (not enough space for A)");
+				ND_PRINT(C_RESET, C_RESET " (not enough space for A)");
 				goto invalid;
 			}
 			while (al != 0) {
-				ND_PRINT(" %02x", GET_U_1(p));
+				ND_PRINT(C_RESET, C_RESET " %02x", GET_U_1(p));
 				p++;
 				l--;
 				al--;
@@ -437,10 +437,10 @@ cdp_print_addr(netdissect_options *ndo,
 		}
 		num--;
 		if (num)
-			ND_PRINT(" ");
+			ND_PRINT(C_RESET, C_RESET " ");
 	}
 	if (l)
-		ND_PRINT(" (%u bytes of stray data)", l);
+		ND_PRINT(C_RESET, C_RESET " (%u bytes of stray data)", l);
 	return;
 
 invalid:
@@ -452,14 +452,14 @@ cdp_print_prefixes(netdissect_options *ndo,
                    const u_char * p, u_int l)
 {
 	if (l % 5) {
-		ND_PRINT(" [length %u is not a multiple of 5]", l);
+		ND_PRINT(C_RESET, C_RESET " [length %u is not a multiple of 5]", l);
 		goto invalid;
 	}
 
-	ND_PRINT(" IPv4 Prefixes (%u):", l / 5);
+	ND_PRINT(C_RESET, C_RESET " IPv4 Prefixes (%u):", l / 5);
 
 	while (l > 0) {
-		ND_PRINT(" %u.%u.%u.%u/%u",
+		ND_PRINT(C_RESET, C_RESET " %u.%u.%u.%u/%u",
 		         GET_U_1(p), GET_U_1(p + 1), GET_U_1(p + 2),
 		         GET_U_1(p + 3), GET_U_1(p + 4));
 		l -= 5;

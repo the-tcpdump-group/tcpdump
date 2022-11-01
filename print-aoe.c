@@ -147,44 +147,44 @@ aoev1_issue_print(netdissect_options *ndo,
 	if (len < AOEV1_ISSUE_ARG_LEN)
 		goto invalid;
 	/* AFlags */
-	ND_PRINT("\n\tAFlags: [%s]",
+	ND_PRINT(C_RESET, "\n\tAFlags: [%s]",
 		 bittok2str(aoev1_aflag_bitmap_str, "none", GET_U_1(cp)));
 	cp += 1;
 	len -= 1;
 	/* Err/Feature */
-	ND_PRINT(", Err/Feature: %u", GET_U_1(cp));
+	ND_PRINT(C_RESET, ", Err/Feature: %u", GET_U_1(cp));
 	cp += 1;
 	len -= 1;
 	/* Sector Count (not correlated with the length) */
-	ND_PRINT(", Sector Count: %u", GET_U_1(cp));
+	ND_PRINT(C_RESET, ", Sector Count: %u", GET_U_1(cp));
 	cp += 1;
 	len -= 1;
 	/* Cmd/Status */
-	ND_PRINT(", Cmd/Status: %u", GET_U_1(cp));
+	ND_PRINT(C_RESET, ", Cmd/Status: %u", GET_U_1(cp));
 	cp += 1;
 	len -= 1;
 	/* lba0 */
-	ND_PRINT("\n\tlba0: %u", GET_U_1(cp));
+	ND_PRINT(C_RESET, "\n\tlba0: %u", GET_U_1(cp));
 	cp += 1;
 	len -= 1;
 	/* lba1 */
-	ND_PRINT(", lba1: %u", GET_U_1(cp));
+	ND_PRINT(C_RESET, ", lba1: %u", GET_U_1(cp));
 	cp += 1;
 	len -= 1;
 	/* lba2 */
-	ND_PRINT(", lba2: %u", GET_U_1(cp));
+	ND_PRINT(C_RESET, ", lba2: %u", GET_U_1(cp));
 	cp += 1;
 	len -= 1;
 	/* lba3 */
-	ND_PRINT(", lba3: %u", GET_U_1(cp));
+	ND_PRINT(C_RESET, ", lba3: %u", GET_U_1(cp));
 	cp += 1;
 	len -= 1;
 	/* lba4 */
-	ND_PRINT(", lba4: %u", GET_U_1(cp));
+	ND_PRINT(C_RESET, ", lba4: %u", GET_U_1(cp));
 	cp += 1;
 	len -= 1;
 	/* lba5 */
-	ND_PRINT(", lba5: %u", GET_U_1(cp));
+	ND_PRINT(C_RESET, ", lba5: %u", GET_U_1(cp));
 	cp += 1;
 	len -= 1;
 	/* Reserved */
@@ -193,7 +193,7 @@ aoev1_issue_print(netdissect_options *ndo,
 	len -= 2;
 	/* Data */
 	if (len)
-		ND_PRINT("\n\tData: %u bytes", len);
+		ND_PRINT(C_RESET, "\n\tData: %u bytes", len);
 	return;
 
 invalid:
@@ -210,19 +210,19 @@ aoev1_query_print(netdissect_options *ndo,
 	if (len < AOEV1_QUERY_ARG_LEN)
 		goto invalid;
 	/* Buffer Count */
-	ND_PRINT("\n\tBuffer Count: %u", GET_BE_U_2(cp));
+	ND_PRINT(C_RESET, "\n\tBuffer Count: %u", GET_BE_U_2(cp));
 	cp += 2;
 	len -= 2;
 	/* Firmware Version */
-	ND_PRINT(", Firmware Version: %u", GET_BE_U_2(cp));
+	ND_PRINT(C_RESET, ", Firmware Version: %u", GET_BE_U_2(cp));
 	cp += 2;
 	len -= 2;
 	/* Sector Count */
-	ND_PRINT(", Sector Count: %u", GET_U_1(cp));
+	ND_PRINT(C_RESET, ", Sector Count: %u", GET_U_1(cp));
 	cp += 1;
 	len -= 1;
 	/* AoE/CCmd */
-	ND_PRINT(", AoE: %u, CCmd: %s", (GET_U_1(cp) & 0xF0) >> 4,
+	ND_PRINT(C_RESET, ", AoE: %u, CCmd: %s", (GET_U_1(cp) & 0xF0) >> 4,
 	          tok2str(aoev1_ccmd_str, "Unknown (0x02x)", GET_U_1(cp) & 0x0F));
 	cp += 1;
 	len -= 1;
@@ -234,7 +234,7 @@ aoev1_query_print(netdissect_options *ndo,
 		goto invalid;
 	/* Config String */
 	if (cslen) {
-		ND_PRINT("\n\tConfig String (length %u): ", cslen);
+		ND_PRINT(C_RESET, "\n\tConfig String (length %u): ", cslen);
 		nd_printjn(ndo, cp, cslen);
 	}
 	return;
@@ -256,12 +256,12 @@ aoev1_mac_print(netdissect_options *ndo,
 	cp += 1;
 	len -= 1;
 	/* MCmd */
-	ND_PRINT("\n\tMCmd: %s",
+	ND_PRINT(C_RESET, "\n\tMCmd: %s",
 		 tok2str(aoev1_mcmd_str, "Unknown (0x%02x)", GET_U_1(cp)));
 	cp += 1;
 	len -= 1;
 	/* MError */
-	ND_PRINT(", MError: %s",
+	ND_PRINT(C_RESET, ", MError: %s",
 		 tok2str(aoev1_merror_str, "Unknown (0x%02x)", GET_U_1(cp)));
 	cp += 1;
 	len -= 1;
@@ -269,7 +269,7 @@ aoev1_mac_print(netdissect_options *ndo,
 	dircount = GET_U_1(cp);
 	cp += 1;
 	len -= 1;
-	ND_PRINT(", Dir Count: %u", dircount);
+	ND_PRINT(C_RESET, ", Dir Count: %u", dircount);
 	if (dircount * 8U > len)
 		goto invalid;
 	/* directives */
@@ -278,12 +278,12 @@ aoev1_mac_print(netdissect_options *ndo,
 		cp += 1;
 		len -= 1;
 		/* DCmd */
-		ND_PRINT("\n\t DCmd: %s",
+		ND_PRINT(C_RESET, "\n\t DCmd: %s",
 			 tok2str(aoev1_dcmd_str, "Unknown (0x%02x)", GET_U_1(cp)));
 		cp += 1;
 		len -= 1;
 		/* Ethernet Address */
-		ND_PRINT(", Ethernet Address: %s", GET_ETHERADDR_STRING(cp));
+		ND_PRINT(C_RESET, ", Ethernet Address: %s", GET_ETHERADDR_STRING(cp));
 		cp += MAC_ADDR_LEN;
 		len -= MAC_ADDR_LEN;
 	}
@@ -303,7 +303,7 @@ aoev1_reserve_print(netdissect_options *ndo,
 	if (len < AOEV1_RESERVE_ARG_LEN || (len - AOEV1_RESERVE_ARG_LEN) % MAC_ADDR_LEN)
 		goto invalid;
 	/* RCmd */
-	ND_PRINT("\n\tRCmd: %s",
+	ND_PRINT(C_RESET, "\n\tRCmd: %s",
 		 tok2str(aoev1_rcmd_str, "Unknown (0x%02x)", GET_U_1(cp)));
 	cp += 1;
 	len -= 1;
@@ -311,12 +311,12 @@ aoev1_reserve_print(netdissect_options *ndo,
 	nmacs = GET_U_1(cp);
 	cp += 1;
 	len -= 1;
-	ND_PRINT(", NMacs: %u", nmacs);
+	ND_PRINT(C_RESET, ", NMacs: %u", nmacs);
 	if (nmacs * MAC_ADDR_LEN != len)
 		goto invalid;
 	/* addresses */
 	for (i = 0; i < nmacs; i++) {
-		ND_PRINT("\n\tEthernet Address %u: %s", i, GET_ETHERADDR_STRING(cp));
+		ND_PRINT(C_RESET, "\n\tEthernet Address %u: %s", i, GET_ETHERADDR_STRING(cp));
 		cp += MAC_ADDR_LEN;
 		len -= MAC_ADDR_LEN;
 	}
@@ -339,32 +339,32 @@ aoev1_print(netdissect_options *ndo,
 		goto invalid;
 	/* Flags */
 	flags = GET_U_1(cp) & 0x0F;
-	ND_PRINT(", Flags: [%s]", bittok2str(aoev1_flag_str, "none", flags));
+	ND_PRINT(C_RESET, ", Flags: [%s]", bittok2str(aoev1_flag_str, "none", flags));
 	cp += 1;
 	len -= 1;
 	if (! ndo->ndo_vflag)
 		return;
 	/* Error */
 	if (flags & AOEV1_FLAG_E)
-		ND_PRINT("\n\tError: %s",
+		ND_PRINT(C_RESET, "\n\tError: %s",
 			 tok2str(aoev1_errcode_str, "Invalid (%u)", GET_U_1(cp)));
 	cp += 1;
 	len -= 1;
 	/* Major */
-	ND_PRINT("\n\tMajor: 0x%04x", GET_BE_U_2(cp));
+	ND_PRINT(C_RESET, "\n\tMajor: 0x%04x", GET_BE_U_2(cp));
 	cp += 2;
 	len -= 2;
 	/* Minor */
-	ND_PRINT(", Minor: 0x%02x", GET_U_1(cp));
+	ND_PRINT(C_RESET, ", Minor: 0x%02x", GET_U_1(cp));
 	cp += 1;
 	len -= 1;
 	/* Command */
 	command = GET_U_1(cp);
 	cp += 1;
 	len -= 1;
-	ND_PRINT(", Command: %s", tok2str(cmdcode_str, "Unknown (0x%02x)", command));
+	ND_PRINT(C_RESET, ", Command: %s", tok2str(cmdcode_str, "Unknown (0x%02x)", command));
 	/* Tag */
-	ND_PRINT(", Tag: 0x%08x", GET_BE_U_4(cp));
+	ND_PRINT(C_RESET, ", Tag: 0x%08x", GET_BE_U_4(cp));
 	cp += 4;
 	len -= 4;
 	/* Arg */
@@ -390,14 +390,14 @@ aoe_print(netdissect_options *ndo,
 	uint8_t ver;
 
 	ndo->ndo_protocol = "aoe";
-	ND_PRINT("AoE length %u", len);
+	ND_PRINT(C_RESET, "AoE length %u", len);
 
 	if (len < 1)
 		goto invalid;
 	/* Ver/Flags */
 	ver = (GET_U_1(cp) & 0xF0) >> 4;
 	/* Don't advance cp yet: low order 4 bits are version-specific. */
-	ND_PRINT(", Ver %u", ver);
+	ND_PRINT(C_RESET, ", Ver %u", ver);
 
 	switch (ver) {
 		case AOE_V1:

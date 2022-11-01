@@ -48,11 +48,11 @@ dtp_print(netdissect_options *ndo, const u_char *tptr, u_int length)
 {
     ndo->ndo_protocol = "dtp";
     if (length < DTP_HEADER_LEN) {
-        ND_PRINT("[zero packet length]");
+        ND_PRINT(C_RESET, "[zero packet length]");
         goto invalid;
     }
 
-    ND_PRINT("DTPv%u, length %u",
+    ND_PRINT(C_RESET, "DTPv%u, length %u",
            GET_U_1(tptr),
            length);
 
@@ -70,7 +70,7 @@ dtp_print(netdissect_options *ndo, const u_char *tptr, u_int length)
         uint16_t type, len;
 
         if (length < 4) {
-            ND_PRINT("[%u bytes remaining]", length);
+            ND_PRINT(C_RESET, "[%u bytes remaining]", length);
             goto invalid;
         }
 	type = GET_BE_U_2(tptr);
@@ -78,19 +78,19 @@ dtp_print(netdissect_options *ndo, const u_char *tptr, u_int length)
        /* XXX: should not be but sometimes it is, see the test captures */
         if (type == 0)
             return;
-        ND_PRINT("\n\t%s (0x%04x) TLV, length %u",
+        ND_PRINT(C_RESET, "\n\t%s (0x%04x) TLV, length %u",
                tok2str(dtp_tlv_values, "Unknown", type),
                type, len);
 
         /* infinite loop check */
         if (len < 4 || len > length) {
-            ND_PRINT("[invalid TLV length %u]", len);
+            ND_PRINT(C_RESET, "[invalid TLV length %u]", len);
             goto invalid;
         }
 
         switch (type) {
 	case DTP_DOMAIN_TLV:
-		ND_PRINT(", ");
+		ND_PRINT(C_RESET, ", ");
 		nd_printjnp(ndo, tptr+4, len-4);
 		break;
 
@@ -98,13 +98,13 @@ dtp_print(netdissect_options *ndo, const u_char *tptr, u_int length)
 	case DTP_DTP_TYPE_TLV:
                 if (len != 5)
                     goto invalid;
-                ND_PRINT(", 0x%x", GET_U_1(tptr + 4));
+                ND_PRINT(C_RESET, ", 0x%x", GET_U_1(tptr + 4));
                 break;
 
 	case DTP_NEIGHBOR_TLV:
                 if (len != 10)
                     goto invalid;
-                ND_PRINT(", %s", GET_ETHERADDR_STRING(tptr+4));
+                ND_PRINT(C_RESET, ", %s", GET_ETHERADDR_STRING(tptr+4));
                 break;
 
         default:

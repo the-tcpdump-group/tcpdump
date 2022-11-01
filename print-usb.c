@@ -194,48 +194,48 @@ usb_header_print(netdissect_options *ndo, const pcap_usb_header *uh)
 	if (ndo->ndo_qflag)
 		return;
 
-	ND_PRINT(" ");
+	ND_PRINT(C_RESET, " ");
 	transfer_type = GET_U_1(uh->transfer_type);
 	switch(transfer_type)
 	{
 		case URB_ISOCHRONOUS:
-			ND_PRINT("ISOCHRONOUS");
+			ND_PRINT(C_RESET, "ISOCHRONOUS");
 			break;
 		case URB_INTERRUPT:
-			ND_PRINT("INTERRUPT");
+			ND_PRINT(C_RESET, "INTERRUPT");
 			break;
 		case URB_CONTROL:
-			ND_PRINT("CONTROL");
+			ND_PRINT(C_RESET, "CONTROL");
 			break;
 		case URB_BULK:
-			ND_PRINT("BULK");
+			ND_PRINT(C_RESET, "BULK");
 			break;
 		default:
-			ND_PRINT(" ?");
+			ND_PRINT(C_RESET, " ?");
 	}
 
 	event_type = GET_U_1(uh->event_type);
 	switch(event_type)
 	{
 		case URB_SUBMIT:
-			ND_PRINT(" SUBMIT");
+			ND_PRINT(C_RESET, " SUBMIT");
 			break;
 		case URB_COMPLETE:
-			ND_PRINT(" COMPLETE");
+			ND_PRINT(C_RESET, " COMPLETE");
 			break;
 		case URB_ERROR:
-			ND_PRINT(" ERROR");
+			ND_PRINT(C_RESET, " ERROR");
 			break;
 		default:
-			ND_PRINT(" ?");
+			ND_PRINT(C_RESET, " ?");
 	}
 
 	direction = get_direction(transfer_type, event_type);
 	if(direction == 1)
-		ND_PRINT(" from");
+		ND_PRINT(C_RESET, " from");
 	else if(direction == 2)
-		ND_PRINT(" to");
-	ND_PRINT(" %u:%u:%u", GET_HE_U_2(uh->bus_id),
+		ND_PRINT(C_RESET, " to");
+	ND_PRINT(C_RESET, " %u:%u:%u", GET_HE_U_2(uh->bus_id),
 		 GET_U_1(uh->device_address),
 		 GET_U_1(uh->endpoint_number) & 0x7f);
 }

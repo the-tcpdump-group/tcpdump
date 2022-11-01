@@ -73,17 +73,17 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		if (length < sizeof(label_entry))
 			goto invalid;
 		label_entry = GET_BE_U_4(p);
-		ND_PRINT("%s(label %u",
+		ND_PRINT(C_RESET, "%s(label %u",
 		       (label_stack_depth && ndo->ndo_vflag) ? "\n\t" : " ",
        		       MPLS_LABEL(label_entry));
 		label_stack_depth++;
 		if (ndo->ndo_vflag &&
 		    MPLS_LABEL(label_entry) < sizeof(mpls_labelname) / sizeof(mpls_labelname[0]))
-			ND_PRINT(" (%s)", mpls_labelname[MPLS_LABEL(label_entry)]);
-		ND_PRINT(", tc %u", MPLS_TC(label_entry));
+			ND_PRINT(C_RESET, " (%s)", mpls_labelname[MPLS_LABEL(label_entry)]);
+		ND_PRINT(C_RESET, ", tc %u", MPLS_TC(label_entry));
 		if (MPLS_STACK(label_entry))
-			ND_PRINT(", [S]");
-		ND_PRINT(", ttl %u)", MPLS_TTL(label_entry));
+			ND_PRINT(C_RESET, ", [S]");
+		ND_PRINT(C_RESET, ", ttl %u)", MPLS_TTL(label_entry));
 
 		p += sizeof(label_entry);
 		length -= sizeof(label_entry);
@@ -152,17 +152,29 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		break;
 
 	case PT_IPV4:
-		ND_PRINT(ndo->ndo_vflag ? "\n\t" : " ");
+		if(ndo->ndo_vflag)
+			ND_PRINT(C_RESET, "\n\t");
+		else
+			ND_PRINT(C_RESET, " ");
+		
 		ip_print(ndo, p, length);
 		break;
 
 	case PT_IPV6:
-		ND_PRINT(ndo->ndo_vflag ? "\n\t" : " ");
+		if(ndo->ndo_vflag)
+			ND_PRINT(C_RESET, "\n\t");
+		else
+			ND_PRINT(C_RESET, " ");
+
 		ip6_print(ndo, p, length);
 		break;
 
 	case PT_OSI:
-		ND_PRINT(ndo->ndo_vflag ? "\n\t" : " ");
+		if(ndo->ndo_vflag)
+			ND_PRINT(C_RESET, "\n\t");
+		else
+			ND_PRINT(C_RESET, " ");
+
 		isoclns_print(ndo, p, length);
 		break;
 	}

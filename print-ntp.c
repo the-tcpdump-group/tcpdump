@@ -238,27 +238,27 @@ ntp_time_print(netdissect_options *ndo,
 		goto invalid;
 
 	stratum = GET_U_1(bp->stratum);
-	ND_PRINT(", Stratum %u (%s)",
+	ND_PRINT(C_RESET, C_RESET ", Stratum %u (%s)",
 		stratum,
 		tok2str(ntp_stratum_values, (stratum >=2 && stratum<=15) ? "secondary reference" : "reserved", stratum));
 
-	ND_PRINT(", poll %d", GET_S_1(bp->ppoll));
+	ND_PRINT(C_RESET, C_RESET ", poll %d", GET_S_1(bp->ppoll));
 	p_poll(ndo, GET_S_1(bp->ppoll));
 
-	ND_PRINT(", precision %d", GET_S_1(bp->precision));
+	ND_PRINT(C_RESET, C_RESET ", precision %d", GET_S_1(bp->precision));
 
-	ND_PRINT("\n\tRoot Delay: ");
+	ND_PRINT(C_RESET, C_RESET "\n\tRoot Delay: ");
 	p_sfix(ndo, &bp->root_delay);
 
-	ND_PRINT(", Root dispersion: ");
+	ND_PRINT(C_RESET, C_RESET ", Root dispersion: ");
 	p_sfix(ndo, &bp->root_dispersion);
 
-	ND_PRINT(", Reference-ID: ");
+	ND_PRINT(C_RESET, C_RESET ", Reference-ID: ");
 	/* Interpretation depends on stratum */
 	switch (stratum) {
 
 	case UNSPECIFIED:
-		ND_PRINT("(unspec)");
+		ND_PRINT(C_RESET, C_RESET "(unspec)");
 		ND_TCHECK_4(bp->refid);
 		break;
 
@@ -267,60 +267,60 @@ ntp_time_print(netdissect_options *ndo,
 		break;
 
 	case INFO_QUERY:
-		ND_PRINT("%s INFO_QUERY", GET_IPADDR_STRING(bp->refid));
+		ND_PRINT(C_RESET, C_RESET "%s INFO_QUERY", GET_IPADDR_STRING(bp->refid));
 		/* this doesn't have more content */
 		return;
 
 	case INFO_REPLY:
-		ND_PRINT("%s INFO_REPLY", GET_IPADDR_STRING(bp->refid));
+		ND_PRINT(C_RESET, C_RESET "%s INFO_REPLY", GET_IPADDR_STRING(bp->refid));
 		/* this is too complex to be worth printing */
 		return;
 
 	default:
 		/* In NTPv4 (RFC 5905) refid is an IPv4 address or first 32 bits of
 		   MD5 sum of IPv6 address */
-		ND_PRINT("0x%08x", GET_BE_U_4(bp->refid));
+		ND_PRINT(C_RESET, C_RESET "0x%08x", GET_BE_U_4(bp->refid));
 		break;
 	}
 
-	ND_PRINT("\n\t  Reference Timestamp:  ");
+	ND_PRINT(C_RESET, C_RESET "\n\t  Reference Timestamp:  ");
 	p_ntp_time(ndo, &(bp->ref_timestamp));
 
-	ND_PRINT("\n\t  Originator Timestamp: ");
+	ND_PRINT(C_RESET, C_RESET "\n\t  Originator Timestamp: ");
 	p_ntp_time(ndo, &(bp->org_timestamp));
 
-	ND_PRINT("\n\t  Receive Timestamp:    ");
+	ND_PRINT(C_RESET, C_RESET "\n\t  Receive Timestamp:    ");
 	p_ntp_time(ndo, &(bp->rec_timestamp));
 
-	ND_PRINT("\n\t  Transmit Timestamp:   ");
+	ND_PRINT(C_RESET, C_RESET "\n\t  Transmit Timestamp:   ");
 	p_ntp_time(ndo, &(bp->xmt_timestamp));
 
-	ND_PRINT("\n\t    Originator - Receive Timestamp:  ");
+	ND_PRINT(C_RESET, C_RESET "\n\t    Originator - Receive Timestamp:  ");
 	p_ntp_delta(ndo, &(bp->org_timestamp), &(bp->rec_timestamp));
 
-	ND_PRINT("\n\t    Originator - Transmit Timestamp: ");
+	ND_PRINT(C_RESET, C_RESET "\n\t    Originator - Transmit Timestamp: ");
 	p_ntp_delta(ndo, &(bp->org_timestamp), &(bp->xmt_timestamp));
 
 	/* FIXME: this code is not aware of any extension fields */
 	if (length == NTP_TIMEMSG_MINLEN + 4) { 	/* Optional: key-id (crypto-NAK) */
-		ND_PRINT("\n\tKey id: %u", GET_BE_U_4(bp->key_id));
+		ND_PRINT(C_RESET, C_RESET "\n\tKey id: %u", GET_BE_U_4(bp->key_id));
 	} else if (length == NTP_TIMEMSG_MINLEN + 4 + 16) { 	/* Optional: key-id + 128-bit digest */
-		ND_PRINT("\n\tKey id: %u", GET_BE_U_4(bp->key_id));
-		ND_PRINT("\n\tAuthentication: %08x%08x%08x%08x",
+		ND_PRINT(C_RESET, C_RESET "\n\tKey id: %u", GET_BE_U_4(bp->key_id));
+		ND_PRINT(C_RESET, C_RESET "\n\tAuthentication: %08x%08x%08x%08x",
 			 GET_BE_U_4(bp->message_digest),
 			 GET_BE_U_4(bp->message_digest + 4),
 			 GET_BE_U_4(bp->message_digest + 8),
 			 GET_BE_U_4(bp->message_digest + 12));
 	} else if (length == NTP_TIMEMSG_MINLEN + 4 + 20) { 	/* Optional: key-id + 160-bit digest */
-		ND_PRINT("\n\tKey id: %u", GET_BE_U_4(bp->key_id));
-		ND_PRINT("\n\tAuthentication: %08x%08x%08x%08x%08x",
+		ND_PRINT(C_RESET, C_RESET "\n\tKey id: %u", GET_BE_U_4(bp->key_id));
+		ND_PRINT(C_RESET, C_RESET "\n\tAuthentication: %08x%08x%08x%08x%08x",
 			 GET_BE_U_4(bp->message_digest),
 			 GET_BE_U_4(bp->message_digest + 4),
 			 GET_BE_U_4(bp->message_digest + 8),
 			 GET_BE_U_4(bp->message_digest + 12),
 			 GET_BE_U_4(bp->message_digest + 16));
 	} else if (length > NTP_TIMEMSG_MINLEN) {
-		ND_PRINT("\n\t(%u more bytes after the header)", length - NTP_TIMEMSG_MINLEN);
+		ND_PRINT(C_RESET, C_RESET "\n\t(%u more bytes after the header)", length - NTP_TIMEMSG_MINLEN);
 	}
 	return;
 
@@ -347,30 +347,30 @@ ntp_control_print(netdissect_options *ndo,
 	E = (control & 0x40) != 0;
 	M = (control & 0x20) != 0;
 	opcode = control & 0x1f;
-	ND_PRINT(", %s, %s, %s, OpCode=%u\n",
+	ND_PRINT(C_RESET, C_RESET ", %s, %s, %s, OpCode=%u\n",
 		  R ? "Response" : "Request", E ? "Error" : "OK",
 		  M ? "More" : "Last", opcode);
 
 	sequence = GET_BE_U_2(cd->sequence);
-	ND_PRINT("\tSequence=%hu", sequence);
+	ND_PRINT(C_RESET, C_RESET "\tSequence=%hu", sequence);
 
 	status = GET_BE_U_2(cd->status);
-	ND_PRINT(", Status=%#hx", status);
+	ND_PRINT(C_RESET, C_RESET ", Status=%#hx", status);
 
 	assoc = GET_BE_U_2(cd->assoc);
-	ND_PRINT(", Assoc.=%hu", assoc);
+	ND_PRINT(C_RESET, C_RESET ", Assoc.=%hu", assoc);
 
 	offset = GET_BE_U_2(cd->offset);
-	ND_PRINT(", Offset=%hu", offset);
+	ND_PRINT(C_RESET, C_RESET ", Offset=%hu", offset);
 
 	count = GET_BE_U_2(cd->count);
-	ND_PRINT(", Count=%hu", count);
+	ND_PRINT(C_RESET, C_RESET ", Count=%hu", count);
 
 	if (NTP_CTRLMSG_MINLEN + count > length)
 		goto invalid;
 	if (count != 0) {
 		ND_TCHECK_LEN(cd->data, count);
-		ND_PRINT("\n\tTO-BE-DONE: data not interpreted");
+		ND_PRINT(C_RESET, C_RESET "\n\tTO-BE-DONE: data not interpreted");
 	}
 	return;
 
@@ -399,22 +399,22 @@ ntp_print(netdissect_options *ndo,
 	status = GET_U_1(bp->td.status);
 
 	version = (status & VERSIONMASK) >> VERSIONSHIFT;
-	ND_PRINT("NTPv%u", version);
+	ND_PRINT(C_RESET, C_RESET "NTPv%u", version);
 
 	mode = (status & MODEMASK) >> MODESHIFT;
 	if (!ndo->ndo_vflag) {
-		ND_PRINT(", %s, length %u",
+		ND_PRINT(C_RESET, C_RESET ", %s, length %u",
 			 tok2str(ntp_mode_values, "Unknown mode", mode),
 			 length);
 		return;
 	}
 
-	ND_PRINT(", %s, length %u\n",
+	ND_PRINT(C_RESET, C_RESET ", %s, length %u\n",
 		  tok2str(ntp_mode_values, "Unknown mode", mode), length);
 
 	/* leapind = (status & LEAPMASK) >> LEAPSHIFT; */
 	leapind = (status & LEAPMASK);
-	ND_PRINT("\tLeap indicator: %s (%u)",
+	ND_PRINT(C_RESET, C_RESET "\tLeap indicator: %s (%u)",
 		 tok2str(ntp_leapind_values, "Unknown", leapind),
 		 leapind);
 
@@ -450,7 +450,7 @@ p_sfix(netdissect_options *ndo,
 	f = GET_BE_U_2(sfp->fraction);
 	ff = f / 65536.0;		/* shift radix point by 16 bits */
 	f = (int)(ff * 1000000.0);	/* Treat fraction as parts per million */
-	ND_PRINT("%d.%06d", i, f);
+	ND_PRINT(C_RESET, C_RESET "%d.%06d", i, f);
 }
 
 /* Prints time difference between *lfp and *olfp */
@@ -503,7 +503,7 @@ p_ntp_delta(netdissect_options *ndo,
 		ff += FMAXINT;
 	ff = ff / FMAXINT;			/* shift radix point by 32 bits */
 	f = (uint32_t)(ff * 1000000000.0);	/* treat fraction as parts per billion */
-	ND_PRINT("%s%u.%09u", signbit ? "-" : "+", i, f);
+	ND_PRINT(C_RESET, C_RESET "%s%u.%09u", signbit ? "-" : "+", i, f);
 }
 
 /* Prints polling interval in log2 as seconds or fraction of second */
@@ -515,8 +515,8 @@ p_poll(netdissect_options *ndo,
 		return;
 
 	if (poll_interval >= 0)
-		ND_PRINT(" (%us)", 1U << poll_interval);
+		ND_PRINT(C_RESET, C_RESET " (%us)", 1U << poll_interval);
 	else
-		ND_PRINT(" (1/%us)", 1U << -poll_interval);
+		ND_PRINT(C_RESET, C_RESET " (1/%us)", 1U << -poll_interval);
 }
 

@@ -133,7 +133,7 @@ vtp_print(netdissect_options *ndo,
     ND_TCHECK_LEN(tptr, VTP_HEADER_LEN);
 
     type = GET_U_1(tptr + 1);
-    ND_PRINT("VTPv%u, Message %s (0x%02x), length %u",
+    ND_PRINT(C_RESET, "VTPv%u, Message %s (0x%02x), length %u",
 	   GET_U_1(tptr),
 	   tok2str(vtp_message_type_values,"Unknown message type", type),
 	   type,
@@ -145,14 +145,14 @@ vtp_print(netdissect_options *ndo,
     }
 
     /* verbose mode print all fields */
-    ND_PRINT("\n\tDomain name: ");
+    ND_PRINT(C_RESET, "\n\tDomain name: ");
     mgmtd_len = GET_U_1(tptr + 3);
     if (mgmtd_len < 1 ||  mgmtd_len > VTP_DOMAIN_NAME_LEN) {
-	ND_PRINT(" [invalid MgmtD Len %u]", mgmtd_len);
+	ND_PRINT(C_RESET, " [invalid MgmtD Len %u]", mgmtd_len);
 	goto invalid;
     }
     nd_printjnp(ndo, tptr + 4, mgmtd_len);
-    ND_PRINT(", %s: %u",
+    ND_PRINT(C_RESET, ", %s: %u",
 	   tok2str(vtp_header_values, "Unknown", type),
 	   GET_U_1(tptr + 2));
 
@@ -182,16 +182,16 @@ vtp_print(netdissect_options *ndo,
 	 *
 	 */
 
-	ND_PRINT("\n\t  Config Rev %x, Updater %s",
+	ND_PRINT(C_RESET, "\n\t  Config Rev %x, Updater %s",
 	       GET_BE_U_4(tptr),
 	       GET_IPADDR_STRING(tptr+4));
 	tptr += 8;
-	ND_PRINT(", Timestamp 0x%08x 0x%08x 0x%08x",
+	ND_PRINT(C_RESET, ", Timestamp 0x%08x 0x%08x 0x%08x",
 	       GET_BE_U_4(tptr),
 	       GET_BE_U_4(tptr + 4),
 	       GET_BE_U_4(tptr + 8));
 	tptr += VTP_UPDATE_TIMESTAMP_LEN;
-	ND_PRINT(", MD5 digest: %08x%08x%08x%08x",
+	ND_PRINT(C_RESET, ", MD5 digest: %08x%08x%08x%08x",
 	       GET_BE_U_4(tptr),
 	       GET_BE_U_4(tptr + 4),
 	       GET_BE_U_4(tptr + 8),
@@ -221,7 +221,7 @@ vtp_print(netdissect_options *ndo,
 	 *
 	 */
 
-	ND_PRINT(", Config Rev %x", GET_BE_U_4(tptr));
+	ND_PRINT(C_RESET, ", Config Rev %x", GET_BE_U_4(tptr));
 
 	/*
 	 *  VLAN INFORMATION
@@ -250,7 +250,7 @@ vtp_print(netdissect_options *ndo,
 	    vtp_vlan = (const struct vtp_vlan_*)tptr;
 	    if (len < VTP_VLAN_INFO_FIXED_PART_LEN)
 		goto invalid;
-	    ND_PRINT("\n\tVLAN info status %s, type %s, VLAN-id %u, MTU %u, SAID 0x%08x, Name ",
+	    ND_PRINT(C_RESET, "\n\tVLAN info status %s, type %s, VLAN-id %u, MTU %u, SAID 0x%08x, Name ",
 		   tok2str(vtp_vlan_status,"Unknown",GET_U_1(vtp_vlan->status)),
 		   tok2str(vtp_vlan_type_values,"Unknown",GET_U_1(vtp_vlan->type)),
 		   GET_BE_U_2(vtp_vlan->vlanid),
@@ -285,12 +285,12 @@ vtp_print(netdissect_options *ndo,
                 type = GET_U_1(tptr);
                 tlv_len = GET_U_1(tptr + 1);
 
-                ND_PRINT("\n\t\t%s (0x%04x) TLV",
+                ND_PRINT(C_RESET, "\n\t\t%s (0x%04x) TLV",
                        tok2str(vtp_vlan_tlv_values, "Unknown", type),
                        type);
 
                 if (len < tlv_len * 2 + 2) {
-                    ND_PRINT(" (TLV goes past the end of the packet)");
+                    ND_PRINT(C_RESET, " (TLV goes past the end of the packet)");
                     goto invalid;
                 }
                 ND_TCHECK_LEN(tptr, tlv_len * 2 + 2);
@@ -300,36 +300,36 @@ vtp_print(netdissect_options *ndo,
                  * in units of 16-bit words.
                  */
                 if (tlv_len != 1) {
-                    ND_PRINT(" (invalid TLV length %u != 1)", tlv_len);
+                    ND_PRINT(C_RESET, " (invalid TLV length %u != 1)", tlv_len);
                     goto invalid;
                 } else {
                     tlv_value = GET_BE_U_2(tptr + 2);
 
                     switch (type) {
                     case VTP_VLAN_STE_HOP_COUNT:
-                        ND_PRINT(", %u", tlv_value);
+                        ND_PRINT(C_RESET, ", %u", tlv_value);
                         break;
 
                     case VTP_VLAN_PRUNING:
-                        ND_PRINT(", %s (%u)",
+                        ND_PRINT(C_RESET, ", %s (%u)",
                                tlv_value == 1 ? "Enabled" : "Disabled",
                                tlv_value);
                         break;
 
                     case VTP_VLAN_STP_TYPE:
-                        ND_PRINT(", %s (%u)",
+                        ND_PRINT(C_RESET, ", %s (%u)",
                                tok2str(vtp_stp_type_values, "Unknown", tlv_value),
                                tlv_value);
                         break;
 
                     case VTP_VLAN_BRIDGE_TYPE:
-                        ND_PRINT(", %s (%u)",
+                        ND_PRINT(C_RESET, ", %s (%u)",
                                tlv_value == 1 ? "SRB" : "SRT",
                                tlv_value);
                         break;
 
                     case VTP_VLAN_BACKUP_CRF_MODE:
-                        ND_PRINT(", %s (%u)",
+                        ND_PRINT(C_RESET, ", %s (%u)",
                                tlv_value == 1 ? "Backup" : "Not backup",
                                tlv_value);
                         break;
@@ -371,7 +371,7 @@ vtp_print(netdissect_options *ndo,
 	 *
 	 */
 
-	ND_PRINT("\n\tStart value: %u", GET_BE_U_4(tptr));
+	ND_PRINT(C_RESET, "\n\tStart value: %u", GET_BE_U_4(tptr));
 	break;
 
     case VTP_JOIN_MESSAGE:

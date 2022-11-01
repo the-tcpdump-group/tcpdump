@@ -92,31 +92,31 @@ vjc_print(netdissect_options *ndo, const u_char *bp, u_short proto _U_)
 	switch (GET_U_1(bp) & 0xf0) {
 	case TYPE_IP:
 		if (ndo->ndo_eflag)
-			ND_PRINT("(vjc type=IP) ");
+			ND_PRINT(C_RESET, "(vjc type=IP) ");
 		return PPP_IP;
 	case TYPE_UNCOMPRESSED_TCP:
 		if (ndo->ndo_eflag)
-			ND_PRINT("(vjc type=raw TCP) ");
+			ND_PRINT(C_RESET, "(vjc type=raw TCP) ");
 		return PPP_IP;
 	case TYPE_COMPRESSED_TCP:
 		if (ndo->ndo_eflag)
-			ND_PRINT("(vjc type=compressed TCP) ");
+			ND_PRINT(C_RESET, "(vjc type=compressed TCP) ");
 		for (i = 0; i < 8; i++) {
 			if (GET_U_1(bp + 1) & (0x80 >> i))
-				ND_PRINT("%c", "?CI?SAWU"[i]);
+				ND_PRINT(C_RESET, "%c", "?CI?SAWU"[i]);
 		}
 		if (GET_U_1(bp + 1))
-			ND_PRINT(" ");
-		ND_PRINT("C=0x%02x ", GET_U_1(bp + 2));
-		ND_PRINT("sum=0x%04x ", GET_HE_U_2(bp + 3));
+			ND_PRINT(C_RESET, " ");
+		ND_PRINT(C_RESET, "C=0x%02x ", GET_U_1(bp + 2));
+		ND_PRINT(C_RESET, "sum=0x%04x ", GET_HE_U_2(bp + 3));
 		return -1;
 	case TYPE_ERROR:
 		if (ndo->ndo_eflag)
-			ND_PRINT("(vjc type=error) ");
+			ND_PRINT(C_RESET, "(vjc type=error) ");
 		return -1;
 	default:
 		if (ndo->ndo_eflag)
-			ND_PRINT("(vjc type=0x%02x) ", GET_U_1(bp) & 0xf0);
+			ND_PRINT(C_RESET, "(vjc type=0x%02x) ", GET_U_1(bp) & 0xf0);
 		return -1;
 	}
 }

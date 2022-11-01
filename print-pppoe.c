@@ -103,7 +103,7 @@ pppoe_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	ndo->ndo_protocol = "pppoe";
 	if (length < PPPOE_HDRLEN) {
-		ND_PRINT(" (length %u < %u)", length, PPPOE_HDRLEN);
+		ND_PRINT(C_RESET, " (length %u < %u)", length, PPPOE_HDRLEN);
 		goto invalid;
 	}
 	length -= PPPOE_HDRLEN;
@@ -117,22 +117,22 @@ pppoe_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	pppoe_payload = pppoe_packet + PPPOE_HDRLEN;
 
 	if (pppoe_ver != 1) {
-		ND_PRINT(" [ver %u]",pppoe_ver);
+		ND_PRINT(C_RESET, " [ver %u]",pppoe_ver);
 	}
 	if (pppoe_type != 1) {
-		ND_PRINT(" [type %u]",pppoe_type);
+		ND_PRINT(C_RESET, " [type %u]",pppoe_type);
 	}
 
-	ND_PRINT("PPPoE %s", tok2str(pppoecode2str, "PAD-%x", pppoe_code));
+	ND_PRINT(C_RESET, "PPPoE %s", tok2str(pppoecode2str, "PAD-%x", pppoe_code));
 	if (pppoe_code == PPPOE_PADI && pppoe_length > 1484 - PPPOE_HDRLEN) {
-		ND_PRINT(" [len %u!]",pppoe_length);
+		ND_PRINT(C_RESET, " [len %u!]",pppoe_length);
 	}
 	if (pppoe_length > length) {
-		ND_PRINT(" [len %u > %u!]", pppoe_length, length);
+		ND_PRINT(C_RESET, " [len %u > %u!]", pppoe_length, length);
 		pppoe_length = length;
 	}
 	if (pppoe_sessionid) {
-		ND_PRINT(" [ses 0x%x]", pppoe_sessionid);
+		ND_PRINT(C_RESET, " [ses 0x%x]", pppoe_sessionid);
 	}
 
 	if (pppoe_code) {
@@ -170,23 +170,23 @@ pppoe_print(netdissect_options *ndo, const u_char *bp, u_int length)
 				tag_str[tag_str_len] = 0;
 
 				if (ascii_count > garbage_count) {
-					ND_PRINT(" [%s \"%*.*s\"]",
+					ND_PRINT(C_RESET, " [%s \"%*.*s\"]",
 					       tok2str(pppoetag2str, "TAG-0x%x", tag_type),
 					       (int)tag_str_len,
 					       (int)tag_str_len,
 					       tag_str);
 				} else {
 					/* Print hex, not fast to abuse printf but this doesn't get used much */
-					ND_PRINT(" [%s 0x", tok2str(pppoetag2str, "TAG-0x%x", tag_type));
+					ND_PRINT(C_RESET, " [%s 0x", tok2str(pppoetag2str, "TAG-0x%x", tag_type));
 					for (v=p; v<p+tag_len; v++) {
-						ND_PRINT("%02X", GET_U_1(v));
+						ND_PRINT(C_RESET, "%02X", GET_U_1(v));
 					}
-					ND_PRINT("]");
+					ND_PRINT(C_RESET, "]");
 				}
 
 
 			} else
-				ND_PRINT(" [%s]", tok2str(pppoetag2str,
+				ND_PRINT(C_RESET, " [%s]", tok2str(pppoetag2str,
 				    "TAG-0x%x", tag_type));
 
 			p += tag_len;
@@ -195,7 +195,7 @@ pppoe_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		return PPPOE_HDRLEN;
 	} else {
 		/* PPPoE data */
-		ND_PRINT(" ");
+		ND_PRINT(C_RESET, " ");
 		return (PPPOE_HDRLEN + ppp_print(ndo, pppoe_payload, pppoe_length));
 	}
 	/* NOTREACHED */

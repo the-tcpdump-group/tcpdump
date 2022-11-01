@@ -319,35 +319,35 @@ print_sflow_counter_generic(netdissect_options *ndo,
 	return 1;
 
     sflow_gen_counter = (const struct sflow_generic_counter_t *)pointer;
-    ND_PRINT("\n\t      ifindex %u, iftype %u, ifspeed %" PRIu64 ", ifdirection %u (%s)",
+    ND_PRINT(C_RESET, "\n\t      ifindex %u, iftype %u, ifspeed %" PRIu64 ", ifdirection %u (%s)",
 	   GET_BE_U_4(sflow_gen_counter->ifindex),
 	   GET_BE_U_4(sflow_gen_counter->iftype),
 	   GET_BE_U_8(sflow_gen_counter->ifspeed),
 	   GET_BE_U_4(sflow_gen_counter->ifdirection),
 	   tok2str(sflow_iface_direction_values, "Unknown",
 	   GET_BE_U_4(sflow_gen_counter->ifdirection)));
-    ND_PRINT("\n\t      ifstatus %u, adminstatus: %s, operstatus: %s",
+    ND_PRINT(C_RESET, "\n\t      ifstatus %u, adminstatus: %s, operstatus: %s",
 	   GET_BE_U_4(sflow_gen_counter->ifstatus),
 	   GET_BE_U_4(sflow_gen_counter->ifstatus)&1 ? "up" : "down",
 	   (GET_BE_U_4(sflow_gen_counter->ifstatus)>>1)&1 ? "up" : "down");
-    ND_PRINT("\n\t      In octets %" PRIu64
+    ND_PRINT(C_RESET, "\n\t      In octets %" PRIu64
 	   ", unicast pkts %u, multicast pkts %u, broadcast pkts %u, discards %u",
 	   GET_BE_U_8(sflow_gen_counter->ifinoctets),
 	   GET_BE_U_4(sflow_gen_counter->ifinunicastpkts),
 	   GET_BE_U_4(sflow_gen_counter->ifinmulticastpkts),
 	   GET_BE_U_4(sflow_gen_counter->ifinbroadcastpkts),
 	   GET_BE_U_4(sflow_gen_counter->ifindiscards));
-    ND_PRINT("\n\t      In errors %u, unknown protos %u",
+    ND_PRINT(C_RESET, "\n\t      In errors %u, unknown protos %u",
 	   GET_BE_U_4(sflow_gen_counter->ifinerrors),
 	   GET_BE_U_4(sflow_gen_counter->ifinunkownprotos));
-    ND_PRINT("\n\t      Out octets %" PRIu64
+    ND_PRINT(C_RESET, "\n\t      Out octets %" PRIu64
 	   ", unicast pkts %u, multicast pkts %u, broadcast pkts %u, discards %u",
 	   GET_BE_U_8(sflow_gen_counter->ifoutoctets),
 	   GET_BE_U_4(sflow_gen_counter->ifoutunicastpkts),
 	   GET_BE_U_4(sflow_gen_counter->ifoutmulticastpkts),
 	   GET_BE_U_4(sflow_gen_counter->ifoutbroadcastpkts),
 	   GET_BE_U_4(sflow_gen_counter->ifoutdiscards));
-    ND_PRINT("\n\t      Out errors %u, promisc mode %u",
+    ND_PRINT(C_RESET, "\n\t      Out errors %u, promisc mode %u",
 	   GET_BE_U_4(sflow_gen_counter->ifouterrors),
 	   GET_BE_U_4(sflow_gen_counter->ifpromiscmode));
 
@@ -364,18 +364,18 @@ print_sflow_counter_ethernet(netdissect_options *ndo,
 	return 1;
 
     sflow_eth_counter = (const struct sflow_ethernet_counter_t *)pointer;
-    ND_PRINT("\n\t      align errors %u, fcs errors %u, single collision %u, multiple collision %u, test error %u",
+    ND_PRINT(C_RESET, "\n\t      align errors %u, fcs errors %u, single collision %u, multiple collision %u, test error %u",
 	   GET_BE_U_4(sflow_eth_counter->alignerrors),
 	   GET_BE_U_4(sflow_eth_counter->fcserrors),
 	   GET_BE_U_4(sflow_eth_counter->single_collision_frames),
 	   GET_BE_U_4(sflow_eth_counter->multiple_collision_frames),
 	   GET_BE_U_4(sflow_eth_counter->test_errors));
-    ND_PRINT("\n\t      deferred %u, late collision %u, excessive collision %u, mac trans error %u",
+    ND_PRINT(C_RESET, "\n\t      deferred %u, late collision %u, excessive collision %u, mac trans error %u",
 	   GET_BE_U_4(sflow_eth_counter->deferred_transmissions),
 	   GET_BE_U_4(sflow_eth_counter->late_collisions),
 	   GET_BE_U_4(sflow_eth_counter->excessive_collisions),
 	   GET_BE_U_4(sflow_eth_counter->mac_transmit_errors));
-    ND_PRINT("\n\t      carrier error %u, frames too long %u, mac receive errors %u, symbol errors %u",
+    ND_PRINT(C_RESET, "\n\t      carrier error %u, frames too long %u, mac receive errors %u, symbol errors %u",
 	   GET_BE_U_4(sflow_eth_counter->carrier_sense_errors),
 	   GET_BE_U_4(sflow_eth_counter->frame_too_longs),
 	   GET_BE_U_4(sflow_eth_counter->mac_receive_errors),
@@ -401,23 +401,23 @@ print_sflow_counter_basevg(netdissect_options *ndo,
 	return 1;
 
     sflow_100basevg_counter = (const struct sflow_100basevg_counter_t *)pointer;
-    ND_PRINT("\n\t      in high prio frames %u, in high prio octets %" PRIu64,
+    ND_PRINT(C_RESET, "\n\t      in high prio frames %u, in high prio octets %" PRIu64,
 	   GET_BE_U_4(sflow_100basevg_counter->in_highpriority_frames),
 	   GET_BE_U_8(sflow_100basevg_counter->in_highpriority_octets));
-    ND_PRINT("\n\t      in norm prio frames %u, in norm prio octets %" PRIu64,
+    ND_PRINT(C_RESET, "\n\t      in norm prio frames %u, in norm prio octets %" PRIu64,
 	   GET_BE_U_4(sflow_100basevg_counter->in_normpriority_frames),
 	   GET_BE_U_8(sflow_100basevg_counter->in_normpriority_octets));
-    ND_PRINT("\n\t      in ipm errors %u, oversized %u, in data errors %u, null addressed frames %u",
+    ND_PRINT(C_RESET, "\n\t      in ipm errors %u, oversized %u, in data errors %u, null addressed frames %u",
 	   GET_BE_U_4(sflow_100basevg_counter->in_ipmerrors),
 	   GET_BE_U_4(sflow_100basevg_counter->in_oversized),
 	   GET_BE_U_4(sflow_100basevg_counter->in_data_errors),
 	   GET_BE_U_4(sflow_100basevg_counter->in_null_addressed_frames));
-    ND_PRINT("\n\t      out high prio frames %u, out high prio octets %" PRIu64
+    ND_PRINT(C_RESET, "\n\t      out high prio frames %u, out high prio octets %" PRIu64
 	   ", trans into frames %u",
 	   GET_BE_U_4(sflow_100basevg_counter->out_highpriority_frames),
 	   GET_BE_U_8(sflow_100basevg_counter->out_highpriority_octets),
 	   GET_BE_U_4(sflow_100basevg_counter->transitioninto_frames));
-    ND_PRINT("\n\t      in hc high prio octets %" PRIu64
+    ND_PRINT(C_RESET, "\n\t      in hc high prio octets %" PRIu64
 	   ", in hc norm prio octets %" PRIu64
 	   ", out hc high prio octets %" PRIu64,
 	   GET_BE_U_8(sflow_100basevg_counter->hc_in_highpriority_octets),
@@ -437,7 +437,7 @@ print_sflow_counter_vlan(netdissect_options *ndo,
 	return 1;
 
     sflow_vlan_counter = (const struct sflow_vlan_counter_t *)pointer;
-    ND_PRINT("\n\t      vlan_id %u, octets %" PRIu64
+    ND_PRINT(C_RESET, "\n\t      vlan_id %u, octets %" PRIu64
 	   ", unicast_pkt %u, multicast_pkt %u, broadcast_pkt %u, discards %u",
 	   GET_BE_U_4(sflow_vlan_counter->vlan_id),
 	   GET_BE_U_8(sflow_vlan_counter->octets),
@@ -467,7 +467,7 @@ print_sflow_counter_processor(netdissect_options *ndo,
 	return 1;
 
     sflow_processor_counter = (const struct sflow_processor_counter_t *)pointer;
-    ND_PRINT("\n\t      5sec %u, 1min %u, 5min %u, total_mem %" PRIu64
+    ND_PRINT(C_RESET, "\n\t      5sec %u, 1min %u, 5min %u, total_mem %" PRIu64
 	   ", total_mem %" PRIu64,
 	   GET_BE_U_4(sflow_processor_counter->five_sec_util),
 	   GET_BE_U_4(sflow_processor_counter->one_min_util),
@@ -504,7 +504,7 @@ sflow_print_counter_records(netdissect_options *ndo,
 	counter_type = enterprise & 0x0FFF;
 	enterprise = enterprise >> 20;
 	counter_len  = GET_BE_U_4(sflow_counter_record->length);
-	ND_PRINT("\n\t    enterprise %u, %s (%u) length %u",
+	ND_PRINT(C_RESET, "\n\t    enterprise %u, %s (%u) length %u",
 	       enterprise,
 	       (enterprise == 0) ? tok2str(sflow_counter_type_values,"Unknown",counter_type) : "Unknown",
 	       counter_type,
@@ -570,7 +570,7 @@ sflow_print_counter_sample(netdissect_options *ndo,
 
     nrecords   = GET_BE_U_4(sflow_counter_sample->records);
 
-    ND_PRINT(" seqnum %u, type %u, idx %u, records %u",
+    ND_PRINT(C_RESET, " seqnum %u, type %u, idx %u, records %u",
 	   GET_BE_U_4(sflow_counter_sample->seqnum),
 	   GET_U_1(sflow_counter_sample->type),
 	   GET_BE_U_3(sflow_counter_sample->index),
@@ -596,7 +596,7 @@ sflow_print_expanded_counter_sample(netdissect_options *ndo,
 
     nrecords = GET_BE_U_4(sflow_expanded_counter_sample->records);
 
-    ND_PRINT(" seqnum %u, type %u, idx %u, records %u",
+    ND_PRINT(C_RESET, " seqnum %u, type %u, idx %u, records %u",
 	   GET_BE_U_4(sflow_expanded_counter_sample->seqnum),
 	   GET_BE_U_4(sflow_expanded_counter_sample->type),
 	   GET_BE_U_4(sflow_expanded_counter_sample->index),
@@ -617,7 +617,7 @@ print_sflow_raw_packet(netdissect_options *ndo,
 	return 1;
 
     sflow_flow_raw = (const struct sflow_expanded_flow_raw_t *)pointer;
-    ND_PRINT("\n\t      protocol %s (%u), length %u, stripped bytes %u, header_size %u",
+    ND_PRINT(C_RESET, "\n\t      protocol %s (%u), length %u, stripped bytes %u, header_size %u",
 	   tok2str(sflow_flow_raw_protocol_values,"Unknown",GET_BE_U_4(sflow_flow_raw->protocol)),
 	   GET_BE_U_4(sflow_flow_raw->protocol),
 	   GET_BE_U_4(sflow_flow_raw->length),
@@ -641,7 +641,7 @@ print_sflow_ethernet_frame(netdissect_options *ndo,
 
     sflow_ethernet_frame = (const struct sflow_ethernet_frame_t *)pointer;
 
-    ND_PRINT("\n\t      frame len %u, type %u",
+    ND_PRINT(C_RESET, "\n\t      frame len %u, type %u",
 	   GET_BE_U_4(sflow_ethernet_frame->length),
 	   GET_BE_U_4(sflow_ethernet_frame->type));
 
@@ -658,7 +658,7 @@ print_sflow_extended_switch_data(netdissect_options *ndo,
 	return 1;
 
     sflow_extended_sw_data = (const struct sflow_extended_switch_data_t *)pointer;
-    ND_PRINT("\n\t      src vlan %u, src pri %u, dst vlan %u, dst pri %u",
+    ND_PRINT(C_RESET, "\n\t      src vlan %u, src pri %u, dst vlan %u, dst pri %u",
 	   GET_BE_U_4(sflow_extended_sw_data->src_vlan),
 	   GET_BE_U_4(sflow_extended_sw_data->src_pri),
 	   GET_BE_U_4(sflow_extended_sw_data->dst_vlan),
@@ -697,7 +697,7 @@ sflow_print_flow_records(netdissect_options *ndo,
 	flow_type = enterprise & 0x0FFF;
 	enterprise = enterprise >> 12;
 	flow_len  = GET_BE_U_4(sflow_flow_record->length);
-	ND_PRINT("\n\t    enterprise %u %s (%u) length %u",
+	ND_PRINT(C_RESET, "\n\t    enterprise %u %s (%u) length %u",
 	       enterprise,
 	       (enterprise == 0) ? tok2str(sflow_flow_type_values,"Unknown",flow_type) : "Unknown",
 	       flow_type,
@@ -767,7 +767,7 @@ sflow_print_flow_sample(netdissect_options *ndo,
 
     nrecords = GET_BE_U_4(sflow_flow_sample->records);
 
-    ND_PRINT(" seqnum %u, type %u, idx %u, rate %u, pool %u, drops %u, input %u output %u records %u",
+    ND_PRINT(C_RESET, " seqnum %u, type %u, idx %u, rate %u, pool %u, drops %u, input %u output %u records %u",
 	   GET_BE_U_4(sflow_flow_sample->seqnum),
 	   GET_U_1(sflow_flow_sample->type),
 	   GET_BE_U_3(sflow_flow_sample->index),
@@ -797,7 +797,7 @@ sflow_print_expanded_flow_sample(netdissect_options *ndo,
 
     nrecords = GET_BE_U_4(sflow_expanded_flow_sample->records);
 
-    ND_PRINT(" seqnum %u, type %u, idx %u, rate %u, pool %u, drops %u, records %u",
+    ND_PRINT(C_RESET, " seqnum %u, type %u, idx %u, rate %u, pool %u, drops %u, records %u",
 	   GET_BE_U_4(sflow_expanded_flow_sample->seqnum),
 	   GET_BE_U_4(sflow_expanded_flow_sample->type),
 	   GET_BE_U_4(sflow_expanded_flow_sample->index),
@@ -834,8 +834,8 @@ sflow_print(netdissect_options *ndo,
 
     if ((len < sizeof(struct sflow_datagram_t) && (ip_version == 1)) ||
         (len < sizeof(struct sflow_v6_datagram_t) && (ip_version == 2))) {
-        ND_PRINT("sFlowv%u", GET_BE_U_4(sflow_datagram->version));
-        ND_PRINT(" [length %u < %zu]", len, sizeof(struct sflow_datagram_t));
+        ND_PRINT(C_RESET, "sFlowv%u", GET_BE_U_4(sflow_datagram->version));
+        ND_PRINT(C_RESET, " [length %u < %zu]", len, sizeof(struct sflow_datagram_t));
         nd_print_invalid(ndo);
         return;
     }
@@ -845,13 +845,13 @@ sflow_print(netdissect_options *ndo,
      * Sanity checking of the header.
      */
     if (GET_BE_U_4(sflow_datagram->version) != 5) {
-        ND_PRINT("sFlow version %u packet not supported",
+        ND_PRINT(C_RESET, "sFlow version %u packet not supported",
                GET_BE_U_4(sflow_datagram->version));
         return;
     }
 
     if (ndo->ndo_vflag < 1) {
-        ND_PRINT("sFlowv%u, %s agent %s, agent-id %u, length %u",
+        ND_PRINT(C_RESET, "sFlowv%u, %s agent %s, agent-id %u, length %u",
                GET_BE_U_4(sflow_datagram->version),
                ip_version == 1 ? "IPv4" : "IPv6",
                ip_version == 1 ? GET_IPADDR_STRING(sflow_datagram->agent) :
@@ -865,7 +865,7 @@ sflow_print(netdissect_options *ndo,
     /* ok they seem to want to know everything - lets fully decode it */
     if (ip_version == 1) {
         nsamples = GET_BE_U_4(sflow_datagram->samples);
-        ND_PRINT("sFlowv%u, %s agent %s, agent-id %u, seqnum %u, uptime %u, samples %u, length %u",
+        ND_PRINT(C_RESET, "sFlowv%u, %s agent %s, agent-id %u, seqnum %u, uptime %u, samples %u, length %u",
                GET_BE_U_4(sflow_datagram->version),
                "IPv4",
                GET_IPADDR_STRING(sflow_datagram->agent),
@@ -881,7 +881,7 @@ sflow_print(netdissect_options *ndo,
         tlen -= sizeof(struct sflow_datagram_t);
     } else {
         nsamples = GET_BE_U_4(sflow_v6_datagram->samples);
-        ND_PRINT("sFlowv%u, %s agent %s, agent-id %u, seqnum %u, uptime %u, samples %u, length %u",
+        ND_PRINT(C_RESET, "sFlowv%u, %s agent %s, agent-id %u, seqnum %u, uptime %u, samples %u, length %u",
                GET_BE_U_4(sflow_v6_datagram->version),
                "IPv6",
                GET_IP6ADDR_STRING(sflow_v6_datagram->agent),
@@ -908,7 +908,7 @@ sflow_print(netdissect_options *ndo,
         tptr += sizeof(struct sflow_sample_header);
         tlen -= sizeof(struct sflow_sample_header);
 
-        ND_PRINT("\n\t%s (%u), length %u,",
+        ND_PRINT(C_RESET, "\n\t%s (%u), length %u,",
                tok2str(sflow_format_values, "Unknown", sflow_sample_type),
                sflow_sample_type,
                sflow_sample_len);

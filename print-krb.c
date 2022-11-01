@@ -140,9 +140,9 @@ krb4_print_hdr(netdissect_options *ndo,
 #define PRINT		if ((cp = c_print(ndo, cp, ndo->ndo_snapend)) == NULL) goto trunc
 
 	PRINT;
-	ND_PRINT(".");
+	ND_PRINT(C_RESET, ".");
 	PRINT;
-	ND_PRINT("@");
+	ND_PRINT(C_RESET, "@");
 	PRINT;
 	return (cp);
 
@@ -170,7 +170,7 @@ krb4_print(netdissect_options *ndo,
 
 	type = GET_U_1(kp->type) & (0xFF << 1);
 
-	ND_PRINT(" %s %s: ",
+	ND_PRINT(C_RESET, " %s %s: ",
 	    IS_LENDIAN(kp) ? "le" : "be", tok2str(type2str, NULL, type));
 
 	switch (type) {
@@ -179,21 +179,21 @@ krb4_print(netdissect_options *ndo,
 		if ((cp = krb4_print_hdr(ndo, cp)) == NULL)
 			return;
 		cp += 4;	/* ctime */
-		ND_PRINT(" %umin ", GET_U_1(cp) * 5);
+		ND_PRINT(C_RESET, " %umin ", GET_U_1(cp) * 5);
 		cp++;
 		PRINT;
-		ND_PRINT(".");
+		ND_PRINT(C_RESET, ".");
 		PRINT;
 		break;
 
 	case AUTH_MSG_APPL_REQUEST:
 		cp += 2;
-		ND_PRINT("v%u ", GET_U_1(cp));
+		ND_PRINT(C_RESET, "v%u ", GET_U_1(cp));
 		cp++;
 		PRINT;
-		ND_PRINT(" (%u)", GET_U_1(cp));
+		ND_PRINT(C_RESET, " (%u)", GET_U_1(cp));
 		cp++;
-		ND_PRINT(" (%u)", GET_U_1(cp));
+		ND_PRINT(C_RESET, " (%u)", GET_U_1(cp));
 		break;
 
 	case AUTH_MSG_KDC_REPLY:
@@ -201,20 +201,20 @@ krb4_print(netdissect_options *ndo,
 			return;
 		cp += 10;	/* timestamp + n + exp + kvno */
 		len = KTOHSP(kp, cp);
-		ND_PRINT(" (%u)", len);
+		ND_PRINT(C_RESET, " (%u)", len);
 		break;
 
 	case AUTH_MSG_ERR_REPLY:
 		if ((cp = krb4_print_hdr(ndo, cp)) == NULL)
 			return;
 		cp += 4; 	  /* timestamp */
-		ND_PRINT(" %s ", tok2str(kerr2str, NULL, KTOHSP(kp, cp)));
+		ND_PRINT(C_RESET, " %s ", tok2str(kerr2str, NULL, KTOHSP(kp, cp)));
 		cp += 4;
 		PRINT;
 		break;
 
 	default:
-		ND_PRINT("(unknown)");
+		ND_PRINT(C_RESET, "(unknown)");
 		break;
 	}
 
@@ -239,17 +239,17 @@ krb_print(netdissect_options *ndo,
 	case 1:
 	case 2:
 	case 3:
-		ND_PRINT(" v%u", GET_U_1(kp->pvno));
+		ND_PRINT(C_RESET, " v%u", GET_U_1(kp->pvno));
 		break;
 
 	case 4:
-		ND_PRINT(" v%u", GET_U_1(kp->pvno));
+		ND_PRINT(C_RESET, " v%u", GET_U_1(kp->pvno));
 		krb4_print(ndo, (const u_char *)kp);
 		break;
 
 	case 106:
 	case 107:
-		ND_PRINT(" v5");
+		ND_PRINT(C_RESET, " v5");
 		/* Decode ASN.1 here "someday" */
 		break;
 	}

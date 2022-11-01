@@ -69,7 +69,7 @@ bcm_li_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "bcm_li";
 	if (length < BCM_LI_SHIM_LEN) {
-	    ND_PRINT(" (length %u < %u)", length, BCM_LI_SHIM_LEN);
+	    ND_PRINT(C_RESET, " (length %u < %u)", length, BCM_LI_SHIM_LEN);
 	    goto invalid;
 	}
 	shim = GET_BE_U_4(bp);
@@ -82,7 +82,7 @@ bcm_li_print(netdissect_options *ndo,
 	length -= BCM_LI_SHIM_LEN;
 	bp += BCM_LI_SHIM_LEN;
 
-	ND_PRINT("%sBCM-LI-SHIM: direction %s, pkt-type %s, pkt-subtype %s, li-id %u%s",
+	ND_PRINT(C_RESET, "%sBCM-LI-SHIM: direction %s, pkt-type %s, pkt-subtype %s, li-id %u%s",
 		 ndo->ndo_vflag ? "\n    " : "",
 		 tok2str(bcm_li_direction_values, "unknown", direction),
 		 tok2str(bcm_li_pkt_type_values, "unknown", pkt_type),
@@ -115,7 +115,7 @@ bcm_li_print(netdissect_options *ndo,
 	    } else if ((GET_U_1(bp) >> 4) == 6) {
 		ip6_print(ndo, bp, length);
 	    } else {
-		ND_PRINT("unknown payload");
+		ND_PRINT(C_RESET, "unknown payload");
 	    }
 	    break;
 

@@ -400,7 +400,7 @@ telnet_parse(netdissect_options *ndo, const u_char *sp, u_int length, int print)
 	FETCH(c, sp, length);
 	if (c == IAC) {		/* <IAC><IAC>! */
 		if (print)
-			ND_PRINT("IAC IAC");
+			ND_PRINT(C_RESET, "IAC IAC");
 		goto done;
 	}
 
@@ -418,10 +418,10 @@ telnet_parse(netdissect_options *ndo, const u_char *sp, u_int length, int print)
 		FETCH(x, sp, length);
 		if (x >= 0 && x < NTELOPTS) {
 			if (print)
-				ND_PRINT("%s %s", telcmds[i], telopts[x]);
+				ND_PRINT(C_RESET, "%s %s", telcmds[i], telopts[x]);
 		} else {
 			if (print)
-				ND_PRINT("%s %#x", telcmds[i], x);
+				ND_PRINT(C_RESET, "%s %#x", telcmds[i], x);
 		}
 		if (c != SB)
 			break;
@@ -441,46 +441,46 @@ telnet_parse(netdissect_options *ndo, const u_char *sp, u_int length, int print)
 				break;
 			FETCH(c, sp, length);
 			if (print)
-				ND_PRINT(" %s", STR_OR_ID(c, authcmd));
+				ND_PRINT(C_RESET, " %s", STR_OR_ID(c, authcmd));
 			if (p <= sp)
 				break;
 			FETCH(c, sp, length);
 			if (print)
-				ND_PRINT(" %s", STR_OR_ID(c, authtype));
+				ND_PRINT(C_RESET, " %s", STR_OR_ID(c, authtype));
 			break;
 		case TELOPT_ENCRYPT:
 			if (p <= sp)
 				break;
 			FETCH(c, sp, length);
 			if (print)
-				ND_PRINT(" %s", STR_OR_ID(c, enccmd));
+				ND_PRINT(C_RESET, " %s", STR_OR_ID(c, enccmd));
 			if (p <= sp)
 				break;
 			FETCH(c, sp, length);
 			if (print)
-				ND_PRINT(" %s", STR_OR_ID(c, enctype));
+				ND_PRINT(C_RESET, " %s", STR_OR_ID(c, enctype));
 			break;
 		default:
 			if (p <= sp)
 				break;
 			FETCH(c, sp, length);
 			if (print)
-				ND_PRINT(" %s", STR_OR_ID(c, cmds));
+				ND_PRINT(C_RESET, " %s", STR_OR_ID(c, cmds));
 			break;
 		}
 		while (p > sp) {
 			FETCH(x, sp, length);
 			if (print)
-				ND_PRINT(" %#x", x);
+				ND_PRINT(C_RESET, " %#x", x);
 		}
 		/* terminating IAC SE */
 		if (print)
-			ND_PRINT(" SE");
+			ND_PRINT(C_RESET, " SE");
 		sp += 2;
 		break;
 	default:
 		if (print)
-			ND_PRINT("%s", telcmds[i]);
+			ND_PRINT(C_RESET, "%s", telcmds[i]);
 		goto done;
 	}
 
@@ -516,14 +516,14 @@ telnet_print(netdissect_options *ndo, const u_char *sp, u_int length)
 		 */
 		if (ndo->ndo_Xflag && 2 < ndo->ndo_vflag) {
 			if (first)
-				ND_PRINT("\nTelnet:");
+				ND_PRINT(C_RESET, "\nTelnet:");
 			hex_print_with_offset(ndo, "\n", sp, l, (u_int)(sp - osp));
 			if (l > 8)
-				ND_PRINT("\n\t\t\t\t");
+				ND_PRINT(C_RESET, "\n\t\t\t\t");
 			else
-				ND_PRINT("%*s\t", (8 - l) * 3, "");
+				ND_PRINT(C_RESET, "%*s\t", (8 - l) * 3, "");
 		} else
-			ND_PRINT("%s", (first) ? " [telnet " : ", ");
+			ND_PRINT(C_RESET, "%s", (first) ? " [telnet " : ", ");
 
 		(void)telnet_parse(ndo, sp, length, 1);
 		first = 0;
@@ -533,8 +533,8 @@ telnet_print(netdissect_options *ndo, const u_char *sp, u_int length)
 	}
 	if (!first) {
 		if (ndo->ndo_Xflag && 2 < ndo->ndo_vflag)
-			ND_PRINT("\n");
+			ND_PRINT(C_RESET, "\n");
 		else
-			ND_PRINT("]");
+			ND_PRINT(C_RESET, "]");
 	}
 }

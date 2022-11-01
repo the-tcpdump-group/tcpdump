@@ -695,7 +695,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		str = tok2str(icmp2str, "type-#%u", icmp_type);
 		break;
 	}
-	ND_PRINT("ICMP %s, length %u", str, plen);
+	ND_PRINT(C_RESET, "ICMP %s, length %u", str, plen);
 	if (ndo->ndo_vflag && !fragmented) { /* don't attempt checksumming if this is a frag */
 		if (ND_TTEST_LEN(bp, plen)) {
 			uint16_t sum;
@@ -705,7 +705,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			sum = in_cksum(vec, 1);
 			if (sum != 0) {
 				uint16_t icmp_sum = GET_BE_U_2(dp->icmp_cksum);
-				ND_PRINT(" (wrong icmp cksum %x (->%x)!)",
+				ND_PRINT(C_RESET, " (wrong icmp cksum %x (->%x)!)",
 					     icmp_sum,
 					     in_cksum_shouldbe(icmp_sum, sum));
 			}
@@ -720,7 +720,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		const u_char *snapend_save;
 
 		bp += 8;
-		ND_PRINT("\n\t");
+		ND_PRINT(C_RESET, "\n\t");
 		ip = (const struct ip *)bp;
 		snapend_save = ndo->ndo_snapend;
 		/*
@@ -763,7 +763,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                 }
             }
 
-            ND_PRINT("\n\tICMP Multi-Part extension v%u",
+            ND_PRINT(C_RESET, "\n\tICMP Multi-Part extension v%u",
                    ICMP_EXT_EXTRACT_VERSION(*(ext_dp->icmp_ext_version_res)));
 
             /*
@@ -771,7 +771,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
              */
             if (ICMP_EXT_EXTRACT_VERSION(*(ext_dp->icmp_ext_version_res)) !=
                 ICMP_EXT_VERSION) {
-                ND_PRINT(" packet not supported");
+                ND_PRINT(C_RESET, " packet not supported");
                 return;
             }
 
@@ -779,7 +779,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
             if (ND_TTEST_LEN(ext_dp->icmp_ext_version_res, hlen)) {
                 vec[0].ptr = (const uint8_t *)(const void *)&ext_dp->icmp_ext_version_res;
                 vec[0].len = hlen;
-                ND_PRINT(", checksum 0x%04x (%scorrect), length %u",
+                ND_PRINT(C_RESET, ", checksum 0x%04x (%scorrect), length %u",
                        GET_BE_U_2(ext_dp->icmp_ext_checksum),
                        in_cksum(vec, 1) ? "in" : "",
                        hlen);
@@ -797,7 +797,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                 obj_ctype = GET_U_1(icmp_multipart_ext_object_header->ctype);
                 obj_tptr += sizeof(struct icmp_multipart_ext_object_header_t);
 
-                ND_PRINT("\n\t  %s Object (%u), Class-Type: %u, length %u",
+                ND_PRINT(C_RESET, "\n\t  %s Object (%u), Class-Type: %u, length %u",
                        tok2str(icmp_multipart_ext_obj_values,"unknown",obj_class_num),
                        obj_class_num,
                        obj_ctype,
@@ -817,10 +817,10 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                     switch(obj_ctype) {
                     case 1:
                         raw_label = GET_BE_U_4(obj_tptr);
-                        ND_PRINT("\n\t    label %u, tc %u", MPLS_LABEL(raw_label), MPLS_TC(raw_label));
+                        ND_PRINT(C_RESET, "\n\t    label %u, tc %u", MPLS_LABEL(raw_label), MPLS_TC(raw_label));
                         if (MPLS_STACK(raw_label))
-                            ND_PRINT(", [S]");
-                        ND_PRINT(", ttl %u", MPLS_TTL(raw_label));
+                            ND_PRINT(C_RESET, ", [S]");
+                        ND_PRINT(C_RESET, ", ttl %u", MPLS_TTL(raw_label));
                         break;
                     default:
                         print_unknown_data(ndo, obj_tptr, "\n\t    ", obj_tlen);
@@ -842,30 +842,30 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                     name_flag      = (obj_ctype & 0x2) >> 1;
                     mtu_flag       = (obj_ctype & 0x1);
 
-                    ND_PRINT("\n\t\t This object describes %s",
+                    ND_PRINT(C_RESET, "\n\t\t This object describes %s",
                              tok2str(icmp_interface_identification_role_values,
                              "an unknown interface role",interface_role));
 
                     offset = obj_tptr;
 
                     if (if_index_flag) {
-                        ND_PRINT("\n\t\t Interface Index: %u", GET_BE_U_4(offset));
+                        ND_PRINT(C_RESET, "\n\t\t Interface Index: %u", GET_BE_U_4(offset));
                         offset += 4;
                     }
                     if (ipaddr_flag) {
-                        ND_PRINT("\n\t\t IP Address sub-object: ");
+                        ND_PRINT(C_RESET, "\n\t\t IP Address sub-object: ");
                         ipaddr_subobj = (const struct icmp_interface_identification_ipaddr_subobject_t *) offset;
                         switch (GET_BE_U_2(ipaddr_subobj->afi)) {
                             case 1:
-                                ND_PRINT("%s", GET_IPADDR_STRING(ipaddr_subobj->ip_addr));
+                                ND_PRINT(C_RESET, "%s", GET_IPADDR_STRING(ipaddr_subobj->ip_addr));
                                 offset += 4;
                                 break;
                             case 2:
-                                ND_PRINT("%s", GET_IP6ADDR_STRING(ipaddr_subobj->ip_addr));
+                                ND_PRINT(C_RESET, "%s", GET_IP6ADDR_STRING(ipaddr_subobj->ip_addr));
                                 offset += 16;
                                 break;
                             default:
-                                ND_PRINT("Unknown Address Family Identifier");
+                                ND_PRINT(C_RESET, "Unknown Address Family Identifier");
                                 return;
                         }
                         offset += 4;
@@ -875,26 +875,26 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 
                         ifname_subobj = (const struct icmp_interface_identification_ifname_subobject_t *) offset;
                         inft_name_length_field = GET_U_1(ifname_subobj->length);
-                        ND_PRINT("\n\t\t Interface Name");
+                        ND_PRINT(C_RESET, "\n\t\t Interface Name");
                         if (inft_name_length_field % 4 != 0) {
-                            ND_PRINT(" [length %u != N x 4]", inft_name_length_field);
+                            ND_PRINT(C_RESET, " [length %u != N x 4]", inft_name_length_field);
                             nd_print_invalid(ndo);
                             offset += inft_name_length_field;
                             break;
                         }
                         if (inft_name_length_field > 64) {
-                            ND_PRINT(" [length %u > 64]", inft_name_length_field);
+                            ND_PRINT(C_RESET, " [length %u > 64]", inft_name_length_field);
                             nd_print_invalid(ndo);
                             offset += inft_name_length_field;
                             break;
                         }
-                        ND_PRINT(", length %u: ", inft_name_length_field);
+                        ND_PRINT(C_RESET, ", length %u: ", inft_name_length_field);
                         nd_printjnp(ndo, ifname_subobj->if_name,
                                     inft_name_length_field - 1);
                         offset += inft_name_length_field;
                     }
                     if (mtu_flag) {
-                        ND_PRINT("\n\t\t MTU: %u", GET_BE_U_4(offset));
+                        ND_PRINT(C_RESET, "\n\t\t MTU: %u", GET_BE_U_4(offset));
                         offset += 4;
                     }
                     break;

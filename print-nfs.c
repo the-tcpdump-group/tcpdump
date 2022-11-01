@@ -225,7 +225,7 @@ nfsaddr_print(netdissect_options *ndo,
 		break;
 	}
 
-	ND_PRINT("%s.%s > %s.%s: ", srcaddr, s, dstaddr, d);
+	ND_PRINT(C_RESET, "%s.%s > %s.%s: ", srcaddr, s, dstaddr, d);
 }
 
 /*
@@ -314,17 +314,17 @@ print_sattr3(netdissect_options *ndo,
              const struct nfsv3_sattr *sa3, int verbose)
 {
 	if (sa3->sa_modeset)
-		ND_PRINT(" mode %o", sa3->sa_mode);
+		ND_PRINT(C_RESET, " mode %o", sa3->sa_mode);
 	if (sa3->sa_uidset)
-		ND_PRINT(" uid %u", sa3->sa_uid);
+		ND_PRINT(C_RESET, " uid %u", sa3->sa_uid);
 	if (sa3->sa_gidset)
-		ND_PRINT(" gid %u", sa3->sa_gid);
+		ND_PRINT(C_RESET, " gid %u", sa3->sa_gid);
 	if (verbose > 1) {
 		if (sa3->sa_atimetype == NFSV3SATTRTIME_TOCLIENT)
-			ND_PRINT(" atime %u.%06u", sa3->sa_atime.nfsv3_sec,
+			ND_PRINT(C_RESET, " atime %u.%06u", sa3->sa_atime.nfsv3_sec,
 			       sa3->sa_atime.nfsv3_nsec);
 		if (sa3->sa_mtimetype == NFSV3SATTRTIME_TOCLIENT)
-			ND_PRINT(" mtime %u.%06u", sa3->sa_mtime.nfsv3_sec,
+			ND_PRINT(C_RESET, " mtime %u.%06u", sa3->sa_mtime.nfsv3_sec,
 			       sa3->sa_mtime.nfsv3_nsec);
 	}
 }
@@ -374,13 +374,13 @@ nfsreply_noaddr_print(netdissect_options *ndo,
 	switch (reply_stat) {
 
 	case SUNRPC_MSG_ACCEPTED:
-		ND_PRINT("reply ok %u", length);
+		ND_PRINT(C_RESET, "reply ok %u", length);
 		if (xid_map_find(ndo, rp, bp2, &proc, &vers) >= 0)
 			interp_reply(ndo, rp, proc, vers, length);
 		break;
 
 	case SUNRPC_MSG_DENIED:
-		ND_PRINT("reply ERR %u: ", length);
+		ND_PRINT(C_RESET, "reply ERR %u: ", length);
 		ND_TCHECK_4(rp->rm_reply.rp_reject.rj_stat);
 		rstat = GET_BE_U_4(&rp->rm_reply.rp_reject.rj_stat);
 		switch (rstat) {
@@ -389,23 +389,23 @@ nfsreply_noaddr_print(netdissect_options *ndo,
 			ND_TCHECK_4(rp->rm_reply.rp_reject.rj_vers.high);
 			rlow = GET_BE_U_4(&rp->rm_reply.rp_reject.rj_vers.low);
 			rhigh = GET_BE_U_4(&rp->rm_reply.rp_reject.rj_vers.high);
-			ND_PRINT("RPC Version mismatch (%u-%u)", rlow, rhigh);
+			ND_PRINT(C_RESET, "RPC Version mismatch (%u-%u)", rlow, rhigh);
 			break;
 
 		case SUNRPC_AUTH_ERROR:
 			ND_TCHECK_4(rp->rm_reply.rp_reject.rj_why);
 			rwhy = GET_BE_U_4(&rp->rm_reply.rp_reject.rj_why);
-			ND_PRINT("Auth %s", tok2str(sunrpc_auth_str, "Invalid failure code %u", rwhy));
+			ND_PRINT(C_RESET, "Auth %s", tok2str(sunrpc_auth_str, "Invalid failure code %u", rwhy));
 			break;
 
 		default:
-			ND_PRINT("Unknown reason for rejecting rpc message %u", (unsigned int)rstat);
+			ND_PRINT(C_RESET, "Unknown reason for rejecting rpc message %u", (unsigned int)rstat);
 			break;
 		}
 		break;
 
 	default:
-		ND_PRINT("reply Unknown rpc response code=%u %u", reply_stat, length);
+		ND_PRINT(C_RESET, "reply Unknown rpc response code=%u %u", reply_stat, length);
 		break;
 	}
 	return;
@@ -509,7 +509,7 @@ parsefn(netdissect_options *ndo,
 	dp++;
 
 	if (UINT_MAX - len < 3) {
-		ND_PRINT("[cannot pad to 32-bit boundaries]");
+		ND_PRINT(C_RESET, "[cannot pad to 32-bit boundaries]");
 		nd_print_invalid(ndo);
 		return NULL;
 	}
@@ -520,12 +520,12 @@ parsefn(netdissect_options *ndo,
 	cp = (const u_char *)dp;
 	/* Update 32-bit pointer (NFS filenames padded to 32-bit boundaries) */
 	dp += rounded_len / sizeof(*dp);
-	ND_PRINT("\"");
+	ND_PRINT(C_RESET, "\"");
 	if (nd_printn(ndo, cp, len, ndo->ndo_snapend)) {
-		ND_PRINT("\"");
+		ND_PRINT(C_RESET, "\"");
 		goto trunc;
 	}
-	ND_PRINT("\"");
+	ND_PRINT(C_RESET, "\"");
 
 	return (dp);
 trunc:
@@ -544,7 +544,7 @@ parsefhn(netdissect_options *ndo,
 	dp = parsefh(ndo, dp, v3);
 	if (dp == NULL)
 		return (NULL);
-	ND_PRINT(" ");
+	ND_PRINT(C_RESET, " ");
 	return (parsefn(ndo, dp));
 }
 
@@ -562,7 +562,7 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 	struct nfsv3_sattr sa3;
 
 	ndo->ndo_protocol = "nfs";
-	ND_PRINT("%u", length);
+	ND_PRINT(C_RESET, "%u", length);
 	rp = (const struct sunrpc_msg *)bp;
 
 	if (!xid_map_enter(ndo, rp, bp2))	/* record proc number for later on */
@@ -574,7 +574,7 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 	if (!v3 && proc < NFS_NPROCS)
 		proc =  nfsv3_procid[proc];
 
-	ND_PRINT(" %s", tok2str(nfsproc_str, "proc-%u", proc));
+	ND_PRINT(C_RESET, " %s", tok2str(nfsproc_str, "proc-%u", proc));
 	switch (proc) {
 
 	case NFSPROC_GETATTR:
@@ -612,33 +612,33 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 		access_flags = GET_BE_U_4(dp);
 		if (access_flags & ~NFSV3ACCESS_FULL) {
 			/* NFSV3ACCESS definitions aren't up to date */
-			ND_PRINT(" %04x", access_flags);
+			ND_PRINT(C_RESET, " %04x", access_flags);
 		} else if ((access_flags & NFSV3ACCESS_FULL) == NFSV3ACCESS_FULL) {
-			ND_PRINT(" NFS_ACCESS_FULL");
+			ND_PRINT(C_RESET, " NFS_ACCESS_FULL");
 		} else {
 			char separator = ' ';
 			if (access_flags & NFSV3ACCESS_READ) {
-				ND_PRINT(" NFS_ACCESS_READ");
+				ND_PRINT(C_RESET, " NFS_ACCESS_READ");
 				separator = '|';
 			}
 			if (access_flags & NFSV3ACCESS_LOOKUP) {
-				ND_PRINT("%cNFS_ACCESS_LOOKUP", separator);
+				ND_PRINT(C_RESET, "%cNFS_ACCESS_LOOKUP", separator);
 				separator = '|';
 			}
 			if (access_flags & NFSV3ACCESS_MODIFY) {
-				ND_PRINT("%cNFS_ACCESS_MODIFY", separator);
+				ND_PRINT(C_RESET, "%cNFS_ACCESS_MODIFY", separator);
 				separator = '|';
 			}
 			if (access_flags & NFSV3ACCESS_EXTEND) {
-				ND_PRINT("%cNFS_ACCESS_EXTEND", separator);
+				ND_PRINT(C_RESET, "%cNFS_ACCESS_EXTEND", separator);
 				separator = '|';
 			}
 			if (access_flags & NFSV3ACCESS_DELETE) {
-				ND_PRINT("%cNFS_ACCESS_DELETE", separator);
+				ND_PRINT(C_RESET, "%cNFS_ACCESS_DELETE", separator);
 				separator = '|';
 			}
 			if (access_flags & NFSV3ACCESS_EXECUTE)
-				ND_PRINT("%cNFS_ACCESS_EXECUTE", separator);
+				ND_PRINT(C_RESET, "%cNFS_ACCESS_EXECUTE", separator);
 		}
 		break;
 
@@ -650,11 +650,11 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 		if (dp == NULL)
 			goto trunc;
 		if (v3) {
-			ND_PRINT(" %u bytes @ %" PRIu64,
+			ND_PRINT(C_RESET, " %u bytes @ %" PRIu64,
 			       GET_BE_U_4(dp + 2),
 			       GET_BE_U_8(dp));
 		} else {
-			ND_PRINT(" %u bytes @ %u",
+			ND_PRINT(C_RESET, " %u bytes @ %u",
 			    GET_BE_U_4(dp + 1),
 			    GET_BE_U_4(dp));
 		}
@@ -668,17 +668,17 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 		if (dp == NULL)
 			goto trunc;
 		if (v3) {
-			ND_PRINT(" %u (%u) bytes @ %" PRIu64,
+			ND_PRINT(C_RESET, " %u (%u) bytes @ %" PRIu64,
 					GET_BE_U_4(dp + 4),
 					GET_BE_U_4(dp + 2),
 					GET_BE_U_8(dp));
 			if (ndo->ndo_vflag) {
-				ND_PRINT(" <%s>",
+				ND_PRINT(C_RESET, " <%s>",
 					tok2str(nfsv3_writemodes,
 						NULL, GET_BE_U_4(dp + 3)));
 			}
 		} else {
-			ND_PRINT(" %u (%u) bytes @ %u (%u)",
+			ND_PRINT(C_RESET, " %u (%u) bytes @ %u (%u)",
 					GET_BE_U_4(dp + 3),
 					GET_BE_U_4(dp + 2),
 					GET_BE_U_4(dp + 1),
@@ -693,7 +693,7 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 		dp = parsefhn(ndo, dp, v3);
 		if (dp == NULL)
 			goto trunc;
-		ND_PRINT(" ->");
+		ND_PRINT(C_RESET, " ->");
 		if (v3 && (dp = parse_sattr3(ndo, dp, &sa3)) == NULL)
 			goto trunc;
 		if (parsefn(ndo, dp) == NULL)
@@ -714,9 +714,9 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 		dp = parse_sattr3(ndo, dp, &sa3);
 		if (dp == NULL)
 			goto trunc;
-		ND_PRINT(" %s", tok2str(type2str, "unk-ft %u", type));
+		ND_PRINT(C_RESET, " %s", tok2str(type2str, "unk-ft %u", type));
 		if (ndo->ndo_vflag && (type == NFCHR || type == NFBLK)) {
-			ND_PRINT(" %u/%u",
+			ND_PRINT(C_RESET, " %u/%u",
 			       GET_BE_U_4(dp),
 			       GET_BE_U_4(dp + 1));
 			dp += 2;
@@ -732,7 +732,7 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 		dp = parsefhn(ndo, dp, v3);
 		if (dp == NULL)
 			goto trunc;
-		ND_PRINT(" ->");
+		ND_PRINT(C_RESET, " ->");
 		if (parsefhn(ndo, dp, v3) == NULL)
 			goto trunc;
 		break;
@@ -744,7 +744,7 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 		dp = parsefh(ndo, dp, v3);
 		if (dp == NULL)
 			goto trunc;
-		ND_PRINT(" ->");
+		ND_PRINT(C_RESET, " ->");
 		if (parsefhn(ndo, dp, v3) == NULL)
 			goto trunc;
 		break;
@@ -761,7 +761,7 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 			 * We shouldn't really try to interpret the
 			 * offset cookie here.
 			 */
-			ND_PRINT(" %u bytes @ %" PRId64,
+			ND_PRINT(C_RESET, " %u bytes @ %" PRId64,
 			    GET_BE_U_4(dp + 4),
 			    GET_BE_U_8(dp));
 			if (ndo->ndo_vflag) {
@@ -771,7 +771,7 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 				 * from the low-order byte
 				 * to the high-order byte.
 				 */
-				ND_PRINT(" verf %08x%08x",
+				ND_PRINT(C_RESET, " verf %08x%08x",
 					  GET_BE_U_4(dp + 2),
 					  GET_BE_U_4(dp + 3));
 			}
@@ -780,7 +780,7 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 			 * Print the offset as signed, since -1 is
 			 * common, but offsets > 2^31 aren't.
 			 */
-			ND_PRINT(" %u bytes @ %u",
+			ND_PRINT(C_RESET, " %u bytes @ %u",
 			    GET_BE_U_4(dp + 1),
 			    GET_BE_U_4(dp));
 		}
@@ -797,7 +797,7 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 		 * We don't try to interpret the offset
 		 * cookie here.
 		 */
-		ND_PRINT(" %u bytes @ %" PRId64,
+		ND_PRINT(C_RESET, " %u bytes @ %" PRId64,
 			GET_BE_U_4(dp + 4),
 			GET_BE_U_8(dp));
 		if (ndo->ndo_vflag) {
@@ -807,7 +807,7 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 			 * from the low-order byte
 			 * to the high-order byte.
 			 */
-			ND_PRINT(" max %u verf %08x%08x",
+			ND_PRINT(C_RESET, " max %u verf %08x%08x",
 			          GET_BE_U_4(dp + 5),
 			          GET_BE_U_4(dp + 2),
 			          GET_BE_U_4(dp + 3));
@@ -821,7 +821,7 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 		dp = parsefh(ndo, dp, v3);
 		if (dp == NULL)
 			goto trunc;
-		ND_PRINT(" %u bytes @ %" PRIu64,
+		ND_PRINT(C_RESET, " %u bytes @ %" PRIu64,
 			GET_BE_U_4(dp + 2),
 			GET_BE_U_8(dp));
 		break;
@@ -857,7 +857,7 @@ nfs_printfh(netdissect_options *ndo,
 		u_int i;
 		char const *sep = "";
 
-		ND_PRINT(" fh[");
+		ND_PRINT(C_RESET, " fh[");
 		for (i=0; i<len; i++) {
 			/*
 			 * This displays 4 bytes in big-endian byte
@@ -871,10 +871,10 @@ nfs_printfh(netdissect_options *ndo,
 			 * running tcpdump may show the same file
 			 * handle in different ways.
 			 */
-			ND_PRINT("%s%x", sep, GET_BE_U_4(dp + i));
+			ND_PRINT(C_RESET, "%s%x", sep, GET_BE_U_4(dp + i));
 			sep = ":";
 		}
-		ND_PRINT("]");
+		ND_PRINT(C_RESET, "]");
 		return;
 	}
 
@@ -896,17 +896,17 @@ nfs_printfh(netdissect_options *ndo,
 		if (spacep)
 			*spacep = '\0';
 
-		ND_PRINT(" fh %s/", temp);
+		ND_PRINT(C_RESET, " fh %s/", temp);
 	} else {
-		ND_PRINT(" fh %u,%u/",
+		ND_PRINT(C_RESET, " fh %u,%u/",
 			     fsid.Fsid_dev.Major, fsid.Fsid_dev.Minor);
 	}
 
 	if(fsid.Fsid_dev.Minor == 257)
 		/* Print the undecoded handle */
-		ND_PRINT("%s", fsid.Opaque_Handle);
+		ND_PRINT(C_RESET, "%s", fsid.Opaque_Handle);
 	else
-		ND_PRINT("%u", ino);
+		ND_PRINT(C_RESET, "%u", ino);
 }
 
 /*
@@ -1088,7 +1088,7 @@ parserep(netdissect_options *ndo,
 	 */
 	astat = (enum sunrpc_accept_stat) GET_BE_U_4(dp);
 	if (astat != SUNRPC_SUCCESS) {
-		ND_PRINT(" %s", tok2str(sunrpc_str, "ar_stat %u", astat));
+		ND_PRINT(C_RESET, " %s", tok2str(sunrpc_str, "ar_stat %u", astat));
 		*nfserrp = 1;		/* suppress trunc string */
 		return (NULL);
 	}
@@ -1110,7 +1110,7 @@ parsestatus(netdissect_options *ndo,
 		*er = errnum;
 	if (errnum != 0) {
 		if (!ndo->ndo_qflag)
-			ND_PRINT(" ERROR: %s",
+			ND_PRINT(C_RESET, " ERROR: %s",
 			    tok2str(status2str, "unk %u", errnum));
 		*nfserrp = 1;
 	}
@@ -1132,54 +1132,54 @@ parsefattr(netdissect_options *ndo,
 		 * signed because -2 has traditionally been the
 		 * UID for "nobody", rather than 4294967294.
 		 */
-		ND_PRINT(" %s %o ids %d/%d",
+		ND_PRINT(C_RESET, " %s %o ids %d/%d",
 		    tok2str(type2str, "unk-ft %u ",
 		    GET_BE_U_4(fap->fa_type)),
 		    GET_BE_U_4(fap->fa_mode),
 		    GET_BE_S_4(fap->fa_uid),
 		    GET_BE_S_4(fap->fa_gid));
 		if (v3) {
-			ND_PRINT(" sz %" PRIu64,
+			ND_PRINT(C_RESET, " sz %" PRIu64,
 				GET_BE_U_8(fap->fa3_size));
 		} else {
-			ND_PRINT(" sz %u", GET_BE_U_4(fap->fa2_size));
+			ND_PRINT(C_RESET, " sz %u", GET_BE_U_4(fap->fa2_size));
 		}
 	}
 	/* print lots more stuff */
 	if (verbose > 1) {
 		if (v3) {
 			ND_TCHECK_8(&fap->fa3_ctime);
-			ND_PRINT(" nlink %u rdev %u/%u",
+			ND_PRINT(C_RESET, " nlink %u rdev %u/%u",
 			       GET_BE_U_4(fap->fa_nlink),
 			       GET_BE_U_4(fap->fa3_rdev.specdata1),
 			       GET_BE_U_4(fap->fa3_rdev.specdata2));
-			ND_PRINT(" fsid %" PRIx64,
+			ND_PRINT(C_RESET, " fsid %" PRIx64,
 				GET_BE_U_8(fap->fa3_fsid));
-			ND_PRINT(" fileid %" PRIx64,
+			ND_PRINT(C_RESET, " fileid %" PRIx64,
 				GET_BE_U_8(fap->fa3_fileid));
-			ND_PRINT(" a/m/ctime %u.%06u",
+			ND_PRINT(C_RESET, " a/m/ctime %u.%06u",
 			       GET_BE_U_4(fap->fa3_atime.nfsv3_sec),
 			       GET_BE_U_4(fap->fa3_atime.nfsv3_nsec));
-			ND_PRINT(" %u.%06u",
+			ND_PRINT(C_RESET, " %u.%06u",
 			       GET_BE_U_4(fap->fa3_mtime.nfsv3_sec),
 			       GET_BE_U_4(fap->fa3_mtime.nfsv3_nsec));
-			ND_PRINT(" %u.%06u",
+			ND_PRINT(C_RESET, " %u.%06u",
 			       GET_BE_U_4(fap->fa3_ctime.nfsv3_sec),
 			       GET_BE_U_4(fap->fa3_ctime.nfsv3_nsec));
 		} else {
 			ND_TCHECK_8(&fap->fa2_ctime);
-			ND_PRINT(" nlink %u rdev 0x%x fsid 0x%x nodeid 0x%x a/m/ctime",
+			ND_PRINT(C_RESET, " nlink %u rdev 0x%x fsid 0x%x nodeid 0x%x a/m/ctime",
 			       GET_BE_U_4(fap->fa_nlink),
 			       GET_BE_U_4(fap->fa2_rdev),
 			       GET_BE_U_4(fap->fa2_fsid),
 			       GET_BE_U_4(fap->fa2_fileid));
-			ND_PRINT(" %u.%06u",
+			ND_PRINT(C_RESET, " %u.%06u",
 			       GET_BE_U_4(fap->fa2_atime.nfsv2_sec),
 			       GET_BE_U_4(fap->fa2_atime.nfsv2_usec));
-			ND_PRINT(" %u.%06u",
+			ND_PRINT(C_RESET, " %u.%06u",
 			       GET_BE_U_4(fap->fa2_mtime.nfsv2_sec),
 			       GET_BE_U_4(fap->fa2_mtime.nfsv2_usec));
-			ND_PRINT(" %u.%06u",
+			ND_PRINT(C_RESET, " %u.%06u",
 			       GET_BE_U_4(fap->fa2_ctime.nfsv2_sec),
 			       GET_BE_U_4(fap->fa2_ctime.nfsv2_usec));
 		}
@@ -1240,7 +1240,7 @@ parselinkres(netdissect_options *ndo,
 		if (dp == NULL)
 			return (0);
 	}
-	ND_PRINT(" ");
+	ND_PRINT(C_RESET, " ");
 	return (parsefn(ndo, dp) != NULL);
 }
 
@@ -1262,7 +1262,7 @@ parsestatfs(netdissect_options *ndo,
 
 	if (v3) {
 		if (ndo->ndo_vflag)
-			ND_PRINT(" POST:");
+			ND_PRINT(C_RESET, " POST:");
 		dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag);
 		if (dp == NULL)
 			return (0);
@@ -1273,19 +1273,19 @@ parsestatfs(netdissect_options *ndo,
 	sfsp = (const struct nfs_statfs *)dp;
 
 	if (v3) {
-		ND_PRINT(" tbytes %" PRIu64 " fbytes %" PRIu64 " abytes %" PRIu64,
+		ND_PRINT(C_RESET, " tbytes %" PRIu64 " fbytes %" PRIu64 " abytes %" PRIu64,
 			GET_BE_U_8(sfsp->sf_tbytes),
 			GET_BE_U_8(sfsp->sf_fbytes),
 			GET_BE_U_8(sfsp->sf_abytes));
 		if (ndo->ndo_vflag) {
-			ND_PRINT(" tfiles %" PRIu64 " ffiles %" PRIu64 " afiles %" PRIu64 " invar %u",
+			ND_PRINT(C_RESET, " tfiles %" PRIu64 " ffiles %" PRIu64 " afiles %" PRIu64 " invar %u",
 			       GET_BE_U_8(sfsp->sf_tfiles),
 			       GET_BE_U_8(sfsp->sf_ffiles),
 			       GET_BE_U_8(sfsp->sf_afiles),
 			       GET_BE_U_4(sfsp->sf_invarsec));
 		}
 	} else {
-		ND_PRINT(" tsize %u bsize %u blocks %u bfree %u bavail %u",
+		ND_PRINT(C_RESET, " tsize %u bsize %u blocks %u bfree %u bavail %u",
 			GET_BE_U_4(sfsp->sf_tsize),
 			GET_BE_U_4(sfsp->sf_bsize),
 			GET_BE_U_4(sfsp->sf_blocks),
@@ -1312,10 +1312,10 @@ parserddires(netdissect_options *ndo,
 	if (ndo->ndo_qflag)
 		return (1);
 
-	ND_PRINT(" offset 0x%x size %u ",
+	ND_PRINT(C_RESET, " offset 0x%x size %u ",
 	       GET_BE_U_4(dp), GET_BE_U_4(dp + 1));
 	if (GET_BE_U_4(dp + 2) != 0)
-		ND_PRINT(" eof");
+		ND_PRINT(C_RESET, " eof");
 
 	return (1);
 }
@@ -1325,8 +1325,8 @@ parse_wcc_attr(netdissect_options *ndo,
                const uint32_t *dp)
 {
 	/* Our caller has already checked this */
-	ND_PRINT(" sz %" PRIu64, GET_BE_U_8(dp));
-	ND_PRINT(" mtime %u.%06u ctime %u.%06u",
+	ND_PRINT(C_RESET, " sz %" PRIu64, GET_BE_U_8(dp));
+	ND_PRINT(C_RESET, " mtime %u.%06u ctime %u.%06u",
 	       GET_BE_U_4(dp + 2), GET_BE_U_4(dp + 3),
 	       GET_BE_U_4(dp + 4), GET_BE_U_4(dp + 5));
 	return (dp + 6);
@@ -1374,13 +1374,13 @@ parse_wcc_data(netdissect_options *ndo,
                const uint32_t *dp, int verbose)
 {
 	if (verbose > 1)
-		ND_PRINT(" PRE:");
+		ND_PRINT(C_RESET, " PRE:");
 	dp = parse_pre_op_attr(ndo, dp, verbose);
 	if (dp == NULL)
 		return (0);
 
 	if (verbose)
-		ND_PRINT(" POST:");
+		ND_PRINT(C_RESET, " POST:");
 	return parse_post_op_attr(ndo, dp, verbose);
 }
 
@@ -1407,7 +1407,7 @@ parsecreateopres(netdissect_options *ndo,
 			if (dp == NULL)
 				return (0);
 			if (ndo->ndo_vflag > 1) {
-				ND_PRINT(" dir attr:");
+				ND_PRINT(C_RESET, " dir attr:");
 				dp = parse_wcc_data(ndo, dp, verbose);
 			}
 		}
@@ -1437,7 +1437,7 @@ parsev3rddirres(netdissect_options *ndo,
 	if (dp == NULL)
 		return (0);
 	if (ndo->ndo_vflag)
-		ND_PRINT(" POST:");
+		ND_PRINT(C_RESET, " POST:");
 	dp = parse_post_op_attr(ndo, dp, verbose);
 	if (dp == NULL)
 		return (0);
@@ -1448,7 +1448,7 @@ parsev3rddirres(netdissect_options *ndo,
 		 * This displays the 8 bytes of the verifier in order,
 		 * from the low-order byte to the high-order byte.
 		 */
-		ND_PRINT(" verf %08x%08x",
+		ND_PRINT(C_RESET, " verf %08x%08x",
 			  GET_BE_U_4(dp), GET_BE_U_4(dp + 1));
 		dp += 2;
 	}
@@ -1466,7 +1466,7 @@ parsefsinfo(netdissect_options *ndo,
 	if (dp == NULL)
 		return (0);
 	if (ndo->ndo_vflag)
-		ND_PRINT(" POST:");
+		ND_PRINT(C_RESET, " POST:");
 	dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag);
 	if (dp == NULL)
 		return (0);
@@ -1475,18 +1475,18 @@ parsefsinfo(netdissect_options *ndo,
 
 	sfp = (const struct nfsv3_fsinfo *)dp;
 	ND_TCHECK_SIZE(sfp);
-	ND_PRINT(" rtmax %u rtpref %u wtmax %u wtpref %u dtpref %u",
+	ND_PRINT(C_RESET, " rtmax %u rtpref %u wtmax %u wtpref %u dtpref %u",
 	       GET_BE_U_4(sfp->fs_rtmax),
 	       GET_BE_U_4(sfp->fs_rtpref),
 	       GET_BE_U_4(sfp->fs_wtmax),
 	       GET_BE_U_4(sfp->fs_wtpref),
 	       GET_BE_U_4(sfp->fs_dtpref));
 	if (ndo->ndo_vflag) {
-		ND_PRINT(" rtmult %u wtmult %u maxfsz %" PRIu64,
+		ND_PRINT(C_RESET, " rtmult %u wtmult %u maxfsz %" PRIu64,
 		       GET_BE_U_4(sfp->fs_rtmult),
 		       GET_BE_U_4(sfp->fs_wtmult),
 		       GET_BE_U_8(sfp->fs_maxfilesize));
-		ND_PRINT(" delta %u.%06u ",
+		ND_PRINT(C_RESET, " delta %u.%06u ",
 		       GET_BE_U_4(sfp->fs_timedelta.nfsv3_sec),
 		       GET_BE_U_4(sfp->fs_timedelta.nfsv3_nsec));
 	}
@@ -1506,7 +1506,7 @@ parsepathconf(netdissect_options *ndo,
 	if (dp == NULL)
 		return (0);
 	if (ndo->ndo_vflag)
-		ND_PRINT(" POST:");
+		ND_PRINT(C_RESET, " POST:");
 	dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag);
 	if (dp == NULL)
 		return (0);
@@ -1516,7 +1516,7 @@ parsepathconf(netdissect_options *ndo,
 	spp = (const struct nfsv3_pathconf *)dp;
 	ND_TCHECK_SIZE(spp);
 
-	ND_PRINT(" linkmax %u namemax %u %s %s %s %s",
+	ND_PRINT(C_RESET, " linkmax %u namemax %u %s %s %s %s",
 	       GET_BE_U_4(spp->pc_linkmax),
 	       GET_BE_U_4(spp->pc_namemax),
 	       GET_BE_U_4(spp->pc_notrunc) ? "notrunc" : "",
@@ -1543,7 +1543,7 @@ interp_reply(netdissect_options *ndo,
 	if (!v3 && proc < NFS_NPROCS)
 		proc = nfsv3_procid[proc];
 
-	ND_PRINT(" %s", tok2str(nfsproc_str, "proc-%u", proc));
+	ND_PRINT(C_RESET, " %s", tok2str(nfsproc_str, "proc-%u", proc));
 	switch (proc) {
 
 	case NFSPROC_GETATTR:
@@ -1577,7 +1577,7 @@ interp_reply(netdissect_options *ndo,
 				goto trunc;
 			if (er) {
 				if (ndo->ndo_vflag > 1) {
-					ND_PRINT(" post dattr:");
+					ND_PRINT(C_RESET, " post dattr:");
 					dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag);
 					if (dp == NULL)
 						goto trunc;
@@ -1590,7 +1590,7 @@ interp_reply(netdissect_options *ndo,
 				if (dp == NULL)
 					goto trunc;
 				if (ndo->ndo_vflag > 1) {
-					ND_PRINT(" post dattr:");
+					ND_PRINT(C_RESET, " post dattr:");
 					dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag);
 					if (dp == NULL)
 						goto trunc;
@@ -1610,12 +1610,12 @@ interp_reply(netdissect_options *ndo,
 		if (dp == NULL)
 			goto trunc;
 		if (ndo->ndo_vflag)
-			ND_PRINT(" attr:");
+			ND_PRINT(C_RESET, " attr:");
 		dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag);
 		if (dp == NULL)
 			goto trunc;
 		if (!er) {
-			ND_PRINT(" c %04x", GET_BE_U_4(dp));
+			ND_PRINT(C_RESET, " c %04x", GET_BE_U_4(dp));
 		}
 		break;
 
@@ -1640,9 +1640,9 @@ interp_reply(netdissect_options *ndo,
 				goto trunc;
 			if (!er) {
 				if (ndo->ndo_vflag) {
-					ND_PRINT(" %u bytes", GET_BE_U_4(dp));
+					ND_PRINT(C_RESET, " %u bytes", GET_BE_U_4(dp));
 					if (GET_BE_U_4(dp + 1))
-						ND_PRINT(" EOF");
+						ND_PRINT(C_RESET, " EOF");
 				}
 			}
 		} else {
@@ -1664,14 +1664,14 @@ interp_reply(netdissect_options *ndo,
 				goto trunc;
 			if (!er) {
 				if (ndo->ndo_vflag) {
-					ND_PRINT(" %u bytes", GET_BE_U_4(dp));
+					ND_PRINT(C_RESET, " %u bytes", GET_BE_U_4(dp));
 					if (ndo->ndo_vflag > 1) {
-						ND_PRINT(" <%s>",
+						ND_PRINT(C_RESET, " <%s>",
 							tok2str(nfsv3_writemodes,
 								NULL, GET_BE_U_4(dp + 1)));
 
 						/* write-verf-cookie */
-						ND_PRINT(" verf %" PRIx64,
+						ND_PRINT(C_RESET, " verf %" PRIx64,
 						         GET_BE_U_8(dp + 2));
 					}
 				}
@@ -1741,11 +1741,11 @@ interp_reply(netdissect_options *ndo,
 			if (dp == NULL)
 				goto trunc;
 			if (ndo->ndo_vflag) {
-				ND_PRINT(" from:");
+				ND_PRINT(C_RESET, " from:");
 				dp = parse_wcc_data(ndo, dp, ndo->ndo_vflag);
 				if (dp == NULL)
 					goto trunc;
-				ND_PRINT(" to:");
+				ND_PRINT(C_RESET, " to:");
 				dp = parse_wcc_data(ndo, dp, ndo->ndo_vflag);
 				if (dp == NULL)
 					goto trunc;
@@ -1765,11 +1765,11 @@ interp_reply(netdissect_options *ndo,
 			if (dp == NULL)
 				goto trunc;
 			if (ndo->ndo_vflag) {
-				ND_PRINT(" file POST:");
+				ND_PRINT(C_RESET, " file POST:");
 				dp = parse_post_op_attr(ndo, dp, ndo->ndo_vflag);
 				if (dp == NULL)
 					goto trunc;
-				ND_PRINT(" dir:");
+				ND_PRINT(C_RESET, " dir:");
 				dp = parse_wcc_data(ndo, dp, ndo->ndo_vflag);
 				if (dp == NULL)
 					goto trunc;
@@ -1835,7 +1835,7 @@ interp_reply(netdissect_options *ndo,
 			goto trunc;
 		if (ndo->ndo_vflag > 1) {
 			/* write-verf-cookie */
-			ND_PRINT(" verf %" PRIx64, GET_BE_U_8(dp));
+			ND_PRINT(C_RESET, " verf %" PRIx64, GET_BE_U_8(dp));
 		}
 		break;
 

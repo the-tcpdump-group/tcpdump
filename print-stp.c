@@ -105,10 +105,10 @@ stp_print_config_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
     uint8_t bpdu_flags;
 
     bpdu_flags = GET_U_1(stp_bpdu->flags);
-    ND_PRINT(", Flags [%s]",
+    ND_PRINT(C_RESET, C_RESET ", Flags [%s]",
            bittok2str(stp_bpdu_flag_values, "none", bpdu_flags));
 
-    ND_PRINT(", bridge-id %s.%04x, length %u",
+    ND_PRINT(C_RESET, C_RESET ", bridge-id %s.%04x, length %u",
            stp_print_bridge_id(ndo, stp_bpdu->bridge_id),
            GET_BE_U_2(stp_bpdu->port_id), length);
 
@@ -117,20 +117,20 @@ stp_print_config_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
         return;
     }
 
-    ND_PRINT("\n\tmessage-age %.2fs, max-age %.2fs"
+    ND_PRINT(C_RESET, C_RESET "\n\tmessage-age %.2fs, max-age %.2fs"
            ", hello-time %.2fs, forwarding-delay %.2fs",
            (float) GET_BE_U_2(stp_bpdu->message_age) / STP_TIME_BASE,
            (float) GET_BE_U_2(stp_bpdu->max_age) / STP_TIME_BASE,
            (float) GET_BE_U_2(stp_bpdu->hello_time) / STP_TIME_BASE,
            (float) GET_BE_U_2(stp_bpdu->forward_delay) / STP_TIME_BASE);
 
-    ND_PRINT("\n\troot-id %s, root-pathcost %u",
+    ND_PRINT(C_RESET, C_RESET "\n\troot-id %s, root-pathcost %u",
            stp_print_bridge_id(ndo, stp_bpdu->root_id),
            GET_BE_U_4(stp_bpdu->root_path_cost));
 
     /* Port role is only valid for 802.1w */
     if (GET_U_1(stp_bpdu->protocol_version) == STP_PROTO_RAPID) {
-        ND_PRINT(", port-role %s",
+        ND_PRINT(C_RESET, C_RESET ", port-role %s",
                tok2str(rstp_obj_port_role_values, "Unknown",
                        RSTP_EXTRACT_PORT_ROLE(bpdu_flags)));
     }
@@ -244,7 +244,7 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
 
     ptr = (const u_char *)stp_bpdu;
     bpdu_flags = GET_U_1(stp_bpdu->flags);
-    ND_PRINT(", CIST Flags [%s], length %u",
+    ND_PRINT(C_RESET, C_RESET ", CIST Flags [%s], length %u",
            bittok2str(stp_bpdu_flag_values, "none", bpdu_flags), length);
 
     /*
@@ -254,30 +254,30 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
         return;
     }
 
-    ND_PRINT("\n\tport-role %s, ",
+    ND_PRINT(C_RESET, C_RESET "\n\tport-role %s, ",
            tok2str(rstp_obj_port_role_values, "Unknown",
                    RSTP_EXTRACT_PORT_ROLE(bpdu_flags)));
 
-    ND_PRINT("CIST root-id %s, CIST ext-pathcost %u",
+    ND_PRINT(C_RESET, C_RESET "CIST root-id %s, CIST ext-pathcost %u",
            stp_print_bridge_id(ndo, stp_bpdu->root_id),
            GET_BE_U_4(stp_bpdu->root_path_cost));
 
-    ND_PRINT("\n\tCIST regional-root-id %s, ",
+    ND_PRINT(C_RESET, C_RESET "\n\tCIST regional-root-id %s, ",
            stp_print_bridge_id(ndo, stp_bpdu->bridge_id));
 
-    ND_PRINT("CIST port-id %04x,", GET_BE_U_2(stp_bpdu->port_id));
+    ND_PRINT(C_RESET, C_RESET "CIST port-id %04x,", GET_BE_U_2(stp_bpdu->port_id));
 
-    ND_PRINT("\n\tmessage-age %.2fs, max-age %.2fs"
+    ND_PRINT(C_RESET, C_RESET "\n\tmessage-age %.2fs, max-age %.2fs"
            ", hello-time %.2fs, forwarding-delay %.2fs",
            (float) GET_BE_U_2(stp_bpdu->message_age) / STP_TIME_BASE,
            (float) GET_BE_U_2(stp_bpdu->max_age) / STP_TIME_BASE,
            (float) GET_BE_U_2(stp_bpdu->hello_time) / STP_TIME_BASE,
            (float) GET_BE_U_2(stp_bpdu->forward_delay) / STP_TIME_BASE);
 
-    ND_PRINT("\n\tv3len %u, ", GET_BE_U_2(ptr + MST_BPDU_VER3_LEN_OFFSET));
-    ND_PRINT("MCID Name ");
+    ND_PRINT(C_RESET, C_RESET "\n\tv3len %u, ", GET_BE_U_2(ptr + MST_BPDU_VER3_LEN_OFFSET));
+    ND_PRINT(C_RESET, C_RESET "MCID Name ");
     nd_printjnp(ndo, ptr + MST_BPDU_CONFIG_NAME_OFFSET, 32);
-    ND_PRINT(", rev %u,"
+    ND_PRINT(C_RESET, C_RESET ", rev %u,"
             "\n\t\tdigest %08x%08x%08x%08x, ",
 	          GET_BE_U_2(ptr + MST_BPDU_CONFIG_NAME_OFFSET + 32),
 	          GET_BE_U_4(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET),
@@ -285,13 +285,13 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
 	          GET_BE_U_4(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 8),
 	          GET_BE_U_4(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 12));
 
-    ND_PRINT("CIST int-root-pathcost %u,",
+    ND_PRINT(C_RESET, C_RESET "CIST int-root-pathcost %u,",
             GET_BE_U_4(ptr + MST_BPDU_CIST_INT_PATH_COST_OFFSET));
 
-    ND_PRINT("\n\tCIST bridge-id %s, ",
+    ND_PRINT(C_RESET, C_RESET "\n\tCIST bridge-id %s, ",
            stp_print_bridge_id(ndo, ptr + MST_BPDU_CIST_BRIDGE_ID_OFFSET));
 
-    ND_PRINT("CIST remaining-hops %u",
+    ND_PRINT(C_RESET, C_RESET "CIST remaining-hops %u",
              GET_U_1(ptr + MST_BPDU_CIST_REMAIN_HOPS_OFFSET));
 
     /* Dump all MSTI's */
@@ -303,16 +303,16 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
             msti = GET_BE_U_2(ptr + offset + MST_BPDU_MSTI_ROOT_PRIO_OFFSET);
             msti = msti & 0x0FFF;
 
-            ND_PRINT("\n\tMSTI %u, Flags [%s], port-role %s",
+            ND_PRINT(C_RESET, C_RESET "\n\tMSTI %u, Flags [%s], port-role %s",
                    msti,
                    bittok2str(stp_bpdu_flag_values, "none", GET_U_1(ptr + offset)),
                    tok2str(rstp_obj_port_role_values, "Unknown",
                            RSTP_EXTRACT_PORT_ROLE(GET_U_1(ptr + offset))));
-            ND_PRINT("\n\t\tMSTI regional-root-id %s, pathcost %u",
+            ND_PRINT(C_RESET, C_RESET "\n\t\tMSTI regional-root-id %s, pathcost %u",
                    stp_print_bridge_id(ndo, ptr + offset +
                                        MST_BPDU_MSTI_ROOT_PRIO_OFFSET),
                    GET_BE_U_4(ptr + offset + MST_BPDU_MSTI_ROOT_PATH_COST_OFFSET));
-            ND_PRINT("\n\t\tMSTI bridge-prio %u, port-prio %u, hops %u",
+            ND_PRINT(C_RESET, C_RESET "\n\t\tMSTI bridge-prio %u, port-prio %u, hops %u",
                    GET_U_1(ptr + offset + MST_BPDU_MSTI_BRIDGE_PRIO_OFFSET) >> 4,
                    GET_U_1(ptr + offset + MST_BPDU_MSTI_PORT_PRIO_OFFSET) >> 4,
                    GET_U_1(ptr + offset + MST_BPDU_MSTI_REMAIN_HOPS_OFFSET));
@@ -338,17 +338,17 @@ stp_print_spb_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
 
     ptr = (const u_char *)stp_bpdu;
 
-    ND_PRINT("\n\tv4len %u, ", GET_BE_U_2(ptr + offset));
-    ND_PRINT("AUXMCID Name ");
+    ND_PRINT(C_RESET, C_RESET "\n\tv4len %u, ", GET_BE_U_2(ptr + offset));
+    ND_PRINT(C_RESET, C_RESET "AUXMCID Name ");
     nd_printjnp(ndo, ptr + offset + SPB_BPDU_CONFIG_NAME_OFFSET, 32);
-    ND_PRINT(", Rev %u,\n\t\tdigest %08x%08x%08x%08x",
+    ND_PRINT(C_RESET, C_RESET ", Rev %u,\n\t\tdigest %08x%08x%08x%08x",
             GET_BE_U_2(ptr + offset + SPB_BPDU_CONFIG_REV_OFFSET),
             GET_BE_U_4(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET),
             GET_BE_U_4(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 4),
             GET_BE_U_4(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 8),
             GET_BE_U_4(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 12));
 
-    ND_PRINT("\n\tAgreement num %u, Discarded Agreement num %u, Agreement valid-"
+    ND_PRINT(C_RESET, C_RESET "\n\tAgreement num %u, Discarded Agreement num %u, Agreement valid-"
             "flag %u,\n\tRestricted role-flag: %u, Format id %u cap %u, "
             "Convention id %u cap %u,\n\tEdge count %u, "
             "Agreement digest %08x%08x%08x%08x%08x",
@@ -388,12 +388,12 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
         goto invalid;
 
     if (GET_BE_U_2(stp_bpdu->protocol_id)) {
-        ND_PRINT("unknown STP version, length %u", length);
+        ND_PRINT(C_RESET, C_RESET "unknown STP version, length %u", length);
         return;
     }
 
     protocol_version = GET_U_1(stp_bpdu->protocol_version);
-    ND_PRINT("STP %s", tok2str(stp_proto_values, "Unknown STP protocol (0x%02x)",
+    ND_PRINT(C_RESET, C_RESET "STP %s", tok2str(stp_proto_values, "Unknown STP protocol (0x%02x)",
                          protocol_version));
 
     switch (protocol_version) {
@@ -407,7 +407,7 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
     }
 
     bpdu_type = GET_U_1(stp_bpdu->bpdu_type);
-    ND_PRINT(", %s", tok2str(stp_bpdu_type_values, "Unknown BPDU Type (0x%02x)",
+    ND_PRINT(C_RESET, C_RESET ", %s", tok2str(stp_bpdu_type_values, "Unknown BPDU Type (0x%02x)",
                            bpdu_type));
 
     switch (bpdu_type) {

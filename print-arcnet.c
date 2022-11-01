@@ -129,7 +129,7 @@ arcnet_print(netdissect_options *ndo, const u_char *bp, u_int length, int phds,
 	ap = (const struct arc_header *)bp;
 
 	if (ndo->ndo_qflag) {
-		ND_PRINT("%02x %02x %u: ",
+		ND_PRINT(C_RESET, "%02x %02x %u: ",
 			     GET_U_1(ap->arc_shost),
 			     GET_U_1(ap->arc_dhost),
 			     length);
@@ -139,7 +139,7 @@ arcnet_print(netdissect_options *ndo, const u_char *bp, u_int length, int phds,
 	arctypename = tok2str(arctypemap, "%02x", GET_U_1(ap->arc_type));
 
 	if (!phds) {
-		ND_PRINT("%02x %02x %s %u: ",
+		ND_PRINT(C_RESET, "%02x %02x %s %u: ",
 			     GET_U_1(ap->arc_shost),
 			     GET_U_1(ap->arc_dhost),
 			     arctypename,
@@ -148,7 +148,7 @@ arcnet_print(netdissect_options *ndo, const u_char *bp, u_int length, int phds,
 	}
 
 	if (flag == 0) {
-		ND_PRINT("%02x %02x %s seqid %04x %u: ",
+		ND_PRINT(C_RESET, "%02x %02x %s seqid %04x %u: ",
 			GET_U_1(ap->arc_shost),
 			GET_U_1(ap->arc_dhost),
 			arctypename, seqid,
@@ -157,14 +157,14 @@ arcnet_print(netdissect_options *ndo, const u_char *bp, u_int length, int phds,
 	}
 
 	if (flag & 1)
-		ND_PRINT("%02x %02x %s seqid %04x "
+		ND_PRINT(C_RESET, "%02x %02x %s seqid %04x "
 			"(first of %u fragments) %u: ",
 			GET_U_1(ap->arc_shost),
 			GET_U_1(ap->arc_dhost),
 			arctypename, seqid,
 			(flag + 3) / 2, length);
 	else
-		ND_PRINT("%02x %02x %s seqid %04x "
+		ND_PRINT(C_RESET, "%02x %02x %s seqid %04x "
 			"(fragment %u) %u: ",
 			GET_U_1(ap->arc_shost),
 			GET_U_1(ap->arc_dhost),
@@ -214,7 +214,7 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 	if (phds) {
 		if (caplen < ARC_HDRNEWLEN) {
 			arcnet_print(ndo, p, length, 0, 0, 0);
-			ND_PRINT(" phds");
+			ND_PRINT(C_RESET, " phds");
 			ndo->ndo_ll_hdr_len += caplen;
 			nd_trunc_longjmp(ndo);
 		}
@@ -223,7 +223,7 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 		if (flag == 0xff) {
 			if (caplen < ARC_HDRNEWLEN_EXC) {
 				arcnet_print(ndo, p, length, 0, 0, 0);
-				ND_PRINT(" phds extended");
+				ND_PRINT(C_RESET, " phds extended");
 				ndo->ndo_ll_hdr_len += caplen;
 				nd_trunc_longjmp(ndo);
 			}
@@ -352,7 +352,7 @@ arcnet_encap_print(netdissect_options *ndo, u_char arctype, const u_char *p,
 
 	case ARCTYPE_ATALK:	/* XXX was this ever used? */
 		if (ndo->ndo_vflag)
-			ND_PRINT("et1 ");
+			ND_PRINT(C_RESET, "et1 ");
 		atalk_print(ndo, p, length);
 		return (1);
 

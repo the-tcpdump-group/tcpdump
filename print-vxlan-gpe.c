@@ -66,16 +66,16 @@ vxlan_gpe_print(netdissect_options *ndo, const u_char *bp, u_int len)
     uint32_t vni;
 
     ndo->ndo_protocol = "vxlan_gpe";
-    ND_PRINT("VXLAN-GPE, ");
+    ND_PRINT(C_RESET, C_RESET "VXLAN-GPE, ");
     if (len < VXLAN_GPE_HDR_LEN) {
-        ND_PRINT(" (len %u < %u)", len, VXLAN_GPE_HDR_LEN);
+        ND_PRINT(C_RESET, C_RESET " (len %u < %u)", len, VXLAN_GPE_HDR_LEN);
         goto invalid;
     }
 
     flags = GET_U_1(bp);
     bp += 1;
     len -= 1;
-    ND_PRINT("flags [%s], ",
+    ND_PRINT(C_RESET, C_RESET "flags [%s], ",
               bittok2str_nosep(vxlan_gpe_flags, "none", flags));
 
     /* Reserved */
@@ -95,8 +95,12 @@ vxlan_gpe_print(netdissect_options *ndo, const u_char *bp, u_int len)
     bp += 1;
     len -= 1;
 
-    ND_PRINT("vni %u", vni);
-    ND_PRINT(ndo->ndo_vflag ? "\n    " : ": ");
+    ND_PRINT(C_RESET, "vni %u", vni);
+
+    if(ndo->ndo_vflag)
+        ND_PRINT(C_RESET, "\n    ");
+    else
+        ND_PRINT(C_RESET, ": ");
 
     switch (next_protocol) {
     case 0x1:
@@ -112,7 +116,7 @@ vxlan_gpe_print(netdissect_options *ndo, const u_char *bp, u_int len)
         nsh_print(ndo, bp, len);
         break;
     default:
-        ND_PRINT("ERROR: unknown-next-protocol");
+        ND_PRINT(C_RESET, C_RESET "ERROR: unknown-next-protocol");
         goto invalid;
     }
 

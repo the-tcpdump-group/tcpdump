@@ -109,11 +109,11 @@ ahcp_time_print(netdissect_options *ndo,
 		goto invalid;
 	t = GET_BE_U_4(cp);
 	if (NULL == (tm = gmtime(&t)))
-		ND_PRINT(": gmtime() error");
+		ND_PRINT(C_RESET, ": gmtime() error");
 	else if (0 == strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", tm))
-		ND_PRINT(": strftime() error");
+		ND_PRINT(C_RESET, ": strftime() error");
 	else
-		ND_PRINT(": %s UTC", buf);
+		ND_PRINT(C_RESET, ": %s UTC", buf);
 	return;
 
 invalid:
@@ -127,7 +127,7 @@ ahcp_seconds_print(netdissect_options *ndo,
 {
 	if (len != 4)
 		goto invalid;
-	ND_PRINT(": %us", GET_BE_U_4(cp));
+	ND_PRINT(C_RESET, ": %us", GET_BE_U_4(cp));
 	return;
 
 invalid:
@@ -144,7 +144,7 @@ ahcp_ipv6_addresses_print(netdissect_options *ndo,
 	while (len) {
 		if (len < 16)
 			goto invalid;
-		ND_PRINT("%s%s", sep, GET_IP6ADDR_STRING(cp));
+		ND_PRINT(C_RESET, "%s%s", sep, GET_IP6ADDR_STRING(cp));
 		cp += 16;
 		len -= 16;
 		sep = ", ";
@@ -165,7 +165,7 @@ ahcp_ipv4_addresses_print(netdissect_options *ndo,
 	while (len) {
 		if (len < 4)
 			goto invalid;
-		ND_PRINT("%s%s", sep, GET_IPADDR_STRING(cp));
+		ND_PRINT(C_RESET, "%s%s", sep, GET_IPADDR_STRING(cp));
 		cp += 4;
 		len -= 4;
 		sep = ", ";
@@ -186,7 +186,7 @@ ahcp_ipv6_prefixes_print(netdissect_options *ndo,
 	while (len) {
 		if (len < 17)
 			goto invalid;
-		ND_PRINT("%s%s/%u", sep, GET_IP6ADDR_STRING(cp), GET_U_1(cp + 16));
+		ND_PRINT(C_RESET, "%s%s/%u", sep, GET_IP6ADDR_STRING(cp), GET_U_1(cp + 16));
 		cp += 17;
 		len -= 17;
 		sep = ", ";
@@ -207,7 +207,7 @@ ahcp_ipv4_prefixes_print(netdissect_options *ndo,
 	while (len) {
 		if (len < 5)
 			goto invalid;
-		ND_PRINT("%s%s/%u", sep, GET_IPADDR_STRING(cp), GET_U_1(cp + 4));
+		ND_PRINT(C_RESET, "%s%s/%u", sep, GET_IPADDR_STRING(cp), GET_U_1(cp + 4));
 		cp += 5;
 		len -= 5;
 		sep = ", ";
@@ -248,7 +248,7 @@ ahcp1_options_print(netdissect_options *ndo,
 		option_no = GET_U_1(cp);
 		cp += 1;
 		len -= 1;
-		ND_PRINT("\n\t %s", tok2str(ahcp1_opt_str, "Unknown-%u", option_no));
+		ND_PRINT(C_RESET, "\n\t %s", tok2str(ahcp1_opt_str, "Unknown-%u", option_no));
 		if (option_no == AHCP1_OPT_PAD || option_no == AHCP1_OPT_MANDATORY)
 			continue;
 		/* Length */
@@ -263,7 +263,7 @@ ahcp1_options_print(netdissect_options *ndo,
 		if (option_no <= AHCP1_OPT_MAX && data_decoders[option_no] != NULL) {
 			data_decoders[option_no](ndo, cp, option_len);
 		} else {
-			ND_PRINT(" (Length %u)", option_len);
+			ND_PRINT(C_RESET, " (Length %u)", option_len);
 			ND_TCHECK_LEN(cp, option_len);
 		}
 		cp += option_len;
@@ -299,10 +299,10 @@ ahcp1_body_print(netdissect_options *ndo,
 	len -= 2;
 
 	if (ndo->ndo_vflag) {
-		ND_PRINT("\n\t%s", tok2str(ahcp1_msg_str, "Unknown-%u", type));
+		ND_PRINT(C_RESET, "\n\t%s", tok2str(ahcp1_msg_str, "Unknown-%u", type));
 		if (mbz != 0)
-			ND_PRINT(", MBZ %u", mbz);
-		ND_PRINT(", Length %u", body_len);
+			ND_PRINT(C_RESET, ", MBZ %u", mbz);
+		ND_PRINT(C_RESET, ", Length %u", body_len);
 	}
 	if (body_len > len)
 		goto invalid;
@@ -342,7 +342,7 @@ ahcp_print(netdissect_options *ndo,
 	len -= 1;
 	switch (version) {
 		case AHCP_VERSION_1: {
-			ND_PRINT(" Version 1");
+			ND_PRINT(C_RESET, " Version 1");
 			if (len < AHCP1_HEADER_FIX_LEN - 2)
 				goto invalid;
 			if (!ndo->ndo_vflag) {
@@ -351,23 +351,23 @@ ahcp_print(netdissect_options *ndo,
 				len -= AHCP1_HEADER_FIX_LEN - 2;
 			} else {
 				/* Hopcount */
-				ND_PRINT("\n\tHopcount %u", GET_U_1(cp));
+				ND_PRINT(C_RESET, "\n\tHopcount %u", GET_U_1(cp));
 				cp += 1;
 				len -= 1;
 				/* Original Hopcount */
-				ND_PRINT(", Original Hopcount %u", GET_U_1(cp));
+				ND_PRINT(C_RESET, ", Original Hopcount %u", GET_U_1(cp));
 				cp += 1;
 				len -= 1;
 				/* Nonce */
-				ND_PRINT(", Nonce 0x%08x", GET_BE_U_4(cp));
+				ND_PRINT(C_RESET, ", Nonce 0x%08x", GET_BE_U_4(cp));
 				cp += 4;
 				len -= 4;
 				/* Source Id */
-				ND_PRINT(", Source Id %s", GET_LINKADDR_STRING(cp, LINKADDR_OTHER, 8));
+				ND_PRINT(C_RESET, ", Source Id %s", GET_LINKADDR_STRING(cp, LINKADDR_OTHER, 8));
 				cp += 8;
 				len -= 8;
 				/* Destination Id */
-				ND_PRINT(", Destination Id %s", GET_LINKADDR_STRING(cp, LINKADDR_OTHER, 8));
+				ND_PRINT(C_RESET, ", Destination Id %s", GET_LINKADDR_STRING(cp, LINKADDR_OTHER, 8));
 				cp += 8;
 				len -= 8;
 			}
@@ -376,7 +376,7 @@ ahcp_print(netdissect_options *ndo,
 			break;
 		}
 		default:
-			ND_PRINT(" Version %u (unknown)", version);
+			ND_PRINT(C_RESET, " Version %u (unknown)", version);
 			ND_TCHECK_LEN(cp, len);
 			break;
 	}

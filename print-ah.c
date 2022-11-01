@@ -58,18 +58,18 @@ ah_print(netdissect_options *ndo, const u_char *bp)
 	ah_len = GET_U_1(ah->ah_len);
 	ah_hdr_len = (ah_len + 2) * 4;
 
-	ND_PRINT("(");
+	ND_PRINT(C_RESET, "(");
 	if (ndo->ndo_vflag)
-		ND_PRINT("length=%u(%u-bytes),", ah_len, ah_hdr_len);
+		ND_PRINT(C_RESET, "length=%u(%u-bytes),", ah_len, ah_hdr_len);
 	reserved = GET_BE_U_2(ah->ah_reserved);
 	if (reserved)
-		ND_PRINT("reserved=0x%x[MustBeZero],", reserved);
-	ND_PRINT("spi=0x%08x,", GET_BE_U_4(ah->ah_spi));
-	ND_PRINT("seq=0x%x,", GET_BE_U_4(ah->ah_seq));
-	ND_PRINT("icv=0x");
+		ND_PRINT(C_RESET, "reserved=0x%x[MustBeZero],", reserved);
+	ND_PRINT(C_RESET, "spi=0x%08x,", GET_BE_U_4(ah->ah_spi));
+	ND_PRINT(C_RESET, "seq=0x%x,", GET_BE_U_4(ah->ah_seq));
+	ND_PRINT(C_RESET, "icv=0x");
 	for (p = (const u_char *)(ah + 1); p < bp + ah_hdr_len; p++)
-		ND_PRINT("%02x", GET_U_1(p));
-	ND_PRINT("): ");
+		ND_PRINT(C_RESET, "%02x", GET_U_1(p));
+	ND_PRINT(C_RESET, "): ");
 
 	return ah_hdr_len;
 }

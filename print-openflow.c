@@ -83,10 +83,10 @@ of_bitmap_print(netdissect_options *ndo,
 {
 	/* Assigned bits? */
 	if (v & ~u)
-		ND_PRINT(" (%s)", bittok2str(t, "", v));
+		ND_PRINT(C_RESET, C_RESET " (%s)", bittok2str(t, "", v));
 	/* Unassigned bits? */
 	if (v & u)
-		ND_PRINT(" (bogus)");
+		ND_PRINT(C_RESET, C_RESET " (bogus)");
 }
 
 void
@@ -96,7 +96,7 @@ of_data_print(netdissect_options *ndo,
 	if (len == 0)
 		return;
 	/* data */
-	ND_PRINT("\n\t data (%u octets)", len);
+	ND_PRINT(C_RESET, C_RESET "\n\t data (%u octets)", len);
 	if (ndo->ndo_vflag >= 2)
 		hex_and_ascii_print(ndo, "\n\t  ", cp, len);
 	else
@@ -144,7 +144,7 @@ void
 openflow_print(netdissect_options *ndo, const u_char *cp, u_int len)
 {
 	ndo->ndo_protocol = "openflow";
-	ND_PRINT(": OpenFlow");
+	ND_PRINT(C_RESET, C_RESET ": OpenFlow");
 	while (len) {
 		/* Print a single OpenFlow message. */
 		uint8_t version, type;
@@ -154,7 +154,7 @@ openflow_print(netdissect_options *ndo, const u_char *cp, u_int len)
 		/* version */
 		version = GET_U_1(cp);
 		OF_FWD(1);
-		ND_PRINT("\n\tversion %s",
+		ND_PRINT(C_RESET, C_RESET "\n\tversion %s",
 		         tok2str(ofver_str, "unknown (0x%02x)", version));
 		/* type */
 		if (len < 1)
@@ -166,20 +166,20 @@ openflow_print(netdissect_options *ndo, const u_char *cp, u_int len)
 			version == OF_VER_1_3 ? of13_identify_msgtype(type) :
 			NULL;
 		if (mti && mti->name)
-			ND_PRINT(", type %s", mti->name);
+			ND_PRINT(C_RESET, C_RESET ", type %s", mti->name);
 		else
-			ND_PRINT(", type unknown (0x%02x)", type);
+			ND_PRINT(C_RESET, C_RESET ", type unknown (0x%02x)", type);
 		/* length */
 		if (len < 2)
 			goto partial_header;
 		length = GET_BE_U_2(cp);
 		OF_FWD(2);
-		ND_PRINT(", length %u%s", length,
+		ND_PRINT(C_RESET, C_RESET ", length %u%s", length,
 		         length < OF_HEADER_FIXLEN ? " (too short!)" : "");
 		/* xid */
 		if (len < 4)
 			goto partial_header;
-		ND_PRINT(", xid 0x%08x", GET_BE_U_4(cp));
+		ND_PRINT(C_RESET, C_RESET ", xid 0x%08x", GET_BE_U_4(cp));
 		OF_FWD(4);
 
 		/*
@@ -219,7 +219,7 @@ openflow_print(netdissect_options *ndo, const u_char *cp, u_int len)
 	return;
 
 partial_header:
-	ND_PRINT(" (end of TCP payload)");
+	ND_PRINT(C_RESET, C_RESET " (end of TCP payload)");
 	ND_TCHECK_LEN(cp, len);
 	return;
 invalid: /* fail the current packet */

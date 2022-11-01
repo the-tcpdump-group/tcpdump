@@ -199,7 +199,7 @@ rip_entry_print_v1(netdissect_options *ndo, const u_char *p,
 	ND_TCHECK_SIZE(ni);
 	family = GET_BE_U_2(ni->rip_family);
 	if (family != BSD_AFNUM_INET && family != 0) {
-		ND_PRINT("\n\t AFI %s, ", tok2str(bsd_af_values, "Unknown (%u)", family));
+		ND_PRINT(C_RESET, "\n\t AFI %s, ", tok2str(bsd_af_values, "Unknown (%u)", family));
 		print_unknown_data(ndo, p + sizeof(*eh), "\n\t  ", RIP_ROUTELEN - sizeof(*eh));
 		return (RIP_ROUTELEN);
 	}
@@ -211,12 +211,12 @@ rip_entry_print_v1(netdissect_options *ndo, const u_char *p,
 		return (RIP_ROUTELEN);
 	}
 	if (family == 0) {
-		ND_PRINT("\n\t  AFI 0, %s, metric: %u",
+		ND_PRINT(C_RESET, "\n\t  AFI 0, %s, metric: %u",
 			 GET_IPADDR_STRING(ni->rip_dest),
 			 GET_BE_U_4(ni->rip_metric));
 		return (RIP_ROUTELEN);
 	} /* BSD_AFNUM_INET */
-	ND_PRINT("\n\t  %s, metric: %u",
+	ND_PRINT(C_RESET, "\n\t  %s, metric: %u",
 		 GET_IPADDR_STRING(ni->rip_dest),
 		 GET_BE_U_4(ni->rip_metric));
 	return (RIP_ROUTELEN);
@@ -241,7 +241,7 @@ rip_entry_print_v2(netdissect_options *ndo, const u_char *p,
 		p += sizeof(*eh);
 		remaining -= sizeof(*eh);
 		if (auth_type == 2) {
-			ND_PRINT("\n\t  Simple Text Authentication data: ");
+			ND_PRINT(C_RESET, "\n\t  Simple Text Authentication data: ");
 			nd_printjnp(ndo, p, RIP_AUTHLEN);
 		} else if (auth_type == 3) {
 			const struct rip_auth_crypto_v2 *ch;
@@ -249,42 +249,42 @@ rip_entry_print_v2(netdissect_options *ndo, const u_char *p,
 			ch = (const struct rip_auth_crypto_v2 *)p;
 			ND_ICHECKMSG_ZU("remaining data length", remaining,
 					<, sizeof(*ch));
-			ND_PRINT("\n\t  Auth header:");
-			ND_PRINT(" Packet Len %u,",
+			ND_PRINT(C_RESET, "\n\t  Auth header:");
+			ND_PRINT(C_RESET, " Packet Len %u,",
 				 GET_BE_U_2(ch->rip_packet_len));
-			ND_PRINT(" Key-ID %u,", GET_U_1(ch->rip_key_id));
-			ND_PRINT(" Auth Data Len %u,",
+			ND_PRINT(C_RESET, " Key-ID %u,", GET_U_1(ch->rip_key_id));
+			ND_PRINT(C_RESET, " Auth Data Len %u,",
 				 GET_U_1(ch->rip_auth_data_len));
-			ND_PRINT(" SeqNo %u,", GET_BE_U_4(ch->rip_seq_num));
-			ND_PRINT(" MBZ %u,", GET_BE_U_4(ch->rip_mbz1));
-			ND_PRINT(" MBZ %u", GET_BE_U_4(ch->rip_mbz2));
+			ND_PRINT(C_RESET, " SeqNo %u,", GET_BE_U_4(ch->rip_seq_num));
+			ND_PRINT(C_RESET, " MBZ %u,", GET_BE_U_4(ch->rip_mbz1));
+			ND_PRINT(C_RESET, " MBZ %u", GET_BE_U_4(ch->rip_mbz2));
 		} else if (auth_type == 1) {
-			ND_PRINT("\n\t  Auth trailer:");
+			ND_PRINT(C_RESET, "\n\t  Auth trailer:");
 			print_unknown_data(ndo, p, "\n\t  ", remaining);
 			return (sizeof(*eh) + remaining); /* AT spans till the packet end */
 		} else {
-			ND_PRINT("\n\t  Unknown (%u) Authentication data:",
+			ND_PRINT(C_RESET, "\n\t  Unknown (%u) Authentication data:",
 				 auth_type);
 			print_unknown_data(ndo, p, "\n\t  ", remaining);
 			return (sizeof(*eh) + remaining); /* we don't know how long this is, so we go to the packet end */
 		}
 	} else if (family != BSD_AFNUM_INET && family != 0) {
-		ND_PRINT("\n\t  AFI %s", tok2str(bsd_af_values, "Unknown (%u)", family));
+		ND_PRINT(C_RESET, "\n\t  AFI %s", tok2str(bsd_af_values, "Unknown (%u)", family));
 		print_unknown_data(ndo, p + sizeof(*eh), "\n\t  ", RIP_ROUTELEN - sizeof(*eh));
 	} else { /* BSD_AFNUM_INET or AFI 0 */
 		ni = (const struct rip_netinfo_v2 *)p;
 		ND_ICHECKMSG_ZU("remaining data length", remaining, <,
 				sizeof(*ni));
-		ND_PRINT("\n\t  AFI %s, %15s/%-2d, tag 0x%04x, metric: %u, next-hop: ",
+		ND_PRINT(C_RESET, "\n\t  AFI %s, %15s/%-2d, tag 0x%04x, metric: %u, next-hop: ",
 			 tok2str(bsd_af_values, "%u", family),
 			 GET_IPADDR_STRING(ni->rip_dest),
 			 mask2plen(GET_BE_U_4(ni->rip_dest_mask)),
 			 GET_BE_U_2(ni->rip_tag),
 			 GET_BE_U_4(ni->rip_metric));
 		if (GET_BE_U_4(ni->rip_router))
-			ND_PRINT("%s", GET_IPADDR_STRING(ni->rip_router));
+			ND_PRINT(C_RESET, "%s", GET_IPADDR_STRING(ni->rip_router));
 		else
-			ND_PRINT("self");
+			ND_PRINT(C_RESET, "self");
 	}
 	return (RIP_ROUTELEN);
 invalid:
@@ -300,22 +300,22 @@ rip_print(netdissect_options *ndo,
 	unsigned entry_size;
 
 	ndo->ndo_protocol = "rip";
-	ND_PRINT("%s", (ndo->ndo_vflag >= 1) ? "\n\t" : "");
+	ND_PRINT(C_RESET, "%s", (ndo->ndo_vflag >= 1) ? "\n\t" : "");
 	nd_print_protocol_caps(ndo);
 	ND_ICHECKMSG_ZU("packet length", len, <, sizeof(*rp));
 
 	rp = (const struct rip *)p;
 
 	vers = GET_U_1(rp->rip_vers);
-	ND_PRINT("v%u", vers);
+	ND_PRINT(C_RESET, "v%u", vers);
 	if (vers != 1 && vers != 2) {
-		ND_PRINT(" [version != 1 && version != 2]");
+		ND_PRINT(C_RESET, " [version != 1 && version != 2]");
 		goto invalid;
 	}
 
 	/* dump version and lets see if we know the commands name*/
 	cmd = GET_U_1(rp->rip_cmd);
-	ND_PRINT(", %s, length: %u",
+	ND_PRINT(C_RESET, ", %s, length: %u",
 		tok2str(rip_cmd_values, "unknown command (%u)", cmd),
 		len);
 
@@ -332,7 +332,7 @@ rip_print(netdissect_options *ndo,
 		switch (vers) {
 
 		case 1:
-			ND_PRINT(", routes: %u", len / RIP_ROUTELEN);
+			ND_PRINT(C_RESET, ", routes: %u", len / RIP_ROUTELEN);
 			while (len != 0) {
 				entry_size = rip_entry_print_v1(ndo, p, len);
 				if (entry_size == 0) {
@@ -347,7 +347,7 @@ rip_print(netdissect_options *ndo,
 			break;
 
 		case 2:
-			ND_PRINT(", routes: %u or less", len / RIP_ROUTELEN);
+			ND_PRINT(C_RESET, ", routes: %u or less", len / RIP_ROUTELEN);
 			while (len != 0) {
 				entry_size = rip_entry_print_v2(ndo, p, len);
 				if (entry_size == 0) {
@@ -362,7 +362,7 @@ rip_print(netdissect_options *ndo,
 			break;
 
 		default:
-			ND_PRINT(", unknown version");
+			ND_PRINT(C_RESET, ", unknown version");
 			break;
 		}
 		break;

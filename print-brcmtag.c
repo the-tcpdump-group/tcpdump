@@ -88,27 +88,27 @@ brcm_tag_print(netdissect_options *ndo, const u_char *bp)
 	for (i = 0; i < BRCM_TAG_LEN; i++)
 		tag[i] = GET_U_1(bp + i);
 
-	ND_PRINT("BRCM tag OP: %s", tag[0] ? "IG" : "EG");
+	ND_PRINT(C_RESET, "BRCM tag OP: %s", tag[0] ? "IG" : "EG");
 	if (tag[0] & (1 << BRCM_OPCODE_SHIFT)) {
 		/* Ingress Broadcom tag */
-		ND_PRINT(", TC: %d", (tag[1] >> BRCM_IG_TC_SHIFT) &
+		ND_PRINT(C_RESET, ", TC: %d", (tag[1] >> BRCM_IG_TC_SHIFT) &
 			 BRCM_IG_TC_MASK);
-		ND_PRINT(", TE: %s",
+		ND_PRINT(C_RESET, ", TE: %s",
 			 tok2str(brcm_tag_te_values, "unknown",
 				 (tag[1] & BRCM_IG_TE_MASK)));
-		ND_PRINT(", TS: %d", tag[1] >> BRCM_IG_TS_SHIFT);
+		ND_PRINT(C_RESET, ", TS: %d", tag[1] >> BRCM_IG_TS_SHIFT);
 		dst_map = (uint16_t)tag[2] << 8 | tag[3];
-		ND_PRINT(", DST map: 0x%04x", dst_map & BRCM_IG_DSTMAP_MASK);
+		ND_PRINT(C_RESET, ", DST map: 0x%04x", dst_map & BRCM_IG_DSTMAP_MASK);
 	} else {
 		/* Egress Broadcom tag */
-		ND_PRINT(", CID: %d", tag[1]);
-		ND_PRINT(", RC: %s", tok2str(brcm_tag_rc_values,
+		ND_PRINT(C_RESET, ", CID: %d", tag[1]);
+		ND_PRINT(C_RESET, ", RC: %s", tok2str(brcm_tag_rc_values,
 			 "reserved", tag[2]));
-		ND_PRINT(", TC: %d", (tag[3] >> BRCM_EG_TC_SHIFT) &
+		ND_PRINT(C_RESET, ", TC: %d", (tag[3] >> BRCM_EG_TC_SHIFT) &
 			 BRCM_EG_TC_MASK);
-		ND_PRINT(", port: %d", tag[3] & BRCM_EG_PID_MASK);
+		ND_PRINT(C_RESET, ", port: %d", tag[3] & BRCM_EG_PID_MASK);
 	}
-	ND_PRINT(", ");
+	ND_PRINT(C_RESET, ", ");
 }
 
 void

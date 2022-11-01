@@ -47,15 +47,15 @@ ipoib_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	ether_type = GET_BE_U_2(bp + 40);
 	if (!ndo->ndo_qflag) {
-		ND_PRINT(", ethertype %s (0x%04x)",
+		ND_PRINT(C_RESET, ", ethertype %s (0x%04x)",
 			     tok2str(ethertype_values,"Unknown", ether_type),
 			     ether_type);
 	} else {
-		ND_PRINT(", ethertype %s",
+		ND_PRINT(C_RESET, ", ethertype %s",
 			     tok2str(ethertype_values,"Unknown", ether_type));
 	}
 
-	ND_PRINT(", length %u: ", length);
+	ND_PRINT(C_RESET, ", length %u: ", length);
 }
 
 /*

@@ -36,7 +36,7 @@ msdp_print(netdissect_options *ndo, const u_char *sp, u_int length)
 	unsigned int type, len;
 
 	ndo->ndo_protocol = "msdp";
-	ND_PRINT(": ");
+	ND_PRINT(C_RESET, ": ");
 	nd_print_protocol(ndo);
 	/* See if we think we're at the beginning of a compound packet */
 	type = GET_U_1(sp);
@@ -47,7 +47,7 @@ msdp_print(netdissect_options *ndo, const u_char *sp, u_int length)
 		type = GET_U_1(sp);
 		len = GET_BE_U_2(sp + 1);
 		if (len > 1400 || ndo->ndo_vflag)
-			ND_PRINT(" [len %u]", len);
+			ND_PRINT(C_RESET, " [len %u]", len);
 		if (len < 3)
 			goto trunc;
 		if (length < len)
@@ -58,14 +58,14 @@ msdp_print(netdissect_options *ndo, const u_char *sp, u_int length)
 		case 1:	/* IPv4 Source-Active */
 		case 3: /* IPv4 Source-Active Response */
 			if (type == 1)
-				ND_PRINT(" SA");
+				ND_PRINT(C_RESET, " SA");
 			else
-				ND_PRINT(" SA-Response");
-			ND_PRINT(" %u entries", GET_U_1(sp));
+				ND_PRINT(C_RESET, " SA-Response");
+			ND_PRINT(C_RESET, " %u entries", GET_U_1(sp));
 			if ((u_int)((GET_U_1(sp) * 12) + 8) < len) {
-				ND_PRINT(" [w/data]");
+				ND_PRINT(C_RESET, " [w/data]");
 				if (ndo->ndo_vflag > 1) {
-					ND_PRINT(" ");
+					ND_PRINT(C_RESET, " ");
 					ip_print(ndo, sp +
 						 GET_U_1(sp) * 12 + 8 - 3,
 						 len - (GET_U_1(sp) * 12 + 8));
@@ -73,19 +73,19 @@ msdp_print(netdissect_options *ndo, const u_char *sp, u_int length)
 			}
 			break;
 		case 2:
-			ND_PRINT(" SA-Request");
-			ND_PRINT(" for %s", GET_IPADDR_STRING(sp + 1));
+			ND_PRINT(C_RESET, " SA-Request");
+			ND_PRINT(C_RESET, " for %s", GET_IPADDR_STRING(sp + 1));
 			break;
 		case 4:
-			ND_PRINT(" Keepalive");
+			ND_PRINT(C_RESET, " Keepalive");
 			if (len != 3)
-				ND_PRINT("[len=%u] ", len);
+				ND_PRINT(C_RESET, "[len=%u] ", len);
 			break;
 		case 5:
-			ND_PRINT(" Notification");
+			ND_PRINT(C_RESET, " Notification");
 			break;
 		default:
-			ND_PRINT(" [type=%u len=%u]", type, len);
+			ND_PRINT(C_RESET, " [type=%u len=%u]", type, len);
 			break;
 		}
 		sp += (len - 3);

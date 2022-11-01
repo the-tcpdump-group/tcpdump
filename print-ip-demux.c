@@ -106,7 +106,7 @@ again:
 		if (ver == 4)
 			icmp_print(ndo, bp, length, iph, fragmented);
 		else {
-			ND_PRINT("[%s requires IPv4]",
+			ND_PRINT(C_RESET, "[%s requires IPv4]",
 				 tok2str(ipproto_values,"unknown",nh));
 			nd_print_invalid(ndo);
 		}
@@ -116,7 +116,7 @@ again:
 		if (ver == 6)
 			icmp6_print(ndo, bp, length, iph, fragmented);
 		else {
-			ND_PRINT("[%s requires IPv6]",
+			ND_PRINT(C_RESET, "[%s requires IPv6]",
 				 tok2str(ipproto_values,"unknown",nh));
 			nd_print_invalid(ndo);
 		}
@@ -144,7 +144,7 @@ again:
 		break;
 
 	case IPPROTO_ND:
-		ND_PRINT(" nd %u", length);
+		ND_PRINT(C_RESET, " nd %u", length);
 		break;
 
 	case IPPROTO_EGP:
@@ -162,7 +162,7 @@ again:
 		if (ver == 4)
 			igmp_print(ndo, bp, length);
 		else {
-			ND_PRINT("[%s requires IPv4]",
+			ND_PRINT(C_RESET, "[%s requires IPv4]",
 				 tok2str(ipproto_values,"unknown",nh));
 			nd_print_invalid(ndo);
 		}
@@ -210,22 +210,22 @@ again:
 		if (ver == 6)
 			ether_print(ndo, bp, length, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL);
 		else {
-			ND_PRINT("[%s requires IPv6]",
+			ND_PRINT(C_RESET, "[%s requires IPv6]",
 				 tok2str(ipproto_values,"unknown",nh));
 			nd_print_invalid(ndo);
 		}
 		break;
 
 	case IPPROTO_NONE:
-		ND_PRINT("no next header");
+		ND_PRINT(C_RESET, "no next header");
 		break;
 
 	default:
 		if (ndo->ndo_nflag==0 && (p_name = netdb_protoname(nh)) != NULL)
-			ND_PRINT(" %s", p_name);
+			ND_PRINT(C_RESET, " %s", p_name);
 		else
-			ND_PRINT(" ip-proto-%u", nh);
-		ND_PRINT(" %u", length);
+			ND_PRINT(C_RESET, " ip-proto-%u", nh);
+		ND_PRINT(C_RESET, " %u", length);
 		break;
 	}
 }

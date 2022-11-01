@@ -116,20 +116,20 @@ vrrp_print(netdissect_options *ndo,
 	version = (GET_U_1(bp) & 0xf0) >> 4;
 	type = GET_U_1(bp) & 0x0f;
 	type_s = tok2str(type2str, "unknown type (%u)", type);
-	ND_PRINT("v%u, %s", version, type_s);
+	ND_PRINT(C_RESET, "v%u, %s", version, type_s);
 	if (ttl != 255)
-		ND_PRINT(", (ttl %u)", ttl);
+		ND_PRINT(C_RESET, ", (ttl %u)", ttl);
 	if (version < 2 || version > 3 || type != VRRP_TYPE_ADVERTISEMENT)
 		return;
-	ND_PRINT(", vrid %u, prio %u", GET_U_1(bp + 1), GET_U_1(bp + 2));
+	ND_PRINT(C_RESET, ", vrid %u, prio %u", GET_U_1(bp + 1), GET_U_1(bp + 2));
 
 	if (version == 2) {
 		auth_type = GET_U_1(bp + 4);
-		ND_PRINT(", authtype %s", tok2str(auth2str, NULL, auth_type));
-		ND_PRINT(", intvl %us, length %u", GET_U_1(bp + 5), len);
+		ND_PRINT(C_RESET, ", authtype %s", tok2str(auth2str, NULL, auth_type));
+		ND_PRINT(C_RESET, ", intvl %us, length %u", GET_U_1(bp + 5), len);
 	} else { /* version == 3 */
 		uint16_t intvl = (GET_U_1(bp + 4) & 0x0f) << 8 | GET_U_1(bp + 5);
-		ND_PRINT(", intvl %ucs, length %u", intvl, len);
+		ND_PRINT(C_RESET, ", intvl %ucs, length %u", intvl, len);
 	}
 
 	if (ndo->ndo_vflag) {
@@ -143,7 +143,7 @@ vrrp_print(netdissect_options *ndo,
 			vec[0].ptr = bp;
 			vec[0].len = len;
 			if (in_cksum(vec, 1))
-				ND_PRINT(", (bad vrrp cksum %x)",
+				ND_PRINT(C_RESET, ", (bad vrrp cksum %x)",
 					GET_BE_U_2(bp + 6));
 		}
 
@@ -157,34 +157,34 @@ vrrp_print(netdissect_options *ndo,
 				cksum = nextproto6_cksum(ndo, (const struct ip6_hdr *)bp2, bp,
 					len, len, IPPROTO_VRRP);
 			if (cksum)
-				ND_PRINT(", (bad vrrp cksum %x)",
+				ND_PRINT(C_RESET, ", (bad vrrp cksum %x)",
 					GET_BE_U_2(bp + 6));
 		}
 
-		ND_PRINT(", addrs");
+		ND_PRINT(C_RESET, ", addrs");
 		if (naddrs > 1)
-			ND_PRINT("(%u)", naddrs);
-		ND_PRINT(":");
+			ND_PRINT(C_RESET, "(%u)", naddrs);
+		ND_PRINT(C_RESET, ":");
 		c = ' ';
 		bp += 8;
 		for (i = 0; i < naddrs; i++) {
 			if (ver == 4) {
-				ND_PRINT("%c%s", c, GET_IPADDR_STRING(bp));
+				ND_PRINT(C_RESET, "%c%s", c, GET_IPADDR_STRING(bp));
 				bp += 4;
 			} else {
-				ND_PRINT("%c%s", c, GET_IP6ADDR_STRING(bp));
+				ND_PRINT(C_RESET, "%c%s", c, GET_IP6ADDR_STRING(bp));
 				bp += 16;
 			}
 			c = ',';
 		}
 		if (version == 2 && auth_type == VRRP_AUTH_SIMPLE) { /* simple text password */
-			ND_PRINT(" auth \"");
+			ND_PRINT(C_RESET, " auth \"");
 			/*
 			 * RFC 2338 Section 5.3.10: "If the configured authentication string
 			 * is shorter than 8 bytes, the remaining space MUST be zero-filled.
 			 */
 			nd_printjnp(ndo, bp, 8);
-			ND_PRINT("\"");
+			ND_PRINT(C_RESET, "\"");
 		}
 	}
 }

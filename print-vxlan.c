@@ -60,7 +60,7 @@ vxlan_print(netdissect_options *ndo, const u_char *bp, u_int len)
 
     flags = GET_U_1(bp);
     bp += 1;
-    ND_PRINT(", flags [%s] (0x%02x), ",
+    ND_PRINT(C_RESET, ", flags [%s] (0x%02x), ",
              bittok2str_nosep(vxlan_flags, "invalid", flags), flags);
 
     /* 1st Reserved */
@@ -68,7 +68,7 @@ vxlan_print(netdissect_options *ndo, const u_char *bp, u_int len)
 
     vni = GET_BE_U_3(bp);
     bp += 3;
-    ND_PRINT("vni %u\n", vni);
+    ND_PRINT(C_RESET, "vni %u\n", vni);
 
     /* 2nd Reserved */
     ND_TCHECK_1(bp);

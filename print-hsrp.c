@@ -101,33 +101,33 @@ hsrp_print(netdissect_options *ndo, const u_char *bp, u_int len)
 
 	ndo->ndo_protocol = "hsrp";
 	version = GET_U_1(hp->hsrp_version);
-	ND_PRINT("HSRPv%u", version);
+	ND_PRINT(C_RESET, C_RESET "HSRPv%u", version);
 	if (version != 0)
 		return;
-	ND_PRINT("-");
-	ND_PRINT("%s ",
+	ND_PRINT(C_RESET, C_RESET "-");
+	ND_PRINT(C_RESET, C_RESET "%s ",
 		 tok2strary(op_code_str, "unknown (%u)", GET_U_1(hp->hsrp_op_code)));
-	ND_PRINT("%u: ", len);
-	ND_PRINT("state=%s ",
+	ND_PRINT(C_RESET, C_RESET "%u: ", len);
+	ND_PRINT(C_RESET, C_RESET "state=%s ",
 		 tok2str(states, "Unknown (%u)", GET_U_1(hp->hsrp_state)));
-	ND_PRINT("group=%u ", GET_U_1(hp->hsrp_group));
+	ND_PRINT(C_RESET, C_RESET "group=%u ", GET_U_1(hp->hsrp_group));
 	if (GET_U_1(hp->hsrp_reserved) != 0) {
-		ND_PRINT("[reserved=%u!] ", GET_U_1(hp->hsrp_reserved));
+		ND_PRINT(C_RESET, C_RESET "[reserved=%u!] ", GET_U_1(hp->hsrp_reserved));
 	}
-	ND_PRINT("addr=%s", GET_IPADDR_STRING(hp->hsrp_virtaddr));
+	ND_PRINT(C_RESET, C_RESET "addr=%s", GET_IPADDR_STRING(hp->hsrp_virtaddr));
 	if (ndo->ndo_vflag) {
-		ND_PRINT(" hellotime=");
+		ND_PRINT(C_RESET, C_RESET " hellotime=");
 		unsigned_relts_print(ndo, GET_U_1(hp->hsrp_hellotime));
-		ND_PRINT(" holdtime=");
+		ND_PRINT(C_RESET, C_RESET " holdtime=");
 		unsigned_relts_print(ndo, GET_U_1(hp->hsrp_holdtime));
-		ND_PRINT(" priority=%u", GET_U_1(hp->hsrp_priority));
-		ND_PRINT(" auth=\"");
+		ND_PRINT(C_RESET, C_RESET " priority=%u", GET_U_1(hp->hsrp_priority));
+		ND_PRINT(C_RESET, C_RESET " auth=\"");
 		/*
 		 * RFC 2281 Section 5.1 does not specify the encoding of
 		 * Authentication Data explicitly, but zero padding can be
 		 * inferred from the "recommended default value".
 		 */
 		nd_printjnp(ndo, hp->hsrp_authdata, HSRP_AUTH_SIZE);
-		ND_PRINT("\"");
+		ND_PRINT(C_RESET, C_RESET "\"");
 	}
 }

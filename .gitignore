@@ -45,3 +45,5 @@ tcpdump.sln
 .failed
 instrument_functions_global.devel
 instrument_functions_off.devel
+.cache
+compile_commands.json

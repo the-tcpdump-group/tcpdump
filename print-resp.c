@@ -50,11 +50,11 @@
 #define RESP_BULK_STRING      '$'
 #define RESP_ARRAY            '*'
 
-#define resp_print_empty(ndo)            ND_PRINT(" empty")
-#define resp_print_null(ndo)             ND_PRINT(" null")
-#define resp_print_length_too_large(ndo) ND_PRINT(" length too large")
-#define resp_print_length_negative(ndo)  ND_PRINT(" length negative and not -1")
-#define resp_print_invalid(ndo)          ND_PRINT(" invalid")
+#define resp_print_empty(ndo)            ND_PRINT(C_RESET, " empty")
+#define resp_print_null(ndo)             ND_PRINT(C_RESET, " null")
+#define resp_print_length_too_large(ndo) ND_PRINT(C_RESET, " length too large")
+#define resp_print_length_negative(ndo)  ND_PRINT(C_RESET, " length negative and not -1")
+#define resp_print_invalid(ndo)          ND_PRINT(C_RESET, " invalid")
 
 static int resp_parse(netdissect_options *, const u_char *, int);
 static int resp_print_string_error_integer(netdissect_options *, const u_char *, int);
@@ -201,7 +201,7 @@ static int resp_get_length(netdissect_options *, const u_char *, int, const u_ch
  * Assumes the data has already been verified as present.
  */
 #define RESP_PRINT_SEGMENT(_ndo, _bp, _len)            \
-    ND_PRINT(" \"");                                   \
+    ND_PRINT(C_RESET, " \"");                                   \
     if (nd_printn(_ndo, _bp, _len, _ndo->ndo_snapend)) \
         goto trunc;                                    \
     fn_print_char(_ndo, '"');
@@ -213,7 +213,7 @@ resp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
     ndo->ndo_protocol = "resp";
 
-    ND_PRINT(": RESP");
+    ND_PRINT(C_RESET, ": RESP");
     while (length > 0) {
         /*
          * This block supports redis pipelining.

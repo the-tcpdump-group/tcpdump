@@ -47,20 +47,20 @@ otv_print(netdissect_options *ndo, const u_char *bp, u_int len)
     uint8_t flags;
 
     ndo->ndo_protocol = "otv";
-    ND_PRINT("OTV, ");
+    ND_PRINT(C_RESET, "OTV, ");
     if (len < OTV_HDR_LEN) {
-        ND_PRINT("[length %u < %u]", len, OTV_HDR_LEN);
+        ND_PRINT(C_RESET, "[length %u < %u]", len, OTV_HDR_LEN);
         goto invalid;
     }
 
     flags = GET_U_1(bp);
-    ND_PRINT("flags [%s] (0x%02x), ", flags & 0x08 ? "I" : ".", flags);
+    ND_PRINT(C_RESET, "flags [%s] (0x%02x), ", flags & 0x08 ? "I" : ".", flags);
     bp += 1;
 
-    ND_PRINT("overlay %u, ", GET_BE_U_3(bp));
+    ND_PRINT(C_RESET, "overlay %u, ", GET_BE_U_3(bp));
     bp += 3;
 
-    ND_PRINT("instance %u\n", GET_BE_U_3(bp));
+    ND_PRINT(C_RESET, "instance %u\n", GET_BE_U_3(bp));
     bp += 3;
 
     /* Reserved */

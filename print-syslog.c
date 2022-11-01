@@ -111,14 +111,14 @@ syslog_print(netdissect_options *ndo,
 
     if (ndo->ndo_vflag < 1 )
     {
-        ND_PRINT("SYSLOG %s.%s, length: %u",
+        ND_PRINT(C_RESET, "SYSLOG %s.%s, length: %u",
                tok2str(syslog_facility_values, "unknown (%u)", facility),
                tok2str(syslog_severity_values, "unknown (%u)", severity),
                len);
         return;
     }
 
-    ND_PRINT("SYSLOG, length: %u\n\tFacility %s (%u), Severity %s (%u)\n\tMsg: ",
+    ND_PRINT(C_RESET, "SYSLOG, length: %u\n\tFacility %s (%u), Severity %s (%u)\n\tMsg: ",
            len,
            tok2str(syslog_facility_values, "unknown (%u)", facility),
            facility,

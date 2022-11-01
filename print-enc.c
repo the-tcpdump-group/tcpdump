@@ -83,7 +83,7 @@ struct enchdr {
 
 #define ENC_PRINT_TYPE(wh, xf, name) \
 	if ((wh) & (xf)) { \
-		ND_PRINT("%s%s", name, (wh) == (xf) ? "): " : ","); \
+		ND_PRINT(C_RESET, "%s%s", name, (wh) == (xf) ? "): " : ","); \
 		(wh) &= ~(xf); \
 	}
 
@@ -134,13 +134,13 @@ enc_if_print(netdissect_options *ndo,
 	}
 
 	if (flags == 0)
-		ND_PRINT("(unprotected): ");
+		ND_PRINT(C_RESET, "(unprotected): ");
 	else
-		ND_PRINT("(");
+		ND_PRINT(C_RESET, "(");
 	ENC_PRINT_TYPE(flags, M_AUTH, "authentic");
 	ENC_PRINT_TYPE(flags, M_CONF, "confidential");
 	/* ENC_PRINT_TYPE(flags, M_TUNNEL, "tunnel"); */
-	ND_PRINT("SPI 0x%08x: ", GET_BE_U_4(hdr->spi));
+	ND_PRINT(C_RESET, "SPI 0x%08x: ", GET_BE_U_4(hdr->spi));
 
 	length -= ENC_HDRLEN;
 	p += ENC_HDRLEN;

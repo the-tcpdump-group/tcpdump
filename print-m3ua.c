@@ -229,11 +229,11 @@ tag_value_print(netdissect_options *ndo,
     /* buf and size don't include the header */
     if (size < 4)
       goto invalid;
-    ND_PRINT("0x%08x", GET_BE_U_4(buf));
+    ND_PRINT(C_RESET, "0x%08x", GET_BE_U_4(buf));
     break;
   /* ... */
   default:
-    ND_PRINT("(length %zu)", size + sizeof(struct m3ua_param_header));
+    ND_PRINT(C_RESET, "(length %zu)", size + sizeof(struct m3ua_param_header));
   }
   ND_TCHECK_LEN(buf, size);
   return;
@@ -268,7 +268,7 @@ m3ua_tags_print(netdissect_options *ndo,
       goto invalid;
     /* Parameter Tag */
     hdr_tag = GET_BE_U_2(p);
-    ND_PRINT("\n\t\t\t%s: ", tok2str(ParamName, "Unknown Parameter (0x%04x)", hdr_tag));
+    ND_PRINT(C_RESET, "\n\t\t\t%s: ", tok2str(ParamName, "Unknown Parameter (0x%04x)", hdr_tag));
     /* Parameter Length */
     hdr_len = GET_BE_U_2(p + 2);
     if (hdr_len < sizeof(struct m3ua_param_header))
@@ -317,13 +317,13 @@ m3ua_print(netdissect_options *ndo,
   msg_class = GET_U_1(hdr->msg_class);
   dict = uint2tokary(m3ua_msgc2tokary, msg_class);
 
-  ND_PRINT("\n\t\t%s", tok2str(MessageClasses, "Unknown message class %i", msg_class));
+  ND_PRINT(C_RESET, "\n\t\t%s", tok2str(MessageClasses, "Unknown message class %i", msg_class));
   if (dict != NULL)
-    ND_PRINT(" %s Message",
+    ND_PRINT(C_RESET, " %s Message",
              tok2str(dict, "Unknown (0x%02x)", GET_U_1(hdr->msg_type)));
 
   if (size != GET_BE_U_4(hdr->len))
-    ND_PRINT("\n\t\t\t@@@@@@ Corrupted length %u of message @@@@@@",
+    ND_PRINT(C_RESET, "\n\t\t\t@@@@@@ Corrupted length %u of message @@@@@@",
              GET_BE_U_4(hdr->len));
   else
     m3ua_tags_print(ndo, buf + sizeof(struct m3ua_common_header),

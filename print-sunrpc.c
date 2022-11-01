@@ -181,26 +181,26 @@ sunrpc_print(netdissect_options *ndo, const u_char *bp,
 	switch (IP_V((const struct ip *)bp2)) {
 	case 4:
 		ip = (const struct ip *)bp2;
-		ND_PRINT("%s.%s > %s.%s: %u",
+		ND_PRINT(C_RESET, "%s.%s > %s.%s: %u",
 		    GET_IPADDR_STRING(ip->ip_src), srcid,
 		    GET_IPADDR_STRING(ip->ip_dst), dstid, length);
 		break;
 	case 6:
 		ip6 = (const struct ip6_hdr *)bp2;
-		ND_PRINT("%s.%s > %s.%s: %u",
+		ND_PRINT(C_RESET, "%s.%s > %s.%s: %u",
 		    GET_IP6ADDR_STRING(ip6->ip6_src), srcid,
 		    GET_IP6ADDR_STRING(ip6->ip6_dst), dstid, length);
 		break;
 	default:
-		ND_PRINT("%s.%s > %s.%s: %u", "?", srcid, "?", dstid, length);
+		ND_PRINT(C_RESET, "%s.%s > %s.%s: %u", "?", srcid, "?", dstid, length);
 		break;
 	}
 
-	ND_PRINT(" %s", tok2str(proc2str, " proc #%u",
+	ND_PRINT(C_RESET, " %s", tok2str(proc2str, " proc #%u",
 	    GET_BE_U_4(rp->rm_call.cb_proc)));
 	x = GET_BE_U_4(rp->rm_call.cb_rpcvers);
 	if (x != SUNRPC_MSG_VERSION)
-		ND_PRINT(" [rpcver %u]", x);
+		ND_PRINT(C_RESET, " [rpcver %u]", x);
 
 	switch (GET_BE_U_4(rp->rm_call.cb_proc)) {
 
@@ -210,10 +210,10 @@ sunrpc_print(netdissect_options *ndo, const u_char *bp,
 	case SUNRPC_PMAPPROC_CALLIT:
 		x = GET_BE_U_4(rp->rm_call.cb_prog);
 		if (!ndo->ndo_nflag)
-			ND_PRINT(" %s", progstr(x));
+			ND_PRINT(C_RESET, " %s", progstr(x));
 		else
-			ND_PRINT(" %u", x);
-		ND_PRINT(".%u", GET_BE_U_4(rp->rm_call.cb_vers));
+			ND_PRINT(C_RESET, " %u", x);
+		ND_PRINT(C_RESET, ".%u", GET_BE_U_4(rp->rm_call.cb_vers));
 		break;
 	}
 }

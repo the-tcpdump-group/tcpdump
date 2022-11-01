@@ -119,7 +119,7 @@ udld_print(netdissect_options *ndo,
     tptr += 1;
     length -= 1;
 
-    ND_PRINT("UDLDv%u, Code %s (%x), Flags [%s] (0x%02x), length %u",
+    ND_PRINT(C_RESET, "UDLDv%u, Code %s (%x), Flags [%s] (0x%02x), length %u",
            ver,
            tok2str(udld_code_values, "Reserved", code),
            code,
@@ -134,7 +134,7 @@ udld_print(netdissect_options *ndo,
         goto tcheck_remainder;
     }
 
-    ND_PRINT("\n\tChecksum 0x%04x (unverified)", GET_BE_U_2(tptr));
+    ND_PRINT(C_RESET, "\n\tChecksum 0x%04x (unverified)", GET_BE_U_2(tptr));
     tptr += 2;
     length -= 2;
 
@@ -152,7 +152,7 @@ udld_print(netdissect_options *ndo,
         tptr += 2;
         length -= 2;
 
-        ND_PRINT("\n\t%s (0x%04x) TLV, length %u",
+        ND_PRINT(C_RESET, "\n\t%s (0x%04x) TLV, length %u",
                tok2str(udld_tlv_values, "Unknown", type),
                type, len);
 
@@ -168,12 +168,12 @@ udld_print(netdissect_options *ndo,
         case UDLD_DEVICE_ID_TLV:
         case UDLD_PORT_ID_TLV:
         case UDLD_DEVICE_NAME_TLV:
-            ND_PRINT(", ");
+            ND_PRINT(C_RESET, ", ");
             nd_printjnp(ndo, tptr, len);
             break;
 
         case UDLD_ECHO_TLV:
-            ND_PRINT(", ");
+            ND_PRINT(C_RESET, ", ");
             nd_printjn(ndo, tptr, len);
             break;
 
@@ -181,13 +181,13 @@ udld_print(netdissect_options *ndo,
         case UDLD_TIMEOUT_INTERVAL_TLV:
             if (len != 1)
                 goto invalid;
-            ND_PRINT(", %us", (GET_U_1(tptr)));
+            ND_PRINT(C_RESET, ", %us", (GET_U_1(tptr)));
             break;
 
         case UDLD_SEQ_NUMBER_TLV:
             if (len != 4)
                 goto invalid;
-            ND_PRINT(", %u", GET_BE_U_4(tptr));
+            ND_PRINT(C_RESET, ", %u", GET_BE_U_4(tptr));
             break;
 
         default:

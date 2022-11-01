@@ -160,7 +160,7 @@ sll_print(netdissect_options *ndo, const struct sll_header *sllp, u_int length)
 	u_short ether_type;
 
 	ndo->ndo_protocol = "sll";
-        ND_PRINT("%3s ",
+        ND_PRINT(C_RESET, "%3s ",
 		 tok2str(sll_pkttype_values,"?",GET_BE_U_2(sllp->sll_pkttype)));
 
 	/*
@@ -169,7 +169,7 @@ sll_print(netdissect_options *ndo, const struct sll_header *sllp, u_int length)
 	 * XXX - print others as strings of hex?
 	 */
 	if (GET_BE_U_2(sllp->sll_halen) == MAC_ADDR_LEN)
-		ND_PRINT("%s ", GET_ETHERADDR_STRING(sllp->sll_addr));
+		ND_PRINT(C_RESET, "%s ", GET_ETHERADDR_STRING(sllp->sll_addr));
 
 	if (!ndo->ndo_qflag) {
 		ether_type = GET_BE_U_2(sllp->sll_protocol);
@@ -184,30 +184,30 @@ sll_print(netdissect_options *ndo, const struct sll_header *sllp, u_int length)
 				/*
 				 * Ethernet_802.3 IPX frame.
 				 */
-				ND_PRINT("802.3");
+				ND_PRINT(C_RESET, "802.3");
 				break;
 
 			case LINUX_SLL_P_802_2:
 				/*
 				 * 802.2.
 				 */
-				ND_PRINT("802.2");
+				ND_PRINT(C_RESET, "802.2");
 				break;
 
 			default:
 				/*
 				 * What is it?
 				 */
-				ND_PRINT("ethertype Unknown (0x%04x)",
+				ND_PRINT(C_RESET, "ethertype Unknown (0x%04x)",
 				    ether_type);
 				break;
 			}
 		} else {
-			ND_PRINT("ethertype %s (0x%04x)",
+			ND_PRINT(C_RESET, "ethertype %s (0x%04x)",
 			    tok2str(ethertype_values, "Unknown", ether_type),
 			    ether_type);
 		}
-		ND_PRINT(", length %u: ", length);
+		ND_PRINT(C_RESET, ", length %u: ", length);
 	}
 }
 
@@ -310,14 +310,14 @@ recurse:
 	        if (ndo->ndo_eflag) {
 			uint16_t tag = GET_BE_U_2(p);
 
-			ND_PRINT("%s, ", ieee8021q_tci_string(tag));
+			ND_PRINT(C_RESET, "%s, ", ieee8021q_tci_string(tag));
 		}
 
 		ether_type = GET_BE_U_2(p + 2);
 		if (ether_type <= MAX_ETHERNET_LENGTH_VAL)
 			ether_type = LINUX_SLL_P_802_2;
 		if (!ndo->ndo_qflag) {
-			ND_PRINT("ethertype %s, ",
+			ND_PRINT(C_RESET, "ethertype %s, ",
 			    tok2str(ethertype_values, "Unknown", ether_type));
 		}
 		p += 4;
@@ -344,7 +344,7 @@ sll2_print(netdissect_options *ndo, const struct sll2_header *sllp, u_int length
 	u_short ether_type;
 
 	ndo->ndo_protocol = "sll2";
-	ND_PRINT("ifindex %u ", GET_BE_U_4(sllp->sll2_if_index));
+	ND_PRINT(C_RESET, "ifindex %u ", GET_BE_U_4(sllp->sll2_if_index));
 
 	/*
 	 * XXX - check the link-layer address type value?
@@ -352,7 +352,7 @@ sll2_print(netdissect_options *ndo, const struct sll2_header *sllp, u_int length
 	 * XXX - print others as strings of hex?
 	 */
 	if (GET_U_1(sllp->sll2_halen) == MAC_ADDR_LEN)
-		ND_PRINT("%s ", GET_ETHERADDR_STRING(sllp->sll2_addr));
+		ND_PRINT(C_RESET, "%s ", GET_ETHERADDR_STRING(sllp->sll2_addr));
 
 	if (!ndo->ndo_qflag) {
 		ether_type = GET_BE_U_2(sllp->sll2_protocol);
@@ -367,30 +367,30 @@ sll2_print(netdissect_options *ndo, const struct sll2_header *sllp, u_int length
 				/*
 				 * Ethernet_802.3 IPX frame.
 				 */
-				ND_PRINT("802.3");
+				ND_PRINT(C_RESET, "802.3");
 				break;
 
 			case LINUX_SLL_P_802_2:
 				/*
 				 * 802.2.
 				 */
-				ND_PRINT("802.2");
+				ND_PRINT(C_RESET, "802.2");
 				break;
 
 			default:
 				/*
 				 * What is it?
 				 */
-				ND_PRINT("ethertype Unknown (0x%04x)",
+				ND_PRINT(C_RESET, "ethertype Unknown (0x%04x)",
 				    ether_type);
 				break;
 			}
 		} else {
-			ND_PRINT("ethertype %s (0x%04x)",
+			ND_PRINT(C_RESET, "ethertype %s (0x%04x)",
 			    tok2str(ethertype_values, "Unknown", ether_type),
 			    ether_type);
 		}
-		ND_PRINT(", length %u: ", length);
+		ND_PRINT(C_RESET, ", length %u: ", length);
 	}
 }
 
@@ -423,10 +423,10 @@ sll2_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 	if_index = GET_BE_U_4(sllp->sll2_if_index);
 	if (!if_indextoname(if_index, ifname))
 		strncpy(ifname, "?", 2);
-	ND_PRINT("%-5s ", ifname);
+	ND_PRINT(C_RESET, "%-5s ", ifname);
 #endif
 
-	ND_PRINT("%-3s ",
+	ND_PRINT(C_RESET, "%-3s ",
 		 tok2str(sll_pkttype_values, "?", GET_U_1(sllp->sll2_pkttype)));
 
 	if (ndo->ndo_eflag)
@@ -506,14 +506,14 @@ recurse:
 	        if (ndo->ndo_eflag) {
 			uint16_t tag = GET_BE_U_2(p);
 
-			ND_PRINT("%s, ", ieee8021q_tci_string(tag));
+			ND_PRINT(C_RESET, "%s, ", ieee8021q_tci_string(tag));
 		}
 
 		ether_type = GET_BE_U_2(p + 2);
 		if (ether_type <= MAX_ETHERNET_LENGTH_VAL)
 			ether_type = LINUX_SLL_P_802_2;
 		if (!ndo->ndo_qflag) {
-			ND_PRINT("ethertype %s, ",
+			ND_PRINT(C_RESET, "ethertype %s, ",
 			    tok2str(ethertype_values, "Unknown", ether_type));
 		}
 		p += 4;

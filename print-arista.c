@@ -99,11 +99,11 @@ arista_print_date_hms_time(netdissect_options *ndo, uint32_t seconds,
 	ts = seconds + (nanoseconds / 1000000000);
 	nanoseconds %= 1000000000;
 	if (NULL == (tm = gmtime(&ts)))
-		ND_PRINT("gmtime() error");
+		ND_PRINT(C_RESET, "gmtime() error");
 	else if (0 == strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", tm))
-		ND_PRINT("strftime() error");
+		ND_PRINT(C_RESET, "strftime() error");
 	else
-		ND_PRINT("%s.%09u", buf, nanoseconds);
+		ND_PRINT(C_RESET, "%s.%09u", buf, nanoseconds);
 }
 
 int
@@ -118,7 +118,7 @@ arista_ethertype_print(netdissect_options *ndo, const u_char *bp, u_int len _U_)
 	bp += 2;
 	bytesConsumed += 2;
 
-	ND_PRINT("SubType %s (0x%04x), ",
+	ND_PRINT(C_RESET, "SubType %s (0x%04x), ",
 	         tok2str(subtype_str, "Unknown", subTypeId),
 	         subTypeId);
 
@@ -129,7 +129,7 @@ arista_ethertype_print(netdissect_options *ndo, const u_char *bp, u_int len _U_)
 		uint8_t ts_timescale = GET_U_1(bp);
 		bp += 1;
 		bytesConsumed += 1;
-		ND_PRINT("Timescale %s (%u), ",
+		ND_PRINT(C_RESET, "Timescale %s (%u), ",
 		         tok2str(ts_timescale_str, "Unknown", ts_timescale),
 		         ts_timescale);
 
@@ -139,7 +139,7 @@ arista_ethertype_print(netdissect_options *ndo, const u_char *bp, u_int len _U_)
 		bytesConsumed += 1;
 
 		// Timestamp has 32-bit lsb in nanosec and remaining msb in sec
-		ND_PRINT("Format %s (%u), HwInfo %s (%u), Timestamp ",
+		ND_PRINT(C_RESET, "Format %s (%u), HwInfo %s (%u), Timestamp ",
 		         tok2str(ts_format_str, "Unknown", ts_format),
 		         ts_format,
 		         tok2str(hw_info_str, "Unknown", hw_info),
@@ -156,7 +156,7 @@ arista_ethertype_print(netdissect_options *ndo, const u_char *bp, u_int len _U_)
 			nanoseconds = GET_BE_U_4(bp + 2);
 			seconds += nanoseconds / 1000000000;
 			nanoseconds %= 1000000000;
-			ND_PRINT("%" PRIu64 ".%09u", seconds, nanoseconds);
+			ND_PRINT(C_RESET, "%" PRIu64 ".%09u", seconds, nanoseconds);
 			bytesConsumed += 6;
 			break;
 		default:
@@ -165,6 +165,6 @@ arista_ethertype_print(netdissect_options *ndo, const u_char *bp, u_int len _U_)
 	} else {
 		return -1;
 	}
-	ND_PRINT(": ");
+	ND_PRINT(C_RESET, ": ");
 	return bytesConsumed;
 }

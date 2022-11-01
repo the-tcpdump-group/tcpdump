@@ -63,10 +63,10 @@ print_btp_body(netdissect_options *ndo,
 	u_int msg_type;
 
 	/* Assuming ItsPduHeader */
-	ND_PRINT("; ItsPduHeader v:%u", GET_U_1(bp));
+	ND_PRINT(C_RESET, "; ItsPduHeader v:%u", GET_U_1(bp));
 
 	msg_type = GET_U_1(bp + 1);
-	ND_PRINT(" t:%u-%s", msg_type,
+	ND_PRINT(C_RESET, " t:%u-%s", msg_type,
 	         tok2str(msg_type_values, "unknown (%u)", msg_type));
 }
 
@@ -75,17 +75,17 @@ static void
 print_btp(netdissect_options *ndo,
 	  const u_char *bp)
 {
-	ND_PRINT("; BTP Dst:%u", GET_BE_U_2(bp + 0));
-	ND_PRINT(" Src:%u", GET_BE_U_2(bp + 2));
+	ND_PRINT(C_RESET, "; BTP Dst:%u", GET_BE_U_2(bp + 0));
+	ND_PRINT(C_RESET, " Src:%u", GET_BE_U_2(bp + 2));
 }
 
 static void
 print_long_pos_vector(netdissect_options *ndo,
 		      const u_char *bp)
 {
-	ND_PRINT("GN_ADDR:%s ", GET_LINKADDR_STRING(bp, LINKADDR_OTHER, GEONET_ADDR_LEN));
-	ND_PRINT("lat:%u ", GET_BE_U_4(bp + 12));
-	ND_PRINT("lon:%u", GET_BE_U_4(bp + 16));
+	ND_PRINT(C_RESET, "GN_ADDR:%s ", GET_LINKADDR_STRING(bp, LINKADDR_OTHER, GEONET_ADDR_LEN));
+	ND_PRINT(C_RESET, "lat:%u ", GET_BE_U_4(bp + 12));
+	ND_PRINT(C_RESET, "lon:%u", GET_BE_U_4(bp + 16));
 }
 
 
@@ -108,14 +108,14 @@ geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	int hdr_size = -1;
 
 	ndo->ndo_protocol = "geonet";
-	ND_PRINT("GeoNet ");
+	ND_PRINT(C_RESET, "GeoNet ");
 	if (src != NULL)
-		ND_PRINT("src:%s", (src->addr_string)(ndo, src->addr));
-	ND_PRINT("; ");
+		ND_PRINT(C_RESET, "src:%s", (src->addr_string)(ndo, src->addr));
+	ND_PRINT(C_RESET, "; ");
 
 	/* Process Common Header */
 	if (length < 36) {
-		ND_PRINT(" (common header length %u < 36)", length);
+		ND_PRINT(C_RESET, " (common header length %u < 36)", length);
 		goto invalid;
 	}
 
@@ -161,11 +161,11 @@ geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			break;
 	}
 
-	ND_PRINT("v:%u ", version);
-	ND_PRINT("NH:%u-%s ", next_hdr, next_hdr_txt);
-	ND_PRINT("HT:%u-%u-%s ", hdr_type, hdr_subtype, hdr_type_txt);
-	ND_PRINT("HopLim:%u ", hop_limit);
-	ND_PRINT("Payload:%u ", payload_length);
+	ND_PRINT(C_RESET, "v:%u ", version);
+	ND_PRINT(C_RESET, "NH:%u-%s ", next_hdr, next_hdr_txt);
+	ND_PRINT(C_RESET, "HT:%u-%u-%s ", hdr_type, hdr_subtype, hdr_type_txt);
+	ND_PRINT(C_RESET, "HopLim:%u ", hop_limit);
+	ND_PRINT(C_RESET, "Payload:%u ", payload_length);
 	print_long_pos_vector(ndo, bp + 8);
 
 	/* Skip Common Header */
@@ -222,7 +222,7 @@ geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	/* Skip Extended headers */
 	if (hdr_size >= 0) {
 		if (length < (u_int)hdr_size) {
-			ND_PRINT(" (header size %d > %u)", hdr_size, length);
+			ND_PRINT(C_RESET, " (header size %d > %u)", hdr_size, length);
 			goto invalid;
 		}
 		ND_TCHECK_LEN(bp, hdr_size);
@@ -234,7 +234,7 @@ geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			case 1:
 			case 2: /* BTP A/B */
 				if (length < 4) {
-					ND_PRINT(" (BTP length %u < 4)", length);
+					ND_PRINT(C_RESET, " (BTP length %u < 4)", length);
 					goto invalid;
 				}
 				print_btp(ndo, bp);

@@ -76,7 +76,7 @@ igrp_entry_print(netdissect_options *ndo, const struct igrprte *igr)
 	metric = ND_MIN(bandwidth + delay, 0xffffff);
 	mtu = GET_BE_U_2(igr->igr_mtu);
 
-	ND_PRINT(" d=%u b=%u r=%u l=%u M=%u mtu=%u in %u hops",
+	ND_PRINT(C_RESET, " d=%u b=%u r=%u l=%u M=%u mtu=%u in %u hops",
 	    10 * delay, bandwidth == 0 ? 0 : 10000000 / bandwidth,
 	    GET_U_1(igr->igr_rel), GET_U_1(igr->igr_ld), metric,
 	    mtu, GET_U_1(igr->igr_hct));
@@ -99,14 +99,14 @@ igrp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	ndo->ndo_protocol = "igrp";
 	hdr = (const struct igrphdr *)bp;
 	cp = (const u_char *)(hdr + 1);
-	ND_PRINT("igrp:");
+	ND_PRINT(C_RESET, "igrp:");
 
 	/* Header */
 	nint = GET_BE_U_2(hdr->ig_ni);
 	nsys = GET_BE_U_2(hdr->ig_ns);
 	next = GET_BE_U_2(hdr->ig_nx);
 
-	ND_PRINT(" %s V%u edit=%u AS=%u (%u/%u/%u)",
+	ND_PRINT(C_RESET, " %s V%u edit=%u AS=%u (%u/%u/%u)",
 	    tok2str(op2str, "op-#%u", IGRP_OP(GET_U_1(hdr->ig_vop))),
 	    IGRP_V(GET_U_1(hdr->ig_vop)),
 	    GET_U_1(hdr->ig_ed),
@@ -116,7 +116,7 @@ igrp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	    next);
 	cksum = GET_BE_U_2(hdr->ig_sum);
 	if (ndo->ndo_vflag)
-		ND_PRINT(" checksum=0x%04x", cksum);
+		ND_PRINT(C_RESET, " checksum=0x%04x", cksum);
 
 	length -= sizeof(*hdr);
 	while (length >= IGRP_RTE_SIZE) {
@@ -126,19 +126,19 @@ igrp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		uint8_t net2 = GET_U_1(&igr->igr_net[2]);
 
 		if (nint > 0) {
-			ND_PRINT(" *.%u.%u.%u", net0, net1, net2);
+			ND_PRINT(C_RESET, " *.%u.%u.%u", net0, net1, net2);
 			igrp_entry_print(ndo, igr);
 			--nint;
 		} else if (nsys > 0) {
-			ND_PRINT(" %u.%u.%u.0", net0, net1, net2);
+			ND_PRINT(C_RESET, " %u.%u.%u.0", net0, net1, net2);
 			igrp_entry_print(ndo, igr);
 			--nsys;
 		} else if (next > 0) {
-			ND_PRINT(" X%u.%u.%u.0", net0, net1, net2);
+			ND_PRINT(C_RESET, " X%u.%u.%u.0", net0, net1, net2);
 			igrp_entry_print(ndo, igr);
 			--next;
 		} else {
-			ND_PRINT(" [extra bytes %u]", length);
+			ND_PRINT(C_RESET, " [extra bytes %u]", length);
 			break;
 		}
 		cp += IGRP_RTE_SIZE;

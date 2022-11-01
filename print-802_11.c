@@ -404,13 +404,13 @@ struct meshcntl_t {
 
 #define PRINT_SSID(p) \
 	if (p.ssid_present) { \
-		ND_PRINT(" ("); \
+		ND_PRINT(C_RESET, " ("); \
 		fn_print_str(ndo, p.ssid.ssid); \
-		ND_PRINT(")"); \
+		ND_PRINT(C_RESET, ")"); \
 	}
 
 #define PRINT_RATE(_sep, _r, _suf) \
-	ND_PRINT("%s%2.1f%s", _sep, (.5 * ((_r) & 0x7f)), _suf)
+	ND_PRINT(C_RESET, "%s%2.1f%s", _sep, (.5 * ((_r) & 0x7f)), _suf)
 #define PRINT_RATES(p) \
 	if (p.rates_present) { \
 		const char *sep = " ["; \
@@ -420,21 +420,21 @@ struct meshcntl_t {
 					(p.rates.rate[z] & 0x80 ? "*" : "")); \
 				sep = " "; \
 			} \
-			ND_PRINT(" Mbit]"); \
+			ND_PRINT(C_RESET, " Mbit]"); \
 		} \
 	}
 
 #define PRINT_DS_CHANNEL(p) \
 	if (p.ds_present) \
-		ND_PRINT(" CH: %u", p.ds.channel); \
-	ND_PRINT("%s", \
+		ND_PRINT(C_RESET, " CH: %u", p.ds.channel); \
+	ND_PRINT(C_RESET, "%s", \
 	    CAPABILITY_PRIVACY(p.capability_info) ? ", PRIVACY" : "");
 
 #define PRINT_MESHID(p) \
 	if (p.meshid_present) { \
-		ND_PRINT(" (MESHID: "); \
+		ND_PRINT(C_RESET, " (MESHID: "); \
 		fn_print_str(ndo, p.meshid.meshid); \
-		ND_PRINT(")"); \
+		ND_PRINT(C_RESET, ")"); \
 	}
 
 #define MAX_MCS_INDEX	76
@@ -1135,7 +1135,7 @@ wep_print(netdissect_options *ndo,
 	ND_TCHECK_LEN(p, IEEE802_11_IV_LEN + IEEE802_11_KID_LEN);
 	iv = GET_LE_U_4(p);
 
-	ND_PRINT(" IV:%3x Pad %x KeyID %x", IV_IV(iv), IV_PAD(iv),
+	ND_PRINT(C_RESET, " IV:%3x Pad %x KeyID %x", IV_IV(iv), IV_PAD(iv),
 	    IV_KEYID(iv));
 
 	return 1;
@@ -1381,7 +1381,7 @@ parse_elements(netdissect_options *ndo,
 			break;
 		default:
 #if 0
-			ND_PRINT("(1) unhandled element_id (%u)  ",
+			ND_PRINT(C_RESET, "(1) unhandled element_id (%u)  ",
 			    GET_U_1(p + offset));
 #endif
 			offset += 2 + elementlen;
@@ -1429,7 +1429,7 @@ handle_beacon(netdissect_options *ndo,
 
 	PRINT_SSID(pbody);
 	PRINT_RATES(pbody);
-	ND_PRINT(" %s",
+	ND_PRINT(C_RESET, " %s",
 	    CAPABILITY_ESS(pbody.capability_info) ? "ESS" : "IBSS");
 	PRINT_DS_CHANNEL(pbody);
 	PRINT_MESHID(pbody);
@@ -1495,7 +1495,7 @@ handle_assoc_response(netdissect_options *ndo,
 
 	ret = parse_elements(ndo, &pbody, p, offset, length);
 
-	ND_PRINT(" AID(%x) :%s: %s", ((uint16_t)(pbody.aid << 2 )) >> 2 ,
+	ND_PRINT(C_RESET, " AID(%x) :%s: %s", ((uint16_t)(pbody.aid << 2 )) >> 2 ,
 	    CAPABILITY_PRIVACY(pbody.capability_info) ? " PRIVACY " : "",
 	    (pbody.status_code < NUM_STATUSES
 		? status_text[pbody.status_code]
@@ -1534,7 +1534,7 @@ handle_reassoc_request(netdissect_options *ndo,
 	ret = parse_elements(ndo, &pbody, p, offset, length);
 
 	PRINT_SSID(pbody);
-	ND_PRINT(" AP : %s", etheraddr_string(ndo,  pbody.ap ));
+	ND_PRINT(C_RESET, " AP : %s", etheraddr_string(ndo,  pbody.ap ));
 
 	return ret;
 trunc:
@@ -1624,7 +1624,7 @@ handle_disassoc(netdissect_options *ndo,
 		goto trunc;
 	pbody.reason_code = GET_LE_U_2(p);
 
-	ND_PRINT(": %s",
+	ND_PRINT(C_RESET, ": %s",
 	    (pbody.reason_code < NUM_REASONS)
 		? reason_text[pbody.reason_code]
 		: "Reserved");
@@ -1662,7 +1662,7 @@ handle_auth(netdissect_options *ndo,
 	if ((pbody.auth_alg == 1) &&
 	    ((pbody.auth_trans_seq_num == 2) ||
 	     (pbody.auth_trans_seq_num == 3))) {
-		ND_PRINT(" (%s)-%x [Challenge Text] %s",
+		ND_PRINT(C_RESET, " (%s)-%x [Challenge Text] %s",
 		    (pbody.auth_alg < NUM_AUTH_ALGS)
 			? auth_alg_text[pbody.auth_alg]
 			: "Reserved",
@@ -1673,7 +1673,7 @@ handle_auth(netdissect_options *ndo,
 			       : "n/a") : ""));
 		return ret;
 	}
-	ND_PRINT(" (%s)-%x: %s",
+	ND_PRINT(C_RESET, " (%s)-%x: %s",
 	    (pbody.auth_alg < NUM_AUTH_ALGS)
 		? auth_alg_text[pbody.auth_alg]
 		: "Reserved",
@@ -1708,9 +1708,9 @@ handle_deauth(netdissect_options *ndo,
 			: "Reserved";
 
 	if (ndo->ndo_eflag) {
-		ND_PRINT(": %s", reason);
+		ND_PRINT(C_RESET, ": %s", reason);
 	} else {
-		ND_PRINT(" (%s): %s", GET_ETHERADDR_STRING(src), reason);
+		ND_PRINT(C_RESET, " (%s): %s", GET_ETHERADDR_STRING(src), reason);
 	}
 	return 1;
 trunc:
@@ -1793,18 +1793,18 @@ handle_action(netdissect_options *ndo,
 	if (length < 2)
 		goto trunc;
 	if (ndo->ndo_eflag) {
-		ND_PRINT(": ");
+		ND_PRINT(C_RESET, ": ");
 	} else {
-		ND_PRINT(" (%s): ", GET_ETHERADDR_STRING(src));
+		ND_PRINT(C_RESET, " (%s): ", GET_ETHERADDR_STRING(src));
 	}
 	category = GET_U_1(p);
-	ND_PRINT("%s ", tok2str(category_str, "Reserved(%u)", category));
+	ND_PRINT(C_RESET, "%s ", tok2str(category_str, "Reserved(%u)", category));
 	action = GET_U_1(p + 1);
 	action_str = uint2tokary(category2tokary, category);
 	if (!action_str)
-		ND_PRINT("Act#%u", action);
+		ND_PRINT(C_RESET, "Act#%u", action);
 	else
-		ND_PRINT("%s", tok2str(action_str, "Act#%u", action));
+		ND_PRINT(C_RESET, "%s", tok2str(action_str, "Act#%u", action));
 
 	return 1;
 trunc:
@@ -1821,7 +1821,7 @@ static int
 mgmt_body_print(netdissect_options *ndo,
 		uint16_t fc, const uint8_t *src, const u_char *p, u_int length)
 {
-	ND_PRINT("%s", tok2str(st_str, "Unhandled Management subtype(%x)", FC_SUBTYPE(fc)));
+	ND_PRINT(C_RESET, "%s", tok2str(st_str, "Unhandled Management subtype(%x)", FC_SUBTYPE(fc)));
 
 	/* There may be a problem w/ AP not having this bit set */
 	if (FC_PROTECTED(fc))
@@ -1865,7 +1865,7 @@ static int
 ctrl_body_print(netdissect_options *ndo,
 		uint16_t fc, const u_char *p)
 {
-	ND_PRINT("%s", tok2str(ctrl_str, "Unknown Ctrl Subtype", FC_SUBTYPE(fc)));
+	ND_PRINT(C_RESET, "%s", tok2str(ctrl_str, "Unknown Ctrl Subtype", FC_SUBTYPE(fc)));
 	switch (FC_SUBTYPE(fc)) {
 	case CTRL_CONTROL_WRAPPER:
 		/* XXX - requires special handling */
@@ -1873,7 +1873,7 @@ ctrl_body_print(netdissect_options *ndo,
 	case CTRL_BAR:
 		ND_TCHECK_LEN(p, CTRL_BAR_HDRLEN);
 		if (!ndo->ndo_eflag)
-			ND_PRINT(" RA:%s TA:%s CTL(%x) SEQ(%u) ",
+			ND_PRINT(C_RESET, " RA:%s TA:%s CTL(%x) SEQ(%u) ",
 			    GET_ETHERADDR_STRING(((const struct ctrl_bar_hdr_t *)p)->ra),
 			    GET_ETHERADDR_STRING(((const struct ctrl_bar_hdr_t *)p)->ta),
 			    GET_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->ctl),
@@ -1882,42 +1882,42 @@ ctrl_body_print(netdissect_options *ndo,
 	case CTRL_BA:
 		ND_TCHECK_LEN(p, CTRL_BA_HDRLEN);
 		if (!ndo->ndo_eflag)
-			ND_PRINT(" RA:%s ",
+			ND_PRINT(C_RESET, " RA:%s ",
 			    GET_ETHERADDR_STRING(((const struct ctrl_ba_hdr_t *)p)->ra));
 		break;
 	case CTRL_PS_POLL:
 		ND_TCHECK_LEN(p, CTRL_PS_POLL_HDRLEN);
-		ND_PRINT(" AID(%x)",
+		ND_PRINT(C_RESET, " AID(%x)",
 		    GET_LE_U_2(((const struct ctrl_ps_poll_hdr_t *)p)->aid));
 		break;
 	case CTRL_RTS:
 		ND_TCHECK_LEN(p, CTRL_RTS_HDRLEN);
 		if (!ndo->ndo_eflag)
-			ND_PRINT(" TA:%s ",
+			ND_PRINT(C_RESET, " TA:%s ",
 			    GET_ETHERADDR_STRING(((const struct ctrl_rts_hdr_t *)p)->ta));
 		break;
 	case CTRL_CTS:
 		ND_TCHECK_LEN(p, CTRL_CTS_HDRLEN);
 		if (!ndo->ndo_eflag)
-			ND_PRINT(" RA:%s ",
+			ND_PRINT(C_RESET, " RA:%s ",
 			    GET_ETHERADDR_STRING(((const struct ctrl_cts_hdr_t *)p)->ra));
 		break;
 	case CTRL_ACK:
 		ND_TCHECK_LEN(p, CTRL_ACK_HDRLEN);
 		if (!ndo->ndo_eflag)
-			ND_PRINT(" RA:%s ",
+			ND_PRINT(C_RESET, " RA:%s ",
 			    GET_ETHERADDR_STRING(((const struct ctrl_ack_hdr_t *)p)->ra));
 		break;
 	case CTRL_CF_END:
 		ND_TCHECK_LEN(p, CTRL_END_HDRLEN);
 		if (!ndo->ndo_eflag)
-			ND_PRINT(" RA:%s ",
+			ND_PRINT(C_RESET, " RA:%s ",
 			    GET_ETHERADDR_STRING(((const struct ctrl_end_hdr_t *)p)->ra));
 		break;
 	case CTRL_END_ACK:
 		ND_TCHECK_LEN(p, CTRL_END_ACK_HDRLEN);
 		if (!ndo->ndo_eflag)
-			ND_PRINT(" RA:%s ",
+			ND_PRINT(C_RESET, " RA:%s ",
 			    GET_ETHERADDR_STRING(((const struct ctrl_end_ack_hdr_t *)p)->ra));
 		break;
 	}
@@ -1998,19 +1998,19 @@ data_header_print(netdissect_options *ndo, uint16_t fc, const u_char *p)
 
 	if (DATA_FRAME_IS_CF_ACK(subtype) || DATA_FRAME_IS_CF_POLL(subtype) ||
 	    DATA_FRAME_IS_QOS(subtype)) {
-		ND_PRINT("CF ");
+		ND_PRINT(C_RESET, "CF ");
 		if (DATA_FRAME_IS_CF_ACK(subtype)) {
 			if (DATA_FRAME_IS_CF_POLL(subtype))
-				ND_PRINT("Ack/Poll");
+				ND_PRINT(C_RESET, "Ack/Poll");
 			else
-				ND_PRINT("Ack");
+				ND_PRINT(C_RESET, "Ack");
 		} else {
 			if (DATA_FRAME_IS_CF_POLL(subtype))
-				ND_PRINT("Poll");
+				ND_PRINT(C_RESET, "Poll");
 		}
 		if (DATA_FRAME_IS_QOS(subtype))
-			ND_PRINT("+QoS");
-		ND_PRINT(" ");
+			ND_PRINT(C_RESET, "+QoS");
+		ND_PRINT(C_RESET, " ");
 	}
 
 #define ADDR1  (p + 4)
@@ -2019,19 +2019,19 @@ data_header_print(netdissect_options *ndo, uint16_t fc, const u_char *p)
 #define ADDR4  (p + 24)
 
 	if (!FC_TO_DS(fc) && !FC_FROM_DS(fc)) {
-		ND_PRINT("DA:%s SA:%s BSSID:%s ",
+		ND_PRINT(C_RESET, "DA:%s SA:%s BSSID:%s ",
 		    GET_ETHERADDR_STRING(ADDR1), GET_ETHERADDR_STRING(ADDR2),
 		    GET_ETHERADDR_STRING(ADDR3));
 	} else if (!FC_TO_DS(fc) && FC_FROM_DS(fc)) {
-		ND_PRINT("DA:%s BSSID:%s SA:%s ",
+		ND_PRINT(C_RESET, "DA:%s BSSID:%s SA:%s ",
 		    GET_ETHERADDR_STRING(ADDR1), GET_ETHERADDR_STRING(ADDR2),
 		    GET_ETHERADDR_STRING(ADDR3));
 	} else if (FC_TO_DS(fc) && !FC_FROM_DS(fc)) {
-		ND_PRINT("BSSID:%s SA:%s DA:%s ",
+		ND_PRINT(C_RESET, "BSSID:%s SA:%s DA:%s ",
 		    GET_ETHERADDR_STRING(ADDR1), GET_ETHERADDR_STRING(ADDR2),
 		    GET_ETHERADDR_STRING(ADDR3));
 	} else if (FC_TO_DS(fc) && FC_FROM_DS(fc)) {
-		ND_PRINT("RA:%s TA:%s DA:%s SA:%s ",
+		ND_PRINT(C_RESET, "RA:%s TA:%s DA:%s SA:%s ",
 		    GET_ETHERADDR_STRING(ADDR1), GET_ETHERADDR_STRING(ADDR2),
 		    GET_ETHERADDR_STRING(ADDR3), GET_ETHERADDR_STRING(ADDR4));
 	}
@@ -2047,7 +2047,7 @@ mgmt_header_print(netdissect_options *ndo, const u_char *p)
 {
 	const struct mgmt_header_t *hp = (const struct mgmt_header_t *) p;
 
-	ND_PRINT("BSSID:%s DA:%s SA:%s ",
+	ND_PRINT(C_RESET, "BSSID:%s DA:%s SA:%s ",
 	    GET_ETHERADDR_STRING((hp)->bssid), GET_ETHERADDR_STRING((hp)->da),
 	    GET_ETHERADDR_STRING((hp)->sa));
 }
@@ -2057,42 +2057,42 @@ ctrl_header_print(netdissect_options *ndo, uint16_t fc, const u_char *p)
 {
 	switch (FC_SUBTYPE(fc)) {
 	case CTRL_BAR:
-		ND_PRINT(" RA:%s TA:%s CTL(%x) SEQ(%u) ",
+		ND_PRINT(C_RESET, " RA:%s TA:%s CTL(%x) SEQ(%u) ",
 		    GET_ETHERADDR_STRING(((const struct ctrl_bar_hdr_t *)p)->ra),
 		    GET_ETHERADDR_STRING(((const struct ctrl_bar_hdr_t *)p)->ta),
 		    GET_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->ctl),
 		    GET_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->seq));
 		break;
 	case CTRL_BA:
-		ND_PRINT("RA:%s TA:%s ",
+		ND_PRINT(C_RESET, "RA:%s TA:%s ",
 		    GET_ETHERADDR_STRING(((const struct ctrl_ba_hdr_t *)p)->ra),
 		    GET_ETHERADDR_STRING(((const struct ctrl_ba_hdr_t *)p)->ta));
 		break;
 	case CTRL_PS_POLL:
-		ND_PRINT("BSSID:%s TA:%s ",
+		ND_PRINT(C_RESET, "BSSID:%s TA:%s ",
 		    GET_ETHERADDR_STRING(((const struct ctrl_ps_poll_hdr_t *)p)->bssid),
 		    GET_ETHERADDR_STRING(((const struct ctrl_ps_poll_hdr_t *)p)->ta));
 		break;
 	case CTRL_RTS:
-		ND_PRINT("RA:%s TA:%s ",
+		ND_PRINT(C_RESET, "RA:%s TA:%s ",
 		    GET_ETHERADDR_STRING(((const struct ctrl_rts_hdr_t *)p)->ra),
 		    GET_ETHERADDR_STRING(((const struct ctrl_rts_hdr_t *)p)->ta));
 		break;
 	case CTRL_CTS:
-		ND_PRINT("RA:%s ",
+		ND_PRINT(C_RESET, "RA:%s ",
 		    GET_ETHERADDR_STRING(((const struct ctrl_cts_hdr_t *)p)->ra));
 		break;
 	case CTRL_ACK:
-		ND_PRINT("RA:%s ",
+		ND_PRINT(C_RESET, "RA:%s ",
 		    GET_ETHERADDR_STRING(((const struct ctrl_ack_hdr_t *)p)->ra));
 		break;
 	case CTRL_CF_END:
-		ND_PRINT("RA:%s BSSID:%s ",
+		ND_PRINT(C_RESET, "RA:%s BSSID:%s ",
 		    GET_ETHERADDR_STRING(((const struct ctrl_end_hdr_t *)p)->ra),
 		    GET_ETHERADDR_STRING(((const struct ctrl_end_hdr_t *)p)->bssid));
 		break;
 	case CTRL_END_ACK:
-		ND_PRINT("RA:%s BSSID:%s ",
+		ND_PRINT(C_RESET, "RA:%s BSSID:%s ",
 		    GET_ETHERADDR_STRING(((const struct ctrl_end_ack_hdr_t *)p)->ra),
 		    GET_ETHERADDR_STRING(((const struct ctrl_end_ack_hdr_t *)p)->bssid));
 		break;
@@ -2132,7 +2132,7 @@ extract_header_length(netdissect_options *ndo,
 		case CTRL_END_ACK:
 			return CTRL_END_ACK_HDRLEN;
 		default:
-			ND_PRINT("unknown 802.11 ctrl frame subtype (%u)", FC_SUBTYPE(fc));
+			ND_PRINT(C_RESET, "unknown 802.11 ctrl frame subtype (%u)", FC_SUBTYPE(fc));
 			return 0;
 		}
 	case T_DATA:
@@ -2141,7 +2141,7 @@ extract_header_length(netdissect_options *ndo,
 			len += 2;
 		return len;
 	default:
-		ND_PRINT("unknown 802.11 frame type (%u)", FC_TYPE(fc));
+		ND_PRINT(C_RESET, "unknown 802.11 frame type (%u)", FC_TYPE(fc));
 		return 0;
 	}
 }
@@ -2162,19 +2162,19 @@ ieee_802_11_hdr_print(netdissect_options *ndo,
 {
 	if (ndo->ndo_vflag) {
 		if (FC_MORE_DATA(fc))
-			ND_PRINT("More Data ");
+			ND_PRINT(C_RESET, "More Data ");
 		if (FC_MORE_FLAG(fc))
-			ND_PRINT("More Fragments ");
+			ND_PRINT(C_RESET, "More Fragments ");
 		if (FC_POWER_MGMT(fc))
-			ND_PRINT("Pwr Mgmt ");
+			ND_PRINT(C_RESET, "Pwr Mgmt ");
 		if (FC_RETRY(fc))
-			ND_PRINT("Retry ");
+			ND_PRINT(C_RESET, "Retry ");
 		if (FC_ORDER(fc))
-			ND_PRINT("Strictly Ordered ");
+			ND_PRINT(C_RESET, "Strictly Ordered ");
 		if (FC_PROTECTED(fc))
-			ND_PRINT("Protected ");
+			ND_PRINT(C_RESET, "Protected ");
 		if (FC_TYPE(fc) != T_CTRL || FC_SUBTYPE(fc) != CTRL_PS_POLL)
-			ND_PRINT("%uus ",
+			ND_PRINT(C_RESET, "%uus ",
 			    GET_LE_U_2(((const struct mgmt_header_t *)p)->duration));
 	}
 	if (meshdrlen != 0) {
@@ -2182,15 +2182,15 @@ ieee_802_11_hdr_print(netdissect_options *ndo,
 		    (const struct meshcntl_t *)(p + hdrlen - meshdrlen);
 		u_int ae = GET_U_1(mc->flags) & 3;
 
-		ND_PRINT("MeshData (AE %u TTL %u seq %u", ae,
+		ND_PRINT(C_RESET, "MeshData (AE %u TTL %u seq %u", ae,
 		    GET_U_1(mc->ttl), GET_LE_U_4(mc->seq));
 		if (ae > 0)
-			ND_PRINT(" A4:%s", GET_ETHERADDR_STRING(mc->addr4));
+			ND_PRINT(C_RESET, " A4:%s", GET_ETHERADDR_STRING(mc->addr4));
 		if (ae > 1)
-			ND_PRINT(" A5:%s", GET_ETHERADDR_STRING(mc->addr5));
+			ND_PRINT(C_RESET, " A5:%s", GET_ETHERADDR_STRING(mc->addr5));
 		if (ae > 2)
-			ND_PRINT(" A6:%s", GET_ETHERADDR_STRING(mc->addr6));
-		ND_PRINT(") ");
+			ND_PRINT(C_RESET, " A6:%s", GET_ETHERADDR_STRING(mc->addr6));
+		ND_PRINT(C_RESET, ") ");
 	}
 
 	switch (FC_TYPE(fc)) {
@@ -2293,7 +2293,7 @@ ieee802_11_print(netdissect_options *ndo,
 			return hdrlen;	/* no-data frame */
 		/* There may be a problem w/ AP not having this bit set */
 		if (FC_PROTECTED(fc)) {
-			ND_PRINT("Data");
+			ND_PRINT(C_RESET, "Data");
 			if (!wep_print(ndo, p)) {
 				nd_print_trunc(ndo);
 				return hdrlen;
@@ -2706,46 +2706,46 @@ static void
 print_chaninfo(netdissect_options *ndo,
 	       uint16_t freq, uint32_t flags, uint32_t presentflags)
 {
-	ND_PRINT("%u MHz", freq);
+	ND_PRINT(C_RESET, "%u MHz", freq);
 	if (presentflags & (1 << IEEE80211_RADIOTAP_MCS)) {
 		/*
 		 * We have the MCS field, so this is 11n, regardless
 		 * of what the channel flags say.
 		 */
-		ND_PRINT(" 11n");
+		ND_PRINT(C_RESET, " 11n");
 	} else {
 		if (IS_CHAN_FHSS(flags))
-			ND_PRINT(" FHSS");
+			ND_PRINT(C_RESET, " FHSS");
 		if (IS_CHAN_A(flags)) {
 			if (flags & IEEE80211_CHAN_HALF)
-				ND_PRINT(" 11a/10Mhz");
+				ND_PRINT(C_RESET, " 11a/10Mhz");
 			else if (flags & IEEE80211_CHAN_QUARTER)
-				ND_PRINT(" 11a/5Mhz");
+				ND_PRINT(C_RESET, " 11a/5Mhz");
 			else
-				ND_PRINT(" 11a");
+				ND_PRINT(C_RESET, " 11a");
 		}
 		if (IS_CHAN_ANYG(flags)) {
 			if (flags & IEEE80211_CHAN_HALF)
-				ND_PRINT(" 11g/10Mhz");
+				ND_PRINT(C_RESET, " 11g/10Mhz");
 			else if (flags & IEEE80211_CHAN_QUARTER)
-				ND_PRINT(" 11g/5Mhz");
+				ND_PRINT(C_RESET, " 11g/5Mhz");
 			else
-				ND_PRINT(" 11g");
+				ND_PRINT(C_RESET, " 11g");
 		} else if (IS_CHAN_B(flags))
-			ND_PRINT(" 11b");
+			ND_PRINT(C_RESET, " 11b");
 		if (flags & IEEE80211_CHAN_TURBO)
-			ND_PRINT(" Turbo");
+			ND_PRINT(C_RESET, " Turbo");
 	}
 	/*
 	 * These apply to 11n.
 	 */
 	if (flags & IEEE80211_CHAN_HT20)
-		ND_PRINT(" ht/20");
+		ND_PRINT(C_RESET, " ht/20");
 	else if (flags & IEEE80211_CHAN_HT40D)
-		ND_PRINT(" ht/40-");
+		ND_PRINT(C_RESET, " ht/40-");
 	else if (flags & IEEE80211_CHAN_HT40U)
-		ND_PRINT(" ht/40+");
-	ND_PRINT(" ");
+		ND_PRINT(C_RESET, " ht/40+");
+	ND_PRINT(C_RESET, " ");
 }
 
 static int
@@ -2764,7 +2764,7 @@ print_radiotap_field(netdissect_options *ndo,
 		rc = nd_cpack_uint64(ndo, s, &tsft);
 		if (rc != 0)
 			goto trunc;
-		ND_PRINT("%" PRIu64 "us tsft ", tsft);
+		ND_PRINT(C_RESET, "%" PRIu64 "us tsft ", tsft);
 		break;
 		}
 
@@ -2776,15 +2776,15 @@ print_radiotap_field(netdissect_options *ndo,
 			goto trunc;
 		*flagsp = flagsval;
 		if (flagsval & IEEE80211_RADIOTAP_F_CFP)
-			ND_PRINT("cfp ");
+			ND_PRINT(C_RESET, "cfp ");
 		if (flagsval & IEEE80211_RADIOTAP_F_SHORTPRE)
-			ND_PRINT("short preamble ");
+			ND_PRINT(C_RESET, "short preamble ");
 		if (flagsval & IEEE80211_RADIOTAP_F_WEP)
-			ND_PRINT("wep ");
+			ND_PRINT(C_RESET, "wep ");
 		if (flagsval & IEEE80211_RADIOTAP_F_FRAG)
-			ND_PRINT("fragmented ");
+			ND_PRINT(C_RESET, "fragmented ");
 		if (flagsval & IEEE80211_RADIOTAP_F_BADFCS)
-			ND_PRINT("bad-fcs ");
+			ND_PRINT(C_RESET, "bad-fcs ");
 		break;
 		}
 
@@ -2832,9 +2832,9 @@ print_radiotap_field(netdissect_options *ndo,
 			 * information from Flags, at least on
 			 * FreeBSD?
 			 */
-			ND_PRINT("MCS %u ", rate & 0x7f);
+			ND_PRINT(C_RESET, "MCS %u ", rate & 0x7f);
 		} else
-			ND_PRINT("%2.1f Mb/s ", .5 * rate);
+			ND_PRINT(C_RESET, "%2.1f Mb/s ", .5 * rate);
 		break;
 		}
 
@@ -2868,7 +2868,7 @@ print_radiotap_field(netdissect_options *ndo,
 		rc = nd_cpack_uint8(ndo, s, &hoppat);
 		if (rc != 0)
 			goto trunc;
-		ND_PRINT("fhset %u fhpat %u ", hopset, hoppat);
+		ND_PRINT(C_RESET, "fhset %u fhpat %u ", hopset, hoppat);
 		break;
 		}
 
@@ -2878,7 +2878,7 @@ print_radiotap_field(netdissect_options *ndo,
 		rc = nd_cpack_int8(ndo, s, &dbm_antsignal);
 		if (rc != 0)
 			goto trunc;
-		ND_PRINT("%ddBm signal ", dbm_antsignal);
+		ND_PRINT(C_RESET, "%ddBm signal ", dbm_antsignal);
 		break;
 		}
 
@@ -2888,7 +2888,7 @@ print_radiotap_field(netdissect_options *ndo,
 		rc = nd_cpack_int8(ndo, s, &dbm_antnoise);
 		if (rc != 0)
 			goto trunc;
-		ND_PRINT("%ddBm noise ", dbm_antnoise);
+		ND_PRINT(C_RESET, "%ddBm noise ", dbm_antnoise);
 		break;
 		}
 
@@ -2898,7 +2898,7 @@ print_radiotap_field(netdissect_options *ndo,
 		rc = nd_cpack_uint16(ndo, s, &lock_quality);
 		if (rc != 0)
 			goto trunc;
-		ND_PRINT("%u sq ", lock_quality);
+		ND_PRINT(C_RESET, "%u sq ", lock_quality);
 		break;
 		}
 
@@ -2908,7 +2908,7 @@ print_radiotap_field(netdissect_options *ndo,
 		rc = nd_cpack_int16(ndo, s, &tx_attenuation);
 		if (rc != 0)
 			goto trunc;
-		ND_PRINT("%d tx power ", -tx_attenuation);
+		ND_PRINT(C_RESET, "%d tx power ", -tx_attenuation);
 		break;
 		}
 
@@ -2918,7 +2918,7 @@ print_radiotap_field(netdissect_options *ndo,
 		rc = nd_cpack_int8(ndo, s, &db_tx_attenuation);
 		if (rc != 0)
 			goto trunc;
-		ND_PRINT("%ddB tx attenuation ", -db_tx_attenuation);
+		ND_PRINT(C_RESET, "%ddB tx attenuation ", -db_tx_attenuation);
 		break;
 		}
 
@@ -2928,7 +2928,7 @@ print_radiotap_field(netdissect_options *ndo,
 		rc = nd_cpack_int8(ndo, s, &dbm_tx_power);
 		if (rc != 0)
 			goto trunc;
-		ND_PRINT("%ddBm tx power ", dbm_tx_power);
+		ND_PRINT(C_RESET, "%ddBm tx power ", dbm_tx_power);
 		break;
 		}
 
@@ -2938,7 +2938,7 @@ print_radiotap_field(netdissect_options *ndo,
 		rc = nd_cpack_uint8(ndo, s, &antenna);
 		if (rc != 0)
 			goto trunc;
-		ND_PRINT("antenna %u ", antenna);
+		ND_PRINT(C_RESET, "antenna %u ", antenna);
 		break;
 		}
 
@@ -2948,7 +2948,7 @@ print_radiotap_field(netdissect_options *ndo,
 		rc = nd_cpack_uint8(ndo, s, &db_antsignal);
 		if (rc != 0)
 			goto trunc;
-		ND_PRINT("%udB signal ", db_antsignal);
+		ND_PRINT(C_RESET, "%udB signal ", db_antsignal);
 		break;
 		}
 
@@ -2958,7 +2958,7 @@ print_radiotap_field(netdissect_options *ndo,
 		rc = nd_cpack_uint8(ndo, s, &db_antnoise);
 		if (rc != 0)
 			goto trunc;
-		ND_PRINT("%udB noise ", db_antnoise);
+		ND_PRINT(C_RESET, "%udB noise ", db_antnoise);
 		break;
 		}
 
@@ -3053,36 +3053,36 @@ print_radiotap_field(netdissect_options *ndo,
 				 * We have the rate.
 				 * Print it.
 				 */
-				ND_PRINT("%.1f Mb/s MCS %u ", htrate, mcs_index);
+				ND_PRINT(C_RESET, "%.1f Mb/s MCS %u ", htrate, mcs_index);
 			} else {
 				/*
 				 * We at least have the MCS index.
 				 * Print it.
 				 */
-				ND_PRINT("MCS %u ", mcs_index);
+				ND_PRINT(C_RESET, "MCS %u ", mcs_index);
 			}
 		}
 		if (known & IEEE80211_RADIOTAP_MCS_BANDWIDTH_KNOWN) {
-			ND_PRINT("%s ",
+			ND_PRINT(C_RESET, "%s ",
 				ht_bandwidth[flags & IEEE80211_RADIOTAP_MCS_BANDWIDTH_MASK]);
 		}
 		if (known & IEEE80211_RADIOTAP_MCS_GUARD_INTERVAL_KNOWN) {
-			ND_PRINT("%s GI ",
+			ND_PRINT(C_RESET, "%s GI ",
 				(flags & IEEE80211_RADIOTAP_MCS_SHORT_GI) ?
 				"short" : "long");
 		}
 		if (known & IEEE80211_RADIOTAP_MCS_HT_FORMAT_KNOWN) {
-			ND_PRINT("%s ",
+			ND_PRINT(C_RESET, "%s ",
 				(flags & IEEE80211_RADIOTAP_MCS_HT_GREENFIELD) ?
 				"greenfield" : "mixed");
 		}
 		if (known & IEEE80211_RADIOTAP_MCS_FEC_TYPE_KNOWN) {
-			ND_PRINT("%s FEC ",
+			ND_PRINT(C_RESET, "%s FEC ",
 				(flags & IEEE80211_RADIOTAP_MCS_FEC_LDPC) ?
 				"LDPC" : "BCC");
 		}
 		if (known & IEEE80211_RADIOTAP_MCS_STBC_KNOWN) {
-			ND_PRINT("RX-STBC%u ",
+			ND_PRINT(C_RESET, "RX-STBC%u ",
 				(flags & IEEE80211_RADIOTAP_MCS_STBC_MASK) >> IEEE80211_RADIOTAP_MCS_STBC_SHIFT);
 		}
 		break;
@@ -3184,17 +3184,17 @@ print_radiotap_field(netdissect_options *ndo,
 			if (nss == 0)
 				continue;
 
-			ND_PRINT("User %u MCS %u ", i, mcs);
-			ND_PRINT("%s FEC ",
+			ND_PRINT(C_RESET, "User %u MCS %u ", i, mcs);
+			ND_PRINT(C_RESET, "%s FEC ",
 				(coding & (IEEE80211_RADIOTAP_CODING_LDPC_USERn << i)) ?
 				"LDPC" : "BCC");
 		}
 		if (known & IEEE80211_RADIOTAP_VHT_BANDWIDTH_KNOWN) {
-			ND_PRINT("%s ",
+			ND_PRINT(C_RESET, "%s ",
 				vht_bandwidth[bandwidth & IEEE80211_RADIOTAP_VHT_BANDWIDTH_MASK]);
 		}
 		if (known & IEEE80211_RADIOTAP_VHT_GUARD_INTERVAL_KNOWN) {
-			ND_PRINT("%s GI ",
+			ND_PRINT(C_RESET, "%s GI ",
 				(flags & IEEE80211_RADIOTAP_VHT_SHORT_GI) ?
 				"short" : "long");
 		}
@@ -3206,7 +3206,7 @@ print_radiotap_field(netdissect_options *ndo,
 		 * size we do not know, so we cannot
 		 * proceed.  Just print the bit number.
 		 */
-		ND_PRINT("[bit %u] ", bit);
+		ND_PRINT(C_RESET, "[bit %u] ", bit);
 		return -1;
 	}
 

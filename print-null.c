@@ -57,14 +57,14 @@ static void
 null_hdr_print(netdissect_options *ndo, uint32_t family, u_int length)
 {
 	if (!ndo->ndo_qflag) {
-		ND_PRINT("AF %s (%u)",
+		ND_PRINT(C_RESET, "AF %s (%u)",
 			tok2str(bsd_af_values,"Unknown",family),family);
 	} else {
-		ND_PRINT("%s",
+		ND_PRINT(C_RESET, "%s",
 			tok2str(bsd_af_values,"Unknown AF %u",family));
 	}
 
-	ND_PRINT(", length %u: ", length);
+	ND_PRINT(C_RESET, ", length %u: ", length);
 }
 
 /*

@@ -111,7 +111,7 @@ static void
 ether_addresses_print(netdissect_options *ndo, const u_char *src,
 		      const u_char *dst)
 {
-	ND_PRINT("%s > %s, ",
+	 ND_PRINT(C_RESET, "%s > %s, ",
 		 GET_ETHERADDR_STRING(src), GET_ETHERADDR_STRING(dst));
 }
 
@@ -119,10 +119,10 @@ static void
 ether_type_print(netdissect_options *ndo, uint16_t type)
 {
 	if (!ndo->ndo_qflag)
-		ND_PRINT("ethertype %s (0x%04x)",
+		 ND_PRINT(C_RESET, "ethertype %s (0x%04x)",
 			 tok2str(ethertype_values, "Unknown", type), type);
 	else
-		ND_PRINT("%s",
+		 ND_PRINT(C_RESET, "%s",
 			 tok2str(ethertype_values, "Unknown Ethertype (0x%04x)", type));
 }
 
@@ -151,7 +151,7 @@ ether_common_print(netdissect_options *ndo, const u_char *p, u_int length,
 	struct lladdr_info src, dst;
 
 	if (length < caplen) {
-		ND_PRINT("[length %u < caplen %u]", length, caplen);
+		 ND_PRINT(C_RESET, "[length %u < caplen %u]", length, caplen);
 		nd_print_invalid(ndo);
 		return length;
 	}
@@ -217,7 +217,7 @@ recurse:
 		 */
 		if (ndo->ndo_eflag) {
 			ether_type_print(ndo, length_type);
-			ND_PRINT(", length %u: ", orig_length);
+			 ND_PRINT(C_RESET, ", length %u: ", orig_length);
 			printed_length = 1;
 		}
 
@@ -273,11 +273,11 @@ recurse:
 
 			ether_type_print(ndo, length_type);
 			if (!printed_length) {
-				ND_PRINT(", length %u: ", orig_length);
+				 ND_PRINT(C_RESET, ", length %u: ", orig_length);
 				printed_length = 1;
 			} else
-				ND_PRINT(", ");
-			ND_PRINT("%s, ", ieee8021q_tci_string(tag));
+				 ND_PRINT(C_RESET, ", ");
+			 ND_PRINT(C_RESET, "%s, ", ieee8021q_tci_string(tag));
 		}
 
 		length_type = GET_BE_U_2(p + 2);
@@ -312,9 +312,9 @@ recurse:
 		}
 
 		if (ndo->ndo_eflag) {
-			ND_PRINT("802.3");
+			 ND_PRINT(C_RESET, "802.3");
 			if (!printed_length)
-				ND_PRINT(", length %u: ", length);
+				 ND_PRINT(C_RESET, ", length %u: ", length);
 		}
 
 		/*
@@ -351,15 +351,15 @@ recurse:
 		hdrlen += llc_hdrlen;
 	} else if (length_type == ETHERTYPE_ARISTA) {
 		if (caplen < 2) {
-			ND_PRINT("[|arista]");
+			 ND_PRINT(C_RESET, "[|arista]");
 			return hdrlen + caplen;
 		}
 		if (length < 2) {
-			ND_PRINT("[|arista]");
+			 ND_PRINT(C_RESET, "[|arista]");
 			return hdrlen + length;
 		}
 		ether_type_print(ndo, length_type);
-		ND_PRINT(", length %u: ", orig_length);
+		 ND_PRINT(C_RESET, ", length %u: ", orig_length);
 		int bytesConsumed = arista_ethertype_print(ndo, p, length);
 		if (bytesConsumed > 0) {
 			p += bytesConsumed;
@@ -372,7 +372,7 @@ recurse:
 			if (!ndo->ndo_eflag && length_type > MAX_ETHERNET_LENGTH_VAL) {
 				ether_addresses_print(ndo, src.addr, dst.addr);
 				ether_type_print(ndo, length_type);
-				ND_PRINT(", length %u: ", orig_length);
+				 ND_PRINT(C_RESET, ", length %u: ", orig_length);
 			}
 			 if (!ndo->ndo_suppress_default_print)
 				 ND_DEFAULTPRINT(p, caplen);
@@ -384,9 +384,9 @@ recurse:
 		if (ndo->ndo_eflag) {
 			ether_type_print(ndo, length_type);
 			if (!printed_length)
-				ND_PRINT(", length %u: ", orig_length);
+				 ND_PRINT(C_RESET, ", length %u: ", orig_length);
 			else
-				ND_PRINT(", ");
+				 ND_PRINT(C_RESET, ", ");
 		}
 		if (ethertype_print(ndo, length_type, p, length, caplen, &src, &dst) == 0) {
 			/* type not known, print raw packet */
@@ -400,7 +400,7 @@ recurse:
 				 */
 				ether_addresses_print(ndo, src.addr, dst.addr);
 				ether_type_print(ndo, length_type);
-				ND_PRINT(", length %u: ", orig_length);
+				 ND_PRINT(C_RESET, ", length %u: ", orig_length);
 			}
 
 			if (!ndo->ndo_suppress_default_print)
@@ -551,7 +551,7 @@ ethertype_print(netdissect_options *ndo,
 
 	case ETHERTYPE_ATALK:
 		if (ndo->ndo_vflag)
-			ND_PRINT("et1 ");
+			 ND_PRINT(C_RESET, "et1 ");
 		atalk_print(ndo, p, length);
 		return (1);
 
@@ -560,7 +560,7 @@ ethertype_print(netdissect_options *ndo,
 		return (1);
 
 	case ETHERTYPE_IPX:
-		ND_PRINT("(NOV-ETHII) ");
+		 ND_PRINT(C_RESET, "(NOV-ETHII) ");
 		ipx_print(ndo, p, length);
 		return (1);
 
@@ -593,7 +593,7 @@ ethertype_print(netdissect_options *ndo,
 
 	case ETHERTYPE_PPP:
 		if (length) {
-			ND_PRINT(": ");
+			 ND_PRINT(C_RESET, ": ");
 			ppp_print(ndo, p, length);
 		}
 		return (1);

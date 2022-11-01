@@ -112,22 +112,22 @@ static const struct tok nflog_values[] = {
 static void
 nflog_hdr_print(netdissect_options *ndo, const nflog_hdr_t *hdr, u_int length)
 {
-	ND_PRINT("version %u, resource ID %u",
+	ND_PRINT(C_RESET, "version %u, resource ID %u",
 	    GET_U_1(hdr->nflog_version), GET_BE_U_2(hdr->nflog_rid));
 
 	if (!ndo->ndo_qflag) {
-		ND_PRINT(", family %s (%u)",
+		ND_PRINT(C_RESET, ", family %s (%u)",
 			 tok2str(nflog_values, "Unknown",
 				 GET_U_1(hdr->nflog_family)),
 			 GET_U_1(hdr->nflog_family));
 		} else {
-		ND_PRINT(", %s",
+		ND_PRINT(C_RESET, ", %s",
 			 tok2str(nflog_values,
 				 "Unknown NFLOG (0x%02x)",
 			 GET_U_1(hdr->nflog_family)));
 		}
 
-	ND_PRINT(", length %u: ", length);
+	ND_PRINT(C_RESET, ", length %u: ", length);
 }
 
 void
@@ -150,7 +150,7 @@ nflog_if_print(netdissect_options *ndo,
 
 	ND_TCHECK_SIZE(hdr);
 	if (GET_U_1(hdr->nflog_version) != 0) {
-		ND_PRINT("version %u (unknown)", GET_U_1(hdr->nflog_version));
+		ND_PRINT(C_RESET, "version %u (unknown)", GET_U_1(hdr->nflog_version));
 		return;
 	}
 

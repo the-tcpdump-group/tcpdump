@@ -478,17 +478,17 @@ decnet_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "decnet";
 	if (length < sizeof(struct shorthdr)) {
-		ND_PRINT(" (length %u < %zu)", length, sizeof(struct shorthdr));
+		ND_PRINT(C_RESET, " (length %u < %zu)", length, sizeof(struct shorthdr));
 		goto invalid;
 	}
 
 	pktlen = GET_LE_U_2(ap);
 	if (pktlen < sizeof(struct shorthdr)) {
-		ND_PRINT(" (pktlen %u < %zu)", pktlen, sizeof(struct shorthdr));
+		ND_PRINT(C_RESET, " (pktlen %u < %zu)", pktlen, sizeof(struct shorthdr));
 		goto invalid;
 	}
 	if (pktlen > length) {
-		ND_PRINT(" (pktlen %u > %u)", pktlen, length);
+		ND_PRINT(C_RESET, " (pktlen %u > %u)", pktlen, length);
 		goto invalid;
 	}
 	length = pktlen;
@@ -500,9 +500,9 @@ decnet_print(netdissect_options *ndo,
 	    /* pad bytes of some sort in front of message */
 	    u_int padlen = mflags & RMF_PADMASK;
 	    if (ndo->ndo_vflag)
-		ND_PRINT("[pad:%u] ", padlen);
+		ND_PRINT(C_RESET, "[pad:%u] ", padlen);
 	    if (length < padlen + 2) {
-		ND_PRINT(" (length %u < %u)", length, padlen + 2);
+		ND_PRINT(C_RESET, " (length %u < %u)", length, padlen + 2);
 		goto invalid;
 	    }
 	    ND_TCHECK_LEN(ap + sizeof(short), padlen);
@@ -514,7 +514,7 @@ decnet_print(netdissect_options *ndo,
 	}
 
 	if (mflags & RMF_FVER) {
-		ND_PRINT("future-version-decnet");
+		ND_PRINT(C_RESET, "future-version-decnet");
 		ND_DEFAULTPRINT(ap, ND_MIN(length, caplen));
 		return;
 	}
@@ -529,7 +529,7 @@ decnet_print(netdissect_options *ndo,
 	switch (mflags & RMF_MASK) {
 	case RMF_LONG:
 	    if (length < sizeof(struct longhdr)) {
-		ND_PRINT(" (length %u < %zu)", length, sizeof(struct longhdr));
+		ND_PRINT(C_RESET, " (length %u < %zu)", length, sizeof(struct longhdr));
 		goto invalid;
 	    }
 	    ND_TCHECK_SIZE(&rhp->rh_long);
@@ -549,21 +549,21 @@ decnet_print(netdissect_options *ndo,
 	    nsplen = length - sizeof(struct shorthdr);
 	    break;
 	default:
-	    ND_PRINT("unknown message flags under mask");
+	    ND_PRINT(C_RESET, "unknown message flags under mask");
 	    ND_DEFAULTPRINT((const u_char *)ap, ND_MIN(length, caplen));
 	    return;
 	}
 
-	ND_PRINT("%s > %s %u ",
+	ND_PRINT(C_RESET, "%s > %s %u ",
 			dnaddr_string(ndo, src), dnaddr_string(ndo, dst), pktlen);
 	if (ndo->ndo_vflag) {
 	    if (mflags & RMF_RQR)
-		ND_PRINT("RQR ");
+		ND_PRINT(C_RESET, "RQR ");
 	    if (mflags & RMF_RTS)
-		ND_PRINT("RTS ");
+		ND_PRINT(C_RESET, "RTS ");
 	    if (mflags & RMF_IE)
-		ND_PRINT("IE ");
-	    ND_PRINT("%u hops ", hops);
+		ND_PRINT(C_RESET, "IE ");
+	    ND_PRINT(C_RESET, "%u hops ", hops);
 	}
 
 	if (!print_nsp(ndo, nspp, nsplen))
@@ -589,7 +589,7 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 
 	switch (mflags & RMF_CTLMASK) {
 	case RMF_INIT:
-	    ND_PRINT("init ");
+	    ND_PRINT(C_RESET, "init ");
 	    if (length < sizeof(struct initmsg))
 		goto invalid;
 	    ND_TCHECK_SIZE(&cmp->cm_init);
@@ -601,48 +601,48 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 	    ueco = GET_U_1(cmp->cm_init.in_ueco);
 	    hello = GET_LE_U_2(cmp->cm_init.in_hello);
 	    print_t_info(ndo, info);
-	    ND_PRINT("src %sblksize %u vers %u eco %u ueco %u hello %u",
+	    ND_PRINT(C_RESET, "src %sblksize %u vers %u eco %u ueco %u hello %u",
 			dnaddr_string(ndo, src), blksize, vers, eco, ueco,
 			hello);
 	    break;
 	case RMF_VER:
-	    ND_PRINT("verification ");
+	    ND_PRINT(C_RESET, "verification ");
 	    if (length < sizeof(struct verifmsg))
 		goto invalid;
 	    src = GET_LE_U_2(cmp->cm_ver.ve_src);
 	    other = GET_U_1(cmp->cm_ver.ve_fcnval);
-	    ND_PRINT("src %s fcnval %o", dnaddr_string(ndo, src), other);
+	    ND_PRINT(C_RESET, "src %s fcnval %o", dnaddr_string(ndo, src), other);
 	    break;
 	case RMF_TEST:
-	    ND_PRINT("test ");
+	    ND_PRINT(C_RESET, "test ");
 	    if (length < sizeof(struct testmsg))
 		goto invalid;
 	    src = GET_LE_U_2(cmp->cm_test.te_src);
 	    other = GET_U_1(cmp->cm_test.te_data);
-	    ND_PRINT("src %s data %o", dnaddr_string(ndo, src), other);
+	    ND_PRINT(C_RESET, "src %s data %o", dnaddr_string(ndo, src), other);
 	    break;
 	case RMF_L1ROUT:
-	    ND_PRINT("lev-1-routing ");
+	    ND_PRINT(C_RESET, "lev-1-routing ");
 	    if (length < sizeof(struct l1rout))
 		goto invalid;
 	    ND_TCHECK_SIZE(&cmp->cm_l1rou);
 	    src = GET_LE_U_2(cmp->cm_l1rou.r1_src);
-	    ND_PRINT("src %s ", dnaddr_string(ndo, src));
+	    ND_PRINT(C_RESET, "src %s ", dnaddr_string(ndo, src));
 	    print_l1_routes(ndo, &(rhpx[sizeof(struct l1rout)]),
 				length - sizeof(struct l1rout));
 	    break;
 	case RMF_L2ROUT:
-	    ND_PRINT("lev-2-routing ");
+	    ND_PRINT(C_RESET, "lev-2-routing ");
 	    if (length < sizeof(struct l2rout))
 		goto invalid;
 	    ND_TCHECK_SIZE(&cmp->cm_l2rout);
 	    src = GET_LE_U_2(cmp->cm_l2rout.r2_src);
-	    ND_PRINT("src %s ", dnaddr_string(ndo, src));
+	    ND_PRINT(C_RESET, "src %s ", dnaddr_string(ndo, src));
 	    print_l2_routes(ndo, &(rhpx[sizeof(struct l2rout)]),
 				length - sizeof(struct l2rout));
 	    break;
 	case RMF_RHELLO:
-	    ND_PRINT("router-hello ");
+	    ND_PRINT(C_RESET, "router-hello ");
 	    if (length < sizeof(struct rhellomsg))
 		goto invalid;
 	    ND_TCHECK_SIZE(&cmp->cm_rhello);
@@ -656,14 +656,14 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 	    priority = GET_U_1(cmp->cm_rhello.rh_priority);
 	    hello = GET_LE_U_2(cmp->cm_rhello.rh_hello);
 	    print_i_info(ndo, info);
-	    ND_PRINT("vers %u eco %u ueco %u src %s blksize %u pri %u hello %u",
+	    ND_PRINT(C_RESET, "vers %u eco %u ueco %u src %s blksize %u pri %u hello %u",
 			vers, eco, ueco, dnaddr_string(ndo, src),
 			blksize, priority, hello);
 	    print_elist(&(rhpx[sizeof(struct rhellomsg)]),
 				length - sizeof(struct rhellomsg));
 	    break;
 	case RMF_EHELLO:
-	    ND_PRINT("endnode-hello ");
+	    ND_PRINT(C_RESET, "endnode-hello ");
 	    if (length < sizeof(struct ehellomsg))
 		goto invalid;
 	    vers = GET_U_1(cmp->cm_ehello.eh_vers);
@@ -679,13 +679,13 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 	    hello = GET_LE_U_2(cmp->cm_ehello.eh_hello);
 	    other = GET_U_1(cmp->cm_ehello.eh_data);
 	    print_i_info(ndo, info);
-	    ND_PRINT("vers %u eco %u ueco %u src %s blksize %u rtr %s hello %u data %o",
+	    ND_PRINT(C_RESET, "vers %u eco %u ueco %u src %s blksize %u rtr %s hello %u data %o",
 			vers, eco, ueco, dnaddr_string(ndo, src),
 			blksize, dnaddr_string(ndo, dst), hello, other);
 	    break;
 
 	default:
-	    ND_PRINT("unknown control message");
+	    ND_PRINT(C_RESET, "unknown control message");
 	    ND_DEFAULTPRINT((const u_char *)rhp, ND_MIN(length, caplen));
 	    break;
 	}
@@ -701,15 +701,15 @@ print_t_info(netdissect_options *ndo,
 {
 	u_int ntype = info & 3;
 	switch (ntype) {
-	case 0: ND_PRINT("reserved-ntype? "); break;
-	case TI_L2ROUT: ND_PRINT("l2rout "); break;
-	case TI_L1ROUT: ND_PRINT("l1rout "); break;
-	case TI_ENDNODE: ND_PRINT("endnode "); break;
+	case 0: ND_PRINT(C_RESET, "reserved-ntype? "); break;
+	case TI_L2ROUT: ND_PRINT(C_RESET, "l2rout "); break;
+	case TI_L1ROUT: ND_PRINT(C_RESET, "l1rout "); break;
+	case TI_ENDNODE: ND_PRINT(C_RESET, "endnode "); break;
 	}
 	if (info & TI_VERIF)
-	    ND_PRINT("verif ");
+	    ND_PRINT(C_RESET, "verif ");
 	if (info & TI_BLOCK)
-	    ND_PRINT("blo ");
+	    ND_PRINT(C_RESET, "blo ");
 }
 
 static void
@@ -734,7 +734,7 @@ print_l1_routes(netdissect_options *ndo,
 	    info = GET_LE_U_2(rp);
 	    rp += sizeof(short);
 	    len -= sizeof(short);
-	    ND_PRINT("{ids %u-%u cost %u hops %u} ", id, id + count,
+	    ND_PRINT(C_RESET, "{ids %u-%u cost %u hops %u} ", id, id + count,
 			    RI_COST(info), RI_HOPS(info));
 	}
 }
@@ -761,7 +761,7 @@ print_l2_routes(netdissect_options *ndo,
 	    info = GET_LE_U_2(rp);
 	    rp += sizeof(short);
 	    len -= sizeof(short);
-	    ND_PRINT("{areas %u-%u cost %u hops %u} ", area, area + count,
+	    ND_PRINT(C_RESET, "{areas %u-%u cost %u hops %u} ", area, area + count,
 			    RI_COST(info), RI_HOPS(info));
 	}
 }
@@ -772,17 +772,17 @@ print_i_info(netdissect_options *ndo,
 {
 	u_int ntype = info & II_TYPEMASK;
 	switch (ntype) {
-	case 0: ND_PRINT("reserved-ntype? "); break;
-	case II_L2ROUT: ND_PRINT("l2rout "); break;
-	case II_L1ROUT: ND_PRINT("l1rout "); break;
-	case II_ENDNODE: ND_PRINT("endnode "); break;
+	case 0: ND_PRINT(C_RESET, "reserved-ntype? "); break;
+	case II_L2ROUT: ND_PRINT(C_RESET, "l2rout "); break;
+	case II_L1ROUT: ND_PRINT(C_RESET, "l1rout "); break;
+	case II_ENDNODE: ND_PRINT(C_RESET, "endnode "); break;
 	}
 	if (info & II_VERIF)
-	    ND_PRINT("verif ");
+	    ND_PRINT(C_RESET, "verif ");
 	if (info & II_NOMCAST)
-	    ND_PRINT("nomcast ");
+	    ND_PRINT(C_RESET, "nomcast ");
 	if (info & II_BLOCK)
-	    ND_PRINT("blo ");
+	    ND_PRINT(C_RESET, "blo ");
 }
 
 static void
@@ -799,7 +799,7 @@ print_nsp(netdissect_options *ndo,
 	u_int dst, src, flags;
 
 	if (nsplen < sizeof(struct nsphdr)) {
-		ND_PRINT(" (nsplen %u < %zu)", nsplen, sizeof(struct nsphdr));
+		ND_PRINT(C_RESET, " (nsplen %u < %zu)", nsplen, sizeof(struct nsphdr));
 		goto invalid;
 	}
 	flags = GET_U_1(nsphp->nh_flags);
@@ -813,7 +813,7 @@ print_nsp(netdissect_options *ndo,
 	    case MFS_MOM:
 	    case MFS_EOM:
 	    case MFS_BOM+MFS_EOM:
-		ND_PRINT("data %u>%u ", src, dst);
+		ND_PRINT(C_RESET, "data %u>%u ", src, dst);
 		{
 		    const struct seghdr *shp = (const struct seghdr *)nspp;
 		    u_int ack;
@@ -824,29 +824,29 @@ print_nsp(netdissect_options *ndo,
 		    ack = GET_LE_U_2(shp->sh_seq[0]);
 		    if (ack & SGQ_ACK) {	/* acknum field */
 			if ((ack & SGQ_NAK) == SGQ_NAK)
-			    ND_PRINT("nak %u ", ack & SGQ_MASK);
+			    ND_PRINT(C_RESET, "nak %u ", ack & SGQ_MASK);
 			else
-			    ND_PRINT("ack %u ", ack & SGQ_MASK);
+			    ND_PRINT(C_RESET, "ack %u ", ack & SGQ_MASK);
 			data_off += sizeof(short);
 			if (nsplen < data_off)
 			    goto invalid;
 		        ack = GET_LE_U_2(shp->sh_seq[1]);
 			if (ack & SGQ_OACK) {	/* ackoth field */
 			    if ((ack & SGQ_ONAK) == SGQ_ONAK)
-				ND_PRINT("onak %u ", ack & SGQ_MASK);
+				ND_PRINT(C_RESET, "onak %u ", ack & SGQ_MASK);
 			    else
-				ND_PRINT("oack %u ", ack & SGQ_MASK);
+				ND_PRINT(C_RESET, "oack %u ", ack & SGQ_MASK);
 			    data_off += sizeof(short);
 			    if (nsplen < data_off)
 				goto invalid;
 			    ack = GET_LE_U_2(shp->sh_seq[2]);
 			}
 		    }
-		    ND_PRINT("seg %u ", ack & SGQ_MASK);
+		    ND_PRINT(C_RESET, "seg %u ", ack & SGQ_MASK);
 		}
 		break;
 	    case MFS_ILS+MFS_INT:
-		ND_PRINT("intr ");
+		ND_PRINT(C_RESET, "intr ");
 		{
 		    const struct seghdr *shp = (const struct seghdr *)nspp;
 		    u_int ack;
@@ -857,29 +857,29 @@ print_nsp(netdissect_options *ndo,
 		    ack = GET_LE_U_2(shp->sh_seq[0]);
 		    if (ack & SGQ_ACK) {	/* acknum field */
 			if ((ack & SGQ_NAK) == SGQ_NAK)
-			    ND_PRINT("nak %u ", ack & SGQ_MASK);
+			    ND_PRINT(C_RESET, "nak %u ", ack & SGQ_MASK);
 			else
-			    ND_PRINT("ack %u ", ack & SGQ_MASK);
+			    ND_PRINT(C_RESET, "ack %u ", ack & SGQ_MASK);
 			data_off += sizeof(short);
 			if (nsplen < data_off)
 			    goto invalid;
 		        ack = GET_LE_U_2(shp->sh_seq[1]);
 			if (ack & SGQ_OACK) {	/* ackdat field */
 			    if ((ack & SGQ_ONAK) == SGQ_ONAK)
-				ND_PRINT("nakdat %u ", ack & SGQ_MASK);
+				ND_PRINT(C_RESET, "nakdat %u ", ack & SGQ_MASK);
 			    else
-				ND_PRINT("ackdat %u ", ack & SGQ_MASK);
+				ND_PRINT(C_RESET, "ackdat %u ", ack & SGQ_MASK);
 			    data_off += sizeof(short);
 			    if (nsplen < data_off)
 				goto invalid;
 			    ack = GET_LE_U_2(shp->sh_seq[2]);
 			}
 		    }
-		    ND_PRINT("seg %u ", ack & SGQ_MASK);
+		    ND_PRINT(C_RESET, "seg %u ", ack & SGQ_MASK);
 		}
 		break;
 	    case MFS_ILS:
-		ND_PRINT("link-service %u>%u ", src, dst);
+		ND_PRINT(C_RESET, "link-service %u>%u ", src, dst);
 		{
 		    const struct seghdr *shp = (const struct seghdr *)nspp;
 		    const struct lsmsg *lsmp =
@@ -892,56 +892,56 @@ print_nsp(netdissect_options *ndo,
 		    ack = GET_LE_U_2(shp->sh_seq[0]);
 		    if (ack & SGQ_ACK) {	/* acknum field */
 			if ((ack & SGQ_NAK) == SGQ_NAK)
-			    ND_PRINT("nak %u ", ack & SGQ_MASK);
+			    ND_PRINT(C_RESET, "nak %u ", ack & SGQ_MASK);
 			else
-			    ND_PRINT("ack %u ", ack & SGQ_MASK);
+			    ND_PRINT(C_RESET, "ack %u ", ack & SGQ_MASK);
 		        ack = GET_LE_U_2(shp->sh_seq[1]);
 			if (ack & SGQ_OACK) {	/* ackdat field */
 			    if ((ack & SGQ_ONAK) == SGQ_ONAK)
-				ND_PRINT("nakdat %u ", ack & SGQ_MASK);
+				ND_PRINT(C_RESET, "nakdat %u ", ack & SGQ_MASK);
 			    else
-				ND_PRINT("ackdat %u ", ack & SGQ_MASK);
+				ND_PRINT(C_RESET, "ackdat %u ", ack & SGQ_MASK);
 			    ack = GET_LE_U_2(shp->sh_seq[2]);
 			}
 		    }
-		    ND_PRINT("seg %u ", ack & SGQ_MASK);
+		    ND_PRINT(C_RESET, "seg %u ", ack & SGQ_MASK);
 		    lsflags = GET_U_1(lsmp->ls_lsflags);
 		    fcval = GET_U_1(lsmp->ls_fcval);
 		    switch (lsflags & LSI_MASK) {
 		    case LSI_DATA:
-			ND_PRINT("dat seg count %u ", fcval);
+			ND_PRINT(C_RESET, "dat seg count %u ", fcval);
 			switch (lsflags & LSM_MASK) {
 			case LSM_NOCHANGE:
 			    break;
 			case LSM_DONOTSEND:
-			    ND_PRINT("donotsend-data ");
+			    ND_PRINT(C_RESET, "donotsend-data ");
 			    break;
 			case LSM_SEND:
-			    ND_PRINT("send-data ");
+			    ND_PRINT(C_RESET, "send-data ");
 			    break;
 			default:
-			    ND_PRINT("reserved-fcmod? %x", lsflags);
+			    ND_PRINT(C_RESET, "reserved-fcmod? %x", lsflags);
 			    break;
 			}
 			break;
 		    case LSI_INTR:
-			ND_PRINT("intr req count %u ", fcval);
+			ND_PRINT(C_RESET, "intr req count %u ", fcval);
 			break;
 		    default:
-			ND_PRINT("reserved-fcval-int? %x", lsflags);
+			ND_PRINT(C_RESET, "reserved-fcval-int? %x", lsflags);
 			break;
 		    }
 		}
 		break;
 	    default:
-		ND_PRINT("reserved-subtype? %x %u > %u", flags, src, dst);
+		ND_PRINT(C_RESET, "reserved-subtype? %x %u > %u", flags, src, dst);
 		break;
 	    }
 	    break;
 	case MFT_ACK:
 	    switch (flags & NSP_SUBMASK) {
 	    case MFS_DACK:
-		ND_PRINT("data-ack %u>%u ", src, dst);
+		ND_PRINT(C_RESET, "data-ack %u>%u ", src, dst);
 		{
 		    const struct ackmsg *amp = (const struct ackmsg *)nspp;
 		    u_int ack;
@@ -952,21 +952,21 @@ print_nsp(netdissect_options *ndo,
 		    ack = GET_LE_U_2(amp->ak_acknum[0]);
 		    if (ack & SGQ_ACK) {	/* acknum field */
 			if ((ack & SGQ_NAK) == SGQ_NAK)
-			    ND_PRINT("nak %u ", ack & SGQ_MASK);
+			    ND_PRINT(C_RESET, "nak %u ", ack & SGQ_MASK);
 			else
-			    ND_PRINT("ack %u ", ack & SGQ_MASK);
+			    ND_PRINT(C_RESET, "ack %u ", ack & SGQ_MASK);
 		        ack = GET_LE_U_2(amp->ak_acknum[1]);
 			if (ack & SGQ_OACK) {	/* ackoth field */
 			    if ((ack & SGQ_ONAK) == SGQ_ONAK)
-				ND_PRINT("onak %u ", ack & SGQ_MASK);
+				ND_PRINT(C_RESET, "onak %u ", ack & SGQ_MASK);
 			    else
-				ND_PRINT("oack %u ", ack & SGQ_MASK);
+				ND_PRINT(C_RESET, "oack %u ", ack & SGQ_MASK);
 			}
 		    }
 		}
 		break;
 	    case MFS_IACK:
-		ND_PRINT("ils-ack %u>%u ", src, dst);
+		ND_PRINT(C_RESET, "ils-ack %u>%u ", src, dst);
 		{
 		    const struct ackmsg *amp = (const struct ackmsg *)nspp;
 		    u_int ack;
@@ -977,24 +977,24 @@ print_nsp(netdissect_options *ndo,
 		    ack = GET_LE_U_2(amp->ak_acknum[0]);
 		    if (ack & SGQ_ACK) {	/* acknum field */
 			if ((ack & SGQ_NAK) == SGQ_NAK)
-			    ND_PRINT("nak %u ", ack & SGQ_MASK);
+			    ND_PRINT(C_RESET, "nak %u ", ack & SGQ_MASK);
 			else
-			    ND_PRINT("ack %u ", ack & SGQ_MASK);
+			    ND_PRINT(C_RESET, "ack %u ", ack & SGQ_MASK);
 		        ack = GET_LE_U_2(amp->ak_acknum[1]);
 			if (ack & SGQ_OACK) {	/* ackdat field */
 			    if ((ack & SGQ_ONAK) == SGQ_ONAK)
-				ND_PRINT("nakdat %u ", ack & SGQ_MASK);
+				ND_PRINT(C_RESET, "nakdat %u ", ack & SGQ_MASK);
 			    else
-				ND_PRINT("ackdat %u ", ack & SGQ_MASK);
+				ND_PRINT(C_RESET, "ackdat %u ", ack & SGQ_MASK);
 			}
 		    }
 		}
 		break;
 	    case MFS_CACK:
-		ND_PRINT("conn-ack %u", dst);
+		ND_PRINT(C_RESET, "conn-ack %u", dst);
 		break;
 	    default:
-		ND_PRINT("reserved-acktype? %x %u > %u", flags, src, dst);
+		ND_PRINT(C_RESET, "reserved-acktype? %x %u > %u", flags, src, dst);
 		break;
 	    }
 	    break;
@@ -1003,10 +1003,10 @@ print_nsp(netdissect_options *ndo,
 	    case MFS_CI:
 	    case MFS_RCI:
 		if ((flags & NSP_SUBMASK) == MFS_CI)
-		    ND_PRINT("conn-initiate ");
+		    ND_PRINT(C_RESET, "conn-initiate ");
 		else
-		    ND_PRINT("retrans-conn-initiate ");
-		ND_PRINT("%u>%u ", src, dst);
+		    ND_PRINT(C_RESET, "retrans-conn-initiate ");
+		ND_PRINT(C_RESET, "%u>%u ", src, dst);
 		{
 		    const struct cimsg *cimp = (const struct cimsg *)nspp;
 		    u_int services, info, segsize;
@@ -1021,31 +1021,31 @@ print_nsp(netdissect_options *ndo,
 		    case COS_NONE:
 			break;
 		    case COS_SEGMENT:
-			ND_PRINT("seg ");
+			ND_PRINT(C_RESET, "seg ");
 			break;
 		    case COS_MESSAGE:
-			ND_PRINT("msg ");
+			ND_PRINT(C_RESET, "msg ");
 			break;
 		    }
 		    switch (info & COI_MASK) {
 		    case COI_32:
-			ND_PRINT("ver 3.2 ");
+			ND_PRINT(C_RESET, "ver 3.2 ");
 			break;
 		    case COI_31:
-			ND_PRINT("ver 3.1 ");
+			ND_PRINT(C_RESET, "ver 3.1 ");
 			break;
 		    case COI_40:
-			ND_PRINT("ver 4.0 ");
+			ND_PRINT(C_RESET, "ver 4.0 ");
 			break;
 		    case COI_41:
-			ND_PRINT("ver 4.1 ");
+			ND_PRINT(C_RESET, "ver 4.1 ");
 			break;
 		    }
-		    ND_PRINT("segsize %u ", segsize);
+		    ND_PRINT(C_RESET, "segsize %u ", segsize);
 		}
 		break;
 	    case MFS_CC:
-		ND_PRINT("conn-confirm %u>%u ", src, dst);
+		ND_PRINT(C_RESET, "conn-confirm %u>%u ", src, dst);
 		{
 		    const struct ccmsg *ccmp = (const struct ccmsg *)nspp;
 		    u_int services, info;
@@ -1062,34 +1062,34 @@ print_nsp(netdissect_options *ndo,
 		    case COS_NONE:
 			break;
 		    case COS_SEGMENT:
-			ND_PRINT("seg ");
+			ND_PRINT(C_RESET, "seg ");
 			break;
 		    case COS_MESSAGE:
-			ND_PRINT("msg ");
+			ND_PRINT(C_RESET, "msg ");
 			break;
 		    }
 		    switch (info & COI_MASK) {
 		    case COI_32:
-			ND_PRINT("ver 3.2 ");
+			ND_PRINT(C_RESET, "ver 3.2 ");
 			break;
 		    case COI_31:
-			ND_PRINT("ver 3.1 ");
+			ND_PRINT(C_RESET, "ver 3.1 ");
 			break;
 		    case COI_40:
-			ND_PRINT("ver 4.0 ");
+			ND_PRINT(C_RESET, "ver 4.0 ");
 			break;
 		    case COI_41:
-			ND_PRINT("ver 4.1 ");
+			ND_PRINT(C_RESET, "ver 4.1 ");
 			break;
 		    }
-		    ND_PRINT("segsize %u ", segsize);
+		    ND_PRINT(C_RESET, "segsize %u ", segsize);
 		    if (optlen) {
-			ND_PRINT("optlen %u ", optlen);
+			ND_PRINT(C_RESET, "optlen %u ", optlen);
 		    }
 		}
 		break;
 	    case MFS_DI:
-		ND_PRINT("disconn-initiate %u>%u ", src, dst);
+		ND_PRINT(C_RESET, "disconn-initiate %u>%u ", src, dst);
 		{
 		    const struct dimsg *dimp = (const struct dimsg *)nspp;
 		    u_int reason;
@@ -1102,12 +1102,12 @@ print_nsp(netdissect_options *ndo,
 
 		    print_reason(ndo, reason);
 		    if (optlen) {
-			ND_PRINT("optlen %u ", optlen);
+			ND_PRINT(C_RESET, "optlen %u ", optlen);
 		    }
 		}
 		break;
 	    case MFS_DC:
-		ND_PRINT("disconn-confirm %u>%u ", src, dst);
+		ND_PRINT(C_RESET, "disconn-confirm %u>%u ", src, dst);
 		{
 		    const struct dcmsg *dcmp = (const struct dcmsg *)nspp;
 		    u_int reason;
@@ -1118,12 +1118,12 @@ print_nsp(netdissect_options *ndo,
 		}
 		break;
 	    default:
-		ND_PRINT("reserved-ctltype? %x %u > %u", flags, src, dst);
+		ND_PRINT(C_RESET, "reserved-ctltype? %x %u > %u", flags, src, dst);
 		break;
 	    }
 	    break;
 	default:
-	    ND_PRINT("reserved-type? %x %u > %u", flags, src, dst);
+	    ND_PRINT(C_RESET, "reserved-type? %x %u > %u", flags, src, dst);
 	    break;
 	}
 	return (1);
@@ -1162,7 +1162,7 @@ static void
 print_reason(netdissect_options *ndo,
              u_int reason)
 {
-	ND_PRINT("%s ", tok2str(reason2str, "reason-%u", reason));
+	ND_PRINT(C_RESET, "%s ", tok2str(reason2str, "reason-%u", reason));
 }
 
 const char *

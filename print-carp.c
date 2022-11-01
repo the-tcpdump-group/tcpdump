@@ -58,12 +58,12 @@ carp_print(netdissect_options *ndo, const u_char *bp, u_int len, u_int ttl)
 		type_s = "advertise";
 	else
 		type_s = "unknown";
-	ND_PRINT("CARPv%u-%s %u: ", version, type_s, len);
+	ND_PRINT(C_RESET, "CARPv%u-%s %u: ", version, type_s, len);
 	if (ttl != 255)
-		ND_PRINT("[ttl=%u!] ", ttl);
+		ND_PRINT(C_RESET, "[ttl=%u!] ", ttl);
 	if (version != 2 || type != 1)
 		return;
-	ND_PRINT("vhid=%u advbase=%u advskew=%u authlen=%u ",
+	ND_PRINT(C_RESET, "vhid=%u advbase=%u advskew=%u authlen=%u ",
 	    GET_U_1(bp + 1), GET_U_1(bp + 5), GET_U_1(bp + 2),
 	    GET_U_1(bp + 3));
 	if (ndo->ndo_vflag) {
@@ -71,8 +71,8 @@ carp_print(netdissect_options *ndo, const u_char *bp, u_int len, u_int ttl)
 		vec[0].ptr = (const uint8_t *)bp;
 		vec[0].len = len;
 		if (ND_TTEST_LEN(bp, len) && in_cksum(vec, 1))
-			ND_PRINT(" (bad carp cksum %x!)",
+			ND_PRINT(C_RESET, " (bad carp cksum %x!)",
 				GET_BE_U_2(bp + 6));
 	}
-	ND_PRINT("counter=%" PRIu64, GET_BE_U_8(bp + 8));
+	ND_PRINT(C_RESET, "counter=%" PRIu64, GET_BE_U_8(bp + 8));
 }

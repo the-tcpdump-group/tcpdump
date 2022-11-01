@@ -83,7 +83,7 @@ dvmrp_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "dvmrp";
 	if (len < 8) {
-		ND_PRINT(" [length %u < 8]", len);
+		ND_PRINT(C_RESET, " [length %u < 8]", len);
 		goto invalid;
 	}
 
@@ -93,7 +93,7 @@ dvmrp_print(netdissect_options *ndo,
 	bp += 8;
 	len -= 8;
 
-	ND_PRINT(" %s", tok2str(dvmrp_msgtype_str, "[type %u]", type));
+	ND_PRINT(C_RESET, " %s", tok2str(dvmrp_msgtype_str, "[type %u]", type));
 	switch (type) {
 
 	case DVMRP_PROBE:
@@ -124,17 +124,17 @@ dvmrp_print(netdissect_options *ndo,
 		break;
 
 	case DVMRP_PRUNE:
-		ND_PRINT(" src %s grp %s", GET_IPADDR_STRING(bp), GET_IPADDR_STRING(bp + 4));
-		ND_PRINT(" timer ");
+		ND_PRINT(C_RESET, " src %s grp %s", GET_IPADDR_STRING(bp), GET_IPADDR_STRING(bp + 4));
+		ND_PRINT(C_RESET, " timer ");
 		unsigned_relts_print(ndo, GET_BE_U_4(bp + 8));
 		break;
 
 	case DVMRP_GRAFT:
-		ND_PRINT(" src %s grp %s", GET_IPADDR_STRING(bp), GET_IPADDR_STRING(bp + 4));
+		ND_PRINT(C_RESET, " src %s grp %s", GET_IPADDR_STRING(bp), GET_IPADDR_STRING(bp + 4));
 		break;
 
 	case DVMRP_GRAFT_ACK:
-		ND_PRINT(" src %s grp %s", GET_IPADDR_STRING(bp), GET_IPADDR_STRING(bp + 4));
+		ND_PRINT(C_RESET, " src %s grp %s", GET_IPADDR_STRING(bp), GET_IPADDR_STRING(bp + 4));
 		break;
 	}
 	return;
@@ -154,7 +154,7 @@ print_report(netdissect_options *ndo,
 
 	while (len > 0) {
 		if (len < 3) {
-			ND_PRINT(" [length %u < 3]", len);
+			ND_PRINT(C_RESET, " [length %u < 3]", len);
 			goto invalid;
 		}
 		mask = (uint32_t)0xff << 24 | GET_U_1(bp) << 16 |
@@ -167,12 +167,12 @@ print_report(netdissect_options *ndo,
 		if (GET_U_1(bp + 2))
 			width = 4;
 
-		ND_PRINT("\n\tMask %s", intoa(htonl(mask)));
+		ND_PRINT(C_RESET, "\n\tMask %s", intoa(htonl(mask)));
 		bp += 3;
 		len -= 3;
 		do {
 			if (len < width + 1) {
-				ND_PRINT("\n\t  [Truncated Report]");
+				ND_PRINT(C_RESET, "\n\t  [Truncated Report]");
 				goto invalid;
 			}
 			origin = 0;
@@ -187,7 +187,7 @@ print_report(netdissect_options *ndo,
 			bp++;
 			done = metric & 0x80;
 			metric &= 0x7f;
-			ND_PRINT("\n\t  %s metric %u", intoa(htonl(origin)),
+			ND_PRINT(C_RESET, "\n\t  %s metric %u", intoa(htonl(origin)),
 				metric);
 			len -= width + 1;
 		} while (!done);
@@ -204,11 +204,16 @@ print_probe(netdissect_options *ndo,
             u_int len)
 {
 	if (len < 4) {
-		ND_PRINT(" [full length %u < 4]", len);
+		ND_PRINT(C_RESET, " [full length %u < 4]", len);
 		goto invalid;
 	}
-	ND_PRINT(ndo->ndo_vflag > 1 ? "\n\t" : " ");
-	ND_PRINT("genid %u", GET_BE_U_4(bp));
+
+	if(ndo->ndo_vflag > 1)
+		ND_PRINT(C_RESET, "\n\t");
+	else
+		ND_PRINT(C_RESET, " ");
+
+	ND_PRINT(C_RESET, "genid %u", GET_BE_U_4(bp));
 	if (ndo->ndo_vflag < 2)
 		return;
 
@@ -216,10 +221,10 @@ print_probe(netdissect_options *ndo,
 	len -= 4;
 	while (len > 0) {
 		if (len < 4) {
-			ND_PRINT("[remaining length %u < 4]", len);
+			ND_PRINT(C_RESET, "[remaining length %u < 4]", len);
 			goto invalid;
 		}
-		ND_PRINT("\n\tneighbor %s", GET_IPADDR_STRING(bp));
+		ND_PRINT(C_RESET, "\n\tneighbor %s", GET_IPADDR_STRING(bp));
 		bp += 4; len -= 4;
 	}
 	return;
@@ -240,7 +245,7 @@ print_neighbors(netdissect_options *ndo,
 
 	while (len > 0) {
 		if (len < 7) {
-			ND_PRINT(" [length %u < 7]", len);
+			ND_PRINT(C_RESET, " [length %u < 7]", len);
 			goto invalid;
 		}
 		laddr = bp;
@@ -254,11 +259,11 @@ print_neighbors(netdissect_options *ndo,
 		len -= 7;
 		while (--ncount >= 0) {
 			if (len < 4) {
-				ND_PRINT(" [length %u < 4]", len);
+				ND_PRINT(C_RESET, " [length %u < 4]", len);
 				goto invalid;
 			}
-			ND_PRINT(" [%s ->", GET_IPADDR_STRING(laddr));
-			ND_PRINT(" %s, (%u/%u)]",
+			ND_PRINT(C_RESET, " [%s ->", GET_IPADDR_STRING(laddr));
+			ND_PRINT(C_RESET, " %s, (%u/%u)]",
 				   GET_IPADDR_STRING(bp), metric, thresh);
 			bp += 4;
 			len -= 4;
@@ -280,11 +285,11 @@ print_neighbors2(netdissect_options *ndo,
 	u_char metric, thresh, flags;
 	int ncount;
 
-	ND_PRINT(" (v %u.%u):", major_version, minor_version);
+	ND_PRINT(C_RESET, " (v %u.%u):", major_version, minor_version);
 
 	while (len > 0) {
 		if (len < 8) {
-			ND_PRINT(" [length %u < 8]", len);
+			ND_PRINT(C_RESET, " [length %u < 8]", len);
 			goto invalid;
 		}
 		laddr = bp;
@@ -300,28 +305,28 @@ print_neighbors2(netdissect_options *ndo,
 		len -= 8;
 		while (--ncount >= 0 && len > 0) {
 			if (len < 4) {
-				ND_PRINT(" [length %u < 4]", len);
+				ND_PRINT(C_RESET, " [length %u < 4]", len);
 				goto invalid;
 			}
-			ND_PRINT(" [%s -> ", GET_IPADDR_STRING(laddr));
-			ND_PRINT("%s (%u/%u", GET_IPADDR_STRING(bp),
+			ND_PRINT(C_RESET, " [%s -> ", GET_IPADDR_STRING(laddr));
+			ND_PRINT(C_RESET, "%s (%u/%u", GET_IPADDR_STRING(bp),
 				     metric, thresh);
 			if (flags & DVMRP_NF_TUNNEL)
-				ND_PRINT("/tunnel");
+				ND_PRINT(C_RESET, "/tunnel");
 			if (flags & DVMRP_NF_SRCRT)
-				ND_PRINT("/srcrt");
+				ND_PRINT(C_RESET, "/srcrt");
 			if (flags & DVMRP_NF_QUERIER)
-				ND_PRINT("/querier");
+				ND_PRINT(C_RESET, "/querier");
 			if (flags & DVMRP_NF_DISABLED)
-				ND_PRINT("/disabled");
+				ND_PRINT(C_RESET, "/disabled");
 			if (flags & DVMRP_NF_DOWN)
-				ND_PRINT("/down");
-			ND_PRINT(")]");
+				ND_PRINT(C_RESET, "/down");
+			ND_PRINT(C_RESET, ")]");
 			bp += 4;
 			len -= 4;
 		}
 		if (ncount != -1) {
-			ND_PRINT(" [invalid ncount]");
+			ND_PRINT(C_RESET, " [invalid ncount]");
 			goto invalid;
 		}
 	}

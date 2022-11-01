@@ -109,19 +109,19 @@ pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
 	rulenr = GET_BE_U_4(&hdr->rulenr);
 	subrulenr = GET_BE_U_4(&hdr->subrulenr);
 	if (subrulenr == (uint32_t)-1)
-		ND_PRINT("rule %u/", rulenr);
+		ND_PRINT(C_RESET, "rule %u/", rulenr);
 	else {
-		ND_PRINT("rule %u.", rulenr);
+		ND_PRINT(C_RESET, "rule %u.", rulenr);
 		nd_printjnp(ndo, (const u_char*)hdr->ruleset, PFLOG_RULESET_NAME_SIZE);
-		ND_PRINT(".%u/", subrulenr);
+		ND_PRINT(C_RESET, ".%u/", subrulenr);
 	}
 
-	ND_PRINT("%s: %s %s on ",
+	ND_PRINT(C_RESET, "%s: %s %s on ",
 	    tok2str(pf_reasons, "unkn(%u)", GET_U_1(&hdr->reason)),
 	    tok2str(pf_actions, "unkn(%u)", GET_U_1(&hdr->action)),
 	    tok2str(pf_directions, "unkn(%u)", GET_U_1(&hdr->dir)));
 	nd_printjnp(ndo, (const u_char*)hdr->ifname, PFLOG_IFNAMSIZ);
-	ND_PRINT(": ");
+	ND_PRINT(C_RESET, ": ");
 }
 
 void
@@ -145,7 +145,7 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 #define MIN_PFLOG_HDRLEN	45
 	hdr = (const struct pfloghdr *)p;
 	if (GET_U_1(&hdr->length) < MIN_PFLOG_HDRLEN) {
-		ND_PRINT("[pflog: invalid header length!]");
+		ND_PRINT(C_RESET, "[pflog: invalid header length!]");
 		ndo->ndo_ll_hdr_len += GET_U_1(&hdr->length);	/* XXX: not really */
 		return;
 	}

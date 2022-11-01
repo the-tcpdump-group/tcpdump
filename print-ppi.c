@@ -47,14 +47,14 @@ ppi_header_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	dltname = pcap_datalink_val_to_name(dlt);
 
 	if (!ndo->ndo_qflag) {
-		ND_PRINT("V.%u DLT %s (%u) len %u", GET_U_1(hdr->ppi_ver),
+		ND_PRINT(C_RESET, "V.%u DLT %s (%u) len %u", GET_U_1(hdr->ppi_ver),
 			  (dltname != NULL ? dltname : "UNKNOWN"), dlt,
                           len);
         } else {
-		ND_PRINT("%s", (dltname != NULL ? dltname : "UNKNOWN"));
+		ND_PRINT(C_RESET, "%s", (dltname != NULL ? dltname : "UNKNOWN"));
         }
 
-	ND_PRINT(", length %u: ", length);
+	ND_PRINT(C_RESET, ", length %u: ", length);
 }
 
 /*
@@ -87,7 +87,7 @@ ppi_if_print(netdissect_options *ndo,
 	len = GET_LE_U_2(hdr->ppi_len);
 	if (len < sizeof(ppi_header_t) || len > 65532) {
 		/* It MUST be between 8 and 65,532 inclusive (spec 3.1.3) */
-		ND_PRINT(" [length %u < %zu or > 65532]", len,
+		ND_PRINT(C_RESET, " [length %u < %zu or > 65532]", len,
 			 sizeof(ppi_header_t));
 		nd_print_invalid(ndo);
 		ndo->ndo_ll_hdr_len += caplen;

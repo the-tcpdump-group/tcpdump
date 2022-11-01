@@ -195,11 +195,11 @@ auth_print(netdissect_options *ndo, const u_char *pptr)
         ND_TCHECK_SIZE(bfd_auth_header);
         auth_type = GET_U_1(bfd_auth_header->auth_type);
         auth_len = GET_U_1(bfd_auth_header->auth_len);
-        ND_PRINT("\n\tAuthentication: %s (%u), length: %u",
+        ND_PRINT(C_RESET, "\n\tAuthentication: %s (%u), length: %u",
                  tok2str(bfd_v1_authentication_values,"Unknown",auth_type),
                  auth_type, auth_len);
                 pptr += 2;
-                ND_PRINT("\n\t  Auth Key ID: %u", GET_U_1(pptr));
+                ND_PRINT(C_RESET, "\n\t  Auth Key ID: %u", GET_U_1(pptr));
 
         switch(auth_type) {
             case AUTH_PASSWORD:
@@ -216,12 +216,12 @@ auth_print(netdissect_options *ndo, const u_char *pptr)
  */
                 if (auth_len < AUTH_PASSWORD_FIELD_MIN_LEN ||
                     auth_len > AUTH_PASSWORD_FIELD_MAX_LEN) {
-                    ND_PRINT("[invalid length %u]",
+                    ND_PRINT(C_RESET, "[invalid length %u]",
                              auth_len);
                     break;
                 }
                 pptr++;
-                ND_PRINT(", Password: ");
+                ND_PRINT(C_RESET, ", Password: ");
                 /* the length is equal to the password length plus three */
                 nd_printjn(ndo, pptr, auth_len - 3);
                 break;
@@ -243,17 +243,17 @@ auth_print(netdissect_options *ndo, const u_char *pptr)
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
                 if (auth_len != AUTH_MD5_FIELD_LEN) {
-                    ND_PRINT("[invalid length %u]",
+                    ND_PRINT(C_RESET, "[invalid length %u]",
                              auth_len);
                     break;
                 }
                 pptr += 2;
-                ND_PRINT(", Sequence Number: 0x%08x", GET_BE_U_4(pptr));
+                ND_PRINT(C_RESET, ", Sequence Number: 0x%08x", GET_BE_U_4(pptr));
                 pptr += 4;
                 ND_TCHECK_LEN(pptr, AUTH_MD5_HASH_LEN);
-                ND_PRINT("\n\t  Digest: ");
+                ND_PRINT(C_RESET, "\n\t  Digest: ");
                 for(i = 0; i < AUTH_MD5_HASH_LEN; i++)
-                    ND_PRINT("%02x", GET_U_1(pptr + i));
+                    ND_PRINT(C_RESET, "%02x", GET_U_1(pptr + i));
                 break;
             case AUTH_SHA1:
             case AUTH_MET_SHA1:
@@ -273,17 +273,17 @@ auth_print(netdissect_options *ndo, const u_char *pptr)
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
                 if (auth_len != AUTH_SHA1_FIELD_LEN) {
-                    ND_PRINT("[invalid length %u]",
+                    ND_PRINT(C_RESET, "[invalid length %u]",
                              auth_len);
                     break;
                 }
                 pptr += 2;
-                ND_PRINT(", Sequence Number: 0x%08x", GET_BE_U_4(pptr));
+                ND_PRINT(C_RESET, ", Sequence Number: 0x%08x", GET_BE_U_4(pptr));
                 pptr += 4;
                 ND_TCHECK_LEN(pptr, AUTH_SHA1_HASH_LEN);
-                ND_PRINT("\n\t  Hash: ");
+                ND_PRINT(C_RESET, "\n\t  Hash: ");
                 for(i = 0; i < AUTH_SHA1_HASH_LEN; i++)
-                    ND_PRINT("%02x", GET_U_1(pptr + i));
+                    ND_PRINT(C_RESET, "%02x", GET_U_1(pptr + i));
                 break;
         }
 }
@@ -317,33 +317,33 @@ bfd_print(netdissect_options *ndo, const u_char *pptr,
             case 0:
                 if (ndo->ndo_vflag < 1)
                 {
-                    ND_PRINT("BFDv0, Control, Flags: [%s], length: %u",
+                    ND_PRINT(C_RESET, "BFDv0, Control, Flags: [%s], length: %u",
                            bittok2str(bfd_v0_flag_values, "none", flags),
                            len);
                     return;
                 }
 
-                ND_PRINT("BFDv0, length: %u\n\tControl, Flags: [%s], Diagnostic: %s (0x%02x)",
+                ND_PRINT(C_RESET, "BFDv0, length: %u\n\tControl, Flags: [%s], Diagnostic: %s (0x%02x)",
                        len,
                        bittok2str(bfd_v0_flag_values, "none", flags),
                        tok2str(bfd_diag_values,"unknown",BFD_EXTRACT_DIAG(version_diag)),
                        BFD_EXTRACT_DIAG(version_diag));
 
-                ND_PRINT("\n\tDetection Timer Multiplier: %u (%u ms Detection time), BFD Length: %u",
+                ND_PRINT(C_RESET, "\n\tDetection Timer Multiplier: %u (%u ms Detection time), BFD Length: %u",
                        GET_U_1(bfd_header->detect_time_multiplier),
                        GET_U_1(bfd_header->detect_time_multiplier) * GET_BE_U_4(bfd_header->desired_min_tx_interval)/1000,
                        GET_U_1(bfd_header->length));
 
 
-                ND_PRINT("\n\tMy Discriminator: 0x%08x",
+                ND_PRINT(C_RESET, "\n\tMy Discriminator: 0x%08x",
                          GET_BE_U_4(bfd_header->my_discriminator));
-                ND_PRINT(", Your Discriminator: 0x%08x",
+                ND_PRINT(C_RESET, ", Your Discriminator: 0x%08x",
                          GET_BE_U_4(bfd_header->your_discriminator));
-                ND_PRINT("\n\t  Desired min Tx Interval:    %4u ms",
+                ND_PRINT(C_RESET, "\n\t  Desired min Tx Interval:    %4u ms",
                          GET_BE_U_4(bfd_header->desired_min_tx_interval)/1000);
-                ND_PRINT("\n\t  Required min Rx Interval:   %4u ms",
+                ND_PRINT(C_RESET, "\n\t  Required min Rx Interval:   %4u ms",
                          GET_BE_U_4(bfd_header->required_min_rx_interval)/1000);
-                ND_PRINT("\n\t  Required min Echo Interval: %4u ms",
+                ND_PRINT(C_RESET, "\n\t  Required min Echo Interval: %4u ms",
                          GET_BE_U_4(bfd_header->required_min_echo_interval)/1000);
 
                 if (flags & BFD_FLAG_AUTH) {
@@ -355,7 +355,7 @@ bfd_print(netdissect_options *ndo, const u_char *pptr,
             case 1:
                 if (ndo->ndo_vflag < 1)
                 {
-                    ND_PRINT("BFDv1, %s, State %s, Flags: [%s], length: %u",
+                    ND_PRINT(C_RESET, "BFDv1, %s, State %s, Flags: [%s], length: %u",
                            tok2str(bfd_port_values, "unknown (%u)", port),
                            tok2str(bfd_v1_state_values, "unknown (%u)", (flags & 0xc0) >> 6),
                            bittok2str(bfd_v1_flag_values, "none", flags & 0x3f),
@@ -363,7 +363,7 @@ bfd_print(netdissect_options *ndo, const u_char *pptr,
                     return;
                 }
 
-                ND_PRINT("BFDv1, length: %u\n\t%s, State %s, Flags: [%s], Diagnostic: %s (0x%02x)",
+                ND_PRINT(C_RESET, "BFDv1, length: %u\n\t%s, State %s, Flags: [%s], Diagnostic: %s (0x%02x)",
                        len,
                        tok2str(bfd_port_values, "unknown (%u)", port),
                        tok2str(bfd_v1_state_values, "unknown (%u)", (flags & 0xc0) >> 6),
@@ -371,21 +371,21 @@ bfd_print(netdissect_options *ndo, const u_char *pptr,
                        tok2str(bfd_diag_values,"unknown",BFD_EXTRACT_DIAG(version_diag)),
                        BFD_EXTRACT_DIAG(version_diag));
 
-                ND_PRINT("\n\tDetection Timer Multiplier: %u (%u ms Detection time), BFD Length: %u",
+                ND_PRINT(C_RESET, "\n\tDetection Timer Multiplier: %u (%u ms Detection time), BFD Length: %u",
                        GET_U_1(bfd_header->detect_time_multiplier),
                        GET_U_1(bfd_header->detect_time_multiplier) * GET_BE_U_4(bfd_header->desired_min_tx_interval)/1000,
                        GET_U_1(bfd_header->length));
 
 
-                ND_PRINT("\n\tMy Discriminator: 0x%08x",
+                ND_PRINT(C_RESET, "\n\tMy Discriminator: 0x%08x",
                          GET_BE_U_4(bfd_header->my_discriminator));
-                ND_PRINT(", Your Discriminator: 0x%08x",
+                ND_PRINT(C_RESET, ", Your Discriminator: 0x%08x",
                          GET_BE_U_4(bfd_header->your_discriminator));
-                ND_PRINT("\n\t  Desired min Tx Interval:    %4u ms",
+                ND_PRINT(C_RESET, "\n\t  Desired min Tx Interval:    %4u ms",
                          GET_BE_U_4(bfd_header->desired_min_tx_interval)/1000);
-                ND_PRINT("\n\t  Required min Rx Interval:   %4u ms",
+                ND_PRINT(C_RESET, "\n\t  Required min Rx Interval:   %4u ms",
                          GET_BE_U_4(bfd_header->required_min_rx_interval)/1000);
-                ND_PRINT("\n\t  Required min Echo Interval: %4u ms",
+                ND_PRINT(C_RESET, "\n\t  Required min Echo Interval: %4u ms",
                          GET_BE_U_4(bfd_header->required_min_echo_interval)/1000);
 
                 if (flags & BFD_FLAG_AUTH) {
@@ -394,7 +394,7 @@ bfd_print(netdissect_options *ndo, const u_char *pptr,
                 break;
 
             default:
-                ND_PRINT("BFDv%u, Control, length: %u",
+                ND_PRINT(C_RESET, "BFDv%u, Control, length: %u",
                        version,
                        len);
                 if (ndo->ndo_vflag >= 1) {
@@ -407,7 +407,7 @@ bfd_print(netdissect_options *ndo, const u_char *pptr,
             /*
              * Echo packet.
              */
-            ND_PRINT("BFD, Echo, length: %u",
+            ND_PRINT(C_RESET, "BFD, Echo, length: %u",
                    len);
             if (ndo->ndo_vflag >= 1) {
                 if(!print_unknown_data(ndo, pptr,"\n\t",len))
@@ -417,7 +417,7 @@ bfd_print(netdissect_options *ndo, const u_char *pptr,
             /*
              * Unknown packet type.
              */
-            ND_PRINT("BFD, unknown (%u), length: %u",
+            ND_PRINT(C_RESET, "BFD, unknown (%u), length: %u",
                    port,
                    len);
             if (ndo->ndo_vflag >= 1) {

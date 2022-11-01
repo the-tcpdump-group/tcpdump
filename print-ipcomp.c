@@ -46,7 +46,7 @@ ipcomp_print(netdissect_options *ndo, const u_char *bp)
 	ipcomp = (const struct ipcomp *)bp;
 	cpi = GET_BE_U_2(ipcomp->comp_cpi);
 
-	ND_PRINT("IPComp(cpi=0x%04x)", cpi);
+	ND_PRINT(C_RESET, "IPComp(cpi=0x%04x)", cpi);
 
 	/*
 	 * XXX - based on the CPI, we could decompress the packet here.

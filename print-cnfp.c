@@ -177,48 +177,48 @@ cnfp_v1_print(netdissect_options *ndo, const u_char *cp)
 	t = GET_BE_U_4(nh->utc_sec);
 #endif
 
-	ND_PRINT("NetFlow v%x, %u.%03u uptime, %u.%09u, ", ver,
+	ND_PRINT(C_RESET, C_RESET "NetFlow v%x, %u.%03u uptime, %u.%09u, ", ver,
 	       GET_BE_U_4(nh->msys_uptime)/1000,
 	       GET_BE_U_4(nh->msys_uptime)%1000,
 	       GET_BE_U_4(nh->utc_sec), GET_BE_U_4(nh->utc_nsec));
 
 	nr = (const struct nfrec_v1 *)&nh[1];
 
-	ND_PRINT("%2u recs", nrecs);
+	ND_PRINT(C_RESET, C_RESET "%2u recs", nrecs);
 
 	for (; nrecs != 0; nr++, nrecs--) {
-		ND_PRINT("\n  started %u.%03u, last %u.%03u",
+		ND_PRINT(C_RESET, C_RESET "\n  started %u.%03u, last %u.%03u",
 		       GET_BE_U_4(nr->start_time)/1000,
 		       GET_BE_U_4(nr->start_time)%1000,
 		       GET_BE_U_4(nr->last_time)/1000,
 		       GET_BE_U_4(nr->last_time)%1000);
 
-		ND_PRINT("\n    %s:%u ",
+		ND_PRINT(C_RESET, C_RESET "\n    %s:%u ",
 			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->src_ina)),
 			GET_BE_U_2(nr->srcport));
 
-		ND_PRINT("> %s:%u ",
+		ND_PRINT(C_RESET, C_RESET "> %s:%u ",
 			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->dst_ina)),
 			GET_BE_U_2(nr->dstport));
 
-		ND_PRINT(">> %s\n    ",
+		ND_PRINT(C_RESET, C_RESET ">> %s\n    ",
 			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->nhop_ina)));
 
 		proto = GET_U_1(nr->proto);
 		if (!ndo->ndo_nflag && (p_name = netdb_protoname(proto)) != NULL)
-			ND_PRINT("%s ", p_name);
+			ND_PRINT(C_RESET, C_RESET "%s ", p_name);
 		else
-			ND_PRINT("%u ", proto);
+			ND_PRINT(C_RESET, C_RESET "%u ", proto);
 
 		/* tcp flags for tcp only */
 		if (proto == IPPROTO_TCP) {
 			u_int flags;
 			flags = GET_U_1(nr->tcp_flags);
 			if (flags)
-				ND_PRINT("%s ", bittok2str_nosep(tcp_flag_values, "", flags));
+				ND_PRINT(C_RESET, C_RESET "%s ", bittok2str_nosep(tcp_flag_values, "", flags));
 		}
 
-		ND_PRINT("tos %u, %u (%u octets)",
+		ND_PRINT(C_RESET, C_RESET "tos %u, %u (%u octets)",
 		       GET_U_1(nr->tos),
 		       GET_BE_U_4(nr->packets),
 		       GET_BE_U_4(nr->octets));
@@ -252,53 +252,53 @@ cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 	t = GET_BE_U_4(nh->utc_sec);
 #endif
 
-	ND_PRINT("NetFlow v%x, %u.%03u uptime, %u.%09u, ", ver,
+	ND_PRINT(C_RESET, C_RESET "NetFlow v%x, %u.%03u uptime, %u.%09u, ", ver,
 	       GET_BE_U_4(nh->msys_uptime)/1000,
 	       GET_BE_U_4(nh->msys_uptime)%1000,
 	       GET_BE_U_4(nh->utc_sec), GET_BE_U_4(nh->utc_nsec));
 
-	ND_PRINT("#%u, ", GET_BE_U_4(nh->sequence));
+	ND_PRINT(C_RESET, C_RESET "#%u, ", GET_BE_U_4(nh->sequence));
 	/* This was not all of struct nfhdr_v5. */
 	ND_TCHECK_SIZE(nh);
 	nr = (const struct nfrec_v5 *)&nh[1];
 
-	ND_PRINT("%2u recs", nrecs);
+	ND_PRINT(C_RESET, C_RESET "%2u recs", nrecs);
 
 	for (; nrecs != 0; nr++, nrecs--) {
-		ND_PRINT("\n  started %u.%03u, last %u.%03u",
+		ND_PRINT(C_RESET, C_RESET "\n  started %u.%03u, last %u.%03u",
 		       GET_BE_U_4(nr->start_time)/1000,
 		       GET_BE_U_4(nr->start_time)%1000,
 		       GET_BE_U_4(nr->last_time)/1000,
 		       GET_BE_U_4(nr->last_time)%1000);
 
-		ND_PRINT("\n    %s/%u:%u:%u ",
+		ND_PRINT(C_RESET, C_RESET "\n    %s/%u:%u:%u ",
 			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->src_ina)),
 			GET_U_1(nr->src_mask), GET_BE_U_2(nr->src_as),
 			GET_BE_U_2(nr->srcport));
 
-		ND_PRINT("> %s/%u:%u:%u ",
+		ND_PRINT(C_RESET, C_RESET "> %s/%u:%u:%u ",
 			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->dst_ina)),
 			GET_U_1(nr->dst_mask), GET_BE_U_2(nr->dst_as),
 			GET_BE_U_2(nr->dstport));
 
-		ND_PRINT(">> %s\n    ",
+		ND_PRINT(C_RESET, C_RESET ">> %s\n    ",
 			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->nhop_ina)));
 
 		proto = GET_U_1(nr->proto);
 		if (!ndo->ndo_nflag && (p_name = netdb_protoname(proto)) != NULL)
-			ND_PRINT("%s ", p_name);
+			ND_PRINT(C_RESET, C_RESET "%s ", p_name);
 		else
-			ND_PRINT("%u ", proto);
+			ND_PRINT(C_RESET, C_RESET "%u ", proto);
 
 		/* tcp flags for tcp only */
 		if (proto == IPPROTO_TCP) {
 			u_int flags;
 			flags = GET_U_1(nr->tcp_flags);
 			if (flags)
-				ND_PRINT("%s ", bittok2str_nosep(tcp_flag_values, "", flags));
+				ND_PRINT(C_RESET, C_RESET "%s ", bittok2str_nosep(tcp_flag_values, "", flags));
 		}
 
-		ND_PRINT("tos %u, %u (%u octets)",
+		ND_PRINT(C_RESET, C_RESET "tos %u, %u (%u octets)",
 		       GET_U_1(nr->tos),
 		       GET_BE_U_4(nr->packets),
 		       GET_BE_U_4(nr->octets));
@@ -332,53 +332,53 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 	t = GET_BE_U_4(nh->utc_sec);
 #endif
 
-	ND_PRINT("NetFlow v%x, %u.%03u uptime, %u.%09u, ", ver,
+	ND_PRINT(C_RESET, C_RESET "NetFlow v%x, %u.%03u uptime, %u.%09u, ", ver,
 	       GET_BE_U_4(nh->msys_uptime)/1000,
 	       GET_BE_U_4(nh->msys_uptime)%1000,
 	       GET_BE_U_4(nh->utc_sec), GET_BE_U_4(nh->utc_nsec));
 
-	ND_PRINT("#%u, ", GET_BE_U_4(nh->sequence));
+	ND_PRINT(C_RESET, C_RESET "#%u, ", GET_BE_U_4(nh->sequence));
 	/* This was not all of struct nfhdr_v6. */
 	ND_TCHECK_SIZE(nh);
 	nr = (const struct nfrec_v6 *)&nh[1];
 
-	ND_PRINT("%2u recs", nrecs);
+	ND_PRINT(C_RESET, C_RESET "%2u recs", nrecs);
 
 	for (; nrecs != 0; nr++, nrecs--) {
-		ND_PRINT("\n  started %u.%03u, last %u.%03u",
+		ND_PRINT(C_RESET, C_RESET "\n  started %u.%03u, last %u.%03u",
 		       GET_BE_U_4(nr->start_time)/1000,
 		       GET_BE_U_4(nr->start_time)%1000,
 		       GET_BE_U_4(nr->last_time)/1000,
 		       GET_BE_U_4(nr->last_time)%1000);
 
-		ND_PRINT("\n    %s/%u:%u:%u ",
+		ND_PRINT(C_RESET, C_RESET "\n    %s/%u:%u:%u ",
 			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->src_ina)),
 			GET_U_1(nr->src_mask), GET_BE_U_2(nr->src_as),
 			GET_BE_U_2(nr->srcport));
 
-		ND_PRINT("> %s/%u:%u:%u ",
+		ND_PRINT(C_RESET, C_RESET "> %s/%u:%u:%u ",
 			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->dst_ina)),
 			GET_U_1(nr->dst_mask), GET_BE_U_2(nr->dst_as),
 			GET_BE_U_2(nr->dstport));
 
-		ND_PRINT(">> %s\n    ",
+		ND_PRINT(C_RESET, C_RESET ">> %s\n    ",
 			intoa(GET_IPV4_TO_NETWORK_ORDER(nr->nhop_ina)));
 
 		proto = GET_U_1(nr->proto);
 		if (!ndo->ndo_nflag && (p_name = netdb_protoname(proto)) != NULL)
-			ND_PRINT("%s ", p_name);
+			ND_PRINT(C_RESET, C_RESET "%s ", p_name);
 		else
-			ND_PRINT("%u ", proto);
+			ND_PRINT(C_RESET, C_RESET "%u ", proto);
 
 		/* tcp flags for tcp only */
 		if (proto == IPPROTO_TCP) {
 			u_int flags;
 			flags = GET_U_1(nr->tcp_flags);
 			if (flags)
-				ND_PRINT("%s ", bittok2str_nosep(tcp_flag_values, "", flags));
+				ND_PRINT(C_RESET, C_RESET "%s ", bittok2str_nosep(tcp_flag_values, "", flags));
 		}
 
-		ND_PRINT("tos %u, %u (%u octets) (%u<>%u encaps)",
+		ND_PRINT(C_RESET, C_RESET "tos %u, %u (%u octets) (%u<>%u encaps)",
 		       GET_U_1(nr->tos),
 		       GET_BE_U_4(nr->packets),
 		       GET_BE_U_4(nr->octets),
@@ -414,7 +414,7 @@ cnfp_print(netdissect_options *ndo, const u_char *cp)
 		break;
 
 	default:
-		ND_PRINT("NetFlow v%x", ver);
+		ND_PRINT(C_RESET, C_RESET "NetFlow v%x", ver);
 		break;
 	}
 }

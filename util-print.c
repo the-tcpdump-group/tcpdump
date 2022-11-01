@@ -71,13 +71,13 @@ fn_print_char(netdissect_options *ndo, u_char c)
 {
 	if (!ND_ISASCII(c)) {
 		c = ND_TOASCII(c);
-		ND_PRINT("M-");
+		ND_PRINT(C_RESET, "M-");
 	}
 	if (!ND_ASCII_ISPRINT(c)) {
 		c ^= 0x40;	/* DEL to ?, others to alpha */
-		ND_PRINT("^");
+		ND_PRINT(C_RESET, "^");
 	}
-	ND_PRINT("%c", c);
+	ND_PRINT(C_RESET, "%c", c);
 }
 
 /*
@@ -220,19 +220,19 @@ ts_frac_print(netdissect_options *ndo, long usec)
 	switch (ndo->ndo_tstamp_precision) {
 
 	case PCAP_TSTAMP_PRECISION_MICRO:
-		ND_PRINT(".%06u", (unsigned)usec);
+		ND_PRINT(C_RESET, ".%06u", (unsigned)usec);
 		break;
 
 	case PCAP_TSTAMP_PRECISION_NANO:
-		ND_PRINT(".%09u", (unsigned)usec);
+		ND_PRINT(C_RESET, ".%09u", (unsigned)usec);
 		break;
 
 	default:
-		ND_PRINT(".{unknown}");
+		ND_PRINT(C_RESET, ".{unknown}");
 		break;
 	}
 #else
-	ND_PRINT(".%06u", (unsigned)usec);
+	ND_PRINT(C_RESET, ".%06u", (unsigned)usec);
 #endif
 }
 
@@ -250,7 +250,7 @@ ts_date_hmsfrac_print(netdissect_options *ndo, long sec, long usec,
 	char timestr[32];
 
 	if ((unsigned)sec & 0x80000000) {
-		ND_PRINT("[Error converting time]");
+		ND_PRINT(C_RESET, "[Error converting time]");
 		return;
 	}
 
@@ -260,14 +260,14 @@ ts_date_hmsfrac_print(netdissect_options *ndo, long sec, long usec,
 		tm = gmtime(&Time);
 
 	if (!tm) {
-		ND_PRINT("[Error converting time]");
+		ND_PRINT(C_RESET, "[Error converting time]");
 		return;
 	}
 	if (date_flag == WITH_DATE)
 		strftime(timestr, sizeof(timestr), "%Y-%m-%d %H:%M:%S", tm);
 	else
 		strftime(timestr, sizeof(timestr), "%H:%M:%S", tm);
-	ND_PRINT("%s", timestr);
+	ND_PRINT(C_RESET, "%s", timestr);
 
 	ts_frac_print(ndo, usec);
 }
@@ -279,11 +279,11 @@ static void
 ts_unix_print(netdissect_options *ndo, long sec, long usec)
 {
 	if ((unsigned)sec & 0x80000000) {
-		ND_PRINT("[Error converting time]");
+		ND_PRINT(C_RESET, "[Error converting time]");
 		return;
 	}
 
-	ND_PRINT("%u", (unsigned)sec);
+	ND_PRINT(C_RESET, "%u", (unsigned)sec);
 	ts_frac_print(ndo, usec);
 }
 
@@ -304,7 +304,7 @@ ts_print(netdissect_options *ndo,
 	case 0: /* Default */
 		ts_date_hmsfrac_print(ndo, tvp->tv_sec, tvp->tv_usec,
 				      WITHOUT_DATE, LOCAL_TIME);
-		ND_PRINT(" ");
+		ND_PRINT(C_RESET, " ");
 		break;
 
 	case 1: /* No time stamp */
@@ -312,7 +312,7 @@ ts_print(netdissect_options *ndo,
 
 	case 2: /* Unix timeval style */
 		ts_unix_print(ndo, tvp->tv_sec, tvp->tv_usec);
-		ND_PRINT(" ");
+		ND_PRINT(C_RESET, " ");
 		break;
 
 	case 3: /* Microseconds/nanoseconds since previous packet */
@@ -341,10 +341,14 @@ ts_print(netdissect_options *ndo,
 		else
 			netdissect_timevalsub(tvp, &tv_ref, &tv_result, nano_prec);
 
-		ND_PRINT((negative_offset ? "-" : " "));
+		if(negative_offset)
+			ND_PRINT(C_RESET, "-");
+		else
+			ND_PRINT(C_RESET, " ");
+
 		ts_date_hmsfrac_print(ndo, tv_result.tv_sec, tv_result.tv_usec,
 				      WITHOUT_DATE, UTC_TIME);
-		ND_PRINT(" ");
+		ND_PRINT(C_RESET, " ");
 
                 if (ndo->ndo_tflag == 3)
 			tv_ref = *tvp; /* set timestamp for previous packet */
@@ -353,7 +357,7 @@ ts_print(netdissect_options *ndo,
 	case 4: /* Date + Default */
 		ts_date_hmsfrac_print(ndo, tvp->tv_sec, tvp->tv_usec,
 				      WITH_DATE, LOCAL_TIME);
-		ND_PRINT(" ");
+		ND_PRINT(C_RESET, " ");
 		break;
 	}
 }
@@ -373,12 +377,12 @@ unsigned_relts_print(netdissect_options *ndo,
 	const u_int *s = seconds;
 
 	if (secs == 0) {
-		ND_PRINT("0s");
+		ND_PRINT(C_RESET, "0s");
 		return;
 	}
 	while (secs > 0) {
 		if (secs >= *s) {
-			ND_PRINT("%u%s", secs / *s, *l);
+			ND_PRINT(C_RESET, "%u%s", secs / *s, *l);
 			secs -= (secs / *s) * *s;
 		}
 		s++;
@@ -396,7 +400,7 @@ signed_relts_print(netdissect_options *ndo,
                    int32_t secs)
 {
 	if (secs < 0) {
-		ND_PRINT("-");
+		ND_PRINT(C_RESET, "-");
 		if (secs == INT32_MIN) {
 			/*
 			 * -2^31; you can't fit its absolute value into
@@ -425,13 +429,13 @@ signed_relts_print(netdissect_options *ndo,
 /* Print the truncated string */
 void nd_print_trunc(netdissect_options *ndo)
 {
-	ND_PRINT(" [|%s]", ndo->ndo_protocol);
+	ND_PRINT(C_RESET, " [|%s]", ndo->ndo_protocol);
 }
 
 /* Print the protocol name */
 void nd_print_protocol(netdissect_options *ndo)
 {
-	ND_PRINT("%s", ndo->ndo_protocol);
+	ND_PRINT(C_RESET, "%s", ndo->ndo_protocol);
 }
 
 /* Print the protocol name in caps (uppercases) */
@@ -439,13 +443,13 @@ void nd_print_protocol_caps(netdissect_options *ndo)
 {
 	const char *p;
         for (p = ndo->ndo_protocol; *p != '\0'; p++)
-                ND_PRINT("%c", ND_ASCII_TOUPPER(*p));
+                ND_PRINT(C_RESET, "%c", ND_ASCII_TOUPPER(*p));
 }
 
 /* Print the invalid string */
 void nd_print_invalid(netdissect_options *ndo)
 {
-	ND_PRINT(" (invalid)");
+	ND_PRINT(C_RESET, " (invalid)");
 }
 
 /*
@@ -459,7 +463,7 @@ print_unknown_data(netdissect_options *ndo, const u_char *cp,
                    const char *indent, u_int len)
 {
 	if (!ND_TTEST_LEN(cp, 0)) {
-		ND_PRINT("%sDissector error: %s() called with pointer past end of packet",
+		ND_PRINT(C_RESET, "%sDissector error: %s() called with pointer past end of packet",
 		    indent, __func__);
 		return(0);
 	}
@@ -805,12 +809,12 @@ print_txt_line(netdissect_options *ndo, const char *prefix,
 	 * in the buffer; treat this as if it were truncated.
 	 */
 	linelen = idx - startidx;
-	ND_PRINT("%s%.*s", prefix, (int)linelen, pptr + startidx);
+	ND_PRINT(C_RESET, "%s%.*s", prefix, (int)linelen, pptr + startidx);
 	nd_print_trunc(ndo);
 	return (0);
 
 print:
-	ND_PRINT("%s%.*s", prefix, (int)linelen, pptr + startidx);
+	ND_PRINT(C_RESET, "%s%.*s", prefix, (int)linelen, pptr + startidx);
 	return (idx);
 }
 
@@ -904,7 +908,7 @@ txtproto_print(netdissect_options *ndo, const u_char *pptr, u_int len,
 			 * request or response; just print the length
 			 * on the first line of the output.
 			 */
-			ND_PRINT(", length: %u", len);
+			ND_PRINT(C_RESET, ", length: %u", len);
 			for (idx = 0;
 			    idx < len && (eol = print_txt_line(ndo, "\n\t", pptr, idx, len)) != 0;
 			    idx = eol)

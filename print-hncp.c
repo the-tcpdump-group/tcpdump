@@ -49,7 +49,7 @@ hncp_print(netdissect_options *ndo,
            const u_char *cp, u_int length)
 {
     ndo->ndo_protocol = "hncp";
-    ND_PRINT("hncp (%u)", length);
+    ND_PRINT(C_RESET, "hncp (%u)", length);
     hncp_print_rec(ndo, cp, length, 1);
 }
 
@@ -234,7 +234,7 @@ print_prefix(netdissect_options *ndo, const u_char *prefix, u_int max_length)
             return plenbytes;
     }
 
-    ND_PRINT("%s", buf);
+    ND_PRINT(C_RESET, "%s", buf);
     return plenbytes;
 }
 
@@ -249,7 +249,7 @@ print_dns_label(netdissect_options *ndo,
         if (lab_length == 0)
             return (int)length;
         if (length > 1 && print)
-            ND_PRINT(".");
+            ND_PRINT(C_RESET, ".");
         if (length+lab_length > max_length) {
             if (print)
                 nd_printjnp(ndo, cp+length, max_length-length);
@@ -260,7 +260,7 @@ print_dns_label(netdissect_options *ndo,
         length += lab_length;
     }
     if (print)
-        ND_PRINT("[|DNS]");
+        ND_PRINT(C_RESET, "[|DNS]");
     return -1;
 }
 
@@ -281,12 +281,12 @@ dhcpv4_print(netdissect_options *ndo,
         optlen = GET_U_1(tlv + 1);
         value = tlv + 2;
 
-        ND_PRINT("\n");
+        ND_PRINT(C_RESET, "\n");
         for (t = indent; t > 0; t--)
-            ND_PRINT("\t");
+            ND_PRINT(C_RESET, "\t");
 
-        ND_PRINT("%s", tok2str(dh4opt_str, "Unknown", type));
-        ND_PRINT(" (%u)", optlen + 2 );
+        ND_PRINT(C_RESET, "%s", tok2str(dh4opt_str, "Unknown", type));
+        ND_PRINT(C_RESET, " (%u)", optlen + 2 );
         if (i + 2 + optlen > length)
             return -1;
 
@@ -297,13 +297,13 @@ dhcpv4_print(netdissect_options *ndo,
                 return -1;
             }
             for (t = 0; t < optlen; t += 4)
-                ND_PRINT(" %s", GET_IPADDR_STRING(value + t));
+                ND_PRINT(C_RESET, " %s", GET_IPADDR_STRING(value + t));
         }
             break;
         case DH4OPT_DOMAIN_SEARCH: {
             const u_char *tp = value;
             while (tp < value + optlen) {
-                ND_PRINT(" ");
+                ND_PRINT(C_RESET, " ");
                 if ((tp = fqdn_print(ndo, tp, value + optlen)) == NULL)
                     return -1;
             }
@@ -333,12 +333,12 @@ dhcpv6_print(netdissect_options *ndo,
         optlen = GET_BE_U_2(tlv + 2);
         value = tlv + 4;
 
-        ND_PRINT("\n");
+        ND_PRINT(C_RESET, "\n");
         for (t = indent; t > 0; t--)
-            ND_PRINT("\t");
+            ND_PRINT(C_RESET, "\t");
 
-        ND_PRINT("%s", tok2str(dh6opt_str, "Unknown", type));
-        ND_PRINT(" (%u)", optlen + 4 );
+        ND_PRINT(C_RESET, "%s", tok2str(dh6opt_str, "Unknown", type));
+        ND_PRINT(C_RESET, " (%u)", optlen + 4 );
         if (i + 4 + optlen > length)
             return -1;
 
@@ -350,13 +350,13 @@ dhcpv6_print(netdissect_options *ndo,
                     return -1;
                 }
                 for (t = 0; t < optlen; t += 16)
-                    ND_PRINT(" %s", GET_IP6ADDR_STRING(value + t));
+                    ND_PRINT(C_RESET, " %s", GET_IP6ADDR_STRING(value + t));
             }
                 break;
             case DH6OPT_DOMAIN_LIST: {
                 const u_char *tp = value;
                 while (tp < value + optlen) {
-                    ND_PRINT(" ");
+                    ND_PRINT(C_RESET, " ");
                     if ((tp = fqdn_print(ndo, tp, value + optlen)) == NULL)
                         return -1;
                 }
@@ -385,18 +385,18 @@ print_type_in_line(netdissect_options *ndo,
             *first_one = 0;
             if (indent > 1) {
                 u_int t;
-                ND_PRINT("\n");
+                ND_PRINT(C_RESET, "\n");
                 for (t = indent; t > 0; t--)
-                    ND_PRINT("\t");
+                    ND_PRINT(C_RESET, "\t");
             } else {
-                ND_PRINT(" ");
+                ND_PRINT(C_RESET, " ");
             }
         } else {
-            ND_PRINT(", ");
+            ND_PRINT(C_RESET, ", ");
         }
-        ND_PRINT("%s", tok2str(type_values, "Easter Egg", type));
+        ND_PRINT(C_RESET, "%s", tok2str(type_values, "Easter Egg", type));
         if (count > 1)
-            ND_PRINT(" (x%d)", count);
+            ND_PRINT(C_RESET, " (x%d)", count);
     }
 }
 
@@ -421,9 +421,9 @@ hncp_print_rec(netdissect_options *ndo,
         tlv = cp + i;
 
         if (!in_line) {
-            ND_PRINT("\n");
+            ND_PRINT(C_RESET, "\n");
             for (t = indent; t > 0; t--)
-                ND_PRINT("\t");
+                ND_PRINT(C_RESET, "\t");
         }
 
         ND_TCHECK_4(tlv);
@@ -471,10 +471,10 @@ hncp_print_rec(netdissect_options *ndo,
             goto skip_multiline;
         }
 
-        ND_PRINT("%s", tok2str(type_values, "Easter Egg (42)", type_mask) );
+        ND_PRINT(C_RESET, "%s", tok2str(type_values, "Easter Egg (42)", type_mask) );
         if (type_mask > 0xffff)
-            ND_PRINT(": type=%u", type );
-        ND_PRINT(" (%u)", bodylen + 4 );
+            ND_PRINT(C_RESET, ": type=%u", type );
+        ND_PRINT(C_RESET, " (%u)", bodylen + 4 );
 
         switch (type_mask) {
 
@@ -491,7 +491,7 @@ hncp_print_rec(netdissect_options *ndo,
                 break;
             }
             node_identifier = format_nid(ndo, value);
-            ND_PRINT(" NID: %s", node_identifier);
+            ND_PRINT(C_RESET, " NID: %s", node_identifier);
         }
             break;
 
@@ -504,7 +504,7 @@ hncp_print_rec(netdissect_options *ndo,
             }
             node_identifier = format_nid(ndo, value);
             endpoint_identifier = GET_BE_U_4(value + 4);
-            ND_PRINT(" NID: %s EPID: %08x",
+            ND_PRINT(C_RESET, " NID: %s EPID: %08x",
                 node_identifier,
                 endpoint_identifier
             );
@@ -518,7 +518,7 @@ hncp_print_rec(netdissect_options *ndo,
                 break;
             }
             hash = GET_BE_U_8(value);
-            ND_PRINT(" hash: %016" PRIx64, hash);
+            ND_PRINT(C_RESET, " hash: %016" PRIx64, hash);
         }
             break;
 
@@ -534,7 +534,7 @@ hncp_print_rec(netdissect_options *ndo,
             sequence_number = GET_BE_U_4(value + 4);
             interval = format_interval(GET_BE_U_4(value + 8));
             hash = GET_BE_U_8(value + 12);
-            ND_PRINT(" NID: %s seqno: %u %s hash: %016" PRIx64,
+            ND_PRINT(C_RESET, " NID: %s seqno: %u %s hash: %016" PRIx64,
                 node_identifier,
                 sequence_number,
                 interval,
@@ -554,7 +554,7 @@ hncp_print_rec(netdissect_options *ndo,
             peer_node_identifier = format_nid(ndo, value);
             peer_endpoint_identifier = GET_BE_U_4(value + 4);
             endpoint_identifier = GET_BE_U_4(value + 8);
-            ND_PRINT(" Peer-NID: %s Peer-EPID: %08x Local-EPID: %08x",
+            ND_PRINT(C_RESET, " Peer-NID: %s Peer-EPID: %08x Local-EPID: %08x",
                 peer_node_identifier,
                 peer_endpoint_identifier,
                 endpoint_identifier
@@ -571,7 +571,7 @@ hncp_print_rec(netdissect_options *ndo,
             }
             endpoint_identifier = GET_BE_U_4(value);
             interval = format_interval(GET_BE_U_4(value + 4));
-            ND_PRINT(" EPID: %08x Interval: %s",
+            ND_PRINT(C_RESET, " EPID: %08x Interval: %s",
                 endpoint_identifier,
                 interval
             );
@@ -583,7 +583,7 @@ hncp_print_rec(netdissect_options *ndo,
                 nd_print_invalid(ndo);
                 break;
             }
-            ND_PRINT(" Verdict: %u Fingerprint: %s Common Name: ",
+            ND_PRINT(C_RESET, " Verdict: %u Fingerprint: %s Common Name: ",
                 GET_U_1(value),
                 format_256(ndo, value + 4));
             nd_printjnp(ndo, value + 36, bodylen - 36);
@@ -602,7 +602,7 @@ hncp_print_rec(netdissect_options *ndo,
             P = (uint8_t)((capabilities >> 8) & 0xf);
             H = (uint8_t)((capabilities >> 4) & 0xf);
             L = (uint8_t)(capabilities & 0xf);
-            ND_PRINT(" M: %u P: %u H: %u L: %u User-agent: ",
+            ND_PRINT(C_RESET, " M: %u P: %u H: %u L: %u User-agent: ",
                 M, P, H, L
             );
             nd_printjnp(ndo, value + 4, bodylen - 4);
@@ -621,13 +621,13 @@ hncp_print_rec(netdissect_options *ndo,
                 nd_print_invalid(ndo);
                 break;
             }
-            ND_PRINT(" VLSO: %s PLSO: %s Prefix: ",
+            ND_PRINT(C_RESET, " VLSO: %s PLSO: %s Prefix: ",
                 format_interval(GET_BE_U_4(value)),
                 format_interval(GET_BE_U_4(value + 4))
             );
             l = print_prefix(ndo, value + 8, bodylen - 8);
             if (l == -1) {
-                ND_PRINT("(length is invalid)");
+                ND_PRINT(C_RESET, "(length is invalid)");
                 break;
             }
             if (l < 0) {
@@ -658,18 +658,18 @@ hncp_print_rec(netdissect_options *ndo,
                 break;
             }
             policy = GET_U_1(value);
-            ND_PRINT(" type: ");
+            ND_PRINT(C_RESET, " type: ");
             if (policy == 0) {
                 if (bodylen != 1) {
                     nd_print_invalid(ndo);
                     break;
                 }
-                ND_PRINT("Internet connectivity");
+                ND_PRINT(C_RESET, "Internet connectivity");
             } else if (policy >= 1 && policy <= 128) {
-                ND_PRINT("Dest-Prefix: ");
+                ND_PRINT(C_RESET, "Dest-Prefix: ");
                 l = print_prefix(ndo, value, bodylen);
                 if (l == -1) {
-                    ND_PRINT("(length is invalid)");
+                    ND_PRINT(C_RESET, "(length is invalid)");
                     break;
                 }
                 if (l < 0) {
@@ -686,19 +686,19 @@ hncp_print_rec(netdissect_options *ndo,
                     break;
                 }
             } else if (policy == 129) {
-                ND_PRINT("DNS domain: ");
+                ND_PRINT(C_RESET, "DNS domain: ");
                 print_dns_label(ndo, value+1, bodylen-1, 1);
             } else if (policy == 130) {
-                ND_PRINT("Opaque UTF-8: ");
+                ND_PRINT(C_RESET, "Opaque UTF-8: ");
                 nd_printjnp(ndo, value + 1, bodylen - 1);
             } else if (policy == 131) {
                 if (bodylen != 1) {
                     nd_print_invalid(ndo);
                     break;
                 }
-                ND_PRINT("Restrictive assignment");
+                ND_PRINT(C_RESET, "Restrictive assignment");
             } else if (policy >= 132) {
-                ND_PRINT("Unknown (%u)", policy); /* Reserved for future additions */
+                ND_PRINT(C_RESET, "Unknown (%u)", policy); /* Reserved for future additions */
             }
         }
             break;
@@ -733,11 +733,11 @@ hncp_print_rec(netdissect_options *ndo,
                 break;
             }
             prty = GET_U_1(value + 4) & 0xf;
-            ND_PRINT(" EPID: %08x Prty: %u",
+            ND_PRINT(C_RESET, " EPID: %08x Prty: %u",
                 GET_BE_U_4(value),
                 prty
             );
-            ND_PRINT(" Prefix: ");
+            ND_PRINT(C_RESET, " Prefix: ");
             if ((l = print_prefix(ndo, value + 5, bodylen - 5)) < 0) {
                 nd_print_invalid(ndo);
                 break;
@@ -759,7 +759,7 @@ hncp_print_rec(netdissect_options *ndo,
             }
             endpoint_identifier = GET_BE_U_4(value);
             ip_address = format_ip6addr(ndo, value + 4);
-            ND_PRINT(" EPID: %08x IP Address: %s",
+            ND_PRINT(C_RESET, " EPID: %08x IP Address: %s",
                 endpoint_identifier,
                 ip_address
             );
@@ -776,7 +776,7 @@ hncp_print_rec(netdissect_options *ndo,
                 break;
             }
             ip_address = format_ip6addr(ndo, value);
-            ND_PRINT(" IP-Address: %s %c%c%c ",
+            ND_PRINT(C_RESET, " IP-Address: %s %c%c%c ",
                 ip_address,
                 (GET_U_1(value + 16) & 4) ? 'l' : '-',
                 (GET_U_1(value + 16) & 2) ? 'b' : '-',
@@ -799,7 +799,7 @@ hncp_print_rec(netdissect_options *ndo,
                 nd_print_invalid(ndo);
                 break;
             }
-            ND_PRINT(" Domain: ");
+            ND_PRINT(C_RESET, " Domain: ");
             print_dns_label(ndo, value, bodylen, 1);
         }
             break;
@@ -815,13 +815,13 @@ hncp_print_rec(netdissect_options *ndo,
                 nd_print_invalid(ndo);
                 break;
             }
-            ND_PRINT(" IP-Address: %s Name: ",
+            ND_PRINT(C_RESET, " IP-Address: %s Name: ",
                 format_ip6addr(ndo, value)
             );
             if (l < 64) {
-                ND_PRINT("\"");
+                ND_PRINT(C_RESET, "\"");
                 nd_printjnp(ndo, value + 17, l);
-                ND_PRINT("\"");
+                ND_PRINT(C_RESET, "\"");
             } else {
                 nd_print_invalid(ndo);
             }
@@ -837,7 +837,7 @@ hncp_print_rec(netdissect_options *ndo,
                 nd_print_invalid(ndo);
                 break;
             }
-            ND_PRINT(" PSK: %s", format_256(ndo, value));
+            ND_PRINT(C_RESET, " PSK: %s", format_256(ndo, value));
             hncp_print_rec(ndo, value + 32, bodylen - 32, indent+1);
         }
             break;

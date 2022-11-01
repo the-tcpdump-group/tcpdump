@@ -92,19 +92,19 @@ macsec_print_header(netdissect_options *ndo,
 		    const struct macsec_sectag *sectag,
 		    u_int short_length)
 {
-	ND_PRINT("an %u, pn %u, flags %s",
+	ND_PRINT(C_RESET, "an %u, pn %u, flags %s",
 		 GET_U_1(sectag->tci_an) & MACSEC_AN_MASK,
 		 GET_BE_U_4(sectag->packet_number),
 		 bittok2str_nosep(macsec_flag_values, "none",
 				  GET_U_1(sectag->tci_an) & MACSEC_TCI_FLAGS));
 
 	if (short_length != 0)
-		ND_PRINT(", sl %u", short_length);
+		ND_PRINT(C_RESET, ", sl %u", short_length);
 
 	if (GET_U_1(sectag->tci_an) & MACSEC_TCI_SC)
-		ND_PRINT(", sci " SCI_FMT, GET_BE_U_8(sectag->secure_channel_id));
+		ND_PRINT(C_RESET, ", sci " SCI_FMT, GET_BE_U_8(sectag->secure_channel_id));
 
-	ND_PRINT(", ");
+	ND_PRINT(C_RESET, ", ");
 }
 
 /* returns < 0 iff the packet can be decoded completely */
@@ -182,12 +182,12 @@ macsec_print(netdissect_options *ndo, const u_char **bp,
 			 * so print them, if we have any.
 			 */
 			if (src != NULL && dst != NULL) {
-				ND_PRINT("%s > %s ",
+				ND_PRINT(C_RESET, "%s > %s ",
 					(src->addr_string)(ndo, src->addr),
 					(dst->addr_string)(ndo, dst->addr));
 			}
 
-			ND_PRINT("802.1AE MACsec, ");
+			ND_PRINT(C_RESET, "802.1AE MACsec, ");
 
 			/*
 			 * Print the MACsec header.

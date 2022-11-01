@@ -76,13 +76,13 @@ ipx_print(netdissect_options *ndo, const u_char *p, u_int length)
 
 	ndo->ndo_protocol = "ipx";
 	if (!ndo->ndo_eflag)
-		ND_PRINT("IPX ");
+		ND_PRINT(C_RESET, "IPX ");
 
-	ND_PRINT("%s.%04x > ",
+	ND_PRINT(C_RESET, "%s.%04x > ",
 		     ipxaddr_string(ndo, GET_BE_U_4(ipx->srcNet), ipx->srcNode),
 		     GET_BE_U_2(ipx->srcSkt));
 
-	ND_PRINT("%s.%04x: ",
+	ND_PRINT(C_RESET, "%s.%04x: ",
 		     ipxaddr_string(ndo, GET_BE_U_4(ipx->dstNet), ipx->dstNode),
 		     GET_BE_U_2(ipx->dstSkt));
 
@@ -90,7 +90,7 @@ ipx_print(netdissect_options *ndo, const u_char *p, u_int length)
 	length = GET_BE_U_2(ipx->length);
 
 	if (length < ipxSize) {
-		ND_PRINT("[length %u < %u]", length, ipxSize);
+		ND_PRINT(C_RESET, "[length %u < %u]", length, ipxSize);
 		nd_print_invalid(ndo);
 		return;
 	}
@@ -118,7 +118,7 @@ ipx_decode(netdissect_options *ndo, const struct ipxHdr *ipx, const u_char *data
     dstSkt = GET_BE_U_2(ipx->dstSkt);
     switch (dstSkt) {
       case IPX_SKT_NCP:
-	ND_PRINT("ipx-ncp %u", length);
+	ND_PRINT(C_RESET, "ipx-ncp %u", length);
 	break;
       case IPX_SKT_SAP:
 	ipx_sap_print(ndo, datap, length);
@@ -127,16 +127,16 @@ ipx_decode(netdissect_options *ndo, const struct ipxHdr *ipx, const u_char *data
 	ipx_rip_print(ndo, datap, length);
 	break;
       case IPX_SKT_NETBIOS:
-	ND_PRINT("ipx-netbios %u", length);
+	ND_PRINT(C_RESET, "ipx-netbios %u", length);
 #ifdef ENABLE_SMB
 	ipx_netbios_print(ndo, datap, length);
 #endif
 	break;
       case IPX_SKT_DIAGNOSTICS:
-	ND_PRINT("ipx-diags %u", length);
+	ND_PRINT(C_RESET, "ipx-diags %u", length);
 	break;
       case IPX_SKT_NWLINK_DGM:
-	ND_PRINT("ipx-nwlink-dgm %u", length);
+	ND_PRINT(C_RESET, "ipx-nwlink-dgm %u", length);
 #ifdef ENABLE_SMB
 	ipx_netbios_print(ndo, datap, length);
 #endif
@@ -145,7 +145,7 @@ ipx_decode(netdissect_options *ndo, const struct ipxHdr *ipx, const u_char *data
 	eigrp_print(ndo, datap, length);
 	break;
       default:
-	ND_PRINT("ipx-#%x %u", dstSkt, length);
+	ND_PRINT(C_RESET, "ipx-#%x %u", dstSkt, length);
 	break;
     }
 }
@@ -164,38 +164,38 @@ ipx_sap_print(netdissect_options *ndo, const u_char *ipx, u_int length)
       case 1:
       case 3:
 	if (command == 1)
-	    ND_PRINT("ipx-sap-req");
+	    ND_PRINT(C_RESET, "ipx-sap-req");
 	else
-	    ND_PRINT("ipx-sap-nearest-req");
+	    ND_PRINT(C_RESET, "ipx-sap-nearest-req");
 
-	ND_PRINT(" %s", ipxsap_string(ndo, htons(GET_BE_U_2(ipx))));
+	ND_PRINT(C_RESET, " %s", ipxsap_string(ndo, htons(GET_BE_U_2(ipx))));
 	break;
 
       case 2:
       case 4:
 	if (command == 2)
-	    ND_PRINT("ipx-sap-resp");
+	    ND_PRINT(C_RESET, "ipx-sap-resp");
 	else
-	    ND_PRINT("ipx-sap-nearest-resp");
+	    ND_PRINT(C_RESET, "ipx-sap-nearest-resp");
 
 	for (i = 0; i < 8 && length != 0; i++) {
 	    ND_ICHECK_U(length, <, 2);
-	    ND_PRINT(" %s '", ipxsap_string(ndo, htons(GET_BE_U_2(ipx))));
+	    ND_PRINT(C_RESET, " %s '", ipxsap_string(ndo, htons(GET_BE_U_2(ipx))));
 	    ipx += 2;
 	    length -= 2;
 	    if (length < 48) {
-		ND_PRINT("'");
+		ND_PRINT(C_RESET, "'");
 		goto invalid;
 	    }
 	    nd_printjnp(ndo, ipx, 48);
-	    ND_PRINT("'");
+	    ND_PRINT(C_RESET, "'");
 	    ipx += 48;
 	    length -= 48;
 	    /*
 	     * 10 bytes of IPX address.
 	     */
 	    ND_ICHECK_U(length, <, 10);
-	    ND_PRINT(" addr %s",
+	    ND_PRINT(C_RESET, " addr %s",
 		ipxaddr_string(ndo, GET_BE_U_4(ipx), ipx + 4));
 	    ipx += 10;
 	    length -= 10;
@@ -210,7 +210,7 @@ ipx_sap_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	}
 	break;
       default:
-	ND_PRINT("ipx-sap-?%x", command);
+	ND_PRINT(C_RESET, "ipx-sap-?%x", command);
 	break;
     }
     return;
@@ -231,18 +231,18 @@ ipx_rip_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 
     switch (command) {
       case 1:
-	ND_PRINT("ipx-rip-req");
+	ND_PRINT(C_RESET, "ipx-rip-req");
 	if (length != 0) {
 	    ND_ICHECK_U(length, <, 8);
-	    ND_PRINT(" %08x/%u.%u", GET_BE_U_4(ipx),
+	    ND_PRINT(C_RESET, " %08x/%u.%u", GET_BE_U_4(ipx),
 			 GET_BE_U_2(ipx + 4), GET_BE_U_2(ipx + 6));
 	}
 	break;
       case 2:
-	ND_PRINT("ipx-rip-resp");
+	ND_PRINT(C_RESET, "ipx-rip-resp");
 	for (i = 0; i < 50 && length != 0; i++) {
 	    ND_ICHECK_U(length, <, 8);
-	    ND_PRINT(" %08x/%u.%u", GET_BE_U_4(ipx),
+	    ND_PRINT(C_RESET, " %08x/%u.%u", GET_BE_U_4(ipx),
 			 GET_BE_U_2(ipx + 4), GET_BE_U_2(ipx + 6));
 
 	    ipx += 8;
@@ -250,7 +250,7 @@ ipx_rip_print(netdissect_options *ndo, const u_char *ipx, u_int length)
 	}
 	break;
       default:
-	ND_PRINT("ipx-rip-?%x", command);
+	ND_PRINT(C_RESET, "ipx-rip-?%x", command);
 	break;
     }
     return;

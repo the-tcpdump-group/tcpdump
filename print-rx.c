@@ -536,30 +536,30 @@ rx_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "rx";
 	if (!ND_TTEST_LEN(bp, sizeof(struct rx_header))) {
-		ND_PRINT(" [|rx] (%u)", length);
+		ND_PRINT(C_RESET, " [|rx] (%u)", length);
 		return;
 	}
 
 	rxh = (const struct rx_header *) bp;
 
 	type = GET_U_1(rxh->type);
-	ND_PRINT(" rx %s", tok2str(rx_types, "type %u", type));
+	ND_PRINT(C_RESET, " rx %s", tok2str(rx_types, "type %u", type));
 
 	flags = GET_U_1(rxh->flags);
 	if (ndo->ndo_vflag) {
 		int firstflag = 0;
 
 		if (ndo->ndo_vflag > 1)
-			ND_PRINT(" cid %08x call# %u",
+			ND_PRINT(C_RESET, " cid %08x call# %u",
 			       GET_BE_U_4(rxh->cid),
 			       GET_BE_U_4(rxh->callNumber));
 
-		ND_PRINT(" seq %u ser %u",
+		ND_PRINT(C_RESET, " seq %u ser %u",
 		       GET_BE_U_4(rxh->seq),
 		       GET_BE_U_4(rxh->serial));
 
 		if (ndo->ndo_vflag > 2)
-			ND_PRINT(" secindex %u serviceid %hu",
+			ND_PRINT(C_RESET, " secindex %u serviceid %hu",
 				GET_U_1(rxh->securityIndex),
 				GET_BE_U_2(rxh->serviceId));
 
@@ -570,11 +570,11 @@ rx_print(netdissect_options *ndo,
 				     type == rx_flags[i].packetType)) {
 					if (!firstflag) {
 						firstflag = 1;
-						ND_PRINT(" ");
+						ND_PRINT(C_RESET, " ");
 					} else {
-						ND_PRINT(",");
+						ND_PRINT(C_RESET, ",");
 					}
-					ND_PRINT("<%s>", rx_flags[i].s);
+					ND_PRINT(C_RESET, "<%s>", rx_flags[i].s);
 				}
 			}
 	}
@@ -675,7 +675,7 @@ rx_print(netdissect_options *ndo,
 		rx_ack_print(ndo, bp, length);
 
 
-	ND_PRINT(" (%u)", length);
+	ND_PRINT(C_RESET, " (%u)", length);
 }
 
 /*
@@ -761,7 +761,7 @@ rx_cache_find(netdissect_options *ndo, const struct rx_header *rxh,
 			bp += sizeof(uint32_t); \
 			n3 = GET_BE_U_4(bp); \
 			bp += sizeof(uint32_t); \
-			ND_PRINT(" fid %u/%u/%u", n1, n2, n3); \
+			ND_PRINT(C_RESET, " fid %u/%u/%u", n1, n2, n3); \
 		}
 
 #define STROUT(MAX) { uint32_t _i; \
@@ -769,29 +769,29 @@ rx_cache_find(netdissect_options *ndo, const struct rx_header *rxh,
 			if (_i > (MAX)) \
 				goto trunc; \
 			bp += sizeof(uint32_t); \
-			ND_PRINT(" \""); \
+			ND_PRINT(C_RESET, " \""); \
 			if (nd_printn(ndo, bp, _i, ndo->ndo_snapend)) \
 				goto trunc; \
-			ND_PRINT("\""); \
+			ND_PRINT(C_RESET, "\""); \
 			bp += ((_i + sizeof(uint32_t) - 1) / sizeof(uint32_t)) * sizeof(uint32_t); \
 		}
 
 #define INTOUT() { int32_t _i; \
 			_i = GET_BE_S_4(bp); \
 			bp += sizeof(int32_t); \
-			ND_PRINT(" %d", _i); \
+			ND_PRINT(C_RESET, " %d", _i); \
 		}
 
 #define UINTOUT() { uint32_t _i; \
 			_i = GET_BE_U_4(bp); \
 			bp += sizeof(uint32_t); \
-			ND_PRINT(" %u", _i); \
+			ND_PRINT(C_RESET, " %u", _i); \
 		}
 
 #define UINT64OUT() { uint64_t _i; \
 			_i = GET_BE_U_8(bp); \
 			bp += sizeof(uint64_t); \
-			ND_PRINT(" %" PRIu64, _i); \
+			ND_PRINT(C_RESET, " %" PRIu64, _i); \
 		}
 
 #define DATEOUT() { time_t _t; struct tm *tm; char str[256]; \
@@ -799,25 +799,25 @@ rx_cache_find(netdissect_options *ndo, const struct rx_header *rxh,
 			bp += sizeof(int32_t); \
 			tm = localtime(&_t); \
 			strftime(str, 256, "%Y/%m/%d %H:%M:%S", tm); \
-			ND_PRINT(" %s", str); \
+			ND_PRINT(C_RESET, " %s", str); \
 		}
 
 #define STOREATTROUT() { uint32_t mask, _i; \
 			ND_TCHECK_LEN(bp, (sizeof(uint32_t) * 6)); \
 			mask = GET_BE_U_4(bp); bp += sizeof(uint32_t); \
-			if (mask) ND_PRINT(" StoreStatus"); \
-		        if (mask & 1) { ND_PRINT(" date"); DATEOUT(); } \
+			if (mask) ND_PRINT(C_RESET, " StoreStatus"); \
+		        if (mask & 1) { ND_PRINT(C_RESET, " date"); DATEOUT(); } \
 			else bp += sizeof(uint32_t); \
 			_i = GET_BE_U_4(bp); bp += sizeof(uint32_t); \
-		        if (mask & 2) ND_PRINT(" owner %u", _i);  \
+		        if (mask & 2) ND_PRINT(C_RESET, " owner %u", _i);  \
 			_i = GET_BE_U_4(bp); bp += sizeof(uint32_t); \
-		        if (mask & 4) ND_PRINT(" group %u", _i); \
+		        if (mask & 4) ND_PRINT(C_RESET, " group %u", _i); \
 			_i = GET_BE_U_4(bp); bp += sizeof(uint32_t); \
-		        if (mask & 8) ND_PRINT(" mode %o", _i & 07777); \
+		        if (mask & 8) ND_PRINT(C_RESET, " mode %o", _i & 07777); \
 			_i = GET_BE_U_4(bp); bp += sizeof(uint32_t); \
-		        if (mask & 16) ND_PRINT(" segsize %u", _i); \
+		        if (mask & 16) ND_PRINT(C_RESET, " segsize %u", _i); \
 			/* undocumented in 3.3 docu */ \
-		        if (mask & 1024) ND_PRINT(" fsync");  \
+		        if (mask & 1024) ND_PRINT(C_RESET, " fsync");  \
 		}
 
 #define UBIK_VERSIONOUT() {uint32_t epoch; uint32_t counter; \
@@ -826,24 +826,24 @@ rx_cache_find(netdissect_options *ndo, const struct rx_header *rxh,
 			bp += sizeof(uint32_t); \
 			counter = GET_BE_U_4(bp); \
 			bp += sizeof(uint32_t); \
-			ND_PRINT(" %u.%u", epoch, counter); \
+			ND_PRINT(C_RESET, " %u.%u", epoch, counter); \
 		}
 
 #define AFSUUIDOUT() {uint32_t temp; int _i; \
 			ND_TCHECK_LEN(bp, 11 * sizeof(uint32_t)); \
 			temp = GET_BE_U_4(bp); \
 			bp += sizeof(uint32_t); \
-			ND_PRINT(" %08x", temp); \
+			ND_PRINT(C_RESET, " %08x", temp); \
 			temp = GET_BE_U_4(bp); \
 			bp += sizeof(uint32_t); \
-			ND_PRINT("%04x", temp); \
+			ND_PRINT(C_RESET, "%04x", temp); \
 			temp = GET_BE_U_4(bp); \
 			bp += sizeof(uint32_t); \
-			ND_PRINT("%04x", temp); \
+			ND_PRINT(C_RESET, "%04x", temp); \
 			for (_i = 0; _i < 8; _i++) { \
 				temp = GET_BE_U_4(bp); \
 				bp += sizeof(uint32_t); \
-				ND_PRINT("%02x", (unsigned char) temp); \
+				ND_PRINT(C_RESET, "%02x", (unsigned char) temp); \
 			} \
 		}
 
@@ -862,9 +862,9 @@ rx_cache_find(netdissect_options *ndo, const struct rx_header *rxh,
 				bp += sizeof(uint32_t); \
 			} \
 			s[(MAX)] = '\0'; \
-			ND_PRINT(" \""); \
+			ND_PRINT(C_RESET, " \""); \
 			fn_print_str(ndo, s); \
-			ND_PRINT("\""); \
+			ND_PRINT(C_RESET, "\""); \
 		}
 
 #define DESTSERVEROUT() { uint32_t n1, n2, n3; \
@@ -875,7 +875,7 @@ rx_cache_find(netdissect_options *ndo, const struct rx_header *rxh,
 			bp += sizeof(uint32_t); \
 			n3 = GET_BE_U_4(bp); \
 			bp += sizeof(uint32_t); \
-			ND_PRINT(" server %u:%u:%u", n1, n2, n3); \
+			ND_PRINT(C_RESET, " server %u:%u:%u", n1, n2, n3); \
 		}
 
 /*
@@ -899,7 +899,7 @@ fs_print(netdissect_options *ndo,
 
 	fs_op = GET_BE_U_4(bp + sizeof(struct rx_header));
 
-	ND_PRINT(" fs call %s", tok2str(fs_req, "op#%u", fs_op));
+	ND_PRINT(C_RESET, " fs call %s", tok2str(fs_req, "op#%u", fs_op));
 
 	/*
 	 * Print out arguments to some of the AFS calls.  This stuff is
@@ -915,9 +915,9 @@ fs_print(netdissect_options *ndo,
 	switch (fs_op) {
 		case 130:	/* Fetch data */
 			FIDOUT();
-			ND_PRINT(" offset");
+			ND_PRINT(C_RESET, " offset");
 			UINTOUT();
-			ND_PRINT(" length");
+			ND_PRINT(C_RESET, " length");
 			UINTOUT();
 			break;
 		case 131:	/* Fetch ACL */
@@ -937,11 +937,11 @@ fs_print(netdissect_options *ndo,
 		case 133:	/* Store data */
 			FIDOUT();
 			STOREATTROUT();
-			ND_PRINT(" offset");
+			ND_PRINT(C_RESET, " offset");
 			UINTOUT();
-			ND_PRINT(" length");
+			ND_PRINT(C_RESET, " length");
 			UINTOUT();
-			ND_PRINT(" flen");
+			ND_PRINT(C_RESET, " flen");
 			UINTOUT();
 			break;
 		case 134:	/* Store ACL */
@@ -969,23 +969,23 @@ fs_print(netdissect_options *ndo,
 			STROUT(AFSNAMEMAX);
 			break;
 		case 138:	/* Rename file */
-			ND_PRINT(" old");
+			ND_PRINT(C_RESET, " old");
 			FIDOUT();
 			STROUT(AFSNAMEMAX);
-			ND_PRINT(" new");
+			ND_PRINT(C_RESET, " new");
 			FIDOUT();
 			STROUT(AFSNAMEMAX);
 			break;
 		case 139:	/* Symlink */
 			FIDOUT();
 			STROUT(AFSNAMEMAX);
-			ND_PRINT(" link to");
+			ND_PRINT(C_RESET, " link to");
 			STROUT(AFSNAMEMAX);
 			break;
 		case 140:	/* Link */
 			FIDOUT();
 			STROUT(AFSNAMEMAX);
-			ND_PRINT(" link to");
+			ND_PRINT(C_RESET, " link to");
 			FIDOUT();
 			break;
 		case 148:	/* Get volume info */
@@ -993,11 +993,11 @@ fs_print(netdissect_options *ndo,
 			break;
 		case 149:	/* Get volume stats */
 		case 150:	/* Set volume stats */
-			ND_PRINT(" volid");
+			ND_PRINT(C_RESET, " volid");
 			UINTOUT();
 			break;
 		case 154:	/* New get volume info */
-			ND_PRINT(" volname");
+			ND_PRINT(C_RESET, " volname");
 			STROUT(AFSNAMEMAX);
 			break;
 		case 155:	/* Bulk stat */
@@ -1010,31 +1010,31 @@ fs_print(netdissect_options *ndo,
 			for (i = 0; i < j; i++) {
 				FIDOUT();
 				if (i != j - 1)
-					ND_PRINT(",");
+					ND_PRINT(C_RESET, ",");
 			}
 			if (j == 0)
-				ND_PRINT(" <none!>");
+				ND_PRINT(C_RESET, " <none!>");
 			break;
 		}
 		case 65537:	/* Fetch data 64 */
 			FIDOUT();
-			ND_PRINT(" offset");
+			ND_PRINT(C_RESET, " offset");
 			UINT64OUT();
-			ND_PRINT(" length");
+			ND_PRINT(C_RESET, " length");
 			UINT64OUT();
 			break;
 		case 65538:	/* Store data 64 */
 			FIDOUT();
 			STOREATTROUT();
-			ND_PRINT(" offset");
+			ND_PRINT(C_RESET, " offset");
 			UINT64OUT();
-			ND_PRINT(" length");
+			ND_PRINT(C_RESET, " length");
 			UINT64OUT();
-			ND_PRINT(" flen");
+			ND_PRINT(C_RESET, " flen");
 			UINT64OUT();
 			break;
 		case 65541:    /* CallBack rx conn address */
-			ND_PRINT(" addr");
+			ND_PRINT(C_RESET, " addr");
 			UINTOUT();
 		default:
 			;
@@ -1043,7 +1043,7 @@ fs_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT(" [|fs]");
+	ND_PRINT(C_RESET, " [|fs]");
 }
 
 /*
@@ -1068,7 +1068,7 @@ fs_reply_print(netdissect_options *ndo,
 	 * gleaned from fsint/afsint.xg
 	 */
 
-	ND_PRINT(" fs reply %s", tok2str(fs_req, "op#%u", opcode));
+	ND_PRINT(C_RESET, " fs reply %s", tok2str(fs_req, "op#%u", opcode));
 
 	type = GET_U_1(rxh->type);
 	bp += sizeof(struct rx_header);
@@ -1093,11 +1093,11 @@ fs_reply_print(netdissect_options *ndo,
 		}
 		case 137:	/* Create file */
 		case 141:	/* MakeDir */
-			ND_PRINT(" new");
+			ND_PRINT(C_RESET, " new");
 			FIDOUT();
 			break;
 		case 151:	/* Get root volume */
-			ND_PRINT(" root volume");
+			ND_PRINT(C_RESET, " root volume");
 			STROUT(AFSNAMEMAX);
 			break;
 		case 153:	/* Get time */
@@ -1115,15 +1115,15 @@ fs_reply_print(netdissect_options *ndo,
 		errcode = GET_BE_S_4(bp);
 		bp += sizeof(int32_t);
 
-		ND_PRINT(" error %s", tok2str(afs_fs_errors, "#%d", errcode));
+		ND_PRINT(C_RESET, " error %s", tok2str(afs_fs_errors, "#%d", errcode));
 	} else {
-		ND_PRINT(" strange fs reply of type %u", type);
+		ND_PRINT(C_RESET, " strange fs reply of type %u", type);
 	}
 
 	return;
 
 trunc:
-	ND_PRINT(" [|fs]");
+	ND_PRINT(C_RESET, " [|fs]");
 }
 
 /*
@@ -1164,7 +1164,7 @@ acl_print(netdissect_options *ndo,
 	 */
 
 #define ACLOUT(acl) \
-	ND_PRINT("%s%s%s%s%s%s%s", \
+	ND_PRINT(C_RESET, "%s%s%s%s%s%s%s", \
 	          acl & PRSFS_READ       ? "r" : "", \
 	          acl & PRSFS_LOOKUP     ? "l" : "", \
 	          acl & PRSFS_INSERT     ? "i" : "", \
@@ -1177,11 +1177,11 @@ acl_print(netdissect_options *ndo,
 		if (sscanf((char *) s, "%" NUMSTRINGIFY(USERNAMEMAX) "s %d\n%n", user, &acl, &n) != 2)
 			return;
 		s += n;
-		ND_PRINT(" +{");
+		ND_PRINT(C_RESET, " +{");
 		fn_print_str(ndo, (u_char *)user);
-		ND_PRINT(" ");
+		ND_PRINT(C_RESET, " ");
 		ACLOUT(acl);
-		ND_PRINT("}");
+		ND_PRINT(C_RESET, "}");
 		if (s > end)
 			return;
 	}
@@ -1190,11 +1190,11 @@ acl_print(netdissect_options *ndo,
 		if (sscanf((char *) s, "%" NUMSTRINGIFY(USERNAMEMAX) "s %d\n%n", user, &acl, &n) != 2)
 			return;
 		s += n;
-		ND_PRINT(" -{");
+		ND_PRINT(C_RESET, " -{");
 		fn_print_str(ndo, (u_char *)user);
-		ND_PRINT(" ");
+		ND_PRINT(C_RESET, " ");
 		ACLOUT(acl);
-		ND_PRINT("}");
+		ND_PRINT(C_RESET, "}");
 		if (s > end)
 			return;
 	}
@@ -1223,7 +1223,7 @@ cb_print(netdissect_options *ndo,
 
 	cb_op = GET_BE_U_4(bp + sizeof(struct rx_header));
 
-	ND_PRINT(" cb call %s", tok2str(cb_req, "op#%u", cb_op));
+	ND_PRINT(C_RESET, " cb call %s", tok2str(cb_req, "op#%u", cb_op));
 
 	bp += sizeof(struct rx_header) + 4;
 
@@ -1242,22 +1242,22 @@ cb_print(netdissect_options *ndo,
 			for (i = 0; i < j; i++) {
 				FIDOUT();
 				if (i != j - 1)
-					ND_PRINT(",");
+					ND_PRINT(C_RESET, ",");
 			}
 
 			if (j == 0)
-				ND_PRINT(" <none!>");
+				ND_PRINT(C_RESET, " <none!>");
 
 			j = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 
 			if (j != 0)
-				ND_PRINT(";");
+				ND_PRINT(C_RESET, ";");
 
 			for (i = 0; i < j; i++) {
-				ND_PRINT(" ver");
+				ND_PRINT(C_RESET, " ver");
 				INTOUT();
-				ND_PRINT(" expires");
+				ND_PRINT(C_RESET, " expires");
 				DATEOUT();
 				t = GET_BE_U_4(bp);
 				bp += sizeof(uint32_t);
@@ -1266,7 +1266,7 @@ cb_print(netdissect_options *ndo,
 			break;
 		}
 		case 214: {
-			ND_PRINT(" afsuuid");
+			ND_PRINT(C_RESET, " afsuuid");
 			AFSUUIDOUT();
 			break;
 		}
@@ -1277,7 +1277,7 @@ cb_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT(" [|cb]");
+	ND_PRINT(C_RESET, " [|cb]");
 }
 
 /*
@@ -1301,7 +1301,7 @@ cb_reply_print(netdissect_options *ndo,
 	 * gleaned from fsint/afscbint.xg
 	 */
 
-	ND_PRINT(" cb reply %s", tok2str(cb_req, "op#%u", opcode));
+	ND_PRINT(C_RESET, " cb reply %s", tok2str(cb_req, "op#%u", opcode));
 
 	type = GET_U_1(rxh->type);
 	bp += sizeof(struct rx_header);
@@ -1322,14 +1322,14 @@ cb_reply_print(netdissect_options *ndo,
 		/*
 		 * Otherwise, just print out the return code
 		 */
-		ND_PRINT(" errcode");
+		ND_PRINT(C_RESET, " errcode");
 		INTOUT();
 	}
 
 	return;
 
 trunc:
-	ND_PRINT(" [|cb]");
+	ND_PRINT(C_RESET, " [|cb]");
 }
 
 /*
@@ -1353,14 +1353,14 @@ prot_print(netdissect_options *ndo,
 
 	pt_op = GET_BE_U_4(bp + sizeof(struct rx_header));
 
-	ND_PRINT(" pt");
+	ND_PRINT(C_RESET, " pt");
 
 	if (is_ubik(pt_op)) {
 		ubik_print(ndo, bp);
 		return;
 	}
 
-	ND_PRINT(" call %s", tok2str(pt_req, "op#%u", pt_op));
+	ND_PRINT(C_RESET, " call %s", tok2str(pt_req, "op#%u", pt_op));
 
 	/*
 	 * Decode some of the arguments to the PT calls
@@ -1371,9 +1371,9 @@ prot_print(netdissect_options *ndo,
 	switch (pt_op) {
 		case 500:	/* I New User */
 			STROUT(PRNAMEMAX);
-			ND_PRINT(" id");
+			ND_PRINT(C_RESET, " id");
 			INTOUT();
-			ND_PRINT(" oldid");
+			ND_PRINT(C_RESET, " oldid");
 			INTOUT();
 			break;
 		case 501:	/* Where is it */
@@ -1385,19 +1385,19 @@ prot_print(netdissect_options *ndo,
 		case 518:	/* Get CPS2 */
 		case 519:	/* Get host CPS */
 		case 530:	/* List super groups */
-			ND_PRINT(" id");
+			ND_PRINT(C_RESET, " id");
 			INTOUT();
 			break;
 		case 502:	/* Dump entry */
-			ND_PRINT(" pos");
+			ND_PRINT(C_RESET, " pos");
 			INTOUT();
 			break;
 		case 503:	/* Add to group */
 		case 507:	/* Remove from group */
 		case 515:	/* Is a member of? */
-			ND_PRINT(" uid");
+			ND_PRINT(C_RESET, " uid");
 			INTOUT();
-			ND_PRINT(" gid");
+			ND_PRINT(C_RESET, " gid");
 			INTOUT();
 			break;
 		case 504:	/* Name to ID */
@@ -1417,45 +1417,45 @@ prot_print(netdissect_options *ndo,
 				VECOUT(PRNAMEMAX);
 			}
 			if (j == 0)
-				ND_PRINT(" <none!>");
+				ND_PRINT(C_RESET, " <none!>");
 		}
 			break;
 		case 505:	/* Id to name */
 		{
 			uint32_t j;
-			ND_PRINT(" ids:");
+			ND_PRINT(C_RESET, " ids:");
 			i = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 			for (j = 0; j < i; j++)
 				INTOUT();
 			if (j == 0)
-				ND_PRINT(" <none!>");
+				ND_PRINT(C_RESET, " <none!>");
 		}
 			break;
 		case 509:	/* New entry */
 			STROUT(PRNAMEMAX);
-			ND_PRINT(" flag");
+			ND_PRINT(C_RESET, " flag");
 			INTOUT();
-			ND_PRINT(" oid");
+			ND_PRINT(C_RESET, " oid");
 			INTOUT();
 			break;
 		case 511:	/* Set max */
-			ND_PRINT(" id");
+			ND_PRINT(C_RESET, " id");
 			INTOUT();
-			ND_PRINT(" gflag");
+			ND_PRINT(C_RESET, " gflag");
 			INTOUT();
 			break;
 		case 513:	/* Change entry */
-			ND_PRINT(" id");
+			ND_PRINT(C_RESET, " id");
 			INTOUT();
 			STROUT(PRNAMEMAX);
-			ND_PRINT(" oldid");
+			ND_PRINT(C_RESET, " oldid");
 			INTOUT();
-			ND_PRINT(" newid");
+			ND_PRINT(C_RESET, " newid");
 			INTOUT();
 			break;
 		case 520:	/* Update entry */
-			ND_PRINT(" id");
+			ND_PRINT(C_RESET, " id");
 			INTOUT();
 			STROUT(PRNAMEMAX);
 			break;
@@ -1467,7 +1467,7 @@ prot_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT(" [|pt]");
+	ND_PRINT(C_RESET, " [|pt]");
 }
 
 /*
@@ -1493,14 +1493,14 @@ prot_reply_print(netdissect_options *ndo,
 	 * Ubik call, however.
 	 */
 
-	ND_PRINT(" pt");
+	ND_PRINT(C_RESET, " pt");
 
 	if (is_ubik(opcode)) {
 		ubik_reply_print(ndo, bp, length, opcode);
 		return;
 	}
 
-	ND_PRINT(" reply %s", tok2str(pt_req, "op#%u", opcode));
+	ND_PRINT(C_RESET, " reply %s", tok2str(pt_req, "op#%u", opcode));
 
 	type = GET_U_1(rxh->type);
 	bp += sizeof(struct rx_header);
@@ -1514,13 +1514,13 @@ prot_reply_print(netdissect_options *ndo,
 		case 504:		/* Name to ID */
 		{
 			uint32_t j;
-			ND_PRINT(" ids:");
+			ND_PRINT(C_RESET, " ids:");
 			i = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 			for (j = 0; j < i; j++)
 				INTOUT();
 			if (j == 0)
-				ND_PRINT(" <none!>");
+				ND_PRINT(C_RESET, " <none!>");
 		}
 			break;
 		case 505:		/* ID to name */
@@ -1540,7 +1540,7 @@ prot_reply_print(netdissect_options *ndo,
 				VECOUT(PRNAMEMAX);
 			}
 			if (j == 0)
-				ND_PRINT(" <none!>");
+				ND_PRINT(C_RESET, " <none!>");
 		}
 			break;
 		case 508:		/* Get CPS */
@@ -1556,13 +1556,13 @@ prot_reply_print(netdissect_options *ndo,
 				INTOUT();
 			}
 			if (j == 0)
-				ND_PRINT(" <none!>");
+				ND_PRINT(C_RESET, " <none!>");
 		}
 			break;
 		case 510:		/* List max */
-			ND_PRINT(" maxuid");
+			ND_PRINT(C_RESET, " maxuid");
 			INTOUT();
-			ND_PRINT(" maxgid");
+			ND_PRINT(C_RESET, " maxgid");
 			INTOUT();
 			break;
 		default:
@@ -1572,14 +1572,14 @@ prot_reply_print(netdissect_options *ndo,
 		/*
 		 * Otherwise, just print out the return code
 		 */
-		ND_PRINT(" errcode");
+		ND_PRINT(C_RESET, " errcode");
 		INTOUT();
 	}
 
 	return;
 
 trunc:
-	ND_PRINT(" [|pt]");
+	ND_PRINT(C_RESET, " [|pt]");
 }
 
 /*
@@ -1603,13 +1603,13 @@ vldb_print(netdissect_options *ndo,
 
 	vldb_op = GET_BE_U_4(bp + sizeof(struct rx_header));
 
-	ND_PRINT(" vldb");
+	ND_PRINT(C_RESET, " vldb");
 
 	if (is_ubik(vldb_op)) {
 		ubik_print(ndo, bp);
 		return;
 	}
-	ND_PRINT(" call %s", tok2str(vldb_req, "op#%u", vldb_op));
+	ND_PRINT(C_RESET, " call %s", tok2str(vldb_req, "op#%u", vldb_op));
 
 	/*
 	 * Decode some of the arguments to the VLDB calls
@@ -1628,12 +1628,12 @@ vldb_print(netdissect_options *ndo,
 		case 508:	/* Set lock */
 		case 509:	/* Release lock */
 		case 518:	/* Get entry by ID N */
-			ND_PRINT(" volid");
+			ND_PRINT(C_RESET, " volid");
 			INTOUT();
 			i = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 			if (i <= 2)
-				ND_PRINT(" type %s", voltype[i]);
+				ND_PRINT(C_RESET, " type %s", voltype[i]);
 			break;
 		case 504:	/* Get entry by name */
 		case 519:	/* Get entry by name N */
@@ -1642,22 +1642,22 @@ vldb_print(netdissect_options *ndo,
 			STROUT(VLNAMEMAX);
 			break;
 		case 505:	/* Get new vol id */
-			ND_PRINT(" bump");
+			ND_PRINT(C_RESET, " bump");
 			INTOUT();
 			break;
 		case 506:	/* Replace entry */
 		case 520:	/* Replace entry N */
-			ND_PRINT(" volid");
+			ND_PRINT(C_RESET, " volid");
 			INTOUT();
 			i = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 			if (i <= 2)
-				ND_PRINT(" type %s", voltype[i]);
+				ND_PRINT(C_RESET, " type %s", voltype[i]);
 			VECOUT(VLNAMEMAX);
 			break;
 		case 510:	/* List entry */
 		case 521:	/* List entry N */
-			ND_PRINT(" index");
+			ND_PRINT(C_RESET, " index");
 			INTOUT();
 			break;
 		default:
@@ -1667,7 +1667,7 @@ vldb_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT(" [|vldb]");
+	ND_PRINT(C_RESET, " [|vldb]");
 }
 
 /*
@@ -1693,14 +1693,14 @@ vldb_reply_print(netdissect_options *ndo,
 	 * Ubik call, however.
 	 */
 
-	ND_PRINT(" vldb");
+	ND_PRINT(C_RESET, " vldb");
 
 	if (is_ubik(opcode)) {
 		ubik_reply_print(ndo, bp, length, opcode);
 		return;
 	}
 
-	ND_PRINT(" reply %s", tok2str(vldb_req, "op#%u", opcode));
+	ND_PRINT(C_RESET, " reply %s", tok2str(vldb_req, "op#%u", opcode));
 
 	type = GET_U_1(rxh->type);
 	bp += sizeof(struct rx_header);
@@ -1712,9 +1712,9 @@ vldb_reply_print(netdissect_options *ndo,
 	if (type == RX_PACKET_TYPE_DATA)
 		switch (opcode) {
 		case 510:	/* List entry */
-			ND_PRINT(" count");
+			ND_PRINT(C_RESET, " count");
 			INTOUT();
-			ND_PRINT(" nextindex");
+			ND_PRINT(C_RESET, " nextindex");
 			INTOUT();
 			ND_FALL_THROUGH;
 		case 503:	/* Get entry by id */
@@ -1723,80 +1723,80 @@ vldb_reply_print(netdissect_options *ndo,
 			VECOUT(VLNAMEMAX);
 			ND_TCHECK_4(bp);
 			bp += sizeof(uint32_t);
-			ND_PRINT(" numservers");
+			ND_PRINT(C_RESET, " numservers");
 			nservers = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
-			ND_PRINT(" %u", nservers);
-			ND_PRINT(" servers");
+			ND_PRINT(C_RESET, " %u", nservers);
+			ND_PRINT(C_RESET, " servers");
 			for (i = 0; i < 8; i++) {
 				ND_TCHECK_4(bp);
 				if (i < nservers)
-					ND_PRINT(" %s",
+					ND_PRINT(C_RESET, " %s",
 					   intoa(GET_IPV4_TO_NETWORK_ORDER(bp)));
 				bp += sizeof(nd_ipv4);
 			}
-			ND_PRINT(" partitions");
+			ND_PRINT(C_RESET, " partitions");
 			for (i = 0; i < 8; i++) {
 				j = GET_BE_U_4(bp);
 				if (i < nservers && j <= 26)
-					ND_PRINT(" %c", 'a' + j);
+					ND_PRINT(C_RESET, " %c", 'a' + j);
 				else if (i < nservers)
-					ND_PRINT(" %u", j);
+					ND_PRINT(C_RESET, " %u", j);
 				bp += sizeof(uint32_t);
 			}
 			ND_TCHECK_LEN(bp, 8 * sizeof(uint32_t));
 			bp += 8 * sizeof(uint32_t);
-			ND_PRINT(" rwvol");
+			ND_PRINT(C_RESET, " rwvol");
 			UINTOUT();
-			ND_PRINT(" rovol");
+			ND_PRINT(C_RESET, " rovol");
 			UINTOUT();
-			ND_PRINT(" backup");
+			ND_PRINT(C_RESET, " backup");
 			UINTOUT();
 		}
 			break;
 		case 505:	/* Get new volume ID */
-			ND_PRINT(" newvol");
+			ND_PRINT(C_RESET, " newvol");
 			UINTOUT();
 			break;
 		case 521:	/* List entry */
 		case 529:	/* List entry U */
-			ND_PRINT(" count");
+			ND_PRINT(C_RESET, " count");
 			INTOUT();
-			ND_PRINT(" nextindex");
+			ND_PRINT(C_RESET, " nextindex");
 			INTOUT();
 			ND_FALL_THROUGH;
 		case 518:	/* Get entry by ID N */
 		case 519:	/* Get entry by name N */
 		{	uint32_t nservers, j;
 			VECOUT(VLNAMEMAX);
-			ND_PRINT(" numservers");
+			ND_PRINT(C_RESET, " numservers");
 			nservers = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
-			ND_PRINT(" %u", nservers);
-			ND_PRINT(" servers");
+			ND_PRINT(C_RESET, " %u", nservers);
+			ND_PRINT(C_RESET, " servers");
 			for (i = 0; i < 13; i++) {
 				ND_TCHECK_4(bp);
 				if (i < nservers)
-					ND_PRINT(" %s",
+					ND_PRINT(C_RESET, " %s",
 					   intoa(GET_IPV4_TO_NETWORK_ORDER(bp)));
 				bp += sizeof(nd_ipv4);
 			}
-			ND_PRINT(" partitions");
+			ND_PRINT(C_RESET, " partitions");
 			for (i = 0; i < 13; i++) {
 				j = GET_BE_U_4(bp);
 				if (i < nservers && j <= 26)
-					ND_PRINT(" %c", 'a' + j);
+					ND_PRINT(C_RESET, " %c", 'a' + j);
 				else if (i < nservers)
-					ND_PRINT(" %u", j);
+					ND_PRINT(C_RESET, " %u", j);
 				bp += sizeof(uint32_t);
 			}
 			ND_TCHECK_LEN(bp, 13 * sizeof(uint32_t));
 			bp += 13 * sizeof(uint32_t);
-			ND_PRINT(" rwvol");
+			ND_PRINT(C_RESET, " rwvol");
 			UINTOUT();
-			ND_PRINT(" rovol");
+			ND_PRINT(C_RESET, " rovol");
 			UINTOUT();
-			ND_PRINT(" backup");
+			ND_PRINT(C_RESET, " backup");
 			UINTOUT();
 		}
 			break;
@@ -1804,14 +1804,14 @@ vldb_reply_print(netdissect_options *ndo,
 		case 527:	/* Get entry by name U */
 		{	uint32_t nservers, j;
 			VECOUT(VLNAMEMAX);
-			ND_PRINT(" numservers");
+			ND_PRINT(C_RESET, " numservers");
 			nservers = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
-			ND_PRINT(" %u", nservers);
-			ND_PRINT(" servers");
+			ND_PRINT(C_RESET, " %u", nservers);
+			ND_PRINT(C_RESET, " servers");
 			for (i = 0; i < 13; i++) {
 				if (i < nservers) {
-					ND_PRINT(" afsuuid");
+					ND_PRINT(C_RESET, " afsuuid");
 					AFSUUIDOUT();
 				} else {
 					ND_TCHECK_LEN(bp, 44);
@@ -1820,22 +1820,22 @@ vldb_reply_print(netdissect_options *ndo,
 			}
 			ND_TCHECK_LEN(bp, 4 * 13);
 			bp += 4 * 13;
-			ND_PRINT(" partitions");
+			ND_PRINT(C_RESET, " partitions");
 			for (i = 0; i < 13; i++) {
 				j = GET_BE_U_4(bp);
 				if (i < nservers && j <= 26)
-					ND_PRINT(" %c", 'a' + j);
+					ND_PRINT(C_RESET, " %c", 'a' + j);
 				else if (i < nservers)
-					ND_PRINT(" %u", j);
+					ND_PRINT(C_RESET, " %u", j);
 				bp += sizeof(uint32_t);
 			}
 			ND_TCHECK_LEN(bp, 13 * sizeof(uint32_t));
 			bp += 13 * sizeof(uint32_t);
-			ND_PRINT(" rwvol");
+			ND_PRINT(C_RESET, " rwvol");
 			UINTOUT();
-			ND_PRINT(" rovol");
+			ND_PRINT(C_RESET, " rovol");
 			UINTOUT();
-			ND_PRINT(" backup");
+			ND_PRINT(C_RESET, " backup");
 			UINTOUT();
 		}
 		default:
@@ -1846,14 +1846,14 @@ vldb_reply_print(netdissect_options *ndo,
 		/*
 		 * Otherwise, just print out the return code
 		 */
-		ND_PRINT(" errcode");
+		ND_PRINT(C_RESET, " errcode");
 		INTOUT();
 	}
 
 	return;
 
 trunc:
-	ND_PRINT(" [|vldb]");
+	ND_PRINT(C_RESET, " [|vldb]");
 }
 
 /*
@@ -1876,7 +1876,7 @@ kauth_print(netdissect_options *ndo,
 
 	kauth_op = GET_BE_U_4(bp + sizeof(struct rx_header));
 
-	ND_PRINT(" kauth");
+	ND_PRINT(C_RESET, " kauth");
 
 	if (is_ubik(kauth_op)) {
 		ubik_print(ndo, bp);
@@ -1884,7 +1884,7 @@ kauth_print(netdissect_options *ndo,
 	}
 
 
-	ND_PRINT(" call %s", tok2str(kauth_req, "op#%u", kauth_op));
+	ND_PRINT(C_RESET, " call %s", tok2str(kauth_req, "op#%u", kauth_op));
 
 	/*
 	 * Decode some of the arguments to the KA calls
@@ -1903,7 +1903,7 @@ kauth_print(netdissect_options *ndo,
 		case 8:		/* Get entry */
 		case 14:	/* Unlock */
 		case 15:	/* Lock status */
-			ND_PRINT(" principal");
+			ND_PRINT(C_RESET, " principal");
 			STROUT(KANAMEMAX);
 			STROUT(KANAMEMAX);
 			break;
@@ -1911,28 +1911,28 @@ kauth_print(netdissect_options *ndo,
 		case 23:	/* GetTicket */
 		{
 			uint32_t i;
-			ND_PRINT(" kvno");
+			ND_PRINT(C_RESET, " kvno");
 			INTOUT();
-			ND_PRINT(" domain");
+			ND_PRINT(C_RESET, " domain");
 			STROUT(KANAMEMAX);
 			i = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 			ND_TCHECK_LEN(bp, i);
 			bp += i;
-			ND_PRINT(" principal");
+			ND_PRINT(C_RESET, " principal");
 			STROUT(KANAMEMAX);
 			STROUT(KANAMEMAX);
 			break;
 		}
 		case 4:		/* Set Password */
-			ND_PRINT(" principal");
+			ND_PRINT(C_RESET, " principal");
 			STROUT(KANAMEMAX);
 			STROUT(KANAMEMAX);
-			ND_PRINT(" kvno");
+			ND_PRINT(C_RESET, " kvno");
 			INTOUT();
 			break;
 		case 12:	/* Get password */
-			ND_PRINT(" name");
+			ND_PRINT(C_RESET, " name");
 			STROUT(KANAMEMAX);
 			break;
 		default:
@@ -1942,7 +1942,7 @@ kauth_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT(" [|kauth]");
+	ND_PRINT(C_RESET, " [|kauth]");
 }
 
 /*
@@ -1966,14 +1966,14 @@ kauth_reply_print(netdissect_options *ndo,
 	 * gleaned from kauth/kauth.rg
 	 */
 
-	ND_PRINT(" kauth");
+	ND_PRINT(C_RESET, " kauth");
 
 	if (is_ubik(opcode)) {
 		ubik_reply_print(ndo, bp, length, opcode);
 		return;
 	}
 
-	ND_PRINT(" reply %s", tok2str(kauth_req, "op#%u", opcode));
+	ND_PRINT(C_RESET, " reply %s", tok2str(kauth_req, "op#%u", opcode));
 
 	type = GET_U_1(rxh->type);
 	bp += sizeof(struct rx_header);
@@ -1989,7 +1989,7 @@ kauth_reply_print(netdissect_options *ndo,
 		/*
 		 * Otherwise, just print out the return code
 		 */
-		ND_PRINT(" errcode");
+		ND_PRINT(C_RESET, " errcode");
 		INTOUT();
 	}
 }
@@ -2014,126 +2014,126 @@ vol_print(netdissect_options *ndo,
 
 	vol_op = GET_BE_U_4(bp + sizeof(struct rx_header));
 
-	ND_PRINT(" vol call %s", tok2str(vol_req, "op#%u", vol_op));
+	ND_PRINT(C_RESET, " vol call %s", tok2str(vol_req, "op#%u", vol_op));
 
 	bp += sizeof(struct rx_header) + 4;
 
 	switch (vol_op) {
 		case 100:	/* Create volume */
-			ND_PRINT(" partition");
+			ND_PRINT(C_RESET, " partition");
 			UINTOUT();
-			ND_PRINT(" name");
+			ND_PRINT(C_RESET, " name");
 			STROUT(AFSNAMEMAX);
-			ND_PRINT(" type");
+			ND_PRINT(C_RESET, " type");
 			UINTOUT();
-			ND_PRINT(" parent");
+			ND_PRINT(C_RESET, " parent");
 			UINTOUT();
 			break;
 		case 101:	/* Delete volume */
 		case 107:	/* Get flags */
-			ND_PRINT(" trans");
+			ND_PRINT(C_RESET, " trans");
 			UINTOUT();
 			break;
 		case 102:	/* Restore */
-			ND_PRINT(" totrans");
+			ND_PRINT(C_RESET, " totrans");
 			UINTOUT();
-			ND_PRINT(" flags");
+			ND_PRINT(C_RESET, " flags");
 			UINTOUT();
 			break;
 		case 103:	/* Forward */
-			ND_PRINT(" fromtrans");
+			ND_PRINT(C_RESET, " fromtrans");
 			UINTOUT();
-			ND_PRINT(" fromdate");
+			ND_PRINT(C_RESET, " fromdate");
 			DATEOUT();
 			DESTSERVEROUT();
-			ND_PRINT(" desttrans");
+			ND_PRINT(C_RESET, " desttrans");
 			INTOUT();
 			break;
 		case 104:	/* End trans */
-			ND_PRINT(" trans");
+			ND_PRINT(C_RESET, " trans");
 			UINTOUT();
 			break;
 		case 105:	/* Clone */
-			ND_PRINT(" trans");
+			ND_PRINT(C_RESET, " trans");
 			UINTOUT();
-			ND_PRINT(" purgevol");
+			ND_PRINT(C_RESET, " purgevol");
 			UINTOUT();
-			ND_PRINT(" newtype");
+			ND_PRINT(C_RESET, " newtype");
 			UINTOUT();
-			ND_PRINT(" newname");
+			ND_PRINT(C_RESET, " newname");
 			STROUT(AFSNAMEMAX);
 			break;
 		case 106:	/* Set flags */
-			ND_PRINT(" trans");
+			ND_PRINT(C_RESET, " trans");
 			UINTOUT();
-			ND_PRINT(" flags");
+			ND_PRINT(C_RESET, " flags");
 			UINTOUT();
 			break;
 		case 108:	/* Trans create */
-			ND_PRINT(" vol");
+			ND_PRINT(C_RESET, " vol");
 			UINTOUT();
-			ND_PRINT(" partition");
+			ND_PRINT(C_RESET, " partition");
 			UINTOUT();
-			ND_PRINT(" flags");
+			ND_PRINT(C_RESET, " flags");
 			UINTOUT();
 			break;
 		case 109:	/* Dump */
 		case 655537:	/* Get size */
-			ND_PRINT(" fromtrans");
+			ND_PRINT(C_RESET, " fromtrans");
 			UINTOUT();
-			ND_PRINT(" fromdate");
+			ND_PRINT(C_RESET, " fromdate");
 			DATEOUT();
 			break;
 		case 110:	/* Get n-th volume */
-			ND_PRINT(" index");
+			ND_PRINT(C_RESET, " index");
 			UINTOUT();
 			break;
 		case 111:	/* Set forwarding */
-			ND_PRINT(" tid");
+			ND_PRINT(C_RESET, " tid");
 			UINTOUT();
-			ND_PRINT(" newsite");
+			ND_PRINT(C_RESET, " newsite");
 			UINTOUT();
 			break;
 		case 112:	/* Get name */
 		case 113:	/* Get status */
-			ND_PRINT(" tid");
+			ND_PRINT(C_RESET, " tid");
 			break;
 		case 114:	/* Signal restore */
-			ND_PRINT(" name");
+			ND_PRINT(C_RESET, " name");
 			STROUT(AFSNAMEMAX);
-			ND_PRINT(" type");
+			ND_PRINT(C_RESET, " type");
 			UINTOUT();
-			ND_PRINT(" pid");
+			ND_PRINT(C_RESET, " pid");
 			UINTOUT();
-			ND_PRINT(" cloneid");
+			ND_PRINT(C_RESET, " cloneid");
 			UINTOUT();
 			break;
 		case 116:	/* List volumes */
-			ND_PRINT(" partition");
+			ND_PRINT(C_RESET, " partition");
 			UINTOUT();
-			ND_PRINT(" flags");
+			ND_PRINT(C_RESET, " flags");
 			UINTOUT();
 			break;
 		case 117:	/* Set id types */
-			ND_PRINT(" tid");
+			ND_PRINT(C_RESET, " tid");
 			UINTOUT();
-			ND_PRINT(" name");
+			ND_PRINT(C_RESET, " name");
 			STROUT(AFSNAMEMAX);
-			ND_PRINT(" type");
+			ND_PRINT(C_RESET, " type");
 			UINTOUT();
-			ND_PRINT(" pid");
+			ND_PRINT(C_RESET, " pid");
 			UINTOUT();
-			ND_PRINT(" clone");
+			ND_PRINT(C_RESET, " clone");
 			UINTOUT();
-			ND_PRINT(" backup");
+			ND_PRINT(C_RESET, " backup");
 			UINTOUT();
 			break;
 		case 119:	/* Partition info */
-			ND_PRINT(" name");
+			ND_PRINT(C_RESET, " name");
 			STROUT(AFSNAMEMAX);
 			break;
 		case 120:	/* Reclone */
-			ND_PRINT(" tid");
+			ND_PRINT(C_RESET, " tid");
 			UINTOUT();
 			break;
 		case 121:	/* List one volume */
@@ -2141,25 +2141,25 @@ vol_print(netdissect_options *ndo,
 		case 124:	/* Extended List volumes */
 		case 125:	/* Extended List one volume */
 		case 65536:	/* Convert RO to RW volume */
-			ND_PRINT(" partid");
+			ND_PRINT(C_RESET, " partid");
 			UINTOUT();
-			ND_PRINT(" volid");
+			ND_PRINT(C_RESET, " volid");
 			UINTOUT();
 			break;
 		case 123:	/* Set date */
-			ND_PRINT(" tid");
+			ND_PRINT(C_RESET, " tid");
 			UINTOUT();
-			ND_PRINT(" date");
+			ND_PRINT(C_RESET, " date");
 			DATEOUT();
 			break;
 		case 126:	/* Set info */
-			ND_PRINT(" tid");
+			ND_PRINT(C_RESET, " tid");
 			UINTOUT();
 			break;
 		case 128:	/* Forward multiple */
-			ND_PRINT(" fromtrans");
+			ND_PRINT(C_RESET, " fromtrans");
 			UINTOUT();
-			ND_PRINT(" fromdate");
+			ND_PRINT(C_RESET, " fromdate");
 			DATEOUT();
 			{
 				uint32_t i, j;
@@ -2168,18 +2168,18 @@ vol_print(netdissect_options *ndo,
 				for (i = 0; i < j; i++) {
 					DESTSERVEROUT();
 					if (i != j - 1)
-						ND_PRINT(",");
+						ND_PRINT(C_RESET, ",");
 				}
 				if (j == 0)
-					ND_PRINT(" <none!>");
+					ND_PRINT(C_RESET, " <none!>");
 			}
 			break;
 		case 65538:	/* Dump version 2 */
-			ND_PRINT(" fromtrans");
+			ND_PRINT(C_RESET, " fromtrans");
 			UINTOUT();
-			ND_PRINT(" fromdate");
+			ND_PRINT(C_RESET, " fromdate");
 			DATEOUT();
-			ND_PRINT(" flags");
+			ND_PRINT(C_RESET, " flags");
 			UINTOUT();
 			break;
 		default:
@@ -2188,7 +2188,7 @@ vol_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT(" [|vol]");
+	ND_PRINT(C_RESET, " [|vol]");
 }
 
 /*
@@ -2212,7 +2212,7 @@ vol_reply_print(netdissect_options *ndo,
 	 * gleaned from volser/volint.xg
 	 */
 
-	ND_PRINT(" vol reply %s", tok2str(vol_req, "op#%u", opcode));
+	ND_PRINT(C_RESET, " vol reply %s", tok2str(vol_req, "op#%u", opcode));
 
 	type = GET_U_1(rxh->type);
 	bp += sizeof(struct rx_header);
@@ -2224,66 +2224,66 @@ vol_reply_print(netdissect_options *ndo,
 	if (type == RX_PACKET_TYPE_DATA) {
 		switch (opcode) {
 			case 100:	/* Create volume */
-				ND_PRINT(" volid");
+				ND_PRINT(C_RESET, " volid");
 				UINTOUT();
-				ND_PRINT(" trans");
+				ND_PRINT(C_RESET, " trans");
 				UINTOUT();
 				break;
 			case 104:	/* End transaction */
 				UINTOUT();
 				break;
 			case 105:	/* Clone */
-				ND_PRINT(" newvol");
+				ND_PRINT(C_RESET, " newvol");
 				UINTOUT();
 				break;
 			case 107:	/* Get flags */
 				UINTOUT();
 				break;
 			case 108:	/* Transaction create */
-				ND_PRINT(" trans");
+				ND_PRINT(C_RESET, " trans");
 				UINTOUT();
 				break;
 			case 110:	/* Get n-th volume */
-				ND_PRINT(" volume");
+				ND_PRINT(C_RESET, " volume");
 				UINTOUT();
-				ND_PRINT(" partition");
+				ND_PRINT(C_RESET, " partition");
 				UINTOUT();
 				break;
 			case 112:	/* Get name */
 				STROUT(AFSNAMEMAX);
 				break;
 			case 113:	/* Get status */
-				ND_PRINT(" volid");
+				ND_PRINT(C_RESET, " volid");
 				UINTOUT();
-				ND_PRINT(" nextuniq");
+				ND_PRINT(C_RESET, " nextuniq");
 				UINTOUT();
-				ND_PRINT(" type");
+				ND_PRINT(C_RESET, " type");
 				UINTOUT();
-				ND_PRINT(" parentid");
+				ND_PRINT(C_RESET, " parentid");
 				UINTOUT();
-				ND_PRINT(" clone");
+				ND_PRINT(C_RESET, " clone");
 				UINTOUT();
-				ND_PRINT(" backup");
+				ND_PRINT(C_RESET, " backup");
 				UINTOUT();
-				ND_PRINT(" restore");
+				ND_PRINT(C_RESET, " restore");
 				UINTOUT();
-				ND_PRINT(" maxquota");
+				ND_PRINT(C_RESET, " maxquota");
 				UINTOUT();
-				ND_PRINT(" minquota");
+				ND_PRINT(C_RESET, " minquota");
 				UINTOUT();
-				ND_PRINT(" owner");
+				ND_PRINT(C_RESET, " owner");
 				UINTOUT();
-				ND_PRINT(" create");
+				ND_PRINT(C_RESET, " create");
 				DATEOUT();
-				ND_PRINT(" access");
+				ND_PRINT(C_RESET, " access");
 				DATEOUT();
-				ND_PRINT(" update");
+				ND_PRINT(C_RESET, " update");
 				DATEOUT();
-				ND_PRINT(" expire");
+				ND_PRINT(C_RESET, " expire");
 				DATEOUT();
-				ND_PRINT(" backup");
+				ND_PRINT(C_RESET, " backup");
 				DATEOUT();
-				ND_PRINT(" copy");
+				ND_PRINT(C_RESET, " copy");
 				DATEOUT();
 				break;
 			case 115:	/* Old list partitions */
@@ -2295,17 +2295,17 @@ vol_reply_print(netdissect_options *ndo,
 					j = GET_BE_U_4(bp);
 					bp += sizeof(uint32_t);
 					for (i = 0; i < j; i++) {
-						ND_PRINT(" name");
+						ND_PRINT(C_RESET, " name");
 						VECOUT(32);
-						ND_PRINT(" volid");
+						ND_PRINT(C_RESET, " volid");
 						UINTOUT();
-						ND_PRINT(" type");
+						ND_PRINT(C_RESET, " type");
 						bp += sizeof(uint32_t) * 21;
 						if (i != j - 1)
-							ND_PRINT(",");
+							ND_PRINT(C_RESET, ",");
 					}
 					if (j == 0)
-						ND_PRINT(" <none!>");
+						ND_PRINT(C_RESET, " <none!>");
 				}
 				break;
 
@@ -2317,14 +2317,14 @@ vol_reply_print(netdissect_options *ndo,
 		/*
 		 * Otherwise, just print out the return code
 		 */
-		ND_PRINT(" errcode");
+		ND_PRINT(C_RESET, " errcode");
 		INTOUT();
 	}
 
 	return;
 
 trunc:
-	ND_PRINT(" [|vol]");
+	ND_PRINT(C_RESET, " [|vol]");
 }
 
 /*
@@ -2347,7 +2347,7 @@ bos_print(netdissect_options *ndo,
 
 	bos_op = GET_BE_U_4(bp + sizeof(struct rx_header));
 
-	ND_PRINT(" bos call %s", tok2str(bos_req, "op#%u", bos_op));
+	ND_PRINT(C_RESET, " bos call %s", tok2str(bos_req, "op#%u", bos_op));
 
 	/*
 	 * Decode some of the arguments to the BOS calls
@@ -2357,9 +2357,9 @@ bos_print(netdissect_options *ndo,
 
 	switch (bos_op) {
 		case 80:	/* Create B node */
-			ND_PRINT(" type");
+			ND_PRINT(C_RESET, " type");
 			STROUT(BOSNAMEMAX);
-			ND_PRINT(" instance");
+			ND_PRINT(C_RESET, " instance");
 			STROUT(BOSNAMEMAX);
 			break;
 		case 81:	/* Delete B node */
@@ -2380,12 +2380,12 @@ bos_print(netdissect_options *ndo,
 		case 82:	/* Set status */
 		case 98:	/* Set T status */
 			STROUT(BOSNAMEMAX);
-			ND_PRINT(" status");
+			ND_PRINT(C_RESET, " status");
 			INTOUT();
 			break;
 		case 86:	/* Get instance parm */
 			STROUT(BOSNAMEMAX);
-			ND_PRINT(" num");
+			ND_PRINT(C_RESET, " num");
 			INTOUT();
 			break;
 		case 84:	/* Enumerate instance */
@@ -2398,11 +2398,11 @@ bos_print(netdissect_options *ndo,
 			break;
 		case 105:	/* Install */
 			STROUT(BOSNAMEMAX);
-			ND_PRINT(" size");
+			ND_PRINT(C_RESET, " size");
 			INTOUT();
-			ND_PRINT(" flags");
+			ND_PRINT(C_RESET, " flags");
 			INTOUT();
-			ND_PRINT(" date");
+			ND_PRINT(C_RESET, " date");
 			INTOUT();
 			break;
 		default:
@@ -2412,7 +2412,7 @@ bos_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT(" [|bos]");
+	ND_PRINT(C_RESET, " [|bos]");
 }
 
 /*
@@ -2436,7 +2436,7 @@ bos_reply_print(netdissect_options *ndo,
 	 * gleaned from volser/volint.xg
 	 */
 
-	ND_PRINT(" bos reply %s", tok2str(bos_req, "op#%u", opcode));
+	ND_PRINT(C_RESET, " bos reply %s", tok2str(bos_req, "op#%u", opcode));
 
 	type = GET_U_1(rxh->type);
 	bp += sizeof(struct rx_header);
@@ -2452,7 +2452,7 @@ bos_reply_print(netdissect_options *ndo,
 		/*
 		 * Otherwise, just print out the return code
 		 */
-		ND_PRINT(" errcode");
+		ND_PRINT(C_RESET, " errcode");
 		INTOUT();
 	}
 }
@@ -2493,7 +2493,7 @@ ubik_print(netdissect_options *ndo,
 	 */
 	ubik_op = GET_BE_U_4(bp + sizeof(struct rx_header));
 
-	ND_PRINT(" ubik call %s", tok2str(ubik_req, "op#%u", ubik_op));
+	ND_PRINT(C_RESET, " ubik call %s", tok2str(ubik_req, "op#%u", ubik_op));
 
 	/*
 	 * Decode some of the arguments to the Ubik calls
@@ -2505,16 +2505,16 @@ ubik_print(netdissect_options *ndo,
 		case 10000:		/* Beacon */
 			temp = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
-			ND_PRINT(" syncsite %s", temp ? "yes" : "no");
-			ND_PRINT(" votestart");
+			ND_PRINT(C_RESET, " syncsite %s", temp ? "yes" : "no");
+			ND_PRINT(C_RESET, " votestart");
 			DATEOUT();
-			ND_PRINT(" dbversion");
+			ND_PRINT(C_RESET, " dbversion");
 			UBIK_VERSIONOUT();
-			ND_PRINT(" tid");
+			ND_PRINT(C_RESET, " tid");
 			UBIK_VERSIONOUT();
 			break;
 		case 10003:		/* Get sync site */
-			ND_PRINT(" site");
+			ND_PRINT(C_RESET, " site");
 			UINTOUT();
 			break;
 		case 20000:		/* Begin */
@@ -2522,56 +2522,56 @@ ubik_print(netdissect_options *ndo,
 		case 20007:		/* Abort */
 		case 20008:		/* Release locks */
 		case 20010:		/* Writev */
-			ND_PRINT(" tid");
+			ND_PRINT(C_RESET, " tid");
 			UBIK_VERSIONOUT();
 			break;
 		case 20002:		/* Lock */
-			ND_PRINT(" tid");
+			ND_PRINT(C_RESET, " tid");
 			UBIK_VERSIONOUT();
-			ND_PRINT(" file");
+			ND_PRINT(C_RESET, " file");
 			INTOUT();
-			ND_PRINT(" pos");
+			ND_PRINT(C_RESET, " pos");
 			INTOUT();
-			ND_PRINT(" length");
+			ND_PRINT(C_RESET, " length");
 			INTOUT();
 			temp = GET_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 			tok2str(ubik_lock_types, "type %u", temp);
 			break;
 		case 20003:		/* Write */
-			ND_PRINT(" tid");
+			ND_PRINT(C_RESET, " tid");
 			UBIK_VERSIONOUT();
-			ND_PRINT(" file");
+			ND_PRINT(C_RESET, " file");
 			INTOUT();
-			ND_PRINT(" pos");
+			ND_PRINT(C_RESET, " pos");
 			INTOUT();
 			break;
 		case 20005:		/* Get file */
-			ND_PRINT(" file");
+			ND_PRINT(C_RESET, " file");
 			INTOUT();
 			break;
 		case 20006:		/* Send file */
-			ND_PRINT(" file");
+			ND_PRINT(C_RESET, " file");
 			INTOUT();
-			ND_PRINT(" length");
+			ND_PRINT(C_RESET, " length");
 			INTOUT();
-			ND_PRINT(" dbversion");
+			ND_PRINT(C_RESET, " dbversion");
 			UBIK_VERSIONOUT();
 			break;
 		case 20009:		/* Truncate */
-			ND_PRINT(" tid");
+			ND_PRINT(C_RESET, " tid");
 			UBIK_VERSIONOUT();
-			ND_PRINT(" file");
+			ND_PRINT(C_RESET, " file");
 			INTOUT();
-			ND_PRINT(" length");
+			ND_PRINT(C_RESET, " length");
 			INTOUT();
 			break;
 		case 20012:		/* Set version */
-			ND_PRINT(" tid");
+			ND_PRINT(C_RESET, " tid");
 			UBIK_VERSIONOUT();
-			ND_PRINT(" oldversion");
+			ND_PRINT(C_RESET, " oldversion");
 			UBIK_VERSIONOUT();
-			ND_PRINT(" newversion");
+			ND_PRINT(C_RESET, " newversion");
 			UBIK_VERSIONOUT();
 			break;
 		default:
@@ -2581,7 +2581,7 @@ ubik_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT(" [|ubik]");
+	ND_PRINT(C_RESET, " [|ubik]");
 }
 
 /*
@@ -2605,7 +2605,7 @@ ubik_reply_print(netdissect_options *ndo,
 	 * from ubik/ubik_int.xg
 	 */
 
-	ND_PRINT(" ubik reply %s", tok2str(ubik_req, "op#%u", opcode));
+	ND_PRINT(C_RESET, " ubik reply %s", tok2str(ubik_req, "op#%u", opcode));
 
 	type = GET_U_1(rxh->type);
 	bp += sizeof(struct rx_header);
@@ -2617,10 +2617,10 @@ ubik_reply_print(netdissect_options *ndo,
 	if (type == RX_PACKET_TYPE_DATA)
 		switch (opcode) {
 		case 10000:		/* Beacon */
-			ND_PRINT(" vote no");
+			ND_PRINT(C_RESET, " vote no");
 			break;
 		case 20004:		/* Get version */
-			ND_PRINT(" dbversion");
+			ND_PRINT(C_RESET, " dbversion");
 			UBIK_VERSIONOUT();
 			break;
 		default:
@@ -2636,18 +2636,18 @@ ubik_reply_print(netdissect_options *ndo,
 	else
 		switch (opcode) {
 		case 10000:		/* Beacon */
-			ND_PRINT(" vote yes until");
+			ND_PRINT(C_RESET, " vote yes until");
 			DATEOUT();
 			break;
 		default:
-			ND_PRINT(" errcode");
+			ND_PRINT(C_RESET, " errcode");
 			INTOUT();
 		}
 
 	return;
 
 trunc:
-	ND_PRINT(" [|ubik]");
+	ND_PRINT(C_RESET, " [|ubik]");
 }
 
 /*
@@ -2678,12 +2678,12 @@ rx_ack_print(netdissect_options *ndo,
 	 */
 
 	if (ndo->ndo_vflag > 2)
-		ND_PRINT(" bufspace %u maxskew %u",
+		ND_PRINT(C_RESET, " bufspace %u maxskew %u",
 		       GET_BE_U_2(rxa->bufferSpace),
 		       GET_BE_U_2(rxa->maxSkew));
 
 	firstPacket = GET_BE_U_4(rxa->firstPacket);
-	ND_PRINT(" first %u serial %u reason %s",
+	ND_PRINT(C_RESET, " first %u serial %u reason %s",
 	       firstPacket, GET_BE_U_4(rxa->serial),
 	       tok2str(rx_ack_reasons, "#%u", GET_U_1(rxa->reason)));
 
@@ -2727,7 +2727,7 @@ rx_ack_print(netdissect_options *ndo,
 				 */
 
 				if (last == -2) {
-					ND_PRINT(" acked %u", firstPacket + i);
+					ND_PRINT(C_RESET, " acked %u", firstPacket + i);
 					start = i;
 				}
 
@@ -2741,7 +2741,7 @@ rx_ack_print(netdissect_options *ndo,
 				 */
 
 				else if (last != i - 1) {
-					ND_PRINT(",%u", firstPacket + i);
+					ND_PRINT(C_RESET, ",%u", firstPacket + i);
 					start = i;
 				}
 
@@ -2767,7 +2767,7 @@ rx_ack_print(netdissect_options *ndo,
 				 * range.
 				 */
 			} else if (last == i - 1 && start != last)
-				ND_PRINT("-%u", firstPacket + i - 1);
+				ND_PRINT(C_RESET, "-%u", firstPacket + i - 1);
 
 		/*
 		 * So, what's going on here?  We ran off the end of the
@@ -2781,7 +2781,7 @@ rx_ack_print(netdissect_options *ndo,
 		 */
 
 		if (last == i - 1 && start != last)
-			ND_PRINT("-%u", firstPacket + i - 1);
+			ND_PRINT(C_RESET, "-%u", firstPacket + i - 1);
 
 		/*
 		 * Same as above, just without comments
@@ -2790,18 +2790,18 @@ rx_ack_print(netdissect_options *ndo,
 		for (i = 0, start = last = -2; i < nAcks; i++)
 			if (GET_U_1(bp + i) == RX_ACK_TYPE_NACK) {
 				if (last == -2) {
-					ND_PRINT(" nacked %u", firstPacket + i);
+					ND_PRINT(C_RESET, " nacked %u", firstPacket + i);
 					start = i;
 				} else if (last != i - 1) {
-					ND_PRINT(",%u", firstPacket + i);
+					ND_PRINT(C_RESET, ",%u", firstPacket + i);
 					start = i;
 				}
 				last = i;
 			} else if (last == i - 1 && start != last)
-				ND_PRINT("-%u", firstPacket + i - 1);
+				ND_PRINT(C_RESET, "-%u", firstPacket + i - 1);
 
 		if (last == i - 1 && start != last)
-			ND_PRINT("-%u", firstPacket + i - 1);
+			ND_PRINT(C_RESET, "-%u", firstPacket + i - 1);
 
 		bp += nAcks;
 	}
@@ -2818,25 +2818,25 @@ rx_ack_print(netdissect_options *ndo,
 
 	if (ndo->ndo_vflag > 1) {
 		TRUNCRET(4);
-		ND_PRINT(" ifmtu");
+		ND_PRINT(C_RESET, " ifmtu");
 		UINTOUT();
 
 		TRUNCRET(4);
-		ND_PRINT(" maxmtu");
+		ND_PRINT(C_RESET, " maxmtu");
 		UINTOUT();
 
 		TRUNCRET(4);
-		ND_PRINT(" rwind");
+		ND_PRINT(C_RESET, " rwind");
 		UINTOUT();
 
 		TRUNCRET(4);
-		ND_PRINT(" maxpackets");
+		ND_PRINT(C_RESET, " maxpackets");
 		UINTOUT();
 	}
 
 	return;
 
 trunc:
-	ND_PRINT(" [|ack]");
+	ND_PRINT(C_RESET, " [|ack]");
 }
 #undef TRUNCRET

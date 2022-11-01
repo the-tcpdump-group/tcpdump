@@ -77,7 +77,7 @@ mobile_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		nd_print_trunc(ndo);
 		return;
 	}
-	ND_PRINT("mobile: ");
+	ND_PRINT(C_RESET, "mobile: ");
 
 	proto = GET_BE_U_2(mob->proto);
 	crc =  GET_BE_U_2(mob->hcheck);
@@ -86,19 +86,19 @@ mobile_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	}
 
 	if (osp)  {
-		ND_PRINT("[S] ");
+		ND_PRINT(C_RESET, "[S] ");
 		if (ndo->ndo_vflag)
-			ND_PRINT("%s ", GET_IPADDR_STRING(mob->osrc));
+			ND_PRINT(C_RESET, "%s ", GET_IPADDR_STRING(mob->osrc));
 	} else {
-		ND_PRINT("[] ");
+		ND_PRINT(C_RESET, "[] ");
 	}
 	if (ndo->ndo_vflag) {
-		ND_PRINT("> %s ", GET_IPADDR_STRING(mob->odst));
-		ND_PRINT("(oproto=%u)", proto>>8);
+		ND_PRINT(C_RESET, "> %s ", GET_IPADDR_STRING(mob->odst));
+		ND_PRINT(C_RESET, "(oproto=%u)", proto>>8);
 	}
 	vec[0].ptr = (const uint8_t *)(const void *)mob;
 	vec[0].len = osp ? 12 : 8;
 	if (in_cksum(vec, 1)!=0) {
-		ND_PRINT(" (bad checksum %u)", crc);
+		ND_PRINT(C_RESET, " (bad checksum %u)", crc);
 	}
 }
