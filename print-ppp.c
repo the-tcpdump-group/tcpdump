@@ -421,7 +421,7 @@ handle_ctrl_proto(netdissect_options *ndo,
         tptr=pptr;
 
         typestr = tok2str(ppptype2str, "unknown ctrl-proto (0x%04x)", proto);
-	ND_PRINT(C_RESET, C_RESET "%s, ", typestr);
+	ND_PRINT(C_RESET, "%s, ", typestr);
 
 	if (length < 4) /* FIXME weak boundary checking */
 		goto trunc;
@@ -430,7 +430,7 @@ handle_ctrl_proto(netdissect_options *ndo,
 	code = GET_U_1(tptr);
 	tptr++;
 
-	ND_PRINT(C_RESET, C_RESET "%s (0x%02x), id %u, length %u",
+	ND_PRINT(C_RESET, "%s (0x%02x), id %u, length %u",
 	          tok2str(cpcodes, "Unknown Opcode",code),
 	          code,
 	          GET_U_1(tptr), /* ID */
@@ -444,17 +444,17 @@ handle_ctrl_proto(netdissect_options *ndo,
 	tptr += 2;
 
 	if (len < 4) {
-		ND_PRINT(C_RESET, C_RESET "\n\tencoded length %u (< 4))", len);
+		ND_PRINT(C_RESET, "\n\tencoded length %u (< 4))", len);
 		return;
 	}
 
 	if (len > length) {
-		ND_PRINT(C_RESET, C_RESET "\n\tencoded length %u (> packet length %u))", len, length);
+		ND_PRINT(C_RESET, "\n\tencoded length %u (> packet length %u))", len, length);
 		return;
 	}
 	length = len;
 
-	ND_PRINT(C_RESET, C_RESET "\n\tencoded length %u (=Option(s) length %u)", len, len - 4);
+	ND_PRINT(C_RESET, "\n\tencoded length %u (=Option(s) length %u)", len, len - 4);
 
 	if (length == 4)
 		return;    /* there may be a NULL confreq etc. */
@@ -467,9 +467,9 @@ handle_ctrl_proto(netdissect_options *ndo,
 	case CPCODES_VEXT:
 		if (length < 11)
 			break;
-		ND_PRINT(C_RESET, C_RESET "\n\t  Magic-Num 0x%08x", GET_BE_U_4(tptr));
+		ND_PRINT(C_RESET, "\n\t  Magic-Num 0x%08x", GET_BE_U_4(tptr));
 		tptr += 4;
-		ND_PRINT(C_RESET, C_RESET " Vendor: %s (%u)",
+		ND_PRINT(C_RESET, " Vendor: %s (%u)",
                        tok2str(oui_values,"Unknown",GET_BE_U_3(tptr)),
                        GET_BE_U_3(tptr));
 		/* XXX: need to decode Kind and Value(s)? */
@@ -511,7 +511,7 @@ handle_ctrl_proto(netdissect_options *ndo,
 			if ((advance = (*pfunc)(ndo, tptr, len)) == 0)
 				break;
 			if (tlen < advance) {
-				ND_PRINT(C_RESET, C_RESET " [remaining options length %u < %u]",
+				ND_PRINT(C_RESET, " [remaining options length %u < %u]",
 					 tlen, advance);
 				nd_print_invalid(ndo);
 				break;
@@ -531,12 +531,12 @@ handle_ctrl_proto(netdissect_options *ndo,
 	case CPCODES_PROT_REJ:
 		if (length < 6)
 			break;
-		ND_PRINT(C_RESET, C_RESET "\n\t  Rejected %s Protocol (0x%04x)",
+		ND_PRINT(C_RESET, "\n\t  Rejected %s Protocol (0x%04x)",
 		       tok2str(ppptype2str,"unknown", GET_BE_U_2(tptr)),
 		       GET_BE_U_2(tptr));
 		/* XXX: need to decode Rejected-Information? - hexdump for now */
 		if (len > 6) {
-			ND_PRINT(C_RESET, C_RESET "\n\t  Rejected Packet");
+			ND_PRINT(C_RESET, "\n\t  Rejected Packet");
 			print_unknown_data(ndo, tptr + 2, "\n\t    ", len - 2);
 		}
 		break;
@@ -545,10 +545,10 @@ handle_ctrl_proto(netdissect_options *ndo,
 	case CPCODES_DISC_REQ:
 		if (length < 8)
 			break;
-		ND_PRINT(C_RESET, C_RESET "\n\t  Magic-Num 0x%08x", GET_BE_U_4(tptr));
+		ND_PRINT(C_RESET, "\n\t  Magic-Num 0x%08x", GET_BE_U_4(tptr));
 		/* XXX: need to decode Data? - hexdump for now */
 		if (len > 8) {
-			ND_PRINT(C_RESET, C_RESET "\n\t  -----trailing data-----");
+			ND_PRINT(C_RESET, "\n\t  -----trailing data-----");
 			ND_TCHECK_LEN(tptr + 4, len - 8);
 			print_unknown_data(ndo, tptr + 4, "\n\t  ", len - 8);
 		}
@@ -556,10 +556,10 @@ handle_ctrl_proto(netdissect_options *ndo,
 	case CPCODES_ID:
 		if (length < 8)
 			break;
-		ND_PRINT(C_RESET, C_RESET "\n\t  Magic-Num 0x%08x", GET_BE_U_4(tptr));
+		ND_PRINT(C_RESET, "\n\t  Magic-Num 0x%08x", GET_BE_U_4(tptr));
 		/* RFC 1661 says this is intended to be human readable */
 		if (len > 8) {
-			ND_PRINT(C_RESET, C_RESET "\n\t  Message\n\t    ");
+			ND_PRINT(C_RESET, "\n\t  Message\n\t    ");
 			if (nd_printn(ndo, tptr + 4, len - 4, ndo->ndo_snapend))
 				goto trunc;
 		}
@@ -567,8 +567,8 @@ handle_ctrl_proto(netdissect_options *ndo,
 	case CPCODES_TIME_REM:
 		if (length < 12)
 			break;
-		ND_PRINT(C_RESET, C_RESET "\n\t  Magic-Num 0x%08x", GET_BE_U_4(tptr));
-		ND_PRINT(C_RESET, C_RESET ", Seconds-Remaining %us", GET_BE_U_4(tptr + 4));
+		ND_PRINT(C_RESET, "\n\t  Magic-Num 0x%08x", GET_BE_U_4(tptr));
+		ND_PRINT(C_RESET, ", Seconds-Remaining %us", GET_BE_U_4(tptr + 4));
 		/* XXX: need to decode Message? */
 		break;
 	default:
@@ -582,7 +582,7 @@ handle_ctrl_proto(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT(C_RESET, C_RESET "[|%s]", typestr);
+	ND_PRINT(C_RESET, "[|%s]", typestr);
 }
 
 /* LCP config options */
@@ -601,61 +601,61 @@ print_lcp_config_options(netdissect_options *ndo,
 		return 0;
 	if (len < 2) {
 		if (opt < NUM_LCPOPTS)
-			ND_PRINT(C_RESET, C_RESET "\n\t  %s Option (0x%02x), length %u (length bogus, should be >= 2)",
+			ND_PRINT(C_RESET, "\n\t  %s Option (0x%02x), length %u (length bogus, should be >= 2)",
 			          lcpconfopts[opt], opt, len);
 		else
-			ND_PRINT(C_RESET, C_RESET "\n\tunknown LCP option 0x%02x", opt);
+			ND_PRINT(C_RESET, "\n\tunknown LCP option 0x%02x", opt);
 		return 0;
 	}
 	if (opt < NUM_LCPOPTS)
-		ND_PRINT(C_RESET, C_RESET "\n\t  %s Option (0x%02x), length %u", lcpconfopts[opt], opt, len);
+		ND_PRINT(C_RESET, "\n\t  %s Option (0x%02x), length %u", lcpconfopts[opt], opt, len);
 	else {
-		ND_PRINT(C_RESET, C_RESET "\n\tunknown LCP option 0x%02x", opt);
+		ND_PRINT(C_RESET, "\n\tunknown LCP option 0x%02x", opt);
 		return len;
 	}
 
 	switch (opt) {
 	case LCPOPT_VEXT:
 		if (len < 6) {
-			ND_PRINT(C_RESET, C_RESET " (length bogus, should be >= 6)");
+			ND_PRINT(C_RESET, " (length bogus, should be >= 6)");
 			return len;
 		}
-		ND_PRINT(C_RESET, C_RESET ": Vendor: %s (%u)",
+		ND_PRINT(C_RESET, ": Vendor: %s (%u)",
 			tok2str(oui_values,"Unknown",GET_BE_U_3(p + 2)),
 			GET_BE_U_3(p + 2));
 #if 0
-		ND_PRINT(C_RESET, C_RESET ", kind: 0x%02x", GET_U_1(p + 5));
-		ND_PRINT(C_RESET, C_RESET ", Value: 0x");
+		ND_PRINT(C_RESET, ", kind: 0x%02x", GET_U_1(p + 5));
+		ND_PRINT(C_RESET, ", Value: 0x");
 		for (i = 0; i < len - 6; i++) {
-			ND_PRINT(C_RESET, C_RESET "%02x", GET_U_1(p + 6 + i));
+			ND_PRINT(C_RESET, "%02x", GET_U_1(p + 6 + i));
 		}
 #endif
 		break;
 	case LCPOPT_MRU:
 		if (len != 4) {
-			ND_PRINT(C_RESET, C_RESET " (length bogus, should be = 4)");
+			ND_PRINT(C_RESET, " (length bogus, should be = 4)");
 			return len;
 		}
-		ND_PRINT(C_RESET, C_RESET ": %u", GET_BE_U_2(p + 2));
+		ND_PRINT(C_RESET, ": %u", GET_BE_U_2(p + 2));
 		break;
 	case LCPOPT_ACCM:
 		if (len != 6) {
-			ND_PRINT(C_RESET, C_RESET " (length bogus, should be = 6)");
+			ND_PRINT(C_RESET, " (length bogus, should be = 6)");
 			return len;
 		}
-		ND_PRINT(C_RESET, C_RESET ": 0x%08x", GET_BE_U_4(p + 2));
+		ND_PRINT(C_RESET, ": 0x%08x", GET_BE_U_4(p + 2));
 		break;
 	case LCPOPT_AP:
 		if (len < 4) {
-			ND_PRINT(C_RESET, C_RESET " (length bogus, should be >= 4)");
+			ND_PRINT(C_RESET, " (length bogus, should be >= 4)");
 			return len;
 		}
-		ND_PRINT(C_RESET, C_RESET ": %s",
+		ND_PRINT(C_RESET, ": %s",
 			 tok2str(ppptype2str, "Unknown Auth Proto (0x04x)", GET_BE_U_2(p + 2)));
 
 		switch (GET_BE_U_2(p + 2)) {
 		case PPP_CHAP:
-			ND_PRINT(C_RESET, C_RESET ", %s",
+			ND_PRINT(C_RESET, ", %s",
 				 tok2str(authalg_values, "Unknown Auth Alg %u", GET_U_1(p + 4)));
 			break;
 		case PPP_PAP: /* fall through */
@@ -669,20 +669,20 @@ print_lcp_config_options(netdissect_options *ndo,
 		break;
 	case LCPOPT_QP:
 		if (len < 4) {
-			ND_PRINT(C_RESET, C_RESET " (length bogus, should be >= 4)");
+			ND_PRINT(C_RESET, " (length bogus, should be >= 4)");
 			return 0;
 		}
 		if (GET_BE_U_2(p + 2) == PPP_LQM)
-			ND_PRINT(C_RESET, C_RESET ": LQR");
+			ND_PRINT(C_RESET, ": LQR");
 		else
-			ND_PRINT(C_RESET, C_RESET ": unknown");
+			ND_PRINT(C_RESET, ": unknown");
 		break;
 	case LCPOPT_MN:
 		if (len != 6) {
-			ND_PRINT(C_RESET, C_RESET " (length bogus, should be = 6)");
+			ND_PRINT(C_RESET, " (length bogus, should be = 6)");
 			return 0;
 		}
-		ND_PRINT(C_RESET, C_RESET ": 0x%08x", GET_BE_U_4(p + 2));
+		ND_PRINT(C_RESET, ": 0x%08x", GET_BE_U_4(p + 2));
 		break;
 	case LCPOPT_PFC:
 		break;
@@ -733,10 +733,10 @@ print_lcp_config_options(netdissect_options *ndo,
 			break;
 		case MEDCLASS_MAC:
 			if (len != 9) {
-				ND_PRINT(C_RESET, C_RESET " (length bogus, should be = 9)");
+				ND_PRINT(C_RESET, " (length bogus, should be = 9)");
 				return 0;
 			}
-			ND_PRINT(C_RESET, C_RESET ": MAC %s", GET_ETHERADDR_STRING(p + 3));
+			ND_PRINT(C_RESET, ": MAC %s", GET_ETHERADDR_STRING(p + 3));
 			break;
 		case MEDCLASS_MNB:
 			ND_PRINT(C_RESET, ": Magic-Num-Block"); /* XXX */

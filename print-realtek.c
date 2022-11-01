@@ -112,20 +112,20 @@ rrcp_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "rrcp";
 	rrcp_opcode = GET_U_1((cp + RRCP_OPCODE_ISREPLY_OFFSET)) & RRCP_OPCODE_MASK;
-	ND_PRINT(C_RESET, C_RESET "RRCP %s: %s",
+	ND_PRINT(C_RESET, "RRCP %s: %s",
 		((GET_U_1(cp + RRCP_OPCODE_ISREPLY_OFFSET)) & RRCP_ISREPLY) ? "reply" : "query",
 		tok2str(opcode_values,"unknown opcode (0x%02x)",rrcp_opcode));
 	if (rrcp_opcode==RRCP_OPCODE_GET_CONFIGURATION ||
 	    rrcp_opcode==RRCP_OPCODE_SET_CONFIGURATION){
-    	    ND_PRINT(C_RESET, C_RESET " addr=0x%04x, data=0x%08x",
+    	    ND_PRINT(C_RESET, " addr=0x%04x, data=0x%08x",
 		     GET_LE_U_2(cp + RRCP_REG_ADDR_OFFSET),
 		     GET_LE_U_4(cp + RRCP_REG_DATA_OFFSET));
 	}
-	ND_PRINT(C_RESET, C_RESET ", auth=0x%04x",
+	ND_PRINT(C_RESET, ", auth=0x%04x",
 	         GET_BE_U_2(cp + RRCP_AUTHKEY_OFFSET));
 	if (rrcp_opcode==RRCP_OPCODE_HELLO &&
 	     ((GET_U_1(cp + RRCP_OPCODE_ISREPLY_OFFSET)) & RRCP_ISREPLY)){
-	    ND_PRINT(C_RESET, C_RESET " downlink_port=%u, uplink_port=%u, uplink_mac=%s, vendor_id=%08x ,chip_id=%04x ",
+	    ND_PRINT(C_RESET, " downlink_port=%u, uplink_port=%u, uplink_mac=%s, vendor_id=%08x ,chip_id=%04x ",
 		     GET_U_1(cp + RRCP_DOWNLINK_PORT_OFFSET),
 		     GET_U_1(cp + RRCP_UPLINK_PORT_OFFSET),
 		     GET_ETHERADDR_STRING(cp + RRCP_UPLINK_MAC_OFFSET),
@@ -133,7 +133,7 @@ rrcp_print(netdissect_options *ndo,
 		     GET_BE_U_2(cp + RRCP_CHIP_ID_OFFSET));
 	}else if (rrcp_opcode==RRCP_OPCODE_GET_CONFIGURATION ||
 	          rrcp_opcode==RRCP_OPCODE_SET_CONFIGURATION){
-	    ND_PRINT(C_RESET, C_RESET ", cookie=0x%08x%08x ",
+	    ND_PRINT(C_RESET, ", cookie=0x%08x%08x ",
 		    GET_BE_U_4(cp + RRCP_COOKIE2_OFFSET),
 		    GET_BE_U_4(cp + RRCP_COOKIE1_OFFSET));
 	}
@@ -216,7 +216,7 @@ rtl_print(netdissect_options *ndo,
 	ndo->ndo_protocol = "rtl";
 
 	if (src != NULL && dst != NULL) {
-		ND_PRINT(C_RESET, C_RESET "%s > %s, ",
+		ND_PRINT(C_RESET, "%s > %s, ",
 			(src->addr_string)(ndo, src->addr),
 			(dst->addr_string)(ndo, dst->addr));
 	}
@@ -229,20 +229,20 @@ rtl_print(netdissect_options *ndo,
 		/*
 		 * REP packets have no payload.
 		 */
-		ND_PRINT(C_RESET, C_RESET "REP");
+		ND_PRINT(C_RESET, "REP");
 	} else if (rtl_proto == RTL_PROTOCOL_RLDP ||
 	           rtl_proto == RTL_PROTOCOL_RLDP2) {
 		/*
 		 * RLDP packets have no payload.
 		 * (XXX - except when they do?  See above.)
 		 */
-		ND_PRINT(C_RESET, C_RESET "RLDP");
+		ND_PRINT(C_RESET, "RLDP");
 	} else if (rtl_proto == RTL_PROTOCOL_XXX_DSA)
-		ND_PRINT(C_RESET, C_RESET "Realtek 8-byte DSA tag");
+		ND_PRINT(C_RESET, "Realtek 8-byte DSA tag");
 	else if ((rtl_proto & 0xF0) == RTL_PROTOCOL_8306_DSA)
-		ND_PRINT(C_RESET, C_RESET "Realtek RTL8306 4-byte DSA tag");
+		ND_PRINT(C_RESET, "Realtek RTL8306 4-byte DSA tag");
 	else if ((rtl_proto & 0xF0) == RTL_PROTOCOL_8366RB_DSA)
-		ND_PRINT(C_RESET, C_RESET "Realtek RTL8366RB 4-byte DSA tag");
+		ND_PRINT(C_RESET, "Realtek RTL8366RB 4-byte DSA tag");
 	else
-		ND_PRINT(C_RESET, C_RESET "Realtek unknown type 0x%02x", rtl_proto);
+		ND_PRINT(C_RESET, "Realtek unknown type 0x%02x", rtl_proto);
 }

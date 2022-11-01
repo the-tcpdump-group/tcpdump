@@ -243,15 +243,15 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	ND_TCHECK_SIZE(ip6);
 	if (length < sizeof (struct ip6_hdr)) {
-		ND_PRINT(C_RESET, C_RESET "truncated-ip6 %u", length);
+		ND_PRINT(C_RESET, "truncated-ip6 %u", length);
 		return;
 	}
 
 	if (!ndo->ndo_eflag)
-	    ND_PRINT(C_RESET, C_RESET "IP6 ");
+	    ND_PRINT(C_RESET, "IP6 ");
 
 	if (IP6_VERSION(ip6) != 6) {
-	  ND_PRINT(C_RESET, C_RESET "version error: %u != 6", IP6_VERSION(ip6));
+	  ND_PRINT(C_RESET, "version error: %u != 6", IP6_VERSION(ip6));
 	  return;
 	}
 
@@ -281,7 +281,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	if (payload_len != 0) {
 		len = payload_len + sizeof(struct ip6_hdr);
 		if (length < len)
-			ND_PRINT(C_RESET, C_RESET "truncated-ip6 - %u bytes missing!",
+			ND_PRINT(C_RESET, "truncated-ip6 - %u bytes missing!",
 				len - length);
 	} else
 		len = length + sizeof(struct ip6_hdr);
@@ -290,14 +290,14 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	nh = GET_U_1(ip6->ip6_nxt);
 	if (ndo->ndo_vflag) {
 	    flow = GET_BE_U_4(ip6->ip6_flow);
-	    ND_PRINT(C_RESET, C_RESET "(");
+	    ND_PRINT(C_RESET, "(");
 	    /* RFC 2460 */
 	    if (flow & 0x0ff00000)
-	        ND_PRINT(C_RESET, C_RESET "class 0x%02x, ", (flow & 0x0ff00000) >> 20);
+	        ND_PRINT(C_RESET, "class 0x%02x, ", (flow & 0x0ff00000) >> 20);
 	    if (flow & 0x000fffff)
-	        ND_PRINT(C_RESET, C_RESET "flowlabel 0x%05x, ", flow & 0x000fffff);
+	        ND_PRINT(C_RESET, "flowlabel 0x%05x, ", flow & 0x000fffff);
 
-	    ND_PRINT(C_RESET, C_RESET "hlim %u, next-header %s (%u) payload length: %u) ",
+	    ND_PRINT(C_RESET, "hlim %u, next-header %s (%u) payload length: %u) ",
 	                 GET_U_1(ip6->ip6_hlim),
 	                 tok2str(ipproto_values,"unknown",nh),
 	                 nh,
@@ -329,7 +329,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		if (cp == (const u_char *)(ip6 + 1) &&
 		    nh != IPPROTO_TCP && nh != IPPROTO_UDP &&
 		    nh != IPPROTO_DCCP && nh != IPPROTO_SCTP) {
-			ND_PRINT(C_RESET, C_RESET "%s > %s: ", GET_IP6ADDR_STRING(ip6->ip6_src),
+			ND_PRINT(C_RESET, "%s > %s: ", GET_IP6ADDR_STRING(ip6->ip6_src),
 				     GET_IP6ADDR_STRING(ip6->ip6_dst));
 		}
 
@@ -341,18 +341,18 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			 * must immediately follow the IPv6 header (RFC 8200)
 			 */
 			if (found_hbh == 1) {
-				ND_PRINT(C_RESET, C_RESET "[The Hop-by-Hop Options header was already found]");
+				ND_PRINT(C_RESET, "[The Hop-by-Hop Options header was already found]");
 				nd_print_invalid(ndo);
 				return;
 			}
 			if (ph != 255) {
-				ND_PRINT(C_RESET, C_RESET "[The Hop-by-Hop Options header don't follow the IPv6 header]");
+				ND_PRINT(C_RESET, "[The Hop-by-Hop Options header don't follow the IPv6 header]");
 				nd_print_invalid(ndo);
 				return;
 			}
 			advance = hbhopt_process(ndo, cp, &found_jumbo, &payload_len);
 			if (payload_len == 0 && found_jumbo == 0) {
-				ND_PRINT(C_RESET, C_RESET "[No valid Jumbo Payload Hop-by-Hop option found]");
+				ND_PRINT(C_RESET, "[No valid Jumbo Payload Hop-by-Hop option found]");
 				nd_print_invalid(ndo);
 				return;
 			}
@@ -437,7 +437,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 				if (len < total_advance)
 					goto trunc;
 				if (length < len)
-					ND_PRINT(C_RESET, C_RESET "truncated-ip6 - %u bytes missing!",
+					ND_PRINT(C_RESET, "truncated-ip6 - %u bytes missing!",
 						len - length);
 				nd_change_snaplen(ndo, bp, len);
 

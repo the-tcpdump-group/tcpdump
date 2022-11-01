@@ -180,7 +180,7 @@ print_payload(netdissect_options *ndo, const struct payload_tipc_pkthdr *ap)
 	orig_port = GET_BE_U_4(ap->orig_port);
 	dest_port = GET_BE_U_4(ap->dest_port);
 	if (hsize <= 6) {
-		ND_PRINT(C_RESET, C_RESET "TIPC v%u.0 %u.%u.%u:%u > %u, headerlength %u bytes, MessageSize %u bytes, %s, messageType %s",
+		ND_PRINT(C_RESET, "TIPC v%u.0 %u.%u.%u:%u > %u, headerlength %u bytes, MessageSize %u bytes, %s, messageType %s",
 		    TIPC_VER(w0),
 		    TIPC_ZONE(prev_node), TIPC_CLUSTER(prev_node), TIPC_NODE(prev_node),
 		    orig_port, dest_port,
@@ -190,7 +190,7 @@ print_payload(netdissect_options *ndo, const struct payload_tipc_pkthdr *ap)
 	} else {
 		orig_node = GET_BE_U_4(ap->orig_node);
 		dest_node = GET_BE_U_4(ap->dest_node);
-		ND_PRINT(C_RESET, C_RESET "TIPC v%u.0 %u.%u.%u:%u > %u.%u.%u:%u, headerlength %u bytes, MessageSize %u bytes, %s, messageType %s",
+		ND_PRINT(C_RESET, "TIPC v%u.0 %u.%u.%u:%u > %u.%u.%u:%u, headerlength %u bytes, MessageSize %u bytes, %s, messageType %s",
 		    TIPC_VER(w0),
 		    TIPC_ZONE(orig_node), TIPC_CLUSTER(orig_node), TIPC_NODE(orig_node),
 		    orig_port,
@@ -205,7 +205,7 @@ print_payload(netdissect_options *ndo, const struct payload_tipc_pkthdr *ap)
 			w2 = GET_BE_U_4(ap->w2);
 			link_ack = TIPC_LINK_ACK(w2);
 			link_seq = TIPC_LINK_SEQ(w2);
-			ND_PRINT(C_RESET, C_RESET "\n\tPrevious Node %u.%u.%u, Broadcast Ack %u, Link Ack %u, Link Sequence %u",
+			ND_PRINT(C_RESET, "\n\tPrevious Node %u.%u.%u, Broadcast Ack %u, Link Ack %u, Link Sequence %u",
 			    TIPC_ZONE(prev_node), TIPC_CLUSTER(prev_node), TIPC_NODE(prev_node),
 			    broadcast_ack, link_ack, link_seq);
 		}
@@ -242,7 +242,7 @@ print_internal(netdissect_options *ndo, const struct internal_tipc_pkthdr *ap)
 	mtype = TIPC_MTYPE(w1);
 	orig_node = GET_BE_U_4(ap->orig_node);
 	dest_node = GET_BE_U_4(ap->dest_node);
-	ND_PRINT(C_RESET, C_RESET "TIPC v%u.0 %u.%u.%u > %u.%u.%u, headerlength %u bytes, MessageSize %u bytes, %s, messageType %s (0x%08x)",
+	ND_PRINT(C_RESET, "TIPC v%u.0 %u.%u.%u > %u.%u.%u, headerlength %u bytes, MessageSize %u bytes, %s, messageType %s (0x%08x)",
 	    TIPC_VER(w0),
 	    TIPC_ZONE(orig_node), TIPC_CLUSTER(orig_node), TIPC_NODE(orig_node),
 	    TIPC_ZONE(dest_node), TIPC_CLUSTER(dest_node), TIPC_NODE(dest_node),
@@ -266,7 +266,7 @@ print_internal(netdissect_options *ndo, const struct internal_tipc_pkthdr *ap)
 		w9 = GET_BE_U_4(ap->w9);
 		msg_cnt = TIPC_MSG_CNT(w9);
 		link_tol = TIPC_LINK_TOL(w9);
-		ND_PRINT(C_RESET, C_RESET "\n\tPrevious Node %u.%u.%u, Session No. %u, Broadcast Ack %u, Sequence Gap %u,  Broadcast Gap After %u, Broadcast Gap To %u, Last Sent Packet No. %u, Next sent Packet No. %u, Transport Sequence %u, msg_count %u, Link Tolerance %u",
+		ND_PRINT(C_RESET, "\n\tPrevious Node %u.%u.%u, Session No. %u, Broadcast Ack %u, Sequence Gap %u,  Broadcast Gap After %u, Broadcast Gap To %u, Last Sent Packet No. %u, Next sent Packet No. %u, Transport Sequence %u, msg_count %u, Link Tolerance %u",
 		    TIPC_ZONE(prev_node), TIPC_CLUSTER(prev_node), TIPC_NODE(prev_node),
 		    sess_no, broadcast_ack, seq_gap, bc_gap_after, bc_gap_to,
 		    last_sent_frag, next_sent_frag, trans_seq, msg_cnt,
@@ -297,7 +297,7 @@ print_link_conf(netdissect_options *ndo, const struct link_conf_tipc_pkthdr *ap)
 	dest_domain = GET_BE_U_4(ap->dest_domain);
 	prev_node = GET_BE_U_4(ap->prev_node);
 
-	ND_PRINT(C_RESET, C_RESET "TIPC v%u.0 %u.%u.%u > %u.%u.%u, headerlength %u bytes, MessageSize %u bytes, %s, messageType %s",
+	ND_PRINT(C_RESET, "TIPC v%u.0 %u.%u.%u > %u.%u.%u, headerlength %u bytes, MessageSize %u bytes, %s, messageType %s",
 	    TIPC_VER(w0),
 	    TIPC_ZONE(prev_node), TIPC_CLUSTER(prev_node), TIPC_NODE(prev_node),
 	    TIPC_ZONE(dest_domain), TIPC_CLUSTER(dest_domain), TIPC_NODE(dest_domain),
@@ -309,7 +309,7 @@ print_link_conf(netdissect_options *ndo, const struct link_conf_tipc_pkthdr *ap)
 		ntwrk_id = GET_BE_U_4(ap->ntwrk_id);
 		w5 = GET_BE_U_4(ap->w5);
 		media_id = TIPC_MEDIA_ID(w5);
-		ND_PRINT(C_RESET, C_RESET "\n\tNodeSignature %u, network_id %u, media_id %u",
+		ND_PRINT(C_RESET, "\n\tNodeSignature %u, network_id %u, media_id %u",
 		    node_sig, ntwrk_id, media_id);
 	}
 }

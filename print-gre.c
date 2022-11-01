@@ -85,7 +85,7 @@ gre_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	nd_print_protocol_caps(ndo);
 	ND_ICHECK_U(length, <, 2);
 	vers = GET_BE_U_2(bp) & GRE_VERS_MASK;
-	ND_PRINT(C_RESET, C_RESET "v%u",vers);
+	ND_PRINT(C_RESET, "v%u",vers);
 
 	switch(vers) {
 	case 0:
@@ -95,7 +95,7 @@ gre_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		gre_print_1(ndo, bp, length);
 		break;
 	default:
-		ND_PRINT(C_RESET, C_RESET " ERROR: unknown-version");
+		ND_PRINT(C_RESET, " ERROR: unknown-version");
 		break;
 	}
 	return;
@@ -113,7 +113,7 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 	ND_ICHECK_U(len, <, 2);
 	flags = GET_BE_U_2(bp);
 	if (ndo->ndo_vflag)
-		ND_PRINT(C_RESET, C_RESET ", Flags [%s]",
+		ND_PRINT(C_RESET, ", Flags [%s]",
 			 bittok2str(gre_flag_values,"none",flags));
 
 	len -= 2;
@@ -130,26 +130,26 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 		ND_ICHECK_U(len, <, 2);
 		sum =  GET_BE_U_2(bp);
 		if (ndo->ndo_vflag)
-			ND_PRINT(C_RESET, C_RESET ", sum 0x%x", sum);
+			ND_PRINT(C_RESET, ", sum 0x%x", sum);
 		bp += 2;
 		len -= 2;
 
 		ND_ICHECK_U(len, <, 2);
-		ND_PRINT(C_RESET, C_RESET ", off 0x%x", GET_BE_U_2(bp));
+		ND_PRINT(C_RESET, ", off 0x%x", GET_BE_U_2(bp));
 		bp += 2;
 		len -= 2;
 	}
 
 	if (flags & GRE_KP) {
 		ND_ICHECK_U(len, <, 4);
-		ND_PRINT(C_RESET, C_RESET ", key=0x%x", GET_BE_U_4(bp));
+		ND_PRINT(C_RESET, ", key=0x%x", GET_BE_U_4(bp));
 		bp += 4;
 		len -= 4;
 	}
 
 	if (flags & GRE_SP) {
 		ND_ICHECK_U(len, <, 4);
-		ND_PRINT(C_RESET, C_RESET ", seq %u", GET_BE_U_4(bp));
+		ND_PRINT(C_RESET, ", seq %u", GET_BE_U_4(bp));
 		bp += 4;
 		len -= 4;
 	}
@@ -180,15 +180,15 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 	}
 
 	if (ndo->ndo_eflag)
-		ND_PRINT(C_RESET, C_RESET ", proto %s (0x%04x)",
+		ND_PRINT(C_RESET, ", proto %s (0x%04x)",
 			 tok2str(ethertype_values,"unknown",prot), prot);
 
-	ND_PRINT(C_RESET, C_RESET ", length %u",length);
+	ND_PRINT(C_RESET, ", length %u",length);
 
 	if (ndo->ndo_vflag < 1)
-		ND_PRINT(C_RESET, C_RESET ": "); /* put in a colon as protocol demarc */
+		ND_PRINT(C_RESET, ": "); /* put in a colon as protocol demarc */
 	else
-		ND_PRINT(C_RESET, C_RESET "\n\t"); /* if verbose go multiline */
+		ND_PRINT(C_RESET, "\n\t"); /* if verbose go multiline */
 
 	switch (prot) {
 	case ETHERTYPE_IP:
@@ -213,7 +213,7 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 		ether_print(ndo, bp, len, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL);
 		break;
 	default:
-		ND_PRINT(C_RESET, C_RESET "gre-proto-0x%x", prot);
+		ND_PRINT(C_RESET, "gre-proto-0x%x", prot);
 	}
 	return;
 
@@ -233,7 +233,7 @@ gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 	bp += 2;
 
 	if (ndo->ndo_vflag)
-		ND_PRINT(C_RESET, C_RESET ", Flags [%s]",
+		ND_PRINT(C_RESET, ", Flags [%s]",
 			 bittok2str(gre_flag_values,"none",flags));
 
 	ND_ICHECK_U(len, <, 2);
@@ -247,48 +247,48 @@ gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 
 		ND_ICHECK_U(len, <, 4);
 		k = GET_BE_U_4(bp);
-		ND_PRINT(C_RESET, C_RESET ", call %u", k & 0xffff);
+		ND_PRINT(C_RESET, ", call %u", k & 0xffff);
 		len -= 4;
 		bp += 4;
 	}
 
 	if (flags & GRE_SP) {
 		ND_ICHECK_U(len, <, 4);
-		ND_PRINT(C_RESET, C_RESET ", seq %u", GET_BE_U_4(bp));
+		ND_PRINT(C_RESET, ", seq %u", GET_BE_U_4(bp));
 		bp += 4;
 		len -= 4;
 	}
 
 	if (flags & GRE_AP) {
 		ND_ICHECK_U(len, <, 4);
-		ND_PRINT(C_RESET, C_RESET ", ack %u", GET_BE_U_4(bp));
+		ND_PRINT(C_RESET, ", ack %u", GET_BE_U_4(bp));
 		bp += 4;
 		len -= 4;
 	}
 
 	if ((flags & GRE_SP) == 0)
-		ND_PRINT(C_RESET, C_RESET ", no-payload");
+		ND_PRINT(C_RESET, ", no-payload");
 
 	if (ndo->ndo_eflag)
-		ND_PRINT(C_RESET, C_RESET ", proto %s (0x%04x)",
+		ND_PRINT(C_RESET, ", proto %s (0x%04x)",
 			 tok2str(ethertype_values,"unknown",prot), prot);
 
-	ND_PRINT(C_RESET, C_RESET ", length %u",length);
+	ND_PRINT(C_RESET, ", length %u",length);
 
 	if ((flags & GRE_SP) == 0)
 		return;
 
 	if (ndo->ndo_vflag < 1)
-		ND_PRINT(C_RESET, C_RESET ": "); /* put in a colon as protocol demarc */
+		ND_PRINT(C_RESET, ": "); /* put in a colon as protocol demarc */
 	else
-		ND_PRINT(C_RESET, C_RESET "\n\t"); /* if verbose go multiline */
+		ND_PRINT(C_RESET, "\n\t"); /* if verbose go multiline */
 
 	switch (prot) {
 	case ETHERTYPE_PPP:
 		ppp_print(ndo, bp, len);
 		break;
 	default:
-		ND_PRINT(C_RESET, C_RESET "gre-proto-0x%x", prot);
+		ND_PRINT(C_RESET, "gre-proto-0x%x", prot);
 		break;
 	}
 	return;
@@ -305,17 +305,17 @@ gre_sre_print(netdissect_options *ndo, uint16_t af, uint8_t sreoff,
 
 	switch (af) {
 	case GRESRE_IP:
-		ND_PRINT(C_RESET, C_RESET ", (rtaf=ip");
+		ND_PRINT(C_RESET, ", (rtaf=ip");
 		ret = gre_sre_ip_print(ndo, sreoff, srelen, bp, len);
-		ND_PRINT(C_RESET, C_RESET ")");
+		ND_PRINT(C_RESET, ")");
 		break;
 	case GRESRE_ASN:
-		ND_PRINT(C_RESET, C_RESET ", (rtaf=asn");
+		ND_PRINT(C_RESET, ", (rtaf=asn");
 		ret = gre_sre_asn_print(ndo, sreoff, srelen, bp, len);
-		ND_PRINT(C_RESET, C_RESET ")");
+		ND_PRINT(C_RESET, ")");
 		break;
 	default:
-		ND_PRINT(C_RESET, C_RESET ", (rtaf=0x%x)", af);
+		ND_PRINT(C_RESET, ", (rtaf=0x%x)", af);
 		ret = 1;
 	}
 	return (ret);
@@ -329,15 +329,15 @@ gre_sre_ip_print(netdissect_options *ndo, uint8_t sreoff, uint8_t srelen,
 	char buf[INET_ADDRSTRLEN];
 
 	if (sreoff & 3) {
-		ND_PRINT(C_RESET, C_RESET ", badoffset=%u", sreoff);
+		ND_PRINT(C_RESET, ", badoffset=%u", sreoff);
 		goto invalid;
 	}
 	if (srelen & 3) {
-		ND_PRINT(C_RESET, C_RESET ", badlength=%u", srelen);
+		ND_PRINT(C_RESET, ", badlength=%u", srelen);
 		goto invalid;
 	}
 	if (sreoff >= srelen) {
-		ND_PRINT(C_RESET, C_RESET ", badoff/len=%u/%u", sreoff, srelen);
+		ND_PRINT(C_RESET, ", badoff/len=%u/%u", sreoff, srelen);
 		goto invalid;
 	}
 
@@ -346,7 +346,7 @@ gre_sre_ip_print(netdissect_options *ndo, uint8_t sreoff, uint8_t srelen,
 
 		ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 		addrtostr(bp, buf, sizeof(buf));
-		ND_PRINT(C_RESET, C_RESET " %s%s",
+		ND_PRINT(C_RESET, " %s%s",
 			 ((bp - up) == sreoff) ? "*" : "", buf);
 
 		bp += 4;
@@ -366,22 +366,22 @@ gre_sre_asn_print(netdissect_options *ndo, uint8_t sreoff, uint8_t srelen,
 	const u_char *up = bp;
 
 	if (sreoff & 1) {
-		ND_PRINT(C_RESET, C_RESET ", badoffset=%u", sreoff);
+		ND_PRINT(C_RESET, ", badoffset=%u", sreoff);
 		goto invalid;
 	}
 	if (srelen & 1) {
-		ND_PRINT(C_RESET, C_RESET ", badlength=%u", srelen);
+		ND_PRINT(C_RESET, ", badlength=%u", srelen);
 		goto invalid;
 	}
 	if (sreoff >= srelen) {
-		ND_PRINT(C_RESET, C_RESET ", badoff/len=%u/%u", sreoff, srelen);
+		ND_PRINT(C_RESET, ", badoff/len=%u/%u", sreoff, srelen);
 		goto invalid;
 	}
 
 	while (srelen != 0) {
 		ND_ICHECK_U(len, <, 2);
 
-		ND_PRINT(C_RESET, C_RESET " %s%x",
+		ND_PRINT(C_RESET, " %s%x",
 			 ((bp - up) == sreoff) ? "*" : "", GET_BE_U_2(bp));
 
 		bp += 2;
