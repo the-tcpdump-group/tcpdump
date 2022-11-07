@@ -8,6 +8,8 @@ TBD
       BGP: Shutdown message can be up to 255 bytes length according to rfc9003
       DSA: correctly determine VID.
       EAP: fix some length checks and output issues.
+      802.11: Fix the misleading comment regarding "From DS", "To DS" Frame
+        Control Flags.
       802.15.4, BGP, LISP: fix some length checks, compiler warnings,
         and undefined behavior warnings.
       PFLOG: handle LINKTYPE_PFLOG/DLT_PFLOG files from all OSes on all
@@ -17,9 +19,9 @@ TBD
       ICMP: redo MPLS Extension code as general ICMP Extension code.
       VQP: Do not print unknown error codes twice.
       Juniper: Add some bounds checks.
-      lwres: Fix a length check.
+      lwres: Fix a length check, update a variable type.
       EAP: Fix some undefined behaviors at runtime.
-      Ethernet: Rework the length checks.
+      Ethernet: Rework the length checks, add a length check.
       ZEP: Add thren length checks.
       IPX: Add two length checks.
       Zephyr: Avoid printing non-ASCII characters.
@@ -30,19 +32,34 @@ TBD
       ISAKMP: Use GET_U_1() to replace a direct dereference.
       RADIUS: Use GET_U_1() to replace a direct dereference.
       TCP: Fix an invalid check.
+      RESP: Fix an invalid check.
       RESP: Remove an unnecessary test.
       Arista: Refine the output format and print HwInfo.
       EIGRP: Get the packet header fields right.
-      sFlow: add support for IPv6 agent.
+      sFlow: add support for IPv6 agent, add a length check.
       VRRP: add support for IPv6.
       OSPF: Update to match the Router Properties registry.
+      OSPF: Remove two unnecessary dereferences.
+      OSPF: Add support bit Nt RFC3101.
+      OSPFv3: Remove two unnecessary dereferences.
       ICMPv6: Fix output for Router Renumbering messages.
       ICMPv6: Fix the Node Information flags.
+      ICMPv6: Remove an unused macro and extra blank lines.
+      ICMPv6: Add a length check in the rpl_dio_print() function.
+      ICMPv6: Use GET_IP6ADDR_STRING() in the rpl_dio_print() function.
       IPv6: Add some checks for the Hop-by-Hop Options header
+      IPv6: Add a check for the Jumbo Payload Hop-by-Hop option.
       NFS: Fix the format for printing an unsigned int
       PTP: fix printing of the correction fields
+      PTP: Use ND_LCHECK_U for checking invalid length.
       WHOIS: Add its own printer source file and printer function
       MPTCP: print length before subtype inside MPTCP options
+      ESP: Add a workaround to a "use-of-uninitialized-value".
+      PPP: Add tests to avoid incorrectly re-entering ppp_hdlc().
+      PPP: Don't process further if protocol is unknown (-e option).
+      PPP: Change the pointer to packet data.
+      ZEP: Add three length checks.
+      Add some const qualifiers.
     Building and testing:
       Update config.guess and config.sub.
       Use AS_HELP_STRING macro instead of AC_HELP_STRING.
@@ -50,6 +67,7 @@ TBD
       Fix an error when cross-compiling.
       Fix "make releasetar" on AIX and Solaris.
       Use "git archive" for the "make releasetar" process.
+      Remove the release candidate rcX targets.
       Remove the release candidate rcX targets.
       Mend "make check" on Solaris 9 with Autoconf.
       Address assorted compiler warnings.
@@ -61,16 +79,30 @@ TBD
       Remove awk code from mkdep.
       Fix configure test errors with Clang 15
       CMake: Prevent stripping of the RPATH on installation.
+      AppVeyor CI: update Npcap site, update to 1.12 SDK.
+      Cirrus CI: Use the same configuration as for the main branch.
+      CI: Add back running tcpdump -J/-L and capture, now with Cirrus VMs.
+      Remove four test files (They are now in the libpcap tests directory).
     Source code:
       Fix some snapend-changing routines to protect against pointer
         underflow.
       Use __func__ from C99 in some function calls.
       Memory allocator: Update nd_add_alloc_list() to a static function.
       addrtoname.c: Fix two invalid tests.
+      Use more S_SUCCESS and S_ERR_HOST_PROGRAM in main().
+      Add some comments about "don't use GET_IP6ADDR_STRING()".
+      Assign ndo->ndo_packetp in pretty_print_packet().
+      Add ND_LCHECKMSG_U, ND_LCHECK_U, ND_LCHECKMSG_ZU and ND_LCHECK_ZU macros.
+      Update tok2strbuf() to a static function.
+      netdissect.h: Keep the link-layer dissectors names sorted.
+      setsignal(): Set SA_RESTART on non-lethal signals (REQ_INFO, FLUSH_PCAP)
+        to avoid corrupting binary pcap output.
     Documentation:
       Some man page cleanups.
+      Update the print interface for the packet count to stdout.
       Note that we require compilers to support at least some of C99.
       Update AIX and Solaris-related specifics.
+      INSTALL.txt: Add doc/README.*, delete the deleted win32 directory.
 
 Wednesday, June 9, 2021 by gharris
   Summary for 4.99.1 tcpdump release
