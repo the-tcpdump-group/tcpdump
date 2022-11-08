@@ -442,11 +442,11 @@ ip_print(netdissect_options *ndo,
 	        vec[0].ptr = (const uint8_t *)(const void *)ip;
 	        vec[0].len = hlen;
 	        sum = in_cksum(vec, 1);
-		if (sum != 0) {
-		    ip_sum = GET_BE_U_2(ip->ip_sum);
-		    ND_PRINT(", bad cksum %x (->%x)!", ip_sum,
-			     in_cksum_shouldbe(ip_sum, sum));
-		}
+
+	        ip_sum = GET_BE_U_2(ip->ip_sum);
+	        ND_PRINT(", bad cksum %x (->%x)!", ip_sum,
+		         in_cksum_shouldbe(ip_sum, sum));
+
 	    }
 
 	    ND_PRINT(")\n    ");
