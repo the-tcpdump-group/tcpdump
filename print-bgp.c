@@ -174,6 +174,7 @@ static const struct tok bgp_route_refresh_subtype_values[] = {
 #define BGPTYPE_ENTROPY_LABEL           28    /* RFC6790 */
 #define BGPTYPE_LARGE_COMMUNITY         32    /* draft-ietf-idr-large-community-05 */
 #define BGPTYPE_BGPSEC_PATH             33    /* RFC8205 */
+#define BGPTYPE_OTC                     35    /* RFC9234 */
 #define BGPTYPE_ATTR_SET               128    /* RFC6368 */
 
 #define BGP_MP_NLRI_MINSIZE              3    /* End of RIB Marker detection */
@@ -203,6 +204,7 @@ static const struct tok bgp_attr_values[] = {
     { BGPTYPE_ENTROPY_LABEL,    "Entropy Label"},
     { BGPTYPE_LARGE_COMMUNITY,  "Large Community"},
     { BGPTYPE_BGPSEC_PATH,      "BGPsec Path"},
+    { BGPTYPE_OTC,              "Only to Customer (OTC)"},
     { BGPTYPE_ATTR_SET,         "Attribute Set"},
     { 255,                      "Reserved for development"},
     { 0, NULL}
@@ -249,6 +251,7 @@ static const struct tok bgp_opt_values[] = {
 #define BGP_CAPCODE_EXT_MSG             6 /* RFC8654 */
 #define BGP_CAPCODE_BGPSEC              7 /* RFC8205 */
 #define BGP_CAPCODE_ML                  8 /* RFC8277 */
+#define BGP_CAPCODE_ROLE                9 /* RFC9234 */
 #define BGP_CAPCODE_RESTART            64 /* RFC4724  */
 #define BGP_CAPCODE_AS_NEW             65 /* RFC6793 */
 #define BGP_CAPCODE_DYN_CAP            67 /* draft-ietf-idr-dynamic-cap */
@@ -275,6 +278,7 @@ static const struct tok bgp_capcode_values[] = {
     { BGP_CAPCODE_ENH_RR,       "Enhanced Route Refresh"},
     { BGP_CAPCODE_LLGR,         "Long-lived Graceful Restart"},
     { BGP_CAPCODE_RR_CISCO,     "Route Refresh (Cisco)"},
+    { BGP_CAPCODE_ROLE,         "Role Capability"},
     { 0, NULL}
 };
 
@@ -402,6 +406,21 @@ static const struct tok bgp_pmsi_flag_values[] = {
 
 static const struct tok bgp_aigp_values[] = {
     { BGP_AIGP_TLV, "AIGP"},
+    { 0, NULL}
+};
+
+#define BGP_ROLE_PROVIDER 0
+#define BGP_ROLE_RS 1
+#define BGP_ROLE_RS_CLIENT 2
+#define BGP_ROLE_CUSTOMER 3
+#define BGP_ROLE_PEER 4
+
+static const struct tok bgp_role_values[] = {
+    { BGP_ROLE_PROVIDER, "Provider"},
+    { BGP_ROLE_RS, "RS"},
+    { BGP_ROLE_RS_CLIENT, "RS-Client"},
+    { BGP_ROLE_CUSTOMER, "Customer"},
+    { BGP_ROLE_PEER, "Peer"},
     { 0, NULL}
 };
 
@@ -2654,6 +2673,15 @@ bgp_attr_print(netdissect_options *ndo,
         }
         break;
     }
+    case BGPTYPE_OTC:
+    {
+        if (len < 4) {
+            ND_PRINT("invalid len");
+            break;
+        }
+        ND_PRINT("\n\t    OTC %u", GET_BE_U_4(pptr));
+        break;
+    }
     default:
         ND_TCHECK_LEN(pptr, len);
         ND_PRINT("\n\t    no Attribute %u decoder", atype); /* we have no decoder for the attribute */
@@ -2765,6 +2793,15 @@ bgp_capabilities_print(netdissect_options *ndo,
                 tcap_len -= 4;
                 cap_offset += 4;
             }
+            break;
+        case BGP_CAPCODE_ROLE:
+            if (cap_len < 1) {
+                ND_PRINT(" (too short, < 1)");
+                return;
+            }
+            ND_PRINT("\n\t\tRole name %s (%u)",
+                     tok2str(bgp_role_values, "Unassigned",
+                             GET_U_1(opt + i + 2)), GET_U_1(opt + i + 2));
             break;
         case BGP_CAPCODE_RR:
         case BGP_CAPCODE_LLGR:
