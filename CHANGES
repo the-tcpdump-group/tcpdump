@@ -41,6 +41,7 @@ Monthday, Month DD, YYYY by gharris and denis
       Add a configure option to help debugging (--enable-instrument-functions)
       cmake: Update the minimum required version to 2.8.12 (except Windows).
       Makefile.in: Add the releasecheck target.
+      Cirrus CI: Add the "make releasecheck" command in the Linux task.
 
 TBD
   Summary for 4.99.2 tcpdump release (so far!)
