@@ -49,6 +49,8 @@ linux_task:
     - apt list --installed 'lib*-dev'
     - echo '$ git clone [...] libpcap.git'
     - git -C .. clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT}
+    - ./configure --quiet # build the Makefile
+    - make releasecheck
     - ./build_matrix.sh
 
 macos_task:
