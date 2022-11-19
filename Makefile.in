@@ -473,6 +473,33 @@ releasetar:
 	    echo "No $$TAG tag. Archive build from HEAD."; \
 	fi
 
+releasecheck: releasetar
+	@TAG=$(PROG)-`cat VERSION` && \
+	DIR=`pwd` && \
+	cd /tmp && \
+	rm -rf "$$TAG" && \
+	tar xf "$$DIR"/"$$TAG".tar.gz && \
+	cd "$$TAG" && \
+	echo '[$@] $$ ./configure --enable-smb --quiet' && \
+	./configure --enable-smb --quiet && \
+	echo '[$@] $$ make -s all check' && \
+	make -s all check >/dev/null && \
+	cd .. && \
+	rm -rf "$$TAG" && \
+	tar xf "$$DIR"/"$$TAG".tar.gz && \
+	cd "$$TAG" && \
+	mkdir build && \
+	cd build && \
+	echo '[$@] $$ cmake -DENABLE_SMB=yes [...] ..' && \
+	cmake -DENABLE_SMB=yes \
+	    -DCMAKE_MESSAGE_LOG_LEVEL=NOTICE \
+	    -DCMAKE_RULE_MESSAGES=OFF .. && \
+	echo '[$@] $$ make -s all check' && \
+	make -s all check >/dev/null && \
+	cd ../.. && \
+	rm -rf "$$TAG" && \
+	echo '[$@] Done.'
+
 testlist:
 	echo $(TEST_DIST)
 
