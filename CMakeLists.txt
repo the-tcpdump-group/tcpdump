@@ -16,7 +16,7 @@ else(WIN32)
     # environment variable when running pkg-config, to make sure
     # it finds any .pc file from there.
     #
-    cmake_minimum_required(VERSION 2.8.6)
+    cmake_minimum_required(VERSION 2.8.12)
 endif(WIN32)
 
 #
