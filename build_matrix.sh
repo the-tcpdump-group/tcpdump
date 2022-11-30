@@ -13,6 +13,12 @@
 : "${MATRIX_CMAKE:=no yes}"
 : "${MATRIX_CRYPTO:=no yes}"
 : "${MATRIX_SMB:=no yes}"
+# Set this variable to "yes" before calling this script to disregard all cmake
+# warnings in a particular environment (CI or a local working copy).  Set it
+# to "yes" in this script or in build.sh when a matrix subset is known to be
+# not cmake warning-free because of the version or whatever other factor
+# that the scripts can detect both in and out of CI.
+: "${TCPDUMP_CMAKE_TAINTED:=no}"
 # Set this variable to "yes" before calling this script to disregard all
 # warnings in a particular environment (CI or a local working copy).  Set it
 # to "yes" in this script or in build.sh when a matrix subset is known to be
@@ -33,6 +39,7 @@ if [ -z "$PREFIX" ]; then
 fi
 COUNT=0
 export TCPDUMP_TAINTED
+export TCPDUMP_CMAKE_TAINTED
 export MAKE_BIN
 
 build_tcpdump() {

@@ -10,6 +10,7 @@
 : "${CRYPTO:=no}"
 : "${SMB:=no}"
 : "${TCPDUMP_TAINTED:=no}"
+: "${TCPDUMP_CMAKE_TAINTED:=no}"
 : "${MAKE_BIN:=make}"
 
 . ./build_common.sh
@@ -42,6 +43,12 @@ esac
 
 [ "$TCPDUMP_TAINTED" != yes ] && CFLAGS=`cc_werr_cflags`
 
+# If necessary, set TCPDUMP_CMAKE_TAINTED here to exempt particular cmake from
+# warnings. Use as specific terms as possible (e.g. some specific version and
+# some specific OS).
+
+[ "$TCPDUMP_CMAKE_TAINTED" != yes ] && CMAKE_OPTIONS='-Werror=dev'
+
 if [ "$CMAKE" = no ]; then
     if [ "$BUILD_LIBPCAP" = yes ]; then
         echo "Using PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
@@ -59,13 +66,15 @@ else
     run_after_echo mkdir build
     run_after_echo cd build
     if [ "$BUILD_LIBPCAP" = yes ]; then
-        run_after_echo cmake -DWITH_CRYPTO="$CRYPTO" -DENABLE_SMB="$SMB" \
+        run_after_echo cmake "$CMAKE_OPTIONS" \
+            -DWITH_CRYPTO="$CRYPTO" -DENABLE_SMB="$SMB" \
             ${CFLAGS:+-DEXTRA_CFLAGS="$CFLAGS"} \
             -DCMAKE_INSTALL_PREFIX="$PREFIX" -DCMAKE_PREFIX_PATH="$PREFIX" ..
         LD_LIBRARY_PATH="$PREFIX/lib"
         export LD_LIBRARY_PATH
     else
-        run_after_echo cmake -DWITH_CRYPTO="$CRYPTO" -DENABLE_SMB="$SMB" \
+        run_after_echo cmake "$CMAKE_OPTIONS" \
+            -DWITH_CRYPTO="$CRYPTO" -DENABLE_SMB="$SMB" \
              ${CFLAGS:+-DEXTRA_CFLAGS="$CFLAGS"} \
             -DCMAKE_INSTALL_PREFIX="$PREFIX" ..
     fi
