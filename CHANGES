@@ -42,6 +42,7 @@ Monthday, Month DD, YYYY by gharris and denis
       cmake: Update the minimum required version to 2.8.12 (except Windows).
       Makefile.in: Add the releasecheck target.
       Cirrus CI: Add the "make releasecheck" command in the Linux task.
+      CI: Introduce and use TCPDUMP_CMAKE_TAINTED.
 
 TBD
   Summary for 4.99.2 tcpdump release (so far!)
