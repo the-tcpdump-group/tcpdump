@@ -176,11 +176,11 @@
  *
  */
 
+/* Values from IEEE1588-2008: 13.3.2.2 messageType (Enumeration4) */
 #define M_SYNC                  0x0
 #define M_DELAY_REQ             0x1
 #define M_PDELAY_REQ            0x2
 #define M_PDELAY_RESP           0x3
-#define M_OTHER                 0x5
 #define M_FOLLOW_UP             0x8
 #define M_DELAY_RESP            0x9
 #define M_PDELAY_RESP_FOLLOW_UP 0xA
@@ -193,13 +193,35 @@ static const struct tok ptp_msg_type[] = {
     { M_DELAY_REQ, "delay req msg"},
     { M_PDELAY_REQ, "peer delay req msg"},
     { M_PDELAY_RESP, "peer delay resp msg"},
-    { M_OTHER, "Other"},
     { M_FOLLOW_UP, "follow up msg"},
     { M_DELAY_RESP, "delay resp msg"},
     { M_PDELAY_RESP_FOLLOW_UP, "pdelay resp fup msg"},
     { M_ANNOUNCE, "announce msg"},
     { M_SIGNALLING, "signalling msg"},
     { M_MANAGEMENT, "management msg"},
+    { 0, NULL}
+};
+
+/* Values from IEEE1588-2008: 13.3.2.10 controlField (UInteger8) */
+/*
+ * The use of this field by the receiver is deprecated.
+ * NOTE-This field is provided for compatibility with hardware designed
+ * to conform to version 1 of this standard.
+ */
+#define C_SYNC              0x0
+#define C_DELAY_REQ         0x1
+#define C_FOLLOW_UP         0x2
+#define C_DELAY_RESP        0x3
+#define C_MANAGEMENT        0x4
+#define C_OTHER             0x5
+
+static const struct tok ptp_control_field[] = {
+    { C_SYNC, "Sync"},
+    { C_DELAY_REQ, "Delay_Req"},
+    { C_FOLLOW_UP, "Follow_Up"},
+    { C_DELAY_RESP, "Delay_Resp"},
+    { C_MANAGEMENT, "Management"},
+    { C_OTHER, "Other"},
     { 0, NULL}
 };
 
@@ -381,7 +403,7 @@ ptp_print_2(netdissect_options *ndo, const u_char *bp, u_int length)
 
     /* control */
     len -= 2; bp += 2; control = GET_U_1(bp) ;
-    ND_PRINT(", control : %u (%s)", control, tok2str(ptp_msg_type, "none", control));
+    ND_PRINT(", control : %u (%s)", control, tok2str(ptp_control_field, "Reserved", control));
 
     /* log message interval */
     lm_int = GET_BE_U_2(bp) & PTP_LOGMSG_MASK; ND_PRINT(", log message interval : %u", lm_int); len -= 2; bp += 2;
