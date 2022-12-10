@@ -52,13 +52,12 @@ linux_task:
     - ./build_matrix.sh
 
 macos_task:
-  name: macos-amd64
+  name: macos-aarch64
   only_if: $CIRRUS_BRANCH != 'coverity_scan'
   macos_instance:
-    image: big-sur-xcode
-    # "cpu" and "memory" are invalid keywords for macOS tasks now
+    image: ghcr.io/cirruslabs/macos-ventura-xcode:14.1 # macOS 13 with Xcode 14.1
   env:
-    MAKEFLAGS: '-j 12'
+    MAKEFLAGS: '-j 4'
   script:
     - brew update >/dev/null
     - brew install libsmi | grep -v '%'
