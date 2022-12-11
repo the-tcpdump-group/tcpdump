@@ -22,7 +22,7 @@ Monthday, Month DD, YYYY by gharris and denis
       BGP: Handle ORF in Route-Refresh messages
       BGP: add dissector for BGPsec capability and path
       BGP: Add Origin Validation State extended community
-      BGP: Add support for BGP Role capabilty and OTC attribute
+      BGP: Add support for BGP Role capability and OTC attribute
     User interface:
       Add optional unit suffix on -C file size.
       Add --print-sampling to print every Nth packet instead of all.
