@@ -490,29 +490,40 @@ releasetar:
 
 releasecheck: releasetar
 	@TAG=$(PROG)-`cat VERSION` && \
+	INSTALL_DIR=/tmp/install_"$$TAG"_$$$$ && \
 	DIR=`pwd` && \
 	cd /tmp && \
 	rm -rf "$$TAG" && \
+	rm -rf "$$INSTALL_DIR" && \
 	tar xf "$$DIR"/"$$TAG".tar.gz && \
 	cd "$$TAG" && \
-	echo '[$@] $$ ./configure --enable-smb --quiet' && \
-	./configure --enable-smb --quiet && \
+	echo "[$@] $$ ./configure --enable-smb --quiet --prefix=$$INSTALL_DIR" && \
+	./configure --enable-smb --quiet --prefix="$$INSTALL_DIR" && \
 	echo '[$@] $$ make -s all check' && \
 	make -s all check >/dev/null && \
+	echo '[$@] $$ make -s install' && \
+	make -s install && \
 	cd .. && \
 	rm -rf "$$TAG" && \
+	rm -rf "$$INSTALL_DIR" && \
 	tar xf "$$DIR"/"$$TAG".tar.gz && \
 	cd "$$TAG" && \
 	mkdir build && \
 	cd build && \
 	echo '[$@] $$ cmake -DENABLE_SMB=yes [...] ..' && \
 	cmake -DENABLE_SMB=yes \
+	    -DCMAKE_INSTALL_PREFIX="$$INSTALL_DIR" \
 	    -DCMAKE_MESSAGE_LOG_LEVEL=NOTICE \
-	    -DCMAKE_RULE_MESSAGES=OFF .. && \
+	    -DCMAKE_RULE_MESSAGES=OFF \
+	    -DCMAKE_INSTALL_MESSAGE=NEVER \
+	    .. && \
 	echo '[$@] $$ make -s all check' && \
 	make -s all check >/dev/null && \
+	echo '[$@] $$ make -s install' && \
+	make -s install && \
 	cd ../.. && \
 	rm -rf "$$TAG" && \
+	rm -rf "$$INSTALL_DIR" && \
 	echo '[$@] Done.'
 
 testlist:
