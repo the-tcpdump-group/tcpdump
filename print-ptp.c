@@ -203,7 +203,6 @@ static const struct tok ptp_msg_type[] = {
     { 0, NULL}
 };
 
-
 #define PTP_TRUE 1
 #define PTP_FALSE !PTP_TRUE
 
@@ -236,7 +235,6 @@ static const struct tok ptp_msg_type[] = {
 #define PTP_SECURITY_MASK           0x4000
 #define PTP_FLAGS_UNKNOWN_MASK      0x18C0
 
-
 static const struct tok ptp_flag_values[] = {
     { PTP_L161_MASK ,"l1 61"},
     { PTP_L1_59_MASK ,"l1 59"},
@@ -254,11 +252,6 @@ static const struct tok ptp_flag_values[] = {
     {0, NULL}
 };
 
-#define PTP_PRINT_MSG_TYPE(e) \
-        { \
-            ND_PRINT("(%s)", tok2str(ptp_msg_type, "unknown", e)); \
-        }
-
 static const char *p_porigin_ts = "preciseOriginTimeStamp";
 static const char *p_origin_ts = "originTimeStamp";
 static const char *p_recv_ts = "receiveTimeStamp";
@@ -271,8 +264,6 @@ static const char *p_recv_ts = "receiveTimeStamp";
 #define PTP_UINT32_LEN sizeof(uint32_t)
 #define PTP_6BYTES_LEN sizeof(uint32_t)+sizeof(uint16_t)
 #define PTP_UINT64_LEN sizeof(uint64_t)
-
-
 
 static void ptp_print_1(netdissect_options *ndo);
 static void ptp_print_2(netdissect_options *ndo, const u_char *bp, u_int len);
