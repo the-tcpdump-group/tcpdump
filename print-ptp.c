@@ -189,17 +189,17 @@
 #define M_MANAGEMENT            0xD
 
 static const struct tok ptp_msg_type[] = {
-    { M_SYNC ,"sync msg"},
-    { M_DELAY_REQ ,"delay req msg"},
-    { M_PDELAY_REQ ,"peer delay req msg"},
-    { M_PDELAY_RESP ,"peer delay resp msg"},
+    { M_SYNC, "sync msg"},
+    { M_DELAY_REQ, "delay req msg"},
+    { M_PDELAY_REQ, "peer delay req msg"},
+    { M_PDELAY_RESP, "peer delay resp msg"},
     { M_OTHER, "Other"},
-    { M_FOLLOW_UP ,"follow up msg"},
-    { M_DELAY_RESP ,"delay resp msg"},
-    { M_PDELAY_RESP_FOLLOW_UP ,"pdelay resp fup msg"},
-    { M_ANNOUNCE ,"announce msg"},
-    { M_SIGNALLING ,"signalling msg"},
-    { M_MANAGEMENT ,"management msg"},
+    { M_FOLLOW_UP, "follow up msg"},
+    { M_DELAY_RESP, "delay resp msg"},
+    { M_PDELAY_RESP_FOLLOW_UP, "pdelay resp fup msg"},
+    { M_ANNOUNCE, "announce msg"},
+    { M_SIGNALLING, "signalling msg"},
+    { M_MANAGEMENT, "management msg"},
     { 0, NULL}
 };
 
@@ -236,19 +236,19 @@ static const struct tok ptp_msg_type[] = {
 #define PTP_FLAGS_UNKNOWN_MASK      0x18C0
 
 static const struct tok ptp_flag_values[] = {
-    { PTP_L161_MASK ,"l1 61"},
-    { PTP_L1_59_MASK ,"l1 59"},
-    { PTP_UTC_REASONABLE_MASK ,"utc reasonable"},
-    { PTP_TIMESCALE_MASK ,"timescale"},
-    { PTP_TIME_TRACABLE_MASK ,"time tracable"},
-    { PTP_FREQUENCY_TRACABLE_MASK ,"frequency tracable"},
-    { PTP_ALTERNATE_MASTER_MASK ,"alternate master"},
-    { PTP_TWO_STEP_MASK ,"two step"},
-    { PTP_UNICAST_MASK ,"unicast"},
-    { PTP_PROFILE_SPEC_1_MASK ,"profile specific 1"},
-    { PTP_PROFILE_SPEC_2_MASK ,"profile specific 2"},
-    { PTP_SECURITY_MASK ,"security mask"},
-    { PTP_FLAGS_UNKNOWN_MASK , "unknown"},
+    { PTP_L161_MASK, "l1 61"},
+    { PTP_L1_59_MASK, "l1 59"},
+    { PTP_UTC_REASONABLE_MASK, "utc reasonable"},
+    { PTP_TIMESCALE_MASK, "timescale"},
+    { PTP_TIME_TRACABLE_MASK, "time tracable"},
+    { PTP_FREQUENCY_TRACABLE_MASK, "frequency tracable"},
+    { PTP_ALTERNATE_MASTER_MASK, "alternate master"},
+    { PTP_TWO_STEP_MASK, "two step"},
+    { PTP_UNICAST_MASK, "unicast"},
+    { PTP_PROFILE_SPEC_1_MASK, "profile specific 1"},
+    { PTP_PROFILE_SPEC_2_MASK, "profile specific 2"},
+    { PTP_SECURITY_MASK, "security mask"},
+    { PTP_FLAGS_UNKNOWN_MASK,  "unknown"},
     {0, NULL}
 };
 
