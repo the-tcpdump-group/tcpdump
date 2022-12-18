@@ -1197,7 +1197,7 @@ varbind_print(netdissect_options *ndo,
               u_short pduid, const u_char *np, u_int length)
 {
 	struct be elem;
-	int count = 0, ind;
+	int count = 0;
 #ifdef USE_LIBSMI
 	SmiNode *smiNode = NULL;
 #endif
@@ -1217,7 +1217,7 @@ varbind_print(netdissect_options *ndo,
 	length = elem.asnlen;
 	np = (const u_char *)elem.data.raw;
 
-	for (ind = 1; length > 0; ind++) {
+	while (length) {
 		const u_char *vbend;
 		u_int vblength;
 
