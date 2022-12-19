@@ -51,6 +51,7 @@ linux_task:
     - git -C .. clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT}
     - ./configure --quiet # build the Makefile
     - make releasecheck
+    - make whitespacecheck
     - ./build_matrix.sh
 
 macos_task:
