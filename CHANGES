@@ -45,6 +45,7 @@ Monthday, Month DD, YYYY by gharris and denis
       Cirrus CI: Add the "make releasecheck" command in the Linux task.
       CI: Introduce and use TCPDUMP_CMAKE_TAINTED.
       Makefile.in: Add "make -s install" in the releasecheck target.
+      Makefile.in: Add the whitespacecheck target.
 
 TBD
   Summary for 4.99.2 tcpdump release (so far!)
