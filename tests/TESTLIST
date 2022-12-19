@@ -64,18 +64,18 @@ edsa-high-vid-e	edsa-high-vid.pcap	edsa-high-vid-e.out	-e
 
 # ESP tests
 esp0		02-sunrise-sunset-esp.pcap	esp0.out
-# more ESP tests in crypto.sh
+# more ESP tests in crypto.tests
 
 # ISAKMP tests
 isakmp1 isakmp-delete-segfault.pcap isakmp1.out
 isakmp2 isakmp-pointer-loop.pcap    isakmp2.out
 isakmp3 isakmp-identification-segfault.pcap isakmp3.out -v
-# isakmp4 is in crypto.sh
+# isakmp4 is in crypto.tests
 isakmp5-v	ISAKMP_sa_setup.pcap		isakmp5-v.out	-v
 
 # Link Management Protocol tests
 lmp		lmp.pcap		lmp.out -T lmp
-# lmp-v is now conditionally handled by lmp-v.sh
+# lmp-v is now conditionally handled by lmp-v.tests
 
 # MPLS tests
 mpls-ldp-hello	mpls-ldp-hello.pcap	mpls-ldp-hello.out -v
@@ -106,7 +106,7 @@ ospf3_auth-vv	ospf3_auth.pcapng			ospf3_auth-vv.out 	-v -v
 ikev2four	ikev2four.pcap		ikev2four.out	-v
 ikev2fourv	ikev2four.pcap		ikev2fourv.out	-v -v -v
 ikev2fourv4	ikev2four.pcap		ikev2fourv4.out	-v -v -v -v
-# ikev2pI2 test in crypto.sh
+# ikev2pI2 test in crypto.tests
 ikev2pI2-segfault	ikev2pI2-segfault.pcapng	ikev2pI2-segfault.out
 ikev2pI2-segfault-v	ikev2pI2-segfault.pcapng	ikev2pI2-segfault-v.out	-v
 
@@ -349,7 +349,7 @@ isis_cap_tlv	isis_cap_tlv.pcap		isis_cap_tlv.out	-v
 isis_iid-v      isis_iid_tlv.pcap               isis_iid_tlv.out        -v
 isis_sr-v	isis_sr.pcapng			isis_sr.out	-v
 # fuzzed pcap
-# isis-seg-fault-1-v is now conditionally handled by isis-seg-fault-1-v.sh
+# isis-seg-fault-1-v is now conditionally handled by isis-seg-fault-1-v.tests
 isis-seg-fault-2-v isis-seg-fault-2.pcapng isis-seg-fault-2-v.out -v
 isis-seg-fault-3-v isis-seg-fault-3.pcapng isis-seg-fault-3-v.out -v
 isis_sid	isis_sid.pcap			isis_sid.out	-v
