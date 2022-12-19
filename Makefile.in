@@ -511,6 +511,19 @@ releasecheck: releasetar
 	rm -rf "$$INSTALL_DIR" && \
 	echo '[$@] Done.'
 
+whitespacecheck:
+	@# trailing space(s)?
+	@if git grep -I -n ' $$' $$(git ls-files|grep -v '^tests/'); then \
+	    echo 'Error: Trailing space(s).'; \
+	    exit 1; \
+	fi
+	@# trailing tab(s)?
+	@# install-sh has a tab at the end of one line
+	@if git grep -I -n '	$$' $$(git ls-files|grep -vE '^(tests/|install-sh$$)'); then \
+	    echo 'Error: Trailing tabs(s).'; \
+	    exit 1; \
+	fi
+
 testlist:
 	echo $(TEST_DIST)
 
