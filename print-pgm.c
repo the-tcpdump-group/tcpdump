@@ -329,6 +329,7 @@ pgm_print(netdissect_options *ndo,
 	case PGM_NCF: {
 	    const struct pgm_nak *nak;
 	    char source_buf[INET6_ADDRSTRLEN], group_buf[INET6_ADDRSTRLEN];
+	    unsigned afnum;
 
 	    nak = (const struct pgm_nak *)(pgm + 1);
 	    ND_TCHECK_SIZE(nak);
@@ -358,8 +359,9 @@ pgm_print(netdissect_options *ndo,
 	     * Skip past the group, saving info along the way
 	     * and stopping if we don't have enough.
 	     */
+	    afnum = GET_BE_U_2(bp);
 	    bp += (2 * sizeof(uint16_t));
-	    switch (GET_BE_U_2(bp)) {
+	    switch (afnum) {
 	    case AFNUM_INET:
 		ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 		addrtostr(bp, group_buf, sizeof(group_buf));
