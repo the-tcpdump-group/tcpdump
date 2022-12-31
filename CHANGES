@@ -60,6 +60,7 @@ TBD
       EAP: fix some length checks and output issues.
       802.11: Fix the misleading comment regarding "From DS", "To DS" Frame
         Control Flags.
+      802.11: Fetch the CF and TIM IEs a field at a time.
       802.15.4, BGP, LISP: fix some length checks, compiler warnings,
         and undefined behavior warnings.
       PFLOG: handle LINKTYPE_PFLOG/DLT_PFLOG files from all OSes on all
@@ -69,10 +70,10 @@ TBD
       ICMP: redo MPLS Extension code as general ICMP Extension code.
       VQP: Do not print unknown error codes twice.
       Juniper: Add some bounds checks.
+      Juniper: Don't treat known DLT_ types as "Unknown".
       lwres: Fix a length check, update a variable type.
       EAP: Fix some undefined behaviors at runtime.
       Ethernet: Rework the length checks, add a length check.
-      ZEP: Add thren length checks.
       IPX: Add two length checks.
       Zephyr: Avoid printing non-ASCII characters.
       VRRP: Print the protocol name before any GET_().
@@ -85,7 +86,6 @@ TBD
       RESP: Fix an invalid check.
       RESP: Remove an unnecessary test.
       Arista: Refine the output format and print HwInfo.
-      EIGRP: Get the packet header fields right.
       sFlow: add support for IPv6 agent, add a length check.
       VRRP: add support for IPv6.
       OSPF: Update to match the Router Properties registry.
@@ -115,9 +115,7 @@ TBD
       Use AS_HELP_STRING macro instead of AC_HELP_STRING.
       Handle some Autoconf/make errors better.
       Fix an error when cross-compiling.
-      Fix "make releasetar" on AIX and Solaris.
       Use "git archive" for the "make releasetar" process.
-      Remove the release candidate rcX targets.
       Remove the release candidate rcX targets.
       Mend "make check" on Solaris 9 with Autoconf.
       Address assorted compiler warnings.
@@ -125,7 +123,6 @@ TBD
       Treat "msys" as Windows for test exit statuses.
       Clean up some help messages in configure.
       Use unified diff by default.
-      Improve error detection in "make releasetar".
       Remove awk code from mkdep.
       Fix configure test errors with Clang 15
       CMake: Prevent stripping of the RPATH on installation.
@@ -133,6 +130,15 @@ TBD
       Cirrus CI: Use the same configuration as for the main branch.
       CI: Add back running tcpdump -J/-L and capture, now with Cirrus VMs.
       Remove four test files (They are now in the libpcap tests directory).
+      On Solaris, for 64-bit builds, use the 64-bit pcap-config.
+      Tell CMake not to check for a C++ compiler.
+      CMake: Add a way to request -Werror and equivalents.
+      configure: Special-case macOS /usr/bin/pcap-config as we do in CMake.
+      configure: Use pcap-config --static-pcap-only if available.
+      configure: Use ac_c_werror_flag to force unknown compiler flags to fail.
+      configure: Use AC_COMPILE_IFELSE() and AC_LANG_SOURCE() for testing
+        flags.
+      Run the test that fails on OpenBSD only if we're not on OpenBSD.
     Source code:
       Fix some snapend-changing routines to protect against pointer
         underflow.
@@ -147,12 +153,17 @@ TBD
       netdissect.h: Keep the link-layer dissectors names sorted.
       setsignal(): Set SA_RESTART on non-lethal signals (REQ_INFO, FLUSH_PCAP)
         to avoid corrupting binary pcap output.
+      Use __builtin_unreachable().
+      Fail if nd_push_buffer() or nd_push_snaplen() fails.
+      Improve code style and fix many typos.
     Documentation:
       Some man page cleanups.
       Update the print interface for the packet count to stdout.
       Note that we require compilers to support at least some of C99.
       Update AIX and Solaris-related specifics.
       INSTALL.txt: Add doc/README.*, delete the deleted win32 directory.
+      Update README.md and README.Win32.md.
+      Update some comments with new RFC numbers.
 
 Wednesday, June 9, 2021 by gharris
   Summary for 4.99.1 tcpdump release
