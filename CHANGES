@@ -1,5 +1,13 @@
 TBD
   Summary for 4.99.3 tcpdump release (so far!)
+    Building and testing:
+      cmake: Update the minimum required version to 2.8.12 (except Windows).
+      CI: Introduce and use TCPDUMP_CMAKE_TAINTED.
+      Makefile.in: Add the releasecheck target.
+      Makefile.in: Add "make -s install" in the releasecheck target.
+      Cirrus CI: Run the "make releasecheck" command in the Linux task.
+      Makefile.in: Add the whitespacecheck target.
+      Cirrus CI: Run the "make whitespacecheck" command in the Linux task.
 
 Saturday, December 31, 2022 / The Tcpdump Group
   Summary for 4.99.2 tcpdump release
