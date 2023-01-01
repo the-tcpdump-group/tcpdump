@@ -770,6 +770,7 @@ smb_fdata1(netdissect_options *ndo,
 	    time_t t;
 	    struct tm *lt;
 	    const char *tstring;
+	    char buffer[sizeof("Www Mmm dd hh:mm:ss yyyy\n")];
 	    uint32_t x;
 
 	    switch (atoi(fmt + 1)) {
@@ -800,8 +801,10 @@ smb_fdata1(netdissect_options *ndo,
 	    }
 	    if (t != 0) {
 		lt = localtime(&t);
-		if (lt != NULL)
-		    tstring = asctime(lt);
+		if (lt != NULL) {
+		    strftime(buffer, sizeof(buffer), "%a %b %e %T %Y%n", lt);
+		    tstring = buffer;
+		}
 		else
 		    tstring = "(Can't convert time)\n";
 	    } else
