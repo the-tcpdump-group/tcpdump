@@ -1,5 +1,7 @@
 TBD
   Summary for 4.99.3 tcpdump release (so far!)
+    Source code:
+      smbutil.c: Replace obsolete function call (asctime)
     Building and testing:
       cmake: Update the minimum required version to 2.8.12 (except Windows).
       CI: Introduce and use TCPDUMP_CMAKE_TAINTED.
@@ -8,8 +10,6 @@ TBD
       Cirrus CI: Run the "make releasecheck" command in the Linux task.
       Makefile.in: Add the whitespacecheck target.
       Cirrus CI: Run the "make whitespacecheck" command in the Linux task.
-    Source code:
-      smbutil.c: Replace obsolete function call (asctime)
 
 Saturday, December 31, 2022 / The Tcpdump Group
   Summary for 4.99.2 tcpdump release
