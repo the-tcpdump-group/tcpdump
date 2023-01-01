@@ -49,7 +49,7 @@ endif()
 #    $ {target-directory}/tcpdump -h
 #    {target-directory}/tcpdump: Shared object "libpcap.so.0" not found
 #
-# It also appears to be the case that, on Ubunto 22.04, FreeBSD 12,
+# It also appears to be the case that, on Ubuntu 22.04, FreeBSD 12,
 # DragonFly BSD 5.8, OpenBSD 6.6, and Solaris 11.4,
 #
 # On Ubuntu and Solaris, even if you have a libpcap in /usr/local, you
