@@ -49,7 +49,10 @@ Monthday, Month DD, YYYY by gharris and denis
       Cirrus CI: Run the "make whitespacecheck" command in the Linux task.
 
 TBD
-  Summary for 4.99.2 tcpdump release (so far!)
+  Summary for 4.99.3 tcpdump release (so far!)
+
+Saturday, December 31, 2022 / The Tcpdump Group
+  Summary for 4.99.2 tcpdump release
     Updated printers:
       BGP: Update cease notification decoding to RFC 9003.
       BGP: decode BGP link-bandwidth extended community properly.
