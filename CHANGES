@@ -13,6 +13,11 @@ TBD
       Cirrus CI: Run the "make releasecheck" command in the Linux task.
       Makefile.in: Add the whitespacecheck target.
       Cirrus CI: Run the "make whitespacecheck" command in the Linux task.
+    Documentation:
+      Reformat the installation notes (INSTALL.txt) in Markdown.
+      Convert CONTRIBUTING to Markdown.
+      CONTRIBUTING.md: Document the use of "protocol: " in a commit summary.
+      Add a README file for NetBSD.
 
 Saturday, December 31, 2022 / The Tcpdump Group
   Summary for 4.99.2 tcpdump release
