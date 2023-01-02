@@ -368,7 +368,7 @@ ptp_print_2(netdissect_options *ndo, const u_char *bp, u_int length)
     v1_compat = foct & PTP_V1_COMPAT;
     ND_PRINT(", v1 compat : %s", v1_compat?"yes":"no");
     msg_type = foct & PTP_MSG_TYPE_MASK;
-    ND_PRINT(", msg type : %s", tok2str(ptp_msg_type, "none", msg_type));
+    ND_PRINT(", msg type : %s", tok2str(ptp_msg_type, "Reserved", msg_type));
 
     /* msg length */
     len -= 2; bp += 2; msg_len = GET_BE_U_2(bp); ND_PRINT(", length : %u", msg_len);
