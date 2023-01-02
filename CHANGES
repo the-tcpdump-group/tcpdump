@@ -1,5 +1,8 @@
 TBD
   Summary for 4.99.3 tcpdump release (so far!)
+    Updated printers:
+      PTP: Use the proper values for the control field and print un-allocated
+        values for the message field as "Reserved" instead of "none".
     Source code:
       smbutil.c: Replace obsolete function call (asctime)
     Building and testing:
