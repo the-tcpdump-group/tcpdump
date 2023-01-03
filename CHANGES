@@ -56,6 +56,7 @@ TBD
       Cirrus CI: Run the "make releasecheck" command in the Linux task.
       Makefile.in: Add the whitespacecheck target.
       Cirrus CI: Run the "make whitespacecheck" command in the Linux task.
+      Address all shellcheck warnings in update-test.sh.
     Documentation:
       Reformat the installation notes (INSTALL.txt) in Markdown.
       Convert CONTRIBUTING to Markdown.
