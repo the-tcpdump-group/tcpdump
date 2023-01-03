@@ -55,7 +55,7 @@
 #define PPTP_CTRL_MSG_TYPE_WEN		14
 #define PPTP_CTRL_MSG_TYPE_SLI		15
 
-#define PPTP_FRAMING_CAP_ASYNC_MASK	0x00000001      /* Aynchronous */
+#define PPTP_FRAMING_CAP_ASYNC_MASK	0x00000001      /* Asynchronous */
 #define PPTP_FRAMING_CAP_SYNC_MASK	0x00000002      /* Synchronous */
 
 #define PPTP_BEARER_CAP_ANALOG_MASK	0x00000001      /* Analog */

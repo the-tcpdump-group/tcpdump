@@ -77,7 +77,7 @@
 #endif
 
 /*
- * Action vaues.
+ * Action values.
  */
 #define PF_PASS			0
 #define PF_DROP			1
