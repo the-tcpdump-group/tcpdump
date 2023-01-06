@@ -23,6 +23,7 @@ Monthday, Month DD, YYYY by gharris and denis
       BGP: add dissector for BGPsec capability and path
       BGP: Add Origin Validation State extended community
       BGP: Add support for BGP Role capability and OTC attribute
+      Arista: Use the test .pcap file from pull request #955 (HwInfo).
     User interface:
       Add optional unit suffix on -C file size.
       Add --print-sampling to print every Nth packet instead of all.
