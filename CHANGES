@@ -19,6 +19,7 @@ TBD
       Convert CONTRIBUTING to Markdown.
       CONTRIBUTING.md: Document the use of "protocol: " in a commit summary.
       Add a README file for NetBSD.
+      Fix CMake build to set man page section numbers in tcpdump.1
 
 Saturday, December 31, 2022 / The Tcpdump Group
   Summary for 4.99.2 tcpdump release
