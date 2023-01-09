@@ -1243,6 +1243,55 @@ file(GLOB PROJECT_SOURCE_LIST_H
     *.h
 )
 
+#
+# Assume, by default, no support for shared libraries and V7/BSD
+# convention for man pages (devices in section 4, file formats in
+# section 5, miscellaneous info in section 7, administrative commands
+# and daemons in section 8).  Individual cases can override this.
+# Individual cases can override this.
+#
+set(MAN_FILE_FORMATS 5)
+set(MAN_MISC_INFO 7)
+if(CMAKE_SYSTEM_NAME STREQUAL "AIX")
+    # Workaround to enable certain features
+    set(_SUN TRUE)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "HP-UX")
+    #
+    # Use System V conventions for man pages.
+    #
+    set(MAN_FILE_FORMATS 4)
+    set(MAN_MISC_INFO 5)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "IRIX" OR CMAKE_SYSTEM_NAME STREQUAL "IRIX64")
+    #
+    # Use IRIX conventions for man pages; they're the same as the
+    # System V conventions, except that they use section 8 for
+    # administrative commands and daemons.
+    #
+    set(MAN_FILE_FORMATS 4)
+    set(MAN_MISC_INFO 5)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "OSF1")
+    #
+    # DEC OSF/1, a/k/a Digital UNIX, a/k/a Tru64 UNIX.
+    # Use Tru64 UNIX conventions for man pages; they're the same as the
+    # System V conventions except that they use section 8 for
+    # administrative commands and daemons.
+    #
+    set(MAN_FILE_FORMATS 4)
+    set(MAN_MISC_INFO 5)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "SunOS" AND CMAKE_SYSTEM_VERSION MATCHES "5[.][0-9.]*")
+    #
+    # SunOS 5.x.
+    #
+    if(CMAKE_SYSTEM_VERSION STREQUAL "5.12")
+    else()
+        #
+        # Use System V conventions for man pages.
+        #
+        set(MAN_FILE_FORMATS 4)
+        set(MAN_MISC_INFO 5)
+    endif()
+endif()
+
 source_group("Source Files" FILES ${PROJECT_SOURCE_LIST_C})
 source_group("Header Files" FILES ${PROJECT_SOURCE_LIST_H})
 
