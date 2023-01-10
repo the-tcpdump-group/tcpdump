@@ -459,7 +459,7 @@ clean:
 
 distclean:
 	rm -f $(CLEANFILES) Makefile config.cache config.log config.status \
-	    config.h gnuc.h os-proto.h stamp-h stamp-h.in $(PROG).1 \
+	    config.h os-proto.h stamp-h stamp-h.in $(PROG).1 \
 	    libnetdissect.a tests/.failed tests/.passed \
 	    tests/failure-outputs.txt
 	rm -rf autom4te.cache tests/DIFF tests/NEW

@@ -58,6 +58,7 @@ TBD
       Makefile.in: Add the whitespacecheck target.
       Cirrus CI: Run the "make whitespacecheck" command in the Linux task.
       Address all shellcheck warnings in update-test.sh.
+      Makefile.in: Get rid of a remain of gnuc.h.
     Documentation:
       Reformat the installation notes (INSTALL.txt) in Markdown.
       Convert CONTRIBUTING to Markdown.
