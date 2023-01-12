@@ -1,5 +1,5 @@
-TBD
-  Summary for 4.99.3 tcpdump release (so far!)
+Thursday, January 12, 2023 / The Tcpdump Group
+  Summary for 4.99.3 tcpdump release
     Updated printers:
       PTP: Use the proper values for the control field and print un-allocated
         values for the message field as "Reserved" instead of "none".
