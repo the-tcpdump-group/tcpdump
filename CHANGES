@@ -1,4 +1,4 @@
-Monthday, Month DD, YYYY by gharris and denis
+DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
   Summary for 5.0.0 tcpdump release (so far!)
     Refine protocol decoding for:
       OpenFlow 1.0: Fix indentation of PORT_MOD, improve handling of
@@ -42,8 +42,11 @@ Monthday, Month DD, YYYY by gharris and denis
     Building and testing:
       Add a configure option to help debugging (--enable-instrument-functions)
 
-TBD
-  Summary for 4.99.3 tcpdump release (so far!)
+DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
+  Summary for 4.99.4 tcpdump release (so far!)
+
+Thursday, January 12, 2023 / The Tcpdump Group
+  Summary for 4.99.3 tcpdump release
     Updated printers:
       PTP: Use the proper values for the control field and print un-allocated
         values for the message field as "Reserved" instead of "none".
