@@ -1045,11 +1045,11 @@ dnl
 dnl AC_LBL_LIBRARY_NET
 dnl
 dnl This test is for network applications that need socket() and
-dnl gethostbyname() -ish functions.  Under Solaris, those applications
+dnl gethostbyaddr() -ish functions.  Under Solaris, those applications
 dnl need to link with "-lsocket -lnsl".  Under IRIX, they need to link
 dnl with "-lnsl" but should *not* link with "-lsocket" because
 dnl libsocket.a breaks a number of things (for instance:
-dnl gethostbyname() under IRIX 5.2, and snoop sockets under most
+dnl gethostbyaddr() under IRIX 5.2, and snoop sockets under most
 dnl versions of IRIX).
 dnl
 dnl Unfortunately, many application developers are not aware of this,
@@ -1077,16 +1077,16 @@ dnl statically and happen to have a libresolv.a lying around (and no
 dnl libnsl.a).
 dnl
 AC_DEFUN(AC_LBL_LIBRARY_NET, [
-    # Most operating systems have gethostbyname() in the default searched
+    # Most operating systems have gethostbyaddr() in the default searched
     # libraries (i.e. libc):
     # Some OSes (eg. Solaris) place it in libnsl
     # Some strange OSes (SINIX) have it in libsocket:
-    AC_SEARCH_LIBS(gethostbyname, nsl socket resolv)
+    AC_SEARCH_LIBS(gethostbyaddr, nsl socket resolv)
     # Unfortunately libsocket sometimes depends on libnsl and
     # AC_SEARCH_LIBS isn't up to the task of handling dependencies like this.
-    if test "$ac_cv_search_gethostbyname" = "no"
+    if test "$ac_cv_search_gethostbyaddr" = "no"
     then
-	AC_CHECK_LIB(socket, gethostbyname,
+	AC_CHECK_LIB(socket, gethostbyaddr,
                      LIBS="-lsocket -lnsl $LIBS", , -lnsl)
     fi
     AC_SEARCH_LIBS(socket, socket, ,
