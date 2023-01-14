@@ -764,7 +764,6 @@ extern void zmtp1_datagram_print(netdissect_options *, const u_char *, const u_i
 extern void someip_print(netdissect_options *, const u_char *, const u_int);
 
 /* checksum routines */
-extern void init_checksum(void);
 extern uint16_t verify_crc10_cksum(uint16_t, const u_char *, int);
 extern uint16_t create_osi_cksum(const uint8_t *, int, int);
 
