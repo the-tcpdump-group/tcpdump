@@ -5,7 +5,7 @@ if(WIN32)
     cmake_minimum_required(VERSION 3.12)
 else(WIN32)
     #
-    # For now, require only 2.8.6, just in case somebody is
+    # For now, require only 2.8.12, just in case somebody is
     # configuring with CMake on a "long-term support" version
     # of some OS and that version supplies an older version of
     # CMake.
