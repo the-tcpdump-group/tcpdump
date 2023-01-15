@@ -83,6 +83,8 @@ bgp-bgpsec	bgp-bgpsec.pcap		bgp-bgpsec.out		-v
 bgp-ovs	bgp-ovs.pcapng		bgp-ovs.out		-v
 bgp-role	bgp-role.pcapng		bgp-role.out		-v
 bgp_notification_rr_msg_error bgp_notification_rr_msg_error.pcap bgp_notification_rr_msg_error.out -v
+bgp-sr-te-tunnel-policy bgp-sr-te-tunnel-policy.pcap bgp-sr-te-tunnel-policy.out -v
+bgp-sr-te-malformed-pkt bgp-sr-te-malformed-pkt.pcap bgp-sr-te-malformed-pkt.out -v
 
 # Broadcom tag tests
 brcmtag		brcm-tag.pcap		brcm-tag.out

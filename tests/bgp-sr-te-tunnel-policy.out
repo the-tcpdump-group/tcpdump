@@ -1,0 +1,276 @@
+    1  2019-04-16 20:37:06.326576 IP6 (hlim 1, next-header HBH (0), payload length 56) fe80::200:eff:fe01:0 > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 2 group record(s) [gaddr ff02::1:ff00:1 to_ex, 0 source(s)] [gaddr ff02::1:ff01:0 to_ex, 0 source(s)]
+    2  2019-04-16 20:37:06.390208 IP6 (hlim 1, next-header HBH (0), payload length 56) fe80::7c4c:1fff:fecf:2ce > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 2 group record(s) [gaddr ff02::1:ff00:2 to_ex, 0 source(s)] [gaddr ff02::1:ffcf:2ce to_ex, 0 source(s)]
+    3  2019-04-16 20:37:06.998314 IP6 (hlim 1, next-header HBH (0), payload length 56) fe80::200:eff:fe01:0 > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 2 group record(s) [gaddr ff02::1:ff00:1 to_ex, 0 source(s)] [gaddr ff02::1:ff01:0 to_ex, 0 source(s)]
+    4  2019-04-16 20:37:07.402850 IP6 (hlim 1, next-header HBH (0), payload length 76) fe80::200:eff:fe01:0 > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 3 group record(s) [gaddr ff02::1:ff00:0 to_ex, 0 source(s)] [gaddr ff05::2 to_ex, 0 source(s)] [gaddr ff02::2 to_ex, 0 source(s)]
+    5  2019-04-16 20:37:07.474102 IP6 (hlim 1, next-header HBH (0), payload length 76) fe80::7c4c:1fff:fecf:2ce > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 3 group record(s) [gaddr ff02::1:ff00:0 to_ex, 0 source(s)] [gaddr ff05::2 to_ex, 0 source(s)] [gaddr ff02::2 to_ex, 0 source(s)]
+    6  2019-04-16 20:37:07.990188 IP6 (hlim 1, next-header HBH (0), payload length 76) fe80::7c4c:1fff:fecf:2ce > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 3 group record(s) [gaddr ff02::1:ff00:0 to_ex, 0 source(s)] [gaddr ff05::2 to_ex, 0 source(s)] [gaddr ff02::2 to_ex, 0 source(s)]
+    7  2019-04-16 20:37:08.246441 IP6 (hlim 1, next-header HBH (0), payload length 76) fe80::200:eff:fe01:0 > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 3 group record(s) [gaddr ff02::1:ff00:0 to_ex, 0 source(s)] [gaddr ff05::2 to_ex, 0 source(s)] [gaddr ff02::2 to_ex, 0 source(s)]
+    8  2019-04-16 20:37:08.606010 IP6 (hlim 255, next-header ICMPv6 (58), payload length 32) 2000:0:0:40::2 > ff02::1:ff00:1: [icmp6 sum ok] ICMP6, neighbor solicitation, length 32, who has 2000:0:0:40::1
+	  source link-address option (1), length 8 (1): 7e:4c:1f:cf:02:ce
+    9  2019-04-16 20:37:08.608773 IP6 (hlim 255, next-header ICMPv6 (58), payload length 32) 2000:0:0:40::1 > 2000:0:0:40::2: [icmp6 sum ok] ICMP6, neighbor advertisement, length 32, tgt is 2000:0:0:40::1, Flags [router, solicited, override]
+	  destination link-address option (2), length 8 (1): 00:00:0e:01:00:00
+   10  2019-04-16 20:37:08.609091 IP6 (flowlabel 0x7652b, hlim 64, next-header TCP (6), payload length 40) 2000:0:0:40::2.44323 > 2000:0:0:40::1.179: Flags [S], cksum 0x956e (correct), seq 4234797614, win 28800, options [mss 1440,sackOK,TS val 778585801 ecr 0,nop,wscale 9], length 0
+   11  2019-04-16 20:37:08.611536 IP6 (flowlabel 0xccdfa, hlim 64, next-header TCP (6), payload length 20) 2000:0:0:40::1.179 > 2000:0:0:40::2.44323: Flags [R.], cksum 0xe2dd (correct), seq 0, ack 4234797615, win 0, length 0
+   12  2019-04-16 20:37:08.637989 IP6 (flowlabel 0x9db84, hlim 64, next-header TCP (6), payload length 40) 2000:0:0:40::2.37641 > 2000:0:0:40::1.179: Flags [S], cksum 0x9429 (correct), seq 2679134782, win 28800, options [mss 1440,sackOK,TS val 778585810 ecr 0,nop,wscale 9], length 0
+   13  2019-04-16 20:37:08.640249 IP6 (flowlabel 0xa9b9c, hlim 64, next-header TCP (6), payload length 20) 2000:0:0:40::1.179 > 2000:0:0:40::2.37641: Flags [R.], cksum 0xe1a1 (correct), seq 0, ack 2679134783, win 0, length 0
+   14  2019-04-16 20:37:08.675679 IP6 (flowlabel 0xec447, hlim 64, next-header TCP (6), payload length 40) 2000:0:0:40::2.40919 > 2000:0:0:40::1.179: Flags [S], cksum 0x7a0b (correct), seq 1511632156, win 28800, options [mss 1440,sackOK,TS val 778585819 ecr 0,nop,wscale 9], length 0
+   15  2019-04-16 20:37:08.678056 IP6 (flowlabel 0x13160, hlim 64, next-header TCP (6), payload length 20) 2000:0:0:40::1.179 > 2000:0:0:40::2.40919: Flags [R.], cksum 0xc78c (correct), seq 0, ack 1511632157, win 0, length 0
+   16  2019-04-16 20:37:08.733367 IP6 (flowlabel 0x2078c, hlim 64, next-header TCP (6), payload length 40) 2000:0:0:40::2.45559 > 2000:0:0:40::1.179: Flags [S], cksum 0xb771 (correct), seq 598971374, win 28800, options [mss 1440,sackOK,TS val 778585833 ecr 0,nop,wscale 9], length 0
+   17  2019-04-16 20:37:08.735733 IP6 (flowlabel 0x6738f, hlim 64, next-header TCP (6), payload length 20) 2000:0:0:40::1.179 > 2000:0:0:40::2.45559: Flags [R.], cksum 0x0501 (correct), seq 0, ack 598971375, win 0, length 0
+   18  2019-04-16 20:37:08.831483 IP6 (flowlabel 0x0206e, hlim 64, next-header TCP (6), payload length 40) 2000:0:0:40::2.35875 > 2000:0:0:40::1.179: Flags [S], cksum 0xa04d (correct), seq 2625722367, win 28800, options [mss 1440,sackOK,TS val 778585858 ecr 0,nop,wscale 9], length 0
+   19  2019-04-16 20:37:08.835486 IP6 (flowlabel 0x33031, hlim 64, next-header TCP (6), payload length 20) 2000:0:0:40::1.179 > 2000:0:0:40::2.35875: Flags [R.], cksum 0xedf5 (correct), seq 0, ack 2625722368, win 0, length 0
+   20  2019-04-16 20:37:09.024377 IP6 (flowlabel 0x8405d, hlim 64, next-header TCP (6), payload length 40) 2000:0:0:40::2.41377 > 2000:0:0:40::1.179: Flags [S], cksum 0x70b8 (correct), seq 3456778333, win 28800, options [mss 1440,sackOK,TS val 778585906 ecr 0,nop,wscale 9], length 0
+   21  2019-04-16 20:37:09.027340 IP6 (flowlabel 0x3b89f, hlim 64, next-header TCP (6), payload length 20) 2000:0:0:40::1.179 > 2000:0:0:40::2.41377: Flags [R.], cksum 0xbe90 (correct), seq 0, ack 3456778334, win 0, length 0
+   22  2019-04-16 20:37:09.371914 IP6 (flowlabel 0xd8c49, hlim 64, next-header TCP (6), payload length 40) 2000:0:0:40::2.33579 > 2000:0:0:40::1.179: Flags [S], cksum 0x56dd (correct), seq 4094448213, win 28800, options [mss 1440,sackOK,TS val 778585993 ecr 0,nop,wscale 9], length 0
+   23  2019-04-16 20:37:09.374836 IP6 (flowlabel 0x85ee1, hlim 64, next-header TCP (6), payload length 20) 2000:0:0:40::1.179 > 2000:0:0:40::2.33579: Flags [R.], cksum 0xa50c (correct), seq 0, ack 4094448214, win 0, length 0
+   24  2019-04-16 20:37:10.043571 IP6 (flowlabel 0x26438, hlim 64, next-header TCP (6), payload length 40) 2000:0:0:40::2.37185 > 2000:0:0:40::1.179: Flags [S], cksum 0xba99 (correct), seq 3339390172, win 28800, options [mss 1440,sackOK,TS val 778586161 ecr 0,nop,wscale 9], length 0
+   25  2019-04-16 20:37:10.046464 IP6 (flowlabel 0xfd941, hlim 64, next-header TCP (6), payload length 20) 2000:0:0:40::1.179 > 2000:0:0:40::2.37185: Flags [R.], cksum 0x0971 (correct), seq 0, ack 3339390173, win 0, length 0
+   26  2019-04-16 20:37:11.355774 IP6 (flowlabel 0xf3995, hlim 64, next-header TCP (6), payload length 40) 2000:0:0:40::2.38279 > 2000:0:0:40::1.179: Flags [S], cksum 0x451a (correct), seq 3747832949, win 28800, options [mss 1440,sackOK,TS val 778586489 ecr 0,nop,wscale 9], length 0
+   27  2019-04-16 20:37:11.358668 IP6 (flowlabel 0x46303, hlim 64, next-header TCP (6), payload length 20) 2000:0:0:40::1.179 > 2000:0:0:40::2.38279: Flags [R.], cksum 0x9539 (correct), seq 0, ack 3747832950, win 0, length 0
+   28  2019-04-16 20:37:13.949532 IP6 (flowlabel 0x42172, hlim 64, next-header TCP (6), payload length 40) 2000:0:0:40::2.38717 > 2000:0:0:40::1.179: Flags [S], cksum 0x341f (correct), seq 458175815, win 28800, options [mss 1440,sackOK,TS val 778587137 ecr 0,nop,wscale 9], length 0
+   29  2019-04-16 20:37:13.952481 IP6 (class 0xc0, flowlabel 0x4cb8f, hlim 255, next-header TCP (6), payload length 40) 2000:0:0:40::1.179 > 2000:0:0:40::2.38717: Flags [S.], cksum 0xdb1a (correct), seq 4006408363, ack 458175816, win 28560, options [mss 1440,sackOK,TS val 778587138 ecr 778587137,nop,wscale 9], length 0
+   30  2019-04-16 20:37:13.952690 IP6 (flowlabel 0x42172, hlim 64, next-header TCP (6), payload length 32) 2000:0:0:40::2.38717 > 2000:0:0:40::1.179: Flags [.], cksum 0x792b (correct), ack 1, win 57, options [nop,nop,TS val 778587138 ecr 778587138], length 0
+   31  2019-04-16 20:37:13.970758 IP6 (flowlabel 0x42172, hlim 64, next-header TCP (6), payload length 83) 2000:0:0:40::2.38717 > 2000:0:0:40::1.179: Flags [P.], cksum 0xa650 (correct), seq 1:52, ack 1, win 57, options [nop,nop,TS val 778587143 ecr 778587138], length 51: BGP
+	Open Message (1), length: 51
+	  Version 4, my AS 23456, Holdtime 0s, ID 1.1.1.1
+	  Optional parameters, length: 22
+	    Option Capabilities Advertisement (2), length: 20
+	      Multiprotocol Extensions (1), length: 4
+		AFI IPv4 (1), SAFI SR-TE Policy (73)
+	      Multiprotocol Extensions (1), length: 4
+		AFI IPv6 (2), SAFI SR-TE Policy (73)
+	      Route Refresh (2), length: 0
+	      32-Bit AS Number (65), length: 4
+		 4 Byte AS 1523982034
+   32  2019-04-16 20:37:13.973440 IP6 (class 0xc0, flowlabel 0x4cb8f, hlim 255, next-header TCP (6), payload length 32) 2000:0:0:40::1.179 > 2000:0:0:40::2.38717: Flags [.], cksum 0x78ef (correct), ack 52, win 56, options [nop,nop,TS val 778587143 ecr 778587143], length 0
+   33  2019-04-16 20:37:13.973613 IP6 (class 0xc0, flowlabel 0x4cb8f, hlim 255, next-header TCP (6), payload length 99) 2000:0:0:40::1.179 > 2000:0:0:40::2.38717: Flags [P.], cksum 0x49fe (correct), seq 1:68, ack 52, win 56, options [nop,nop,TS val 778587143 ecr 778587143], length 67: BGP
+	Open Message (1), length: 67
+	  Version 4, my AS 23456, Holdtime 180s, ID 0.0.0.1
+	  Optional parameters, length: 38
+	    Option Capabilities Advertisement (2), length: 36
+	      Multiprotocol Extensions (1), length: 4
+		AFI IPv6 (2), SAFI Unicast (1)
+	      Multiprotocol Extensions (1), length: 4
+		AFI IPv4 (1), SAFI SR-TE Policy (73)
+	      Multiprotocol Extensions (1), length: 4
+		AFI IPv6 (2), SAFI SR-TE Policy (73)
+	      Route Refresh (2), length: 0
+	      Graceful Restart (64), length: 2
+		Restart Flags: [R, N], Restart Time 300s
+	      32-Bit AS Number (65), length: 4
+		 4 Byte AS 1523982034
+	      Multiple Paths (69), length: 4
+		AFI IPv6 (2), SAFI Unicast (1), Send/Receive: Receive
+   34  2019-04-16 20:37:13.973750 IP6 (flowlabel 0x42172, hlim 64, next-header TCP (6), payload length 32) 2000:0:0:40::2.38717 > 2000:0:0:40::1.179: Flags [.], cksum 0x78ab (correct), ack 68, win 57, options [nop,nop,TS val 778587143 ecr 778587143], length 0
+   35  2019-04-16 20:37:13.973943 IP6 (flowlabel 0x42172, hlim 64, next-header TCP (6), payload length 51) 2000:0:0:40::2.38717 > 2000:0:0:40::1.179: Flags [P.], cksum 0x747d (correct), seq 52:71, ack 68, win 57, options [nop,nop,TS val 778587143 ecr 778587143], length 19: BGP
+	Keepalive Message (4), length: 19
+   36  2019-04-16 20:37:13.977569 IP6 (class 0xc0, flowlabel 0x4cb8f, hlim 255, next-header TCP (6), payload length 51) 2000:0:0:40::1.179 > 2000:0:0:40::2.38717: Flags [P.], cksum 0x747d (correct), seq 68:87, ack 52, win 56, options [nop,nop,TS val 778587144 ecr 778587143], length 19: BGP
+	Keepalive Message (4), length: 19
+   37  2019-04-16 20:37:14.018075 IP6 (flowlabel 0x42172, hlim 64, next-header TCP (6), payload length 32) 2000:0:0:40::2.38717 > 2000:0:0:40::1.179: Flags [.], cksum 0x7878 (correct), ack 87, win 57, options [nop,nop,TS val 778587155 ecr 778587144], length 0
+   38  2019-04-16 20:37:14.018308 IP6 (class 0xc0, flowlabel 0x4cb8f, hlim 255, next-header TCP (6), payload length 32) 2000:0:0:40::1.179 > 2000:0:0:40::2.38717: Flags [.], cksum 0x787a (correct), ack 71, win 56, options [nop,nop,TS val 778587155 ecr 778587143], length 0
+   39  2019-04-16 20:37:14.020857 IP6 (class 0xc0, flowlabel 0x4cb8f, hlim 255, next-header TCP (6), payload length 51) 2000:0:0:40::1.179 > 2000:0:0:40::2.38717: Flags [P.], cksum 0x7440 (correct), seq 87:106, ack 71, win 56, options [nop,nop,TS val 778587155 ecr 778587155], length 19: BGP
+	Keepalive Message (4), length: 19
+   40  2019-04-16 20:37:14.021038 IP6 (flowlabel 0x42172, hlim 64, next-header TCP (6), payload length 32) 2000:0:0:40::2.38717 > 2000:0:0:40::1.179: Flags [.], cksum 0x785a (correct), ack 106, win 57, options [nop,nop,TS val 778587155 ecr 778587155], length 0
+   41  2019-04-16 20:37:33.815821 IP6 (flowlabel 0x42172, hlim 64, next-header TCP (6), payload length 339) 2000:0:0:40::2.38717 > 2000:0:0:40::1.179: Flags [P.], cksum 0xf673 (correct), seq 71:378, ack 106, win 57, options [nop,nop,TS val 778592104 ecr 778587155], length 307: BGP
+	Update Message (2), length: 307
+	  Community (8), length: 4, Flags [OT]:  NO_ADVERTISE
+	  Tunnel Encapsulation (23), length: 228, Flags [OT]: 
+	    Tunnel-type: SR Policy (15), length: 224
+	      Binding SID (13), length: 6, Flags [], Label: 965536, TC: 0, S: 0, TTL: 0
+	      Preference (12), length: 6, Flags [], Preference: 200
+	      Segment List (128), length: 25
+	        Segment Type A (1), length: 6, Flags [], Label: 65537, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 131073, TC: 0, S: 0, TTL: 0
+	        Weight (9), length: 6, Flags [], Weight: 500
+	      Segment List (128), length: 25
+	        Segment Type A (1), length: 6, Flags [], Label: 196609, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262145, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 327682, TC: 0, S: 0, TTL: 0
+	      Segment List (128), length: 57
+	        Segment Type A (1), length: 6, Flags [], Label: 262145, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262146, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262147, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262148, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262149, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262150, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262151, TC: 0, S: 0, TTL: 0
+	      Segment List (128), length: 1
+	      Segment List (128), length: 9
+	        Weight (9), length: 6, Flags [], Weight: 111
+	      Segment List (128), length: 73
+	        Segment Type A (1), length: 6, Flags [], Label: 65537, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65538, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65539, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65540, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65541, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65542, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65543, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65544, TC: 0, S: 0, TTL: 0
+	        Weight (9), length: 6, Flags [], Weight: 999
+	  Origin (1), length: 1, Flags [T]: IGP
+	  AS Path (2), length: 6, Flags [T]: 200 
+	  Local Preference (5), length: 4, Flags [T]: 100
+	  Multi-Protocol Reach NLRI (14), length: 22, Flags [OE]: 
+	    AFI: IPv4 (1), SAFI: SR-TE Policy (73)
+	    nexthop: 1.0.0.2, nh-length: 4, no SNPA
+	      NLRI Length: 96, Distinguisher: 4294967295, Color: 2147483648, Endpoint: 3.4.5.6
+   42  2019-04-16 20:37:33.819087 IP6 (class 0xc0, flowlabel 0x4cb8f, hlim 255, next-header TCP (6), payload length 32) 2000:0:0:40::1.179 > 2000:0:0:40::2.38717: Flags [.], cksum 0x507d (correct), ack 378, win 56, options [nop,nop,TS val 778592105 ecr 778592104], length 0
+   43  2019-04-16 20:37:33.819228 ARP, Ethernet (len 6), IPv4 (len 4), Request who-has 1.0.0.2 tell 1.0.0.1, length 28
+   44  2019-04-16 20:37:33.819396 ARP, Ethernet (len 6), IPv4 (len 4), Reply 1.0.0.2 is-at 7e:4c:1f:cf:02:ce, length 28
+   45  2019-04-16 20:37:34.690324 IP6 (flowlabel 0x42172, hlim 64, next-header TCP (6), payload length 363) 2000:0:0:40::2.38717 > 2000:0:0:40::1.179: Flags [P.], cksum 0x0190 (correct), seq 378:709, ack 106, win 57, options [nop,nop,TS val 778592323 ecr 778592105], length 331: BGP
+	Update Message (2), length: 331
+	  Community (8), length: 4, Flags [OT]:  NO_ADVERTISE
+	  Tunnel Encapsulation (23), length: 228, Flags [OT]: 
+	    Tunnel-type: SR Policy (15), length: 224
+	      Binding SID (13), length: 6, Flags [], Label: 965537, TC: 0, S: 0, TTL: 0
+	      Preference (12), length: 6, Flags [], Preference: 200
+	      Segment List (128), length: 25
+	        Segment Type A (1), length: 6, Flags [], Label: 65537, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 131073, TC: 0, S: 0, TTL: 0
+	        Weight (9), length: 6, Flags [], Weight: 500
+	      Segment List (128), length: 25
+	        Segment Type A (1), length: 6, Flags [], Label: 196609, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262145, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 327682, TC: 0, S: 0, TTL: 0
+	      Segment List (128), length: 57
+	        Segment Type A (1), length: 6, Flags [], Label: 262145, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262146, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262147, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262148, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262149, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262150, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262151, TC: 0, S: 0, TTL: 0
+	      Segment List (128), length: 1
+	      Segment List (128), length: 9
+	        Weight (9), length: 6, Flags [], Weight: 111
+	      Segment List (128), length: 73
+	        Segment Type A (1), length: 6, Flags [], Label: 65537, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65538, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65539, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65540, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65541, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65542, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65543, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65544, TC: 0, S: 0, TTL: 0
+	        Weight (9), length: 6, Flags [], Weight: 999
+	  Origin (1), length: 1, Flags [T]: IGP
+	  AS Path (2), length: 6, Flags [T]: 200 
+	  Local Preference (5), length: 4, Flags [T]: 100
+	  Multi-Protocol Reach NLRI (14), length: 46, Flags [OE]: 
+	    AFI: IPv6 (2), SAFI: SR-TE Policy (73)
+	    nexthop: 2000:0:0:40::2, nh-length: 16, no SNPA
+	      NLRI Length: 192, Distinguisher: 4294967295, Color: 2147483648, Endpoint: 2002::304:506
+   46  2019-04-16 20:37:34.693512 IP6 (class 0xc0, flowlabel 0x4cb8f, hlim 255, next-header TCP (6), payload length 32) 2000:0:0:40::1.179 > 2000:0:0:40::2.38717: Flags [.], cksum 0x4d7d (correct), ack 709, win 56, options [nop,nop,TS val 778592323 ecr 778592323], length 0
+   47  2019-04-16 20:37:39.798084 IP6 (hlim 255, next-header ICMPv6 (58), payload length 32) fe80::7c4c:1fff:fecf:2ce > 2000:0:0:40::1: [icmp6 sum ok] ICMP6, neighbor solicitation, length 32, who has 2000:0:0:40::1
+	  source link-address option (1), length 8 (1): 7e:4c:1f:cf:02:ce
+   48  2019-04-16 20:37:39.800930 IP6 (hlim 255, next-header ICMPv6 (58), payload length 24) 2000:0:0:40::1 > fe80::7c4c:1fff:fecf:2ce: [icmp6 sum ok] ICMP6, neighbor advertisement, length 24, tgt is 2000:0:0:40::1, Flags [router, solicited]
+   49  2019-04-16 20:37:55.797538 IP6 (flowlabel 0x42172, hlim 64, next-header TCP (6), payload length 75) 2000:0:0:40::2.38717 > 2000:0:0:40::1.179: Flags [P.], cksum 0x9720 (correct), seq 709:752, ack 106, win 57, options [nop,nop,TS val 778597599 ecr 778592323], length 43: BGP
+	Update Message (2), length: 43
+	  Multi-Protocol Unreach NLRI (15), length: 16, Flags [OE]: 
+	    AFI: IPv4 (1), SAFI: SR-TE Policy (73)
+	      NLRI Length: 96, Distinguisher: 4294967295, Color: 2147483648, Endpoint: 3.4.5.6
+   50  2019-04-16 20:37:55.800569 IP6 (class 0xc0, flowlabel 0x4cb8f, hlim 255, next-header TCP (6), payload length 32) 2000:0:0:40::1.179 > 2000:0:0:40::2.38717: Flags [.], cksum 0x2419 (correct), ack 752, win 56, options [nop,nop,TS val 778597600 ecr 778597599], length 0
+   51  2019-04-16 20:37:56.649536 IP6 (flowlabel 0x42172, hlim 64, next-header TCP (6), payload length 87) 2000:0:0:40::2.38717 > 2000:0:0:40::1.179: Flags [P.], cksum 0x064b (correct), seq 752:807, ack 106, win 57, options [nop,nop,TS val 778597812 ecr 778597600], length 55: BGP
+	Update Message (2), length: 55
+	  Multi-Protocol Unreach NLRI (15), length: 28, Flags [OE]: 
+	    AFI: IPv6 (2), SAFI: SR-TE Policy (73)
+	      NLRI Length: 192, Distinguisher: 4294967295, Color: 2147483648, Endpoint: 2002::304:506
+   52  2019-04-16 20:37:56.652666 IP6 (class 0xc0, flowlabel 0x4cb8f, hlim 255, next-header TCP (6), payload length 32) 2000:0:0:40::1.179 > 2000:0:0:40::2.38717: Flags [.], cksum 0x2238 (correct), ack 807, win 56, options [nop,nop,TS val 778597813 ecr 778597812], length 0
+   53  2019-04-16 20:37:59.893446 IP6 (flowlabel 0x42172, hlim 64, next-header TCP (6), payload length 351) 2000:0:0:40::2.38717 > 2000:0:0:40::1.179: Flags [P.], cksum 0x4c43 (correct), seq 807:1126, ack 106, win 57, options [nop,nop,TS val 778598623 ecr 778597813], length 319: BGP
+	Update Message (2), length: 319
+	  Community (8), length: 4, Flags [OT]:  NO_ADVERTISE
+	  Tunnel Encapsulation (23), length: 228, Flags [OT]: 
+	    Tunnel-type: SR Policy (15), length: 224
+	      Binding SID (13), length: 6, Flags [], Label: 965536, TC: 0, S: 0, TTL: 0
+	      Preference (12), length: 6, Flags [], Preference: 200
+	      Segment List (128), length: 25
+	        Segment Type A (1), length: 6, Flags [], Label: 65537, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 131073, TC: 0, S: 0, TTL: 0
+	        Weight (9), length: 6, Flags [], Weight: 500
+	      Segment List (128), length: 25
+	        Segment Type A (1), length: 6, Flags [], Label: 196609, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262145, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 327682, TC: 0, S: 0, TTL: 0
+	      Segment List (128), length: 57
+	        Segment Type A (1), length: 6, Flags [], Label: 262145, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262146, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262147, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262148, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262149, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262150, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262151, TC: 0, S: 0, TTL: 0
+	      Segment List (128), length: 1
+	      Segment List (128), length: 9
+	        Weight (9), length: 6, Flags [], Weight: 111
+	      Segment List (128), length: 73
+	        Segment Type A (1), length: 6, Flags [], Label: 65537, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65538, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65539, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65540, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65541, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65542, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65543, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65544, TC: 0, S: 0, TTL: 0
+	        Weight (9), length: 6, Flags [], Weight: 999
+	  Origin (1), length: 1, Flags [T]: IGP
+	  AS Path (2), length: 6, Flags [T]: 200 
+	  Local Preference (5), length: 4, Flags [T]: 100
+	  Multi-Protocol Reach NLRI (14), length: 34, Flags [OE]: 
+	    AFI: IPv4 (1), SAFI: SR-TE Policy (73)
+	    nexthop: 2000:0:0:40::2, nh-length: 16, no SNPA
+	      NLRI Length: 96, Distinguisher: 4294967295, Color: 2147483648, Endpoint: 3.4.5.6
+   54  2019-04-16 20:37:59.896504 IP6 (class 0xc0, flowlabel 0x4cb8f, hlim 255, next-header TCP (6), payload length 32) 2000:0:0:40::1.179 > 2000:0:0:40::2.38717: Flags [.], cksum 0x1aa3 (correct), ack 1126, win 56, options [nop,nop,TS val 778598624 ecr 778598623], length 0
+   55  2019-04-16 20:37:59.958559 IP6 (flowlabel 0x42172, hlim 64, next-header TCP (6), payload length 363) 2000:0:0:40::2.38717 > 2000:0:0:40::1.179: Flags [P.], cksum 0xcc7f (correct), seq 1126:1457, ack 106, win 57, options [nop,nop,TS val 778598640 ecr 778598624], length 331: BGP
+	Update Message (2), length: 331
+	  Community (8), length: 4, Flags [OT]:  NO_ADVERTISE
+	  Tunnel Encapsulation (23), length: 228, Flags [OT]: 
+	    Tunnel-type: SR Policy (15), length: 224
+	      Binding SID (13), length: 6, Flags [], Label: 965537, TC: 0, S: 0, TTL: 0
+	      Preference (12), length: 6, Flags [], Preference: 200
+	      Segment List (128), length: 25
+	        Segment Type A (1), length: 6, Flags [], Label: 65537, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 131073, TC: 0, S: 0, TTL: 0
+	        Weight (9), length: 6, Flags [], Weight: 500
+	      Segment List (128), length: 25
+	        Segment Type A (1), length: 6, Flags [], Label: 196609, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262145, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 327682, TC: 0, S: 0, TTL: 0
+	      Segment List (128), length: 57
+	        Segment Type A (1), length: 6, Flags [], Label: 262145, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262146, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262147, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262148, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262149, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262150, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 262151, TC: 0, S: 0, TTL: 0
+	      Segment List (128), length: 1
+	      Segment List (128), length: 9
+	        Weight (9), length: 6, Flags [], Weight: 111
+	      Segment List (128), length: 73
+	        Segment Type A (1), length: 6, Flags [], Label: 65537, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65538, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65539, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65540, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65541, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65542, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65543, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 65544, TC: 0, S: 0, TTL: 0
+	        Weight (9), length: 6, Flags [], Weight: 999
+	  Origin (1), length: 1, Flags [T]: IGP
+	  AS Path (2), length: 6, Flags [T]: 200 
+	  Local Preference (5), length: 4, Flags [T]: 100
+	  Multi-Protocol Reach NLRI (14), length: 46, Flags [OE]: 
+	    AFI: IPv6 (2), SAFI: SR-TE Policy (73)
+	    nexthop: 2000:0:0:40::2, nh-length: 16, no SNPA
+	      NLRI Length: 192, Distinguisher: 4294967295, Color: 2147483648, Endpoint: 2002::304:506
+   56  2019-04-16 20:37:59.960950 IP6 (class 0xc0, flowlabel 0x4cb8f, hlim 255, next-header TCP (6), payload length 32) 2000:0:0:40::1.179 > 2000:0:0:40::2.38717: Flags [.], cksum 0x1937 (correct), ack 1457, win 56, options [nop,nop,TS val 778598640 ecr 778598640], length 0
+   57  2019-04-16 20:38:04.817099 IP6 (class 0xc0, flowlabel 0x4cb8f, hlim 255, next-header TCP (6), payload length 53) 2000:0:0:40::1.179 > 2000:0:0:40::2.38717: Flags [P.], cksum 0x0e41 (correct), seq 106:127, ack 1457, win 56, options [nop,nop,TS val 778599854 ecr 778598640], length 21: BGP
+	Notification Message (3), length: 21, Cease (6), subcode Peer Unconfigured (3)
+   58  2019-04-16 20:38:04.817304 IP6 (class 0xc0, flowlabel 0x4cb8f, hlim 255, next-header TCP (6), payload length 32) 2000:0:0:40::1.179 > 2000:0:0:40::2.38717: Flags [F.], cksum 0x1463 (correct), seq 127, ack 1457, win 56, options [nop,nop,TS val 778599854 ecr 778598640], length 0
+   59  2019-04-16 20:38:04.817436 IP6 (flowlabel 0x42172, hlim 64, next-header TCP (6), payload length 32) 2000:0:0:40::2.38717 > 2000:0:0:40::1.179: Flags [.], cksum 0x0fa5 (correct), ack 127, win 57, options [nop,nop,TS val 778599854 ecr 778599854], length 0
+   60  2019-04-16 20:38:04.857972 IP6 (flowlabel 0x42172, hlim 64, next-header TCP (6), payload length 32) 2000:0:0:40::2.38717 > 2000:0:0:40::1.179: Flags [.], cksum 0x0f99 (correct), ack 128, win 57, options [nop,nop,TS val 778599865 ecr 778599854], length 0
+   61  2019-04-16 20:38:08.442566 IP6 (hlim 1, next-header HBH (0), payload length 116) fe80::200:eff:fe01:0 > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 5 group record(s) [gaddr ff02::1:ff00:0 to_ex, 0 source(s)] [gaddr ff05::2 to_ex, 0 source(s)] [gaddr ff02::2 to_ex, 0 source(s)] [gaddr ff02::1:ff00:1 to_ex, 0 source(s)] [gaddr ff02::1:ff01:0 to_ex, 0 source(s)]
+   62  2019-04-16 20:38:09.662200 IP6 (hlim 1, next-header HBH (0), payload length 76) fe80::7c4c:1fff:fecf:2ce > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 3 group record(s) [gaddr ff02::1:ff00:0 to_in, 0 source(s)] [gaddr ff05::2 to_in, 0 source(s)] [gaddr ff02::2 to_in, 0 source(s)]
+   63  2019-04-16 20:38:09.668050 IP6 (hlim 1, next-header HBH (0), payload length 76) fe80::a007:a2ff:fe03:6ee0 > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 3 group record(s) [gaddr ff02::1:ff00:0 to_in, 0 source(s)] [gaddr ff05::2 to_in, 0 source(s)] [gaddr ff02::2 to_in, 0 source(s)]
+   64  2019-04-16 20:38:09.684548 IP6 (hlim 1, next-header HBH (0), payload length 76) fe80::a007:a2ff:fe03:6ee0 > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 3 group record(s) [gaddr ff02::1:ff00:0 to_in, 0 source(s)] [gaddr ff05::2 to_in, 0 source(s)] [gaddr ff02::2 to_in, 0 source(s)]
+   65  2019-04-16 20:38:10.390145 IP6 (hlim 1, next-header HBH (0), payload length 76) fe80::7c4c:1fff:fecf:2ce > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 3 group record(s) [gaddr ff02::1:ff00:0 to_in, 0 source(s)] [gaddr ff05::2 to_in, 0 source(s)] [gaddr ff02::2 to_in, 0 source(s)]
