@@ -1007,9 +1007,6 @@ lspping_print(netdissect_options *ndo,
 
             /* FIXME add hash-key type, depth limit, multipath processing */
 
-            tlv_tptr+=sizeof(struct lspping_tlv_downstream_map_info_t);
-            tlv_tlen-=sizeof(struct lspping_tlv_downstream_map_info_t);
-
             /* FIXME print downstream labels */
 
             tlv_hexdump=TRUE; /* dump the TLV until code complete */
