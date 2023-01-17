@@ -673,7 +673,7 @@ AC_DEFUN(AC_LBL_LIBPCAP,
                 #
                 AC_CHECK_LIB(pcap, main, libpcap="-lpcap")
                 if test $libpcap = FAIL ; then
-                    AC_MSG_ERROR(see the INSTALL doc for more info)
+                    AC_MSG_ERROR(see the INSTALL.md file for more info)
                 fi
                 dnl
                 dnl Some versions of Red Hat Linux put "pcap.h" in
@@ -795,7 +795,7 @@ AC_DEFUN(AC_LBL_LIBPCAP,
             fi
 
             if test $pcapH = FAIL ; then
-                AC_MSG_ERROR(cannot find pcap.h: see INSTALL)
+                AC_MSG_ERROR(cannot find pcap.h: see the INSTALL.md file)
             fi
 
             #
@@ -901,7 +901,7 @@ AC_DEFUN(AC_LBL_FIXINCLUDES,
 	    if test $ac_cv_lbl_gcc_fixincludes = no ; then
 		    # Don't cache failure
 		    unset ac_cv_lbl_gcc_fixincludes
-		    AC_MSG_ERROR(see the INSTALL for more info)
+		    AC_MSG_ERROR(see the INSTALL.md file for more info)
 	    fi
     fi])
 

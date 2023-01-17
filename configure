@@ -6256,7 +6256,7 @@ then :
 fi
 
                 if test $libpcap = FAIL ; then
-                    as_fn_error $? "see the INSTALL doc for more info" "$LINENO" 5
+                    as_fn_error $? "see the INSTALL.md file for more info" "$LINENO" 5
                 fi
                                                                                                                                                                                                                                                                                                                                 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for extraneous pcap header directories" >&5
 printf %s "checking for extraneous pcap header directories... " >&6; }
@@ -6406,7 +6406,7 @@ fi
             fi
 
             if test $pcapH = FAIL ; then
-                as_fn_error $? "cannot find pcap.h: see INSTALL" "$LINENO" 5
+                as_fn_error $? "cannot find pcap.h: see the INSTALL.md file" "$LINENO" 5
             fi
 
             #
