@@ -5802,7 +5802,7 @@ if test "x$ac_cv_lib_pcap_main" = xyes; then :
 fi
 
                 if test $libpcap = FAIL ; then
-                    as_fn_error $? "see the INSTALL doc for more info" "$LINENO" 5
+                    as_fn_error $? "see the INSTALL.md file for more info" "$LINENO" 5
                 fi
                                                                                                                                                                                                                                                                                                                                 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for extraneous pcap header directories" >&5
 $as_echo_n "checking for extraneous pcap header directories... " >&6; }
@@ -5947,7 +5947,7 @@ fi
             fi
 
             if test $pcapH = FAIL ; then
-                as_fn_error $? "cannot find pcap.h: see INSTALL" "$LINENO" 5
+                as_fn_error $? "cannot find pcap.h: see the INSTALL.md file" "$LINENO" 5
             fi
 
             #
