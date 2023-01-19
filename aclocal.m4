@@ -39,7 +39,6 @@ AC_DEFUN(AC_LBL_C_INIT_BEFORE_CC,
 [
     AC_BEFORE([$0], [AC_LBL_C_INIT])
     AC_BEFORE([$0], [AC_PROG_CC])
-    AC_BEFORE([$0], [AC_LBL_FIXINCLUDES])
     AC_BEFORE([$0], [AC_LBL_DEVEL])
     AC_ARG_WITH(gcc, [  --without-gcc           don't use gcc])
     $1=""
@@ -94,9 +93,7 @@ dnl	LBL_CFLAGS
 dnl
 AC_DEFUN(AC_LBL_C_INIT,
 [
-    AC_BEFORE([$0], [AC_LBL_FIXINCLUDES])
     AC_BEFORE([$0], [AC_LBL_DEVEL])
-    AC_BEFORE([$0], [AC_LBL_SHLIBS_INIT])
     if test "$GCC" = yes ; then
 	    #
 	    # -Werror forces warnings to be errors.
@@ -868,96 +865,6 @@ able to fix it, without that information, as we have not been able to
 reproduce this problem ourselves.])
     ])
 ])
-
-dnl
-dnl If using gcc, make sure we have ANSI ioctl definitions
-dnl
-dnl usage:
-dnl
-dnl	AC_LBL_FIXINCLUDES
-dnl
-AC_DEFUN(AC_LBL_FIXINCLUDES,
-    [if test "$GCC" = yes ; then
-	    AC_MSG_CHECKING(for ANSI ioctl definitions)
-	    AC_CACHE_VAL(ac_cv_lbl_gcc_fixincludes,
-		AC_TRY_COMPILE(
-		    [/*
-		     * This generates a "duplicate case value" when fixincludes
-		     * has not be run.
-		     */
-#		include <sys/types.h>
-#		include <sys/time.h>
-#		include <sys/ioctl.h>
-#		ifdef HAVE_SYS_IOCCOM_H
-#		include <sys/ioccom.h>
-#		endif],
-		    [switch (0) {
-		    case _IO('A', 1):;
-		    case _IO('B', 1):;
-		    }],
-		    ac_cv_lbl_gcc_fixincludes=yes,
-		    ac_cv_lbl_gcc_fixincludes=no))
-	    AC_MSG_RESULT($ac_cv_lbl_gcc_fixincludes)
-	    if test $ac_cv_lbl_gcc_fixincludes = no ; then
-		    # Don't cache failure
-		    unset ac_cv_lbl_gcc_fixincludes
-		    AC_MSG_ERROR(see the INSTALL.md file for more info)
-	    fi
-    fi])
-
-dnl
-dnl Checks to see if union wait is used with WEXITSTATUS()
-dnl
-dnl usage:
-dnl
-dnl	AC_LBL_UNION_WAIT
-dnl
-dnl results:
-dnl
-dnl	DECLWAITSTATUS (defined)
-dnl
-AC_DEFUN(AC_LBL_UNION_WAIT,
-    [AC_MSG_CHECKING(if union wait is used)
-    AC_CACHE_VAL(ac_cv_lbl_union_wait,
-	AC_TRY_COMPILE([
-#	include <sys/types.h>
-#	include <sys/wait.h>],
-	    [int status;
-	    u_int i = WEXITSTATUS(status);
-	    u_int j = waitpid(0, &status, 0);],
-	    ac_cv_lbl_union_wait=no,
-	    ac_cv_lbl_union_wait=yes))
-    AC_MSG_RESULT($ac_cv_lbl_union_wait)
-    if test $ac_cv_lbl_union_wait = yes ; then
-	    AC_DEFINE(DECLWAITSTATUS,union wait,[type for wait])
-    else
-	    AC_DEFINE(DECLWAITSTATUS,int,[type for wait])
-    fi])
-
-dnl
-dnl Checks to see if -R is used
-dnl
-dnl usage:
-dnl
-dnl	AC_LBL_HAVE_RUN_PATH
-dnl
-dnl results:
-dnl
-dnl	ac_cv_lbl_have_run_path (yes or no)
-dnl
-AC_DEFUN(AC_LBL_HAVE_RUN_PATH,
-    [AC_MSG_CHECKING(for ${CC-cc} -R)
-    AC_CACHE_VAL(ac_cv_lbl_have_run_path,
-	[echo 'main(){}' > conftest.c
-	${CC-cc} -o conftest conftest.c -R/a1/b2/c3 >conftest.out 2>&1
-	if test ! -s conftest.out ; then
-		ac_cv_lbl_have_run_path=yes
-	else
-		ac_cv_lbl_have_run_path=no
-	fi
-	rm -f -r conftest*])
-    AC_MSG_RESULT($ac_cv_lbl_have_run_path)
-    ])
 
 dnl
 dnl Check whether a given format can be used to print 64-bit integers

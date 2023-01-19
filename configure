@@ -2530,7 +2530,6 @@ case $host_os in *\ *) host_os=`echo "$host_os" | sed 's/ /-/g'`;; esac
 
 
 
-
 # Check whether --with-gcc was given.
 if test "${with_gcc+set}" = set; then :
   withval=$with_gcc;
@@ -3571,8 +3570,6 @@ if test "$ac_cv_prog_cc_c99" = "no"; then
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The C compiler does not support C99; there may be compiler errors" >&5
 $as_echo "$as_me: WARNING: The C compiler does not support C99; there may be compiler errors" >&2;}
 fi
-
-
 
 
     if test "$GCC" = yes ; then
