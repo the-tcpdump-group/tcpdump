@@ -13,7 +13,7 @@ dnl
 # config.sub.
 #
 
-AC_PREREQ(2.64)
+AC_PREREQ(2.69)
 AC_INIT(tcpdump, m4_esyscmd_s([cat VERSION]))
 AC_CONFIG_SRCDIR(tcpdump.c)
 
