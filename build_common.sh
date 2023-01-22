@@ -248,6 +248,9 @@ print_so_deps() {
     Darwin-*)
         run_after_echo otool -L "${1:?}"
         ;;
+    Haiku-*)
+        run_after_echo objdump -p "${1:?}"
+        ;;
     *)
         run_after_echo ldd "${1:?}"
         ;;
