@@ -162,9 +162,6 @@
 /* define if libpcap has pcap_version */
 #undef HAVE_PCAP_VERSION
 
-/* Define to 1 if you have the `pfopen' function. */
-#undef HAVE_PFOPEN
-
 /* Define to 1 if you have the <rpc/rpcent.h> header file. */
 #undef HAVE_RPC_RPCENT_H
 

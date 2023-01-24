@@ -5366,26 +5366,6 @@ fi
 
 
 
-                LBL_LIBS="$LIBS"
-    pfopen=/usr/examples/packetfilter/pfopen.c
-    if test -f $pfopen ; then
-        for ac_func in pfopen
-do :
-  ac_fn_c_check_func "$LINENO" "pfopen" "ac_cv_func_pfopen"
-if test "x$ac_cv_func_pfopen" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_PFOPEN 1
-_ACEOF
-
-fi
-done
-
-        if test $ac_cv_func_pfopen = "no" ; then
-            { $as_echo "$as_me:${as_lineno-$LINENO}: result: Using $pfopen" >&5
-$as_echo "Using $pfopen" >&6; }
-            LIBS="$LIBS $pfopen"
-        fi
-    fi
     libpcap=FAIL
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to look for a local libpcap" >&5
 $as_echo_n "checking whether to look for a local libpcap... " >&6; }

@@ -422,7 +422,6 @@ AC_DEFUN(AC_LBL_C_INLINE,
     AC_DEFINE_UNQUOTED(inline, $ac_cv_lbl_inline, [Define as token for inline if inlining supported])])
 
 dnl
-dnl Use pfopen.c if available and pfopen() not in standard libraries
 dnl Require libpcap
 dnl Look for libpcap in directories under ..; those are local versions.
 dnl Look for an installed libpcap if there is no local version or if
@@ -437,22 +436,9 @@ dnl
 dnl	$1 (pcapdep set)
 dnl	$2 (incls appended)
 dnl	LIBS
-dnl	LBL_LIBS
 dnl
 AC_DEFUN(AC_LBL_LIBPCAP,
     [AC_REQUIRE([AC_LBL_LIBRARY_NET])
-    dnl
-    dnl save a copy before locating libpcap.a
-    dnl
-    LBL_LIBS="$LIBS"
-    pfopen=/usr/examples/packetfilter/pfopen.c
-    if test -f $pfopen ; then
-        AC_CHECK_FUNCS(pfopen)
-        if test $ac_cv_func_pfopen = "no" ; then
-            AC_MSG_RESULT(Using $pfopen)
-            LIBS="$LIBS $pfopen"
-        fi
-    fi
     libpcap=FAIL
     AC_MSG_CHECKING([whether to look for a local libpcap])
     AC_ARG_ENABLE(local-libpcap,

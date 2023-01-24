@@ -159,9 +159,6 @@
 /* Define to 1 if you have the `pcap_wsockinit' function. */
 #cmakedefine HAVE_PCAP_WSOCKINIT 1
 
-/* Define to 1 if you have the `pfopen' function. */
-#cmakedefine HAVE_PFOPEN 1
-
 /* Define to 1 if you have the <rpc/rpcent.h> header file. */
 #cmakedefine HAVE_RPC_RPCENT_H 1
 

@@ -31,6 +31,5 @@ struct timezone;
 #endif
 int	gettimeofday(struct timeval *, struct timezone *);
 int	ioctl(int, int, caddr_t);
-int	pfopen(char *, int);
 int	setlinebuf(FILE *);
 int	socket(int, int, int);
