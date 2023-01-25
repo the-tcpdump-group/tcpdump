@@ -72,9 +72,6 @@
 /* Define to 1 if you have the <net/if.h> header file. */
 #undef HAVE_NET_IF_H
 
-/* Define to 1 if printf(3) does not support the z length modifier. */
-#undef HAVE_NO_PRINTF_Z
-
 /* Define to 1 if you have the `openat' function. */
 #undef HAVE_OPENAT
 

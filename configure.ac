@@ -13,8 +13,8 @@ dnl
 # config.sub.
 #
 
-AC_PREREQ(2.69)
-AC_INIT(tcpdump, m4_esyscmd_s([cat VERSION]))
+AC_PREREQ([2.69])
+AC_INIT([tcpdump],[m4_esyscmd_s(cat VERSION)])
 AC_CONFIG_SRCDIR(tcpdump.c)
 
 AC_CANONICAL_HOST
@@ -84,8 +84,7 @@ if test "x$with_smi" != "xno" ; then
 			AC_MSG_CHECKING([whether to enable libsmi])
 			savedlibs="$LIBS"
 			LIBS="-lsmi $LIBS"
-			AC_TRY_RUN(
-				[
+			AC_RUN_IFELSE([AC_LANG_SOURCE([[
 /* libsmi available check */
 #include <stdio.h>
 #include <stdlib.h>
@@ -106,6 +105,7 @@ int main()
     exit(4);
   exit(0);
 }
+				]])
 				],
 				[
 					AC_MSG_RESULT(yes)
@@ -484,7 +484,7 @@ AC_LBL_LIBPCAP(V_PCAPDEP, V_INCLS)
 #
 AC_CHECK_FUNCS(ether_ntohost, [
     AC_CACHE_CHECK(for buggy ether_ntohost, ac_cv_buggy_ether_ntohost, [
-	AC_TRY_RUN([
+	AC_RUN_IFELSE([AC_LANG_SOURCE([[
 		#include <netdb.h>
 		#include <netinet/ether.h>
 		#include <stdlib.h>
@@ -501,6 +501,7 @@ AC_CHECK_FUNCS(ether_ntohost, [
 			ether_ntohost(name, (struct ether_addr *)ea);
 			exit(0);
 		}
+	]])
 	], [ac_cv_buggy_ether_ntohost=no],
 	   [ac_cv_buggy_ether_ntohost=yes],
 	   [ac_cv_buggy_ether_ntohost="not while cross-compiling"])])
@@ -750,14 +751,14 @@ fi
 AC_CHECK_FUNCS(pcap_dump_flush pcap_lib_version)
 if test $ac_cv_func_pcap_lib_version = "no" ; then
     AC_MSG_CHECKING(whether pcap_version is defined by libpcap)
-    AC_TRY_LINK([],
-       [
+    AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[
 	extern char pcap_version[];
 
 	return (int)pcap_version;
+       ]])
        ],
-       ac_lbl_cv_pcap_version_defined=yes,
-       ac_lbl_cv_pcap_version_defined=no)
+       [ac_lbl_cv_pcap_version_defined=yes],
+       [ac_lbl_cv_pcap_version_defined=no])
     if test "$ac_lbl_cv_pcap_version_defined" = yes ; then
 	AC_MSG_RESULT(yes)
 	AC_DEFINE(HAVE_PCAP_VERSION, 1, [define if libpcap has pcap_version])
@@ -779,14 +780,14 @@ if test "$ac_cv_func_pcap_set_parser_debug" = "no" ; then
 	# filter expression parser debug flag; can we directly set the
 	# flag?
 	AC_MSG_CHECKING(whether pcap_debug is defined by libpcap)
-	AC_TRY_LINK([],
-	   [
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[
 		extern int pcap_debug;
 
 		return pcap_debug;
+	   ]])
 	   ],
-	   ac_lbl_cv_pcap_debug_defined=yes,
-	   ac_lbl_cv_pcap_debug_defined=no)
+	   [ac_lbl_cv_pcap_debug_defined=yes],
+	   [ac_lbl_cv_pcap_debug_defined=no])
 	if test "$ac_lbl_cv_pcap_debug_defined" = yes ; then
 		AC_MSG_RESULT(yes)
 		AC_DEFINE(HAVE_PCAP_DEBUG, 1, [define if libpcap has pcap_debug])
@@ -796,14 +797,14 @@ if test "$ac_cv_func_pcap_set_parser_debug" = "no" ; then
 		# OK, what about "yydebug"?
 		#
 		AC_MSG_CHECKING(whether yydebug is defined by libpcap)
-		AC_TRY_LINK([],
-		   [
+		AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[
 			extern int yydebug;
 
 			return yydebug;
+		   ]])
 		   ],
-		   ac_lbl_cv_yydebug_defined=yes,
-		   ac_lbl_cv_yydebug_defined=no)
+		   [ac_lbl_cv_yydebug_defined=yes],
+		   [ac_lbl_cv_yydebug_defined=no])
 		if test "$ac_lbl_cv_yydebug_defined" = yes ; then
 			AC_MSG_RESULT(yes)
 			AC_DEFINE(HAVE_YYDEBUG, 1, [define if libpcap has yydebug])
@@ -1054,10 +1055,11 @@ AC_PROG_INSTALL
 
 AC_CONFIG_HEADER(config.h)
 
-AC_OUTPUT_COMMANDS([if test -f .devel; then
+AC_CONFIG_COMMANDS([.devel],[[if test -f .devel; then
 	echo timestamp > stamp-h
 	cat $srcdir/Makefile-devel-adds >> Makefile
 	make depend || exit 1
-fi])
-AC_OUTPUT(Makefile tcpdump.1)
+fi]],[[]])
+AC_CONFIG_FILES([Makefile tcpdump.1])
+AC_OUTPUT
 exit 0
