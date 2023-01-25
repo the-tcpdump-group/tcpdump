@@ -4308,6 +4308,7 @@ int main()
   exit(0);
 }
 
+
 _ACEOF
 if ac_fn_c_try_run "$LINENO"; then :
 
@@ -6160,6 +6161,7 @@ else
 			exit(0);
 		}
 
+
 _ACEOF
 if ac_fn_c_try_run "$LINENO"; then :
   ac_cv_buggy_ether_ntohost=no
@@ -6560,6 +6562,7 @@ main ()
   ;
   return 0;
 }
+
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
   ac_lbl_cv_pcap_version_defined=yes
@@ -6653,6 +6656,7 @@ main ()
   ;
   return 0;
 }
+
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
   ac_lbl_cv_pcap_debug_defined=yes
@@ -6689,6 +6693,7 @@ main ()
   ;
   return 0;
 }
+
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
   ac_lbl_cv_yydebug_defined=yes
@@ -8423,7 +8428,7 @@ test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
 ac_config_headers="$ac_config_headers config.h"
 
 
-ac_config_commands="$ac_config_commands default-1"
+ac_config_commands="$ac_config_commands .devel"
 
 ac_config_files="$ac_config_files Makefile tcpdump.1"
 
@@ -9127,7 +9132,7 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
-    "default-1") CONFIG_COMMANDS="$CONFIG_COMMANDS default-1" ;;
+    ".devel") CONFIG_COMMANDS="$CONFIG_COMMANDS .devel" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "tcpdump.1") CONFIG_FILES="$CONFIG_FILES tcpdump.1" ;;
 
@@ -9685,7 +9690,7 @@ $as_echo "$as_me: executing $ac_file commands" >&6;}
 
 
   case $ac_file$ac_mode in
-    "default-1":C) if test -f .devel; then
+    ".devel":C) if test -f .devel; then
 	echo timestamp > stamp-h
 	cat $srcdir/Makefile-devel-adds >> Makefile
 	make depend || exit 1
