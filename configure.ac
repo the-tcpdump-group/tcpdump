@@ -1044,13 +1044,13 @@ AC_SUBST(MAN_MISC_INFO)
 
 AC_PROG_INSTALL
 
-AC_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 
 AC_CONFIG_COMMANDS([.devel],[[if test -f .devel; then
 	echo timestamp > stamp-h
 	cat $srcdir/Makefile-devel-adds >> Makefile
 	make depend || exit 1
-fi]],[[]])
+fi]])
 AC_CONFIG_FILES([Makefile tcpdump.1])
 AC_OUTPUT
 exit 0
