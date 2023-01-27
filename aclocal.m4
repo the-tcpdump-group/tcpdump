@@ -853,47 +853,6 @@ reproduce this problem ourselves.])
 ])
 
 dnl
-dnl Check whether a given format can be used to print 64-bit integers
-dnl
-AC_DEFUN(AC_LBL_CHECK_64BIT_FORMAT,
-  [
-    AC_MSG_CHECKING([whether %$1x can be used to format 64-bit integers])
-    AC_RUN_IFELSE(
-      [
-	AC_LANG_SOURCE(
-	  [[
-#	    ifdef HAVE_INTTYPES_H
-	    #include <inttypes.h>
-#	    endif
-	    #include <stdio.h>
-	    #include <sys/types.h>
-
-	    main()
-	    {
-	      uint64_t t = 1;
-	      char strbuf[16+1];
-	      sprintf(strbuf, "%016$1x", t << 32);
-	      if (strcmp(strbuf, "0000000100000000") == 0)
-		exit(0);
-	      else
-		exit(1);
-	    }
-	  ]])
-      ],
-      [
-	AC_DEFINE(PRId64, "$1d", [define if the platform doesn't define PRId64])
-	AC_DEFINE(PRIo64, "$1o", [define if the platform doesn't define PRIo64])
-	AC_DEFINE(PRIx64, "$1x", [define if the platform doesn't define PRIu64])
-	AC_DEFINE(PRIu64, "$1u", [define if the platform doesn't define PRIx64])
-	AC_MSG_RESULT(yes)
-      ],
-      [
-	AC_MSG_RESULT(no)
-	$2
-      ])
-  ])
-
-dnl
 dnl If the file .devel exists:
 dnl	Add some warning flags if the compiler supports them
 dnl	If an os prototype include exists, symlink os-proto.h to it
