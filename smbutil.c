@@ -770,7 +770,7 @@ smb_fdata1(netdissect_options *ndo,
 	    time_t t;
 	    struct tm *lt;
 	    const char *tstring;
-	    char buffer[sizeof("Www Mmm dd hh:mm:ss yyyy\n")];
+	    char buffer[sizeof("Www Mmm dd hh:mm:ss yyyyy\n")];
 	    uint32_t x;
 
 	    switch (atoi(fmt + 1)) {
