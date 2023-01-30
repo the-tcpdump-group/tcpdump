@@ -38,9 +38,7 @@
 
 #include "netdissect-stdinc.h"
 
-#ifdef HAVE_STRFTIME
 #include <time.h>
-#endif
 
 #include "netdissect.h"
 #include "addrtoname.h"

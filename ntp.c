@@ -48,7 +48,6 @@ p_ntp_time(netdissect_options *ndo,
 	f = (uint32_t)(ff * 1000000000.0);	/* treat fraction as parts per billion */
 	ND_PRINT("%u.%09u", i, f);
 
-#ifdef HAVE_STRFTIME
 	/*
 	 * print the UTC time in human-readable format.
 	 */
@@ -81,5 +80,4 @@ p_ntp_time(netdissect_options *ndo,
 		}
 	    }
 	}
-#endif
 }

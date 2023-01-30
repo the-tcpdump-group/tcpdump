@@ -102,7 +102,7 @@
 /* Define to 1 if you have the `pcap_dump_flush' function. */
 #cmakedefine HAVE_PCAP_DUMP_FLUSH 1
 
-/* define if libpcap has pcap_dump_ftell() */
+/* Define to 1 if you have the `pcap_dump_ftell' function. */
 #cmakedefine HAVE_PCAP_DUMP_FTELL 1
 
 /* Define to 1 if you have the `pcap_dump_ftell64' function. */
@@ -179,9 +179,6 @@
 
 /* Define to 1 if you have the `strdup' function. */
 #cmakedefine HAVE_STRDUP 1
-
-/* Define to 1 if you have the `strftime' function. */
-#cmakedefine HAVE_STRFTIME 1
 
 /* Define to 1 if you have the <strings.h> header file. */
 #cmakedefine HAVE_STRINGS_H 1
