@@ -413,6 +413,58 @@ if(NOT HAVE_SNPRINTF)
     message(FATAL_ERROR "snprintf() is required but wasn't found")
 endif()
 
+#
+# Require a proof of suitable snprintf(3), same as in Autoconf.
+#
+include(CheckCSourceRuns)
+check_c_source_runs("
+#include <stdio.h>
+#include <string.h>
+#include <inttypes.h>
+#include <sys/types.h>
+
+int main()
+{
+  char buf[100];
+  uint64_t t = (uint64_t)1 << 32;
+
+  snprintf(buf, sizeof(buf), \"%zu\", sizeof(buf));
+  if (strncmp(buf, \"100\", sizeof(buf)))
+    return 1;
+
+  snprintf(buf, sizeof(buf), \"%zd\", -sizeof(buf));
+  if (strncmp(buf, \"-100\", sizeof(buf)))
+    return 2;
+
+  snprintf(buf, sizeof(buf), \"%\" PRId64, -t);
+  if (strncmp(buf, \"-4294967296\", sizeof(buf)))
+    return 3;
+
+  snprintf(buf, sizeof(buf), \"0o%\" PRIo64, t);
+  if (strncmp(buf, \"0o40000000000\", sizeof(buf)))
+    return 4;
+
+  snprintf(buf, sizeof(buf), \"0x%\" PRIx64, t);
+  if (strncmp(buf, \"0x100000000\", sizeof(buf)))
+    return 5;
+
+  snprintf(buf, sizeof(buf), \"%\" PRIu64, t);
+  if (strncmp(buf, \"4294967296\", sizeof(buf)))
+    return 6;
+
+  return 0;
+}
+
+"
+    SUITABLE_SNPRINTF
+)
+if(NOT SUITABLE_SNPRINTF)
+    message(FATAL_ERROR
+"The snprintf(3) implementation in this libc is not suitable,
+tcpdump would not work correctly even if it managed to compile."
+    )
+endif()
+
 check_function_exists(getopt_long HAVE_GETOPT_LONG)
 check_function_exists(setlinebuf HAVE_SETLINEBUF)
 #

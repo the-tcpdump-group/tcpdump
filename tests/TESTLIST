@@ -93,15 +93,15 @@ mpls-over-udp  mpls-over-udp.pcap  mpls-over-udp.out
 mpls-over-udp-v  mpls-over-udp.pcap  mpls-over-udp-v.out -v
 
 # OSPF tests
-# In printf_z.tests:
-# ospf-gmpls
-# ospf-nssa-bitnt
-# ospf3_ah-vv
-# ospf3_bc-vv
-# ospf3_mp-vv
-# ospf3_nbma-vv
-# ospf2-seg-fault-1-v (fuzzed pcap)
+ospf-gmpls	ospf-gmpls.pcap				ospf-gmpls.out		-v
+ospf-nssa-bitnt	ospf-nssa-bitnt.pcap			ospf-nssa-bitnt.out	-v
+ospf3_ah-vv	OSPFv3_with_AH.pcap			ospf3_ah-vv.out		-v -v
 ospf3_auth-vv	ospf3_auth.pcapng			ospf3_auth-vv.out	-v -v
+ospf3_bc-vv	OSPFv3_broadcast_adjacency.pcap		ospf3_bc-vv.out		-v -v
+ospf3_mp-vv	OSPFv3_multipoint_adjacencies.pcap	ospf3_mp-vv.out		-v -v
+ospf3_nbma-vv	OSPFv3_NBMA_adjacencies.pcap		ospf3_nbma-vv.out	-v -v
+# fuzzed pcap
+ospf2-seg-fault-1-v  ospf2-seg-fault-1.pcapng  ospf2-seg-fault-1-v.out  -v
 
 # IKEv2 tests
 ikev2four	ikev2four.pcap		ikev2four.out	-v
@@ -273,8 +273,7 @@ geonet-calm-fast	geonet_and_calm_fast.pcap	geonet_and_calm_fast.out	-vv
 
 # M3UA tests
 m3ua isup.pcap isup.out
-# In printf_z.tests:
-# m3ua-vv
+m3ua-vv isup.pcap isupvv.out -vv
 
 # NFLOG test case
 nflog-e nflog.pcap nflog-e.out -e
@@ -358,8 +357,7 @@ isis-seg-fault-3-v isis-seg-fault-3.pcapng isis-seg-fault-3-v.out -v
 isis_sid	isis_sid.pcap			isis_sid.out	-v
 
 # RSVP tests
-# In printf_z.tests:
-# rsvp_infloop-v
+rsvp_infloop-v	rsvp-infinite-loop.pcap		rsvp_infloop-v.out	-v
 rsvp_cap	rsvp_cap.pcap			rsvp_cap.out		-v
 # fuzzed pcap
 rsvp-inf-loop-2-v rsvp-inf-loop-2.pcapng	rsvp-inf-loop-2-v.out -v
@@ -371,8 +369,7 @@ hdlc3	HDLC.pcap		hdlc3.out
 hdlc4	hdlc_slarp.pcapng	hdlc4.out
 
 # DECnet test case
-# In printf_z.tests:
-# decnet
+decnet		DECnet_Phone.pcap	decnet.out
 
 # RADIUS tests
 radius-v	RADIUS.pcap	radius-v.out	-v
@@ -593,16 +590,14 @@ icmp-cksum-oobr-3	icmp-cksum-oobr-3.pcapng	icmp-cksum-oobr-3.out	-vvv -e
 icmp-cksum-oobr-4	icmp-cksum-oobr-4.pcapng	icmp-cksum-oobr-4.out	-vvv -e
 tok2str-oobr-1		tok2str-oobr-1.pcap		tok2str-oobr-1.out	-vvv -e
 tok2str-oobr-2		tok2str-oobr-2.pcap		tok2str-oobr-2.out	-vvv -e
-# In printf_z.tests:
-#eigrp-tlv-oobr
+eigrp-tlv-oobr		eigrp-tlv-oobr.pcap		eigrp-tlv-oobr.out	-vvv -e
 zephyr-oobr		zephyr-oobr.pcap		zephyr-oobr.out		-vvv -e
 isakmp-no-none-np	isakmp-no-none-np.pcapng	isakmp-no-none-np.out	-vvv -e
 telnet-iac-check-oobr	telnet-iac-check-oobr.pcap	telnet-iac-check-oobr.out	-vvv -e
 resp_4_infiniteloop	resp_4_infiniteloop.pcapng	resp_4_infiniteloop.out	-vvv -e
 dns_fwdptr		dns_fwdptr.pcap			dns_fwdptr.out		-vvv -e
-# In printf_z.tests:
-# isis-areaaddr-oobr-1
-# isis-areaaddr-oobr-2
+isis-areaaddr-oobr-1	isis-areaaddr-oobr-1.pcap	isis-areaaddr-oobr-1.out		-vvv -e
+isis-areaaddr-oobr-2	isis-areaaddr-oobr-2.pcap	isis-areaaddr-oobr-2.out		-vvv -e
 isis-extd-ipreach-oobr	isis-extd-ipreach-oobr.pcap	isis-extd-ipreach-oobr.out		-vvv -e
 lldp-infinite-loop-1	lldp-infinite-loop-1.pcap	lldp-infinite-loop-1.out		-vvv -e
 lldp-infinite-loop-2	lldp-infinite-loop-2.pcap	lldp-infinite-loop-2.out		-vvv -e
@@ -620,8 +615,7 @@ juniper_es_oobr		juniper_es_oobr.pcap		juniper_es_oobr.out	-vvv -e
 
 # bad packets from Yannick Formaggio
 l2tp-avp-overflow	l2tp-avp-overflow.pcap		l2tp-avp-overflow.out	-v
-# In printf_z.tests:
-# pktap-heap-overflow
+pktap-heap-overflow	pktap-heap-overflow.pcap	pktap-heap-overflow.out	-v
 wb-oobr			wb-oobr.pcap			wb-oobr.out	-v
 
 # bad packets from Bhargava Shastry
@@ -762,10 +756,9 @@ nfs-cannot-pad-32-bit nfs-cannot-pad-32-bit.pcap nfs-cannot-pad-32-bit.out
 #
 # See http://marc.info/?l=tcpdump-workers&m=95552439022555
 #
-# In printf_z.tests:
-# dns-zlip-1
-# dns-zlip-2
-# dns-zlip-3
+dns-zlip-1		dns-zlip-1.pcap		dns-zlip-1.out
+dns-zlip-2		dns-zlip-2.pcap		dns-zlip-2.out
+dns-zlip-3		dns-zlip-3.pcap		dns-zlip-3.out
 
 # NTP tests
 ntp			ntp.pcap		ntp.out
@@ -826,8 +819,7 @@ arista-ether-ev          arista_ether.pcap        arista_ether-ev.out      -ev
 huge-tipc-messages	huge-tipc-messages.pcap	huge-tipc-messages.out
 
 # CVE-2018-10105 bad packets from Luis Rocha
-# In printf_z.tests:
-# sflow_print-segv
+sflow_print-segv sflow_print-segv.pcap sflow_print-segv.out -v
 # two more in smb.tests
 
 #ptp tests

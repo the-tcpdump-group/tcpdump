@@ -392,21 +392,58 @@ AC_CHECK_FUNC(snprintf,,
     AC_MSG_ERROR([snprintf() is required but wasn't found]))
 
 #
-# Define HAVE_NO_PRINTF_Z to make it possible to disable test cases that
-# depend on %zu.
+# It became apparent at some point that using a suitable C99 compiler does not
+# automatically mean snprintf(3) implementation in the libc supports all the
+# modifiers and specifiers used in the project, so let's test that before the
+# build, not after.
 #
-AC_MSG_CHECKING([whether printf(3) supports the z length modifier])
+# Testing the sizeof_t length modifier takes making an snprintf() call and
+# comparing the actual result with the expected result.  If this fails, it will
+# most likely happen at run time, not compile time.
+#
+# Testing the 64-bit conversion specifiers in addition to that requires the
+# <inttypes.h> header to be present and the macros to be defined, so if this
+# fails, it will more likely happen at compile time.
+#
+AC_MSG_CHECKING([whether snprintf is suitable])
 AC_RUN_IFELSE(
     [
         AC_LANG_SOURCE([[
 #include <stdio.h>
 #include <string.h>
+#include <inttypes.h>
+#include <sys/types.h>
 
 int main()
 {
   char buf[100];
+  uint64_t t = (uint64_t)1 << 32;
+
   snprintf(buf, sizeof(buf), "%zu", sizeof(buf));
-  return strncmp(buf, "100", sizeof(buf)) ? 1 : 0;
+  if (strncmp(buf, "100", sizeof(buf)))
+    return 1;
+
+  snprintf(buf, sizeof(buf), "%zd", -sizeof(buf));
+  if (strncmp(buf, "-100", sizeof(buf)))
+    return 2;
+
+  snprintf(buf, sizeof(buf), "%" PRId64, -t);
+  if (strncmp(buf, "-4294967296", sizeof(buf)))
+    return 3;
+
+  snprintf(buf, sizeof(buf), "0o%" PRIo64, t);
+  if (strncmp(buf, "0o40000000000", sizeof(buf)))
+    return 4;
+
+  snprintf(buf, sizeof(buf), "0x%" PRIx64, t);
+  if (strncmp(buf, "0x100000000", sizeof(buf)))
+    return 5;
+
+  snprintf(buf, sizeof(buf), "%" PRIu64, t);
+  if (strncmp(buf, "4294967296", sizeof(buf)))
+    return 6;
+
+  return 0;
 }
         ]])
     ],
@@ -415,8 +452,9 @@ int main()
     ],
     [
         AC_MSG_RESULT(no)
-        AC_DEFINE(HAVE_NO_PRINTF_Z, 1,
-            [Define to 1 if printf(3) does not support the z length modifier.])
+        AC_MSG_ERROR(
+[The snprintf(3) implementation in this libc is not suitable,
+tcpdump would not work correctly even if it managed to compile.])
     ],
     [
         AC_MSG_RESULT(not while cross-compiling)
