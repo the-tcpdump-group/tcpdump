@@ -45,6 +45,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Add a configure option to help debugging (--enable-instrument-functions)
       autoconf: Add autogen.sh, remove configure and config.h.in and put
         these generated files in the release tarball.
+      At build time require a proof of suitable snprintf(3) implementation in
+        libc (and document Solaris 9 as unsupported because of that).
 
 DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
   Summary for 4.99.4 tcpdump release (so far!)
