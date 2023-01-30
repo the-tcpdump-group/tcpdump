@@ -49,6 +49,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       smbutil.c: Fix the strftime buffer size
     Building and testing:
       Require at least autoconf 2.69.
+      Don't check for strftime(), as it's in C90 and beyond.
 
 Thursday, January 12, 2023 / The Tcpdump Group
   Summary for 4.99.3 tcpdump release
