@@ -77,7 +77,6 @@ static void zep_print_ts(netdissect_options *ndo, const u_char *p)
 						billion */
 	ND_PRINT("%u.%09d", i, f);
 
-#ifdef HAVE_STRFTIME
 	/*
 	 * print the time in human-readable format.
 	 */
@@ -90,7 +89,6 @@ static void zep_print_ts(netdissect_options *ndo, const u_char *p)
 		strftime(time_buf, sizeof (time_buf), "%Y/%m/%d %H:%M:%S", tm);
 		ND_PRINT(" (%s)", time_buf);
 	}
-#endif
 }
 
 /*

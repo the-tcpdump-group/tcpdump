@@ -407,7 +407,7 @@ if test "$ipv6" = "yes" -a "$ipv6lib" != "none"; then
 fi
 
 AC_REPLACE_FUNCS(strlcat strlcpy strdup strsep getservent getopt_long)
-AC_CHECK_FUNCS(fork vfork strftime)
+AC_CHECK_FUNCS(fork vfork)
 AC_CHECK_FUNCS(setlinebuf)
 
 #

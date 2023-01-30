@@ -38,9 +38,7 @@
 
 #include "netdissect-stdinc.h"
 
-#ifdef HAVE_STRFTIME
 #include <time.h>
-#endif
 
 #define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
