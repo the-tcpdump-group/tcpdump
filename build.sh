@@ -52,11 +52,13 @@ esac
 if [ "$CMAKE" = no ]; then
     if [ "$BUILD_LIBPCAP" = yes ]; then
         echo "Using PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
+        run_after_echo ./autogen.sh
         run_after_echo ./configure --with-crypto="$CRYPTO" \
             --enable-smb="$SMB" --prefix="$PREFIX"
         LD_LIBRARY_PATH="$PREFIX/lib"
         export LD_LIBRARY_PATH
     else
+        run_after_echo ./autogen.sh
         run_after_echo ./configure --with-crypto="$CRYPTO" \
             --enable-smb="$SMB" --prefix="$PREFIX" --disable-local-libpcap
     fi

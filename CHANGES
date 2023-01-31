@@ -42,6 +42,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       RPKI-Router: Refine length and bounds checks.
     Building and testing:
       Add a configure option to help debugging (--enable-instrument-functions)
+      autoconf: Add autogen.sh, remove configure and config.h.in and put
+        these generated files in the release tarball.
 
 DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
   Summary for 4.99.4 tcpdump release (so far!)
