@@ -31,6 +31,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Print the list of data link types (-L) to stdout instead of stderr.
     Source code:
       Use %zu when printing a sizeof to squelch compiler warnings
+      Remove unused missing/snprintf.c.
       (FIXME: somebody please wrap the line below just before the release)
       AODV, AppleTalk, BOOTP, CHDLC, DCCP, EGP, EIGRP, ForCES, Geneve, GRE, Juniper, L2TP, NetFlow, NTP, OLSR, PGM, RIP, RSVP, SCTP, SNMP, TCP, UDP, vsock: Modernize packet parsing style
       DCCP, EGP: Replace custom code with tok2str()
