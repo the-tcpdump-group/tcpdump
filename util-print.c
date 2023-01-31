@@ -247,7 +247,8 @@ ts_date_hmsfrac_print(netdissect_options *ndo, long sec, long usec,
 {
 	time_t Time = sec;
 	struct tm *tm;
-	char timestr[32];
+	char timebuf[32];
+	const char *timestr;
 
 	if ((unsigned)sec & 0x80000000) {
 		ND_PRINT("[Error converting time]");
@@ -259,14 +260,13 @@ ts_date_hmsfrac_print(netdissect_options *ndo, long sec, long usec,
 	else
 		tm = gmtime(&Time);
 
-	if (!tm) {
-		ND_PRINT("[Error converting time]");
-		return;
+	if (date_flag == WITH_DATE) {
+		timestr = nd_format_time(timebuf, sizeof(timebuf),
+		    "%Y-%m-%d %H:%M:%S", tm);
+	} else {
+		timestr = nd_format_time(timebuf, sizeof(timebuf),
+		    "%H:%M:%S", tm);
 	}
-	if (date_flag == WITH_DATE)
-		strftime(timestr, sizeof(timestr), "%Y-%m-%d %H:%M:%S", tm);
-	else
-		strftime(timestr, sizeof(timestr), "%H:%M:%S", tm);
 	ND_PRINT("%s", timestr);
 
 	ts_frac_print(ndo, usec);
@@ -420,6 +420,26 @@ signed_relts_print(netdissect_options *ndo,
 		return;
 	}
 	unsigned_relts_print(ndo, secs);
+}
+
+/*
+ * Format a struct tm with strftime().
+ * If the pointer to the struct tm is null, that means that the
+ * routine to convert a time_t to a struct tm failed; the localtime()
+ * and gmtime() in the Microsoft Visual Studio C library will fail,
+ * returning null, if the value is before the UNIX Epoch.
+ */
+const char *
+nd_format_time(char *buf, size_t bufsize, const char *format,
+         const struct tm *timeptr)
+{
+	if (timeptr != NULL) {
+		if (strftime(buf, bufsize, format, timeptr) != 0)
+			return (buf);
+		else
+			return ("[nd_format_time() buffer is too small]");
+	} else
+		return ("[localtime() or gmtime() couldn't convert the date and time]");
 }
 
 /* Print the truncated string */

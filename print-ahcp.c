@@ -102,18 +102,14 @@ ahcp_time_print(netdissect_options *ndo,
                 const u_char *cp, uint8_t len)
 {
 	time_t t;
-	struct tm *tm;
-	char buf[BUFSIZE];
+	char buf[sizeof("-yyyyyyyyyy-mm-dd hh:mm:ss UTC")];
 
 	if (len != 4)
 		goto invalid;
 	t = GET_BE_U_4(cp);
-	if (NULL == (tm = gmtime(&t)))
-		ND_PRINT(": gmtime() error");
-	else if (0 == strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", tm))
-		ND_PRINT(": strftime() error");
-	else
-		ND_PRINT(": %s UTC", buf);
+	ND_PRINT(": %s",
+	    nd_format_time(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S UTC",
+	      gmtime(&t)));
 	return;
 
 invalid:
