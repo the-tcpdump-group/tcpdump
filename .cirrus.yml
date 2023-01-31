@@ -51,6 +51,7 @@ linux_task:
     - apt list --installed 'lib*-dev'
     - echo '$ git clone [...] libpcap.git'
     - git -C .. clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT}
+    - ./autogen.sh
     - ./configure --quiet # build the Makefile
     - make releasecheck
     - make whitespacecheck
@@ -90,4 +91,5 @@ coverity_task:
     - apt-get -qy install libssl-dev libsmi2-dev libcap-ng-dev libpcap-dev >/dev/null
     - apt-get -qy install git curl wget ruby rubygems ruby-json >/dev/null # for the coverity script
     - apt list --installed 'lib*-dev'
+    - ./autogen.sh
     - ./.ci-coverity-scan-build.sh

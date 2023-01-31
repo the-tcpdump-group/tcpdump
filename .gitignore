@@ -5,9 +5,11 @@ Makefile
 *.o
 libnetdissect.a
 config.h
+config.h.in
 config.log
 config.cache
 config.status
+configure
 .devel
 os-proto.h
 stamp-h

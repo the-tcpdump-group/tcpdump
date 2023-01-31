@@ -62,14 +62,12 @@ build_tcpdump() {
                 fi
                 run_after_echo rm -rf "$PREFIX"/bin/tcpdump*
                 run_after_echo git status -suall
-                # Cancel changes in configure
-                run_after_echo git checkout configure
             done
         done
     done
 }
 
-touch .devel configure
+touch .devel
 for CC in $MATRIX_CC; do
     export CC
     discard_cc_cache
