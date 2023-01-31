@@ -373,7 +373,6 @@ EXTRA_DIST = \
 	missing/getopt_long.h \
 	missing/getservent.c \
 	missing/pcap_dump_ftell.c \
-	missing/snprintf.c \
 	missing/strdup.c \
 	missing/strlcat.c \
 	missing/strlcpy.c \
@@ -409,8 +408,6 @@ getservent.o: $(srcdir)/missing/getservent.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/getservent.c
 getopt_long.o: $(srcdir)/missing/getopt_long.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/getopt_long.c
-snprintf.o: $(srcdir)/missing/snprintf.c
-	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/snprintf.c
 strdup.o: $(srcdir)/missing/strdup.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/strdup.c
 strlcat.o: $(srcdir)/missing/strlcat.c
