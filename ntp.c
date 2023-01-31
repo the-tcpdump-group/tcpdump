@@ -54,8 +54,8 @@ p_ntp_time(netdissect_options *ndo,
 	if (i) {
 	    int64_t seconds_64bit = (int64_t)i - JAN_1970;
 	    time_t seconds;
-	    struct tm *tm;
 	    char time_buf[128];
+	    const char *time_string;
 
 	    seconds = (time_t)seconds_64bit;
 	    if (seconds != seconds_64bit) {
@@ -63,21 +63,12 @@ p_ntp_time(netdissect_options *ndo,
 		 * It doesn't fit into a time_t, so we can't hand it
 		 * to gmtime.
 		 */
-		ND_PRINT(" (unrepresentable)");
+		time_string = "[Time is too large to fit into a time_t]";
 	    } else {
-		tm = gmtime(&seconds);
-		if (tm == NULL) {
-		    /*
-		     * gmtime() can't handle it.
-		     * (Yes, that might happen with some version of
-		     * Microsoft's C library.)
-		     */
-		    ND_PRINT(" (unrepresentable)");
-		} else {
-		    /* use ISO 8601 (RFC3339) format */
-		    strftime(time_buf, sizeof (time_buf), "%Y-%m-%dT%H:%M:%SZ", tm);
-		    ND_PRINT(" (%s)", time_buf);
-		}
+		/* use ISO 8601 (RFC3339) format */
+		time_string = nd_format_time(time_buf, sizeof (time_buf),
+		  "%Y-%m-%dT%H:%M:%SZ", gmtime(&seconds));
 	    }
+	    ND_PRINT(" (%s)", time_string);
 	}
 }

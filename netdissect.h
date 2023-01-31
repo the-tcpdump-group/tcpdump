@@ -423,6 +423,9 @@ extern void ts_print(netdissect_options *, const struct timeval *);
 extern void signed_relts_print(netdissect_options *, int32_t);
 extern void unsigned_relts_print(netdissect_options *, uint32_t);
 
+extern const char *nd_format_time(char *buf, size_t bufsize,
+    const char *format, const struct tm *timeptr);
+
 extern void fn_print_char(netdissect_options *, u_char);
 extern void fn_print_str(netdissect_options *, const u_char *);
 extern u_int nd_printztn(netdissect_options *, const u_char *, u_int, const u_char *);

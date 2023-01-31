@@ -843,6 +843,8 @@ MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
         char *filename = malloc(PATH_MAX + 1);
         if (filename == NULL)
             error("%s: malloc", __func__);
+        if (strlen(orig_name) == 0)
+            error("an empty string is not a valid file name");
 
         /* Process with strftime if Gflag is set. */
         if (Gflag != 0) {
@@ -854,9 +856,25 @@ MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
           }
 
           /* There's no good way to detect an error in strftime since a return
-           * value of 0 isn't necessarily failure.
+           * value of 0 isn't necessarily failure; if orig_name is an empty
+           * string, the formatted string will be empty.
+           *
+           * However, the C90 standard says that, if there *is* a
+           * buffer overflow, the content of the buffer is undefined,
+           * so we must check for a buffer overflow.
+           *
+           * So we check above for an empty orig_name, and only call
+           * strftime() if it's non-empty, in which case the return
+           * value will only be 0 if the formatted date doesn't fit
+           * in the buffer.
+           *
+           * (We check above because, even if we don't use -G, we
+           * want a better error message than "tcpdump: : No such
+           * file or directory" for this case.)
            */
-          strftime(filename, PATH_MAX, orig_name, local_tm);
+          if (strftime(filename, PATH_MAX, orig_name, local_tm) == 0) {
+            error("%s: strftime", __func__);
+          }
         } else {
           strncpy(filename, orig_name, PATH_MAX);
         }
