@@ -12,9 +12,27 @@ the generally available GNU C compiler (GCC) or Clang.
 
 After libpcap has been built (either install it with `make install` or
 make sure both the libpcap and tcpdump source trees are in the same
-directory), run `./configure` (a shell script). `configure` will
+directory), do the following steps:
+
+* If you build from a git clone rather than from a release archive,
+run `./autogen.sh` (a shell script). The autogen.sh script will
+build the `configure` and `config.h.in` files.
+
+On some system, you may need to set the `AUTORECONF` variable, like:
+`AUTORECONF=autoreconf-2.69 ./autogen.sh`
+to select the `autoreconf` version you want to use.
+
+* Run `./configure` (a shell script). The configure script will
 determine your system attributes and generate an appropriate `Makefile`
-from `Makefile.in`.  Now build tcpdump by running `make`.
+from `Makefile.in`.  The configure script has a number of options to
+control the configuration of tcpdump; `./configure --help` will show
+them.
+
+* Next, build tcpdump by running `make`.
+
+On OpenBSD, you may need to set, before the `make`, the `AUTOCONF_VERSION`
+variable like:
+`AUTOCONF_VERSION=2.69 make`
 
 If everything builds fine, `su` and type `make install`.  This will install
 tcpdump and the manual entry.  Any user will be able to use tcpdump to
@@ -62,15 +80,14 @@ ascii_strcasecmp.c - locale-independent case-independent string comparison
 		routines
 atime.awk	- TCP ack awk script
 atm.h		- ATM traffic type definitions
+autogen.sh	- build configure and config.h.in (run this first)
 bpf_dump.c	- BPF program printing routines, in case libpcap doesn't
 		  have them
 chdlc.h		- Cisco HDLC definitions
 cpack.c		- functions to extract packed data
 cpack.h		- declarations of functions to extract packed data
 config.guess	- autoconf support
-config.h.in	- autoconf input
 config.sub	- autoconf support
-configure	- configure script (run this first)
 configure.ac	- configure script source
 doc/README.*	- some building documentation
 ethertype.h	- Ethernet type value definitions

@@ -344,6 +344,7 @@ EXTRA_DIST = \
 	README.md \
 	VERSION \
 	aclocal.m4 \
+	autogen.sh \
 	atime.awk \
 	bpf_dump.c \
 	cmake/Modules/FindCRYPTO.cmake \
@@ -352,9 +353,7 @@ EXTRA_DIST = \
 	cmake_uninstall.cmake.in \
 	cmakeconfig.h.in \
 	config.guess \
-	config.h.in \
 	config.sub \
-	configure \
 	configure.ac \
 	doc/README.aix.md \
 	doc/README.NetBSD.md \
@@ -386,7 +385,7 @@ EXTRA_DIST = \
 	stime.awk \
 	tcpdump.1.in
 
-TEST_DIST= `git ls-files tests | grep -v 'tests/\..*'`
+TEST_DIST= `git -C "$$DIR" ls-files tests | grep -v 'tests/\..*'`
 
 RELEASE_FILES = $(CSRC) $(HDR) $(LIBNETDISSECT_SRC) $(EXTRA_DIST) $(TEST_DIST)
 
@@ -446,7 +445,8 @@ clean:
 
 distclean:
 	rm -f $(CLEANFILES) Makefile config.cache config.log config.status \
-	    config.h os-proto.h stamp-h stamp-h.in $(PROG).1 \
+	    config.h config.h.in config.h.in~ configure configure~ configure.ac~ \
+	    os-proto.h stamp-h stamp-h.in $(PROG).1 \
 	    libnetdissect.a tests/.failed tests/.passed \
 	    tests/failure-outputs.txt
 	rm -rf autom4te.cache tests/DIFF tests/NEW
@@ -463,17 +463,52 @@ tags: $(TAGFILES)
 TAGS: $(TAGFILES)
 	etags $(TAGFILES)
 
+#
+# Use git archive piped to tar to construct a subdirectory whose name
+# is tcpdump-{release}, containing all the checked-in source files,
+# and then run autoreconf in that directory to generate the configure
+# script and other files from that source. Then remove autom4te.cache,
+# construct the release tarball from that subdirectory, and remove
+# the subdirectory.
+#
+# The --format=tar is to force git archive to write a non-compressed
+# archive, in case the platform's tar command doesn't have built-in
+# decompression.
+#
+# The ^{tree} is there to force git archive not to write out the
+# "helpful" global extended pax header with a commit ID, as not all
+# versions of tar can handle that (Solaris tar can't, for example).
+# (It turns HEAD, or a tag, both of which are apparently "tree-ish"es,
+# into a tree; apparently, unlike HEAD, or a tag, which have a commit
+# ID associated with them, the tree associated with them doesn't have
+# a commit ID, so no commit ID is available to write, and thus
+# git archive doesn't write one.)
+#
 releasetar:
 	@TAG=$(PROG)-`cat VERSION` && \
-	if git show-ref --tags --quiet --verify -- "refs/tags/$$TAG"; then \
-	    git archive --prefix="$$TAG"/ -o "$$TAG".tar.gz "$$TAG" \
-	    $(RELEASE_FILES) && \
+	if [ ! -d .git ]; then echo 'Not in a git clone, stop.'; exit 1; fi && \
+	TMPTESTFILE=`mktemp -t tmptestfile_XXXXXXXX` && \
+	rm -f "$$TMPTESTFILE" && \
+	AUTORECONF_DIR=`dirname "$$TMPTESTFILE"`/"$(PROG)"_build_autoreconf_$$$$ && \
+	DIR=`pwd` && \
+	rm -rf "$$AUTORECONF_DIR" && \
+	mkdir "$$AUTORECONF_DIR" && \
+	cd "$$AUTORECONF_DIR" && \
+	if git -C "$$DIR" show-ref --tags --quiet --verify -- "refs/tags/$$TAG"; then \
+	    (git -C "$$DIR" archive --format=tar --prefix="$$TAG"/ "$$TAG^{tree}" $(RELEASE_FILES) | \
+	     tar xf -) && \
 	    echo "Archive build from tag $$TAG."; \
 	else \
-	    git archive --prefix="$$TAG"/ -o "$$TAG".tar.gz HEAD \
-	    $(RELEASE_FILES) && \
+	    (git -C "$$DIR" archive --format=tar --prefix="$$TAG"/ "HEAD^{tree}" $(RELEASE_FILES) | \
+	     tar xf -) && \
 	    echo "No $$TAG tag. Archive build from HEAD."; \
-	fi
+	fi && \
+	(cd "$$TAG" && "$${AUTORECONF:-autoreconf}" && rm -rf autom4te.cache) && \
+	tar cf "$$DIR/$$TAG".tar "$$TAG" && \
+	rm -f "$$DIR/$$TAG".tar.gz && \
+	gzip --best "$$DIR/$$TAG".tar && \
+	cd "$$DIR" && \
+	rm -rf "$$AUTORECONF_DIR"
 
 releasecheck: releasetar
 	@TAG=$(PROG)-`cat VERSION` && \
