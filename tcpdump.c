@@ -1506,6 +1506,8 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 static int
 no_printf(netdissect_options *ndo, const char *fmt, ...)
 {
+	ndo++;
+	fmt++;
 	return (0);
 }
 
