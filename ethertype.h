@@ -216,4 +216,11 @@
 #define	ETHERTYPE_ARISTA        0xd28b /*  Arista Networks vendor specific EtherType */
 #endif
 
+/*
+ * Length of an Ethernet header; note that some compilers may pad
+ * "struct ether_header" to a multiple of 4 bytes, for example, so
+ * "sizeof (struct ether_header)" may not give the right answer.
+ */
+#define ETHER_HDRLEN		14
+
 extern const struct tok ethertype_values[];

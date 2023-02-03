@@ -167,6 +167,8 @@ The Regents of the University of California.  All rights reserved.\n";
 
 #include "fptype.h"
 
+#include "ethertype.h"
+
 #ifndef PATH_MAX
 #define PATH_MAX 1024
 #endif
@@ -221,6 +223,8 @@ static int Jflag;			/* list available time stamp types */
 static int jflag = -1;			/* packet time stamp source */
 #endif
 static int lflag;			/* line-buffered output */
+static int overviewFlag = 0;	/* overview mode */
+static int noPrintFlag = 0;		/* don't print packets */
 static int pflag;			/* don't go promiscuous */
 #ifdef HAVE_PCAP_SETDIRECTION
 static int Qflag = -1;			/* restrict captured packet by send/receive direction */
@@ -240,6 +244,29 @@ static int count_mode;
 static int infodelay;
 static int infoprint;
 
+#define MAX_ADDR_LEN 100
+
+struct endpoint_stats {
+	char src[MAX_ADDR_LEN];
+	char dst[MAX_ADDR_LEN];
+	u_int64_t kilobytes;
+	u_int64_t bytes;
+	u_int64_t packets;
+};
+
+#define MAX_ENDPOINT_PAIRS 1000
+
+static struct endpoint_stats endpoint_overview_stats[MAX_ENDPOINT_PAIRS];
+static int endpoint_overview_stats_len = 0;
+static struct timeval capture_start_time;
+static struct timeval capture_end_time;
+
+/* Column headers for overview option */
+#define COLUMN_HEADER_SRC "SRC"
+#define COLUMN_HEADER_DST "DST"
+#define COLUMN_HEADER_PACKETS "PACKETS"
+#define COLUMN_HEADER_BYTES "BYTES"
+
 char *program_name;
 
 /* Forwards */
@@ -252,6 +279,11 @@ static void print_usage(FILE *);
 static void print_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void dump_packet_and_trunc(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void dump_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
+
+static void add_to_endpoint_statistics(const char* src, const char* dst, int packet_bytes);
+static void print_with_spaces(const char* str, size_t padding_len, int prefix_spaces);
+static size_t count_digits(u_int64_t n);
+static void print_endpoint_statistics(void);
 
 #ifdef SIGNAL_REQ_INFO
 static void requestinfo(int);
@@ -270,6 +302,7 @@ static void flushpcap(int);
 
 static void info(int);
 static u_int packets_captured;
+static u_int64_t bytes_captured;
 
 #ifdef HAVE_PCAP_FINDALLDEVS
 static const struct tok status_flags[] = {
@@ -692,6 +725,8 @@ show_remote_devices_and_exit(void)
 #define OPTION_FP_TYPE			135
 #define OPTION_COUNT			136
 #define OPTION_PRINT_SAMPLING		137
+#define OPTION_OVERVIEW			138
+#define OPTION_NO_PRINT			139
 
 static const struct option longopts[] = {
 #if defined(HAVE_PCAP_CREATE) || defined(_WIN32)
@@ -741,6 +776,8 @@ static const struct option longopts[] = {
 	{ "print", no_argument, NULL, OPTION_PRINT },
 	{ "print-sampling", required_argument, NULL, OPTION_PRINT_SAMPLING },
 	{ "version", no_argument, NULL, OPTION_VERSION },
+	{ "overview", no_argument, NULL, OPTION_OVERVIEW },
+	{ "no-print", no_argument, NULL, OPTION_NO_PRINT },
 	{ NULL, 0, NULL, 0 }
 };
 
@@ -1466,6 +1503,14 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 	return (pc);
 }
 
+static int
+no_printf(netdissect_options *ndo, const char *fmt, ...)
+{
+	ndo++;
+	fmt++;
+	return (0);
+}
+
 int
 main(int argc, char **argv)
 {
@@ -1474,7 +1519,6 @@ main(int argc, char **argv)
 	char *cp, *infile, *cmdbuf, *device, *RFileName, *VFileName, *WFileName;
 	char *endp;
 	pcap_handler callback;
-	int dlt;
 	const char *dlt_name;
 	struct bpf_program fcode;
 #ifndef _WIN32
@@ -1525,7 +1569,7 @@ main(int argc, char **argv)
 	VFileName = NULL;
 	VFile = NULL;
 	WFileName = NULL;
-	dlt = -1;
+	ndo->ndo_dlt = -1;
 	if ((cp = strrchr(argv[0], PATH_SEPARATOR)) != NULL)
 		ndo->program_name = program_name = cp + 1;
 	else
@@ -2013,6 +2057,14 @@ main(int argc, char **argv)
 			count_mode = 1;
 			break;
 
+		case OPTION_OVERVIEW:
+			overviewFlag = 1;
+			break;
+
+		case OPTION_NO_PRINT:
+			noPrintFlag = 1;
+			break;
+
 		default:
 			print_usage(stderr);
 			exit_tcpdump(S_ERR_HOST_PROGRAM);
@@ -2142,18 +2194,18 @@ main(int argc, char **argv)
 			error("unable to limit pcap descriptor");
 		}
 #endif
-		dlt = pcap_datalink(pd);
-		dlt_name = pcap_datalink_val_to_name(dlt);
+		ndo->ndo_dlt = pcap_datalink(pd);
+		dlt_name = pcap_datalink_val_to_name(ndo->ndo_dlt);
 		fprintf(stderr, "reading from file %s", RFileName);
 		if (dlt_name == NULL) {
-			fprintf(stderr, ", link-type %u", dlt);
+			fprintf(stderr, ", link-type %u", ndo->ndo_dlt);
 		} else {
 			fprintf(stderr, ", link-type %s (%s)", dlt_name,
-				pcap_datalink_val_to_description(dlt));
+				pcap_datalink_val_to_description(ndo->ndo_dlt));
 		}
 		fprintf(stderr, ", snapshot length %d\n", pcap_snapshot(pd));
 #ifdef DLT_LINUX_SLL2
-		if (dlt == DLT_LINUX_SLL2)
+		if (ndo->ndo_dlt == DLT_LINUX_SLL2)
 			fprintf(stderr, "Warning: interface names might be incorrect\n");
 #endif
 	} else if (dflag && !device) {
@@ -2522,8 +2574,8 @@ DIAG_ON_ASSIGN_ENUM
 			pcap_userdata = (u_char *)&dumpinfo;
 		}
 		if (print) {
-			dlt = pcap_datalink(pd);
-			ndo->ndo_if_printer = get_if_printer(dlt);
+			ndo->ndo_dlt = pcap_datalink(pd);
+			ndo->ndo_if_printer = get_if_printer(ndo->ndo_dlt);
 			dumpinfo.ndo = ndo;
 		} else
 			dumpinfo.ndo = NULL;
@@ -2533,8 +2585,14 @@ DIAG_ON_ASSIGN_ENUM
 			pcap_dump_flush(pdd);
 #endif
 	} else {
-		dlt = pcap_datalink(pd);
-		ndo->ndo_if_printer = get_if_printer(dlt);
+		ndo->ndo_dlt = pcap_datalink(pd);
+		ndo->ndo_if_printer = get_if_printer(ndo->ndo_dlt);
+
+		/* If no printing of packets is desired, override the printf function to suppress printing packets */
+		if (noPrintFlag) {
+			ndo->ndo_printf = no_printf;
+		}
+
 		callback = print_packet;
 		pcap_userdata = (u_char *)ndo;
 	}
@@ -2600,14 +2658,14 @@ DIAG_ON_ASSIGN_ENUM
 			    program_name);
 		} else
 			(void)fprintf(stderr, "%s: ", program_name);
-		dlt = pcap_datalink(pd);
-		dlt_name = pcap_datalink_val_to_name(dlt);
+		ndo->ndo_dlt = pcap_datalink(pd);
+		dlt_name = pcap_datalink_val_to_name(ndo->ndo_dlt);
 		(void)fprintf(stderr, "listening on %s", device);
 		if (dlt_name == NULL) {
-			(void)fprintf(stderr, ", link-type %u", dlt);
+			(void)fprintf(stderr, ", link-type %u", ndo->ndo_dlt);
 		} else {
 			(void)fprintf(stderr, ", link-type %s (%s)", dlt_name,
-				      pcap_datalink_val_to_description(dlt));
+				      pcap_datalink_val_to_description(ndo->ndo_dlt));
 		}
 		(void)fprintf(stderr, ", snapshot length %d bytes\n", ndo->ndo_snaplen);
 		(void)fflush(stderr);
@@ -2681,7 +2739,7 @@ DIAG_ON_ASSIGN_ENUM
 				}
 #endif
 				new_dlt = pcap_datalink(pd);
-				if (new_dlt != dlt) {
+				if (new_dlt != ndo->ndo_dlt) {
 					/*
 					 * The new file has a different
 					 * link-layer header type from the
@@ -2709,8 +2767,8 @@ DIAG_ON_ASSIGN_ENUM
 					 * and recompile the filter with
 					 * the new DLT.
 					 */
-					dlt = new_dlt;
-					ndo->ndo_if_printer = get_if_printer(dlt);
+					ndo->ndo_dlt = new_dlt;
+					ndo->ndo_if_printer = get_if_printer(ndo->ndo_dlt);
 					if (pcap_compile(pd, &fcode, cmdbuf, Oflag, netmask) < 0)
 						error("%s", pcap_geterr(pd));
 				}
@@ -2724,14 +2782,14 @@ DIAG_ON_ASSIGN_ENUM
 				/*
 				 * Report the new file.
 				 */
-				dlt_name = pcap_datalink_val_to_name(dlt);
+				dlt_name = pcap_datalink_val_to_name(ndo->ndo_dlt);
 				fprintf(stderr, "reading from file %s", RFileName);
 				if (dlt_name == NULL) {
-					fprintf(stderr, ", link-type %u", dlt);
+					fprintf(stderr, ", link-type %u", ndo->ndo_dlt);
 				} else {
 					fprintf(stderr, ", link-type %s (%s)",
 						dlt_name,
-						pcap_datalink_val_to_description(dlt));
+						pcap_datalink_val_to_description(ndo->ndo_dlt));
 				}
 				fprintf(stderr, ", snapshot length %d\n", pcap_snapshot(pd));
 			}
@@ -2742,6 +2800,11 @@ DIAG_ON_ASSIGN_ENUM
 	if (count_mode && RFileName != NULL)
 		fprintf(stdout, "%u packet%s\n", packets_captured,
 			PLURAL_SUFFIX(packets_captured));
+
+	/* If overview mode was specified, print the overview */
+	if (overviewFlag) {
+		print_endpoint_statistics();
+	}
 
 	free(cmdbuf);
 	pcap_freecode(&fcode);
@@ -3185,9 +3248,155 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	if (!count_mode)
 		pretty_print_packet((netdissect_options *)user, h, sp, packets_captured);
 
+	/* If overview mode was selected on the command line, store the statistics
+	   between each src/dst pair for each ethernet packet. */
+	if (overviewFlag && h && sp && user) {
+		const struct ip* ipPacket;
+		netdissect_options* ndo;
+
+		ndo = (netdissect_options*)user;
+		
+		if (ndo->ndo_dlt == DLT_EN10MB) {
+			
+			if (capture_start_time.tv_sec == 0)
+				capture_start_time.tv_sec = h->ts.tv_sec;
+
+			capture_end_time.tv_sec = h->ts.tv_sec;
+
+			ipPacket = (const struct ip*)(sp + ndo->ndo_ll_hdr_len);
+			
+			add_to_endpoint_statistics(
+					ipaddr_string(ndo, ipPacket->ip_src),
+					ipaddr_string(ndo, ipPacket->ip_dst),
+					h->len);
+		}
+	}		
+
 	--infodelay;
 	if (infoprint)
 		info(0);
+}
+
+static void add_to_endpoint_statistics(const char* src, const char* dst, int packet_bytes)
+{
+	struct endpoint_stats* stats = NULL;
+
+	/* Add to the total bytes */
+	bytes_captured += packet_bytes;
+
+	/* Lookup src and dst strings in overview_stats. */
+	for (int i = 0; i < endpoint_overview_stats_len && stats == NULL; i++) {
+		if (!strcmp(endpoint_overview_stats[i].src, src) && !strcmp(endpoint_overview_stats[i].dst, dst)) {
+			stats = &endpoint_overview_stats[i];
+		}
+	}
+
+	/* Add a new array element if needed. */
+	if (!stats && endpoint_overview_stats_len < MAX_ENDPOINT_PAIRS) {
+		endpoint_overview_stats_len++;
+		stats = &endpoint_overview_stats[endpoint_overview_stats_len - 1];
+		strncpy(stats->src, src, MAX_ADDR_LEN);
+		stats->src[MAX_ADDR_LEN - 1] = 0;
+		strncpy(stats->dst, dst, MAX_ADDR_LEN);
+		stats->dst[MAX_ADDR_LEN - 1] = 0;
+	}
+
+	/* Add to the stats. */
+	if (stats) {
+		stats->packets++;
+		stats->bytes += packet_bytes;
+	}
+}
+
+void print_with_spaces(const char* str, size_t padding_len, int prefix_spaces_flag)
+{
+	size_t spaces = 0;
+
+	if (!prefix_spaces_flag) printf("%s", str);
+
+	spaces = padding_len - strlen(str);
+	while (spaces) {
+		printf(" ");
+		spaces--;
+	}
+
+	if (prefix_spaces_flag) printf("%s", str);
+}
+
+size_t count_digits(u_int64_t n)
+{
+    size_t count = 0;
+
+    if (n == 0)
+        return 1;
+    while (n != 0) {
+        n = n / 10;
+        ++count;
+    }
+    return count;
+}
+
+void print_endpoint_statistics(void)
+{
+	struct endpoint_stats* stats = NULL;
+	size_t max_src_len = strlen(COLUMN_HEADER_SRC);
+	size_t max_dst_len = strlen(COLUMN_HEADER_DST);
+	size_t max_packets_len = strlen(COLUMN_HEADER_PACKETS);
+	size_t max_bytes_len = strlen(COLUMN_HEADER_BYTES);
+	size_t len = 0;
+	char str[MAX_ADDR_LEN];
+
+	struct timeval delta_time;
+	double hours;
+
+	delta_time.tv_sec = capture_end_time.tv_sec - capture_start_time.tv_sec;
+	hours = (double)delta_time.tv_sec / 3600.0;
+
+	printf("\n");
+	printf("OVERVIEW\n");
+	printf("--------\n");
+	printf("packets_captured: %d\n", packets_captured);
+	printf("bytes_captured: %ld\n", bytes_captured);
+	printf("seconds: %ld\n", delta_time.tv_sec);
+	printf("hours: %2.2f\n", hours);
+	printf("\n");
+
+	for (int i = 0; i < endpoint_overview_stats_len; i++) {
+		stats = &endpoint_overview_stats[i];
+		if ((len = strlen(stats->src)) > max_src_len) {
+			max_src_len = len;
+		}
+		if ((len = strlen(stats->dst)) > max_dst_len) {
+			max_dst_len = len;
+		}
+		if ((len = count_digits(stats->packets)) > max_packets_len) {
+			max_packets_len = len;
+		}
+		if ((len = count_digits(stats->bytes)) > max_bytes_len) {
+			max_bytes_len = len;
+		}
+	}
+
+	print_with_spaces(COLUMN_HEADER_SRC, max_src_len + 1, 0);
+	print_with_spaces(COLUMN_HEADER_DST, max_dst_len + 1, 0);
+	print_with_spaces(COLUMN_HEADER_PACKETS, max_packets_len + 1, 1);
+	print_with_spaces(COLUMN_HEADER_BYTES, max_bytes_len + 1, 1);
+	printf("\n");
+
+	for (int i = 0; i < endpoint_overview_stats_len; i++) {
+		stats = &endpoint_overview_stats[i];
+
+		print_with_spaces(stats->src, max_src_len + 1, 0);
+		print_with_spaces(stats->dst, max_dst_len + 1, 0);
+
+		sprintf(str, "%ld", stats->packets);
+		print_with_spaces(str, max_packets_len + 1, 1);
+
+		sprintf(str, "%ld", stats->bytes);
+		print_with_spaces(str, max_bytes_len + 1, 1);					
+
+		printf("\n");
+	}
 }
 
 #ifdef SIGNAL_REQ_INFO
@@ -3310,4 +3519,6 @@ print_usage(FILE *f)
 #endif
 	(void)fprintf(f,
 "\t\t[ -z postrotate-command ] [ -Z user ] [ expression ]\n");
+	(void)fprintf(f,
+"\t\t[ --overview ] [ --no-print ]\n");
 }

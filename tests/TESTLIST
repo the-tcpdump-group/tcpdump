@@ -909,3 +909,9 @@ quic_handshake			quic_handshake.pcap		quic_handshake.out	-v
 quic_handshake_truncated	quic_handshake_truncated.pcap	quic_handshake_truncated.out	-v
 quic_retry			quic_retry.pcap			quic_retry.out	-v
 gquic				gquic.pcap			gquic.out	-v
+
+# Overview tests
+overview1    overview.pcap      overview1.out    --overview --no-print
+overview2    overview.pcap      overview2.out    --overview -t
+overview3    overview.pcap      overview3.out    --no-print
+

@@ -42,13 +42,6 @@ struct	ether_header {
 	nd_uint16_t	ether_length_type;
 };
 
-/*
- * Length of an Ethernet header; note that some compilers may pad
- * "struct ether_header" to a multiple of 4 bytes, for example, so
- * "sizeof (struct ether_header)" may not give the right answer.
- */
-#define ETHER_HDRLEN		14
-
 const struct tok ethertype_values[] = {
     { ETHERTYPE_IP,		"IPv4" },
     { ETHERTYPE_MPLS,		"MPLS unicast" },
