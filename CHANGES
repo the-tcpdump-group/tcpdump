@@ -29,6 +29,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Add --print-sampling to print every Nth packet instead of all.
       Print the supported time stamp types (-J) to stdout instead of stderr.
       Print the list of data link types (-L) to stdout instead of stderr.
+      Add --overview to print an overview of the contents of the capture
+      Add --no-print to suppress printing of individual packets (useful with --overview)
     Source code:
       Use %zu when printing a sizeof to squelch compiler warnings
       Remove unused missing/snprintf.c.

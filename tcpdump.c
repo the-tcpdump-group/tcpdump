@@ -725,8 +725,8 @@ show_remote_devices_and_exit(void)
 #define OPTION_FP_TYPE			135
 #define OPTION_COUNT			136
 #define OPTION_PRINT_SAMPLING		137
-#define OPTION_OVERVIEW			137
-#define OPTION_NO_PRINT			138
+#define OPTION_OVERVIEW			138
+#define OPTION_NO_PRINT			139
 
 static const struct option longopts[] = {
 #if defined(HAVE_PCAP_CREATE) || defined(_WIN32)
