@@ -238,6 +238,8 @@ struct netdissect_options {
   const u_char *ndo_packetp;
   const u_char *ndo_snapend;
 
+  int ndo_dlt; /* datalink type */
+
   /* stack of saved packet boundary and buffer information */
   struct netdissect_saved_packet_info *ndo_packet_info_stack;
 
