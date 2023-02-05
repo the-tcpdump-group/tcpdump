@@ -2654,6 +2654,8 @@ DIAG_ON_ASSIGN_ENUM
 					 */
 					dlt = new_dlt;
 					ndo->ndo_if_printer = get_if_printer(dlt);
+					/* Free the old filter */
+					pcap_freecode(&fcode);
 					if (pcap_compile(pd, &fcode, cmdbuf, Oflag, netmask) < 0)
 						error("%s", pcap_geterr(pd));
 				}
