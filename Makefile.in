@@ -443,9 +443,9 @@ lint:
 clean:
 	rm -f $(CLEANFILES) $(PROG)-`cat ${srcdir}/VERSION`.tar.gz
 
-distclean:
-	rm -f $(CLEANFILES) Makefile config.cache config.log config.status \
-	    config.h config.h.in config.h.in~ configure configure~ configure.ac~ \
+distclean: clean
+	rm -f Makefile config.cache config.log config.status \
+	    config.h config.h.in~ configure~ configure.ac~ \
 	    os-proto.h stamp-h stamp-h.in $(PROG).1 \
 	    libnetdissect.a tests/.failed tests/.passed \
 	    tests/failure-outputs.txt
