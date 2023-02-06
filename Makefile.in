@@ -328,7 +328,7 @@ TAGHDR = \
 	/usr/include/netinet/in.h
 
 TAGFILES = $(SRC) $(HDR) $(TAGHDR) $(LIBNETDISSECT_SRC) \
-	print-pflog.c print-smb.c smbutil.c
+	print-smb.c smbutil.c
 
 CLEANFILES = $(PROG) $(OBJ) $(LIBNETDISSECT_OBJ)
 
@@ -378,7 +378,6 @@ EXTRA_DIST = \
 	missing/strsep.c \
 	mkdep \
 	packetdat.awk \
-	print-pflog.c \
 	print-smb.c \
 	send-ack.awk \
 	smbutil.c \
