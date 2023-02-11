@@ -103,9 +103,19 @@ typedef struct nflog_timestamp {
 #define NFULA_HWHEADER			16	/* skbuff's MAC-layer header */
 #define NFULA_HWLEN			17	/* length of skbuff's MAC-layer header */
 
+/*
+ * Define two constants specifically for the two AF code points from the
+ * LINKTYPE_NFLOG specification above and use these constants instead of
+ * AF_INET and AF_INET6.  This is the only way to dissect the "wire" encoding
+ * correctly because some BSD systems define AF_INET6 differently from Linux
+ * (see af.h) and Haiku defines both AF_INET and AF_INET6 differently from
+ * Linux.
+ */
+#define NFLOG_AF_INET   2
+#define NFLOG_AF_INET6 10
 static const struct tok nflog_values[] = {
-	{ AF_INET,		"IPv4" },
-	{ AF_INET6,		"IPv6" },
+	{ NFLOG_AF_INET,	"IPv4" },
+	{ NFLOG_AF_INET6,	"IPv6" },
 	{ 0,			NULL }
 };
 
@@ -203,11 +213,11 @@ nflog_if_print(netdissect_options *ndo,
 
 	switch (GET_U_1(hdr->nflog_family)) {
 
-	case AF_INET:
+	case NFLOG_AF_INET:
 		ip_print(ndo, p, length);
 		break;
 
-	case AF_INET6:
+	case NFLOG_AF_INET6:
 		ip6_print(ndo, p, length);
 		break;
 
