@@ -64,6 +64,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Autoconf: Use AC_SYS_YEAR2038_RECOMMENDED when possible if the
         environment variable BUILD_YEAR2038 = yes (via autogen.sh).
       Autoconf: Avoid incorrectly include the libpcap's config.h.
+      Autoconf: Refine reporting of os-proto.h.
       Require config.h to be from the tcpdump build.
       AppVeyor: Update Npcap SDK to 1.15.
       autogen.sh: Allow to configure Autoconf warnings.
