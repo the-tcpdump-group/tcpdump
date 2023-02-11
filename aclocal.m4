@@ -48,18 +48,6 @@ AC_DEFUN(AC_LBL_C_INIT_BEFORE_CC,
     if test "${CFLAGS+set}" = set; then
 	    LBL_CFLAGS="$CFLAGS"
     fi
-    if test -z "$CC" ; then
-	    case "$host_os" in
-
-	    bsdi*)
-		    AC_CHECK_PROG(SHLICC2, shlicc2, yes, no)
-		    if test $SHLICC2 = yes ; then
-			    CC=shlicc2
-			    export CC
-		    fi
-		    ;;
-	    esac
-    fi
     if test -z "$CC" -a "$with_gcc" = no ; then
 	    CC=cc
 	    export CC
