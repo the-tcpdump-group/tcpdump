@@ -441,12 +441,12 @@ lint:
 	    grep -v 'possible pointer alignment problem'
 
 clean:
-	rm -f $(CLEANFILES) $(PROG)-`cat ${srcdir}/VERSION`.tar.gz
+	rm -f $(CLEANFILES) $(PROG)-`cat ${srcdir}/VERSION`.tar.gz \
+	config.h.in~ configure~ configure.ac~
 
 distclean: clean
 	rm -f Makefile config.cache config.log config.status \
-	    config.h config.h.in~ configure~ configure.ac~ \
-	    os-proto.h stamp-h stamp-h.in $(PROG).1 \
+	    config.h os-proto.h stamp-h stamp-h.in $(PROG).1 \
 	    libnetdissect.a tests/.failed tests/.passed \
 	    tests/failure-outputs.txt
 	rm -rf autom4te.cache tests/DIFF tests/NEW
