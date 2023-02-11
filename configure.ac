@@ -155,20 +155,26 @@ esac
 
 AC_ARG_WITH(user, [  --with-user=USERNAME    drop privileges by default to USERNAME])
 AC_MSG_CHECKING([whether to drop root privileges by default])
-if test ! -z "$with_user" ; then
+if test ! -z "$withval" && test "$withval" != "no" ; then
+       if test "$withval" = "yes" ; then
+           AC_MSG_ERROR([--with-user requires a username])
+       fi
        AC_DEFINE_UNQUOTED(WITH_USER, "$withval",
            [define if should drop privileges by default])
-       AC_MSG_RESULT(to \"$withval\")
+       AC_MSG_RESULT([yes, to user "$withval"])
 else
        AC_MSG_RESULT(no)
 fi
 
 AC_ARG_WITH(chroot, [  --with-chroot=DIRECTORY when dropping privileges, chroot to DIRECTORY])
 AC_MSG_CHECKING([whether to chroot])
-if test ! -z "$with_chroot" && test "$with_chroot" != "no" ; then
+if test ! -z "$withval" && test "$withval" != "no" ; then
+       if test "$withval" = "yes" ; then
+           AC_MSG_ERROR([--with-chroot requires a directory])
+       fi
        AC_DEFINE_UNQUOTED(WITH_CHROOT, "$withval",
            [define if should chroot when dropping privileges])
-       AC_MSG_RESULT(to \"$withval\")
+       AC_MSG_RESULT([yes, to directory "$withval"])
 else
        AC_MSG_RESULT(no)
 fi
