@@ -356,6 +356,7 @@ EXTRA_DIST = \
 	config.sub \
 	configure.ac \
 	doc/README.aix.md \
+	doc/README.haiku.md \
 	doc/README.NetBSD.md \
 	doc/README.solaris.md \
 	doc/README.Win32.md \
