@@ -440,7 +440,9 @@ dnl	LIBS
 dnl	LBL_LIBS
 dnl
 AC_DEFUN(AC_LBL_LIBPCAP,
-    [AC_REQUIRE([AC_LBL_LIBRARY_NET])
+[
+    AC_REQUIRE([AC_PROG_EGREP])
+    AC_REQUIRE([AC_LBL_LIBRARY_NET])
     dnl
     dnl save a copy before locating libpcap.a
     dnl
@@ -477,9 +479,9 @@ AC_DEFUN(AC_LBL_LIBPCAP,
         AC_MSG_CHECKING(for local pcap library)
         lastdir=FAIL
         places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
-            egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT|rc.)?$'`
+            $EGREP '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT|rc.)?$'`
         places2=`ls .. | sed -e 's,/$,,' -e "s,^,../," | \
-            egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT|rc.)?$'`
+            $EGREP '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT|rc.)?$'`
         for dir in $places $srcdir/../libpcap ../libpcap $srcdir/libpcap $places2 ; do
             basedir=`echo $dir | sed -e 's/[[ab]][[0-9]]*$//' | \
                 sed -e 's/-PRE-GIT$//' `
@@ -777,9 +779,9 @@ AC_DEFUN(AC_LBL_LIBPCAP,
             # Make sure it has a pcap.h file.
             #
             places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
-                egrep '/libpcap-[[0-9]]*.[[0-9]]*(.[[0-9]]*)?([[ab]][[0-9]]*)?$'`
+                $EGREP '/libpcap-[[0-9]]*.[[0-9]]*(.[[0-9]]*)?([[ab]][[0-9]]*)?$'`
             places2=`ls .. | sed -e 's,/$,,' -e "s,^,../," | \
-                egrep '/libpcap-[[0-9]]*.[[0-9]]*(.[[0-9]]*)?([[ab]][[0-9]]*)?$'`
+                $EGREP '/libpcap-[[0-9]]*.[[0-9]]*(.[[0-9]]*)?([[ab]][[0-9]]*)?$'`
             pcapH=FAIL
             if test -r $local_pcap_dir/pcap.h; then
                 pcapH=$local_pcap_dir
