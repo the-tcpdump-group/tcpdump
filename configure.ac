@@ -310,6 +310,15 @@ ipv6lib=none
 ipv6trylibc=no
 
 if test "$ipv6" = "yes"; then
+	# Apparently, only on Linux by this point the configure script knows
+	# what the C preprocessor and the extended regexp grep commands are.
+	# On other OSes the first call to AC_EGREP_CPP() induces a search for
+	# these tools, which prints three lines in the middle of the IPv6
+	# detection message and distorts it.  Resolve these dependencies
+	# beforehand to prevent that.
+	AC_PROG_CPP
+	AC_PROG_EGREP
+
 	AC_MSG_CHECKING([ipv6 stack type])
 	for i in inria kame linux-glibc linux-libinet6 toshiba v6d zeta; do
 		case $i in
