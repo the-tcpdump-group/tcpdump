@@ -203,22 +203,6 @@ AC_DEFUN(AC_LBL_C_INIT,
 		    #
 		    ac_lbl_cc_force_warning_errors=-errwarn
 		    ;;
-
-	    ultrix*)
-		    AC_MSG_CHECKING(that Ultrix $CC hacks const in prototypes)
-		    AC_CACHE_VAL(ac_cv_lbl_cc_const_proto,
-			AC_TRY_COMPILE(
-			    [#include <sys/types.h>],
-			    [struct a { int b; };
-			    void c(const struct a *)],
-			    ac_cv_lbl_cc_const_proto=yes,
-			    ac_cv_lbl_cc_const_proto=no))
-		    AC_MSG_RESULT($ac_cv_lbl_cc_const_proto)
-		    if test $ac_cv_lbl_cc_const_proto = no ; then
-			    AC_DEFINE(const,[],
-			        [to handle Ultrix compilers that don't support const in prototypes])
-		    fi
-		    ;;
 	    esac
 	    $1="$$1 -O"
     fi

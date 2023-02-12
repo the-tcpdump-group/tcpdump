@@ -264,8 +264,6 @@ LIBNETDISSECT=libnetdissect.a
 
 SRC =	$(CSRC) $(LOCALSRC)
 
-# We would like to say "OBJ = $(SRC:.c=.o)" but Ultrix's make cannot
-# hack the extra indirection
 OBJ =	$(CSRC:.c=.o)
 HDR = \
 	addrtoname.h \
@@ -364,7 +362,6 @@ EXTRA_DIST = \
 	lbl/os-osf4.h \
 	lbl/os-solaris2.h \
 	lbl/os-sunos4.h \
-	lbl/os-ultrix4.h \
 	makemib \
 	missing/datalinks.c \
 	missing/dlnames.c \
