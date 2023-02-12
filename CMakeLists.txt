@@ -278,6 +278,23 @@ if(MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif(MSVC)
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Haiku")
+    #
+    # On Haiku, all executables are built as shared objects,
+    # and must have their code build as PIC.
+    #
+    # At least some versions of Haiku's GCC default to PIC,
+    # with a -fno-pic option for cases where that's not desired.
+    #
+    # Clang hasn't been modified in that fashion, so Clang
+    # builds of tcpdump fail.
+    #
+    # Force the use of -fPIC (even for GCC; adding -fPIC for GCC
+    # won't break anything).
+    #
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+endif(CMAKE_SYSTEM_NAME STREQUAL "Haiku")
+
 if(MSVC)
     if (USE_STATIC_RT)
         MESSAGE(STATUS "Use STATIC runtime")
