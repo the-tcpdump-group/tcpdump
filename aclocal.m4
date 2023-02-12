@@ -82,6 +82,32 @@ dnl
 AC_DEFUN(AC_LBL_C_INIT,
 [
     AC_BEFORE([$0], [AC_LBL_DEVEL])
+    #
+    # Changes to copt that are required even for compilers that appear
+    # to be GCC (note that not all compilers that apper to be GCC
+    # are, in fact, GCC; Clang, for example, looks enough like GCC
+    # that the autoconf tests for the C compiler set GCC to yes).
+    #
+    case "$host_os" in
+
+    haiku*)
+	    #
+	    # On Haiku, all executables are built as shared objects,
+	    # and must have their code build as PIC.
+	    #
+	    # At least some versions of Haiku's GCC default to PIC,
+	    # with a -fno-pic option for cases where that's not desired.
+	    #
+	    # Clang hasn't been modified in that fashion, so Clang
+	    # builds of tcpdump fail.
+	    #
+	    # Force the use of -fPIC (even for GCC; adding -fPIC for GCC
+	    # won't break anything).
+	    #
+	    $1="$$1 -fPIC"
+	    ;;
+    esac
+
     if test "$GCC" = yes ; then
 	    #
 	    # -Werror forces warnings to be errors.
@@ -97,6 +123,9 @@ AC_DEFUN(AC_LBL_C_INIT,
 		    #
 		    # This is assumed either to be GCC or clang, both
 		    # of which use -Werror to force warnings to be errors.
+		    #
+		    # XXX - they also both cause GCC to be set to yes,
+		    # so we should never get here in the first place.
 		    #
 		    ac_lbl_cc_force_warning_errors=-Werror
 		    ;;
