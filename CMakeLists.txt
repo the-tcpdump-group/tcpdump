@@ -115,6 +115,20 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 # C++ code in tcpdump.
 #
 project(tcpdump C)
+if(CMAKE_SYSTEM_NAME STREQUAL "Haiku")
+    #
+    # Due to Haiku bug 18258, it is difficult if not impossible
+    # to get Clang to be usable as a compiler for CMake projects.
+    #
+    # If CMAKE_SIZEOF_VOID_P is undefined, we assume that means
+    # that the attempt to determine the compiler ABI failed, due
+    # the the consequences of that bug, and tell the user that
+    # this compiler doesn't work wel with CMake on Haiku
+    #
+    if(NOT CMAKE_SIZEOF_VOID_P)
+        message(FATAL_ERROR "${CMAKE_C_COMPILER} does not work well on Haiku for projects using CMake")
+    endif()
+endif()
 
 #
 # For checking if a compiler flag works and adding it if it does.
@@ -277,23 +291,6 @@ if(MSVC)
     add_definitions(-D__STDC__)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif(MSVC)
-
-if(CMAKE_SYSTEM_NAME STREQUAL "Haiku")
-    #
-    # On Haiku, all executables are built as shared objects,
-    # and must have their code build as PIC.
-    #
-    # At least some versions of Haiku's GCC default to PIC,
-    # with a -fno-pic option for cases where that's not desired.
-    #
-    # Clang hasn't been modified in that fashion, so Clang
-    # builds of tcpdump fail.
-    #
-    # Force the use of -fPIC (even for GCC; adding -fPIC for GCC
-    # won't break anything).
-    #
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
-endif(CMAKE_SYSTEM_NAME STREQUAL "Haiku")
 
 if(MSVC)
     if (USE_STATIC_RT)
