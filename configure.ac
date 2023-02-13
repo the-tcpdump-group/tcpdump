@@ -33,6 +33,9 @@ AC_C_INLINE
 
 AC_CHECK_HEADERS(fcntl.h rpc/rpc.h rpc/rpcent.h net/if.h)
 
+#
+# Assorted platform checks.
+#
 case "$host_os" in
 
 darwin*)
@@ -61,8 +64,24 @@ darwin*)
 		esac
 	fi
 	;;
-esac
 
+haiku*)
+	#
+	# On Haiku, all executables are built as shared objects,
+	# and must have their code build as PIC.
+	#
+	# At least some versions of Haiku's GCC default to PIC,
+	# with a -fno-pic option for cases where that's not desired.
+	#
+	# Clang hasn't been modified in that fashion, so Clang
+	# builds of tcpdump fail.
+	#
+	# Force the use of -fPIC (even for GCC; adding -fPIC for GCC
+	# won't break anything).
+	#
+	CFLAGS="$CFLAGS -fPIC"
+	;;
+esac
 
 AC_ARG_WITH([smi],
    [AS_HELP_STRING([--with-smi],
