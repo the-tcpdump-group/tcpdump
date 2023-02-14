@@ -19,6 +19,29 @@ AC_CONFIG_SRCDIR(tcpdump.c)
 
 AC_CANONICAL_HOST
 
+case "$host_os" in
+
+haiku*)
+	#
+	# On Haiku, all executables are built as shared objects,
+	# and must have their code build as PIC.  This also
+	# applies to code in static libraries, as well as
+	# shared libraries, as executables may be linked
+	# with that code.
+	#
+	# At least some versions of Haiku's GCC default to PIC,
+	# with a -fno-pic option for cases where that's not desired.
+	#
+	# Clang hasn't been modified in that fashion, so Clang
+	# builds of tcpdump fail.  This is Haiku bug 18258.
+	#
+	# Force the use of -fPIC (even for GCC; adding -fPIC for GCC
+	# won't break anything).
+	#
+	CFLAGS="$CFLAGS -fPIC"
+	;;
+esac
+
 AC_LBL_C_INIT_BEFORE_CC(V_INCLS)
 #
 # Try to enable as many C99 features as we can.
@@ -33,9 +56,6 @@ AC_C_INLINE
 
 AC_CHECK_HEADERS(fcntl.h rpc/rpc.h rpc/rpcent.h net/if.h)
 
-#
-# Assorted platform checks.
-#
 case "$host_os" in
 
 darwin*)
@@ -63,23 +83,6 @@ darwin*)
 			;;
 		esac
 	fi
-	;;
-
-haiku*)
-	#
-	# On Haiku, all executables are built as shared objects,
-	# and must have their code build as PIC.
-	#
-	# At least some versions of Haiku's GCC default to PIC,
-	# with a -fno-pic option for cases where that's not desired.
-	#
-	# Clang hasn't been modified in that fashion, so Clang
-	# builds of tcpdump fail.
-	#
-	# Force the use of -fPIC (even for GCC; adding -fPIC for GCC
-	# won't break anything).
-	#
-	CFLAGS="$CFLAGS -fPIC"
 	;;
 esac
 
