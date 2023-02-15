@@ -182,7 +182,7 @@ static const struct tok opcode[] = {
 	{ LWRES_OPCODE_GETADDRSBYNAME,	"getaddrsbyname", },
 	{ LWRES_OPCODE_GETNAMEBYADDR,	"getnamebyaddr", },
 	{ LWRES_OPCODE_GETRDATABYNAME,	"getrdatabyname", },
-	{ 0, 				NULL, },
+	{ 0,				NULL, },
 };
 
 /* print-domain.c */

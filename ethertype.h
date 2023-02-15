@@ -174,16 +174,16 @@
 #define ETHERTYPE_LLDP          0x88cc
 #endif
 #ifndef ETHERTYPE_EAPOL
-#define ETHERTYPE_EAPOL  	0x888e
+#define ETHERTYPE_EAPOL		0x888e
 #endif
 #ifndef ETHERTYPE_REALTEK
-#define ETHERTYPE_REALTEK  	0x8899	/* Realtek layer 2 protocols and switch tags */
+#define ETHERTYPE_REALTEK	0x8899	/* Realtek layer 2 protocols and switch tags */
 #endif
 #ifndef ETHERTYPE_AOE
-#define ETHERTYPE_AOE  		0x88a2
+#define ETHERTYPE_AOE		0x88a2
 #endif
 #ifndef ETHERTYPE_PTP
-#define ETHERTYPE_PTP  		0x88f7
+#define ETHERTYPE_PTP		0x88f7
 #endif
 #ifndef	ETHERTYPE_LOOPBACK
 #define	ETHERTYPE_LOOPBACK	0x9000

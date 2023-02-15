@@ -2215,8 +2215,8 @@ bgp_attr_print(netdissect_options *ndo,
             ND_PRINT("\n\t    %u SNPA", snpa);
             for (/*nothing*/; snpa != 0; snpa--) {
                 uint8_t snpalen;
-            	if (tlen < 1)
-            	    goto trunc;
+		if (tlen < 1)
+		    goto trunc;
                 snpalen = GET_U_1(tptr);
                 ND_PRINT("\n\t      %u bytes", snpalen);
                 tptr++;

@@ -42,11 +42,11 @@ struct eap_frame_t {
 };
 
 static const struct tok eap_frame_type_values[] = {
-    { EAP_FRAME_TYPE_PACKET,      	"EAP packet" },
-    { EAP_FRAME_TYPE_START,    		"EAPOL start" },
-    { EAP_FRAME_TYPE_LOGOFF,      	"EAPOL logoff" },
-    { EAP_FRAME_TYPE_KEY,      		"EAPOL key" },
-    { EAP_FRAME_TYPE_ENCAP_ASF_ALERT, 	"Encapsulated ASF alert" },
+    { EAP_FRAME_TYPE_PACKET,		"EAP packet" },
+    { EAP_FRAME_TYPE_START,		"EAPOL start" },
+    { EAP_FRAME_TYPE_LOGOFF,		"EAPOL logoff" },
+    { EAP_FRAME_TYPE_KEY,		"EAPOL key" },
+    { EAP_FRAME_TYPE_ENCAP_ASF_ALERT,	"Encapsulated ASF alert" },
     { 0, NULL}
 };
 
@@ -89,21 +89,21 @@ static const struct tok eap_type_values[] = {
     { EAP_TYPE_NO_PROPOSED,	"No proposed" },
     { EAP_TYPE_IDENTITY,	"Identity" },
     { EAP_TYPE_NOTIFICATION,    "Notification" },
-    { EAP_TYPE_NAK,      	"Nak" },
+    { EAP_TYPE_NAK,		"Nak" },
     { EAP_TYPE_MD5_CHALLENGE,   "MD5-challenge" },
-    { EAP_TYPE_OTP,      	"OTP" },
-    { EAP_TYPE_GTC,      	"GTC" },
-    { EAP_TYPE_TLS,      	"TLS" },
-    { EAP_TYPE_SIM,      	"SIM" },
-    { EAP_TYPE_TTLS,      	"TTLS" },
-    { EAP_TYPE_AKA,      	"AKA" },
-    { EAP_TYPE_FAST,      	"FAST" },
+    { EAP_TYPE_OTP,		"OTP" },
+    { EAP_TYPE_GTC,		"GTC" },
+    { EAP_TYPE_TLS,		"TLS" },
+    { EAP_TYPE_SIM,		"SIM" },
+    { EAP_TYPE_TTLS,		"TTLS" },
+    { EAP_TYPE_AKA,		"AKA" },
+    { EAP_TYPE_FAST,		"FAST" },
     { EAP_TYPE_EXPANDED_TYPES,  "Expanded types" },
     { EAP_TYPE_EXPERIMENTAL,    "Experimental" },
     { 0, NULL}
 };
 
-#define EAP_TLS_EXTRACT_BIT_L(x) 	(((x)&0x80)>>7)
+#define EAP_TLS_EXTRACT_BIT_L(x)	(((x)&0x80)>>7)
 
 /* RFC 5216 - EAP TLS bits */
 #define EAP_TLS_FLAGS_LEN_INCLUDED		(1 << 7)

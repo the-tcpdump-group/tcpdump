@@ -517,13 +517,13 @@ const struct tok ns_type2str[] = {
 	{ T_CERT,	"CERT" },		/* RFC 4398 */
 	{ T_A6,		"A6" },			/* RFC 6563 */
 	{ T_DNAME,	"DNAME" },		/* RFC 6672 */
-	{ T_SINK, 	"SINK" },
+	{ T_SINK,	"SINK" },
 	{ T_OPT,	"OPT" },		/* RFC 6891 */
-	{ T_APL, 	"APL" },		/* RFC 3123 */
+	{ T_APL,	"APL" },		/* RFC 3123 */
 	{ T_DS,		"DS" },			/* RFC 4034 */
 	{ T_SSHFP,	"SSHFP" },		/* RFC 4255 */
 	{ T_IPSECKEY,	"IPSECKEY" },		/* RFC 4025 */
-	{ T_RRSIG, 	"RRSIG" },		/* RFC 4034 */
+	{ T_RRSIG,	"RRSIG" },		/* RFC 4034 */
 	{ T_NSEC,	"NSEC" },		/* RFC 4034 */
 	{ T_DNSKEY,	"DNSKEY" },		/* RFC 4034 */
 	{ T_DHCID,	"DHCID" },		/* RFC 4071 */

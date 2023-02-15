@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2009
- * 	Siemens AG, All rights reserved.
- * 	Dmitry Eremin-Solenikov (dbaryshkov@gmail.com)
+ *	Siemens AG, All rights reserved.
+ *	Dmitry Eremin-Solenikov (dbaryshkov@gmail.com)
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that: (1) source code distributions
@@ -41,13 +41,13 @@
 /* Frame types from Table 7-1 of 802.15.4-2015 */
 static const char *ftypes[] = {
 	"Beacon",			/* 0 */
-	"Data", 			/* 1 */
+	"Data",				/* 1 */
 	"ACK",				/* 2 */
 	"Command",			/* 3 */
 	"Reserved",			/* 4 */
 	"Multipurpose",			/* 5 */
 	"Fragment",			/* 6 */
-	"Extended" 			/* 7 */
+	"Extended"			/* 7 */
 };
 
 /* Element IDs for Header IEs from Table 7-7 of 802.15.4-2015 */
@@ -87,15 +87,15 @@ static const char *h_ie_names[] = {
 	"Reserved 0x20",				/* 0x20 */
 	"Extended DSME PAN descriptor IE",		/* 0x21 */
 	"Fragment Sequence Context Description IE",	/* 0x22 */
-	"Simplified Superframe Specification IE", 	/* 0x23 */
-	"Simplified GTS Specification IE", 		/* 0x24 */
-	"LECIM Capabilities IE", 			/* 0x25 */
-	"TRLE Descriptor IE", 				/* 0x26 */
-	"RCC Capabilities IE", 				/* 0x27 */
-	"RCCN Descriptor IE", 				/* 0x28 */
-	"Global Time IE", 				/* 0x29 */
-	"Omnibus Header IE", 				/* 0x2a */
-	"DA IE", 					/* 0x2b */
+	"Simplified Superframe Specification IE",	/* 0x23 */
+	"Simplified GTS Specification IE",		/* 0x24 */
+	"LECIM Capabilities IE",			/* 0x25 */
+	"TRLE Descriptor IE",				/* 0x26 */
+	"RCC Capabilities IE",				/* 0x27 */
+	"RCCN Descriptor IE",				/* 0x28 */
+	"Global Time IE",				/* 0x29 */
+	"Omnibus Header IE",				/* 0x2a */
+	"DA IE",					/* 0x2b */
 	"Reserved 0x2c",				/* 0x2c */
 	"Reserved 0x2d",				/* 0x2d */
 	"Reserved 0x2e",				/* 0x2e */
@@ -179,7 +179,7 @@ static const char *h_ie_names[] = {
 	"Reserved 0x7c",				/* 0x7c */
 	"Reserved 0x7d",				/* 0x7d */
 	"Header Termination 1 IE",			/* 0x7e */
-	"Header Termination 2 IE" 			/* 0x7f */
+	"Header Termination 2 IE"			/* 0x7f */
 };
 
 /* Payload IE Group IDs from Table 7-15 of 802.15.4-2015 */
@@ -199,7 +199,7 @@ static const char *p_ie_names[] = {
 	"Reserved 0x0c",		/* 0x0c */
 	"Reserved 0x0d",		/* 0x0d */
 	"Reserved 0x0e",		/* 0x0e */
-	"List termination" 		/* 0x0f */
+	"List termination"		/* 0x0f */
 };
 
 /* Sub-ID for short format from Table 7-16 of 802.15.4-2015 */
@@ -239,15 +239,15 @@ static const char *p_mlme_short_names[] = {
 	"All MAC Metrics IE",				/* 0x20 */
 	"Coexistence Specification IE",			/* 0x21 */
 	"SUN Device Capabilities IE",			/* 0x22 */
-	"SUN FSK Generic PHY IE", 			/* 0x23 */
-	"Mode Switch Parameter IE", 			/* 0x24 */
-	"PHY Parameter Change IE", 			/* 0x25 */
-	"O-QPSK PHY Mode IE", 				/* 0x26 */
-	"PCA Allocation IE", 				/* 0x27 */
-	"LECIM DSSS Operating Mode IE", 		/* 0x28 */
-	"LECIM FSK Operating Mode IE", 			/* 0x29 */
-	"Reserved 0x2a", 				/* 0x2a */
-	"TVWS PHY Operating Mode Description IE", 	/* 0x2b */
+	"SUN FSK Generic PHY IE",			/* 0x23 */
+	"Mode Switch Parameter IE",			/* 0x24 */
+	"PHY Parameter Change IE",			/* 0x25 */
+	"O-QPSK PHY Mode IE",				/* 0x26 */
+	"PCA Allocation IE",				/* 0x27 */
+	"LECIM DSSS Operating Mode IE",			/* 0x28 */
+	"LECIM FSK Operating Mode IE",			/* 0x29 */
+	"Reserved 0x2a",				/* 0x2a */
+	"TVWS PHY Operating Mode Description IE",	/* 0x2b */
 	"TVWS Device Capabilities IE",			/* 0x2c */
 	"TVWS Device Category IE",			/* 0x2d */
 	"TVWS Device Identiication IE",			/* 0x2e */
@@ -331,7 +331,7 @@ static const char *p_mlme_short_names[] = {
 	"Reserved 0x7c",				/* 0x7c */
 	"Reserved 0x7d",				/* 0x7d */
 	"Reserved 0x7e",				/* 0x7e */
-	"Reserved 0x7f" 				/* 0x7f */
+	"Reserved 0x7f"					/* 0x7f */
 };
 
 /* Sub-ID for long format from Table 7-17 of 802.15.4-2015 */
@@ -351,7 +351,7 @@ static const char *p_mlme_long_names[] = {
 	"Reserved 0x0c",			/* 0x0c */
 	"Reserved 0x0d",			/* 0x0d */
 	"Reserved 0x0e",			/* 0x0e */
-	"Reserved 0x0f" 			/* 0x0f */
+	"Reserved 0x0f"				/* 0x0f */
 };
 
 /* MAC commands from Table 7-49 of 802.15.4-2015 */
@@ -390,20 +390,20 @@ static const char *mac_c_names[] = {
 	"Reserved 0x1f",				/* 0x1f */
 	"RIT Data Request command",			/* 0x20 */
 	"DBS Request command",				/* 0x21 */
-	"DBS Response command",     			/* 0x22 */
-	"RIT Data Response command", 			/* 0x23 */
-	"Vendor Specific command", 			/* 0x24 */
-	"Reserved 0x25", 				/* 0x25 */
-	"Reserved 0x26", 				/* 0x26 */
-	"Reserved 0x27", 				/* 0x27 */
-	"Reserved 0x28", 				/* 0x28 */
-	"Reserved 0x29", 				/* 0x29 */
-	"Reserved 0x2a", 				/* 0x2a */
-	"Reserved 0x2b", 				/* 0x2b */
+	"DBS Response command",				/* 0x22 */
+	"RIT Data Response command",			/* 0x23 */
+	"Vendor Specific command",			/* 0x24 */
+	"Reserved 0x25",				/* 0x25 */
+	"Reserved 0x26",				/* 0x26 */
+	"Reserved 0x27",				/* 0x27 */
+	"Reserved 0x28",				/* 0x28 */
+	"Reserved 0x29",				/* 0x29 */
+	"Reserved 0x2a",				/* 0x2a */
+	"Reserved 0x2b",				/* 0x2b */
 	"Reserved 0x2c",				/* 0x2c */
 	"Reserved 0x2d",				/* 0x2d */
 	"Reserved 0x2e",				/* 0x2e */
-	"Reserved 0x2f"				/* 0x2f */
+	"Reserved 0x2f"					/* 0x2f */
 };
 
 /*

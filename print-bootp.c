@@ -210,8 +210,8 @@ struct bootp {
 #define	TAG_CLIENT_GUID		((uint8_t)  97)
 #define	TAG_LDAP_URL		((uint8_t)  95)
 /* RFC 4833, TZ codes */
-#define	TAG_TZ_PCODE    	((uint8_t) 100)
-#define	TAG_TZ_TCODE    	((uint8_t) 101)
+#define	TAG_TZ_PCODE		((uint8_t) 100)
+#define	TAG_TZ_TCODE		((uint8_t) 101)
 #define	TAG_NETINFO_PARENT	((uint8_t) 112)
 #define	TAG_NETINFO_PARENT_TAG	((uint8_t) 113)
 #define	TAG_URL			((uint8_t) 114)
@@ -515,8 +515,8 @@ static const struct tok tag2str[] = {
 	{ TAG_CLIENT_NDI,	"bNDI" },	/* XXX 'b' */
 	{ TAG_CLIENT_GUID,	"bGUID" },	/* XXX 'b' */
 	{ TAG_LDAP_URL,		"aLDAP" },
-	{ TAG_TZ_PCODE, 	"aPOSIX-TZ" },
-	{ TAG_TZ_TCODE, 	"aTZ-Name" },
+	{ TAG_TZ_PCODE,		"aPOSIX-TZ" },
+	{ TAG_TZ_TCODE,		"aTZ-Name" },
 	{ TAG_NETINFO_PARENT,	"iNI" },
 	{ TAG_NETINFO_PARENT_TAG, "aNITAG" },
 	{ TAG_URL,		"aURL" },

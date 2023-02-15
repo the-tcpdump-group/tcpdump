@@ -143,7 +143,7 @@ static const struct tok lldp_cap_values[] = {
 #define LLDP_PRIVATE_8021_SUBTYPE_PFC_CONFIGURATION      11
 #define LLDP_PRIVATE_8021_SUBTYPE_APPLICATION_PRIORITY   12
 #define LLDP_PRIVATE_8021_SUBTYPE_EVB                    13
-#define LLDP_PRIVATE_8021_SUBTYPE_CDCP 			 14
+#define LLDP_PRIVATE_8021_SUBTYPE_CDCP			 14
 
 static const struct tok lldp_8021_subtype_values[] = {
     { LLDP_PRIVATE_8021_SUBTYPE_PORT_VLAN_ID, "Port VLAN Id"},
@@ -511,10 +511,10 @@ static const struct tok lldp_pmd_capability_values[] = {
 #define LLDP_MDI_PAIR_CONTROL_ABILITY		(1 <<  3)
 
 static const struct tok lldp_mdi_values[] = {
-    { LLDP_MDI_PORT_CLASS, 		"PSE"},
-    { LLDP_MDI_POWER_SUPPORT, 		"supported"},
-    { LLDP_MDI_POWER_STATE, 		"enabled"},
-    { LLDP_MDI_PAIR_CONTROL_ABILITY, 	"can be controlled"},
+    { LLDP_MDI_PORT_CLASS,		"PSE"},
+    { LLDP_MDI_POWER_SUPPORT,		"supported"},
+    { LLDP_MDI_POWER_STATE,		"enabled"},
+    { LLDP_MDI_PAIR_CONTROL_ABILITY,	"can be controlled"},
     { 0, NULL}
 };
 

@@ -1,4 +1,4 @@
-/*	$NetBSD: print-telnet.c,v 1.2 1999/10/11 12:40:12 sjg Exp $ 	*/
+/*	$NetBSD: print-telnet.c,v 1.2 1999/10/11 12:40:12 sjg Exp $	*/
 
 /*-
  * Copyright (c) 1997, 1998 The NetBSD Foundation, Inc.
@@ -59,7 +59,7 @@
 #include "extract.h"
 
 
-/*	NetBSD: telnet.h,v 1.9 2001/06/11 01:50:50 wiz Exp 	*/
+/*	NetBSD: telnet.h,v 1.9 2001/06/11 01:50:50 wiz Exp	*/
 
 /*
  * Definitions for the TELNET protocol.
@@ -108,8 +108,8 @@ static const char *telcmds[] = {
 #define	TELOPT_STATUS	5	/* give status */
 #define	TELOPT_TM	6	/* timing mark */
 #define	TELOPT_RCTE	7	/* remote controlled transmission and echo */
-#define TELOPT_NAOL 	8	/* negotiate about output line width */
-#define TELOPT_NAOP 	9	/* negotiate about output page size */
+#define TELOPT_NAOL	8	/* negotiate about output line width */
+#define TELOPT_NAOP	9	/* negotiate about output page size */
 #define TELOPT_NAOCRD	10	/* negotiate about CR disposition */
 #define TELOPT_NAOHTS	11	/* negotiate about horizontal tabstops */
 #define TELOPT_NAOHTD	12	/* negotiate about horizontal tab disposition */

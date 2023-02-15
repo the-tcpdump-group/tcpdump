@@ -1,4 +1,4 @@
-/*	NetBSD: ip6.h,v 1.9 2000/07/13 05:34:21 itojun Exp 	*/
+/*	NetBSD: ip6.h,v 1.9 2000/07/13 05:34:21 itojun Exp	*/
 /*	$KAME: ip6.h,v 1.9 2000/07/02 21:01:32 itojun Exp $	*/
 
 /*
@@ -136,7 +136,7 @@ struct ip6_dest {
 #define IP6OPT_RTALERT_LEN	4
 #define IP6OPT_RTALERT_MLD	0	/* Datagram contains an MLD message */
 #define IP6OPT_RTALERT_RSVP	1	/* Datagram contains an RSVP message */
-#define IP6OPT_RTALERT_ACTNET	2 	/* contains an Active Networks msg */
+#define IP6OPT_RTALERT_ACTNET	2	/* contains an Active Networks msg */
 #define IP6OPT_MINLEN		2
 
 #define IP6OPT_QUICK_START	0x26	/* 00 1 00110 */
