@@ -30,6 +30,7 @@
 #endif
 #include <sys/types.h>
 #include <setjmp.h>
+#include <time.h>
 #include "status-exit-codes.h"
 #include "funcattrs.h" /* for PRINTFLIKE_FUNCPTR() */
 #include "diag-control.h" /* for ND_UNREACHABLE */

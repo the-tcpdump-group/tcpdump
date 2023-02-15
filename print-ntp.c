@@ -38,8 +38,6 @@
 
 #include "netdissect-stdinc.h"
 
-#include <time.h>
-
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
