@@ -38,8 +38,6 @@
 
 #include "netdissect-stdinc.h"
 
-#include <time.h>
-
 #define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
