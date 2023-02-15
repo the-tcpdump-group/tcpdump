@@ -1,5 +1,5 @@
 /*	$NetBSD: strlcat.c,v 1.5 1999/09/20 04:39:47 lukem Exp $	*/
-/*	from OpenBSD: strlcat.c,v 1.2 1999/06/17 16:28:58 millert Exp 	*/
+/*	from OpenBSD: strlcat.c,v 1.2 1999/06/17 16:28:58 millert Exp	*/
 
 /*
  * Copyright (c) 1998 Todd C. Miller <Todd.Miller@courtesan.com>

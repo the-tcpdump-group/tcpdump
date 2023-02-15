@@ -959,8 +959,8 @@ static const char *status_text[] = {
 	"Reserved",									/* 69 */
 	"Reserved",									/* 70 */
 	"Reserved",									/* 71 */
-	"Invalid contents of RSNE", 				/* 72 */
-	"U-APSD coexistence is not supported", 		/* 73 */
+	"Invalid contents of RSNE",				/* 72 */
+	"U-APSD coexistence is not supported",		/* 73 */
 	"Requested U-APSD coexistence mode is not supported", /* 74 */
 	"Requested Interval/Duration value cannot be "
 	  "supported with U-APSD coexistence",		/* 75 */
@@ -1007,7 +1007,7 @@ static const char *status_text[] = {
 	  "Spectrum Management field is unacceptable", /* 103 */
 	"Association denied because the requesting STA "
 	  "does not support VHT features",			/* 104 */
-	"Enablement denied", 						/* 105 */
+	"Enablement denied",						/* 105 */
 	"Enablement denied due to restriction from an "
 	  "authorized GDB",							/* 106 */
 	"Authorization deenabled",					/* 107 */

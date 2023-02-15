@@ -35,17 +35,17 @@
 #define TLV_HDRL	4
 #define ILV_HDRL	8
 
-#define TOM_RSVD 	0x0
-#define TOM_ASSNSETUP 	0x1
-#define TOM_ASSNTEARD 	0x2
-#define TOM_CONFIG 	0x3
-#define TOM_QUERY 	0x4
-#define TOM_EVENTNOT 	0x5
-#define TOM_PKTREDIR 	0x6
-#define TOM_HEARTBT 	0x0F
-#define TOM_ASSNSETREP 	0x11
-#define TOM_CONFIGREP 	0x13
-#define TOM_QUERYREP 	0x14
+#define TOM_RSVD	0x0
+#define TOM_ASSNSETUP	0x1
+#define TOM_ASSNTEARD	0x2
+#define TOM_CONFIG	0x3
+#define TOM_QUERY	0x4
+#define TOM_EVENTNOT	0x5
+#define TOM_PKTREDIR	0x6
+#define TOM_HEARTBT	0x0F
+#define TOM_ASSNSETREP	0x11
+#define TOM_CONFIGREP	0x13
+#define TOM_QUERYREP	0x14
 
 /*
  * tom_h Flags: resv1(8b):maxtlvs(4b):resv2(2b):mintlv(2b)
@@ -250,7 +250,7 @@ struct pathdata_h {
 };
 
 #define	B_FULLD		0x1
-#define	B_SPARD 	0x2
+#define	B_SPARD		0x2
 #define B_RESTV		0x4
 #define B_KEYIN		0x8
 #define B_APPND		0x10

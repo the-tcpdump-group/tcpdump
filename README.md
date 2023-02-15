@@ -58,7 +58,7 @@ LBL.  To insure that there would be no vestige of proprietary code in
 tcpdump, Steve wrote these pieces from the specification given by the
 manual entry, with no access to the source of tcpdump or etherfind.
 ```text
-formerly from 	Lawrence Berkeley National Laboratory
+formerly from	Lawrence Berkeley National Laboratory
 		Network Research Group <tcpdump@ee.lbl.gov>
 		ftp://ftp.ee.lbl.gov/old/tcpdump.tar.Z (3.4)
 ```

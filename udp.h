@@ -78,7 +78,7 @@ struct udphdr {
 #define SNMPTRAP_PORT			162	/*XXX*/
 #endif
 #ifndef PTP_EVENT_PORT
-#define PTP_EVENT_PORT	        	319 /* IANA */
+#define PTP_EVENT_PORT			319 /* IANA */
 #endif
 #ifndef PTP_GENERAL_PORT
 #define PTP_GENERAL_PORT	        320 /* IANA */

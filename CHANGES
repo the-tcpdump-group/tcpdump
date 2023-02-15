@@ -915,7 +915,7 @@ Mon.    September 10, 2007.  ken@xelerance.com.  Summary for 3.9.8 tcpdump relea
 
 Wed.	July 23, 2007.  mcr@xelerance.com.  Summary for 3.9.7 libpcap release
 
-    	NFS: Print unsigned values as such.
+	NFS: Print unsigned values as such.
 	RX: parse safely.
 	BGP: fixes for IPv6-less builds.
 	801.1ag: use standard codepoint.
@@ -987,7 +987,7 @@ Tue.	September 19, 2006. ken@xelerance.com. Summary for 3.9.5 tcpdump release
 	Lots of minor cosmetic changes to output printers
 
 
-Mon. 	September 19, 2005.  ken@xelerance.com. Summary for 3.9.4 tcpdump release
+Mon.	September 19, 2005.  ken@xelerance.com. Summary for 3.9.4 tcpdump release
 	Decoder support for more Juniper link-layer types
 	Fix a potential buffer overflow (although it can't occur in
 		practice).
@@ -1006,7 +1006,7 @@ Mon. 	September 19, 2005.  ken@xelerance.com. Summary for 3.9.4 tcpdump release
 		those TLVs as system IDs, not as node IDs.
 	Support for DCCP.
 
-Tue. 	July 5, 2005.  ken@xelerance.com. Summary for 3.9.3 tcpdump release
+Tue.	July 5, 2005.  ken@xelerance.com. Summary for 3.9.3 tcpdump release
 
 	Option to chroot() when dropping privs
 	Fixes for compiling on nearly every platform,

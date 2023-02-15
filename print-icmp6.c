@@ -41,7 +41,7 @@
 #include "udp.h"
 #include "ah.h"
 
-/*	NetBSD: icmp6.h,v 1.13 2000/08/03 16:30:37 itojun Exp 	*/
+/*	NetBSD: icmp6.h,v 1.13 2000/08/03 16:30:37 itojun Exp	*/
 /*	$KAME: icmp6.h,v 1.22 2000/08/03 15:25:16 jinmei Exp $	*/
 
 /*
@@ -103,7 +103,7 @@ struct icmp6_hdr {
 #define ICMP6_ECHO_REQUEST		128	/* echo service */
 #define ICMP6_ECHO_REPLY		129	/* echo reply */
 #define ICMP6_MEMBERSHIP_QUERY		130	/* group membership query */
-#define MLD6_LISTENER_QUERY		130 	/* multicast listener query */
+#define MLD6_LISTENER_QUERY		130	/* multicast listener query */
 #define ICMP6_MEMBERSHIP_REPORT		131	/* group membership report */
 #define MLD6_LISTENER_REPORT		131	/* multicast listener report */
 #define ICMP6_MEMBERSHIP_REDUCTION	132	/* group membership termination */
@@ -145,10 +145,10 @@ struct icmp6_hdr {
 #define ICMP6_DST_UNREACH_ADDR		3	/* address unreachable */
 #define ICMP6_DST_UNREACH_NOPORT	4	/* port unreachable */
 
-#define ICMP6_TIME_EXCEED_TRANSIT 	0	/* ttl==0 in transit */
+#define ICMP6_TIME_EXCEED_TRANSIT	0	/* ttl==0 in transit */
 #define ICMP6_TIME_EXCEED_REASSEMBLY	1	/* ttl==0 in reass */
 
-#define ICMP6_PARAMPROB_HEADER 		0	/* erroneous header field */
+#define ICMP6_PARAMPROB_HEADER		0	/* erroneous header field */
 #define ICMP6_PARAMPROB_NEXTHEADER	1	/* unrecognized next header */
 #define ICMP6_PARAMPROB_OPTION		2	/* unrecognized option */
 #define ICMP6_PARAMPROB_FRAGHDRCHAIN	3	/* incomplete header chain */
@@ -193,7 +193,7 @@ struct mld6_hdr {
  */
 
 struct nd_router_solicit {	/* router solicitation */
-	struct icmp6_hdr 	nd_rs_hdr;
+	struct icmp6_hdr	nd_rs_hdr;
 	/* could be followed by options */
 };
 
@@ -427,7 +427,7 @@ struct icmp6_router_renum {	/* router renumbering header */
 #define rr_type		rr_hdr.icmp6_type
 #define rr_code		rr_hdr.icmp6_code
 #define rr_cksum	rr_hdr.icmp6_cksum
-#define rr_seqnum 	rr_hdr.icmp6_data32[0]
+#define rr_seqnum	rr_hdr.icmp6_data32[0]
 
 struct rr_pco_match {		/* match prefix part */
 	nd_uint8_t		rpm_code;
@@ -811,15 +811,15 @@ rpl_printopts(netdissect_options *ndo, const uint8_t *opts, u_int length)
                         optlen = 1;
                         ND_PRINT(" opt:pad1");
                 } else {
-                	if (length < RPL_GENOPTION_LEN)
-                		goto trunc;
+			if (length < RPL_GENOPTION_LEN)
+				goto trunc;
 	                optlen = GET_U_1(opt->rpl_dio_len)+RPL_GENOPTION_LEN;
                         ND_PRINT(" opt:%s len:%u ",
                                   tok2str(rpl_subopt_values, "subopt:%u", dio_type),
                                   optlen);
                         ND_TCHECK_LEN(opt, optlen);
                         if (length < optlen)
-                        	goto trunc;
+				goto trunc;
                         if (ndo->ndo_vflag > 2) {
                                 hex_print(ndo,
                                           " ",

@@ -388,7 +388,7 @@ unistr(netdissect_options *ndo, char (*buf)[MAX_UNISTR_SIZE+1],
 	}
     }
     if (!use_unicode) {
-    	while (strsize != 0) {
+	while (strsize != 0) {
 	    c = GET_U_1(s);
 	    s++;
 	    strsize--;

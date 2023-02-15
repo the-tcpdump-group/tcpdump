@@ -71,7 +71,7 @@ addrtostr (const void *src, char *dst, size_t size)
 	return NULL;
     }
     for (i = 0; i < 4; ++i) {
-    	int n = *srcaddr++;
+	int n = *srcaddr++;
 	int non_zerop = 0;
 
 	if (non_zerop || n / 100 > 0) {
@@ -167,7 +167,7 @@ addrtostr6 (const void *src, char *dst, size_t size)
     if (best.base != -1 && i >= best.base && i < (best.base + best.len))
     {
       if (i == best.base)
-      	 APPEND_CHAR(':');
+	  APPEND_CHAR(':');
       continue;
     }
 

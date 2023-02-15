@@ -117,7 +117,7 @@ rrcp_print(netdissect_options *ndo,
 		tok2str(opcode_values,"unknown opcode (0x%02x)",rrcp_opcode));
 	if (rrcp_opcode==RRCP_OPCODE_GET_CONFIGURATION ||
 	    rrcp_opcode==RRCP_OPCODE_SET_CONFIGURATION){
-    	    ND_PRINT(" addr=0x%04x, data=0x%08x",
+	    ND_PRINT(" addr=0x%04x, data=0x%08x",
 		     GET_LE_U_2(cp + RRCP_REG_ADDR_OFFSET),
 		     GET_LE_U_4(cp + RRCP_REG_DATA_OFFSET));
 	}

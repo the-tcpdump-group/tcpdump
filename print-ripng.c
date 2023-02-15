@@ -128,7 +128,7 @@ ripng_print(netdissect_options *ndo, const u_char *dat, unsigned int length)
 		if (length_left < (sizeof(struct rip6) - sizeof(struct netinfo6)))
 			goto invalid;
 		length_left -= (sizeof(struct rip6) - sizeof(struct netinfo6));
- 		j = length_left / sizeof(*ni);
+		j = length_left / sizeof(*ni);
 		if (j == 1) {
 			if (GET_U_1(rp->rip6_nets->rip6_metric) == HOPCNT_INFINITY6
 			    && ND_IN6_IS_ADDR_UNSPECIFIED(&rp->rip6_nets->rip6_dest)) {

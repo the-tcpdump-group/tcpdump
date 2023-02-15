@@ -81,14 +81,14 @@ struct rtcp_rr {
 #define RTCP_PT_SR	200
 #define RTCP_PT_RR	201
 #define RTCP_PT_SDES	202
-#define 	RTCP_SDES_CNAME	1
-#define 	RTCP_SDES_NAME	2
-#define 	RTCP_SDES_EMAIL	3
-#define 	RTCP_SDES_PHONE	4
-#define 	RTCP_SDES_LOC	5
-#define 	RTCP_SDES_TOOL	6
-#define 	RTCP_SDES_NOTE	7
-#define 	RTCP_SDES_PRIV	8
+#define    RTCP_SDES_CNAME	1
+#define    RTCP_SDES_NAME	2
+#define    RTCP_SDES_EMAIL	3
+#define    RTCP_SDES_PHONE	4
+#define    RTCP_SDES_LOC	5
+#define    RTCP_SDES_TOOL	6
+#define    RTCP_SDES_NOTE	7
+#define    RTCP_SDES_PRIV	8
 #define RTCP_PT_BYE	203
 #define RTCP_PT_APP	204
 

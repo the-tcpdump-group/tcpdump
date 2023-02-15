@@ -28,7 +28,7 @@
 #include "extract.h"
 #include "addrtoname.h"
 
-#define VQP_VERSION            		1
+#define VQP_VERSION 1
 
 /*
  * VQP common header

@@ -70,7 +70,7 @@
 /* return values */
 #define	BADCH		(int)'?'
 #define	BADARG		((*options == ':') ? (int)':' : (int)'?')
-#define	INORDER 	(int)1
+#define	INORDER		(int)1
 
 #define	EMSG		""
 
