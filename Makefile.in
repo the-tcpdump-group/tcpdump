@@ -361,8 +361,6 @@ EXTRA_DIST = \
 	install-sh \
 	instrument-functions.c \
 	lbl/os-osf4.h \
-	lbl/os-solaris2.h \
-	lbl/os-sunos4.h \
 	makemib \
 	missing/datalinks.c \
 	missing/dlnames.c \
