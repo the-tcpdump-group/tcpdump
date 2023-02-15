@@ -85,7 +85,13 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
 #
-# OK, this is a royal pain.
+# We explicitly indicate what languages are used in tcpdump to avoid
+# checking for a C++ compiler.
+#
+# One reason to avoid that check is that there's no need to waste
+# configuration time performing it.
+#
+# Another reason is that:
 #
 # CMake will try to determine the sizes of some data types, including
 # void *, early in the process of configuration; apparently, it's done
@@ -110,9 +116,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 # 64-bit, and Oracle Studio's C++ compiler, which will default to
 # building 32-bit, the size for C++ will win, and, again, hilarity
 # will ensue.
-#
-# So we *explicitly* state that only C is used; there is currently no
-# C++ code in tcpdump.
 #
 project(tcpdump C)
 
