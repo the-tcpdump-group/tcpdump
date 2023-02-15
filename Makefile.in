@@ -567,6 +567,11 @@ whitespacecheck:
 	    echo 'Error: Trailing tabs(s).'; \
 	    exit 1; \
 	fi
+	@# space(s) before tab(s)?
+	@if git grep -I -n '[ ][	]' $$(git ls-files|grep -v '^tests/'); then \
+	    echo 'Error: space(s) before tab(s).'; \
+	    exit 1; \
+	fi
 
 testlist:
 	echo $(TEST_DIST)
