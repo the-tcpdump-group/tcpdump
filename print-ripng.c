@@ -117,7 +117,8 @@ ripng_print(netdissect_options *ndo, const u_char *dat, unsigned int length)
 	ndo->ndo_protocol = "ripng";
 	vers = GET_U_1(rp->rip6_vers);
 	if (vers != RIP6_VERSION) {
-		ND_PRINT(" [vers %u]", vers);
+		nd_print_protocol(ndo);
+		ND_PRINT(" [version %u, must be %u]", vers, RIP6_VERSION);
 		goto invalid;
 	}
 	cmd = GET_U_1(rp->rip6_cmd);
