@@ -384,10 +384,8 @@ AC_CHECK_FUNCS(fork vfork)
 AC_CHECK_FUNCS(setlinebuf)
 
 #
-# Make sure we have vsnprintf() and snprintf(); we require them.
+# Make sure we have snprintf(); we require it.
 #
-AC_CHECK_FUNC(vsnprintf,,
-    AC_MSG_ERROR([vsnprintf() is required but wasn't found]))
 AC_CHECK_FUNC(snprintf,,
     AC_MSG_ERROR([snprintf() is required but wasn't found]))
 

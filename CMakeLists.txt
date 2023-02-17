@@ -399,15 +399,11 @@ endif(STDLIBS_HAVE_GETSERVENT)
 cmake_pop_check_state()
 
 #
-# Make sure we have vsnprintf() and snprintf(); we require them.
-# We use check_symbol_exists(), as they aren't necessarily external
-# functions - in Visual Studio, for example, they're inline functions
-# calling a common external function.
+# Make sure we have snprintf(); we require it.
+# We use check_symbol_exists(), as it isn't necessarily an external
+# function - in Visual Studio, for example, it is an inline function
+# calling an external function.
 #
-check_symbol_exists(vsnprintf "stdio.h" HAVE_VSNPRINTF)
-if(NOT HAVE_VSNPRINTF)
-    message(FATAL_ERROR "vsnprintf() is required but wasn't found")
-endif(NOT HAVE_VSNPRINTF)
 check_symbol_exists(snprintf "stdio.h" HAVE_SNPRINTF)
 if(NOT HAVE_SNPRINTF)
     message(FATAL_ERROR "snprintf() is required but wasn't found")
