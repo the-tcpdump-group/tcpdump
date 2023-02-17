@@ -701,7 +701,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			otv_print(ndo, cp, length);
 		else if (IS_SRC_OR_DST_PORT(VXLAN_PORT))
 			vxlan_print(ndo, cp, length);
-		else if (IS_SRC_OR_DST_PORT(GENEVE_PORT))
+		else if (dport == GENEVE_PORT)
 			geneve_print(ndo, cp, length);
 		else if (IS_SRC_OR_DST_PORT(LISP_CONTROL_PORT))
 			lisp_print(ndo, cp, length);
