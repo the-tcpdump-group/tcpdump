@@ -86,12 +86,19 @@ static void print_debug(void *this_fn, void *call_site, action_type action)
 	static long symcount;
 	static asection *text;
 	static bfd_vma vma;
+	static int instrument_off;
 	static int print_only_global;
 	symbol_info syminfo;
 	struct stat statbuf;
 	int i;
 
-	if (!stat(ND_FILE_FLAG_OFF, &statbuf))
+	if (!instrument_off) {
+		/* one-time test */
+		if (!stat(ND_FILE_FLAG_OFF, &statbuf)) {
+			instrument_off = 1;
+			return;
+		}
+	} else
 		return;
 
 	/* If no errors, this block should be executed one time */
