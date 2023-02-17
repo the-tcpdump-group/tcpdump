@@ -360,7 +360,6 @@ EXTRA_DIST = \
 	doc/README.Win32.md \
 	install-sh \
 	instrument-functions.c \
-	lbl/os-osf4.h \
 	makemib \
 	missing/datalinks.c \
 	missing/dlnames.c \
