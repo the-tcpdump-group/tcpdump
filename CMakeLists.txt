@@ -339,7 +339,6 @@ endif(HAVE_RPC_RPC_H)
 #
 check_function_exists(strlcat HAVE_STRLCAT)
 check_function_exists(strlcpy HAVE_STRLCPY)
-check_function_exists(strdup HAVE_STRDUP)
 check_function_exists(strsep HAVE_STRSEP)
 
 #
@@ -1261,7 +1260,7 @@ set(NETDISSECT_SOURCE_LIST_C
 #
 # Replace missing functions
 #
-foreach(FUNC strlcat strlcpy strdup strsep getservent getopt_long)
+foreach(FUNC strlcat strlcpy strsep getservent getopt_long)
     string(TOUPPER ${FUNC} FUNC_UPPERCASE)
     set(HAVE_FUNC_UPPERCASE HAVE_${FUNC_UPPERCASE})
     if(NOT ${HAVE_FUNC_UPPERCASE})
