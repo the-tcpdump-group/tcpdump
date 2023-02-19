@@ -60,11 +60,6 @@
     DIAG_DO_PRAGMA(clang diagnostic ignored "-Wassign-enum")
   #define DIAG_ON_ASSIGN_ENUM \
     DIAG_DO_PRAGMA(clang diagnostic pop)
-
-  #define DIAG_OFF_CAST_QUAL
-  #define DIAG_ON_CAST_QUAL
-  #define DIAG_OFF_DEPRECATION
-  #define DIAG_ON_DEPRECATION
 /*
  * The current clang compilers also define __GNUC__ and __GNUC_MINOR__
  * thus we need to test the clang case before the GCC one
@@ -126,8 +121,6 @@
   #endif
 #elif ND_IS_AT_LEAST_GNUC_VERSION(4,2)
   /* GCC apparently doesn't complain about ORing enums together. */
-  #define DIAG_OFF_ASSIGN_ENUM
-  #define DIAG_ON_ASSIGN_ENUM
 
   /*
    * It does, however, complain about casting away constness in
@@ -151,20 +144,6 @@
    * GCC supports -Wc99-c11-compat since version 5.1.0, but the warning does
    * not trigger for now, so let's just leave it be.
    */
-#else
-  #define DIAG_OFF_ASSIGN_ENUM
-  #define DIAG_ON_ASSIGN_ENUM
-  #define DIAG_OFF_CAST_QUAL
-  #define DIAG_ON_CAST_QUAL
-  #define DIAG_OFF_DEPRECATION
-  #define DIAG_ON_DEPRECATION
-#endif
-
-#ifndef DIAG_OFF_C11_EXTENSIONS
-#define DIAG_OFF_C11_EXTENSIONS
-#endif
-#ifndef DIAG_ON_C11_EXTENSIONS
-#define DIAG_ON_C11_EXTENSIONS
 #endif
 
 /*
@@ -179,8 +158,34 @@
    * So please remember to use this very carefully.
    */
   #define ND_UNREACHABLE __builtin_unreachable();
-#else
-  #define ND_UNREACHABLE
+#endif
+
+#ifndef DIAG_OFF_ASSIGN_ENUM
+#define DIAG_OFF_ASSIGN_ENUM
+#endif
+#ifndef DIAG_ON_ASSIGN_ENUM
+#define DIAG_ON_ASSIGN_ENUM
+#endif
+#ifndef DIAG_OFF_CAST_QUAL
+#define DIAG_OFF_CAST_QUAL
+#endif
+#ifndef DIAG_ON_CAST_QUAL
+#define DIAG_ON_CAST_QUAL
+#endif
+#ifndef DIAG_OFF_DEPRECATION
+#define DIAG_OFF_DEPRECATION
+#endif
+#ifndef DIAG_ON_DEPRECATION
+#define DIAG_ON_DEPRECATION
+#endif
+#ifndef DIAG_OFF_C11_EXTENSIONS
+#define DIAG_OFF_C11_EXTENSIONS
+#endif
+#ifndef DIAG_ON_C11_EXTENSIONS
+#define DIAG_ON_C11_EXTENSIONS
+#endif
+#ifndef ND_UNREACHABLE
+#define ND_UNREACHABLE
 #endif
 
 #endif /* _diag_control_h */
