@@ -3,6 +3,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
     Updated printers:
       LSP ping: Fix "Unused value" warnings from Coverity.
       smbutil.c: Fix the strftime buffer size
+      DNS: sync resource types with IANA.
     Building and testing:
       Require at least autoconf 2.69.
       Don't check for strftime(), as it's in C90 and beyond.
