@@ -9,7 +9,6 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       BFD: Add support for S-BFD and spell LAG in uppercase.
       IEEE 802.11: include the Mesh ID field while printing management
         frames.
-      DNS: sync resource types with IANA.
       MPTCP: parse MPC data_len field, print flags from MP_CAPABLE option.
       ICMP: add dissector for ICMP Interface Identification Object
       BGP: Parse BGP extended message support capability
@@ -54,6 +53,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
     Updated printers:
       LSP ping: Fix "Unused value" warnings from Coverity.
       smbutil.c: Fix the strftime buffer size
+      DNS: sync resource types with IANA.
     Building and testing:
       Require at least autoconf 2.69.
       Don't check for strftime(), as it's in C90 and beyond.
