@@ -45,11 +45,11 @@ extern const struct tok bsd_af_values[];
  * so, because we want to be able to read captures from all of the BSDs,
  * we check for all of them.
  */
-#define BSD_AFNUM_INET		2
-#define BSD_AFNUM_NS		6		/* XEROX NS protocols */
-#define BSD_AFNUM_ISO		7
-#define BSD_AFNUM_APPLETALK	16
-#define BSD_AFNUM_IPX		23
-#define BSD_AFNUM_INET6_BSD	24	/* NetBSD, OpenBSD, BSD/OS, Npcap */
-#define BSD_AFNUM_INET6_FREEBSD	28	/* FreeBSD */
-#define BSD_AFNUM_INET6_DARWIN	30	/* macOS, iOS, other Darwin-based OSes */
+#define BSD_AF_INET		2
+#define BSD_AF_NS		6	/* XEROX NS protocols */
+#define BSD_AF_ISO		7
+#define BSD_AF_APPLETALK	16
+#define BSD_AF_IPX		23
+#define BSD_AF_INET6_BSD	24	/* NetBSD, OpenBSD, BSD/OS, Npcap */
+#define BSD_AF_INET6_FREEBSD	28	/* FreeBSD */
+#define BSD_AF_INET6_DARWIN	30	/* macOS, iOS, other Darwin-based OSes */

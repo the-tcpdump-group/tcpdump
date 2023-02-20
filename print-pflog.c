@@ -176,7 +176,7 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 		 *
 		 * Hopefully, there isn't.
 		 */
-		case BSD_AFNUM_INET:
+		case BSD_AF_INET:
 		        ip_print(ndo, p, length);
 			break;
 
@@ -184,9 +184,9 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 		 * Try all AF_INET6 values for all systems with pflog,
 		 * including Darwin.
 		 */
-		case BSD_AFNUM_INET6_BSD:
-		case BSD_AFNUM_INET6_FREEBSD:
-		case BSD_AFNUM_INET6_DARWIN:
+		case BSD_AF_INET6_BSD:
+		case BSD_AF_INET6_FREEBSD:
+		case BSD_AF_INET6_DARWIN:
 			ip6_print(ndo, p, length);
 			break;
 
