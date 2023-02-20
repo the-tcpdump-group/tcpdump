@@ -34,6 +34,7 @@
 #include "ip.h"
 #include "ip6.h"
 #include "ipproto.h"
+#include "af.h"
 
 #define PIMV1_TYPE_QUERY           0
 #define PIMV1_TYPE_REGISTER        1
@@ -559,13 +560,12 @@ pimv2_addr_print(netdissect_options *ndo,
 	if (addr_len == 0) {
 		if (len < 2)
 			goto trunc;
-		switch (GET_U_1(bp)) {
-		case 1:
-			af = AF_INET;
+		af = GET_U_1(bp);
+		switch (af) {
+		case AFNUM_INET:
 			addr_len = (u_int)sizeof(nd_ipv4);
 			break;
-		case 2:
-			af = AF_INET6;
+		case AFNUM_INET6:
 			addr_len = (u_int)sizeof(nd_ipv6);
 			break;
 		default:
@@ -577,10 +577,10 @@ pimv2_addr_print(netdissect_options *ndo,
 	} else {
 		switch (addr_len) {
 		case sizeof(nd_ipv4):
-			af = AF_INET;
+			af = AFNUM_INET;
 			break;
 		case sizeof(nd_ipv6):
-			af = AF_INET6;
+			af = AFNUM_INET6;
 			break;
 		default:
 			return -1;
@@ -596,11 +596,11 @@ pimv2_addr_print(netdissect_options *ndo,
 		if (len < addr_len)
 			goto trunc;
 		ND_TCHECK_LEN(bp, addr_len);
-		if (af == AF_INET) {
+		if (af == AFNUM_INET) {
 			if (!silent)
 				ND_PRINT("%s", GET_IPADDR_STRING(bp));
 		}
-		else if (af == AF_INET6) {
+		else if (af == AFNUM_INET6) {
 			if (!silent)
 				ND_PRINT("%s", GET_IP6ADDR_STRING(bp));
 		}
@@ -610,14 +610,14 @@ pimv2_addr_print(netdissect_options *ndo,
 		if (len < addr_len + 2)
 			goto trunc;
 		ND_TCHECK_LEN(bp, addr_len + 2);
-		if (af == AF_INET) {
+		if (af == AFNUM_INET) {
 			if (!silent) {
 				ND_PRINT("%s", GET_IPADDR_STRING(bp + 2));
 				if (GET_U_1(bp + 1) != 32)
 					ND_PRINT("/%u", GET_U_1(bp + 1));
 			}
 		}
-		else if (af == AF_INET6) {
+		else if (af == AFNUM_INET6) {
 			if (!silent) {
 				ND_PRINT("%s", GET_IP6ADDR_STRING(bp + 2));
 				if (GET_U_1(bp + 1) != 128)
