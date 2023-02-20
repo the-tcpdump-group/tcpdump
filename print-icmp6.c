@@ -879,7 +879,7 @@ rpl_dao_print(netdissect_options *ndo,
         if(RPL_DAO_D(rpl_flags)) {
                 ND_TCHECK_LEN(dao->rpl_dagid, DAGID_LEN);
                 if (length < DAGID_LEN)
-                	goto tooshort;
+                        goto tooshort;
                 dagid_str = ip6addr_string (ndo, dao->rpl_dagid);
                 bp += DAGID_LEN;
                 length -= DAGID_LEN;
@@ -922,7 +922,7 @@ rpl_daoack_print(netdissect_options *ndo,
         if(RPL_DAOACK_D(GET_U_1(daoack->rpl_flags))) {
                 ND_TCHECK_LEN(daoack->rpl_dagid, DAGID_LEN);
                 if (length < DAGID_LEN)
-                	goto tooshort;
+                        goto tooshort;
                 dagid_str = ip6addr_string (ndo, daoack->rpl_dagid);
                 bp += DAGID_LEN;
                 length -= DAGID_LEN;
