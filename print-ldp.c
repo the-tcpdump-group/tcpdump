@@ -307,14 +307,14 @@ ldp_tlv_print(netdissect_options *ndo,
 	ND_PRINT("\n\t      Address Family: %s, addresses",
                tok2str(af_values, "Unknown (%u)", af));
         switch (af) {
-        case AFNUM_INET:
+        case AFNUM_IP:
 	    while(tlv_tlen >= sizeof(nd_ipv4)) {
 		ND_PRINT(" %s", GET_IPADDR_STRING(tptr));
 		tlv_tlen-=sizeof(nd_ipv4);
 		tptr+=sizeof(nd_ipv4);
 	    }
             break;
-        case AFNUM_INET6:
+        case AFNUM_IP6:
 	    while(tlv_tlen >= sizeof(nd_ipv6)) {
 		ND_PRINT(" %s", GET_IP6ADDR_STRING(tptr));
 		tlv_tlen-=sizeof(nd_ipv6);
@@ -354,7 +354,7 @@ ldp_tlv_print(netdissect_options *ndo,
 	    af = GET_BE_U_2(tptr);
 	    tptr+=2;
 	    tlv_tlen-=2;
-	    if (af == AFNUM_INET) {
+	    if (af == AFNUM_IP) {
 		i=decode_prefix4(ndo, tptr, tlv_tlen, buf, sizeof(buf));
 		if (i == -2)
 		    goto trunc;
@@ -365,7 +365,7 @@ ldp_tlv_print(netdissect_options *ndo,
 		else
 		    ND_PRINT(": IPv4 prefix %s", buf);
 	    }
-	    else if (af == AFNUM_INET6) {
+	    else if (af == AFNUM_IP6) {
 		i=decode_prefix6(ndo, tptr, tlv_tlen, buf, sizeof(buf));
 		if (i == -2)
 		    goto trunc;

@@ -1349,12 +1349,12 @@ lldp_network_addr_print(netdissect_options *ndo, const u_char *tptr, u_int len)
     len--;
     af = GET_U_1(tptr);
     switch (af) {
-    case AFNUM_INET:
+    case AFNUM_IP:
         if (len < sizeof(nd_ipv4))
           return NULL;
         pfunc = ipaddr_string;
         break;
-    case AFNUM_INET6:
+    case AFNUM_IP6:
         if (len < sizeof(nd_ipv6))
           return NULL;
         pfunc = ip6addr_string;

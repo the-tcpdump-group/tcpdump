@@ -239,7 +239,7 @@ cfm_network_addr_print(netdissect_options *ndo,
      * Resolve the passed in Address.
      */
     switch(network_addr_type) {
-    case AFNUM_INET:
+    case AFNUM_IP:
         if (length != 1 + 4) {
             ND_PRINT("(invalid IPv4 address length %u)", length - 1);
             hexdump = TRUE;
@@ -248,7 +248,7 @@ cfm_network_addr_print(netdissect_options *ndo,
         ND_PRINT(", %s", GET_IPADDR_STRING(tptr + 1));
         break;
 
-    case AFNUM_INET6:
+    case AFNUM_IP6:
         if (length != 1 + 16) {
             ND_PRINT("(invalid IPv6 address length %u)", length - 1);
             hexdump = TRUE;

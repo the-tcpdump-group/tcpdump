@@ -19,8 +19,8 @@ extern const struct tok af_values[];
 extern const struct tok bsd_af_values[];
 
 /* RFC1700 address family numbers */
-#define AFNUM_INET	1
-#define AFNUM_INET6	2
+#define AFNUM_IP	1
+#define AFNUM_IP6	2
 #define AFNUM_NSAP	3
 #define AFNUM_HDLC	4
 #define AFNUM_BBN1822	5

@@ -562,10 +562,10 @@ pimv2_addr_print(netdissect_options *ndo,
 			goto trunc;
 		af = GET_U_1(bp);
 		switch (af) {
-		case AFNUM_INET:
+		case AFNUM_IP:
 			addr_len = (u_int)sizeof(nd_ipv4);
 			break;
-		case AFNUM_INET6:
+		case AFNUM_IP6:
 			addr_len = (u_int)sizeof(nd_ipv6);
 			break;
 		default:
@@ -577,10 +577,10 @@ pimv2_addr_print(netdissect_options *ndo,
 	} else {
 		switch (addr_len) {
 		case sizeof(nd_ipv4):
-			af = AFNUM_INET;
+			af = AFNUM_IP;
 			break;
 		case sizeof(nd_ipv6):
-			af = AFNUM_INET6;
+			af = AFNUM_IP6;
 			break;
 		default:
 			return -1;
@@ -596,11 +596,11 @@ pimv2_addr_print(netdissect_options *ndo,
 		if (len < addr_len)
 			goto trunc;
 		ND_TCHECK_LEN(bp, addr_len);
-		if (af == AFNUM_INET) {
+		if (af == AFNUM_IP) {
 			if (!silent)
 				ND_PRINT("%s", GET_IPADDR_STRING(bp));
 		}
-		else if (af == AFNUM_INET6) {
+		else if (af == AFNUM_IP6) {
 			if (!silent)
 				ND_PRINT("%s", GET_IP6ADDR_STRING(bp));
 		}
@@ -610,14 +610,14 @@ pimv2_addr_print(netdissect_options *ndo,
 		if (len < addr_len + 2)
 			goto trunc;
 		ND_TCHECK_LEN(bp, addr_len + 2);
-		if (af == AFNUM_INET) {
+		if (af == AFNUM_IP) {
 			if (!silent) {
 				ND_PRINT("%s", GET_IPADDR_STRING(bp + 2));
 				if (GET_U_1(bp + 1) != 32)
 					ND_PRINT("/%u", GET_U_1(bp + 1));
 			}
 		}
-		else if (af == AFNUM_INET6) {
+		else if (af == AFNUM_IP6) {
 			if (!silent) {
 				ND_PRINT("%s", GET_IP6ADDR_STRING(bp + 2));
 				if (GET_U_1(bp + 1) != 128)

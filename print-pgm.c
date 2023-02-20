@@ -229,12 +229,12 @@ pgm_print(netdissect_options *ndo,
 	    bp = (const u_char *) (spm + 1);
 
 	    switch (GET_BE_U_2(spm->pgms_nla_afi)) {
-	    case AFNUM_INET:
+	    case AFNUM_IP:
 		ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 		addrtostr(bp, nla_buf, sizeof(nla_buf));
 		bp += sizeof(nd_ipv4);
 		break;
-	    case AFNUM_INET6:
+	    case AFNUM_IP6:
 		ND_TCHECK_LEN(bp, sizeof(nd_ipv6));
 		addrtostr6(bp, nla_buf, sizeof(nla_buf));
 		bp += sizeof(nd_ipv6);
@@ -261,12 +261,12 @@ pgm_print(netdissect_options *ndo,
 	    bp = (const u_char *) (pgm_poll + 1);
 
 	    switch (GET_BE_U_2(pgm_poll->pgmp_nla_afi)) {
-	    case AFNUM_INET:
+	    case AFNUM_IP:
 		ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 		addrtostr(bp, nla_buf, sizeof(nla_buf));
 		bp += sizeof(nd_ipv4);
 		break;
-	    case AFNUM_INET6:
+	    case AFNUM_IP6:
 		ND_TCHECK_LEN(bp, sizeof(nd_ipv6));
 		addrtostr6(bp, nla_buf, sizeof(nla_buf));
 		bp += sizeof(nd_ipv6);
@@ -339,12 +339,12 @@ pgm_print(netdissect_options *ndo,
 	     * and stopping if we don't have enough.
 	     */
 	    switch (GET_BE_U_2(nak->pgmn_source_afi)) {
-	    case AFNUM_INET:
+	    case AFNUM_IP:
 		ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 		addrtostr(bp, source_buf, sizeof(source_buf));
 		bp += sizeof(nd_ipv4);
 		break;
-	    case AFNUM_INET6:
+	    case AFNUM_IP6:
 		ND_TCHECK_LEN(bp, sizeof(nd_ipv6));
 		addrtostr6(bp, source_buf, sizeof(source_buf));
 		bp += sizeof(nd_ipv6);
@@ -360,12 +360,12 @@ pgm_print(netdissect_options *ndo,
 	     */
 	    bp += (2 * sizeof(uint16_t));
 	    switch (GET_BE_U_2(bp)) {
-	    case AFNUM_INET:
+	    case AFNUM_IP:
 		ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 		addrtostr(bp, group_buf, sizeof(group_buf));
 		bp += sizeof(nd_ipv4);
 		break;
-	    case AFNUM_INET6:
+	    case AFNUM_IP6:
 		ND_TCHECK_LEN(bp, sizeof(nd_ipv6));
 		addrtostr6(bp, group_buf, sizeof(group_buf));
 		bp += sizeof(nd_ipv6);
@@ -572,7 +572,7 @@ pgm_print(netdissect_options *ndo,
 		    nla_afnum = GET_BE_U_2(bp);
 		    bp += 2+2;
 		    switch (nla_afnum) {
-		    case AFNUM_INET:
+		    case AFNUM_IP:
 			if (opt_len != PGM_OPT_REDIRECT_FIXED_LEN + sizeof(nd_ipv4)) {
 			    ND_PRINT("[Bad OPT_REDIRECT option, length %u != %u + address size]",
 			        opt_len, PGM_OPT_REDIRECT_FIXED_LEN);
@@ -583,7 +583,7 @@ pgm_print(netdissect_options *ndo,
 			bp += sizeof(nd_ipv4);
 			opts_len -= PGM_OPT_REDIRECT_FIXED_LEN + sizeof(nd_ipv4);
 			break;
-		    case AFNUM_INET6:
+		    case AFNUM_IP6:
 			if (opt_len != PGM_OPT_REDIRECT_FIXED_LEN + sizeof(nd_ipv6)) {
 			    ND_PRINT("[Bad OPT_REDIRECT option, length %u != %u + address size]",
 			        opt_len, PGM_OPT_REDIRECT_FIXED_LEN);
@@ -729,7 +729,7 @@ pgm_print(netdissect_options *ndo,
 		    nla_afnum = GET_BE_U_2(bp);
 		    bp += 2+2;
 		    switch (nla_afnum) {
-		    case AFNUM_INET:
+		    case AFNUM_IP:
 			if (opt_len != PGM_OPT_PGMCC_DATA_FIXED_LEN + sizeof(nd_ipv4)) {
 			    ND_PRINT("[Bad OPT_PGMCC_DATA option, length %u != %u + address size]",
 			        opt_len, PGM_OPT_PGMCC_DATA_FIXED_LEN);
@@ -740,7 +740,7 @@ pgm_print(netdissect_options *ndo,
 			bp += sizeof(nd_ipv4);
 			opts_len -= PGM_OPT_PGMCC_DATA_FIXED_LEN + sizeof(nd_ipv4);
 			break;
-		    case AFNUM_INET6:
+		    case AFNUM_IP6:
 			if (opt_len != PGM_OPT_PGMCC_DATA_FIXED_LEN + sizeof(nd_ipv6)) {
 			    ND_PRINT("[Bad OPT_PGMCC_DATA option, length %u != %u + address size]",
 			        opt_len, PGM_OPT_PGMCC_DATA_FIXED_LEN);
@@ -772,7 +772,7 @@ pgm_print(netdissect_options *ndo,
 		    nla_afnum = GET_BE_U_2(bp);
 		    bp += 2+2;
 		    switch (nla_afnum) {
-		    case AFNUM_INET:
+		    case AFNUM_IP:
 			if (opt_len != PGM_OPT_PGMCC_FEEDBACK_FIXED_LEN + sizeof(nd_ipv4)) {
 			    ND_PRINT("[Bad OPT_PGMCC_FEEDBACK option, length %u != %u + address size]",
 			        opt_len, PGM_OPT_PGMCC_FEEDBACK_FIXED_LEN);
@@ -783,7 +783,7 @@ pgm_print(netdissect_options *ndo,
 			bp += sizeof(nd_ipv4);
 			opts_len -= PGM_OPT_PGMCC_FEEDBACK_FIXED_LEN + sizeof(nd_ipv4);
 			break;
-		    case AFNUM_INET6:
+		    case AFNUM_IP6:
 			if (opt_len != PGM_OPT_PGMCC_FEEDBACK_FIXED_LEN + sizeof(nd_ipv6)) {
 			    ND_PRINT("[Bad OPT_PGMCC_FEEDBACK option, length %u != %u + address size]",
 			        opt_len, PGM_OPT_PGMCC_FEEDBACK_FIXED_LEN);

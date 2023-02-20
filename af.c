@@ -25,8 +25,8 @@
 
 const struct tok af_values[] = {
     { 0,                      "Reserved"},
-    { AFNUM_INET,             "IPv4"},
-    { AFNUM_INET6,            "IPv6"},
+    { AFNUM_IP,               "IPv4"},
+    { AFNUM_IP6,              "IPv6"},
     { AFNUM_NSAP,             "NSAP"},
     { AFNUM_HDLC,             "HDLC"},
     { AFNUM_BBN1822,          "BBN 1822"},

@@ -1776,23 +1776,23 @@ bgp_mp_af_print(netdissect_options *ndo,
                   safi);
 
         switch(af<<8 | safi) {
-        case (AFNUM_INET<<8 | SAFNUM_UNICAST):
-        case (AFNUM_INET<<8 | SAFNUM_MULTICAST):
-        case (AFNUM_INET<<8 | SAFNUM_UNIMULTICAST):
-        case (AFNUM_INET<<8 | SAFNUM_LABUNICAST):
-        case (AFNUM_INET<<8 | SAFNUM_RT_ROUTING_INFO):
-        case (AFNUM_INET<<8 | SAFNUM_VPNUNICAST):
-        case (AFNUM_INET<<8 | SAFNUM_VPNMULTICAST):
-        case (AFNUM_INET<<8 | SAFNUM_VPNUNIMULTICAST):
-        case (AFNUM_INET<<8 | SAFNUM_MULTICAST_VPN):
-        case (AFNUM_INET<<8 | SAFNUM_MDT):
-        case (AFNUM_INET6<<8 | SAFNUM_UNICAST):
-        case (AFNUM_INET6<<8 | SAFNUM_MULTICAST):
-        case (AFNUM_INET6<<8 | SAFNUM_UNIMULTICAST):
-        case (AFNUM_INET6<<8 | SAFNUM_LABUNICAST):
-        case (AFNUM_INET6<<8 | SAFNUM_VPNUNICAST):
-        case (AFNUM_INET6<<8 | SAFNUM_VPNMULTICAST):
-        case (AFNUM_INET6<<8 | SAFNUM_VPNUNIMULTICAST):
+        case (AFNUM_IP<<8 | SAFNUM_UNICAST):
+        case (AFNUM_IP<<8 | SAFNUM_MULTICAST):
+        case (AFNUM_IP<<8 | SAFNUM_UNIMULTICAST):
+        case (AFNUM_IP<<8 | SAFNUM_LABUNICAST):
+        case (AFNUM_IP<<8 | SAFNUM_RT_ROUTING_INFO):
+        case (AFNUM_IP<<8 | SAFNUM_VPNUNICAST):
+        case (AFNUM_IP<<8 | SAFNUM_VPNMULTICAST):
+        case (AFNUM_IP<<8 | SAFNUM_VPNUNIMULTICAST):
+        case (AFNUM_IP<<8 | SAFNUM_MULTICAST_VPN):
+        case (AFNUM_IP<<8 | SAFNUM_MDT):
+        case (AFNUM_IP6<<8 | SAFNUM_UNICAST):
+        case (AFNUM_IP6<<8 | SAFNUM_MULTICAST):
+        case (AFNUM_IP6<<8 | SAFNUM_UNIMULTICAST):
+        case (AFNUM_IP6<<8 | SAFNUM_LABUNICAST):
+        case (AFNUM_IP6<<8 | SAFNUM_VPNUNICAST):
+        case (AFNUM_IP6<<8 | SAFNUM_VPNMULTICAST):
+        case (AFNUM_IP6<<8 | SAFNUM_VPNUNIMULTICAST):
         case (AFNUM_NSAP<<8 | SAFNUM_UNICAST):
         case (AFNUM_NSAP<<8 | SAFNUM_MULTICAST):
         case (AFNUM_NSAP<<8 | SAFNUM_UNIMULTICAST):
@@ -1826,9 +1826,9 @@ bgp_nlri_print(netdissect_options *ndo, uint16_t af, uint8_t safi,
 	u_int path_id = 0;
 
 	switch (af<<8 | safi) {
-            case (AFNUM_INET<<8 | SAFNUM_UNICAST):
-            case (AFNUM_INET<<8 | SAFNUM_MULTICAST):
-            case (AFNUM_INET<<8 | SAFNUM_UNIMULTICAST):
+            case (AFNUM_IP<<8 | SAFNUM_UNICAST):
+            case (AFNUM_IP<<8 | SAFNUM_MULTICAST):
+            case (AFNUM_IP<<8 | SAFNUM_UNIMULTICAST):
                 if (add_path4) {
                     path_id = GET_BE_U_4(tptr);
                     tptr += 4;
@@ -1845,7 +1845,7 @@ bgp_nlri_print(netdissect_options *ndo, uint16_t af, uint8_t safi,
 		    advance += 4;
                 }
                 break;
-            case (AFNUM_INET<<8 | SAFNUM_LABUNICAST):
+            case (AFNUM_IP<<8 | SAFNUM_LABUNICAST):
                 advance = decode_labeled_prefix4(ndo, tptr, len, buf, buflen);
                 if (advance == -1)
                     ND_PRINT("\n\t    (illegal prefix length)");
@@ -1856,20 +1856,20 @@ bgp_nlri_print(netdissect_options *ndo, uint16_t af, uint8_t safi,
                 else
                     ND_PRINT("\n\t      %s", buf);
                 break;
-            case (AFNUM_INET<<8 | SAFNUM_VPNUNICAST):
-            case (AFNUM_INET<<8 | SAFNUM_VPNMULTICAST):
-            case (AFNUM_INET<<8 | SAFNUM_VPNUNIMULTICAST):
+            case (AFNUM_IP<<8 | SAFNUM_VPNUNICAST):
+            case (AFNUM_IP<<8 | SAFNUM_VPNMULTICAST):
+            case (AFNUM_IP<<8 | SAFNUM_VPNUNIMULTICAST):
                 advance = decode_labeled_vpn_prefix4(ndo, tptr, buf, buflen);
                 if (advance == -1)
                     ND_PRINT("\n\t    (illegal prefix length)");
                 else
                     ND_PRINT("\n\t      %s", buf);
                 break;
-            case (AFNUM_INET<<8 | SAFNUM_RT_ROUTING_INFO):
+            case (AFNUM_IP<<8 | SAFNUM_RT_ROUTING_INFO):
                 advance = decode_rt_routing_info(ndo, tptr);
                 break;
-            case (AFNUM_INET<<8 | SAFNUM_MULTICAST_VPN): /* fall through */
-            case (AFNUM_INET6<<8 | SAFNUM_MULTICAST_VPN):
+            case (AFNUM_IP<<8 | SAFNUM_MULTICAST_VPN): /* fall through */
+            case (AFNUM_IP6<<8 | SAFNUM_MULTICAST_VPN):
                 advance = decode_multicast_vpn(ndo, tptr, buf, buflen);
                 if (advance == -1)
                     ND_PRINT("\n\t    (illegal prefix length)");
@@ -1879,7 +1879,7 @@ bgp_nlri_print(netdissect_options *ndo, uint16_t af, uint8_t safi,
                     ND_PRINT("\n\t      %s", buf);
                 break;
 
-            case (AFNUM_INET<<8 | SAFNUM_MDT):
+            case (AFNUM_IP<<8 | SAFNUM_MDT):
                 advance = decode_mdt_vpn_nlri(ndo, tptr, buf, buflen);
                 if (advance == -1)
                     ND_PRINT("\n\t    (illegal prefix length)");
@@ -1888,9 +1888,9 @@ bgp_nlri_print(netdissect_options *ndo, uint16_t af, uint8_t safi,
                 else
                     ND_PRINT("\n\t      %s", buf);
                 break;
-            case (AFNUM_INET6<<8 | SAFNUM_UNICAST):
-            case (AFNUM_INET6<<8 | SAFNUM_MULTICAST):
-            case (AFNUM_INET6<<8 | SAFNUM_UNIMULTICAST):
+            case (AFNUM_IP6<<8 | SAFNUM_UNICAST):
+            case (AFNUM_IP6<<8 | SAFNUM_MULTICAST):
+            case (AFNUM_IP6<<8 | SAFNUM_UNIMULTICAST):
                 if (add_path6) {
                     path_id = GET_BE_U_4(tptr);
                     tptr += 4;
@@ -1907,7 +1907,7 @@ bgp_nlri_print(netdissect_options *ndo, uint16_t af, uint8_t safi,
 		    advance += 4;
                 }
                 break;
-            case (AFNUM_INET6<<8 | SAFNUM_LABUNICAST):
+            case (AFNUM_IP6<<8 | SAFNUM_LABUNICAST):
                 advance = decode_labeled_prefix6(ndo, tptr, len, buf, buflen);
                 if (advance == -1)
                     ND_PRINT("\n\t    (illegal prefix length)");
@@ -1918,9 +1918,9 @@ bgp_nlri_print(netdissect_options *ndo, uint16_t af, uint8_t safi,
                 else
                     ND_PRINT("\n\t      %s", buf);
                 break;
-            case (AFNUM_INET6<<8 | SAFNUM_VPNUNICAST):
-            case (AFNUM_INET6<<8 | SAFNUM_VPNMULTICAST):
-            case (AFNUM_INET6<<8 | SAFNUM_VPNUNIMULTICAST):
+            case (AFNUM_IP6<<8 | SAFNUM_VPNUNICAST):
+            case (AFNUM_IP6<<8 | SAFNUM_VPNMULTICAST):
+            case (AFNUM_IP6<<8 | SAFNUM_VPNUNIMULTICAST):
                 advance = decode_labeled_vpn_prefix6(ndo, tptr, buf, buflen);
                 if (advance == -1)
                     ND_PRINT("\n\t    (illegal prefix length)");
@@ -2185,13 +2185,13 @@ bgp_attr_print(netdissect_options *ndo,
                     ND_PRINT(", " );
                 }
                 switch(af<<8 | safi) {
-                case (AFNUM_INET<<8 | SAFNUM_UNICAST):
-                case (AFNUM_INET<<8 | SAFNUM_MULTICAST):
-                case (AFNUM_INET<<8 | SAFNUM_UNIMULTICAST):
-                case (AFNUM_INET<<8 | SAFNUM_LABUNICAST):
-                case (AFNUM_INET<<8 | SAFNUM_RT_ROUTING_INFO):
-                case (AFNUM_INET<<8 | SAFNUM_MULTICAST_VPN):
-                case (AFNUM_INET<<8 | SAFNUM_MDT):
+                case (AFNUM_IP<<8 | SAFNUM_UNICAST):
+                case (AFNUM_IP<<8 | SAFNUM_MULTICAST):
+                case (AFNUM_IP<<8 | SAFNUM_UNIMULTICAST):
+                case (AFNUM_IP<<8 | SAFNUM_LABUNICAST):
+                case (AFNUM_IP<<8 | SAFNUM_RT_ROUTING_INFO):
+                case (AFNUM_IP<<8 | SAFNUM_MULTICAST_VPN):
+                case (AFNUM_IP<<8 | SAFNUM_MDT):
                     if (tnhlen < sizeof(nd_ipv4)) {
                         ND_PRINT("invalid len");
                         tptr += tnhlen;
@@ -2204,9 +2204,9 @@ bgp_attr_print(netdissect_options *ndo,
                         tlen -= sizeof(nd_ipv4);
                     }
                     break;
-                case (AFNUM_INET<<8 | SAFNUM_VPNUNICAST):
-                case (AFNUM_INET<<8 | SAFNUM_VPNMULTICAST):
-                case (AFNUM_INET<<8 | SAFNUM_VPNUNIMULTICAST):
+                case (AFNUM_IP<<8 | SAFNUM_VPNUNICAST):
+                case (AFNUM_IP<<8 | SAFNUM_VPNMULTICAST):
+                case (AFNUM_IP<<8 | SAFNUM_VPNUNIMULTICAST):
                     if (tnhlen < sizeof(nd_ipv4)+BGP_VPN_RD_LEN) {
                         ND_PRINT("invalid len");
                         tptr += tnhlen;
@@ -2221,10 +2221,10 @@ bgp_attr_print(netdissect_options *ndo,
                         tnhlen -= (sizeof(nd_ipv4)+BGP_VPN_RD_LEN);
                     }
                     break;
-                case (AFNUM_INET6<<8 | SAFNUM_UNICAST):
-                case (AFNUM_INET6<<8 | SAFNUM_MULTICAST):
-                case (AFNUM_INET6<<8 | SAFNUM_UNIMULTICAST):
-                case (AFNUM_INET6<<8 | SAFNUM_LABUNICAST):
+                case (AFNUM_IP6<<8 | SAFNUM_UNICAST):
+                case (AFNUM_IP6<<8 | SAFNUM_MULTICAST):
+                case (AFNUM_IP6<<8 | SAFNUM_UNIMULTICAST):
+                case (AFNUM_IP6<<8 | SAFNUM_LABUNICAST):
                     if (tnhlen < sizeof(nd_ipv6)) {
                         ND_PRINT("invalid len");
                         tptr += tnhlen;
@@ -2237,9 +2237,9 @@ bgp_attr_print(netdissect_options *ndo,
                         tnhlen -= sizeof(nd_ipv6);
                     }
                     break;
-                case (AFNUM_INET6<<8 | SAFNUM_VPNUNICAST):
-                case (AFNUM_INET6<<8 | SAFNUM_VPNMULTICAST):
-                case (AFNUM_INET6<<8 | SAFNUM_VPNUNIMULTICAST):
+                case (AFNUM_IP6<<8 | SAFNUM_VPNUNICAST):
+                case (AFNUM_IP6<<8 | SAFNUM_VPNMULTICAST):
+                case (AFNUM_IP6<<8 | SAFNUM_VPNUNIMULTICAST):
                     if (tnhlen < sizeof(nd_ipv6)+BGP_VPN_RD_LEN) {
                         ND_PRINT("invalid len");
                         tptr += tnhlen;
