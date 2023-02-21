@@ -78,9 +78,6 @@
 /* Define to 1 if you have the <openssl/evp.h> header file. */
 #cmakedefine HAVE_OPENSSL_EVP_H 1
 
-/* define if the OS provides AF_INET6 and struct in6_addr */
-#cmakedefine HAVE_OS_IPV6_SUPPORT 1
-
 /* if there's an os_proto.h for this platform, to use additional prototypes */
 #cmakedefine HAVE_OS_PROTO_H 1
 

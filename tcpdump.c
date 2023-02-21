@@ -916,6 +916,7 @@ capdns_setup(void)
 	if (cap_dns_type_limit(capdnsloc, types, 1) < 0)
 		error("unable to limit access to system.dns service");
 	families[0] = AF_INET;
+	/* Casper is a feature of FreeBSD, which defines AF_INET6. */
 	families[1] = AF_INET6;
 	if (cap_dns_family_limit(capdnsloc, families, 2) < 0)
 		error("unable to limit access to system.dns service");

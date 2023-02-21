@@ -148,14 +148,15 @@ win32_gethostbyaddr(const char *addr, int len, int type)
 	static struct hostent host;
 	static char hostbuf[NI_MAXHOST];
 	char hname[NI_MAXHOST];
-	struct sockaddr_in6 addr6;
 
 	host.h_name = hostbuf;
 	switch (type) {
 	case AF_INET:
 		return gethostbyaddr(addr, len, type);
 		break;
-	case AF_INET6:
+#ifdef AF_INET6
+	case AF_INET6: {
+		struct sockaddr_in6 addr6;
 		memset(&addr6, 0, sizeof(addr6));
 		addr6.sin6_family = AF_INET6;
 		memcpy(&addr6.sin6_addr, addr, len);
@@ -167,6 +168,8 @@ win32_gethostbyaddr(const char *addr, int len, int type)
 			return &host;
 		}
 		break;
+	}
+#endif /* AF_INET6 */
 	default:
 		return NULL;
 	}
@@ -358,6 +361,7 @@ ip6addr_string(netdissect_options *ndo, const u_char *ap)
 	/*
 	 * Do not print names if -n was given.
 	 */
+#ifdef AF_INET6
 	if (!ndo->ndo_nflag) {
 #ifdef HAVE_CASPER
 		if (capdns != NULL) {
@@ -383,6 +387,7 @@ ip6addr_string(netdissect_options *ndo, const u_char *ap)
 			return (p->name);
 		}
 	}
+#endif /* AF_INET6 */
 	cp = addrtostr6(ap, ntop_buf, sizeof(ntop_buf));
 	p->name = strdup(cp);
 	if (p->name == NULL)

@@ -202,10 +202,6 @@
 #define inline __inline
 #endif
 
-#if defined(AF_INET6) && !defined(HAVE_OS_IPV6_SUPPORT)
-#define HAVE_OS_IPV6_SUPPORT
-#endif
-
 #ifndef INET6_ADDRSTRLEN
 #define INET6_ADDRSTRLEN 46
 #endif
@@ -317,28 +313,6 @@ typedef char *caddr_t;
             : "=q" (x) : "0" (x));
     return (x);
   }
-#endif
-
-/*
- * If the OS doesn't define AF_INET6 and struct in6_addr:
- *
- * define AF_INET6, so we can use it internally as a "this is an
- * IPv6 address" indication;
- *
- * define struct in6_addr so that we can use it for IPv6 addresses.
- */
-#ifndef HAVE_OS_IPV6_SUPPORT
-#ifndef AF_INET6
-#define AF_INET6	24
-
-struct in6_addr {
-	union {
-		__uint8_t   __u6_addr8[16];
-		__uint16_t  __u6_addr16[8];
-		__uint32_t  __u6_addr32[4];
-	} __u6_addr;			/* 128-bit IP6 address */
-};
-#endif
 #endif
 
 #ifndef NI_MAXHOST

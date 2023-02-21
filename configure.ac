@@ -261,47 +261,6 @@ fi
 #
 AC_LBL_LIBRARY_NET
 
-#
-# Check whether AF_INET6 and struct in6_addr are defined.
-# If they aren't both defined, we don't have sufficient OS
-# support for IPv6, so we don't look for IPv6 support libraries,
-# and we define AF_INET6 and struct in6_addr ourselves.
-#
-AC_MSG_CHECKING([whether the operating system supports IPv6])
-AC_COMPILE_IFELSE(
-    [
-      AC_LANG_SOURCE(
-	[[
-#include <string.h>
-/* AF_INET6 available check */
-#include <sys/types.h>
-#ifdef _WIN32
-#include <ws2tcpip.h>
-#else
-#include <sys/socket.h>
-#include <netinet/in.h>
-#endif
-#ifdef AF_INET6
-void
-foo(struct in6_addr *addr)
-{
- memset(addr, 0, sizeof (struct in6_addr));
-}
-#else
-#error "AF_INET6 not defined"
-#endif
-	]])
-    ],
-    [
-	AC_MSG_RESULT(yes)
-	AC_DEFINE(HAVE_OS_IPV6_SUPPORT, 1,
-	    [define if the OS provides AF_INET6 and struct in6_addr])
-    ],
-    [
-	AC_MSG_RESULT(no)
-    ]
-)
-
 AC_REPLACE_FUNCS(strlcat strlcpy strsep getservent getopt_long)
 AC_CHECK_FUNCS(fork vfork)
 AC_CHECK_FUNCS(setlinebuf)
