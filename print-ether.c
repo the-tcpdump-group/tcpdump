@@ -193,6 +193,7 @@ ether_common_print(netdissect_options *ndo, const u_char *p, u_int length,
 	 */
 recurse:
 	length_type = GET_BE_U_2(p);
+	ndo->ndo_length_type = length_type;
 
 	length -= 2;
 	caplen -= 2;
@@ -230,6 +231,7 @@ recurse:
 			 * Keep processing type/length fields.
 			 */
 			length_type = GET_BE_U_2(p);
+			ndo->ndo_length_type = length_type;
 
 			ND_ICHECK_U(caplen, <, 2);
 			length -= 2;
@@ -274,6 +276,8 @@ recurse:
 		}
 
 		length_type = GET_BE_U_2(p + 2);
+		ndo->ndo_length_type = length_type;
+		
 		p += 4;
 		length -= 4;
 		caplen -= 4;

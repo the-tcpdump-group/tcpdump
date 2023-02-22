@@ -3256,7 +3256,7 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 
 		ndo = (netdissect_options*)user;
 		
-		if (ndo->ndo_dlt == DLT_EN10MB) {
+		if (ndo->ndo_dlt == DLT_EN10MB && ndo->ndo_length_type == 0x800) {
 			
 			if (capture_start_time.tv_sec == 0)
 				capture_start_time.tv_sec = h->ts.tv_sec;
