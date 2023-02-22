@@ -49,6 +49,7 @@
 #include "gmpls.h"
 #include "oui.h"
 #include "signature.h"
+#include "af.h"
 
 
 /*
@@ -2280,7 +2281,7 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
     processed=4;
     tptr+=4;
 
-    if (afi == AF_INET) {
+    if (afi == AFNUM_IP) {
         status_byte=GET_U_1(tptr);
         tptr++;
         bit_length = status_byte&0x3f;
@@ -2291,7 +2292,7 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
             return (0);
         }
         processed++;
-    } else if (afi == AF_INET6) {
+    } else if (afi == AFNUM_IP6) {
         status_byte=GET_U_1(tptr);
         bit_length=GET_U_1(tptr + 1);
         if (bit_length > 128) {
@@ -2312,12 +2313,12 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
     tptr+=byte_length;
     processed+=byte_length;
 
-    if (afi == AF_INET)
+    if (afi == AFNUM_IP)
         ND_PRINT("%sIPv4 prefix: %15s/%u",
                indent,
                ipaddr_string(ndo, prefix), /* local buffer, not packet data; don't use GET_IPADDR_STRING() */
                bit_length);
-    else if (afi == AF_INET6)
+    else if (afi == AFNUM_IP6)
         ND_PRINT("%sIPv6 prefix: %s/%u",
                indent,
                ip6addr_string(ndo, prefix), /* local buffer, not packet data; don't use GET_IP6ADDR_STRING() */
@@ -2327,15 +2328,15 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
            ISIS_MASK_TLV_EXTD_IP_UPDOWN(status_byte) ? "down" : "up",
            metric);
 
-    if (afi == AF_INET && ISIS_MASK_TLV_EXTD_IP_SUBTLV(status_byte))
+    if (afi == AFNUM_IP && ISIS_MASK_TLV_EXTD_IP_SUBTLV(status_byte))
         ND_PRINT(", sub-TLVs present");
-    else if (afi == AF_INET6)
+    else if (afi == AFNUM_IP6)
         ND_PRINT(", %s%s",
                ISIS_MASK_TLV_EXTD_IP6_IE(status_byte) ? "External" : "Internal",
                ISIS_MASK_TLV_EXTD_IP6_SUBTLV(status_byte) ? ", sub-TLVs present" : "");
 
-    if ((afi == AF_INET  && ISIS_MASK_TLV_EXTD_IP_SUBTLV(status_byte))
-     || (afi == AF_INET6 && ISIS_MASK_TLV_EXTD_IP6_SUBTLV(status_byte))
+    if ((afi == AFNUM_IP  && ISIS_MASK_TLV_EXTD_IP_SUBTLV(status_byte))
+     || (afi == AFNUM_IP6 && ISIS_MASK_TLV_EXTD_IP6_SUBTLV(status_byte))
             ) {
         /* assume that one prefix can hold more
            than one subTLV - therefore the first byte must reflect
@@ -3019,7 +3020,7 @@ isis_print(netdissect_options *ndo,
 
 	case ISIS_TLV_EXTD_IP_REACH:
 	    while (tlen != 0) {
-                ext_ip_len = isis_print_extd_ip_reach(ndo, tptr, "\n\t      ", AF_INET);
+                ext_ip_len = isis_print_extd_ip_reach(ndo, tptr, "\n\t      ", AFNUM_IP);
                 if (ext_ip_len == 0) /* did something go wrong ? */
                     goto trunc;
                 if (tlen < ext_ip_len) {
@@ -3041,7 +3042,7 @@ isis_print(netdissect_options *ndo,
             tlen-=mt_len;
 
             while (tlen != 0) {
-                ext_ip_len = isis_print_extd_ip_reach(ndo, tptr, "\n\t      ", AF_INET);
+                ext_ip_len = isis_print_extd_ip_reach(ndo, tptr, "\n\t      ", AFNUM_IP);
                 if (ext_ip_len == 0) /* did something go wrong ? */
                     goto trunc;
                 if (tlen < ext_ip_len) {
@@ -3056,7 +3057,7 @@ isis_print(netdissect_options *ndo,
 
 	case ISIS_TLV_IP6_REACH:
             while (tlen != 0) {
-                ext_ip_len = isis_print_extd_ip_reach(ndo, tptr, "\n\t      ", AF_INET6);
+                ext_ip_len = isis_print_extd_ip_reach(ndo, tptr, "\n\t      ", AFNUM_IP6);
                 if (ext_ip_len == 0) /* did something go wrong ? */
                     goto trunc;
                 if (tlen < ext_ip_len) {
@@ -3078,7 +3079,7 @@ isis_print(netdissect_options *ndo,
             tlen-=mt_len;
 
             while (tlen != 0) {
-                ext_ip_len = isis_print_extd_ip_reach(ndo, tptr, "\n\t      ", AF_INET6);
+                ext_ip_len = isis_print_extd_ip_reach(ndo, tptr, "\n\t      ", AFNUM_IP6);
                 if (ext_ip_len == 0) /* did something go wrong ? */
                     goto trunc;
                 if (tlen < ext_ip_len) {
