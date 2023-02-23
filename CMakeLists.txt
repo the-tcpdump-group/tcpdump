@@ -802,6 +802,7 @@ check_function_exists(pcap_set_optimizer_debug HAVE_PCAP_SET_OPTIMIZER_DEBUG)
 check_function_exists(bpf_dump HAVE_BPF_DUMP)
 
 cmake_pop_check_state()
+cmake_pop_check_state()
 
 #
 # We have libpcap.
