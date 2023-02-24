@@ -632,12 +632,6 @@ cmake_pop_check_state()
 # so we use check_struct_has_member() and look for ss_family.
 #
 
-#
-# FIXME: This check does not influence the build logic, but without it CMake
-# 3.18.4 fails trying to make the next check_type_size() check later on.
-#
-check_type_size("struct in6_addr" HAVE_STRUCT_IN6_ADDR)
-
 ######################################
 # External dependencies
 ######################################
@@ -661,6 +655,14 @@ set(CMAKE_REQUIRED_INCLUDES ${PCAP_INCLUDE_DIRS})
 # If we do, we use that to get the C99 types defined.
 #
 check_include_file(pcap/pcap-inttypes.h HAVE_PCAP_PCAP_INTTYPES_H)
+
+#
+# At compile time HAVE_PCAP_FINDALLDEVS depends on HAVE_PCAP_IF_T.
+#
+cmake_push_check_state()
+set(CMAKE_EXTRA_INCLUDE_FILES pcap.h)
+check_type_size(pcap_if_t PCAP_IF_T)
+cmake_pop_check_state()
 
 #
 # Check for various functions in libpcap/WinPcap/Npcap.
@@ -751,19 +753,6 @@ endif(HAVE_PCAP_CREATE)
 # if we have them.
 #
 check_function_exists(pcap_findalldevs HAVE_PCAP_FINDALLDEVS)
-if(HAVE_PCAP_FINDALLDEVS)
-    #
-    # Check for libpcap having pcap_findalldevs() but the pcap.h header
-    # not having pcap_if_t; some versions of Mac OS X shipped with pcap.h
-    # from 0.6 and libpcap 0.8, so that libpcap had pcap_findalldevs but
-    # pcap.h didn't have pcap_if_t.
-    #
-    cmake_push_check_state()
-    set(CMAKE_REQUIRED_INCLUDES ${PCAP_INCLUDE_DIRS})
-    set(CMAKE_EXTRA_INCLUDE_FILES pcap.h)
-    check_type_size(pcap_if_t PCAP_IF_T)
-    cmake_pop_check_state()
-endif(HAVE_PCAP_FINDALLDEVS)
 check_function_exists(pcap_dump_flush HAVE_PCAP_DUMP_FLUSH)
 check_function_exists(pcap_lib_version HAVE_PCAP_LIB_VERSION)
 if(NOT HAVE_PCAP_LIB_VERSION)
