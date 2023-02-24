@@ -782,16 +782,6 @@ fi
 # if we have them.
 #
 AC_CHECK_FUNCS(pcap_findalldevs)
-if test $ac_cv_func_pcap_findalldevs = "yes" ; then
-dnl Check for libpcap having pcap_findalldevs() but the pcap.h header
-dnl not having pcap_if_t; some versions of Mac OS X shipped with pcap.h
-dnl from 0.6 and libpcap 0.8, so that libpcap had pcap_findalldevs but
-dnl pcap.h didn't have pcap_if_t.
-    savedcppflags="$CPPFLAGS"
-    CPPFLAGS="$CPPFLAGS $V_INCLS"
-    AC_CHECK_TYPES(pcap_if_t, , , [#include <pcap.h>])
-    CPPFLAGS="$savedcppflags"
-fi
 AC_CHECK_FUNCS(pcap_dump_flush pcap_lib_version)
 if test $ac_cv_func_pcap_lib_version = "no" ; then
     AC_MSG_CHECKING(whether pcap_version is defined by libpcap)
@@ -926,13 +916,20 @@ fi
 #
 AC_TYPE_UINTPTR_T
 
+savedcppflags="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS $V_INCLS"
+
 #
 # Check whether we have pcap/pcap-inttypes.h.
 # If we do, we use that to get the C99 types defined.
 #
-savedcppflags="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $V_INCLS"
 AC_CHECK_HEADERS(pcap/pcap-inttypes.h)
+
+#
+# At compile time HAVE_PCAP_FINDALLDEVS depends on HAVE_PCAP_IF_T.
+#
+AC_CHECK_TYPES(pcap_if_t, , , [#include <pcap.h>])
+
 CPPFLAGS="$savedcppflags"
 
 #
