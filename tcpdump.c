@@ -38,7 +38,7 @@
 #endif
 
 /*
- * Some older versions of Mac OS X may ship pcap.h from libpcap 0.6 with a
+ * Some older versions of Mac OS X ship pcap.h from libpcap 0.6 with a
  * libpcap based on 0.8.  That means it has pcap_findalldevs() but the
  * header doesn't define pcap_if_t, meaning that we can't actually *use*
  * pcap_findalldevs().
