@@ -12,6 +12,9 @@
 : "${TCPDUMP_TAINTED:=no}"
 : "${TCPDUMP_CMAKE_TAINTED:=no}"
 : "${MAKE_BIN:=make}"
+# At least one OS (AIX 7) where this software can build does not have at least
+# one command (mktemp) required for a successful run of "make releasetar".
+: "${TEST_RELEASETAR:=yes}"
 
 . ./build_common.sh
 # Install directory prefix
@@ -111,7 +114,7 @@ if [ "$BUILD_LIBPCAP" = yes ]; then
     run_after_echo "$MAKE_BIN" check
 fi
 if [ "$CMAKE" = no ]; then
-    run_after_echo "$MAKE_BIN" releasetar
+    [ "$TEST_RELEASETAR" = yes ] && run_after_echo "$MAKE_BIN" releasetar
 fi
 if [ "$CIRRUS_CI" = true ]; then
     run_after_echo sudo \
