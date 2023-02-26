@@ -1599,7 +1599,7 @@ Some offsets and field values may be expressed as names
 rather than as numeric values. For example tcp[13] may
 be replaced with tcp[tcpflags]. The following TCP flag
 field values are also available: tcp-fin, tcp-syn, tcp-rst,
-tcp-push, tcp-ack, tcp-urg.
+tcp-push, tcp-ack, tcp-urg, tcp-ece and tcp-cwr.
 .PP
 This can be demonstrated as:
 .RS
@@ -2006,6 +2006,13 @@ Finally,
 jssmag.209 initiates the next request.
 The `*' on the request
 indicates that XO (`exactly once') was \fInot\fP set.
+
+.SH BACKWARD COMPATIBILITY
+The TCP flag names
+.B tcp-ece
+and
+.B tcp-cwr
+became available when linking with libpcap 1.9.0 or later.
 
 .SH "SEE ALSO"
 .BR stty (1),
