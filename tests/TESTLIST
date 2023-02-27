@@ -601,7 +601,7 @@ isakmp-rfc3948-oobr	isakmp-rfc3948-oobr.pcap	isakmp-rfc3948-oobr.out
 isoclns-oobr		isoclns-oobr.pcap		isoclns-oobr.out
 nfs-attr-oobr		nfs-attr-oobr.pcap		nfs-attr-oobr.out
 decnet-oobr		decnet-oobr.pcap		decnet-oobr.out
-oobr_parse_elements	oobr_parse_elements.pcap	oobr_parse_elements.out
+ieee802.11_parse_elements_oobr ieee802.11_parse_elements_oobr.pcap ieee802.11_parse_elements_oobr.out
 hoobr_ripng_print	hoobr_ripng_print.pcap		hoobr_ripng_print.out
 hoobr_juniper		hoobr_juniper.pcap		hoobr_juniper.out
 hoobr_juniper2		hoobr_juniper2.pcap		hoobr_juniper2.out
