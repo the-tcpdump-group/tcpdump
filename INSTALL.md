@@ -21,7 +21,7 @@ tcpdump and the manual entry.  Any user will be able to use tcpdump to
 read saved captures.  Whether a user will be able to capture traffic
 depends on the OS and the configuration of the system; see the
 [tcpdump man page](https://www.tcpdump.org/manpages/tcpdump.1.html)
-for details.  Do *NOT* give untrusted users the ability to
+for details.  Do **NOT** give untrusted users the ability to
 capture traffic.  If a user can capture traffic, he or she could use
 utilities such as tcpdump to capture any traffic on your net, including
 passwords.
