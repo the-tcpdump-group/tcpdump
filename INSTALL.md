@@ -3,7 +3,7 @@ If you have not built libpcap, and your system does not have libpcap
 installed, install libpcap first.  Your system might provide a version
 of libpcap that can be installed; if so, to compile tcpdump you might
 need to install a "developer" version of libpcap as well as the
-"run-time" version.  You can also install tcpdump.org's version of
+"run-time" version.  You can also install The Tcpdump Group version of
 libpcap; see [this file](README.md) for the location.
 
 You will need a C99 compiler to build tcpdump.  The build system
@@ -34,12 +34,12 @@ On OpenBSD, you may need to set, before the `make`, the `AUTOCONF_VERSION`
 variable like:
 `AUTOCONF_VERSION=2.69 make`
 
-If everything builds ok, `su` and type `make install`.  This will install
+If everything builds fine, `su` and type `make install`.  This will install
 tcpdump and the manual entry.  Any user will be able to use tcpdump to
 read saved captures.  Whether a user will be able to capture traffic
 depends on the OS and the configuration of the system; see the
 [tcpdump man page](https://www.tcpdump.org/manpages/tcpdump.1.html)
-for details.  DO NOT give untrusted users the ability to
+for details.  Do *NOT* give untrusted users the ability to
 capture traffic.  If a user can capture traffic, he or she could use
 utilities such as tcpdump to capture any traffic on your net, including
 passwords.
@@ -47,11 +47,11 @@ passwords.
 Note that most systems ship tcpdump, but usually an older version.
 Building tcpdump from source as explained above will usually install the
 binary as `/usr/local/bin/tcpdump`.  If your system has other tcpdump
-binaries, you might need to deinstall these or to set the PATH environment
+binaries, you might need to deinstall these or to set the `PATH` environment
 variable if you need the `tcpdump` command to run the new binary
 (`tcpdump --version` can be used to tell different versions apart).
 
-If your system is not one which we have tested tcpdump on, you may have
+If your system is not one that we have tested tcpdump on, you may have
 to modify the `configure` script and `Makefile.in`. Please
 [send us patches](https://www.tcpdump.org/index.html#patches)
 for any modifications you need to make.
