@@ -114,7 +114,12 @@ static void print_debug(void *this_fn, void *call_site, action_type action)
 			perror("failed to find executable\n");
 			return;
 		}
-		pgm_name[ret] = 0;
+		if (ret == sizeof(pgm_name)) {
+			/* no space for the '\0' */
+			printf("truncation may have occurred\n");
+			return;
+		}
+		pgm_name[ret] = '\0';
 
 		bfd_init();
 
