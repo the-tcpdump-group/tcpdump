@@ -199,7 +199,8 @@ static void print_debug(void *this_fn, void *call_site, action_type action)
 				printf("%s", func);
 			printf(" (%d)", profile_func_level);
 			/* Print the "from" part except for the main function) */
-			if (action == ENTER && strncmp(func, "main", sizeof("main"))) {
+			if (action == ENTER && func != NULL &&
+				strncmp(func, "main", sizeof("main"))) {
 				/* Calling function */
 				if ((bfd_vma)call_site < vma) {
 					printf("[ERROR address call_site]");
