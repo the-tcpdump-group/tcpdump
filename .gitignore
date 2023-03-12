@@ -42,5 +42,3 @@ netdissect.dir/
 tcpdump.dir/
 tcpdump.sln
 .vs/
-/instrument_functions_global.devel
-/instrument_functions_off.devel

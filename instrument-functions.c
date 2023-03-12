@@ -14,8 +14,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <unistd.h>
 #include <bfd.h>
 
@@ -33,14 +31,10 @@
  * If entering in a function it prints also the calling function name with
  * file name and line number.
  *
- * To configure the printing of only the global functions names:
- * $ make instrument_global
- *
- * To go back to print all the functions names:
- * $ make instrument_all
- *
- * To print nothing, like with no instrumentation:
- * $ make instrument_off
+ * If the environment variable INSTRUMENT is
+ * unset or set to an empty string, print nothing, like with no instrumentation
+ * set to "all" or "a", print all the functions names
+ * set to "global" or "g", print only the global functions names
  */
 
 #define ND_NO_INSTRUMENT __attribute__((no_instrument_function))
@@ -73,12 +67,6 @@ __cyg_profile_func_exit(void *this_fn, void *call_site)
 	print_debug(this_fn, call_site, EXIT);
 }
 
-/* If this file exists, print only the global functions */
-#define ND_FILE_FLAG_GLOBAL "instrument_functions_global.devel"
-
-/* If this file exists, print nothing, like with no instrumentation */
-#define ND_FILE_FLAG_OFF "instrument_functions_off.devel"
-
 static void print_debug(void *this_fn, void *call_site, action_type action)
 {
 	static bfd* abfd;
@@ -86,32 +74,45 @@ static void print_debug(void *this_fn, void *call_site, action_type action)
 	static long symcount;
 	static asection *text;
 	static bfd_vma vma;
+	static char *instrument_type;
+	static int instrument_set;
 	static int instrument_off;
-	static int print_only_global;
-	symbol_info syminfo;
-	struct stat statbuf;
+	static int instrument_global;
 	int i;
 
-	if (!instrument_off) {
-		/* one-time test */
-		if (!stat(ND_FILE_FLAG_OFF, &statbuf)) {
+	if (!instrument_set) {
+		/* Get the configuration environment variable INSTRUMENT value if any */
+		instrument_type = getenv("INSTRUMENT");
+		/* unset or set to an empty string ? */
+		if (instrument_type == NULL ||
+			!strncmp(instrument_type, "", sizeof(""))) {
 			instrument_off = 1;
-			return;
+		} else {
+			/* set to "global" or "g" ? */
+			if (!strncmp(instrument_type, "global", sizeof("global")) ||
+				!strncmp(instrument_type, "g", sizeof("g")))
+				instrument_global = 1;
+			else if (strncmp(instrument_type, "all", sizeof("all")) &&
+					 strncmp(instrument_type, "a", sizeof("a"))) {
+				fprintf(stderr, "INSTRUMENT can be only \"\", \"all\", \"a\", "
+						"\"global\" or \"g\".\n");
+				exit(1);
+			}
 		}
-	} else
-		return;
+		instrument_set = 1;
+	}
+
+	if (instrument_off)
+			return;
 
 	/* If no errors, this block should be executed one time */
 	if (!abfd) {
 		char pgm_name[1024];
 		long symsize;
 
-		if (!stat(ND_FILE_FLAG_GLOBAL, &statbuf))
-			print_only_global = 1;
-
 		ssize_t ret = readlink("/proc/self/exe", pgm_name, sizeof(pgm_name));
 		if (ret == -1) {
-			perror("failed to find executable\n");
+			perror("failed to find executable");
 			return;
 		}
 		if (ret == sizeof(pgm_name)) {
@@ -142,8 +143,8 @@ static void print_debug(void *this_fn, void *call_site, action_type action)
 		symtab = (asymbol **)malloc(symsize);
 		symcount = bfd_canonicalize_symtab(abfd, symtab);
 		if (symcount < 0) {
-			free (symtab);
-			bfd_perror ("bfd_canonicalize_symtab");
+			free(symtab);
+			bfd_perror("bfd_canonicalize_symtab");
 			return;
 		}
 
@@ -154,7 +155,8 @@ static void print_debug(void *this_fn, void *call_site, action_type action)
 		vma = text->vma;
 	}
 
-	if (print_only_global) {
+	if (instrument_global) {
+		symbol_info syminfo;
 		int found;
 
 		i = 0;

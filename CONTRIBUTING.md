@@ -123,7 +123,7 @@ and ask!
   You can configure and build tcpdump with the instrumentation of functions:
   ```
   $ ./configure --enable-instrument-functions
-  $ make -s
+  $ make -s clean all
   ```
 
   This generates instrumentation calls for entry and exit to functions.
@@ -137,19 +137,22 @@ and ask!
   In some cases, with Clang 11, the file number is unknown (printed '??')
   or the line number is unknown (printed '?'). In this case, use GCC.
 
-  To print nothing, like with no instrumentation:
-  ```
-  $ make instrument_off
-  ```
+  If the environment variable INSTRUMENT is
+  - unset or set to an empty string, print nothing, like with no
+    instrumentation
+  - set to "all" or "a", print all the functions names
+  - set to "global" or "g", print only the global functions names
 
-  To configure the printing of only the global functions names:
+  This allows to run:
   ```
-  $ make instrument_global
+  $ INSTRUMENT=a ./tcpdump ...
+  $ INSTRUMENT=g ./tcpdump ...
+  $ INSTRUMENT= ./tcpdump ...
   ```
-
-  To go back to print all the functions names:
+  or
   ```
-  $ make instrument_all
+  $ export INSTRUMENT=global
+  $ ./tcpdump ...
   ```
 
   The library libbfd is used, therefore the binutils-dev package is required.

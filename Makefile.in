@@ -389,18 +389,6 @@ $(PROG): $(OBJ) @V_PCAPDEP@ $(LIBNETDISSECT)
 	@rm -f $@
 	$(CC) $(FULL_CFLAGS) $(LDFLAGS) -o $@ $(OBJ) $(LIBNETDISSECT) $(LIBS)
 
-instrument_all: $(PROG)
-	@rm -f instrument_functions_global.devel
-	@rm -f instrument_functions_off.devel
-
-instrument_global: $(PROG)
-	@touch instrument_functions_global.devel
-	@rm -f instrument_functions_off.devel
-
-instrument_off: $(PROG)
-	@touch instrument_functions_off.devel
-	@rm -f instrument_functions_global.devel
-
 $(LIBNETDISSECT): $(LIBNETDISSECT_OBJ)
 	@rm -f $@
 	$(AR) cr $@ $(LIBNETDISSECT_OBJ)
