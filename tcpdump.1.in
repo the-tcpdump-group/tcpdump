@@ -20,7 +20,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "30 July 2022"
+.TH TCPDUMP 1  "12 March 2023"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -1299,7 +1299,7 @@ The general format of a TCP protocol line is:
 \fISrc\fP and \fIdst\fP are the source and destination IP
 addresses and ports.
 \fITcpflags\fP are some combination of S (SYN),
-F (FIN), P (PUSH), R (RST), U (URG), W (ECN CWR), E (ECN-Echo) or
+F (FIN), P (PSH), R (RST), U (URG), W (CWR), E (ECE) or
 `.' (ACK), or `none' if no flags are set.
 \fIData-seqno\fP describes the portion of sequence space covered
 by the data in this packet (see example below).
@@ -1366,7 +1366,7 @@ feature, causing the original sequence numbers to be output.
 .LP
 On the 6th line, rtsg sends csam 19 bytes of data (bytes 2 through 20
 in the rtsg \(-> csam side of the conversation).
-The PUSH flag is set in the packet.
+The PSH flag is set in the packet.
 On the 7th line, csam says it's received data sent by rtsg up to
 but not including byte 21.
 Most of this data is apparently sitting in the
