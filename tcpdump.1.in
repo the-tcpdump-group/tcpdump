@@ -1105,8 +1105,7 @@ gives a brief description and examples of most of the formats.
 .sp 1.5
 .B
 ..
-.HD
-Timestamps
+.SS Timestamps
 .LP
 By default, all output lines are preceded by a timestamp.
 The timestamp
@@ -1126,8 +1125,7 @@ packet from the network and the time when an interrupt was delivered to
 the kernel to get it to read the packet and a delay between the time
 when the kernel serviced the `new packet' interrupt and the time when it
 applied a time stamp to the packet.
-.HD
-Link Level Headers
+.SS Link Level Headers
 .LP
 If the '-e' option is given, the link level header is printed out.
 On Ethernets, the source and destination addresses, protocol,
@@ -1191,8 +1189,7 @@ data and 6 bytes of compressed header:
 \fBO ctcp * A+6 S+49 I+6 3 (6)\fP
 .fi
 .RE
-.HD
-ARP/RARP Packets
+.SS ARP/RARP Packets
 .LP
 ARP/RARP output shows the type of request and its arguments.
 The
@@ -1235,8 +1232,7 @@ CSAM RTSG 0806  64: arp reply csam is-at CSAM\fR
 For the first packet this says the Ethernet source address is RTSG, the
 destination is the Ethernet broadcast address, the type field
 contained hex 0806 (type ETHER_ARP) and the total length was 64 bytes.
-.HD
-IPv4 Packets
+.SS IPv4 Packets
 .LP
 If the link-layer header is not being printed, for IPv4 packets,
 \fBIP\fP is printed after the time stamp.
@@ -1279,8 +1275,7 @@ protocol header.  Fragmentation information will be printed only with
 the
 .B \-v
 flag, in the IP header information, as described above.
-.HD
-TCP Packets
+.SS TCP Packets
 .LP
 \fI(N.B.:The following description assumes familiarity with
 the TCP protocol described in RFC 793.
@@ -1387,8 +1382,7 @@ If the header
 length indicates options are present but the IP datagram length is not
 long enough for the options to actually be there, \fItcpdump\fP reports
 it as ``[\fIbad hdr length\fP]''.
-.HD
-.B Capturing TCP packets with particular flag combinations (SYN-ACK, URG-ACK, etc.)
+.SS Particular TCP Flag Combinations (SYN-ACK, URG-ACK, etc.)
 .PP
 There are 8 bits in the control bits section of the TCP header:
 .IP
@@ -1590,9 +1584,7 @@ This can be demonstrated as:
 Note that you should use single quotes or a backslash
 in the expression to hide the AND ('&') special character
 from the shell.
-.HD
-.B
-UDP Packets
+.SS UDP Packets
 .LP
 UDP format is illustrated by this rwho packet:
 .RS
@@ -1611,8 +1603,7 @@ Some UDP services are recognized (from the source or destination
 port number) and the higher level protocol information printed.
 In particular, Domain Name service requests (RFC 1034/1035) and Sun
 RPC calls (RFC 1050) to NFS.
-.HD
-TCP or UDP Name Server Requests
+.SS TCP or UDP Name Server Requests
 .LP
 \fI(N.B.:The following description assumes familiarity with
 the Domain Service protocol described in RFC 1035.
@@ -1658,8 +1649,7 @@ is the appropriate count.
 If any of the response bits are set (AA, RA or rcode) or any of the
 `must be zero' bits are set in bytes two and three, `[b2&3=\fIx\fP]'
 is printed, where \fIx\fP is the hex value of header bytes two and three.
-.HD
-TCP or UDP Name Server Responses
+.SS TCP or UDP Name Server Responses
 .LP
 Name server responses are formatted as
 .RS
@@ -1694,8 +1684,7 @@ RA, \fInot\fP set) and `|' (truncated message, TC, set).
 If the
 `question' section doesn't contain exactly one entry, `[\fIn\fPq]'
 is printed.
-.HD
-SMB/CIFS decoding
+.SS SMB/CIFS Decoding
 .LP
 \fItcpdump\fP now includes fairly extensive SMB/CIFS/NBT decoding for data
 on UDP/137, UDP/138 and TCP/139.
@@ -1712,8 +1701,7 @@ For information on SMB packet formats and what all the fields mean see
 \%https://download.samba.org/pub/samba/specs/ and other online resources.
 The SMB patches were written by Andrew Tridgell
 (tridge@samba.org).
-.HD
-NFS Requests and Replies
+.SS NFS Requests and Replies
 .LP
 Sun NFS (Network File System) requests and replies are printed as:
 .RS
@@ -1795,8 +1783,7 @@ Instead,
 replies using the transaction ID.
 If a reply does not closely follow the
 corresponding request, it might not be parsable.
-.HD
-AFS Requests and Replies
+.SS AFS Requests and Replies
 .LP
 Transarc AFS (Andrew File System) requests and replies are printed
 as:
@@ -1860,8 +1847,7 @@ If a reply does not closely
 follow the
 corresponding request, it might not be parsable.
 
-.HD
-KIP AppleTalk (DDP in UDP)
+.SS KIP AppleTalk (DDP in UDP)
 .LP
 AppleTalk DDP packets encapsulated in UDP datagrams are de-encapsulated
 and dumped as DDP packets (i.e., all the UDP header information is
@@ -1925,7 +1911,8 @@ Other protocols just dump
 the protocol name (or number if no name is registered for the
 protocol) and packet size.
 
-\fBNBP packets\fP are formatted like the following examples:
+.SS NBP Packets
+NBP packets are formatted like the following examples:
 .RS
 .nf
 .sp .5
@@ -1945,7 +1932,8 @@ The third line is
 another reply to the same request saying host techpit has laserwriter
 "techpit" registered on port 186.
 
-\fBATP packet\fP formatting is demonstrated by the following example:
+.SS ATP Packets
+ATP packet formatting is demonstrated by the following example:
 .RS
 .nf
 .sp .5
