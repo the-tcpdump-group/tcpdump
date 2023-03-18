@@ -2,6 +2,12 @@
 
 * Autoconf works everywhere.
 
+## OmniOS r151044/AMD64
+
+* Both system and local libpcap are suitable.
+* CMake 3.25.2 works.
+* GCC 12.2.0 and Clang 15.0.7 work.
+
 ## OmniOS r151042/AMD64
 
 * Both system and local libpcap are suitable.
@@ -39,6 +45,12 @@ developer/gcc
 developer/llvm/clang
 ENDOFTEXT
 ```
+
+## Solaris 11.3/(SPARC and AMD64)
+
+* Both system and local libpcap are suitable.
+* CMake 3.14.3 works.
+* Sun C 5.13 and GCC 5.5.0 work.
 
 ## Solaris 9
 
