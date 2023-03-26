@@ -762,7 +762,7 @@ AC_DEFUN(AC_LBL_LIBPCAP,
             # statically linked, and provide only the direct
             # dependencies with --static-pcap-only.
             #
-            if grep -s -q "static-pcap-only" "$PCAP_CONFIG"
+            if grep "static-pcap-only" "$PCAP_CONFIG" >/dev/null 2>&1
             then
                 static_opt="--static-pcap-only"
             else
