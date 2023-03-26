@@ -241,7 +241,7 @@ AC_DEFUN(AC_LBL_CHECK_COMPILER_OPT,
 	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
 	#
 	# This may, as per those two messages, be fixed in autoconf 2.70,
-	# but we only require 2.64 or newer for now.
+	# but we only require 2.69 or newer for now.
 	#
 	AC_COMPILE_IFELSE(
 	    [AC_LANG_SOURCE([[int main(void) { return 0; }]])],
