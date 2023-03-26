@@ -49,6 +49,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
         libc (and document Solaris 9 as unsupported because of that).
       Autoconf: Remove detection of early IPv6 stacks.
       Detect OS IPv6 support using AF_INET6 only.
+      Fix --static-pcap-only test on Solaris 10.
 
 DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
   Summary for 4.99.4 tcpdump release (so far!)
