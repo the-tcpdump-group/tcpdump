@@ -812,6 +812,8 @@ bfd-multihop	bfd-multihop.pcap	bfd-multihop.out
 bfd-multihop-v	bfd-multihop.pcap	bfd-multihop-v.out	-v
 bfd-lag		bfd-lag.pcap		bfd-lag.out
 bfd-lag-v	bfd-lag.pcap		bfd-lag-v.out		-v
+# BFD with source port 49152
+bfd_source_port_49152 bfd_source_port_49152.pcap bfd_source_port_49152.out -v
 
 # Arista Vendor Specific Tests
 arista-ether             arista_ether.pcap        arista_ether.out
