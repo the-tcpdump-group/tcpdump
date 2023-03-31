@@ -622,8 +622,6 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 					(IP_V(ip) == 6) ? 1 : 0);
 		else if (IS_SRC_OR_DST_PORT(MPLS_LSP_PING_PORT))
 			lspping_print(ndo, cp, length);
-		else if (sport == BCM_LI_PORT)
-			bcm_li_print(ndo, cp, length);
 		else if (dport == BFD_CONTROL_PORT ||
 			 dport == BFD_MULTIHOP_PORT ||
 			 dport == BFD_LAG_PORT ||
@@ -675,6 +673,8 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		else if (IS_SRC_OR_DST_PORT(HTTPS_PORT) &&
 			 quic_detect(ndo, cp, length))
 			quic_print(ndo, cp, length);
+		else if (sport == BCM_LI_PORT)
+			bcm_li_print(ndo, cp, length);
 		else {
 			if (ulen > length && !fragmented)
 				ND_PRINT("UDP, bad length %u > %u",
