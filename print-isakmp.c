@@ -385,32 +385,88 @@ struct ikev2_n {
 };
 
 enum ikev2_n_type {
-	IV2_NOTIFY_UNSUPPORTED_CRITICAL_PAYLOAD            = 1,
-	IV2_NOTIFY_INVALID_IKE_SPI                         = 4,
-	IV2_NOTIFY_INVALID_MAJOR_VERSION                   = 5,
-	IV2_NOTIFY_INVALID_SYNTAX                          = 7,
-	IV2_NOTIFY_INVALID_MESSAGE_ID                      = 9,
-	IV2_NOTIFY_INVALID_SPI                             =11,
-	IV2_NOTIFY_NO_PROPOSAL_CHOSEN                      =14,
-	IV2_NOTIFY_INVALID_KE_PAYLOAD                      =17,
-	IV2_NOTIFY_AUTHENTICATION_FAILED                   =24,
-	IV2_NOTIFY_SINGLE_PAIR_REQUIRED                    =34,
-	IV2_NOTIFY_NO_ADDITIONAL_SAS                       =35,
-	IV2_NOTIFY_INTERNAL_ADDRESS_FAILURE                =36,
-	IV2_NOTIFY_FAILED_CP_REQUIRED                      =37,
-	IV2_NOTIFY_INVALID_SELECTORS                       =39,
-	IV2_NOTIFY_INITIAL_CONTACT                         =16384,
-	IV2_NOTIFY_SET_WINDOW_SIZE                         =16385,
-	IV2_NOTIFY_ADDITIONAL_TS_POSSIBLE                  =16386,
-	IV2_NOTIFY_IPCOMP_SUPPORTED                        =16387,
-	IV2_NOTIFY_NAT_DETECTION_SOURCE_IP                 =16388,
-	IV2_NOTIFY_NAT_DETECTION_DESTINATION_IP            =16389,
-	IV2_NOTIFY_COOKIE                                  =16390,
-	IV2_NOTIFY_USE_TRANSPORT_MODE                      =16391,
-	IV2_NOTIFY_HTTP_CERT_LOOKUP_SUPPORTED              =16392,
-	IV2_NOTIFY_REKEY_SA                                =16393,
-	IV2_NOTIFY_ESP_TFC_PADDING_NOT_SUPPORTED           =16394,
-	IV2_NOTIFY_NON_FIRST_FRAGMENTS_ALSO                =16395
+	IV2_NOTIFY_UNSUPPORTED_CRITICAL_PAYLOAD            = 1,    /* [RFC7296] */
+	IV2_NOTIFY_INVALID_IKE_SPI                         = 4,    /* [RFC7296] */
+	IV2_NOTIFY_INVALID_MAJOR_VERSION                   = 5,    /* [RFC7296] */
+	IV2_NOTIFY_INVALID_SYNTAX                          = 7,    /* [RFC7296] */
+	IV2_NOTIFY_INVALID_MESSAGE_ID                      = 9,    /* [RFC7296] */
+	IV2_NOTIFY_INVALID_SPI                             =11,    /* [RFC7296] */
+	IV2_NOTIFY_NO_PROPOSAL_CHOSEN                      =14,    /* [RFC7296] */
+	IV2_NOTIFY_INVALID_KE_PAYLOAD                      =17,    /* [RFC7296] */
+	IV2_NOTIFY_AUTHENTICATION_FAILED                   =24,    /* [RFC7296] */
+	IV2_NOTIFY_SINGLE_PAIR_REQUIRED                    =34,    /* [RFC7296] */
+	IV2_NOTIFY_NO_ADDITIONAL_SAS                       =35,    /* [RFC7296] */
+	IV2_NOTIFY_INTERNAL_ADDRESS_FAILURE                =36,    /* [RFC7296] */
+	IV2_NOTIFY_FAILED_CP_REQUIRED                      =37,    /* [RFC7296] */
+	IV2_NOTIFY_TS_UNACCEPTABLE                         =38,    /* [RFC7296] */
+	IV2_NOTIFY_INVALID_SELECTORS                       =39,    /* [RFC7296] */
+	IV2_NOTIFY_UNACCEPTABLE_ADDRESSES                  =40,    /* [RFC4555] */
+	IV2_NOTIFY_UNEXPECTED_NAT_DETECTED                 =41,    /* [RFC4555] */
+	IV2_NOTIFY_USE_ASSIGNED_HOA                        =42,    /* [RFC5026] */
+	IV2_NOTIFY_TEMPORARY_FAILURE                       =43,    /* [RFC7296] */
+	IV2_NOTIFY_CHILD_SA_NOT_FOUND                      =44,    /* [RFC7296] */
+	IV2_NOTIFY_INVALID_GROUP_ID                        =45,    /* [draft-yeung-g-ikev2] */
+	IV2_NOTIFY_AUTHORIZATION_FAILED                    =46,    /* [draft-yeung-g-ikev2] */
+	IV2_NOTIFY_STATE_NOT_FOUND                         =47,    /* [RFC-ietf-ipsecme-ikev2-multiple-ke-12] */
+	IV2_NOTIFY_INITIAL_CONTACT                         =16384, /* [RFC7296] */
+	IV2_NOTIFY_SET_WINDOW_SIZE                         =16385, /* [RFC7296] */
+	IV2_NOTIFY_ADDITIONAL_TS_POSSIBLE                  =16386, /* [RFC7296] */
+	IV2_NOTIFY_IPCOMP_SUPPORTED                        =16387, /* [RFC7296] */
+	IV2_NOTIFY_NAT_DETECTION_SOURCE_IP                 =16388, /* [RFC7296] */
+	IV2_NOTIFY_NAT_DETECTION_DESTINATION_IP            =16389, /* [RFC7296] */
+	IV2_NOTIFY_COOKIE                                  =16390, /* [RFC7296] */
+	IV2_NOTIFY_USE_TRANSPORT_MODE                      =16391, /* [RFC7296] */
+	IV2_NOTIFY_HTTP_CERT_LOOKUP_SUPPORTED              =16392, /* [RFC7296] */
+	IV2_NOTIFY_REKEY_SA                                =16393, /* [RFC7296] */
+	IV2_NOTIFY_ESP_TFC_PADDING_NOT_SUPPORTED           =16394, /* [RFC7296] */
+	IV2_NOTIFY_NON_FIRST_FRAGMENTS_ALSO                =16395, /* [RFC7296] */
+	IV2_NOTIFY_MOBIKE_SUPPORTED                        =16396, /* [RFC4555] */
+	IV2_NOTIFY_ADDITIONAL_IP4_ADDRESS                  =16397, /* [RFC4555] */
+	IV2_NOTIFY_ADDITIONAL_IP6_ADDRESS                  =16398, /* [RFC4555] */
+	IV2_NOTIFY_NO_ADDITIONAL_ADDRESSES                 =16399, /* [RFC4555] */
+	IV2_NOTIFY_UPDATE_SA_ADDRESSES                     =16400, /* [RFC4555] */
+	IV2_NOTIFY_COOKIE2                                 =16401, /* [RFC4555] */
+	IV2_NOTIFY_NO_NATS_ALLOWED                         =16402, /* [RFC4555] */
+	IV2_NOTIFY_AUTH_LIFETIME                           =16403, /* [RFC4478] */
+	IV2_NOTIFY_MULTIPLE_AUTH_SUPPORTED                 =16404, /* [RFC4739] */
+	IV2_NOTIFY_ANOTHER_AUTH_FOLLOWS                    =16405, /* [RFC4739] */
+	IV2_NOTIFY_REDIRECT_SUPPORTED                      =16406, /* [RFC5685] */
+	IV2_NOTIFY_REDIRECT                                =16407, /* [RFC5685] */
+	IV2_NOTIFY_REDIRECTED_FROM                         =16408, /* [RFC5685] */
+	IV2_NOTIFY_TICKET_LT_OPAQUE                        =16409, /* [RFC5723] */
+	IV2_NOTIFY_TICKET_REQUEST                          =16410, /* [RFC5723] */
+	IV2_NOTIFY_TICKET_ACK                              =16411, /* [RFC5723] */
+	IV2_NOTIFY_TICKET_NACK                             =16412, /* [RFC5723] */
+	IV2_NOTIFY_TICKET_OPAQUE                           =16413, /* [RFC5723] */
+	IV2_NOTIFY_LINK_ID                                 =16414, /* [RFC5739] */
+	IV2_NOTIFY_USE_WESP_MODE                           =16415, /* [RFC5840] */
+	IV2_NOTIFY_ROHC_SUPPORTED                          =16416, /* [RFC5857] */
+	IV2_NOTIFY_EAP_ONLY_AUTHENTICATION                 =16417, /* [RFC5998] */
+	IV2_NOTIFY_CHILDLESS_IKEV2_SUPPORTED               =16418, /* [RFC6023] */
+	IV2_NOTIFY_QUICK_CRASH_DETECTION                   =16419, /* [RFC6290] */
+	IV2_NOTIFY_IKEV2_MESSAGE_ID_SYNC_SUPPORTED         =16420, /* [RFC6311] */
+	IV2_NOTIFY_IPSEC_REPLAY_COUNTER_SYNC_SUPPORTED     =16421, /* [RFC6311] */
+	IV2_NOTIFY_IKEV2_MESSAGE_ID_SYNC                   =16422, /* [RFC6311] */
+	IV2_NOTIFY_IPSEC_REPLAY_COUNTER_SYNC               =16423, /* [RFC6311] */
+	IV2_NOTIFY_SECURE_PASSWORD_METHODS                 =16424, /* [RFC6467] */
+	IV2_NOTIFY_PSK_PERSIST                             =16425, /* [RFC6631] */
+	IV2_NOTIFY_PSK_CONFIRM                             =16426, /* [RFC6631] */
+	IV2_NOTIFY_ERX_SUPPORTED                           =16427, /* [RFC6867] */
+	IV2_NOTIFY_IFOM_CAPABILITY                         =16428, /* [Frederic_Firmin][3GPP TS 24.303 v10.6.0 annex B.2] */
+	IV2_NOTIFY_SENDER_REQUEST_ID                       =16429, /* [draft-yeung-g-ikev2] */
+	IV2_NOTIFY_IKEV2_FRAGMENTATION_SUPPORTED           =16430, /* [RFC7383] */
+	IV2_NOTIFY_SIGNATURE_HASH_ALGORITHMS               =16431, /* [RFC7427] */
+	IV2_NOTIFY_CLONE_IKE_SA_SUPPORTED                  =16432, /* [RFC7791] */
+	IV2_NOTIFY_CLONE_IKE_SA                            =16433, /* [RFC7791] */
+	IV2_NOTIFY_PUZZLE                                  =16434, /* [RFC8019] */
+	IV2_NOTIFY_USE_PPK                                 =16435, /* [RFC8784] */
+	IV2_NOTIFY_PPK_IDENTITY                            =16436, /* [RFC8784] */
+	IV2_NOTIFY_NO_PPK_AUTH                             =16437, /* [RFC8784] */
+	IV2_NOTIFY_INTERMEDIATE_EXCHANGE_SUPPORTED         =16438, /* [RFC9242] */
+	IV2_NOTIFY_IP4_ALLOWED                             =16439, /* [RFC8983] */
+	IV2_NOTIFY_IP6_ALLOWED                             =16440, /* [RFC8983] */
+	IV2_NOTIFY_ADDITIONAL_KEY_EXCHANGE                 =16441, /* [RFC-ietf-ipsecme-ikev2-multiple-ke-12] */
+	IV2_NOTIFY_USE_AGGFRAG                             =16442  /* [RFC9347] */
 };
 
 struct notify_messages {
@@ -2386,7 +2442,7 @@ ikev2_n_print(netdissect_options *ndo, u_char tpay _U_,
 	ND_TCHECK_SIZE(p);
 	ikev2_pay_print(ndo, NPSTR(ISAKMP_NPTYPE_N), GET_U_1(p->h.critical));
 
-	showspi = 1;
+	showspi=0;
 	showsomedata=0;
 	notify_name=NULL;
 
@@ -2398,7 +2454,6 @@ ikev2_n_print(netdissect_options *ndo, u_char tpay _U_,
 	switch(type) {
 	case IV2_NOTIFY_UNSUPPORTED_CRITICAL_PAYLOAD:
 		notify_name = "unsupported_critical_payload";
-		showspi = 0;
 		break;
 
 	case IV2_NOTIFY_INVALID_IKE_SPI:
@@ -2408,7 +2463,6 @@ ikev2_n_print(netdissect_options *ndo, u_char tpay _U_,
 
 	case IV2_NOTIFY_INVALID_MAJOR_VERSION:
 		notify_name = "invalid_major_version";
-		showspi = 0;
 		break;
 
 	case IV2_NOTIFY_INVALID_SYNTAX:
@@ -2427,7 +2481,7 @@ ikev2_n_print(netdissect_options *ndo, u_char tpay _U_,
 		break;
 
 	case IV2_NOTIFY_NO_PROPOSAL_CHOSEN:
-		notify_name = "no_protocol_chosen";
+		notify_name = "no_proposal_chosen";
 		showspi = 1;
 		break;
 
@@ -2448,42 +2502,70 @@ ikev2_n_print(netdissect_options *ndo, u_char tpay _U_,
 
 	case IV2_NOTIFY_NO_ADDITIONAL_SAS:
 		notify_name = "no_additional_sas";
-		showspi = 0;
 		break;
 
 	case IV2_NOTIFY_INTERNAL_ADDRESS_FAILURE:
 		notify_name = "internal_address_failure";
-		showspi = 0;
 		break;
 
 	case IV2_NOTIFY_FAILED_CP_REQUIRED:
-		notify_name = "failed:cp_required";
-		showspi = 0;
+		notify_name = "failed_cp_required";
+		break;
+
+	case IV2_NOTIFY_TS_UNACCEPTABLE:
+		notify_name = "ts_unnacceptable";
 		break;
 
 	case IV2_NOTIFY_INVALID_SELECTORS:
 		notify_name = "invalid_selectors";
-		showspi = 0;
+		break;
+
+	case IV2_NOTIFY_UNACCEPTABLE_ADDRESSES:
+		notify_name = "unacceptable_addresses";
+		break;
+
+	case IV2_NOTIFY_UNEXPECTED_NAT_DETECTED:
+		notify_name = "unexpected_nat_detected";
+		break;
+
+	case IV2_NOTIFY_USE_ASSIGNED_HOA:
+		notify_name = "use_assigned_hoa";
+		break;
+
+	case IV2_NOTIFY_TEMPORARY_FAILURE:
+		notify_name = "temporary_failure";
+		break;
+
+	case IV2_NOTIFY_CHILD_SA_NOT_FOUND:
+		notify_name = "child_sa_not_found";
+		break;
+
+	case IV2_NOTIFY_INVALID_GROUP_ID:
+		notify_name = "invalid_group_id";
+		break;
+
+	case IV2_NOTIFY_AUTHORIZATION_FAILED:
+		notify_name = "authorization_failed";
+		break;
+
+	case IV2_NOTIFY_STATE_NOT_FOUND:
+		notify_name = "state_not_found";
 		break;
 
 	case IV2_NOTIFY_INITIAL_CONTACT:
 		notify_name = "initial_contact";
-		showspi = 0;
 		break;
 
 	case IV2_NOTIFY_SET_WINDOW_SIZE:
 		notify_name = "set_window_size";
-		showspi = 0;
 		break;
 
 	case IV2_NOTIFY_ADDITIONAL_TS_POSSIBLE:
 		notify_name = "additional_ts_possible";
-		showspi = 0;
 		break;
 
 	case IV2_NOTIFY_IPCOMP_SUPPORTED:
 		notify_name = "ipcomp_supported";
-		showspi = 0;
 		break;
 
 	case IV2_NOTIFY_NAT_DETECTION_SOURCE_IP:
@@ -2504,12 +2586,10 @@ ikev2_n_print(netdissect_options *ndo, u_char tpay _U_,
 
 	case IV2_NOTIFY_USE_TRANSPORT_MODE:
 		notify_name = "use_transport_mode";
-		showspi = 0;
 		break;
 
 	case IV2_NOTIFY_HTTP_CERT_LOOKUP_SUPPORTED:
 		notify_name = "http_cert_lookup_supported";
-		showspi = 0;
 		break;
 
 	case IV2_NOTIFY_REKEY_SA:
@@ -2519,15 +2599,202 @@ ikev2_n_print(netdissect_options *ndo, u_char tpay _U_,
 
 	case IV2_NOTIFY_ESP_TFC_PADDING_NOT_SUPPORTED:
 		notify_name = "tfc_padding_not_supported";
-		showspi = 0;
 		break;
 
 	case IV2_NOTIFY_NON_FIRST_FRAGMENTS_ALSO:
 		notify_name = "non_first_fragment_also";
-		showspi = 0;
+		break;
+
+	case IV2_NOTIFY_MOBIKE_SUPPORTED:
+		notify_name = "mobike_supported";
+		break;
+
+	case IV2_NOTIFY_ADDITIONAL_IP4_ADDRESS:
+		notify_name = "additional_ip4_address";
+		break;
+
+	case IV2_NOTIFY_ADDITIONAL_IP6_ADDRESS:
+		notify_name = "additional_ip6_address";
+		break;
+
+	case IV2_NOTIFY_NO_ADDITIONAL_ADDRESSES:
+		notify_name = "no_additional_addresses";
+		break;
+
+	case IV2_NOTIFY_UPDATE_SA_ADDRESSES:
+		notify_name = "update_sa_addresses";
+		break;
+
+	case IV2_NOTIFY_COOKIE2:
+		notify_name = "cookie2";
+		break;
+
+	case IV2_NOTIFY_NO_NATS_ALLOWED:
+		notify_name = "no_nats_allowed";
+		break;
+
+	case IV2_NOTIFY_AUTH_LIFETIME:
+		notify_name = "auth_lifetime";
+		break;
+
+	case IV2_NOTIFY_MULTIPLE_AUTH_SUPPORTED:
+		notify_name = "multiple_auth_supported";
+		break;
+
+	case IV2_NOTIFY_ANOTHER_AUTH_FOLLOWS:
+		notify_name = "another_auth_follows";
+		break;
+
+	case IV2_NOTIFY_REDIRECT_SUPPORTED:
+		notify_name = "redirect_supported";
+		break;
+
+	case IV2_NOTIFY_REDIRECT:
+		notify_name = "redirect";
+		break;
+
+	case IV2_NOTIFY_REDIRECTED_FROM:
+		notify_name = "redirected_from";
+		break;
+
+	case IV2_NOTIFY_TICKET_LT_OPAQUE:
+		notify_name = "ticket_lt_opaque";
+		break;
+
+	case IV2_NOTIFY_TICKET_REQUEST:
+		notify_name = "ticket_request";
+		break;
+
+	case IV2_NOTIFY_TICKET_ACK:
+		notify_name = "ticket_ack";
+		break;
+
+	case IV2_NOTIFY_TICKET_NACK:
+		notify_name = "ticket_nack";
+		break;
+
+	case IV2_NOTIFY_TICKET_OPAQUE:
+		notify_name = "ticket_opaque";
+		break;
+
+	case IV2_NOTIFY_LINK_ID:
+		notify_name = "link_id";
+		break;
+
+	case IV2_NOTIFY_USE_WESP_MODE:
+		notify_name = "use_wesp_mode";
+		break;
+
+	case IV2_NOTIFY_ROHC_SUPPORTED:
+		notify_name = "rohc_supported";
+		break;
+
+	case IV2_NOTIFY_EAP_ONLY_AUTHENTICATION:
+		notify_name = "eap_only_authentication";
+		break;
+
+	case IV2_NOTIFY_CHILDLESS_IKEV2_SUPPORTED:
+		notify_name = "childless_ikev2_supported";
+		break;
+
+	case IV2_NOTIFY_QUICK_CRASH_DETECTION:
+		notify_name = "quick_crash_detection";
+		break;
+
+	case IV2_NOTIFY_IKEV2_MESSAGE_ID_SYNC_SUPPORTED:
+		notify_name = "ikev2_message_id_sync_supported";
+		break;
+
+	case IV2_NOTIFY_IPSEC_REPLAY_COUNTER_SYNC_SUPPORTED:
+		notify_name = "ipsec_replay_counter_sync_supported";
+		break;
+
+	case IV2_NOTIFY_IKEV2_MESSAGE_ID_SYNC:
+		notify_name = "ikev2_message_id_sync";
+		break;
+
+	case IV2_NOTIFY_IPSEC_REPLAY_COUNTER_SYNC:
+		notify_name = "ipsec_replay_counter_sync";
+		break;
+
+	case IV2_NOTIFY_SECURE_PASSWORD_METHODS:
+		notify_name = "secure_password_methods";
+		break;
+
+	case IV2_NOTIFY_PSK_PERSIST:
+		notify_name = "psk_persist";
+		break;
+
+	case IV2_NOTIFY_PSK_CONFIRM:
+		notify_name = "psk_confirm";
+		break;
+
+	case IV2_NOTIFY_ERX_SUPPORTED:
+		notify_name = "erx_supported";
+		break;
+
+	case IV2_NOTIFY_IFOM_CAPABILITY:
+		notify_name = "ifom_capability";
+		break;
+
+	case IV2_NOTIFY_SENDER_REQUEST_ID:
+		notify_name = "sender_request_id";
+		break;
+
+	case IV2_NOTIFY_IKEV2_FRAGMENTATION_SUPPORTED:
+		notify_name = "ikev2_fragmentation_supported";
+		break;
+
+	case IV2_NOTIFY_SIGNATURE_HASH_ALGORITHMS:
+		notify_name = "signature_hash_algorithms";
+		break;
+
+	case IV2_NOTIFY_CLONE_IKE_SA_SUPPORTED:
+		notify_name = "clone_ike_sa_supported";
+		break;
+
+	case IV2_NOTIFY_CLONE_IKE_SA:
+		notify_name = "clone_ike_sa";
+		break;
+
+	case IV2_NOTIFY_PUZZLE:
+		notify_name = "puzzle";
+		break;
+
+	case IV2_NOTIFY_USE_PPK:
+		notify_name = "use_ppk";
+		break;
+
+	case IV2_NOTIFY_PPK_IDENTITY:
+		notify_name = "ppk_identity";
+		break;
+
+	case IV2_NOTIFY_NO_PPK_AUTH:
+		notify_name = "no_ppk_auth";
+		break;
+
+	case IV2_NOTIFY_INTERMEDIATE_EXCHANGE_SUPPORTED:
+		notify_name = "intermediate_exchange_supported";
+		break;
+
+	case IV2_NOTIFY_IP4_ALLOWED:
+		notify_name = "ip4_allowed";
+		break;
+
+	case IV2_NOTIFY_IP6_ALLOWED:
+		notify_name = "ip6_allowed";
+		break;
+
+	case IV2_NOTIFY_ADDITIONAL_KEY_EXCHANGE:
+		notify_name = "additional_key_exchange";
+		break;
+
+	case IV2_NOTIFY_USE_AGGFRAG:
+		notify_name = "use_aggfrag";
 		break;
 
 	default:
+		showspi = 1;
 		if (type < 8192) {
 			notify_name="error";
 		} else if(type < 16384) {
