@@ -1,13 +1,18 @@
 DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
   Summary for 4.99.4 tcpdump release (so far!)
+    Source code:
+      Fix spaces before tabs in indentation.
     Updated printers:
       LSP ping: Fix "Unused value" warnings from Coverity.
       smbutil.c: Fix the strftime buffer size
       DNS: sync resource types with IANA.
       ICMPv6: Update the output to show a RPL DAO field name.
+      Geneve: Fix the Geneve UDP port test.
     Building and testing:
       Require at least autoconf 2.69.
       Don't check for strftime(), as it's in C90 and beyond.
+    Documentation:
+      man: Document TCP flag names better.
 
 Thursday, January 12, 2023 / The Tcpdump Group
   Summary for 4.99.3 tcpdump release
