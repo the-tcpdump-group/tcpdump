@@ -1,5 +1,5 @@
-DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
-  Summary for 4.99.4 tcpdump release (so far!)
+Friday, April 7, 2023 / The Tcpdump Group
+  Summary for 4.99.4 tcpdump release
     Source code:
       Fix spaces before tabs in indentation.
     Updated printers:
