@@ -4,7 +4,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Fix spaces before tabs in indentation.
     Updated printers:
       LSP ping: Fix "Unused value" warnings from Coverity.
-      smbutil.c: Fix the strftime buffer size
+      CVE-2023-1801: Fix an out-of-bounds write in the SMB printer.
       DNS: sync resource types with IANA.
       ICMPv6: Update the output to show a RPL DAO field name.
       Geneve: Fix the Geneve UDP port test.
