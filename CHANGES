@@ -11,6 +11,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
     Building and testing:
       Require at least autoconf 2.69.
       Don't check for strftime(), as it's in C90 and beyond.
+      Update config.{guess,sub}, timestamps 2023-01-01,2023-01-21.
     Documentation:
       man: Document TCP flag names better.
 
