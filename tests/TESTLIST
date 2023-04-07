@@ -901,3 +901,7 @@ quic_handshake			quic_handshake.pcap		quic_handshake.out	-v
 quic_handshake_truncated	quic_handshake_truncated.pcap	quic_handshake_truncated.out	-v
 quic_retry			quic_retry.pcap			quic_retry.out	-v
 gquic				gquic.pcap			gquic.out	-v
+# netlink tests
+netlink-le	netlink-le.pcap	netlink-le.out
+netlink-le-v	netlink-le.pcap	netlink-le-v.out	-v
+netlink-be-v	netlink-be.pcap	netlink-be-v.out	-v

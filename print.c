@@ -178,6 +178,9 @@ static const struct printer printers[] = {
 #ifdef DLT_NETANALYZER_TRANSPARENT
 	{ netanalyzer_transparent_if_print, DLT_NETANALYZER_TRANSPARENT },
 #endif
+#ifdef DLT_NETLINK
+	{ netlink_if_print,	DLT_NETLINK },
+#endif
 #ifdef DLT_NFLOG
 	{ nflog_if_print,	DLT_NFLOG},
 #endif
