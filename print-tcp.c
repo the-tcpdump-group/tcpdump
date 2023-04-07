@@ -778,6 +778,9 @@ tcp_print(netdissect_options *ndo,
         } else if (IS_SRC_OR_DST_PORT(HTTP_PORT) || IS_SRC_OR_DST_PORT(HTTP_PORT_ALT)) {
                 ND_PRINT(": ");
                 http_print(ndo, bp, length);
+        } else if (IS_SRC_OR_DST_PORT(HTTPS_PORT)) {
+                ND_PRINT(": ");
+                tls_print(ndo, bp, length);
         } else if (IS_SRC_OR_DST_PORT(RTSP_PORT) || IS_SRC_OR_DST_PORT(RTSP_PORT_ALT)) {
                 ND_PRINT(": ");
                 rtsp_print(ndo, bp, length);

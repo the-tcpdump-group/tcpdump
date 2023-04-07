@@ -901,3 +901,10 @@ quic_handshake			quic_handshake.pcap		quic_handshake.out	-v
 quic_handshake_truncated	quic_handshake_truncated.pcap	quic_handshake_truncated.out	-v
 quic_retry			quic_retry.pcap			quic_retry.out	-v
 gquic				gquic.pcap			gquic.out	-v
+
+# TLS Tests
+tls-13-https                tls-1.3-https.pcap          tls-1.3-https.out
+tls-13-https-v              tls-1.3-https.pcap          tls-1.3-https-v.out -v
+tls-13-https-vv             tls-1.3-https.pcap          tls-1.3-https-vv.out -vv
+tls-trunc                   tls-trunc.pcap              tls-trunc.out -vv
+tls-10-unencrypted-alert    tls-v1.0-alert.pcap         tls-v1.0-alert.out -vv

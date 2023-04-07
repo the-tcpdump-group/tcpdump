@@ -747,6 +747,7 @@ extern void telnet_print(netdissect_options *, const u_char *, u_int);
 extern void tftp_print(netdissect_options *, const u_char *, u_int);
 extern void timed_print(netdissect_options *, const u_char *);
 extern void tipc_print(netdissect_options *, const u_char *, u_int, u_int);
+extern void tls_print(netdissect_options *, const u_char *, u_int);
 extern u_int token_print(netdissect_options *, const u_char *, u_int, u_int);
 extern void udld_print(netdissect_options *, const u_char *, u_int);
 extern void udp_print(netdissect_options *, const u_char *, u_int, const u_char *, int, u_int);

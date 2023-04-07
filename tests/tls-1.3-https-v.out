@@ -1,0 +1,107 @@
+    1  08:46:29.784434 IP (tos 0x0, ttl 64, id 51353, offset 0, flags [DF], proto TCP (6), length 60)
+    172.16.10.62.42836 > 93.184.216.34.443: Flags [S], cksum 0xfde5 (correct), seq 4032104602, win 64240, options [mss 1460,sackOK,TS val 349023283 ecr 0,nop,wscale 7], length 0
+    2  08:46:30.067408 IP (tos 0x0, ttl 54, id 30546, offset 0, flags [none], proto TCP (6), length 60)
+    93.184.216.34.443 > 172.16.10.62.42836: Flags [S.], cksum 0xf796 (correct), seq 1112285027, ack 4032104603, win 65535, options [mss 1460,sackOK,TS val 2452491599 ecr 349023283,nop,wscale 9], length 0
+    3  08:46:30.067546 IP (tos 0x0, ttl 64, id 51354, offset 0, flags [DF], proto TCP (6), length 52)
+    172.16.10.62.42836 > 93.184.216.34.443: Flags [.], cksum 0x2354 (correct), ack 1, win 502, options [nop,nop,TS val 349023566 ecr 2452491599], length 0
+    4  08:46:30.078638 IP (tos 0x0, ttl 64, id 51355, offset 0, flags [DF], proto TCP (6), length 569)
+    172.16.10.62.42836 > 93.184.216.34.443: Flags [P.], cksum 0xb803 (correct), seq 1:518, ack 1, win 502, options [nop,nop,TS val 349023577 ecr 2452491599], length 517: TLS
+	Handshake TLSv1.0, length: 512
+	    ClientHello client version: TLSv1.2 random: 0xf32bab8e...94c2e6f4, session id: 0x33a54bb5...33e5a0da, 36 cipher suites, name: example.com [h2,http/1.1], versions: TLSv1.3,TLSv1.2
+    5  08:46:30.272139 IP (tos 0x0, ttl 54, id 30570, offset 0, flags [none], proto TCP (6), length 52)
+    93.184.216.34.443 > 172.16.10.62.42836: Flags [.], cksum 0x2197 (correct), ack 518, win 131, options [nop,nop,TS val 2452491887 ecr 349023577], length 0
+    6  08:46:30.272202 IP (tos 0x0, ttl 54, id 30571, offset 0, flags [none], proto TCP (6), length 151)
+    93.184.216.34.443 > 172.16.10.62.42836: Flags [P.], cksum 0x3f2e (correct), seq 1:100, ack 518, win 131, options [nop,nop,TS val 2452491887 ecr 349023577], length 99: TLS
+	Handshake TLSv1.2, length: 88
+	    ServerHello server version: TLSv1.2 random: 0xcf21ad74...c8a8339c, session id: 0x33a54bb5...33e5a0da, cipher TLS_AES_256_GCM_SHA384, version: TLSv1.3
+	ChangeCipherSpec TLSv1.2, length: 1
+    7  08:46:30.272271 IP (tos 0x0, ttl 64, id 51356, offset 0, flags [DF], proto TCP (6), length 52)
+    172.16.10.62.42836 > 93.184.216.34.443: Flags [.], cksum 0x1eff (correct), ack 100, win 502, options [nop,nop,TS val 349023771 ecr 2452491887], length 0
+    8  08:46:30.272922 IP (tos 0x0, ttl 64, id 51357, offset 0, flags [DF], proto TCP (6), length 575)
+    172.16.10.62.42836 > 93.184.216.34.443: Flags [P.], cksum 0x601a (correct), seq 518:1041, ack 100, win 502, options [nop,nop,TS val 349023772 ecr 2452491887], length 523: TLS
+	ChangeCipherSpec TLSv1.2, length: 1
+	Handshake TLSv1.2, length: 512
+	    ClientHello client version: TLSv1.2 random: 0xf32bab8e...94c2e6f4, session id: 0x33a54bb5...33e5a0da, 36 cipher suites, name: example.com [h2,http/1.1], versions: TLSv1.3,TLSv1.2
+    9  08:46:30.477422 IP (tos 0x0, ttl 54, id 30618, offset 0, flags [none], proto TCP (6), length 52)
+    93.184.216.34.443 > 172.16.10.62.42836: Flags [.], cksum 0x1da0 (correct), ack 1041, win 133, options [nop,nop,TS val 2452492083 ecr 349023772], length 0
+   10  08:46:30.477486 IP (tos 0x0, ttl 54, id 30619, offset 0, flags [none], proto TCP (6), length 52)
+    93.184.216.34.443 > 172.16.10.62.42836: Flags [.], cksum 0x1da0 (correct), ack 1041, win 133, options [nop,nop,TS val 2452492083 ecr 349023772], length 0
+   11  08:46:30.477497 IP (tos 0x0, ttl 54, id 30620, offset 0, flags [none], proto TCP (6), length 2948)
+    93.184.216.34.443 > 172.16.10.62.42836: Flags [P.], cksum 0x707b (correct), seq 100:2996, ack 1041, win 133, options [nop,nop,TS val 2452492084 ecr 349023772], length 2896: TLS
+	Handshake TLSv1.2, length: 155
+	    ServerHello server version: TLSv1.2 random: 0xb46c4b7c...15efc18f, session id: 0x33a54bb5...33e5a0da, cipher TLS_AES_256_GCM_SHA384, version: TLSv1.3
+	ApplicationData TLSv1.2, length: 32
+	ApplicationData TLSv1.2, length: 3120
+   12  08:46:30.477525 IP (tos 0x0, ttl 64, id 51358, offset 0, flags [DF], proto TCP (6), length 52)
+    172.16.10.62.42836 > 93.184.216.34.443: Flags [.], cksum 0x1028 (correct), ack 2996, win 480, options [nop,nop,TS val 349023976 ecr 2452492084], length 0
+   13  08:46:30.477582 IP (tos 0x0, ttl 54, id 30622, offset 0, flags [none], proto TCP (6), length 838)
+    93.184.216.34.443 > 172.16.10.62.42836: Flags [P.], cksum 0x174a (correct), seq 2996:3782, ack 1041, win 133, options [nop,nop,TS val 2452492084 ecr 349023772], length 786: TLS
+	TLS Fragment or unknown record type(231)
+   14  08:46:30.477611 IP (tos 0x0, ttl 64, id 51359, offset 0, flags [DF], proto TCP (6), length 52)
+    172.16.10.62.42836 > 93.184.216.34.443: Flags [.], cksum 0x0d1c (correct), ack 3782, win 474, options [nop,nop,TS val 349023976 ecr 2452492084], length 0
+   15  08:46:30.480046 IP (tos 0x0, ttl 64, id 51360, offset 0, flags [DF], proto TCP (6), length 126)
+    172.16.10.62.42836 > 93.184.216.34.443: Flags [P.], cksum 0xab78 (correct), seq 1041:1115, ack 3782, win 501, options [nop,nop,TS val 349023979 ecr 2452492084], length 74: TLS
+	ApplicationData TLSv1.2, length: 69
+   16  08:46:30.480350 IP (tos 0x0, ttl 64, id 51361, offset 0, flags [DF], proto TCP (6), length 147)
+    172.16.10.62.42836 > 93.184.216.34.443: Flags [P.], cksum 0x7cda (correct), seq 1115:1210, ack 3782, win 501, options [nop,nop,TS val 349023979 ecr 2452492084], length 95: TLS
+	ApplicationData TLSv1.2, length: 41
+	ApplicationData TLSv1.2, length: 44
+   17  08:46:30.480450 IP (tos 0x0, ttl 64, id 51362, offset 0, flags [DF], proto TCP (6), length 87)
+    172.16.10.62.42836 > 93.184.216.34.443: Flags [P.], cksum 0xdd52 (correct), seq 1210:1245, ack 3782, win 501, options [nop,nop,TS val 349023979 ecr 2452492084], length 35: TLS
+	ApplicationData TLSv1.2, length: 30
+   18  08:46:30.480775 IP (tos 0x0, ttl 64, id 51363, offset 0, flags [DF], proto TCP (6), length 111)
+    172.16.10.62.42836 > 93.184.216.34.443: Flags [P.], cksum 0xf6ed (correct), seq 1245:1304, ack 3782, win 501, options [nop,nop,TS val 349023979 ecr 2452492084], length 59: TLS
+	ApplicationData TLSv1.2, length: 54
+   19  08:46:30.681894 IP (tos 0x0, ttl 54, id 30658, offset 0, flags [none], proto TCP (6), length 52)
+    93.184.216.34.443 > 172.16.10.62.42836: Flags [.], cksum 0x0d55 (correct), ack 1115, win 133, options [nop,nop,TS val 2452492291 ecr 349023979], length 0
+   20  08:46:30.681957 IP (tos 0x0, ttl 54, id 30659, offset 0, flags [none], proto TCP (6), length 52)
+    93.184.216.34.443 > 172.16.10.62.42836: Flags [.], cksum 0x0cf6 (correct), ack 1210, win 133, options [nop,nop,TS val 2452492291 ecr 349023979], length 0
+   21  08:46:30.681968 IP (tos 0x0, ttl 54, id 30660, offset 0, flags [none], proto TCP (6), length 52)
+    93.184.216.34.443 > 172.16.10.62.42836: Flags [.], cksum 0x0cd3 (correct), ack 1245, win 133, options [nop,nop,TS val 2452492291 ecr 349023979], length 0
+   22  08:46:30.681976 IP (tos 0x0, ttl 54, id 30661, offset 0, flags [none], proto TCP (6), length 52)
+    93.184.216.34.443 > 172.16.10.62.42836: Flags [.], cksum 0x0c98 (correct), ack 1304, win 133, options [nop,nop,TS val 2452492291 ecr 349023979], length 0
+   23  08:46:30.681985 IP (tos 0x0, ttl 54, id 30662, offset 0, flags [none], proto TCP (6), length 307)
+    93.184.216.34.443 > 172.16.10.62.42836: Flags [P.], cksum 0x86cc (correct), seq 3782:4037, ack 1304, win 133, options [nop,nop,TS val 2452492291 ecr 349023979], length 255: TLS
+	ApplicationData TLSv1.2, length: 250
+   24  08:46:30.682014 IP (tos 0x0, ttl 64, id 51364, offset 0, flags [DF], proto TCP (6), length 52)
+    172.16.10.62.42836 > 93.184.216.34.443: Flags [.], cksum 0x0960 (correct), ack 4037, win 500, options [nop,nop,TS val 349024181 ecr 2452492291], length 0
+   25  08:46:30.682072 IP (tos 0x0, ttl 54, id 30663, offset 0, flags [none], proto TCP (6), length 307)
+    93.184.216.34.443 > 172.16.10.62.42836: Flags [P.], cksum 0x8399 (correct), seq 4037:4292, ack 1304, win 133, options [nop,nop,TS val 2452492291 ecr 349023979], length 255: TLS
+	ApplicationData TLSv1.2, length: 250
+   26  08:46:30.682095 IP (tos 0x0, ttl 64, id 51365, offset 0, flags [DF], proto TCP (6), length 52)
+    172.16.10.62.42836 > 93.184.216.34.443: Flags [.], cksum 0x0862 (correct), ack 4292, win 499, options [nop,nop,TS val 349024181 ecr 2452492291], length 0
+   27  08:46:30.682109 IP (tos 0x0, ttl 54, id 30664, offset 0, flags [none], proto TCP (6), length 179)
+    93.184.216.34.443 > 172.16.10.62.42836: Flags [P.], cksum 0x79ee (correct), seq 4292:4419, ack 1304, win 133, options [nop,nop,TS val 2452492291 ecr 349023979], length 127: TLS
+	ApplicationData TLSv1.2, length: 56
+	ApplicationData TLSv1.2, length: 26
+	ApplicationData TLSv1.2, length: 30
+   28  08:46:30.682128 IP (tos 0x0, ttl 64, id 51366, offset 0, flags [DF], proto TCP (6), length 52)
+    172.16.10.62.42836 > 93.184.216.34.443: Flags [.], cksum 0x07e3 (correct), ack 4419, win 499, options [nop,nop,TS val 349024181 ecr 2452492291], length 0
+   29  08:46:30.682139 IP (tos 0x0, ttl 54, id 30665, offset 0, flags [none], proto TCP (6), length 1567)
+    93.184.216.34.443 > 172.16.10.62.42836: Flags [P.], cksum 0x91ad (correct), seq 4419:5934, ack 1304, win 133, options [nop,nop,TS val 2452492291 ecr 349023979], length 1515: TLS
+	ApplicationData TLSv1.2, length: 201
+	ApplicationData TLSv1.2, length: 26
+	ApplicationData TLSv1.2, length: 1273
+   30  08:46:30.682156 IP (tos 0x0, ttl 64, id 51367, offset 0, flags [DF], proto TCP (6), length 52)
+    172.16.10.62.42836 > 93.184.216.34.443: Flags [.], cksum 0x0203 (correct), ack 5934, win 488, options [nop,nop,TS val 349024181 ecr 2452492291], length 0
+   31  08:46:30.682608 IP (tos 0x0, ttl 64, id 51368, offset 0, flags [DF], proto TCP (6), length 83)
+    172.16.10.62.42836 > 93.184.216.34.443: Flags [P.], cksum 0xb77e (correct), seq 1304:1335, ack 5934, win 488, options [nop,nop,TS val 349024181 ecr 2452492291], length 31: TLS
+	ApplicationData TLSv1.2, length: 26
+   32  08:46:30.683272 IP (tos 0x0, ttl 64, id 51369, offset 0, flags [DF], proto TCP (6), length 76)
+    172.16.10.62.42836 > 93.184.216.34.443: Flags [P.], cksum 0x3d21 (correct), seq 1335:1359, ack 5934, win 501, options [nop,nop,TS val 349024182 ecr 2452492291], length 24: TLS
+	ApplicationData TLSv1.2, length: 19
+   33  08:46:30.685033 IP (tos 0x0, ttl 64, id 51370, offset 0, flags [DF], proto TCP (6), length 52)
+    172.16.10.62.42836 > 93.184.216.34.443: Flags [F.], cksum 0x01bb (correct), seq 1359, ack 5934, win 501, options [nop,nop,TS val 349024184 ecr 2452492291], length 0
+   34  08:46:30.886272 IP (tos 0x0, ttl 54, id 30713, offset 0, flags [none], proto TCP (6), length 64)
+    93.184.216.34.443 > 172.16.10.62.42836: Flags [.], cksum 0xcfe1 (correct), ack 1335, win 133, options [nop,nop,TS val 2452492498 ecr 349024181,nop,nop,sack 1 {1359:1360}], length 0
+   35  08:46:30.886345 IP (tos 0x0, ttl 54, id 30714, offset 0, flags [none], proto TCP (6), length 52)
+    93.184.216.34.443 > 172.16.10.62.42836: Flags [.], cksum 0x025e (correct), ack 1360, win 133, options [nop,nop,TS val 2452492498 ecr 349024182], length 0
+   36  08:46:30.886407 IP (tos 0x0, ttl 54, id 30715, offset 0, flags [none], proto TCP (6), length 76)
+    93.184.216.34.443 > 172.16.10.62.42836: Flags [P.], cksum 0xfa6b (correct), seq 5934:5958, ack 1360, win 133, options [nop,nop,TS val 2452492498 ecr 349024182], length 24: TLS
+	ApplicationData TLSv1.2, length: 19
+   37  08:46:30.886452 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
+    172.16.10.62.42836 > 93.184.216.34.443: Flags [R], cksum 0x1c68 (correct), seq 4032105962, win 0, length 0
+   38  08:46:30.886494 IP (tos 0x0, ttl 54, id 30716, offset 0, flags [none], proto TCP (6), length 52)
+    93.184.216.34.443 > 172.16.10.62.42836: Flags [F.], cksum 0x0245 (correct), seq 5958, ack 1360, win 133, options [nop,nop,TS val 2452492498 ecr 349024182], length 0
+   39  08:46:30.886512 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
+    172.16.10.62.42836 > 93.184.216.34.443: Flags [R], cksum 0x1c68 (correct), seq 4032105962, win 0, length 0
