@@ -242,13 +242,13 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 		 *
 		 * This may either just mean "IPv4" or it may mean
 		 * "IPv4 preceded by a WCCP redirect header".  We
-		 * check to seeif the first octet looks like the
+		 * check to see if the first octet looks like the
 		 * beginning of an IPv4 header and, if not, dissect
 		 * it "IPv4 preceded by a WCCP redirect header",
 		 * otherwise we dissect it as just IPv4.
 		 *
 		 * See "Packet redirection" in draft-forster-wrec-wccp-v1-00,
-		 * scetion 4.12 "Traffic Forwarding" in
+		 * section 4.12 "Traffic Forwarding" in
 		 * draft-wilson-wrec-wccp-v2-01, and section 3.12.1
 		 * "Forwarding using GRE Encapsulation" in
 		 * draft-param-wccp-v2rev1-01.
@@ -281,7 +281,6 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 			printf(": ");
 		}
 		/* FALLTHROUGH */
-		break;
 	case ETHERTYPE_IP:
 		ip_print(ndo, bp, len);
 		break;
