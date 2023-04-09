@@ -30,7 +30,18 @@
 
 /*
  * netdissect printer for GRE - Generic Routing Encapsulation
- * RFC1701 (GRE), RFC1702 (GRE IPv4), and RFC2637 (Enhanced GRE)
+ * RFC 1701 (GRE), RFC 1702 (GRE IPv4), RFC 2637 (PPTP, which
+ * has an extended form of GRE), RFC 2784 (revised GRE, with
+ * R, K, S, and s bits and Recur and Offset fields now reserved
+ * in the header, and no optional Key or Sequence number in the
+ * header), and RFC 2890 (proposal to add back the K and S bits
+ * and the optional Key and Sequence number).
+ *
+ * The RFC 2637 PPTP GRE repurposes the Key field to hold a
+ * 16-bit Payload Length and a 16-bit Call ID.
+ *
+ * RFC 7637 (NVGRE) repurposes the Key field to hold a 24-bit
+ * Virtual Subnet ID (VSID) and an 8-bit FlowID.
  */
 
 #ifdef HAVE_CONFIG_H
@@ -141,10 +152,21 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 	}
 
 	if (flags & GRE_KP) {
+		uint32_t key;
+
 		ND_ICHECK_U(len, <, 4);
-		ND_PRINT(", key=0x%x", GET_BE_U_4(bp));
+		key = GET_BE_U_4(bp);
 		bp += 4;
 		len -= 4;
+
+		/*
+		 * OpenBSD shows this as both a 32-bit
+		 * (decimal) key value and a VSID+FlowID
+		 * pair, with the VSID in decimal and
+		 * the FlowID in hex, as key=<Key>|<VSID>+<FlowID>,
+		 * in case this is NVGRE.
+		 */
+		ND_PRINT(", key=0x%x", key);
 	}
 
 	if (flags & GRE_SP) {
