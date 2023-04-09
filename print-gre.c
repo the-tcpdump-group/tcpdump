@@ -289,6 +289,7 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 		ip6_print(ndo, bp, len);
 		break;
 	case ETHERTYPE_MPLS:
+	case ETHERTYPE_MPLS_MULTI:
 		mpls_print(ndo, bp, len);
 		break;
 	case ETHERTYPE_IPX:
