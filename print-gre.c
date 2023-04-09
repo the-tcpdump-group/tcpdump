@@ -81,6 +81,21 @@ static const struct tok gre_flag_values[] = {
 #define	GRESRE_IP	0x0800		/* IP */
 #define	GRESRE_ASN	0xfffe		/* ASN */
 
+/*
+ * Ethertype values used for GRE (but not elsewhere?).
+ */
+#define GRE_WCCP		0x883e	/* Web Cache C* Protocol */
+
+struct wccp_redirect {
+	nd_uint8_t	flags;
+#define WCCP_T			(1 << 7)
+#define WCCP_A			(1 << 6)
+#define WCCP_U			(1 << 5)
+	nd_uint8_t	ServiceId;
+	nd_uint8_t	AltBucket;
+	nd_uint8_t	PriBucket;
+};
+
 static void gre_print_0(netdissect_options *, const u_char *, u_int);
 static void gre_print_1(netdissect_options *, const u_char *, u_int);
 static int gre_sre_print(netdissect_options *, uint16_t, uint8_t, uint8_t, const u_char *, u_int);
@@ -220,6 +235,52 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 		 * https://www.cisco.com/c/en/us/support/docs/ip/generic-routing-encapsulation-gre/118370-technote-gre-00.html#anc1
 		 */
 		printf("keep-alive");
+		break;
+	case GRE_WCCP:
+		/*
+		 * This is a bit weird.
+		 *
+		 * This may either just mean "IPv4" or it may mean
+		 * "IPv4 preceded by a WCCP redirect header".  We
+		 * check to seeif the first octet looks like the
+		 * beginning of an IPv4 header and, if not, dissect
+		 * it "IPv4 preceded by a WCCP redirect header",
+		 * otherwise we dissect it as just IPv4.
+		 *
+		 * See "Packet redirection" in draft-forster-wrec-wccp-v1-00,
+		 * scetion 4.12 "Traffic Forwarding" in
+		 * draft-wilson-wrec-wccp-v2-01, and section 3.12.1
+		 * "Forwarding using GRE Encapsulation" in
+		 * draft-param-wccp-v2rev1-01.
+		 */
+		ND_PRINT("wccp ");
+
+		ND_ICHECK_U(len, <, 1);
+		if (GET_U_1(bp) >> 4 != 4) {
+			/*
+			 * First octet isn't 0x4*, so it's not IPv4.
+			 */
+			const struct wccp_redirect *wccp;
+			uint8_t wccp_flags;
+
+			ND_ICHECK_ZU(len, <, sizeof(*wccp));
+			wccp = (const struct wccp_redirect *)bp;
+			wccp_flags = GET_U_1(wccp->flags);
+
+			ND_PRINT("T:%c A:%c U:%c SId:%u Alt:%u Pri:%u",
+			    (wccp_flags & WCCP_T) ? '1' : '0',
+			    (wccp_flags & WCCP_A) ? '1' : '0',
+			    (wccp_flags & WCCP_U) ? '1' : '0',
+			    GET_U_1(wccp->ServiceId),
+			    GET_U_1(wccp->AltBucket),
+			    GET_U_1(wccp->PriBucket));
+
+			bp += sizeof(*wccp);
+			len -= sizeof(*wccp);
+
+			printf(": ");
+		}
+		/* FALLTHROUGH */
 		break;
 	case ETHERTYPE_IP:
 		ip_print(ndo, bp, len);
