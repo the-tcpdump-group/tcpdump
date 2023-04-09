@@ -213,6 +213,14 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 		ND_PRINT("\n\t"); /* if verbose go multiline */
 
 	switch (prot) {
+	case 0x0000:
+		/*
+		 * 0x0000 is reserved, but Cisco, at least, appears to
+		 * use it for keep-alives; see, for example,
+		 * https://www.cisco.com/c/en/us/support/docs/ip/generic-routing-encapsulation-gre/118370-technote-gre-00.html#anc1
+		 */
+		printf("keep-alive");
+		break;
 	case ETHERTYPE_IP:
 		ip_print(ndo, bp, len);
 		break;
