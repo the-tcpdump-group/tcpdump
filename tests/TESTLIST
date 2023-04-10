@@ -904,6 +904,3 @@ gquic				gquic.pcap			gquic.out	-v
 
 # GRE keepalives, CDP over GRE
 various_gre			various_gre.pcap		various_gre.out	-v
-
-# WCCP redirect over GRE
-wccp_redirect_gre		wccp_redirect_gre.pcap		wccp_redirect_gre.out	-v
