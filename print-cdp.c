@@ -309,7 +309,7 @@ cdp_print(netdissect_options *ndo,
 			}
 		}
 
-		if (!covered) {
+		if (ndo->ndo_vflag && !covered) {
 			ND_TCHECK_LEN(tptr, len);
 			print_unknown_data(ndo, tptr, "\n\t  ", len);
 		}
