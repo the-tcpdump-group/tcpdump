@@ -140,7 +140,21 @@
 	root-id 84bd.aa:bb:cc:00:03:00, root-pathcost 0
    49  09:45:19.766290 IP (tos 0x0, ttl 255, id 152, offset 0, flags [none], proto GRE (47), length 381)
     10.172.64.6 > 10.172.64.7: GREv0, Flags [key present], key=0x28, length 361
-	gre-proto-0x2000
+	CDPv2, ttl: 180s, checksum: 0xa82e (unverified), length 353
+	Device-ID (0x01), value length: 2 bytes: 'R1'
+	Version String (0x05), value length: 257 bytes: 
+	  Cisco IOS Software, Linux Software (I86BI_LINUX-ADVENTERPRISEK9-M), Version 15.5(3)S2, DEVELOPMENT TEST SOFTWARE
+	  Technical Support: http://www.cisco.com/techsupport
+	  Copyright (c) 1986-2016 by Cisco Systems, Inc.
+	  Compiled Mon 08-Feb-16 20:48 by prod_rel_team
+	Platform (0x06), value length: 10 bytes: 'Linux Unix'
+	Address (0x02), value length: 13 bytes: IPv4 (1) 172.17.1.54
+	Port-ID (0x03), value length: 8 bytes: 'Tunnel40'
+	Capability (0x04), value length: 4 bytes: (0x00000001): Router
+	Prefixes (0x07), value length: 5 bytes:  IPv4 Prefixes (1): 10.172.64.6/31
+	Management Addresses (0x16), value length: 13 bytes: IPv4 (1) 172.17.1.54
+	unknown field type (0x1b), value length: 1 byte: 
+	  0x0000:  00
    50  09:45:20.096783 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 35
 	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
 	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
@@ -182,7 +196,21 @@
 	Neighbor (0x0004) TLV, length 10, aa:bb:cc:00:03:10
    63  09:45:27.181709 IP (tos 0x0, ttl 255, id 172, offset 0, flags [none], proto GRE (47), length 381)
     10.172.64.7 > 10.172.64.6: GREv0, Flags [key present], key=0x28, length 361
-	gre-proto-0x2000
+	CDPv2, ttl: 180s, checksum: 0xa82b (unverified), length 353
+	Device-ID (0x01), value length: 2 bytes: 'R2'
+	Version String (0x05), value length: 257 bytes: 
+	  Cisco IOS Software, Linux Software (I86BI_LINUX-ADVENTERPRISEK9-M), Version 15.5(3)S2, DEVELOPMENT TEST SOFTWARE
+	  Technical Support: http://www.cisco.com/techsupport
+	  Copyright (c) 1986-2016 by Cisco Systems, Inc.
+	  Compiled Mon 08-Feb-16 20:48 by prod_rel_team
+	Platform (0x06), value length: 10 bytes: 'Linux Unix'
+	Address (0x02), value length: 13 bytes: IPv4 (1) 172.17.1.55
+	Port-ID (0x03), value length: 8 bytes: 'Tunnel40'
+	Capability (0x04), value length: 4 bytes: (0x00000001): Router
+	Prefixes (0x07), value length: 5 bytes:  IPv4 Prefixes (1): 10.172.64.6/31
+	Management Addresses (0x16), value length: 13 bytes: IPv4 (1) 172.17.1.55
+	unknown field type (0x1b), value length: 1 byte: 
+	  0x0000:  00
    64  09:45:27.478420 IP (tos 0xc0, ttl 255, id 174, offset 0, flags [none], proto GRE (47), length 64)
     10.172.64.7 > 10.172.64.6: GREv0, Flags [key present], key=0x28, length 44
 	gre-proto-0x8909

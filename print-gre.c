@@ -84,6 +84,7 @@ static const struct tok gre_flag_values[] = {
 /*
  * Ethertype values used for GRE (but not elsewhere?).
  */
+#define GRE_CDP			0x2000	/* Cisco Discovery Protocol */
 #define GRE_WCCP		0x883e	/* Web Cache C* Protocol */
 
 struct wccp_redirect {
@@ -305,6 +306,9 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 		break;
 	case ETHERTYPE_NSH:
 		nsh_print(ndo, bp, len);
+		break;
+	case GRE_CDP:
+		cdp_print(ndo, bp, len);
 		break;
 	default:
 		ND_PRINT("gre-proto-0x%x", prot);
