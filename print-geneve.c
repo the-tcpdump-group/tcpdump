@@ -196,7 +196,8 @@ geneve_opts_print(netdissect_options *ndo, const u_char *bp, u_int len)
                 ND_PRINT(" %08x", GET_BE_U_4(data));
                 data++;
             }
-        }
+        } else
+            ND_TCHECK_LEN(bp, opt_len);
 
         bp += opt_len;
         len -= opt_len;
