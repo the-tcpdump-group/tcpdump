@@ -297,7 +297,7 @@ cdp_print(netdissect_options *ndo,
 		    (info ? (info->when_to_print == VERBOSE_OR_NOT_VERBOSE) : 0);
 		if (len < CDP_TLV_HEADER_LEN) {
 			if (ndo->ndo_vflag)
-				ND_PRINT("\n\t%s (0x%02x), TLV length: %u byte%s (too short)",
+				ND_PRINT("\n\t%s (0x%04x), TLV length: %u byte%s (too short)",
 				         name, type, len, PLURAL_SUFFIX(len));
 			else
 				ND_PRINT(", %s TLV length %u too short",
@@ -314,7 +314,7 @@ cdp_print(netdissect_options *ndo,
 
 		if (ndo->ndo_vflag) {
 			/* Print all TLVs when in verbose mode */
-			ND_PRINT("\n\t%s (0x%02x), value length: %u byte%s: ",
+			ND_PRINT("\n\t%s (0x%04x), value length: %u byte%s: ",
 			         name, type, len, PLURAL_SUFFIX(len));
 		} else {
 			/* Print only some TLVs when not in verbose mode */
