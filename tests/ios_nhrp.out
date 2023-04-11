@@ -1,0 +1,3 @@
+    1  17:40:27.474286 IP (tos 0xc0, ttl 255, id 8, offset 0, flags [none], proto GRE (47), length 105)
+    10.0.12.2 > 10.0.12.1: GREv0, Flags [none], length 85
+	NHRP: reg request, id 5, hopcnt 255, src nbma 10.0.12.2, 192.168.0.2 -> 192.168.0.1 (code 0, pl 255, mtu 1514, htime 30, pref 0)

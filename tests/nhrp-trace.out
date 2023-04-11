@@ -1,0 +1,12 @@
+    1  07:11:37.354029 IP (tos 0xc0, ttl 255, id 22, offset 0, flags [none], proto GRE (47), length 126)
+    192.168.200.1 > 192.168.200.3: GREv0, Flags [key present], key=0x3e8, length 106
+	NHRP: unknown-op-type-0008, hopcnt 255, src nbma 192.168.200.1, 10.255.255.1 -> 10.255.255.3
+    2  07:11:37.366110 IP (tos 0xc0, ttl 255, id 14, offset 0, flags [none], proto GRE (47), length 114)
+    192.168.200.3 > 192.168.200.1: GREv0, Flags [key present], key=0x3e8, length 94
+	NHRP: res request, id 5, hopcnt 255, src nbma 192.168.200.3, 10.255.255.3 -> 10.255.255.2 (code 0, pl 0, mtu 1514, htime 7200, pref 0)
+    3  07:11:37.378373 IP (tos 0xc0, ttl 255, id 24, offset 0, flags [none], proto GRE (47), length 134)
+    192.168.200.1 > 192.168.200.2: GREv0, Flags [key present], key=0x3e8, length 114
+	NHRP: res request, id 5, hopcnt 254, src nbma 192.168.200.3, 10.255.255.3 -> 10.255.255.2 (code 0, pl 0, mtu 1514, htime 7200, pref 0)
+    4  07:11:37.385926 IP (tos 0xc0, ttl 255, id 20, offset 0, flags [none], proto GRE (47), length 162)
+    192.168.200.2 > 192.168.200.3: GREv0, Flags [key present], key=0x3e8, length 142
+	NHRP: res reply, id 5, hopcnt 255, src nbma 192.168.200.3, 10.255.255.3 -> 10.255.255.2 (code 0, pl 32, mtu 1514, htime 7200, pref 0, nbma 192.168.200.2, proto 10.255.255.2)

@@ -1,0 +1,12 @@
+    1  08:21:45.190210 IP (tos 0xc0, ttl 255, id 16, offset 0, flags [none], proto GRE (47), length 136)
+    169.254.100.1 > 169.254.100.5: GREv0, Flags [key present], key=0x2, length 116
+	NHRP: reg request, id 1, hopcnt 255, src nbma 169.254.100.1, 155.1.0.1 -> 155.1.0.5 (code 0, pl 32, mtu 17912, htime 7200, pref 0)
+    2  08:21:45.192105 IP (tos 0xc0, ttl 255, id 16, offset 0, flags [none], proto GRE (47), length 156)
+    169.254.100.5 > 169.254.100.1: GREv0, Flags [key present], key=0x2, length 136
+	NHRP: reg reply, id 1, hopcnt 255, src nbma 169.254.100.1, 155.1.0.1 -> 155.1.0.5 (code 0, pl 32, mtu 17912, htime 7200, pref 0)
+    3  08:21:46.188858 IP (tos 0xc0, ttl 255, id 17, offset 0, flags [none], proto GRE (47), length 136)
+    169.254.100.1 > 169.254.100.5: GREv0, Flags [key present], key=0x2, length 116
+	NHRP: reg request, id 2, hopcnt 255, src nbma 169.254.100.1, 155.1.0.1 -> 155.1.0.5 (code 0, pl 32, mtu 17912, htime 7200, pref 0)
+    4  08:21:46.189213 IP (tos 0xc0, ttl 255, id 17, offset 0, flags [none], proto GRE (47), length 156)
+    169.254.100.5 > 169.254.100.1: GREv0, Flags [key present], key=0x2, length 136
+	NHRP: reg reply, id 2, hopcnt 255, src nbma 169.254.100.1, 155.1.0.1 -> 155.1.0.5 (code 0, pl 32, mtu 17912, htime 7200, pref 0)

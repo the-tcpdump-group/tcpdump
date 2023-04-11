@@ -697,6 +697,7 @@ extern void netbeui_print(netdissect_options *, u_short, const u_char *, u_int);
 extern void nfsreply_noaddr_print(netdissect_options *, const u_char *, u_int, const u_char *);
 extern void nfsreply_print(netdissect_options *, const u_char *, u_int, const u_char *);
 extern void nfsreq_noaddr_print(netdissect_options *, const u_char *, u_int, const u_char *);
+extern void nhrp_print(netdissect_options *, const u_char *, u_int);
 extern void nsh_print(netdissect_options *, const u_char *, u_int);
 extern void ntp_print(netdissect_options *, const u_char *, u_int);
 extern void oam_print(netdissect_options *, const u_char *, u_int, u_int);

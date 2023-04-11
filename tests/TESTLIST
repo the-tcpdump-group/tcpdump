@@ -907,3 +907,10 @@ various_gre			various_gre.pcap		various_gre.out	-v
 
 # DHCP ZTP(RFC5970) and SZTP(RFC8572) tests
 dhcpv4v6-rfc5970-rfc8572        dhcpv4v6-rfc5970-rfc8572.pcap           dhcpv4v6-rfc5970-rfc8572.out    -vv
+
+# NHRP tests
+ios_nhrp			ios_nhrp.pcap			ios_nhrp.out	-v
+NHRP_registration		NHRP_registration.pcap		NHRP_registration.out	-v
+NHRP-responder-address		NHRP-responder-address.pcap	NHRP-responder-address.out	-v
+nhrp-trace			nhrp-trace.pcap			nhrp-trace.out	-v
+nhrp				nhrp.pcap			nhrp.out	-v
