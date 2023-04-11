@@ -212,7 +212,7 @@ nhrp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	}
 	length -= sizeof(*fixed_hdr);
 	if (mand_part_len > length)
-		mand_part_len = length;
+		mand_part_len = (uint16_t)length;
 
 	/* We start looking at the mandatory header here. */
 	ND_TCHECK_LEN(bp, sizeof(*fixed_hdr));
@@ -221,9 +221,6 @@ nhrp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	ND_ICHECK_ZU(mand_part_len, <, sizeof(*mand_hdr));
 	ND_TCHECK_LEN(bp, sizeof(*mand_hdr));
 	mand_hdr = (const struct nhrp_mand_header *)bp;
-
-//	nhrpext = p + extoff;
-//	nhrpend = p + pktsz;
 
 	switch (op_type) {
 	case NHRP_PKT_RESOLUTION_REQUEST:
@@ -339,10 +336,14 @@ nhrp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		while (mand_part_len != 0) {
 			u_int cie_len;
 
+			/*
+			 * cie_len is guaranteed by nhrp_print_cie()
+			 * to be <= mand_part_len.
+			 */
 			cie_len = nhrp_print_cie(ndo, bp, mand_part_len,
 			    afn, pro_type);
 			bp += cie_len;
-			mand_part_len -= cie_len;
+			mand_part_len -= (uint16_t)cie_len;
 		}
 		break;
 	case NHRP_PKT_ERROR_INDICATION:
