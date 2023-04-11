@@ -15,8 +15,7 @@
 	AVVID trust bitmap (0x12), value length: 1 byte: 0x00
 	AVVID untrusted ports CoS (0x13), value length: 1 byte: 0x00
 	Management Addresses (0x16), value length: 13 bytes: IPv4 (1) 192.168.0.1
-	unknown field type (0x1a), value length: 12 bytes: 
-	  0x0000:  0000 0001 0000 0000 ffff ffff
+	Power available (0x1a), value length: 12 bytes: reqid 0, mgmtid 1, pwravail 0 mW 4294967295 mW
     2  11:47:08.378706 CDPv2, ttl: 180s, checksum: 0xb0bd (unverified), length 378
 	Device-ID (0x01), value length: 6 bytes: 'Switch'
 	Version String (0x05), value length: 192 bytes: 
@@ -34,8 +33,7 @@
 	AVVID trust bitmap (0x12), value length: 1 byte: 0x00
 	AVVID untrusted ports CoS (0x13), value length: 1 byte: 0x00
 	Management Addresses (0x16), value length: 13 bytes: IPv4 (1) 192.168.0.1
-	unknown field type (0x1a), value length: 12 bytes: 
-	  0x0000:  0000 0001 0000 0000 ffff ffff
+	Power available (0x1a), value length: 12 bytes: reqid 0, mgmtid 1, pwravail 0 mW 4294967295 mW
     3  11:48:08.392643 CDPv2, ttl: 180s, checksum: 0xb0bd (unverified), length 378
 	Device-ID (0x01), value length: 6 bytes: 'Switch'
 	Version String (0x05), value length: 192 bytes: 
@@ -53,5 +51,4 @@
 	AVVID trust bitmap (0x12), value length: 1 byte: 0x00
 	AVVID untrusted ports CoS (0x13), value length: 1 byte: 0x00
 	Management Addresses (0x16), value length: 13 bytes: IPv4 (1) 192.168.0.1
-	unknown field type (0x1a), value length: 12 bytes: 
-	  0x0000:  0000 0001 0000 0000 ffff ffff
+	Power available (0x1a), value length: 12 bytes: reqid 0, mgmtid 1, pwravail 0 mW 4294967295 mW

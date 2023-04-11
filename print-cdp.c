@@ -182,6 +182,22 @@ cdp_print_phys_loc(netdissect_options *ndo,
 	}
 }
 
+static void
+cdp_print_power_avail(netdissect_options *ndo,
+                   const u_char *cp, const u_int len)
+{
+	ND_PRINT("reqid %u, mgmtid %u", GET_BE_U_2(cp), GET_BE_U_2(cp + 2));
+	if (len > 4) {
+		const u_char *powerp;
+		u_int powerlen;
+
+		ND_PRINT(", pwravail");
+		for (powerp = cp + 4, powerlen = len - 4;
+		    powerlen >= 4; powerp += 4, powerlen -= 4)
+			ND_PRINT(" %u mW", GET_BE_U_4(powerp));
+	}
+}
+
 typedef enum {
 	VERBOSE_OR_NOT_VERBOSE,
 	VERBOSE_ONLY
@@ -232,6 +248,8 @@ static const struct cdp_tlvinfo cdptlvs[] = {
 	[ 0x16 ] = { "Management Addresses", cdp_print_addr, VERBOSE_ONLY, 4, -1 },
 	/* not documented */
 	[ 0x17 ] = { "Physical Location", cdp_print_phys_loc, VERBOSE_ONLY, 1, -1 },
+	/* not documented */
+	[ 0x1a ] = { "Power available", cdp_print_power_avail, VERBOSE_ONLY, 8, -1 },
 };
 
 #define T_MAX	(sizeof cdptlvs / sizeof cdptlvs[0])
