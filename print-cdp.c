@@ -213,7 +213,7 @@ struct cdp_tlvinfo {
 static const struct cdp_tlvinfo cdptlvs[] = {
 	/* 0x00 */
 	[ 0x01 ] = { "Device-ID", cdp_print_string, VERBOSE_OR_NOT_VERBOSE, -1, -1 },
-	[ 0x02 ] = { "Address", cdp_print_addr, VERBOSE_ONLY, -1, -1 },
+	[ 0x02 ] = { "Address", cdp_print_addr, VERBOSE_ONLY, 4, -1 },
 	[ 0x03 ] = { "Port-ID", cdp_print_string, VERBOSE_ONLY, -1, -1 },
 	[ 0x04 ] = { "Capability", cdp_print_capability, VERBOSE_ONLY, 4, 4 },
 	[ 0x05 ] = { "Version String", cdp_print_version, VERBOSE_ONLY, -1, -1 },
@@ -375,10 +375,6 @@ cdp_print_addr(netdissect_options *ndo,
 		0xaa, 0xaa, 0x03, 0x00, 0x00, 0x00, 0x86, 0xdd
 	};
 
-	if (l < 4) {
-		ND_PRINT(" (not enough space for num)");
-		goto invalid;
-	}
 	num = GET_BE_U_4(p);
 	p += 4;
 	l -= 4;
