@@ -1161,6 +1161,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-msnlb.c
     print-nflog.c
     print-nfs.c
+    print-nhrp.c
     print-nsh.c
     print-ntp.c
     print-null.c

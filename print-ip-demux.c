@@ -216,6 +216,10 @@ again:
 		}
 		break;
 
+	case IPPROTO_NHRP:
+		nhrp_print(ndo, bp, length);
+		break;
+
 	case IPPROTO_NONE:
 		ND_PRINT("no next header");
 		break;

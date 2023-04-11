@@ -89,6 +89,9 @@ extern const char *netdb_protoname (const uint8_t);
 #ifndef IPPROTO_AH
 #define	IPPROTO_AH		51		/* SIPP Auth Header */
 #endif
+#ifndef IPPROTO_NHRP
+#define IPPROTO_NHRP		54		/* Next Hop Resolution */
+#endif
 #ifndef IPPROTO_MOBILE
 #define IPPROTO_MOBILE		55
 #endif
