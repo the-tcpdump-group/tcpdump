@@ -20,6 +20,7 @@
 
 /*
  * RFC 2332 NBMA Next Hop Resolution Protocol (NHRP)
+ * I-D draft-detienne-dmvpn-01 (expired)
  */
 
 #ifdef HAVE_CONFIG_H
@@ -45,6 +46,7 @@
 #define NHRP_PKT_PURGE_REQUEST		5
 #define NHRP_PKT_PURGE_REPLY		6
 #define NHRP_PKT_ERROR_INDICATION	7
+#define NHRP_PKT_TRAFFIC_INDICATION	8 /* draft-detienne-dmvpn-01 */
 
 static const struct tok pkt_types[] = {
 	{ NHRP_PKT_RESOLUTION_REQUEST,   "res request" },
@@ -54,6 +56,7 @@ static const struct tok pkt_types[] = {
 	{ NHRP_PKT_PURGE_REQUEST,        "purge request" },
 	{ NHRP_PKT_PURGE_REPLY,          "purge reply" },
 	{ NHRP_PKT_ERROR_INDICATION,     "error indication" },
+	{ NHRP_PKT_TRAFFIC_INDICATION,   "traffic indication" },
 	{ 0, NULL }
 };
 
@@ -82,8 +85,9 @@ struct nhrp_fixed_header {
  *
  * The mandatory header part formats are similar for
  * all NHRP packets; the only difference is that NHRP_PKT_ERROR_INDICATION
- * has a 16-bit error code and a 16-bit error packet offset rather
- * than a 32-bit request ID.
+ * has a 16-bit error code and a 16-bit error packet offset, and
+ * NHRP_PKT_TRAFFIC_INDICATION has a 16-bit traffic code and a 16-bit unused
+ * field, rather than a 32-bit request ID.
  */
 struct nhrp_mand_header {
 	nd_uint8_t	spl;		/* src proto len */
@@ -95,7 +99,29 @@ struct nhrp_mand_header {
 			nd_uint16_t	code;
 			nd_uint16_t	offset;
 		} err;
+		struct {		/* error code */
+			nd_uint16_t	traffic_code;
+			nd_uint16_t	unused;
+		} tind;
 	} u;
+};
+
+static const struct tok err_code_types[] = {
+	{ 1,  "unrecognized extension" },
+	{ 3,  "NHRP loop detected" },
+	{ 6,  "protocol address unreachable" },
+	{ 7,  "protocol error" },
+	{ 8,  "NHRP SDU size exceeded" },
+	{ 9,  "invalid extension" },
+	{ 10, "invalid NHRP resolution reply received" },
+	{ 11, "authentication failure" },
+	{ 15, "hop count exceeded" },
+	{ 0, NULL }
+};
+
+static const struct tok traffic_code_types[] = {
+	{ 0, "NHRP traffic redirect/indirection" },
+	{ 0, NULL }
 };
 
 #define NHRP_FIXED_HEADER_LEN			20
@@ -232,8 +258,11 @@ nhrp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		ND_PRINT(", id %u", GET_BE_U_4(mand_hdr->u.id));
 		break;
 	case NHRP_PKT_ERROR_INDICATION:
-		ND_PRINT(", error %u", GET_BE_U_2(mand_hdr->u.err.code));
-		return;
+		ND_PRINT(", error <%s>", tok2str(err_code_types, "unknown-err-code-%u", GET_BE_U_2(mand_hdr->u.err.code)));
+		break;
+	case NHRP_PKT_TRAFFIC_INDICATION:
+		ND_PRINT(", code <%s>", tok2str(traffic_code_types, "unknown-traffic-code-%u", GET_BE_U_2(mand_hdr->u.tind.traffic_code)));
+		break;
 	}
 
 	shtl = GET_U_1(fixed_hdr->shtl);
