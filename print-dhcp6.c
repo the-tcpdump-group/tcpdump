@@ -851,7 +851,7 @@ dhcp6_print(netdissect_options *ndo,
 	const char *name;
 
 	ndo->ndo_protocol = "dhcp6";
-	ND_PRINT("dhcp6");
+	nd_print_protocol(ndo);
 
 	ep = ndo->ndo_snapend;
 	if (cp + length < ep)
