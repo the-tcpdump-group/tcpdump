@@ -33,7 +33,7 @@
 
 #include "ip6.h"
 
-const struct tok srh_tlv_type[] = {
+static const struct tok srh_tlv_type[] = {
     { IPV6_SRH_TLV_PAD1, "Pad1"},
     { IPV6_SRH_TLV_PADN, "PadN"},
     { IPV6_SRH_TLV_HMAC, "HMAC"},
