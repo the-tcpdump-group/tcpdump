@@ -336,9 +336,9 @@ dhcp6opt_print(netdissect_options *ndo,
 				}
 				break;
 			case 2:
-				if (optlen >= 2 + 8) {
-					ND_PRINT(" vid ");
-					for (i = 2; i < 2 + 8; i++)
+				if (optlen >= 2 + 4) {
+					ND_PRINT(" enterprise %u ", GET_BE_U_4(tp + 2));
+					for (i = 2 + 4; i < optlen; i++)
 						ND_PRINT("%02x",
 							 GET_U_1(tp + i));
 					/*(*/
