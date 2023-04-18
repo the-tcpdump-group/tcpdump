@@ -33,39 +33,44 @@
 
 #include "ip6.h"
 
+const struct tok srh_tlv_type[] = {
+    { IPV6_SRH_TLV_PAD1, "Pad1"},
+    { IPV6_SRH_TLV_PADN, "PadN"},
+    { IPV6_SRH_TLV_HMAC, "HMAC"},
+    { 0, NULL }
+};
+
 static int
 srh_tlv_print(netdissect_options *ndo, const u_char *p, u_int bytes_left)
 {
 	u_int tlv_type, tlv_len;
 	while (bytes_left != 0) {
 		tlv_type = GET_U_1(p);
+		ND_PRINT(", TLV-type=%s(%u)",
+			 tok2str(srh_tlv_type, "Unknown", tlv_type),
+			 tlv_type);
 		ND_ICHECKMSG_U("remaining length", bytes_left, <, 1);
 		p += 1;
 		bytes_left -= 1;
 		if (bytes_left == 0)
 			break;
-		if (tlv_type == IPV6_SRH_TLV_PAD1) {
-			ND_PRINT(", TLV-type=Pad1(%u)", tlv_type);
+		if (tlv_type == IPV6_SRH_TLV_PAD1)
 			continue;
-		}
 
 		tlv_len = GET_U_1(p);
+		ND_PRINT(", TLV-len=%u", tlv_len);
 		ND_ICHECKMSG_U("remaining length", bytes_left, <, 1);
 		p += 1;
 		bytes_left -= 1;
 
 		switch (tlv_type) {
 		case IPV6_SRH_TLV_PADN:
-			ND_PRINT(", TLV-type=PadN(%u)", tlv_type);
-			ND_PRINT(", TLV-len=%u", tlv_len);
 			ND_ICHECKMSG_U("PadN length", tlv_len, >, 5); /* RFC 8754 */
 			ND_ICHECKMSG_U("remaining length", bytes_left, <, tlv_len);
 			p += tlv_len;
 			bytes_left -= tlv_len;
 			break;
 		case IPV6_SRH_TLV_HMAC:
-			ND_PRINT(", TLV-type=HMAC(%u)", tlv_type);
-			ND_PRINT(", TLV-len=%u", tlv_len);
 			ND_ICHECKMSG_U("remaining length", bytes_left, <, 6);
 			uint16_t reserved;
 			uint32_t key_id;
@@ -90,9 +95,7 @@ srh_tlv_print(netdissect_options *ndo, const u_char *p, u_int bytes_left)
 					ND_PRINT("%02x", hmac_byte);
 			}
 			break;
-		default:						/* Unknown type */
-			ND_PRINT(" Unknown");
-			ND_PRINT(", TLV-len=%u", tlv_len);
+		default:	/* Unknown type */
 			if (ndo->ndo_vflag)
 				ND_PRINT(", TLV-value=0x");
 			ND_ICHECKMSG_U("remaining length", bytes_left, <, tlv_len);
