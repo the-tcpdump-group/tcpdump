@@ -197,6 +197,10 @@ struct ip6_srh {
 	nd_ipv6		srh_segments[1];	/* SRH segments list*/
 };
 
+#define IPV6_SRH_TLV_PAD1 0
+#define IPV6_SRH_TLV_PADN 4
+#define IPV6_SRH_TLV_HMAC 5
+
 /* Fragment header */
 struct ip6_frag {
 	nd_uint8_t  ip6f_nxt;		/* next header */
