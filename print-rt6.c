@@ -79,6 +79,8 @@ srh_tlv_print(netdissect_options *ndo, const u_char *p, u_int bytes_left)
 			p += 2;
 			if (ndo->ndo_vflag)
 				ND_PRINT(", D=%u", reserved >> 15);
+			if (ndo->ndo_vflag && (reserved & 0x7fff) != 0)
+				ND_PRINT(", reserved MBZ %u", reserved & 0x7fff);
 			key_id = GET_BE_U_4(p);
 			p += 4;
 			if (ndo->ndo_vflag)
