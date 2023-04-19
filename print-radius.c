@@ -794,8 +794,7 @@ print_attr_string(netdissect_options *ndo,
       case TUNNEL_ASSIGN_ID:
       case TUNNEL_CLIENT_AUTH:
       case TUNNEL_SERVER_AUTH:
-           if (GET_U_1(data) <= 0x1F)
-           {
+           if (GET_U_1(data) <= 0x1F) {
               if (length < 1)
                  goto trunc;
               if (GET_U_1(data))
@@ -857,15 +856,13 @@ print_vendor_attr(netdissect_options *ndo,
         vendor_type = GET_U_1(data);
         vendor_length = GET_U_1(data + 1);
 
-        if (vendor_length < 2)
-        {
+        if (vendor_length < 2) {
             ND_PRINT("\n\t    Vendor Attribute: %u, Length: %u (bogus, must be >= 2)",
                    vendor_type,
                    vendor_length);
             return;
         }
-        if (vendor_length > length)
-        {
+        if (vendor_length > length) {
             ND_PRINT("\n\t    Vendor Attribute: %u, Length: %u (bogus, goes past end of vendor-specific attribute)",
                    vendor_type,
                    vendor_length);
@@ -902,21 +899,18 @@ print_attr_num(netdissect_options *ndo,
 {
    uint32_t timeout;
 
-   if (length != 4)
-   {
+   if (length != 4) {
        ND_PRINT("ERROR: length %u != 4", length);
        return;
    }
 
                           /* This attribute has standard values */
-   if (attr_type[attr_code].siz_subtypes)
-   {
+   if (attr_type[attr_code].siz_subtypes) {
       static const char **table;
       uint32_t data_value;
       table = attr_type[attr_code].subtypes;
 
-      if ( (attr_code == TUNNEL_TYPE) || (attr_code == TUNNEL_MEDIUM) )
-      {
+      if ( (attr_code == TUNNEL_TYPE) || (attr_code == TUNNEL_MEDIUM) ) {
          if (!GET_U_1(data))
             ND_PRINT("Tag[Unused] ");
          else
@@ -1017,8 +1011,7 @@ static void
 print_attr_address(netdissect_options *ndo,
                    const u_char *data, u_int length, u_short attr_code)
 {
-   if (length != 4)
-   {
+   if (length != 4) {
        ND_PRINT("ERROR: length %u != 4", length);
        return;
    }
@@ -1053,8 +1046,7 @@ static void
 print_attr_address6(netdissect_options *ndo,
                    const u_char *data, u_int length, u_short attr_code _U_)
 {
-   if (length != 16)
-   {
+   if (length != 16) {
        ND_PRINT("ERROR: length %u != 16", length);
        return;
    }
@@ -1068,14 +1060,12 @@ print_attr_netmask6(netdissect_options *ndo,
 {
    u_char data2[16];
 
-   if (length < 2 || length > 18)
-   {
+   if (length < 2 || length > 18) {
        ND_PRINT("ERROR: length %u not in range (2..18)", length);
        return;
    }
    ND_TCHECK_LEN(data, length);
-   if (GET_U_1(data + 1) > 128)
-   {
+   if (GET_U_1(data + 1) > 128) {
       ND_PRINT("ERROR: netmask %u not in range (0..128)", GET_U_1(data + 1));
       return;
    }
@@ -1099,14 +1089,12 @@ static void
 print_attr_mip6_home_link_prefix(netdissect_options *ndo,
                     const u_char *data, u_int length, u_short attr_code _U_)
 {
-   if (length != 17)
-   {
+   if (length != 17) {
       ND_PRINT("ERROR: length %u != 17", length);
       return;
    }
    ND_TCHECK_LEN(data, length);
-   if (GET_U_1(data) > 128)
-   {
+   if (GET_U_1(data) > 128) {
       ND_PRINT("ERROR: netmask %u not in range (0..128)", GET_U_1(data));
       return;
    }
@@ -1126,8 +1114,7 @@ print_attr_operator_name(netdissect_options *ndo,
    u_int namespace_value;
 
    ND_TCHECK_LEN(data, length);
-   if (length < 2)
-   {
+   if (length < 2) {
       ND_PRINT("ERROR: length %u < 2", length);
       return;
    }
@@ -1151,8 +1138,7 @@ print_attr_location_information(netdissect_options *ndo,
    uint8_t code, entity;
 
    ND_TCHECK_LEN(data, length);
-   if (length < 21)
-   {
+   if (length < 21) {
      ND_PRINT("ERROR: length %u < 21", length);
       return;
    }
@@ -1199,8 +1185,7 @@ print_attr_location_data(netdissect_options *ndo,
    uint16_t index;
 
    ND_TCHECK_LEN(data, length);
-   if (length < 3)
-   {
+   if (length < 3) {
      ND_PRINT("ERROR: length %u < 3", length);
       return;
    }
@@ -1231,8 +1216,7 @@ print_basic_location_policy_rules(netdissect_options *ndo,
    uint16_t flags;
 
    ND_TCHECK_LEN(data, length);
-   if (length < 10)
-   {
+   if (length < 10) {
      ND_PRINT("ERROR: length %u < 10", length);
       return;
    }
@@ -1273,8 +1257,7 @@ print_attr_time(netdissect_options *ndo,
    time_t attr_time;
    char string[26];
 
-   if (length != 4)
-   {
+   if (length != 4) {
        ND_PRINT("ERROR: length %u != 4", length);
        return;
    }
@@ -1293,8 +1276,7 @@ print_attr_vector64(netdissect_options *ndo,
    uint64_t data_value, i;
    const char *sep = "";
 
-   if (length != 8)
-   {
+   if (length != 8) {
        ND_PRINT("ERROR: length %u != 8", length);
        return;
    }
@@ -1333,8 +1315,7 @@ print_attr_strange(netdissect_options *ndo,
    switch(attr_code)
    {
       case ARAP_PASS:
-           if (length != 16)
-           {
+           if (length != 16) {
                ND_PRINT("ERROR: length %u != 16", length);
                return;
            }
@@ -1348,8 +1329,7 @@ print_attr_strange(netdissect_options *ndo,
         break;
 
       case ARAP_FEATURES:
-           if (length != 14)
-           {
+           if (length != 14) {
                ND_PRINT("ERROR: length %u != 14", length);
                return;
            }
@@ -1372,8 +1352,7 @@ print_attr_strange(netdissect_options *ndo,
         break;
 
       case ARAP_CHALLENGE_RESP:
-           if (length < 8)
-           {
+           if (length < 8) {
                ND_PRINT("ERROR: length %u != 8", length);
                return;
            }
@@ -1382,8 +1361,7 @@ print_attr_strange(netdissect_options *ndo,
         break;
 
       case ERROR_CAUSE:
-           if (length != 4)
-           {
+           if (length != 4) {
                ND_PRINT("Error: length %u != 4", length);
                return;
            }
@@ -1419,22 +1397,18 @@ radius_attrs_print(netdissect_options *ndo,
                attr_string,
                type,
                len);
-     if (len < 2)
-     {
+     if (len < 2) {
        ND_PRINT(" (bogus, must be >= 2)");
        return;
      }
-     if (len > length)
-     {
+     if (len > length) {
         ND_PRINT(" (bogus, goes past end of packet)");
         return;
      }
      ND_PRINT(", Value: ");
 
-     if (type < TAM_SIZE(attr_type))
-     {
-         if (len > 2)
-         {
+     if (type < TAM_SIZE(attr_type)) {
+         if (len > 2) {
              if ( attr_type[type].print_func )
                  (*attr_type[type].print_func)(
                      ndo, ((const u_char *)(rad_attr+1)),
@@ -1466,8 +1440,7 @@ radius_print(netdissect_options *ndo,
    rad = (const struct radius_hdr *)dat;
    len = GET_BE_U_2(rad->len);
 
-   if (len < MIN_RADIUS_LEN)
-   {
+   if (len < MIN_RADIUS_LEN) {
 	  nd_print_trunc(ndo);
 	  return;
    }

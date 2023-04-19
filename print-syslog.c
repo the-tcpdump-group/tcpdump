@@ -109,8 +109,7 @@ syslog_print(netdissect_options *ndo,
     facility = (pri & SYSLOG_FACILITY_MASK) >> 3;
     severity = pri & SYSLOG_SEVERITY_MASK;
 
-    if (ndo->ndo_vflag < 1 )
-    {
+    if (ndo->ndo_vflag < 1 ) {
         ND_PRINT("SYSLOG %s.%s, length: %u",
                tok2str(syslog_facility_values, "unknown (%u)", facility),
                tok2str(syslog_severity_values, "unknown (%u)", severity),
