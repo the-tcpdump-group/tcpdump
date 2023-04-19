@@ -1549,8 +1549,7 @@ isis_print_mt_port_cap_subtlv(netdissect_options *ndo,
 
         ND_PRINT("\n\t         Digest: ");
 
-        for(i=1;i<=8; i++)
-        {
+        for(i=1;i<=8; i++) {
             ND_PRINT("%08x ", GET_BE_U_4(tptr));
             if (i%4 == 0 && i != 8)
               ND_PRINT("\n\t                 ");

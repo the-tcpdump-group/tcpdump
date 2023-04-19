@@ -114,8 +114,7 @@ verify_crc10_cksum(uint16_t accum, const u_char *p, int length)
 {
     int i;
 
-    for ( i = 0;  i < length;  i++ )
-    {
+    for ( i = 0;  i < length;  i++ ) {
         accum = ((accum << 8) & 0x3ff)
             ^ crc10_table[( accum >> 2) & 0xff]
             ^ *p++;
