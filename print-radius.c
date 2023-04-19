@@ -1403,8 +1403,7 @@ radius_attrs_print(netdissect_options *ndo,
    const char *attr_string;
    uint8_t type, len;
 
-   while (length > 0)
-   {
+   while (length > 0) {
      if (length < 2)
         goto trunc;
      ND_TCHECK_SIZE(rad_attr);
