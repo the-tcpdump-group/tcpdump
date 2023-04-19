@@ -351,8 +351,7 @@ olsr_print(netdissect_options *ndo,
         } msgptr;
         int msg_len_valid = 0;
 
-        if (is_ipv6)
-        {
+        if (is_ipv6) {
             ND_TCHECK_LEN(tptr, sizeof(struct olsr_msg6));
             msgptr.v6 = (const struct olsr_msg6 *) tptr;
             msg_type = GET_U_1(msgptr.v6->msg_type);
@@ -517,8 +516,7 @@ olsr_print(netdissect_options *ndo,
         }
 
         case OLSR_HNA_MSG:
-            if (is_ipv6)
-            {
+            if (is_ipv6) {
                 int i = 0;
 
                 ND_PRINT("\n\t  Advertised networks (total %u)",
