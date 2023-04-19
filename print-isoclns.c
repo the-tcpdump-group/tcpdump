@@ -1487,8 +1487,7 @@ isis_print_mt_port_cap_subtlv(netdissect_options *ndo,
   const struct isis_subtlv_spb_mcid *subtlv_spb_mcid;
   int i;
 
-  while (len > 2)
-  {
+  while (len > 2) {
     stlv_type = GET_U_1(tptr);
     stlv_len  = GET_U_1(tptr + 1);
 
@@ -1566,8 +1565,7 @@ isis_print_mt_port_cap_subtlv(netdissect_options *ndo,
 
       case ISIS_SUBTLV_SPB_BVID:
       {
-        while (stlv_len != 0)
-        {
+        while (stlv_len != 0) {
           if (stlv_len < 4)
             goto subtlv_too_short;
           ND_PRINT("\n\t           ECT: %08x",
@@ -1619,8 +1617,7 @@ isis_print_mt_capability_subtlv(netdissect_options *ndo,
 {
   u_int stlv_type, stlv_len, treecount;
 
-  while (len > 2)
-  {
+  while (len > 2) {
     stlv_type = GET_U_1(tptr);
     stlv_len  = GET_U_1(tptr + 1);
     tptr += 2;
@@ -1667,8 +1664,7 @@ isis_print_mt_capability_subtlv(netdissect_options *ndo,
           len -= ISIS_SUBTLV_SPB_INSTANCE_MIN_LEN;
           stlv_len -= ISIS_SUBTLV_SPB_INSTANCE_MIN_LEN;
 
-          while (treecount)
-          {
+          while (treecount) {
             if (stlv_len < ISIS_SUBTLV_SPB_INSTANCE_VLAN_TUPLE_LEN)
               goto trunc;
 
