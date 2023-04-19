@@ -554,8 +554,7 @@ sctp_print(netdissect_options *ndo,
       chunkID = GET_U_1(chunkDescPtr->chunkID);
       ND_PRINT("[%s] ", tok2str(sctp_chunkid_str, "Unknown chunk type: 0x%x",
 	       chunkID));
-      switch (chunkID)
-	{
+      switch (chunkID) {
 	case SCTP_DATA :
 	  {
 	    const struct sctpDataPart *dataHdrPtr;
