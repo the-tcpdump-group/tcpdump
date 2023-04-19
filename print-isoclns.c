@@ -1508,8 +1508,7 @@ isis_print_mt_port_cap_subtlv(netdissect_options *ndo,
     /* Make sure the entire subTLV is in the captured data */
     ND_TCHECK_LEN(tptr, stlv_len);
 
-    switch (stlv_type)
-    {
+    switch (stlv_type) {
       case ISIS_SUBTLV_SPB_MCID:
       {
 	if (stlv_len < ISIS_SUBTLV_SPB_MCID_MIN_LEN)
@@ -1635,8 +1634,7 @@ isis_print_mt_capability_subtlv(netdissect_options *ndo,
     /* Make sure the entire subTLV is in the captured data */
     ND_TCHECK_LEN(tptr, stlv_len);
 
-    switch (stlv_type)
-    {
+    switch (stlv_type) {
       case ISIS_SUBTLV_SPB_INSTANCE:
           if (stlv_len < ISIS_SUBTLV_SPB_INSTANCE_MIN_LEN)
             goto subtlv_too_short;

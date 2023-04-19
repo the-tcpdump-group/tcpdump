@@ -773,8 +773,7 @@ print_attr_string(netdissect_options *ndo,
 
    ND_TCHECK_LEN(data, length);
 
-   switch(attr_code)
-   {
+   switch(attr_code) {
       case TUNNEL_PASS:
            if (length < 3)
               goto trunc;
@@ -1016,8 +1015,7 @@ print_attr_address(netdissect_options *ndo,
        return;
    }
 
-   switch(attr_code)
-   {
+   switch(attr_code) {
       case FRM_IPADDR:
       case LOG_IPHOST:
            if (GET_BE_U_4(data) == 0xFFFFFFFF )
@@ -1312,8 +1310,7 @@ print_attr_strange(netdissect_options *ndo,
    u_short len_data;
    u_int error_cause_value;
 
-   switch(attr_code)
-   {
+   switch(attr_code) {
       case ARAP_PASS:
            if (length != 16) {
                ND_PRINT("ERROR: length %u != 16", length);
