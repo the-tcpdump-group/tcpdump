@@ -58,8 +58,7 @@ frag6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2)
 	/* it is meaningless to decode non-first fragment */
 	if ((GET_BE_U_2(dp->ip6f_offlg) & IP6F_OFF_MASK) != 0)
 		return -1;
-	else
-	{
+	else {
 		ND_PRINT(" ");
 		return sizeof(struct ip6_frag);
 	}

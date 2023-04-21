@@ -917,8 +917,7 @@ print_attr_num(netdissect_options *ndo,
          data++;
          data_value = GET_BE_U_3(data);
       }
-      else
-      {
+      else {
          data_value = GET_BE_U_4(data);
       }
       if ( data_value <= (uint32_t)(attr_type[attr_code].siz_subtypes - 1 +
@@ -928,8 +927,7 @@ print_attr_num(netdissect_options *ndo,
       else
          ND_PRINT("#%u", data_value);
    }
-   else
-   {
+   else {
       switch(attr_code) /* Be aware of special cases... */
       {
         case FRM_IPX:
@@ -947,8 +945,7 @@ print_attr_num(netdissect_options *ndo,
              timeout = GET_BE_U_4(data);
              if ( timeout < 60 )
                 ND_PRINT("%02d secs", timeout);
-             else
-             {
+             else {
                 if ( timeout < 3600 )
                    ND_PRINT("%02d:%02d min",
                           timeout / 60, timeout % 60);
