@@ -970,8 +970,7 @@ xid_map_enter(netdissect_options *ndo,
 				 sizeof(ip->ip_src));
 		UNALIGNED_MEMCPY(&xmep->server, ip->ip_dst,
 				 sizeof(ip->ip_dst));
-	}
-	else if (ip6) {
+	} else if (ip6) {
 		xmep->ipver = 6;
 		UNALIGNED_MEMCPY(&xmep->client, ip6->ip6_src,
 				 sizeof(ip6->ip6_src));

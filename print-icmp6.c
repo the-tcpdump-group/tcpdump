@@ -1328,8 +1328,7 @@ get_upperlayer(netdissect_options *ndo, const u_char *bp, u_int *prot)
 			if (ND_TTEST_2(uh->uh_dport)) {
 				*prot = nh;
 				return(uh);
-			}
-			else
+			} else
 				return(NULL);
 			/* NOTREACHED */
 

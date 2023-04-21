@@ -1265,8 +1265,7 @@ of10_match_print(netdissect_options *ndo,
 		  && ! (wildcards & OFPFW_NW_PROTO) && nw_proto == IPPROTO_ICMP
 		  ? "icmp_code" : "tp_dst";
 		ND_PRINT("%smatch %s %u", pfx, field_name, GET_BE_U_2(cp));
-	}
-	else
+	} else
 		ND_TCHECK_2(cp);
 }
 

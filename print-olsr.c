@@ -380,8 +380,7 @@ olsr_print(netdissect_options *ndo,
 
             msg_tlen = msg_len - sizeof(struct olsr_msg6);
             msg_data = tptr + sizeof(struct olsr_msg6);
-        }
-        else {	/* (!is_ipv6) */
+        } else {	/* (!is_ipv6) */
             ND_TCHECK_LEN(tptr, sizeof(struct olsr_msg4));
             msgptr.v4 = (const struct olsr_msg4 *) tptr;
             msg_type = GET_U_1(msgptr.v4->msg_type);
@@ -535,8 +534,7 @@ olsr_print(netdissect_options *ndo,
                     msg_data += sizeof(struct olsr_hna6);
                     msg_tlen -= sizeof(struct olsr_hna6);
                 }
-            }
-            else {
+            } else {
                 int col = 0;
 
                 ND_PRINT("\n\t  Advertised networks (total %u)",
