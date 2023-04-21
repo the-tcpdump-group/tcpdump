@@ -526,8 +526,7 @@ lookup_nsap(netdissect_options *ndo, const u_char *nsap,
 		k = (ensap[0] << 8) | ensap[1];
 		j = (ensap[2] << 8) | ensap[3];
 		i = (ensap[4] << 8) | ensap[5];
-	}
-	else
+	} else
 		i = j = k = 0;
 
 	tp = &nsaptable[(i ^ j) & (HASHNAMESIZE-1)];

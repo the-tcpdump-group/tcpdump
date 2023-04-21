@@ -189,8 +189,7 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
                 bp += NSH_HDR_WORD_SIZE;
             }
             past_headers = 1;
-        }
-        else if (md_type == MD_TYPE2) {
+        } else if (md_type == MD_TYPE2) {
             n = 0;
             while (n < length - 2) {
                 uint16_t tlv_class;

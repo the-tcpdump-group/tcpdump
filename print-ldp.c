@@ -364,8 +364,7 @@ ldp_tlv_print(netdissect_options *ndo,
 		    ND_PRINT(": IPv4 prefix (invalid length)");
 		else
 		    ND_PRINT(": IPv4 prefix %s", buf);
-	    }
-	    else if (af == AFNUM_INET6) {
+	    } else if (af == AFNUM_INET6) {
 		i=decode_prefix6(ndo, tptr, tlv_tlen, buf, sizeof(buf));
 		if (i == -2)
 		    goto trunc;
@@ -375,8 +374,7 @@ ldp_tlv_print(netdissect_options *ndo,
 		    ND_PRINT(": IPv6 prefix (invalid length)");
 		else
 		    ND_PRINT(": IPv6 prefix %s", buf);
-	    }
-	    else
+	    } else
 		ND_PRINT(": Address family %u prefix", af);
 	    break;
 	case LDP_FEC_HOSTADDRESS:

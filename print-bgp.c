@@ -2986,8 +2986,7 @@ bgp_notification_print(netdissect_options *ndo,
             /* garbage, hexdump it all */
             if (shutdown_comm_length > length - (BGP_NOTIFICATION_SIZE + 1)) {
                 ND_PRINT(", invalid Shutdown Communication length");
-            }
-            else if (shutdown_comm_length == 0) {
+            } else if (shutdown_comm_length == 0) {
                 ND_PRINT(", empty Shutdown Communication");
                 remainder_offset += 1;
             }

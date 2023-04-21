@@ -1070,8 +1070,7 @@ domain_print(netdissect_options *ndo,
 			if (arcount)
 				goto trunc;
 		}
-	}
-	else {
+	} else {
 		/* this is a request */
 		ND_PRINT("%u%s%s%s", GET_BE_U_2(np->id),
 			  ns_ops[DNS_OPCODE(flags)],
@@ -1088,8 +1087,7 @@ domain_print(netdissect_options *ndo,
 				ND_PRINT(" [%uq]", qdcount);
 			if (ancount != 1)
 				ND_PRINT(" [%ua]", ancount);
-		}
-		else {
+		} else {
 			if (ancount)
 				ND_PRINT(" [%ua]", ancount);
 			if (qdcount != 1)

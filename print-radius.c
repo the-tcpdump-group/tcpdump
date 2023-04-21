@@ -916,8 +916,7 @@ print_attr_num(netdissect_options *ndo,
             ND_PRINT("Tag[%u] ", GET_U_1(data));
          data++;
          data_value = GET_BE_U_3(data);
-      }
-      else {
+      } else {
          data_value = GET_BE_U_4(data);
       }
       if ( data_value <= (uint32_t)(attr_type[attr_code].siz_subtypes - 1 +
@@ -926,8 +925,7 @@ print_attr_num(netdissect_options *ndo,
          ND_PRINT("%s", table[data_value]);
       else
          ND_PRINT("#%u", data_value);
-   }
-   else {
+   } else {
       switch(attr_code) /* Be aware of special cases... */
       {
         case FRM_IPX:
@@ -1449,8 +1447,7 @@ radius_print(netdissect_options *ndo,
               GET_U_1(rad->id),
               len);
        return;
-   }
-   else {
+   } else {
        ND_PRINT("RADIUS, length: %u\n\t%s (%u), id: 0x%02x, Authenticator: ",
               len,
               tok2str(radius_command_values,"Unknown Command",GET_U_1(rad->code)),
