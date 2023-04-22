@@ -227,7 +227,7 @@ nhrp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	/*
 	 * Mandatory part length.
 	 * We already know that pktsz is large enough for the fixed
-	 * header and the fixed part of the mandatory heaer.
+	 * header and the fixed part of the mandatory header.
 	 */
 	if (extoff == 0) {
 		mand_part_len = pktsz - sizeof(*fixed_hdr);
