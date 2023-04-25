@@ -480,5 +480,15 @@ nhrp_print_cie(netdissect_options *ndo, const u_char *data, uint16_t mand_part_l
 
 invalid:
 	nd_print_invalid(ndo);
+
+	/*
+	 * We get here because this CIE goes past thE remaining length,
+	 * of the mandatory part.  We've reported that error; we now
+	 * assignt he insufficnetly-large remaining piece of the
+	 * mandatory part to this CIE, so that this CIE finishes up
+	 * the mandatory part, and the loop processing the CIEs
+	 * terminates.  There cannot be any CIEs after this one.
+	 */
+	cie_len += mand_part_len;
 	return (cie_len);
 }
