@@ -245,6 +245,7 @@ ripv2_auth      ripv2_auth.pcap         ripv2_auth.out  -v
 
 # RIP invalid
 ripv2-invalid-length ripv2-invalid-length.pcap ripv2-invalid-length.out -v
+rip_error_hexdump rip_error_hexdump.pcap rip_error_hexdump.out -vv
 
 # DHCPv6 tests
 dhcpv6-aftr-name	dhcpv6-AFTR-Name-RFC6334.pcap	dhcpv6-AFTR-Name-RFC6334.out	-v

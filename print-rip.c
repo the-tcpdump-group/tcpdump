@@ -385,7 +385,7 @@ rip_print(netdissect_options *ndo,
 		break;
 	}
 	/* do we want to see an additionally hexdump ? */
-	if (ndo->ndo_vflag> 1) {
+	if (ndo->ndo_vflag > 1 && ND_TTEST_LEN(p, len)) {
 		if (!print_unknown_data(ndo, p, "\n\t", len))
 			return;
 	}
