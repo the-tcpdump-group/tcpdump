@@ -1131,7 +1131,7 @@ print_ipcp_config_options(netdissect_options *ndo,
 			print_unknown_data(ndo, p + 2, "\n\t    ", len - 2);
 		break;
 	}
-	if (ndo->ndo_vflag > 1)
+	if (ndo->ndo_vflag > 1 && ND_TTEST_LEN(p + 2, len - 2))
 		print_unknown_data(ndo, p + 2, "\n\t    ", len - 2); /* exclude TLV header */
 	return len;
 
