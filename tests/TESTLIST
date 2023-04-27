@@ -155,6 +155,9 @@ babel_pad1      babel_pad1.pcap        babel_pad1.out
 babel_rtt       babel_rtt.pcap         babel_rtt.out   -v
 babel_rfc6126bis  babel_rfc6126bis.pcap  babel_rfc6126bis.out     -v
 
+# PPP tests
+ppp_error_hexdump ppp_error_hexdump.pcap ppp_error_hexdump.out -vv
+
 # PPPoE tests
 pppoe           pppoe.pcap             pppoe.out
 pppoes          pppoes.pcap            pppoes.out
