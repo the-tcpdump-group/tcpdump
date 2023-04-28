@@ -482,9 +482,9 @@ invalid:
 	nd_print_invalid(ndo);
 
 	/*
-	 * We get here because this CIE goes past thE remaining length,
+	 * We get here because this CIE goes past the remaining length,
 	 * of the mandatory part.  We've reported that error; we now
-	 * assignt he insufficnetly-large remaining piece of the
+	 * assign the insufficiently-large remaining piece of the
 	 * mandatory part to this CIE, so that this CIE finishes up
 	 * the mandatory part, and the loop processing the CIEs
 	 * terminates.  There cannot be any CIEs after this one.
