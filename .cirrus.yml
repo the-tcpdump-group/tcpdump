@@ -40,6 +40,7 @@ linux_task:
   env:
     DEBIAN_FRONTEND: noninteractive
     MAKEFLAGS: -j 5
+    LANG: C
   script:
     - apt-get -qy update >/dev/null
     - apt-get -qy install git autoconf make cmake clang gcc bc >/dev/null
