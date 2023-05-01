@@ -214,6 +214,7 @@ os_id() {
         ;;
     Haiku)
         # Meaningful version is the substring before the plus sign.
+        # "hrev56578" stands for "R1/beta4".
         # "hrev55181" stands for "R1/beta3".
         # "hrev54154" stands for "R1/beta2".
         : "${os_id_version:=`uname -v`}"
