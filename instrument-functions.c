@@ -74,13 +74,14 @@ static void print_debug(void *this_fn, void *call_site, action_type action)
 	static long symcount;
 	static asection *text;
 	static bfd_vma vma;
-	static char *instrument_type;
 	static int instrument_set;
 	static int instrument_off;
 	static int instrument_global;
 	int i;
 
 	if (!instrument_set) {
+		static char *instrument_type;
+
 		/* Get the configuration environment variable INSTRUMENT value if any */
 		instrument_type = getenv("INSTRUMENT");
 		/* unset or set to an empty string ? */
