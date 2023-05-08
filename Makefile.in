@@ -484,10 +484,10 @@ releasecheck: releasetar
 	cd "$$TAG" && \
 	echo "[$@] $$ ./configure --enable-smb --quiet --prefix=$$INSTALL_DIR" && \
 	./configure --enable-smb --quiet --prefix="$$INSTALL_DIR" && \
-	echo '[$@] $$ make -s all check' && \
-	make -s all check >/dev/null && \
-	echo '[$@] $$ make -s install' && \
-	make -s install && \
+	echo '[$@] $$ $(MAKE) -s all check' && \
+	$(MAKE) -s all check >/dev/null && \
+	echo '[$@] $$ $(MAKE) -s install' && \
+	$(MAKE) -s install && \
 	cd .. && \
 	rm -rf "$$TAG" && \
 	rm -rf "$$INSTALL_DIR" && \
@@ -502,10 +502,10 @@ releasecheck: releasetar
 	    -DCMAKE_RULE_MESSAGES=OFF \
 	    -DCMAKE_INSTALL_MESSAGE=NEVER \
 	    .. && \
-	echo '[$@] $$ make -s all check' && \
-	make -s all check >/dev/null && \
-	echo '[$@] $$ make -s install' && \
-	make -s install && \
+	echo '[$@] $$ $(MAKE) -s all check' && \
+	$(MAKE) -s all check >/dev/null && \
+	echo '[$@] $$ $(MAKE) -s install' && \
+	$(MAKE) -s install && \
 	cd ../.. && \
 	rm -rf "$$TAG" && \
 	rm -rf "$$INSTALL_DIR" && \
