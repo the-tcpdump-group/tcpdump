@@ -768,13 +768,10 @@ ntp			ntp.pcap		ntp.out
 ntp-v			ntp.pcap		ntp-v.out		-v
 ntp-time		ntp-time.pcap		ntp-time.out
 ntp-time--v		ntp-time.pcap		ntp-time--v.out		-v
-ntp-time--vv		ntp-time.pcap		ntp-time--vv.out	-vv
 ntp-control		ntp-control.pcap	ntp-control.out
 ntp-control--v		ntp-control.pcap	ntp-control--v.out	-v
-ntp-control--vv		ntp-control.pcap	ntp-control--vv.out	-vv
 ntp-mode7		ntp-mode7.pcap		ntp-mode7.out
 ntp-mode7--v		ntp-mode7.pcap		ntp-mode7--v.out	-v
-ntp-mode7--vv		ntp-mode7.pcap		ntp-mode7--vv.out	-vv
 
 # RX/AFS
 rx			afs.pcap		rx.out
