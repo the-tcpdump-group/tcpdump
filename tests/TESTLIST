@@ -137,6 +137,9 @@ ospf3_mp-vv	OSPFv3_multipoint_adjacencies.pcap	ospf3_mp-vv.out		-v -v
 ospf3_nbma-vv	OSPFv3_NBMA_adjacencies.pcap		ospf3_nbma-vv.out	-v -v
 # fuzzed pcap
 ospf2-seg-fault-1-v  ospf2-seg-fault-1.pcapng  ospf2-seg-fault-1-v.out  -v
+# SR RI
+sr_ri_tlv       sr_ri_tlv.pcap  			sr_ri_tlv.out   	-v
+sr_ri_sid       sr_ri_sid.pcap  			sr_ri_sid.out   	-v
 
 # IKEv2 tests
 ikev2four	ikev2four.pcap		ikev2four.out	-v

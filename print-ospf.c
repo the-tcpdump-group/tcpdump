@@ -98,9 +98,11 @@ static const struct tok ospf_dd_flag_values[] = {
 };
 
 static const struct tok lsa_opaque_values[] = {
-	{ LS_OPAQUE_TYPE_TE,    "Traffic Engineering" },
-	{ LS_OPAQUE_TYPE_GRACE, "Graceful restart" },
-	{ LS_OPAQUE_TYPE_RI,    "Router Information" },
+	{ LS_OPAQUE_TYPE_TE,                 "Traffic Engineering" },
+	{ LS_OPAQUE_TYPE_GRACE,              "Graceful restart" },
+	{ LS_OPAQUE_TYPE_RI,                 "Router Information" },
+	{ LS_OPAQUE_TYPE_EXTENDED_PREFIX,    "Extended Prefix" },
+	{ LS_OPAQUE_TYPE_EXTENDED_LINK,      "Extended Link" },
 	{ 0,			NULL }
 };
 
@@ -151,7 +153,16 @@ static const struct tok lsa_opaque_te_tlv_link_type_sub_tlv_values[] = {
 
 static const struct tok lsa_opaque_ri_tlv_values[] = {
 	{ LS_OPAQUE_RI_TLV_CAP, "Router Capabilities" },
+	{ LS_OPAQUE_RI_TLV_SR_ALGO, "SR-Algorithm" },
+	{ LS_OPAQUE_RI_TLV_SID_LABEL_RANGE, "SID/Label Range" },
+	{ LS_OPAQUE_RI_TLV_SR_LOCAL_BLOCK, "SR Local Block" },
+	{ LS_OPAQUE_RI_TLV_SRMS_PREFERENCE, "SRMS Preference" },
 	{ 0,		        NULL }
+};
+
+static const struct tok lsa_opaque_extended_prefix_tlv_values[] = {
+	{ LS_OPAQUE_EXTENDED_PREFIX_SUBTLV_SID_LABEL, "SID/Label Sub-TLV" },
+	{ LS_OPAQUE_EXTENDED_PREFIX_SUBTLV_PREFIX_SID, "Prefix-SID Sub-TLV" },
 };
 
 static const struct tok lsa_opaque_ri_tlv_cap_values[] = {
@@ -166,6 +177,11 @@ static const struct tok lsa_opaque_ri_tlv_cap_values[] = {
 	{ 256, "p2p over LAN" },
 	{ 512, "path computation server" },
 	{ 0,		        NULL }
+};
+static const struct tok lsa_opaque_ri_tlv_sr_algos[] = {
+	{ 0, "Shortest Path First" },
+	{ 1, "Strict Shortest Path First" },
+	{ 0,                    NULL }
 };
 
 static const struct tok ospf_lls_tlv_values[] = {
@@ -626,10 +642,10 @@ ospf_print_lsa(netdissect_options *ndo,
 	const struct aslametric *almp;
 	const struct mcla *mcp;
 	const uint8_t *lp;
-	u_int tlv_type, tlv_length, rla_count, topology;
-	int ospf_print_lshdr_ret;
+	u_int tlv_type, tlv_length, rla_count, topology, sub_tlv_type, sub_tlv_length, range_size, num_tlv;
+	int ospf_print_lshdr_ret, sub_tlv_remaining;
 	u_int ls_length;
-	const uint8_t *tptr;
+	const uint8_t *tptr, *sub_tlv_tptr;
 
 	tptr = (const uint8_t *)lsap->lsa_un.un_unknown; /* squelch compiler warnings */
 	ospf_print_lshdr_ret = ospf_print_lshdr(ndo, &lsap->ls_hdr);
@@ -806,7 +822,7 @@ ospf_print_lsa(netdissect_options *ndo,
 		u_int ls_length_remaining = ls_length;
 		while (ls_length_remaining != 0) {
                     ND_TCHECK_4(tptr);
-		    if (ls_length_remaining < 4) {
+                    if (ls_length_remaining < 4) {
                         ND_PRINT("\n\t    Remaining LS length %u < 4", ls_length_remaining);
                         return(ls_end);
                     }
@@ -814,7 +830,6 @@ ospf_print_lsa(netdissect_options *ndo,
                     tlv_length = GET_BE_U_2(tptr + 2);
                     tptr+=4;
                     ls_length_remaining-=4;
-
                     ND_PRINT("\n\t    %s TLV (%u), length: %u, value: ",
                            tok2str(lsa_opaque_ri_tlv_values,"unknown",tlv_type),
                            tlv_type,
@@ -836,6 +851,114 @@ ospf_print_lsa(netdissect_options *ndo,
                         ND_PRINT("Capabilities: %s",
                                bittok2str(lsa_opaque_ri_tlv_cap_values, "Unknown", GET_BE_U_4(tptr)));
                         break;
+
+                    case LS_OPAQUE_RI_TLV_SR_ALGO:
+                        num_tlv = tlv_length;
+                        while (num_tlv != 0) {
+                            ND_PRINT("\n\t\t    %s (%u)",
+                                     tok2str(lsa_opaque_ri_tlv_sr_algos, "Unknown", GET_U_1(tptr+tlv_length-num_tlv)), GET_U_1(tptr+tlv_length-num_tlv));
+                            num_tlv--;
+                        }
+                        if (tlv_length % 4 != 0) {//padding
+                            tptr+=4-(tlv_length % 4);
+                            ls_length_remaining-=4-(tlv_length % 4);
+                        }
+                        break;
+
+                    case LS_OPAQUE_RI_TLV_SID_LABEL_RANGE:
+                        range_size = GET_BE_U_3(tptr);
+
+                        ND_PRINT("\n\t\t    Range Size: %u",range_size);
+                        sub_tlv_tptr = tptr + 4;
+                        sub_tlv_remaining = tlv_length - 4;
+                        while (sub_tlv_remaining > 0) {
+                            sub_tlv_type = GET_BE_U_2(sub_tlv_tptr);
+                            sub_tlv_length = GET_BE_U_2(sub_tlv_tptr + 2);
+                            switch(sub_tlv_type) {
+
+                            case LS_OPAQUE_EXTENDED_PREFIX_SUBTLV_SID_LABEL:
+                                ND_PRINT("\n\t\t    %s (%u), length: %u, value: ",
+                                         tok2str(lsa_opaque_extended_prefix_tlv_values,"unknown",sub_tlv_type),
+                                         sub_tlv_type,
+                                         sub_tlv_length);
+                                if (sub_tlv_length == 3) {
+                                    ND_PRINT("Label: %u",GET_BE_U_3(sub_tlv_tptr + 4));
+                                }
+                                else if (sub_tlv_length == 4) {
+                                    ND_PRINT("SID:%u", GET_BE_U_4(sub_tlv_tptr + 4));
+                                }
+                                else {
+                                    ND_PRINT("\n\t    Bogus length %u != 3 or 4", sub_tlv_length);
+                                    if (!print_unknown_data(ndo, sub_tlv_tptr, "\n\t      ", sub_tlv_length))
+                                        return(ls_end);
+                                }
+                                break;
+
+                            default:
+                                if (ndo->ndo_vflag <= 1) {
+                                    if (!print_unknown_data(ndo, sub_tlv_tptr, "\n\t      ", sub_tlv_length))
+                                        return(ls_end);
+                                }
+                                break;
+                           }
+
+                           sub_tlv_tptr+=8;
+                           sub_tlv_remaining-=8;
+                        }
+                        break;
+
+                    case LS_OPAQUE_RI_TLV_SR_LOCAL_BLOCK:
+                        range_size = GET_BE_U_3(tptr);
+
+                        ND_PRINT("\n\t\t    Range Size: %u",range_size);
+                        sub_tlv_tptr = tptr + 4;
+                        sub_tlv_remaining = tlv_length - 4;
+                        while (sub_tlv_remaining > 0) {
+                            sub_tlv_type = GET_BE_U_2(sub_tlv_tptr);
+                            sub_tlv_length = GET_BE_U_2(sub_tlv_tptr + 2);
+                            switch(sub_tlv_type) {
+
+                            case LS_OPAQUE_EXTENDED_PREFIX_SUBTLV_SID_LABEL:
+                                ND_PRINT("\n\t\t    %s (%u), length: %u, value: ",
+                                         tok2str(lsa_opaque_extended_prefix_tlv_values,"unknown",sub_tlv_type),
+                                         sub_tlv_type,
+                                         sub_tlv_length);
+                                if (sub_tlv_length == 3) {
+                                    ND_PRINT("Label: %u",GET_BE_U_3(sub_tlv_tptr + 4));
+                                }
+                                else if (sub_tlv_length == 4) {
+                                    ND_PRINT("SID:%u", GET_BE_U_4(sub_tlv_tptr + 4));
+                                }
+                                else {
+                                    ND_PRINT("\n\t    Bogus length %u != 3 or 4", sub_tlv_length);
+                                    if (!print_unknown_data(ndo, sub_tlv_tptr, "\n\t      ", sub_tlv_length))
+                                        return(ls_end);
+                                }
+                                break;
+
+                            default:
+                                if (ndo->ndo_vflag <= 1) {
+                                    if (!print_unknown_data(ndo, sub_tlv_tptr, "\n\t      ", sub_tlv_length))
+                                        return(ls_end);
+                                }
+                                break;
+                            }
+
+                            sub_tlv_tptr+=8;
+                            sub_tlv_remaining-=8;
+                        }
+                        break;
+
+                    case LS_OPAQUE_RI_TLV_SRMS_PREFERENCE:
+                        if (tlv_length != 4) {
+                            ND_PRINT("\n\t    Bogus SRMS Preference TLV length %u != 4", tlv_length);
+                            return(ls_end);
+                        }
+                        ND_PRINT("SRMS Preference: %u",
+                            GET_U_1(tptr));
+                        break;
+
+
                     default:
                         if (ndo->ndo_vflag <= 1) {
                             if (!print_unknown_data(ndo, tptr, "\n\t      ", tlv_length))

@@ -69,9 +69,11 @@
 #define	LS_TYPE_OPAQUE_AL      10   /* rfc2370 - Opaque Link Local */
 #define	LS_TYPE_OPAQUE_DW      11   /* rfc2370 - Opaque Domain Wide */
 
-#define LS_OPAQUE_TYPE_TE       1   /* rfc3630 */
-#define LS_OPAQUE_TYPE_GRACE    3   /* rfc3623 */
-#define LS_OPAQUE_TYPE_RI       4   /* draft-ietf-ospf-cap-03 */
+#define LS_OPAQUE_TYPE_TE              1   /* rfc3630 */
+#define LS_OPAQUE_TYPE_GRACE           3   /* rfc3623 */
+#define LS_OPAQUE_TYPE_RI              4   /* rfc7770 */
+#define LS_OPAQUE_TYPE_EXTENDED_PREFIX 7   /* rfc7684 */
+#define LS_OPAQUE_TYPE_EXTENDED_LINK   8   /* rfc7684 */
 
 #define LS_OPAQUE_TE_TLV_ROUTER 1   /* rfc3630 */
 #define LS_OPAQUE_TE_TLV_LINK   2   /* rfc3630 */
@@ -105,6 +107,13 @@
 
 #define LS_OPAQUE_RI_TLV_CAP             1 /* draft-ietf-ospf-cap-03 */
 
+#define LS_OPAQUE_EXTENDED_PREFIX_SUBTLV_SID_LABEL  1 /* rfc8665 */
+#define LS_OPAQUE_EXTENDED_PREFIX_SUBTLV_PREFIX_SID 2 /* rfc8665 */
+
+#define LS_OPAQUE_RI_TLV_SR_ALGO           8 /* rfc8865 */
+#define LS_OPAQUE_RI_TLV_SID_LABEL_RANGE   9 /* rfc8865 */
+#define LS_OPAQUE_RI_TLV_SR_LOCAL_BLOCK   14 /* rfc8865 */
+#define LS_OPAQUE_RI_TLV_SRMS_PREFERENCE  15 /* rfc8865 */
 
 /* rla_link.link_type	*/
 #define	RLA_TYPE_ROUTER		1   /* point-to-point to another router	*/

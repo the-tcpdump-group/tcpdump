@@ -1,0 +1,85 @@
+    1  20:39:31.473461 IP (tos 0xc0, ttl 1, id 64686, offset 0, flags [DF], proto OSPF (89), length 68)
+    1.0.0.2 > 224.0.0.5: OSPFv2, Hello, length 48
+	Router-ID 2.2.2.2, Backbone Area, Authentication Type: none (0)
+	Options [External]
+	  Hello Timer 10s, Dead Timer 40s, Mask 255.255.255.0, Priority 1
+	  Designated Router 1.0.0.2, Backup Designated Router 1.0.0.1
+	  Neighbor List:
+	    1.1.1.1
+    2  20:39:33.944913 IP (tos 0xc0, ttl 1, id 27495, offset 0, flags [DF], proto OSPF (89), length 68)
+    1.0.0.1 > 224.0.0.5: OSPFv2, Hello, length 48
+	Router-ID 1.1.1.1, Backbone Area, Authentication Type: none (0)
+	Options [External]
+	  Hello Timer 10s, Dead Timer 40s, Mask 255.255.255.0, Priority 1
+	  Designated Router 1.0.0.2, Backup Designated Router 1.0.0.1
+	  Neighbor List:
+	    2.2.2.2
+    3  20:39:38.265498 IP (tos 0x0, ttl 1, id 1, offset 0, flags [none], proto OSPF (89), length 108)
+    1.0.0.2 > 224.0.0.5: OSPFv2, LS-Update, length 88
+	Router-ID 2.2.2.2, Backbone Area, Authentication Type: none (0), 1 LSA
+	  LSA #1
+	  Advertising Router 2.2.2.2, seq 0x80000001, age 3600s, length 40
+	    Area Local Opaque LSA (10), Opaque-Type Router Information LSA (4), Opaque-ID 0
+	    Options: [none]
+	    SR-Algorithm TLV (8), length: 1, value: 
+		    Shortest Path First (0)
+	    SID/Label Range TLV (9), length: 12, value: 
+		    Range Size: 100
+		    SID/Label Sub-TLV (1), length: 3, value: Label: 100
+	    SID/Label Range TLV (9), length: 12, value: 
+		    Range Size: 100
+		    SID/Label Sub-TLV (1), length: 3, value: Label: 1000
+    4  20:39:38.265783 IP (tos 0xc0, ttl 1, id 22022, offset 0, flags [DF], proto OSPF (89), length 64)
+    1.0.0.1 > 1.0.0.2: OSPFv2, LS-Ack, length 44
+	Router-ID 1.1.1.1, Backbone Area, Authentication Type: none (0)
+	  Advertising Router 2.2.2.2, seq 0x80000001, age 3600s, length 40
+	    Area Local Opaque LSA (10), Opaque-Type Router Information LSA (4), Opaque-ID 0
+	    Options: [none] [|ospf2]
+    5  20:39:41.473468 IP (tos 0xc0, ttl 1, id 91, offset 0, flags [DF], proto OSPF (89), length 68)
+    1.0.0.2 > 224.0.0.5: OSPFv2, Hello, length 48
+	Router-ID 2.2.2.2, Backbone Area, Authentication Type: none (0)
+	Options [External]
+	  Hello Timer 10s, Dead Timer 40s, Mask 255.255.255.0, Priority 1
+	  Designated Router 1.0.0.2, Backup Designated Router 1.0.0.1
+	  Neighbor List:
+	    1.1.1.1
+    6  20:39:43.944911 IP (tos 0xc0, ttl 1, id 27752, offset 0, flags [DF], proto OSPF (89), length 68)
+    1.0.0.1 > 224.0.0.5: OSPFv2, Hello, length 48
+	Router-ID 1.1.1.1, Backbone Area, Authentication Type: none (0)
+	Options [External]
+	  Hello Timer 10s, Dead Timer 40s, Mask 255.255.255.0, Priority 1
+	  Designated Router 1.0.0.2, Backup Designated Router 1.0.0.1
+	  Neighbor List:
+	    2.2.2.2
+    7  20:39:51.473465 IP (tos 0xc0, ttl 1, id 946, offset 0, flags [DF], proto OSPF (89), length 68)
+    1.0.0.2 > 224.0.0.5: OSPFv2, Hello, length 48
+	Router-ID 2.2.2.2, Backbone Area, Authentication Type: none (0)
+	Options [External]
+	  Hello Timer 10s, Dead Timer 40s, Mask 255.255.255.0, Priority 1
+	  Designated Router 1.0.0.2, Backup Designated Router 1.0.0.1
+	  Neighbor List:
+	    1.1.1.1
+    8  20:39:53.944914 IP (tos 0xc0, ttl 1, id 28292, offset 0, flags [DF], proto OSPF (89), length 68)
+    1.0.0.1 > 224.0.0.5: OSPFv2, Hello, length 48
+	Router-ID 1.1.1.1, Backbone Area, Authentication Type: none (0)
+	Options [External]
+	  Hello Timer 10s, Dead Timer 40s, Mask 255.255.255.0, Priority 1
+	  Designated Router 1.0.0.2, Backup Designated Router 1.0.0.1
+	  Neighbor List:
+	    2.2.2.2
+    9  20:40:01.473458 IP (tos 0xc0, ttl 1, id 1868, offset 0, flags [DF], proto OSPF (89), length 68)
+    1.0.0.2 > 224.0.0.5: OSPFv2, Hello, length 48
+	Router-ID 2.2.2.2, Backbone Area, Authentication Type: none (0)
+	Options [External]
+	  Hello Timer 10s, Dead Timer 40s, Mask 255.255.255.0, Priority 1
+	  Designated Router 1.0.0.2, Backup Designated Router 1.0.0.1
+	  Neighbor List:
+	    1.1.1.1
+   10  20:40:03.944913 IP (tos 0xc0, ttl 1, id 29497, offset 0, flags [DF], proto OSPF (89), length 68)
+    1.0.0.1 > 224.0.0.5: OSPFv2, Hello, length 48
+	Router-ID 1.1.1.1, Backbone Area, Authentication Type: none (0)
+	Options [External]
+	  Hello Timer 10s, Dead Timer 40s, Mask 255.255.255.0, Priority 1
+	  Designated Router 1.0.0.2, Backup Designated Router 1.0.0.1
+	  Neighbor List:
+	    2.2.2.2
