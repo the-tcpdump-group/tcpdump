@@ -1,6 +1,7 @@
 DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
   Summary for 5.0.0 tcpdump release (so far!)
     Refine protocol decoding for:
+      OSPF: Add Extensions for Segment Routing (RFC8665)
       OpenFlow 1.0: Fix indentation of PORT_MOD, improve handling of
           some lengths, and fix handling of snapend.
       RIP: Make a couple trivial protocol updates.
