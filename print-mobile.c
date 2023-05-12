@@ -44,6 +44,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -73,11 +74,10 @@ mobile_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	ndo->ndo_protocol = "mobile";
 	mob = (const struct mobile_ip *)bp;
 
-	if (length < MOBILE_SIZE || !ND_TTEST_SIZE(mob)) {
-		nd_print_trunc(ndo);
-		return;
-	}
-	ND_PRINT("mobile: ");
+	ND_ICHECK_U(length, <, MOBILE_SIZE);
+	ND_TCHECK_SIZE(mob);
+	nd_print_protocol(ndo);
+	ND_PRINT(": ");
 
 	proto = GET_BE_U_2(mob->proto);
 	crc =  GET_BE_U_2(mob->hcheck);
@@ -101,4 +101,7 @@ mobile_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	if (in_cksum(vec, 1)!=0) {
 		ND_PRINT(" (bad checksum %u)", crc);
 	}
+	return;
+invalid:
+	nd_print_invalid(ndo);
 }
