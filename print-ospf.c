@@ -152,17 +152,18 @@ static const struct tok lsa_opaque_te_tlv_link_type_sub_tlv_values[] = {
 };
 
 static const struct tok lsa_opaque_ri_tlv_values[] = {
-	{ LS_OPAQUE_RI_TLV_CAP, "Router Capabilities" },
-	{ LS_OPAQUE_RI_TLV_SR_ALGO, "SR-Algorithm" },
-	{ LS_OPAQUE_RI_TLV_SID_LABEL_RANGE, "SID/Label Range" },
-	{ LS_OPAQUE_RI_TLV_SR_LOCAL_BLOCK, "SR Local Block" },
-	{ LS_OPAQUE_RI_TLV_SRMS_PREFERENCE, "SRMS Preference" },
+	{ LS_OPAQUE_RI_TLV_CAP,                   "Router Capabilities" },
+	{ LS_OPAQUE_RI_TLV_SR_ALGO,               "SR-Algorithm" },
+	{ LS_OPAQUE_RI_TLV_SID_LABEL_RANGE,       "SID/Label Range" },
+	{ LS_OPAQUE_RI_TLV_SR_LOCAL_BLOCK,        "SR Local Block" },
+	{ LS_OPAQUE_RI_TLV_SRMS_PREFERENCE,       "SRMS Preference" },
 	{ 0,		        NULL }
 };
 
 static const struct tok lsa_opaque_extended_prefix_tlv_values[] = {
 	{ LS_OPAQUE_EXTENDED_PREFIX_SUBTLV_SID_LABEL, "SID/Label Sub-TLV" },
 	{ LS_OPAQUE_EXTENDED_PREFIX_SUBTLV_PREFIX_SID, "Prefix-SID Sub-TLV" },
+	{ 0,		        NULL }
 };
 
 static const struct tok lsa_opaque_ri_tlv_cap_values[] = {
@@ -178,6 +179,7 @@ static const struct tok lsa_opaque_ri_tlv_cap_values[] = {
 	{ 512, "path computation server" },
 	{ 0,		        NULL }
 };
+
 static const struct tok lsa_opaque_ri_tlv_sr_algos[] = {
 	{ 0, "Shortest Path First" },
 	{ 1, "Strict Shortest Path First" },
@@ -822,7 +824,7 @@ ospf_print_lsa(netdissect_options *ndo,
 		u_int ls_length_remaining = ls_length;
 		while (ls_length_remaining != 0) {
                     ND_TCHECK_4(tptr);
-                    if (ls_length_remaining < 4) {
+		    if (ls_length_remaining < 4) {
                         ND_PRINT("\n\t    Remaining LS length %u < 4", ls_length_remaining);
                         return(ls_end);
                     }
@@ -830,6 +832,7 @@ ospf_print_lsa(netdissect_options *ndo,
                     tlv_length = GET_BE_U_2(tptr + 2);
                     tptr+=4;
                     ls_length_remaining-=4;
+
                     ND_PRINT("\n\t    %s TLV (%u), length: %u, value: ",
                            tok2str(lsa_opaque_ri_tlv_values,"unknown",tlv_type),
                            tlv_type,
@@ -856,7 +859,8 @@ ospf_print_lsa(netdissect_options *ndo,
                         num_tlv = tlv_length;
                         while (num_tlv != 0) {
                             ND_PRINT("\n\t\t    %s (%u)",
-                                     tok2str(lsa_opaque_ri_tlv_sr_algos, "Unknown", GET_U_1(tptr+tlv_length-num_tlv)), GET_U_1(tptr+tlv_length-num_tlv));
+                                     tok2str(lsa_opaque_ri_tlv_sr_algos, "Unknown", GET_U_1(tptr+tlv_length-num_tlv)),
+                                     GET_U_1(tptr+tlv_length-num_tlv));
                             num_tlv--;
                         }
                         if (tlv_length % 4 != 0) {//padding
@@ -883,11 +887,9 @@ ospf_print_lsa(netdissect_options *ndo,
                                          sub_tlv_length);
                                 if (sub_tlv_length == 3) {
                                     ND_PRINT("Label: %u",GET_BE_U_3(sub_tlv_tptr + 4));
-                                }
-                                else if (sub_tlv_length == 4) {
-                                    ND_PRINT("SID:%u", GET_BE_U_4(sub_tlv_tptr + 4));
-                                }
-                                else {
+                                } else if (sub_tlv_length == 4) {
+                                    ND_PRINT("SID: %u", GET_BE_U_4(sub_tlv_tptr + 4));
+                                } else {
                                     ND_PRINT("\n\t    Bogus length %u != 3 or 4", sub_tlv_length);
                                     if (!print_unknown_data(ndo, sub_tlv_tptr, "\n\t      ", sub_tlv_length))
                                         return(ls_end);
@@ -900,10 +902,10 @@ ospf_print_lsa(netdissect_options *ndo,
                                         return(ls_end);
                                 }
                                 break;
-                           }
+                            }
 
-                           sub_tlv_tptr+=8;
-                           sub_tlv_remaining-=8;
+                            sub_tlv_tptr+=8;
+                            sub_tlv_remaining-=8;
                         }
                         break;
 
@@ -925,11 +927,9 @@ ospf_print_lsa(netdissect_options *ndo,
                                          sub_tlv_length);
                                 if (sub_tlv_length == 3) {
                                     ND_PRINT("Label: %u",GET_BE_U_3(sub_tlv_tptr + 4));
-                                }
-                                else if (sub_tlv_length == 4) {
-                                    ND_PRINT("SID:%u", GET_BE_U_4(sub_tlv_tptr + 4));
-                                }
-                                else {
+                                } else if (sub_tlv_length == 4) {
+                                    ND_PRINT("SID: %u", GET_BE_U_4(sub_tlv_tptr + 4));
+                                } else {
                                     ND_PRINT("\n\t    Bogus length %u != 3 or 4", sub_tlv_length);
                                     if (!print_unknown_data(ndo, sub_tlv_tptr, "\n\t      ", sub_tlv_length))
                                         return(ls_end);
