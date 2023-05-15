@@ -321,7 +321,7 @@ print_neighbors2(netdissect_options *ndo,
 			len -= 4;
 		}
 		if (ncount != -1) {
-			ND_PRINT(" [invalid ncount]");
+			ND_PRINT(" [ncount %d]", ncount);
 			goto invalid;
 		}
 	}
