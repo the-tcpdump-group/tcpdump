@@ -158,7 +158,7 @@
  *    | Requesting Port Identity      |
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
- *  Signalling Message (msg type=0xC)
+ *  Signaling Message (msg type=0xC)
  *     0                   1                   2                   3
  *     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  *                                    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -185,7 +185,7 @@
 #define M_DELAY_RESP            0x9
 #define M_PDELAY_RESP_FOLLOW_UP 0xA
 #define M_ANNOUNCE              0xB
-#define M_SIGNALLING            0xC
+#define M_SIGNALING             0xC
 #define M_MANAGEMENT            0xD
 
 static const struct tok ptp_msg_type[] = {
@@ -197,7 +197,7 @@ static const struct tok ptp_msg_type[] = {
     { M_DELAY_RESP, "delay resp msg"},
     { M_PDELAY_RESP_FOLLOW_UP, "pdelay resp fup msg"},
     { M_ANNOUNCE, "announce msg"},
-    { M_SIGNALLING, "signalling msg"},
+    { M_SIGNALING, "signaling msg"},
     { M_MANAGEMENT, "management msg"},
     { 0, NULL}
 };
@@ -433,7 +433,7 @@ ptp_print_2(netdissect_options *ndo, const u_char *bp, u_int length)
         case M_ANNOUNCE:
             ptp_print_announce_msg(ndo, bp, &len);
             break;
-        case M_SIGNALLING:
+        case M_SIGNALING:
             ptp_print_port_id(ndo, bp, &len);
             break;
         case M_MANAGEMENT:
