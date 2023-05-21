@@ -1558,7 +1558,7 @@ interp_reply(netdissect_options *ndo,
 		if (dp == NULL)
 			goto trunc;
 		if (v3) {
-			if (parsewccres(ndo, dp, ndo->ndo_vflag, &nfserr) == 0)
+			if (parsewccres(ndo, dp, ndo->ndo_vflag, &nfserr) == NULL)
 				goto trunc;
 		} else {
 			if (parseattrstat(ndo, dp, !ndo->ndo_qflag, 0, &nfserr) == 0)
