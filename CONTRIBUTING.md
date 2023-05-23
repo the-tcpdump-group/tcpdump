@@ -164,6 +164,7 @@ and ask!
 
 *  Use `struct tok` for indexed strings and print them with
    `tok2str()` or `bittok2str()` (for flags).
+   All `struct tok` must end with `{ 0, NULL }`.
 
 *  Avoid empty lines in output of printers.
 
