@@ -74,10 +74,10 @@ mobile_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	ndo->ndo_protocol = "mobile";
 	mob = (const struct mobile_ip *)bp;
 
-	ND_ICHECK_U(length, <, MOBILE_SIZE);
-	ND_TCHECK_SIZE(mob);
 	nd_print_protocol(ndo);
 	ND_PRINT(": ");
+	ND_ICHECK_U(length, <, MOBILE_SIZE);
+	ND_TCHECK_SIZE(mob);
 
 	proto = GET_BE_U_2(mob->proto);
 	crc =  GET_BE_U_2(mob->hcheck);
