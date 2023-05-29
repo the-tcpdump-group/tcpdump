@@ -267,7 +267,7 @@ lwres_printaddr(netdissect_options *ndo,
 		}
 	}
 
-	return ND_BYTES_BETWEEN(p, p0);
+	return ND_BYTES_BETWEEN(p0, p);
 }
 
 void
@@ -546,7 +546,7 @@ lwres_print(netdissect_options *ndo,
 		ND_PRINT(" [len: %u != %u]", GET_BE_U_4(np->length),
 			  length);
 	}
-	if (!unsupported && ND_BYTES_BETWEEN(s, bp) < GET_BE_U_4(np->length))
+	if (!unsupported && ND_BYTES_BETWEEN(bp, s) < GET_BE_U_4(np->length))
 		ND_PRINT("[extra]");
 	return;
 
