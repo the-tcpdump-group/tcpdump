@@ -385,13 +385,13 @@ nd_trunc_longjmp(netdissect_options *ndo)
 /*
  * Number of bytes between two pointers.
  */
-#define ND_BYTES_BETWEEN(p1, p2) ((u_int)(((const uint8_t *)(p1)) - (const uint8_t *)(p2)))
+#define ND_BYTES_BETWEEN(p1, p2) ((const u_char *)(p1) >= (const u_char *)(p2) ? 0 : ((u_int)(((const u_char *)(p2)) - (const u_char *)(p1))))
 
 /*
  * Number of bytes remaining in the captured data, starting at the
  * byte pointed to by the argument.
  */
-#define ND_BYTES_AVAILABLE_AFTER(p) ND_BYTES_BETWEEN(ndo->ndo_snapend, (p))
+#define ND_BYTES_AVAILABLE_AFTER(p) ND_BYTES_BETWEEN((p), ndo->ndo_snapend)
 
 /*
  * Check (expression_1 operator expression_2) for invalid packet with
