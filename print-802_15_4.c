@@ -584,7 +584,7 @@ ieee802_15_4_print_gts_info(netdissect_options *ndo,
 			    u_int data_len)
 {
 	uint8_t gts_spec, gts_cnt;
-	u_int len;
+	int len;
 	int i;
 
 	gts_spec = GET_U_1(p);

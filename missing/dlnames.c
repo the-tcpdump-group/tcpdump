@@ -158,7 +158,7 @@ pcap_datalink_val_to_name(int dlt)
 const char *
 pcap_datalink_val_to_description(int dlt)
 {
-	int i;
+	size_t i;
 
 	for (i = 0; dlt_choices[i].name != NULL; i++) {
 		if (dlt_choices[i].dlt == dlt)

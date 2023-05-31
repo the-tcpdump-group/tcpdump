@@ -1482,7 +1482,7 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 			if (len < 32)
 				ND_PRINT(" len=%u [bad: < 32]", len);
 			else {
-				mask = (const u_char *)(data + sizeof(nd_ipv6));
+				mask = (data + sizeof(nd_ipv6));
 				/*XXX*/
 				ND_PRINT(" len=%u %s/0x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x", len,
 					  GET_IP6ADDR_STRING(data),
@@ -1889,7 +1889,7 @@ ikev1_d_print(netdissect_options *ndo, u_char tpay _U_,
 	for (i = 0; i < num_spi; i++) {
 		if (i != 0)
 			ND_PRINT(",");
-		if (!rawprint(ndo, (const uint8_t *)q, spi_size))
+		if (!rawprint(ndo, q, spi_size))
 			goto trunc;
 		q += spi_size;
 	}
@@ -1941,7 +1941,7 @@ static const u_char *
 ikev2_gen_print(netdissect_options *ndo, u_char tpay,
 		const struct isakmp_gen *ext, u_int item_len)
 {
-	const struct isakmp_gen *p = (const struct isakmp_gen *)ext;
+	const struct isakmp_gen *p = ext;
 
 	ND_TCHECK_SIZE(ext);
 	ikev2_pay_print(ndo, NPSTR(tpay), GET_U_1(p->critical));

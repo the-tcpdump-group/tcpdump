@@ -380,8 +380,8 @@ numstr(int x)
 static int
 telnet_parse(netdissect_options *ndo, const u_char *sp, u_int length, int print)
 {
-	int i, x;
-	u_int c;
+	int x;
+	u_int c, i;
 	const u_char *osp, *p;
 #define FETCH(c, sp, length) \
 	do { \
@@ -403,9 +403,10 @@ telnet_parse(netdissect_options *ndo, const u_char *sp, u_int length, int print)
 			ND_PRINT("IAC IAC");
 		goto done;
 	}
-
+    if (c < TELCMD_FIRST)
+        goto pktend;
 	i = c - TELCMD_FIRST;
-	if (i < 0 || i > IAC - TELCMD_FIRST)
+	if (i > IAC - TELCMD_FIRST)
 		goto pktend;
 
 	switch (c) {

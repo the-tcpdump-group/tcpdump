@@ -23,7 +23,7 @@
 #include "netdissect.h"
 #include "extract.h"
 
-static int
+static u_int
 ssh_print_version(netdissect_options *ndo, const u_char *pptr, u_int len)
 {
 	u_int idx = 0;

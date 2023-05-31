@@ -545,7 +545,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			/* over_tcp: FALSE, is_mdns: TRUE */
 			domain_print(ndo, cp, length, FALSE, TRUE);
 		else if (IS_SRC_OR_DST_PORT(TIMED_PORT))
-			timed_print(ndo, (const u_char *)cp);
+			timed_print(ndo, cp);
 		else if (IS_SRC_OR_DST_PORT(TFTP_PORT))
 			tftp_print(ndo, cp, length);
 		else if (IS_SRC_OR_DST_PORT(BOOTPC_PORT) || IS_SRC_OR_DST_PORT(BOOTPS_PORT))
@@ -566,7 +566,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		else if (IS_SRC_OR_DST_PORT(NTP_PORT))
 			ntp_print(ndo, cp, length);
 		else if (IS_SRC_OR_DST_PORT(KERBEROS_PORT) || IS_SRC_OR_DST_PORT(KERBEROS_SEC_PORT))
-			krb_print(ndo, (const u_char *)cp);
+			krb_print(ndo, cp);
 		else if (IS_SRC_OR_DST_PORT(L2TP_PORT))
 			l2tp_print(ndo, cp, length);
 #ifdef ENABLE_SMB

@@ -1105,7 +1105,7 @@ domain_print(netdissect_options *ndo,
 				goto trunc;
 			qdcount--;
 			while (cp < ndo->ndo_snapend && qdcount) {
-				cp = ns_qprint(ndo, (const u_char *)cp,
+				cp = ns_qprint(ndo, cp,
 					       (const u_char *)np,
 					       is_mdns);
 				if (!cp)

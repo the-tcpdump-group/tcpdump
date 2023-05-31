@@ -561,7 +561,7 @@ l2tp_ppp_discon_cc_print(netdissect_options *ndo, const u_char *dat, u_int lengt
 
 	if (length != 0) {
 		ND_PRINT(" ");
-		print_string(ndo, (const u_char *)dat, length);
+		print_string(ndo, dat, length);
 	}
 }
 
