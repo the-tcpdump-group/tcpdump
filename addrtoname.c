@@ -225,8 +225,7 @@ const char *
 intoa(uint32_t addr)
 {
 	char *cp;
-	u_int byte;
-	int n;
+	u_int byte, n;
 	static char buf[sizeof(".xxx.xxx.xxx.xxx")];
 
 	addr = ntohl(addr);

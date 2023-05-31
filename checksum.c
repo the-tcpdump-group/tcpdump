@@ -148,8 +148,7 @@ create_osi_cksum (const uint8_t *pptr, int checksum_offset, int length)
 
     if (x == 0) x = 255;
     if (y == 0) y = 255;
-
-    y &= 0x00FF;
+    else y &= 0x00FF;
     checksum = ((x << 8) | y);
 
     return checksum;

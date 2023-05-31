@@ -48,14 +48,14 @@ const struct tok signature_check_values[] = {
  */
 DIAG_OFF_DEPRECATION
 static void
-signature_compute_hmac_md5(const uint8_t *text, int text_len, unsigned char *key,
+signature_compute_hmac_md5(const uint8_t *text, unsigned int text_len, unsigned char *key,
                            unsigned int key_len, uint8_t *digest)
 {
     MD5_CTX context;
     unsigned char k_ipad[65];    /* inner padding - key XORd with ipad */
     unsigned char k_opad[65];    /* outer padding - key XORd with opad */
     unsigned char tk[16];
-    int i;
+    size_t i;
 
     /* if key is longer than 64 bytes reset it to key=MD5(key) */
     if (key_len > 64) {

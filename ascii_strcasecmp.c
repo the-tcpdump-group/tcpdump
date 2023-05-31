@@ -75,7 +75,7 @@ ascii_strncasecmp(const char *s1, const char *s2, size_t n)
 			*us1 = (const unsigned char *)s1,
 			*us2 = (const unsigned char *)s2;
 
-	for (;;) {
+	for (;;us1++, us2++) {
 		if (n == 0) {
 			/*
 			 * We've run out of characters that we should
@@ -85,13 +85,13 @@ ascii_strncasecmp(const char *s1, const char *s2, size_t n)
 			 */
 			return(0);
 		}
-		if (cm[*us1] != cm[*us2++]) {
+		if (cm[*us1] != cm[*us2]) {
 			/*
 			 * We've found a mismatch.
 			 */
 			break;
 		}
-		if (*us1++ == '\0') {
+		if (*us1 == '\0') {
 			/*
 			 * We've run out of characters *to* compare,
 			 * and they've all been equal; return 0, to
@@ -101,5 +101,5 @@ ascii_strncasecmp(const char *s1, const char *s2, size_t n)
 		}
 		n--;
 	}
-	return(cm[*us1] - cm[*--us2]);
+	return(cm[*us1] - cm[*us2]);
 }

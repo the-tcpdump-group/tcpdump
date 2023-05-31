@@ -54,10 +54,10 @@
 #define REDUCE {l_util.l = sum; sum = l_util.s[0] + l_util.s[1]; ADDCARRY(sum);}
 
 uint16_t
-in_cksum(const struct cksum_vec *vec, int veclen)
+in_cksum(const struct cksum_vec *vec, u_int veclen)
 {
 	const uint16_t *w;
-	int sum = 0;
+	u_int sum = 0;
 	int mlen = 0;
 	int byte_swapped = 0;
 

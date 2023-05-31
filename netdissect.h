@@ -772,7 +772,7 @@ struct cksum_vec {
 	const uint8_t	*ptr;
 	int		len;
 };
-extern uint16_t in_cksum(const struct cksum_vec *, int);
+extern uint16_t in_cksum(const struct cksum_vec *, u_int);
 extern uint16_t in_cksum_shouldbe(uint16_t, uint16_t);
 
 /* IP protocol demuxing routines */

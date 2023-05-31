@@ -63,7 +63,7 @@ addrtostr (const void *src, char *dst, size_t size)
 {
     const u_char *srcaddr = (const u_char *)src;
     const char digits[] = "0123456789";
-    int i;
+    u_int i;
     const char *orig_dst = dst;
 
     if (size < INET_ADDRSTRLEN) {
@@ -74,7 +74,7 @@ addrtostr (const void *src, char *dst, size_t size)
 	int n = *srcaddr++;
 	int non_zerop = 0;
 
-	if (non_zerop || n / 100 > 0) {
+	if (n / 100 > 0) {
 	    *dst++ = digits[n / 100];
 	    n %= 100;
 	    non_zerop = 1;

@@ -34,8 +34,8 @@ void
 bpf_dump(const struct bpf_program *p, int option)
 {
 	struct bpf_insn *insn;
-	int i;
-	int n = p->bf_len;
+	u_int i;
+	u_int n = p->bf_len;
 
 	insn = p->bf_insns;
 	if (option > 2) {
