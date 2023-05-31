@@ -30,9 +30,9 @@
 
 void	init_print(netdissect_options *ndo, uint32_t localnet, uint32_t mask);
 
-int	has_printer(uint32_t type);
+int	has_printer(int type);
 
-if_printer get_if_printer(uint32_t type);
+if_printer get_if_printer(int type);
 
 void	pretty_print_packet(netdissect_options *ndo,
 	    const struct pcap_pkthdr *h, const u_char *sp,

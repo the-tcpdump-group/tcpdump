@@ -712,7 +712,7 @@ sctp_print(netdissect_options *ndo,
 		 chunkLengthRemaining != 0 && tsnNo<GET_BE_U_2(sack->numDupTsns);
 		 bp += 4, sctpPacketLengthRemaining -= 4, chunkLengthRemaining -= 4, tsnNo++) {
 	      ND_ICHECKMSG_U("chunk length", chunkLengthRemaining, <, 4);
-	      dupTSN = bp;
+	      dupTSN = (const u_char *)bp;
 	      ND_PRINT("\n\t\t[dup TSN #%u: %u] ", tsnNo+1,
 		       GET_BE_U_4(dupTSN));
 	    }

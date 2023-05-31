@@ -555,7 +555,7 @@ pimv2_addr_print(netdissect_options *ndo,
                  u_int addr_len, int silent)
 {
 	u_int af;
-	u_int hdrlen;
+	int hdrlen;
 
 	if (addr_len == 0) {
 		if (len < 2)

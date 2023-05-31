@@ -86,7 +86,7 @@ static const struct tok z_types[] = {
 static char z_buf[256];
 
 static const char *
-parse_field(netdissect_options *ndo, const char **pptr, u_int *len)
+parse_field(netdissect_options *ndo, const char **pptr, int *len)
 {
     const char *s;
 
@@ -165,7 +165,7 @@ zephyr_print(netdissect_options *ndo, const u_char *cp, u_int length)
 	NULL	/* multi_uid */
     };
     const char *parse = (const char *) cp;
-    u_int parselen = length;
+    int parselen = length;
     const char *s;
     int lose = 0;
 
@@ -188,7 +188,7 @@ zephyr_print(netdissect_options *ndo, const u_char *cp, u_int length)
     if (lose)
 	goto invalid;
 
-    if (strncmp(z.version, "ZEPH", 4) != 0)
+    if (strncmp(z.version, "ZEPH", 4))
 	return;
 
     PARSE_FIELD_INT(z.numfields);
@@ -212,7 +212,7 @@ zephyr_print(netdissect_options *ndo, const u_char *cp, u_int length)
 	goto invalid;
 
     ND_PRINT(" zephyr");
-    if (strncmp(z.version+4, "0.2", 3) != 0) {
+    if (strncmp(z.version+4, "0.2", 3)) {
 	ZEPHYR_PRINT(" v", z.version+4)
 	return;
     }
@@ -222,7 +222,7 @@ zephyr_print(netdissect_options *ndo, const u_char *cp, u_int length)
 	/* Initialization to silence warnings */
 	const char *ackdata = NULL;
 	PARSE_FIELD_STR(ackdata);
-	if (!lose && strcmp(ackdata, "SENT") != 0)
+	if (!lose && strcmp(ackdata, "SENT"))
 	    ZEPHYR_PRINT("/", str_to_lower(ackdata))
     }
     if (*z.sender) ZEPHYR_PRINT(" ", z.sender);

@@ -229,7 +229,7 @@ struct netdissect_options {
   int   ndo_packettype;	/* as specified by -T */
 
   int   ndo_snaplen;
-  u_int   ndo_ll_hdr_len;	/* link-layer header length */
+  int   ndo_ll_hdr_len;	/* link-layer header length */
 
   /*global pointers to beginning and end of current packet (during printing) */
   const u_char *ndo_packetp;
@@ -753,7 +753,7 @@ extern void udld_print(netdissect_options *, const u_char *, u_int);
 extern void udp_print(netdissect_options *, const u_char *, u_int, const u_char *, int, u_int);
 extern int vjc_print(netdissect_options *, const u_char *, u_short);
 extern void vqp_print(netdissect_options *, const u_char *, u_int);
-extern void vrrp_print(netdissect_options *, const u_char *, u_int, const u_char *, int, u_int);
+extern void vrrp_print(netdissect_options *, const u_char *, u_int, const u_char *, int, int);
 extern void vtp_print(netdissect_options *, const u_char *, const u_int);
 extern void vxlan_gpe_print(netdissect_options *, const u_char *, u_int);
 extern void vxlan_print(netdissect_options *, const u_char *, u_int);

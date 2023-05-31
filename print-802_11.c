@@ -1145,7 +1145,7 @@ trunc:
 
 static int
 parse_elements(netdissect_options *ndo,
-	       struct mgmt_body_t *pbody, const u_char *p, u_int offset,
+	       struct mgmt_body_t *pbody, const u_char *p, int offset,
 	       u_int length)
 {
 	u_int elementlen;
@@ -1473,7 +1473,7 @@ handle_assoc_response(netdissect_options *ndo,
 		      const u_char *p, u_int length)
 {
 	struct mgmt_body_t pbody;
-	u_int offset = 0;
+	int offset = 0;
 	int ret;
 
 	memset(&pbody, 0, sizeof(pbody));

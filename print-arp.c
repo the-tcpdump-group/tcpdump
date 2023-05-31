@@ -410,7 +410,7 @@ arp_print(netdissect_options *ndo,
 	case ARPOP_REQUEST:
 		ND_PRINT("who-has ");
 		tpaddr_print_ip(ndo, ap, pro);
-		if (isnonzero(ndo, THA(ap), HRD_LEN(ap)))
+		if (isnonzero(ndo, (const u_char *)THA(ap), HRD_LEN(ap)))
 			ND_PRINT(" (%s)",
 				  GET_LINKADDR_STRING(THA(ap), linkaddr, HRD_LEN(ap)));
 		ND_PRINT(" tell ");
