@@ -560,8 +560,7 @@ whitespacecheck:
 	    exit 1; \
 	fi
 	@# trailing tab(s)?
-	@# install-sh has a tab at the end of one line
-	@if git grep -I -n '	$$' $$(git ls-files|grep -vE '^(tests/|install-sh$$)'); then \
+	@if git grep -I -n '	$$' $$(git ls-files|grep -v '^tests/'); then \
 	    echo 'Error: Trailing tabs(s).'; \
 	    exit 1; \
 	fi
