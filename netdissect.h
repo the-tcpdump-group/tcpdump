@@ -392,7 +392,7 @@ nd_trunc_longjmp(netdissect_options *ndo)
  * Number of bytes remaining in the captured data, starting at the
  * byte pointed to by the argument.
  */
-#define ND_BYTES_AVAILABLE_AFTER(p) ND_BYTES_BETWEEN((p), ndo->ndo_snapend)
+#define ND_BYTES_AVAILABLE_AFTER(p) ((const u_char *)(p) < ndo->ndo_packetp ? 0 : ND_BYTES_BETWEEN((p), ndo->ndo_snapend))
 
 /* Check length < minimum for invalid packet with a custom message, format %u */
 #define ND_LCHECKMSG_U(length, minimum, what) \
