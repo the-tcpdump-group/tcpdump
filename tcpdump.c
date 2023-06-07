@@ -1971,14 +1971,6 @@ main(int argc, char **argv)
 		show_remote_devices_and_exit();
 #endif
 
-#if defined(DLT_LINUX_SLL2) && defined(HAVE_PCAP_SET_DATALINK)
-/* Set default linktype DLT_LINUX_SLL2 when capturing on the "any" device */
-		if (device != NULL &&
-		    strncmp (device, "any", strlen("any")) == 0
-		    && yflag_dlt == -1)
-			yflag_dlt = DLT_LINUX_SLL2;
-#endif
-
 	switch (ndo->ndo_tflag) {
 
 	case 0: /* Default */
@@ -2233,6 +2225,21 @@ main(int argc, char **argv)
 				      pcap_datalink_val_to_name(yflag_dlt));
 			(void)fflush(stderr);
 		}
+#if defined(DLT_LINUX_SLL2) && defined(HAVE_PCAP_SET_DATALINK)
+		else {
+			/*
+			 * Attempt to set default linktype to
+			 * DLT_LINUX_SLL2 when capturing on the
+			 * "any" device.
+			 *
+			 * If the attempt fails, just quietly drive
+			 * on; this may be a non-Linux "any" device
+			 * that doesn't support DLT_LINUX_SLL2.
+			 */
+			if (strcmp(device, "any") == 0)
+				(void) pcap_set_datalink(pd, DLT_LINUX_SLL2);
+		}
+#endif
 		i = pcap_snapshot(pd);
 		if (ndo->ndo_snaplen < i) {
 			if (ndo->ndo_snaplen != 0)
