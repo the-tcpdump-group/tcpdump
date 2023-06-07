@@ -86,7 +86,9 @@ static const struct tok gre_flag_values[] = {
  */
 #define GRE_CDP			0x2000	/* Cisco Discovery Protocol */
 #define GRE_NHRP		0x2001	/* Next Hop Resolution Protocol */
+#define GRE_ERSPAN_III		0x22eb
 #define GRE_WCCP		0x883e	/* Web Cache C* Protocol */
+#define GRE_ERSPAN_I_II		0x88be
 
 struct wccp_redirect {
 	nd_uint8_t	flags;
@@ -307,6 +309,9 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 		break;
 	case ETHERTYPE_NSH:
 		nsh_print(ndo, bp, len);
+		break;
+	case GRE_ERSPAN_I_II:
+		erspan_print(ndo, flags, bp, len);
 		break;
 	case GRE_CDP:
 		cdp_print(ndo, bp, len);

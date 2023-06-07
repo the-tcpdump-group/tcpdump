@@ -1066,8 +1066,8 @@ set(NETDISSECT_SOURCE_LIST_C
     netdissect.c
     netdissect-alloc.c
     nlpid.c
-    oui.c
     ntp.c
+    oui.c
     parsenfsfh.c
     print.c
     print-802_11.c
@@ -1109,6 +1109,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-egp.c
     print-eigrp.c
     print-enc.c
+    print-erspan.c
     print-esp.c
     print-ether.c
     print-fddi.c

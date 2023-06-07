@@ -131,6 +131,7 @@ LIBNETDISSECT_SRC=\
 	print-egp.c \
 	print-eigrp.c \
 	print-enc.c \
+	print-erspan.c \
 	print-esp.c \
 	print-ether.c \
 	print-fddi.c \
