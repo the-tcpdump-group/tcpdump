@@ -86,6 +86,7 @@ static const struct tok gre_flag_values[] = {
  */
 #define GRE_CDP			0x2000	/* Cisco Discovery Protocol */
 #define GRE_NHRP		0x2001	/* Next Hop Resolution Protocol */
+#define GRE_MIKROTIK_EOIP	0x6400	/* MikroTik RouterBoard Ethernet over IP (EoIP) */
 #define GRE_ERSPAN_III		0x22eb
 #define GRE_WCCP		0x883e	/* Web Cache C* Protocol */
 #define GRE_ERSPAN_I_II		0x88be
@@ -348,6 +349,31 @@ gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 	len -= 2;
 	bp += 2;
 
+	/*
+	 * This version is used for two purposes:
+	 *
+	 *  RFC 2637 PPTP;
+	 *  Some Mikrotik Ethernet-over-IP hack.
+	 */
+	switch (prot) {
+	case GRE_MIKROTIK_EOIP:
+		/*
+		 * The MikroTik hack uses only the key field, and uses it
+		 * for its own purposes.  If anything other than the version
+		 * and K bit are set, report an error and give up.
+		 */
+		if ((flags & ~GRE_VERS_MASK) != GRE_KP) {
+			ND_PRINT(" unknown-eoip-flags-%04x!", flags);
+			return;
+		}
+		break;
+	default:
+		/*
+		 * XXX - what should we do if it's not ETHERTYPE_PPP?
+		 */
+		break;
+	}
+
 	if (flags & GRE_KP) {
 		/* Skip payload length? */
 		ND_ICHECK_U(len, <, 2);
@@ -356,7 +382,11 @@ gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 		bp += 2;
 
 		ND_ICHECK_U(len, <, 2);
-		ND_PRINT(", call %u", GET_BE_U_2(bp));
+		if (prot == GRE_MIKROTIK_EOIP) {
+			/* Non-standard */
+			ND_PRINT(", tunnel-id %u", GET_BE_U_2(bp));
+		} else
+			ND_PRINT(", call %u", GET_BE_U_2(bp));
 		len -= 2;
 		bp += 2;
 	} else
@@ -376,7 +406,10 @@ gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 		len -= 4;
 	}
 
-	if ((flags & GRE_SP) == 0)
+	/*
+	 * More non-standard EoIP behavior.
+	 */
+	if (prot != GRE_MIKROTIK_EOIP && (flags & GRE_SP) == 0)
 		ND_PRINT(", no-payload");
 
 	if (ndo->ndo_eflag)
@@ -385,7 +418,10 @@ gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	ND_PRINT(", length %u",length);
 
-	if ((flags & GRE_SP) == 0)
+	/*
+	 * More non-standard EoIP behavior.
+	 */
+	if (prot != GRE_MIKROTIK_EOIP && (flags & GRE_SP) == 0)
 		return;
 
 	if (ndo->ndo_vflag < 1)
@@ -396,6 +432,13 @@ gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 	switch (prot) {
 	case ETHERTYPE_PPP:
 		ppp_print(ndo, bp, len);
+		break;
+	case GRE_MIKROTIK_EOIP:
+		/* MikroTik RouterBoard Ethernet over IP (EoIP) */
+		if (len == 0)
+			ND_PRINT("keepalive");
+		else
+			ether_print(ndo, bp, len, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL);
 		break;
 	default:
 		ND_PRINT("gre-proto-0x%x", prot);
