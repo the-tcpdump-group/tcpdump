@@ -348,16 +348,19 @@ gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 	len -= 2;
 	bp += 2;
 
-
 	if (flags & GRE_KP) {
-		uint32_t k;
+		/* Skip payload length? */
+		ND_ICHECK_U(len, <, 2);
+		ND_TCHECK_LEN(bp, 2);
+		len -= 2;
+		bp += 2;
 
-		ND_ICHECK_U(len, <, 4);
-		k = GET_BE_U_4(bp);
-		ND_PRINT(", call %u", k & 0xffff);
-		len -= 4;
-		bp += 4;
-	}
+		ND_ICHECK_U(len, <, 2);
+		ND_PRINT(", call %u", GET_BE_U_2(bp));
+		len -= 2;
+		bp += 2;
+	} else
+		ND_PRINT(", (ERROR: K flag not set)");
 
 	if (flags & GRE_SP) {
 		ND_ICHECK_U(len, <, 4);
