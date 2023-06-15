@@ -67,7 +67,7 @@
 #define	IEEE802_11_STATUS_LEN		2
 #define	IEEE802_11_REASON_LEN		2
 
-/* Length of previous AP in reassocation frame */
+/* Length of previous AP in reassociation frame */
 #define	IEEE802_11_AP_LEN		6
 
 #define	T_MGMT 0x0  /* management */
@@ -1724,7 +1724,7 @@ static const struct tok category_str[] = {
 	{ 3,   "BA"                  },
 	{ 7,   "HT"                  },
 	{ 13,  "MeshAction"          },
-	{ 14,  "MultiohopAction"     },
+	{ 14,  "MultihopAction"      },
 	{ 15,  "SelfprotectAction"   },
 	{ 127, "Vendor"              },
 	{ 0, NULL }

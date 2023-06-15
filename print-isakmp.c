@@ -2513,7 +2513,7 @@ ikev2_n_print(netdissect_options *ndo, u_char tpay _U_,
 		break;
 
 	case IV2_NOTIFY_TS_UNACCEPTABLE:
-		notify_name = "ts_unnacceptable";
+		notify_name = "ts_unacceptable";
 		break;
 
 	case IV2_NOTIFY_INVALID_SELECTORS:
