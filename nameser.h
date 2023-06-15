@@ -87,7 +87,7 @@
 #define UPDATEMA	0xd		/* modify all named resource record */
 
 #define ZONEINIT	0xe		/* initial zone transfer */
-#define ZONEREF		0xf		/* incremental zone referesh */
+#define ZONEREF		0xf		/* incremental zone refresh */
 
 /*
  * Undefine various #defines from various System V-flavored OSes (Solaris,
@@ -112,7 +112,7 @@
 #define NOERROR		0		/* no error */
 #define FORMERR		1		/* format error */
 #define SERVFAIL	2		/* server failure */
-#define NXDOMAIN	3		/* non existent domain */
+#define NXDOMAIN	3		/* nonexistent domain */
 #define NOTIMP		4		/* not implemented */
 #define REFUSED		5		/* query refused */
 	/* non standard */
@@ -125,7 +125,7 @@
 #define T_NS		2		/* authoritative server */
 #define T_MD		3		/* mail destination */
 #define T_MF		4		/* mail forwarder */
-#define T_CNAME		5		/* connonical name */
+#define T_CNAME		5		/* canonical name */
 #define T_SOA		6		/* start of authority zone */
 #define T_MB		7		/* mailbox domain name */
 #define T_MG		8		/* mail group member */

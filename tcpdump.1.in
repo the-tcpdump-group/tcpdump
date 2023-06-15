@@ -407,7 +407,7 @@ which should include a time format as defined by
 .BR strftime (3).
 If no time format is specified, each new file will overwrite the previous.
 Whenever a generated filename is not unique, tcpdump will overwrite the
-pre-existing data; providing a time specification that is coarser than the
+preexisting data; providing a time specification that is coarser than the
 capture period is therefore not advised.
 .IP
 If used in conjunction with the
@@ -1680,7 +1680,7 @@ The op (Query) and response code
 (NoError) were omitted, as was the class (C_IN) of the A record.
 .LP
 In the second example, \fIhelios\fP responds to query 2 with a
-response code of non-existent domain (NXDomain) with no answers,
+response code of nonexistent domain (NXDomain) with no answers,
 one name server and no authority records.
 The `*' indicates that
 the \fIauthoritative answer\fP bit was set.

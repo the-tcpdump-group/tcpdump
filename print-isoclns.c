@@ -207,7 +207,7 @@ static const struct tok esis_option_values[] = {
     { ESIS_OPTION_SECURITY,        "Security" },
     { ESIS_OPTION_ES_CONF_TIME,    "ES Configuration Time" },
     { ESIS_OPTION_PRIORITY,        "Priority" },
-    { ESIS_OPTION_ADDRESS_MASK,    "Addressk Mask" },
+    { ESIS_OPTION_ADDRESS_MASK,    "Address Mask" },
     { ESIS_OPTION_SNPA_MASK,       "SNPA Mask" },
     { 0, NULL }
 };
@@ -612,7 +612,7 @@ static const struct tok isis_lsp_istype_values[] = {
 #define ISIS_PTP_ADJ_INIT 1
 #define ISIS_PTP_ADJ_DOWN 2
 
-static const struct tok isis_ptp_adjancey_values[] = {
+static const struct tok isis_ptp_adjacency_values[] = {
     { ISIS_PTP_ADJ_UP,    "Up" },
     { ISIS_PTP_ADJ_INIT,  "Initializing" },
     { ISIS_PTP_ADJ_DOWN,  "Down" },
@@ -3148,7 +3148,7 @@ isis_print(netdissect_options *ndo,
 	    tlv_ptp_adj = (const struct isis_tlv_ptp_adj *)tptr;
 	    if(tlen>=1) {
 		ND_PRINT("\n\t      Adjacency State: %s (%u)",
-		       tok2str(isis_ptp_adjancey_values, "unknown", GET_U_1(tptr)),
+		       tok2str(isis_ptp_adjacency_values, "unknown", GET_U_1(tptr)),
 		       GET_U_1(tptr));
 		tlen--;
 	    }

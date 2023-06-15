@@ -194,7 +194,7 @@ static const char *lcpconfopts[] = {
 	"deprecated(12)",	/* used to be a Multi-Link-Procedure*/
 	"Call-Back",		/* (13) */
 	"deprecated(14)",	/* used to be a Connect-Time */
-	"deprecated(15)",	/* used to be a Compund-Frames */
+	"deprecated(15)",	/* used to be a Compound-Frames */
 	"deprecated(16)",	/* used to be a Nominal-Data-Encap */
 	"MRRU",			/* (17) */
 	"12-Bit seq #",		/* (18) */
@@ -859,7 +859,7 @@ handle_chap(netdissect_options *ndo,
 	 * don't know which flavor of CHAP (i.e. CHAP-MD5, MS-CHAPv1,
 	 * MS-CHAPv2) is used at this point, we can't decode packet
 	 * specifically to each algorithms. Instead, we simply decode
-	 * the GCD (Gratest Common Denominator) for all algorithms.
+	 * the GCD (Greatest Common Denominator) for all algorithms.
 	 */
 	switch (code) {
 	case CHAP_CHAL:

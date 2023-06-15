@@ -1115,7 +1115,7 @@ static const struct ipxsap_ent {
 	{ 0x030a, "GalacticommWorldgroupServer" },
 	{ 0x030c, "IntelNetport2/HP JetDirect/HP Quicksilver" },
 	{ 0x0320, "AttachmateGateway" },
-	{ 0x0327, "MicrosoftDiagnostiocs" },
+	{ 0x0327, "MicrosoftDiagnostics" },
 	{ 0x0328, "WATCOM SQL Server" },
 	{ 0x0335, "MultiTechSystems MultisynchCommServer" },
 	{ 0x0343, "Xylogics RemoteAccessServer/LANModem" },

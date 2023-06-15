@@ -412,7 +412,7 @@ invalid:
 }
 
 /*
- * Print an Ethernet frame while specyfing a non-standard Ethernet header
+ * Print an Ethernet frame while specifying a non-standard Ethernet header
  * length.
  * This might be encapsulated within another frame; we might be passed
  * a pointer to a function that can print header information for that

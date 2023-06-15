@@ -808,7 +808,7 @@ droproot(const char *username, const char *chroot_dir)
 	} else
 		error("Couldn't find user '%.32s'", username);
 #ifdef HAVE_LIBCAP_NG
-	/* We don't need CAP_SETUID, CAP_SETGID and CAP_SYS_CHROOT any more. */
+	/* We don't need CAP_SETUID, CAP_SETGID and CAP_SYS_CHROOT anymore. */
 DIAG_OFF_ASSIGN_ENUM
 	capng_updatev(
 		CAPNG_DROP,
@@ -979,7 +979,7 @@ tstamp_precision_to_string(int precision)
  * along the lines of ioctl(), the fact that ioctl() operations are
  * largely specific to particular character devices but fcntl() operations
  * are either generic to all descriptors or generic to all descriptors for
- * regular files nonwithstanding.
+ * regular files notwithstanding.
  *
  * The Capsicum people decided that fine-grained control of descriptor
  * operations was required, so that you need to grant permission for

@@ -112,38 +112,38 @@
 
 /* Radius packet codes */
 /* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-27 */
-#define RADCMD_ACCESS_REQ   1 /* Access-Request      */
-#define RADCMD_ACCESS_ACC   2 /* Access-Accept       */
-#define RADCMD_ACCESS_REJ   3 /* Access-Reject       */
-#define RADCMD_ACCOUN_REQ   4 /* Accounting-Request  */
-#define RADCMD_ACCOUN_RES   5 /* Accounting-Response */
-#define RADCMD_ACCESS_CHA  11 /* Access-Challenge    */
-#define RADCMD_STATUS_SER  12 /* Status-Server       */
-#define RADCMD_STATUS_CLI  13 /* Status-Client       */
-#define RADCMD_DISCON_REQ  40 /* Disconnect-Request  */
-#define RADCMD_DISCON_ACK  41 /* Disconnect-ACK      */
-#define RADCMD_DISCON_NAK  42 /* Disconnect-NAK      */
-#define RADCMD_COA_REQ     43 /* CoA-Request         */
-#define RADCMD_COA_ACK     44 /* CoA-ACK             */
-#define RADCMD_COA_NAK     45 /* CoA-NAK             */
-#define RADCMD_RESERVED   255 /* Reserved            */
+#define RADCMD_ACCESS_REQ    1 /* Access-Request      */
+#define RADCMD_ACCESS_ACC    2 /* Access-Accept       */
+#define RADCMD_ACCESS_REJ    3 /* Access-Reject       */
+#define RADCMD_ACCOUNT_REQ   4 /* Accounting-Request  */
+#define RADCMD_ACCOUNT_RES   5 /* Accounting-Response */
+#define RADCMD_ACCESS_CHA   11 /* Access-Challenge    */
+#define RADCMD_STATUS_SER   12 /* Status-Server       */
+#define RADCMD_STATUS_CLI   13 /* Status-Client       */
+#define RADCMD_DISCON_REQ   40 /* Disconnect-Request  */
+#define RADCMD_DISCON_ACK   41 /* Disconnect-ACK      */
+#define RADCMD_DISCON_NAK   42 /* Disconnect-NAK      */
+#define RADCMD_COA_REQ      43 /* CoA-Request         */
+#define RADCMD_COA_ACK      44 /* CoA-ACK             */
+#define RADCMD_COA_NAK      45 /* CoA-NAK             */
+#define RADCMD_RESERVED    255 /* Reserved            */
 
 static const struct tok radius_command_values[] = {
-    { RADCMD_ACCESS_REQ, "Access-Request" },
-    { RADCMD_ACCESS_ACC, "Access-Accept" },
-    { RADCMD_ACCESS_REJ, "Access-Reject" },
-    { RADCMD_ACCOUN_REQ, "Accounting-Request" },
-    { RADCMD_ACCOUN_RES, "Accounting-Response" },
-    { RADCMD_ACCESS_CHA, "Access-Challenge" },
-    { RADCMD_STATUS_SER, "Status-Server" },
-    { RADCMD_STATUS_CLI, "Status-Client" },
-    { RADCMD_DISCON_REQ, "Disconnect-Request" },
-    { RADCMD_DISCON_ACK, "Disconnect-ACK" },
-    { RADCMD_DISCON_NAK, "Disconnect-NAK" },
-    { RADCMD_COA_REQ,    "CoA-Request" },
-    { RADCMD_COA_ACK,    "CoA-ACK" },
-    { RADCMD_COA_NAK,    "CoA-NAK" },
-    { RADCMD_RESERVED,   "Reserved" },
+    { RADCMD_ACCESS_REQ,  "Access-Request" },
+    { RADCMD_ACCESS_ACC,  "Access-Accept" },
+    { RADCMD_ACCESS_REJ,  "Access-Reject" },
+    { RADCMD_ACCOUNT_REQ, "Accounting-Request" },
+    { RADCMD_ACCOUNT_RES, "Accounting-Response" },
+    { RADCMD_ACCESS_CHA,  "Access-Challenge" },
+    { RADCMD_STATUS_SER,  "Status-Server" },
+    { RADCMD_STATUS_CLI,  "Status-Client" },
+    { RADCMD_DISCON_REQ,  "Disconnect-Request" },
+    { RADCMD_DISCON_ACK,  "Disconnect-ACK" },
+    { RADCMD_DISCON_NAK,  "Disconnect-NAK" },
+    { RADCMD_COA_REQ,     "CoA-Request" },
+    { RADCMD_COA_ACK,     "CoA-ACK" },
+    { RADCMD_COA_NAK,     "CoA-NAK" },
+    { RADCMD_RESERVED,    "Reserved" },
     { 0, NULL}
 };
 

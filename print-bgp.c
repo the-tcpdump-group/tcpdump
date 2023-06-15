@@ -1598,7 +1598,7 @@ check_add_path(netdissect_options *ndo, const u_char *pptr, u_int length,
     }
 
     /*
-     * Scan through the NLRI information under the assumpetion that
+     * Scan through the NLRI information under the assumption that
      * it doesn't have path IDs.
      */
     for (offset = 0; offset < length;) {

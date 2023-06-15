@@ -928,7 +928,7 @@ Wed.	April 25, 2007. ken@xelerance.com.  Summary for 3.9.6 tcpdump release
 	 RFC 4340.
 	Add support for per-VLAN spanning tree and per-VLAN rapid spanning tree
 	Add support for Multiple-STP as per 802.1s
-	Add support for the cisco propriatry 'dynamic trunking protocol'
+	Add support for the cisco proprietary 'dynamic trunking protocol'
 	Add support for the cisco proprietary VTP protocol
 	Update dhcp6 options table as per IETF standardization activities
 

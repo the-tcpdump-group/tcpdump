@@ -67,7 +67,7 @@
 #define	IEEE802_11_STATUS_LEN		2
 #define	IEEE802_11_REASON_LEN		2
 
-/* Length of previous AP in reassocation frame */
+/* Length of previous AP in reassociation frame */
 #define	IEEE802_11_AP_LEN		6
 
 #define	T_MGMT 0x0  /* management */
@@ -1744,7 +1744,7 @@ handle_action(netdissect_options *ndo,
 	case 7: ND_PRINT("HT "); PRINT_HT_ACTION(GET_U_1(p + 1)); break;
 	case 13: ND_PRINT("MeshAction "); PRINT_MESH_ACTION(GET_U_1(p + 1)); break;
 	case 14:
-		ND_PRINT("MultiohopAction ");
+		ND_PRINT("MultihopAction");
 		PRINT_MULTIHOP_ACTION(GET_U_1(p + 1)); break;
 	case 15:
 		ND_PRINT("SelfprotectAction ");

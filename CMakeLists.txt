@@ -1011,7 +1011,7 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/.devel OR EXISTS ${CMAKE_BINARY_DIR}/.devel)
         # __declspec(align), because the only structures whose layout
         # we precisely specify are those that get overlaid on packet
         # data, and in those every element is an array of octets so
-        # that we have full control over the size and aligmnet, and,
+        # that we have full control over the size and alignment, and,
         # apparently, jmp_buf has such a declaration on x86, meaning
         # that everything that includes netdissect.h, i.e. almost every
         # file in tcpdump, gets a warning.
