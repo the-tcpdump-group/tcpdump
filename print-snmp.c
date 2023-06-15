@@ -1070,7 +1070,7 @@ smi_print_value(netdissect_options *ndo,
 	}
 
 	if (NOTIFY_CLASS(pduid) && smiNode->access < SMI_ACCESS_NOTIFY) {
-	    ND_PRINT("[notNotifyable]");
+	    ND_PRINT("[notNotifiable]");
 	}
 
 	if (READ_CLASS(pduid) && smiNode->access < SMI_ACCESS_READ_ONLY) {

@@ -690,7 +690,7 @@ sflow_print_flow_records(netdissect_options *ndo,
 
 	sflow_flow_record = (const struct sflow_flow_record_t *)tptr;
 
-	/* so, the funky encoding means we cannot blythly mask-off
+	/* so, the funky encoding means we cannot blithely mask-off
 	   bits, we must also check the enterprise. */
 
 	enterprise = GET_BE_U_4(sflow_flow_record->format);

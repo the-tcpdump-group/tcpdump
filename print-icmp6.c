@@ -526,7 +526,7 @@ struct nd_rpl_security {
 #endif
 };
 
-/* section 6.2.1, DODAG Information Solication (DIS_IS) */
+/* section 6.2.1, DODAG Information Solicitation (DIS_IS) */
 struct nd_rpl_dis_is {
     nd_uint8_t rpl_dis_flags;
     nd_uint8_t rpl_dis_reserved;
