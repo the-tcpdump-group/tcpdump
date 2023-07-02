@@ -21,6 +21,7 @@
 if [ -z "$PREFIX" ]; then
     PREFIX=`mktempdir tcpdump_build`
     echo "PREFIX set to '$PREFIX'"
+    DELETE_PREFIX=yes
 fi
 TCPDUMP_BIN="$PREFIX/bin/tcpdump"
 # For TESTrun
