@@ -121,6 +121,10 @@ struct dhcp6_relay {
 /* options */
 #define DH6OPT_CLIENTID	1
 #define DH6OPT_SERVERID	2
+#  define DUID_LLT  1 /* RFC8415 */
+#  define DUID_EN   2 /* RFC8415 */
+#  define DUID_LL   3 /* RFC8415 */
+#  define DUID_UUID 4 /* RFC6355 */
 #define DH6OPT_IA_NA 3
 #define DH6OPT_IA_TA 4
 #define DH6OPT_IA_ADDR 5
@@ -320,7 +324,7 @@ dhcp6opt_print(netdissect_options *ndo,
 			}
 			tp = (const u_char *)(dh6o + 1);
 			switch (GET_BE_U_2(tp)) {
-			case 1:
+			case DUID_LLT:
 				if (optlen >= 2 + 6) {
 					ND_PRINT(" hwaddr/time type %u time %u ",
 					    GET_BE_U_2(tp + 2),
@@ -335,7 +339,7 @@ dhcp6opt_print(netdissect_options *ndo,
 					ND_PRINT(" ?)");
 				}
 				break;
-			case 2:
+			case DUID_EN:
 				if (optlen >= 2 + 4) {
 					ND_PRINT(" enterprise %u ", GET_BE_U_4(tp + 2));
 					for (i = 2 + 4; i < optlen; i++)
@@ -348,11 +352,24 @@ dhcp6opt_print(netdissect_options *ndo,
 					ND_PRINT(" ?)");
 				}
 				break;
-			case 3:
+			case DUID_LL:
 				if (optlen >= 2 + 2) {
 					ND_PRINT(" hwaddr type %u ",
 					    GET_BE_U_2(tp + 2));
 					for (i = 4; i < optlen; i++)
+						ND_PRINT("%02x",
+							 GET_U_1(tp + i));
+					/*(*/
+					ND_PRINT(")");
+				} else {
+					/*(*/
+					ND_PRINT(" ?)");
+				}
+				break;
+			case DUID_UUID:
+				ND_PRINT(" uuid ");
+				if (optlen == 2 + 16) {
+					for (i = 2; i < optlen; i++)
 						ND_PRINT("%02x",
 							 GET_U_1(tp + i));
 					/*(*/
