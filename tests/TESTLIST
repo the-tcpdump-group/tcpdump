@@ -220,6 +220,7 @@ dhcpv6-ntp-server	dhcpv6-ntp-server.pcap	dhcpv6-ntp-server.out	-v
 dhcpv6-sip-server-d	dhcpv6-sip-server-d.pcap	dhcpv6-sip-server-d.out -v
 dhcpv6-domain-list	dhcpv6-domain-list.pcap	dhcpv6-domain-list.out	-v
 dhcpv6-mud	dhcpv6-mud.pcap		dhcpv6-mud.out -vv
+dhcpv6-rfc6355-duid-uuid dhcpv6-rfc6355-duid-uuid.pcap dhcpv6-rfc6355-duid-uuid.out -v
 
 # ZeroMQ/PGM tests
 # ZMTP/1.0 over TCP
