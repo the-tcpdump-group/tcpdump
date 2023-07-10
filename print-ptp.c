@@ -231,7 +231,8 @@ static const struct tok ptp_control_field[] = {
 #define PTP_HDR_LEN         0x22
 
 /* mask based on the first byte */
-#define PTP_VERS_MASK       0xFF
+#define PTP_MAJOR_VERS_MASK 0x0F
+#define PTP_MINOR_VERS_MASK 0xF0
 #define PTP_V1_COMPAT       0x10
 #define PTP_MSG_TYPE_MASK   0x0F
 
@@ -449,13 +450,25 @@ ptp_print_2(netdissect_options *ndo, const u_char *bp, u_int length)
 void
 ptp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
-    u_int vers;
+    u_int major_vers;
+    u_int minor_vers;
 
+    /* In 1588-2019, a minorVersionPTP field has been created in the common PTP
+     * message header, from a previously reserved field. Implementations
+     * compatible to the 2019 edition shall indicate a versionPTP field value
+     * of 2 and minorVersionPTP field value of 1, indicating that this is PTP
+     * version 2.1.
+     */
     ndo->ndo_protocol = "ptp";
     ND_ICHECK_U(length, <, PTP_HDR_LEN);
-    vers = GET_BE_U_2(bp) & PTP_VERS_MASK;
-    ND_PRINT("PTPv%u",vers);
-    switch(vers) {
+    major_vers = GET_BE_U_2(bp) & PTP_MAJOR_VERS_MASK;
+    minor_vers = (GET_BE_U_2(bp) & PTP_MINOR_VERS_MASK) >> 4;
+    if (minor_vers)
+	    ND_PRINT("PTPv%u.%u", major_vers, minor_vers);
+    else
+	    ND_PRINT("PTPv%u", major_vers);
+
+    switch(major_vers) {
         case PTP_VER_1:
             ptp_print_1(ndo);
             break;
