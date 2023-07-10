@@ -233,7 +233,7 @@ static const struct tok ptp_control_field[] = {
 /* mask based on the first byte */
 #define PTP_MAJOR_VERS_MASK 0x0F
 #define PTP_MINOR_VERS_MASK 0xF0
-#define PTP_V1_COMPAT       0x10
+#define PTP_MAJOR_SDO_ID_MASK   0xF0
 #define PTP_MSG_TYPE_MASK   0x0F
 
 /*mask based 2byte */
@@ -359,15 +359,15 @@ ptp_print_2(netdissect_options *ndo, const u_char *bp, u_int length)
 {
     u_int len = length;
     uint16_t msg_len, flags, port_id, seq_id;
-    uint8_t foct, domain_no, msg_type, v1_compat, rsvd1, lm_int, control;
+    uint8_t foct, domain_no, msg_type, major_sdo_id, rsvd1, lm_int, control;
     uint64_t ns_corr;
     uint16_t sns_corr;
     uint32_t rsvd2;
     uint64_t clk_id;
 
     foct = GET_U_1(bp);
-    v1_compat = foct & PTP_V1_COMPAT;
-    ND_PRINT(", v1 compat : %s", v1_compat?"yes":"no");
+    major_sdo_id = (foct & PTP_MAJOR_SDO_ID_MASK) >> 4;
+    ND_PRINT(", majorSdoId : 0x%x", major_sdo_id);
     msg_type = foct & PTP_MSG_TYPE_MASK;
     ND_PRINT(", msg type : %s", tok2str(ptp_msg_type, "Reserved", msg_type));
 
