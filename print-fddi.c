@@ -256,8 +256,8 @@ fddi_hdr_print(netdissect_options *ndo,
 {
 	const char *srcname, *dstname;
 
-	srcname = mac64_string(ndo, fsrc);
-	dstname = mac64_string(ndo, fdst);
+	srcname = mac48_string(ndo, fsrc);
+	dstname = mac48_string(ndo, fdst);
 
 	if (!ndo->ndo_qflag)
 		print_fddi_fc(ndo, GET_U_1(fddip->fddi_fc));
@@ -298,9 +298,9 @@ fddi_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 		fddi_hdr_print(ndo, fddip, length, srcmac, dstmac);
 
 	src.addr = srcmac;
-	src.addr_string = mac64_string;
+	src.addr_string = mac48_string;
 	dst.addr = dstmac;
-	dst.addr_string = mac64_string;
+	dst.addr_string = mac48_string;
 
 	/* Skip over FDDI MAC header */
 	length -= FDDI_HDRLEN;

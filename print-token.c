@@ -108,8 +108,8 @@ token_hdr_print(netdissect_options *ndo,
 {
 	const char *srcname, *dstname;
 
-	srcname = mac64_string(ndo, fsrc);
-	dstname = mac64_string(ndo, fdst);
+	srcname = mac48_string(ndo, fsrc);
+	dstname = mac48_string(ndo, fdst);
 
 	if (!ndo->ndo_qflag)
 		ND_PRINT("%02x %02x ",
@@ -204,9 +204,9 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 	}
 
 	src.addr = srcmac;
-	src.addr_string = mac64_string;
+	src.addr_string = mac48_string;
 	dst.addr = dstmac;
-	dst.addr_string = mac64_string;
+	dst.addr_string = mac48_string;
 
 	/* Skip over token ring MAC header and routing information */
 	length -= hdr_len;

@@ -171,9 +171,9 @@ ether_common_print(netdissect_options *ndo, const u_char *p, u_int length,
 	 */
 	ehp = (const struct ether_header *)p;
 	src.addr = ehp->ether_shost;
-	src.addr_string = mac64_string;
+	src.addr_string = mac48_string;
 	dst.addr = ehp->ether_dhost;
-	dst.addr_string = mac64_string;
+	dst.addr_string = mac48_string;
 
 	length -= 2*MAC48_LEN;
 	caplen -= 2*MAC48_LEN;

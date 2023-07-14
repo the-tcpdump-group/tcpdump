@@ -1362,7 +1362,7 @@ lldp_network_addr_print(netdissect_options *ndo, const u_char *tptr, u_int len)
     case AFNUM_802:
         if (len < MAC48_LEN)
           return NULL;
-        pfunc = mac64_string;
+        pfunc = mac48_string;
         break;
     default:
         pfunc = NULL;

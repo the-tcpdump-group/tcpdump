@@ -66,8 +66,8 @@ ipfc_hdr_print(netdissect_options *ndo,
 {
 	const char *srcname, *dstname;
 
-	srcname = mac64_string(ndo, ipfcsrc);
-	dstname = mac64_string(ndo, ipfcdst);
+	srcname = mac48_string(ndo, ipfcsrc);
+	dstname = mac48_string(ndo, ipfcdst);
 
 	/*
 	 * XXX - should we show the upper 16 bits of the addresses?
@@ -106,9 +106,9 @@ ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 		ipfc_hdr_print(ndo, ipfcp, length, srcmac, dstmac);
 
 	src.addr = srcmac;
-	src.addr_string = mac64_string;
+	src.addr_string = mac48_string;
 	dst.addr = dstmac;
-	dst.addr_string = mac64_string;
+	dst.addr_string = mac48_string;
 
 	/* Skip over Network_Header */
 	length -= IPFC_HDRLEN;

@@ -589,7 +589,7 @@ lookup_protoid(netdissect_options *ndo, const u_char *pi)
 }
 
 const char *
-mac64_string(netdissect_options *ndo, const uint8_t *ep)
+mac48_string(netdissect_options *ndo, const uint8_t *ep)
 {
 	int i;
 	char *cp;
@@ -691,7 +691,7 @@ linkaddr_string(netdissect_options *ndo, const uint8_t *ep,
 		return ("<empty>");
 
 	if (type == LINKADDR_MAC48 && len == MAC48_LEN)
-		return (mac64_string(ndo, ep));
+		return (mac48_string(ndo, ep));
 
 	if (type == LINKADDR_FRELAY)
 		return (q922_string(ndo, ep, len));
@@ -949,7 +949,7 @@ static const struct etherlist {
  * Initialize the ethers hash table.  We take two different approaches
  * depending on whether or not the system provides the ethers name
  * service.  If it does, we just wire in a few names at startup,
- * and mac64_string() fills in the table on demand.  If it doesn't,
+ * and mac48_string() fills in the table on demand.  If it doesn't,
  * then we suck in the entire /etc/ethers file at startup.  The idea
  * is that parsing the local file will be fast, but spinning through
  * all the ethers entries via NIS & next_etherent might be very slow.
@@ -995,7 +995,7 @@ init_etherarray(netdissect_options *ndo)
 		/*
 		 * Use YP/NIS version of name if available.
 		 */
-		/* Same workaround as in mac64_string(). */
+		/* Same workaround as in mac48_string(). */
 		struct ether_addr ea;
 		memcpy (&ea, el->addr, MAC48_LEN);
 		if (ether_ntohost(name, &ea) == 0) {

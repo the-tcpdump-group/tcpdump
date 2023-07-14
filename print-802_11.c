@@ -1534,7 +1534,7 @@ handle_reassoc_request(netdissect_options *ndo,
 	ret = parse_elements(ndo, &pbody, p, offset, length);
 
 	PRINT_SSID(pbody);
-	ND_PRINT(" AP : %s", mac64_string(ndo,  pbody.ap ));
+	ND_PRINT(" AP : %s", mac48_string(ndo,  pbody.ap ));
 
 	return ret;
 trunc:
@@ -2272,8 +2272,8 @@ ieee802_11_print(netdissect_options *ndo,
 	caplen -= hdrlen;
 	p += hdrlen;
 
-	src.addr_string = mac64_string;
-	dst.addr_string = mac64_string;
+	src.addr_string = mac48_string;
+	dst.addr_string = mac48_string;
 	switch (FC_TYPE(fc)) {
 	case T_MGMT:
 		get_mgmt_src_dst_mac(p - hdrlen, &src.addr, &dst.addr);

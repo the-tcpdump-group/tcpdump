@@ -47,7 +47,7 @@ enum {
 #define BUFSIZE 128
 
 extern const char *linkaddr_string(netdissect_options *, const uint8_t *, const unsigned int, const unsigned int);
-extern const char *mac64_string(netdissect_options *, const uint8_t *);
+extern const char *mac48_string(netdissect_options *, const uint8_t *);
 extern const char *eui64_string(netdissect_options *, const uint8_t *);
 extern const char *eui64le_string(netdissect_options *, const uint8_t *);
 extern const char *tcpport_string(netdissect_options *, u_short);
@@ -79,11 +79,11 @@ get_linkaddr_string(netdissect_options *ndo, const uint8_t *p,
 }
 
 static inline const char *
-get_mac64_string(netdissect_options *ndo, const uint8_t *p)
+get_mac48_string(netdissect_options *ndo, const uint8_t *p)
 {
         if (!ND_TTEST_LEN(p, MAC48_LEN))
                 nd_trunc_longjmp(ndo);
-        return mac64_string(ndo, p);
+        return mac48_string(ndo, p);
 }
 
 static inline const char *
@@ -128,7 +128,7 @@ get_ip6addr_string(netdissect_options *ndo, const u_char *p)
 }
 
 #define GET_LINKADDR_STRING(p, type, len) get_linkaddr_string(ndo, (const u_char *)(p), type, len)
-#define GET_MAC48_STRING(p) get_mac64_string(ndo, (const u_char *)(p))
+#define GET_MAC48_STRING(p) get_mac48_string(ndo, (const u_char *)(p))
 #define GET_EUI64_STRING(p) get_eui64_string(ndo, (const u_char *)(p))
 #define GET_EUI64LE_STRING(p) get_eui64le_string(ndo, (const u_char *)(p))
 #define GET_ISONSAP_STRING(nsap, nsap_length) get_isonsap_string(ndo, (const u_char *)(nsap), nsap_length)
