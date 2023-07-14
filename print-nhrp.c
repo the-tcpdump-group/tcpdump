@@ -179,7 +179,7 @@ static const char *
 nhrp_mac_addr_string(netdissect_options *ndo, const u_char *addr, u_int addrlen)
 {
 	if (addrlen == 6)
-		return (GET_ETHERADDR_STRING(addr));
+		return (GET_MAC48_STRING(addr));
 	else
 		return (GET_LINKADDR_STRING(addr, LINKADDR_OTHER, addrlen));
 }

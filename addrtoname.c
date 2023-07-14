@@ -71,7 +71,7 @@
     #else /* HAVE_STRUCT_ETHER_ADDR */
 	struct ether_addr {
 		/* Beware FreeBSD calls this "octet". */
-		unsigned char ether_addr_octet[MAC_ADDR_LEN];
+		unsigned char ether_addr_octet[MAC48_LEN];
 	};
     #endif /* HAVE_STRUCT_ETHER_ADDR */
   #endif /* what declares ether_ntohost() */
@@ -589,7 +589,7 @@ lookup_protoid(netdissect_options *ndo, const u_char *pi)
 }
 
 const char *
-etheraddr_string(netdissect_options *ndo, const uint8_t *ep)
+mac64_string(netdissect_options *ndo, const uint8_t *ep)
 {
 	int i;
 	char *cp;
@@ -610,7 +610,7 @@ etheraddr_string(netdissect_options *ndo, const uint8_t *ep)
 		 */
 		struct ether_addr ea;
 
-		memcpy (&ea, ep, MAC_ADDR_LEN);
+		memcpy (&ea, ep, MAC48_LEN);
 		if (ether_ntohost(buf2, &ea) == 0) {
 			tp->e_name = strdup(buf2);
 			if (tp->e_name == NULL)
@@ -690,8 +690,8 @@ linkaddr_string(netdissect_options *ndo, const uint8_t *ep,
 	if (len == 0)
 		return ("<empty>");
 
-	if (type == LINKADDR_ETHER && len == MAC_ADDR_LEN)
-		return (etheraddr_string(ndo, ep));
+	if (type == LINKADDR_MAC48 && len == MAC48_LEN)
+		return (mac64_string(ndo, ep));
 
 	if (type == LINKADDR_FRELAY)
 		return (q922_string(ndo, ep, len));
@@ -938,7 +938,7 @@ init_protoidarray(netdissect_options *ndo)
 }
 
 static const struct etherlist {
-	const nd_mac_addr addr;
+	const nd_mac48 addr;
 	const char *name;
 } etherlist[] = {
 	{{ 0xff, 0xff, 0xff, 0xff, 0xff, 0xff }, "Broadcast" },
@@ -949,7 +949,7 @@ static const struct etherlist {
  * Initialize the ethers hash table.  We take two different approaches
  * depending on whether or not the system provides the ethers name
  * service.  If it does, we just wire in a few names at startup,
- * and etheraddr_string() fills in the table on demand.  If it doesn't,
+ * and mac64_string() fills in the table on demand.  If it doesn't,
  * then we suck in the entire /etc/ethers file at startup.  The idea
  * is that parsing the local file will be fast, but spinning through
  * all the ethers entries via NIS & next_etherent might be very slow.
@@ -995,9 +995,9 @@ init_etherarray(netdissect_options *ndo)
 		/*
 		 * Use YP/NIS version of name if available.
 		 */
-		/* Same workaround as in etheraddr_string(). */
+		/* Same workaround as in mac64_string(). */
 		struct ether_addr ea;
-		memcpy (&ea, el->addr, MAC_ADDR_LEN);
+		memcpy (&ea, el->addr, MAC48_LEN);
 		if (ether_ntohost(name, &ea) == 0) {
 			tp->e_name = strdup(name);
 			if (tp->e_name == NULL)

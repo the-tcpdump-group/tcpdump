@@ -1360,9 +1360,9 @@ lldp_network_addr_print(netdissect_options *ndo, const u_char *tptr, u_int len)
         pfunc = ip6addr_string;
         break;
     case AFNUM_802:
-        if (len < MAC_ADDR_LEN)
+        if (len < MAC48_LEN)
           return NULL;
-        pfunc = etheraddr_string;
+        pfunc = mac64_string;
         break;
     default:
         pfunc = NULL;
@@ -1505,7 +1505,7 @@ lldp_print(netdissect_options *ndo,
                     if (tlv_len < 1+6) {
                         goto trunc;
                     }
-                    ND_PRINT("%s", GET_ETHERADDR_STRING(tptr + 1));
+                    ND_PRINT("%s", GET_MAC48_STRING(tptr + 1));
                     break;
 
                 case LLDP_CHASSIS_INTF_NAME_SUBTYPE: /* fall through */
@@ -1546,7 +1546,7 @@ lldp_print(netdissect_options *ndo,
                     if (tlv_len < 1+6) {
                         goto trunc;
                     }
-                    ND_PRINT("%s", GET_ETHERADDR_STRING(tptr + 1));
+                    ND_PRINT("%s", GET_MAC48_STRING(tptr + 1));
                     break;
 
                 case LLDP_PORT_INTF_NAME_SUBTYPE: /* fall through */

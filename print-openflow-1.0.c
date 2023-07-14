@@ -1034,8 +1034,8 @@ of10_phy_port_print(netdissect_options *ndo,
 		 tok2str(ofpp_str, "%u", GET_BE_U_2(cp)));
 	cp += 2;
 	/* hw_addr */
-	ND_PRINT(", hw_addr %s", GET_ETHERADDR_STRING(cp));
-	cp += MAC_ADDR_LEN;
+	ND_PRINT(", hw_addr %s", GET_MAC48_STRING(cp));
+	cp += MAC48_LEN;
 	/* name */
 	ND_PRINT(", name '");
 	nd_printjnp(ndo, cp, OFP_MAX_PORT_NAME_LEN);
@@ -1205,12 +1205,12 @@ of10_match_print(netdissect_options *ndo,
 	cp += 2;
 	/* dl_src */
 	if (! (wildcards & OFPFW_DL_SRC))
-		ND_PRINT("%smatch dl_src %s", pfx, GET_ETHERADDR_STRING(cp));
-	cp += MAC_ADDR_LEN;
+		ND_PRINT("%smatch dl_src %s", pfx, GET_MAC48_STRING(cp));
+	cp += MAC48_LEN;
 	/* dl_dst */
 	if (! (wildcards & OFPFW_DL_DST))
-		ND_PRINT("%smatch dl_dst %s", pfx, GET_ETHERADDR_STRING(cp));
-	cp += MAC_ADDR_LEN;
+		ND_PRINT("%smatch dl_dst %s", pfx, GET_MAC48_STRING(cp));
+	cp += MAC48_LEN;
 	/* dl_vlan */
 	if (! (wildcards & OFPFW_DL_VLAN))
 		ND_PRINT("%smatch dl_vlan %s", pfx, vlan_str(GET_BE_U_2(cp)));
@@ -1371,8 +1371,8 @@ of10_actions_print(netdissect_options *ndo,
 		case OFPAT_SET_DL_SRC:
 		case OFPAT_SET_DL_DST:
 			/* dl_addr */
-			ND_PRINT(", dl_addr %s", GET_ETHERADDR_STRING(cp));
-			OF_FWD(MAC_ADDR_LEN);
+			ND_PRINT(", dl_addr %s", GET_MAC48_STRING(cp));
+			OF_FWD(MAC48_LEN);
 			/* pad */
 			/* Sometimes the last field, check bounds. */
 			OF_CHK_FWD(6);
@@ -1537,8 +1537,8 @@ of10_port_mod_print(netdissect_options *ndo,
 	ND_PRINT("\n\t port_no %s", tok2str(ofpp_str, "%u", GET_BE_U_2(cp)));
 	cp += 2;
 	/* hw_addr */
-	ND_PRINT(", hw_addr %s", GET_ETHERADDR_STRING(cp));
-	cp += MAC_ADDR_LEN;
+	ND_PRINT(", hw_addr %s", GET_MAC48_STRING(cp));
+	cp += MAC48_LEN;
 	/* config */
 	ND_PRINT("\n\t  config 0x%08x", GET_BE_U_4(cp));
 	of_bitmap_print(ndo, ofppc_bm, GET_BE_U_4(cp), OFPPC_U);

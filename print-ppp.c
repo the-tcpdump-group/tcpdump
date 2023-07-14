@@ -736,7 +736,7 @@ print_lcp_config_options(netdissect_options *ndo,
 				ND_PRINT(" (length bogus, should be = 9)");
 				return 0;
 			}
-			ND_PRINT(": MAC %s", GET_ETHERADDR_STRING(p + 3));
+			ND_PRINT(": MAC %s", GET_MAC48_STRING(p + 3));
 			break;
 		case MEDCLASS_MNB:
 			ND_PRINT(": Magic-Num-Block"); /* XXX */

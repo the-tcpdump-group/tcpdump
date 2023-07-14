@@ -39,8 +39,8 @@
 
 struct fddi_header {
 	nd_uint8_t  fddi_fc;		/* frame control */
-	nd_mac_addr fddi_dhost;
-	nd_mac_addr fddi_shost;
+	nd_mac48 fddi_dhost;
+	nd_mac48 fddi_shost;
 };
 
 /*
@@ -256,8 +256,8 @@ fddi_hdr_print(netdissect_options *ndo,
 {
 	const char *srcname, *dstname;
 
-	srcname = etheraddr_string(ndo, fsrc);
-	dstname = etheraddr_string(ndo, fdst);
+	srcname = mac64_string(ndo, fsrc);
+	dstname = mac64_string(ndo, fdst);
 
 	if (!ndo->ndo_qflag)
 		print_fddi_fc(ndo, GET_U_1(fddip->fddi_fc));
@@ -277,7 +277,7 @@ fddi_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 {
 	const struct fddi_header *fddip = (const struct fddi_header *)p;
 	uint8_t fc;
-	nd_mac_addr srcmac, dstmac;
+	nd_mac48 srcmac, dstmac;
 	struct lladdr_info src, dst;
 	int llc_hdrlen;
 
@@ -298,9 +298,9 @@ fddi_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 		fddi_hdr_print(ndo, fddip, length, srcmac, dstmac);
 
 	src.addr = srcmac;
-	src.addr_string = etheraddr_string;
+	src.addr_string = mac64_string;
 	dst.addr = dstmac;
-	dst.addr_string = etheraddr_string;
+	dst.addr_string = mac64_string;
 
 	/* Skip over FDDI MAC header */
 	length -= FDDI_HDRLEN;

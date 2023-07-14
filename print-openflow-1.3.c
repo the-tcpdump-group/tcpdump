@@ -655,8 +655,8 @@ of13_port_print(netdissect_options *ndo,
 	/* pad */
 	cp += 4;
 	/* hw_addr */
-	ND_PRINT(", hw_addr %s", GET_ETHERADDR_STRING(cp));
-	cp += MAC_ADDR_LEN;
+	ND_PRINT(", hw_addr %s", GET_MAC48_STRING(cp));
+	cp += MAC48_LEN;
 	/* pad2 */
 	cp += 2;
 	/* name */
@@ -812,8 +812,8 @@ of13_port_mod_print(netdissect_options *ndo,
 	/* pad */
 	cp += 4;
 	/* hw_addr */
-	ND_PRINT(", hw_addr %s", GET_ETHERADDR_STRING(cp));
-	cp += MAC_ADDR_LEN;
+	ND_PRINT(", hw_addr %s", GET_MAC48_STRING(cp));
+	cp += MAC48_LEN;
 	/* pad2 */
 	cp += 2;
 	/* config */

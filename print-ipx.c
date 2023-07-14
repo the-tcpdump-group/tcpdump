@@ -52,10 +52,10 @@ struct ipxHdr {
     nd_uint8_t	tCtl;		/* Transport Control (i.e. hop count) */
     nd_uint8_t	pType;		/* Packet Type (i.e. level 2 protocol) */
     nd_uint32_t	dstNet;		/* destination net */
-    nd_mac_addr	dstNode;	/* destination node */
+    nd_mac48	dstNode;	/* destination node */
     nd_uint16_t	dstSkt;		/* destination socket */
     nd_uint32_t	srcNet;		/* source net */
-    nd_mac_addr	srcNode;	/* source node */
+    nd_mac48	srcNode;	/* source node */
     nd_uint16_t	srcSkt;		/* source socket */
 };
 

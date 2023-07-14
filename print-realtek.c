@@ -128,7 +128,7 @@ rrcp_print(netdissect_options *ndo,
 	    ND_PRINT(" downlink_port=%u, uplink_port=%u, uplink_mac=%s, vendor_id=%08x ,chip_id=%04x ",
 		     GET_U_1(cp + RRCP_DOWNLINK_PORT_OFFSET),
 		     GET_U_1(cp + RRCP_UPLINK_PORT_OFFSET),
-		     GET_ETHERADDR_STRING(cp + RRCP_UPLINK_MAC_OFFSET),
+		     GET_MAC48_STRING(cp + RRCP_UPLINK_MAC_OFFSET),
 		     GET_BE_U_4(cp + RRCP_VENDOR_ID_OFFSET),
 		     GET_BE_U_2(cp + RRCP_CHIP_ID_OFFSET));
 	}else if (rrcp_opcode==RRCP_OPCODE_GET_CONFIGURATION ||

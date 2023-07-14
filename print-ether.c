@@ -37,8 +37,8 @@
  * Structure of an Ethernet header.
  */
 struct	ether_header {
-	nd_mac_addr	ether_dhost;
-	nd_mac_addr	ether_shost;
+	nd_mac48	ether_dhost;
+	nd_mac48	ether_shost;
 	nd_uint16_t	ether_length_type;
 };
 
@@ -112,7 +112,7 @@ ether_addresses_print(netdissect_options *ndo, const u_char *src,
 		      const u_char *dst)
 {
 	ND_PRINT("%s > %s, ",
-		 GET_ETHERADDR_STRING(src), GET_ETHERADDR_STRING(dst));
+		 GET_MAC48_STRING(src), GET_MAC48_STRING(dst));
 }
 
 static void
@@ -171,14 +171,14 @@ ether_common_print(netdissect_options *ndo, const u_char *p, u_int length,
 	 */
 	ehp = (const struct ether_header *)p;
 	src.addr = ehp->ether_shost;
-	src.addr_string = etheraddr_string;
+	src.addr_string = mac64_string;
 	dst.addr = ehp->ether_dhost;
-	dst.addr_string = etheraddr_string;
+	dst.addr_string = mac64_string;
 
-	length -= 2*MAC_ADDR_LEN;
-	caplen -= 2*MAC_ADDR_LEN;
-	p += 2*MAC_ADDR_LEN;
-	hdrlen = 2*MAC_ADDR_LEN;
+	length -= 2*MAC48_LEN;
+	caplen -= 2*MAC48_LEN;
+	p += 2*MAC48_LEN;
+	hdrlen = 2*MAC48_LEN;
 
 	if (ndo->ndo_eflag)
 		ether_addresses_print(ndo, src.addr, dst.addr);

@@ -104,7 +104,7 @@ dtp_print(netdissect_options *ndo, const u_char *tptr, u_int length)
 	case DTP_NEIGHBOR_TLV:
                 if (len != 10)
                     goto invalid;
-                ND_PRINT(", %s", GET_ETHERADDR_STRING(tptr+4));
+                ND_PRINT(", %s", GET_MAC48_STRING(tptr+4));
                 break;
 
         default:

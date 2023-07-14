@@ -56,7 +56,7 @@
  * IS-IS is defined in ISO 10589.  Look there for protocol definitions.
  */
 
-#define SYSTEM_ID_LEN	MAC_ADDR_LEN
+#define SYSTEM_ID_LEN	MAC48_LEN
 #define NODE_ID_LEN     (SYSTEM_ID_LEN+1)
 #define LSP_ID_LEN      (SYSTEM_ID_LEN+2)
 
@@ -1300,10 +1300,10 @@ esis_print(netdissect_options *ndo,
 		pptr += netal;
                 li -= netal;
 
-		if (snpal == MAC_ADDR_LEN)
+		if (snpal == MAC48_LEN)
 			ND_PRINT("\n\t  SNPA (length: %u): %s",
 			       snpal,
-			       GET_ETHERADDR_STRING(snpa));
+			       GET_MAC48_STRING(snpa));
 		else
 			ND_PRINT("\n\t  SNPA (length: %u): %s",
 			       snpal,
@@ -2889,12 +2889,12 @@ isis_print(netdissect_options *ndo,
 	    break;
 	case ISIS_TLV_ISNEIGH:
 	    while (tlen != 0) {
-		if (tlen < MAC_ADDR_LEN)
+		if (tlen < MAC48_LEN)
 		    goto tlv_trunc;
-                ND_TCHECK_LEN(tptr, MAC_ADDR_LEN);
-                ND_PRINT("\n\t      SNPA: %s", isis_print_id(ndo, tptr, MAC_ADDR_LEN));
-                tlen -= MAC_ADDR_LEN;
-                tptr += MAC_ADDR_LEN;
+                ND_TCHECK_LEN(tptr, MAC48_LEN);
+                ND_PRINT("\n\t      SNPA: %s", isis_print_id(ndo, tptr, MAC48_LEN));
+                tlen -= MAC48_LEN;
+                tptr += MAC48_LEN;
 	    }
 	    break;
 

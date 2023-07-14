@@ -217,7 +217,7 @@ lwapp_control_print(netdissect_options *ndo,
 	   tlen);
 
     if (has_ap_ident) {
-        ND_PRINT("\n\tAP identity: %s", GET_ETHERADDR_STRING(tptr));
+        ND_PRINT("\n\tAP identity: %s", GET_MAC48_STRING(tptr));
         tptr+=sizeof(struct lwapp_transport_header)+6;
     } else {
         tptr+=sizeof(struct lwapp_transport_header);

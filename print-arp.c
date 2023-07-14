@@ -373,7 +373,7 @@ arp_print(netdissect_options *ndo,
             linkaddr = LINKADDR_FRELAY;
             break;
         default:
-            linkaddr = LINKADDR_ETHER;
+            linkaddr = LINKADDR_MAC48;
             break;
 	}
 

@@ -203,7 +203,7 @@ static const struct tok slow_tlv_values[] = {
 
 struct lacp_tlv_actor_partner_info_t {
     nd_uint16_t sys_pri;
-    nd_mac_addr sys;
+    nd_mac48 sys;
     nd_uint16_t key;
     nd_uint16_t port_pri;
     nd_uint16_t port;
@@ -230,7 +230,7 @@ struct lacp_tlv_collector_info_t {
 
 struct marker_tlv_marker_info_t {
     nd_uint16_t req_port;
-    nd_mac_addr req_sys;
+    nd_mac48 req_sys;
     nd_uint32_t req_trans_id;
     nd_byte     pad[2];
 };
@@ -411,7 +411,7 @@ slow_marker_lacp_print(netdissect_options *ndo,
 
             ND_PRINT("\n\t  System %s, System Priority %u, Key %u"
                    ", Port %u, Port Priority %u\n\t  State Flags [%s]",
-                   GET_ETHERADDR_STRING(tlv_ptr.lacp_tlv_actor_partner_info->sys),
+                   GET_MAC48_STRING(tlv_ptr.lacp_tlv_actor_partner_info->sys),
                    GET_BE_U_2(tlv_ptr.lacp_tlv_actor_partner_info->sys_pri),
                    GET_BE_U_2(tlv_ptr.lacp_tlv_actor_partner_info->key),
                    GET_BE_U_2(tlv_ptr.lacp_tlv_actor_partner_info->port),
@@ -448,7 +448,7 @@ slow_marker_lacp_print(netdissect_options *ndo,
             tlv_ptr.marker_tlv_marker_info = (const struct marker_tlv_marker_info_t *)tlv_tptr;
 
             ND_PRINT("\n\t  Request System %s, Request Port %u, Request Transaction ID 0x%08x",
-                   GET_ETHERADDR_STRING(tlv_ptr.marker_tlv_marker_info->req_sys),
+                   GET_MAC48_STRING(tlv_ptr.marker_tlv_marker_info->req_sys),
                    GET_BE_U_2(tlv_ptr.marker_tlv_marker_info->req_port),
                    GET_BE_U_4(tlv_ptr.marker_tlv_marker_info->req_trans_id));
 

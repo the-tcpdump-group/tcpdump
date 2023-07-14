@@ -80,12 +80,12 @@ loopback_message_print(netdissect_options *ndo,
 			ND_TCHECK_LEN(cp, len);
 			break;
 		case LOOPBACK_FWDDATA:
-			if (len < MAC_ADDR_LEN)
+			if (len < MAC48_LEN)
 				goto invalid;
 			/* forwarding address */
-			ND_PRINT(", forwarding address %s", GET_ETHERADDR_STRING(cp));
-			cp += MAC_ADDR_LEN;
-			len -= MAC_ADDR_LEN;
+			ND_PRINT(", forwarding address %s", GET_MAC48_STRING(cp));
+			cp += MAC48_LEN;
+			len -= MAC48_LEN;
 			/* data */
 			ND_PRINT(", data (%u octets)", len);
 			ND_TCHECK_LEN(cp, len);

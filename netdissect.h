@@ -102,8 +102,8 @@ typedef unsigned char nd_ipv6[16];
 /*
  * Use this for MAC addresses.
  */
-#define MAC_ADDR_LEN	6U		/* length of MAC addresses */
-typedef unsigned char nd_mac_addr[MAC_ADDR_LEN];
+#define MAC48_LEN	6U		/* length of MAC addresses */
+typedef unsigned char nd_mac48[MAC48_LEN];
 
 /*
  * Use this for EUI64s.

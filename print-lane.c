@@ -34,8 +34,8 @@
 
 struct lecdatahdr_8023 {
   nd_uint16_t le_header;
-  nd_mac_addr h_dest;
-  nd_mac_addr h_source;
+  nd_mac48 h_dest;
+  nd_mac48 h_source;
   nd_uint16_t h_type;
 };
 

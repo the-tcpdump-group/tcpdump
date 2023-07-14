@@ -83,8 +83,8 @@
 struct token_header {
 	nd_uint8_t   token_ac;
 	nd_uint8_t   token_fc;
-	nd_mac_addr  token_dhost;
-	nd_mac_addr  token_shost;
+	nd_mac48  token_dhost;
+	nd_mac48  token_shost;
 	nd_uint16_t  token_rcf;
 	nd_uint16_t  token_rseg[ROUTING_SEGMENT_MAX];
 };
@@ -108,8 +108,8 @@ token_hdr_print(netdissect_options *ndo,
 {
 	const char *srcname, *dstname;
 
-	srcname = etheraddr_string(ndo, fsrc);
-	dstname = etheraddr_string(ndo, fdst);
+	srcname = mac64_string(ndo, fsrc);
+	dstname = mac64_string(ndo, fdst);
 
 	if (!ndo->ndo_qflag)
 		ND_PRINT("%02x %02x ",
@@ -147,7 +147,7 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 {
 	const struct token_header *trp;
 	int llc_hdrlen;
-	nd_mac_addr srcmac, dstmac;
+	nd_mac48 srcmac, dstmac;
 	struct lladdr_info src, dst;
 	u_int route_len = 0, hdr_len = TOKEN_HDRLEN;
 	int seg;
@@ -204,9 +204,9 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 	}
 
 	src.addr = srcmac;
-	src.addr_string = etheraddr_string;
+	src.addr_string = mac64_string;
 	dst.addr = dstmac;
-	dst.addr_string = etheraddr_string;
+	dst.addr_string = mac64_string;
 
 	/* Skip over token ring MAC header and routing information */
 	length -= hdr_len;

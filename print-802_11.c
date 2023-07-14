@@ -176,9 +176,9 @@ static const struct tok ctrl_str[] = {
 struct mgmt_header_t {
 	nd_uint16_t	fc;
 	nd_uint16_t	duration;
-	nd_mac_addr	da;
-	nd_mac_addr	sa;
-	nd_mac_addr	bssid;
+	nd_mac48	da;
+	nd_mac48	sa;
+	nd_mac48	bssid;
 	nd_uint16_t	seq_ctrl;
 };
 
@@ -300,7 +300,7 @@ struct mgmt_body_t {
 struct ctrl_control_wrapper_hdr_t {
 	nd_uint16_t	fc;
 	nd_uint16_t	duration;
-	nd_mac_addr	addr1;
+	nd_mac48	addr1;
 	nd_uint16_t	carried_fc[IEEE802_11_CARRIED_FC_LEN];
 	nd_uint16_t	ht_control[IEEE802_11_HT_CONTROL_LEN];
 };
@@ -313,8 +313,8 @@ struct ctrl_control_wrapper_hdr_t {
 struct ctrl_rts_hdr_t {
 	nd_uint16_t	fc;
 	nd_uint16_t	duration;
-	nd_mac_addr	ra;
-	nd_mac_addr	ta;
+	nd_mac48	ra;
+	nd_mac48	ta;
 };
 
 #define	CTRL_RTS_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
@@ -323,7 +323,7 @@ struct ctrl_rts_hdr_t {
 struct ctrl_cts_hdr_t {
 	nd_uint16_t	fc;
 	nd_uint16_t	duration;
-	nd_mac_addr	ra;
+	nd_mac48	ra;
 };
 
 #define	CTRL_CTS_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+IEEE802_11_RA_LEN)
@@ -331,7 +331,7 @@ struct ctrl_cts_hdr_t {
 struct ctrl_ack_hdr_t {
 	nd_uint16_t	fc;
 	nd_uint16_t	duration;
-	nd_mac_addr	ra;
+	nd_mac48	ra;
 };
 
 #define	CTRL_ACK_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+IEEE802_11_RA_LEN)
@@ -339,8 +339,8 @@ struct ctrl_ack_hdr_t {
 struct ctrl_ps_poll_hdr_t {
 	nd_uint16_t	fc;
 	nd_uint16_t	aid;
-	nd_mac_addr	bssid;
-	nd_mac_addr	ta;
+	nd_mac48	bssid;
+	nd_mac48	ta;
 };
 
 #define	CTRL_PS_POLL_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_AID_LEN+\
@@ -349,8 +349,8 @@ struct ctrl_ps_poll_hdr_t {
 struct ctrl_end_hdr_t {
 	nd_uint16_t	fc;
 	nd_uint16_t	duration;
-	nd_mac_addr	ra;
-	nd_mac_addr	bssid;
+	nd_mac48	ra;
+	nd_mac48	bssid;
 };
 
 #define	CTRL_END_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
@@ -359,8 +359,8 @@ struct ctrl_end_hdr_t {
 struct ctrl_end_ack_hdr_t {
 	nd_uint16_t	fc;
 	nd_uint16_t	duration;
-	nd_mac_addr	ra;
-	nd_mac_addr	bssid;
+	nd_mac48	ra;
+	nd_mac48	bssid;
 };
 
 #define	CTRL_END_ACK_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
@@ -369,8 +369,8 @@ struct ctrl_end_ack_hdr_t {
 struct ctrl_ba_hdr_t {
 	nd_uint16_t	fc;
 	nd_uint16_t	duration;
-	nd_mac_addr	ra;
-	nd_mac_addr	ta;
+	nd_mac48	ra;
+	nd_mac48	ta;
 };
 
 #define	CTRL_BA_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
@@ -379,8 +379,8 @@ struct ctrl_ba_hdr_t {
 struct ctrl_bar_hdr_t {
 	nd_uint16_t	fc;
 	nd_uint16_t	dur;
-	nd_mac_addr	ra;
-	nd_mac_addr	ta;
+	nd_mac48	ra;
+	nd_mac48	ta;
 	nd_uint16_t	ctl;
 	nd_uint16_t	seq;
 };
@@ -393,9 +393,9 @@ struct meshcntl_t {
 	nd_uint8_t	flags;
 	nd_uint8_t	ttl;
 	nd_uint32_t	seq;
-	nd_mac_addr	addr4;
-	nd_mac_addr	addr5;
-	nd_mac_addr	addr6;
+	nd_mac48	addr4;
+	nd_mac48	addr5;
+	nd_mac48	addr6;
 };
 
 #define	IV_IV(iv)	((iv) & 0xFFFFFF)
@@ -1534,7 +1534,7 @@ handle_reassoc_request(netdissect_options *ndo,
 	ret = parse_elements(ndo, &pbody, p, offset, length);
 
 	PRINT_SSID(pbody);
-	ND_PRINT(" AP : %s", etheraddr_string(ndo,  pbody.ap ));
+	ND_PRINT(" AP : %s", mac64_string(ndo,  pbody.ap ));
 
 	return ret;
 trunc:
@@ -1710,7 +1710,7 @@ handle_deauth(netdissect_options *ndo,
 	if (ndo->ndo_eflag) {
 		ND_PRINT(": %s", reason);
 	} else {
-		ND_PRINT(" (%s): %s", GET_ETHERADDR_STRING(src), reason);
+		ND_PRINT(" (%s): %s", GET_MAC48_STRING(src), reason);
 	}
 	return 1;
 trunc:
@@ -1795,7 +1795,7 @@ handle_action(netdissect_options *ndo,
 	if (ndo->ndo_eflag) {
 		ND_PRINT(": ");
 	} else {
-		ND_PRINT(" (%s): ", GET_ETHERADDR_STRING(src));
+		ND_PRINT(" (%s): ", GET_MAC48_STRING(src));
 	}
 	category = GET_U_1(p);
 	ND_PRINT("%s ", tok2str(category_str, "Reserved(%u)", category));
@@ -1874,8 +1874,8 @@ ctrl_body_print(netdissect_options *ndo,
 		ND_TCHECK_LEN(p, CTRL_BAR_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s TA:%s CTL(%x) SEQ(%u) ",
-			    GET_ETHERADDR_STRING(((const struct ctrl_bar_hdr_t *)p)->ra),
-			    GET_ETHERADDR_STRING(((const struct ctrl_bar_hdr_t *)p)->ta),
+			    GET_MAC48_STRING(((const struct ctrl_bar_hdr_t *)p)->ra),
+			    GET_MAC48_STRING(((const struct ctrl_bar_hdr_t *)p)->ta),
 			    GET_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->ctl),
 			    GET_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->seq));
 		break;
@@ -1883,7 +1883,7 @@ ctrl_body_print(netdissect_options *ndo,
 		ND_TCHECK_LEN(p, CTRL_BA_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
-			    GET_ETHERADDR_STRING(((const struct ctrl_ba_hdr_t *)p)->ra));
+			    GET_MAC48_STRING(((const struct ctrl_ba_hdr_t *)p)->ra));
 		break;
 	case CTRL_PS_POLL:
 		ND_TCHECK_LEN(p, CTRL_PS_POLL_HDRLEN);
@@ -1894,31 +1894,31 @@ ctrl_body_print(netdissect_options *ndo,
 		ND_TCHECK_LEN(p, CTRL_RTS_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" TA:%s ",
-			    GET_ETHERADDR_STRING(((const struct ctrl_rts_hdr_t *)p)->ta));
+			    GET_MAC48_STRING(((const struct ctrl_rts_hdr_t *)p)->ta));
 		break;
 	case CTRL_CTS:
 		ND_TCHECK_LEN(p, CTRL_CTS_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
-			    GET_ETHERADDR_STRING(((const struct ctrl_cts_hdr_t *)p)->ra));
+			    GET_MAC48_STRING(((const struct ctrl_cts_hdr_t *)p)->ra));
 		break;
 	case CTRL_ACK:
 		ND_TCHECK_LEN(p, CTRL_ACK_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
-			    GET_ETHERADDR_STRING(((const struct ctrl_ack_hdr_t *)p)->ra));
+			    GET_MAC48_STRING(((const struct ctrl_ack_hdr_t *)p)->ra));
 		break;
 	case CTRL_CF_END:
 		ND_TCHECK_LEN(p, CTRL_END_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
-			    GET_ETHERADDR_STRING(((const struct ctrl_end_hdr_t *)p)->ra));
+			    GET_MAC48_STRING(((const struct ctrl_end_hdr_t *)p)->ra));
 		break;
 	case CTRL_END_ACK:
 		ND_TCHECK_LEN(p, CTRL_END_ACK_HDRLEN);
 		if (!ndo->ndo_eflag)
 			ND_PRINT(" RA:%s ",
-			    GET_ETHERADDR_STRING(((const struct ctrl_end_ack_hdr_t *)p)->ra));
+			    GET_MAC48_STRING(((const struct ctrl_end_ack_hdr_t *)p)->ra));
 		break;
 	}
 	return 1;
@@ -2020,20 +2020,20 @@ data_header_print(netdissect_options *ndo, uint16_t fc, const u_char *p)
 
 	if (!FC_TO_DS(fc) && !FC_FROM_DS(fc)) {
 		ND_PRINT("DA:%s SA:%s BSSID:%s ",
-		    GET_ETHERADDR_STRING(ADDR1), GET_ETHERADDR_STRING(ADDR2),
-		    GET_ETHERADDR_STRING(ADDR3));
+		    GET_MAC48_STRING(ADDR1), GET_MAC48_STRING(ADDR2),
+		    GET_MAC48_STRING(ADDR3));
 	} else if (!FC_TO_DS(fc) && FC_FROM_DS(fc)) {
 		ND_PRINT("DA:%s BSSID:%s SA:%s ",
-		    GET_ETHERADDR_STRING(ADDR1), GET_ETHERADDR_STRING(ADDR2),
-		    GET_ETHERADDR_STRING(ADDR3));
+		    GET_MAC48_STRING(ADDR1), GET_MAC48_STRING(ADDR2),
+		    GET_MAC48_STRING(ADDR3));
 	} else if (FC_TO_DS(fc) && !FC_FROM_DS(fc)) {
 		ND_PRINT("BSSID:%s SA:%s DA:%s ",
-		    GET_ETHERADDR_STRING(ADDR1), GET_ETHERADDR_STRING(ADDR2),
-		    GET_ETHERADDR_STRING(ADDR3));
+		    GET_MAC48_STRING(ADDR1), GET_MAC48_STRING(ADDR2),
+		    GET_MAC48_STRING(ADDR3));
 	} else if (FC_TO_DS(fc) && FC_FROM_DS(fc)) {
 		ND_PRINT("RA:%s TA:%s DA:%s SA:%s ",
-		    GET_ETHERADDR_STRING(ADDR1), GET_ETHERADDR_STRING(ADDR2),
-		    GET_ETHERADDR_STRING(ADDR3), GET_ETHERADDR_STRING(ADDR4));
+		    GET_MAC48_STRING(ADDR1), GET_MAC48_STRING(ADDR2),
+		    GET_MAC48_STRING(ADDR3), GET_MAC48_STRING(ADDR4));
 	}
 
 #undef ADDR1
@@ -2048,8 +2048,8 @@ mgmt_header_print(netdissect_options *ndo, const u_char *p)
 	const struct mgmt_header_t *hp = (const struct mgmt_header_t *) p;
 
 	ND_PRINT("BSSID:%s DA:%s SA:%s ",
-	    GET_ETHERADDR_STRING((hp)->bssid), GET_ETHERADDR_STRING((hp)->da),
-	    GET_ETHERADDR_STRING((hp)->sa));
+	    GET_MAC48_STRING((hp)->bssid), GET_MAC48_STRING((hp)->da),
+	    GET_MAC48_STRING((hp)->sa));
 }
 
 static void
@@ -2058,43 +2058,43 @@ ctrl_header_print(netdissect_options *ndo, uint16_t fc, const u_char *p)
 	switch (FC_SUBTYPE(fc)) {
 	case CTRL_BAR:
 		ND_PRINT(" RA:%s TA:%s CTL(%x) SEQ(%u) ",
-		    GET_ETHERADDR_STRING(((const struct ctrl_bar_hdr_t *)p)->ra),
-		    GET_ETHERADDR_STRING(((const struct ctrl_bar_hdr_t *)p)->ta),
+		    GET_MAC48_STRING(((const struct ctrl_bar_hdr_t *)p)->ra),
+		    GET_MAC48_STRING(((const struct ctrl_bar_hdr_t *)p)->ta),
 		    GET_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->ctl),
 		    GET_LE_U_2(((const struct ctrl_bar_hdr_t *)p)->seq));
 		break;
 	case CTRL_BA:
 		ND_PRINT("RA:%s TA:%s ",
-		    GET_ETHERADDR_STRING(((const struct ctrl_ba_hdr_t *)p)->ra),
-		    GET_ETHERADDR_STRING(((const struct ctrl_ba_hdr_t *)p)->ta));
+		    GET_MAC48_STRING(((const struct ctrl_ba_hdr_t *)p)->ra),
+		    GET_MAC48_STRING(((const struct ctrl_ba_hdr_t *)p)->ta));
 		break;
 	case CTRL_PS_POLL:
 		ND_PRINT("BSSID:%s TA:%s ",
-		    GET_ETHERADDR_STRING(((const struct ctrl_ps_poll_hdr_t *)p)->bssid),
-		    GET_ETHERADDR_STRING(((const struct ctrl_ps_poll_hdr_t *)p)->ta));
+		    GET_MAC48_STRING(((const struct ctrl_ps_poll_hdr_t *)p)->bssid),
+		    GET_MAC48_STRING(((const struct ctrl_ps_poll_hdr_t *)p)->ta));
 		break;
 	case CTRL_RTS:
 		ND_PRINT("RA:%s TA:%s ",
-		    GET_ETHERADDR_STRING(((const struct ctrl_rts_hdr_t *)p)->ra),
-		    GET_ETHERADDR_STRING(((const struct ctrl_rts_hdr_t *)p)->ta));
+		    GET_MAC48_STRING(((const struct ctrl_rts_hdr_t *)p)->ra),
+		    GET_MAC48_STRING(((const struct ctrl_rts_hdr_t *)p)->ta));
 		break;
 	case CTRL_CTS:
 		ND_PRINT("RA:%s ",
-		    GET_ETHERADDR_STRING(((const struct ctrl_cts_hdr_t *)p)->ra));
+		    GET_MAC48_STRING(((const struct ctrl_cts_hdr_t *)p)->ra));
 		break;
 	case CTRL_ACK:
 		ND_PRINT("RA:%s ",
-		    GET_ETHERADDR_STRING(((const struct ctrl_ack_hdr_t *)p)->ra));
+		    GET_MAC48_STRING(((const struct ctrl_ack_hdr_t *)p)->ra));
 		break;
 	case CTRL_CF_END:
 		ND_PRINT("RA:%s BSSID:%s ",
-		    GET_ETHERADDR_STRING(((const struct ctrl_end_hdr_t *)p)->ra),
-		    GET_ETHERADDR_STRING(((const struct ctrl_end_hdr_t *)p)->bssid));
+		    GET_MAC48_STRING(((const struct ctrl_end_hdr_t *)p)->ra),
+		    GET_MAC48_STRING(((const struct ctrl_end_hdr_t *)p)->bssid));
 		break;
 	case CTRL_END_ACK:
 		ND_PRINT("RA:%s BSSID:%s ",
-		    GET_ETHERADDR_STRING(((const struct ctrl_end_ack_hdr_t *)p)->ra),
-		    GET_ETHERADDR_STRING(((const struct ctrl_end_ack_hdr_t *)p)->bssid));
+		    GET_MAC48_STRING(((const struct ctrl_end_ack_hdr_t *)p)->ra),
+		    GET_MAC48_STRING(((const struct ctrl_end_ack_hdr_t *)p)->bssid));
 		break;
 	default:
 		/* We shouldn't get here - we should already have quit */
@@ -2185,11 +2185,11 @@ ieee_802_11_hdr_print(netdissect_options *ndo,
 		ND_PRINT("MeshData (AE %u TTL %u seq %u", ae,
 		    GET_U_1(mc->ttl), GET_LE_U_4(mc->seq));
 		if (ae > 0)
-			ND_PRINT(" A4:%s", GET_ETHERADDR_STRING(mc->addr4));
+			ND_PRINT(" A4:%s", GET_MAC48_STRING(mc->addr4));
 		if (ae > 1)
-			ND_PRINT(" A5:%s", GET_ETHERADDR_STRING(mc->addr5));
+			ND_PRINT(" A5:%s", GET_MAC48_STRING(mc->addr5));
 		if (ae > 2)
-			ND_PRINT(" A6:%s", GET_ETHERADDR_STRING(mc->addr6));
+			ND_PRINT(" A6:%s", GET_MAC48_STRING(mc->addr6));
 		ND_PRINT(") ");
 	}
 
@@ -2272,8 +2272,8 @@ ieee802_11_print(netdissect_options *ndo,
 	caplen -= hdrlen;
 	p += hdrlen;
 
-	src.addr_string = etheraddr_string;
-	dst.addr_string = etheraddr_string;
+	src.addr_string = mac64_string;
+	dst.addr_string = mac64_string;
 	switch (FC_TYPE(fc)) {
 	case T_MGMT:
 		get_mgmt_src_dst_mac(p - hdrlen, &src.addr, &dst.addr);

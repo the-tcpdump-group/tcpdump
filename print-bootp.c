@@ -305,8 +305,8 @@ bootp_print(netdissect_options *ndo,
 
 	bp_htype = GET_U_1(bp->bp_htype);
 	bp_hlen = GET_U_1(bp->bp_hlen);
-	if (bp_htype == 1 && bp_hlen == MAC_ADDR_LEN && bp_op == BOOTPREQUEST) {
-		ND_PRINT(" from %s", GET_ETHERADDR_STRING(bp->bp_chaddr));
+	if (bp_htype == 1 && bp_hlen == MAC48_LEN && bp_op == BOOTPREQUEST) {
+		ND_PRINT(" from %s", GET_MAC48_STRING(bp->bp_chaddr));
 	}
 
 	ND_PRINT(", length %u", length);
@@ -321,7 +321,7 @@ bootp_print(netdissect_options *ndo,
 		ND_PRINT(", htype %u", bp_htype);
 
 	/* The usual length for 10Mb Ethernet address is 6 bytes */
-	if (bp_htype != 1 || bp_hlen != MAC_ADDR_LEN)
+	if (bp_htype != 1 || bp_hlen != MAC48_LEN)
 		ND_PRINT(", hlen %u", bp_hlen);
 
 	/* Only print interesting fields */
@@ -354,8 +354,8 @@ bootp_print(netdissect_options *ndo,
 		ND_PRINT("\n\t  Gateway-IP %s", GET_IPADDR_STRING(bp->bp_giaddr));
 
 	/* Client's Ethernet address */
-	if (bp_htype == 1 && bp_hlen == MAC_ADDR_LEN) {
-		ND_PRINT("\n\t  Client-Ethernet-Address %s", GET_ETHERADDR_STRING(bp->bp_chaddr));
+	if (bp_htype == 1 && bp_hlen == MAC48_LEN) {
+		ND_PRINT("\n\t  Client-Ethernet-Address %s", GET_MAC48_STRING(bp->bp_chaddr));
 	}
 
 	if (GET_U_1(bp->bp_sname)) {	/* get first char only */
