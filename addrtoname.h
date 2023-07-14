@@ -39,7 +39,7 @@ extern cap_channel_t *capdns;
 enum {
     LINKADDR_ETHER,
     LINKADDR_FRELAY,
-    LINKADDR_IEEE1394,
+    LINKADDR_EUI64,
     LINKADDR_ATM,
     LINKADDR_OTHER
 };
@@ -48,7 +48,8 @@ enum {
 
 extern const char *linkaddr_string(netdissect_options *, const uint8_t *, const unsigned int, const unsigned int);
 extern const char *etheraddr_string(netdissect_options *, const uint8_t *);
-extern const char *le64addr_string(netdissect_options *, const uint8_t *);
+extern const char *eui64_string(netdissect_options *, const uint8_t *);
+extern const char *eui64le_string(netdissect_options *, const uint8_t *);
 extern const char *tcpport_string(netdissect_options *, u_short);
 extern const char *udpport_string(netdissect_options *, u_short);
 extern const char *isonsap_string(netdissect_options *, const uint8_t *, u_int);
@@ -86,11 +87,19 @@ get_etheraddr_string(netdissect_options *ndo, const uint8_t *p)
 }
 
 static inline const char *
-get_le64addr_string(netdissect_options *ndo, const u_char *p)
+get_eui64_string(netdissect_options *ndo, const uint8_t *p)
 {
-        if (!ND_TTEST_8(p))
+        if (!ND_TTEST_LEN(p, EUI64_LEN))
                 nd_trunc_longjmp(ndo);
-        return le64addr_string(ndo, p);
+        return eui64_string(ndo, p);
+}
+
+static inline const char *
+get_eui64le_string(netdissect_options *ndo, const uint8_t *p)
+{
+        if (!ND_TTEST_LEN(p, EUI64_LEN))
+                nd_trunc_longjmp(ndo);
+        return eui64le_string(ndo, p);
 }
 
 static inline const char *
@@ -120,7 +129,8 @@ get_ip6addr_string(netdissect_options *ndo, const u_char *p)
 
 #define GET_LINKADDR_STRING(p, type, len) get_linkaddr_string(ndo, (const u_char *)(p), type, len)
 #define GET_ETHERADDR_STRING(p) get_etheraddr_string(ndo, (const u_char *)(p))
-#define GET_LE64ADDR_STRING(p) get_le64addr_string(ndo, (const u_char *)(p))
+#define GET_EUI64_STRING(p) get_eui64_string(ndo, (const u_char *)(p))
+#define GET_EUI64LE_STRING(p) get_eui64le_string(ndo, (const u_char *)(p))
 #define GET_ISONSAP_STRING(nsap, nsap_length) get_isonsap_string(ndo, (const u_char *)(nsap), nsap_length)
 #define GET_IPADDR_STRING(p) get_ipaddr_string(ndo, (const u_char *)(p))
 #define GET_IP6ADDR_STRING(p) get_ip6addr_string(ndo, (const u_char *)(p))

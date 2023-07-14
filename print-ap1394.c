@@ -36,10 +36,9 @@
 /*
  * Structure of a header for Apple's IP-over-IEEE 1384 BPF header.
  */
-#define FIREWIRE_EUI64_LEN	8
 struct firewire_header {
-	nd_byte     firewire_dhost[FIREWIRE_EUI64_LEN];
-	nd_byte     firewire_shost[FIREWIRE_EUI64_LEN];
+	nd_eui64    firewire_dhost;
+	nd_eui64    firewire_shost;
 	nd_uint16_t firewire_type;
 };
 
@@ -47,14 +46,10 @@ struct firewire_header {
  * Length of that header; note that some compilers may pad
  * "struct firewire_header" to a multiple of 4 bytes, for example, so
  * "sizeof (struct firewire_header)" may not give the right answer.
+ * (That could be true even though we're using nd_ types, none of
+ * which should require anything more than byte alignment.)
  */
 #define FIREWIRE_HDRLEN		18
-
-static const char *
-fwaddr_string(netdissect_options *ndo, const u_char *addr)
-{
-	return GET_LINKADDR_STRING(addr, LINKADDR_IEEE1394, FIREWIRE_EUI64_LEN);
-}
 
 static void
 ap1394_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
@@ -65,8 +60,8 @@ ap1394_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	fp = (const struct firewire_header *)bp;
 
 	ND_PRINT("%s > %s",
-		     fwaddr_string(ndo, fp->firewire_shost),
-		     fwaddr_string(ndo, fp->firewire_dhost));
+		     eui64_string(ndo, fp->firewire_shost),
+		     eui64_string(ndo, fp->firewire_dhost));
 
 	firewire_type = GET_BE_U_2(fp->firewire_type);
 	if (!ndo->ndo_qflag) {
@@ -109,9 +104,9 @@ ap1394_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 
 	ether_type = GET_BE_U_2(fp->firewire_type);
 	src.addr = fp->firewire_shost;
-	src.addr_string = fwaddr_string;
+	src.addr_string = eui64_string;
 	dst.addr = fp->firewire_dhost;
-	dst.addr_string = fwaddr_string;
+	dst.addr_string = eui64_string;
 	if (ethertype_print(ndo, ether_type, p, length, caplen, &src, &dst) == 0) {
 		/* ether_type not known, print raw packet */
 		if (!ndo->ndo_eflag)

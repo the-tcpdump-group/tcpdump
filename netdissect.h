@@ -106,6 +106,12 @@ typedef unsigned char nd_ipv6[16];
 typedef unsigned char nd_mac_addr[MAC_ADDR_LEN];
 
 /*
+ * Use this for EUI64s.
+ */
+#define EUI64_LEN	8U
+typedef unsigned char nd_eui64[EUI64_LEN];
+
+/*
  * Use this for blobs of bytes; make them arrays of nd_byte.
  */
 typedef unsigned char nd_byte;

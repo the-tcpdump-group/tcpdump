@@ -546,7 +546,7 @@ ieee802_15_4_print_addr(netdissect_options *ndo, const u_char *p,
 		ND_PRINT("%04x", GET_LE_U_2(p));
 		break;
 	case 8:
-		ND_PRINT("%s", GET_LE64ADDR_STRING(p));
+		ND_PRINT("%s", GET_EUI64LE_STRING(p));
 		break;
 	}
 }
@@ -1576,7 +1576,7 @@ ieee802_15_4_print_aux_sec_header(netdissect_options *ndo,
 			return -1;
 		}
 		if (ndo->ndo_vflag > 1) {
-			ND_PRINT("KeySource %s, ", GET_LE64ADDR_STRING(p));
+			ND_PRINT("KeySource %s, ", GET_EUI64LE_STRING(p));
 		}
 		p += 4;
 		caplen -= 4;

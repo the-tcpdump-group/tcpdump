@@ -641,7 +641,16 @@ etheraddr_string(netdissect_options *ndo, const uint8_t *ep)
 }
 
 const char *
-le64addr_string(netdissect_options *ndo, const uint8_t *ep)
+eui64_string(netdissect_options *ndo, const uint8_t *ep)
+{
+	return (linkaddr_string(ndo, ep, LINKADDR_EUI64, EUI64_LEN));
+}
+
+/*
+ * EUI-64 with the rightmost octet first.
+ */
+const char *
+eui64le_string(netdissect_options *ndo, const uint8_t *ep)
 {
 	const unsigned int len = 8;
 	u_int i;
