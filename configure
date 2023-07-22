@@ -4367,47 +4367,64 @@ $as_echo "no" >&6; }
 	;;
 esac
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to drop root privileges by default" >&5
+$as_echo_n "checking whether to drop root privileges by default... " >&6; }
 
 # Check whether --with-user was given.
 if test "${with_user+set}" = set; then :
   withval=$with_user;
+else
+  withval=no
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to drop root privileges by default" >&5
-$as_echo_n "checking whether to drop root privileges by default... " >&6; }
-if test ! -z "$with_user" ; then
+case "$withval" in #(
+  no) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; } ;; #(
+  ''|yes) :
+    as_fn_error $? "--with-user requires a username" "$LINENO" 5 ;; #(
+  *) :
+
 
 cat >>confdefs.h <<_ACEOF
 #define WITH_USER "$withval"
 _ACEOF
 
-       { $as_echo "$as_me:${as_lineno-$LINENO}: result: to \"$withval\"" >&5
-$as_echo "to \"$withval\"" >&6; }
-else
-       { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, to user \"$withval\"" >&5
+$as_echo "yes, to user \"$withval\"" >&6; }
 
+ ;;
+esac
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to chroot" >&5
+$as_echo_n "checking whether to chroot... " >&6; }
 
 # Check whether --with-chroot was given.
 if test "${with_chroot+set}" = set; then :
   withval=$with_chroot;
+else
+  withval=no
+
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to chroot" >&5
-$as_echo_n "checking whether to chroot... " >&6; }
-if test ! -z "$with_chroot" && test "$with_chroot" != "no" ; then
+case "$withval" in #(
+  no) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; } ;; #(
+  ''|yes) :
+    as_fn_error $? "--with-chroot requires a directory" "$LINENO" 5 ;; #(
+  *) :
+
 
 cat >>confdefs.h <<_ACEOF
 #define WITH_CHROOT "$withval"
 _ACEOF
 
-       { $as_echo "$as_me:${as_lineno-$LINENO}: result: to \"$withval\"" >&5
-$as_echo "to \"$withval\"" >&6; }
-else
-       { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, to directory \"$withval\"" >&5
+$as_echo "yes, to directory \"$withval\"" >&6; }
+
+ ;;
+esac
 
 
 # Check whether --with-sandbox-capsicum was given.
