@@ -61,6 +61,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
     Source code:
       Update ND_BYTES_BETWEEN() macro for better accuracy.
       Update ND_BYTES_AVAILABLE_AFTER() macro for better accuracy.
+      TCP: Test ports < 1024 in port order to select the printer.
 
 Friday, April 7, 2023 / The Tcpdump Group
   Summary for 4.99.4 tcpdump release
