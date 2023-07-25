@@ -55,7 +55,7 @@ macos_task:
     MAKEFLAGS: '-j 4'
   script:
     - brew update >/dev/null
-    - brew install libsmi | grep -v '%'
+    - brew install libsmi openssl@3 | grep -v '%'
     - echo '$ git clone [...] libpcap.git'
     - git -C .. clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT}
     - ./build_matrix.sh
