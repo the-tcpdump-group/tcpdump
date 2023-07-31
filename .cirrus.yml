@@ -9,18 +9,18 @@ freebsd_task:
     # FreeBSD fails to start with 1 GB. 8 CPUs max concurrency.
     # The number of CPU cores must be either 1 or a multiple of 2.
     matrix:
-      - image_family: freebsd-12-3
+      - image_family: freebsd-12-4
         cpu: 2
         memory: 2G
-      - image_family: freebsd-13-1
+      - image_family: freebsd-13-2
         cpu: 2
         memory: 2G
   env:
     IGNORE_OSVERSION: yes
     MAKEFLAGS: -j 3
-    MATRIX_CC: clang14 gcc12
+    MATRIX_CC: clang15 gcc12
   script:
-    - pkg install -qy git autoconf gcc12 llvm14
+    - pkg install -qy git autoconf gcc12 llvm15
     - pkg install -qy cmake # for build_matrix.sh and build.sh
     - pkg install -qy pkgconf # for cmake, replaces pkg-config
     - pkg install -qy sudo # for some tcpdump commands
@@ -40,9 +40,11 @@ linux_task:
   env:
     DEBIAN_FRONTEND: noninteractive
     MAKEFLAGS: -j 5
+    MATRIX_CC: gcc clang-15
+    LANG: C
   script:
     - apt-get -qy update >/dev/null
-    - apt-get -qy install git autoconf make cmake clang gcc bc >/dev/null
+    - apt-get -qy install git autoconf make cmake clang-15 gcc bc >/dev/null
     - apt-get -qy install flex bison libdbus-1-dev libbluetooth-dev libnl-genl-3-dev libibverbs-dev >/dev/null # for libpcap
     - apt-get -qy install libssl-dev libsmi2-dev libcap-ng-dev libpcap-dev >/dev/null
     - apt-get -qy install sudo >/dev/null # for some tcpdump commands
