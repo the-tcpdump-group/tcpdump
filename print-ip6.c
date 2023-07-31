@@ -241,18 +241,20 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	ndo->ndo_protocol = "ip6";
 	ip6 = (const struct ip6_hdr *)bp;
 
+	if (!ndo->ndo_eflag) {
+		nd_print_protocol_caps(ndo);
+		ND_PRINT(" ");
+	}
+
+	if (IP6_VERSION(ip6) != 6) {
+		ND_PRINT("version error: %u != 6", IP6_VERSION(ip6));
+		return;
+	}
+
 	ND_TCHECK_SIZE(ip6);
 	if (length < sizeof (struct ip6_hdr)) {
 		ND_PRINT("truncated-ip6 %u", length);
 		return;
-	}
-
-	if (!ndo->ndo_eflag)
-	    ND_PRINT("IP6 ");
-
-	if (IP6_VERSION(ip6) != 6) {
-	  ND_PRINT("version error: %u != 6", IP6_VERSION(ip6));
-	  return;
 	}
 
 	payload_len = GET_BE_U_2(ip6->ip6_plen);
