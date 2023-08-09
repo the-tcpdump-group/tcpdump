@@ -36,17 +36,17 @@ and ask!
 
 ## How to add new code and to update existing code
 
-0) Check that there isn't a pull request already opened for the changes you
+1) Check that there isn't a pull request already opened for the changes you
    intend to make.
 
 1) [Fork](https://help.github.com/articles/fork-a-repo/) the Tcpdump
    [repository](https://github.com/the-tcpdump-group/tcpdump).
 
-2) The easiest way to test your changes on multiple operating systems and
+1) The easiest way to test your changes on multiple operating systems and
    architectures is to let the upstream CI test your pull request (more on
    this below).
 
-3) Setup your git working copy
+1) Setup your git working copy
    ```
    git clone https://github.com/<username>/tcpdump.git
    cd tcpdump
@@ -54,19 +54,19 @@ and ask!
    git fetch upstream
    ```
 
-4) Do a `touch .devel` in your working directory.
+1) Do a `touch .devel` in your working directory.
    Currently, the effect is
    * add (via `configure`, in `Makefile`) some warnings options (`-Wall`,
      `-Wmissing-prototypes`, `-Wstrict-prototypes`, ...) to the compiler if it
      supports these options,
    * have the `Makefile` support `make depend` and the `configure` script run it.
 
-5) Configure and build
+1) Configure and build
    ```
    ./configure && make -s && make check
    ```
 
-6) Add/update tests
+1) Add/update tests
    The `tests` directory contains regression tests of the dissection of captured
    packets.  Those captured packets were saved running tcpdump with option
    `-w sample.pcap`.  Additional options, such as `-n`, are used to create relevant
@@ -96,12 +96,12 @@ and ask!
    It is often useful to have test outputs with different verbosity levels
    (none, `-v`, `-vv`, `-vvv`, etc.) depending on the code.
 
-7) Test using `make check` (current build options) and `./build_matrix.sh`
+1) Test using `make check` (current build options) and `./build_matrix.sh`
    (a multitude of build options, build systems and compilers). If you can,
    test on more than one operating system. Don't send a pull request until
    all tests pass.
 
-8) Try to rebase your commits to keep the history simple.
+1) Try to rebase your commits to keep the history simple.
    ```
    git fetch upstream
    git rebase upstream/master
@@ -109,22 +109,22 @@ and ask!
    (If the rebase fails and you cannot resolve, issue `git rebase --abort`
    and ask for help in the pull request comment.)
 
-9) Once 100% happy, put your work into your forked repository using `git push`.
+1) Once 100% happy, put your work into your forked repository using `git push`.
 
-10) [Initiate and send](https://help.github.com/articles/using-pull-requests/)
+1) [Initiate and send](https://help.github.com/articles/using-pull-requests/)
     a pull request.
     This will trigger the upstream repository CI tests.
 
 
 ## Code style and generic remarks
-*  A thorough reading of some other printers code is useful.
+1) A thorough reading of some other printers code is useful.
 
-*  Put the normative reference if any as comments (RFC, etc.).
+1) Put the normative reference if any as comments (RFC, etc.).
 
-*  Put the format of packets/headers/options as comments if there is no
+1) Put the format of packets/headers/options as comments if there is no
    published normative reference.
 
-*  The printer may receive incomplete packet in the buffer, truncated at any
+1) The printer may receive incomplete packet in the buffer, truncated at any
    random position, for example by capturing with `-s size` option.
    This means that an attempt to fetch packet data based on the expected
    format of the packet may run the risk of overrunning the buffer.
@@ -281,11 +281,11 @@ and ask!
    DLCI, if the address is a valid Q.922 header, and an error indication
    otherwise;
 
-   * `LINKADDR_EUI64`, `LINKADDR_ATM`, `LINKADDR_OTHER` - 
+   * `LINKADDR_EUI64`, `LINKADDR_ATM`, `LINKADDR_OTHER` -
    the string is a sequence of XX:XX:... values for the bytes
    of the address.
 
-*  When defining a structure corresponding to a packet or part of a
+6) When defining a structure corresponding to a packet or part of a
    packet, so that a pointer to packet data can be cast to a pointer to
    that structure and that structure pointer used to refer to fields in
    the packet, use the `nd_*` types for the structure members.
@@ -318,20 +318,20 @@ and ask!
    The `nd_*` type for a byte in a sequence of bytes is `nd_byte`; an
    *N*-byte sequence should be declared as `nd_byte[N]`.
 
-*  Do invalid packet checks in code: Think that your code can receive in input
+1) Do invalid packet checks in code: Think that your code can receive in input
    not only a valid packet but any arbitrary random sequence of octets (packet
    * built malformed originally by the sender or by a fuzz tester,
    * became corrupted in transit or for some other reason).
 
    Print with: `nd_print_invalid(ndo);	/* to print " (invalid)" */`
 
-*  Use `struct tok` for indexed strings and print them with
+1) Use `struct tok` for indexed strings and print them with
    `tok2str()` or `bittok2str()` (for flags).
    All `struct tok` must end with `{ 0, NULL }`.
 
-*  Avoid empty lines in output of printers.
+1) Avoid empty lines in output of printers.
 
-*  A commit message must have:
+1) A commit message must have:
    ```
    First line: Capitalized short summary in the imperative (50 chars or less)
 
@@ -343,14 +343,14 @@ and ask!
    the body.
    ```
 
-*  Avoid non-ASCII characters in code and commit messages.
+1) Avoid non-ASCII characters in code and commit messages.
 
-*  Use the style of the modified sources.
+1) Use the style of the modified sources.
 
-*  Don't mix declarations and code.
+1) Don't mix declarations and code.
 
-*  tcpdump requires a compiler that supports C99 or later, so C99
+1) tcpdump requires a compiler that supports C99 or later, so C99
    features may be used in code, but C11 or later features should not be
    used.
 
-*  Avoid trailing tabs/spaces
+1) Avoid trailing tabs/spaces
