@@ -349,7 +349,8 @@ and ask!
 
 *  Don't mix declarations and code.
 
-*  Don't use `//` for comments.
-   Not all C compilers accept C++/C99 comments by default.
+*  tcpdump requires a compiler that supports C99 or later, so C99
+   features may be used in code, but C11 or later features should not be
+   used.
 
 *  Avoid trailing tabs/spaces
