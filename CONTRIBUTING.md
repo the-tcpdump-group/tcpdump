@@ -129,12 +129,6 @@ and ask!
    This means that an attempt to fetch packet data based on the expected
    format of the packet may run the risk of overrunning the buffer.
 
-   This is because the printer may receive incomplete packet in the
-   buffer, truncated at any random position, for example by capturing
-   with `-s size` option, so any attempt to fetch packet data based on
-   the expected format of the packet may run the risk of overrunning the
-   buffer.
-
    Furthermore, if the packet is complete, but is not correctly formed,
    that can also cause a printer to overrun the buffer, as it will be
    fetching packet data based on the expected format of the packet.
@@ -154,6 +148,13 @@ and ask!
    ND_TCHECK_SIZE(p)
    ND_TCHECK_LEN(p, l)
    ```
+
+   where *p* points to the data not being decoded.  For `ND_CHECK_n()`,
+   *n* is the length of the gap, in bytes.  For `ND_CHECK_SIZE()`, the
+   length of the gap, in bytes, is the size of an item of the data type
+   to which *p* points.  For `ND_CHECK_LEN()`, *l* is the length of the
+   gap, in bytes.
+
    For the `GET_*()` and `ND_TCHECK_*` macros (if not already done):
    * Assign: `ndo->ndo_protocol = "protocol";`
    * Define: `ND_LONGJMP_FROM_TCHECK` before including `netdissect.h`
@@ -183,7 +184,8 @@ and ask!
    `U` indicates that an unsigned value is fetched; `S` indicates that a
    signed value is fetched.  For multi-byte values, `BE` indicates that
    a big-endian value ("network byte order") is fetched, and `LE`
-   indicates that a little-endian value is fetched.
+   indicates that a little-endian value is fetched. *n* is the length,
+   in bytes, of the multi-byte integral value to be fetched.
 
    In addition to the bounds checking the `GET_*()` macros perform,
    using those macros has other advantages:
