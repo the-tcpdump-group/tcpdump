@@ -59,9 +59,16 @@ typedef signed char nd_int8_t[1];
 
 /*
  * "unsigned char" so that sign extension isn't done on the
- * individual bytes while they're being assembled.
+ * individual bytes while they're being assembled.  Use
+ * GET_S_BE_n() and GET_S_LE_n() macros to extract the value
+ * as a signed integer.
  */
+typedef unsigned char nd_int16_t[2];
+typedef unsigned char nd_int24_t[3];
 typedef unsigned char nd_int32_t[4];
+typedef unsigned char nd_int40_t[5];
+typedef unsigned char nd_int48_t[6];
+typedef unsigned char nd_int56_t[7];
 typedef unsigned char nd_int64_t[8];
 
 #define	FMAXINT	(4294967296.0)	/* floating point rep. of MAXINT */

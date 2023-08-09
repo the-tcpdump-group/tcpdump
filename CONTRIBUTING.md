@@ -285,6 +285,39 @@ and ask!
    the string is a sequence of XX:XX:... values for the bytes
    of the address.
 
+*  When defining a structure corresponding to a packet or part of a
+   packet, so that a pointer to packet data can be cast to a pointer to
+   that structure and that structure pointer used to refer to fields in
+   the packet, use the `nd_*` types for the structure members.
+
+   Those types all are aligned only on a 1-byte boundary, so a
+   compiler will not assume that the structure is aligned on a boundary
+   stricter than one byte; there is no guarantee that fields in packets
+   are aligned on any particular boundary.
+
+   This means that all padding in the structure must be explicitly
+   declared as fields in the structure.
+
+   The `nd_*` types for integral values are:
+
+   * `nd_uintN_t`, for unsigned integral values, where *N* is the number
+      of bytes in the value.
+   * `nd_intN_t`, for signed integral values, where *N* is the number
+      of bytes in the value.
+
+   The `nd_*` types for IP addresses are:
+
+   * `nd_ipv4`, for IPv4 addresses;
+   * `nd_ipv6`, for IPv6 addresses.
+
+   The `nd_*` types for link-layer addresses are:
+
+   * `nd_mac48`, for MAC-48 (Ethernet, 802.11, etc.) addresses;
+   * `nd_eui64`, for EUI-64 values.
+
+   The `nd_*` type for a byte in a sequence of bytes is `nd_byte`; an
+   *N*-byte sequence should be declared as `nd_byte[N]`.
+
 *  Do invalid packet checks in code: Think that your code can receive in input
    not only a valid packet but any arbitrary random sequence of octets (packet
    * built malformed originally by the sender or by a fuzz tester,
