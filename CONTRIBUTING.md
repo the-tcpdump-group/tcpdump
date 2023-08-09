@@ -126,15 +126,27 @@ and ask!
 
 *  The printer may receive incomplete packet in the buffer, truncated at any
    random position, for example by capturing with `-s size` option.
+   This means that an attempt to fetch packet data based on the expected
+   format of the packet may run the risk of overrunning the buffer.
+
+   This is because the printer may receive incomplete packet in the
+   buffer, truncated at any random position, for example by capturing
+   with `-s size` option, so any attempt to fetch packet data based on
+   the expected format of the packet may run the risk of overrunning the
+   buffer.
+
+   Furthermore, if the packet is complete, but is not correctly formed,
+   that can also cause a printer to overrun the buffer, as it will be
+   fetching packet data based on the expected format of the packet.
+
+   Therefore, integral, IPv4 address, and octet sequence values should
+   be fetched using the `GET_*()` macros, which are defined in
+   `extract.h`.
+
    If your code reads and decodes every byte of the protocol packet, then to
    ensure proper and complete bounds checks it would be sufficient to read all
-   packet data using the `GET_*()` macros, typically:
-   ```
-   GET_U_1(p)
-   GET_S_1(p)
-   GET_BE_U_n(p), n in { 2, 3, 4, 5, 6, 7, 8 }
-   GET_BE_S_n(p), n in { 2, 3, 4, 5, 6, 7, 8 }
-   ```
+   packet data using the `GET_*()` macros.
+
    If your code uses the macros above only on some packet data, then the gaps
    would have to be bounds-checked using the `ND_TCHECK_*()` macros:
    ```
@@ -142,7 +154,7 @@ and ask!
    ND_TCHECK_SIZE(p)
    ND_TCHECK_LEN(p, l)
    ```
-   For the `ND_TCHECK_*` macros (if not already done):
+   For the `GET_*()` and `ND_TCHECK_*` macros (if not already done):
    * Assign: `ndo->ndo_protocol = "protocol";`
    * Define: `ND_LONGJMP_FROM_TCHECK` before including `netdissect.h`
    * Make sure that the intersection of `GET_*()` and `ND_TCHECK_*()` is minimal,
@@ -154,6 +166,122 @@ and ask!
    sudo tcpreplay -i lo sample.pcap             # in another terminal
    ```
    You should try several values for snaplen to do various truncation.
+
+*  The `GET_*()` macros that fetch integral values are:
+   ```
+   GET_U_1(p)
+   GET_S_1(p)
+   GET_BE_U_n(p), n in { 2, 3, 4, 5, 6, 7, 8 }
+   GET_BE_S_n(p), n in { 2, 3, 4, 5, 6, 7, 8 }
+   GET_LE_U_n(p), n in { 2, 3, 4, 5, 6, 7, 8 }
+   GET_LE_S_n(p), n in { 2, 3, 4, 5, 6, 7, 8 }
+   ```
+
+   where *p* points to the integral value in the packet buffer. The
+   macro returns the integral value at that location.
+
+   `U` indicates that an unsigned value is fetched; `S` indicates that a
+   signed value is fetched.  For multi-byte values, `BE` indicates that
+   a big-endian value ("network byte order") is fetched, and `LE`
+   indicates that a little-endian value is fetched.
+
+   In addition to the bounds checking the `GET_*()` macros perform,
+   using those macros has other advantages:
+
+   * tcpdump runs on both big-endian and little-endian systems, so
+     fetches of multi-byte integral values must be done in a fashion
+     that works regardless of the byte order of the machine running
+     tcpdump.  The `GET_BE_*()` macros will fetch a big-endian value and
+     return a host-byte-order value on both big-endian and little-endian
+     machines, and the `GET_LE_*()` macros will fetch a little-endian
+     value and return a host-byte-order value on both big-endian and
+     little-endian machines.
+
+   * tcpdump runs on machines that do not support unaligned access to
+     multi-byte values, and packet values are not guaranteed to be
+     aligned on the proper boundary.  The `GET_BE_*()` and `GET_LE_*()`
+     macros will fetch values even if they are not aligned on the proper
+     boundary.
+
+*  The `GET_*()` macros that fetch IPv4 address values are:
+   ```
+   GET_IPV4_TO_HOST_ORDER(p)
+   GET_IPV4_TO_NETWORK_ORDER(p)
+   ```
+
+   where *p* points to the address in the packet buffer.
+  `GET_IPV4_TO_HOST_ORDER()` returns the address in the byte order of
+   the host that is running tcpdump; `GET_IPV4_TO_NETWORK_ORDER()`
+   returns it in network byte order.
+
+   Like the integral `GET_*()` macros, these macros work correctly on
+   both big-endian and little-endian machines and will fetch values even
+   if they are not aligned on the proper boundary.
+
+*  The `GET_*()` macro that fetches an arbitrary sequences of bytes is:
+   ```
+   GET_CPY_BYTES(dst, p, len)
+   ```
+
+   where *dst* is the destination to which the sequence of bytes should
+   be copied, *p* points to the first byte of the sequence of bytes, and
+   *len* is the number of bytes to be copied.  The bytes are copied in
+   the order in which they appear in the packet.
+
+*  To fetch a network address and convert it to a printable string, use
+   the following `GET_*()` macros, defined in `addrtoname.h`, to
+   perform bounds checks to make sure the entire address is within the
+   buffer and to translate the address to a string to print:
+   ```
+   GET_IPADDR_STRING(p)
+   GET_IP6ADDR_STRING(p)
+   GET_MAC48_STRING(p)
+   GET_EUI64_STRING(p)
+   GET_EUI64LE_STRING(p)
+   GET_LINKADDR_STRING(p, type, len)
+   GET_ISONSAP_STRING(nsap, nsap_length)
+   ```
+
+   `GET_IPADDR_STRING()` fetches an IPv4 address pointed to by *p* and
+   returns a string that is either a host name, if the `-n` flag wasn't
+   specified and a host name could be found for the address, or the
+   standard XXX.XXX.XXX.XXX-style representation of the address.
+
+   `GET_IP6ADDR_STRING()` fetches an IPv6 address pointed to by *p* and
+   returns a string that is either a host name, if the `-n` flag wasn't
+   specified and a host name could be found for the address, or the
+   standard XXXX::XXXX-style representation of the address.
+
+   `GET_MAC48_STRING()` fetches a 48-bit MAC address (Ethernet, 802.11,
+   etc.) pointed to by *p* and returns a string that is either a host
+   name, if the `-n` flag wasn't specified and a host name could be
+   found in the ethers file for the address, or the standard
+   XX:XX:XX:XX:XX:XX-style representation of the address.
+
+   `GET_EUI64_STRING()` fetches a 64-bit EUI pointed to by *p* and
+   returns a string that is the standard XX:XX:XX:XX:XX:XX:XX:XX-style
+   representation of the address.
+
+   `GET_EUI64LE_STRING()` fetches a 64-bit EUI, in reverse byte order,
+   pointed to by *p* and returns a string that is the standard
+   XX:XX:XX:XX:XX:XX:XX:XX-style representation of the address.
+
+   `GET_LINKADDR_STRING()` fetches an octet string, of length *length*
+   and type *type*,  pointed to by *p* and returns a string whose format
+   depends on the value of *type*:
+
+   * `LINKADDR_MAC48` - if the length is 6, the string has the same
+   value as `GET_MAC48_STRING()` would return for that address,
+   otherwise, the string is a sequence of XX:XX:... values for the bytes
+   of the address;
+
+   * `LINKADDR_FRELAY` - the string is "DLCI XXX", where XXX is the
+   DLCI, if the address is a valid Q.922 header, and an error indication
+   otherwise;
+
+   * `LINKADDR_EUI64`, `LINKADDR_ATM`, `LINKADDR_OTHER` - 
+   the string is a sequence of XX:XX:... values for the bytes
+   of the address.
 
 *  Do invalid packet checks in code: Think that your code can receive in input
    not only a valid packet but any arbitrary random sequence of octets (packet
