@@ -464,7 +464,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			domain_print(ndo, cp, length, FALSE, FALSE);
 			break;
 		case PT_QUIC:
-			quic_print(ndo, cp, length);
+			quic_print(ndo, cp);
 			break;
 		}
 		return;
@@ -674,7 +674,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			someip_print(ndo, cp, length);
 		else if (IS_SRC_OR_DST_PORT(HTTPS_PORT) &&
 			 quic_detect(ndo, cp, length))
-			quic_print(ndo, cp, length);
+			quic_print(ndo, cp);
 		else if (sport == BCM_LI_PORT)
 			bcm_li_print(ndo, cp, length);
 		else {

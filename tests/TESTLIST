@@ -907,6 +907,7 @@ quic_handshake			quic_handshake.pcap		quic_handshake.out	-v
 quic_handshake_truncated	quic_handshake_truncated.pcap	quic_handshake_truncated.out	-v
 quic_retry			quic_retry.pcap			quic_retry.out	-v
 gquic				gquic.pcap			gquic.out	-v
+quic_32_bit_pointer_overflow quic_32_bit_pointer_overflow.pcap quic_32_bit_pointer_overflow.out
 
 # GRE keepalives, CDP over GRE
 various_gre			various_gre.pcap		various_gre.out	-v
