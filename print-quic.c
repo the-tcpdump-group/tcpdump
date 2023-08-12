@@ -272,9 +272,9 @@ quic_print_packet(netdissect_options *ndo, const u_char *bp, const u_char *end)
 }
 
 void
-quic_print(netdissect_options *ndo, const u_char *bp, const u_int len)
+quic_print(netdissect_options *ndo, const u_char *bp)
 {
-	const uint8_t *end = bp + len;
+	const uint8_t *end = bp + ND_BYTES_AVAILABLE_AFTER(bp);
 
 	ndo->ndo_protocol = "quic";
 	nd_print_protocol(ndo);
