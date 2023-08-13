@@ -1009,7 +1009,7 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/.devel OR EXISTS ${CMAKE_BINARY_DIR}/.devel)
         # We do *not* care whether a structure had padding added at
         # the end because of __declspec(align) - *we* don't use
         # __declspec(align), because the only structures whose layout
-        # we precisely specify are those that get overlayed on packet
+        # we precisely specify are those that get overlaid on packet
         # data, and in those every element is an array of octets so
         # that we have full control over the size and aligmnet, and,
         # apparently, jmp_buf has such a declaration on x86, meaning
