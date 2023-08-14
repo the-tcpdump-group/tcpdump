@@ -328,11 +328,17 @@ ldp_tlv_print(netdissect_options *ndo,
 	break;
 
     case LDP_TLV_COMMON_SESSION:
-	TLV_TCHECK(8);
+	TLV_TCHECK(14);
 	ND_PRINT("\n\t      Version: %u, Keepalive: %us, Flags: [Downstream %s, Loop Detection %s]",
 	       GET_BE_U_2(tptr), GET_BE_U_2(tptr + 2),
-	       (GET_BE_U_2(tptr + 6)&0x8000) ? "On Demand" : "Unsolicited",
-	       (GET_BE_U_2(tptr + 6)&0x4000) ? "Enabled" : "Disabled"
+	       (GET_BE_U_2(tptr + 4)&0x8000) ? "On Demand" : "Unsolicited",
+	       (GET_BE_U_2(tptr + 4)&0x4000) ? "Enabled" : "Disabled"
+	       );
+	ND_PRINT("\n\t      Path Vector Limit %u, Max-PDU length: %u, Receiver Label-Space-ID %s:%u",
+	       GET_U_1(tptr+5),
+	       GET_BE_U_2(tptr+6),
+	       GET_IPADDR_STRING(tptr+8),
+	       GET_BE_U_2(tptr+12)
 	       );
 	break;
 
