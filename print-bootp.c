@@ -147,7 +147,7 @@ struct bootp {
 #define	TAG_NIS_P_DOMAIN	((uint8_t)  64)
 #define	TAG_NIS_P_SERVERS	((uint8_t)  65)
 #define	TAG_MOBILE_HOME		((uint8_t)  68)
-#define	TAG_SMPT_SERVER		((uint8_t)  69)
+#define	TAG_SMTP_SERVER		((uint8_t)  69)
 #define	TAG_POP3_SERVER		((uint8_t)  70)
 #define	TAG_NNTP_SERVER		((uint8_t)  71)
 #define	TAG_WWW_SERVER		((uint8_t)  72)
@@ -463,7 +463,7 @@ static const struct tok tag2str[] = {
 	{ TAG_NIS_P_DOMAIN,	"sN+D" },
 	{ TAG_NIS_P_SERVERS,	"iN+S" },
 	{ TAG_MOBILE_HOME,	"iMH" },
-	{ TAG_SMPT_SERVER,	"iSMTP" },
+	{ TAG_SMTP_SERVER,	"iSMTP" },
 	{ TAG_POP3_SERVER,	"iPOP3" },
 	{ TAG_NNTP_SERVER,	"iNNTP" },
 	{ TAG_WWW_SERVER,	"iWWW" },
