@@ -62,6 +62,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Update ND_BYTES_BETWEEN() macro for better accuracy.
       Update ND_BYTES_AVAILABLE_AFTER() macro for better accuracy.
       TCP: Test ports < 1024 in port order to select the printer.
+      UDP: Move source port equal BCM_LI_PORT to bottom of long if else chain.
+      UDP: Test ports < 1024 in port order to select the printer.
       LDP: Add missing fields of the Common Session Parameters TLV and fix the
         offset for the A&D bits.
 
