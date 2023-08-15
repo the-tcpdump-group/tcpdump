@@ -20,7 +20,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "12 March 2023"
+.TH TCPDUMP 1  "09 Sep 2023"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -1125,6 +1125,15 @@ packet from the network and the time when an interrupt was delivered to
 the kernel to get it to read the packet and a delay between the time
 when the kernel serviced the `new packet' interrupt and the time when it
 applied a time stamp to the packet.
+.SS Interface
+.LP
+When the \fIany\fP interface is selected on capture or when a link-type
+\fILINUX_SLL2\fP capture file is read the
+interface name is printed after the timestamp. This is followed by the packet
+type with \fIIn\fP and \fIOut\fP denoting a packet destined for this host or
+originating from this host respectively. Other possible values are \fIB\fP
+for broadcast packets, \fIM\fP for multicast packets, and \fIP\fP for packets
+destined for other hosts.
 .SS Link Level Headers
 .LP
 If the '-e' option is given, the link level header is printed out.
