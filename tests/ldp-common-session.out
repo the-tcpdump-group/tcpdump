@@ -3,7 +3,7 @@
 	LDP, Label-Space-ID: 192.168.0.2:0, pdu-length: 28
 	  Notification Message (0x0001), length: 18, Message ID: 0xfffffff9, Flags: [ignore if unknown]
 	    Status TLV (0x0300), length: 10, Flags: [ignore and don't forward if unknown]
-	      Status: 0x0a, Flags: [Fatal error and don't forward]
+	      Status Code: Shutdown, Flags: [Fatal error and don't forward]
     2  12:23:59.828114 IP (tos 0xc0, ttl 255, id 1499, offset 0, flags [none], proto TCP (6), length 40)
     192.168.0.2.58320 > 192.168.0.1.646: Flags [F.], cksum 0x7d76 (correct), seq 32, ack 1, win 2990, length 0
     3  12:24:00.018513 IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 70)
@@ -126,7 +126,7 @@
 	    Generic Label TLV (0x0200), length: 4, Flags: [ignore and don't forward if unknown]
 	      Label: 20066
 	    Status TLV (0x0300), length: 10, Flags: [ignore and don't forward if unknown]
-	      Status: 0x0b, Flags: [Advisory Notification and don't forward], causing Message ID: 0x0000000f
+	      Status Code: Loop Detected, Flags: [Advisory Notification and don't forward], causing Message ID: 0x0000000f, Message ID: Label Mapping
 	LDP, Label-Space-ID: 192.168.0.2:0, pdu-length: 48
 	  Label Release Message (0x0403), length: 38, Message ID: 0x0000000b, Flags: [ignore if unknown]
 	    FEC TLV (0x0100), length: 8, Flags: [ignore and don't forward if unknown]
@@ -134,7 +134,7 @@
 	    Generic Label TLV (0x0200), length: 4, Flags: [ignore and don't forward if unknown]
 	      Label: 20066
 	    Status TLV (0x0300), length: 10, Flags: [ignore and don't forward if unknown]
-	      Status: 0x0b, Flags: [Advisory Notification and don't forward], causing Message ID: 0x00000010
+	      Status Code: Loop Detected, Flags: [Advisory Notification and don't forward], causing Message ID: 0x00000010, Message ID: Label Mapping
 	LDP, Label-Space-ID: 192.168.0.2:0, pdu-length: 48
 	  Label Release Message (0x0403), length: 38, Message ID: 0x0000000c, Flags: [ignore if unknown]
 	    FEC TLV (0x0100), length: 8, Flags: [ignore and don't forward if unknown]
@@ -142,7 +142,7 @@
 	    Generic Label TLV (0x0200), length: 4, Flags: [ignore and don't forward if unknown]
 	      Label: 20066
 	    Status TLV (0x0300), length: 10, Flags: [ignore and don't forward if unknown]
-	      Status: 0x0b, Flags: [Advisory Notification and don't forward], causing Message ID: 0x00000011
+	      Status Code: Loop Detected, Flags: [Advisory Notification and don't forward], causing Message ID: 0x00000011, Message ID: Label Mapping
 	LDP, Label-Space-ID: 192.168.0.2:0, pdu-length: 48
 	  Label Release Message (0x0403), length: 38, Message ID: 0x0000000d, Flags: [ignore if unknown]
 	    FEC TLV (0x0100), length: 8, Flags: [ignore and don't forward if unknown]
@@ -150,7 +150,7 @@
 	    Generic Label TLV (0x0200), length: 4, Flags: [ignore and don't forward if unknown]
 	      Label: 20066
 	    Status TLV (0x0300), length: 10, Flags: [ignore and don't forward if unknown]
-	      Status: 0x0b, Flags: [Advisory Notification and don't forward], causing Message ID: 0x00000012
+	      Status Code: Loop Detected, Flags: [Advisory Notification and don't forward], causing Message ID: 0x00000012, Message ID: Label Mapping
 	LDP, Label-Space-ID: 192.168.0.2:0, pdu-length: 48
 	  Label Release Message (0x0403), length: 38, Message ID: 0x0000000e, Flags: [ignore if unknown]
 	    FEC TLV (0x0100), length: 8, Flags: [ignore and don't forward if unknown]
@@ -158,7 +158,7 @@
 	    Generic Label TLV (0x0200), length: 4, Flags: [ignore and don't forward if unknown]
 	      Label: 20066
 	    Status TLV (0x0300), length: 10, Flags: [ignore and don't forward if unknown]
-	      Status: 0x0b, Flags: [Advisory Notification and don't forward], causing Message ID: 0x00000013
+	      Status Code: Loop Detected, Flags: [Advisory Notification and don't forward], causing Message ID: 0x00000013, Message ID: Label Mapping
    13  12:24:12.831754 IP (tos 0xc0, ttl 255, id 1520, offset 0, flags [none], proto TCP (6), length 415)
     192.168.0.2.58321 > 192.168.0.1.646: Flags [P.], cksum 0xef2a (correct), seq 666:1041, ack 813, win 3000, length 375
 	LDP, Label-Space-ID: 192.168.0.2:0, pdu-length: 371
