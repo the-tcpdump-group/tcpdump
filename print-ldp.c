@@ -172,6 +172,37 @@ static const struct tok ldp_tlv_values[] = {
     { 0, NULL}
 };
 
+static const struct tok ldp_status_code_values[] = {
+    /* rfc 5036 */
+    { 0x00000000, "Success" },
+    { 0x00000001, "Bad LDP Identifier" },
+    { 0x00000002, "Bad Protocol Version" },
+    { 0x00000003, "Bad PDU Length" },
+    { 0x00000004, "Unknown Message Type" },
+    { 0x00000005, "Bad Message Length" },
+    { 0x00000006, "Unknown TLV" },
+    { 0x00000007, "Bad TLV Length" },
+    { 0x00000008, "Malformted TLV Value" },
+    { 0x00000009, "Hold Timer Expired" },
+    { 0x0000000A, "Shutdown" },
+    { 0x0000000B, "Loop Detected" },
+    { 0x0000000C, "Unknown FEC" },
+    { 0x0000000D, "No Route" },
+    { 0x0000000E, "No Label Resources" },
+    { 0x0000000F, "Label Resources/Available" },
+    { 0x00000010, "Session Rejected/No Hello" },
+    { 0x00000011, "Session Rejected/Parameters Advertisement Mode" },
+    { 0x00000012, "Session Rejected/Parameters Max PDU Length" },
+    { 0x00000013, "Session Rejected/Parameters Label Range" },
+    { 0x00000014, "KeepAlive Timer Expired" },
+    { 0x00000015, "Label Request Aborted" },
+    { 0x00000016, "Missing Message Parameters" },
+    { 0x00000017, "Unsupported Address Family" },
+    { 0x00000018, "Session Rejected/Bad KeepAlive Time" },
+    { 0x00000019, "Internal Error" },
+    { 0, NULL}
+};
+
 #define LDP_FEC_WILDCARD	0x01
 #define LDP_FEC_PREFIX		0x02
 #define LDP_FEC_HOSTADDRESS	0x03
@@ -491,17 +522,21 @@ ldp_tlv_print(netdissect_options *ndo,
 	break;
 
     case LDP_TLV_STATUS:
-	TLV_TCHECK(8);
+	TLV_TCHECK(10);
 	ui = GET_BE_U_4(tptr);
 	tptr+=4;
-	ND_PRINT("\n\t      Status: 0x%02x, Flags: [%s and %s forward]",
-	       ui&0x3fffffff,
-	       ui&0x80000000 ? "Fatal error" : "Advisory Notification",
-	       ui&0x40000000 ? "do" : "don't");
+	ND_PRINT("\n\t      Status Code: %s, Flags: [%s and %s forward]",
+		 tok2str(ldp_status_code_values, "Unknown", ui&0x3fffffff),
+		 ui&0x80000000 ? "Fatal error" : "Advisory Notification",
+		 ui&0x40000000 ? "do" : "don't");
 	ui = GET_BE_U_4(tptr);
 	tptr+=4;
 	if (ui)
 	    ND_PRINT(", causing Message ID: 0x%08x", ui);
+	ui = GET_BE_U_2(tptr);
+	if (ui)
+	    ND_PRINT(", Message ID: %s", tok2str(ldp_msg_values, "Unknown", ui));
+
 	break;
 
     case LDP_TLV_FT_SESSION:
