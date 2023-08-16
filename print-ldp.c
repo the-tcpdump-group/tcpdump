@@ -144,6 +144,7 @@ static const struct tok ldp_msg_values[] = {
 #define LDP_TLV_FT_SESSION	     0x0503
 #define	LDP_TLV_LABEL_REQUEST_MSG_ID 0x0600
 #define LDP_TLV_MTU                  0x0601 /* rfc 3988 */
+#define LDP_TLV_DUAL_STACK_CAP       0x0701 /* rfc 7552 */
 
 static const struct tok ldp_tlv_values[] = {
     { LDP_TLV_FEC,	             "FEC" },
@@ -167,6 +168,7 @@ static const struct tok ldp_tlv_values[] = {
     { LDP_TLV_FT_SESSION,            "Fault-Tolerant Session Parameters" },
     { LDP_TLV_LABEL_REQUEST_MSG_ID,  "Label Request Message ID" },
     { LDP_TLV_MTU,                   "MTU" },
+    { LDP_TLV_DUAL_STACK_CAP,        "Dual-Stack Capability" },
     { 0, NULL}
 };
 
@@ -211,6 +213,16 @@ static const struct tok ldp_fec_martini_ifparm_vccv_cv_values[] = {
     { 0, NULL}
 };
 
+/* rfc 7552 */
+#define LDP_DUAL_STACK_TRANSPORT_PREF_IPV4  0x40
+#define LDP_DUAL_STACK_TRANSPORT_PREF_IPV6  0x60
+
+static const struct tok ldp_dual_stack_transport_pref_values[] = {
+    { LDP_DUAL_STACK_TRANSPORT_PREF_IPV4, "IPv4" },
+    { LDP_DUAL_STACK_TRANSPORT_PREF_IPV6, "IPv6" },
+    { 0, NULL}
+};
+
 static u_int ldp_pdu_print(netdissect_options *, const u_char *);
 
 /*
@@ -249,7 +261,7 @@ ldp_tlv_print(netdissect_options *ndo,
 
     const struct ldp_tlv_header *ldp_tlv_header;
     u_short tlv_type,tlv_len,tlv_tlen,af,ft_flags;
-    u_char fec_type;
+    u_char fec_type, transport_pref;
     u_int ui,vc_info_len, vc_info_tlv_type, vc_info_tlv_len,idx;
     char buf[100];
     int i;
@@ -517,6 +529,15 @@ ldp_tlv_print(netdissect_options *ndo,
 	ND_PRINT("\n\t      MTU: %u", GET_BE_U_2(tptr));
 	break;
 
+    case LDP_TLV_DUAL_STACK_CAP:
+	TLV_TCHECK(4);
+	transport_pref = GET_U_1(tptr);
+	ND_PRINT("\n\t      Transport Connection Preference: %s",
+		 tok2str(ldp_dual_stack_transport_pref_values,
+			 "Unknown",
+			 transport_pref));
+	break;
+
 
     /*
      *  FIXME those are the defined TLVs that lack a decoder
@@ -667,6 +688,9 @@ ldp_pdu_print(netdissect_options *ndo,
         case LDP_MSG_LABEL_MAPPING:
         case LDP_MSG_ADDRESS_WITHDRAW:
         case LDP_MSG_LABEL_WITHDRAW:
+        case LDP_MSG_LABEL_REQUEST:
+        case LDP_MSG_LABEL_RELEASE:
+        case LDP_MSG_LABEL_ABORT_REQUEST:
             while(msg_tlen >= 4) {
                 processed = ldp_tlv_print(ndo, msg_tptr, msg_tlen);
                 if (processed == 0)
@@ -675,15 +699,6 @@ ldp_pdu_print(netdissect_options *ndo,
                 msg_tptr+=processed;
             }
             break;
-
-        /*
-         *  FIXME those are the defined messages that lack a decoder
-         *  you are welcome to contribute code ;-)
-         */
-
-        case LDP_MSG_LABEL_REQUEST:
-        case LDP_MSG_LABEL_RELEASE:
-        case LDP_MSG_LABEL_ABORT_REQUEST:
 
         default:
             if (ndo->ndo_vflag <= 1)
