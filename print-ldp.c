@@ -142,6 +142,7 @@ static const struct tok ldp_msg_values[] = {
 #define	LDP_TLV_ATM_SESSION_PARM     0x0501
 #define	LDP_TLV_FR_SESSION_PARM      0x0502
 #define LDP_TLV_FT_SESSION	     0x0503
+#define LDP_TLV_TYPED_WC_FEC_CAP     0x050b /* rfc 5918 */
 #define	LDP_TLV_LABEL_REQUEST_MSG_ID 0x0600
 #define LDP_TLV_MTU                  0x0601 /* rfc 3988 */
 #define LDP_TLV_DUAL_STACK_CAP       0x0701 /* rfc 7552 */
@@ -166,6 +167,7 @@ static const struct tok ldp_tlv_values[] = {
     { LDP_TLV_ATM_SESSION_PARM,      "ATM Session Parameters" },
     { LDP_TLV_FR_SESSION_PARM,       "Frame-Relay Session Parameters" },
     { LDP_TLV_FT_SESSION,            "Fault-Tolerant Session Parameters" },
+    { LDP_TLV_TYPED_WC_FEC_CAP,      "Typed Wildcard FEC Capability" },
     { LDP_TLV_LABEL_REQUEST_MSG_ID,  "Label Request Message ID" },
     { LDP_TLV_MTU,                   "MTU" },
     { LDP_TLV_DUAL_STACK_CAP,        "Dual-Stack Capability" },
@@ -557,6 +559,11 @@ ldp_tlv_print(netdissect_options *ndo,
 	ui = GET_BE_U_4(tptr);
 	if (ui)
 	    ND_PRINT(", Recovery Time: %ums", ui);
+	break;
+
+    case LDP_TLV_TYPED_WC_FEC_CAP:
+	TLV_TCHECK(1);
+	ND_PRINT("\n\t      %s", GET_U_1(tptr)&0x80 ? "Support" : "No Support");
 	break;
 
     case LDP_TLV_MTU:
