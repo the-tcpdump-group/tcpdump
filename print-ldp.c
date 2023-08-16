@@ -372,6 +372,23 @@ ldp_tlv_print(netdissect_options *ndo,
         }
 	break;
 
+    case LDP_TLV_HOP_COUNT:
+	TLV_TCHECK(1);
+	ND_PRINT("\n\t      Hop Count: %u", GET_U_1(tptr));
+	break;
+
+    case LDP_TLV_PATH_VECTOR:
+	TLV_TCHECK(4);
+	ND_PRINT("\n\t      Path Vector: %s", GET_IPADDR_STRING(tptr));
+	tptr += 4;
+	tlv_tlen -= 4;
+	while (tlv_tlen >= 4) {
+	    ND_PRINT(", %s", GET_IPADDR_STRING(tptr));
+	    tptr += 4;
+	    tlv_tlen -= 4;
+	}
+	break;
+
     case LDP_TLV_COMMON_SESSION:
 	TLV_TCHECK(14);
 	ND_PRINT("\n\t      Version: %u, Keepalive: %us, Flags: [Downstream %s, Loop Detection %s]",
@@ -586,8 +603,6 @@ ldp_tlv_print(netdissect_options *ndo,
      *  you are welcome to contribute code ;-)
      */
 
-    case LDP_TLV_HOP_COUNT:
-    case LDP_TLV_PATH_VECTOR:
     case LDP_TLV_ATM_LABEL:
     case LDP_TLV_FR_LABEL:
     case LDP_TLV_EXTD_STATUS:
