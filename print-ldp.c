@@ -554,8 +554,7 @@ ldp_tlv_print(netdissect_options *ndo,
 	    ND_PRINT(", causing Message ID: 0x%08x", ui);
 	ui = GET_BE_U_2(tptr);
 	if (ui)
-	    ND_PRINT(", Message ID: %s", tok2str(ldp_msg_values, "Unknown", ui));
-
+	    ND_PRINT(", Message Type: %s", tok2str(ldp_msg_values, "Unknown", ui));
 	break;
 
     case LDP_TLV_FT_SESSION:
