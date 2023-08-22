@@ -220,13 +220,14 @@ pgm_print(netdissect_options *ndo,
 		     pgm->pgm_gsid[3],
                      pgm->pgm_gsid[4],
                      pgm->pgm_gsid[5]);
+	bp += sizeof(struct pgm_header);
 	switch (pgm_type_val) {
 	case PGM_SPM: {
 	    const struct pgm_spm *spm;
 
-	    spm = (const struct pgm_spm *)(pgm + 1);
+	    spm = (const struct pgm_spm *)bp;
 	    ND_TCHECK_SIZE(spm);
-	    bp = (const u_char *) (spm + 1);
+	    bp += sizeof(struct pgm_spm);
 
 	    switch (GET_BE_U_2(spm->pgms_nla_afi)) {
 	    case AFNUM_IP:
@@ -256,9 +257,9 @@ pgm_print(netdissect_options *ndo,
 	    const struct pgm_poll *pgm_poll;
 	    uint32_t ivl, rnd, mask;
 
-	    pgm_poll = (const struct pgm_poll *)(pgm + 1);
+	    pgm_poll = (const struct pgm_poll *)bp;
 	    ND_TCHECK_SIZE(pgm_poll);
-	    bp = (const u_char *) (pgm_poll + 1);
+	    bp += sizeof(struct pgm_poll);
 
 	    switch (GET_BE_U_2(pgm_poll->pgmp_nla_afi)) {
 	    case AFNUM_IP:
@@ -294,33 +295,33 @@ pgm_print(netdissect_options *ndo,
 	case PGM_POLR: {
 	    const struct pgm_polr *polr_msg;
 
-	    polr_msg = (const struct pgm_polr *)(pgm + 1);
+	    polr_msg = (const struct pgm_polr *)bp;
 	    ND_TCHECK_SIZE(polr_msg);
 	    ND_PRINT("POLR seq %u round %u",
 			 GET_BE_U_4(polr_msg->pgmp_seq),
 			 GET_BE_U_2(polr_msg->pgmp_round));
-	    bp = (const u_char *) (polr_msg + 1);
+	    bp += sizeof(struct pgm_polr);
 	    break;
 	}
 	case PGM_ODATA: {
 	    const struct pgm_data *odata;
 
-	    odata = (const struct pgm_data *)(pgm + 1);
+	    odata = (const struct pgm_data *)bp;
 	    ND_PRINT("ODATA trail %u seq %u",
 			 GET_BE_U_4(odata->pgmd_trailseq),
 			 GET_BE_U_4(odata->pgmd_seq));
-	    bp = (const u_char *) (odata + 1);
+	    bp += sizeof(struct pgm_data);
 	    break;
 	}
 
 	case PGM_RDATA: {
 	    const struct pgm_data *rdata;
 
-	    rdata = (const struct pgm_data *)(pgm + 1);
+	    rdata = (const struct pgm_data *)bp;
 	    ND_PRINT("RDATA trail %u seq %u",
 			 GET_BE_U_4(rdata->pgmd_trailseq),
 			 GET_BE_U_4(rdata->pgmd_seq));
-	    bp = (const u_char *) (rdata + 1);
+	    bp += sizeof(struct pgm_data);
 	    break;
 	}
 
@@ -330,9 +331,9 @@ pgm_print(netdissect_options *ndo,
 	    const struct pgm_nak *nak;
 	    char source_buf[INET6_ADDRSTRLEN], group_buf[INET6_ADDRSTRLEN];
 
-	    nak = (const struct pgm_nak *)(pgm + 1);
+	    nak = (const struct pgm_nak *)bp;
 	    ND_TCHECK_SIZE(nak);
-	    bp = (const u_char *) (nak + 1);
+	    bp += sizeof(struct pgm_nak);
 
 	    /*
 	     * Skip past the source, saving info along the way
@@ -399,11 +400,11 @@ pgm_print(netdissect_options *ndo,
 	case PGM_ACK: {
 	    const struct pgm_ack *ack;
 
-	    ack = (const struct pgm_ack *)(pgm + 1);
+	    ack = (const struct pgm_ack *)bp;
 	    ND_TCHECK_SIZE(ack);
 	    ND_PRINT("ACK seq %u",
 			 GET_BE_U_4(ack->pgma_rx_max_seq));
-	    bp = (const u_char *) (ack + 1);
+	    bp += sizeof(struct pgm_ack);
 	    break;
 	}
 
