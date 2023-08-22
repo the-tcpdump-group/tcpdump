@@ -15,6 +15,20 @@
 
 /* \summary: Pragmatic General Multicast (PGM) printer */
 
+/* specification: RFC 3208
+
+   Plus https://dl.acm.org/doi/pdf/10.1145/347057.347390 for PGMCC,
+   whence the ACK packet type comes; there are some I-Ds for PGMCC,
+   draft-ietf-rmt-bb-pgmcc-00 through draft-ietf-rmt-bb-pgmcc-03,
+   but none of them give any description of the packet-level
+   changes to PGM, unlike the paper in question, which merely gives
+   an *insufficient* description of said changes.  In particular,
+   it doesn't indicate what the packet type code for ACK is.
+
+   This uses 0x0b as the packet type code; Wireshark uses 0x0d.
+   At least one capture appears to use 0x0d, so we use *both*,
+   treating *either one* as a PGMCC ACK. */
+
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -104,8 +118,9 @@ typedef enum _pgm_type {
     PGM_NAK = 0x08,		/* NAK */
     PGM_NULLNAK = 0x09,		/* Null NAK */
     PGM_NCF = 0x0a,		/* NAK Confirmation */
-    PGM_ACK = 0x0b,		/* ACK for congestion control */
-    PGM_SPMR = 0x0c		/* SPM request */
+    PGM_ACK = 0x0b,		/* ACK for congestion control? */
+    PGM_SPMR = 0x0c,		/* SPM request */
+    PGM_ACK2 = 0x0d,		/* Also ACK for congestion control? */
 } pgm_type;
 
 #define PGM_OPT_BIT_PRESENT	0x01
@@ -396,7 +411,8 @@ pgm_print(netdissect_options *ndo,
 	    break;
 	}
 
-	case PGM_ACK: {
+	case PGM_ACK:
+	case PGM_ACK2: {
 	    const struct pgm_ack *ack;
 
 	    ack = (const struct pgm_ack *)bp;
