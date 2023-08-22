@@ -674,7 +674,7 @@ pgm_print(netdissect_options *ndo,
 
 		case PGM_OPT_PATH_NLA:
 		    ND_PRINT(" PATH_NLA [%u]", opt_len);
-		    bp += opt_len;
+		    bp += opt_len - 2;
 		    opts_len -= opt_len;
 		    break;
 
@@ -716,7 +716,7 @@ pgm_print(netdissect_options *ndo,
 
 		case PGM_OPT_CR:
 		    ND_PRINT(" CR");
-		    bp += opt_len;
+		    bp += opt_len - 2;
 		    opts_len -= opt_len;
 		    break;
 
@@ -820,7 +820,7 @@ pgm_print(netdissect_options *ndo,
 
 		default:
 		    ND_PRINT(" OPT_%02X [%u] ", opt_type, opt_len);
-		    bp += opt_len;
+		    bp += opt_len - 2;
 		    opts_len -= opt_len;
 		    break;
 		}
