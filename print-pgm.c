@@ -25,9 +25,27 @@
    an *insufficient* description of said changes.  In particular,
    it doesn't indicate what the packet type code for ACK is.
 
-   This uses 0x0b as the packet type code; Wireshark uses 0x0d.
-   At least one capture appears to use 0x0d, so we use *both*,
-   treating *either one* as a PGMCC ACK. */
+   Luigi Risso's PGMCC code for FreeBSD, at
+
+      https://web.archive.org/web/20020302084503/http://info.iet.unipi.it/~luigi/pgm-code/
+
+   uses 0x0b (11) for ACK.
+
+   A capture file attached to
+
+      https://gitlab.com/wireshark/wireshark/-/issues/4798
+
+   has packets that use 0x0d for ACK, as does the Wireshark dissector
+   for PGM, and as does OpenPGM at https://github.com/steve-o/openpgm.
+   It may be that some proprietary PGMCC implementations, such as
+   SmartPGM, do so as well.
+
+   We use *both*, treating *either one* as a PGMCC ACK, pending
+   more information, such as an answer to
+
+      https://github.com/steve-o/openpgm/issues/75.
+
+   */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
