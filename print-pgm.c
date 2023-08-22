@@ -96,17 +96,16 @@ struct pgm_data {
 };
 
 typedef enum _pgm_type {
-    PGM_SPM = 0,		/* source path message */
-    PGM_POLL = 1,		/* POLL Request */
-    PGM_POLR = 2,		/* POLL Response */
-    PGM_ODATA = 4,		/* original data */
-    PGM_RDATA = 5,		/* repair data */
-    PGM_NAK = 8,		/* NAK */
-    PGM_NULLNAK = 9,		/* Null NAK */
-    PGM_NCF = 10,		/* NAK Confirmation */
-    PGM_ACK = 11,		/* ACK for congestion control */
-    PGM_SPMR = 12,		/* SPM request */
-    PGM_MAX = 255
+    PGM_SPM = 0x00,		/* source path message */
+    PGM_POLL = 0x01,		/* POLL Request */
+    PGM_POLR = 0x02,		/* POLL Response */
+    PGM_ODATA = 0x04,		/* original data */
+    PGM_RDATA = 0x05,		/* repair data */
+    PGM_NAK = 0x08,		/* NAK */
+    PGM_NULLNAK = 0x09,		/* Null NAK */
+    PGM_NCF = 0x0a,		/* NAK Confirmation */
+    PGM_ACK = 0x0b,		/* ACK for congestion control */
+    PGM_SPMR = 0x0c		/* SPM request */
 } pgm_type;
 
 #define PGM_OPT_BIT_PRESENT	0x01
