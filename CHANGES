@@ -66,6 +66,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       UDP: Test ports < 1024 in port order to select the printer.
       LDP: Add missing fields of the Common Session Parameters TLV and fix the
         offset for the A&D bits.
+      Skip privilege dropping when using -Z root on --with-user builds.
 
 Friday, April 7, 2023 / The Tcpdump Group
   Summary for 4.99.4 tcpdump release
