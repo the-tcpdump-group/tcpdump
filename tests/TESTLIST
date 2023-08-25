@@ -313,6 +313,7 @@ ipv6-srh-ipproto-ether-v ipv6-srh-ipproto-ether.pcap ipv6-srh-ipproto-ether-v.ou
 ipv6-srh-ipproto-ether-ev ipv6-srh-ipproto-ether.pcap ipv6-srh-ipproto-ether-ev.out -ev
 ipv6-too-long-jumbo	ipv6-too-long-jumbo.pcap	ipv6-too-long-jumbo.out -v
 ipv6_jumbogram_1	ipv6_jumbogram_1.pcap	ipv6_jumbogram_1.out -ev
+ipv6_invalid_length ipv6_invalid_length.pcap ipv6_invalid_length.out
 
 # Loopback/CTP test case
 loopback	loopback.pcap		loopback.out

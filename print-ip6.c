@@ -246,17 +246,13 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		ND_PRINT(" ");
 	}
 
+	ND_ICHECK_ZU(length, <, sizeof (struct ip6_hdr));
 	if (IP6_VERSION(ip6) != 6) {
 		ND_PRINT("version error: %u != 6", IP6_VERSION(ip6));
 		return;
 	}
 
 	ND_TCHECK_SIZE(ip6);
-	if (length < sizeof (struct ip6_hdr)) {
-		ND_PRINT("truncated-ip6 %u", length);
-		return;
-	}
-
 	payload_len = GET_BE_U_2(ip6->ip6_plen);
 	/*
 	 * RFC 1883 says:
@@ -501,4 +497,8 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	return;
 trunc:
 	nd_print_trunc(ndo);
+	return;
+
+invalid:
+	nd_print_invalid(ndo);
 }
