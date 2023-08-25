@@ -247,10 +247,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	}
 
 	ND_ICHECK_ZU(length, <, sizeof (struct ip6_hdr));
-	if (IP6_VERSION(ip6) != 6) {
-		ND_PRINT("version error: %u != 6", IP6_VERSION(ip6));
-		return;
-	}
+	ND_ICHECKMSG_U("version", IP6_VERSION(ip6), !=, 6);
 
 	ND_TCHECK_SIZE(ip6);
 	payload_len = GET_BE_U_2(ip6->ip6_plen);
