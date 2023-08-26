@@ -315,6 +315,7 @@ ipv6-too-long-jumbo	ipv6-too-long-jumbo.pcap	ipv6-too-long-jumbo.out -v
 ipv6_jumbogram_1	ipv6_jumbogram_1.pcap	ipv6_jumbogram_1.out -ev
 ipv6_invalid_length ipv6_invalid_length.pcap ipv6_invalid_length.out
 ipv6_invalid_length_2 ipv6_invalid_length_2.pcap ipv6_invalid_length_2.out -v
+ipv6_jumbogram_invalid_length ipv6_jumbogram_invalid_length.pcap ipv6_jumbogram_invalid_length.out -v
 
 # Loopback/CTP test case
 loopback	loopback.pcap		loopback.out
