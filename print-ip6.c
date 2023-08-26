@@ -275,9 +275,12 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	 */
 	if (payload_len != 0) {
 		len = payload_len + sizeof(struct ip6_hdr);
-		if (length < len)
-			ND_PRINT("truncated-ip6 - %u bytes missing!",
-				len - length);
+		if (len > length) {
+			ND_PRINT("[payload+header length %u > length %u]",
+				 len, length);
+			nd_print_invalid(ndo);
+			ND_PRINT(" ");
+		}
 	} else
 		len = length + sizeof(struct ip6_hdr);
 
