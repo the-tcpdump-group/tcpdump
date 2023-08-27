@@ -249,7 +249,6 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	ND_ICHECK_ZU(length, <, sizeof (struct ip6_hdr));
 	ND_ICHECKMSG_U("version", IP6_VERSION(ip6), !=, 6);
 
-	ND_TCHECK_SIZE(ip6);
 	payload_len = GET_BE_U_2(ip6->ip6_plen);
 	/*
 	 * RFC 1883 says:
@@ -301,6 +300,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	                 nh,
 	                 payload_len);
 	}
+	ND_TCHECK_SIZE(ip6);
 
 	/*
 	 * Cut off the snapshot length to the end of the IP payload.
@@ -328,7 +328,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		    nh != IPPROTO_TCP && nh != IPPROTO_UDP &&
 		    nh != IPPROTO_DCCP && nh != IPPROTO_SCTP) {
 			ND_PRINT("%s > %s: ", GET_IP6ADDR_STRING(ip6->ip6_src),
-				     GET_IP6ADDR_STRING(ip6->ip6_dst));
+				 GET_IP6ADDR_STRING(ip6->ip6_dst));
 		}
 
 		switch (nh) {
