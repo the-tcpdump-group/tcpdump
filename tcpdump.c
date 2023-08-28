@@ -126,7 +126,7 @@ The Regents of the University of California.  All rights reserved.\n";
 #include <grp.h>
 #endif /* _WIN32 */
 
-#include "../../depktcap.c"
+#include "depktcap.h"
 /*
  * Pathname separator.
  * Use this in pathnames, but do *not* use it in URLs.

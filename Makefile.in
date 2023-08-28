@@ -44,7 +44,7 @@ AR = @AR@
 MKDEP = @MKDEP@
 PROG = tcpdump
 CCOPT = @V_CCOPT@
-INCLS = -I. @V_INCLS@
+INCLS = -I. @V_INCLS@ -I ../../
 DEFS = @DEFS@ @CPPFLAGS@ @V_DEFS@
 
 # Standard CFLAGS
@@ -55,7 +55,7 @@ FULL_CFLAGS = $(CCOPT) $(DEFS) $(INCLS) $(CFLAGS)
 LDFLAGS = @LDFLAGS@
 
 # Standard LIBS
-LIBS = @LIBS@
+LIBS = @LIBS@ -L../.. -ldepkt
 
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
