@@ -101,13 +101,20 @@ sub runtest {
     my $stderrlog = "tests/NEW/${outputbase}.stderr";
     my $diffstat = 0;
     my $errdiffstat = 0;
+    my $inputswitch = '-r';
+
+    if ($options =~ s/(^|\s+)-V\b//) {
+	# If the options contains '-V', remove it from there and place it
+	# before the input file name.
+        $inputswitch = '-V';
+    }
 
     # we used to do this as a nice pipeline, but the problem is that $r fails to
     # to be set properly if the tcpdump core dumps.
     #
     # Furthermore, on Windows, fc can't read the standard input, so we
     # can't do it as a pipeline in any case.
-    $r = system "$TCPDUMP -# -n -r $input $options >tests/NEW/${outputbase} 2>${rawstderrlog}";
+    $r = system "$TCPDUMP -# -n $inputswitch $input $options >tests/NEW/${outputbase} 2>${rawstderrlog}";
     if($r != 0) {
         #
         # Something other than "tcpdump opened the file, read it, and
