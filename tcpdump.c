@@ -896,7 +896,7 @@ get_next_file(FILE *VFile, char *ptr)
 }
 
 static int
-open_pcap_file(const char *path, const netdissect_options *ndo _U_)
+open_pcap_file(const char *path, const netdissect_options *ndo)
 {
 	int dlt;
 	const char *dlt_name;
@@ -913,6 +913,7 @@ open_pcap_file(const char *path, const netdissect_options *ndo _U_)
 		ndo->ndo_tstamp_precision, ebuf);
 #else
 	pd = pcap_open_offline(path, ebuf);
+	(void)ndo; /* placate -Wunused-parameter */
 #endif
 
 	if (pd == NULL)
