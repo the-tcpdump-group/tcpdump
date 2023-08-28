@@ -251,7 +251,7 @@ name_len(netdissect_options *ndo,
 	s += GET_U_1(s) + 1;
 	ND_TCHECK_1(s);
     }
-    return(ND_BYTES_BETWEEN(s, s0) + 1);
+    return(ND_BYTES_BETWEEN(s0, s) + 1);
 
 trunc:
     return(-1);	/* name goes past the end of the buffer */
@@ -334,7 +334,7 @@ write_bits(netdissect_options *ndo,
     u_int i = 0;
 
     while ((p = strchr(fmt, '|'))) {
-	u_int l = ND_BYTES_BETWEEN(p, fmt);
+	u_int l = ND_BYTES_BETWEEN(fmt, p);
 	if (l && (val & (1 << i)))
 	    ND_PRINT("%.*s ", (int)l, fmt);
 	fmt = p + 1;
@@ -388,7 +388,7 @@ unistr(netdissect_options *ndo, char (*buf)[MAX_UNISTR_SIZE+1],
 	}
     }
     if (!use_unicode) {
-    	while (strsize != 0) {
+	while (strsize != 0) {
 	    c = GET_U_1(s);
 	    s++;
 	    strsize--;
@@ -493,7 +493,7 @@ smb_fdata1(netdissect_options *ndo,
 	    u_int l;
 
 	    p = strchr(++fmt, '}');
-	    l = ND_BYTES_BETWEEN(p, fmt);
+	    l = ND_BYTES_BETWEEN(fmt, p);
 
 	    if (l > sizeof(bitfmt) - 1)
 		l = sizeof(bitfmt)-1;
@@ -742,8 +742,9 @@ smb_fdata1(netdissect_options *ndo,
 
 	    switch (t) {
 	    case 1:
-		name_type = name_extract(ndo, startbuf, ND_BYTES_BETWEEN(buf, startbuf),
-		    maxbuf, nbuf);
+		name_type = name_extract(ndo, startbuf,
+                                         ND_BYTES_BETWEEN(startbuf, buf),
+                                         maxbuf, nbuf);
 		if (name_type < 0)
 		    goto trunc;
 		len = name_len(ndo, buf, maxbuf);
@@ -768,8 +769,8 @@ smb_fdata1(netdissect_options *ndo,
 	case 'T':
 	  {
 	    time_t t;
-	    struct tm *lt;
 	    const char *tstring;
+	    char buffer[sizeof("Www Mmm dd hh:mm:ss yyyyy")];
 	    uint32_t x;
 
 	    switch (atoi(fmt + 1)) {
@@ -799,14 +800,11 @@ smb_fdata1(netdissect_options *ndo,
 		break;
 	    }
 	    if (t != 0) {
-		lt = localtime(&t);
-		if (lt != NULL)
-		    tstring = asctime(lt);
-		else
-		    tstring = "(Can't convert time)\n";
+		    tstring = nd_format_time(buffer, sizeof(buffer), "%a %b %e %T %Y",
+		    localtime(&t));
 	    } else
-		tstring = "NULL\n";
-	    ND_PRINT("%s", tstring);
+		tstring = "NULL";
+	    ND_PRINT("%s\n", tstring);
 	    fmt++;
 	    while (ND_ASCII_ISDIGIT(*fmt))
 		fmt++;
@@ -936,7 +934,7 @@ smb_fdata(netdissect_options *ndo,
 	}
     }
     if (!depth && buf < maxbuf) {
-	u_int len = ND_BYTES_BETWEEN(maxbuf, buf);
+	u_int len = ND_BYTES_BETWEEN(buf, maxbuf);
 	ND_PRINT("Data: (%u bytes)\n", len);
 	smb_data_print(ndo, buf, len);
 	return(buf + len);

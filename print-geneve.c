@@ -196,7 +196,8 @@ geneve_opts_print(netdissect_options *ndo, const u_char *bp, u_int len)
                 ND_PRINT(" %08x", GET_BE_U_4(data));
                 data++;
             }
-        }
+        } else
+            ND_TCHECK_LEN(bp, opt_len);
 
         bp += opt_len;
         len -= opt_len;
@@ -273,8 +274,7 @@ geneve_print(netdissect_options *ndo, const u_char *bp, u_int len)
         if (ndo->ndo_vflag) {
             if (! geneve_opts_print(ndo, bp, opts_len))
                 goto invalid;
-        }
-        else {
+        } else {
             ND_TCHECK_LEN(bp, opts_len);
             ND_PRINT("%u bytes", opts_len);
         }

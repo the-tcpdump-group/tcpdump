@@ -13,8 +13,8 @@ dnl
 # config.sub.
 #
 
-AC_PREREQ(2.64)
-AC_INIT(tcpdump, m4_esyscmd_s([cat VERSION]))
+AC_PREREQ([2.69])
+AC_INIT([tcpdump],[m4_esyscmd_s(cat VERSION)])
 AC_CONFIG_SRCDIR(tcpdump.c)
 
 AC_CANONICAL_HOST
@@ -29,7 +29,7 @@ if test "$ac_cv_prog_cc_c99" = "no"; then
 	AC_MSG_WARN([The C compiler does not support C99; there may be compiler errors])
 fi
 AC_LBL_C_INIT(V_CCOPT, V_INCLS)
-AC_LBL_C_INLINE
+AC_C_INLINE
 
 AC_CHECK_HEADERS(fcntl.h rpc/rpc.h rpc/rpcent.h net/if.h)
 
@@ -63,7 +63,6 @@ darwin*)
 	;;
 esac
 
-
 AC_ARG_WITH([smi],
    [AS_HELP_STRING([--with-smi],
      [link with libsmi (allows to load MIBs on the fly to decode SNMP packets) [default=yes, if available]])],
@@ -84,8 +83,7 @@ if test "x$with_smi" != "xno" ; then
 			AC_MSG_CHECKING([whether to enable libsmi])
 			savedlibs="$LIBS"
 			LIBS="-lsmi $LIBS"
-			AC_TRY_RUN(
-				[
+			AC_RUN_IFELSE([AC_LANG_SOURCE([[
 /* libsmi available check */
 #include <stdio.h>
 #include <stdlib.h>
@@ -106,6 +104,7 @@ int main()
     exit(4);
   exit(0);
 }
+				]])
 				],
 				[
 					AC_MSG_RESULT(yes)
@@ -180,25 +179,42 @@ yes)	AC_MSG_RESULT(yes)
 	;;
 esac
 
-AC_ARG_WITH(user, [  --with-user=USERNAME    drop privileges by default to USERNAME])
 AC_MSG_CHECKING([whether to drop root privileges by default])
-if test ! -z "$with_user" ; then
-       AC_DEFINE_UNQUOTED(WITH_USER, "$withval",
-           [define if should drop privileges by default])
-       AC_MSG_RESULT(to \"$withval\")
-else
-       AC_MSG_RESULT(no)
-fi
+AC_ARG_WITH(
+	[user],
+	[AS_HELP_STRING([--with-user=USERNAME],
+		[drop privileges by default to USERNAME]
+	)],
+	[],
+	[withval=no])
+AS_CASE(["$withval"],
+	[no], [AC_MSG_RESULT(no)],
+	[''|yes], [AC_MSG_ERROR([--with-user requires a username])],
+	[
+		AC_DEFINE_UNQUOTED(WITH_USER, "$withval",
+		    [define if should drop privileges by default])
+		AC_MSG_RESULT([yes, to user "$withval"])
+	]
+)
 
-AC_ARG_WITH(chroot, [  --with-chroot=DIRECTORY when dropping privileges, chroot to DIRECTORY])
 AC_MSG_CHECKING([whether to chroot])
-if test ! -z "$with_chroot" && test "$with_chroot" != "no" ; then
-       AC_DEFINE_UNQUOTED(WITH_CHROOT, "$withval",
-           [define if should chroot when dropping privileges])
-       AC_MSG_RESULT(to \"$withval\")
-else
-       AC_MSG_RESULT(no)
-fi
+AC_ARG_WITH(
+	[chroot],
+	[AS_HELP_STRING([--with-chroot=DIRECTORY],
+		[when dropping privileges, chroot to DIRECTORY]
+	)],
+	[],
+	[withval=no]
+)
+AS_CASE(["$withval"],
+	[no], [AC_MSG_RESULT(no)],
+	[''|yes], [AC_MSG_ERROR([--with-chroot requires a directory])],
+	[
+		AC_DEFINE_UNQUOTED(WITH_CHROOT, "$withval",
+		    [define if should chroot when dropping privileges])
+		AC_MSG_RESULT([yes, to directory "$withval"])
+	]
+)
 
 AC_ARG_WITH(sandbox-capsicum,
 	AS_HELP_STRING([--with-sandbox-capsicum],
@@ -256,184 +272,69 @@ fi
 #
 AC_LBL_LIBRARY_NET
 
-#
-# Check whether AF_INET6 and struct in6_addr are defined.
-# If they aren't both defined, we don't have sufficient OS
-# support for IPv6, so we don't look for IPv6 support libraries,
-# and we define AF_INET6 and struct in6_addr ourselves.
-#
-AC_MSG_CHECKING([whether the operating system supports IPv6])
-AC_COMPILE_IFELSE(
-    [
-      AC_LANG_SOURCE(
-	[[
-#include <string.h>
-/* AF_INET6 available check */
-#include <sys/types.h>
-#ifdef _WIN32
-#include <ws2tcpip.h>
-#else
-#include <sys/socket.h>
-#include <netinet/in.h>
-#endif
-#ifdef AF_INET6
-void
-foo(struct in6_addr *addr)
-{
- memset(addr, 0, sizeof (struct in6_addr));
-}
-#else
-#error "AF_INET6 not defined"
-#endif
-	]])
-    ],
-    [
-	AC_MSG_RESULT(yes)
-	AC_DEFINE(HAVE_OS_IPV6_SUPPORT, 1,
-	    [define if the OS provides AF_INET6 and struct in6_addr])
-	ipv6=yes
-    ],
-    [
-	AC_MSG_RESULT(no)
-	ipv6=no
-    ]
-)
-
-ipv6type=unknown
-ipv6lib=none
-ipv6trylibc=no
-
-if test "$ipv6" = "yes"; then
-	AC_MSG_CHECKING([ipv6 stack type])
-	for i in inria kame linux-glibc linux-libinet6 toshiba v6d zeta; do
-		case $i in
-		inria)
-			dnl http://www.kame.net/
-			AC_EGREP_CPP(yes,
-[#include <netinet/in.h>
-#ifdef IPV6_INRIA_VERSION
-yes
-#endif],
-				[ipv6type=$i])
-			;;
-		kame)
-			dnl http://www.kame.net/
-			AC_EGREP_CPP(yes,
-[#include <netinet/in.h>
-#ifdef __KAME__
-yes
-#endif],
-				[ipv6type=$i;
-				ipv6lib=inet6;
-				ipv6libdir=/usr/local/v6/lib;
-				ipv6trylibc=yes])
-			;;
-		linux-glibc)
-			dnl http://www.v6.linux.or.jp/
-			AC_EGREP_CPP(yes,
-[#include <features.h>
-#if defined(__GLIBC__) && __GLIBC__ >= 2 && __GLIBC_MINOR__ >= 1
-yes
-#endif],
-				[ipv6type=$i])
-			;;
-		linux-libinet6)
-			dnl http://www.v6.linux.or.jp/
-			dnl
-			dnl This also matches Solaris 8 and Tru64 UNIX 5.1,
-			dnl and possibly other versions of those OSes
-			dnl
-			if test -d /usr/inet6 -o -f /usr/include/netinet/ip6.h; then
-				ipv6type=$i
-				ipv6lib=inet6
-				ipv6libdir=/usr/inet6/lib
-				ipv6trylibc=yes;
-				CFLAGS="-I/usr/inet6/include $CFLAGS"
-			fi
-			;;
-		toshiba)
-			AC_EGREP_CPP(yes,
-[#include <sys/param.h>
-#ifdef _TOSHIBA_INET6
-yes
-#endif],
-				[ipv6type=$i;
-				ipv6lib=inet6;
-				ipv6libdir=/usr/local/v6/lib])
-			;;
-		v6d)
-			AC_EGREP_CPP(yes,
-[#include </usr/local/v6/include/sys/v6config.h>
-#ifdef __V6D__
-yes
-#endif],
-				[ipv6type=$i;
-				ipv6lib=v6;
-				ipv6libdir=/usr/local/v6/lib;
-				CFLAGS="-I/usr/local/v6/include $CFLAGS"])
-			;;
-		zeta)
-			AC_EGREP_CPP(yes,
-[#include <sys/param.h>
-#ifdef _ZETA_MINAMI_INET6
-yes
-#endif],
-				[ipv6type=$i;
-				ipv6lib=inet6;
-				ipv6libdir=/usr/local/v6/lib])
-			;;
-		esac
-		if test "$ipv6type" != "unknown"; then
-			break
-		fi
-	done
-	AC_MSG_RESULT($ipv6type)
-fi
-
-if test "$ipv6" = "yes" -a "$ipv6lib" != "none"; then
-	if test -d $ipv6libdir -a -f $ipv6libdir/lib$ipv6lib.a; then
-		LIBS="-L$ipv6libdir -l$ipv6lib $LIBS"
-		echo "You have $ipv6lib library, using it"
-	else
-		if test "$ipv6trylibc" = "yes"; then
-			echo "You do not have $ipv6lib library, using libc"
-		else
-			echo 'Fatal: no $ipv6lib library found.  cannot continue.'
-			echo "You need to fetch lib$ipv6lib.a from appropriate"
-			echo 'ipv6 kit and compile beforehand.'
-			exit 1
-		fi
-	fi
-fi
-
-AC_REPLACE_FUNCS(strlcat strlcpy strdup strsep getservent getopt_long)
-AC_CHECK_FUNCS(fork vfork strftime)
+AC_REPLACE_FUNCS(strlcat strlcpy strsep getservent getopt_long)
+AC_CHECK_FUNCS(fork vfork)
 AC_CHECK_FUNCS(setlinebuf)
 
 #
-# Make sure we have vsnprintf() and snprintf(); we require them.
+# Make sure we have snprintf(); we require it.
 #
-AC_CHECK_FUNC(vsnprintf,,
-    AC_MSG_ERROR([vsnprintf() is required but wasn't found]))
 AC_CHECK_FUNC(snprintf,,
     AC_MSG_ERROR([snprintf() is required but wasn't found]))
 
 #
-# Define HAVE_NO_PRINTF_Z to make it possible to disable test cases that
-# depend on %zu.
+# It became apparent at some point that using a suitable C99 compiler does not
+# automatically mean snprintf(3) implementation in the libc supports all the
+# modifiers and specifiers used in the project, so let's test that before the
+# build, not after.
 #
-AC_MSG_CHECKING([whether printf(3) supports the z length modifier])
+# Testing the sizeof_t length modifier takes making an snprintf() call and
+# comparing the actual result with the expected result.  If this fails, it will
+# most likely happen at run time, not compile time.
+#
+# Testing the 64-bit conversion specifiers in addition to that requires the
+# <inttypes.h> header to be present and the macros to be defined, so if this
+# fails, it will more likely happen at compile time.
+#
+AC_MSG_CHECKING([whether snprintf is suitable])
 AC_RUN_IFELSE(
     [
         AC_LANG_SOURCE([[
 #include <stdio.h>
 #include <string.h>
+#include <inttypes.h>
+#include <sys/types.h>
 
 int main()
 {
   char buf[100];
+  uint64_t t = (uint64_t)1 << 32;
+
   snprintf(buf, sizeof(buf), "%zu", sizeof(buf));
-  return strncmp(buf, "100", sizeof(buf)) ? 1 : 0;
+  if (strncmp(buf, "100", sizeof(buf)))
+    return 1;
+
+  snprintf(buf, sizeof(buf), "%zd", -sizeof(buf));
+  if (strncmp(buf, "-100", sizeof(buf)))
+    return 2;
+
+  snprintf(buf, sizeof(buf), "%" PRId64, -t);
+  if (strncmp(buf, "-4294967296", sizeof(buf)))
+    return 3;
+
+  snprintf(buf, sizeof(buf), "0o%" PRIo64, t);
+  if (strncmp(buf, "0o40000000000", sizeof(buf)))
+    return 4;
+
+  snprintf(buf, sizeof(buf), "0x%" PRIx64, t);
+  if (strncmp(buf, "0x100000000", sizeof(buf)))
+    return 5;
+
+  snprintf(buf, sizeof(buf), "%" PRIu64, t);
+  if (strncmp(buf, "4294967296", sizeof(buf)))
+    return 6;
+
+  return 0;
 }
         ]])
     ],
@@ -442,8 +343,9 @@ int main()
     ],
     [
         AC_MSG_RESULT(no)
-        AC_DEFINE(HAVE_NO_PRINTF_Z, 1,
-            [Define to 1 if printf(3) does not support the z length modifier.])
+        AC_MSG_ERROR(
+[The snprintf(3) implementation in this libc is not suitable,
+tcpdump would not work correctly even if it managed to compile.])
     ],
     [
         AC_MSG_RESULT(not while cross-compiling)
@@ -475,7 +377,7 @@ AC_LBL_LIBPCAP(V_PCAPDEP, V_INCLS)
 #
 AC_CHECK_FUNCS(ether_ntohost, [
     AC_CACHE_CHECK(for buggy ether_ntohost, ac_cv_buggy_ether_ntohost, [
-	AC_TRY_RUN([
+	AC_RUN_IFELSE([AC_LANG_SOURCE([[
 		#include <netdb.h>
 		#include <netinet/ether.h>
 		#include <stdlib.h>
@@ -492,6 +394,7 @@ AC_CHECK_FUNCS(ether_ntohost, [
 			ether_ntohost(name, (struct ether_addr *)ea);
 			exit(0);
 		}
+	]])
 	], [ac_cv_buggy_ether_ntohost=no],
 	   [ac_cv_buggy_ether_ntohost=yes],
 	   [ac_cv_buggy_ether_ntohost="not while cross-compiling"])])
@@ -728,27 +631,17 @@ fi
 # if we have them.
 #
 AC_CHECK_FUNCS(pcap_findalldevs)
-if test $ac_cv_func_pcap_findalldevs = "yes" ; then
-dnl Check for libpcap having pcap_findalldevs() but the pcap.h header
-dnl not having pcap_if_t; some versions of Mac OS X shipped with pcap.h
-dnl from 0.6 and libpcap 0.8, so that libpcap had pcap_findalldevs but
-dnl pcap.h didn't have pcap_if_t.
-    savedcppflags="$CPPFLAGS"
-    CPPFLAGS="$CPPFLAGS $V_INCLS"
-    AC_CHECK_TYPES(pcap_if_t, , , [#include <pcap.h>])
-    CPPFLAGS="$savedcppflags"
-fi
 AC_CHECK_FUNCS(pcap_dump_flush pcap_lib_version)
 if test $ac_cv_func_pcap_lib_version = "no" ; then
     AC_MSG_CHECKING(whether pcap_version is defined by libpcap)
-    AC_TRY_LINK([],
-       [
+    AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[
 	extern char pcap_version[];
 
 	return (int)pcap_version;
+       ]])
        ],
-       ac_lbl_cv_pcap_version_defined=yes,
-       ac_lbl_cv_pcap_version_defined=no)
+       [ac_lbl_cv_pcap_version_defined=yes],
+       [ac_lbl_cv_pcap_version_defined=no])
     if test "$ac_lbl_cv_pcap_version_defined" = yes ; then
 	AC_MSG_RESULT(yes)
 	AC_DEFINE(HAVE_PCAP_VERSION, 1, [define if libpcap has pcap_version])
@@ -770,14 +663,14 @@ if test "$ac_cv_func_pcap_set_parser_debug" = "no" ; then
 	# filter expression parser debug flag; can we directly set the
 	# flag?
 	AC_MSG_CHECKING(whether pcap_debug is defined by libpcap)
-	AC_TRY_LINK([],
-	   [
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[
 		extern int pcap_debug;
 
 		return pcap_debug;
+	   ]])
 	   ],
-	   ac_lbl_cv_pcap_debug_defined=yes,
-	   ac_lbl_cv_pcap_debug_defined=no)
+	   [ac_lbl_cv_pcap_debug_defined=yes],
+	   [ac_lbl_cv_pcap_debug_defined=no])
 	if test "$ac_lbl_cv_pcap_debug_defined" = yes ; then
 		AC_MSG_RESULT(yes)
 		AC_DEFINE(HAVE_PCAP_DEBUG, 1, [define if libpcap has pcap_debug])
@@ -787,14 +680,14 @@ if test "$ac_cv_func_pcap_set_parser_debug" = "no" ; then
 		# OK, what about "yydebug"?
 		#
 		AC_MSG_CHECKING(whether yydebug is defined by libpcap)
-		AC_TRY_LINK([],
-		   [
+		AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[
 			extern int yydebug;
 
 			return yydebug;
+		   ]])
 		   ],
-		   ac_lbl_cv_yydebug_defined=yes,
-		   ac_lbl_cv_yydebug_defined=no)
+		   [ac_lbl_cv_yydebug_defined=yes],
+		   [ac_lbl_cv_yydebug_defined=no])
 		if test "$ac_lbl_cv_yydebug_defined" = yes ; then
 			AC_MSG_RESULT(yes)
 			AC_DEFINE(HAVE_YYDEBUG, 1, [define if libpcap has yydebug])
@@ -872,13 +765,20 @@ fi
 #
 AC_TYPE_UINTPTR_T
 
+savedcppflags="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS $V_INCLS"
+
 #
 # Check whether we have pcap/pcap-inttypes.h.
 # If we do, we use that to get the C99 types defined.
 #
-savedcppflags="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $V_INCLS"
 AC_CHECK_HEADERS(pcap/pcap-inttypes.h)
+
+#
+# At compile time HAVE_PCAP_FINDALLDEVS depends on HAVE_PCAP_IF_T.
+#
+AC_CHECK_TYPES(pcap_if_t, , , [#include <pcap.h>])
+
 CPPFLAGS="$savedcppflags"
 
 #
@@ -1043,12 +943,13 @@ AC_SUBST(MAN_MISC_INFO)
 
 AC_PROG_INSTALL
 
-AC_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 
-AC_OUTPUT_COMMANDS([if test -f .devel; then
+AC_CONFIG_COMMANDS([.devel],[[if test -f .devel; then
 	echo timestamp > stamp-h
 	cat $srcdir/Makefile-devel-adds >> Makefile
 	make depend || exit 1
-fi])
-AC_OUTPUT(Makefile tcpdump.1)
+fi]])
+AC_CONFIG_FILES([Makefile tcpdump.1])
+AC_OUTPUT
 exit 0

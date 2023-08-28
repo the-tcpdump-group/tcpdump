@@ -25,8 +25,8 @@
 
 const struct tok af_values[] = {
     { 0,                      "Reserved"},
-    { AFNUM_INET,             "IPv4"},
-    { AFNUM_INET6,            "IPv6"},
+    { AFNUM_IP,               "IPv4"},
+    { AFNUM_IP6,              "IPv6"},
     { AFNUM_NSAP,             "NSAP"},
     { AFNUM_HDLC,             "HDLC"},
     { AFNUM_BBN1822,          "BBN 1822"},
@@ -46,13 +46,13 @@ const struct tok af_values[] = {
 };
 
 const struct tok bsd_af_values[] = {
-    { BSD_AFNUM_INET, "IPv4" },
-    { BSD_AFNUM_NS, "NS" },
-    { BSD_AFNUM_ISO, "ISO" },
-    { BSD_AFNUM_APPLETALK, "Appletalk" },
-    { BSD_AFNUM_IPX, "IPX" },
-    { BSD_AFNUM_INET6_BSD, "IPv6" },
-    { BSD_AFNUM_INET6_FREEBSD, "IPv6" },
-    { BSD_AFNUM_INET6_DARWIN, "IPv6" },
+    { BSD_AF_INET, "IPv4" },
+    { BSD_AF_NS, "NS" },
+    { BSD_AF_ISO, "ISO" },
+    { BSD_AF_APPLETALK, "Appletalk" },
+    { BSD_AF_IPX, "IPX" },
+    { BSD_AF_INET6_BSD, "IPv6" },
+    { BSD_AF_INET6_FREEBSD, "IPv6" },
+    { BSD_AF_INET6_DARWIN, "IPv6" },
     { 0, NULL}
 };

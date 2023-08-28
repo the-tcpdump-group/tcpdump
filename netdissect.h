@@ -30,6 +30,7 @@
 #endif
 #include <sys/types.h>
 #include <setjmp.h>
+#include <time.h>
 #include "status-exit-codes.h"
 #include "funcattrs.h" /* for PRINTFLIKE_FUNCPTR() */
 #include "diag-control.h" /* for ND_UNREACHABLE */
@@ -58,9 +59,16 @@ typedef signed char nd_int8_t[1];
 
 /*
  * "unsigned char" so that sign extension isn't done on the
- * individual bytes while they're being assembled.
+ * individual bytes while they're being assembled.  Use
+ * GET_S_BE_n() and GET_S_LE_n() macros to extract the value
+ * as a signed integer.
  */
+typedef unsigned char nd_int16_t[2];
+typedef unsigned char nd_int24_t[3];
 typedef unsigned char nd_int32_t[4];
+typedef unsigned char nd_int40_t[5];
+typedef unsigned char nd_int48_t[6];
+typedef unsigned char nd_int56_t[7];
 typedef unsigned char nd_int64_t[8];
 
 #define	FMAXINT	(4294967296.0)	/* floating point rep. of MAXINT */
@@ -101,8 +109,14 @@ typedef unsigned char nd_ipv6[16];
 /*
  * Use this for MAC addresses.
  */
-#define MAC_ADDR_LEN	6U		/* length of MAC addresses */
-typedef unsigned char nd_mac_addr[MAC_ADDR_LEN];
+#define MAC48_LEN	6U		/* length of MAC addresses */
+typedef unsigned char nd_mac48[MAC48_LEN];
+
+/*
+ * Use this for EUI64s.
+ */
+#define EUI64_LEN	8U
+typedef unsigned char nd_eui64[EUI64_LEN];
 
 /*
  * Use this for blobs of bytes; make them arrays of nd_byte.
@@ -127,10 +141,6 @@ extern size_t strlcat (char *, const char *, size_t);
 #endif
 #ifndef HAVE_STRLCPY
 extern size_t strlcpy (char *, const char *, size_t);
-#endif
-
-#ifndef HAVE_STRDUP
-extern char *strdup (const char *str);
 #endif
 
 #ifndef HAVE_STRSEP
@@ -269,19 +279,10 @@ extern void nd_change_snaplen(netdissect_options *, const u_char *, const u_int)
 extern void nd_pop_packet_info(netdissect_options *);
 extern void nd_pop_all_packet_info(netdissect_options *);
 
-static inline NORETURN void
-nd_trunc_longjmp(netdissect_options *ndo)
-{
-	longjmp(ndo->ndo_early_end, ND_TRUNCATED);
-#ifdef _AIX
-	/*
-	 * In AIX <setjmp.h> decorates longjmp() with "#pragma leaves", which tells
-	 * XL C that the function is noreturn, but GCC remains unaware of that and
-	 * yields a "'noreturn' function does return" warning.
-	 */
-	ND_UNREACHABLE
-#endif /* _AIX */
-}
+/*
+ * Report a packet truncation with a longjmp().
+ */
+NORETURN void nd_trunc_longjmp(netdissect_options *ndo);
 
 #define PT_VAT		1	/* Visual Audio Tool */
 #define PT_WB		2	/* distributed White Board */
@@ -388,13 +389,13 @@ nd_trunc_longjmp(netdissect_options *ndo)
 /*
  * Number of bytes between two pointers.
  */
-#define ND_BYTES_BETWEEN(p1, p2) ((u_int)(((const uint8_t *)(p1)) - (const uint8_t *)(p2)))
+#define ND_BYTES_BETWEEN(p1, p2) ((const u_char *)(p1) >= (const u_char *)(p2) ? 0 : ((u_int)(((const u_char *)(p2)) - (const u_char *)(p1))))
 
 /*
  * Number of bytes remaining in the captured data, starting at the
  * byte pointed to by the argument.
  */
-#define ND_BYTES_AVAILABLE_AFTER(p) ND_BYTES_BETWEEN(ndo->ndo_snapend, (p))
+#define ND_BYTES_AVAILABLE_AFTER(p) ((const u_char *)(p) < ndo->ndo_packetp ? 0 : ND_BYTES_BETWEEN((p), ndo->ndo_snapend))
 
 /*
  * Check (expression_1 operator expression_2) for invalid packet with
@@ -436,6 +437,9 @@ ND_ICHECKMSG_ZU((#expression_1), (expression_1), operator, (expression_2))
 extern void ts_print(netdissect_options *, const struct timeval *);
 extern void signed_relts_print(netdissect_options *, int32_t);
 extern void unsigned_relts_print(netdissect_options *, uint32_t);
+
+extern const char *nd_format_time(char *buf, size_t bufsize,
+    const char *format, const struct tm *timeptr);
 
 extern void fn_print_char(netdissect_options *, u_char);
 extern void fn_print_str(netdissect_options *, const u_char *);
@@ -631,6 +635,7 @@ extern void eap_print(netdissect_options *, const u_char *, u_int);
 extern void eapol_print(netdissect_options *, const u_char *);
 extern void egp_print(netdissect_options *, const u_char *, u_int);
 extern void eigrp_print(netdissect_options *, const u_char *, u_int);
+extern void erspan_print(netdissect_options *, uint16_t, const u_char *, u_int);
 extern void esp_print(netdissect_options *, const u_char *, u_int, const u_char *, u_int, int, u_int);
 extern u_int ether_print(netdissect_options *, const u_char *, u_int, u_int, void (*)(netdissect_options *, const u_char *), const u_char *);
 extern u_int ether_switch_tag_print(netdissect_options *, const u_char *, u_int, u_int, void (*)(netdissect_options *, const u_char *), u_int);
@@ -697,6 +702,7 @@ extern void netbeui_print(netdissect_options *, u_short, const u_char *, u_int);
 extern void nfsreply_noaddr_print(netdissect_options *, const u_char *, u_int, const u_char *);
 extern void nfsreply_print(netdissect_options *, const u_char *, u_int, const u_char *);
 extern void nfsreq_noaddr_print(netdissect_options *, const u_char *, u_int, const u_char *);
+extern void nhrp_print(netdissect_options *, const u_char *, u_int);
 extern void nsh_print(netdissect_options *, const u_char *, u_int);
 extern void ntp_print(netdissect_options *, const u_char *, u_int);
 extern void oam_print(netdissect_options *, const u_char *, u_int, u_int);
@@ -718,7 +724,7 @@ extern void ptp_print(netdissect_options *, const u_char *, u_int);
 extern const char *q922_string(netdissect_options *, const u_char *, u_int);
 extern void q933_print(netdissect_options *, const u_char *, u_int);
 extern int quic_detect(netdissect_options *, const u_char *, const u_int);
-extern void quic_print(netdissect_options *, const u_char *, const u_int);
+extern void quic_print(netdissect_options *, const u_char *);
 extern void radius_print(netdissect_options *, const u_char *, u_int);
 extern void resp_print(netdissect_options *, const u_char *, u_int);
 extern void rip_print(netdissect_options *, const u_char *, u_int);
@@ -764,7 +770,6 @@ extern void zmtp1_datagram_print(netdissect_options *, const u_char *, const u_i
 extern void zmtp1_print(netdissect_options *, const u_char *, u_int);
 
 /* checksum routines */
-extern void init_checksum(void);
 extern uint16_t verify_crc10_cksum(uint16_t, const u_char *, int);
 extern uint16_t create_osi_cksum(const uint8_t *, int, int);
 

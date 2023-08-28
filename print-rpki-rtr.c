@@ -320,8 +320,7 @@ rpki_rtr_pdu_print(netdissect_options *ndo, const u_char *tptr, const u_int len,
 		    goto invalid;
 		if (! recurse) {
 		    ND_TCHECK_LEN(tptr, tlen + encapsulated_pdu_length);
-		}
-		else {
+		} else {
 		    ND_PRINT("%s-----encapsulated PDU-----", indent_string(indent+4));
 		    rpki_rtr_pdu_print(ndo, tptr + tlen,
 			encapsulated_pdu_length, 0, indent + 2);

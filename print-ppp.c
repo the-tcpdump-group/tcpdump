@@ -194,7 +194,7 @@ static const char *lcpconfopts[] = {
 	"deprecated(12)",	/* used to be a Multi-Link-Procedure*/
 	"Call-Back",		/* (13) */
 	"deprecated(14)",	/* used to be a Connect-Time */
-	"deprecated(15)",	/* used to be a Compund-Frames */
+	"deprecated(15)",	/* used to be a Compound-Frames */
 	"deprecated(16)",	/* used to be a Nominal-Data-Encap */
 	"MRRU",			/* (17) */
 	"12-Bit seq #",		/* (18) */
@@ -736,7 +736,7 @@ print_lcp_config_options(netdissect_options *ndo,
 				ND_PRINT(" (length bogus, should be = 9)");
 				return 0;
 			}
-			ND_PRINT(": MAC %s", GET_ETHERADDR_STRING(p + 3));
+			ND_PRINT(": MAC %s", GET_MAC48_STRING(p + 3));
 			break;
 		case MEDCLASS_MNB:
 			ND_PRINT(": Magic-Num-Block"); /* XXX */
@@ -859,7 +859,7 @@ handle_chap(netdissect_options *ndo,
 	 * don't know which flavor of CHAP (i.e. CHAP-MD5, MS-CHAPv1,
 	 * MS-CHAPv2) is used at this point, we can't decode packet
 	 * specifically to each algorithms. Instead, we simply decode
-	 * the GCD (Gratest Common Denominator) for all algorithms.
+	 * the GCD (Greatest Common Denominator) for all algorithms.
 	 */
 	switch (code) {
 	case CHAP_CHAL:
@@ -1131,7 +1131,7 @@ print_ipcp_config_options(netdissect_options *ndo,
 			print_unknown_data(ndo, p + 2, "\n\t    ", len - 2);
 		break;
 	}
-	if (ndo->ndo_vflag > 1)
+	if (ndo->ndo_vflag > 1 && ND_TTEST_LEN(p + 2, len - 2))
 		print_unknown_data(ndo, p + 2, "\n\t    ", len - 2); /* exclude TLV header */
 	return len;
 

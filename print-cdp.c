@@ -182,53 +182,77 @@ cdp_print_phys_loc(netdissect_options *ndo,
 	}
 }
 
+static void
+cdp_print_power_avail(netdissect_options *ndo,
+                   const u_char *cp, const u_int len)
+{
+	ND_PRINT("reqid %u, mgmtid %u", GET_BE_U_2(cp), GET_BE_U_2(cp + 2));
+	if (len > 4) {
+		const u_char *powerp;
+		u_int powerlen;
+
+		ND_PRINT(", pwravail");
+		for (powerp = cp + 4, powerlen = len - 4;
+		    powerlen >= 4; powerp += 4, powerlen -= 4)
+			ND_PRINT(" %u mW", GET_BE_U_4(powerp));
+	}
+}
+
+typedef enum {
+	VERBOSE_OR_NOT_VERBOSE,
+	VERBOSE_ONLY
+} when_to_print_t;
+
 struct cdp_tlvinfo {
 	const char *name;
 	void (*printer)(netdissect_options *ndo, const u_char *, u_int);
+	when_to_print_t when_to_print;
 	int min_len, max_len;
 };
 
-#define T_DEV_ID 0x01
-#define T_MAX 0x17
-static const struct cdp_tlvinfo cdptlvs[T_MAX + 1] = {
+static const struct cdp_tlvinfo cdptlvs[] = {
 	/* 0x00 */
-	[ T_DEV_ID ] = { "Device-ID", cdp_print_string, -1, -1 },
-	[ 0x02 ] = { "Address", cdp_print_addr, -1, -1 },
-	[ 0x03 ] = { "Port-ID", cdp_print_string, -1, -1 },
-	[ 0x04 ] = { "Capability", cdp_print_capability, 4, 4 },
-	[ 0x05 ] = { "Version String", cdp_print_version, -1, -1 },
-	[ 0x06 ] = { "Platform", cdp_print_string, -1, -1 },
-	[ 0x07 ] = { "Prefixes", cdp_print_prefixes, -1, -1 },
+	[ 0x01 ] = { "Device-ID", cdp_print_string, VERBOSE_OR_NOT_VERBOSE, -1, -1 },
+	[ 0x02 ] = { "Address", cdp_print_addr, VERBOSE_ONLY, 4, -1 },
+	[ 0x03 ] = { "Port-ID", cdp_print_string, VERBOSE_ONLY, -1, -1 },
+	[ 0x04 ] = { "Capability", cdp_print_capability, VERBOSE_ONLY, 4, 4 },
+	[ 0x05 ] = { "Version String", cdp_print_version, VERBOSE_ONLY, -1, -1 },
+	[ 0x06 ] = { "Platform", cdp_print_string, VERBOSE_ONLY, -1, -1 },
+	[ 0x07 ] = { "Prefixes", cdp_print_prefixes, VERBOSE_ONLY, -1, -1 },
 	/* not documented */
-	[ 0x08 ] = { "Protocol-Hello option", NULL, -1, -1 },
+	[ 0x08 ] = { "Protocol-Hello option", NULL, VERBOSE_ONLY, -1, -1 },
 	/* CDPv2 */
-	[ 0x09 ] = { "VTP Management Domain", cdp_print_string, -1, -1 },
+	[ 0x09 ] = { "VTP Management Domain", cdp_print_string, VERBOSE_ONLY, -1, -1 },
 	/* CDPv2 */
-	[ 0x0a ] = { "Native VLAN ID", cdp_print_uint16, 2, 2 },
+	[ 0x0a ] = { "Native VLAN ID", cdp_print_uint16, VERBOSE_ONLY, 2, 2 },
 	/* CDPv2 */
-	[ 0x0b ] = { "Duplex", cdp_print_duplex, 1, 1 },
+	[ 0x0b ] = { "Duplex", cdp_print_duplex, VERBOSE_ONLY, 1, 1 },
 	/* 0x0c */
 	/* 0x0d */
 	/* incomplete doc. */
-	[ 0x0e ] = { "ATA-186 VoIP VLAN assignment", cdp_print_ata186, 3, 3 },
+	[ 0x0e ] = { "ATA-186 VoIP VLAN assignment", cdp_print_ata186, VERBOSE_ONLY, 3, 3 },
 	/* incomplete doc. */
-	[ 0x0f ] = { "ATA-186 VoIP VLAN request", cdp_print_ata186, 2, 3 },
+	[ 0x0f ] = { "ATA-186 VoIP VLAN request", cdp_print_ata186, VERBOSE_ONLY, 2, 3 },
 	/* not documented */
-	[ 0x10 ] = { "power consumption", cdp_print_power, 1, 3 },
+	[ 0x10 ] = { "power consumption", cdp_print_power, VERBOSE_ONLY, 1, 3 },
 	/* not documented */
-	[ 0x11 ] = { "MTU", cdp_print_mtu, 4, 4 },
+	[ 0x11 ] = { "MTU", cdp_print_mtu, VERBOSE_ONLY, 4, 4 },
 	/* not documented */
-	[ 0x12 ] = { "AVVID trust bitmap", cdp_print_uint8x, 1, 1 },
+	[ 0x12 ] = { "AVVID trust bitmap", cdp_print_uint8x, VERBOSE_ONLY, 1, 1 },
 	/* not documented */
-	[ 0x13 ] = { "AVVID untrusted ports CoS", cdp_print_uint8x, 1, 1 },
+	[ 0x13 ] = { "AVVID untrusted ports CoS", cdp_print_uint8x, VERBOSE_ONLY, 1, 1 },
 	/* not documented */
-	[ 0x14 ] = { "System Name", cdp_print_string, -1, -1 },
+	[ 0x14 ] = { "System Name", cdp_print_string, VERBOSE_ONLY, -1, -1 },
 	/* not documented */
-	[ 0x15 ] = { "System Object ID (not decoded)", NULL, -1, -1 },
-	[ 0x16 ] = { "Management Addresses", cdp_print_addr, 4, -1 },
+	[ 0x15 ] = { "System Object ID (not decoded)", NULL, VERBOSE_ONLY, -1, -1 },
+	[ 0x16 ] = { "Management Addresses", cdp_print_addr, VERBOSE_ONLY, 4, -1 },
 	/* not documented */
-	[ 0x17 ] = { "Physical Location", cdp_print_phys_loc, 1, -1 },
+	[ 0x17 ] = { "Physical Location", cdp_print_phys_loc, VERBOSE_ONLY, 1, -1 },
+	/* not documented */
+	[ 0x1a ] = { "Power available", cdp_print_power_avail, VERBOSE_ONLY, 8, -1 },
 };
+
+#define T_MAX	(sizeof cdptlvs / sizeof cdptlvs[0])
 
 void
 cdp_print(netdissect_options *ndo,
@@ -257,7 +281,8 @@ cdp_print(netdissect_options *ndo,
 		u_int type, len;
 		const struct cdp_tlvinfo *info;
 		const char *name;
-		u_char covered = 0;
+		int print_if_not_verbose;
+		int covered = 0;
 
 		if (length < CDP_TLV_HEADER_LEN) {
 			ND_PRINT(" (remaining packet length %u < %u)",
@@ -266,11 +291,13 @@ cdp_print(netdissect_options *ndo,
 		}
 		type = GET_BE_U_2(tptr + CDP_TLV_TYPE_OFFSET);
 		len  = GET_BE_U_2(tptr + CDP_TLV_LEN_OFFSET); /* object length includes the 4 bytes header length */
-		info = type <= T_MAX ? &cdptlvs[type] : NULL;
+		info = type < T_MAX ? &cdptlvs[type] : NULL;
 		name = (info && info->name) ? info->name : "unknown field type";
+		print_if_not_verbose =
+		    (info ? (info->when_to_print == VERBOSE_OR_NOT_VERBOSE) : 0);
 		if (len < CDP_TLV_HEADER_LEN) {
 			if (ndo->ndo_vflag)
-				ND_PRINT("\n\t%s (0x%02x), TLV length: %u byte%s (too short)",
+				ND_PRINT("\n\t%s (0x%04x), TLV length: %u byte%s (too short)",
 				         name, type, len, PLURAL_SUFFIX(len));
 			else
 				ND_PRINT(", %s TLV length %u too short",
@@ -285,18 +312,21 @@ cdp_print(netdissect_options *ndo,
 		length -= CDP_TLV_HEADER_LEN;
 		len -= CDP_TLV_HEADER_LEN;
 
-		/* In non-verbose mode just print Device-ID. */
-		if (!ndo->ndo_vflag && type == T_DEV_ID)
-			ND_PRINT(", Device-ID ");
-		else if (ndo->ndo_vflag)
-			ND_PRINT("\n\t%s (0x%02x), value length: %u byte%s: ",
+		if (ndo->ndo_vflag) {
+			/* Print all TLVs when in verbose mode */
+			ND_PRINT("\n\t%s (0x%04x), value length: %u byte%s: ",
 			         name, type, len, PLURAL_SUFFIX(len));
+		} else {
+			/* Print only some TLVs when not in verbose mode */
+			if (print_if_not_verbose)
+				ND_PRINT(", %s ", name);
+		}
 
 		if (info) {
 			if ((info->min_len > 0 && len < (unsigned)info->min_len) ||
 			    (info->max_len > 0 && len > (unsigned)info->max_len))
 				ND_PRINT(" (malformed TLV)");
-			else if (ndo->ndo_vflag || type == T_DEV_ID) {
+			else if (ndo->ndo_vflag || print_if_not_verbose) {
 				if (info->printer)
 					info->printer(ndo, tptr, len);
 				else
@@ -309,7 +339,7 @@ cdp_print(netdissect_options *ndo,
 			}
 		}
 
-		if (!covered) {
+		if (ndo->ndo_vflag && !covered) {
 			ND_TCHECK_LEN(tptr, len);
 			print_unknown_data(ndo, tptr, "\n\t  ", len);
 		}
@@ -345,10 +375,6 @@ cdp_print_addr(netdissect_options *ndo,
 		0xaa, 0xaa, 0x03, 0x00, 0x00, 0x00, 0x86, 0xdd
 	};
 
-	if (l < 4) {
-		ND_PRINT(" (not enough space for num)");
-		goto invalid;
-	}
 	num = GET_BE_U_4(p);
 	p += 4;
 	l -= 4;
@@ -389,8 +415,7 @@ cdp_print_addr(netdissect_options *ndo,
 			ND_PRINT("IPv4 (%u) %s", num, GET_IPADDR_STRING(p));
 			p += al;
 			l -= al;
-		}
-		else if (pt == PT_IEEE_802_2 && pl == 8 &&
+		} else if (pt == PT_IEEE_802_2 && pl == 8 &&
 		         memcmp(p, prot_ipv6, 8) == 0 && al == 16) {
 			/*
 			 * IPv6: protocol type = IEEE 802.2 header,
@@ -408,8 +433,7 @@ cdp_print_addr(netdissect_options *ndo,
 			ND_PRINT("IPv6 (%u) %s", num, GET_IP6ADDR_STRING(p));
 			p += al;
 			l -= al;
-		}
-		else {
+		} else {
 			/*
 			 * Generic case: just print raw data
 			 */

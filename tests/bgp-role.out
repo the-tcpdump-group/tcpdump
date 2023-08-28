@@ -1,0 +1,125 @@
+    1  20:08:52.541413 IP (tos 0xc0, ttl 1, id 17240, offset 0, flags [DF], proto TCP (6), length 159)
+    192.168.10.17.179 > 192.168.10.124.53580: Flags [P.], cksum 0x966f (incorrect -> 0x2000), seq 3763129203:3763129310, ack 4158499266, win 128, options [nop,nop,TS val 2413434737 ecr 2257657437], length 107: BGP
+	Open Message (1), length: 107
+	  Version 4, my AS 65002, Holdtime 180s, ID 192.168.10.17
+	  Optional parameters, length: 78
+	    Option Capabilities Advertisement (2), length: 6
+	      Multiprotocol Extensions (1), length: 4
+		AFI IPv4 (1), SAFI Unicast (1)
+	    Option Capabilities Advertisement (2), length: 2
+	      Route Refresh (Cisco) (128), length: 0
+	    Option Capabilities Advertisement (2), length: 2
+	      Route Refresh (2), length: 0
+	    Option Capabilities Advertisement (2), length: 2
+	      Enhanced Route Refresh (70), length: 0
+	    Option Capabilities Advertisement (2), length: 6
+	      32-Bit AS Number (65), length: 4
+		 4 Byte AS 65002
+	    Option Capabilities Advertisement (2), length: 2
+	      BGP Extended Message (6), length: 0
+	    Option Capabilities Advertisement (2), length: 3
+	      Role Capability (9), length: 1
+		Role name Customer (3)
+	    Option Capabilities Advertisement (2), length: 6
+	      Multiple Paths (69), length: 4
+		AFI IPv4 (1), SAFI Unicast (1), Send/Receive: Receive
+	    Option Capabilities Advertisement (2), length: 14
+	      Unknown (73), length: 12
+		no decoder for Capability 73
+		0x0000:  0a64 6f6e 6174 6173 2d70 6300
+	    Option Capabilities Advertisement (2), length: 4
+	      Graceful Restart (64), length: 2
+		Restart Flags: [N], Restart Time 120s
+	    Option Capabilities Advertisement (2), length: 9
+	      Long-lived Graceful Restart (71), length: 7
+    2  20:08:53.642401 IP (tos 0xc0, ttl 1, id 17245, offset 0, flags [DF], proto TCP (6), length 75)
+    192.168.10.17.179 > 192.168.10.124.53580: Flags [P.], cksum 0x961b (incorrect -> 0x69a0), seq 145:168, ack 39, win 128, options [nop,nop,TS val 2413435838 ecr 2257658439], length 23: BGP
+	Update Message (2), length: 23
+	  End-of-Rib Marker (empty NLRI)
+    3  20:08:53.642524 IP (tos 0xc0, ttl 1, id 43436, offset 0, flags [DF], proto TCP (6), length 52)
+    192.168.10.124.53580 > 192.168.10.17.179: Flags [.], cksum 0x69e6 (correct), ack 168, win 502, options [nop,nop,TS val 2257658538 ecr 2413435838], length 0
+    4  20:08:53.643391 IP (tos 0xc0, ttl 1, id 43437, offset 0, flags [DF], proto TCP (6), length 550)
+    192.168.10.124.53580 > 192.168.10.17.179: Flags [P.], cksum 0x24c3 (correct), seq 39:537, ack 168, win 502, options [nop,nop,TS val 2257658539 ecr 2413435838], length 498: BGP
+	Update Message (2), length: 62
+	  Origin (1), length: 1, Flags [T]: Incomplete
+	  AS Path (2), length: 6, Flags [TE]: 65001 
+	  Next Hop (3), length: 4, Flags [T]: 192.168.10.124
+	  Multi Exit Discriminator (4), length: 4, Flags [O]: 0
+	  Only to Customer (OTC) (35), length: 4, Flags [OT]: 
+	    OTC 65001
+	  Updated routes:
+	    10.0.2.0/24
+	Update Message (2), length: 62
+	  Origin (1), length: 1, Flags [T]: IGP
+	  AS Path (2), length: 6, Flags [TE]: 65001 
+	  Next Hop (3), length: 4, Flags [T]: 192.168.10.124
+	  Multi Exit Discriminator (4), length: 4, Flags [O]: 0
+	  Only to Customer (OTC) (35), length: 4, Flags [OT]: 
+	    OTC 65001
+	  Updated routes:
+	    10.10.100.0/24
+	Update Message (2), length: 83
+	  Origin (1), length: 1, Flags [T]: Incomplete
+	  AS Path (2), length: 6, Flags [TE]: 65001 
+	  Next Hop (3), length: 4, Flags [T]: 192.168.10.124
+	  Multi Exit Discriminator (4), length: 4, Flags [O]: 0
+	  Only to Customer (OTC) (35), length: 4, Flags [OT]: 
+	    OTC 65001
+	  Updated routes:
+	    172.16.31.1/32
+	    200.200.200.202/32
+	    200.200.200.201/32
+	    172.16.31.3/32
+	    172.16.31.2/32
+	Update Message (2), length: 62
+	  Origin (1), length: 1, Flags [T]: Incomplete
+	  AS Path (2), length: 6, Flags [TE]: 65001 
+	  Next Hop (3), length: 4, Flags [T]: 192.168.10.124
+	  Multi Exit Discriminator (4), length: 4, Flags [O]: 0
+	  Only to Customer (OTC) (35), length: 4, Flags [OT]: 
+	    OTC 65001
+	  Updated routes:
+	    192.168.0.0/24
+	Update Message (2), length: 62
+	  Origin (1), length: 1, Flags [T]: Incomplete
+	  AS Path (2), length: 6, Flags [TE]: 65001 
+	  Next Hop (3), length: 4, Flags [T]: 192.168.10.124
+	  Multi Exit Discriminator (4), length: 4, Flags [O]: 0
+	  Only to Customer (OTC) (35), length: 4, Flags [OT]: 
+	    OTC 65001
+	  Updated routes:
+	    192.168.1.0/24
+	Update Message (2), length: 62
+	  Origin (1), length: 1, Flags [T]: Incomplete
+	  AS Path (2), length: 6, Flags [TE]: 65001 
+	  Next Hop (3), length: 4, Flags [T]: 192.168.10.124
+	  Multi Exit Discriminator (4), length: 4, Flags [O]: 0
+	  Only to Customer (OTC) (35), length: 4, Flags [OT]: 
+	    OTC 65001
+	  Updated routes:
+	    192.168.10.0/24
+	Update Message (2), length: 82
+	  Origin (1), length: 1, Flags [T]: Incomplete
+	  AS Path (2), length: 10, Flags [TE]: 65001 65010 
+	  Next Hop (3), length: 4, Flags [T]: 192.168.10.124
+	  Multi Exit Discriminator (4), length: 4, Flags [O]: 0
+	  Large Community (32), length: 12, Flags [OT]: 
+	    65001:65001:1
+	  Only to Customer (OTC) (35), length: 4, Flags [OT]: 
+	    OTC 65001
+	  Updated routes:
+	    200.200.200.200/32
+	Update Message (2), length: 23
+	  End-of-Rib Marker (empty NLRI)
+    5  20:08:53.643398 IP (tos 0xc0, ttl 1, id 17246, offset 0, flags [DF], proto TCP (6), length 52)
+    192.168.10.17.179 > 192.168.10.124.53580: Flags [.], cksum 0x9604 (incorrect -> 0x6968), ack 537, win 128, options [nop,nop,TS val 2413435839 ecr 2257658539], length 0
+    6  20:08:54.542570 IP (tos 0xc0, ttl 1, id 17247, offset 0, flags [DF], proto TCP (6), length 71)
+    192.168.10.17.179 > 192.168.10.124.53580: Flags [P.], cksum 0x9617 (incorrect -> 0x61b6), seq 168:187, ack 537, win 128, options [nop,nop,TS val 2413436739 ecr 2257658539], length 19: BGP
+	Keepalive Message (4), length: 19
+    7  20:08:54.542789 IP (tos 0xc0, ttl 1, id 43438, offset 0, flags [DF], proto TCP (6), length 52)
+    192.168.10.124.53580 > 192.168.10.17.179: Flags [.], cksum 0x60d7 (correct), ack 187, win 502, options [nop,nop,TS val 2257659439 ecr 2413436739], length 0
+    8  20:08:54.542863 IP (tos 0xc0, ttl 1, id 43439, offset 0, flags [DF], proto TCP (6), length 71)
+    192.168.10.124.53580 > 192.168.10.17.179: Flags [P.], cksum 0x5ca9 (correct), seq 537:556, ack 187, win 502, options [nop,nop,TS val 2257659439 ecr 2413436739], length 19: BGP
+	Keepalive Message (4), length: 19
+    9  20:08:54.542871 IP (tos 0xc0, ttl 1, id 17248, offset 0, flags [DF], proto TCP (6), length 52)
+    192.168.10.17.179 > 192.168.10.124.53580: Flags [.], cksum 0x9604 (incorrect -> 0x623a), ack 556, win 128, options [nop,nop,TS val 2413436739 ecr 2257659439], length 0

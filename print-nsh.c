@@ -181,7 +181,7 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
 
         if (md_type == MD_TYPE1) {
             if (length != 6) {
-                ND_PRINT(" (invalid length for the MD type)");
+                ND_PRINT(" (length for the MD type)");
                 goto invalid;
             }
             for (n = 0; n < length - 2; n++) {
@@ -189,8 +189,7 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
                 bp += NSH_HDR_WORD_SIZE;
             }
             past_headers = 1;
-        }
-        else if (md_type == MD_TYPE2) {
+        } else if (md_type == MD_TYPE2) {
             n = 0;
             while (n < length - 2) {
                 uint16_t tlv_class;

@@ -77,20 +77,17 @@ static void zep_print_ts(netdissect_options *ndo, const u_char *p)
 						billion */
 	ND_PRINT("%u.%09d", i, f);
 
-#ifdef HAVE_STRFTIME
 	/*
 	 * print the time in human-readable format.
 	 */
 	if (i) {
 		time_t seconds = i - JAN_1970;
-		struct tm *tm;
 		char time_buf[128];
 
-		tm = localtime(&seconds);
-		strftime(time_buf, sizeof (time_buf), "%Y/%m/%d %H:%M:%S", tm);
-		ND_PRINT(" (%s)", time_buf);
+		ND_PRINT(" (%s)",
+		    nd_format_time(time_buf, sizeof (time_buf), "%Y/%m/%d %H:%M:%S",
+		      localtime(&seconds)));
 	}
-#endif
 }
 
 /*

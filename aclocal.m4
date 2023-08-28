@@ -39,7 +39,6 @@ AC_DEFUN(AC_LBL_C_INIT_BEFORE_CC,
 [
     AC_BEFORE([$0], [AC_LBL_C_INIT])
     AC_BEFORE([$0], [AC_PROG_CC])
-    AC_BEFORE([$0], [AC_LBL_FIXINCLUDES])
     AC_BEFORE([$0], [AC_LBL_DEVEL])
     AC_ARG_WITH(gcc, [  --without-gcc           don't use gcc])
     $1=""
@@ -48,18 +47,6 @@ AC_DEFUN(AC_LBL_C_INIT_BEFORE_CC,
     fi
     if test "${CFLAGS+set}" = set; then
 	    LBL_CFLAGS="$CFLAGS"
-    fi
-    if test -z "$CC" ; then
-	    case "$host_os" in
-
-	    bsdi*)
-		    AC_CHECK_PROG(SHLICC2, shlicc2, yes, no)
-		    if test $SHLICC2 = yes ; then
-			    CC=shlicc2
-			    export CC
-		    fi
-		    ;;
-	    esac
     fi
     if test -z "$CC" -a "$with_gcc" = no ; then
 	    CC=cc
@@ -94,9 +81,7 @@ dnl	LBL_CFLAGS
 dnl
 AC_DEFUN(AC_LBL_C_INIT,
 [
-    AC_BEFORE([$0], [AC_LBL_FIXINCLUDES])
     AC_BEFORE([$0], [AC_LBL_DEVEL])
-    AC_BEFORE([$0], [AC_LBL_SHLIBS_INIT])
     if test "$GCC" = yes ; then
 	    #
 	    # -Werror forces warnings to be errors.
@@ -112,6 +97,9 @@ AC_DEFUN(AC_LBL_C_INIT,
 		    #
 		    # This is assumed either to be GCC or clang, both
 		    # of which use -Werror to force warnings to be errors.
+		    #
+		    # XXX - they also both cause GCC to be set to yes,
+		    # so we should never get here in the first place.
 		    #
 		    ac_lbl_cc_force_warning_errors=-Werror
 		    ;;
@@ -189,22 +177,6 @@ AC_DEFUN(AC_LBL_C_INIT,
 		    #
 		    ac_lbl_cc_force_warning_errors=-errwarn
 		    ;;
-
-	    ultrix*)
-		    AC_MSG_CHECKING(that Ultrix $CC hacks const in prototypes)
-		    AC_CACHE_VAL(ac_cv_lbl_cc_const_proto,
-			AC_TRY_COMPILE(
-			    [#include <sys/types.h>],
-			    [struct a { int b; };
-			    void c(const struct a *)],
-			    ac_cv_lbl_cc_const_proto=yes,
-			    ac_cv_lbl_cc_const_proto=no))
-		    AC_MSG_RESULT($ac_cv_lbl_cc_const_proto)
-		    if test $ac_cv_lbl_cc_const_proto = no ; then
-			    AC_DEFINE(const,[],
-			        [to handle Ultrix compilers that don't support const in prototypes])
-		    fi
-		    ;;
 	    esac
 	    $1="$$1 -O"
     fi
@@ -244,7 +216,7 @@ AC_DEFUN(AC_LBL_CHECK_COMPILER_OPT,
 	#    https://www.postgresql.org/message-id/2192993.1591682589%40sss.pgh.pa.us
 	#
 	# This may, as per those two messages, be fixed in autoconf 2.70,
-	# but we only require 2.64 or newer for now.
+	# but we only require 2.69 or newer for now.
 	#
 	AC_COMPILE_IFELSE(
 	    [AC_LANG_SOURCE([[int main(void) { return 0; }]])],
@@ -373,59 +345,7 @@ AC_DEFUN(AC_LBL_CHECK_DEPENDENCY_GENERATION_OPT,
 	AC_SUBST(MKDEP)
     ])
 
-#
-# Try compiling a sample of the type of code that appears in
-# gencode.c with "inline", "__inline__", and "__inline".
-#
-# Autoconf's AC_C_INLINE, at least in autoconf 2.13, isn't good enough,
-# as it just tests whether a function returning "int" can be inlined;
-# at least some versions of HP's C compiler can inline that, but can't
-# inline a function that returns a struct pointer.
-#
-# Make sure we use the V_CCOPT flags, because some of those might
-# disable inlining.
-#
-AC_DEFUN(AC_LBL_C_INLINE,
-    [AC_MSG_CHECKING(for inline)
-    save_CFLAGS="$CFLAGS"
-    CFLAGS="$V_CCOPT"
-    AC_CACHE_VAL(ac_cv_lbl_inline, [
-	ac_cv_lbl_inline=""
-	ac_lbl_cc_inline=no
-	for ac_lbl_inline in inline __inline__ __inline
-	do
-	    AC_TRY_COMPILE(
-		[#define inline $ac_lbl_inline
-		static inline struct iltest *foo(void);
-		struct iltest {
-		    int iltest1;
-		    int iltest2;
-		};
-
-		static inline struct iltest *
-		foo()
-		{
-		    static struct iltest xxx;
-
-		    return &xxx;
-		}],,ac_lbl_cc_inline=yes,)
-	    if test "$ac_lbl_cc_inline" = yes ; then
-		break;
-	    fi
-	done
-	if test "$ac_lbl_cc_inline" = yes ; then
-	    ac_cv_lbl_inline=$ac_lbl_inline
-	fi])
-    CFLAGS="$save_CFLAGS"
-    if test ! -z "$ac_cv_lbl_inline" ; then
-	AC_MSG_RESULT($ac_cv_lbl_inline)
-    else
-	AC_MSG_RESULT(no)
-    fi
-    AC_DEFINE_UNQUOTED(inline, $ac_cv_lbl_inline, [Define as token for inline if inlining supported])])
-
 dnl
-dnl Use pfopen.c if available and pfopen() not in standard libraries
 dnl Require libpcap
 dnl Look for libpcap in directories under ..; those are local versions.
 dnl Look for an installed libpcap if there is no local version or if
@@ -440,22 +360,11 @@ dnl
 dnl	$1 (pcapdep set)
 dnl	$2 (incls appended)
 dnl	LIBS
-dnl	LBL_LIBS
 dnl
 AC_DEFUN(AC_LBL_LIBPCAP,
-    [AC_REQUIRE([AC_LBL_LIBRARY_NET])
-    dnl
-    dnl save a copy before locating libpcap.a
-    dnl
-    LBL_LIBS="$LIBS"
-    pfopen=/usr/examples/packetfilter/pfopen.c
-    if test -f $pfopen ; then
-        AC_CHECK_FUNCS(pfopen)
-        if test $ac_cv_func_pfopen = "no" ; then
-            AC_MSG_RESULT(Using $pfopen)
-            LIBS="$LIBS $pfopen"
-        fi
-    fi
+[
+    AC_REQUIRE([AC_PROG_EGREP])
+    AC_REQUIRE([AC_LBL_LIBRARY_NET])
     libpcap=FAIL
     AC_MSG_CHECKING([whether to look for a local libpcap])
     AC_ARG_ENABLE(local-libpcap,
@@ -480,9 +389,9 @@ AC_DEFUN(AC_LBL_LIBPCAP,
         AC_MSG_CHECKING(for local pcap library)
         lastdir=FAIL
         places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
-            egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT|rc.)?$'`
+            $EGREP '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT|rc.)?$'`
         places2=`ls .. | sed -e 's,/$,,' -e "s,^,../," | \
-            egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT|rc.)?$'`
+            $EGREP '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT|rc.)?$'`
         for dir in $places $srcdir/../libpcap ../libpcap $srcdir/libpcap $places2 ; do
             basedir=`echo $dir | sed -e 's/[[ab]][[0-9]]*$//' | \
                 sed -e 's/-PRE-GIT$//' `
@@ -673,7 +582,7 @@ AC_DEFUN(AC_LBL_LIBPCAP,
                 #
                 AC_CHECK_LIB(pcap, main, libpcap="-lpcap")
                 if test $libpcap = FAIL ; then
-                    AC_MSG_ERROR(see the INSTALL doc for more info)
+                    AC_MSG_ERROR(see the INSTALL.md file for more info)
                 fi
                 dnl
                 dnl Some versions of Red Hat Linux put "pcap.h" in
@@ -765,7 +674,7 @@ AC_DEFUN(AC_LBL_LIBPCAP,
             # statically linked, and provide only the direct
             # dependencies with --static-pcap-only.
             #
-            if grep -s -q "static-pcap-only" "$PCAP_CONFIG"
+            if grep "static-pcap-only" "$PCAP_CONFIG" >/dev/null 2>&1
             then
                 static_opt="--static-pcap-only"
             else
@@ -780,9 +689,9 @@ AC_DEFUN(AC_LBL_LIBPCAP,
             # Make sure it has a pcap.h file.
             #
             places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
-                egrep '/libpcap-[[0-9]]*.[[0-9]]*(.[[0-9]]*)?([[ab]][[0-9]]*)?$'`
+                $EGREP '/libpcap-[[0-9]]*.[[0-9]]*(.[[0-9]]*)?([[ab]][[0-9]]*)?$'`
             places2=`ls .. | sed -e 's,/$,,' -e "s,^,../," | \
-                egrep '/libpcap-[[0-9]]*.[[0-9]]*(.[[0-9]]*)?([[ab]][[0-9]]*)?$'`
+                $EGREP '/libpcap-[[0-9]]*.[[0-9]]*(.[[0-9]]*)?([[ab]][[0-9]]*)?$'`
             pcapH=FAIL
             if test -r $local_pcap_dir/pcap.h; then
                 pcapH=$local_pcap_dir
@@ -795,7 +704,7 @@ AC_DEFUN(AC_LBL_LIBPCAP,
             fi
 
             if test $pcapH = FAIL ; then
-                AC_MSG_ERROR(cannot find pcap.h: see INSTALL)
+                AC_MSG_ERROR(cannot find pcap.h: see the INSTALL.md file)
             fi
 
             #
@@ -870,137 +779,6 @@ reproduce this problem ourselves.])
 ])
 
 dnl
-dnl If using gcc, make sure we have ANSI ioctl definitions
-dnl
-dnl usage:
-dnl
-dnl	AC_LBL_FIXINCLUDES
-dnl
-AC_DEFUN(AC_LBL_FIXINCLUDES,
-    [if test "$GCC" = yes ; then
-	    AC_MSG_CHECKING(for ANSI ioctl definitions)
-	    AC_CACHE_VAL(ac_cv_lbl_gcc_fixincludes,
-		AC_TRY_COMPILE(
-		    [/*
-		     * This generates a "duplicate case value" when fixincludes
-		     * has not be run.
-		     */
-#		include <sys/types.h>
-#		include <sys/time.h>
-#		include <sys/ioctl.h>
-#		ifdef HAVE_SYS_IOCCOM_H
-#		include <sys/ioccom.h>
-#		endif],
-		    [switch (0) {
-		    case _IO('A', 1):;
-		    case _IO('B', 1):;
-		    }],
-		    ac_cv_lbl_gcc_fixincludes=yes,
-		    ac_cv_lbl_gcc_fixincludes=no))
-	    AC_MSG_RESULT($ac_cv_lbl_gcc_fixincludes)
-	    if test $ac_cv_lbl_gcc_fixincludes = no ; then
-		    # Don't cache failure
-		    unset ac_cv_lbl_gcc_fixincludes
-		    AC_MSG_ERROR(see the INSTALL for more info)
-	    fi
-    fi])
-
-dnl
-dnl Checks to see if union wait is used with WEXITSTATUS()
-dnl
-dnl usage:
-dnl
-dnl	AC_LBL_UNION_WAIT
-dnl
-dnl results:
-dnl
-dnl	DECLWAITSTATUS (defined)
-dnl
-AC_DEFUN(AC_LBL_UNION_WAIT,
-    [AC_MSG_CHECKING(if union wait is used)
-    AC_CACHE_VAL(ac_cv_lbl_union_wait,
-	AC_TRY_COMPILE([
-#	include <sys/types.h>
-#	include <sys/wait.h>],
-	    [int status;
-	    u_int i = WEXITSTATUS(status);
-	    u_int j = waitpid(0, &status, 0);],
-	    ac_cv_lbl_union_wait=no,
-	    ac_cv_lbl_union_wait=yes))
-    AC_MSG_RESULT($ac_cv_lbl_union_wait)
-    if test $ac_cv_lbl_union_wait = yes ; then
-	    AC_DEFINE(DECLWAITSTATUS,union wait,[type for wait])
-    else
-	    AC_DEFINE(DECLWAITSTATUS,int,[type for wait])
-    fi])
-
-dnl
-dnl Checks to see if -R is used
-dnl
-dnl usage:
-dnl
-dnl	AC_LBL_HAVE_RUN_PATH
-dnl
-dnl results:
-dnl
-dnl	ac_cv_lbl_have_run_path (yes or no)
-dnl
-AC_DEFUN(AC_LBL_HAVE_RUN_PATH,
-    [AC_MSG_CHECKING(for ${CC-cc} -R)
-    AC_CACHE_VAL(ac_cv_lbl_have_run_path,
-	[echo 'main(){}' > conftest.c
-	${CC-cc} -o conftest conftest.c -R/a1/b2/c3 >conftest.out 2>&1
-	if test ! -s conftest.out ; then
-		ac_cv_lbl_have_run_path=yes
-	else
-		ac_cv_lbl_have_run_path=no
-	fi
-	rm -f -r conftest*])
-    AC_MSG_RESULT($ac_cv_lbl_have_run_path)
-    ])
-
-dnl
-dnl Check whether a given format can be used to print 64-bit integers
-dnl
-AC_DEFUN(AC_LBL_CHECK_64BIT_FORMAT,
-  [
-    AC_MSG_CHECKING([whether %$1x can be used to format 64-bit integers])
-    AC_RUN_IFELSE(
-      [
-	AC_LANG_SOURCE(
-	  [[
-#	    ifdef HAVE_INTTYPES_H
-	    #include <inttypes.h>
-#	    endif
-	    #include <stdio.h>
-	    #include <sys/types.h>
-
-	    main()
-	    {
-	      uint64_t t = 1;
-	      char strbuf[16+1];
-	      sprintf(strbuf, "%016$1x", t << 32);
-	      if (strcmp(strbuf, "0000000100000000") == 0)
-		exit(0);
-	      else
-		exit(1);
-	    }
-	  ]])
-      ],
-      [
-	AC_DEFINE(PRId64, "$1d", [define if the platform doesn't define PRId64])
-	AC_DEFINE(PRIo64, "$1o", [define if the platform doesn't define PRIo64])
-	AC_DEFINE(PRIx64, "$1x", [define if the platform doesn't define PRIu64])
-	AC_DEFINE(PRIu64, "$1u", [define if the platform doesn't define PRIx64])
-	AC_MSG_RESULT(yes)
-      ],
-      [
-	AC_MSG_RESULT(no)
-	$2
-      ])
-  ])
-
-dnl
 dnl If the file .devel exists:
 dnl	Add some warning flags if the compiler supports them
 dnl	If an os prototype include exists, symlink os-proto.h to it
@@ -1031,6 +809,7 @@ AC_DEFUN(AC_LBL_DEVEL,
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wcast-qual)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wmissing-prototypes)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wmissing-variable-declarations)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wnull-pointer-subtraction)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wold-style-definition)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wpedantic)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wpointer-arith)
@@ -1039,6 +818,8 @@ AC_DEFUN(AC_LBL_DEVEL,
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wsign-compare)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wstrict-prototypes)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wunreachable-code-return)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wunused-but-set-parameter)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wunused-but-set-variable)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wused-but-marked-unused)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wwrite-strings)
 	    fi
@@ -1051,90 +832,28 @@ AC_DEFUN(AC_LBL_DEVEL,
 	    # .devel file; why should the ABI for which we produce code
 	    # depend on .devel?
 	    #
+	    AC_MSG_CHECKING([whether to use an os-proto.h header])
 	    os=`echo $host_os | sed -e 's/\([[0-9]][[0-9]]*\)[[^0-9]].*$/\1/'`
 	    name="lbl/os-$os.h"
 	    if test -f $name ; then
+		    AC_MSG_RESULT([yes, at "$name"])
 		    ln -s $name os-proto.h
 		    AC_DEFINE(HAVE_OS_PROTO_H, 1,
-			[if there's an os_proto.h for this platform, to use additional prototypes])
+			[if there's an os-proto.h for this platform, to use additional prototypes])
 	    else
-		    AC_MSG_WARN(can't find $name)
+		    AC_MSG_RESULT([no])
 	    fi
     fi])
-
-dnl
-dnl Improved version of AC_CHECK_LIB
-dnl
-dnl Thanks to John Hawkinson (jhawk@mit.edu)
-dnl
-dnl usage:
-dnl
-dnl	AC_LBL_CHECK_LIB(LIBRARY, FUNCTION [, ACTION-IF-FOUND [,
-dnl	    ACTION-IF-NOT-FOUND [, OTHER-LIBRARIES]]])
-dnl
-dnl results:
-dnl
-dnl	LIBS
-dnl
-dnl XXX - "AC_LBL_LIBRARY_NET" was redone to use "AC_SEARCH_LIBS"
-dnl rather than "AC_LBL_CHECK_LIB", so this isn't used any more.
-dnl We keep it around for reference purposes in case it's ever
-dnl useful in the future.
-dnl
-
-define(AC_LBL_CHECK_LIB,
-[AC_MSG_CHECKING([for $2 in -l$1])
-dnl Use a cache variable name containing the library, function
-dnl name, and extra libraries to link with, because the test really is
-dnl for library $1 defining function $2, when linked with potinal
-dnl library $5, not just for library $1.  Separate tests with the same
-dnl $1 and different $2's or $5's may have different results.
-ac_lib_var=`echo $1['_']$2['_']$5 | sed 'y%./+- %__p__%'`
-AC_CACHE_VAL(ac_cv_lbl_lib_$ac_lib_var,
-[ac_save_LIBS="$LIBS"
-LIBS="-l$1 $5 $LIBS"
-AC_TRY_LINK(dnl
-ifelse([$2], [main], , dnl Avoid conflicting decl of main.
-[/* Override any gcc2 internal prototype to avoid an error.  */
-]ifelse(AC_LANG, CPLUSPLUS, [#ifdef __cplusplus
-extern "C"
-#endif
-])dnl
-[/* We use char because int might match the return type of a gcc2
-    builtin and then its argument prototype would still apply.  */
-char $2();
-]),
-	    [$2()],
-	    eval "ac_cv_lbl_lib_$ac_lib_var=yes",
-	    eval "ac_cv_lbl_lib_$ac_lib_var=no")
-LIBS="$ac_save_LIBS"
-])dnl
-if eval "test \"`echo '$ac_cv_lbl_lib_'$ac_lib_var`\" = yes"; then
-  AC_MSG_RESULT(yes)
-  ifelse([$3], ,
-[changequote(, )dnl
-  ac_tr_lib=HAVE_LIB`echo $1 | sed -e 's/[^a-zA-Z0-9_]/_/g' \
-    -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
-changequote([, ])dnl
-  AC_DEFINE_UNQUOTED($ac_tr_lib)
-  LIBS="-l$1 $LIBS"
-], [$3])
-else
-  AC_MSG_RESULT(no)
-ifelse([$4], , , [$4
-])dnl
-fi
-])
 
 dnl
 dnl AC_LBL_LIBRARY_NET
 dnl
 dnl This test is for network applications that need socket() and
-dnl gethostbyname() -ish functions.  Under Solaris, those applications
+dnl gethostbyaddr() -ish functions.  Under Solaris, those applications
 dnl need to link with "-lsocket -lnsl".  Under IRIX, they need to link
 dnl with "-lnsl" but should *not* link with "-lsocket" because
 dnl libsocket.a breaks a number of things (for instance:
-dnl gethostbyname() under IRIX 5.2, and snoop sockets under most
+dnl gethostbyaddr() under IRIX 5.2, and snoop sockets under most
 dnl versions of IRIX).
 dnl
 dnl Unfortunately, many application developers are not aware of this,
@@ -1162,16 +881,16 @@ dnl statically and happen to have a libresolv.a lying around (and no
 dnl libnsl.a).
 dnl
 AC_DEFUN(AC_LBL_LIBRARY_NET, [
-    # Most operating systems have gethostbyname() in the default searched
+    # Most operating systems have gethostbyaddr() in the default searched
     # libraries (i.e. libc):
     # Some OSes (eg. Solaris) place it in libnsl
     # Some strange OSes (SINIX) have it in libsocket:
-    AC_SEARCH_LIBS(gethostbyname, nsl socket resolv)
+    AC_SEARCH_LIBS(gethostbyaddr, network nsl socket resolv)
     # Unfortunately libsocket sometimes depends on libnsl and
     # AC_SEARCH_LIBS isn't up to the task of handling dependencies like this.
-    if test "$ac_cv_search_gethostbyname" = "no"
+    if test "$ac_cv_search_gethostbyaddr" = "no"
     then
-	AC_CHECK_LIB(socket, gethostbyname,
+	AC_CHECK_LIB(socket, gethostbyaddr,
                      LIBS="-lsocket -lnsl $LIBS", , -lnsl)
     fi
     AC_SEARCH_LIBS(socket, socket, ,
@@ -1179,66 +898,3 @@ AC_DEFUN(AC_LBL_LIBRARY_NET, [
     # DLPI needs putmsg under HPUX so test for -lstr while we're at it
     AC_SEARCH_LIBS(putmsg, str)
     ])
-
-dnl Copyright (c) 1999 WIDE Project. All rights reserved.
-dnl
-dnl Redistribution and use in source and binary forms, with or without
-dnl modification, are permitted provided that the following conditions
-dnl are met:
-dnl 1. Redistributions of source code must retain the above copyright
-dnl    notice, this list of conditions and the following disclaimer.
-dnl 2. Redistributions in binary form must reproduce the above copyright
-dnl    notice, this list of conditions and the following disclaimer in the
-dnl    documentation and/or other materials provided with the distribution.
-dnl 3. Neither the name of the project nor the names of its contributors
-dnl    may be used to endorse or promote products derived from this software
-dnl    without specific prior written permission.
-dnl
-dnl THIS SOFTWARE IS PROVIDED BY THE PROJECT AND CONTRIBUTORS ``AS IS'' AND
-dnl ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-dnl IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-dnl ARE DISCLAIMED.  IN NO EVENT SHALL THE PROJECT OR CONTRIBUTORS BE LIABLE
-dnl FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-dnl DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-dnl OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-dnl HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-dnl LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-dnl OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-dnl SUCH DAMAGE.
-
-AC_DEFUN(AC_LBL_SSLEAY,
-    [
-	#
-	# Find the last component of $libdir; it's not necessarily
-	# "lib" - it might be "lib64" on, for example, x86-64
-	# Linux systems.
-	#
-	# We assume the directory in which we're looking for
-	# libcrypto has a subdirectory with that as its name.
-	#
-	tmplib=`echo "$libdir" | sed 's,.*/,,'`
-
-	#
-	# XXX - is there a better way to check if a given library is
-	# in a given directory than checking each of the possible
-	# shared library suffixes?
-	#
-	# Are there any other suffixes we need to look for?  Do we
-	# have to worry about ".so.{version}"?
-	#
-	# Or should we just look for "libcrypto.*"?
-	#
-	if test -d "$1/$tmplib" -a \( -f "$1/$tmplib/libcrypto.a" -o \
-				    -f "$1/$tmplib/libcrypto.so" -o \
-				    -f "$1/$tmplib/libcrypto.sl" -o \
-				    -f "$1/$tmplib/libcrypto.dylib" \); then
-		ac_cv_ssleay_path="$1"
-	fi
-
-	#
-	# Make sure we have the headers as well.
-	#
-	if test -d "$1/include/openssl" -a -f "$1/include/openssl/des.h"; then
-		incdir="-I$1/include"
-	fi
-])

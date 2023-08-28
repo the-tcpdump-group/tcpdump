@@ -78,7 +78,7 @@ extern const char *netdb_protoname (const uint8_t);
 #define IPPROTO_FRAGMENT	44		/* IPv6 fragmentation header */
 #endif
 #ifndef IPPROTO_RSVP
-#define IPPROTO_RSVP		46 		/* resource reservation */
+#define IPPROTO_RSVP		46		/* resource reservation */
 #endif
 #ifndef IPPROTO_GRE
 #define	IPPROTO_GRE		47		/* General Routing Encap. */
@@ -88,6 +88,9 @@ extern const char *netdb_protoname (const uint8_t);
 #endif
 #ifndef IPPROTO_AH
 #define	IPPROTO_AH		51		/* SIPP Auth Header */
+#endif
+#ifndef IPPROTO_NHRP
+#define IPPROTO_NHRP		54		/* Next Hop Resolution */
 #endif
 #ifndef IPPROTO_MOBILE
 #define IPPROTO_MOBILE		55

@@ -37,8 +37,8 @@
 
 
 struct ipfc_header {
-	nd_byte ipfc_dhost[2+MAC_ADDR_LEN];
-	nd_byte ipfc_shost[2+MAC_ADDR_LEN];
+	nd_byte ipfc_dhost[2+MAC48_LEN];
+	nd_byte ipfc_shost[2+MAC48_LEN];
 };
 
 #define IPFC_HDRLEN 16
@@ -52,8 +52,8 @@ extract_ipfc_addrs(const struct ipfc_header *ipfcp, char *ipfcsrc,
 	 * We assume that, as per RFC 2625, the lower 48 bits of the
 	 * source and destination addresses are MAC addresses.
 	 */
-	memcpy(ipfcdst, (const char *)&ipfcp->ipfc_dhost[2], MAC_ADDR_LEN);
-	memcpy(ipfcsrc, (const char *)&ipfcp->ipfc_shost[2], MAC_ADDR_LEN);
+	memcpy(ipfcdst, (const char *)&ipfcp->ipfc_dhost[2], MAC48_LEN);
+	memcpy(ipfcsrc, (const char *)&ipfcp->ipfc_shost[2], MAC48_LEN);
 }
 
 /*
@@ -66,8 +66,8 @@ ipfc_hdr_print(netdissect_options *ndo,
 {
 	const char *srcname, *dstname;
 
-	srcname = etheraddr_string(ndo, ipfcsrc);
-	dstname = etheraddr_string(ndo, ipfcdst);
+	srcname = mac48_string(ndo, ipfcsrc);
+	dstname = mac48_string(ndo, ipfcdst);
 
 	/*
 	 * XXX - should we show the upper 16 bits of the addresses?
@@ -91,7 +91,7 @@ static u_int
 ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 {
 	const struct ipfc_header *ipfcp = (const struct ipfc_header *)p;
-	nd_mac_addr srcmac, dstmac;
+	nd_mac48 srcmac, dstmac;
 	struct lladdr_info src, dst;
 	int llc_hdrlen;
 
@@ -106,9 +106,9 @@ ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 		ipfc_hdr_print(ndo, ipfcp, length, srcmac, dstmac);
 
 	src.addr = srcmac;
-	src.addr_string = etheraddr_string;
+	src.addr_string = mac48_string;
 	dst.addr = dstmac;
-	dst.addr_string = etheraddr_string;
+	dst.addr_string = mac48_string;
 
 	/* Skip over Network_Header */
 	length -= IPFC_HDRLEN;

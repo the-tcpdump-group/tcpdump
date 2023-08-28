@@ -28,7 +28,7 @@
 #include "extract.h"
 #include "addrtoname.h"
 
-#define VQP_VERSION            		1
+#define VQP_VERSION 1
 
 /*
  * VQP common header
@@ -195,9 +195,9 @@ vqp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
             /* those objects have similar semantics - fall through */
 	case VQP_OBJ_MAC_ADDRESS:
 	case VQP_OBJ_MAC_NULL:
-            if (vqp_obj_len != MAC_ADDR_LEN)
+            if (vqp_obj_len != MAC48_LEN)
                 goto invalid;
-	      ND_PRINT("%s", GET_ETHERADDR_STRING(tptr));
+	      ND_PRINT("%s", GET_MAC48_STRING(tptr));
               break;
         default:
             if (ndo->ndo_vflag <= 1)

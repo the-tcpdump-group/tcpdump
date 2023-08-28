@@ -441,17 +441,17 @@ static const char *voltype[] = { "read-write", "read-only", "backup" };
 
 static const struct tok afs_fs_errors[] = {
 	{ 101,		"salvage volume" },
-	{ 102, 		"no such vnode" },
-	{ 103, 		"no such volume" },
-	{ 104, 		"volume exist" },
-	{ 105, 		"no service" },
-	{ 106, 		"volume offline" },
-	{ 107, 		"voline online" },
-	{ 108, 		"diskfull" },
-	{ 109, 		"diskquota exceeded" },
-	{ 110, 		"volume busy" },
-	{ 111, 		"volume moved" },
-	{ 112, 		"AFS IO error" },
+	{ 102,		"no such vnode" },
+	{ 103,		"no such volume" },
+	{ 104,		"volume exist" },
+	{ 105,		"no service" },
+	{ 106,		"volume offline" },
+	{ 107,		"voline online" },
+	{ 108,		"diskfull" },
+	{ 109,		"diskquota exceeded" },
+	{ 110,		"volume busy" },
+	{ 111,		"volume moved" },
+	{ 112,		"AFS IO error" },
 	{ 0xffffff9c,	"restarting fileserver" }, /* -100, sic! */
 	{ 0,		NULL }
 };
@@ -794,12 +794,12 @@ rx_cache_find(netdissect_options *ndo, const struct rx_header *rxh,
 			ND_PRINT(" %" PRIu64, _i); \
 		}
 
-#define DATEOUT() { time_t _t; struct tm *tm; char str[256]; \
+#define DATEOUT() { time_t _t; char str[256]; \
 			_t = (time_t) GET_BE_S_4(bp); \
 			bp += sizeof(int32_t); \
-			tm = localtime(&_t); \
-			strftime(str, 256, "%Y/%m/%d %H:%M:%S", tm); \
-			ND_PRINT(" %s", str); \
+			ND_PRINT(" %s", \
+			    nd_format_time(str, sizeof(str), \
+			      "%Y/%m/%d %H:%M:%S", localtime(&_t))); \
 		}
 
 #define STOREATTROUT() { uint32_t mask, _i; \

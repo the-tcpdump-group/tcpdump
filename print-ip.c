@@ -363,8 +363,7 @@ ip_print(netdissect_options *ndo,
             if (len) {
                 ND_PRINT("bad-len %u", len);
                 return;
-            }
-            else {
+            } else {
                 /* we guess that it is a TSO send */
                 len = length;
             }

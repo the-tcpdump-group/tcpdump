@@ -249,9 +249,7 @@ static const struct printer printers[] = {
 void
 init_print(netdissect_options *ndo, uint32_t localnet, uint32_t mask)
 {
-
 	init_addrtoname(ndo, localnet, mask);
-	init_checksum();
 }
 
 if_printer

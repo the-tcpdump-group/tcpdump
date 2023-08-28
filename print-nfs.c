@@ -970,8 +970,7 @@ xid_map_enter(netdissect_options *ndo,
 				 sizeof(ip->ip_src));
 		UNALIGNED_MEMCPY(&xmep->server, ip->ip_dst,
 				 sizeof(ip->ip_dst));
-	}
-	else if (ip6) {
+	} else if (ip6) {
 		xmep->ipver = 6;
 		UNALIGNED_MEMCPY(&xmep->client, ip6->ip6_src,
 				 sizeof(ip6->ip6_src));
@@ -1559,7 +1558,7 @@ interp_reply(netdissect_options *ndo,
 		if (dp == NULL)
 			goto trunc;
 		if (v3) {
-			if (parsewccres(ndo, dp, ndo->ndo_vflag, &nfserr) == 0)
+			if (parsewccres(ndo, dp, ndo->ndo_vflag, &nfserr) == NULL)
 				goto trunc;
 		} else {
 			if (parseattrstat(ndo, dp, !ndo->ndo_qflag, 0, &nfserr) == 0)

@@ -71,7 +71,7 @@
     #else /* HAVE_STRUCT_ETHER_ADDR */
 	struct ether_addr {
 		/* Beware FreeBSD calls this "octet". */
-		unsigned char ether_addr_octet[MAC_ADDR_LEN];
+		unsigned char ether_addr_octet[MAC48_LEN];
 	};
     #endif /* HAVE_STRUCT_ETHER_ADDR */
   #endif /* what declares ether_ntohost() */
@@ -148,14 +148,15 @@ win32_gethostbyaddr(const char *addr, int len, int type)
 	static struct hostent host;
 	static char hostbuf[NI_MAXHOST];
 	char hname[NI_MAXHOST];
-	struct sockaddr_in6 addr6;
 
 	host.h_name = hostbuf;
 	switch (type) {
 	case AF_INET:
 		return gethostbyaddr(addr, len, type);
 		break;
-	case AF_INET6:
+#ifdef AF_INET6
+	case AF_INET6: {
+		struct sockaddr_in6 addr6;
 		memset(&addr6, 0, sizeof(addr6));
 		addr6.sin6_family = AF_INET6;
 		memcpy(&addr6.sin6_addr, addr, len);
@@ -167,6 +168,8 @@ win32_gethostbyaddr(const char *addr, int len, int type)
 			return &host;
 		}
 		break;
+	}
+#endif /* AF_INET6 */
 	default:
 		return NULL;
 	}
@@ -358,6 +361,7 @@ ip6addr_string(netdissect_options *ndo, const u_char *ap)
 	/*
 	 * Do not print names if -n was given.
 	 */
+#ifdef AF_INET6
 	if (!ndo->ndo_nflag) {
 #ifdef HAVE_CASPER
 		if (capdns != NULL) {
@@ -383,6 +387,7 @@ ip6addr_string(netdissect_options *ndo, const u_char *ap)
 			return (p->name);
 		}
 	}
+#endif /* AF_INET6 */
 	cp = addrtostr6(ap, ntop_buf, sizeof(ntop_buf));
 	p->name = strdup(cp);
 	if (p->name == NULL)
@@ -526,8 +531,7 @@ lookup_nsap(netdissect_options *ndo, const u_char *nsap,
 		k = (ensap[0] << 8) | ensap[1];
 		j = (ensap[2] << 8) | ensap[3];
 		i = (ensap[4] << 8) | ensap[5];
-	}
-	else
+	} else
 		i = j = k = 0;
 
 	tp = &nsaptable[(i ^ j) & (HASHNAMESIZE-1)];
@@ -585,7 +589,7 @@ lookup_protoid(netdissect_options *ndo, const u_char *pi)
 }
 
 const char *
-etheraddr_string(netdissect_options *ndo, const uint8_t *ep)
+mac48_string(netdissect_options *ndo, const uint8_t *ep)
 {
 	int i;
 	char *cp;
@@ -606,7 +610,7 @@ etheraddr_string(netdissect_options *ndo, const uint8_t *ep)
 		 */
 		struct ether_addr ea;
 
-		memcpy (&ea, ep, MAC_ADDR_LEN);
+		memcpy (&ea, ep, MAC48_LEN);
 		if (ether_ntohost(buf2, &ea) == 0) {
 			tp->e_name = strdup(buf2);
 			if (tp->e_name == NULL)
@@ -637,7 +641,16 @@ etheraddr_string(netdissect_options *ndo, const uint8_t *ep)
 }
 
 const char *
-le64addr_string(netdissect_options *ndo, const uint8_t *ep)
+eui64_string(netdissect_options *ndo, const uint8_t *ep)
+{
+	return (linkaddr_string(ndo, ep, LINKADDR_EUI64, EUI64_LEN));
+}
+
+/*
+ * EUI-64 with the rightmost octet first.
+ */
+const char *
+eui64le_string(netdissect_options *ndo, const uint8_t *ep)
 {
 	const unsigned int len = 8;
 	u_int i;
@@ -677,8 +690,8 @@ linkaddr_string(netdissect_options *ndo, const uint8_t *ep,
 	if (len == 0)
 		return ("<empty>");
 
-	if (type == LINKADDR_ETHER && len == MAC_ADDR_LEN)
-		return (etheraddr_string(ndo, ep));
+	if (type == LINKADDR_MAC48 && len == MAC48_LEN)
+		return (mac48_string(ndo, ep));
 
 	if (type == LINKADDR_FRELAY)
 		return (q922_string(ndo, ep, len));
@@ -925,7 +938,7 @@ init_protoidarray(netdissect_options *ndo)
 }
 
 static const struct etherlist {
-	const nd_mac_addr addr;
+	const nd_mac48 addr;
 	const char *name;
 } etherlist[] = {
 	{{ 0xff, 0xff, 0xff, 0xff, 0xff, 0xff }, "Broadcast" },
@@ -936,7 +949,7 @@ static const struct etherlist {
  * Initialize the ethers hash table.  We take two different approaches
  * depending on whether or not the system provides the ethers name
  * service.  If it does, we just wire in a few names at startup,
- * and etheraddr_string() fills in the table on demand.  If it doesn't,
+ * and mac48_string() fills in the table on demand.  If it doesn't,
  * then we suck in the entire /etc/ethers file at startup.  The idea
  * is that parsing the local file will be fast, but spinning through
  * all the ethers entries via NIS & next_etherent might be very slow.
@@ -982,9 +995,9 @@ init_etherarray(netdissect_options *ndo)
 		/*
 		 * Use YP/NIS version of name if available.
 		 */
-		/* Same workaround as in etheraddr_string(). */
+		/* Same workaround as in mac48_string(). */
 		struct ether_addr ea;
-		memcpy (&ea, el->addr, MAC_ADDR_LEN);
+		memcpy (&ea, el->addr, MAC48_LEN);
 		if (ether_ntohost(name, &ea) == 0) {
 			tp->e_name = strdup(name);
 			if (tp->e_name == NULL)
@@ -1116,7 +1129,7 @@ static const struct ipxsap_ent {
 	{ 0x030a, "GalacticommWorldgroupServer" },
 	{ 0x030c, "IntelNetport2/HP JetDirect/HP Quicksilver" },
 	{ 0x0320, "AttachmateGateway" },
-	{ 0x0327, "MicrosoftDiagnostiocs" },
+	{ 0x0327, "MicrosoftDiagnostics" },
 	{ 0x0328, "WATCOM SQL Server" },
 	{ 0x0335, "MultiTechSystems MultisynchCommServer" },
 	{ 0x0343, "Xylogics RemoteAccessServer/LANModem" },

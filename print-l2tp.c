@@ -88,7 +88,7 @@
 #define	L2TP_MSGTYPE_SLI	16 /* Set-Link-Info */
 
 static const struct tok l2tp_msgtype2str[] = {
-	{ L2TP_MSGTYPE_SCCRQ, 	"SCCRQ" },
+	{ L2TP_MSGTYPE_SCCRQ,	"SCCRQ" },
 	{ L2TP_MSGTYPE_SCCRP,	"SCCRP" },
 	{ L2TP_MSGTYPE_SCCCN,	"SCCCN" },
 	{ L2TP_MSGTYPE_STOPCCN,	"StopCCN" },
@@ -114,17 +114,17 @@ static const struct tok l2tp_msgtype2str[] = {
 #define L2TP_AVP_FIRM_VER		6  /* Firmware Revision */
 #define L2TP_AVP_HOST_NAME		7  /* Host Name */
 #define L2TP_AVP_VENDOR_NAME		8  /* Vendor Name */
-#define L2TP_AVP_ASSND_TUN_ID 		9  /* Assigned Tunnel ID */
+#define L2TP_AVP_ASSND_TUN_ID		9  /* Assigned Tunnel ID */
 #define L2TP_AVP_RECV_WIN_SIZE		10 /* Receive Window Size */
 #define L2TP_AVP_CHALLENGE		11 /* Challenge */
 #define L2TP_AVP_Q931_CC		12 /* Q.931 Cause Code */
 #define L2TP_AVP_CHALLENGE_RESP		13 /* Challenge Response */
-#define L2TP_AVP_ASSND_SESS_ID  	14 /* Assigned Session ID */
-#define L2TP_AVP_CALL_SER_NUM 		15 /* Call Serial Number */
+#define L2TP_AVP_ASSND_SESS_ID		14 /* Assigned Session ID */
+#define L2TP_AVP_CALL_SER_NUM		15 /* Call Serial Number */
 #define L2TP_AVP_MINIMUM_BPS		16 /* Minimum BPS */
 #define L2TP_AVP_MAXIMUM_BPS		17 /* Maximum BPS */
 #define L2TP_AVP_BEARER_TYPE		18 /* Bearer Type */
-#define L2TP_AVP_FRAMING_TYPE 		19 /* Framing Type */
+#define L2TP_AVP_FRAMING_TYPE		19 /* Framing Type */
 #define L2TP_AVP_PACKET_PROC_DELAY	20 /* Packet Processing Delay (OBSOLETE) */
 #define L2TP_AVP_CALLED_NUMBER		21 /* Called Number */
 #define L2TP_AVP_CALLING_NUMBER		22 /* Calling Number */
@@ -144,7 +144,7 @@ static const struct tok l2tp_msgtype2str[] = {
 #define L2TP_AVP_RANDOM_VECTOR		36 /* Random Vector */
 #define L2TP_AVP_PRIVATE_GRP_ID		37 /* Private Group ID */
 #define L2TP_AVP_RX_CONN_SPEED		38 /* (Rx) Connect Speed */
-#define L2TP_AVP_SEQ_REQUIRED 		39 /* Sequencing Required */
+#define L2TP_AVP_SEQ_REQUIRED		39 /* Sequencing Required */
 #define L2TP_AVP_PPP_DISCON_CC		46 /* PPP Disconnect Cause Code - RFC 3145 */
 
 static const struct tok l2tp_avp2str[] = {

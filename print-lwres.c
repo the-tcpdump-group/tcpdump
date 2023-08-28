@@ -182,7 +182,7 @@ static const struct tok opcode[] = {
 	{ LWRES_OPCODE_GETADDRSBYNAME,	"getaddrsbyname", },
 	{ LWRES_OPCODE_GETNAMEBYADDR,	"getnamebyaddr", },
 	{ LWRES_OPCODE_GETRDATABYNAME,	"getrdatabyname", },
-	{ 0, 				NULL, },
+	{ 0,				NULL, },
 };
 
 /* print-domain.c */
@@ -267,7 +267,7 @@ lwres_printaddr(netdissect_options *ndo,
 		}
 	}
 
-	return ND_BYTES_BETWEEN(p, p0);
+	return ND_BYTES_BETWEEN(p0, p);
 }
 
 void
@@ -291,7 +291,9 @@ lwres_print(netdissect_options *ndo,
 	if (ndo->ndo_vflag || v != LWRES_LWPACKETVERSION_0)
 		ND_PRINT(" v%u", v);
 	if (v != LWRES_LWPACKETVERSION_0) {
-		s = bp + GET_BE_U_4(np->length);
+		uint32_t pkt_len = GET_BE_U_4(np->length);
+		ND_TCHECK_LEN(bp, pkt_len);
+		s = bp + pkt_len;
 		goto tail;
 	}
 
@@ -546,7 +548,7 @@ lwres_print(netdissect_options *ndo,
 		ND_PRINT(" [len: %u != %u]", GET_BE_U_4(np->length),
 			  length);
 	}
-	if (!unsupported && ND_BYTES_BETWEEN(s, bp) < GET_BE_U_4(np->length))
+	if (!unsupported && ND_BYTES_BETWEEN(bp, s) < GET_BE_U_4(np->length))
 		ND_PRINT("[extra]");
 	return;
 

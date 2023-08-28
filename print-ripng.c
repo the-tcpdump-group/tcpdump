@@ -117,7 +117,8 @@ ripng_print(netdissect_options *ndo, const u_char *dat, unsigned int length)
 	ndo->ndo_protocol = "ripng";
 	vers = GET_U_1(rp->rip6_vers);
 	if (vers != RIP6_VERSION) {
-		ND_PRINT(" [vers %u]", vers);
+		nd_print_protocol(ndo);
+		ND_PRINT(" [version %u, must be %u]", vers, RIP6_VERSION);
 		goto invalid;
 	}
 	cmd = GET_U_1(rp->rip6_cmd);
@@ -128,7 +129,7 @@ ripng_print(netdissect_options *ndo, const u_char *dat, unsigned int length)
 		if (length_left < (sizeof(struct rip6) - sizeof(struct netinfo6)))
 			goto invalid;
 		length_left -= (sizeof(struct rip6) - sizeof(struct netinfo6));
- 		j = length_left / sizeof(*ni);
+		j = length_left / sizeof(*ni);
 		if (j == 1) {
 			if (GET_U_1(rp->rip6_nets->rip6_metric) == HOPCNT_INFINITY6
 			    && ND_IN6_IS_ADDR_UNSPECIFIED(&rp->rip6_nets->rip6_dest)) {

@@ -311,7 +311,7 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
             tlv_ptr.eigrp_tlv_general_parm = (const struct eigrp_tlv_general_parm_t *)tlv_tptr;
             if (tlv_tlen < sizeof(*tlv_ptr.eigrp_tlv_general_parm)) {
                 ND_PRINT(" (too short, < %zu)",
-        		 sizeof(struct eigrp_tlv_header) + sizeof(*tlv_ptr.eigrp_tlv_general_parm));
+			 sizeof(struct eigrp_tlv_header) + sizeof(*tlv_ptr.eigrp_tlv_general_parm));
                 break;
             }
 

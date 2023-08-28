@@ -207,7 +207,7 @@ krb4_print(netdissect_options *ndo,
 	case AUTH_MSG_ERR_REPLY:
 		if ((cp = krb4_print_hdr(ndo, cp)) == NULL)
 			return;
-		cp += 4; 	  /* timestamp */
+		cp += 4;	  /* timestamp */
 		ND_PRINT(" %s ", tok2str(kerr2str, NULL, KTOHSP(kp, cp)));
 		cp += 4;
 		PRINT;

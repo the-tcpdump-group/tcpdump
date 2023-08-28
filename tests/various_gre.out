@@ -1,0 +1,334 @@
+    1  09:45:01.394037 Loopback, skipCount 0, Reply, receipt number 0, data (44 octets)
+    2  09:45:01.623859 STP 802.1d, Config, Flags [none], bridge-id 84bd.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 84bd.aa:bb:cc:00:03:00, root-pathcost 0
+    3  09:45:02.038883 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+    4  09:45:02.038987 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+    5  09:45:03.624965 STP 802.1d, Config, Flags [none], bridge-id 84bd.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 84bd.aa:bb:cc:00:03:00, root-pathcost 0
+    6  09:45:04.045591 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+    7  09:45:04.045722 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+    8  09:45:05.624960 STP 802.1d, Config, Flags [none], bridge-id 84bd.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 84bd.aa:bb:cc:00:03:00, root-pathcost 0
+    9  09:45:06.048563 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   10  09:45:06.048815 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   11  09:45:07.471682 IP (tos 0xc0, ttl 255, id 164, offset 0, flags [none], proto GRE (47), length 64)
+    10.172.64.7 > 10.172.64.6: GREv0, Flags [key present], key=0x28, length 44
+	gre-proto-0x8909
+   12  09:45:07.472073 IP (tos 0xc0, ttl 254, id 163, offset 0, flags [none], proto GRE (47), length 28)
+    10.172.64.6 > 10.172.64.7: GREv0, Flags [key present], key=0x28, length 8
+	keep-alive
+   13  09:45:07.629913 STP 802.1d, Config, Flags [none], bridge-id 84bd.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 84bd.aa:bb:cc:00:03:00, root-pathcost 0
+   14  09:45:08.055445 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   15  09:45:08.055695 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   16  09:45:09.443471 IP (tos 0xc0, ttl 255, id 144, offset 0, flags [none], proto GRE (47), length 64)
+    10.172.64.6 > 10.172.64.7: GREv0, Flags [key present], key=0x28, length 44
+	gre-proto-0x8909
+   17  09:45:09.443550 IP (tos 0xc0, ttl 254, id 143, offset 0, flags [none], proto GRE (47), length 28)
+    10.172.64.7 > 10.172.64.6: GREv0, Flags [key present], key=0x28, length 8
+	keep-alive
+   18  09:45:09.634332 STP 802.1d, Config, Flags [none], bridge-id 84bd.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 84bd.aa:bb:cc:00:03:00, root-pathcost 0
+   19  09:45:10.062882 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   20  09:45:10.062952 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   21  09:45:11.394321 Loopback, skipCount 0, Reply, receipt number 0, data (44 octets)
+   22  09:45:11.642760 STP 802.1d, Config, Flags [none], bridge-id 84bd.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 84bd.aa:bb:cc:00:03:00, root-pathcost 0
+   23  09:45:12.063595 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   24  09:45:12.063843 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   25  09:45:13.293327 IP (tos 0x0, ttl 255, id 145, offset 0, flags [none], proto GRE (47), length 136)
+    10.172.64.6 > 10.172.64.7: GREv0, Flags [key present], key=0x28, length 116
+	gre-proto-0x8909
+   26  09:45:13.293583 IP (tos 0x0, ttl 255, id 165, offset 0, flags [none], proto GRE (47), length 136)
+    10.172.64.7 > 10.172.64.6: GREv0, Flags [key present], key=0x28, length 116
+	gre-proto-0x8909
+   27  09:45:13.294084 IP (tos 0x0, ttl 255, id 146, offset 0, flags [none], proto GRE (47), length 136)
+    10.172.64.6 > 10.172.64.7: GREv0, Flags [key present], key=0x28, length 116
+	gre-proto-0x8909
+   28  09:45:13.294279 IP (tos 0x0, ttl 255, id 166, offset 0, flags [none], proto GRE (47), length 136)
+    10.172.64.7 > 10.172.64.6: GREv0, Flags [key present], key=0x28, length 116
+	gre-proto-0x8909
+   29  09:45:13.294690 IP (tos 0x0, ttl 255, id 147, offset 0, flags [none], proto GRE (47), length 136)
+    10.172.64.6 > 10.172.64.7: GREv0, Flags [key present], key=0x28, length 116
+	gre-proto-0x8909
+   30  09:45:13.294884 IP (tos 0x0, ttl 255, id 167, offset 0, flags [none], proto GRE (47), length 136)
+    10.172.64.7 > 10.172.64.6: GREv0, Flags [key present], key=0x28, length 116
+	gre-proto-0x8909
+   31  09:45:13.295325 IP (tos 0x0, ttl 255, id 148, offset 0, flags [none], proto GRE (47), length 136)
+    10.172.64.6 > 10.172.64.7: GREv0, Flags [key present], key=0x28, length 116
+	gre-proto-0x8909
+   32  09:45:13.295522 IP (tos 0x0, ttl 255, id 168, offset 0, flags [none], proto GRE (47), length 136)
+    10.172.64.7 > 10.172.64.6: GREv0, Flags [key present], key=0x28, length 116
+	gre-proto-0x8909
+   33  09:45:13.295933 IP (tos 0x0, ttl 255, id 149, offset 0, flags [none], proto GRE (47), length 136)
+    10.172.64.6 > 10.172.64.7: GREv0, Flags [key present], key=0x28, length 116
+	gre-proto-0x8909
+   34  09:45:13.296143 IP (tos 0x0, ttl 255, id 169, offset 0, flags [none], proto GRE (47), length 136)
+    10.172.64.7 > 10.172.64.6: GREv0, Flags [key present], key=0x28, length 116
+	gre-proto-0x8909
+   35  09:45:13.647378 STP 802.1d, Config, Flags [none], bridge-id 84bd.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 84bd.aa:bb:cc:00:03:00, root-pathcost 0
+   36  09:45:14.074294 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   37  09:45:14.074542 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   38  09:45:15.651238 STP 802.1d, Config, Flags [none], bridge-id 84bd.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 84bd.aa:bb:cc:00:03:00, root-pathcost 0
+   39  09:45:16.079934 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   40  09:45:16.080011 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   41  09:45:17.471330 IP (tos 0xc0, ttl 255, id 171, offset 0, flags [none], proto GRE (47), length 64)
+    10.172.64.7 > 10.172.64.6: GREv0, Flags [key present], key=0x28, length 44
+	gre-proto-0x8909
+   42  09:45:17.471625 IP (tos 0xc0, ttl 254, id 170, offset 0, flags [none], proto GRE (47), length 28)
+    10.172.64.6 > 10.172.64.7: GREv0, Flags [key present], key=0x28, length 8
+	keep-alive
+   43  09:45:17.654754 STP 802.1d, Config, Flags [none], bridge-id 84bd.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 84bd.aa:bb:cc:00:03:00, root-pathcost 0
+   44  09:45:18.081824 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   45  09:45:18.082117 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   46  09:45:19.444985 IP (tos 0xc0, ttl 255, id 151, offset 0, flags [none], proto GRE (47), length 64)
+    10.172.64.6 > 10.172.64.7: GREv0, Flags [key present], key=0x28, length 44
+	gre-proto-0x8909
+   47  09:45:19.445057 IP (tos 0xc0, ttl 254, id 150, offset 0, flags [none], proto GRE (47), length 28)
+    10.172.64.7 > 10.172.64.6: GREv0, Flags [key present], key=0x28, length 8
+	keep-alive
+   48  09:45:19.663320 STP 802.1d, Config, Flags [none], bridge-id 84bd.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 84bd.aa:bb:cc:00:03:00, root-pathcost 0
+   49  09:45:19.766290 IP (tos 0x0, ttl 255, id 152, offset 0, flags [none], proto GRE (47), length 381)
+    10.172.64.6 > 10.172.64.7: GREv0, Flags [key present], key=0x28, length 361
+	CDPv2, ttl: 180s, checksum: 0xa82e (unverified), length 353
+	Device-ID (0x0001), value length: 2 bytes: 'R1'
+	Version String (0x0005), value length: 257 bytes: 
+	  Cisco IOS Software, Linux Software (I86BI_LINUX-ADVENTERPRISEK9-M), Version 15.5(3)S2, DEVELOPMENT TEST SOFTWARE
+	  Technical Support: http://www.cisco.com/techsupport
+	  Copyright (c) 1986-2016 by Cisco Systems, Inc.
+	  Compiled Mon 08-Feb-16 20:48 by prod_rel_team
+	Platform (0x0006), value length: 10 bytes: 'Linux Unix'
+	Address (0x0002), value length: 13 bytes: IPv4 (1) 172.17.1.54
+	Port-ID (0x0003), value length: 8 bytes: 'Tunnel40'
+	Capability (0x0004), value length: 4 bytes: (0x00000001): Router
+	Prefixes (0x0007), value length: 5 bytes:  IPv4 Prefixes (1): 10.172.64.6/31
+	Management Addresses (0x0016), value length: 13 bytes: IPv4 (1) 172.17.1.54
+	unknown field type (0x001b), value length: 1 byte: 
+	  0x0000:  00
+   50  09:45:20.096783 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   51  09:45:20.097040 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   52  09:45:21.399232 Loopback, skipCount 0, Reply, receipt number 0, data (44 octets)
+   53  09:45:21.663581 STP 802.1d, Config, Flags [none], bridge-id 84bd.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 84bd.aa:bb:cc:00:03:00, root-pathcost 0
+   54  09:45:22.097069 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   55  09:45:22.097311 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   56  09:45:23.667223 STP 802.1d, Config, Flags [none], bridge-id 84bd.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 84bd.aa:bb:cc:00:03:00, root-pathcost 0
+   57  09:45:24.106329 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   58  09:45:24.106567 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   59  09:45:25.674039 STP 802.1d, Config, Flags [none], bridge-id 84bd.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 84bd.aa:bb:cc:00:03:00, root-pathcost 0
+   60  09:45:26.116487 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   61  09:45:26.116589 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   62  09:45:26.681769 DTPv1, length 26
+	Domain (0x0001) TLV, length 5, 
+	Status (0x0002) TLV, length 5, 0x81
+	DTP type (0x0003) TLV, length 5, 0xa5
+	Neighbor (0x0004) TLV, length 10, aa:bb:cc:00:03:10
+   63  09:45:27.181709 IP (tos 0x0, ttl 255, id 172, offset 0, flags [none], proto GRE (47), length 381)
+    10.172.64.7 > 10.172.64.6: GREv0, Flags [key present], key=0x28, length 361
+	CDPv2, ttl: 180s, checksum: 0xa82b (unverified), length 353
+	Device-ID (0x0001), value length: 2 bytes: 'R2'
+	Version String (0x0005), value length: 257 bytes: 
+	  Cisco IOS Software, Linux Software (I86BI_LINUX-ADVENTERPRISEK9-M), Version 15.5(3)S2, DEVELOPMENT TEST SOFTWARE
+	  Technical Support: http://www.cisco.com/techsupport
+	  Copyright (c) 1986-2016 by Cisco Systems, Inc.
+	  Compiled Mon 08-Feb-16 20:48 by prod_rel_team
+	Platform (0x0006), value length: 10 bytes: 'Linux Unix'
+	Address (0x0002), value length: 13 bytes: IPv4 (1) 172.17.1.55
+	Port-ID (0x0003), value length: 8 bytes: 'Tunnel40'
+	Capability (0x0004), value length: 4 bytes: (0x00000001): Router
+	Prefixes (0x0007), value length: 5 bytes:  IPv4 Prefixes (1): 10.172.64.6/31
+	Management Addresses (0x0016), value length: 13 bytes: IPv4 (1) 172.17.1.55
+	unknown field type (0x001b), value length: 1 byte: 
+	  0x0000:  00
+   64  09:45:27.478420 IP (tos 0xc0, ttl 255, id 174, offset 0, flags [none], proto GRE (47), length 64)
+    10.172.64.7 > 10.172.64.6: GREv0, Flags [key present], key=0x28, length 44
+	gre-proto-0x8909
+   65  09:45:27.478740 IP (tos 0xc0, ttl 254, id 173, offset 0, flags [none], proto GRE (47), length 28)
+    10.172.64.6 > 10.172.64.7: GREv0, Flags [key present], key=0x28, length 8
+	keep-alive
+   66  09:45:27.674617 STP 802.1d, Config, Flags [none], bridge-id 84bd.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 84bd.aa:bb:cc:00:03:00, root-pathcost 0
+   67  09:45:28.056866 IP (tos 0xc0, ttl 255, id 153, offset 0, flags [none], proto GRE (47), length 94)
+    10.172.64.6 > 10.172.64.7: GREv0, Flags [key present], key=0x28, length 74
+	gre-proto-0x8909
+   68  09:45:28.124258 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   69  09:45:28.124503 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   70  09:45:29.444561 IP (tos 0xc0, ttl 255, id 155, offset 0, flags [none], proto GRE (47), length 64)
+    10.172.64.6 > 10.172.64.7: GREv0, Flags [key present], key=0x28, length 44
+	gre-proto-0x8909
+   71  09:45:29.444644 IP (tos 0xc0, ttl 254, id 154, offset 0, flags [none], proto GRE (47), length 28)
+    10.172.64.7 > 10.172.64.6: GREv0, Flags [key present], key=0x28, length 8
+	keep-alive
+   72  09:45:29.677306 STP 802.1d, Config, Flags [none], bridge-id 84bd.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 84bd.aa:bb:cc:00:03:00, root-pathcost 0
+   73  09:45:30.055654 IP (tos 0xc0, ttl 255, id 175, offset 0, flags [none], proto GRE (47), length 94)
+    10.172.64.7 > 10.172.64.6: GREv0, Flags [key present], key=0x28, length 74
+	gre-proto-0x8909
+   74  09:45:30.132613 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   75  09:45:30.132668 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   76  09:45:31.400394 Loopback, skipCount 0, Reply, receipt number 0, data (44 octets)
+   77  09:45:31.686543 STP 802.1d, Config, Flags [none], bridge-id 84bd.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 84bd.aa:bb:cc:00:03:00, root-pathcost 0
+   78  09:45:32.146972 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   79  09:45:32.147122 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   80  09:45:33.695258 STP 802.1d, Config, Flags [none], bridge-id 84bd.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 84bd.aa:bb:cc:00:03:00, root-pathcost 0
+   81  09:45:34.147364 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   82  09:45:34.147449 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   83  09:45:35.703305 STP 802.1d, Config, Flags [none], bridge-id 84bd.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 84bd.aa:bb:cc:00:03:00, root-pathcost 0
+   84  09:45:36.153211 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   85  09:45:36.153297 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   86  09:45:37.371888 CDPv2, ttl: 180s, checksum: 0x2005 (unverified), length 424
+	Device-ID (0x0001), value length: 3 bytes: 'SW1'
+	Version String (0x0005), value length: 331 bytes: 
+	  Cisco IOS Software, Linux Software (I86BI_LINUXL2-ADVENTERPRISEK9-M), Version 15.2(HI_20170202)FLO_DSGS7, EARLY DEPLOYMENT DEVELOPMENT BUILD, synced to  FLO_DSGS7_POSTCOLLAPSE_TEAM_TRACK_DSGS_PI5
+	  Technical Support: http://www.cisco.com/techsupport
+	  Copyright (c) 1986-2017 by Cisco Systems, Inc.
+	  Compiled Thu 02-Feb-17 03:37 by mmen
+	Platform (0x0006), value length: 10 bytes: 'Linux Unix'
+	Address (0x0002), value length: 4 bytes: 
+	Port-ID (0x0003), value length: 11 bytes: 'Ethernet0/1'
+	Capability (0x0004), value length: 4 bytes: (0x00000029): Router, L2 Switch, IGMP snooping
+	VTP Management Domain (0x0009), value length: 0 bytes: ''
+	Native VLAN ID (0x000a), value length: 2 bytes: 1
+	Duplex (0x000b), value length: 1 byte: full
+	AVVID trust bitmap (0x0012), value length: 1 byte: 0x00
+	AVVID untrusted ports CoS (0x0013), value length: 1 byte: 0x00
+	Management Addresses (0x0016), value length: 4 bytes: 
+   87  09:45:37.479185 IP (tos 0xc0, ttl 255, id 177, offset 0, flags [none], proto GRE (47), length 64)
+    10.172.64.7 > 10.172.64.6: GREv0, Flags [key present], key=0x28, length 44
+	gre-proto-0x8909
+   88  09:45:37.479491 IP (tos 0xc0, ttl 254, id 176, offset 0, flags [none], proto GRE (47), length 28)
+    10.172.64.6 > 10.172.64.7: GREv0, Flags [key present], key=0x28, length 8
+	keep-alive
+   89  09:45:37.711799 STP 802.1d, Config, Flags [none], bridge-id 84bd.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 84bd.aa:bb:cc:00:03:00, root-pathcost 0
+   90  09:45:38.163467 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   91  09:45:38.163598 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   92  09:45:39.450836 IP (tos 0xc0, ttl 255, id 157, offset 0, flags [none], proto GRE (47), length 64)
+    10.172.64.6 > 10.172.64.7: GREv0, Flags [key present], key=0x28, length 44
+	gre-proto-0x8909
+   93  09:45:39.450920 IP (tos 0xc0, ttl 254, id 156, offset 0, flags [none], proto GRE (47), length 28)
+    10.172.64.7 > 10.172.64.6: GREv0, Flags [key present], key=0x28, length 8
+	keep-alive
+   94  09:45:39.715820 STP 802.1d, Config, Flags [none], bridge-id 84bd.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 84bd.aa:bb:cc:00:03:00, root-pathcost 0
+   95  09:45:40.166239 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   96  09:45:40.166355 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+   97  09:45:41.401880 Loopback, skipCount 0, Reply, receipt number 0, data (44 octets)
+   98  09:45:41.729147 STP 802.1d, Config, Flags [none], bridge-id 84bd.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 84bd.aa:bb:cc:00:03:00, root-pathcost 0
+   99  09:45:42.185565 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0
+  100  09:45:42.185807 STP 802.1d, Config, Flags [none], bridge-id 8001.aa:bb:cc:00:03:00.8002, length 42
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8001.aa:bb:cc:00:03:00, root-pathcost 0

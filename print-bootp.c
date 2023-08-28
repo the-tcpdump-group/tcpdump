@@ -148,7 +148,7 @@ struct bootp {
 #define	TAG_NIS_P_DOMAIN	((uint8_t)  64)
 #define	TAG_NIS_P_SERVERS	((uint8_t)  65)
 #define	TAG_MOBILE_HOME		((uint8_t)  68)
-#define	TAG_SMPT_SERVER		((uint8_t)  69)
+#define	TAG_SMTP_SERVER		((uint8_t)  69)
 #define	TAG_POP3_SERVER		((uint8_t)  70)
 #define	TAG_NNTP_SERVER		((uint8_t)  71)
 #define	TAG_WWW_SERVER		((uint8_t)  72)
@@ -194,6 +194,8 @@ struct bootp {
 /* RFC 3442 */
 #define TAG_CLASSLESS_STATIC_RT	((uint8_t) 121)
 #define TAG_CLASSLESS_STA_RT_MS	((uint8_t) 249)
+/* RFC8572 */
+#define TAG_SZTP_REDIRECT	((uint8_t) 143)
 /* RFC 5859 - TFTP Server Address Option for DHCPv4 */
 #define	TAG_TFTP_SERVER_ADDRESS	((uint8_t) 150)
 /* https://www.iana.org/assignments/bootp-dhcp-parameters/bootp-dhcp-parameters.xhtml */
@@ -211,8 +213,8 @@ struct bootp {
 #define	TAG_CLIENT_GUID		((uint8_t)  97)
 #define	TAG_LDAP_URL		((uint8_t)  95)
 /* RFC 4833, TZ codes */
-#define	TAG_TZ_PCODE    	((uint8_t) 100)
-#define	TAG_TZ_TCODE    	((uint8_t) 101)
+#define	TAG_TZ_PCODE		((uint8_t) 100)
+#define	TAG_TZ_TCODE		((uint8_t) 101)
 #define	TAG_NETINFO_PARENT	((uint8_t) 112)
 #define	TAG_NETINFO_PARENT_TAG	((uint8_t) 113)
 #define	TAG_URL			((uint8_t) 114)
@@ -303,8 +305,8 @@ bootp_print(netdissect_options *ndo,
 
 	bp_htype = GET_U_1(bp->bp_htype);
 	bp_hlen = GET_U_1(bp->bp_hlen);
-	if (bp_htype == 1 && bp_hlen == MAC_ADDR_LEN && bp_op == BOOTPREQUEST) {
-		ND_PRINT(" from %s", GET_ETHERADDR_STRING(bp->bp_chaddr));
+	if (bp_htype == 1 && bp_hlen == MAC48_LEN && bp_op == BOOTPREQUEST) {
+		ND_PRINT(" from %s", GET_MAC48_STRING(bp->bp_chaddr));
 	}
 
 	ND_PRINT(", length %u", length);
@@ -319,7 +321,7 @@ bootp_print(netdissect_options *ndo,
 		ND_PRINT(", htype %u", bp_htype);
 
 	/* The usual length for 10Mb Ethernet address is 6 bytes */
-	if (bp_htype != 1 || bp_hlen != MAC_ADDR_LEN)
+	if (bp_htype != 1 || bp_hlen != MAC48_LEN)
 		ND_PRINT(", hlen %u", bp_hlen);
 
 	/* Only print interesting fields */
@@ -352,8 +354,8 @@ bootp_print(netdissect_options *ndo,
 		ND_PRINT("\n\t  Gateway-IP %s", GET_IPADDR_STRING(bp->bp_giaddr));
 
 	/* Client's Ethernet address */
-	if (bp_htype == 1 && bp_hlen == MAC_ADDR_LEN) {
-		ND_PRINT("\n\t  Client-Ethernet-Address %s", GET_ETHERADDR_STRING(bp->bp_chaddr));
+	if (bp_htype == 1 && bp_hlen == MAC48_LEN) {
+		ND_PRINT("\n\t  Client-Ethernet-Address %s", GET_MAC48_STRING(bp->bp_chaddr));
 	}
 
 	if (GET_U_1(bp->bp_sname)) {	/* get first char only */
@@ -468,7 +470,7 @@ static const struct tok tag2str[] = {
 	{ TAG_NIS_P_DOMAIN,	"sN+D" },
 	{ TAG_NIS_P_SERVERS,	"iN+S" },
 	{ TAG_MOBILE_HOME,	"iMH" },
-	{ TAG_SMPT_SERVER,	"iSMTP" },
+	{ TAG_SMTP_SERVER,	"iSMTP" },
 	{ TAG_POP3_SERVER,	"iPOP3" },
 	{ TAG_NNTP_SERVER,	"iNNTP" },
 	{ TAG_WWW_SERVER,	"iWWW" },
@@ -506,6 +508,8 @@ static const struct tok tag2str[] = {
 /* RFC 3442 */
 	{ TAG_CLASSLESS_STATIC_RT, "$Classless-Static-Route" },
 	{ TAG_CLASSLESS_STA_RT_MS, "$Classless-Static-Route-Microsoft" },
+/* RFC 8572 */
+	{ TAG_SZTP_REDIRECT,	"$SZTP-Redirect" },
 /* RFC 5859 - TFTP Server Address Option for DHCPv4 */
 	{ TAG_TFTP_SERVER_ADDRESS, "iTFTP-Server-Address" },
 /* https://www.iana.org/assignments/bootp-dhcp-parameters/bootp-dhcp-parameters.xhtml#options */
@@ -522,8 +526,8 @@ static const struct tok tag2str[] = {
 	{ TAG_CLIENT_NDI,	"bNDI" },	/* XXX 'b' */
 	{ TAG_CLIENT_GUID,	"bGUID" },	/* XXX 'b' */
 	{ TAG_LDAP_URL,		"aLDAP" },
-	{ TAG_TZ_PCODE, 	"aPOSIX-TZ" },
-	{ TAG_TZ_TCODE, 	"aTZ-Name" },
+	{ TAG_TZ_PCODE,		"aPOSIX-TZ" },
+	{ TAG_TZ_TCODE,		"aTZ-Name" },
 	{ TAG_NETINFO_PARENT,	"iNI" },
 	{ TAG_NETINFO_PARENT_TAG, "aNITAG" },
 	{ TAG_URL,		"aURL" },
@@ -992,6 +996,39 @@ rfc1048_print(netdissect_options *ndo,
 				}
 				break;
 			    }
+
+
+			case TAG_SZTP_REDIRECT:
+				/* as per https://datatracker.ietf.org/doc/html/rfc8572#section-8.3
+				 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-...-+-+-+-+-+-+-+
+				 |        uri-length             |          URI                  |
+				 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-...-+-+-+-+-+-+-+
+
+				 * uri-length: 2 octets long; specifies the length of the URI data.
+				 * URI: URI of the SZTP bootstrap server.
+				 */
+				while (len >= 2) {
+					suboptlen = GET_BE_U_2(bp);
+					bp += 2;
+					len -= 2;
+					ND_PRINT("\n\t	    ");
+					ND_PRINT("length %u: ", suboptlen);
+					if (len < suboptlen) {
+						ND_PRINT("length goes past end of option");
+						bp += len;
+						len = 0;
+						break;
+					}
+					ND_PRINT("\"");
+					nd_printjn(ndo, bp, suboptlen);
+					ND_PRINT("\"");
+					len -= suboptlen;
+					bp += suboptlen;
+				}
+				if (len != 0) {
+					ND_PRINT("[ERROR: length < 2 bytes]");
+				}
+				break;
 
 			default:
 				ND_PRINT("[unknown special tag %u, size %u]",

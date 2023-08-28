@@ -41,10 +41,6 @@ extern size_t strlcat(char *, const char *, size_t);
 extern size_t strlcpy(char *, const char *, size_t);
 #endif
 
-#ifndef HAVE_STRDUP
-extern char *strdup(const char *);
-#endif
-
 #ifndef HAVE_STRSEP
 extern char *strsep(char **, const char *);
 #endif

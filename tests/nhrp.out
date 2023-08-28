@@ -1,0 +1,75 @@
+    1  07:19:51.987024 IP (tos 0xc0, ttl 255, id 123, offset 0, flags [none], proto GRE (47), length 128)
+    100.1.2.27 > 100.1.0.14: GREv0, Flags [none], length 108
+	NHRP: reg request, id 21, hopcnt 255, src nbma 100.1.2.27, 10.65.0.3 -> 10.65.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)
+    2  07:19:51.988481 IP (tos 0xc0, ttl 249, id 901, offset 0, flags [none], proto GRE (47), length 148)
+    100.1.0.14 > 100.1.2.27: GREv0, Flags [none], length 128
+	NHRP: reg reply, id 21, hopcnt 255, src nbma 100.1.2.27, 10.65.0.3 -> 10.65.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)
+    3  07:19:52.987348 IP (tos 0xc0, ttl 255, id 124, offset 0, flags [none], proto GRE (47), length 128)
+    100.1.2.27 > 100.1.0.14: GREv0, Flags [none], length 108
+	NHRP: reg request, id 22, hopcnt 255, src nbma 100.1.2.27, 10.65.0.3 -> 10.65.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)
+    4  07:19:52.989260 IP (tos 0xc0, ttl 249, id 902, offset 0, flags [none], proto GRE (47), length 148)
+    100.1.0.14 > 100.1.2.27: GREv0, Flags [none], length 128
+	NHRP: reg reply, id 22, hopcnt 255, src nbma 100.1.2.27, 10.65.0.3 -> 10.65.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)
+    5  07:22:55.203280 IP (tos 0xc0, ttl 255, id 1, offset 0, flags [none], proto GRE (47), length 128)
+    100.1.2.27 > 100.1.0.15: GREv0, Flags [none], length 108
+	NHRP: reg request, id 1, hopcnt 255, src nbma 100.1.2.27, 10.64.0.3 -> 10.64.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)
+    6  07:22:55.204580 IP (tos 0xc0, ttl 251, id 1778, offset 0, flags [none], proto GRE (47), length 148)
+    100.1.0.15 > 100.1.2.27: GREv0, Flags [none], length 128
+	NHRP: reg reply, id 1, hopcnt 255, src nbma 100.1.2.27, 10.64.0.3 -> 10.64.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)
+    7  07:22:55.407426 IP (tos 0xc0, ttl 255, id 1, offset 0, flags [none], proto GRE (47), length 128)
+    100.1.2.27 > 100.1.0.14: GREv0, Flags [none], length 108
+	NHRP: reg request, id 2, hopcnt 255, src nbma 100.1.2.27, 10.65.0.3 -> 10.65.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)
+    8  07:22:55.408874 IP (tos 0xc0, ttl 249, id 924, offset 0, flags [none], proto GRE (47), length 148)
+    100.1.0.14 > 100.1.2.27: GREv0, Flags [none], length 128
+	NHRP: reg reply, id 2, hopcnt 255, src nbma 100.1.2.27, 10.65.0.3 -> 10.65.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)
+    9  07:22:56.785123 IP (tos 0xc0, ttl 255, id 2, offset 0, flags [none], proto GRE (47), length 128)
+    100.1.2.27 > 100.1.0.15: GREv0, Flags [none], length 108
+	NHRP: reg request, id 1, hopcnt 255, src nbma 100.1.2.27, 10.64.0.3 -> 10.64.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)
+   10  07:22:56.786403 IP (tos 0xc0, ttl 251, id 1779, offset 0, flags [none], proto GRE (47), length 148)
+    100.1.0.15 > 100.1.2.27: GREv0, Flags [none], length 128
+	NHRP: reg reply, id 1, hopcnt 255, src nbma 100.1.2.27, 10.64.0.3 -> 10.64.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)
+   11  07:23:00.452506 IP (tos 0xc0, ttl 255, id 3, offset 0, flags [none], proto GRE (47), length 128)
+    100.1.2.27 > 100.1.0.15: GREv0, Flags [none], length 108
+	NHRP: reg request, id 1, hopcnt 255, src nbma 100.1.2.27, 10.64.0.3 -> 10.64.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)
+   12  07:23:00.453960 IP (tos 0xc0, ttl 251, id 1780, offset 0, flags [none], proto GRE (47), length 148)
+    100.1.0.15 > 100.1.2.27: GREv0, Flags [none], length 128
+	NHRP: reg reply, id 1, hopcnt 255, src nbma 100.1.2.27, 10.64.0.3 -> 10.64.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)
+   13  07:23:08.136007 IP (tos 0xc0, ttl 255, id 4, offset 0, flags [none], proto GRE (47), length 128)
+    100.1.2.27 > 100.1.0.15: GREv0, Flags [none], length 108
+	NHRP: reg request, id 1, hopcnt 255, src nbma 100.1.2.27, 10.64.0.3 -> 10.64.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)
+   14  07:23:20.172765 IP (tos 0xc0, ttl 255, id 5, offset 0, flags [none], proto GRE (47), length 128)
+    100.1.2.27 > 100.1.0.15: GREv0, Flags [none], length 108
+	NHRP: reg request, id 1, hopcnt 255, src nbma 100.1.2.27, 10.64.0.3 -> 10.64.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)
+   15  07:23:45.699548 IP (tos 0xc0, ttl 255, id 6, offset 0, flags [none], proto GRE (47), length 128)
+    100.1.2.27 > 100.1.0.15: GREv0, Flags [none], length 108
+	NHRP: reg request, id 1, hopcnt 255, src nbma 100.1.2.27, 10.64.0.3 -> 10.64.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)
+   16  07:24:33.740180 IP (tos 0xc0, ttl 255, id 7, offset 0, flags [none], proto GRE (47), length 128)
+    100.1.2.27 > 100.1.0.15: GREv0, Flags [none], length 108
+	NHRP: reg request, id 1, hopcnt 255, src nbma 100.1.2.27, 10.64.0.3 -> 10.64.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)
+   17  07:25:23.946120 IP (tos 0xc0, ttl 255, id 8, offset 0, flags [none], proto GRE (47), length 128)
+    100.1.2.27 > 100.1.0.15: GREv0, Flags [none], length 108
+	NHRP: reg request, id 1, hopcnt 255, src nbma 100.1.2.27, 10.64.0.3 -> 10.64.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)
+   18  07:26:27.340081 IP (tos 0xc0, ttl 255, id 9, offset 0, flags [none], proto GRE (47), length 128)
+    100.1.2.27 > 100.1.0.15: GREv0, Flags [none], length 108
+	NHRP: reg request, id 1, hopcnt 255, src nbma 100.1.2.27, 10.64.0.3 -> 10.64.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)
+   19  07:26:27.341463 IP (tos 0xc0, ttl 251, id 1, offset 0, flags [none], proto GRE (47), length 148)
+    100.1.0.15 > 100.1.2.27: GREv0, Flags [none], length 128
+	NHRP: reg reply, id 1, hopcnt 255, src nbma 100.1.2.27, 10.64.0.3 -> 10.64.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)
+   20  07:27:21.911625 IP (tos 0xc0, ttl 255, id 10, offset 0, flags [none], proto GRE (47), length 128)
+    100.1.2.27 > 100.1.0.15: GREv0, Flags [none], length 108
+	NHRP: reg request, id 1, hopcnt 255, src nbma 100.1.2.27, 10.64.0.3 -> 10.64.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)
+   21  07:27:21.912680 IP (tos 0xc0, ttl 251, id 11, offset 0, flags [none], proto GRE (47), length 148)
+    100.1.0.15 > 100.1.2.27: GREv0, Flags [none], length 128
+	NHRP: reg reply, id 1, hopcnt 255, src nbma 100.1.2.27, 10.64.0.3 -> 10.64.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)
+   22  07:28:23.385265 IP (tos 0xc0, ttl 255, id 11, offset 0, flags [none], proto GRE (47), length 128)
+    100.1.2.27 > 100.1.0.15: GREv0, Flags [none], length 108
+	NHRP: reg request, id 1, hopcnt 255, src nbma 100.1.2.27, 10.64.0.3 -> 10.64.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)
+   23  07:28:23.386428 IP (tos 0xc0, ttl 251, id 16, offset 0, flags [none], proto GRE (47), length 148)
+    100.1.0.15 > 100.1.2.27: GREv0, Flags [none], length 128
+	NHRP: reg reply, id 1, hopcnt 255, src nbma 100.1.2.27, 10.64.0.3 -> 10.64.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)
+   24  07:29:23.772910 IP (tos 0xc0, ttl 255, id 12, offset 0, flags [none], proto GRE (47), length 128)
+    100.1.2.27 > 100.1.0.15: GREv0, Flags [none], length 108
+	NHRP: reg request, id 1, hopcnt 255, src nbma 100.1.2.27, 10.64.0.3 -> 10.64.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)
+   25  07:29:23.774010 IP (tos 0xc0, ttl 251, id 20, offset 0, flags [none], proto GRE (47), length 148)
+    100.1.0.15 > 100.1.2.27: GREv0, Flags [none], length 128
+	NHRP: reg reply, id 1, hopcnt 255, src nbma 100.1.2.27, 10.64.0.3 -> 10.64.0.1 (code 0, pl 32, mtu 17916, htime 7200, pref 0)

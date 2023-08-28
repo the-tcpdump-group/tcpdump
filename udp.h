@@ -78,10 +78,13 @@ struct udphdr {
 #define SNMPTRAP_PORT			162	/*XXX*/
 #endif
 #ifndef PTP_EVENT_PORT
-#define PTP_EVENT_PORT	        	319 /* IANA */
+#define PTP_EVENT_PORT			319	/* IANA */
 #endif
 #ifndef PTP_GENERAL_PORT
-#define PTP_GENERAL_PORT	        320 /* IANA */
+#define PTP_GENERAL_PORT		320	/* IANA */
+#endif
+#ifndef HTTPS_PORT
+#define HTTPS_PORT			443
 #endif
 #ifndef CISCO_AUTORP_PORT
 #define CISCO_AUTORP_PORT		496	/*XXX*/
@@ -160,9 +163,6 @@ struct udphdr {
 #endif
 #ifndef MPLS_LSP_PING_PORT
 #define MPLS_LSP_PING_PORT		3503	/* draft-ietf-mpls-lsp-ping-02.txt */
-#endif
-#ifndef BCM_LI_PORT
-#define BCM_LI_PORT			49152   /* SDK default */
 #endif
 #ifndef BFD_CONTROL_PORT
 #define BFD_CONTROL_PORT		3784	/* RFC 5881 */
@@ -251,6 +251,6 @@ struct udphdr {
 #ifndef SOMEIP_PORT
 #define SOMEIP_PORT			30490	/* https://www.autosar.org/standards/foundation */
 #endif
-#ifndef HTTPS_PORT
-#define	HTTPS_PORT			443
+#ifndef BCM_LI_PORT
+#define BCM_LI_PORT			49152	/* SDK default */
 #endif

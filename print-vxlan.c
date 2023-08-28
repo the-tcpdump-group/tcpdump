@@ -27,8 +27,10 @@
 #include "netdissect.h"
 #include "extract.h"
 
+#define VXLAN_I     0x08 /* Instance Bit */
+
 static const struct tok vxlan_flags [] = {
-    { 0x08, "I" },
+    { VXLAN_I, "I" },
     { 0, NULL }
 };
 #define VXLAN_HDR_LEN 8
@@ -51,7 +53,6 @@ void
 vxlan_print(netdissect_options *ndo, const u_char *bp, u_int len)
 {
     uint8_t flags;
-    uint32_t vni;
 
     ndo->ndo_protocol = "vxlan";
     nd_print_protocol_caps(ndo);
@@ -66,9 +67,14 @@ vxlan_print(netdissect_options *ndo, const u_char *bp, u_int len)
     /* 1st Reserved */
     bp += 3;
 
-    vni = GET_BE_U_3(bp);
+    /*
+     * RFC 7348 says that the I flag MUST be set.
+     */
+    if (flags & VXLAN_I)
+        ND_PRINT("vni %u\n", GET_BE_U_3(bp));
+    else
+        ND_PRINT("ERROR: I flag not set\n");
     bp += 3;
-    ND_PRINT("vni %u\n", vni);
 
     /* 2nd Reserved */
     ND_TCHECK_1(bp);

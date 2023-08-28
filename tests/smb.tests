@@ -135,6 +135,23 @@ $testlist = [
         args   => '-vv',
     },
 
+# WCCP redirect over GRE
+    {
+        config_set   => 'ENABLE_SMB',
+        name => 'wccp_redirect_gre',
+        input => 'wccp_redirect_gre.pcap',
+        output => 'wccp_redirect_gre.out',
+        args   => '-v',
+    },
+
+    {
+        config_unset   => 'ENABLE_SMB',
+        name => 'wccp_redirect_gre-nosmb',
+        input => 'wccp_redirect_gre.pcap',
+        output => 'wccp_redirect_gre-nosmb.out',
+        args   => '-v',
+    },
+
 ];
 
 1;

@@ -125,9 +125,9 @@ struct aarp {
 	nd_uint16_t	htype, ptype;
 	nd_uint8_t	halen, palen;
 	nd_uint16_t	op;
-	nd_mac_addr	hsaddr;
+	nd_mac48	hsaddr;
 	uint8_t		psaddr[4];
-	nd_mac_addr	hdaddr;
+	nd_mac48	hdaddr;
 	uint8_t		pdaddr[4];
 };
 
@@ -271,7 +271,7 @@ aarp_print(netdissect_options *ndo,
 	ND_TCHECK_SIZE(ap);
 	if (GET_BE_U_2(ap->htype) == 1 &&
 	    GET_BE_U_2(ap->ptype) == ETHERTYPE_ATALK &&
-	    GET_U_1(ap->halen) == MAC_ADDR_LEN && GET_U_1(ap->palen) == 4)
+	    GET_U_1(ap->halen) == MAC48_LEN && GET_U_1(ap->palen) == 4)
 		switch (GET_BE_U_2(ap->op)) {
 
 		case 1:				/* request */
@@ -279,7 +279,7 @@ aarp_print(netdissect_options *ndo,
 			return;
 
 		case 2:				/* response */
-			ND_PRINT("reply %s is-at %s", AT(psaddr), GET_ETHERADDR_STRING(ap->hsaddr));
+			ND_PRINT("reply %s is-at %s", AT(psaddr), GET_MAC48_STRING(ap->hsaddr));
 			return;
 
 		case 3:				/* probe (oy!) */

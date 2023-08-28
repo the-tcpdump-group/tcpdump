@@ -1,6 +1,9 @@
-Monthday, Month DD, YYYY by gharris and denis
+DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
   Summary for 5.0.0 tcpdump release (so far!)
     Refine protocol decoding for:
+      DHCP: parse the SZTP redirect tag
+      DHCP6: parse the user class, boot file URL, and SZTP redirect
+          options
       OpenFlow 1.0: Fix indentation of PORT_MOD, improve handling of
           some lengths, and fix handling of snapend.
       RIP: Make a couple trivial protocol updates.
@@ -9,7 +12,6 @@ Monthday, Month DD, YYYY by gharris and denis
       BFD: Add support for S-BFD and spell LAG in uppercase.
       IEEE 802.11: include the Mesh ID field while printing management
         frames.
-      DNS: sync resource types with IANA.
       MPTCP: parse MPC data_len field, print flags from MP_CAPABLE option.
       ICMP: add dissector for ICMP Interface Identification Object
       BGP: Parse BGP extended message support capability
@@ -22,6 +24,10 @@ Monthday, Month DD, YYYY by gharris and denis
       BGP: Handle ORF in Route-Refresh messages
       BGP: add dissector for BGPsec capability and path
       BGP: Add Origin Validation State extended community
+      BGP: Add support for BGP Role capability and OTC attribute
+      Arista: Use the test .pcap file from pull request #955 (HwInfo).
+      NFLOG: Use correct AF code points on all OSes.
+      SNMP: Fix two undefined behaviors.
     User interface:
       Add optional unit suffix on -C file size.
       Add --print-sampling to print every Nth packet instead of all.
@@ -29,6 +35,8 @@ Monthday, Month DD, YYYY by gharris and denis
       Print the list of data link types (-L) to stdout instead of stderr.
     Source code:
       Use %zu when printing a sizeof to squelch compiler warnings
+      Remove unused missing/snprintf.c.
+      Remove unused missing/strdup.c.
       (FIXME: somebody please wrap the line below just before the release)
       AODV, AppleTalk, BOOTP, CHDLC, DCCP, EGP, EIGRP, ForCES, Geneve, GRE, Juniper, L2TP, NetFlow, NTP, OLSR, PGM, RIP, RSVP, SCTP, SNMP, TCP, UDP, vsock: Modernize packet parsing style
       DCCP, EGP: Replace custom code with tok2str()
@@ -39,9 +47,70 @@ Monthday, Month DD, YYYY by gharris and denis
       RPKI-Router: Refine length and bounds checks.
     Building and testing:
       Add a configure option to help debugging (--enable-instrument-functions)
+      autoconf: Add autogen.sh, remove configure and config.h.in and put
+        these generated files in the release tarball.
+      autoconf: Update install-sh script to the latest available version.
+      At build time require a proof of suitable snprintf(3) implementation in
+        libc (and document Solaris 9 as unsupported because of that).
+      Autoconf: Remove detection of early IPv6 stacks.
+      Detect OS IPv6 support using AF_INET6 only.
+      Fix --static-pcap-only test on Solaris 10.
 
-TBD
-  Summary for 4.99.2 tcpdump release (so far!)
+DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
+  Summary for 4.99.5 tcpdump release (so far!)
+    Source code:
+      Update ND_BYTES_BETWEEN() macro for better accuracy.
+      Update ND_BYTES_AVAILABLE_AFTER() macro for better accuracy.
+      TCP: Test ports < 1024 in port order to select the printer.
+      UDP: Move source port equal BCM_LI_PORT to bottom of long if else chain.
+      UDP: Test ports < 1024 in port order to select the printer.
+      LDP: Add missing fields of the Common Session Parameters TLV and fix the
+        offset for the A&D bits.
+      Skip privilege dropping when using -Z root on --with-user builds.
+
+Friday, April 7, 2023 / The Tcpdump Group
+  Summary for 4.99.4 tcpdump release
+    Source code:
+      Fix spaces before tabs in indentation.
+    Updated printers:
+      LSP ping: Fix "Unused value" warnings from Coverity.
+      CVE-2023-1801: Fix an out-of-bounds write in the SMB printer.
+      DNS: sync resource types with IANA.
+      ICMPv6: Update the output to show a RPL DAO field name.
+      Geneve: Fix the Geneve UDP port test.
+    Building and testing:
+      Require at least autoconf 2.69.
+      Don't check for strftime(), as it's in C90 and beyond.
+      Update config.{guess,sub}, timestamps 2023-01-01,2023-01-21.
+    Documentation:
+      man: Document TCP flag names better.
+
+Thursday, January 12, 2023 / The Tcpdump Group
+  Summary for 4.99.3 tcpdump release
+    Updated printers:
+      PTP: Use the proper values for the control field and print un-allocated
+        values for the message field as "Reserved" instead of "none".
+    Source code:
+      smbutil.c: Replace obsolete function call (asctime)
+    Building and testing:
+      cmake: Update the minimum required version to 2.8.12 (except Windows).
+      CI: Introduce and use TCPDUMP_CMAKE_TAINTED.
+      Makefile.in: Add the releasecheck target.
+      Makefile.in: Add "make -s install" in the releasecheck target.
+      Cirrus CI: Run the "make releasecheck" command in the Linux task.
+      Makefile.in: Add the whitespacecheck target.
+      Cirrus CI: Run the "make whitespacecheck" command in the Linux task.
+      Address all shellcheck warnings in update-test.sh.
+      Makefile.in: Get rid of a remain of gnuc.h.
+    Documentation:
+      Reformat the installation notes (INSTALL.txt) in Markdown.
+      Convert CONTRIBUTING to Markdown.
+      CONTRIBUTING.md: Document the use of "protocol: " in a commit summary.
+      Add a README file for NetBSD.
+      Fix CMake build to set man page section numbers in tcpdump.1
+
+Saturday, December 31, 2022 / The Tcpdump Group
+  Summary for 4.99.2 tcpdump release
     Updated printers:
       BGP: Update cease notification decoding to RFC 9003.
       BGP: decode BGP link-bandwidth extended community properly.
@@ -52,6 +121,7 @@ TBD
       EAP: fix some length checks and output issues.
       802.11: Fix the misleading comment regarding "From DS", "To DS" Frame
         Control Flags.
+      802.11: Fetch the CF and TIM IEs a field at a time.
       802.15.4, BGP, LISP: fix some length checks, compiler warnings,
         and undefined behavior warnings.
       PFLOG: handle LINKTYPE_PFLOG/DLT_PFLOG files from all OSes on all
@@ -61,10 +131,10 @@ TBD
       ICMP: redo MPLS Extension code as general ICMP Extension code.
       VQP: Do not print unknown error codes twice.
       Juniper: Add some bounds checks.
+      Juniper: Don't treat known DLT_ types as "Unknown".
       lwres: Fix a length check, update a variable type.
       EAP: Fix some undefined behaviors at runtime.
       Ethernet: Rework the length checks, add a length check.
-      ZEP: Add thren length checks.
       IPX: Add two length checks.
       Zephyr: Avoid printing non-ASCII characters.
       VRRP: Print the protocol name before any GET_().
@@ -77,7 +147,6 @@ TBD
       RESP: Fix an invalid check.
       RESP: Remove an unnecessary test.
       Arista: Refine the output format and print HwInfo.
-      EIGRP: Get the packet header fields right.
       sFlow: add support for IPv6 agent, add a length check.
       VRRP: add support for IPv6.
       OSPF: Update to match the Router Properties registry.
@@ -107,9 +176,7 @@ TBD
       Use AS_HELP_STRING macro instead of AC_HELP_STRING.
       Handle some Autoconf/make errors better.
       Fix an error when cross-compiling.
-      Fix "make releasetar" on AIX and Solaris.
       Use "git archive" for the "make releasetar" process.
-      Remove the release candidate rcX targets.
       Remove the release candidate rcX targets.
       Mend "make check" on Solaris 9 with Autoconf.
       Address assorted compiler warnings.
@@ -117,7 +184,6 @@ TBD
       Treat "msys" as Windows for test exit statuses.
       Clean up some help messages in configure.
       Use unified diff by default.
-      Improve error detection in "make releasetar".
       Remove awk code from mkdep.
       Fix configure test errors with Clang 15
       CMake: Prevent stripping of the RPATH on installation.
@@ -125,6 +191,15 @@ TBD
       Cirrus CI: Use the same configuration as for the main branch.
       CI: Add back running tcpdump -J/-L and capture, now with Cirrus VMs.
       Remove four test files (They are now in the libpcap tests directory).
+      On Solaris, for 64-bit builds, use the 64-bit pcap-config.
+      Tell CMake not to check for a C++ compiler.
+      CMake: Add a way to request -Werror and equivalents.
+      configure: Special-case macOS /usr/bin/pcap-config as we do in CMake.
+      configure: Use pcap-config --static-pcap-only if available.
+      configure: Use ac_c_werror_flag to force unknown compiler flags to fail.
+      configure: Use AC_COMPILE_IFELSE() and AC_LANG_SOURCE() for testing
+        flags.
+      Run the test that fails on OpenBSD only if we're not on OpenBSD.
     Source code:
       Fix some snapend-changing routines to protect against pointer
         underflow.
@@ -139,12 +214,17 @@ TBD
       netdissect.h: Keep the link-layer dissectors names sorted.
       setsignal(): Set SA_RESTART on non-lethal signals (REQ_INFO, FLUSH_PCAP)
         to avoid corrupting binary pcap output.
+      Use __builtin_unreachable().
+      Fail if nd_push_buffer() or nd_push_snaplen() fails.
+      Improve code style and fix many typos.
     Documentation:
       Some man page cleanups.
       Update the print interface for the packet count to stdout.
       Note that we require compilers to support at least some of C99.
       Update AIX and Solaris-related specifics.
       INSTALL.txt: Add doc/README.*, delete the deleted win32 directory.
+      Update README.md and README.Win32.md.
+      Update some comments with new RFC numbers.
 
 Wednesday, June 9, 2021 by gharris
   Summary for 4.99.1 tcpdump release
@@ -865,7 +945,7 @@ Mon.    September 10, 2007.  ken@xelerance.com.  Summary for 3.9.8 tcpdump relea
 
 Wed.	July 23, 2007.  mcr@xelerance.com.  Summary for 3.9.7 libpcap release
 
-    	NFS: Print unsigned values as such.
+	NFS: Print unsigned values as such.
 	RX: parse safely.
 	BGP: fixes for IPv6-less builds.
 	801.1ag: use standard codepoint.
@@ -903,7 +983,7 @@ Wed.	April 25, 2007. ken@xelerance.com.  Summary for 3.9.6 tcpdump release
 	 RFC 4340.
 	Add support for per-VLAN spanning tree and per-VLAN rapid spanning tree
 	Add support for Multiple-STP as per 802.1s
-	Add support for the cisco propriatry 'dynamic trunking protocol'
+	Add support for the cisco proprietary 'dynamic trunking protocol'
 	Add support for the cisco proprietary VTP protocol
 	Update dhcp6 options table as per IETF standardization activities
 
@@ -937,7 +1017,7 @@ Tue.	September 19, 2006. ken@xelerance.com. Summary for 3.9.5 tcpdump release
 	Lots of minor cosmetic changes to output printers
 
 
-Mon. 	September 19, 2005.  ken@xelerance.com. Summary for 3.9.4 tcpdump release
+Mon.	September 19, 2005.  ken@xelerance.com. Summary for 3.9.4 tcpdump release
 	Decoder support for more Juniper link-layer types
 	Fix a potential buffer overflow (although it can't occur in
 		practice).
@@ -956,7 +1036,7 @@ Mon. 	September 19, 2005.  ken@xelerance.com. Summary for 3.9.4 tcpdump release
 		those TLVs as system IDs, not as node IDs.
 	Support for DCCP.
 
-Tue. 	July 5, 2005.  ken@xelerance.com. Summary for 3.9.3 tcpdump release
+Tue.	July 5, 2005.  ken@xelerance.com. Summary for 3.9.3 tcpdump release
 
 	Option to chroot() when dropping privs
 	Fixes for compiling on nearly every platform,

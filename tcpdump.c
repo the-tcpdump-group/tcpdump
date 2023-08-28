@@ -38,7 +38,7 @@
 #endif
 
 /*
- * Some older versions of Mac OS X may ship pcap.h from libpcap 0.6 with a
+ * Some older versions of Mac OS X ship pcap.h from libpcap 0.6 with a
  * libpcap based on 0.8.  That means it has pcap_findalldevs() but the
  * header doesn't define pcap_if_t, meaning that we can't actually *use*
  * pcap_findalldevs().
@@ -796,7 +796,7 @@ droproot(const char *username, const char *chroot_dir)
 	} else
 		error("Couldn't find user '%.32s'", username);
 #ifdef HAVE_LIBCAP_NG
-	/* We don't need CAP_SETUID, CAP_SETGID and CAP_SYS_CHROOT any more. */
+	/* We don't need CAP_SETUID, CAP_SETGID and CAP_SYS_CHROOT anymore. */
 DIAG_OFF_ASSIGN_ENUM
 	capng_updatev(
 		CAPNG_DROP,
@@ -833,6 +833,8 @@ MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
         char *filename = malloc(PATH_MAX + 1);
         if (filename == NULL)
             error("%s: malloc", __func__);
+        if (strlen(orig_name) == 0)
+            error("an empty string is not a valid file name");
 
         /* Process with strftime if Gflag is set. */
         if (Gflag != 0) {
@@ -844,9 +846,25 @@ MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
           }
 
           /* There's no good way to detect an error in strftime since a return
-           * value of 0 isn't necessarily failure.
+           * value of 0 isn't necessarily failure; if orig_name is an empty
+           * string, the formatted string will be empty.
+           *
+           * However, the C90 standard says that, if there *is* a
+           * buffer overflow, the content of the buffer is undefined,
+           * so we must check for a buffer overflow.
+           *
+           * So we check above for an empty orig_name, and only call
+           * strftime() if it's non-empty, in which case the return
+           * value will only be 0 if the formatted date doesn't fit
+           * in the buffer.
+           *
+           * (We check above because, even if we don't use -G, we
+           * want a better error message than "tcpdump: : No such
+           * file or directory" for this case.)
            */
-          strftime(filename, PATH_MAX, orig_name, local_tm);
+          if (strftime(filename, PATH_MAX, orig_name, local_tm) == 0) {
+            error("%s: strftime", __func__);
+          }
         } else {
           strncpy(filename, orig_name, PATH_MAX);
         }
@@ -898,6 +916,7 @@ capdns_setup(void)
 	if (cap_dns_type_limit(capdnsloc, types, 1) < 0)
 		error("unable to limit access to system.dns service");
 	families[0] = AF_INET;
+	/* Casper is a feature of FreeBSD, which defines AF_INET6. */
 	families[1] = AF_INET6;
 	if (cap_dns_family_limit(capdnsloc, families, 2) < 0)
 		error("unable to limit access to system.dns service");
@@ -949,7 +968,7 @@ tstamp_precision_to_string(int precision)
  * along the lines of ioctl(), the fact that ioctl() operations are
  * largely specific to particular character devices but fcntl() operations
  * are either generic to all descriptors or generic to all descriptors for
- * regular files nonwithstanding.
+ * regular files notwithstanding.
  *
  * The Capsicum people decided that fine-grained control of descriptor
  * operations was required, so that you need to grant permission for
@@ -2010,14 +2029,6 @@ main(int argc, char **argv)
 		show_remote_devices_and_exit();
 #endif
 
-#if defined(DLT_LINUX_SLL2) && defined(HAVE_PCAP_SET_DATALINK)
-/* Set default linktype DLT_LINUX_SLL2 when capturing on the "any" device */
-		if (device != NULL &&
-		    strncmp (device, "any", strlen("any")) == 0
-		    && yflag_dlt == -1)
-			yflag_dlt = DLT_LINUX_SLL2;
-#endif
-
 	switch (ndo->ndo_tflag) {
 
 	case 0: /* Default */
@@ -2067,6 +2078,8 @@ main(int argc, char **argv)
 		/* Run with '-Z root' to restore old behaviour */
 		if (!username)
 			username = WITH_USER;
+		else if (strcmp(username, "root") == 0)
+			username = NULL;
 	}
 #endif
 
@@ -2270,6 +2283,21 @@ main(int argc, char **argv)
 				      pcap_datalink_val_to_name(yflag_dlt));
 			(void)fflush(stderr);
 		}
+#if defined(DLT_LINUX_SLL2) && defined(HAVE_PCAP_SET_DATALINK)
+		else {
+			/*
+			 * Attempt to set default linktype to
+			 * DLT_LINUX_SLL2 when capturing on the
+			 * "any" device.
+			 *
+			 * If the attempt fails, just quietly drive
+			 * on; this may be a non-Linux "any" device
+			 * that doesn't support DLT_LINUX_SLL2.
+			 */
+			if (strcmp(device, "any") == 0)
+				(void) pcap_set_datalink(pd, DLT_LINUX_SLL2);
+		}
+#endif
 		i = pcap_snapshot(pd);
 		if (ndo->ndo_snaplen < i) {
 			if (ndo->ndo_snaplen != 0)
@@ -2602,6 +2630,9 @@ DIAG_ON_ASSIGN_ENUM
 #else
 	cansandbox = (cansandbox && ndo->ndo_nflag);
 #endif /* HAVE_CASPER */
+	cansandbox = (cansandbox && (pcap_fileno(pd) != -1 ||
+	    RFileName != NULL));
+
 	if (cansandbox && cap_enter() < 0 && errno != ENOSYS)
 		error("unable to enter the capability mode");
 #endif	/* HAVE_CAPSICUM */
@@ -2693,6 +2724,8 @@ DIAG_ON_ASSIGN_ENUM
 					 */
 					dlt = new_dlt;
 					ndo->ndo_if_printer = get_if_printer(dlt);
+					/* Free the old filter */
+					pcap_freecode(&fcode);
 					if (pcap_compile(pd, &fcode, cmdbuf, Oflag, netmask) < 0)
 						error("%s", pcap_geterr(pd));
 				}
@@ -2815,7 +2848,7 @@ cleanup(int signo _U_)
 static void
 child_cleanup(int signo _U_)
 {
-  wait(NULL);
+  while (waitpid(-1, NULL, WNOHANG) >= 0);
 }
 #endif /* HAVE_FORK && HAVE_VFORK */
 

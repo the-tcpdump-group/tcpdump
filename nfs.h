@@ -1,4 +1,4 @@
-/*	NetBSD: nfs.h,v 1.1 1996/05/23 22:49:53 fvdl Exp 	*/
+/*	NetBSD: nfs.h,v 1.1 1996/05/23 22:49:53 fvdl Exp	*/
 
 /*
  * Copyright (c) 1989, 1993
@@ -120,8 +120,8 @@
 #define NFSX_V3SATTR		60	/* max. all fields filled in */
 #define NFSX_V3POSTOPATTR	(NFSX_V3FATTR + NFSX_UNSIGNED)
 #define NFSX_V3WCCDATA		(NFSX_V3POSTOPATTR + 8 * NFSX_UNSIGNED)
-#define NFSX_V3COOKIEVERF 	8
-#define NFSX_V3WRITEVERF 	8
+#define NFSX_V3COOKIEVERF	8
+#define NFSX_V3WRITEVERF	8
 #define NFSX_V3CREATEVERF	8
 #define NFSX_V3STATFS		52
 #define NFSX_V3FSINFO		48

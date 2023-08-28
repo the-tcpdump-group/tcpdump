@@ -1299,13 +1299,13 @@ rsvp_obj_print(netdissect_options *ndo,
                     case RSVP_GEN_UNI_SUBOBJ_DESTINATION_TNA_ADDRESS:
 
                         switch(af) {
-                        case AFNUM_INET:
+                        case AFNUM_IP:
                             if (subobj_len < 8)
                                 goto subobj_tooshort;
                             ND_PRINT("%s    UNI IPv4 TNA address: %s",
                                    indent, GET_IPADDR_STRING(obj_tptr + 4));
                             break;
-                        case AFNUM_INET6:
+                        case AFNUM_IP6:
                             if (subobj_len < 20)
                                 goto subobj_tooshort;
                             ND_PRINT("%s    UNI IPv6 TNA address: %s",

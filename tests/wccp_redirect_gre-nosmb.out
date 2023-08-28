@@ -1,0 +1,4 @@
+    1  08:50:26.794117 IP (tos 0x0, ttl 253, id 44163, offset 0, flags [none], proto GRE (47), length 268)
+    10.254.127.194 > 10.254.214.82: GREv0, Flags [none], length 248
+	wccp T:0 A:0 U:0 SId:89 Alt:0 Pri:72: IP (tos 0x0, ttl 64, id 37140, offset 0, flags [DF], proto TCP (6), length 240)
+    10.254.127.195.1291 > 10.254.108.228.445: Flags [P.], cksum 0x2909 (correct), seq 2206441866:2206442054, ack 1426770077, win 63887, options [nop,nop,TS val 40478 ecr 28035935], length 188

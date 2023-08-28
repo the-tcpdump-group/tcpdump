@@ -283,9 +283,9 @@ aoev1_mac_print(netdissect_options *ndo,
 		cp += 1;
 		len -= 1;
 		/* Ethernet Address */
-		ND_PRINT(", Ethernet Address: %s", GET_ETHERADDR_STRING(cp));
-		cp += MAC_ADDR_LEN;
-		len -= MAC_ADDR_LEN;
+		ND_PRINT(", Ethernet Address: %s", GET_MAC48_STRING(cp));
+		cp += MAC48_LEN;
+		len -= MAC48_LEN;
 	}
 	return;
 
@@ -300,7 +300,7 @@ aoev1_reserve_print(netdissect_options *ndo,
 {
 	uint8_t nmacs, i;
 
-	if (len < AOEV1_RESERVE_ARG_LEN || (len - AOEV1_RESERVE_ARG_LEN) % MAC_ADDR_LEN)
+	if (len < AOEV1_RESERVE_ARG_LEN || (len - AOEV1_RESERVE_ARG_LEN) % MAC48_LEN)
 		goto invalid;
 	/* RCmd */
 	ND_PRINT("\n\tRCmd: %s",
@@ -312,13 +312,13 @@ aoev1_reserve_print(netdissect_options *ndo,
 	cp += 1;
 	len -= 1;
 	ND_PRINT(", NMacs: %u", nmacs);
-	if (nmacs * MAC_ADDR_LEN != len)
+	if (nmacs * MAC48_LEN != len)
 		goto invalid;
 	/* addresses */
 	for (i = 0; i < nmacs; i++) {
-		ND_PRINT("\n\tEthernet Address %u: %s", i, GET_ETHERADDR_STRING(cp));
-		cp += MAC_ADDR_LEN;
-		len -= MAC_ADDR_LEN;
+		ND_PRINT("\n\tEthernet Address %u: %s", i, GET_MAC48_STRING(cp));
+		cp += MAC48_LEN;
+		len -= MAC48_LEN;
 	}
 	return;
 

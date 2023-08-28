@@ -75,7 +75,7 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		label_entry = GET_BE_U_4(p);
 		ND_PRINT("%s(label %u",
 		       (label_stack_depth && ndo->ndo_vflag) ? "\n\t" : " ",
-       		       MPLS_LABEL(label_entry));
+			MPLS_LABEL(label_entry));
 		label_stack_depth++;
 		if (ndo->ndo_vflag &&
 		    MPLS_LABEL(label_entry) < sizeof(mpls_labelname) / sizeof(mpls_labelname[0]))

@@ -214,6 +214,7 @@ os_id() {
         ;;
     Haiku)
         # Meaningful version is the substring before the plus sign.
+        # "hrev56578" stands for "R1/beta4".
         # "hrev55181" stands for "R1/beta3".
         # "hrev54154" stands for "R1/beta2".
         : "${os_id_version:=`uname -v`}"
@@ -247,6 +248,9 @@ print_so_deps() {
     case `os_id` in
     Darwin-*)
         run_after_echo otool -L "${1:?}"
+        ;;
+    Haiku-*)
+        run_after_echo objdump -p "${1:?}"
         ;;
     *)
         run_after_echo ldd "${1:?}"

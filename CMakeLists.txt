@@ -2,10 +2,11 @@ if(WIN32)
     #
     # We need 3.12 or later, so that we can set policy CMP0074; see
     # below.
+    #
     cmake_minimum_required(VERSION 3.12)
 else(WIN32)
     #
-    # For now, require only 2.8.6, just in case somebody is
+    # For now, require only 2.8.12, just in case somebody is
     # configuring with CMake on a "long-term support" version
     # of some OS and that version supplies an older version of
     # CMake.
@@ -16,7 +17,7 @@ else(WIN32)
     # environment variable when running pkg-config, to make sure
     # it finds any .pc file from there.
     #
-    cmake_minimum_required(VERSION 2.8.6)
+    cmake_minimum_required(VERSION 2.8.12)
 endif(WIN32)
 
 #
@@ -49,7 +50,7 @@ endif()
 #    $ {target-directory}/tcpdump -h
 #    {target-directory}/tcpdump: Shared object "libpcap.so.0" not found
 #
-# It also appears to be the case that, on Ubunto 22.04, FreeBSD 12,
+# It also appears to be the case that, on Ubuntu 22.04, FreeBSD 12,
 # DragonFly BSD 5.8, OpenBSD 6.6, and Solaris 11.4,
 #
 # On Ubuntu and Solaris, even if you have a libpcap in /usr/local, you
@@ -77,7 +78,7 @@ endif()
 # If, for whatever reason, directories in which we search for external
 # libraries, other than the standard system library directories, are
 # added to the executable's rpath in the build process, we most
-# defintely want them in the installed image's rpath if they are
+# definitely want them in the installed image's rpath if they are
 # necessary in order to find the libraries at run time.
 #
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -85,7 +86,13 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
 #
-# OK, this is a royal pain.
+# We explicitly indicate what languages are used in tcpdump to avoid
+# checking for a C++ compiler.
+#
+# One reason to avoid that check is that there's no need to waste
+# configuration time performing it.
+#
+# Another reason is that:
 #
 # CMake will try to determine the sizes of some data types, including
 # void *, early in the process of configuration; apparently, it's done
@@ -110,9 +117,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 # 64-bit, and Oracle Studio's C++ compiler, which will default to
 # building 32-bit, the size for C++ will win, and, again, hilarity
 # will ensue.
-#
-# So we *explicitly* state that only C is used; there is currently no
-# C++ code in tcpdump.
 #
 project(tcpdump C)
 
@@ -335,7 +339,6 @@ endif(HAVE_RPC_RPC_H)
 #
 check_function_exists(strlcat HAVE_STRLCAT)
 check_function_exists(strlcpy HAVE_STRLCPY)
-check_function_exists(strdup HAVE_STRDUP)
 check_function_exists(strsep HAVE_STRSEP)
 
 #
@@ -368,7 +371,12 @@ else(WIN32)
             if(LIBNSL_HAS_GETHOSTBYADDR)
                 set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} nsl)
             else(LIBNSL_HAS_GETHOSTBYADDR)
-                message(FATAL_ERROR "gethostbyaddr is required, but wasn't found")
+                check_library_exists(network gethostbyaddr "" LIBNETWORK_HAS_GETHOSTBYADDR)
+                if(LIBNETWORK_HAS_GETHOSTBYADDR)
+                    set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} network)
+                else(LIBNETWORK_HAS_GETHOSTBYADDR)
+                    message(FATAL_ERROR "gethostbyaddr is required, but wasn't found")
+                endif(LIBNETWORK_HAS_GETHOSTBYADDR)
             endif(LIBNSL_HAS_GETHOSTBYADDR)
         endif(LIBSOCKET_HAS_GETHOSTBYADDR)
     endif(NOT STDLIBS_HAVE_GETHOSTBYADDR)
@@ -396,22 +404,69 @@ endif(STDLIBS_HAVE_GETSERVENT)
 cmake_pop_check_state()
 
 #
-# Make sure we have vsnprintf() and snprintf(); we require them.
-# We use check_symbol_exists(), as they aren't necessarily external
-# functions - in Visual Studio, for example, they're inline functions
-# calling a common external function.
+# Make sure we have snprintf(); we require it.
+# We use check_symbol_exists(), as it isn't necessarily an external
+# function - in Visual Studio, for example, it is an inline function
+# calling an external function.
 #
-check_symbol_exists(vsnprintf "stdio.h" HAVE_VSNPRINTF)
-if(NOT HAVE_VSNPRINTF)
-    message(FATAL_ERROR "vsnprintf() is required but wasn't found")
-endif(NOT HAVE_VSNPRINTF)
 check_symbol_exists(snprintf "stdio.h" HAVE_SNPRINTF)
 if(NOT HAVE_SNPRINTF)
     message(FATAL_ERROR "snprintf() is required but wasn't found")
 endif()
 
+#
+# Require a proof of suitable snprintf(3), same as in Autoconf.
+#
+include(CheckCSourceRuns)
+check_c_source_runs("
+#include <stdio.h>
+#include <string.h>
+#include <inttypes.h>
+#include <sys/types.h>
+
+int main()
+{
+  char buf[100];
+  uint64_t t = (uint64_t)1 << 32;
+
+  snprintf(buf, sizeof(buf), \"%zu\", sizeof(buf));
+  if (strncmp(buf, \"100\", sizeof(buf)))
+    return 1;
+
+  snprintf(buf, sizeof(buf), \"%zd\", -sizeof(buf));
+  if (strncmp(buf, \"-100\", sizeof(buf)))
+    return 2;
+
+  snprintf(buf, sizeof(buf), \"%\" PRId64, -t);
+  if (strncmp(buf, \"-4294967296\", sizeof(buf)))
+    return 3;
+
+  snprintf(buf, sizeof(buf), \"0o%\" PRIo64, t);
+  if (strncmp(buf, \"0o40000000000\", sizeof(buf)))
+    return 4;
+
+  snprintf(buf, sizeof(buf), \"0x%\" PRIx64, t);
+  if (strncmp(buf, \"0x100000000\", sizeof(buf)))
+    return 5;
+
+  snprintf(buf, sizeof(buf), \"%\" PRIu64, t);
+  if (strncmp(buf, \"4294967296\", sizeof(buf)))
+    return 6;
+
+  return 0;
+}
+
+"
+    SUITABLE_SNPRINTF
+)
+if(NOT SUITABLE_SNPRINTF)
+    message(FATAL_ERROR
+"The snprintf(3) implementation in this libc is not suitable,
+tcpdump would not work correctly even if it managed to compile."
+    )
+endif()
+
 check_function_exists(getopt_long HAVE_GETOPT_LONG)
-check_function_exists(strftime HAVE_STRFTIME)
 check_function_exists(setlinebuf HAVE_SETLINEBUF)
 #
 # For Windows,  don't need to waste time checking for fork() or vfork().
@@ -577,24 +632,6 @@ cmake_pop_check_state()
 # so we use check_struct_has_member() and look for ss_family.
 #
 
-#
-# Check for IPv6 support.
-# We just check for AF_INET6 and struct in6_addr.
-#
-cmake_push_check_state()
-if(WIN32)
-    set(CMAKE_EXTRA_INCLUDE_FILES sys/types.h ws2tcpip.h)
-    check_symbol_exists(AF_INET6 "sys/types.h;ws2tcpip.h" HAVE_AF_INET6)
-else(WIN32)
-    set(CMAKE_EXTRA_INCLUDE_FILES sys/types.h sys/socket.h netinet/in.h)
-    check_symbol_exists(AF_INET6 "sys/types.h;sys/socket.h;netinet/in.h" HAVE_AF_INET6)
-endif(WIN32)
-check_type_size("struct in6_addr" HAVE_STRUCT_IN6_ADDR)
-cmake_pop_check_state()
-if(HAVE_AF_INET6 AND HAVE_STRUCT_IN6_ADDR)
-    set(HAVE_OS_IPV6_SUPPORT TRUE)
-endif(HAVE_AF_INET6 AND HAVE_STRUCT_IN6_ADDR)
-
 ######################################
 # External dependencies
 ######################################
@@ -618,6 +655,14 @@ set(CMAKE_REQUIRED_INCLUDES ${PCAP_INCLUDE_DIRS})
 # If we do, we use that to get the C99 types defined.
 #
 check_include_file(pcap/pcap-inttypes.h HAVE_PCAP_PCAP_INTTYPES_H)
+
+#
+# At compile time HAVE_PCAP_FINDALLDEVS depends on HAVE_PCAP_IF_T.
+#
+cmake_push_check_state()
+set(CMAKE_EXTRA_INCLUDE_FILES pcap.h)
+check_type_size(pcap_if_t PCAP_IF_T)
+cmake_pop_check_state()
 
 #
 # Check for various functions in libpcap/WinPcap/Npcap.
@@ -708,19 +753,6 @@ endif(HAVE_PCAP_CREATE)
 # if we have them.
 #
 check_function_exists(pcap_findalldevs HAVE_PCAP_FINDALLDEVS)
-if(HAVE_PCAP_FINDALLDEVS)
-    #
-    # Check for libpcap having pcap_findalldevs() but the pcap.h header
-    # not having pcap_if_t; some versions of Mac OS X shipped with pcap.h
-    # from 0.6 and libpcap 0.8, so that libpcap had pcap_findalldevs but
-    # pcap.h didn't have pcap_if_t.
-    #
-    cmake_push_check_state()
-    set(CMAKE_REQUIRED_INCLUDES ${PCAP_INCLUDE_DIRS})
-    set(CMAKE_EXTRA_INCLUDE_FILES pcap.h)
-    check_type_size(pcap_if_t PCAP_IF_T)
-    cmake_pop_check_state()
-endif(HAVE_PCAP_FINDALLDEVS)
 check_function_exists(pcap_dump_flush HAVE_PCAP_DUMP_FLUSH)
 check_function_exists(pcap_lib_version HAVE_PCAP_LIB_VERSION)
 if(NOT HAVE_PCAP_LIB_VERSION)
@@ -758,6 +790,7 @@ endif(NOT HAVE_PCAP_SET_PARSER_DEBUG)
 check_function_exists(pcap_set_optimizer_debug HAVE_PCAP_SET_OPTIMIZER_DEBUG)
 check_function_exists(bpf_dump HAVE_BPF_DUMP)
 
+cmake_pop_check_state()
 cmake_pop_check_state()
 
 #
@@ -959,9 +992,9 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/.devel OR EXISTS ${CMAKE_BINARY_DIR}/.devel)
         # We do *not* care whether a structure had padding added at
         # the end because of __declspec(align) - *we* don't use
         # __declspec(align), because the only structures whose layout
-        # we precisely specify are those that get overlayed on packet
+        # we precisely specify are those that get overlaid on packet
         # data, and in those every element is an array of octets so
-        # that we have full control over the size and aligmnet, and,
+        # that we have full control over the size and alignment, and,
         # apparently, jmp_buf has such a declaration on x86, meaning
         # that everything that includes netdissect.h, i.e. almost every
         # file in tcpdump, gets a warning.
@@ -1033,8 +1066,8 @@ set(NETDISSECT_SOURCE_LIST_C
     netdissect.c
     netdissect-alloc.c
     nlpid.c
-    oui.c
     ntp.c
+    oui.c
     parsenfsfh.c
     print.c
     print-802_11.c
@@ -1076,6 +1109,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-egp.c
     print-eigrp.c
     print-enc.c
+    print-erspan.c
     print-esp.c
     print-ether.c
     print-fddi.c
@@ -1128,6 +1162,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-msnlb.c
     print-nflog.c
     print-nfs.c
+    print-nhrp.c
     print-nsh.c
     print-ntp.c
     print-null.c
@@ -1205,7 +1240,7 @@ set(NETDISSECT_SOURCE_LIST_C
 #
 # Replace missing functions
 #
-foreach(FUNC strlcat strlcpy strdup strsep getservent getopt_long)
+foreach(FUNC strlcat strlcpy strsep getservent getopt_long)
     string(TOUPPER ${FUNC} FUNC_UPPERCASE)
     set(HAVE_FUNC_UPPERCASE HAVE_${FUNC_UPPERCASE})
     if(NOT ${HAVE_FUNC_UPPERCASE})
@@ -1242,6 +1277,55 @@ set(PROJECT_SOURCE_LIST_C ${NETDISSECT_SOURCE_LIST_C} ${TCPDUMP_SOURCE_LIST_C})
 file(GLOB PROJECT_SOURCE_LIST_H
     *.h
 )
+
+#
+# Assume, by default, no support for shared libraries and V7/BSD
+# convention for man pages (devices in section 4, file formats in
+# section 5, miscellaneous info in section 7, administrative commands
+# and daemons in section 8).  Individual cases can override this.
+# Individual cases can override this.
+#
+set(MAN_FILE_FORMATS 5)
+set(MAN_MISC_INFO 7)
+if(CMAKE_SYSTEM_NAME STREQUAL "AIX")
+    # Workaround to enable certain features
+    set(_SUN TRUE)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "HP-UX")
+    #
+    # Use System V conventions for man pages.
+    #
+    set(MAN_FILE_FORMATS 4)
+    set(MAN_MISC_INFO 5)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "IRIX" OR CMAKE_SYSTEM_NAME STREQUAL "IRIX64")
+    #
+    # Use IRIX conventions for man pages; they're the same as the
+    # System V conventions, except that they use section 8 for
+    # administrative commands and daemons.
+    #
+    set(MAN_FILE_FORMATS 4)
+    set(MAN_MISC_INFO 5)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "OSF1")
+    #
+    # DEC OSF/1, a/k/a Digital UNIX, a/k/a Tru64 UNIX.
+    # Use Tru64 UNIX conventions for man pages; they're the same as the
+    # System V conventions except that they use section 8 for
+    # administrative commands and daemons.
+    #
+    set(MAN_FILE_FORMATS 4)
+    set(MAN_MISC_INFO 5)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "SunOS" AND CMAKE_SYSTEM_VERSION MATCHES "5[.][0-9.]*")
+    #
+    # SunOS 5.x.
+    #
+    if(CMAKE_SYSTEM_VERSION STREQUAL "5.12")
+    else()
+        #
+        # Use System V conventions for man pages.
+        #
+        set(MAN_FILE_FORMATS 4)
+        set(MAN_MISC_INFO 5)
+    endif()
+endif()
 
 source_group("Source Files" FILES ${PROJECT_SOURCE_LIST_C})
 source_group("Header Files" FILES ${PROJECT_SOURCE_LIST_H})

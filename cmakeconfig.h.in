@@ -78,9 +78,6 @@
 /* Define to 1 if you have the <openssl/evp.h> header file. */
 #cmakedefine HAVE_OPENSSL_EVP_H 1
 
-/* define if the OS provides AF_INET6 and struct in6_addr */
-#cmakedefine HAVE_OS_IPV6_SUPPORT 1
-
 /* if there's an os_proto.h for this platform, to use additional prototypes */
 #cmakedefine HAVE_OS_PROTO_H 1
 
@@ -102,7 +99,7 @@
 /* Define to 1 if you have the `pcap_dump_flush' function. */
 #cmakedefine HAVE_PCAP_DUMP_FLUSH 1
 
-/* define if libpcap has pcap_dump_ftell() */
+/* Define to 1 if you have the `pcap_dump_ftell' function. */
 #cmakedefine HAVE_PCAP_DUMP_FTELL 1
 
 /* Define to 1 if you have the `pcap_dump_ftell64' function. */
@@ -159,9 +156,6 @@
 /* Define to 1 if you have the `pcap_wsockinit' function. */
 #cmakedefine HAVE_PCAP_WSOCKINIT 1
 
-/* Define to 1 if you have the `pfopen' function. */
-#cmakedefine HAVE_PFOPEN 1
-
 /* Define to 1 if you have the <rpc/rpcent.h> header file. */
 #cmakedefine HAVE_RPC_RPCENT_H 1
 
@@ -176,12 +170,6 @@
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #cmakedefine HAVE_STDLIB_H 1
-
-/* Define to 1 if you have the `strdup' function. */
-#cmakedefine HAVE_STRDUP 1
-
-/* Define to 1 if you have the `strftime' function. */
-#cmakedefine HAVE_STRFTIME 1
 
 /* Define to 1 if you have the <strings.h> header file. */
 #cmakedefine HAVE_STRINGS_H 1

@@ -1142,8 +1142,7 @@ fr_q933_print_ie_codeset_0_5(netdissect_options *ndo, u_int iecode,
             dlci = ((GET_U_1(p) & 0x3F) << 4) | ((GET_U_1(p + 1) & 0x78) >> 3);
             if (ielength == 4) {
                 dlci = (dlci << 6) | ((GET_U_1(p + 2) & 0x7E) >> 1);
-	    }
-            else if (ielength == 5) {
+	    } else if (ielength == 5) {
                 dlci = (dlci << 13) | (GET_U_1(p + 2) & 0x7F) | ((GET_U_1(p + 3) & 0x7E) >> 1);
 	    }
 

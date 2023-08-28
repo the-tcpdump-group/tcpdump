@@ -15,6 +15,38 @@
 
 /* \summary: Pragmatic General Multicast (PGM) printer */
 
+/* specification: RFC 3208
+
+   Plus https://dl.acm.org/doi/pdf/10.1145/347057.347390 for PGMCC,
+   whence the ACK packet type comes; there are some I-Ds for PGMCC,
+   draft-ietf-rmt-bb-pgmcc-00 through draft-ietf-rmt-bb-pgmcc-03,
+   but none of them give any description of the packet-level
+   changes to PGM, unlike the paper in question, which merely gives
+   an *insufficient* description of said changes.  In particular,
+   it doesn't indicate what the packet type code for ACK is.
+
+   Luigi Rizzo's PGMCC code for FreeBSD, at
+
+      https://web.archive.org/web/20020302084503/http://info.iet.unipi.it/~luigi/pgm-code/
+
+   uses 0x0b (11) for ACK.
+
+   A capture file attached to
+
+      https://gitlab.com/wireshark/wireshark/-/issues/4798
+
+   has packets that use 0x0d for ACK, as does the Wireshark dissector
+   for PGM, and as does OpenPGM at https://github.com/steve-o/openpgm.
+   It may be that some proprietary PGMCC implementations, such as
+   SmartPGM, do so as well.
+
+   We use *both*, treating *either one* as a PGMCC ACK, pending
+   more information, such as an answer to
+
+      https://github.com/steve-o/openpgm/issues/75.
+
+   */
+
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -96,17 +128,17 @@ struct pgm_data {
 };
 
 typedef enum _pgm_type {
-    PGM_SPM = 0,		/* source path message */
-    PGM_POLL = 1,		/* POLL Request */
-    PGM_POLR = 2,		/* POLL Response */
-    PGM_ODATA = 4,		/* original data */
-    PGM_RDATA = 5,		/* repair data */
-    PGM_NAK = 8,		/* NAK */
-    PGM_NULLNAK = 9,		/* Null NAK */
-    PGM_NCF = 10,		/* NAK Confirmation */
-    PGM_ACK = 11,		/* ACK for congestion control */
-    PGM_SPMR = 12,		/* SPM request */
-    PGM_MAX = 255
+    PGM_SPM = 0x00,		/* source path message */
+    PGM_POLL = 0x01,		/* POLL Request */
+    PGM_POLR = 0x02,		/* POLL Response */
+    PGM_ODATA = 0x04,		/* original data */
+    PGM_RDATA = 0x05,		/* repair data */
+    PGM_NAK = 0x08,		/* NAK */
+    PGM_NULLNAK = 0x09,		/* Null NAK */
+    PGM_NCF = 0x0a,		/* NAK Confirmation */
+    PGM_ACK = 0x0b,		/* ACK for congestion control? */
+    PGM_SPMR = 0x0c,		/* SPM request */
+    PGM_ACK2 = 0x0d,		/* Also ACK for congestion control? */
 } pgm_type;
 
 #define PGM_OPT_BIT_PRESENT	0x01
@@ -220,21 +252,22 @@ pgm_print(netdissect_options *ndo,
 		     pgm->pgm_gsid[3],
                      pgm->pgm_gsid[4],
                      pgm->pgm_gsid[5]);
+	bp += sizeof(struct pgm_header);
 	switch (pgm_type_val) {
 	case PGM_SPM: {
 	    const struct pgm_spm *spm;
 
-	    spm = (const struct pgm_spm *)(pgm + 1);
+	    spm = (const struct pgm_spm *)bp;
 	    ND_TCHECK_SIZE(spm);
-	    bp = (const u_char *) (spm + 1);
+	    bp += sizeof(struct pgm_spm);
 
 	    switch (GET_BE_U_2(spm->pgms_nla_afi)) {
-	    case AFNUM_INET:
+	    case AFNUM_IP:
 		ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 		addrtostr(bp, nla_buf, sizeof(nla_buf));
 		bp += sizeof(nd_ipv4);
 		break;
-	    case AFNUM_INET6:
+	    case AFNUM_IP6:
 		ND_TCHECK_LEN(bp, sizeof(nd_ipv6));
 		addrtostr6(bp, nla_buf, sizeof(nla_buf));
 		bp += sizeof(nd_ipv6);
@@ -256,17 +289,17 @@ pgm_print(netdissect_options *ndo,
 	    const struct pgm_poll *pgm_poll;
 	    uint32_t ivl, rnd, mask;
 
-	    pgm_poll = (const struct pgm_poll *)(pgm + 1);
+	    pgm_poll = (const struct pgm_poll *)bp;
 	    ND_TCHECK_SIZE(pgm_poll);
-	    bp = (const u_char *) (pgm_poll + 1);
+	    bp += sizeof(struct pgm_poll);
 
 	    switch (GET_BE_U_2(pgm_poll->pgmp_nla_afi)) {
-	    case AFNUM_INET:
+	    case AFNUM_IP:
 		ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 		addrtostr(bp, nla_buf, sizeof(nla_buf));
 		bp += sizeof(nd_ipv4);
 		break;
-	    case AFNUM_INET6:
+	    case AFNUM_IP6:
 		ND_TCHECK_LEN(bp, sizeof(nd_ipv6));
 		addrtostr6(bp, nla_buf, sizeof(nla_buf));
 		bp += sizeof(nd_ipv6);
@@ -294,33 +327,33 @@ pgm_print(netdissect_options *ndo,
 	case PGM_POLR: {
 	    const struct pgm_polr *polr_msg;
 
-	    polr_msg = (const struct pgm_polr *)(pgm + 1);
+	    polr_msg = (const struct pgm_polr *)bp;
 	    ND_TCHECK_SIZE(polr_msg);
 	    ND_PRINT("POLR seq %u round %u",
 			 GET_BE_U_4(polr_msg->pgmp_seq),
 			 GET_BE_U_2(polr_msg->pgmp_round));
-	    bp = (const u_char *) (polr_msg + 1);
+	    bp += sizeof(struct pgm_polr);
 	    break;
 	}
 	case PGM_ODATA: {
 	    const struct pgm_data *odata;
 
-	    odata = (const struct pgm_data *)(pgm + 1);
+	    odata = (const struct pgm_data *)bp;
 	    ND_PRINT("ODATA trail %u seq %u",
 			 GET_BE_U_4(odata->pgmd_trailseq),
 			 GET_BE_U_4(odata->pgmd_seq));
-	    bp = (const u_char *) (odata + 1);
+	    bp += sizeof(struct pgm_data);
 	    break;
 	}
 
 	case PGM_RDATA: {
 	    const struct pgm_data *rdata;
 
-	    rdata = (const struct pgm_data *)(pgm + 1);
+	    rdata = (const struct pgm_data *)bp;
 	    ND_PRINT("RDATA trail %u seq %u",
 			 GET_BE_U_4(rdata->pgmd_trailseq),
 			 GET_BE_U_4(rdata->pgmd_seq));
-	    bp = (const u_char *) (rdata + 1);
+	    bp += sizeof(struct pgm_data);
 	    break;
 	}
 
@@ -330,21 +363,21 @@ pgm_print(netdissect_options *ndo,
 	    const struct pgm_nak *nak;
 	    char source_buf[INET6_ADDRSTRLEN], group_buf[INET6_ADDRSTRLEN];
 
-	    nak = (const struct pgm_nak *)(pgm + 1);
+	    nak = (const struct pgm_nak *)bp;
 	    ND_TCHECK_SIZE(nak);
-	    bp = (const u_char *) (nak + 1);
+	    bp += sizeof(struct pgm_nak);
 
 	    /*
 	     * Skip past the source, saving info along the way
 	     * and stopping if we don't have enough.
 	     */
 	    switch (GET_BE_U_2(nak->pgmn_source_afi)) {
-	    case AFNUM_INET:
+	    case AFNUM_IP:
 		ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 		addrtostr(bp, source_buf, sizeof(source_buf));
 		bp += sizeof(nd_ipv4);
 		break;
-	    case AFNUM_INET6:
+	    case AFNUM_IP6:
 		ND_TCHECK_LEN(bp, sizeof(nd_ipv6));
 		addrtostr6(bp, source_buf, sizeof(source_buf));
 		bp += sizeof(nd_ipv6);
@@ -360,12 +393,12 @@ pgm_print(netdissect_options *ndo,
 	     */
 	    bp += (2 * sizeof(uint16_t));
 	    switch (GET_BE_U_2(bp)) {
-	    case AFNUM_INET:
+	    case AFNUM_IP:
 		ND_TCHECK_LEN(bp, sizeof(nd_ipv4));
 		addrtostr(bp, group_buf, sizeof(group_buf));
 		bp += sizeof(nd_ipv4);
 		break;
-	    case AFNUM_INET6:
+	    case AFNUM_IP6:
 		ND_TCHECK_LEN(bp, sizeof(nd_ipv6));
 		addrtostr6(bp, group_buf, sizeof(group_buf));
 		bp += sizeof(nd_ipv6);
@@ -396,14 +429,15 @@ pgm_print(netdissect_options *ndo,
 	    break;
 	}
 
-	case PGM_ACK: {
+	case PGM_ACK:
+	case PGM_ACK2: {
 	    const struct pgm_ack *ack;
 
-	    ack = (const struct pgm_ack *)(pgm + 1);
+	    ack = (const struct pgm_ack *)bp;
 	    ND_TCHECK_SIZE(ack);
 	    ND_PRINT("ACK seq %u",
 			 GET_BE_U_4(ack->pgma_rx_max_seq));
-	    bp = (const u_char *) (ack + 1);
+	    bp += sizeof(struct pgm_ack);
 	    break;
 	}
 
@@ -572,7 +606,7 @@ pgm_print(netdissect_options *ndo,
 		    nla_afnum = GET_BE_U_2(bp);
 		    bp += 2+2;
 		    switch (nla_afnum) {
-		    case AFNUM_INET:
+		    case AFNUM_IP:
 			if (opt_len != PGM_OPT_REDIRECT_FIXED_LEN + sizeof(nd_ipv4)) {
 			    ND_PRINT("[Bad OPT_REDIRECT option, length %u != %u + address size]",
 			        opt_len, PGM_OPT_REDIRECT_FIXED_LEN);
@@ -583,7 +617,7 @@ pgm_print(netdissect_options *ndo,
 			bp += sizeof(nd_ipv4);
 			opts_len -= PGM_OPT_REDIRECT_FIXED_LEN + sizeof(nd_ipv4);
 			break;
-		    case AFNUM_INET6:
+		    case AFNUM_IP6:
 			if (opt_len != PGM_OPT_REDIRECT_FIXED_LEN + sizeof(nd_ipv6)) {
 			    ND_PRINT("[Bad OPT_REDIRECT option, length %u != %u + address size]",
 			        opt_len, PGM_OPT_REDIRECT_FIXED_LEN);
@@ -658,7 +692,7 @@ pgm_print(netdissect_options *ndo,
 
 		case PGM_OPT_PATH_NLA:
 		    ND_PRINT(" PATH_NLA [%u]", opt_len);
-		    bp += opt_len;
+		    bp += opt_len - 2;
 		    opts_len -= opt_len;
 		    break;
 
@@ -700,7 +734,7 @@ pgm_print(netdissect_options *ndo,
 
 		case PGM_OPT_CR:
 		    ND_PRINT(" CR");
-		    bp += opt_len;
+		    bp += opt_len - 2;
 		    opts_len -= opt_len;
 		    break;
 
@@ -729,7 +763,7 @@ pgm_print(netdissect_options *ndo,
 		    nla_afnum = GET_BE_U_2(bp);
 		    bp += 2+2;
 		    switch (nla_afnum) {
-		    case AFNUM_INET:
+		    case AFNUM_IP:
 			if (opt_len != PGM_OPT_PGMCC_DATA_FIXED_LEN + sizeof(nd_ipv4)) {
 			    ND_PRINT("[Bad OPT_PGMCC_DATA option, length %u != %u + address size]",
 			        opt_len, PGM_OPT_PGMCC_DATA_FIXED_LEN);
@@ -740,7 +774,7 @@ pgm_print(netdissect_options *ndo,
 			bp += sizeof(nd_ipv4);
 			opts_len -= PGM_OPT_PGMCC_DATA_FIXED_LEN + sizeof(nd_ipv4);
 			break;
-		    case AFNUM_INET6:
+		    case AFNUM_IP6:
 			if (opt_len != PGM_OPT_PGMCC_DATA_FIXED_LEN + sizeof(nd_ipv6)) {
 			    ND_PRINT("[Bad OPT_PGMCC_DATA option, length %u != %u + address size]",
 			        opt_len, PGM_OPT_PGMCC_DATA_FIXED_LEN);
@@ -772,7 +806,7 @@ pgm_print(netdissect_options *ndo,
 		    nla_afnum = GET_BE_U_2(bp);
 		    bp += 2+2;
 		    switch (nla_afnum) {
-		    case AFNUM_INET:
+		    case AFNUM_IP:
 			if (opt_len != PGM_OPT_PGMCC_FEEDBACK_FIXED_LEN + sizeof(nd_ipv4)) {
 			    ND_PRINT("[Bad OPT_PGMCC_FEEDBACK option, length %u != %u + address size]",
 			        opt_len, PGM_OPT_PGMCC_FEEDBACK_FIXED_LEN);
@@ -783,7 +817,7 @@ pgm_print(netdissect_options *ndo,
 			bp += sizeof(nd_ipv4);
 			opts_len -= PGM_OPT_PGMCC_FEEDBACK_FIXED_LEN + sizeof(nd_ipv4);
 			break;
-		    case AFNUM_INET6:
+		    case AFNUM_IP6:
 			if (opt_len != PGM_OPT_PGMCC_FEEDBACK_FIXED_LEN + sizeof(nd_ipv6)) {
 			    ND_PRINT("[Bad OPT_PGMCC_FEEDBACK option, length %u != %u + address size]",
 			        opt_len, PGM_OPT_PGMCC_FEEDBACK_FIXED_LEN);
@@ -804,7 +838,7 @@ pgm_print(netdissect_options *ndo,
 
 		default:
 		    ND_PRINT(" OPT_%02X [%u] ", opt_type, opt_len);
-		    bp += opt_len;
+		    bp += opt_len - 2;
 		    opts_len -= opt_len;
 		    break;
 		}

@@ -84,7 +84,7 @@ dtp_print(netdissect_options *ndo, const u_char *tptr, u_int length)
 
         /* infinite loop check */
         if (len < 4 || len > length) {
-            ND_PRINT("[invalid TLV length %u]", len);
+            ND_PRINT("[TLV length %u]", len);
             goto invalid;
         }
 
@@ -104,7 +104,7 @@ dtp_print(netdissect_options *ndo, const u_char *tptr, u_int length)
 	case DTP_NEIGHBOR_TLV:
                 if (len != 10)
                     goto invalid;
-                ND_PRINT(", %s", GET_ETHERADDR_STRING(tptr+4));
+                ND_PRINT(", %s", GET_MAC48_STRING(tptr+4));
                 break;
 
         default:

@@ -1,0 +1,6 @@
+    1  07:30:12.301691 IP (tos 0xc0, ttl 255, id 10041, offset 0, flags [none], proto GRE (47), length 136)
+    155.1.79.2 > 6.6.6.6: GREv0, Flags [key present], key=0x2, length 116
+	NHRP: reg request, id 300, hopcnt 255, src nbma 155.1.79.2, 155.1.0.9 -> 155.1.0.6 (code 0, pl 32, mtu 17912, htime 7200, pref 0)
+    2  07:30:12.304575 IP (tos 0xc0, ttl 254, id 19697, offset 0, flags [none], proto GRE (47), length 156)
+    6.6.6.6 > 155.1.79.2: GREv0, Flags [key present], key=0x2, length 136
+	NHRP: reg reply, id 300, hopcnt 255, src nbma 155.1.79.2, 155.1.0.9 -> 155.1.0.6 (code 0, pl 32, mtu 17912, htime 7200, pref 0)

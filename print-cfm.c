@@ -114,8 +114,8 @@ struct cfm_lbm_t {
 struct cfm_ltm_t {
     nd_uint32_t transaction_id;
     nd_uint8_t  ttl;
-    nd_mac_addr original_mac;
-    nd_mac_addr target_mac;
+    nd_mac48 original_mac;
+    nd_mac48 target_mac;
 };
 
 static const struct tok cfm_ltm_flag_values[] = {
@@ -239,7 +239,7 @@ cfm_network_addr_print(netdissect_options *ndo,
      * Resolve the passed in Address.
      */
     switch(network_addr_type) {
-    case AFNUM_INET:
+    case AFNUM_IP:
         if (length != 1 + 4) {
             ND_PRINT("(invalid IPv4 address length %u)", length - 1);
             hexdump = TRUE;
@@ -248,7 +248,7 @@ cfm_network_addr_print(netdissect_options *ndo,
         ND_PRINT(", %s", GET_IPADDR_STRING(tptr + 1));
         break;
 
-    case AFNUM_INET6:
+    case AFNUM_IP6:
         if (length != 1 + 16) {
             ND_PRINT("(invalid IPv6 address length %u)", length - 1);
             hexdump = TRUE;
@@ -405,8 +405,8 @@ cfm_print(netdissect_options *ndo,
                 break;
 
             case CFM_CCM_MD_FORMAT_MAC:
-                if (md_namelength == MAC_ADDR_LEN) {
-                    ND_PRINT("\n\t  MAC %s", GET_ETHERADDR_STRING(md_name));
+                if (md_namelength == MAC48_LEN) {
+                    ND_PRINT("\n\t  MAC %s", GET_MAC48_STRING(md_name));
                 } else {
                     ND_PRINT("\n\t  MAC (length invalid)");
                 }
@@ -484,8 +484,8 @@ cfm_print(netdissect_options *ndo,
                GET_U_1(msg_ptr.cfm_ltm->ttl));
 
         ND_PRINT("\n\t  Original-MAC %s, Target-MAC %s",
-               GET_ETHERADDR_STRING(msg_ptr.cfm_ltm->original_mac),
-               GET_ETHERADDR_STRING(msg_ptr.cfm_ltm->target_mac));
+               GET_MAC48_STRING(msg_ptr.cfm_ltm->original_mac),
+               GET_MAC48_STRING(msg_ptr.cfm_ltm->target_mac));
         break;
 
     case CFM_OPCODE_LTR:
@@ -640,12 +640,12 @@ cfm_print(netdissect_options *ndo,
                 /* IEEE 802.1Q-2014 Section 21.5.3.3: Chassis ID */
                 switch (chassis_id_type) {
                 case CFM_CHASSIS_ID_MAC_ADDRESS:
-                    if (chassis_id_length != MAC_ADDR_LEN) {
+                    if (chassis_id_length != MAC48_LEN) {
                         ND_PRINT(" (invalid MAC address length)");
                         hexdump = TRUE;
                         break;
                     }
-                    ND_PRINT("\n\t  MAC %s", GET_ETHERADDR_STRING(tptr + 1));
+                    ND_PRINT("\n\t  MAC %s", GET_MAC48_STRING(tptr + 1));
                     break;
 
                 case CFM_CHASSIS_ID_NETWORK_ADDRESS:

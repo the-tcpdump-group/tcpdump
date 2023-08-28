@@ -10,13 +10,18 @@
 : "${CRYPTO:=no}"
 : "${SMB:=no}"
 : "${TCPDUMP_TAINTED:=no}"
+: "${TCPDUMP_CMAKE_TAINTED:=no}"
 : "${MAKE_BIN:=make}"
+# At least one OS (AIX 7) where this software can build does not have at least
+# one command (mktemp) required for a successful run of "make releasetar".
+: "${TEST_RELEASETAR:=yes}"
 
 . ./build_common.sh
 # Install directory prefix
 if [ -z "$PREFIX" ]; then
     PREFIX=`mktempdir tcpdump_build`
     echo "PREFIX set to '$PREFIX'"
+    DELETE_PREFIX=yes
 fi
 TCPDUMP_BIN="$PREFIX/bin/tcpdump"
 # For TESTrun
@@ -42,14 +47,22 @@ esac
 
 [ "$TCPDUMP_TAINTED" != yes ] && CFLAGS=`cc_werr_cflags`
 
+# If necessary, set TCPDUMP_CMAKE_TAINTED here to exempt particular cmake from
+# warnings. Use as specific terms as possible (e.g. some specific version and
+# some specific OS).
+
+[ "$TCPDUMP_CMAKE_TAINTED" != yes ] && CMAKE_OPTIONS='-Werror=dev'
+
 if [ "$CMAKE" = no ]; then
     if [ "$BUILD_LIBPCAP" = yes ]; then
         echo "Using PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
+        run_after_echo ./autogen.sh
         run_after_echo ./configure --with-crypto="$CRYPTO" \
             --enable-smb="$SMB" --prefix="$PREFIX"
         LD_LIBRARY_PATH="$PREFIX/lib"
         export LD_LIBRARY_PATH
     else
+        run_after_echo ./autogen.sh
         run_after_echo ./configure --with-crypto="$CRYPTO" \
             --enable-smb="$SMB" --prefix="$PREFIX" --disable-local-libpcap
     fi
@@ -59,13 +72,15 @@ else
     run_after_echo mkdir build
     run_after_echo cd build
     if [ "$BUILD_LIBPCAP" = yes ]; then
-        run_after_echo cmake -DWITH_CRYPTO="$CRYPTO" -DENABLE_SMB="$SMB" \
+        run_after_echo cmake "$CMAKE_OPTIONS" \
+            -DWITH_CRYPTO="$CRYPTO" -DENABLE_SMB="$SMB" \
             ${CFLAGS:+-DEXTRA_CFLAGS="$CFLAGS"} \
             -DCMAKE_INSTALL_PREFIX="$PREFIX" -DCMAKE_PREFIX_PATH="$PREFIX" ..
         LD_LIBRARY_PATH="$PREFIX/lib"
         export LD_LIBRARY_PATH
     else
-        run_after_echo cmake -DWITH_CRYPTO="$CRYPTO" -DENABLE_SMB="$SMB" \
+        run_after_echo cmake "$CMAKE_OPTIONS" \
+            -DWITH_CRYPTO="$CRYPTO" -DENABLE_SMB="$SMB" \
              ${CFLAGS:+-DEXTRA_CFLAGS="$CFLAGS"} \
             -DCMAKE_INSTALL_PREFIX="$PREFIX" ..
     fi
@@ -100,7 +115,7 @@ if [ "$BUILD_LIBPCAP" = yes ]; then
     run_after_echo "$MAKE_BIN" check
 fi
 if [ "$CMAKE" = no ]; then
-    run_after_echo "$MAKE_BIN" releasetar
+    [ "$TEST_RELEASETAR" = yes ] && run_after_echo "$MAKE_BIN" releasetar
 fi
 if [ "$CIRRUS_CI" = true ]; then
     run_after_echo sudo \

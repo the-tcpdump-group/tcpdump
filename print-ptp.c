@@ -158,7 +158,7 @@
  *    | Requesting Port Identity      |
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
- *  Signalling Message (msg type=0xC)
+ *  Signaling Message (msg type=0xC)
  *     0                   1                   2                   3
  *     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  *                                    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -176,33 +176,54 @@
  *
  */
 
+/* Values from IEEE1588-2008: 13.3.2.2 messageType (Enumeration4) */
 #define M_SYNC                  0x0
 #define M_DELAY_REQ             0x1
 #define M_PDELAY_REQ            0x2
 #define M_PDELAY_RESP           0x3
-#define M_OTHER                 0x5
 #define M_FOLLOW_UP             0x8
 #define M_DELAY_RESP            0x9
 #define M_PDELAY_RESP_FOLLOW_UP 0xA
 #define M_ANNOUNCE              0xB
-#define M_SIGNALLING            0xC
+#define M_SIGNALING             0xC
 #define M_MANAGEMENT            0xD
 
 static const struct tok ptp_msg_type[] = {
-    { M_SYNC ,"sync msg"},
-    { M_DELAY_REQ ,"delay req msg"},
-    { M_PDELAY_REQ ,"peer delay req msg"},
-    { M_PDELAY_RESP ,"peer delay resp msg"},
-    { M_OTHER, "Other"},
-    { M_FOLLOW_UP ,"follow up msg"},
-    { M_DELAY_RESP ,"delay resp msg"},
-    { M_PDELAY_RESP_FOLLOW_UP ,"pdelay resp fup msg"},
-    { M_ANNOUNCE ,"announce msg"},
-    { M_SIGNALLING ,"signalling msg"},
-    { M_MANAGEMENT ,"management msg"},
+    { M_SYNC, "sync msg"},
+    { M_DELAY_REQ, "delay req msg"},
+    { M_PDELAY_REQ, "peer delay req msg"},
+    { M_PDELAY_RESP, "peer delay resp msg"},
+    { M_FOLLOW_UP, "follow up msg"},
+    { M_DELAY_RESP, "delay resp msg"},
+    { M_PDELAY_RESP_FOLLOW_UP, "pdelay resp fup msg"},
+    { M_ANNOUNCE, "announce msg"},
+    { M_SIGNALING, "signaling msg"},
+    { M_MANAGEMENT, "management msg"},
     { 0, NULL}
 };
 
+/* Values from IEEE1588-2008: 13.3.2.10 controlField (UInteger8) */
+/*
+ * The use of this field by the receiver is deprecated.
+ * NOTE-This field is provided for compatibility with hardware designed
+ * to conform to version 1 of this standard.
+ */
+#define C_SYNC              0x0
+#define C_DELAY_REQ         0x1
+#define C_FOLLOW_UP         0x2
+#define C_DELAY_RESP        0x3
+#define C_MANAGEMENT        0x4
+#define C_OTHER             0x5
+
+static const struct tok ptp_control_field[] = {
+    { C_SYNC, "Sync"},
+    { C_DELAY_REQ, "Delay_Req"},
+    { C_FOLLOW_UP, "Follow_Up"},
+    { C_DELAY_RESP, "Delay_Resp"},
+    { C_MANAGEMENT, "Management"},
+    { C_OTHER, "Other"},
+    { 0, NULL}
+};
 
 #define PTP_TRUE 1
 #define PTP_FALSE !PTP_TRUE
@@ -210,8 +231,9 @@ static const struct tok ptp_msg_type[] = {
 #define PTP_HDR_LEN         0x22
 
 /* mask based on the first byte */
-#define PTP_VERS_MASK       0xFF
-#define PTP_V1_COMPAT       0x10
+#define PTP_MAJOR_VERS_MASK 0x0F
+#define PTP_MINOR_VERS_MASK 0xF0
+#define PTP_MAJOR_SDO_ID_MASK   0xF0
 #define PTP_MSG_TYPE_MASK   0x0F
 
 /*mask based 2byte */
@@ -236,28 +258,22 @@ static const struct tok ptp_msg_type[] = {
 #define PTP_SECURITY_MASK           0x4000
 #define PTP_FLAGS_UNKNOWN_MASK      0x18C0
 
-
 static const struct tok ptp_flag_values[] = {
-    { PTP_L161_MASK ,"l1 61"},
-    { PTP_L1_59_MASK ,"l1 59"},
-    { PTP_UTC_REASONABLE_MASK ,"utc reasonable"},
-    { PTP_TIMESCALE_MASK ,"timescale"},
-    { PTP_TIME_TRACABLE_MASK ,"time tracable"},
-    { PTP_FREQUENCY_TRACABLE_MASK ,"frequency tracable"},
-    { PTP_ALTERNATE_MASTER_MASK ,"alternate master"},
-    { PTP_TWO_STEP_MASK ,"two step"},
-    { PTP_UNICAST_MASK ,"unicast"},
-    { PTP_PROFILE_SPEC_1_MASK ,"profile specific 1"},
-    { PTP_PROFILE_SPEC_2_MASK ,"profile specific 2"},
-    { PTP_SECURITY_MASK ,"security mask"},
-    { PTP_FLAGS_UNKNOWN_MASK , "unknown"},
+    { PTP_L161_MASK, "l1 61"},
+    { PTP_L1_59_MASK, "l1 59"},
+    { PTP_UTC_REASONABLE_MASK, "utc reasonable"},
+    { PTP_TIMESCALE_MASK, "timescale"},
+    { PTP_TIME_TRACABLE_MASK, "time tracable"},
+    { PTP_FREQUENCY_TRACABLE_MASK, "frequency tracable"},
+    { PTP_ALTERNATE_MASTER_MASK, "alternate master"},
+    { PTP_TWO_STEP_MASK, "two step"},
+    { PTP_UNICAST_MASK, "unicast"},
+    { PTP_PROFILE_SPEC_1_MASK, "profile specific 1"},
+    { PTP_PROFILE_SPEC_2_MASK, "profile specific 2"},
+    { PTP_SECURITY_MASK, "security mask"},
+    { PTP_FLAGS_UNKNOWN_MASK,  "unknown"},
     {0, NULL}
 };
-
-#define PTP_PRINT_MSG_TYPE(e) \
-        { \
-            ND_PRINT("(%s)", tok2str(ptp_msg_type, "unknown", e)); \
-        }
 
 static const char *p_porigin_ts = "preciseOriginTimeStamp";
 static const char *p_origin_ts = "originTimeStamp";
@@ -271,8 +287,6 @@ static const char *p_recv_ts = "receiveTimeStamp";
 #define PTP_UINT32_LEN sizeof(uint32_t)
 #define PTP_6BYTES_LEN sizeof(uint32_t)+sizeof(uint16_t)
 #define PTP_UINT64_LEN sizeof(uint64_t)
-
-
 
 static void ptp_print_1(netdissect_options *ndo);
 static void ptp_print_2(netdissect_options *ndo, const u_char *bp, u_int len);
@@ -345,17 +359,17 @@ ptp_print_2(netdissect_options *ndo, const u_char *bp, u_int length)
 {
     u_int len = length;
     uint16_t msg_len, flags, port_id, seq_id;
-    uint8_t foct, domain_no, msg_type, v1_compat, rsvd1, lm_int, control;
+    uint8_t foct, domain_no, msg_type, major_sdo_id, rsvd1, lm_int, control;
     uint64_t ns_corr;
     uint16_t sns_corr;
     uint32_t rsvd2;
     uint64_t clk_id;
 
     foct = GET_U_1(bp);
-    v1_compat = foct & PTP_V1_COMPAT;
-    ND_PRINT(", v1 compat : %s", v1_compat?"yes":"no");
+    major_sdo_id = (foct & PTP_MAJOR_SDO_ID_MASK) >> 4;
+    ND_PRINT(", majorSdoId : 0x%x", major_sdo_id);
     msg_type = foct & PTP_MSG_TYPE_MASK;
-    ND_PRINT(", msg type : %s", tok2str(ptp_msg_type, "none", msg_type));
+    ND_PRINT(", msg type : %s", tok2str(ptp_msg_type, "Reserved", msg_type));
 
     /* msg length */
     len -= 2; bp += 2; msg_len = GET_BE_U_2(bp); ND_PRINT(", length : %u", msg_len);
@@ -390,7 +404,7 @@ ptp_print_2(netdissect_options *ndo, const u_char *bp, u_int length)
 
     /* control */
     len -= 2; bp += 2; control = GET_U_1(bp) ;
-    ND_PRINT(", control : %u (%s)", control, tok2str(ptp_msg_type, "none", control));
+    ND_PRINT(", control : %u (%s)", control, tok2str(ptp_control_field, "Reserved", control));
 
     /* log message interval */
     lm_int = GET_BE_U_2(bp) & PTP_LOGMSG_MASK; ND_PRINT(", log message interval : %u", lm_int); len -= 2; bp += 2;
@@ -420,7 +434,7 @@ ptp_print_2(netdissect_options *ndo, const u_char *bp, u_int length)
         case M_ANNOUNCE:
             ptp_print_announce_msg(ndo, bp, &len);
             break;
-        case M_SIGNALLING:
+        case M_SIGNALING:
             ptp_print_port_id(ndo, bp, &len);
             break;
         case M_MANAGEMENT:
@@ -436,13 +450,25 @@ ptp_print_2(netdissect_options *ndo, const u_char *bp, u_int length)
 void
 ptp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
-    u_int vers;
+    u_int major_vers;
+    u_int minor_vers;
 
+    /* In 1588-2019, a minorVersionPTP field has been created in the common PTP
+     * message header, from a previously reserved field. Implementations
+     * compatible to the 2019 edition shall indicate a versionPTP field value
+     * of 2 and minorVersionPTP field value of 1, indicating that this is PTP
+     * version 2.1.
+     */
     ndo->ndo_protocol = "ptp";
     ND_ICHECK_U(length, <, PTP_HDR_LEN);
-    vers = GET_BE_U_2(bp) & PTP_VERS_MASK;
-    ND_PRINT("PTPv%u",vers);
-    switch(vers) {
+    major_vers = GET_BE_U_2(bp) & PTP_MAJOR_VERS_MASK;
+    minor_vers = (GET_BE_U_2(bp) & PTP_MINOR_VERS_MASK) >> 4;
+    if (minor_vers)
+	    ND_PRINT("PTPv%u.%u", major_vers, minor_vers);
+    else
+	    ND_PRINT("PTPv%u", major_vers);
+
+    switch(major_vers) {
         case PTP_VER_1:
             ptp_print_1(ndo);
             break;

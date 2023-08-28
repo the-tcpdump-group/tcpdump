@@ -198,7 +198,7 @@ rip_entry_print_v1(netdissect_options *ndo, const u_char *p,
 	ND_ICHECKMSG_U("remaining data length", remaining, <, RIP_ROUTELEN);
 	ND_TCHECK_SIZE(ni);
 	family = GET_BE_U_2(ni->rip_family);
-	if (family != BSD_AFNUM_INET && family != 0) {
+	if (family != BSD_AF_INET && family != 0) {
 		ND_PRINT("\n\t AFI %s, ", tok2str(bsd_af_values, "Unknown (%u)", family));
 		print_unknown_data(ndo, p + sizeof(*eh), "\n\t  ", RIP_ROUTELEN - sizeof(*eh));
 		return (RIP_ROUTELEN);
@@ -215,7 +215,7 @@ rip_entry_print_v1(netdissect_options *ndo, const u_char *p,
 			 GET_IPADDR_STRING(ni->rip_dest),
 			 GET_BE_U_4(ni->rip_metric));
 		return (RIP_ROUTELEN);
-	} /* BSD_AFNUM_INET */
+	} /* BSD_AF_INET */
 	ND_PRINT("\n\t  %s, metric: %u",
 		 GET_IPADDR_STRING(ni->rip_dest),
 		 GET_BE_U_4(ni->rip_metric));
@@ -268,10 +268,10 @@ rip_entry_print_v2(netdissect_options *ndo, const u_char *p,
 			print_unknown_data(ndo, p, "\n\t  ", remaining);
 			return (sizeof(*eh) + remaining); /* we don't know how long this is, so we go to the packet end */
 		}
-	} else if (family != BSD_AFNUM_INET && family != 0) {
+	} else if (family != BSD_AF_INET && family != 0) {
 		ND_PRINT("\n\t  AFI %s", tok2str(bsd_af_values, "Unknown (%u)", family));
 		print_unknown_data(ndo, p + sizeof(*eh), "\n\t  ", RIP_ROUTELEN - sizeof(*eh));
-	} else { /* BSD_AFNUM_INET or AFI 0 */
+	} else { /* BSD_AF_INET or AFI 0 */
 		ni = (const struct rip_netinfo_v2 *)p;
 		ND_ICHECKMSG_ZU("remaining data length", remaining, <,
 				sizeof(*ni));
@@ -385,7 +385,7 @@ rip_print(netdissect_options *ndo,
 		break;
 	}
 	/* do we want to see an additionally hexdump ? */
-	if (ndo->ndo_vflag> 1) {
+	if (ndo->ndo_vflag > 1 && ND_TTEST_LEN(p, len)) {
 		if (!print_unknown_data(ndo, p, "\n\t", len))
 			return;
 	}

@@ -146,12 +146,12 @@ enc_if_print(netdissect_options *ndo,
 	p += ENC_HDRLEN;
 
 	switch (af) {
-	case BSD_AFNUM_INET:
+	case BSD_AF_INET:
 		ip_print(ndo, p, length);
 		break;
-	case BSD_AFNUM_INET6_BSD:
-	case BSD_AFNUM_INET6_FREEBSD:
-	case BSD_AFNUM_INET6_DARWIN:
+	case BSD_AF_INET6_BSD:
+	case BSD_AF_INET6_FREEBSD:
+	case BSD_AF_INET6_DARWIN:
 		ip6_print(ndo, p, length);
 		break;
 	}

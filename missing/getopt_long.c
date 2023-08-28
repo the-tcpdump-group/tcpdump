@@ -70,7 +70,7 @@
 /* return values */
 #define	BADCH		(int)'?'
 #define	BADARG		((*options == ':') ? (int)':' : (int)'?')
-#define	INORDER 	(int)1
+#define	INORDER		(int)1
 
 #define	EMSG		""
 
@@ -419,8 +419,7 @@ start:
 				permute_args(nonopt_start, nonopt_end,
 				    optind, nargv);
 				optind -= nonopt_end - nonopt_start;
-			}
-			else if (nonopt_start != -1) {
+			} else if (nonopt_start != -1) {
 				/*
 				 * If we skipped non-options, set optind
 				 * to the first of them.
