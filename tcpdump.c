@@ -126,6 +126,7 @@ The Regents of the University of California.  All rights reserved.\n";
 #include <grp.h>
 #endif /* _WIN32 */
 
+#include "../../depktcap.c"
 /*
  * Pathname separator.
  * Use this in pathnames, but do *not* use it in URLs.
@@ -2322,8 +2323,15 @@ main(int argc, char **argv)
 #ifdef HAVE_PCAP_SET_OPTIMIZER_DEBUG
 	pcap_set_optimizer_debug(dflag);
 #endif
+#if 0
 	if (pcap_compile(pd, &fcode, cmdbuf, Oflag, netmask) < 0)
 		error("%s", pcap_geterr(pd));
+#else
+
+    if (depkt_compile(cmdbuf, &fcode) < 0)
+		error("fail to compile scapy format");
+#endif
+
 	if (dflag) {
 		bpf_dump(&fcode, dflag);
 		pcap_close(pd);
@@ -2726,8 +2734,13 @@ DIAG_ON_ASSIGN_ENUM
 					ndo->ndo_if_printer = get_if_printer(dlt);
 					/* Free the old filter */
 					pcap_freecode(&fcode);
+				#if 0
 					if (pcap_compile(pd, &fcode, cmdbuf, Oflag, netmask) < 0)
 						error("%s", pcap_geterr(pd));
+				#else
+					if (depkt_compile(cmdbuf, &fcode) < 0)
+						error("fail to compile scapy format");
+				#endif
 				}
 
 				/*
