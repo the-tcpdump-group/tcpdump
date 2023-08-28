@@ -896,7 +896,7 @@ get_next_file(FILE *VFile, char *ptr)
 }
 
 static int
-open_pcap_file(const char *path, const netdissect_options *ndo)
+open_pcap_file(const char *path, const netdissect_options *ndo _U_)
 {
 	int dlt;
 	const char *dlt_name;
