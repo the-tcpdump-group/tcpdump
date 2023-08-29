@@ -1,2 +1,2 @@
-    1  06:15:22.659099000 1.0 Mb/s 2412 MHz 11b 100 sq antenna 0 57dB signal DeAuthentication (00:0d:93:82:36:3a): Reserved
-    2  06:15:22.659099000 1.0 Mb/s 2412 MHz 11b 100 sq antenna 0 57dB signal DeAuthentication (00:0d:93:82:36:3a): Reserved
+    1  01:10:59.680304000 IP 48.48.48.48.69 > 48.48.48.48.12336: TFTP, length 12308, RRQ "00" [|tftp]
+    2  01:10:59.680304000 IP 48.48.48.48.69 > 48.48.48.48.12336: TFTP, length 12308, RRQ "00" [|tftp]
