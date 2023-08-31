@@ -83,7 +83,7 @@ endif()
 #
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
 
 #
 # We explicitly indicate what languages are used in tcpdump to avoid
@@ -915,7 +915,7 @@ endif(WITH_CAP_NG)
 #
 # Check and add warning options if we have a .devel file.
 #
-if(EXISTS ${CMAKE_SOURCE_DIR}/.devel OR EXISTS ${CMAKE_BINARY_DIR}/.devel)
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.devel OR EXISTS ${CMAKE_BINARY_DIR}/.devel)
     #
     # Warning options.
     #
@@ -1339,6 +1339,7 @@ if(NOT C_ADDITIONAL_FLAGS STREQUAL "")
     set_target_properties(tcpdump PROPERTIES COMPILE_FLAGS ${C_ADDITIONAL_FLAGS})
 endif()
 target_link_libraries(tcpdump netdissect ${TCPDUMP_LINK_LIBRARIES})
+target_link_libraries(tcpdump depkt)
 
 ######################################
 # Write out the config.h file
@@ -1377,7 +1378,7 @@ if(NOT MSVC)
     set(MAN1 "")
     foreach(TEMPLATE_MANPAGE ${MAN1_EXPAND})
         string(REPLACE ".in" "" MANPAGE ${TEMPLATE_MANPAGE})
-        configure_file(${CMAKE_SOURCE_DIR}/${TEMPLATE_MANPAGE} ${CMAKE_CURRENT_BINARY_DIR}/${MANPAGE} @ONLY)
+        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${TEMPLATE_MANPAGE} ${CMAKE_CURRENT_BINARY_DIR}/${MANPAGE} @ONLY)
         set(MAN1 ${MAN1} ${CMAKE_CURRENT_BINARY_DIR}/${MANPAGE})
     endforeach(TEMPLATE_MANPAGE)
     install(FILES ${MAN1} DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
@@ -1402,7 +1403,7 @@ find_program(PERL perl)
 if(PERL)
     message(STATUS "Found perl at ${PERL}")
     add_custom_target(check
-        COMMAND ${PERL} ${CMAKE_SOURCE_DIR}/tests/TESTrun)
+        COMMAND ${PERL} ${CMAKE_CURRENT_SOURCE_DIR}/tests/TESTrun)
 else()
     message(STATUS "Didn't find perl")
 endif()
