@@ -1,6 +1,6 @@
     1  02:25:41.663606 IP (tos 0x10, ttl 64, id 63177, offset 0, flags [DF], proto TCP (6), length 168)
     204.9.54.80.22 > 204.9.51.132.50079: Flags [P.], cksum 0x0282 (incorrect -> 0x3217), seq 1819218606:1819218722, ack 1238485076, win 1039, options [nop,nop,TS val 1340592078 ecr 941371882], length 116
-    2  17:19:33.672232 IP6, wrong link-layer encapsulation (invalid)
+    2  17:19:33.672232 IP  [version 6 != 4] (invalid)
     3  17:19:33.684826 IP (tos 0x10, ttl 62, id 62920, offset 0, flags [DF], proto TCP (6), length 52, bad cksum 4504 (->451a)!)
     204.9.51.132.50079 > 204.243.53.80.22: Flags [.], cksum 0x858b (incorrect -> 0x85a1), ack 1819218722, win 4092, options [nop,nop,TS val 941371913 ecr 1340592084], length 0
     4  17:19:33.703499 IP (tos 0x0, ttl 64, id 63178, offset 0, flags [DF], proto TCP (6), length 52, bad cksum 3e8c (->438c)!)

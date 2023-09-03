@@ -332,16 +332,13 @@ ip_print(netdissect_options *ndo,
 
 	ndo->ndo_protocol = "ip";
 	ip = (const struct ip *)bp;
-	if (IP_V(ip) != 4) { /* print version and fail if != 4 */
-	    if (IP_V(ip) == 6)
-	      ND_PRINT("IP6, wrong link-layer encapsulation");
-	    else
-	      ND_PRINT("IP%u", IP_V(ip));
-	    nd_print_invalid(ndo);
-	    return;
+
+	if (!ndo->ndo_eflag) {
+		nd_print_protocol_caps(ndo);
+		ND_PRINT(" ");
 	}
-	if (!ndo->ndo_eflag)
-		ND_PRINT("IP ");
+
+	ND_ICHECKMSG_U("version", IP_V(ip), !=, 4);
 
 	ND_TCHECK_SIZE(ip);
 	if (length < sizeof (struct ip)) {
@@ -512,6 +509,10 @@ ip_print(netdissect_options *ndo,
 
 trunc:
 	nd_print_trunc(ndo);
+	return;
+
+invalid:
+	nd_print_invalid(ndo);
 }
 
 void
