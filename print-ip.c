@@ -343,12 +343,14 @@ ip_print(netdissect_options *ndo,
 
 	hlen = IP_HL(ip) * 4;
 	ND_ICHECKMSG_ZU("header length", hlen, <, sizeof (struct ip));
-	ND_TCHECK_SIZE(ip);
 
 	len = GET_BE_U_2(ip->ip_len);
-	if (length < len)
-		ND_PRINT("truncated-ip - %u bytes missing! ",
-			len - length);
+	if (len > length) {
+		ND_PRINT("[total length %u > length %u]", len, length);
+		nd_print_invalid(ndo);
+		ND_PRINT(" ");
+	}
+	ND_TCHECK_SIZE(ip);
 	if (len < hlen) {
 #ifdef GUESS_TSO
             if (len) {
