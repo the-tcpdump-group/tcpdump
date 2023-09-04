@@ -338,13 +338,10 @@ ip_print(netdissect_options *ndo,
 		ND_PRINT(" ");
 	}
 
+	ND_ICHECK_ZU(length, <, sizeof (struct ip));
 	ND_ICHECKMSG_U("version", IP_V(ip), !=, 4);
 
 	ND_TCHECK_SIZE(ip);
-	if (length < sizeof (struct ip)) {
-		ND_PRINT("truncated-ip %u", length);
-		return;
-	}
 	hlen = IP_HL(ip) * 4;
 	if (hlen < sizeof (struct ip)) {
 		ND_PRINT("bad-hlen %u", hlen);

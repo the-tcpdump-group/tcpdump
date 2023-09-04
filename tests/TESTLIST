@@ -304,6 +304,9 @@ dns_udp_8053-T dns_udp_8053.pcap dns_udp_8053-T.out -vv -T domain
 # DNSSEC from https://bugzilla.redhat.com/show_bug.cgi?id=205842, -vv exposes EDNS DO
 dnssec-vv	dnssec.pcap		dnssec-vv.out		-vv
 
+#IPv4 tests
+ipv4_invalid_length ipv4_invalid_length.pcap ipv4_invalid_length.out -v
+
 #IPv6 tests
 ipv6-bad-version	ipv6-bad-version.pcap	ipv6-bad-version.out
 ipv6-routing-header	ipv6-routing-header.pcap	ipv6-routing-header.out -v
