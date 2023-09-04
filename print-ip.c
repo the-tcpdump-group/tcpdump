@@ -341,12 +341,9 @@ ip_print(netdissect_options *ndo,
 	ND_ICHECK_ZU(length, <, sizeof (struct ip));
 	ND_ICHECKMSG_U("version", IP_V(ip), !=, 4);
 
-	ND_TCHECK_SIZE(ip);
 	hlen = IP_HL(ip) * 4;
-	if (hlen < sizeof (struct ip)) {
-		ND_PRINT("bad-hlen %u", hlen);
-		return;
-	}
+	ND_ICHECKMSG_ZU("header length", hlen, <, sizeof (struct ip));
+	ND_TCHECK_SIZE(ip);
 
 	len = GET_BE_U_2(ip->ip_len);
 	if (length < len)
