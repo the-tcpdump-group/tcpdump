@@ -1560,6 +1560,13 @@ main(int argc, char **argv)
 	if (abort_on_misalignment(ebuf, sizeof(ebuf)) < 0)
 		error("%s", ebuf);
 
+	/*
+	 * An explicit tzset() call is usually not needed as it happens
+	 * implicitly the first time we call localtime() or mktime(),
+	 * but in some cases (sandboxing, chroot) this may be too late.
+	 */
+	tzset();
+
 	while (
 	    (op = getopt_long(argc, argv, SHORTOPTS, longopts, NULL)) != -1)
 		switch (op) {
