@@ -1267,7 +1267,8 @@ part of a fragmented datagram or not.
 and \fBDF\fP is reported if F is set.  If neither are set, \fB.\fP is
 reported.
 \fIproto\fP is the protocol ID field.
-\fIlength\fP is the total length field.
+\fIlength\fP is the total length field; if the packet is a presumed TSO
+(TCP Segmentation Offload) send, [was 0, presumed TSO] is reported.
 \fIoptions\fP are the IP options, if any.
 .LP
 Next, for TCP and UDP packets, the source and destination IP addresses

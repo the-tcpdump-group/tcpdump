@@ -309,6 +309,8 @@ ipv4_invalid_length ipv4_invalid_length.pcap ipv4_invalid_length.out -v
 ipv4_invalid_hdr_length ipv4_invalid_hdr_length.pcap ipv4_invalid_hdr_length.out -v
 ipv4_invalid_total_length ipv4_invalid_total_length.pcap ipv4_invalid_total_length.out -v
 ipv4_tcp_http_xml ipv4_tcp_http_xml.pcap ipv4_tcp_http_xml.out -v
+ipv4_invalid_total_length_2 ipv4_invalid_total_length_2.pcap ipv4_invalid_total_length_2.out -v
+ipv4_tcp_http_xml_tso ipv4_tcp_http_xml_tso.pcap ipv4_tcp_http_xml_tso.out -v
 
 #IPv6 tests
 ipv6-bad-version	ipv6-bad-version.pcap	ipv6-bad-version.out
