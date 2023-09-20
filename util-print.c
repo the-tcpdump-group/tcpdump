@@ -822,11 +822,10 @@ print_txt_line(netdissect_options *ndo, const char *prefix,
 
 	/*
 	 * All printable ASCII, but no line ending after that point
-	 * in the buffer; treat this as if it were truncated.
+	 * in the buffer.
 	 */
 	linelen = idx - startidx;
 	ND_PRINT("%s%.*s", prefix, (int)linelen, pptr + startidx);
-	nd_print_trunc(ndo);
 	return (0);
 
 print:
