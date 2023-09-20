@@ -318,7 +318,7 @@ static const struct tok ip_frag_values[] = {
 void
 ip_print(netdissect_options *ndo,
 	 const u_char *bp,
-	 u_int length)
+	 const u_int length)
 {
 	const struct ip *ip;
 	u_int off;
@@ -329,6 +329,7 @@ ip_print(netdissect_options *ndo,
 	uint16_t sum, ip_sum;
 	const char *p_name;
 	int truncated = 0;
+	int presumed_tso = 0;
 
 	ndo->ndo_protocol = "ip";
 	ip = (const struct ip *)bp;
@@ -350,22 +351,14 @@ ip_print(netdissect_options *ndo,
 		nd_print_invalid(ndo);
 		ND_PRINT(" ");
 	}
-	ND_TCHECK_SIZE(ip);
-	if (len < hlen) {
-#ifdef GUESS_TSO
-            if (len) {
-                ND_PRINT("bad-len %u", len);
-                return;
-            } else {
-                /* we guess that it is a TSO send */
-                len = length;
-            }
-#else
-            ND_PRINT("bad-len %u", len);
-            return;
-#endif /* GUESS_TSO */
-	}
+	if (len == 0) {
+		/* we guess that it is a TSO send */
+		len = length;
+		presumed_tso = 1;
+	} else
+		ND_ICHECKMSG_U("total length", len, <, hlen);
 
+	ND_TCHECK_SIZE(ip);
 	/*
 	 * Cut off the snapshot length to the end of the IP payload.
 	 */
@@ -418,7 +411,10 @@ ip_print(netdissect_options *ndo,
                          tok2str(ipproto_values, "unknown", ip_proto),
                          ip_proto);
 
-            ND_PRINT(", length %u", GET_BE_U_2(ip->ip_len));
+	    if (presumed_tso)
+                ND_PRINT(", length %u [was 0, presumed TSO]", length);
+	    else
+                ND_PRINT(", length %u", GET_BE_U_2(ip->ip_len));
 
             if ((hlen - sizeof(struct ip)) > 0) {
                 ND_PRINT(", options (");

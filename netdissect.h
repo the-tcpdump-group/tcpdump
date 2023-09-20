@@ -664,7 +664,7 @@ extern void igmp_print(netdissect_options *, const u_char *, u_int);
 extern void igrp_print(netdissect_options *, const u_char *, u_int);
 extern void ip6_print(netdissect_options *, const u_char *, u_int);
 extern void ipN_print(netdissect_options *, const u_char *, u_int);
-extern void ip_print(netdissect_options *, const u_char *, u_int);
+extern void ip_print(netdissect_options *, const u_char *, const u_int);
 extern void ipcomp_print(netdissect_options *, const u_char *);
 extern void ipx_netbios_print(netdissect_options *, const u_char *, u_int);
 extern void ipx_print(netdissect_options *, const u_char *, u_int);
