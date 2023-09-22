@@ -725,7 +725,7 @@ extern const char *q922_string(netdissect_options *, const u_char *, u_int);
 extern void q933_print(netdissect_options *, const u_char *, u_int);
 extern int quic_detect(netdissect_options *, const u_char *, const u_int);
 extern void quic_print(netdissect_options *, const u_char *);
-extern void radius_print(netdissect_options *, const u_char *, u_int);
+extern void radius_print(netdissect_options *, const u_char *, const u_int);
 extern void resp_print(netdissect_options *, const u_char *, u_int);
 extern void rip_print(netdissect_options *, const u_char *, u_int);
 extern void ripng_print(netdissect_options *, const u_char *, unsigned int);

@@ -7,6 +7,6 @@
 	  Framed-IPv6-Prefix Attribute (97), length: 20, Value: 2001:db8:a0b:12f0::/64
 	  Framed-IPv6-Prefix Attribute (97), length: 12, Value: 2001:db8:a0b:12f0::/64
 	  Framed-IPv6-Prefix Attribute (97), length: 4, Value: ::/0
-	  Framed-IPv6-Prefix Attribute (97), length: 3, Value: ERROR: length 1 not in range (2..18)
-	  Framed-IPv6-Prefix Attribute (97), length: 21, Value: ERROR: length 19 not in range (2..18)
-	  Framed-IPv6-Prefix Attribute (97), length: 20, Value: ERROR: netmask 129 not in range (0..128)
+	  Framed-IPv6-Prefix Attribute (97), length: 3, Value:  [length 1 < 2] (invalid)
+	  Framed-IPv6-Prefix Attribute (97), length: 21, Value:  [length 19 > 18] (invalid)
+	  Framed-IPv6-Prefix Attribute (97), length: 20, Value:  [prefix length 129 > 128] (invalid)
