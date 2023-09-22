@@ -92,12 +92,12 @@
 
 #include "netdissect-ctype.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
 #include "oui.h"
 #include "ntp.h"
-
 
 #define TAM_SIZE(x) (sizeof(x)/sizeof(x[0]) )
 
@@ -108,7 +108,6 @@
               ptr_data++;                                            \
               bytes_len--;                                           \
            }
-
 
 /* Radius packet codes */
 /* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-27 */
@@ -201,7 +200,6 @@ static const struct tok rfc4675_tagged[] = {
     { 0, NULL}
 };
 
-
 static void print_attr_string(netdissect_options *, const u_char *, u_int, u_short );
 static void print_attr_num(netdissect_options *, const u_char *, u_int, u_short );
 static void print_vendor_attr(netdissect_options *, const u_char *, u_int, u_short );
@@ -217,7 +215,6 @@ static void print_attr_time(netdissect_options *, const u_char *, u_int, u_short
 static void print_attr_vector64(netdissect_options *, const u_char *, u_int, u_short);
 static void print_attr_strange(netdissect_options *, const u_char *, u_int, u_short);
 
-
 struct radius_hdr { nd_uint8_t  code;     /* Radius packet code  */
                     nd_uint8_t  id;       /* Radius packet id    */
                     nd_uint16_t len;      /* Radius total length */
@@ -229,7 +226,6 @@ struct radius_hdr { nd_uint8_t  code;     /* Radius packet code  */
 struct radius_attr { nd_uint8_t type; /* Attribute type   */
                      nd_uint8_t len;  /* Attribute length */
                    };
-
 
 /* Service-Type Attribute standard values */
 /* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-4 */
@@ -297,7 +293,6 @@ static const char *login_serv[]={ "Telnet",
                                   "Unassigned",
                                   "TCP Clear Quiet",
                                 };
-
 
 /* Termination-Action Attribute standard values */
 /* https://www.iana.org/assignments/radius-types/radius-types.xhtml#radius-types-9 */
@@ -757,7 +752,6 @@ static const struct attrtype {
      /* ^ [120, 129] ^ */
   };
 
-
 /*****************************/
 /* Print an attribute string */
 /* value pointed by 'data'   */
@@ -771,12 +765,9 @@ print_attr_string(netdissect_options *ndo,
 {
    u_int i;
 
-   ND_TCHECK_LEN(data, length);
-
    switch(attr_code) {
       case TUNNEL_PASS:
-           if (length < 3)
-              goto trunc;
+           ND_ICHECK_U(length, <, 3);
            if (GET_U_1(data) && (GET_U_1(data) <= 0x1F))
               ND_PRINT("Tag[%u] ", GET_U_1(data));
            else
@@ -794,8 +785,7 @@ print_attr_string(netdissect_options *ndo,
       case TUNNEL_CLIENT_AUTH:
       case TUNNEL_SERVER_AUTH:
            if (GET_U_1(data) <= 0x1F) {
-              if (length < 1)
-                 goto trunc;
+              ND_ICHECK_U(length, <, 1);
               if (GET_U_1(data))
                 ND_PRINT("Tag[%u] ", GET_U_1(data));
               else
@@ -805,8 +795,7 @@ print_attr_string(netdissect_options *ndo,
            }
         break;
       case EGRESS_VLAN_NAME:
-           if (length < 1)
-              goto trunc;
+           ND_ICHECK_U(length, <, 1);
            ND_PRINT("%s (0x%02x) ",
                   tok2str(rfc4675_tagged,"Unknown tag",GET_U_1(data)),
                   GET_U_1(data));
@@ -814,8 +803,7 @@ print_attr_string(netdissect_options *ndo,
            length--;
         break;
       case EAP_MESSAGE:
-           if (length < 1)
-              goto trunc;
+           ND_ICHECK_U(length, <, 1);
            eap_print(ndo, data, length);
            return;
    }
@@ -825,8 +813,8 @@ print_attr_string(netdissect_options *ndo,
 
    return;
 
-   trunc:
-      nd_print_trunc(ndo);
+invalid:
+   nd_print_invalid(ndo);
 }
 
 /*
@@ -841,8 +829,7 @@ print_vendor_attr(netdissect_options *ndo,
     u_int vendor_type;
     u_int vendor_length;
 
-    if (length < 4)
-        goto trunc;
+    ND_ICHECK_U(length, <, 4);
     vendor_id = GET_BE_U_4(data);
     data+=4;
     length-=4;
@@ -855,34 +842,23 @@ print_vendor_attr(netdissect_options *ndo,
         vendor_type = GET_U_1(data);
         vendor_length = GET_U_1(data + 1);
 
-        if (vendor_length < 2) {
-            ND_PRINT("\n\t    Vendor Attribute: %u, Length: %u (bogus, must be >= 2)",
-                   vendor_type,
-                   vendor_length);
-            return;
-        }
-        if (vendor_length > length) {
-            ND_PRINT("\n\t    Vendor Attribute: %u, Length: %u (bogus, goes past end of vendor-specific attribute)",
-                   vendor_type,
-                   vendor_length);
-            return;
-        }
+        ND_PRINT("\n\t    Vendor Attribute: %u, length: %u",
+                 vendor_type, vendor_length);
+        ND_ICHECKMSG_U("length", vendor_length, <, 2);
+        ND_ICHECKMSG_U("length", vendor_length, >, length);
         data+=2;
         vendor_length-=2;
         length-=2;
-	ND_TCHECK_LEN(data, vendor_length);
 
-        ND_PRINT("\n\t    Vendor Attribute: %u, Length: %u, Value: ",
-               vendor_type,
-               vendor_length);
+        ND_PRINT(", value: ");
         for (idx = 0; idx < vendor_length ; idx++, data++)
             ND_PRINT("%c", ND_ASCII_ISPRINT(GET_U_1(data)) ? GET_U_1(data) : '.');
         length-=vendor_length;
     }
     return;
 
-   trunc:
-     nd_print_trunc(ndo);
+invalid:
+    nd_print_invalid(ndo);
 }
 
 /******************************/
@@ -898,10 +874,7 @@ print_attr_num(netdissect_options *ndo,
 {
    uint32_t timeout;
 
-   if (length != 4) {
-       ND_PRINT("ERROR: length %u != 4", length);
-       return;
-   }
+   ND_ICHECK_U(length, !=, 4);
 
                           /* This attribute has standard values */
    if (attr_type[attr_code].siz_subtypes) {
@@ -992,6 +965,10 @@ print_attr_num(netdissect_options *ndo,
       } /* switch */
 
    } /* if-else */
+   return;
+
+invalid:
+   nd_print_invalid(ndo);
 }
 
 /*****************************/
@@ -1005,10 +982,7 @@ static void
 print_attr_address(netdissect_options *ndo,
                    const u_char *data, u_int length, u_short attr_code)
 {
-   if (length != 4) {
-       ND_PRINT("ERROR: length %u != 4", length);
-       return;
-   }
+   ND_ICHECK_U(length, !=, 4);
 
    switch(attr_code) {
       case FRM_IPADDR:
@@ -1026,6 +1000,10 @@ print_attr_address(netdissect_options *ndo,
           ND_PRINT("%s", GET_IPADDR_STRING(data));
       break;
    }
+   return;
+
+invalid:
+   nd_print_invalid(ndo);
 }
 
 /*****************************/
@@ -1039,12 +1017,13 @@ static void
 print_attr_address6(netdissect_options *ndo,
                    const u_char *data, u_int length, u_short attr_code _U_)
 {
-   if (length != 16) {
-       ND_PRINT("ERROR: length %u != 16", length);
-       return;
-   }
+   ND_ICHECK_U(length, !=, 16);
 
    ND_PRINT("%s", GET_IP6ADDR_STRING(data));
+   return;
+
+invalid:
+   nd_print_invalid(ndo);
 }
 
 static void
@@ -1052,52 +1031,42 @@ print_attr_netmask6(netdissect_options *ndo,
                     const u_char *data, u_int length, u_short attr_code _U_)
 {
    u_char data2[16];
+   u_int reserved_mbz, prefix_length;
 
-   if (length < 2 || length > 18) {
-       ND_PRINT("ERROR: length %u not in range (2..18)", length);
-       return;
-   }
-   ND_TCHECK_LEN(data, length);
-   if (GET_U_1(data + 1) > 128) {
-      ND_PRINT("ERROR: netmask %u not in range (0..128)", GET_U_1(data + 1));
-      return;
-   }
-
+   ND_ICHECK_U(length, <, 2);
+   ND_ICHECK_U(length, >, 18);
+   reserved_mbz = GET_U_1(data);
+   if (reserved_mbz)
+      ND_PRINT("[reserved-MBZ %u] ", reserved_mbz);
+   prefix_length = GET_U_1(data + 1);
+   ND_ICHECKMSG_U("prefix length", prefix_length, >, 128);
    memset(data2, 0, sizeof(data2));
    if (length > 2)
-      memcpy(data2, data+2, length-2);
+      GET_CPY_BYTES(data2, data+2, length-2);
 
-   ND_PRINT("%s/%u", ip6addr_string(ndo, data2), GET_U_1(data + 1)); /* local buffer, not packet data; don't use GET_IP6ADDR_STRING() */
+   ND_PRINT("%s/%u", ip6addr_string(ndo, data2), prefix_length); /* local buffer, not packet data; don't use GET_IP6ADDR_STRING() */
 
-   if (GET_U_1(data + 1) > 8 * (length - 2))
-      ND_PRINT(" (inconsistent prefix length)");
+   ND_ICHECKMSG_U("inconsistent prefix length", prefix_length, >, 8 * (length - 2));
 
    return;
 
-   trunc:
-     nd_print_trunc(ndo);
+invalid:
+   nd_print_invalid(ndo);
 }
 
 static void
 print_attr_mip6_home_link_prefix(netdissect_options *ndo,
                     const u_char *data, u_int length, u_short attr_code _U_)
 {
-   if (length != 17) {
-      ND_PRINT("ERROR: length %u != 17", length);
-      return;
-   }
-   ND_TCHECK_LEN(data, length);
-   if (GET_U_1(data) > 128) {
-      ND_PRINT("ERROR: netmask %u not in range (0..128)", GET_U_1(data));
-      return;
-   }
+   ND_ICHECK_U(length, !=, 17);
+   ND_ICHECKMSG_U("prefix length", GET_U_1(data), >, 128);
 
    ND_PRINT("%s/%u", GET_IP6ADDR_STRING(data + 1), GET_U_1(data));
 
    return;
 
-   trunc:
-     nd_print_trunc(ndo);
+invalid:
+   nd_print_invalid(ndo);
 }
 
 static void
@@ -1106,11 +1075,7 @@ print_attr_operator_name(netdissect_options *ndo,
 {
    u_int namespace_value;
 
-   ND_TCHECK_LEN(data, length);
-   if (length < 2) {
-      ND_PRINT("ERROR: length %u < 2", length);
-      return;
-   }
+   ND_ICHECK_U(length, <, 2);
    namespace_value = GET_U_1(data);
    data++;
    ND_PRINT("[%s] ", tok2str(operator_name_vector, "unknown namespace %u", namespace_value));
@@ -1119,8 +1084,8 @@ print_attr_operator_name(netdissect_options *ndo,
 
    return;
 
-   trunc:
-      nd_print_trunc(ndo);
+invalid:
+   nd_print_invalid(ndo);
 }
 
 static void
@@ -1130,11 +1095,7 @@ print_attr_location_information(netdissect_options *ndo,
    uint16_t index;
    uint8_t code, entity;
 
-   ND_TCHECK_LEN(data, length);
-   if (length < 21) {
-     ND_PRINT("ERROR: length %u < 21", length);
-      return;
-   }
+   ND_ICHECK_U(length, <, 21);
 
    index = GET_BE_U_2(data);
    data += 2;
@@ -1167,8 +1128,8 @@ print_attr_location_information(netdissect_options *ndo,
 
    return;
 
-   trunc:
-      nd_print_trunc(ndo);
+invalid:
+   nd_print_invalid(ndo);
 }
 
 static void
@@ -1177,11 +1138,7 @@ print_attr_location_data(netdissect_options *ndo,
 {
    uint16_t index;
 
-   ND_TCHECK_LEN(data, length);
-   if (length < 3) {
-     ND_PRINT("ERROR: length %u < 3", length);
-      return;
-   }
+   ND_ICHECK_U(length, <, 3);
 
    index = GET_BE_U_2(data);
    data += 2;
@@ -1198,8 +1155,8 @@ print_attr_location_data(netdissect_options *ndo,
 
    return;
 
-   trunc:
-      nd_print_trunc(ndo);
+invalid:
+   nd_print_invalid(ndo);
 }
 
 static void
@@ -1208,11 +1165,7 @@ print_basic_location_policy_rules(netdissect_options *ndo,
 {
    uint16_t flags;
 
-   ND_TCHECK_LEN(data, length);
-   if (length < 10) {
-     ND_PRINT("ERROR: length %u < 10", length);
-      return;
-   }
+   ND_ICHECK_U(length, <, 10);
 
    flags = GET_BE_U_2(data);
    data += 2;
@@ -1230,10 +1183,9 @@ print_basic_location_policy_rules(netdissect_options *ndo,
 
    return;
 
-   trunc:
-      nd_print_trunc(ndo);
+invalid:
+   nd_print_invalid(ndo);
 }
-
 
 /*************************************/
 /* Print an attribute of 'secs since */
@@ -1250,16 +1202,17 @@ print_attr_time(netdissect_options *ndo,
    time_t attr_time;
    char string[26];
 
-   if (length != 4) {
-       ND_PRINT("ERROR: length %u != 4", length);
-       return;
-   }
+   ND_ICHECK_U(length, !=, 4);
 
    attr_time = GET_BE_U_4(data);
    strlcpy(string, ctime(&attr_time), sizeof(string));
    /* Get rid of the newline */
    string[24] = '\0';
    ND_PRINT("%.24s", string);
+   return;
+
+invalid:
+   nd_print_invalid(ndo);
 }
 
 static void
@@ -1269,10 +1222,7 @@ print_attr_vector64(netdissect_options *ndo,
    uint64_t data_value, i;
    const char *sep = "";
 
-   if (length != 8) {
-       ND_PRINT("ERROR: length %u != 8", length);
-       return;
-   }
+   ND_ICHECK_U(length, !=, 8);
 
    ND_PRINT("[");
 
@@ -1289,6 +1239,10 @@ print_attr_vector64(netdissect_options *ndo,
    }
 
    ND_PRINT("]");
+   return;
+
+invalid:
+   nd_print_invalid(ndo);
 }
 
 /***********************************/
@@ -1307,10 +1261,7 @@ print_attr_strange(netdissect_options *ndo,
 
    switch(attr_code) {
       case ARAP_PASS:
-           if (length != 16) {
-               ND_PRINT("ERROR: length %u != 16", length);
-               return;
-           }
+           ND_ICHECK_U(length, !=, 16);
            ND_PRINT("User_challenge (");
            len_data = 8;
            PRINT_HEX(len_data, data);
@@ -1321,10 +1272,7 @@ print_attr_strange(netdissect_options *ndo,
         break;
 
       case ARAP_FEATURES:
-           if (length != 14) {
-               ND_PRINT("ERROR: length %u != 14", length);
-               return;
-           }
+           ND_ICHECK_U(length, !=, 14);
            if (GET_U_1(data))
               ND_PRINT("User can change password");
            else
@@ -1344,25 +1292,21 @@ print_attr_strange(netdissect_options *ndo,
         break;
 
       case ARAP_CHALLENGE_RESP:
-           if (length < 8) {
-               ND_PRINT("ERROR: length %u != 8", length);
-               return;
-           }
+           ND_ICHECK_U(length, !=, 8);
            len_data = 8;
            PRINT_HEX(len_data, data);
         break;
 
       case ERROR_CAUSE:
-           if (length != 4) {
-               ND_PRINT("Error: length %u != 4", length);
-               return;
-           }
-
+           ND_ICHECK_U(length, !=, 4);
            error_cause_value = GET_BE_U_4(data);
            ND_PRINT("Error cause %u: %s", error_cause_value, tok2str(errorcausetype, "Error-Cause %u not known", error_cause_value));
         break;
    }
    return;
+
+invalid:
+   nd_print_invalid(ndo);
 }
 
 static void
@@ -1374,9 +1318,7 @@ radius_attrs_print(netdissect_options *ndo,
    uint8_t type, len;
 
    while (length > 0) {
-     if (length < 2)
-        goto trunc;
-     ND_TCHECK_SIZE(rad_attr);
+     ND_ICHECK_U(length, <, 2);
 
      type = GET_U_1(rad_attr->type);
      len = GET_U_1(rad_attr->len);
@@ -1389,14 +1331,8 @@ radius_attrs_print(netdissect_options *ndo,
                attr_string,
                type,
                len);
-     if (len < 2) {
-       ND_PRINT(" (bogus, must be >= 2)");
-       return;
-     }
-     if (len > length) {
-        ND_PRINT(" (bogus, goes past end of packet)");
-        return;
-     }
+     ND_ICHECKMSG_U("length", len, <, 2);
+     ND_ICHECKMSG_U("length", len, >, length);
      ND_PRINT(", Value: ");
 
      if (type < TAM_SIZE(attr_type)) {
@@ -1416,52 +1352,50 @@ radius_attrs_print(netdissect_options *ndo,
    }
    return;
 
-trunc:
-   nd_print_trunc(ndo);
+invalid:
+   nd_print_invalid(ndo);
 }
 
 void
 radius_print(netdissect_options *ndo,
-             const u_char *dat, u_int length)
+             const u_char *dat, const u_int length)
 {
    const struct radius_hdr *rad;
    u_int len, auth_idx;
 
    ndo->ndo_protocol = "radius";
-   ND_TCHECK_LEN(dat, MIN_RADIUS_LEN);
+   nd_print_protocol_caps(ndo);
+   ND_ICHECK_U(length, <, MIN_RADIUS_LEN);
    rad = (const struct radius_hdr *)dat;
    len = GET_BE_U_2(rad->len);
 
-   if (len < MIN_RADIUS_LEN) {
-	  nd_print_trunc(ndo);
-	  return;
-   }
-
-   if (len > length)
-	  len = length;
+   ND_ICHECKMSG_U("length", len, <, MIN_RADIUS_LEN);
+   ND_ICHECKMSG_U("length", len, >, 4096);
+   ND_ICHECKMSG_U("length", len, >, length);
 
    if (ndo->ndo_vflag < 1) {
-       ND_PRINT("RADIUS, %s (%u), id: 0x%02x length: %u",
+       ND_PRINT(", %s (%u), id: 0x%02x, length: %u",
               tok2str(radius_command_values,"Unknown Command",GET_U_1(rad->code)),
               GET_U_1(rad->code),
               GET_U_1(rad->id),
               len);
+       ND_TCHECK_LEN(dat, MIN_RADIUS_LEN);
        return;
    } else {
-       ND_PRINT("RADIUS, length: %u\n\t%s (%u), id: 0x%02x, Authenticator: ",
+       ND_PRINT(", length: %u\n\t%s (%u), id: 0x%02x, Authenticator: ",
               len,
               tok2str(radius_command_values,"Unknown Command",GET_U_1(rad->code)),
               GET_U_1(rad->code),
               GET_U_1(rad->id));
 
        for(auth_idx=0; auth_idx < 16; auth_idx++)
-            ND_PRINT("%02x", rad->auth[auth_idx]);
+            ND_PRINT("%02x", GET_U_1((rad->auth + auth_idx)));
    }
 
    if (len > MIN_RADIUS_LEN)
       radius_attrs_print(ndo, dat + MIN_RADIUS_LEN, len - MIN_RADIUS_LEN);
    return;
 
-trunc:
-   nd_print_trunc(ndo);
+invalid:
+   nd_print_invalid(ndo);
 }
