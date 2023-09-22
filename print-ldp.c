@@ -29,7 +29,6 @@
 #include "l2vpn.h"
 #include "af.h"
 
-
 /*
  * ldp common header
  *
@@ -275,13 +274,6 @@ static u_int ldp_pdu_print(netdissect_options *, const u_char *);
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 
-#define TLV_TCHECK(minlen) \
-    if (tlv_tlen < minlen) { \
-        ND_PRINT(" [tlv length %u < %u]", tlv_tlen, minlen); \
-        nd_print_invalid(ndo); \
-        goto invalid; \
-    }
-
 static u_int
 ldp_tlv_print(netdissect_options *ndo,
               const u_char *tptr,
@@ -324,7 +316,7 @@ ldp_tlv_print(netdissect_options *ndo,
     switch(tlv_type) {
 
     case LDP_TLV_COMMON_HELLO:
-        TLV_TCHECK(4);
+        ND_ICHECKMSG_U("tlv length", tlv_len, <, 4);
         ND_PRINT("\n\t      Hold Time: %us, Flags: [%s Hello%s]",
                GET_BE_U_2(tptr),
                (GET_BE_U_2(tptr + 2)&0x8000) ? "Targeted" : "Link",
@@ -332,20 +324,21 @@ ldp_tlv_print(netdissect_options *ndo,
         break;
 
     case LDP_TLV_IPV4_TRANSPORT_ADDR:
-        TLV_TCHECK(4);
+        ND_ICHECKMSG_U("tlv length", tlv_len, <, 4);
         ND_PRINT("\n\t      IPv4 Transport Address: %s", GET_IPADDR_STRING(tptr));
         break;
     case LDP_TLV_IPV6_TRANSPORT_ADDR:
-        TLV_TCHECK(16);
+        ND_ICHECKMSG_U("tlv length", tlv_len, <, 16);
         ND_PRINT("\n\t      IPv6 Transport Address: %s", GET_IP6ADDR_STRING(tptr));
         break;
     case LDP_TLV_CONFIG_SEQ_NUMBER:
-        TLV_TCHECK(4);
+        ND_ICHECKMSG_U("tlv length", tlv_len, <, 4);
         ND_PRINT("\n\t      Sequence Number: %u", GET_BE_U_4(tptr));
         break;
 
     case LDP_TLV_ADDRESS_LIST:
-        TLV_TCHECK(LDP_TLV_ADDRESS_LIST_AFNUM_LEN);
+        ND_ICHECKMSG_U("tlv length", tlv_len, <,
+                       LDP_TLV_ADDRESS_LIST_AFNUM_LEN);
 	af = GET_BE_U_2(tptr);
 	tptr+=LDP_TLV_ADDRESS_LIST_AFNUM_LEN;
         tlv_tlen -= LDP_TLV_ADDRESS_LIST_AFNUM_LEN;
@@ -373,12 +366,12 @@ ldp_tlv_print(netdissect_options *ndo,
 	break;
 
     case LDP_TLV_HOP_COUNT:
-	TLV_TCHECK(1);
+	ND_ICHECKMSG_U("tlv length", tlv_len, <, 1);
 	ND_PRINT("\n\t      Hop Count: %u", GET_U_1(tptr));
 	break;
 
     case LDP_TLV_PATH_VECTOR:
-	TLV_TCHECK(4);
+	ND_ICHECKMSG_U("tlv length", tlv_len, <, 4);
 	ND_PRINT("\n\t      Path Vector: %s", GET_IPADDR_STRING(tptr));
 	tptr += 4;
 	tlv_tlen -= 4;
@@ -390,7 +383,7 @@ ldp_tlv_print(netdissect_options *ndo,
 	break;
 
     case LDP_TLV_COMMON_SESSION:
-	TLV_TCHECK(14);
+	ND_ICHECKMSG_U("tlv length", tlv_len, <, 14);
 	ND_PRINT("\n\t      Version: %u, Keepalive: %us, Flags: [Downstream %s, Loop Detection %s]",
 	       GET_BE_U_2(tptr), GET_BE_U_2(tptr + 2),
 	       (GET_BE_U_2(tptr + 4)&0x8000) ? "On Demand" : "Unsolicited",
@@ -405,7 +398,7 @@ ldp_tlv_print(netdissect_options *ndo,
 	break;
 
     case LDP_TLV_FEC:
-        TLV_TCHECK(1);
+        ND_ICHECKMSG_U("tlv length", tlv_len, <, 1);
         fec_type = GET_U_1(tptr);
 	ND_PRINT("\n\t      %s FEC (0x%02x)",
 	       tok2str(ldp_fec_values, "Unknown", fec_type),
@@ -418,7 +411,7 @@ ldp_tlv_print(netdissect_options *ndo,
 	case LDP_FEC_WILDCARD:
 	    break;
 	case LDP_FEC_PREFIX:
-	    TLV_TCHECK(2);
+	    ND_ICHECKMSG_U("tlv length", tlv_len, <, 2);
 	    af = GET_BE_U_2(tptr);
 	    tptr+=2;
 	    tlv_tlen-=2;
@@ -452,7 +445,7 @@ ldp_tlv_print(netdissect_options *ndo,
              * We assume the type was supposed to be one of the MPLS
              * Pseudowire Types.
              */
-            TLV_TCHECK(7);
+            ND_ICHECKMSG_U("tlv length", tlv_len, <, 7);
             vc_info_len = GET_U_1(tptr + 2);
 
             /*
@@ -470,7 +463,7 @@ ldp_tlv_print(netdissect_options *ndo,
             }
 
             /* Make sure we have the VC ID as well */
-            TLV_TCHECK(11);
+            ND_ICHECKMSG_U("tlv length", tlv_len, <, 11);
 	    ND_PRINT(": %s, %scontrol word, group-ID %u, VC-ID %u, VC-info-length: %u",
 		   tok2str(mpls_pw_types_values, "Unknown", GET_BE_U_2(tptr)&0x7fff),
 		   GET_BE_U_2(tptr)&0x8000 ? "" : "no ",
@@ -487,7 +480,7 @@ ldp_tlv_print(netdissect_options *ndo,
             /* Skip past the fixed information and the VC ID */
             tptr+=11;
             tlv_tlen-=11;
-            TLV_TCHECK(vc_info_len);
+            ND_ICHECKMSG_U("tlv length", tlv_len, <, vc_info_len);
 
             while (vc_info_len > 2) {
                 vc_info_tlv_type = GET_U_1(tptr);
@@ -536,12 +529,12 @@ ldp_tlv_print(netdissect_options *ndo,
 	break;
 
     case LDP_TLV_GENERIC_LABEL:
-	TLV_TCHECK(4);
+	ND_ICHECKMSG_U("tlv length", tlv_len, <, 4);
 	ND_PRINT("\n\t      Label: %u", GET_BE_U_4(tptr) & 0xfffff);
 	break;
 
     case LDP_TLV_STATUS:
-	TLV_TCHECK(10);
+	ND_ICHECKMSG_U("tlv length", tlv_len, <, 10);
 	ui = GET_BE_U_4(tptr);
 	tptr+=4;
 	ND_PRINT("\n\t      Status Code: %s, Flags: [%s and %s forward]",
@@ -558,7 +551,7 @@ ldp_tlv_print(netdissect_options *ndo,
 	break;
 
     case LDP_TLV_FT_SESSION:
-	TLV_TCHECK(12);
+	ND_ICHECKMSG_U("tlv length", tlv_len, <, 12);
 	ft_flags = GET_BE_U_2(tptr);
 	ND_PRINT("\n\t      Flags: [%sReconnect, %sSave State, %sAll-Label Protection, %s Checkpoint, %sRe-Learn State]",
 	       ft_flags&0x8000 ? "" : "No ",
@@ -578,24 +571,23 @@ ldp_tlv_print(netdissect_options *ndo,
 	break;
 
     case LDP_TLV_TYPED_WC_FEC_CAP:
-	TLV_TCHECK(1);
+	ND_ICHECKMSG_U("tlv length", tlv_len, <, 1);
 	ND_PRINT("\n\t      %s", GET_U_1(tptr)&0x80 ? "Support" : "No Support");
 	break;
 
     case LDP_TLV_MTU:
-	TLV_TCHECK(2);
+	ND_ICHECKMSG_U("tlv length", tlv_len, <, 2);
 	ND_PRINT("\n\t      MTU: %u", GET_BE_U_2(tptr));
 	break;
 
     case LDP_TLV_DUAL_STACK_CAP:
-	TLV_TCHECK(4);
+	ND_ICHECKMSG_U("tlv length", tlv_len, <, 4);
 	transport_pref = GET_U_1(tptr);
 	ND_PRINT("\n\t      Transport Connection Preference: %s",
 		 tok2str(ldp_dual_stack_transport_pref_values,
 			 "Unknown",
 			 transport_pref));
 	break;
-
 
     /*
      *  FIXME those are the defined TLVs that lack a decoder
@@ -622,6 +614,7 @@ trunc:
     nd_trunc_longjmp(ndo);
 
 invalid:
+    nd_print_invalid(ndo);
     return(tlv_len+4); /* Type & Length fields not included */
 }
 
