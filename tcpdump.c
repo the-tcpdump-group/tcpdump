@@ -563,8 +563,21 @@ show_remote_devices_and_exit(void)
 	int i;
 
 	if (pcap_findalldevs_ex(remote_interfaces_source, NULL, &devlist,
-	    ebuf) < 0)
+	    ebuf) < 0) {
+		if (strcmp(ebuf, "not supported") == 0) {
+			/*
+			 * macOS 14's pcap_findalldevs_ex(), which is a
+			 * stub that always returns -1 with an error
+			 * message of "not supported".
+			 *
+			 * In this case, as we passed it an rpcap://
+			 * URL, treat that as meaning "remote capture
+			 * not supported".
+			 */
+			error("Remote capture not supported");
+		}
 		error("%s", ebuf);
+	}
 	for (i = 0, dev = devlist; dev != NULL; i++, dev = dev->next) {
 		printf("%d.%s", i+1, dev->name);
 		if (dev->description != NULL)
@@ -1270,6 +1283,18 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 		    ebuf);
 		if (pc == NULL) {
 			/*
+			 * macOS 14's pcap_pcap_open(), which is a
+			 * stub that always returns NULL with an error
+			 * message of "not supported".
+			 *
+			 * In this case, as we passed it an rpcap://
+			 * URL, treat that as meaning "remote capture
+			 * not supported".
+			 */
+			if (strcmp(ebuf, "not supported") == 0)
+				error("Remote capture not supported");
+
+			/*
 			 * If this failed with "No such device" or "The system
 			 * cannot find the device specified", that means
 			 * the interface doesn't exist; return NULL, so that
@@ -1438,7 +1463,7 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 		if (status != 0)
 			error("%s: pcap_setdirection() failed: %s",
 			      device,  pcap_geterr(pc));
-		}
+	}
 #endif /* HAVE_PCAP_SETDIRECTION */
 #else /* HAVE_PCAP_CREATE */
 	*ebuf = '\0';
