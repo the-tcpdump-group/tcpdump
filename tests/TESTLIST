@@ -439,7 +439,7 @@ radius-rfc4675	RADIUS-RFC4675.pcap	radius-rfc4675-v.out	-v
 radius-rfc5176	RADIUS-RFC5176.pcap	radius-rfc5176-v.out	-v
 radius-port1700	RADIUS-port1700.pcap	radius-port1700-v.out	-v
 radius-rfc5176-2	RADIUS-RFC5176-2.pcap	radius-rfc5176-2-v.out	-v
-radius-rfc5447	RADIUS-RFC5447.pcap	radius-rfc5447-v.out	-v
+radius_rfc5447_invalid_length radius_rfc5447_invalid_length.pcap radius_rfc5447_invalid_length-v.out -v
 radius-rfc5580	RADIUS-RFC5580.pcap	radius-rfc5580-v.out	-v
 
 # link-level protocols
