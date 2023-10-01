@@ -127,7 +127,7 @@ static const struct tok tcp_option_values[] = {
         { TCPOPT_TIMESTAMP, "TS" },
         { TCPOPT_CC, "cc" },
         { TCPOPT_CCNEW, "ccnew" },
-        { TCPOPT_CCECHO, "" },
+        { TCPOPT_CCECHO, "ccecho" },
         { TCPOPT_SIGNATURE, "md5" },
         { TCPOPT_SCPS, "scps" },
         { TCPOPT_UTO, "uto" },
