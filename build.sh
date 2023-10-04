@@ -72,14 +72,14 @@ else
     run_after_echo mkdir build
     run_after_echo cd build
     if [ "$BUILD_LIBPCAP" = yes ]; then
-        run_after_echo cmake "$CMAKE_OPTIONS" \
+        run_after_echo cmake ${CMAKE_OPTIONS:+"$CMAKE_OPTIONS"} \
             -DWITH_CRYPTO="$CRYPTO" -DENABLE_SMB="$SMB" \
             ${CFLAGS:+-DEXTRA_CFLAGS="$CFLAGS"} \
             -DCMAKE_INSTALL_PREFIX="$PREFIX" -DCMAKE_PREFIX_PATH="$PREFIX" ..
         LD_LIBRARY_PATH="$PREFIX/lib"
         export LD_LIBRARY_PATH
     else
-        run_after_echo cmake "$CMAKE_OPTIONS" \
+        run_after_echo cmake ${CMAKE_OPTIONS:+"$CMAKE_OPTIONS"} \
             -DWITH_CRYPTO="$CRYPTO" -DENABLE_SMB="$SMB" \
              ${CFLAGS:+-DEXTRA_CFLAGS="$CFLAGS"} \
             -DCMAKE_INSTALL_PREFIX="$PREFIX" ..
