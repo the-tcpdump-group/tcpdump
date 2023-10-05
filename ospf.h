@@ -72,6 +72,7 @@
 #define LS_OPAQUE_TYPE_TE       1   /* rfc3630 */
 #define LS_OPAQUE_TYPE_GRACE    3   /* rfc3623 */
 #define LS_OPAQUE_TYPE_RI       4   /* draft-ietf-ospf-cap-03 */
+#define LS_OPAQUE_TYPE_EP       7   /* rfc7684 */
 
 #define LS_OPAQUE_TE_TLV_ROUTER 1   /* rfc3630 */
 #define LS_OPAQUE_TE_TLV_LINK   2   /* rfc3630 */
@@ -94,6 +95,12 @@
 #define LS_OPAQUE_TE_LINK_SUBTLV_LINK_TYPE_PTP        1  /* rfc3630 */
 #define LS_OPAQUE_TE_LINK_SUBTLV_LINK_TYPE_MA         2  /* rfc3630 */
 
+#define LS_OPAQUE_RI_SUBTLV_SID_LABEL                 1  /* rfc8665 */
+
+#define LS_OPAQUE_EP_EXTD_PREFIX_TLV                  1  /* rfc7684 */
+#define LS_OPAQUE_EP_EXTD_PREFIX_RANGE_TLV            2  /* rfc8665 */
+#define LS_OPAQUE_EP_SUBTLV_PREFIX_SID                2  /* rfc8665 */
+
 #define LS_OPAQUE_GRACE_TLV_PERIOD       1 /* rfc3623 */
 #define LS_OPAQUE_GRACE_TLV_REASON       2 /* rfc3623 */
 #define LS_OPAQUE_GRACE_TLV_INT_ADDRESS  3 /* rfc3623 */
@@ -104,7 +111,8 @@
 #define LS_OPAQUE_GRACE_TLV_REASON_CP_SWITCH   3 /* rfc3623 */
 
 #define LS_OPAQUE_RI_TLV_CAP             1 /* draft-ietf-ospf-cap-03 */
-
+#define LS_OPAQUE_RI_TLV_HOSTNAME        7 /* rfc5642 */
+#define LS_OPAQUE_RI_TLV_SID_LABEL_RANGE 9 /* rfc8665 */
 
 /* rla_link.link_type	*/
 #define	RLA_TYPE_ROUTER		1   /* point-to-point to another router	*/
@@ -246,6 +254,13 @@ struct lsa {
 	    nd_uint16_t length;
 	    nd_byte     data[1]; /* may repeat   */
 	} un_ri_tlv[1]; /* may repeat */
+
+        /* Extended Prefix LSA */
+        struct {
+	    nd_uint16_t type;
+	    nd_uint16_t length;
+	    nd_byte     data[1]; /* may repeat   */
+	} un_ep_tlv[1]; /* may repeat */
 
         /* Unknown LSA */
         struct unknown {
