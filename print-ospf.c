@@ -101,13 +101,54 @@ static const struct tok lsa_opaque_values[] = {
 	{ LS_OPAQUE_TYPE_TE,    "Traffic Engineering" },
 	{ LS_OPAQUE_TYPE_GRACE, "Graceful restart" },
 	{ LS_OPAQUE_TYPE_RI,    "Router Information" },
+	{ LS_OPAQUE_TYPE_EP,    "Extended Prefix" },
 	{ 0,			NULL }
+};
+
+static const struct tok lsa_opaque_ri_sid_subtlv_values[] = {
+	{ LS_OPAQUE_RI_SUBTLV_SID_LABEL, "SID/Label" },
+	{ 0,		        NULL }
 };
 
 static const struct tok lsa_opaque_te_tlv_values[] = {
 	{ LS_OPAQUE_TE_TLV_ROUTER, "Router Address" },
 	{ LS_OPAQUE_TE_TLV_LINK,   "Link" },
 	{ 0,			NULL }
+};
+
+static const struct tok lsa_opaque_ep_extd_prefix_subtlv_values[] = {
+	{ LS_OPAQUE_EP_SUBTLV_PREFIX_SID, "Prefix-SID" },
+	{ 0,		        NULL }
+};
+
+static const struct tok ep_range_tlv_prefix_sid_subtlv_flag_values[] = {
+	{ 0x40, "No-PHP"},
+	{ 0x20, "Mapping-Server"},
+	{ 0x10, "Explicit-NULL"},
+	{ 0x08, "Value"},
+	{ 0x04, "Local"},
+	{ 0,			NULL}
+};
+
+
+static const struct tok lsa_opaque_ep_route_type_values[] = {
+	{ 0, "Unspecified" },
+	{ 1, "Intra-Area" },
+	{ 3, "Inter-Area" },
+	{ 5, "AS External" },
+	{ 7, "NSSA External" },
+	{ 0,			NULL }
+};
+
+static const struct tok lsa_opaque_ep_tlv_values[] = {
+	{ LS_OPAQUE_EP_EXTD_PREFIX_TLV,       "Extended Prefix" },
+	{ LS_OPAQUE_EP_EXTD_PREFIX_RANGE_TLV, "Extended Prefix Range" },
+	{ 0,			NULL }
+};
+
+static const struct tok ep_tlv_flag_values[] = {
+	{ 0x80, "Inter-Area"},
+	{ 0,			NULL}
 };
 
 static const struct tok lsa_opaque_te_link_tlv_subtlv_values[] = {
@@ -151,6 +192,8 @@ static const struct tok lsa_opaque_te_tlv_link_type_sub_tlv_values[] = {
 
 static const struct tok lsa_opaque_ri_tlv_values[] = {
 	{ LS_OPAQUE_RI_TLV_CAP, "Router Capabilities" },
+	{ LS_OPAQUE_RI_TLV_HOSTNAME, "Hostname" },
+	{ LS_OPAQUE_RI_TLV_SID_LABEL_RANGE, "SID/Label Range" },
 	{ 0,		        NULL }
 };
 
@@ -211,6 +254,7 @@ ospf_grace_lsa_print(netdissect_options *ndo,
 
         /* Infinite loop protection. */
         if (tlv_type == 0 || tlv_length ==0) {
+	    nd_print_invalid(ndo);
             return -1;
         }
 
@@ -298,6 +342,7 @@ ospf_te_lsa_print(netdissect_options *ndo,
 
         /* Infinite loop protection. */
         if (tlv_type == 0 || tlv_length ==0) {
+	    nd_print_invalid(ndo);
             return -1;
         }
 
@@ -611,6 +656,218 @@ ospf_print_tos_metrics(netdissect_options *ndo,
     }
 }
 
+static int
+ospf_print_ri_lsa_sid_label_range_tlv(netdissect_options *ndo, const uint8_t *tptr,
+				      u_int tlv_length)
+{
+    u_int subtlv_type, subtlv_length;
+
+    while (tlv_length >= 4) {
+
+	subtlv_type = GET_BE_U_2(tptr);
+	subtlv_length = GET_BE_U_2(tptr+2);
+	tptr+=4;
+	tlv_length-=4;
+
+	/* Infinite loop protection. */
+	if (subtlv_type == 0 || subtlv_length == 0) {
+	    nd_print_invalid(ndo);
+	    return -1;
+	}
+
+	ND_PRINT("\n\t      %s subTLV (%u), length: %u, value: ",
+		 tok2str(lsa_opaque_ri_sid_subtlv_values,"unknown",subtlv_type),
+		 subtlv_type,
+		 subtlv_length);
+
+	switch (subtlv_type) {
+	case LS_OPAQUE_RI_SUBTLV_SID_LABEL:
+	    if (subtlv_length == 3) {
+		ND_PRINT("\n\t\tLabel: %u", GET_BE_U_3(tptr));
+	    } else if (subtlv_length == 4) {
+		ND_PRINT("\n\t\tSID: %u", GET_BE_U_4(tptr));
+	    } else {
+		ND_PRINT("\n\t\tBogus subTLV length %u", subtlv_length);
+	    }
+	    break;
+
+	default:
+	    if (ndo->ndo_vflag <= 1) {
+		if (!print_unknown_data(ndo, tptr, "\n\t\t", subtlv_length))
+		    return -1;
+	    }
+	}
+
+	/* in OSPF everything has to be 32-bit aligned, including subTLVs */
+	if (subtlv_length % 4) {
+	    subtlv_length += (4 - (subtlv_length % 4));
+	}
+	tptr+=subtlv_length;
+	tlv_length-=subtlv_length;
+    }
+    return 0;
+}
+
+static int
+ospf_print_ep_lsa_extd_prefix_tlv(netdissect_options *ndo, const uint8_t *tptr,
+				  u_int tlv_length)
+{
+    u_int subtlv_type, subtlv_length;
+    uint8_t flags, mt_id, algo;
+
+    while (tlv_length >= 4) {
+	subtlv_type = GET_BE_U_2(tptr);
+	subtlv_length = GET_BE_U_2(tptr+2);
+	tptr+=4;
+	tlv_length-=4;
+
+	/* Infinite loop protection. */
+	if (subtlv_type == 0 || subtlv_length == 0) {
+	    nd_print_invalid(ndo);
+	    return -1;
+	}
+
+	ND_PRINT("\n\t\t%s subTLV (%u), length: %u, value: ",
+		 tok2str(lsa_opaque_ep_extd_prefix_subtlv_values,"unknown",subtlv_type),
+		 subtlv_type,
+		 subtlv_length);
+
+	switch (subtlv_type) {
+	case LS_OPAQUE_EP_SUBTLV_PREFIX_SID:
+	    flags = GET_U_1(tptr);
+	    mt_id = GET_U_1(tptr+2);
+	    algo = GET_U_1(tptr+3);
+
+	    if (subtlv_length == 7) {
+		ND_PRINT("\n\t\t  Label: %u, MT-ID: %u, Algorithm: %u",
+			 GET_BE_U_3(tptr+4), mt_id, algo);
+	    } else if (subtlv_length == 8) {
+		ND_PRINT("\n\t\t  Index: %u, MT-ID: %u, Algorithm: %u, Flags [%s]",
+			 GET_BE_U_4(tptr+4), mt_id, algo,
+			 bittok2str(ep_range_tlv_prefix_sid_subtlv_flag_values, "none", flags));
+	    } else {
+		ND_PRINT("\n\t\tBogus subTLV length %u", subtlv_length);
+	    }
+	    break;
+
+	default:
+	    if (ndo->ndo_vflag <= 1) {
+		if (!print_unknown_data(ndo, tptr, "\n\t\t", subtlv_length))
+		    return -1;
+	    }
+	}
+
+	/* in OSPF everything has to be 32-bit aligned, including subTLVs */
+	if (subtlv_length % 4) {
+	    subtlv_length += (4 - (subtlv_length % 4));
+	}
+	tptr+=subtlv_length;
+	tlv_length-=subtlv_length;
+    }
+    return 0;
+}
+
+static int
+ospf_ep_lsa_print(netdissect_options *ndo, const uint8_t *tptr, u_int lsa_length)
+{
+    u_int tlv_type, tlv_length;
+    uint16_t range_size;
+    uint8_t af, prefix_length, route_type, flags;
+
+    while (lsa_length >= 4) {
+
+	tlv_type = GET_BE_U_2(tptr);
+	tlv_length = GET_BE_U_2(tptr+2);
+	tptr+=4;
+	lsa_length-=4;
+
+	/* Infinite loop protection. */
+	if (tlv_type == 0 || tlv_length == 0) {
+	    nd_print_invalid(ndo);
+	    return -1;
+	}
+
+	ND_PRINT("\n\t    %s TLV (%u), length: %u, value: ",
+		 tok2str(lsa_opaque_ep_tlv_values,"unknown",tlv_type),
+		 tlv_type,
+		 tlv_length);
+
+	switch (tlv_type) {
+	case LS_OPAQUE_EP_EXTD_PREFIX_TLV:
+	    prefix_length = GET_U_1(tptr+1);
+	    af = GET_U_1(tptr+2);
+	    route_type = GET_U_1(tptr);
+	    flags = GET_U_1(tptr+3);
+
+	    if (af != 0) {
+		ND_PRINT("\n\t      Bogus AF %u", af);
+		return -1;
+	    }
+
+	    if (prefix_length > 32) {
+		ND_PRINT("\n\t      IPv4 prefix: bad bit length %u", prefix_length);
+		return -1;
+	    }
+
+	    ND_PRINT("\n\t      IPv4 prefix: %15s/%u, Route Type: %s, Flags [%s]",
+		     GET_IPADDR_STRING(tptr+4), prefix_length,
+		     tok2str(lsa_opaque_ep_route_type_values, "Unknown", route_type),
+		     bittok2str(ep_tlv_flag_values, "none", flags));
+
+	    /* subTLVs present ? */
+	    if (tlv_length > 12) {
+		if (ospf_print_ep_lsa_extd_prefix_tlv(ndo, tptr+8, tlv_length-8) == -1) {
+		    return -1;
+		}
+	    }
+	    break;
+
+	case LS_OPAQUE_EP_EXTD_PREFIX_RANGE_TLV:
+	    prefix_length = GET_U_1(tptr);
+	    af = GET_U_1(tptr+1);
+	    range_size = GET_BE_U_2(tptr+2);
+	    flags = GET_U_1(tptr+4);
+
+	    if (af != 0) {
+		ND_PRINT("\n\t      Bogus AF %u", af);
+		return -1;
+	    }
+
+	    if (prefix_length > 32) {
+		ND_PRINT("\n\t      IPv4 prefix: bad bit length %u", prefix_length);
+		return -1;
+	    }
+
+	    ND_PRINT("\n\t      IPv4 prefix: %15s/%u, Range size: %u, Flags [%s]",
+		     GET_IPADDR_STRING(tptr+8), prefix_length,
+		     range_size,
+		     bittok2str(ep_tlv_flag_values, "none", flags));
+
+	    /* subTLVs present ? */
+	    if (tlv_length > 12) {
+		if (ospf_print_ep_lsa_extd_prefix_tlv(ndo, tptr+12, tlv_length-12) == -1) {
+		    return -1;
+		}
+	    }
+	    break;
+
+	default:
+	    if (ndo->ndo_vflag <= 1) {
+		if (!print_unknown_data(ndo, tptr, "\n\t\t", tlv_length))
+		    return -1;
+	    }
+	}
+
+	/* in OSPF everything has to be 32-bit aligned, including TLVs */
+	if (tlv_length % 4) {
+	    tlv_length += (4 - (tlv_length % 4));
+	}
+	tptr+=tlv_length;
+	lsa_length-=tlv_length;
+    }
+    return 0;
+}
+
 /*
  * Print a single link state advertisement.  If truncated or if LSA length
  * field is less than the length of the LSA header, return NULl, else
@@ -836,6 +1093,20 @@ ospf_print_lsa(netdissect_options *ndo,
                         ND_PRINT("Capabilities: %s",
                                bittok2str(lsa_opaque_ri_tlv_cap_values, "Unknown", GET_BE_U_4(tptr)));
                         break;
+
+                    case LS_OPAQUE_RI_TLV_HOSTNAME:
+                        ND_PRINT("\n\t      Hostname: ");
+                        nd_printjnp(ndo, tptr, tlv_length);
+                        break;
+
+                    case LS_OPAQUE_RI_TLV_SID_LABEL_RANGE:
+                        ND_TCHECK_4(tptr);
+                        ND_PRINT("\n\t      Range size: %u", GET_BE_U_3(tptr));
+                        if (ospf_print_ri_lsa_sid_label_range_tlv(ndo, tptr+4, tlv_length-4) == -1) {
+                            return(ls_end);
+                        }
+                        break;
+
                     default:
                         if (ndo->ndo_vflag <= 1) {
                             if (!print_unknown_data(ndo, tptr, "\n\t      ", tlv_length))
@@ -843,6 +1114,11 @@ ospf_print_lsa(netdissect_options *ndo,
                         }
                         break;
 
+                    }
+
+                    /* in OSPF everything has to be 32-bit aligned, including TLVs */
+                    if (tlv_length % 4) {
+                        tlv_length += (4 - (tlv_length % 4));
                     }
                     tptr+=tlv_length;
                     ls_length_remaining-=tlv_length;
@@ -858,6 +1134,13 @@ ospf_print_lsa(netdissect_options *ndo,
 
 	    case LS_OPAQUE_TYPE_TE:
                 if (ospf_te_lsa_print(ndo, (const u_char *)(lsap->lsa_un.un_te_lsa_tlv),
+                                      ls_length) == -1) {
+                    return(ls_end);
+                }
+                break;
+
+            case LS_OPAQUE_TYPE_EP:
+                if (ospf_ep_lsa_print(ndo, (const u_char *)(lsap->lsa_un.un_ep_tlv),
                                       ls_length) == -1) {
                     return(ls_end);
                 }
