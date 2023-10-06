@@ -1,5 +1,7 @@
-DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
   Summary for 4.99.5 tcpdump release (so far!)
+    User interface:
+      Print the supported time stamp types (-J) to stdout instead of stderr.
+      Print the list of data link types (-L) to stdout instead of stderr.
     Source code:
       tcpdump: Fix a memory leak.
       Update ND_BYTES_BETWEEN() macro for better accuracy.
