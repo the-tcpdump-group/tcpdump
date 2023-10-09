@@ -110,7 +110,7 @@ pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
 	subrulenr = GET_BE_U_4(hdr->subrulenr);
 	if (subrulenr == (uint32_t)-1) {
 		if (rulenr == (uint32_t)-1)
-			ND_PRINT("rule %d/", -1);
+			ND_PRINT("rule %s/", "def");
 		else
 			ND_PRINT("rule %u/", rulenr);
 	} else {
