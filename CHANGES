@@ -91,6 +91,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
     Building and testing:
       At build time require a proof of suitable snprintf(3) implementation in
         libc (and document Solaris 9 as unsupported because of that).
+      Makefile.in: Add two "touch .devel" commands in the releasecheck target.
       Autoconf: Get --with-user and --with-chroot right.
       Autoconf: Fix --static-pcap-only test on Solaris 10.
       autoconf: Add some warning flags for clang 13 or newer.
