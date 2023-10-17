@@ -136,10 +136,10 @@ vxlan_gpe_print(netdissect_options *ndo, const u_char *bp, u_int len)
     len -= 3;
 
     if (flags & VXLAN_GPE_B)
-        printf(", BUM");
+        ND_PRINT(", BUM");
 
     if (flags & VXLAN_GPE_O) {
-        printf(", OAM (proto 0x%x, len %u)", next_protocol, len);
+        ND_PRINT(", OAM (proto 0x%x, len %u)", next_protocol, len);
         return;
     }
 

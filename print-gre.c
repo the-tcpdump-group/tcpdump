@@ -239,7 +239,7 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 		 * use it for keep-alives; see, for example,
 		 * https://www.cisco.com/c/en/us/support/docs/ip/generic-routing-encapsulation-gre/118370-technote-gre-00.html#anc1
 		 */
-		printf("keep-alive");
+		ND_PRINT("keep-alive");
 		break;
 	case GRE_WCCP:
 		/*
@@ -283,7 +283,7 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 			bp += sizeof(*wccp);
 			len -= sizeof(*wccp);
 
-			printf(": ");
+			ND_PRINT(": ");
 		}
 		/* FALLTHROUGH */
 	case ETHERTYPE_IP:
