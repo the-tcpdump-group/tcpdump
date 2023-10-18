@@ -77,7 +77,6 @@ static void print_debug(void *this_fn, void *call_site, action_type action)
 	static int instrument_set;
 	static int instrument_off;
 	static int instrument_global;
-	int i;
 
 	if (!instrument_set) {
 		static char *instrument_type;
@@ -141,7 +140,7 @@ static void print_debug(void *this_fn, void *call_site, action_type action)
 			return;
 		}
 
-		symtab = (asymbol **)malloc(symsize);
+		symtab = (asymbol **)malloc((size_t)symsize);
 		symcount = bfd_canonicalize_symtab(abfd, symtab);
 		if (symcount < 0) {
 			free(symtab);
@@ -159,6 +158,7 @@ static void print_debug(void *this_fn, void *call_site, action_type action)
 	if (instrument_global) {
 		symbol_info syminfo;
 		int found;
+		long i;
 
 		i = 0;
 		found = 0;
@@ -186,6 +186,8 @@ static void print_debug(void *this_fn, void *call_site, action_type action)
 								   &file, &func, &line)) {
 			printf("[ERROR bfd_find_nearest_line this_fn]");
 		} else {
+			int i;
+
 			if (action == ENTER)
 				profile_func_level += 1;
 			/* Indentation */
