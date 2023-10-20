@@ -94,6 +94,7 @@ ethertype.h	- Ethernet type value definitions
 extract.h	- alignment definitions
 gmpls.c		- GMPLS definitions
 gmpls.h		- GMPLS declarations
+gre.h		- GRE definitions
 install-sh	- BSD style install script
 interface.h	- globals, prototypes and definitions
 ip.h		- IP definitions

@@ -41,6 +41,7 @@
 #define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
+#include "gre.h"
 
 #define ERSPAN2_VER_SHIFT	28
 #define ERSPAN2_VER_MASK	(0xfU << ERSPAN2_VER_SHIFT)
@@ -62,11 +63,6 @@
 
 #define ERSPAN2_INDEX_SHIFT	0
 #define ERSPAN2_INDEX_MASK	(0xfffffU << ERSPAN2_INDEX_SHIFT)
-
-/*
- * XXX - eh?
- */
-#define	GRE_SP		0x1000		/* sequence# present */
 
 void
 erspan_print(netdissect_options *ndo, uint16_t flags, const u_char *bp, u_int len)

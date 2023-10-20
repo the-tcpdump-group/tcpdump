@@ -286,6 +286,7 @@ HDR = \
 	funcattrs.h \
 	getservent.h \
 	gmpls.h \
+	gre.h \
 	interface.h \
 	ip.h \
 	ip6.h \

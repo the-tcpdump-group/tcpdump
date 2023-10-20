@@ -55,14 +55,7 @@
 #include "addrtostr.h"
 #include "extract.h"
 #include "ethertype.h"
-
-
-#define	GRE_CP		0x8000		/* checksum present */
-#define	GRE_RP		0x4000		/* routing present */
-#define	GRE_KP		0x2000		/* key present */
-#define	GRE_SP		0x1000		/* sequence# present */
-#define	GRE_sP		0x0800		/* source routing */
-#define	GRE_AP		0x0080		/* acknowledgment# present */
+#include "gre.h"
 
 static const struct tok gre_flag_values[] = {
     { GRE_CP, "checksum present"},
