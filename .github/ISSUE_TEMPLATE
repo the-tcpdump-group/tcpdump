@@ -1,8 +1,9 @@
 To report a security issue please send an e-mail to security@tcpdump.org.
 
 To report bugs and other problems, contribute patches, request a
-feature, provide generic feedback etc please see the file
-CONTRIBUTING.md in the tcpdump source tree root.
+feature, provide generic feedback etc
+P_L_E_A_S_E___S_E_E___T_H_E___F_I_L_E   CONTRIBUTING.md
+in the tcpdump source tree root.
 
 When reporting bugs and other problems, give tcpdump and libpcap version
 with 'tcpdump --version' or './tcpdump --version'
