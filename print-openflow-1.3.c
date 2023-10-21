@@ -676,7 +676,7 @@ of13_port_print(netdissect_options *ndo,
 	cp += 4;
 	/* state */
 	ND_PRINT("\n\t   state 0x%08x", GET_BE_U_4(cp));
-	of_bitmap_print(ndo, ofpps_bm, GET_BE_U_4(cp), OFPPS_U);;
+	of_bitmap_print(ndo, ofpps_bm, GET_BE_U_4(cp), OFPPS_U);
 	cp += 4;
 	/* curr */
 	ND_PRINT("\n\t   curr 0x%08x", GET_BE_U_4(cp));
