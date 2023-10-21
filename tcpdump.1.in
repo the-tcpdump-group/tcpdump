@@ -20,7 +20,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "09 Sep 2023"
+.TH TCPDUMP 1  "21 October 2023"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -1508,7 +1508,7 @@ We can use this expression as the filter for \fItcpdump\fP in order
 to watch packets which have only SYN set:
 .RS
 .B
-tcpdump -i xl0 tcp[13] == 2
+tcpdump -i xl0 'tcp[13] == 2'
 .RE
 .PP
 The expression says "let the 13th octet of a TCP datagram have
