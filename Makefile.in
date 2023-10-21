@@ -514,8 +514,8 @@ releasecheck: releasetar
 	cd "$$TAG" && \
 	echo "[$@] $$ touch .devel" && \
 	touch .devel && \
-	echo "[$@] $$ ./configure --enable-smb --quiet --prefix=$$INSTALL_DIR" && \
-	./configure --enable-smb --quiet --prefix="$$INSTALL_DIR" && \
+	echo "[$@] $$ ./configure --enable-instrument-functions --enable-smb --quiet --prefix=$$INSTALL_DIR" && \
+	./configure --enable-instrument-functions --enable-smb --quiet --prefix="$$INSTALL_DIR" && \
 	echo '[$@] $$ $(MAKE) -s all check' && \
 	$(MAKE) -s all check >/dev/null && \
 	echo '[$@] $$ $(MAKE) -s install' && \
