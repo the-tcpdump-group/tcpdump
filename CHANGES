@@ -32,7 +32,6 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       AppleTalk: Declutter appletalk.h.
       IEEE 802.11: Simplify handle_action().
     Building and testing:
-      Add a configure option to help debugging (--enable-instrument-functions)
       autoconf: Add autogen.sh, remove configure and config.h.in and put
         these generated files in the release tarball.
       autoconf: Update install-sh script to the latest available version.
@@ -89,6 +88,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Include <time.h> from netdissect.h.
       Remove init_crc10_table() and the entourage.
     Building and testing:
+      Add a configure option to help debugging (--enable-instrument-functions)
       At build time require a proof of suitable snprintf(3) implementation in
         libc (and document Solaris 9 as unsupported because of that).
       Makefile.in: Add two "touch .devel" commands in the releasecheck target.
