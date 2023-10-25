@@ -12,6 +12,9 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       IEEE 802.11: no need for an element ID in the structures for IEs, make
         the length in the IE structures a u_int, include the "TA" field while
         printing Block Ack Control frame.
+      IP: Enable TSO (TCP Segmentation Offload) support; fix printing invalid
+        cases as invalid, not truncated; use ND_ICHECKMSG_ZU() to test the
+        header length.
       IPv6: Fix printing invalid cases as invalid, not truncated; use
         ND_ICHECKMSG_U() to print an invalid version.
       Kerberos: Print the protocol name, remove a redundant bounds check.
@@ -32,6 +35,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       RIP: Make a couple trivial protocol updates.
       RPKI-Router: Refine length and bounds checks.
       SNMP: Fix two undefined behaviors.
+      Text protocols: Fix printing truncation if it is not the case.
       ZMTP: Replace custom code with bittok2str().
     User interface:
       Print the supported time stamp types (-J) to stdout instead of stderr.
