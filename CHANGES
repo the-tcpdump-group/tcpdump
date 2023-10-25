@@ -52,6 +52,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       IEEE 802.11: no need for an element ID in the structures for IEs, make
         the length in the IE structures a u_int, include the "TA" field while
         printing Block Ack Control frame.
+      IPv6: Fix printing invalid cases as invalid, not truncated; use
+        ND_ICHECKMSG_U() to print an invalid version.
       Kerberos: Print the protocol name, remove a redundant bounds check.
       lwres: Fix an undefined behavior in pointer arithmetic.
       OpenFlow 1.0: Fix indentation of PORT_MOD, improve handling of
