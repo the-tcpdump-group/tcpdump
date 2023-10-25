@@ -73,7 +73,7 @@ erspan_print(netdissect_options *ndo, uint16_t flags, const u_char *bp, u_int le
 	nd_print_protocol(ndo);
 
 	if (!(flags & GRE_SP)) {
-		ND_PRINT(" I: ");
+		ND_PRINT(" type1: ");
 		ether_print(ndo, bp, len, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL);
 		return;
 	}
@@ -91,7 +91,7 @@ erspan_print(netdissect_options *ndo, uint16_t flags, const u_char *bp, u_int le
 	}
 
 	if (ndo->ndo_vflag)
-		ND_PRINT(" II");
+		ND_PRINT(" type2");
 
 	sid = (hdr & ERSPAN2_SID_MASK) >> ERSPAN2_SID_SHIFT;
 	ND_PRINT(" session %u", sid);
