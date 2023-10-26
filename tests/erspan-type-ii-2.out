@@ -1,0 +1,64 @@
+    1  07:26:21.649556 IP (tos 0x0, ttl 252, id 296, offset 0, flags [DF], proto GRE (47), length 98)
+    192.168.195.67 > 192.168.195.196: GREv0, Flags [sequence# present], seq 1086760, length 78
+	erspan type2 session 1 cos 6 index 540773: IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 48)
+    10.200.101.2.1985 > 224.0.0.2.1985: HSRPv0-hello 20: state=active group=254 addr=10.200.101.1 hellotime=1s holdtime=3s priority=105 auth="cisco"
+    2  07:26:21.649558 IP (tos 0x0, ttl 252, id 677, offset 0, flags [DF], proto GRE (47), length 98)
+    192.168.195.73 > 192.168.195.196: GREv0, Flags [sequence# present], seq 1306277, length 78
+	erspan type2 session 1 isl 101 cos 0 index 540773: IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 48)
+    10.200.101.2.1985 > 224.0.0.2.1985: HSRPv0-hello 20: state=active group=254 addr=10.200.101.1 hellotime=1s holdtime=3s priority=105 auth="cisco"
+    3  07:26:21.649560 IP (tos 0x0, ttl 252, id 297, offset 0, flags [DF], proto GRE (47), length 130)
+    192.168.195.67 > 192.168.195.196: GREv0, Flags [sequence# present], seq 1086761, length 110
+	erspan type2 session 1 cos 6 index 540772: IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 80)
+    10.200.100.2.1985 > 224.0.0.102.1985: HSRPv1
+    4  07:26:21.649562 IP (tos 0x0, ttl 252, id 678, offset 0, flags [DF], proto GRE (47), length 130)
+    192.168.195.73 > 192.168.195.196: GREv0, Flags [sequence# present], seq 1306278, length 110
+	erspan type2 session 1 isl 100 cos 0 index 540772: IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 80)
+    10.200.100.2.1985 > 224.0.0.102.1985: HSRPv1
+    5  07:26:21.649564 IP (tos 0x0, ttl 252, id 298, offset 0, flags [DF], proto GRE (47), length 130)
+    192.168.195.67 > 192.168.195.196: GREv0, Flags [sequence# present], seq 1086762, length 110
+	erspan type2 session 1 cos 6 index 540772: IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 80)
+    10.200.100.2.1985 > 224.0.0.102.1985: HSRPv1
+    6  07:26:21.649566 IP (tos 0x0, ttl 252, id 679, offset 0, flags [DF], proto GRE (47), length 130)
+    192.168.195.73 > 192.168.195.196: GREv0, Flags [sequence# present], seq 1306279, length 110
+	erspan type2 session 1 isl 100 cos 0 index 540772: IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 80)
+    10.200.100.2.1985 > 224.0.0.102.1985: HSRPv1
+    7  07:26:21.649691 IP (tos 0x0, ttl 252, id 299, offset 0, flags [DF], proto GRE (47), length 98)
+    192.168.195.67 > 192.168.195.196: GREv0, Flags [sequence# present], seq 1086763, length 78
+	erspan type2 session 1 cos 6 index 540773: IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 48)
+    10.200.101.2.1985 > 224.0.0.2.1985: HSRPv0-hello 20: state=active group=250 addr=10.200.101.101 hellotime=1s holdtime=3s priority=110 auth="cisco"
+    8  07:26:21.649693 IP (tos 0x0, ttl 252, id 680, offset 0, flags [DF], proto GRE (47), length 98)
+    192.168.195.73 > 192.168.195.196: GREv0, Flags [sequence# present], seq 1306280, length 78
+	erspan type2 session 1 isl 101 cos 0 index 540773: IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 48)
+    10.200.101.2.1985 > 224.0.0.2.1985: HSRPv0-hello 20: state=active group=250 addr=10.200.101.101 hellotime=1s holdtime=3s priority=110 auth="cisco"
+    9  07:26:21.656108 IP (tos 0x0, ttl 252, id 681, offset 0, flags [DF], proto GRE (47), length 98)
+    192.168.195.73 > 192.168.195.196: GREv0, Flags [sequence# present], seq 1306281, length 78
+	erspan type2 session 1 cos 6 index 540773: IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 48)
+    10.200.101.3.1985 > 224.0.0.2.1985: HSRPv0-hello 20: state=standby group=254 addr=10.200.101.1 hellotime=1s holdtime=3s priority=100 auth="cisco"
+   10  07:26:21.656110 IP (tos 0x0, ttl 252, id 300, offset 0, flags [DF], proto GRE (47), length 98)
+    192.168.195.67 > 192.168.195.196: GREv0, Flags [sequence# present], seq 1086764, length 78
+	erspan type2 session 1 isl 101 cos 0 index 540773: IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 48)
+    10.200.101.3.1985 > 224.0.0.2.1985: HSRPv0-hello 20: state=standby group=254 addr=10.200.101.1 hellotime=1s holdtime=3s priority=100 auth="cisco"
+   11  07:26:21.656112 IP (tos 0x0, ttl 252, id 682, offset 0, flags [DF], proto GRE (47), length 130)
+    192.168.195.73 > 192.168.195.196: GREv0, Flags [sequence# present], seq 1306282, length 110
+	erspan type2 session 1 cos 6 index 540772: IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 80)
+    10.200.100.3.1985 > 224.0.0.102.1985: HSRPv1
+   12  07:26:21.656114 IP (tos 0x0, ttl 252, id 301, offset 0, flags [DF], proto GRE (47), length 130)
+    192.168.195.67 > 192.168.195.196: GREv0, Flags [sequence# present], seq 1086765, length 110
+	erspan type2 session 1 isl 100 cos 0 index 540772: IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 80)
+    10.200.100.3.1985 > 224.0.0.102.1985: HSRPv1
+   13  07:26:21.656332 IP (tos 0x0, ttl 252, id 683, offset 0, flags [DF], proto GRE (47), length 130)
+    192.168.195.73 > 192.168.195.196: GREv0, Flags [sequence# present], seq 1306283, length 110
+	erspan type2 session 1 cos 6 index 540772: IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 80)
+    10.200.100.3.1985 > 224.0.0.102.1985: HSRPv1
+   14  07:26:21.656333 IP (tos 0x0, ttl 252, id 302, offset 0, flags [DF], proto GRE (47), length 130)
+    192.168.195.67 > 192.168.195.196: GREv0, Flags [sequence# present], seq 1086766, length 110
+	erspan type2 session 1 isl 100 cos 0 index 540772: IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 80)
+    10.200.100.3.1985 > 224.0.0.102.1985: HSRPv1
+   15  07:26:21.656335 IP (tos 0x0, ttl 252, id 684, offset 0, flags [DF], proto GRE (47), length 98)
+    192.168.195.73 > 192.168.195.196: GREv0, Flags [sequence# present], seq 1306284, length 78
+	erspan type2 session 1 cos 6 index 540773: IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 48)
+    10.200.101.3.1985 > 224.0.0.2.1985: HSRPv0-hello 20: state=standby group=250 addr=10.200.101.101 hellotime=1s holdtime=3s priority=90 auth="cisco"
+   16  07:26:21.656337 IP (tos 0x0, ttl 252, id 303, offset 0, flags [DF], proto GRE (47), length 98)
+    192.168.195.67 > 192.168.195.196: GREv0, Flags [sequence# present], seq 1086767, length 78
+	erspan type2 session 1 isl 101 cos 0 index 540773: IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 48)
+    10.200.101.3.1985 > 224.0.0.2.1985: HSRPv0-hello 20: state=standby group=250 addr=10.200.101.101 hellotime=1s holdtime=3s priority=90 auth="cisco"

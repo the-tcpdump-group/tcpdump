@@ -558,6 +558,15 @@ bfd-raw-auth-md5-v bfd-raw-auth-md5.pcap bfd-raw-auth-md5-v.out -v
 bfd-raw-auth-sha1 bfd-raw-auth-sha1.pcap bfd-raw-auth-sha1.out
 bfd-raw-auth-sha1-v bfd-raw-auth-sha1.pcap bfd-raw-auth-sha1-v.out -v
 
+# ERSPAN tests
+erspan-type-i-1		erspan-type-i-1.pcap	erspan-type-i-1.out	-v
+erspan-type-i-2		erspan-type-i-2.pcap	erspan-type-i-2.out	-v
+erspan-type-i-3		erspan-type-i-3.pcap	erspan-type-i-3.out	-v
+erspan-type-i-4		erspan-type-i-4.pcap	erspan-type-i-4.out	-v
+erspan-type-ii-1	erspan-type-ii-1.pcap	erspan-type-ii-1.out	-v
+erspan-type-ii-2	erspan-type-ii-2.pcap	erspan-type-ii-2.out	-v
+erspan-type-ii-3	erspan-type-ii-3.pcap	erspan-type-ii-3.out	-v
+
 # bad packets from Hanno Böck
 # heap-overflow-1 is in non-bsd.tests
 heap-overflow-2	heap-overflow-2.pcap		heap-overflow-2.out	-v

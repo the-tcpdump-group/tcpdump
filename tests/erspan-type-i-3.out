@@ -1,0 +1,3 @@
+    1  14:37:10.555050 IP (tos 0x0, ttl 254, id 0, offset 0, flags [none], proto GRE (47), length 88)
+    192.168.90.17 > 192.168.90.127: GREv0, Flags [none], length 68
+	erspan type1: ARP, Ethernet (len 6), IPv4 (len 4), Request who-has 192.168.90.253 tell 192.168.90.100, length 46

@@ -1,0 +1,520 @@
+    1  17:15:19.096226 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106954, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+    2  17:15:21.096172 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106955, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+    3  17:15:22.656962 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106956, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:00 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a2), length 11: 
+	0x0000:  aaaa 0300 0081 01a2 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+    4  17:15:22.657006 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106957, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:01 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a1), length 11: 
+	0x0000:  aaaa 0300 0081 01a1 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+    5  17:15:23.096124 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106958, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+    6  17:15:25.096072 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106959, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+    7  17:15:27.096017 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106960, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+    8  17:15:29.095964 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106961, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+    9  17:15:31.095910 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106962, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   10  17:15:32.656693 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106963, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:00 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a2), length 11: 
+	0x0000:  aaaa 0300 0081 01a2 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+   11  17:15:32.656737 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106964, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:01 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a1), length 11: 
+	0x0000:  aaaa 0300 0081 01a1 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+   12  17:15:33.095854 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106965, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   13  17:15:35.095803 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106966, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   14  17:15:37.095748 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106967, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   15  17:15:39.095705 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106968, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   16  17:15:41.095643 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106969, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   17  17:15:42.656431 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106970, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:00 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a2), length 11: 
+	0x0000:  aaaa 0300 0081 01a2 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+   18  17:15:42.656476 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106971, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:01 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a1), length 11: 
+	0x0000:  aaaa 0300 0081 01a1 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+   19  17:15:43.095593 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106972, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   20  17:15:45.095551 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106973, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   21  17:15:47.095463 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106974, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   22  17:15:49.095446 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106975, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   23  17:15:51.095378 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106976, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   24  17:15:52.656168 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106977, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:00 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a2), length 11: 
+	0x0000:  aaaa 0300 0081 01a2 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+   25  17:15:52.656212 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106978, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:01 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a1), length 11: 
+	0x0000:  aaaa 0300 0081 01a1 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+   26  17:15:53.121837 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106979, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   27  17:15:55.095272 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106980, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   28  17:15:57.095218 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106981, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   29  17:15:59.095166 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106982, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   30  17:16:01.095113 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106983, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   31  17:16:02.655898 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106984, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:00 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a2), length 11: 
+	0x0000:  aaaa 0300 0081 01a2 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+   32  17:16:02.655942 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106985, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:01 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a1), length 11: 
+	0x0000:  aaaa 0300 0081 01a1 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+   33  17:16:03.095064 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106986, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   34  17:16:05.095010 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106987, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   35  17:16:07.094867 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106988, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   36  17:16:09.094903 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106989, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   37  17:16:11.094849 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106990, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   38  17:16:12.655634 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106991, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:00 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a2), length 11: 
+	0x0000:  aaaa 0300 0081 01a2 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+   39  17:16:12.655692 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106992, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:01 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a1), length 11: 
+	0x0000:  aaaa 0300 0081 01a1 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+   40  17:16:13.094796 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106993, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   41  17:16:15.094740 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106994, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   42  17:16:17.094690 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106995, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   43  17:16:19.094635 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106996, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   44  17:16:21.094583 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106997, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   45  17:16:22.655371 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106998, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:00 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a2), length 11: 
+	0x0000:  aaaa 0300 0081 01a2 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+   46  17:16:22.655415 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 106999, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:01 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a1), length 11: 
+	0x0000:  aaaa 0300 0081 01a1 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+   47  17:16:23.094538 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107000, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   48  17:16:25.094480 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107001, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   49  17:16:27.094426 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107002, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   50  17:16:29.094387 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107003, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   51  17:16:31.094320 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107004, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   52  17:16:32.655105 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107005, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:00 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a2), length 11: 
+	0x0000:  aaaa 0300 0081 01a2 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+   53  17:16:32.655150 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107006, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:01 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a1), length 11: 
+	0x0000:  aaaa 0300 0081 01a1 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+   54  17:16:33.094279 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107007, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   55  17:16:35.094215 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107008, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   56  17:16:37.094158 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107009, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   57  17:16:39.094106 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107010, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   58  17:16:41.094063 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107011, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   59  17:16:42.654837 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107012, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:00 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a2), length 11: 
+	0x0000:  aaaa 0300 0081 01a2 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+   60  17:16:42.654882 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107013, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:01 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a1), length 11: 
+	0x0000:  aaaa 0300 0081 01a1 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+   61  17:16:43.093920 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107014, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   62  17:16:45.093946 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107015, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   63  17:16:47.093893 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107016, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   64  17:16:49.093841 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107017, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   65  17:16:51.093790 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107018, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   66  17:16:52.654571 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107019, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:00 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a2), length 11: 
+	0x0000:  aaaa 0300 0081 01a2 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+   67  17:16:52.654616 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107020, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:01 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a1), length 11: 
+	0x0000:  aaaa 0300 0081 01a1 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+   68  17:16:53.093733 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107021, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   69  17:16:55.093680 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107022, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   70  17:16:55.337242 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107023, length 80
+	erspan type2 session 101 vlan 865 cos 0 index 43973: ARP, Ethernet (len 6), IPv4 (len 4), Request who-has 10.240.19.129 tell 10.240.19.139, length 46
+   71  17:16:56.279253 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107024, length 80
+	erspan type2 session 101 vlan 865 cos 0 index 43973: ARP, Ethernet (len 6), IPv4 (len 4), Request who-has 10.240.19.129 tell 10.240.19.139, length 46
+   72  17:16:57.093625 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107025, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   73  17:16:57.284440 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107026, length 80
+	erspan type2 session 101 vlan 865 cos 0 index 43973: ARP, Ethernet (len 6), IPv4 (len 4), Request who-has 10.240.19.129 tell 10.240.19.139, length 46
+   74  17:16:58.782301 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107027, length 80
+	erspan type2 session 101 vlan 865 cos 0 index 43973: ARP, Ethernet (len 6), IPv4 (len 4), Request who-has 10.240.19.133 tell 10.240.19.139, length 46
+   75  17:16:59.093574 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107028, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   76  17:17:00.522058 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107029, length 80
+	erspan type2 session 101 vlan 865 cos 0 index 43973: ARP, Ethernet (len 6), IPv4 (len 4), Request who-has 10.240.19.133 tell 10.240.19.139, length 46
+   77  17:17:01.093521 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107030, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   78  17:17:01.272690 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107031, length 80
+	erspan type2 session 101 vlan 865 cos 0 index 43973: ARP, Ethernet (len 6), IPv4 (len 4), Request who-has 10.240.19.133 tell 10.240.19.139, length 46
+   79  17:17:02.271807 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107032, length 80
+	erspan type2 session 101 vlan 865 cos 0 index 43973: ARP, Ethernet (len 6), IPv4 (len 4), Request who-has 10.240.19.133 tell 10.240.19.139, length 46
+   80  17:17:02.654306 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107033, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:00 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a2), length 11: 
+	0x0000:  aaaa 0300 0081 01a2 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+   81  17:17:02.654351 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107034, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:01 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a1), length 11: 
+	0x0000:  aaaa 0300 0081 01a1 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+   82  17:17:03.093471 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107035, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   83  17:17:05.093417 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107036, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   84  17:17:06.540795 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107037, length 80
+	erspan type2 session 101 vlan 865 cos 0 index 43973: ARP, Ethernet (len 6), IPv4 (len 4), Request who-has 10.240.19.133 tell 10.240.19.139, length 46
+   85  17:17:07.093363 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107038, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   86  17:17:07.283832 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107039, length 80
+	erspan type2 session 101 vlan 865 cos 0 index 43973: ARP, Ethernet (len 6), IPv4 (len 4), Request who-has 10.240.19.133 tell 10.240.19.139, length 46
+   87  17:17:08.282060 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107040, length 80
+	erspan type2 session 101 vlan 865 cos 0 index 43973: ARP, Ethernet (len 6), IPv4 (len 4), Request who-has 10.240.19.133 tell 10.240.19.139, length 46
+   88  17:17:09.093309 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107041, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   89  17:17:11.093257 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107042, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   90  17:17:12.654042 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107043, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:00 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a2), length 11: 
+	0x0000:  aaaa 0300 0081 01a2 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+   91  17:17:12.654087 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107044, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:01 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a1), length 11: 
+	0x0000:  aaaa 0300 0081 01a1 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+   92  17:17:13.093204 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107045, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   93  17:17:15.093164 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107046, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   94  17:17:17.093097 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107047, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   95  17:17:19.093043 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107048, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   96  17:17:21.093002 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107049, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+   97  17:17:22.653776 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107050, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:00 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a2), length 11: 
+	0x0000:  aaaa 0300 0081 01a2 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+   98  17:17:22.653820 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107051, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:01 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a1), length 11: 
+	0x0000:  aaaa 0300 0081 01a1 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+   99  17:17:23.092943 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107052, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+  100  17:17:25.092898 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107053, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+  101  17:17:27.092832 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107054, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+  102  17:17:29.092779 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107055, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+  103  17:17:31.092749 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107056, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+  104  17:17:32.653468 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107057, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:00 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a2), length 11: 
+	0x0000:  aaaa 0300 0081 01a2 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+  105  17:17:32.653572 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 100)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107058, length 80
+	erspan type2 session 101 vlan 1 cos 0 index 43973: 00:19:69:df:dc:01 > 01:00:81:00:01:01 SNAP, oui Nortel Networks SONMP (0x000081), pid Unknown (0x01a1), length 11: 
+	0x0000:  aaaa 0300 0081 01a1 0000 0000 0001 1583  ................
+	0x0010:  0c02 00                                  ...
+  106  17:17:33.092673 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107059, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+  107  17:17:35.092618 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107060, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0
+  108  17:17:37.092562 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 96)
+    192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 107061, length 76
+	erspan type2 session 101 vlan 1 cos 0 index 43973: STP 802.1d, Config, Flags [none], bridge-id 8000.00:19:69:df:dc:01.8015, length 35
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	root-id 8000.00:19:69:df:dc:01, root-pathcost 0

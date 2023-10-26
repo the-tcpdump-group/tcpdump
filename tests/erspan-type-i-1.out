@@ -1,0 +1,8 @@
+    1  13:09:59.174316 IP (tos 0xfc, ttl 32, id 0, offset 0, flags [none], proto GRE (47), length 126)
+    1.1.1.1 > 192.168.255.5: GREv0, Flags [none], length 106
+	erspan type1: IP (tos 0x0, ttl 255, id 40771, offset 0, flags [none], proto ICMP (1), length 84)
+    10.52.128.233 > 10.52.128.234: ICMP echo request, id 44114, seq 3, length 64
+    2  13:09:59.174822 IP (tos 0xfc, ttl 32, id 0, offset 0, flags [none], proto GRE (47), length 126)
+    1.1.1.1 > 192.168.255.5: GREv0, Flags [none], length 106
+	erspan type1: IP (tos 0x0, ttl 255, id 40771, offset 0, flags [none], proto ICMP (1), length 84)
+    10.52.128.234 > 10.52.128.233: ICMP echo reply, id 44114, seq 3, length 64
