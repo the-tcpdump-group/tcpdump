@@ -142,7 +142,6 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 		return;
 	}
 
-#define MIN_PFLOG_HDRLEN	45
 	hdr = (const struct pfloghdr *)p;
 	hdrlen = GET_U_1(hdr->length);
 	if (hdrlen < MIN_PFLOG_HDRLEN) {

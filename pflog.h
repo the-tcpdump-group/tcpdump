@@ -128,6 +128,8 @@ struct pfloghdr {
 	nd_uint32_t	rule_uid;
 	nd_int32_t	rule_pid;
 	nd_uint8_t	dir;
+/* Minimum header length (without padding): 61 */
+#define MIN_PFLOG_HDRLEN 61
 #if defined(__OpenBSD__)
 	nd_uint8_t	rewritten;
 	nd_uint8_t	naf;
@@ -146,6 +148,3 @@ struct pfloghdr {
 	nd_uint16_t	dport;
 #endif
 };
-
-
-
