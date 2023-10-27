@@ -37,7 +37,7 @@ static const struct tok pf_reasons[] = {
 	{ PFRES_MATCH,		"0(match)" },
 	{ PFRES_BADOFF,		"1(bad-offset)" },
 	{ PFRES_FRAG,		"2(fragment)" },
-	{ PFRES_NORM,		"3(short)" },
+	{ PFRES_SHORT,		"3(short)" },
 	{ PFRES_NORM,		"4(normalize)" },
 	{ PFRES_MEMORY,		"5(memory)" },
 	{ PFRES_TS,		"6(bad-timestamp)" },
