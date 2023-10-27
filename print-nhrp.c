@@ -34,7 +34,6 @@
 #include "addrtoname.h"
 #include "af.h"
 #include "ethertype.h"
-#include "interface.h"
 #include "extract.h"
 
 #define NHRP_VER_RFC2332		1
