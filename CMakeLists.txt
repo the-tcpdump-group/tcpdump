@@ -788,7 +788,6 @@ if(NOT HAVE_PCAP_SET_PARSER_DEBUG)
 endif(NOT HAVE_PCAP_SET_PARSER_DEBUG)
 
 check_function_exists(pcap_set_optimizer_debug HAVE_PCAP_SET_OPTIMIZER_DEBUG)
-check_function_exists(bpf_dump HAVE_BPF_DUMP)
 
 cmake_pop_check_state()
 cmake_pop_check_state()
@@ -1257,9 +1256,6 @@ endif()
 
 set(TCPDUMP_SOURCE_LIST_C fptype.c tcpdump.c)
 
-if(NOT HAVE_BPF_DUMP)
-    set(TCPDUMP_SOURCE_LIST_C ${TCPDUMP_SOURCE_LIST_C} bpf_dump.c)
-endif(NOT HAVE_BPF_DUMP)
 if(NOT HAVE_PCAP_DUMP_FTELL)
     set(TCPDUMP_SOURCE_LIST_C ${TCPDUMP_SOURCE_LIST_C} missing/pcap_dump_ftell.c)
 endif(NOT HAVE_PCAP_DUMP_FTELL)

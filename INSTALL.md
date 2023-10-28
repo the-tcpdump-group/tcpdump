@@ -81,8 +81,6 @@ ascii_strcasecmp.c - locale-independent case-independent string comparison
 atime.awk	- TCP ack awk script
 atm.h		- ATM traffic type definitions
 autogen.sh	- build configure and config.h.in (run this first)
-bpf_dump.c	- BPF program printing routines, in case libpcap doesn't
-		  have them
 chdlc.h		- Cisco HDLC definitions
 cpack.c		- functions to extract packed data
 cpack.h		- declarations of functions to extract packed data

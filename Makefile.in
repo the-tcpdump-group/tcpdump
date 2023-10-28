@@ -347,7 +347,6 @@ EXTRA_DIST = \
 	aclocal.m4 \
 	autogen.sh \
 	atime.awk \
-	bpf_dump.c \
 	cmake/Modules/FindCRYPTO.cmake \
 	cmake/Modules/FindPCAP.cmake \
 	cmake/Modules/FindSMI.cmake \

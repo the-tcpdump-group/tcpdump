@@ -697,7 +697,6 @@ if test "$ac_cv_func_pcap_set_parser_debug" = "no" ; then
 	fi
 fi
 AC_CHECK_FUNCS(pcap_set_optimizer_debug)
-AC_REPLACE_FUNCS(bpf_dump)	dnl moved to libpcap in 0.6
 
 V_GROUP=0
 if test -f /etc/group -a ! -z "`grep '^wheel:' /etc/group`" ; then
