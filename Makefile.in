@@ -309,7 +309,6 @@ HDR = \
 	ospf.h \
 	oui.h \
 	pcap-missing.h \
-	pflog.h \
 	ppp.h \
 	print.h \
 	rpc_auth.h \
