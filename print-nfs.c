@@ -896,7 +896,9 @@ nfs_printfh(netdissect_options *ndo,
 		if (spacep)
 			*spacep = '\0';
 
-		ND_PRINT(" fh %s/", temp);
+		ND_PRINT(" fh ");
+		fn_print_str(ndo, (const u_char *)temp);
+		ND_PRINT("/");
 	} else {
 		ND_PRINT(" fh %u,%u/",
 			     fsid.Fsid_dev.Major, fsid.Fsid_dev.Minor);
