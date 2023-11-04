@@ -1067,7 +1067,8 @@ ospf_decode_v2(netdissect_options *ndo,
 
 	case OSPF_TYPE_LS_ACK:
                 lshp = op->ospf_lsa.lsa_lshdr;
-                while (ospf_print_lshdr(ndo, lshp) != -1) {
+                while ((const u_char *)lshp < dataend) {
+                    ospf_print_lshdr(ndo, lshp);
                     ++lshp;
                 }
                 break;
