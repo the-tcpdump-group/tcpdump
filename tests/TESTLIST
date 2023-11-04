@@ -131,6 +131,7 @@ mpls-over-udp-v  mpls-over-udp.pcap  mpls-over-udp-v.out -v
 # OSPF tests
 ospf-gmpls	ospf-gmpls.pcap				ospf-gmpls.out		-v
 ospf-nssa-bitnt	ospf-nssa-bitnt.pcap			ospf-nssa-bitnt.out	-v
+ospf-ack	ospf-ack.pcap				ospf-ack.out		-v
 ospf3_ah-vv	OSPFv3_with_AH.pcap			ospf3_ah-vv.out		-v -v
 ospf3_auth-vv	ospf3_auth.pcapng			ospf3_auth-vv.out	-v -v
 ospf3_bc-vv	OSPFv3_broadcast_adjacency.pcap		ospf3_bc-vv.out		-v -v
