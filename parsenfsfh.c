@@ -48,6 +48,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 
 #include "netdissect-ctype.h"
 
@@ -389,6 +390,7 @@ Parse_fh(netdissect_options *ndo, const unsigned char *fh, u_int len,
 	    (void)fprintf(stderr, "\n");
 #endif
 	    /* Save the actual handle, so it can be display with -u */
+	    /* XXX really ? When -u is used this function is not called */
 	    for (i = 0; i < len*4 && i*2 < sizeof(fsidp->Opaque_Handle) - 1; i++)
 		(void)snprintf(&(fsidp->Opaque_Handle[i*2]), 3, "%.2X",
 			       GET_U_1(fhp + i));
@@ -396,11 +398,12 @@ Parse_fh(netdissect_options *ndo, const unsigned char *fh, u_int len,
 
 	    /* XXX for now, give "bogus" values to aid debugging */
 	    fsidp->fsid_code = 0;
-	    fsidp->Fsid_dev.Minor = 257;
-	    fsidp->Fsid_dev.Major = 257;
+	    fsidp->Fsid_dev.Minor = UINT_MAX;
+	    fsidp->Fsid_dev.Major = UINT_MAX;
 	    *inop = 1;
 
-	    /* display will show this string instead of (257,257) */
+	    /* display will show this string instead of (UINT_MAX,UINT_MAX) */
+	    /* XXX really ? */
 	    if (fsnamep)
 		*fsnamep = "Unknown";
 
