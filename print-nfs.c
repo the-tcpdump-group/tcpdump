@@ -904,7 +904,7 @@ nfs_printfh(netdissect_options *ndo,
 			     fsid.Fsid_dev.Major, fsid.Fsid_dev.Minor);
 	}
 
-	if(fsid.Fsid_dev.Minor == 257)
+	if(fsid.Fsid_dev.Minor == UINT_MAX && fsid.Fsid_dev.Major == UINT_MAX)
 		/* Print the undecoded handle */
 		fn_print_str(ndo, (const u_char *)fsid.Opaque_Handle);
 	else
