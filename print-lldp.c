@@ -1098,7 +1098,7 @@ lldp_private_tia_print(netdissect_options *ndo,
 		tptr += 2;
                 lci_len -= 2;
 
-                ND_PRINT("\n\t      CA type \'%s\' (%u), length %u: ",
+                ND_PRINT("\n\t      CA type '%s' (%u), length %u: ",
                        tok2str(lldp_tia_location_lci_catype_values, "unknown", ca_type),
                        ca_type, ca_len);
 
