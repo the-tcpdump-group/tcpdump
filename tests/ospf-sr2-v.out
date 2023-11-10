@@ -18,7 +18,7 @@
 	    Extended Prefix TLV (1), length: 20, value: 
 	      IPv4 prefix:     192.168.0.0/32, Route Type: Intra-Area, Flags [none]
 		Prefix-SID subTLV (2), length: 8, value: 
-		  Index: 0, MT-ID: 0, Algorithm: 0, Flags [none]
+		  Index: 0, MT-ID: 0, Algorithm: Shortest Path First (0), Flags [none]
 	  LSA #3
 	  Advertising Router 192.168.0.0, seq 0x80000009, age 1s, length 112
 	    Router LSA (1), LSA-ID: 192.168.0.0

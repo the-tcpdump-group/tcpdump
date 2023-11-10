@@ -18,7 +18,7 @@
 	    Extended Prefix Range TLV (2), length: 24, value: 
 	      IPv4 prefix:     192.168.0.0/32, Range size: 1, Flags [none]
 		Prefix-SID subTLV (2), length: 8, value: 
-		  Index: 4, MT-ID: 0, Algorithm: 0, Flags [none]
+		  Index: 4, MT-ID: 0, Algorithm: Shortest Path First (0), Flags [none]
 	  LSA #3
 	  Advertising Router 192.168.0.4, seq 0x8000001e, age 1s, length 112
 	    Router LSA (1), LSA-ID: 192.168.0.4
