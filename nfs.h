@@ -53,6 +53,7 @@
 #define	NFS_PROG	100003
 #define NFS_VER2	2
 #define	NFS_VER3	3
+#define	NFS_VER4	4
 #define NFS_V2MAXDATA	8192
 #define	NFS_MAXDGRAMDATA 16384
 #define	NFS_MAXDATA	32768

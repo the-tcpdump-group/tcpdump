@@ -571,6 +571,19 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 	v3 = (GET_BE_U_4(&rp->rm_call.cb_vers) == NFS_VER3);
 	proc = GET_BE_U_4(&rp->rm_call.cb_proc);
 
+	if (GET_BE_U_4(&rp->rm_call.cb_vers) == NFS_VER4) {
+		ND_PRINT(" v4");
+		switch (proc) {
+			case 0:
+				ND_PRINT(" null");
+				break;
+			case 1:
+				ND_PRINT(" compound");
+				break;
+		}
+		return;
+	}
+
 	if (!v3 && proc < NFS_NPROCS)
 		proc =  nfsv3_procid[proc];
 
@@ -1538,6 +1551,25 @@ interp_reply(netdissect_options *ndo,
 	int v3;
 	u_int er;
 	int nfserr = 0;
+
+	if (vers == NFS_VER4) {
+		ND_PRINT(" v4");
+		switch (proc) {
+			case 0:
+				ND_PRINT(" null");
+				break;
+			case 1:
+				ND_PRINT(" compound");
+				break;
+		}
+		dp = parserep(ndo, rp, length, &nfserr);
+		if (dp == NULL)
+			goto trunc;
+		dp = parsestatus(ndo, dp, &er, &nfserr);
+		if (dp == NULL)
+			goto trunc;
+		return;
+	}
 
 	v3 = (vers == NFS_VER3);
 
