@@ -102,6 +102,7 @@ static const struct tok lsa_opaque_values[] = {
 	{ LS_OPAQUE_TYPE_GRACE, "Graceful restart" },
 	{ LS_OPAQUE_TYPE_RI,    "Router Information" },
 	{ LS_OPAQUE_TYPE_EP,    "Extended Prefix" },
+	{ LS_OPAQUE_TYPE_EL,    "Extended Link" },
 	{ 0,			NULL }
 };
 
@@ -192,8 +193,11 @@ static const struct tok lsa_opaque_te_tlv_link_type_sub_tlv_values[] = {
 
 static const struct tok lsa_opaque_ri_tlv_values[] = {
 	{ LS_OPAQUE_RI_TLV_CAP, "Router Capabilities" },
+	{ LS_OPAQUE_RI_TLV_SR_ALGO, "SR-Algorithm" },
 	{ LS_OPAQUE_RI_TLV_HOSTNAME, "Hostname" },
 	{ LS_OPAQUE_RI_TLV_SID_LABEL_RANGE, "SID/Label Range" },
+	{ LS_OPAQUE_RI_TLV_SR_LOCAL_BLOCK, "SR Local Block" },
+	{ LS_OPAQUE_RI_TLV_SRMS_PREFERENCE, "SRMS Preference" },
 	{ 0,		        NULL }
 };
 
@@ -209,6 +213,12 @@ static const struct tok lsa_opaque_ri_tlv_cap_values[] = {
 	{ 256, "p2p over LAN" },
 	{ 512, "path computation server" },
 	{ 0,		        NULL }
+};
+
+static const struct tok lsa_opaque_ri_tlv_sr_algos[] = {
+	{ 0, "Shortest Path First" },
+	{ 1, "Strict Shortest Path First" },
+	{ 0,                    NULL }
 };
 
 static const struct tok ospf_lls_tlv_values[] = {
@@ -656,6 +666,14 @@ ospf_print_tos_metrics(netdissect_options *ndo,
     }
 }
 
+/*
+ * The SID/Label Range TLV
+ * https://datatracker.ietf.org/doc/html/rfc8665#section-3.2
+ * and the SR Local Block TLV
+ * https://datatracker.ietf.org/doc/html/rfc8665#section-3.3
+ * have the same contents, so this function is used to
+ * print both.
+ */
 static int
 ospf_print_ri_lsa_sid_label_range_tlv(netdissect_options *ndo, const uint8_t *tptr,
 				      u_int tlv_length)
@@ -739,15 +757,16 @@ ospf_print_ep_lsa_extd_prefix_tlv(netdissect_options *ndo, const uint8_t *tptr,
 	    algo = GET_U_1(tptr+3);
 
 	    if (subtlv_length == 7) {
-		ND_PRINT("\n\t\t  Label: %u, MT-ID: %u, Algorithm: %u",
-			 GET_BE_U_3(tptr+4), mt_id, algo);
+		ND_PRINT("\n\t\t  Label: %u", GET_BE_U_3(tptr+4));
 	    } else if (subtlv_length == 8) {
-		ND_PRINT("\n\t\t  Index: %u, MT-ID: %u, Algorithm: %u, Flags [%s]",
-			 GET_BE_U_4(tptr+4), mt_id, algo,
-			 bittok2str(ep_range_tlv_prefix_sid_subtlv_flag_values, "none", flags));
+		ND_PRINT("\n\t\t  Index: %u", GET_BE_U_4(tptr+4));
 	    } else {
 		ND_PRINT("\n\t\tBogus subTLV length %u", subtlv_length);
+		break;
 	    }
+	    ND_PRINT( ", MT-ID: %u, Algorithm: %s (%u), Flags [%s]",
+		      mt_id, tok2str(lsa_opaque_ri_tlv_sr_algos, "Unknown", algo), algo,
+		 bittok2str(ep_range_tlv_prefix_sid_subtlv_flag_values, "none", flags));
 	    break;
 
 	default:
@@ -883,7 +902,7 @@ ospf_print_lsa(netdissect_options *ndo,
 	const struct aslametric *almp;
 	const struct mcla *mcp;
 	const uint8_t *lp;
-	u_int tlv_type, tlv_length, rla_count, topology;
+	u_int tlv_type, tlv_length, rla_count, topology, num_tlv;
 	int ospf_print_lshdr_ret;
 	u_int ls_length;
 	const uint8_t *tptr;
@@ -1099,12 +1118,30 @@ ospf_print_lsa(netdissect_options *ndo,
                         nd_printjnp(ndo, tptr, tlv_length);
                         break;
 
+                    case LS_OPAQUE_RI_TLV_SR_ALGO:
+                        num_tlv = tlv_length;
+                        while (num_tlv >= 1) {
+                            ND_PRINT("\n\t      %s (%u)",
+                                     tok2str(lsa_opaque_ri_tlv_sr_algos, "Unknown", GET_U_1(tptr+tlv_length-num_tlv)), GET_U_1(tptr+tlv_length-num_tlv));
+                            num_tlv--;
+                        }
+                        break;
+
                     case LS_OPAQUE_RI_TLV_SID_LABEL_RANGE:
+                    case LS_OPAQUE_RI_TLV_SR_LOCAL_BLOCK:
                         ND_TCHECK_4(tptr);
                         ND_PRINT("\n\t      Range size: %u", GET_BE_U_3(tptr));
                         if (ospf_print_ri_lsa_sid_label_range_tlv(ndo, tptr+4, tlv_length-4) == -1) {
                             return(ls_end);
                         }
+                        break;
+
+                    case LS_OPAQUE_RI_TLV_SRMS_PREFERENCE:
+                        if (tlv_length != 4) {
+                            ND_PRINT("\n\t    Bogus SRMS Preference TLV length %u != 4", tlv_length);
+                            return(ls_end);
+                        }
+                        ND_PRINT("\n\t      SRMS Preference: %u", GET_U_1(tptr));
                         break;
 
                     default:

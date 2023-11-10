@@ -1,0 +1,27 @@
+    1  22:11:10.755260 IP (tos 0x0, ttl 1, id 1, offset 0, flags [none], proto OSPF (89), length 148, bad cksum d831 (->d809)!)
+    1.0.0.2 > 224.0.0.5: OSPFv2, LS-Update, length 128
+	Router-ID 2.2.2.2, Backbone Area, Authentication Type: none (0), 1 LSA
+	  LSA #1
+	  Advertising Router 2.2.2.2, seq 0x80000001, age 3600s, length 80
+	    Area Local Opaque LSA (10), Opaque-Type Router Information LSA (4), Opaque-ID 0
+	    Options: [none]
+	    SR-Algorithm TLV (8), length: 1, value: 
+	      Shortest Path First (0)
+	    SID/Label Range TLV (9), length: 12, value: 
+	      Range size: 100
+	      SID/Label subTLV (1), length: 3, value: 
+		Label: 100
+	    SID/Label Range TLV (9), length: 12, value: 
+	      Range size: 100
+	      SID/Label subTLV (1), length: 3, value: 
+		Label: 1000
+	    SR Local Block TLV (14), length: 12, value: 
+	      Range size: 4242
+	      SID/Label subTLV (1), length: 3, value: 
+		Label: 4321
+	    SR Local Block TLV (14), length: 12, value: 
+	      Range size: 4242
+	      SID/Label subTLV (1), length: 4, value: 
+		SID: 24680
+	    SRMS Preference TLV (15), length: 4, value: 
+	      SRMS Preference: 99
