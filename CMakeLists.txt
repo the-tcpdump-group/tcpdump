@@ -6,18 +6,22 @@ if(WIN32)
     cmake_minimum_required(VERSION 3.12)
 else(WIN32)
     #
-    # For now, require only 2.8.12, just in case somebody is
-    # configuring with CMake on a "long-term support" version
-    # of some OS and that version supplies an older version of
-    # CMake.
+    # For now:
     #
-    # If this is ever updated to CMake 3.1 or later, remove the
-    # stuff in cmake/Modules/FindPCAP.cmake that appends subdirectories
-    # of directories from CMAKE_PREFIX_PATH to the PKG_CONFIG_PATH
-    # environment variable when running pkg-config, to make sure
-    # it finds any .pc file from there.
+    #  if this is a version of CMake less than 3.5, require only
+    #  2.8.12, just in case somebody is configuring with CMake
+    #  on a "long-term support" version # of some OS and that
+    #  version supplies an older version of CMake;
     #
-    cmake_minimum_required(VERSION 2.8.12)
+    #  otherwise, require 3.5, so we don't get messages warning
+    #  that support for versions of CMake lower than 3.5 is
+    #  deprecated.
+    #
+    if(CMAKE_VERSION VERSION_LESS "3.5")
+        cmake_minimum_required(VERSION 2.8.12)
+    else()
+        cmake_minimum_required(VERSION 3.5)
+    endif()
 endif(WIN32)
 
 #
