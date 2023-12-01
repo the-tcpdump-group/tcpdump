@@ -2243,8 +2243,11 @@ main(int argc, char **argv)
 			 * on; this may be a non-Linux "any" device
 			 * that doesn't support DLT_LINUX_SLL2.
 			 */
-			if (strcmp(device, "any") == 0)
+			if (strcmp(device, "any") == 0) {
+DIAG_OFF_WARN_UNUSED_RESULT
 				(void) pcap_set_datalink(pd, DLT_LINUX_SLL2);
+DIAG_ON_WARN_UNUSED_RESULT
+			}
 		}
 #endif
 		i = pcap_snapshot(pd);

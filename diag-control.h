@@ -132,6 +132,22 @@
   #define DIAG_ON_CAST_QUAL \
     DIAG_DO_PRAGMA(GCC diagnostic pop)
 
+  #if ND_IS_AT_LEAST_GNUC_VERSION(4,5)
+    /*
+     * GCC warns about unused return values if a function is marked as
+     * "warn about ignoring this function's return value".
+     *
+     * Clang appears to let you ignore a result without a warning by
+     * casting the function result to void, so we don't appear to
+     * need this for Clang.
+     */
+    #define DIAG_OFF_WARN_UNUSED_RESULT \
+      DIAG_DO_PRAGMA(GCC diagnostic push) \
+      DIAG_DO_PRAGMA(GCC diagnostic ignored "-Wunused-result")
+    #define DIAG_ON_WARN_UNUSED_RESULT \
+      DIAG_DO_PRAGMA(GCC diagnostic pop)
+  #endif
+
   /*
    * Suppress deprecation warnings.
    */
@@ -171,6 +187,12 @@
 #endif
 #ifndef DIAG_ON_CAST_QUAL
 #define DIAG_ON_CAST_QUAL
+#endif
+#ifndef DIAG_OFF_WARN_UNUSED_RESULT
+#define DIAG_OFF_WARN_UNUSED_RESULT
+#endif
+#ifndef DIAG_ON_WARN_UNUSED_RESULT
+#define DIAG_ON_WARN_UNUSED_RESULT
 #endif
 #ifndef DIAG_OFF_DEPRECATION
 #define DIAG_OFF_DEPRECATION
