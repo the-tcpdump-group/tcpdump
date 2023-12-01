@@ -34,7 +34,6 @@
 #include "netdissect-stdinc.h"
 
 #include "netdissect.h"
-#include "ethertype.h"
 #include "extract.h"
 
 

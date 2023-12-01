@@ -29,7 +29,6 @@
 
 #define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
-#include "ethertype.h"
 #include "addrtoname.h"
 #include "extract.h"
 
