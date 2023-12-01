@@ -22,7 +22,6 @@
 #include "netdissect-stdinc.h"
 #include "netdissect.h"
 #include "extract.h"
-#include "udp.h"
 
 /*
  * SOMEIP Header (R19-11)
