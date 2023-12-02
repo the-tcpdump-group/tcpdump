@@ -33,7 +33,6 @@
 
 #include "ip.h"
 #include "ip6.h"
-#include "ipproto.h"
 #include "af.h"
 
 #define PIMV1_TYPE_QUERY           0

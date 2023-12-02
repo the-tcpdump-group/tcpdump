@@ -70,7 +70,6 @@
 #include "extract.h"
 #include "addrtoname.h"
 #include "ethertype.h"
-#include "ipproto.h"
 #include "oui.h"
 #include "openflow.h"
 

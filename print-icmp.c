@@ -36,7 +36,6 @@
 
 #include "ip.h"
 #include "udp.h"
-#include "ipproto.h"
 #include "mpls.h"
 
 /*

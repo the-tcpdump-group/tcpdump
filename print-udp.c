@@ -36,7 +36,6 @@
 
 #include "ip.h"
 #include "ip6.h"
-#include "ipproto.h"
 #include "rpc_auth.h"
 #include "rpc_msg.h"
 

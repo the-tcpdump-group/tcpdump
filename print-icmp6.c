@@ -36,7 +36,6 @@
 #include "extract.h"
 
 #include "ip6.h"
-#include "ipproto.h"
 
 #include "udp.h"
 #include "ah.h"

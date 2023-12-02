@@ -50,7 +50,6 @@ __RCSID("$NetBSD: print-tcp.c,v 1.8 2007/07/24 11:53:48 drochner Exp $");
 
 #include "ip.h"
 #include "ip6.h"
-#include "ipproto.h"
 #include "rpc_auth.h"
 #include "rpc_msg.h"
 
