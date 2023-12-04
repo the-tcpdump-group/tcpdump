@@ -35,9 +35,20 @@ tcpdump compiles and works on at least the following platforms:
 * {Mac} OS X / macOS
 * NetBSD
 * OpenBSD
-* OpenWrt
 * Solaris
 * Windows (requires WinPcap or Npcap, and Visual Studio with CMake)
+
+In the past tcpdump certainly or likely worked on the following platforms:
+
+* 4.3BSD
+* BSD/386, later BSD/OS
+* DEC OSF/1, later Digital UNIX, later Tru64 UNIX
+* DOS
+* IRIX
+* SINIX
+* SunOS
+* Ultrix
+* UnixWare
 
 ### Dependency on libpcap
 Tcpdump uses libpcap, a system-independent interface for user-level
