@@ -482,6 +482,23 @@ void nd_print_invalid(netdissect_options *ndo)
 }
 
 /*
+ * Print a sequence of bytes, separated by a single space.
+ * Stop if truncated (via GET_U_1/longjmp) or after n bytes,
+ * whichever is first.
+ */
+void
+nd_print_bytes_hex(netdissect_options *ndo, const u_char *cp, u_int n)
+{
+	while (n > 0) {
+		ND_PRINT("%02x", GET_U_1(cp));
+		n--;
+		cp++;
+		if (n > 0)
+			ND_PRINT(" ");
+	}
+}
+
+/*
  *  this is a generic routine for printing unknown data;
  *  we pass on the linefeed plus indentation string to
  *  get a proper output - returns 0 on error
