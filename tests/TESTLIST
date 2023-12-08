@@ -249,6 +249,8 @@ icmpv6_nodeinfo_replyipv6 icmpv6_nodeinfo_replyipv6.pcap icmpv6_nodeinfo_replyip
 icmpv6-ns-nonce-v0	icmpv6-ns-nonce.pcap	icmpv6-ns-nonce-v0.out
 icmpv6-ns-nonce-v1	icmpv6-ns-nonce.pcap	icmpv6-ns-nonce-v1.out	-v
 icmpv6-ns-nonce-v2	icmpv6-ns-nonce.pcap	icmpv6-ns-nonce-v2.out	-vv
+icmpv6-ra-pref64-v1	icmpv6-ra-pref64.pcap	icmpv6-ra-pref64-v1.out	-v
+icmpv6-ra-pref64-v2	icmpv6-ra-pref64.pcap	icmpv6-ra-pref64-v2.out	-vv
 
 # SPB tests
 spb	            spb.pcap	            spb.out
