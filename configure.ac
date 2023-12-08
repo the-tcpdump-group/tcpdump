@@ -868,8 +868,8 @@ if test "$want_libcrypto" != "no"; then
 	#
 	AC_CHECK_HEADER(openssl/crypto.h,
 	[
-		AC_CHECK_LIB(crypto, DES_cbc_encrypt)
-		if test "$ac_cv_lib_crypto_DES_cbc_encrypt" = "yes"; then
+		AC_CHECK_LIB(crypto, AES_cbc_encrypt)
+		if test "$ac_cv_lib_crypto_AES_cbc_encrypt" = "yes"; then
 			AC_CHECK_HEADERS(openssl/evp.h)
 			#
 			# OK, then:
