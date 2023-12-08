@@ -828,7 +828,8 @@ if(WITH_CRYPTO)
         #
         # Check for some headers and functions.
         #
-        check_include_file(openssl/evp.h HAVE_OPENSSL_EVP_H)
+        set(CMAKE_REQUIRED_INCLUDES "${CRYPTO_INCLUDE_DIR}")
+        check_include_file("openssl/evp.h" HAVE_OPENSSL_EVP_H)
 
         #
         # 1) do we have EVP_CIPHER_CTX_new?
