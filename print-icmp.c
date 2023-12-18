@@ -876,6 +876,11 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                         ifname_subobj = (const struct icmp_interface_identification_ifname_subobject_t *) offset;
                         inft_name_length_field = GET_U_1(ifname_subobj->length);
                         ND_PRINT("\n\t\t Interface Name");
+                        if (inft_name_length_field == 0) {
+                            ND_PRINT(" [length %u]", inft_name_length_field);
+                            nd_print_invalid(ndo);
+                            break;
+                        }
                         if (inft_name_length_field % 4 != 0) {
                             ND_PRINT(" [length %u != N x 4]", inft_name_length_field);
                             nd_print_invalid(ndo);
