@@ -657,7 +657,7 @@ extern void hncp_print(netdissect_options *, const u_char *, u_int);
 extern void hsrp_print(netdissect_options *, const u_char *, u_int);
 extern void http_print(netdissect_options *, const u_char *, u_int);
 extern void icmp6_print(netdissect_options *, const u_char *, u_int, const u_char *, int);
-extern void icmp_print(netdissect_options *, const u_char *, u_int, const u_char *, int);
+extern void icmp_print(netdissect_options *, const u_char *, u_int, int);
 extern u_int ieee802_11_radio_print(netdissect_options *, const u_char *, u_int, u_int);
 extern u_int ieee802_15_4_print(netdissect_options *, const u_char *, u_int);
 extern void igmp_print(netdissect_options *, const u_char *, u_int);

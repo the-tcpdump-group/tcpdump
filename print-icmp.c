@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -333,7 +334,6 @@ struct icmp_interface_identification_ifname_subobject_t {
     nd_byte     if_name[63];
 };
 
-
 /* prototypes */
 const char *icmp_tstamp_print(u_int);
 
@@ -354,34 +354,21 @@ icmp_tstamp_print(u_int tstamp)
 }
 
 void
-icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *bp2,
+icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen,
            int fragmented)
 {
-	char *cp;
 	const struct icmp *dp;
 	uint8_t icmp_type, icmp_code;
-        const struct icmp_ext_t *ext_dp;
-	const struct ip *ip;
+	const struct icmp_ext_t *ext_dp;
 	const char *str;
-	const struct ip *oip;
-	uint8_t ip_proto;
-	const struct udphdr *ouh;
-        const uint8_t *obj_tptr;
-        uint32_t raw_label;
-	const struct icmp_multipart_ext_object_header_t *icmp_multipart_ext_object_header;
-		u_int interface_role, if_index_flag, ipaddr_flag, name_flag, mtu_flag;
-        const uint8_t *offset;
-		const struct icmp_interface_identification_ipaddr_subobject_t *ipaddr_subobj;
-		const struct icmp_interface_identification_ifname_subobject_t *ifname_subobj;
-	u_int hlen, mtu, obj_tlen, obj_class_num, obj_ctype;
-	uint16_t dport;
+	const uint8_t *obj_tptr;
+	u_int hlen;
 	char buf[MAXHOSTNAMELEN + 100];
 	struct cksum_vec vec[1];
 
 	ndo->ndo_protocol = "icmp";
 	dp = (const struct icmp *)bp;
-        ext_dp = (const struct icmp_ext_t *)bp;
-	ip = (const struct ip *)bp2;
+	ext_dp = (const struct icmp_ext_t *)bp;
 	str = buf;
 
 	icmp_type = GET_U_1(dp->icmp_type);
@@ -420,7 +407,12 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			break;
 
 		case ICMP_UNREACH_PORT:
-			ND_TCHECK_1(dp->icmp_ip.ip_p);
+		    {
+			const struct ip *oip;
+			const struct udphdr *ouh;
+			uint8_t ip_proto;
+			uint16_t dport;
+
 			oip = &dp->icmp_ip;
 			hlen = IP_HL(oip) * 4;
 			ouh = (const struct udphdr *)(((const u_char *)oip) + hlen);
@@ -450,10 +442,13 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 				break;
 			}
 			break;
+		    }
 
 		case ICMP_UNREACH_NEEDFRAG:
 		    {
 			const struct mtu_discovery *mp;
+			u_int mtu;
+
 			mp = (const struct mtu_discovery *)(const u_char *)&dp->icmp_void;
 			mtu = GET_BE_U_2(mp->nexthopmtu);
 			if (mtu) {
@@ -585,6 +580,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 
 	case ICMP_ROUTERADVERT:
 	    {
+		char *cp;
 		const struct ih_rdiscovery *ihp;
 		const struct id_rdiscovery *idp;
 		u_int lifetime, num, size;
@@ -593,7 +589,6 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		cp = buf + strlen(buf);
 
 		ihp = (const struct ih_rdiscovery *)&dp->icmp_void;
-		ND_TCHECK_SIZE(ihp);
 		(void)strncpy(cp, " lifetime ", sizeof(buf) - (cp - buf));
 		cp = buf + strlen(buf);
 		lifetime = GET_BE_U_2(ihp->ird_lifetime);
@@ -624,13 +619,12 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		}
 		idp = (const struct id_rdiscovery *)&dp->icmp_data;
 		while (num > 0) {
-			ND_TCHECK_SIZE(idp);
 			(void)snprintf(cp, sizeof(buf) - (cp - buf), " {%s %u}",
 			    GET_IPADDR_STRING(idp->ird_addr),
 			    GET_BE_U_4(idp->ird_pref));
 			cp = buf + strlen(buf);
 			++idp;
-		num--;
+			num--;
 		}
 	    }
 		break;
@@ -678,7 +672,6 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		break;
 
 	case ICMP_TSTAMPREPLY:
-		ND_TCHECK_4(dp->icmp_ttime);
 		(void)snprintf(buf, sizeof(buf),
 		    "time stamp reply id %u seq %u: org %s",
                                GET_BE_U_2(dp->icmp_id),
@@ -717,6 +710,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
          * save the snaplength as this may get overridden in the IP printer.
          */
 	if (ndo->ndo_vflag >= 1 && ICMP_ERRTYPE(icmp_type)) {
+		const struct ip *ip;
 		const u_char *snapend_save;
 
 		bp += 8;
@@ -745,7 +739,6 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
          * Attempt to decode multi-part message extensions (rfc4884) only for some ICMP types.
          */
         if (ndo->ndo_vflag >= 1 && plen > ICMP_EXTD_MINLEN && ICMP_MULTIPART_EXT_TYPE(icmp_type)) {
-
             ND_TCHECK_SIZE(ext_dp);
 
             /*
@@ -789,9 +782,10 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
             obj_tptr = (const uint8_t *)ext_dp->icmp_ext_data;
 
             while (hlen > sizeof(struct icmp_multipart_ext_object_header_t)) {
+                u_int obj_tlen, obj_class_num, obj_ctype;
+                const struct icmp_multipart_ext_object_header_t *icmp_multipart_ext_object_header;
 
                 icmp_multipart_ext_object_header = (const struct icmp_multipart_ext_object_header_t *)obj_tptr;
-                ND_TCHECK_SIZE(icmp_multipart_ext_object_header);
                 obj_tlen = GET_BE_U_2(icmp_multipart_ext_object_header->length);
                 obj_class_num = GET_U_1(icmp_multipart_ext_object_header->class_num);
                 obj_ctype = GET_U_1(icmp_multipart_ext_object_header->ctype);
@@ -816,18 +810,23 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                 case MPLS_STACK_ENTRY_OBJECT_CLASS:
                     switch(obj_ctype) {
                     case 1:
+                      {
+                        uint32_t raw_label;
+
                         raw_label = GET_BE_U_4(obj_tptr);
                         ND_PRINT("\n\t    label %u, tc %u", MPLS_LABEL(raw_label), MPLS_TC(raw_label));
                         if (MPLS_STACK(raw_label))
                             ND_PRINT(", [S]");
                         ND_PRINT(", ttl %u", MPLS_TTL(raw_label));
                         break;
+                      }
                     default:
                         print_unknown_data(ndo, obj_tptr, "\n\t    ", obj_tlen);
                     }
                     break;
 
                 case INTERFACE_INFORMATION_OBJECT_CLASS:
+                  {
                     /*
                     Ctype in a INTERFACE_INFORMATION_OBJECT_CLASS object:
 
@@ -836,6 +835,9 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                     | Interface Role| Rsvd1 | Rsvd2 |ifIndex| IPAddr|  name |  MTU  |
                     +-------+-------+-------+-------+-------+-------+-------+-------+
                     */
+                    const uint8_t *offset;
+                    u_int interface_role, if_index_flag, ipaddr_flag, name_flag, mtu_flag;
+
                     interface_role = (obj_ctype & 0xc0) >> 6;
                     if_index_flag  = (obj_ctype & 0x8) >> 3;
                     ipaddr_flag    = (obj_ctype & 0x4) >> 2;
@@ -853,6 +855,8 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                         offset += 4;
                     }
                     if (ipaddr_flag) {
+                        const struct icmp_interface_identification_ipaddr_subobject_t *ipaddr_subobj;
+
                         ND_PRINT("\n\t\t IP Address sub-object: ");
                         ipaddr_subobj = (const struct icmp_interface_identification_ipaddr_subobject_t *) offset;
                         switch (GET_BE_U_2(ipaddr_subobj->afi)) {
@@ -872,6 +876,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                     }
                     if (name_flag) {
                         uint8_t inft_name_length_field;
+                        const struct icmp_interface_identification_ifname_subobject_t *ifname_subobj;
 
                         ifname_subobj = (const struct icmp_interface_identification_ifname_subobject_t *) offset;
                         inft_name_length_field = GET_U_1(ifname_subobj->length);
@@ -903,6 +908,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                         offset += 4;
                     }
                     break;
+                  }
 
                 default:
                     print_unknown_data(ndo, obj_tptr, "\n\t    ", obj_tlen);
@@ -914,8 +920,4 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                 obj_tptr += obj_tlen;
             }
         }
-
-	return;
-trunc:
-	nd_print_trunc(ndo);
 }
