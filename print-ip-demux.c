@@ -104,7 +104,7 @@ again:
 
 	case IPPROTO_ICMP:
 		if (ver == 4)
-			icmp_print(ndo, bp, length, iph, fragmented);
+			icmp_print(ndo, bp, length, fragmented);
 		else {
 			ND_PRINT("[%s requires IPv4]",
 				 tok2str(ipproto_values,"unknown",nh));
