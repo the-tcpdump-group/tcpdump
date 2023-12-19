@@ -3,6 +3,6 @@
 	IP (tos 0x0, ttl 1, id 42321, offset 0, flags [none], proto UDP (17), length 40, bad cksum f76a (->db81)!)
     8.15.4.4.42315 > 12.223.32.1.33440: UDP, length 12
 	ICMP Multi-Part extension v2
-	  Interface Identification Object (2), Class-Type: 2, length 8016
-		 This object describes the IP interface upon which a datagram arrived
-		 Interface Name [length 0] (invalid) [|icmp]
+	  Interface Information Object (2), Class-Type: 2, length 8016
+	    Interface Role: Incoming IP Interface
+	    Interface Name [length 0] (invalid) [|icmp]

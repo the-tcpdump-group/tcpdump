@@ -294,17 +294,17 @@ struct icmp_multipart_ext_object_header_t {
 };
 
 static const struct tok icmp_multipart_ext_obj_values[] = {
-    { 1, "MPLS Stack Entry" },
-    { 2, "Interface Identification" },
+    { 1, "MPLS Stack Entry Object" },
+    { 2, "Interface Information Object" },
     { 0, NULL}
 };
 
 /* rfc5837 */
-static const struct tok icmp_interface_identification_role_values[] = {
-    { 0, "the IP interface upon which a datagram arrived"},
-    { 1, "the sub-IP component of an IP interface upon which a datagram arrived"},
-    { 2, "the IP interface through which the datagram would have been forwarded had it been forwardable"},
-    { 3, "the IP next hop to which the datagram would have been forwarded"},
+static const struct tok icmp_interface_information_role_values[] = {
+    { 0, "Incoming IP Interface"},
+    { 1, "Sub-IP Component of Incoming IP Interface"},
+    { 2, "Outgoing IP Interface"},
+    { 3, "IP Next hop"},
     { 0, NULL }
 };
 
@@ -316,7 +316,7 @@ Interface IP Address Sub-Object
 +-------+-------+-------+-------+
 |         IP Address   ....
 */
-struct icmp_interface_identification_ipaddr_subobject_t {
+struct icmp_interface_information_ipaddr_subobject_t {
     nd_uint16_t  afi;
     nd_uint16_t  reserved;
     nd_uint32_t  ip_addr;
@@ -329,7 +329,7 @@ octet    0        1                                   63
         | length |   interface name octets 1-63               |
         +--------+-----------................-----------------+
 */
-struct icmp_interface_identification_ifname_subobject_t {
+struct icmp_interface_information_ifname_subobject_t {
     nd_uint8_t  length;
     nd_byte     if_name[63];
 };
@@ -791,7 +791,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen,
                 obj_ctype = GET_U_1(icmp_multipart_ext_object_header->ctype);
                 obj_tptr += sizeof(struct icmp_multipart_ext_object_header_t);
 
-                ND_PRINT("\n\t  %s Object (%u), Class-Type: %u, length %u",
+                ND_PRINT("\n\t  %s (%u), Class-Type: %u, length %u",
                        tok2str(icmp_multipart_ext_obj_values,"unknown",obj_class_num),
                        obj_class_num,
                        obj_ctype,
@@ -844,21 +844,21 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen,
                     name_flag      = (obj_ctype & 0x2) >> 1;
                     mtu_flag       = (obj_ctype & 0x1);
 
-                    ND_PRINT("\n\t\t This object describes %s",
-                             tok2str(icmp_interface_identification_role_values,
+                    ND_PRINT("\n\t    Interface Role: %s",
+                             tok2str(icmp_interface_information_role_values,
                              "an unknown interface role",interface_role));
 
                     offset = obj_tptr;
 
                     if (if_index_flag) {
-                        ND_PRINT("\n\t\t Interface Index: %u", GET_BE_U_4(offset));
+                        ND_PRINT("\n\t    Interface Index: %u", GET_BE_U_4(offset));
                         offset += 4;
                     }
                     if (ipaddr_flag) {
-                        const struct icmp_interface_identification_ipaddr_subobject_t *ipaddr_subobj;
+                        const struct icmp_interface_information_ipaddr_subobject_t *ipaddr_subobj;
 
-                        ND_PRINT("\n\t\t IP Address sub-object: ");
-                        ipaddr_subobj = (const struct icmp_interface_identification_ipaddr_subobject_t *) offset;
+                        ND_PRINT("\n\t    IP Address sub-object: ");
+                        ipaddr_subobj = (const struct icmp_interface_information_ipaddr_subobject_t *) offset;
                         switch (GET_BE_U_2(ipaddr_subobj->afi)) {
                             case 1:
                                 ND_PRINT("%s", GET_IPADDR_STRING(ipaddr_subobj->ip_addr));
@@ -876,11 +876,11 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen,
                     }
                     if (name_flag) {
                         uint8_t inft_name_length_field;
-                        const struct icmp_interface_identification_ifname_subobject_t *ifname_subobj;
+                        const struct icmp_interface_information_ifname_subobject_t *ifname_subobj;
 
-                        ifname_subobj = (const struct icmp_interface_identification_ifname_subobject_t *) offset;
+                        ifname_subobj = (const struct icmp_interface_information_ifname_subobject_t *) offset;
                         inft_name_length_field = GET_U_1(ifname_subobj->length);
-                        ND_PRINT("\n\t\t Interface Name");
+                        ND_PRINT("\n\t    Interface Name");
                         if (inft_name_length_field == 0) {
                             ND_PRINT(" [length %u]", inft_name_length_field);
                             nd_print_invalid(ndo);
@@ -904,7 +904,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen,
                         offset += inft_name_length_field;
                     }
                     if (mtu_flag) {
-                        ND_PRINT("\n\t\t MTU: %u", GET_BE_U_4(offset));
+                        ND_PRINT("\n\t    MTU: %u", GET_BE_U_4(offset));
                         offset += 4;
                     }
                     break;

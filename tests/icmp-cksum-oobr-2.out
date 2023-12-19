@@ -3,8 +3,8 @@
 	(tos 0x0, ttl 1, id 42321, offset 0, flags [none], proto UDP (17), length 40)
     12.4.4.4.42315 > 12.1.1.1.33440: [bad udp cksum 0x1000 -> 0xbad0!] UDP, length 12
 	ICMP Multi-Part extension v2
-	  Interface Identification Object (2), Class-Type: 14, length 80
-		 This object describes the IP interface upon which a datagram arrived
-		 Interface Index: 15
-		 IP Address sub-object: 10.10.10.10
-		 Interface Name [length 63 != N x 4] (invalid) [|icmp]
+	  Interface Information Object (2), Class-Type: 14, length 80
+	    Interface Role: Incoming IP Interface
+	    Interface Index: 15
+	    IP Address sub-object: 10.10.10.10
+	    Interface Name [length 63 != N x 4] (invalid) [|icmp]
