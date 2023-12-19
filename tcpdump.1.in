@@ -70,6 +70,10 @@ tcpdump \- dump traffic on a network
 .B \-j
 .I tstamp_type
 ]
+.ti +8
+[
+.BI \-\-lengths
+]
 [
 .B \-m
 .I module
@@ -609,6 +613,13 @@ example, it might support only fake Ethernet headers, or might support
 and another set of data link types when in monitor mode (for example, it
 might support 802.11 headers, or 802.11 headers with radio information,
 only in monitor mode).
+.TP
+.BI \-\-lengths
+Print the captured and original packet lengths.
+The lengths are printed at the beginning of the line or after the packet
+number, if any.
+\fIcaplen\fP is the captured packet length (See \fB-s\fP option).
+\fIlen\fP is the original (on wire) packet length.
 .TP
 .BI \-m " module"
 Load SMI MIB module definitions from file \fImodule\fR.

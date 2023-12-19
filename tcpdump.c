@@ -705,6 +705,7 @@ show_remote_devices_and_exit(void)
 #define OPTION_FP_TYPE			135
 #define OPTION_COUNT			136
 #define OPTION_PRINT_SAMPLING		137
+#define OPTION_LENGTHS			138
 
 static const struct option longopts[] = {
 #if defined(HAVE_PCAP_CREATE) || defined(_WIN32)
@@ -753,12 +754,13 @@ static const struct option longopts[] = {
 	{ "number", no_argument, NULL, '#' },
 	{ "print", no_argument, NULL, OPTION_PRINT },
 	{ "print-sampling", required_argument, NULL, OPTION_PRINT_SAMPLING },
+	{ "lengths", no_argument, NULL, OPTION_LENGTHS },
 	{ "version", no_argument, NULL, OPTION_VERSION },
 	{ NULL, 0, NULL, 0 }
 };
 
 #ifdef HAVE_PCAP_FINDALLDEVS_EX
-#define LIST_REMOTE_INTERFACES_USAGE "[ --list-remote-interfaces remote-source ]"
+#define LIST_REMOTE_INTERFACES_USAGE " [ --list-remote-interfaces remote-source ]"
 #else
 #define LIST_REMOTE_INTERFACES_USAGE
 #endif
@@ -1988,6 +1990,10 @@ main(int argc, char **argv)
 
 		case '#':
 			ndo->ndo_packet_number = 1;
+			break;
+
+		case OPTION_LENGTHS:
+			ndo->ndo_lengths = 1;
 			break;
 
 		case OPTION_VERSION:
@@ -3340,7 +3346,7 @@ print_usage(FILE *f)
 "\t\t[ -i interface ]" IMMEDIATE_MODE_USAGE j_FLAG_USAGE "\n");
 #ifdef HAVE_PCAP_FINDALLDEVS_EX
 	(void)fprintf(f,
-"\t\t" LIST_REMOTE_INTERFACES_USAGE "\n");
+"\t\t[ --lengths ]" LIST_REMOTE_INTERFACES_USAGE "\n");
 #endif
 #ifdef USE_LIBSMI
 	(void)fprintf(f,

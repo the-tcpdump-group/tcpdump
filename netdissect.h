@@ -228,6 +228,7 @@ struct netdissect_options {
   jmp_buf ndo_early_end;	/* jmp_buf for setjmp()/longjmp() */
   void *ndo_last_mem_p;		/* pointer to the last allocated memory chunk */
   int ndo_packet_number;	/* print a packet number in the beginning of line */
+  int ndo_lengths;		/* print packet header caplen and len */
   int ndo_print_sampling;	/* print every Nth packet */
   int ndo_suppress_default_print; /* don't use default_print() for unknown packet types */
   int ndo_tstamp_precision;	/* requested time stamp precision */
