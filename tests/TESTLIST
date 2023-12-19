@@ -347,6 +347,9 @@ dns_tcp_8053-T dns_tcp_8053.pcap dns_tcp_8053-T.out -vv -T domain
 dns_udp_8053 dns_udp_8053.pcap dns_udp_8053.out -vv
 dns_udp_8053-T dns_udp_8053.pcap dns_udp_8053-T.out -vv -T domain
 
+# test with --lengths option
+dns_udp_2--lengths dns_udp_2.pcap dns_udp_2.out --lengths -vv
+
 # DNSSEC from https://bugzilla.redhat.com/show_bug.cgi?id=205842, -vv exposes EDNS DO
 dnssec-vv	dnssec.pcap		dnssec-vv.out		-vv
 

@@ -21,6 +21,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
     User interface:
       Add optional unit suffix on -C file size.
       Add --print-sampling to print every Nth packet instead of all.
+      Add --lengths option to print the captured and original packet lengths.
     Source code:
       Use %zu when printing a sizeof to squelch compiler warnings
       Remove unused missing/snprintf.c.
