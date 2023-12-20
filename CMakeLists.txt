@@ -1397,7 +1397,7 @@ add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 
 #
-# Tcpdump tests
+# tcpdump tests
 # We try to find the Perl interpreter and, if we do, we have the check
 # rule run tests/TESTrun with it, because just trying to run the TESTrun
 # script as a command won't work on Windows.

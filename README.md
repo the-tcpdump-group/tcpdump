@@ -51,7 +51,7 @@ In the past tcpdump certainly or likely worked on the following platforms:
 * UnixWare
 
 ### Dependency on libpcap
-Tcpdump uses libpcap, a system-independent interface for user-level
+tcpdump uses libpcap, a system-independent interface for user-level
 packet capture.  Before building tcpdump, you must first retrieve and
 build libpcap.
 

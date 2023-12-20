@@ -1796,7 +1796,7 @@ v2.0.1 Sun Jan 26 21:10:10 PDT
 - Ultrix 4.0 is supported (also thanks to Jeff Mogul).
 
 - IBM RT and Stanford Enetfilter support has been added by
-  Rayan Zachariassen <rayan@canet.ca>.  Tcpdump has been tested under
+  Rayan Zachariassen <rayan@canet.ca>.  tcpdump has been tested under
   both the vanilla Enetfilter interface, and the extended interface
   (#ifdef'd by IBMRTPC) present in the MERIT version of the Enetfilter.
 
