@@ -1019,7 +1019,7 @@ tstamp_precision_to_string(int precision)
  * that requires that it be able to do an F_GETFL fcntl() to read
  * the O_ flags.
  *
- * Tcpdump uses ftell() to determine how much data has been written
+ * tcpdump uses ftell() to determine how much data has been written
  * to a file in order to, when used with -C, determine when it's time
  * to rotate capture files.  ftell() therefore needs to do an lseek()
  * to find out the file offset and must, thanks to the aforementioned
@@ -2592,7 +2592,7 @@ DIAG_ON_WARN_UNUSED_RESULT
 	 * devices, and can't just give users that permission,
 	 * you'd make tcpdump set-UID or set-GID).
 	 *
-	 * Tcpdump doesn't necessarily write only to one savefile;
+	 * tcpdump doesn't necessarily write only to one savefile;
 	 * the general only way to allow a -Z instance to write to
 	 * savefiles as the user under whose UID it's run, rather
 	 * than as the user specified with -Z, would thus be to switch
