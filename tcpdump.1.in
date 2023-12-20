@@ -155,7 +155,7 @@ tcpdump \- dump traffic on a network
 .ad
 .SH DESCRIPTION
 .LP
-\fITcpdump\fP prints out a description of the contents of packets on a
+\fItcpdump\fP prints out a description of the contents of packets on a
 network interface that match the Boolean \fIexpression\fP (see
 .BR \%pcap-filter (@MAN_MISC_INFO@)
 for the \fIexpression\fP syntax); the
@@ -175,7 +175,7 @@ only packets that match
 will be processed by
 .IR tcpdump .
 .LP
-.I Tcpdump
+.I tcpdump
 will, if not run with the
 .B \-c
 flag, continue capturing packets until it is interrupted by a SIGINT
@@ -872,7 +872,7 @@ flag to cause packets to be written as soon as they are received.
 The MIME type \fIapplication/vnd.tcpdump.pcap\fP has been registered
 with IANA for \fIpcap\fP files. The filename extension \fI.pcap\fP
 appears to be the most commonly used along with \fI.cap\fP and
-\fI.dmp\fP. \fITcpdump\fP itself doesn't check the extension when
+\fI.dmp\fP. \fItcpdump\fP itself doesn't check the extension when
 reading capture files and doesn't add an extension when writing them
 (it uses magic numbers in the file header instead). However, many
 operating systems and applications will use the extension if it is
