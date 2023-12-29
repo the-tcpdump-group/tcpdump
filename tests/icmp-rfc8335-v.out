@@ -1,0 +1,44 @@
+    1  2024-01-01 22:21:42.293205 IP (tos 0x0, ttl 54, id 10659, offset 0, flags [none], proto ICMP (1), length 48)
+    204.194.23.128 > 149.28.74.237: ICMP extended echo request, id 63210, seq 0, length 28
+	Local Interface, checksum 0xdcf4 (correct), length 12
+	  Interface Identification Object (3), Class-Type: 2, length 8
+	    Interface Index: 1
+    2  2024-01-01 22:22:02.791281 IP (tos 0x0, ttl 54, id 11917, offset 0, flags [none], proto ICMP (1), length 50)
+    204.194.23.128 > 149.28.74.237: ICMP extended echo request, id 63239, seq 0, length 30
+	Local Interface, checksum 0x9424 (correct), length 14
+	  Interface Identification Object (3), Class-Type: 1, length 10
+	    Interface Name, length 6: enp1s0
+    3  2024-01-01 22:22:49.391909 IP (tos 0x0, ttl 54, id 14708, offset 0, flags [none], proto ICMP (1), length 52)
+    204.194.23.128 > 149.28.74.237: ICMP extended echo request, id 63269, seq 0, length 32
+	Local Interface, checksum 0xf8e5 (correct), length 16
+	  Interface Identification Object (3), Class-Type: 3, length 12
+	    IP Address sub-object: 149.28.74.237
+    4  2024-01-01 22:23:14.907148 IP (tos 0x0, ttl 54, id 16258, offset 0, flags [none], proto ICMP (1), length 52)
+    204.194.23.128 > 149.28.74.237: ICMP extended echo request, id 63274, seq 0, length 32
+	Remote Interface, checksum 0xf9d1 (correct), length 16
+	  Interface Identification Object (3), Class-Type: 3, length 12
+	    IP Address sub-object: 149.28.74.1
+    5  2024-01-01 22:36:36.688455 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto ICMP (1), length 52)
+    149.28.74.237 > 204.194.23.128: ICMP extended echo request, id 42, seq 42, length 32
+	Local Interface, checksum 0xd819 (correct), length 16
+	  Interface Identification Object (3), Class-Type: 1, length 12
+	    Interface Name, length 8: fxp0.0
+    6  2024-01-01 22:36:36.750419 IP (tos 0x0, ttl 245, id 63324, offset 0, flags [DF], proto ICMP (1), length 52)
+    204.194.23.128 > 149.28.74.237: ICMP extended echo reply, id 42, seq 42, length 32
+	Code 0 (No error), State 0 (Reserved), active 1 ipv4 1 ipv6 1
+    7  2024-01-01 22:36:44.864530 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto ICMP (1), length 44)
+    149.28.74.237 > 204.194.23.128: ICMP extended echo request, id 42, seq 42, length 24
+	Local Interface, checksum 0xd819 (correct), length 16
+	  Interface Identification Object (3), Class-Type: 1, length 12
+	    Interface Name, length 8: fxp0.0
+    8  2024-01-01 22:36:44.926583 IP (tos 0x0, ttl 245, id 63780, offset 0, flags [DF], proto ICMP (1), length 44)
+    204.194.23.128 > 149.28.74.237: ICMP extended echo reply, id 42, seq 42, length 24
+	Code 1 (Malformed Query), State 0 (Reserved), active 0 ipv4 0 ipv6 0
+    9  2024-01-01 22:37:03.384499 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto ICMP (1), length 48)
+    149.28.74.237 > 204.194.23.128: ICMP extended echo request, id 42, seq 42, length 28
+	Local Interface, checksum 0xdccb (correct), length 12
+	  Interface Identification Object (3), Class-Type: 2, length 8
+	    Interface Index: 42
+   10  2024-01-01 22:37:03.446572 IP (tos 0x0, ttl 245, id 64921, offset 0, flags [DF], proto ICMP (1), length 48)
+    204.194.23.128 > 149.28.74.237: ICMP extended echo reply, id 42, seq 42, length 28
+	Code 2 (No Such Interface), State 0 (Reserved), active 0 ipv4 0 ipv6 0
