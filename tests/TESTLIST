@@ -221,6 +221,9 @@ dvmrp		mrinfo_query.pcap	dvmrp.out
 # ICMPv4 -- pcap from https://bugs.wireshark.org/bugzilla/show_bug.cgi?id=6632
 rfc5837    icmp-rfc5837.pcap icmp-rfc5837.out -v
 icmp_inft_name_length_zero icmp_inft_name_length_zero.pcap icmp_inft_name_length_zero.out -v
+rfc8335		rfc8335.pcap	icmp-rfc8335.out
+rfc8335-v	rfc8335.pcap	icmp-rfc8335-v.out	-v
+rfc8335-missing-bytes	rfc8335-missing-bytes.pcap	icmp-rfc8335-missing-bytes.out	-v
 
 # ICMPv6
 icmpv6          icmpv6.pcap             icmpv6.out      -vv

@@ -57,12 +57,19 @@ struct icmp {
 			nd_uint16_t icd_id;
 			nd_uint16_t icd_seq;
 		} ih_idseq;
+		struct ih_idseqx {	/* RFC8335 */
+			nd_uint16_t icdx_id;
+			nd_uint8_t icdx_seq;
+			nd_uint8_t icdx_info;
+		} ih_idseqx;
 		nd_uint32_t ih_void;
 	} icmp_hun;
 #define	icmp_pptr	icmp_hun.ih_pptr
 #define	icmp_gwaddr	icmp_hun.ih_gwaddr
 #define	icmp_id		icmp_hun.ih_idseq.icd_id
 #define	icmp_seq	icmp_hun.ih_idseq.icd_seq
+#define	icmp_xseq	icmp_hun.ih_idseqx.icdx_seq
+#define	icmp_xinfo	icmp_hun.ih_idseqx.icdx_info
 #define	icmp_void	icmp_hun.ih_void
 	union {
 		struct id_ts {
@@ -140,7 +147,12 @@ struct icmp {
 #define	ICMP_MASKREQ		17		/* address mask request */
 #define	ICMP_MASKREPLY		18		/* address mask reply */
 
-#define	ICMP_MAXTYPE		18
+#define	ICMP_EXTENDED_ECHO_REQUEST	42	/* extended echo request */
+#define	ICMP_EXTENDED_ECHO_REPLY	43	/* extended echo reply */
+#define		ICMP_ECHO_X_MALFORMED_QUERY	1	/* malformed query */
+#define		ICMP_ECHO_X_NO_SUCH_INTERFACE	2	/* no such interface */
+#define		ICMP_ECHO_X_NO_SUCH_TABLE_ENTRY	3	/* no such table entry */
+#define		ICMP_ECHO_X_MULTIPLE_INTERFACES	4	/* multiple interfaces satisfy query */
 
 #define ICMP_ERRTYPE(type) \
 	((type) == ICMP_UNREACH || (type) == ICMP_SOURCEQUENCH || \
@@ -150,6 +162,9 @@ struct icmp {
 	((type) == ICMP_UNREACH || \
          (type) == ICMP_TIMXCEED || \
          (type) == ICMP_PARAMPROB)
+#define ICMP_EXTENDED_ECHO_TYPE(type) \
+        ((type) == ICMP_EXTENDED_ECHO_REQUEST || \
+	 (type) == ICMP_EXTENDED_ECHO_REPLY)
 /* rfc1700 */
 #ifndef ICMP_UNREACH_NET_UNKNOWN
 #define ICMP_UNREACH_NET_UNKNOWN	6	/* destination net unknown */
@@ -195,6 +210,28 @@ static const struct tok icmp2str[] = {
 	{ ICMP_IREQ,			"information request" },
 	{ ICMP_IREQREPLY,		"information reply" },
 	{ ICMP_MASKREQ,			"address mask request" },
+	{ ICMP_EXTENDED_ECHO_REQUEST,   "extended echo request" },
+	{ ICMP_EXTENDED_ECHO_REPLY,     "extended echo reply" },
+	{ 0,				NULL }
+};
+
+static const struct tok icmp_extended_echo_reply_code_str[] = {
+	{ 0,				"No error" },
+	{ ICMP_ECHO_X_MALFORMED_QUERY,  "Malformed Query" },
+	{ ICMP_ECHO_X_NO_SUCH_INTERFACE, "No Such Interface" },
+	{ ICMP_ECHO_X_NO_SUCH_TABLE_ENTRY, "No Such Table Entry" },
+	{ ICMP_ECHO_X_MULTIPLE_INTERFACES, "Multiple Interfaces Satisfy Query" },
+	{ 0,				NULL }
+};
+
+static const struct tok icmp_extended_echo_reply_state_str[] = {
+	{ 0,				"Reserved" },
+	{ 1,				"Incomplete" },
+	{ 2,				"Reachable" },
+	{ 3,				"Stale" },
+	{ 4,				"Delay" },
+	{ 5,				"Probe" },
+	{ 6,				"Failed" },
 	{ 0,				NULL }
 };
 
@@ -278,12 +315,16 @@ struct icmp_ext_t {
  * contained bytes of the payload beyond the first 128 bytes, in
  * draft-bonica-icmp-mpls-02; it was reassigned to an "Interface
  * Information Object" in RFC 5837.
+ *
+ * Class 3 is defined by RFC8335.
  */
 
 /* rfc4950  */
 #define MPLS_STACK_ENTRY_OBJECT_CLASS            1
 /* rfc5837 */
 #define INTERFACE_INFORMATION_OBJECT_CLASS       2
+/* rfc8335 */
+#define INTERFACE_IDENTIFICATION_OBJECT_CLASS    3
 
 struct icmp_multipart_ext_object_header_t {
     nd_uint16_t length;
@@ -292,8 +333,9 @@ struct icmp_multipart_ext_object_header_t {
 };
 
 static const struct tok icmp_multipart_ext_obj_values[] = {
-    { 1, "MPLS Stack Entry Object" },
-    { 2, "Interface Information Object" },
+    { MPLS_STACK_ENTRY_OBJECT_CLASS,         "MPLS Stack Entry Object" },
+    { INTERFACE_INFORMATION_OBJECT_CLASS,    "Interface Information Object" },
+    { INTERFACE_IDENTIFICATION_OBJECT_CLASS, "Interface Identification Object" },
     { 0, NULL}
 };
 
@@ -330,6 +372,22 @@ octet    0        1                                   63
 struct icmp_interface_information_ifname_subobject_t {
     nd_uint8_t  length;
     nd_byte     if_name[63];
+};
+
+/*
+ * Interface Identification IP Address Sub-Object
+ *     0                   1                   2                   3
+ *     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *    |            AFI                | Address Length|   Reserved    |
+ *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *    |                Address   ....
+ */
+struct icmp_interface_identification_ipaddr_subobject_t {
+    nd_uint16_t  afi;
+    nd_uint8_t   addrlen;
+    nd_uint8_t   reserved;
+    nd_byte      ip_addr[1];
 };
 
 /* prototypes */
@@ -479,6 +537,45 @@ print_icmp_multipart_ext_object(netdissect_options *ndo, const uint8_t *obj_tptr
 	    }
 	    break;
 	  }
+
+	case INTERFACE_IDENTIFICATION_OBJECT_CLASS:
+	    switch (obj_ctype) {
+	    case 1:
+		ND_PRINT("\n\t    Interface Name, length %d: ", obj_tlen);
+		nd_printjnp(ndo, obj_tptr, obj_tlen);
+		break;
+	    case 2:
+		ND_PRINT("\n\t    Interface Index: %u", GET_BE_U_4(obj_tptr));
+		break;
+	    case 3:
+	      {
+		const struct icmp_interface_identification_ipaddr_subobject_t *id_ipaddr_subobj;
+		ND_PRINT("\n\t    IP Address sub-object: ");
+		id_ipaddr_subobj = (const struct icmp_interface_identification_ipaddr_subobject_t *) obj_tptr;
+		switch (GET_BE_U_2(id_ipaddr_subobj->afi)) {
+		    case 1:
+			if (GET_U_1(id_ipaddr_subobj->addrlen) != 4) {
+			    ND_PRINT("[length %d != 4] ", GET_U_1(id_ipaddr_subobj->addrlen));
+			}
+			ND_PRINT("%s", GET_IPADDR_STRING(id_ipaddr_subobj->ip_addr));
+			break;
+		    case 2:
+			if (GET_U_1(id_ipaddr_subobj->addrlen) != 16) {
+			    ND_PRINT("[length %d != 16] ", GET_U_1(id_ipaddr_subobj->addrlen));
+			}
+			ND_PRINT("%s", GET_IP6ADDR_STRING(id_ipaddr_subobj->ip_addr));
+			break;
+		    default:
+			ND_PRINT("Unknown Address Family Identifier");
+			return -1;
+		}
+		break;
+	      }
+	    default:
+		print_unknown_data(ndo, obj_tptr, "\n\t    ", obj_tlen);
+		break;
+	    }
+	    break;
 
 	default:
 	    print_unknown_data(ndo, obj_tptr, "\n\t    ", obj_tlen);
@@ -818,6 +915,16 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen,
                          icmp_tstamp_print(GET_BE_U_4(dp->icmp_ttime)));
                 break;
 
+	case ICMP_EXTENDED_ECHO_REQUEST:
+	case ICMP_EXTENDED_ECHO_REPLY:
+		/* brief info here due to limited buf; more info below */
+		(void)snprintf(buf, sizeof(buf), "extended echo %s, id %u, seq %u",
+                               icmp_type == ICMP_EXTENDED_ECHO_REQUEST ?
+                               "request" : "reply",
+                               GET_BE_U_2(dp->icmp_id),
+                               GET_U_1(dp->icmp_xseq));
+		break;
+
 	default:
 		str = tok2str(icmp2str, "type-#%u", icmp_type);
 		break;
@@ -927,4 +1034,47 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen,
                 obj_tptr += obj_tlen;
             }
         }
+
+	if (ndo->ndo_vflag >= 1 && ICMP_EXTENDED_ECHO_TYPE(icmp_type)) {
+	    int xinfo = GET_U_1(dp->icmp_xinfo);
+	    switch (icmp_type) {
+		case ICMP_EXTENDED_ECHO_REQUEST:
+		    ND_PRINT("\n\t%s Interface", xinfo & 1 ? "Local" : "Remote");
+		    if (ICMP_EXT_EXTRACT_VERSION(GET_U_1(dp->icmp_data)) != ICMP_EXT_VERSION) {
+			nd_print_invalid(ndo);
+		    } else {
+			// A single extended object.  The extended header is not
+			// located at offset 128 in this case, so we can not use
+			// icmp_ext_checksum.
+			uint16_t sum = GET_BE_U_2(dp->icmp_data + 2);
+			uint16_t len = GET_BE_U_2(dp->icmp_data + 4);
+			// The checksum is over the extended header and the single
+			// object
+			len += 4;
+			vec[0].ptr = dp->icmp_data;
+			vec[0].len = len;
+			if (ND_TTEST_LEN(vec[0].ptr, vec[0].len)) {
+			    ND_PRINT(", checksum 0x%04x (%scorrect), length %u",
+				   sum,
+				   in_cksum(vec, 1) ? "in" : "",
+				   len);
+			}
+			print_icmp_multipart_ext_object(ndo, dp->icmp_data + 4);
+		    }
+		    break;
+		case ICMP_EXTENDED_ECHO_REPLY:
+		    {
+		    int state = ( xinfo & 0xe0 ) >> 5;
+		    ND_PRINT("\n\tCode %d (%s), State %d (%s), active %d ipv4 %d ipv6 %d",
+			    icmp_code, tok2str(icmp_extended_echo_reply_code_str, "Unknown", icmp_code),
+			    state, tok2str(icmp_extended_echo_reply_state_str, "Unknown", state),
+			    xinfo & 4 ? 1 : 0,
+			    xinfo & 2 ? 1 : 0,
+			    xinfo & 1 ? 1 : 0);
+		    }
+		    break;
+	    }
+	}
+
+	return;
 }
