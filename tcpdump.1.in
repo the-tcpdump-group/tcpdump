@@ -1340,8 +1340,8 @@ The general format of a TCP protocol line is:
 .RE
 \fISrc\fP and \fIdst\fP are the source and destination IP
 addresses and ports.
-\fITcpflags\fP are some combination of S (SYN),
-F (FIN), P (PSH), R (RST), U (URG), W (CWR), E (ECE) or
+\fITcpflags\fP are some combination of S (SYN), F (FIN),
+P (PSH), R (RST), U (URG), W (CWR), E (ECE), e (AE) or
 `.' (ACK), or `none' if no flags are set.
 \fIData-seqno\fP describes the portion of sequence space covered
 by the data in this packet (see example below).
@@ -1431,10 +1431,10 @@ long enough for the options to actually be there, \fItcpdump\fP reports
 it as ``[\fIbad hdr length\fP]''.
 .SS Particular TCP Flag Combinations (SYN-ACK, URG-ACK, etc.)
 .PP
-There are 8 bits in the control bits section of the TCP header:
-.IP
-.I CWR | ECE | URG | ACK | PSH | RST | SYN | FIN
-.PP
+There are 9 bits in the control bits section of the TCP header:
+.LP
+\fIAE(e) CWR(W) ECE(E) URG(U) ACK(.) PSH(P) RST(R) SYN(S) FIN(F)\fP
+.LP
 Let's assume that we want to watch packets used in establishing
 a TCP connection.
 Recall that TCP uses a 3-way handshake protocol
@@ -1469,7 +1469,9 @@ Recall the structure of a TCP header without options:
 -----------------------------------------------------------------
 |                     acknowledgment number                     |
 -----------------------------------------------------------------
-|  HL   | rsvd  |C|E|U|A|P|R|S|F|        window size            |
+|header |re   |A|C|E|U|A|P|R|S|F|                               |
+|length |serv |E|W|C|R|C|S|S|Y|I|        window size            |
+|       |  ed | |R|E|G|K|H|T|N|N|                               |
 -----------------------------------------------------------------
 |         TCP checksum          |       urgent pointer          |
 -----------------------------------------------------------------
@@ -1481,12 +1483,14 @@ The first line of the graph contains octets 0 - 3, the
 second line shows octets 4 - 7 etc.
 .PP
 Starting to count with 0, the relevant TCP control bits are contained
-in octet 13:
+in octets 12 and 13:
 .PP
 .nf
  0             7|             15|             23|             31
 ----------------|---------------|---------------|----------------
-|  HL   | rsvd  |C|E|U|A|P|R|S|F|        window size            |
+|header |re   |A|C|E|U|A|P|R|S|F|                               |
+|length |serv |E|W|C|R|C|S|S|Y|I|        window size            |
+|       |  ed | |R|E|G|K|H|T|N|N|                               |
 ----------------|---------------|---------------|----------------
 |               |  13th octet   |               |               |
 .fi
@@ -1497,6 +1501,8 @@ Let's have a closer look at octet no. 13:
                 |               |
                 |---------------|
                 |C|E|U|A|P|R|S|F|
+                |W|C|R|C|S|S|Y|I|
+                |R|E|G|K|H|T|N|N|
                 |---------------|
                 |7   5   3     0|
 .fi
@@ -1512,6 +1518,8 @@ with the SYN bit set in its header:
 .PP
 .nf
                 |C|E|U|A|P|R|S|F|
+                |W|C|R|C|S|S|Y|I|
+                |R|E|G|K|H|T|N|N|
                 |---------------|
                 |0 0 0 0 0 0 1 0|
                 |---------------|
@@ -1561,6 +1569,8 @@ with SYN-ACK set arrives:
 .PP
 .nf
      |C|E|U|A|P|R|S|F|
+     |W|C|R|C|S|S|Y|I|
+     |R|E|G|K|H|T|N|N|
      |---------------|
      |0 0 0 1 0 0 1 0|
      |---------------|

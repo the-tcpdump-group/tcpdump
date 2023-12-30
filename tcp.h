@@ -50,6 +50,8 @@ struct tcphdr {
 };
 
 #define TH_OFF(th)	((GET_U_1((th)->th_offx2) & 0xf0) >> 4)
+#define tcp_get_flags(th)	((GET_U_1((th)->th_flags)) | \
+			((GET_U_1((th)->th_offx2) & 0x0f) << 8))
 
 /* TCP flags */
 #define	TH_FIN     0x01
@@ -60,6 +62,7 @@ struct tcphdr {
 #define	TH_URG	   0x20
 #define TH_ECNECHO 0x40	/* ECN Echo */
 #define TH_CWR	   0x80	/* ECN Cwnd Reduced */
+#define	TH_AE	  0x100	/* AccECN (draft-ietf-tcpm-accurate-ecn;rfc7560) part of L4S (rfc9330) */
 extern const struct tok tcp_flag_values[];
 
 

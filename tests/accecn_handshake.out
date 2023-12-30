@@ -1,0 +1,25 @@
+    1  2022-07-26 06:26:07.794026 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    31.133.146.248.16433 > 66.228.43.12.80: Flags [SEWe], cksum 0x209c (incorrect -> 0xe443), seq 1948076589, win 65535, options [mss 1460,nop,wscale 6,sackOK,TS val 112147477 ecr 0], length 0
+    2  2022-07-26 06:26:08.016156 IP (tos 0x0, ttl 54, id 0, offset 0, flags [DF], proto TCP (6), length 72)
+    66.228.43.12.80 > 31.133.146.248.16433: Flags [S.W], cksum 0x22a8 (correct), seq 2972234643, ack 1948076590, win 65160, options [mss 1460,sackOK,TS val 2783239876 ecr 112147477,exp-acc0,wscale 7], length 0
+    3  2022-07-26 06:26:08.016573 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 68)
+    31.133.146.248.16433 > 66.228.43.12.80: Flags [.W], cksum 0x20a4 (incorrect -> 0x3b19), ack 1, win 1027, options [nop,nop,TS val 112147698 ecr 2783239876,exp-acc0,eol], length 0
+    4  2022-07-26 06:26:08.017141 IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 130)
+    31.133.146.248.16433 > 66.228.43.12.80: Flags [P.Ee], cksum 0x20e2 (incorrect -> 0x9373), seq 1:79, ack 1, win 1027, options [nop,nop,TS val 112147698 ecr 2783239876], length 78: HTTP, length: 78
+	GET /1M HTTP/1.1
+	Host: 66.228.43.12
+	User-Agent: curl/7.69.1
+	Accept: */*
+	
+    5  2022-07-26 06:26:08.056144 IP (tos 0x1,ECT(1), ttl 54, id 45724, offset 0, flags [DF], proto TCP (6), length 52)
+    66.228.43.12.80 > 31.133.146.248.16433: Flags [.Ee], cksum 0x26c6 (correct), ack 79, win 509, options [nop,nop,TS val 2783239918 ecr 112147698], length 0
+    6  2022-07-26 06:26:08.075386 IP (tos 0x1,ECT(1), ttl 54, id 45725, offset 0, flags [DF], proto TCP (6), length 1500)
+    66.228.43.12.80 > 31.133.146.248.16433: Flags [.Ee], cksum 0xcfbd (correct), seq 1:1449, ack 79, win 509, options [nop,nop,TS val 2783239922 ecr 112147698], length 1448: HTTP, length: 1448
+	HTTP/1.1 200 OK
+	Date: Mon, 25 Jul 2022 15:45:42 GMT
+	Server: Apache/2.4.41 (Ubuntu)
+	Last-Modified: Sun, 24 Jul 2022 18:49:15 GMT
+	ETag: "f4240-5e491862a86d8"
+	Accept-Ranges: bytes
+	Content-Length: 1000000
+	

@@ -904,6 +904,9 @@ ospf-signed-integer-ubsan       ospf-signed-integer-ubsan.pcap          ospf-sig
 bgp-ub bgp-ub.pcap bgp-ub.out -v
 fletcher-checksum-negative-shift fletcher-checksum-negative-shift.pcap fletcher-checksum-negative-shift.out     -v
 
+# AccECN tests
+accecn_handshake	accecn_handshake.pcap		accecn_handshake.out	-v
+
 # Mobility Support in IPv6
 # ipv6_mobility_1.pcap is built with scapy
 ipv6_mobility_1 ipv6_mobility_1.pcap ipv6_mobility_1.out
