@@ -26,6 +26,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
         advance the packet data pointer
       OSPF: Print more truncation indications
       OSPF: Add more length checks
+      TCP: Add support for the AE (AccECN) flag.
     User interface:
       Add optional unit suffix on -C file size.
       Add --print-sampling to print every Nth packet instead of all.
