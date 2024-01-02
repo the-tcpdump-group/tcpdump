@@ -718,7 +718,7 @@ mask62plen(const u_char *mask)
  * either a space character at the beginning of the line (this
  * includes a blank line) or no more tokens remaining on the line.
  */
-static int
+static u_int
 fetch_token(netdissect_options *ndo, const u_char *pptr, u_int idx, u_int len,
     u_char *tbuf, size_t tbuflen)
 {
