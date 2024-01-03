@@ -299,7 +299,6 @@ dhcp6opt_print(netdissect_options *ndo,
 	uint8_t dh6_reconf_type;
 	uint8_t dh6_lq_query_type;
 	u_int first_list_value;
-	uint16_t remainder_len;
 
 	if (cp == ep)
 		return;
@@ -786,7 +785,7 @@ dhcp6opt_print(netdissect_options *ndo,
 					nd_printjnp(ndo, tp, label_len);
 					tp += label_len;
 					remain_len -= (label_len + 1);
-					if(GET_U_1(tp)) ND_PRINT(".");
+					if (GET_U_1(tp)) ND_PRINT(".");
 				} else {
 					ND_PRINT(" ?");
 					break;
@@ -819,24 +818,24 @@ dhcp6opt_print(netdissect_options *ndo,
 			ND_PRINT(" ");
 			tp = (const u_char *)(dh6o + 1);
 			first_list_value = TRUE;
-			remainder_len = optlen;
-			while (remainder_len >= 2) {
+			remain_len = optlen;
+			while (remain_len >= 2) {
 				if (first_list_value == FALSE) {
 					ND_PRINT(",");
 				}
 				first_list_value = FALSE;
 				subopt_len = GET_BE_U_2(tp);
-				if (subopt_len > remainder_len-2) {
+				if (subopt_len > remain_len - 2) {
+					ND_PRINT(" ?");
 					break;
 				}
 				tp += 2;
 				nd_printjn(ndo, tp, subopt_len);
 				tp += subopt_len;
-				remainder_len -= (subopt_len+2);
+				remain_len -= (subopt_len + 2);
 			}
-			if (remainder_len != 0 ) {
+			if (remain_len != 0)
 				ND_PRINT(" ?");
-			}
 			ND_PRINT(")");
 			break;
 
