@@ -557,7 +557,9 @@ dhcp6opt_print(netdissect_options *ndo,
 			ND_PRINT(" ");
 			for (i = 0; i < optlen && i < 10; i++)
 				ND_PRINT("%02x", GET_U_1(tp + i));
-			ND_PRINT("...)");
+			if (i < optlen)
+				ND_PRINT("...");
+			ND_PRINT(")");
 			break;
 		case DH6OPT_RECONF_MSG:
 			if (optlen != 1) {
@@ -684,7 +686,9 @@ dhcp6opt_print(netdissect_options *ndo,
 			 */
 			for (i = 4; i < optlen && i < 14; i++)
 				ND_PRINT("%02x", GET_U_1(tp + i));
-			ND_PRINT("...)");
+			if (i < optlen)
+				ND_PRINT("...");
+			ND_PRINT(")");
 			break;
 		case DH6OPT_LQ_QUERY:
 			if (optlen < 17) {
@@ -731,7 +735,9 @@ dhcp6opt_print(netdissect_options *ndo,
 			 */
 			for (i = 16; i < optlen && i < 26; i++)
 				ND_PRINT("%02x", GET_U_1(tp + i));
-			ND_PRINT("...)");
+			if (i < optlen)
+				ND_PRINT("...");
+			ND_PRINT(")");
 			break;
 		case DH6OPT_NTP_SERVER:
 			if (optlen < 4) {
