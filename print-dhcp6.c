@@ -845,6 +845,47 @@ dhcp6opt_print(netdissect_options *ndo,
 			ND_PRINT(")");
 			break;
 
+		case DH6OPT_VENDOR_OPTS:
+			/* RFC 8415 section 21.17 */
+			if (optlen < 4) {
+				ND_PRINT(" ?)");
+				break;
+			}
+			tp = (const u_char *)(dh6o + 1);
+			remain_len = optlen;
+			ND_PRINT(" enterprise %u", GET_BE_U_4(tp));
+			remain_len -= 4;
+			tp += 4;
+			while (remain_len >= 4) {
+				/* there are sub-options */
+				ND_PRINT(" (code %u", GET_BE_U_2(tp));
+				tp += 2;
+				subopt_len = GET_BE_U_2(tp);
+				ND_PRINT(" len %u", subopt_len);
+				tp += 2;
+				remain_len -= 4;
+				if (subopt_len > remain_len) {
+					ND_PRINT(" ?");
+					break;
+				}
+				if (subopt_len > 0) {
+					ND_PRINT(" data ");
+					for (i = 0; i < subopt_len && i < 10; i++)
+						ND_PRINT("%02x",
+							 GET_U_1(tp + i));
+					if (i < subopt_len)
+						ND_PRINT("...");
+					ND_PRINT(")");
+					tp += subopt_len;
+					remain_len -= subopt_len;
+				}
+				ND_PRINT(")");
+			}
+			if (remain_len != 0)
+				ND_PRINT(" ?");
+			ND_PRINT(")");
+			break;
+
 		default:
 			ND_PRINT(")");
 			break;
