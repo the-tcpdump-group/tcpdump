@@ -837,6 +837,9 @@ nfs-seg-fault-1  nfs-seg-fault-1.pcapng  nfs-seg-fault-1.out
 # NFS invalid
 nfs-cannot-pad-32-bit nfs-cannot-pad-32-bit.pcap nfs-cannot-pad-32-bit.out
 
+# NFSv4 support
+nfs-v4			nfs-v4.pcap		nfs-v4.out
+
 # DNS infinite loop tests
 #
 # See http://marc.info/?l=tcpdump-workers&m=95552439022555

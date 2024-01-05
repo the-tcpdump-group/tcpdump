@@ -1,0 +1,6 @@
+    1  08:48:53.854625 IP 192.168.200.177.671 > 192.168.200.1.2049: Flags [P.], seq 1022539785:1022539969, ack 556520858, win 1592, options [nop,nop,TS val 1549792688 ecr 1201363416], length 184: NFS request xid 1209063269 180 v4 compound
+    2  08:48:53.855103 IP 192.168.200.1.2049 > 192.168.200.177.671: Flags [P.], seq 1:173, ack 184, win 1064, options [nop,nop,TS val 1201382193 ecr 1549792688], length 172: NFS reply xid 1209063269 reply ok 168 v4 compound
+    3  08:48:53.855178 IP 192.168.200.177.671 > 192.168.200.1.2049: Flags [.], ack 173, win 1615, options [nop,nop,TS val 1549792689 ecr 1201382193], length 0
+    4  08:48:53.855490 IP 192.168.200.177.671 > 192.168.200.1.2049: Flags [P.], seq 184:376, ack 173, win 1615, options [nop,nop,TS val 1549792689 ecr 1201382193], length 192: NFS request xid 1225840485 188 v4 compound
+    5  08:48:53.855747 IP 192.168.200.1.2049 > 192.168.200.177.671: Flags [P.], seq 173:273, ack 376, win 1078, options [nop,nop,TS val 1201382194 ecr 1549792689], length 100: NFS reply xid 1225840485 reply ok 96 v4 compound ERROR: No such file or directory
+    6  08:48:53.896607 IP 192.168.200.177.671 > 192.168.200.1.2049: Flags [.], ack 273, win 1615, options [nop,nop,TS val 1549792730 ecr 1201382194], length 0
