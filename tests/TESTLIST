@@ -266,6 +266,7 @@ dhcpv6-domain-list	dhcpv6-domain-list.pcap	dhcpv6-domain-list.out	-v
 dhcpv6-mud	dhcpv6-mud.pcap		dhcpv6-mud.out -v
 dhcpv6-rfc6355-duid-uuid dhcpv6-rfc6355-duid-uuid.pcap dhcpv6-rfc6355-duid-uuid.out -v
 dhcpv6-vendor-specific-information dhcpv6-vendor-specific-information.pcap dhcpv6-vendor-specific-information.out -v
+dhcpv6-vendor-specific-information-vv dhcpv6-vendor-specific-information.pcap dhcpv6-vendor-specific-information-vv.out -vv
 
 # ZeroMQ/PGM tests
 # ZMTP/1.0 over TCP
