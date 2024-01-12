@@ -680,7 +680,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			ND_PRINT(" %u ", GET_BE_U_4(tp));
+			ND_PRINT(" enterprise %u ", GET_BE_U_4(tp));
 			/*
 			 * Print hex dump first 10 characters.
 			 */
