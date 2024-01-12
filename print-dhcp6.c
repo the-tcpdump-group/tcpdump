@@ -287,7 +287,7 @@ dhcp6opt_print(netdissect_options *ndo,
 	const u_char *tp;
 	u_int i;
 	uint16_t opttype;
-	uint16_t optlen;
+	u_int optlen;
 	uint8_t auth_proto;
 	uint8_t auth_alg;
 	uint8_t auth_rdm;
@@ -299,6 +299,7 @@ dhcp6opt_print(netdissect_options *ndo,
 	uint8_t dh6_reconf_type;
 	uint8_t dh6_lq_query_type;
 	u_int first_list_value;
+	u_int max_char;
 
 	if (cp == ep)
 		return;
@@ -549,13 +550,16 @@ dhcp6opt_print(netdissect_options *ndo,
 			break;
 		case DH6OPT_INTERFACE_ID:
 		case DH6OPT_SUBSCRIBER_ID:
-			/*
-			 * Since we cannot predict the encoding, print hex dump
-			 * at most 10 characters.
-			 */
 			tp = (const u_char *)(dh6o + 1);
 			ND_PRINT(" ");
-			for (i = 0; i < optlen && i < 10; i++)
+			/*
+			 * if ndo_vflag < 2, print hex dump up to 10 characters.
+			 */
+			if (ndo->ndo_vflag < 2)
+				max_char = ND_MIN(optlen, 10);
+			else
+				max_char = optlen;
+			for (i = 0; i < max_char; i++)
 				ND_PRINT("%02x", GET_U_1(tp + i));
 			if (i < optlen)
 				ND_PRINT("...");
@@ -681,12 +685,17 @@ dhcp6opt_print(netdissect_options *ndo,
 			}
 			tp = (const u_char *)(dh6o + 1);
 			ND_PRINT(" enterprise %u ", GET_BE_U_4(tp));
+			tp += 4;
 			/*
-			 * Print hex dump first 10 characters.
+			 * if ndo_vflag < 2, print hex dump up to 10 characters.
 			 */
-			for (i = 4; i < optlen && i < 14; i++)
+			if (ndo->ndo_vflag < 2)
+				max_char = ND_MIN(optlen - 4, 10);
+			else
+				max_char = optlen - 4;
+			for (i = 0; i < max_char; i++)
 				ND_PRINT("%02x", GET_U_1(tp + i));
-			if (i < optlen)
+			if (i < optlen - 4)
 				ND_PRINT("...");
 			ND_PRINT(")");
 			break;
@@ -730,12 +739,17 @@ dhcp6opt_print(netdissect_options *ndo,
 			}
 			tp = (const u_char *)(dh6o + 1);
 			ND_PRINT(" %s ", GET_IP6ADDR_STRING(tp));
+			tp += 16;
 			/*
-			 * Print hex dump first 10 characters.
+			 * if ndo_vflag < 2, print hex dump up to 10 characters.
 			 */
-			for (i = 16; i < optlen && i < 26; i++)
+			if (ndo->ndo_vflag < 2)
+				max_char = ND_MIN(optlen - 16, 10);
+			else
+				max_char = optlen - 16;
+			for (i = 0; i < max_char; i++)
 				ND_PRINT("%02x", GET_U_1(tp + i));
-			if (i < optlen)
+			if (i < optlen - 16)
 				ND_PRINT("...");
 			ND_PRINT(")");
 			break;
@@ -870,7 +884,15 @@ dhcp6opt_print(netdissect_options *ndo,
 				}
 				if (subopt_len > 0) {
 					ND_PRINT(" data ");
-					for (i = 0; i < subopt_len && i < 10; i++)
+					/*
+					 * if ndo_vflag < 2, print hex dump up
+					 * to 10 characters.
+					 */
+					if (ndo->ndo_vflag < 2)
+						max_char = ND_MIN(subopt_len, 10);
+					else
+						max_char = subopt_len;
+					for (i = 0; i < max_char; i++)
 						ND_PRINT("%02x",
 							 GET_U_1(tp + i));
 					if (i < subopt_len)
