@@ -897,7 +897,6 @@ dhcp6opt_print(netdissect_options *ndo,
 							 GET_U_1(tp + i));
 					if (i < subopt_len)
 						ND_PRINT("...");
-					ND_PRINT(")");
 					tp += subopt_len;
 					remain_len -= subopt_len;
 				}
