@@ -353,6 +353,142 @@ icmp_tstamp_print(u_int tstamp)
     return buf;
 }
 
+static int
+print_icmp_multipart_ext_object(netdissect_options *ndo, const uint8_t *obj_tptr)
+{
+	u_int obj_tlen, obj_class_num, obj_ctype;
+	const struct icmp_multipart_ext_object_header_t *icmp_multipart_ext_object_header;
+
+	icmp_multipart_ext_object_header = (const struct icmp_multipart_ext_object_header_t *)obj_tptr;
+	obj_tlen = GET_BE_U_2(icmp_multipart_ext_object_header->length);
+	obj_class_num = GET_U_1(icmp_multipart_ext_object_header->class_num);
+	obj_ctype = GET_U_1(icmp_multipart_ext_object_header->ctype);
+	obj_tptr += sizeof(struct icmp_multipart_ext_object_header_t);
+
+	ND_PRINT("\n\t  %s (%u), Class-Type: %u, length %u",
+		 tok2str(icmp_multipart_ext_obj_values,"unknown",obj_class_num),
+		 obj_class_num,
+		 obj_ctype,
+		 obj_tlen);
+
+	/* infinite loop protection */
+	if ((obj_class_num == 0) ||
+	    (obj_tlen < sizeof(struct icmp_multipart_ext_object_header_t))) {
+	    return -1;
+	}
+	obj_tlen -= sizeof(struct icmp_multipart_ext_object_header_t);
+
+	switch (obj_class_num) {
+	case MPLS_STACK_ENTRY_OBJECT_CLASS:
+	    switch(obj_ctype) {
+	    case 1:
+	      {
+		uint32_t raw_label;
+
+		raw_label = GET_BE_U_4(obj_tptr);
+		ND_PRINT("\n\t    label %u, tc %u", MPLS_LABEL(raw_label), MPLS_TC(raw_label));
+		if (MPLS_STACK(raw_label))
+		    ND_PRINT(", [S]");
+		ND_PRINT(", ttl %u", MPLS_TTL(raw_label));
+		break;
+	      }
+	    default:
+		print_unknown_data(ndo, obj_tptr, "\n\t    ", obj_tlen);
+	    }
+	    break;
+
+	case INTERFACE_INFORMATION_OBJECT_CLASS:
+	  {
+	    /*
+	    Ctype in a INTERFACE_INFORMATION_OBJECT_CLASS object:
+
+	    Bit     0       1       2       3       4       5       6       7
+	    +-------+-------+-------+-------+-------+-------+-------+-------+
+	    | Interface Role| Rsvd1 | Rsvd2 |ifIndex| IPAddr|  name |  MTU  |
+	    +-------+-------+-------+-------+-------+-------+-------+-------+
+	    */
+	    const uint8_t *offset;
+	    u_int interface_role, if_index_flag, ipaddr_flag, name_flag, mtu_flag;
+
+	    interface_role = (obj_ctype & 0xc0) >> 6;
+	    if_index_flag  = (obj_ctype & 0x8) >> 3;
+	    ipaddr_flag    = (obj_ctype & 0x4) >> 2;
+	    name_flag      = (obj_ctype & 0x2) >> 1;
+	    mtu_flag       = (obj_ctype & 0x1);
+
+	    ND_PRINT("\n\t    Interface Role: %s",
+		     tok2str(icmp_interface_information_role_values,
+		     "an unknown interface role",interface_role));
+
+	    offset = obj_tptr;
+
+	    if (if_index_flag) {
+		ND_PRINT("\n\t    Interface Index: %u", GET_BE_U_4(offset));
+		offset += 4;
+	    }
+	    if (ipaddr_flag) {
+		const struct icmp_interface_information_ipaddr_subobject_t *ipaddr_subobj;
+
+		ND_PRINT("\n\t    IP Address sub-object: ");
+		ipaddr_subobj = (const struct icmp_interface_information_ipaddr_subobject_t *) offset;
+		switch (GET_BE_U_2(ipaddr_subobj->afi)) {
+		    case 1:
+			ND_PRINT("%s", GET_IPADDR_STRING(ipaddr_subobj->ip_addr));
+			offset += 4;
+			break;
+		    case 2:
+			ND_PRINT("%s", GET_IP6ADDR_STRING(ipaddr_subobj->ip_addr));
+			offset += 16;
+			break;
+		    default:
+			ND_PRINT("Unknown Address Family Identifier");
+			return -1;
+		}
+		offset += 4;
+	    }
+	    if (name_flag) {
+		uint8_t inft_name_length_field;
+		const struct icmp_interface_information_ifname_subobject_t *ifname_subobj;
+
+		ifname_subobj = (const struct icmp_interface_information_ifname_subobject_t *) offset;
+		inft_name_length_field = GET_U_1(ifname_subobj->length);
+		ND_PRINT("\n\t    Interface Name");
+		if (inft_name_length_field == 0) {
+		    ND_PRINT(" [length %u]", inft_name_length_field);
+		    nd_print_invalid(ndo);
+		    break;
+		}
+		if (inft_name_length_field % 4 != 0) {
+		    ND_PRINT(" [length %u != N x 4]", inft_name_length_field);
+		    nd_print_invalid(ndo);
+		    offset += inft_name_length_field;
+		    break;
+		}
+		if (inft_name_length_field > 64) {
+		    ND_PRINT(" [length %u > 64]", inft_name_length_field);
+		    nd_print_invalid(ndo);
+		    offset += inft_name_length_field;
+		    break;
+		}
+		ND_PRINT(", length %u: ", inft_name_length_field);
+		nd_printjnp(ndo, ifname_subobj->if_name,
+			    inft_name_length_field - 1);
+		offset += inft_name_length_field;
+	    }
+	    if (mtu_flag) {
+		ND_PRINT("\n\t    MTU: %u", GET_BE_U_4(offset));
+		offset += 4;
+	    }
+	    break;
+	  }
+
+	default:
+	    print_unknown_data(ndo, obj_tptr, "\n\t    ", obj_tlen);
+	    break;
+	}
+	return obj_tlen + sizeof(struct icmp_multipart_ext_object_header_t);
+}
+
 void
 icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen,
            int fragmented)
@@ -782,139 +918,12 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen,
             obj_tptr = (const uint8_t *)ext_dp->icmp_ext_data;
 
             while (hlen > sizeof(struct icmp_multipart_ext_object_header_t)) {
-                u_int obj_tlen, obj_class_num, obj_ctype;
-                const struct icmp_multipart_ext_object_header_t *icmp_multipart_ext_object_header;
-
-                icmp_multipart_ext_object_header = (const struct icmp_multipart_ext_object_header_t *)obj_tptr;
-                obj_tlen = GET_BE_U_2(icmp_multipart_ext_object_header->length);
-                obj_class_num = GET_U_1(icmp_multipart_ext_object_header->class_num);
-                obj_ctype = GET_U_1(icmp_multipart_ext_object_header->ctype);
-                obj_tptr += sizeof(struct icmp_multipart_ext_object_header_t);
-
-                ND_PRINT("\n\t  %s (%u), Class-Type: %u, length %u",
-                       tok2str(icmp_multipart_ext_obj_values,"unknown",obj_class_num),
-                       obj_class_num,
-                       obj_ctype,
-                       obj_tlen);
-
-                hlen-=sizeof(struct icmp_multipart_ext_object_header_t); /* length field includes tlv header */
-
-                /* infinite loop protection */
-                if ((obj_class_num == 0) ||
-                    (obj_tlen < sizeof(struct icmp_multipart_ext_object_header_t))) {
+                int obj_tlen = print_icmp_multipart_ext_object(ndo, obj_tptr);
+                if (obj_tlen < 0) {
+                    /* malformed object */
                     return;
                 }
-                obj_tlen-=sizeof(struct icmp_multipart_ext_object_header_t);
-
-                switch (obj_class_num) {
-                case MPLS_STACK_ENTRY_OBJECT_CLASS:
-                    switch(obj_ctype) {
-                    case 1:
-                      {
-                        uint32_t raw_label;
-
-                        raw_label = GET_BE_U_4(obj_tptr);
-                        ND_PRINT("\n\t    label %u, tc %u", MPLS_LABEL(raw_label), MPLS_TC(raw_label));
-                        if (MPLS_STACK(raw_label))
-                            ND_PRINT(", [S]");
-                        ND_PRINT(", ttl %u", MPLS_TTL(raw_label));
-                        break;
-                      }
-                    default:
-                        print_unknown_data(ndo, obj_tptr, "\n\t    ", obj_tlen);
-                    }
-                    break;
-
-                case INTERFACE_INFORMATION_OBJECT_CLASS:
-                  {
-                    /*
-                    Ctype in a INTERFACE_INFORMATION_OBJECT_CLASS object:
-
-                    Bit     0       1       2       3       4       5       6       7
-                    +-------+-------+-------+-------+-------+-------+-------+-------+
-                    | Interface Role| Rsvd1 | Rsvd2 |ifIndex| IPAddr|  name |  MTU  |
-                    +-------+-------+-------+-------+-------+-------+-------+-------+
-                    */
-                    const uint8_t *offset;
-                    u_int interface_role, if_index_flag, ipaddr_flag, name_flag, mtu_flag;
-
-                    interface_role = (obj_ctype & 0xc0) >> 6;
-                    if_index_flag  = (obj_ctype & 0x8) >> 3;
-                    ipaddr_flag    = (obj_ctype & 0x4) >> 2;
-                    name_flag      = (obj_ctype & 0x2) >> 1;
-                    mtu_flag       = (obj_ctype & 0x1);
-
-                    ND_PRINT("\n\t    Interface Role: %s",
-                             tok2str(icmp_interface_information_role_values,
-                             "an unknown interface role",interface_role));
-
-                    offset = obj_tptr;
-
-                    if (if_index_flag) {
-                        ND_PRINT("\n\t    Interface Index: %u", GET_BE_U_4(offset));
-                        offset += 4;
-                    }
-                    if (ipaddr_flag) {
-                        const struct icmp_interface_information_ipaddr_subobject_t *ipaddr_subobj;
-
-                        ND_PRINT("\n\t    IP Address sub-object: ");
-                        ipaddr_subobj = (const struct icmp_interface_information_ipaddr_subobject_t *) offset;
-                        switch (GET_BE_U_2(ipaddr_subobj->afi)) {
-                            case 1:
-                                ND_PRINT("%s", GET_IPADDR_STRING(ipaddr_subobj->ip_addr));
-                                offset += 4;
-                                break;
-                            case 2:
-                                ND_PRINT("%s", GET_IP6ADDR_STRING(ipaddr_subobj->ip_addr));
-                                offset += 16;
-                                break;
-                            default:
-                                ND_PRINT("Unknown Address Family Identifier");
-                                return;
-                        }
-                        offset += 4;
-                    }
-                    if (name_flag) {
-                        uint8_t inft_name_length_field;
-                        const struct icmp_interface_information_ifname_subobject_t *ifname_subobj;
-
-                        ifname_subobj = (const struct icmp_interface_information_ifname_subobject_t *) offset;
-                        inft_name_length_field = GET_U_1(ifname_subobj->length);
-                        ND_PRINT("\n\t    Interface Name");
-                        if (inft_name_length_field == 0) {
-                            ND_PRINT(" [length %u]", inft_name_length_field);
-                            nd_print_invalid(ndo);
-                            break;
-                        }
-                        if (inft_name_length_field % 4 != 0) {
-                            ND_PRINT(" [length %u != N x 4]", inft_name_length_field);
-                            nd_print_invalid(ndo);
-                            offset += inft_name_length_field;
-                            break;
-                        }
-                        if (inft_name_length_field > 64) {
-                            ND_PRINT(" [length %u > 64]", inft_name_length_field);
-                            nd_print_invalid(ndo);
-                            offset += inft_name_length_field;
-                            break;
-                        }
-                        ND_PRINT(", length %u: ", inft_name_length_field);
-                        nd_printjnp(ndo, ifname_subobj->if_name,
-                                    inft_name_length_field - 1);
-                        offset += inft_name_length_field;
-                    }
-                    if (mtu_flag) {
-                        ND_PRINT("\n\t    MTU: %u", GET_BE_U_4(offset));
-                        offset += 4;
-                    }
-                    break;
-                  }
-
-                default:
-                    print_unknown_data(ndo, obj_tptr, "\n\t    ", obj_tlen);
-                    break;
-                }
-                if (hlen < obj_tlen)
+                if (hlen < (u_int)obj_tlen)
                     break;
                 hlen -= obj_tlen;
                 obj_tptr += obj_tlen;
