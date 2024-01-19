@@ -460,13 +460,14 @@ ptp_print(netdissect_options *ndo, const u_char *bp, u_int length)
      * version 2.1.
      */
     ndo->ndo_protocol = "ptp";
+    nd_print_protocol_caps(ndo);
     ND_ICHECK_U(length, <, PTP_HDR_LEN);
     major_vers = GET_BE_U_2(bp) & PTP_MAJOR_VERS_MASK;
     minor_vers = (GET_BE_U_2(bp) & PTP_MINOR_VERS_MASK) >> 4;
     if (minor_vers)
-	    ND_PRINT("PTPv%u.%u", major_vers, minor_vers);
+	    ND_PRINT("v%u.%u", major_vers, minor_vers);
     else
-	    ND_PRINT("PTPv%u", major_vers);
+	    ND_PRINT("v%u", major_vers);
 
     switch(major_vers) {
         case PTP_VER_1:
@@ -476,7 +477,7 @@ ptp_print(netdissect_options *ndo, const u_char *bp, u_int length)
             ptp_print_2(ndo, bp, length);
             break;
         default:
-            //ND_PRINT("ERROR: unknown-version\n");
+            ND_PRINT(" (unsupported)");
             break;
     }
     return;
