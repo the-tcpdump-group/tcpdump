@@ -37,6 +37,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
         these generated files in the release tarball.
       autoconf: Update install-sh script to the latest available version.
       Autoconf: Remove detection of early IPv6 stacks.
+      Autoconf: Update config.{guess,sub}, timestamps 2024-01-01
       Detect OS IPv6 support using AF_INET6 only.
 
 DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
