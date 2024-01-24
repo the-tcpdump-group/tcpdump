@@ -63,6 +63,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Autoconf: Get --with-user and --with-chroot right.
       Autoconf: Fix --static-pcap-only test on Solaris 10.
       autoconf: Add some warning flags for clang 13 or newer.
+      Autoconf: Update config.{guess,sub}, timestamps 2024-01-01.
       configure: Apply autoupdate 2.69.
       CMake: improve the comment before project(tcpdump C).
       Do not require vsnprintf().
