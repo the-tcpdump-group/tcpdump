@@ -37,7 +37,6 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
         these generated files in the release tarball.
       autoconf: Update install-sh script to the latest available version.
       Autoconf: Remove detection of early IPv6 stacks.
-      Autoconf: Update config.{guess,sub}, timestamps 2024-01-01
       Detect OS IPv6 support using AF_INET6 only.
 
 DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
@@ -105,6 +104,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Autoconf: Get --with-user and --with-chroot right.
       Autoconf: Fix --static-pcap-only test on Solaris 10.
       autoconf: Add some warning flags for clang 13 or newer.
+      Autoconf: Update config.{guess,sub}, timestamps 2024-01-01.
       configure: Apply autoupdate 2.69.
       CMake: improve the comment before project(tcpdump C).
       Do not require vsnprintf().
