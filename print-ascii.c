@@ -214,22 +214,3 @@ hex_print(netdissect_options *ndo,
 {
 	hex_print_with_offset(ndo, indent, cp, length, 0);
 }
-
-#ifdef MAIN
-int
-main(int argc, char *argv[])
-{
-	hex_print("\n\t", "Hello, World!\n", 14);
-	printf("\n");
-	hex_and_ascii_print("\n\t", "Hello, World!\n", 14);
-	printf("\n");
-	ascii_print("Hello, World!\n", 14);
-	printf("\n");
-#define TMSG "Now is the winter of our discontent...\n"
-	hex_print_with_offset("\n\t", TMSG, sizeof(TMSG) - 1, 0x100);
-	printf("\n");
-	hex_and_ascii_print_with_offset("\n\t", TMSG, sizeof(TMSG) - 1, 0x100);
-	printf("\n");
-	exit(0);
-}
-#endif /* MAIN */
