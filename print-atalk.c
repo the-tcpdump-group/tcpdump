@@ -427,6 +427,10 @@ atp_bitmap_print(netdissect_options *ndo,
 	 * The '& 0xff' below is needed for compilers that want to sign
 	 * extend a u_char, which is the case with the Ultrix compiler.
 	 * (gcc is smart enough to eliminate it, at least on the Sparc).
+	 *
+	 * FIXME: If this problem no longer exists, this workaround should be
+	 * removed.  Otherwise the problem should be consistently detected and
+	 * handled, perhaps at build time.
 	 */
 	if ((bm + 1) & (bm & 0xff)) {
 		char c = '<';

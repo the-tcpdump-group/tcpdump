@@ -258,9 +258,6 @@
 /* define on AIX to get certain functions */
 #cmakedefine _SUN 1
 
-/* to handle Ultrix compilers that don't support const in prototypes */
-#cmakedefine const 1
-
 /* Define as token for inline if inlining supported */
 #cmakedefine inline 1
 

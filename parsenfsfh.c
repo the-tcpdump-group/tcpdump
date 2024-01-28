@@ -118,9 +118,6 @@ Parse_fh(netdissect_options *ndo, const unsigned char *fh, u_int len,
 #if	defined(SUNOS5)
 		    fhtype = FHT_SUNOS5;
 #endif
-#if	defined(ultrix)
-		    fhtype = FHT_ULTRIX;
-#endif
 #if	defined(__osf__)
 		    fhtype = FHT_DECOSF;
 #endif
