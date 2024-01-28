@@ -157,7 +157,6 @@ The Regents of the University of California.  All rights reserved.\n";
 #include "netdissect.h"
 #include "interface.h"
 #include "addrtoname.h"
-#include "machdep.h"
 #include "pcap-missing.h"
 #include "ascii_strcasecmp.h"
 
@@ -1566,16 +1565,6 @@ main(int argc, char **argv)
 	if (wsockinit() != 0)
 		error("Attempting to initialize Winsock failed");
 #endif
-
-	/*
-	 * On platforms where the CPU doesn't support unaligned loads,
-	 * force unaligned accesses to abort with SIGBUS, rather than
-	 * being fixed up (slowly) by the OS kernel; on those platforms,
-	 * misaligned accesses are bugs, and we want tcpdump to crash so
-	 * that the bugs are reported.
-	 */
-	if (abort_on_misalignment(ebuf, sizeof(ebuf)) < 0)
-		error("%s", ebuf);
 
 	/*
 	 * An explicit tzset() call is usually not needed as it happens

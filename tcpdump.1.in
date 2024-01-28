@@ -222,7 +222,7 @@ is running, if the OS reports that information to applications; if not,
 it will be reported as 0).
 .LP
 On platforms that support the SIGINFO signal, such as most BSDs
-(including macOS) and Digital/Tru64 UNIX, it will report those counts
+(including macOS), it will report those counts
 when it receives a SIGINFO signal (generated, for example, by typing
 your ``status'' character, typically control-T, although on some
 platforms, such as macOS, the ``status'' character is not set by

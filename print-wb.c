@@ -73,10 +73,6 @@ struct pkt_hdr {
 #define PT_PREP         7       /* page vector reply */
 
 #if 0
-#ifdef PF_USER
-#undef PF_USER			/* {Digital,Tru64} UNIX define this, alas */
-#endif
-
 /* flags */
 #define PF_USER		0x01	/* hint that packet has interactive data */
 #define PF_VIS		0x02	/* only visible ops wanted */

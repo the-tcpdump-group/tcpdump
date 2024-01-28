@@ -84,7 +84,6 @@ LIBNETDISSECT_SRC=\
 	in_cksum.c \
 	ipproto.c \
 	l2vpn.c \
-	machdep.c \
 	netdissect.c \
 	netdissect-alloc.c \
 	nlpid.c \
@@ -293,7 +292,6 @@ HDR = \
 	ipproto.h \
 	l2vpn.h \
 	llc.h \
-	machdep.h \
 	mib.h \
 	mpls.h \
 	nameser.h \

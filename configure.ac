@@ -734,16 +734,6 @@ irix*)
 	MAN_MISC_INFO=5
 	;;
 
-osf*)
-	V_GROUP=system
-
-	#
-	# Use System V conventions for man pages.
-	#
-	MAN_FILE_FORMATS=4
-	MAN_MISC_INFO=5
-	;;
-
 solaris*)
 	V_GROUP=sys
 

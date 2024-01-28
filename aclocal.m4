@@ -148,28 +148,6 @@ AC_DEFUN(AC_LBL_C_INIT,
 		    $1="$$1 -xansi -signed -g3"
 		    ;;
 
-	    osf*)
-		    #
-		    # Presumed to be DEC OSF/1, Digital UNIX, or
-		    # Tru64 UNIX.
-		    #
-		    # The DEC C compiler, which is what we presume we're
-		    # using, doesn't exit with a non-zero exit status if we
-		    # hand it an invalid -W flag, can't be forced to do
-		    # so, and doesn't handle GCC-style -W flags, so we
-		    # don't want to try using GCC-style -W flags.
-		    #
-		    ac_lbl_cc_dont_try_gcc_dashW=yes
-		    #
-		    # -g is equivalent to -g2, which turns off
-		    # optimization; we choose -g3, which generates
-		    # debugging information but doesn't turn off
-		    # optimization (even if the optimization would
-		    # cause inaccuracies in debugging).
-		    #
-		    $1="$$1 -g3"
-		    ;;
-
 	    solaris*)
 		    #
 		    # Assumed to be Sun C, which requires -errwarn to force
@@ -271,9 +249,9 @@ AC_DEFUN(AC_LBL_CHECK_DEPENDENCY_GENERATION_OPT,
 		#
 		case "$host_os" in
 
-		irix*|osf*|darwin*)
+		irix*|darwin*)
 			#
-			# MIPS C for IRIX, DEC C, and clang all use -M.
+			# MIPS C for IRIX and Clang use -M.
 			#
 			ac_lbl_dependency_flag="-M"
 			;;

@@ -105,8 +105,6 @@ l2vpn.c		- L2VPN encapsulation value-to-name table
 l2vpn.h		- L2VPN encapsulation definitions
 lbl/os-*.h	- OS-dependent defines and prototypes (currently none)
 llc.h		- LLC definitions
-machdep.c	- machine dependent routines
-machdep.h	- machine dependent definitions
 makemib		- mib to header script
 mib.h		- mib definitions
 missing/*	- replacements for missing library functions
