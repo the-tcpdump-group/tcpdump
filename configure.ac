@@ -699,10 +699,6 @@ fi
 AC_CHECK_FUNCS(pcap_set_optimizer_debug)
 AC_REPLACE_FUNCS(bpf_dump)	dnl moved to libpcap in 0.6
 
-V_GROUP=0
-if test -f /etc/group -a ! -z "`grep '^wheel:' /etc/group`" ; then
-	V_GROUP=wheel
-fi
 #
 # Assume V7/BSD convention for man pages (file formats in section 5,
 # miscellaneous info in section 7).
@@ -725,8 +721,6 @@ hpux*)
 	;;
 
 solaris*)
-	V_GROUP=sys
-
 	#
 	# Use System V conventions for man pages.
 	#
@@ -734,10 +728,6 @@ solaris*)
 	MAN_MISC_INFO=5
 	;;
 esac
-
-if test -f /dev/bpf0 ; then
-	V_GROUP=bpf
-fi
 
 #
 # Make sure we have a definition for C99's uintptr_t (regardless of
@@ -914,7 +904,6 @@ fi
 
 AC_SUBST(V_CCOPT)
 AC_SUBST(V_DEFS)
-AC_SUBST(V_GROUP)
 AC_SUBST(V_INCLS)
 AC_SUBST(V_PCAPDEP)
 AC_SUBST(LOCALSRC)
