@@ -14,7 +14,7 @@ dnl
 #
 
 AC_PREREQ([2.69])
-AC_INIT([tcpdump],[m4_esyscmd_s(cat VERSION)])
+AC_INIT([tcpdump],[m4_esyscmd_s(cat VERSION)],[https://github.com/the-tcpdump-group/tcpdump/issues])
 AC_CONFIG_SRCDIR(tcpdump.c)
 
 AC_CANONICAL_HOST
