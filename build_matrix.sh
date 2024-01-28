@@ -49,7 +49,7 @@ build_tcpdump() {
             export CRYPTO
             for SMB in $MATRIX_SMB; do
                 export SMB
-                COUNT=`increment $COUNT`
+                COUNT=`increment "$COUNT"`
                 echo_magenta "===== SETUP $COUNT: BUILD_LIBPCAP=$BUILD_LIBPCAP REMOTE=${REMOTE:-?} CC=$CC CMAKE=$CMAKE CRYPTO=$CRYPTO SMB=$SMB =====" >&2
                 # Run one build with setup environment variables:
                 # BUILD_LIBPCAP, REMOTE, CC, CMAKE, CRYPTO and SMB
