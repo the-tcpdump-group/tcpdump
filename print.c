@@ -194,9 +194,6 @@ static const struct printer printers[] = {
 #ifdef DLT_PPI
 	{ ppi_if_print,		DLT_PPI },
 #endif
-#ifdef DLT_PPP_BSDOS
-	{ ppp_bsdos_if_print,	DLT_PPP_BSDOS },
-#endif
 #ifdef DLT_PPP_SERIAL
 	{ ppp_hdlc_if_print,	DLT_PPP_SERIAL },
 #endif
