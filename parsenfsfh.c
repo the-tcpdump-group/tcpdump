@@ -103,15 +103,6 @@ Parse_fh(netdissect_options *ndo, const unsigned char *fh, u_int len,
 	else {
 		if (ourself) {
 		    /* File handle generated on this host, no need for guessing */
-#if	defined(IRIX40)
-		    fhtype = FHT_IRIX4;
-#endif
-#if	defined(IRIX50)
-		    fhtype = FHT_IRIX5;
-#endif
-#if	defined(IRIX51)
-		    fhtype = FHT_IRIX5;
-#endif
 #if	defined(SUNOS4)
 		    fhtype = FHT_SUNOS4;
 #endif
@@ -267,6 +258,7 @@ Parse_fh(netdissect_options *ndo, const unsigned char *fh, u_int len,
 	    break;
 
 	case FHT_IRIX5:
+	    /* FIXME: None of the heuristics above return this. */
 	    fsidp->Fsid_dev.Minor = GET_BE_U_2(fhp + 2);
 	    fsidp->Fsid_dev.Major = GET_BE_U_2(fhp);
 	    fsidp->fsid_code = GET_BE_U_4(fhp + 4);

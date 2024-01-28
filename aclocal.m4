@@ -115,39 +115,6 @@ AC_DEFUN(AC_LBL_C_INIT,
 		    ac_lbl_cc_dont_try_gcc_dashW=yes
 		    ;;
 
-	    irix*)
-		    #
-		    # MIPS C, which is what we presume we're using, doesn't
-		    # necessarily exit with a non-zero exit status if we
-		    # hand it an invalid -W flag, can't be forced to do
-		    # so, and doesn't handle GCC-style -W flags, so we
-		    # don't want to try using GCC-style -W flags.
-		    #
-		    ac_lbl_cc_dont_try_gcc_dashW=yes
-		    #
-		    # It also, apparently, defaults to "char" being
-		    # unsigned, unlike most other C implementations;
-		    # I suppose we could say "signed char" whenever
-		    # we want to guarantee a signed "char", but let's
-		    # just force signed chars.
-		    #
-		    # -xansi is normally the default, but the
-		    # configure script was setting it; perhaps -cckr
-		    # was the default in the Old Days.  (Then again,
-		    # that would probably be for backwards compatibility
-		    # in the days when ANSI C was Shiny and New, i.e.
-		    # 1989 and the early '90's, so maybe we can just
-		    # drop support for those compilers.)
-		    #
-		    # -g is equivalent to -g2, which turns off
-		    # optimization; we choose -g3, which generates
-		    # debugging information but doesn't turn off
-		    # optimization (even if the optimization would
-		    # cause inaccuracies in debugging).
-		    #
-		    $1="$$1 -xansi -signed -g3"
-		    ;;
-
 	    solaris*)
 		    #
 		    # Assumed to be Sun C, which requires -errwarn to force
@@ -249,9 +216,9 @@ AC_DEFUN(AC_LBL_CHECK_DEPENDENCY_GENERATION_OPT,
 		#
 		case "$host_os" in
 
-		irix*|darwin*)
+		darwin*)
 			#
-			# MIPS C for IRIX and Clang use -M.
+			# Clang uses -M.
 			#
 			ac_lbl_dependency_flag="-M"
 			;;
@@ -802,14 +769,6 @@ AC_DEFUN(AC_LBL_DEVEL,
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wwrite-strings)
 	    fi
 	    AC_LBL_CHECK_DEPENDENCY_GENERATION_OPT()
-	    #
-	    # We used to set -n32 for IRIX 6 when not using GCC (presumed
-	    # to mean that we're using MIPS C or MIPSpro C); it specified
-	    # the "new" faster 32-bit ABI, introduced in IRIX 6.2.  I'm
-	    # not sure why that would be something to do *only* with a
-	    # .devel file; why should the ABI for which we produce code
-	    # depend on .devel?
-	    #
 	    AC_MSG_CHECKING([whether to use an os-proto.h header])
 	    os=`echo $host_os | sed -e 's/\([[0-9]][[0-9]]*\)[[^0-9]].*$/\1/'`
 	    name="lbl/os-$os.h"

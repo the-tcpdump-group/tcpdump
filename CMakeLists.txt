@@ -1299,14 +1299,6 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "HP-UX")
     #
     set(MAN_FILE_FORMATS 4)
     set(MAN_MISC_INFO 5)
-elseif(CMAKE_SYSTEM_NAME STREQUAL "IRIX" OR CMAKE_SYSTEM_NAME STREQUAL "IRIX64")
-    #
-    # Use IRIX conventions for man pages; they're the same as the
-    # System V conventions, except that they use section 8 for
-    # administrative commands and daemons.
-    #
-    set(MAN_FILE_FORMATS 4)
-    set(MAN_MISC_INFO 5)
 elseif(CMAKE_SYSTEM_NAME STREQUAL "SunOS" AND CMAKE_SYSTEM_VERSION MATCHES "5[.][0-9.]*")
     #
     # SunOS 5.x.
