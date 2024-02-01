@@ -104,6 +104,7 @@ const struct tok ethertype_values[] = {
     { ETHERTYPE_AOE,            "AoE" },
     { ETHERTYPE_PTP,            "PTP" },
     { ETHERTYPE_HSR,            "HSR" },
+    { ETHERTYPE_HSR_PRP_SUP,    "HSR/PRP Supervision" },
     { ETHERTYPE_ARISTA,         "Arista Vendor Specific Protocol" },
     { 0, NULL}
 };
@@ -670,6 +671,10 @@ ethertype_print(netdissect_options *ndo,
 
 	case ETHERTYPE_PTP:
 		ptp_print(ndo, p, length);
+		return (1);
+
+	case ETHERTYPE_HSR_PRP_SUP:
+		hsr_prp_supervision_print(ndo, p, length);
 		return (1);
 
 	case ETHERTYPE_LAT:
