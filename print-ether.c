@@ -103,6 +103,7 @@ const struct tok ethertype_values[] = {
     { ETHERTYPE_CALM_FAST,      "CALM FAST"},
     { ETHERTYPE_AOE,            "AoE" },
     { ETHERTYPE_PTP,            "PTP" },
+    { ETHERTYPE_HSR,            "HSR" },
     { ETHERTYPE_ARISTA,         "Arista Vendor Specific Protocol" },
     { 0, NULL}
 };
@@ -285,6 +286,24 @@ recurse:
 		length -= 4;
 		caplen -= 4;
 		hdrlen += 4;
+	}
+
+	if (length_type == ETHERTYPE_HSR) {
+		if (ndo->ndo_eflag) {
+			ether_type_print(ndo, length_type);
+			if (!printed_length) {
+				ND_PRINT(", length %u: ", orig_length);
+				printed_length = 1;
+			} else
+				ND_PRINT(", ");
+			hsr_print(ndo, p, length);
+		}
+
+		length_type = GET_BE_U_2(p + 4);
+		p += 6;
+		length -= 6;
+		caplen -= 6;
+		hdrlen += 6;
 	}
 
 	/*
