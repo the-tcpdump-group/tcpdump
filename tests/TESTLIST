@@ -959,6 +959,10 @@ nhrp-trace			nhrp-trace.pcap			nhrp-trace.out	-v
 nhrp				nhrp.pcapng			nhrp.out	-v
 pb_nhrp_1			pb_nhrp_1.pcap			pb_nhrp_1.out	-v
 
+# HSR/PRP tests
+hsr		hsr.pcap	hsr.out		-e
+prp		prp.pcap	prp.out		-e
+
 # Undefined behavior tests
 ip-snmp-leftshift-unsigned ip-snmp-leftshift-unsigned.pcap ip-snmp-leftshift-unsigned.out
 ip6-snmp-oid-unsigned ip6-snmp-oid-unsigned.pcap ip6-snmp-oid-unsigned.out
