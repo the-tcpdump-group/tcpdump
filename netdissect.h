@@ -655,6 +655,7 @@ extern void hex_print(netdissect_options *, const char *indent, const u_char *cp
 extern void hex_print_with_offset(netdissect_options *, const char *indent, const u_char *cp, u_int, u_int);
 extern void hncp_print(netdissect_options *, const u_char *, u_int);
 extern void hsr_print(netdissect_options *, const u_char *, u_int);
+extern void prp_print(netdissect_options *, const u_char *, u_int);
 extern void hsr_prp_supervision_print(netdissect_options *ndo, const u_char *bp, u_int length);
 extern void hsrp_print(netdissect_options *, const u_char *, u_int);
 extern void http_print(netdissect_options *, const u_char *, u_int);

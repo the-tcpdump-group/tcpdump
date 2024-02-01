@@ -40,6 +40,30 @@
  * header, tags before the HSR tag (e.g. VLAN), and the HSR ethertype field.
  * For PRP it includes the PRP suffix.
  *
+ *
+ * PRP trailer
+ *     0                   1                   2                   3
+ *     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *    |         Sequence number       | LanId |       LSDUsize        |
+ *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *    |         PRP Suffix (0x88fb)   |
+ *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ *     0                   1                   2                   3
+ *
+ * PRP uses a trailer on the packets, making it harder to parse. The suffix
+ * 0x88fb indicates that it is a PRP frame, but since this could occur
+ * naturally in a packet there is also the LSDUsize that indicates the size of
+ * the packet. If this size does not match then it is not a PRP trailer.
+ * Unfortunately, this could still match on other packets if coincidentally
+ * both the suffix and LSDUsize matches up. We could also verify that LanId is
+ * valid (0xA or 0xB) to further reduce likelihood of bad matches.
+ *
+ * LanId in HSR header is 0 = LAN A and 1 = LAN B. In PRP frames it is
+ * represented as 0xA and 0xB.
+ *
+ *
  * HSR/PRP Supervision frame
  *     0                   1                   2                   3
  *     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -91,6 +115,24 @@ void hsr_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 invalid:
 	nd_print_invalid(ndo);
+}
+
+void prp_print(netdissect_options *ndo, const u_char *bp, u_int length)
+{
+	u_int lsdu_size, lanid, seqnr;
+
+	lsdu_size = GET_BE_U_2(bp + length - 4) & 0xfff;
+	lanid = GET_BE_U_2(bp + length - 4) >> 12;
+
+	/* If length does not match LSDUsize or LanId isn't valid it isn't a
+	 * valid PRP trailer. This length assumes VLAN tags have been stripped
+	 * away already.
+	 */
+	if (lsdu_size == length && (lanid == 0xA || lanid == 0xB)) {
+		seqnr = GET_BE_U_2(bp + length - 6);
+		ND_PRINT("PRP trailer (0x88fb), LSDUsize %d, SeqNr %d, LanId %s, ",
+			 lsdu_size, seqnr, lanid == 0xA ? "A" : "B");
+	}
 }
 
 void hsr_prp_supervision_print(netdissect_options *ndo, const u_char *bp, u_int length)
