@@ -91,7 +91,7 @@
 
 /*
  * Undefine various #defines from various System V-flavored OSes (Solaris,
- * SINIX, HP-UX) so the compiler doesn't whine that we redefine them.
+ * HP-UX) so the compiler doesn't whine that we redefine them.
  */
 #ifdef T_NULL
 #undef T_NULL

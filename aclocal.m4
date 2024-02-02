@@ -783,55 +783,24 @@ AC_DEFUN(AC_LBL_DEVEL,
     fi])
 
 dnl
-dnl AC_LBL_LIBRARY_NET
-dnl
-dnl This test is for network applications that need socket() and
-dnl gethostbyaddr() -ish functions.  Under Solaris, those applications
-dnl need to link with "-lsocket -lnsl".  Under IRIX, they need to link
-dnl with "-lnsl" but should *not* link with "-lsocket" because
-dnl libsocket.a breaks a number of things (for instance:
-dnl gethostbyaddr() under IRIX 5.2, and snoop sockets under most
-dnl versions of IRIX).
-dnl
-dnl Unfortunately, many application developers are not aware of this,
-dnl and mistakenly write tests that cause -lsocket to be used under
-dnl IRIX.  It is also easy to write tests that cause -lnsl to be used
-dnl under operating systems where neither are necessary (or useful),
-dnl such as SunOS 4.1.4, which uses -lnsl for TLI.
-dnl
-dnl This test exists so that every application developer does not test
-dnl this in a different, and subtly broken fashion.
-
-dnl It has been argued that this test should be broken up into two
-dnl separate tests, one for the resolver libraries, and one for the
-dnl libraries necessary for using Sockets API. Unfortunately, the two
-dnl are carefully intertwined and allowing the autoconf user to use
-dnl them independently potentially results in unfortunate ordering
-dnl dependencies -- as such, such component macros would have to
-dnl carefully use indirection and be aware if the other components were
-dnl executed. Since other autoconf macros do not go to this trouble,
-dnl and almost no applications use sockets without the resolver, this
-dnl complexity has not been implemented.
-dnl
-dnl The check for libresolv is in case you are attempting to link
-dnl statically and happen to have a libresolv.a lying around (and no
-dnl libnsl.a).
+dnl This is a simplified adaptation of AC_LBL_LIBRARY_NET from libpcap.
+dnl In this context tcpdump needs gethostbyaddr() only.
 dnl
 AC_DEFUN(AC_LBL_LIBRARY_NET, [
-    # Most operating systems have gethostbyaddr() in the default searched
-    # libraries (i.e. libc):
-    # Some OSes (eg. Solaris) place it in libnsl
-    # Some strange OSes (SINIX) have it in libsocket:
-    AC_SEARCH_LIBS(gethostbyaddr, network nsl socket resolv)
-    # Unfortunately libsocket sometimes depends on libnsl and
-    # AC_SEARCH_LIBS isn't up to the task of handling dependencies like this.
-    if test "$ac_cv_search_gethostbyaddr" = "no"
-    then
+    AC_CHECK_FUNC(gethostbyaddr,,
+    [
 	AC_CHECK_LIB(socket, gethostbyaddr,
-                     LIBS="-lsocket -lnsl $LIBS", , -lnsl)
-    fi
-    AC_SEARCH_LIBS(socket, socket, ,
-	AC_CHECK_LIB(socket, socket, LIBS="-lsocket -lnsl $LIBS", , -lnsl))
-    # DLPI needs putmsg under HPUX so test for -lstr while we're at it
-    AC_SEARCH_LIBS(putmsg, str)
+	[
+	    LIBS="-lsocket -lnsl $LIBS"
+	],
+	[
+	    AC_CHECK_LIB(network, gethostbyaddr,
+	    [
+		LIBS="-lnetwork $LIBS"
+	    ],
+	    [
+		AC_MSG_ERROR([gethostbyaddr is required, but wasn't found])
+	    ])
+	], -lnsl)
     ])
+])
