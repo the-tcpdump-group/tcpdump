@@ -38,6 +38,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       autoconf: Update install-sh script to the latest available version.
       Autoconf: Remove detection of early IPv6 stacks.
       Detect OS IPv6 support using AF_INET6 only.
+      Remove all remaining support for BSD/OS, IRIX, {OSF/1, Digital Unix,
+        Tru64 Unix}, SINIX and Ultrix.
 
 DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
   Summary for 4.99.5 tcpdump release (so far!)
