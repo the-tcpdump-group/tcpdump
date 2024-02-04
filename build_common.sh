@@ -45,6 +45,7 @@ mktempdir() {
     *)
         # At least Haiku, Linux and OpenBSD implementations require explicit
         # trailing X'es in the template, so make it the same suffix as above.
+        # XXX - is MSYS2 GNU-based, so that it would be like Linux?
         mktemp -d -t "${mktempdir_prefix}.XXXXXXXX"
         ;;
     esac
@@ -94,6 +95,16 @@ cc_version_nocache() {
             ;;
         esac
         ;;
+    cl)
+        # Visual Studio's compiler doesn't have a "print the compiler
+        # version" option, but we can get version information by
+        # running it with no options, sending its standard error to
+        # the standard output, and throwing out the usage message;
+        # as we have MSYS2, we can just "head" it out.
+        #
+        # XXX - does it exit with an error?
+        "$CC" 2>&1 | head -2
+        ;;
     *)
         "$CC" --version || "$CC" -V || :
         ;;
@@ -129,6 +140,12 @@ cc_id_nocache() {
     fi
 
     cc_id_guessed=`echo "$cc_id_firstline" | sed 's/^.* Sun C \([0-9\.]*\) .*$/suncc-\1/'`
+    if [ "$cc_id_firstline" != "$cc_id_guessed" ]; then
+        echo "$cc_id_guessed"
+        return
+    fi
+
+    cc_id_guessed=`echo "$cc_id_firstline" | sed 's/^Microsoft (R) C\/C++ Optimizing Compiler Version \([0-9\.]*\) .*$/msvc-\1/'`
     if [ "$cc_id_firstline" != "$cc_id_guessed" ]; then
         echo "$cc_id_guessed"
         return
@@ -181,6 +198,10 @@ cc_werr_cflags() {
     suncc-*)
         echo '-errwarn=%all'
         ;;
+    msvc-*)
+        # XXX - what?
+        echo ''
+        ;;
     esac
 }
 
@@ -205,11 +226,12 @@ os_id() {
         : "${os_id_version:=`uname -v`}"
         echo "${os_id_version}.${os_id_release}"
         ;;
-    Darwin|NetBSD|OpenBSD|SunOS)
+    Darwin|GNU|OpenBSD|SunOS)
         echo "$os_id_release"
         ;;
-    FreeBSD|Linux)
+    FreeBSD|NetBSD|Linux)
         # Meaningful version is usually the substring before the first dash.
+        # Or the first underscore.
         echo "$os_id_release" | sed 's/^\([0-9\.]*\).*$/\1/'
         ;;
     Haiku)
@@ -220,6 +242,11 @@ os_id() {
         : "${os_id_version:=`uname -v`}"
         echo "$os_id_version" | sed 's/^\(hrev.*\)+.*$/\1/'
         ;;
+    MSYS*)
+        # uname -s produces "MSYS_NT-{NT version?}-{build?}
+        # uname -r produces MSYS2 version?
+        echo "$os_id_version", MSYS "$os_id_release"
+        ;;
     *)
         echo 'UNKNOWN'
         ;;
@@ -228,7 +255,8 @@ os_id() {
 
 increment() {
     # No arithmetic expansion in Solaris /bin/sh before 11.
-    echo "${1:?} + 1" | bc
+    # shellcheck disable=SC2003
+    expr "${1:?}" + 1
 }
 
 # Display text in magenta.
@@ -251,6 +279,9 @@ print_so_deps() {
         ;;
     Haiku-*)
         run_after_echo objdump -p "${1:?}"
+        ;;
+    MSYS*)
+        run_after_echo dumpbin /dependents "${1:?}"
         ;;
     *)
         run_after_echo ldd "${1:?}"

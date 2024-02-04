@@ -44,7 +44,7 @@ linux_task:
     LANG: C
   script:
     - apt-get -qy update >/dev/null
-    - apt-get -qy install git autoconf make cmake clang-15 gcc bc >/dev/null
+    - apt-get -qy install git autoconf make cmake clang-15 gcc >/dev/null
     - apt-get -qy install flex bison libdbus-1-dev libbluetooth-dev libnl-genl-3-dev libibverbs-dev >/dev/null # for libpcap
     - apt-get -qy install libssl-dev libsmi2-dev libcap-ng-dev libpcap-dev binutils-dev >/dev/null
     - apt-get -qy install sudo >/dev/null # for some tcpdump commands
