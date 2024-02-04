@@ -15,6 +15,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
     Building and testing:
       Treat SA_RESTART as optional.
       CI: Implement cross-compiling with libpcap.
+      Fix compiling on GNU/Hurd.
     QNX:
       Use a lower packet buffer timeout.
 
