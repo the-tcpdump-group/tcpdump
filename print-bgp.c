@@ -1994,7 +1994,7 @@ bgp_attr_print(netdissect_options *ndo,
     int advance;
     u_int tlen;
     const u_char *tptr;
-    char buf[MAXHOSTNAMELEN + 100];
+    char buf[512];
     u_int as_size;
     int add_path4, add_path6;
     int ret;
@@ -2962,7 +2962,7 @@ bgp_update_print(netdissect_options *ndo,
 {
     const u_char *p;
     u_int withdrawn_routes_len;
-    char buf[MAXHOSTNAMELEN + 100];
+    char buf[512];
     int wpfx;
     u_int len;
     int i;

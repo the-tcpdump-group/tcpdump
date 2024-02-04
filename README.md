@@ -31,6 +31,7 @@ tcpdump compiles and works on at least the following platforms:
 * Haiku
 * HP-UX 11i
 * illumos (OmniOS, OpenIndiana)
+* GNU/Hurd
 * GNU/Linux
 * {Mac} OS X / macOS
 * NetBSD

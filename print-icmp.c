@@ -499,7 +499,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen,
 	const char *str;
 	const uint8_t *obj_tptr;
 	u_int hlen;
-	char buf[MAXHOSTNAMELEN + 100];
+	char buf[512];
 	struct cksum_vec vec[1];
 
 	ndo->ndo_protocol = "icmp";
