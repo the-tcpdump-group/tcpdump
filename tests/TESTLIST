@@ -326,6 +326,7 @@ ipv6_invalid_length ipv6_invalid_length.pcap ipv6_invalid_length.out
 ipv6_invalid_length_2 ipv6_invalid_length_2.pcap ipv6_invalid_length_2.out -v
 ipv6_jumbogram_invalid_length ipv6_jumbogram_invalid_length.pcap ipv6_jumbogram_invalid_length.out -v
 ipv6_39_byte_header ipv6_39_byte_header.pcap ipv6_39_byte_header.out -v
+ipv6_missing_jumbo_payload_option ipv6_missing_jumbo_payload_option.pcap ipv6_missing_jumbo_payload_option.out
 
 # Loopback/CTP test case
 loopback	loopback.pcap		loopback.out
