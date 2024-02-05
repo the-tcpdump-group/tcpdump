@@ -34,6 +34,7 @@
 #include "extract.h"
 
 #include "ip.h"
+#include "icmp.h"
 #include "udp.h"
 #include "ipproto.h"
 #include "mpls.h"
@@ -585,6 +586,44 @@ print_icmp_multipart_ext_object(netdissect_options *ndo, const uint8_t *obj_tptr
 }
 
 void
+print_icmp_rfc8335(netdissect_options *ndo, uint8_t xinfo, int isrequest, uint8_t icmp_code, const uint8_t *data) {
+	struct cksum_vec vec[1];
+
+	if (isrequest) {
+		ND_PRINT("\n\t%s Interface", xinfo & 1 ? "Local" : "Remote");
+		if (ICMP_EXT_EXTRACT_VERSION(GET_U_1(data)) != ICMP_EXT_VERSION) {
+		    nd_print_invalid(ndo);
+		} else {
+		    // A single extended object.  The extended header is not
+		    // located at offset 128 in this case, so we can not use
+		    // icmp_ext_checksum.
+		    uint16_t sum = GET_BE_U_2(data + 2);
+		    uint16_t len = GET_BE_U_2(data + 4);
+		    // The checksum is over the extended header and the single
+		    // object
+		    len += 4;
+		    vec[0].ptr = data;
+		    vec[0].len = len;
+		    if (ND_TTEST_LEN(vec[0].ptr, vec[0].len)) {
+			ND_PRINT(", checksum 0x%04x (%scorrect), length %u",
+			       sum,
+			       in_cksum(vec, 1) ? "in" : "",
+			       len);
+		    }
+		    print_icmp_multipart_ext_object(ndo, data + 4);
+		}
+	} else {
+		    int state = ( xinfo & 0xe0 ) >> 5;
+		    ND_PRINT("\n\tCode %d (%s), State %d (%s), active %d ipv4 %d ipv6 %d",
+			    icmp_code, tok2str(icmp_extended_echo_reply_code_str, "Unknown", icmp_code),
+			    state, tok2str(icmp_extended_echo_reply_state_str, "Unknown", state),
+			    xinfo & 4 ? 1 : 0,
+			    xinfo & 2 ? 1 : 0,
+			    xinfo & 1 ? 1 : 0);
+	}
+}
+
+void
 icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen,
            int fragmented)
 {
@@ -1036,44 +1075,9 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen,
         }
 
 	if (ndo->ndo_vflag >= 1 && ICMP_EXTENDED_ECHO_TYPE(icmp_type)) {
-	    int xinfo = GET_U_1(dp->icmp_xinfo);
-	    switch (icmp_type) {
-		case ICMP_EXTENDED_ECHO_REQUEST:
-		    ND_PRINT("\n\t%s Interface", xinfo & 1 ? "Local" : "Remote");
-		    if (ICMP_EXT_EXTRACT_VERSION(GET_U_1(dp->icmp_data)) != ICMP_EXT_VERSION) {
-			nd_print_invalid(ndo);
-		    } else {
-			// A single extended object.  The extended header is not
-			// located at offset 128 in this case, so we can not use
-			// icmp_ext_checksum.
-			uint16_t sum = GET_BE_U_2(dp->icmp_data + 2);
-			uint16_t len = GET_BE_U_2(dp->icmp_data + 4);
-			// The checksum is over the extended header and the single
-			// object
-			len += 4;
-			vec[0].ptr = dp->icmp_data;
-			vec[0].len = len;
-			if (ND_TTEST_LEN(vec[0].ptr, vec[0].len)) {
-			    ND_PRINT(", checksum 0x%04x (%scorrect), length %u",
-				   sum,
-				   in_cksum(vec, 1) ? "in" : "",
-				   len);
-			}
-			print_icmp_multipart_ext_object(ndo, dp->icmp_data + 4);
-		    }
-		    break;
-		case ICMP_EXTENDED_ECHO_REPLY:
-		    {
-		    int state = ( xinfo & 0xe0 ) >> 5;
-		    ND_PRINT("\n\tCode %d (%s), State %d (%s), active %d ipv4 %d ipv6 %d",
-			    icmp_code, tok2str(icmp_extended_echo_reply_code_str, "Unknown", icmp_code),
-			    state, tok2str(icmp_extended_echo_reply_state_str, "Unknown", state),
-			    xinfo & 4 ? 1 : 0,
-			    xinfo & 2 ? 1 : 0,
-			    xinfo & 1 ? 1 : 0);
-		    }
-		    break;
-	    }
+	    uint8_t xinfo = GET_U_1(dp->icmp_xinfo);
+	    // RFC8335 printing is shared between ICMP and ICMPv6
+	    print_icmp_rfc8335( ndo, xinfo, icmp_type == ICMP_EXTENDED_ECHO_REQUEST, icmp_code, dp->icmp_data );
 	}
 
 	return;

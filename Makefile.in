@@ -282,6 +282,7 @@ HDR = \
 	getservent.h \
 	gmpls.h \
 	gre.h \
+	icmp.h \
 	interface.h \
 	ip.h \
 	ip6.h \
