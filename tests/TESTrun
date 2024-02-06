@@ -97,8 +97,8 @@ sub runtest {
     my $coredump = false;
     my $status = 0;
     my $linecount = 0;
-    my $rawstderrlog = "tests/NEW/${outputbase}.raw.stderr";
-    my $stderrlog = "tests/NEW/${outputbase}.stderr";
+    my $rawstderrlog = "${newdir}/${outputbase}.raw.stderr";
+    my $stderrlog = "${newdir}/${outputbase}.stderr";
     my $diffstat = 0;
     my $errdiffstat = 0;
 
@@ -107,7 +107,7 @@ sub runtest {
     #
     # Furthermore, on Windows, fc can't read the standard input, so we
     # can't do it as a pipeline in any case.
-    $r = system "$TCPDUMP -# -n -r $input $options >tests/NEW/${outputbase} 2>${rawstderrlog}";
+    $r = system "$TCPDUMP -# -n -r $input $options >${newdir}/${outputbase} 2>${rawstderrlog}";
     if($r != 0) {
         #
         # Something other than "tcpdump opened the file, read it, and
@@ -117,7 +117,7 @@ sub runtest {
         # wrote out, so it shows up when we diff the expected output
         # with it.
         #
-        open(OUTPUT, ">>"."tests/NEW/$outputbase") || die "fail to open $outputbase\n";
+        open(OUTPUT, ">>"."${newdir}/$outputbase") || die "fail to open $outputbase\n";
         if($r == -1) {
             # failed to start due to error.
             $status = $!;
@@ -228,7 +228,7 @@ sub runtest {
             $r = system "fc /lb1000 /t /1 $winoutput tests\\NEW\\$outputbase >tests\\DIFF\\$outputbase.diff";
             $diffstat = $r >> 8;
         } else {
-            $r = system "diff $diff_flags $output tests/NEW/$outputbase >tests/DIFF/$outputbase.diff";
+            $r = system "diff $diff_flags $output ${newdir}/$outputbase >${diffdir}/$outputbase.diff";
             $diffstat = WEXITSTATUS($r);
         }
     }
@@ -261,7 +261,7 @@ sub runtest {
             $nr = system "fc /lb1000 /t /1 $winoutput.stderr $canonstderrlog >tests\DIFF\$outputbase.stderr.diff";
             $errdiffstat = $nr >> 8;
         } else {
-            $nr = system "diff $output.stderr $stderrlog >tests/DIFF/$outputbase.stderr.diff";
+            $nr = system "diff $output.stderr $stderrlog >${diffdir}/$outputbase.stderr.diff";
             $errdiffstat = WEXITSTATUS($nr);
         }
         if($r == 0) {
@@ -286,7 +286,7 @@ sub runtest {
             printf "    %-40s: passed with error messages:\n", $name;
             showfile($stderrlog);
         }
-        unlink "tests/DIFF/$outputbase.diff";
+        unlink "${diffdir}/$outputbase.diff";
         return 0;
     }
     # must have failed!
@@ -294,14 +294,14 @@ sub runtest {
     open FOUT, '>>tests/failure-outputs.txt';
     printf FOUT "\nFailed test: $name\n\n";
     close FOUT;
-    if(-f "tests/DIFF/$outputbase.diff") {
+    if(-f "${diffdir}/$outputbase.diff") {
         #
         # XXX - just do this directly in Perl?
         #
         if ($^O eq 'MSWin32') {
             system "type tests\\DIFF\\$outputbase.diff >> tests\\failure-outputs.txt";
         } else {
-            system "cat tests/DIFF/$outputbase.diff >> tests/failure-outputs.txt";
+            system "cat ${diffdir}/$outputbase.diff >> tests/failure-outputs.txt";
         }
     }
 
