@@ -909,6 +909,57 @@ get_next_file(FILE *VFile, char *ptr)
 	return ret;
 }
 
+static int
+open_pcap_file(const char *path, const netdissect_options *ndo)
+{
+	int dlt;
+	const char *dlt_name;
+	char ebuf[PCAP_ERRBUF_SIZE];
+#ifdef DLT_LINUX_SLL2
+	static int sll_warning_printed = 0;
+#endif /* DLT_LINUX_SLL2 */
+#ifdef HAVE_CAPSICUM
+	cap_rights_t rights;
+#endif	/* HAVE_CAPSICUM */
+
+#ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
+	pd = pcap_open_offline_with_tstamp_precision(path,
+		ndo->ndo_tstamp_precision, ebuf);
+#else
+	pd = pcap_open_offline(path, ebuf);
+	(void)ndo; /* placate -Wunused-parameter */
+#endif
+
+	if (pd == NULL)
+		error("%s", ebuf);
+#ifdef HAVE_CAPSICUM
+	cap_rights_init(&rights, CAP_READ);
+	if (cap_rights_limit(fileno(pcap_file(pd)), &rights) < 0 &&
+		errno != ENOSYS) {
+		error("unable to limit pcap descriptor");
+	}
+#endif
+	dlt = pcap_datalink(pd);
+	dlt_name = pcap_datalink_val_to_name(dlt);
+	fprintf(stderr, "reading from file %s", path);
+	if (dlt_name == NULL) {
+		fprintf(stderr, ", link-type %u", dlt);
+	} else {
+		fprintf(stderr, ", link-type %s (%s)", dlt_name,
+			pcap_datalink_val_to_description(dlt));
+	}
+	fprintf(stderr, ", snapshot length %d\n", pcap_snapshot(pd));
+#ifdef DLT_LINUX_SLL2
+	if (!sll_warning_printed && dlt == DLT_LINUX_SLL2)
+	{
+		fprintf(stderr, "Warning: interface names might be incorrect\n");
+		sll_warning_printed = 1;
+	}
+#endif
+
+	return dlt;
+}
+
 #ifdef HAVE_CASPER
 static cap_channel_t *
 capdns_setup(void)
@@ -1502,7 +1553,6 @@ main(int argc, char **argv)
 	char *endp;
 	pcap_handler callback;
 	int dlt;
-	const char *dlt_name;
 	struct bpf_program fcode;
 #ifndef _WIN32
 	void (*oldhandler)(int);
@@ -2148,36 +2198,7 @@ main(int argc, char **argv)
 			RFileName = VFileLine;
 		}
 
-#ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
-		pd = pcap_open_offline_with_tstamp_precision(RFileName,
-		    ndo->ndo_tstamp_precision, ebuf);
-#else
-		pd = pcap_open_offline(RFileName, ebuf);
-#endif
-
-		if (pd == NULL)
-			error("%s", ebuf);
-#ifdef HAVE_CAPSICUM
-		cap_rights_init(&rights, CAP_READ);
-		if (cap_rights_limit(fileno(pcap_file(pd)), &rights) < 0 &&
-		    errno != ENOSYS) {
-			error("unable to limit pcap descriptor");
-		}
-#endif
-		dlt = pcap_datalink(pd);
-		dlt_name = pcap_datalink_val_to_name(dlt);
-		fprintf(stderr, "reading from file %s", RFileName);
-		if (dlt_name == NULL) {
-			fprintf(stderr, ", link-type %u", dlt);
-		} else {
-			fprintf(stderr, ", link-type %s (%s)", dlt_name,
-				pcap_datalink_val_to_description(dlt));
-		}
-		fprintf(stderr, ", snapshot length %d\n", pcap_snapshot(pd));
-#ifdef DLT_LINUX_SLL2
-		if (dlt == DLT_LINUX_SLL2)
-			fprintf(stderr, "Warning: interface names might be incorrect\n");
-#endif
+		dlt = open_pcap_file(RFileName, ndo);
 	} else if (dflag && !device) {
 		int dump_dlt = DLT_EN10MB;
 		/*
@@ -2634,6 +2655,8 @@ DIAG_ON_ASSIGN_ENUM
 		 * to a file from the -V file).  Print a message to
 		 * the standard error on UN*X.
 		 */
+		const char *dlt_name;
+
 		if (!ndo->ndo_vflag && !WFileName) {
 			(void)fprintf(stderr,
 			    "%s: verbose output suppressed, use -v[v]... for full protocol decode\n",
@@ -2713,17 +2736,7 @@ DIAG_ON_ASSIGN_ENUM
 				int new_dlt;
 
 				RFileName = VFileLine;
-				pd = pcap_open_offline(RFileName, ebuf);
-				if (pd == NULL)
-					error("%s", ebuf);
-#ifdef HAVE_CAPSICUM
-				cap_rights_init(&rights, CAP_READ);
-				if (cap_rights_limit(fileno(pcap_file(pd)),
-				    &rights) < 0 && errno != ENOSYS) {
-					error("unable to limit pcap descriptor");
-				}
-#endif
-				new_dlt = pcap_datalink(pd);
+				new_dlt = open_pcap_file(RFileName, ndo);
 				if (new_dlt != dlt) {
 					/*
 					 * The new file has a different
@@ -2765,20 +2778,6 @@ DIAG_ON_ASSIGN_ENUM
 				 */
 				if (pcap_setfilter(pd, &fcode) < 0)
 					error("%s", pcap_geterr(pd));
-
-				/*
-				 * Report the new file.
-				 */
-				dlt_name = pcap_datalink_val_to_name(dlt);
-				fprintf(stderr, "reading from file %s", RFileName);
-				if (dlt_name == NULL) {
-					fprintf(stderr, ", link-type %u", dlt);
-				} else {
-					fprintf(stderr, ", link-type %s (%s)",
-						dlt_name,
-						pcap_datalink_val_to_description(dlt));
-				}
-				fprintf(stderr, ", snapshot length %d\n", pcap_snapshot(pd));
 			}
 		}
 	}

@@ -90,10 +90,10 @@ sub showfile {
 }
 
 sub runtest {
-    local($name, $input, $output, $options) = @_;
+    local($name, $input, $outputbase, $options) = @_;
     my $r;
 
-    $outputbase = basename($output);
+    my $output = "$testsdir/$outputbase";
     my $coredump = false;
     my $status = 0;
     my $linecount = 0;
@@ -101,13 +101,33 @@ sub runtest {
     my $stderrlog = "tests/NEW/${outputbase}.stderr";
     my $diffstat = 0;
     my $errdiffstat = 0;
+    my $inputswitch = '-r';
 
-    # we used to do this as a nice pipeline, but the problem is that $r fails to
-    # to be set properly if the tcpdump core dumps.
-    #
-    # Furthermore, on Windows, fc can't read the standard input, so we
-    # can't do it as a pipeline in any case.
-    $r = system "$TCPDUMP -# -n -r $input $options >tests/NEW/${outputbase} 2>${rawstderrlog}";
+    # EXPAND any occurrences of @TESTDIR@ to $testsdir
+    $options =~ s/\@TESTDIR\@/$testsdir/;
+
+    if ($options =~ s/(^|\s+)-V\b//) {
+	# If the options contains '-V', the $input file is a file that itself
+	# contains a list of pcap file paths. We need to process that here to
+	# rewrite each relative path into an absolute path into $testsdir.
+        open(my $pcaplist, '<', "$testsdir/$input") or die "Can't read input: $!";
+        my @lines = <$pcaplist>;
+        chomp(@lines);
+        my $filenames = join("\\n", map { "$testsdir/$_" } @lines);
+
+	# We don't pass the original input file directly; instead we write the
+	# munged version to stdin, and use '-V -' to read it.
+        $r = system "printf \"$filenames\" | $TCPDUMP -# -n -V - $options >tests/NEW/${outputbase} 2>${rawstderrlog}";
+    } else {
+        # Otherwise, $input is the pcap file to read with '-r'.
+	#
+        # we used to do this as a nice pipeline, but the problem is that $r fails to
+        # to be set properly if the tcpdump core dumps.
+        #
+        # Furthermore, on Windows, fc can't read the standard input, so we
+        # can't do it as a pipeline in any case.
+        $r = system "$TCPDUMP -# -n -r $testsdir/$input $options >tests/NEW/${outputbase} 2>${rawstderrlog}";
+    }
     if($r != 0) {
         #
         # Something other than "tcpdump opened the file, read it, and
@@ -417,12 +437,9 @@ sub runOneComplexTest {
     #use Data::Dumper;
     #print Dumper($testconfig);
 
-    # EXPAND any occurrences of @TESTDIR@ to $testsdir
-    $options =~ s/\@TESTDIR\@/$testsdir/;
-
     my $result = runtest($name,
-                         $testsdir . "/" . $input,
-                         $testsdir . "/" . $output,
+                         $input,
+                         $output,
                          $options);
 
     if($result == 0) {
