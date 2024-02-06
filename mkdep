@@ -68,7 +68,7 @@ if [ ! -w $MAKE ]; then
 	exit 1
 fi
 
-TMP=/tmp/mkdep$$
+TMP=${TMPDIR:-/tmp}/mkdep$$
 
 trap 'rm -f $TMP ; exit 1' 1 2 3 13 15
 
