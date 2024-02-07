@@ -225,7 +225,9 @@ sub runtest {
         #
         if ($^O eq 'MSWin32') {
             my $winoutput = File::Spec->canonpath($output);
-            $r = system "fc /lb1000 /t /1 $winoutput tests\\NEW\\$outputbase >tests\\DIFF\\$outputbase.diff";
+            my $winnewdir = File::Spec->canonpath($newdir);
+            my $windiffdir = File::Spec->canonpath($diffdir);
+            $r = system "fc /lb1000 /t /1 $winoutput ${winnewdir}\\$outputbase >${windiffdir}\\$outputbase.diff";
             $diffstat = $r >> 8;
         } else {
             $r = system "diff $diff_flags $output ${newdir}/$outputbase >${diffdir}/$outputbase.diff";
@@ -257,8 +259,9 @@ sub runtest {
         #
         if ($^O eq 'MSWin32') {
             my $winoutput = File::Spec->canonpath($output);
+            my $windiffdir = File::Spec->canonpath($diffdir);
             my $canonstderrlog = File::Spec->canonpath($stderrlog);
-            $nr = system "fc /lb1000 /t /1 $winoutput.stderr $canonstderrlog >tests\DIFF\$outputbase.stderr.diff";
+            $nr = system "fc /lb1000 /t /1 $winoutput.stderr $canonstderrlog >${windiffdir}\\$outputbase.stderr.diff";
             $errdiffstat = $nr >> 8;
         } else {
             $nr = system "diff $output.stderr $stderrlog >${diffdir}/$outputbase.stderr.diff";
@@ -299,7 +302,8 @@ sub runtest {
         # XXX - just do this directly in Perl?
         #
         if ($^O eq 'MSWin32') {
-            system "type tests\\DIFF\\$outputbase.diff >> tests\\failure-outputs.txt";
+            my $windiffdir = File::Spec->canonpath($diffdir);
+            system "type ${windiffdir}\\$outputbase.diff >> tests\\failure-outputs.txt";
         } else {
             system "cat ${diffdir}/$outputbase.diff >> tests/failure-outputs.txt";
         }
