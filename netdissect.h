@@ -153,9 +153,9 @@ struct tok {
 };
 
 /* tok2str is deprecated */
-extern const char *tok2str(const struct tok *, const char *, u_int);
-extern char *bittok2str(const struct tok *, const char *, u_int);
-extern char *bittok2str_nosep(const struct tok *, const char *, u_int);
+extern const char *tok2str(const struct tok *, const char *, const u_int);
+extern char *bittok2str(const struct tok *, const char *, const u_int);
+extern char *bittok2str_nosep(const struct tok *, const char *, const u_int);
 
 /* Initialize netdissect. */
 extern int nd_init(char *, size_t);
@@ -501,7 +501,7 @@ extern int unaligned_memcmp(const void *, const void *, size_t);
 #define PLURAL_SUFFIX(n) \
 	(((n) != 1) ? "s" : "")
 
-extern const char *tok2strary_internal(const char **, int, const char *, int);
+extern const char *tok2strary_internal(const char **, int, const char *, const int);
 #define	tok2strary(a,f,i) tok2strary_internal(a, sizeof(a)/sizeof(a[0]),f,i)
 
 struct uint_tokary
@@ -794,7 +794,7 @@ extern void nd_print_protocol(netdissect_options *);
 extern void nd_print_protocol_caps(netdissect_options *);
 extern void nd_print_invalid(netdissect_options *);
 
-extern int mask2plen(uint32_t);
+extern int mask2plen(const uint32_t);
 extern int mask62plen(const u_char *);
 
 extern const char *dnnum_string(netdissect_options *, u_short);
