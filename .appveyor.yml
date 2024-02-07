@@ -12,6 +12,8 @@ matrix:
 install:
   - appveyor DownloadFile https://npcap.com/dist/npcap-sdk-1.13.zip
   - 7z x .\npcap-sdk-1.13.zip -oc:\projects\libpcap\Win32\npcap-sdk-1.13
+  - appveyor DownloadFile https://github.com/lucasg/Dependencies/releases/download/v1.11.1/Dependencies_x64_Debug.zip
+  - 7z x .\Dependencies_x64_Debug.zip -oc:\\projects\dependencies
 
 environment:
   matrix:
@@ -56,5 +58,6 @@ build_script:
   - msbuild /m /nologo /p:Configuration=Release tcpdump.sln
   - copy Release\tcpdump.exe C:\Windows\system32
   - echo %path%
+  - \projects\dependencies\dependencies.exe Release\tcpdump.exe
   - tcpdump.exe -h
   - tcpdump.exe --version
