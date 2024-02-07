@@ -15,7 +15,7 @@ install:
   - appveyor DownloadFile https://github.com/lucasg/Dependencies/releases/download/v1.11.1/Dependencies_x64_Debug.zip
   - 7z x .\Dependencies_x64_Debug.zip -oc:\\projects\dependencies
   - appveyor DownloadFile https://npcap.com/dist/npcap-1.79.exe
-  - 7z x .\npcap-1.79.exe -oc:\projects\npcap-1.79
+  - 7z x .\npcap-1.79.exe -oc:\projects\npcap-1.79 -aou
 
 environment:
   matrix:
