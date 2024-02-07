@@ -58,6 +58,6 @@ build_script:
   - msbuild /m /nologo /p:Configuration=Release tcpdump.sln
   - copy Release\tcpdump.exe C:\Windows\system32
   - echo %path%
-  - \projects\dependencies\dependencies.exe Release\tcpdump.exe
+  - \projects\dependencies\dependencies.exe -cache -knowndll Release\tcpdump.exe
   - tcpdump.exe -h
   - tcpdump.exe --version
