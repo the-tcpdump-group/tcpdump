@@ -54,3 +54,4 @@ build_script:
   - if NOT DEFINED PLATFORM cmake -DPCAP_ROOT=c:\projects\libpcap\Win32\%SDK% -G"%GENERATOR%" ..
   - if DEFINED PLATFORM cmake -DPCAP_ROOT=c:\projects\libpcap\Win32\%SDK% -G"%GENERATOR%" -A %PLATFORM% ..
   - msbuild /m /nologo /p:Configuration=Release tcpdump.sln
+  - Release\tcpdump.exe --version
