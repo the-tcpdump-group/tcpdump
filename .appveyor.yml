@@ -59,5 +59,6 @@ build_script:
   - copy Release\tcpdump.exe C:\Windows\system32
   - echo %path%
   - \projects\dependencies\dependencies.exe -cache -knowndll Release\tcpdump.exe
+  - \projects\dependencies\dependencies.exe -cache -chain Release\tcpdump.exe
   - tcpdump.exe -h
   - tcpdump.exe --version
