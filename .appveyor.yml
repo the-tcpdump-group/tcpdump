@@ -56,4 +56,5 @@ build_script:
   - msbuild /m /nologo /p:Configuration=Release tcpdump.sln
   - copy Release\tcpdump.exe C:\Windows\system32
   - echo %path%
+  - tcpdump.exe -h
   - tcpdump.exe --version
