@@ -14,6 +14,8 @@ install:
   - 7z x .\npcap-sdk-1.13.zip -oc:\projects\libpcap\Win32\npcap-sdk-1.13
   - appveyor DownloadFile https://github.com/lucasg/Dependencies/releases/download/v1.11.1/Dependencies_x64_Debug.zip
   - 7z x .\Dependencies_x64_Debug.zip -oc:\\projects\dependencies
+  - appveyor DownloadFile https://npcap.com/dist/npcap-1.79.exe
+  - 7z x .\npcap-1.79.exe -oc:\projects\npcap-1.79
 
 environment:
   matrix:
@@ -57,6 +59,7 @@ build_script:
   - if DEFINED PLATFORM cmake -DPCAP_ROOT=c:\projects\libpcap\Win32\%SDK% -G"%GENERATOR%" -A %PLATFORM% ..
   - msbuild /m /nologo /p:Configuration=Release tcpdump.sln
   - copy Release\tcpdump.exe C:\Windows\system32
+  - copy \projects\npcap-1.79\wpcap.dll C:\Windows\system32
   - echo %path%
   - \projects\dependencies\dependencies.exe -cache -knowndll Release\tcpdump.exe
   - echo -----
