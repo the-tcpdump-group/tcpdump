@@ -12,7 +12,7 @@ if (!($TCPDUMP = $ENV{TCPDUMP_BIN})) {
         # XXX - assume, for now, a Visual Studio debug build, so that
         # tcpdump is in the Debug subdirectory.
         #
-        $TCPDUMP = "Debug\\tcpdump"
+        $TCPDUMP = "Debug\\tcpdump.exe"
     } else {
         $TCPDUMP = "./tcpdump"
     }
