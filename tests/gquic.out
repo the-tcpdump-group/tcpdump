@@ -1,2 +1,2 @@
     1  06:42:38.000000 IP (tos 0x0, ttl 64, id 38137, offset 0, flags [DF], proto UDP (17), length 1378)
-    10.7.0.3.38824 > 216.58.195.67.443: quic, initial, v51303436, length 0, protected
+    10.7.0.3.38824 > 216.58.195.67.443: quic, unsupported gquic

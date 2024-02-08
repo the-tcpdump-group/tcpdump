@@ -168,7 +168,10 @@ quic_print_packet(netdissect_options *ndo, const u_char *bp, const u_char *end)
 		version = GET_BE_U_4(bp);
 		bp += 4;
 
-		if (version == 0)
+		if (version >> 24 == 0x51) {
+			ND_PRINT(", unsupported gquic");
+			return end;
+		} else if (version == 0)
 			ND_PRINT(", version negotiation");
 		else if (packet_type == QUIC_LH_TYPE_INITIAL)
 			ND_PRINT(", initial");
