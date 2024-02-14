@@ -672,7 +672,7 @@ show_remote_devices_and_exit(void)
 #define U_FLAG
 #endif
 
-#define SHORTOPTS "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpq" Q_FLAG "r:s:StT:u" U_FLAG "vV:w:W:xXy:Yz:Z:#"
+#define SHORTOPTS "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpPq" Q_FLAG "r:s:StT:u" U_FLAG "vV:w:W:xXy:Yz:Z:#"
 
 /*
  * Long options.
@@ -1827,6 +1827,10 @@ main(int argc, char **argv)
 
 		case 'p':
 			++pflag;
+			break;
+
+		case 'P':
+			++ndo->ndo_Pflag;
 			break;
 
 		case 'q':

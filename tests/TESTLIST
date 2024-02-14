@@ -961,7 +961,7 @@ pb_nhrp_1			pb_nhrp_1.pcap			pb_nhrp_1.out	-v
 
 # HSR/PRP tests
 hsr		hsr.pcap	hsr.out		-e
-prp		prp.pcap	prp.out		-e
+prp		prp.pcap	prp.out		-e -P
 
 # Undefined behavior tests
 ip-snmp-leftshift-unsigned ip-snmp-leftshift-unsigned.pcap ip-snmp-leftshift-unsigned.out

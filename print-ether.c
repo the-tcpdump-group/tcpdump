@@ -308,7 +308,7 @@ recurse:
 		hdrlen += 6;
 	}
 
-	if (caplen >= 6) {
+	if (ndo->ndo_Pflag && caplen >= 6) {
 		prp_suffix = GET_BE_U_2(p + caplen - 2);
 		if (prp_suffix == 0x88fb) {
 			prp_print(ndo, p, caplen);
