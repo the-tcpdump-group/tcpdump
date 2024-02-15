@@ -51,6 +51,133 @@ static void interp_reply(netdissect_options *, const struct sunrpc_msg *, uint32
 static const uint32_t *parse_post_op_attr(netdissect_options *, const uint32_t *, int);
 
 /*
+ * NFS Version 4 Procedures.
+ */
+static const struct tok nfsv4proc_str[] = {
+	{ NFSV4PROC_NULL,        "null"      },
+	{ NFSV4PROC_COMPOUND,    "compound"  },
+	{ 0, NULL }
+};
+
+static const struct tok status2strv4[] = {
+	/* RFC 7530 NFSv4 */
+	{ NFS4_OK,                           "NFS4_OK"                           },
+	{ NFS4ERR_PERM,                      "NFS4ERR_PERM"                      },
+	{ NFS4ERR_NOENT,                     "NFS4ERR_NOENT"                     },
+	{ NFS4ERR_IO,                        "NFS4ERR_IO"                        },
+	{ NFS4ERR_NXIO,                      "NFS4ERR_NXIO"                      },
+	{ NFS4ERR_ACCESS,                    "NFS4ERR_ACCESS"                    },
+	{ NFS4ERR_EXIST,                     "NFS4ERR_EXIST"                     },
+	{ NFS4ERR_XDEV,                      "NFS4ERR_XDEV"                      },
+	{ NFS4ERR_NOTDIR,                    "NFS4ERR_NOTDIR"                    },
+	{ NFS4ERR_ISDIR,                     "NFS4ERR_ISDIR"                     },
+	{ NFS4ERR_INVAL,                     "NFS4ERR_INVAL"                     },
+	{ NFS4ERR_FBIG,                      "NFS4ERR_FBIG"                      },
+	{ NFS4ERR_NOSPC,                     "NFS4ERR_NOSPC"                     },
+	{ NFS4ERR_ROFS,                      "NFS4ERR_ROFS"                      },
+	{ NFS4ERR_MLINK,                     "NFS4ERR_MLINK"                     },
+	{ NFS4ERR_NAMETOOLONG,               "NFS4ERR_NAMETOOLONG"               },
+	{ NFS4ERR_NOTEMPTY,                  "NFS4ERR_NOTEMPTY"                  },
+	{ NFS4ERR_DQUOT,                     "NFS4ERR_DQUOT"                     },
+	{ NFS4ERR_STALE,                     "NFS4ERR_STALE"                     },
+	{ NFS4ERR_BADHANDLE,                 "NFS4ERR_BADHANDLE"                 },
+	{ NFS4ERR_BAD_COOKIE,                "NFS4ERR_BAD_COOKIE"                },
+	{ NFS4ERR_NOTSUPP,                   "NFS4ERR_NOTSUPP"                   },
+	{ NFS4ERR_TOOSMALL,                  "NFS4ERR_TOOSMALL"                  },
+	{ NFS4ERR_SERVERFAULT,               "NFS4ERR_SERVERFAULT"               },
+	{ NFS4ERR_BADTYPE,                   "NFS4ERR_BADTYPE"                   },
+	{ NFS4ERR_DELAY,                     "NFS4ERR_DELAY"                     },
+	{ NFS4ERR_SAME,                      "NFS4ERR_SAME"                      },
+	{ NFS4ERR_DENIED,                    "NFS4ERR_DENIED"                    },
+	{ NFS4ERR_EXPIRED,                   "NFS4ERR_EXPIRED"                   },
+	{ NFS4ERR_LOCKED,                    "NFS4ERR_LOCKED"                    },
+	{ NFS4ERR_GRACE,                     "NFS4ERR_GRACE"                     },
+	{ NFS4ERR_FHEXPIRED,                 "NFS4ERR_FHEXPIRED"                 },
+	{ NFS4ERR_SHARE_DENIED,              "NFS4ERR_SHARE_DENIED"              },
+	{ NFS4ERR_WRONGSEC,                  "NFS4ERR_WRONGSEC"                  },
+	{ NFS4ERR_CLID_INUSE,                "NFS4ERR_CLID_INUSE"                },
+	{ NFS4ERR_RESOURCE,                  "NFS4ERR_RESOURCE"                  },
+	{ NFS4ERR_MOVED,                     "NFS4ERR_MOVED"                     },
+	{ NFS4ERR_NOFILEHANDLE,              "NFS4ERR_NOFILEHANDLE"              },
+	{ NFS4ERR_MINOR_VERS_MISMATCH,       "NFS4ERR_MINOR_VERS_MISMATCH"       },
+	{ NFS4ERR_STALE_CLIENTID,            "NFS4ERR_STALE_CLIENTID"            },
+	{ NFS4ERR_STALE_STATEID,             "NFS4ERR_STALE_STATEID"             },
+	{ NFS4ERR_OLD_STATEID,               "NFS4ERR_OLD_STATEID"               },
+	{ NFS4ERR_BAD_STATEID,               "NFS4ERR_BAD_STATEID"               },
+	{ NFS4ERR_BAD_SEQID,                 "NFS4ERR_BAD_SEQID"                 },
+	{ NFS4ERR_NOT_SAME,                  "NFS4ERR_NOT_SAME"                  },
+	{ NFS4ERR_LOCK_RANGE,                "NFS4ERR_LOCK_RANGE"                },
+	{ NFS4ERR_SYMLINK,                   "NFS4ERR_SYMLINK"                   },
+	{ NFS4ERR_RESTOREFH,                 "NFS4ERR_RESTOREFH"                 },
+	{ NFS4ERR_LEASE_MOVED,               "NFS4ERR_LEASE_MOVED"               },
+	{ NFS4ERR_ATTRNOTSUPP,               "NFS4ERR_ATTRNOTSUPP"               },
+	{ NFS4ERR_NO_GRACE,                  "NFS4ERR_NO_GRACE"                  },
+	{ NFS4ERR_RECLAIM_BAD,               "NFS4ERR_RECLAIM_BAD"               },
+	{ NFS4ERR_RECLAIM_CONFLICT,          "NFS4ERR_RECLAIM_CONFLICT"          },
+	{ NFS4ERR_BADXDR,                    "NFS4ERR_BADXDR"                    },
+	{ NFS4ERR_LOCKS_HELD,                "NFS4ERR_LOCKS_HELD"                },
+	{ NFS4ERR_OPENMODE,                  "NFS4ERR_OPENMODE"                  },
+	{ NFS4ERR_BADOWNER,                  "NFS4ERR_BADOWNER"                  },
+	{ NFS4ERR_BADCHAR,                   "NFS4ERR_BADCHAR"                   },
+	{ NFS4ERR_BADNAME,                   "NFS4ERR_BADNAME"                   },
+	{ NFS4ERR_BAD_RANGE,                 "NFS4ERR_BAD_RANGE"                 },
+	{ NFS4ERR_LOCK_NOTSUPP,              "NFS4ERR_LOCK_NOTSUPP"              },
+	{ NFS4ERR_OP_ILLEGAL,                "NFS4ERR_OP_ILLEGAL"                },
+	{ NFS4ERR_DEADLOCK,                  "NFS4ERR_DEADLOCK"                  },
+	{ NFS4ERR_FILE_OPEN,                 "NFS4ERR_FILE_OPEN"                 },
+	{ NFS4ERR_ADMIN_REVOKED,             "NFS4ERR_ADMIN_REVOKED"             },
+	{ NFS4ERR_CB_PATH_DOWN,              "NFS4ERR_CB_PATH_DOWN"              },
+	/* RFC 8881 NFSv4.1 */
+	{ NFS4ERR_BADIOMODE,                 "NFS4ERR_BADIOMODE"                 },
+	{ NFS4ERR_BADLAYOUT,                 "NFS4ERR_BADLAYOUT"                 },
+	{ NFS4ERR_BAD_SESSION_DIGEST,        "NFS4ERR_BAD_SESSION_DIGEST"        },
+	{ NFS4ERR_BADSESSION,                "NFS4ERR_BADSESSION"                },
+	{ NFS4ERR_BADSLOT,                   "NFS4ERR_BADSLOT"                   },
+	{ NFS4ERR_COMPLETE_ALREADY,          "NFS4ERR_COMPLETE_ALREADY"          },
+	{ NFS4ERR_CONN_NOT_BOUND_TO_SESSION, "NFS4ERR_CONN_NOT_BOUND_TO_SESSION" },
+	{ NFS4ERR_DELEG_ALREADY_WANTED,      "NFS4ERR_DELEG_ALREADY_WANTED"      },
+	{ NFS4ERR_BACK_CHAN_BUSY,            "NFS4ERR_BACK_CHAN_BUSY"            },
+	{ NFS4ERR_LAYOUTTRYLATER,            "NFS4ERR_LAYOUTTRYLATER"            },
+	{ NFS4ERR_LAYOUTUNAVAILABLE,         "NFS4ERR_LAYOUTUNAVAILABLE"         },
+	{ NFS4ERR_NOMATCHING_LAYOUT,         "NFS4ERR_NOMATCHING_LAYOUT"         },
+	{ NFS4ERR_RECALLCONFLICT,            "NFS4ERR_RECALLCONFLICT"            },
+	{ NFS4ERR_UNKNOWN_LAYOUTTYPE,        "NFS4ERR_UNKNOWN_LAYOUTTYPE"        },
+	{ NFS4ERR_SEQ_MISORDERED,            "NFS4ERR_SEQ_MISORDERED"            },
+	{ NFS4ERR_SEQUENCE_POS,              "NFS4ERR_SEQUENCE_POS"              },
+	{ NFS4ERR_REQ_TOO_BIG,               "NFS4ERR_REQ_TOO_BIG"               },
+	{ NFS4ERR_REP_TOO_BIG,               "NFS4ERR_REP_TOO_BIG"               },
+	{ NFS4ERR_REP_TOO_BIG_TO_CACHE,      "NFS4ERR_REP_TOO_BIG_TO_CACHE"      },
+	{ NFS4ERR_RETRY_UNCACHED_REP,        "NFS4ERR_RETRY_UNCACHED_REP"        },
+	{ NFS4ERR_UNSAFE_COMPOUND,           "NFS4ERR_UNSAFE_COMPOUND"           },
+	{ NFS4ERR_TOO_MANY_OPS,              "NFS4ERR_TOO_MANY_OPS"              },
+	{ NFS4ERR_OP_NOT_IN_SESSION,         "NFS4ERR_OP_NOT_IN_SESSION"         },
+	{ NFS4ERR_HASH_ALG_UNSUPP,           "NFS4ERR_HASH_ALG_UNSUPP"           },
+	{ NFS4ERR_CLIENTID_BUSY,             "NFS4ERR_CLIENTID_BUSY"             },
+	{ NFS4ERR_PNFS_IO_HOLE,              "NFS4ERR_PNFS_IO_HOLE"              },
+	{ NFS4ERR_SEQ_FALSE_RETRY,           "NFS4ERR_SEQ_FALSE_RETRY"           },
+	{ NFS4ERR_BAD_HIGH_SLOT,             "NFS4ERR_BAD_HIGH_SLOT"             },
+	{ NFS4ERR_DEADSESSION,               "NFS4ERR_DEADSESSION"               },
+	{ NFS4ERR_ENCR_ALG_UNSUPP,           "NFS4ERR_ENCR_ALG_UNSUPP"           },
+	{ NFS4ERR_PNFS_NO_LAYOUT,            "NFS4ERR_PNFS_NO_LAYOUT"            },
+	{ NFS4ERR_NOT_ONLY_OP,               "NFS4ERR_NOT_ONLY_OP"               },
+	{ NFS4ERR_WRONG_CRED,                "NFS4ERR_WRONG_CRED"                },
+	{ NFS4ERR_WRONG_TYPE,                "NFS4ERR_WRONG_TYPE"                },
+	{ NFS4ERR_DIRDELEG_UNAVAIL,          "NFS4ERR_DIRDELEG_UNAVAIL"          },
+	{ NFS4ERR_REJECT_DELEG,              "NFS4ERR_REJECT_DELEG"              },
+	{ NFS4ERR_RETURNCONFLICT,            "NFS4ERR_RETURNCONFLICT"            },
+	{ NFS4ERR_DELEG_REVOKED,             "NFS4ERR_DELEG_REVOKED"             },
+	/* RFC 7862 NFSv4.2 */
+	{ NFS4ERR_PARTNER_NOTSUPP,           "NFS4ERR_PARTNER_NOTSUPP"           },
+	{ NFS4ERR_PARTNER_NO_AUTH,           "NFS4ERR_PARTNER_NO_AUTH"           },
+	{ NFS4ERR_UNION_NOTSUPP,             "NFS4ERR_UNION_NOTSUPP"             },
+	{ NFS4ERR_OFFLOAD_DENIED,            "NFS4ERR_OFFLOAD_DENIED"            },
+	{ NFS4ERR_WRONG_LFS,                 "NFS4ERR_WRONG_LFS"                 },
+	{ NFS4ERR_BADLABEL,                  "NFS4ERR_BADLABEL"                  },
+	{ NFS4ERR_OFFLOAD_NO_REQS,           "NFS4ERR_OFFLOAD_NO_REQS"           },
+	{ 0,     NULL }
+};
+
+/*
  * Mapping of old NFS Version 2 RPC numbers to generic numbers.
  */
 static uint32_t nfsv3_procid[NFS_NPROCS] = {
@@ -572,15 +699,7 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 	proc = GET_BE_U_4(&rp->rm_call.cb_proc);
 
 	if (GET_BE_U_4(&rp->rm_call.cb_vers) == NFS_VER4) {
-		ND_PRINT(" v4");
-		switch (proc) {
-			case 0:
-				ND_PRINT(" null");
-				break;
-			case 1:
-				ND_PRINT(" compound");
-				break;
-		}
+		ND_PRINT(" v4 %s", tok2str(nfsv4proc_str, "proc-%u", proc));
 		return;
 	}
 
@@ -1132,6 +1251,24 @@ parsestatus(netdissect_options *ndo,
 }
 
 static const uint32_t *
+parsestatusv4(netdissect_options *ndo,
+            const uint32_t *dp, u_int *er, int *nfserrp)
+{
+	u_int errnum;
+
+	errnum = GET_BE_U_4(dp);
+	if (er)
+		*er = errnum;
+	if (errnum != NFS4_OK) {
+		if (!ndo->ndo_qflag)
+			ND_PRINT(" ERROR: %s",
+			    tok2str(status2strv4, "unk %u", errnum));
+		*nfserrp = 1;
+	}
+	return (dp + 1);
+}
+
+static const uint32_t *
 parsefattr(netdissect_options *ndo,
            const uint32_t *dp, int verbose, int v3)
 {
@@ -1553,21 +1690,15 @@ interp_reply(netdissect_options *ndo,
 	int nfserr = 0;
 
 	if (vers == NFS_VER4) {
-		ND_PRINT(" v4");
-		switch (proc) {
-			case 0:
-				ND_PRINT(" null");
-				break;
-			case 1:
-				ND_PRINT(" compound");
-				break;
+		ND_PRINT(" v4 %s", tok2str(nfsv4proc_str, "proc-%u", proc));
+		if (proc == NFSV4PROC_COMPOUND) {
+				dp = parserep(ndo, rp, length, &nfserr);
+				if (dp == NULL)
+					goto trunc;
+				dp = parsestatusv4(ndo, dp, &er, &nfserr);
+				if (dp == NULL)
+					goto trunc;
 		}
-		dp = parserep(ndo, rp, length, &nfserr);
-		if (dp == NULL)
-			goto trunc;
-		dp = parsestatus(ndo, dp, &er, &nfserr);
-		if (dp == NULL)
-			goto trunc;
 		return;
 	}
 
