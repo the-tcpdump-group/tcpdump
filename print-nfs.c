@@ -675,6 +675,46 @@ parsefhn(netdissect_options *ndo,
 	return (parsefn(ndo, dp));
 }
 
+/*
+ * Print out the contents of an NFSv4 compound procedure.
+ * If packet was truncated, return 0.
+ */
+static const uint32_t *
+parsecmp(netdissect_options *ndo,
+        const uint32_t *dp, uint32_t proc)
+{
+	uint32_t tag_length;
+	uint32_t minorversion;
+	uint32_t numops;
+
+	if (!ND_TTEST_LEN(dp, 4))
+		goto notag;
+	tag_length = GET_BE_U_4(dp++);
+	if (tag_length > 0) {
+			if (!ND_TTEST_LEN(dp, roundup2(tag_length + 1, 4)))
+				goto notag;
+			dp += (tag_length + 3) / sizeof(*dp);
+	}
+
+	if (!ND_TTEST_LEN(dp, 4))
+		goto nominorv;
+	minorversion = GET_BE_U_4(dp++);
+
+	if (!ND_TTEST_LEN(dp, 4))
+		goto nonumops;
+	numops = GET_BE_U_4(dp++);
+
+	ND_PRINT(" v4.%d %s ops %d", minorversion, tok2str(nfsv4proc_str, "proc-%u", proc), numops);
+	return (dp);
+nonumops:
+	ND_PRINT(" v4.%d %s", minorversion, tok2str(nfsv4proc_str, "proc-%u", proc));
+	return (NULL);
+notag:
+nominorv:
+	ND_PRINT(" v4 %s", tok2str(nfsv4proc_str, "proc-%u", proc));
+	return (NULL);
+}
+
 void
 nfsreq_noaddr_print(netdissect_options *ndo,
                     const u_char *bp, u_int length,
@@ -699,7 +739,15 @@ nfsreq_noaddr_print(netdissect_options *ndo,
 	proc = GET_BE_U_4(&rp->rm_call.cb_proc);
 
 	if (GET_BE_U_4(&rp->rm_call.cb_vers) == NFS_VER4) {
-		ND_PRINT(" v4 %s", tok2str(nfsv4proc_str, "proc-%u", proc));
+		if (proc == NFSV4PROC_COMPOUND) {
+			dp = parsereq(ndo, rp, length);
+			if (dp == NULL)
+				goto trunc;
+			if (parsecmp(ndo, dp, proc) == NULL)
+				goto trunc;
+		} else {
+			ND_PRINT(" v4 %s", tok2str(nfsv4proc_str, "proc-%u", proc));
+		}
 		return;
 	}
 
@@ -1692,12 +1740,12 @@ interp_reply(netdissect_options *ndo,
 	if (vers == NFS_VER4) {
 		ND_PRINT(" v4 %s", tok2str(nfsv4proc_str, "proc-%u", proc));
 		if (proc == NFSV4PROC_COMPOUND) {
-				dp = parserep(ndo, rp, length, &nfserr);
-				if (dp == NULL)
-					goto trunc;
-				dp = parsestatusv4(ndo, dp, &er, &nfserr);
-				if (dp == NULL)
-					goto trunc;
+			dp = parserep(ndo, rp, length, &nfserr);
+			if (dp == NULL)
+				goto trunc;
+			dp = parsestatusv4(ndo, dp, &er, &nfserr);
+			if (dp == NULL)
+				goto trunc;
 		}
 		return;
 	}
