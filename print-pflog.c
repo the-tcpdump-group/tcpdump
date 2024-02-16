@@ -27,6 +27,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 #include "af.h"
@@ -80,6 +81,7 @@ struct pfloghdr {
 	nd_uint16_t	dport;
 #endif
 };
+#define MAX_PFLOG_HDRLEN 100	/* 61 + 3 + 16 + 16 + 2 + 2 */
 
 /*
  * Reason values.
@@ -252,29 +254,17 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 
 	ndo->ndo_protocol = "pflog";
 	/* check length */
-	if (caplen < sizeof(uint8_t)) {
-		nd_print_trunc(ndo);
-		ndo->ndo_ll_hdr_len += h->caplen;
-		return;
-	}
+	ND_ICHECK_U(length, <, MIN_PFLOG_HDRLEN);
 
 	hdr = (const struct pfloghdr *)p;
 	hdrlen = GET_U_1(hdr->length);
-	if (hdrlen < MIN_PFLOG_HDRLEN) {
-		ND_PRINT("[pflog: invalid header length!]");
-		ndo->ndo_ll_hdr_len += hdrlen;	/* XXX: not really */
-		return;
-	}
+	ND_ICHECK_U(hdrlen, <, MIN_PFLOG_HDRLEN);
 	hdrlen = roundup2(hdrlen, 4);
-
-	if (caplen < hdrlen) {
-		nd_print_trunc(ndo);
-		ndo->ndo_ll_hdr_len += hdrlen;	/* XXX: true? */
-		return;
-	}
+	ND_ICHECK_U(hdrlen, >, MAX_PFLOG_HDRLEN);
 
 	/* print what we know */
-	ND_TCHECK_SIZE(hdr);
+	ND_TCHECK_LEN(hdr, hdrlen);
+	ndo->ndo_ll_hdr_len += hdrlen;
 	if (ndo->ndo_eflag)
 		pflog_print(ndo, hdr);
 
@@ -314,9 +304,8 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 			ND_DEFAULTPRINT(p, caplen);
 	}
 
-	ndo->ndo_ll_hdr_len += hdrlen;
 	return;
-trunc:
-	nd_print_trunc(ndo);
-	ndo->ndo_ll_hdr_len += hdrlen;
+
+invalid:
+	nd_print_invalid(ndo);
 }
