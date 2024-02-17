@@ -289,6 +289,7 @@ static const struct tok bgp_capcode_values[] = {
 #define BGP_NOTIFY_MAJOR_FSM            5
 #define BGP_NOTIFY_MAJOR_CEASE          6
 #define BGP_NOTIFY_MAJOR_ROUTEREFRESH   7
+#define BGP_NOTIFY_MAJOR_SENDHOLDTIME   8
 
 static const struct tok bgp_notify_major_values[] = {
     { BGP_NOTIFY_MAJOR_MSG,     "Message Header Error"},
@@ -298,6 +299,7 @@ static const struct tok bgp_notify_major_values[] = {
     { BGP_NOTIFY_MAJOR_FSM,     "Finite State Machine Error"},
     { BGP_NOTIFY_MAJOR_CEASE,   "Cease"},
     { BGP_NOTIFY_MAJOR_ROUTEREFRESH, "ROUTE-REFRESH Message Error"},
+    { BGP_NOTIFY_MAJOR_SENDHOLDTIME, "Send Hold Timer Expired"},
     { 0, NULL}
 };
 
