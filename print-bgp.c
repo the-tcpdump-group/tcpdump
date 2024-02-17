@@ -288,7 +288,7 @@ static const struct tok bgp_capcode_values[] = {
 #define BGP_NOTIFY_MAJOR_HOLDTIME       4
 #define BGP_NOTIFY_MAJOR_FSM            5
 #define BGP_NOTIFY_MAJOR_CEASE          6
-#define BGP_NOTIFY_MAJOR_CAP            7
+#define BGP_NOTIFY_MAJOR_ROUTEREFRESH   7
 
 static const struct tok bgp_notify_major_values[] = {
     { BGP_NOTIFY_MAJOR_MSG,     "Message Header Error"},
@@ -297,7 +297,7 @@ static const struct tok bgp_notify_major_values[] = {
     { BGP_NOTIFY_MAJOR_HOLDTIME,"Hold Timer Expired"},
     { BGP_NOTIFY_MAJOR_FSM,     "Finite State Machine Error"},
     { BGP_NOTIFY_MAJOR_CEASE,   "Cease"},
-    { BGP_NOTIFY_MAJOR_CAP,     "Capability Message Error"},
+    { BGP_NOTIFY_MAJOR_ROUTEREFRESH, "ROUTE-REFRESH Message Error"},
     { 0, NULL}
 };
 
@@ -363,11 +363,8 @@ static const struct tok bgp_notify_minor_fsm_values[] = {
     { 0, NULL }
 };
 
-static const struct tok bgp_notify_minor_cap_values[] = {
-    { 1,                        "Invalid Action Value" },
-    { 2,                        "Invalid Capability Length" },
-    { 3,                        "Malformed Capability Value" },
-    { 4,                        "Unsupported Capability Code" },
+static const struct tok bgp_notify_minor_routerefresh_values[] = {
+    { 1,                        "Invalid Message Length" },
     { 0, NULL }
 };
 
@@ -3177,9 +3174,9 @@ bgp_notification_print_code(netdissect_options *ndo,
                           bgpn_minor),
                   bgpn_minor);
         break;
-    case BGP_NOTIFY_MAJOR_CAP:
+    case BGP_NOTIFY_MAJOR_ROUTEREFRESH:
         ND_PRINT(" subcode %s (%u)",
-                  tok2str(bgp_notify_minor_cap_values, "Unknown",
+                  tok2str(bgp_notify_minor_routerefresh_values, "Unknown",
                           bgpn_minor),
                   bgpn_minor);
         break;
