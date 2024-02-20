@@ -73,6 +73,7 @@ bgp-orf			bgp-orf.pcapng		bgp-orf.out		-v
 bgp-bgpsec	bgp-bgpsec.pcap		bgp-bgpsec.out		-v
 bgp-ovs	bgp-ovs.pcapng		bgp-ovs.out		-v
 bgp-role	bgp-role.pcapng		bgp-role.out		-v
+bgp_notification_rr_msg_error bgp_notification_rr_msg_error.pcap bgp_notification_rr_msg_error.out -v
 
 # Broadcom tag tests
 brcmtag		brcm-tag.pcap		brcm-tag.out
