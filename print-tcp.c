@@ -135,6 +135,7 @@ static const struct tok tcp_option_values[] = {
         { TCPOPT_TCPAO, "tcp-ao" },
         { TCPOPT_MPTCP, "mptcp" },
         { TCPOPT_FASTOPEN, "tfo" },
+        { TCPOPT_EXPERIMENT1, "exp1" },
         { TCPOPT_EXPERIMENT2, "exp" },
         { 0, NULL }
 };
@@ -166,7 +167,7 @@ tcp_print(netdissect_options *ndo,
 {
         const struct tcphdr *tp;
         const struct ip *ip;
-        u_char flags;
+        uint16_t flags;
         u_int hlen;
         char ch;
         uint16_t sport, dport, win, urp;
@@ -248,7 +249,7 @@ tcp_print(netdissect_options *ndo,
                 return;
         }
 
-        flags = GET_U_1(tp->th_flags);
+        flags = TH_FLAGS(tp);
         ND_PRINT("Flags [%s]", bittok2str_nosep(tcp_flag_values, "none", flags));
 
         if (!ndo->ndo_Sflag && (flags & TH_ACK)) {
