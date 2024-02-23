@@ -33,6 +33,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
 
@@ -151,14 +152,11 @@ nflog_if_print(netdissect_options *ndo,
 	u_int length = h->len;
 
 	ndo->ndo_protocol = "nflog";
-	if (caplen < NFLOG_HDR_LEN) {
-		nd_print_trunc(ndo);
-		ndo->ndo_ll_hdr_len += caplen;
-		return;
-	}
-	ndo->ndo_ll_hdr_len += NFLOG_HDR_LEN;
+	ND_ICHECK_ZU(length, <, NFLOG_HDR_LEN);
 
 	ND_TCHECK_SIZE(hdr);
+	ndo->ndo_ll_hdr_len += NFLOG_HDR_LEN;
+
 	if (GET_U_1(hdr->nflog_version) != 0) {
 		ND_PRINT("version %u (unknown)", GET_U_1(hdr->nflog_version));
 		return;
@@ -174,23 +172,20 @@ nflog_if_print(netdissect_options *ndo,
 	while (length > 0) {
 		const nflog_tlv_t *tlv;
 
-		/* We have some data.  Do we have enough for the TLV header? */
-		if (caplen < NFLOG_TLV_LEN)
-			goto trunc;	/* No. */
-
+		ND_ICHECK_ZU(length, <, NFLOG_TLV_LEN);
 		tlv = (const nflog_tlv_t *) p;
+		/* Do we have enough data for the TLV header? */
 		ND_TCHECK_SIZE(tlv);
 		size = GET_HE_U_2(tlv->tlv_length);
 		if (size % 4 != 0)
 			size += 4 - size % 4;
 
 		/* Is the TLV's length less than the minimum? */
-		if (size < NFLOG_TLV_LEN)
-			goto trunc;	/* Yes. Give up now. */
+		ND_ICHECK_ZU(size, <, NFLOG_TLV_LEN);
+		ND_ICHECK_U(length, <, size);
 
 		/* Do we have enough data for the full TLV? */
-		if (caplen < size)
-			goto trunc;	/* No. */
+		ND_TCHECK_LEN(tlv, size);
 
 		if (GET_HE_U_2(tlv->tlv_type) == NFULA_PAYLOAD) {
 			/*
@@ -233,9 +228,9 @@ nflog_if_print(netdissect_options *ndo,
 
 	ndo->ndo_ll_hdr_len += h_size - NFLOG_HDR_LEN;
 	return;
-trunc:
-	nd_print_trunc(ndo);
-	ndo->ndo_ll_hdr_len += h_size - NFLOG_HDR_LEN;
+
+invalid:
+	nd_print_invalid(ndo);
 }
 
 #endif /* DLT_NFLOG */
