@@ -839,6 +839,7 @@ ns_rprint(netdissect_options *ndo,
 	case T_URI:
 		if (!ND_TTEST_LEN(cp, len))
 			return(NULL);
+		ND_ICHECK_U(len, <, 4);
 		ND_PRINT(" %u %u ", GET_BE_U_2(cp), GET_BE_U_2(cp + 2));
 		if (nd_printn(ndo, cp + 4, len - 4, ndo->ndo_snapend))
 			return(NULL);
@@ -894,6 +895,8 @@ ns_rprint(netdissect_options *ndo,
 	    }
 	}
 	return (rp);		/* XXX This isn't always right */
+invalid:
+	nd_print_invalid(ndo);
 }
 
 void
