@@ -514,10 +514,7 @@ rsvp_intserv_print(netdissect_options *ndo,
                    const u_char *tptr, u_int obj_tlen)
 {
     u_int parameter_id,parameter_length;
-    union {
-	float f;
-	uint32_t i;
-    } bw;
+    float bw;
 
     ND_ICHECK_U(obj_tlen, <, 4);
     parameter_id = GET_U_1(tptr);
@@ -554,8 +551,8 @@ rsvp_intserv_print(netdissect_options *ndo,
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
         if (parameter_length == 4) {
-            bw.i = GET_BE_U_4(tptr + 4);
-            ND_PRINT("\n\t\tPath b/w estimate: %.10g Mbps", bw.f / 125000);
+            bw = GET_BE_F_4(tptr + 4);
+            ND_PRINT("\n\t\tPath b/w estimate: %.10g Mbps", bw / 125000);
         }
         break;
 
@@ -607,12 +604,12 @@ rsvp_intserv_print(netdissect_options *ndo,
         */
 
         if (parameter_length == 20) {
-            bw.i = GET_BE_U_4(tptr + 4);
-            ND_PRINT("\n\t\tToken Bucket Rate: %.10g Mbps", bw.f / 125000);
-            bw.i = GET_BE_U_4(tptr + 8);
-            ND_PRINT("\n\t\tToken Bucket Size: %.10g bytes", bw.f);
-            bw.i = GET_BE_U_4(tptr + 12);
-            ND_PRINT("\n\t\tPeak Data Rate: %.10g Mbps", bw.f / 125000);
+            bw = GET_BE_F_4(tptr + 4);
+            ND_PRINT("\n\t\tToken Bucket Rate: %.10g Mbps", bw / 125000);
+            bw = GET_BE_F_4(tptr + 8);
+            ND_PRINT("\n\t\tToken Bucket Size: %.10g bytes", bw);
+            bw = GET_BE_F_4(tptr + 12);
+            ND_PRINT("\n\t\tPeak Data Rate: %.10g Mbps", bw / 125000);
             ND_PRINT("\n\t\tMinimum Policed Unit: %u bytes",
                      GET_BE_U_4(tptr + 16));
             ND_PRINT("\n\t\tMaximum Packet Size: %u bytes",
@@ -632,8 +629,8 @@ rsvp_intserv_print(netdissect_options *ndo,
         */
 
         if (parameter_length == 8) {
-            bw.i = GET_BE_U_4(tptr + 4);
-            ND_PRINT("\n\t\tRate: %.10g Mbps", bw.f / 125000);
+            bw = GET_BE_F_4(tptr + 4);
+            ND_PRINT("\n\t\tRate: %.10g Mbps", bw / 125000);
             ND_PRINT("\n\t\tSlack Term: %u", GET_BE_U_4(tptr + 8));
         }
         break;
@@ -687,10 +684,7 @@ rsvp_obj_print(netdissect_options *ndo,
     u_int obj_tlen,intserv_serv_tlen;
     int hexdump;
     u_int processed,padbytes,error_code,error_value,i,sigcheck;
-    union {
-	float f;
-	uint32_t i;
-    } bw;
+    float bw;
     u_int namelen;
 
     u_int action, subchannel;
@@ -1547,13 +1541,13 @@ rsvp_obj_print(netdissect_options *ndo,
             case RSVP_CTYPE_1: /* new style */
                 if (obj_tlen < sizeof(struct rsvp_obj_frr_t))
                     goto obj_tooshort;
-                bw.i = GET_BE_U_4(obj_ptr.rsvp_obj_frr->bandwidth);
+                bw = GET_BE_F_4(obj_ptr.rsvp_obj_frr->bandwidth);
                 ND_PRINT("%s  Setup Priority: %u, Holding Priority: %u, Hop-limit: %u, Bandwidth: %.10g Mbps",
                        indent,
                        obj_ptr.rsvp_obj_frr->setup_prio,
                        obj_ptr.rsvp_obj_frr->hold_prio,
                        obj_ptr.rsvp_obj_frr->hop_limit,
-                       bw.f * 8 / 1000000);
+                       bw * 8 / 1000000);
                 ND_PRINT("%s  Include-any: 0x%08x, Exclude-any: 0x%08x, Include-all: 0x%08x",
                        indent,
                        GET_BE_U_4(obj_ptr.rsvp_obj_frr->include_any),
@@ -1566,13 +1560,13 @@ rsvp_obj_print(netdissect_options *ndo,
             case RSVP_CTYPE_TUNNEL_IPV4: /* old style */
                 if (obj_tlen < 16)
                     goto obj_tooshort;
-                bw.i = GET_BE_U_4(obj_ptr.rsvp_obj_frr->bandwidth);
+                bw = GET_BE_F_4(obj_ptr.rsvp_obj_frr->bandwidth);
                 ND_PRINT("%s  Setup Priority: %u, Holding Priority: %u, Hop-limit: %u, Bandwidth: %.10g Mbps",
                        indent,
                        obj_ptr.rsvp_obj_frr->setup_prio,
                        obj_ptr.rsvp_obj_frr->hold_prio,
                        obj_ptr.rsvp_obj_frr->hop_limit,
-                       bw.f * 8 / 1000000);
+                       bw * 8 / 1000000);
                 ND_PRINT("%s  Include Colors: 0x%08x, Exclude Colors: 0x%08x",
                        indent,
                        GET_BE_U_4(obj_ptr.rsvp_obj_frr->include_any),

@@ -746,6 +746,36 @@ get_he_s_4(netdissect_options *ndo, const u_char *p)
 	return EXTRACT_HE_S_4(p);
 }
 
+/* get_be_f_N */
+
+static inline float
+get_be_f_4(netdissect_options *ndo, const u_char *p)
+{
+	union { /* int to float conversion buffer */
+		float f;
+		uint32_t i;
+	} buf;
+
+	if (!ND_TTEST_4(p))
+		nd_trunc_longjmp(ndo);
+	buf.i = EXTRACT_BE_U_4(p);
+	return buf.f;
+}
+
+static inline double
+get_be_f_8(netdissect_options *ndo, const u_char *p)
+{
+	union { /* int to float conversion buffer */
+		double f;
+		uint64_t i;
+	} buf;
+
+	if (!ND_TTEST_8(p))
+		nd_trunc_longjmp(ndo);
+	buf.i = EXTRACT_BE_U_8(p);
+	return buf.f;
+}
+
 /* get_le_u_N */
 
 static inline uint16_t
@@ -882,6 +912,9 @@ get_cpy_bytes(netdissect_options *ndo, u_char *dst, const u_char *p, size_t len)
 #define GET_BE_S_6(p) get_be_s_6(ndo, (const u_char *)(p))
 #define GET_BE_S_7(p) get_be_s_7(ndo, (const u_char *)(p))
 #define GET_BE_S_8(p) get_be_s_8(ndo, (const u_char *)(p))
+
+#define GET_BE_F_4(p) get_be_f_4(ndo, (const u_char *)(p))
+#define GET_BE_F_8(p) get_be_f_8(ndo, (const u_char *)(p))
 
 #define GET_HE_U_2(p) get_he_u_2(ndo, (const u_char *)(p))
 #define GET_HE_U_4(p) get_he_u_4(ndo, (const u_char *)(p))
