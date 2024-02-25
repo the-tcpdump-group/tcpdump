@@ -329,10 +329,7 @@ ospf_te_lsa_print(netdissect_options *ndo,
 {
     u_int tlv_type, tlv_length, subtlv_type, subtlv_length;
     u_int priority_level, te_class, count_srlg;
-    union { /* int to float conversion buffer for several subTLVs */
-        float f;
-        uint32_t i;
-    } bw;
+    float bw;
 
     while (ls_length != 0) {
         ND_TCHECK_4(tptr);
@@ -426,8 +423,8 @@ ospf_te_lsa_print(netdissect_options *ndo,
 			ND_PRINT(" != 4");
 			goto invalid;
 		    }
-                    bw.i = GET_BE_U_4(tptr);
-                    ND_PRINT(", %.3f Mbps", bw.f * 8 / 1000000);
+                    bw = GET_BE_F_4(tptr);
+                    ND_PRINT(", %.3f Mbps", bw * 8 / 1000000);
                     break;
                 case LS_OPAQUE_TE_LINK_SUBTLV_UNRES_BW:
 		    if (subtlv_length != 32) {
@@ -435,10 +432,10 @@ ospf_te_lsa_print(netdissect_options *ndo,
 			goto invalid;
 		    }
                     for (te_class = 0; te_class < 8; te_class++) {
-                        bw.i = GET_BE_U_4(tptr + te_class * 4);
+                        bw = GET_BE_F_4(tptr + te_class * 4);
                         ND_PRINT("\n\t\tTE-Class %u: %.3f Mbps",
                                te_class,
-                               bw.f * 8 / 1000000);
+                               bw * 8 / 1000000);
                     }
                     break;
                 case LS_OPAQUE_TE_LINK_SUBTLV_BW_CONSTRAINTS:
@@ -460,10 +457,10 @@ ospf_te_lsa_print(netdissect_options *ndo,
 		    }
                     /* decode BCs until the subTLV ends */
                     for (te_class = 0; te_class < (subtlv_length-4)/4; te_class++) {
-                        bw.i = GET_BE_U_4(tptr + 4 + te_class * 4);
+                        bw = GET_BE_F_4(tptr + 4 + te_class * 4);
                         ND_PRINT("\n\t\t  Bandwidth constraint CT%u: %.3f Mbps",
                                te_class,
-                               bw.f * 8 / 1000000);
+                               bw * 8 / 1000000);
                     }
                     break;
                 case LS_OPAQUE_TE_LINK_SUBTLV_TE_METRIC:
@@ -493,10 +490,10 @@ ospf_te_lsa_print(netdissect_options *ndo,
                     ND_PRINT("\n\t\tLSP Encoding: %s\n\t\tMax LSP Bandwidth:",
                            tok2str(gmpls_encoding_values, "Unknown", GET_U_1((tptr + 1))));
                     for (priority_level = 0; priority_level < 8; priority_level++) {
-                        bw.i = GET_BE_U_4(tptr + 4 + (priority_level * 4));
+                        bw = GET_BE_F_4(tptr + 4 + (priority_level * 4));
                         ND_PRINT("\n\t\t  priority level %u: %.3f Mbps",
                                priority_level,
-                               bw.f * 8 / 1000000);
+                               bw * 8 / 1000000);
                     }
                     break;
                 case LS_OPAQUE_TE_LINK_SUBTLV_LINK_TYPE:
@@ -518,8 +515,7 @@ ospf_te_lsa_print(netdissect_options *ndo,
                     if (count_srlg != 0)
                         ND_PRINT("\n\t\t  Shared risk group: ");
                     while (count_srlg > 0) {
-                        bw.i = GET_BE_U_4(tptr);
-                        ND_PRINT("%u", bw.i);
+                        ND_PRINT("%u", GET_BE_U_4(tptr));
                         tptr+=4;
                         count_srlg--;
                         if (count_srlg > 0)

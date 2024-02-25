@@ -1950,10 +1950,7 @@ isis_print_ext_is_reach(netdissect_options *ndo,
     u_int subtlv_type,subtlv_len,subtlv_sum_len;
     int proc_bytes = 0; /* how many bytes did we process ? */
     u_int te_class,priority_level,gmpls_switch_cap;
-    union { /* int to float conversion buffer for several subTLVs */
-        float f;
-        uint32_t i;
-    } bw;
+    float bw;
 
     ND_TCHECK_LEN(tptr, NODE_ID_LEN);
     if (tlv_remaining < NODE_ID_LEN)
@@ -2041,18 +2038,18 @@ isis_print_ext_is_reach(netdissect_options *ndo,
             case ISIS_SUBTLV_EXT_IS_REACH_MAX_LINK_BW :
             case ISIS_SUBTLV_EXT_IS_REACH_RESERVABLE_BW:
                 if (subtlv_len >= 4) {
-                    bw.i = GET_BE_U_4(tptr);
-                    ND_PRINT(", %.3f Mbps", bw.f * 8 / 1000000);
+                    bw = GET_BE_F_4(tptr);
+                    ND_PRINT(", %.3f Mbps", bw * 8 / 1000000);
                 }
                 break;
             case ISIS_SUBTLV_EXT_IS_REACH_UNRESERVED_BW :
                 if (subtlv_len >= 32) {
                     for (te_class = 0; te_class < 8; te_class++) {
-                        bw.i = GET_BE_U_4(tptr);
+                        bw = GET_BE_F_4(tptr);
                         ND_PRINT("%s  TE-Class %u: %.3f Mbps",
                                   indent,
                                   te_class,
-                                  bw.f * 8 / 1000000);
+                                  bw * 8 / 1000000);
                         tptr += 4;
                         subtlv_len -= 4;
                         subtlv_sum_len -= 4;
@@ -2076,11 +2073,11 @@ isis_print_ext_is_reach(netdissect_options *ndo,
                 for (te_class = 0; subtlv_len != 0; te_class++) {
                     if (subtlv_len < 4)
                         break;
-                    bw.i = GET_BE_U_4(tptr);
+                    bw = GET_BE_F_4(tptr);
                     ND_PRINT("%s  Bandwidth constraint CT%u: %.3f Mbps",
                               indent,
                               te_class,
-                              bw.f * 8 / 1000000);
+                              bw * 8 / 1000000);
                     tptr += 4;
                     subtlv_len -= 4;
                     subtlv_sum_len -= 4;
@@ -2136,11 +2133,11 @@ isis_print_ext_is_reach(netdissect_options *ndo,
                     proc_bytes += 4;
                     ND_PRINT("%s  Max LSP Bandwidth:", indent);
                     for (priority_level = 0; priority_level < 8; priority_level++) {
-                        bw.i = GET_BE_U_4(tptr);
+                        bw = GET_BE_F_4(tptr);
                         ND_PRINT("%s    priority level %u: %.3f Mbps",
                                   indent,
                                   priority_level,
-                                  bw.f * 8 / 1000000);
+                                  bw * 8 / 1000000);
                         tptr += 4;
                         subtlv_len -= 4;
                         subtlv_sum_len -= 4;
@@ -2153,16 +2150,16 @@ isis_print_ext_is_reach(netdissect_options *ndo,
                     case GMPLS_PSC4:
                         if (subtlv_len < 6)
                             break;
-                        bw.i = GET_BE_U_4(tptr);
-                        ND_PRINT("%s  Min LSP Bandwidth: %.3f Mbps", indent, bw.f * 8 / 1000000);
+                        bw = GET_BE_F_4(tptr);
+                        ND_PRINT("%s  Min LSP Bandwidth: %.3f Mbps", indent, bw * 8 / 1000000);
                         ND_PRINT("%s  Interface MTU: %u", indent,
                                  GET_BE_U_2(tptr + 4));
                         break;
                     case GMPLS_TSC:
                         if (subtlv_len < 8)
                             break;
-                        bw.i = GET_BE_U_4(tptr);
-                        ND_PRINT("%s  Min LSP Bandwidth: %.3f Mbps", indent, bw.f * 8 / 1000000);
+                        bw = GET_BE_F_4(tptr);
+                        ND_PRINT("%s  Min LSP Bandwidth: %.3f Mbps", indent, bw * 8 / 1000000);
                         ND_PRINT("%s  Indication %s", indent,
                                   tok2str(gmpls_switch_cap_tsc_indication_values, "Unknown (%u)", GET_U_1((tptr + 4))));
                         break;
