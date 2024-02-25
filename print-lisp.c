@@ -242,7 +242,6 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	uint16_t auth_data_len;
 	uint32_t ttl;
 	const u_char *packet_iterator;
-	const u_char *loc_ip_pointer;
 	const lisp_map_register_hdr *lisp_hdr;
 	const lisp_map_register_eid *lisp_eid;
 	const lisp_map_register_loc *lisp_loc;
@@ -331,7 +330,6 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			ND_TCHECK_LEN(packet_iterator + packet_offset,
 				      MAP_REGISTER_LOC_LEN);
 			lisp_loc = (const lisp_map_register_loc *) (packet_iterator + packet_offset);
-			loc_ip_pointer = (const u_char *) (lisp_loc + 1);
 			packet_offset += MAP_REGISTER_LOC_LEN;
 			loc_afi = GET_BE_U_2(lisp_loc->locator_afi);
 
@@ -340,13 +338,15 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 			switch (loc_afi) {
 			case IPv4_AFI:
-				ND_TCHECK_4(packet_iterator + packet_offset);
-				ND_PRINT(" LOC %s", GET_IPADDR_STRING(loc_ip_pointer));
+				ND_PRINT(" LOC %s",
+					 GET_IPADDR_STRING(packet_iterator +
+					 packet_offset));
 				packet_offset += 4;
 				break;
 			case IPv6_AFI:
-				ND_TCHECK_16(packet_iterator + packet_offset);
-				ND_PRINT(" LOC %s", GET_IP6ADDR_STRING(loc_ip_pointer));
+				ND_PRINT(" LOC %s",
+					 GET_IP6ADDR_STRING(packet_iterator +
+					 packet_offset));
 				packet_offset += 16;
 				break;
 			default:
