@@ -548,6 +548,14 @@ p_ntp_ef(netdissect_options *ndo, u_int type, u_int length, const u_char *ef_bod
 
 	if (ndo->ndo_vflag > 2)
 		hex_print(ndo, "\n\t    ", ef_body, length - 4);
+	else {
+		/*
+		 * If we're not going to print it, at least make sure
+		 * it's present in the packet, so if ef_len is too long,
+		 * we stop.
+		 */
+		ND_TCHECK_LEN(ef_body, length - 4);
+	}
 }
 
 /* Prints list of extension fields per RFC 7822 */
@@ -579,6 +587,17 @@ p_ext_fields(netdissect_options *ndo, const u_char *cp, u_int length)
 		}
 
 		p_ntp_ef(ndo, ef_type, ef_len, (const u_char *)(ef + 1));
+
+		/*
+		 * The entire extension field is guaranted to be in the
+		 * captured data, as p_ntp_ef() will longjmp out if it
+		 * isn't.
+		 *
+		 * As the total length of the captured data fits in a
+		 * u_int, this means that the total length of all the
+		 * extension fields will fit in a u_int, so this will
+		 * never overflow.
+		 */
 		efs_len += ef_len;
 	}
 
