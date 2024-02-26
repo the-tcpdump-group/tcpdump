@@ -756,7 +756,7 @@ pimv2_print(netdissect_options *ndo,
 	case PIMV2_TYPE_HELLO:
 	    {
 		uint16_t otype, olen;
-		while (len > 0) {
+		while (len != 0) {
 			if (len < 4)
 				goto trunc;
 			otype = GET_BE_U_2(bp);

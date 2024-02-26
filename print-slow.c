@@ -355,7 +355,7 @@ slow_marker_lacp_print(netdissect_options *ndo,
         const struct marker_tlv_marker_info_t *marker_tlv_marker_info;
     } tlv_ptr;
 
-    while(tlen>0) {
+    while(tlen != 0) {
         /* is the packet big enough to include the tlv header ? */
         if (tlen < sizeof(struct tlv_header_t))
             goto tooshort;
@@ -525,7 +525,7 @@ slow_oam_print(netdissect_options *ndo,
 
     switch (code) {
     case SLOW_OAM_CODE_INFO:
-        while (tlen > 0) {
+        while (tlen != 0) {
             ptr.slow_oam_tlv_header = (const struct slow_oam_tlv_header_t *)tptr;
             if (tlen < sizeof(*ptr.slow_oam_tlv_header))
                 goto tooshort;
@@ -622,7 +622,7 @@ slow_oam_print(netdissect_options *ndo,
         tptr += 2;
 
         /* TLVs */
-        while (tlen > 0) {
+        while (tlen != 0) {
             ptr.slow_oam_tlv_header = (const struct slow_oam_tlv_header_t *)tptr;
             if (tlen < sizeof(*ptr.slow_oam_tlv_header))
                 goto tooshort;

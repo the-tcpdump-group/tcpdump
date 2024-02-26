@@ -164,7 +164,7 @@ geneve_opts_print(netdissect_options *ndo, const u_char *bp, u_int len)
 {
     const char *sep = "";
 
-    while (len > 0) {
+    while (len != 0) {
         uint16_t opt_class;
         uint8_t opt_type;
         uint8_t opt_len;

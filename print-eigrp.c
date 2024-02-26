@@ -279,7 +279,7 @@ eigrp_print(netdissect_options *ndo, const u_char *pptr, u_int len)
 
     tptr+=sizeof(struct eigrp_common_header);
 
-    while(tlen>0) {
+    while(tlen != 0) {
         if (tlen < sizeof(struct eigrp_tlv_header)) {
             ND_PRINT("\n\t  (only %u bytes of data)", tlen);
             goto invalid;

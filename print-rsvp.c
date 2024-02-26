@@ -1236,7 +1236,7 @@ rsvp_obj_print(netdissect_options *ndo,
 
 		/* read variable length subobjects */
 		total_subobj_len = obj_tlen;
-                while(total_subobj_len > 0) {
+                while(total_subobj_len != 0) {
                     /* If RFC 3476 Section 3.1 defined that a sub-object of the
                      * GENERALIZED_UNI RSVP object must have the Length field as
                      * a multiple of 4, instead of the check below it would be
@@ -1965,7 +1965,7 @@ rsvp_print(netdissect_options *ndo,
          * Bundle messages may not contain bundle submessages, so we don't
          * need to handle bundle submessages specially.
          */
-        while(tlen > 0) {
+        while(tlen != 0) {
             const u_char *subpptr=tptr, *subtptr;
             u_short subplen, subtlen;
 

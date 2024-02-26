@@ -73,7 +73,7 @@ ascii_print(netdissect_options *ndo,
 		truncated = TRUE;
 	}
 	ND_PRINT("\n");
-	while (length > 0) {
+	while (length != 0) {
 		s = GET_U_1(cp);
 		cp++;
 		length--;

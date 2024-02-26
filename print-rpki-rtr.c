@@ -153,7 +153,7 @@ indent_string (u_int indent)
 	indent -= 8;
     }
 
-    while (indent > 0) {
+    while (indent != 0) {
 	buf[idx] = ' ';
 	idx++;
 	indent--;

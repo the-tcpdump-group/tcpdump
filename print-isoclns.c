@@ -1015,7 +1015,7 @@ clnp_print(netdissect_options *ndo,
                     }
                     tptr+=nsap_offset;
                     tlen-=nsap_offset;
-                    while (tlen > 0) {
+                    while (tlen != 0) {
                             source_address_length=GET_U_1(tptr);
                             if (tlen < source_address_length+1) {
                                     ND_PRINT("\n\t    NSAP address goes past end of option");
@@ -1327,7 +1327,7 @@ esis_print(netdissect_options *ndo,
 
             ND_PRINT("\n\t  Number of Source Addresses: %u", source_address_number);
 
-            while (source_address_number > 0) {
+            while (source_address_number != 0) {
                 ND_TCHECK_1(pptr);
 		if (li < 1) {
                     ND_PRINT(", bad esh/li");
@@ -1420,7 +1420,7 @@ esis_print(netdissect_options *ndo,
                 break;
 
             case ESIS_OPTION_PROTOCOLS:
-                while (opli>0) {
+                while (opli != 0) {
                     ND_PRINT("%s (0x%02x)",
                            tok2str(nlpid_values,
                                    "unknown",
@@ -1804,7 +1804,7 @@ isis_print_tlv_ip_reach(netdissect_options *ndo,
 
 	tlv_ip_reach = (const struct isis_tlv_ip_reach *)cp;
 
-	while (length > 0) {
+	while (length != 0) {
 		if ((size_t)length < sizeof(*tlv_ip_reach)) {
 			ND_PRINT("short IPv4 Reachability (%u vs %zu)",
                                length,
@@ -2338,7 +2338,7 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
         processed+=sublen+1;
         ND_PRINT(" (%u)", sublen);   /* print out subTLV length */
 
-        while (sublen>0) {
+        while (sublen != 0) {
             subtlvtype=GET_U_1(tptr);
             subtlvlen=GET_U_1(tptr + 1);
             tptr+=2;
@@ -2846,7 +2846,7 @@ isis_print(netdissect_options *ndo,
      * Now print the TLV's.
      */
 
-    while (packet_len > 0) {
+    while (packet_len != 0) {
 	ND_TCHECK_2(pptr);
 	if (packet_len < 2)
 	    goto trunc;

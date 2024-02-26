@@ -494,7 +494,7 @@ sflow_print_counter_records(netdissect_options *ndo,
     tptr = pointer;
     tlen = len;
 
-    while (nrecords > 0) {
+    while (nrecords != 0) {
 	/* do we have the "header?" */
 	if (tlen < sizeof(struct sflow_counter_record_t))
 	    return 1;
@@ -683,7 +683,7 @@ sflow_print_flow_records(netdissect_options *ndo,
     tptr = pointer;
     tlen = len;
 
-    while (nrecords > 0) {
+    while (nrecords != 0) {
 	/* do we have the "header?" */
 	if (tlen < sizeof(struct sflow_flow_record_t))
 	    return 1;
@@ -896,7 +896,7 @@ sflow_print(netdissect_options *ndo,
         tptr += sizeof(struct sflow_v6_datagram_t);
         tlen -= sizeof(struct sflow_v6_datagram_t);
     }
-    while (nsamples > 0 && tlen > 0) {
+    while (nsamples != 0 && tlen != 0) {
         sflow_sample = (const struct sflow_sample_header *)tptr;
 
         sflow_sample_type = (GET_BE_U_4(sflow_sample->format)&0x0FFF);

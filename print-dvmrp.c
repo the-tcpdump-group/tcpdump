@@ -152,7 +152,7 @@ print_report(netdissect_options *ndo,
 	u_int metric, done;
 	u_int i, width;
 
-	while (len > 0) {
+	while (len != 0) {
 		if (len < 3) {
 			ND_PRINT(" [length %u < 3]", len);
 			goto invalid;
@@ -214,7 +214,7 @@ print_probe(netdissect_options *ndo,
 
 	bp += 4;
 	len -= 4;
-	while (len > 0) {
+	while (len != 0) {
 		if (len < 4) {
 			ND_PRINT("[remaining length %u < 4]", len);
 			goto invalid;
@@ -238,7 +238,7 @@ print_neighbors(netdissect_options *ndo,
 	u_char thresh;
 	int ncount;
 
-	while (len > 0) {
+	while (len != 0) {
 		if (len < 7) {
 			ND_PRINT(" [length %u < 7]", len);
 			goto invalid;
@@ -282,7 +282,7 @@ print_neighbors2(netdissect_options *ndo,
 
 	ND_PRINT(" (v %u.%u):", major_version, minor_version);
 
-	while (len > 0) {
+	while (len != 0) {
 		if (len < 8) {
 			ND_PRINT(" [length %u < 8]", len);
 			goto invalid;
@@ -298,7 +298,7 @@ print_neighbors2(netdissect_options *ndo,
 		ncount = GET_U_1(bp);
 		bp++;
 		len -= 8;
-		while (--ncount >= 0 && len > 0) {
+		while (--ncount >= 0 && len != 0) {
 			if (len < 4) {
 				ND_PRINT(" [length %u < 4]", len);
 				goto invalid;

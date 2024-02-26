@@ -477,7 +477,7 @@ lmp_print(netdissect_options *ndo,
     tptr+=sizeof(struct lmp_common_header);
     tlen-=sizeof(struct lmp_common_header);
 
-    while(tlen>0) {
+    while(tlen != 0) {
         const struct lmp_object_header *lmp_obj_header =
             (const struct lmp_object_header *)tptr;
         lmp_obj_len=GET_BE_U_2(lmp_obj_header->length);

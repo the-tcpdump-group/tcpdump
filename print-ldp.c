@@ -689,7 +689,7 @@ ldp_pdu_print(netdissect_options *ndo,
     tptr = pptr + sizeof(struct ldp_common_header);
     tlen = pdu_len - (sizeof(struct ldp_common_header)-4);	/* Type & Length fields not included */
 
-    while(tlen>0) {
+    while(tlen != 0) {
         /* did we capture enough for fully decoding the msg header ? */
         ND_TCHECK_LEN(tptr, sizeof(struct ldp_msg_header));
 

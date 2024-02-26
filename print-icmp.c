@@ -754,7 +754,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen,
 			break;
 		}
 		idp = (const struct id_rdiscovery *)&dp->icmp_data;
-		while (num > 0) {
+		while (num != 0) {
 			(void)snprintf(cp, sizeof(buf) - (cp - buf), " {%s %u}",
 			    GET_IPADDR_STRING(idp->ird_addr),
 			    GET_BE_U_4(idp->ird_pref));

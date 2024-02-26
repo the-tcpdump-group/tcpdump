@@ -271,7 +271,7 @@ vtp_print(netdissect_options *ndo,
 
             /* TLV information follows */
 
-            while (len > 0) {
+            while (len != 0) {
 
                 /*
                  * Cisco specs say 2 bytes for type + 2 bytes for length;

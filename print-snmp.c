@@ -847,7 +847,7 @@ asn1_decode(u_char *p, u_int length)
 	struct be elem;
 	int i = 0;
 
-	while (i >= 0 && length > 0) {
+	while (i >= 0 && length != 0) {
 		i = asn1_parse(ndo, p, length, &elem);
 		if (i >= 0) {
 			ND_PRINT(" ");

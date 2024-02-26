@@ -1317,7 +1317,7 @@ radius_attrs_print(netdissect_options *ndo,
    const char *attr_string;
    uint8_t type, len;
 
-   while (length > 0) {
+   while (length != 0) {
      ND_ICHECK_U(length, <, 2);
 
      type = GET_U_1(rad_attr->type);

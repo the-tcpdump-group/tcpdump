@@ -214,7 +214,7 @@ resp_print(netdissect_options *ndo, const u_char *bp, u_int length)
     ndo->ndo_protocol = "resp";
 
     ND_PRINT(": RESP");
-    while (length > 0) {
+    while (length != 0) {
         /*
          * This block supports redis pipelining.
          * For example, multiple operations can be pipelined within the same string:

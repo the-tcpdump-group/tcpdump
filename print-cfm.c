@@ -528,7 +528,7 @@ cfm_print(netdissect_options *ndo,
     tptr += first_tlv_offset;
     tlen -= first_tlv_offset;
 
-    while (tlen > 0) {
+    while (tlen != 0) {
         cfm_tlv_header = (const struct cfm_tlv_header_t *)tptr;
 
         /* Enough to read the tlv type ? */

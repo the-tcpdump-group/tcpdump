@@ -1088,7 +1088,7 @@ lldp_private_tia_print(netdissect_options *ndo,
             tptr = tptr + 9;
 
             /* Decode each civic address element */
-            while (lci_len > 0) {
+            while (lci_len != 0) {
                 if (lci_len < 2) {
                     return hexdump;
                 }

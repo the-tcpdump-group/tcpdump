@@ -181,7 +181,7 @@ nd_printn(netdissect_options *ndo,
 void
 nd_printjn(netdissect_options *ndo, const u_char *s, u_int n)
 {
-	while (n > 0) {
+	while (n != 0) {
 		fn_print_char(ndo, GET_U_1(s));
 		n--;
 		s++;
@@ -200,7 +200,7 @@ nd_printjnp(netdissect_options *ndo, const u_char *s, u_int n)
 {
 	u_char c;
 
-	while (n > 0) {
+	while (n != 0) {
 		c = GET_U_1(s);
 		if (c == '\0')
 			break;
@@ -376,7 +376,7 @@ unsigned_relts_print(netdissect_options *ndo,
 		ND_PRINT("0s");
 		return;
 	}
-	while (secs > 0) {
+	while (secs != 0) {
 		if (secs >= *s) {
 			ND_PRINT("%u%s", secs / *s, *l);
 			secs -= (secs / *s) * *s;

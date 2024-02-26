@@ -651,7 +651,7 @@ rfc1048_print(netdissect_options *ndo,
 
 		if (tag == TAG_PARM_REQUEST) {
 			idx = 0;
-			while (len > 0) {
+			while (len != 0) {
 				uint8_t innertag = GET_U_1(bp);
 				bp++;
 				len--;
@@ -736,7 +736,7 @@ rfc1048_print(netdissect_options *ndo,
 
 		case 'B':
 			/* boolean */
-			while (len > 0) {
+			while (len != 0) {
 				uint8_t bool_value;
 				if (!first)
 					ND_PRINT(",");
@@ -762,7 +762,7 @@ rfc1048_print(netdissect_options *ndo,
 		case 'x':
 		default:
 			/* Bytes */
-			while (len > 0) {
+			while (len != 0) {
 				uint8_t byte_value;
 				if (!first)
 					ND_PRINT(c == 'x' ? ":" : ".");
@@ -853,7 +853,7 @@ rfc1048_print(netdissect_options *ndo,
 					break;
 				} else {
 					ND_PRINT("%s ", tok2str(arp2str, "hardware-type %u,", type));
-					while (len > 0) {
+					while (len != 0) {
 						if (!first)
 							ND_PRINT(":");
 						ND_PRINT("%02x", GET_U_1(bp));
@@ -913,7 +913,7 @@ rfc1048_print(netdissect_options *ndo,
 					len = 0;
 					break;
 				}
-				while (len > 0) {
+				while (len != 0) {
 					if (!first)
 						ND_PRINT(",");
 					mask_width = GET_U_1(bp);
@@ -968,7 +968,7 @@ rfc1048_print(netdissect_options *ndo,
 					len = 0;
 					break;
 				}
-				while (len > 0) {
+				while (len != 0) {
 					suboptlen = GET_U_1(bp);
 					bp++;
 					len--;

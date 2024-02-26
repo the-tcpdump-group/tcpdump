@@ -179,7 +179,7 @@ struct  atmarp_pkthdr {
 static int
 isnonzero(netdissect_options *ndo, const u_char *a, size_t len)
 {
-	while (len > 0) {
+	while (len != 0) {
 		if (GET_U_1(a) != 0)
 			return (1);
 		a++;

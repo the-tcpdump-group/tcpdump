@@ -661,7 +661,7 @@ ospf6_print_lsa(netdissect_options *ndo,
                        prefixes);
 
 		tptr = (const uint8_t *)llsap->llsa_prefix;
-		while (prefixes > 0) {
+		while (prefixes != 0) {
 			bytelen = ospf6_print_lsaprefix(ndo, tptr, lsa_length);
 			if (bytelen < 0)
 				goto trunc;
@@ -693,7 +693,7 @@ ospf6_print_lsa(netdissect_options *ndo,
 		ND_PRINT("\n\t      Prefixes %u:", prefixes);
 
 		tptr = (const uint8_t *)lsap->lsa_un.un_intra_ap.intra_ap_prefix;
-		while (prefixes > 0) {
+		while (prefixes != 0) {
 			bytelen = ospf6_print_lsaprefix(ndo, tptr, lsa_length);
 			if (bytelen < 0)
 				goto trunc;

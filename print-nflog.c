@@ -169,7 +169,7 @@ nflog_if_print(netdissect_options *ndo,
 	length -= NFLOG_HDR_LEN;
 	caplen -= NFLOG_HDR_LEN;
 
-	while (length > 0) {
+	while (length != 0) {
 		const nflog_tlv_t *tlv;
 
 		ND_ICHECK_ZU(length, <, NFLOG_TLV_LEN);

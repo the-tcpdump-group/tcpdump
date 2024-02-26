@@ -445,7 +445,7 @@ tcp_print(netdissect_options *ndo,
                 hlen -= sizeof(*tp);
                 cp = (const u_char *)tp + sizeof(*tp);
                 ND_PRINT(", options [");
-                while (hlen > 0) {
+                while (hlen != 0) {
                         if (ch != '\0')
                                 ND_PRINT("%c", ch);
                         opt = GET_U_1(cp);
