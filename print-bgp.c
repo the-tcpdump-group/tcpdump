@@ -2653,7 +2653,7 @@ bgp_attr_print(netdissect_options *ndo,
         tptr += 3;
         sblen -= 3;
         /* Parse signature segments */
-        while (sblen > 0) {
+        while (sblen != 0) {
             uint16_t siglen;
 
             ND_PRINT("\n\t      Signature Segment:\n\t        SKI: ");
