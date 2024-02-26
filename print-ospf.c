@@ -240,7 +240,7 @@ ospf_grace_lsa_print(netdissect_options *ndo,
     u_int tlv_type, tlv_length;
 
 
-    while (ls_length > 0) {
+    while (ls_length != 0) {
         ND_TCHECK_4(tptr);
         if (ls_length < 4) {
             ND_PRINT("\n\t    Remaining LS length %u < 4", ls_length);
@@ -323,13 +323,207 @@ trunc:
     return -1;
 }
 
+static int
+ospf_te_tlv_link_print(netdissect_options *ndo,
+                       const u_char *tptr, u_int tlv_length)
+{
+    u_int subtlv_type, subtlv_length;
+    u_int priority_level, te_class, count_srlg;
+    float bw;
+
+    while (tlv_length != 0) {
+        if (tlv_length < 4) {
+            ND_PRINT("\n\t    Remaining TLV length %u < 4",
+                   tlv_length);
+            return -1;
+        }
+        subtlv_type = GET_BE_U_2(tptr);
+        subtlv_length = GET_BE_U_2(tptr + 2);
+        tptr+=4;
+        tlv_length-=4;
+
+        /* Infinite loop protection */
+        if (subtlv_type == 0 || subtlv_length == 0)
+            goto invalid;
+
+        ND_PRINT("\n\t      %s subTLV (%u), length: %u",
+               tok2str(lsa_opaque_te_link_tlv_subtlv_values,"unknown",subtlv_type),
+               subtlv_type,
+               subtlv_length);
+
+        if (tlv_length < subtlv_length) {
+            ND_PRINT("\n\t    Remaining TLV length %u < %u",
+                   tlv_length, subtlv_length);
+            return -1;
+        }
+        ND_TCHECK_LEN(tptr, subtlv_length);
+        switch(subtlv_type) {
+        case LS_OPAQUE_TE_LINK_SUBTLV_ADMIN_GROUP:
+            if (subtlv_length != 4) {
+                ND_PRINT(" != 4");
+                goto invalid;
+            }
+            ND_PRINT(", 0x%08x", GET_BE_U_4(tptr));
+            break;
+        case LS_OPAQUE_TE_LINK_SUBTLV_LINK_ID:
+        case LS_OPAQUE_TE_LINK_SUBTLV_LINK_LOCAL_REMOTE_ID:
+            if (subtlv_length != 4 && subtlv_length != 8) {
+                ND_PRINT(" != 4 && != 8");
+                goto invalid;
+            }
+            ND_PRINT(", %s (0x%08x)",
+                   GET_IPADDR_STRING(tptr),
+                   GET_BE_U_4(tptr));
+            if (subtlv_length == 8) /* rfc4203 */
+                ND_PRINT(", %s (0x%08x)",
+                       GET_IPADDR_STRING(tptr+4),
+                       GET_BE_U_4(tptr + 4));
+            break;
+        case LS_OPAQUE_TE_LINK_SUBTLV_LOCAL_IP:
+        case LS_OPAQUE_TE_LINK_SUBTLV_REMOTE_IP:
+            if (subtlv_length != 4) {
+                ND_PRINT(" != 4");
+                goto invalid;
+            }
+            ND_PRINT(", %s", GET_IPADDR_STRING(tptr));
+            break;
+        case LS_OPAQUE_TE_LINK_SUBTLV_MAX_BW:
+        case LS_OPAQUE_TE_LINK_SUBTLV_MAX_RES_BW:
+            if (subtlv_length != 4) {
+                ND_PRINT(" != 4");
+                goto invalid;
+            }
+            bw = GET_BE_F_4(tptr);
+            ND_PRINT(", %.3f Mbps", bw * 8 / 1000000);
+            break;
+        case LS_OPAQUE_TE_LINK_SUBTLV_UNRES_BW:
+            if (subtlv_length != 32) {
+                ND_PRINT(" != 32");
+                goto invalid;
+            }
+            for (te_class = 0; te_class < 8; te_class++) {
+                bw = GET_BE_F_4(tptr + te_class * 4);
+                ND_PRINT("\n\t\tTE-Class %u: %.3f Mbps",
+                       te_class,
+                       bw * 8 / 1000000);
+            }
+            break;
+        case LS_OPAQUE_TE_LINK_SUBTLV_BW_CONSTRAINTS:
+            if (subtlv_length < 4) {
+                ND_PRINT(" < 4");
+                goto invalid;
+            }
+            /* BC Model Id (1 octet) + Reserved (3 octets) */
+            ND_PRINT("\n\t\tBandwidth Constraints Model ID: %s (%u)",
+                   tok2str(diffserv_te_bc_values, "unknown", GET_U_1(tptr)),
+                   GET_U_1(tptr));
+            if (subtlv_length % 4 != 0) {
+                ND_PRINT("\n\t\tlength %u != N x 4", subtlv_length);
+                goto invalid;
+            }
+            if (subtlv_length > 36) {
+                ND_PRINT("\n\t\tlength %u > 36", subtlv_length);
+                goto invalid;
+            }
+            /* decode BCs until the subTLV ends */
+            for (te_class = 0; te_class < (subtlv_length-4)/4; te_class++) {
+                bw = GET_BE_F_4(tptr + 4 + te_class * 4);
+                ND_PRINT("\n\t\t  Bandwidth constraint CT%u: %.3f Mbps",
+                       te_class,
+                       bw * 8 / 1000000);
+            }
+            break;
+        case LS_OPAQUE_TE_LINK_SUBTLV_TE_METRIC:
+            if (subtlv_length != 4) {
+                ND_PRINT(" != 4");
+                goto invalid;
+            }
+            ND_PRINT(", Metric %u", GET_BE_U_4(tptr));
+            break;
+        case LS_OPAQUE_TE_LINK_SUBTLV_LINK_PROTECTION_TYPE:
+            /* Protection Cap (1 octet) + Reserved ((3 octets) */
+            if (subtlv_length != 4) {
+                ND_PRINT(" != 4");
+                goto invalid;
+            }
+            ND_PRINT(", %s",
+                     bittok2str(gmpls_link_prot_values, "none", GET_U_1(tptr)));
+            break;
+        case LS_OPAQUE_TE_LINK_SUBTLV_INTF_SW_CAP_DESCR:
+            if (subtlv_length < 36) {
+                ND_PRINT(" < 36");
+                goto invalid;
+            }
+            /* Switching Cap (1 octet) + Encoding (1) +  Reserved (2) */
+            ND_PRINT("\n\t\tInterface Switching Capability: %s",
+                   tok2str(gmpls_switch_cap_values, "Unknown", GET_U_1((tptr))));
+            ND_PRINT("\n\t\tLSP Encoding: %s\n\t\tMax LSP Bandwidth:",
+                   tok2str(gmpls_encoding_values, "Unknown", GET_U_1((tptr + 1))));
+            for (priority_level = 0; priority_level < 8; priority_level++) {
+                bw = GET_BE_F_4(tptr + 4 + (priority_level * 4));
+                ND_PRINT("\n\t\t  priority level %u: %.3f Mbps",
+                       priority_level,
+                       bw * 8 / 1000000);
+            }
+            break;
+        case LS_OPAQUE_TE_LINK_SUBTLV_LINK_TYPE:
+            if (subtlv_length != 1) {
+                ND_PRINT(" != 1");
+                goto invalid;
+            }
+            ND_PRINT(", %s (%u)",
+                   tok2str(lsa_opaque_te_tlv_link_type_sub_tlv_values,"unknown",GET_U_1(tptr)),
+                   GET_U_1(tptr));
+            break;
+        case LS_OPAQUE_TE_LINK_SUBTLV_SHARED_RISK_GROUP:
+            if (subtlv_length % 4 != 0) {
+                ND_PRINT(" != N x 4");
+                goto invalid;
+            }
+            count_srlg = subtlv_length / 4;
+            if (count_srlg != 0)
+                ND_PRINT("\n\t\t  Shared risk group: ");
+            while (count_srlg > 0) {
+                ND_PRINT("%u", GET_BE_U_4(tptr));
+                tptr+=4;
+                count_srlg--;
+                if (count_srlg > 0)
+                    ND_PRINT(", ");
+            }
+            break;
+        default:
+            if (ndo->ndo_vflag <= 1) {
+                if (!print_unknown_data(ndo, tptr, "\n\t\t", subtlv_length))
+                    return -1;
+            }
+            break;
+        }
+        /* in OSPF everything has to be 32-bit aligned, including subTLVs */
+        if (subtlv_length%4 != 0) {
+            subtlv_length+=4-(subtlv_length%4);
+
+            if (tlv_length < subtlv_length) {
+                ND_PRINT("\n\t    Remaining TLV length %u < %u",
+                        tlv_length, subtlv_length);
+                return -1;
+            }
+        }
+        tlv_length-=subtlv_length;
+        tptr+=subtlv_length;
+    }
+    return 0;
+trunc:
+    return -1;
+invalid:
+    nd_print_invalid(ndo);
+    return -1;
+}
+
 int
 ospf_te_lsa_print(netdissect_options *ndo,
                   const u_char *tptr, u_int ls_length)
 {
-    u_int tlv_type, tlv_length, subtlv_type, subtlv_length;
-    u_int priority_level, te_class, count_srlg;
-    float bw;
+    u_int tlv_type, tlv_length;
 
     while (ls_length != 0) {
         ND_TCHECK_4(tptr);
@@ -350,206 +544,25 @@ ospf_te_lsa_print(netdissect_options *ndo,
         if (tlv_length > ls_length) {
             ND_PRINT("\n\t    Bogus length %u > %u", tlv_length,
                    ls_length);
-            return -1;
+            goto invalid;
         }
 
         /* Infinite loop protection. */
         if (tlv_type == 0 || tlv_length ==0) {
 	    nd_print_invalid(ndo);
-            return -1;
+            goto invalid;
         }
 
         switch(tlv_type) {
         case LS_OPAQUE_TE_TLV_LINK:
-            while (tlv_length != 0) {
-                if (tlv_length < 4) {
-                    ND_PRINT("\n\t    Remaining TLV length %u < 4",
-                           tlv_length);
-                    return -1;
-                }
-                subtlv_type = GET_BE_U_2(tptr);
-                subtlv_length = GET_BE_U_2(tptr + 2);
-                tptr+=4;
-                tlv_length-=4;
-
-		/* Infinite loop protection */
-		if (subtlv_type == 0 || subtlv_length == 0)
-		    goto invalid;
-
-                ND_PRINT("\n\t      %s subTLV (%u), length: %u",
-                       tok2str(lsa_opaque_te_link_tlv_subtlv_values,"unknown",subtlv_type),
-                       subtlv_type,
-                       subtlv_length);
-
-                if (tlv_length < subtlv_length) {
-                    ND_PRINT("\n\t    Remaining TLV length %u < %u",
-                           tlv_length, subtlv_length);
-                    return -1;
-                }
-                ND_TCHECK_LEN(tptr, subtlv_length);
-                switch(subtlv_type) {
-                case LS_OPAQUE_TE_LINK_SUBTLV_ADMIN_GROUP:
-		    if (subtlv_length != 4) {
-			ND_PRINT(" != 4");
-			goto invalid;
-		    }
-                    ND_PRINT(", 0x%08x", GET_BE_U_4(tptr));
-                    break;
-                case LS_OPAQUE_TE_LINK_SUBTLV_LINK_ID:
-                case LS_OPAQUE_TE_LINK_SUBTLV_LINK_LOCAL_REMOTE_ID:
-		    if (subtlv_length != 4 && subtlv_length != 8) {
-			ND_PRINT(" != 4 && != 8");
-			goto invalid;
-		    }
-                    ND_PRINT(", %s (0x%08x)",
-                           GET_IPADDR_STRING(tptr),
-                           GET_BE_U_4(tptr));
-                    if (subtlv_length == 8) /* rfc4203 */
-                        ND_PRINT(", %s (0x%08x)",
-                               GET_IPADDR_STRING(tptr+4),
-                               GET_BE_U_4(tptr + 4));
-                    break;
-                case LS_OPAQUE_TE_LINK_SUBTLV_LOCAL_IP:
-                case LS_OPAQUE_TE_LINK_SUBTLV_REMOTE_IP:
-		    if (subtlv_length != 4) {
-			ND_PRINT(" != 4");
-			goto invalid;
-		    }
-                    ND_PRINT(", %s", GET_IPADDR_STRING(tptr));
-                    break;
-                case LS_OPAQUE_TE_LINK_SUBTLV_MAX_BW:
-                case LS_OPAQUE_TE_LINK_SUBTLV_MAX_RES_BW:
-		    if (subtlv_length != 4) {
-			ND_PRINT(" != 4");
-			goto invalid;
-		    }
-                    bw = GET_BE_F_4(tptr);
-                    ND_PRINT(", %.3f Mbps", bw * 8 / 1000000);
-                    break;
-                case LS_OPAQUE_TE_LINK_SUBTLV_UNRES_BW:
-		    if (subtlv_length != 32) {
-			ND_PRINT(" != 32");
-			goto invalid;
-		    }
-                    for (te_class = 0; te_class < 8; te_class++) {
-                        bw = GET_BE_F_4(tptr + te_class * 4);
-                        ND_PRINT("\n\t\tTE-Class %u: %.3f Mbps",
-                               te_class,
-                               bw * 8 / 1000000);
-                    }
-                    break;
-                case LS_OPAQUE_TE_LINK_SUBTLV_BW_CONSTRAINTS:
-		    if (subtlv_length < 4) {
-			ND_PRINT(" < 4");
-			goto invalid;
-		    }
-		    /* BC Model Id (1 octet) + Reserved (3 octets) */
-                    ND_PRINT("\n\t\tBandwidth Constraints Model ID: %s (%u)",
-                           tok2str(diffserv_te_bc_values, "unknown", GET_U_1(tptr)),
-                           GET_U_1(tptr));
-		    if (subtlv_length % 4 != 0) {
-			ND_PRINT("\n\t\tlength %u != N x 4", subtlv_length);
-			goto invalid;
-		    }
-		    if (subtlv_length > 36) {
-			ND_PRINT("\n\t\tlength %u > 36", subtlv_length);
-			goto invalid;
-		    }
-                    /* decode BCs until the subTLV ends */
-                    for (te_class = 0; te_class < (subtlv_length-4)/4; te_class++) {
-                        bw = GET_BE_F_4(tptr + 4 + te_class * 4);
-                        ND_PRINT("\n\t\t  Bandwidth constraint CT%u: %.3f Mbps",
-                               te_class,
-                               bw * 8 / 1000000);
-                    }
-                    break;
-                case LS_OPAQUE_TE_LINK_SUBTLV_TE_METRIC:
-		    if (subtlv_length != 4) {
-			ND_PRINT(" != 4");
-			goto invalid;
-		    }
-                    ND_PRINT(", Metric %u", GET_BE_U_4(tptr));
-                    break;
-                case LS_OPAQUE_TE_LINK_SUBTLV_LINK_PROTECTION_TYPE:
-		    /* Protection Cap (1 octet) + Reserved ((3 octets) */
-		    if (subtlv_length != 4) {
-			ND_PRINT(" != 4");
-			goto invalid;
-		    }
-                    ND_PRINT(", %s",
-                             bittok2str(gmpls_link_prot_values, "none", GET_U_1(tptr)));
-                    break;
-                case LS_OPAQUE_TE_LINK_SUBTLV_INTF_SW_CAP_DESCR:
-		    if (subtlv_length < 36) {
-			ND_PRINT(" < 36");
-			goto invalid;
-		    }
-		    /* Switching Cap (1 octet) + Encoding (1) +  Reserved (2) */
-                    ND_PRINT("\n\t\tInterface Switching Capability: %s",
-                           tok2str(gmpls_switch_cap_values, "Unknown", GET_U_1((tptr))));
-                    ND_PRINT("\n\t\tLSP Encoding: %s\n\t\tMax LSP Bandwidth:",
-                           tok2str(gmpls_encoding_values, "Unknown", GET_U_1((tptr + 1))));
-                    for (priority_level = 0; priority_level < 8; priority_level++) {
-                        bw = GET_BE_F_4(tptr + 4 + (priority_level * 4));
-                        ND_PRINT("\n\t\t  priority level %u: %.3f Mbps",
-                               priority_level,
-                               bw * 8 / 1000000);
-                    }
-                    break;
-                case LS_OPAQUE_TE_LINK_SUBTLV_LINK_TYPE:
-		    if (subtlv_length != 1) {
-			ND_PRINT(" != 1");
-			goto invalid;
-		    }
-                    ND_PRINT(", %s (%u)",
-                           tok2str(lsa_opaque_te_tlv_link_type_sub_tlv_values,"unknown",GET_U_1(tptr)),
-                           GET_U_1(tptr));
-                    break;
-
-                case LS_OPAQUE_TE_LINK_SUBTLV_SHARED_RISK_GROUP:
-		    if (subtlv_length % 4 != 0) {
-			ND_PRINT(" != N x 4");
-			goto invalid;
-		    }
-                    count_srlg = subtlv_length / 4;
-                    if (count_srlg != 0)
-                        ND_PRINT("\n\t\t  Shared risk group: ");
-                    while (count_srlg > 0) {
-                        ND_PRINT("%u", GET_BE_U_4(tptr));
-                        tptr+=4;
-                        count_srlg--;
-                        if (count_srlg > 0)
-                            ND_PRINT(", ");
-                    }
-                    break;
-
-                default:
-                    if (ndo->ndo_vflag <= 1) {
-                        if (!print_unknown_data(ndo, tptr, "\n\t\t", subtlv_length))
-                            return -1;
-                    }
-                    break;
-                }
-                /* in OSPF everything has to be 32-bit aligned, including subTLVs */
-                if (subtlv_length%4 != 0) {
-                    subtlv_length+=4-(subtlv_length%4);
-
-                    if (tlv_length < subtlv_length) {
-                        ND_PRINT("\n\t    Remaining TLV length %u < %u",
-                           tlv_length, subtlv_length);
-                        return -1;
-                    }
-                }
-                tlv_length-=subtlv_length;
-                tptr+=subtlv_length;
-
-            }
+            if (ospf_te_tlv_link_print(ndo, tptr, tlv_length) == -1)
+                return -1;
             break;
 
         case LS_OPAQUE_TE_TLV_ROUTER:
             if (tlv_length < 4) {
                 ND_PRINT("\n\t    TLV length %u < 4", tlv_length);
-                return -1;
+                goto invalid;
             }
             ND_PRINT(", %s", GET_IPADDR_STRING(tptr));
             break;
@@ -557,7 +570,7 @@ ospf_te_lsa_print(netdissect_options *ndo,
         default:
             if (ndo->ndo_vflag <= 1) {
                 if (!print_unknown_data(ndo, tptr, "\n\t      ", tlv_length))
-                    return -1;
+                    goto invalid;
             }
             break;
         }
@@ -567,7 +580,7 @@ ospf_te_lsa_print(netdissect_options *ndo,
             if (tlv_length > ls_length) {
                 ND_PRINT("\n\t    Bogus padded length %u > %u", tlv_length,
                        ls_length);
-                return -1;
+                goto invalid;
             }
         }
         ls_length-=tlv_length;
