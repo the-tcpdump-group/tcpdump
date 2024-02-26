@@ -36,7 +36,6 @@
 
 #include "ospf.h"
 
-
 static const struct tok ospf_option_values[] = {
 	{ OSPF_OPTION_MT,	"MultiTopology" }, /* draft-ietf-ospf-mt-09 */
 	{ OSPF_OPTION_E,	"External" },
@@ -130,7 +129,6 @@ static const struct tok ep_range_tlv_prefix_sid_subtlv_flag_values[] = {
 	{ 0x04, "Local"},
 	{ 0,			NULL}
 };
-
 
 static const struct tok lsa_opaque_ep_route_type_values[] = {
 	{ 0, "Unspecified" },
@@ -238,7 +236,6 @@ ospf_grace_lsa_print(netdissect_options *ndo,
                      const u_char *tptr, u_int ls_length)
 {
     u_int tlv_type, tlv_length;
-
 
     while (ls_length != 0) {
         ND_TCHECK_4(tptr);
@@ -483,7 +480,7 @@ ospf_te_tlv_link_print(netdissect_options *ndo,
             count_srlg = subtlv_length / 4;
             if (count_srlg != 0)
                 ND_PRINT("\n\t\t  Shared risk group: ");
-            while (count_srlg > 0) {
+            while (count_srlg != 0) {
                 ND_PRINT("%u", GET_BE_U_4(tptr));
                 tptr+=4;
                 count_srlg--;
