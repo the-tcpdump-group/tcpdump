@@ -119,6 +119,19 @@
     #define DIAG_ON_C11_EXTENSIONS \
       DIAG_DO_PRAGMA(clang diagnostic pop)
   #endif
+
+  /*
+   * When Clang correctly detects an old-style function prototype after
+   * preprocessing, the warning can be irrelevant to this source tree because
+   * the prototype comes from a system header macro.
+   */
+  #if ND_IS_AT_LEAST_CLANG_VERSION(5,0)
+    #define DIAG_OFF_STRICT_PROTOTYPES \
+      DIAG_DO_PRAGMA(clang diagnostic push) \
+      DIAG_DO_PRAGMA(clang diagnostic ignored "-Wstrict-prototypes")
+    #define DIAG_ON_STRICT_PROTOTYPES \
+      DIAG_DO_PRAGMA(clang diagnostic pop)
+  #endif
 #elif ND_IS_AT_LEAST_GNUC_VERSION(4,2)
   /* GCC apparently doesn't complain about ORing enums together. */
 
@@ -159,6 +172,9 @@
   /*
    * GCC supports -Wc99-c11-compat since version 5.1.0, but the warning does
    * not trigger for now, so let's just leave it be.
+   *
+   * GCC does not currently generate any -Wstrict-prototypes warnings that
+   * would need silencing as is done for Clang above.
    */
 #endif
 
@@ -205,6 +221,12 @@
 #endif
 #ifndef DIAG_ON_C11_EXTENSIONS
 #define DIAG_ON_C11_EXTENSIONS
+#endif
+#ifndef DIAG_OFF_STRICT_PROTOTYPES
+#define DIAG_OFF_STRICT_PROTOTYPES
+#endif
+#ifndef DIAG_ON_STRICT_PROTOTYPES
+#define DIAG_ON_STRICT_PROTOTYPES
 #endif
 #ifndef ND_UNREACHABLE
 #define ND_UNREACHABLE
