@@ -2379,7 +2379,21 @@ DIAG_ON_WARN_UNUSED_RESULT
 #endif
 	/* Cooperate with nohup(1) */
 #ifndef _WIN32
+	/*
+	 * In illumos /usr/include/sys/iso/signal_iso.h causes Clang to
+	 * generate a -Wstrict-prototypes warning here, see [1].  The
+	 * __illumos__ macro is available since at least GCC 11 and Clang 13,
+	 * see [2].
+	 * 1: https://www.illumos.org/issues/16344
+	 * 2: https://www.illumos.org/issues/13726
+	 */
+#ifdef __illumos__
+	DIAG_OFF_STRICT_PROTOTYPES
+#endif /* __illumos__ */
 	if ((oldhandler = setsignal(SIGHUP, cleanup)) != SIG_DFL)
+#ifdef __illumos__
+	DIAG_ON_STRICT_PROTOTYPES
+#endif /* __illumos__ */
 		(void)setsignal(SIGHUP, oldhandler);
 #endif /* _WIN32 */
 
@@ -2816,7 +2830,14 @@ static void
 		)
 		new.sa_flags = SA_RESTART;
 	if (sigaction(sig, &new, &old) < 0)
+		/* The same workaround as for SIG_DFL above. */
+#ifdef __illumos__
+		DIAG_OFF_STRICT_PROTOTYPES
+#endif /* __illumos__ */
 		return (SIG_ERR);
+#ifdef __illumos__
+		DIAG_ON_STRICT_PROTOTYPES
+#endif /* __illumos__ */
 	return (old.sa_handler);
 #endif
 }
