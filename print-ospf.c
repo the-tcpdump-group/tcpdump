@@ -317,6 +317,7 @@ ospf_grace_lsa_print(netdissect_options *ndo,
 
     return 0;
 trunc:
+    nd_print_trunc(ndo);
     return -1;
 }
 
@@ -510,6 +511,7 @@ ospf_te_tlv_link_print(netdissect_options *ndo,
     }
     return 0;
 trunc:
+    nd_print_trunc(ndo);
     return -1;
 invalid:
     nd_print_invalid(ndo);
@@ -585,6 +587,7 @@ ospf_te_lsa_print(netdissect_options *ndo,
     }
     return 0;
 trunc:
+    nd_print_trunc(ndo);
     return -1;
 invalid:
     nd_print_invalid(ndo);
@@ -1254,6 +1257,7 @@ ospf_print_lsa(netdissect_options *ndo,
 
 	return (ls_end);
 trunc:
+	nd_print_trunc(ndo);
 	return (NULL);
 }
 
