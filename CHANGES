@@ -116,6 +116,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Autoconf: don't use egrep, use $EGREP.
       Autoconf: check for gethostbyaddr(), not gethostbyname().
       Autoconf, CMake: search for gethostbyaddr() in libnetwork.
+      Make illumos build warning-free.
     Documentation:
       Fixed errors in doc/README.Win32.md and renamed it to README.windows.md.
       Make various improvements to the man page.
