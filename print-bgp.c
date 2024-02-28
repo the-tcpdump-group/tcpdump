@@ -697,9 +697,8 @@ badtlv:
 }
 
 static int
-decode_labeled_prefix4(netdissect_options *ndo,
-                       const u_char *pptr, u_int itemlen, char *buf,
-                       size_t buflen)
+print_labeled_prefix4(netdissect_options *ndo,
+                      const u_char *pptr, u_int itemlen)
 {
     nd_ipv4 addr;
     u_int plen, plenbytes;
@@ -718,12 +717,12 @@ decode_labeled_prefix4(netdissect_options *ndo,
     */
 
     if (24 > plen)
-        return -1;
+        goto badplen;
 
     plen-=24; /* adjust prefixlen - labellength */
 
     if (32 < plen)
-        return -1;
+        goto badplen;
     itemlen -= 4;
 
     memset(&addr, 0, sizeof(addr));
@@ -734,13 +733,17 @@ decode_labeled_prefix4(netdissect_options *ndo,
         ((u_char *)&addr)[plenbytes - 1] &= ((0xff00 >> (plen % 8)) & 0xff);
     }
     /* the label may get offsetted by 4 bits so lets shift it right */
-    snprintf(buf, buflen, "%s/%u, label:%u %s",
+    ND_PRINT("\n\t      %s/%u, label:%u %s",
              ipaddr_string(ndo, (const u_char *)&addr),
              plen,
              GET_BE_U_3(pptr + 1)>>4,
              ((GET_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
 
     return 4 + plenbytes;
+
+badplen:
+    ND_PRINT("\n\t    (illegal prefix length)");
+    return -1;
 
 trunc:
     return -2;
@@ -799,11 +802,10 @@ bgp_vpn_ip_print(netdissect_options *ndo,
  * return the number of bytes read from the wire.
  */
 static u_int
-bgp_vpn_sg_print(netdissect_options *ndo,
-                 const u_char *pptr, char *buf, size_t buflen)
+bgp_vpn_sg_print(netdissect_options *ndo, const u_char *pptr)
 {
     uint8_t addr_length;
-    u_int total_length, offset;
+    u_int total_length;
 
     total_length = 0;
 
@@ -814,10 +816,9 @@ bgp_vpn_sg_print(netdissect_options *ndo,
     /* Source address */
     ND_TCHECK_LEN(pptr, (addr_length >> 3));
     total_length += (addr_length >> 3) + 1;
-    offset = (u_int)strlen(buf);
     if (addr_length) {
-        snprintf(buf + offset, buflen - offset, ", Source %s",
-             bgp_vpn_ip_print(ndo, pptr, addr_length));
+        ND_PRINT(", Source %s",
+                 bgp_vpn_ip_print(ndo, pptr, addr_length));
         pptr += (addr_length >> 3);
     }
 
@@ -828,10 +829,9 @@ bgp_vpn_sg_print(netdissect_options *ndo,
     /* Group address */
     ND_TCHECK_LEN(pptr, (addr_length >> 3));
     total_length += (addr_length >> 3) + 1;
-    offset = (u_int)strlen(buf);
     if (addr_length) {
-        snprintf(buf + offset, buflen - offset, ", Group %s",
-             bgp_vpn_ip_print(ndo, pptr, addr_length));
+        ND_PRINT(", Group %s",
+                 bgp_vpn_ip_print(ndo, pptr, addr_length));
         pptr += (addr_length >> 3);
     }
 
@@ -841,8 +841,7 @@ trunc:
 
 /* Print an RFC 4364 Route Distinguisher */
 const char *
-bgp_vpn_rd_print(netdissect_options *ndo,
-                 const u_char *pptr)
+bgp_vpn_rd_print(netdissect_options *ndo, const u_char *pptr)
 {
     /* allocate space for the largest possible string */
     static char rd[sizeof("xxxxx.xxxxx:xxxxx (xxx.xxx.xxx.xxx:xxxxx)")];
@@ -1089,8 +1088,7 @@ bgp_rt_prefix_print(netdissect_options *ndo,
 
 /* RFC 4684 */
 static int
-decode_rt_routing_info(netdissect_options *ndo,
-                       const u_char *pptr)
+print_rt_routing_info(netdissect_options *ndo, const u_char *pptr)
 {
     uint8_t route_target[8];
     u_int plen;
@@ -1146,8 +1144,7 @@ decode_rt_routing_info(netdissect_options *ndo,
 }
 
 static int
-decode_labeled_vpn_prefix4(netdissect_options *ndo,
-                           const u_char *pptr, char *buf, size_t buflen)
+print_labeled_vpn_prefix4(netdissect_options *ndo, const u_char *pptr)
 {
     nd_ipv4 addr;
     u_int plen;
@@ -1155,12 +1152,12 @@ decode_labeled_vpn_prefix4(netdissect_options *ndo,
     plen = GET_U_1(pptr);   /* get prefix length */
 
     if ((24+64) > plen)
-        return -1;
+        goto badplen;
 
     plen -= (24+64); /* adjust prefixlen - labellength - RD len*/
 
     if (32 < plen)
-        return -1;
+        goto badplen;
 
     memset(&addr, 0, sizeof(addr));
     GET_CPY_BYTES(&addr, pptr + 12, (plen + 7) / 8);
@@ -1169,7 +1166,7 @@ decode_labeled_vpn_prefix4(netdissect_options *ndo,
             ((0xff00 >> (plen % 8)) & 0xff);
     }
     /* the label may get offsetted by 4 bits so lets shift it right */
-    snprintf(buf, buflen, "RD: %s, %s/%u, label:%u %s",
+    ND_PRINT("\n\t      RD: %s, %s/%u, label:%u %s",
                 bgp_vpn_rd_print(ndo, pptr+4),
                 ipaddr_string(ndo, (const u_char *)&addr),
                 plen,
@@ -1177,6 +1174,10 @@ decode_labeled_vpn_prefix4(netdissect_options *ndo,
                 ((GET_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
 
     return 12 + (plen + 7) / 8;
+
+badplen:
+    ND_PRINT("\n\t    (illegal prefix length)");
+    return -1;
 }
 
 /*
@@ -1192,15 +1193,16 @@ decode_labeled_vpn_prefix4(netdissect_options *ndo,
 #define MDT_VPN_NLRI_LEN 16
 
 static int
-decode_mdt_vpn_nlri(netdissect_options *ndo,
-                    const u_char *pptr, char *buf, size_t buflen)
+print_mdt_vpn_nlri(netdissect_options *ndo, const u_char *pptr)
 {
     const u_char *rd;
     const u_char *vpn_ip;
 
     /* if the NLRI is not predefined length, quit.*/
-    if (GET_U_1(pptr) != MDT_VPN_NLRI_LEN * 8)
+    if (GET_U_1(pptr) != MDT_VPN_NLRI_LEN * 8) {
+        ND_PRINT("\n\t    (illegal prefix length)");
         return -1;
+    }
     pptr++;
 
     /* RD */
@@ -1213,8 +1215,10 @@ decode_mdt_vpn_nlri(netdissect_options *ndo,
     pptr += sizeof(nd_ipv4);
 
     /* MDT Group Address */
-    snprintf(buf, buflen, "RD: %s, VPN IP Address: %s, MC Group Address: %s",
-                bgp_vpn_rd_print(ndo, rd), GET_IPADDR_STRING(vpn_ip), GET_IPADDR_STRING(pptr));
+    ND_PRINT("\n\t      RD: %s, VPN IP Address: %s, MC Group Address: %s",
+             bgp_vpn_rd_print(ndo, rd),
+             GET_IPADDR_STRING(vpn_ip),
+             GET_IPADDR_STRING(pptr));
 
     return MDT_VPN_NLRI_LEN + 1;
 
@@ -1242,21 +1246,19 @@ static const struct tok bgp_multicast_vpn_route_type_values[] = {
 };
 
 static int
-decode_multicast_vpn(netdissect_options *ndo,
-                     const u_char *pptr, char *buf, size_t buflen)
+print_multicast_vpn(netdissect_options *ndo, const u_char *pptr)
 {
     /* allocate space for the largest possible string */
     char astostr[AS_STR_SIZE];
     uint8_t route_type, route_length;
     u_int addr_length, sg_length;
-    u_int offset;
 
     route_type = GET_U_1(pptr);
     pptr++;
     route_length = GET_U_1(pptr);
     pptr++;
 
-    snprintf(buf, buflen, "Route-Type: %s (%u), length: %u",
+    ND_PRINT("\n\t      Route-Type: %s (%u), length: %u",
          tok2str(bgp_multicast_vpn_route_type_values,
                  "Unknown", route_type),
          route_type, route_length);
@@ -1266,58 +1268,50 @@ decode_multicast_vpn(netdissect_options *ndo,
         ND_TCHECK_LEN(pptr, BGP_VPN_RD_LEN);
         if (route_length < BGP_VPN_RD_LEN)
             goto trunc;
-        offset = (u_int)strlen(buf);
-        snprintf(buf + offset, buflen - offset, ", RD: %s, Originator %s",
+        ND_PRINT(", RD: %s, Originator %s",
                     bgp_vpn_rd_print(ndo, pptr),
                     bgp_vpn_ip_print(ndo, pptr + BGP_VPN_RD_LEN,
                                      (route_length - BGP_VPN_RD_LEN) << 3));
         break;
     case BGP_MULTICAST_VPN_ROUTE_TYPE_INTER_AS_I_PMSI:
         ND_TCHECK_LEN(pptr, BGP_VPN_RD_LEN + 4);
-        offset = (u_int)strlen(buf);
-        snprintf(buf + offset, buflen - offset, ", RD: %s, Source-AS %s",
-        bgp_vpn_rd_print(ndo, pptr),
-        as_printf(ndo, astostr, sizeof(astostr),
-        GET_BE_U_4(pptr + BGP_VPN_RD_LEN)));
+        ND_PRINT(", RD: %s, Source-AS %s",
+                 bgp_vpn_rd_print(ndo, pptr),
+                 as_printf(ndo, astostr, sizeof(astostr),
+                           GET_BE_U_4(pptr + BGP_VPN_RD_LEN)));
         break;
 
     case BGP_MULTICAST_VPN_ROUTE_TYPE_S_PMSI:
         ND_TCHECK_LEN(pptr, BGP_VPN_RD_LEN);
-        offset = (u_int)strlen(buf);
-        snprintf(buf + offset, buflen - offset, ", RD: %s",
-                    bgp_vpn_rd_print(ndo, pptr));
+        ND_PRINT(", RD: %s",  bgp_vpn_rd_print(ndo, pptr));
         pptr += BGP_VPN_RD_LEN;
 
-        sg_length = bgp_vpn_sg_print(ndo, pptr, buf, buflen);
+        sg_length = bgp_vpn_sg_print(ndo, pptr);
         addr_length =  route_length - sg_length;
 
         ND_TCHECK_LEN(pptr, addr_length);
-        offset = (u_int)strlen(buf);
-        snprintf(buf + offset, buflen - offset, ", Originator %s",
-                    bgp_vpn_ip_print(ndo, pptr, addr_length << 3));
+        ND_PRINT(", Originator %s",
+                 bgp_vpn_ip_print(ndo, pptr, addr_length << 3));
         break;
 
     case BGP_MULTICAST_VPN_ROUTE_TYPE_SOURCE_ACTIVE:
         ND_TCHECK_LEN(pptr, BGP_VPN_RD_LEN);
-        offset = (u_int)strlen(buf);
-        snprintf(buf + offset, buflen - offset, ", RD: %s",
-                    bgp_vpn_rd_print(ndo, pptr));
+        ND_PRINT(", RD: %s", bgp_vpn_rd_print(ndo, pptr));
         pptr += BGP_VPN_RD_LEN;
 
-        bgp_vpn_sg_print(ndo, pptr, buf, buflen);
+        bgp_vpn_sg_print(ndo, pptr);
         break;
 
     case BGP_MULTICAST_VPN_ROUTE_TYPE_SHARED_TREE_JOIN: /* fall through */
     case BGP_MULTICAST_VPN_ROUTE_TYPE_SOURCE_TREE_JOIN:
         ND_TCHECK_LEN(pptr, BGP_VPN_RD_LEN + 4);
-        offset = (u_int)strlen(buf);
-        snprintf(buf + offset, buflen - offset, ", RD: %s, Source-AS %s",
-                    bgp_vpn_rd_print(ndo, pptr),
-                    as_printf(ndo, astostr, sizeof(astostr),
-                    GET_BE_U_4(pptr + BGP_VPN_RD_LEN)));
+        ND_PRINT(", RD: %s, Source-AS %s",
+                 bgp_vpn_rd_print(ndo, pptr),
+                 as_printf(ndo, astostr, sizeof(astostr),
+                           GET_BE_U_4(pptr + BGP_VPN_RD_LEN)));
         pptr += BGP_VPN_RD_LEN + 4;
 
-        bgp_vpn_sg_print(ndo, pptr, buf, buflen);
+        bgp_vpn_sg_print(ndo, pptr);
         break;
 
         /*
@@ -1355,11 +1349,9 @@ trunc:
     }
 
 static int
-decode_labeled_vpn_l2(netdissect_options *ndo,
-                      const u_char *pptr, char *buf, size_t buflen)
+print_labeled_vpn_l2(netdissect_options *ndo, const u_char *pptr)
 {
     u_int plen, tlen, tlv_type, tlv_len, ttlv_len;
-    int stringlen;
 
     plen = GET_BE_U_2(pptr);
     tlen = plen;
@@ -1371,36 +1363,27 @@ decode_labeled_vpn_l2(netdissect_options *ndo,
     if (plen == 12) {
         /* assume AD-only with RD, BGPNH */
         ND_TCHECK_LEN(pptr, 12);
-        buf[0] = '\0';
-        stringlen = snprintf(buf, buflen, "RD: %s, BGPNH: %s",
+        ND_PRINT("\n\t      RD: %s, BGPNH: %s",
                                 bgp_vpn_rd_print(ndo, pptr),
                                 GET_IPADDR_STRING(pptr+8));
-        UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
-        pptr += 12;
-        tlen -= 12;
         return plen + 2;
     } else if (plen > 17) {
         /* assume old format */
         /* RD, ID, LBLKOFF, LBLBASE */
 
         ND_TCHECK_LEN(pptr, 15);
-        buf[0] = '\0';
-        stringlen = snprintf(buf, buflen, "RD: %s, CE-ID: %u, Label-Block Offset: %u, Label Base %u",
+        ND_PRINT("\n\t      RD: %s, CE-ID: %u, Label-Block Offset: %u, Label Base %u",
                                 bgp_vpn_rd_print(ndo, pptr),
                                 GET_BE_U_2(pptr + 8),
                                 GET_BE_U_2(pptr + 10),
                                 GET_BE_U_3(pptr + 12)>>4); /* the label is offsetted by 4 bits so lets shift it right */
-        UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
         pptr += 15;
         tlen -= 15;
 
         /* ok now the variable part - lets read out TLVs*/
         while (tlen != 0) {
             if (tlen < 3) {
-                if (buflen != 0) {
-                    stringlen=snprintf(buf,buflen, "\n\t\tran past the end");
-                    UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
-                }
+                ND_PRINT("\n\t\tran past the end");
                 return plen + 2;
             }
             tlv_type = GET_U_1(pptr);
@@ -1411,43 +1394,27 @@ decode_labeled_vpn_l2(netdissect_options *ndo,
 
             switch(tlv_type) {
             case 1:
-                if (buflen != 0) {
-                    stringlen=snprintf(buf,buflen, "\n\t\tcircuit status vector (%u) length: %u: 0x",
-                                          tlv_type,
-                                          tlv_len);
-                    UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
-                }
+                ND_PRINT("\n\t\tcircuit status vector (%u) length: %u: 0x",
+                                      tlv_type,
+                                      tlv_len);
                 while (ttlv_len != 0) {
                     if (tlen < 1) {
-                        if (buflen != 0) {
-                            stringlen=snprintf(buf,buflen, " (ran past the end)");
-                            UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
-                        }
+                        ND_PRINT(" (ran past the end)");
                         return plen + 2;
                     }
                     ND_TCHECK_1(pptr);
-                    if (buflen != 0) {
-                        stringlen=snprintf(buf,buflen, "%02x",
-                                              GET_U_1(pptr));
-                        pptr++;
-                        UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
-                    }
+                    ND_PRINT("%02x", GET_U_1(pptr));
+                    pptr++;
                     ttlv_len--;
                     tlen--;
                 }
                 break;
             default:
-                if (buflen != 0) {
-                    stringlen=snprintf(buf,buflen, "\n\t\tunknown TLV #%u, length: %u",
-                                          tlv_type,
-                                          tlv_len);
-                    UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
-                }
+                ND_PRINT("\n\t\tunknown TLV #%u, length: %u",
+                                      tlv_type,
+                                      tlv_len);
                 if (tlen < ttlv_len) {
-                    if (buflen != 0) {
-                        stringlen=snprintf(buf,buflen, " (ran past the end)");
-                        UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
-                    }
+                    ND_PRINT(" (ran past the end)");
                     return plen + 2;
                 }
                 tlen -= ttlv_len;
@@ -1494,8 +1461,8 @@ badtlv:
 }
 
 static int
-decode_labeled_prefix6(netdissect_options *ndo,
-               const u_char *pptr, u_int itemlen, char *buf, size_t buflen)
+print_labeled_prefix6(netdissect_options *ndo,
+                      const u_char *pptr, u_int itemlen)
 {
     nd_ipv6 addr;
     u_int plen, plenbytes;
@@ -1506,12 +1473,12 @@ decode_labeled_prefix6(netdissect_options *ndo,
     plen = GET_U_1(pptr); /* get prefix length */
 
     if (24 > plen)
-        return -1;
+        goto badplen;
 
     plen -= 24; /* adjust prefixlen - labellength */
 
     if (128 < plen)
-        return -1;
+        goto badplen;
     itemlen -= 4;
 
     memset(&addr, 0, sizeof(addr));
@@ -1522,13 +1489,17 @@ decode_labeled_prefix6(netdissect_options *ndo,
             ((0xff00 >> (plen % 8)) & 0xff);
     }
     /* the label may get offsetted by 4 bits so lets shift it right */
-    snprintf(buf, buflen, "%s/%u, label:%u %s",
+    ND_PRINT("\n\t      %s/%u, label:%u %s",
                 ip6addr_string(ndo, (const u_char *)&addr),
                 plen,
                 GET_BE_U_3(pptr + 1)>>4,
                 ((GET_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
 
     return 4 + plenbytes;
+
+badplen:
+    ND_PRINT("\n\t    (illegal prefix length)");
+    return -1;
 
 trunc:
     return -2;
@@ -1538,8 +1509,7 @@ badtlv:
 }
 
 static int
-decode_labeled_vpn_prefix6(netdissect_options *ndo,
-                           const u_char *pptr, char *buf, size_t buflen)
+print_labeled_vpn_prefix6(netdissect_options *ndo, const u_char *pptr)
 {
     nd_ipv6 addr;
     u_int plen;
@@ -1547,12 +1517,12 @@ decode_labeled_vpn_prefix6(netdissect_options *ndo,
     plen = GET_U_1(pptr);   /* get prefix length */
 
     if ((24+64) > plen)
-        return -1;
+        goto badplen;
 
     plen -= (24+64); /* adjust prefixlen - labellength - RD len*/
 
     if (128 < plen)
-        return -1;
+        goto badplen;
 
     memset(&addr, 0, sizeof(addr));
     GET_CPY_BYTES(&addr, pptr + 12, (plen + 7) / 8);
@@ -1561,7 +1531,7 @@ decode_labeled_vpn_prefix6(netdissect_options *ndo,
             ((0xff00 >> (plen % 8)) & 0xff);
     }
     /* the label may get offsetted by 4 bits so lets shift it right */
-    snprintf(buf, buflen, "RD: %s, %s/%u, label:%u %s",
+    ND_PRINT("\n\t      RD: %s, %s/%u, label:%u %s",
                 bgp_vpn_rd_print(ndo, pptr+4),
                 ip6addr_string(ndo, (const u_char *)&addr),
                 plen,
@@ -1569,11 +1539,14 @@ decode_labeled_vpn_prefix6(netdissect_options *ndo,
                 ((GET_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
 
     return 12 + (plen + 7) / 8;
+
+badplen:
+    ND_PRINT("\n\t    (illegal prefix length)");
+    return -1;
 }
 
 static int
-decode_clnp_prefix(netdissect_options *ndo,
-                   const u_char *pptr, char *buf, size_t buflen)
+print_clnp_prefix(netdissect_options *ndo, const u_char *pptr)
 {
     uint8_t addr[19];
     u_int plen;
@@ -1581,7 +1554,7 @@ decode_clnp_prefix(netdissect_options *ndo,
     plen = GET_U_1(pptr); /* get prefix length */
 
     if (152 < plen)
-        return -1;
+        goto badplen;
 
     memset(&addr, 0, sizeof(addr));
     GET_CPY_BYTES(&addr, pptr + 4, (plen + 7) / 8);
@@ -1590,16 +1563,19 @@ decode_clnp_prefix(netdissect_options *ndo,
             ((0xff00 >> (plen % 8)) & 0xff);
     }
     /* Cannot use GET_ISONSAP_STRING (not packet buffer pointer) */
-    snprintf(buf, buflen, "%s/%u",
+    ND_PRINT("\n\t      %s/%u",
                 isonsap_string(ndo, addr,(plen + 7) / 8),
                 plen);
 
     return 1 + (plen + 7) / 8;
+
+badplen:
+    ND_PRINT("\n\t    (illegal prefix length)");
+    return -1;
 }
 
 static int
-decode_labeled_vpn_clnp_prefix(netdissect_options *ndo,
-                               const u_char *pptr, char *buf, size_t buflen)
+print_labeled_vpn_clnp_prefix(netdissect_options *ndo, const u_char *pptr)
 {
     uint8_t addr[19];
     u_int plen;
@@ -1607,12 +1583,12 @@ decode_labeled_vpn_clnp_prefix(netdissect_options *ndo,
     plen = GET_U_1(pptr);   /* get prefix length */
 
     if ((24+64) > plen)
-        return -1;
+        goto badplen;
 
     plen -= (24+64); /* adjust prefixlen - labellength - RD len*/
 
     if (152 < plen)
-        return -1;
+        goto badplen;
 
     memset(&addr, 0, sizeof(addr));
     GET_CPY_BYTES(&addr, pptr + 12, (plen + 7) / 8);
@@ -1621,7 +1597,7 @@ decode_labeled_vpn_clnp_prefix(netdissect_options *ndo,
     }
     /* the label may get offsetted by 4 bits so lets shift it right */
     /* Cannot use GET_ISONSAP_STRING (not packet buffer pointer) */
-    snprintf(buf, buflen, "RD: %s, %s/%u, label:%u %s",
+    ND_PRINT("\n\t      RD: %s, %s/%u, label:%u %s",
                 bgp_vpn_rd_print(ndo, pptr+4),
                 isonsap_string(ndo, addr,(plen + 7) / 8),
                 plen,
@@ -1629,6 +1605,10 @@ decode_labeled_vpn_clnp_prefix(netdissect_options *ndo,
                 ((GET_U_1(pptr + 3) & 1) == 0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
 
     return 12 + (plen + 7) / 8;
+
+badplen:
+    ND_PRINT("\n\t    (illegal prefix length)");
+    return -1;
 }
 
 /*
@@ -1817,11 +1797,11 @@ trunc:
 static int
 bgp_nlri_print(netdissect_options *ndo, uint16_t af, uint8_t safi,
 	       const u_char *tptr, u_int len,
-	       char *buf, size_t buflen,
 	       int add_path4, int add_path6)
 {
 	int advance;
 	u_int path_id = 0;
+	char buf[512];
 
 	switch (af<<8 | safi) {
             case (AFNUM_IP<<8 | SAFNUM_UNICAST):
@@ -1831,7 +1811,7 @@ bgp_nlri_print(netdissect_options *ndo, uint16_t af, uint8_t safi,
                     path_id = GET_BE_U_4(tptr);
                     tptr += 4;
                 }
-                advance = decode_prefix4(ndo, tptr, len, buf, buflen);
+                advance = decode_prefix4(ndo, tptr, len, buf, sizeof(buf));
                 if (advance == -1)
                     ND_PRINT("\n\t    (illegal prefix length)");
                 else if (advance == -2)
@@ -1844,47 +1824,29 @@ bgp_nlri_print(netdissect_options *ndo, uint16_t af, uint8_t safi,
                 }
                 break;
             case (AFNUM_IP<<8 | SAFNUM_LABUNICAST):
-                advance = decode_labeled_prefix4(ndo, tptr, len, buf, buflen);
-                if (advance == -1)
-                    ND_PRINT("\n\t    (illegal prefix length)");
-                else if (advance == -2)
+                advance = print_labeled_prefix4(ndo, tptr, len);
+                if (advance == -2)
                     goto trunc;
-                else if (advance == -3)
-                    break; /* bytes left, but not enough */
-                else
-                    ND_PRINT("\n\t      %s", buf);
                 break;
             case (AFNUM_IP<<8 | SAFNUM_VPNUNICAST):
             case (AFNUM_IP<<8 | SAFNUM_VPNMULTICAST):
             case (AFNUM_IP<<8 | SAFNUM_VPNUNIMULTICAST):
-                advance = decode_labeled_vpn_prefix4(ndo, tptr, buf, buflen);
-                if (advance == -1)
-                    ND_PRINT("\n\t    (illegal prefix length)");
-                else
-                    ND_PRINT("\n\t      %s", buf);
+                advance = print_labeled_vpn_prefix4(ndo, tptr);
                 break;
             case (AFNUM_IP<<8 | SAFNUM_RT_ROUTING_INFO):
-                advance = decode_rt_routing_info(ndo, tptr);
+                advance = print_rt_routing_info(ndo, tptr);
                 break;
             case (AFNUM_IP<<8 | SAFNUM_MULTICAST_VPN): /* fall through */
             case (AFNUM_IP6<<8 | SAFNUM_MULTICAST_VPN):
-                advance = decode_multicast_vpn(ndo, tptr, buf, buflen);
-                if (advance == -1)
-                    ND_PRINT("\n\t    (illegal prefix length)");
-                else if (advance == -2)
+                advance = print_multicast_vpn(ndo, tptr);
+                if (advance == -2)
                     goto trunc;
-                else
-                    ND_PRINT("\n\t      %s", buf);
                 break;
 
             case (AFNUM_IP<<8 | SAFNUM_MDT):
-                advance = decode_mdt_vpn_nlri(ndo, tptr, buf, buflen);
-                if (advance == -1)
-                    ND_PRINT("\n\t    (illegal prefix length)");
-                else if (advance == -2)
+                advance = print_mdt_vpn_nlri(ndo, tptr);
+                if (advance == -2)
                     goto trunc;
-                else
-                    ND_PRINT("\n\t      %s", buf);
                 break;
             case (AFNUM_IP6<<8 | SAFNUM_UNICAST):
             case (AFNUM_IP6<<8 | SAFNUM_MULTICAST):
@@ -1893,7 +1855,7 @@ bgp_nlri_print(netdissect_options *ndo, uint16_t af, uint8_t safi,
                     path_id = GET_BE_U_4(tptr);
                     tptr += 4;
                 }
-                advance = decode_prefix6(ndo, tptr, len, buf, buflen);
+                advance = decode_prefix6(ndo, tptr, len, buf, sizeof(buf));
                 if (advance == -1)
                     ND_PRINT("\n\t    (illegal prefix length)");
                 else if (advance == -2)
@@ -1906,54 +1868,32 @@ bgp_nlri_print(netdissect_options *ndo, uint16_t af, uint8_t safi,
                 }
                 break;
             case (AFNUM_IP6<<8 | SAFNUM_LABUNICAST):
-                advance = decode_labeled_prefix6(ndo, tptr, len, buf, buflen);
-                if (advance == -1)
-                    ND_PRINT("\n\t    (illegal prefix length)");
-                else if (advance == -2)
+                advance = print_labeled_prefix6(ndo, tptr, len);
+                if (advance == -2)
                     goto trunc;
-                else if (advance == -3)
-                    break; /* bytes left, but not enough */
-                else
-                    ND_PRINT("\n\t      %s", buf);
                 break;
             case (AFNUM_IP6<<8 | SAFNUM_VPNUNICAST):
             case (AFNUM_IP6<<8 | SAFNUM_VPNMULTICAST):
             case (AFNUM_IP6<<8 | SAFNUM_VPNUNIMULTICAST):
-                advance = decode_labeled_vpn_prefix6(ndo, tptr, buf, buflen);
-                if (advance == -1)
-                    ND_PRINT("\n\t    (illegal prefix length)");
-                else
-                    ND_PRINT("\n\t      %s", buf);
+                advance = print_labeled_vpn_prefix6(ndo, tptr);
                 break;
             case (AFNUM_VPLS<<8 | SAFNUM_VPLS):
             case (AFNUM_L2VPN<<8 | SAFNUM_VPNUNICAST):
             case (AFNUM_L2VPN<<8 | SAFNUM_VPNMULTICAST):
             case (AFNUM_L2VPN<<8 | SAFNUM_VPNUNIMULTICAST):
-                advance = decode_labeled_vpn_l2(ndo, tptr, buf, buflen);
-                if (advance == -1)
-                    ND_PRINT("\n\t    (illegal length)");
-                else if (advance == -2)
+                advance = print_labeled_vpn_l2(ndo, tptr);
+                if (advance == -2)
                     goto trunc;
-                else
-                    ND_PRINT("\n\t      %s", buf);
                 break;
             case (AFNUM_NSAP<<8 | SAFNUM_UNICAST):
             case (AFNUM_NSAP<<8 | SAFNUM_MULTICAST):
             case (AFNUM_NSAP<<8 | SAFNUM_UNIMULTICAST):
-                advance = decode_clnp_prefix(ndo, tptr, buf, buflen);
-                if (advance == -1)
-                    ND_PRINT("\n\t    (illegal prefix length)");
-                else
-                    ND_PRINT("\n\t      %s", buf);
+                advance = print_clnp_prefix(ndo, tptr);
                 break;
             case (AFNUM_NSAP<<8 | SAFNUM_VPNUNICAST):
             case (AFNUM_NSAP<<8 | SAFNUM_VPNMULTICAST):
             case (AFNUM_NSAP<<8 | SAFNUM_VPNUNIMULTICAST):
-                advance = decode_labeled_vpn_clnp_prefix(ndo, tptr, buf, buflen);
-                if (advance == -1)
-                    ND_PRINT("\n\t    (illegal prefix length)");
-                else
-                    ND_PRINT("\n\t      %s", buf);
+                advance = print_labeled_vpn_clnp_prefix(ndo, tptr);
                 break;
             default:
 		/*
@@ -1990,7 +1930,6 @@ bgp_attr_print(netdissect_options *ndo,
     int advance;
     u_int tlen;
     const u_char *tptr;
-    char buf[512];
     u_int as_size;
     int add_path4, add_path6;
     int ret;
@@ -2350,7 +2289,7 @@ bgp_attr_print(netdissect_options *ndo,
                                    (len-ND_BYTES_BETWEEN(pptr, tptr)), 128);
 
         while (tptr < pptr + len) {
-            advance = bgp_nlri_print(ndo, af, safi, tptr, len, buf, sizeof(buf),
+            advance = bgp_nlri_print(ndo, af, safi, tptr, len,
                     add_path4, add_path6);
             if (advance == -2)
                 goto trunc;
@@ -2379,7 +2318,7 @@ bgp_attr_print(netdissect_options *ndo,
                                    (len-ND_BYTES_BETWEEN(pptr, tptr)), 128);
 
         while (tptr < pptr + len) {
-            advance = bgp_nlri_print(ndo, af, safi, tptr, len, buf, sizeof(buf),
+            advance = bgp_nlri_print(ndo, af, safi, tptr, len,
                     add_path4, add_path6);
             if (advance == -2)
                 goto trunc;
