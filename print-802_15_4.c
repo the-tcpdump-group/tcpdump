@@ -1299,7 +1299,7 @@ ieee802_15_4_print_mlme_ie_list(netdissect_options *ndo,
 		ND_PRINT("] ");
 		p += sub_ie_len;
 		ie_len -= 2 + sub_ie_len;
-	} while (ie_len > 0);
+	} while (ie_len != 0);
 }
 
 /*
@@ -1502,7 +1502,7 @@ ieee802_15_4_print_payload_ie_list(netdissect_options *ndo,
 		if (group_id == 0xf) {
 			break;
 		}
-	} while (caplen > 0);
+	} while (caplen != 0);
 	return len;
 }
 
