@@ -22,7 +22,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       NTP: Check that the entire extension field is in the capture even
         if it isn't printed
       MPTCP: parse MPC data_len field, print flags from MP_CAPABLE option.
-      OSPF: Fix printing of Traffic Engineering Link TLVs to correcly
+      OSPF: Fix printing of Traffic Engineering Link TLVs to correctly
         advance the packet data pointer
       OSPF: Print more truncation indications
       OSPF: Add more length checks

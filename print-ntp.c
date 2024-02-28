@@ -589,7 +589,7 @@ p_ext_fields(netdissect_options *ndo, const u_char *cp, u_int length)
 		p_ntp_ef(ndo, ef_type, ef_len, (const u_char *)(ef + 1));
 
 		/*
-		 * The entire extension field is guaranted to be in the
+		 * The entire extension field is guaranteed to be in the
 		 * captured data, as p_ntp_ef() will longjmp out if it
 		 * isn't.
 		 *
