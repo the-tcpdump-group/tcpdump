@@ -18,6 +18,15 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       BGP: add dissector for BGPsec capability and path
       BGP: Add Origin Validation State extended community
       BGP: Add support for BGP Role capability and OTC attribute
+      BGP: Fix most printing code to print directly rather than filling
+        in a fixed-size buffer to be printed later
+      OSPF: Fix printing of Traffic Engineering Link TLVs to correcly
+        advance the packet data pointer
+      OSPF: Print more truncation indications
+      OSPF: Add more length checks
+      NTP: Check that the entire extension field is in the capture even
+        if it isn't printed
+      DNS: Detect and correectly handle too-short URI RRs
     User interface:
       Add optional unit suffix on -C file size.
       Add --print-sampling to print every Nth packet instead of all.
@@ -32,6 +41,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       UDP: Clean up address and port printing.
       AppleTalk: Declutter appletalk.h.
       IEEE 802.11: Simplify handle_action().
+      Provide GET_ macros for 4-byte and 8-byte floating-point numbers
+        and use them rather than custom code
     Building and testing:
       autoconf: Add autogen.sh, remove configure and config.h.in and put
         these generated files in the release tarball.
