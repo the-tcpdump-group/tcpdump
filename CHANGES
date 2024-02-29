@@ -1,12 +1,7 @@
 DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
   Summary for 5.0.0 tcpdump release (so far!)
     Refine protocol decoding for:
-      NetFlow: Use tcp_flag_values[] for TCP flags.
       BFD: Add support for S-BFD and spell LAG in uppercase.
-      IEEE 802.11: include the Mesh ID field while printing management
-        frames.
-      MPTCP: parse MPC data_len field, print flags from MP_CAPABLE option.
-      ICMP: add dissector for ICMP Interface Identification Object
       BGP: Parse BGP extended message support capability
       BGP: Deprecate DPA, ADVERTISER and RCID_PATH path attributes
       BGP: Print Enhanced route refresh capability
@@ -20,12 +15,17 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       BGP: Add support for BGP Role capability and OTC attribute
       BGP: Fix most printing code to print directly rather than filling
         in a fixed-size buffer to be printed later
+      ICMP: add dissector for ICMP Interface Identification Object
+      IEEE 802.11: include the Mesh ID field while printing management
+        frames.
+      NetFlow: Use tcp_flag_values[] for TCP flags.
+      NTP: Check that the entire extension field is in the capture even
+        if it isn't printed
+      MPTCP: parse MPC data_len field, print flags from MP_CAPABLE option.
       OSPF: Fix printing of Traffic Engineering Link TLVs to correcly
         advance the packet data pointer
       OSPF: Print more truncation indications
       OSPF: Add more length checks
-      NTP: Check that the entire extension field is in the capture even
-        if it isn't printed
     User interface:
       Add optional unit suffix on -C file size.
       Add --print-sampling to print every Nth packet instead of all.
