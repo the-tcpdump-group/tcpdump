@@ -84,6 +84,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       LDP: Add missing fields of the Common Session Parameters TLV and fix the
         offset for the A&D bits.
       NFLOG: Use correct AF code points on all OSes.
+      OSPF: Pad TLVs in LS_OPAQUE_TYPE_RI to multiples of 4 bytes.
       OSPF6: Fix an undefined behavior.
       pflog: use nd_ types in struct pfloghdr.
       PPP: Check if there is some data to hexdump.
