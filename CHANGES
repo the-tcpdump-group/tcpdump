@@ -62,7 +62,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       DHCPv6: client-id/server-id DUID type 2 correction; parse the user class,
         boot file URL, and SZTP redirect options; add DUID-UUID printing
         (RFC6355).
-      DNS: Detect and correectly handle too-short URI RRs
+      DNS: Detect and correctly handle too-short URI RRs.
       EAP: Assign ndo_protocol in the eap_print() function.
       IEEE 802.11: no need for an element ID in the structures for IEs, make
         the length in the IE structures a u_int, include the "TA" field while
