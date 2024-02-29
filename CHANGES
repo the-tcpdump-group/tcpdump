@@ -26,7 +26,6 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       OSPF: Add more length checks
       NTP: Check that the entire extension field is in the capture even
         if it isn't printed
-      DNS: Detect and correectly handle too-short URI RRs
     User interface:
       Add optional unit suffix on -C file size.
       Add --print-sampling to print every Nth packet instead of all.
@@ -64,6 +63,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       DHCP: parse the SZTP redirect tag.
       DHCPv6: client-id/server-id DUID type 2 correction; Parse the user class,          boot file URL, and SZTP redirect options; Add DUID-UUID printing
          (RFC6355).
+      DNS: Detect and correectly handle too-short URI RRs
       EAP: Assign ndo_protocol in the eap_print() function.
       IEEE 802.11: no need for an element ID in the structures for IEs, make
         the length in the IE structures a u_int, include the "TA" field while
