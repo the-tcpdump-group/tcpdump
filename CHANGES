@@ -63,11 +63,11 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       At build time require a proof of suitable snprintf(3) implementation in
         libc (and document Solaris 9 as unsupported because of that).
       Makefile.in: Add two "touch .devel" commands in the releasecheck target.
-      Autoconf: Get --with-user and --with-chroot right.
-      Autoconf: Fix --static-pcap-only test on Solaris 10.
+      autoconf: Get --with-user and --with-chroot right.
+      autoconf: Fix --static-pcap-only test on Solaris 10.
       autoconf: Add some warning flags for clang 13 or newer.
-      Autoconf: Update config.{guess,sub}, timestamps 2024-01-01.
-      Autoconf: Add autogen.sh, remove configure and config.h.in and put
+      autoconf: Update config.{guess,sub}, timestamps 2024-01-01.
+      autoconf: Add autogen.sh, remove configure and config.h.in and put
         these generated files in the release tarball.
       configure: Apply autoupdate 2.69.
       CMake: improve the comment before project(tcpdump C).
@@ -1762,7 +1762,7 @@ v2.0.1 Sun Jan 26 21:10:10 PDT
 - Ultrix 4.0 is supported (also thanks to Jeff Mogul).
 
 - IBM RT and Stanford Enetfilter support has been added by
-  Rayan Zachariassen <rayan@canet.ca>.  Tcpdump has been tested under
+  Rayan Zachariassen <rayan@canet.ca>.  tcpdump has been tested under
   both the vanilla Enetfilter interface, and the extended interface
   (#ifdef'd by IBMRTPC) present in the MERIT version of the Enetfilter.
 
