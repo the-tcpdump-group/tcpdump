@@ -584,7 +584,7 @@ hoobr_juniper		hoobr_juniper.pcap		hoobr_juniper.out
 hoobr_juniper2		hoobr_juniper2.pcap		hoobr_juniper2.out
 hoobr_juniper3		hoobr_juniper3.pcap		hoobr_juniper3.out
 hoobr_juniper4		hoobr_juniper4.pcap		hoobr_juniper4.out
-hoobr_parse_field	hoobr_parse_field.pcap		hoobr_parse_field.out
+hoobr_zephyr_parse_field hoobr_zephyr_parse_field.pcap	hoobr_zephyr_parse_field.out
 hoobr_chdlc_print	hoobr_chdlc_print.pcap		hoobr_chdlc_print.out
 hoobr_lookup_nsap	hoobr_lookup_nsap.pcap		hoobr_lookup_nsap.out
 hoobr_rt6_print		hoobr_rt6_print.pcap		hoobr_rt6_print.out
