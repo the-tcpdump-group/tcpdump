@@ -1036,9 +1036,13 @@ endif()
 # usage: cmake -DEXTRA_CFLAGS='-Wall -Wextra -Werror' ...
 #
 if(NOT "${EXTRA_CFLAGS}" STREQUAL "")
-    foreach(_extra_cflag ${EXTRA_CFLAGS})
-        check_and_add_compiler_option("${_extra_cflag}")
-    endforeach(_extra_cflag)
+    # The meaning of EXTRA_CFLAGS is "use the exact specified options, or the
+    # build risks failing to fail", not "try every specified option, omit those
+    # that do not work and use the rest".  Thus use add_compile_options(), not
+    # foreach()/check_and_add_compiler_option().  Another reason to do that is
+    # that the effect lasts in testprogs/ and testprogs/fuzz/.
+    string(REPLACE " " ";" _extra_cflags_list ${EXTRA_CFLAGS})
+    add_compile_options(${_extra_cflags_list})
     message(STATUS "Added extra compile options (${EXTRA_CFLAGS})")
 endif()
 

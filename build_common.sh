@@ -196,7 +196,10 @@ cc_werr_cflags() {
         echo '-qhalt=w'
         ;;
     suncc-*)
-        echo '-errwarn=%all'
+        # GCC and Clang print an identification for every warning, which is
+        # useful for root cause analysis and bug fixing.  Sun C does not do it
+        # by default, but an additional option makes the style more consistent.
+        echo '-errwarn=%all -errtags=yes'
         ;;
     msvc-*)
         # XXX - what?
