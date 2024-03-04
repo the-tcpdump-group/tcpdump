@@ -84,6 +84,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Do not require vsnprintf().
       tests: Use the -tttt option, by default, for the tests.
       autoconf, CMake: Get the size of a void * and a time_t.
+      Fix propagation of cc_werr_cflags() output.
     Documentation:
       Fixed errors in doc/README.Win32.md.
 
