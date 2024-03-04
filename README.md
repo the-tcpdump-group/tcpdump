@@ -25,19 +25,20 @@ recent snapshot it will take to compile tcpdump from the source code.
 
 tcpdump compiles and works on at least the following platforms:
 
-* AIX
+* [AIX](./doc/README.aix.md)
 * DragonFly BSD
 * FreeBSD
-* Haiku
+* [Haiku](./doc/README.haiku.md)
 * HP-UX 11i
 * illumos (OmniOS, OpenIndiana)
 * GNU/Hurd
 * GNU/Linux
 * {Mac} OS X / macOS
-* NetBSD
+* [NetBSD](./doc/README.NetBSD.md)
 * OpenBSD
-* Solaris
-* Windows (requires WinPcap or Npcap, and Visual Studio with CMake)
+* [Solaris and related OSes](./doc/README.solaris.md)
+* [Windows](./doc/README.Win32.md) (requires WinPcap or Npcap, and Visual
+  Studio with CMake)
 
 In the past tcpdump certainly or likely worked on the following platforms:
 
@@ -46,6 +47,7 @@ In the past tcpdump certainly or likely worked on the following platforms:
 * DEC OSF/1, later Digital UNIX, later Tru64 UNIX
 * DOS
 * IRIX
+* LynxOS
 * SINIX
 * SunOS
 * Ultrix
