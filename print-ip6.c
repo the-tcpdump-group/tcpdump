@@ -275,7 +275,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	if (payload_len != 0) {
 		len = payload_len + sizeof(struct ip6_hdr);
 		if (len > length) {
-			ND_PRINT("[payload+header length %u > length %u]",
+			ND_PRINT("[header+payload length %u > length %u]",
 				 len, length);
 			nd_print_invalid(ndo);
 			ND_PRINT(" ");
@@ -435,7 +435,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 				if (len < total_advance)
 					goto trunc;
 				if (len > length) {
-					ND_PRINT("[payload+header length %u > length %u]",
+					ND_PRINT("[header+payload length %u > length %u]",
 						 len, length);
 					nd_print_invalid(ndo);
 					ND_PRINT(" ");
