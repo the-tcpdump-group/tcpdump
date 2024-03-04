@@ -235,12 +235,20 @@ os_id() {
         echo "$os_id_release" | sed 's/^\([0-9\.]*\).*$/\1/'
         ;;
     Haiku)
-        # Meaningful version is the substring before the plus sign.
-        # "hrev56578" stands for "R1/beta4".
-        # "hrev55181" stands for "R1/beta3".
-        # "hrev54154" stands for "R1/beta2".
+        # The complete version is a substring before the first space, e.g.:
+        # * "hrevNNNNN" for a release without updates, e.g. hrev56578 for
+        #   R1/beta4, also for a clean build of master branch;
+        # * "hrevNNNNN+MM" for a release with updates;
+        # * "hrevNNNNN-MM" for a build of a branch that is ahead of the master
+        #   branch;
+        # * "hrevNNNNN_MMMM_KK" for a CI build of a Gerrit review;
+        # * something else for a build of a working copy with the changes not
+        #   yet commited.
+        # With this system it is not clear which version components would be
+        # meaningful to relate with the build result, so let's return the
+        # complete version and leave any interpretation to the user.
         : "${os_id_version:=`uname -v`}"
-        echo "$os_id_version" | sed 's/^\(hrev.*\)+.*$/\1/'
+        echo "$os_id_version" | sed -E 's/^(hrev[^ ]+).+$/\1/'
         ;;
     MSYS*)
         # uname -s produces "MSYS_NT-{NT version?}-{build?}
