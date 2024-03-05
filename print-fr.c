@@ -526,11 +526,18 @@ mfr_print(netdissect_options *ndo,
                 break;
 
             case MFR_CTRL_IE_TIMESTAMP:
-                if (ie_len == sizeof(struct timeval)) {
-                    ts_print(ndo, (const struct timeval *)tptr);
+                /*
+                 * FRF.16.1 Section 3.4.4 Timestamp Information Element
+                 *
+                 * The maximum length is 14 octets. Format is implementation
+                 * specific.
+                 */
+                if (ie_len > 14) {
+                    ND_PRINT("[Timestamp IE length %d > 14]", ie_len);
+                    nd_print_invalid(ndo);
                     break;
                 }
-                /* fall through and hexdump if no unix timestamp */
+                /* fall through and hexdump */
                 ND_FALL_THROUGH;
 
                 /*
