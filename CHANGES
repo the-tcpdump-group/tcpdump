@@ -11,6 +11,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
         (RFC6355).
       DNS: Detect and correctly handle too-short URI RRs.
       EAP: Assign ndo_protocol in the eap_print() function.
+      Frame Relay (Multilink) : Fix the Timestamp Information Element printing
+      ICMPv6: Fix printing the Home Agent Address Discovery Reply Message
       IEEE 802.11: no need for an element ID in the structures for IEs, make
         the length in the IE structures a u_int, include the "TA" field while
         printing Block Ack Control frame.
