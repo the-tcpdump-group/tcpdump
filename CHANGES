@@ -60,6 +60,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Include <time.h> from netdissect.h.
       Remove init_crc10_table() and the entourage.
       Initialize tzcode early.
+      Capsicum support: Fix a 'not defined' macro error.
     Building and testing:
       Add a configure option to help debugging (--enable-instrument-functions)
       At build time require a proof of suitable snprintf(3) implementation in
