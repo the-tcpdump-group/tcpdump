@@ -636,6 +636,19 @@ cmake_pop_check_state()
 # so we use check_struct_has_member() and look for ss_family.
 #
 
+#
+# Large file support on UN*X, a/k/a LFS.
+#
+if(NOT WIN32)
+  include(FindLFS)
+  if(LFS_FOUND)
+    #
+    # Add the required #defines.
+    #
+    add_definitions(${LFS_DEFINITIONS})
+  endif()
+endif()
+
 ######################################
 # External dependencies
 ######################################

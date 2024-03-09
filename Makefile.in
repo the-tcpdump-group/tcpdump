@@ -347,6 +347,7 @@ EXTRA_DIST = \
 	atime.awk \
 	bpf_dump.c \
 	cmake/Modules/FindCRYPTO.cmake \
+	cmake/Modules/FindLFS.cmake \
 	cmake/Modules/FindPCAP.cmake \
 	cmake/Modules/FindSMI.cmake \
 	cmake_uninstall.cmake.in \
