@@ -219,6 +219,7 @@ option(WITH_CRYPTO "Build with OpenSSL/libressl libcrypto, if available" ON)
 option(WITH_CAPSICUM "Build with Capsicum security functions, if available" ON)
 option(WITH_CAP_NG "Use libcap-ng, if available" ON)
 option(ENABLE_SMB "Build with the SMB dissector" OFF)
+option(WITH_MSGPUCK "Build with msgpuck, if available" ON)
 
 #
 # String parameters.  Neither of them are set, initially; only if the
@@ -820,6 +821,22 @@ if(WITH_SMI)
 endif(WITH_SMI)
 
 #
+# msgpuck.
+#
+if(WITH_MSGPUCK)
+    find_package(MSGPUCK)
+    if(MSGPUCK_FOUND)
+        check_library_exists(${MSGPUCK_LIBRARY} mp_check_ext_data ""
+            MSGPUCK_HAVE_CHECK_EXT_DATA)
+        if (MSGPUCK_HAVE_CHECK_EXT_DATA)
+            include_directories(SYSTEM ${MSGPUCK_INCLUDE_DIRS})
+            set(TCPDUMP_LINK_LIBRARIES ${TCPDUMP_LINK_LIBRARIES} ${MSGPUCK_LIBRARIES})
+            set(HAVE_MSGPUCK ON)
+        endif()
+    endif(MSGPUCK_FOUND)
+endif(WITH_MSGPUCK)
+
+#
 # OpenSSL/libressl libcrypto.
 #
 if(WITH_CRYPTO)
@@ -1217,6 +1234,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-sunrpc.c
     print-symantec.c
     print-syslog.c
+    print-tarantool.c
     print-tcp.c
     print-telnet.c
     print-tftp.c

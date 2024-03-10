@@ -230,6 +230,7 @@ LIBNETDISSECT_SRC=\
 	print-sunrpc.c \
 	print-symantec.c \
 	print-syslog.c \
+	print-tarantool.c \
 	print-tcp.c \
 	print-telnet.c \
 	print-tftp.c \

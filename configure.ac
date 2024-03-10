@@ -136,6 +136,23 @@ int main()
 	])
 fi
 
+AC_ARG_WITH([tarantool],
+   [AS_HELP_STRING([--with-tarantool],
+     [link with msgpuck (Tarantool binary protocol support) [default=yes, if available]])],
+   [],
+   [with_tarantool=yes])
+
+if test "x$with_tarantool" != "xno" ; then
+	AC_CHECK_HEADER(msgpuck.h,
+	[
+		AC_CHECK_LIB(msgpuck, mp_check_ext_data,
+		[
+			LIBS="$LIBS -lmsgpuck"
+			AC_DEFINE(HAVE_MSGPUCK, 1, [Define to 1 if you have the `msgpuck` library (-lmsgpuck)])
+		])
+	])
+fi
+
 AC_MSG_CHECKING([whether to enable the instrument functions code])
 AC_ARG_ENABLE([instrument-functions],
    [AS_HELP_STRING([--enable-instrument-functions],
