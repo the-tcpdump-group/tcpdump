@@ -214,17 +214,17 @@ nd_printjnp(netdissect_options *ndo, const u_char *s, u_int n)
  * Print the timestamp .FRAC part (Microseconds/nanoseconds)
  */
 static void
-ts_frac_print(netdissect_options *ndo, long usec)
+ts_frac_print(netdissect_options *ndo, const struct timeval *tv)
 {
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
 	switch (ndo->ndo_tstamp_precision) {
 
 	case PCAP_TSTAMP_PRECISION_MICRO:
-		ND_PRINT(".%06u", (unsigned)usec);
+		ND_PRINT(".%06u", (unsigned)tv->tv_usec);
 		break;
 
 	case PCAP_TSTAMP_PRECISION_NANO:
-		ND_PRINT(".%09u", (unsigned)usec);
+		ND_PRINT(".%09u", (unsigned)tv->tv_usec);
 		break;
 
 	default:
@@ -232,7 +232,7 @@ ts_frac_print(netdissect_options *ndo, long usec)
 		break;
 	}
 #else
-	ND_PRINT(".%06u", (unsigned)usec);
+	ND_PRINT(".%06u", (unsigned)tv->tv_usec);
 #endif
 }
 
@@ -242,23 +242,22 @@ ts_frac_print(netdissect_options *ndo, long usec)
  *   if date_flag == WITH_DATE print YY:MM:DD before HH:MM:SS.FRAC
  */
 static void
-ts_date_hmsfrac_print(netdissect_options *ndo, long sec, long usec,
+ts_date_hmsfrac_print(netdissect_options *ndo, const struct timeval *tv,
 		      enum date_flag date_flag, enum time_flag time_flag)
 {
-	time_t Time = sec;
 	struct tm *tm;
 	char timebuf[32];
 	const char *timestr;
 
-	if ((unsigned)sec & 0x80000000) {
+	if ((unsigned)tv->tv_sec & 0x80000000) {
 		ND_PRINT("[Error converting time]");
 		return;
 	}
 
 	if (time_flag == LOCAL_TIME)
-		tm = localtime(&Time);
+		tm = localtime(&tv->tv_sec);
 	else
-		tm = gmtime(&Time);
+		tm = gmtime(&tv->tv_sec);
 
 	if (date_flag == WITH_DATE) {
 		timestr = nd_format_time(timebuf, sizeof(timebuf),
@@ -269,22 +268,22 @@ ts_date_hmsfrac_print(netdissect_options *ndo, long sec, long usec,
 	}
 	ND_PRINT("%s", timestr);
 
-	ts_frac_print(ndo, usec);
+	ts_frac_print(ndo, tv);
 }
 
 /*
  * Print the timestamp - Unix timeval style, as SECS.FRAC.
  */
 static void
-ts_unix_print(netdissect_options *ndo, long sec, long usec)
+ts_unix_print(netdissect_options *ndo, const struct timeval *tv)
 {
-	if ((unsigned)sec & 0x80000000) {
+	if ((unsigned)tv->tv_sec & 0x80000000) {
 		ND_PRINT("[Error converting time]");
 		return;
 	}
 
-	ND_PRINT("%u", (unsigned)sec);
-	ts_frac_print(ndo, usec);
+	ND_PRINT("%u", (unsigned)tv->tv_sec);
+	ts_frac_print(ndo, tv);
 }
 
 /*
@@ -302,8 +301,7 @@ ts_print(netdissect_options *ndo,
 	switch (ndo->ndo_tflag) {
 
 	case 0: /* Default */
-		ts_date_hmsfrac_print(ndo, tvp->tv_sec, tvp->tv_usec,
-				      WITHOUT_DATE, LOCAL_TIME);
+		ts_date_hmsfrac_print(ndo, tvp, WITHOUT_DATE, LOCAL_TIME);
 		ND_PRINT(" ");
 		break;
 
@@ -311,7 +309,7 @@ ts_print(netdissect_options *ndo,
 		break;
 
 	case 2: /* Unix timeval style */
-		ts_unix_print(ndo, tvp->tv_sec, tvp->tv_usec);
+		ts_unix_print(ndo, tvp);
 		ND_PRINT(" ");
 		break;
 
@@ -342,8 +340,7 @@ ts_print(netdissect_options *ndo,
 			netdissect_timevalsub(tvp, &tv_ref, &tv_result, nano_prec);
 
 		ND_PRINT((negative_offset ? "-" : " "));
-		ts_date_hmsfrac_print(ndo, tv_result.tv_sec, tv_result.tv_usec,
-				      WITHOUT_DATE, UTC_TIME);
+		ts_date_hmsfrac_print(ndo, &tv_result, WITHOUT_DATE, UTC_TIME);
 		ND_PRINT(" ");
 
                 if (ndo->ndo_tflag == 3)
@@ -351,8 +348,7 @@ ts_print(netdissect_options *ndo,
 		break;
 
 	case 4: /* Date + Default */
-		ts_date_hmsfrac_print(ndo, tvp->tv_sec, tvp->tv_usec,
-				      WITH_DATE, LOCAL_TIME);
+		ts_date_hmsfrac_print(ndo, tvp, WITH_DATE, LOCAL_TIME);
 		ND_PRINT(" ");
 		break;
 	}
