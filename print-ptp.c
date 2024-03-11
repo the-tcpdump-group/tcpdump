@@ -292,10 +292,10 @@ static void ptp_print_2(netdissect_options *ndo, const u_char *bp, u_int len);
 static void ptp_print_timestamp(netdissect_options *ndo, const u_char *bp, u_int *len, const char *stype);
 static void ptp_print_timestamp_identity(netdissect_options *ndo, const u_char *bp, u_int *len, const char *ttype);
 static void ptp_print_announce_msg(netdissect_options *ndo, const u_char *bp, u_int *len);
-static void ptp_print_port_id(netdissect_options *ndo, const u_char *bp, u_int *len);
+static const u_char *ptp_print_port_id(netdissect_options *ndo, const u_char *bp, u_int *len);
 static void ptp_print_mgmt_msg(netdissect_options *ndo, const u_char *bp, u_int *len);
 
-static void
+static const u_char *
 print_field(netdissect_options *ndo, const char *st, uint32_t flen,
             const u_char *bp, u_int *len, uint8_t hex)
 {
@@ -344,6 +344,8 @@ print_field(netdissect_options *ndo, const char *st, uint32_t flen,
         default:
             break;
     }
+
+    return bp;
 }
 
 static void
@@ -614,7 +616,8 @@ ptp_print_announce_msg(netdissect_options *ndo, const u_char *bp, u_int *len)
     bp += 1;
 
 }
-static void
+
+static const u_char *
 ptp_print_port_id(netdissect_options *ndo, const u_char *bp, u_int *len)
 {
     uint16_t port_id;
@@ -632,14 +635,15 @@ ptp_print_port_id(netdissect_options *ndo, const u_char *bp, u_int *len)
     *len -= 2;
     bp += 2;
 
+    return bp;
 }
 
 static void
 ptp_print_mgmt_msg(netdissect_options *ndo, const u_char *bp, u_int *len)
 {
-    ptp_print_port_id(ndo, bp, len);
-    print_field(ndo, ", start boundary hops ", PTP_UCHAR_LEN, bp, len, PTP_FALSE);
-    print_field(ndo, ", boundary hops ", PTP_UCHAR_LEN, bp, len, PTP_FALSE);
-    print_field(ndo, ", flags ", PTP_UCHAR_LEN, bp, len, PTP_TRUE);
-    print_field(ndo, ", reserved ", PTP_UCHAR_LEN, bp, len, PTP_TRUE);
+    bp = ptp_print_port_id(ndo, bp, len);
+    bp = print_field(ndo, "start boundary hops:", PTP_UCHAR_LEN, bp, len, PTP_FALSE);
+    bp = print_field(ndo, "boundary hops:", PTP_UCHAR_LEN, bp, len, PTP_FALSE);
+    bp = print_field(ndo, "flags:", PTP_UCHAR_LEN, bp, len, PTP_TRUE);
+    bp = print_field(ndo, "reserved:", PTP_UCHAR_LEN, bp, len, PTP_TRUE);
 }
