@@ -1,1 +1,1 @@
-    1  09:28:06.000000 IP6 2001:db8:1::1 > cafe:1::2: RT6 (len=5, type=4, segleft=0, last-entry=0, tag=0, [0]cafe:1::2, TLV-type=HMAC(5), TLV-len=16) no next header
+    1  2021-10-22 09:28:06.000000 IP6 2001:db8:1::1 > cafe:1::2: RT6 (len=5, type=4, segleft=0, last-entry=0, tag=0, [0]cafe:1::2, TLV-type=HMAC(5), TLV-len=16) no next header

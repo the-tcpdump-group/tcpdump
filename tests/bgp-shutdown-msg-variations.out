@@ -1,11 +1,11 @@
-    1  01:19:23.958779 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto TCP (6), length 81)
+    1  2022-04-05 01:19:23.958779 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto TCP (6), length 81)
     127.0.0.1.20 > 127.0.0.1.179: Flags [S], cksum 0xa709 (correct), seq 0:41, win 8192, length 41: BGP
 	Notification Message (3), length: 41, Cease (6), subcode Administrative Reset (4), Shutdown Communication (length: 10): "0123456789", Data: (length: 9)
 		0x0000:  4578 7472 6144 6174 61
-    2  01:19:23.960010 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto TCP (6), length 62)
+    2  2022-04-05 01:19:23.960010 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto TCP (6), length 62)
     127.0.0.1.20 > 127.0.0.1.179: Flags [S], cksum 0x89e7 (correct), seq 0:22, win 8192, length 22: BGP
 	Notification Message (3), length: 22, Cease (6), subcode Administrative Reset (4), empty Shutdown Communication
-    3  01:19:23.960948 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto TCP (6), length 72)
+    3  2022-04-05 01:19:23.960948 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto TCP (6), length 72)
     127.0.0.1.20 > 127.0.0.1.179: Flags [S], cksum 0x8489 (correct), seq 0:32, win 8192, length 32: BGP
 	Notification Message (3), length: 32, Cease (6), subcode Administrative Reset (4), invalid Shutdown Communication length, Data: (length: 11)
 		0x0000:  4030 3132 3334 3536 3738 39

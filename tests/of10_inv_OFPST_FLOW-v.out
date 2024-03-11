@@ -1,4 +1,4 @@
-    1  04:47:19.498417 IP (tos 0x0, ttl 64, id 60713, offset 0, flags [DF], proto TCP (6), length 562, bad cksum 11cf (->28df)!)
+    1  2014-04-24 04:47:19.498417 IP (tos 0x0, ttl 64, id 60713, offset 0, flags [DF], proto TCP (6), length 562, bad cksum 11cf (->28df)!)
     109.74.179.168.6653 > 88.150.169.52.4756: Flags [P.], seq 3053183029:3053183539, ack 3441835434, win 59369, options [eol], length 510: OpenFlow
 	version 1.0, type STATS_REPLY, length 128, xid 0xffff0100
 	 type FLOW, flags 0x003e (bogus)
@@ -17,7 +17,7 @@
 	  action [remaining length 4 < 8] (invalid)
 	 [remaining length 24 < 88] (invalid)
 	version unknown (0x5c), type unknown (0x1e), length 56297, xid 0xf4ffff04 [|openflow]
-    2  05:25:04.505352 IP (tos 0x0, ttl 64, id 60713, offset 0, flags [DF], proto TCP (6), length 562, bad cksum 11cf (->28df)!)
+    2  1970-07-14 05:25:04.505352 IP (tos 0x0, ttl 64, id 60713, offset 0, flags [DF], proto TCP (6), length 562, bad cksum 11cf (->28df)!)
     109.74.179.168.6653 > 88.150.169.52.4756: Flags [P.], seq 0:510, ack 1627389953, win 59369, options [eol], length 510: OpenFlow
 	version 1.0, type STATS_REPLY, length 128, xid 0xffff0100
 	 type FLOW, flags 0x003e (bogus)

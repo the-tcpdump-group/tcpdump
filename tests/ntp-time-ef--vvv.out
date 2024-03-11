@@ -1,4 +1,4 @@
-    1  13:23:30.254335 IP (tos 0x0, ttl 64, id 62645, offset 0, flags [DF], proto UDP (17), length 360)
+    1  2022-08-11 13:23:30.254335 IP (tos 0x0, ttl 64, id 62645, offset 0, flags [DF], proto UDP (17), length 360)
     10.43.135.229.57551 > 162.159.200.123.123: [udp sum ok] NTPv4, Client, length 332
 	Leap indicator:  (0), Stratum 0 (unspecified), poll 6 (64s), precision 32
 	Root Delay: 0.000000, Root dispersion: 0.000000, Reference-ID: (unspec)
@@ -32,7 +32,7 @@
 	    0x0000:  0010 0010 be30 1336 d3eb 3cad ce3e 94c1
 	    0x0010:  4fbb d155 35e9 37b9 638d faa3 c4c9 f1b8
 	    0x0020:  1e44 7d3d
-    2  13:23:30.258867 IP (tos 0x0, ttl 55, id 41904, offset 0, flags [DF], proto UDP (17), length 360)
+    2  2022-08-11 13:23:30.258867 IP (tos 0x0, ttl 55, id 41904, offset 0, flags [DF], proto UDP (17), length 360)
     162.159.200.123.123 > 10.43.135.229.57551: [udp sum ok] NTPv4, Server, length 332
 	Leap indicator:  (0), Stratum 3 (secondary reference), poll 6 (64s), precision -25
 	Root Delay: 0.017074, Root dispersion: 0.000732, Reference-ID: 0x0a1f0880

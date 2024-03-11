@@ -1,4 +1,4 @@
-    1  19:36:14.856146 IP (tos 0xc0, ttl 1, id 20666, offset 0, flags [DF], proto TCP (6), length 147)
+    1  2021-10-31 19:36:14.856146 IP (tos 0xc0, ttl 1, id 20666, offset 0, flags [DF], proto TCP (6), length 147)
     192.168.10.68.179 > 192.168.10.252.34091: Flags [P.], cksum 0x415f (correct), seq 2489578672:2489578767, ack 2869082848, win 227, options [nop,nop,TS val 435210 ecr 2547569735], length 95: BGP
 	Open Message (1), length: 95
 	  Version 4, my AS 65001, Holdtime 180s, ID 192.168.10.68

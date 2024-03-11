@@ -1,4 +1,4 @@
-    1  09:02:50.838041 IP (tos 0xc0, ttl 255, id 51487, offset 0, flags [DF], proto TCP (6), length 321)
+    1  2022-10-04 09:02:50.838041 IP (tos 0xc0, ttl 255, id 51487, offset 0, flags [DF], proto TCP (6), length 321)
     192.168.10.17.53084 > 192.168.10.124.179: Flags [P.], cksum 0x9711 (incorrect -> 0xbe28), seq 1852580574:1852580843, ack 3956070749, win 126, options [nop,nop,TS val 429792956 ecr 3755909458], length 269: BGP
 	Update Message (2), length: 68
 	  Origin (1), length: 1, Flags [T]: Incomplete

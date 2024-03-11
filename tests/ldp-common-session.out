@@ -1,12 +1,12 @@
-    1  12:23:59.828062 IP (tos 0xc0, ttl 255, id 1498, offset 0, flags [none], proto TCP (6), length 72)
+    1  2023-08-10 12:23:59.828062 IP (tos 0xc0, ttl 255, id 1498, offset 0, flags [none], proto TCP (6), length 72)
     192.168.0.2.58320 > 192.168.0.1.646: Flags [P.], cksum 0x3986 (correct), seq 96201:96233, ack 83737, win 2990, length 32
 	LDP, Label-Space-ID: 192.168.0.2:0, pdu-length: 28
 	  Notification Message (0x0001), length: 18, Message ID: 0xfffffff9, Flags: [ignore if unknown]
 	    Status TLV (0x0300), length: 10, Flags: [ignore and don't forward if unknown]
 	      Status Code: Shutdown, Flags: [Fatal error and don't forward]
-    2  12:23:59.828114 IP (tos 0xc0, ttl 255, id 1499, offset 0, flags [none], proto TCP (6), length 40)
+    2  2023-08-10 12:23:59.828114 IP (tos 0xc0, ttl 255, id 1499, offset 0, flags [none], proto TCP (6), length 40)
     192.168.0.2.58320 > 192.168.0.1.646: Flags [F.], cksum 0x7d76 (correct), seq 32, ack 1, win 2990, length 0
-    3  12:24:00.018513 IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 70)
+    3  2023-08-10 12:24:00.018513 IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 70)
     12.1.3.2.646 > 224.0.0.2.646: 
 	LDP, Label-Space-ID: 172.168.0.2:0, pdu-length: 38
 	  Hello Message (0x0100), length: 28, Message ID: 0x00000038, Flags: [ignore if unknown]
@@ -16,7 +16,7 @@
 	      IPv4 Transport Address: 172.168.0.2
 	    Dual-Stack Capability TLV (0x0701), length: 4, Flags: [continue processing and don't forward if unknown]
 	      Transport Connection Preference: IPv4
-    4  12:24:05.058942 IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 70)
+    4  2023-08-10 12:24:05.058942 IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 70)
     12.1.3.2.646 > 224.0.0.2.646: 
 	LDP, Label-Space-ID: 172.168.0.2:0, pdu-length: 38
 	  Hello Message (0x0100), length: 28, Message ID: 0x00000038, Flags: [ignore if unknown]
@@ -26,7 +26,7 @@
 	      IPv4 Transport Address: 172.168.0.2
 	    Dual-Stack Capability TLV (0x0701), length: 4, Flags: [continue processing and don't forward if unknown]
 	      Transport Connection Preference: IPv4
-    5  12:24:08.049677 IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 70)
+    5  2023-08-10 12:24:08.049677 IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 70)
     12.0.0.2.646 > 224.0.0.2.646: 
 	LDP, Label-Space-ID: 192.168.0.2:0, pdu-length: 38
 	  Hello Message (0x0100), length: 28, Message ID: 0x00000000, Flags: [ignore if unknown]
@@ -36,7 +36,7 @@
 	      IPv4 Transport Address: 192.168.0.2
 	    Dual-Stack Capability TLV (0x0701), length: 4, Flags: [continue processing and don't forward if unknown]
 	      Transport Connection Preference: IPv4
-    6  12:24:10.017949 IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 70)
+    6  2023-08-10 12:24:10.017949 IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 70)
     12.1.3.2.646 > 224.0.0.2.646: 
 	LDP, Label-Space-ID: 172.168.0.2:0, pdu-length: 38
 	  Hello Message (0x0100), length: 28, Message ID: 0x00000038, Flags: [ignore if unknown]
@@ -46,9 +46,9 @@
 	      IPv4 Transport Address: 172.168.0.2
 	    Dual-Stack Capability TLV (0x0701), length: 4, Flags: [continue processing and don't forward if unknown]
 	      Transport Connection Preference: IPv4
-    7  12:24:11.046122 IP (tos 0x0, ttl 255, id 1505, offset 0, flags [none], proto TCP (6), length 48)
+    7  2023-08-10 12:24:11.046122 IP (tos 0x0, ttl 255, id 1505, offset 0, flags [none], proto TCP (6), length 48)
     192.168.0.2.58321 > 192.168.0.1.646: Flags [S], cksum 0x6df9 (correct), seq 110236, win 65535, options [mss 1420,nop,wscale 5], length 0
-    8  12:24:11.046149 IP (tos 0xc0, ttl 255, id 1506, offset 0, flags [none], proto TCP (6), length 81)
+    8  2023-08-10 12:24:11.046149 IP (tos 0xc0, ttl 255, id 1506, offset 0, flags [none], proto TCP (6), length 81)
     192.168.0.2.58321 > 192.168.0.1.646: Flags [P.], cksum 0x68c1 (correct), seq 110237:110278, ack 87765, win 3025, length 41
 	LDP, Label-Space-ID: 192.168.0.2:0, pdu-length: 37
 	  Initialization Message (0x0200), length: 27, Message ID: 0x00000001, Flags: [ignore if unknown]
@@ -57,9 +57,9 @@
 	      Path Vector Limit 32, Max-PDU length: 0, Receiver Label-Space-ID 192.168.0.1:0
 	    Typed Wildcard FEC Capability TLV (0x050b), length: 1, Flags: [continue processing and don't forward if unknown]
 	      Support
-    9  12:24:11.052281 IP (tos 0xc0, ttl 255, id 1507, offset 0, flags [none], proto TCP (6), length 58)
+    9  2023-08-10 12:24:11.052281 IP (tos 0xc0, ttl 255, id 1507, offset 0, flags [none], proto TCP (6), length 58)
     192.168.0.2.58321 > 192.168.0.1.646: Flags [P.], cksum 0x73a6 (correct), seq 41:59, ack 60, win 3023, length 18
-   10  12:24:11.103231 IP (tos 0xc0, ttl 255, id 1508, offset 0, flags [none], proto TCP (6), length 387)
+   10  2023-08-10 12:24:11.103231 IP (tos 0xc0, ttl 255, id 1508, offset 0, flags [none], proto TCP (6), length 387)
     192.168.0.2.58321 > 192.168.0.1.646: Flags [P.], cksum 0x46c6 (correct), seq 59:406, ack 60, win 3023, length 347
 	LDP, Label-Space-ID: 192.168.0.2:0, pdu-length: 56
 	  Address Message (0x0300), length: 46, Message ID: 0x00000003, Flags: [ignore if unknown]
@@ -115,9 +115,9 @@
 	      Hop Count: 1
 	    Path Vector TLV (0x0104), length: 4, Flags: [ignore and don't forward if unknown]
 	      Path Vector: 192.168.0.2
-   11  12:24:11.929655 IP (tos 0xc0, ttl 255, id 1509, offset 0, flags [none], proto TCP (6), length 40)
+   11  2023-08-10 12:24:11.929655 IP (tos 0xc0, ttl 255, id 1509, offset 0, flags [none], proto TCP (6), length 40)
     192.168.0.2.58321 > 192.168.0.1.646: Flags [.], cksum 0x34ab (correct), ack 168, win 3020, length 0
-   12  12:24:11.929679 IP (tos 0xc0, ttl 255, id 1510, offset 0, flags [none], proto TCP (6), length 300)
+   12  2023-08-10 12:24:11.929679 IP (tos 0xc0, ttl 255, id 1510, offset 0, flags [none], proto TCP (6), length 300)
     192.168.0.2.58321 > 192.168.0.1.646: Flags [P.], cksum 0xbffe (correct), seq 406:666, ack 813, win 3000, length 260
 	LDP, Label-Space-ID: 192.168.0.2:0, pdu-length: 48
 	  Label Release Message (0x0403), length: 38, Message ID: 0x0000000a, Flags: [ignore if unknown]
@@ -159,7 +159,7 @@
 	      Label: 20066
 	    Status TLV (0x0300), length: 10, Flags: [ignore and don't forward if unknown]
 	      Status Code: Loop Detected, Flags: [Advisory Notification and don't forward], causing Message ID: 0x00000013, Message Type: Label Mapping
-   13  12:24:12.831754 IP (tos 0xc0, ttl 255, id 1520, offset 0, flags [none], proto TCP (6), length 415)
+   13  2023-08-10 12:24:12.831754 IP (tos 0xc0, ttl 255, id 1520, offset 0, flags [none], proto TCP (6), length 415)
     192.168.0.2.58321 > 192.168.0.1.646: Flags [P.], cksum 0xef2a (correct), seq 666:1041, ack 813, win 3000, length 375
 	LDP, Label-Space-ID: 192.168.0.2:0, pdu-length: 371
 	  Label Mapping Message (0x0400), length: 41, Message ID: 0x0000000f, Flags: [ignore if unknown]
@@ -232,7 +232,7 @@
 	      Prefix FEC (0x02): IPv4 prefix 192.168.4.3/32
 	    Generic Label TLV (0x0200), length: 4, Flags: [ignore and don't forward if unknown]
 	      Label: 20066
-   14  12:24:13.028465 IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 70)
+   14  2023-08-10 12:24:13.028465 IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 70)
     12.0.0.2.646 > 224.0.0.2.646: 
 	LDP, Label-Space-ID: 192.168.0.2:0, pdu-length: 38
 	  Hello Message (0x0100), length: 28, Message ID: 0x00000000, Flags: [ignore if unknown]
@@ -242,9 +242,9 @@
 	      IPv4 Transport Address: 192.168.0.2
 	    Dual-Stack Capability TLV (0x0701), length: 4, Flags: [continue processing and don't forward if unknown]
 	      Transport Connection Preference: IPv4
-   15  12:24:13.058561 IP (tos 0xc0, ttl 255, id 1524, offset 0, flags [none], proto TCP (6), length 40)
+   15  2023-08-10 12:24:13.058561 IP (tos 0xc0, ttl 255, id 1524, offset 0, flags [none], proto TCP (6), length 40)
     192.168.0.2.58321 > 192.168.0.1.646: Flags [.], cksum 0x2e0b (correct), ack 1263, win 2986, length 0
-   16  12:24:13.833287 IP (tos 0xc0, ttl 255, id 1530, offset 0, flags [none], proto TCP (6), length 255)
+   16  2023-08-10 12:24:13.833287 IP (tos 0xc0, ttl 255, id 1530, offset 0, flags [none], proto TCP (6), length 255)
     192.168.0.2.58321 > 192.168.0.1.646: Flags [P.], cksum 0x7e4f (correct), seq 1041:1256, ack 1263, win 2986, length 215
 	LDP, Label-Space-ID: 192.168.0.2:0, pdu-length: 211
 	  Label Mapping Message (0x0400), length: 37, Message ID: 0x00000019, Flags: [ignore if unknown]
@@ -292,7 +292,7 @@
 	      Hop Count: 0
 	    Path Vector TLV (0x0104), length: 4, Flags: [ignore and don't forward if unknown]
 	      Path Vector: 192.168.0.2
-   17  12:24:15.036359 IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 70)
+   17  2023-08-10 12:24:15.036359 IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 70)
     12.1.3.2.646 > 224.0.0.2.646: 
 	LDP, Label-Space-ID: 172.168.0.2:0, pdu-length: 38
 	  Hello Message (0x0100), length: 28, Message ID: 0x00000038, Flags: [ignore if unknown]
@@ -302,7 +302,7 @@
 	      IPv4 Transport Address: 172.168.0.2
 	    Dual-Stack Capability TLV (0x0701), length: 4, Flags: [continue processing and don't forward if unknown]
 	      Transport Connection Preference: IPv4
-   18  12:24:18.042950 IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 70)
+   18  2023-08-10 12:24:18.042950 IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 70)
     12.0.0.2.646 > 224.0.0.2.646: 
 	LDP, Label-Space-ID: 192.168.0.2:0, pdu-length: 38
 	  Hello Message (0x0100), length: 28, Message ID: 0x00000000, Flags: [ignore if unknown]
@@ -312,7 +312,7 @@
 	      IPv4 Transport Address: 192.168.0.2
 	    Dual-Stack Capability TLV (0x0701), length: 4, Flags: [continue processing and don't forward if unknown]
 	      Transport Connection Preference: IPv4
-   19  12:24:20.052540 IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 70)
+   19  2023-08-10 12:24:20.052540 IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 70)
     12.1.3.2.646 > 224.0.0.2.646: 
 	LDP, Label-Space-ID: 172.168.0.2:0, pdu-length: 38
 	  Hello Message (0x0100), length: 28, Message ID: 0x00000038, Flags: [ignore if unknown]
@@ -322,11 +322,11 @@
 	      IPv4 Transport Address: 172.168.0.2
 	    Dual-Stack Capability TLV (0x0701), length: 4, Flags: [continue processing and don't forward if unknown]
 	      Transport Connection Preference: IPv4
-   20  12:24:21.030795 IP (tos 0xc0, ttl 255, id 1534, offset 0, flags [none], proto TCP (6), length 58)
+   20  2023-08-10 12:24:21.030795 IP (tos 0xc0, ttl 255, id 1534, offset 0, flags [none], proto TCP (6), length 58)
     192.168.0.2.58321 > 192.168.0.1.646: Flags [P.], cksum 0x6a3d (correct), seq 1256:1274, ack 1263, win 2986, length 18
-   21  12:24:21.087477 IP (tos 0xc0, ttl 255, id 1535, offset 0, flags [none], proto TCP (6), length 40)
+   21  2023-08-10 12:24:21.087477 IP (tos 0xc0, ttl 255, id 1535, offset 0, flags [none], proto TCP (6), length 40)
     192.168.0.2.58321 > 192.168.0.1.646: Flags [.], cksum 0x2d11 (correct), ack 1281, win 2985, length 0
-   22  12:24:23.011577 IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 70)
+   22  2023-08-10 12:24:23.011577 IP (tos 0xc0, ttl 1, id 0, offset 0, flags [none], proto UDP (17), length 70)
     12.0.0.2.646 > 224.0.0.2.646: 
 	LDP, Label-Space-ID: 192.168.0.2:0, pdu-length: 38
 	  Hello Message (0x0100), length: 28, Message ID: 0x00000000, Flags: [ignore if unknown]

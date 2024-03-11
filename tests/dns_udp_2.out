@@ -1,4 +1,4 @@
-    1  caplen 98 len 98 09:37:33.129402 IP (tos 0x0, ttl 64, id 22989, offset 0, flags [none], proto UDP (17), length 84)
+    1  caplen 98 len 98 2023-12-26 09:37:33.129402 IP (tos 0x0, ttl 64, id 22989, offset 0, flags [none], proto UDP (17), length 84)
     192.168.1.11.43966 > 209.87.249.18.53: [udp sum ok] 22836+ [1au] A? www.tcpdump.org. ar: . OPT UDPsize=4096 [COOKIE 42f5d00996f90b13] (56)
-    2  caplen 98 len 266 09:37:33.259762 IP (tos 0x0, ttl 128, id 45, offset 0, flags [none], proto UDP (17), length 252)
+    2  caplen 98 len 266 2023-12-26 09:37:33.259762 IP (tos 0x0, ttl 128, id 45, offset 0, flags [none], proto UDP (17), length 252)
     209.87.249.18.53 > 192.168.1.11.43966: 22836*- q: A? www.tcpdump.org. 2/2/5 www.tcpdump.org. A 192.139.46.66, www.tcpdump.org. [|domain]

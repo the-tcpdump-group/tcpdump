@@ -1,4 +1,4 @@
-    1  19:50:14.587897 IP (tos 0x0, ttl 128, id 17097, offset 0, flags [DF], proto TCP (6), length 2016 [was 0, presumed TSO], bad cksum 0 (->d8df)!)
+    1  2012-09-19 19:50:14.587897 IP (tos 0x0, ttl 128, id 17097, offset 0, flags [DF], proto TCP (6), length 2016 [was 0, presumed TSO], bad cksum 0 (->d8df)!)
     30.7.181.121.39556 > 199.43.68.163.8080: Flags [P.], cksum 0xdf55 (incorrect -> 0x9cf2), seq 1891338696:1891340672, ack 727404759, win 256, length 1976: HTTP, length: 1976
 	POST http://gwm-ml-a2.wsodqa.com//research/module-loader/module-loader.asp?user_id=test HTTP/1.1
 	Content-Type: text/xml; charset=utf-8

@@ -1,4 +1,4 @@
-    1  22:11:10.755260 IP (tos 0x0, ttl 1, id 1, offset 0, flags [none], proto OSPF (89), length 148, bad cksum d831 (->d809)!)
+    1  2023-12-13 22:11:10.755260 IP (tos 0x0, ttl 1, id 1, offset 0, flags [none], proto OSPF (89), length 148, bad cksum d831 (->d809)!)
     1.0.0.2 > 224.0.0.5: OSPFv2, LS-Update, length 128
 	Router-ID 2.2.2.2, Backbone Area, Authentication Type: none (0), 1 LSA
 	  LSA #1

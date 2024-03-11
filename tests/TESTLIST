@@ -24,19 +24,19 @@ print-sampling print-flags.pcap print-sampling.out --print-sampling=3
 # Use "no -t", -t, -tt, -ttt, -tttt, -ttttt options for more code coverage
 # in timestamp printing functions
 # micro outputs with -q
-tcp-handshake-micro tcp-handshake-nano.pcap tcp-handshake-micro.out -q
-tcp-handshake-micro-t tcp-handshake-nano.pcap tcp-handshake-micro-t.out -t -q
-tcp-handshake-micro-tt tcp-handshake-nano.pcap tcp-handshake-micro-tt.out -tt -q
-tcp-handshake-micro-ttt tcp-handshake-nano.pcap tcp-handshake-micro-ttt.out -ttt -q
-tcp-handshake-micro-tttt tcp-handshake-nano.pcap tcp-handshake-micro-tttt.out -tttt -q
-tcp-handshake-micro-ttttt tcp-handshake-nano.pcap tcp-handshake-micro-ttttt.out -ttttt -q
+tcp-handshake-micro tcp-handshake-nano.pcap tcp-handshake-micro.out -q SPECIAL_t
+tcp-handshake-micro-t tcp-handshake-nano.pcap tcp-handshake-micro-t.out -t -q SPECIAL_t
+tcp-handshake-micro-tt tcp-handshake-nano.pcap tcp-handshake-micro-tt.out -tt -q SPECIAL_t
+tcp-handshake-micro-ttt tcp-handshake-nano.pcap tcp-handshake-micro-ttt.out -ttt -q SPECIAL_t
+tcp-handshake-micro-tttt tcp-handshake-nano.pcap tcp-handshake-micro-tttt.out -tttt -q SPECIAL_t
+tcp-handshake-micro-ttttt tcp-handshake-nano.pcap tcp-handshake-micro-ttttt.out -ttttt -q SPECIAL_t
 # nano outputs with -q
-tcp-handshake-nano tcp-handshake-nano.pcap tcp-handshake-nano.out -q --nano
-tcp-handshake-nano-t tcp-handshake-nano.pcap tcp-handshake-nano-t.out -t -q --nano
-tcp-handshake-nano-tt tcp-handshake-nano.pcap tcp-handshake-nano-tt.out -tt -q --nano
-tcp-handshake-nano-ttt tcp-handshake-nano.pcap tcp-handshake-nano-ttt.out -ttt -q --nano
-tcp-handshake-nano-tttt tcp-handshake-nano.pcap tcp-handshake-nano-tttt.out -tttt -q --nano
-tcp-handshake-nano-ttttt tcp-handshake-nano.pcap tcp-handshake-nano-ttttt.out -ttttt -q --nano
+tcp-handshake-nano tcp-handshake-nano.pcap tcp-handshake-nano.out -q --nano SPECIAL_t
+tcp-handshake-nano-t tcp-handshake-nano.pcap tcp-handshake-nano-t.out -t -q --nano SPECIAL_t
+tcp-handshake-nano-tt tcp-handshake-nano.pcap tcp-handshake-nano-tt.out -tt -q --nano SPECIAL_t
+tcp-handshake-nano-ttt tcp-handshake-nano.pcap tcp-handshake-nano-ttt.out -ttt -q --nano SPECIAL_t
+tcp-handshake-nano-tttt tcp-handshake-nano.pcap tcp-handshake-nano-tttt.out -tttt -q --nano SPECIAL_t
+tcp-handshake-nano-ttttt tcp-handshake-nano.pcap tcp-handshake-nano-ttttt.out -ttttt -q --nano SPECIAL_t
 
 # TCP with data in the RST segment
 tcp_rst_data tcp_rst_data.pcap tcp_rst_data.out -v
