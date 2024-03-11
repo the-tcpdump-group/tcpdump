@@ -1,4 +1,4 @@
-    1  20:08:52.541413 IP (tos 0xc0, ttl 1, id 17240, offset 0, flags [DF], proto TCP (6), length 159)
+    1  2022-11-17 20:08:52.541413 IP (tos 0xc0, ttl 1, id 17240, offset 0, flags [DF], proto TCP (6), length 159)
     192.168.10.17.179 > 192.168.10.124.53580: Flags [P.], cksum 0x966f (incorrect -> 0x2000), seq 3763129203:3763129310, ack 4158499266, win 128, options [nop,nop,TS val 2413434737 ecr 2257657437], length 107: BGP
 	Open Message (1), length: 107
 	  Version 4, my AS 65002, Holdtime 180s, ID 192.168.10.17
@@ -32,13 +32,13 @@
 		Restart Flags: [N], Restart Time 120s
 	    Option Capabilities Advertisement (2), length: 9
 	      Long-lived Graceful Restart (71), length: 7
-    2  20:08:53.642401 IP (tos 0xc0, ttl 1, id 17245, offset 0, flags [DF], proto TCP (6), length 75)
+    2  2022-11-17 20:08:53.642401 IP (tos 0xc0, ttl 1, id 17245, offset 0, flags [DF], proto TCP (6), length 75)
     192.168.10.17.179 > 192.168.10.124.53580: Flags [P.], cksum 0x961b (incorrect -> 0x69a0), seq 145:168, ack 39, win 128, options [nop,nop,TS val 2413435838 ecr 2257658439], length 23: BGP
 	Update Message (2), length: 23
 	  End-of-Rib Marker (empty NLRI)
-    3  20:08:53.642524 IP (tos 0xc0, ttl 1, id 43436, offset 0, flags [DF], proto TCP (6), length 52)
+    3  2022-11-17 20:08:53.642524 IP (tos 0xc0, ttl 1, id 43436, offset 0, flags [DF], proto TCP (6), length 52)
     192.168.10.124.53580 > 192.168.10.17.179: Flags [.], cksum 0x69e6 (correct), ack 168, win 502, options [nop,nop,TS val 2257658538 ecr 2413435838], length 0
-    4  20:08:53.643391 IP (tos 0xc0, ttl 1, id 43437, offset 0, flags [DF], proto TCP (6), length 550)
+    4  2022-11-17 20:08:53.643391 IP (tos 0xc0, ttl 1, id 43437, offset 0, flags [DF], proto TCP (6), length 550)
     192.168.10.124.53580 > 192.168.10.17.179: Flags [P.], cksum 0x24c3 (correct), seq 39:537, ack 168, win 502, options [nop,nop,TS val 2257658539 ecr 2413435838], length 498: BGP
 	Update Message (2), length: 62
 	  Origin (1), length: 1, Flags [T]: Incomplete
@@ -111,15 +111,15 @@
 	    200.200.200.200/32
 	Update Message (2), length: 23
 	  End-of-Rib Marker (empty NLRI)
-    5  20:08:53.643398 IP (tos 0xc0, ttl 1, id 17246, offset 0, flags [DF], proto TCP (6), length 52)
+    5  2022-11-17 20:08:53.643398 IP (tos 0xc0, ttl 1, id 17246, offset 0, flags [DF], proto TCP (6), length 52)
     192.168.10.17.179 > 192.168.10.124.53580: Flags [.], cksum 0x9604 (incorrect -> 0x6968), ack 537, win 128, options [nop,nop,TS val 2413435839 ecr 2257658539], length 0
-    6  20:08:54.542570 IP (tos 0xc0, ttl 1, id 17247, offset 0, flags [DF], proto TCP (6), length 71)
+    6  2022-11-17 20:08:54.542570 IP (tos 0xc0, ttl 1, id 17247, offset 0, flags [DF], proto TCP (6), length 71)
     192.168.10.17.179 > 192.168.10.124.53580: Flags [P.], cksum 0x9617 (incorrect -> 0x61b6), seq 168:187, ack 537, win 128, options [nop,nop,TS val 2413436739 ecr 2257658539], length 19: BGP
 	Keepalive Message (4), length: 19
-    7  20:08:54.542789 IP (tos 0xc0, ttl 1, id 43438, offset 0, flags [DF], proto TCP (6), length 52)
+    7  2022-11-17 20:08:54.542789 IP (tos 0xc0, ttl 1, id 43438, offset 0, flags [DF], proto TCP (6), length 52)
     192.168.10.124.53580 > 192.168.10.17.179: Flags [.], cksum 0x60d7 (correct), ack 187, win 502, options [nop,nop,TS val 2257659439 ecr 2413436739], length 0
-    8  20:08:54.542863 IP (tos 0xc0, ttl 1, id 43439, offset 0, flags [DF], proto TCP (6), length 71)
+    8  2022-11-17 20:08:54.542863 IP (tos 0xc0, ttl 1, id 43439, offset 0, flags [DF], proto TCP (6), length 71)
     192.168.10.124.53580 > 192.168.10.17.179: Flags [P.], cksum 0x5ca9 (correct), seq 537:556, ack 187, win 502, options [nop,nop,TS val 2257659439 ecr 2413436739], length 19: BGP
 	Keepalive Message (4), length: 19
-    9  20:08:54.542871 IP (tos 0xc0, ttl 1, id 17248, offset 0, flags [DF], proto TCP (6), length 52)
+    9  2022-11-17 20:08:54.542871 IP (tos 0xc0, ttl 1, id 17248, offset 0, flags [DF], proto TCP (6), length 52)
     192.168.10.17.179 > 192.168.10.124.53580: Flags [.], cksum 0x9604 (incorrect -> 0x623a), ack 556, win 128, options [nop,nop,TS val 2413436739 ecr 2257659439], length 0

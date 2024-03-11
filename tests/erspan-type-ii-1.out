@@ -1,4 +1,4 @@
-    1  18:53:28.139390 IP (tos 0xfc, ttl 251, id 171, offset 0, flags [DF], proto GRE (47), length 108)
+    1  2011-09-07 18:53:28.139390 IP (tos 0xfc, ttl 251, id 171, offset 0, flags [DF], proto GRE (47), length 108)
     1.1.1.2 > 192.168.255.5: GREv0, Flags [sequence# present], seq 171, length 88
 	erspan type2 session 666 cos 6 index 32760: IP (tos 0xc0, ttl 1, id 23540, offset 0, flags [none], proto PIM (103), length 58)
     10.48.6.1 > 224.0.0.13: PIMv2, length 38

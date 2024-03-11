@@ -1,4 +1,4 @@
-    1  12:11:42.563815 IP (tos 0x0, ttl 64, id 1, offset 0, flags [+, DF], proto UDP (17), length 70, bad cksum 0 (->3903)!)
+    1  2020-11-19 12:11:42.563815 IP (tos 0x0, ttl 64, id 1, offset 0, flags [+, DF], proto UDP (17), length 70, bad cksum 0 (->3903)!)
     0.254.96.182.520 > 255.127.128.111.65535: 
 	RIPv2, Request, length: 42, routes: 1 or less
 	  Unknown (26725) Authentication data:
