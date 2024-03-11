@@ -932,6 +932,7 @@ ptp         ptp.pcap    ptp.out
 ptp_ethernet	ptp_ethernet.pcap	ptp_ethernet.out	-e
 ptp_corrections	ptp_corrections.pcap	ptp_corrections.out
 ptp_v2_1	ptp_v2_1.pcap		ptp_v2_1.out
+ptp_management	ptp_management.pcap	ptp_management.out
 
 # bad packets from Jason Xiaole
 ldp_tlv_print-oobr ldp_tlv_print-oobr.pcap ldp_tlv_print-oobr.out -v
