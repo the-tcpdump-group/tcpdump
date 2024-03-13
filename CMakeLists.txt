@@ -124,6 +124,12 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 project(tcpdump C)
 
 #
+# Export the size of void * as SIZEOF_VOID_P so that it can be
+# tested with #if.
+#
+set(SIZEOF_VOID_P "${CMAKE_SIZEOF_VOID_P}")
+
+#
 # For checking if a compiler flag works and adding it if it does.
 #
 include(CheckCCompilerFlag)
@@ -326,6 +332,14 @@ include(CheckSymbolExists)
 include(CheckStructHasMember)
 include(CheckVariableExists)
 include(CheckTypeSize)
+
+#
+# Get the size of a time_t, to know whether it's 32-bit or 64-bit.
+#
+cmake_push_check_state()
+set(CMAKE_EXTRA_INCLUDE_FILES time.h)
+check_type_size("time_t" SIZEOF_TIME_T)
+cmake_pop_check_state()
 
 #
 # Header files.
