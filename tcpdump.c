@@ -3242,6 +3242,8 @@ print_version(FILE *f)
 	(void)fprintf (f, "Compiled with MemorySanitizer/Clang.\n");
 #  endif
 #endif /* __SANITIZE_ADDRESS__ or __has_feature */
+	(void)fprintf (f, "%zu-bit build, %zu-bit time_t\n",
+		       sizeof(void *) * 8, sizeof(time_t) * 8);
 }
 DIAG_ON_DEPRECATION
 
