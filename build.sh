@@ -41,6 +41,13 @@ esac
 
 [ "$TCPDUMP_TAINTED" != yes ] && CFLAGS=`cc_werr_cflags`
 
+case `cc_id`/`os_id` in
+clang-*/SunOS-5.11)
+    # Work around https://www.illumos.org/issues/16369
+    [ `uname -o` = illumos ] && grep -Fq OpenIndiana /etc/release && CFLAGS="-Wno-fuse-ld-path${CFLAGS:+ $CFLAGS}"
+    ;;
+esac
+
 # If necessary, set TCPDUMP_CMAKE_TAINTED here to exempt particular cmake from
 # warnings. Use as specific terms as possible (e.g. some specific version and
 # some specific OS).
