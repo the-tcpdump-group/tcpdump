@@ -1043,7 +1043,13 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/.devel OR EXISTS ${CMAKE_BINARY_DIR}/.devel)
         check_and_add_compiler_option(-Wmissing-prototypes)
         check_and_add_compiler_option(-Wmissing-variable-declarations)
         check_and_add_compiler_option(-Wold-style-definition)
-        check_and_add_compiler_option(-Wpedantic)
+        if(NOT CMAKE_C_COMPILER_ID MATCHES "Sun")
+            # In Sun C versions that implement GCC compatibility "-Wpedantic"
+            # means the same as "-pedantic".  The latter is mutually exclusive
+            # with several other options.  One of those is "-xc99", which has
+            # already been set for Sun C above.
+            check_and_add_compiler_option(-Wpedantic)
+        endif()
         check_and_add_compiler_option(-Wpointer-arith)
         check_and_add_compiler_option(-Wpointer-sign)
         check_and_add_compiler_option(-Wshadow)
