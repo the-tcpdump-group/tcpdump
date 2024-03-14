@@ -176,6 +176,14 @@
    * GCC does not currently generate any -Wstrict-prototypes warnings that
    * would need silencing as is done for Clang above.
    */
+#elif ND_IS_AT_LEAST_SUNC_VERSION(5,5)
+  /*
+   * Suppress deprecation warnings.
+   */
+  #define DIAG_OFF_DEPRECATION \
+    DIAG_DO_PRAGMA(error_messages(off,E_DEPRECATED_ATT))
+  #define DIAG_ON_DEPRECATION \
+    DIAG_DO_PRAGMA(error_messages(default,E_DEPRECATED_ATT))
 #endif
 
 /*
