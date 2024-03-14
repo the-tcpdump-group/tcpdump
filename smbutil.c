@@ -891,7 +891,6 @@ smb_fdata(netdissect_options *ndo,
 	     */
 	    fmt++;
 	    return(buf);
-	    break;
 
 	case '[':
 	    /*

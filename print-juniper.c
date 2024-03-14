@@ -1166,7 +1166,6 @@ juniper_ppp_heuristic_guess(netdissect_options *ndo,
 
     default:
         return 0; /* did not find a ppp header */
-        break;
     }
     return 1; /* we printed a ppp packet */
 }
@@ -1210,7 +1209,6 @@ ip_heuristic_guess(netdissect_options *ndo,
         break;
     default:
         return 0; /* did not find a ip header */
-        break;
     }
     return 1; /* we printed an v4/v6 packet */
 }

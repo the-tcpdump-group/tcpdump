@@ -1740,7 +1740,7 @@ main(int argc, char **argv)
 		case 'h':
 			print_usage(stdout);
 			exit_tcpdump(S_SUCCESS);
-			break;
+			/* NOTREACHED */
 
 		case 'H':
 			++ndo->ndo_Hflag;
@@ -1988,7 +1988,7 @@ main(int argc, char **argv)
 		case OPTION_VERSION:
 			print_version(stdout);
 			exit_tcpdump(S_SUCCESS);
-			break;
+			/* NOTREACHED */
 
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
 		case OPTION_TSTAMP_PRECISION:
@@ -2068,7 +2068,7 @@ main(int argc, char **argv)
 
 	default: /* Not supported */
 		error("only -t, -tt, -ttt, -tttt and -ttttt are supported");
-		break;
+		/* NOTREACHED */
 	}
 
 	if (ndo->ndo_fflag != 0 && (VFileName != NULL || RFileName != NULL))

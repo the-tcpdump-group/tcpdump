@@ -513,20 +513,16 @@ ieee802_15_4_addr_len(uint16_t addr_type)
 	switch (addr_type) {
 	case FC_ADDRESSING_MODE_NONE: /* None. */
 		return 0;
-		break;
 	case FC_ADDRESSING_MODE_RESERVED: /* Reserved, there used to be 8-bit
 					   * address type in one amendment, but
 					   * that and the feature using it was
 					   * removed during 802.15.4-2015
 					   * maintenance process. */
 		return -1;
-		break;
 	case FC_ADDRESSING_MODE_SHORT: /* Short. */
 		return 2;
-		break;
 	case FC_ADDRESSING_MODE_LONG: /* Extended. */
 		return 8;
-		break;
 	}
 	return 0;
 }
@@ -1388,8 +1384,6 @@ ieee802_15_4_print_mpx_ie(netdissect_options *ndo,
 			}
 		}
 		return;
-		/* NOTREACHED */
-		break;
 	case 0x03: /* Reserved */
 	case 0x05: /* Reserved */
 	case 0x07: /* Reserved */
@@ -1554,7 +1548,6 @@ ieee802_15_4_print_aux_sec_header(netdissect_options *ndo,
 			ND_PRINT("Implicit");
 		}
 		return len;
-		break;
 	case 0x01: /* Key Index, nothing to print here. */
 		break;
 	case 0x02: /* PAN and Short address Key Source, and Key Index. */
@@ -1632,7 +1625,7 @@ ieee802_15_4_print_command_data(netdissect_options *ndo,
 				  "Allocate address, " : ""));
 			return caplen;
 		}
-		break;
+		/* NOTREACHED */
 	case 0x02: /* Association Response */
 		if (caplen != 3) {
 			ND_PRINT("Invalid Association response command length");
@@ -1663,7 +1656,7 @@ ieee802_15_4_print_command_data(netdissect_options *ndo,
 			}
 			return caplen;
 		}
-		break;
+		/* NOTREACHED */
 	case 0x03: /* Disassociation Notification command */
 		if (caplen != 1) {
 			ND_PRINT("Invalid Disassociation Notification command length");
@@ -1723,7 +1716,7 @@ ieee802_15_4_print_command_data(netdissect_options *ndo,
 			ieee802_15_4_print_addr(ndo, p + 5, 2);
 			return caplen;
 		}
-		break;
+		/* NOTREACHED */
 	case 0x09: /* GTS Request command */
 		if (caplen != 1) {
 			ND_PRINT("Invalid GTS Request command length");
@@ -1740,7 +1733,7 @@ ieee802_15_4_print_command_data(netdissect_options *ndo,
 				  "GTS allocation" : "GTS deallocations"));
 			return caplen;
 		}
-		break;
+		/* NOTREACHED */
 	case 0x13: /* DSME Association Request command */
 		/* XXX Not implemented */
 	case 0x14: /* DSME Association Response command */
@@ -2493,19 +2486,14 @@ ieee802_15_4_print(netdissect_options *ndo,
 	case 0x02: /* Acknowledgement */
 	case 0x03: /* MAC Command */
 		return ieee802_15_4_std_frames(ndo, p, caplen, fc);
-		break;
 	case 0x04: /* Reserved */
 		return 0;
-		break;
 	case 0x05: /* Multipurpose */
 		return ieee802_15_4_mp_frame(ndo, p, caplen, fc);
-		break;
 	case 0x06: /* Fragment or Frak */
 		return ieee802_15_4_frag_frame(ndo, p, caplen, fc);
-		break;
 	case 0x07: /* Extended */
 		return 0;
-		break;
 	}
 	return 0;
 }

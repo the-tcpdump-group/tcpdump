@@ -183,6 +183,9 @@ static int resp_get_length(netdissect_options *, const u_char *, int, const u_ch
  * TEST_RET_LEN
  * If ret_len is < 0, jump to the trunc tag which returns (-1)
  * and 'bubbles up' to printing tstr. Otherwise, return ret_len.
+ *
+ * Note that using this macro with a semicolon at the end emits a warning from
+ * Sun C about an unreachable statement (the semicolon is the statement).
  */
 #define TEST_RET_LEN(rl) \
     if (rl < 0) { goto trunc; } else { return rl; }
@@ -260,7 +263,7 @@ resp_parse(netdissect_options *ndo, const u_char *bp, int length)
      * including invalid packet errors; that's what we want, as
      * we have to give up on further parsing in that case.
      */
-    TEST_RET_LEN(ret_len);
+    TEST_RET_LEN(ret_len) // without a semicolon
 
 trunc:
     return (-1);
@@ -310,7 +313,7 @@ resp_print_string_error_integer(netdissect_options *ndo, const u_char *bp, int l
     RESP_PRINT_SEGMENT(ndo, bp, len);
     ret_len = 1 /*<opcode>*/ + len /*<string>*/ + 2 /*<CRLF>*/;
 
-    TEST_RET_LEN(ret_len);
+    TEST_RET_LEN(ret_len) // without a semicolon
 
 trunc:
     return (-1);

@@ -165,7 +165,6 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 		/*(*/
 		ND_PRINT(") ");
 		return((GET_U_1(dp0->ip6r0_len) + 1) << 3);
-		break;
 	case IPV6_RTHDR_TYPE_4:
 		srh = (const struct ip6_srh *)dp;
 		last_entry = GET_U_1(srh->srh_last_ent);
@@ -195,7 +194,6 @@ rt6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2 _U_)
 		/*(*/
 		ND_PRINT(") ");
 		return((GET_U_1(srh->srh_len) + 1) << 3);
-		break;
 	default:
 		ND_PRINT(" (unknown type)");
 		goto invalid;
