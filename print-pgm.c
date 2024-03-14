@@ -274,7 +274,6 @@ pgm_print(netdissect_options *ndo,
 		break;
 	    default:
 		goto invalid;
-		break;
 	    }
 
 	    ND_PRINT("SPM seq %u trail %u lead %u nla %s",
@@ -306,7 +305,6 @@ pgm_print(netdissect_options *ndo,
 		break;
 	    default:
 		goto invalid;
-		break;
 	    }
 
 	    ivl = GET_BE_U_4(bp);
@@ -384,7 +382,6 @@ pgm_print(netdissect_options *ndo,
 		break;
 	    default:
 		goto invalid;
-		break;
 	    }
 
 	    /*
@@ -405,7 +402,6 @@ pgm_print(netdissect_options *ndo,
 		break;
 	    default:
 		goto invalid;
-		break;
 	    }
 
 	    /*
@@ -630,7 +626,6 @@ pgm_print(netdissect_options *ndo,
 			break;
 		    default:
 			goto invalid;
-			break;
 		    }
 
 		    ND_PRINT(" REDIRECT %s",  nla_buf);
@@ -787,7 +782,6 @@ pgm_print(netdissect_options *ndo,
 			break;
 		    default:
 			goto invalid;
-			break;
 		    }
 
 		    ND_PRINT(" PGMCC DATA %u %s", offset, nla_buf);
@@ -830,7 +824,6 @@ pgm_print(netdissect_options *ndo,
 			break;
 		    default:
 			goto invalid;
-			break;
 		    }
 
 		    ND_PRINT(" PGMCC FEEDBACK %u %s", offset, nla_buf);

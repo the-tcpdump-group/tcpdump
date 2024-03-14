@@ -392,7 +392,6 @@ dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 		break;
 	default:
 		goto invalid;
-		break;
 	}
 
 	if ((DCCPH_TYPE(dh) != DCCP_PKT_DATA) &&
@@ -596,7 +595,6 @@ dccp_print_option(netdissect_options *ndo, const u_char *bp, u_int hlen)
 			default:
 				ND_PRINT(" [optlen != 6 or 8 or 10]");
 				goto invalid;
-				break;
 			}
 			break;
 		case DCCP_OPTION_ELAPSED_TIME:

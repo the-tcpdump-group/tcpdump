@@ -320,7 +320,6 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			 * No support for LCAF right now.
 			 */
 			return;
-			break;
 		}
 
 		ND_PRINT(" %u locator(s)", loc_count);

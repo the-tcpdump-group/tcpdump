@@ -584,7 +584,6 @@ pimv2_addr_print(netdissect_options *ndo,
 			break;
 		default:
 			return -1;
-			break;
 		}
 		hdrlen = 0;
 	}
@@ -813,7 +812,6 @@ pimv2_print(netdissect_options *ndo,
 					ND_PRINT("[option length %u != 4]", olen);
 					nd_print_invalid(ndo);
 					return;
-					break;
 				}
 				break;
 

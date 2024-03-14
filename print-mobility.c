@@ -319,7 +319,6 @@ mobility_print(netdissect_options *ndo,
 	default:
 		ND_PRINT(" len=%u", GET_U_1(mh->ip6m_len));
 		return(mhlen);
-		break;
 	}
 	if (ndo->ndo_vflag)
 		if (mobility_opt_print(ndo, bp + hlen, mhlen - hlen))

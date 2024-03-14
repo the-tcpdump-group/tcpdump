@@ -2250,7 +2250,6 @@ bgp_attr_print(netdissect_options *ndo,
                     tlen -= tnhlen;
                     tnhlen = 0;
                     goto done;
-                    break;
                 }
             }
         }
