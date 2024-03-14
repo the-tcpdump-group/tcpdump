@@ -44,7 +44,7 @@ esac
 case `cc_id`/`os_id` in
 clang-*/SunOS-5.11)
     # Work around https://www.illumos.org/issues/16369
-    [ `uname -o` = illumos ] && grep -Fq OpenIndiana /etc/release && CFLAGS="-Wno-fuse-ld-path${CFLAGS:+ $CFLAGS}"
+    [ "`uname -o`" = illumos ] && grep -Fq OpenIndiana /etc/release && CFLAGS="-Wno-fuse-ld-path${CFLAGS:+ $CFLAGS}"
     ;;
 esac
 
