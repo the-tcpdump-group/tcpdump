@@ -3354,10 +3354,8 @@ print_usage(FILE *f)
 "\t\t[ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]\n");
 	(void)fprintf(f,
 "\t\t[ -i interface ]" IMMEDIATE_MODE_USAGE j_FLAG_USAGE "\n");
-#ifdef HAVE_PCAP_FINDALLDEVS_EX
 	(void)fprintf(f,
 "\t\t[ --lengths ]" LIST_REMOTE_INTERFACES_USAGE "\n");
-#endif
 #ifdef USE_LIBSMI
 	(void)fprintf(f,
 "\t\t" m_FLAG_USAGE "\n");
