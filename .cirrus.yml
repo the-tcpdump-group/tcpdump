@@ -48,6 +48,7 @@ linux_task:
     - apt-get -qy install flex bison libdbus-1-dev libbluetooth-dev libnl-genl-3-dev libibverbs-dev >/dev/null # for libpcap
     - apt-get -qy install libssl-dev libsmi2-dev libcap-ng-dev libpcap-dev binutils-dev >/dev/null
     - apt-get -qy install sudo >/dev/null # for some tcpdump commands
+    - apt-get -qy install shellcheck >/dev/null
     - apt list --installed 'lib*-dev'
     - echo '$ git clone [...] libpcap.git'
     - git -C .. clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT}
@@ -55,6 +56,7 @@ linux_task:
     - ./configure --quiet # build the Makefile
     - make releasecheck
     - make whitespacecheck
+    - make shellcheck
     - ./build_matrix.sh
 
 macos_task:
