@@ -30,13 +30,13 @@ tcpdump compiles and works on at least the following platforms:
 * FreeBSD
 * [Haiku](./doc/README.haiku.md)
 * HP-UX 11i
-* illumos (OmniOS, OpenIndiana)
+* [illumos](./doc/README.solaris.md) (OmniOS, OpenIndiana)
 * GNU/Hurd
 * GNU/Linux
 * {Mac} OS X / macOS
 * [NetBSD](./doc/README.NetBSD.md)
 * OpenBSD
-* [Solaris and related OSes](./doc/README.solaris.md)
+* [Solaris](./doc/README.solaris.md)
 * [Windows](./doc/README.Win32.md) (requires WinPcap or Npcap, and Visual
   Studio with CMake)
 
