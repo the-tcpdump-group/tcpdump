@@ -246,7 +246,7 @@ os_id() {
         #   branch;
         # * "hrevNNNNN_MMMM_KK" for a CI build of a Gerrit review;
         # * something else for a build of a working copy with the changes not
-        #   yet commited.
+        #   yet committed.
         # With this system it is not clear which version components would be
         # meaningful to relate with the build result, so let's return the
         # complete version and leave any interpretation to the user.
