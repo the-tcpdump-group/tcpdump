@@ -249,8 +249,8 @@ ts_date_hmsfrac_print(netdissect_options *ndo, const struct timeval *tv,
 	char timebuf[32];
 	const char *timestr;
 
-	if ((unsigned)tv->tv_sec & 0x80000000) {
-		ND_PRINT("[Error converting time]");
+	if (tv->tv_sec < 0) {
+		ND_PRINT("[timestamp < 1970-01-01 00:00:00 UTC]");
 		return;
 	}
 
@@ -277,8 +277,8 @@ ts_date_hmsfrac_print(netdissect_options *ndo, const struct timeval *tv,
 static void
 ts_unix_print(netdissect_options *ndo, const struct timeval *tv)
 {
-	if ((unsigned)tv->tv_sec & 0x80000000) {
-		ND_PRINT("[Error converting time]");
+	if (tv->tv_sec < 0) {
+		ND_PRINT("[timestamp < 1970-01-01 00:00:00 UTC]");
 		return;
 	}
 
