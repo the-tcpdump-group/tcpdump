@@ -92,6 +92,6 @@ data:
 [000] FF 00 07 00 FF 00 00 00  08 00 00 FF FF FF FF 00  M-^?^@^G^@M-^?^@^@^@ ^H^@^@M-^?M-^?M-^?M-^?^@
 [010] 46 00 53 00                                       F^@S^@ 
 
-    4  [Error converting time] IP (tos 0x0, ttl 128, id 633, offset 0, flags [DF], proto TCP (6), length 116)
+    4  2038-01-01 00:00:00.000000 IP (tos 0x0, ttl 128, id 633, offset 0, flags [DF], proto TCP (6), length 116)
     192.168.56.119.49199 > 192.168.56.55.445: Flags [P.], cksum 0x2253 (incorrect -> 0x229b), seq 75:151, ack 168, win 253, length 76 SMB-over-TCP packet:(raw data or continuation?)
 

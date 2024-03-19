@@ -1,4 +1,4 @@
-    1  [Error converting time] unknown PPP protocol (0x7e80): IPCP, Conf-Request (0x01), id 0, length 48
+    1  2038-01-01 00:00:00.000000 unknown PPP protocol (0x7e80): IPCP, Conf-Request (0x01), id 0, length 48
 	encoded length 45 (=Option(s) length 41)
 	0x0000:  8021 0100 002d
 	  unknown Option (0x66), length 4
