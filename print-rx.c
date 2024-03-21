@@ -799,7 +799,7 @@ rx_cache_find(netdissect_options *ndo, const struct rx_header *rxh,
 			bp += sizeof(int32_t); \
 			ND_PRINT(" %s", \
 			    nd_format_time(str, sizeof(str), \
-			      "%Y/%m/%d %H:%M:%S", localtime(&_t))); \
+			      "%Y-%m-%d %H:%M:%S", localtime(&_t))); \
 		}
 
 #define STOREATTROUT() { uint32_t mask, _i; \
