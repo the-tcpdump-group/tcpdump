@@ -84,7 +84,6 @@ static void zep_print_ts(netdissect_options *ndo, const u_char *p)
 		time_t seconds = i - JAN_1970;
 		char time_buf[128];
 
-		ND_DEBUG
 		ND_PRINT(" (%s)",
 		    nd_format_time(time_buf, sizeof (time_buf), "%Y-%m-%d %H:%M:%S",
 		      localtime(&seconds)));
