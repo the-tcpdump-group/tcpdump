@@ -85,7 +85,7 @@ static void zep_print_ts(netdissect_options *ndo, const u_char *p)
 		char time_buf[128];
 
 		ND_PRINT(" (%s)",
-		    nd_format_time(time_buf, sizeof (time_buf), "%Y/%m/%d %H:%M:%S",
+		    nd_format_time(time_buf, sizeof (time_buf), "%Y-%m-%d %H:%M:%S",
 		      localtime(&seconds)));
 	}
 }
