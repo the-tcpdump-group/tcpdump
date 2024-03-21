@@ -5,7 +5,7 @@
     3  1999-11-11 21:46:16.889677 IP (tos 0x0, ttl 64, id 57926, offset 0, flags [none], proto UDP (17), length 93)
     131.151.32.21.7001 > 131.151.1.59.7000:  rx ack seq 0 ser 432 first 2 serial 347 reason delay (65)
     4  1999-11-11 21:46:24.151512 IP (tos 0x0, ttl 64, id 57928, offset 0, flags [none], proto UDP (17), length 108)
-    131.151.32.21.7001 > 131.151.1.59.7000:  rx data seq 1 ser 433 fs call makedir fid 536871098/1/1 "tmpdir" StoreStatus date 1999/11/11 21:46:24 group 0 mode 755 (80)
+    131.151.32.21.7001 > 131.151.1.59.7000:  rx data seq 1 ser 433 fs call makedir fid 536871098/1/1 "tmpdir" StoreStatus date 1999-11-11 21:46:24 group 0 mode 755 (80)
     5  1999-11-11 21:46:24.245048 IP (tos 0x0, ttl 254, id 59867, offset 0, flags [DF], proto UDP (17), length 80)
     131.151.1.59.7000 > 131.151.32.91.7001:  rx data seq 1 ser 2312 cb call callback fid 536871098/1/1 (52)
     6  1999-11-11 21:46:24.255513 IP (tos 0x0, ttl 128, id 42324, offset 0, flags [none], proto UDP (17), length 56)
