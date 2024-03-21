@@ -800,8 +800,8 @@ smb_fdata1(netdissect_options *ndo,
 		break;
 	    }
 	    if (t != 0) {
-		    tstring = nd_format_time(buffer, sizeof(buffer), "%a %b %e %T %Y",
-		    localtime(&t));
+		tstring = nd_format_time(buffer, sizeof(buffer), "%Y-%m-%d %T",
+					 localtime(&t));
 	    } else
 		tstring = "NULL";
 	    ND_PRINT("%s\n", tstring);
