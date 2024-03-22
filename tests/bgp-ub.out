@@ -1,4 +1,4 @@
-    1  13:29:37.678220 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto TCP (6), length 4748)
+    1  2022-03-20 13:29:37.678220 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto TCP (6), length 4748)
     127.0.0.1.540 > 127.0.0.1.179: Flags [S], cksum 0xf1a8 (correct), seq 0:4708, win 8192, length 4708: BGP [|bgp]
 	Update Message (2), length: 154
 	  Origin (1), length: 1, Flags [T]: Incomplete

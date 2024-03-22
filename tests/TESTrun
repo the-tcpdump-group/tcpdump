@@ -107,7 +107,16 @@ sub runtest {
     #
     # Furthermore, on Windows, fc can't read the standard input, so we
     # can't do it as a pipeline in any case.
+    if (index($options, "SPECIAL_t") != -1) {
+        # Hack to keep specific time options for tcp-handshake-micro-t, etc.
+        # -t, -tt, etc.
+        $options =~ s/ SPECIAL_t//;
+    } else {
+        # No specific time option, use -tttt
+        $options .= " -tttt";
+    }
     $r = system "$TCPDUMP -# -n -r $input $options >${newdir}/${outputbase} 2>${rawstderrlog}";
+
     if($r != 0) {
         #
         # Something other than "tcpdump opened the file, read it, and

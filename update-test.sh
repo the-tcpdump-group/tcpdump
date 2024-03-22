@@ -16,7 +16,7 @@ for TEST in "$@"; do
         MATCH=1
         # Word splitting is intentional for $options.
         # shellcheck disable=SC2086
-        ./tcpdump -# -n -r "$PREFIX/$input" $options >"$PREFIX/$output"
+        ./tcpdump -# -n -tttt -r "$PREFIX/$input" $options >"$PREFIX/$output"
     done < $PREFIX/TESTLIST
     [ $MATCH = 0 ] && echo "test $TEST not found" >&2
 done
