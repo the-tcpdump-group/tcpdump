@@ -41,13 +41,17 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
         correctly, Print majorSdoId field instead of just the first bit.
       RIP: Make a couple trivial protocol updates.
       RPKI-Router: Refine length and bounds checks.
+      RX: Use the "%Y-%m-%d" date format.
+      smbutil.c: Use the "%Y-%m-%d" date format.
       SNMP: Fix two undefined behaviors.
       Text protocols: Fix printing truncation if it is not the case.
+      ZEP: Use the "%Y-%m-%d" date format.
       ZMTP: Replace custom code with bittok2str().
     User interface:
       Print the supported time stamp types (-J) to stdout instead of stderr.
       Print the list of data link types (-L) to stdout instead of stderr.
       Use symmetrical quotation characters in error messages.
+      Update --version option to print 32/64-bit build and time_t size.
     Source code:
       tcpdump: Fix a memory leak.
       child_cleanup: reap as many child processes as possible.
@@ -63,6 +67,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Remove init_crc10_table() and the entourage.
       Initialize tzcode early.
       Capsicum support: Fix a 'not defined' macro error.
+      Update the "Error converting time" tests for packet times.
     Building and testing:
       Add a configure option to help debugging (--enable-instrument-functions)
       At build time require a proof of suitable snprintf(3) implementation in
@@ -77,6 +82,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       configure: Apply autoupdate 2.69.
       CMake: improve the comment before project(tcpdump C).
       Do not require vsnprintf().
+      tests: Use the -tttt option, by default, for the tests.
+      autoconf, CMake: Get the size of a void * and a time_t.
 
 Friday, April 7, 2023 / The Tcpdump Group
   Summary for 4.99.4 tcpdump release
