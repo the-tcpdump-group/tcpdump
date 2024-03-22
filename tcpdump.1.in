@@ -2027,7 +2027,6 @@ became available when linking with libpcap 1.9.0 or later.
 .BR stty (1),
 .BR pcap (3PCAP),
 .BR bpf (4),
-.BR nit (4P),
 .BR \%pcap-savefile (@MAN_FILE_FORMATS@),
 .BR \%pcap-filter (@MAN_MISC_INFO@),
 .BR \%pcap-tstamp (@MAN_MISC_INFO@)
