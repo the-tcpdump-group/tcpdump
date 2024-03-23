@@ -2069,9 +2069,6 @@ feature, provide generic feedback etc. please see the file
 .I CONTRIBUTING.md
 in the tcpdump source tree root.
 .LP
-NIT doesn't let you watch your own outbound traffic, BPF will.
-We recommend that you use the latter.
-.LP
 Some attempt should be made to reassemble IP fragments or, at least
 to compute the right length for the higher level protocol.
 .LP
