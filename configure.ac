@@ -283,7 +283,6 @@ AC_LBL_LIBRARY_NET
 
 AC_REPLACE_FUNCS(strlcat strlcpy strsep getservent getopt_long)
 AC_CHECK_FUNCS(fork vfork)
-AC_CHECK_FUNCS(setlinebuf)
 
 #
 # Make sure we have snprintf(); we require it.

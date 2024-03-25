@@ -42,6 +42,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       IEEE 802.11: Simplify handle_action().
       Provide GET_ macros for 4-byte and 8-byte floating-point numbers
         and use them rather than custom code
+      Disregard setlinebuf(3), always use setvbuf(3).
     Building and testing:
       autoconf: Update install-sh script to the latest available version.
       autoconf: Remove detection of early IPv6 stacks.

@@ -162,9 +162,6 @@
 /* Define to 1 if you have the <rpc/rpc.h> header file. */
 #cmakedefine HAVE_RPC_RPC_H 1
 
-/* Define to 1 if you have the `setlinebuf' function. */
-#cmakedefine HAVE_SETLINEBUF 1
-
 /* Define to 1 if you have the <stdint.h> header file. */
 #cmakedefine HAVE_STDINT_H 1
 

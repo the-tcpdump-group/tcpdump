@@ -1781,11 +1781,7 @@ main(int argc, char **argv)
 			 */
 			setvbuf(stdout, NULL, _IONBF, 0);
 #else /* _WIN32 */
-#ifdef HAVE_SETLINEBUF
-			setlinebuf(stdout);
-#else
 			setvbuf(stdout, NULL, _IOLBF, 0);
-#endif
 #endif /* _WIN32 */
 			lflag = 1;
 			break;

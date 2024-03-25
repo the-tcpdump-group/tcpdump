@@ -485,7 +485,6 @@ tcpdump would not work correctly even if it managed to compile."
 endif()
 
 check_function_exists(getopt_long HAVE_GETOPT_LONG)
-check_function_exists(setlinebuf HAVE_SETLINEBUF)
 #
 # For Windows,  don't need to waste time checking for fork() or vfork().
 #
