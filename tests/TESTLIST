@@ -487,7 +487,7 @@ aoe_1-v		AoE_Linux.pcap		aoe_1-v.out	-v
 # Geneve tests
 geneve-vv	geneve.pcap		geneve-vv.out	-vv
 geneve-vni	geneve.pcap		geneve-vni.out	geneve 0xb
-geneve-tcp	geneve.pcap		geneve-tcp.out	"geneve && tcp"
+geneve-tcp	geneve.pcap		geneve-tcp.out	geneve and tcp
 geneve-gcp	geneve-gcp.pcap		geneve-gcp.out	-vv
 
 # DHCP tests
