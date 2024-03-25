@@ -448,7 +448,6 @@ fi
 
 AC_REPLACE_FUNCS(strlcat strlcpy strdup strsep getservent getopt_long)
 AC_CHECK_FUNCS(fork vfork)
-AC_CHECK_FUNCS(setlinebuf)
 
 #
 # It became apparent at some point that using a suitable C99 compiler does not
