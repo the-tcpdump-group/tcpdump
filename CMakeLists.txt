@@ -1314,10 +1314,7 @@ file(GLOB PROJECT_SOURCE_LIST_H
 #
 set(MAN_FILE_FORMATS 5)
 set(MAN_MISC_INFO 7)
-if(CMAKE_SYSTEM_NAME STREQUAL "AIX")
-    # Workaround to enable certain features
-    set(_SUN TRUE)
-elseif(CMAKE_SYSTEM_NAME STREQUAL "HP-UX")
+if(CMAKE_SYSTEM_NAME STREQUAL "HP-UX")
     #
     # Use System V conventions for man pages.
     #

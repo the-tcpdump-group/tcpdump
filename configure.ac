@@ -715,11 +715,6 @@ MAN_FILE_FORMATS=5
 MAN_MISC_INFO=7
 case "$host_os" in
 
-aix*)
-	dnl Workaround to enable certain features
-	AC_DEFINE(_SUN,1,[define on AIX to get certain functions])
-	;;
-
 hpux*)
 	#
 	# Use System V conventions for man pages.
