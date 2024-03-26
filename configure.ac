@@ -29,7 +29,6 @@ if test "$ac_cv_prog_cc_c99" = "no"; then
 	AC_MSG_WARN([The C compiler does not support C99; there may be compiler errors])
 fi
 AC_LBL_C_INIT(V_CCOPT, V_INCLS)
-AC_C_INLINE
 
 AC_CHECK_HEADERS(fcntl.h rpc/rpc.h rpc/rpcent.h net/if.h)
 #
