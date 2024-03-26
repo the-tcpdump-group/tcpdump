@@ -668,7 +668,7 @@ instead of ``nic.ddn.mil''.
 .TP
 .B \-\-number
 .PD
-Print an optional packet number at the beginning of the line.
+Print a packet number at the beginning of the line.
 .TP
 .B \-O
 .PD 0
