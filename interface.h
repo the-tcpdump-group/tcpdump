@@ -29,10 +29,7 @@
 #include "funcattrs.h"
 
 #include <stdarg.h>
-
-#if HAVE_STDINT_H
 #include <stdint.h>
-#endif
 
 #ifndef HAVE_STRLCAT
 extern size_t strlcat(char *, const char *, size_t);

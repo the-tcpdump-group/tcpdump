@@ -54,9 +54,6 @@
 /* Define to 1 if you have the `getservent' function. */
 #cmakedefine HAVE_GETSERVENT 1
 
-/* Define to 1 if you have the <inttypes.h> header file. */
-#cmakedefine HAVE_INTTYPES_H 1
-
 /* Define to 1 if you have the `cap-ng' library (-lcap-ng). */
 #cmakedefine HAVE_LIBCAP_NG 1
 
@@ -65,9 +62,6 @@
 
 /* Define to 1 if you have the `rpc' library (-lrpc). */
 #cmakedefine HAVE_LIBRPC 1
-
-/* Define to 1 if you have the <memory.h> header file. */
-#cmakedefine HAVE_MEMORY_H 1
 
 /* Define to 1 if you have the <net/if.h> header file. */
 #cmakedefine HAVE_NET_IF_H 1
@@ -162,18 +156,6 @@
 /* Define to 1 if you have the <rpc/rpc.h> header file. */
 #cmakedefine HAVE_RPC_RPC_H 1
 
-/* Define to 1 if you have the <stdint.h> header file. */
-#cmakedefine HAVE_STDINT_H 1
-
-/* Define to 1 if you have the <stdlib.h> header file. */
-#cmakedefine HAVE_STDLIB_H 1
-
-/* Define to 1 if you have the <strings.h> header file. */
-#cmakedefine HAVE_STRINGS_H 1
-
-/* Define to 1 if you have the <string.h> header file. */
-#cmakedefine HAVE_STRING_H 1
-
 /* Define to 1 if you have the `strlcat' function. */
 #cmakedefine HAVE_STRLCAT 1
 
@@ -186,17 +168,8 @@
 /* Define to 1 if the system has the type `struct ether_addr'. */
 #cmakedefine HAVE_STRUCT_ETHER_ADDR 1
 
-/* Define to 1 if you have the <sys/stat.h> header file. */
-#cmakedefine HAVE_SYS_STAT_H 1
-
-/* Define to 1 if you have the <sys/types.h> header file. */
-#cmakedefine HAVE_SYS_TYPES_H 1
-
 /* Define to 1 if the system has the type `uintptr_t'. */
 #cmakedefine HAVE_UINTPTR_T 1
-
-/* Define to 1 if you have the <unistd.h> header file. */
-#cmakedefine HAVE_UNISTD_H 1
 
 /* Define to 1 if you have the `vfork' function. */
 #cmakedefine HAVE_VFORK 1
