@@ -9,7 +9,7 @@ freebsd_task:
     # FreeBSD fails to start with 1 GB. 8 CPUs max concurrency.
     # The number of CPU cores must be either 1 or a multiple of 2.
     matrix:
-      - image_family: freebsd-13-2
+      - image_family: freebsd-13-3
         cpu: 2
         memory: 2G
       - image_family: freebsd-14-0
