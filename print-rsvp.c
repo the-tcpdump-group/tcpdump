@@ -461,7 +461,7 @@ static const struct tok rsvp_obj_error_code_diffserv_te_values[] = {
     { 6,                      "CT/setup priority and CT/holding priority do not form a configured TE-Class" },
     { 7,                      "Inconsistency between signaled PSC and signaled CT" },
     { 8,                      "Inconsistency between signaled PHBs and signaled CT" },
-   { 0, NULL}
+    { 0, NULL}
 };
 
 /* rfc3473 / rfc 3471 */
