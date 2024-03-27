@@ -32,9 +32,7 @@
  * Specifications: I-D draft-foschiano-erspan-03.
  */
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #include "netdissect-stdinc.h"
 

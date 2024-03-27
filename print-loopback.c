@@ -33,9 +33,7 @@
  * https://web.archive.org/web/20060919181108/http://www.mit.edu/people/jhawk/ctp.pdf
  */
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #include "netdissect-stdinc.h"
 

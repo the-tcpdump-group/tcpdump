@@ -44,9 +44,7 @@
  * Virtual Subnet ID (VSID) and an 8-bit FlowID.
  */
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #include "netdissect-stdinc.h"
 

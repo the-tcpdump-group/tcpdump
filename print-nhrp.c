@@ -23,9 +23,7 @@
  * I-D draft-detienne-dmvpn-01 (expired)
  */
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #include "netdissect-stdinc.h"
 

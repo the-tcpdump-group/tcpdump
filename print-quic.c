@@ -23,9 +23,7 @@
 /* \summary: QUIC Protocol printer */
 /* specification: https://www.rfc-editor.org/rfc/rfc9000.txt */
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #include "netdissect-stdinc.h"
 #include "netdissect-alloc.h"

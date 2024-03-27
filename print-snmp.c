@@ -58,9 +58,7 @@
 
 /* \summary: Simple Network Management Protocol (SNMP) printer */
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #include "netdissect-stdinc.h"
 

@@ -21,9 +21,7 @@
 
 /* \summary: Broadcom Ethernet switches tag (4 bytes) printer */
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #include "netdissect-stdinc.h"
 

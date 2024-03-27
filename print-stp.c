@@ -10,9 +10,7 @@
 
 /* \summary: IEEE 802.1d Spanning Tree Protocol (STP) printer */
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #include "netdissect-stdinc.h"
 
