@@ -326,7 +326,7 @@ Wednesday, June 9, 2021 by gharris
       Fix "make clean" for out-of-tree autotools builds
       CMake: add stuff from CMAKE_PREFIX_PATH to PKG_CONFIG_PATH.
     Documentation:
-      man: Update a reference as www.cifs.org is gone. [skip ci]
+      man: Update a reference as www.cifs.org is gone.
       man: Update DNS sections
     Solaris:
       Fix a compile error with Sun C
