@@ -315,11 +315,11 @@ static const struct tok rsvp_ctype_values[] = {
  * out-of-band, or negotiated by other RSVP objects.
  */
 struct rsvp_obj_integrity_t {
-    uint8_t flags;
-    uint8_t res;
-    uint8_t key_id[6];
-    uint8_t sequence[8];
-    uint8_t digest[16];
+    nd_uint8_t flags;
+    nd_uint8_t res;
+    nd_byte    key_id[6];
+    nd_byte    sequence[8];
+    nd_byte    digest[16];
 };
 
 static const struct tok rsvp_obj_integrity_flag_values[] = {
@@ -328,14 +328,14 @@ static const struct tok rsvp_obj_integrity_flag_values[] = {
 };
 
 struct rsvp_obj_frr_t {
-    uint8_t setup_prio;
-    uint8_t hold_prio;
-    uint8_t hop_limit;
-    uint8_t flags;
-    uint8_t bandwidth[4];
-    uint8_t include_any[4];
-    uint8_t exclude_any[4];
-    uint8_t include_all[4];
+    nd_uint8_t  setup_prio;
+    nd_uint8_t  hold_prio;
+    nd_uint8_t  hop_limit;
+    nd_uint8_t  flags;
+    nd_float    bandwidth;
+    nd_uint32_t include_any;
+    nd_uint32_t exclude_any;
+    nd_uint32_t include_all;
 };
 
 
@@ -1544,9 +1544,9 @@ rsvp_obj_print(netdissect_options *ndo,
                 bw = GET_BE_F_4(obj_ptr.rsvp_obj_frr->bandwidth);
                 ND_PRINT("%s  Setup Priority: %u, Holding Priority: %u, Hop-limit: %u, Bandwidth: %.10g Mbps",
                        indent,
-                       obj_ptr.rsvp_obj_frr->setup_prio,
-                       obj_ptr.rsvp_obj_frr->hold_prio,
-                       obj_ptr.rsvp_obj_frr->hop_limit,
+                       GET_U_1(obj_ptr.rsvp_obj_frr->setup_prio),
+                       GET_U_1(obj_ptr.rsvp_obj_frr->hold_prio),
+                       GET_U_1(obj_ptr.rsvp_obj_frr->hop_limit),
                        bw * 8 / 1000000);
                 ND_PRINT("%s  Include-any: 0x%08x, Exclude-any: 0x%08x, Include-all: 0x%08x",
                        indent,
@@ -1563,9 +1563,9 @@ rsvp_obj_print(netdissect_options *ndo,
                 bw = GET_BE_F_4(obj_ptr.rsvp_obj_frr->bandwidth);
                 ND_PRINT("%s  Setup Priority: %u, Holding Priority: %u, Hop-limit: %u, Bandwidth: %.10g Mbps",
                        indent,
-                       obj_ptr.rsvp_obj_frr->setup_prio,
-                       obj_ptr.rsvp_obj_frr->hold_prio,
-                       obj_ptr.rsvp_obj_frr->hop_limit,
+                       GET_U_1(obj_ptr.rsvp_obj_frr->setup_prio),
+                       GET_U_1(obj_ptr.rsvp_obj_frr->hold_prio),
+                       GET_U_1(obj_ptr.rsvp_obj_frr->hop_limit),
                        bw * 8 / 1000000);
                 ND_PRINT("%s  Include Colors: 0x%08x, Exclude Colors: 0x%08x",
                        indent,
@@ -1758,7 +1758,7 @@ rsvp_obj_print(netdissect_options *ndo,
                        GET_BE_U_4(obj_ptr.rsvp_obj_integrity->sequence + 4),
                        bittok2str(rsvp_obj_integrity_flag_values,
                                   "none",
-                                  obj_ptr.rsvp_obj_integrity->flags));
+                                  GET_U_1(obj_ptr.rsvp_obj_integrity->flags)));
                 ND_PRINT("%s  MD5-sum 0x%08x%08x%08x%08x ",
                        indent,
                        GET_BE_U_4(obj_ptr.rsvp_obj_integrity->digest),

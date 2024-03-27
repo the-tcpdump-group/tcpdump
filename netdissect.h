@@ -74,6 +74,14 @@ typedef unsigned char nd_int64_t[8];
 #define	FMAXINT	(4294967296.0)	/* floating point rep. of MAXINT */
 
 /*
+ * Data types corresponding to multi-byte floating_point values within
+ * data structures.  These are defined as arrays of octets, for the
+ * same reason that we do so for integral values.
+ */
+typedef unsigned char nd_float[4];
+typedef unsigned char nd_double[8];
+
+/*
  * Use this for IPv4 addresses and netmasks.
  *
  * It's defined as an array of octets, so that it's not guaranteed to
