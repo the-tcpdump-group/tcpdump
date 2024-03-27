@@ -17,9 +17,7 @@
 
 /* specification: https://standards.ieee.org/findstds/standard/1588-2008.html*/
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #include "netdissect-stdinc.h"
 #include "netdissect.h"

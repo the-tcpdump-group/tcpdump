@@ -279,8 +279,6 @@ file(STRINGS ${tcpdump_SOURCE_DIR}/VERSION
 # Project settings
 ######################################
 
-add_definitions(-DHAVE_CONFIG_H)
-
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${tcpdump_SOURCE_DIR}

@@ -82,9 +82,7 @@
  * TODO: Among other things to print ok MacIntosh and Vendor values
  */
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #include "netdissect-stdinc.h"
 

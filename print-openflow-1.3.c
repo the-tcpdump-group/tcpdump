@@ -33,9 +33,7 @@
 
 /* \summary: OpenFlow protocol version 1.3 printer */
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #include "netdissect-stdinc.h"
 

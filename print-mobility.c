@@ -30,9 +30,7 @@
 /* \summary: IPv6 mobility printer */
 /* RFC 3775 */
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #include "netdissect-stdinc.h"
 

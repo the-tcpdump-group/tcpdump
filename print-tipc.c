@@ -27,9 +27,7 @@
  *     https://web.archive.org/web/20161025110514/http://tipc.sourceforge.net/doc/tipc_message_formats.html
  */
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #include "netdissect-stdinc.h"
 

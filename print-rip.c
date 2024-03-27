@@ -23,9 +23,7 @@
 
 /* specification: RFC 1058, RFC 2453, RFC 4822 */
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #include "netdissect-stdinc.h"
 

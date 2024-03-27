@@ -25,9 +25,7 @@
  *	Seth Webster <swebster@sst.ll.mit.edu>
  */
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #include <stdlib.h>
 #include <string.h>

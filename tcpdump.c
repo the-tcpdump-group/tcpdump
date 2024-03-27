@@ -33,9 +33,7 @@
  * combined efforts of Van, Steve McCanne and Craig Leres of LBL.
  */
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 /*
  * Some older versions of Mac OS X ship pcap.h from libpcap 0.6 with a

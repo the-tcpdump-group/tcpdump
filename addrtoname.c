@@ -22,9 +22,7 @@
  *  and address to string conversion routines
  */
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #ifdef HAVE_CASPER
 #include <libcasper.h>

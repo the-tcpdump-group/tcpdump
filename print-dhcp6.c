@@ -43,9 +43,7 @@
  *  RFC6334: Dual-Stack Lite option,
  */
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #include "netdissect-stdinc.h"
 
