@@ -362,7 +362,6 @@ lmp_print_data_link_subobjs(netdissect_options *ndo, const u_char *obj_tptr,
 {
     int hexdump = FALSE;
     int subobj_type, subobj_len;
-    float bw;
 
     while (total_subobj_len > 0 && hexdump == FALSE ) {
 	subobj_type = GET_U_1(obj_tptr + offset);
@@ -397,12 +396,10 @@ lmp_print_data_link_subobjs(netdissect_options *ndo, const u_char *obj_tptr,
 			"Unknown",
 			GET_U_1(obj_tptr + offset + 3)),
 		GET_U_1(obj_tptr + offset + 3));
-	    bw = GET_BE_F_4(obj_tptr + offset + 4);
 	    ND_PRINT("\n\t      Min Reservable Bandwidth: %.3f Mbps",
-                bw*8/1000000);
-	    bw = GET_BE_F_4(obj_tptr + offset + 8);
+		GET_BE_F_4(obj_tptr + offset + 4)*8/1000000);
 	    ND_PRINT("\n\t      Max Reservable Bandwidth: %.3f Mbps",
-                bw*8/1000000);
+		GET_BE_F_4(obj_tptr + offset + 8)*8/1000000);
 	    break;
 	case WAVELENGTH_SUBOBJ:
 	    ND_PRINT("\n\t      Wavelength: %u",
@@ -429,7 +426,6 @@ lmp_print(netdissect_options *ndo,
     int hexdump;
     u_int offset;
     u_int link_type;
-    float bw;
 
     ndo->ndo_protocol = "lmp";
     tptr=pptr;
@@ -795,8 +791,8 @@ lmp_print(netdissect_options *ndo,
 			GET_BE_U_2(obj_tptr + 10),
 			GET_BE_U_2(obj_tptr + 10),
 			GET_BE_U_2(obj_tptr + 10)&8000 ? " (Payload test messages capable)" : "");
-                bw = GET_BE_F_4(obj_tptr + 12);
-		ND_PRINT("\n\t    Transmission Rate: %.3f Mbps",bw*8/1000000);
+		ND_PRINT("\n\t    Transmission Rate: %.3f Mbps",
+			GET_BE_F_4(obj_tptr + 12)*8/1000000);
 		ND_PRINT("\n\t    Wavelength: %u",
 			GET_BE_U_4(obj_tptr + 16));
 		break;

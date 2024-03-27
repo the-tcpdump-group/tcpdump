@@ -893,7 +893,6 @@ static void
 bgp_extended_community_print(netdissect_options *ndo,
                              const u_char *pptr)
 {
-    float bw;
     /* allocate space for the largest possible string */
     char astostr[AS_STR_SIZE];
 
@@ -925,9 +924,8 @@ bgp_extended_community_print(netdissect_options *ndo,
             break;
 
     case BGP_EXT_COM_LINKBAND:
-            bw = GET_BE_F_4(pptr + 4);
             ND_PRINT("bandwidth: %.3f Mbps",
-                     bw*8/1000000);
+                     GET_BE_F_4(pptr + 4)*8/1000000);
             break;
 
     case BGP_EXT_COM_OVS:
