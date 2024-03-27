@@ -1,0 +1,3 @@
+    1  2024-01-22 18:23:52.186004 IP [total length 84 > length 35] (invalid) (tos 0x0, ttl 64, id 53536, offset 0, flags [DF], proto ICMP (1), length 84, bad cksum 22 (->cdef)!)
+    35.36.42.37 > 38.39.40.41: ICMP extended echo request, id 11823, seq 48, length 64
+	Local Interface [|icmp]
