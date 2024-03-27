@@ -17,9 +17,7 @@
 /* \summary: Syslog protocol printer */
 /* specification: RFC 3164 (not RFC 5424) */
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #include "netdissect-stdinc.h"
 

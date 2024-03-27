@@ -28,9 +28,7 @@
 /* \summary: ZeroMQ Message Transport Protocol (ZMTP) printer */
 /* specification: https://rfc.zeromq.org/spec/13/ */
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #include "netdissect-stdinc.h"
 
