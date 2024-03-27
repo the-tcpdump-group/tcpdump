@@ -446,12 +446,6 @@ AC_CHECK_FUNCS(fork vfork)
 AC_CHECK_FUNCS(setlinebuf)
 
 #
-# Make sure we have snprintf(); we require it.
-#
-AC_CHECK_FUNC(snprintf,,
-    AC_MSG_ERROR([snprintf() is required but wasn't found]))
-
-#
 # It became apparent at some point that using a suitable C99 compiler does not
 # automatically mean snprintf(3) implementation in the libc supports all the
 # modifiers and specifiers used in the project, so let's test that before the
