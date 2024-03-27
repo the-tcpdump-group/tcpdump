@@ -422,17 +422,6 @@ endif(STDLIBS_HAVE_GETSERVENT)
 cmake_pop_check_state()
 
 #
-# Make sure we have snprintf(); we require it.
-# We use check_symbol_exists(), as it isn't necessarily an external
-# function - in Visual Studio, for example, it is an inline function
-# calling an external function.
-#
-check_symbol_exists(snprintf "stdio.h" HAVE_SNPRINTF)
-if(NOT HAVE_SNPRINTF)
-    message(FATAL_ERROR "snprintf() is required but wasn't found")
-endif()
-
-#
 # Require a proof of suitable snprintf(3), same as in Autoconf.
 #
 include(CheckCSourceRuns)
