@@ -31,7 +31,7 @@ fi
 AC_LBL_C_INIT(V_CCOPT, V_INCLS)
 AC_LBL_C_INLINE
 
-AC_CHECK_HEADERS(fcntl.h rpc/rpc.h rpc/rpcent.h net/if.h)
+AC_CHECK_HEADERS(rpc/rpc.h rpc/rpcent.h net/if.h)
 #
 # Get the size of a void *, to know whether this is a 32-bit or 64-bit build.
 #
