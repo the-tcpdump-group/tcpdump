@@ -725,12 +725,6 @@ solaris*)
 	;;
 esac
 
-#
-# Make sure we have a definition for C99's uintptr_t (regardless of
-# whether the environment is a C99 environment or not).
-#
-AC_TYPE_UINTPTR_T
-
 savedcppflags="$CPPFLAGS"
 CPPFLAGS="$CPPFLAGS $V_INCLS"
 

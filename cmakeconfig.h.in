@@ -168,9 +168,6 @@
 /* Define to 1 if the system has the type `struct ether_addr'. */
 #cmakedefine HAVE_STRUCT_ETHER_ADDR 1
 
-/* Define to 1 if the system has the type `uintptr_t'. */
-#cmakedefine HAVE_UINTPTR_T 1
-
 /* Define to 1 if you have the `vfork' function. */
 #cmakedefine HAVE_VFORK 1
 
@@ -239,7 +236,3 @@
 
 /* Define to `uint8_t' if u_int8_t not defined. */
 #cmakedefine u_int8_t 1
-
-/* Define to the type of an unsigned integer type wide enough to hold a
-   pointer, if such a type exists, and if the system does not define it. */
-#cmakedefine uintptr_t 1
