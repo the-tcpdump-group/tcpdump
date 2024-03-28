@@ -72,7 +72,7 @@
 /* Define to 1 if you have the <openssl/evp.h> header file. */
 #cmakedefine HAVE_OPENSSL_EVP_H 1
 
-/* if there's an os_proto.h for this platform, to use additional prototypes */
+/* if there's an os-proto.h for this platform, to use additional prototypes */
 #cmakedefine HAVE_OS_PROTO_H 1
 
 /* Define to 1 if you have the `pcap_breakloop' function. */
