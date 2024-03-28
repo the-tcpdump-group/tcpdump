@@ -126,9 +126,9 @@ struct aarp {
 	nd_uint8_t	halen, palen;
 	nd_uint16_t	op;
 	nd_mac48	hsaddr;
-	uint8_t		psaddr[4];
+	nd_byte		psaddr[4];
 	nd_mac48	hdaddr;
-	uint8_t		pdaddr[4];
+	nd_byte		pdaddr[4];
 };
 
 static void atp_print(netdissect_options *, const struct atATP *, u_int);
