@@ -39,9 +39,6 @@
 /* Define to 1 if you have the `EVP_DecryptInit_ex' function. */
 #cmakedefine HAVE_EVP_DECRYPTINIT_EX 1
 
-/* Define to 1 if you have the <fcntl.h> header file. */
-#cmakedefine HAVE_FCNTL_H 1
-
 /* Define to 1 if you have the `fork' function. */
 #cmakedefine HAVE_FORK 1
 
