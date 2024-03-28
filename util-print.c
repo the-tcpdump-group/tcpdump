@@ -43,9 +43,6 @@
 
 #include <sys/stat.h>
 
-#ifdef HAVE_FCNTL_H
-#include <fcntl.h>
-#endif
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
