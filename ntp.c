@@ -29,7 +29,7 @@
 #define	JAN_1970	INT64_T_CONSTANT(2208988800)	/* 1970 - 1900 in seconds */
 
 void
-p_ntp_time(netdissect_options *ndo,
+p_ntp_time_fmt(netdissect_options *ndo, const char *fmt,
 	   const struct l_fixedpt *lfp)
 {
 	uint32_t i;
@@ -63,10 +63,16 @@ p_ntp_time(netdissect_options *ndo,
 		 */
 		time_string = "[Time is too large to fit into a time_t]";
 	    } else {
-		/* use ISO 8601 (RFC3339) format */
 		time_string = nd_format_time(time_buf, sizeof (time_buf),
-		  "%Y-%m-%dT%H:%M:%SZ", gmtime(&seconds));
+		  fmt, gmtime(&seconds));
 	    }
 	    ND_PRINT(" (%s)", time_string);
 	}
+}
+
+void
+p_ntp_time(netdissect_options *ndo, const struct l_fixedpt *lfp)
+{
+	/* use ISO 8601 (RFC3339) format */
+	p_ntp_time_fmt(ndo, "%Y-%m-%dT%H:%M:%SZ", lfp);
 }
