@@ -37,7 +37,7 @@ tcpdump compiles and works on at least the following platforms:
 * [NetBSD](./doc/README.NetBSD.md)
 * OpenBSD
 * [Solaris](./doc/README.solaris.md)
-* [Windows](./doc/README.Win32.md) (requires WinPcap or Npcap, and Visual
+* [Windows](./doc/README.windows.md) (requires WinPcap or Npcap, and Visual
   Studio with CMake)
 
 In the past tcpdump certainly or likely worked on the following platforms:

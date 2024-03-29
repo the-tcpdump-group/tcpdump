@@ -141,7 +141,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       tests: Use the -tttt option, by default, for the tests.
       autoconf, CMake: Get the size of a void * and a time_t.
     Documentation:
-      Fixed errors in doc/README.Win32.md.
+      Fixed errors in doc/README.Win32.md and renamed it to
+        README.windows.md.
 
 Friday, April 7, 2023 / The Tcpdump Group
   Summary for 4.99.4 tcpdump release
