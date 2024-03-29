@@ -23,14 +23,12 @@
 
 #include <config.h>
 
-#ifdef HAVE_NET_IF_H
 /*
  * Include diag-control.h before <net/if.h>, which too defines a macro
  * named ND_UNREACHABLE.
  */
 #include "diag-control.h"
 #include <net/if.h>
-#endif
 
 #include "netdissect-stdinc.h"
 
@@ -408,21 +406,17 @@ sll2_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 	u_short ether_type;
 	int llc_hdrlen;
 	u_int hdrlen;
-#ifdef HAVE_NET_IF_H
 	uint32_t if_index;
 	char ifname[IF_NAMESIZE];
-#endif
 
 	ndo->ndo_protocol = "sll2";
 	ND_TCHECK_LEN(p, SLL2_HDR_LEN);
 
 	sllp = (const struct sll2_header *)p;
-#ifdef HAVE_NET_IF_H
 	if_index = GET_BE_U_4(sllp->sll2_if_index);
 	if (!if_indextoname(if_index, ifname))
 		strncpy(ifname, "?", 2);
 	ND_PRINT("%-5s ", ifname);
-#endif
 
 	ND_PRINT("%-3s ",
 		 tok2str(sll_pkttype_values, "?", GET_U_1(sllp->sll2_pkttype)));
