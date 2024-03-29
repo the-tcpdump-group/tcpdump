@@ -359,7 +359,7 @@ EXTRA_DIST = \
 	doc/README.haiku.md \
 	doc/README.NetBSD.md \
 	doc/README.solaris.md \
-	doc/README.Win32.md \
+	doc/README.windows.md \
 	install-sh \
 	instrument-functions.c \
 	lbl/os-osf4.h \
