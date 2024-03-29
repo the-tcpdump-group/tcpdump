@@ -249,16 +249,32 @@ ts_date_hmsfrac_print(netdissect_options *ndo, const struct timeval *tv,
 	struct tm *tm;
 	char timebuf[32];
 	const char *timestr;
+#ifdef _WIN32
+	time_t sec;
+#endif
 
 	if (tv->tv_sec < 0) {
 		ND_PRINT("[timestamp overflow]");
 		return;
 	}
 
+#ifdef _WIN32
+	/* on Windows tv->tv_sec is a long not a 64-bit time_t. */
+	sec = tv->tv_sec;
+#endif
+
 	if (time_flag == LOCAL_TIME)
+#ifdef _WIN32
+		tm = localtime(&sec);
+#else
 		tm = localtime(&tv->tv_sec);
+#endif
 	else
+#ifdef _WIN32
+		tm = gmtime(&sec);
+#else
 		tm = gmtime(&tv->tv_sec);
+#endif
 
 	if (date_flag == WITH_DATE) {
 		timestr = nd_format_time(timebuf, sizeof(timebuf),
