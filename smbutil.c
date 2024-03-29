@@ -35,43 +35,38 @@ smb_reset(void)
 }
 
 /*
- * interpret a 32 bit dos packed date/time to some parameters
- */
-static void
-interpret_dos_date(uint32_t date, struct tm *tp)
-{
-    uint32_t p0, p1, p2, p3;
-
-    p0 = date & 0xFF;
-    p1 = ((date & 0xFF00) >> 8) & 0xFF;
-    p2 = ((date & 0xFF0000) >> 16) & 0xFF;
-    p3 = ((date & 0xFF000000) >> 24) & 0xFF;
-
-    tp->tm_sec = 2 * (p0 & 0x1F);
-    tp->tm_min = ((p0 >> 5) & 0xFF) + ((p1 & 0x7) << 3);
-    tp->tm_hour = (p1 >> 3) & 0xFF;
-    tp->tm_mday = (p2 & 0x1F);
-    tp->tm_mon = ((p2 >> 5) & 0xFF) + ((p3 & 0x1) << 3) - 1;
-    tp->tm_year = ((p3 >> 1) & 0xFF) + 80;
-}
-
-/*
- * common portion:
- * create a unix date from a dos date
+ * create a UNIX time_t from a 32-bit DOS packetd date/time, with
+ * the DOS date/time assumed to be local time in *our* location.
  */
 static time_t
 int_unix_date(uint32_t dos_date)
 {
+    uint32_t p0, p1, p2, p3;
     struct tm t;
 
     if (dos_date == 0)
 	return(0);
 
-    interpret_dos_date(dos_date, &t);
-    t.tm_wday = 1;
-    t.tm_yday = 1;
-    t.tm_isdst = 0;
+    p0 = dos_date & 0xFF;
+    p1 = ((dos_date & 0xFF00) >> 8) & 0xFF;
+    p2 = ((dos_date & 0xFF0000) >> 16) & 0xFF;
+    p3 = ((dos_date & 0xFF000000) >> 24) & 0xFF;
 
+    t.tm_sec = 2 * (p0 & 0x1F);
+    t.tm_min = ((p0 >> 5) & 0xFF) + ((p1 & 0x7) << 3);
+    t.tm_hour = (p1 >> 3) & 0xFF;
+    t.tm_mday = (p2 & 0x1F);
+    t.tm_mon = ((p2 >> 5) & 0xFF) + ((p3 & 0x1) << 3) - 1;
+    t.tm_year = ((p3 >> 1) & 0xFF) + 80;
+
+    t.tm_wday = 1;	/* XXX - should not affect the result; why 1? */
+    t.tm_yday = 1;	/* XXX - should not affect the result; why 1? */
+    t.tm_isdst = 0;	/* XXX - should be -1, to handle DST? */
+
+    /*
+     * XXX - if tm_year is 2038 or later, this might not fit in a
+     * 32-bit time_t.
+     */
     return (mktime(&t));
 }
 
@@ -103,31 +98,38 @@ make_unix_date2(netdissect_options *ndo, const u_char *date_ptr)
     return int_unix_date(x2);
 }
 
+/* Delta between the NT FILETIME epoch and the POSIX epoch. */
+#define FILETIME_TO_POSIX_DELTA INT64_C(11644473600)
+
 /*
- * interpret an 8 byte "filetime" structure to a time_t
+ * interpret an 8 byte NT FILETIME structure to a time_t
  * It's originally in "100ns units since jan 1st 1601"
  */
 static time_t
-interpret_long_date(netdissect_options *ndo, const u_char *p)
+interpret_filetime(netdissect_options *ndo, const u_char *p)
 {
-    double d;
-    time_t ret;
+    int64_t ret;
+    time_t ret_time_t;
 
-    /* this gives us seconds since jan 1st 1601 (approx) */
-    d = (GET_LE_U_4(p + 4) * 256.0 + GET_U_1(p + 3)) * (1.0e-7 * (1 << 24));
+    /*
+     * Fetch a FILETIME structure; the first 4 bytes are the low-order
+     * 32 bits of a 64-bit count of 100ns units since 1601-01-01
+     * at some specific time, and the next 4 bytes are the high-order
+     * 32 bits of that count.
+     */
+    ret = (int64_t)(((uint64_t)GET_LE_U_4(p + 4) << 32) + (uint64_t)GET_LE_U_4(p));
 
-    /* now adjust by 369 years to make the secs since 1970 */
-    d -= 369.0 * 365.25 * 24 * 60 * 60;
+    /* Now convert from FILETIME to POSIX time. */
+    ret += FILETIME_TO_POSIX_DELTA;
 
-    /* and a fudge factor as we got it wrong by a few days */
-    d += (3 * 24 * 60 * 60 + 6 * 60 * 60 + 2);
-
-    if (d < 0)
-	return(0);
-
-    ret = (time_t)d;
-
-    return(ret);
+    ret_time_t = (time_t)ret;
+    if (ret_time_t != ret) {
+        /*
+         * It doesn't fit in a time_t.  Return 0, as an error indication.
+         */
+        return(0);
+    }
+    return(ret_time_t);
 }
 
 /*
@@ -790,7 +792,7 @@ smb_fdata1(netdissect_options *ndo,
 		break;
 	    case 3:
 		ND_TCHECK_8(buf);
-		t = interpret_long_date(ndo, buf);
+		t = interpret_filetime(ndo, buf);
 		buf += 8;
 		break;
 	    default:
