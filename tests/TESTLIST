@@ -93,11 +93,9 @@ mpls-ldp-hello	mpls-ldp-hello.pcap	mpls-ldp-hello.out -v
 ldp-common-session ldp-common-session.pcap ldp-common-session.out -v
 ldp_infloop	ldp-infinite-loop.pcap	ldp_infloop.out
 lspping-fec-ldp    lspping-fec-ldp.pcap lspping-fec-ldp.out
-lspping-fec-ldp-v  lspping-fec-ldp.pcap lspping-fec-ldp-v.out -v
-lspping-fec-ldp-vv lspping-fec-ldp.pcap lspping-fec-ldp-vv.out -vv
+# Tests with -v and -vv are now in time.tests skipped if not HAVE_TIME_T_64
 lspping-fec-rsvp    lspping-fec-rsvp.pcap lspping-fec-rsvp.out
-lspping-fec-rsvp-v  lspping-fec-rsvp.pcap lspping-fec-rsvp-v.out -v
-lspping-fec-rsvp-vv lspping-fec-rsvp.pcap lspping-fec-rsvp-vv.out -vv
+# Tests with -v and -vv are now in time.tests skipped if not HAVE_TIME_T_64
 mpls-traceroute   mpls-traceroute.pcap mpls-traceroute.out
 mpls-traceroute-v mpls-traceroute.pcap mpls-traceroute-v.out -v
 mpls-over-udp  mpls-over-udp.pcap  mpls-over-udp.out
@@ -805,7 +803,7 @@ dns-zlip-3		dns-zlip-3.pcap		dns-zlip-3.out
 
 # NTP tests
 ntp			ntp.pcap		ntp.out
-ntp-v			ntp.pcap		ntp-v.out		-v
+# Test with -v is now in time.tests skipped if not HAVE_TIME_T_64
 ntp-time		ntp-time.pcap		ntp-time.out
 ntp-time--v		ntp-time.pcap		ntp-time--v.out		-v
 ntp-control		ntp-control.pcap	ntp-control.out
