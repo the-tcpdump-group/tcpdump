@@ -557,6 +557,41 @@ my @decode_tests = (
 		output => 'time_2107-tt.out',
 		args => '-tt -q SPECIAL_t'
 	},
+	{
+		skip => skip_time_t_not (64),
+		name => 'lspping-fec-ldp-v',
+		input => 'lspping-fec-ldp.pcap',
+		output => 'lspping-fec-ldp-v.out',
+		args => '-v'
+	},
+	{
+		skip => skip_time_t_not (64),
+		name => 'lspping-fec-ldp-vv',
+		input => 'lspping-fec-ldp.pcap',
+		output => 'lspping-fec-ldp-vv.out',
+		args => '-vv'
+	},
+	{
+		skip => skip_time_t_not (64),
+		name => 'lspping-fec-rsvp-v',
+		input => 'lspping-fec-rsvp.pcap',
+		output => 'lspping-fec-rsvp-v.out',
+		args => '-v'
+	},
+	{
+		skip => skip_time_t_not (64),
+		name => 'lspping-fec-rsvp-vv',
+		input => 'lspping-fec-rsvp.pcap',
+		output => 'lspping-fec-rsvp-vv.out',
+		args => '-vv'
+	},
+	{
+		skip => skip_time_t_not (64),
+		name => 'ntp-v',
+		input => 'ntp.pcap',
+		output => 'ntp-v.out',
+		args => '-v'
+	},
 );
 
 sub decode_exit_status {

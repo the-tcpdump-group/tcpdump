@@ -26,7 +26,11 @@
 
 #include "extract.h"
 
-#define	JAN_1970	INT64_C(2208988800)	/* 1970 - 1900 in seconds */
+/* NTP epoch 1: January 1, 1900, 00:00:00 UTC. */
+#define DIFF_1970_1900 INT64_C(2208988800) /* 1970 - 1900 in seconds */
+/* RFC4330 - 3. NTP Timestamp Format - 6h 28m 16s UTC on 7 February 2036 */
+/* NTP epoch 2: February 7, 2036, 06:28:16 UTC. */
+#define DIFF_2036_1970 INT64_C(2085978496) /* 2036 - 1970 in seconds */
 
 void
 p_ntp_time_fmt(netdissect_options *ndo, const char *fmt,
@@ -50,21 +54,25 @@ p_ntp_time_fmt(netdissect_options *ndo, const char *fmt,
 	 * print the UTC time in human-readable format.
 	 */
 	if (i) {
-	    int64_t seconds_64bit = (int64_t)i - JAN_1970;
+	    int64_t seconds_64bit;
 	    time_t seconds;
 	    char time_buf[128];
 	    const char *time_string;
 
+	    if ((i & 0x80000000) != 0)
+		seconds_64bit = (int64_t)i - DIFF_1970_1900;
+	    else
+		seconds_64bit = (int64_t)i + DIFF_2036_1970;
 	    seconds = (time_t)seconds_64bit;
 	    if (seconds != seconds_64bit) {
 		/*
 		 * It doesn't fit into a time_t, so we can't hand it
 		 * to gmtime.
 		 */
-		time_string = "[Time is too large to fit into a time_t]";
+		time_string = "[timestamp overflow]";
 	    } else {
 		time_string = nd_format_time(time_buf, sizeof (time_buf),
-		  fmt, gmtime(&seconds));
+					     fmt, gmtime(&seconds));
 	    }
 	    ND_PRINT(" (%s)", time_string);
 	}
