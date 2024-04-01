@@ -23,7 +23,7 @@
 
 #include <config.h>
 
-#ifdef HAVE_NET_IF_H
+#ifdef __linux__
 #include <net/if.h>
 #endif
 
@@ -403,7 +403,7 @@ sll2_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 	u_short ether_type;
 	int llc_hdrlen;
 	u_int hdrlen;
-#ifdef HAVE_NET_IF_H
+#ifdef __linux__
 	uint32_t if_index;
 	char ifname[IF_NAMESIZE];
 #endif
@@ -412,7 +412,7 @@ sll2_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 	ND_TCHECK_LEN(p, SLL2_HDR_LEN);
 
 	sllp = (const struct sll2_header *)p;
-#ifdef HAVE_NET_IF_H
+#ifdef __linux__
 	if_index = GET_BE_U_4(sllp->sll2_if_index);
 	if (!if_indextoname(if_index, ifname))
 		strncpy(ifname, "?", 2);

@@ -2166,7 +2166,7 @@ main(int argc, char **argv)
 				pcap_datalink_val_to_description(dlt));
 		}
 		fprintf(stderr, ", snapshot length %d\n", pcap_snapshot(pd));
-#ifdef DLT_LINUX_SLL2
+#if defined(DLT_LINUX_SLL2) && defined(__linux__)
 		if (dlt == DLT_LINUX_SLL2)
 			fprintf(stderr, "Warning: interface names might be incorrect\n");
 #endif
