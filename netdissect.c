@@ -34,6 +34,10 @@
 #include <smi.h>
 #endif
 
+#ifdef _AIX
+#include "diag-control.h"
+#endif /* _AIX */
+
 /*
  * Initialize anything that must be initialized before dissecting
  * packets.

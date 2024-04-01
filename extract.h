@@ -37,7 +37,6 @@
  */
 #include "funcattrs.h"
 #include "netdissect.h"
-#include "diag-control.h"
 
 /*
  * If we have versions of GCC or Clang that support an __attribute__

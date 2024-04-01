@@ -24,11 +24,6 @@
 #include <config.h>
 
 #ifdef HAVE_NET_IF_H
-/*
- * Include diag-control.h before <net/if.h>, which too defines a macro
- * named ND_UNREACHABLE.
- */
-#include "diag-control.h"
 #include <net/if.h>
 #endif
 

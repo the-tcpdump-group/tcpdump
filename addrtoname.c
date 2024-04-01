@@ -75,11 +75,6 @@
   #endif /* what declares ether_ntohost() */
 
   #ifdef NEED_NETINET_IF_ETHER_H
-    /*
-     * Include diag-control.h before <net/if.h>, which too defines a macro
-     * named ND_UNREACHABLE.
-     */
-    #include "diag-control.h"
     #include <net/if.h>		/* Needed on some platforms */
     #include <netinet/in.h>	/* Needed on some platforms */
     #include <netinet/if_ether.h>
