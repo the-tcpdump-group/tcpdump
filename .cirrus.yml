@@ -8,12 +8,11 @@ freebsd_task:
   freebsd_instance:
     # FreeBSD fails to start with 1 GB. 8 CPUs max concurrency.
     # The number of CPU cores must be either 1 or a multiple of 2.
-    cpu: 2
+    cpu: 1
     memory: 2G
     image_family: freebsd-13-3
   env:
     IGNORE_OSVERSION: yes
-    MAKEFLAGS: -j 3
     MATRIX_CC: clang17 gcc13
   script:
     - pkg install -qy git autoconf gcc13 llvm17
@@ -30,30 +29,22 @@ linux_task:
   container:
     # Linux works just fine with 1 GB. 16 CPUs max concurrency.
     # The number of CPU cores must be either 1 or a multiple of 2.
-    cpu: 4
+    cpu: 1
     memory: 1G
     image: ubuntu:22.04
   env:
     DEBIAN_FRONTEND: noninteractive
-    MAKEFLAGS: -j 5
-    MATRIX_CC: gcc clang-15
     LANG: C
   script:
     - apt-get -qy update >/dev/null
-    - apt-get -qy install git autoconf make cmake clang-15 gcc >/dev/null
-    - apt-get -qy install flex bison libdbus-1-dev libbluetooth-dev libnl-genl-3-dev libibverbs-dev >/dev/null # for libpcap
-    - apt-get -qy install libssl-dev libsmi2-dev libcap-ng-dev libpcap-dev binutils-dev >/dev/null
-    - apt-get -qy install sudo >/dev/null # for some tcpdump commands
+    - apt-get -qy install autoconf make gcc libpcap-dev >/dev/null # for "./configure"
+    - apt-get -qy install cmake git >/dev/null # for "make releasecheck"
     - apt-get -qy install shellcheck >/dev/null
-    - apt list --installed 'lib*-dev'
-    - echo '$ git clone [...] libpcap.git'
-    - git -C .. clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT}
     - ./autogen.sh
     - ./configure --quiet # build the Makefile
     - make releasecheck
     - make whitespacecheck
     - make shellcheck
-    - ./build_matrix.sh
 
 macos_task:
   name: macos-aarch64
@@ -73,7 +64,7 @@ coverity_task:
   name: Coverity Scan
   only_if: $CIRRUS_BRANCH == 'coverity_scan'
   container:
-    cpu: 4
+    cpu: 1
     memory: 2G
     image: ubuntu:22.04
   env:
