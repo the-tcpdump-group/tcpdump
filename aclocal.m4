@@ -711,8 +711,10 @@ AC_DEFUN(AC_LBL_LIBPCAP,
     AC_CHECK_FUNC(pcap_loop,,
     [
         AC_MSG_ERROR(
-[This is a bug, please follow the guidelines in CONTRIBUTING.md and include the
-config.log file in your report.  If you have downloaded libpcap from
+[
+1. Do you try to build a 32-bit tcpdump with a 64-bit libpcap or vice versa?
+2. This is a bug, please follow the guidelines in CONTRIBUTING.md and include
+the config.log file in your report.  If you have downloaded libpcap from
 tcpdump.org, and built it yourself, please also include the config.log
 file from the libpcap source directory, the Makefile from the libpcap
 source directory, and the output of the make process for libpcap, as
