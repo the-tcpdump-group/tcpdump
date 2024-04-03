@@ -185,6 +185,7 @@ static int64_t Cflag;			/* rotate dump files after this many bytes */
 static long Cflag;			/* rotate dump files after this many bytes */
 #endif
 static int Cflag_count;			/* Keep track of which file number we're writing */
+static int rotate_now = 0;              /* user forced rotate after next packet */
 #ifdef HAVE_PCAP_FINDALLDEVS
 static int Dflag;			/* list available devices and exit */
 #endif
@@ -240,6 +241,7 @@ char *program_name;
 /* Forwards */
 static void (*setsignal (int sig, void (*func)(int)))(int);
 static void cleanup(int);
+static void rotate(int);
 static void child_cleanup(int);
 static void print_version(FILE *);
 static void print_usage(FILE *);
@@ -2364,6 +2366,7 @@ DIAG_ON_WARN_UNUSED_RESULT
 #ifndef _WIN32
 	(void)setsignal(SIGPIPE, cleanup);
 	(void)setsignal(SIGTERM, cleanup);
+	(void)setsignal(SIGUSR2, rotate);
 #endif /* _WIN32 */
 	(void)setsignal(SIGINT, cleanup);
 #if defined(HAVE_FORK) || defined(HAVE_VFORK)
@@ -3024,11 +3027,12 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 
 
 		/* If the time is greater than the specified window, rotate */
-		if (t - Gflag_time >= Gflag) {
+		if ((t - Gflag_time >= Gflag) || rotate_now != 0) {
 #ifdef HAVE_CAPSICUM
 			FILE *fp;
 			int fd;
 #endif
+			rotate_now = 0;
 
 			/* Update the Gflag_time */
 			Gflag_time = t;
@@ -3133,11 +3137,12 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 
 		if (size == -1)
 			error("ftell fails on output file");
-		if (size > Cflag) {
+		if (size > Cflag || rotate_now) {
 #ifdef HAVE_CAPSICUM
 			FILE *fp;
 			int fd;
 #endif
+			rotate_now = 0;
 
 			/*
 			 * Close the current file and open a new one.
@@ -3258,6 +3263,12 @@ requestinfo(int signo _U_)
 		info(0);
 }
 #endif
+
+static void
+rotate(int signo _U_)
+{
+	rotate_now = 1;
+}
 
 #ifdef SIGNAL_FLUSH_PCAP
 static void
