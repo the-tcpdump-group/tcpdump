@@ -64,12 +64,8 @@ RANLIB = @RANLIB@
 
 DEPENDENCY_CFLAG = @DEPENDENCY_CFLAG@
 
-# Explicitly define compilation rule since SunOS 4's make doesn't like gcc.
-# Also, gcc does not remove the .o before forking 'as', which can be a
-# problem if you don't own the file but can write to the directory.
 .c.o:
-	@rm -f $@
-	$(CC) $(FULL_CFLAGS) -c $(srcdir)/$*.c
+	$(CC) $(FULL_CFLAGS) -c -o $@ $<
 
 CSRC =	fptype.c tcpdump.c
 
