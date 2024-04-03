@@ -46,8 +46,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
         and use them rather than custom code
       Disregard setlinebuf(3), always use setvbuf(3).
     Building and testing:
-      autoconf: Update install-sh script to the latest available version.
-      autoconf: Remove detection of early IPv6 stacks.
+      Autoconf: Remove detection of early IPv6 stacks.
       Detect OS IPv6 support using AF_INET6 only.
       Remove all remaining support for BSD/OS, IRIX, {OSF/1, Digital Unix,
         Tru64 Unix}, SINIX and Ultrix.
@@ -130,17 +129,18 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       At build time require a proof of suitable snprintf(3) implementation in
         libc (and document Solaris 9 as unsupported because of that).
       Makefile.in: Add two "touch .devel" commands in the releasecheck target.
-      autoconf: Get --with-user and --with-chroot right.
-      autoconf: Fix --static-pcap-only test on Solaris 10.
-      autoconf: Add some warning flags for clang 13 or newer.
-      autoconf: Update config.{guess,sub}, timestamps 2024-01-01.
-      autoconf: Add autogen.sh, remove configure and config.h.in and put
+      Autoconf: Get --with-user and --with-chroot right.
+      Autoconf: Fix --static-pcap-only test on Solaris 10.
+      Autoconf: Add some warning flags for clang 13 or newer.
+      Autoconf: Update config.{guess,sub}, timestamps 2024-01-01.
+      Autoconf: Add autogen.sh, remove configure and config.h.in and put
         these generated files in the release tarball.
+      Autoconf: Update the install-sh script to the 2020-11-14.01 version.
       configure: Apply autoupdate 2.69.
       CMake: improve the comment before project(tcpdump C).
       Do not require vsnprintf().
       tests: Use the -tttt option, by default, for the tests.
-      autoconf, CMake: Get the size of a void * and a time_t.
+      Autoconf, CMake: Get the size of a void * and a time_t.
     Documentation:
       Fixed errors in doc/README.Win32.md and renamed it to
         README.windows.md.
