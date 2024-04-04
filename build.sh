@@ -12,12 +12,16 @@
 : "${TCPDUMP_TAINTED:=no}"
 : "${TCPDUMP_CMAKE_TAINTED:=no}"
 : "${MAKE_BIN:=make}"
+# At least one OS (AIX 7) where this software can build does not have at least
+# one command (mktemp) required for a successful run of "make releasetar".
+: "${TEST_RELEASETAR:=yes}"
 
 . ./build_common.sh
 # Install directory prefix
 if [ -z "$PREFIX" ]; then
     PREFIX=`mktempdir tcpdump_build`
     echo "PREFIX set to '$PREFIX'"
+    DELETE_PREFIX=yes
 fi
 TCPDUMP_BIN="$PREFIX/bin/tcpdump"
 # For TESTrun
@@ -39,9 +43,18 @@ clang-*/SunOS-5.11)
     #   [-Wstrict-prototypes]
     [ "`uname -o`" = illumos ] && TCPDUMP_TAINTED=yes
     ;;
+*)
+    ;;
 esac
 
 [ "$TCPDUMP_TAINTED" != yes ] && CFLAGS=`cc_werr_cflags`
+
+case `cc_id`/`os_id` in
+clang-*/SunOS-5.11)
+    # Work around https://www.illumos.org/issues/16369
+    [ "`uname -o`" = illumos ] && grep -Fq OpenIndiana /etc/release && CFLAGS="-Wno-fuse-ld-path${CFLAGS:+ $CFLAGS}"
+    ;;
+esac
 
 # If necessary, set TCPDUMP_CMAKE_TAINTED here to exempt particular cmake from
 # warnings. Use as specific terms as possible (e.g. some specific version and
@@ -68,14 +81,14 @@ else
     run_after_echo mkdir build
     run_after_echo cd build
     if [ "$BUILD_LIBPCAP" = yes ]; then
-        run_after_echo cmake "$CMAKE_OPTIONS" \
+        run_after_echo cmake ${CMAKE_OPTIONS:+"$CMAKE_OPTIONS"} \
             -DWITH_CRYPTO="$CRYPTO" -DENABLE_SMB="$SMB" \
             ${CFLAGS:+-DEXTRA_CFLAGS="$CFLAGS"} \
             -DCMAKE_INSTALL_PREFIX="$PREFIX" -DCMAKE_PREFIX_PATH="$PREFIX" ..
         LD_LIBRARY_PATH="$PREFIX/lib"
         export LD_LIBRARY_PATH
     else
-        run_after_echo cmake "$CMAKE_OPTIONS" \
+        run_after_echo cmake ${CMAKE_OPTIONS:+"$CMAKE_OPTIONS"} \
             -DWITH_CRYPTO="$CRYPTO" -DENABLE_SMB="$SMB" \
              ${CFLAGS:+-DEXTRA_CFLAGS="$CFLAGS"} \
             -DCMAKE_INSTALL_PREFIX="$PREFIX" ..
@@ -111,7 +124,7 @@ if [ "$BUILD_LIBPCAP" = yes ]; then
     run_after_echo "$MAKE_BIN" check
 fi
 if [ "$CMAKE" = no ]; then
-    run_after_echo "$MAKE_BIN" releasetar
+    [ "$TEST_RELEASETAR" = yes ] && run_after_echo "$MAKE_BIN" releasetar
 fi
 if [ "$CIRRUS_CI" = true ]; then
     run_after_echo sudo \
