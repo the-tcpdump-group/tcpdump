@@ -43,6 +43,10 @@ clang-*/SunOS-5.11)
     #   [-Wstrict-prototypes]
     [ "`uname -o`" = illumos ] && TCPDUMP_TAINTED=yes
     ;;
+suncc-5.1[45]/SunOS-5.11)
+    # Various E_STATEMENT_NOT_REACHED and E_DEPRECATED_ATT warnings.
+    TCPDUMP_TAINTED=yes
+    ;;
 *)
     ;;
 esac
