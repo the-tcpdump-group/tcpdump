@@ -1044,8 +1044,7 @@ if(NOT "${EXTRA_CFLAGS}" STREQUAL "")
     # The meaning of EXTRA_CFLAGS is "use the exact specified options, or the
     # build risks failing to fail", not "try every specified option, omit those
     # that do not work and use the rest".  Thus use add_compile_options(), not
-    # foreach()/check_and_add_compiler_option().  Another reason to do that is
-    # that the effect lasts in testprogs/ and testprogs/fuzz/.
+    # foreach()/check_and_add_compiler_option().
     string(REPLACE " " ";" _extra_cflags_list ${EXTRA_CFLAGS})
     add_compile_options(${_extra_cflags_list})
     message(STATUS "Added extra compile options (${EXTRA_CFLAGS})")
