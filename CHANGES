@@ -52,7 +52,6 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
         Tru64 Unix}, SINIX and Ultrix.
       Fix compiling on GNU/Hurd.
       Make illumos build warning-free.
-      Fix propagation of cc_werr_cflags() output.
 
 DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
   Summary for 4.99.5 tcpdump release (so far!)
@@ -141,6 +140,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Do not require vsnprintf().
       tests: Use the -tttt option, by default, for the tests.
       Autoconf, CMake: Get the size of a void * and a time_t.
+      Fix propagation of cc_werr_cflags() output.
     Documentation:
       Fixed errors in doc/README.Win32.md and renamed it to
         README.windows.md.
