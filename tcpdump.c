@@ -3037,6 +3037,9 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			/*
 			 * Close the current file and open a new one.
 			 */
+#ifdef HAVE_PCAP_DUMP_FLUSH
+			pcap_dump_flush(dump_info->pdd);
+#endif
 			pcap_dump_close(dump_info->pdd);
 
 			/*
@@ -3142,6 +3145,9 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			/*
 			 * Close the current file and open a new one.
 			 */
+#ifdef HAVE_PCAP_DUMP_FLUSH
+			pcap_dump_flush(dump_info->pdd);
+#endif
 			pcap_dump_close(dump_info->pdd);
 
 			/*
