@@ -2994,6 +2994,58 @@ compress_savefile(const char *filename)
 #endif /* HAVE_FORK && HAVE_VFORK */
 
 static void
+close_old_dump_file(struct dump_info *dump_info)
+{
+	/*
+	 * Close the current file and open a new one.
+	 */
+	pcap_dump_close(dump_info->pdd);
+
+	/*
+	 * Compress the file we just closed, if the user asked for it.
+	 */
+	if (zflag != NULL)
+		compress_savefile(dump_info->CurrentFileName);
+}
+
+static void
+open_new_dump_file(struct dump_info *dump_info)
+{
+#ifdef HAVE_CAPSICUM
+	FILE *fp;
+	int fd;
+#endif
+
+#ifdef HAVE_LIBCAP_NG
+	capng_update(CAPNG_ADD, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
+	capng_apply(CAPNG_SELECT_BOTH);
+#endif /* HAVE_LIBCAP_NG */
+#ifdef HAVE_CAPSICUM
+	fd = openat(dump_info->dirfd, dump_info->CurrentFileName,
+	    O_CREAT | O_WRONLY | O_TRUNC, 0644);
+	if (fd < 0) {
+		error("unable to open file %s", dump_info->CurrentFileName);
+	}
+	fp = fdopen(fd, "w");
+	if (fp == NULL) {
+		error("unable to fdopen file %s", dump_info->CurrentFileName);
+	}
+	dump_info->pdd = pcap_dump_fopen(dump_info->pd, fp);
+#else	/* !HAVE_CAPSICUM */
+	dump_info->pdd = pcap_dump_open(dump_info->pd, dump_info->CurrentFileName);
+#endif
+#ifdef HAVE_LIBCAP_NG
+	capng_update(CAPNG_DROP, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
+	capng_apply(CAPNG_SELECT_BOTH);
+#endif /* HAVE_LIBCAP_NG */
+	if (dump_info->pdd == NULL)
+		error("%s", pcap_geterr(pd));
+#ifdef HAVE_CAPSICUM
+	set_dumper_capsicum_rights(dump_info->pdd);
+#endif
+}
+
+static void
 dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
 	struct dump_info *dump_info;
@@ -3025,25 +3077,12 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 
 		/* If the time is greater than the specified window, rotate */
 		if (t - Gflag_time >= Gflag) {
-#ifdef HAVE_CAPSICUM
-			FILE *fp;
-			int fd;
-#endif
-
 			/* Update the Gflag_time */
 			Gflag_time = t;
 			/* Update Gflag_count */
 			Gflag_count++;
-			/*
-			 * Close the current file and open a new one.
-			 */
-			pcap_dump_close(dump_info->pdd);
 
-			/*
-			 * Compress the file we just closed, if the user asked for it
-			 */
-			if (zflag != NULL)
-				compress_savefile(dump_info->CurrentFileName);
+			close_old_dump_file(dump_info);
 
 			/*
 			 * Check to see if we've exceeded the Wflag (when
@@ -3080,36 +3119,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			else
 				MakeFilename(dump_info->CurrentFileName, dump_info->WFileName, 0, 0);
 
-#ifdef HAVE_LIBCAP_NG
-			capng_update(CAPNG_ADD, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
-			capng_apply(CAPNG_SELECT_BOTH);
-#endif /* HAVE_LIBCAP_NG */
-#ifdef HAVE_CAPSICUM
-			fd = openat(dump_info->dirfd,
-			    dump_info->CurrentFileName,
-			    O_CREAT | O_WRONLY | O_TRUNC, 0644);
-			if (fd < 0) {
-				error("unable to open file %s",
-				    dump_info->CurrentFileName);
-			}
-			fp = fdopen(fd, "w");
-			if (fp == NULL) {
-				error("unable to fdopen file %s",
-				    dump_info->CurrentFileName);
-			}
-			dump_info->pdd = pcap_dump_fopen(dump_info->pd, fp);
-#else	/* !HAVE_CAPSICUM */
-			dump_info->pdd = pcap_dump_open(dump_info->pd, dump_info->CurrentFileName);
-#endif
-#ifdef HAVE_LIBCAP_NG
-			capng_update(CAPNG_DROP, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
-			capng_apply(CAPNG_SELECT_BOTH);
-#endif /* HAVE_LIBCAP_NG */
-			if (dump_info->pdd == NULL)
-				error("%s", pcap_geterr(pd));
-#ifdef HAVE_CAPSICUM
-			set_dumper_capsicum_rights(dump_info->pdd);
-#endif
+			open_new_dump_file(dump_info);
 		}
 	}
 
@@ -3134,22 +3144,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 		if (size == -1)
 			error("ftell fails on output file");
 		if (size > Cflag) {
-#ifdef HAVE_CAPSICUM
-			FILE *fp;
-			int fd;
-#endif
-
-			/*
-			 * Close the current file and open a new one.
-			 */
-			pcap_dump_close(dump_info->pdd);
-
-			/*
-			 * Compress the file we just closed, if the user
-			 * asked for it.
-			 */
-			if (zflag != NULL)
-				compress_savefile(dump_info->CurrentFileName);
+			close_old_dump_file(dump_info);
 
 			Cflag_count++;
 			if (Wflag > 0) {
@@ -3162,35 +3157,8 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			if (dump_info->CurrentFileName == NULL)
 				error("%s: malloc", __func__);
 			MakeFilename(dump_info->CurrentFileName, dump_info->WFileName, Cflag_count, WflagChars);
-#ifdef HAVE_LIBCAP_NG
-			capng_update(CAPNG_ADD, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
-			capng_apply(CAPNG_SELECT_BOTH);
-#endif /* HAVE_LIBCAP_NG */
-#ifdef HAVE_CAPSICUM
-			fd = openat(dump_info->dirfd, dump_info->CurrentFileName,
-			    O_CREAT | O_WRONLY | O_TRUNC, 0644);
-			if (fd < 0) {
-				error("unable to open file %s",
-				    dump_info->CurrentFileName);
-			}
-			fp = fdopen(fd, "w");
-			if (fp == NULL) {
-				error("unable to fdopen file %s",
-				    dump_info->CurrentFileName);
-			}
-			dump_info->pdd = pcap_dump_fopen(dump_info->pd, fp);
-#else	/* !HAVE_CAPSICUM */
-			dump_info->pdd = pcap_dump_open(dump_info->pd, dump_info->CurrentFileName);
-#endif
-#ifdef HAVE_LIBCAP_NG
-			capng_update(CAPNG_DROP, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
-			capng_apply(CAPNG_SELECT_BOTH);
-#endif /* HAVE_LIBCAP_NG */
-			if (dump_info->pdd == NULL)
-				error("%s", pcap_geterr(pd));
-#ifdef HAVE_CAPSICUM
-			set_dumper_capsicum_rights(dump_info->pdd);
-#endif
+
+			open_new_dump_file(dump_info);
 		}
 	}
 
