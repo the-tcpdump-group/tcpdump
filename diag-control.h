@@ -178,12 +178,17 @@
    */
 #elif ND_IS_AT_LEAST_SUNC_VERSION(5,5)
   /*
-   * Suppress deprecation warnings.
+   * error_messages() is a valid pragma.
    */
-  #define DIAG_OFF_DEPRECATION \
-    DIAG_DO_PRAGMA(error_messages(off,E_DEPRECATED_ATT))
-  #define DIAG_ON_DEPRECATION \
-    DIAG_DO_PRAGMA(error_messages(default,E_DEPRECATED_ATT))
+  #if ND_IS_AT_LEAST_SUNC_VERSION(5,13)
+    /*
+     * E_DEPRECATED_ATT is a valid warning tag.
+     */
+    #define DIAG_OFF_DEPRECATION \
+      DIAG_DO_PRAGMA(error_messages(off,E_DEPRECATED_ATT))
+    #define DIAG_ON_DEPRECATION \
+      DIAG_DO_PRAGMA(error_messages(default,E_DEPRECATED_ATT))
+  #endif
 #endif
 
 /*
