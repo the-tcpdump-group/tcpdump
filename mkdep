@@ -1,4 +1,4 @@
-#!/bin/sh -
+#!/bin/sh -e
 #
 # Copyright (c) 1994, 1996
 #	The Regents of the University of California.  All rights reserved.
