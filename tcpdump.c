@@ -1392,6 +1392,11 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 			    pcap_statustostr(status));
 	}
 #endif
+#ifdef __linux__
+	/* SLL is always possible on Linux */
+	if (ndo->ndo_yflag == DLT_LINUX_SLL || ndo->ndo_yflag == DLT_LINUX_SLL2)
+		pcap_cook(pc);
+#endif
 	status = pcap_activate(pc);
 	if (status < 0) {
 		/*
@@ -1524,7 +1529,6 @@ main(int argc, char **argv)
 	int cansandbox;
 #endif	/* HAVE_CAPSICUM */
 	int Oflag = 1;			/* run filter code optimizer */
-	int yflag_dlt = -1;
 	const char *yflag_dlt_name = NULL;
 	int print = 0;
 	long Cflagmult;
@@ -1541,6 +1545,7 @@ main(int argc, char **argv)
 	memset(ndo, 0, sizeof(*ndo));
 	ndo_set_function_pointers(ndo);
 
+	ndo->ndo_yflag = -1;
 	cnt = -1;
 	device = NULL;
 	infile = NULL;
@@ -1947,9 +1952,9 @@ main(int argc, char **argv)
 
 		case 'y':
 			yflag_dlt_name = optarg;
-			yflag_dlt =
+			ndo->ndo_yflag =
 				pcap_datalink_name_to_val(yflag_dlt_name);
-			if (yflag_dlt < 0)
+			if (ndo->ndo_yflag < 0)
 				error("invalid data link type %s", yflag_dlt_name);
 			break;
 
@@ -2282,9 +2287,9 @@ main(int argc, char **argv)
 #endif /* !defined(HAVE_PCAP_CREATE) && defined(_WIN32) */
 		if (Lflag)
 			show_dlts_and_exit(pd, device);
-		if (yflag_dlt >= 0) {
+		if (ndo->ndo_yflag >= 0) {
 #ifdef HAVE_PCAP_SET_DATALINK
-			if (pcap_set_datalink(pd, yflag_dlt) < 0)
+			if (pcap_set_datalink(pd, ndo->ndo_yflag) < 0)
 				error("%s", pcap_geterr(pd));
 #else
 			/*
@@ -2292,7 +2297,7 @@ main(int argc, char **argv)
 			 * data link type, so we only let them
 			 * set it to what it already is.
 			 */
-			if (yflag_dlt != pcap_datalink(pd)) {
+			if (ndo->ndo_yflag != pcap_datalink(pd)) {
 				error("%s is not one of the DLTs supported by this device\n",
 				      yflag_dlt_name);
 			}

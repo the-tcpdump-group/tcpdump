@@ -231,6 +231,7 @@ struct netdissect_options {
 				 * LF, CR and SPACE as graphical chars
 				 */
   int ndo_Hflag;		/* dissect 802.11s draft mesh standard */
+  int ndo_yflag;		/* use a cooked capture */
   const char *ndo_protocol;	/* protocol */
   jmp_buf ndo_early_end;	/* jmp_buf for setjmp()/longjmp() */
   void *ndo_last_mem_p;		/* pointer to the last allocated memory chunk */
