@@ -145,8 +145,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Makefile.in: Fix the depend target.
       mkdep: Exit with a non-zero status if a command fails.
     Documentation:
-      Fixed errors in doc/README.Win32.md and renamed it to
-        README.windows.md.
+      Fixed errors in doc/README.Win32.md and renamed it to README.windows.md.
 
 Friday, April 7, 2023 / The Tcpdump Group
   Summary for 4.99.4 tcpdump release
