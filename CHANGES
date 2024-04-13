@@ -56,8 +56,6 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
 
 DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
   Summary for 4.99.5 tcpdump release (so far!)
-    Fix:
-      Use the buffer stack for de-escaping PPP; fixes CVE-2024-2397.
     Refine protocol decoding for:
       Arista: Use the test .pcap file from pull request #955 (HwInfo).
       BGP: Fix an undefined behavior when it tries to parse a too-short packet.
@@ -93,6 +91,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       OSPF6: Fix an undefined behavior.
       pflog: use nd_ types in struct pfloghdr.
       PPP: Check if there is some data to hexdump.
+      Use the buffer stack for de-escaping PPP; fixes CVE-2024-2397;
+        Note: This problem does not affect any tcpdump release.
       PTP: Fix spelling of type SIGNALING, Parse major and minor version
         correctly, Print majorSdoId field instead of just the first bit.
       RIP: Make a couple trivial protocol updates.
