@@ -392,6 +392,19 @@ sll2_print(netdissect_options *ndo, const struct sll2_header *sllp, u_int length
  * Linux "cooked capture" header of the packet, 'h->ts' is the timestamp,
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
+ *
+ * On Linux, we attempt to look up the interface index and print the
+ * name of the interface on which the packet arrived or was sent.
+ *
+ * This look up is only likely to work well if done on the same machine
+ * as the one on which the capture was done, as the interface with a
+ * given index on the latter machine is unlikely to have the same
+ * name as the interface with that index on the former machine.
+ *
+ * As DLT_LINUX_SLL2 live captures are supported only on Linux, this
+ * means that if the machine on which we're reading the file isn't
+ * running Linux, it's probably not the machine that captured the file,
+ * so we don't bother trying to do the lookup on non-Linux machines.
  */
 void
 sll2_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
