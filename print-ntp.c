@@ -35,6 +35,7 @@
 #include <config.h>
 
 #include "netdissect-stdinc.h"
+#include "netdissect-ctype.h"
 
 #define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
@@ -268,8 +269,20 @@ ntp_time_print(netdissect_options *ndo,
 	switch (stratum) {
 
 	case UNSPECIFIED:
-		ND_PRINT("(unspec)");
-		ND_TCHECK_4(bp->refid);
+		/* NTPv4 (RFC 5905, section 7.4) formalizes that refid _may_
+		 * contain a printable, four-character, left justified, zero
+		 * filled ASCII string ("kiss code") for status reporting
+		 * and debugging. Some kiss codes are defined in the RFC as
+		 * initial set for a new IANA registry, but the list may be
+		 * modified or extended in the future, and unregistered kiss
+		 * codes are possible (and are being seen in the field).
+		 */
+		if (!ND_ASCII_ISPRINT((bp->refid)[0])) {
+			ND_PRINT("(unspec)");
+			ND_TCHECK_4(bp->refid);
+		} else {
+			nd_printjn(ndo, (const u_char *)&(bp->refid), 4);
+		}
 		break;
 
 	case PRIM_REF:
