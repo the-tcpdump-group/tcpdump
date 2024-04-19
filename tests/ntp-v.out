@@ -13,7 +13,7 @@
     2  2017-06-19 14:12:10.231082 IP (tos 0xb8, ttl 64, id 24722, offset 0, flags [DF], proto UDP (17), length 80)
     192.168.100.1.123 > 192.168.100.2.58054: NTPv4, Server, length 52
 	Leap indicator: clock unsynchronized (192), Stratum 0 (unspecified), poll 3 (8s), precision -23
-	Root Delay: 0.000000, Root dispersion: 0.001373, Reference-ID: (unspec)
+	Root Delay: 0.000000, Root dispersion: 0.001373, Reference-ID: STEP
 	  Reference Timestamp:  0.000000000
 	  Originator Timestamp: 2763234513.007738396 (1987-07-25T21:08:33Z)
 	  Receive Timestamp:    3706870329.516015118 (2017-06-19T14:12:09Z)
@@ -68,7 +68,7 @@
     7  2017-06-19 14:47:12.800853 IP (tos 0xc0, ttl 64, id 4575, offset 0, flags [DF], proto UDP (17), length 96)
     192.168.100.2.123 > 192.168.100.1.123: NTPv4, Client, length 68
 	Leap indicator: clock unsynchronized (192), Stratum 0 (unspecified), poll 6 (64s), precision -25
-	Root Delay: 0.000000, Root dispersion: 0.000000, Reference-ID: (unspec)
+	Root Delay: 0.000000, Root dispersion: 0.000000, Reference-ID: INIT
 	  Reference Timestamp:  0.000000000
 	  Originator Timestamp: 0.000000000
 	  Receive Timestamp:    0.000000000
