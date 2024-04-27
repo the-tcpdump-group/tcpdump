@@ -40,18 +40,13 @@ frag6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2)
 	dp = (const struct ip6_frag *)bp;
 	ip6 = (const struct ip6_hdr *)bp2;
 
-	if (ndo->ndo_vflag) {
-		ND_PRINT("frag (0x%08x:%u|%zu)",
-			 GET_BE_U_4(dp->ip6f_ident),
-			 GET_BE_U_2(dp->ip6f_offlg) & IP6F_OFF_MASK,
-			 sizeof(struct ip6_hdr) + GET_BE_U_2(ip6->ip6_plen) -
-			        (bp - bp2) - sizeof(struct ip6_frag));
-	} else {
-		ND_PRINT("frag (%u|%zu)",
-		         GET_BE_U_2(dp->ip6f_offlg) & IP6F_OFF_MASK,
-		         sizeof(struct ip6_hdr) + GET_BE_U_2(ip6->ip6_plen) -
-			         (bp - bp2) - sizeof(struct ip6_frag));
-	}
+	ND_PRINT("frag (");
+	if (ndo->ndo_vflag)
+		ND_PRINT("0x%08x:", GET_BE_U_4(dp->ip6f_ident));
+	ND_PRINT("%u|%zu)",
+		 GET_BE_U_2(dp->ip6f_offlg) & IP6F_OFF_MASK,
+		 sizeof(struct ip6_hdr) + GET_BE_U_2(ip6->ip6_plen) -
+			(bp - bp2) - sizeof(struct ip6_frag));
 
 	/* it is meaningless to decode non-first fragment */
 	if ((GET_BE_U_2(dp->ip6f_offlg) & IP6F_OFF_MASK) != 0)
