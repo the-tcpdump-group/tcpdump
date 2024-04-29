@@ -382,6 +382,7 @@ sub loadconfighash {
     } else {
         $have_fptype = "HAVE_FPTYPE2";
     }
+    printf "$TCPDUMP --fp-type => %s\n", $have_fptype;
     $main::confighhash->{$have_fptype} = 1;
 
     # and check whether this is OpenBSD, as one test fails in OpenBSD
