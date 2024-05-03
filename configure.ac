@@ -437,7 +437,7 @@ if test "$ac_cv_func_ether_ntohost" = yes -a \
 		unset ac_cv_have_decl_ether_ntohost
 		AC_CHECK_DECL(ether_ntohost,
 		    [
-			AC_DEFINE(NETINET_ETHER_H_DECLARES_ETHER_NTOHOST,,
+			AC_DEFINE(NETINET_ETHER_H_DECLARES_ETHER_NTOHOST,1,
 			    [Define to 1 if netinet/ether.h declares `ether_ntohost'])
 		    ],,
 		    [
