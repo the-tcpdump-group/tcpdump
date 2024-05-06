@@ -45,10 +45,14 @@ frag6_print(netdissect_options *ndo, const u_char *bp, const u_char *bp2)
 	ND_PRINT("frag (");
 	if (ndo->ndo_vflag)
 		ND_PRINT("0x%08x:", GET_BE_U_4(dp->ip6f_ident));
-	ND_PRINT("%u|%zu)",
-		 GET_BE_U_2(dp->ip6f_offlg) & IP6F_OFF_MASK,
-		 sizeof(struct ip6_hdr) + GET_BE_U_2(ip6->ip6_plen) -
-			(bp - bp2) - sizeof(struct ip6_frag));
+	ND_PRINT("%u|", GET_BE_U_2(dp->ip6f_offlg) & IP6F_OFF_MASK);
+	if ((bp - bp2) + sizeof(struct ip6_frag) >
+	    sizeof(struct ip6_hdr) + GET_BE_U_2(ip6->ip6_plen))
+		ND_PRINT("[length < 0] (invalid))");
+	else
+		ND_PRINT("%zu)",
+			 sizeof(struct ip6_hdr) + GET_BE_U_2(ip6->ip6_plen) -
+			 (bp - bp2) - sizeof(struct ip6_frag));
 
 	/* it is meaningless to decode non-first fragment */
 	if ((GET_BE_U_2(dp->ip6f_offlg) & IP6F_OFF_MASK) != 0)
