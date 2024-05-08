@@ -836,6 +836,7 @@ macsec-short-valid   macsec-short-valid.pcap   macsec-short-valid.out   -e
 # NFS tests
 # fuzzed pcap
 nfs-write-verf-cookie nfs-write-verf-cookie.pcapng nfs-write-verf-cookie.out -vv
+nfs_large_credentials_length nfs_large_credentials_length.pcap nfs_large_credentials_length.out
 
 # NFS fuzzed
 nfs-seg-fault-1  nfs-seg-fault-1.pcapng  nfs-seg-fault-1.out
