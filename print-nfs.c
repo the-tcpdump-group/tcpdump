@@ -434,6 +434,11 @@ parsereq(netdissect_options *ndo,
 	if (length < 2 * sizeof(*dp))
 		goto trunc;
 	len = GET_BE_U_4(dp + 1);
+	if (len > length) {
+		ND_PRINT(" [credentials length %u > %u]", len, length);
+		nd_print_invalid(ndo);
+		return NULL;
+	}
 	rounded_len = roundup2(len, 4);
 	ND_TCHECK_LEN(dp + 2, rounded_len);
 	if (2 * sizeof(*dp) + rounded_len <= length) {
@@ -453,6 +458,11 @@ parsereq(netdissect_options *ndo,
 		if (length < 2 * sizeof(*dp))
 			goto trunc;
 		len = GET_BE_U_4(dp + 1);
+		if (len > length) {
+			ND_PRINT(" [verifier length %u > %u]", len, length);
+			nd_print_invalid(ndo);
+			return NULL;
+		}
 		rounded_len = roundup2(len, 4);
 		ND_TCHECK_LEN(dp + 2, rounded_len);
 		if (2 * sizeof(*dp) + rounded_len < length) {
