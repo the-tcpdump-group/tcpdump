@@ -1,18 +1,37 @@
 # tcpdump installation notes
-If you have not built libpcap, and your system does not have libpcap
-installed, install libpcap first.  Your system might provide a version
-of libpcap that can be installed; if so, to compile tcpdump you might
-need to install a "developer" version of libpcap as well as the
-"run-time" version.  You can also install The Tcpdump Group version of
-libpcap; see [this file](README.md) for the location.
 
-You will need a C99 compiler to build tcpdump.  The build system
-will abort if your compiler is not C99 compliant.  If this happens, use
-the generally available GNU C compiler (GCC) or Clang.
+## Installing libpcap
 
-After libpcap has been built (either install it with `make install` or
-make sure both the libpcap and tcpdump source trees are in the same
-directory), do the following steps:
+Tcpdump requires libpcap.
+
+### On UN*Xes
+
+Your system might provide a version of libpcap that can be installed, or
+that is installed by default; if so, to compile tcpdump you might need
+to install a "developer" version of libpcap as well as the "run-time"
+version, even if the "run-time" version has already been installed.
+
+If your system does not provide libpcap, or provides a version that does
+not support all of the libpcap 1.0 APIs, you will need to download the
+source for The Tcpdump Group version of libpcap; see [this
+file](README.md) for the location, and build and install that version.
+Either install libpcap with `make install` or make sure both the libpcap
+and tcpdump source trees are in the same directory.
+
+### On Windows
+
+You will need to install both Npcap and the Npcap SDK; see [this
+file](README.windows.md) for information on that.
+
+## Building tcpdump
+
+You will need a C99 compiler to build tcpdump and, if necessary, to
+build libpcap.  The build system will abort if your compiler is not C99
+compliant.  If this happens, use the generally available GNU C compiler
+(GCC) or Clang.
+
+Once you have a version of libpcap with which you can build tcpdump, do
+the following steps:
 
 * If you build from a git clone rather than from a release archive,
 run `./autogen.sh` (a shell script). The autogen.sh script will

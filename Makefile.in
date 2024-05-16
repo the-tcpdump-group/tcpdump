@@ -358,12 +358,9 @@ EXTRA_DIST = \
 	install-sh \
 	instrument-functions.c \
 	makemib \
-	missing/datalinks.c \
-	missing/dlnames.c \
 	missing/getopt_long.c \
 	missing/getopt_long.h \
 	missing/getservent.c \
-	missing/pcap_dump_ftell.c \
 	missing/strlcat.c \
 	missing/strlcpy.c \
 	missing/strsep.c \
@@ -390,10 +387,6 @@ $(LIBNETDISSECT): $(LIBNETDISSECT_OBJ)
 	$(AR) cr $@ $(LIBNETDISSECT_OBJ)
 	$(RANLIB) $@
 
-datalinks.o: $(srcdir)/missing/datalinks.c
-	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/datalinks.c
-dlnames.o: $(srcdir)/missing/dlnames.c
-	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/dlnames.c
 getservent.o: $(srcdir)/missing/getservent.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/getservent.c
 getopt_long.o: $(srcdir)/missing/getopt_long.c
@@ -404,8 +397,6 @@ strlcpy.o: $(srcdir)/missing/strlcpy.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/strlcpy.c
 strsep.o: $(srcdir)/missing/strsep.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/strsep.c
-pcap_dump_ftell.o: $(srcdir)/missing/pcap_dump_ftell.c
-	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/pcap_dump_ftell.c
 
 install: all
 	[ -d $(DESTDIR)$(bindir) ] || \

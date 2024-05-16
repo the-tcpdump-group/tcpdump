@@ -69,59 +69,20 @@
 /* if there's an os-proto.h for this platform, to use additional prototypes */
 #cmakedefine HAVE_OS_PROTO_H 1
 
-/* Define to 1 if you have the `pcap_breakloop' function. */
-#cmakedefine HAVE_PCAP_BREAKLOOP 1
-
-/* Define to 1 if you have the `pcap_create' function. */
-#cmakedefine HAVE_PCAP_CREATE 1
-
-/* define if libpcap has pcap_datalink_name_to_val() */
-#cmakedefine HAVE_PCAP_DATALINK_NAME_TO_VAL 1
-
-/* define if libpcap has pcap_datalink_val_to_description() */
-#cmakedefine HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION 1
-
 /* define if libpcap has pcap_debug */
 #cmakedefine HAVE_PCAP_DEBUG 1
-
-/* Define to 1 if you have the `pcap_dump_flush' function. */
-#cmakedefine HAVE_PCAP_DUMP_FLUSH 1
-
-/* Define to 1 if you have the `pcap_dump_ftell' function. */
-#cmakedefine HAVE_PCAP_DUMP_FTELL 1
 
 /* Define to 1 if you have the `pcap_dump_ftell64' function. */
 #cmakedefine HAVE_PCAP_DUMP_FTELL64 1
 
-/* Define to 1 if you have the `pcap_findalldevs' function. */
-#cmakedefine HAVE_PCAP_FINDALLDEVS 1
-
 /* Define to 1 if you have the `pcap_findalldevs_ex' function. */
 #cmakedefine HAVE_PCAP_FINDALLDEVS_EX 1
-
-/* Define to 1 if you have the `pcap_free_datalinks' function. */
-#cmakedefine HAVE_PCAP_FREE_DATALINKS 1
-
-/* Define to 1 if the system has the type `pcap_if_t'. */
-#cmakedefine HAVE_PCAP_IF_T 1
-
-/* Define to 1 if you have the `pcap_lib_version' function. */
-#cmakedefine HAVE_PCAP_LIB_VERSION 1
-
-/* define if libpcap has pcap_list_datalinks() */
-#cmakedefine HAVE_PCAP_LIST_DATALINKS 1
 
 /* Define to 1 if you have the `pcap_open' function. */
 #cmakedefine HAVE_PCAP_OPEN 1
 
 /* Define to 1 if you have the <pcap/pcap-inttypes.h> header file. */
 #cmakedefine HAVE_PCAP_PCAP_INTTYPES_H 1
-
-/* Define to 1 if you have the `pcap_setdirection' function. */
-#cmakedefine HAVE_PCAP_SETDIRECTION 1
-
-/* Define to 1 if you have the `pcap_set_datalink' function. */
-#cmakedefine HAVE_PCAP_SET_DATALINK 1
 
 /* Define to 1 if you have the `pcap_set_immediate_mode' function. */
 #cmakedefine HAVE_PCAP_SET_IMMEDIATE_MODE 1
@@ -137,9 +98,6 @@
 
 /* Define to 1 if you have the `pcap_set_tstamp_type' function. */
 #cmakedefine HAVE_PCAP_SET_TSTAMP_TYPE 1
-
-/* define if libpcap has pcap_version */
-#cmakedefine HAVE_PCAP_VERSION 1
 
 /* Define to 1 if you have the `pcap_wsockinit' function. */
 #cmakedefine HAVE_PCAP_WSOCKINIT 1

@@ -554,105 +554,33 @@ if test "$ac_cv_func_ether_ntohost" = yes -a \
 	fi
 fi
 
-dnl
-dnl Check for "pcap_list_datalinks()" and use a substitute version if
-dnl it's not present.  If it is present, check for "pcap_free_datalinks()";
-dnl if it's not present, we don't replace it for now.  (We could do so
-dnl on UN*X, but not on Windows, where hilarity ensues if a program
-dnl built with one version of the MSVC support library tries to free
-dnl something allocated by a library built with another version of
-dnl the MSVC support library.)
-dnl
-AC_CHECK_FUNC(pcap_list_datalinks,
-	[
-	    AC_DEFINE(HAVE_PCAP_LIST_DATALINKS, 1,
-		[define if libpcap has pcap_list_datalinks()])
-	    AC_CHECK_FUNCS(pcap_free_datalinks)
-	],
-	[
-	    AC_LIBOBJ(datalinks)
-	])
-
-dnl
-dnl Check for "pcap_datalink_name_to_val()", and use a substitute
-dnl version if it's not present.  If it is present, check for
-dnl "pcap_datalink_val_to_description()", and if we don't have it,
-dnl use a substitute version.
-dnl
-AC_CHECK_FUNC(pcap_datalink_name_to_val,
-	[
-	    AC_DEFINE(HAVE_PCAP_DATALINK_NAME_TO_VAL, 1,
-		[define if libpcap has pcap_datalink_name_to_val()])
-	    AC_CHECK_FUNC(pcap_datalink_val_to_description,
-		AC_DEFINE(HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION, 1,
-		    [define if libpcap has pcap_datalink_val_to_description()]),
-		[
-		    AC_LIBOBJ(dlnames)
-		])
-	],
-	[
-	    AC_LIBOBJ(dlnames)
-	])
-
-dnl
-dnl Check for "pcap_set_datalink()"; you can't substitute for it if
-dnl it's absent (it has hooks into libpcap), so just define the
-dnl HAVE_ value if it's there.
-dnl
-AC_CHECK_FUNCS(pcap_set_datalink)
-
-dnl
-dnl Check for "pcap_breakloop()"; you can't substitute for it if
-dnl it's absent (it has hooks into the live capture routines),
-dnl so just define the HAVE_ value if it's there.
-dnl
-AC_CHECK_FUNCS(pcap_breakloop)
-
 #
 # Do we have the new open API?  Check for pcap_create, and assume that,
 # if we do, we also have pcap_activate() and the other new routines
-# introduced in libpcap 1.0.0.
+# introduced in libpcap 1.0.
 #
-AC_CHECK_FUNCS(pcap_create)
-if test $ac_cv_func_pcap_create = "yes" ; then
-	#
-	# OK, do we have pcap_set_tstamp_type?  If so, assume we have
-	# pcap_list_tstamp_types and pcap_free_tstamp_types as well.
-	#
-	AC_CHECK_FUNCS(pcap_set_tstamp_type)
-	#
-	# And do we have pcap_set_tstamp_precision?  If so, we assume
-	# we also have pcap_open_offline_with_tstamp_precision.
-	#
-	AC_CHECK_FUNCS(pcap_set_tstamp_precision)
-fi
+# We require those routines, so fail if we don't find it.
+#
+AC_CHECK_FUNC(pcap_create,,
+    [AC_MSG_ERROR([libpcap is too old; 1.0 or later is required])])
+
+#
+# OK, do we have pcap_set_tstamp_type?  If so, assume we have
+# pcap_list_tstamp_types and pcap_free_tstamp_types as well.
+#
+AC_CHECK_FUNCS(pcap_set_tstamp_type)
+#
+# And do we have pcap_set_tstamp_precision?  If so, we assume
+# we also have pcap_open_offline_with_tstamp_precision.
+#
+AC_CHECK_FUNCS(pcap_set_tstamp_precision)
 
 #
 # Check for a miscellaneous collection of functions which we use
 # if we have them.
 #
-AC_CHECK_FUNCS(pcap_findalldevs)
-AC_CHECK_FUNCS(pcap_dump_flush pcap_lib_version)
-if test $ac_cv_func_pcap_lib_version = "no" ; then
-    AC_MSG_CHECKING(whether pcap_version is defined by libpcap)
-    AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[
-	extern char pcap_version[];
-
-	return (int)pcap_version;
-       ]])
-       ],
-       [ac_lbl_cv_pcap_version_defined=yes],
-       [ac_lbl_cv_pcap_version_defined=no])
-    if test "$ac_lbl_cv_pcap_version_defined" = yes ; then
-	AC_MSG_RESULT(yes)
-	AC_DEFINE(HAVE_PCAP_VERSION, 1, [define if libpcap has pcap_version])
-    else
-	AC_MSG_RESULT(no)
-    fi
-fi
-AC_CHECK_FUNCS(pcap_setdirection pcap_set_immediate_mode pcap_dump_ftell64)
+AC_CHECK_FUNCS(pcap_set_immediate_mode pcap_dump_ftell64)
 AC_CHECK_FUNCS(pcap_open pcap_findalldevs_ex)
-AC_REPLACE_FUNCS(pcap_dump_ftell)
 
 #
 # Check for special debugging functions
@@ -698,6 +626,13 @@ if test "$ac_cv_func_pcap_set_parser_debug" = "no" ; then
 	fi
 fi
 AC_CHECK_FUNCS(pcap_set_optimizer_debug)
+
+#
+# bpf_dump() moved from tcpdump to libpcap in libpcap 0.6, but not all
+# versions of libpcap didn't pick that change up; the OpenBSD libpcap
+# picked up most of the new APIs from versions up to 1.0, but didn't
+# pick up bpf_dump(), so we need to provide it if it's absent.
+#
 AC_REPLACE_FUNCS(bpf_dump)	dnl moved to libpcap in 0.6
 
 #
@@ -733,11 +668,6 @@ CPPFLAGS="$CPPFLAGS $V_INCLS"
 # If we do, we use that to get the C99 types defined.
 #
 AC_CHECK_HEADERS(pcap/pcap-inttypes.h)
-
-#
-# At compile time HAVE_PCAP_FINDALLDEVS depends on HAVE_PCAP_IF_T.
-#
-AC_CHECK_TYPES(pcap_if_t, , , [#include <pcap.h>])
 
 CPPFLAGS="$savedcppflags"
 

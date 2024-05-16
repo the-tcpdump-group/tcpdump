@@ -659,112 +659,61 @@ set(CMAKE_REQUIRED_INCLUDES ${PCAP_INCLUDE_DIRS})
 check_include_file(pcap/pcap-inttypes.h HAVE_PCAP_PCAP_INTTYPES_H)
 
 #
-# At compile time HAVE_PCAP_FINDALLDEVS depends on HAVE_PCAP_IF_T.
-#
-cmake_push_check_state()
-set(CMAKE_EXTRA_INCLUDE_FILES pcap.h)
-check_type_size(pcap_if_t PCAP_IF_T)
-cmake_pop_check_state()
-
-#
 # Check for various functions in libpcap/WinPcap/Npcap.
 #
 cmake_push_check_state()
 set(CMAKE_REQUIRED_LIBRARIES ${PCAP_LIBRARIES})
 
 #
-# Check for "pcap_list_datalinks()" and use a substitute version if
-# it's not present.  If it is present, check for "pcap_free_datalinks()";
-# if it's not present, we don't replace it for now.  (We could do so
-# on UN*X, but not on Windows, where hilarity ensues if a program
-# built with one version of the MSVC support library tries to free
-# something allocated by a library built with another version of
-# the MSVC support library.)
-#
-check_function_exists(pcap_list_datalinks HAVE_PCAP_LIST_DATALINKS)
-if(HAVE_PCAP_LIST_DATALINKS)
-    check_function_exists(pcap_free_datalinks HAVE_PCAP_FREE_DATALINKS)
-endif(HAVE_PCAP_LIST_DATALINKS)
-
-#
-# Check for "pcap_datalink_name_to_val()", and use a substitute
-# version if it's not present.  If it is present, check for
-# "pcap_datalink_val_to_description()", and if we don't have it,
-# use a substitute version.
-#
-check_function_exists(pcap_datalink_name_to_val HAVE_PCAP_DATALINK_NAME_TO_VAL)
-if(HAVE_PCAP_DATALINK_NAME_TO_VAL)
-    check_function_exists(pcap_datalink_val_to_description HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION)
-endif(HAVE_PCAP_DATALINK_NAME_TO_VAL)
-
-#
-# Check for "pcap_set_datalink()"; you can't substitute for it if
-# it's absent (it has hooks into libpcap), so just define the
-# HAVE_ value if it's there.
-#
-check_function_exists(pcap_set_datalink HAVE_PCAP_SET_DATALINK)
-
-#
-# Check for "pcap_breakloop()"; you can't substitute for it if
-# it's absent (it has hooks into the live capture routines),
-# so just define the HAVE_ value if it's there.
-#
-check_function_exists(pcap_breakloop HAVE_PCAP_BREAKLOOP)
-
-#
-# Check for "pcap_dump_ftell()"; we use a substitute version
-# if it's not present.
-#
-check_function_exists(pcap_dump_ftell HAVE_PCAP_DUMP_FTELL)
-
-#
 # Do we have the new open API?  Check for pcap_create() and for
 # pcap_statustostr(), and assume that, if we have both of them,
 # we also have pcap_activate() and the other new routines
-# introduced in libpcap 1.0.0.  (We check for pcap_statustostr()
-# as well, because WinPcap 4.1.3 screwed up and exported pcap_create()
-# but not other routines such as pcap_statustostr(), even though it
-# defined them and even though you really want pcap_statustostr() to
-# get strings corresponding to some of the status returns from the
-# new routines.)
+# introduced in libpcap 1.0.
 #
-check_function_exists(pcap_statustostr HAVE_PCAP_STATUSTOSTR)
+# We require those routines, so fail if we don't find it.
 #
-# If we don't have pcap_statustostr(), don't check for pcap_create(),
-# so we pretend we don't have it.
-#
-if(HAVE_PCAP_STATUSTOSTR)
-    check_function_exists(pcap_create HAVE_PCAP_CREATE)
-endif(HAVE_PCAP_STATUSTOSTR)
-if(HAVE_PCAP_CREATE)
-    #
-    # OK, do we have pcap_set_tstamp_type?  If so, assume we have
-    # pcap_list_tstamp_types and pcap_free_tstamp_types as well.
-    #
-    check_function_exists(pcap_set_tstamp_type HAVE_PCAP_SET_TSTAMP_TYPE)
+check_function_exists(pcap_create HAVE_PCAP_CREATE)
+if(NOT HAVE_PCAP_CREATE)
+    if(WIN32)
+        MESSAGE(FATAL_ERROR "libpcap is too old; 1.0 or later is required")
+    else(WIN32)
+        MESSAGE(FATAL_ERROR "libpcap is too old; 1.0 or later is required - if you're using WinPcap, try Npcap")
+    endif(WIN32)
+endif(NOT HAVE_PCAP_CREATE)
 
+if(WIN32)
     #
-    # And do we have pcap_set_tstamp_precision?  If so, we assume
-    # we also have pcap_open_offline_with_tstamp_precision.
+    # We check for pcap_statustostr() as well, because WinPcap 4.1.3
+    # screwed up and exported pcap_create() but not other routines
+    # such as pcap_statustostr(), even though it defined them and
+    #  even though you really want pcap_statustostr() to get strings
+    # corresponding to some of the status returns from the new routines.)
     #
-    check_function_exists(pcap_set_tstamp_precision HAVE_PCAP_SET_TSTAMP_PRECISION)
-endif(HAVE_PCAP_CREATE)
+    check_function_exists(pcap_statustostr HAVE_PCAP_STATUSTOSTR)
+    if(NOT HAVE_PCAP_STATUSTOSTR)
+        MESSAGE(FATAL_ERROR "pcap_create is available, but pcap_statustostr isn't - if you're using WinPcap, try Npcap ")
+    endif(NOT HAVE_PCAP_STATUSTOSTR)
+endif(WIN32)
+
+#
+# OK, do we have pcap_set_tstamp_type?  If so, assume we have
+# pcap_list_tstamp_types and pcap_free_tstamp_types as well.
+#
+check_function_exists(pcap_set_tstamp_type HAVE_PCAP_SET_TSTAMP_TYPE)
+
+#
+# And do we have pcap_set_tstamp_precision?  If so, we assume
+# we also have pcap_open_offline_with_tstamp_precision.
+#
+check_function_exists(pcap_set_tstamp_precision HAVE_PCAP_SET_TSTAMP_PRECISION)
 
 #
 # Check for a miscellaneous collection of functions which we use
 # if we have them.
 #
-check_function_exists(pcap_findalldevs HAVE_PCAP_FINDALLDEVS)
-check_function_exists(pcap_dump_flush HAVE_PCAP_DUMP_FLUSH)
-check_function_exists(pcap_lib_version HAVE_PCAP_LIB_VERSION)
-if(NOT HAVE_PCAP_LIB_VERSION)
-    # Check for the pcap_version string variable and set HAVE_PCAP_VERSION
-endif(NOT HAVE_PCAP_LIB_VERSION)
-check_function_exists(pcap_setdirection HAVE_PCAP_SETDIRECTION)
 check_function_exists(pcap_set_immediate_mode HAVE_PCAP_SET_IMMEDIATE_MODE)
 check_function_exists(pcap_dump_ftell64 HAVE_PCAP_DUMP_FTELL64)
 check_function_exists(pcap_open HAVE_PCAP_OPEN)
-check_function_exists(pcap_findalldevs_ex HAVE_PCAP_FINDALLDEVS_EX)
 
 #
 # On Windows, check for pcap_wsockinit(); if we don't have it, check for
@@ -790,6 +739,13 @@ if(NOT HAVE_PCAP_SET_PARSER_DEBUG)
 endif(NOT HAVE_PCAP_SET_PARSER_DEBUG)
 
 check_function_exists(pcap_set_optimizer_debug HAVE_PCAP_SET_OPTIMIZER_DEBUG)
+
+#
+# bpf_dump() moved from tcpdump to libpcap in libpcap 0.6, but not all
+# versions of libpcap didn't pick that change up; the OpenBSD libpcap
+# picked up most of the new APIs from versions up to 1.0, but didn't
+# pick up bpf_dump(), so we need to provide it if it's absent.
+#
 check_function_exists(bpf_dump HAVE_BPF_DUMP)
 
 cmake_pop_check_state()
@@ -1271,17 +1227,6 @@ set(TCPDUMP_SOURCE_LIST_C fptype.c tcpdump.c)
 if(NOT HAVE_BPF_DUMP)
     set(TCPDUMP_SOURCE_LIST_C ${TCPDUMP_SOURCE_LIST_C} bpf_dump.c)
 endif(NOT HAVE_BPF_DUMP)
-if(NOT HAVE_PCAP_DUMP_FTELL)
-    set(TCPDUMP_SOURCE_LIST_C ${TCPDUMP_SOURCE_LIST_C} missing/pcap_dump_ftell.c)
-endif(NOT HAVE_PCAP_DUMP_FTELL)
-
-if(NOT HAVE_PCAP_LIST_DATALINKS)
-    set(TCPDUMP_SOURCE_LIST_C ${TCPDUMP_SOURCE_LIST_C} missing/datalinks.c)
-endif(NOT HAVE_PCAP_LIST_DATALINKS)
-
-if((NOT HAVE_PCAP_DATALINK_NAME_TO_VAL) OR (NOT HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION))
-    set(TCPDUMP_SOURCE_LIST_C ${TCPDUMP_SOURCE_LIST_C} missing/dlnames.c)
-endif((NOT HAVE_PCAP_DATALINK_NAME_TO_VAL) OR (NOT HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION))
 
 set(PROJECT_SOURCE_LIST_C ${NETDISSECT_SOURCE_LIST_C} ${TCPDUMP_SOURCE_LIST_C})
 
