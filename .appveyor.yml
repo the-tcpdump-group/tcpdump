@@ -10,8 +10,6 @@ matrix:
   fast_finish: true
 
 install:
-  - appveyor DownloadFile https://www.winpcap.org/install/bin/WpdPack_4_1_2.zip
-  - 7z x .\WpdPack_4_1_2.zip -oc:\projects\libpcap\Win32
   - appveyor DownloadFile https://npcap.com/dist/npcap-sdk-1.12.zip
   - 7z x .\npcap-sdk-1.12.zip -oc:\projects\libpcap\Win32\npcap-sdk-1.12
 
@@ -19,22 +17,10 @@ environment:
   matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       GENERATOR: "Visual Studio 14 2015"
-      SDK: WpdPack
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-      GENERATOR: "Visual Studio 14 2015 Win64"
-      SDK: WpdPack
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-      GENERATOR: "Visual Studio 14 2015"
       SDK: npcap-sdk-1.12
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       GENERATOR: "Visual Studio 14 2015 Win64"
       SDK: npcap-sdk-1.12
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      GENERATOR: "Visual Studio 15 2017"
-      SDK: WpdPack
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      GENERATOR: "Visual Studio 15 2017 Win64"
-      SDK: WpdPack
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       GENERATOR: "Visual Studio 15 2017"
       SDK: npcap-sdk-1.12
@@ -44,27 +30,11 @@ environment:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       GENERATOR: "Visual Studio 16 2019"
       PLATFORM: Win32
-      SDK: WpdPack
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-      GENERATOR: "Visual Studio 16 2019"
-      PLATFORM: x64
-      SDK: WpdPack
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-      GENERATOR: "Visual Studio 16 2019"
-      PLATFORM: Win32
       SDK: npcap-sdk-1.12
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       GENERATOR: "Visual Studio 16 2019"
       PLATFORM: x64
       SDK: npcap-sdk-1.12
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
-      GENERATOR: "Visual Studio 17 2022"
-      PLATFORM: Win32
-      SDK: WpdPack
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
-      GENERATOR: "Visual Studio 17 2022"
-      PLATFORM: x64
-      SDK: WpdPack
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
       GENERATOR: "Visual Studio 17 2022"
       PLATFORM: Win32

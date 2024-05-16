@@ -356,16 +356,6 @@ This can be useful on systems that don't have a command to list them
 .BR "ifconfig \-a" );
 the number can be useful on Windows 2000 and later systems, where the
 interface name is a somewhat complex string.
-.IP
-The
-.B \-D
-flag will not be supported if
-.I tcpdump
-was built with an older version of
-.I libpcap
-that lacks the
-.BR pcap_findalldevs (3PCAP)
-function.
 .TP
 .B \-e
 Print the link-level header on each dump line.  This can be used, for
@@ -479,10 +469,9 @@ argument of ``any'' can be used to capture packets from all interfaces.
 Note that captures on the ``any'' pseudo-interface will not be done in promiscuous
 mode.
 .IP
-If the
+An interface number as printed by the
 .B \-D
-flag is supported, an interface number as printed by that flag can be
-used as the
+flag can be used as the
 .I interface
 argument, if no interface on the system has that number as a name.
 .TP
@@ -853,16 +842,6 @@ option is specified, make the saved raw packet output
 ``packet-buffered''; i.e., as each packet is saved, it will be written
 to the output file, rather than being written only when the output
 buffer fills.
-.IP
-The
-.B \-U
-flag will not be supported if
-.I tcpdump
-was built with an older version of
-.I libpcap
-that lacks the
-.BR pcap_dump_flush (3PCAP)
-function.
 .TP
 .B \-v
 When parsing and printing, produce (slightly more) verbose output.

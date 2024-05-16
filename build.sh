@@ -96,12 +96,6 @@ fi
 run_after_echo "$MAKE_BIN" install
 print_so_deps "$TCPDUMP_BIN"
 run_after_echo "$TCPDUMP_BIN" -h
-# The "-D" flag depends on HAVE_PCAP_FINDALLDEVS and it would not be difficult
-# to run the command below only if the macro is defined.  That said, it seems
-# more useful to run it anyway: every system that currently runs this script
-# has pcap_findalldevs(), thus if the macro isn't defined, it means something
-# went wrong in the build process (as was observed with GCC, CMake and the
-# system libpcap on Solaris 11).
 run_after_echo "$TCPDUMP_BIN" -D
 if [ "$CIRRUS_CI" = true ]; then
     # Likewise for the "-J" flag and HAVE_PCAP_SET_TSTAMP_TYPE.

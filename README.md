@@ -56,8 +56,10 @@ In the past tcpdump certainly or likely worked on the following platforms:
 
 ### Dependency on libpcap
 tcpdump uses libpcap, a system-independent interface for user-level
-packet capture.  Before building tcpdump, you must first retrieve and
-build libpcap.
+packet capture.  If your operating system does not provide libpcap, or
+if it provides a libpcap that does not support the APIs from libpcap 1.0
+or later, you must first retrieve and build libpcap before building
+tcpdump,
 
 Once libpcap is built (either install it or make sure it's in
 `../libpcap`), you can build tcpdump using the procedure in the

@@ -33,6 +33,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Add --print-sampling to print every Nth packet instead of all.
       Add --lengths option to print the captured and original packet lengths.
     Source code:
+      Drop support for building with versions of libpcap that don't
+        support all the libpcap 1.0 APIs.
       Use %zu when printing a sizeof to squelch compiler warnings
       Remove unused missing/snprintf.c.
       Remove unused missing/strdup.c.
