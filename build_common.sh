@@ -63,7 +63,7 @@ print_sysinfo() {
 cc_version_nocache() {
     : "${CC:?}"
     case `basename "$CC"` in
-    gcc*|egcc*|clang*)
+    gcc*|egcc*|clang*|tcc*)
         # GCC and Clang recognize --version, print to stdout and exit with 0.
         "$CC" --version
         ;;
@@ -151,6 +151,17 @@ cc_id_nocache() {
         return
     fi
 
+    # Examples of installed packages:
+    # "tcc version 0.9.27 (x86_64 Linux)"
+    # "tcc version 0.9.27 2023-07-05 mob@5b28165 (x86_64 OpenBSD)"
+    # Example of a development version:
+    # "tcc version 0.9.28rc 2024-04-28 mob@0aca8611 (x86_64 Linux)"
+    cc_id_guessed=`echo "$cc_id_firstline" | sed 's/^.*tcc version \([0-9\.rc]*\).*$/tcc-\1/'`
+    if [ "$cc_id_firstline" != "$cc_id_guessed" ]; then
+        echo "$cc_id_guessed"
+        return
+    fi
+
     # OpenBSD default GCC:
     # "gcc (GCC) 4.2.1 20070719"
     # RedHat GCC:
@@ -187,7 +198,7 @@ discard_cc_cache() {
 # warnings as errors.
 cc_werr_cflags() {
     case `cc_id` in
-    gcc-*|clang-*)
+    gcc-*|clang-*|tcc-*)
         echo '-Werror'
         ;;
     xlc-*)
