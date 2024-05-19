@@ -357,7 +357,7 @@ static void esp_print_addsa(netdissect_options *ndo,
 }
 
 
-static u_int hexdigit(netdissect_options *ndo, char hex)
+static int hexdigit(netdissect_options *ndo, char hex)
 {
 	if (hex >= '0' && hex <= '9')
 		return (hex - '0');
@@ -366,18 +366,10 @@ static u_int hexdigit(netdissect_options *ndo, char hex)
 	else if (hex >= 'a' && hex <= 'f')
 		return (hex - 'a' + 10);
 	else {
-		(*ndo->ndo_error)(ndo, S_ERR_ND_ESP_SECRET,
-				  "invalid hex digit %c in espsecret\n", hex);
-		/* NOTREACHED */
+		(*ndo->ndo_warning)(ndo,
+				    "invalid hex digit %c in espsecret\n", hex);
+		return (-1);
 	}
-}
-
-static u_int hex2byte(netdissect_options *ndo, char *hexstring)
-{
-	u_int byte;
-
-	byte = (hexdigit(ndo, hexstring[0]) << 4) + hexdigit(ndo, hexstring[1]);
-	return byte;
 }
 
 /*
@@ -387,19 +379,40 @@ static int
 espprint_decode_hex(netdissect_options *ndo,
 		    u_char *binbuf, unsigned int binbuf_len, char *hex)
 {
-	unsigned int len;
+	size_t len;
 	int i;
 
+	/*
+	 * XXX - fail if the string length isn't a multiple of 2?
+	 */
 	len = strlen(hex) / 2;
 
 	if (len > binbuf_len) {
-		(*ndo->ndo_warning)(ndo, "secret is too big: %u\n", len);
+		(*ndo->ndo_warning)(ndo, "secret is too big: %zu\n", len);
 		return 0;
 	}
 
 	i = 0;
 	while (hex[0] != '\0' && hex[1]!='\0') {
-		binbuf[i] = hex2byte(ndo, hex);
+		int upper_nibble, lower_nibble;
+
+		upper_nibble = hexdigit(ndo, hex[0]);
+		if (upper_nibble < 0) {
+			/*
+			 * Invalid hex digit; a warning has already been
+			 * printed.
+			 */
+			return 0;
+		}
+		lower_nibble = hexdigit(ndo, hex[1]);
+		if (lower_nibble < 0) {
+			/*
+			 * Invalid hex digit; a warning has already been
+			 * printed.
+			 */
+			return 0;
+		}
+		binbuf[i] = (((u_int)upper_nibble) << 4) + (((u_int)lower_nibble) << 0);
 		hex += 2;
 		i++;
 	}
