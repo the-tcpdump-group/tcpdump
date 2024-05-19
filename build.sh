@@ -35,6 +35,12 @@ print_cc_version
 # later warnings in the same matrix subset trigger an error.
 
 case `cc_id`/`os_id` in
+tcc-*/*)
+    # print-802_11.c:3317: warning: assignment discards qualifiers from pointer
+    #   target type
+    # print-esp.c:373: warning: function might return no value: 'ldp_pdu_print'
+    TCPDUMP_TAINTED=yes
+    ;;
 *)
     ;;
 esac
