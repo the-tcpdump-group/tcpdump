@@ -368,6 +368,7 @@ static u_int hexdigit(netdissect_options *ndo, char hex)
 	else {
 		(*ndo->ndo_error)(ndo, S_ERR_ND_ESP_SECRET,
 				  "invalid hex digit %c in espsecret\n", hex);
+		/* NOTREACHED */
 	}
 }
 
