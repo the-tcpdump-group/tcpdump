@@ -50,7 +50,6 @@ suncc-5.1[45]/SunOS-5.11)
 tcc-*/*)
     # print-802_11.c:3317: warning: assignment discards qualifiers from pointer
     #   target type
-    # print-ldp.c:702: warning: function might return no value: 'ldp_pdu_print'
     TCPDUMP_TAINTED=yes
     ;;
 *)
