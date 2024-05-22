@@ -169,15 +169,17 @@ invalid:
 #define ERSPAN3_SID_SHIFT		0
 #define ERSPAN3_SID_MASK		(0x3ffU << ERSPAN3_SID_SHIFT)
 #define ERSPAN3_P_SHIFT			15
-#define ERSPAN3_P_MASK			(0x1U << ERSPAN3_P_MASK)
+#define ERSPAN3_P_MASK			(0x1U << ERSPAN3_P_SHIFT)
 #define ERSPAN3_FT_SHIFT		10
-#define ERSPAN3_FT_MASK			(0x1fU << ERSPAN3_FT_MASK)
+#define ERSPAN3_FT_MASK			(0x1fU << ERSPAN3_FT_SHIFT)
+#define ERSPAN3_FT_ETHERNET		0
+#define ERSPAN3_FT_IP			2
 #define ERSPAN3_HW_ID_SHIFT		4
-#define ERSPAN3_HW_ID_MASK		(0x3fU << ERSPAN3_HW_ID_MASK)
+#define ERSPAN3_HW_ID_MASK		(0x3fU << ERSPAN3_HW_ID_SHIFT)
 #define ERSPAN3_D_SHIFT			3
 #define ERSPAN3_D_MASK			(0x1U << ERSPAN3_D_SHIFT)
 #define ERSPAN3_GRA_SHIFT		1
-#define ERSPAN3_GRA_MASK		(0x3U << ERSPAN3_GRA_MASK)
+#define ERSPAN3_GRA_MASK		(0x3U << ERSPAN3_GRA_SHIFT)
 #define ERSPAN3_O_SHIFT			0
 #define ERSPAN3_O_MASK			(0x1U << ERSPAN3_O_SHIFT)
 
@@ -189,10 +191,16 @@ static const struct tok erspan3_bso_values[] = {
 	{ 0, NULL }
 };
 
+static const struct tok erspan3_ft_values[] = {
+	{ ERSPAN3_FT_ETHERNET, "Ethernet" },
+	{ ERSPAN3_FT_IP, "IP" },
+	{ 0, NULL }
+};
+
 void
 erspan_print_iii(netdissect_options *ndo, const u_char *bp, u_int len)
 {
-	uint32_t hdr, hdr2, ver, cos, sid;
+	uint32_t hdr, hdr2, ver, cos, sid, ft;
 
 	ndo->ndo_protocol = "erspan";
 	nd_print_protocol(ndo);
@@ -250,6 +258,11 @@ erspan_print_iii(netdissect_options *ndo, const u_char *bp, u_int len)
 	bp += 2;
 	len -= 2;
 
+	ft = (hdr2 & ERSPAN3_FT_MASK) >> ERSPAN3_FT_SHIFT;
+	ND_PRINT(" ft %s",
+		 tok2str(erspan3_ft_values, "unknown %x", ft));
+
+
 	/* Do we have the platform-specific header? */
 	if (hdr2 & ERSPAN3_O_MASK) {
 		/* Yes.  Skip it. */
@@ -259,7 +272,17 @@ erspan_print_iii(netdissect_options *ndo, const u_char *bp, u_int len)
 	}
 
 	ND_PRINT(": ");
-	ether_print(ndo, bp, len, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL);
+
+	switch (ft) {
+
+	case ERSPAN3_FT_ETHERNET:
+		ether_print(ndo, bp, len, ND_BYTES_AVAILABLE_AFTER(bp), NULL, NULL);
+		break;
+
+	default:
+		ND_PRINT("Frame type unknown");
+		break;
+	}
 	return;
 
 invalid:
