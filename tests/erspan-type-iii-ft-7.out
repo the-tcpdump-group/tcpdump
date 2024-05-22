@@ -1,240 +1,174 @@
     1  2017-02-12 03:55:21.583545 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 112)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47838, length 92
-	erspan type3 session 101 bso Bad cos 0: 4b:87:01:00:81:00 Unknown SSAP 0x18 > 00:00:ab:c5:00:00 Null Supervisory, Reject, rcv seq 111, Flags [Final], length 58
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
     2  2017-02-12 03:55:21.583600 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 112)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47839, length 92
-	erspan type3 session 101 bso Bad cos 0: 4b:87:01:00:81:00 Unknown SSAP 0x18 > 00:00:ab:c5:00:00 Null Supervisory, Reject, rcv seq 111, Flags [Final], length 58
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
     3  2017-02-12 03:55:22.022711 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47840, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
     4  2017-02-12 03:55:24.022653 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47841, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
     5  2017-02-12 03:55:26.022595 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47842, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
     6  2017-02-12 03:55:28.022542 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47843, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
     7  2017-02-12 03:55:30.022483 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47844, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
     8  2017-02-12 03:55:31.583262 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 112)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47845, length 92
-	erspan type3 session 101 bso Bad cos 0: 4b:9e:01:00:81:00 Unknown SSAP 0x18 > 00:00:ab:c5:00:00 Null Supervisory, Reject, rcv seq 111, Flags [Final], length 58
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
     9  2017-02-12 03:55:31.583312 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 112)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47846, length 92
-	erspan type3 session 101 bso Bad cos 0: 4b:9e:01:00:81:00 Unknown SSAP 0x18 > 00:00:ab:c5:00:00 Null Supervisory, Reject, rcv seq 111, Flags [Final], length 58
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    10  2017-02-12 03:55:32.022425 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47847, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    11  2017-02-12 03:55:34.022368 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47848, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    12  2017-02-12 03:55:36.022310 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47849, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    13  2017-02-12 03:55:38.022256 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47850, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    14  2017-02-12 03:55:40.022201 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47851, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    15  2017-02-12 03:55:41.582985 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 112)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47852, length 92
-	erspan type3 session 101 bso Bad cos 0: 4b:b5:01:00:81:00 Unknown SSAP 0x18 > 00:00:ab:c5:00:00 Null Supervisory, Reject, rcv seq 111, Flags [Final], length 58
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    16  2017-02-12 03:55:41.583029 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 112)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47853, length 92
-	erspan type3 session 101 bso Bad cos 0: 4b:b5:01:00:81:00 Unknown SSAP 0x18 > 00:00:ab:c5:00:00 Null Supervisory, Reject, rcv seq 111, Flags [Final], length 58
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    17  2017-02-12 03:55:42.022149 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47854, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    18  2017-02-12 03:55:42.048321 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 112)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47855, length 92
-	erspan type3 session 101 bso Bad cos 0: 4b:b6:ff:ff:ff:ff > 00:00:ab:c5:00:00, ethertype Unknown (0xffff), length 72: 
-	0x0000:  1418 7760 aa75 8100 0361 0806 0001 0800  ..w`.u...a......
-	0x0010:  0604 0001 1418 7760 aa75 0af0 138b 0000  ......w`.u......
-	0x0020:  0000 0000 0af0 1381 0000 0000 0000 0000  ................
-	0x0030:  0000 0000 0000 0000 0000                 ..........
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    19  2017-02-12 03:55:44.022090 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47856, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    20  2017-02-12 03:55:46.022036 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47857, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    21  2017-02-12 03:55:48.021981 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47858, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    22  2017-02-12 03:55:50.021922 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47859, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    23  2017-02-12 03:55:51.582703 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 112)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47860, length 92
-	erspan type3 session 101 bso Bad cos 0: 4b:cd:01:00:81:00 Unknown SSAP 0x18 > 00:00:ab:c5:00:00 Null Supervisory, Reject, rcv seq 111, Flags [Final], length 58
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    24  2017-02-12 03:55:51.582748 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 112)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47861, length 92
-	erspan type3 session 101 bso Bad cos 0: 4b:cd:01:00:81:00 Unknown SSAP 0x18 > 00:00:ab:c5:00:00 Null Supervisory, Reject, rcv seq 111, Flags [Final], length 58
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    25  2017-02-12 03:55:52.021865 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47862, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    26  2017-02-12 03:55:54.021808 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47863, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    27  2017-02-12 03:55:56.021750 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47864, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    28  2017-02-12 03:55:58.021697 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47865, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    29  2017-02-12 03:56:00.021643 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47866, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    30  2017-02-12 03:56:01.582424 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 112)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47867, length 92
-	erspan type3 session 101 bso Bad cos 0: 4b:e4:01:00:81:00 Unknown SSAP 0x18 > 00:00:ab:c5:00:00 Null Supervisory, Reject, rcv seq 111, Flags [Final], length 58
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    31  2017-02-12 03:56:01.582469 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 112)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47868, length 92
-	erspan type3 session 101 bso Bad cos 0: 4b:e4:01:00:81:00 Unknown SSAP 0x18 > 00:00:ab:c5:00:00 Null Supervisory, Reject, rcv seq 111, Flags [Final], length 58
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    32  2017-02-12 03:56:02.021587 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47869, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    33  2017-02-12 03:56:04.021530 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47870, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    34  2017-02-12 03:56:06.021475 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47871, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    35  2017-02-12 03:56:08.021417 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47872, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    36  2017-02-12 03:56:10.021363 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47873, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    37  2017-02-12 03:56:11.582146 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 112)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47874, length 92
-	erspan type3 session 101 bso Bad cos 0: 4b:fb:01:00:81:00 Unknown SSAP 0x18 > 00:00:ab:c5:00:00 Null Supervisory, Reject, rcv seq 111, Flags [Final], length 58
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    38  2017-02-12 03:56:11.582191 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 112)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47875, length 92
-	erspan type3 session 101 bso Bad cos 0: 4b:fb:01:00:81:00 Unknown SSAP 0x18 > 00:00:ab:c5:00:00 Null Supervisory, Reject, rcv seq 111, Flags [Final], length 58
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    39  2017-02-12 03:56:12.021307 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47876, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    40  2017-02-12 03:56:12.859628 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 144)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47877, length 124
-	erspan type3 session 101 bso Bad cos 0: 4b:fe:ff:ff:ff:ff > 00:00:ab:c5:00:00, ethertype Unknown (0xffff), length 104: 
-	0x0000:  1418 7760 aa75 8100 0361 0800 4500 004e  ..w`.u...a..E..N
-	0x0010:  0726 0000 8011 f60f 0af0 138b 0af0 13ff  .&..............
-	0x0020:  0089 0089 003a 933c b946 0110 0001 0000  .....:.<.F......
-	0x0030:  0000 0000 2045 4a45 4f46 4546 4345 4245  .....EJEOFEFCEBE
-	0x0040:  4846 4145 4845 4545 5043 4143 4143 4143  HFAEHEEEPCACACAC
-	0x0050:  4143 4141 4100 0020 0001                 ACAAA.....
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    41  2017-02-12 03:56:12.859864 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 122)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47878, length 102
-	erspan type3 session 101 bso Bad cos 0: 4b:fe:01:00:5e:00 Unknown SSAP 0x18 > 00:00:ab:c5:00:00 Unknown DSAP 0x14 Unnumbered, 67, Flags [Poll], length 68
-	0x0000:  1418 7760 aa75 8100 0361 0800 4500 0038  ..w`.u...a..E..8
-	0x0010:  1875 0000 0111 a1c9 0af0 138b e000 00fc  .u..............
-	0x0020:  ff5b 14eb 0024 e893 da3c 0000 0001 0000  .[...$...<......
-	0x0030:  0000 0000 0a69 6e74 7261 6770 6764 6f00  .....intragpgdo.
-	0x0040:  0001 0001                                ....
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    42  2017-02-12 03:56:12.860029 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 122)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47879, length 102
-	erspan type3 session 101 bso Bad cos 0: 4b:fe:01:00:5e:00 Unknown SSAP 0x18 > 00:00:ab:c5:00:00 Unknown DSAP 0x14 Unnumbered, 67, Flags [Poll], length 68
-	0x0000:  1418 7760 aa75 8100 0361 0800 4500 0038  ..w`.u...a..E..8
-	0x0010:  1876 0000 0111 a1c8 0af0 138b e000 00fc  .v..............
-	0x0020:  fdb4 14eb 0024 a251 220b 0000 0001 0000  .....$.Q".......
-	0x0030:  0000 0000 0a69 6e74 7261 6770 6764 6f00  .....intragpgdo.
-	0x0040:  001c 0001                                ....
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    43  2017-02-12 03:56:13.050090 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 112)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47880, length 92
-	erspan type3 session 101 bso Bad cos 0: 4b:ff:ff:ff:ff:ff > 00:00:ab:c5:00:00, ethertype Unknown (0xffff), length 72: 
-	0x0000:  1418 7760 aa75 8100 0361 0806 0001 0800  ..w`.u...a......
-	0x0010:  0604 0001 1418 7760 aa75 0af0 138b 0000  ......w`.u......
-	0x0020:  0000 0000 0af0 1385 0000 0000 0000 0000  ................
-	0x0030:  0000 0000 0000 0000 0000                 ..........
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    44  2017-02-12 03:56:13.268895 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 122)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47881, length 102
-	erspan type3 session 101 bso Bad cos 0: 4b:ff:01:00:5e:00 Unknown SSAP 0x18 > 00:00:ab:c5:00:00 Unknown DSAP 0x14 Unnumbered, 67, Flags [Poll], length 68
-	0x0000:  1418 7760 aa75 8100 0361 0800 4500 0038  ..w`.u...a..E..8
-	0x0010:  1877 0000 0111 a1c7 0af0 138b e000 00fc  .w..............
-	0x0020:  fdb4 14eb 0024 a251 220b 0000 0001 0000  .....$.Q".......
-	0x0030:  0000 0000 0a69 6e74 7261 6770 6764 6f00  .....intragpgdo.
-	0x0040:  001c 0001                                ....
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    45  2017-02-12 03:56:13.268927 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 122)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47882, length 102
-	erspan type3 session 101 bso Bad cos 0: 4b:ff:01:00:5e:00 Unknown SSAP 0x18 > 00:00:ab:c5:00:00 Unknown DSAP 0x14 Unnumbered, 67, Flags [Poll], length 68
-	0x0000:  1418 7760 aa75 8100 0361 0800 4500 0038  ..w`.u...a..E..8
-	0x0010:  1878 0000 0111 a1c6 0af0 138b e000 00fc  .x..............
-	0x0020:  ff5b 14eb 0024 e893 da3c 0000 0001 0000  .[...$...<......
-	0x0030:  0000 0000 0a69 6e74 7261 6770 6764 6f00  .....intragpgdo.
-	0x0040:  0001 0001                                ....
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    46  2017-02-12 03:56:13.643869 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 144)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47883, length 124
-	erspan type3 session 101 bso Bad cos 0: 4c:00:ff:ff:ff:ff > 00:00:ab:c5:00:00, ethertype Unknown (0xffff), length 104: 
-	0x0000:  1418 7760 aa75 8100 0361 0800 4500 004e  ..w`.u...a..E..N
-	0x0010:  0728 0000 8011 f60d 0af0 138b 0af0 13ff  .(..............
-	0x0020:  0089 0089 003a 933c b946 0110 0001 0000  .....:.<.F......
-	0x0030:  0000 0000 2045 4a45 4f46 4546 4345 4245  .....EJEOFEFCEBE
-	0x0040:  4846 4145 4845 4545 5043 4143 4143 4143  HFAEHEEEPCACACAC
-	0x0050:  4143 4141 4100 0020 0001                 ACAAA.....
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    47  2017-02-12 03:56:14.021252 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47884, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    48  2017-02-12 03:56:14.445047 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 144)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47885, length 124
-	erspan type3 session 101 bso Bad cos 0: 4c:02:ff:ff:ff:ff > 00:00:ab:c5:00:00, ethertype Unknown (0xffff), length 104: 
-	0x0000:  1418 7760 aa75 8100 0361 0800 4500 004e  ..w`.u...a..E..N
-	0x0010:  072a 0000 8011 f60b 0af0 138b 0af0 13ff  .*..............
-	0x0020:  0089 0089 003a 933c b946 0110 0001 0000  .....:.<.F......
-	0x0030:  0000 0000 2045 4a45 4f46 4546 4345 4245  .....EJEOFEFCEBE
-	0x0040:  4846 4145 4845 4545 5043 4143 4143 4143  HFAEHEEEPCACACAC
-	0x0050:  4143 4141 4100 0020 0001                 ACAAA.....
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    49  2017-02-12 03:56:14.852333 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 112)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47886, length 92
-	erspan type3 session 101 bso Bad cos 0: 4c:03:ff:ff:ff:ff > 00:00:ab:c5:00:00, ethertype Unknown (0xffff), length 72: 
-	0x0000:  1418 7760 aa75 8100 0361 0806 0001 0800  ..w`.u...a......
-	0x0010:  0604 0001 1418 7760 aa75 0af0 138b 0000  ......w`.u......
-	0x0020:  0000 0000 0af0 1385 0000 0000 0000 0000  ................
-	0x0030:  0000 0000 0000 0000 0000                 ..........
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    50  2017-02-12 03:56:15.549506 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 112)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47887, length 92
-	erspan type3 session 101 bso Bad cos 0: 4c:04:ff:ff:ff:ff > 00:00:ab:c5:00:00, ethertype Unknown (0xffff), length 72: 
-	0x0000:  1418 7760 aa75 8100 0361 0806 0001 0800  ..w`.u...a......
-	0x0010:  0604 0001 1418 7760 aa75 0af0 138b 0000  ......w`.u......
-	0x0020:  0000 0000 0af0 1385 0000 0000 0000 0000  ................
-	0x0030:  0000 0000 0000 0000 0000                 ..........
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    51  2017-02-12 03:56:16.021193 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47888, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    52  2017-02-12 03:56:16.547213 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 112)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47889, length 92
-	erspan type3 session 101 bso Bad cos 0: 4c:07:ff:ff:ff:ff > 00:00:ab:c5:00:00, ethertype Unknown (0xffff), length 72: 
-	0x0000:  1418 7760 aa75 8100 0361 0806 0001 0800  ..w`.u...a......
-	0x0010:  0604 0001 1418 7760 aa75 0af0 138b 0000  ......w`.u......
-	0x0020:  0000 0000 0af0 1385 0000 0000 0000 0000  ................
-	0x0030:  0000 0000 0000 0000 0000                 ..........
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    53  2017-02-12 03:56:18.021131 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47890, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    54  2017-02-12 03:56:20.021084 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 108)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47891, length 88
-	erspan type3 session 101 bso Bad cos 0:  [|llc]
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    55  2017-02-12 03:56:20.859987 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 112)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47892, length 92
-	erspan type3 session 101 bso Bad cos 0: 4c:11:ff:ff:ff:ff > 00:00:ab:c5:00:00, ethertype Unknown (0xffff), length 72: 
-	0x0000:  1418 7760 aa75 8100 0361 0806 0001 0800  ..w`.u...a......
-	0x0010:  0604 0001 1418 7760 aa75 0af0 138b 0000  ......w`.u......
-	0x0020:  0000 0000 0af0 1385 0000 0000 0000 0000  ................
-	0x0030:  0000 0000 0000 0000 0000                 ..........
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    56  2017-02-12 03:56:21.547457 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 112)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47893, length 92
-	erspan type3 session 101 bso Bad cos 0: 4c:12:ff:ff:ff:ff > 00:00:ab:c5:00:00, ethertype Unknown (0xffff), length 72: 
-	0x0000:  1418 7760 aa75 8100 0361 0806 0001 0800  ..w`.u...a......
-	0x0010:  0604 0001 1418 7760 aa75 0af0 138b 0000  ......w`.u......
-	0x0020:  0000 0000 0af0 1385 0000 0000 0000 0000  ................
-	0x0030:  0000 0000 0000 0000 0000                 ..........
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    57  2017-02-12 03:56:21.581865 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 112)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47894, length 92
-	erspan type3 session 101 bso Bad cos 0: 4c:12:01:00:81:00 Unknown SSAP 0x18 > 00:00:ab:c5:00:00 Null Supervisory, Reject, rcv seq 111, Flags [Final], length 58
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
    58  2017-02-12 03:56:21.581909 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto GRE (47), length 112)
     192.168.1.172 > 192.168.1.249: GREv0, Flags [sequence# present], seq 47895, length 92
-	erspan type3 session 101 bso Bad cos 0: 4c:12:01:00:81:00 Unknown SSAP 0x18 > 00:00:ab:c5:00:00 Null Supervisory, Reject, rcv seq 111, Flags [Final], length 58
+	erspan type3 session 101 bso Bad cos 0 ft unknown 7: Frame type unknown
