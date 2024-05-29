@@ -630,6 +630,9 @@ erspan-type-iii-ft-0	erspan-type-iii-ft-0.pcap	erspan-type-iii-ft-0.out	-v
 erspan-type-iii-ft-7	erspan-type-iii-ft-7.pcap	erspan-type-iii-ft-7.out	-v
 erspan-type-iii-pb-1	erspan-type-iii-pb-1.pcap	erspan-type-iii-pb-1.out	-v
 
+# timed (TSP) tests
+timed_1 timed_1.pcap timed_1.out
+
 # bad packets from Hanno Böck
 # heap-overflow-1 is in non-bsd.tests
 heap-overflow-2	heap-overflow-2.pcap		heap-overflow-2.out	-v
