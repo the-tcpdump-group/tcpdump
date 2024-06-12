@@ -1,0 +1,36 @@
+# -*- perl -*-
+
+# The "verbose" Link Management Protocol test involves a float calculation that
+# may produce a slightly different result depending on the compiler and the
+# version of the instruction set for which it's generating code (see GitHub
+# issue #333). The test is done with an output file that depends on the
+# floating-point type, as reported by "./tcpdump --fp-type".
+
+$testlist = [
+    {
+        name => 'time_2038',
+        input => 'time_2038.pcap',
+        output => 'time_2038.out',
+        args   => ''
+    },
+    {
+        name => 'time_2039',
+        input => 'time_2039.pcap',
+        output => 'time_2039.out',
+        args   => ''
+    },
+    {
+        name => 'time_2106',
+        input => 'time_2106.pcap',
+        output => 'time_2106.out',
+        args   => ''
+    },
+    {
+        name => 'time_2107',
+        input => 'time_2107.pcapng',
+        output => 'time_2107.out',
+        args   => ''
+    },
+];
+
+1;
