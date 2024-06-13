@@ -224,9 +224,12 @@ pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
 	ndo->ndo_protocol = "pflog";
 	rulenr = GET_BE_U_4(hdr->rulenr);
 	subrulenr = GET_BE_U_4(hdr->subrulenr);
-	if (subrulenr == (uint32_t)-1)
-		ND_PRINT("rule %u/", rulenr);
-	else {
+	if (subrulenr == (uint32_t)-1) {
+		if (rulenr == (uint32_t)-1)
+			ND_PRINT("rule %s/", "def");
+		else
+			ND_PRINT("rule %u/", rulenr);
+	} else {
 		ND_PRINT("rule %u.", rulenr);
 		nd_printjnp(ndo, (const u_char*)hdr->ruleset, PFLOG_RULESET_NAME_SIZE);
 		ND_PRINT(".%u/", subrulenr);
