@@ -35,6 +35,7 @@
 
 #include "ip6.h"
 #include "ipproto.h"
+#include "icmp.h"
 
 #include "udp.h"
 #include "ah.h"
@@ -92,6 +93,8 @@ struct icmp6_hdr {
 #define icmp6_id	icmp6_data16[0]		/* echo request/reply */
 #define icmp6_seq	icmp6_data16[1]		/* echo request/reply */
 #define icmp6_maxdelay	icmp6_data16[0]		/* mcast group membership */
+#define icmp6_xseq	icmp6_data8[2]		/* extended echo request/reply */
+#define icmp6_xinfo	icmp6_data8[3]		/* extended echo request/reply */
 
 #define ICMP6_DST_UNREACH		1	/* dest unreachable, codes: */
 #define ICMP6_PACKET_TOO_BIG		2	/* packet too big */
@@ -130,6 +133,8 @@ struct icmp6_hdr {
 #define ICMP6_HADISCOV_REPLY		145
 #define ICMP6_MOBILEPREFIX_SOLICIT	146
 #define ICMP6_MOBILEPREFIX_ADVERT	147
+#define	ICMP6_EXTENDED_ECHO_REQUEST	160	/* extended echo request */
+#define	ICMP6_EXTENDED_ECHO_REPLY	161	/* extended echo reply */
 
 #define MLD6_MTRACE_RESP		200	/* mtrace response(to sender) */
 #define MLD6_MTRACE			201	/* mtrace messages */
@@ -666,6 +671,8 @@ static const struct tok icmp6_type_values[] = {
     { MLD6_MTRACE, "mtrace message"},
     { MLD6_MTRACE_RESP, "mtrace response"},
     { ND_RPL_MESSAGE,   "RPL"},
+    { ICMP6_EXTENDED_ECHO_REQUEST, "extended echo request"},
+    { ICMP6_EXTENDED_ECHO_REPLY, "extended echo reply"},
     { 0,	NULL }
 };
 
@@ -1283,6 +1290,17 @@ icmp6_print(netdissect_options *ndo,
                 /* plus 4, because struct icmp6_hdr contains 4 bytes of icmp payload */
                 rpl_print(ndo, icmp6_code, dp->icmp6_data, length-sizeof(struct icmp6_hdr)+4);
                 break;
+	case ICMP6_EXTENDED_ECHO_REQUEST:
+	case ICMP6_EXTENDED_ECHO_REPLY:
+		ND_PRINT(", id %u, seq %u", GET_BE_U_2(dp->icmp6_id),
+			GET_U_1(dp->icmp6_xseq));
+		// The content of the message is the same as ICMP, so use the
+		// function defined in print-icmp.c
+		if (ndo->ndo_vflag) {
+			uint8_t xinfo = GET_U_1(dp->icmp6_xinfo);
+			print_icmp_rfc8335(ndo, xinfo, icmp6_type == ICMP6_EXTENDED_ECHO_REQUEST, icmp6_code, dp->icmp6_data + 4);
+		}
+		break;
 	default:
                 ND_PRINT(", length %u", length);
                 if (ndo->ndo_vflag <= 1)
