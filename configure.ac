@@ -1005,7 +1005,7 @@ AC_ARG_WITH(crypto,
 		# Put the subdirectories of the libcrypto root directory
 		# at the front of the header and library search path.
 		#
-		CFLAGS="-I$withval/include $CFLAGS"
+		V_INCLS="-I$withval/include $V_INCLS"
 		LIBS="-L$withval/lib $LIBS"
 	fi
 ],[
