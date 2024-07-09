@@ -713,7 +713,54 @@ check_function_exists(pcap_set_tstamp_precision HAVE_PCAP_SET_TSTAMP_PRECISION)
 #
 check_function_exists(pcap_set_immediate_mode HAVE_PCAP_SET_IMMEDIATE_MODE)
 check_function_exists(pcap_dump_ftell64 HAVE_PCAP_DUMP_FTELL64)
-check_function_exists(pcap_open HAVE_PCAP_OPEN)
+#
+# macOS Sonoma's libpcap includes stub versions of the remote-
+# capture APIs.  They are exported as "weakly linked symbols".
+#
+# Xcode 15 offers only a macOS Sonoma SDK, which has a .tbd
+# file for libpcap that claims it includes those APIs.  (Newer
+# versions of macOS don't provide the system shared libraries,
+# they only provide the dyld shared cache containing those
+# libraries, so the OS provides SDKs that include a .tbd file
+# to use when linking.)
+#
+# This means that check_function_exists() will think that
+# the remote-capture APIs are present, including pcap_open().
+#
+# However, they are *not* present in macOS Ventura and earlier,
+# which means that building on Ventura with Xcode 15 produces
+# executables that fail to start because one of those APIs
+# isn't found in the system libpcap.
+#
+# Protecting calls to those APIs with __builtin_available()
+# does not prevent this, because the libpcap header files
+# in the Sonoma SDK mark them as being first available
+# in macOS 10.13, just like all the other routines introduced
+# in libpcap 1.9, even though they're only available if libpcap
+# is built with remote capture enabled or stub routines are
+# provided.  (A fix to enable this has been checked into the
+# libpcap repository, and may end up in a later version of
+# the SDK.)
+#
+# Given all that, and given that the versions of the
+# remote-capture APIs in Sonoma are stubs that always fail,
+# there doesn't seem to be any point in checking for pcap_open()
+# if we're linking against the Apple libpcap.
+#
+# However, if we're *not* linking against the Apple libpcap,
+# we should check for it, so that we can use it if it's present.
+#
+# So we check for pcap_open if 1) this isn't macOS or 2) the
+# the libpcap we found is not a system library, meaning that
+# its path begins neither with /usr/lib (meaning it's a system
+# dylib) nor /Application/Xcode.app (meaning it's a file in
+# the Xcode SDK).
+#
+if(NOT APPLE OR NOT
+   (PCAP_LIBRARIES MATCHES "/usr/lib/.*" OR
+    PCAP_LIBRARIES MATCHES "/Application/Xcode.app/.*"))
+    check_function_exists(pcap_open HAVE_PCAP_OPEN)
+endif()
 
 #
 # On Windows, check for pcap_wsockinit(); if we don't have it, check for
