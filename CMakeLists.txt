@@ -760,6 +760,7 @@ if(NOT APPLE OR NOT
    (PCAP_LIBRARIES MATCHES "/usr/lib/.*" OR
     PCAP_LIBRARIES MATCHES "/Application/Xcode.app/.*"))
     check_function_exists(pcap_open HAVE_PCAP_OPEN)
+    check_function_exists(pcap_findalldevs_ex HAVE_PCAP_FINDALLDEVS_EX)
 endif()
 
 #
