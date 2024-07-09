@@ -810,7 +810,14 @@ if test $ac_cv_func_pcap_lib_version = "no" ; then
     fi
 fi
 AC_CHECK_FUNCS(pcap_setdirection pcap_set_immediate_mode pcap_dump_ftell64)
-AC_CHECK_FUNCS(pcap_open pcap_findalldevs_ex)
+#
+# See the comment in AC_LBL_LIBPCAP in aclocal.m4 for the reason
+# why we don't check for remote-capture APIs if we're building
+# with the system libpcap on macOS.
+#
+if test "$_dont_check_for_remote_apis" != "yes"; then
+	AC_CHECK_FUNCS(pcap_open pcap_findalldevs_ex)
+fi
 AC_REPLACE_FUNCS(pcap_dump_ftell)
 
 #
