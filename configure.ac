@@ -1003,10 +1003,14 @@ AC_ARG_WITH(crypto,
 
 		#
 		# Put the subdirectories of the libcrypto root directory
-		# at the front of the header and library search path.
+		# at the end of the header and library search path, to
+		# make sure they come after any -I or -L flags for
+		# a local libpcap - those must take precedence of any
+		# directory that might contain an installed version of
+		# libpcap.
 		#
-		V_INCLS="-I$withval/include $V_INCLS"
-		LIBS="-L$withval/lib $LIBS"
+		V_INCLS="$V_INCLS -I$withval/include"
+		LIBS="$LIBS -L$withval/lib"
 	fi
 ],[
 	#
