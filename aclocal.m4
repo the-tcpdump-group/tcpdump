@@ -454,6 +454,59 @@ AC_DEFUN(AC_LBL_LIBPCAP,
                         # ignore those values.
                         #
                         _broken_apple_pcap_config=yes
+
+                        #
+                        # Furthermore:
+                        #
+                        # macOS Sonoma's libpcap includes stub versions
+                        # of the remote-capture APIs.  They are exported
+                        # as "weakly linked symbols".
+                        #
+                        # Xcode 15 offers only a macOS Sonoma SDK, which
+                        # has a .tbd file for libpcap that claims it
+                        # includes those APIs.  (Newer versions of macOS
+                        # don't provide the system shared libraries,
+                        # they only provide the dyld shared cache
+                        # containing those libraries, so the OS provides
+                        # SDKs that include a .tbd file to use when
+                        # linking.)
+                        #
+                        # This means that AC_CHECK_FUNCS() will think
+                        # that the remote-capture APIs are present,
+                        # including pcap_open() and
+                        # pcap_findalldevs_ex().
+                        #
+                        # However, they are *not* present in macOS
+                        # Ventura and earlier, which means that building
+                        # on Ventura with Xcode 15 produces executables
+                        # that fail to start because one of those APIs
+                        # isn't found in the system libpcap.
+                        #
+                        # Protecting calls to those APIs with
+                        # __builtin_available() does not appear to
+                        # prevent this, for some unknown reason, and it
+                        # doesn't even allow the program to compile with
+                        # versions of Xcode prior to Xcode 15, as the
+                        # pcap.h file doesn't specify minimum OS
+                        # versions for those functions.
+                        #
+                        # Given all that, and given that the versions of
+                        # the remote-capture APIs in Sonoma are stubs
+                        # that always fail, there doesn't seem to be any
+                        # point in checking for pcap_open() if we're
+                        # linking against the Apple libpcap.
+                        #
+                        # However, if we're *not* linking against the
+                        # Apple libpcap, we should check for it, so that
+                        # we can use it if it's present.
+                        #
+                        # We know this is macOS and that we're using
+                        # the system-provided pcap-config to find
+                        # libpcap, so we know it'll be the system
+                        # libpcap, and note that we should not search
+                        # for remote-capture APIs.
+                        #
+                        _dont_check_for_remote_apis=yes
                         ;;
 
                     solaris*)

@@ -580,7 +580,14 @@ AC_CHECK_FUNCS(pcap_set_tstamp_precision)
 # if we have them.
 #
 AC_CHECK_FUNCS(pcap_set_immediate_mode pcap_dump_ftell64)
-AC_CHECK_FUNCS(pcap_open pcap_findalldevs_ex)
+#
+# See the comment in AC_LBL_LIBPCAP in aclocal.m4 for the reason
+# why we don't check for remote-capture APIs if we're building
+# with the system libpcap on macOS.
+#
+if test "$_dont_check_for_remote_apis" != "yes"; then
+	AC_CHECK_FUNCS(pcap_open pcap_findalldevs_ex)
+fi
 
 #
 # Check for special debugging functions
