@@ -131,6 +131,80 @@ project(tcpdump C)
 set(SIZEOF_VOID_P "${CMAKE_SIZEOF_VOID_P}")
 
 #
+# Show the bit width for which we're compiling.
+# This can help debug problems if you're dealing with a compiler that
+# defaults to generating 32-bit code even when running on a 64-bit
+# platform, and where that platform may provide only 64-bit versions of
+# libraries that we might use (looking at *you*, Oracle Studio!).
+#
+if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+  message(STATUS "Building 32-bit")
+elseif(CMAKE_SIZEOF_VOID_P EQUAL 8)
+  message(STATUS "Building 64-bit")
+endif()
+
+#
+# Solaris pkg-config is annoying.  For at least one package (D-Bus, I'm
+# looking at *you*!), there are separate include files for 32-bit and
+# 64-bit builds (I guess using "unsigned long long" as a 64-bit integer
+# type on a 64-bit build is like crossing the beams or something), and
+# there are two separate .pc files, so if we're doing a 32-bit build we
+# should make sure we look in /usr/lib/pkgconfig for .pc files and if
+# we're doing a 64-bit build we should make sure we look in
+# /usr/lib/amd64/pkgconfig for .pc files.
+#
+if(CMAKE_SYSTEM_NAME STREQUAL "SunOS" AND CMAKE_SYSTEM_VERSION MATCHES "5[.][0-9.]*")
+    #
+    # Note: string(REPLACE) does not appear to support using ENV{...}
+    # as an argument, so we set a variable and then use set() to set
+    # the environment variable.
+    #
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        #
+        # 64-bit build.  If /usr/lib/pkgconfig appears in the path,
+        # prepend /usr/lib/amd64/pkgconfig to it; otherwise,
+        # put /usr/lib/amd64 at the end.
+        #
+        if((NOT DEFINED ENV{PKG_CONFIG_PATH}) OR "$ENV{PKG_CONFIG_PATH}" EQUAL "")
+            #
+            # Not set, or empty.  Set it to /usr/lib/amd64/pkgconfig.
+            #
+            set(fixed_path "/usr/lib/amd64/pkgconfig")
+        elseif("$ENV{PKG_CONFIG_PATH}" MATCHES "/usr/lib/pkgconfig")
+            #
+            # It contains /usr/lib/pkgconfig.  Prepend
+            # /usr/lib/amd64/pkgconfig to /usr/lib/pkgconfig.
+            #
+            string(REPLACE "/usr/lib/pkgconfig"
+                "/usr/lib/amd64/pkgconfig:/usr/lib/pkgconfig"
+                fixed_path "$ENV{PKG_CONFIG_PATH}")
+        else()
+            #
+            # Not empty, but doesn't contain /usr/lib/pkgconfig.
+            # Append /usr/lib/amd64/pkgconfig to it.
+            #
+            set(fixed_path "$ENV{PKG_CONFIG_PATH}:/usr/lib/amd64/pkgconfig")
+        endif()
+        set(ENV{PKG_CONFIG_PATH} "${fixed_path}")
+    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+        #
+        # 32-bit build.  If /usr/amd64/lib/pkgconfig appears in the path,
+        # prepend /usr/lib/pkgconfig to it.
+        #
+        if("$ENV{PKG_CONFIG_PATH}" MATCHES "/usr/lib/amd64/pkgconfig")
+            #
+            # It contains /usr/lib/amd64/pkgconfig.  Prepend
+            # /usr/lib/pkgconfig to /usr/lib/amd64/pkgconfig.
+            #
+            string(REPLACE "/usr/lib/amd64/pkgconfig"
+                "/usr/lib/pkgconfig:/usr/lib/amd64/pkgconfig"
+                fixed_path "$ENV{PKG_CONFIG_PATH}")
+            set(ENV{PKG_CONFIG_PATH} "${fixed_path}")
+        endif()
+    endif()
+endif()
+
+#
 # For checking if a compiler flag works and adding it if it does.
 #
 include(CheckCCompilerFlag)
@@ -828,11 +902,6 @@ endif(WITH_SMI)
 if(WITH_CRYPTO)
     find_package(CRYPTO)
     if(CRYPTO_FOUND)
-        #
-        # Check for some headers and functions.
-        #
-        check_include_file(openssl/evp.h HAVE_OPENSSL_EVP_H)
-
         #
         # 1) do we have EVP_CIPHER_CTX_new?
         # If so, we use it to allocate an EVP_CIPHER_CTX, as
