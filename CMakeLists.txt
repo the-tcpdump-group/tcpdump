@@ -807,7 +807,8 @@ check_function_exists(pcap_dump_ftell64 HAVE_PCAP_DUMP_FTELL64)
 # to use when linking.)
 #
 # This means that check_function_exists() will think that
-# the remote-capture APIs are present, including pcap_open().
+# the remote-capture APIs are present, including pcap_open()
+# and pcap_findalldevs_ex().
 #
 # However, they are *not* present in macOS Ventura and earlier,
 # which means that building on Ventura with Xcode 15 produces
@@ -827,14 +828,14 @@ check_function_exists(pcap_dump_ftell64 HAVE_PCAP_DUMP_FTELL64)
 # Given all that, and given that the versions of the
 # remote-capture APIs in Sonoma are stubs that always fail,
 # there doesn't seem to be any point in checking for pcap_open()
-# if we're linking against the Apple libpcap.
+# and pcap_findalldevs_ex() if we're linking against the Apple libpcap.
 #
 # However, if we're *not* linking against the Apple libpcap,
 # we should check for it, so that we can use it if it's present.
 #
-# So we check for pcap_open if 1) this isn't macOS or 2) the
-# the libpcap we found is not a system library, meaning that
-# its path begins neither with /usr/lib (meaning it's a system
+# So we check for pcap_open() and pcap_findalldevs_ex() if 1) this isn't
+# macOS or 2) the the libpcap we found is not a system library, meaning
+# that its path begins neither with /usr/lib (meaning it's a system
 # dylib) nor /Application/Xcode.app (meaning it's a file in
 # the Xcode SDK).
 #
