@@ -57,7 +57,7 @@
 /* Define to 1 if you have the `cap-ng' library (-lcap-ng). */
 #cmakedefine HAVE_LIBCAP_NG 1
 
-/* Define to 1 if you have the `crypto' library (-lcrypto). */
+/* Define to 1 if you have a usable `crypto' library (-lcrypto). */
 #cmakedefine HAVE_LIBCRYPTO 1
 
 /* Define to 1 if you have the `rpc' library (-lrpc). */
@@ -71,9 +71,6 @@
 
 /* Define to 1 if you have the `openat' function. */
 #cmakedefine HAVE_OPENAT 1
-
-/* Define to 1 if you have the <openssl/evp.h> header file. */
-#cmakedefine HAVE_OPENSSL_EVP_H 1
 
 /* define if the OS provides AF_INET6 and struct in6_addr */
 #cmakedefine HAVE_OS_IPV6_SUPPORT 1
