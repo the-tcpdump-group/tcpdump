@@ -387,35 +387,6 @@ AC_LBL_LIBPCAP(V_PCAPDEP, V_INCLS)
 # Before you is a C compiler.
 #
 AC_CHECK_FUNCS(ether_ntohost, [
-    AC_CACHE_CHECK(for buggy ether_ntohost, ac_cv_buggy_ether_ntohost, [
-	AC_RUN_IFELSE([AC_LANG_SOURCE([[
-		#include <netdb.h>
-		#include <netinet/ether.h>
-		#include <stdlib.h>
-		#include <sys/types.h>
-		#include <sys/param.h>
-		#include <sys/socket.h>
-
-		int
-		main(int argc, char **argv)
-		{
-			u_char ea[6] = { 0xff, 0xff, 0xff, 0xff, 0xff };
-			char name[MAXHOSTNAMELEN];
-
-			ether_ntohost(name, (struct ether_addr *)ea);
-			exit(0);
-		}
-	]])
-	], [ac_cv_buggy_ether_ntohost=no],
-	   [ac_cv_buggy_ether_ntohost=yes],
-	   [ac_cv_buggy_ether_ntohost="not while cross-compiling"])])
-    if test "$ac_cv_buggy_ether_ntohost" = "no"; then
-	AC_DEFINE(USE_ETHER_NTOHOST, 1,
-	    [define if you have ether_ntohost() and it works])
-    fi
-])
-if test "$ac_cv_func_ether_ntohost" = yes -a \
-    "$ac_cv_buggy_ether_ntohost" = "no"; then
 	#
 	# OK, we have ether_ntohost().  Is it declared in <net/ethernet.h>?
 	#
@@ -424,7 +395,7 @@ if test "$ac_cv_func_ether_ntohost" = yes -a \
 	#
 	AC_CHECK_DECL(ether_ntohost,
 	    [
-		AC_DEFINE(NET_ETHERNET_H_DECLARES_ETHER_NTOHOST,,
+		AC_DEFINE(NET_ETHERNET_H_DECLARES_ETHER_NTOHOST,1,
 		    [Define to 1 if net/ethernet.h declares `ether_ntohost'])
 	    ],,
 	    [
@@ -472,7 +443,7 @@ if test "$ac_cv_func_ether_ntohost" = yes -a \
 		unset ac_cv_have_decl_ether_ntohost
 		AC_CHECK_DECL(ether_ntohost,
 		    [
-			AC_DEFINE(SYS_ETHERNET_H_DECLARES_ETHER_NTOHOST,,
+			AC_DEFINE(SYS_ETHERNET_H_DECLARES_ETHER_NTOHOST,1,
 			    [Define to 1 if sys/ethernet.h declares `ether_ntohost'])
 		    ],,
 		    [
@@ -499,7 +470,7 @@ if test "$ac_cv_func_ether_ntohost" = yes -a \
 		unset ac_cv_have_decl_ether_ntohost
 		AC_CHECK_DECL(ether_ntohost,
 		    [
-			AC_DEFINE(ARPA_INET_H_DECLARES_ETHER_NTOHOST,,
+			AC_DEFINE(ARPA_INET_H_DECLARES_ETHER_NTOHOST,1,
 			    [Define to 1 if arpa/inet.h declares `ether_ntohost'])
 		    ],,
 		    [
@@ -527,7 +498,7 @@ if test "$ac_cv_func_ether_ntohost" = yes -a \
 		unset ac_cv_have_decl_ether_ntohost
 		AC_CHECK_DECL(ether_ntohost,
 		    [
-			AC_DEFINE(NETINET_IF_ETHER_H_DECLARES_ETHER_NTOHOST,,
+			AC_DEFINE(NETINET_IF_ETHER_H_DECLARES_ETHER_NTOHOST,1,
 			    [Define to 1 if netinet/if_ether.h declares `ether_ntohost'])
 		    ],,
 		    [
@@ -562,7 +533,91 @@ if test "$ac_cv_func_ether_ntohost" = yes -a \
 			#include <netinet/if_ether.h>
 		    ])
 	fi
-fi
+    AC_CACHE_CHECK(for buggy ether_ntohost, ac_cv_buggy_ether_ntohost, [
+	AC_RUN_IFELSE([AC_LANG_SOURCE([[
+  #include <netdb.h>
+  #if defined(NET_ETHERNET_H_DECLARES_ETHER_NTOHOST)
+    /*
+     * OK, just include <net/ethernet.h>.
+     */
+    #include <net/ethernet.h>
+  #elif defined(NETINET_ETHER_H_DECLARES_ETHER_NTOHOST)
+    /*
+     * OK, just include <netinet/ether.h>
+     */
+    #include <netinet/ether.h>
+  #elif defined(SYS_ETHERNET_H_DECLARES_ETHER_NTOHOST)
+    /*
+     * OK, just include <sys/ethernet.h>
+     */
+    #include <sys/ethernet.h>
+  #elif defined(ARPA_INET_H_DECLARES_ETHER_NTOHOST)
+    /*
+     * OK, just include <arpa/inet.h>
+     */
+    #include <arpa/inet.h>
+  #elif defined(NETINET_IF_ETHER_H_DECLARES_ETHER_NTOHOST)
+    /*
+     * OK, include <netinet/if_ether.h>, after all the other stuff we
+     * need to include or define for its benefit.
+     */
+    #define NEED_NETINET_IF_ETHER_H
+  #else
+    /*
+     * We'll have to declare it ourselves.
+     * If <netinet/if_ether.h> defines struct ether_addr, include
+     * it.  Otherwise, define it ourselves.
+     */
+    #ifdef HAVE_STRUCT_ETHER_ADDR
+      #define NEED_NETINET_IF_ETHER_H
+    #else /* HAVE_STRUCT_ETHER_ADDR */
+	struct ether_addr {
+		/* Beware FreeBSD calls this "octet". */
+		unsigned char ether_addr_octet[MAC_ADDR_LEN];
+	};
+    #endif /* HAVE_STRUCT_ETHER_ADDR */
+  #endif /* what declares ether_ntohost() */
+
+  #ifdef NEED_NETINET_IF_ETHER_H
+    /*
+     * Include diag-control.h before <net/if.h>, which too defines a macro
+     * named ND_UNREACHABLE.
+     */
+    #include "diag-control.h"
+    #include <net/if.h>		/* Needed on some platforms */
+    #include <netinet/in.h>	/* Needed on some platforms */
+    #include <netinet/if_ether.h>
+  #endif /* NEED_NETINET_IF_ETHER_H */
+
+  #ifndef HAVE_DECL_ETHER_NTOHOST
+    /*
+     * No header declares it, so declare it ourselves.
+     */
+    extern int ether_ntohost(char *, const struct ether_addr *);
+  #endif /* !defined(HAVE_DECL_ETHER_NTOHOST) */
+  #include <stdlib.h>
+  #include <sys/types.h>
+  #include <sys/param.h>
+  #include <sys/socket.h>
+
+  int
+  main(int argc, char **argv)
+  {
+    u_char ea[6] = { 0xff, 0xff, 0xff, 0xff, 0xff };
+    char name[MAXHOSTNAMELEN];
+
+    ether_ntohost(name, (struct ether_addr *)ea);
+    exit(0);
+  }
+	]])
+	], [ac_cv_buggy_ether_ntohost=no],
+	   [ac_cv_buggy_ether_ntohost=yes],
+	   [ac_cv_buggy_ether_ntohost="not while cross-compiling"])])
+    if test "$ac_cv_buggy_ether_ntohost" = "no"; then
+	AC_DEFINE(USE_ETHER_NTOHOST, 1,
+	    [define if you have ether_ntohost() and it works])
+    fi
+])
 
 #
 # Do we have the new open API?  Check for pcap_create, and assume that,
