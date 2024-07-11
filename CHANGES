@@ -18,6 +18,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       BGP: Fix most printing code to print directly rather than filling
         in a fixed-size buffer to be printed later
       ICMP: add dissector for ICMP Interface Identification Object
+      ICMP: print RFC8335 PROBE extended echo/reply messages.
       IEEE 802.11: include the Mesh ID field while printing management
         frames.
       NetFlow: Use tcp_flag_values[] for TCP flags.
