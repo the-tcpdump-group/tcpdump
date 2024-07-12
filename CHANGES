@@ -88,6 +88,11 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Fix propagation of cc_werr_cflags() output.
       Makefile.in: Fix the depend target.
       mkdep: Exit with a non-zero status if a command fails.
+      Autoconf: use V_INCLS to update the list of include search paths.
+      Autoconf: don't put anything before -I and -L flags for local libpcap.
+      Autoconf, CMake: work around an Xcode 15+ issue.
+      Autoconf, CMake: use pkg-config and Homebrew when looking for
+        libcrypto.
     Documentation:
       Fixed errors in doc/README.Win32.md and renamed it to README.windows.md.
 
