@@ -284,9 +284,11 @@ else
 fi
 
 #
-# We must check this before checking whether to check the OS's IPv6,
-# support because, on some platforms (such as SunOS 5.x), the test
-# program requires the extra networking libraries.
+# XXX - we used to check this before checking whether to check the OS's
+# IPv6, support because, on some platforms (such as SunOS 5.x), the test
+# program requires the extra networking libraries.  We no longer
+# test for IPv6 support, we just assume it's present with the
+# standard API, so perhaps this can be moved.
 #
 AC_LBL_LIBRARY_NET
 
