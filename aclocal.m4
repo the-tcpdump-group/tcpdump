@@ -1041,12 +1041,12 @@ dnl --------------------------------------------------------------
 dnl Since: 0.4.0
 AC_DEFUN([PKG_CHECK_MODULE],
 [
-AC_MSG_CHECKING([for $2 with pkg-config])
 if test -n "$PKG_CONFIG"; then
     AC_ARG_VAR([$1][_CFLAGS], [C compiler flags for $2, overriding pkg-config])dnl
     AC_ARG_VAR([$1][_LIBS], [linker flags for $2, overriding pkg-config])dnl
     AC_ARG_VAR([$1][_LIBS_STATIC], [static-link linker flags for $2, overriding pkg-config])dnl
 
+    AC_MSG_CHECKING([for $2 with pkg-config])
     if AC_RUN_LOG([$PKG_CONFIG --exists --print-errors "$2"]); then
 	#
 	# The package was found, so try to get its C flags and
@@ -1063,7 +1063,6 @@ if test -n "$PKG_CONFIG"; then
     fi
 else
     # No pkg-config, so obviously not found with pkg-config.
-    AC_MSG_RESULT([pkg-config not found])
     m4_default([$4], [:])
 fi
 ])dnl PKG_CHECK_MODULE
