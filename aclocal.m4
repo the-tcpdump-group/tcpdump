@@ -393,57 +393,20 @@ AC_DEFUN(AC_LBL_LIBPCAP,
     if test $using_local_libpcap = no ; then
         #
         # We didn't find a local libpcap.
-        # Look for an installed pkg-config.
+        # First, try finding it with pkg-config.
         #
-        if test -n "$PKG_CONFIG" ; then
+        PKG_CHECK_MODULE(LIBPCAP, libpcap,
+        [
             #
-            # We have it.  Are there .pc files for libpcap?
+            # We found it; use the results as configuration information
+            # for libpcap.
             #
-            # --exists was introduced in pkg-config 0.4.0; that
-            # dates back to late 2000, so we won't worry about
-            # earlier releases that lack it.
+            $2="$LIBPCAP_CFLAGS $$2"
+            libpcap="$LIBPCAP_LIBS"
+        ],
+        [
             #
-            AC_MSG_CHECKING(whether there are .pc files for libpcap)
-            if "$PKG_CONFIG" libpcap --exists ; then
-                #
-                # Yes, so we can use pkg-config to get configuration
-                # information for libpcap.
-                #
-                AC_MSG_RESULT(yes)
-                pkg_config_usable=yes
-            else
-                #
-                # No, so we can't use pkg-config to get configuration
-                # information for libpcap.
-                #
-                AC_MSG_RESULT(no)
-                pkg_config_usable=no
-            fi
-        else
-            #
-            # We don't have it, so we obviously can't use it.
-            #
-            pkg_config_usable=no
-        fi
-        if test "$pkg_config_usable" = "yes" ; then
-            #
-            # Found both - use pkg-config to get the include flags for
-            # libpcap and the flags to link with libpcap.
-            #
-            # Please read section 11.6 "Shell Substitutions"
-            # in the autoconf manual before doing anything
-            # to this that involves quoting.  Especially note
-            # the statement "There is just no portable way to use
-            # double-quoted strings inside double-quoted back-quoted
-            # expressions (pfew!)."
-            #
-            cflags=`"$PKG_CONFIG" libpcap --cflags`
-            $2="$cflags $$2"
-            libpcap=`"$PKG_CONFIG" libpcap --libs`
-        else
-            #
-            # No pkg-config
-            # Look for an installed pcap-config.
+            # We didn't find it; look for an installed pcap-config.
             #
             AC_PATH_TOOL(PCAP_CONFIG, pcap-config)
             if test -n "$PCAP_CONFIG" ; then
@@ -639,7 +602,7 @@ AC_DEFUN(AC_LBL_LIBPCAP,
                     AC_MSG_RESULT(found -- -I$d added)
                 fi
             fi
-        fi
+        ])
     else
         #
         # We found a local libpcap.  Add it to the dependencies for
@@ -965,10 +928,13 @@ fi[]dnl
 
 dnl PKG_CHECK_EXISTS(MODULE, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 dnl -------------------------------------------------------------------
-dnl Since: 0.18
-dnl
 dnl Check to see whether a particular module exists. Similar to
 dnl PKG_CHECK_MODULE(), but does not set variables or print errors.
+dnl
+dnl --exists was introduced in pkg-config 0.4.0; that dates back to late
+dnl 2000, and we require 0.17.0 or later anyway, so we won't worry about
+dnl earlier releases that lack it.
+dnl
 AC_DEFUN([PKG_CHECK_EXISTS],
 [
 if test -n "$PKG_CONFIG" && \
@@ -1038,7 +1004,11 @@ fi[]dnl
 dnl PKG_CHECK_MODULE(VARIABLE-PREFIX, MODULE, [ACTION-IF-FOUND],
 dnl   [ACTION-IF-NOT-FOUND])
 dnl --------------------------------------------------------------
-dnl Since: 0.4.0
+dnl Check to see whether a particular module exists and, if it
+dnl does, set <MODULE>_CFLAGS, <MODULE>_LIBS, and <MODULE>_LIBS_STATIC
+dnl to the results of --cflags, --libs, and --libs --static,
+dnl respectively.
+dnl
 AC_DEFUN([PKG_CHECK_MODULE],
 [
 if test -n "$PKG_CONFIG"; then
