@@ -760,16 +760,21 @@ AC_DEFUN(AC_LBL_LIBPCAP,
     [
         AC_MSG_ERROR(
 [
-1. Do you try to build a 32-bit tcpdump with a 64-bit libpcap or vice versa?
-2. This is a bug, please follow the guidelines in CONTRIBUTING.md and include
-the config.log file in your report.  If you have downloaded libpcap from
-tcpdump.org, and built it yourself, please also include the config.log
-file from the libpcap source directory, the Makefile from the libpcap
-source directory, and the output of the make process for libpcap, as
-this could be a problem with the libpcap that was built, and we will
-not be able to determine why this is happening, and thus will not be
-able to fix it, without that information, as we have not been able to
-reproduce this problem ourselves.])
+For some reason, linking with libpcap failed.
+
+This may be a result of the way you have configured the build.  For
+example, you may have specified a static build with a version of libpcap
+that cannot be linked statically, or you may have specified something
+that would ause a 32-bit tcpdump to be linked with a 64-bit libpcap or
+vice versa.
+
+Please check the config.log file in the build directory.  It should have
+a line that says "checking for pcap_loop"; following that will be a
+command that links a small test program with libpcap, and following that
+should be error messages indicating why the attempt to link failed.
+
+Then check the doc/README.{platform}.md file for the platform for which
+you're building, to see if it gives any advice.])
     ])
 ])
 
