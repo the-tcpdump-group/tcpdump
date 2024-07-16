@@ -658,7 +658,14 @@ AC_DEFUN(AC_LBL_LIBPCAP,
             # dependencies with --static-pcap-only.
             #
             AC_MSG_CHECKING([whether $PCAP_CONFIG supports --static-pcap-only])
-            if grep -s -q "static-pcap-only" "$PCAP_CONFIG"
+            #
+            # On Solaris 10, only /usr/xpg4/bin/grep supports the -s and
+            # -q flags, so we silence it by sending the standard output
+            # and error to /dev/null. The autoconf documentation
+            # recmmends avoiding those options in favor of redirecting
+            # to /dev/null.
+            #
+            if grep "static-pcap-only" "$PCAP_CONFIG" >/dev/null 2>&1
             then
                 AC_MSG_RESULT([yes])
                 static_opt="--static-pcap-only"
