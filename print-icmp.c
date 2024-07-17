@@ -359,7 +359,7 @@ Interface IP Address Sub-Object
 struct icmp_interface_information_ipaddr_subobject_t {
     nd_uint16_t  afi;
     nd_uint16_t  reserved;
-    nd_uint32_t  ip_addr;
+    nd_byte  ip_addr[1];
 };
 
 /*
