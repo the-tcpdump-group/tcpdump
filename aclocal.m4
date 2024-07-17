@@ -765,7 +765,7 @@ For some reason, linking with libpcap failed.
 This may be a result of the way you have configured the build.  For
 example, you may have specified a static build with a version of libpcap
 that cannot be linked statically, or you may have specified something
-that would ause a 32-bit tcpdump to be linked with a 64-bit libpcap or
+that would cause a 32-bit tcpdump to be linked with a 64-bit libpcap or
 vice versa.
 
 Please check the config.log file in the build directory.  It should have
