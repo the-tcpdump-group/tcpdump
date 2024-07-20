@@ -217,6 +217,33 @@ static const struct tok lsa_opaque_ri_tlv_sr_algos[] = {
 	{ 0,                    NULL }
 };
 
+static const struct tok lsa_opaque_el_tlv_values[] = {
+        { LS_OPAQUE_EXTENDED_LINK_TLV, "Extended Link" },
+        { 0,                    NULL }
+};
+
+static const struct tok lsa_opaque_extended_link_link_type_values[] = {
+        { RLA_TYPE_ROUTER,  "Point-to-Point Link" },
+        { RLA_TYPE_TRANSIT, "Link to Transit Network" },
+        { RLA_TYPE_STUB,    "Link to Stub Network" },
+        { RLA_TYPE_VIRTUAL, "Virtual Link" },
+        { 0,                    NULL }
+};
+
+static const struct tok lsa_opaque_extended_link_subtlv_adj_sid_flag_values[] = {
+        { LS_OPAQUE_EXTENDED_LINK_SUBTLV_ADJ_SID_FLAG_B, "Backup" },
+        { LS_OPAQUE_EXTENDED_LINK_SUBTLV_ADJ_SID_FLAG_V, "Value/Index" },
+        { LS_OPAQUE_EXTENDED_LINK_SUBTLV_ADJ_SID_FLAG_L, "Local/Global" },
+        { LS_OPAQUE_EXTENDED_LINK_SUBTLV_ADJ_SID_FLAG_G, "Group" },
+        { LS_OPAQUE_EXTENDED_LINK_SUBTLV_ADJ_SID_FLAG_P, "Persistent" },
+        { 0,                    NULL }
+};
+
+static const struct tok lsa_opaque_extended_link_subtlv_values[] = {
+        { LS_OPAQUE_EXTENDED_LINK_SUBTLV_ADJ_SID, "Adj-SID Sub-TLV" },
+        { 0,                    NULL }
+};
+
 static const struct tok ospf_lls_tlv_values[] = {
 	{ OSPF_LLS_EO,	"Extended Options" },
 	{ OSPF_LLS_MD5,	"MD5 Authentication" },
@@ -930,6 +957,113 @@ ospf_ep_lsa_print(netdissect_options *ndo, const uint8_t *tptr, u_int lsa_length
     return 0;
 }
 
+static int
+ospf_el_lsa_print(netdissect_options *ndo, const uint8_t *tptr, u_int lsa_length)
+{
+    u_int tlv_type, tlv_length, link_type, sub_tlv_flags;
+    u_int sub_tlv_type, sub_tlv_length, sub_tlv_remaining;
+    const uint8_t *sub_tlv_tptr;
+    u_int vflag, lflag;
+
+    while (lsa_length >= 4) {
+	tlv_type = GET_BE_U_2(tptr);
+	tlv_length = GET_BE_U_2(tptr+2);
+	tptr+=4;
+	lsa_length-=4;
+
+	/* Infinite loop protection. */
+	if (tlv_type == 0 || tlv_length == 0) {
+	    return -1;
+	}
+
+	ND_PRINT("\n\t    %s TLV (%u), length: %u, value: ",
+		 tok2str(lsa_opaque_el_tlv_values,"unknown",tlv_type),
+		 tlv_type,
+		 tlv_length);
+
+	switch (tlv_type) {
+        case LS_OPAQUE_EXTENDED_LINK_TLV:
+            link_type = GET_U_1(tptr);
+
+            ND_PRINT("\n\t      Link Type: %s (%u)",
+                tok2str(lsa_opaque_extended_link_link_type_values,"unknown",link_type),
+                link_type);
+            ND_PRINT("\n\t      Reserved: %u", GET_BE_U_3(tptr+1));
+            ND_PRINT("\n\t      Link ID: %s", GET_IPADDR_STRING(tptr+4));
+            ND_PRINT("\n\t      Link Data: %s", GET_IPADDR_STRING(tptr+8));
+
+            sub_tlv_tptr = tptr + 12;
+            sub_tlv_remaining = tlv_length - 12;
+
+            while(sub_tlv_remaining > 0) {
+                sub_tlv_type = GET_BE_U_2(sub_tlv_tptr);
+                sub_tlv_length = GET_BE_U_2(sub_tlv_tptr + 2);
+                sub_tlv_remaining-=4;
+                sub_tlv_tptr+=4;
+
+                ND_PRINT("\n\t      %s (%u), length: %u, value: ",
+                    tok2str(lsa_opaque_extended_link_subtlv_values,"unknown",sub_tlv_type),
+                    sub_tlv_type,
+                    sub_tlv_length);
+
+                switch(sub_tlv_type){
+
+                case LS_OPAQUE_EXTENDED_LINK_SUBTLV_ADJ_SID:
+                    sub_tlv_flags = GET_U_1(sub_tlv_tptr);
+
+                    ND_PRINT("\n\t        Flags: [%s]",
+                        bittok2str(lsa_opaque_extended_link_subtlv_adj_sid_flag_values, "none", sub_tlv_flags));
+                    ND_PRINT("\n\t        Reserved: %u", GET_U_1(sub_tlv_tptr+1));
+                    ND_PRINT("\n\t        MT-ID: %u", GET_U_1(sub_tlv_tptr+2));
+                    ND_PRINT("\n\t        Weight: %u", GET_U_1(sub_tlv_tptr+3));
+
+                    vflag = sub_tlv_flags & LS_OPAQUE_EXTENDED_LINK_SUBTLV_ADJ_SID_FLAG_V;
+                    lflag = sub_tlv_flags & LS_OPAQUE_EXTENDED_LINK_SUBTLV_ADJ_SID_FLAG_L;
+                    if (vflag && lflag) {
+                        ND_PRINT("\n\t        SID/Label: %u",GET_BE_U_3(sub_tlv_tptr + 4));
+                    }
+                    else if ( !vflag && !lflag ) {
+                        ND_PRINT("\n\t        SID/Label: %u",GET_BE_U_4(sub_tlv_tptr + 4));
+                    }
+                    else {
+                        ND_PRINT("\n\t        Invalid V-Flag and L-flag combination");
+                        if (!print_unknown_data(ndo, sub_tlv_tptr, "\n\t      ", sub_tlv_length))
+                            return(-1);
+                    }
+                    break;
+
+                default:
+                    if (ndo->ndo_vflag <= 1) {
+                        if (!print_unknown_data(ndo, sub_tlv_tptr, "\n\t      ", sub_tlv_length))
+                            return(-1);
+                    }
+                    break;
+                }
+
+                if (sub_tlv_length % 4) {
+                    sub_tlv_length += (4 - (sub_tlv_length % 4));
+                }
+                sub_tlv_tptr+=sub_tlv_length;
+                sub_tlv_remaining-=sub_tlv_length;
+            }
+            break;
+	default:
+	    if (ndo->ndo_vflag <= 1) {
+		if (!print_unknown_data(ndo, tptr, "\n\t      ", tlv_length))
+		    return -1;
+	    }
+	}
+
+	/* in OSPF everything has to be 32-bit aligned, including TLVs */
+	if (tlv_length % 4) {
+	    tlv_length += (4 - (tlv_length % 4));
+	}
+	tptr+=tlv_length;
+	lsa_length-=tlv_length;
+    }
+    return 0;
+}
+
 /*
  * Print a single link state advertisement.  If truncated or if LSA length
  * field is less than the length of the LSA header, return NULl, else
@@ -1226,6 +1360,13 @@ ospf_print_lsa(netdissect_options *ndo,
 
             case LS_OPAQUE_TYPE_EP:
                 if (ospf_ep_lsa_print(ndo, (const u_char *)(lsap->lsa_un.un_ep_tlv),
+                                      ls_length) == -1) {
+                    return(ls_end);
+                }
+                break;
+
+            case LS_OPAQUE_TYPE_EL:
+                if (ospf_el_lsa_print(ndo, (const u_char *)(lsap->lsa_un.un_el_tlv),
                                       ls_length) == -1) {
                     return(ls_end);
                 }
