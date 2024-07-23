@@ -50,6 +50,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Provide GET_ macros for 4-byte and 8-byte floating-point numbers
         and use them rather than custom code
       Disregard setlinebuf(3), always use setvbuf(3).
+      Change Sun RPC code licence to BSD-3-Clause.
     Building and testing:
       Autoconf: Remove detection of early IPv6 stacks.
       Detect OS IPv6 support using AF_INET6 only.
