@@ -414,6 +414,7 @@ espprint_decode_encalgo(netdissect_options *ndo,
 	const EVP_CIPHER *evp;
 	int authlen = 0;
 	char *colon, *p;
+	const char *real_decode;
 
 	colon = strchr(decode, ':');
 	if (colon == NULL) {
@@ -434,10 +435,23 @@ espprint_decode_encalgo(netdissect_options *ndo,
 		p = strstr(decode, "-cbc");
 		*p = '\0';
 	}
-	evp = EVP_get_cipherbyname(decode);
+	/*
+	 * Not all versions of libcrypto support calls to add aliases
+	 * to ciphers - newer versions of libressl don't - so, instead
+	 * of making "3des" an alias for "des_ede3_cbc", if attempting
+	 * to get the cipher fails and the name is "3des", we try
+	 * "des_ede3_cbc".
+	 */
+	real_decode = decode;
+	if (strcmp(real_decode, "3des") == 0)
+		real_decode = "des-ede3-cbc";
+	evp = EVP_get_cipherbyname(real_decode);
 
 	if (!evp) {
-		(*ndo->ndo_warning)(ndo, "failed to find cipher algo %s\n", decode);
+		if (decode != real_decode)
+			(*ndo->ndo_warning)(ndo, "failed to find cipher algo %s (%s)\n", real_decode, decode);
+		else
+			(*ndo->ndo_warning)(ndo, "failed to find cipher algo %s\n", decode);
 		sa->evp = NULL;
 		sa->authlen = 0;
 		sa->ivlen = 0;
@@ -673,7 +687,6 @@ static void esp_init(netdissect_options *ndo _U_)
 #if !defined(OPENSSL_API_COMPAT) || OPENSSL_API_COMPAT < 0x10100000L
 	OpenSSL_add_all_algorithms();
 #endif
-	EVP_add_cipher_alias(SN_des_ede3_cbc, "3des");
 }
 DIAG_ON_DEPRECATION
 
