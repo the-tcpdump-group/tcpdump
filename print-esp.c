@@ -684,7 +684,11 @@ static void esp_init(netdissect_options *ndo _U_)
 #if !defined(OPENSSL_API_COMPAT) || OPENSSL_API_COMPAT < 0x10100000L
 	OpenSSL_add_all_algorithms();
 #endif
+
+	// Does not exist since LibreSSL 3.9.0.
+#ifndef LIBRESSL_VERSION_NUMBER
 	EVP_add_cipher_alias(SN_des_ede3_cbc, "3des");
+#endif
 }
 DIAG_ON_DEPRECATION
 

@@ -3,7 +3,7 @@
 # Only attempt OpenSSL-specific tests when compiled with the library.
 # Reading the secret(s) from a file does not work with Capsicum.
 
-$testlist = [
+$testlist_3des = [
     {
         config_set => 'HAVE_LIBCRYPTO',
         name => 'esp1',
@@ -40,18 +40,20 @@ $testlist = [
     {
         config_set   => 'HAVE_LIBCRYPTO',
         config_unset => 'HAVE_CAPSICUM',
-        name => 'esp5',
-        input => '08-sunrise-sunset-aes.pcap',
-        output => 'esp5.out',
-        args   => '-E "file @TESTDIR@/esp-secrets.txt"',
-    },
-
-    {
-        config_set   => 'HAVE_LIBCRYPTO',
-        config_unset => 'HAVE_CAPSICUM',
         name => 'espudp1',
         input => 'espudp1.pcap',
         output => 'espudp1.out',
+        args   => '-E "file @TESTDIR@/esp-secrets.txt"',
+    },
+];
+
+$testlist_other = [
+    {
+        config_set   => 'HAVE_LIBCRYPTO',
+        config_unset => 'HAVE_CAPSICUM',
+        name => 'esp5',
+        input => '08-sunrise-sunset-aes.pcap',
+        output => 'esp5.out',
         args   => '-E "file @TESTDIR@/esp-secrets.txt"',
     },
 
@@ -110,5 +112,19 @@ $testlist = [
     },
 
 ];
+
+$testlist = [];
+
+# On OpenBSD skip, with appropriate reason, all tests that use 3DES because
+# tcpdump 3DES support depends on EVP_add_cipher_alias(), which LibreSSL no
+# longer supports, and on OpenBSD libcrypto is LibreSSL by default.
+foreach(@$testlist_3des) {
+    if($^O eq "openbsd") {
+        $_->{config_unset} = 'IS_OPENBSD';
+    }
+    push(@$testlist, ($_));
+}
+
+push(@$testlist, @$testlist_other);
 
 1;
