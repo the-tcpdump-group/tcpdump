@@ -66,6 +66,7 @@ unshift(@INC, $testsdir);
 
 $passedcount = 0;
 $failedcount = 0;
+$skippedcount = 0;
 #
 my $failureoutput=$origdir . "/tests/failure-outputs.txt";
 
@@ -420,11 +421,13 @@ sub runOneComplexTest {
 
     if(!$foundit) {
         printf "    %-40s: skipped (%s not set)\n", $name, $configset;
+        $skippedcount++;
         return 0;
     }
 
     if(!$unfoundit) {
         printf "    %-40s: skipped (%s set)\n", $name, $configunset;
+        $skippedcount++;
         return 0;
     }
 
@@ -509,6 +512,7 @@ if(scalar(@ARGV) == 0) {
 
 # exit with number of failing tests.
 print "------------------------------------------------\n";
+printf("%4u tests skipped\n",$skippedcount);
 printf("%4u tests failed\n",$failedcount);
 printf("%4u tests passed\n",$passedcount);
 
