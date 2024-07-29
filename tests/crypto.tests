@@ -52,7 +52,7 @@ $testlist = [
         name => 'espudp1',
         input => 'espudp1.pcap',
         output => 'espudp1.out',
-        args   => '-nnnn -E "file @TESTDIR@/esp-secrets.txt"',
+        args   => '-E "file @TESTDIR@/esp-secrets.txt"',
     },
 
     {
