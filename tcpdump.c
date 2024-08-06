@@ -724,7 +724,10 @@ droproot(const char *username, const char *chroot_dir)
 				fprintf(stderr, "dropped privs to %s\n", username);
 		}
 #else
-		if (initgroups(pw->pw_name, pw->pw_gid) != 0 ||
+
+		if ((pw->pw_gid == 0) && (pw->pw_uid == 0))
+			fprintf(stderr, "requested to not drop privs\n");
+		else if (initgroups(pw->pw_name, pw->pw_gid) != 0 ||
 		    setgid(pw->pw_gid) != 0 || setuid(pw->pw_uid) != 0)
 			error("Couldn't change to '%.32s' uid=%lu gid=%lu: %s",
 				username,
