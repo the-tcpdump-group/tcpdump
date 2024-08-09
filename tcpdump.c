@@ -1162,15 +1162,14 @@ _U_
 		free(host_url);
 	} else
 #endif
-      status = pcap_findalldevs(&devlist, ebuf);
-
-    if (status < 0) {
-		  if (devlist != NULL) {
-			  pcap_freealldevs(devlist);
-		  }
-		error("%s", ebuf);
-		return NULL;
-	}
+        status = pcap_findalldevs(&devlist, ebuf);
+        if (status < 0) {
+		        if (devlist != NULL) {
+			          pcap_freealldevs(devlist);
+		        }
+		        error("%s", ebuf);
+		        return NULL;
+	      }
 
 	/*
 	 * Look for the devnum-th entry in the list of devices (1-based).
