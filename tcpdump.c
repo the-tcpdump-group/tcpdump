@@ -1171,8 +1171,11 @@ _U_
 	for (i = 0, dev = devlist; i < devnum-1 && dev != NULL;
 	    i++, dev = dev->next)
 		;
-	if (dev == NULL)
-		error("Invalid adapter index");
+	if (dev == NULL) {
+		pcap_freealldevs(devlist);
+		error("Invalid adapter index %ld: only %ld interfaces found",
+		    devnum, i);
+	}
 	device = strdup(dev->name);
 	pcap_freealldevs(devlist);
 	return (device);
