@@ -115,6 +115,10 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Print the list of data link types (-L) to stdout instead of stderr.
       Use symmetrical quotation characters in error messages.
       Update --version option to print 32/64-bit build and time_t size.
+      Improve error messages for invalid interface indexes specified
+        with -i.
+      Free interface list just before exiting where it wasn't being
+        freed.
     Source code:
       tcpdump: Fix a memory leak.
       child_cleanup: reap as many child processes as possible.
