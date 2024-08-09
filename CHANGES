@@ -56,6 +56,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
         with -i.
       Free interface list just before exiting where it wasn't being
         freed.
+      Support "3des" as an alias for "des_ede3_cbc" even if the crypto
+        library doesn't support adding aliases.
     Source code:
       tcpdump: Fix a memory leak.
       child_cleanup: reap as many child processes as possible.
