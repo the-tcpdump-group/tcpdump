@@ -1162,7 +1162,7 @@ parse_interface_number(const char *device)
 			/*
 			 * No, it's not an ordinal.
 			 */
-			error("Invalid adapter index");
+			error("Invalid adapter index %s", device);
 		}
 		return (devnum);
 	} else {
