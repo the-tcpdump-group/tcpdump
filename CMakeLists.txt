@@ -1206,6 +1206,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-geonet.c
     print-gre.c
     print-hncp.c
+    print-hsr-prp.c
     print-hsrp.c
     print-http.c
     print-icmp.c

@@ -185,6 +185,12 @@
 #ifndef ETHERTYPE_PTP
 #define ETHERTYPE_PTP		0x88f7
 #endif
+#ifndef ETHERTYPE_HSR
+#define ETHERTYPE_HSR		0x892f
+#endif
+#ifndef ETHERTYPE_HSR_PRP_SUP
+#define ETHERTYPE_HSR_PRP_SUP	0x88fb
+#endif
 #ifndef	ETHERTYPE_LOOPBACK
 #define	ETHERTYPE_LOOPBACK	0x9000
 #endif

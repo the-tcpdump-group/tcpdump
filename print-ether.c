@@ -101,6 +101,8 @@ const struct tok ethertype_values[] = {
     { ETHERTYPE_CALM_FAST,      "CALM FAST"},
     { ETHERTYPE_AOE,            "AoE" },
     { ETHERTYPE_PTP,            "PTP" },
+    { ETHERTYPE_HSR,            "HSR" },
+    { ETHERTYPE_HSR_PRP_SUP,    "HSR/PRP Supervision" },
     { ETHERTYPE_ARISTA,         "Arista Vendor Specific Protocol" },
     { 0, NULL}
 };
@@ -147,6 +149,7 @@ ether_common_print(netdissect_options *ndo, const u_char *p, u_int length,
 	int printed_length;
 	int llc_hdrlen;
 	struct lladdr_info src, dst;
+	int prp_suffix;
 
 	if (length < caplen) {
 		ND_PRINT("[length %u < caplen %u]", length, caplen);
@@ -283,6 +286,31 @@ recurse:
 		length -= 4;
 		caplen -= 4;
 		hdrlen += 4;
+	}
+
+	if (length_type == ETHERTYPE_HSR) {
+		if (ndo->ndo_eflag) {
+			ether_type_print(ndo, length_type);
+			if (!printed_length) {
+				ND_PRINT(", length %u: ", orig_length);
+				printed_length = 1;
+			} else
+				ND_PRINT(", ");
+			hsr_print(ndo, p, length);
+		}
+
+		length_type = GET_BE_U_2(p + 4);
+		p += 6;
+		length -= 6;
+		caplen -= 6;
+		hdrlen += 6;
+	}
+
+	if (caplen >= 6) {
+		prp_suffix = GET_BE_U_2(p + caplen - 2);
+		if (prp_suffix == 0x88fb) {
+			prp_print(ndo, p, caplen);
+		}
 	}
 
 	/*
@@ -649,6 +677,10 @@ ethertype_print(netdissect_options *ndo,
 
 	case ETHERTYPE_PTP:
 		ptp_print(ndo, p, length);
+		return (1);
+
+	case ETHERTYPE_HSR_PRP_SUP:
+		hsr_prp_supervision_print(ndo, p, length);
 		return (1);
 
 	case ETHERTYPE_LAT:
