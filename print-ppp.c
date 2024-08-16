@@ -695,7 +695,6 @@ print_lcp_config_options(netdissect_options *ndo,
 			ND_PRINT(" (length bogus, should be >= 3)");
 			return 0;
 		}
-		ND_PRINT(": ");
 		ND_PRINT(": Callback Operation %s (%u)",
                        tok2str(ppp_callback_values, "Unknown", GET_U_1(p + 2)),
                        GET_U_1(p + 2));

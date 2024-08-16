@@ -35,7 +35,7 @@
 	  Magic-Num Option (0x05), length 6: 0x021952cf
 	  PFC Option (0x07), length 2
 	  ACFC Option (0x08), length 2
-	  Call-Back Option (0x0d), length 3: : Callback Operation CBCP (6)
+	  Call-Back Option (0x0d), length 3: Callback Operation CBCP (6)
 	  MRRU Option (0x11), length 4: 1614
 	  End-Disc Option (0x13), length 23: Local
    17  2000-03-27 08:56:35.412217 IP (tos 0x0, ttl 64, id 20409, offset 0, flags [DF], proto TCP (6), length 40)
