@@ -20,7 +20,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "26 March 2024"
+.TH TCPDUMP 1  "15 May 2024"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -2080,6 +2080,8 @@ The TCP flag names
 and
 .B tcp-cwr
 became available when linking with libpcap 1.9.0 or later.
+.LP
+This version of tcpdump requires libpcap 1.0 or later.
 
 .SH "SEE ALSO"
 .BR stty (1),
