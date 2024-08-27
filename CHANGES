@@ -11,6 +11,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
         (RFC6355).
       DNS: Detect and correctly handle too-short URI RRs.
       EAP: Assign ndo_protocol in the eap_print() function.
+      ESP: Don't use EVP_add_cipher_alias() (fixes building on OpenBSD 7.5).
       Frame Relay (Multilink) : Fix the Timestamp Information Element printing
       ICMPv6: Fix printing the Home Agent Address Discovery Reply Message
       IEEE 802.11: no need for an element ID in the structures for IEs, make
@@ -21,6 +22,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
         header length.
       IPv6: Fix printing invalid cases as invalid, not truncated; use
         ND_ICHECKMSG_U() to print an invalid version.
+      IPv6: Fix invalid 32-bit versus 64-bit printouts of fragment headers.
+      ISAKMP: Fix printing Delete payload SPI when size is zero.
       Kerberos: Print the protocol name, remove a redundant bounds check.
       lwres: Fix an undefined behavior in pointer arithmetic.
       OpenFlow 1.0: Fix indentation of PORT_MOD, improve handling of
@@ -31,10 +34,13 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       LDP: Add missing fields of the Common Session Parameters TLV and fix the
         offset for the A&D bits.
       NFLOG: Use correct AF code points on all OSes.
+      NFS: Avoid printing non-ASCII characters.
       OSPF: Pad TLVs in LS_OPAQUE_TYPE_RI to multiples of 4 bytes.
+      OSPF: Update LS-Ack printing not to run off the end of the packet.
       OSPF6: Fix an undefined behavior.
       pflog: use nd_ types in struct pfloghdr.
       PPP: Check if there is some data to hexdump.
+      PPP: Remove an extra colon before LCP Callback Operation.
       Use the buffer stack for de-escaping PPP; fixes CVE-2024-2397;
         Note: This problem does not affect any tcpdump release.
       PTP: Fix spelling of type SIGNALING, Parse major and minor version
@@ -54,8 +60,6 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Update --version option to print 32/64-bit build and time_t size.
       Improve error messages for invalid interface indexes specified
         with -i.
-      Free interface list just before exiting where it wasn't being
-        freed.
       Support "3des" as an alias for "des_ede3_cbc" even if the crypto
         library doesn't support adding aliases.
     Source code:
@@ -74,6 +78,9 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Initialize tzcode early.
       Capsicum support: Fix a 'not defined' macro error.
       Update the "Error converting time" tests for packet times.
+      Fix warnings when building for 32-bit and defining _TIME_BITS=64.
+      Free interface list just before exiting where it wasn't being
+        freed.
     Building and testing:
       Add a configure option to help debugging (--enable-instrument-functions)
       At build time require a proof of suitable snprintf(3) implementation in
@@ -99,8 +106,21 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Autoconf, CMake: work around an Xcode 15+ issue.
       Autoconf, CMake: use pkg-config and Homebrew when looking for
         libcrypto.
+      Fix Sun C invocation from CMake.
+      mkdep: Use TMPDIR if it is set and not null.
+      Add initial support for building with TinyCC.
+      Makefile.in: Use the variable MAKE instead of the make command.
+      Makefile.in: Add instrumentation configuration in releasecheck target
+      Make various improvements to the TESTrun script.
+      Untangle detection of pcap_findalldevs().
+      Autoconf: don't use egrep, use $EGREP.
+      Autoconf: check for gethostbyaddr(), not gethostbyname().
+      Autoconf, CMake: search for gethostbyaddr() in libnetwork.
     Documentation:
       Fixed errors in doc/README.Win32.md and renamed it to README.windows.md.
+      Make various improvements to the man page.
+      Add initial README file for Haiku.
+      Make various improvements to CONTRIBUTING.md.
 
 Friday, April 7, 2023 / The Tcpdump Group
   Summary for 4.99.4 tcpdump release
