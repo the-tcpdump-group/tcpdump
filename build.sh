@@ -35,8 +35,6 @@ print_cc_version
 # later warnings in the same matrix subset trigger an error.
 
 case `cc_id`/`os_id` in
-*)
-    ;;
 suncc-5.1[45]/SunOS-5.11)
     # Various E_STATEMENT_NOT_REACHED and E_DEPRECATED_ATT warnings.
     TCPDUMP_TAINTED=yes
