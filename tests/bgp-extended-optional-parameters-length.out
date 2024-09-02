@@ -1,4 +1,4 @@
-    1  2021-11-21 21:07:21.568564 IP6 (class 0xc0, flowlabel 0x67c6e, hlim 1, next-header TCP (6) payload length: 172) 2a02:abc::123.45566 > 2a02:abc::17.179: Flags [P.], cksum 0xdfd3 (correct), seq 83043996:83044136, ack 2441923920, win 127, options [nop,nop,TS val 4087797327 ecr 29756155], length 140: BGP
+    1  2021-11-21 21:07:21.568564 IP6 (class 0xc0, flowlabel 0x67c6e, hlim 1, next-header TCP (6), payload length 172) 2a02:abc::123.45566 > 2a02:abc::17.179: Flags [P.], cksum 0xdfd3 (correct), seq 83043996:83044136, ack 2441923920, win 127, options [nop,nop,TS val 4087797327 ecr 29756155], length 140: BGP
 	Open Message (1), length: 140
 	  Version 4, my AS 174, Holdtime 180s, ID 6.6.6.6
 	  Optional parameters (Extended), length: 108

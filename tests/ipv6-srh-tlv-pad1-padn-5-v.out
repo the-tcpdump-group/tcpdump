@@ -1,1 +1,1 @@
-    1  2022-11-11 17:47:55.000001 IP6 (class 0x78, flowlabel 0x9abcd, hlim 64, next-header Routing (43) payload length: 32) 2001:db8:1::1 > cafe:1::2: RT6 (len=3, type=4, segleft=0, last-entry=0, flags=0x0, tag=0, [0]cafe:1::2, TLV-type=Pad1(0), TLV-type=PadN(4), TLV-len=5) no next header
+    1  2022-11-11 17:47:55.000001 IP6 (class 0x78, flowlabel 0x9abcd, hlim 64, next-header Routing (43), payload length 32) 2001:db8:1::1 > cafe:1::2: RT6 (len=3, type=4, segleft=0, last-entry=0, flags=0x0, tag=0, [0]cafe:1::2, TLV-type=Pad1(0), TLV-type=PadN(4), TLV-len=5) no next header
