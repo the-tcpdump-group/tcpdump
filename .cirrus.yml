@@ -31,7 +31,7 @@ linux_task:
     # The number of CPU cores must be either 1 or a multiple of 2.
     cpu: 1
     memory: 1G
-    image: ubuntu:22.04
+    image: ubuntu:24.04
   env:
     DEBIAN_FRONTEND: noninteractive
     LANG: C
@@ -66,10 +66,9 @@ coverity_task:
   container:
     cpu: 1
     memory: 2G
-    image: ubuntu:22.04
+    image: ubuntu:24.04
   env:
     DEBIAN_FRONTEND: noninteractive
-    MAKEFLAGS: -j 5
     COVERITY_SCAN_PROJECT_NAME: $CIRRUS_REPO_FULL_NAME
     COVERITY_SCAN_TOKEN: ENCRYPTED[1b6f994cabfe74267ce2dce81fd9e49f694e9cfe69fb99f7d1580907bec1266efd7b38df3a47ccab53d5af98636f8e9c]
     COVERITY_SCAN_BUILD_COMMAND_PREPEND: ./configure --enable-instrument-functions --enable-smb
