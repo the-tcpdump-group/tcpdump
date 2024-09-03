@@ -65,6 +65,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
   Summary for 4.99.6 tcpdump release (so far!)
     Refine protocol decoding for:
       IPv6: Add a missing comma and remove a colon in the output.
+      TCP: Note if the Urgent Pointer is non-zero while URG flag not set,
+           if the verbose level is > 1 (option -vv and more).
 
 Friday, August 30, 2024 / The Tcpdump Group
   Summary for 4.99.5 tcpdump release
