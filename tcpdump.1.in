@@ -20,7 +20,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "15 May 2024"
+.TH TCPDUMP 1  "7 September 2024"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -408,10 +408,9 @@ The test for `foreign' IPv4 addresses is done using the IPv4 address and
 netmask of the interface on that capture is being done.  If that
 address or netmask are not available, either because the
 interface on that capture is being done has no address or netmask or
-because it is the "any" pseudo-interface, which is
-available in Linux and in recent versions of macOS and Solaris, and which
-can capture on more than one interface, this option will not work
-correctly.
+because it is the "any" pseudo-interface (see the
+.B \-i
+flag below), this option will not work correctly.
 .TP
 .BI \-F " file"
 Use \fIfile\fP as input for the filter expression.
@@ -462,10 +461,14 @@ flag is not given, \fItcpdump\fP searches the system
 interface list for the lowest numbered, configured up interface
 (excluding loopback), which may turn out to be, for example, ``eth0''.
 .IP
-On Linux systems with 2.2 or later kernels and on recent versions of macOS
+On all supported Linux systems, as well as on recent versions of macOS
 and Solaris, an
 .I interface
-argument of ``any'' can be used to capture packets from all interfaces.
+argument of ``any'' can be used to capture packets from all network interfaces.
+The latter should not be confused with all available capture devices as printed
+by the
+.B \-D
+flag, which may also include D-Bus, USB etc.
 Note that captures on the ``any'' pseudo-interface will not be done in promiscuous
 mode.
 .IP

@@ -60,6 +60,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Make illumos build warning-free.
       Makefile.in: Update the .c.o build rule (Remove hacks for old SunOS 4).
       Autoconf: fix buggy tests for ether_ntohost().
+    Documentation:
+      man: Clarify the "any" pseudo-interface further.
 
 DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
   Summary for 4.99.6 tcpdump release (so far!)
