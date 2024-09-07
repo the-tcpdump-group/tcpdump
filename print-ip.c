@@ -414,7 +414,7 @@ ip_print(netdissect_options *ndo,
 	    else
                 ND_PRINT(", length %u", GET_BE_U_2(ip->ip_len));
 
-            if ((hlen - sizeof(struct ip)) > 0) {
+            if ((hlen > sizeof(struct ip))) {
                 ND_PRINT(", options (");
                 if (ip_optprint(ndo, (const u_char *)(ip + 1),
                     hlen - sizeof(struct ip)) == -1) {
