@@ -20,9 +20,9 @@
 
 #include <config.h>
 
-#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -40,21 +40,20 @@ msdp_print(netdissect_options *ndo, const u_char *sp, u_int length)
 	/* See if we think we're at the beginning of a compound packet */
 	type = GET_U_1(sp);
 	len = GET_BE_U_2(sp + 1);
-	if (len > 1500 || len < 3 || type == 0 || type > MSDP_TYPE_MAX)
-		goto trunc;	/* not really truncated, but still not decodable */
+	ND_ICHECK_U(len, >, 1500);
+	ND_ICHECK_U(len, <, 3);
+	ND_ICHECK_U(type, ==, 0);
+	ND_ICHECK_U(type, >, MSDP_TYPE_MAX);
 	while (length != 0) {
 		unsigned int entry_count;
 
-		if (length < 3)
-			goto trunc;
+		ND_ICHECK_U(length, <, 3);
 		type = GET_U_1(sp);
 		len = GET_BE_U_2(sp + 1);
 		if (len > 1400 || ndo->ndo_vflag)
 			ND_PRINT(" [len %u]", len);
-		if (len < 3)
-			goto trunc;
-		if (length < len)
-			goto trunc;
+		ND_ICHECK_U(len, <, 3);
+		ND_ICHECK_U(length, <, len);
 		switch (type) {
 		case 1:	/* IPv4 Source-Active */
 		case 3: /* IPv4 Source-Active Response */
@@ -64,14 +63,12 @@ msdp_print(netdissect_options *ndo, const u_char *sp, u_int length)
 				ND_PRINT(" SA-Response");
 
 			/* Entry Count */
-			if (len < 4)
-				goto trunc;
+			ND_ICHECK_U(len, <, 4);
 			entry_count = GET_U_1(sp + 3);
 			ND_PRINT(" %u entries", entry_count);
 
 			/* RP Address */
-			if (len < 8)
-				goto trunc;
+			ND_ICHECK_U(len, <, 8);
 			/* XXX -print this based on ndo_vflag? */
 			ND_TCHECK_LEN(sp + 4, 4);
 
@@ -93,13 +90,11 @@ msdp_print(netdissect_options *ndo, const u_char *sp, u_int length)
 			ND_PRINT(" SA-Request");
 
 			/* Reserved */
-			if (len < 4)
-				goto trunc;
+			ND_ICHECK_U(len, <, 4);
 			ND_TCHECK_1(sp + 3);
 
 			/* Group Address */
-			if (len < 8)
-				goto trunc;
+			ND_ICHECK_U(len, <, 8);
 			if (len != 8)
 				ND_PRINT("[len=%u] ", len);
 			ND_PRINT(" for %s", GET_IPADDR_STRING(sp + 4));
@@ -121,6 +116,8 @@ msdp_print(netdissect_options *ndo, const u_char *sp, u_int length)
 		length -= len;
 	}
 	return;
-trunc:
-	nd_print_trunc(ndo);
+
+invalid:
+   nd_print_invalid(ndo);
+
 }
