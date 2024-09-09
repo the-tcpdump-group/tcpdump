@@ -155,6 +155,7 @@ static const struct tok pf_reasons[] = {
 #define PF_SYNPROXY_DROP	10
 #if defined(__FreeBSD__)
 #define PF_DEFER		11
+#define PF_MATCH		12
 #elif defined(__OpenBSD__)
 #define PF_DEFER		11
 #define PF_MATCH		12
@@ -182,6 +183,7 @@ static const struct tok pf_actions[] = {
 	{ PF_SYNPROXY_DROP,	"synproxy-drop" },
 #if defined(__FreeBSD__)
 	{ PF_DEFER,		"defer" },
+	{ PF_MATCH,		"match" },
 #elif defined(__OpenBSD__)
 	{ PF_DEFER,		"defer" },
 	{ PF_MATCH,		"match" },
