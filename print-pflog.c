@@ -59,7 +59,11 @@ struct pfloghdr {
 	nd_uint32_t	rule_uid;
 	nd_int32_t	rule_pid;
 	nd_uint8_t	dir;
-/* Minimum header length (without padding): 61 */
+/*
+ * This is the minimum pflog header length; it includes none of
+ * the fields added either by OpenBSD or FreeBSD, and doesn't
+ * include any padding.
+ */
 #define MIN_PFLOG_HDRLEN 61
 #if defined(__OpenBSD__)
 	nd_uint8_t	rewritten;
@@ -223,10 +227,16 @@ static void
 pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
 {
 	uint32_t rulenr, subrulenr;
+#if defined(__FreeBSD__)
+	uint32_t ridentifier;
+#endif
 
 	ndo->ndo_protocol = "pflog";
 	rulenr = GET_BE_U_4(hdr->rulenr);
 	subrulenr = GET_BE_U_4(hdr->subrulenr);
+#if defined(__FreeBSD__)
+	ridentifier = GET_BE_U_4(hdr->ridentifier);
+#endif
 	if (subrulenr == (uint32_t)-1)
 		ND_PRINT("rule %u/", rulenr);
 	else {
@@ -235,8 +245,17 @@ pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
 		ND_PRINT(".%u/", subrulenr);
 	}
 
-	ND_PRINT("%s: %s %s on ",
-	    tok2str(pf_reasons, "unkn(%u)", GET_U_1(hdr->reason)),
+	ND_PRINT("%s", tok2str(pf_reasons, "unkn(%u)", GET_U_1(hdr->reason)));
+
+	if (GET_BE_U_4(hdr->uid) != UID_MAX)
+		ND_PRINT(" [uid %u]", GET_BE_U_4(hdr->uid));
+
+#if defined(__FreeBSD__)
+	if (ridentifier != 0)
+		ND_PRINT(" [ridentifier %u]", ridentifier);
+#endif
+
+	ND_PRINT(": %s %s on ",
 	    tok2str(pf_actions, "unkn(%u)", GET_U_1(hdr->action)),
 	    tok2str(pf_directions, "unkn(%u)", GET_U_1(hdr->dir)));
 	nd_printjnp(ndo, (const u_char*)hdr->ifname, PFLOG_IFNAMSIZ);
