@@ -247,7 +247,11 @@ pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
 
 	ND_PRINT("%s", tok2str(pf_reasons, "unkn(%u)", GET_U_1(hdr->reason)));
 
-	if (GET_BE_U_4(hdr->uid) != UID_MAX)
+	/*
+	 * All bits set means that the UID shouldn't be printed.
+	 * That's UINT_MAX if signed, or -1 if unsigned.
+	 */
+	if (GET_BE_U_4(hdr->uid) != UINT_MAX)
 		ND_PRINT(" [uid %u]", GET_BE_U_4(hdr->uid));
 
 #if defined(__FreeBSD__)
