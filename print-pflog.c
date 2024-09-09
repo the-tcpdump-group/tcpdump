@@ -23,6 +23,8 @@
 
 #include <config.h>
 
+#include <limits.h>
+
 #include "netdissect-stdinc.h"
 
 #define ND_LONGJMP_FROM_TCHECK
