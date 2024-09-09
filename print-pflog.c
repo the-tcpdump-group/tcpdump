@@ -47,6 +47,24 @@ struct pf_addr {
 #define v6	pfa.v6
 };
 
+/*
+ * This header is:
+ *
+ *    61 bytes long on NetBSD, DragonFly BSD. and Darwin;
+ *    84 bytes lon on OpenBSD;
+ *    72 bytes long on FreeBSD;
+ *
+ * which, unfortunately, does not allow us to distinguish, based on
+ * the header length, between the three OSes listed as having 61-byte
+ * headers.  As the action values differ between them, this makes it
+ * impossible to correctly dissect the reason values that differ
+ * between NetBSD and Darwin (reason value 15) without having some
+ * way to explicitly tell tcpdump what to do.
+ *
+ * (We could, I guess, label reason value 15 as
+ * "state-locked (NetBSD)/dummynet (macOS etc.)" or something such as
+ * that.)
+ */
 struct pfloghdr {
 	nd_uint8_t	length;
 	nd_uint8_t	af;
