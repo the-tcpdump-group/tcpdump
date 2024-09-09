@@ -166,7 +166,6 @@
    */
   #define isatty _isatty
   #define stat _stat
-  #define strdup _strdup
   #define open _open
   #define read _read
   #define close _close
