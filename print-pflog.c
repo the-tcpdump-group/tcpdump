@@ -74,6 +74,7 @@ static const struct tok pf_actions[] = {
 	{ PF_SYNPROXY_DROP,	"synproxy-drop" },
 #if defined(__FreeBSD__)
 	{ PF_DEFER,		"defer" },
+	{ PF_MATCH,		"match" },
 #elif defined(__OpenBSD__)
 	{ PF_DEFER,		"defer" },
 	{ PF_MATCH,		"match" },
