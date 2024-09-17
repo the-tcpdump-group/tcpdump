@@ -61,6 +61,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Make illumos build warning-free.
       Makefile.in: Update the .c.o build rule (Remove hacks for old SunOS 4).
       Autoconf: fix buggy tests for ether_ntohost().
+      CMake: Skip snprintf(3) tests when cross-compiling.
     Documentation:
       man: Clarify the "any" pseudo-interface further.
 
