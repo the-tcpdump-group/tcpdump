@@ -64,6 +64,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       CMake: Skip snprintf(3) tests when cross-compiling.
       Makefile.in: Do not install a version-suffixed tcpdump binary if the
         .devel file does not exists.
+      tests: On HP-UX use "diff -c" by default.
     Documentation:
       man: Clarify the "any" pseudo-interface further.
 
