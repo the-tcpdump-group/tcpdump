@@ -392,6 +392,28 @@ if(MSVC)
    endif (USE_STATIC_RT)
 endif(MSVC)
 
+#
+# CMake's definition of "cross-compiling" appears to be "compiling
+# for an *operating system* other than the one on which the build
+# is being done*.
+#
+# This is an inadequate definition, as people build for the same
+# operating system but a different instruciton set, e.g. building
+# on an IA-32 or x86-64 Linux box for an Arm embedded Linux box,
+# or building Arm code on an IA-32 or x86-64 Windows box.
+#
+# At least for the Windows case, people may do those builds by
+# setting the target with th -A flag to CMake; that causes
+# CMAKE_GENERATOR_PLATFORM to be set to the target.  If
+# CMAKE_GENERATOR_PLATFORM is set, compare it with
+# CMAKE_HOST_SYSTEM_PROCESSOR and, if they're not equal, set
+# CMAKE_CROSSCOMPILING to TRUE.
+#
+if (CMAKE_GENERATOR_PLATFORM AND
+    NOT CMAKE_GENERATOR_PLATFORM STREQUAL CMAKE_HOST_SYSTEM_PROCESSOR)
+    set(CMAKE_CROSSCOMPILING TRUE)
+endif()
+
 ###################################################################
 #   Detect available platform features
 ###################################################################
