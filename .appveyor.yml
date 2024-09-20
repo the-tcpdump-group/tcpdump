@@ -10,43 +10,43 @@ matrix:
   fast_finish: true
 
 install:
-  - appveyor DownloadFile https://npcap.com/dist/npcap-sdk-1.13.zip
-  - 7z x .\npcap-sdk-1.13.zip -oc:\projects\libpcap\Win32\npcap-sdk-1.13
+  - appveyor DownloadFile https://github.com/the-tcpdump-group/tcpdump-htdocs/raw/master/depends/npcap-sdk-1.15.zip
+  - 7z x .\npcap-sdk-1.15.zip -oc:\projects\libpcap\Win32\npcap-sdk-1.15
 
 environment:
   matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       GENERATOR: "Visual Studio 15 2017"
       PLATFORM: Win32
-      SDK: npcap-sdk-1.13
+      SDK: npcap-sdk-1.15
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       GENERATOR: "Visual Studio 15 2017"
       PLATFORM: x64
-      SDK: npcap-sdk-1.13
+      SDK: npcap-sdk-1.15
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       GENERATOR: "Visual Studio 16 2019"
       PLATFORM: Win32
-      SDK: npcap-sdk-1.13
+      SDK: npcap-sdk-1.15
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       GENERATOR: "Visual Studio 16 2019"
       PLATFORM: x64
-      SDK: npcap-sdk-1.13
+      SDK: npcap-sdk-1.15
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       GENERATOR: "Visual Studio 16 2019"
       PLATFORM: ARM64
-      SDK: npcap-sdk-1.13
+      SDK: npcap-sdk-1.15
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
       GENERATOR: "Visual Studio 17 2022"
       PLATFORM: Win32
-      SDK: npcap-sdk-1.13
+      SDK: npcap-sdk-1.15
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
       GENERATOR: "Visual Studio 17 2022"
       PLATFORM: x64
-      SDK: npcap-sdk-1.13
+      SDK: npcap-sdk-1.15
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
       GENERATOR: "Visual Studio 17 2022"
       PLATFORM: ARM64
-      SDK: npcap-sdk-1.13
+      SDK: npcap-sdk-1.15
 
 build_script:
   #
