@@ -29,3 +29,13 @@ echo "$AUTORECONF identification: $AUTORECONFVERSION"
 # the branch) amount of noise to the build matrix output, so provide a means
 # to silence that.
 env ${AUTOCONF_WARNINGS:+WARNINGS="$AUTOCONF_WARNINGS"} "$AUTORECONF" -f
+
+# Autoconf 2.71 adds a blank line after the final "exit 0" on Linux, but not
+# on OpenBSD.  Remove this difference to make it easier to compare the result
+# of "make releasetar" across different platforms.  From sed one-liners:
+# "delete all trailing blank lines at end of file (works on all seds)".  Don't
+# use mktemp(1) because AIX does not have it.
+CONFIGURE_NEW="configure.new$$"
+sed -e :a -e '/^\n*$/{$d;N;ba' -e '}' <configure >"$CONFIGURE_NEW"
+cmp -s configure "$CONFIGURE_NEW" || cat "$CONFIGURE_NEW" >configure
+rm -f "$CONFIGURE_NEW"

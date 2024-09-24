@@ -66,6 +66,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
         .devel file does not exists.
       tests: On HP-UX use "diff -c" by default.
       autogen.sh: Allow to configure Autoconf warnings.
+      autogen.sh: Delete all trailing blank lines at end of configure.
     Documentation:
       man: Clarify the "any" pseudo-interface further.
 
