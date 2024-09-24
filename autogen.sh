@@ -22,4 +22,10 @@ if [ "$maj" = "" ] || [ "$min" = "" ] || \
 fi
 
 echo "$AUTORECONF identification: $AUTORECONFVERSION"
-"$AUTORECONF" -f
+
+# configure.ac is an Autoconf 2.69 file, but it works as expected even with
+# Autoconf 2.72.  However, in Autoconf versions 2.70 and later obsolete
+# construct warnings are enabled by default, which adds varying (depending on
+# the branch) amount of noise to the build matrix output, so provide a means
+# to silence that.
+env ${AUTOCONF_WARNINGS:+WARNINGS="$AUTOCONF_WARNINGS"} "$AUTORECONF" -f

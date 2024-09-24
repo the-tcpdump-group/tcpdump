@@ -65,6 +65,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Makefile.in: Do not install a version-suffixed tcpdump binary if the
         .devel file does not exists.
       tests: On HP-UX use "diff -c" by default.
+      autogen.sh: Allow to configure Autoconf warnings.
     Documentation:
       man: Clarify the "any" pseudo-interface further.
 
