@@ -500,7 +500,7 @@ releasetar:
 	     tar xf -) && \
 	    echo "No $$TAG tag. Archive build from HEAD."; \
 	fi && \
-	(cd "$$TAG" && "$${AUTORECONF:-autoreconf}" && rm -rf autom4te.cache) && \
+	(cd "$$TAG" && ./autogen.sh && rm -rf autom4te.cache) && \
 	tar cf "$$DIR/$$TAG".tar "$$TAG" && \
 	rm -f "$$DIR/$$TAG".tar.gz && \
 	gzip --best "$$DIR/$$TAG".tar && \

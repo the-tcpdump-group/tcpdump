@@ -1,6 +1,7 @@
 env:
   CIRRUS_CLONE_DEPTH: 3 # The internal git client reads CIRRUS_CLONE_DEPTH.
   LIBPCAP_GIT: https://github.com/the-tcpdump-group/libpcap.git
+  AUTOCONF_WARNINGS: no-obsolete
 
 freebsd_task:
   name: freebsd-amd64
