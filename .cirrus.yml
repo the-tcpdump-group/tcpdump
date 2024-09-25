@@ -11,7 +11,7 @@ freebsd_task:
     # The number of CPU cores must be either 1 or a multiple of 2.
     cpu: 1
     memory: 2G
-    image_family: freebsd-13-3
+    image_family: freebsd-13-4
   env:
     IGNORE_OSVERSION: yes
     MATRIX_CC: clang17 gcc13
