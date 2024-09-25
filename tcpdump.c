@@ -641,6 +641,7 @@ show_remote_devices_and_exit(void)
 #define OPTION_COUNT			136
 #define OPTION_PRINT_SAMPLING		137
 #define OPTION_LENGTHS			138
+#define OPTION_TIME_T_SIZE		139
 
 static const struct option longopts[] = {
 	{ "buffer-size", required_argument, NULL, 'B' },
@@ -682,6 +683,7 @@ static const struct option longopts[] = {
 	{ "print", no_argument, NULL, OPTION_PRINT },
 	{ "print-sampling", required_argument, NULL, OPTION_PRINT_SAMPLING },
 	{ "lengths", no_argument, NULL, OPTION_LENGTHS },
+	{ "time-t-size", no_argument, NULL, OPTION_TIME_T_SIZE },
 	{ "version", no_argument, NULL, OPTION_VERSION },
 	{ NULL, 0, NULL, 0 }
 };
@@ -1869,6 +1871,10 @@ main(int argc, char **argv)
 		case OPTION_LENGTHS:
 			ndo->ndo_lengths = 1;
 			break;
+
+		case OPTION_TIME_T_SIZE:
+			printf("%zu\n", sizeof(time_t) * 8);
+			return 0;
 
 		case OPTION_VERSION:
 			print_version(stdout);
