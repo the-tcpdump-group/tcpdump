@@ -39,6 +39,7 @@ linux_task:
   script:
     - apt-get -qy update >/dev/null
     - apt-get -qy install autoconf make gcc libpcap-dev >/dev/null # for "./configure"
+    - apt-get -qy install flex bison libdbus-1-dev libbluetooth-dev libnl-genl-3-dev libibverbs-dev >/dev/null # for libpcap
     - apt-get -qy install cmake git binutils-dev >/dev/null # for "make releasecheck"
     - apt-get -qy install shellcheck >/dev/null
     - ./autogen.sh

@@ -493,6 +493,22 @@ releasecheck: releasetar
 	INSTALL_DIR=/tmp/install_"$$TAG"_$$$$ && \
 	DIR=`pwd` && \
 	cd /tmp && \
+	rm -rf libpcap && \
+	rm -rf install_libpcap && \
+	echo "[$@] $$ git clone [...] libpcap.git" && \
+	git clone --depth 3 --quiet https://github.com/the-tcpdump-group/libpcap.git && \
+	echo "[$@] $$ cd libpcap" && \
+	cd libpcap && \
+	echo "[$@] $$ ./autogen.sh" && \
+	./autogen.sh && \
+	echo "[$@] $$ ./configure --quiet --prefix=/tmp/install_libpcap" && \
+	./configure --quiet --prefix=/tmp/install_libpcap && \
+	echo "[$@] $$ make -s " && \
+	make -s && \
+	echo "[$@] $$ make -s install" && \
+	make -s install && \
+	echo "[$@] $$ cd .." && \
+	cd .. && \
 	rm -rf "$$TAG" && \
 	rm -rf "$$INSTALL_DIR" && \
 	tar xf "$$DIR"/"$$TAG".tar.gz && \
@@ -514,6 +530,8 @@ releasecheck: releasetar
 	touch .devel && \
 	mkdir build && \
 	cd build && \
+	echo "[$@] $$ export PKG_CONFIG_PATH=/tmp/install_libpcap/lib/pkgconfig" && \
+	export PKG_CONFIG_PATH=/tmp/install_libpcap/lib/pkgconfig && \
 	echo '[$@] $$ cmake -DENABLE_SMB=yes [...] ..' && \
 	cmake -DENABLE_SMB=yes \
 	    -DCMAKE_INSTALL_PREFIX="$$INSTALL_DIR" \
@@ -528,6 +546,8 @@ releasecheck: releasetar
 	cd ../.. && \
 	rm -rf "$$TAG" && \
 	rm -rf "$$INSTALL_DIR" && \
+	rm -rf install_libpcap && \
+	rm -rf libpcap && \
 	echo '[$@] Done.'
 
 whitespacecheck:
