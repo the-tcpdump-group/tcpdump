@@ -701,6 +701,7 @@ show_remote_devices_and_exit(void)
 #define OPTION_TSTAMP_NANO		134
 #define OPTION_FP_TYPE			135
 #define OPTION_COUNT			136
+#define OPTION_TIME_T_SIZE		139
 
 static const struct option longopts[] = {
 #if defined(HAVE_PCAP_CREATE) || defined(_WIN32)
@@ -748,6 +749,7 @@ static const struct option longopts[] = {
 	{ "fp-type", no_argument, NULL, OPTION_FP_TYPE },
 	{ "number", no_argument, NULL, '#' },
 	{ "print", no_argument, NULL, OPTION_PRINT },
+	{ "time-t-size", no_argument, NULL, OPTION_TIME_T_SIZE },
 	{ "version", no_argument, NULL, OPTION_VERSION },
 	{ NULL, 0, NULL, 0 }
 };
@@ -1913,6 +1915,10 @@ main(int argc, char **argv)
 		case '#':
 			ndo->ndo_packet_number = 1;
 			break;
+
+		case OPTION_TIME_T_SIZE:
+			printf("%zu\n", sizeof(time_t) * 8);
+			return 0;
 
 		case OPTION_VERSION:
 			print_version(stdout);

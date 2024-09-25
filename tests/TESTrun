@@ -386,6 +386,17 @@ sub loadconfighash {
     printf "$TCPDUMP --fp-type => %s\n", $have_fptype;
     $main::confighhash->{$have_fptype} = 1;
 
+    # run tcpdump --time-t-size to get the size of size_t in bits
+    open(TIMETSIZE_PIPE, "$TCPDUMP --time-t-size |") or die("piping tcpdump --time-t-size failed\n");
+    my $time_t_size = <TIMETSIZE_PIPE>;
+    close(TIMETSIZE_PIPE);
+    my $have_time_t_64;
+    if($time_t_size == "64") {
+        $have_time_t_64 = "HAVE_TIME_T_64";
+    }
+    printf "$TCPDUMP --time-t-size => %s\n", $time_t_size;
+    $main::confighhash->{$have_time_t_64} = 1;
+
     # and check whether this is OpenBSD, as one test fails in OpenBSD
     # due to the sad hellscape of low-numbered DLT_ values, due to
     # 12 meaning "OpenBSD loopback" rather than "raw IP" on OpenBSD
