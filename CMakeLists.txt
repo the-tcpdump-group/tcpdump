@@ -1307,6 +1307,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-dhcp6.c
     print-domain.c
     print-dsa.c
+    print-dsa-gsw1xx.c
     print-dtp.c
     print-dvmrp.c
     print-eap.c

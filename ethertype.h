@@ -182,6 +182,9 @@
 #ifndef ETHERTYPE_AOE
 #define ETHERTYPE_AOE		0x88a2
 #endif
+#ifndef ETHERTYPE_GSW1XX
+#define ETHERTYPE_GSW1XX	0x88c3
+#endif
 #ifndef ETHERTYPE_PTP
 #define ETHERTYPE_PTP		0x88f7
 #endif
