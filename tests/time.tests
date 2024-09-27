@@ -63,6 +63,20 @@ $testlist = [
         output => 'time_2107.out',
         args   => '-q'
     },
+    {
+        config_set => 'HAVE_TIME_T_64',
+        name => 'time_2106_overflow-tt',
+        input => 'time_2106_overflow.pcapng',
+        output => 'time_2106_overflow-tt.out',
+        args   => '-tt -q SPECIAL_t'
+    },
+    {
+        config_set => 'HAVE_TIME_T_64',
+        name => 'time_2107-tt',
+        input => 'time_2107.pcapng',
+        output => 'time_2107-tt.out',
+        args   => '-tt -q SPECIAL_t'
+    },
 ];
 
 1;

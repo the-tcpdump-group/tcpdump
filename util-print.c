@@ -277,7 +277,7 @@ ts_unix_print(netdissect_options *ndo, const struct timeval *tv)
 		return;
 	}
 
-	ND_PRINT("%u", (unsigned)tv->tv_sec);
+	ND_PRINT("%" PRId64, (int64_t)tv->tv_sec);
 	ts_frac_print(ndo, tv);
 }
 
