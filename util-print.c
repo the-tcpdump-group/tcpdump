@@ -251,7 +251,7 @@ ts_date_hmsfrac_print(netdissect_options *ndo, const struct timeval *tv,
 	const char *timestr;
 
 	if (tv->tv_sec < 0) {
-		ND_PRINT("[timestamp < 1970-01-01 00:00:00 UTC]");
+		ND_PRINT("[timestamp overflow]");
 		return;
 	}
 
@@ -279,7 +279,7 @@ static void
 ts_unix_print(netdissect_options *ndo, const struct timeval *tv)
 {
 	if (tv->tv_sec < 0) {
-		ND_PRINT("[timestamp < 1970-01-01 00:00:00 UTC]");
+		ND_PRINT("[timestamp overflow]");
 		return;
 	}
 
