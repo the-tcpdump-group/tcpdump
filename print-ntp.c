@@ -277,7 +277,7 @@ ntp_time_print(netdissect_options *ndo,
 		 * modified or extended in the future, and unregistered kiss
 		 * codes are possible (and are being seen in the field).
 		 */
-		if (!ND_ASCII_ISPRINT((bp->refid)[0])) {
+		if (!ND_ASCII_ISPRINT(GET_U_1(bp->refid))) {
 			ND_PRINT("(unspec)");
 			ND_TCHECK_4(bp->refid);
 		} else {
