@@ -25,6 +25,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       NTP: Check that the entire extension field is in the capture even
         if it isn't printed
       NTP: Print kiss codes relevant for NTP debugging.
+      NTP: Use GET_U_1() to replace a direct dereference.
       MPTCP: parse MPC data_len field, print flags from MP_CAPABLE option.
       OSPF: Fix printing of Traffic Engineering Link TLVs to correctly
         advance the packet data pointer
