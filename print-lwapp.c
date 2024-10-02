@@ -73,9 +73,9 @@ struct lwapp_control_header {
 #define LWAPP_EXTRACT_CONTROL_BIT(x) (((x)&0x04)>>2)
 
 static const struct tok lwapp_header_bits_values[] = {
-    { 0x01, "Last Fragment Bit"},
-    { 0x02, "Fragment Bit"},
-    { 0x04, "Control Bit"},
+    { 0x01, "Not Last"},	/* L Bit */
+    { 0x02, "Fragment"},	/* F Bit */
+    { 0x04, "Control"},		/* C Bit */
     { 0, NULL}
 };
 
@@ -335,7 +335,7 @@ lwapp_data_print(netdissect_options *ndo,
     /* ok they seem to want to know everything - lets fully decode it */
     tlen=GET_BE_U_2(lwapp_trans_header->length);
     if (tlen < sizeof(struct lwapp_transport_header)) {
-        ND_PRINT("LWAPPv%u, %s frame, Radio-id  %u, Flags [%s], length %u < transport header length",
+        ND_PRINT("LWAPPv%u, %s frame, Radio-id %u, Flags [%s], length %u < transport header length",
                LWAPP_EXTRACT_VERSION(version),
                LWAPP_EXTRACT_CONTROL_BIT(version) ? "Control" : "Data",
                LWAPP_EXTRACT_RID(version),
@@ -344,7 +344,7 @@ lwapp_data_print(netdissect_options *ndo,
         return;
     }
 
-    ND_PRINT("LWAPPv%u, %s frame, Radio-id  %u, Flags [%s], Frag-id  %u, length %u",
+    ND_PRINT("LWAPPv%u, %s frame, Radio-id %u, Flags [%s], Frag-id %u, length %u",
            LWAPP_EXTRACT_VERSION(version),
            LWAPP_EXTRACT_CONTROL_BIT(version) ? "Control" : "Data",
            LWAPP_EXTRACT_RID(version),
