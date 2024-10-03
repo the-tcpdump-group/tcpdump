@@ -235,6 +235,8 @@ icmpv6-rfc7112	icmpv6-rfc7112.pcap	icmpv6-rfc7112.out
 icmpv6-RFC2894-RR icmpv6-RFC2894-RR.pcap icmpv6-RFC2894-RR.out
 icmpv6-RFC2894-RR-v icmpv6-RFC2894-RR.pcap icmpv6-RFC2894-RR-v.out -v
 icmpv6-ni-flags	icmpv6-ni-flags.pcap	icmpv6-ni-flags.out
+icmpv6-ra-pref64-v1	icmpv6-ra-pref64.pcap	icmpv6-ra-pref64-v1.out	-v
+icmpv6-ra-pref64-v2	icmpv6-ra-pref64.pcap	icmpv6-ra-pref64-v2.out	-vv
 
 # SPB tests
 spb	            spb.pcap	            spb.out
