@@ -188,9 +188,9 @@ lwapp_control_print(netdissect_options *ndo,
      * Sanity checking of the header.
      */
     if (LWAPP_EXTRACT_VERSION(version) != LWAPP_VERSION) {
-	ND_PRINT("LWAPP version %u packet not supported",
+        ND_PRINT("LWAPP version %u packet not supported",
                LWAPP_EXTRACT_VERSION(version));
-	return;
+        return;
     }
 
     /* non-verbose */
@@ -211,8 +211,8 @@ lwapp_control_print(netdissect_options *ndo,
            LWAPP_EXTRACT_CONTROL_BIT(version) ? "Control" : "Data",
            LWAPP_EXTRACT_RID(version),
            bittok2str(lwapp_header_bits_values,"none",version&0x07),
-	   GET_U_1(lwapp_trans_header->frag_id),
-	   tlen);
+           GET_U_1(lwapp_trans_header->frag_id),
+           tlen);
 
     if (has_ap_ident) {
         ND_PRINT("\n\tAP identity: %s", GET_ETHERADDR_STRING(tptr));
@@ -231,14 +231,14 @@ lwapp_control_print(netdissect_options *ndo,
         }
 
         lwapp_control_header = (const struct lwapp_control_header *)tptr;
-	msg_tlen = GET_BE_U_2(lwapp_control_header->len);
+        msg_tlen = GET_BE_U_2(lwapp_control_header->len);
         if (tlen < sizeof(struct lwapp_control_header) + msg_tlen) {
             ND_PRINT("\n\t  Msg goes past end of PDU");
             break;
         }
 
-	/* print message header */
-	msg_type = GET_U_1(lwapp_control_header->msg_type);
+        /* print message header */
+        msg_type = GET_U_1(lwapp_control_header->msg_type);
         ND_PRINT("\n\t  Msg type: %s (%u), Seqnum: %u, Msg len: %u, Session: 0x%08x",
                tok2str(lwapp_msg_type_values,"Unknown",msg_type),
                msg_type,
@@ -249,7 +249,7 @@ lwapp_control_print(netdissect_options *ndo,
         /* did we capture enough for fully decoding the message */
         ND_TCHECK_LEN(tptr, msg_tlen);
 
-	/* XXX - Decode sub messages for each message */
+        /* XXX - Decode sub messages for each message */
         switch(msg_type) {
         case LWAPP_MSGTYPE_DISCOVERY_REQUEST:
         case LWAPP_MSGTYPE_DISCOVERY_RESPONSE:
