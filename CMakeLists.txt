@@ -1496,6 +1496,9 @@ add_executable(tcpdump ${TCPDUMP_SOURCE_LIST_C})
 if(NOT C_ADDITIONAL_FLAGS STREQUAL "")
     set_target_properties(tcpdump PROPERTIES COMPILE_FLAGS ${C_ADDITIONAL_FLAGS})
 endif()
+if(NOT "${PCAP_LINK_FLAGS}" STREQUAL "")
+    set_target_properties(tcpdump PROPERTIES LINK_FLAGS ${PCAP_LINK_FLAGS})
+endif()
 target_link_libraries(tcpdump netdissect ${TCPDUMP_LINK_LIBRARIES})
 
 ######################################
