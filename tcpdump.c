@@ -1437,6 +1437,42 @@ main(int argc, char **argv)
 	netdissect_options Ndo;
 	netdissect_options *ndo = &Ndo;
 
+#ifdef _WIN32
+	/*
+	 * We need to look for wpcap.dll in \Windows\System32\Npcap first,
+	 * as either:
+	 *
+	 *  1) WinPcap isn't installed and Npcap isn't installed in "WinPcap
+	 *     API-compatible Mode", so there's no wpcap.dll in
+	 *     \Windows\System32, only in \Windows\System32\Npcap;
+	 *
+	 *  2) WinPcap is installed and Npcap isn't installed in "WinPcap
+	 *     API-compatible Mode", so the wpcap.dll in \Windows\System32
+	 *     is a WinPcap DLL, but we'd prefer an Npcap DLL (we should
+	 *     work with either one if we're configured against WinPcap,
+	 *     and we'll probably require Npcap if we're configured againt
+	 *     it), and that's in \Windows\System32\Npcap;
+	 *
+	 *  3) Npcap is installed in "WinPcap API-compatible Mode", so both
+	 *     \Windows\System32 and \Windows\System32\Npcap have an Npcap
+	 *     wpcap.dll.
+	 *
+	 * Unfortunately, Windows has no notion of an rpath, so we can't
+	 * set the rpath to include \Windows\System32\Npcap at link time;
+	 * what we need to do is to link wpcap as a delay-load DLL and
+	 * add \Windows\System32\Npcap to the DLL search path early in
+	 * main() with a call to SetDllDirectory().
+	 *
+	 * The same applies to packet.dll.
+	 *
+	 * We add \Windows\System32\Npcap here.
+	 *
+	 * See https://npcap.com/guide/npcap-devguide.html#npcap-feature-native-dll-implicitly
+	 */
+	if (!SetDllDirectoryA("C:\\Windows\\System32\\Npcap"))
+		error("SetDllDirectory failed");
+#endif
+
 	/*
 	 * Initialize the netdissect code.
 	 */
