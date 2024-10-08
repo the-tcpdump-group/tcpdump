@@ -113,9 +113,9 @@ struct isakmp {
 #define ISAKMP_FLAG_extra 0x04
 
 /* IKEv2 */
-#define ISAKMP_FLAG_I (1 << 3)  /* (I)nitiator */
-#define ISAKMP_FLAG_V (1 << 4)  /* (V)ersion   */
-#define ISAKMP_FLAG_R (1 << 5)  /* (R)esponse  */
+#define ISAKMP_FLAG_I (1 << 3)  /* Initiator */
+#define ISAKMP_FLAG_V (1 << 4)  /* Version   */
+#define ISAKMP_FLAG_R (1 << 5)  /* Response  */
 
 
 /* 3.2 Payload Generic Header
