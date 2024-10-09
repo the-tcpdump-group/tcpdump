@@ -60,6 +60,8 @@ build_script:
   - msbuild /m /nologo /p:Configuration=Release tcpdump.sln
   - copy Release\tcpdump.exe C:\Windows\system32
   - copy \projects\npcap-1.79\wpcap.dll C:\Windows\system32
+  - md C:\Windows\system32\Npcap
+  - copy \projects\npcap-1.79\wpcap.dll C:\Windows\system32\Npcap
   - echo %path%
   - \projects\dependencies\dependencies.exe -cache -knowndll Release\tcpdump.exe
   - echo -----
