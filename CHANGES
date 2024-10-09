@@ -85,6 +85,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Fixed to find wpcap.dll if WinPcap isn't installed and Npcap was
         installed without the WinPcap API compatibility option. (GitHub
         issue #1226).
+    Building and testing:
+      Makefile.in: Use a local libpcap in the releasecheck target.
 
 Friday, August 30, 2024 / The Tcpdump Group
   Summary for 4.99.5 tcpdump release
