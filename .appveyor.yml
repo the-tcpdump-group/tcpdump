@@ -62,6 +62,7 @@ build_script:
   - copy \projects\npcap-1.79\wpcap.dll C:\Windows\system32
   - md C:\Windows\system32\Npcap
   - copy \projects\npcap-1.79\wpcap.dll C:\Windows\system32\Npcap
+  - dir /s \wpcap.dll
   - echo %path%
   - \projects\dependencies\dependencies.exe -cache -knowndll Release\tcpdump.exe
   - echo -----
