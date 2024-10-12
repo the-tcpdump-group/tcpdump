@@ -74,7 +74,7 @@ if(WIN32)
     #     API-compatible Mode", so the wpcap.dll in \Windows\System32
     #     is a WinPcap DLL, but we'd prefer an Npcap DLL (we should
     #     work with either one if we're configured against WinPcap,
-    #     and we'll probably require Npcap if we're configured againt
+    #     and we'll probably require Npcap if we're configured against
     #     it), and that's in \Windows\System32\Npcap;
     #
     #  3) Npcap is installed in "WinPcap API-compatible Mode", so both
