@@ -374,9 +374,15 @@ NORETURN void nd_trunc_longjmp(netdissect_options *ndo);
 
 /* Bail out if "l" bytes from "p" were not captured */
 #ifdef ND_LONGJMP_FROM_TCHECK
-#define ND_TCHECK_LEN(p, l) if (!ND_TTEST_LEN(p, l)) nd_trunc_longjmp(ndo)
+#define ND_TCHECK_LEN(p, l) \
+do { \
+if (!ND_TTEST_LEN(p, l)) nd_trunc_longjmp(ndo); \
+} while (0)
 #else
-#define ND_TCHECK_LEN(p, l) if (!ND_TTEST_LEN(p, l)) goto trunc
+#define ND_TCHECK_LEN(p, l) \
+do { \
+if (!ND_TTEST_LEN(p, l)) goto trunc; \
+} while (0)
 #endif
 
 /* Bail out if "*(p)" was not captured */
