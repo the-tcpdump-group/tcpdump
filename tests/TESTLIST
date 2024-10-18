@@ -984,3 +984,6 @@ bgp-ub bgp-ub.pcap bgp-ub.out -v
 
 # AccECN tests
 accecn_handshake	accecn_handshake.pcap		accecn_handshake.out	-v
+
+# Juniper tests
+juniper_monitor_invalid_cookie_length juniper_monitor_invalid_cookie_length.pcap  juniper_monitor_invalid_cookie_length.out

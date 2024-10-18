@@ -890,7 +890,6 @@ juniper_mlppp_if_print(netdissect_options *ndo,
 }
 #endif
 
-
 #ifdef DLT_JUNIPER_MFR
 void
 juniper_mfr_if_print(netdissect_options *ndo,
@@ -1272,11 +1271,9 @@ juniper_parse_header(netdissect_options *ndo,
     int tlv_value;
     const u_char *tptr;
 
-
     l2info->header_len = 0;
     l2info->cookie_len = 0;
     l2info->proto = 0;
-
 
     l2info->length = h->len;
     l2info->caplen = h->caplen;
@@ -1429,7 +1426,6 @@ juniper_parse_header(netdissect_options *ndo,
             break;
         }
 
-
 #ifdef DLT_JUNIPER_MFR
         /* MFR child links don't carry cookies */
         if (l2info->pictype == DLT_JUNIPER_MFR &&
@@ -1447,10 +1443,7 @@ juniper_parse_header(netdissect_options *ndo,
                    lp->s,
                    l2info->cookie_len);
 
-        if (l2info->cookie_len > 8) {
-            nd_print_invalid(ndo);
-            return 0;
-        }
+        ND_ICHECKMSG_U("cookie length", l2info->cookie_len, >, 8);
 
         if (l2info->cookie_len > 0) {
             ND_TCHECK_LEN(p, l2info->cookie_len);
@@ -1463,7 +1456,6 @@ juniper_parse_header(netdissect_options *ndo,
         }
 
         if (ndo->ndo_eflag) ND_PRINT(": "); /* print demarc b/w L2/L3*/
-
 
         l2info->proto = GET_BE_U_2(p + l2info->cookie_len);
     }
