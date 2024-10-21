@@ -108,17 +108,21 @@ tcpdump \- dump traffic on a network
 .I snaplen
 ]
 [
+.B \-\-skip
+.I count
+]
+[
 .B \-T
 .I type
 ]
 [
 .B \-\-version
 ]
+.ti +8
 [
 .B \-V
 .I file
 ]
-.ti +8
 [
 .B \-w
 .I file
@@ -275,7 +279,10 @@ Set the operating system capture buffer size to \fIbuffer_size\fP, in
 units of KiB (1024 bytes).
 .TP
 .BI \-c " count"
-Exit after receiving \fIcount\fP packets.
+Exit after receiving or reading \fIcount\fP packets.
+If the
+.B --skip
+option is used, the \fIcount\fP starts after the skipped packets.
 .TP
 .BI \-\-count
 Print only on stdout the packet count when reading capture file(s) instead
@@ -760,6 +767,10 @@ protocol information you're interested in.  Setting
 \fIsnaplen\fP to 0 sets it to the default of 262144,
 for backwards compatibility with recent older versions of
 .IR tcpdump .
+.TP
+.BI \-\-skip " count"
+Skip \fIcount\fP packets before writing or printing.
+\fIcount\fP with value 0 is allowed.
 .TP
 .BI \-T " type"
 Force packets selected by "\fIexpression\fP" to be interpreted the

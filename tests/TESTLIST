@@ -352,6 +352,10 @@ dns_udp dns_udp.pcap dns_udp.out
 dns_udp-v dns_udp.pcap dns_udp-v.out -v
 dns_udp-vv dns_udp.pcap dns_udp-vv.out -vv
 dns_udp-vvv dns_udp.pcap dns_udp-vvv.out -vvv
+# tests with --skip option
+dns_tcp-skip-3 dns_tcp.pcap dns_tcp-skip-3.out --skip 3
+dns_tcp-skip-3-c-4 dns_tcp.pcap dns_tcp-skip-3-c-4.out --skip 3 -c 4
+dns_tcp-skip-3-c-1 dns_tcp.pcap dns_tcp-skip-3-c-1.out --skip 3 -c 1
 
 # DNS on non-standard ports.
 dns_tcp_8053 dns_tcp_8053.pcap dns_tcp_8053.out -vv
