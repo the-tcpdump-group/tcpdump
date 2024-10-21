@@ -37,6 +37,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Add optional unit suffix on -C file size.
       Add --print-sampling to print every Nth packet instead of all.
       Add --lengths option to print the captured and original packet lengths.
+      Add --skip option to skip some packets before writing or printing.
     Source code:
       Drop support for building with versions of libpcap that don't
         support all the libpcap 1.0 APIs.

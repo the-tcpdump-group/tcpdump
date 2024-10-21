@@ -211,6 +211,7 @@ static int timeout = 1000;		/* default timeout = 1000 ms = 1 s */
 static int immediate_mode;
 #endif
 static int count_mode;
+static u_int packets_skipped;
 
 static int infodelay;
 static int infoprint;
@@ -642,6 +643,7 @@ show_remote_devices_and_exit(void)
 #define OPTION_PRINT_SAMPLING		137
 #define OPTION_LENGTHS			138
 #define OPTION_TIME_T_SIZE		139
+#define OPTION_SKIP			140
 
 static const struct option longopts[] = {
 	{ "buffer-size", required_argument, NULL, 'B' },
@@ -684,6 +686,7 @@ static const struct option longopts[] = {
 	{ "print-sampling", required_argument, NULL, OPTION_PRINT_SAMPLING },
 	{ "lengths", no_argument, NULL, OPTION_LENGTHS },
 	{ "time-t-size", no_argument, NULL, OPTION_TIME_T_SIZE },
+	{ "skip", required_argument, NULL, OPTION_SKIP },
 	{ "version", no_argument, NULL, OPTION_VERSION },
 	{ NULL, 0, NULL, 0 }
 };
@@ -1943,6 +1946,14 @@ main(int argc, char **argv)
 				error("invalid print sampling %s", optarg);
 			break;
 
+		case OPTION_SKIP:
+			errno = 0;
+			packets_skipped = (u_int)strtoul(optarg, &end, 0);
+			if (optarg[0] == '-' || optarg == end || *end != '\0' ||
+			    errno != 0)
+				error("invalid packet skipped %s", optarg);
+			break;
+
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
 		case OPTION_TSTAMP_MICRO:
 			ndo->ndo_tstamp_precision = PCAP_TSTAMP_PRECISION_MICRO;
@@ -2569,7 +2580,9 @@ DIAG_ON_ASSIGN_ENUM
 #endif	/* HAVE_CAPSICUM */
 
 	do {
-		status = pcap_loop(pd, cnt, callback, pcap_userdata);
+		status = pcap_loop(pd,
+				   cnt + (cnt == -1 ? 0 : packets_skipped),
+				   callback, pcap_userdata);
 		if (WFileName == NULL) {
 			/*
 			 * We're printing packets.  Flush the printed output,
@@ -2931,6 +2944,9 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 
 	dump_info = (struct dump_info *)user;
 
+	if (packets_captured <= packets_skipped)
+		return;
+
 	/*
 	 * XXX - this won't force the file to rotate on the specified time
 	 * boundary, but it will rotate on the first packet received after the
@@ -3060,6 +3076,9 @@ dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 
 	dump_info = (struct dump_info *)user;
 
+	if (packets_captured <= packets_skipped)
+		return;
+
 	pcap_dump((u_char *)dump_info->pdd, h, sp);
 	if (Uflag)
 		pcap_dump_flush(dump_info->pdd);
@@ -3079,7 +3098,7 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 
 	++infodelay;
 
-	if (!count_mode)
+	if (!count_mode && packets_captured > packets_skipped)
 		pretty_print_packet((netdissect_options *)user, h, sp, packets_captured);
 
 	--infodelay;
