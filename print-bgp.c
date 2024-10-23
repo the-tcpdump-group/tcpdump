@@ -2172,6 +2172,11 @@ bgp_attr_print(netdissect_options *ndo,
                         tptr += tnhlen;
                         tlen -= tnhlen;
                         tnhlen = 0;
+                    } else if (tnhlen >= sizeof(nd_ipv6)) {
+                        ND_PRINT("%s",GET_IP6ADDR_STRING(tptr));
+                        tptr += sizeof(nd_ipv6);
+                        tnhlen -= sizeof(nd_ipv6);
+                        tlen -= sizeof(nd_ipv6);
                     } else {
                         ND_PRINT("%s",GET_IPADDR_STRING(tptr));
                         tptr += sizeof(nd_ipv4);
