@@ -505,6 +505,11 @@ static const struct tok bgp_graceful_restart_comm_flag_values[] = {
 #define BGP_EXT_COM_VRF_RT_IMP  0x010b  /* RFC-ietf-l3vpn-2547bis-mcast-bgp-08.txt */
 #define BGP_EXT_COM_L2VPN_RT_0  0x000a  /* L2VPN Identifier,Format AS(2bytes):AN(4bytes) */
 #define BGP_EXT_COM_L2VPN_RT_1  0xF10a  /* L2VPN Identifier,Format IP address:AN(2bytes) */
+                                        /* rfc7432 */
+#define BGP_EXT_COM_DEF_GATEWAY 0x030d  /* Default gateway */
+#define BGP_EXT_COM_EVPN_MMOB   0x0600  /* EVPN MAC Mobility */
+#define BGP_EXT_COM_EVPN_ESI    0x0601  /* EVPN ESI Label */
+#define BGP_EXT_COM_EVPN_ES_IMP 0x0602  /* EVPN ES-Import Route Target */
 
 /* https://www.cisco.com/en/US/tech/tk436/tk428/technologies_tech_note09186a00801eb09a.shtml  */
 #define BGP_EXT_COM_EIGRP_GEN                    0x8800
@@ -560,6 +565,10 @@ static const struct tok bgp_extd_comm_subtype_values[] = {
     { BGP_EXT_COM_VRF_RT_IMP, "vrf-route-import"},
     { BGP_EXT_COM_L2VPN_RT_0, "l2vpn-id"},
     { BGP_EXT_COM_L2VPN_RT_1, "l2vpn-id"},
+    { BGP_EXT_COM_DEF_GATEWAY, "default-gateway" },
+    { BGP_EXT_COM_EVPN_MMOB, "mac-mobility" },
+    { BGP_EXT_COM_EVPN_ESI, "esi-label" },
+    { BGP_EXT_COM_EVPN_ES_IMP, "es-import-target" },
     { 0, NULL},
 };
 
@@ -981,6 +990,39 @@ bgp_extended_community_print(netdissect_options *ndo,
                                            "unknown encaps",
                                            GET_BE_U_2(pptr + 6)));
         break;
+
+    case BGP_EXT_COM_DEF_GATEWAY:
+	/* Empty payload */
+	ND_PRINT("(empty)");
+	break;
+
+    case BGP_EXT_COM_EVPN_MMOB:
+        {
+	    uint8_t flag = GET_U_1(pptr + 2);
+	    ND_PRINT("Sequence number: %u%s",
+		     GET_BE_U_4(pptr + 4),
+		     flag == 0x1 ? " (static)" : "");
+	}
+	break;
+
+    case BGP_EXT_COM_EVPN_ESI:
+        {
+	    uint8_t flag = GET_U_1(pptr + 2);
+	    ND_PRINT("%u %s",
+                     GET_BE_U_3(pptr + 5),
+                     flag == 1 ? "(Single-Active)" : "(All-Active)");
+        }
+	break;
+
+    case BGP_EXT_COM_EVPN_ES_IMP:
+	ND_PRINT("%02x:%02x:%02x:%02x:%02x:%02x",
+		 GET_U_1(pptr + 2),
+                 GET_U_1(pptr + 3),
+                 GET_U_1(pptr + 4),
+                 GET_U_1(pptr + 5),
+                 GET_U_1(pptr + 6),
+                 GET_U_1(pptr + 7));
+	break;
 
     default:
         ND_PRINT("%02x%02x%02x%02x%02x%02x",
