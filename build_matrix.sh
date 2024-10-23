@@ -67,6 +67,7 @@ build_tcpdump() {
     done
 }
 
+run_after_echo git show --oneline -s
 touch .devel
 for CC in $MATRIX_CC; do
     export CC
