@@ -893,6 +893,28 @@ bgp_vpn_rd_print(netdissect_options *ndo, const u_char *pptr)
     return (rd);
 }
 
+/* Print an RFC 7432 Ethernet Segment Identifier */
+static const char *
+bgp_evpn_esi_print(netdissect_options *ndo, const u_char *pptr)
+{
+    static char esi[sizeof("01:23:45:67:89:01:23:45:67:89")];
+
+    snprintf(esi, sizeof(esi),
+             "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
+             GET_U_1(pptr),
+             GET_U_1(pptr + 1),
+             GET_U_1(pptr + 2),
+             GET_U_1(pptr + 3),
+             GET_U_1(pptr + 4),
+             GET_U_1(pptr + 5),
+             GET_U_1(pptr + 6),
+             GET_U_1(pptr + 7),
+             GET_U_1(pptr + 8),
+             GET_U_1(pptr + 9));
+
+    return esi;
+}
+
 /*
  * Print an RFC 4360 Extended Community.
  */
@@ -1470,6 +1492,139 @@ trunc:
     return -2;
 }
 
+static int
+print_evpn_prefix(netdissect_options *ndo, const u_char *pptr, u_int itemlen)
+{
+    u_int ptype, plen, tlen, iplen, maclen;
+
+    if (itemlen < 2)
+        goto trunc;
+
+    ptype = GET_U_1(pptr);
+    plen = GET_U_1(pptr + 1);
+    tlen = plen + 2;
+    pptr += 2;
+
+    if (itemlen < tlen) {
+        ND_PRINT("\n\t      (ran past the end)");
+        goto trunc;
+    }
+
+    ND_PRINT("\n\t      EVPN Route-Type: %u", ptype);
+
+    switch (ptype) {
+    case 1: /* Ethernet auto-discovery route */
+        ND_PRINT("\n\t\tRD: %s", bgp_vpn_rd_print(ndo, pptr));
+        ND_PRINT("\n\t\tEthernet Segment ID: %s", bgp_evpn_esi_print(ndo, pptr + 8));
+        ND_PRINT("\n\t\tEthernet Tag: 0x%08x", GET_BE_U_4(pptr + 18));
+        ND_PRINT("\n\t\tMPLS Label: %u", GET_BE_U_3(pptr + 22));
+        break;
+    case 2: /* MAC/IP advertisement route */
+        ND_PRINT("\n\t\tRD: %s", bgp_vpn_rd_print(ndo, pptr));
+        ND_PRINT("\n\t\tEthernet Segment ID: %s", bgp_evpn_esi_print(ndo, pptr + 8));
+        ND_PRINT("\n\t\tEthernet Tag: 0x%08x", GET_BE_U_4(pptr + 18));
+        pptr += 22;
+        plen -= 22;
+
+        maclen = GET_U_1(pptr);
+        pptr++;
+        plen--;
+
+        ND_PRINT("\n\t\tMAC Address: ");
+
+        if ((plen * 8) < maclen) { /* maclen is in bits */
+            ND_PRINT("(ran past the end)");
+            break;
+        } else if (maclen == (sizeof(nd_mac48) * 8)) {
+            ND_PRINT("%s", GET_MAC48_STRING(pptr));
+        } else {
+            ND_PRINT("(illegal address length)");
+        }
+
+        pptr += maclen / 8;
+        plen -= maclen / 8;
+
+        iplen = GET_U_1(pptr);
+        pptr++;
+        plen--;
+
+        if (iplen != 0) {
+            ND_PRINT("\n\t\tIP Address: ");
+
+            if ((plen * 8) < iplen) { /* iplen is in bits */
+                ND_PRINT("(ran past the end)");
+                break;
+            } else if (iplen == (sizeof(nd_ipv4) * 8)) {
+                ND_PRINT("%s", GET_IPADDR_STRING(pptr));
+            } else if (iplen == (sizeof(nd_ipv6) * 8)) {
+                ND_PRINT("%s", GET_IP6ADDR_STRING(pptr));
+            } else {
+                ND_PRINT("(illegal address length)");
+            }
+
+            pptr += iplen / 8;
+            plen -= iplen / 8;
+        }
+
+        ND_PRINT("\n\t\tMPLS Label 1: %u", GET_BE_U_3(pptr));
+        pptr += 3;
+        plen -= 3;
+
+        if (plen > 0) {
+            ND_PRINT("\n\t\tMPLS Label 2: ");
+
+            if (plen < 3) {
+                ND_PRINT("(ran past the end)");
+            } else {
+                ND_PRINT("%u", GET_BE_U_3(pptr));
+            }
+        }
+
+        break;
+    case 3: /* Inclusive multicast ethernet tag route */
+    case 4: /* Ethernet segment route */
+        ND_PRINT("\n\t\tRD: %s", bgp_vpn_rd_print(ndo, pptr));
+        pptr += 8;
+        plen -= 8;
+
+        if (ptype == 3) {
+            ND_PRINT("\n\t\tEthernet Tag: 0x%08x", GET_BE_U_4(pptr));
+            pptr += 4;
+            plen -= 4;
+        } else if (ptype == 4) {
+            ND_PRINT("\n\t\tEthernet Segment ID: %s", bgp_evpn_esi_print(ndo, pptr));
+            pptr += 10;
+            plen -= 10;
+        }
+
+        iplen = GET_U_1(pptr);
+        pptr++;
+        plen--;
+
+        ND_PRINT("\n\t\tOriginating Router: ");
+
+        if ((plen * 8) < iplen) { /* iplen is in bits */
+            ND_PRINT("(ran past the end)");
+        } else if (iplen == (sizeof(nd_ipv4) * 8)) {
+            ND_PRINT("%s", GET_IPADDR_STRING(pptr));
+        } else if (iplen == (sizeof(nd_ipv6) * 8)) {
+            ND_PRINT("%s", GET_IP6ADDR_STRING(pptr));
+        } else {
+            ND_PRINT("(illegal address length)");
+        }
+
+        break;
+    default:
+        ND_PRINT(" (no decoder)");
+        break;
+    }
+
+    return tlen;
+
+trunc:
+    return -2;
+}
+
 int
 decode_prefix6(netdissect_options *ndo,
                const u_char *pd, u_int itemlen, char *buf, size_t buflen)
@@ -1819,6 +1974,7 @@ bgp_mp_af_print(netdissect_options *ndo,
         case (AFNUM_L2VPN<<8 | SAFNUM_VPNMULTICAST):
         case (AFNUM_L2VPN<<8 | SAFNUM_VPNUNIMULTICAST):
         case (AFNUM_VPLS<<8 | SAFNUM_VPLS):
+        case (AFNUM_VPLS<<8 | SAFNUM_EVPN):
             break;
         default:
             ND_TCHECK_LEN(tptr, tlen);
@@ -1920,6 +2076,11 @@ bgp_nlri_print(netdissect_options *ndo, uint16_t af, uint8_t safi,
             case (AFNUM_L2VPN<<8 | SAFNUM_VPNMULTICAST):
             case (AFNUM_L2VPN<<8 | SAFNUM_VPNUNIMULTICAST):
                 advance = print_labeled_vpn_l2(ndo, tptr);
+                if (advance == -2)
+                    goto trunc;
+                break;
+            case (AFNUM_VPLS<<8 | SAFNUM_EVPN):
+                advance = print_evpn_prefix(ndo, tptr, len);
                 if (advance == -2)
                     goto trunc;
                 break;
@@ -2248,6 +2409,24 @@ bgp_attr_print(netdissect_options *ndo,
                         tptr += (sizeof(nd_ipv4));
                         tlen -= (sizeof(nd_ipv4));
                         tnhlen -= (sizeof(nd_ipv4));
+                    }
+                    break;
+                case (AFNUM_VPLS<<8 | SAFNUM_EVPN):
+                    if (tnhlen < sizeof(nd_ipv4)) {
+                        ND_PRINT("invalid len");
+                        tptr += tnhlen;
+                        tlen -= tnhlen;
+                        tnhlen = 0;
+                    } else if (tnhlen >= sizeof(nd_ipv6)) {
+                        ND_PRINT("%s",GET_IP6ADDR_STRING(tptr));
+                        tptr += sizeof(nd_ipv6);
+                        tnhlen -= sizeof(nd_ipv6);
+                        tlen -= sizeof(nd_ipv6);
+                    } else {
+                        ND_PRINT("%s",GET_IPADDR_STRING(tptr));
+                        tptr += sizeof(nd_ipv4);
+                        tnhlen -= sizeof(nd_ipv4);
+                        tlen -= sizeof(nd_ipv4);
                     }
                     break;
                 case (AFNUM_NSAP<<8 | SAFNUM_UNICAST):
