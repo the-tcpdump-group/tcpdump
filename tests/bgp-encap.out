@@ -9,7 +9,10 @@
 	    encapsulation (0x030c), Flags [none]: Tunnel type: VXLAN
 	  Multi-Protocol Reach NLRI (14), length: 44, Flags [OE]: 
 	    AFI: VPLS (25), SAFI: EVPN (70)
-	    no AFI 25 / SAFI 70 decoder
-	    0x0000:  0019 4604 0404 0404 0002 2100 0104 0404
-	    0x0010:  0400 0400 0000 0000 0000 0000 0000 0000
-	    0x0020:  0030 0206 0a0e faf3 0000 0065
+	    nexthop: 4.4.4.4, nh-length: 4, no SNPA
+	      EVPN Route-Type: 2
+		RD: 4.4.4.4:4
+		Ethernet Segment ID: 00:00:00:00:00:00:00:00:00:00
+		Ethernet Tag: 0x00000000
+		MAC Address: 02:06:0a:0e:fa:f3
+		MPLS Label 1: 101
