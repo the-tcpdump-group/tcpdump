@@ -66,7 +66,7 @@
 #define ERSPAN2_INDEX_MASK	(0xfffffU << ERSPAN2_INDEX_SHIFT)
 
 void
-erspan_print_i_ii(netdissect_options *ndo, uint16_t flags, const u_char *bp, u_int len)
+erspan_i_ii_print(netdissect_options *ndo, uint16_t flags, const u_char *bp, u_int len)
 {
 	uint32_t hdr, ver, vlan, cos, en, sid, index;
 
@@ -198,7 +198,7 @@ static const struct tok erspan3_ft_values[] = {
 };
 
 void
-erspan_print_iii(netdissect_options *ndo, const u_char *bp, u_int len)
+erspan_iii_print(netdissect_options *ndo, const u_char *bp, u_int len)
 {
 	uint32_t hdr, hdr2, ver, cos, sid, ft;
 

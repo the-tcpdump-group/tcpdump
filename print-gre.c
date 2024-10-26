@@ -303,10 +303,10 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 		nsh_print(ndo, bp, len);
 		break;
 	case GRE_ERSPAN_I_II:
-		erspan_print_i_ii(ndo, flags, bp, len);
+		erspan_i_ii_print(ndo, flags, bp, len);
 		break;
 	case GRE_ERSPAN_III:
-		erspan_print_iii(ndo, bp, len);
+		erspan_iii_print(ndo, bp, len);
 		break;
 	case GRE_CDP:
 		cdp_print(ndo, bp, len);
