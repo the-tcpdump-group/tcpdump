@@ -78,6 +78,7 @@ build_script:
   #
   # Appveyor defaults to cmd.exe, so use cmd.exe syntax.
   #
+  - git show --oneline -s
   - type NUL >.devel
   - md build
   - cd build
