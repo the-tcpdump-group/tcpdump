@@ -593,6 +593,7 @@ erspan-type-ii-2	erspan-type-ii-2.pcap	erspan-type-ii-2.out	-v
 erspan-type-ii-3	erspan-type-ii-3.pcap	erspan-type-ii-3.out	-v
 erspan-type-iii-ft-0	erspan-type-iii-ft-0.pcap	erspan-type-iii-ft-0.out	-v
 erspan-type-iii-ft-7	erspan-type-iii-ft-7.pcap	erspan-type-iii-ft-7.out	-v
+erspan-type-iii-pb-1	erspan-type-iii-pb-1.pcap	erspan-type-iii-pb-1.out	-v
 
 # bad packets from Hanno Böck
 # heap-overflow-1 is in non-bsd.tests

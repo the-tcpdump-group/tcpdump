@@ -1,0 +1,2 @@
+    1  1972-02-16 17:25:18.554240 IP6 (class 0x30, flowlabel 0x00001, hlim 1, next-header unknown (60), payload length 288) 4120:7467:1700:4200:143:100:7f01:400e > 4591:bfd7:cd87:d7:68:38:101:e800: DSTOPT (padn)(pad1)(padn)(opt_type 0x40: len=1)(pad1)(opt_type 0x7f: len=0)(pad1)(pad1) GREv0, Flags [sequence# present, source routing present], seq 4280811777, length 272
+	erspan type3 session 0 bso Short cos 0 ft Ethernet [|erspan]
