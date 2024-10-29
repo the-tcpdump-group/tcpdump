@@ -1553,8 +1553,123 @@ main(int argc, char **argv)
 	 *
 	 * See https://npcap.com/guide/npcap-devguide.html#npcap-feature-native-dll-implicitly
 	 */
-	if (!SetDllDirectoryA("C:\\Windows\\System32\\Npcap"))
+	WCHAR *dll_directory = NULL;
+	size_t dll_directory_buf_len = 0;	/* units of bytes */
+	UINT system_directory_buf_len = 0;	/* units of WCHARs */
+	UINT system_directory_len;		/* units of WCHARs */
+	static const WCHAR npcap[] = L"\\Npcap";
+
+	/*
+	 * Get the system directory path, in UTF-16, into a buffer that's
+	 * large enough for that directory path plus "\Npcap".
+	 *
+	 * String manipulation in C, plus fetching a variable-length
+	 * string into a buffer whose size is fixed at the time of
+	 * the call, with an oddball return value (see below), is just
+	 * a huge bag of fun.
+	 *
+	 * And it's even more fun when dealing with UTF-16, so that the
+	 * buffer sizes used in GetSystemDirectoryW() are in different
+	 * units from the buffer sizes used in realloc()!   We maintain
+	 * all sizes/length in units of bytes, not WCHARs, so that our
+	 * heads don't explode.
+	 */
+	for (;;) {
+		/*
+		 * Try to fetch the system directory.
+		 *
+		 * GetSystemDirectoryW() expects a buffer size in units
+		 * of WCHARs, not bytes, and returns a directory path
+		 * length in units of WCHARs, not bytes.
+		 *
+		 * For extra fun, if GetSystemDirectoryW() succeeds,
+		 * the return value is the length of the directory
+		 * path in units of WCHARs, *not* including the
+		 * terminating '\0', but if it fails because the
+		 * path string wouldn't fit, the return value is
+		 * the length of the directory path in units of WCHARs,
+		 * *including* the terminating '\0'.
+		 */
+		system_directory_len = GetSystemDirectoryW(dll_directory,
+		    system_directory_buf_len);
+		if (system_directory_len == 0)
+			error("GetSystemDirectoryW() failed");
+
+		/*
+		 * Did the directory path fit in the buffer?
+		 *
+		 * As per the above, this means that the return value
+		 * *plus 1*, so that the terminating '\0' is counted,
+		 * is <= the buffer size.
+		 *
+		 * (If the directory path, complete with the terminating
+		 * '\0', fits *exactly*, the return value would be the
+		 * size of the buffer minus 1, as it doesn't count the
+		 * terminating '\0', so the test below would succeed.
+		 *
+		 * If everything *but* the terminating '\0' fits,
+		 * the return value would be the size of the buffer + 1,
+		 * i.e., the size that the string in question would
+		 * have required.
+		 *
+		 * The astute reader will note that returning the
+		 * size of the buffer is not one of the two cases
+		 * above, and should never happen.)
+		 */
+		if ((system_directory_len + 1) <= system_directory_buf_len) {
+			/*
+			 * No.  We have a buffer that's large enough
+			 * for our purposes.
+			 */
+			break;
+		}
+
+		/*
+		 * Yes.  Grow the buffer.
+		 *
+		 * The space we'll need in the buffer for the system
+		 * directory, in units of WCHARs, is system_directory_len,
+		 * as that's the length of the system directory path
+		 * including the terminating '\0'.
+		 */
+		system_directory_buf_len = system_directory_len;
+
+		/*
+		 * The size of the DLL directory buffer, in *bytes*, must
+		 * be the number of WCHARs taken by the system directory,
+		 * *minus* the terminating '\0' (as we'll overwrite that
+		 * with the "\" of the "\Npcap" string), multiplied by
+		 * sizeof(WCHAR) to convert it to the number of bytes,
+		 * plus the size of the "\Npcap" string, in bytes (which
+		 * will include the terminating '\0', as that will become
+		 * the DLL path's terminating '\0').
+		 */
+		dll_directory_buf_len =
+		    ((system_directory_len - 1)*sizeof(WCHAR)) + sizeof npcap;
+		dll_directory = realloc(dll_directory, dll_directory_buf_len);
+		if (dll_directory == NULL)
+			error("Can't allocate string for Npcap directory");
+	}
+
+	/*
+	 * OK, that worked.
+	 *
+	 * Now append \Npcap.  We add the length of the system directory path,
+	 * in WCHARs, *not* including the terminating '\0' (which, since
+	 * GetSystemDirectoryW() succeeded, is the return value of
+	 * GetSystemDirectoryW(), as per the above), to the pointer to the
+	 * beginning of the path, to go past the end of the system directory
+	 * to point to the terminating '\0'.
+	 */
+	memcpy(dll_directory + system_directory_len, npcap, sizeof npcap);
+
+	/*
+	 * Now add that as a system DLL directory.
+	 */
+	if (!SetDllDirectoryW(dll_directory))
 		error("SetDllDirectory failed");
+
+	free(dll_directory);
 #endif
 
 	/*
