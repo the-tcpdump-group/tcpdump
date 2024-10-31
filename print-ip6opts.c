@@ -220,10 +220,11 @@ hbhopt_process(netdissect_options *ndo, const u_char *bp, int *found_jumbo,
     const struct ip6_hbh *dp = (const struct ip6_hbh *)bp;
     u_int hbhlen = 0;
 
-    ndo->ndo_protocol = "hbhopt";
+    ndo->ndo_protocol = "hbh";
     hbhlen = (GET_U_1(dp->ip6h_len) + 1) << 3;
     ND_TCHECK_LEN(dp, hbhlen);
-    ND_PRINT("HBH ");
+    nd_print_protocol_caps(ndo);
+    ND_PRINT(" ");
     if (ip6_opt_process(ndo, (const u_char *)dp + sizeof(*dp),
 			hbhlen - sizeof(*dp), found_jumbo, jumbolen) == -1)
 	goto trunc;
@@ -243,7 +244,8 @@ dstopt_process(netdissect_options *ndo, const u_char *bp)
     ndo->ndo_protocol = "dstopt";
     dstoptlen = (GET_U_1(dp->ip6d_len) + 1) << 3;
     ND_TCHECK_LEN(dp, dstoptlen);
-    ND_PRINT("DSTOPT ");
+    nd_print_protocol_caps(ndo);
+    ND_PRINT(" ");
     if (ndo->ndo_vflag) {
 	/*
 	 * The Jumbo Payload option is a hop-by-hop option; we don't
