@@ -64,4 +64,4 @@
    24  2011-04-07 19:45:35.388520 IP6 (hlim 64, next-header UDP (17), payload length 188) fe80::3428:af91:251:d626.5359 > fe80::68d3:1235:d068:1f9e.5359: [udp sum ok] AHCP Version 1
 	Hopcount 1, Original Hopcount 1, Nonce 0xcbb83d0d, Source Id 79:40:14:7f:b6:6d:c3:29, Destination Id 02:18:f3:ff:fe:a9:91:4e
 	Ack, Length 152
-   25  2011-04-07 19:45:35.537445 IP6 (hlim 1, next-header Options (0), payload length 56) fe80::68d3:1235:d068:1f9e > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 2 group record(s) [gaddr ff02::1:6 to_ex, 0 source(s)] [gaddr ff02::cca6:c0f9:e182:5359 to_ex, 0 source(s)]
+   25  2011-04-07 19:45:35.537445 IP6 (hlim 1, next-header HBH (0), payload length 56) fe80::68d3:1235:d068:1f9e > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 2 group record(s) [gaddr ff02::1:6 to_ex, 0 source(s)] [gaddr ff02::cca6:c0f9:e182:5359 to_ex, 0 source(s)]
