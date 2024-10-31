@@ -80,6 +80,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
            if the verbose level is > 1 (option -vv and more).
       TCP: Note if the Acknowledgment Number is non-zero while ACK flag not set,
            if the verbose level is > 1 (option -vv and more).
+      IP: Fix setting the snapshot length for the payload.
     Source code:
       Fix '-tt' option printing when time > 2106-02-07T06:28:15Z.
     Windows:
