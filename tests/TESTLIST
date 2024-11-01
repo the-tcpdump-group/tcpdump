@@ -39,9 +39,11 @@ tcp-handshake-nano-tttt tcp-handshake-nano.pcap tcp-handshake-nano-tttt.out -ttt
 tcp-handshake-nano-ttttt tcp-handshake-nano.pcap tcp-handshake-nano-ttttt.out -ttttt -q --nano SPECIAL_t
 
 # TCP with data in the RST segment
-tcp_rst_data tcp_rst_data.pcap tcp_rst_data.out -v
+tcp_rst_data tcp_rst_data.pcap tcp_rst_data-v.out -v
+tcp_rst_data tcp_rst_data.pcap tcp_rst_data.out
 # TCP with data in the RST segment, truncated example
-tcp_rst_data-trunc tcp_rst_data-trunc.pcap tcp_rst_data-trunc.out -v
+tcp_rst_data-trunc tcp_rst_data-trunc.pcap tcp_rst_data-trunc-v.out -v
+tcp_rst_data-trunc tcp_rst_data-trunc.pcap tcp_rst_data-trunc.out
 
 # TCP
 tcp_eight_lowest_weight_flags_set tcp_eight_lowest_weight_flags_set.pcap tcp_eight_lowest_weight_flags_set.out
