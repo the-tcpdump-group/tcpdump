@@ -729,8 +729,11 @@ tcp_print(netdissect_options *ndo,
                 nd_trunc_longjmp(ndo);
         }
         bp += header_len;
-        if ((flags & TH_RST) && ndo->ndo_vflag) {
-                print_tcp_rst_data(ndo, bp, length);
+        if (flags & TH_RST) {
+                if(ndo->ndo_vflag)
+                        print_tcp_rst_data(ndo, bp, length);
+                else
+                        ND_TCHECK_LEN(bp, length);
                 return;
         }
 
