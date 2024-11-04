@@ -301,9 +301,11 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	ND_TCHECK_SIZE(ip6);
 
 	/*
-	 * Cut off the snapshot length to the end of the IP payload.
+	 * Cut off the snapshot length to the end of the IP payload
+	 * or the end of the data in which it's contained, whichever
+	 * comes first.
 	 */
-	if (!nd_push_snaplen(ndo, bp, len)) {
+	if (!nd_push_snaplen(ndo, bp, ND_MIN(length, len))) {
 		(*ndo->ndo_error)(ndo, S_ERR_ND_MEM_ALLOC,
 			"%s: can't push snaplen on buffer stack", __func__);
 	}
