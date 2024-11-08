@@ -52,7 +52,7 @@ macos_task:
   name: macos-aarch64
   only_if: $CIRRUS_BRANCH != 'coverity_scan'
   macos_instance:
-    image: ghcr.io/cirruslabs/macos-ventura-xcode:14.1 # macOS 13 with Xcode 14.1
+    image: ghcr.io/cirruslabs/macos-runner:sonoma # last 3 versions of Xcode
   env:
     MAKEFLAGS: '-j 4'
   script:
