@@ -81,7 +81,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       TCP: Note if the Acknowledgment Number is non-zero while ACK flag not set,
            if the verbose level is > 1 (option -vv and more).
       TCP: Fix Reset segment processing.
-      IP: Fix setting the snapshot length for the payload.
+      IP, IPv6: Fix setting the snapshot length for the payload.
       PTP: Remove spaces before colons in output.
       PTP: Fix management packet fields.
     Source code:
@@ -92,6 +92,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
         issue #1226).
     Building and testing:
       Makefile.in: Use a local libpcap in the releasecheck target.
+      CMake: Fix build with CMake 3.31.
 
 Friday, August 30, 2024 / The Tcpdump Group
   Summary for 4.99.5 tcpdump release
