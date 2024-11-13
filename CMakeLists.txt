@@ -13,14 +13,21 @@ else(WIN32)
     #  on a "long-term support" version # of some OS and that
     #  version supplies an older version of CMake;
     #
-    #  otherwise, require 3.5, so we don't get messages warning
-    #  that support for versions of CMake lower than 3.5 is
+    #  otherwise, if it's a version less than 3.10, require only
+    #  3.10, just in case somebody is configuring with CMake
+    #  on a "long-term support" version # of some OS and that
+    #  version supplies an older version of CMake;
+    #
+    #  otherwise, require 3.10, so we don't get messages warning
+    #  that support for versions of CMake lower than 3.10 is
     #  deprecated.
     #
     if(CMAKE_VERSION VERSION_LESS "3.5")
         cmake_minimum_required(VERSION 2.8.12)
-    else()
+    elseif(CMAKE_VERSION VERSION_LESS "3.10")
         cmake_minimum_required(VERSION 3.5)
+    else()
+        cmake_minimum_required(VERSION 3.10)
     endif()
 endif(WIN32)
 
