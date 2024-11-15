@@ -32,6 +32,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       OSPF: Print more truncation indications
       OSPF: Add more length checks
       SLL2: Translate interface indices to names on Linux only.
+      RT6: Add a bounds check for the PadN TLV in Segment Routing Header.
       TCP: Add support for the AE (AccECN) flag.
     User interface:
       Add optional unit suffix on -C file size.
