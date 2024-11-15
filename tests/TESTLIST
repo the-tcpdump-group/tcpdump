@@ -392,6 +392,7 @@ ipv6-srh-tlv-hmac ipv6-srh-tlv-hmac.pcap ipv6-srh-tlv-hmac.out
 ipv6-srh-tlv-hmac-v ipv6-srh-tlv-hmac.pcap ipv6-srh-tlv-hmac-v.out -v
 ipv6-srh-tlv-pad1-padn-5 ipv6-srh-tlv-pad1-padn-5.pcap ipv6-srh-tlv-pad1-padn-5.out
 ipv6-srh-tlv-pad1-padn-5-v ipv6-srh-tlv-pad1-padn-5.pcap ipv6-srh-tlv-pad1-padn-5-v.out -v
+ipv6-srh-tlv-pad1-padn-5-trunc ipv6-srh-tlv-pad1-padn-5-trunc.pcap ipv6-srh-tlv-pad1-padn-5-trunc.out
 ipv6_invalid_length ipv6_invalid_length.pcap ipv6_invalid_length.out
 ipv6_invalid_length_2 ipv6_invalid_length_2.pcap ipv6_invalid_length_2.out -v
 ipv6_jumbogram_invalid_length ipv6_jumbogram_invalid_length.pcap ipv6_jumbogram_invalid_length.out -v
