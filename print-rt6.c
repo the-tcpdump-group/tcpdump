@@ -25,6 +25,7 @@
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -65,6 +66,7 @@ srh_tlv_print(netdissect_options *ndo, const u_char *p, u_int bytes_left)
 		case IPV6_SRH_TLV_PADN:
 			ND_ICHECKMSG_U("PadN length", tlv_len, >, 5); /* RFC 8754 */
 			ND_ICHECKMSG_U("remaining length", bytes_left, <, tlv_len);
+			ND_TCHECK_LEN(p, tlv_len);
 			p += tlv_len;
 			bytes_left -= tlv_len;
 			break;
