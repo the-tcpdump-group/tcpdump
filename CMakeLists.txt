@@ -14,7 +14,7 @@ else(WIN32)
     #  version supplies an older version of CMake;
     #
     #  otherwise, if it's a version less than 3.10, require only
-    #  3.10, just in case somebody is configuring with CMake
+    #  3.5, just in case somebody is configuring with CMake
     #  on a "long-term support" version # of some OS and that
     #  version supplies an older version of CMake;
     #
