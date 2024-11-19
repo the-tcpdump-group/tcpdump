@@ -2,29 +2,17 @@
 
 * Autoconf works everywhere.
 
-## OmniOS r151048/AMD64
+## OmniOS r151052/AMD64
 
 * Both system and local libpcap are suitable.
-* CMake 3.29.0 works
-* GCC 13.2.0 and Clang 17.0.6 work.
+* CMake 3.30.5 works.
+* GCC 14.2.0 and Clang 19.1.2 work.
 
 ## OmniOS r151046/AMD64
 
 * Both system and local libpcap are suitable.
 * CMake 3.26.4 works
 * GCC 12.2.0 and Clang 16.0.4 work.
-
-## OmniOS r151044/AMD64
-
-* Both system and local libpcap are suitable.
-* CMake 3.25.2 works.
-* GCC 12.2.0 and Clang 15.0.7 work.
-
-## OmniOS r151042/AMD64
-
-* Both system and local libpcap are suitable.
-* CMake 3.23.1 works.
-* GCC 11.2.0 and Clang 14.0.3 work.
 
 ## OpenIndiana 2023.10/AMD64
 
