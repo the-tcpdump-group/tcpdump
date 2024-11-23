@@ -46,7 +46,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Remove unused missing/snprintf.c.
       Remove unused missing/strdup.c.
       (FIXME: somebody please wrap the line below just before the release)
-      AODV, AppleTalk, BOOTP, CHDLC, DCCP, EAP, EGP, EIGRP, ForCES, Geneve, GRE, ICMP, Juniper, L2TP, mobile, MSDP, NetFlow, NFLOG, NTP, OLSR, pflog, PGM, RADIUS, RIP, RSVP, SCTP, SNMP, TCP, UDP, vsock: Modernize packet parsing style
+      AODV, AppleTalk, BOOTP, CHDLC, DCCP, EAP, EGP, EIGRP, ForCES, Geneve, GRE, ICMP, Juniper, L2TP, LISP, mobile, MSDP, NetFlow, NFLOG, NTP, OLSR, pflog, PGM, RADIUS, RIP, RSVP, SCTP, SNMP, TCP, UDP, vsock: Modernize packet parsing style
       DCCP, EGP: Replace custom code with tok2str()
       UDP: Clean up address and port printing.
       AppleTalk: Declutter appletalk.h.
