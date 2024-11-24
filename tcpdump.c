@@ -258,6 +258,12 @@ static const struct tok status_flags[] = {
 #ifdef PCAP_IF_WIRELESS
 	{ PCAP_IF_WIRELESS, "Wireless" },
 #endif
+#ifdef PCAP_IF_NO_INJECT
+	{ PCAP_IF_NO_INJECT, "NoInject" },
+#endif
+#ifdef PCAP_IF_NO_CAPTURE
+	{ PCAP_IF_NO_CAPTURE, "NoCapture" },
+#endif
 	{ 0, NULL }
 };
 
@@ -470,8 +476,25 @@ show_devices_and_exit(void)
 
 	if (pcap_findalldevs(&devlist, ebuf) < 0)
 		error("%s", ebuf);
-	for (i = 0, dev = devlist; dev != NULL; i++, dev = dev->next) {
+	for (i = 0, dev = devlist; dev != NULL; dev = dev->next) {
+		/*
+		 * If PCAP_IF_NO_CAPTURE is set, do not count the device and
+		 * print it without a number.
+		 */
+#ifdef PCAP_IF_NO_CAPTURE
+		if (dev->flags & PCAP_IF_NO_CAPTURE)
+			printf("%s %s",
+			    i > 999  ? "    " :
+			    i > 99  ? "   " :
+			    i > 9 ? "  " :
+			    " ",
+			    dev->name
+			);
+		else
+			printf("%d.%s", i+1, dev->name);
+#else
 		printf("%d.%s", i+1, dev->name);
+#endif // PCAP_IF_NO_CAPTURE
 		if (dev->description != NULL)
 			printf(" (%s)", dev->description);
 		if (dev->flags != 0) {
@@ -519,6 +542,11 @@ show_devices_and_exit(void)
 			printf("]");
 		}
 		printf("\n");
+#ifdef PCAP_IF_NO_CAPTURE
+		if (dev->flags & PCAP_IF_NO_CAPTURE)
+			continue;
+#endif // PCAP_IF_NO_CAPTURE
+		i++;
 	}
 	pcap_freealldevs(devlist);
 	exit_tcpdump(S_SUCCESS);
@@ -1172,10 +1200,18 @@ _U_
 		error("%s", ebuf);
 	/*
 	 * Look for the devnum-th entry in the list of devices (1-based).
+	 * Do not count devices that have PCAP_IF_NO_CAPTURE set, consistently
+	 * with show_devices_and_exit().
 	 */
-	for (i = 0, dev = devlist; i < devnum-1 && dev != NULL;
-	    i++, dev = dev->next)
-		;
+	for (i = 0, dev = devlist; dev != NULL; dev = dev->next) {
+#ifdef PCAP_IF_NO_CAPTURE
+		if (dev->flags & PCAP_IF_NO_CAPTURE)
+			continue;
+#endif // PCAP_IF_NO_CAPTURE
+		if (i == devnum - 1)
+			break;
+		i++;
+	}
 	if (dev == NULL) {
 		pcap_freealldevs(devlist);
 		error("Invalid adapter index %ld: only %ld interfaces found",

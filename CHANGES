@@ -55,6 +55,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
         and use them rather than custom code
       Disregard setlinebuf(3), always use setvbuf(3).
       Change Sun RPC code licence to BSD-3-Clause.
+      Add support for no-capture and no-inject device flags.
     Building and testing:
       Autoconf: Remove detection of early IPv6 stacks.
       Detect OS IPv6 support using AF_INET6 only.
