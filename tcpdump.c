@@ -315,7 +315,7 @@ pcap_set_parser_debug(int value)
 }
 
 #define HAVE_PCAP_SET_PARSER_DEBUG
-#endif
+#endif // HAVE_PCAP_SET_PARSER_DEBUG, HAVE_PCAP_DEBUG, HAVE_YYDEBUG
 
 #if defined(HAVE_PCAP_SET_OPTIMIZER_DEBUG)
 /*
@@ -330,7 +330,7 @@ __declspec(dllimport)
 extern
 #endif /* _WIN32 */
 void pcap_set_optimizer_debug(int);
-#endif
+#endif // HAVE_PCAP_SET_OPTIMIZER_DEBUG
 
 static void NORETURN
 exit_tcpdump(const int status)
@@ -407,7 +407,7 @@ show_tstamp_types_and_exit(pcap_t *pc, const char *device)
 	pcap_free_tstamp_types(tstamp_types);
 	exit_tcpdump(S_SUCCESS);
 }
-#endif
+#endif // HAVE_PCAP_SET_TSTAMP_TYPE
 
 static void NORETURN
 show_dlts_and_exit(pcap_t *pc, const char *device)
@@ -515,7 +515,7 @@ show_devices_and_exit(void)
 					break;
 				}
 			}
-#endif
+#endif // PCAP_IF_WIRELESS
 			printf("]");
 		}
 		printf("\n");
@@ -900,7 +900,7 @@ tstamp_precision_to_string(int precision)
 		return "unknown";
 	}
 }
-#endif
+#endif // HAVE_PCAP_SET_TSTAMP_PRECISION
 
 #ifdef HAVE_CAPSICUM
 /*
@@ -970,7 +970,7 @@ set_dumper_capsicum_rights(pcap_dumper_t *p)
 		error("unable to limit dump descriptor fcntls");
 	}
 }
-#endif
+#endif // HAVE_CAPSICUM
 
 /*
  * Copy arg vector into a new buffer, concatenating arguments with spaces.
@@ -1166,7 +1166,7 @@ _U_
 		status = pcap_findalldevs_ex(host_url, NULL, &devlist, ebuf);
 		free(host_url);
 	} else
-#endif
+#endif // HAVE_PCAP_FINDALLDEVS_EX
 	status = pcap_findalldevs(&devlist, ebuf);
 	if (status < 0)
 		error("%s", ebuf);
@@ -1367,7 +1367,7 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 			    "and use %s as the tcpdump interface",
 			    device, newdev, parent, newdev);
 		}
-#endif
+#endif // __FreeBSD__
 		else
 			error("%s: %s", device,
 			    pcap_statustostr(status));
@@ -1589,7 +1589,7 @@ main(int argc, char **argv)
 		error("SetDllDirectory failed");
 
 	free(dll_directory);
-#endif
+#endif // _WIN32
 
 	/*
 	 * Initialize the netdissect code.
