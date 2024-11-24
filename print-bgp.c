@@ -1324,26 +1324,6 @@ trunc:
     return -2;
 }
 
-/*
- * As I remember, some versions of systems have an snprintf() that
- * returns -1 if the buffer would have overflowed.  If the return
- * value is negative, set buflen to 0, to indicate that we've filled
- * the buffer up.
- *
- * If the return value is greater than buflen, that means that
- * the buffer would have overflowed; again, set buflen to 0 in
- * that case.
- */
-#define UPDATE_BUF_BUFLEN(buf, buflen, stringlen) \
-    if (stringlen<0) \
-        buflen=0; \
-    else if ((u_int)stringlen>buflen) \
-        buflen=0; \
-    else { \
-        buflen-=stringlen; \
-        buf+=stringlen; \
-    }
-
 static int
 print_labeled_vpn_l2(netdissect_options *ndo, const u_char *pptr)
 {
