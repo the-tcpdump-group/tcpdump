@@ -3321,7 +3321,7 @@ print_usage(FILE *f)
 	(void)fprintf(f,
 "\t\t[ --print-sampling nth ] [ -Q in|out|inout ] [ -r file ]\n");
 	(void)fprintf(f,
-"\t\t[ -s snaplen ] [ -T type ] [ --version ]\n");
+"\t\t[ -s snaplen ] [ --skip count ] [ -T type ] [ --version ]\n");
 	(void)fprintf(f,
 "\t\t[ -V file ] [ -w file ] [ -W filecount ] [ -y datalinktype ]\n");
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
