@@ -265,6 +265,11 @@ special privileges.
 .B \-A
 Print each packet (minus its link level header) in ASCII.  Handy for
 capturing web pages.
+No effect when
+.B \-x[x]
+or
+.B \-X[X]
+options are used.
 .TP
 .B \-b
 Print the AS number in BGP packets using "asdot" rather than "asplain"
@@ -952,6 +957,9 @@ required padding.
 In the current implementation this flag may have the same effect as
 .B \-xx
 if the packet is truncated.
+No effect when
+.B \-X[X]
+option is used.
 .TP
 .B \-xx
 When parsing and printing,
@@ -959,6 +967,9 @@ in addition to printing the headers of each packet, print the data of
 each packet,
 .I including
 its link level header, in hex.
+No effect when
+.B \-X[X]
+option is used.
 .TP
 .B \-X
 When parsing and printing,
