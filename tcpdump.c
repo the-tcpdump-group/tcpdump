@@ -2125,6 +2125,13 @@ main(int argc, char **argv)
 			/* NOTREACHED */
 		}
 
+	if (ndo->ndo_Aflag && ndo->ndo_xflag)
+		warning("-A and -x[x] are mutually exclusive. -A ignored.");
+	if (ndo->ndo_Aflag && ndo->ndo_Xflag)
+		warning("-A and -X[X] are mutually exclusive. -A ignored.");
+	if (ndo->ndo_xflag && ndo->ndo_Xflag)
+		warning("-x[x] and -X[X] are mutually exclusive. -x[x] ignored.");
+
 #ifdef HAVE_PCAP_FINDALLDEVS
 	if (Dflag)
 		show_devices_and_exit();
