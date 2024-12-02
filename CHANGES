@@ -10,6 +10,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       IP, IPv6: Fix setting the snapshot length for the payload.
       PTP: Remove spaces before colons in output.
       PTP: Fix management packet fields.
+    User interface:
+      Warn that options -A, -x[x] and -X[X] are mutually exclusive.
     Source code:
       Fix '-tt' option printing when time > 2106-02-07T06:28:15Z.
     Windows:
