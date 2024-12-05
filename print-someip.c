@@ -129,7 +129,7 @@ someip_print(netdissect_options *ndo, const u_char *bp, const u_int len)
 
     return_code = GET_U_1(bp);
     bp += 1;
-    ND_PRINT(", retcode %s\n",
+    ND_PRINT(", retcode %s",
 	     tok2str(return_code_values, "Unknown", return_code));
 
     return;
