@@ -268,14 +268,18 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		ND_PRINT("\n    %u record(s), ", record_count);
 		ND_PRINT("Authentication %s,",
 			 tok2str(auth_type, "unknown-type", key_id));
+		ND_ICHECKMSG_ZU("authentication data length", auth_data_len, >,
+				length - MAP_REGISTER_HDR_LEN);
 		hex_print(ndo, "\n    Authentication-Data: ",
 			  bp + packet_offset, auth_data_len);
 	} else {
 		ND_PRINT(" %u record(s),", record_count);
+		ND_ICHECKMSG_ZU("authentication data length", auth_data_len, >,
+				length - MAP_REGISTER_HDR_LEN);
 	}
 	packet_offset += auth_data_len;
 
-	ND_ICHECK_U(record_count, ==, 0);
+	ND_ICHECKMSG_U("record count", record_count, ==, 0);
 
 	/* Print all the EID records */
 	while ((length > packet_offset) && (record_count != 0)) {
@@ -310,6 +314,8 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			packet_offset += 16;
 			break;
 		default:
+			ND_PRINT(" [unsuported address family identifier %u]",
+				 eid_afi);
 			/*
 			 * No support for LCAF right now.
 			 */

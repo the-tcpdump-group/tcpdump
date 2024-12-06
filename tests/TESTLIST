@@ -556,6 +556,8 @@ lisp_ipv6_eid		lisp_ipv6.pcap		lisp_ipv6.out
 lisp_eid_notify-v	lisp_eid_notify.pcap	lisp_eid_notify-v.out	-v
 lisp_eid_register-v	lisp_eid_register.pcap	lisp_eid_register-v.out	-v
 lisp_ipv6_eid-v		lisp_ipv6.pcap		lisp_ipv6-v.out		-v
+lisp_invalid		lisp_invalid.pcap	lisp_invalid.out
+lisp_invalid-v		lisp_invalid.pcap	lisp_invalid-v.out	-v
 
 # NSH tests
 nsh                    nsh.pcap                nsh.out
