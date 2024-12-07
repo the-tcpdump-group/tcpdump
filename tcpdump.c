@@ -1827,7 +1827,7 @@ main(int argc, char **argv)
 			 * Will multiplying it by multiplier overflow?
 			 */
 #ifdef HAVE_PCAP_DUMP_FTELL64
-			if (Cflag > INT64_T_CONSTANT(0x7fffffffffffffff) / Cflagmult)
+			if (Cflag > INT64_MAX / Cflagmult)
 #else
 			if (Cflag > LONG_MAX / Cflagmult)
 #endif
