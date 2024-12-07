@@ -26,7 +26,7 @@
 
 #include "extract.h"
 
-#define	JAN_1970	INT64_T_CONSTANT(2208988800)	/* 1970 - 1900 in seconds */
+#define	JAN_1970	INT64_C(2208988800)	/* 1970 - 1900 in seconds */
 
 void
 p_ntp_time_fmt(netdissect_options *ndo, const char *fmt,
