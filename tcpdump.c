@@ -2056,7 +2056,7 @@ main(int argc, char **argv)
 
 		case OPTION_SKIP:
 			packets_skipped = parse_u_int("packet skip count",
-			    optarg, NULL, 1, UINT_MAX, 0);
+			    optarg, NULL, 0, INT_MAX, 0);
 			break;
 
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
@@ -2096,6 +2096,12 @@ main(int argc, char **argv)
 		warning("-A and -X[X] are mutually exclusive. -A ignored.");
 	if (ndo->ndo_xflag && ndo->ndo_Xflag)
 		warning("-x[x] and -X[X] are mutually exclusive. -x[x] ignored.");
+
+	if (cnt != -1)
+		if ((int)packets_skipped > (INT_MAX - cnt))
+			// cnt + (int)packets_skipped used in pcap_loop() call
+			error("Overflow (-c count) %d + (--skip count) %d", cnt,
+			      (int)packets_skipped);
 
 	if (Dflag)
 		show_devices_and_exit();
@@ -2693,7 +2699,7 @@ DIAG_ON_ASSIGN_ENUM
 
 	do {
 		status = pcap_loop(pd,
-				   cnt + (cnt == -1 ? 0 : packets_skipped),
+				   (cnt == -1 ? -1 : cnt + (int)packets_skipped),
 				   callback, pcap_userdata);
 		if (WFileName == NULL) {
 			/*
