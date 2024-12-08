@@ -165,11 +165,7 @@ The Regents of the University of California.  All rights reserved.\n";
 #endif
 
 static int Bflag;			/* buffer size */
-#ifdef HAVE_PCAP_DUMP_FTELL64
 static int64_t Cflag;			/* rotate dump files after this many bytes */
-#else
-static long Cflag;			/* rotate dump files after this many bytes */
-#endif
 static int Cflag_count;			/* Keep track of which file number we're writing */
 static int Dflag;			/* list available devices and exit */
 #ifdef HAVE_PCAP_FINDALLDEVS_EX
@@ -219,6 +215,12 @@ static int infoprint;
 char *program_name;
 
 /* Forwards */
+static int parse_int(const char *argname, const char *string, char **endp,
+    int minval, int maxval, int base);
+static u_int parse_u_int(const char *argname, const char *string, char **endp,
+    u_int minval, u_int maxval, int base);
+static int64_t parse_int64(const char *argname, const char *string,
+    char **endp, int64_t minval, int64_t maxval, int base);
 static void (*setsignal (int sig, void (*func)(int)))(int);
 static void cleanup(int);
 static void child_cleanup(int);
@@ -1422,7 +1424,6 @@ main(int argc, char **argv)
 	const char *chroot_dir = NULL;
 #endif
 	char *ret = NULL;
-	char *end;
 	pcap_if_t *devlist;
 	long devnum;
 	int status;
@@ -1645,26 +1646,24 @@ main(int argc, char **argv)
 			break;
 
 		case 'B':
-			Bflag = atoi(optarg)*1024;
-			if (Bflag <= 0)
-				error("invalid packet buffer size %s", optarg);
+			Bflag = parse_int("packet buffer size", optarg, NULL, 1,
+			    INT_MAX, 10);
+			/*
+			 * Will multiplying it by 1024 overflow?
+			 */
+			if (Bflag > INT_MAX / 1024)
+				error("packet buffer size %s is too large", optarg);
+			Bflag *= 1024;
 			break;
 
 		case 'c':
-			cnt = atoi(optarg);
-			if (cnt <= 0)
-				error("invalid packet count %s", optarg);
+			cnt = parse_int("packet count", optarg, NULL, 1,
+			    INT_MAX, 10);
 			break;
 
 		case 'C':
-			errno = 0;
-#ifdef HAVE_PCAP_DUMP_FTELL64
-			Cflag = strtoint64_t(optarg, &endp, 10);
-#else
-			Cflag = strtol(optarg, &endp, 10);
-#endif
-			if (endp == optarg || errno != 0 || Cflag <= 0)
-				error("invalid file size %s", optarg);
+			Cflag = parse_int64("file size", optarg, &endp, 1,
+			    INT64_MAX, 10);
 
 			if (*endp == '\0') {
 				/*
@@ -1709,7 +1708,7 @@ main(int argc, char **argv)
 					break;
 
 				default:
-					error("invalid file size %s", optarg);
+					error("invalid file size %s (invalid units)", optarg);
 				}
 
 				/*
@@ -1720,7 +1719,7 @@ main(int argc, char **argv)
 				endp++;
 				if (*endp != '\0') {
 					/* Yes - error */
-					error("invalid file size %s", optarg);
+					error("invalid file size %s (invalid units)", optarg);
 				}
 			}
 
@@ -1774,9 +1773,8 @@ main(int argc, char **argv)
 			break;
 
 		case 'G':
-			Gflag = atoi(optarg);
-			if (Gflag < 0)
-				error("invalid number of seconds %s", optarg);
+			Gflag = parse_int("number of seconds", optarg, NULL, 0,
+			    INT_MAX, 10);
 
                         /* We will create one file initially. */
                         Gflag_count = 0;
@@ -1895,11 +1893,8 @@ main(int argc, char **argv)
 			break;
 
 		case 's':
-			ndo->ndo_snaplen = (int)strtol(optarg, &end, 0);
-			if (optarg == end || *end != '\0'
-			    || ndo->ndo_snaplen < 0 || ndo->ndo_snaplen > MAXIMUM_SNAPLEN)
-				error("invalid snaplen %s (must be >= 0 and <= %d)",
-				      optarg, MAXIMUM_SNAPLEN);
+			ndo->ndo_snaplen = parse_int("snaplen", optarg, NULL,
+			    0, MAXIMUM_SNAPLEN, 0);
 			break;
 
 		case 'S':
@@ -1978,9 +1973,8 @@ main(int argc, char **argv)
 			break;
 
 		case 'W':
-			Wflag = atoi(optarg);
-			if (Wflag <= 0)
-				error("invalid number of output files %s", optarg);
+			Wflag = parse_int("number of output files", optarg,
+			    NULL, 1, INT_MAX, 10);
 			WflagChars = getWflagChars(Wflag);
 			break;
 
@@ -2056,17 +2050,13 @@ main(int argc, char **argv)
 		case OPTION_PRINT_SAMPLING:
 			print = 1;
 			++ndo->ndo_Sflag;
-			ndo->ndo_print_sampling = atoi(optarg);
-			if (ndo->ndo_print_sampling <= 0)
-				error("invalid print sampling %s", optarg);
+			ndo->ndo_print_sampling = parse_int("print sampling",
+			    optarg, NULL, 1, INT_MAX, 10);
 			break;
 
 		case OPTION_SKIP:
-			errno = 0;
-			packets_skipped = (u_int)strtoul(optarg, &end, 0);
-			if (optarg[0] == '-' || optarg == end || *end != '\0' ||
-			    errno != 0)
-				error("invalid packet skipped %s", optarg);
+			packets_skipped = parse_u_int("packet skip count",
+			    optarg, NULL, 1, UINT_MAX, 0);
 			break;
 
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
@@ -2827,6 +2817,134 @@ DIAG_ON_ASSIGN_ENUM
 	free(cmdbuf);
 	pcap_freecode(&fcode);
 	exit_tcpdump(status == -1 ? S_ERR_HOST_PROGRAM : S_SUCCESS);
+}
+
+/*
+ * Routines to parse numerical command-line arguments and check for
+ * errors, including "too large for that type".
+ */
+static int
+parse_int(const char *argname, const char *string, char **endpp,
+    int minval, int maxval, int base)
+{
+	long val;
+	char *endp;
+
+	errno = 0;
+	val = strtol(string, &endp, base);
+
+	/*
+	 * Did it either not parse any of the string, find extra stuff
+	 * at the end that the caller isn't interested in, or get
+	 * another parsing error?
+	 */
+	if (string == endp || (endpp == NULL && *endp != '\0') ||
+	    (val == 0 && errno == EINVAL)) {
+		error("invalid %s \"%s\" (not a valid number)", argname,
+		    string);
+	}
+
+	/*
+	 * Did it get a value that's out of range?
+	 */
+	if (((val == LONG_MAX || val == LONG_MIN) && errno == ERANGE) ||
+	    val < minval || val > maxval) {
+		error("invalid %s %s (must be >= %d and <= %d)",
+		    argname, string, minval, maxval);
+	}
+
+	/*
+	 * OK, it passes all the tests.
+	 */
+	if (endpp != NULL)
+		*endpp = endp;
+	return ((int)val);
+}
+
+static u_int
+parse_u_int(const char *argname, const char *string, char **endpp,
+    u_int minval, u_int maxval, int base)
+{
+	unsigned long val;
+	char *endp;
+
+	errno = 0;
+
+	/*
+	 * strtoul() does *NOT* report an error if the string
+	 * begins with a minus sign. We do.
+	 */
+	if (*string == '-') {
+		error("invalid %s \"%s\" (not a valid unsigned number)",
+		    argname, string);
+	}
+
+	val = strtoul(string, &endp, base);
+
+	/*
+	 * Did it either not parse any of the string, find extra stuff
+	 * at the end that the caller isn't interested in, or get
+	 * another parsing error?
+	 */
+	if (string == endp || (endpp == NULL && *endp != '\0') ||
+	    (val == 0 && errno == EINVAL)) {
+		error("invalid %s \"%s\" (not a valid unsigned number)",
+		    argname, string);
+	}
+
+	/*
+	 * Did it get a value that's out of range?
+	 */
+	if ((val == ULONG_MAX && errno == ERANGE) ||
+	    val < minval || val > maxval) {
+		error("invalid %s %s (must be >= %u and <= %u)",
+		    argname, string, minval, maxval);
+	}
+
+	/*
+	 * OK, it passes all the tests.
+	 */
+	if (endpp != NULL)
+		*endpp = endp;
+	return ((u_int)val);
+}
+
+static int64_t
+parse_int64(const char *argname, const char *string, char **endpp,
+    int64_t minval, int64_t maxval, int base)
+{
+	intmax_t val;
+	char *endp;
+
+	errno = 0;
+	val = strtoimax(string, &endp, base);
+
+	/*
+	 * Did it either not parse any of the string, find extra stuff
+	 * at the end that the caller isn't interested in, or get
+	 * another parsing error?
+	 */
+	if (string == endp || (endpp == NULL && *endp != '\0') ||
+	    (val == 0 && errno == EINVAL)) {
+		error("invalid %s \"%s\" (not a valid number)", argname,
+		    string);
+	}
+
+	/*
+	 * Did it get a value that's out of range?
+	 */
+	if (((val == INTMAX_MAX || val == INTMAX_MIN) && errno == ERANGE) ||
+	    val < minval || val > maxval) {
+		error("invalid %s %s (must be >= %" PRId64 " and <= %" PRId64 ")",
+		    argname, string, minval, maxval);
+	}
+
+	/*
+	 * OK, it passes all the tests.
+	 */
+	if (endpp != NULL)
+		*endpp = endp;
+	return ((int64_t)val);
 }
 
 /*
