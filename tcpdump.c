@@ -1600,7 +1600,7 @@ main(int argc, char **argv)
 	memset(ndo, 0, sizeof(*ndo));
 	ndo_set_function_pointers(ndo);
 
-	cnt = -1;
+	cnt = 0;
 	device = NULL;
 	infile = NULL;
 	RFileName = NULL;
@@ -2703,7 +2703,7 @@ DIAG_ON_ASSIGN_ENUM
 
 	do {
 		status = pcap_loop(pd,
-				   cnt + (cnt == -1 ? 0 : packets_skipped),
+				   (cnt == 0 ? 0 : cnt + packets_skipped),
 				   callback, pcap_userdata);
 		if (WFileName == NULL) {
 			/*
