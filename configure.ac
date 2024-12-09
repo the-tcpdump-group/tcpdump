@@ -30,7 +30,16 @@ if test "$ac_cv_prog_cc_c99" = "no"; then
 fi
 AC_LBL_C_INIT(V_CCOPT, V_INCLS)
 
+#
+# Test for ONC RPC headers.
+#
+# XXX - we should supply copies of these, as I think Sun released them
+# under a sufficiently permissive license, and that would be one less
+# place where we rely on OS headers, rather than our own headers, for
+# a protocol that is specified independent of any particular OS.
+#
 AC_CHECK_HEADERS(rpc/rpc.h rpc/rpcent.h)
+
 #
 # Get the size of a void *, to know whether this is a 32-bit or 64-bit build.
 #

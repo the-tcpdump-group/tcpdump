@@ -444,7 +444,12 @@ check_type_size("time_t" SIZEOF_TIME_T)
 cmake_pop_check_state()
 
 #
-# Header files.
+# Test for ONC RPC headers.
+#
+# XXX - we should supply copies of these, as I think Sun released them
+# under a sufficiently permissive license, and that would be one less
+# place where we rely on OS headers, rather than our own headers, for
+# a protocol that is specified independent of any particular OS.
 #
 check_include_file(rpc/rpc.h HAVE_RPC_RPC_H)
 if(HAVE_RPC_RPC_H)
