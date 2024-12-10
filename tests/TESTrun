@@ -29,7 +29,6 @@ use POSIX qw( WEXITSTATUS WIFEXITED);
 use Cwd qw(abs_path getcwd);
 use File::Path qw(mkpath);   # mkpath works with ancient perl, as well as newer perl
 use File::Spec;
-use Data::Dumper;            # for debugging.
 
 # these are created in the directory where we are run, which might be
 # a build directory.
@@ -294,8 +293,6 @@ sub runtest {
         }
     }
 
-    #print sprintf("END: %08x\n", $r);
-
     if($r == 0) {
         if($linecount == 0) {
             printf "    %-40s: passed\n", $name;
@@ -368,12 +365,10 @@ sub loadconfighash {
     while(<CONFIG_H>) {
         chomp;
         if(/^\#define (.*) 1/) {
-            #print "Setting $1\n";
             $main::confighhash->{$1} = 1;
         }
     }
     close(CONFIG_H);
-    #print Dumper($main::confighhash);
 
     # also run tcpdump --fp-type to get the type of floating-point
     # arithmetic we're doing, setting a HAVE_{fptype} key based
@@ -425,7 +420,6 @@ sub runOneComplexTest {
     my $configset = $testconfig->{config_set};
     my $configunset = $testconfig->{config_unset};
     my $ch = loadconfighash();
-    #print Dumper($ch);
 
     if(defined($configset)) {
         $foundit = ($ch->{$configset} == 1);
@@ -445,9 +439,6 @@ sub runOneComplexTest {
         $skippedcount++;
         return 0;
     }
-
-    #use Data::Dumper;
-    #print Dumper($testconfig);
 
     # EXPAND any occurrences of @TESTDIR@ to $testsdir
     $options =~ s/\@TESTDIR\@/$testsdir/;
@@ -478,11 +469,8 @@ sub runComplexTests {
             $definitions = <FILE>;
         }
         close(FILE);
-        #print "STUFF: ${definitions}\n";
         eval $definitions;
         if(defined($testlist)) {
-            #use Data::Dumper;
-            #print Dumper($testlist);
             foreach $test (@$testlist) {
                 runOneComplexTest($test);
             }
@@ -503,12 +491,9 @@ sub runSimpleTests {
 
         unlink("core");
         ($name, $input, $output, @options) = split;
-        #print "processing ${only} vs ${name}\n";
         next if(defined($only) && $only ne $name);
 
         my $options = join(" ", @options);
-        #print "@{options} becomes ${options}\n";
-
         my $hash = { name => $name,
                      input=> $input,
                      output=>$output,
