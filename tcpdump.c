@@ -207,7 +207,7 @@ static int timeout = 1000;		/* default timeout = 1000 ms = 1 s */
 static int immediate_mode;
 #endif
 static int count_mode;
-static u_int packets_skipped;
+static u_int packets_to_skip;
 
 static int infodelay;
 static int infoprint;
@@ -2055,7 +2055,7 @@ main(int argc, char **argv)
 			break;
 
 		case OPTION_SKIP:
-			packets_skipped = parse_u_int("packet skip count",
+			packets_to_skip = parse_u_int("packet skip count",
 			    optarg, NULL, 0, INT_MAX, 0);
 			break;
 
@@ -2098,10 +2098,10 @@ main(int argc, char **argv)
 		warning("-x[x] and -X[X] are mutually exclusive. -x[x] ignored.");
 
 	if (cnt != -1)
-		if ((int)packets_skipped > (INT_MAX - cnt))
-			// cnt + (int)packets_skipped used in pcap_loop() call
+		if ((int)packets_to_skip > (INT_MAX - cnt))
+			// cnt + (int)packets_to_skip used in pcap_loop() call
 			error("Overflow (-c count) %d + (--skip count) %d", cnt,
-			      (int)packets_skipped);
+			      (int)packets_to_skip);
 
 	if (Dflag)
 		show_devices_and_exit();
@@ -2699,7 +2699,7 @@ DIAG_ON_ASSIGN_ENUM
 
 	do {
 		status = pcap_loop(pd,
-				   (cnt == -1 ? -1 : cnt + (int)packets_skipped),
+				   (cnt == -1 ? -1 : cnt + (int)packets_to_skip),
 				   callback, pcap_userdata);
 		if (WFileName == NULL) {
 			/*
@@ -3190,7 +3190,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 
 	dump_info = (struct dump_info *)user;
 
-	if (packets_captured <= packets_skipped)
+	if (packets_captured <= packets_to_skip)
 		return;
 
 	/*
@@ -3322,7 +3322,7 @@ dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 
 	dump_info = (struct dump_info *)user;
 
-	if (packets_captured <= packets_skipped)
+	if (packets_captured <= packets_to_skip)
 		return;
 
 	pcap_dump((u_char *)dump_info->pdd, h, sp);
@@ -3344,7 +3344,7 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 
 	++infodelay;
 
-	if (!count_mode && packets_captured > packets_skipped)
+	if (!count_mode && packets_captured > packets_to_skip)
 		pretty_print_packet((netdissect_options *)user, h, sp, packets_captured);
 
 	--infodelay;
