@@ -20,6 +20,14 @@
  */
 
 /* \summary: DECnet printer */
+/*
+ * specification: Section 10.0 MESSAGES
+ * DECnet Digital Network Architecture
+ * Phase IV
+ * Routing Layer Functional Specification
+ * Order No. AA-X435A-TK
+ * Version 2.0.0 December 1983
+ */
 
 #include <config.h>
 
@@ -480,6 +488,11 @@ decnet_print(netdissect_options *ndo,
 		goto invalid;
 	}
 
+	/*
+	 * This length does not seem to be in any specification, but it is present
+	 * in the test case packet capture, which is consistent with the Wireshark
+	 * protocol decoder.
+	 */
 	pktlen = GET_LE_U_2(ap);
 	if (pktlen < sizeof(struct shorthdr)) {
 		ND_PRINT(" (pktlen %u < %zu)", pktlen, sizeof(struct shorthdr));
