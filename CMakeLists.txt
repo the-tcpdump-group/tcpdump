@@ -409,16 +409,23 @@ endif(MSVC)
 # on an IA-32 or x86-64 Linux box for an Arm embedded Linux box,
 # or building Arm code on an IA-32 or x86-64 Windows box.
 #
-# At least for the Windows case, people may do those builds by
-# setting the target with th -A flag to CMake; that causes
-# CMAKE_GENERATOR_PLATFORM to be set to the target.  If
-# CMAKE_GENERATOR_PLATFORM is set, compare it with
-# CMAKE_HOST_SYSTEM_PROCESSOR and, if they're not equal, set
-# CMAKE_CROSSCOMPILING to TRUE.
+# So just test whether check_c_source_runs() on a trivial program
+# works; if not, it's probably because the generated code won't
+# run on the platform on which we're running.
 #
-if (CMAKE_GENERATOR_PLATFORM AND
-    NOT CMAKE_GENERATOR_PLATFORM STREQUAL CMAKE_HOST_SYSTEM_PROCESSOR)
-    set(CMAKE_CROSSCOMPILING TRUE)
+include(CheckCSourceRuns)
+if (NOT CMAKE_CROSSCOMPILING)
+    check_c_source_runs("
+    int main()
+    {
+        return 0;
+    }
+    "
+        CHECK_C_SOURCE_RUNS_WORKS
+    )
+    if (NOT CHECK_C_SOURCE_RUNS_WORKS)
+        set(CMAKE_CROSSCOMPILING TRUE)
+    endif()
 endif()
 
 ###################################################################
@@ -529,7 +536,6 @@ if (NOT CMAKE_CROSSCOMPILING)
     #
     # Require a proof of suitable snprintf(3), same as in Autoconf.
     #
-    include(CheckCSourceRuns)
     check_c_source_runs("
     #include <stdio.h>
     #include <string.h>
