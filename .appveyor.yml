@@ -15,14 +15,6 @@ install:
 
 environment:
   matrix:
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-      GENERATOR: "Visual Studio 14 2015"
-      PLATFORM: Win32
-      SDK: npcap-sdk-1.13
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-      GENERATOR: "Visual Studio 14 2015"
-      PLATFORM: x64
-      SDK: npcap-sdk-1.13
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       GENERATOR: "Visual Studio 15 2017"
       PLATFORM: Win32
