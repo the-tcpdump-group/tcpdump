@@ -58,6 +58,10 @@ macos_task:
   script:
     - brew update >/dev/null
     - brew install libsmi | grep -v '%'
+    # We need coreutils so that building, checking, and installing
+    # libpcap works, as *that* requires coreutils in order to
+    # install the timeout command in macOS.
+    - brew install coreutils
     - echo '$ git clone [...] libpcap.git'
     - git -C .. clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT}
     - ./build_matrix.sh
