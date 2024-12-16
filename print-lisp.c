@@ -314,7 +314,7 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			packet_offset += 16;
 			break;
 		default:
-			ND_PRINT(" [unsuported address family identifier %u]",
+			ND_PRINT(" [unsupported address family identifier %u]",
 				 eid_afi);
 			/*
 			 * No support for LCAF right now.
