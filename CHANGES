@@ -43,7 +43,6 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Drop support for building with versions of libpcap that don't
         support all the libpcap 1.0 APIs.
       Use %zu when printing a sizeof to squelch compiler warnings
-      Remove unused missing/snprintf.c.
       Remove unused missing/strdup.c.
       (FIXME: somebody please wrap the line below just before the release)
       AODV, AppleTalk, BOOTP, CHDLC, DCCP, EAP, EGP, EIGRP, ForCES, Geneve, GRE, ICMP, Juniper, L2TP, LISP, mobile, MSDP, NetFlow, NFLOG, NTP, OLSR, pflog, PGM, RADIUS, RIP, RSVP, SCTP, SNMP, TCP, UDP, vsock: Modernize packet parsing style
@@ -64,7 +63,6 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Make illumos build warning-free.
       Makefile.in: Update the .c.o build rule (Remove hacks for old SunOS 4).
       Autoconf: fix buggy tests for ether_ntohost().
-      CMake: Skip snprintf(3) tests when cross-compiling.
       Makefile.in: Do not install a version-suffixed tcpdump binary if the
         .devel file does not exists.
       tests: On HP-UX use "diff -c" by default.
@@ -89,6 +87,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Warn that options -A, -x[x] and -X[X] are mutually exclusive.
     Source code:
       Fix '-tt' option printing when time > 2106-02-07T06:28:15Z.
+      Remove unused missing/snprintf.c.
     Windows:
       Fixed to find wpcap.dll if WinPcap isn't installed and Npcap was
         installed without the WinPcap API compatibility option. (GitHub
@@ -96,6 +95,13 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
     Building and testing:
       Makefile.in: Use a local libpcap in the releasecheck target.
       CMake: Fix build with CMake 3.31.
+      autotools, CMake: don't separately test whether snprintf(3) is
+        available and whether it's suitable - the test for whether it's
+        suitable also fails if it's unavailable.
+      CMake: Skip snprintf(3) tests when cross-compiling.
+      autotools, CMake: fix issues with snprintf test and sanitizers.
+      CMake: check whether check_c_source_runs() works, treat the build
+        as a cross-compile if it doesn't work.
 
 Friday, August 30, 2024 / The Tcpdump Group
   Summary for 4.99.5 tcpdump release
