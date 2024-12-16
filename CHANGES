@@ -14,6 +14,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Warn that options -A, -x[x] and -X[X] are mutually exclusive.
     Source code:
       Fix '-tt' option printing when time > 2106-02-07T06:28:15Z.
+      Remove unused missing/snprintf.c.
     Windows:
       Fixed to find wpcap.dll if WinPcap isn't installed and Npcap was
         installed without the WinPcap API compatibility option. (GitHub
@@ -21,6 +22,13 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
     Building and testing:
       Makefile.in: Use a local libpcap in the releasecheck target.
       CMake: Fix build with CMake 3.31.
+      autotools, CMake: don't separately test whether snprintf(3) is
+        available and whether it's suitable - the test for whether it's
+        suitable also fails if it's unavailable.
+      CMake: Skip snprintf(3) tests when cross-compiling.
+      autotools, CMake: fix issues with snprintf test and sanitizers.
+      CMake: check whether check_c_source_runs() works, treat the build
+        as a cross-compile if it doesn't work.
 
 Friday, August 30, 2024 / The Tcpdump Group
   Summary for 4.99.5 tcpdump release
