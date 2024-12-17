@@ -39,6 +39,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Add --print-sampling to print every Nth packet instead of all.
       Add --lengths option to print the captured and original packet lengths.
       Add --skip option to skip some packets before writing or printing.
+      Use a common routine to parse numerical arguments and check its
+        value.
     Source code:
       Drop support for building with versions of libpcap that don't
         support all the libpcap 1.0 APIs.
@@ -54,6 +56,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
         and use them rather than custom code
       Disregard setlinebuf(3), always use setvbuf(3).
       Change Sun RPC code licence to BSD-3-Clause.
+      Use C99 macros to define 64-bit constants and maximum 64-bit
+        values.
     Building and testing:
       Autoconf: Remove detection of early IPv6 stacks.
       Detect OS IPv6 support using AF_INET6 only.
