@@ -70,7 +70,7 @@ Friday, August 30, 2024 / The Tcpdump Group
       OSPF: Pad TLVs in LS_OPAQUE_TYPE_RI to multiples of 4 bytes.
       OSPF: Update LS-Ack printing not to run off the end of the packet.
       OSPF6: Fix an undefined behavior.
-      pflog: use nd_ types in struct pfloghdr.
+      pflog: Use nd_ types in struct pfloghdr.
       PPP: Check if there is some data to hexdump.
       PPP: Remove an extra colon before LCP Callback Operation.
       Use the buffer stack for de-escaping PPP; fixes CVE-2024-2397;
@@ -211,7 +211,7 @@ Saturday, December 31, 2022 / The Tcpdump Group
       802.11: Fetch the CF and TIM IEs a field at a time.
       802.15.4, BGP, LISP: fix some length checks, compiler warnings,
         and undefined behavior warnings.
-      PFLOG: handle LINKTYPE_PFLOG/DLT_PFLOG files from all OSes on all
+      PFLOG: Handle LINKTYPE_PFLOG/DLT_PFLOG files from all OSes on all
         OSes.
       RRCP: support more Realtek protocols than just RRCP.
       MPLS: show the EXP field as TC, as per RFC 5462.
