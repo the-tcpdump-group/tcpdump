@@ -79,31 +79,49 @@ struct pfloghdr {
 	nd_uint32_t	rule_uid;
 	nd_int32_t	rule_pid;
 	nd_uint8_t	dir;
+	union {
+		struct pflog_openbsd_only {
+			nd_uint8_t	rewritten;
+			nd_uint8_t	naf;
+			nd_uint8_t	pad[1];
+			struct pf_addr	saddr;
+			struct pf_addr	daddr;
+			nd_uint16_t	sport;
+			nd_uint16_t	dport;
+		} openbsd;
+		struct pflog_freebsd_only {
+			nd_uint8_t	pad[3];
+			nd_uint32_t	ridentifier;
+			nd_uint8_t	reserve;
+		} freebsd;
+	} u;
+};
+
 /*
- * This is the minimum pflog header length; it includes none of
- * the fields added either by OpenBSD or FreeBSD, and doesn't
- * include any padding.
+ * FreeBSD header length.
+ */
+#define PFLOG_HEADER_LEN_FREEBSD	69
+
+/*
+ * OpenBSD header length.
+ */
+#define PFLOG_HEADER_LEN_OPENBSD	100
+
+/*
+ * DragonFly BSD, NetBSD and Darwin header length.
+ * Older versions of FreeBSD and OpenBSD may have used this
+ * as well.
+ *
+ * Unfortunately, this means we can't distinguish between Darwin, NetBSD,
+ * and DragonFly BSD based on the header length.
+ */
+#define PFLOG_HEADER_LEN_OTHER		61
+
+/*
+ * These are the minimum and maximum pflog header lengths.
  */
 #define MIN_PFLOG_HDRLEN 61
-#if defined(__OpenBSD__)
-	nd_uint8_t	rewritten;
-	nd_uint8_t	naf;
-	nd_uint8_t	pad[1];
-#else
-	nd_uint8_t	pad[3];
-#endif
-#if defined(__FreeBSD__)
-	nd_uint32_t	ridentifier;
-	nd_uint8_t	reserve;
-	nd_uint8_t	pad2[3];
-#elif defined(__OpenBSD__)
-	struct pf_addr	saddr;
-	struct pf_addr	daddr;
-	nd_uint16_t	sport;
-	nd_uint16_t	dport;
-#endif
-};
-#define MAX_PFLOG_HDRLEN 100	/* 61 + 3 + 16 + 16 + 2 + 2 */
+#define MAX_PFLOG_HDRLEN 100
 
 /*
  * Reason values.
@@ -123,18 +141,19 @@ struct pfloghdr {
 #define PFRES_MAXSTATES	12
 #define PFRES_SRCLIMIT	13
 #define PFRES_SYNPROXY	14
-#if defined(__FreeBSD__)
+
+/* FreeBSD */
 #define PFRES_MAPFAILED	15
-#elif defined(__NetBSD__)
-#define PFRES_STATELOCKED 15
-#elif defined(__OpenBSD__)
+
+/* OpenBSD */
 #define PFRES_TRANSLATE	15
 #define PFRES_NOROUTE	16
-#elif defined(__APPLE__)
-#define PFRES_DUMMYNET  15
-#endif
 
-static const struct tok pf_reasons[] = {
+/* NetBSD/Darwin */
+#define PFRES_STATELOCKED_DUMMYNET 15	/* STATELOCKED on NetBSD, DUMMYNET on Darwin */
+#define PFRES_INVPORT	16 /* INVPORT on Darwin */
+
+static const struct tok pf_reasons_freebsd[] = {
 	{ PFRES_MATCH,		"0(match)" },
 	{ PFRES_BADOFF,		"1(bad-offset)" },
 	{ PFRES_FRAG,		"2(fragment)" },
@@ -150,16 +169,50 @@ static const struct tok pf_reasons[] = {
 	{ PFRES_MAXSTATES,	"12(state-limit)" },
 	{ PFRES_SRCLIMIT,	"13(src-limit)" },
 	{ PFRES_SYNPROXY,	"14(synproxy)" },
-#if defined(__FreeBSD__)
 	{ PFRES_MAPFAILED,	"15(map-failed)" },
-#elif defined(__NetBSD__)
-	{ PFRES_STATELOCKED,	"15(state-locked)" },
-#elif defined(__OpenBSD__)
+	{ 0,	NULL }
+};
+
+static const struct tok pf_reasons_openbsd[] = {
+	{ PFRES_MATCH,		"0(match)" },
+	{ PFRES_BADOFF,		"1(bad-offset)" },
+	{ PFRES_FRAG,		"2(fragment)" },
+	{ PFRES_SHORT,		"3(short)" },
+	{ PFRES_NORM,		"4(normalize)" },
+	{ PFRES_MEMORY,		"5(memory)" },
+	{ PFRES_TS,		"6(bad-timestamp)" },
+	{ PFRES_CONGEST,	"7(congestion)" },
+	{ PFRES_IPOPTIONS,	"8(ip-option)" },
+	{ PFRES_PROTCKSUM,	"9(proto-cksum)" },
+	{ PFRES_BADSTATE,	"10(state-mismatch)" },
+	{ PFRES_STATEINS,	"11(state-insert)" },
+	{ PFRES_MAXSTATES,	"12(state-limit)" },
+	{ PFRES_SRCLIMIT,	"13(src-limit)" },
+	{ PFRES_SYNPROXY,	"14(synproxy)" },
 	{ PFRES_TRANSLATE,	"15(translate)" },
 	{ PFRES_NOROUTE,	"16(no-route)" },
-#elif defined(__APPLE__)
-	{ PFRES_DUMMYNET,	"15(dummynet)" },
-#endif
+	{ 0,	NULL }
+};
+
+static const struct tok pf_reasons_other[] = {
+	{ PFRES_MATCH,		"0(match)" },
+	{ PFRES_BADOFF,		"1(bad-offset)" },
+	{ PFRES_FRAG,		"2(fragment)" },
+	{ PFRES_SHORT,		"3(short)" },
+	{ PFRES_NORM,		"4(normalize)" },
+	{ PFRES_MEMORY,		"5(memory)" },
+	{ PFRES_TS,		"6(bad-timestamp)" },
+	{ PFRES_CONGEST,	"7(congestion)" },
+	{ PFRES_IPOPTIONS,	"8(ip-option)" },
+	{ PFRES_PROTCKSUM,	"9(proto-cksum)" },
+	{ PFRES_BADSTATE,	"10(state-mismatch)" },
+	{ PFRES_STATEINS,	"11(state-insert)" },
+	{ PFRES_MAXSTATES,	"12(state-limit)" },
+	{ PFRES_SRCLIMIT,	"13(src-limit)" },
+	{ PFRES_SYNPROXY,	"14(synproxy)" },
+	{ PFRES_STATELOCKED_DUMMYNET,
+				"15(state-locked (NetBSD)/dummynet(Darwin)" },
+	{ PFRES_INVPORT,	"16(invalid-port (Darwin))" },
 	{ 0,	NULL }
 };
 
@@ -177,23 +230,26 @@ static const struct tok pf_reasons[] = {
 #define PF_RDR			8
 #define PF_NORDR		9
 #define PF_SYNPROXY_DROP	10
-#if defined(__FreeBSD__)
+
+/* FreeBSD and OpenBSD */
 #define PF_DEFER		11
+
+/* FreeBSD */
 #define PF_MATCH		12
-#elif defined(__OpenBSD__)
-#define PF_DEFER		11
+
+/* OpenBSD */
 #define PF_MATCH		12
 #define PF_DIVERT		13
 #define PF_RT			14
 #define PF_AFRT			15
-#elif defined(__APPLE__)
+
+/* Darwin */
 #define PF_DUMMYNET		11
 #define PF_NODUMMYNET		12
 #define PF_NAT64		13
 #define PF_NONAT64		14
-#endif
 
-static const struct tok pf_actions[] = {
+static const struct tok pf_actions_freebsd[] = {
 	{ PF_PASS,		"pass" },
 	{ PF_DROP,		"block" },
 	{ PF_SCRUB,		"scrub" },
@@ -205,21 +261,47 @@ static const struct tok pf_actions[] = {
 	{ PF_RDR,		"rdr" },
 	{ PF_NORDR,		"nordr" },
 	{ PF_SYNPROXY_DROP,	"synproxy-drop" },
-#if defined(__FreeBSD__)
 	{ PF_DEFER,		"defer" },
 	{ PF_MATCH,		"match" },
-#elif defined(__OpenBSD__)
+	{ 0,			NULL }
+};
+
+static const struct tok pf_actions_openbsd[] = {
+	{ PF_PASS,		"pass" },
+	{ PF_DROP,		"block" },
+	{ PF_SCRUB,		"scrub" },
+	{ PF_NOSCRUB,		"noscrub" },
+	{ PF_NAT,		"nat" },
+	{ PF_NONAT,		"nonat" },
+	{ PF_BINAT,		"binat" },
+	{ PF_NOBINAT,		"nobinat" },
+	{ PF_RDR,		"rdr" },
+	{ PF_NORDR,		"nordr" },
+	{ PF_SYNPROXY_DROP,	"synproxy-drop" },
 	{ PF_DEFER,		"defer" },
 	{ PF_MATCH,		"match" },
 	{ PF_DIVERT,		"divert" },
 	{ PF_RT,		"rt" },
 	{ PF_AFRT,		"afrt" },
-#elif defined(__APPLE__)
-	{ PF_DUMMYNET,		"dummynet" },
-	{ PF_NODUMMYNET,	"nodummynet" },
-	{ PF_NAT64,		"nat64" },
-	{ PF_NONAT64,		"nonat64" },
-#endif
+	{ 0,			NULL }
+};
+
+static const struct tok pf_actions_darwin[] = {
+	{ PF_PASS,		"pass" },
+	{ PF_DROP,		"block" },
+	{ PF_SCRUB,		"scrub" },
+	{ PF_NOSCRUB,		"noscrub" },
+	{ PF_NAT,		"nat" },
+	{ PF_NONAT,		"nonat" },
+	{ PF_BINAT,		"binat" },
+	{ PF_NOBINAT,		"nobinat" },
+	{ PF_RDR,		"rdr" },
+	{ PF_NORDR,		"nordr" },
+	{ PF_SYNPROXY_DROP,	"synproxy-drop" },
+	{ PF_DUMMYNET,		"dummynet (Darwin)" },
+	{ PF_NODUMMYNET,	"nodummynet (Darwin)" },
+	{ PF_NAT64,		"nat64 (Darwin)" },
+	{ PF_NONAT64,		"nonat64 (Darwin)" },
 	{ 0,			NULL }
 };
 
@@ -229,34 +311,45 @@ static const struct tok pf_actions[] = {
 #define PF_INOUT	0
 #define PF_IN		1
 #define PF_OUT		2
-#if defined(__OpenBSD__)
-#define PF_FWD		3
-#endif
 
-static const struct tok pf_directions[] = {
+/* OpenBSD */
+#define PF_FWD		3
+
+static const struct tok pf_directions_freebsd[] = {
 	{ PF_INOUT,	"in/out" },
 	{ PF_IN,	"in" },
 	{ PF_OUT,	"out" },
-#if defined(__OpenBSD__)
+	{ 0,		NULL }
+};
+
+static const struct tok pf_directions_openbsd[] = {
+	{ PF_INOUT,	"in/out" },
+	{ PF_IN,	"in" },
+	{ PF_OUT,	"out" },
 	{ PF_FWD,	"fwd" },
-#endif
+	{ 0,		NULL }
+};
+
+static const struct tok pf_directions_other[] = {
+	{ PF_INOUT,	"in/out" },
+	{ PF_IN,	"in" },
+	{ PF_OUT,	"out" },
 	{ 0,		NULL }
 };
 
 static void
 pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
 {
+	uint8_t length;
 	uint32_t rulenr, subrulenr;
-#if defined(__FreeBSD__)
+	uint32_t uid;
 	uint32_t ridentifier;
-#endif
 
 	ndo->ndo_protocol = "pflog";
+	length = GET_U_1(hdr->length);
+
 	rulenr = GET_BE_U_4(hdr->rulenr);
 	subrulenr = GET_BE_U_4(hdr->subrulenr);
-#if defined(__FreeBSD__)
-	ridentifier = GET_BE_U_4(hdr->ridentifier);
-#endif
 	if (subrulenr == (uint32_t)-1)
 		ND_PRINT("rule %u/", rulenr);
 	else {
@@ -265,23 +358,69 @@ pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
 		ND_PRINT(".%u/", subrulenr);
 	}
 
-	ND_PRINT("%s", tok2str(pf_reasons, "unkn(%u)", GET_U_1(hdr->reason)));
+	if (length == PFLOG_HEADER_LEN_FREEBSD)
+		ND_PRINT("%s", tok2str(pf_reasons_freebsd, "unkn(%u)", GET_U_1(hdr->reason)));
+	else if (length == PFLOG_HEADER_LEN_OPENBSD)
+		ND_PRINT("%s", tok2str(pf_reasons_openbsd, "unkn(%u)", GET_U_1(hdr->reason)));
+	else
+		ND_PRINT("%s", tok2str(pf_reasons_other, "unkn(%u)", GET_U_1(hdr->reason)));
 
 	/*
-	 * All bits set means that the UID shouldn't be printed.
-	 * That's UINT_MAX if signed, or -1 if unsigned.
+	 * In Darwin (macOS, etc.) and NetBSD, uid is set to
+	 * UID_MAX if there's no UID, and UID_MAX is 2^31-1.
+	 * UID_MAX is 2^31-1.
+	 *
+	 * In OpenBSD, uid is set to -1 if there's no UID, which
+	 * means we'll see it as UINT_MAX, as we treat it as
+	 * unsigned. UID_MAX is 2^32-1.
+	 *
+	 * In FreeBSD and DragonFly BSD, uid is set to UID_MAX
+	 * if there's no UID. UID_MAX is 2^32-1.
+	 *
+	 * So:
+	 *
+	 *   For OpenBSD and FreeBSD, check only for 2^32-1 (0xFFFFFFFFU)
+	 *   if there's no UID.
+	 *
+	 *   For other OSes, it's either NetBSD, DragonFly BSD, or Darwin,
+	 *   check for both 2^31-1 (0x7FFFFFFFU) (NetBSD and Darwin) and
+	 *   2^32-1 (0xFFFFFFFFU) (DragonFly BSD). That runs the risk of
+	 *   the UID not being printed for a DragonFly BSD log if it's
+	 *   0x7FFFFFFF, but that's *probably* not going to be the case.
 	 */
-	if (GET_BE_U_4(hdr->uid) != UINT_MAX)
-		ND_PRINT(" [uid %u]", GET_BE_U_4(hdr->uid));
+	uid = GET_BE_U_4(hdr->uid);
+	if (length == PFLOG_HEADER_LEN_FREEBSD ||
+	    length == PFLOG_HEADER_LEN_OPENBSD) {
+		if (uid != 0xFFFFFFFFU)
+			ND_PRINT(" [uid %u]", uid);
+	} else {
+		if (uid != 0xFFFFFFFFU && uid != 0x7FFFFFFFU)
+			ND_PRINT(" [uid %u]", uid);
+	}
 
-#if defined(__FreeBSD__)
-	if (ridentifier != 0)
-		ND_PRINT(" [ridentifier %u]", ridentifier);
-#endif
+	if (length == PFLOG_HEADER_LEN_FREEBSD) {
+		ridentifier = GET_BE_U_4(hdr->u.freebsd.ridentifier);
+		if (ridentifier != 0)
+			ND_PRINT(" [ridentifier %u]", ridentifier);
+	}
 
-	ND_PRINT(": %s %s on ",
-	    tok2str(pf_actions, "unkn(%u)", GET_U_1(hdr->action)),
-	    tok2str(pf_directions, "unkn(%u)", GET_U_1(hdr->dir)));
+	if (length == PFLOG_HEADER_LEN_FREEBSD) {
+		ND_PRINT(": %s %s on ",
+		    tok2str(pf_actions_freebsd, "unkn(%u)", GET_U_1(hdr->action)),
+		    tok2str(pf_directions_freebsd, "unkn(%u)", GET_U_1(hdr->dir)));
+	} else if (length == PFLOG_HEADER_LEN_OPENBSD) {
+		ND_PRINT(": %s %s on ",
+		    tok2str(pf_actions_openbsd, "unkn(%u)", GET_U_1(hdr->action)),
+		    tok2str(pf_directions_openbsd, "unkn(%u)", GET_U_1(hdr->dir)));
+	} else {
+		/*
+		 * We use the Darwin set of actions, as it's a superset
+		 * of the NetBSD/DragonFly BSD set of actions.
+		 */
+		ND_PRINT(": %s %s on ",
+		    tok2str(pf_actions_darwin, "unkn(%u)", GET_U_1(hdr->action)),
+		    tok2str(pf_directions_other, "unkn(%u)", GET_U_1(hdr->dir)));
+	}
 	nd_printjnp(ndo, (const u_char*)hdr->ifname, PFLOG_IFNAMSIZ);
 	ND_PRINT(": ");
 }
@@ -303,8 +442,8 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	hdr = (const struct pfloghdr *)p;
 	hdrlen = GET_U_1(hdr->length);
 	ND_ICHECK_U(hdrlen, <, MIN_PFLOG_HDRLEN);
-	hdrlen = roundup2(hdrlen, 4);
 	ND_ICHECK_U(hdrlen, >, MAX_PFLOG_HDRLEN);
+	hdrlen = roundup2(hdrlen, 4);
 
 	/* print what we know */
 	ND_TCHECK_LEN(hdr, hdrlen);
