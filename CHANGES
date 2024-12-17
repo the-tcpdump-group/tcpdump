@@ -148,7 +148,11 @@ Friday, August 30, 2024 / The Tcpdump Group
       OSPF: Update LS-Ack printing not to run off the end of the packet.
       OSPF6: Fix an undefined behavior.
       pflog: use nd_ types in struct pfloghdr.
+      pflog: print some additional fields from the header (picked up
+        from the FreeBSD tcpdump).
       pflog: handle all types of pflog files (as best as can be done)
+      pflog: print the ruleset if it's present, regardless of whether
+        the subrule is present (picked up from the OpenBSD tcpdump).
       PPP: Check if there is some data to hexdump.
       PPP: Remove an extra colon before LCP Callback Operation.
       Use the buffer stack for de-escaping PPP; fixes CVE-2024-2397;

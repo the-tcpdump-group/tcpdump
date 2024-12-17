@@ -350,13 +350,17 @@ pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
 
 	rulenr = GET_BE_U_4(hdr->rulenr);
 	subrulenr = GET_BE_U_4(hdr->subrulenr);
-	if (subrulenr == (uint32_t)-1)
-		ND_PRINT("rule %u/", rulenr);
-	else {
-		ND_PRINT("rule %u.", rulenr);
-		nd_printjnp(ndo, (const u_char*)hdr->ruleset, PFLOG_RULESET_NAME_SIZE);
-		ND_PRINT(".%u/", subrulenr);
+	ND_PRINT("rule ");
+	if (rulenr != (uint32_t)-1) {
+		ND_PRINT("%u", rulenr);
+		if (hdr->ruleset[0] != '\0') {
+			ND_PRINT(".");
+			nd_printjnp(ndo, (const u_char*)hdr->ruleset, PFLOG_RULESET_NAME_SIZE);
+		}
+		if (subrulenr != (uint32_t)-1)
+			ND_PRINT(".%u", subrulenr);
 	}
+	ND_PRINT("/");
 
 	if (length == PFLOG_HEADER_LEN_FREEBSD)
 		ND_PRINT("%s", tok2str(pf_reasons_freebsd, "unkn(%u)", GET_U_1(hdr->reason)));
