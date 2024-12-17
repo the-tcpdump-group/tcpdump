@@ -31,6 +31,7 @@
 #include "netdissect.h"
 #include "extract.h"
 #include "af.h"
+#include "addrtostr.h"
 
 /*
  * pflog headers, at least as they exist now.
@@ -338,6 +339,34 @@ static const struct tok pf_directions_other[] = {
 };
 
 static void
+print_pf_addr(netdissect_options *ndo, const char *tag, u_int naf,
+    const struct pf_addr *addr, const nd_uint16_t port)
+{
+	char buf[INET6_ADDRSTRLEN];
+	uint16_t portnum;
+
+	ND_PRINT("%s ", tag);
+	ND_TCHECK_SIZE(addr);
+	switch (naf) {
+
+	case BSD_AF_INET:
+		addrtostr(addr->v4, buf, sizeof(buf));
+		break;
+
+	case BSD_AF_INET6_BSD:
+		addrtostr6(addr->v6, buf, sizeof(buf));
+		break;
+
+	default:
+		strlcpy(buf, "?", sizeof(buf));
+		break;
+	}
+	ND_PRINT("%s:", buf);
+	portnum = GET_BE_U_2(port);
+	ND_PRINT("%u", portnum);
+}
+
+static void
 pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
 {
 	uint8_t length;
@@ -427,6 +456,20 @@ pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
 	}
 	nd_printjnp(ndo, (const u_char*)hdr->ifname, PFLOG_IFNAMSIZ);
 	ND_PRINT(": ");
+	if (length == PFLOG_HEADER_LEN_OPENBSD) {
+		if (ndo->ndo_vflag && GET_U_1(hdr->u.openbsd.rewritten)) {
+			uint8_t naf;
+
+			ND_PRINT("[rewritten: ");
+			naf = GET_U_1(hdr->u.openbsd.naf);
+			print_pf_addr(ndo, "src", naf, &hdr->u.openbsd.saddr,
+			    hdr->u.openbsd.sport);
+			ND_PRINT(", ");
+			print_pf_addr(ndo, "src", naf, &hdr->u.openbsd.daddr,
+			    hdr->u.openbsd.dport);
+			ND_PRINT("; ");
+		}
+	}
 }
 
 void
