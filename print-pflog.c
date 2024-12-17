@@ -219,121 +219,121 @@ static const struct tok pf_reasons_other[] = {
 /*
  * Action values.
  */
-#define PF_PASS			0
-#define PF_DROP			1
-#define PF_SCRUB		2
-#define PF_NOSCRUB		3
-#define PF_NAT			4
-#define PF_NONAT		5
-#define PF_BINAT		6
-#define PF_NOBINAT		7
-#define PF_RDR			8
-#define PF_NORDR		9
-#define PF_SYNPROXY_DROP	10
+#define PFACT_PASS		0
+#define PFACT_DROP		1
+#define PFACT_SCRUB		2
+#define PFACT_NOSCRUB		3
+#define PFACT_NAT		4
+#define PFACT_NONAT		5
+#define PFACT_BINAT		6
+#define PFACT_NOBINAT		7
+#define PFACT_RDR		8
+#define PFACT_NORDR		9
+#define PFACT_SYNPROXY_DROP	10
 
 /* FreeBSD and OpenBSD */
-#define PF_DEFER		11
+#define PFACT_DEFER		11
 
 /* FreeBSD */
-#define PF_MATCH		12
+#define PFACT_MATCH		12
 
 /* OpenBSD */
-#define PF_MATCH		12
-#define PF_DIVERT		13
-#define PF_RT			14
-#define PF_AFRT			15
+#define PFACT_MATCH		12
+#define PFACT_DIVERT		13
+#define PFACT_RT		14
+#define PFACT_AFRT		15
 
 /* Darwin */
-#define PF_DUMMYNET		11
-#define PF_NODUMMYNET		12
-#define PF_NAT64		13
-#define PF_NONAT64		14
+#define PFACT_DUMMYNET		11
+#define PFACT_NODUMMYNET	12
+#define PFACT_NAT64		13
+#define PFACT_NONAT64		14
 
 static const struct tok pf_actions_freebsd[] = {
-	{ PF_PASS,		"pass" },
-	{ PF_DROP,		"block" },
-	{ PF_SCRUB,		"scrub" },
-	{ PF_NOSCRUB,		"noscrub" },
-	{ PF_NAT,		"nat" },
-	{ PF_NONAT,		"nonat" },
-	{ PF_BINAT,		"binat" },
-	{ PF_NOBINAT,		"nobinat" },
-	{ PF_RDR,		"rdr" },
-	{ PF_NORDR,		"nordr" },
-	{ PF_SYNPROXY_DROP,	"synproxy-drop" },
-	{ PF_DEFER,		"defer" },
-	{ PF_MATCH,		"match" },
+	{ PFACT_PASS,		"pass" },
+	{ PFACT_DROP,		"block" },
+	{ PFACT_SCRUB,		"scrub" },
+	{ PFACT_NOSCRUB,	"noscrub" },
+	{ PFACT_NAT,		"nat" },
+	{ PFACT_NONAT,		"nonat" },
+	{ PFACT_BINAT,		"binat" },
+	{ PFACT_NOBINAT,	"nobinat" },
+	{ PFACT_RDR,		"rdr" },
+	{ PFACT_NORDR,		"nordr" },
+	{ PFACT_SYNPROXY_DROP,	"synproxy-drop" },
+	{ PFACT_DEFER,		"defer" },
+	{ PFACT_MATCH,		"match" },
 	{ 0,			NULL }
 };
 
 static const struct tok pf_actions_openbsd[] = {
-	{ PF_PASS,		"pass" },
-	{ PF_DROP,		"block" },
-	{ PF_SCRUB,		"scrub" },
-	{ PF_NOSCRUB,		"noscrub" },
-	{ PF_NAT,		"nat" },
-	{ PF_NONAT,		"nonat" },
-	{ PF_BINAT,		"binat" },
-	{ PF_NOBINAT,		"nobinat" },
-	{ PF_RDR,		"rdr" },
-	{ PF_NORDR,		"nordr" },
-	{ PF_SYNPROXY_DROP,	"synproxy-drop" },
-	{ PF_DEFER,		"defer" },
-	{ PF_MATCH,		"match" },
-	{ PF_DIVERT,		"divert" },
-	{ PF_RT,		"rt" },
-	{ PF_AFRT,		"afrt" },
+	{ PFACT_PASS,		"pass" },
+	{ PFACT_DROP,		"block" },
+	{ PFACT_SCRUB,		"scrub" },
+	{ PFACT_NOSCRUB,	"noscrub" },
+	{ PFACT_NAT,		"nat" },
+	{ PFACT_NONAT,		"nonat" },
+	{ PFACT_BINAT,		"binat" },
+	{ PFACT_NOBINAT,	"nobinat" },
+	{ PFACT_RDR,		"rdr" },
+	{ PFACT_NORDR,		"nordr" },
+	{ PFACT_SYNPROXY_DROP,	"synproxy-drop" },
+	{ PFACT_DEFER,		"defer" },
+	{ PFACT_MATCH,		"match" },
+	{ PFACT_DIVERT,		"divert" },
+	{ PFACT_RT,		"rt" },
+	{ PFACT_AFRT,		"afrt" },
 	{ 0,			NULL }
 };
 
 static const struct tok pf_actions_darwin[] = {
-	{ PF_PASS,		"pass" },
-	{ PF_DROP,		"block" },
-	{ PF_SCRUB,		"scrub" },
-	{ PF_NOSCRUB,		"noscrub" },
-	{ PF_NAT,		"nat" },
-	{ PF_NONAT,		"nonat" },
-	{ PF_BINAT,		"binat" },
-	{ PF_NOBINAT,		"nobinat" },
-	{ PF_RDR,		"rdr" },
-	{ PF_NORDR,		"nordr" },
-	{ PF_SYNPROXY_DROP,	"synproxy-drop" },
-	{ PF_DUMMYNET,		"dummynet (Darwin)" },
-	{ PF_NODUMMYNET,	"nodummynet (Darwin)" },
-	{ PF_NAT64,		"nat64 (Darwin)" },
-	{ PF_NONAT64,		"nonat64 (Darwin)" },
+	{ PFACT_PASS,		"pass" },
+	{ PFACT_DROP,		"block" },
+	{ PFACT_SCRUB,		"scrub" },
+	{ PFACT_NOSCRUB,	"noscrub" },
+	{ PFACT_NAT,		"nat" },
+	{ PFACT_NONAT,		"nonat" },
+	{ PFACT_BINAT,		"binat" },
+	{ PFACT_NOBINAT,	"nobinat" },
+	{ PFACT_RDR,		"rdr" },
+	{ PFACT_NORDR,		"nordr" },
+	{ PFACT_SYNPROXY_DROP,	"synproxy-drop" },
+	{ PFACT_DUMMYNET,	"dummynet (Darwin)" },
+	{ PFACT_NODUMMYNET,	"nodummynet (Darwin)" },
+	{ PFACT_NAT64,		"nat64 (Darwin)" },
+	{ PFACT_NONAT64,	"nonat64 (Darwin)" },
 	{ 0,			NULL }
 };
 
 /*
  * Direction values.
  */
-#define PF_INOUT	0
-#define PF_IN		1
-#define PF_OUT		2
+#define PFDIR_INOUT	0
+#define PFDIR_IN	1
+#define PFDIR_OUT	2
 
 /* OpenBSD */
-#define PF_FWD		3
+#define PFDIR_FWD	3
 
 static const struct tok pf_directions_freebsd[] = {
-	{ PF_INOUT,	"in/out" },
-	{ PF_IN,	"in" },
-	{ PF_OUT,	"out" },
+	{ PFDIR_INOUT,	"in/out" },
+	{ PFDIR_IN,	"in" },
+	{ PFDIR_OUT,	"out" },
 	{ 0,		NULL }
 };
 
 static const struct tok pf_directions_openbsd[] = {
-	{ PF_INOUT,	"in/out" },
-	{ PF_IN,	"in" },
-	{ PF_OUT,	"out" },
-	{ PF_FWD,	"fwd" },
+	{ PFDIR_INOUT,	"in/out" },
+	{ PFDIR_IN,	"in" },
+	{ PFDIR_OUT,	"out" },
+	{ PFDIR_FWD,	"fwd" },
 	{ 0,		NULL }
 };
 
 static const struct tok pf_directions_other[] = {
-	{ PF_INOUT,	"in/out" },
-	{ PF_IN,	"in" },
-	{ PF_OUT,	"out" },
+	{ PFDIR_INOUT,	"in/out" },
+	{ PFDIR_IN,	"in" },
+	{ PFDIR_OUT,	"out" },
 	{ 0,		NULL }
 };
 
