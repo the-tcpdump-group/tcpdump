@@ -234,7 +234,7 @@ struct ikev1_pl_cr {
 	Certificate Types (variable length)
 	  -- Contains a list of the types of certificates requested,
 	  sorted in order of preference.  Each individual certificate
-	  type is 1 octet.  This field is NOT requiredo
+	  type is 1 octet.  This field is NOT required.
 	*/
 	/* # Certificate Authorities (1 octet) */
 	/* Certificate Authorities (variable length) */
