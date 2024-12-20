@@ -1,2 +1,2 @@
-    1  2021-06-16 13:37:05.16842874 IP (tos 0xc, id 0, offset 0, flags [rsvd], proto unknown (54), length 64, options (unknown 107 [bad length 37]), bad cksum 101 (->41a4)!)
+    1  2021-06-16 13:37:05.999999 IP (tos 0xc, id 0, offset 0, flags [rsvd], proto unknown (54), length 64, options (unknown 107 [bad length 37]), bad cksum 101 (->41a4)!)
     62.41.66.144 > 191.215.63.14: NHRP: res request, id 0, hopcnt 103, unknown-nbma-addr-family-5dc9 (01), proto type 007b 67 -> 49 [remaining mandatory part length 8 < 12] (invalid)
