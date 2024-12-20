@@ -13,7 +13,7 @@
 	Options [V6, External, Router]
 	  Hello Timer 10s, Dead Timer 40s, Interface-ID 0.0.0.5, Priority 1
 	  Neighbor List:
-    4  2008-08-31 12:43:41.1756221 IP6 (class 0xe0, hlim 1, next-header OSPF (89), payload length 36) fe80::1 > ff02::5: OSPFv3, Hello, length 36
+    4  2008-08-31 12:43:41.999999 IP6 (class 0xe0, hlim 1, next-header OSPF (89), payload length 36) fe80::1 > ff02::5: OSPFv3, Hello, length 36
 	Router-ID 1.1.1.1, Area 0.0.0.1
 	Options [V6, External, Router]
 	  Hello Timer 10s, Dead Timer 40s, Interface-ID 0.0.0.5, Priority 1
