@@ -777,7 +777,7 @@ rsvp_obj_print(netdissect_options *ndo,
             case RSVP_CTYPE_14: /* IPv6 p2mp LSP Tunnel */
                 if (obj_tlen < 26)
                     goto obj_tooshort;
-                ND_PRINT("%s  IPv6 P2MP LSP ID: 0x%08x, Tunnel ID: 0x%04x, Extended Tunnel ID: %s",
+                ND_PRINT("%s  IPv6 P2MP ID: 0x%08x, Tunnel ID: 0x%04x, Extended Tunnel ID: %s",
                        indent,
                        GET_BE_U_4(obj_tptr),
                        GET_BE_U_2(obj_tptr + 6),
@@ -788,9 +788,9 @@ rsvp_obj_print(netdissect_options *ndo,
             case RSVP_CTYPE_13: /* IPv4 p2mp LSP Tunnel */
                 if (obj_tlen < 12)
                     goto obj_tooshort;
-                ND_PRINT("%s  IPv4 P2MP LSP ID: %s, Tunnel ID: 0x%04x, Extended Tunnel ID: %s",
+                ND_PRINT("%s  IPv4 P2MP ID: 0x%08x, Tunnel ID: 0x%04x, Extended Tunnel ID: %s",
                        indent,
-                       GET_IPADDR_STRING(obj_tptr),
+                       GET_BE_U_4(obj_tptr),
                        GET_BE_U_2(obj_tptr + 6),
                        GET_IPADDR_STRING(obj_tptr + 8));
                 obj_tlen-=12;

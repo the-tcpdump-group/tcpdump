@@ -91,7 +91,7 @@
     1.1.1.1 > 3.3.3.3: 
 	RSVPv1 Path Message (1), Flags: [none], length: 200, ttl: 255, checksum: 0x88ac
 	  Session Object (1) Flags: [reject if unknown], Class-Type: IPv4 P2MP LSP Tunnel (13), length: 16
-	    IPv4 P2MP LSP ID: 1.49.45.0, Tunnel ID: 0x0001, Extended Tunnel ID: 1.1.1.1
+	    IPv4 P2MP ID: 0x01312d00, Tunnel ID: 0x0001, Extended Tunnel ID: 1.1.1.1
 	  RSVP Hop Object (3) Flags: [reject if unknown], Class-Type: IPv4 (1), length: 12
 	    Previous/Next Interface: 10.0.12.1, Logical Interface Handle: 0x00000000
 	  Time Values Object (5) Flags: [reject if unknown], Class-Type: 1 (1), length: 8
@@ -128,7 +128,7 @@
     10.0.12.2 > 10.0.12.1: 
 	RSVPv1 Resv Message (2), Flags: [none], length: 204, ttl: 253, checksum: 0x3483
 	  Session Object (1) Flags: [reject if unknown], Class-Type: IPv4 P2MP LSP Tunnel (13), length: 16
-	    IPv4 P2MP LSP ID: 1.49.45.0, Tunnel ID: 0x0001, Extended Tunnel ID: 1.1.1.1
+	    IPv4 P2MP ID: 0x01312d00, Tunnel ID: 0x0001, Extended Tunnel ID: 1.1.1.1
 	  RSVP Hop Object (3) Flags: [reject if unknown], Class-Type: IPv4 (1), length: 12
 	    Previous/Next Interface: 10.0.12.2, Logical Interface Handle: 0x00000000
 	  Time Values Object (5) Flags: [reject if unknown], Class-Type: 1 (1), length: 8
@@ -165,7 +165,7 @@
     10.0.12.2 > 10.0.12.1: 
 	RSVPv1 PathErr Message (3), Flags: [none], length: 72, ttl: 255, checksum: 0x21f2
 	  Session Object (1) Flags: [reject if unknown], Class-Type: IPv4 P2MP LSP Tunnel (13), length: 16
-	    IPv4 P2MP LSP ID: 1.49.45.0, Tunnel ID: 0x0001, Extended Tunnel ID: 1.1.1.1
+	    IPv4 P2MP ID: 0x01312d00, Tunnel ID: 0x0001, Extended Tunnel ID: 1.1.1.1
 	  Error Spec Object (6) Flags: [reject if unknown], Class-Type: IPv4 (1), length: 12
 	    Error Node Address: 10.0.12.2, Flags: [0x00]
 	    Error Code: Notify Error (25), Unknown Error Value (3)
@@ -180,7 +180,7 @@
     1.1.1.1 > 3.3.3.3: 
 	RSVPv1 PathTear Message (5), Flags: [none], length: 72, ttl: 255, checksum: 0x250d
 	  Session Object (1) Flags: [reject if unknown], Class-Type: IPv4 P2MP LSP Tunnel (13), length: 16
-	    IPv4 P2MP LSP ID: 1.49.45.0, Tunnel ID: 0x0001, Extended Tunnel ID: 1.1.1.1
+	    IPv4 P2MP ID: 0x01312d00, Tunnel ID: 0x0001, Extended Tunnel ID: 1.1.1.1
 	  RSVP Hop Object (3) Flags: [reject if unknown], Class-Type: IPv4 (1), length: 12
 	    Previous/Next Interface: 10.0.12.1, Logical Interface Handle: 0x00000000
 	  Sender Template Object (11) Flags: [reject if unknown], Class-Type: IPv4 P2MP LSP Tunnel (12), length: 20
@@ -194,7 +194,7 @@
     10.0.12.2 > 10.0.12.1: 
 	RSVPv1 ResvTear Message (6), Flags: [none], length: 80, ttl: 255, checksum: 0x1de8
 	  Session Object (1) Flags: [reject if unknown], Class-Type: IPv4 P2MP LSP Tunnel (13), length: 16
-	    IPv4 P2MP LSP ID: 1.49.45.0, Tunnel ID: 0x0001, Extended Tunnel ID: 1.1.1.1
+	    IPv4 P2MP ID: 0x01312d00, Tunnel ID: 0x0001, Extended Tunnel ID: 1.1.1.1
 	  RSVP Hop Object (3) Flags: [reject if unknown], Class-Type: IPv4 (1), length: 12
 	    Previous/Next Interface: 10.0.12.2, Logical Interface Handle: 0x00000000
 	  Style Object (8) Flags: [reject if unknown], Class-Type: 1 (1), length: 8
