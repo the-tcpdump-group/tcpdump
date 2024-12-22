@@ -215,11 +215,11 @@ ts_frac_print(netdissect_options *ndo, const struct timeval *tv)
 	switch (ndo->ndo_tstamp_precision) {
 
 	case PCAP_TSTAMP_PRECISION_MICRO:
-		ND_PRINT(".%06u", (unsigned)tv->tv_usec);
+		ND_PRINT(".%06d", (int32_t)tv->tv_usec);
 		break;
 
 	case PCAP_TSTAMP_PRECISION_NANO:
-		ND_PRINT(".%09u", (unsigned)tv->tv_usec);
+		ND_PRINT(".%09d", (int32_t)tv->tv_usec);
 		break;
 
 	default:
@@ -227,7 +227,7 @@ ts_frac_print(netdissect_options *ndo, const struct timeval *tv)
 		break;
 	}
 #else
-	ND_PRINT(".%06u", (unsigned)tv->tv_usec);
+	ND_PRINT(".%06d", (int32_t)tv->tv_usec);
 #endif
 }
 
