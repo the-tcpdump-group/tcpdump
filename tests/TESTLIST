@@ -19,6 +19,10 @@ print-XX	print-flags.pcap	print-capXX.out	-XX
 print-A		print-flags.pcap	print-A.out	-A
 print-AA	print-flags.pcap	print-AA.out	-AA
 
+# Invalid timestamps, micro and nano precision
+timestamp_invalid_micro timestamp_invalid_micro.pcap timestamp_invalid_micro.out -q SPECIAL_t
+timestamp_invalid_nano timestamp_invalid_nano.pcap timestamp_invalid_nano.out -q --nano SPECIAL_t
+
 # TCP with data in the RST segment
 tcp_rst_data tcp_rst_data.pcap tcp_rst_data-v.out -v
 tcp_rst_data tcp_rst_data.pcap tcp_rst_data.out
