@@ -1,0 +1,208 @@
+    1  2024-12-21 22:27:13.504618 IP (tos 0xc0, ttl 255, id 10000, offset 0, flags [none], proto RSVP (46), length 180, options (RA))
+    1.1.1.1 > 3.3.3.3: 
+	RSVPv1 Path Message (1), Flags: [none], length: 156, ttl: 255, checksum: 0x79d8
+	  Session Object (1) Flags: [reject if unknown], Class-Type: Tunnel IPv4 (7), length: 16
+	    IPv4 Tunnel EndPoint: 3.3.3.3, Tunnel ID: 0x0001, Extended Tunnel ID: 1.1.1.1
+	  RSVP Hop Object (3) Flags: [reject if unknown], Class-Type: IPv4 (1), length: 12
+	    Previous/Next Interface: 10.0.12.1, Logical Interface Handle: 0x00000000
+	  Time Values Object (5) Flags: [reject if unknown], Class-Type: 1 (1), length: 8
+	    Refresh Period: 30000ms
+	  ERO Object (20) Flags: [reject if unknown], Class-Type: IPv4 (1), length: 20
+	    Subobject Type: IPv4 prefix, length 8, Strict, 10.0.12.2/32, Flags: [none]
+	    Subobject Type: IPv4 prefix, length 8, Strict, 10.0.23.3/32, Flags: [none]
+	  Label Request Object (19) Flags: [reject if unknown], Class-Type: without label range (1), length: 8
+	    L3 Protocol ID: IPv4
+	  Session Attribute Object (207) Flags: [ignore and forward if unknown], Class-Type: Tunnel IPv4 (7), length: 24
+	    Session Name: TestTunnelP2p
+	    Setup Priority: 7, Holding Priority: 0, Flags: [Label Recording, SE Style] (0x46)
+	  Sender Template Object (11) Flags: [reject if unknown], Class-Type: Tunnel IPv4 (7), length: 12
+	    IPv4 Tunnel Sender Address: 1.1.1.1, LSP-ID: 0x0001
+	  Sender TSpec Object (12) Flags: [reject if unknown], Class-Type: IntServ (2), length: 36
+	    Msg-Version: 0, length: 28
+	    Service Type: Default/Global Information (1), break bit not set, Service length: 24
+	      Parameter ID: Token Bucket TSpec (127), length: 20, Flags: [0x00]
+		Token Bucket Rate: 0 Mbps
+		Token Bucket Size: 0 bytes
+		Peak Data Rate: 0 Mbps
+		Minimum Policed Unit: 0 bytes
+		Maximum Packet Size: 2147483647 bytes
+	  RRO Object (21) Flags: [reject if unknown], Class-Type: IPv4 (1), length: 12
+	    Subobject Type: IPv4 prefix, length 8, Strict, 10.0.12.1/32, Flags: [none]
+    2  2024-12-21 22:27:13.511662 IP (tos 0xc0, ttl 253, id 1, offset 0, flags [none], proto RSVP (46), length 164)
+    10.0.12.2 > 10.0.12.1: 
+	RSVPv1 Resv Message (2), Flags: [none], length: 144, ttl: 253, checksum: 0xdfda
+	  Session Object (1) Flags: [reject if unknown], Class-Type: Tunnel IPv4 (7), length: 16
+	    IPv4 Tunnel EndPoint: 3.3.3.3, Tunnel ID: 0x0001, Extended Tunnel ID: 1.1.1.1
+	  RSVP Hop Object (3) Flags: [reject if unknown], Class-Type: IPv4 (1), length: 12
+	    Previous/Next Interface: 10.0.12.2, Logical Interface Handle: 0x00000000
+	  Time Values Object (5) Flags: [reject if unknown], Class-Type: 1 (1), length: 8
+	    Refresh Period: 30000ms
+	  Style Object (8) Flags: [reject if unknown], Class-Type: 1 (1), length: 8
+	    Reservation Style: Shared Explicit, Flags: [0x00]
+	  Flowspec Object (9) Flags: [reject if unknown], Class-Type: IntServ (2), length: 36
+	    Msg-Version: 0, length: 28
+	    Service Type: Controlled Load (5), break bit not set, Service length: 24
+	      Parameter ID: Token Bucket TSpec (127), length: 20, Flags: [0x00]
+		Token Bucket Rate: 0 Mbps
+		Token Bucket Size: 0 bytes
+		Peak Data Rate: 0 Mbps
+		Minimum Policed Unit: 0 bytes
+		Maximum Packet Size: 2147483647 bytes
+	  FilterSpec Object (10) Flags: [reject if unknown], Class-Type: Tunnel IPv4 (7), length: 12
+	    Source Address: 1.1.1.1, LSP-ID: 0x0001
+	  Label Object (16) Flags: [reject if unknown], Class-Type: Label (1), length: 8
+	    Label: 200000
+	  RRO Object (21) Flags: [reject if unknown], Class-Type: IPv4 (1), length: 36
+	    Subobject Type: IPv4 prefix, length 8, Strict, 10.0.12.2/32, Flags: [none]
+	    Subobject Type: Label, length 8, Flags: [Global] (0x1), Class-Type: IPv4 (1), 200000
+	    Subobject Type: IPv4 prefix, length 8, Strict, 10.0.23.3/32, Flags: [none]
+	    Subobject Type: Label, length 8, Flags: [Global] (0x1), Class-Type: IPv4 (1), 300000
+    3  2024-12-21 22:27:13.516745 IP (tos 0xc0, ttl 255, id 18, offset 0, flags [none], proto RSVP (46), length 68)
+    10.0.12.2 > 10.0.12.1: 
+	RSVPv1 PathErr Message (3), Flags: [none], length: 48, ttl: 255, checksum: 0xbe6a
+	  Session Object (1) Flags: [reject if unknown], Class-Type: Tunnel IPv4 (7), length: 16
+	    IPv4 Tunnel EndPoint: 3.3.3.3, Tunnel ID: 0x0001, Extended Tunnel ID: 1.1.1.1
+	  Error Spec Object (6) Flags: [reject if unknown], Class-Type: IPv4 (1), length: 12
+	    Error Node Address: 10.0.12.2, Flags: [0x00]
+	    Error Code: Notify Error (25), Unknown Error Value (3)
+	  Sender Template Object (11) Flags: [reject if unknown], Class-Type: Tunnel IPv4 (7), length: 12
+	    IPv4 Tunnel Sender Address: 1.1.1.1, LSP-ID: 0x0001
+    4  2024-12-21 22:27:13.518137 IP (tos 0xc0, ttl 255, id 39, offset 0, flags [none], proto RSVP (46), length 72, options (RA))
+    1.1.1.1 > 3.3.3.3: 
+	RSVPv1 PathTear Message (5), Flags: [none], length: 48, ttl: 255, checksum: 0xc185
+	  Session Object (1) Flags: [reject if unknown], Class-Type: Tunnel IPv4 (7), length: 16
+	    IPv4 Tunnel EndPoint: 3.3.3.3, Tunnel ID: 0x0001, Extended Tunnel ID: 1.1.1.1
+	  RSVP Hop Object (3) Flags: [reject if unknown], Class-Type: IPv4 (1), length: 12
+	    Previous/Next Interface: 10.0.12.1, Logical Interface Handle: 0x00000000
+	  Sender Template Object (11) Flags: [reject if unknown], Class-Type: Tunnel IPv4 (7), length: 12
+	    IPv4 Tunnel Sender Address: 1.1.1.1, LSP-ID: 0x0001
+    5  2024-12-21 22:27:13.519923 IP (tos 0xc0, ttl 255, id 63, offset 0, flags [none], proto RSVP (46), length 76)
+    10.0.12.2 > 10.0.12.1: 
+	RSVPv1 ResvTear Message (6), Flags: [none], length: 56, ttl: 255, checksum: 0xba60
+	  Session Object (1) Flags: [reject if unknown], Class-Type: Tunnel IPv4 (7), length: 16
+	    IPv4 Tunnel EndPoint: 3.3.3.3, Tunnel ID: 0x0001, Extended Tunnel ID: 1.1.1.1
+	  RSVP Hop Object (3) Flags: [reject if unknown], Class-Type: IPv4 (1), length: 12
+	    Previous/Next Interface: 10.0.12.2, Logical Interface Handle: 0x00000000
+	  Style Object (8) Flags: [reject if unknown], Class-Type: 1 (1), length: 8
+	    Reservation Style: Shared Explicit, Flags: [0x00]
+	  FilterSpec Object (10) Flags: [reject if unknown], Class-Type: Tunnel IPv4 (7), length: 12
+	    Source Address: 1.1.1.1, LSP-ID: 0x0001
+    6  2024-12-21 22:27:13.521828 IP (tos 0xc0, ttl 255, id 0, offset 0, flags [none], proto RSVP (46), length 224, options (RA))
+    1.1.1.1 > 3.3.3.3: 
+	RSVPv1 Path Message (1), Flags: [none], length: 200, ttl: 255, checksum: 0x88ac
+	  Session Object (1) Flags: [reject if unknown], Class-Type: IPv4 P2MP LSP Tunnel (13), length: 16
+	    IPv4 P2MP LSP ID: 1.49.45.0, Tunnel ID: 0x0001, Extended Tunnel ID: 1.1.1.1
+	  RSVP Hop Object (3) Flags: [reject if unknown], Class-Type: IPv4 (1), length: 12
+	    Previous/Next Interface: 10.0.12.1, Logical Interface Handle: 0x00000000
+	  Time Values Object (5) Flags: [reject if unknown], Class-Type: 1 (1), length: 8
+	    Refresh Period: 30000ms
+	  ERO Object (20) Flags: [reject if unknown], Class-Type: IPv4 (1), length: 20
+	    Subobject Type: IPv4 prefix, length 8, Strict, 10.0.12.2/32, Flags: [none]
+	    Subobject Type: IPv4 prefix, length 8, Strict, 10.0.23.3/32, Flags: [none]
+	  Label Request Object (19) Flags: [reject if unknown], Class-Type: without label range (1), length: 8
+	    L3 Protocol ID: IPv4
+	  Session Attribute Object (207) Flags: [ignore and forward if unknown], Class-Type: Tunnel IPv4 (7), length: 24
+	    Session Name: TestTunnelP2mp
+	    Setup Priority: 7, Holding Priority: 0, Flags: [Label Recording, SE Style] (0x46)
+	  Sender Template Object (11) Flags: [reject if unknown], Class-Type: IPv4 P2MP LSP Tunnel (12), length: 20
+	    IPv4 Tunnel Sender Address: 1.1.1.1, LSP ID: 0x0001
+	    Sub-Group Originator ID: 1.1.1.1, Sub-Group ID: 0x0000
+	  Sender TSpec Object (12) Flags: [reject if unknown], Class-Type: IntServ (2), length: 36
+	    Msg-Version: 0, length: 28
+	    Service Type: Default/Global Information (1), break bit not set, Service length: 24
+	      Parameter ID: Token Bucket TSpec (127), length: 20, Flags: [0x00]
+		Token Bucket Rate: 0 Mbps
+		Token Bucket Size: 0 bytes
+		Peak Data Rate: 0 Mbps
+		Minimum Policed Unit: 0 bytes
+		Maximum Packet Size: 2147483647 bytes
+	  RRO Object (21) Flags: [reject if unknown], Class-Type: IPv4 (1), length: 12
+	    Subobject Type: IPv4 prefix, length 8, Strict, 10.0.12.1/32, Flags: [none]
+	  Sub-LSP to LSP Object (50) Flags: [reject if unknown], Class-Type: IPv4 sub-LSP (1), length: 8
+	    Sub-LSP destination address: 3.3.3.3
+	  Sub-LSP to LSP Object (50) Flags: [reject if unknown], Class-Type: IPv4 sub-LSP (1), length: 8
+	    Sub-LSP destination address: 4.4.4.4
+	  Unknown Object (200) Flags: [ignore and forward if unknown], Class-Type: Unknown (2), length: 20
+	    0x0000:  0108 0a00 1703 2000 0108 0a00 2204 2000
+    7  2024-12-21 22:27:13.532254 IP (tos 0xc0, ttl 253, id 1, offset 0, flags [none], proto RSVP (46), length 224)
+    10.0.12.2 > 10.0.12.1: 
+	RSVPv1 Resv Message (2), Flags: [none], length: 204, ttl: 253, checksum: 0x3483
+	  Session Object (1) Flags: [reject if unknown], Class-Type: IPv4 P2MP LSP Tunnel (13), length: 16
+	    IPv4 P2MP LSP ID: 1.49.45.0, Tunnel ID: 0x0001, Extended Tunnel ID: 1.1.1.1
+	  RSVP Hop Object (3) Flags: [reject if unknown], Class-Type: IPv4 (1), length: 12
+	    Previous/Next Interface: 10.0.12.2, Logical Interface Handle: 0x00000000
+	  Time Values Object (5) Flags: [reject if unknown], Class-Type: 1 (1), length: 8
+	    Refresh Period: 30000ms
+	  Style Object (8) Flags: [reject if unknown], Class-Type: 1 (1), length: 8
+	    Reservation Style: Shared Explicit, Flags: [0x00]
+	  Flowspec Object (9) Flags: [reject if unknown], Class-Type: IntServ (2), length: 36
+	    Msg-Version: 0, length: 28
+	    Service Type: Controlled Load (5), break bit not set, Service length: 24
+	      Parameter ID: Token Bucket TSpec (127), length: 20, Flags: [0x00]
+		Token Bucket Rate: 0 Mbps
+		Token Bucket Size: 0 bytes
+		Peak Data Rate: 0 Mbps
+		Minimum Policed Unit: 0 bytes
+		Maximum Packet Size: 2147483647 bytes
+	  FilterSpec Object (10) Flags: [reject if unknown], Class-Type: IPv4 P2MP LSP Tunnel (12), length: 20
+	    IPv4 Tunnel Sender Address: 1.1.1.1, LSP ID: 0x0001
+	    Sub-Group Originator ID: 1.1.1.1, Sub-Group ID: 0x0000
+	  Label Object (16) Flags: [reject if unknown], Class-Type: Label (1), length: 8
+	    Label: 200000
+	  RRO Object (21) Flags: [reject if unknown], Class-Type: IPv4 (1), length: 36
+	    Subobject Type: IPv4 prefix, length 8, Strict, 10.0.12.2/32, Flags: [none]
+	    Subobject Type: Label, length 8, Flags: [Global] (0x1), Class-Type: IPv4 (1), 200000
+	    Subobject Type: IPv4 prefix, length 8, Strict, 10.0.23.3/32, Flags: [none]
+	    Subobject Type: Label, length 8, Flags: [Global] (0x1), Class-Type: IPv4 (1), 300000
+	  Sub-LSP to LSP Object (50) Flags: [reject if unknown], Class-Type: IPv4 sub-LSP (1), length: 8
+	    Sub-LSP destination address: 3.3.3.3
+	  Sub-LSP to LSP Object (50) Flags: [reject if unknown], Class-Type: IPv4 sub-LSP (1), length: 8
+	    Sub-LSP destination address: 4.4.4.4
+	  Unknown Object (201) Flags: [ignore and forward if unknown], Class-Type: Unknown (2), length: 36
+	    0x0000:  0108 0a00 1703 2000 0308 0101 0004 93e0
+	    0x0010:  0108 0a00 2204 2000 0308 0101 0006 1a80
+    8  2024-12-21 22:27:13.540508 IP (tos 0xc0, ttl 255, id 18, offset 0, flags [none], proto RSVP (46), length 92)
+    10.0.12.2 > 10.0.12.1: 
+	RSVPv1 PathErr Message (3), Flags: [none], length: 72, ttl: 255, checksum: 0x21f2
+	  Session Object (1) Flags: [reject if unknown], Class-Type: IPv4 P2MP LSP Tunnel (13), length: 16
+	    IPv4 P2MP LSP ID: 1.49.45.0, Tunnel ID: 0x0001, Extended Tunnel ID: 1.1.1.1
+	  Error Spec Object (6) Flags: [reject if unknown], Class-Type: IPv4 (1), length: 12
+	    Error Node Address: 10.0.12.2, Flags: [0x00]
+	    Error Code: Notify Error (25), Unknown Error Value (3)
+	  Sender Template Object (11) Flags: [reject if unknown], Class-Type: IPv4 P2MP LSP Tunnel (12), length: 20
+	    IPv4 Tunnel Sender Address: 1.1.1.1, LSP ID: 0x0001
+	    Sub-Group Originator ID: 1.1.1.1, Sub-Group ID: 0x0000
+	  Sub-LSP to LSP Object (50) Flags: [reject if unknown], Class-Type: IPv4 sub-LSP (1), length: 8
+	    Sub-LSP destination address: 3.3.3.3
+	  Sub-LSP to LSP Object (50) Flags: [reject if unknown], Class-Type: IPv4 sub-LSP (1), length: 8
+	    Sub-LSP destination address: 4.4.4.4
+    9  2024-12-21 22:27:13.543048 IP (tos 0xc0, ttl 255, id 39, offset 0, flags [none], proto RSVP (46), length 96, options (RA))
+    1.1.1.1 > 3.3.3.3: 
+	RSVPv1 PathTear Message (5), Flags: [none], length: 72, ttl: 255, checksum: 0x250d
+	  Session Object (1) Flags: [reject if unknown], Class-Type: IPv4 P2MP LSP Tunnel (13), length: 16
+	    IPv4 P2MP LSP ID: 1.49.45.0, Tunnel ID: 0x0001, Extended Tunnel ID: 1.1.1.1
+	  RSVP Hop Object (3) Flags: [reject if unknown], Class-Type: IPv4 (1), length: 12
+	    Previous/Next Interface: 10.0.12.1, Logical Interface Handle: 0x00000000
+	  Sender Template Object (11) Flags: [reject if unknown], Class-Type: IPv4 P2MP LSP Tunnel (12), length: 20
+	    IPv4 Tunnel Sender Address: 1.1.1.1, LSP ID: 0x0001
+	    Sub-Group Originator ID: 1.1.1.1, Sub-Group ID: 0x0000
+	  Sub-LSP to LSP Object (50) Flags: [reject if unknown], Class-Type: IPv4 sub-LSP (1), length: 8
+	    Sub-LSP destination address: 3.3.3.3
+	  Sub-LSP to LSP Object (50) Flags: [reject if unknown], Class-Type: IPv4 sub-LSP (1), length: 8
+	    Sub-LSP destination address: 4.4.4.4
+   10  2024-12-21 22:27:13.546156 IP (tos 0xc0, ttl 255, id 63, offset 0, flags [none], proto RSVP (46), length 100)
+    10.0.12.2 > 10.0.12.1: 
+	RSVPv1 ResvTear Message (6), Flags: [none], length: 80, ttl: 255, checksum: 0x1de8
+	  Session Object (1) Flags: [reject if unknown], Class-Type: IPv4 P2MP LSP Tunnel (13), length: 16
+	    IPv4 P2MP LSP ID: 1.49.45.0, Tunnel ID: 0x0001, Extended Tunnel ID: 1.1.1.1
+	  RSVP Hop Object (3) Flags: [reject if unknown], Class-Type: IPv4 (1), length: 12
+	    Previous/Next Interface: 10.0.12.2, Logical Interface Handle: 0x00000000
+	  Style Object (8) Flags: [reject if unknown], Class-Type: 1 (1), length: 8
+	    Reservation Style: Shared Explicit, Flags: [0x00]
+	  FilterSpec Object (10) Flags: [reject if unknown], Class-Type: IPv4 P2MP LSP Tunnel (12), length: 20
+	    IPv4 Tunnel Sender Address: 1.1.1.1, LSP ID: 0x0001
+	    Sub-Group Originator ID: 1.1.1.1, Sub-Group ID: 0x0000
+	  Sub-LSP to LSP Object (50) Flags: [reject if unknown], Class-Type: IPv4 sub-LSP (1), length: 8
+	    Sub-LSP destination address: 3.3.3.3
+	  Sub-LSP to LSP Object (50) Flags: [reject if unknown], Class-Type: IPv4 sub-LSP (1), length: 8
+	    Sub-LSP destination address: 4.4.4.4
