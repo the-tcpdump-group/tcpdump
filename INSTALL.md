@@ -21,7 +21,7 @@ and tcpdump source trees are in the same directory.
 ### On Windows
 
 You will need to install both Npcap and the Npcap SDK; see [this
-file](README.windows.md) for information on that.
+file](doc/README.windows.md) for information on that.
 
 ## Building tcpdump
 
