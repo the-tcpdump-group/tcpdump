@@ -426,7 +426,7 @@ ip_print(netdissect_options *ndo,
                 ND_PRINT(")");
             }
 
-	    if (!ndo->ndo_Kflag && (const u_char *)ip + hlen <= ndo->ndo_snapend) {
+	    if (!ndo->ndo_Kflag && ND_TTEST_LEN((const u_char *)ip, hlen)) {
 	        vec[0].ptr = (const uint8_t *)(const void *)ip;
 	        vec[0].len = hlen;
 	        sum = in_cksum(vec, 1);
