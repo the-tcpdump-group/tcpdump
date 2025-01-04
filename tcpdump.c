@@ -1399,6 +1399,11 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 		} else if (status == PCAP_ERROR_PERM_DENIED && *cp != '\0')
 			error("%s: %s\n(%s)", device,
 			    pcap_statustostr(status), cp);
+#ifdef PCAP_ERROR_CAPTURE_NOTSUP
+		else if (status == PCAP_ERROR_CAPTURE_NOTSUP && *cp != '\0')
+			error("%s: %s\n(%s)", device,
+			    pcap_statustostr(status), cp);
+#endif
 #ifdef __FreeBSD__
 		else if (status == PCAP_ERROR_RFMON_NOTSUP &&
 		    strncmp(device, "wlan", 4) == 0) {
