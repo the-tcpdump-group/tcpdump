@@ -8,6 +8,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
            if the verbose level is > 1 (option -vv and more).
       TCP: Fix Reset segment processing.
       IP, IPv6: Fix setting the snapshot length for the payload.
+      IP: Use ND_TTEST_LEN() instead of a custom bounds check.
+      frag6: Add a bounds check in non-verbose mode.
       PTP: Remove spaces before colons in output.
       PTP: Fix management packet fields.
     User interface:
