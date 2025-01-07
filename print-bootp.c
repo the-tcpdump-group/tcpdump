@@ -1012,22 +1012,24 @@ rfc1048_print(netdissect_options *ndo,
 				 * URI: URI of the SZTP bootstrap server.
 				 */
 				while (len >= 2) {
-					suboptlen = GET_BE_U_2(bp);
+					uint16_t suboptlen2;
+
+					suboptlen2 = GET_BE_U_2(bp);
 					bp += 2;
 					len -= 2;
 					ND_PRINT("\n\t	    ");
-					ND_PRINT("length %u: ", suboptlen);
-					if (len < suboptlen) {
+					ND_PRINT("length %u: ", suboptlen2);
+					if (len < suboptlen2) {
 						ND_PRINT("length goes past end of option");
 						bp += len;
 						len = 0;
 						break;
 					}
 					ND_PRINT("\"");
-					nd_printjn(ndo, bp, suboptlen);
+					nd_printjn(ndo, bp, suboptlen2);
 					ND_PRINT("\"");
-					len -= suboptlen;
-					bp += suboptlen;
+					len -= suboptlen2;
+					bp += suboptlen2;
 				}
 				if (len != 0) {
 					ND_PRINT("[ERROR: length < 2 bytes]");
