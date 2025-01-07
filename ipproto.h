@@ -64,7 +64,7 @@ extern const char *netdb_protoname (const uint8_t);
  * "any private interior gateway (used by Cisco for their IGRP)" and
  * 88 as "EIGRP" from Cisco.
  *
- * Recent FreeBSD and DragonFly BSD <netinet/in.h> headers define
+ * Recent FreeBSD, DragonFly BSD, and macOS <netinet/in.h> headers define
  * IP_PROTO_IGRP as 9 and IP_PROTO_IGRP as 88.  We define IP_PROTO_PIGP
  * ("private interior gateway protocol") as 9 and IP_PROTO_EIGRP as 88;
  * those names* better match what the current protocol number
