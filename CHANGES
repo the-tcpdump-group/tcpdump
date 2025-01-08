@@ -96,6 +96,10 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       frag6: Add a bounds check in non-verbose mode.
       PTP: Remove spaces before colons in output.
       PTP: Fix management packet fields.
+      ISO: Avoid undefined behavior and integer overflow in the fletcher
+           checksum calculation.
+      NFS: Delete dead code.
+      BOOTP: Use an uint16_t variable to get the result of a GET_BE_U_2().
     User interface:
       Warn that options -A, -x[x] and -X[X] are mutually exclusive.
       For PCAP_ERROR_CAPTURE_NOTSUP, show the error message provided
