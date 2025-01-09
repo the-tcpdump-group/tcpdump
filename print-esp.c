@@ -747,8 +747,8 @@ esp_print(netdissect_options *ndo,
 	  u_int ttl_hl USED_IF_LIBCRYPTO)
 {
 	const struct newesp *esp;
-	const u_char *ep;
 #ifdef HAVE_LIBCRYPTO
+	const u_char *ep;
 	const struct ip *ip;
 	struct sa_list *sa = NULL;
 	const struct ip6_hdr *ip6 = NULL;
@@ -764,18 +764,16 @@ esp_print(netdissect_options *ndo,
 	ndo->ndo_protocol = "esp";
 	esp = (const struct newesp *)bp;
 
-	/* 'ep' points to the end of available data. */
-	ep = ndo->ndo_snapend;
+	nd_print_protocol_caps(ndo);
 
-	if ((const u_char *)(esp + 1) >= ep) {
-		nd_print_trunc(ndo);
-		return;
-	}
-	ND_PRINT("ESP(spi=0x%08x", GET_BE_U_4(esp->esp_spi));
+	ND_PRINT("(spi=0x%08x", GET_BE_U_4(esp->esp_spi));
 	ND_PRINT(",seq=0x%x)", GET_BE_U_4(esp->esp_seq));
 	ND_PRINT(", length %u", length);
 
 #ifdef HAVE_LIBCRYPTO
+	/* 'ep' points to the end of available data. */
+	ep = ndo->ndo_snapend;
+
 	/* initialize SAs */
 	if (ndo->ndo_sa_list_head == NULL) {
 		if (!ndo->ndo_espsecret)

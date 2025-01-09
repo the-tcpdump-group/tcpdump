@@ -110,6 +110,7 @@ edsa-high-vid-e	edsa-high-vid.pcap	edsa-high-vid-e.out	-e
 
 # ESP tests
 esp0		02-sunrise-sunset-esp.pcap	esp0.out
+esp_truncated esp_truncated.pcap esp_truncated.out
 # more ESP tests in crypto.tests
 
 # ISAKMP tests
