@@ -563,6 +563,7 @@ lisp_eid_register-v	lisp_eid_register.pcap	lisp_eid_register-v.out	-v
 lisp_ipv6_eid-v		lisp_ipv6.pcap		lisp_ipv6-v.out		-v
 lisp_invalid		lisp_invalid.pcap	lisp_invalid.out
 lisp_invalid-v		lisp_invalid.pcap	lisp_invalid-v.out	-v
+lisp_invalid_lengths  lisp_invalid_length.pcap lisp_invalid_length.out
 
 # NSH tests
 nsh                    nsh.pcap                nsh.out

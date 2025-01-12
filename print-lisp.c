@@ -128,12 +128,12 @@ enum {
 };
 
 static const struct tok lisp_type [] = {
-	{ 0, "LISP-Reserved"			 },
-	{ 1, "LISP-Map-Request"			 },
-	{ 2, "LISP-Map-Reply"			 },
-	{ 3, "LISP-Map-Register"		 },
-	{ 4, "LISP-Map-Notify"			 },
-	{ 8, "LISP-Encapsulated-Control-Message" },
+	{ 0, "Reserved"			 },
+	{ 1, "Map-Request"			 },
+	{ 2, "Map-Reply"			 },
+	{ 3, "Map-Register"		 },
+	{ 4, "Map-Notify"			 },
+	{ 8, "Encapsulated-Control-Message" },
 	{ 0, NULL }
 };
 
@@ -245,6 +245,8 @@ lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	const lisp_map_register_loc *lisp_loc;
 
 	ndo->ndo_protocol = "lisp";
+	nd_print_protocol_caps(ndo);
+	ND_ICHECK_ZU(length, <, MAP_REGISTER_HDR_LEN);
 	lisp_hdr = (const lisp_map_register_hdr *) bp;
 	lisp_hdr_flag(ndo, lisp_hdr);
 	/* Supporting only MAP NOTIFY and MAP REGISTER LISP packets */
@@ -406,7 +408,7 @@ static void lisp_hdr_flag(netdissect_options *ndo, const lisp_map_register_hdr *
 {
 	uint8_t type = extract_lisp_type(GET_U_1(lisp_hdr->type_and_flag));
 
-	ND_PRINT("%s,", tok2str(lisp_type, "unknown-type-%u", type));
+	ND_PRINT("-%s,", tok2str(lisp_type, "unknown-type-%u", type));
 	if (!ndo->ndo_vflag)
 		return;
 
