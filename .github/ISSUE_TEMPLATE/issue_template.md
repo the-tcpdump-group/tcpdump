@@ -1,3 +1,11 @@
+---
+name: New issue
+about: File a bug/issue
+title: ''
+labels: ''
+assignees: ''
+---
+
 To report a ***S_E_C_U_R_I_T_Y issue please send an e-mail*** to security@tcpdump.org.
 
 To report bugs and other problems, contribute patches, request a
