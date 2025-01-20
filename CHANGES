@@ -38,6 +38,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
         the subrule is present (inspird by the OpenBSD tcpdump).
       pflog: Handle OpenBSD's "rewritten" flag and addresses (adapted
         from the OpenBSD tcpdump).
+      PTP: Refine timestamp printing.
       SLL2: Translate interface indices to names on Linux only.
       RT6: Add a bounds check for the PadN TLV in Segment Routing Header.
       TCP: Add support for the AE (AccECN) flag.

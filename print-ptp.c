@@ -22,6 +22,7 @@
 #include "netdissect-stdinc.h"
 #include "netdissect.h"
 #include "extract.h"
+#include "timeval-operations.h"
 
 /*
  * PTP header
@@ -227,6 +228,7 @@ static const struct tok ptp_control_field[] = {
 #define PTP_FALSE !PTP_TRUE
 
 #define PTP_HDR_LEN         0x22
+#define PTP_TIMESTAMP_LEN   10U
 
 /* mask based on the first byte */
 #define PTP_MAJOR_VERS_MASK 0x0F
@@ -495,13 +497,15 @@ ptp_print_timestamp(netdissect_options *ndo, const u_char *bp, u_int *len, const
     ND_PRINT(", %s:", stype);
     /* sec time stamp 6 bytes */
     secs = GET_BE_U_6(bp);
-    ND_PRINT(" %"PRIu64" seconds,", secs);
+    ND_PRINT(" %"PRIu64".", secs);
     *len -= 6;
     bp += 6;
 
     /* NS time stamp 4 bytes */
     nsecs = GET_BE_U_4(bp);
-    ND_PRINT(" %u nanoseconds", nsecs);
+    ND_PRINT("%09u seconds", nsecs);
+    if (nsecs > ND_NANO_PER_SEC - 1)
+        ND_PRINT(" " ND_INVALID_NANO_SEC_STR);
     *len -= 4;
     bp += 4;
 }
@@ -509,23 +513,12 @@ static void
 ptp_print_timestamp_identity(netdissect_options *ndo,
                             const u_char *bp, u_int *len, const char *ttype)
 {
-    uint64_t secs;
-    uint32_t nsecs;
     uint16_t port_id;
     uint64_t port_identity;
 
-    ND_PRINT(", %s:", ttype);
-    /* sec time stamp 6 bytes */
-    secs = GET_BE_U_6(bp);
-    ND_PRINT(" %"PRIu64" seconds,", secs);
-    *len -= 6;
-    bp += 6;
-
-    /* NS time stamp 4 bytes */
-    nsecs = GET_BE_U_4(bp);
-    ND_PRINT(" %u nanoseconds", nsecs);
-    *len -= 4;
-    bp += 4;
+    ptp_print_timestamp(ndo, bp, len, ttype);
+    *len -= PTP_TIMESTAMP_LEN;
+    bp += PTP_TIMESTAMP_LEN;
 
     /* port identity*/
     port_identity = GET_BE_U_8(bp);
@@ -545,21 +538,10 @@ ptp_print_announce_msg(netdissect_options *ndo, const u_char *bp, u_int *len)
     uint8_t rsvd, gm_prio_1, gm_prio_2, gm_clk_cls, gm_clk_acc, time_src;
     uint16_t origin_cur_utc, gm_clk_var, steps_removed;
     uint64_t gm_clock_id;
-    uint64_t secs;
-    uint32_t nsecs;
 
-    ND_PRINT(", %s:", p_origin_ts);
-    /* sec time stamp 6 bytes */
-    secs = GET_BE_U_6(bp);
-    ND_PRINT(" %"PRIu64" seconds", secs);
-    *len -= 6;
-    bp += 6;
-
-    /* NS time stamp 4 bytes */
-    nsecs = GET_BE_U_4(bp);
-    ND_PRINT(" %u nanoseconds", nsecs);
-    *len -= 4;
-    bp += 4;
+    ptp_print_timestamp(ndo, bp, len, p_origin_ts);
+    *len -= PTP_TIMESTAMP_LEN;
+    bp += PTP_TIMESTAMP_LEN;
 
     /* origin cur utc */
     origin_cur_utc = GET_BE_U_2(bp);
