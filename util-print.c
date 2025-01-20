@@ -217,13 +217,13 @@ ts_frac_print(netdissect_options *ndo, const struct timeval *tv)
 	case PCAP_TSTAMP_PRECISION_MICRO:
 		ND_PRINT(".%06u", (unsigned)tv->tv_usec);
 		if ((unsigned)tv->tv_usec > ND_MICRO_PER_SEC - 1)
-			ND_PRINT(" (invalid ms)");
+			ND_PRINT(" " ND_INVALID_MICRO_SEC_STR);
 		break;
 
 	case PCAP_TSTAMP_PRECISION_NANO:
 		ND_PRINT(".%09u", (unsigned)tv->tv_usec);
 		if ((unsigned)tv->tv_usec > ND_NANO_PER_SEC - 1)
-			ND_PRINT(" (invalid ns)");
+			ND_PRINT(" " ND_INVALID_NANO_SEC_STR);
 		break;
 
 	default:
@@ -233,7 +233,7 @@ ts_frac_print(netdissect_options *ndo, const struct timeval *tv)
 #else
 	ND_PRINT(".%06u", (unsigned)tv->tv_usec);
 	if ((unsigned)tv->tv_usec > ND_MICRO_PER_SEC - 1)
-		ND_PRINT(" (invalid ms)");
+		ND_PRINT(" " ND_INVALID_MICRO_SEC_STR);
 #endif
 }
 

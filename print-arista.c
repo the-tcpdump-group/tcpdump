@@ -8,6 +8,7 @@
 
 #include "netdissect.h"
 #include "extract.h"
+#include "timeval-operations.h"
 
 /*
 
@@ -85,9 +86,6 @@ static const struct tok hw_info_str[] = {
 	{ 0, NULL }
 };
 
-#define MAX_VALID_NS 999999999U
-#define BOGUS_NS_STR "(bogus ns!)"
-
 static inline void
 arista_print_date_hms_time(netdissect_options *ndo, const uint32_t seconds,
 		const uint32_t nanoseconds)
@@ -98,8 +96,8 @@ arista_print_date_hms_time(netdissect_options *ndo, const uint32_t seconds,
 	ND_PRINT("%s.%09u",
 	    nd_format_time(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S",
 	       gmtime(&ts)), nanoseconds);
-	if (nanoseconds > MAX_VALID_NS)
-		ND_PRINT(" " BOGUS_NS_STR);
+	if (nanoseconds > ND_NANO_PER_SEC - 1)
+		ND_PRINT(" " ND_INVALID_NANO_SEC_STR);
 }
 
 int
@@ -151,8 +149,8 @@ arista_ethertype_print(netdissect_options *ndo, const u_char *bp, u_int len _U_)
 			seconds = GET_BE_U_2(bp);
 			nanoseconds = GET_BE_U_4(bp + 2);
 			ND_PRINT("%u.%09u", seconds, nanoseconds);
-			if (nanoseconds > MAX_VALID_NS)
-				ND_PRINT(" " BOGUS_NS_STR);
+			if (nanoseconds > ND_NANO_PER_SEC - 1)
+				ND_PRINT(" " ND_INVALID_NANO_SEC_STR);
 			bytesConsumed += 6;
 			break;
 		default:
