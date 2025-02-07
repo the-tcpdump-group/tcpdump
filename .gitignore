@@ -22,7 +22,6 @@
 /tcpdump
 /tcpdump.1
 /tcpdump-*.tar.gz
-failure-outputs.txt
 /autom4te.cache/
 *.VC.db
 *.VC.opendb

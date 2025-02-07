@@ -1,21 +1,59 @@
 #!/usr/bin/env perl
 
+BEGIN {
+	require 5.8.4; # Solaris 10
+	use Config;
+	use FindBin;
+	if (defined $ENV{TESTRUN_PERL}) {
+		my $newperl = $ENV{TESTRUN_PERL};
+		delete $ENV{TESTRUN_PERL};
+		print "INFO: Re-launching using TESTRUN_PERL='$newperl'.\n";
+		exec ($newperl, $FindBin::RealBin . '/' . $FindBin::RealScript, @ARGV);
+		die 'ERROR: Failed to re-launch.';
+	}
+	require $FindBin::RealBin . '/TEST' . ($Config{useithreads} ? 'mt' : 'st') . '.pm';
+}
+
+use strict;
+use warnings FATAL => qw(uninitialized);
+require $FindBin::RealBin . '/TESTlib.pm';
+# TESTlib.pm
+use subs qw(
+	file_get_contents
+	get_diff_flags
+	init_tmpdir
+	mytmpfile
+	read_config_h
+	result_failed
+	result_passed
+	result_skipped
+	result_timed_out
+	run_skip_test
+	skip_config_def1
+	skip_config_undef
+	skip_os
+	test_and_report
+);
+
 #
 # Were we told where to find tcpdump?
 #
-if (!($TCPDUMP = $ENV{TCPDUMP_BIN})) {
-    #
-    # No.  Use the appropriate path.
-    #
-    if ($^O eq 'MSWin32') {
-        #
-        # XXX - assume, for now, a Visual Studio debug build, so that
-        # tcpdump is in the Debug subdirectory.
-        #
-        $TCPDUMP = "Debug\\tcpdump.exe"
-    } else {
-        $TCPDUMP = "./tcpdump"
-    }
+my $TCPDUMP;
+if (defined $ENV{TCPDUMP_BIN}) {
+	$TCPDUMP = $ENV{TCPDUMP_BIN};
+} else {
+	#
+	# No.  Use the appropriate path.
+	#
+	if ($^O eq 'MSWin32') {
+		#
+		# XXX - assume, for now, a Visual Studio debug build, so that
+		# tcpdump is in the Debug subdirectory.
+		#
+		$TCPDUMP = "Debug\\tcpdump.exe"
+	} else {
+		$TCPDUMP = "./tcpdump"
+	}
 }
 
 #
@@ -24,497 +62,673 @@ if (!($TCPDUMP = $ENV{TCPDUMP_BIN})) {
 use constant true => 1;
 use constant false => 0;
 
-use File::Basename;
-use POSIX qw( WEXITSTATUS WIFEXITED);
-use Cwd qw(abs_path getcwd);
-use File::Path qw(mkpath);   # mkpath works with ancient perl, as well as newer perl
+use POSIX qw(WEXITSTATUS WIFEXITED);
 use File::Spec;
 
-# these are created in the directory where we are run, which might be
-# a build directory.
-my $newdir = "tests/NEW";
-my $diffdir= "tests/DIFF";
-mkpath($newdir);
-mkpath($diffdir);
-my $origdir = getcwd();
-my $srcdir  = $ENV{'srcdir'} || ".";
-# Default to unified context diff (on HP-UX diff does not support it, so
-# default to the closest alternative) and allow to fall back to another diff
-# format if necessary.
-my $diff_flags = defined $ENV{'DIFF_FLAGS'} ? $ENV{'DIFF_FLAGS'} :
-	$^O eq 'hpux' ? '-c' :
-	'-u';
+# These filenames use a prefix and are relative to the temporary directory.
+my $filename_stdout = 'stdout.txt';
+my $filename_stderr = 'stderr.txt';
+my $filename_diags = 'diags.txt';
+
+my $diff_flags = get_diff_flags;
 
 #
 # Force UTC, so time stamps are printed in a standard time zone, and
 # tests don't have to be run in the time zone in which the output
 # file was generated.
 #
-$ENV{'TZ'}='GMT0';
+$ENV{TZ} = 'GMT0';
 
 #
 # Get the tests directory from $0.
-#
-my $testsdir = dirname($0);
-
-#
 # Convert it to an absolute path, so it works even after we do a cd.
 #
-$testsdir = abs_path($testsdir);
+my $testsdir = $FindBin::RealBin;
+my $fn_testlist = "${testsdir}/TESTLIST";
+
 print "Running tests from ${testsdir}\n";
 print "with ${TCPDUMP}, version:\n";
-system "${TCPDUMP} --version";
+system ("${TCPDUMP} --version") == 0 or die "ERROR: '$TCPDUMP --version' failed to run\n";
 
-unshift(@INC, $testsdir);
-
-$passedcount = 0;
-$failedcount = 0;
-$skippedcount = 0;
-#
-my $failureoutput=$origdir . "/tests/failure-outputs.txt";
-
-# truncate the output file
-open(FAILUREOUTPUT, ">" . $failureoutput);
-close(FAILUREOUTPUT);
-
-$confighhash = undef;
-
-sub showfile {
-    local($path) = @_;
-
-    #
-    # XXX - just do this directly in Perl?
-    #
-    if ($^O eq 'MSWin32') {
-        my $winpath = File::Spec->canonpath($path);
-        system "type $winpath";
-    } else {
-        system "cat $path";
-    }
+sub pipe_tcpdump {
+	my $option = shift;
+	open (OPT_PIPE, "$TCPDUMP $option |") or die "ERROR: piping tcpdump $option failed at open\n";
+	my $ret = <OPT_PIPE>;
+	close (OPT_PIPE) or die "ERROR: piping tcpdump $option failed at close\n";
+	return $ret;
 }
 
-sub runtest {
-    local($name, $input, $output, $options) = @_;
-    my $r;
+# Get the type of floating-point arithmetic we're doing.
+my $fptype = pipe_tcpdump ('--fp-type') == '9877.895' ? 1 : 2;
+printf "%s --fp-type => %s\n", $TCPDUMP, $fptype;
 
-    $outputbase = basename($output);
-    my $coredump = false;
-    my $status = 0;
-    my $linecount = 0;
-    my $rawstderrlog = "${newdir}/${outputbase}.raw.stderr";
-    my $stderrlog = "${newdir}/${outputbase}.stderr";
-    my $diffstat = 0;
-    my $errdiffstat = 0;
+# Get the size of size_t in bits.
+my $time_t_size = int (pipe_tcpdump '--time-t-size');
+printf "%s --time-t-size => %s\n", $TCPDUMP, $time_t_size;
 
-    # we used to do this as a nice pipeline, but the problem is that $r fails to
-    # to be set properly if the tcpdump core dumps.
-    #
-    # Furthermore, on Windows, fc can't read the standard input, so we
-    # can't do it as a pipeline in any case.
-    if (index($options, "SPECIAL_t") != -1) {
-        # Hack to keep specific time options for tcp-handshake-micro-t, etc.
-        # -t, -tt, etc.
-        $options =~ s/ SPECIAL_t//;
-    } else {
-        # No specific time option, use -tttt
-        $options .= " -tttt";
-    }
-    $r = system "$TCPDUMP -# -n -r $input $options >${newdir}/${outputbase} 2>${rawstderrlog}";
+# Enable all shared skip functions to be able to declare the tests below.
+read_config_h (defined $ENV{CONFIG_H} ? $ENV{CONFIG_H} : './config.h');
 
-    if($r != 0) {
-        #
-        # Something other than "tcpdump opened the file, read it, and
-        # dissected all the packets".  What happened?
-        #
-        # We write out an exit status after whatever the subprocess
-        # wrote out, so it shows up when we diff the expected output
-        # with it.
-        #
-        open(OUTPUT, ">>"."${newdir}/$outputbase") || die "fail to open $outputbase\n";
-        if($r == -1) {
-            # failed to start due to error.
-            $status = $!;
-            printf OUTPUT "FAILED TO RUN: status: %d\n", $status;
-        } else {
-            if ($^O eq 'MSWin32' or $^O eq 'msys') {
-                #
-                # On Windows, the return value of system is the lower 8
-                # bits of the exit status of the process, shifted left
-                # 8 bits.
-                #
-                # If the process crashed, rather than exiting, the
-                # exit status will be one of the EXCEPTION_ values
-                # listed in the documentation for the GetExceptionCode()
-                # macro.
-                #
-                # Those are defined as STATUS_ values, which should have
-                # 0xC in the topmost 4 bits (being fatal error
-                # statuses); some of them have a value that fits in
-                # the lower 8 bits.  We could, I guess, assume that
-                # any value that 1) isn't returned by tcpdump and 2)
-                # corresponds to the lower 8 bits of a STATUS_ value
-                # used as an EXCEPTION_ value indicates that tcpdump
-                # exited with that exception.
-                #
-                # However, as we're running tcpdump with system, which
-                # runs the command through cmd.exe, and as cmd.exe
-                # doesn't map the command's exit code to its own exit
-                # code in any straightforward manner, we can't get
-                # that information in any case, so there's no point
-                # in trying to interpret it in that fashion.
-                #
-                $status = $r >> 8;
-            } else {
-                #
-                # On UN*Xes, the return status is a POSIX as filled in
-                # by wait() or waitpid().
-                #
-                # POSIX offers some calls for analyzing it, such as
-                # WIFSIGNALED() to test whether it indicates that the
-                # process was terminated by a signal, WTERMSIG() to
-                # get the signal number from it, WIFEXITED() to test
-                # whether it indicates that the process exited normally,
-                # and WEXITSTATUS() to get the exit status from it.
-                #
-                # POSIX doesn't standardize core dumps, so the POSIX
-                # calls can't test whether a core dump occurred.
-                # However, all the UN*Xes we are likely to encounter
-                # follow Research UNIX in this regard, with the exit
-                # status containing either 0 or a signal number in
-                # the lower 7 bits, with 0 meaning "exited rather
-                # than being terminated by a signal", the "core dumped"
-                # flag in the 0x80 bit, and, if the signal number is
-                # 0, the exit status in the next 8 bits up.
-                #
-                # This should be cleaned up to use the POSIX calls
-                # from the Perl library - and to define an additional
-                # WCOREDUMP() call to test the "core dumped" bit and
-                # use that.
-                #
-                # But note also that, as we're running tcpdump with
-                # system, which runs the command through a shell, if
-                # tcpdump crashes, we'll only know that if the shell
-                # maps the signal indication and uses that as its
-                # exit status.
-                #
-                # The good news is that the Bourne shell, and compatible
-                # shells, have traditionally done that.  If the process
-                # for which the shell reports the exit status terminates
-                # with a signal, it adds 128 to the signal number and
-                # returns that as its exit status.  (This is why the
-                # "this is now working right" behavior described in a
-                # comment below is occurring.)
-                #
-                # As tcpdump itself never returns with an exit status
-                # >= 128, we can try checking for an exit status with
-                # the 0x80 bit set and, if we have one, get the signal
-                # number from the lower 7 bits of the exit status.  We
-                # can't get the "core dumped" indication from the
-                # shell's exit status; all we can do is check whether
-                # there's a core file.
-                #
-                if( $r & 128 ) {
-                    $coredump = $r & 127;
-                }
-                if( WIFEXITED($r)) {
-                    $status = WEXITSTATUS($r);
-                }
-            }
-
-            if($coredump || $status) {
-                printf OUTPUT "EXIT CODE %08x: dump:%d code: %d\n", $r, $coredump, $status;
-            } else {
-                printf OUTPUT "EXIT CODE %08x\n", $r;
-            }
-            $r = 0;
-        }
-        close(OUTPUT);
-    }
-    if($r == 0) {
-        #
-        # Compare tcpdump's output with what we think it should be.
-        # If tcpdump failed to produce output, we've produced our own
-        # "output" above, with the exit status.
-        #
-        if ($^O eq 'MSWin32') {
-            my $winoutput = File::Spec->canonpath($output);
-            my $winnewdir = File::Spec->canonpath($newdir);
-            my $windiffdir = File::Spec->canonpath($diffdir);
-            $r = system "fc /lb1000 /t /1 $winoutput ${winnewdir}\\$outputbase >${windiffdir}\\$outputbase.diff";
-            $diffstat = $r >> 8;
-        } else {
-            $r = system "diff $diff_flags $output ${newdir}/$outputbase >${diffdir}/$outputbase.diff";
-            $diffstat = WEXITSTATUS($r);
-        }
-    }
-
-    # process the standard error file, sanitize "reading from" line,
-    # and count lines
-    $linecount = 0;
-    open(ERRORRAW, "<" . $rawstderrlog);
-    open(ERROROUT, ">" . $stderrlog);
-    while(<ERRORRAW>) {
-        next if /^$/;  # blank lines are boring
-        if(/^(reading from file )(.*)(,.*)$/) {
-            my $filename = basename($2);
-            print ERROROUT "${1}${filename}${3}\n";
-            next;
-        }
-        print ERROROUT;
-        $linecount++;
-    }
-    close(ERROROUT);
-    close(ERRORRAW);
-
-    if ( -f "$output.stderr" ) {
-        #
-        # Compare the standard error with what we think it should be.
-        #
-        if ($^O eq 'MSWin32') {
-            my $winoutput = File::Spec->canonpath($output);
-            my $windiffdir = File::Spec->canonpath($diffdir);
-            my $canonstderrlog = File::Spec->canonpath($stderrlog);
-            $nr = system "fc /lb1000 /t /1 $winoutput.stderr $canonstderrlog >${windiffdir}\\$outputbase.stderr.diff";
-            $errdiffstat = $nr >> 8;
-        } else {
-            $nr = system "diff $output.stderr $stderrlog >${diffdir}/$outputbase.stderr.diff";
-            $errdiffstat = WEXITSTATUS($nr);
-        }
-        if($r == 0) {
-            $r = $nr;
-        }
-    }
-
-    if($r == 0) {
-        if($linecount == 0 && $status == 0) {
-            unlink($stderrlog);
-        } else {
-            $errdiffstat = 1;
-        }
-    }
-
-    if($r == 0) {
-        if($linecount == 0) {
-            printf "    %-40s: passed\n", $name;
-        } else {
-            printf "    %-40s: passed with error messages:\n", $name;
-            showfile($stderrlog);
-        }
-        unlink "${diffdir}/$outputbase.diff";
-        return 0;
-    }
-    # must have failed!
-    printf "    %-40s: TEST FAILED(exit core=%d/diffstat=%d,%d/r=%d)", $name, $coredump, $diffstat, $errdiffstat, $r;
-    open FOUT, '>>tests/failure-outputs.txt';
-    printf FOUT "\nFailed test: $name\n\n";
-    close FOUT;
-    if(-f "${diffdir}/$outputbase.diff") {
-        #
-        # XXX - just do this directly in Perl?
-        #
-        if ($^O eq 'MSWin32') {
-            my $windiffdir = File::Spec->canonpath($diffdir);
-            system "type ${windiffdir}\\$outputbase.diff >> tests\\failure-outputs.txt";
-        } else {
-            system "cat ${diffdir}/$outputbase.diff >> tests/failure-outputs.txt";
-        }
-    }
-
-    if($r == -1) {
-        print " (failed to execute: $!)\n";
-        return(30);
-    }
-
-    # this is not working right, $r == 0x8b00 when there is a core dump.
-    # clearly, we need some platform specific perl magic to take this apart, so look for "core"
-    # too.
-    # In particular, on Solaris 10 SPARC an alignment problem results in SIGILL,
-    # a core dump and $r set to 0x00008a00 ($? == 138 in the shell).
-    if($r & 127 || -f "core") {
-        my $with = ($r & 128) ? 'with' : 'without';
-        if(-f "core") {
-            $with = "with";
-        }
-        printf " (terminated with signal %u, %s coredump)", ($r & 127), $with;
-        if($linecount == 0) {
-            print "\n";
-        } else {
-            print " with error messages:\n";
-            showfile($stderrlog);
-        }
-        return(($r & 128) ? 10 : 20);
-    }
-    if($linecount == 0) {
-        print "\n";
-    } else {
-        print " with error messages:\n";
-        showfile($stderrlog);
-    }
-    return(5);
+sub skip_fptype_not {
+	my $val = shift;
+	return $fptype != $val ? "fp-type!=$val" : '';
 }
 
-sub loadconfighash {
-    if(defined($confighhash)) {
-        return $confighhash;
-    }
-
-    $main::confighhash = {};
-
-    # this could be loaded once perhaps.
-    open(CONFIG_H, "config.h") || die "Can not open config.h: $!\n";
-    while(<CONFIG_H>) {
-        chomp;
-        if(/^\#define (.*) 1/) {
-            $main::confighhash->{$1} = 1;
-        }
-    }
-    close(CONFIG_H);
-
-    # also run tcpdump --fp-type to get the type of floating-point
-    # arithmetic we're doing, setting a HAVE_{fptype} key based
-    # on the value it prints
-    open(FPTYPE_PIPE, "$TCPDUMP --fp-type |") or die("piping tcpdump --fp-type failed\n");
-    my $fptype_val = <FPTYPE_PIPE>;
-    close(FPTYPE_PIPE);
-    my $have_fptype;
-    if($fptype_val == "9877.895") {
-        $have_fptype = "HAVE_FPTYPE1";
-    } else {
-        $have_fptype = "HAVE_FPTYPE2";
-    }
-    printf "$TCPDUMP --fp-type => %s\n", $have_fptype;
-    $main::confighhash->{$have_fptype} = 1;
-
-    # run tcpdump --time-t-size to get the size of size_t in bits
-    open(TIMETSIZE_PIPE, "$TCPDUMP --time-t-size |") or die("piping tcpdump --time-t-size failed\n");
-    my $time_t_size = <TIMETSIZE_PIPE>;
-    close(TIMETSIZE_PIPE);
-    my $have_time_t_64;
-    if($time_t_size == "64") {
-        $have_time_t_64 = "HAVE_TIME_T_64";
-    }
-    printf "$TCPDUMP --time-t-size => %s\n", $time_t_size;
-    $main::confighhash->{$have_time_t_64} = 1;
-
-    # and check whether this is OpenBSD, as one test fails in OpenBSD
-    # due to the sad hellscape of low-numbered DLT_ values, due to
-    # 12 meaning "OpenBSD loopback" rather than "raw IP" on OpenBSD
-    if($^O eq "openbsd") {
-        $main::confighhash->{"IS_OPENBSD"} = 1;
-    }
-
-    return $main::confighhash;
+sub skip_time_t_not {
+	my $val = shift;
+	return $time_t_size != $val ? "time_t is not ${val}-bit" : '';
 }
 
+my @decode_tests = (
+	# -------- formerly crypto.tests --------
+	# Only attempt OpenSSL-specific tests when compiled with the library.
+	# Reading the secret(s) from a file does not work with Capsicum.
 
-sub runOneComplexTest {
-    local($testconfig) = @_;
+	{
+		skip => skip_config_undef ('HAVE_LIBCRYPTO'),
+		name => 'esp1',
+		input => '02-sunrise-sunset-esp.pcap',
+		output => 'esp1.out',
+		args => '-E "0x12345678@192.1.2.45 3des-cbc-hmac96:0x4043434545464649494a4a4c4c4f4f515152525454575758"'
+	},
 
-    my $output = $testconfig->{output};
-    my $input  = $testconfig->{input};
-    my $name   = $testconfig->{name};
-    my $options= $testconfig->{args};
-    my $foundit = 1;
-    my $unfoundit=1;
+	{
+		skip => skip_config_undef ('HAVE_LIBCRYPTO'),
+		name => 'esp2',
+		input => '08-sunrise-sunset-esp2.pcap',
+		output => 'esp2.out',
+		args => '-E "0x12345678@192.1.2.45 3des-cbc-hmac96:0x43434545464649494a4a4c4c4f4f51515252545457575840,0xabcdabcd@192.0.1.1 3des-cbc-hmac96:0x434545464649494a4a4c4c4f4f5151525254545757584043"'
+	},
 
-    my $configset = $testconfig->{config_set};
-    my $configunset = $testconfig->{config_unset};
-    my $ch = loadconfighash();
+	{
+		skip => skip_config_undef ('HAVE_LIBCRYPTO'),
+		name => 'esp3',
+		input => '02-sunrise-sunset-esp.pcap',
+		output => 'esp1.out',
+		args => '-E "3des-cbc-hmac96:0x4043434545464649494a4a4c4c4f4f515152525454575758"',
+	},
 
-    if(defined($configset)) {
-        $foundit = ($ch->{$configset} == 1);
-    }
-    if(defined($configunset)) {
-        $unfoundit=($ch->{$configunset} != 1);
-    }
+	{
+		skip => (skip_config_undef ('HAVE_LIBCRYPTO') || skip_config_def1 ('HAVE_CAPSICUM')),
+		name => 'esp4',
+		input => '08-sunrise-sunset-esp2.pcap',
+		output => 'esp2.out',
+		args => "-E 'file ${testsdir}/esp-secrets.txt'",
+	},
 
-    if(!$foundit) {
-        printf "    %-40s: skipped (%s not set)\n", $name, $configset;
-        $skippedcount++;
-        return 0;
-    }
+	{
+		skip => (skip_config_undef ('HAVE_LIBCRYPTO') || skip_config_def1 ('HAVE_CAPSICUM')),
+		name => 'esp5',
+		input => '08-sunrise-sunset-aes.pcap',
+		output => 'esp5.out',
+		args => "-E 'file ${testsdir}/esp-secrets.txt'",
+	},
 
-    if(!$unfoundit) {
-        printf "    %-40s: skipped (%s set)\n", $name, $configunset;
-        $skippedcount++;
-        return 0;
-    }
+	{
+		skip => (skip_config_undef ('HAVE_LIBCRYPTO') || skip_config_def1 ('HAVE_CAPSICUM')),
+		name => 'espudp1',
+		input => 'espudp1.pcap',
+		output => 'espudp1.out',
+		args => "-E 'file ${testsdir}/esp-secrets.txt'",
+	},
 
-    # EXPAND any occurrences of @TESTDIR@ to $testsdir
-    $options =~ s/\@TESTDIR\@/$testsdir/;
+	{
+		skip => (skip_config_undef ('HAVE_LIBCRYPTO') || skip_config_def1 ('HAVE_CAPSICUM')),
+		name => 'ikev2pI2',
+		input => 'ikev2pI2.pcap',
+		output => 'ikev2pI2.out',
+		args => "-v -v -v -v -E 'file ${testsdir}/ikev2pI2-secrets.txt'",
+	},
 
-    my $result = runtest($name,
-                         $testsdir . "/" . $input,
-                         $testsdir . "/" . $output,
-                         $options);
+	{
+		skip => (skip_config_undef ('HAVE_LIBCRYPTO') || skip_config_def1 ('HAVE_CAPSICUM')),
+		name => 'isakmp4',
+		input => 'isakmp4500.pcap',
+		output => 'isakmp4.out',
+		args => "-E 'file ${testsdir}/esp-secrets.txt'",
+	},
 
-    if($result == 0) {
-        $passedcount++;
-    } else {
-        $failedcount++;
-    }
+	{
+		skip => skip_config_undef ('HAVE_LIBCRYPTO'),
+		name => 'bgp-as-path-oobr-ssl',
+		input => 'bgp-as-path-oobr.pcap',
+		output => 'bgp-as-path-oobr-ssl.out',
+		args => '-vvv -e'
+	},
+
+	{
+		skip => skip_config_undef ('HAVE_LIBCRYPTO'),
+		name => 'bgp-aigp-oobr-ssl',
+		input => 'bgp-aigp-oobr.pcap',
+		output => 'bgp-aigp-oobr-ssl.out',
+		args => '-vvv -e'
+	},
+
+	{
+		skip => skip_config_def1 ('HAVE_LIBCRYPTO'),
+		name => 'bgp-as-path-oobr-nossl',
+		input => 'bgp-as-path-oobr.pcap',
+		output => 'bgp-as-path-oobr-nossl.out',
+		args => '-vvv -e'
+	},
+
+	{
+		skip => skip_config_def1 ('HAVE_LIBCRYPTO'),
+		name => 'bgp-aigp-oobr-nossl',
+		input => 'bgp-aigp-oobr.pcap',
+		output => 'bgp-aigp-oobr-nossl.out',
+		args => '-vvv -e'
+	},
+
+	# -------- formerly isis-seg-fault-1-v.tests --------
+	# This "verbose" ISIS protocol test involves a float calculation that
+	# may produce a slightly different result depending on the compiler and
+	# the version of the instruction set for which it's generating code (see
+	# GitHub issue #333 for another example). The test is done only if we have
+	# a floating-point type, as reported by "./tcpdump --fp-type", of FPTYPE1.
+	#
+	# XXX - this works on my 32-bit x86 Linux virtual machine, so do this
+	# regardless of the floating-point type, so always do this.  If it
+	# fails on some platform, we'll need to tweak tcpdump and tests/TESTrun
+	# to check for *that* floating-point difference.
+
+	{
+		name => 'isis-seg-fault-1-v',
+		input => 'isis-seg-fault-1.pcapng',
+		output => 'isis-seg-fault-1-v.out',
+		args => '-v'
+	},
+
+	# -------- formerly lmp-v.tests --------
+	# The "verbose" Link Management Protocol test involves a float calculation that
+	# may produce a slightly different result depending on the compiler and the
+	# version of the instruction set for which it's generating code (see GitHub
+	# issue #333). The test is done with an output file that depends on the
+	# floating-point type, as reported by "./tcpdump --fp-type".
+
+	{
+		skip => skip_fptype_not (1),
+		name => 'lmp-v-fptype1',
+		input => 'lmp.pcap',
+		output => 'lmp-v-fptype1.out',
+		args => '-T lmp -v'
+	},
+	{
+		skip => skip_fptype_not (2),
+		name => 'lmp-v-fptype2',
+		input => 'lmp.pcap',
+		output => 'lmp-v-fptype2.out',
+		args => '-T lmp -v'
+	},
+
+	# -------- formerly non-bsd.tests --------
+	# This specific test fails on OpenBSD because the .pcap file uses DLT_RAW,
+	# which OpenBSD treats as DLT_LOOP.
+
+	{
+		skip => skip_os ('openbsd'),
+		name => 'heap-overflow-1',
+		input => 'heap-overflow-1.pcap',
+		output => 'heap-overflow-1.out',
+		args => '-v'
+	},
+
+	# -------- formerly smb.tests --------
+	# Only attempt OpenSSL-specific tests when compiled with the library.
+	# Reading the secret(s) from a file does not work with Capsicum.
+
+	# EAP tests
+	{
+		skip => skip_config_undef ('ENABLE_SMB'),
+		name => 'eapon1',
+		input => 'eapon1.pcap',
+		output => 'eapon1.out',
+	},
+
+	{
+		skip => skip_config_def1 ('ENABLE_SMB'),
+		name => 'eapon1-nosmb',
+		input => 'eapon1.pcap',
+		output => 'eapon1-nosmb.out',
+	},
+
+	{
+		skip => skip_config_undef ('ENABLE_SMB'),
+		name => 'eapon1-v',
+		input => 'eapon1.pcap',
+		output => 'eapon1-v.out',
+		args => '-v'
+	},
+
+	{
+		skip => skip_config_def1 ('ENABLE_SMB'),
+		name => 'eapon1-v-nosmb',
+		input => 'eapon1.pcap',
+		output => 'eapon1-v-nosmb.out',
+		args => '-v'
+	},
+
+	# IPX/Netware packets
+	{
+		skip => skip_config_undef ('ENABLE_SMB'),
+		name => 'ipx',
+		input => 'ipx.pcap',
+		output => 'ipx.out',
+	},
+
+	{
+		skip => skip_config_def1 ('ENABLE_SMB'),
+		name => 'ipx-nosmb',
+		input => 'ipx.pcap',
+		output => 'ipx-nosmb.out',
+	},
+
+	# bad packets from Otto Airamo and Antti Levomäki
+	{
+		skip => skip_config_undef ('ENABLE_SMB'),
+		name => 'nbns-valgrind',
+		input => 'nbns-valgrind.pcap',
+		output => 'nbns-valgrind.out',
+		args => '-vvv -e',
+	},
+
+	{
+		skip => skip_config_def1 ('ENABLE_SMB'),
+		name => 'nbns-valgrind-nosmb',
+		input => 'nbns-valgrind.pcap',
+		output => 'nbns-valgrind-nosmb.out',
+		args => '-vvv -e',
+	},
+
+	# bad packets from Junjie Wang
+	{
+		skip => skip_config_undef ('ENABLE_SMB'),
+		name => 'smb_print_trans-oobr1',
+		input => 'smb_print_trans-oobr1.pcap',
+		output => 'smb_print_trans-oobr1.out',
+		args => '-vv',
+	},
+
+	{
+		skip => skip_config_def1 ('ENABLE_SMB'),
+		name => 'smb_print_trans-oobr1-nosmb',
+		input => 'smb_print_trans-oobr1.pcap',
+		output => 'smb_print_trans-oobr1-nosmb.out',
+		args => '-vv',
+	},
+
+	# bad packets from Philippe Antoine
+	{
+		skip => skip_config_undef ('ENABLE_SMB'),
+		name => 'smb_print_trans-oobr2',
+		input => 'smb_print_trans-oobr2.pcap',
+		output => 'smb_print_trans-oobr2.out',
+		args => '-vv',
+	},
+
+	{
+		skip => skip_config_def1 ('ENABLE_SMB'),
+		name => 'smb_print_trans-oobr2-nosmb',
+		input => 'smb_print_trans-oobr2.pcap',
+		output => 'smb_print_trans-oobr2-nosmb.out',
+		args => '-vv',
+	},
+
+	# bad packets from Luis Rocha
+	{
+		skip => skip_config_undef ('ENABLE_SMB'),
+		name => 'smb_data_print-oobr',
+		input => 'smb_data_print-oobr.pcapng',
+		output => 'smb_data_print-oobr.out',
+		args => '-vv',
+	},
+
+	{
+		skip => skip_config_def1 ('ENABLE_SMB'),
+		name => 'smb_data_print-oobr-nosmb',
+		input => 'smb_data_print-oobr.pcapng',
+		output => 'smb_data_print-oobr-nosmb.out',
+		args => '-vv',
+	},
+
+	{
+		skip => skip_config_undef ('ENABLE_SMB'),
+		name => 'smb_data_print-segv',
+		input => 'smb_data_print-segv.pcap',
+		output => 'smb_data_print-segv.out',
+		args => '-vv',
+	},
+
+	{
+		skip => skip_config_def1 ('ENABLE_SMB'),
+		name => 'smb_data_print-segv-nosmb',
+		input => 'smb_data_print-segv.pcap',
+		output => 'smb_data_print-segv-nosmb.out',
+		args => '-vv',
+	},
+
+	# WCCP redirect over GRE
+	{
+		skip => skip_config_undef ('ENABLE_SMB'),
+		name => 'wccp_redirect_gre',
+		input => 'wccp_redirect_gre.pcap',
+		output => 'wccp_redirect_gre.out',
+		args => '-v',
+	},
+
+	{
+		skip => skip_config_def1 ('ENABLE_SMB'),
+		name => 'wccp_redirect_gre-nosmb',
+		input => 'wccp_redirect_gre.pcap',
+		output => 'wccp_redirect_gre-nosmb.out',
+		args => '-v',
+	},
+
+	# -------- formerly time.tests --------
+	# The packet time when > 2038-01-19T03:14:07Z cannot be correctly printed
+	# if time_t size is 32 bits (overflow).
+	# Some tests are run only if time_t is 64-bit. it depends on the
+	# output of "./tcpdump --time-t-size" (32 or 64).
+
+	# A 32-bit unsigned time_t goes until 2106-02-07T06:28:15Z.
+	# All values above require a pcapng file.
+
+	{
+		name => 'time_2038',
+		input => 'time_2038.pcap',
+		output => 'time_2038.out',
+		args => '-q'
+	},
+	{
+		name => 'time_2038_max',
+		input => 'time_2038_max.pcap',
+		output => 'time_2038_max.out',
+		args => '-q'
+	},
+	{
+		skip => skip_time_t_not (64),
+		name => 'time_2038_overflow',
+		input => 'time_2038_overflow.pcap',
+		output => 'time_2038_overflow.out',
+		args => '-q'
+	},
+	{
+		skip => skip_time_t_not (64),
+		name => 'time_2039',
+		input => 'time_2039.pcap',
+		output => 'time_2039.out',
+		args => '-q'
+	},
+	{
+		skip => skip_time_t_not (64),
+		name => 'time_2106',
+		input => 'time_2106.pcap',
+		output => 'time_2106.out',
+		args => '-q'
+	},
+	{
+		skip => skip_time_t_not (64),
+		name => 'time_2106_max',
+		input => 'time_2106_max.pcap',
+		output => 'time_2106_max.out',
+		args => '-q'
+	},
+	{
+		skip => skip_time_t_not (64),
+		name => 'time_2106_overflow',
+		input => 'time_2106_overflow.pcapng',
+		output => 'time_2106_overflow.out',
+		args => '-q'
+	},
+	{
+		skip => skip_time_t_not (64),
+		name => 'time_2107',
+		input => 'time_2107.pcapng',
+		output => 'time_2107.out',
+		args => '-q'
+	},
+	{
+		skip => skip_time_t_not (64),
+		name => 'time_2106_overflow-tt',
+		input => 'time_2106_overflow.pcapng',
+		output => 'time_2106_overflow-tt.out',
+		args => '-tt -q SPECIAL_t'
+	},
+	{
+		skip => skip_time_t_not (64),
+		name => 'time_2107-tt',
+		input => 'time_2107.pcapng',
+		output => 'time_2107-tt.out',
+		args => '-tt -q SPECIAL_t'
+	},
+);
+
+sub decode_exit_status {
+	my $r = shift;
+	my $status;
+	my $coredump = false;
+	if ($^O eq 'MSWin32' or $^O eq 'msys') {
+		#
+		# On Windows, the return value of system is the lower 8
+		# bits of the exit status of the process, shifted left
+		# 8 bits.
+		#
+		# If the process crashed, rather than exiting, the
+		# exit status will be one of the EXCEPTION_ values
+		# listed in the documentation for the GetExceptionCode()
+		# macro.
+		#
+		# Those are defined as STATUS_ values, which should have
+		# 0xC in the topmost 4 bits (being fatal error
+		# statuses); some of them have a value that fits in
+		# the lower 8 bits.  We could, I guess, assume that
+		# any value that 1) isn't returned by tcpdump and 2)
+		# corresponds to the lower 8 bits of a STATUS_ value
+		# used as an EXCEPTION_ value indicates that tcpdump
+		# exited with that exception.
+		#
+		# However, as we're running tcpdump with system, which
+		# runs the command through cmd.exe, and as cmd.exe
+		# doesn't map the command's exit code to its own exit
+		# code in any straightforward manner, we can't get
+		# that information in any case, so there's no point
+		# in trying to interpret it in that fashion.
+		#
+		$status = $r >> 8;
+	} else {
+		#
+		# On UN*Xes, the return status is a POSIX as filled in
+		# by wait() or waitpid().
+		#
+		# POSIX offers some calls for analyzing it, such as
+		# WIFSIGNALED() to test whether it indicates that the
+		# process was terminated by a signal, WTERMSIG() to
+		# get the signal number from it, WIFEXITED() to test
+		# whether it indicates that the process exited normally,
+		# and WEXITSTATUS() to get the exit status from it.
+		#
+		# POSIX doesn't standardize core dumps, so the POSIX
+		# calls can't test whether a core dump occurred.
+		# However, all the UN*Xes we are likely to encounter
+		# follow Research UNIX in this regard, with the exit
+		# status containing either 0 or a signal number in
+		# the lower 7 bits, with 0 meaning "exited rather
+		# than being terminated by a signal", the "core dumped"
+		# flag in the 0x80 bit, and, if the signal number is
+		# 0, the exit status in the next 8 bits up.
+		#
+		# This should be cleaned up to use the POSIX calls
+		# from the Perl library - and to define an additional
+		# WCOREDUMP() call to test the "core dumped" bit and
+		# use that.
+		#
+		# But note also that, as we're running tcpdump with
+		# system, which runs the command through a shell, if
+		# tcpdump crashes, we'll only know that if the shell
+		# maps the signal indication and uses that as its
+		# exit status.
+		#
+		# The good news is that the Bourne shell, and compatible
+		# shells, have traditionally done that.  If the process
+		# for which the shell reports the exit status terminates
+		# with a signal, it adds 128 to the signal number and
+		# returns that as its exit status.  (This is why the
+		# "this is now working right" behavior described in a
+		# comment below is occurring.)
+		#
+		# As tcpdump itself never returns with an exit status
+		# >= 128, we can try checking for an exit status with
+		# the 0x80 bit set and, if we have one, get the signal
+		# number from the lower 7 bits of the exit status.  We
+		# can't get the "core dumped" indication from the
+		# shell's exit status; all we can do is check whether
+		# there's a core file.
+		#
+		$coredump = $r & 127 if ($r & 128);
+		# This works as intended only if the caller has removed any
+		# pre-existing core dumps before running the command.
+		$coredump = 'present' if (! $coredump && -f 'core');
+		$status = WEXITSTATUS ($r) if WIFEXITED ($r);
+	}
+	return ($status, $coredump);
 }
 
-# *.tests files are PERL hash definitions.  They should create an array of hashes
-# one per test, and place it into the variable @testlist.
-sub runComplexTests {
-    my @files = glob( $testsdir . '/*.tests' );
-    foreach $file (@files) {
-        my @testlist = undef;
-        my $definitions;
-        print "FILE: ${file}\n";
-        open(FILE, "<".$file) || die "can not open $file: $!";
-        {
-            local $/ = undef;
-            $definitions = <FILE>;
-        }
-        close(FILE);
-        eval $definitions;
-        if(defined($testlist)) {
-            foreach $test (@$testlist) {
-                runOneComplexTest($test);
-            }
-        } else {
-            warn "File: ${file} could not be loaded as PERL: $!";
-        }
-    }
+sub run_decode_test {
+	my $test = shift;
+	my $input = $testsdir . '/' . $test->{input};
+	my $output = $testsdir . '/' . $test->{output};
+
+	# we used to do this as a nice pipeline, but the problem is that $r fails to
+	# to be set properly if the tcpdump core dumps.
+	#
+	# Furthermore, on Windows, fc can't read the standard input, so we
+	# can't do it as a pipeline in any case.
+
+	unlink 'core';
+	my $cmdline = sprintf (
+		'%s -# -n -r "%s" %s >"%s" 2>"%s"',
+		$TCPDUMP,
+		$input,
+		$test->{options},
+		mytmpfile ($filename_stdout),
+		mytmpfile ($filename_stderr)
+	);
+	my $r = system $cmdline;
+
+	return result_failed ('failed to run tcpdump', $!) if $r == -1;
+
+	if ($r != 0) {
+		#
+		# Something other than "failed to start".
+		# Something other than "tcpdump opened the file, read it, and
+		# dissected all the packets".  What happened?
+		#
+		my ($status, $coredump) = decode_exit_status $r;
+		return result_failed (
+			($coredump || $status) ?
+			sprintf ('exit code 0x%08x (dump: %d, code: %d)', $r, $coredump, $status) :
+			sprintf ('exit code 0x%08x', $r),
+			file_get_contents mytmpfile $filename_stderr
+		);
+	}
+
+	#
+	# $r == 0
+	# Compare tcpdump's output with what we think it should be.
+	#
+	my $diffstat;
+	if ($^O eq 'MSWin32') {
+		$cmdline = sprintf (
+			'fc /lb1000 /t /1 %s %s >%s',
+			File::Spec->canonpath ($output),
+			mytmpfile ($filename_stdout),
+			mytmpfile ($filename_diags)
+		);
+		$diffstat = system ($cmdline) >> 8;
+	} else {
+		$cmdline = sprintf (
+			'diff %s "%s" "%s" >"%s" 2>&1',
+			$diff_flags,
+			$output,
+			mytmpfile ($filename_stdout),
+			mytmpfile ($filename_diags)
+		);
+		$diffstat = WEXITSTATUS (system $cmdline);
+	}
+	return result_failed (
+		"diff exited with $diffstat",
+		file_get_contents mytmpfile $filename_diags
+	) if $diffstat;
+
+	# Anything other than the "reading from" line on stderr fails the test.
+	my $failed = false;
+	my $filename = mytmpfile $filename_stderr;
+	open (ERRORRAW, '<', $filename) || die "ERROR: failed opening ${filename}: $!\n";
+	while (<ERRORRAW>) {
+		next if /^reading from file /o;
+		$failed = true;
+		last;
+	}
+	close (ERRORRAW) || die "ERROR: failed closing '$filename'";;
+	return result_failed (
+		'stderr present',
+		file_get_contents mytmpfile $filename_stderr
+	) if $failed;
+
+	return result_passed;
 }
 
-sub runSimpleTests {
+sub request_test {
+	my $testconfig = shift;
 
-    local($only)=@_;
+	return {
+		label => $testconfig->{name},
+		func => \&run_skip_test,
+		skip => $testconfig->{skip},
+	} if defined $testconfig->{skip} && $testconfig->{skip} ne '';
 
-    open(TESTLIST, "<" . "${testsdir}/TESTLIST") || die "no ${testsdir}/TESTFILE: $!\n";
-    while(<TESTLIST>) {
-        next if /^\#/;
-        next if /^$/;
+	my $options = defined ($testconfig->{args}) ? $testconfig->{args} : '';
+	if (index ($options, 'SPECIAL_t') != -1) {
+		# Hack to keep specific time options for tcp-handshake-micro-t, etc.
+		# -t, -tt, etc.
+		$options =~ s/ SPECIAL_t//o;
+	} else {
+		# No specific time option, use -tttt
+		$options .= ' -tttt';
+	}
 
-        unlink("core");
-        ($name, $input, $output, @options) = split;
-        next if(defined($only) && $only ne $name);
-
-        my $options = join(" ", @options);
-        my $hash = { name => $name,
-                     input=> $input,
-                     output=>$output,
-                     args => $options };
-
-        runOneComplexTest($hash);
-    }
+	return {
+		label => $testconfig->{name},
+		func => \&run_decode_test,
+		input => $testconfig->{input},
+		options => $options,
+		output => $testconfig->{output},
+	};
 }
 
-if(scalar(@ARGV) == 0) {
-    runSimpleTests();
-    runComplexTests();
-} else {
-    runSimpleTests($ARGV[0]);
+open (TESTLIST, '<', $fn_testlist) || die "ERROR: failed opening ${fn_testlist}: $!\n";
+while (<TESTLIST>) {
+	next if /^\#/o || /^$/o;
+	my ($name, $input, $output, @options) = split;
+	push @decode_tests, {
+		name => $name,
+		input => $input,
+		output => $output,
+		args => join (' ', @options)
+	};
+}
+close (TESTLIST) || die "ERROR failed closing '$fn_testlist'";
+
+my $only_one = @ARGV == 1 ? $ARGV[0] : undef;
+my @ready_to_run;
+for (@decode_tests) {
+	next if defined ($only_one) && $only_one ne $_->{name};
+	push @ready_to_run, request_test $_
 }
 
-# exit with number of failing tests.
-print "------------------------------------------------\n";
-printf("%4u tests skipped\n",$skippedcount);
-printf("%4u tests failed\n",$failedcount);
-printf("%4u tests passed\n",$passedcount);
-
-showfile(${failureoutput});
-exit $failedcount;
+if (! scalar @ready_to_run) {
+	die "ERROR: Unknown test case '${only_one}'" if defined $only_one;
+	die 'Internal error: no tests defined to run!'
+}
+init_tmpdir 'tcpdump_TESTrun';
+exit test_and_report @ready_to_run;

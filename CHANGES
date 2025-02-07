@@ -80,6 +80,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       tests: On HP-UX use "diff -c" by default.
       autogen.sh: Allow to configure Autoconf warnings.
       autogen.sh: Delete all trailing blank lines at end of configure.
+      Reimplement the tests similarly to libpcap.
     Documentation:
       man: Clarify the "any" pseudo-interface further.
 

@@ -373,7 +373,7 @@ EXTRA_DIST = \
 	stime.awk \
 	tcpdump.1.in
 
-TEST_DIST= `git -C "$$DIR" ls-files tests | grep -v 'tests/\..*'`
+TEST_DIST= `git -C "$$DIR" ls-files tests`
 
 RELEASE_FILES = $(CSRC) $(HDR) $(LIBNETDISSECT_SRC) $(EXTRA_DIST) $(TEST_DIST)
 
@@ -425,9 +425,8 @@ clean:
 distclean: clean
 	rm -f Makefile config.cache config.log config.status \
 	    config.h os-proto.h stamp-h stamp-h.in $(PROG).1 \
-	    libnetdissect.a tests/.failed tests/.passed \
-	    tests/failure-outputs.txt
-	rm -rf autom4te.cache tests/DIFF tests/NEW
+	    libnetdissect.a
+	rm -rf autom4te.cache
 
 check: tcpdump
 	$(srcdir)/tests/TESTrun
