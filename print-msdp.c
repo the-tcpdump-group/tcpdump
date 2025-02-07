@@ -70,7 +70,7 @@ msdp_print(netdissect_options *ndo, const u_char *sp, u_int length)
 			/* RP Address */
 			ND_ICHECK_U(len, <, 8);
 			/* XXX -print this based on ndo_vflag? */
-			ND_TCHECK_LEN(sp + 4, 4);
+			ND_TCHECK_4(sp + 4);
 
 			/* Entries */
 			ND_TCHECK_LEN(sp + 8, entry_count*12);

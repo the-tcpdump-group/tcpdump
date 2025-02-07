@@ -371,7 +371,7 @@ gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 	if (flags & GRE_KP) {
 		/* Skip payload length? */
 		ND_ICHECK_U(len, <, 2);
-		ND_TCHECK_LEN(bp, 2);
+		ND_TCHECK_2(bp);
 		len -= 2;
 		bp += 2;
 

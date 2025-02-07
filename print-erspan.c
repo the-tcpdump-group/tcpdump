@@ -244,13 +244,13 @@ erspan_iii_print(netdissect_options *ndo, const u_char *bp, u_int len)
 
 	/* Skip timestamp */
 	ND_ICHECK_U(len, <, 4);
-	ND_TCHECK_LEN(bp, 4);
+	ND_TCHECK_4(bp);
 	bp += 4;
 	len -= 4;
 
 	/* Skip SGT */
 	ND_ICHECK_U(len, <, 2);
-	ND_TCHECK_LEN(bp, 2);
+	ND_TCHECK_2(bp);
 	bp += 2;
 	len -= 2;
 
@@ -269,7 +269,7 @@ erspan_iii_print(netdissect_options *ndo, const u_char *bp, u_int len)
 	if (hdr2 & ERSPAN3_O_MASK) {
 		/* Yes.  Skip it. */
 		ND_ICHECK_U(len, <, 8);
-		ND_TCHECK_LEN(bp, 8);
+		ND_TCHECK_8(bp);
 		bp += 8;
 		len -= 8;
 	}

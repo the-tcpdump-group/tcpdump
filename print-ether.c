@@ -479,7 +479,7 @@ netanalyzer_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	 * Fail if we don't have enough data for the Hilscher pseudo-header.
 	 */
 	ndo->ndo_protocol = "netanalyzer";
-	ND_TCHECK_LEN(p, 4);
+	ND_TCHECK_4(p);
 
 	/* Skip the pseudo-header. */
 	ndo->ndo_ll_hdr_len += 4;
