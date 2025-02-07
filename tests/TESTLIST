@@ -43,10 +43,10 @@ timestamp_invalid_micro timestamp_invalid_micro.pcap timestamp_invalid_micro.out
 timestamp_invalid_nano timestamp_invalid_nano.pcap timestamp_invalid_nano.out -q --nano SPECIAL_t
 
 # TCP with data in the RST segment
-tcp_rst_data tcp_rst_data.pcap tcp_rst_data-v.out -v
+tcp_rst_data-v tcp_rst_data.pcap tcp_rst_data-v.out -v
 tcp_rst_data tcp_rst_data.pcap tcp_rst_data.out
 # TCP with data in the RST segment, truncated example
-tcp_rst_data-trunc tcp_rst_data-trunc.pcap tcp_rst_data-trunc-v.out -v
+tcp_rst_data-trunc-v tcp_rst_data-trunc.pcap tcp_rst_data-trunc-v.out -v
 tcp_rst_data-trunc tcp_rst_data-trunc.pcap tcp_rst_data-trunc.out
 
 # TCP
