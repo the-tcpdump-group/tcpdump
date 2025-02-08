@@ -310,6 +310,7 @@ dns_udp dns_udp.pcap dns_udp.out
 dns_udp-v dns_udp.pcap dns_udp-v.out -v
 dns_udp-vv dns_udp.pcap dns_udp-vv.out -vv
 dns_udp-vvv dns_udp.pcap dns_udp-vvv.out -vvv
+ppp_ip_udp_dns-vv ppp_ip_udp_dns.pcap ppp_ip_udp_dns.out -vv
 
 # DNS on non-standard ports.
 dns_tcp_8053 dns_tcp_8053.pcap dns_tcp_8053.out -vv
