@@ -359,6 +359,7 @@ dns_udp dns_udp.pcap dns_udp.out
 dns_udp-v dns_udp.pcap dns_udp-v.out -v
 dns_udp-vv dns_udp.pcap dns_udp-vv.out -vv
 dns_udp-vvv dns_udp.pcap dns_udp-vvv.out -vvv
+ppp_ip_udp_dns-vv ppp_ip_udp_dns.pcap ppp_ip_udp_dns.out -vv
 # tests with --skip option
 dns_tcp-skip-3 dns_tcp.pcap dns_tcp-skip-3.out --skip 3
 dns_tcp-skip-3-c-4 dns_tcp.pcap dns_tcp-skip-3-c-4.out --skip 3 -c 4
