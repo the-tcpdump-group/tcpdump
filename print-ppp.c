@@ -871,19 +871,13 @@ handle_chap(netdissect_options *ndo,
 		}
 		name_size = len - (u_int)(p - p0);
 		ND_PRINT(", Name ");
-		for (i = 0; i < name_size; i++) {
-			fn_print_char(ndo, GET_U_1(p));
-			p++;
-		}
+		nd_printjn(ndo, p, name_size);
 		break;
 	case CHAP_SUCC:
 	case CHAP_FAIL:
 		msg_size = len - (u_int)(p - p0);
 		ND_PRINT(", Msg ");
-		for (i = 0; i< msg_size; i++) {
-			fn_print_char(ndo, GET_U_1(p));
-			p++;
-		}
+		nd_printjn(ndo, p, msg_size);
 		break;
 	}
 }
@@ -896,7 +890,6 @@ handle_pap(netdissect_options *ndo,
 	u_int code, len;
 	u_int peerid_len, passwd_len, msg_len;
 	const u_char *p0;
-	u_int i;
 
 	p0 = p;
 	if (length < 1) {
@@ -941,10 +934,8 @@ handle_pap(netdissect_options *ndo,
 		if (length - (p - p0) < peerid_len)
 			return;
 		ND_PRINT(", Peer ");
-		for (i = 0; i < peerid_len; i++) {
-			fn_print_char(ndo, GET_U_1(p));
-			p++;
-		}
+		nd_printjn(ndo, p, peerid_len);
+		p += peerid_len;
 
 		if (length - (p - p0) < 1)
 			return;
@@ -953,10 +944,7 @@ handle_pap(netdissect_options *ndo,
 		if (length - (p - p0) < passwd_len)
 			return;
 		ND_PRINT(", Name ");
-		for (i = 0; i < passwd_len; i++) {
-			fn_print_char(ndo, GET_U_1(p));
-			p++;
-		}
+		nd_printjn(ndo, p, passwd_len);
 		break;
 	case PAP_AACK:
 	case PAP_ANAK:
@@ -974,10 +962,7 @@ handle_pap(netdissect_options *ndo,
 		if (length - (p - p0) < msg_len)
 			return;
 		ND_PRINT(", Msg ");
-		for (i = 0; i< msg_len; i++) {
-			fn_print_char(ndo, GET_U_1(p));
-			p++;
-		}
+		nd_printjn(ndo, p, msg_len);
 		break;
 	}
 	return;
