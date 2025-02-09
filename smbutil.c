@@ -257,15 +257,6 @@ trunc:
     return(-1);	/* name goes past the end of the buffer */
 }
 
-static void
-print_asc(netdissect_options *ndo,
-          const u_char *buf, u_int len)
-{
-    u_int i;
-    for (i = 0; i < len; i++)
-        fn_print_char(ndo, GET_U_1(buf + i));
-}
-
 static const char *
 name_type_str(int name_type)
 {
@@ -297,9 +288,9 @@ smb_data_print(netdissect_options *ndo, const u_char *buf, u_int len)
 	if (i%8 == 0)
 	    ND_PRINT(" ");
 	if (i % 16 == 0) {
-	    print_asc(ndo, buf + i - 16, 8);
+	    nd_printjn(ndo, buf + i - 16, 8);
 	    ND_PRINT(" ");
-	    print_asc(ndo, buf + i - 8, 8);
+	    nd_printjn(ndo, buf + i - 8, 8);
 	    ND_PRINT("\n");
 	    if (i < len)
 		ND_PRINT("[%03X] ", i);
@@ -316,11 +307,11 @@ smb_data_print(netdissect_options *ndo, const u_char *buf, u_int len)
 	    ND_PRINT("   ");
 
 	n = ND_MIN(8, i % 16);
-	print_asc(ndo, buf + i - (i % 16), n);
+	nd_printjn(ndo, buf + i - (i % 16), n);
 	ND_PRINT(" ");
 	n = (i % 16) - n;
 	if (n > 0)
-	    print_asc(ndo, buf + i - n, n);
+	    nd_printjn(ndo, buf + i - n, n);
 	ND_PRINT("\n");
     }
 }
