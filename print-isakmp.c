@@ -1437,10 +1437,8 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 		case IPSECDOI_ID_FQDN:
 		case IPSECDOI_ID_USER_FQDN:
 		    {
-			u_int i;
 			ND_PRINT(" len=%u ", len);
-			for (i = 0; i < len; i++)
-				fn_print_char(ndo, GET_U_1(data + i));
+			nd_printjn(ndo, data, len);
 			len = 0;
 			break;
 		    }
