@@ -264,16 +264,6 @@ static char *l2tp_error_code_general[] = {
 /* generic print out routines */
 /******************************/
 static void
-print_string(netdissect_options *ndo, const u_char *dat, u_int length)
-{
-	u_int i;
-	for (i=0; i<length; i++) {
-		fn_print_char(ndo, GET_U_1(dat));
-		dat++;
-	}
-}
-
-static void
 print_octets(netdissect_options *ndo, const u_char *dat, u_int length)
 {
 	u_int i;
@@ -336,7 +326,7 @@ l2tp_result_code_print(netdissect_options *ndo, const u_char *dat, u_int length)
 	if (length == 0)
 		return;
 	ND_PRINT(" ");
-	print_string(ndo, dat, length);
+	nd_printjn(ndo, dat, length);
 }
 
 static void
@@ -393,7 +383,7 @@ l2tp_q931_cc_print(netdissect_options *ndo, const u_char *dat, u_int length)
 	length -= 3;
 	if (length != 0) {
 		ND_PRINT(" ");
-		print_string(ndo, dat, length);
+		nd_printjn(ndo, dat, length);
 	}
 }
 
@@ -559,7 +549,7 @@ l2tp_ppp_discon_cc_print(netdissect_options *ndo, const u_char *dat, u_int lengt
 
 	if (length != 0) {
 		ND_PRINT(" ");
-		print_string(ndo, (const u_char *)dat, length);
+		nd_printjn(ndo, (const u_char *)dat, length);
 	}
 }
 
@@ -659,7 +649,7 @@ l2tp_avp_print(netdissect_options *ndo, const u_char *dat, u_int length)
 			case L2TP_AVP_SUB_ADDRESS:
 			case L2TP_AVP_PROXY_AUTH_NAME:
 			case L2TP_AVP_PRIVATE_GRP_ID:
-				print_string(ndo, dat, len-6);
+				nd_printjn(ndo, dat, len-6);
 				break;
 			case L2TP_AVP_CHALLENGE:
 			case L2TP_AVP_INI_RECV_LCP:
