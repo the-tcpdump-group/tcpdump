@@ -285,7 +285,7 @@ ldp_tlv_print(netdissect_options *ndo,
     const struct ldp_tlv_header *ldp_tlv_header;
     u_short tlv_type,tlv_len,tlv_tlen,af,ft_flags;
     u_char fec_type, transport_pref;
-    u_int ui,vc_info_len, vc_info_tlv_type, vc_info_tlv_len,idx;
+    u_int ui,vc_info_len, vc_info_tlv_type, vc_info_tlv_len;
     char buf[100];
     int i;
 
@@ -500,8 +500,7 @@ ldp_tlv_print(netdissect_options *ndo,
 
                 case LDP_FEC_MARTINI_IFPARM_DESC:
                     ND_PRINT(": ");
-                    for (idx = 2; idx < vc_info_tlv_len; idx++)
-                        fn_print_char(ndo, GET_U_1(tptr + idx));
+                    nd_printjn(ndo, tptr + 2, vc_info_tlv_len - 2);
                     break;
 
                 case LDP_FEC_MARTINI_IFPARM_VCCV:
