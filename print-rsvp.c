@@ -679,7 +679,7 @@ rsvp_obj_print(netdissect_options *ndo,
     u_short rsvp_obj_len,rsvp_obj_ctype,rsvp_obj_class_num;
     u_int obj_tlen,intserv_serv_tlen;
     int hexdump;
-    u_int processed,padbytes,error_code,error_value,i,sigcheck;
+    u_int processed,padbytes,error_code,error_value,sigcheck;
     u_int namelen;
 
     u_int action, subchannel;
@@ -1202,8 +1202,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 4+namelen)
                     goto obj_tooshort;
                 ND_PRINT("%s  Session Name: ", indent);
-                for (i = 0; i < namelen; i++)
-                    fn_print_char(ndo, GET_U_1(obj_tptr + 4 + i));
+                nd_printjn(ndo, obj_tptr + 4, namelen);
                 ND_PRINT("%s  Setup Priority: %u, Holding Priority: %u, Flags: [%s] (%#x)",
                        indent,
                        GET_U_1(obj_tptr),
