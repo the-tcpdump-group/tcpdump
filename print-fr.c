@@ -441,7 +441,7 @@ u_int
 mfr_print(netdissect_options *ndo,
           const u_char *p, u_int length)
 {
-    u_int tlen,idx,hdr_len = 0;
+    u_int tlen,hdr_len = 0;
     uint16_t sequence_num;
     uint8_t ie_type,ie_len;
     const uint8_t *tptr;
@@ -515,12 +515,7 @@ mfr_print(netdissect_options *ndo,
 
             case MFR_CTRL_IE_BUNDLE_ID: /* same message format */
             case MFR_CTRL_IE_LINK_ID:
-                for (idx = 0; idx < ie_len && idx < MFR_ID_STRING_MAXLEN; idx++) {
-                    if (GET_U_1(tptr + idx) != 0) /* don't print null termination */
-                        fn_print_char(ndo, GET_U_1(tptr + idx));
-                    else
-                        break;
-                }
+                nd_printjnp(ndo, tptr, ND_MIN(ie_len, MFR_ID_STRING_MAXLEN));
                 break;
 
             case MFR_CTRL_IE_TIMESTAMP:
