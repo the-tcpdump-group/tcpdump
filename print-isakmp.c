@@ -2250,7 +2250,7 @@ ikev2_ID_print(netdissect_options *ndo, u_char tpay,
 		uint32_t proto _U_, int depth _U_)
 {
 	const struct ikev2_id *idp;
-	u_int idtype_len, i;
+	u_int idtype_len;
 	unsigned int dumpascii, dumphex;
 	const unsigned char *typedata;
 
@@ -2307,13 +2307,7 @@ ikev2_ID_print(netdissect_options *ndo, u_char tpay,
 
 	if(dumpascii) {
 		ND_TCHECK_LEN(typedata, idtype_len);
-		for(i=0; i<idtype_len; i++) {
-			if(ND_ASCII_ISPRINT(GET_U_1(typedata + i))) {
-				ND_PRINT("%c", GET_U_1(typedata + i));
-			} else {
-				ND_PRINT(".");
-			}
-		}
+		nd_printjn(ndo, typedata, idtype_len);
 	}
 	if(dumphex) {
 		if (!rawprint(ndo, (const uint8_t *)typedata, idtype_len))
@@ -2848,7 +2842,7 @@ ikev2_vid_print(netdissect_options *ndo, u_char tpay,
 		uint32_t proto _U_, int depth _U_)
 {
 	const u_char *vid;
-	u_int i, len;
+	u_int len;
 
 	ND_TCHECK_SIZE(ext);
 	ikev2_pay_print(ndo, NPSTR(tpay), GET_U_1(ext->critical));
@@ -2861,11 +2855,7 @@ ikev2_vid_print(netdissect_options *ndo, u_char tpay,
 	vid = (const u_char *)(ext+1);
 	len = item_len - 4;
 	ND_TCHECK_LEN(vid, len);
-	for(i=0; i<len; i++) {
-		if(ND_ASCII_ISPRINT(GET_U_1(vid + i)))
-			ND_PRINT("%c", GET_U_1(vid + i));
-		else ND_PRINT(".");
-	}
+	nd_printjn(ndo, vid, len);
 	if (2 < ndo->ndo_vflag && 4 < len) {
 		/* Print the entire payload in hex */
 		ND_PRINT(" ");
