@@ -405,6 +405,7 @@ ipv6_jumbogram_invalid_length ipv6_jumbogram_invalid_length.pcap ipv6_jumbogram_
 ipv6_39_byte_header ipv6_39_byte_header.pcap ipv6_39_byte_header.out -v
 ipv6_missing_jumbo_payload_option ipv6_missing_jumbo_payload_option.pcap ipv6_missing_jumbo_payload_option.out
 ipv6_frag6_negative_len ipv6_frag6_negative_len.pcap ipv6_frag6_negative_len.out -v
+ipv6_no_next_header ipv6_no_next_header.pcap ipv6_no_next_header.out -v
 
 # Loopback/CTP test case
 loopback	loopback.pcap		loopback.out
