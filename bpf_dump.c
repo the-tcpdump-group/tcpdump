@@ -31,7 +31,7 @@
 void
 bpf_dump(const struct bpf_program *p, int option)
 {
-	struct bpf_insn *insn;
+	const struct bpf_insn *insn;
 	int i;
 	int n = p->bf_len;
 
@@ -51,10 +51,6 @@ bpf_dump(const struct bpf_program *p, int option)
 		return;
 	}
 	for (i = 0; i < n; ++insn, ++i) {
-#ifdef BDEBUG
-		extern int bids[];
-		printf(bids[i] > 0 ? "[%02d]" : " -- ", bids[i] - 1);
-#endif
 		puts(bpf_image(insn, i));
 	}
 }
