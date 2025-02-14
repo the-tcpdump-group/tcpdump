@@ -103,11 +103,8 @@ struct icmp6_hdr {
 
 #define ICMP6_ECHO_REQUEST		128	/* echo service */
 #define ICMP6_ECHO_REPLY		129	/* echo reply */
-#define ICMP6_MEMBERSHIP_QUERY		130	/* group membership query */
 #define MLD6_LISTENER_QUERY		130	/* multicast listener query */
-#define ICMP6_MEMBERSHIP_REPORT		131	/* group membership report */
 #define MLD6_LISTENER_REPORT		131	/* multicast listener report */
-#define ICMP6_MEMBERSHIP_REDUCTION	132	/* group membership termination */
 #define MLD6_LISTENER_DONE		132	/* multicast listener done */
 
 #define ND_ROUTER_SOLICIT		133	/* router solicitation */
@@ -1141,7 +1138,7 @@ icmp6_print(netdissect_options *ndo,
                 ND_PRINT(", id %u, seq %u", GET_BE_U_2(dp->icmp6_id),
 			 GET_BE_U_2(dp->icmp6_seq));
 		break;
-	case ICMP6_MEMBERSHIP_QUERY:
+	case MLD6_LISTENER_QUERY:
 		if (length == MLD_MINLEN) {
 			mld6_print(ndo, (const u_char *)dp);
 		} else if (length >= MLDV2_MINLEN) {
@@ -1151,10 +1148,10 @@ icmp6_print(netdissect_options *ndo,
                         ND_PRINT(" unknown-version (len %u) ", length);
 		}
 		break;
-	case ICMP6_MEMBERSHIP_REPORT:
+	case MLD6_LISTENER_REPORT:
 		mld6_print(ndo, (const u_char *)dp);
 		break;
-	case ICMP6_MEMBERSHIP_REDUCTION:
+	case MLD6_LISTENER_DONE:
 		mld6_print(ndo, (const u_char *)dp);
 		break;
 	case ND_ROUTER_SOLICIT:
