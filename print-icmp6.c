@@ -112,11 +112,7 @@ struct icmp6_hdr {
 
 #define ICMP6_ROUTER_RENUMBERING	138	/* router renumbering */
 
-#define ICMP6_WRUREQUEST		139	/* who are you request */
-#define ICMP6_WRUREPLY			140	/* who are you reply */
-#define ICMP6_FQDN_QUERY		139	/* FQDN query */
-#define ICMP6_FQDN_REPLY		140	/* FQDN reply */
-#define ICMP6_NI_QUERY			139	/* node information request - RFC 4620 */
+#define ICMP6_NI_QUERY			139	/* node information query - RFC 4620 */
 #define ICMP6_NI_REPLY			140	/* node information reply - RFC 4620 */
 #define IND_SOLICIT			141	/* inverse neighbor solicitation */
 #define IND_ADVERT			142	/* inverse neighbor advertisement */
@@ -656,8 +652,6 @@ static const struct tok icmp6_type_values[] = {
     { ICMP6_HADISCOV_REPLY, "ha discovery reply"},
     { ICMP6_MOBILEPREFIX_SOLICIT, "mobile router solicitation"},
     { ICMP6_MOBILEPREFIX_ADVERT, "mobile router advertisement"},
-    { ICMP6_WRUREQUEST, "who-are-you request"},
-    { ICMP6_WRUREPLY, "who-are-you reply"},
     { ICMP6_NI_QUERY, "node information query"},
     { ICMP6_NI_REPLY, "node information reply"},
     { MLD6_MTRACE, "mtrace message"},
@@ -1712,7 +1706,6 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 			ND_PRINT(" who-are-you request");
 			break;
 		}
-		ND_PRINT(" node information query");
 
 		ND_TCHECK_LEN(dp, sizeof(*ni6));
 		ni6 = (const struct icmp6_nodeinfo *)dp;
@@ -1824,7 +1817,6 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 
 		ND_TCHECK_LEN(dp, sizeof(*ni6));
 		ni6 = (const struct icmp6_nodeinfo *)dp;
-		ND_PRINT(" node information reply");
 		ND_PRINT(" (");	/*)*/
 		switch (GET_U_1(ni6->ni_code)) {
 		case ICMP6_NI_SUCCESS:
