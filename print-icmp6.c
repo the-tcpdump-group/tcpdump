@@ -378,10 +378,9 @@ struct icmp6_nodeinfo {
 #define ni_qtype	icmp6_ni_hdr.icmp6_data16[0]
 #define ni_flags	icmp6_ni_hdr.icmp6_data16[1]
 
-#define NI_QTYPE_NOOP		0 /* NOOP  */
-#define NI_QTYPE_SUPTYPES	1 /* Supported Qtypes (drafts up to 09) */
-#define NI_QTYPE_FQDN		2 /* FQDN (draft 04) */
-#define NI_QTYPE_DNSNAME	2 /* DNS Name */
+#define NI_QTYPE_NOOP		0 /* NOOP */
+#define NI_QTYPE_SUPTYPES	1 /* Supported Qtypes (Obsolete) */
+#define NI_QTYPE_NODENAME	2 /* Node Name */
 #define NI_QTYPE_NODEADDR	3 /* Node Addresses */
 #define NI_QTYPE_IPV4ADDR	4 /* IPv4 Addresses */
 
@@ -1714,14 +1713,8 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 		case NI_QTYPE_NOOP:
 			ND_PRINT("noop");
 			break;
-		case NI_QTYPE_SUPTYPES:
-			ND_PRINT("supported qtypes");
-			i = GET_BE_U_2(ni6->ni_flags);
-			if (i)
-				ND_PRINT(" [%s]", (i & 0x01) ? "C" : "");
-			break;
-		case NI_QTYPE_FQDN:
-			ND_PRINT("DNS name");
+		case NI_QTYPE_NODENAME:
+			ND_PRINT("node name");
 			break;
 		case NI_QTYPE_NODEADDR:
 			ND_PRINT("node addresses");
@@ -1742,19 +1735,10 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 			break;
 		}
 
-		if (GET_BE_U_2(ni6->ni_qtype) == NI_QTYPE_NOOP ||
-		    GET_BE_U_2(ni6->ni_qtype) == NI_QTYPE_SUPTYPES) {
+		if (GET_BE_U_2(ni6->ni_qtype) == NI_QTYPE_NOOP) {
 			if (siz != sizeof(*ni6))
 				if (ndo->ndo_vflag)
 					ND_PRINT(", invalid len");
-			/*(*/
-			ND_PRINT(")");
-			break;
-		}
-
-		/* XXX backward compat, icmp-name-lookup-03 */
-		if (siz == sizeof(*ni6)) {
-			ND_PRINT(", 03 draft");
 			/*(*/
 			ND_PRINT(")");
 			break;
@@ -1775,19 +1759,7 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 			break;
 		case ICMP6_NI_SUBJ_FQDN:
 			ND_PRINT(", subject=DNS name");
-			if (GET_U_1(cp) == ep - cp - 1) {
-				/* icmp-name-lookup-03, pascal string */
-				if (ndo->ndo_vflag)
-					ND_PRINT(", 03 draft");
-				cp++;
-				ND_PRINT(", \"");
-				while (cp < ep) {
-					fn_print_char(ndo, GET_U_1(cp));
-					cp++;
-				}
-				ND_PRINT("\"");
-			} else
-				dnsname_print(ndo, cp, ep);
+			dnsname_print(ndo, cp, ep);
 			break;
 		case ICMP6_NI_SUBJ_IPV4:
 			if (!ND_TTEST_LEN(dp, sizeof(*ni6) + sizeof(nd_ipv4)))
@@ -1856,32 +1828,12 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 				if (ndo->ndo_vflag)
 					ND_PRINT(", invalid length");
 			break;
-		case NI_QTYPE_SUPTYPES:
+		case NI_QTYPE_NODENAME:
 			if (needcomma)
 				ND_PRINT(", ");
-			ND_PRINT("supported qtypes");
-			i = GET_BE_U_2(ni6->ni_flags);
-			if (i)
-				ND_PRINT(" [%s]", (i & 0x01) ? "C" : "");
-			break;
-		case NI_QTYPE_FQDN:
-			if (needcomma)
-				ND_PRINT(", ");
-			ND_PRINT("DNS name");
+			ND_PRINT("node name");
 			cp = (const u_char *)(ni6 + 1) + 4;
-			if (GET_U_1(cp) == ep - cp - 1) {
-				/* icmp-name-lookup-03, pascal string */
-				if (ndo->ndo_vflag)
-					ND_PRINT(", 03 draft");
-				cp++;
-				ND_PRINT(", \"");
-				while (cp < ep) {
-					fn_print_char(ndo, GET_U_1(cp));
-					cp++;
-				}
-				ND_PRINT("\"");
-			} else
-				dnsname_print(ndo, cp, ep);
+			dnsname_print(ndo, cp, ep);
 			if ((GET_BE_U_2(ni6->ni_flags) & 0x01) != 0)
 				ND_PRINT(" [TTL=%u]", GET_BE_U_4(ni6 + 1));
 			break;
