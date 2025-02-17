@@ -205,7 +205,7 @@ static int resp_get_length(netdissect_options *, const u_char *, int, const u_ch
     ND_PRINT(" \"");                                   \
     if (nd_printn(_ndo, _bp, _len, _ndo->ndo_snapend)) \
         goto trunc;                                    \
-    fn_print_char(_ndo, '"');
+    ND_PRINT("\"");
 
 void
 resp_print(netdissect_options *ndo, const u_char *bp, u_int length)
