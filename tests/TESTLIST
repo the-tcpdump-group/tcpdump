@@ -194,6 +194,8 @@ icmpv6-rfc7112	icmpv6-rfc7112.pcap	icmpv6-rfc7112.out
 icmpv6-RFC2894-RR icmpv6-RFC2894-RR.pcap icmpv6-RFC2894-RR.out
 icmpv6-RFC2894-RR-v icmpv6-RFC2894-RR.pcap icmpv6-RFC2894-RR-v.out -v
 icmpv6-ni-flags	icmpv6-ni-flags.pcap	icmpv6-ni-flags.out
+icmpv6_nodeinfo_queryipv4 icmpv6_nodeinfo_queryipv4.pcap icmpv6_nodeinfo_queryipv4.out -v
+icmpv6_nodeinfo_replyipv4 icmpv6_nodeinfo_replyipv4.pcap icmpv6_nodeinfo_replyipv4.out -v
 icmpv6_nodeinfo_queryipv6 icmpv6_nodeinfo_queryipv6.pcap icmpv6_nodeinfo_queryipv6.out -v
 icmpv6_nodeinfo_replyipv6 icmpv6_nodeinfo_replyipv6.pcap icmpv6_nodeinfo_replyipv6.out -v
 
