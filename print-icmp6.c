@@ -390,7 +390,16 @@ struct icmp6_nodeinfo {
 #define NI_NODEADDR_FLAG_LINKLOCAL	0x0008
 #define NI_NODEADDR_FLAG_SITELOCAL	0x0010
 #define NI_NODEADDR_FLAG_GLOBAL		0x0020
-#define NI_NODEADDR_FLAG_ANYCAST	0x0040 /* just experimental. not in spec */
+
+static const struct tok ni_nodeaddr_flag_values[] = {
+        { NI_NODEADDR_FLAG_TRUNCATE, "T" },
+        { NI_NODEADDR_FLAG_ALL, "A" },
+        { NI_NODEADDR_FLAG_COMPAT, "C" },
+        { NI_NODEADDR_FLAG_LINKLOCAL, "L" },
+        { NI_NODEADDR_FLAG_SITELOCAL, "S" },
+        { NI_NODEADDR_FLAG_GLOBAL, "G" },
+        { 0, NULL }
+};
 
 struct ni_reply_fqdn {
 	nd_uint32_t ni_fqdn_ttl;	/* TTL */
@@ -413,6 +422,15 @@ struct icmp6_router_renum {	/* router renumbering header */
 #define ICMP6_RR_FLAGS_FORCEAPPLY	0x20
 #define ICMP6_RR_FLAGS_SPECSITE		0x10
 #define ICMP6_RR_FLAGS_PREVDONE		0x08
+
+static const struct tok router_renum_flag_values[] = {
+	{ ICMP6_RR_FLAGS_TEST, "T" },
+	{ ICMP6_RR_FLAGS_REQRESULT, "R" },
+	{ ICMP6_RR_FLAGS_FORCEAPPLY, "A" },
+	{ ICMP6_RR_FLAGS_SPECSITE, "S" },
+	{ ICMP6_RR_FLAGS_PREVDONE, "P" },
+	{ 0, NULL },
+};
 
 #define rr_type		rr_hdr.icmp6_type
 #define rr_code		rr_hdr.icmp6_code
@@ -1721,14 +1739,13 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 			i = GET_BE_U_2(ni6->ni_flags);
 			if (!i)
 				break;
-			/* NI_NODEADDR_FLAG_TRUNCATE undefined for query */
-			ND_PRINT(" [%s%s%s%s%s%s]",
-			    (i & NI_NODEADDR_FLAG_ANYCAST) ? "a" : "",
-			    (i & NI_NODEADDR_FLAG_GLOBAL) ? "G" : "",
-			    (i & NI_NODEADDR_FLAG_SITELOCAL) ? "S" : "",
-			    (i & NI_NODEADDR_FLAG_LINKLOCAL) ? "L" : "",
-			    (i & NI_NODEADDR_FLAG_COMPAT) ? "C" : "",
-			    (i & NI_NODEADDR_FLAG_ALL) ? "A" : "");
+			ND_PRINT(" [%s]",
+				 bittok2str_nosep(ni_nodeaddr_flag_values,
+				 "none", i));
+			if (i & NI_NODEADDR_FLAG_TRUNCATE) {
+				ND_PRINT(" [flag Truncate present]");
+				nd_print_invalid(ndo);
+			}
 			break;
 		default:
 			ND_PRINT("unknown");
@@ -1853,14 +1870,9 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 			i = GET_BE_U_2(ni6->ni_flags);
 			if (!i)
 				break;
-			ND_PRINT(" [%s%s%s%s%s%s%s]",
-                                  (i & NI_NODEADDR_FLAG_ANYCAST) ? "a" : "",
-                                  (i & NI_NODEADDR_FLAG_GLOBAL) ? "G" : "",
-                                  (i & NI_NODEADDR_FLAG_SITELOCAL) ? "S" : "",
-                                  (i & NI_NODEADDR_FLAG_LINKLOCAL) ? "L" : "",
-                                  (i & NI_NODEADDR_FLAG_COMPAT) ? "C" : "",
-                                  (i & NI_NODEADDR_FLAG_ALL) ? "A" : "",
-                                  (i & NI_NODEADDR_FLAG_TRUNCATE) ? "T" : "");
+			ND_PRINT(" [%s]",
+				 bittok2str_nosep(ni_nodeaddr_flag_values,
+				 "none", i));
 			break;
 		default:
 			if (needcomma)
@@ -1914,14 +1926,11 @@ icmp6_rrenum_print(netdissect_options *ndo, const u_char *bp, const u_char *ep)
 
 	if (ndo->ndo_vflag) {
 		uint8_t rr_flags = GET_U_1(rr6->rr_flags);
-#define F(x, y)	(rr_flags & (x) ? (y) : "")
 		ND_PRINT("[");	/*]*/
 		if (rr_flags) {
-			ND_PRINT("%s%s%s%s%s,", F(ICMP6_RR_FLAGS_TEST, "T"),
-                                  F(ICMP6_RR_FLAGS_REQRESULT, "R"),
-                                  F(ICMP6_RR_FLAGS_FORCEAPPLY, "A"),
-                                  F(ICMP6_RR_FLAGS_SPECSITE, "S"),
-                                  F(ICMP6_RR_FLAGS_PREVDONE, "P"));
+			ND_PRINT("%s,",
+				 bittok2str_nosep(router_renum_flag_values,
+				 "none", rr_flags));
 		}
                 ND_PRINT("seg=%u,", GET_U_1(rr6->rr_segnum));
                 ND_PRINT("maxdelay=%u", GET_BE_U_2(rr6->rr_maxdelay));
@@ -1929,7 +1938,6 @@ icmp6_rrenum_print(netdissect_options *ndo, const u_char *bp, const u_char *ep)
 			ND_PRINT("rsvd=0x%x", GET_BE_U_4(rr6->rr_reserved));
 		/*[*/
 		ND_PRINT("]");
-#undef F
 	}
 
 	if (GET_U_1(rr6->rr_code) == ICMP6_ROUTER_RENUMBERING_COMMAND) {
