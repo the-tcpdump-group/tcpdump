@@ -406,6 +406,12 @@ static const struct tok ni_nodeaddr_flag_values[] = {
         { 0, NULL }
 };
 
+static const struct tok ni_ipv4addr_flag_values[] = {
+        { NI_NODEADDR_FLAG_TRUNCATE, "T" },
+        { NI_NODEADDR_FLAG_ALL, "A" },
+        { 0, NULL }
+};
+
 struct ni_reply_fqdn {
 	nd_uint32_t ni_fqdn_ttl;	/* TTL */
 	nd_uint8_t ni_fqdn_namelen; /* length in octets of the FQDN */
@@ -1745,6 +1751,16 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 			if (flags & NI_NODEADDR_FLAG_TRUNCATE)
 				ND_PRINT(" [invalid flag Truncate present]");
 			break;
+		case NI_QTYPE_IPV4ADDR:
+			ND_PRINT("ipv4 addresses");
+			flags = GET_BE_U_2(ni6->ni_flags);
+			if (flags)
+				ND_PRINT(" [%s]",
+					 bittok2str_nosep(ni_ipv4addr_flag_values,
+					 "none", flags));
+			if (flags & NI_NODEADDR_FLAG_TRUNCATE)
+				ND_PRINT(" [invalid flag Truncate present]");
+			break;
 		default:
 			ND_PRINT("unknown");
 			break;
@@ -1869,6 +1885,25 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 				    GET_IP6ADDR_STRING(bp + i + sizeof(uint32_t)),
 				    GET_BE_U_4(bp + i));
 				i += sizeof(uint32_t) + sizeof(nd_ipv6);
+			}
+			break;
+		case NI_QTYPE_IPV4ADDR:
+			if (needcomma)
+				ND_PRINT(", ");
+			ND_PRINT("ipv4 addresses");
+			flags = GET_BE_U_2(ni6->ni_flags);
+			if (flags)
+				ND_PRINT(" [%s]",
+					 bittok2str_nosep(ni_nodeaddr_flag_values,
+					 "none", flags));
+			cp = (const u_char *)(ni6 + 1);
+			while (cp < ep) {
+				uint32_t ttl;
+
+				ttl = GET_BE_U_4(cp);
+				cp += 4;
+				ND_PRINT(" %s(%u)", GET_IPADDR_STRING(cp), ttl);
+				cp += 4;
 			}
 			break;
 		default:
