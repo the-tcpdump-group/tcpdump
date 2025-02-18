@@ -926,7 +926,7 @@ endif(NOT HAVE_PCAP_SET_PARSER_DEBUG)
 check_function_exists(pcap_set_optimizer_debug HAVE_PCAP_SET_OPTIMIZER_DEBUG)
 
 #
-# bpf_dump() moved from tcpdump to libpcap in libpcap 0.6, but not all
+# bpf_dump() moved from tcpdump to libpcap in libpcap 0.6, but some
 # versions of libpcap didn't pick that change up; the OpenBSD libpcap
 # picked up most of the new APIs from versions up to 1.0, but didn't
 # pick up bpf_dump(), so we need to provide it if it's absent.
