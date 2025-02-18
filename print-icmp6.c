@@ -1708,6 +1708,7 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 	const struct icmp6_hdr *dp;
 	const u_char *cp;
 	size_t siz, i;
+	uint16_t flags;
 	int needcomma;
 
 	if (ep < bp)
@@ -1736,16 +1737,13 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 			break;
 		case NI_QTYPE_NODEADDR:
 			ND_PRINT("node addresses");
-			i = GET_BE_U_2(ni6->ni_flags);
-			if (!i)
-				break;
-			ND_PRINT(" [%s]",
-				 bittok2str_nosep(ni_nodeaddr_flag_values,
-				 "none", i));
-			if (i & NI_NODEADDR_FLAG_TRUNCATE) {
-				ND_PRINT(" [flag Truncate present]");
-				nd_print_invalid(ndo);
-			}
+			flags = GET_BE_U_2(ni6->ni_flags);
+			if (flags)
+				ND_PRINT(" [%s]",
+					 bittok2str_nosep(ni_nodeaddr_flag_values,
+					 "none", flags));
+			if (flags & NI_NODEADDR_FLAG_TRUNCATE)
+				ND_PRINT(" [invalid flag Truncate present]");
 			break;
 		default:
 			ND_PRINT("unknown");
@@ -1858,6 +1856,11 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 			if (needcomma)
 				ND_PRINT(", ");
 			ND_PRINT("node addresses");
+			flags = GET_BE_U_2(ni6->ni_flags);
+			if (flags)
+				ND_PRINT(" [%s]",
+					 bittok2str_nosep(ni_nodeaddr_flag_values,
+					 "none", flags));
 			i = sizeof(*ni6);
 			while (i < siz) {
 				if (i + sizeof(uint32_t) + sizeof(nd_ipv6) > siz)
@@ -1867,12 +1870,6 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 				    GET_BE_U_4(bp + i));
 				i += sizeof(uint32_t) + sizeof(nd_ipv6);
 			}
-			i = GET_BE_U_2(ni6->ni_flags);
-			if (!i)
-				break;
-			ND_PRINT(" [%s]",
-				 bittok2str_nosep(ni_nodeaddr_flag_values,
-				 "none", i));
 			break;
 		default:
 			if (needcomma)
