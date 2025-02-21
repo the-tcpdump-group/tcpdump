@@ -1,21 +1,41 @@
 #!/usr/bin/env perl
 
-BEGIN {
-	require 5.8.4; # Solaris 10
-	use Config;
-	use FindBin;
-	if (defined $ENV{TESTRUN_PERL}) {
-		my $newperl = $ENV{TESTRUN_PERL};
-		delete $ENV{TESTRUN_PERL};
-		print "INFO: Re-launching using TESTRUN_PERL='$newperl'.\n";
-		exec ($newperl, $FindBin::RealBin . '/' . $FindBin::RealScript, @ARGV);
-		die 'ERROR: Failed to re-launch.';
-	}
-	require $FindBin::RealBin . '/TEST' . ($Config{useithreads} ? 'mt' : 'st') . '.pm';
-}
+# Copyright (c) 2020-2025 The Tcpdump Group
+# All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+# COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
 
+require 5.8.4; # Solaris 10
+use sigtrap qw(die normal-signals);
 use strict;
 use warnings FATAL => qw(uninitialized);
+use Getopt::Long;
+use Time::HiRes;
+use Config;
+use FindBin;
+use POSIX qw(WEXITSTATUS WIFEXITED);
+require $FindBin::RealBin . '/TEST' . ($Config{useithreads} ? 'mt' : 'st') . '.pm';
 require $FindBin::RealBin . '/TESTlib.pm';
 # TESTlib.pm
 use subs qw(
@@ -35,6 +55,75 @@ use subs qw(
 	test_and_report
 );
 
+my $testsdir = $FindBin::RealBin;
+# These filenames use a prefix and are relative to the temporary directory.
+my $filename_stdout = 'stdout.txt';
+my $filename_stderr = 'stderr.txt';
+my $filename_diags = 'diags.txt';
+
+use constant {
+	EX_OK => 0,
+	EX_USAGE => 64,
+};
+
+#
+# Make true and false work as Booleans.
+#
+use constant true => 1;
+use constant false => 0;
+
+# Set these later only if running any tests.
+my $diff_flags;
+
+sub usage_text {
+	my $detailed = shift;
+	my $myname = $FindBin::Script;
+
+	my $ret = "Usage: ${myname} [--passed]
+       (run all tests)
+  or:  ${myname} --list
+       (print all test labels)
+  or:  ${myname} --one <test_label> [--passed]
+       (run one test only)
+  or:  ${myname} --config
+       (print the parsed contents of config.h)
+  or:  ${myname} --help
+       (print the detailed help screen)
+
+Options:
+  --passed        print the passed tests as well (with timings)
+";
+	return $ret unless $detailed;
+	$ret .= "
+TCPDUMP_BIN and CONFIG_H allow to specify custom paths to respective files
+if the current working directory is not the directory where the build output
+files go to.  Otherwise by default this script finds the files for both
+Autoconf and CMake, both in-tree and out-of-tree builds.
+
+TESTRUN_JOBS allows to specify the number of tester threads (1 by default).
+";
+	return $ret;
+}
+
+my $config_h = defined $ENV{CONFIG_H} ? $ENV{CONFIG_H} : './config.h';
+my $only_one = undef;
+my $only_list = 0;
+my $print_passed = 0;
+if (! GetOptions (
+	'one=s' => \$only_one,
+	'list' => \$only_list,
+	'passed' => \$print_passed,
+	'config' => sub {
+		my %config = read_config_h $config_h;
+		printf "%-50s %s\n", $_, $config{$_} foreach sort keys %config;
+		exit EX_OK;
+	},
+	'help' => sub {print STDOUT usage_text 1; exit EX_OK;},
+)) {
+	print STDERR usage_text 0;
+	exit EX_USAGE;
+};
+
 #
 # Were we told where to find tcpdump?
 #
@@ -45,7 +134,7 @@ if (defined $ENV{TCPDUMP_BIN}) {
 	#
 	# No.  Use the appropriate path.
 	#
-	if ($^O eq 'MSWin32') {
+	if ($^O eq 'msys') {
 		#
 		# XXX - assume, for now, a Visual Studio debug build, so that
 		# tcpdump is in the Debug subdirectory.
@@ -55,40 +144,6 @@ if (defined $ENV{TCPDUMP_BIN}) {
 		$TCPDUMP = "./tcpdump"
 	}
 }
-
-#
-# Make true and false work as Booleans.
-#
-use constant true => 1;
-use constant false => 0;
-
-use POSIX qw(WEXITSTATUS WIFEXITED);
-use File::Spec;
-
-# These filenames use a prefix and are relative to the temporary directory.
-my $filename_stdout = 'stdout.txt';
-my $filename_stderr = 'stderr.txt';
-my $filename_diags = 'diags.txt';
-
-my $diff_flags = get_diff_flags;
-
-#
-# Force UTC, so time stamps are printed in a standard time zone, and
-# tests don't have to be run in the time zone in which the output
-# file was generated.
-#
-$ENV{TZ} = 'GMT0';
-
-#
-# Get the tests directory from $0.
-# Convert it to an absolute path, so it works even after we do a cd.
-#
-my $testsdir = $FindBin::RealBin;
-my $fn_testlist = "${testsdir}/TESTLIST";
-
-print "Running tests from ${testsdir}\n";
-print "with ${TCPDUMP}, version:\n";
-system ("${TCPDUMP} --version") == 0 or die "ERROR: '$TCPDUMP --version' failed to run\n";
 
 sub pipe_tcpdump {
 	my $option = shift;
@@ -106,8 +161,9 @@ printf "%s --fp-type => %s\n", $TCPDUMP, $fptype;
 my $time_t_size = int (pipe_tcpdump '--time-t-size');
 printf "%s --time-t-size => %s\n", $TCPDUMP, $time_t_size;
 
-# Enable all shared skip functions to be able to declare the tests below.
-read_config_h (defined $ENV{CONFIG_H} ? $ENV{CONFIG_H} : './config.h');
+# Initialize now so that the skip functions in TESTlib.pm (and therefore the
+# test declarations below) work as intended.
+read_config_h ($config_h);
 
 sub skip_fptype_not {
 	my $val = shift;
@@ -507,7 +563,7 @@ sub decode_exit_status {
 	my $r = shift;
 	my $status;
 	my $coredump = false;
-	if ($^O eq 'MSWin32' or $^O eq 'msys') {
+	if ($^O eq 'msys') {
 		#
 		# On Windows, the return value of system is the lower 8
 		# bits of the exit status of the process, shifted left
@@ -613,7 +669,15 @@ sub run_decode_test {
 		mytmpfile ($filename_stdout),
 		mytmpfile ($filename_stderr)
 	);
-	my $r = system $cmdline;
+	my $r;
+	my $T;
+	if (! $print_passed) {
+		$r = system $cmdline;
+	} else {
+		my $t0 = Time::HiRes::time;
+		$r = system $cmdline;
+		$T = Time::HiRes::time - $t0;
+	}
 
 	return result_failed ('failed to run tcpdump', $!) if $r == -1;
 
@@ -637,24 +701,14 @@ sub run_decode_test {
 	# Compare tcpdump's output with what we think it should be.
 	#
 	my $diffstat;
-	if ($^O eq 'MSWin32') {
-		$cmdline = sprintf (
-			'fc /lb1000 /t /1 %s %s >%s',
-			File::Spec->canonpath ($output),
-			mytmpfile ($filename_stdout),
-			mytmpfile ($filename_diags)
-		);
-		$diffstat = system ($cmdline) >> 8;
-	} else {
-		$cmdline = sprintf (
-			'diff %s "%s" "%s" >"%s" 2>&1',
-			$diff_flags,
-			$output,
-			mytmpfile ($filename_stdout),
-			mytmpfile ($filename_diags)
-		);
-		$diffstat = WEXITSTATUS (system $cmdline);
-	}
+	$cmdline = sprintf (
+		'diff %s "%s" "%s" >"%s" 2>&1',
+		$diff_flags,
+		$output,
+		mytmpfile ($filename_stdout),
+		mytmpfile ($filename_diags)
+	);
+	$diffstat = WEXITSTATUS (system $cmdline);
 	return result_failed (
 		"diff exited with $diffstat",
 		file_get_contents mytmpfile $filename_diags
@@ -675,7 +729,7 @@ sub run_decode_test {
 		file_get_contents mytmpfile $filename_stderr
 	) if $failed;
 
-	return result_passed;
+	return result_passed $T;
 }
 
 sub request_test {
@@ -706,6 +760,7 @@ sub request_test {
 	};
 }
 
+my $fn_testlist = "${testsdir}/TESTLIST";
 open (TESTLIST, '<', $fn_testlist) || die "ERROR: failed opening ${fn_testlist}: $!\n";
 while (<TESTLIST>) {
 	next if /^\#/o || /^$/o;
@@ -719,7 +774,6 @@ while (<TESTLIST>) {
 }
 close (TESTLIST) || die "ERROR failed closing '$fn_testlist'";
 
-my $only_one = @ARGV == 1 ? $ARGV[0] : undef;
 my @ready_to_run;
 for (@decode_tests) {
 	next if defined ($only_one) && $only_one ne $_->{name};
@@ -730,5 +784,23 @@ if (! scalar @ready_to_run) {
 	die "ERROR: Unknown test case '${only_one}'" if defined $only_one;
 	die 'Internal error: no tests defined to run!'
 }
+if ($only_list) {
+	print $_->{label} . "\n" foreach @ready_to_run;
+	exit EX_OK;
+}
+
+$diff_flags = get_diff_flags;
+
+#
+# Force UTC, so time stamps are printed in a standard time zone, and
+# tests don't have to be run in the time zone in which the output
+# file was generated.
+#
+$ENV{TZ} = 'GMT0';
+
+print "Running tests from ${testsdir}\n";
+print "with ${TCPDUMP}, version:\n";
+system ("${TCPDUMP} --version") == 0 or die "ERROR: '$TCPDUMP --version' failed to run\n";
+
 init_tmpdir 'tcpdump_TESTrun';
 exit test_and_report @ready_to_run;

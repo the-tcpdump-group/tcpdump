@@ -3,6 +3,7 @@ use strict;
 use warnings FATAL => qw(uninitialized);
 use Config;
 use File::Temp qw(tempdir);
+use List::Util qw(min max sum);
 
 # TESTrun helper functions (common to all projects).
 
@@ -20,6 +21,21 @@ use constant {
 	CHAR_FAILED => 'F',
 	CHAR_TIMED_OUT => 'T',
 };
+
+my %osnames = (
+	aix => 'AIX',
+	darwin => 'macOS',
+	dragonfly => 'DragonFly BSD',
+	freebsd => 'FreeBSD',
+	gnu => 'Hurd',
+	haiku => 'Haiku',
+	hpux => 'HP-UX',
+	linux => 'Linux',
+	msys => 'Windows',
+	netbsd => 'NetBSD',
+	openbsd => 'OpenBSD',
+	solaris => 'illumos/Solaris',
+);
 
 my $results_to_print;
 my $results_printed;
@@ -65,56 +81,61 @@ sub get_diff_flags {
 # Parse config.h into a hash for later use.
 sub read_config_h {
 	my $config_h = shift;
-	%config = {};
-	my $re_define_uint = qr/^#define ([0-9_A-Z]+) ([0-9]+)$/;
-	my $re_define_str = qr/^#define ([0-9_A-Z]+) "(.+)"$/;
-	open (my $fh, '<', $config_h) || die "failed opening '$config_h'";
-	while (<$fh>) {
-		$config{$1} = $2 if /$re_define_uint/o || /$re_define_str/o;
+	%config = ();
+	open FH, '<', $config_h or die "failed opening '$config_h'";
+	while (<FH>) {
+		$config{$1} = $2 if /^
+			[[:blank:]]*\#define
+			[[:blank:]]+([0-9_A-Z]+)
+			[[:blank:]]+([0-9]+|".*")
+			[\r\n]*$/xo;
 	}
-	close ($fh) || die "failed closing '$config_h'";
+	close FH or die "failed closing '$config_h'";
+	return %config;
 }
 
 # This is a simpler version of the PHP function.
 sub file_put_contents {
 	my ($filename, $contents) = @_;
-	open (my $fh, '>', $filename) || die "failed opening '$filename'";
-	print $fh $contents;
-	close ($fh) || die "failed closing '$filename'";
+	open FH, '>', $filename or die "failed opening '$filename'";
+	print FH $contents;
+	close FH or die "failed closing '$filename'";
 }
 
 # Idem.
 sub file_get_contents {
 	my $filename = shift;
-	open (my $fh, '<', $filename) || die "failed opening '$filename'";
+	open FH, '<', $filename or die "failed opening '$filename'";
 	my $ret = '';
-	$ret .= $_ while (<$fh>);
-	close ($fh) || die "failed closing '$filename'";
+	$ret .= $_ while (<FH>);
+	close FH or die "failed closing '$filename'";
 	return $ret;
 }
 
 sub string_in_file {
 	my ($string, $filename) = @_;
 	my $ret = 0;
-	open (my $fh, '<', $filename) || die "failed opening '$filename'";
-	while (<$fh>) {
+	open FH, '<', $filename or die "failed opening '$filename'";
+	while (<FH>) {
 		if (-1 != index $_, $string) {
 			$ret = 1;
 			last;
 		}
 	}
-	close ($fh) || die "failed closing '$filename'";
+	close FH or die "failed closing '$filename'";
 	return $ret;
 }
 
 sub skip_os {
 	my $name = shift;
-	return $^O eq $name ? "is $name" : '';
+	my $bettername = $osnames{$name} || $name;
+	return $^O eq $name ? "is $bettername" : '';
 }
 
 sub skip_os_not {
 	my $name = shift;
-	return $^O ne $name ? "is not $name" : '';
+	my $bettername = $osnames{$name} || $name;
+	return $^O ne $name ? "is not $bettername" : '';
 }
 
 sub skip_config_def1 {
@@ -149,7 +170,10 @@ sub result_skipped {
 }
 
 sub result_passed {
-	return {char => CHAR_PASSED};
+	return {
+		char => CHAR_PASSED,
+		T => shift
+	};
 }
 
 sub result_failed {
@@ -202,7 +226,7 @@ sub print_result_char {
 	if ($results_dangling) {
 		return if $results_printed < $results_to_print;
 		# Complete the dangling line to keep the progress column aligned.
-		print ' ' for (1 .. $max_results_per_line - $results_dangling);
+		print ' ' x ($max_results_per_line - $results_dangling);
 	}
 	printf " %*u / %*u (%3u%%)\n",
 		$max_result_digits,
@@ -231,6 +255,10 @@ sub test_and_report {
 	# * details (optional, [multi-line] string)
 	my %failed;
 	my $passedcount = 0;
+	my %passed; # May stay empty even if $passedcount > 0.
+
+	printf "INFO: %s = skipped, %s = passed, %s = failed, %s = timed out\n",
+		CHAR_SKIPPED, CHAR_PASSED, CHAR_FAILED, CHAR_TIMED_OUT;
 
 	# Ordering of the results is the same as ordering of the tests.  Print the
 	# results map immediately and buffer any skipped/failed test details for the
@@ -243,13 +271,21 @@ sub test_and_report {
 			$failed{$result->{label}} = $result->{failure};
 		} else {
 			$passedcount++;
+			$passed{$result->{label}} = $result->{T} if defined $result->{T};
 		}
 	}
 
 	print "\n";
+	if (%passed) {
+		print "Passed tests:\n";
+		print_result $_, sprintf ('T=%.06fs', $passed{$_}) foreach (sort keys %passed);
+		print "\n";
+	}
 	if (%skipped) {
 		print "Skipped tests:\n";
-		print_result $_, $skipped{$_} foreach (sort keys %skipped);
+		foreach (sort keys %skipped) {
+			print_result $_, $skipped{$_} if $skipped{$_} ne '';
+		}
 		print "\n";
 	}
 	if (%failed) {
@@ -268,7 +304,21 @@ sub test_and_report {
 	print "------------------------------------------------\n";
 	printf "%4u tests skipped\n", $skippedcount;
 	printf "%4u tests failed\n", $failedcount;
-	printf "%4u tests passed\n", $passedcount;
+	if (! scalar keys %passed) {
+		# There isn't any test duration statistics.
+		printf "%4u tests passed\n", $passedcount;
+	} elsif ($passedcount != scalar keys %passed) {
+		die sprintf ("Internal error: statistics bug (%u != %u)",
+			$passedcount,
+			scalar (keys %passed)
+		);
+	} else {
+		printf "%4u tests passed: T min/avg/max = %.06f/%.06f/%.06fs\n",
+			scalar (keys %passed),
+			min (values %passed),
+			sum (values %passed) / scalar (keys %passed),
+			max (values %passed);
+	}
 
 	if ($skippedcount + $failedcount + $passedcount != $results_to_print) {
 		printf STDERR "Internal error: statistics bug (%u + %u + %u != %u)\n",
