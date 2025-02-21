@@ -346,6 +346,7 @@ endif()
 
 ###################################################################
 #   Versioning
+# (and other variables to keep config.h consistent with Autoconf)
 ###################################################################
 
 # Get, parse, format and set tcpdump's version string from
@@ -356,6 +357,12 @@ file(STRINGS ${tcpdump_SOURCE_DIR}/VERSION
     PACKAGE_VERSION
     LIMIT_COUNT 1 # Read only the first line
 )
+
+set(PACKAGE_BUGREPORT "https://github.com/the-tcpdump-group/tcpdump/issues")
+set(PACKAGE_NAME "tcpdump")
+set(PACKAGE_STRING "${PACKAGE_NAME} ${PACKAGE_VERSION}")
+set(PACKAGE_TARNAME "${PACKAGE_NAME}")
+set(PACKAGE_URL "https://www.tcpdump.org/")
 
 ######################################
 # Project settings
