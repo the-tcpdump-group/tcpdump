@@ -255,6 +255,10 @@ AS_CASE(["$withval"],
 AC_ARG_WITH(sandbox-capsicum,
 	AS_HELP_STRING([--with-sandbox-capsicum],
 		       [use Capsicum security functions @<:@default=yes, if available@:>@]))
+
+# Capsicum is available on FreeBSD only.
+expr "$host_os" : freebsd >/dev/null || with_sandbox_capsicum=no
+
 #
 # Check whether various functions are available.  If any are, set
 # ac_lbl_capsicum_function_seen to yes; if any are not, set
