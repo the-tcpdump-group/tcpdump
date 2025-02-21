@@ -93,7 +93,11 @@ PKG_PROG_PKG_CONFIG
 #
 # Do we have the brew command from Homebrew?
 #
-AC_PATH_PROG([BREW], [brew])
+case "$host_os" in
+darwin*|linux*)
+	AC_PATH_PROG([BREW], [brew])
+	;;
+esac
 
 AC_ARG_WITH([smi],
    [AS_HELP_STRING([--with-smi],
