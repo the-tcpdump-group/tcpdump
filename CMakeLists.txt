@@ -308,7 +308,11 @@ if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
 else()
     set(WITH_CAPSICUM OFF)
 endif()
-option(WITH_CAP_NG "Use libcap-ng, if available" ON)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    option(WITH_CAP_NG "Use libcap-ng, if available" ON)
+else()
+    set(WITH_CAP_NG OFF)
+endif()
 option(ENABLE_SMB "Build with the SMB dissector" OFF)
 
 #

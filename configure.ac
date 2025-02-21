@@ -1070,7 +1070,6 @@ fi
 # Check for libcap-ng
 AC_MSG_CHECKING(whether to use libcap-ng)
 # Specify location for both includes and libraries.
-want_libcap_ng=ifavailable
 AC_ARG_WITH(cap_ng,
     AS_HELP_STRING([--with-cap-ng],
 		   [use libcap-ng @<:@default=yes, if available@:>@]),
@@ -1091,6 +1090,10 @@ AC_ARG_WITH(cap_ng,
 	want_libcap_ng=ifavailable
 	AC_MSG_RESULT([yes, if available])
 ])
+
+# libcap-ng is available on Linux only.
+expr "$host_os" : linux >/dev/null || want_libcap_ng=no
+
 if test "$want_libcap_ng" != "no"; then
 	AC_CHECK_LIB(cap-ng, capng_change_id)
 	AC_CHECK_HEADERS(cap-ng.h)
