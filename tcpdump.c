@@ -2375,7 +2375,11 @@ DIAG_ON_WARN_UNUSED_RESULT
 #ifdef HAVE_PCAP_SET_OPTIMIZER_DEBUG
 	pcap_set_optimizer_debug(dflag);
 #endif
-	if (pcap_compile(pd, &fcode, cmdbuf, Oflag, netmask) < 0)
+	/*
+	 * netmask is in network byte order, pcap_compile() takes it
+	 * in host byte order.
+	 */
+	if (pcap_compile(pd, &fcode, cmdbuf, Oflag, ntohl(netmask)) < 0)
 		error("%s", pcap_geterr(pd));
 	if (dflag) {
 		bpf_dump(&fcode, dflag);
@@ -2390,6 +2394,7 @@ DIAG_ON_WARN_UNUSED_RESULT
 		capdns = capdns_setup();
 #endif	/* HAVE_CASPER */
 
+	// Both localnet and netmask are in network byte order.
 	init_print(ndo, localnet, netmask);
 
 #ifndef _WIN32
@@ -2793,7 +2798,11 @@ DIAG_ON_ASSIGN_ENUM
 					ndo->ndo_if_printer = get_if_printer(dlt);
 					/* Free the old filter */
 					pcap_freecode(&fcode);
-					if (pcap_compile(pd, &fcode, cmdbuf, Oflag, netmask) < 0)
+					/*
+					 * netmask is in network byte order, pcap_compile() takes it
+					 * in host byte order.
+					 */
+					if (pcap_compile(pd, &fcode, cmdbuf, Oflag, ntohl(netmask)) < 0)
 						error("%s", pcap_geterr(pd));
 				}
 

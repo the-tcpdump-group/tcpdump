@@ -290,6 +290,7 @@ ipaddr_string(netdissect_options *ndo, const u_char *ap)
 	 *      (2) Address is foreign and -f was given. (If -f was not
 	 *	    given, f_netmask and f_localnet are 0 and the test
 	 *	    evaluates to true)
+	 * Both addr and f_netmask and f_localnet are in network byte order.
 	 */
 	if (!ndo->ndo_nflag &&
 	    (addr & f_netmask) == f_localnet) {
@@ -1244,7 +1245,7 @@ init_ipxsaparray(netdissect_options *ndo)
  * Initialize the address to name translation machinery.  We map all
  * non-local IP addresses to numeric addresses if ndo->ndo_fflag is true
  * (i.e., to prevent blocking on the nameserver).  localnet is the IP address
- * of the local network.  mask is its subnet mask.
+ * of the local network, mask is its subnet mask, both in network byte order.
  */
 void
 init_addrtoname(netdissect_options *ndo, uint32_t localnet, uint32_t mask)

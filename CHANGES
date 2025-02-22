@@ -66,6 +66,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Change Sun RPC code licence to BSD-3-Clause.
       Use C99 macros to define 64-bit constants and maximum 64-bit
         values.
+      Fix "ip broadcast" netmask byte order with the -f flag.
     Building and testing:
       Autoconf: Remove detection of early IPv6 stacks.
       Detect OS IPv6 support using AF_INET6 only.

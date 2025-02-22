@@ -241,6 +241,7 @@ static const struct printer printers[] = {
 	{ NULL,                 0 },
 };
 
+// Both localnet and mask are in network byte order.
 void
 init_print(netdissect_options *ndo, uint32_t localnet, uint32_t mask)
 {

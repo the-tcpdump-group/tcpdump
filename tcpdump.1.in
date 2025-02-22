@@ -20,7 +20,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "30 November 2024"
+.TH TCPDUMP 1  "22 February 2025"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -417,12 +417,26 @@ Sun's NIS server \(em usually it hangs forever translating non-local
 internet numbers).
 .IP
 The test for `foreign' IPv4 addresses is done using the IPv4 address and
-netmask of the interface on that capture is being done.  If that
-address or netmask are not available, either because the
-interface on that capture is being done has no address or netmask or
-because it is the "any" pseudo-interface (see the
+netmask of the interface on that capture is being done.  If the interface
+has no IPv4 addresses (which by convention applies to the "any"
+pseudo-interface (see the
 .B \-i
-flag below), this option will not work correctly.
+flag below), the IPv4 netmask is assumed to be /0 and any IPv4 address is
+considered non-foreign.  If the IPv4 netmask is /32, all IPv4 addresses
+except the interface's own address are considered foreign.  If the
+interface has more than one IPv4 address, it is not trivial to predict
+which one will be used for the test.
+.IP
+Without the
+.B \-f
+flag, or when the netmask is assumed to be /0 (as discussed above), the
+.B "ip broadcast"
+primitive in the filter expression matches IPv4 packets that have either
+0.0.0.0 or 255.255.255.255 as the destination address.  With the flag,
+the primitive uses the same netmask (but not the network address) to test
+the IPv4 destination address as the foreign address test.  One exception
+is the netmask /32, in which case the primitive is considered invalid for
+the interface.
 .TP
 .BI \-F " file"
 Use \fIfile\fP as input for the filter expression.
