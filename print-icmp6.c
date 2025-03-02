@@ -279,6 +279,7 @@ struct nd_opt_hdr {		/* Neighbor discovery option header */
 #define ND_OPT_MTU			5
 #define ND_OPT_ADVINTERVAL		7
 #define ND_OPT_HOMEAGENT_INFO		8
+#define ND_OPT_NONCE			14
 #define ND_OPT_ROUTE_INFO		24	/* RFC4191 */
 #define ND_OPT_RDNSS			25
 #define ND_OPT_DNSSL			31
@@ -731,6 +732,7 @@ static const struct tok icmp6_opt_values[] = {
    { ND_OPT_DNSSL, "dnssl"},
    { ND_OPT_ADVINTERVAL, "advertisement interval"},
    { ND_OPT_HOMEAGENT_INFO, "homeagent information"},
+   { ND_OPT_NONCE, "nonce"},
    { ND_OPT_ROUTE_INFO, "route info"},
    { 0,	NULL }
 };
@@ -769,6 +771,18 @@ get_lifetime(uint32_t v)
 	else {
 		snprintf(buf, sizeof(buf), "%us", v);
 		return buf;
+	}
+}
+
+static void
+print_opaque_data(netdissect_options *ndo, const uint8_t *p, size_t l)
+{
+	if (l > 0)
+		ND_PRINT("0x");
+	while (l > 0) {
+		ND_PRINT("%02x", GET_U_1(p));
+		p++;
+		l--;
 	}
 }
 
@@ -1503,6 +1517,10 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			ND_PRINT(" preference %u, lifetime %u",
                                   GET_BE_U_2(oph->nd_opt_hai_preference),
                                   GET_BE_U_2(oph->nd_opt_hai_lifetime));
+			break;
+		case ND_OPT_NONCE:
+			l = (opt_len << 3) - 2;
+			print_opaque_data(ndo, cp + 2, l);
 			break;
 		case ND_OPT_ROUTE_INFO:
 			opri = (const struct nd_opt_route_info *)op;
