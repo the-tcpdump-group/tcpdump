@@ -341,7 +341,7 @@ olsr_print(netdissect_options *ndo,
         return;
     }
 
-    while (tptr < (pptr+length)) {
+    while (tptr - pptr < length) {
         union
         {
             const struct olsr_msg4 *v4;
@@ -679,7 +679,7 @@ olsr_print(netdissect_options *ndo,
             break;
         } /* switch (msg_type) */
         tptr += msg_len;
-    } /* while (tptr < (pptr+length)) */
+    } /* while (tptr - pptr < length) */
 
     return;
 
