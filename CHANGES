@@ -1,6 +1,7 @@
 DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
   Summary for 4.99.6 tcpdump release (so far!)
     Refine protocol decoding for:
+      DNS: Use ND_TCHECK_LEN() instead of a custom bounds check.
       IPv6: Add a missing comma and remove a colon in the output.
       TCP: Note if the Urgent Pointer is non-zero while URG flag not set,
            if the verbose level is > 1 (option -vv and more).
