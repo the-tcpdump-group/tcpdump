@@ -466,11 +466,16 @@ interface list for the lowest numbered, configured up interface
 On all supported Linux systems, as well as on recent versions of macOS
 and Solaris, an
 .I interface
-argument of ``any'' can be used to capture packets from all network interfaces.
-The latter should not be confused with all available capture devices as printed
-by the
+argument of ``any'' means a special pseudo-interface, which captures packets
+from all regular network interfaces of the OS.  What is considered a regular
+network interface is an implementation detail of the OS (for example, on
+Linux this includes SocketCAN devices), so packets captured on the ``any''
+pseudo-interface may represent more different network protocols than expected.
+Also all regular network interfaces are a subset of all available capture
+devices as printed by the
 .B \-D
-flag, which may also include D-Bus, USB etc.
+flag.  The latter may also include capture devices that libpcap implements by
+means other than the OS network stack: Bluetooth, DAG, D-Bus, SNF and USB.
 Note that captures on the ``any'' pseudo-interface will not be done in promiscuous
 mode.
 .IP
