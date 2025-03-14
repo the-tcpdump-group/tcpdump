@@ -32,6 +32,11 @@ AC_LBL_C_INIT(V_CCOPT, V_INCLS)
 AC_LBL_C_INLINE
 
 AC_CHECK_HEADERS(rpc/rpc.h rpc/rpcent.h net/if.h)
+
+# On Linux, if Autoconf version >= 2.72 and GNU C Library version >= 2.34,
+# uncomment AC_SYS_YEAR2038_RECOMMENDED to ensure time_t is Y2038-safe.
+# (Can be done by autogen.sh)
+# AC_SYS_YEAR2038_RECOMMENDED
 #
 # Get the size of a void *, to know whether this is a 32-bit or 64-bit build.
 #
