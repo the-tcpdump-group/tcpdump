@@ -283,6 +283,7 @@ struct nd_opt_hdr {		/* Neighbor discovery option header */
 #define ND_OPT_ROUTE_INFO		24	/* RFC4191 */
 #define ND_OPT_RDNSS			25
 #define ND_OPT_DNSSL			31
+#define ND_OPT_PREF64_INFORMATION	38	/* RFC8781 */
 
 struct nd_opt_prefix_info {	/* prefix information */
 	nd_uint8_t	nd_opt_pi_type;
@@ -352,6 +353,13 @@ struct nd_opt_route_info {	/* route info */
 	nd_uint8_t	nd_opt_rti_flags;
 	nd_uint32_t	nd_opt_rti_lifetime;
 	/* prefix follows */
+};
+
+struct nd_opt_pref64 {		/* PREF64 option */
+	nd_uint8_t	nd_opt_pref64_type;
+	nd_uint8_t	nd_opt_pref64_len;
+	nd_uint16_t	nd_opt_pref64_slplc; /* 13bit lft + 3bit PLC */
+	nd_uint32_t	nd_opt_pref64_words[3]; /* highest 96 bits of prefix */
 };
 
 /*
@@ -495,6 +503,7 @@ struct rr_result {		/* router renumbering result message */
 
 static const char *get_rtpref(u_int);
 static const char *get_lifetime(uint32_t);
+static const char *get_pref64_len_repr(uint16_t);
 static void print_lladdr(netdissect_options *ndo, const u_char *, size_t);
 static int icmp6_opt_print(netdissect_options *ndo, const u_char *, int);
 static void mld6_print(netdissect_options *ndo, const u_char *);
@@ -734,6 +743,7 @@ static const struct tok icmp6_opt_values[] = {
    { ND_OPT_HOMEAGENT_INFO, "homeagent information"},
    { ND_OPT_NONCE, "nonce"},
    { ND_OPT_ROUTE_INFO, "route info"},
+   { ND_OPT_PREF64_INFORMATION, "pref64"},
    { 0,	NULL }
 };
 
@@ -772,6 +782,20 @@ get_lifetime(uint32_t v)
 		snprintf(buf, sizeof(buf), "%us", v);
 		return buf;
 	}
+}
+
+static const char *
+get_pref64_len_repr(uint16_t v)
+{
+	static const char *prefixlen_str[] = {
+		"96", "64", "56", "48", "40", "32"
+	};
+
+	v = v & 0x0007;
+	if (v < 6)
+		return prefixlen_str[v];
+	else
+		return "??";
 }
 
 static void
@@ -1416,10 +1440,12 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 	const struct nd_opt_advinterval *opa;
 	const struct nd_opt_homeagent_info *oph;
 	const struct nd_opt_route_info *opri;
+	const struct nd_opt_pref64 *op64;
 	const u_char *cp, *ep, *domp;
 	nd_ipv6 in6;
 	size_t l;
 	u_int i;
+	uint16_t w;
 
 	cp = bp;
 	/* 'ep' points to the end of available data. */
@@ -1532,6 +1558,20 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 				 get_rtpref(GET_U_1(opri->nd_opt_rti_flags)));
 			ND_PRINT(", lifetime=%s",
                                   get_lifetime(GET_BE_U_4(opri->nd_opt_rti_lifetime)));
+			break;
+		case ND_OPT_PREF64_INFORMATION:
+			op64 = (const struct nd_opt_pref64 *)op;
+			if (opt_len != 2)
+				ND_PRINT("%s", "bad option length! ");
+			w = GET_BE_U_2(op64->nd_opt_pref64_slplc);
+			memset(&in6, 0, sizeof(in6));
+			GET_CPY_BYTES(&in6, op64->nd_opt_pref64_words,
+                                      sizeof(op64->nd_opt_pref64_words));
+			ND_PRINT("%s/%s (plc %u), lifetime %us",
+                                 ip6addr_string(ndo, (const u_char *)&in6),
+                                 get_pref64_len_repr(w),
+                                 w & 0x0007,
+                                 w & 0xfff8);
 			break;
 		default:
                         if (ndo->ndo_vflag <= 1) {
