@@ -401,9 +401,9 @@ invalid:
  * The first character specifies the format to print:
  *     i - ip address (32 bits)
  *     p - ip address pairs (32 bits + 32 bits)
- *     l - long (32 bits)
- *     L - unsigned long (32 bits)
- *     s - short (16 bits)
+ *     l - unsigned longs (32 bits)
+ *     L - longs (32 bits)
+ *     s - unsigned shorts (16 bits)
  *     b - period-separated decimal bytes (variable length)
  *     x - colon-separated hex bytes (variable length)
  *     a - ASCII string (variable length)
@@ -721,7 +721,7 @@ rfc1048_print(netdissect_options *ndo,
 			break;
 
 		case 's':
-			/* shorts */
+			/* unsigned shorts */
 			while (len >= 2) {
 				if (!first)
 					ND_PRINT(",");
