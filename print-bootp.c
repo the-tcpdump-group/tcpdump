@@ -179,7 +179,7 @@ struct bootp {
 /* RFC 2485 */
 #define	TAG_OPEN_GROUP_UAP	((uint8_t)  98)
 /* RFC 2563 */
-#define	TAG_DISABLE_AUTOCONF	((uint8_t) 116)
+#define	TAG_AUTO_CONFIGURE	((uint8_t) 116)
 /* RFC 2610 */
 #define	TAG_SLP_DA		((uint8_t)  78)
 #define	TAG_SLP_SCOPE		((uint8_t)  79)
@@ -493,7 +493,7 @@ static const struct tok tag2str[] = {
 /* RFC 2485 */
 	{ TAG_OPEN_GROUP_UAP,	"aUAP" },
 /* RFC 2563 */
-	{ TAG_DISABLE_AUTOCONF,	"BNOAUTO" },
+	{ TAG_AUTO_CONFIGURE,	"BAuto-Configure" },
 /* RFC 2610 */
 	{ TAG_SLP_DA,		"bSLP-DA" },	/*"b" is a little wrong */
 	{ TAG_SLP_SCOPE,	"bSLP-SCOPE" },	/*"b" is a little wrong */
