@@ -52,6 +52,35 @@ tcp_rst_data-trunc tcp_rst_data-trunc.pcap tcp_rst_data-trunc.out
 # TCP
 tcp_eight_lowest_weight_flags_set tcp_eight_lowest_weight_flags_set.pcap tcp_eight_lowest_weight_flags_set.out
 
+# SCTP tests
+# I-DATA tests
+sctp-i-data sctp-i-data.pcap sctp-i-data.out
+sctp-i-data-v sctp-i-data.pcap sctp-i-data-v.out -v
+sctp-i-data-vv sctp-i-data.pcap sctp-i-data-vv.out -vv
+
+# I-FORWARD tests
+sctp-i-forward sctp-i-forward.pcap sctp-i-forward.out
+sctp-i-forward-v sctp-i-forward.pcap sctp-i-forward-v.out -v
+sctp-i-forward-vv sctp-i-forward.pcap sctp-i-forward-vv.out -vv
+
+# RE-CONFIG tests
+sctp-re-config sctp-re-config.pcap sctp-re-config.out
+sctp-re-config-v sctp-re-config.pcap sctp-re-config-v.out -v
+sctp-re-config-vv sctp-re-config.pcap sctp-re-config-vv.out -vv
+
+# ASCONF tests
+sctp-asconf sctp-asconf.pcap sctp-asconf.out
+sctp-asconf-v sctp-asconf.pcap sctp-asconf-v.out -v
+sctp-asconf-vv sctp-asconf.pcap sctp-asconf-vv.out -vv
+sctp-asconf-6 sctp-asconf-6.pcap sctp-asconf-6.out
+sctp-asconf-6-v sctp-asconf-6.pcap sctp-asconf-6-v.out -v
+sctp-asconf-6-vv sctp-asconf-6.pcap sctp-asconf-6-vv.out -vv
+
+# PAD tests
+sctp-pad sctp-pad.pcap sctp-pad.out
+sctp-pad-v sctp-pad.pcap sctp-pad-v.out -v
+sctp-pad-vv sctp-pad.pcap sctp-pad-vv.out -vv
+
 # BGP tests
 bgp_vpn_attrset bgp_vpn_attrset.pcap bgp_vpn_attrset.out -v
 mpbgp-linklocal-nexthop mpbgp-linklocal-nexthop.pcap mpbgp-linklocal-nexthop.out -v
