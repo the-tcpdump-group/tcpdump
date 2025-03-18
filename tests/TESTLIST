@@ -525,6 +525,7 @@ dhcp-rfc4388	dhcp-rfc4388.pcap	dhcp-rfc4388.out	-v
 dhcp-rfc5859	dhcp-rfc5859.pcap	dhcp-rfc5859-v.out	-v
 dhcp-mud	dhcp-mud.pcap		dhcp-mud.out	-vv
 dhcp-option-33	dhcp-option-33.pcap	dhcp-option-33.out	-vvv
+dhcp-option-108	dhcp-option-108.pcapng	dhcp-option-108.out	-v
 
 # VXLAN tests
 vxlan  vxlan.pcap  vxlan.out -e
