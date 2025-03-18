@@ -518,7 +518,7 @@ static const struct tok tag2str[] = {
 	{ TAG_TZ_STRING,	"aTZSTR" },
 	{ TAG_FQDN_OPTION,	"bFQDNS" },	/* XXX 'b' */
 	{ TAG_AUTH,		"bAUTH" },	/* XXX 'b' */
-	{ TAG_CLIENT_LAST_TRANSACTION_TIME, "LLast-Transaction-Time" },
+	{ TAG_CLIENT_LAST_TRANSACTION_TIME, "lLast-Transaction-Time" },
 	{ TAG_ASSOCIATED_IP,	"iAssociated-IP" },
 	{ TAG_CLIENT_ARCH,	"sARCH" },
 	{ TAG_CLIENT_NDI,	"bNDI" },	/* XXX 'b' */
