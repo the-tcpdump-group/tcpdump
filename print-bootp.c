@@ -734,27 +734,32 @@ rfc1048_print(netdissect_options *ndo,
 
 		case 'B':
 			/* boolean */
-			while (len != 0) {
-				uint8_t bool_value;
-				if (!first)
-					ND_PRINT(",");
-				bool_value = GET_U_1(bp);
-				switch (bool_value) {
-				case 0:
-					ND_PRINT("N");
-					break;
-				case 1:
-					ND_PRINT("Y");
-					break;
-				default:
-					ND_PRINT("%u?", bool_value);
-					break;
-				}
-				++bp;
-				--len;
-				first = 0;
+		    {
+			/* this option should be 1 byte long */
+			if (len != 1) {
+				ND_PRINT("[ERROR: length != 1 byte]");
+				bp += len;
+				len = 0;
+				break;
 			}
+
+			uint8_t bool_value;
+			bool_value = GET_U_1(bp);
+			switch (bool_value) {
+			case 0:
+				ND_PRINT("N");
+				break;
+			case 1:
+				ND_PRINT("Y");
+				break;
+			default:
+				ND_PRINT("%u?", bool_value);
+				break;
+			}
+			++bp;
+			--len;
 			break;
+		    }
 
 		case 'b':
 		case 'x':
