@@ -126,6 +126,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       autotools, CMake: fix issues with snprintf test and sanitizers.
       CMake: check whether check_c_source_runs() works, treat the build
         as a cross-compile if it doesn't work.
+      Autoconf: Use AC_SYS_YEAR2038_RECOMMENDED when possible if the
+        environment variable BUILD_YEAR2038 = yes (via autogen.sh).
 
 Friday, August 30, 2024 / The Tcpdump Group
   Summary for 4.99.5 tcpdump release
