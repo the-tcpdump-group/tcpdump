@@ -183,6 +183,8 @@ struct bootp {
 /* RFC 2610 */
 #define	TAG_SLP_DA		((uint8_t)  78)
 #define	TAG_SLP_SCOPE		((uint8_t)  79)
+/* RFC 8925 */
+#define TAG_IPV6_ONLY_PREFERRED	((uint8_t) 108)
 /* RFC 2937 */
 #define	TAG_NS_SEARCH		((uint8_t) 117)
 /* RFC 3004 - The User Class Option for DHCP */
@@ -530,6 +532,7 @@ static const struct tok tag2str[] = {
 	{ TAG_NETINFO_PARENT_TAG, "aNITAG" },
 	{ TAG_URL,		"aURL" },
 	{ TAG_MUDURL,           "aMUD-URL" },
+	{ TAG_IPV6_ONLY_PREFERRED, "$IPv6-Only-Preferred" },
 	{ 0, NULL }
 };
 
@@ -1033,6 +1036,18 @@ rfc1048_print(netdissect_options *ndo,
 				if (len != 0) {
 					ND_PRINT("[ERROR: length < 2 bytes]");
 				}
+				break;
+
+			case TAG_IPV6_ONLY_PREFERRED:
+				/* this option should be 4 bytes long */
+				if (len != 4) {
+					ND_PRINT("[ERROR: length != 4 bytes]");
+					bp += len;
+					len = 0;
+				}
+				ND_PRINT("%u", GET_BE_U_4(bp));
+				bp += 4;
+				len -= 4;
 				break;
 
 			default:
