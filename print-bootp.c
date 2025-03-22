@@ -733,7 +733,8 @@ rfc1048_print(netdissect_options *ndo,
 		    {
 			/* this option should be 1 byte long */
 			if (len != 1) {
-				ND_PRINT("[ERROR: length != 1 byte]");
+				ND_PRINT("[length != 1 byte]");
+				nd_print_invalid(ndo);
 				bp += len;
 				len = 0;
 				break;
@@ -783,7 +784,8 @@ rfc1048_print(netdissect_options *ndo,
 			case TAG_NETBIOS_NODE:
 				/* this option should be at least 1 byte long */
 				if (len < 1) {
-					ND_PRINT("[ERROR: length < 1 byte]");
+					ND_PRINT("[length < 1 byte]");
+					nd_print_invalid(ndo);
 					break;
 				}
 				tag = GET_U_1(bp);
@@ -795,7 +797,8 @@ rfc1048_print(netdissect_options *ndo,
 			case TAG_OPT_OVERLOAD:
 				/* this option should be at least 1 byte long */
 				if (len < 1) {
-					ND_PRINT("[ERROR: length < 1 byte]");
+					ND_PRINT("[length < 1 byte]");
+					nd_print_invalid(ndo);
 					break;
 				}
 				tag = GET_U_1(bp);
@@ -807,14 +810,16 @@ rfc1048_print(netdissect_options *ndo,
 			case TAG_CLIENT_FQDN:
 				/* this option should be at least 3 bytes long */
 				if (len < 3) {
-					ND_PRINT("[ERROR: length < 3 bytes]");
+					ND_PRINT("[length < 3 bytes]");
+					nd_print_invalid(ndo);
 					bp += len;
 					len = 0;
 					break;
 				}
 				if (GET_U_1(bp) & 0xf0) {
-					ND_PRINT("[ERROR: MBZ nibble 0x%x != 0] ",
+					ND_PRINT("[MBZ nibble 0x%x != 0] ",
 						 (GET_U_1(bp) & 0xf0) >> 4);
+					nd_print_invalid(ndo);
 				}
 				if (GET_U_1(bp) & 0x0f)
 					ND_PRINT("[%s] ",
@@ -840,7 +845,8 @@ rfc1048_print(netdissect_options *ndo,
 
 				/* this option should be at least 1 byte long */
 				if (len < 1) {
-					ND_PRINT("[ERROR: length < 1 byte]");
+					ND_PRINT("[length < 1 byte]");
+					nd_print_invalid(ndo);
 					break;
 				}
 				type = GET_U_1(bp);
@@ -914,7 +920,8 @@ rfc1048_print(netdissect_options *ndo,
 
 				/* this option should be at least 5 bytes long */
 				if (len < 5) {
-					ND_PRINT("[ERROR: length < 5 bytes]");
+					ND_PRINT("[length < 5 bytes]");
+					nd_print_invalid(ndo);
 					bp += len;
 					len = 0;
 					break;
@@ -927,7 +934,8 @@ rfc1048_print(netdissect_options *ndo,
 					len--;
 					/* mask_width <= 32 */
 					if (mask_width > 32) {
-						ND_PRINT("[ERROR: Mask width (%u) > 32]", mask_width);
+						ND_PRINT("[Mask width (%u) > 32]", mask_width);
+						nd_print_invalid(ndo);
 						bp += len;
 						len = 0;
 						break;
@@ -935,7 +943,8 @@ rfc1048_print(netdissect_options *ndo,
 					significant_octets = (mask_width + 7) / 8;
 					/* significant octets + router(4) */
 					if (len < significant_octets + 4) {
-						ND_PRINT("[ERROR: Remaining length (%u) < %u bytes]", len, significant_octets + 4);
+						ND_PRINT("[Remaining length (%u) < %u bytes]", len, significant_octets + 4);
+						nd_print_invalid(ndo);
 						bp += len;
 						len = 0;
 						break;
@@ -969,7 +978,8 @@ rfc1048_print(netdissect_options *ndo,
 
 				first = 1;
 				if (len < 2) {
-					ND_PRINT("[ERROR: length < 2 bytes]");
+					ND_PRINT("[length < 2 bytes]");
+					nd_print_invalid(ndo);
 					bp += len;
 					len = 0;
 					break;
@@ -981,13 +991,16 @@ rfc1048_print(netdissect_options *ndo,
 					ND_PRINT("\n\t      ");
 					ND_PRINT("instance#%u: ", suboptnumber);
 					if (suboptlen == 0) {
-						ND_PRINT("[ERROR: suboption length must be non-zero]");
+						ND_PRINT("[suboption length == 0]");
+						nd_print_invalid(ndo);
 						bp += len;
 						len = 0;
 						break;
 					}
 					if (len < suboptlen) {
-						ND_PRINT("[ERROR: invalid option]");
+						ND_PRINT("[length %u < suboption length %u",
+							 len, suboptlen);
+						nd_print_invalid(ndo);
 						bp += len;
 						len = 0;
 						break;
@@ -1037,7 +1050,8 @@ rfc1048_print(netdissect_options *ndo,
 					bp += suboptlen2;
 				}
 				if (len != 0) {
-					ND_PRINT("[ERROR: length < 2 bytes]");
+					ND_PRINT("[length < 2 bytes]");
+					nd_print_invalid(ndo);
 				}
 				break;
 
