@@ -707,6 +707,14 @@ rfc1048_print(netdissect_options *ndo,
 
 		case 'p':
 			/* IP address pairs */
+			/* this option should be N x 8 bytes long */
+			if (len < 8 || len % 8 != 0) {
+				ND_PRINT("%s[length != N x 8 bytes]",
+					 len == 0 ? " " : "");
+				bp += len;
+				len = 0;
+				break;
+			}
 			while (len >= 2*4) {
 				if (!first)
 					ND_PRINT(",");
