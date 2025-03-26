@@ -112,6 +112,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Fix '-tt' option printing when time > 2106-02-07T06:28:15Z.
       Add sub-second packet timestamp checks for invalid micro/nano.
       Remove unused missing/snprintf.c.
+      Fix incompatible pointer types with time functions calls on Windows.
     Windows:
       Fixed to find wpcap.dll if WinPcap isn't installed and Npcap was
         installed without the WinPcap API compatibility option. (GitHub
