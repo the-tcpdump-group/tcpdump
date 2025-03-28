@@ -17,7 +17,11 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
            checksum calculation.
       NFS: Delete dead code.
       BOOTP: Use an uint16_t variable to get the result of a GET_BE_U_2().
+      ZEP: use the exissting NTP time formatting code.
+      NTP: Fix p_ntp_time_fmt() using epoch 1/epoch 2 convention (RFC 4330).
     User interface:
+      Add optional unit suffix on -C file size.
+      Improve the handling of size suffixes for -C.
       Warn that options -A, -x[x] and -X[X] are mutually exclusive.
       For PCAP_ERROR_CAPTURE_NOTSUP, show the error message provided
         by libpcap for that error if it's non-empty.
@@ -26,6 +30,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Add sub-second packet timestamp checks for invalid micro/nano.
       Remove unused missing/snprintf.c.
       Fix incompatible pointer types with time functions calls on Windows.
+      Use C99 macros to define 64-bit constants and maximum 64-bit values.
     Windows:
       Fixed to find wpcap.dll if WinPcap isn't installed and Npcap was
         installed without the WinPcap API compatibility option. (GitHub
