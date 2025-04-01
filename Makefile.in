@@ -303,7 +303,6 @@ HDR = \
 	openflow.h \
 	ospf.h \
 	oui.h \
-	pcap-missing.h \
 	ppp.h \
 	print.h \
 	rpc_auth.h \

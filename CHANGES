@@ -64,6 +64,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Disregard setlinebuf(3), always use setvbuf(3).
       Change Sun RPC code licence to BSD-3-Clause.
       Fix "ip broadcast" netmask byte order with the -f flag.
+      Remove pcap-missing.h.
     Building and testing:
       Autoconf: Remove detection of early IPv6 stacks.
       Detect OS IPv6 support using AF_INET6 only.

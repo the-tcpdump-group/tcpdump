@@ -141,7 +141,6 @@ nlpid.h		- OSI NLPID definitions
 ospf.h		- Open Shortest Path First definitions
 packetdat.awk	- TCP chunk summary awk script
 parsenfsfh.c	- Network File System file parser routines
-pcap-missing.h	- declarations of functions possibly missing from libpcap
 ppp.h		- Point to Point Protocol definitions
 print.c		- Top-level routines for protocol printing
 print-*.c	- The netdissect printers

@@ -141,7 +141,6 @@ The Regents of the University of California.  All rights reserved.\n";
 #include "netdissect.h"
 #include "interface.h"
 #include "addrtoname.h"
-#include "pcap-missing.h"
 #include "ascii_strcasecmp.h"
 
 #include "print.h"
