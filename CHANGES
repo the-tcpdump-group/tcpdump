@@ -19,6 +19,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       BOOTP: Use an uint16_t variable to get the result of a GET_BE_U_2().
       ZEP: use the exissting NTP time formatting code.
       NTP: Fix p_ntp_time_fmt() using epoch 1/epoch 2 convention (RFC 4330).
+      NTP: Update a field name with the RFC 5905 name (Origin Timestamp).
     User interface:
       Add optional unit suffix on -C file size.
       Improve the handling of size suffixes for -C.
