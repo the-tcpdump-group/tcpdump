@@ -244,7 +244,9 @@ static void warning(FORMAT_STRING(const char *), ...) PRINTFLIKE(1, 2);
 static NORETURN void exit_tcpdump(int);
 static void (*setsignal (int sig, void (*func)(int)))(int);
 static void cleanup(int);
+#if defined(HAVE_FORK) || defined(HAVE_VFORK)
 static void child_cleanup(int);
+#endif
 static void print_version(FILE *);
 static void print_usage(FILE *);
 #ifdef HAVE_PCAP_SET_TSTAMP_TYPE
