@@ -225,7 +225,9 @@ static int64_t parse_int64(const char *argname, const char *string,
     char **endp, int64_t minval, int64_t maxval, int base);
 static void (*setsignal (int sig, void (*func)(int)))(int);
 static void cleanup(int);
+#if defined(HAVE_FORK) || defined(HAVE_VFORK)
 static void child_cleanup(int);
+#endif
 static void print_version(FILE *);
 static void print_usage(FILE *);
 
