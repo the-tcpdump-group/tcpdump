@@ -1293,6 +1293,13 @@ AC_SUBST(MAN_MISC_INFO)
 AC_PROG_INSTALL
 
 AC_CONFIG_HEADER(config.h)
+AH_TOP([
+#ifndef TCPDUMP_CONFIG_H_
+#define TCPDUMP_CONFIG_H_
+])
+AH_BOTTOM([
+#endif // TCPDUMP_CONFIG_H_
+])
 
 AC_CONFIG_COMMANDS([.devel],[[if test -f .devel; then
 	echo timestamp > stamp-h
