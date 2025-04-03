@@ -34,6 +34,9 @@
  */
 
 #include <config.h>
+#ifndef TCPDUMP_CONFIG_H_
+#error "The included config.h header is not from the tcpdump build."
+#endif
 
 #include "netdissect-stdinc.h"
 

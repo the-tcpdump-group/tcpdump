@@ -80,6 +80,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       autogen.sh: Allow to configure Autoconf warnings.
       autogen.sh: Delete all trailing blank lines at end of configure.
       Reimplement the tests similarly to libpcap.
+      Require config.h to be from the tcpdump build.
     Documentation:
       man: Clarify the "any" pseudo-interface further.
 

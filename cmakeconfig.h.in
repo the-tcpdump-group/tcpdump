@@ -1,5 +1,8 @@
 /* cmakeconfig.h.in */
 
+#ifndef TCPDUMP_CONFIG_H_
+#define TCPDUMP_CONFIG_H_
+
 /* Define to 1 if arpa/inet.h declares `ether_ntohost' */
 #cmakedefine ARPA_INET_H_DECLARES_ETHER_NTOHOST 1
 
@@ -185,3 +188,5 @@
 
 /* Define to `uint8_t' if u_int8_t not defined. */
 #cmakedefine u_int8_t 1
+
+#endif // TCPDUMP_CONFIG_H_
