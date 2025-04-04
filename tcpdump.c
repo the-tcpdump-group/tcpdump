@@ -203,7 +203,9 @@ static int Qflag = -1;			/* restrict captured packet by send/receive direction *
 static int Uflag;			/* "unbuffered" output of dump files */
 static int Wflag;			/* recycle output files after this number of files */
 static int WflagChars;
+#if defined(HAVE_FORK) || defined(HAVE_VFORK)
 static char *zflag = NULL;		/* compress each savefile using a specified command (like gzip or bzip2) */
+#endif
 static int timeout = 1000;		/* default timeout = 1000 ms = 1 s */
 #ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
 static int immediate_mode;
@@ -2014,7 +2016,11 @@ main(int argc, char **argv)
 			break;
 #endif
 		case 'z':
+#if defined(HAVE_FORK) || defined(HAVE_VFORK)
 			zflag = optarg;
+#else
+			warning("-z ignored. Fork subprocess not implemented.\n");
+#endif
 			break;
 
 		case 'Z':
@@ -3134,15 +3140,7 @@ compress_savefile(const char *filename)
 	_exit(S_ERR_HOST_PROGRAM);
 #endif
 }
-#else  /* HAVE_FORK && HAVE_VFORK */
-static void
-compress_savefile(const char *filename)
-{
-	fprintf(stderr,
-		"%s failed. Functionality not implemented under your system\n",
-		__func__);
-}
-#endif /* HAVE_FORK && HAVE_VFORK */
+#endif /* HAVE_FORK || HAVE_VFORK */
 
 static void
 close_old_dump_file(struct dump_info *dump_info)
@@ -3152,11 +3150,13 @@ close_old_dump_file(struct dump_info *dump_info)
 	 */
 	pcap_dump_close(dump_info->pdd);
 
+#if defined(HAVE_FORK) || defined(HAVE_VFORK)
 	/*
 	 * Compress the file we just closed, if the user asked for it.
 	 */
 	if (zflag != NULL)
 		compress_savefile(dump_info->CurrentFileName);
+#endif
 }
 
 static void
