@@ -3104,8 +3104,8 @@ compress_savefile(const char *filename)
 	child = fork_subprocess();
 	if (child == -1) {
 		fprintf(stderr,
-			"compress_savefile: fork failed: %s\n",
-			pcap_strerror(errno));
+			"%s: fork failed: %s\n",
+			__func__, pcap_strerror(errno));
 		return;
 	}
 	if (child != 0) {
@@ -3124,10 +3124,8 @@ compress_savefile(const char *filename)
 #endif
 	if (execlp(zflag, zflag, filename, (char *)NULL) == -1)
 		fprintf(stderr,
-			"compress_savefile: execlp(%s, %s) failed: %s\n",
-			zflag,
-			filename,
-			pcap_strerror(errno));
+			"%s: execlp(%s, %s) failed: %s\n",
+			__func__, zflag, filename, pcap_strerror(errno));
 #ifdef HAVE_FORK
 	exit(S_ERR_HOST_PROGRAM);
 #else
@@ -3139,7 +3137,8 @@ static void
 compress_savefile(const char *filename)
 {
 	fprintf(stderr,
-		"compress_savefile failed. Functionality not implemented under your system\n");
+		"%s failed. Functionality not implemented under your system\n",
+		__func__);
 }
 #endif /* HAVE_FORK && HAVE_VFORK */
 
