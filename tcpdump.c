@@ -2019,7 +2019,7 @@ main(int argc, char **argv)
 #if defined(HAVE_FORK) || defined(HAVE_VFORK)
 			zflag = optarg;
 #else
-			warning("-z ignored. Fork subprocess not implemented.\n");
+			error("-z cannot be used. Fork subprocess not implemented.\n");
 #endif
 			break;
 
@@ -2106,11 +2106,19 @@ main(int argc, char **argv)
 		}
 
 	if (ndo->ndo_Aflag && ndo->ndo_xflag)
-		warning("-A and -x[x] are mutually exclusive. -A ignored.");
+		error("-A and -x[x] are mutually exclusive.");
 	if (ndo->ndo_Aflag && ndo->ndo_Xflag)
-		warning("-A and -X[X] are mutually exclusive. -A ignored.");
+		error("-A and -X[X] are mutually exclusive.");
 	if (ndo->ndo_xflag && ndo->ndo_Xflag)
-		warning("-x[x] and -X[X] are mutually exclusive. -x[x] ignored.");
+		error("-x[x] and -X[X] are mutually exclusive.");
+	if (Cflag != 0 && WFileName == NULL)
+		error("-C cannot be used without -w.\n");
+	if (Gflag != 0 && WFileName == NULL)
+		error("-G cannot be used without -w.\n");
+#if defined(HAVE_FORK) || defined(HAVE_VFORK)
+	if (zflag != NULL && (WFileName == NULL || (Cflag == 0 && Gflag == 0)))
+		error("-z cannot be used without -w and (-C or -G).\n");
+#endif
 
 	if (cnt != -1)
 		if ((int)packets_to_skip > (INT_MAX - cnt))
@@ -2141,7 +2149,7 @@ main(int argc, char **argv)
 	}
 
 	if (ndo->ndo_fflag != 0 && (VFileName != NULL || RFileName != NULL))
-		error("-f can not be used with -V or -r");
+		error("-f cannot be used with -V or -r.");
 
 	if (VFileName != NULL && RFileName != NULL)
 		error("-V and -r are mutually exclusive.");
