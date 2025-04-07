@@ -109,7 +109,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
     User interface:
       Add optional unit suffix on -C file size.
       Improve the handling of size suffixes for -C.
-      Warn that options -A, -x[x] and -X[X] are mutually exclusive.
+      Print errors for options -A, -x[x] and -X[X] (mutually exclusive).
+      Print errors about -C, -G and -z options usage.
       For PCAP_ERROR_CAPTURE_NOTSUP, show the error message provided
         by libpcap for that error if it's non-empty.
       Update the -z option processing. Print when it is ignored.
