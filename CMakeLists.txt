@@ -1158,6 +1158,39 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/.devel OR EXISTS ${CMAKE_BINARY_DIR}/.devel)
         # file in tcpdump, gets a warning.
         #
         check_and_add_compiler_option(-wd4324)
+        #
+        # Suppress warnings about a "possible loss of performance"
+        # due to "storing 32-bit float result in memory" in the
+        # "fetch a 32-bit floating-point variable, in a particular
+        # byte order, from a packet" routines.
+        #
+        # What those routines do is fetch a 32-bit unsigned integral
+        # value in the appropriate byte order, store it into the
+        # "32-bit unsigned integer value" member of a union, and then
+        # return the "32-bit floating-point value" member of that union,
+        # in order to reinterpret the bits of the value as if it were
+        # an IEEE floating-point value. (Yes, we know, VAX floating
+        # point; at least the IBM mainframes have supported IEEE
+        # floating-point since the G4 S/390s.)
+        #
+        # The Microsoft page on that warning:
+        #
+        #    https://learn.microsoft.com/en-us/cpp/error-messages/compiler-warnings/compiler-warning-level-3-c4738?view=msvc-170
+        #
+        # says that
+        #
+        #    C4738 warns that the result of an assignment, cast, passed
+        #    argument, or other operation may need to be rounded or
+        #    that the operation ran out of registers and needed to
+        #    use memory (spilling). This can result in performance loss.
+        #
+        # That suggests that the performance issues would be due to
+        # conversion between double and float, which we're not doing,
+        # or due to a calculation somehow running out of registers,
+        # but we're not doing a calculation.  Thus, we just suppress
+        # the warning.
+        #
+        check_and_add_compiler_option(-wd4738)
     else()
         #
         # Other compilers, including MSVC with a Clang front end and
