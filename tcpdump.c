@@ -732,7 +732,7 @@ droproot(const char *username, const char *chroot_dir)
 		{
 			int ret = capng_change_id(pw->pw_uid, pw->pw_gid, CAPNG_NO_FLAG);
 			if (ret < 0)
-				error("capng_change_id(): return %d\n", ret);
+				error("capng_change_id(): return %d", ret);
 			else
 				fprintf(stderr, "dropped privs to %s\n", username);
 		}
@@ -1374,7 +1374,7 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 			 * specific case would be an error message that looks a bit odd.
 			 */
 			newdev[strlen(newdev)-1]++;
-			error("%s is not a monitor mode VAP\n"
+			error("%s is not a monitor mode VAP"
 			    "To create a new monitor mode VAP use:\n"
 			    "  ifconfig %s create wlandev %s wlanmode monitor\n"
 			    "and use %s as the tcpdump interface",
@@ -2019,7 +2019,7 @@ main(int argc, char **argv)
 #if defined(HAVE_FORK) || defined(HAVE_VFORK)
 			zflag = optarg;
 #else
-			error("-z cannot be used. Fork subprocess not implemented.\n");
+			error("-z cannot be used. Fork subprocess not implemented.");
 #endif
 			break;
 
@@ -2112,12 +2112,12 @@ main(int argc, char **argv)
 	if (ndo->ndo_xflag && ndo->ndo_Xflag)
 		error("-x[x] and -X[X] are mutually exclusive.");
 	if (Cflag != 0 && WFileName == NULL)
-		error("-C cannot be used without -w.\n");
+		error("-C cannot be used without -w.");
 	if (Gflag != 0 && WFileName == NULL)
-		error("-G cannot be used without -w.\n");
+		error("-G cannot be used without -w.");
 #if defined(HAVE_FORK) || defined(HAVE_VFORK)
 	if (zflag != NULL && (WFileName == NULL || (Cflag == 0 && Gflag == 0)))
-		error("-z cannot be used without -w and (-C or -G).\n");
+		error("-z cannot be used without -w and (-C or -G).");
 #endif
 
 	if (cnt != -1)
@@ -2217,11 +2217,11 @@ main(int argc, char **argv)
 				VFile = fopen(VFileName, "r");
 
 			if (VFile == NULL)
-				error("Unable to open file: %s\n", pcap_strerror(errno));
+				error("Unable to open file: %s", pcap_strerror(errno));
 
 			ret = get_next_file(VFile, VFileLine);
 			if (!ret)
-				error("Nothing in %s\n", VFileName);
+				error("Nothing in %s", VFileName);
 			RFileName = VFileLine;
 		}
 
