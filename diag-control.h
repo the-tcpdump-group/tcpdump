@@ -193,6 +193,10 @@
 
 /*
  * GCC needs this on AIX for longjmp().
+ *
+ * We call it ND_NOT_REACHABLE rather than ND_UNREACHABLE, as, at
+ * least on some versions of Illumos (and Solaris?), ND_UNREACHABLE
+ * is defined differently by <net/if.h>.
  */
 #if ND_IS_AT_LEAST_GNUC_VERSION(5,1)
   /*
@@ -202,7 +206,7 @@
    * squelch the warning and ruin the process too, albeit in a different way).
    * So please remember to use this very carefully.
    */
-  #define ND_UNREACHABLE __builtin_unreachable();
+  #define ND_NOT_REACHABLE __builtin_unreachable();
 #endif
 
 #ifndef DIAG_OFF_ASSIGN_ENUM
@@ -241,8 +245,8 @@
 #ifndef DIAG_ON_STRICT_PROTOTYPES
 #define DIAG_ON_STRICT_PROTOTYPES
 #endif
-#ifndef ND_UNREACHABLE
-#define ND_UNREACHABLE
+#ifndef ND_NOT_REACHABLE
+#define ND_NOT_REACHABLE
 #endif
 
 #endif /* _diag_control_h */
