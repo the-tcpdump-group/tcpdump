@@ -673,7 +673,15 @@ show_remote_devices_and_exit(void)
 #define U_FLAG
 #endif
 
-#define SHORTOPTS "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpq" Q_FLAG "r:s:StT:u" U_FLAG "vV:w:W:xXy:Yz:Z:#"
+#if defined(HAVE_FORK) || defined(HAVE_VFORK)
+#define z_FLAG		"z:"
+#define z_FLAG_USAGE    "[ -z postrotate-command ] "
+#else
+#define z_FLAG
+#define z_FLAG_USAGE
+#endif
+
+#define SHORTOPTS "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpq" Q_FLAG "r:s:StT:u" U_FLAG "vV:w:W:xXy:Y" z_FLAG "Z:#"
 
 /*
  * Long options.
@@ -2122,13 +2130,12 @@ main(int argc, char **argv)
 			}
 			break;
 #endif
-		case 'z':
+
 #if defined(HAVE_FORK) || defined(HAVE_VFORK)
+		case 'z':
 			zflag = optarg;
-#else
-			error("-z cannot be used. Fork subprocess not implemented.");
-#endif
 			break;
+#endif
 
 		case 'Z':
 			username = optarg;
@@ -3534,5 +3541,5 @@ print_usage(FILE *f)
 "\t\t[ --time-stamp-precision precision ] [ --micro ] [ --nano ]\n");
 #endif
 	(void)fprintf(f,
-"\t\t[ -z postrotate-command ] [ -Z user ] [ expression ]\n");
+"\t\t" z_FLAG_USAGE "[ -Z user ] [ expression ]\n");
 }

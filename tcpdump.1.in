@@ -964,6 +964,8 @@ or
 .B \-z bzip2
 will compress each savefile using gzip or bzip2.
 .IP
+This option can only be used if fork subprocess is implemented (e.g. not on Windows systems).
+.IP
 Note that tcpdump will run the command in parallel to the capture, using
 the lowest priority so that this doesn't disturb the capture process.
 .IP
