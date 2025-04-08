@@ -149,7 +149,6 @@ The Regents of the University of California.  All rights reserved.\n";
 #include <sys/sysctl.h>
 #endif /* __FreeBSD__ */
 
-#include "netdissect-stdinc.h"
 #include "netdissect.h"
 #include "interface.h"
 #include "addrtoname.h"
