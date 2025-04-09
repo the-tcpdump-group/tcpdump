@@ -681,7 +681,19 @@ show_remote_devices_and_exit(void)
 #define z_FLAG_USAGE
 #endif
 
-#define SHORTOPTS "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpq" Q_FLAG "r:s:StT:u" U_FLAG "vV:w:W:xXy:Y" z_FLAG "Z:#"
+#ifdef HAVE_LIBCRYPTO
+#define E_FLAG		"E:"
+#define E_FLAG_USAGE    "[ -E algo:secret ] "
+#define M_FLAG		"M:"
+#define M_FLAG_USAGE	"[ -M secret ] "
+#else
+#define E_FLAG
+#define E_FLAG_USAGE
+#define M_FLAG
+#define M_FLAG_USAGE
+#endif
+
+#define SHORTOPTS "aAb" B_FLAG "c:C:d" D_FLAG "e" E_FLAG "fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:" M_FLAG "nNOpq" Q_FLAG "r:s:StT:u" U_FLAG "vV:w:W:xXy:Y" z_FLAG "Z:#"
 
 /*
  * Long options.
@@ -1870,12 +1882,11 @@ main(int argc, char **argv)
 			++ndo->ndo_eflag;
 			break;
 
+#ifdef HAVE_LIBCRYPTO
 		case 'E':
-#ifndef HAVE_LIBCRYPTO
-			warning("crypto code not compiled in");
-#endif
 			ndo->ndo_espsecret = optarg;
 			break;
+#endif
 
 		case 'f':
 			++ndo->ndo_fflag;
@@ -1968,13 +1979,12 @@ main(int argc, char **argv)
 			}
 			break;
 
+#ifdef HAVE_LIBCRYPTO
 		case 'M':
 			/* TCP-MD5 shared secret */
-#ifndef HAVE_LIBCRYPTO
-			warning("crypto code not compiled in");
-#endif
 			ndo->ndo_sigsecret = optarg;
 			break;
+#endif
 
 		case 'n':
 			++ndo->ndo_nflag;
@@ -3519,7 +3529,7 @@ print_usage(FILE *f)
 	(void)fprintf(f,
 "Usage: %s [-Abd" D_FLAG "efhH" I_FLAG J_FLAG "KlLnNOpqStu" U_FLAG "vxX#]" B_FLAG_USAGE " [ -c count ] [--count]\n", program_name);
 	(void)fprintf(f,
-"\t\t[ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]\n");
+"\t\t[ -C file_size ] " E_FLAG_USAGE "[ -F file ] [ -G seconds ]\n");
 	(void)fprintf(f,
 "\t\t[ -i interface ]" IMMEDIATE_MODE_USAGE j_FLAG_USAGE "\n");
 #ifdef HAVE_PCAP_FINDALLDEVS_EX
@@ -3531,7 +3541,7 @@ print_usage(FILE *f)
 "\t\t" m_FLAG_USAGE "\n");
 #endif
 	(void)fprintf(f,
-"\t\t[ -M secret ] [ --number ] [ --print ]" Q_FLAG_USAGE "\n");
+"\t\t" M_FLAG_USAGE "[ --number ] [ --print ]" Q_FLAG_USAGE "\n");
 	(void)fprintf(f,
 "\t\t[ -r file ] [ -s snaplen ] [ -T type ] [ --version ]\n");
 	(void)fprintf(f,
