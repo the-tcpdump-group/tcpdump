@@ -27,7 +27,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Print errors about -C, -G and -z options usage.
       For PCAP_ERROR_CAPTURE_NOTSUP, show the error message provided
         by libpcap for that error if it's non-empty.
-      Update the -z option processing. Print when it is ignored.
+      Update the -z option processing. Print "invalid option -- z" when it is.
     Source code:
       Fix '-tt' option printing when time > 2106-02-07T06:28:15Z.
       Add sub-second packet timestamp checks for invalid micro/nano.
