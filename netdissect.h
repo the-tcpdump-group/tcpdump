@@ -169,14 +169,8 @@ extern int nd_init(char *, size_t);
 /* Clean up netdissect. */
 extern void nd_cleanup(void);
 
-/* Do we have libsmi support? */
-extern int nd_have_smi_support(void);
-/* Load an SMI module. */
-extern int nd_load_smi_module(const char *, char *, size_t);
 /* Flag indicating whether an SMI module has been loaded. */
 extern int nd_smi_module_loaded;
-/* Version number of the SMI library, or NULL if we don't have libsmi support. */
-extern const char *nd_smi_version_string(void);
 
 typedef struct netdissect_options netdissect_options;
 

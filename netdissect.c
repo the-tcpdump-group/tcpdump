@@ -104,50 +104,11 @@ nd_cleanup(void)
 #endif
 }
 
-int
-nd_have_smi_support(void)
-{
-#ifdef USE_LIBSMI
-	return (1);
-#else
-	return (0);
-#endif
-}
-
 /*
  * Indicates whether an SMI module has been loaded, so that we can use
  * libsmi to translate OIDs.
  */
 int nd_smi_module_loaded;
-
-int
-nd_load_smi_module(const char *module, char *errbuf, size_t errbuf_size)
-{
-#ifdef USE_LIBSMI
-	if (smiLoadModule(module) == 0) {
-		snprintf(errbuf, errbuf_size, "could not load MIB module %s",
-		    module);
-		return (-1);
-	}
-	nd_smi_module_loaded = 1;
-	return (0);
-#else
-	snprintf(errbuf, errbuf_size, "MIB module %s not loaded: no libsmi support",
-	    module);
-	return (-1);
-#endif
-}
-
-const char *
-nd_smi_version_string(void)
-{
-#ifdef USE_LIBSMI
-	return (smi_version_string);
-#else
-	return (NULL);
-#endif
-}
-
 
 int
 nd_push_buffer(netdissect_options *ndo, u_char *new_buffer,

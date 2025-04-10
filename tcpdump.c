@@ -58,6 +58,10 @@ The Regents of the University of California.  All rights reserved.\n";
 #include <openssl/crypto.h>
 #endif
 
+#ifdef USE_LIBSMI
+#include <smi.h>
+#endif
+
 #ifdef HAVE_GETOPT_LONG
 #include <getopt.h>
 #else
@@ -610,7 +614,10 @@ show_remote_devices_and_exit(void)
 #endif /* HAVE_PCAP_SET_TSTAMP_TYPE */
 
 #ifdef USE_LIBSMI
+#define m_FLAG		"m:"
 #define m_FLAG_USAGE "[ -m module ] ..."
+#else
+#define m_FLAG
 #endif
 
 #if defined(HAVE_FORK) || defined(HAVE_VFORK)
@@ -633,7 +640,7 @@ show_remote_devices_and_exit(void)
 #define M_FLAG_USAGE
 #endif
 
-#define SHORTOPTS "aAbB:c:C:dDe" E_FLAG "fF:gG:hHi:I" j_FLAG J_FLAG "KlLm:" M_FLAG "nNOpqQ:r:s:StT:uUvV:w:W:xXy:Y" z_FLAG "Z:#"
+#define SHORTOPTS "aAbB:c:C:dDe" E_FLAG "fF:gG:hHi:I" j_FLAG J_FLAG "KlL" m_FLAG M_FLAG "nNOpqQ:r:s:StT:uUvV:w:W:xXy:Y" z_FLAG "Z:#"
 
 /*
  * Long options.
@@ -1870,16 +1877,13 @@ main(int argc, char **argv)
 			++ndo->ndo_Kflag;
 			break;
 
+#ifdef USE_LIBSMI
 		case 'm':
-			if (nd_have_smi_support()) {
-				if (nd_load_smi_module(optarg, ebuf, sizeof(ebuf)) == -1)
-					error("%s", ebuf);
-			} else {
-				(void)fprintf(stderr, "%s: ignoring option '-m %s' ",
-					      program_name, optarg);
-				(void)fprintf(stderr, "(no libsmi support)\n");
-			}
+			if (smiLoadModule(optarg) == NULL)
+				error("could not load  MIB module %s", optarg);
+			nd_smi_module_loaded = 1;
 			break;
+#endif
 
 #ifdef HAVE_LIBCRYPTO
 		case 'M':
@@ -3455,8 +3459,6 @@ DIAG_OFF_DEPRECATION
 static void
 print_version(FILE *f)
 {
-	const char *smi_version_string;
-
 	(void)fprintf(f, "%s version " PACKAGE_VERSION "\n", program_name);
 	(void)fprintf(f, "%s\n", pcap_lib_version());
 
@@ -3464,9 +3466,9 @@ print_version(FILE *f)
 	(void)fprintf (f, "%s\n", SSLeay_version(SSLEAY_VERSION));
 #endif
 
-	smi_version_string = nd_smi_version_string();
-	if (smi_version_string != NULL)
-		(void)fprintf (f, "SMI-library: %s\n", smi_version_string);
+#ifdef USE_LIBSMI
+	(void)fprintf (f, "SMI-library: %s\n", smi_version_string);
+#endif
 
 #if defined(__SANITIZE_ADDRESS__)
 	(void)fprintf (f, "Compiled with AddressSanitizer/GCC.\n");
