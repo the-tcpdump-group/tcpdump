@@ -80,7 +80,6 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       autogen.sh: Allow to configure Autoconf warnings.
       autogen.sh: Delete all trailing blank lines at end of configure.
       Reimplement the tests similarly to libpcap.
-      Require config.h to be from the tcpdump build.
     Documentation:
       man: Clarify the "any" pseudo-interface further.
 
@@ -137,6 +136,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Autoconf: Use AC_SYS_YEAR2038_RECOMMENDED when possible if the
         environment variable BUILD_YEAR2038 = yes (via autogen.sh).
       Autoconf: Avoid incorrectly include the libpcap's config.h.
+      Require config.h to be from the tcpdump build.
 
 Friday, August 30, 2024 / The Tcpdump Group
   Summary for 4.99.5 tcpdump release
