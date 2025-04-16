@@ -30,6 +30,7 @@ if [ "$BUILD_YEAR2038" = yes ] && [ "`uname -s`" = Linux ]; then
 		GLIBC_VERSION=`ldd --version|head -1|grep GLIBC|sed 's/.* //'`
 		maj_glibc=`echo "$GLIBC_VERSION" | cut -d. -f1`
 		min_glibc=`echo "$GLIBC_VERSION" | cut -d. -f2`
+		echo "GNU C Library identification: $GLIBC_VERSION"
 		if [ "$maj_glibc" -gt 2 ] || { [ "$maj_glibc" -eq 2 ] && \
 		   [ "$min_glibc" -ge 34 ]; }; then
 			CONFIGURE_AC_NEW="configure.ac.new$$"
