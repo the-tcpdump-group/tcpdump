@@ -40,6 +40,15 @@ tcc-*/*)
     #   target type
     TCPDUMP_TAINTED=yes
     ;;
+suncc-5.14/SunOS-5.10)
+    # "tcpdump.c", line 347: warning: function "exit_tcpdump" marked as not
+    #   returning, might return
+    # "netdissect.c", line 317: warning: function "nd_trunc_longjmp" marked as
+    #   not returning, might return
+    # "print.c", line 530: warning: function "ndo_error" marked as not
+    #   returning, might return
+    TCPDUMP_TAINTED=yes
+    ;;
 *)
     ;;
 esac
