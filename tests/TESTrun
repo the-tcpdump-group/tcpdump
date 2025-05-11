@@ -592,6 +592,18 @@ my @decode_tests = (
 		output => 'ntp-v.out',
 		args => '-v'
 	},
+	{
+		name => 'arcnet-rfc1051-arp-icmp-http-e',
+		input => 'arcnet-rfc1051-arp-icmp-http.pcap',
+		output => 'arcnet-rfc1051-arp-icmp-http-e.out',
+		args => '-e'
+	},
+	{
+		name => 'arcnet-rfc1201-arp-icmp-http-e',
+		input => 'arcnet-rfc1201-arp-icmp-http.pcap',
+		output => 'arcnet-rfc1201-arp-icmp-http-e.out',
+		args => '-e'
+	},
 );
 
 sub decode_exit_status {
