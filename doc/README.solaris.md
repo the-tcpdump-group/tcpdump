@@ -2,6 +2,12 @@
 
 * Autoconf works everywhere.
 
+## OmniOS r151054/AMD64
+
+* Both system and local libpcap are suitable.
+* CMake 4.0.1 works.
+* GCC 14.2.0 and Clang 20.1.2 work.
+
 ## OmniOS r151052/AMD64
 
 * Both system and local libpcap are suitable.
@@ -19,23 +25,6 @@
 * Both system and local libpcap are suitable.
 * CMake 3.29.0 works
 * GCC 13.2.0 and Clang 17.0.6 work.
-
-## OpenIndiana 2021.04/AMD64
-
-* Both system and local libpcap are suitable.
-* CMake 3.21.1 works.
-* GCC 7.5.0 and GCC 10.3.0 work, Clang 9.0.1 works.
-
-For reference, the tests were done using a system installed from
-`OI-hipster-text-20210430.iso` plus the following packages:
-```shell
-xargs -L1 pkg install <<ENDOFTEXT
-developer/build/autoconf
-developer/build/cmake
-developer/gcc-10
-developer/clang-90
-ENDOFTEXT
-```
 
 ## Oracle Solaris CBE (11.4.42.111.0)/AMD64
 
