@@ -859,26 +859,6 @@ AC_ARG_WITH(crypto,
 ])
 if test "$want_libcrypto" != "no"; then
 	#
-	# Do we already *have* libcrypto, e.g. if we're using a
-	# version of libpcap that has rpcap-over-TLS support?
-	#
-	AC_MSG_CHECKING([whether we're already linking with libcrypto])
-	if $EGREP -s -q -e '-lcrypto|libcrypto' <<EOF
-$LIBS
-EOF
-	then
-		#
-		# Yes; we already *have* libcrypto, don't
-		# look for another one.
-		#
-		AC_MSG_RESULT([yes])
-		want_libcrypto=no
-	else
-		AC_MSG_RESULT([no])
-	fi
-fi
-if test "$want_libcrypto" != "no"; then
-	#
 	# Were we told where to look for libcrypto?
 	#
 	if test -z "$libcrypto_root"; then
