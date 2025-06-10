@@ -26,6 +26,9 @@
 #include "netdissect-stdinc.h"
 
 #include "netdissect.h"
+#include "extract.h"
+
+#include "ip.h"
 
 /*
  * The DLT_RAW packet has no header. It contains a raw IP packet.
@@ -39,5 +42,21 @@ raw_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 	if (ndo->ndo_eflag)
 		ND_PRINT("ip: ");
 
-	ipN_print(ndo, p, h->len);
+	if (h->len < 1) {
+		ND_PRINT("truncated-ip %u", h->len);
+		return;
+	}
+
+	u_char ipver = IP_V((const struct ip *)p);
+	switch (ipver) {
+	case 4:
+		ip_print(ndo, p, h->len);
+		break;
+	case 6:
+		ip6_print(ndo, p, h->len);
+		break;
+	default:
+		ND_PRINT("unknown ip %u", ipver);
+		break;
+	}
 }

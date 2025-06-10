@@ -506,25 +506,3 @@ trunc:
 invalid:
 	nd_print_invalid(ndo);
 }
-
-void
-ipN_print(netdissect_options *ndo, const u_char *bp, u_int length)
-{
-	ndo->ndo_protocol = "ipn";
-	if (length < 1) {
-		ND_PRINT("truncated-ip %u", length);
-		return;
-	}
-
-	switch (GET_U_1(bp) & 0xF0) {
-	case 0x40:
-		ip_print(ndo, bp, length);
-		break;
-	case 0x60:
-		ip6_print(ndo, bp, length);
-		break;
-	default:
-		ND_PRINT("unknown ip %u", (GET_U_1(bp) & 0xF0) >> 4);
-		break;
-	}
-}
