@@ -466,14 +466,28 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 					/*
 					 * OK, we didn't see any extension
-					 * header, but that means we have
-					 * no payload, so set the length
-					 * to the IPv6 header length,
+					 * header - presume BIG TCP without
+					 * a Jumbo Payload option, but only
+					 * if it's actually >64k. Otherwise,
+					 * we have no payload, so set the
+					 * length to the IPv6 header length,
 					 * and change the snapshot length
 					 * accordingly.
 					 */
-					len = sizeof(struct ip6_hdr);
-					nd_change_snaplen(ndo, bp, len);
+					if (length > 65535 &&
+					    (nh == IPPROTO_TCP || nh == IPPROTO_UDP)) {
+						/* we guess that it is an offload
+						 * because next header is TCP or
+						 * UDP (for VXLAN or Geneve)
+						 */
+						len = length;
+						if (ndo->ndo_vflag)
+							ND_PRINT("[real length %u, presumed BIG TCP] ",
+								 len);
+					} else {
+						len = sizeof(struct ip6_hdr);
+						nd_change_snaplen(ndo, bp, len);
+					}
 
 					/*
 					 * Now subtract the length of
