@@ -604,6 +604,17 @@ my @decode_tests = (
 		output => 'arcnet-rfc1201-arp-icmp-http-e.out',
 		args => '-e'
 	},
+	{
+		name => 'lwapp',
+		input => 'lwapp-data.pcap',
+		output => 'lwapp-data.out',
+	},
+	{
+		name => 'lwapp-v',
+		input => 'lwapp-data.pcap',
+		output => 'lwapp-data-v.out',
+		args => '-v'
+	},
 );
 
 sub decode_exit_status {
