@@ -1,2 +1,1 @@
-    1  2023-11-18 11:13:40.999999 FRF.16 Frag, seq 193, Flags [Begin, End], UI 08! VTPv69, Message Subset advertisement (0x02), length 262131
-	Domain name: , Seq number: 0, Config Rev 4040404 (invalid) [|vtp]
+    1  2023-11-18 11:13:40.999999 FRF.16 Frag, seq 193, Flags [Begin, End], UI 08! VTP [version 69 > 3] (invalid) [|vtp]

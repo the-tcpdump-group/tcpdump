@@ -121,18 +121,22 @@ vtp_print(netdissect_options *ndo,
     u_int type, len, name_len, tlv_len, tlv_value, mgmtd_len;
     const u_char *tptr;
     const struct vtp_vlan_ *vtp_vlan;
+    uint8_t version;
 
     ndo->ndo_protocol = "vtp";
-    if (length < VTP_HEADER_LEN)
-        goto invalid;
+    nd_print_protocol_caps(ndo);
+    ND_ICHECK_U(length, <, VTP_HEADER_LEN);
 
     tptr = pptr;
 
     ND_TCHECK_LEN(tptr, VTP_HEADER_LEN);
 
+    version = GET_U_1(tptr);
+    ND_ICHECK_U(version, <, 1);
+    ND_ICHECK_U(version, >, 3);
     type = GET_U_1(tptr + 1);
-    ND_PRINT("VTPv%u, Message %s (0x%02x), length %u",
-	   GET_U_1(tptr),
+    ND_PRINT("v%u, Message %s (0x%02x), length %u",
+	   version,
 	   tok2str(vtp_message_type_values,"Unknown message type", type),
 	   type,
 	   length);
