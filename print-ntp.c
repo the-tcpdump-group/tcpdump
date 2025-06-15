@@ -245,8 +245,7 @@ ntp_time_print(netdissect_options *ndo,
 	uint8_t stratum;
 	u_int efs_len;
 
-	if (length < NTP_TIMEMSG_MINLEN)
-		goto invalid;
+	ND_ICHECK_U(length, <, NTP_TIMEMSG_MINLEN);
 
 	stratum = GET_U_1(bp->stratum);
 	ND_PRINT(", Stratum %u (%s)",
@@ -369,8 +368,7 @@ ntp_control_print(netdissect_options *ndo,
 	uint8_t control, R, E, M, opcode;
 	uint16_t sequence, status, assoc, offset, count;
 
-	if (length < NTP_CTRLMSG_MINLEN)
-		goto invalid;
+	ND_ICHECK_U(length, <, NTP_CTRLMSG_MINLEN);
 
 	control = GET_U_1(cd->control);
 	R = (control & 0x80) != 0;
@@ -396,8 +394,7 @@ ntp_control_print(netdissect_options *ndo,
 	count = GET_BE_U_2(cd->count);
 	ND_PRINT(", Count=%hu", count);
 
-	if (NTP_CTRLMSG_MINLEN + count > length)
-		goto invalid;
+	ND_ICHECK_U(length, <, NTP_CTRLMSG_MINLEN + count);
 	if (count != 0) {
 		ND_TCHECK_LEN(cd->data, count);
 		ND_PRINT("\n\tTO-BE-DONE: data not interpreted");
