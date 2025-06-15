@@ -39,6 +39,8 @@
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 
+#define SOMEIP_HDR_LEN 16
+
 static const struct tok message_type_values[] = {
     { 0x00, "REQUEST" },
     { 0x01, "REQUEST_NO_RETURN" },
@@ -74,7 +76,7 @@ static const struct tok return_code_values[] = {
 };
 
 void
-someip_print(netdissect_options *ndo, const u_char *bp, const u_int len)
+someip_print(netdissect_options *ndo, const u_char *bp, const u_int length)
 {
     uint32_t message_id;
     uint16_t service_id;
@@ -92,9 +94,7 @@ someip_print(netdissect_options *ndo, const u_char *bp, const u_int len)
     ndo->ndo_protocol = "someip";
     nd_print_protocol_caps(ndo);
 
-    if (len < 16) {
-        goto invalid;
-    }
+    ND_ICHECK_U(length, <, SOMEIP_HDR_LEN);
 
     message_id = GET_BE_U_4(bp);
     service_id = message_id >> 16;
