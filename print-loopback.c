@@ -54,81 +54,76 @@ static const struct tok fcode_str[] = {
 
 static void
 loopback_message_print(netdissect_options *ndo,
-                       const u_char *cp, u_int len)
+                       const u_char *cp, u_int length)
 {
 	uint16_t function;
 
-	if (len < 2)
-		goto invalid;
+	ND_ICHECK_U(length, <, 2);
 	/* function */
 	function = GET_LE_U_2(cp);
 	cp += 2;
-	len -= 2;
+	length -= 2;
 	ND_PRINT(", %s", tok2str(fcode_str, " invalid (%u)", function));
 
 	switch (function) {
 		case LOOPBACK_REPLY:
-			if (len < 2)
-				goto invalid;
+			ND_ICHECK_U(length, <, 2);
 			/* receipt number */
 			ND_PRINT(", receipt number %u", GET_LE_U_2(cp));
 			cp += 2;
-			len -= 2;
+			length -= 2;
 			/* data */
-			ND_PRINT(", data (%u octets)", len);
-			ND_TCHECK_LEN(cp, len);
+			ND_PRINT(", data (%u octets)", length);
+			ND_TCHECK_LEN(cp, length);
 			break;
 		case LOOPBACK_FWDDATA:
-			if (len < MAC48_LEN)
-				goto invalid;
+			ND_ICHECK_U(length, <, MAC48_LEN);
 			/* forwarding address */
 			ND_PRINT(", forwarding address %s", GET_MAC48_STRING(cp));
 			cp += MAC48_LEN;
-			len -= MAC48_LEN;
+			length -= MAC48_LEN;
 			/* data */
-			ND_PRINT(", data (%u octets)", len);
-			ND_TCHECK_LEN(cp, len);
+			ND_PRINT(", data (%u octets)", length);
+			ND_TCHECK_LEN(cp, length);
 			break;
 		default:
-			ND_TCHECK_LEN(cp, len);
+			ND_TCHECK_LEN(cp, length);
 			break;
 	}
 	return;
 
 invalid:
 	nd_print_invalid(ndo);
-	ND_TCHECK_LEN(cp, len);
+	ND_TCHECK_LEN(cp, length);
 }
 
 void
 loopback_print(netdissect_options *ndo,
-               const u_char *cp, u_int len)
+               const u_char *cp, u_int length)
 {
 	uint16_t skipCount;
 
 	ndo->ndo_protocol = "loopback";
 	ND_PRINT("Loopback");
-	if (len < 2)
-		goto invalid;
+	ND_ICHECK_U(length, <, 2);
 	/* skipCount */
 	skipCount = GET_LE_U_2(cp);
 	cp += 2;
-	len -= 2;
+	length -= 2;
 	ND_PRINT(", skipCount %u", skipCount);
 	if (skipCount % 8)
 		ND_PRINT(" (bogus)");
-	if (skipCount > len)
-		goto invalid;
+	ND_ICHECK_U(length, <, skipCount);
 	/* the octets to skip */
 	ND_TCHECK_LEN(cp, skipCount);
 	cp += skipCount;
-	len -= skipCount;
+	length -= skipCount;
 	/* the first message to decode */
-	loopback_message_print(ndo, cp, len);
+	loopback_message_print(ndo, cp, length);
 	return;
 
 invalid:
 	nd_print_invalid(ndo);
-	ND_TCHECK_LEN(cp, len);
+	 ND_TCHECK_LEN(cp, length);
 }
 
