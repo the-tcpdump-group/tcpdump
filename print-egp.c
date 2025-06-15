@@ -177,8 +177,7 @@ egpnr_print(netdissect_options *ndo,
 	for (gateways = 0; gateways < t_gateways; ++gateways) {
 		/* Pickup host part of gateway address */
 		addr = 0;
-		if (length < 4 - netlen)
-			goto invalid;
+		ND_ICHECK_U(length, <, 4 - netlen);
 		ND_TCHECK_LEN(cp, 4 - netlen);
 		switch (netlen) {
 
@@ -197,8 +196,7 @@ egpnr_print(netdissect_options *ndo,
 		}
 		addr |= net;
 		length -= 4 - netlen;
-		if (length < 1)
-			goto invalid;
+		ND_ICHECK_U(length, <, 1);
 		distances = GET_U_1(cp);
 		cp++;
 		length--;
@@ -209,8 +207,7 @@ egpnr_print(netdissect_options *ndo,
 		comma = "";
 		ND_PRINT("(");
 		while (distances != 0) {
-			if (length < 2)
-				goto invalid;
+			ND_ICHECK_U(length, <, 2);
 			ND_PRINT("%sd%u:", comma, GET_U_1(cp));
 			cp++;
 			comma = ", ";
@@ -219,20 +216,17 @@ egpnr_print(netdissect_options *ndo,
 			length -= 2;
 			while (networks != 0) {
 				/* Pickup network number */
-				if (length < 1)
-					goto invalid;
+				ND_ICHECK_U(length, <, 1);
 				addr = ((uint32_t) GET_U_1(cp)) << 24;
 				cp++;
 				length--;
 				if (IN_CLASSB(addr)) {
-					if (length < 1)
-						goto invalid;
+					ND_ICHECK_U(length, <, 1);
 					addr |= ((uint32_t) GET_U_1(cp)) << 16;
 					cp++;
 					length--;
 				} else if (!IN_CLASSA(addr)) {
-					if (length < 2)
-						goto invalid;
+					ND_ICHECK_U(length, <, 2);
 					addr |= ((uint32_t) GET_U_1(cp)) << 16;
 					cp++;
 					addr |= ((uint32_t) GET_U_1(cp)) << 8;
