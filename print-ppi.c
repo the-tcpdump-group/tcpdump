@@ -5,8 +5,8 @@
 /* \summary: Per-Packet Information (DLT_PPI) printer */
 
 /* Specification:
- * Per-Packet Information Header Specification - Version 1.0.7
- * https://web.archive.org/web/20160328114748/http://www.cacetech.com/documents/PPI%20Header%20format%201.0.7.pdf
+ * Per-Packet Information Header Specification - Version 1.0.10
+ * https://www.tcpdump.org/papers/PPI_Header_format_1.0.10.pdf
  */
 
 #include <config.h>
