@@ -1,1 +1,1 @@
-    1  2010-05-20 04:24:49.656077 IP6 fe80::25a:28ff:fe08:f150 > 6e02::41: ICMP6, length 0 (invalid)
+    1  2010-05-20 04:24:49.656077 IP6 fe80::25a:28ff:fe08:f150 > 6e02::41: ICMP6, neighbor advertisement, tgt is fe80:0:aa:aaaa:aaaa:aaaa:aaaa:aaaa, length 32
