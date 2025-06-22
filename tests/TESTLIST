@@ -1020,3 +1020,9 @@ accecn_handshake	accecn_handshake.pcap		accecn_handshake.out	-v
 
 # Juniper tests
 juniper_monitor_invalid_cookie_length juniper_monitor_invalid_cookie_length.pcap  juniper_monitor_invalid_cookie_length.out
+
+# PKTAP tests
+LINKTYPE_USER2_PKTAP LINKTYPE_USER2_PKTAP.pcap LINKTYPE_USER2_PKTAP.out
+LINKTYPE_USER2_PKTAP-e LINKTYPE_USER2_PKTAP.pcap LINKTYPE_USER2_PKTAP-e.out -e
+LINKTYPE_PKTAP LINKTYPE_PKTAP.pcap LINKTYPE_PKTAP.out
+LINKTYPE_PKTAP-e LINKTYPE_PKTAP.pcap LINKTYPE_PKTAP-e.out -e
