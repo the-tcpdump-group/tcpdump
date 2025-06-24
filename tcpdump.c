@@ -2905,6 +2905,7 @@ DIAG_ON_ASSIGN_ENUM
 			info(1);
 		}
 		pcap_close(pd);
+		pd = NULL;
 		if (VFileName != NULL) {
 			ret = get_next_file(VFile, VFileLine);
 			if (ret) {
@@ -3053,7 +3054,8 @@ cleanup(int signo _U_)
 	 * to do anything with standard I/O streams in a signal handler -
 	 * the ANSI C standard doesn't say it is).
 	 */
-	pcap_breakloop(pd);
+	if (pd)
+		pcap_breakloop(pd);
 #else
 	/*
 	 * We don't have "pcap_breakloop()"; this isn't safe, but
