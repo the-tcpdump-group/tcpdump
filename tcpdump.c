@@ -3328,8 +3328,11 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 
 			Cflag_count++;
 			if (Wflag > 0) {
-				if (Cflag_count >= Wflag)
+				if (Cflag_count >= Wflag) {
 					Cflag_count = 0;
+					pcap_breakloop(dump_info->pd);
+					goto end;
+				}
 			}
 			if (dump_info->CurrentFileName != NULL)
 				free(dump_info->CurrentFileName);
@@ -3349,6 +3352,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 	if (dump_info->ndo != NULL)
 		pretty_print_packet(dump_info->ndo, h, sp, packets_captured);
 
+end:
 	--infodelay;
 	if (infoprint)
 		info(0);
