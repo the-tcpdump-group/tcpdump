@@ -27,11 +27,12 @@ tcpdump \- dump traffic on a network
 .na
 .B tcpdump
 [
-.B \-AbdDefhHIJKlLnNOpqStuUvxX#
+.B \-AbdDefghHIJKlLnNOpqStuUvxX#
 ] [
 .B \-B
 .I buffer_size
 ]
+.br
 .ti +8
 [
 .B \-c
@@ -44,11 +45,13 @@ tcpdump \- dump traffic on a network
 .B \-C
 .I file_size
 ]
+.br
 .ti +8
 [
 .B \-E
 .I spi@ipaddr algo:secret,...
 ]
+.br
 .ti +8
 [
 .B \-F
@@ -62,6 +65,7 @@ tcpdump \- dump traffic on a network
 .B \-i
 .I interface
 ]
+.br
 .ti +8
 [
 .B \-\-immediate\-mode
@@ -70,7 +74,6 @@ tcpdump \- dump traffic on a network
 .B \-j
 .I tstamp_type
 ]
-.ti +8
 [
 .BI \-\-lengths
 ]
@@ -78,6 +81,7 @@ tcpdump \- dump traffic on a network
 .B \-m
 .I module
 ]
+.br
 .ti +8
 [
 .B \-M
@@ -89,11 +93,12 @@ tcpdump \- dump traffic on a network
 [
 .B \-\-print
 ]
-.ti +8
 [
 .B \-\-print\-sampling
 .I nth
 ]
+.br
+.ti +8
 [
 .B \-Q
 .I in|out|inout
@@ -102,7 +107,6 @@ tcpdump \- dump traffic on a network
 .B \-r
 .I file
 ]
-.ti +8
 [
 .B \-s
 .I snaplen
@@ -111,6 +115,8 @@ tcpdump \- dump traffic on a network
 .B \-\-skip
 .I count
 ]
+.br
+.ti +8
 [
 .B \-T
 .I type
@@ -118,7 +124,6 @@ tcpdump \- dump traffic on a network
 [
 .B \-\-version
 ]
-.ti +8
 [
 .B \-V
 .I file
@@ -131,11 +136,12 @@ tcpdump \- dump traffic on a network
 .B \-W
 .I filecount
 ]
+.br
+.ti +8
 [
 .B \-y
 .I datalinktype
 ]
-.ti +8
 [
 .B \-z
 .I postrotate-command
@@ -144,17 +150,18 @@ tcpdump \- dump traffic on a network
 .B \-Z
 .I user
 ]
+.br
 .ti +8
 [
 .BI \-\-time\-stamp\-precision= tstamp_precision
 ]
-.ti +8
 [
 .BI \-\-micro
 ]
 [
 .BI \-\-nano
 ]
+.br
 .ti +8
 [
 .I expression
@@ -441,6 +448,13 @@ the interface.
 .BI \-F " file"
 Use \fIfile\fP as input for the filter expression.
 An additional expression given on the command line is ignored.
+.TP
+.B \-g
+.PD 0
+.TP
+.BI \-\-ip\-oneline
+.PD
+Do not insert a line break after the IP header in verbose mode.
 .TP
 .BI \-G " rotate_seconds"
 If specified, rotates the dump file specified with the

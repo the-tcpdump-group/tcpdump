@@ -217,6 +217,7 @@ struct netdissect_options {
   int ndo_bflag;		/* print 4 byte ASes in ASDOT notation */
   int ndo_eflag;		/* print ethernet header */
   int ndo_fflag;		/* don't translate "foreign" IP address */
+  int ndo_gflag;		/* don't split IP output into two lines in verbose mode */
   int ndo_Kflag;		/* don't check IP, TCP or UDP checksums */
   int ndo_nflag;		/* leave addresses as numbers */
   int ndo_Nflag;		/* remove domains from printed host names */

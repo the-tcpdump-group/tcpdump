@@ -437,7 +437,10 @@ ip_print(netdissect_options *ndo,
 		}
 	    }
 
-	    ND_PRINT(")\n    ");
+	    if (ndo->ndo_gflag)
+		ND_PRINT(") ");
+	    else
+		ND_PRINT(")\n    ");
 	    if (truncated) {
 		ND_PRINT("%s > %s: ",
 			 GET_IPADDR_STRING(ip->ip_src),
