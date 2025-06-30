@@ -696,7 +696,7 @@ show_remote_devices_and_exit(void)
 #define M_FLAG_USAGE
 #endif
 
-#define SHORTOPTS "aAb" B_FLAG "c:C:d" D_FLAG "e" E_FLAG "fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:" M_FLAG "nNOpq" Q_FLAG "r:s:StT:u" U_FLAG "vV:w:W:xXy:Y" z_FLAG "Z:#"
+#define SHORTOPTS "aAb" B_FLAG "c:C:d" D_FLAG "e" E_FLAG "fF:gG:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:" M_FLAG "nNOpq" Q_FLAG "r:s:StT:u" U_FLAG "vV:w:W:xXy:Y" z_FLAG "Z:#"
 
 /*
  * Long options.
@@ -776,6 +776,7 @@ static const struct option longopts[] = {
 	{ "number", no_argument, NULL, '#' },
 	{ "print", no_argument, NULL, OPTION_PRINT },
 	{ "time-t-size", no_argument, NULL, OPTION_TIME_T_SIZE },
+	{ "ip-oneline", no_argument, NULL, 'g' },
 	{ "version", no_argument, NULL, OPTION_VERSION },
 	{ NULL, 0, NULL, 0 }
 };
@@ -1899,6 +1900,10 @@ main(int argc, char **argv)
 
 		case 'F':
 			infile = optarg;
+			break;
+
+		case 'g':
+			++ndo->ndo_gflag;
 			break;
 
 		case 'G':
@@ -3534,7 +3539,7 @@ print_usage(FILE *f)
 {
 	print_version(f);
 	(void)fprintf(f,
-"Usage: %s [-Abd" D_FLAG "efhH" I_FLAG J_FLAG "KlLnNOpqStu" U_FLAG "vxX#]" B_FLAG_USAGE " [ -c count ] [--count]\n", program_name);
+"Usage: %s [-Abd" D_FLAG "efghH" I_FLAG J_FLAG "KlLnNOpqStu" U_FLAG "vxX#]" B_FLAG_USAGE " [ -c count ] [--count]\n", program_name);
 	(void)fprintf(f,
 "\t\t[ -C file_size ] " E_FLAG_USAGE "[ -F file ] [ -G seconds ]\n");
 	(void)fprintf(f,
