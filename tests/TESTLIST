@@ -232,6 +232,9 @@ icmp-rfc8335-missing-bytes	icmp-rfc8335-missing-bytes.pcap	icmp-rfc8335-missing-
 icmp6-rfc8335	icmp6-rfc8335.pcap	icmp6-rfc8335.out
 icmp6-rfc8335-v	icmp6-rfc8335.pcap	icmp6-rfc8335-v.out	-v
 
+# ICMPv4 -- pcap from tcpdump-security
+icmp_ext_oob_poc	icmp_ext_oob_poc.pcap	icmp_ext_oob_poc.out	-v
+
 # ICMPv6
 icmpv6          icmpv6.pcap             icmpv6.out      -vv
 icmpv6_opt24-v	icmpv6_opt24.pcap	icmpv6_opt24-v.out	-v

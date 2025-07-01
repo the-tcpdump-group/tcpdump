@@ -1,0 +1,5 @@
+    1  2025-05-14 11:44:45.360234 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto ICMP (1), length 44)
+    192.168.1.100 > 192.168.1.200: ICMP extended echo request, id 0, seq 0, length 24
+	Remote Interface, checksum 0xcccb (correct), length 10
+	  Interface Information Object (2), Class-Type: 12, length 6
+	    Interface Role: Incoming IP Interface
