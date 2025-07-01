@@ -1,10 +1,13 @@
-    1  2021-12-18 11:21:59.145495 IP6 (class 0xc0, flowlabel 0x8b071, hlim 1, next-header TCP (6), payload length 55) 2a02:abc::17.37754 > 2a02:abc::123.179: Flags [P.], cksum 0x6af3 (incorrect -> 0xd8aa), seq 3973869487:3973869510, ack 742445183, win 501, options [nop,nop,TS val 1477990677 ecr 1816731457], length 23: BGP
+    1  2021-12-18 11:21:59.145495 IP6 (class 0xc0, flowlabel 0x8b071, hlim 1, next-header TCP (6), length 95)
+    2a02:abc::17.37754 > 2a02:abc::123.179: Flags [P.], cksum 0x6af3 (incorrect -> 0xd8aa), seq 3973869487:3973869510, ack 742445183, win 501, options [nop,nop,TS val 1477990677 ecr 1816731457], length 23: BGP
 	Route Refresh Message (5), length: 23
 	  AFI IPv4 (1), SAFI Unicast (1), Subtype Normal route refresh request (0)
-    2  2021-12-18 11:21:59.146152 IP6 (class 0xc0, flowlabel 0xb2582, hlim 1, next-header TCP (6), payload length 55) 2a02:abc::123.179 > 2a02:abc::17.37754: Flags [P.], cksum 0xcbcd (correct), seq 1:24, ack 23, win 501, options [nop,nop,TS val 1816734726 ecr 1477990677], length 23: BGP
+    2  2021-12-18 11:21:59.146152 IP6 (class 0xc0, flowlabel 0xb2582, hlim 1, next-header TCP (6), length 95)
+    2a02:abc::123.179 > 2a02:abc::17.37754: Flags [P.], cksum 0xcbcd (correct), seq 1:24, ack 23, win 501, options [nop,nop,TS val 1816734726 ecr 1477990677], length 23: BGP
 	Route Refresh Message (5), length: 23
 	  AFI IPv4 (1), SAFI Unicast (1), Subtype Demarcation of the beginning of a route refresh (1)
-    3  2021-12-18 11:21:59.692052 IP6 (class 0xc0, flowlabel 0xb2582, hlim 1, next-header TCP (6), payload length 360) 2a02:abc::123.179 > 2a02:abc::17.37754: Flags [P.], cksum 0x57e1 (correct), seq 24:352, ack 176, win 501, options [nop,nop,TS val 1816735270 ecr 1477990778], length 328: BGP
+    3  2021-12-18 11:21:59.692052 IP6 (class 0xc0, flowlabel 0xb2582, hlim 1, next-header TCP (6), length 400)
+    2a02:abc::123.179 > 2a02:abc::17.37754: Flags [P.], cksum 0x57e1 (correct), seq 24:352, ack 176, win 501, options [nop,nop,TS val 1816735270 ecr 1477990778], length 328: BGP
 	Update Message (2), length: 79
 	  Origin (1), length: 1, Flags [T]: Incomplete
 	  AS Path (2), length: 10, Flags [TE]: 174 65001 
