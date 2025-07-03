@@ -3285,7 +3285,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			/* Allocate space for max filename + \0. */
 			dump_info->CurrentFileName = (char *)malloc(PATH_MAX + 1);
 			if (dump_info->CurrentFileName == NULL)
-				error("dump_packet_and_trunc: malloc");
+				error("%s: malloc", __func__);
 			/*
 			 * Gflag was set otherwise we wouldn't be here. Reset the count
 			 * so multiple files would end with 1,2,3 in the filename.
