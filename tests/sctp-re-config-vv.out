@@ -1,0 +1,50 @@
+    1  2023-05-13 19:56:38.595332 IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto SCTP (132), length 92)
+    192.168.5.1.58384 > 192.168.5.2.36297: sctp
+	1) [INIT] [init tag: 2670115933] [rwnd: 106496] [OS: 10] [MIS: 65535] [init TSN: 1593007960] 
+    2  2023-05-13 19:56:38.595368 IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto SCTP (132), length 348)
+    192.168.5.2.36297 > 192.168.5.1.58384: sctp
+	1) [INIT ACK] [init tag: 2082750980] [rwnd: 106496] [OS: 5] [MIS: 5] [init TSN: 2238062072] 
+    3  2023-05-13 19:56:38.595379 IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto SCTP (132), length 296)
+    192.168.5.1.58384 > 192.168.5.2.36297: sctp
+	1) [COOKIE ECHO] 
+    4  2023-05-13 19:56:38.595392 IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto SCTP (132), length 36)
+    192.168.5.2.36297 > 192.168.5.1.58384: sctp
+	1) [COOKIE ACK] 
+    5  2023-05-13 19:56:38.595416 IP (tos 0x2,ECT(0), ttl 64, id 1, offset 0, flags [DF], proto SCTP (132), length 76)
+    192.168.5.1.58384 > 192.168.5.2.36297: sctp
+	1) [RE-CONFIG] [OUT SSN RESET: REQ SEQ: 1593007960, RES SEQ: 2238062071, Last TSN: 1593007959, SID 0 1 2 3][IN SSN RESET: REQ SEQ: 1593007961, SID 0 1 2 3]
+    6  2023-05-13 19:56:38.595421 IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto SCTP (132), length 76)
+    192.168.5.2.36297 > 192.168.5.1.58384: sctp
+	1) [RE-CONFIG] [RESP: REQ SEQ: 1593007960, REQ: Success - Performed]
+	2) [RE-CONFIG] [OUT SSN RESET: REQ SEQ: 2238062072, RES SEQ: 1593007961, Last TSN: 2238062071, SID 0 1 2 3]
+    7  2023-05-13 19:56:38.595426 IP (tos 0x2,ECT(0), ttl 64, id 2, offset 0, flags [DF], proto SCTP (132), length 48)
+    192.168.5.1.58384 > 192.168.5.2.36297: sctp
+	1) [RE-CONFIG] [RESP: REQ SEQ: 2238062072, REQ: Success - Performed]
+    8  2023-05-13 19:56:38.595434 IP (tos 0x2,ECT(0), ttl 64, id 3, offset 0, flags [DF], proto SCTP (132), length 60)
+    192.168.5.1.58384 > 192.168.5.2.36297: sctp
+	1) [DATA] (B)(E) [TSN: 1593007960] [SID: 0] [SSEQ 0] [PPID 0x0] [Payload:
+	0x0000:  7265 7365 7420 492f 4f00                 reset.I/O.]
+    9  2023-05-13 19:56:38.595440 IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto SCTP (132), length 48)
+    192.168.5.2.36297 > 192.168.5.1.58384: sctp
+	1) [SACK] [cum ack 1593007960] [a_rwnd 106486] [#gap acks 0] [#dup tsns 0] 
+   10  2023-05-13 19:56:40.359603 IP (tos 0x2,ECT(0), ttl 64, id 4, offset 0, flags [DF], proto SCTP (132), length 92)
+    192.168.5.1.58384 > 192.168.5.4.36297: sctp
+	1) [HB REQ] 
+   11  2023-05-13 19:56:40.359631 IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto SCTP (132), length 92)
+    192.168.5.2.36297 > 192.168.5.1.58384: sctp
+	1) [HB ACK] 
+   12  2023-05-13 19:56:42.055670 IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto SCTP (132), length 92)
+    192.168.5.2.36297 > 192.168.5.3.58384: sctp
+	1) [HB REQ] 
+   13  2023-05-13 19:56:42.055866 IP (tos 0x2,ECT(0), ttl 64, id 5, offset 0, flags [DF], proto SCTP (132), length 92)
+    192.168.5.1.58384 > 192.168.5.2.36297: sctp
+	1) [HB ACK] 
+   14  2023-05-13 19:56:51.811692 IP (tos 0x2,ECT(0), ttl 64, id 6, offset 0, flags [DF], proto SCTP (132), length 40)
+    192.168.5.1.58384 > 192.168.5.2.36297: sctp
+	1) [SHUTDOWN] 
+   15  2023-05-13 19:56:51.811707 IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto SCTP (132), length 36)
+    192.168.5.2.36297 > 192.168.5.1.58384: sctp
+	1) [SHUTDOWN ACK] 
+   16  2023-05-13 19:56:51.811712 IP (tos 0x2,ECT(0), ttl 64, id 7, offset 0, flags [DF], proto SCTP (132), length 36)
+    192.168.5.1.58384 > 192.168.5.2.36297: sctp
+	1) [SHUTDOWN COMPLETE] 
