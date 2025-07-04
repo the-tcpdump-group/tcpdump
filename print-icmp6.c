@@ -1347,8 +1347,7 @@ icmp6_print(netdissect_options *ndo,
                         print_unknown_data(ndo, bp,"\n\t", length);
                 return;
         }
-        if (!ndo->ndo_vflag)
-                ND_PRINT(", length %u", length);
+	ND_PRINT(", length %u", length);
 	return;
 trunc:
 	nd_print_trunc(ndo);

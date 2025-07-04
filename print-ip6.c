@@ -292,11 +292,15 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	    if (flow & 0x000fffff)
 	        ND_PRINT("flowlabel 0x%05x, ", flow & 0x000fffff);
 
-	    ND_PRINT("hlim %u, next-header %s (%u), payload length %u) ",
+	    ND_PRINT("hlim %u, next-header %s (%u), length %u",
 	                 GET_U_1(ip6->ip6_hlim),
 	                 tok2str(ipproto_values,"unknown",nh),
 	                 nh,
-	                 payload_len);
+	                 len);
+	    if (ndo->ndo_gflag)
+		ND_PRINT(") ");
+	    else
+		ND_PRINT(")\n    ");
 	}
 	ND_TCHECK_SIZE(ip6);
 

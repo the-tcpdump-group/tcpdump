@@ -1,4 +1,5 @@
-    1  2023-12-04 20:18:21.401201 IP6 (flowlabel 0x9fc72, hlim 255, next-header ICMPv6 (58), payload length 72) fe80::e015:81ff:feb4:b945 > ff02::1: [icmp6 sum ok] ICMP6, router advertisement, length 72
+    1  2023-12-04 20:18:21.401201 IP6 (flowlabel 0x9fc72, hlim 255, next-header ICMPv6 (58), length 112)
+    fe80::e015:81ff:feb4:b945 > ff02::1: [icmp6 sum ok] ICMP6, router advertisement, length 72
 	hop limit 80, Flags [other stateful], pref medium, router lifetime 500s, reachable time 0ms, retrans timer 0ms
 	  source link-address option (1), length 8 (1): e2:15:81:b4:b9:45
 	    0x0000:  e215 81b4 b945
@@ -6,8 +7,9 @@
 	    0x0000:  4080 0000 0e10 0000 0708 0000 0000 2001
 	    0x0010:  0db8 00cc 00dd 0000 0000 0000 0000
 	  pref64 option (38), length 16 (2): 2001:db8:1:64:ff9b::/96 (plc 0), lifetime 0s
-	    0x0000:  0000 2001 0db8 0001 0064 ff9b 0000
-    2  2023-12-04 20:18:24.401773 IP6 (flowlabel 0x9fc72, hlim 255, next-header ICMPv6 (58), payload length 72) fe80::e015:81ff:feb4:b945 > ff02::1: [icmp6 sum ok] ICMP6, router advertisement, length 72
+	    0x0000:  0000 2001 0db8 0001 0064 ff9b 0000, length 72
+    2  2023-12-04 20:18:24.401773 IP6 (flowlabel 0x9fc72, hlim 255, next-header ICMPv6 (58), length 112)
+    fe80::e015:81ff:feb4:b945 > ff02::1: [icmp6 sum ok] ICMP6, router advertisement, length 72
 	hop limit 80, Flags [other stateful], pref medium, router lifetime 500s, reachable time 0ms, retrans timer 0ms
 	  source link-address option (1), length 8 (1): e2:15:81:b4:b9:45
 	    0x0000:  e215 81b4 b945
@@ -15,8 +17,9 @@
 	    0x0000:  4080 0000 0e10 0000 0708 0000 0000 2001
 	    0x0010:  0db8 00cc 00dd 0000 0000 0000 0000
 	  pref64 option (38), length 16 (2): 2001:db8:0:64:ff9b::/?? (plc 6), lifetime 1800s
-	    0x0000:  070e 2001 0db8 0000 0064 ff9b 0000
-    3  2023-12-04 20:18:27.402345 IP6 (flowlabel 0x9fc72, hlim 255, next-header ICMPv6 (58), payload length 72) fe80::e015:81ff:feb4:b945 > ff02::1: [icmp6 sum ok] ICMP6, router advertisement, length 72
+	    0x0000:  070e 2001 0db8 0000 0064 ff9b 0000, length 72
+    3  2023-12-04 20:18:27.402345 IP6 (flowlabel 0x9fc72, hlim 255, next-header ICMPv6 (58), length 112)
+    fe80::e015:81ff:feb4:b945 > ff02::1: [icmp6 sum ok] ICMP6, router advertisement, length 72
 	hop limit 80, Flags [other stateful], pref medium, router lifetime 500s, reachable time 0ms, retrans timer 0ms
 	  source link-address option (1), length 8 (1): e2:15:81:b4:b9:45
 	    0x0000:  e215 81b4 b945
@@ -24,8 +27,9 @@
 	    0x0000:  4080 0000 0e10 0000 0708 0000 0000 2a00
 	    0x0010:  f480 00cc 00dd 0000 0000 0000 0000
 	  pref64 option (38), length 16 (2): 2001:db8:0:64:ff9b::/96 (plc 0), lifetime 1800s
-	    0x0000:  0708 2001 0db8 0000 0064 ff9b 0000
-    4  2023-12-04 20:18:30.402917 IP6 (flowlabel 0x9fc72, hlim 255, next-header ICMPv6 (58), payload length 72) fe80::e015:81ff:feb4:b945 > ff02::1: [icmp6 sum ok] ICMP6, router advertisement, length 72
+	    0x0000:  0708 2001 0db8 0000 0064 ff9b 0000, length 72
+    4  2023-12-04 20:18:30.402917 IP6 (flowlabel 0x9fc72, hlim 255, next-header ICMPv6 (58), length 112)
+    fe80::e015:81ff:feb4:b945 > ff02::1: [icmp6 sum ok] ICMP6, router advertisement, length 72
 	hop limit 80, Flags [other stateful], pref medium, router lifetime 500s, reachable time 0ms, retrans timer 0ms
 	  source link-address option (1), length 8 (1): e2:15:81:b4:b9:45
 	    0x0000:  e215 81b4 b945
@@ -33,4 +37,4 @@
 	    0x0000:  4080 0000 0e10 0000 0708 0000 0000 2001
 	    0x0010:  0db8 00cc 00dd 0000 0000 0000 0000
 	  pref64 option (38), length 16 (2): 2001:db8:0:64:ff9b::/96 (plc 0), lifetime 65528s
-	    0x0000:  fff8 2001 0db8 0000 0064 ff9b 0000
+	    0x0000:  fff8 2001 0db8 0000 0064 ff9b 0000, length 72
