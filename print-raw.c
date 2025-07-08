@@ -39,8 +39,6 @@ raw_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 {
 	ndo->ndo_protocol = "raw";
 	ndo->ndo_ll_hdr_len += 0;
-	if (ndo->ndo_eflag)
-		ND_PRINT("ip: ");
 
 	if (h->len < 1) {
 		ND_PRINT("truncated-ip %u", h->len);
@@ -50,13 +48,18 @@ raw_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 	u_char ipver = IP_V((const struct ip *)p);
 	switch (ipver) {
 	case 4:
+		if (ndo->ndo_eflag)
+			ND_PRINT("IP ");
 		ip_print(ndo, p, h->len);
 		break;
 	case 6:
+		if (ndo->ndo_eflag)
+			ND_PRINT("IP6 ");
 		ip6_print(ndo, p, h->len);
 		break;
 	default:
-		ND_PRINT("unknown ip %u", ipver);
+		ND_PRINT("IP%u", ipver);
+		nd_print_invalid(ndo);
 		break;
 	}
 }
