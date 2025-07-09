@@ -19,7 +19,7 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-/* \summary: Raw IP printer */
+/* \summary: Raw IPv4/IPv6 printer and similar */
 
 #include <config.h>
 
@@ -62,4 +62,34 @@ raw_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 		nd_print_invalid(ndo);
 		break;
 	}
+}
+
+/*
+ * The DLT_IPV4 packet has no header. It contains a raw IPv4 packet.
+ */
+
+void
+ipv4_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
+{
+	ndo->ndo_protocol = "ip";
+	ndo->ndo_ll_hdr_len += 0;
+
+	if (ndo->ndo_eflag)
+		ND_PRINT("IP ");
+	ip_print(ndo, p, h->len);
+}
+
+/*
+ * The DLT_IPV6 packet has no header. It contains a raw IPv6 packet.
+ */
+
+void
+ipv6_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
+{
+	ndo->ndo_protocol = "ip6";
+	ndo->ndo_ll_hdr_len += 0;
+
+	if (ndo->ndo_eflag)
+		ND_PRINT("IP6 ");
+	ip6_print(ndo, p, h->len);
 }
