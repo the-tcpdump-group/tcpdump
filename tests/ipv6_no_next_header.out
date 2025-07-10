@@ -1,1 +1,2 @@
-    1  2025-02-11 13:31:22.134532 IP6 (hlim 64, next-header No Next Header (59), payload length 20) 2005::1 > 2008::1: no next header
+    1  2025-02-11 13:31:22.134532 IP6 (hlim 64, next-header No Next Header (59), length 60)
+    2005::1 > 2008::1: no next header
