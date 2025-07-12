@@ -208,6 +208,8 @@ mobility_print(netdissect_options *ndo,
 	uint8_t type;
 
 	ndo->ndo_protocol = "mobility";
+	nd_print_protocol(ndo);
+	ND_PRINT(": ");
 	mh = (const struct ip6_mobility *)bp;
 
 	/* 'ep' points to the end of available data. */
@@ -238,7 +240,7 @@ mobility_print(netdissect_options *ndo,
 		ND_PRINT("(header length %u is too small for type %u)", mhlen, type);
 		goto trunc;
 	}
-	ND_PRINT("mobility: %s", tok2str(ip6m_str, "type-#%u", type));
+	ND_PRINT("%s", tok2str(ip6m_str, "type-#%u", type));
 	switch (type) {
 	case IP6M_BINDING_REQUEST:
 		hlen = IP6M_MINLEN;
