@@ -205,12 +205,17 @@ mobility_print(netdissect_options *ndo,
 	const struct ip6_mobility *mh;
 	const u_char *ep;
 	unsigned mhlen, hlen;
-	uint8_t type;
+	uint8_t pproto, type;
 
 	ndo->ndo_protocol = "mobility";
 	nd_print_protocol(ndo);
 	ND_PRINT(": ");
 	mh = (const struct ip6_mobility *)bp;
+
+	pproto = GET_U_1(mh->ip6m_pproto);
+	if (pproto != IPPROTO_NONE)
+		ND_PRINT("(payload protocol %u should be %u) ", pproto,
+			 IPPROTO_NONE);
 
 	/* 'ep' points to the end of available data. */
 	ep = ndo->ndo_snapend;
@@ -326,7 +331,7 @@ mobility_print(netdissect_options *ndo,
 
 	return(mhlen);
 
- trunc:
+trunc:
 	nd_print_trunc(ndo);
 	return(-1);
 }
