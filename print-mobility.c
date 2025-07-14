@@ -203,7 +203,6 @@ mobility_print(netdissect_options *ndo,
                const u_char *bp, const u_char *bp2 _U_)
 {
 	const struct ip6_mobility *mh;
-	const u_char *ep;
 	unsigned mhlen, hlen;
 	uint8_t pproto, type;
 
@@ -217,25 +216,6 @@ mobility_print(netdissect_options *ndo,
 		ND_PRINT("(payload protocol %u should be %u) ", pproto,
 			 IPPROTO_NONE);
 
-	/* 'ep' points to the end of available data. */
-	ep = ndo->ndo_snapend;
-
-	if (!ND_TTEST_1(mh->ip6m_len)) {
-		/*
-		 * There's not enough captured data to include the
-		 * mobility header length.
-		 *
-		 * Our caller expects us to return the length, however,
-		 * so return a value that will run to the end of the
-		 * captured data.
-		 *
-		 * XXX - "ip6_print()" doesn't do anything with the
-		 * returned length, however, as it breaks out of the
-		 * header-processing loop.
-		 */
-		mhlen = (unsigned)(ep - bp);
-		goto trunc;
-	}
 	mhlen = (GET_U_1(mh->ip6m_len) + 1) << 3;
 
 	/* XXX ip6m_cksum */
