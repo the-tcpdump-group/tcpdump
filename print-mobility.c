@@ -221,11 +221,11 @@ mobility_print(netdissect_options *ndo,
 	/* XXX ip6m_cksum */
 
 	type = GET_U_1(mh->ip6m_type);
-	if (type <= IP6M_MAX && mhlen < ip6m_hdrlen[type]) {
-		ND_PRINT("(header length %u is too small for type %u)", mhlen, type);
-		goto trunc;
-	}
 	ND_PRINT("%s", tok2str(ip6m_str, "type-#%u", type));
+	if (type <= IP6M_MAX && mhlen < ip6m_hdrlen[type]) {
+		ND_PRINT(" (header length %u < %u)", mhlen, ip6m_hdrlen[type]);
+		goto invalid;
+	}
 	switch (type) {
 	case IP6M_BINDING_REQUEST:
 		hlen = IP6M_MINLEN;
@@ -314,5 +314,9 @@ mobility_print(netdissect_options *ndo,
 
 trunc:
 	nd_print_trunc(ndo);
+	return(-1);
+
+invalid:
+	nd_print_invalid(ndo);
 	return(-1);
 }
