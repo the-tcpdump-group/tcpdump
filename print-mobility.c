@@ -28,18 +28,18 @@
  */
 
 /* \summary: IPv6 mobility printer */
-/* RFC 3775 */
+/* RFC 6275 */
 
 #include <config.h>
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
 
 #include "ip6.h"
-
 
 /* Mobility header */
 struct ip6_mobility {
@@ -120,78 +120,65 @@ static int
 mobility_opt_print(netdissect_options *ndo,
                    const u_char *bp, const unsigned len)
 {
-	unsigned i, optlen;
+	unsigned i, opttype, optlen;
 
 	for (i = 0; i < len; i += optlen) {
-		if (GET_U_1(bp + i) == IP6MOPT_PAD1)
+		opttype = GET_U_1(bp + i);
+		if (opttype == IP6MOPT_PAD1)
 			optlen = 1;
 		else {
-			if (i + 1 < len) {
-				optlen = GET_U_1(bp + i + 1) + 2;
-			} else
-				goto trunc;
+			ND_ICHECKMSG_U("remaining length", (u_int)(len - i), <, 1);
+			optlen = GET_U_1(bp + i + 1) + 2;
 		}
-		if (i + optlen > len)
-			goto trunc;
-		ND_TCHECK_1(bp + i + optlen);
+		ND_ICHECKMSG_U("remaining length", (u_int)(len - i), <, optlen);
+		ND_TCHECK_LEN(bp + i, optlen);
 
-		switch (GET_U_1(bp + i)) {
+		switch (opttype) {
 		case IP6MOPT_PAD1:
 			ND_PRINT("(pad1)");
 			break;
 		case IP6MOPT_PADN:
-			if (len - i < IP6MOPT_MINLEN) {
-				ND_PRINT("(padn: trunc)");
-				goto trunc;
-			}
 			ND_PRINT("(padn)");
+			ND_ICHECKMSG_U("remaining length", (u_int)(len - i), <,
+				       IP6MOPT_MINLEN);
 			break;
 		case IP6MOPT_REFRESH:
-			if (len - i < IP6MOPT_REFRESH_MINLEN) {
-				ND_PRINT("(refresh: trunc)");
-				goto trunc;
-			}
+			ND_PRINT("(refresh: ");
+			ND_ICHECKMSG_U("remaining length", (u_int)(len - i), <,
+				       IP6MOPT_REFRESH_MINLEN);
 			/* units of 4 secs */
-			ND_PRINT("(refresh: %u)",
-				GET_BE_U_2(bp + i + 2) << 2);
+			ND_PRINT("%u)", GET_BE_U_2(bp + i + 2) << 2);
 			break;
 		case IP6MOPT_ALTCOA:
-			if (len - i < IP6MOPT_ALTCOA_MINLEN) {
-				ND_PRINT("(altcoa: trunc)");
-				goto trunc;
-			}
-			ND_PRINT("(alt-CoA: %s)", GET_IP6ADDR_STRING(bp + i + 2));
+			ND_PRINT("(alt-CoA: ");
+			ND_ICHECKMSG_U("remaining length", (u_int)(len - i), <,
+				       IP6MOPT_ALTCOA_MINLEN);
+			ND_PRINT("%s)", GET_IP6ADDR_STRING(bp + i + 2));
 			break;
 		case IP6MOPT_NONCEID:
-			if (len - i < IP6MOPT_NONCEID_MINLEN) {
-				ND_PRINT("(ni: trunc)");
-				goto trunc;
-			}
-			ND_PRINT("(ni: ho=0x%04x co=0x%04x)",
-				GET_BE_U_2(bp + i + 2),
-				GET_BE_U_2(bp + i + 4));
+			ND_PRINT("(ni: ");
+			ND_ICHECKMSG_U("remaining length", (u_int)(len - i), <,
+				       IP6MOPT_NONCEID_MINLEN);
+			ND_PRINT("ho=0x%04x co=0x%04x)",
+				 GET_BE_U_2(bp + i + 2),
+				 GET_BE_U_2(bp + i + 4));
 			break;
 		case IP6MOPT_AUTH:
-			if (len - i < IP6MOPT_AUTH_MINLEN) {
-				ND_PRINT("(auth: trunc)");
-				goto trunc;
-			}
 			ND_PRINT("(auth)");
+			ND_ICHECKMSG_U("remaining length", (u_int)(len - i), <,
+				       IP6MOPT_AUTH_MINLEN);
 			break;
 		default:
-			if (len - i < IP6MOPT_MINLEN) {
-				ND_PRINT("(sopt_type %u: trunc)",
-					 GET_U_1(bp + i));
-				goto trunc;
-			}
-			ND_PRINT("(type-0x%02x: len=%u)", GET_U_1(bp + i),
-				 GET_U_1(bp + i + 1));
+			ND_PRINT("(unknown: ");
+			ND_ICHECKMSG_U("remaining length", (u_int)(len - i), <,
+				       IP6MOPT_MINLEN);
+			ND_PRINT("type-#%u len=%u)", opttype, optlen - 2);
 			break;
 		}
 	}
 	return 0;
 
-trunc:
+invalid:
 	return 1;
 }
 
@@ -235,9 +222,9 @@ mobility_print(netdissect_options *ndo,
 		hlen = IP6M_MINLEN;
 		if (ndo->ndo_vflag) {
 			ND_PRINT(" %s Init Cookie=%08x:%08x",
-			       type == IP6M_HOME_TEST_INIT ? "Home" : "Care-of",
-			       GET_BE_U_4(bp + hlen),
-			       GET_BE_U_4(bp + hlen + 4));
+			         type == IP6M_HOME_TEST_INIT ? "Home" : "Care-of",
+			         GET_BE_U_4(bp + hlen),
+			         GET_BE_U_4(bp + hlen + 4));
 		}
 		hlen += 8;
 		break;
@@ -247,16 +234,16 @@ mobility_print(netdissect_options *ndo,
 		hlen = IP6M_MINLEN;
 		if (ndo->ndo_vflag) {
 			ND_PRINT(" %s Init Cookie=%08x:%08x",
-			       type == IP6M_HOME_TEST ? "Home" : "Care-of",
-			       GET_BE_U_4(bp + hlen),
-			       GET_BE_U_4(bp + hlen + 4));
+			         type == IP6M_HOME_TEST ? "Home" : "Care-of",
+			         GET_BE_U_4(bp + hlen),
+			         GET_BE_U_4(bp + hlen + 4));
 		}
 		hlen += 8;
 		if (ndo->ndo_vflag) {
 			ND_PRINT(" %s Keygen Token=%08x:%08x",
-			       type == IP6M_HOME_TEST ? "Home" : "Care-of",
-			       GET_BE_U_4(bp + hlen),
-			       GET_BE_U_4(bp + hlen + 4));
+			         type == IP6M_HOME_TEST ? "Home" : "Care-of",
+			         GET_BE_U_4(bp + hlen),
+			         GET_BE_U_4(bp + hlen + 4));
 		}
 		hlen += 8;
 		break;
@@ -265,7 +252,6 @@ mobility_print(netdissect_options *ndo,
 		int bits;
 		ND_PRINT(" seq#=%u", GET_BE_U_2(mh->ip6m_data16[0]));
 		hlen = IP6M_MINLEN;
-		ND_TCHECK_2(bp + hlen);
 		bits = (GET_U_1(bp + hlen) & 0xf0) >> 4;
 		if (bits) {
 			ND_PRINT(" ");
@@ -307,13 +293,9 @@ mobility_print(netdissect_options *ndo,
 	}
 	if (ndo->ndo_vflag)
 		if (mobility_opt_print(ndo, bp + hlen, mhlen - hlen))
-			goto trunc;
+			goto invalid;
 
 	return(mhlen);
-
-trunc:
-	nd_print_trunc(ndo);
-	return(-1);
 
 invalid:
 	nd_print_invalid(ndo);
