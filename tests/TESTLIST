@@ -1043,3 +1043,8 @@ LINKTYPE_IPV4_invalid LINKTYPE_IPV4_invalid.pcap LINKTYPE_IPV4_invalid.out
 LINKTYPE_IPV4_invalid-e LINKTYPE_IPV4_invalid.pcap LINKTYPE_IPV4_invalid-e.out -e
 LINKTYPE_IPV6_invalid LINKTYPE_IPV6_invalid.pcap LINKTYPE_IPV6_invalid.out
 LINKTYPE_IPV6_invalid-e LINKTYPE_IPV6_invalid.pcap LINKTYPE_IPV6_invalid-e.out -e
+
+# Mobility Support in IPv6
+# ipv6_mobility_1.pcap is built with scapy
+ipv6_mobility_1 ipv6_mobility_1.pcap ipv6_mobility_1.out
+ipv6_mobility_1-v ipv6_mobility_1.pcap ipv6_mobility_1-v.out -v
