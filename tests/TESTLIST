@@ -901,3 +901,8 @@ lwres-pointer-arithmetic-ub lwres-pointer-arithmetic-ub.pcap lwres-pointer-arith
 ospf-signed-integer-ubsan       ospf-signed-integer-ubsan.pcap          ospf-signed-integer-ubsan.out -vv
 bgp-ub bgp-ub.pcap bgp-ub.out -v
 fletcher-checksum-negative-shift fletcher-checksum-negative-shift.pcap fletcher-checksum-negative-shift.out     -v
+
+# Mobility Support in IPv6
+# ipv6_mobility_1.pcap is built with scapy
+ipv6_mobility_1 ipv6_mobility_1.pcap ipv6_mobility_1.out
+ipv6_mobility_1-v ipv6_mobility_1.pcap ipv6_mobility_1-v.out -v
