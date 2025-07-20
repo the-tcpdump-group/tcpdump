@@ -90,8 +90,8 @@ static const unsigned ip6m_hdrlen[IP6M_MAX + 1] = {
 	IP6M_MINLEN + 8,  /* IP6M_CAREOF_TEST_INIT */
 	IP6M_MINLEN + 16, /* IP6M_HOME_TEST        */
 	IP6M_MINLEN + 16, /* IP6M_CAREOF_TEST      */
-	IP6M_MINLEN + 4,  /* IP6M_BINDING_UPDATE   */
-	IP6M_MINLEN + 4,  /* IP6M_BINDING_ACK      */
+	IP6M_MINLEN + 8,  /* IP6M_BINDING_UPDATE   */
+	IP6M_MINLEN + 8,  /* IP6M_BINDING_ACK      */
 	IP6M_MINLEN + 16, /* IP6M_BINDING_ERROR    */
 };
 
