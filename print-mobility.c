@@ -127,7 +127,8 @@ mobility_opt_print(netdissect_options *ndo,
 		if (opttype == IP6MOPT_PAD1)
 			optlen = 1;
 		else {
-			ND_ICHECKMSG_U("remaining length", (u_int)(len - i), <, 1);
+			ND_ICHECKMSG_U("remaining length", (u_int)(len - i), <,
+				       IP6MOPT_MINLEN);
 			optlen = GET_U_1(bp + i + 1) + 2;
 		}
 		ND_ICHECKMSG_U("remaining length", (u_int)(len - i), <, optlen);
@@ -139,8 +140,6 @@ mobility_opt_print(netdissect_options *ndo,
 			break;
 		case IP6MOPT_PADN:
 			ND_PRINT("(padn)");
-			ND_ICHECKMSG_U("remaining length", (u_int)(len - i), <,
-				       IP6MOPT_MINLEN);
 			break;
 		case IP6MOPT_REFRESH:
 			ND_PRINT("(refresh: ");
@@ -170,8 +169,6 @@ mobility_opt_print(netdissect_options *ndo,
 			break;
 		default:
 			ND_PRINT("(unknown: ");
-			ND_ICHECKMSG_U("remaining length", (u_int)(len - i), <,
-				       IP6MOPT_MINLEN);
 			ND_PRINT("type-#%u len=%u)", opttype, optlen - 2);
 			break;
 		}
