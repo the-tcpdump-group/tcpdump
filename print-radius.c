@@ -1090,12 +1090,12 @@ static void
 print_attr_location_information(netdissect_options *ndo,
                     const u_char *data, u_int length, u_short attr_code _U_)
 {
-   uint16_t index;
+   uint16_t idx;
    uint8_t code, entity;
 
    ND_ICHECK_U(length, <, 21);
 
-   index = GET_BE_U_2(data);
+   idx = GET_BE_U_2(data);
    data += 2;
 
    code = GET_U_1(data);
@@ -1105,7 +1105,7 @@ print_attr_location_information(netdissect_options *ndo,
    data++;
 
    ND_PRINT("index %u, code %s, entity %s, ",
-       index,
+       idx,
        tok2str(location_information_code_vector, "Unknown (%u)", code),
        tok2str(location_information_entity_vector, "Unknown (%u)", entity)
    );
@@ -1134,13 +1134,10 @@ static void
 print_attr_location_data(netdissect_options *ndo,
                     const u_char *data, u_int length, u_short attr_code _U_)
 {
-   uint16_t index;
-
    ND_ICHECK_U(length, <, 3);
 
-   index = GET_BE_U_2(data);
+   ND_PRINT("index %u, location", GET_BE_U_2(data));
    data += 2;
-   ND_PRINT("index %u, location", index);
 
    /* The Location field of the String field of the Location-Data attribute
     * can have two completely different structures depending on the value of

@@ -68,7 +68,7 @@
 void
 erspan_i_ii_print(netdissect_options *ndo, uint16_t flags, const u_char *bp, u_int len)
 {
-	uint32_t hdr, ver, vlan, cos, en, sid, index;
+	uint32_t hdr, ver, vlan, cos, en, sid;
 
 	ndo->ndo_protocol = "erspan";
 	nd_print_protocol(ndo);
@@ -136,8 +136,8 @@ erspan_i_ii_print(netdissect_options *ndo, uint16_t flags, const u_char *bp, u_i
 	len -= 4;
 
 	if (ndo->ndo_vflag) {
-		index = (hdr & ERSPAN2_INDEX_MASK) >> ERSPAN2_INDEX_SHIFT;
-		ND_PRINT(" index %u", index);
+		ND_PRINT(" index %u",
+		         (hdr & ERSPAN2_INDEX_MASK) >> ERSPAN2_INDEX_SHIFT);
 	}
 
 	ND_PRINT(": ");
