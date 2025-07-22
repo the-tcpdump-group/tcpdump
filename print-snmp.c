@@ -756,7 +756,7 @@ asn1_print(netdissect_options *ndo,
 		}
 
 		for (; i != 0; p++, i--) {
-			o = (o << ASN_SHIFT7) + (GET_U_1(p) & ~ASN_BIT8);
+			o = ( ( o & 0x01ffffff ) << ASN_SHIFT7) + (GET_U_1(p) & ~ASN_BIT8);
 			if (GET_U_1(p) & ASN_LONGLEN)
 			        continue;
 
@@ -906,7 +906,7 @@ smi_decode_oid(netdissect_options *ndo,
 	unsigned int firstval;
 
 	for (*oidlen = 0; i != 0; p++, i--) {
-	        o = (o << ASN_SHIFT7) + (GET_U_1(p) & ~ASN_BIT8);
+	        o = ( ( o & 0x01ffffff ) << ASN_SHIFT7) + (GET_U_1(p) & ~ASN_BIT8);
 		if (GET_U_1(p) & ASN_LONGLEN)
 		    continue;
 
