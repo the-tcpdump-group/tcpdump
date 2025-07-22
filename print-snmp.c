@@ -531,6 +531,7 @@ asn1_parse(netdissect_options *ndo,
 
 			case INTEGER: {
 				uint32_t data;
+				uint32_t signbit = 0;
 				elem->type = BE_INT;
 				data = 0;
 
@@ -538,11 +539,15 @@ asn1_parse(netdissect_options *ndo,
 					ND_PRINT("[asnlen=0]");
 					goto invalid;
 				}
-				if (GET_U_1(p) & ASN_BIT8)	/* negative */
+				if (GET_U_1(p) & ASN_BIT8) {	/* negative */
 					data = UINT_MAX;
+					signbit = 0x80000000;
+				}
+				/* We can only store the low 32 bits of the given value. If we've
+				 * shifted the sign bit away, we will restore it below. */
 				for (i = elem->asnlen; i != 0; p++, i--)
-					data = (data << ASN_SHIFT8) | GET_U_1(p);
-				elem->data.integer = data;
+					data = ( ( data & 0x00ffffff ) << ASN_SHIFT8) | GET_U_1(p);
+				elem->data.integer = (int32_t)( data | signbit );
 				break;
 			}
 
