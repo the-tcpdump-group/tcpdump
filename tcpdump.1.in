@@ -20,7 +20,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "27 July 2025"
+.TH TCPDUMP 1  "30 June 2025"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -2020,7 +2020,7 @@ Lines in this file have the form
 .sp .5
 \fInumber	name\fP
 
-\f(CW1.254	ether
+\f(CW1.254		ether
 16.1		icsd-net
 1.254.110	ace\fR
 .sp .5
