@@ -153,7 +153,7 @@ again:
 		if (ver == 6)
 			ospf6_print(ndo, bp, length);
 		else
-			ospf_print(ndo, bp, length, iph);
+			ospf_print(ndo, bp, length);
 		break;
 
 	case IPPROTO_IGMP:

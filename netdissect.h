@@ -732,7 +732,7 @@ extern void olsr_print(netdissect_options *, const u_char *, u_int, int);
 extern void openflow_print(netdissect_options *, const u_char *, u_int);
 extern void ospf6_print(netdissect_options *, const u_char *, u_int);
 extern int ospf_grace_lsa_print(netdissect_options *, const u_char *, u_int);
-extern void ospf_print(netdissect_options *, const u_char *, u_int, const u_char *);
+extern void ospf_print(netdissect_options *, const u_char *, u_int);
 extern int ospf_te_lsa_print(netdissect_options *, const u_char *, u_int);
 extern void pgm_print(netdissect_options *, const u_char *, u_int, const u_char *);
 extern void pim_print(netdissect_options *, const u_char *, u_int, const u_char *);

@@ -22,11 +22,13 @@
  */
 
 /* \summary: Open Shortest Path First (OSPF) printer */
+/* specification: RFC 2328 and others */
 
 #include <config.h>
 
 #include "netdissect-stdinc.h"
 
+#define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -236,11 +238,7 @@ ospf_grace_lsa_print(netdissect_options *ndo,
     u_int tlv_type, tlv_length;
 
     while (ls_length != 0) {
-        ND_TCHECK_4(tptr);
-        if (ls_length < 4) {
-            ND_PRINT("\n\t    Remaining LS length %u < 4", ls_length);
-            return -1;
-        }
+        ND_ICHECKMSG_U("remaining LS length", ls_length, <, 4);
         tlv_type = GET_BE_U_2(tptr);
         tlv_length = GET_BE_U_2(tptr + 2);
         tptr += 4;
@@ -251,44 +249,29 @@ ospf_grace_lsa_print(netdissect_options *ndo,
                tlv_type,
                tlv_length);
 
-        if (tlv_length > ls_length) {
-            ND_PRINT("\n\t    Bogus length %u > %u", tlv_length,
-                   ls_length);
-            return -1;
-        }
+        ND_ICHECKMSG_U("remaining LS length", ls_length, <, tlv_length);
 
         /* Infinite loop protection. */
-        if (tlv_type == 0 || tlv_length == 0) {
-	    nd_print_invalid(ndo);
-            return -1;
-        }
+        ND_ICHECKMSG_U("tlv type", tlv_type, ==, 0);
+        ND_ICHECKMSG_U("tlv length", tlv_length, ==, 0);
 
         ND_TCHECK_LEN(tptr, tlv_length);
         switch(tlv_type) {
 
         case LS_OPAQUE_GRACE_TLV_PERIOD:
-            if (tlv_length != 4) {
-                ND_PRINT("\n\t    Bogus length %u != 4", tlv_length);
-                return -1;
-            }
+            ND_ICHECKMSG_U("TLV length", tlv_length, !=, 4);
             ND_PRINT("%us", GET_BE_U_4(tptr));
             break;
 
         case LS_OPAQUE_GRACE_TLV_REASON:
-            if (tlv_length != 1) {
-                ND_PRINT("\n\t    Bogus length %u != 1", tlv_length);
-                return -1;
-            }
+            ND_ICHECKMSG_U("TLV length", tlv_length, !=, 1);
             ND_PRINT("%s (%u)",
                    tok2str(lsa_opaque_grace_tlv_reason_values, "Unknown", GET_U_1(tptr)),
                    GET_U_1(tptr));
             break;
 
         case LS_OPAQUE_GRACE_TLV_INT_ADDRESS:
-            if (tlv_length != 4) {
-                ND_PRINT("\n\t    Bogus length %u != 4", tlv_length);
-                return -1;
-            }
+            ND_ICHECKMSG_U("TLV length", tlv_length, !=, 4);
             ND_PRINT("%s", GET_IPADDR_STRING(tptr));
             break;
 
@@ -303,19 +286,16 @@ ospf_grace_lsa_print(netdissect_options *ndo,
         /* in OSPF everything has to be 32-bit aligned, including TLVs */
         if (tlv_length % 4 != 0) {
             tlv_length += 4 - (tlv_length % 4);
-            if (tlv_length > ls_length) {
-                ND_PRINT("\n\t    Bogus padded length %u > %u", tlv_length,
-                       ls_length);
-                return -1;
-            }
+            ND_ICHECKMSG_U("remaining LS length", ls_length, <,
+                           tlv_length);
         }
         ls_length -= tlv_length;
         tptr += tlv_length;
     }
-
     return 0;
-trunc:
-    nd_print_trunc(ndo);
+
+invalid:
+    nd_print_invalid(ndo);
     return -1;
 }
 
@@ -327,30 +307,23 @@ ospf_te_tlv_link_print(netdissect_options *ndo,
     u_int priority_level, te_class, count_srlg;
 
     while (tlv_length != 0) {
-        if (tlv_length < 4) {
-            ND_PRINT("\n\t    Remaining TLV length %u < 4",
-                   tlv_length);
-            return -1;
-        }
+        ND_ICHECKMSG_U("remaining TLV length", tlv_length, <, 4);
         subtlv_type = GET_BE_U_2(tptr);
         subtlv_length = GET_BE_U_2(tptr + 2);
         tptr += 4;
         tlv_length -= 4;
 
         /* Infinite loop protection */
-        if (subtlv_type == 0 || subtlv_length == 0)
-            goto invalid;
+        ND_ICHECKMSG_U("subtlv type", subtlv_type, ==, 0);
+        ND_ICHECKMSG_U("subtlv length", subtlv_length, ==, 0);
 
         ND_PRINT("\n\t      %s subTLV (%u), length: %u",
                tok2str(lsa_opaque_te_link_tlv_subtlv_values,"unknown",subtlv_type),
                subtlv_type,
                subtlv_length);
 
-        if (tlv_length < subtlv_length) {
-            ND_PRINT("\n\t    Remaining TLV length %u < %u",
-                   tlv_length, subtlv_length);
-            return -1;
-        }
+        ND_ICHECKMSG_U("remaining TLV length", tlv_length, <,
+                       subtlv_length);
         ND_TCHECK_LEN(tptr, subtlv_length);
         switch(subtlv_type) {
         case LS_OPAQUE_TE_LINK_SUBTLV_ADMIN_GROUP:
@@ -493,19 +466,14 @@ ospf_te_tlv_link_print(netdissect_options *ndo,
         if (subtlv_length % 4 != 0) {
             subtlv_length += 4 - (subtlv_length % 4);
 
-            if (tlv_length < subtlv_length) {
-                ND_PRINT("\n\t    Remaining TLV length %u < %u",
-                        tlv_length, subtlv_length);
-                return -1;
-            }
+            ND_ICHECKMSG_U("remaining TLV length", tlv_length, <,
+                           subtlv_length);
         }
         tlv_length -= subtlv_length;
         tptr += subtlv_length;
     }
     return 0;
-trunc:
-    nd_print_trunc(ndo);
-    return -1;
+
 invalid:
     nd_print_invalid(ndo);
     return -1;
@@ -518,11 +486,7 @@ ospf_te_lsa_print(netdissect_options *ndo,
     u_int tlv_type, tlv_length;
 
     while (ls_length != 0) {
-        ND_TCHECK_4(tptr);
-        if (ls_length < 4) {
-            ND_PRINT("\n\t    Remaining LS length %u < 4", ls_length);
-            return -1;
-        }
+        ND_ICHECKMSG_U("remaining LS length", ls_length, <, 4);
         tlv_type = GET_BE_U_2(tptr);
         tlv_length = GET_BE_U_2(tptr + 2);
         tptr += 4;
@@ -533,17 +497,11 @@ ospf_te_lsa_print(netdissect_options *ndo,
                tlv_type,
                tlv_length);
 
-        if (tlv_length > ls_length) {
-            ND_PRINT("\n\t    Bogus length %u > %u", tlv_length,
-                   ls_length);
-            goto invalid;
-        }
+        ND_ICHECKMSG_U("remaining LS length", ls_length, <, tlv_length);
 
         /* Infinite loop protection. */
-        if (tlv_type == 0 || tlv_length == 0) {
-	    nd_print_invalid(ndo);
-            goto invalid;
-        }
+        ND_ICHECKMSG_U("subtlv type", tlv_type, ==, 0);
+        ND_ICHECKMSG_U("subtlv length", tlv_length, ==, 0);
 
         switch(tlv_type) {
         case LS_OPAQUE_TE_TLV_LINK:
@@ -552,10 +510,7 @@ ospf_te_lsa_print(netdissect_options *ndo,
             break;
 
         case LS_OPAQUE_TE_TLV_ROUTER:
-            if (tlv_length < 4) {
-                ND_PRINT("\n\t    TLV length %u < 4", tlv_length);
-                goto invalid;
-            }
+	    ND_ICHECKMSG_U("TLV length", tlv_length, <, 4);
             ND_PRINT(", %s", GET_IPADDR_STRING(tptr));
             break;
 
@@ -569,6 +524,8 @@ ospf_te_lsa_print(netdissect_options *ndo,
         /* in OSPF everything has to be 32-bit aligned, including TLVs */
         if (tlv_length % 4 != 0) {
             tlv_length += 4 - (tlv_length % 4);
+            ND_ICHECKMSG_U("remaining LS length", ls_length, <,
+                           tlv_length);
             if (tlv_length > ls_length) {
                 ND_PRINT("\n\t    Bogus padded length %u > %u", tlv_length,
                        ls_length);
@@ -579,9 +536,7 @@ ospf_te_lsa_print(netdissect_options *ndo,
         tptr += tlv_length;
     }
     return 0;
-trunc:
-    nd_print_trunc(ndo);
-    return -1;
+
 invalid:
     nd_print_invalid(ndo);
     return -1;
@@ -690,29 +645,24 @@ ospf_print_ri_lsa_sid_label_range_tlv(netdissect_options *ndo, const uint8_t *tp
 {
     u_int subtlv_type, subtlv_length;
 
-    while (tlv_length >= 4) {
-
+    while (tlv_length != 0) {
+	ND_ICHECKMSG_U("remaining TLV length", tlv_length, <, 4);
 	subtlv_type = GET_BE_U_2(tptr);
 	subtlv_length = GET_BE_U_2(tptr + 2);
 	tptr += 4;
 	tlv_length -= 4;
 
 	/* Infinite loop protection. */
-	if (subtlv_type == 0 || subtlv_length == 0) {
-	    nd_print_invalid(ndo);
-	    return -1;
-	}
+        ND_ICHECKMSG_U("subtlv type", subtlv_type, ==, 0);
+        ND_ICHECKMSG_U("subtlv length", subtlv_length, ==, 0);
 
 	ND_PRINT("\n\t      %s subTLV (%u), length: %u, value: ",
 		 tok2str(lsa_opaque_ri_sid_subtlv_values,"unknown",subtlv_type),
 		 subtlv_type,
 		 subtlv_length);
 
-	if (tlv_length < subtlv_length) {
-	    ND_PRINT("\n\t    Remaining TLV length %u < %u",
-		tlv_length, subtlv_length);
-	    return -1;
-	}
+	ND_ICHECKMSG_U("remaining TLV length", tlv_length, <,
+		       subtlv_length);
 
 	switch (subtlv_type) {
 	case LS_OPAQUE_RI_SUBTLV_SID_LABEL:
@@ -735,16 +685,17 @@ ospf_print_ri_lsa_sid_label_range_tlv(netdissect_options *ndo, const uint8_t *tp
 	/* in OSPF everything has to be 32-bit aligned, including subTLVs */
 	if (subtlv_length % 4) {
 	    subtlv_length += (4 - (subtlv_length % 4));
-	    if (tlv_length < subtlv_length) {
-		ND_PRINT("\n\t    Remaining TLV length %u < %u",
-		    tlv_length, subtlv_length);
-		return -1;
-	    }
+	    ND_ICHECKMSG_U("remaining TLV length", tlv_length, <,
+			   subtlv_length);
 	}
 	tptr += subtlv_length;
 	tlv_length -= subtlv_length;
     }
     return 0;
+
+invalid:
+    nd_print_invalid(ndo);
+    return -1;
 }
 
 static int
@@ -754,28 +705,24 @@ ospf_print_ep_lsa_extd_prefix_tlv(netdissect_options *ndo, const uint8_t *tptr,
     u_int subtlv_type, subtlv_length;
     uint8_t flags, mt_id, algo;
 
-    while (tlv_length >= 4) {
+    while (tlv_length != 0) {
+        ND_ICHECKMSG_U("remaining TLV length", tlv_length, <, 4);
 	subtlv_type = GET_BE_U_2(tptr);
 	subtlv_length = GET_BE_U_2(tptr + 2);
 	tptr += 4;
 	tlv_length -= 4;
 
 	/* Infinite loop protection. */
-	if (subtlv_type == 0 || subtlv_length == 0) {
-	    nd_print_invalid(ndo);
-	    return -1;
-	}
+	ND_ICHECKMSG_U("subtlv type", subtlv_type, ==, 0);
+	ND_ICHECKMSG_U("subtlv length", subtlv_length, ==, 0);
 
 	ND_PRINT("\n\t\t%s subTLV (%u), length: %u, value: ",
 		 tok2str(lsa_opaque_ep_extd_prefix_subtlv_values,"unknown",subtlv_type),
 		 subtlv_type,
 		 subtlv_length);
 
-	if (tlv_length < subtlv_length) {
-            ND_PRINT("\n\t    Remaining TLV length %u < %u",
-                tlv_length, subtlv_length);
-	    return -1;
-	}
+	ND_ICHECKMSG_U("remaining TLV length", tlv_length, <,
+		       subtlv_length);
 
 	switch (subtlv_type) {
 	case LS_OPAQUE_EP_SUBTLV_PREFIX_SID:
@@ -806,16 +753,17 @@ ospf_print_ep_lsa_extd_prefix_tlv(netdissect_options *ndo, const uint8_t *tptr,
 	/* in OSPF everything has to be 32-bit aligned, including subTLVs */
 	if (subtlv_length % 4) {
 	    subtlv_length += (4 - (subtlv_length % 4));
-	    if (tlv_length < subtlv_length) {
-		ND_PRINT("\n\t    Remaining TLV length %u < %u",
-		    tlv_length, subtlv_length);
-		return -1;
-	    }
+	    ND_ICHECKMSG_U("remaining TLV length", tlv_length, <,
+			   subtlv_length);
 	}
 	tptr += subtlv_length;
 	tlv_length -= subtlv_length;
     }
     return 0;
+
+invalid:
+    nd_print_invalid(ndo);
+    return -1;
 }
 
 static int
@@ -825,29 +773,24 @@ ospf_ep_lsa_print(netdissect_options *ndo, const uint8_t *tptr, u_int lsa_length
     uint16_t range_size;
     uint8_t af, prefix_length, route_type, flags;
 
-    while (lsa_length >= 4) {
-
+    while (lsa_length != 0) {
 	tlv_type = GET_BE_U_2(tptr);
 	tlv_length = GET_BE_U_2(tptr + 2);
+	ND_ICHECKMSG_U("remaining TLV length", tlv_length, <, 4);
 	tptr += 4;
 	lsa_length -= 4;
 
 	/* Infinite loop protection. */
-	if (tlv_type == 0 || tlv_length == 0) {
-	    nd_print_invalid(ndo);
-	    return -1;
-	}
+        ND_ICHECKMSG_U("tlv type", tlv_type, ==, 0);
+        ND_ICHECKMSG_U("tlv length", tlv_length, ==, 0);
 
 	ND_PRINT("\n\t    %s TLV (%u), length: %u, value: ",
 		 tok2str(lsa_opaque_ep_tlv_values,"unknown",tlv_type),
 		 tlv_type,
 		 tlv_length);
 
-	if (tlv_length > lsa_length) {
-	    ND_PRINT("\n\t    Bogus length %u > %u",
-		tlv_length, lsa_length);
-	    return -1;
-	}
+	ND_ICHECKMSG_U("remaining LSA length", lsa_length, <,
+		       tlv_length);
 
 	switch (tlv_type) {
 	case LS_OPAQUE_EP_EXTD_PREFIX_TLV:
@@ -918,6 +861,8 @@ ospf_ep_lsa_print(netdissect_options *ndo, const uint8_t *tptr, u_int lsa_length
 	/* in OSPF everything has to be 32-bit aligned, including TLVs */
 	if (tlv_length % 4) {
 	    tlv_length += (4 - (tlv_length % 4));
+	    ND_ICHECKMSG_U("remaining LSA length", lsa_length, <,
+			   tlv_length);
 	    if (tlv_length > lsa_length) {
 		ND_PRINT("\n\t    Bogus padded length %u > %u", tlv_length,
 		    lsa_length);
@@ -928,6 +873,10 @@ ospf_ep_lsa_print(netdissect_options *ndo, const uint8_t *tptr, u_int lsa_length
 	lsa_length -= tlv_length;
     }
     return 0;
+
+invalid:
+    nd_print_invalid(ndo);
+    return -1;
 }
 
 /*
@@ -1124,11 +1073,8 @@ ospf_print_lsa(netdissect_options *ndo,
 
 		u_int ls_length_remaining = ls_length;
 		while (ls_length_remaining != 0) {
-                    ND_TCHECK_4(tptr);
-		    if (ls_length_remaining < 4) {
-                        ND_PRINT("\n\t    Remaining LS length %u < 4", ls_length_remaining);
-                        return(ls_end);
-                    }
+		    ND_ICHECKMSG_U("remaining LS length",
+				   ls_length_remaining, <, 4);
                     tlv_type = GET_BE_U_2(tptr);
                     tlv_length = GET_BE_U_2(tptr + 2);
                     tptr += 4;
@@ -1201,6 +1147,8 @@ ospf_print_lsa(netdissect_options *ndo,
                     /* in OSPF everything has to be 32-bit aligned, including TLVs */
                     if (tlv_length % 4) {
                         tlv_length += (4 - (tlv_length % 4));
+                        ND_ICHECKMSG_U("remaining LS length",
+			               ls_length_remaining, <, tlv_length);
                         if (tlv_length > ls_length_remaining) {
                             ND_PRINT("\n\t    Bogus padded length %u > %u", tlv_length,
                                    ls_length_remaining);
@@ -1251,20 +1199,23 @@ ospf_print_lsa(netdissect_options *ndo,
             }
 
 	return (ls_end);
-trunc:
-	nd_print_trunc(ndo);
+
+invalid:
+	nd_print_invalid(ndo);
 	return (NULL);
 }
 
+/* OSPF Link-Local Signaling */
 static void
 ospf_decode_lls(netdissect_options *ndo,
                 const struct ospfhdr *op, u_int length)
 {
     const u_char *dptr;
     const u_char *dataend;
-    u_int length2;
+    uint16_t ospf_len;
     uint16_t lls_type, lls_len;
     uint32_t lls_flags;
+    uint8_t authdata_len;
 
     switch (GET_U_1(op->ospf_type)) {
 
@@ -1283,23 +1234,24 @@ ospf_decode_lls(netdissect_options *ndo,
     }
 
     /* dig deeper if LLS data is available; see RFC4813 */
-    length2 = GET_BE_U_2(op->ospf_len);
-    dptr = (const u_char *)op + length2;
+    ospf_len = GET_BE_U_2(op->ospf_len);
+    dptr = (const u_char *)op + ospf_len;
     dataend = (const u_char *)op + length;
 
+    authdata_len = GET_U_1(op->ospf_authdata + 3);
     if (GET_BE_U_2(op->ospf_authtype) == OSPF_AUTH_MD5) {
-        dptr = dptr + GET_U_1(op->ospf_authdata + 3);
-        length2 += GET_U_1(op->ospf_authdata + 3);
+        dptr = dptr + authdata_len;
+        ospf_len += authdata_len;
     }
-    if (length2 >= length) {
+    if (ospf_len >= length) {
         ND_PRINT("\n\t[LLS truncated]");
         return;
     }
     ND_PRINT("\n\t  LLS: checksum: 0x%04x", (u_int) GET_BE_U_2(dptr));
 
     dptr += 2;
-    length2 = GET_BE_U_2(dptr);
-    ND_PRINT(", length: %u", length2);
+    ospf_len = GET_BE_U_2(dptr);
+    ND_PRINT(", length: %u", ospf_len);
 
     dptr += 2;
     while (dptr < dataend) {
@@ -1337,7 +1289,7 @@ ospf_decode_lls(netdissect_options *ndo,
     }
 }
 
-static int
+static void
 ospf_decode_v2(netdissect_options *ndo,
                const struct ospfhdr *op, const u_char *dataend)
 {
@@ -1447,25 +1399,34 @@ ospf_decode_v2(netdissect_options *ndo,
 	default:
 		break;
 	}
-	return (0);
+	return;
+
 trunc:
-	return (1);
+	nd_trunc_longjmp(ndo);
 }
 
 void
 ospf_print(netdissect_options *ndo,
-           const u_char *bp, u_int length,
-           const u_char *bp2 _U_)
+           const u_char *bp, u_int length)
 {
 	const struct ospfhdr *op;
 	const u_char *dataend;
 	const char *cp;
+	uint8_t version;
+	uint16_t ospf_len, authtype;
 
 	ndo->ndo_protocol = "ospf2";
+	ND_PRINT("OSPF");
+
 	op = (const struct ospfhdr *)bp;
+	ND_ICHECK_U(length, <, OSPF_HDR_LEN);
+	version = GET_U_1(op->ospf_version);
+	ND_ICHECK_U(version, !=, 2);
+	ND_PRINT("v%u", version);
 
 	/* XXX Before we do anything else, strip off the MD5 trailer */
-	if (GET_BE_U_2(op->ospf_authtype) == OSPF_AUTH_MD5) {
+	authtype = GET_BE_U_2(op->ospf_authtype);
+	if (authtype == OSPF_AUTH_MD5) {
 		length -= OSPF_AUTH_MD5_LEN;
 		ndo->ndo_snapend -= OSPF_AUTH_MD5_LEN;
 	}
@@ -1473,21 +1434,21 @@ ospf_print(netdissect_options *ndo,
 	/* If the type is valid translate it, or just print the type */
 	/* value.  If it's not valid, say so and return */
 	cp = tok2str(type2str, "unknown LS-type %u", GET_U_1(op->ospf_type));
-	ND_PRINT("OSPFv%u, %s, length %u", GET_U_1(op->ospf_version), cp,
-		 length);
+	ND_PRINT(", %s, length %u", cp, length);
 	if (*cp == 'u')
-		return;
+		goto invalid;
 
 	if (!ndo->ndo_vflag) { /* non verbose - so lets bail out here */
 		return;
 	}
 
-	if (length != GET_BE_U_2(op->ospf_len)) {
-		ND_PRINT(" [len %u]", GET_BE_U_2(op->ospf_len));
+	ospf_len = GET_BE_U_2(op->ospf_len);
+	if (length != ospf_len) {
+		ND_PRINT(" [len %u]", ospf_len);
 	}
 
-	if (length > GET_BE_U_2(op->ospf_len)) {
-		dataend = bp + GET_BE_U_2(op->ospf_len);
+	if (length > ospf_len) {
+		dataend = bp + ospf_len;
 	} else {
 		dataend = bp + length;
 	}
@@ -1504,10 +1465,10 @@ ospf_print(netdissect_options *ndo,
 		ND_TCHECK_LEN(op->ospf_authdata, sizeof(op->ospf_authdata));
 
 		ND_PRINT(", Authentication Type: %s (%u)",
-		          tok2str(ospf_authtype_values, "unknown", GET_BE_U_2(op->ospf_authtype)),
-		          GET_BE_U_2(op->ospf_authtype));
+		          tok2str(ospf_authtype_values, "unknown", authtype),
+		          authtype);
 
-		switch (GET_BE_U_2(op->ospf_authtype)) {
+		switch (authtype) {
 
 		case OSPF_AUTH_NONE:
 			break;
@@ -1528,23 +1489,14 @@ ospf_print(netdissect_options *ndo,
 			return;
 		}
 	}
-	/* Do rest according to version.	 */
-	switch (GET_U_1(op->ospf_version)) {
 
-	case 2:
-		/* ospf version 2 */
-		if (ospf_decode_v2(ndo, op, dataend))
-			goto trunc;
-		if (length > GET_BE_U_2(op->ospf_len))
-			ospf_decode_lls(ndo, op, length);
-		break;
-
-	default:
-		ND_PRINT(" ospf [version %u]", GET_U_1(op->ospf_version));
-		break;
-	}			/* end switch on version */
+	/* ospf version 2 */
+	ospf_decode_v2(ndo, op, dataend);
+	if (length > ospf_len)
+		ospf_decode_lls(ndo, op, length);
 
 	return;
-trunc:
-	nd_trunc_longjmp(ndo);
+
+invalid:
+	nd_print_invalid(ndo);
 }

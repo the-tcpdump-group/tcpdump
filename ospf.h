@@ -274,7 +274,8 @@ struct lsa {
     } lsa_un;
 };
 
-#define	OSPF_AUTH_SIZE	8
+#define OSPF_AUTH_SIZE	8
+#define OSPF_HDR_LEN	24 /* standard 24 byte header */
 
 /*
  * the main header
