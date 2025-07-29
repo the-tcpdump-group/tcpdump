@@ -243,8 +243,8 @@ ospf_grace_lsa_print(netdissect_options *ndo,
         }
         tlv_type = GET_BE_U_2(tptr);
         tlv_length = GET_BE_U_2(tptr + 2);
-        tptr+=4;
-        ls_length-=4;
+        tptr += 4;
+        ls_length -= 4;
 
         ND_PRINT("\n\t    %s TLV (%u), length %u, value: ",
                tok2str(lsa_opaque_grace_tlv_values,"unknown",tlv_type),
@@ -258,7 +258,7 @@ ospf_grace_lsa_print(netdissect_options *ndo,
         }
 
         /* Infinite loop protection. */
-        if (tlv_type == 0 || tlv_length ==0) {
+        if (tlv_type == 0 || tlv_length == 0) {
 	    nd_print_invalid(ndo);
             return -1;
         }
@@ -301,16 +301,16 @@ ospf_grace_lsa_print(netdissect_options *ndo,
 
         }
         /* in OSPF everything has to be 32-bit aligned, including TLVs */
-        if (tlv_length%4 != 0) {
-            tlv_length+=4-(tlv_length%4);
+        if (tlv_length % 4 != 0) {
+            tlv_length += 4 - (tlv_length % 4);
             if (tlv_length > ls_length) {
                 ND_PRINT("\n\t    Bogus padded length %u > %u", tlv_length,
                        ls_length);
                 return -1;
             }
         }
-        ls_length-=tlv_length;
-        tptr+=tlv_length;
+        ls_length -= tlv_length;
+        tptr += tlv_length;
     }
 
     return 0;
@@ -334,8 +334,8 @@ ospf_te_tlv_link_print(netdissect_options *ndo,
         }
         subtlv_type = GET_BE_U_2(tptr);
         subtlv_length = GET_BE_U_2(tptr + 2);
-        tptr+=4;
-        tlv_length-=4;
+        tptr += 4;
+        tlv_length -= 4;
 
         /* Infinite loop protection */
         if (subtlv_type == 0 || subtlv_length == 0)
@@ -371,7 +371,7 @@ ospf_te_tlv_link_print(netdissect_options *ndo,
                    GET_BE_U_4(tptr));
             if (subtlv_length == 8) /* rfc4203 */
                 ND_PRINT(", %s (0x%08x)",
-                       GET_IPADDR_STRING(tptr+4),
+                       GET_IPADDR_STRING(tptr + 4),
                        GET_BE_U_4(tptr + 4));
             break;
         case LS_OPAQUE_TE_LINK_SUBTLV_LOCAL_IP:
@@ -419,7 +419,7 @@ ospf_te_tlv_link_print(netdissect_options *ndo,
                 goto invalid;
             }
             /* decode BCs until the subTLV ends */
-            for (te_class = 0; te_class < (subtlv_length-4)/4; te_class++) {
+            for (te_class = 0; te_class < (subtlv_length - 4) / 4; te_class++) {
                 ND_PRINT("\n\t\t  Bandwidth constraint CT%u: %.3f Mbps",
                        te_class,
                        GET_BE_F_4(tptr + 4 + te_class * 4) * 8 / 1000000);
@@ -476,7 +476,7 @@ ospf_te_tlv_link_print(netdissect_options *ndo,
                 ND_PRINT("\n\t\t  Shared risk group: ");
             while (count_srlg != 0) {
                 ND_PRINT("%u", GET_BE_U_4(tptr));
-                tptr+=4;
+                tptr += 4;
                 count_srlg--;
                 if (count_srlg > 0)
                     ND_PRINT(", ");
@@ -490,8 +490,8 @@ ospf_te_tlv_link_print(netdissect_options *ndo,
             break;
         }
         /* in OSPF everything has to be 32-bit aligned, including subTLVs */
-        if (subtlv_length%4 != 0) {
-            subtlv_length+=4-(subtlv_length%4);
+        if (subtlv_length % 4 != 0) {
+            subtlv_length += 4 - (subtlv_length % 4);
 
             if (tlv_length < subtlv_length) {
                 ND_PRINT("\n\t    Remaining TLV length %u < %u",
@@ -499,8 +499,8 @@ ospf_te_tlv_link_print(netdissect_options *ndo,
                 return -1;
             }
         }
-        tlv_length-=subtlv_length;
-        tptr+=subtlv_length;
+        tlv_length -= subtlv_length;
+        tptr += subtlv_length;
     }
     return 0;
 trunc:
@@ -525,8 +525,8 @@ ospf_te_lsa_print(netdissect_options *ndo,
         }
         tlv_type = GET_BE_U_2(tptr);
         tlv_length = GET_BE_U_2(tptr + 2);
-        tptr+=4;
-        ls_length-=4;
+        tptr += 4;
+        ls_length -= 4;
 
         ND_PRINT("\n\t    %s TLV (%u), length: %u",
                tok2str(lsa_opaque_te_tlv_values,"unknown",tlv_type),
@@ -540,7 +540,7 @@ ospf_te_lsa_print(netdissect_options *ndo,
         }
 
         /* Infinite loop protection. */
-        if (tlv_type == 0 || tlv_length ==0) {
+        if (tlv_type == 0 || tlv_length == 0) {
 	    nd_print_invalid(ndo);
             goto invalid;
         }
@@ -567,16 +567,16 @@ ospf_te_lsa_print(netdissect_options *ndo,
             break;
         }
         /* in OSPF everything has to be 32-bit aligned, including TLVs */
-        if (tlv_length%4 != 0) {
-            tlv_length+=4-(tlv_length%4);
+        if (tlv_length % 4 != 0) {
+            tlv_length += 4 - (tlv_length % 4);
             if (tlv_length > ls_length) {
                 ND_PRINT("\n\t    Bogus padded length %u > %u", tlv_length,
                        ls_length);
                 goto invalid;
             }
         }
-        ls_length-=tlv_length;
-        tptr+=tlv_length;
+        ls_length -= tlv_length;
+        tptr += tlv_length;
     }
     return 0;
 trunc:
@@ -657,7 +657,7 @@ ospf_print_tos_metrics(netdissect_options *ndo,
     u_int toscount;
     u_int tos_type;
 
-    toscount = GET_U_1(tos->link.link_tos_count)+1;
+    toscount = GET_U_1(tos->link.link_tos_count) + 1;
     metric_count = 0;
 
     /*
@@ -693,9 +693,9 @@ ospf_print_ri_lsa_sid_label_range_tlv(netdissect_options *ndo, const uint8_t *tp
     while (tlv_length >= 4) {
 
 	subtlv_type = GET_BE_U_2(tptr);
-	subtlv_length = GET_BE_U_2(tptr+2);
-	tptr+=4;
-	tlv_length-=4;
+	subtlv_length = GET_BE_U_2(tptr + 2);
+	tptr += 4;
+	tlv_length -= 4;
 
 	/* Infinite loop protection. */
 	if (subtlv_type == 0 || subtlv_length == 0) {
@@ -741,8 +741,8 @@ ospf_print_ri_lsa_sid_label_range_tlv(netdissect_options *ndo, const uint8_t *tp
 		return -1;
 	    }
 	}
-	tptr+=subtlv_length;
-	tlv_length-=subtlv_length;
+	tptr += subtlv_length;
+	tlv_length -= subtlv_length;
     }
     return 0;
 }
@@ -756,9 +756,9 @@ ospf_print_ep_lsa_extd_prefix_tlv(netdissect_options *ndo, const uint8_t *tptr,
 
     while (tlv_length >= 4) {
 	subtlv_type = GET_BE_U_2(tptr);
-	subtlv_length = GET_BE_U_2(tptr+2);
-	tptr+=4;
-	tlv_length-=4;
+	subtlv_length = GET_BE_U_2(tptr + 2);
+	tptr += 4;
+	tlv_length -= 4;
 
 	/* Infinite loop protection. */
 	if (subtlv_type == 0 || subtlv_length == 0) {
@@ -780,13 +780,13 @@ ospf_print_ep_lsa_extd_prefix_tlv(netdissect_options *ndo, const uint8_t *tptr,
 	switch (subtlv_type) {
 	case LS_OPAQUE_EP_SUBTLV_PREFIX_SID:
 	    flags = GET_U_1(tptr);
-	    mt_id = GET_U_1(tptr+2);
-	    algo = GET_U_1(tptr+3);
+	    mt_id = GET_U_1(tptr + 2);
+	    algo = GET_U_1(tptr + 3);
 
 	    if (subtlv_length == 7) {
-		ND_PRINT("\n\t\t  Label: %u", GET_BE_U_3(tptr+4));
+		ND_PRINT("\n\t\t  Label: %u", GET_BE_U_3(tptr + 4));
 	    } else if (subtlv_length == 8) {
-		ND_PRINT("\n\t\t  Index: %u", GET_BE_U_4(tptr+4));
+		ND_PRINT("\n\t\t  Index: %u", GET_BE_U_4(tptr + 4));
 	    } else {
 		ND_PRINT("\n\t\tBogus subTLV length %u", subtlv_length);
 		break;
@@ -812,8 +812,8 @@ ospf_print_ep_lsa_extd_prefix_tlv(netdissect_options *ndo, const uint8_t *tptr,
 		return -1;
 	    }
 	}
-	tptr+=subtlv_length;
-	tlv_length-=subtlv_length;
+	tptr += subtlv_length;
+	tlv_length -= subtlv_length;
     }
     return 0;
 }
@@ -828,9 +828,9 @@ ospf_ep_lsa_print(netdissect_options *ndo, const uint8_t *tptr, u_int lsa_length
     while (lsa_length >= 4) {
 
 	tlv_type = GET_BE_U_2(tptr);
-	tlv_length = GET_BE_U_2(tptr+2);
-	tptr+=4;
-	lsa_length-=4;
+	tlv_length = GET_BE_U_2(tptr + 2);
+	tptr += 4;
+	lsa_length -= 4;
 
 	/* Infinite loop protection. */
 	if (tlv_type == 0 || tlv_length == 0) {
@@ -851,10 +851,10 @@ ospf_ep_lsa_print(netdissect_options *ndo, const uint8_t *tptr, u_int lsa_length
 
 	switch (tlv_type) {
 	case LS_OPAQUE_EP_EXTD_PREFIX_TLV:
-	    prefix_length = GET_U_1(tptr+1);
-	    af = GET_U_1(tptr+2);
+	    prefix_length = GET_U_1(tptr + 1);
+	    af = GET_U_1(tptr + 2);
 	    route_type = GET_U_1(tptr);
-	    flags = GET_U_1(tptr+3);
+	    flags = GET_U_1(tptr + 3);
 
 	    if (af != 0) {
 		ND_PRINT("\n\t      Bogus AF %u", af);
@@ -867,13 +867,13 @@ ospf_ep_lsa_print(netdissect_options *ndo, const uint8_t *tptr, u_int lsa_length
 	    }
 
 	    ND_PRINT("\n\t      IPv4 prefix: %15s/%u, Route Type: %s, Flags [%s]",
-		     GET_IPADDR_STRING(tptr+4), prefix_length,
+		     GET_IPADDR_STRING(tptr + 4), prefix_length,
 		     tok2str(lsa_opaque_ep_route_type_values, "Unknown", route_type),
 		     bittok2str(ep_tlv_flag_values, "none", flags));
 
 	    /* subTLVs present ? */
 	    if (tlv_length > 12) {
-		if (ospf_print_ep_lsa_extd_prefix_tlv(ndo, tptr+8, tlv_length-8) == -1) {
+		if (ospf_print_ep_lsa_extd_prefix_tlv(ndo, tptr + 8, tlv_length - 8) == -1) {
 		    return -1;
 		}
 	    }
@@ -881,9 +881,9 @@ ospf_ep_lsa_print(netdissect_options *ndo, const uint8_t *tptr, u_int lsa_length
 
 	case LS_OPAQUE_EP_EXTD_PREFIX_RANGE_TLV:
 	    prefix_length = GET_U_1(tptr);
-	    af = GET_U_1(tptr+1);
-	    range_size = GET_BE_U_2(tptr+2);
-	    flags = GET_U_1(tptr+4);
+	    af = GET_U_1(tptr + 1);
+	    range_size = GET_BE_U_2(tptr + 2);
+	    flags = GET_U_1(tptr + 4);
 
 	    if (af != 0) {
 		ND_PRINT("\n\t      Bogus AF %u", af);
@@ -896,13 +896,13 @@ ospf_ep_lsa_print(netdissect_options *ndo, const uint8_t *tptr, u_int lsa_length
 	    }
 
 	    ND_PRINT("\n\t      IPv4 prefix: %15s/%u, Range size: %u, Flags [%s]",
-		     GET_IPADDR_STRING(tptr+8), prefix_length,
+		     GET_IPADDR_STRING(tptr + 8), prefix_length,
 		     range_size,
 		     bittok2str(ep_tlv_flag_values, "none", flags));
 
 	    /* subTLVs present ? */
 	    if (tlv_length > 12) {
-		if (ospf_print_ep_lsa_extd_prefix_tlv(ndo, tptr+12, tlv_length-12) == -1) {
+		if (ospf_print_ep_lsa_extd_prefix_tlv(ndo, tptr + 12, tlv_length - 12) == -1) {
 		    return -1;
 		}
 	    }
@@ -924,8 +924,8 @@ ospf_ep_lsa_print(netdissect_options *ndo, const uint8_t *tptr, u_int lsa_length
 		return -1;
 	    }
 	}
-	tptr+=tlv_length;
-	lsa_length-=tlv_length;
+	tptr += tlv_length;
+	lsa_length -= tlv_length;
     }
     return 0;
 }
@@ -1131,8 +1131,8 @@ ospf_print_lsa(netdissect_options *ndo,
                     }
                     tlv_type = GET_BE_U_2(tptr);
                     tlv_length = GET_BE_U_2(tptr + 2);
-                    tptr+=4;
-                    ls_length_remaining-=4;
+                    tptr += 4;
+                    ls_length_remaining -= 4;
 
                     ND_PRINT("\n\t    %s TLV (%u), length: %u, value: ",
                            tok2str(lsa_opaque_ri_tlv_values,"unknown",tlv_type),
@@ -1165,7 +1165,9 @@ ospf_print_lsa(netdissect_options *ndo,
                         num_tlv = tlv_length;
                         while (num_tlv >= 1) {
                             ND_PRINT("\n\t      %s (%u)",
-                                     tok2str(lsa_opaque_ri_tlv_sr_algos, "Unknown", GET_U_1(tptr+tlv_length-num_tlv)), GET_U_1(tptr+tlv_length-num_tlv));
+                                     tok2str(lsa_opaque_ri_tlv_sr_algos,
+                                     "Unknown", GET_U_1(tptr + tlv_length - num_tlv)),
+                                     GET_U_1(tptr + tlv_length - num_tlv));
                             num_tlv--;
                         }
                         break;
@@ -1174,7 +1176,7 @@ ospf_print_lsa(netdissect_options *ndo,
                     case LS_OPAQUE_RI_TLV_SR_LOCAL_BLOCK:
                         ND_TCHECK_4(tptr);
                         ND_PRINT("\n\t      Range size: %u", GET_BE_U_3(tptr));
-                        if (ospf_print_ri_lsa_sid_label_range_tlv(ndo, tptr+4, tlv_length-4) == -1) {
+                        if (ospf_print_ri_lsa_sid_label_range_tlv(ndo, tptr + 4, tlv_length - 4) == -1) {
                             return(ls_end);
                         }
                         break;
@@ -1205,8 +1207,8 @@ ospf_print_lsa(netdissect_options *ndo,
                             return(NULL);
                         }
                     }
-                    tptr+=tlv_length;
-                    ls_length_remaining-=tlv_length;
+                    tptr += tlv_length;
+                    ls_length_remaining -= tlv_length;
                 }
                 break;
 
@@ -1426,7 +1428,7 @@ ospf_decode_v2(netdissect_options *ndo,
                 lsap = op->ospf_lsu.lsu_lsa;
                 lsa_count_max = GET_BE_U_4(op->ospf_lsu.lsu_count);
                 ND_PRINT(", %u LSA%s", lsa_count_max, PLURAL_SUFFIX(lsa_count_max));
-                for (lsa_count=1;lsa_count <= lsa_count_max;lsa_count++) {
+                for (lsa_count = 1; lsa_count <= lsa_count_max; lsa_count++) {
                     ND_PRINT("\n\t  LSA #%u", lsa_count);
                         lsap = (const struct lsa *)ospf_print_lsa(ndo, lsap);
                         if (lsap == NULL)
