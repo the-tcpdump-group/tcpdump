@@ -1415,7 +1415,7 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 		 */
 		cp = pcap_geterr(pc);
 		if (status == PCAP_ERROR)
-			error("%s", cp);
+			error("%s: %s", device, cp);
 		else if (status == PCAP_ERROR_NO_SUCH_DEVICE) {
 			/*
 			 * Return an error for our caller to handle.
