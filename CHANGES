@@ -21,6 +21,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       NTP: Fix p_ntp_time_fmt() using epoch 1/epoch 2 convention (RFC 4330).
       NTP: Update a field name with the RFC 5905 name (Origin Timestamp).
       IPv6 mobility: Modernize packet parsing and make fixes.
+      IP6OPTS: Modernize packet parsing and make fixes.
     User interface:
       Add optional unit suffix on -C file size.
       Improve the handling of size suffixes for -C.
