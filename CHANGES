@@ -116,6 +116,10 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Update the -z option processing. Print "invalid option -- z" when it is.
     Other:
       Avoid race condition when receiving signal during shutdown.
+      Always show the interface name in error messages when the
+        interface can't be opened.
+      Clean up the message shown if a -i flag is specified with an
+        interface index that's too large.
     Source code:
       Fix '-tt' option printing when time > 2106-02-07T06:28:15Z.
       Add sub-second packet timestamp checks for invalid micro/nano.
