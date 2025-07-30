@@ -1259,6 +1259,8 @@ _U_
 	status = pcap_findalldevs(&devlist, ebuf);
 	if (status < 0)
 		error("%s", ebuf);
+	if (devlist == NULL)
+		error("no interfaces available for capture");
 	/*
 	 * Look for the devnum-th entry in the list of devices (1-based).
 	 */
@@ -1267,8 +1269,8 @@ _U_
 		;
 	if (dev == NULL) {
 		pcap_freealldevs(devlist);
-		error("Invalid adapter index %ld: only %ld interfaces found",
-		    devnum, i);
+		error("Invalid adapter index %ld: only %ld interface%s found",
+		    devnum, i, (i == 1) ? "" : "s");
 	}
 	device = strdup(dev->name);
 	pcap_freealldevs(devlist);
