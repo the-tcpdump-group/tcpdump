@@ -1,0 +1,590 @@
+    1  2018-02-14 15:30:19.014914 IP (tos 0xc0, ttl 1, id 48925, offset 0, flags [none], proto OSPF (89), length 124)
+    192.168.121.5 > 224.0.0.5: OSPFv2, Hello, length 88 [len 52]
+	Router-ID 192.168.255.15, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a834112
+	Options [External, LLS]
+	  Hello Timer 10s, Dead Timer 40s, Mask 255.255.255.0, Priority 1
+	  Designated Router 192.168.121.4, Backup Designated Router 192.168.121.5
+	  Neighbor List:
+	    192.168.255.11
+	    192.168.255.14
+	  LLS: checksum: 0x0000, length: 9
+	    Extended Options (1), length: 4
+	      Options: 0x00000001 [LSDB resync]
+	    MD5 Authentication (2), length: 20
+	      Sequence number: 0x5a834112
+    2  2018-02-14 15:30:22.228510 IP (tos 0xc0, ttl 1, id 56663, offset 0, flags [none], proto OSPF (89), length 124)
+    192.168.121.4 > 224.0.0.5: OSPFv2, Hello, length 88 [len 52]
+	Router-ID 192.168.255.14, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a842370
+	Options [External, LLS]
+	  Hello Timer 10s, Dead Timer 40s, Mask 255.255.255.0, Priority 1
+	  Designated Router 192.168.121.4, Backup Designated Router 192.168.121.5
+	  Neighbor List:
+	    192.168.255.11
+	    192.168.255.15
+	  LLS: checksum: 0x0000, length: 9
+	    Extended Options (1), length: 4
+	      Options: 0x00000001 [LSDB resync]
+	    MD5 Authentication (2), length: 20
+	      Sequence number: 0x5a842370
+    3  2018-02-14 15:30:22.712123 IP (tos 0xc0, ttl 1, id 2314, offset 0, flags [none], proto OSPF (89), length 104)
+    192.168.121.42 > 192.168.121.4: OSPFv2, Database Description, length 68 [len 32]
+	Router-ID 192.168.255.11, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a83413f
+	Options [External, LLS, Opaque], DD Flags [Init, More, Master], MTU: 1500, Sequence: 0x00000081
+	  LLS: checksum: 0x0000, length: 9
+	    Extended Options (1), length: 4
+	      Options: 0x00000001 [LSDB resync]
+	    MD5 Authentication (2), length: 20
+	      Sequence number: 0x5a83413f
+    4  2018-02-14 15:30:22.712132 IP (tos 0xc0, ttl 1, id 56664, offset 0, flags [none], proto OSPF (89), length 104)
+    192.168.121.4 > 192.168.121.42: OSPFv2, Database Description, length 68 [len 32]
+	Router-ID 192.168.255.14, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a842370
+	Options [External, LLS, Opaque], DD Flags [Init, More, Master], MTU: 1500, Sequence: 0x00001bfb
+	  LLS: checksum: 0x0000, length: 9
+	    Extended Options (1), length: 4
+	      Options: 0x00000001 [LSDB resync]
+	    MD5 Authentication (2), length: 20
+	      Sequence number: 0x5a842370
+    5  2018-02-14 15:30:22.712137 IP (tos 0xc0, ttl 1, id 2315, offset 0, flags [none], proto OSPF (89), length 204)
+    192.168.121.42 > 192.168.121.4: OSPFv2, Database Description, length 168 [len 132]
+	Router-ID 192.168.255.11, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a83413f
+	Options [External, LLS, Opaque], DD Flags [More], MTU: 1500, Sequence: 0x00001bfb
+	  Advertising Router 192.168.255.11, seq 0x80000002, age 4s, length 40
+	    Router LSA (1), LSA-ID: 192.168.255.11
+	    Options: [External, Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x80000001, age 30s, length 16
+	    External LSA (5), LSA-ID: 192.168.124.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x80000001, age 30s, length 16
+	    External LSA (5), LSA-ID: 192.168.127.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x80000001, age 30s, length 16
+	    External LSA (5), LSA-ID: 192.168.128.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x80000001, age 30s, length 16
+	    External LSA (5), LSA-ID: 192.168.255.12
+	    Options: [Demand Circuit]
+	  LLS: checksum: 0x0000, length: 9
+	    Extended Options (1), length: 4
+	      Options: 0x00000001 [LSDB resync]
+	    MD5 Authentication (2), length: 20
+	      Sequence number: 0x5a83413f
+    6  2018-02-14 15:30:22.712141 IP (tos 0xc0, ttl 1, id 56665, offset 0, flags [none], proto OSPF (89), length 304)
+    192.168.121.4 > 192.168.121.42: OSPFv2, Database Description, length 268 [len 232]
+	Router-ID 192.168.255.14, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a842370
+	Options [External, LLS, Opaque], DD Flags [Master], MTU: 1500, Sequence: 0x00001bfc
+	  Advertising Router 192.168.255.11, seq 0x800002d8, age 373s, length 40
+	    Router LSA (1), LSA-ID: 192.168.255.11
+	    Options: [External, Demand Circuit]
+	  Advertising Router 192.168.255.14, seq 0x800002ca, age 725s, length 28
+	    Router LSA (1), LSA-ID: 192.168.255.14
+	    Options: [External, Demand Circuit]
+	  Advertising Router 192.168.255.15, seq 0x800002c7, age 428s, length 28
+	    Router LSA (1), LSA-ID: 192.168.255.15
+	    Options: [External, Demand Circuit]
+	  Advertising Router 192.168.255.14, seq 0x80000011, age 60s, length 12
+	    Network LSA (2), LSA-ID: 192.168.121.4
+	    Options: [External, Demand Circuit]
+	  Advertising Router 192.168.255.14, seq 0x800002bd, age 1218s, length 16
+	    External LSA (5), LSA-ID: 0.0.0.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.15, seq 0x800002bd, age 915s, length 16
+	    External LSA (5), LSA-ID: 0.0.0.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x8000000b, age 281s, length 16
+	    External LSA (5), LSA-ID: 192.168.124.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x8000000d, age 281s, length 16
+	    External LSA (5), LSA-ID: 192.168.127.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x8000000b, age 281s, length 16
+	    External LSA (5), LSA-ID: 192.168.128.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x800002b1, age 785s, length 16
+	    External LSA (5), LSA-ID: 192.168.255.12
+	    Options: [Demand Circuit]
+	  LLS: checksum: 0x0000, length: 9
+	    Extended Options (1), length: 4
+	      Options: 0x00000001 [LSDB resync]
+	    MD5 Authentication (2), length: 20
+	      Sequence number: 0x5a842370
+    7  2018-02-14 15:30:22.712146 IP (tos 0xc0, ttl 1, id 2316, offset 0, flags [none], proto OSPF (89), length 180)
+    192.168.121.42 > 192.168.121.4: OSPFv2, LS-Request, length 144
+	Router-ID 192.168.255.11, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a83413f
+	  Advertising Router: 192.168.255.11, Router LSA (1), LSA-ID: 192.168.255.11
+	  Advertising Router: 192.168.255.14, Router LSA (1), LSA-ID: 192.168.255.14
+	  Advertising Router: 192.168.255.15, Router LSA (1), LSA-ID: 192.168.255.15
+	  Advertising Router: 192.168.255.14, Network LSA (2), LSA-ID: 192.168.121.4
+	  Advertising Router: 192.168.255.14, External LSA (5), LSA-ID: 0.0.0.0
+	  Advertising Router: 192.168.255.15, External LSA (5), LSA-ID: 0.0.0.0
+	  Advertising Router: 192.168.255.11, External LSA (5), LSA-ID: 192.168.124.0
+	  Advertising Router: 192.168.255.11, External LSA (5), LSA-ID: 192.168.127.0
+	  Advertising Router: 192.168.255.11, External LSA (5), LSA-ID: 192.168.128.0
+	  Advertising Router: 192.168.255.11, External LSA (5), LSA-ID: 192.168.255.12
+    8  2018-02-14 15:30:22.712150 IP (tos 0xc0, ttl 1, id 2317, offset 0, flags [none], proto OSPF (89), length 104)
+    192.168.121.42 > 192.168.121.4: OSPFv2, Database Description, length 68 [len 32]
+	Router-ID 192.168.255.11, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a83413f
+	Options [External, LLS, Opaque], DD Flags [none], MTU: 1500, Sequence: 0x00001bfc
+	  LLS: checksum: 0x0000, length: 9
+	    Extended Options (1), length: 4
+	      Options: 0x00000001 [LSDB resync]
+	    MD5 Authentication (2), length: 20
+	      Sequence number: 0x5a83413f
+    9  2018-02-14 15:30:22.712154 IP (tos 0xc0, ttl 1, id 56666, offset 0, flags [none], proto OSPF (89), length 468)
+    192.168.121.4 > 192.168.121.42: OSPFv2, LS-Update, length 432
+	Router-ID 192.168.255.14, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a842370, 10 LSAs
+	  LSA #1
+	  Advertising Router 192.168.255.11, seq 0x800002d8, age 374s, length 40
+	    Router LSA (1), LSA-ID: 192.168.255.11
+	    Options: [External, Demand Circuit]
+	    Router LSA Options: [ASBR]
+	      Stub Network: 192.168.255.11, Mask: 255.255.255.255
+		topology default (0), metric 1
+	      Stub Network: 192.168.122.0, Mask: 255.255.255.252
+		topology default (0), metric 12
+	      Neighbor Network-ID: 192.168.121.4, Interface Address: 192.168.121.42
+		topology default (0), metric 12
+	  LSA #2
+	  Advertising Router 192.168.255.14, seq 0x800002ca, age 726s, length 28
+	    Router LSA (1), LSA-ID: 192.168.255.14
+	    Options: [External, Demand Circuit]
+	    Router LSA Options: [ASBR]
+	      Neighbor Network-ID: 192.168.121.4, Interface Address: 192.168.121.4
+		topology default (0), metric 1
+	      Stub Network: 192.168.120.0, Mask: 255.255.255.0
+		topology default (0), metric 1
+	  LSA #3
+	  Advertising Router 192.168.255.15, seq 0x800002c7, age 429s, length 28
+	    Router LSA (1), LSA-ID: 192.168.255.15
+	    Options: [External, Demand Circuit]
+	    Router LSA Options: [ASBR]
+	      Stub Network: 192.168.120.0, Mask: 255.255.255.0
+		topology default (0), metric 1
+	      Neighbor Network-ID: 192.168.121.4, Interface Address: 192.168.121.5
+		topology default (0), metric 1
+	  LSA #4
+	  Advertising Router 192.168.255.14, seq 0x80000011, age 61s, length 12
+	    Network LSA (2), LSA-ID: 192.168.121.4
+	    Options: [External, Demand Circuit]
+	    Mask 255.255.255.0
+	    Connected Routers:
+	      192.168.255.14
+	      192.168.255.15
+	  LSA #5
+	  Advertising Router 192.168.255.14, seq 0x800002bd, age 1219s, length 16
+	    External LSA (5), LSA-ID: 0.0.0.0
+	    Options: [Demand Circuit]
+	    Mask 0.0.0.0
+		topology default (0), type 2, metric 1, tag 0.0.0.4
+	  LSA #6
+	  Advertising Router 192.168.255.15, seq 0x800002bd, age 916s, length 16
+	    External LSA (5), LSA-ID: 0.0.0.0
+	    Options: [Demand Circuit]
+	    Mask 0.0.0.0
+		topology default (0), type 2, metric 1, tag 0.0.0.4
+	  LSA #7
+	  Advertising Router 192.168.255.11, seq 0x8000000b, age 282s, length 16
+	    External LSA (5), LSA-ID: 192.168.124.0
+	    Options: [Demand Circuit]
+	    Mask 255.255.255.0
+		topology default (0), type 2, metric 20
+	  LSA #8
+	  Advertising Router 192.168.255.11, seq 0x8000000d, age 282s, length 16
+	    External LSA (5), LSA-ID: 192.168.127.0
+	    Options: [Demand Circuit]
+	    Mask 255.255.255.0
+		topology default (0), type 2, metric 20
+	  LSA #9
+	  Advertising Router 192.168.255.11, seq 0x8000000b, age 282s, length 16
+	    External LSA (5), LSA-ID: 192.168.128.0
+	    Options: [Demand Circuit]
+	    Mask 255.255.254.0
+		topology default (0), type 2, metric 20
+	  LSA #10
+	  Advertising Router 192.168.255.11, seq 0x800002b1, age 786s, length 16
+	    External LSA (5), LSA-ID: 192.168.255.12
+	    Options: [Demand Circuit]
+	    Mask 255.255.255.254
+		topology default (0), type 2, metric 20
+   10  2018-02-14 15:30:22.712158 IP (tos 0xc0, ttl 1, id 2318, offset 0, flags [none], proto OSPF (89), length 100)
+    192.168.121.42 > 224.0.0.6: OSPFv2, LS-Update, length 64
+	Router-ID 192.168.255.11, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a83413f, 1 LSA
+	  LSA #1
+	  Advertising Router 192.168.255.11, seq 0x8000000c, age 1s, length 16
+	    External LSA (5), LSA-ID: 192.168.124.0
+	    Options: [Demand Circuit]
+	    Mask 255.255.255.0
+		topology default (0), type 2, metric 20
+   11  2018-02-14 15:30:22.712163 IP (tos 0xc0, ttl 1, id 56667, offset 0, flags [none], proto OSPF (89), length 100)
+    192.168.121.4 > 224.0.0.5: OSPFv2, LS-Update, length 64
+	Router-ID 192.168.255.14, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a842370, 1 LSA
+	  LSA #1
+	  Advertising Router 192.168.255.11, seq 0x8000000c, age 2s, length 16
+	    External LSA (5), LSA-ID: 192.168.124.0
+	    Options: [Demand Circuit]
+	    Mask 255.255.255.0
+		topology default (0), type 2, metric 20
+   12  2018-02-14 15:30:22.712167 IP (tos 0xc0, ttl 1, id 2319, offset 0, flags [none], proto OSPF (89), length 172)
+    192.168.121.42 > 224.0.0.6: OSPFv2, LS-Update, length 136
+	Router-ID 192.168.255.11, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a83413f, 3 LSAs
+	  LSA #1
+	  Advertising Router 192.168.255.11, seq 0x8000000e, age 1s, length 16
+	    External LSA (5), LSA-ID: 192.168.127.0
+	    Options: [Demand Circuit]
+	    Mask 255.255.255.0
+		topology default (0), type 2, metric 20
+	  LSA #2
+	  Advertising Router 192.168.255.11, seq 0x8000000c, age 1s, length 16
+	    External LSA (5), LSA-ID: 192.168.128.0
+	    Options: [Demand Circuit]
+	    Mask 255.255.254.0
+		topology default (0), type 2, metric 20
+	  LSA #3
+	  Advertising Router 192.168.255.11, seq 0x800002b2, age 1s, length 16
+	    External LSA (5), LSA-ID: 192.168.255.12
+	    Options: [Demand Circuit]
+	    Mask 255.255.255.254
+		topology default (0), type 2, metric 20
+   13  2018-02-14 15:30:22.712171 IP (tos 0xc0, ttl 1, id 56668, offset 0, flags [none], proto OSPF (89), length 172)
+    192.168.121.4 > 224.0.0.5: OSPFv2, LS-Update, length 136
+	Router-ID 192.168.255.14, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a842370, 3 LSAs
+	  LSA #1
+	  Advertising Router 192.168.255.11, seq 0x8000000e, age 2s, length 16
+	    External LSA (5), LSA-ID: 192.168.127.0
+	    Options: [Demand Circuit]
+	    Mask 255.255.255.0
+		topology default (0), type 2, metric 20
+	  LSA #2
+	  Advertising Router 192.168.255.11, seq 0x8000000c, age 2s, length 16
+	    External LSA (5), LSA-ID: 192.168.128.0
+	    Options: [Demand Circuit]
+	    Mask 255.255.254.0
+		topology default (0), type 2, metric 20
+	  LSA #3
+	  Advertising Router 192.168.255.11, seq 0x800002b2, age 2s, length 16
+	    External LSA (5), LSA-ID: 192.168.255.12
+	    Options: [Demand Circuit]
+	    Mask 255.255.255.254
+		topology default (0), type 2, metric 20
+   14  2018-02-14 15:30:22.712175 IP (tos 0xc0, ttl 1, id 2320, offset 0, flags [none], proto OSPF (89), length 104)
+    192.168.121.42 > 192.168.121.5: OSPFv2, Database Description, length 68 [len 32]
+	Router-ID 192.168.255.11, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a83413f
+	Options [External, LLS, Opaque], DD Flags [Init, More, Master], MTU: 1500, Sequence: 0x00000e50
+	  LLS: checksum: 0x0000, length: 9
+	    Extended Options (1), length: 4
+	      Options: 0x00000001 [LSDB resync]
+	    MD5 Authentication (2), length: 20
+	      Sequence number: 0x5a83413f
+   15  2018-02-14 15:30:22.712179 IP (tos 0xc0, ttl 1, id 48933, offset 0, flags [none], proto OSPF (89), length 104)
+    192.168.121.5 > 192.168.121.42: OSPFv2, Database Description, length 68 [len 32]
+	Router-ID 192.168.255.15, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a834116
+	Options [External, LLS, Opaque], DD Flags [Init, More, Master], MTU: 1500, Sequence: 0x00001488
+	  LLS: checksum: 0x0000, length: 9
+	    Extended Options (1), length: 4
+	      Options: 0x00000001 [LSDB resync]
+	    MD5 Authentication (2), length: 20
+	      Sequence number: 0x5a834116
+   16  2018-02-14 15:30:22.712184 IP (tos 0xc0, ttl 1, id 2321, offset 0, flags [none], proto OSPF (89), length 304)
+    192.168.121.42 > 192.168.121.5: OSPFv2, Database Description, length 268 [len 232]
+	Router-ID 192.168.255.11, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a83413f
+	Options [External, LLS, Opaque], DD Flags [More], MTU: 1500, Sequence: 0x00001488
+	  Advertising Router 192.168.255.11, seq 0x80000002, age 4s, length 40
+	    Router LSA (1), LSA-ID: 192.168.255.11
+	    Options: [External, Demand Circuit]
+	  Advertising Router 192.168.255.14, seq 0x800002ca, age 726s, length 28
+	    Router LSA (1), LSA-ID: 192.168.255.14
+	    Options: [External, Demand Circuit]
+	  Advertising Router 192.168.255.15, seq 0x800002c7, age 429s, length 28
+	    Router LSA (1), LSA-ID: 192.168.255.15
+	    Options: [External, Demand Circuit]
+	  Advertising Router 192.168.255.14, seq 0x80000011, age 61s, length 12
+	    Network LSA (2), LSA-ID: 192.168.121.4
+	    Options: [External, Demand Circuit]
+	  Advertising Router 192.168.255.14, seq 0x800002bd, age 1219s, length 16
+	    External LSA (5), LSA-ID: 0.0.0.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.15, seq 0x800002bd, age 916s, length 16
+	    External LSA (5), LSA-ID: 0.0.0.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x8000000c, age 0s, length 16
+	    External LSA (5), LSA-ID: 192.168.124.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x8000000e, age 0s, length 16
+	    External LSA (5), LSA-ID: 192.168.127.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x8000000c, age 0s, length 16
+	    External LSA (5), LSA-ID: 192.168.128.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x800002b2, age 0s, length 16
+	    External LSA (5), LSA-ID: 192.168.255.12
+	    Options: [Demand Circuit]
+	  LLS: checksum: 0x0000, length: 9
+	    Extended Options (1), length: 4
+	      Options: 0x00000001 [LSDB resync]
+	    MD5 Authentication (2), length: 20
+	      Sequence number: 0x5a83413f
+   17  2018-02-14 15:30:22.712187 IP (tos 0xc0, ttl 1, id 48934, offset 0, flags [none], proto OSPF (89), length 304)
+    192.168.121.5 > 192.168.121.42: OSPFv2, Database Description, length 268 [len 232]
+	Router-ID 192.168.255.15, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a834116
+	Options [External, LLS, Opaque], DD Flags [Master], MTU: 1500, Sequence: 0x00001489
+	  Advertising Router 192.168.255.11, seq 0x800002d8, age 373s, length 40
+	    Router LSA (1), LSA-ID: 192.168.255.11
+	    Options: [External, Demand Circuit]
+	  Advertising Router 192.168.255.14, seq 0x800002ca, age 727s, length 28
+	    Router LSA (1), LSA-ID: 192.168.255.14
+	    Options: [External, Demand Circuit]
+	  Advertising Router 192.168.255.15, seq 0x800002c7, age 427s, length 28
+	    Router LSA (1), LSA-ID: 192.168.255.15
+	    Options: [External, Demand Circuit]
+	  Advertising Router 192.168.255.14, seq 0x80000011, age 61s, length 12
+	    Network LSA (2), LSA-ID: 192.168.121.4
+	    Options: [External, Demand Circuit]
+	  Advertising Router 192.168.255.14, seq 0x800002bd, age 1219s, length 16
+	    External LSA (5), LSA-ID: 0.0.0.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.15, seq 0x800002bd, age 914s, length 16
+	    External LSA (5), LSA-ID: 0.0.0.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x8000000c, age 2s, length 16
+	    External LSA (5), LSA-ID: 192.168.124.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x8000000e, age 2s, length 16
+	    External LSA (5), LSA-ID: 192.168.127.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x8000000c, age 2s, length 16
+	    External LSA (5), LSA-ID: 192.168.128.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x800002b2, age 2s, length 16
+	    External LSA (5), LSA-ID: 192.168.255.12
+	    Options: [Demand Circuit]
+	  LLS: checksum: 0x0000, length: 9
+	    Extended Options (1), length: 4
+	      Options: 0x00000001 [LSDB resync]
+	    MD5 Authentication (2), length: 20
+	      Sequence number: 0x5a834116
+   18  2018-02-14 15:30:22.712192 IP (tos 0xc0, ttl 1, id 2322, offset 0, flags [none], proto OSPF (89), length 72)
+    192.168.121.42 > 192.168.121.5: OSPFv2, LS-Request, length 36
+	Router-ID 192.168.255.11, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a83413f
+	  Advertising Router: 192.168.255.11, Router LSA (1), LSA-ID: 192.168.255.11
+   19  2018-02-14 15:30:22.712196 IP (tos 0xc0, ttl 1, id 2323, offset 0, flags [none], proto OSPF (89), length 104)
+    192.168.121.42 > 192.168.121.5: OSPFv2, Database Description, length 68 [len 32]
+	Router-ID 192.168.255.11, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a83413f
+	Options [External, LLS, Opaque], DD Flags [none], MTU: 1500, Sequence: 0x00001489
+	  LLS: checksum: 0x0000, length: 9
+	    Extended Options (1), length: 4
+	      Options: 0x00000001 [LSDB resync]
+	    MD5 Authentication (2), length: 20
+	      Sequence number: 0x5a83413f
+   20  2018-02-14 15:30:22.712200 IP (tos 0xc0, ttl 1, id 48935, offset 0, flags [none], proto OSPF (89), length 124)
+    192.168.121.5 > 192.168.121.42: OSPFv2, LS-Update, length 88
+	Router-ID 192.168.255.15, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a834116, 1 LSA
+	  LSA #1
+	  Advertising Router 192.168.255.11, seq 0x800002d8, age 374s, length 40
+	    Router LSA (1), LSA-ID: 192.168.255.11
+	    Options: [External, Demand Circuit]
+	    Router LSA Options: [ASBR]
+	      Stub Network: 192.168.255.11, Mask: 255.255.255.255
+		topology default (0), metric 1
+	      Stub Network: 192.168.122.0, Mask: 255.255.255.252
+		topology default (0), metric 12
+	      Neighbor Network-ID: 192.168.121.4, Interface Address: 192.168.121.42
+		topology default (0), metric 12
+   21  2018-02-14 15:30:23.211321 IP (tos 0xc0, ttl 1, id 56669, offset 0, flags [none], proto OSPF (89), length 100)
+    192.168.121.4 > 224.0.0.5: OSPFv2, LS-Update, length 64
+	Router-ID 192.168.255.14, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a842371, 1 LSA
+	  LSA #1
+	  Advertising Router 192.168.255.14, seq 0x80000012, age 1s, length 16
+	    Network LSA (2), LSA-ID: 192.168.121.4
+	    Options: [External, Demand Circuit]
+	    Mask 255.255.255.0
+	    Connected Routers:
+	      192.168.255.14
+	      192.168.255.11
+	      192.168.255.15
+   22  2018-02-14 15:30:23.538926 IP (tos 0xc0, ttl 1, id 2324, offset 0, flags [none], proto OSPF (89), length 124)
+    192.168.121.42 > 224.0.0.6: OSPFv2, LS-Update, length 88
+	Router-ID 192.168.255.11, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a83413f, 1 LSA
+	  LSA #1
+	  Advertising Router 192.168.255.11, seq 0x800002d9, age 1s, length 40
+	    Router LSA (1), LSA-ID: 192.168.255.11
+	    Options: [External, Demand Circuit]
+	    Router LSA Options: [ASBR]
+	      Stub Network: 192.168.255.11, Mask: 255.255.255.255
+		topology default (0), metric 1
+	      Stub Network: 192.168.122.0, Mask: 255.255.255.252
+		topology default (0), metric 12
+	      Neighbor Network-ID: 192.168.121.4, Interface Address: 192.168.121.42
+		topology default (0), metric 12
+   23  2018-02-14 15:30:23.538935 IP (tos 0xc0, ttl 1, id 56670, offset 0, flags [none], proto OSPF (89), length 124)
+    192.168.121.4 > 224.0.0.5: OSPFv2, LS-Update, length 88
+	Router-ID 192.168.255.14, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a842371, 1 LSA
+	  LSA #1
+	  Advertising Router 192.168.255.11, seq 0x800002d9, age 2s, length 40
+	    Router LSA (1), LSA-ID: 192.168.255.11
+	    Options: [External, Demand Circuit]
+	    Router LSA Options: [ASBR]
+	      Stub Network: 192.168.255.11, Mask: 255.255.255.255
+		topology default (0), metric 1
+	      Stub Network: 192.168.122.0, Mask: 255.255.255.252
+		topology default (0), metric 12
+	      Neighbor Network-ID: 192.168.121.4, Interface Address: 192.168.121.42
+		topology default (0), metric 12
+   24  2018-02-14 15:30:25.239318 IP (tos 0xc0, ttl 1, id 48939, offset 0, flags [none], proto OSPF (89), length 180)
+    192.168.121.5 > 224.0.0.5: OSPFv2, LS-Ack, length 144
+	Router-ID 192.168.255.15, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a834118
+	  Advertising Router 192.168.255.11, seq 0x8000000c, age 2s, length 16
+	    External LSA (5), LSA-ID: 192.168.124.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x8000000e, age 2s, length 16
+	    External LSA (5), LSA-ID: 192.168.127.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x8000000c, age 2s, length 16
+	    External LSA (5), LSA-ID: 192.168.128.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x800002b2, age 2s, length 16
+	    External LSA (5), LSA-ID: 192.168.255.12
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.14, seq 0x80000012, age 1s, length 16
+	    Network LSA (2), LSA-ID: 192.168.121.4
+	    Options: [External, Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x800002d9, age 2s, length 40
+	    Router LSA (1), LSA-ID: 192.168.255.11
+	    Options: [External, Demand Circuit]
+   25  2018-02-14 15:30:25.239328 IP (tos 0xc0, ttl 1, id 2329, offset 0, flags [none], proto OSPF (89), length 300)
+    192.168.121.42 > 224.0.0.6: OSPFv2, LS-Ack, length 264
+	Router-ID 192.168.255.11, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a834141
+	  Advertising Router 192.168.255.11, seq 0x800002d8, age 374s, length 40
+	    Router LSA (1), LSA-ID: 192.168.255.11
+	    Options: [External, Demand Circuit]
+	  Advertising Router 192.168.255.14, seq 0x800002ca, age 726s, length 28
+	    Router LSA (1), LSA-ID: 192.168.255.14
+	    Options: [External, Demand Circuit]
+	  Advertising Router 192.168.255.15, seq 0x800002c7, age 429s, length 28
+	    Router LSA (1), LSA-ID: 192.168.255.15
+	    Options: [External, Demand Circuit]
+	  Advertising Router 192.168.255.14, seq 0x80000011, age 61s, length 12
+	    Network LSA (2), LSA-ID: 192.168.121.4
+	    Options: [External, Demand Circuit]
+	  Advertising Router 192.168.255.14, seq 0x800002bd, age 1219s, length 16
+	    External LSA (5), LSA-ID: 0.0.0.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.15, seq 0x800002bd, age 916s, length 16
+	    External LSA (5), LSA-ID: 0.0.0.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x8000000b, age 282s, length 16
+	    External LSA (5), LSA-ID: 192.168.124.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x8000000d, age 282s, length 16
+	    External LSA (5), LSA-ID: 192.168.127.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x8000000b, age 282s, length 16
+	    External LSA (5), LSA-ID: 192.168.128.0
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x800002b1, age 786s, length 16
+	    External LSA (5), LSA-ID: 192.168.255.12
+	    Options: [Demand Circuit]
+	  Advertising Router 192.168.255.11, seq 0x800002d8, age 374s, length 40
+	    Router LSA (1), LSA-ID: 192.168.255.11
+	    Options: [External, Demand Circuit]
+	  Advertising Router 192.168.255.14, seq 0x80000012, age 1s, length 16
+	    Network LSA (2), LSA-ID: 192.168.121.4
+	    Options: [External, Demand Circuit]
+   26  2018-02-14 15:30:27.017740 IP (tos 0xc0, ttl 1, id 2330, offset 0, flags [none], proto OSPF (89), length 124)
+    192.168.121.42 > 224.0.0.5: OSPFv2, Hello, length 88 [len 52]
+	Router-ID 192.168.255.11, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a834143
+	Options [External, LLS]
+	  Hello Timer 10s, Dead Timer 40s, Mask 255.255.255.0, Priority 1
+	  Designated Router 192.168.121.4, Backup Designated Router 192.168.121.5
+	  Neighbor List:
+	    192.168.255.14
+	    192.168.255.15
+	  LLS: checksum: 0x0000, length: 9
+	    Extended Options (1), length: 4
+	      Options: 0x00000001 [LSDB resync]
+	    MD5 Authentication (2), length: 20
+	      Sequence number: 0x5a834143
+   27  2018-02-14 15:30:28.921122 IP (tos 0xc0, ttl 1, id 48942, offset 0, flags [none], proto OSPF (89), length 124)
+    192.168.121.5 > 224.0.0.5: OSPFv2, Hello, length 88 [len 52]
+	Router-ID 192.168.255.15, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a83411c
+	Options [External, LLS]
+	  Hello Timer 10s, Dead Timer 40s, Mask 255.255.255.0, Priority 1
+	  Designated Router 192.168.121.4, Backup Designated Router 192.168.121.5
+	  Neighbor List:
+	    192.168.255.11
+	    192.168.255.14
+	  LLS: checksum: 0x0000, length: 9
+	    Extended Options (1), length: 4
+	      Options: 0x00000001 [LSDB resync]
+	    MD5 Authentication (2), length: 20
+	      Sequence number: 0x5a83411c
+   28  2018-02-14 15:30:32.118925 IP (tos 0xc0, ttl 1, id 56676, offset 0, flags [none], proto OSPF (89), length 124)
+    192.168.121.4 > 224.0.0.5: OSPFv2, Hello, length 88 [len 52]
+	Router-ID 192.168.255.14, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a84237a
+	Options [External, LLS]
+	  Hello Timer 10s, Dead Timer 40s, Mask 255.255.255.0, Priority 1
+	  Designated Router 192.168.121.4, Backup Designated Router 192.168.121.5
+	  Neighbor List:
+	    192.168.255.11
+	    192.168.255.15
+	  LLS: checksum: 0x0000, length: 9
+	    Extended Options (1), length: 4
+	      Options: 0x00000001 [LSDB resync]
+	    MD5 Authentication (2), length: 20
+	      Sequence number: 0x5a84237a
+   29  2018-02-14 15:30:36.034523 IP (tos 0xc0, ttl 1, id 2334, offset 0, flags [none], proto OSPF (89), length 124)
+    192.168.121.42 > 224.0.0.5: OSPFv2, Hello, length 88 [len 52]
+	Router-ID 192.168.255.11, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a83414c
+	Options [External, LLS]
+	  Hello Timer 10s, Dead Timer 40s, Mask 255.255.255.0, Priority 1
+	  Designated Router 192.168.121.4, Backup Designated Router 192.168.121.5
+	  Neighbor List:
+	    192.168.255.14
+	    192.168.255.15
+	  LLS: checksum: 0x0000, length: 9
+	    Extended Options (1), length: 4
+	      Options: 0x00000001 [LSDB resync]
+	    MD5 Authentication (2), length: 20
+	      Sequence number: 0x5a83414c
+   30  2018-02-14 15:30:38.733366 IP (tos 0xc0, ttl 1, id 48944, offset 0, flags [none], proto OSPF (89), length 124)
+    192.168.121.5 > 224.0.0.5: OSPFv2, Hello, length 88 [len 52]
+	Router-ID 192.168.255.15, Backbone Area, Authentication Type: MD5 (2)
+	Key-ID: 1, Auth-Length: 16, Crypto Sequence Number: 0x5a834125
+	Options [External, LLS]
+	  Hello Timer 10s, Dead Timer 40s, Mask 255.255.255.0, Priority 1
+	  Designated Router 192.168.121.4, Backup Designated Router 192.168.121.5
+	  Neighbor List:
+	    192.168.255.11
+	    192.168.255.14
+	  LLS: checksum: 0x0000, length: 9
+	    Extended Options (1), length: 4
+	      Options: 0x00000001 [LSDB resync]
+	    MD5 Authentication (2), length: 20
+	      Sequence number: 0x5a834125

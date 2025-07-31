@@ -149,6 +149,9 @@ ospf3_auth-vv	ospf3_auth.pcapng			ospf3_auth-vv.out	-v -v
 ospf3_bc-vv	OSPFv3_broadcast_adjacency.pcap		ospf3_bc-vv.out		-v -v
 ospf3_mp-vv	OSPFv3_multipoint_adjacencies.pcap	ospf3_mp-vv.out		-v -v
 ospf3_nbma-vv	OSPFv3_NBMA_adjacencies.pcap		ospf3_nbma-vv.out	-v -v
+OSPFv2_Capture_FINAL OSPFv2_Capture_FINAL.pcapng OSPFv2_Capture_FINAL.out
+OSPFv2_Capture_FINAL-v OSPFv2_Capture_FINAL.pcapng OSPFv2_Capture_FINAL-v.out -v
+
 # fuzzed pcap
 ospf2-seg-fault-1-v  ospf2-seg-fault-1.pcapng  ospf2-seg-fault-1-v.out  -v
 
