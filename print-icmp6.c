@@ -298,7 +298,7 @@ struct nd_opt_prefix_info {	/* prefix information */
 
 #define ND_OPT_PI_FLAG_ONLINK		0x80
 #define ND_OPT_PI_FLAG_AUTO		0x40
-#define ND_OPT_PI_FLAG_ROUTER		0x20	/*2292bis*/
+#define ND_OPT_PI_FLAG_ROUTER		0x20	/* IPv6 Mobility, RFC 6275 */
 
 struct nd_opt_rd_hdr {         /* redirected header */
 	nd_uint8_t	nd_opt_rh_type;
