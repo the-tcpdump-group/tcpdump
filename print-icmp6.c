@@ -299,6 +299,7 @@ struct nd_opt_prefix_info {	/* prefix information */
 #define ND_OPT_PI_FLAG_ONLINK		0x80
 #define ND_OPT_PI_FLAG_AUTO		0x40
 #define ND_OPT_PI_FLAG_ROUTER		0x20	/* IPv6 Mobility, RFC 6275 */
+#define ND_OPT_PI_FLAG_DHCPPD		0x10	/* DHCPv6-PD Preferred, RFC 9762 */
 
 struct nd_opt_rd_hdr {         /* redirected header */
 	nd_uint8_t	nd_opt_rh_type;
@@ -713,6 +714,7 @@ static const struct tok icmp6_opt_pi_flag_values[] = {
     { ND_OPT_PI_FLAG_ONLINK, "onlink" },
     { ND_OPT_PI_FLAG_AUTO, "auto" },
     { ND_OPT_PI_FLAG_ROUTER, "router" },
+    { ND_OPT_PI_FLAG_DHCPPD, "pd preferred" },
     { 0,	NULL }
 };
 
