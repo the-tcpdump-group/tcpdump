@@ -302,15 +302,21 @@ tcp_print(netdissect_options *ndo,
                                                         "%s: calloc", __func__);
                                 }
                                 th->addr = tha;
-                                if (rev)
-                                        th->ack = seq, th->seq = ack - 1;
-                                else
-                                        th->seq = seq, th->ack = ack - 1;
+                                if (rev) {
+                                        th->ack = seq;
+                                        th->seq = ack - 1;
+                                } else {
+                                        th->seq = seq;
+                                        th->ack = ack - 1;
+                                }
                         } else {
-                                if (rev)
-                                        seq -= th->ack, ack -= th->seq;
-                                else
-                                        seq -= th->seq, ack -= th->ack;
+                                if (rev) {
+                                        seq -= th->ack;
+                                        ack -= th->seq;
+                                } else {
+                                        seq -= th->seq;
+                                        ack -= th->ack;
+                                }
                         }
 
                         thseq = th->seq;
@@ -360,15 +366,21 @@ tcp_print(netdissect_options *ndo,
                                                         "%s: calloc", __func__);
                                 }
                                 th->addr = tha;
-                                if (rev)
-                                        th->ack = seq, th->seq = ack - 1;
-                                else
-                                        th->seq = seq, th->ack = ack - 1;
+                                if (rev) {
+                                        th->ack = seq;
+                                        th->seq = ack - 1;
+                                } else {
+                                        th->seq = seq;
+                                        th->ack = ack - 1;
+                                }
                         } else {
-                                if (rev)
-                                        seq -= th->ack, ack -= th->seq;
-                                else
-                                        seq -= th->seq, ack -= th->ack;
+                                if (rev) {
+                                        seq -= th->ack;
+                                        ack -= th->seq;
+                                } else {
+                                        seq -= th->seq;
+                                        ack -= th->ack;
+                                }
                         }
 
                         thseq = th->seq;
