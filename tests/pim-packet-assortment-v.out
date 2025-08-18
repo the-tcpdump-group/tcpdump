@@ -1583,16 +1583,16 @@
 	Assert, cksum 0xd7b4 (correct) group=ff02::6 src=1::7 pref=0 metric=0
   178  2019-07-05 17:27:40.810753 IP6 (hlim 64, next-header PIM (103), payload length 48) 10::2 > 10::1: PIMv2, length 48
 	Register, cksum 0xcc3c (correct), Flags [ Null ]
-	IP6 (class 0xc0, hlim 1, next-header PIM (103), payload length 0) 1::2 > ff02::1:  [|pim]
+	IP6 (class 0xc0, hlim 1, next-header PIM (103), payload length 0) 1::2 > ff02::1: [real length 40, presumed TSO]  [|pim]
   179  2019-07-05 17:27:40.827314 IP6 (hlim 64, next-header PIM (103), payload length 48) 10::2 > 10::1: PIMv2, length 48
 	Register, cksum 0xcc3c (correct), Flags [ Null ]
-	IP6 (class 0xc0, hlim 1, next-header PIM (103), payload length 0) 1::2 > ff02::1:  [|pim]
+	IP6 (class 0xc0, hlim 1, next-header PIM (103), payload length 0) 1::2 > ff02::1: [real length 40, presumed TSO]  [|pim]
   180  2019-07-05 17:27:40.843664 IP6 (hlim 64, next-header PIM (103), payload length 48) 10::2 > 10::1: PIMv2, length 48
 	Register, cksum 0xcc3c (correct), Flags [ Null ]
-	IP6 (class 0xc0, hlim 1, next-header PIM (103), payload length 0) 1::2 > ff02::1:  [|pim]
+	IP6 (class 0xc0, hlim 1, next-header PIM (103), payload length 0) 1::2 > ff02::1: [real length 40, presumed TSO]  [|pim]
   181  2019-07-05 17:27:40.860071 IP6 (hlim 64, next-header PIM (103), payload length 48) 10::2 > 10::1: PIMv2, length 48
 	Register, cksum 0xcc3c (correct), Flags [ Null ]
-	IP6 (class 0xc0, hlim 1, next-header PIM (103), payload length 0) 1::2 > ff02::1:  [|pim]
+	IP6 (class 0xc0, hlim 1, next-header PIM (103), payload length 0) 1::2 > ff02::1: [real length 40, presumed TSO]  [|pim]
   182  2019-07-05 17:27:40.879398 IP6 (hlim 64, next-header PIM (103), payload length 1400) 10::2 > 10::1: PIMv2, length 1400
 	Register, cksum 0x67ce (correct), Flags [ none ]
 	IP6 (hlim 64, next-header UDP (17), payload length 1352) 1::3.2468 > ff02::2.2468: [udp sum ok] UDP, length 1344
@@ -1607,16 +1607,16 @@
 	IP6 (hlim 64, next-header UDP (17), payload length 65487) 1::6.2468 > ff02::5.2468: UDP, length 65479
   186  2019-07-05 17:27:40.957722 IP6 (hlim 64, next-header PIM (103), payload length 48) 10::2 > 10::1: PIMv2, length 48
 	Register, cksum 0xcc32 (correct), Flags [ Null ]
-	IP6 (class 0xc0, hlim 1, next-header PIM (103), payload length 0) 1::7 > ff02::6:  [|pim]
+	IP6 (class 0xc0, hlim 1, next-header PIM (103), payload length 0) 1::7 > ff02::6: [real length 40, presumed TSO]  [|pim]
   187  2019-07-05 17:27:40.975732 IP6 (hlim 64, next-header PIM (103), payload length 48) 10::2 > 10::1: PIMv2, length 48
 	Register, cksum 0xcc32 (correct), Flags [ Null ]
-	IP6 (class 0xc0, hlim 1, next-header PIM (103), payload length 0) 1::7 > ff02::6:  [|pim]
+	IP6 (class 0xc0, hlim 1, next-header PIM (103), payload length 0) 1::7 > ff02::6: [real length 40, presumed TSO]  [|pim]
   188  2019-07-05 17:27:40.993200 IP6 (hlim 64, next-header PIM (103), payload length 48) 10::2 > ff02::d: PIMv2, length 48
 	Register, cksum 0xcd31 (correct), Flags [ Null ]
-	IP6 (class 0xc0, hlim 1, next-header PIM (103), payload length 0) 1::8 > ff02::7:  [|pim]
+	IP6 (class 0xc0, hlim 1, next-header PIM (103), payload length 0) 1::8 > ff02::7: [real length 40, presumed TSO]  [|pim]
   189  2019-07-05 17:27:56.005578 IP6 (hlim 64, next-header PIM (103), payload length 48) 10::2 > ff02::d: PIMv2, length 48
 	Register, cksum 0xcd2f (correct), Flags [ Null ]
-	IP6 (class 0xc0, hlim 1, next-header PIM (103), payload length 0) 1::9 > ff02::8:  [|pim]
+	IP6 (class 0xc0, hlim 1, next-header PIM (103), payload length 0) 1::9 > ff02::8: [real length 40, presumed TSO]  [|pim]
   190  2019-07-05 17:28:11.113454 IP6 (class 0xc0, flowlabel 0xe75c5, hlim 255, next-header PIM (103), payload length 156) 1::b > 10::2: PIMv2, length 156
 	Register, cksum 0xde72 (correct), Flags [ none ]
 	IP6 (hlim 64, next-header UDP (17), payload length 108) 1::a.2468 > ff02::9.2468: [udp sum ok] UDP, length 100
@@ -1634,10 +1634,10 @@
 	IP6 (hlim 64, next-header UDP (17), payload length 108) 1::a.2468 > ff02::9.2468: [udp sum ok] UDP, length 100
   195  2019-07-05 17:28:11.213700 IP6 (class 0xc0, flowlabel 0xfe48b, hlim 255, next-header PIM (103), payload length 48) 10::1 > 10::2: PIMv2, length 48
 	Register, cksum 0x9e6d (correct), Flags [ Null ]
-	IP6 (class 0xc0, hlim 1, next-header PIM (103), payload length 0) 1::c > ff02::a:  [|pim]
+	IP6 (class 0xc0, hlim 1, next-header PIM (103), payload length 0) 1::c > ff02::a: [real length 40, presumed TSO]  [|pim]
   196  2019-07-05 17:28:11.228981 IP6 (class 0xc0, flowlabel 0xfe48b, hlim 255, next-header PIM (103), payload length 48) 10::1 > 10::2: PIMv2, length 48
 	Register, cksum 0x9e7e (incorrect), Flags [ Null ]
-	IP6 (class 0xc0, hlim 1, next-header PIM (103), payload length 0) 1::d > ff02::b:  [|pim]
+	IP6 (class 0xc0, hlim 1, next-header PIM (103), payload length 0) 1::d > ff02::b: [real length 40, presumed TSO]  [|pim]
   197  2019-07-05 17:28:18.502726 IP6 (hlim 64, next-header PIM (103), payload length 42) 10::2 > 10::1: PIMv2, length 42
 	Register Stop, cksum 0xd9c4 (correct) group=ff02::1 source=1::2
   198  2019-07-05 17:28:18.517840 IP6 (hlim 64, next-header PIM (103), payload length 42) 10::2 > 10::1: PIMv2, length 42
