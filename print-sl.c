@@ -72,7 +72,7 @@ sl_if_print(netdissect_options *ndo,
 
 	switch (IP_V(ip)) {
 	case 4:
-	        ip_print(ndo, (const u_char *)ip, length);
+		ip_print(ndo, (const u_char *)ip, length);
 		break;
 	case 6:
 		ip6_print(ndo, (const u_char *)ip, length);
