@@ -124,6 +124,6 @@ loopback_print(netdissect_options *ndo,
 
 invalid:
 	nd_print_invalid(ndo);
-	 ND_TCHECK_LEN(cp, length);
+	ND_TCHECK_LEN(cp, length);
 }
 
