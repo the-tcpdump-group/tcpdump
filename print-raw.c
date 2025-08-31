@@ -32,6 +32,12 @@
 
 /*
  * The DLT_RAW packet has no header. It contains a raw IPv4 or IPv6 packet.
+ *
+ * The DLT_IPV4 packet has no header. It's defined to contains a raw IPv4
+ * packet, but there's no reason to reject IPv6 packets.
+ *
+ * The DLT_IPV6 packet has no header. It's defined to contains a raw IPv6
+ * packet, but there's no reason to reject IPv4 packets.
  */
 
 void
@@ -62,34 +68,4 @@ raw_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 		nd_print_invalid(ndo);
 		break;
 	}
-}
-
-/*
- * The DLT_IPV4 packet has no header. It contains a raw IPv4 packet.
- */
-
-void
-ipv4_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
-{
-	ndo->ndo_protocol = "ip";
-	ndo->ndo_ll_hdr_len += 0;
-
-	if (ndo->ndo_eflag)
-		ND_PRINT("IP ");
-	ip_print(ndo, p, h->len);
-}
-
-/*
- * The DLT_IPV6 packet has no header. It contains a raw IPv6 packet.
- */
-
-void
-ipv6_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
-{
-	ndo->ndo_protocol = "ip6";
-	ndo->ndo_ll_hdr_len += 0;
-
-	if (ndo->ndo_eflag)
-		ND_PRINT("IP6 ");
-	ip6_print(ndo, p, h->len);
 }

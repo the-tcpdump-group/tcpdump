@@ -561,8 +561,6 @@ extern void ieee802_15_4_tap_if_print IF_PRINTER_ARGS;
 extern void ipfc_if_print IF_PRINTER_ARGS;
 extern void ipnet_if_print IF_PRINTER_ARGS;
 extern void ipoib_if_print IF_PRINTER_ARGS;
-extern void ipv4_if_print IF_PRINTER_ARGS;
-extern void ipv6_if_print IF_PRINTER_ARGS;
 extern void juniper_atm1_if_print IF_PRINTER_ARGS;
 extern void juniper_atm2_if_print IF_PRINTER_ARGS;
 extern void juniper_chdlc_if_print IF_PRINTER_ARGS;

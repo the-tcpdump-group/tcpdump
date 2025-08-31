@@ -205,10 +205,20 @@ static const struct printer printers[] = {
 #endif
 	{ raw_if_print,		DLT_RAW },
 #ifdef DLT_IPV4
-	{ ipv4_if_print,	DLT_IPV4 },
+	/*
+	 * Treat this the same way as DLT_RAW, and allow both IPv4 and
+	 * IPv6 packets; there's no reason to use either DLT_IPV4
+	 * or DLT_IPV6 to save raw IP packes, DLT_RAW works fine
+	 * and there's no reason to reserve values for "just IPv4"
+	 * or "just IPv6".
+	 */
+	{ raw_if_print,		DLT_IPV4 },
 #endif
 #ifdef DLT_IPV6
-	{ ipv6_if_print,	DLT_IPV6 },
+	/*
+	 * See previous comment.
+	 */
+	{ raw_if_print,		DLT_IPV6 },
 #endif
 #ifdef DLT_SLIP_BSDOS
 	{ sl_bsdos_if_print,	DLT_SLIP_BSDOS },
