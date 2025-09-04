@@ -65,7 +65,10 @@ RANLIB = @RANLIB@
 DEPENDENCY_CFLAG = @DEPENDENCY_CFLAG@
 
 .c.o:
-	$(CC) $(FULL_CFLAGS) -c -o $@ $<
+	$(CC) $(FULL_CFLAGS) -MD -MP -c -o $@ $<
+	@mv $(@:.o=.d) $(@:.o=.d.tmp)
+	@sed -e 's|.*:|$@:|' <$(@:.o=.d).tmp >$(@:.o=.d)
+	@rm -f $(@:.o=.d).tmp
 
 CSRC =	fptype.c tcpdump.c
 
@@ -419,7 +422,8 @@ lint:
 
 clean:
 	rm -f $(CLEANFILES) $(PROG)-`cat ${srcdir}/VERSION`.tar.gz \
-	config.h.in~ configure~ configure.ac~
+	    config.h.in~ configure~ configure.ac~ \
+	    $(DEPS)
 
 distclean: clean
 	rm -f Makefile config.cache config.log config.status \
@@ -574,3 +578,7 @@ depend:
 
 shellcheck:
 	shellcheck -f gcc -e SC2006 autogen.sh build.sh build_matrix.sh build_common.sh mkdep .ci-coverity-scan-build.sh
+
+DEPS = $(SRC:.c=.d) $(LIBNETDISSECT_SRC:.c=.d)
+-include $(DEPS)
+
