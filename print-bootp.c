@@ -1067,6 +1067,7 @@ rfc1048_print(netdissect_options *ndo,
 					nd_print_invalid(ndo);
 					bp += len;
 					len = 0;
+					break;
 				}
 				ND_PRINT("%u", GET_BE_U_4(bp));
 				bp += 4;
