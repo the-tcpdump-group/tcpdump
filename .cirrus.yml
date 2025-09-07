@@ -80,7 +80,7 @@ coverity_task:
     - apt-get -qy update >/dev/null
     - apt-get -qy install autoconf make gcc >/dev/null
     - apt-get -qy install libssl-dev libsmi2-dev libcap-ng-dev libpcap-dev binutils-dev >/dev/null
-    - apt-get -qy install git curl wget ruby rubygems ruby-json >/dev/null # for the coverity script
+    - apt-get -qy install git curl wget ruby rubygems ruby-json file >/dev/null # for the coverity script
     - apt list --installed 'lib*-dev'
     - ./autogen.sh
     - ./.ci-coverity-scan-build.sh
