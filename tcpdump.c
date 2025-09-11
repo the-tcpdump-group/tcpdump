@@ -571,13 +571,10 @@ show_remote_devices_and_exit(void)
 /*
  * Short options.
  *
- * Note that there we use all letters for short options except for g, k,
+ * Note that there we use all letters for short options except for k,
  * o, and P, and those are used by other versions of tcpdump, and we should
  * only use them for the same purposes that the other versions of tcpdump
  * use them:
- *
- * macOS tcpdump uses -g to force non--v output for IP to be on one
- * line, making it more "g"repable;
  *
  * macOS tcpdump uses -k to specify that packet comments in pcapng files
  * should be printed;
