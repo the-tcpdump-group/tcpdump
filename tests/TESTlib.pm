@@ -153,8 +153,8 @@ sub skip_config_undef {
 sub skip_config_have_decl {
 	my ($name, $value) = @_;
 	$name = 'HAVE_DECL_' . $name;
-	# "Unlike the other ‘AC_CHECK_*S’ macros, when a symbol is not declared,
-	# HAVE_DECL_symbol is defined to ‘0’ instead of leaving HAVE_DECL_symbol
+	# "Unlike the other 'AC_CHECK_*S' macros, when a symbol is not declared,
+	# HAVE_DECL_symbol is defined to '0' instead of leaving HAVE_DECL_symbol
 	# undeclared." -- GNU Autoconf manual.
 	#
 	# (This requires the CMake leg to do the same for the same symbol.)
