@@ -402,8 +402,8 @@ if (!ND_TTEST_LEN(p, l)) goto trunc; \
 #define ND_TCHECK_SIZE(p) ND_TCHECK_LEN(p, sizeof(*(p)))
 
 /*
- * Number of bytes between two pointers, if p1 points to an address after
- * p2; zero otherwise.
+ * Number of bytes between the two pointers arguments p1 and p2, with
+ * p2 being equal to or beyond p1; if it isn't, the result is zero.
  *
  * The result must fit in a u_int; the difference is never negative,
  * and must be able to handle the full size of an address space, so
