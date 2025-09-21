@@ -402,13 +402,20 @@ if (!ND_TTEST_LEN(p, l)) goto trunc; \
 #define ND_TCHECK_SIZE(p) ND_TCHECK_LEN(p, sizeof(*(p)))
 
 /*
- * Number of bytes between two pointers.
+ * Number of bytes between two pointers, if p1 points to an address after
+ * p2; zero otherwise.
+ *
+ * The result must fit in a u_int; the difference is never negative,
+ * and must be able to handle the full size of an address space, so
+ * the signed ptrdiff_t is not appropriate.
  */
 #define ND_BYTES_BETWEEN(p1, p2) ((const u_char *)(p1) >= (const u_char *)(p2) ? 0 : ((u_int)(((const u_char *)(p2)) - (const u_char *)(p1))))
 
 /*
  * Number of bytes remaining in the captured data, starting at the
  * byte pointed to by the argument.
+ *
+ * Returns 0 if the pointer is before the *beginning* of the packet.
  */
 #define ND_BYTES_AVAILABLE_AFTER(p) ((const u_char *)(p) < ndo->ndo_packetp ? 0 : ND_BYTES_BETWEEN((p), ndo->ndo_snapend))
 
