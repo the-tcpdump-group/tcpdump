@@ -27,6 +27,7 @@ const struct tok oui_values[] = {
     { OUI_IANA, "IANA" },
     { OUI_NORTEL, "Nortel Networks SONMP" },
     { OUI_CISCO_90, "Cisco bridged" },
+    { OUI_ITU_T, "ITU-T" },
     { OUI_RFC2684, "Ethernet bridged" },
     { OUI_ATM_FORUM, "ATM Forum" },
     { OUI_CABLE_BPDU, "DOCSIS Spanning Tree" },
