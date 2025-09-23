@@ -34,6 +34,7 @@
 #define	SLOW_PROTO_LACP                     1
 #define	SLOW_PROTO_MARKER                   2
 #define SLOW_PROTO_OAM                      3
+#define SLOW_PROTO_OSSP                    10
 
 #define	LACP_VERSION                        1
 #define	MARKER_VERSION                      1
@@ -42,6 +43,7 @@ static const struct tok slow_proto_values[] = {
     { SLOW_PROTO_LACP, "LACP" },
     { SLOW_PROTO_MARKER, "MARKER" },
     { SLOW_PROTO_OAM, "OAM" },
+    { SLOW_PROTO_OSSP, "OSSP" },
     { 0, NULL}
 };
 
@@ -239,6 +241,7 @@ struct lacp_marker_tlv_terminator_t {
 
 static void slow_marker_lacp_print(netdissect_options *, const u_char *, u_int, u_int);
 static void slow_oam_print(netdissect_options *, const u_char *, u_int);
+static void slow_ossp_print(netdissect_options *, const u_char *, u_int);
 
 void
 slow_print(netdissect_options *ndo,
@@ -278,7 +281,8 @@ slow_print(netdissect_options *ndo,
         print_version = 1;
         break;
 
-    case SLOW_PROTO_OAM: /* fall through */
+    case SLOW_PROTO_OAM:
+    case SLOW_PROTO_OSSP:
         print_version = 0;
         break;
 
@@ -311,6 +315,13 @@ slow_print(netdissect_options *ndo,
 
     switch (subtype) {
     default: /* should not happen */
+        break;
+
+    case SLOW_PROTO_OSSP:
+        /* skip subtype */
+        len -= 1;
+        pptr += 1;
+        slow_ossp_print(ndo, pptr, len);
         break;
 
     case SLOW_PROTO_OAM:
@@ -732,4 +743,30 @@ slow_oam_print(netdissect_options *ndo,
 
 tooshort:
     ND_PRINT("\n\t\t packet is too short");
+}
+
+/*
+ * Print Organization Specific Slow Protocol. (802.3 Annex 57B)
+ */
+static void
+slow_ossp_print(netdissect_options *ndo,
+                const u_char *tptr, u_int tlen)
+{
+    uint32_t oui;
+
+    ND_ICHECKMSG_U("length", tlen, <, 3);
+
+    oui = GET_BE_U_3(tptr);
+    ND_PRINT("\n\tOUI: %s (0x%06x)",
+             tok2str(oui_values, "Unknown", oui),
+             oui);
+    tlen -= 3;
+    tptr += 3;
+
+    print_unknown_data(ndo, tptr, "\n\t", tlen);
+
+    return;
+
+invalid:
+    nd_print_invalid(ndo);
 }

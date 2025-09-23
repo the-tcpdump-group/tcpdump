@@ -505,6 +505,7 @@ lldp_mud-v	lldp_mudurl.pcap	lldp_mudurl-v.out	-e -v
 lldp_mud-vv	lldp_mudurl.pcap	lldp_mudurl-vv.out	-e -vv
 lldp_8021_linkagg-v  lldp_8021_linkagg.pcap lldp_8021_linkagg-v.out  -v
 lldp_8021_linkagg-vv lldp_8021_linkagg.pcap lldp_8021_linkagg-vv.out -vv
+slow-ossp	slow-ossp.pcap	slow-ossp.out	-v
 # fuzzed pcap
 udld-inf-loop-1-v  udld-inf-loop-1.pcapng  udld-inf-loop-1-v.out  -v
 
