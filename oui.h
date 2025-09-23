@@ -21,6 +21,7 @@ extern const struct tok smi_values[];
 #define OUI_IANA              0x00005E  /* IANA */
 #define OUI_NORTEL            0x000081  /* Nortel SONMP */
 #define OUI_CISCO_90          0x0000f8  /* Cisco bridging */
+#define OUI_ITU_T             0x0019a7  /* International Telecommunication Union - Telecommunication Standardization Sector */
 #define OUI_RFC2684           0x0080c2  /* RFC 2427/2684 bridged Ethernet */
 #define OUI_ATM_FORUM         0x00A03E  /* ATM Forum */
 #define OUI_CABLE_BPDU        0x00E02F  /* DOCSIS spanning tree BPDU */
