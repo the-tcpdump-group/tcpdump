@@ -61,12 +61,24 @@ and ask!
      supports these options,
    * have the `Makefile` support `make depend` and the `configure` script run it.
 
-6) Configure and build
+6) Make your changes
+
+7) Generate the configure scripts
    ```
-   ./configure && make -s && make check
+   ./autogen.sh
    ```
 
-7) Add/update tests
+8) Configure
+   ```
+   ./configure
+   ```
+
+9) Build
+   ```
+   make -s
+   ```
+
+10) Add/update tests
    The `tests` directory contains regression tests of the dissection of captured
    packets.  Those captured packets were saved running tcpdump with option
    `-w sample.pcap`.  Additional options, such as `-n`, are used to create relevant
@@ -96,12 +108,12 @@ and ask!
    It is often useful to have test outputs with different verbosity levels
    (none, `-v`, `-vv`, `-vvv`, etc.) depending on the code.
 
-8) Test using `make check` (current build options) and `./build_matrix.sh`
+11) Test using `make check` (current build options) and `./build_matrix.sh`
    (a multitude of build options, build systems and compilers). If you can,
    test on more than one operating system. Don't send a pull request until
    all tests pass.
 
-9) Try to rebase your commits to keep the history simple.
+12) Try to rebase your commits to keep the history simple.
    ```
    git fetch upstream
    git rebase upstream/master
@@ -109,9 +121,9 @@ and ask!
    (If the rebase fails and you cannot resolve, issue `git rebase --abort`
    and ask for help in the pull request comment.)
 
-10) Once 100% happy, put your work into your forked repository using `git push`.
+13) Once 100% happy, put your work into your forked repository using `git push`.
 
-11) [Initiate and send](https://help.github.com/articles/using-pull-requests/)
+14) [Initiate and send](https://help.github.com/articles/using-pull-requests/)
     a pull request.
     This will trigger the upstream repository CI tests.
 
