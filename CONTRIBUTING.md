@@ -78,19 +78,18 @@ and ask!
    make -s
    ```
 
-10) Add/update tests
-   The `tests` directory contains regression tests of the dissection of captured
-   packets.  Those captured packets were saved running tcpdump with option
-   `-w sample.pcap`.  Additional options, such as `-n`, are used to create relevant
-   and reproducible output; `-#` is used to indicate which particular packets
-   have output that differs.  The tests are run with the `TZ` environment
-   variable set to `GMT0`, so that UTC, rather than the local time where the
-   tests are being run, is used when "local time" values are printed.  The
-   actual test compares the current text output with the expected result
-   (`sample.out`) saved from a previous version.
+10) Add/update tests. The `tests` directory contains regression tests of the dissection of captured
+    packets.  Those captured packets were saved running tcpdump with option
+    `-w sample.pcap`.  Additional options, such as `-n`, are used to create relevant
+    and reproducible output; `-#` is used to indicate which particular packets
+    have output that differs.  The tests are run with the `TZ` environment
+    variable set to `GMT0`, so that UTC, rather than the local time where the
+    tests are being run, is used when "local time" values are printed.  The
+    actual test compares the current text output with the expected result
+    (`sample.out`) saved from a previous version.
    
-   Any new/updated fields in a dissector must be present in a `sample.pcap` file
-   and the corresponding output file.
+    Any new/updated fields in a dissector must be present in a `sample.pcap` file
+    and the corresponding output file.
 
    Configuration is set in `tests/TESTLIST`.
    Each line in this file has the following format:
