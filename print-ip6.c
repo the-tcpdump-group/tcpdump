@@ -466,14 +466,13 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 					/*
 					 * OK, we didn't see any extension
-					 * header, but that means we have
-					 * no payload, so set the length
-					 * to the IPv6 header length,
-					 * and change the snapshot length
-					 * accordingly.
+					 * header - presume TSO without a
+					 * Jumbo Payload option.
 					 */
-					len = sizeof(struct ip6_hdr);
-					nd_change_snaplen(ndo, bp, len);
+					len = length;
+					if (ndo->ndo_vflag)
+						ND_PRINT("[real length %u, presumed TSO] ",
+							 len);
 
 					/*
 					 * Now subtract the length of
