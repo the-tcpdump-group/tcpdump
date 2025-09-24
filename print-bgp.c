@@ -375,6 +375,17 @@ static const struct tok bgp_origin_values[] = {
     { 0, NULL}
 };
 
+/*
+ * https://datatracker.ietf.org/doc/html/draft-ietf-idr-sr-policy-safi#section-2.4.5
+ */
+static const struct tok bgp_sr_te_enlp_values[] = {
+    { 1, "IPv4" },
+    { 2, "IPv6" },
+    { 3, "Both" },
+    { 4, "None" },
+    { 0, NULL }
+};
+
 #define BGP_PMSI_TUNNEL_RSVP_P2MP 1
 #define BGP_PMSI_TUNNEL_LDP_P2MP  2
 #define BGP_PMSI_TUNNEL_PIM_SSM   3
@@ -397,6 +408,179 @@ static const struct tok bgp_pmsi_tunnel_values[] = {
 static const struct tok bgp_pmsi_flag_values[] = {
     { 0x01, "Leaf Information required"},
     { 0, NULL}
+};
+
+/* https://www.iana.org/assignments/bgp-tunnel-encapsulation/bgp-tunnel-encapsulation.xhtml#tunnel-types */
+#define BGP_TUNNEL_ENCAP_SR_TE     15
+
+static const struct tok bgp_tunnel_encap_values[] = {
+    { BGP_TUNNEL_ENCAP_SR_TE,      "SR Policy"},
+    { 0,                           NULL}
+};
+
+/* https://www.iana.org/assignments/bgp-tunnel-encapsulation/bgp-tunnel-encapsulation.xhtml#tunnel-sub-tlvs */
+#define BGP_TUNNEL_ENCAP_ENCAPSULATION          1
+#define BGP_TUNNEL_ENCAP_PROTOCOL_TYPE          2
+#define BGP_TUNNEL_ENCAP_IPSEC_TA               3
+#define BGP_TUNNEL_ENCAP_COLOR                  4
+#define BGP_TUNNEL_ENCAP_LBB                    5
+#define BGP_TUNNEL_ENCAP_REMOTE_ENDPOINT        6
+#define BGP_TUNNEL_ENCAP_IPV4_DS                7
+#define BGP_TUNNEL_ENCAP_UDP_DPORT              8
+#define BGP_TUNNEL_ENCAP_ELH                    9
+#define BGP_TUNNEL_ENCAP_LABEL_STACK            10
+#define BGP_TUNNEL_ENCAP_PREFIX_SID             11
+#define BGP_TUNNEL_ENCAP_SR_TE_PREFERENCE       12
+#define BGP_TUNNEL_ENCAP_SR_TE_BINDING_SID      13
+#define BGP_TUNNEL_ENCAP_SR_TE_ENLP             14
+#define BGP_TUNNEL_ENCAP_SR_TE_PRIORITY         15
+#define BGP_TUNNEL_ENCAP_SR_TE_SRV6_BINDING_SID 20
+#define BGP_TUNNEL_ENCAP_SR_TE_SEGMENT_LIST     128
+#define BGP_TUNNEL_ENCAP_SR_TE_POLICY_CP_NAME   129
+#define BGP_TUNNEL_ENCAP_SR_TE_POLICY_NAME      130
+
+static const struct tok bgp_tunnel_encap_subtlv_values[] = {
+    { BGP_TUNNEL_ENCAP_ENCAPSULATION,           "Encapsulation"},
+    { BGP_TUNNEL_ENCAP_PROTOCOL_TYPE,           "Protocol Type"},
+    { BGP_TUNNEL_ENCAP_IPSEC_TA,                "IPsec Tunnel Authenticator"},
+    { BGP_TUNNEL_ENCAP_COLOR,                   "Color"},
+    { BGP_TUNNEL_ENCAP_LBB,                     "Load-Balancing Block"},
+    { BGP_TUNNEL_ENCAP_REMOTE_ENDPOINT,         "Remote Endpoint"},
+    { BGP_TUNNEL_ENCAP_IPV4_DS,                 "IPv4 DS Field"},
+    { BGP_TUNNEL_ENCAP_UDP_DPORT,               "UDP Destination Port"},
+    { BGP_TUNNEL_ENCAP_ELH,                     "Embedded Label Handling"},
+    { BGP_TUNNEL_ENCAP_LABEL_STACK,             "MPLS Label Stack"},
+    { BGP_TUNNEL_ENCAP_PREFIX_SID,              "Prefix SID"},
+    { BGP_TUNNEL_ENCAP_SR_TE_PREFERENCE,        "Preference"},
+    { BGP_TUNNEL_ENCAP_SR_TE_BINDING_SID,       "Binding SID"},
+    { BGP_TUNNEL_ENCAP_SR_TE_ENLP,              "Explicit Null Label Policy"},
+    { BGP_TUNNEL_ENCAP_SR_TE_PRIORITY,          "Priority"},
+    { BGP_TUNNEL_ENCAP_SR_TE_SRV6_BINDING_SID,  "SRv6 Binding SID"},
+    { BGP_TUNNEL_ENCAP_SR_TE_SEGMENT_LIST,      "Segment List"},
+    { BGP_TUNNEL_ENCAP_SR_TE_POLICY_CP_NAME,    "Policy CP Name"},
+    { BGP_TUNNEL_ENCAP_SR_TE_POLICY_NAME,       "Policy Name"},
+    { 0,                                        NULL}
+};
+
+/*
+ * https://datatracker.ietf.org/doc/html/draft-ietf-idr-sr-policy-safi#section-2.4
+ */
+#define BGP_TUNNEL_ENCAP_SR_TE_PREFERENCE_LENGTH                          6
+#define BGP_TUNNEL_ENCAP_SR_TE_BINDING_SID_NO_SID_LENGTH                  2
+#define BGP_TUNNEL_ENCAP_SR_TE_BINDING_SID_4_OCTET_LENGTH                 6
+#define BGP_TUNNEL_ENCAP_SR_TE_BINDING_SID_IPV6_LENGTH                   18
+#define BGP_TUNNEL_ENCAP_SR_TE_SRV6_BINDING_SID_BASE_LENGTH              18
+#define BGP_TUNNEL_ENCAP_SR_TE_SRV6_BINDING_SID_ENDPOINT_BEHAVIOR_LENGTH 26
+#define BGP_TUNNEL_ENCAP_SR_TE_ENLP_LENGTH                                3
+
+/*
+ * https://datatracker.ietf.org/doc/html/draft-ietf-idr-sr-policy-safi#section-2.4.4
+ */
+#define BGP_TUNNEL_ENCAP_SEGMENT_LIST_TYPE_A   1
+#define BGP_TUNNEL_ENCAP_SEGMENT_LIST_WEIGHT   9
+#define BGP_TUNNEL_ENCAP_SEGMENT_LIST_TYPE_B  13
+
+#define BGP_TUNNEL_ENCAP_SEGMENT_LIST_TYPE_A_LENGTH    6
+#define BGP_TUNNEL_ENCAP_SEGMENT_LIST_WEIGHT_LENGTH    6
+#define BGP_TUNNEL_ENCAP_SEGMENT_LIST_TYPE_B_LENGTH   18
+#define BGP_TUNNEL_ENCAP_SEGMENT_LIST_TYPE_B_ENDPOINT_BEHAVIOR_LENGTH   26
+
+
+/*
+ * https://datatracker.ietf.org/doc/html/draft-ietf-idr-sr-policy-safi#section-2.4.4 and
+ * https://datatracker.ietf.org/doc/html/draft-ietf-idr-bgp-sr-segtypes-ext#section-2
+ */
+static const struct tok bgp_segmentlist_segment_values[] = {
+    { BGP_TUNNEL_ENCAP_SEGMENT_LIST_TYPE_A,      "Segment Type A" },  //SID only, in the form of MPLS Label
+    { 2,                                         "Deprecated"     },  //Previous SRv6
+    { 3,                                         "Segment Type C" },  //IPv4 Node Address with optional SID
+    { 4,                                         "Segment Type D" },  //IPv6 Node Address with optional SID for SR MPLS
+    { 5,                                         "Segment Type E" },  //IPv4 Address + index with optional SID
+    { 6,                                         "Segment Type F" },  //IPv4 Local and Remote addresses with optional SID
+    { 7,                                         "Segment Type G" },  //IPv6 Address + index for local and remote pair with optional SID for SR MPLS
+    { 8,                                         "Segment Type H" },  //IPv6 Local and Remote addresses with optional SID for SR MPLS
+    { BGP_TUNNEL_ENCAP_SEGMENT_LIST_WEIGHT,      "Weight" },
+    { BGP_TUNNEL_ENCAP_SEGMENT_LIST_TYPE_B,      "Segment Type B" },  //SRv6 SID
+    { 14,                                        "Segment Type I" },  //IPv6 Node and SID for SRv6
+    { 15,                                        "Segment Type J" },  //IPv6 Node + index for remote and local pair and SID for SRv6
+    { 16,                                        "Segment Type K" },  //IPv6 Local/Remote addresses and SID for SRv6
+    { 0,                                         NULL}
+};
+
+/* https://datatracker.ietf.org/doc/html/draft-ietf-idr-sr-policy-safi#section-2.4.2 */
+static const struct tok bgp_sr_binding_sid_flags[] = {
+    { 0x80, "S" },      // Specified-BSID-only
+    { 0x40, "I" },      // Drop Upon Invalid
+    { 0,    NULL }
+};
+
+#define BGP_TUNNEL_ENCAP_SRV6_ENDPOINT_BEHAVIOR_PRESENT	0x20
+/* https://datatracker.ietf.org/doc/html/draft-ietf-idr-sr-policy-safi#section-2.4.3 */
+static const struct tok bgp_srv6_binding_sid_flags[] = {
+    { 0x80, "S" },      // Specified-BSID-only
+    { 0x40, "I" },      // Drop Upon Invalid
+    { BGP_TUNNEL_ENCAP_SRV6_ENDPOINT_BEHAVIOR_PRESENT, "B" },      // SRv6 Endpoint Behavior and SID Structure present
+    { 0,    NULL }
+};
+
+#define BGP_TUNNEL_ENCAP_SR_POLICY_SEGMENT_ENDPOINT_BEHAVIOR_PRESENT 0x10
+/* https://datatracker.ietf.org/doc/html/draft-ietf-idr-sr-policy-safi#section-6.8 */
+static const struct tok bgp_sr_policy_segment_flags[] = {
+    { 0x80, "V" },      // Segment Verification Flag
+    { BGP_TUNNEL_ENCAP_SR_POLICY_SEGMENT_ENDPOINT_BEHAVIOR_PRESENT, "B" },      // SRv6 Endpoint Behavior & SID Structure
+    { 0,    NULL }
+};
+
+/* https://www.iana.org/assignments/segment-routing/segment-routing.xhtml#srv6-endpoint-behaviors */
+static const struct tok bgp_sr_v6_endpoint_behaviors[] = {
+    { 1,        "End" },
+    { 2,        "End with PSP" },
+    { 3,        "End with USP" },
+    { 4,        "End with PSP & USP" },
+    { 5,        "End.X" },
+    { 6,        "End.X with PSP" },
+    { 7,        "End.X with USP" },
+    { 8,        "End.X with PSP & USP" },
+    { 9,        "End.T" },
+    { 10,       "End.T with PSP" },
+    { 11,       "End.T with USP" },
+    { 12,       "End.T with PSP & USP" },
+    { 14,       "End.B6.Encaps" },
+    { 15,       "End.BM" },
+    { 16,       "End.DX6" },
+    { 17,       "End.DX4" },
+    { 18,       "End.DT6" },
+    { 19,       "End.DT4" },
+    { 20,       "End.DT46" },
+    { 21,       "End.DX2" },
+    { 22,       "End.DX2V" },
+    { 23,       "End.DT2U" },
+    { 24,       "End.DT2M" },
+    { 25,       "Reserved" },
+    { 27,       "End.B6.Encaps.Red" },
+    { 28,       "End with USD" },
+    { 29,       "End with PSP & USD" },
+    { 30,       "End with USP & USD" },
+    { 31,       "End with PSP, USP & USD" },
+    { 32,       "End.X with USD" },
+    { 33,       "End.X with PSP & USD" },
+    { 34,       "End.X with USP & USD" },
+    { 35,       "End.X with PSP, USP & USD" },
+    { 36,       "End.T with USD" },
+    { 37,       "End.T with PSP & USD" },
+    { 38,       "End.T with USP & USD" },
+    { 39,       "End.T with PSP, USP & USD" },
+    { 40,       "End.MAP" },
+    { 41,       "End.Limit" },
+    { 69,       "End.M.GTP6.D" },
+    { 70,       "End.M.GTP6.Di" },
+    { 71,       "End.M.GTP6.E" },
+    { 72,       "End.M.GTP4.E" },
+    { 75,       "End.Replicate" },
+    { 84,       "End.NSH - NSH Segment" },
+    { 32767,    "The SID defined in [RFC8754]" },
+    { 65535,    "Opaque" },
+    { 0,        NULL }
 };
 
 #define BGP_AIGP_TLV 1
@@ -438,6 +622,8 @@ static const struct tok bgp_role_values[] = {
 #define SAFNUM_MDT                      66
 /* RFC7432 */
 #define SAFNUM_EVPN                     70
+/* draft-ietf-idr-sr-policy-safi */
+#define SAFNUM_SR_TE                    73
 /* RFC4364 */
 #define SAFNUM_VPNUNICAST               128
 /* RFC6513 */
@@ -458,6 +644,7 @@ static const struct tok bgp_safi_values[] = {
     { SAFNUM_VPLS,              "VPLS"},
     { SAFNUM_MDT,               "MDT"},
     { SAFNUM_EVPN,              "EVPN"},
+    { SAFNUM_SR_TE,             "SR-TE Policy"},
     { SAFNUM_VPNUNICAST,        "labeled VPN Unicast"},
     { SAFNUM_VPNMULTICAST,      "labeled VPN Multicast"},
     { SAFNUM_VPNUNIMULTICAST,   "labeled VPN Unicast+Multicast"},
@@ -1222,6 +1409,53 @@ print_mdt_vpn_nlri(netdissect_options *ndo, const u_char *pptr)
     return -2;
 }
 
+#define SRTE_IP_NLRI_LEN     96
+#define SRTE_IP6_NLRI_LEN    192
+
+/*
+ *    +------------------+
+ *    |  Distinguisher   | 4 octets
+ *    +------------------+
+ *    |  Policy Color    | 4 octets
+ *    +------------------+
+ *    |  Endpoint        | 4 or 16 octets
+ *    +------------------+
+ */
+static int
+print_srte_nlri(netdissect_options *ndo,
+                 const u_char *pptr, int af)
+{
+    uint8_t nlri_len;
+    nlri_len = GET_U_1(pptr);
+    pptr ++;
+
+    if (af == AFNUM_IP && nlri_len != SRTE_IP_NLRI_LEN)
+        return -1;
+    else if (af == AFNUM_IP6 && nlri_len != SRTE_IP6_NLRI_LEN)
+        return -1;
+
+    uint32_t distinguisher;
+    distinguisher = GET_BE_U_4(pptr);
+    pptr += sizeof(distinguisher);
+
+    uint32_t color;
+    color = GET_BE_U_4(pptr);
+    pptr += sizeof(color);
+
+    ND_PRINT("\n\t      NLRI Length: %u, Distinguisher: %u, Color: %u",
+                        nlri_len, distinguisher, color);
+
+    if (af == AFNUM_IP) {
+        ND_PRINT(", Endpoint: %s",
+                 GET_IPADDR_STRING(pptr));
+    } else if (af == AFNUM_IP6) {
+        ND_PRINT(", Endpoint: %s",
+                 GET_IP6ADDR_STRING(pptr));
+    }
+
+    return nlri_len + 1;
+}
+
 #define BGP_MULTICAST_VPN_ROUTE_TYPE_INTRA_AS_I_PMSI   1
 #define BGP_MULTICAST_VPN_ROUTE_TYPE_INTER_AS_I_PMSI   2
 #define BGP_MULTICAST_VPN_ROUTE_TYPE_S_PMSI            3
@@ -1740,6 +1974,7 @@ bgp_mp_af_print(netdissect_options *ndo,
         case (AFNUM_IP<<8 | SAFNUM_VPNUNIMULTICAST):
         case (AFNUM_IP<<8 | SAFNUM_MULTICAST_VPN):
         case (AFNUM_IP<<8 | SAFNUM_MDT):
+        case (AFNUM_IP<<8 | SAFNUM_SR_TE):
         case (AFNUM_IP6<<8 | SAFNUM_UNICAST):
         case (AFNUM_IP6<<8 | SAFNUM_MULTICAST):
         case (AFNUM_IP6<<8 | SAFNUM_UNIMULTICAST):
@@ -1747,6 +1982,7 @@ bgp_mp_af_print(netdissect_options *ndo,
         case (AFNUM_IP6<<8 | SAFNUM_VPNUNICAST):
         case (AFNUM_IP6<<8 | SAFNUM_VPNMULTICAST):
         case (AFNUM_IP6<<8 | SAFNUM_VPNUNIMULTICAST):
+        case (AFNUM_IP6<<8 | SAFNUM_SR_TE):
         case (AFNUM_NSAP<<8 | SAFNUM_UNICAST):
         case (AFNUM_NSAP<<8 | SAFNUM_MULTICAST):
         case (AFNUM_NSAP<<8 | SAFNUM_UNIMULTICAST):
@@ -1811,6 +2047,12 @@ bgp_nlri_print(netdissect_options *ndo, uint16_t af, uint8_t safi,
                 break;
             case (AFNUM_IP<<8 | SAFNUM_RT_ROUTING_INFO):
                 advance = print_rt_routing_info(ndo, tptr);
+                break;
+            case (AFNUM_IP<<8 | SAFNUM_SR_TE): /* fall through */
+            case (AFNUM_IP6<<8 | SAFNUM_SR_TE):
+                advance = print_srte_nlri(ndo, tptr, af);
+                if (advance == -1)
+                    ND_PRINT( "\n\t    (illegal prefix length)");
                 break;
             case (AFNUM_IP<<8 | SAFNUM_MULTICAST_VPN): /* fall through */
             case (AFNUM_IP6<<8 | SAFNUM_MULTICAST_VPN):
@@ -1892,6 +2134,263 @@ static const struct tok bgp_flags[] = {
 	{ 0x10, "E"},
 	{ 0, NULL }
 };
+
+/*
+ * When an SR-MPLS SID is present in a segment, it is
+ * encoded as specified in
+ * https://datatracker.ietf.org/doc/html/draft-ietf-idr-sr-policy-safi#section-2.4.2
+ *     0                   1                   2                   3
+ *     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *    |          Label                        | TC  |S|       TTL     |
+ *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ */
+static int
+print_srmpls_sid(netdissect_options *ndo, const u_char *sptr) {
+    uint32_t label = GET_BE_U_3(sptr);
+    uint8_t tc_s = label & 0xf;
+    label = label >> 4;
+    sptr += 3;
+    uint8_t ttl;
+    ttl = GET_U_1(sptr);
+    sptr += 1;
+    ND_PRINT( ", Label: %u, TC: %u, S: %u, TTL: %u", label, tc_s>>1, tc_s&1, ttl);
+    // how far did we advance sptr?
+    return 4;
+}
+
+/*
+ * When the SRv6 Endpoint Behavior and SID Structure is
+ * present, it is encoded as specified in
+ * https://datatracker.ietf.org/doc/html/draft-ietf-idr-sr-policy-safi#BEHAVIORSTRUCT
+ */
+static int
+print_srv6_endpoint_behavior(netdissect_options *ndo, const u_char *sptr) {
+    uint16_t behavior = GET_BE_U_2(sptr);
+    sptr += 4;  // skip behavior and reserved
+    ND_PRINT( ", Behavior: %s (%04x), LB Length %d, LN Length %d, Function Length %d, Arg Length %d",
+            tok2str(bgp_sr_v6_endpoint_behaviors, "Unknown", behavior), behavior,
+            GET_U_1(sptr), GET_U_1(sptr + 1), GET_U_1(sptr + 2), GET_U_1(sptr + 3));
+    // how far did we advance sptr?
+    return 8;
+}
+
+static int
+bgp_tunnel_encap_print(netdissect_options *ndo,
+                const u_char **tptr, uint8_t tunnel_len)
+{
+    const u_char *rptr = *tptr;
+    while (rptr < *tptr + tunnel_len) {
+        uint8_t subtlv_type;
+        uint16_t subtlv_len;
+        subtlv_type = GET_U_1(rptr);
+        rptr += sizeof(subtlv_type);
+        ND_PRINT( "\n\t      %s (%u)",
+                  tok2str(bgp_tunnel_encap_subtlv_values, "Unknown", subtlv_type),
+                  subtlv_type);
+        /* https://www.rfc-editor.org/rfc/rfc9012.html#name-bgp-tunnel-encapsulation-att
+         * describes that the length field can be one or two bytes: decode it here:
+         */
+        if (subtlv_type < 128) {
+                /* 1-byte length */
+                subtlv_len = GET_U_1(rptr);
+                rptr += 1;
+        } else {
+                /* 2-byte length */
+                subtlv_len = GET_BE_U_2(rptr);
+                rptr += 2;
+        }
+        ND_PRINT( ", length: %u", subtlv_len);
+        switch (subtlv_type) {
+            case BGP_TUNNEL_ENCAP_SR_TE_BINDING_SID: {
+                if (subtlv_len != BGP_TUNNEL_ENCAP_SR_TE_BINDING_SID_NO_SID_LENGTH
+                        && subtlv_len != BGP_TUNNEL_ENCAP_SR_TE_BINDING_SID_4_OCTET_LENGTH
+                        && subtlv_len != BGP_TUNNEL_ENCAP_SR_TE_BINDING_SID_IPV6_LENGTH) {
+                    ND_PRINT( " (invalid length)");
+                    rptr = *tptr + tunnel_len;
+                    break;
+                }
+                uint8_t flags;
+                flags = GET_U_1(rptr);
+                rptr += sizeof(flags);
+                ND_PRINT( ", Flags [%s]", bittok2str_nosep(bgp_sr_binding_sid_flags, "", flags ));
+                rptr += 1; /*to ignore reserved field*/
+                if (subtlv_len == BGP_TUNNEL_ENCAP_SR_TE_BINDING_SID_NO_SID_LENGTH) {
+                    ND_PRINT( ", No Binding SID present");
+                } else if (subtlv_len == BGP_TUNNEL_ENCAP_SR_TE_BINDING_SID_4_OCTET_LENGTH) {
+                    //4-octet SID
+                    rptr += print_srmpls_sid(ndo, rptr);
+                } else if (subtlv_len == BGP_TUNNEL_ENCAP_SR_TE_BINDING_SID_IPV6_LENGTH) {
+                    //16-octet SID
+                    ND_PRINT( ", ipv6 address: %s", GET_IP6ADDR_STRING(rptr));
+                    rptr += sizeof(struct in6_addr);
+                }
+                break;
+            }
+            case BGP_TUNNEL_ENCAP_SR_TE_SRV6_BINDING_SID: {
+                uint8_t flags;
+                uint8_t expected_length;
+                flags = GET_U_1(rptr);
+                if (flags & BGP_TUNNEL_ENCAP_SRV6_ENDPOINT_BEHAVIOR_PRESENT) {
+                    expected_length = BGP_TUNNEL_ENCAP_SR_TE_SRV6_BINDING_SID_ENDPOINT_BEHAVIOR_LENGTH;
+                } else {
+                    expected_length = BGP_TUNNEL_ENCAP_SR_TE_SRV6_BINDING_SID_BASE_LENGTH;
+                }
+                if (subtlv_len != expected_length) {
+                    ND_PRINT( " (invalid length)");
+                    rptr = *tptr + tunnel_len;
+                    break;
+                }
+                rptr += sizeof(flags);
+                ND_PRINT( ", Flags [%s]", bittok2str_nosep(bgp_srv6_binding_sid_flags, "", flags ));
+                rptr += 1; /*to ignore reserved field*/
+                // 16-byte binding SID
+                ND_PRINT( ", SRv6 Binding SID %s", GET_IP6ADDR_STRING(rptr));
+                rptr += sizeof(struct in6_addr);
+                if (flags & BGP_TUNNEL_ENCAP_SRV6_ENDPOINT_BEHAVIOR_PRESENT) {
+                    rptr += print_srv6_endpoint_behavior(ndo, rptr);
+                }
+                break;
+            }
+            case BGP_TUNNEL_ENCAP_SR_TE_PREFERENCE: {
+                if (subtlv_len != BGP_TUNNEL_ENCAP_SR_TE_PREFERENCE_LENGTH) {
+                    ND_PRINT( " (invalid length)");
+                    rptr = *tptr + tunnel_len;
+                    break;
+                }
+                uint8_t flags;
+                flags = GET_U_1(rptr);
+                rptr += sizeof(flags);
+                rptr += 1; /*to ignore reserved field*/
+                uint32_t preference;
+                preference = GET_BE_U_4(rptr);
+                rptr += sizeof(preference);
+                ND_PRINT( ", Flags [], Preference: %u", preference);
+                break;
+            }
+            case BGP_TUNNEL_ENCAP_SR_TE_ENLP: {
+                if (subtlv_len != BGP_TUNNEL_ENCAP_SR_TE_ENLP_LENGTH) {
+                    ND_PRINT(" (invalid length)");
+                    rptr = *tptr + tunnel_len;
+                    break;
+                }
+                uint8_t flags;
+                flags = GET_U_1(rptr);
+                rptr += sizeof(flags);
+                rptr += 1; /*to ignore reserved field*/
+                uint8_t enlp;
+                enlp = GET_U_1(rptr);
+                rptr += sizeof(enlp);
+                ND_PRINT(", Flags [], ENLP: %s (%u)",
+                         tok2str(bgp_sr_te_enlp_values, "Unknown", enlp), enlp);
+                break;
+            }
+            case BGP_TUNNEL_ENCAP_SR_TE_SEGMENT_LIST: {
+                rptr += 1; /*to ignore reserved field*/
+                if (subtlv_len == 0) {
+                    ND_PRINT( "\n\t        (invalid length)");
+                    rptr = *tptr + tunnel_len;
+                    break;
+                }
+                subtlv_len -= 1;
+                const u_char *sptr = rptr;
+                while (sptr < rptr + subtlv_len) {
+                    uint8_t sl_subtlv_type;
+                    sl_subtlv_type = GET_U_1(sptr);
+                    sptr += sizeof(sl_subtlv_type);
+                    ND_PRINT( "\n\t        %s (%u)",
+                            tok2str(bgp_segmentlist_segment_values, "Unknown", sl_subtlv_type),
+                            sl_subtlv_type);
+                    switch (sl_subtlv_type) {
+                    case BGP_TUNNEL_ENCAP_SEGMENT_LIST_TYPE_A: {
+                        uint8_t length;
+                        length = GET_U_1(sptr);
+                        sptr += sizeof(length);
+                        ND_PRINT( ", length: %u", length);
+                        if (length != BGP_TUNNEL_ENCAP_SEGMENT_LIST_TYPE_A_LENGTH) {
+                            ND_PRINT( " (invalid length)");
+                            sptr = rptr + subtlv_len;
+                            break;
+                        }
+                        uint8_t flags;
+                        flags = GET_U_1(sptr);
+                        sptr += sizeof(flags);
+                        ND_PRINT(", Flags [%s]", bittok2str_nosep(bgp_sr_policy_segment_flags, "", flags));
+                        sptr += 1;  /*to ignore reserved octet*/
+                        sptr += print_srmpls_sid(ndo, sptr);
+                        break;
+                    }
+                    case BGP_TUNNEL_ENCAP_SEGMENT_LIST_TYPE_B: {
+                        uint8_t length;
+                        length = GET_U_1(sptr);
+                        sptr += sizeof(length);
+                        ND_PRINT( ", length: %u", length);
+                        uint8_t flags;
+                        flags = GET_U_1(sptr);
+                        uint8_t expected_len;
+                        if (flags & BGP_TUNNEL_ENCAP_SR_POLICY_SEGMENT_ENDPOINT_BEHAVIOR_PRESENT) {
+                            expected_len = BGP_TUNNEL_ENCAP_SEGMENT_LIST_TYPE_B_ENDPOINT_BEHAVIOR_LENGTH;
+                        } else {
+                            expected_len = BGP_TUNNEL_ENCAP_SEGMENT_LIST_TYPE_B_LENGTH;
+                        }
+                        if (length != expected_len) {
+                            ND_PRINT( " (invalid length)");
+                            sptr = rptr + subtlv_len;
+                            break;
+                        }
+                        sptr += sizeof(flags);
+                        ND_PRINT(", Flags [%s]", bittok2str_nosep(bgp_sr_policy_segment_flags, "", flags));
+                        sptr += 1;  /*to ignore reserved octet*/
+                        ND_PRINT( ", SRv6 Binding SID %s", GET_IP6ADDR_STRING(sptr));
+                        sptr += sizeof(struct in6_addr);
+                        if (flags & BGP_TUNNEL_ENCAP_SR_POLICY_SEGMENT_ENDPOINT_BEHAVIOR_PRESENT) {
+                            sptr += print_srv6_endpoint_behavior(ndo, sptr);
+                        }
+                        break;
+                    }
+                    case BGP_TUNNEL_ENCAP_SEGMENT_LIST_WEIGHT: {
+                        uint8_t length;
+                        length = GET_U_1(sptr);
+                        sptr += sizeof(length);
+                        ND_PRINT( ", length: %u", length);
+                        if (length != BGP_TUNNEL_ENCAP_SEGMENT_LIST_WEIGHT_LENGTH) {
+                            ND_PRINT( " (invalid length)");
+                            sptr = rptr + subtlv_len;
+                            break;
+                        }
+                        uint8_t flags;
+                        flags = GET_U_1(sptr);
+                        sptr += sizeof(flags);
+                        sptr += 1;  /*to ignore reserved fields*/
+                        uint32_t weight;
+                        weight = GET_BE_U_4(sptr);
+                        sptr += sizeof(weight);
+                        ND_PRINT( ", Flags [], Weight: %u", weight);
+                        break;
+                    }
+                    default:
+                        ND_TCHECK_LEN(sptr, subtlv_len);
+                        if (ndo->ndo_vflag >= 1)
+                            print_unknown_data(ndo, rptr, "\n\t        ", subtlv_len);
+                        sptr = rptr + subtlv_len;
+                        break;
+                    }
+                }
+                rptr = sptr;
+                break;
+            }
+            default:
+                if (ndo->ndo_vflag >= 1)
+                    print_unknown_data(ndo, rptr, "\n\t\t", subtlv_len);
+                rptr += subtlv_len;
+                break;
+        }
+    }
+    *tptr = rptr;
+    return -1;
+trunc:
+    return -2;
+}
 
 static int
 bgp_attr_print(netdissect_options *ndo,
@@ -2132,6 +2631,35 @@ bgp_attr_print(netdissect_options *ndo,
                         tptr += (sizeof(nd_ipv4)+BGP_VPN_RD_LEN);
                         tlen -= (sizeof(nd_ipv4)+BGP_VPN_RD_LEN);
                         tnhlen -= (sizeof(nd_ipv4)+BGP_VPN_RD_LEN);
+                    }
+                    break;
+                case (AFNUM_IP<<8 | SAFNUM_SR_TE):
+                case (AFNUM_IP6<<8 | SAFNUM_SR_TE):
+                    if (tnhlen == 2*(int)sizeof(struct in6_addr)) {
+                        ND_PRINT( "%s (Global)", GET_IP6ADDR_STRING(tptr));
+                        tptr += sizeof(struct in6_addr);
+                        tlen -= sizeof(struct in6_addr);
+                        tnhlen -= sizeof(struct in6_addr);
+
+                        ND_PRINT( "%s (Link-Local)", GET_IP6ADDR_STRING(tptr));
+                        tptr += sizeof(struct in6_addr);
+                        tlen -= sizeof(struct in6_addr);
+                        tnhlen -= sizeof(struct in6_addr);
+                    } else if (tnhlen == (int)sizeof(struct in6_addr)) {
+                        ND_PRINT( "%s", GET_IP6ADDR_STRING(tptr));
+                        tptr += sizeof(struct in6_addr);
+                        tlen -= sizeof(struct in6_addr);
+                        tnhlen -= sizeof(struct in6_addr);
+                    } else if (tnhlen == (int)sizeof(struct in_addr)) {
+                        ND_PRINT( "%s", GET_IPADDR_STRING(tptr));
+                        tptr += sizeof(struct in_addr);
+                        tlen -= sizeof(struct in_addr);
+                        tnhlen -= sizeof(struct in_addr);
+                    } else {
+                        ND_PRINT( "invalid len");
+                        tptr += tnhlen;
+                        tlen -= tnhlen;
+                        tnhlen = 0;
                     }
                     break;
                 case (AFNUM_IP6<<8 | SAFNUM_UNICAST):
@@ -2383,6 +2911,26 @@ bgp_attr_print(netdissect_options *ndo,
             if (ndo->ndo_vflag <= 1) {
                 print_unknown_data(ndo, tptr, "\n\t      ", tlen);
             }
+        }
+        break;
+    }
+    case BGPTYPE_TUNNEL_ENCAP:
+    {
+        while (tptr < pptr + len) {
+            uint8_t tunnel_type;
+            uint16_t tunnel_len;
+            ND_TCHECK_2(tptr);
+            tunnel_type = GET_U_1(tptr+1);
+            tptr += 2;
+            ND_TCHECK_LEN(tptr, sizeof(tunnel_len));
+            tunnel_len = GET_BE_U_2(tptr);
+            tptr += sizeof(tunnel_len);
+            ND_PRINT( "\n\t    Tunnel-type: %s (%u), length: %u",
+                        tok2str(bgp_tunnel_encap_values, "Unknown", tunnel_type),
+                        tunnel_type, tunnel_len);
+            advance = bgp_tunnel_encap_print(ndo, &tptr, tunnel_len);
+            if (advance == -2)
+                goto trunc;
         }
         break;
     }
