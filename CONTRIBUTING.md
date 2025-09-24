@@ -100,7 +100,7 @@ and ask!
     The `sample.out` file can be produced as follows:
     ```
     (cd tests && TZ=GMT0 ../tcpdump -# -n -r sample.pcap tcpdump-options > sample.out)
-   ```
+    ```
 
     Or, for convenience, use `./update-test.sh test-name`
 
@@ -108,17 +108,17 @@ and ask!
     (none, `-v`, `-vv`, `-vvv`, etc.) depending on the code.
 
 11) Test using `make check` (current build options) and `./build_matrix.sh`
-   (a multitude of build options, build systems and compilers). If you can,
-   test on more than one operating system. Don't send a pull request until
-   all tests pass.
+    (a multitude of build options, build systems and compilers). If you can,
+    test on more than one operating system. Don't send a pull request until
+    all tests pass.
 
 12) Try to rebase your commits to keep the history simple.
-   ```
-   git fetch upstream
-   git rebase upstream/master
-   ```
-   (If the rebase fails and you cannot resolve, issue `git rebase --abort`
-   and ask for help in the pull request comment.)
+    ```
+    git fetch upstream
+    git rebase upstream/master
+    ```
+    (If the rebase fails and you cannot resolve, issue `git rebase --abort`
+    and ask for help in the pull request comment.)
 
 13) Once 100% happy, put your work into your forked repository using `git push`.
 
