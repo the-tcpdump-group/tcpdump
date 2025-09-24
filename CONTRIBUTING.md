@@ -91,21 +91,21 @@ and ask!
     Any new/updated fields in a dissector must be present in a `sample.pcap` file
     and the corresponding output file.
 
-   Configuration is set in `tests/TESTLIST`.
-   Each line in this file has the following format:
-   ```
-   test-name   sample.pcap   sample.out   tcpdump-options
+    Configuration is set in `tests/TESTLIST`.
+    Each line in this file has the following format:
+    ```
+    test-name   sample.pcap   sample.out   tcpdump-options
+    ```
+
+    The `sample.out` file can be produced as follows:
+    ```
+    (cd tests && TZ=GMT0 ../tcpdump -# -n -r sample.pcap tcpdump-options > sample.out)
    ```
 
-   The `sample.out` file can be produced as follows:
-   ```
-   (cd tests && TZ=GMT0 ../tcpdump -# -n -r sample.pcap tcpdump-options > sample.out)
-   ```
+    Or, for convenience, use `./update-test.sh test-name`
 
-   Or, for convenience, use `./update-test.sh test-name`
-
-   It is often useful to have test outputs with different verbosity levels
-   (none, `-v`, `-vv`, `-vvv`, etc.) depending on the code.
+    It is often useful to have test outputs with different verbosity levels
+    (none, `-v`, `-vv`, `-vvv`, etc.) depending on the code.
 
 11) Test using `make check` (current build options) and `./build_matrix.sh`
    (a multitude of build options, build systems and compilers). If you can,
