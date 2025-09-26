@@ -187,7 +187,7 @@ yes)	AC_MSG_RESULT(yes)
 	AC_CHECK_LIB([bfd], [bfd_init],
 	    [true],
 	    [AC_MSG_ERROR(
-	       [--enable-instrument-functions was given, but test for library libbfd failed. Please install the 'binutils-dev' package.])],
+	       [--enable-instrument-functions was given, but test for library libbfd failed. Please install the 'binutils-dev' or 'binutils-devel' package.])],
 	    [])
 	AC_DEFINE(ENABLE_INSTRUMENT_FUNCTIONS, 1,
 	    [define if you want to build the instrument functions code])
