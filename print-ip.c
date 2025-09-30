@@ -353,8 +353,11 @@ ip_print(netdissect_options *ndo,
 		/* we guess that it is a TSO send */
 		len = length;
 		presumed_tso = 1;
-	} else
-		ND_ICHECKMSG_U("total length", len, <, hlen);
+	}
+	if (len < hlen) {
+		ND_PRINT("[total length %u < header length %u]", len, hlen);
+		goto invalid;
+	}
 
 	ND_TCHECK_SIZE(ip);
 	/*
