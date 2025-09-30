@@ -2108,10 +2108,16 @@ extract_header_length(netdissect_options *ndo,
 
 	switch (FC_TYPE(fc)) {
 	case T_MGMT:
-		return MGMT_HDRLEN;
+		len = MGMT_HDRLEN;
+		// HT Control field presence determined by +HTC bit
+		// (9.2.4.6 of IEEE 802.11-2020)
+		if (FC_ORDER(fc))
+			len += IEEE802_11_HT_CONTROL_LEN;
+		return len;
 	case T_CTRL:
 		switch (FC_SUBTYPE(fc)) {
 		case CTRL_CONTROL_WRAPPER:
+			// HT Control field included in length
 			return CTRL_CONTROL_WRAPPER_HDRLEN;
 		case CTRL_BAR:
 			return CTRL_BAR_HDRLEN;
@@ -2135,8 +2141,13 @@ extract_header_length(netdissect_options *ndo,
 		}
 	case T_DATA:
 		len = (FC_TO_DS(fc) && FC_FROM_DS(fc)) ? 30 : 24;
-		if (DATA_FRAME_IS_QOS(FC_SUBTYPE(fc)))
+		if (DATA_FRAME_IS_QOS(FC_SUBTYPE(fc))) {
 			len += 2;
+			// HT Control field presence determined by +HTC bit
+			// (9.2.4.6 of IEEE 802.11-2020)
+			if (FC_ORDER(fc))
+				len += IEEE802_11_HT_CONTROL_LEN;
+		}
 		return len;
 	default:
 		ND_PRINT("unknown 802.11 frame type (%u)", FC_TYPE(fc));
