@@ -87,7 +87,7 @@ and ask!
     tests are being run, is used when "local time" values are printed.  The
     actual test compares the current text output with the expected result
     (`sample.out`) saved from a previous version.
-   
+
     Any new/updated fields in a dissector must be present in a `sample.pcap` file
     and the corresponding output file.
 
