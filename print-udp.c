@@ -642,11 +642,11 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		else if (IS_SRC_OR_DST_PORT(SFLOW_PORT))
 			sflow_print(ndo, cp, length);
 		else if (dport == LWAPP_CONTROL_PORT)
-			lwapp_control_print(ndo, cp, length, 1);
+			lwapp_print(ndo, cp, length, 1);
 		else if (sport == LWAPP_CONTROL_PORT)
-			lwapp_control_print(ndo, cp, length, 0);
+			lwapp_print(ndo, cp, length, 0);
 		else if (IS_SRC_OR_DST_PORT(LWAPP_DATA_PORT))
-			lwapp_data_print(ndo, cp, length);
+			lwapp_print(ndo, cp, length, 0);
 		else if (IS_SRC_OR_DST_PORT(SIP_PORT))
 			sip_print(ndo, cp, length);
 		else if (IS_SRC_OR_DST_PORT(VXLAN_LINUX_PORT))
