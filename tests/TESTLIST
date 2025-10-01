@@ -668,8 +668,6 @@ relts-0x80000000	relts-0x80000000.pcap	relts-0x80000000.out	-v
 # bad packets from Brian Carpenter
 ipv6hdr-heapoverflow	ipv6hdr-heapoverflow.pcap	ipv6hdr-heapoverflow.out
 ipv6hdr-heapoverflow-v	ipv6hdr-heapoverflow.pcap	ipv6hdr-heapoverflow-v.out	-v
-otv-heapoverflow-1	otv-heapoverflow-1.pcap		otv-heapoverflow-1.out
-otv-heapoverflow-2	otv-heapoverflow-2.pcap		otv-heapoverflow-2.out
 q933-heapoverflow-2	q933-heapoverflow-2.pcap	q933-heapoverflow-2.out
 atm-heapoverflow	atm-heapoverflow.pcap		atm-heapoverflow.out -e
 ipv6-next-header-oobr-1	ipv6-next-header-oobr-1.pcap	ipv6-next-header-oobr-1.out

@@ -85,6 +85,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
 
 DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
   Summary for 4.99.6 tcpdump release (so far!)
+    Remove protocol decoding for:
+      OTV (draft-hasmit-otv-04, this Internet-Draft is no longer active).
     Refine protocol decoding for:
       DNS: Use ND_TCHECK_LEN() instead of a custom bounds check.
       IPv6: Add a missing comma and remove a colon in the output.
@@ -107,6 +109,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       NTP: Update a field name with the RFC 5905 name (Origin Timestamp).
       IPv6 mobility: Modernize packet parsing and make fixes.
       IP6OPTS: Modernize packet parsing and make fixes.
+      VXLAN: Add UDP port 8472 used by Linux as the default port.
     User interface:
       Add optional unit suffix on -C file size.
       Improve the handling of size suffixes for -C.
