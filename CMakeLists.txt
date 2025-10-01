@@ -1373,7 +1373,6 @@ set(NETDISSECT_SOURCE_LIST_C
     print-openflow.c
     print-ospf.c
     print-ospf6.c
-    print-otv.c
     print-pflog.c
     print-pgm.c
     print-pim.c
