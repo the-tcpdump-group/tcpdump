@@ -195,6 +195,7 @@ qinqv           QinQpacket.pcap         QinQpacketv.out  -e -v
 # now SFLOW tests
 sflow1          sflow_multiple_counter_30_pdus.pcap     sflow_multiple_counter_30_pdus.out      -v
 sflow2          sflow_multiple_counter_30_pdus.pcap     sflow_multiple_counter_30_pdus-nv.out
+sflow-expanded  sflow_expanded.pcap                     sflow_expanded.out                      -v
 # ipv6 sflow support
 sflow-v6	sflow-print-v6.pcap			sflow-print-v6.out			-vvv
 

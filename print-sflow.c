@@ -795,13 +795,17 @@ sflow_print_expanded_flow_sample(netdissect_options *ndo,
 
     nrecords = GET_BE_U_4(sflow_expanded_flow_sample->records);
 
-    ND_PRINT(" seqnum %u, type %u, idx %u, rate %u, pool %u, drops %u, records %u",
+    ND_PRINT(" seqnum %u, type %u, idx %u, rate %u, pool %u, drops %u, input %u (%u), output %u (%u), records %u",
 	   GET_BE_U_4(sflow_expanded_flow_sample->seqnum),
 	   GET_BE_U_4(sflow_expanded_flow_sample->type),
 	   GET_BE_U_4(sflow_expanded_flow_sample->index),
 	   GET_BE_U_4(sflow_expanded_flow_sample->rate),
 	   GET_BE_U_4(sflow_expanded_flow_sample->pool),
 	   GET_BE_U_4(sflow_expanded_flow_sample->drops),
+       GET_BE_U_4(sflow_expanded_flow_sample->in_interface_value),
+       GET_BE_U_4(sflow_expanded_flow_sample->in_interface_format),
+       GET_BE_U_4(sflow_expanded_flow_sample->out_interface_value),
+       GET_BE_U_4(sflow_expanded_flow_sample->out_interface_format),
 	   nrecords);
 
     return sflow_print_flow_records(ndo, pointer + sizeof(struct sflow_expanded_flow_sample_t),
