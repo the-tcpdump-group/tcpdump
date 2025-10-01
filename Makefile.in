@@ -192,7 +192,6 @@ LIBNETDISSECT_SRC=\
 	print-openflow.c \
 	print-ospf.c \
 	print-ospf6.c \
-	print-otv.c \
 	print-pflog.c \
 	print-pgm.c \
 	print-pim.c \
