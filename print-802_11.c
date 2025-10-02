@@ -2179,7 +2179,7 @@ ieee_802_11_hdr_print(netdissect_options *ndo,
 		if (FC_RETRY(fc))
 			ND_PRINT("Retry ");
 		if (FC_ORDER(fc))
-			ND_PRINT("Strictly Ordered ");
+			ND_PRINT("+HTC ");
 		if (FC_PROTECTED(fc))
 			ND_PRINT("Protected ");
 		if (FC_TYPE(fc) != T_CTRL || FC_SUBTYPE(fc) != CTRL_PS_POLL)

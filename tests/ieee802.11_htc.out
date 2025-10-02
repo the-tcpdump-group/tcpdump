@@ -1,1 +1,14 @@
-    1  2025-09-30 12:22:28.668829 967750278us tsft wep 5180 MHz 11a -45dBm signal -107dBm noise antenna 0 [bit 23] CF +QoS BSSID:36:80:94:c0:22:8b SA:b0:be:83:5b:4b:40 DA:ff:ff:ff:ff:ff:ff LLC, dsap SNAP (0xaa) Individual, ssap SNAP (0xaa) Command, ctrl 0x03: oui Ethernet (0x000000), ethertype IPv4 (0x0800), length 328: 0.0.0.0.68 > 255.255.255.255.67: BOOTP/DHCP, Request from b0:be:83:5b:4b:40, length 300
+    1  2025-09-30 12:22:28.668829 967750278us tsft wep 5180 MHz 11a -45dBm signal -107dBm noise antenna 0 [bit 23] +HTC 48us CF +QoS BSSID:36:80:94:c0:22:8b SA:b0:be:83:5b:4b:40 DA:ff:ff:ff:ff:ff:ff LLC, dsap SNAP (0xaa) Individual, ssap SNAP (0xaa) Command, ctrl 0x03: oui Ethernet (0x000000), ethertype IPv4 (0x0800), length 328: (tos 0x0, ttl 255, id 23296, offset 0, flags [none], proto UDP (17), length 328)
+    0.0.0.0.68 > 255.255.255.255.67: BOOTP/DHCP, Request from b0:be:83:5b:4b:40, length 300, xid 0xf6afdddd, Flags [none]
+	  Client-Ethernet-Address b0:be:83:5b:4b:40
+	  Vendor-rfc1048 Extensions
+	    Magic Cookie 0x63825363
+	    DHCP-Message (53), length 1: Discover
+	    Parameter-Request (55), length 12: 
+	      Subnet-Mask (1), Classless-Static-Route (121), Default-Gateway (3), Domain-Name-Server (6)
+	      Domain-Name (15), IPv6-Only-Preferred (108), URL (114), Unknown (119)
+	      Unknown (252), LDAP (95), Netbios-Name-Server (44), Netbios-Node (46)
+	    MSZ (57), length 2: 1500
+	    Client-ID (61), length 7: ether b0:be:83:5b:4b:40
+	    Lease-Time (51), length 4: 7776000
+	    Hostname (12), length 15: "SebastiestMBP13"
