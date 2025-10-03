@@ -30,8 +30,6 @@
 #include "addrtoname.h"
 #include "extract.h"
 
-#define ETHER_TYPE_LEN		2
-
 #define BRCM_TAG_LEN		4
 #define BRCM_OPCODE_SHIFT	5
 #define BRCM_OPCODE_MASK	0x7
