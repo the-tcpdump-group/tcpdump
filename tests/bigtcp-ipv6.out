@@ -1,0 +1,1 @@
+    1  2025-10-02 15:09:21.939724 IP6 (flowlabel 0x81ccd, hlim 61, next-header TCP (6), payload length 0) [real length 80040, presumed BIG TCP] 2604:1380:4091:ce00::b.43267 > 2604:1380:4091:ce00::d.41219: Flags [P.], cksum 0xc8cb (incorrect -> 0x2ab4), seq 2265425561:2265505529, ack 3850636772, win 426, options [nop,nop,TS val 3564116459 ecr 3863151628], length 79968
