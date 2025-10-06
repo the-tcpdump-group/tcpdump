@@ -1,0 +1,2 @@
+    1  2025-10-02 15:05:40.030951 IP (tos 0x0, ttl 64, id 12031, offset 0, flags [DF], proto TCP (6), length 80052 [was 0, presumed BIG TCP])
+    10.25.132.13.35871 > 10.25.132.11.36425: Flags [P.], cksum 0x54f2 (incorrect -> 0x199e), seq 4155358606:4155438606, ack 17023525, win 635, options [nop,nop,TS val 3921144597 ecr 3152931631], length 80000
