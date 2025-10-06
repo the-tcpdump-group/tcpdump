@@ -398,7 +398,6 @@ ipv4_invalid_hdr_length ipv4_invalid_hdr_length.pcap ipv4_invalid_hdr_length.out
 ipv4_invalid_total_length ipv4_invalid_total_length.pcap ipv4_invalid_total_length.out -v
 ipv4_tcp_http_xml ipv4_tcp_http_xml.pcap ipv4_tcp_http_xml.out -v
 ipv4_invalid_total_length_2 ipv4_invalid_total_length_2.pcap ipv4_invalid_total_length_2.out -v
-ipv4_tcp_http_xml_tso ipv4_tcp_http_xml_tso.pcap ipv4_tcp_http_xml_tso.out -v
 
 #IPv6 tests
 ipv6-bad-version	ipv6-bad-version.pcap	ipv6-bad-version.out
@@ -1053,3 +1052,9 @@ LINKTYPE_IPV6_invalid-e LINKTYPE_IPV6_invalid.pcap LINKTYPE_IPV6_invalid-e.out -
 # ipv6_mobility_1.pcap is built with scapy
 ipv6_mobility_1 ipv6_mobility_1.pcap ipv6_mobility_1.out
 ipv6_mobility_1-v ipv6_mobility_1.pcap ipv6_mobility_1-v.out -v
+
+# Aggregation offloads (GSO, BIG TCP)
+gso-ipv4			gso-ipv4.pcap			gso-ipv4.out			-v
+gso-ipv6			gso-ipv6.pcap			gso-ipv6.out			-v
+bigtcp-ipv4			bigtcp-ipv4.pcap		bigtcp-ipv4.out			-v
+bigtcp-ipv6-hbh			bigtcp-ipv6-hbh.pcap		bigtcp-ipv6-hbh.out		-v
