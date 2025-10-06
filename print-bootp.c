@@ -641,7 +641,8 @@ rfc1048_print(netdissect_options *ndo,
 				ND_PRINT(", occurs %u", ntag);
 		}
 
-		ND_TCHECK_LEN(bp, len);
+		if (len != 0)
+			ND_TCHECK_LEN(bp, len);
 
 		if (tag == TAG_DHCP_MESSAGE && len == 1) {
 			ND_PRINT("%s",
