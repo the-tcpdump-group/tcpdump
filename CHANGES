@@ -19,8 +19,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
         in a fixed-size buffer to be printed later
       ICMP: add dissector for ICMP Interface Identification Object
       ICMP: print RFC8335 PROBE extended echo/reply messages.
-      IEEE 802.11: include the Mesh ID field while printing management
-        frames.
+      IEEE 802.11: include the Mesh ID field while printing management frames.
       NetFlow: Use tcp_flag_values[] for TCP flags.
       NTP: Check that the entire extension field is in the capture even
         if it isn't printed
@@ -46,8 +45,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Add --print-sampling to print every Nth packet instead of all.
       Add --lengths option to print the captured and original packet lengths.
       Add --skip option to skip some packets before writing or printing.
-      Use a common routine to parse numerical arguments and check its
-        value.
+      Use a common routine to parse numerical arguments and check its value.
     Source code:
       Drop support for building with versions of libpcap that don't
         support all the libpcap 1.0 APIs.
