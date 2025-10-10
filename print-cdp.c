@@ -260,12 +260,13 @@ cdp_print(netdissect_options *ndo,
 	uint16_t checksum;
 
 	ndo->ndo_protocol = "cdp";
+	nd_print_protocol_caps(ndo);
 
 	if (length < CDP_HEADER_LEN) {
 		ND_PRINT(" (packet length %u < %u)", length, CDP_HEADER_LEN);
 		goto invalid;
 	}
-	ND_PRINT("CDPv%u, ttl: %us",
+	ND_PRINT("v%u, ttl: %us",
 	         GET_U_1(tptr + CDP_HEADER_VERSION_OFFSET),
 	         GET_U_1(tptr + CDP_HEADER_TTL_OFFSET));
 	checksum = GET_BE_U_2(tptr + CDP_HEADER_CHECKSUM_OFFSET);
