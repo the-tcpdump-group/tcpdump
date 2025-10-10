@@ -423,10 +423,12 @@ ntp_print(netdissect_options *ndo,
 	uint8_t status;
 
 	ndo->ndo_protocol = "ntp";
+	nd_print_protocol_caps(ndo);
+
 	status = GET_U_1(bp->td.status);
 
 	version = (status & VERSIONMASK) >> VERSIONSHIFT;
-	ND_PRINT("NTPv%u", version);
+	ND_PRINT("v%u", version);
 
 	mode = (status & MODEMASK) >> MODESHIFT;
 	if (!ndo->ndo_vflag) {
