@@ -45,12 +45,14 @@ void
 dtp_print(netdissect_options *ndo, const u_char *tptr, u_int length)
 {
     ndo->ndo_protocol = "dtp";
+    nd_print_protocol_caps(ndo);
+
     if (length < DTP_HEADER_LEN) {
         ND_PRINT("[zero packet length]");
         goto invalid;
     }
 
-    ND_PRINT("DTPv%u, length %u",
+    ND_PRINT("v%u, length %u",
            GET_U_1(tptr),
            length);
 
