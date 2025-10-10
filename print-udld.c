@@ -105,6 +105,8 @@ udld_print(netdissect_options *ndo,
     uint8_t ver, code, flags;
 
     ndo->ndo_protocol = "udld";
+    nd_print_protocol_caps(ndo);
+
     if (length < UDLD_HEADER_LEN)
         goto invalid;
 
@@ -117,7 +119,7 @@ udld_print(netdissect_options *ndo,
     tptr += 1;
     length -= 1;
 
-    ND_PRINT("UDLDv%u, Code %s (%x), Flags [%s] (0x%02x), length %u",
+    ND_PRINT("v%u, Code %s (%x), Flags [%s] (0x%02x), length %u",
            ver,
            tok2str(udld_code_values, "Reserved", code),
            code,
