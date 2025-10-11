@@ -25,6 +25,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       IPv6 mobility: Modernize packet parsing and make fixes.
       IP6OPTS: Modernize packet parsing and make fixes.
       VXLAN: Add UDP port 8472 used by Linux as the default port.
+      EGP: Replace custom code with tok2str(); Modernize packet parsing and
+        fix printing with -v option.
     User interface:
       Add optional unit suffix on -C file size.
       Improve the handling of size suffixes for -C.

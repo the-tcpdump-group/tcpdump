@@ -256,30 +256,28 @@ egp_print(netdissect_options *ndo,
 	u_int status;
 
 	ndo->ndo_protocol = "egp";
+	nd_print_protocol_caps(ndo);
+
 	egp = (const struct egp_packet *)bp;
-	ND_ICHECKMSG_ZU("packet length", length, <, sizeof(*egp));
-	ND_TCHECK_SIZE(egp);
+	ND_ICHECK_ZU(length, <, sizeof(*egp));
 
 	version = GET_U_1(egp->egp_version);
-        if (!ndo->ndo_vflag) {
-            ND_PRINT("EGPv%u, AS %u, seq %u, length %u",
-                   version,
-                   GET_BE_U_2(egp->egp_as),
-                   GET_BE_U_2(egp->egp_sequence),
-                   length);
-            return;
-        } else
-            ND_PRINT("EGPv%u, length %u",
-                   version,
-                   length);
+	ND_ICHECK_U(version, !=, EGP_VERSION);
+	ND_TCHECK_SIZE(egp);
 
-	if (version != EGP_VERSION) {
-		ND_PRINT("[version %u]", version);
+	ND_PRINT("v%u", version);
+	if (ndo->ndo_vflag) {
+		ND_PRINT(", AS %u, seq %u, length %u",
+			 GET_BE_U_2(egp->egp_as),
+			 GET_BE_U_2(egp->egp_sequence),
+			 length);
+	} else {
+		ND_PRINT(", length %u", length);
 		return;
 	}
 
 	type = GET_U_1(egp->egp_type);
-	ND_PRINT(" %s", tok2str(egp_type_str, "[type %u]", type));
+	ND_PRINT(", %s", tok2str(egp_type_str, "[type %u]", type));
 	code = GET_U_1(egp->egp_code);
 	status = GET_U_1(egp->egp_status);
 
