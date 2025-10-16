@@ -535,6 +535,7 @@ dhcp-option-108	dhcp-option-108.pcapng	dhcp-option-108.out	-v
 
 # VXLAN tests
 vxlan  vxlan.pcap  vxlan.out -e
+vxlan_port_8472 vxlan_port_8472.pcap vxlan_port_8472.out -e
 
 # PPTP tests
 pptp pptp.pcap pptp.out
