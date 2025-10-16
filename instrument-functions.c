@@ -11,6 +11,9 @@
  * FOR A PARTICULAR PURPOSE.
  */
 
+/* required for bfd.h inclusion guard */
+#include <config.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
