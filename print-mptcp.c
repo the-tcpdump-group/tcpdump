@@ -221,14 +221,14 @@ struct mp_tcprst {
 
 static int
 dummy_print(netdissect_options *ndo _U_,
-            const u_char *opt _U_, u_int opt_len _U_, u_char flags _U_)
+            const u_char *opt _U_, u_int opt_len _U_, uint16_t flags _U_)
 {
         return 1;
 }
 
 static int
 mp_capable_print(netdissect_options *ndo,
-                 const u_char *opt, u_int opt_len, u_char flags)
+                 const u_char *opt, u_int opt_len, uint16_t flags)
 {
         const struct mp_capable *mpc = (const struct mp_capable *) opt;
         uint8_t version, csum_enabled;
@@ -270,7 +270,7 @@ mp_capable_print(netdissect_options *ndo,
 
 static int
 mp_join_print(netdissect_options *ndo,
-              const u_char *opt, u_int opt_len, u_char flags)
+              const u_char *opt, u_int opt_len, uint16_t flags)
 {
         const struct mp_join *mpj = (const struct mp_join *) opt;
 
@@ -310,7 +310,7 @@ mp_join_print(netdissect_options *ndo,
 
 static int
 mp_dss_print(netdissect_options *ndo,
-             const u_char *opt, u_int opt_len, u_char flags)
+             const u_char *opt, u_int opt_len, uint16_t flags)
 {
         const struct mp_dss *mdss = (const struct mp_dss *) opt;
         uint8_t mdss_flags;
@@ -401,7 +401,7 @@ mp_dss_print(netdissect_options *ndo,
 
 static int
 add_addr_print(netdissect_options *ndo,
-               const u_char *opt, u_int opt_len, u_char flags _U_)
+               const u_char *opt, u_int opt_len, uint16_t flags _U_)
 {
         const struct mp_add_addr *add_addr = (const struct mp_add_addr *) opt;
 
@@ -438,7 +438,7 @@ add_addr_print(netdissect_options *ndo,
 
 static int
 remove_addr_print(netdissect_options *ndo,
-                  const u_char *opt, u_int opt_len, u_char flags _U_)
+                  const u_char *opt, u_int opt_len, uint16_t flags _U_)
 {
         const struct mp_remove_addr *remove_addr = (const struct mp_remove_addr *) opt;
         u_int i;
@@ -455,7 +455,7 @@ remove_addr_print(netdissect_options *ndo,
 
 static int
 mp_prio_print(netdissect_options *ndo,
-              const u_char *opt, u_int opt_len, u_char flags _U_)
+              const u_char *opt, u_int opt_len, uint16_t flags _U_)
 {
         const struct mp_prio *mpp = (const struct mp_prio *) opt;
 
@@ -474,7 +474,7 @@ mp_prio_print(netdissect_options *ndo,
 
 static int
 mp_fail_print(netdissect_options *ndo,
-              const u_char *opt, u_int opt_len, u_char flags _U_)
+              const u_char *opt, u_int opt_len, uint16_t flags _U_)
 {
         if (opt_len != 12)
                 return 0;
@@ -485,7 +485,7 @@ mp_fail_print(netdissect_options *ndo,
 
 static int
 mp_fast_close_print(netdissect_options *ndo,
-                    const u_char *opt, u_int opt_len, u_char flags _U_)
+                    const u_char *opt, u_int opt_len, uint16_t flags _U_)
 {
         if (opt_len != 12)
                 return 0;
@@ -496,7 +496,7 @@ mp_fast_close_print(netdissect_options *ndo,
 
 static int
 mp_tcprst_print(netdissect_options *ndo,
-                const u_char *opt, u_int opt_len, u_char flags _U_)
+                const u_char *opt, u_int opt_len, uint16_t flags _U_)
 {
         const struct mp_tcprst *mpr = (const struct mp_tcprst *)opt;
 
@@ -513,7 +513,7 @@ mp_tcprst_print(netdissect_options *ndo,
 
 static const struct {
         const char *name;
-        int (*print)(netdissect_options *, const u_char *, u_int, u_char);
+        int (*print)(netdissect_options *, const u_char *, u_int, uint16_t);
 } mptcp_options[] = {
         { "capable",    mp_capable_print },
         { "join",       mp_join_print },
@@ -529,7 +529,7 @@ static const struct {
 
 int
 mptcp_print(netdissect_options *ndo,
-            const u_char *cp, u_int len, u_char flags)
+            const u_char *cp, u_int len, uint16_t flags)
 {
         const struct mptcp_option *opt;
         u_int subtype;
