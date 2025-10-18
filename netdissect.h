@@ -698,7 +698,7 @@ extern void mobile_print(netdissect_options *, const u_char *, u_int);
 extern int mobility_print(netdissect_options *, const u_char *, const u_char *);
 extern void mpcp_print(netdissect_options *, const u_char *, u_int);
 extern void mpls_print(netdissect_options *, const u_char *, u_int);
-extern int mptcp_print(netdissect_options *, const u_char *, u_int, u_char);
+extern int mptcp_print(netdissect_options *, const u_char *, u_int, uint16_t);
 extern void msdp_print(netdissect_options *, const u_char *, u_int);
 extern void msnlb_print(netdissect_options *, const u_char *);
 extern void nbt_tcp_print(netdissect_options *, const u_char *, u_int);
