@@ -504,7 +504,7 @@ struct rr_result {		/* router renumbering result message */
 static const char *get_rtpref(u_int);
 static const char *get_lifetime(uint32_t);
 static const char *get_pref64_len_repr(uint16_t);
-static void print_lladdr(netdissect_options *ndo, const u_char *, size_t);
+static void print_lladdr(netdissect_options *ndo, const u_char *, u_int);
 static int icmp6_opt_print(netdissect_options *ndo, const u_char *, int);
 static void mld6_print(netdissect_options *ndo, const u_char *);
 static void mldv2_report_print(netdissect_options *ndo, const u_char *, u_int);
@@ -799,7 +799,7 @@ get_pref64_len_repr(uint16_t v)
 }
 
 static void
-print_lladdr(netdissect_options *ndo, const uint8_t *p, size_t l)
+print_lladdr(netdissect_options *ndo, const uint8_t *p, u_int l)
 {
 	const uint8_t *ep, *q;
 
@@ -1443,7 +1443,7 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 	const struct nd_opt_pref64 *op64;
 	const u_char *cp, *ep, *domp;
 	nd_ipv6 in6;
-	size_t l;
+	u_int l;
 	u_int i;
 	uint16_t w;
 
