@@ -231,8 +231,7 @@ struct lacp_marker_tlv_terminator_t {
     nd_byte     pad[50];
 };
 
-static void slow_lacp_print(netdissect_options *, const u_char *, u_int);
-static void slow_marker_print(netdissect_options *, const u_char *, u_int);
+static void slow_marker_lacp_print(netdissect_options *, const u_char *, u_int, u_int);
 static void slow_oam_print(netdissect_options *, const u_char *, u_int);
 static void slow_ossp_print(netdissect_options *, const u_char *, u_int);
 
@@ -254,12 +253,9 @@ slow_print(netdissect_options *ndo,
     pptr += 1;
 
     switch (subtype) {
-    case SLOW_PROTO_LACP:
-        slow_lacp_print(ndo, pptr, len);
-        break;
-
+    case SLOW_PROTO_LACP: /* fall through */
     case SLOW_PROTO_MARKER:
-        slow_marker_print(ndo, pptr, len);
+        slow_marker_lacp_print(ndo, pptr, len, subtype);
         break;
 
     case SLOW_PROTO_OAM:
@@ -286,7 +282,7 @@ tooshort:
 }
 
 /*
- * Common tlv logic for LACPv1 and Marker.
+ * Print Link Aggregation Control Protocol and Marker protocol. (802.3ad / 802.1ax)
  */
 static void
 slow_marker_lacp_print(netdissect_options *ndo,
@@ -295,7 +291,7 @@ slow_marker_lacp_print(netdissect_options *ndo,
 {
     const struct tlv_header_t *tlv_header;
     const u_char *tlv_tptr;
-    u_int tlv_type, tlv_len, tlv_tlen;
+    u_int tlv_type, tlv_len, tlv_tlen, version;
 
     union {
         const struct lacp_marker_tlv_terminator_t *lacp_marker_tlv_terminator;
@@ -303,6 +299,26 @@ slow_marker_lacp_print(netdissect_options *ndo,
         const struct lacp_tlv_collector_info_t *lacp_tlv_collector_info;
         const struct marker_tlv_marker_info_t *marker_tlv_marker_info;
     } tlv_ptr;
+
+    if (tlen < 1)
+        goto tooshort;
+
+    version = GET_U_1(tptr);
+    tlen -= 1;
+    tptr += 1;
+
+    ND_PRINT("%sv%u, length %u",
+             proto_subtype == SLOW_PROTO_LACP ? "LACP" : "MARKER",
+             version, tlen + 2);
+
+    if (!ndo->ndo_vflag)
+        return;
+
+    if ((proto_subtype == SLOW_PROTO_LACP && version != LACP_VERSION)
+        || (proto_subtype == SLOW_PROTO_MARKER && version != MARKER_VERSION)) {
+        print_unknown_data(ndo, tptr, "\n\t", tlen);
+        return;
+    }
 
     while(tlen != 0) {
         /* is the packet big enough to include the tlv header ? */
@@ -418,80 +434,6 @@ slow_marker_lacp_print(netdissect_options *ndo,
 
         tptr+=tlv_len;
         tlen-=tlv_len;
-    }
-    return;
-
-tooshort:
-    ND_PRINT("\n\t\t packet is too short");
-}
-
-/*
- * Print Link Aggregation Control Protocol. (802.3ad / 802.1AX)
- */
-static void
-slow_lacp_print(netdissect_options *ndo,
-                const u_char *tptr, u_int tlen)
-{
-    u_int version;
-
-    if (tlen < 1)
-        goto tooshort;
-
-    version = GET_U_1(tptr);
-    tlen -= 1;
-    tptr += 1;
-
-    ND_PRINT("LACPv%u, length %u", version, tlen + 2);
-
-    if (!ndo->ndo_vflag)
-        return;
-
-    switch (version) {
-    case LACP_VERSION:
-        slow_marker_lacp_print(ndo, tptr, tlen, SLOW_PROTO_LACP);
-        break;
-
-    /* TODO LACPv2 */
-
-    default:
-        print_unknown_data(ndo, tptr, "\n\t", tlen);
-        break;
-    }
-    return;
-
-tooshort:
-    ND_PRINT("\n\t\t packet is too short");
-}
-
-/*
- * Print Marker protocol. (802.3ad / 802.1ax)
- */
-static void
-slow_marker_print(netdissect_options *ndo,
-                  const u_char *tptr, u_int tlen)
-{
-    u_int version;
-
-    if (tlen < 1)
-        goto tooshort;
-
-    version = GET_U_1(tptr);
-    tlen -= 1;
-    tptr += 1;
-
-    ND_PRINT("MARKERv%u, length %u", version, tlen + 2);
-
-    if (!ndo->ndo_vflag)
-        return;
-
-    switch (version) {
-    case MARKER_VERSION:
-        slow_marker_lacp_print(ndo, tptr, tlen, SLOW_PROTO_MARKER);
-        break;
-
-    default:
-        print_unknown_data(ndo, tptr, "\n\t", tlen);
-        break;
     }
     return;
 
