@@ -126,6 +126,9 @@
 /* Define to 1 if you have the `wsockinit' function. */
 #cmakedefine HAVE_WSOCKINIT 1
 
+/* Define to 1 if you have the `wcwidth' function. */
+#cmakedefine HAVE_WCWIDTH 1
+
 /* define if libpcap has yydebug */
 #cmakedefine HAVE_YYDEBUG 1
 
