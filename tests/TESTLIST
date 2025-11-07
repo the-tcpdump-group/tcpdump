@@ -189,8 +189,8 @@ forces01vvvv    forces1.pcap            forces1vvvv.out -v -v -v -v
 #forces02vv      forces2.pcap            forces2vv.out   -v -v
 
 # 802.1ad, QinQ tests
-qinq            QinQpacket.pcap         QinQpacket.out  -e
-qinqv           QinQpacket.pcap         QinQpacketv.out  -e -v
+802.1ad_QinQ	802.1ad_QinQ.pcap	802.1ad_QinQ.out -e
+802.1ad_QinQv	802.1ad_QinQ.pcap	802.1ad_QinQv.out -e -v
 
 # now SFLOW tests
 sflow1          sflow_multiple_counter_30_pdus.pcap     sflow_multiple_counter_30_pdus.out      -v
