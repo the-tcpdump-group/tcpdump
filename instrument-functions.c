@@ -15,7 +15,15 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+/*
+ * The binutils bfd header has a weird inclusion guard, requiring this
+ * macro to be defined. Some distributions patch the guard out, others
+ * don't.
+ */
+#define PACKAGE "binutils-bfd.h-guard-workaround"
 #include <bfd.h>
+#undef PACKAGE
 
 /*
  * Generate instrumentation calls for entry and exit to functions.
