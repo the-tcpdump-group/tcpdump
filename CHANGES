@@ -17,6 +17,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       BGP: Add support for BGP Role capability and OTC attribute
       BGP: Fix most printing code to print directly rather than filling
         in a fixed-size buffer to be printed later
+      Broadcom DSA tag: fix various issues.
       ICMP: add dissector for ICMP Interface Identification Object
       ICMP: print RFC8335 PROBE extended echo/reply messages.
       IEEE 802.11: include the Mesh ID field while printing management frames.

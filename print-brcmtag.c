@@ -20,6 +20,7 @@
  */
 
 /* \summary: Broadcom Ethernet switches tag (4 bytes) printer */
+// specification: https://www.tcpdump.org/linktypes/broadcom-switch-tag.html
 
 #include <config.h>
 
@@ -32,7 +33,8 @@
 
 #define BRCM_TAG_LEN		4
 #define BRCM_OPCODE_SHIFT	5
-#define BRCM_OPCODE_MASK	0x7
+#define BRCM_EGRESS		0 // 0b000xxxxx
+#define BRCM_INGRESS		1 // 0b001xxxxx
 
 /* Ingress fields */
 #define BRCM_IG_TC_SHIFT	2
@@ -42,9 +44,8 @@
 #define BRCM_IG_DSTMAP_MASK	0x1ff
 
 /* Egress fields */
-#define BRCM_EG_CID_MASK	0xff
-#define BRCM_EG_RC_MASK		0xff
-#define  BRCM_EG_RC_RSVD	(3 << 6)
+#define  BRCM_EG_RC_RSVD7	(1 << 7)
+#define  BRCM_EG_RC_RSVD6	(1 << 6)
 #define  BRCM_EG_RC_EXCEPTION	(1 << 5)
 #define  BRCM_EG_RC_PROT_SNOOP	(1 << 4)
 #define  BRCM_EG_RC_PROT_TERM	(1 << 3)
@@ -55,6 +56,12 @@
 #define BRCM_EG_TC_MASK		0x7
 #define BRCM_EG_PID_MASK	0x1f
 
+static const struct tok brcm_tag_opcodes[] = {
+	{ BRCM_EGRESS, "EG" },
+	{ BRCM_INGRESS, "IG" },
+	{ 0, NULL }
+};
+
 static const struct tok brcm_tag_te_values[] = {
 	{ 0, "None" },
 	{ 1, "Untag" },
@@ -63,13 +70,15 @@ static const struct tok brcm_tag_te_values[] = {
 	{ 0, NULL }
 };
 
-static const struct tok brcm_tag_rc_values[] = {
-	{ 1, "mirror" },
-	{ 2, "MAC learning" },
-	{ 4, "switching" },
-	{ 8, "prot term" },
-	{ 16, "prot snoop" },
-	{ 32, "exception" },
+static const struct tok brcm_tag_rc_bm[] = {
+	{ BRCM_EG_RC_MIRROR, "mirror" },
+	{ BRCM_EG_RC_MAC_LEARN, "MAC learning" },
+	{ BRCM_EG_RC_SWITCH, "switching" },
+	{ BRCM_EG_RC_PROT_TERM, "prot term" },
+	{ BRCM_EG_RC_PROT_SNOOP, "prot snoop" },
+	{ BRCM_EG_RC_EXCEPTION, "exception" },
+	{ BRCM_EG_RC_RSVD6, "reserved-6" },
+	{ BRCM_EG_RC_RSVD7, "reserved-7" },
 	{ 0, NULL }
 };
 
@@ -83,26 +92,29 @@ brcm_tag_print(netdissect_options *ndo, const u_char *bp)
 	for (i = 0; i < BRCM_TAG_LEN; i++)
 		tag[i] = GET_U_1(bp + i);
 
-	ND_PRINT("BRCM tag OP: %s", tag[0] ? "IG" : "EG");
-	if (tag[0] & (1 << BRCM_OPCODE_SHIFT)) {
-		/* Ingress Broadcom tag */
-		ND_PRINT(", TC: %d", (tag[1] >> BRCM_IG_TC_SHIFT) &
+	uint8_t opcode = tag[0] >> BRCM_OPCODE_SHIFT;
+	ND_PRINT("BRCM tag OP: %s", tok2str(brcm_tag_opcodes, NULL, opcode));
+	switch (opcode) {
+	case BRCM_INGRESS:
+		ND_PRINT(", TC: %d", (tag[0] >> BRCM_IG_TC_SHIFT) &
 			 BRCM_IG_TC_MASK);
 		ND_PRINT(", TE: %s",
 			 tok2str(brcm_tag_te_values, "unknown",
-				 (tag[1] & BRCM_IG_TE_MASK)));
+				 (tag[0] & BRCM_IG_TE_MASK)));
 		ND_PRINT(", TS: %d", tag[1] >> BRCM_IG_TS_SHIFT);
 		dst_map = (uint16_t)tag[2] << 8 | tag[3];
-		ND_PRINT(", DST map: 0x%04x", dst_map & BRCM_IG_DSTMAP_MASK);
-	} else {
-		/* Egress Broadcom tag */
+		ND_PRINT(", DST map: 0x%03x", dst_map & BRCM_IG_DSTMAP_MASK);
+		break;
+	case BRCM_EGRESS:
 		ND_PRINT(", CID: %d", tag[1]);
-		ND_PRINT(", RC: %s", tok2str(brcm_tag_rc_values,
-			 "reserved", tag[2]));
+		ND_PRINT(", RC: [%s]", bittok2str(brcm_tag_rc_bm,
+			 "none", tag[2]));
 		ND_PRINT(", TC: %d", (tag[3] >> BRCM_EG_TC_SHIFT) &
 			 BRCM_EG_TC_MASK);
 		ND_PRINT(", port: %d", tag[3] & BRCM_EG_PID_MASK);
+		break;
 	}
+
 	ND_PRINT(", ");
 }
 
