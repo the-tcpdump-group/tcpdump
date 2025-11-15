@@ -82,6 +82,19 @@ static const struct tok brcm_tag_rc_bm[] = {
 	{ 0, NULL }
 };
 
+static const struct tok brcm_tag_port_bm[] = {
+	{ (1 << 0), "port 0" },
+	{ (1 << 1), "port 1" },
+	{ (1 << 2), "port 2" },
+	{ (1 << 3), "port 3" },
+	{ (1 << 4), "port 4" },
+	{ (1 << 5), "port 5" },
+	{ (1 << 6), "port 6" },
+	{ (1 << 7), "port 7" },
+	{ (1 << 8), "port 8" },
+	{ 0, NULL }
+};
+
 static void
 brcm_tag_print(netdissect_options *ndo, const u_char *bp)
 {
@@ -102,8 +115,9 @@ brcm_tag_print(netdissect_options *ndo, const u_char *bp)
 			 tok2str(brcm_tag_te_values, "unknown",
 				 (tag[0] & BRCM_IG_TE_MASK)));
 		ND_PRINT(", TS: %d", tag[1] >> BRCM_IG_TS_SHIFT);
-		dst_map = (uint16_t)tag[2] << 8 | tag[3];
-		ND_PRINT(", DST map: 0x%03x", dst_map & BRCM_IG_DSTMAP_MASK);
+		dst_map = ((uint16_t)tag[2] << 8 | tag[3]) & BRCM_IG_DSTMAP_MASK;
+		ND_PRINT(", DST map: [%s]",
+		         bittok2str(brcm_tag_port_bm, "none", dst_map));
 		break;
 	case BRCM_EGRESS:
 		ND_PRINT(", CID: %d", tag[1]);
