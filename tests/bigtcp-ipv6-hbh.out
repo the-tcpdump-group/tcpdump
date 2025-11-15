@@ -1,0 +1,1 @@
+    1  2025-10-06 14:13:27.172200 IP6 (flowlabel 0xa31ee, hlim 64, next-header HBH (0), payload length 0) 2604:1380:4091:ce00::d > 2604:1380:4091:ce00::b: HBH (jumbo: 80040)  41851 > 43913: Flags [P.], cksum 0xc8eb (incorrect -> 0x3146), seq 592820498:592900498, ack 2512896041, win 2128, options [nop,nop,TS val 1186840160 ecr 4237097528], length 80000
