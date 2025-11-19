@@ -149,6 +149,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
         environment variable BUILD_YEAR2038 = yes (via autogen.sh).
       Autoconf: Avoid incorrectly include the libpcap's config.h.
       Require config.h to be from the tcpdump build.
+      AppVeyor: Update Npcap SDK to 1.15.
 
 Friday, August 30, 2024 / The Tcpdump Group
   Summary for 4.99.5 tcpdump release
