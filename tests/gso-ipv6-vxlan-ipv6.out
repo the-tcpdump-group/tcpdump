@@ -1,0 +1,2 @@
+    1  2025-10-03 16:31:12.636043 IP6 (hlim 61, next-header UDP (17), payload length 4176) 2604:1380:4091:ce00::b.39902 > 2604:1380:4091:ce00::d.4789: [bad udp cksum 0xa0a5 -> 0xd93a!] VXLAN, flags [I] (0x08), vni 5001
+IP6 (flowlabel 0xb986b, hlim 64, next-header TCP (6), payload length 4106) fd00::2.43583 > fd00::1.44175: Flags [.], cksum 0x0a15 (incorrect -> 0x07c8), seq 1840055637:1840059711, ack 989320780, win 166, options [nop,nop,TS val 1498428967 ecr 4005434925], length 4074
