@@ -325,7 +325,13 @@ static const struct tok lwapp_msg_elem_values[] = {
 	{ 0, NULL}
 };
 
-static const uint16_t msg_elem_minlen[] = {
+/*
+ * Message element type is an 8-bit value, so size the array to make any
+ * uint8_t index valid.  Array elements that are implicitly initialized to 0
+ * effectively mean no minimum length requirement for the respective message
+ * element types.
+ */
+static const uint16_t msg_elem_minlen[UINT8_MAX + 1] = {
 	[LWAPP_MSGELEM_AC_ADDRESS]                         =   7,
 	// Omit "Result Code".
 	[LWAPP_MSGELEM_WTP_DESCRIPTOR]                     =  16,
