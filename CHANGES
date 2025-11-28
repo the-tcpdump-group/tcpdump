@@ -17,6 +17,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       BGP: Add support for BGP Role capability and OTC attribute
       BGP: Fix most printing code to print directly rather than filling
         in a fixed-size buffer to be printed later
+      Broadcom DSA tag: fix various issues.
       ICMP: add dissector for ICMP Interface Identification Object
       ICMP: print RFC8335 PROBE extended echo/reply messages.
       IEEE 802.11: include the Mesh ID field while printing management frames.
@@ -148,6 +149,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
         environment variable BUILD_YEAR2038 = yes (via autogen.sh).
       Autoconf: Avoid incorrectly include the libpcap's config.h.
       Require config.h to be from the tcpdump build.
+      AppVeyor: Update Npcap SDK to 1.15.
 
 Friday, August 30, 2024 / The Tcpdump Group
   Summary for 4.99.5 tcpdump release
