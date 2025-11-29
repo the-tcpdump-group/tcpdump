@@ -231,6 +231,7 @@ struct netdissect_options {
   int ndo_Aflag;		/* print packet only in ASCII observing TAB,
 				 * LF, CR and SPACE as graphical chars
 				 */
+  int ndo_utf8;		/* interpret ASCII output as UTF-8 */
   int ndo_Hflag;		/* dissect 802.11s draft mesh standard */
   const char *ndo_protocol;	/* protocol */
   jmp_buf ndo_early_end;	/* jmp_buf for setjmp()/longjmp() */
