@@ -1,0 +1,2 @@
+    1  2025-10-06 13:09:13.000001 IP (tos 0x0, ttl 61, id 19706, offset 0, flags [DF], proto ICMP (1), length 84 [was 0, presumed TSO])
+    10.25.132.11 > 10.25.132.13: ICMP echo request, id 12931, seq 1, length 64

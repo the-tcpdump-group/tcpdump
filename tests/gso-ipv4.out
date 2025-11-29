@@ -1,0 +1,2 @@
+    1  2025-10-03 16:26:52.155133 IP (tos 0x0, ttl 61, id 41110, offset 0, flags [DF], proto TCP (6), length 7292)
+    10.25.132.11.38407 > 10.25.132.13.39701: Flags [P.], cksum 0x38b9 (incorrect -> 0xb3af), seq 964901299:964908539, ack 2308918948, win 166, options [nop,nop,TS val 3244203756 ecr 4012416721], length 7240
