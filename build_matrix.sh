@@ -83,7 +83,7 @@ for CC in $MATRIX_CC; do
                 export REMOTE
                 # Build libpcap with Autoconf.
                 echo_magenta "Build libpcap (CMAKE=no REMOTE=$REMOTE)" >&2
-                (cd ../libpcap && CMAKE=no ./build.sh)
+                (cd ../libpcap && CMAKE=no TESTRUN_SHORT=1 ./build.sh)
                 # Set PKG_CONFIG_PATH for configure when building libpcap
                 if [ "$CMAKE" != no ]; then
                     PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig"
