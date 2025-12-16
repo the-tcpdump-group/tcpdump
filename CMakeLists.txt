@@ -908,7 +908,7 @@ check_function_exists(pcap_dump_ftell64 HAVE_PCAP_DUMP_FTELL64)
 # we should check for it, so that we can use it if it's present.
 #
 # So we check for pcap_open() and pcap_findalldevs_ex() if 1) this isn't
-# macOS or 2) the the libpcap we found is not a system library, meaning
+# macOS or 2) the libpcap we found is not a system library, meaning
 # that its path begins neither with /usr/lib (meaning it's a system
 # dylib) nor /Application/Xcode.app (meaning it's a file in
 # the Xcode SDK).
