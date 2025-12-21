@@ -76,8 +76,6 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Makefile.in: Do not install a version-suffixed tcpdump binary if the
         .devel file does not exists.
       tests: On HP-UX use "diff -c" by default.
-      autogen.sh: Allow to configure Autoconf warnings.
-      autogen.sh: Delete all trailing blank lines at end of configure.
       Reimplement the tests similarly to libpcap.
     Documentation:
       man: Clarify the "any" pseudo-interface further.
@@ -150,6 +148,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Autoconf: Avoid incorrectly include the libpcap's config.h.
       Require config.h to be from the tcpdump build.
       AppVeyor: Update Npcap SDK to 1.15.
+      autogen.sh: Allow to configure Autoconf warnings.
+      autogen.sh: Delete all trailing blank lines at end of configure.
 
 Friday, August 30, 2024 / The Tcpdump Group
   Summary for 4.99.5 tcpdump release
