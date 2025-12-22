@@ -1,0 +1,18 @@
+    1  2024-02-05 05:10:17.314281 IP6 (flowlabel 0xf260b, hlim 255, next-header ICMPv6 (58), payload length 28) fdfd:5c41:712d:d05a:d0dd:22ff:feac:5c6b > fdfd:5c41:712d:d0aa:225:90ff:fea8:8686: [icmp6 sum ok] ICMP6, extended echo request, id 64353, seq 0
+	Local Interface, checksum 0xdcf4 (correct), length 12
+	  Interface Identification Object (3), Class-Type: 2, length 8
+	    Interface Index: 1
+    2  2024-02-05 05:10:17.314546 IP6 (flowlabel 0x618d4, hlim 59, next-header ICMPv6 (58), payload length 28) fdfd:5c41:712d:d0aa:225:90ff:fea8:8686 > fdfd:5c41:712d:d05a:d0dd:22ff:feac:5c6b: [icmp6 sum ok] ICMP6, extended echo reply, id 64353, seq 0
+	Code 0 (No error), State 0 (Reserved), active 1 ipv4 1 ipv6 1
+    3  2024-02-05 05:10:46.267725 IP6 (flowlabel 0xf260b, hlim 255, next-header ICMPv6 (58), payload length 32) fdfd:5c41:712d:d05a:d0dd:22ff:feac:5c6b > fdfd:5c41:712d:d0aa:225:90ff:fea8:8686: [icmp6 sum ok] ICMP6, extended echo request, id 64356, seq 0
+	Local Interface, checksum 0x2df1 (correct), length 16
+	  Interface Identification Object (3), Class-Type: 1, length 12
+	    Interface Name, length 8: enp2s0f0
+    4  2024-02-05 05:10:46.267887 IP6 (flowlabel 0x618d4, hlim 59, next-header ICMPv6 (58), payload length 32) fdfd:5c41:712d:d0aa:225:90ff:fea8:8686 > fdfd:5c41:712d:d05a:d0dd:22ff:feac:5c6b: [icmp6 sum ok] ICMP6, extended echo reply, id 64356, seq 0
+	Code 0 (No error), State 0 (Reserved), active 1 ipv4 0 ipv6 0
+    5  2024-02-05 05:11:07.324173 IP6 (flowlabel 0xf260b, hlim 255, next-header ICMPv6 (58), payload length 32) fdfd:5c41:712d:d05a:d0dd:22ff:feac:5c6b > fdfd:5c41:712d:d0aa:225:90ff:fea8:8686: [icmp6 sum ok] ICMP6, extended echo request, id 64359, seq 0
+	Local Interface, checksum 0x9eb5 (correct), length 16
+	  Interface Identification Object (3), Class-Type: 1, length 12
+	    Interface Name, length 8: george
+    6  2024-02-05 05:11:07.324377 IP6 (flowlabel 0x618d4, hlim 59, next-header ICMPv6 (58), payload length 32) fdfd:5c41:712d:d0aa:225:90ff:fea8:8686 > fdfd:5c41:712d:d05a:d0dd:22ff:feac:5c6b: [icmp6 sum ok] ICMP6, extended echo reply, id 64359, seq 0
+	Code 2 (No Such Interface), State 0 (Reserved), active 0 ipv4 0 ipv6 0

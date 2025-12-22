@@ -1,0 +1,3 @@
+    1  2015-08-22 11:09:05.156268 IP 192.168.0.105.4342 > 127.0.0.1.4342: LISP-Map-Notify, 3 record(s),
+ [unsupported address family identifier 7680]
+    2  2015-08-22 11:09:05.615558 IP 192.168.0.105.4342 > 127.0.0.1.4342: LISP-Map-Notify, 2 record(s), [authentication data length 35117 > 112] (invalid)

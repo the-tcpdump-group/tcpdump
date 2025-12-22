@@ -1,0 +1,60 @@
+version: '{build}'
+
+clone_depth: 5
+
+branches:
+  except:
+    - coverity_scan
+
+matrix:
+  fast_finish: true
+
+install:
+  - appveyor DownloadFile https://github.com/the-tcpdump-group/tcpdump-htdocs/raw/master/depends/npcap-sdk-1.15.zip
+  - 7z x .\npcap-sdk-1.15.zip -oc:\projects\libpcap\Win32\npcap-sdk-1.15
+
+environment:
+  matrix:
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      GENERATOR: "Visual Studio 15 2017"
+      PLATFORM: Win32
+      SDK: npcap-sdk-1.15
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      GENERATOR: "Visual Studio 15 2017"
+      PLATFORM: x64
+      SDK: npcap-sdk-1.15
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      GENERATOR: "Visual Studio 16 2019"
+      PLATFORM: Win32
+      SDK: npcap-sdk-1.15
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      GENERATOR: "Visual Studio 16 2019"
+      PLATFORM: x64
+      SDK: npcap-sdk-1.15
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      GENERATOR: "Visual Studio 16 2019"
+      PLATFORM: ARM64
+      SDK: npcap-sdk-1.15
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+      GENERATOR: "Visual Studio 17 2022"
+      PLATFORM: Win32
+      SDK: npcap-sdk-1.15
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+      GENERATOR: "Visual Studio 17 2022"
+      PLATFORM: x64
+      SDK: npcap-sdk-1.15
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+      GENERATOR: "Visual Studio 17 2022"
+      PLATFORM: ARM64
+      SDK: npcap-sdk-1.15
+
+build_script:
+  #
+  # Appveyor defaults to cmd.exe, so use cmd.exe syntax.
+  #
+  - git show --oneline -s
+  - type NUL >.devel
+  - md build
+  - cd build
+  - cmake -DPCAP_ROOT=c:\projects\libpcap\Win32\%SDK% -G"%GENERATOR%" -A %PLATFORM% ..
+  - msbuild /m /nologo /p:Configuration=Release tcpdump.sln

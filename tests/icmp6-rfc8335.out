@@ -1,0 +1,6 @@
+    1  2024-02-05 05:10:17.314281 IP6 fdfd:5c41:712d:d05a:d0dd:22ff:feac:5c6b > fdfd:5c41:712d:d0aa:225:90ff:fea8:8686: ICMP6, extended echo request, id 64353, seq 0, length 28
+    2  2024-02-05 05:10:17.314546 IP6 fdfd:5c41:712d:d0aa:225:90ff:fea8:8686 > fdfd:5c41:712d:d05a:d0dd:22ff:feac:5c6b: ICMP6, extended echo reply, id 64353, seq 0, length 28
+    3  2024-02-05 05:10:46.267725 IP6 fdfd:5c41:712d:d05a:d0dd:22ff:feac:5c6b > fdfd:5c41:712d:d0aa:225:90ff:fea8:8686: ICMP6, extended echo request, id 64356, seq 0, length 32
+    4  2024-02-05 05:10:46.267887 IP6 fdfd:5c41:712d:d0aa:225:90ff:fea8:8686 > fdfd:5c41:712d:d05a:d0dd:22ff:feac:5c6b: ICMP6, extended echo reply, id 64356, seq 0, length 32
+    5  2024-02-05 05:11:07.324173 IP6 fdfd:5c41:712d:d05a:d0dd:22ff:feac:5c6b > fdfd:5c41:712d:d0aa:225:90ff:fea8:8686: ICMP6, extended echo request, id 64359, seq 0, length 32
+    6  2024-02-05 05:11:07.324377 IP6 fdfd:5c41:712d:d0aa:225:90ff:fea8:8686 > fdfd:5c41:712d:d05a:d0dd:22ff:feac:5c6b: ICMP6, extended echo reply, id 64359, seq 0, length 32

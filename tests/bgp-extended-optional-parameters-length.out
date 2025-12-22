@@ -1,0 +1,35 @@
+    1  2021-11-21 21:07:21.568564 IP6 (class 0xc0, flowlabel 0x67c6e, hlim 1, next-header TCP (6), payload length 172) 2a02:abc::123.45566 > 2a02:abc::17.179: Flags [P.], cksum 0xdfd3 (correct), seq 83043996:83044136, ack 2441923920, win 127, options [nop,nop,TS val 4087797327 ecr 29756155], length 140: BGP
+	Open Message (1), length: 140
+	  Version 4, my AS 174, Holdtime 180s, ID 6.6.6.6
+	  Optional parameters (Extended), length: 108
+	    Option Capabilities Advertisement (2), length: 6
+	      Multiprotocol Extensions (1), length: 4
+		AFI IPv4 (1), SAFI Unicast (1)
+	    Option Capabilities Advertisement (2), length: 6
+	      Multiprotocol Extensions (1), length: 4
+		AFI IPv6 (2), SAFI Unicast (1)
+	    Option Capabilities Advertisement (2), length: 2
+	      Route Refresh (Cisco) (128), length: 0
+	    Option Capabilities Advertisement (2), length: 2
+	      Route Refresh (2), length: 0
+	    Option Capabilities Advertisement (2), length: 2
+	      Enhanced Route Refresh (70), length: 0
+	    Option Capabilities Advertisement (2), length: 6
+	      32-Bit AS Number (65), length: 4
+		 4 Byte AS 174
+	    Option Capabilities Advertisement (2), length: 2
+	      BGP Extended Message (6), length: 0
+	    Option Capabilities Advertisement (2), length: 10
+	      Multiple Paths (69), length: 8
+		AFI IPv4 (1), SAFI Unicast (1), Send/Receive: Receive
+		AFI IPv6 (2), SAFI Unicast (1), Send/Receive: Receive
+	    Option Capabilities Advertisement (2), length: 19
+	      Unknown (73), length: 17
+		no decoder for Capability 73
+		0x0000:  0f65 7869 7431 2d64 6562 6961 6e2d 3131
+		0x0010:  00
+	    Option Capabilities Advertisement (2), length: 4
+	      Graceful Restart (64), length: 2
+		Restart Flags: [none], Restart Time 120s
+	    Option Capabilities Advertisement (2), length: 16
+	      Long-lived Graceful Restart (71), length: 14

@@ -1,0 +1,1923 @@
+    1  2013-08-05 04:02:45.610103 IP6 (hlim 1, next-header HBH (0), payload length 36) fe80::a00:27ff:fe46:e884 > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 1 group record(s) [gaddr ff02::1:ff00:0 to_ex { }]
+    2  2013-08-05 04:02:51.707303 IP (tos 0x10, ttl 128, id 0, offset 0, flags [none], proto UDP (17), length 328)
+    0.0.0.0.68 > 255.255.255.255.67: [udp sum ok] BOOTP/DHCP, Request from 08:00:27:46:e8:84, length 300, xid 0xd60c7466, secs 13, Flags [none] (0x0000)
+	  Client-Ethernet-Address 08:00:27:46:e8:84
+	  Vendor-rfc1048 Extensions
+	    Magic Cookie 0x63825363
+	    DHCP-Message (53), length 1: Discover
+	    Parameter-Request (55), length 17: 
+	      Subnet-Mask (1), BR (28), Time-Zone (2), Classless-Static-Route (121)
+	      Domain-Name (15), Domain-Name-Server (6), Hostname (12), YD (40)
+	      YS (41), NTP (42), MTU (26), Unknown (119)
+	      Default-Gateway (3), Classless-Static-Route (121), Classless-Static-Route-Microsoft (249), Unknown (252)
+	      NTP (42)
+    3  2013-08-05 04:02:58.010903 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:0d:f1:3c
+	  0x0000:  0408 0027 0df1 3c
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:0d:f1:3c
+	  0x0000:  0308 0027 0df1 3c
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c209 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c20a 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	End TLV (0), length 0
+    4  2013-08-05 04:03:02.335010 IP (tos 0x10, ttl 128, id 0, offset 0, flags [none], proto UDP (17), length 328)
+    0.0.0.0.68 > 255.255.255.255.67: [udp sum ok] BOOTP/DHCP, Request from 08:00:27:46:e8:84, length 300, xid 0xd60c7466, secs 24, Flags [none] (0x0000)
+	  Client-Ethernet-Address 08:00:27:46:e8:84
+	  Vendor-rfc1048 Extensions
+	    Magic Cookie 0x63825363
+	    DHCP-Message (53), length 1: Discover
+	    Parameter-Request (55), length 17: 
+	      Subnet-Mask (1), BR (28), Time-Zone (2), Classless-Static-Route (121)
+	      Domain-Name (15), Domain-Name-Server (6), Hostname (12), YD (40)
+	      YS (41), NTP (42), MTU (26), Unknown (119)
+	      Default-Gateway (3), Classless-Static-Route (121), Classless-Static-Route-Microsoft (249), Unknown (252)
+	      NTP (42)
+    5  2013-08-05 04:03:14.455118 IP (tos 0x10, ttl 128, id 0, offset 0, flags [none], proto UDP (17), length 328)
+    0.0.0.0.68 > 255.255.255.255.67: [udp sum ok] BOOTP/DHCP, Request from 08:00:27:46:e8:84, length 300, xid 0xd60c7466, secs 36, Flags [none] (0x0000)
+	  Client-Ethernet-Address 08:00:27:46:e8:84
+	  Vendor-rfc1048 Extensions
+	    Magic Cookie 0x63825363
+	    DHCP-Message (53), length 1: Discover
+	    Parameter-Request (55), length 17: 
+	      Subnet-Mask (1), BR (28), Time-Zone (2), Classless-Static-Route (121)
+	      Domain-Name (15), Domain-Name-Server (6), Hostname (12), YD (40)
+	      YS (41), NTP (42), MTU (26), Unknown (119)
+	      Default-Gateway (3), Classless-Static-Route (121), Classless-Static-Route-Microsoft (249), Unknown (252)
+	      NTP (42)
+    6  2013-08-05 04:03:25.996519 IP6 (hlim 1, next-header HBH (0), payload length 76) :: > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 3 group record(s) [gaddr ff02::1:ff46:e884 to_ex { }] [gaddr ff02::2 to_ex { }] [gaddr ff02::202 to_ex { }]
+    7  2013-08-05 04:03:26.277614 IP (tos 0x10, ttl 128, id 0, offset 0, flags [none], proto UDP (17), length 328)
+    0.0.0.0.68 > 255.255.255.255.67: [udp sum ok] BOOTP/DHCP, Request from 08:00:27:46:e8:84, length 300, xid 0x3c41e764, Flags [none] (0x0000)
+	  Client-Ethernet-Address 08:00:27:46:e8:84
+	  Vendor-rfc1048 Extensions
+	    Magic Cookie 0x63825363
+	    DHCP-Message (53), length 1: Discover
+	    Parameter-Request (55), length 17: 
+	      Subnet-Mask (1), BR (28), Time-Zone (2), Classless-Static-Route (121)
+	      Domain-Name (15), Domain-Name-Server (6), Hostname (12), YD (40)
+	      YS (41), NTP (42), MTU (26), Unknown (119)
+	      Default-Gateway (3), Classless-Static-Route (121), Classless-Static-Route-Microsoft (249), Unknown (252)
+	      NTP (42)
+    8  2013-08-05 04:03:26.350998 IP6 (hlim 255, next-header ICMPv6 (58), payload length 24) :: > ff02::1:ff46:e884: [icmp6 sum ok] ICMP6, neighbor solicitation, length 24, who has fe80::a00:27ff:fe46:e884
+    9  2013-08-05 04:03:27.354673 IP6 (hlim 255, next-header ICMPv6 (58), payload length 16) fe80::a00:27ff:fe46:e884 > ff02::2: [icmp6 sum ok] ICMP6, router solicitation, length 16
+	  source link-address option (1), length 8 (1): 08:00:27:46:e8:84
+	    0x0000:  0800 2746 e884
+   10  2013-08-05 04:03:27.357124 IP6 (hlim 1, next-header HBH (0), payload length 96) fe80::a00:27ff:fe46:e884 > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 4 group record(s) [gaddr ff02::1:ff00:0 to_ex { }] [gaddr ff02::1:ff46:e884 to_ex { }] [gaddr ff02::2 to_ex { }] [gaddr ff02::202 to_ex { }]
+   11  2013-08-05 04:03:28.117735 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:0d:f1:3c
+	  0x0000:  0408 0027 0df1 3c
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:0d:f1:3c
+	  0x0000:  0308 0027 0df1 3c
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c209 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c20a 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	End TLV (0), length 0
+   12  2013-08-05 04:03:30.897903 IP6 (hlim 1, next-header HBH (0), payload length 76) :: > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 3 group record(s) [gaddr ff02::1:ff42:ba59 to_ex { }] [gaddr ff02::2 to_ex { }] [gaddr ff02::202 to_ex { }]
+   13  2013-08-05 04:03:31.314436 IP6 (hlim 255, next-header ICMPv6 (58), payload length 24) :: > ff02::1:ff42:ba59: [icmp6 sum ok] ICMP6, neighbor solicitation, length 24, who has fe80::a00:27ff:fe42:ba59
+   14  2013-08-05 04:03:32.317793 IP6 (hlim 1, next-header HBH (0), payload length 96) fe80::a00:27ff:fe42:ba59 > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 4 group record(s) [gaddr ff02::1:ff00:0 to_ex { }] [gaddr ff02::1:ff42:ba59 to_ex { }] [gaddr ff02::2 to_ex { }] [gaddr ff02::202 to_ex { }]
+   15  2013-08-05 04:03:32.954128 IP6 (hlim 1, next-header HBH (0), payload length 36) fe80::a00:27ff:fe46:e884 > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 1 group record(s) [gaddr ff02::1:ff00:0 to_ex { }]
+   16  2013-08-05 04:03:34.060615 IP (tos 0x10, ttl 128, id 0, offset 0, flags [none], proto UDP (17), length 328)
+    0.0.0.0.68 > 255.255.255.255.67: [udp sum ok] BOOTP/DHCP, Request from 08:00:27:46:e8:84, length 300, xid 0x3c41e764, secs 8, Flags [none] (0x0000)
+	  Client-Ethernet-Address 08:00:27:46:e8:84
+	  Vendor-rfc1048 Extensions
+	    Magic Cookie 0x63825363
+	    DHCP-Message (53), length 1: Discover
+	    Parameter-Request (55), length 17: 
+	      Subnet-Mask (1), BR (28), Time-Zone (2), Classless-Static-Route (121)
+	      Domain-Name (15), Domain-Name-Server (6), Hostname (12), YD (40)
+	      YS (41), NTP (42), MTU (26), Unknown (119)
+	      Default-Gateway (3), Classless-Static-Route (121), Classless-Static-Route-Microsoft (249), Unknown (252)
+	      NTP (42)
+   17  2013-08-05 04:03:35.582218 IP6 (hlim 1, next-header HBH (0), payload length 36) fe80::a00:27ff:fe42:ba59 > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 1 group record(s) [gaddr ff02::1:ff00:0 to_ex { }]
+   18  2013-08-05 04:03:46.353287 IP (tos 0x10, ttl 128, id 0, offset 0, flags [none], proto UDP (17), length 328)
+    0.0.0.0.68 > 255.255.255.255.67: [udp sum ok] BOOTP/DHCP, Request from 08:00:27:46:e8:84, length 300, xid 0x3c41e764, secs 20, Flags [none] (0x0000)
+	  Client-Ethernet-Address 08:00:27:46:e8:84
+	  Vendor-rfc1048 Extensions
+	    Magic Cookie 0x63825363
+	    DHCP-Message (53), length 1: Discover
+	    Parameter-Request (55), length 17: 
+	      Subnet-Mask (1), BR (28), Time-Zone (2), Classless-Static-Route (121)
+	      Domain-Name (15), Domain-Name-Server (6), Hostname (12), YD (40)
+	      YS (41), NTP (42), MTU (26), Unknown (119)
+	      Default-Gateway (3), Classless-Static-Route (121), Classless-Static-Route-Microsoft (249), Unknown (252)
+	      NTP (42)
+   19  2013-08-05 04:03:58.207517 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:0d:f1:3c
+	  0x0000:  0408 0027 0df1 3c
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:0d:f1:3c
+	  0x0000:  0308 0027 0df1 3c
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c209 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c20a 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	End TLV (0), length 0
+   20  2013-08-05 04:04:07.294578 IP (tos 0x10, ttl 128, id 0, offset 0, flags [none], proto UDP (17), length 328)
+    0.0.0.0.68 > 255.255.255.255.67: [udp sum ok] BOOTP/DHCP, Request from 08:00:27:46:e8:84, length 300, xid 0x3c41e764, secs 41, Flags [none] (0x0000)
+	  Client-Ethernet-Address 08:00:27:46:e8:84
+	  Vendor-rfc1048 Extensions
+	    Magic Cookie 0x63825363
+	    DHCP-Message (53), length 1: Discover
+	    Parameter-Request (55), length 17: 
+	      Subnet-Mask (1), BR (28), Time-Zone (2), Classless-Static-Route (121)
+	      Domain-Name (15), Domain-Name-Server (6), Hostname (12), YD (40)
+	      YS (41), NTP (42), MTU (26), Unknown (119)
+	      Default-Gateway (3), Classless-Static-Route (121), Classless-Static-Route-Microsoft (249), Unknown (252)
+	      NTP (42)
+   21  2013-08-05 04:04:15.044685 IP6 (hlim 1, next-header HBH (0), payload length 76) :: > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 3 group record(s) [gaddr ff02::1:ff46:e884 to_ex { }] [gaddr ff02::2 to_ex { }] [gaddr ff02::202 to_ex { }]
+   22  2013-08-05 04:04:15.295367 IP (tos 0x10, ttl 128, id 0, offset 0, flags [none], proto UDP (17), length 328)
+    0.0.0.0.68 > 255.255.255.255.67: [udp sum ok] BOOTP/DHCP, Request from 08:00:27:46:e8:84, length 300, xid 0xc1fb0d77, Flags [none] (0x0000)
+	  Client-Ethernet-Address 08:00:27:46:e8:84
+	  Vendor-rfc1048 Extensions
+	    Magic Cookie 0x63825363
+	    DHCP-Message (53), length 1: Discover
+	    Parameter-Request (55), length 17: 
+	      Subnet-Mask (1), BR (28), Time-Zone (2), Classless-Static-Route (121)
+	      Domain-Name (15), Domain-Name-Server (6), Hostname (12), YD (40)
+	      YS (41), NTP (42), MTU (26), Unknown (119)
+	      Default-Gateway (3), Classless-Static-Route (121), Classless-Static-Route-Microsoft (249), Unknown (252)
+	      NTP (42)
+   23  2013-08-05 04:04:15.831624 IP6 (hlim 255, next-header ICMPv6 (58), payload length 24) :: > ff02::1:ff46:e884: [icmp6 sum ok] ICMP6, neighbor solicitation, length 24, who has fe80::a00:27ff:fe46:e884
+   24  2013-08-05 04:04:16.833793 IP6 (hlim 255, next-header ICMPv6 (58), payload length 16) fe80::a00:27ff:fe46:e884 > ff02::2: [icmp6 sum ok] ICMP6, router solicitation, length 16
+	  source link-address option (1), length 8 (1): 08:00:27:46:e8:84
+	    0x0000:  0800 2746 e884
+   25  2013-08-05 04:04:16.835771 IP6 (hlim 1, next-header HBH (0), payload length 96) fe80::a00:27ff:fe46:e884 > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 4 group record(s) [gaddr ff02::1:ff00:0 to_ex { }] [gaddr ff02::1:ff46:e884 to_ex { }] [gaddr ff02::2 to_ex { }] [gaddr ff02::202 to_ex { }]
+   26  2013-08-05 04:04:18.197618 IP (tos 0x10, ttl 128, id 0, offset 0, flags [none], proto UDP (17), length 328)
+    0.0.0.0.68 > 255.255.255.255.67: [udp sum ok] BOOTP/DHCP, Request from 08:00:27:46:e8:84, length 300, xid 0xc1fb0d77, secs 3, Flags [none] (0x0000)
+	  Client-Ethernet-Address 08:00:27:46:e8:84
+	  Vendor-rfc1048 Extensions
+	    Magic Cookie 0x63825363
+	    DHCP-Message (53), length 1: Discover
+	    Parameter-Request (55), length 17: 
+	      Subnet-Mask (1), BR (28), Time-Zone (2), Classless-Static-Route (121)
+	      Domain-Name (15), Domain-Name-Server (6), Hostname (12), YD (40)
+	      YS (41), NTP (42), MTU (26), Unknown (119)
+	      Default-Gateway (3), Classless-Static-Route (121), Classless-Static-Route-Microsoft (249), Unknown (252)
+	      NTP (42)
+   27  2013-08-05 04:04:18.745823 IP6 (hlim 1, next-header HBH (0), payload length 36) fe80::a00:27ff:fe46:e884 > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 1 group record(s) [gaddr ff02::1:ff00:0 to_ex { }]
+   28  2013-08-05 04:04:23.674007 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:42:ba:59
+	  0x0000:  0408 0027 42ba 59
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:42:ba:59
+	  0x0000:  0308 0027 42ba 59
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  15  15  15  15  15  15  15 
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   0   0   0   0   0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   0   0   0   0   0   0   0  
+	  0x0000:  0080 c209 00ff ffff ff00 0000 0000 0000
+	  0x0010:  0000 0000 0000 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  15  15  15  15  15  15  15 
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   0   0   0   0   0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   0   0   0   0   0   0   0  
+	  0x0000:  0080 c20a 00ff ffff ff00 0000 0000 0000
+	  0x0010:  0000 0000 0000 0000 00
+	End TLV (0), length 0
+   29  2013-08-05 04:04:25.764634 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:42:ba:59
+	  0x0000:  0408 0027 42ba 59
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:42:ba:59
+	  0x0000:  0308 0027 42ba 59
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  15  15  15  15  15  15  15 
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   0   0   0   0   0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   0   0   0   0   0   0   0  
+	  0x0000:  0080 c209 00ff ffff ff00 0000 0000 0000
+	  0x0010:  0000 0000 0000 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  15  15  15  15  15  15  15 
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   0   0   0   0   0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   0   0   0   0   0   0   0  
+	  0x0000:  0080 c20a 00ff ffff ff00 0000 0000 0000
+	  0x0010:  0000 0000 0000 0000 00
+	End TLV (0), length 0
+   30  2013-08-05 04:04:26.645346 IP (tos 0x10, ttl 128, id 0, offset 0, flags [none], proto UDP (17), length 328)
+    0.0.0.0.68 > 255.255.255.255.67: [udp sum ok] BOOTP/DHCP, Request from 08:00:27:46:e8:84, length 300, xid 0xc1fb0d77, secs 11, Flags [none] (0x0000)
+	  Client-Ethernet-Address 08:00:27:46:e8:84
+	  Vendor-rfc1048 Extensions
+	    Magic Cookie 0x63825363
+	    DHCP-Message (53), length 1: Discover
+	    Parameter-Request (55), length 17: 
+	      Subnet-Mask (1), BR (28), Time-Zone (2), Classless-Static-Route (121)
+	      Domain-Name (15), Domain-Name-Server (6), Hostname (12), YD (40)
+	      YS (41), NTP (42), MTU (26), Unknown (119)
+	      Default-Gateway (3), Classless-Static-Route (121), Classless-Static-Route-Microsoft (249), Unknown (252)
+	      NTP (42)
+   31  2013-08-05 04:04:28.323921 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:0d:f1:3c
+	  0x0000:  0408 0027 0df1 3c
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:0d:f1:3c
+	  0x0000:  0308 0027 0df1 3c
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c209 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c20a 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	End TLV (0), length 0
+   32  2013-08-05 04:04:30.451608 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:0d:f1:3c
+	  0x0000:  0408 0027 0df1 3c
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:0d:f1:3c
+	  0x0000:  0308 0027 0df1 3c
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c209 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c20a 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	End TLV (0), length 0
+   33  2013-08-05 04:04:38.461280 IP (tos 0x10, ttl 128, id 0, offset 0, flags [none], proto UDP (17), length 328)
+    0.0.0.0.68 > 255.255.255.255.67: [udp sum ok] BOOTP/DHCP, Request from 08:00:27:46:e8:84, length 300, xid 0xc1fb0d77, secs 23, Flags [none] (0x0000)
+	  Client-Ethernet-Address 08:00:27:46:e8:84
+	  Vendor-rfc1048 Extensions
+	    Magic Cookie 0x63825363
+	    DHCP-Message (53), length 1: Discover
+	    Parameter-Request (55), length 17: 
+	      Subnet-Mask (1), BR (28), Time-Zone (2), Classless-Static-Route (121)
+	      Domain-Name (15), Domain-Name-Server (6), Hostname (12), YD (40)
+	      YS (41), NTP (42), MTU (26), Unknown (119)
+	      Default-Gateway (3), Classless-Static-Route (121), Classless-Static-Route-Microsoft (249), Unknown (252)
+	      NTP (42)
+   34  2013-08-05 04:04:51.930199 IP (tos 0x10, ttl 128, id 0, offset 0, flags [none], proto UDP (17), length 328)
+    0.0.0.0.68 > 255.255.255.255.67: [udp sum ok] BOOTP/DHCP, Request from 08:00:27:46:e8:84, length 300, xid 0xc1fb0d77, secs 36, Flags [none] (0x0000)
+	  Client-Ethernet-Address 08:00:27:46:e8:84
+	  Vendor-rfc1048 Extensions
+	    Magic Cookie 0x63825363
+	    DHCP-Message (53), length 1: Discover
+	    Parameter-Request (55), length 17: 
+	      Subnet-Mask (1), BR (28), Time-Zone (2), Classless-Static-Route (121)
+	      Domain-Name (15), Domain-Name-Server (6), Hostname (12), YD (40)
+	      YS (41), NTP (42), MTU (26), Unknown (119)
+	      Default-Gateway (3), Classless-Static-Route (121), Classless-Static-Route-Microsoft (249), Unknown (252)
+	      NTP (42)
+   35  2013-08-05 04:04:53.780244 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:42:ba:59
+	  0x0000:  0408 0027 42ba 59
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:42:ba:59
+	  0x0000:  0308 0027 42ba 59
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  1   15  15  15  1   15  1  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   0   0   0   0   0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   0   0   0   0   0   0   0  
+	  0x0000:  0080 c209 00f1 fff1 f100 0000 0000 0000
+	  0x0010:  0000 0000 0000 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  1   15  15  15  1   15  1  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   0   0   0   0   0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   0   0   0   0   0   0   0  
+	  0x0000:  0080 c20a 00f1 fff1 f100 0000 0000 0000
+	  0x0010:  0000 0000 0000 0000 00
+	End TLV (0), length 0
+   36  2013-08-05 04:04:55.904557 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:42:ba:59
+	  0x0000:  0408 0027 42ba 59
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:42:ba:59
+	  0x0000:  0308 0027 42ba 59
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  1   15  15  15  1   15  1  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   0   0   0   0   0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   0   0   0   0   0   0   0  
+	  0x0000:  0080 c209 00f1 fff1 f100 0000 0000 0000
+	  0x0010:  0000 0000 0000 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  1   15  15  15  1   15  1  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   0   0   0   0   0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   0   0   0   0   0   0   0  
+	  0x0000:  0080 c20a 00f1 fff1 f100 0000 0000 0000
+	  0x0010:  0000 0000 0000 0000 00
+	End TLV (0), length 0
+   37  2013-08-05 04:04:58.412637 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:0d:f1:3c
+	  0x0000:  0408 0027 0df1 3c
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:0d:f1:3c
+	  0x0000:  0308 0027 0df1 3c
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c209 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c20a 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	End TLV (0), length 0
+   38  2013-08-05 04:05:00.514707 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:0d:f1:3c
+	  0x0000:  0408 0027 0df1 3c
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:0d:f1:3c
+	  0x0000:  0308 0027 0df1 3c
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c209 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c20a 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	End TLV (0), length 0
+   39  2013-08-05 04:05:03.015934 IP6 (hlim 1, next-header HBH (0), payload length 76) :: > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 3 group record(s) [gaddr ff02::1:ff46:e884 to_ex { }] [gaddr ff02::2 to_ex { }] [gaddr ff02::202 to_ex { }]
+   40  2013-08-05 04:05:03.279132 IP6 (hlim 255, next-header ICMPv6 (58), payload length 24) :: > ff02::1:ff46:e884: [icmp6 sum ok] ICMP6, neighbor solicitation, length 24, who has fe80::a00:27ff:fe46:e884
+   41  2013-08-05 04:05:03.298875 IP (tos 0x10, ttl 128, id 0, offset 0, flags [none], proto UDP (17), length 328)
+    0.0.0.0.68 > 255.255.255.255.67: [udp sum ok] BOOTP/DHCP, Request from 08:00:27:46:e8:84, length 300, xid 0xf0059f6c, Flags [none] (0x0000)
+	  Client-Ethernet-Address 08:00:27:46:e8:84
+	  Vendor-rfc1048 Extensions
+	    Magic Cookie 0x63825363
+	    DHCP-Message (53), length 1: Discover
+	    Parameter-Request (55), length 17: 
+	      Subnet-Mask (1), BR (28), Time-Zone (2), Classless-Static-Route (121)
+	      Domain-Name (15), Domain-Name-Server (6), Hostname (12), YD (40)
+	      YS (41), NTP (42), MTU (26), Unknown (119)
+	      Default-Gateway (3), Classless-Static-Route (121), Classless-Static-Route-Microsoft (249), Unknown (252)
+	      NTP (42)
+   42  2013-08-05 04:05:04.283851 IP6 (hlim 255, next-header ICMPv6 (58), payload length 16) fe80::a00:27ff:fe46:e884 > ff02::2: [icmp6 sum ok] ICMP6, router solicitation, length 16
+	  source link-address option (1), length 8 (1): 08:00:27:46:e8:84
+	    0x0000:  0800 2746 e884
+   43  2013-08-05 04:05:04.285659 IP6 (hlim 1, next-header HBH (0), payload length 96) fe80::a00:27ff:fe46:e884 > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 4 group record(s) [gaddr ff02::1:ff00:0 to_ex { }] [gaddr ff02::1:ff46:e884 to_ex { }] [gaddr ff02::2 to_ex { }] [gaddr ff02::202 to_ex { }]
+   44  2013-08-05 04:05:06.521454 IP6 (hlim 1, next-header HBH (0), payload length 36) fe80::a00:27ff:fe46:e884 > ff02::16: HBH (rtalert: 0x0000) (padn) [icmp6 sum ok] ICMP6, multicast listener report v2, 1 group record(s) [gaddr ff02::1:ff00:0 to_ex { }]
+   45  2013-08-05 04:05:08.315660 IP (tos 0x10, ttl 128, id 0, offset 0, flags [none], proto UDP (17), length 328)
+    0.0.0.0.68 > 255.255.255.255.67: [udp sum ok] BOOTP/DHCP, Request from 08:00:27:46:e8:84, length 300, xid 0xf0059f6c, secs 5, Flags [none] (0x0000)
+	  Client-Ethernet-Address 08:00:27:46:e8:84
+	  Vendor-rfc1048 Extensions
+	    Magic Cookie 0x63825363
+	    DHCP-Message (53), length 1: Discover
+	    Parameter-Request (55), length 17: 
+	      Subnet-Mask (1), BR (28), Time-Zone (2), Classless-Static-Route (121)
+	      Domain-Name (15), Domain-Name-Server (6), Hostname (12), YD (40)
+	      YS (41), NTP (42), MTU (26), Unknown (119)
+	      Default-Gateway (3), Classless-Static-Route (121), Classless-Static-Route-Microsoft (249), Unknown (252)
+	      NTP (42)
+   46  2013-08-05 04:05:20.296407 IP (tos 0x10, ttl 128, id 0, offset 0, flags [none], proto UDP (17), length 328)
+    0.0.0.0.68 > 255.255.255.255.67: [udp sum ok] BOOTP/DHCP, Request from 08:00:27:46:e8:84, length 300, xid 0xf0059f6c, secs 17, Flags [none] (0x0000)
+	  Client-Ethernet-Address 08:00:27:46:e8:84
+	  Vendor-rfc1048 Extensions
+	    Magic Cookie 0x63825363
+	    DHCP-Message (53), length 1: Discover
+	    Parameter-Request (55), length 17: 
+	      Subnet-Mask (1), BR (28), Time-Zone (2), Classless-Static-Route (121)
+	      Domain-Name (15), Domain-Name-Server (6), Hostname (12), YD (40)
+	      YS (41), NTP (42), MTU (26), Unknown (119)
+	      Default-Gateway (3), Classless-Static-Route (121), Classless-Static-Route-Microsoft (249), Unknown (252)
+	      NTP (42)
+   47  2013-08-05 04:05:23.875146 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:42:ba:59
+	  0x0000:  0408 0027 42ba 59
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:42:ba:59
+	  0x0000:  0308 0027 42ba 59
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  15  15  15  15  15  15  15 
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   0   0   0   0   0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   0   0   0   0   0   0   0  
+	  0x0000:  0080 c209 00ff ffff ff00 0000 0000 0000
+	  0x0010:  0000 0000 0000 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  15  15  15  15  15  15  15 
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   0   0   0   0   0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   0   0   0   0   0   0   0  
+	  0x0000:  0080 c20a 00ff ffff ff00 0000 0000 0000
+	  0x0010:  0000 0000 0000 0000 00
+	End TLV (0), length 0
+   48  2013-08-05 04:05:25.977057 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:42:ba:59
+	  0x0000:  0408 0027 42ba 59
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:42:ba:59
+	  0x0000:  0308 0027 42ba 59
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  15  15  15  15  15  15  15 
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   0   0   0   0   0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   0   0   0   0   0   0   0  
+	  0x0000:  0080 c209 00ff ffff ff00 0000 0000 0000
+	  0x0010:  0000 0000 0000 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  15  15  15  15  15  15  15 
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   0   0   0   0   0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   0   0   0   0   0   0   0  
+	  0x0000:  0080 c20a 00ff ffff ff00 0000 0000 0000
+	  0x0010:  0000 0000 0000 0000 00
+	End TLV (0), length 0
+   49  2013-08-05 04:05:28.534761 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:0d:f1:3c
+	  0x0000:  0408 0027 0df1 3c
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:0d:f1:3c
+	  0x0000:  0308 0027 0df1 3c
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c209 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c20a 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	End TLV (0), length 0
+   50  2013-08-05 04:05:30.640668 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:0d:f1:3c
+	  0x0000:  0408 0027 0df1 3c
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:0d:f1:3c
+	  0x0000:  0308 0027 0df1 3c
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c209 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c20a 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	End TLV (0), length 0
+   51  2013-08-05 04:05:39.776898 IP (tos 0x10, ttl 128, id 0, offset 0, flags [none], proto UDP (17), length 328)
+    0.0.0.0.68 > 255.255.255.255.67: [udp sum ok] BOOTP/DHCP, Request from 08:00:27:46:e8:84, length 300, xid 0xf0059f6c, secs 36, Flags [none] (0x0000)
+	  Client-Ethernet-Address 08:00:27:46:e8:84
+	  Vendor-rfc1048 Extensions
+	    Magic Cookie 0x63825363
+	    DHCP-Message (53), length 1: Discover
+	    Parameter-Request (55), length 17: 
+	      Subnet-Mask (1), BR (28), Time-Zone (2), Classless-Static-Route (121)
+	      Domain-Name (15), Domain-Name-Server (6), Hostname (12), YD (40)
+	      YS (41), NTP (42), MTU (26), Unknown (119)
+	      Default-Gateway (3), Classless-Static-Route (121), Classless-Static-Route-Microsoft (249), Unknown (252)
+	      NTP (42)
+   52  2013-08-05 04:05:54.004592 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:42:ba:59
+	  0x0000:  0408 0027 42ba 59
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:42:ba:59
+	  0x0000:  0308 0027 42ba 59
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  15  1   1   15  15  1   15 
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   0   0   0   0   0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   0   0   0   0   0   0   0  
+	  0x0000:  0080 c209 00ff 11ff 1f00 0000 0000 0000
+	  0x0010:  0000 0000 0000 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  15  1   1   15  15  1   15 
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   0   0   0   0   0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   0   0   0   0   0   0   0  
+	  0x0000:  0080 c20a 00ff 11ff 1f00 0000 0000 0000
+	  0x0010:  0000 0000 0000 0000 00
+	End TLV (0), length 0
+   53  2013-08-05 04:05:56.114583 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:42:ba:59
+	  0x0000:  0408 0027 42ba 59
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:42:ba:59
+	  0x0000:  0308 0027 42ba 59
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  15  1   1   15  15  1   15 
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   0   0   0   0   0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   0   0   0   0   0   0   0  
+	  0x0000:  0080 c209 00ff 11ff 1f00 0000 0000 0000
+	  0x0010:  0000 0000 0000 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  15  1   1   15  15  1   15 
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   0   0   0   0   0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   0   0   0   0   0   0   0  
+	  0x0000:  0080 c20a 00ff 11ff 1f00 0000 0000 0000
+	  0x0010:  0000 0000 0000 0000 00
+	End TLV (0), length 0
+   54  2013-08-05 04:05:58.626100 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:0d:f1:3c
+	  0x0000:  0408 0027 0df1 3c
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:0d:f1:3c
+	  0x0000:  0308 0027 0df1 3c
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c209 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c20a 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	End TLV (0), length 0
+   55  2013-08-05 04:06:00.719346 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:0d:f1:3c
+	  0x0000:  0408 0027 0df1 3c
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:0d:f1:3c
+	  0x0000:  0308 0027 0df1 3c
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c209 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c20a 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	End TLV (0), length 0
+   56  2013-08-05 04:06:24.169864 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:42:ba:59
+	  0x0000:  0408 0027 42ba 59
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:42:ba:59
+	  0x0000:  0308 0027 42ba 59
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c209 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c20a 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	End TLV (0), length 0
+   57  2013-08-05 04:06:26.278553 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:42:ba:59
+	  0x0000:  0408 0027 42ba 59
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:42:ba:59
+	  0x0000:  0308 0027 42ba 59
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c209 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c20a 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	End TLV (0), length 0
+   58  2013-08-05 04:06:28.738974 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:0d:f1:3c
+	  0x0000:  0408 0027 0df1 3c
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:0d:f1:3c
+	  0x0000:  0308 0027 0df1 3c
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c209 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c20a 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	End TLV (0), length 0
+   59  2013-08-05 04:06:30.858406 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:0d:f1:3c
+	  0x0000:  0408 0027 0df1 3c
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:0d:f1:3c
+	  0x0000:  0308 0027 0df1 3c
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c209 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c20a 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	End TLV (0), length 0
+   60  2013-08-05 04:06:54.277839 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:42:ba:59
+	  0x0000:  0408 0027 42ba 59
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:42:ba:59
+	  0x0000:  0308 0027 42ba 59
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c209 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c20a 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	End TLV (0), length 0
+   61  2013-08-05 04:06:56.397550 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:42:ba:59
+	  0x0000:  0408 0027 42ba 59
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:42:ba:59
+	  0x0000:  0308 0027 42ba 59
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c209 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c20a 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	End TLV (0), length 0
+   62  2013-08-05 04:06:58.838612 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:0d:f1:3c
+	  0x0000:  0408 0027 0df1 3c
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:0d:f1:3c
+	  0x0000:  0308 0027 0df1 3c
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c209 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c20a 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	End TLV (0), length 0
+   63  2013-08-05 04:07:00.955767 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:0d:f1:3c
+	  0x0000:  0408 0027 0df1 3c
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:0d:f1:3c
+	  0x0000:  0308 0027 0df1 3c
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c209 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c20a 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	End TLV (0), length 0
+   64  2013-08-05 04:07:24.408571 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:42:ba:59
+	  0x0000:  0408 0027 42ba 59
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:42:ba:59
+	  0x0000:  0308 0027 42ba 59
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c209 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c20a 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	End TLV (0), length 0
+   65  2013-08-05 04:07:26.521204 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:42:ba:59
+	  0x0000:  0408 0027 42ba 59
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:42:ba:59
+	  0x0000:  0308 0027 42ba 59
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c209 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c20a 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	End TLV (0), length 0
+   66  2013-08-05 04:07:28.944341 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:0d:f1:3c
+	  0x0000:  0408 0027 0df1 3c
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:0d:f1:3c
+	  0x0000:  0308 0027 0df1 3c
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c209 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c20a 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	End TLV (0), length 0
+   67  2013-08-05 04:07:31.032657 LLDP, length 135
+	Chassis ID TLV (1), length 7
+	  Subtype MAC address (4): 08:00:27:0d:f1:3c
+	  0x0000:  0408 0027 0df1 3c
+	Port ID TLV (2), length 7
+	  Subtype MAC address (3): 08:00:27:0d:f1:3c
+	  0x0000:  0308 0027 0df1 3c
+	Time to Live TLV (3), length 2: TTL 120s
+	  0x0000:  0078
+	Organization specific TLV (127), length 6: OUI Ethernet bridged (0x0080c2)
+	  Port VLAN Id Subtype (1)
+	    port vlan id (PVID): 1
+	  0x0000:  0080 c201 0001
+	Organization specific TLV (127), length 7: OUI Ethernet bridged (0x0080c2)
+	  Port and Protocol VLAN ID Subtype (2)
+	    port and protocol vlan id (PPVID): 0, flags [supported] (0x02)
+	  0x0000:  0080 c202 0200 00
+	Organization specific TLV (127), length 14: OUI Ethernet bridged (0x0080c2)
+	  VLAN name Subtype (3)
+	    vlan id (VID): 1
+	    vlan name: default
+	  0x0000:  0080 c203 0001 0764 6566 6175 6c74
+	Organization specific TLV (127), length 13: OUI Ethernet bridged (0x0080c2)
+	  Protocol Identity Subtype (4)
+	    protocol identity: 
+	  0x0000:  0080 c204 0800 0042 4203 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Configuration Subtype (9)
+	    Willing:0, CBS:0, RES:0, Max TCs:0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c209 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	Organization specific TLV (127), length 25: OUI Ethernet bridged (0x0080c2)
+	  ETS Recommendation Subtype (10)
+	    RES: 0
+	    Priority Assignment Table
+	     Priority : 0   1   2   3   4   5   6   7
+	     Value    : 15  4   1   1   15  4   1   4  
+	    TC Bandwidth Table
+	     TC%   : 0   1   2   3   4   5   6   7
+	     Value : 0   50  0   0   50  0   0   0  
+	    TSA Assignment Table
+	     Traffic Class: 0   1   2   3   4   5   6   7
+	     Value        : 0   2   0   0   2   0   0   0  
+	  0x0000:  0080 c20a 00f4 11f4 1400 3200 0032 0000
+	  0x0010:  0000 0200 0002 0000 00
+	End TLV (0), length 0

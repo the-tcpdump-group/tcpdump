@@ -1,0 +1,7 @@
+    1  2022-12-29 15:03:48.557763 IP (tos 0x0, ttl 64, id 1, offset 0, flags [none], proto UDP (17), length 356)
+    192.0.2.100.47873 > 192.0.2.101.6343: sFlowv5, IPv4 agent 49.49.49.49, agent-id 0, seqnum 115694180, uptime 3465002224, samples 1, length 328
+	expanded flow sample (3), length 292, seqnum 2170480284, type 0, idx 11001, rate 1000, pool 1521799520, drops 0, input 29001 (0), output 1285816721 (0), records 3
+	    enterprise 0 Raw packet (1) length 140
+	      protocol Ethernet (1), length 126, stripped bytes 4, header_size 122
+	    enterprise 0 Extended Gateway data (1003) length 68
+	    enterprise 0 Extended Router data (1002) length 16

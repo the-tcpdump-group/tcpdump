@@ -1,0 +1,3 @@
+    1  2021-07-04 12:20:37.867811 9526800862us tsft 6.0 Mb/s 5745 MHz 11a -34dBm signal [bit 22] Beacon () [6.0* 9.0 12.0* 18.0 24.0* 36.0 48.0 54.0 Mbit] IBSS CH: 149, PRIVACY (MESHID: 11s-mesh-network)
+    2  2021-07-04 12:20:38.357687 9527290733us tsft 6.0 Mb/s 5745 MHz 11a -38dBm signal [bit 22] Probe Request () [6.0 9.0 12.0 18.0 24.0 36.0 48.0 54.0 Mbit]
+    3  2021-07-04 12:20:38.358276 9527291378us tsft 6.0 Mb/s 5745 MHz 11a -34dBm signal [bit 22] Probe Response () [6.0* 9.0 12.0* 18.0 24.0* 36.0 48.0 54.0 Mbit] CH: 149, PRIVACY (MESHID: 11s-mesh-network)

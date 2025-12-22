@@ -1,0 +1,86 @@
+env:
+  CIRRUS_CLONE_DEPTH: 3 # The internal git client reads CIRRUS_CLONE_DEPTH.
+  LIBPCAP_GIT: https://github.com/the-tcpdump-group/libpcap.git
+  AUTOCONF_WARNINGS: no-obsolete
+
+freebsd_task:
+  name: freebsd-amd64
+  only_if: $CIRRUS_BRANCH != 'coverity_scan'
+  freebsd_instance:
+    # FreeBSD fails to start with 1 GB. 8 CPUs max concurrency.
+    # The number of CPU cores must be either 1 or a multiple of 2.
+    cpu: 1
+    memory: 2G
+    image_family: freebsd-13-5
+  env:
+    IGNORE_OSVERSION: yes
+    MATRIX_CC: clang17 gcc13
+  script:
+    - pkg install -qy git autoconf gcc13 llvm17
+    - pkg install -qy cmake-core # for build_matrix.sh and build.sh
+    - pkg install -qy pkgconf # for cmake, replaces pkg-config
+    - pkg install -qy sudo # for some tcpdump commands
+    - echo '$ git clone [...] libpcap.git'
+    - git -C .. clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT}
+    - ./build_matrix.sh
+
+linux_task:
+  name: linux-amd64
+  only_if: $CIRRUS_BRANCH != 'coverity_scan'
+  container:
+    # Linux works just fine with 1 GB. 16 CPUs max concurrency.
+    # The number of CPU cores must be either 1 or a multiple of 2.
+    cpu: 1
+    memory: 1G
+    image: ubuntu:24.04
+  env:
+    DEBIAN_FRONTEND: noninteractive
+    LANG: C
+  script:
+    - apt-get -qy update >/dev/null
+    - apt-get -qy install autoconf make gcc libpcap-dev >/dev/null # for "./configure"
+    - apt-get -qy install flex bison libdbus-1-dev libbluetooth-dev libnl-genl-3-dev libibverbs-dev >/dev/null # for libpcap
+    - apt-get -qy install cmake git binutils-dev >/dev/null # for "make releasecheck"
+    - apt-get -qy install shellcheck >/dev/null
+    - ./autogen.sh
+    - ./configure --quiet # build the Makefile
+    - make releasecheck
+    - make whitespacecheck
+    - make shellcheck
+
+macos_task:
+  name: macos-aarch64
+  only_if: $CIRRUS_BRANCH != 'coverity_scan'
+  macos_instance:
+    image: ghcr.io/cirruslabs/macos-runner:sonoma # last 3 versions of Xcode
+  env:
+    MAKEFLAGS: '-j 4'
+  script:
+    - brew update >/dev/null
+    - brew install libsmi | grep -v '%'
+    - echo '$ git clone [...] libpcap.git'
+    - git -C .. clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT}
+    - ./build_matrix.sh
+
+coverity_task:
+  name: Coverity Scan
+  only_if: $CIRRUS_BRANCH == 'coverity_scan'
+  container:
+    cpu: 1
+    memory: 2G
+    image: ubuntu:24.04
+  env:
+    DEBIAN_FRONTEND: noninteractive
+    LANG: C
+    COVERITY_SCAN_PROJECT_NAME: $CIRRUS_REPO_FULL_NAME
+    COVERITY_SCAN_TOKEN: ENCRYPTED[1b6f994cabfe74267ce2dce81fd9e49f694e9cfe69fb99f7d1580907bec1266efd7b38df3a47ccab53d5af98636f8e9c]
+    COVERITY_SCAN_BUILD_COMMAND_PREPEND: ./configure --enable-instrument-functions --enable-smb
+    COVERITY_SCAN_BUILD_COMMAND: make
+  script:
+    - apt-get -qy update >/dev/null
+    - apt-get -qy install autoconf make gcc >/dev/null
+    - apt-get -qy install libssl-dev libsmi2-dev libcap-ng-dev libpcap-dev binutils-dev >/dev/null
+    - apt-get -qy install git curl wget ruby rubygems ruby-json file >/dev/null # for the coverity script
+    - apt list --installed 'lib*-dev'
+    - ./autogen.sh
+    - ./.ci-coverity-scan-build.sh

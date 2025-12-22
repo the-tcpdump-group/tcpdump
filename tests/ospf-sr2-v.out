@@ -1,0 +1,50 @@
+    1  2023-11-08 18:32:20.590048 IP (tos 0xc0, ttl 255, id 0, offset 0, flags [none], proto OSPF (89), length 308)
+    192.168.0.0 > 224.0.0.5: OSPFv2, LS-Update, length 288
+	Router-ID 192.168.0.0, Backbone Area, Authentication Type: none (0), 4 LSAs
+	  LSA #1
+	  Advertising Router 192.168.0.0, seq 0x80000009, age 1s, length 28
+	    Area Local Opaque LSA (10), Opaque-Type Router Information LSA (4), Opaque-ID 0
+	    Options: [none]
+	    Hostname TLV (7), length: 5, value: 
+	      Hostname: node1
+	    SID/Label Range TLV (9), length: 12, value: 
+	      Range size: 5
+	      SID/Label subTLV (1), length: 3, value: 
+		Label: 10000
+	  LSA #2
+	  Advertising Router 192.168.0.0, seq 0x80000009, age 1s, length 24
+	    Area Local Opaque LSA (10), Opaque-Type Extended Prefix LSA (7), Opaque-ID 0
+	    Options: [none]
+	    Extended Prefix TLV (1), length: 20, value: 
+	      IPv4 prefix:     192.168.0.0/32, Route Type: Intra-Area, Flags [none]
+		Prefix-SID subTLV (2), length: 8, value: 
+		  Index: 0, MT-ID: 0, Algorithm: Shortest Path First (0), Flags [none]
+	  LSA #3
+	  Advertising Router 192.168.0.0, seq 0x80000009, age 1s, length 112
+	    Router LSA (1), LSA-ID: 192.168.0.0
+	    Options: [none]
+	    Router LSA Options: [ASBR]
+	      Neighbor Router-ID: 192.168.0.1, Interface Address: 172.16.0.0
+		topology default (0), metric 5000
+	      Neighbor Router-ID: 192.168.0.2, Interface Address: 172.16.0.2
+		topology default (0), metric 500
+	      Neighbor Router-ID: 192.168.0.3, Interface Address: 172.16.0.4
+		topology default (0), metric 65535
+	      Neighbor Router-ID: 192.168.0.4, Interface Address: 172.16.0.6
+		topology default (0), metric 100
+	      Stub Network: 172.16.0.0, Mask: 255.255.255.254
+		topology default (0), metric 5000
+	      Stub Network: 172.16.0.2, Mask: 255.255.255.254
+		topology default (0), metric 500
+	      Stub Network: 172.16.0.4, Mask: 255.255.255.254
+		topology default (0), metric 65535
+	      Stub Network: 172.16.0.6, Mask: 255.255.255.254
+		topology default (0), metric 100
+	      Stub Network: 192.168.0.0, Mask: 255.255.255.255
+		topology default (0), metric 0
+	  LSA #4
+	  Advertising Router 192.168.0.0, seq 0x80000009, age 1s, length 16
+	    External LSA (5), LSA-ID: 10.0.0.0
+	    Options: [none]
+	    Mask 255.255.255.240
+		topology default (0), type 2, metric 100

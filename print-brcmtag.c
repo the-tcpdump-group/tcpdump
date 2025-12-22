@@ -1,0 +1,172 @@
+/*
+ * Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997
+ *	The Regents of the University of California.  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that: (1) source code distributions
+ * retain the above copyright notice and this paragraph in its entirety, (2)
+ * distributions including binary code include the above copyright notice and
+ * this paragraph in its entirety in the documentation or other materials
+ * provided with the distribution, and (3) all advertising materials mentioning
+ * features or use of this software display the following acknowledgement:
+ * ``This product includes software developed by the University of California,
+ * Lawrence Berkeley Laboratory and its contributors.'' Neither the name of
+ * the University nor the names of its contributors may be used to endorse
+ * or promote products derived from this software without specific prior
+ * written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
+
+/* \summary: Broadcom Ethernet switches tag (4 bytes) printer */
+// specification: https://www.tcpdump.org/linktypes/broadcom-switch-tag.html
+
+#include <config.h>
+
+#include "netdissect-stdinc.h"
+
+#define ND_LONGJMP_FROM_TCHECK
+#include "netdissect.h"
+#include "addrtoname.h"
+#include "extract.h"
+
+#define BRCM_TAG_LEN		4
+#define BRCM_OPCODE_SHIFT	5
+#define BRCM_EGRESS		0 // 0b000xxxxx
+#define BRCM_INGRESS		1 // 0b001xxxxx
+
+/* Ingress fields */
+#define BRCM_IG_TC_SHIFT	2
+#define BRCM_IG_TC_MASK		0x7
+#define BRCM_IG_TE_MASK		0x3
+#define BRCM_IG_TS_SHIFT	7
+#define BRCM_IG_DSTMAP_MASK	0x1ff
+
+/* Egress fields */
+#define  BRCM_EG_RC_RSVD7	(1 << 7)
+#define  BRCM_EG_RC_RSVD6	(1 << 6)
+#define  BRCM_EG_RC_EXCEPTION	(1 << 5)
+#define  BRCM_EG_RC_PROT_SNOOP	(1 << 4)
+#define  BRCM_EG_RC_PROT_TERM	(1 << 3)
+#define  BRCM_EG_RC_SWITCH	(1 << 2)
+#define  BRCM_EG_RC_MAC_LEARN	(1 << 1)
+#define  BRCM_EG_RC_MIRROR	(1 << 0)
+#define BRCM_EG_TC_SHIFT	5
+#define BRCM_EG_TC_MASK		0x7
+#define BRCM_EG_PID_MASK	0x1f
+
+static const struct tok brcm_tag_opcodes[] = {
+	{ BRCM_EGRESS, "EG" },
+	{ BRCM_INGRESS, "IG" },
+	{ 0, NULL }
+};
+
+static const struct tok brcm_tag_te_values[] = {
+	{ 0, "None" },
+	{ 1, "Untag" },
+	{ 2, "Header"},
+	{ 3, "Reserved" },
+	{ 0, NULL }
+};
+
+static const struct tok brcm_tag_rc_bm[] = {
+	{ BRCM_EG_RC_MIRROR, "mirror" },
+	{ BRCM_EG_RC_MAC_LEARN, "MAC learning" },
+	{ BRCM_EG_RC_SWITCH, "switching" },
+	{ BRCM_EG_RC_PROT_TERM, "prot term" },
+	{ BRCM_EG_RC_PROT_SNOOP, "prot snoop" },
+	{ BRCM_EG_RC_EXCEPTION, "exception" },
+	{ BRCM_EG_RC_RSVD6, "reserved-6" },
+	{ BRCM_EG_RC_RSVD7, "reserved-7" },
+	{ 0, NULL }
+};
+
+static const struct tok brcm_tag_port_bm[] = {
+	{ (1 << 0), "port 0" },
+	{ (1 << 1), "port 1" },
+	{ (1 << 2), "port 2" },
+	{ (1 << 3), "port 3" },
+	{ (1 << 4), "port 4" },
+	{ (1 << 5), "port 5" },
+	{ (1 << 6), "port 6" },
+	{ (1 << 7), "port 7" },
+	{ (1 << 8), "port 8" },
+	{ 0, NULL }
+};
+
+static void
+brcm_tag_print(netdissect_options *ndo, const u_char *bp)
+{
+	uint8_t tag[BRCM_TAG_LEN];
+	uint16_t dst_map;
+	unsigned int i;
+
+	for (i = 0; i < BRCM_TAG_LEN; i++)
+		tag[i] = GET_U_1(bp + i);
+
+	uint8_t opcode = tag[0] >> BRCM_OPCODE_SHIFT;
+	ND_PRINT("BRCM tag OP: %s", tok2str(brcm_tag_opcodes, NULL, opcode));
+	switch (opcode) {
+	case BRCM_INGRESS:
+		ND_PRINT(", TC: %d", (tag[0] >> BRCM_IG_TC_SHIFT) &
+			 BRCM_IG_TC_MASK);
+		ND_PRINT(", TE: %s",
+			 tok2str(brcm_tag_te_values, "unknown",
+				 (tag[0] & BRCM_IG_TE_MASK)));
+		ND_PRINT(", TS: %d", tag[1] >> BRCM_IG_TS_SHIFT);
+		dst_map = ((uint16_t)tag[2] << 8 | tag[3]) & BRCM_IG_DSTMAP_MASK;
+		ND_PRINT(", DST map: [%s]",
+		         bittok2str(brcm_tag_port_bm, "none", dst_map));
+		break;
+	case BRCM_EGRESS:
+		ND_PRINT(", CID: %d", tag[1]);
+		ND_PRINT(", RC: [%s]", bittok2str(brcm_tag_rc_bm,
+			 "none", tag[2]));
+		ND_PRINT(", TC: %d", (tag[3] >> BRCM_EG_TC_SHIFT) &
+			 BRCM_EG_TC_MASK);
+		ND_PRINT(", port: %d", tag[3] & BRCM_EG_PID_MASK);
+		break;
+	}
+
+	ND_PRINT(", ");
+}
+
+void
+brcm_tag_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
+		  const u_char *p)
+{
+	u_int caplen = h->caplen;
+	u_int length = h->len;
+
+	ndo->ndo_protocol = "brcm-tag";
+	ndo->ndo_ll_hdr_len +=
+		ether_switch_tag_print(ndo, p, length, caplen,
+				       brcm_tag_print, BRCM_TAG_LEN);
+}
+
+void
+brcm_tag_prepend_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
+			  const u_char *p)
+{
+	u_int caplen = h->caplen;
+	u_int length = h->len;
+
+	ndo->ndo_protocol = "brcm-tag-prepend";
+	ND_TCHECK_LEN(p, BRCM_TAG_LEN);
+	ndo->ndo_ll_hdr_len += BRCM_TAG_LEN;
+
+	if (ndo->ndo_eflag) {
+		/* Print the prepended Broadcom tag. */
+		brcm_tag_print(ndo, p);
+	}
+	p += BRCM_TAG_LEN;
+	length -= BRCM_TAG_LEN;
+	caplen -= BRCM_TAG_LEN;
+
+	/*
+	 * Now print the Ethernet frame following it.
+	 */
+	ndo->ndo_ll_hdr_len +=
+		ether_print(ndo, p, length, caplen, NULL, NULL);
+}

@@ -1,0 +1,10 @@
+    1  2004-06-14 10:13:29.331681 IP (tos 0x0, ttl 254, id 59168, offset 0, flags [DF], proto ICMP (1), length 240)
+    10.4.0.2 > 12.4.4.4: ICMP time exceeded in-transit, length 220
+	IP (tos 0x0, ttl 1, id 42321, offset 0, flags [none], proto UDP (17), length 40)
+    12.4.4.4.42315 > 12.1.1.1.33440: UDP, length 12
+	ICMP Multi-Part extension v2, checksum 0x246c (correct), length 84
+	  Interface Information Object (2), Class-Type: 14, length 80
+	    Interface Role: Incoming IP Interface
+	    Interface Index: 15
+	    IP Address sub-object: 10.10.10.10
+	    Interface Name, length 64: This-is-the-name-of-the-Interface-that-we-are-looking-for-[:-)]

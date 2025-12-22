@@ -1,0 +1,375 @@
+    1  2012-10-04 13:19:44.964471 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
+    2  2012-10-04 13:19:46.966286 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
+    3  2012-10-04 13:19:48.968104 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
+    4  2012-10-04 13:19:50.968841 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
+    5  2012-10-04 13:19:52.969919 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
+    6  2012-10-04 13:19:54.971627 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
+    7  2012-10-04 13:19:56.973555 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
+    8  2012-10-04 13:19:58.974590 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
+    9  2012-10-04 13:20:00.976152 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
+   10  2012-10-04 13:20:02.977225 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
+   11  2012-10-04 13:20:04.978131 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
+   12  2012-10-04 13:20:06.979284 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
+   13  2012-10-04 13:20:08.980357 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
+   14  2012-10-04 13:20:10.981246 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
+   15  2012-10-04 13:20:12.982792 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
+   16  2012-10-04 13:20:14.984471 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
+   17  2012-10-04 13:20:16.985513 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
+   18  2012-10-04 13:20:18.987468 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
+   19  2012-10-04 13:20:20.988197 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
+   20  2012-10-04 13:20:22.989416 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
+   21  2012-10-04 13:20:24.990564 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
+   22  2012-10-04 13:20:26.992430 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
+   23  2012-10-04 13:20:28.993313 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
+   24  2012-10-04 13:20:30.994755 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
+   25  2012-10-04 13:20:32.996159 STP 802.1aq, Rapid STP, CIST Flags [Learn, Forward], length 205
+	port-role Designated, CIST root-id 8000.52:54:00:45:5f:15, CIST ext-pathcost 0
+	CIST regional-root-id 8000.52:54:00:45:5f:15, CIST port-id 8003,
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 80, MCID Name IEEE802.1 SPB Default, rev 0,
+		digest 67d768dfa948eb5e9fd54077e80975a2, CIST int-root-pathcost 0,
+	CIST bridge-id 8000.52:54:00:45:5f:15, CIST remaining-hops 20
+	MSTI 10, Flags [Learn, Forward], port-role Designated
+		MSTI regional-root-id 800a.52:54:00:45:5f:15, pathcost 0
+		MSTI bridge-prio 8, port-prio 8, hops 20
+	v4len 85, AUXMCID Name IEEE802.1 SPB Default, Rev 0,
+		digest c8bd946a00815f86ace612b9f8616283
+	Agreement num 0, Discarded Agreement num 0, Agreement valid-flag 0,
+	Restricted role-flag: 0, Format id 0 cap 0, Convention id 2 cap 32,
+	Edge count 32, Agreement digest 0000000e918994fa9ca00398d9138a3e54000000
