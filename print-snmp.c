@@ -1712,7 +1712,7 @@ v3msg_print(netdissect_options *ndo,
 	u_char flags;
 	int model;
 	const u_char *xnp = np;
-	int xlength = length;
+	u_int xlength = length;
 
 	/* Sequence */
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
@@ -1805,8 +1805,7 @@ v3msg_print(netdissect_options *ndo,
             return;
 	}
 
-	np = xnp + (np - xnp);
-	length = xlength - (np - xnp);
+	length = xlength - (u_int)(np - xnp);
 
 	/* msgSecurityParameters (OCTET STRING) */
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
