@@ -117,6 +117,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       For PCAP_ERROR_CAPTURE_NOTSUP, show the error message provided
         by libpcap for that error if it's non-empty.
       Update the -z option processing. Print "invalid option -- z" when it is.
+      Add the -g option, causing IPv4 output in verbose mode to be on one line.
     Other:
       Avoid race condition when receiving signal during shutdown.
       Always show the interface name in error messages when the
