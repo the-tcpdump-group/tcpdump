@@ -318,7 +318,7 @@ fi
 #
 AC_LBL_LIBRARY_NET
 
-AC_REPLACE_FUNCS(strlcat strlcpy strsep getservent getopt_long)
+AC_REPLACE_FUNCS(strlcat strlcpy strsep getservent getopt_long wcwidth)
 AC_CHECK_FUNCS(fork vfork)
 
 #

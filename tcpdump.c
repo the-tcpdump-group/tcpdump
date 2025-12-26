@@ -103,6 +103,7 @@ The Regents of the University of California.  All rights reserved.\n";
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <locale.h>
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -668,6 +669,7 @@ show_remote_devices_and_exit(void)
 #define OPTION_LENGTHS			138
 #define OPTION_TIME_T_SIZE		139
 #define OPTION_SKIP			140
+#define OPTION_UTF8			141
 
 static const struct option longopts[] = {
 	{ "buffer-size", required_argument, NULL, 'B' },
@@ -712,6 +714,7 @@ static const struct option longopts[] = {
 	{ "time-t-size", no_argument, NULL, OPTION_TIME_T_SIZE },
 	{ "ip-oneline", no_argument, NULL, 'g' },
 	{ "skip", required_argument, NULL, OPTION_SKIP },
+	{ "utf8", no_argument, NULL, OPTION_UTF8 },
 	{ "version", no_argument, NULL, OPTION_VERSION },
 	{ NULL, 0, NULL, 0 }
 };
@@ -727,6 +730,8 @@ static const struct option longopts[] = {
 #else
 #define IMMEDIATE_MODE_USAGE ""
 #endif
+
+#define DISPLAY_UTF8_USAGE "[ --utf8 ] "
 
 #ifndef _WIN32
 /* Drop root privileges and chroot if necessary */
@@ -1631,6 +1636,9 @@ main(int argc, char **argv)
 	memset(ndo, 0, sizeof(*ndo));
 	ndo_set_function_pointers(ndo);
 
+	setlocale(LC_CTYPE, "");
+
+
 	cnt = -1;
 	device = NULL;
 	infile = NULL;
@@ -2094,6 +2102,10 @@ main(int argc, char **argv)
 			    optarg, NULL, 0, INT_MAX, 0);
 			break;
 
+		case OPTION_UTF8:
+			++ndo->ndo_utf8;
+			break;
+
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
 		case OPTION_TSTAMP_MICRO:
 			ndo->ndo_tstamp_precision = PCAP_TSTAMP_PRECISION_MICRO;
@@ -2124,6 +2136,30 @@ main(int argc, char **argv)
 			exit_tcpdump(S_ERR_HOST_PROGRAM);
 			/* NOTREACHED */
 		}
+
+
+	if (ndo->ndo_utf8) {
+#if defined(_WIN32)
+		/* On Windows, explicitly set UTF-8 locale and console code page for mbrtowc() to work */
+		/* Try multiple locale formats for compatibility across Windows versions */
+		if (setlocale(LC_CTYPE, ".UTF-8") == NULL) {
+			if (setlocale(LC_CTYPE, ".UTF8") == NULL) {
+				if (setlocale(LC_CTYPE, "en_US.UTF-8") == NULL) {
+					setlocale(LC_CTYPE, "C.UTF-8");
+				}
+			}
+		}
+		/* Also set console code page to UTF-8 (65001) */
+		SetConsoleOutputCP(65001);
+		SetConsoleCP(65001);
+#else
+		char const *locale = getenv("LANG");
+		if (locale == NULL)
+			locale = "en_US";
+
+		setlocale(LC_CTYPE, locale);
+#endif
+	}
 
 	if (ndo->ndo_Aflag && ndo->ndo_xflag)
 		error("-A and -x[x] are mutually exclusive.");
@@ -3507,5 +3543,5 @@ print_usage(FILE *f)
 "\t\t[ --time-stamp-precision precision ] [ --micro ] [ --nano ]\n");
 #endif
 	(void)fprintf(f,
-"\t\t" z_FLAG_USAGE "[ -Z user ] [ expression ]\n");
+"\t\t" DISPLAY_UTF8_USAGE z_FLAG_USAGE "[ -Z user ] [ expression ]\n");
 }
