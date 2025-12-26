@@ -195,6 +195,7 @@ Friday, August 30, 2024 / The Tcpdump Group
       Make various improvements to the man page.
       Add initial README file for Haiku.
       Make various improvements to CONTRIBUTING.md.
+      man: Clarify the "any" pseudo-interface further.
 
 Friday, April 7, 2023 / The Tcpdump Group
   Summary for 4.99.4 tcpdump release
