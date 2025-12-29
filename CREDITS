@@ -36,10 +36,12 @@ Additional people who have contributed patches (in alphabetical order):
     Angus Cameron                 <anguscc at yahoo dot com>
     Anton Bernal                  <anton at juniper dot net>
     Antonin Décimo                <antonin dot decimo at gmail dot com>
+    anubhav                       <protokoul at users dot noreply dot github dot com>
     Aravind Prasad S              <raja dot avi at gmail dot com>
     Arkadiusz Miskiewicz          <misiek at pld dot org dot pl>
     Armando L. Caro Jr.           <acaro at mail dot eecis dot udel dot edu>
     Arnaldo Carvalho de Melo      <acme at ghostprotocols dot net>
+    Arseny Maslennikov            <arseny at altlinux dot org>
     Atsushi Onoe                  <onoe at netbsd dot org>
     Baptiste Jonglez              <baptiste dot jonglez at ens-lyon dot org>
     Baruch Siach                  <baruch at tkos dot co dot il>
@@ -71,6 +73,7 @@ Additional people who have contributed patches (in alphabetical order):
     Christophe Rhodes             <csr21 at cantab dot net>
     Cliff Frey                    <cliff at meraki dot com>
     Colin Sames                   <sames dot colin at gmail dot com>
+    Corubba                       <corubba at gmx dot de>
     Craig Leres                   <leres at xse dot com>
     Craig Rodrigues               <rodrigc at mediaone dot net>
     Crist J. Clark                <cjclark at alum dot mit dot edu>
@@ -126,6 +129,7 @@ Additional people who have contributed patches (in alphabetical order):
     Gianluca Varenni              <gianluca dot varenni at gmail dot com>
     Gilbert Ramirez Jr.           <gram at xiexie dot org>
     Gisle Vanem                   <gvanem at yahoo dot no>
+    Giulio Sidoretti              <giuliosidoretti at gmail dot com>
     Gleb Smirnoff                 <glebius at FreeBSD dot org>
     Gokul Sivakumar               <gokulkumar792 at gmail dot com>
     Greg Minshall                 <minshall at acm dot org>
@@ -167,6 +171,7 @@ Additional people who have contributed patches (in alphabetical order):
     Jesse Gross                   <jesse at nicira dot com>
     Jesse Rosenstock              <jmr at google dot com>
     Jim Hutchins                  <jim at ca dot sandia dot gov>
+    Joachim Kross                 <kross at kaffeeschluerfer dot com>
     João Medeiros                 <ignotus21 at sourceforge dot net>
     Job Snijders                  <job at instituut dot net>
     Joerg Mayer                   <jmayer at loplof dot de>
@@ -313,6 +318,7 @@ Additional people who have contributed patches (in alphabetical order):
     Scott Mcmillan                <scott dot a dot mcmillan at intel dot com>
     Scott Rose                    <syberpunk at users dot sourceforge dot net>
     Sebastian Krahmer             <krahmer at cs dot uni-potsdam dot de>
+    Sebastien Henri               <sebastien at meter dot com>
     Sebastien Raveau              <sebastien dot raveau at epita dot fr>
     Sebastien Vincent             <svincent at idems dot fr>
     Sepherosa Ziehau              <sepherosa at gmail dot com>
@@ -348,6 +354,7 @@ Additional people who have contributed patches (in alphabetical order):
     Ulrich Windl                  <Ulrich dot Windl at RZ dot Uni-Regensburg dot DE>
     Uns Lider                     <unslider at miranda dot org>
     Victor Oppleman               <oppleman at users dot sourceforge dot net>
+    Vincent Bernat                <vincent at bernat dot ch>
     Viral Mehta                   <viral dot mehta at dell dot com>
     Vitaly Lavrov                 <vel21ripn at gmail dot com>
     Vivien Didelot                <vivien dot didelot at gmail dot com>
