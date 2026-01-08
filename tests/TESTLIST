@@ -479,6 +479,8 @@ rsvp_infloop-v	rsvp-infinite-loop.pcap		rsvp_infloop-v.out	-v
 rsvp_cap	rsvp_cap.pcap			rsvp_cap.out		-v
 # fuzzed pcap
 rsvp-inf-loop-2-v rsvp-inf-loop-2.pcapng	rsvp-inf-loop-2-v.out -v
+# full session, p2p and p2mp
+rsvp_session	rsvp_session.pcap	rsvp_session.out	-v
 
 # HDLC tests
 hdlc1	chdlc-slarp.pcap	hdlc1.out
