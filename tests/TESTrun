@@ -329,6 +329,15 @@ my @decode_tests = (
 		args => '-v'
 	},
 
+	# Regression test for ATM OAM F4 Fault Management Loopback print bug.
+	# Ensures correct ouptut and prevents buffer overrun.
+	{
+		name => 'atm-oam-loopback-print-overrun',
+		input => 'atm-oam-loopback-print-overrun.pcap',
+		output => 'atm-oam-loopback-print-overrun.out',
+		args => '-v'
+	},
+
 	# -------- formerly smb.tests --------
 	# Only attempt OpenSSL-specific tests when compiled with the library.
 	# Reading the secret(s) from a file does not work with Capsicum.
