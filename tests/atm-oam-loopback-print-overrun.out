@@ -1,0 +1,6 @@
+    1  2018-12-11 00:36:17.1159821166 (invalid us) OAM F5, vpi 96, vci 12288, payload [ user data, uncongested, SDU 0 ], clp 0, length 65618
+	cell-type Fault Management (1), func-type Loopback (8)
+	Loopback-Indicator Reply, Correlation-Tag 0x18020109
+	Location-ID 1b 01 1b 9e 1b 00 01 01 01 5a 01 00
+	Source-ID   00 c3 29 1a cd f0 8b 2f 10 27 09 64
+	cksum 0x181 (incorrect)
