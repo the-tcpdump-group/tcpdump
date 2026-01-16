@@ -36,6 +36,7 @@ tcpdump compiles and works on at least the following platforms:
 * {Mac} OS X / macOS
 * [NetBSD](./doc/README.NetBSD.md)
 * OpenBSD
+* [QNX](./doc/README.qnx.md)
 * [Solaris](./doc/README.solaris.md)
 * [Windows](./doc/README.windows.md) (requires WinPcap or Npcap, and Visual
   Studio with CMake)
@@ -48,7 +49,6 @@ In the past tcpdump certainly or likely worked on the following platforms:
 * DOS
 * IRIX
 * LynxOS
-* QNX
 * SINIX
 * SunOS
 * Ultrix
