@@ -79,6 +79,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Reimplement the tests similarly to libpcap.
       CI: Implement cross-compiling with libpcap.
       Autoconf: Add QNX support to AC_LBL_LIBRARY_NET().
+      Treat SA_RESTART as optional.
     Documentation:
 
 DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
