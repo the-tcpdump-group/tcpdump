@@ -3012,7 +3012,8 @@ parse_int64(const char *argname, const char *string, char **endpp,
 static void
 (*setsignal (int sig, void (*func)(int)))(int)
 {
-#ifdef _WIN32
+#if defined(_WIN32) || !defined(SA_RESTART)
+	// No sigaction() in Windows.  No SA_RESTART in QNX 8.0.
 	return (signal(sig, func));
 #else
 	struct sigaction old, new;
