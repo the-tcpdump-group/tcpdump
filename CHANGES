@@ -78,6 +78,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       tests: On HP-UX use "diff -c" by default.
       Reimplement the tests similarly to libpcap.
       CI: Implement cross-compiling with libpcap.
+      Autoconf: Add QNX support to AC_LBL_LIBRARY_NET().
     Documentation:
 
 DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
