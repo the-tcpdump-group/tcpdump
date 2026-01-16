@@ -10,6 +10,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       IP: Update the offload "presumed TSO" case for "BIG TCP".
     User interface:
        Print an error message about --count without -r or -V.
+    Building and testing:
+      Treat SA_RESTART as optional.
 
 Tuesday, December 30, 2025 / The Tcpdump Group
   Summary for 4.99.6 tcpdump release

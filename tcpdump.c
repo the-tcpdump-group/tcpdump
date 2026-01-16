@@ -3007,6 +3007,7 @@ static void
 
 	memset(&new, 0, sizeof(new));
 	new.sa_handler = func;
+# ifdef SA_RESTART
 	if ((sig == SIGCHLD)
 # ifdef SIGNAL_REQ_INFO
 		|| (sig == SIGNAL_REQ_INFO)
@@ -3016,6 +3017,7 @@ static void
 # endif
 		)
 		new.sa_flags = SA_RESTART;
+# endif // SA_RESTART
 	if (sigaction(sig, &new, &old) < 0)
 		/* The same workaround as for SIG_DFL above. */
 #ifdef __illumos__
