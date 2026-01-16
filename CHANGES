@@ -81,6 +81,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Autoconf: Add QNX support to AC_LBL_LIBRARY_NET().
       Treat SA_RESTART as optional.
     Documentation:
+      Add a README.qnx.md file.
 
 DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
   Summary for 4.99.7 tcpdump release (so far!)

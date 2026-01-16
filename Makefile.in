@@ -352,6 +352,7 @@ EXTRA_DIST = \
 	doc/README.aix.md \
 	doc/README.haiku.md \
 	doc/README.NetBSD.md \
+	doc/README.qnx.md \
 	doc/README.solaris.md \
 	doc/README.windows.md \
 	install-sh \
