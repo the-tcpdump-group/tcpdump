@@ -209,6 +209,7 @@ babel_auth      babel_auth.pcap        babel_auth.out  -v
 babel_pad1      babel_pad1.pcap        babel_pad1.out
 babel_rtt       babel_rtt.pcap         babel_rtt.out   -v
 babel_rfc6126bis  babel_rfc6126bis.pcap  babel_rfc6126bis.out     -v
+babel_v4viav6	babel_v4viav6.pcap	babel_v4viav6.out	-v
 
 # PPP tests
 ppp_error_hexdump ppp_error_hexdump.pcap ppp_error_hexdump.out -vv
