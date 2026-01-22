@@ -500,10 +500,10 @@ releasecheck: releasetar
 	./autogen.sh && \
 	echo "[$@] $$ ./configure --quiet --prefix=/tmp/install_libpcap" && \
 	./configure --quiet --prefix=/tmp/install_libpcap && \
-	echo "[$@] $$ make -s " && \
-	make -s && \
-	echo "[$@] $$ make -s install" && \
-	make -s install && \
+	echo "[$@] $$ $(MAKE) -s " && \
+	$(MAKE) -s && \
+	echo "[$@] $$ $(MAKE) -s install" && \
+	$(MAKE) -s install && \
 	echo "[$@] $$ cd .." && \
 	cd .. && \
 	rm -rf "$$TAG" && \
