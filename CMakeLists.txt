@@ -652,6 +652,9 @@ else(STDLIBS_HAVE_GETRPCBYNUMBER)
 endif(STDLIBS_HAVE_GETRPCBYNUMBER)
 cmake_pop_check_state()
 
+
+check_function_exists(wcwidth HAVE_WCWIDTH)
+
 #
 # This requires the libraries we require, as ether_ntohost might be
 # in one of those libraries.  That means we have to do this after
@@ -1443,7 +1446,7 @@ set(NETDISSECT_SOURCE_LIST_C
 #
 # Replace missing functions
 #
-foreach(FUNC strlcat strlcpy strsep getservent getopt_long)
+foreach(FUNC strlcat strlcpy strsep getservent getopt_long wcwidth)
     string(TOUPPER ${FUNC} FUNC_UPPERCASE)
     set(HAVE_FUNC_UPPERCASE HAVE_${FUNC_UPPERCASE})
     if(NOT ${HAVE_FUNC_UPPERCASE})
