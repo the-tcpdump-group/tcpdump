@@ -20,7 +20,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "30 June 2025"
+.TH TCPDUMP 1  "2 February 2026"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -1306,7 +1306,8 @@ and \fBDF\fP is reported if F is set.  If neither are set, \fB.\fP is
 reported.
 \fIproto\fP is the protocol ID field.
 \fIlength\fP is the total length field; if the packet is a presumed TSO
-(TCP Segmentation Offload) send, [was 0, presumed TSO] is reported.
+(TCP Segmentation Offload) send, [was 0, presumed TSO] is reported;
+if the packet is a presumed BIG TCP, [was 0, presumed BIG TCP] is reported.
 \fIoptions\fP are the IP options, if any.
 .LP
 Next, for TCP and UDP packets, the source and destination IP addresses

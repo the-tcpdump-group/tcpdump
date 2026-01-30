@@ -327,7 +327,7 @@ ip_print(netdissect_options *ndo,
 	uint16_t sum, ip_sum;
 	const char *p_name;
 	int truncated = 0;
-	int presumed_tso = 0;
+	int presumed_offload = 0;
 
 	ndo->ndo_protocol = "ip";
 	ip = (const struct ip *)bp;
@@ -350,9 +350,14 @@ ip_print(netdissect_options *ndo,
 		ND_PRINT(" ");
 	}
 	if (len == 0) {
-		/* we guess that it is a TSO send */
-		len = length;
-		presumed_tso = 1;
+		uint8_t nh = GET_U_1(ip->ip_p);
+
+		if (nh == IPPROTO_TCP || nh == IPPROTO_UDP) {
+			// we guess that it is an offload because next header
+			// is TCP or UDP (for VXLAN or Geneve)
+			len = length;
+			presumed_offload = 1;
+		}
 	}
 	if (len < hlen) {
 		ND_PRINT("[total length %u < header length %u]", len, hlen);
@@ -414,8 +419,11 @@ ip_print(netdissect_options *ndo,
 		    tok2str(ipproto_values, "unknown", ip_proto),
 		    ip_proto);
 
-		if (presumed_tso)
-			ND_PRINT(", length %u [was 0, presumed TSO]", length);
+		if (presumed_offload)
+			if (length > 65535)
+				ND_PRINT(", length %u [was 0, presumed BIG TCP]", length);
+			else
+				ND_PRINT(", length %u [was 0, presumed TSO]", length);
 		else
 			ND_PRINT(", length %u", GET_BE_U_2(ip->ip_len));
 
