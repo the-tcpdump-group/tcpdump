@@ -919,4 +919,4 @@ gso-ipv4			gso-ipv4.pcap			gso-ipv4.out			-v
 gso-ipv6			gso-ipv6.pcap			gso-ipv6.out			-v
 bigtcp-ipv4			bigtcp-ipv4.pcap		bigtcp-ipv4.out			-v
 bigtcp-ipv6-hbh			bigtcp-ipv6-hbh.pcap		bigtcp-ipv6-hbh.out		-v
-icmp-length-zero		icmp-length-zero.pcap		icmp-length-zero.out		-v
+icmp-length-zero		icmp-length-zero.pcapng		icmp-length-zero.out		-v
