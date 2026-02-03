@@ -1084,4 +1084,4 @@ bigtcp-ipv6-geneve-ipv4		bigtcp-ipv6-geneve-ipv4.pcap	bigtcp-ipv6-geneve-ipv4.ou
 bigtcp-ipv6-geneve-ipv6		bigtcp-ipv6-geneve-ipv6.pcap	bigtcp-ipv6-geneve-ipv6.out	-v
 bigtcp-ipv6-vxlan-ipv4		bigtcp-ipv6-vxlan-ipv4.pcap	bigtcp-ipv6-vxlan-ipv4.out	-v
 bigtcp-ipv6-vxlan-ipv6		bigtcp-ipv6-vxlan-ipv6.pcap	bigtcp-ipv6-vxlan-ipv6.out	-v
-icmp-length-zero		icmp-length-zero.pcap		icmp-length-zero.out		-v
+icmp-length-zero		icmp-length-zero.pcapng		icmp-length-zero.out		-v
