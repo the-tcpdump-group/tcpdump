@@ -861,7 +861,14 @@ AC_DEFUN(AC_LBL_LIBRARY_NET, [
 		LIBS="-lnetwork $LIBS"
 	    ],
 	    [
-		AC_MSG_ERROR([gethostbyaddr is required, but wasn't found])
+		AS_UNSET(ac_cv_lib_socket_gethostbyaddr)
+		AC_CHECK_LIB(socket, gethostbyaddr,
+		[
+		    LIBS="-lsocket $LIBS"
+		],
+		[
+		    AC_MSG_ERROR([gethostbyaddr is required, but wasn't found])
+		])
 	    ])
 	], -lnsl)
     ])
