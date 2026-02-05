@@ -6,6 +6,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       MPTCP: parse MPC data_len field, print flags from MP_CAPABLE option,
         dissect the MP_TCPRST sub-option.
       TCP: Add support for the AE (AccECN) flag.
+      IP: Update the offload "presumed TSO" case for "BIG TCP".
 
 Tuesday, December 30, 2025 / The Tcpdump Group
   Summary for 4.99.6 tcpdump release
