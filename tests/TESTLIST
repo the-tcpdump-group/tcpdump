@@ -354,8 +354,12 @@ of13_ericsson-vv	of13_ericsson.pcapng	of13_ericsson-vv.out	-vv
 of10_inv_OFPST_FLOW-v	of10_inv_OFPST_FLOW.pcap	of10_inv_OFPST_FLOW-v.out -v
 of10_inv_QUEUE_GET_CONFIG_REPLY-vv	of10_inv_QUEUE_GET_CONFIG_REPLY.pcap	of10_inv_QUEUE_GET_CONFIG_REPLY-vv.out	-vv
 
-# GeoNetworking and CALM FAST tests
-geonet_v0_and_calm_fast	geonet_v0_and_calm_fast.pcap	geonet_v0_and_calm_fast.out	-vv
+
+# GeoNetworking
+geonet_v1  geonet_v1.pcap  geonet_v1.out
+geonet_v1-v  geonet_v1.pcap  geonet_v1-v.out -v
+geonet_v1-vv  geonet_v1.pcap  geonet_v1-vv.out -vv
+geonet_v1-vvv  geonet_v1.pcap  geonet_v1-vvv.out -vvv
 
 # M3UA tests
 m3ua isup.pcap isup.out
@@ -549,7 +553,6 @@ pptp-v pptp.pcap pptp-v.out -v
 
 # CVEs 2014 malformed packets from Steffen Bauch
 cve-2014-8767-OLSR cve-2014-8767-OLSR.pcap cve-2014-8767-OLSR.out -v
-cve-2014-8768-Geonet cve-2014-8768-Geonet.pcap cve-2014-8768-Geonet.out -v
 cve-2014-8769-AODV cve-2014-8769-AODV.pcap cve-2014-8769-AODV.out -v
 
 # bad packets from Kevin Day
@@ -651,8 +654,6 @@ heapoverflow-in_checksum	heapoverflow-in_checksum.pcap	heapoverflow-in_checksum.
 heapoverflow-tcp_print	heapoverflow-tcp_print.pcap	heapoverflow-tcp_print.out	-v
 gre-heapoverflow-1	gre-heapoverflow-1.pcap	gre-heapoverflow-1.out	-v
 gre-heapoverflow-2	gre-heapoverflow-2.pcap	gre-heapoverflow-2.out	-v
-calm-fast-mac-lookup-heapoverflow	calm-fast-mac-lookup-heapoverflow.pcap	calm-fast-mac-lookup-heapoverflow.out	-v
-geonet-mac-lookup-heapoverflow	geonet-mac-lookup-heapoverflow.pcap	geonet-mac-lookup-heapoverflow.out	-v
 radiotap-heapoverflow	radiotap-heapoverflow.pcap	radiotap-heapoverflow.out -v
 isoclns-heapoverflow	isoclns-heapoverflow.pcap	isoclns-heapoverflow.out	-v
 tcp-auth-heapoverflow	tcp-auth-heapoverflow.pcap	tcp-auth-heapoverflow.out	-v
