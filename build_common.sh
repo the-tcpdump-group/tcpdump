@@ -306,7 +306,12 @@ print_so_deps() {
         run_after_echo dumpbin /dependents "${1:?}"
         ;;
     *)
-        run_after_echo ldd "${1:?}"
+        if [ -n "$TARGET" ]; then
+            # ldd does not work on cross-compiled executables.
+            run_after_echo objdump -p "${1:?}"
+        else
+            run_after_echo ldd "${1:?}"
+        fi
         ;;
     esac
 }

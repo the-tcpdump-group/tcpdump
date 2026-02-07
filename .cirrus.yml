@@ -48,6 +48,27 @@ linux_task:
     - make whitespacecheck
     - make shellcheck
 
+linux_cross_task:
+  name: linux-cross-compile
+  only_if: $CIRRUS_BRANCH != 'coverity_scan'
+  container:
+    image: ubuntu:24.04
+    cpu: 1
+    memory: 1G
+  env:
+    DEBIAN_FRONTEND: noninteractive
+    LANG: C
+    TARGET: arm-linux-gnueabihf # little-endian 32-bit
+    MATRIX_CC: $TARGET-gcc-14
+    MATRIX_CMAKE: no # not supported
+    MATRIX_CRYPTO: no # The target environment does not have libcrypto.
+    MATRIX_BUILD_LIBPCAP: yes # The target environment does not have libpcap.
+  script:
+    - apt-get -qy update >/dev/null
+    - apt-get -qy install flex bison autoconf make git gcc-14-$TARGET >/dev/null
+    - git -C .. clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT}
+    - ./build_matrix.sh
+
 macos_task:
   name: macos-aarch64
   only_if: $CIRRUS_BRANCH != 'coverity_scan'
