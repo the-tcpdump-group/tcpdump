@@ -77,6 +77,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
         .devel file does not exists.
       tests: On HP-UX use "diff -c" by default.
       Reimplement the tests similarly to libpcap.
+      CI: Implement cross-compiling with libpcap.
     Documentation:
 
 DayOfTheWeek, Month DD, YYYY / The Tcpdump Group

@@ -1,5 +1,11 @@
 #!/bin/sh -e
 
+# Same as in libpcap.
+if [ -n "$TARGET" ] && [ -z "$CC" ]; then
+    echo "Error: CC must be set if TARGET is set." >&2
+    exit 1
+fi
+
 # This script runs one build with setup environment variables: BUILD_LIBPCAP,
 # REMOTE, CC, CMAKE, CRYPTO and SMB.
 
@@ -15,6 +21,11 @@
 # At least one OS (AIX 7) where this software can build does not have at least
 # one command (mktemp) required for a successful run of "make releasetar".
 : "${TEST_RELEASETAR:=yes}"
+
+if [ -n "$TARGET" ] && [ "$CMAKE" != no ]; then
+    echo "Error: this script does not implement cross-compiling with CMake." >&2
+    exit 1
+fi
 
 . ./build_common.sh
 # Install directory prefix
@@ -73,12 +84,14 @@ if [ "$CMAKE" = no ]; then
         echo "Using PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
         run_after_echo ./autogen.sh
         run_after_echo ./configure --with-crypto="$CRYPTO" \
+            ${TARGET:+--host=$TARGET} \
             --enable-smb="$SMB" --prefix="$PREFIX"
         LD_LIBRARY_PATH="$PREFIX/lib"
         export LD_LIBRARY_PATH
     else
         run_after_echo ./autogen.sh
         run_after_echo ./configure --with-crypto="$CRYPTO" \
+            ${TARGET:+--host=$TARGET} \
             --enable-smb="$SMB" --prefix="$PREFIX" --disable-local-libpcap
     fi
 else
@@ -109,9 +122,9 @@ else
 fi
 run_after_echo "$MAKE_BIN" install
 print_so_deps "$TCPDUMP_BIN"
-run_after_echo "$TCPDUMP_BIN" -h
-run_after_echo "$TCPDUMP_BIN" -D
-if [ "$CIRRUS_CI" = true ]; then
+[ -z "$TARGET" ] && run_after_echo "$TCPDUMP_BIN" -h
+[ -z "$TARGET" ] && run_after_echo "$TCPDUMP_BIN" -D
+if [ -z "$TARGET" ] && [ "$CIRRUS_CI" = true ]; then
     # Likewise for the "-J" flag and HAVE_PCAP_SET_TSTAMP_TYPE.
     run_after_echo sudo \
         ${LD_LIBRARY_PATH:+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"} \
@@ -120,13 +133,13 @@ if [ "$CIRRUS_CI" = true ]; then
         ${LD_LIBRARY_PATH:+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"} \
         "$TCPDUMP_BIN" -L
 fi
-if [ "$BUILD_LIBPCAP" = yes ]; then
+if [ -z "$TARGET" ] && [ "$BUILD_LIBPCAP" = yes ]; then
     run_after_echo "$MAKE_BIN" check
 fi
 if [ "$CMAKE" = no ]; then
     [ "$TEST_RELEASETAR" = yes ] && run_after_echo "$MAKE_BIN" releasetar
 fi
-if [ "$CIRRUS_CI" = true ]; then
+if [ -z "$TARGET" ] && [ "$CIRRUS_CI" = true ]; then
     run_after_echo sudo \
         ${LD_LIBRARY_PATH:+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"} \
         "$TCPDUMP_BIN" -#n -c 10
