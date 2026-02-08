@@ -20,7 +20,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "2 February 2026"
+.TH TCPDUMP 1  "8 February 2026"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -77,12 +77,12 @@ tcpdump \- dump traffic on a network
 [
 .BI \-\-lengths
 ]
+.br
+.ti +8
 [
 .B \-m
 .I module
 ]
-.br
-.ti +8
 [
 .B \-M
 .I secret
@@ -93,12 +93,12 @@ tcpdump \- dump traffic on a network
 [
 .B \-\-print
 ]
+.br
+.ti +8
 [
 .B \-\-print\-sampling
 .I nth
 ]
-.br
-.ti +8
 [
 .B \-Q
 .I in|out|inout
@@ -107,6 +107,8 @@ tcpdump \- dump traffic on a network
 .B \-r
 .I file
 ]
+.br
+.ti +8
 [
 .B \-s
 .I snaplen
@@ -115,8 +117,6 @@ tcpdump \- dump traffic on a network
 .B \-\-skip
 .I count
 ]
-.br
-.ti +8
 [
 .B \-T
 .I type
@@ -124,6 +124,8 @@ tcpdump \- dump traffic on a network
 [
 .B \-\-version
 ]
+.br
+.ti +8
 [
 .B \-V
 .I file
@@ -136,12 +138,12 @@ tcpdump \- dump traffic on a network
 .B \-W
 .I filecount
 ]
-.br
-.ti +8
 [
 .B \-y
 .I datalinktype
 ]
+.br
+.ti +8
 [
 .B \-z
 .I postrotate-command
@@ -155,6 +157,8 @@ tcpdump \- dump traffic on a network
 [
 .BI \-\-time\-stamp\-precision= tstamp_precision
 ]
+.br
+.ti +8
 [
 .BI \-\-micro
 ]
