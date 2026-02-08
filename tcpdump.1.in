@@ -82,7 +82,7 @@ tcpdump \- dump traffic on a network
 [
 .B \-m
 .I module
-]
+] ...
 [
 .B \-M
 .I secret
