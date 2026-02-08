@@ -20,7 +20,6 @@ freebsd_task:
     - pkg install -qy cmake-core # for build_matrix.sh and build.sh
     - pkg install -qy pkgconf # for cmake, replaces pkg-config
     - pkg install -qy sudo # for some tcpdump commands
-    - echo '$ git clone [...] libpcap.git'
     - git -C .. clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT}
     - ./build_matrix.sh
 
@@ -79,7 +78,6 @@ macos_task:
   script:
     - brew update >/dev/null
     - brew install libsmi | grep -v '%'
-    - echo '$ git clone [...] libpcap.git'
     - git -C .. clone --depth ${CIRRUS_CLONE_DEPTH} --branch=master --quiet ${LIBPCAP_GIT}
     - ./build_matrix.sh
 
