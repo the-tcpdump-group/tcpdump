@@ -2230,6 +2230,8 @@ main(int argc, char **argv)
 		error("-C cannot be used without -w.");
 	if (Gflag != 0 && WFileName == NULL)
 		error("-G cannot be used without -w.");
+	if (count_mode && RFileName == NULL && VFileName == NULL)
+		error("--count cannot be used without -r or -V.");
 #if defined(HAVE_FORK) || defined(HAVE_VFORK)
 	if (zflag != NULL && (WFileName == NULL || (Cflag == 0 && Gflag == 0)))
 		error("-z cannot be used without -w and (-C or -G).");
