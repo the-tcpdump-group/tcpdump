@@ -76,14 +76,11 @@
 /* GeoNetworking Basic Header Definitions*/
 #define GN_BASIC_HEADER_MINIMUM_PACKET_LENGTH 4
 
-#define IMPLEMENTED_GN_VERSIONS_NUM 1
-static const u_int implemented_gn_versions[IMPLEMENTED_GN_VERSIONS_NUM] = {1};
+#define IMPLEMENTED_GN_VERSION 1
 
 #define NH_COMMONHEADER 1
 #define NH_SECUREDPACKET 2
-#define IMPLEMENTED_GN_NEXT_HEADERS_NUM 1
-static const u_int implemented_gn_nh_headers[IMPLEMENTED_GN_NEXT_HEADERS_NUM] = {
-	NH_COMMONHEADER};
+#define IMPLEMENTED_GN_NEXT_HEADER NH_COMMONHEADER
 static const struct tok basic_header_next_header_values[] = {
 	{0, "Any"},
 	{NH_COMMONHEADER, "CommonHeader"},
@@ -96,10 +93,8 @@ static const struct tok basic_header_next_header_values[] = {
 #define HT_TSB_MULTI_HOP 1
 #define ELAPSED_SECONDS 5
 
-#define IMPLEMENTED_GN_HEADER_TYPES_NUM 2
-static const u_int implemented_gn_header_types[IMPLEMENTED_GN_HEADER_TYPES_NUM] = {
-	HT_BEACON,
-	HT_TSB};
+#define IMPLEMENTED_GN_HEADER_TYPE_1 HT_BEACON
+#define IMPLEMENTED_GN_HEADER_TYPE_2 HT_TSB
 
 #define LT_BASE_FIFTY_MILLISECONDS 0.05
 #define LT_BASE_ONE_SECOND 1
@@ -192,18 +187,6 @@ static const struct tok btp_port_values[] = {
 	{2024, "P2P_FULL_CTLM"},
 	{0, NULL}};
 
-static int is_value_in_list(u_int value, const u_int *list, u_int length_of_list)
-{
-	for (u_int i = 0; i < length_of_list; i++)
-	{
-		if (value == list[i])
-		{
-			return 1;
-		}
-	}
-	return 0;
-}
-
 static float convert_lt_to_seconds(uint8_t lt_base, uint8_t lt_multiplier)
 {
 	float base_seconds;
@@ -226,7 +209,7 @@ static float convert_lt_to_seconds(uint8_t lt_base, uint8_t lt_multiplier)
 }
 
 /* Process GN Basic Header as per Section 9.6 (ETSI EN 302 636-4-1 V1.4.1 (2020-01))*/
-static void gn_basic_header_decode_from_bytes(netdissect_options *ndo, const u_char **bp, u_int *length, uint8_t *next_header)
+static u_int gn_basic_header_decode_from_bytes(netdissect_options *ndo, const u_char *bp, u_int length, uint8_t *next_header)
 {
 	uint8_t version;
 	uint8_t reserved;
@@ -235,31 +218,33 @@ static void gn_basic_header_decode_from_bytes(netdissect_options *ndo, const u_c
 	uint8_t lt_base;
 	uint8_t rhl;
 
-	uint8_t value = GET_U_1(*bp);
-	(*bp)++;
-	(*length)--;
+	u_int initial_length = length;
+
+	uint8_t value = GET_U_1(bp);
+	bp++;
+	length--;
 	version = (value >> 4) & FOUR_BITS_MASK;
-	if (!is_value_in_list(version, implemented_gn_versions, IMPLEMENTED_GN_VERSIONS_NUM))
+	if (version != IMPLEMENTED_GN_VERSION)
 	{
 		ND_PRINT(" (Unsupported GeoNetworking Basic Header version %u)", version);
 		*next_header = 0; // Indicates an error.
-		return;
+		return initial_length - length;
 	}
 	*next_header = value & FOUR_BITS_MASK;
 
-	reserved = GET_U_1(*bp);
-	(*bp)++;
-	(*length)--;
+	reserved = GET_U_1(bp);
+	bp++;
+	length--;
 
-	lt = GET_U_1(*bp);
-	(*bp)++;
-	(*length)--;
+	lt = GET_U_1(bp);
+	bp++;
+	length--;
 	lt_multiplier = (lt >> 2) & SIX_BITS_MASK;
 	lt_base = lt & TWO_BITS_MASK;
 
-	rhl = GET_U_1(*bp);
-	(*bp)++;
-	(*length)--;
+	rhl = GET_U_1(bp);
+	bp++;
+	length--;
 
 	const char *next_header_text = tok2str(basic_header_next_header_values, "Unknown", *next_header);
 	float lt_product = convert_lt_to_seconds(lt_base, lt_multiplier);
@@ -275,10 +260,12 @@ static void gn_basic_header_decode_from_bytes(netdissect_options *ndo, const u_c
 				 version, next_header_text, reserved,
 				 lt_base, lt_multiplier, lt_product, rhl);
 	}
+
+	return initial_length - length;
 }
 
 /* Process GN Common Header as per Section 9.7 (ETSI EN 302 636-4-1 V1.4.1 (2020-01))*/
-static void gn_common_header_decode_from_bytes(netdissect_options *ndo, const u_char **bp, u_int *length, uint8_t *header_type, uint8_t *header_subtype, uint8_t *next_header)
+static u_int gn_common_header_decode_from_bytes(netdissect_options *ndo, const u_char *bp, u_int length, uint8_t *header_type, uint8_t *header_subtype, uint8_t *next_header)
 {
 	uint8_t reserved;
 	uint8_t tc_encoded;
@@ -289,62 +276,67 @@ static void gn_common_header_decode_from_bytes(netdissect_options *ndo, const u_
 	uint16_t pl;
 	uint8_t mhl;
 	uint8_t reserved2;
+	u_int initial_length = length;
 
-	uint8_t value = GET_U_1(*bp);
-	(*bp)++;
-	(*length)--;
+	uint8_t value = GET_U_1(bp);
+	bp++;
+	length--;
 	*next_header = (value >> 4) & FOUR_BITS_MASK;
 	reserved = value & FOUR_BITS_MASK;
 
-	value = GET_U_1(*bp);
-	(*bp)++;
-	(*length)--;
+	value = GET_U_1(bp);
+	bp++;
+	length--;
 	*header_type = (value >> 4) & FOUR_BITS_MASK;
 	*header_subtype = value & FOUR_BITS_MASK;
 
-	tc_encoded = GET_U_1(*bp);
-	(*bp)++;
-	(*length)--;
+	tc_encoded = GET_U_1(bp);
+	bp++;
+	length--;
 	tc_scf = (tc_encoded >> 7) & ONE_BIT_MASK;
 	tc_channel_offload = (tc_encoded >> 6) & ONE_BIT_MASK;
 	tc_id = tc_encoded & SIX_BITS_MASK;
 
-	flags = GET_U_1(*bp);
-	(*bp)++;
-	(*length)--;
+	flags = GET_U_1(bp);
+	bp++;
+	length--;
 
-	pl = GET_BE_U_2(*bp);
-	*bp += 2;
-	*length -= 2;
+	pl = GET_BE_U_2(bp);
+	bp += 2;
+	length -= 2;
 
-	mhl = GET_U_1(*bp);
-	(*bp)++;
-	(*length)--;
+	mhl = GET_U_1(bp);
+	bp++;
+	length--;
 
-	reserved2 = GET_U_1(*bp);
-	(*bp)++;
-	(*length)--;
+	reserved2 = GET_U_1(bp);
+	bp++;
+	length--;
 
 	const char *next_header_text = tok2str(common_header_next_header_values, "Unknown", *next_header);
 	const char *header_type_text = tok2str(header_type_tok, "Unknown", HT_HST(*header_type, *header_subtype));
 	const char *flags_text = tok2str(flags_text_from_bytes, "Unknown", flags);
-	if (ndo->ndo_vflag == 1)
+	switch (ndo->ndo_vflag)
 	{
+	case 0:
+		ND_PRINT("nh:%s nt:%s; ",
+				 next_header_text, header_type_text);
+		break;
+
+	case 1:
 		ND_PRINT("nh:%s ht:%s f:%s pl:%u mhl:%u; ",
 				 next_header_text, header_type_text, flags_text, pl, mhl);
-	}
-	else if (ndo->ndo_vflag >= 2)
-	{
+		break;
+
+	default:
 		ND_PRINT("nh:%s reserved:%u ht:%s hst:%u tc:[scf:%u co:%u id:%u] f:%s pl:%u mhl:%u reserved2:%u; ",
 				 next_header_text, reserved, header_type_text, *header_subtype,
 				 tc_scf, tc_channel_offload, tc_id,
 				 flags_text, pl, mhl, reserved2);
+		break;
 	}
-	else
-	{
-		ND_PRINT("nh:%s nt:%s; ",
-				 next_header_text, header_type_text);
-	}
+
+	return initial_length - length;
 }
 
 static const char *process_gn_addr(netdissect_options *ndo, uint64_t gn_addr)
@@ -427,7 +419,7 @@ static const char *process_pai(u_int pai)
 }
 
 /* Process Long Position Vector as per Section 9.5.2 of ETSI EN 302 636-4-1 V1.4.1 (2020-01)*/
-static void process_long_position_vector_from_bytes(netdissect_options *ndo, const u_char **bp, u_int *length)
+static u_int process_long_position_vector_from_bytes(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	uint64_t gn_addr;
 	u_int tst;
@@ -437,24 +429,28 @@ static void process_long_position_vector_from_bytes(netdissect_options *ndo, con
 	int16_t s;
 	u_int h;
 
-	gn_addr = GET_BE_U_8(*bp);
-	*bp += 8;
-	*length -= 8;
-	tst = GET_BE_U_4(*bp);
-	*bp += 4;
-	*length -= 4;
-	lat = GET_BE_S_4(*bp);
-	*bp += 4;
-	*length -= 4;
-	lon = GET_BE_S_4(*bp);
-	*bp += 4;
-	*length -= 4;
-	uint32_t value = GET_BE_U_4(*bp);
-	*bp += 4;
-	*length -= 4;
-	pai = (value >> (7 + THREE_BYTES)) & ONE_BIT_MASK;
-	s = (value >> TWO_BYTES) / SEVEN_BITS_MASK;
-	h = value & EIGHT_BITS_MASK;
+	u_int initial_length = length;
+
+	gn_addr = GET_BE_U_8(bp);
+	bp += 8;
+	length -= 8;
+	tst = GET_BE_U_4(bp);
+	bp += 4;
+	length -= 4;
+	lat = GET_BE_S_4(bp);
+	bp += 4;
+	length -= 4;
+	lon = GET_BE_S_4(bp);
+	bp += 4;
+	length -= 4;
+	uint32_t value = GET_BE_U_2(bp);
+	bp += 2;
+	length -= 2;
+	pai = (value >> (7 + ONE_BYTE)) & ONE_BIT_MASK;
+	s = ((int16_t)value << 1) >> 1;
+	h = GET_BE_U_2(bp);
+	bp += 2;
+	length -= 2;
 	if (ndo->ndo_vflag > NDO_V_FLAG_FIRST_DEBUG_LEVEL)
 	{
 		ND_PRINT("GN_ADDR:%s tst:%u lat:%s lon:%s pai:%s, s:%s, h:%s; ", process_gn_addr(ndo, gn_addr), tst, process_lat(lat), process_lon(lon), process_pai(pai), process_speed(s), process_heading(h));
@@ -463,59 +459,79 @@ static void process_long_position_vector_from_bytes(netdissect_options *ndo, con
 	{
 		ND_PRINT("GN_ADDR:%s lat:%s, lon:%s; ", process_gn_addr(ndo, gn_addr), process_lat(lat), process_lon(lon));
 	}
+	return initial_length - length;
 }
 
-static void process_beacon_header_from_bytes(netdissect_options *ndo, const u_char **bp, u_int *length)
+static u_int process_beacon_header_from_bytes(netdissect_options *ndo, const u_char *bp, u_int length)
 {
-	process_long_position_vector_from_bytes(ndo, bp, length);
+	return process_long_position_vector_from_bytes(ndo, bp, length);
 }
 
-static void process_tsb_shb_header_from_bytes(netdissect_options *ndo, const u_char **bp, u_int *length)
+static u_int process_tsb_shb_header_from_bytes(netdissect_options *ndo, const u_char *bp, u_int length)
 {
+	u_int initial_length = length;
+	u_int bytes_processed;
 
-	process_long_position_vector_from_bytes(ndo, bp, length);
-	u_int media_indpendenet_data = GET_BE_U_4(*bp);
-	*bp += 4;
-	*length -= 4;
+	bytes_processed = process_long_position_vector_from_bytes(ndo, bp, length);
+	bp += bytes_processed;
+	length -= bytes_processed;
+	u_int media_indpendenet_data = GET_BE_U_4(bp);
+	bp += 4;
+	length -= 4;
 	if (ndo->ndo_vflag > NDO_V_FLAG_SECOND_DEBUG_LEVEL)
 	{
 		ND_PRINT("Media-Independent Data: %u; ", media_indpendenet_data);
 	}
+	return initial_length - length;
 }
 
-static void process_tsb_header_from_bytes(netdissect_options *ndo, const u_char **bp, u_int *length)
+static u_int process_tsb_header_from_bytes(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	u_int sn;
 	u_int reseved;
+
+	u_int initial_length = length;
+
 	sn = GET_BE_U_2(bp);
-	*bp += 2;
-	*length -= 2;
+	bp += 2;
+	length -= 2;
 	reseved = GET_BE_U_2(bp);
-	*bp += 2;
-	*length -= 2;
+	bp += 2;
+	length -= 2;
 	if (ndo->ndo_vflag > 2)
 	{
 		ND_PRINT("sn:%u reserved:%u; ", sn, reseved);
 	}
-	process_long_position_vector_from_bytes(ndo, bp, length);
+	u_int bytes_processed = process_long_position_vector_from_bytes(ndo, bp, length);
+	length -= bytes_processed;
+
+	return initial_length - length;
 }
 
-static void process_optional_extended_header(netdissect_options *ndo, const u_char **bp, u_int *length, uint8_t header_type, uint8_t header_subtype)
+static u_int process_optional_extended_header(netdissect_options *ndo, const u_char *bp, u_int length, uint8_t header_type, uint8_t header_subtype)
 {
+	u_int initial_length = length;
+	u_int bytes_processed;
+
 	switch (header_type)
 	{
 	case HT_BEACON:
-		process_beacon_header_from_bytes(ndo, bp, length);
-		return;
+		bytes_processed = process_beacon_header_from_bytes(ndo, bp, length);
+		bp += bytes_processed;
+		length -= bytes_processed;
 		break;
 	case HT_TSB:
 		switch (header_subtype)
 		{
 		case 0:
-			process_tsb_shb_header_from_bytes(ndo, bp, length);
+			bytes_processed = process_tsb_shb_header_from_bytes(ndo, bp, length);
+			bp += bytes_processed;
+			length -= bytes_processed;
 			break;
 		case 1:
-			process_tsb_header_from_bytes(ndo, bp, length);
+			bytes_processed = process_tsb_header_from_bytes(ndo, bp, length);
+			bp += bytes_processed;
+			length -= bytes_processed;
 			break;
 		default:
 			ND_PRINT(" (TSB Header-Subtype not supported)");
@@ -526,32 +542,36 @@ static void process_optional_extended_header(netdissect_options *ndo, const u_ch
 		ND_PRINT(" (Header-Type not supported)");
 		break;
 	}
+
+	return initial_length - length;
 }
 
 /* Process BTP Header as per Section 7.2 (ETSI EN 302 636-5-1 V2.2.1 (2019-05))*/
-static void process_btp_header_from_bytes(netdissect_options *ndo, const u_char **bp, u_int *length, u_int common_header_next_header)
+static u_int process_btp_header_from_bytes(netdissect_options *ndo, const u_char *bp, u_int length, u_int common_header_next_header)
 {
 	u_int dst_port;
 	u_int src_port;
 	u_int dst_port_info;
 
-	dst_port = GET_BE_U_2(*bp);
-	*bp += 2;
-	*length -= 2;
+	u_int initial_length = length;
+
+	dst_port = GET_BE_U_2(bp);
+	bp += 2;
+	length -= 2;
 
 	switch (common_header_next_header)
 	{
 	case BTP_A:
-		src_port = GET_BE_U_2(*bp);
-		*bp += 2;
-		*length -= 2;
+		src_port = GET_BE_U_2(bp);
+		bp += 2;
+		length -= 2;
 		ND_PRINT("BTP-A dst:%s src:%s; ", tok2str(btp_port_values, "Unknown", dst_port), tok2str(btp_port_values, "Unknown", src_port));
 		break;
 
 	case BTP_B:
-		dst_port_info = GET_BE_U_2(*bp);
-		*bp += 2;
-		*length -= 2;
+		dst_port_info = GET_BE_U_2(bp);
+		bp += 2;
+		length -= 2;
 		if (ndo->ndo_vflag > NDO_V_FLAG_SECOND_DEBUG_LEVEL)
 		{
 			ND_PRINT("BTP-B dst:%s dpi:%u; ", tok2str(btp_port_values, "Unknown", dst_port), dst_port_info);
@@ -565,10 +585,12 @@ static void process_btp_header_from_bytes(netdissect_options *ndo, const u_char 
 	default:
 		break;
 	}
+	return initial_length - length;
 }
 
 void geonet_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
+	u_int bytes_processed;
 	ndo->ndo_protocol = "geonet";
 	ND_PRINT("GeoNet ");
 
@@ -580,9 +602,11 @@ void geonet_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	/* Process Basic Header */
 	uint8_t basic_header_next_header;
-	gn_basic_header_decode_from_bytes(ndo, &bp, &length, &basic_header_next_header);
+	bytes_processed = gn_basic_header_decode_from_bytes(ndo, bp, length, &basic_header_next_header);
+	bp += bytes_processed;
+	length -= bytes_processed;
 
-	if (!is_value_in_list(basic_header_next_header, implemented_gn_nh_headers, IMPLEMENTED_GN_NEXT_HEADERS_NUM))
+	if (basic_header_next_header != IMPLEMENTED_GN_NEXT_HEADER)
 	{
 		ND_PRINT(" (Next-Header not supported: %s)", tok2str(basic_header_next_header_values, "Unknown", basic_header_next_header));
 		goto invalid;
@@ -592,19 +616,25 @@ void geonet_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	uint8_t header_type;
 	uint8_t header_subtype;
 	uint8_t common_header_next_header;
-	gn_common_header_decode_from_bytes(ndo, &bp, &length, &header_type, &header_subtype, &common_header_next_header);
-	if (!is_value_in_list(header_type, implemented_gn_header_types, IMPLEMENTED_GN_HEADER_TYPES_NUM))
+	bytes_processed = gn_common_header_decode_from_bytes(ndo, bp, length, &header_type, &header_subtype, &common_header_next_header);
+	bp += bytes_processed;
+	length -= bytes_processed;
+	if (header_type != IMPLEMENTED_GN_HEADER_TYPE_1 && header_type != IMPLEMENTED_GN_HEADER_TYPE_2)
 	{
 		ND_PRINT(" (GeoNetworking Header-Type %s not supported)", tok2str(header_type_tok, "Unknown", HT_HST(header_type, header_subtype)));
 		goto invalid;
 	}
 
 	/* Process Optional Extended Header*/
-	process_optional_extended_header(ndo, &bp, &length, header_type, header_subtype);
+	bytes_processed = process_optional_extended_header(ndo, bp, length, header_type, header_subtype);
+	bp += bytes_processed;
+	length -= bytes_processed;
 	if (common_header_next_header == BTP_A || common_header_next_header == BTP_B)
 	{
 		/* Print Basic Transport Header */
-		process_btp_header_from_bytes(ndo, &bp, &length, common_header_next_header);
+		bytes_processed = process_btp_header_from_bytes(ndo, bp, length, common_header_next_header);
+		bp += bytes_processed;
+		length -= bytes_processed;
 	}
 
 	/* Print user data part */
