@@ -89,6 +89,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
         dissect the MP_TCPRST sub-option.
       TCP: Add support for the AE (AccECN) flag.
       IP: Update the offload "presumed TSO" case for "BIG TCP".
+    User interface:
+       Print an error message about --count without -r or -V.
 
 Tuesday, December 30, 2025 / The Tcpdump Group
   Summary for 4.99.6 tcpdump release
