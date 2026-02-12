@@ -337,6 +337,13 @@ my @decode_tests = (
 		output => 'atm-oam-loopback-print-overrun.out',
 		args => '-v'
 	},
+	{
+		# This exercises a bug: "VPI:0 VCI:4 OAM F5, vpi 96, vci 12288".
+		name => 'atm-oam-loopback-print-overrun-e',
+		input => 'atm-oam-loopback-print-overrun.pcap',
+		output => 'atm-oam-loopback-print-overrun-e.out',
+		args => '-e'
+	},
 
 	# -------- formerly smb.tests --------
 	# Only attempt OpenSSL-specific tests when compiled with the library.

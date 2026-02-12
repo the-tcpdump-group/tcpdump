@@ -377,6 +377,12 @@ atm_print(netdissect_options *ndo,
 
 		case VCI_OAMF4SC: /* fall through */
 		case VCI_OAMF4EC:
+			/*
+			 * FIXME: This is broken because oam_print() parses an
+			 * ATM UNI header, which does not work correctly with
+			 * partially-decoded DLT_SUNATM, which is what this
+			 * function gets from sunatm_if_print().
+			 */
 			oam_print(ndo, p, length, ATM_OAM_HEC);
 			return;
 
