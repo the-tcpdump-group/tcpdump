@@ -126,6 +126,7 @@ struct icmp6_hdr {
 #define ICMP6_HADISCOV_REPLY		145
 #define ICMP6_MOBILEPREFIX_SOLICIT	146
 #define ICMP6_MOBILEPREFIX_ADVERT	147
+#define ICMP6_LOCATOR_UPDATE            156     /* locator update - RFC 6743 */
 #define	ICMP6_EXTENDED_ECHO_REQUEST	160	/* extended echo request */
 #define	ICMP6_EXTENDED_ECHO_REPLY	161	/* extended echo reply */
 
@@ -501,6 +502,32 @@ struct rr_result {		/* router renumbering result message */
 #define ICMP6_RR_RESULT_FLAGS_OOB		((uint16_t)htons(0x0002))
 #define ICMP6_RR_RESULT_FLAGS_FORBIDDEN		((uint16_t)htons(0x0001))
 
+/*
+ * ICMP Locator Update Message for ILNPv6 (RFC 6743).
+ */
+struct ilnp_lu_hdr {
+	struct icmp6_hdr	ilu_icmp6_hdr;
+	/* followed by 1..numlocs records */
+};
+
+#define ilh_type	ilu_icmp6_hdr.icmp6_type
+#define ilh_code	ilu_icmp6_hdr.icmp6_code
+#define ilh_cksum	ilu_icmp6_hdr.icmp6_cksum
+#define ilh_numlocs	ilu_icmp6_hdr.icmp6_data8[0]
+#define ilh_opcode	ilu_icmp6_hdr.icmp6_data8[1]
+#define ilh_reserved00	ilu_icmp6_hdr.icmp6_data16[1]
+
+/* Operations defined for ilh_opcode */
+#define ILHO_LOCATOR_UPDATE		0x01
+#define ILHO_LOCATOR_ACK		0x02
+
+/* Per-locator structure */
+struct ilnp_lu_entry {
+	nd_eui64	ile_locator;
+	nd_uint16_t	ile_prec;
+	nd_uint16_t	ile_lifetime;
+};
+
 static const char *get_rtpref(u_int);
 static const char *get_lifetime(uint32_t);
 static const char *get_pref64_len_repr(uint16_t);
@@ -513,6 +540,7 @@ static const struct udphdr *get_upperlayer(netdissect_options *ndo, const u_char
 static void dnsname_print(netdissect_options *ndo, const u_char *, const u_char *);
 static void icmp6_nodeinfo_print(netdissect_options *ndo, u_int, const u_char *, const u_char *);
 static void icmp6_rrenum_print(netdissect_options *ndo, const u_char *, const u_char *);
+static void ilnp6_lu_print(netdissect_options *ndo, const u_char *, const u_char *);
 
 /*
  * DIO: Updated to RFC6550, as published in 2012: section 6. (page 30)
@@ -692,6 +720,7 @@ static const struct tok icmp6_type_values[] = {
     { ICMP6_MOBILEPREFIX_ADVERT, "mobile router advertisement"},
     { ICMP6_NI_QUERY, "node information query"},
     { ICMP6_NI_REPLY, "node information reply"},
+    { ICMP6_LOCATOR_UPDATE, "locator update"},
     { MLD6_MTRACE, "mtrace message"},
     { MLD6_MTRACE_RESP, "mtrace response"},
     { ND_RPL_MESSAGE,   "RPL"},
@@ -1341,6 +1370,9 @@ icmp6_print(netdissect_options *ndo,
 			print_icmp_rfc8335(ndo, xinfo, icmp6_type == ICMP6_EXTENDED_ECHO_REQUEST, icmp6_code, dp->icmp6_data + 4);
 		}
 		break;
+	case ICMP6_LOCATOR_UPDATE:
+		ilnp6_lu_print(ndo, bp, ep);
+		break;
 	default:
                 ND_PRINT(", length %u", length);
                 if (ndo->ndo_vflag <= 1)
@@ -1591,6 +1623,59 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 
 trunc:
 	return -1;
+}
+
+static void
+ilnp6_lu_print(netdissect_options *ndo, const u_char *bp, const u_char *ep)
+{
+	const struct ilnp_lu_hdr	*ilh;
+	const struct ilnp_lu_entry	*ile;
+	const struct icmp6_hdr		*dp;
+	uint8_t				 opcode;
+	size_t				 i, numlocs;
+
+	if (ep < bp)
+		return;
+	dp = (const struct icmp6_hdr *)bp;
+	ilh = (const struct ilnp_lu_hdr *)bp;
+
+	ND_PRINT(", ");
+	opcode = GET_U_1(&ilh->ilh_opcode);
+	switch (opcode) {
+	case ILHO_LOCATOR_UPDATE:
+		ND_PRINT("update");
+		break;
+	case ILHO_LOCATOR_ACK:
+		ND_PRINT("acknowledgement");
+		break;
+	default:
+		ND_PRINT("unknown opcode %u", opcode);
+		return;
+		break;
+	}
+	ND_PRINT(", ");
+
+	numlocs = GET_U_1(&ilh->ilh_numlocs);
+	if (numlocs == 0) {
+		ND_PRINT("empty payload");
+		return;
+	}
+	ND_TCHECK_LEN(dp, sizeof(*ilh) + (sizeof(*ile) * numlocs));
+
+	ile = (const struct ilnp_lu_entry *)(const char *)(ilh + 1);
+	for (i = 0; i < numlocs; i++, ile++) {
+		ND_PRINT("\n\tlocator: %s",
+			 GET_EUI64_STRING(&ile->ile_locator));
+		if (ndo->ndo_vflag >= 1) {
+			ND_PRINT(" (precedence %u, life time %us)",
+				 GET_BE_U_2(&ile->ile_prec),
+				 GET_BE_U_2(&ile->ile_lifetime));
+		}
+	}
+	return;
+
+trunc:
+	nd_print_trunc(ndo);
 }
 
 static void
