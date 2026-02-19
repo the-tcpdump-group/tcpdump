@@ -145,10 +145,12 @@ struct ip6_dest {
 #define IP6OPT_HOME_ADDRESS	0xc9	/* 11 0 01001 */
 #define IP6OPT_HOMEADDR_MINLEN	18
 #define IP6OPT_EID		0x8a	/* 10 0 01010 */
-#define IP6OPT_ILNP_NOTICE	0x8b	/* 10 0 01011 */
+#define IP6OPT_ILNP_NONCE	0x8b	/* 10 0 01011 */
 #define IP6OPT_LINE_ID		0x8c	/* 10 0 01100 */
 #define IP6OPT_MPL		0x6d	/* 01 1 01101 */
 #define IP6OPT_IP_DFF		0xee	/* 11 1 01110 */
+
+#define IP6OPT_ILNP_NONCE_MINLEN 6	/* up to maximum dstopt length */
 
 #define IP6OPT_TYPE(o)		((o) & 0xC0)
 #define IP6OPT_TYPE_SKIP	0x00
