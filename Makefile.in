@@ -370,6 +370,7 @@ EXTRA_DIST = \
 	send-ack.awk \
 	smbutil.c \
 	stime.awk \
+	tcpdump-sysusers.conf \
 	tcpdump.1.in
 
 TEST_DIST= `git -C "$$DIR" ls-files tests`
@@ -406,11 +407,15 @@ install: all
 	[ -d $(DESTDIR)$(mandir)/man1 ] || \
 	    (mkdir -p $(DESTDIR)$(mandir)/man1; chmod 755 $(DESTDIR)$(mandir)/man1)
 	$(INSTALL_DATA) $(PROG).1 $(DESTDIR)$(mandir)/man1/$(PROG).1
+	[ -d $(DESTDIR)$(prefix)/lib/sysusers.d ] || \
+	    (mkdir -p $(DESTDIR)$(prefix)/lib/sysusers.d; chmod 755 $(DESTDIR)$(prefix)/lib/sysusers.d)
+	$(INSTALL_DATA) tcpdump-sysusers.conf $(DESTDIR)$(prefix)/lib/sysusers.d/tcpdump.conf
 
 uninstall:
 	rm -f $(DESTDIR)$(bindir)/$(PROG)
 	rm -f $(DESTDIR)$(bindir)/$(PROG).`cat ${srcdir}/VERSION`
 	rm -f $(DESTDIR)$(mandir)/man1/$(PROG).1
+	rm -f $(DESTDIR)$(prefix)/lib/sysusers.d/tcpdump.conf
 
 lint:
 	lint -hbxn $(SRC) $(LIBNETDISSECT_SRC) | \
