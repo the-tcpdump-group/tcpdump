@@ -633,7 +633,20 @@ show_remote_devices_and_exit(void)
 #define M_FLAG_USAGE
 #endif
 
-#define SHORTOPTS "aAbB:c:C:dDe" E_FLAG "fF:gG:hHi:I" j_FLAG J_FLAG "KlLm:" M_FLAG "nNOpqQ:r:s:StT:uUvV:w:W:xXy:Y" z_FLAG "Z:#"
+/*
+ * The "+" here is to force POSIX-style parsing, in which the first
+ * argument that *doesn't* begin with "-" causes option parsing to
+ * stop, rather than GNU-style parsing, in which any argument that
+ * begins with "-" is treated as an option.
+ *
+ * If we don't do that, commands such as "tcpdump -d ip[4:4] == -1"
+ * will fail, as "-1" will be treated as being a "1" flag rather
+ * than as "minus one".
+ *
+ * All versions of getopt_long() appear to support the "+" (and
+ * appear to give GNU-style parsing if you don't provide the "+").
+ */
+#define SHORTOPTS "+aAbB:c:C:dDe" E_FLAG "fF:gG:hHi:I" j_FLAG J_FLAG "KlLm:" M_FLAG "nNOpqQ:r:s:StT:uUvV:w:W:xXy:Y" z_FLAG "Z:#"
 
 /*
  * Long options.
