@@ -90,7 +90,7 @@ sub showfile {
 }
 
 sub runtest {
-    local($name, $input, $output, $options) = @_;
+    local($name, $input, $output, $test_args) = @_;
     my $r;
 
     $outputbase = basename($output);
@@ -107,15 +107,20 @@ sub runtest {
     #
     # Furthermore, on Windows, fc can't read the standard input, so we
     # can't do it as a pipeline in any case.
-    if (index($options, "SPECIAL_t") != -1) {
+    if (index($test_args, "SPECIAL_t") != -1) {
         # Hack to keep specific time options for tcp-handshake-micro-t, etc.
         # -t, -tt, etc.
-        $options =~ s/ SPECIAL_t//;
+        $test_args =~ s/ SPECIAL_t//;
     } else {
         # No specific time option, use -tttt
-        $options .= " -tttt";
+        # Prepend it, as getopt_long() in tcpdump might be
+        # parsing POSIX-style rather than GNU-style (for
+        # example, if the user set POSIXLY_CORRECT in the
+        # environment), meaning flags arguments must precede
+        # all non-flag arguments.
+        $test_args = "-tttt $test_args";
     }
-    $r = system "$TCPDUMP -# -n -r $input $options >${newdir}/${outputbase} 2>${rawstderrlog}";
+    $r = system "$TCPDUMP -# -n -r $input $test_args >${newdir}/${outputbase} 2>${rawstderrlog}";
 
     if($r != 0) {
         #
@@ -409,7 +414,7 @@ sub runOneComplexTest {
     my $output = $testconfig->{output};
     my $input  = $testconfig->{input};
     my $name   = $testconfig->{name};
-    my $options= $testconfig->{args};
+    my $test_args= $testconfig->{args};
     my $foundit = 1;
     my $unfoundit=1;
 
@@ -437,12 +442,12 @@ sub runOneComplexTest {
     }
 
     # EXPAND any occurrences of @TESTDIR@ to $testsdir
-    $options =~ s/\@TESTDIR\@/$testsdir/;
+    $test_args =~ s/\@TESTDIR\@/$testsdir/;
 
     my $result = runtest($name,
                          $testsdir . "/" . $input,
                          $testsdir . "/" . $output,
-                         $options);
+                         $test_args);
 
     if($result == 0) {
         $passedcount++;
@@ -486,14 +491,14 @@ sub runSimpleTests {
         next if /^$/;
 
         unlink("core");
-        ($name, $input, $output, @options) = split;
+        ($name, $input, $output, @test_args) = split;
         next if(defined($only) && $only ne $name);
 
-        my $options = join(" ", @options);
+        my $test_args = join(" ", @test_args);
         my $hash = { name => $name,
                      input=> $input,
                      output=>$output,
-                     args => $options };
+                     args => $test_args };
 
         runOneComplexTest($hash);
     }
