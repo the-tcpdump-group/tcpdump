@@ -739,7 +739,7 @@ sub run_decode_test {
 		'%s -# -n -r "%s" %s >"%s" 2>"%s"',
 		$TCPDUMP,
 		$input,
-		$test->{options},
+		$test->{test_args},
 		mytmpfile ($filename_stdout),
 		mytmpfile ($filename_stderr)
 	);
@@ -815,21 +815,26 @@ sub request_test {
 		skip => $testconfig->{skip},
 	} if defined $testconfig->{skip} && $testconfig->{skip} ne '';
 
-	my $options = defined ($testconfig->{args}) ? $testconfig->{args} : '';
-	if (index ($options, 'SPECIAL_t') != -1) {
+	my $test_args = defined ($testconfig->{args}) ? $testconfig->{args} : '';
+	if (index ($test_args, 'SPECIAL_t') != -1) {
 		# Hack to keep specific time options for tcp-handshake-micro-t, etc.
 		# -t, -tt, etc.
-		$options =~ s/ SPECIAL_t//o;
+		$test_args =~ s/ SPECIAL_t//o;
 	} else {
 		# No specific time option, use -tttt
-		$options .= ' -tttt';
+		# Prepend it, as getopt_long() in tcpdump might be
+		# parsing POSIX-style rather than GNU-style (for
+		# example, if the user set POSIXLY_CORRECT in the
+		# environment), meaning flags arguments must precede
+		# all non-flag arguments.
+		$test_args = "-tttt $test_args";
 	}
 
 	return {
 		label => $testconfig->{name},
 		func => \&run_decode_test,
 		input => $testconfig->{input},
-		options => $options,
+		test_args => $test_args,
 		output => $testconfig->{output},
 	};
 }
@@ -838,12 +843,12 @@ my $fn_testlist = "${testsdir}/TESTLIST";
 open (TESTLIST, '<', $fn_testlist) || die "ERROR: failed opening ${fn_testlist}: $!\n";
 while (<TESTLIST>) {
 	next if /^\#/o || /^$/o;
-	my ($name, $input, $output, @options) = split;
+	my ($name, $input, $output, @test_args) = split;
 	push @decode_tests, {
 		name => $name,
 		input => $input,
 		output => $output,
-		args => join (' ', @options)
+		args => join (' ', @test_args)
 	};
 }
 close (TESTLIST) || die "ERROR failed closing '$fn_testlist'";
