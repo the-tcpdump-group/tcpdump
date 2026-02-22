@@ -1096,108 +1096,77 @@ metacharacters.
 Multiple arguments are concatenated with spaces before being parsed.
 .SH EXAMPLES
 .LP
-To print all packets arriving at or departing from \fIsundown\fP:
-.RS
-.nf
-\fBtcpdump host sundown\fP
-.fi
-.RE
-.LP
-To print traffic between \fIhelios\fR and either \fIhot\fR or \fIace\fR:
-.RS
-.nf
-\fBtcpdump host helios and \\( hot or ace \\)\fP
-.fi
-.RE
-.LP
-To print all IP packets between \fIace\fR and any host except \fIhelios\fR:
-.RS
-.nf
-\fBtcpdump ip host ace and not helios\fP
-.fi
-.RE
-.LP
-To print all traffic between local hosts and hosts at Berkeley:
+To print packets on all network interfaces, on Linux
+(it's often best to pass -n to display IP addresses rather than hostnames):
 .RS
 .nf
 .B
-tcpdump net ucb-ether
+tcpdump -ni any
 .fi
 .RE
 .LP
-To print all ftp traffic through internet gateway \fIsnup\fP:
-(note that the expression is quoted to prevent the shell from
-(mis-)interpreting the parentheses):
+To print all packets on port 8080:
 .RS
 .nf
 .B
-tcpdump 'gateway snup and (port ftp or ftp-data)'
+tcpdump -n 'port 8080'
 .fi
 .RE
 .LP
-To print traffic neither sourced from nor destined for local hosts
-(if you gateway to one other net, this stuff should never make it
-onto your local net).
+To print all packets sent to or from 192.0.2.1:
 .RS
 .nf
 .B
-tcpdump ip and not net \fIlocalnet\fP
+tcpdump -n 'host 192.0.2.1'
 .fi
 .RE
 .LP
-To print the start and end packets (the SYN and FIN packets) of each
-TCP conversation that involves a non-local host.
+To print all packets sent from 192.0.2.1 on port 53:
 .RS
 .nf
 .B
-tcpdump 'tcp[tcpflags] & (tcp-syn|tcp-fin) != 0 and not src and dst net \fIlocalnet\fP'
+tcpdump -n 'src host 192.0.2.1 and port 53'
 .fi
 .RE
 .LP
-To print the TCP packets with flags RST and ACK both set.
-(i.e. select only the RST and ACK flags in the flags field, and if the result
-is "RST and ACK both set", match)
+To print all ICMP packets:
 .RS
 .nf
 .B
-tcpdump 'tcp[tcpflags] & (tcp-rst|tcp-ack) == (tcp-rst|tcp-ack)'
+tcpdump -n icmp
 .fi
 .RE
 .LP
-To print all IPv4 HTTP packets to and from port 80, i.e. print only
-packets that contain data, not, for example, SYN and FIN packets and
-ACK-only packets.  (IPv6 is left as an exercise for the reader.)
+To write all packets on port 8080 to \fIout.pcap\fP (-v prints a live summary of how many packets have been captured):
 .RS
 .nf
 .B
-tcpdump 'tcp port 80 and (((ip[2:2] - ((ip[0]&0xf)<<2)) - ((tcp[12]&0xf0)>>2)) != 0)'
+tcpdump -v -w out.pcap 'port 8080'
 .fi
 .RE
 .LP
-To print IP packets longer than 576 bytes sent through gateway \fIsnup\fP:
+To print a packet number on each line (for example to use in a discussion, "there's a problem with packet 12..."):
 .RS
 .nf
 .B
-tcpdump 'gateway snup and ip[2:2] > 576'
+tcpdump -n -# 'port 8080'
 .fi
 .RE
 .LP
-To print IP broadcast or multicast packets that were
-.I not
-sent via Ethernet broadcast or multicast:
+To print the start and end packets (the SYN and FIN packets) of each TCP conversation.
 .RS
 .nf
 .B
-tcpdump 'ether[0] & 1 = 0 and ip[16] >= 224'
+tcpdump -n 'tcp[tcpflags] & (tcp-syn|tcp-fin) != 0'
 .fi
 .RE
 .LP
-To print all ICMP packets that are not echo requests/replies (i.e., not
-ping packets):
+To print all IPv4 HTTP packets to and from port 80, i.e. print only packets that
+contain data, not, for example, SYN and FIN packets and ACK-only packets.
 .RS
 .nf
 .B
-tcpdump 'icmp[icmptype] != icmp-echo and icmp[icmptype] != icmp-echoreply'
+tcpdump -n 'tcp port 80 and (((ip[2:2] - ((ip[0]&0xf)<<2)) - ((tcp[12]&0xf0)>>2)) != 0)'
 .fi
 .RE
 .SH OUTPUT FORMAT
