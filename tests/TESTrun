@@ -822,7 +822,12 @@ sub request_test {
 		$test_args =~ s/ SPECIAL_t//o;
 	} else {
 		# No specific time option, use -tttt
-		$test_args = ' -tttt' . " " . $test_args;
+		# Prepend it, as getopt_long() in tcpdump might be
+		# parsing POSIX-style rather than GNU-style (for
+		# example, if the user set POSIXLY_CORRECT in the
+		# environment), meaning flags arguments must precede
+		# all non-flag arguments.
+		$test_args = "-tttt $test_args";
 	}
 
 	return {
