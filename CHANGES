@@ -47,6 +47,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Add --lengths option to print the captured and original packet lengths.
       Add --skip option to skip some packets before writing or printing.
       Use a common routine to parse numerical arguments and check its value.
+      Don't treat arguments beginning with - in or after the filter
+        expression as command-line options.
     Source code:
       Drop support for building with versions of libpcap that don't
         support all the libpcap 1.0 APIs.
