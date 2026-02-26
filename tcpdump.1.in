@@ -22,7 +22,7 @@
 .\"
 .TH TCPDUMP 1  "8 February 2026"
 .SH NAME
-tcpdump \- dump traffic on a network
+tcpdump \- dump traffic on a network or some other capture devices
 .SH SYNOPSIS
 .na
 .B tcpdump
