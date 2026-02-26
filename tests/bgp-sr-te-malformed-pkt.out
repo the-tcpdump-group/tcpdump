@@ -1,0 +1,20 @@
+    1  2021-01-18 15:00:56.247148 IP (tos 0x0, ttl 64, id 41156, offset 0, flags [DF], proto TCP (6), length 232)
+    1.0.0.2.38957 > 1.0.0.1.179: Flags [P.], cksum 0x3412 (correct), seq 1493983574:1493983754, ack 462494371, win 58, options [nop,nop,TS val 1684679531 ecr 1684679365], length 180: BGP
+	Update Message (2), length: 180
+	  Community (8), length: 4, Flags [OT]:  NO_ADVERTISE
+	  Tunnel Encapsulation (23), length: 103, Flags [OT]: 
+	    Tunnel-type: SR Policy (15), length: 99
+	      Binding SID (13), length: 6, Flags [], Label: 965536, TC: 0, S: 0, TTL: 0
+	      Preference (12), length: 6, Flags [], Preference: 200
+	      Explicit Null Label Policy (14), length: 3, Flags [], ENLP: Both (3)
+	      Color (4), length: 8
+		0x0000:  030b 0000 0000 0002
+	      Remote Endpoint (6), length: 10
+		0x0000:  0000 0000 0001 0304 0506
+	      Segment List (128), length: 65535
+	        Segment Type A (1), length: 6, Flags [], Label: 65537, TC: 0, S: 0, TTL: 0
+	        Segment Type A (1), length: 6, Flags [], Label: 131073, TC: 0, S: 0, TTL: 0
+	        Weight (9), length: 6, Flags [], Weight: 500
+	        Unknown (128) [|bgp]
+    2  2021-01-18 15:00:56.247243 IP (tos 0xc0, ttl 255, id 64511, offset 0, flags [DF], proto TCP (6), length 52)
+    1.0.0.1.179 > 1.0.0.2.38957: Flags [.], cksum 0xcaab (correct), ack 180, win 57, options [nop,nop,TS val 1684679531 ecr 1684679531], length 0
