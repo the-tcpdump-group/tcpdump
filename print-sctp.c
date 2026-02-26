@@ -109,9 +109,13 @@
 #define SCTP_ECN_ECHO		0x0c
 #define SCTP_ECN_CWR		0x0d
 #define SCTP_SHUTDOWN_COMPLETE	0x0e
+#define SCTP_I_DATA		0x40
+#define SCTP_ASCONF_ACK		0x80
+#define SCTP_RE_CONFIG		0x82
+#define SCTP_PAD_CHUNK		0x84
 #define SCTP_FORWARD_CUM_TSN    0xc0
-#define SCTP_RELIABLE_CNTL      0xc1
-#define SCTP_RELIABLE_CNTL_ACK  0xc2
+#define SCTP_ASCONF		0xc1
+#define SCTP_I_FORWARD_TSN	0xc2
 
 static const struct tok sctp_chunkid_str[] = {
 	{ SCTP_DATA,              "DATA"              },
@@ -129,9 +133,13 @@ static const struct tok sctp_chunkid_str[] = {
 	{ SCTP_ECN_ECHO,          "ECN ECHO"          },
 	{ SCTP_ECN_CWR,           "ECN CWR"           },
 	{ SCTP_SHUTDOWN_COMPLETE, "SHUTDOWN COMPLETE" },
+	{ SCTP_I_DATA,            "I-DATA"            },
+	{ SCTP_RE_CONFIG,         "RE-CONFIG"         },
+	{ SCTP_PAD_CHUNK,         "PAD"               },
 	{ SCTP_FORWARD_CUM_TSN,   "FOR CUM TSN"       },
-	{ SCTP_RELIABLE_CNTL,     "REL CTRL"          },
-	{ SCTP_RELIABLE_CNTL_ACK, "REL CTRL ACK"      },
+	{ SCTP_ASCONF,            "ASCONF"            },
+	{ SCTP_ASCONF_ACK,        "ASCONF-ACK"        },
+	{ SCTP_I_FORWARD_TSN,     "I-FORWARD-FSN"     },
 	{ 0, NULL }
 };
 
@@ -142,8 +150,32 @@ static const struct tok sctp_chunkid_str[] = {
 #define SCTP_DATA_FIRST_FRAG	0x02
 #define SCTP_DATA_NOT_FRAG	0x03
 #define SCTP_DATA_UNORDERED	0x04
+#define SCTP_DATA_SACK_IMM	0x08
+
+/* I-Forward-TSN Specific Flag */
+#define SCTP_I_FORWARD_UNORDERED 0x01
+
+/* RE-CONFIG Parameters */
+#define OUT_SSN_RESET		13
+#define IN_SSN_RESET		14
+#define SSN_TSN_RESET		15
+#define RE_CONFIG_RES		16
+#define ADD_OUT_STREAM_REQ	17
+#define ADD_IN_STREAM_REQ	18
 
 #define SCTP_ADDRMAX 60
+
+/* ASCONF Parameters*/
+/* - used in INIT/ACK chunk */
+#define SET_PRI_ADDR		0xC004
+#define ADAPT_LAYER_INDIC	0xC006
+#define SUPPORTED_EXT		0x8008
+/* - used in ASCONF param */
+#define ADD_IP_ADDR		0xC001
+#define DEL_IP_ADDR		0xC002
+/* - used in ASCONF response */
+#define ERR_CAUSE_INDIC		0xC003
+#define SUCCESS_INDIC		0xC005
 
 #define CHAN_HP 6704
 #define CHAN_MP 6705
@@ -348,6 +380,80 @@ struct sctpDataPart{
   nd_uint32_t payloadtype;
 };
 
+struct sctpIData{
+  nd_uint32_t TSN;
+  nd_uint16_t streamId;
+  nd_uint16_t reserved;
+  nd_uint32_t MID;
+  nd_uint32_t PPID_FSN;
+};
+
+struct sctpIForward{
+  nd_uint32_t new_cum_TSN;
+};
+
+struct sctpIForwardEntry{
+  nd_uint16_t streamId;
+  nd_uint16_t flag;
+  nd_uint32_t MID;
+};
+
+/* RE-CONFIG Parameters */
+struct sctpReConfigHdr{
+  nd_uint16_t param_type;
+  nd_uint16_t param_len;
+};
+
+struct outGoingSSNReset{
+  nd_uint32_t re_config_req;
+  nd_uint32_t re_config_res;
+  nd_uint32_t last_assigned_TSN;
+};
+
+struct inGoingSSNReset{
+  nd_uint32_t re_config_req;
+};
+
+struct reConfigRes{
+  nd_uint32_t res_seq_num;
+  nd_uint32_t result;
+};
+
+struct addStreamReq{
+  nd_uint32_t res_seq_num;
+  nd_uint16_t num_new_stream;
+  nd_uint16_t reserved;
+};
+
+/* ASCONF parameters */
+struct sctpAsconfParam{
+  nd_uint16_t type;
+  nd_uint16_t length;
+  nd_uint32_t CID;
+  union {
+    struct sctpV4IpAddress ipv4;
+    struct sctpV6IpAddress ipv6;
+  } addr;
+};
+
+struct sctpAsconfParamRes{
+  nd_uint16_t type;
+  nd_uint16_t length;
+  nd_uint32_t CID;
+};
+
+struct sctpASCONF{
+  nd_uint32_t seq_num;
+  union {
+    struct sctpV4IpAddress ipv4;
+    struct sctpV6IpAddress ipv6;
+  } addr;
+};
+
+struct sctpASCONF_ACK{
+  nd_uint32_t seq_num;
+};
+
 struct sctpUnifiedDatagram{
   struct sctpChunkDesc uh;
   struct sctpDataPart dp;
@@ -362,6 +468,57 @@ struct sctpECN_echo{
 struct sctpCWR{
   struct sctpChunkDesc uh;
   nd_uint32_t TSN_reduced_at;
+};
+
+/* RE-CONFIG Parameters */
+static const struct tok RE_CONFIG_parameters[] = {
+	{ OUT_SSN_RESET,	"OUT SSN RESET"	},
+	{ IN_SSN_RESET,		"IN SSN RESET"	},
+	{ SSN_TSN_RESET,	"SSN/TSN Reset"	},
+	{ RE_CONFIG_RES,	"RESP"		},
+	{ ADD_OUT_STREAM_REQ,	"ADD OUT STREAM"},
+	{ ADD_IN_STREAM_REQ,	"ADD IN STREAM" },
+	{ 0, NULL }
+};
+
+static const struct tok results[] = {
+	{ 0,	"Success - Nothing to do"		},
+	{ 1,	"Success - Performed"			},
+	{ 2,	"Denied"				},
+	{ 3,	"Error - Wrong SSN"			},
+	{ 4,	"Error - Request already in progress"	},
+	{ 5,	"Error - Bad Sequence Number"		},
+	{ 6,	"In progress"				},
+	{ 0, NULL }
+};
+
+/* ASCONF tokens */
+static const struct tok asconfigParams[] = {
+	{ SET_PRI_ADDR,         "SET PRIM ADDR"                 },
+	{ ADAPT_LAYER_INDIC,    "Adaptation Layer Indication"   },
+	{ SUPPORTED_EXT,        "Supported Extensions"          },
+	{ ADD_IP_ADDR,          "ADD ADDR"                      },
+	{ DEL_IP_ADDR,          "DEL ADDR"                      },
+	{ ERR_CAUSE_INDIC,      "ERR"                           },
+	{ SUCCESS_INDIC,        "SUCCESS"                       },
+	{ 0, NULL }
+};
+
+static const struct tok causeCode[] = {
+        { 1,    "Invalid Stream Identifier"                     },
+        { 2,    "Missing Mandatory Parameter"                   },
+        { 3,    "Stale Cookie Error"                            },
+        { 4,    "Out of Resource"                               },
+        { 5,    "Unresolvable Address"                          },
+        { 6,    "Unrecognized Chunk Type"                       },
+        { 7,    "Invalid Mandatory Parameter"                   },
+        { 8,    "Unrecognized Parameters"                       },
+        { 9,    "No User Data"                                  },
+        { 10,   "Cookie Received While Shutting Down"           },
+        { 11,   "Restart of an Association with New Addresses"  },
+        { 12,   "User Initiated Abort"                          },
+        { 13,   "Protocol Violation"                            },
+	{ 0,	NULL }
 };
 
 static const struct tok ForCES_channels[] = {
@@ -621,6 +778,137 @@ sctp_print(netdissect_options *ndo,
 	    chunkLengthRemaining -= payload_size;
 	    break;
 	  }
+	case SCTP_I_DATA :
+	  {
+	    const struct sctpIData *dataHdrPtr;
+	    int Bbit = FALSE;
+	    uint8_t chunkFlg;
+	    uint32_t ppid_fsn;
+	    uint16_t payload_size;
+
+	    chunkFlg = GET_U_1(chunkDescPtr->chunkFlg);
+	    if ((chunkFlg & SCTP_DATA_SACK_IMM) == SCTP_DATA_SACK_IMM)
+		ND_PRINT("(I)");
+
+	    if ((chunkFlg & SCTP_DATA_UNORDERED) == SCTP_DATA_UNORDERED)
+		ND_PRINT("(U)");
+
+	    if ((chunkFlg & SCTP_DATA_FIRST_FRAG) == SCTP_DATA_FIRST_FRAG) {
+		ND_PRINT("(B)");
+		Bbit = TRUE;
+	    }
+
+	    if ((chunkFlg & SCTP_DATA_LAST_FRAG) == SCTP_DATA_LAST_FRAG)
+		ND_PRINT("(E)");
+
+	    if (((chunkFlg & SCTP_DATA_UNORDERED) == SCTP_DATA_UNORDERED)   ||
+		((chunkFlg & SCTP_DATA_FIRST_FRAG) == SCTP_DATA_FIRST_FRAG) ||
+		((chunkFlg & SCTP_DATA_LAST_FRAG) == SCTP_DATA_LAST_FRAG)   ||
+		((chunkFlg & SCTP_DATA_SACK_IMM) == SCTP_DATA_SACK_IMM))
+		ND_PRINT(" ");
+
+	    ND_ICHECKMSG_ZU("chunk length", chunkLengthRemaining, <, sizeof(*dataHdrPtr));
+	    dataHdrPtr = (const struct sctpIData*)bp;
+
+	    ppid_fsn = GET_BE_U_4(dataHdrPtr->PPID_FSN);
+	    ND_PRINT("[TSN: %u] ", GET_BE_U_4(dataHdrPtr->TSN));
+	    ND_PRINT("[SID: %u] ", GET_BE_U_2(dataHdrPtr->streamId));
+	    ND_PRINT("[MID: %u] ", GET_BE_U_4(dataHdrPtr->MID));
+	    if (FALSE == Bbit) { /* print FSN if B bit is NOT set */
+		ND_PRINT("[FSN: %u] ", ppid_fsn);
+	    } else {             /* print PPID if B bit is set */
+		ND_PRINT("[PPID %s] ", tok2str(PayloadProto_idents, "0x%x", ppid_fsn));
+	    }
+
+	    bp += sizeof(*dataHdrPtr);
+	    sctpPacketLengthRemaining -= sizeof(*dataHdrPtr);
+	    chunkLengthRemaining -= sizeof(*dataHdrPtr);
+	    ND_ICHECKMSG_U("chunk length", chunkLengthRemaining, ==, 0);
+	    payload_size = chunkLengthRemaining;
+
+	    if (FALSE == Bbit) {
+		if (ndo->ndo_vflag >= 2) {
+		    ND_PRINT("[Payload");
+			if (!ndo->ndo_suppress_default_print) {
+			    ND_PRINT(": ");
+			    ND_DEFAULTPRINT(bp, payload_size);
+			}
+		    ND_PRINT("]");
+		}
+
+		bp += payload_size;
+		sctpPacketLengthRemaining -= payload_size;
+		chunkLengthRemaining -= payload_size;
+
+		/* do not parse ppid and check for CES when B bit is not set */
+		break;
+	    }
+
+	    if (!isforces) {
+		isforces = (ppid_fsn == SCTP_PPID_FORCES_HP) ||
+			   (ppid_fsn == SCTP_PPID_FORCES_MP) ||
+			   (ppid_fsn == SCTP_PPID_FORCES_LP);
+	    }
+
+	    if (isforces) {
+		forces_print(ndo, bp, payload_size);
+		ndo->ndo_protocol = "sctp";
+	    } else if (ndo->ndo_vflag >= 2) {
+		switch (ppid_fsn) {
+		case SCTP_PPID_M3UA:
+		    m3ua_print(ndo, bp, payload_size);
+		    ndo->ndo_protocol = "sctp";
+		    break;
+		default:
+		    ND_PRINT("[Payload");
+		    if (!ndo->ndo_suppress_default_print) {
+			ND_PRINT(":");
+			ND_DEFAULTPRINT(bp, payload_size);
+		    }
+		    ND_PRINT("]");
+		    break;
+		}
+	    }
+
+	    bp += payload_size;
+	    sctpPacketLengthRemaining -= payload_size;
+	    chunkLengthRemaining -= payload_size;
+	    break;
+	  }
+	case SCTP_I_FORWARD_TSN:
+	  {
+	    const struct sctpIForward *dataHdrPtr;
+	    const struct sctpIForwardEntry *entry;
+	    const size_t entry_len = sizeof(struct sctpIForwardEntry);
+
+	    ND_ICHECKMSG_ZU("chunk length", chunkLengthRemaining, <, sizeof(*dataHdrPtr));
+	    dataHdrPtr = (const struct sctpIForward*)bp;
+	    ND_PRINT("[TSN: %u] ", GET_BE_U_4(dataHdrPtr->new_cum_TSN));
+
+	    bp += sizeof(*dataHdrPtr);
+	    sctpPacketLengthRemaining -= sizeof(*dataHdrPtr);
+	    chunkLengthRemaining -= sizeof(*dataHdrPtr);
+
+	    if (ndo->ndo_vflag >= 2) {
+		while (entry_len <= chunkLengthRemaining) {
+		    entry = (const struct sctpIForwardEntry*)bp;
+
+		    ND_PRINT("[SID: %u] ", GET_BE_U_2(entry->streamId));
+		    if ((GET_BE_U_2(entry->flag) & SCTP_I_FORWARD_UNORDERED))
+			ND_PRINT("(U)");	/* if U bit is set */
+		    ND_PRINT("[MID: %u] ", GET_BE_U_4(entry->MID));
+
+		    chunkLengthRemaining -= entry_len;
+		    sctpPacketLengthRemaining -= entry_len;
+		    bp += entry_len;
+		}
+	    }
+
+	    bp += chunkLengthRemaining;
+	    sctpPacketLengthRemaining -= chunkLengthRemaining;
+	    chunkLengthRemaining = 0;
+	    break;
+	  }
 	case SCTP_INITIATION :
 	  {
 	    const struct sctpInitiation *init;
@@ -713,6 +1001,347 @@ sctp_print(netdissect_options *ndo,
 	      dupTSN = (const u_char *)bp;
 	      ND_PRINT("\n\t\t[dup TSN #%u: %u] ", tsnNo+1,
 		       GET_BE_U_4(dupTSN));
+	    }
+	    break;
+	  }
+	case SCTP_RE_CONFIG:
+	  {
+	    const struct sctpReConfigHdr *param;
+	    uint16_t param_len, type;
+	    uint8_t padding_len;
+
+	    sctpPacketLengthRemaining -= chunkLengthRemaining;
+
+	    /* it's a padding if the remaining length is less than 4 */
+	    while (chunkLengthRemaining >= sizeof(uint32_t)) {
+
+		ND_ICHECKMSG_ZU("chunk length", chunkLengthRemaining, <, sizeof(*param));
+		param = (const struct sctpReConfigHdr*)bp;
+		type = GET_BE_U_2(param->param_type);
+		param_len = GET_BE_U_2(param->param_len);
+		padding_len = ((param_len+3) &~ 3) - param_len;
+		ND_ICHECKMSG_ZU("parameter length", param_len, <, sizeof(*param));
+
+		ND_PRINT("[%s", tok2str(RE_CONFIG_parameters, NULL, type));
+
+		param_len -= sizeof(*param);
+		chunkLengthRemaining -= sizeof(*param);
+		bp += sizeof(*param);
+
+		ND_ICHECKMSG_U("chunk length", chunkLengthRemaining, <, param_len);
+
+		/* if verbose level < 2, stop and skip */
+		if (ndo->ndo_vflag < 2) {
+		    ND_PRINT("]");
+
+		    bp += param_len;
+		    chunkLengthRemaining -= param_len;
+		    /* skipping the parameter padding if there are more
+		     * parameters in the remaining length */
+		    if (chunkLengthRemaining > sizeof(uint32_t)) {
+			bp += padding_len;
+			chunkLengthRemaining -= padding_len;
+		    }
+
+		    continue;
+		}
+
+		switch (type) {
+		case OUT_SSN_RESET:
+		  {
+		    uint16_t stream_num = 0;
+		    const struct outGoingSSNReset *content;
+
+		    ND_ICHECKMSG_ZU("parameter length", param_len, <, sizeof(*content));
+
+		    content = (const struct outGoingSSNReset*) bp;
+		    ND_PRINT(": REQ SEQ: %u, ", GET_BE_U_4(content->re_config_req));
+		    ND_PRINT("RES SEQ: %u, ", GET_BE_U_4(content->re_config_res));
+		    ND_PRINT("Last TSN: %u, ", GET_BE_U_4(content->last_assigned_TSN));
+
+		    bp += sizeof(*content);
+		    param_len -= sizeof(*content);
+		    chunkLengthRemaining -= sizeof(*content);
+
+		    ND_PRINT("SID");
+		    while (param_len > 0) {
+			ND_ICHECKMSG_ZU("chunk length", chunkLengthRemaining, <, sizeof(stream_num));
+			ND_ICHECKMSG_ZU("parameter length", param_len , <, sizeof(stream_num));
+			stream_num = GET_BE_U_2(bp);
+			ND_PRINT(" %u", stream_num);
+
+			bp += sizeof(stream_num);
+			param_len -= sizeof(stream_num);
+			chunkLengthRemaining -= sizeof(stream_num);
+		    }
+		    ND_PRINT("]");
+
+		    break;
+		  }
+		case IN_SSN_RESET:
+		  {
+		    uint16_t stream_num = 0;
+		    const struct inGoingSSNReset *content;
+
+		    ND_ICHECKMSG_ZU("parameter length", param_len , <, sizeof(*content));
+
+		    content = (const struct inGoingSSNReset*) bp;
+		    ND_PRINT(": REQ SEQ: %u, ", GET_BE_U_4(content->re_config_req));
+
+		    bp += sizeof(*content);
+		    param_len -= sizeof(*content);
+		    chunkLengthRemaining -= sizeof(*content);
+
+		    ND_PRINT("SID");
+		    while (param_len > 0) {
+			ND_ICHECKMSG_ZU("parameter length", param_len , <, sizeof(stream_num));
+			stream_num = GET_BE_U_2(bp);
+			ND_PRINT(" %u", stream_num);
+
+			bp += sizeof(stream_num);
+			param_len -= sizeof(stream_num);
+			chunkLengthRemaining -= sizeof(stream_num);
+		    }
+		    ND_PRINT("]");
+
+		    break;
+		  }
+		case SSN_TSN_RESET:
+		  {
+		    /* reuse inGoingSSNReset struct as their structure are the same*/
+		    const struct inGoingSSNReset *content;
+
+		    ND_ICHECKMSG_ZU("parameter length", param_len, <, sizeof(*content));
+
+		    content = (const struct inGoingSSNReset*) bp;
+		    ND_PRINT(": REQ SEQ: %u]", GET_BE_U_4(content->re_config_req));
+
+		    bp += sizeof(*content);
+		    chunkLengthRemaining -= sizeof(*content);
+
+		    break;
+		  }
+		case RE_CONFIG_RES:
+		  {
+		    uint32_t optional = 0;
+		    const size_t optional_size = sizeof(optional);
+		    const struct reConfigRes *content;
+
+		    ND_ICHECKMSG_ZU("parameter length", param_len, <, sizeof(*content));
+
+		    content = (const struct reConfigRes*) bp;
+		    ND_PRINT(": REQ SEQ: %u, ", GET_BE_U_4(content->res_seq_num));
+		    ND_PRINT("REQ: %s", tok2str(results, NULL, GET_BE_U_4(content->result)));
+
+		    bp += sizeof(*content);
+		    param_len -= sizeof(*content);
+		    chunkLengthRemaining -= sizeof(*content);
+
+		    if (0 == param_len) {
+			ND_PRINT("]");
+			break;
+		    }
+
+		    /* either both or none must be present */
+		    ND_ICHECKMSG_ZU("parameter length", param_len, <, 2*optional_size);
+		    optional = GET_BE_U_4(bp);
+		    ND_PRINT(", Sender's TSN: %u", optional);
+
+		    bp += optional_size;
+		    param_len -= optional_size;
+		    chunkLengthRemaining -= optional_size;
+
+		    optional = GET_BE_U_4(bp);
+		    ND_PRINT(", Receiver's Next TSN: %u] ", optional);
+
+		    bp += optional_size;
+		    chunkLengthRemaining -= optional_size;
+
+		    break;
+		  }
+		case ADD_OUT_STREAM_REQ:
+		case ADD_IN_STREAM_REQ:
+		  {
+		    const struct addStreamReq *content;
+
+		    ND_ICHECKMSG_ZU("parameter length", param_len, <, sizeof(*content));
+
+		    content = (const struct addStreamReq*) bp;
+		    ND_PRINT(": REQ SEQ: %u, ", GET_BE_U_4(content->res_seq_num));
+		    ND_PRINT("No. of new streams: %u] ", GET_BE_U_2(content->num_new_stream));
+
+		    bp += sizeof(*content);
+		    chunkLengthRemaining -= sizeof(*content);
+
+		    break;
+		  }
+		default:
+		  {
+		    bp += chunkLengthRemaining;
+		    chunkLengthRemaining = 0;
+		    break;
+		  }
+		}
+		/* skipping the parameter padding if there are more parameters
+		 * in the remaining length */
+		if (chunkLengthRemaining > sizeof(uint32_t)) {
+		    bp += padding_len;
+		    chunkLengthRemaining -= padding_len;
+		}
+	    }
+	    bp += chunkLengthRemaining;
+	    chunkLengthRemaining = 0;
+
+	    break;
+	  }
+	case SCTP_ASCONF:
+	  {
+	    const struct sctpASCONF *content;
+	    const struct sctpAsconfParam *param;
+	    size_t length;
+	    uint16_t param_len;
+
+	    /* Should be at least longer than the length of IPv4 typed parameter*/
+	    length = sizeof(nd_uint32_t) + sizeof(struct sctpV4IpAddress);
+	    ND_ICHECKMSG_ZU("chunk length", chunkLengthRemaining, <, length);
+	    content = (const struct sctpASCONF*) bp;
+	    ND_PRINT("[SEQ: %u, ", GET_BE_U_4(content->seq_num));
+
+	    if (GET_BE_U_2(content->addr.ipv4.p.paramType) == 5) {		/* IPv4 */
+		ND_ICHECKMSG_ZU("chunk length", chunkLengthRemaining, <, length);
+		ND_PRINT("ADDR: %s] ", GET_IPADDR_STRING(content->addr.ipv4.ipAddress));
+	    } else if (GET_BE_U_2(content->addr.ipv6.p.paramType) == 6) {	/* IPv6 */
+		length = sizeof(nd_uint32_t) + sizeof(struct sctpV6IpAddress);
+		ND_ICHECKMSG_ZU("chunk length", chunkLengthRemaining, <, length);
+		ND_PRINT("ADDR: %s] ", GET_IP6ADDR_STRING(content->addr.ipv6.ipAddress));
+	    } else {
+		length = sizeof(nd_uint32_t) + GET_BE_U_2(content->addr.ipv4.p.paramLength);
+		ND_ICHECKMSG_ZU("chunk length", chunkLengthRemaining, <, length);
+		ND_PRINT("ADDR: bogus address type]");
+	    }
+	    bp += length;
+	    chunkLengthRemaining -= length;
+	    sctpPacketLengthRemaining -= length;
+
+	    while (0 != chunkLengthRemaining) {
+		ND_ICHECKMSG_ZU("chunk length", chunkLengthRemaining, <, sizeof(uint32_t)); /* ensure param_len can be extracted */
+		param = (const struct sctpAsconfParam*) bp;
+		param_len = GET_BE_U_2(param->length);
+		ND_ICHECKMSG_ZU("parameter length", param_len, <, sizeof(uint16_t));
+
+		ND_ICHECKMSG_U("chunk length", chunkLengthRemaining, <, param_len);
+		bp += param_len;
+		chunkLengthRemaining -= param_len;
+		sctpPacketLengthRemaining -= param_len;
+
+		ND_PRINT("[%s", tok2str(asconfigParams, NULL, GET_BE_U_2(param->type)));
+
+		if (ndo->ndo_vflag >= 2) {
+		    ND_PRINT(": C-ID: %u, ", GET_BE_U_4(param->CID));
+		    if (GET_BE_U_2(param->addr.ipv4.p.paramType) == 5) {	/* IPv4 */
+			length = sizeof(nd_uint32_t) + sizeof(struct sctpV4IpAddress);
+			ND_ICHECKMSG_ZU("param length", param_len, <, length);
+			ND_PRINT("ADDR: %s] ", GET_IPADDR_STRING(param->addr.ipv4.ipAddress));
+		    } else if (GET_BE_U_2(param->addr.ipv4.p.paramType) == 6) {	/* IPv6 */
+			length = sizeof(nd_uint32_t) + sizeof(struct sctpV6IpAddress);
+			ND_ICHECKMSG_ZU("param length", param_len, <, length);
+			ND_PRINT("ADDR: %s] ", GET_IP6ADDR_STRING(param->addr.ipv6.ipAddress));
+		    } else {
+			ND_PRINT("ADDR: bogus address type]");
+		    }
+		} else {
+		    ND_PRINT("]");
+		}
+	    }
+	    break;
+	  }
+	case SCTP_ASCONF_ACK:
+	  {
+	    const struct sctpASCONF_ACK *content;
+	    const struct sctpAsconfParamRes *param;
+	    uint16_t param_len;
+
+	    ND_ICHECKMSG_ZU("chunk length", chunkLengthRemaining, <, sizeof(*content));
+	    content  = (const struct sctpASCONF_ACK*) bp;
+	    ND_PRINT("[SEQ: %u] ", GET_BE_U_4(content->seq_num));
+
+	    bp += sizeof(*content);
+	    chunkLengthRemaining -= sizeof(*content);
+	    sctpPacketLengthRemaining -= sizeof(*content);
+
+	    while (0 != chunkLengthRemaining) {
+		ND_ICHECKMSG_ZU("chunk length", chunkLengthRemaining, <, sizeof(struct sctpAsconfParamRes));
+		param = (const struct sctpAsconfParamRes*) bp;
+		param_len = GET_BE_U_2(param->length);
+		ND_ICHECKMSG_ZU("parameter length", param_len, <, sizeof(struct sctpAsconfParamRes));
+		ND_ICHECKMSG_U("chunk length", chunkLengthRemaining, <, param_len);
+
+		ND_PRINT("[%s", tok2str(asconfigParams, NULL, GET_BE_U_2(param->type)));
+		sctpPacketLengthRemaining -= param_len;
+
+		/* print payload only when vflag >= 2 */
+		if (ndo->ndo_vflag < 2) {
+		    ND_PRINT("] ");
+		    bp += param_len;
+		    chunkLengthRemaining -= param_len;
+		    continue;
+		}
+
+		switch (GET_BE_U_2(param->type)) {
+		case ERR_CAUSE_INDIC:
+		  {
+		    uint16_t cause_len;
+		    const struct sctpOpErrorCause *err_cause;
+
+		    ND_PRINT(": C-ID: %u ", GET_BE_U_4(param->CID));
+		    bp += sizeof(struct sctpAsconfParamRes);
+		    param_len -= sizeof(struct sctpAsconfParamRes);
+		    chunkLengthRemaining -= sizeof(struct sctpAsconfParamRes);
+		    if (0 == param_len) {
+			ND_PRINT("] ");
+			break;
+		    }
+
+		    /* check against ERROR length */
+		    ND_ICHECKMSG_ZU("chunk length", param_len, <, sizeof(uint32_t));
+		    bp += sizeof(uint16_t);
+		    ND_ICHECKMSG_U("param length", param_len, <, GET_BE_U_2(bp));
+		    bp += sizeof(uint16_t);
+		    param_len -= sizeof(uint32_t);
+		    chunkLengthRemaining -= sizeof(uint32_t);
+
+		    while (0 != param_len) {
+			ND_ICHECKMSG_ZU("param length", param_len, <, sizeof(*err_cause));
+			err_cause = (const struct sctpOpErrorCause*) bp;
+			cause_len = GET_BE_U_2(err_cause->causeLen);
+			ND_ICHECKMSG_U("cause length", cause_len, >, param_len);
+			ND_ICHECKMSG_ZU("cause length", cause_len, <, sizeof(*err_cause));
+			ND_PRINT("%s, ", tok2str(causeCode, NULL, GET_BE_U_2(err_cause->cause)));
+
+			bp += cause_len;
+			param_len -= cause_len;
+			chunkLengthRemaining -= cause_len;
+		    }
+		    ND_PRINT("] ");
+		    break;
+		  }
+		case SUCCESS_INDIC:
+		  {
+		    ND_PRINT(": C-ID: %u ", GET_BE_U_4(param->CID));
+		    bp += sizeof(struct sctpAsconfParamRes);
+		    param_len -= sizeof(struct sctpAsconfParamRes);
+		    chunkLengthRemaining -= sizeof(struct sctpAsconfParamRes);
+		    break;
+		  }
+		default:
+		  {
+		    ND_PRINT("Unknown parameter] ");
+		    bp += param_len;
+		    chunkLengthRemaining -= param_len;
+		    param_len -= param_len;
+		    break;
+		  }
+		}
 	    }
 	    break;
 	  }
