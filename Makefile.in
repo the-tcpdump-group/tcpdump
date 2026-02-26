@@ -418,7 +418,7 @@ lint:
 	    grep -v 'possible pointer alignment problem'
 
 clean:
-	rm -f $(CLEANFILES) $(PROG)-`cat ${srcdir}/VERSION`.tar.gz \
+	@rm -f $(CLEANFILES) $(PROG)-`cat ${srcdir}/VERSION`.tar.gz \
 	config.h.in~ configure~ configure.ac~
 
 distclean: clean
