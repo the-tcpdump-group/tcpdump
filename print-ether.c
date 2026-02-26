@@ -102,6 +102,7 @@ const struct tok ethertype_values[] = {
     { ETHERTYPE_AOE,            "AoE" },
     { ETHERTYPE_PTP,            "PTP" },
     { ETHERTYPE_ARISTA,         "Arista Vendor Specific Protocol" },
+    { ETHERTYPE_GSW1XX,         "GSW1XX" },
     { 0, NULL}
 };
 

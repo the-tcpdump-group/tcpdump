@@ -557,6 +557,7 @@ extern void chdlc_if_print IF_PRINTER_ARGS;
 extern void cip_if_print IF_PRINTER_ARGS;
 extern void dsa_if_print IF_PRINTER_ARGS;
 extern void edsa_if_print IF_PRINTER_ARGS;
+extern void gsw1xx_if_print IF_PRINTER_ARGS;
 extern void enc_if_print IF_PRINTER_ARGS;
 extern void ether_if_print IF_PRINTER_ARGS;
 extern void fddi_if_print IF_PRINTER_ARGS;
