@@ -128,6 +128,7 @@ lmp		lmp.pcap		lmp.out -T lmp
 mpls-ldp-hello	mpls-ldp-hello.pcap	mpls-ldp-hello.out -v
 ldp-common-session ldp-common-session.pcap ldp-common-session.out -v
 ldp_infloop	ldp-infinite-loop.pcap	ldp_infloop.out
+ldp-pw-status ldp-pw-status.pcap ldp-pw-status.out -v
 lspping-fec-ldp    lspping-fec-ldp.pcap lspping-fec-ldp.out
 # Tests with -v and -vv are now in TESTrun skipped if skip_time_t_not (64)
 lspping-fec-rsvp    lspping-fec-rsvp.pcap lspping-fec-rsvp.out
