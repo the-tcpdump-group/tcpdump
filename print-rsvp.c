@@ -155,6 +155,8 @@ static const struct tok rsvp_obj_capability_flag_values[] = {
 #define RSVP_OBJ_CAPABILITY         134 /* rfc5063 */
 #define	RSVP_OBJ_NOTIFY_REQ         195 /* rfc3473 */
 #define	RSVP_OBJ_ADMIN_STATUS       196 /* rfc3473 */
+#define	RSVP_OBJ_SERO               200 /* rfc4875  */
+#define	RSVP_OBJ_SRRO               201 /* rfc4875 */
 #define	RSVP_OBJ_PROPERTIES         204 /* juniper proprietary */
 #define	RSVP_OBJ_FASTREROUTE        205 /* rfc4090 */
 #define	RSVP_OBJ_SESSION_ATTRIBUTE  207 /* rfc3209 */
@@ -205,6 +207,8 @@ static const struct tok rsvp_obj_values[] = {
     { RSVP_OBJ_PROTECTION,         "Protection" },
     { RSVP_OBJ_ADMIN_STATUS,       "Administrative Status" },
     { RSVP_OBJ_S2L,                "Sub-LSP to LSP" },
+    { RSVP_OBJ_SERO,               "Secondary ERO" },
+    { RSVP_OBJ_SRRO,               "Secondary RRO" },
     { 0, NULL}
 };
 
@@ -301,6 +305,8 @@ static const struct tok rsvp_ctype_values[] = {
     { 256*RSVP_OBJ_GENERALIZED_UNI+RSVP_CTYPE_1,             "1" },
     { 256*RSVP_OBJ_S2L+RSVP_CTYPE_IPV4,                      "IPv4 sub-LSP" },
     { 256*RSVP_OBJ_S2L+RSVP_CTYPE_IPV6,                      "IPv6 sub-LSP" },
+    { 256*RSVP_OBJ_SERO+RSVP_CTYPE_2,                        "P2MP" },
+    { 256*RSVP_OBJ_SRRO+RSVP_CTYPE_2,                        "P2MP" },
     { 0, NULL}
 };
 
@@ -777,7 +783,7 @@ rsvp_obj_print(netdissect_options *ndo,
             case RSVP_CTYPE_14: /* IPv6 p2mp LSP Tunnel */
                 if (obj_tlen < 26)
                     goto obj_tooshort;
-                ND_PRINT("%s  IPv6 P2MP LSP ID: 0x%08x, Tunnel ID: 0x%04x, Extended Tunnel ID: %s",
+                ND_PRINT("%s  IPv6 P2MP ID: 0x%08x, Tunnel ID: 0x%04x, Extended Tunnel ID: %s",
                        indent,
                        GET_BE_U_4(obj_tptr),
                        GET_BE_U_2(obj_tptr + 6),
@@ -788,9 +794,9 @@ rsvp_obj_print(netdissect_options *ndo,
             case RSVP_CTYPE_13: /* IPv4 p2mp LSP Tunnel */
                 if (obj_tlen < 12)
                     goto obj_tooshort;
-                ND_PRINT("%s  IPv4 P2MP LSP ID: %s, Tunnel ID: 0x%04x, Extended Tunnel ID: %s",
+                ND_PRINT("%s  IPv4 P2MP ID: 0x%08x, Tunnel ID: 0x%04x, Extended Tunnel ID: %s",
                        indent,
-                       GET_IPADDR_STRING(obj_tptr),
+                       GET_BE_U_4(obj_tptr),
                        GET_BE_U_2(obj_tptr + 6),
                        GET_IPADDR_STRING(obj_tptr + 8));
                 obj_tlen-=12;
@@ -1065,8 +1071,12 @@ rsvp_obj_print(netdissect_options *ndo,
 
         case RSVP_OBJ_RRO:
         case RSVP_OBJ_ERO:
-            switch(rsvp_obj_ctype) {
-            case RSVP_CTYPE_IPV4:
+        case RSVP_OBJ_SRRO:
+        case RSVP_OBJ_SERO:
+            if (((rsvp_obj_class_num == RSVP_OBJ_RRO || rsvp_obj_class_num == RSVP_OBJ_ERO) &&
+                 rsvp_obj_ctype == RSVP_CTYPE_IPV4) ||
+                ((rsvp_obj_class_num == RSVP_OBJ_SRRO || rsvp_obj_class_num == RSVP_OBJ_SERO) &&
+                 rsvp_obj_ctype == RSVP_CTYPE_2)) {
                 while(obj_tlen >= 4 ) {
 		    u_char length;
 
@@ -1130,8 +1140,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     obj_tlen-=length;
                     obj_tptr+=length;
                 }
-                break;
-            default:
+            } else {
                 hexdump=TRUE;
             }
             break;
