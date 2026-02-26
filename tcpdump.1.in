@@ -20,9 +20,9 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "10 September 2026"
+.TH TCPDUMP 1  "20 November 2026"
 .SH NAME
-tcpdump \- dump traffic on a network
+tcpdump \- dump traffic on a network interface or other capture device
 .SH SYNOPSIS
 .na
 .B tcpdump
