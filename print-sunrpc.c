@@ -48,7 +48,6 @@
 #endif /* defined(HAVE_GETRPCBYNUMBER) && defined(HAVE_RPC_RPC_H) */
 
 #include <stdio.h>
-#include <string.h>
 
 #define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"

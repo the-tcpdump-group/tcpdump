@@ -50,7 +50,6 @@
  */
 
 
-#include <errno.h>
 #include "getopt_long.h"
 #include <stdlib.h>
 #include <stdio.h>
