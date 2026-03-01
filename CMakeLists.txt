@@ -1191,6 +1191,13 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/.devel OR EXISTS ${CMAKE_BINARY_DIR}/.devel)
         # the warning.
         #
         check_and_add_compiler_option(-wd4738)
+	#
+	# Suppress warning C4200 from MSVC
+	# "nonstandard extension used: zero-sized array in struct/union"
+	# with code like: struct my_struct { ...; nd_byte ip_addr[]; }
+	# allowed by C99.
+	#
+	check_and_add_compiler_option(-wd4200)
     else()
         #
         # Other compilers, including MSVC with a Clang front end and
