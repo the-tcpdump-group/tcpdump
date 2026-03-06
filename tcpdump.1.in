@@ -20,7 +20,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "8 February 2026"
+.TH TCPDUMP 1  "6 March 2026"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -167,7 +167,7 @@ tcpdump \- dump traffic on a network
 ]
 .br
 .ti +8
-[
+[ -- ] [
 .I expression
 ]
 .br
@@ -1086,14 +1086,47 @@ only packets for that \fIexpression\fP is `true' will be dumped.
 .LP
 For the \fIexpression\fP syntax, see
 .BR \%pcap-filter (@MAN_MISC_INFO@).
+The best practice is to follow the pattern shown in the
+.B SYNOPSIS
+section above: first any option arguments in any order, then a
+.RB ` \-\- '
+delimiter and then the
+.I expression
+as a single, quoted string \(em this works with all expressions, all
+implementations of
+.BR getopt_long (3)
+and regardless of whether the
+.B \%POSIXLY_CORRECT
+environment variable is set.
 .LP
-The \fIexpression\fP argument can be passed to \fItcpdump\fP as either a single
-Shell argument, or as multiple Shell arguments, whichever is more convenient.
-Generally, if the expression contains Shell metacharacters, such as
-backslashes used to escape protocol names, it is easier to pass it as
-a single, quoted argument rather than to escape the Shell
-metacharacters.
-Multiple arguments are concatenated with spaces before being parsed.
+For backward compatibility reasons
+.I tcpdump
+also accepts
+.I expression
+as multiple non-option arguments, which it then internally concatenates using
+spaces, but this tends to cause complications.  In particular, unless
+individual non-option arguments are quoted or escaped as necessary, most shells
+will interpret any
+.RB { < ,
+.BR > ,
+.BR << ,
+.BR >> ,
+.BR * ,
+.BR & ,
+.BR | ,
+.BR \e ,
+.BR ( ,
+.BR ) }
+tokens first.  Also non-option arguments that begin with
+.RB ` \- '
+followed by another character will usually be misinterpreted as option
+arguments regardless of any quoting \(em this can be mitigated by setting the
+.B \%POSIXLY_CORRECT
+environment variable, but only if such arguments follow other arguments that
+are obviously not options.  Also the POSIX interpretation does not allow any
+option arguments after the non-option
+.I expression
+argument(s).
 .SH EXAMPLES
 .LP
 To print packets on all network interfaces, on Linux
