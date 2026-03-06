@@ -216,7 +216,7 @@ ppp_error_hexdump ppp_error_hexdump.pcap ppp_error_hexdump.out -vv
 # PPPoE tests
 pppoe           pppoe.pcap             pppoe.out
 pppoes          pppoes.pcap            pppoes.out
-pppoes_id       pppoes.pcap            pppoes_id.out   pppoes 0x3b
+pppoes_id       pppoes.pcap            pppoes_id.out   -- pppoes 0x3b
 
 # PPP invalid
 truncated_aack  truncated-aack.pcap    trunc_aack.out
@@ -527,8 +527,8 @@ aoe_1-v		AoE_Linux.pcap		aoe_1-v.out	-v
 
 # Geneve tests
 geneve-vv	geneve.pcap		geneve-vv.out	-vv
-geneve-vni	geneve.pcap		geneve-vni.out	geneve 0xb
-geneve-tcp	geneve.pcap		geneve-tcp.out	geneve and tcp
+geneve-vni	geneve.pcap		geneve-vni.out	-- geneve 0xb
+geneve-tcp	geneve.pcap		geneve-tcp.out	-- geneve and tcp
 geneve-gcp	geneve-gcp.pcap		geneve-gcp.out	-vv
 
 # DHCP tests
