@@ -219,6 +219,15 @@ static u_int packets_to_skip;
 static int infodelay;
 static int infoprint;
 
+/*
+ * Last component of the path to the executable.
+ */
+static char *executable_name;
+
+/*
+ * Name of the program; we strip any ".exe" suffix from the executable
+ * name to get this.
+ */
 char *program_name;
 
 /* Forwards */
@@ -1441,6 +1450,7 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 int
 main(int argc, char **argv)
 {
+	char *last_dot;
 	int cnt, op, i;
 	bpf_u_int32 localnet = 0, netmask = 0;
 	char *cp, *infile, *cmdbuf, *device, *RFileName, *VFileName, *WFileName;
@@ -1647,9 +1657,15 @@ main(int argc, char **argv)
 	WFileName = NULL;
 	dlt = -1;
 	if ((cp = strrchr(argv[0], PATH_SEPARATOR)) != NULL)
-		ndo->program_name = program_name = cp + 1;
+		executable_name = cp + 1;
 	else
-		ndo->program_name = program_name = argv[0];
+		executable_name = argv[0];
+	/* Strip off trailing ".exe". */
+	program_name = strdup(executable_name);
+	last_dot = strrchr(program_name, '.');
+	if (last_dot != NULL && ascii_strcasecmp(last_dot, ".exe") == 0)
+		*last_dot = '\0';
+	ndo->program_name = program_name;
 
 #if defined(HAVE_PCAP_WSOCKINIT)
 	if (pcap_wsockinit() != 0)
@@ -3489,7 +3505,8 @@ print_usage(FILE *f)
 {
 	print_version(f);
 	(void)fprintf(f,
-"Usage: %s [-AbdDefghHI" J_FLAG "KlLnNOpqStuUvxX#] [ -B size ] [ -c count ] [--count]\n", program_name);
+"Usage: %s [-AbdDefghHI" J_FLAG "KlLnNOpqStuUvxX#] [ -B size ] [ -c count ] [--count]\n",
+	    executable_name);
 	(void)fprintf(f,
 "\t\t[ -C file_size ] " E_FLAG_USAGE "[ -F file ] [ -G seconds ]\n");
 	(void)fprintf(f,
