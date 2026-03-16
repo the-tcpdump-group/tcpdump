@@ -160,6 +160,7 @@
   #define read _read
   #define close _close
   #define O_RDONLY _O_RDONLY
+  #define tzset _tzset
 
   /*
    * We define our_fstat64 as _fstati64, and define our_statb as
