@@ -39,7 +39,9 @@
 
 
 /*
- * For information regarding RESP, see: https://redis.io/topics/protocol
+ * For information regarding RESP, see
+ *
+ *    https://redis.io/docs/latest/develop/reference/protocol-spec/
  */
 
 #define RESP_SIMPLE_STRING    '+'
@@ -173,7 +175,12 @@ static int resp_get_length(netdissect_options *, const u_char *, int, const u_ch
     {                                                         \
         const u_char *_endp;                                  \
         _len = resp_get_length(_ndo, _ptr, _tot_len, &_endp); \
-        _tot_len -= (_endp - _ptr);                           \
+	/*                                                    \
+	 * Neither pcap nor pcapng support packet longer than \
+	 * 2^31-1 bytes, so the pointer difference will fit   \
+	 * within a u_int on all platforms we support.        \
+	 */                                                   \
+        _tot_len -= (u_int)(_endp - _ptr);                    \
         _ptr = _endp;                                         \
     }
 
@@ -319,7 +326,8 @@ trunc:
 
 static int
 resp_print_bulk_string(netdissect_options *ndo, const u_char *bp, int length) {
-    int length_cur = length, string_len;
+    u_int length_cur = length;
+    int string_len;
 
     /* bp points to the op; skip it */
     SKIP_OPCODE(bp, length_cur);
@@ -332,7 +340,7 @@ resp_print_bulk_string(netdissect_options *ndo, const u_char *bp, int length) {
         if (string_len == 0)
             resp_print_empty(ndo);
         else {
-            LCHECK2(length_cur, string_len);
+            LCHECK2(length_cur, (u_int)string_len);
             ND_TCHECK_LEN(bp, string_len);
             RESP_PRINT_SEGMENT(ndo, bp, string_len);
             bp += string_len;
