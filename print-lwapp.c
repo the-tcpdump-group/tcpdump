@@ -650,8 +650,8 @@ lwapp_control_print(netdissect_options *ndo,
 	 * this case should be exactly one LWAPP control header followed by 0 or
 	 * more message elements.
 	 */
-	const size_t ctrlhdrlen = sizeof(struct lwapp_control_header);
-	ND_ICHECKMSG_ZU("transport payload length", len, <, ctrlhdrlen);
+	const uint16_t ctrlhdrlen = (uint16_t)sizeof(struct lwapp_control_header);
+	ND_ICHECKMSG_U("transport payload length", len, <, ctrlhdrlen);
 	const struct lwapp_control_header *ctrlhdr =
 		(const struct lwapp_control_header *)cp;
 
@@ -664,7 +664,7 @@ lwapp_control_print(netdissect_options *ndo,
 
 	uint16_t msg_elem_len = GET_BE_U_2(ctrlhdr->len);
 	ND_PRINT(", Msg len: %u", msg_elem_len);
-	ND_ICHECK_ZU(msg_elem_len, !=, len - ctrlhdrlen);
+	ND_ICHECK_U(msg_elem_len, !=, len - ctrlhdrlen);
 
 	ND_PRINT(", Session: 0x%08x", GET_BE_U_4(ctrlhdr->session_id));
 
@@ -674,10 +674,10 @@ lwapp_control_print(netdissect_options *ndo,
 	 */
 	cp += ctrlhdrlen;
 	len -= ctrlhdrlen;
-	const size_t mehdrlen = sizeof(struct lwapp_msgelem_header);
+	const uint16_t mehdrlen = (uint16_t)sizeof(struct lwapp_msgelem_header);
 	u_int elem_num = 0;
 	while(len) {
-		ND_ICHECKMSG_ZU("remaining length", len, <, mehdrlen);
+		ND_ICHECKMSG_U("remaining length", len, <, mehdrlen);
 		const struct lwapp_msgelem_header *mehdr =
 			(const struct lwapp_msgelem_header *)cp;
 
@@ -691,7 +691,7 @@ lwapp_control_print(netdissect_options *ndo,
 		ND_PRINT(", Length: %u", elem_len);
 		if (elem_len < msg_elem_minlen[elem_type])
 			ND_PRINT(" [too short!]");
-		ND_ICHECK_ZU(elem_len, >, len - mehdrlen);
+		ND_ICHECK_U(elem_len, >, len - mehdrlen);
 
 		cp += mehdrlen;
 		len -= mehdrlen;
@@ -714,7 +714,7 @@ lwapp_print(netdissect_options *ndo,
 	nd_print_protocol_caps(ndo);
 
 	const u_char *cp = pptr;
-	u_int hdrlen = sizeof(struct lwapp_transport_header);
+	u_int hdrlen = (u_int)sizeof(struct lwapp_transport_header);
 	/*
 	 * The [documented] transport header begins after the [undocumented] AP
 	 * identity if the latter is present.  This is not in RFC 5412, but is
