@@ -33,6 +33,7 @@ my %osnames = (
 	linux => 'Linux',
 	msys => 'Windows',
 	netbsd => 'NetBSD',
+	nto => 'QNX',
 	openbsd => 'OpenBSD',
 	solaris => 'illumos/Solaris',
 );

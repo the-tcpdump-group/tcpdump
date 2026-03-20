@@ -52,6 +52,7 @@ use subs qw(
 	skip_config_def1
 	skip_config_undef
 	skip_os
+	skip_os_not
 	test_and_report
 );
 
@@ -173,6 +174,14 @@ sub skip_fptype_not {
 sub skip_time_t_not {
 	my $val = shift;
 	return $time_t_size != $val ? "time_t is not ${val}-bit" : '';
+}
+
+sub skip_round_away_from_zero {
+	return skip_os 'nto';
+}
+
+sub skip_round_to_even {
+	return skip_os_not 'nto';
 }
 
 my @decode_tests = (
@@ -629,6 +638,20 @@ my @decode_tests = (
 		name => 'lwapp-v',
 		input => 'lwapp-data.pcap',
 		output => 'lwapp-data-v.out',
+		args => '-v'
+	},
+	{
+		skip => skip_round_away_from_zero,
+		name => 'olsr-oobr-1-round-to-even',
+		input => 'olsr-oobr-1.pcap',
+		output => 'olsr-oobr-1-round-to-even.out',
+		args => '-v'
+	},
+	{
+		skip => skip_round_to_even,
+		name => 'olsr-oobr-1-round-away-from-zero',
+		input => 'olsr-oobr-1.pcap',
+		output => 'olsr-oobr-1-round-away-from-zero.out',
 		args => '-v'
 	},
 );
