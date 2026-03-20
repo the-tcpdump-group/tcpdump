@@ -219,7 +219,8 @@ cc_werr_cflags() {
     esac
 }
 
-# Tell whether "gcc" is a symlink to Clang (this is the case on macOS).
+# Tell whether "gcc" is a symlink to Clang (this is the case on macOS and
+# in native QNX builds).
 gcc_is_clang_in_disguise() {
     case `cc_id`/`basename "${CC:?}"` in
     clang-*/gcc)
@@ -240,7 +241,7 @@ os_id() {
         : "${os_id_version:=`uname -v`}"
         echo "${os_id_version}.${os_id_release}"
         ;;
-    Darwin|GNU|OpenBSD|SunOS)
+    Darwin|GNU|OpenBSD|QNX|SunOS)
         echo "$os_id_release"
         ;;
     FreeBSD|NetBSD|Linux)
