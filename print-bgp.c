@@ -2564,6 +2564,7 @@ bgp_attr_print(netdissect_options *ndo,
                  sblen,
                  GET_U_1(tptr + 2));
 
+        ND_ICHECKMSG_U("length", sblen, <, 3);
         tptr += 3;
         sblen -= 3;
         /* Parse signature segments */
