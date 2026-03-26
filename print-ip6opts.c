@@ -153,6 +153,22 @@ ip6_opt_process(netdissect_options *ndo, const u_char *bp, const u_int len,
 		}
 	    }
 	    break;
+	/*
+	 * IPv6 Nonce Destination Option for ILNPv6 (RFC 6744).
+	 */
+	case IP6OPT_ILNP_NONCE:
+	    if (len - i < IP6OPT_ILNP_NONCE_MINLEN) {
+		ND_PRINT("(nonce: trunc)");
+		goto invalid;
+	    }
+	    if (bp[i + 1] < IP6OPT_ILNP_NONCE_MINLEN - 2) {
+		printf("(nonce: len %u - < 4)", bp[i + 1]);
+		goto invalid;
+	    }
+	    ND_PRINT("(nonce: ");
+	    hex_print(ndo, " ", &bp[i + 2], (u_int)(bp[i + 1] - 2));
+	    ND_PRINT(") ");
+	    break;
         case IP6OPT_HOME_ADDRESS:
 	    ND_ICHECKMSG_U("(homeaddr) remaining length", (u_int)(len - i), <,
 			   IP6OPT_HOMEADDR_MINLEN);
