@@ -486,8 +486,13 @@ ip_print(netdissect_options *ndo,
 			    hlen);
 			nd_trunc_longjmp(ndo);
 		}
-		ip_demux_print(ndo, (const u_char *)ip + hlen, len, 4,
-		    off & IP_MF, GET_U_1(ip->ip_ttl), nh, bp);
+		/*
+		 * Call ip_demux_print() with the payload length computed
+		 * from the minimum of ( packet containing length, IP length ).
+		 */
+		ip_demux_print(ndo, (const u_char *)ip + hlen,
+			       ND_MIN(length - hlen, len), 4, off & IP_MF,
+			       GET_U_1(ip->ip_ttl), nh, bp);
 	} else {
 		/*
 		 * Ultra quiet now means that all this stuff should be
