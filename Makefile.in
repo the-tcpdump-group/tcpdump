@@ -364,6 +364,8 @@ EXTRA_DIST = \
 	missing/strlcat.c \
 	missing/strlcpy.c \
 	missing/strsep.c \
+	missing/wcwidth.c \
+	missing/wcwidth.h \
 	mkdep \
 	packetdat.awk \
 	print-smb.c \
@@ -397,6 +399,8 @@ strlcpy.o: $(srcdir)/missing/strlcpy.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/strlcpy.c
 strsep.o: $(srcdir)/missing/strsep.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/strsep.c
+wcwidth.o: $(srcdir)/missing/wcwidth.c
+	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/wcwidth.c
 
 install: all
 	[ -d $(DESTDIR)$(bindir) ] || \
