@@ -138,6 +138,28 @@ static const struct tok tcp_option_values[] = {
         { 0, NULL }
 };
 
+static const struct tok tcp_failure_causes[] = {
+        { 0, "Reserved" },
+        { 1, "Illegal option length" },
+        { 2, "Desynchronized state" },
+        { 3, "New data is received after CLOSE is called" },
+        { 4, "ABORT process" },
+        { 5, "Unexpected ACK received by non-synchronized state connection" },
+        { 6, "Unexpected SYN in the window" },
+        { 7, "Unexpected security compartment" },
+        { 8, "Malformed message" },
+        { 9, "Not authorized" },
+        { 10, "Resource exceeded" },
+        { 11, "Network failure" },
+        { 12, "Reset received from the peer" },
+        { 13, "Destination unreachable" },
+        { 14, "Connection timeout" },
+        { 15, "Too much outstanding data" },
+        { 16, "Unacceptable performance" },
+        { 17, "Middlebox interference" },
+        { 0, NULL }
+};
+
 static uint16_t
 tcp_cksum(netdissect_options *ndo,
           const struct ip *ip,
@@ -873,17 +895,43 @@ invalid:
  *                 RST.  No standard has yet been established for such
  *                 data.
  *
+ * draft-ietf-tcpm-rst-diagnostic-payload-00 defines a TCP RST Diagnostic
+ * Payload as shown here:
+ *
+ *     0                   1                   2                   3
+       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      |             0x33AA            |          reason-code          |
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      |                              pen                              |
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *
+ * If the RST segment contains 8 bytes data and the first two bytes match
+ * the magic number, display the data as [RST reason-code/pen].
  */
 
 static void
 print_tcp_rst_data(netdissect_options *ndo,
                    const u_char *sp, u_int length)
 {
+        uint32_t pen;
+        uint16_t code;
+
         ND_PRINT(" [RST");
         if (length > MAX_RST_DATA_LEN)		/* can use -X for longer */
                 ND_PRINT("+");			/* indicate we truncate */
-        ND_PRINT(" ");
-        nd_printjn(ndo, sp, ND_MIN(length, MAX_RST_DATA_LEN));
+        if (length == 8 && GET_BE_U_2(sp) == 0x33AA) {
+                ND_PRINT(": ");
+                code = GET_BE_U_2(sp + 2);
+                pen = GET_BE_U_4(sp + 4);
+                if (ndo->ndo_vflag > 1 && pen == 0)
+                        ND_PRINT("%s", tok2str(tcp_failure_causes, "code %u, pen 0", code));
+                else
+                        ND_PRINT("code %u, pen %u", code, pen);
+        } else {
+                ND_PRINT(" ");
+                nd_printjn(ndo, sp, ND_MIN(length, MAX_RST_DATA_LEN));
+        }
         ND_PRINT("]");
         ND_TCHECK_LEN(sp, length);
 }

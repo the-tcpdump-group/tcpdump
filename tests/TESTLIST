@@ -45,9 +45,15 @@ timestamp_invalid_nano timestamp_invalid_nano.pcap timestamp_invalid_nano.out -q
 # TCP with data in the RST segment
 tcp_rst_data-v tcp_rst_data.pcap tcp_rst_data-v.out -v
 tcp_rst_data tcp_rst_data.pcap tcp_rst_data.out
+tcp_rst_diag_payload-vv tcp_rst_diag_payload.pcap tcp_rst_diag_payload-vv.out -vv
+tcp_rst_diag_payload-v tcp_rst_diag_payload.pcap tcp_rst_diag_payload-v.out -v
+tcp_rst_diag_payload tcp_rst_diag_payload.pcap tcp_rst_diag_payload.out
 # TCP with data in the RST segment, truncated example
 tcp_rst_data-trunc-v tcp_rst_data-trunc.pcap tcp_rst_data-trunc-v.out -v
 tcp_rst_data-trunc tcp_rst_data-trunc.pcap tcp_rst_data-trunc.out
+tcp_rst_diag_payload-trunc-vv tcp_rst_diag_payload-trunc.pcap tcp_rst_diag_payload-trunc-vv.out -vv
+tcp_rst_diag_payload-trunc-v tcp_rst_diag_payload-trunc.pcap tcp_rst_diag_payload-trunc-v.out -v
+tcp_rst_diag_payload-trunc tcp_rst_diag_payload-trunc.pcap tcp_rst_diag_payload-trunc.out
 
 # TCP
 tcp_eight_lowest_weight_flags_set tcp_eight_lowest_weight_flags_set.pcap tcp_eight_lowest_weight_flags_set.out
