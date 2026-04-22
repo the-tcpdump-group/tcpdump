@@ -1,0 +1,2 @@
+    1  2026-04-19 16:59:13.939985 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto TCP (6), length 48)
+    192.0.2.1.39829 > 192.168.0.1.8080: Flags [R.], cksum 0x86a8 (incorrect -> 0x8f66), seq 1:9, ack 334797553, win 0, length 8 [RST: Illegal option length]

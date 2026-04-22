@@ -1,0 +1,2 @@
+    1  2026-04-19 17:04:04.220818 IP (tos 0x0, ttl 255, id 0, offset 0, flags [none], proto TCP (6), length 48)
+    192.0.2.1.43018 > 192.168.0.1.8080: Flags [R.], seq 1:9, ack 3952016906, win 0, length 8 [RST:  [|tcp]
