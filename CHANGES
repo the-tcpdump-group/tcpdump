@@ -42,6 +42,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       SLL2: Translate interface indices to names on Linux only.
       RT6: Add a bounds check for the PadN TLV in Segment Routing Header.
       TCP: Add support for the AE (AccECN) flag.
+      TCP: Add support for RST diagnostic payload.
     User interface:
       Add --print-sampling to print every Nth packet instead of all.
       Add --lengths option to print the captured and original packet lengths.
