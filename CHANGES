@@ -80,6 +80,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Reimplement the tests similarly to libpcap.
       CI: Implement cross-compiling with libpcap.
       Autoconf: Add QNX support to AC_LBL_LIBRARY_NET().
+      Autoconf: Update config.{guess,sub}, timestamps 2025-07-10.
     Documentation:
       Add a README.qnx.md file.
 
