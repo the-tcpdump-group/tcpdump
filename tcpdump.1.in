@@ -1097,7 +1097,8 @@ implementations of
 .BR getopt_long (3)
 and regardless of whether the
 .B \%POSIXLY_CORRECT
-environment variable is set.
+environment variable is set. Exception: On Windows, with cmd.exe command line,
+single quoting must be replaced by double quoting.
 .LP
 For backward compatibility reasons
 .I tcpdump

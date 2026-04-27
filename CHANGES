@@ -315,6 +315,7 @@ Friday, April 7, 2023 / The Tcpdump Group
       Update config.{guess,sub}, timestamps 2023-01-01,2023-01-21.
     Documentation:
       man: Document TCP flag names better.
+      man: Document double quoting on Windows with cmd.exe.
 
 Thursday, January 12, 2023 / The Tcpdump Group
   Summary for 4.99.3 tcpdump release
