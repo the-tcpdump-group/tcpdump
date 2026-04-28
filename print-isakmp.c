@@ -2269,7 +2269,11 @@ ikev2_ID_print(netdissect_options *ndo, u_char tpay,
 			goto trunc;
 	}
 
-	idtype_len =item_len - sizeof(struct ikev2_id);
+	if (item_len < sizeof(struct ikev2_id)) {
+		ND_PRINT(" [payload too short]");
+		return (const u_char *)ext + item_len;
+	}
+	idtype_len = item_len - sizeof(struct ikev2_id);
 	dumpascii = 0;
 	dumphex   = 0;
 	typedata  = (const unsigned char *)(ext)+sizeof(struct ikev2_id);

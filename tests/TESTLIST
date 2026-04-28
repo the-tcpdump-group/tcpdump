@@ -168,6 +168,8 @@ ospf2-seg-fault-1-v  ospf2-seg-fault-1.pcapng  ospf2-seg-fault-1-v.out  -v
 ikev2four	ikev2four.pcap		ikev2four.out	-v
 ikev2fourv	ikev2four.pcap		ikev2fourv.out	-v -v -v
 ikev2fourv4	ikev2four.pcap		ikev2fourv4.out	-v -v -v -v
+ikev2-id-normal    ikev2-id-normal.pcap    ikev2-id-normal.out    -vvv
+ikev2-id-short     ikev2-id-short.pcap     ikev2-id-short.out     -vvv
 # ikev2pI2 test in crypto.tests
 ikev2pI2-segfault	ikev2pI2-segfault.pcapng	ikev2pI2-segfault.out
 ikev2pI2-segfault-v	ikev2pI2-segfault.pcapng	ikev2pI2-segfault-v.out	-v
