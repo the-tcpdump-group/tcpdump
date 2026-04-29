@@ -9,6 +9,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       TCP: Add support for the AE (AccECN) flag.
       IP: Update the offload "presumed TSO" case for "BIG TCP".
       IP: Call ip_demux_print() with the correct payload length.
+      ISAKMP: Validate item_len before subtracting sizeof(ikev2_id).
     User interface:
        Print an error message about --count without -r or -V.
     Building and testing:
