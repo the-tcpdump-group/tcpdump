@@ -110,6 +110,8 @@ tcpdump \- dump traffic on a network
 [
 .B \-\-version
 ]
+.br
+.ti +8
 [
 .B \-V
 .I file
@@ -141,6 +143,8 @@ tcpdump \- dump traffic on a network
 [
 .BI \-\-time\-stamp\-precision= tstamp_precision
 ]
+.br
+.ti +8
 [
 .BI \-\-micro
 ]
