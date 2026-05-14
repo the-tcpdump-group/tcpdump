@@ -1454,7 +1454,7 @@ of10_features_reply_print(netdissect_options *ndo,
 	OF_FWD(4);
 	/* ports */
 	while (len) {
-		ND_ICHECKMSG_U("\n\t  port def. length", len, <, OF_PHY_PORT_FIXLEN);
+		ND_ICHECKMSG_U("port def. length", len, <, OF_PHY_PORT_FIXLEN);
 		of10_phy_port_print(ndo, cp);
 		OF_FWD(OF_PHY_PORT_FIXLEN);
 	}
