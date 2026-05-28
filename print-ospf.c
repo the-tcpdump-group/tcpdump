@@ -1120,6 +1120,10 @@ ospf_print_lsa(netdissect_options *ndo,
 
                     case LS_OPAQUE_RI_TLV_SID_LABEL_RANGE:
                     case LS_OPAQUE_RI_TLV_SR_LOCAL_BLOCK:
+                        if (tlv_length < 4) {
+                            ND_PRINT("\n\t    Bogus TLV length %u < 4", tlv_length);
+                            return(ls_end);
+                        }
                         ND_TCHECK_4(tptr);
                         ND_PRINT("\n\t      Range size: %u", GET_BE_U_3(tptr));
                         if (ospf_print_ri_lsa_sid_label_range_tlv(ndo, tptr + 4, tlv_length - 4) == -1) {
