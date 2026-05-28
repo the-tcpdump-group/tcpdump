@@ -1367,6 +1367,7 @@ print_labeled_vpn_l2(netdissect_options *ndo, const u_char *pptr)
             tlv_len = GET_BE_U_2(pptr);  /* length, in *bits* */
             ttlv_len = (tlv_len + 7)/8;      /* length, in *bytes* */
             pptr += 2;
+            tlen -= 3;
 
             switch(tlv_type) {
             case 1:
