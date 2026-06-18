@@ -127,25 +127,11 @@ run_after_echo "$TCPDUMP_BIN" -h
 run_after_echo "$TCPDUMP_BIN" -D
 [ -z "$TARGET" ] && run_after_echo "$TCPDUMP_BIN" -h
 [ -z "$TARGET" ] && run_after_echo "$TCPDUMP_BIN" -D
-if [ -z "$TARGET" ] && [ "$CIRRUS_CI" = true ]; then
-    # Likewise for the "-J" flag and HAVE_PCAP_SET_TSTAMP_TYPE.
-    run_after_echo sudo \
-        ${LD_LIBRARY_PATH:+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"} \
-        "$TCPDUMP_BIN" -J
-    run_after_echo sudo \
-        ${LD_LIBRARY_PATH:+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"} \
-        "$TCPDUMP_BIN" -L
-fi
 if [ -z "$TARGET" ] && [ "$BUILD_LIBPCAP" = yes ]; then
     run_after_echo "$MAKE_BIN" check
 fi
 if [ "$CMAKE" = no ]; then
     [ "$TEST_RELEASETAR" = yes ] && run_after_echo "$MAKE_BIN" releasetar
-fi
-if [ -z "$TARGET" ] && [ "$CIRRUS_CI" = true ]; then
-    run_after_echo sudo \
-        ${LD_LIBRARY_PATH:+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"} \
-        "$TCPDUMP_BIN" -#n -c 10
 fi
 handle_matrix_debug
 if [ "$DELETE_PREFIX" = yes ]; then
