@@ -209,7 +209,18 @@ static int WflagChars;
 #if defined(HAVE_FORK) || defined(HAVE_VFORK)
 static char *zflag = NULL;		/* compress each savefile using a specified command (like gzip or bzip2) */
 #endif
+
+/*
+ * On QNX 8.0 SA_RESTART is not available, so it needs the workaround discussed
+ * in the comment after setitimer() below.  Use a prime number to reduce the
+ * resonance.
+ */
+#ifdef __QNX__
+static int timeout = 953;
+#else
 static int timeout = 1000;		/* default timeout = 1000 ms = 1 s */
+#endif // __QNX__
+
 #ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
 static int immediate_mode;
 #endif
@@ -2731,6 +2742,25 @@ DIAG_ON_ASSIGN_ENUM
 		timer.it_value.tv_sec = 1;
 		timer.it_value.tv_usec = 1;
 		setitimer(ITIMER_REAL, &timer, NULL);
+		/*
+		 * The timer has just been armed, so this process will receive
+		 * a SIGALRM every second.  Soon the pcap_loop() below will
+		 * start iterating; iterations that have not filled the packet
+		 * buffer completely are supposed to invoke the callback after
+		 * the packet buffer timeout.  However, if the timeout is not
+		 * sufficiently less than the timer interval, the signal
+		 * typically will be delivered before the timeout has expired.
+		 * On at least one OS this will be steadily interrupting a
+		 * system call and interfering with the callback invocation.
+		 *
+		 * Until this problem has a proper solution, the simplest
+		 * workaround is to make the race condition less pronounced by
+		 * lowering the packet buffer timeout.  Ideally this block
+		 * ought both to arm the timer and to set a custom timeout, but
+		 * by now pcap_activate() has already been invoked, so the
+		 * workaround is in the 'timeout' declaration near the top of
+		 * this file.
+		 */
 #endif /* _WIN32 */
 	}
 
