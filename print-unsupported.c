@@ -28,5 +28,12 @@ unsupported_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 {
 	ndo->ndo_protocol = "unsupported";
 	nd_print_protocol_caps(ndo);
-	hex_and_ascii_print(ndo, "\n\t", p, h->caplen);
+	/*
+	 * Print the packet contents as hex and ASCII only if no raw dump was
+	 * requested via -x/-X/-A.  In that case pretty_print_packet() prints
+	 * the raw data itself (honouring the requested format), and printing
+	 * it here as well would duplicate the hex dump.
+	 */
+	if (!ndo->ndo_xflag && !ndo->ndo_Xflag && !ndo->ndo_Aflag)
+		hex_and_ascii_print(ndo, "\n\t", p, h->caplen);
 }
