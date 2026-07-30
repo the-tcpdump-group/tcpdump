@@ -20,28 +20,6 @@ print-A		print-flags.pcap	print-A.out	-A
 print-AA	print-flags.pcap	print-AA.out	-AA
 print-sampling print-flags.pcap print-sampling.out --print-sampling=3
 
-# TCP 3-Way Handshake test, nano precision
-# Use "no -t", -t, -tt, -ttt, -tttt, -ttttt options for more code coverage
-# in timestamp printing functions
-# micro outputs with -q
-tcp-handshake-micro tcp-handshake-nano.pcap tcp-handshake-micro.out -q SPECIAL_t
-tcp-handshake-micro-t tcp-handshake-nano.pcap tcp-handshake-micro-t.out -t -q SPECIAL_t
-tcp-handshake-micro-tt tcp-handshake-nano.pcap tcp-handshake-micro-tt.out -tt -q SPECIAL_t
-tcp-handshake-micro-ttt tcp-handshake-nano.pcap tcp-handshake-micro-ttt.out -ttt -q SPECIAL_t
-tcp-handshake-micro-tttt tcp-handshake-nano.pcap tcp-handshake-micro-tttt.out -tttt -q SPECIAL_t
-tcp-handshake-micro-ttttt tcp-handshake-nano.pcap tcp-handshake-micro-ttttt.out -ttttt -q SPECIAL_t
-# nano outputs with -q
-tcp-handshake-nano tcp-handshake-nano.pcap tcp-handshake-nano.out -q --nano SPECIAL_t
-tcp-handshake-nano-t tcp-handshake-nano.pcap tcp-handshake-nano-t.out -t -q --nano SPECIAL_t
-tcp-handshake-nano-tt tcp-handshake-nano.pcap tcp-handshake-nano-tt.out -tt -q --nano SPECIAL_t
-tcp-handshake-nano-ttt tcp-handshake-nano.pcap tcp-handshake-nano-ttt.out -ttt -q --nano SPECIAL_t
-tcp-handshake-nano-tttt tcp-handshake-nano.pcap tcp-handshake-nano-tttt.out -tttt -q --nano SPECIAL_t
-tcp-handshake-nano-ttttt tcp-handshake-nano.pcap tcp-handshake-nano-ttttt.out -ttttt -q --nano SPECIAL_t
-
-# Invalid timestamps, micro and nano precision
-timestamp_invalid_micro timestamp_invalid_micro.pcap timestamp_invalid_micro.out -q SPECIAL_t
-timestamp_invalid_nano timestamp_invalid_nano.pcap timestamp_invalid_nano.out -q --nano SPECIAL_t
-
 # TCP with data in the RST segment
 tcp_rst_data-v tcp_rst_data.pcap tcp_rst_data-v.out -v
 tcp_rst_data tcp_rst_data.pcap tcp_rst_data.out
@@ -91,29 +69,12 @@ bgp-role	bgp-role.pcapng		bgp-role.out		-v
 bgp_notification_rr_msg_error bgp_notification_rr_msg_error.pcap bgp_notification_rr_msg_error.out -v
 bgpsec_invalid_signature_block_length bgpsec_invalid_signature_block_length.pcap bgpsec_invalid_signature_block_length.out -v
 
-# Broadcom tag tests
-brcmtag		brcm-tag.pcap		brcm-tag.out
-brcmtag-e	brcm-tag.pcap		brcm-tag-e.out	-e
-brcmtagprepend	brcm-tag-prepend.pcap	brcm-tag-prepend.out -e
-
 # Broadcom LI
 bcm-li bcm-li.pcap bcm-li.out
 bcm-li-v bcm-li.pcap bcm-li-v.out -v
 
-# Marvell DSA tag tests
-dsa		dsa.pcap		dsa.out
-dsa-e		dsa.pcap		dsa-e.out	-e
-dsa-high-vid	dsa-high-vid.pcap	dsa-high-vid.out
-dsa-high-vid-e	dsa-high-vid.pcap	dsa-high-vid-e.out	-e
-
 # EAP tests
 # now in smb.tests
-
-# Marvell DSA tag tests
-edsa		edsa.pcap		edsa.out
-edsa-e		edsa.pcap		edsa-e.out	-e
-edsa-high-vid	edsa-high-vid.pcap	edsa-high-vid.out
-edsa-high-vid-e	edsa-high-vid.pcap	edsa-high-vid-e.out	-e
 
 # ESP tests
 esp0		02-sunrise-sunset-esp.pcap	esp0.out
@@ -942,10 +903,6 @@ lldp-app-priority	lldp-app-priority.pcap	lldp-app-priority.out	-v
 # DNS URI RR support tests
 dns-uri		dns-uri.pcap	dns-uri.out
 
-# AF_VSOCK tests
-vsock-1	vsock-1.pcapng	vsock-1.out
-vsock-1-v	vsock-1.pcapng	vsock-1-v.out -v
-vsock-1-vv	vsock-1.pcapng	vsock-1-vv.out -vv
 #IP over infinband (ipoib)
 ipoib	ipoib.pcap	ipoib.out
 ipoib-e	ipoib.pcap	ipoib-e.out -e
@@ -1041,12 +998,6 @@ accecn_handshake	accecn_handshake.pcap		accecn_handshake.out	-v
 
 # Juniper tests
 juniper_monitor_invalid_cookie_length juniper_monitor_invalid_cookie_length.pcap  juniper_monitor_invalid_cookie_length.out
-
-# PKTAP tests
-LINKTYPE_USER2_PKTAP LINKTYPE_USER2_PKTAP.pcap LINKTYPE_USER2_PKTAP.out
-LINKTYPE_USER2_PKTAP-e LINKTYPE_USER2_PKTAP.pcap LINKTYPE_USER2_PKTAP-e.out -e
-LINKTYPE_PKTAP LINKTYPE_PKTAP.pcap LINKTYPE_PKTAP.out
-LINKTYPE_PKTAP-e LINKTYPE_PKTAP.pcap LINKTYPE_PKTAP-e.out -e
 
 # LINKTYPE_RAW, LINKTYPE_IPV4, LINKTYPE_IPV6
 LINKTYPE_RAW_ipv4 LINKTYPE_RAW_ipv4.pcap LINKTYPE_RAW_ipv4.out

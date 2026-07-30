@@ -274,6 +274,18 @@ sub decode_exit_status {
 	return ($status, $coredump);
 }
 
+my %cached_unsupported_DLT;
+sub skip_no_DLT {
+	my $name = shift;
+	if (! defined $cached_unsupported_DLT{$name}) {
+		my $cmdline = "$TCPDUMP -y $name -d >/dev/null 2>&1";
+		my ($status, $coredump) = decode_exit_status system $cmdline;
+		die "'$cmdline' exited with status $status" if $status != 0 && $status != 1;
+		$cached_unsupported_DLT{$name} = $status;
+	}
+	return $cached_unsupported_DLT{$name} ? "no DLT_${name}" : '';
+}
+
 my @decode_tests = (
 	# -------- formerly crypto.tests --------
 	# Only attempt OpenSSL-specific tests when compiled with the library.
@@ -743,6 +755,239 @@ my @decode_tests = (
 		input => 'olsr-oobr-1.pcap',
 		output => 'olsr-oobr-1-round-away-from-zero.out',
 		args => '-v'
+	},
+
+	# TCP 3-Way Handshake test, nano precision
+	# Use "no -t", -t, -tt, -ttt, -tttt, -ttttt options for more code coverage
+	# in timestamp printing functions
+	# micro outputs with -q
+	{
+		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		name => 'tcp-handshake-micro',
+		input => 'tcp-handshake-nano.pcap',
+		output => 'tcp-handshake-micro.out',
+		args => '-q SPECIAL_t',
+	},
+	{
+		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		name => 'tcp-handshake-micro-t',
+		input => 'tcp-handshake-nano.pcap',
+		output => 'tcp-handshake-micro-t.out',
+		args => '-t -q SPECIAL_t',
+	},
+	{
+		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		name => 'tcp-handshake-micro-tt',
+		input => 'tcp-handshake-nano.pcap',
+		output => 'tcp-handshake-micro-tt.out',
+		args => '-tt -q SPECIAL_t',
+	},
+	{
+		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		name => 'tcp-handshake-micro-ttt',
+		input => 'tcp-handshake-nano.pcap',
+		output => 'tcp-handshake-micro-ttt.out',
+		args => '-ttt -q SPECIAL_t',
+	},
+	{
+		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		name => 'tcp-handshake-micro-tttt',
+		input => 'tcp-handshake-nano.pcap',
+		output => 'tcp-handshake-micro-tttt.out',
+		args => '-tttt -q SPECIAL_t',
+	},
+	{
+		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		name => 'tcp-handshake-micro-ttttt',
+		input => 'tcp-handshake-nano.pcap',
+		output => 'tcp-handshake-micro-ttttt.out',
+		args => '-ttttt -q SPECIAL_t',
+	},
+	# nano outputs with -q
+	{
+		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		name => 'tcp-handshake-nano',
+		input => 'tcp-handshake-nano.pcap',
+		output => 'tcp-handshake-nano.out',
+		args => '-q --nano SPECIAL_t',
+	},
+	{
+		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		name => 'tcp-handshake-nano-t',
+		input => 'tcp-handshake-nano.pcap',
+		output => 'tcp-handshake-nano-t.out',
+		args => '-t -q --nano SPECIAL_t',
+	},
+	{
+		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		name => 'tcp-handshake-nano-tt',
+		input => 'tcp-handshake-nano.pcap',
+		output => 'tcp-handshake-nano-tt.out',
+		args => '-tt -q --nano SPECIAL_t',
+	},
+	{
+		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		name => 'tcp-handshake-nano-ttt',
+		input => 'tcp-handshake-nano.pcap',
+		output => 'tcp-handshake-nano-ttt.out',
+		args => '-ttt -q --nano SPECIAL_t',
+	},
+	{
+		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		name => 'tcp-handshake-nano-tttt',
+		input => 'tcp-handshake-nano.pcap',
+		output => 'tcp-handshake-nano-tttt.out',
+		args => '-tttt -q --nano SPECIAL_t',
+	},
+	{
+		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		name => 'tcp-handshake-nano-ttttt',
+		input => 'tcp-handshake-nano.pcap',
+		output => 'tcp-handshake-nano-ttttt.out',
+		args => '-ttttt -q --nano SPECIAL_t',
+	},
+	# Invalid timestamps, micro and nano precision
+	{
+		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		name => 'timestamp_invalid_micro',
+		input => 'timestamp_invalid_micro.pcap',
+		output => 'timestamp_invalid_micro.out',
+		args => '-q SPECIAL_t',
+	},
+	{
+		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		name => 'timestamp_invalid_nano',
+		input => 'timestamp_invalid_nano.pcap',
+		output => 'timestamp_invalid_nano.out',
+		args => '-q --nano SPECIAL_t',
+	},
+
+	# Broadcom tag tests
+	{
+		skip => skip_no_DLT ('DSA_TAG_BRCM'),
+		name => 'brcmtag',
+		input => 'brcm-tag.pcap',
+		output => 'brcm-tag.out',
+	},
+	{
+		skip => skip_no_DLT ('DSA_TAG_BRCM'),
+		name => 'brcmtag-e',
+		input => 'brcm-tag.pcap',
+		output => 'brcm-tag-e.out',
+		args => '-e',
+	},
+	{
+		skip => skip_no_DLT ('DSA_TAG_BRCM_PREPEND'),
+		name => 'brcmtagprepend',
+		input => 'brcm-tag-prepend.pcap',
+		output => 'brcm-tag-prepend.out',
+		args => '-e',
+	},
+
+	# Marvell DSA tag tests
+	{
+		skip => skip_no_DLT ('DSA_TAG_DSA'),
+		name => 'dsa',
+		input => 'dsa.pcap',
+		output => 'dsa.out',
+	},
+	{
+		skip => skip_no_DLT ('DSA_TAG_DSA'),
+		name => 'dsa-e',
+		input => 'dsa.pcap',
+		output => 'dsa-e.out',
+		args => '-e',
+	},
+	{
+		skip => skip_no_DLT ('DSA_TAG_DSA'),
+		name => 'dsa-high-vid',
+		input => 'dsa-high-vid.pcap',
+		output => 'dsa-high-vid.out',
+	},
+	{
+		skip => skip_no_DLT ('DSA_TAG_DSA'),
+		name => 'dsa-high-vid-e',
+		input => 'dsa-high-vid.pcap',
+		output => 'dsa-high-vid-e.out',
+		args => '-e',
+	},
+	{
+		skip => skip_no_DLT ('DSA_TAG_EDSA'),
+		name => 'edsa',
+		input => 'edsa.pcap',
+		output => 'edsa.out',
+	},
+
+	# Marvell EDSA tag tests
+	{
+		skip => skip_no_DLT ('DSA_TAG_EDSA'),
+		name => 'edsa-e',
+		input => 'edsa.pcap',
+		output => 'edsa-e.out',
+		args => '-e',
+	},
+	{
+		skip => skip_no_DLT ('DSA_TAG_EDSA'),
+		name => 'edsa-high-vid',
+		input => 'edsa-high-vid.pcap',
+		output => 'edsa-high-vid.out',
+	},
+	{
+		skip => skip_no_DLT ('DSA_TAG_EDSA'),
+		name => 'edsa-high-vid-e',
+		input => 'edsa-high-vid.pcap',
+		output => 'edsa-high-vid-e.out',
+		args => '-e',
+	},
+
+	# AF_VSOCK tests
+	{
+		skip => skip_no_DLT ('VSOCK'),
+		name => 'vsock-1',
+		input => 'vsock-1.pcapng',
+		output => 'vsock-1.out',
+	},
+	{
+		skip => skip_no_DLT ('VSOCK'),
+		name => 'vsock-1-v',
+		input => 'vsock-1.pcapng',
+		output => 'vsock-1-v.out',
+		args => '-v',
+	},
+	{
+		skip => skip_no_DLT ('VSOCK'),
+		name => 'vsock-1-vv',
+		input => 'vsock-1.pcapng',
+		output => 'vsock-1-vv.out',
+		args => '-vv',
+	},
+
+	# PKTAP tests
+	{
+		skip => skip_no_DLT ('PKTAP'),
+		name => 'LINKTYPE_USER2_PKTAP',
+		input => 'LINKTYPE_USER2_PKTAP.pcap',
+		output => 'LINKTYPE_USER2_PKTAP.out',
+	},
+	{
+		skip => skip_no_DLT ('PKTAP'),
+		name => 'LINKTYPE_USER2_PKTAP-e',
+		input => 'LINKTYPE_USER2_PKTAP.pcap',
+		output => 'LINKTYPE_USER2_PKTAP-e.out',
+		args => '-e',
+	},
+	{
+		skip => skip_no_DLT ('PKTAP'),
+		name => 'LINKTYPE_PKTAP',
+		input => 'LINKTYPE_PKTAP.pcap',
+		output => 'LINKTYPE_PKTAP.out',
+	},
+	{
+		skip => skip_no_DLT ('PKTAP'),
+		name => 'LINKTYPE_PKTAP-e',
+		input => 'LINKTYPE_PKTAP.pcap',
+		output => 'LINKTYPE_PKTAP-e.out',
+		args => '-e',
 	},
 );
 
