@@ -822,6 +822,7 @@ Currently known types are
 \fBcarp\fR (Common Address Redundancy Protocol),
 \fBcnfp\fR (Cisco NetFlow protocol),
 \fBdomain\fR (Domain Name System),
+\fBgeneve\fR (Generic Network Virtualization Encapsulation),
 \fBlmp\fR (Link Management Protocol),
 \fBpgm\fR (Pragmatic General Multicast),
 \fBpgm_zmtp1\fR (ZMTP/1.0 inside PGM/EPGM),

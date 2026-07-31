@@ -308,6 +308,7 @@ NORETURN void nd_trunc_longjmp(netdissect_options *ndo);
 #define PT_SOMEIP	19	/* Autosar SOME/IP Protocol */
 #define PT_DOMAIN	20	/* Domain Name System (DNS) */
 #define PT_QUIC		21	/* QUIC */
+#define PT_GENEVE	22	/* Generic Network Virtualization Encapsulation */
 
 #define ND_MIN(a,b) ((a)>(b)?(b):(a))
 #define ND_MAX(a,b) ((b)>(a)?(b):(a))

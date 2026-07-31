@@ -464,6 +464,9 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		case PT_QUIC:
 			quic_print(ndo, cp);
 			break;
+		case PT_GENEVE:
+			geneve_print(ndo, cp, length);
+			break;
 		}
 		return;
 	}

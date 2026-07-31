@@ -2014,6 +2014,8 @@ main(int argc, char **argv)
 				ndo->ndo_packettype = PT_DOMAIN;
 			else if (ascii_strcasecmp(optarg, "quic") == 0)
 				ndo->ndo_packettype = PT_QUIC;
+			else if (ascii_strcasecmp(optarg, "geneve") == 0)
+				ndo->ndo_packettype = PT_GENEVE;
 			else
 				error("unknown packet type '%s'", optarg);
 			break;
