@@ -255,7 +255,7 @@ tcp_print(netdissect_options *ndo,
 	    }
 	    fwrite((char *)tp + hlen, 1, length-hlen, dfile);
 	    fclose(dfile);
-	  }
+	  } 
 	}
 
         seq = GET_BE_U_4(tp->th_seq);

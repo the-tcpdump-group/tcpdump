@@ -2600,6 +2600,7 @@ DIAG_ON_ASSIGN_ENUM
 #endif	/* HAVE_CAPSICUM */
 
 	do {
+
 		status = pcap_loop(pd, cnt, callback, pcap_userdata);
 		if (WFileName == NULL) {
 			/*
