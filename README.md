@@ -44,6 +44,7 @@ tcpdump compiles and works on at least the following platforms:
 In the past tcpdump certainly or likely worked on the following platforms:
 
 * 4.3BSD
+* AmigaOS 4
 * BSD/386, later BSD/OS
 * DEC OSF/1, later Digital UNIX, later Tru64 UNIX
 * DOS
