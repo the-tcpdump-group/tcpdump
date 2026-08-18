@@ -269,6 +269,7 @@ HDR = \
 	appletalk.h \
 	ascii_strcasecmp.h \
 	atm.h \
+	byteswap.h \
 	chdlc.h \
 	compiler-tests.h \
 	cpack.h \

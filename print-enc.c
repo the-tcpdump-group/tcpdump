@@ -30,6 +30,7 @@
 #define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
+#include "byteswap.h"
 #include "af.h"
 
 /* From $OpenBSD: if_enc.h,v 1.8 2001/06/25 05:14:00 angelos Exp $ */
@@ -85,20 +86,12 @@ struct enchdr {
 		(wh) &= ~(xf); \
 	}
 
-/*
- * Byte-swap a 32-bit number.
- * ("htonl()" or "ntohl()" won't work - we want to byte-swap even on
- * big-endian platforms.)
- */
-#define	SWAPLONG(y) \
-((((y)&0xff)<<24) | (((y)&0xff00)<<8) | (((y)&0xff0000)>>8) | (((y)>>24)&0xff))
-
 void
 enc_if_print(netdissect_options *ndo,
              const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int length = h->len;
-	u_int af, flags;
+	uint32_t af, flags;
 	const struct enchdr *hdr;
 
 	ndo->ndo_protocol = "enc";
@@ -127,8 +120,8 @@ enc_if_print(netdissect_options *ndo,
 	UNALIGNED_MEMCPY(&af, &hdr->af, sizeof (af));
 	UNALIGNED_MEMCPY(&flags, &hdr->flags, sizeof (flags));
 	if ((af & 0xFFFF0000) != 0) {
-		af = SWAPLONG(af);
-		flags = SWAPLONG(flags);
+		af = ND_BSWAP_32(af);
+		flags = ND_BSWAP_32(flags);
 	}
 
 	if (flags == 0)
