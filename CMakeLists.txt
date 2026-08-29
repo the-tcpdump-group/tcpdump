@@ -1588,3 +1588,5 @@ if(PERL)
 else()
     message(STATUS "Didn't find perl")
 endif()
+
+add_subdirectory(fuzz)
