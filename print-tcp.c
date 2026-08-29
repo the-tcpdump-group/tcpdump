@@ -138,25 +138,28 @@ static const struct tok tcp_option_values[] = {
         { 0, NULL }
 };
 
+/* The following definitions come from draft-ietf-tcpm-rst-diagnostic-payload-03. */
 static const struct tok tcp_failure_causes[] = {
         { 0, "Reserved" },
         { 1, "Illegal option length" },
-        { 2, "Desynchronized state" },
-        { 3, "New data is received after CLOSE is called" },
-        { 4, "ABORT process" },
-        { 5, "Unexpected ACK received by non-synchronized state connection" },
-        { 6, "Unexpected SYN in the window" },
-        { 7, "Unexpected security compartment" },
-        { 8, "Malformed message" },
-        { 9, "Not authorized" },
-        { 10, "Resource exceeded" },
-        { 11, "Network failure" },
-        { 12, "Reset received from the peer" },
-        { 13, "Destination unreachable" },
-        { 14, "Connection timeout" },
-        { 15, "Too much outstanding data" },
-        { 16, "Unacceptable performance" },
-        { 17, "Middlebox interference" },
+        { 2, "Data available or received when application cannot read data anymore" },
+        { 3, "ABORT process" },
+        { 4, "Segment received in CLOSED state" },
+        { 5, "ACK segment received in LISTEN state" },
+        { 6, "ACK segment received in SYN-SENT state and SEG.ACK is not acceptable" },
+        { 7, "ACK segment received in SYN-RECEIVED state and SEG.ACK is not acceptable" },
+        { 8, "In window SYN segment received in synchronized state without RFC 5961 support" },
+        { 9, "Unexpected security compartment" },
+        { 10, "Malformed message" },
+        { 11, "Not authorized" },
+        { 12, "Resource exceeded" },
+        { 13, "Network failure" },
+        { 14, "Reset received from the peer" },
+        { 15, "Destination unreachable" },
+        { 16, "Connection timeout" },
+        { 17, "Too much outstanding data" },
+        { 18, "Unacceptable performance" },
+        { 19, "Middlebox interference" },
         { 0, NULL }
 };
 
@@ -895,7 +898,7 @@ invalid:
  *                 RST.  No standard has yet been established for such
  *                 data.
  *
- * draft-ietf-tcpm-rst-diagnostic-payload-00 defines a TCP RST Diagnostic
+ * draft-ietf-tcpm-rst-diagnostic-payload-03 defines a TCP RST Diagnostic
  * Payload as shown here:
  *
  *     0                   1                   2                   3
