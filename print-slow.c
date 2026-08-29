@@ -39,14 +39,6 @@
 #define	LACP_VERSION                        1
 #define	MARKER_VERSION                      1
 
-static const struct tok slow_proto_values[] = {
-    { SLOW_PROTO_LACP, "LACP" },
-    { SLOW_PROTO_MARKER, "MARKER" },
-    { SLOW_PROTO_OAM, "OAM" },
-    { SLOW_PROTO_OSSP, "OSSP" },
-    { 0, NULL}
-};
-
 static const struct tok slow_oam_flag_values[] = {
     { 0x0001, "Link Fault" },
     { 0x0002, "Dying Gasp" },
@@ -243,100 +235,41 @@ static void slow_marker_lacp_print(netdissect_options *, const u_char *, u_int, 
 static void slow_oam_print(netdissect_options *, const u_char *, u_int);
 static void slow_ossp_print(netdissect_options *, const u_char *, u_int);
 
+/*
+ * Print Slow Protocol. (802.3 Annex 57A)
+ */
 void
 slow_print(netdissect_options *ndo,
            const u_char *pptr, u_int len)
 {
-    int print_version;
     u_int subtype;
 
     ndo->ndo_protocol = "slow";
+
     if (len < 1)
         goto tooshort;
     subtype = GET_U_1(pptr);
+    len -= 1;
+    pptr += 1;
 
-    /*
-     * Sanity checking of the header.
-     */
     switch (subtype) {
-    case SLOW_PROTO_LACP:
-        if (len < 2)
-            goto tooshort;
-        if (GET_U_1(pptr + 1) != LACP_VERSION) {
-            ND_PRINT("LACP version %u packet not supported",
-                     GET_U_1(pptr + 1));
-            return;
-        }
-        print_version = 1;
-        break;
-
+    case SLOW_PROTO_LACP: /* fall through */
     case SLOW_PROTO_MARKER:
-        if (len < 2)
-            goto tooshort;
-        if (GET_U_1(pptr + 1) != MARKER_VERSION) {
-            ND_PRINT("MARKER version %u packet not supported",
-                     GET_U_1(pptr + 1));
-            return;
-        }
-        print_version = 1;
+        slow_marker_lacp_print(ndo, pptr, len, subtype);
         break;
 
     case SLOW_PROTO_OAM:
-    case SLOW_PROTO_OSSP:
-        print_version = 0;
-        break;
-
-    default:
-        /* print basic information and exit */
-        print_version = -1;
-        break;
-    }
-
-    if (print_version == 1) {
-        ND_PRINT("%sv%u, length %u",
-               tok2str(slow_proto_values, "unknown (%u)", subtype),
-               GET_U_1((pptr + 1)),
-               len);
-    } else {
-        /* some slow protos don't have a version number in the header */
-        ND_PRINT("%s, length %u",
-               tok2str(slow_proto_values, "unknown (%u)", subtype),
-               len);
-    }
-
-    /* unrecognized subtype */
-    if (print_version == -1) {
-        print_unknown_data(ndo, pptr, "\n\t", len);
-        return;
-    }
-
-    if (!ndo->ndo_vflag)
-        return;
-
-    switch (subtype) {
-    default: /* should not happen */
-        break;
-
-    case SLOW_PROTO_OSSP:
-        /* skip subtype */
-        len -= 1;
-        pptr += 1;
-        slow_ossp_print(ndo, pptr, len);
-        break;
-
-    case SLOW_PROTO_OAM:
-        /* skip subtype */
-        len -= 1;
-        pptr += 1;
         slow_oam_print(ndo, pptr, len);
         break;
 
-    case SLOW_PROTO_LACP:   /* LACP and MARKER share the same semantics */
-    case SLOW_PROTO_MARKER:
-        /* skip subtype and version */
-        len -= 2;
-        pptr += 2;
-        slow_marker_lacp_print(ndo, pptr, len, subtype);
+    case SLOW_PROTO_OSSP:
+        slow_ossp_print(ndo, pptr, len);
+        break;
+
+    default:
+        ND_PRINT("unknown (%u), length %u", subtype, len + 1);
+        if (ndo->ndo_vflag)
+            print_unknown_data(ndo, pptr, "\n\t", len);
         break;
     }
     return;
@@ -348,6 +281,9 @@ tooshort:
         ND_PRINT("\n\t\t packet is too short");
 }
 
+/*
+ * Print Link Aggregation Control Protocol and Marker protocol. (802.3ad / 802.1ax)
+ */
 static void
 slow_marker_lacp_print(netdissect_options *ndo,
                        const u_char *tptr, u_int tlen,
@@ -355,7 +291,7 @@ slow_marker_lacp_print(netdissect_options *ndo,
 {
     const struct tlv_header_t *tlv_header;
     const u_char *tlv_tptr;
-    u_int tlv_type, tlv_len, tlv_tlen;
+    u_int tlv_type, tlv_len, tlv_tlen, version;
 
     union {
         const struct lacp_marker_tlv_terminator_t *lacp_marker_tlv_terminator;
@@ -363,6 +299,26 @@ slow_marker_lacp_print(netdissect_options *ndo,
         const struct lacp_tlv_collector_info_t *lacp_tlv_collector_info;
         const struct marker_tlv_marker_info_t *marker_tlv_marker_info;
     } tlv_ptr;
+
+    if (tlen < 1)
+        goto tooshort;
+
+    version = GET_U_1(tptr);
+    tlen -= 1;
+    tptr += 1;
+
+    ND_PRINT("%sv%u, length %u",
+             proto_subtype == SLOW_PROTO_LACP ? "LACP" : "MARKER",
+             version, tlen + 2);
+
+    if (!ndo->ndo_vflag)
+        return;
+
+    if ((proto_subtype == SLOW_PROTO_LACP && version != LACP_VERSION)
+        || (proto_subtype == SLOW_PROTO_MARKER && version != MARKER_VERSION)) {
+        print_unknown_data(ndo, tptr, "\n\t", tlen);
+        return;
+    }
 
     while(tlen != 0) {
         /* is the packet big enough to include the tlv header ? */
@@ -485,6 +441,9 @@ tooshort:
     ND_PRINT("\n\t\t packet is too short");
 }
 
+/*
+ * Print Operations, Administration, and Maintenance. (802.3)
+ */
 static void
 slow_oam_print(netdissect_options *ndo,
                const u_char *tptr, u_int tlen)
@@ -517,6 +476,11 @@ slow_oam_print(netdissect_options *ndo,
         const struct slow_oam_variableresponse_t *slow_oam_variableresponse;
         const struct slow_oam_loopbackctrl_t *slow_oam_loopbackctrl;
     } tlv;
+
+    ND_PRINT("OAM, length %u", tlen + 1);
+
+    if (!ndo->ndo_vflag)
+        return;
 
     ptr.slow_oam_common_header = (const struct slow_oam_common_header_t *)tptr;
     if (tlen < sizeof(*ptr.slow_oam_common_header))
@@ -753,6 +717,11 @@ slow_ossp_print(netdissect_options *ndo,
                 const u_char *tptr, u_int tlen)
 {
     uint32_t oui;
+
+    ND_PRINT("OSSP, length %u", tlen + 1);
+
+    if (!ndo->ndo_vflag)
+        return;
 
     ND_ICHECKMSG_U("length", tlen, <, 3);
 
