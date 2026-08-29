@@ -1,0 +1,287 @@
+    1  2023-09-07 09:03:51.420596 IP (tos 0xc0, ttl 1, id 44783, offset 0, flags [DF], proto OSPF (89), length 96)
+    1.0.0.2 > 224.0.0.5: OSPFv2, LS-Update, length 76
+	Router-ID 2.2.2.2, Area 0.0.0.6, Authentication Type: none (0), 1 LSA
+	  LSA #1
+	  Advertising Router 2.2.2.2, seq 0x80000001, age 1s, length 28
+	    Area Local Opaque LSA (10), Opaque-Type Extended Link LSA (8), Opaque-ID 0
+	    Options: [Demand Circuit, Opaque]
+	    Extended Link TLV (1), length: 24, value: 
+	      Link Type: Point-to-Point Link (1)
+	      Reserved: 0
+	      Link ID: 1.1.1.1
+	      Link Data: 1.0.0.2
+	      Adj-SID Sub-TLV (2), length: 7, value: 
+	        Flags: [Value/Index, Local/Global]
+	        Reserved: 0
+	        MT-ID: 0
+	        Weight: 0
+	        SID/Label: 116384
+    2  2023-09-07 09:03:51.420611 IP (tos 0xc0, ttl 1, id 41498, offset 0, flags [DF], proto OSPF (89), length 96)
+    1.0.0.1 > 224.0.0.5: OSPFv2, LS-Update, length 76
+	Router-ID 1.1.1.1, Area 0.0.0.6, Authentication Type: none (0), 1 LSA
+	  LSA #1
+	  Advertising Router 1.1.1.1, seq 0x80000001, age 1s, length 28
+	    Area Local Opaque LSA (10), Opaque-Type Extended Link LSA (8), Opaque-ID 0
+	    Options: [Demand Circuit, Opaque]
+	    Extended Link TLV (1), length: 24, value: 
+	      Link Type: Point-to-Point Link (1)
+	      Reserved: 0
+	      Link ID: 2.2.2.2
+	      Link Data: 1.0.0.1
+	      Adj-SID Sub-TLV (2), length: 7, value: 
+	        Flags: [Value/Index, Local/Global]
+	        Reserved: 0
+	        MT-ID: 0
+	        Weight: 0
+	        SID/Label: 116384
+    3  2023-09-07 09:03:51.420713 IP (tos 0xc0, ttl 1, id 44784, offset 0, flags [DF], proto OSPF (89), length 64)
+    1.0.0.2 > 224.0.0.5: OSPFv2, LS-Ack, length 44
+	Router-ID 2.2.2.2, Area 0.0.0.6, Authentication Type: none (0)
+	  Advertising Router 1.1.1.1, seq 0x80000001, age 1s, length 28
+	    Area Local Opaque LSA (10), Opaque-Type Extended Link LSA (8), Opaque-ID 0
+	    Options: [Demand Circuit, Opaque]
+    4  2023-09-07 09:03:51.421011 IP (tos 0xc0, ttl 1, id 41499, offset 0, flags [DF], proto OSPF (89), length 64)
+    1.0.0.1 > 224.0.0.5: OSPFv2, LS-Ack, length 44
+	Router-ID 1.1.1.1, Area 0.0.0.6, Authentication Type: none (0)
+	  Advertising Router 2.2.2.2, seq 0x80000001, age 1s, length 28
+	    Area Local Opaque LSA (10), Opaque-Type Extended Link LSA (8), Opaque-ID 0
+	    Options: [Demand Circuit, Opaque]
+    5  2023-09-07 09:03:51.472637 IP (tos 0xc0, ttl 1, id 44796, offset 0, flags [DF], proto OSPF (89), length 140)
+    1.0.0.2 > 224.0.0.5: OSPFv2, LS-Update, length 120
+	Router-ID 2.2.2.2, Area 0.0.0.6, Authentication Type: none (0), 2 LSAs
+	  LSA #1
+	  Advertising Router 3.3.3.3, seq 0x80000001, age 2s, length 24
+	    Area Local Opaque LSA (10), Opaque-Type Router Information LSA (4), Opaque-ID 0
+	    Options: [Demand Circuit, Opaque]
+	    SR-Algorithm TLV (8), length: 1, value: 
+	      Shortest Path First (0)
+	    SID/Label Range TLV (9), length: 12, value: 
+	      Range size: 65536
+	      SID/Label subTLV (1), length: 3, value: 
+		Label: 900000
+	  LSA #2
+	  Advertising Router 2.2.2.2, seq 0x80000001, age 1s, length 28
+	    Area Local Opaque LSA (10), Opaque-Type Extended Link LSA (8), Opaque-ID 1
+	    Options: [Demand Circuit, Opaque]
+	    Extended Link TLV (1), length: 24, value: 
+	      Link Type: Point-to-Point Link (1)
+	      Reserved: 0
+	      Link ID: 3.3.3.3
+	      Link Data: 1.0.1.1
+	      Adj-SID Sub-TLV (2), length: 7, value: 
+	        Flags: [Value/Index, Local/Global]
+	        Reserved: 0
+	        MT-ID: 0
+	        Weight: 0
+	        SID/Label: 116385
+    6  2023-09-07 09:03:51.472791 IP (tos 0xc0, ttl 1, id 41502, offset 0, flags [DF], proto OSPF (89), length 84)
+    1.0.0.1 > 224.0.0.5: OSPFv2, LS-Ack, length 64
+	Router-ID 1.1.1.1, Area 0.0.0.6, Authentication Type: none (0)
+	  Advertising Router 2.2.2.2, seq 0x80000001, age 1s, length 28
+	    Area Local Opaque LSA (10), Opaque-Type Extended Link LSA (8), Opaque-ID 1
+	    Options: [Demand Circuit, Opaque]
+	  Advertising Router 3.3.3.3, seq 0x80000001, age 2s, length 24
+	    Area Local Opaque LSA (10), Opaque-Type Router Information LSA (4), Opaque-ID 0
+	    Options: [Demand Circuit, Opaque]
+    7  2023-09-07 09:03:51.473157 IP (tos 0xc0, ttl 1, id 44797, offset 0, flags [DF], proto OSPF (89), length 96)
+    1.0.0.2 > 224.0.0.5: OSPFv2, LS-Update, length 76
+	Router-ID 2.2.2.2, Area 0.0.0.6, Authentication Type: none (0), 1 LSA
+	  LSA #1
+	  Advertising Router 3.3.3.3, seq 0x80000001, age 2s, length 28
+	    Area Local Opaque LSA (10), Opaque-Type Extended Link LSA (8), Opaque-ID 0
+	    Options: [Demand Circuit, Opaque]
+	    Extended Link TLV (1), length: 24, value: 
+	      Link Type: Point-to-Point Link (1)
+	      Reserved: 0
+	      Link ID: 2.2.2.2
+	      Link Data: 1.0.1.2
+	      Adj-SID Sub-TLV (2), length: 7, value: 
+	        Flags: [Value/Index, Local/Global]
+	        Reserved: 0
+	        MT-ID: 0
+	        Weight: 0
+	        SID/Label: 116384
+    8  2023-09-07 09:03:51.473279 IP (tos 0xc0, ttl 1, id 41503, offset 0, flags [DF], proto OSPF (89), length 64)
+    1.0.0.1 > 224.0.0.5: OSPFv2, LS-Ack, length 44
+	Router-ID 1.1.1.1, Area 0.0.0.6, Authentication Type: none (0)
+	  Advertising Router 3.3.3.3, seq 0x80000001, age 2s, length 28
+	    Area Local Opaque LSA (10), Opaque-Type Extended Link LSA (8), Opaque-ID 0
+	    Options: [Demand Circuit, Opaque]
+    9  2023-09-07 09:03:51.841651 IP (tos 0xc0, ttl 1, id 44875, offset 0, flags [DF], proto OSPF (89), length 96)
+    1.0.0.2 > 224.0.0.5: OSPFv2, LS-Update, length 76
+	Router-ID 2.2.2.2, Area 0.0.0.6, Authentication Type: none (0), 1 LSA
+	  LSA #1
+	  Advertising Router 2.2.2.2, seq 0x80000001, age 1s, length 28
+	    Area Local Opaque LSA (10), Opaque-Type Extended Link LSA (8), Opaque-ID 2
+	    Options: [Demand Circuit, Opaque]
+	    Extended Link TLV (1), length: 24, value: 
+	      Link Type: Point-to-Point Link (1)
+	      Reserved: 0
+	      Link ID: 1.1.1.1
+	      Link Data: 1.0.0.2
+	      Adj-SID Sub-TLV (2), length: 7, value: 
+	        Flags: [Value/Index, Local/Global]
+	        Reserved: 0
+	        MT-ID: 0
+	        Weight: 0
+	        SID/Label: 132768
+   10  2023-09-07 09:03:51.841738 IP (tos 0xc0, ttl 1, id 44876, offset 0, flags [DF], proto OSPF (89), length 96)
+    1.0.0.2 > 224.0.0.5: OSPFv2, LS-Update, length 76
+	Router-ID 2.2.2.2, Area 0.0.0.6, Authentication Type: none (0), 1 LSA
+	  LSA #1
+	  Advertising Router 2.2.2.2, seq 0x80000001, age 1s, length 28
+	    Area Local Opaque LSA (10), Opaque-Type Extended Link LSA (8), Opaque-ID 3
+	    Options: [Demand Circuit, Opaque]
+	    Extended Link TLV (1), length: 24, value: 
+	      Link Type: Point-to-Point Link (1)
+	      Reserved: 0
+	      Link ID: 3.3.3.3
+	      Link Data: 1.0.1.1
+	      Adj-SID Sub-TLV (2), length: 7, value: 
+	        Flags: [Value/Index, Local/Global]
+	        Reserved: 0
+	        MT-ID: 0
+	        Weight: 0
+	        SID/Label: 132769
+   11  2023-09-07 09:03:51.841850 IP (tos 0xc0, ttl 1, id 41527, offset 0, flags [DF], proto OSPF (89), length 64)
+    1.0.0.1 > 224.0.0.5: OSPFv2, LS-Ack, length 44
+	Router-ID 1.1.1.1, Area 0.0.0.6, Authentication Type: none (0)
+	  Advertising Router 2.2.2.2, seq 0x80000001, age 1s, length 28
+	    Area Local Opaque LSA (10), Opaque-Type Extended Link LSA (8), Opaque-ID 2
+	    Options: [Demand Circuit, Opaque]
+   12  2023-09-07 09:03:51.841894 IP (tos 0xc0, ttl 1, id 41528, offset 0, flags [DF], proto OSPF (89), length 64)
+    1.0.0.1 > 224.0.0.5: OSPFv2, LS-Ack, length 44
+	Router-ID 1.1.1.1, Area 0.0.0.6, Authentication Type: none (0)
+	  Advertising Router 2.2.2.2, seq 0x80000001, age 1s, length 28
+	    Area Local Opaque LSA (10), Opaque-Type Extended Link LSA (8), Opaque-ID 3
+	    Options: [Demand Circuit, Opaque]
+   13  2023-09-07 09:04:56.510076 IP (tos 0xc0, ttl 1, id 54495, offset 0, flags [DF], proto OSPF (89), length 128)
+    1.0.0.2 > 224.0.0.5: OSPFv2, LS-Request, length 108
+	Router-ID 2.2.2.2, Area 0.0.0.6, Authentication Type: none (0)
+	  Advertising Router: 1.1.1.1, Router LSA (1), LSA-ID: 1.1.1.1
+	  Advertising Router: 2.2.2.2, Area Local Opaque LSA (10), Opaque-Type: Router Information LSA (4), Opaque-ID: 0
+	  Advertising Router: 2.2.2.2, Area Local Opaque LSA (10), Opaque-Type: Extended Link LSA (8), Opaque-ID: 0
+	  Advertising Router: 2.2.2.2, Area Local Opaque LSA (10), Opaque-Type: Extended Link LSA (8), Opaque-ID: 2
+	  Advertising Router: 2.2.2.2, Area Local Opaque LSA (10), Opaque-Type: Extended Link LSA (8), Opaque-ID: 3
+	  Advertising Router: 2.2.2.2, Area Local Opaque LSA (10), Opaque-Type: Extended Link LSA (8), Opaque-ID: 1
+	  Advertising Router: 1.1.1.1, Area Local Opaque LSA (10), Opaque-Type: Extended Link LSA (8), Opaque-ID: 1
+   14  2023-09-07 09:04:56.510143 IP (tos 0xc0, ttl 1, id 54496, offset 0, flags [DF], proto OSPF (89), length 192)
+    1.0.0.2 > 224.0.0.5: OSPFv2, Database Description, length 172
+	Router-ID 2.2.2.2, Area 0.0.0.6, Authentication Type: none (0)
+	Options [External, Opaque], DD Flags [Master], MTU: 1500, Sequence: 0x00000052
+	  Advertising Router 3.3.3.3, seq 0x80000001, age 67s, length 24
+	    Area Local Opaque LSA (10), Opaque-Type Router Information LSA (4), Opaque-ID 0
+	    Options: [Demand Circuit, Opaque]
+	  Advertising Router 1.1.1.1, seq 0x80000001, age 67s, length 24
+	    Area Local Opaque LSA (10), Opaque-Type Router Information LSA (4), Opaque-ID 0
+	    Options: [Demand Circuit, Opaque]
+	  Advertising Router 3.3.3.3, seq 0x80000001, age 67s, length 28
+	    Area Local Opaque LSA (10), Opaque-Type Extended Link LSA (8), Opaque-ID 0
+	    Options: [Demand Circuit, Opaque]
+	  Advertising Router 1.1.1.1, seq 0x80000001, age 67s, length 28
+	    Area Local Opaque LSA (10), Opaque-Type Extended Link LSA (8), Opaque-ID 0
+	    Options: [Demand Circuit, Opaque]
+	  Advertising Router 3.3.3.3, seq 0x80000003, age 75s, length 28
+	    Router LSA (1), LSA-ID: 3.3.3.3
+	    Options: [External, Demand Circuit]
+	  Advertising Router 2.2.2.2, seq 0x80000007, age 65s, length 40
+	    Router LSA (1), LSA-ID: 2.2.2.2
+	    Options: [External, Demand Circuit]
+	  Advertising Router 1.1.1.1, seq 0x80000004, age 77s, length 28
+	    Router LSA (1), LSA-ID: 1.1.1.1
+	    Options: [External, Demand Circuit]
+   15  2023-09-07 09:04:56.510243 IP (tos 0xc0, ttl 1, id 52179, offset 0, flags [DF], proto OSPF (89), length 368)
+    1.0.0.1 > 224.0.0.5: OSPFv2, LS-Update, length 348
+	Router-ID 1.1.1.1, Area 0.0.0.6, Authentication Type: none (0), 7 LSAs
+	  LSA #1
+	  Advertising Router 1.1.1.1, seq 0x80000007, age 14s, length 16
+	    Router LSA (1), LSA-ID: 1.1.1.1
+	    Options: [External, Demand Circuit]
+	    Router LSA Options: [none]
+	      Stub Network: 1.0.0.0, Mask: 255.255.255.0
+		topology default (0), metric 10
+	  LSA #2
+	  Advertising Router 2.2.2.2, seq 0x80000001, age 67s, length 24
+	    Area Local Opaque LSA (10), Opaque-Type Router Information LSA (4), Opaque-ID 0
+	    Options: [Demand Circuit, Opaque]
+	    SR-Algorithm TLV (8), length: 1, value: 
+	      Shortest Path First (0)
+	    SID/Label Range TLV (9), length: 12, value: 
+	      Range size: 65536
+	      SID/Label subTLV (1), length: 3, value: 
+		Label: 900000
+	  LSA #3
+	  Advertising Router 2.2.2.2, seq 0x80000001, age 67s, length 28
+	    Area Local Opaque LSA (10), Opaque-Type Extended Link LSA (8), Opaque-ID 0
+	    Options: [Demand Circuit, Opaque]
+	    Extended Link TLV (1), length: 24, value: 
+	      Link Type: Point-to-Point Link (1)
+	      Reserved: 0
+	      Link ID: 1.1.1.1
+	      Link Data: 1.0.0.2
+	      Adj-SID Sub-TLV (2), length: 7, value: 
+	        Flags: [Value/Index, Local/Global]
+	        Reserved: 0
+	        MT-ID: 0
+	        Weight: 0
+	        SID/Label: 116384
+	  LSA #4
+	  Advertising Router 2.2.2.2, seq 0x80000001, age 66s, length 28
+	    Area Local Opaque LSA (10), Opaque-Type Extended Link LSA (8), Opaque-ID 2
+	    Options: [Demand Circuit, Opaque]
+	    Extended Link TLV (1), length: 24, value: 
+	      Link Type: Point-to-Point Link (1)
+	      Reserved: 0
+	      Link ID: 1.1.1.1
+	      Link Data: 1.0.0.2
+	      Adj-SID Sub-TLV (2), length: 7, value: 
+	        Flags: [Value/Index, Local/Global]
+	        Reserved: 0
+	        MT-ID: 0
+	        Weight: 0
+	        SID/Label: 132768
+	  LSA #5
+	  Advertising Router 2.2.2.2, seq 0x80000001, age 66s, length 28
+	    Area Local Opaque LSA (10), Opaque-Type Extended Link LSA (8), Opaque-ID 3
+	    Options: [Demand Circuit, Opaque]
+	    Extended Link TLV (1), length: 24, value: 
+	      Link Type: Point-to-Point Link (1)
+	      Reserved: 0
+	      Link ID: 3.3.3.3
+	      Link Data: 1.0.1.1
+	      Adj-SID Sub-TLV (2), length: 7, value: 
+	        Flags: [Value/Index, Local/Global]
+	        Reserved: 0
+	        MT-ID: 0
+	        Weight: 0
+	        SID/Label: 132769
+	  LSA #6
+	  Advertising Router 2.2.2.2, seq 0x80000001, age 67s, length 28
+	    Area Local Opaque LSA (10), Opaque-Type Extended Link LSA (8), Opaque-ID 1
+	    Options: [Demand Circuit, Opaque]
+	    Extended Link TLV (1), length: 24, value: 
+	      Link Type: Point-to-Point Link (1)
+	      Reserved: 0
+	      Link ID: 3.3.3.3
+	      Link Data: 1.0.1.1
+	      Adj-SID Sub-TLV (2), length: 7, value: 
+	        Flags: [Value/Index, Local/Global]
+	        Reserved: 0
+	        MT-ID: 0
+	        Weight: 0
+	        SID/Label: 116385
+	  LSA #7
+	  Advertising Router 1.1.1.1, seq 0x80000001, age 6s, length 28
+	    Area Local Opaque LSA (10), Opaque-Type Extended Link LSA (8), Opaque-ID 1
+	    Options: [Demand Circuit, Opaque]
+	    Extended Link TLV (1), length: 24, value: 
+	      Link Type: Point-to-Point Link (1)
+	      Reserved: 0
+	      Link ID: 2.2.2.2
+	      Link Data: 1.0.0.1
+	      Adj-SID Sub-TLV (2), length: 7, value: 
+	        Flags: [Value/Index, Local/Global]
+	        Reserved: 0
+	        MT-ID: 0
+	        Weight: 0
+	        SID/Label: 116384
