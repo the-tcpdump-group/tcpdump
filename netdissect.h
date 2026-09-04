@@ -232,6 +232,7 @@ struct netdissect_options {
   int ndo_packet_number;	/* print a packet number in the beginning of line */
   int ndo_lengths;		/* print packet header caplen and len */
   int ndo_print_sampling;	/* print every Nth packet */
+  int ndo_psp;			/* dissect PSP packets */
   int ndo_suppress_default_print; /* don't use default_print() for unknown packet types */
   int ndo_tstamp_precision;	/* requested time stamp precision */
   const char *program_name;	/* Name of the program using the library */
@@ -309,6 +310,7 @@ NORETURN void nd_trunc_longjmp(netdissect_options *ndo);
 #define PT_DOMAIN	20	/* Domain Name System (DNS) */
 #define PT_QUIC		21	/* QUIC */
 #define PT_GENEVE	22	/* Generic Network Virtualization Encapsulation */
+#define PT_PSP		23	/* PSP Security Protocol */
 
 #define ND_MIN(a,b) ((a)>(b)?(b):(a))
 #define ND_MAX(a,b) ((b)>(a)?(b):(a))
@@ -742,6 +744,8 @@ extern u_int ppp_print(netdissect_options *, const u_char *, u_int);
 extern u_int pppoe_print(netdissect_options *, const u_char *, u_int);
 extern void pptp_print(netdissect_options *, const u_char *);
 extern int print_unknown_data(netdissect_options *, const u_char *, const char *, u_int);
+extern int psp_detect(netdissect_options *, const u_char *, u_int);
+extern void psp_print(netdissect_options *, const u_char *, u_int, const u_char *);
 extern void ptp_print(netdissect_options *, const u_char *, u_int);
 extern const char *q922_string(netdissect_options *, const u_char *, u_int);
 extern void q933_print(netdissect_options *, const u_char *, u_int);
