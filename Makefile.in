@@ -197,6 +197,7 @@ LIBNETDISSECT_SRC=\
 	print-ppp.c \
 	print-pppoe.c \
 	print-pptp.c \
+	print-psp.c \
 	print-ptp.c \
 	print-quic.c \
 	print-radius.c \
@@ -304,6 +305,7 @@ HDR = \
 	oui.h \
 	ppp.h \
 	print.h \
+	psp.h \
 	rpc_auth.h \
 	rpc_msg.h \
 	signature.h \
