@@ -128,6 +128,9 @@ struct udphdr {
 #ifndef LWRES_PORT
 #define LWRES_PORT			921	/*XXX*/
 #endif
+#ifndef PSP_PORT
+#define PSP_PORT			1000
+#endif
 #ifndef VQP_PORT
 #define VQP_PORT			1589	/*XXX*/
 #endif

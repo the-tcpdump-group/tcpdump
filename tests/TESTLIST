@@ -515,6 +515,37 @@ vxlan_port_8472 vxlan_port_8472.pcap vxlan_port_8472.out -e
 pptp pptp.pcap pptp.out
 pptp-v pptp.pcap pptp-v.out -v
 
+# PSP tests
+psp-v4-tcp	psp-v4-tcp.pcap		psp-v4-tcp.out		--psp
+psp-v4-tcp-v	psp-v4-tcp.pcap		psp-v4-tcp-v.out	-v --psp
+psp-v6-tcp	psp-v6-tcp.pcap		psp-v6-tcp.out		--psp
+psp-reverse	psp-reverse.pcap	psp-reverse.out		--psp
+psp-zero-crypt	psp-zero-crypt.pcap	psp-zero-crypt.out	--psp
+psp-ports-only	psp-ports-only.pcap	psp-ports-only.out	--psp
+psp-vc-v	psp-vc.pcap		psp-vc-v.out		-v --psp
+psp-tunnel	psp-tunnel.pcap		psp-tunnel.out		--psp
+psp-fallback-udp	non-psp-udp.pcap	psp-fallback-udp.out	--psp
+psp-trunc-hdr	psp-trunc-hdr.pcap	psp-trunc-hdr.out	--psp
+psp-trunc-tcp	psp-trunc-tcp.pcap	psp-trunc-tcp.out	--psp
+psp-no-flag	psp-v4-tcp.pcap		psp-no-flag.out
+psp-port	psp-port.pcap		psp-port.out		-T psp
+psp-v6-ports-only	psp-v6-ports-only.pcap	psp-v6-ports-only.out	--psp
+psp-v6-ports-only-v	psp-v6-ports-only.pcap	psp-v6-ports-only-v.out	-v --psp
+psp-q		psp-v4-tcp.pcap		psp-q.out		-q --psp
+psp-tcp-cryptoff	psp-tcp-cryptoff.pcap	psp-tcp-cryptoff.out	--psp
+psp-tcp-cryptoff-v	psp-tcp-cryptoff.pcap	psp-tcp-cryptoff-v.out	-v --psp
+psp-udp		psp-udp.pcap		psp-udp.out		--psp
+psp-udp-v	psp-udp.pcap		psp-udp-v.out		-v --psp
+psp-tunnel-cryptoff	psp-tunnel-cryptoff.pcap	psp-tunnel-cryptoff.out	--psp
+psp-tunnel-cryptoff-v	psp-tunnel-cryptoff.pcap	psp-tunnel-cryptoff-v.out	-v --psp
+psp-gmac	psp-gmac.pcap		psp-gmac.out		--psp
+psp-gmac-v	psp-gmac.pcap		psp-gmac-v.out		-v --psp
+psp-rsvd	psp-rsvd.pcap		psp-rsvd.out		--psp
+psp-rsvd-T-v	psp-rsvd.pcap		psp-rsvd-T-v.out	-v -T psp
+psp-host-tcp	psp-host-tcp.pcap	psp-host-tcp.out	--psp
+psp-host-tcp-v	psp-host-tcp.pcap	psp-host-tcp-v.out	-v --psp
+psp-host-tcp-T-v	psp-host-tcp.pcap	psp-host-tcp-T-v.out	-v -T psp
+
 # CVEs 2014 malformed packets from Steffen Bauch
 cve-2014-8767-OLSR cve-2014-8767-OLSR.pcap cve-2014-8767-OLSR.out -v
 cve-2014-8768-Geonet cve-2014-8768-Geonet.pcap cve-2014-8768-Geonet.out -v
