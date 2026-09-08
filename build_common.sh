@@ -29,7 +29,7 @@ mktempdir_diy() {
 mktempdir() {
     mktempdir_prefix=${1:-tmp}
     case `os_id` in
-    Darwin-*|FreeBSD-*|NetBSD-*)
+    Darwin-*|FreeBSD-*|NetBSD-*|MidnightBSD-*)
         # In these operating systems mktemp(1) always appends an implicit
         # ".XXXXXXXX" suffix to the requested template when creating a
         # temporary directory.
@@ -89,7 +89,7 @@ cc_version_nocache() {
             # Most likely Clang.
             "$CC" --version
             ;;
-        Linux-*|FreeBSD-*|NetBSD-*|OpenBSD-*)
+        Linux-*|FreeBSD-*|NetBSD-*|OpenBSD-*|MidnightBSD-*)
             # Most likely Clang or GCC.
             "$CC" --version
             ;;
@@ -241,7 +241,7 @@ os_id() {
         : "${os_id_version:=`uname -v`}"
         echo "${os_id_version}.${os_id_release}"
         ;;
-    Darwin|GNU|OpenBSD|QNX|SunOS)
+    Darwin|GNU|OpenBSD|QNX|SunOS|MidnightBSD)
         echo "$os_id_release"
         ;;
     FreeBSD|NetBSD|Linux)
