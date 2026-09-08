@@ -34,6 +34,7 @@ tcpdump compiles and works on at least the following platforms:
 * GNU/Hurd
 * GNU/Linux
 * {Mac} OS X / macOS
+* MidnightBSD
 * [NetBSD](./doc/README.NetBSD.md)
 * OpenBSD
 * [QNX](./doc/README.qnx.md)
