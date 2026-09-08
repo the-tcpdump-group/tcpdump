@@ -303,7 +303,8 @@ set(LIBRARY_NAME netdissect)
 
 option(WITH_SMI "Build with libsmi, if available" ON)
 option(WITH_CRYPTO "Build with OpenSSL/libressl libcrypto, if available" ON)
-if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD" OR
+   CMAKE_SYSTEM_NAME STREQUAL "MidnightBSD")
     option(WITH_CAPSICUM "Build with Capsicum security functions, if available" ON)
 else()
     set(WITH_CAPSICUM OFF)
