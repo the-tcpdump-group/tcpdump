@@ -249,6 +249,7 @@ LIBNETDISSECT_SRC=\
 	print-zeromq.c \
 	signature.c \
 	strtoaddr.c \
+	utf8.c \
 	util-print.c
 
 LOCALSRC = @LOCALSRC@
@@ -314,6 +315,8 @@ HDR = \
 	tcp.h \
 	timeval-operations.h \
 	udp.h \
+	unicode-tables.h \
+	utf8.h \
 	varattrs.h
 
 TAGHDR = \
@@ -355,6 +358,7 @@ EXTRA_DIST = \
 	doc/README.qnx.md \
 	doc/README.solaris.md \
 	doc/README.windows.md \
+	gen-unicode-tables.py \
 	install-sh \
 	instrument-functions.c \
 	makemib \
