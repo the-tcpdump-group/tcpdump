@@ -695,6 +695,7 @@ show_remote_devices_and_exit(void)
 #define OPTION_LENGTHS			138
 #define OPTION_TIME_T_SIZE		139
 #define OPTION_SKIP			140
+#define OPTION_CHARSET			141
 
 static const struct option longopts[] = {
 	{ "buffer-size", required_argument, NULL, 'B' },
@@ -739,6 +740,7 @@ static const struct option longopts[] = {
 	{ "time-t-size", no_argument, NULL, OPTION_TIME_T_SIZE },
 	{ "ip-oneline", no_argument, NULL, 'g' },
 	{ "skip", required_argument, NULL, OPTION_SKIP },
+	{ "charset", required_argument, NULL, OPTION_CHARSET },
 	{ "version", no_argument, NULL, OPTION_VERSION },
 	{ NULL, 0, NULL, 0 }
 };
@@ -2128,6 +2130,17 @@ main(int argc, char **argv)
 		case OPTION_SKIP:
 			packets_to_skip = parse_u_int("packet skip count",
 			    optarg, NULL, 0, INT_MAX, 0);
+			break;
+
+		case OPTION_CHARSET:
+			if (ascii_strcasecmp(optarg, "ascii") == 0)
+				ndo->ndo_utf8 = 0;
+			else if (ascii_strcasecmp(optarg, "utf-8") == 0 ||
+			    ascii_strcasecmp(optarg, "utf8") == 0)
+				ndo->ndo_utf8 = 1;
+			else
+				error("unsupported character set %s (supported: ascii, utf-8)",
+				    optarg);
 			break;
 
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
@@ -3546,9 +3559,9 @@ print_usage(FILE *f)
 "Usage: %s [-AbdDefghHI" J_FLAG "KlLnNOpqStuUvxX#] [ -B size ] [ -c count ] [--count]\n",
 	    executable_name);
 	(void)fprintf(f,
-"\t\t[ -C file_size ] " E_FLAG_USAGE "[ -F file ] [ -G seconds ]\n");
+"\t\t[ -C file_size ] [ --charset charset ] " E_FLAG_USAGE "[ -F file ]\n");
 	(void)fprintf(f,
-"\t\t[ -i interface ]" IMMEDIATE_MODE_USAGE j_FLAG_USAGE "\n");
+"\t\t[ -G seconds ] [ -i interface ]" IMMEDIATE_MODE_USAGE j_FLAG_USAGE "\n");
 	(void)fprintf(f,
 "\t\t[ --lengths ]" LIST_REMOTE_INTERFACES_USAGE "\n");
 #ifdef USE_LIBSMI
