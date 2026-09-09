@@ -1392,6 +1392,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-ppp.c
     print-pppoe.c
     print-pptp.c
+    print-psp.c
     print-ptp.c
     print-quic.c
     print-radius.c
