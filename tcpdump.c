@@ -1406,13 +1406,14 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 #ifdef __FreeBSD__
 		else if (status == PCAP_ERROR_RFMON_NOTSUP &&
 		    strncmp(device, "wlan", 4) == 0) {
-			char parent[8], newdev[8];
+			char parent[16], newdev[8];
 			char sysctl[32];
-			size_t s = sizeof(parent);
+			size_t s = sizeof(parent)-1;
 
 			snprintf(sysctl, sizeof(sysctl),
 			    "net.wlan.%d.%%parent", atoi(device + 4));
 			sysctlbyname(sysctl, parent, &s, NULL, 0);
+			parent[15] = '\0';
 			strlcpy(newdev, device, sizeof(newdev));
 			/* Suggest a new wlan device. */
 			/* FIXME: incrementing the index this way is not going to work well
@@ -1420,7 +1421,7 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 			 * specific case would be an error message that looks a bit odd.
 			 */
 			newdev[strlen(newdev)-1]++;
-			error("%s is not a monitor mode VAP"
+			error("%s is not a monitor mode VAP\n"
 			    "To create a new monitor mode VAP use:\n"
 			    "  ifconfig %s create wlandev %s wlanmode monitor\n"
 			    "and use %s as the tcpdump interface",
