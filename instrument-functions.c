@@ -251,7 +251,7 @@ static void print_debug(void *this_fn, void *call_site, action_type action)
 						if (file == NULL || *file == '\0')
 							printf(" ??:");
 						else {
-							char *slashp = strrchr(file, '/');
+							const char *slashp = strrchr(file, '/');
 							if (slashp != NULL)
 								file = slashp + 1;
 							printf(" %s:", file);
