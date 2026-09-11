@@ -29,7 +29,7 @@ mktempdir_diy() {
 mktempdir() {
     mktempdir_prefix=${1:-tmp}
     case `os_id` in
-    Darwin-*|FreeBSD-*|NetBSD-*|MidnightBSD-*)
+    Darwin-*|FreeBSD-*|NetBSD-*|MidnightBSD-*|DragonFly-*)
         # In these operating systems mktemp(1) always appends an implicit
         # ".XXXXXXXX" suffix to the requested template when creating a
         # temporary directory.
@@ -94,7 +94,7 @@ cc_version_nocache() {
             # Most likely Clang.
             "$CC" --version
             ;;
-        Linux-*|FreeBSD-*|NetBSD-*|OpenBSD-*|MidnightBSD-*)
+        Linux-*|FreeBSD-*|NetBSD-*|OpenBSD-*|MidnightBSD-*|DragonFly-*)
             # Most likely Clang or GCC.
             "$CC" --version
             ;;
@@ -189,6 +189,13 @@ cc_id_nocache() {
         echo "$cc_id_guessed"
         return
     fi
+
+    # "gcc 8.3 [DragonFly] Release/2019-02-22"
+    cc_id_guessed=`echo "$cc_id_firstline" | sed 's/^.* \([0-9\.]*\) \[.*\].*$/gcc-\1/'`
+    if [ "$cc_id_firstline" != "$cc_id_guessed" ]; then
+        echo "$cc_id_guessed"
+        return
+    fi
 }
 
 cc_id() {
@@ -251,7 +258,7 @@ os_id() {
     Darwin|GNU|OpenBSD|QNX|SunOS|MidnightBSD)
         echo "$os_id_release"
         ;;
-    FreeBSD|NetBSD|Linux)
+    FreeBSD|NetBSD|Linux|DragonFly)
         # Meaningful version is usually the substring before the first dash.
         # Or the first underscore.
         echo "$os_id_release" | sed 's/^\([0-9\.]*\).*$/\1/'
