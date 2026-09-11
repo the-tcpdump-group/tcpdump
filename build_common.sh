@@ -63,9 +63,14 @@ print_sysinfo() {
 cc_version_nocache() {
     : "${CC:?}"
     case `basename "$CC"` in
-    gcc*|egcc*|clang*|tcc*)
+    gcc*|egcc*|clang*)
         # GCC and Clang recognize --version, print to stdout and exit with 0.
         "$CC" --version
+        ;;
+    tcc*)
+        # Tiny C Compiler recognizes "-v" (also "--version" after release
+        # 0.9.27), prints to stdout and exits with 0.
+        "$CC" -v
         ;;
     xl*)
         # XL C 12.1 and 13.1 recognize "-qversion", print to stdout and exit
@@ -152,8 +157,10 @@ cc_id_nocache() {
     fi
 
     # Examples of installed packages:
+    # "tcc version 0.9.27 (prerelease) (i386 Unidentified system)"
     # "tcc version 0.9.27 (x86_64 Linux)"
     # "tcc version 0.9.27 2023-07-05 mob@5b28165 (x86_64 OpenBSD)"
+    # "tcc version 0.9.28rc 2026-07-30 mob@2be0218b (x86_64 Linux)"
     # Example of a development version:
     # "tcc version 0.9.28rc 2024-04-28 mob@0aca8611 (x86_64 Linux)"
     cc_id_guessed=`echo "$cc_id_firstline" | sed 's/^.*tcc version \([0-9\.rc]*\).*$/tcc-\1/'`
