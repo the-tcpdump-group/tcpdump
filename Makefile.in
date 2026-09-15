@@ -509,7 +509,7 @@ releasecheck: releasetar
 	cd .. && \
 	rm -rf "$$TAG" && \
 	rm -rf "$$INSTALL_DIR" && \
-	tar xf "$$DIR"/"$$TAG".tar.gz && \
+	tar xzf "$$DIR"/"$$TAG".tar.gz && \
 	cd "$$TAG" && \
 	echo "[$@] $$ touch .devel" && \
 	touch .devel && \
@@ -522,7 +522,7 @@ releasecheck: releasetar
 	cd .. && \
 	rm -rf "$$TAG" && \
 	rm -rf "$$INSTALL_DIR" && \
-	tar xf "$$DIR"/"$$TAG".tar.gz && \
+	tar xzf "$$DIR"/"$$TAG".tar.gz && \
 	cd "$$TAG" && \
 	echo "[$@] $$ touch .devel" && \
 	touch .devel && \
