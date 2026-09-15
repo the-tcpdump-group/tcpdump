@@ -151,11 +151,12 @@ sub pipe_tcpdump {
 	open (OPT_PIPE, "$TCPDUMP $option |") or die "ERROR: piping tcpdump $option failed at open\n";
 	my $ret = <OPT_PIPE>;
 	close (OPT_PIPE) or die "ERROR: piping tcpdump $option failed at close\n";
+	chomp $ret;
 	return $ret;
 }
 
 # Get the type of floating-point arithmetic we're doing.
-my $fptype = pipe_tcpdump ('--fp-type') == '9877.895' ? 1 : 2;
+my $fptype = pipe_tcpdump ('--fp-type') eq '9877.895' ? 1 : 2;
 printf "%s --fp-type => %s\n", $TCPDUMP, $fptype;
 
 # Get the size of size_t in bits.
