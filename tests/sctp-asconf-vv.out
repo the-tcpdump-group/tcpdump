@@ -1,0 +1,106 @@
+    1  2023-05-16 21:05:30.306064 IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto SCTP (132), length 76)
+    192.168.5.1.36296 > 192.168.5.2.36297: sctp
+	1) [INIT] [init tag: 418238363] [rwnd: 106496] [OS: 10] [MIS: 65535] [init TSN: 1890701201] 
+    2  2023-05-16 21:05:30.306083 IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto SCTP (132), length 348)
+    192.168.5.2.36297 > 192.168.5.1.36296: sctp
+	1) [INIT ACK] [init tag: 4149529168] [rwnd: 106496] [OS: 5] [MIS: 5] [init TSN: 3973583667] 
+    3  2023-05-16 21:05:30.306092 IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto SCTP (132), length 296)
+    192.168.5.1.36296 > 192.168.5.2.36297: sctp
+	1) [COOKIE ECHO] 
+    4  2023-05-16 21:05:30.306103 IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto SCTP (132), length 36)
+    192.168.5.2.36297 > 192.168.5.1.36296: sctp
+	1) [COOKIE ACK] 
+    5  2023-05-16 21:05:30.306113 IP (tos 0x2,ECT(0), ttl 64, id 1, offset 0, flags [DF], proto SCTP (132), length 60)
+    192.168.5.1.36296 > 192.168.5.2.36297: sctp
+	1) [DATA] (B)(E) [TSN: 1890701201] [SID: 0] [SSEQ 0] [PPID 0x0] [Payload:
+	0x0000:  636f 6e6e 6563 7465 6400                 connected.]
+    6  2023-05-16 21:05:30.306117 IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto SCTP (132), length 48)
+    192.168.5.2.36297 > 192.168.5.1.36296: sctp
+	1) [SACK] [cum ack 1890701201] [a_rwnd 106486] [#gap acks 0] [#dup tsns 0] 
+    7  2023-05-16 21:05:30.306174 IP (tos 0x2,ECT(0), ttl 64, id 44872, offset 0, flags [DF], proto SCTP (132), length 60)
+    192.168.5.2.36297 > 192.168.5.1.36296: sctp
+	1) [DATA] (B)(E) [TSN: 3973583667] [SID: 0] [SSEQ 0] [PPID 0x0] [Payload:
+	0x0000:  636f 6e6e 6563 7465 6400                 connected.]
+    8  2023-05-16 21:05:30.306182 IP (tos 0x2,ECT(0), ttl 64, id 2, offset 0, flags [DF], proto SCTP (132), length 48)
+    192.168.5.1.36296 > 192.168.5.2.36297: sctp
+	1) [SACK] [cum ack 3973583667] [a_rwnd 106486] [#gap acks 0] [#dup tsns 0] 
+    9  2023-05-16 21:05:30.306212 IP (tos 0x2,ECT(0), ttl 64, id 3, offset 0, flags [DF], proto SCTP (132), length 64)
+    192.168.5.1.36296 > 192.168.5.2.36297: sctp
+	1) [ASCONF] [SEQ: 1890701201, ADDR: 192.168.5.1] [ADD ADDR: C-ID: 0, ADDR: 192.168.5.3] 
+   10  2023-05-16 21:05:30.306220 IP (tos 0x2,ECT(0), ttl 64, id 44873, offset 0, flags [DF], proto SCTP (132), length 40)
+    192.168.5.2.36297 > 192.168.5.1.36296: sctp
+	1) [ASCONF-ACK] [SEQ: 1890701201] 
+   11  2023-05-16 21:05:30.306221 IP (tos 0x2,ECT(0), ttl 64, id 44874, offset 0, flags [DF], proto SCTP (132), length 92)
+    192.168.5.2.36297 > 192.168.5.3.36296: sctp
+	1) [HB REQ] 
+   12  2023-05-16 21:05:30.306231 IP (tos 0x2,ECT(0), ttl 64, id 4, offset 0, flags [DF], proto SCTP (132), length 92)
+    192.168.5.1.36296 > 192.168.5.2.36297: sctp
+	1) [HB ACK] 
+   13  2023-05-16 21:05:30.306267 IP (tos 0x2,ECT(0), ttl 64, id 5, offset 0, flags [DF], proto SCTP (132), length 60)
+    192.168.5.1.36296 > 192.168.5.2.36297: sctp
+	1) [DATA] (B)(E) [TSN: 1890701202] [SID: 0] [SSEQ 1] [PPID 0x0] [Payload:
+	0x0000:  6164 6420 6164 6472 6573 7300            add.address.]
+   14  2023-05-16 21:05:30.306308 IP (tos 0x2,ECT(0), ttl 64, id 44875, offset 0, flags [DF], proto SCTP (132), length 76)
+    192.168.5.2.36297 > 192.168.5.1.36296: sctp
+	1) [SACK] [cum ack 1890701202] [a_rwnd 106496] [#gap acks 0] [#dup tsns 0] 
+	2) [DATA] (B)(E) [TSN: 3973583668] [SID: 0] [SSEQ 1] [PPID 0x0] [Payload:
+	0x0000:  6164 6420 6164 6472 6573 7300            add.address.]
+   15  2023-05-16 21:05:30.306356 IP (tos 0x2,ECT(0), ttl 64, id 6, offset 0, flags [DF], proto SCTP (132), length 64)
+    192.168.5.1.36296 > 192.168.5.2.36297: sctp
+	1) [ASCONF] [SEQ: 1890701202, ADDR: 192.168.5.3] [SET PRIM ADDR: C-ID: 0, ADDR: 192.168.5.3] 
+   16  2023-05-16 21:05:30.306360 IP (tos 0x2,ECT(0), ttl 64, id 44876, offset 0, flags [DF], proto SCTP (132), length 40)
+    192.168.5.2.36297 > 192.168.5.1.36296: sctp
+	1) [ASCONF-ACK] [SEQ: 1890701202] 
+   17  2023-05-16 21:05:30.306385 IP (tos 0x2,ECT(0), ttl 64, id 7, offset 0, flags [DF], proto SCTP (132), length 92)
+    192.168.5.1.36296 > 192.168.5.2.36297: sctp
+	1) [SACK] [cum ack 3973583668] [a_rwnd 106496] [#gap acks 0] [#dup tsns 0] 
+	2) [DATA] (B)(E) [TSN: 1890701203] [SID: 0] [SSEQ 2] [PPID 0x0] [Payload:
+	0x0000:  7365 7420 7065 6572 2070 7269 6d61 7279  set.peer.primary
+	0x0010:  2061 6464 7265 7373 00                   .address.]
+   18  2023-05-16 21:05:30.306503 IP (tos 0x2,ECT(0), ttl 64, id 44877, offset 0, flags [DF], proto SCTP (132), length 76)
+    192.168.5.2.36297 > 192.168.5.3.36296: sctp
+	1) [DATA] (B)(E) [TSN: 3973583669] [SID: 0] [SSEQ 2] [PPID 0x0] [Payload:
+	0x0000:  7365 7420 7065 6572 2070 7269 6d61 7279  set.peer.primary
+	0x0010:  2061 6464 7265 7373 00                   .address.]
+   19  2023-05-16 21:05:30.514024 IP (tos 0x2,ECT(0), ttl 64, id 8, offset 0, flags [DF], proto SCTP (132), length 84)
+    192.168.5.1.36296 > 192.168.5.2.36297: sctp
+	1) [SACK] [cum ack 3973583669] [a_rwnd 106496] [#gap acks 0] [#dup tsns 0] 
+	2) [DATA] (B)(E) [TSN: 1890701204] [SID: 0] [SSEQ 3] [PPID 0x0] [Payload:
+	0x0000:  7365 7420 7072 696d 6172 7920 6164 6472  set.primary.addr
+	0x0010:  6573 7300                                ess.]
+   20  2023-05-16 21:05:30.514024 IP (tos 0x2,ECT(0), ttl 64, id 44878, offset 0, flags [DF], proto SCTP (132), length 48)
+    192.168.5.2.36297 > 192.168.5.1.36296: sctp
+	1) [SACK] [cum ack 1890701203] [a_rwnd 106496] [#gap acks 0] [#dup tsns 0] 
+   21  2023-05-16 21:05:30.514075 IP (tos 0x2,ECT(0), ttl 64, id 44879, offset 0, flags [DF], proto SCTP (132), length 68)
+    192.168.5.2.36297 > 192.168.5.3.36296: sctp
+	1) [DATA] (B)(E) [TSN: 3973583670] [SID: 0] [SSEQ 3] [PPID 0x0] [Payload:
+	0x0000:  7365 7420 7072 696d 6172 7920 6164 6472  set.primary.addr
+	0x0010:  6573 7300                                ess.]
+   22  2023-05-16 21:05:30.514137 IP (tos 0x2,ECT(0), ttl 64, id 9, offset 0, flags [DF], proto SCTP (132), length 64)
+    192.168.5.1.36296 > 192.168.5.2.36297: sctp
+	1) [ASCONF] [SEQ: 1890701203, ADDR: 192.168.5.1] [DEL ADDR: C-ID: 0, ADDR: 192.168.5.3] 
+   23  2023-05-16 21:05:30.514145 IP (tos 0x2,ECT(0), ttl 64, id 44880, offset 0, flags [DF], proto SCTP (132), length 40)
+    192.168.5.2.36297 > 192.168.5.1.36296: sctp
+	1) [ASCONF-ACK] [SEQ: 1890701203] 
+   24  2023-05-16 21:05:30.718033 IP (tos 0x2,ECT(0), ttl 64, id 10, offset 0, flags [DF], proto SCTP (132), length 80)
+    192.168.5.1.36296 > 192.168.5.2.36297: sctp
+	1) [SACK] [cum ack 3973583670] [a_rwnd 106496] [#gap acks 0] [#dup tsns 0] 
+	2) [DATA] (B)(E) [TSN: 1890701205] [SID: 0] [SSEQ 4] [PPID 0x0] [Payload:
+	0x0000:  7265 6d6f 7665 2061 6464 7265 7373 00    remove.address.]
+   25  2023-05-16 21:05:30.718039 IP (tos 0x2,ECT(0), ttl 64, id 44881, offset 0, flags [DF], proto SCTP (132), length 48)
+    192.168.5.2.36297 > 192.168.5.1.36296: sctp
+	1) [SACK] [cum ack 1890701204] [a_rwnd 106496] [#gap acks 0] [#dup tsns 0] 
+   26  2023-05-16 21:05:30.718097 IP (tos 0x2,ECT(0), ttl 64, id 44882, offset 0, flags [DF], proto SCTP (132), length 80)
+    192.168.5.2.36297 > 192.168.5.1.36296: sctp
+	1) [SACK] [cum ack 1890701205] [a_rwnd 106496] [#gap acks 0] [#dup tsns 0] 
+	2) [DATA] (B)(E) [TSN: 3973583671] [SID: 0] [SSEQ 4] [PPID 0x0] [Payload:
+	0x0000:  7265 6d6f 7665 2061 6464 7265 7373 00    remove.address.]
+   27  2023-05-16 21:05:30.718123 IP (tos 0x2,ECT(0), ttl 64, id 11, offset 0, flags [DF], proto SCTP (132), length 40)
+    192.168.5.1.36296 > 192.168.5.2.36297: sctp
+	1) [SHUTDOWN] 
+   28  2023-05-16 21:05:30.718131 IP (tos 0x2,ECT(0), ttl 64, id 44883, offset 0, flags [DF], proto SCTP (132), length 36)
+    192.168.5.2.36297 > 192.168.5.1.36296: sctp
+	1) [SHUTDOWN ACK] 
+   29  2023-05-16 21:05:30.718162 IP (tos 0x2,ECT(0), ttl 64, id 12, offset 0, flags [DF], proto SCTP (132), length 36)
+    192.168.5.1.36296 > 192.168.5.2.36297: sctp
+	1) [SHUTDOWN COMPLETE] 
