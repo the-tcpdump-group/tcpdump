@@ -29,12 +29,10 @@
 /* \summary: Babel Routing Protocol printer */
 /* Specifications:
  *
- * RFC 6126
- * RFC 7298
- * RFC 7557
- * draft-ietf-babel-rfc6126bis-17
- * draft-ietf-babel-hmac-10
- * draft-ietf-babel-source-specific-0
+ * RFC 8966
+ * RFC 8967
+ * RFC 9079
+ * RFC 9229
  */
 
 #include <config.h>
@@ -207,7 +205,7 @@ network_prefix(int ae, int plen, unsigned int omitted,
 
     if(plen >= 0)
         pb = (plen + 7) / 8;
-    else if(ae == 1)
+    else if(ae == 1 || ae == 4)
         pb = 4;
     else
         pb = 16;
@@ -220,6 +218,7 @@ network_prefix(int ae, int plen, unsigned int omitted,
     switch(ae) {
     case 0: break;
     case 1:
+    case 4:
         if(omitted > 4 || pb > 4 || (pb > omitted && len < pb - omitted))
             return -1;
         memcpy(prefix, v4prefix, 12);
@@ -382,6 +381,8 @@ babel_print_v2_tlvs(netdissect_options *ndo,
     u_char v4_prefix[16] =
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF, 0, 0, 0, 0 };
     u_char v6_prefix[16] = {0};
+    u_char v4viav6_prefix[16] =
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF, 0, 0, 0, 0 };
 
     i = 0;
     while(i < tlvs_length) {
@@ -536,31 +537,45 @@ babel_print_v2_tlvs(netdissect_options *ndo,
                 u_char ae, plen;
                 int rc;
                 u_char prefix[16];
+                u_char *update_prefix;
                 ND_PRINT("\n\tUpdate");
                 if(len < 10) goto invalid;
                 ae = GET_U_1(message + 2);
-                plen = GET_U_1(message + 4) + (GET_U_1(message + 2) == 1 ? 96 : 0);
+                switch(ae) {
+                case 0:
+                case 2:
+                case 3:
+                    update_prefix = v6_prefix;
+                    break;
+                case 1:
+                    update_prefix = v4_prefix;
+                    break;
+                case 4:
+                    update_prefix = v4viav6_prefix;
+                    break;
+                default:
+                    goto invalid;
+                }
+                plen = GET_U_1(message + 4) + ((ae == 1 || ae == 4) ? 96 : 0);
                 rc = network_prefix(ae,
                                     GET_U_1(message + 4),
                                     GET_U_1(message + 5),
                                     message + 12,
-                                    GET_U_1(message + 2) == 1 ? v4_prefix : v6_prefix,
+                                    update_prefix,
                                     len - 10, prefix);
                 if(rc < 0) goto invalid;
                 interval = GET_BE_U_2(message + 6);
                 seqno = GET_BE_U_2(message + 8);
                 metric = GET_BE_U_2(message + 10);
-                ND_PRINT("%s%s%s %s metric %u seqno %u interval %s",
+                ND_PRINT("%s%s%s %s metric %u seqno %u interval %s%s",
                        (GET_U_1(message + 3) & 0x80) ? "/prefix": "",
                        (GET_U_1(message + 3) & 0x40) ? "/id" : "",
                        (GET_U_1(message + 3) & 0x3f) ? "/unknown" : "",
                        ae == 0 ? "any" : format_prefix(ndo, prefix, plen),
-                       metric, seqno, format_interval_update(interval));
+                       metric, seqno, format_interval_update(interval),
+                       ae == 4 ? " (v4-via-v6)" : "");
                 if(GET_U_1(message + 3) & 0x80) {
-                    if(GET_U_1(message + 2) == 1)
-                        memcpy(v4_prefix, prefix, 16);
-                    else
-                        memcpy(v6_prefix, prefix, 16);
+                    memcpy(update_prefix, prefix, 16);
                 }
                 /* extra data? */
                 if((u_int)rc < len - 10)
@@ -583,8 +598,9 @@ babel_print_v2_tlvs(netdissect_options *ndo,
                                     GET_U_1(message + 3), 0,
                                     message + 4, NULL, len - 2, prefix);
                 if(rc < 0) goto invalid;
-                ND_PRINT("for %s",
-                       ae == 0 ? "any" : format_prefix(ndo, prefix, plen));
+                ND_PRINT("for %s%s",
+                       ae == 0 ? "any" : format_prefix(ndo, prefix, plen),
+                       ae == 4 ? " (v4-via-v6)" : "");
             }
         }
             break;
@@ -605,10 +621,11 @@ babel_print_v2_tlvs(netdissect_options *ndo,
                                     message + 16, NULL, len - 14, prefix);
                 if(rc < 0) goto invalid;
                 plen = GET_U_1(message + 3) + (GET_U_1(message + 2) == 1 ? 96 : 0);
-                ND_PRINT("(%u hops) for %s seqno %u id %s",
+                ND_PRINT("(%u hops) for %s seqno %u id %s%s",
                        GET_U_1(message + 6),
                        ae == 0 ? "invalid AE 0" : format_prefix(ndo, prefix, plen),
-                       seqno, format_id(ndo, message + 8));
+                       seqno, format_id(ndo, message + 8),
+                       ae == 4 ? " (v4-via-v6)" : "");
             }
         }
             break;
@@ -711,6 +728,9 @@ babel_print_v2_tlvs(netdissect_options *ndo,
                     ND_PRINT("for (%s, ", format_prefix(ndo, prefix, plen));
                     ND_PRINT("%s)", format_prefix(ndo, src_prefix, src_plen));
                 }
+                if(ae == 4) {
+                    ND_PRINT(" (v4-via-v6)");
+                }
             }
         }
             break;
@@ -747,6 +767,9 @@ babel_print_v2_tlvs(netdissect_options *ndo,
                 ND_PRINT("%s) seqno %u id %s",
                           format_prefix(ndo, src_prefix, src_plen),
                           seqno, format_id(ndo, router_id));
+                if(ae == 4) {
+                    ND_PRINT(" (v4-via-v6)");
+                }
             }
         }
             break;

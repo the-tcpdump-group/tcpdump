@@ -1,0 +1,7 @@
+    1  22:48:47.963276 IP6 (class 0xc0, flowlabel 0xad6f7, hlim 1, next-header UDP (17) payload length: 96) fe80::e2e5:cfff:fe7e:4d5e.6696 > ff02::1:6.6696: [udp sum ok] babel 2 (84)
+	Hello seqno 7855 interval 4.00s
+	IHU fe80::1bd9:58fb:b1bf:915e rxcost 409 interval 12.00s
+	Router Id b2:d5:cc:ff:fe:47:02:a9
+	Update 192.168.6.2/32 metric 0 seqno 39228 interval 16.00s (v4-via-v6)
+	Update 192.168.7.2/32 metric 0 seqno 39228 interval 16.00s (v4-via-v6)
+	Update 192.168.8.1/32 metric 0 seqno 39228 interval 16.00s (v4-via-v6)
