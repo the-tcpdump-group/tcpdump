@@ -28,5 +28,12 @@ unsupported_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 {
 	ndo->ndo_protocol = "unsupported";
 	nd_print_protocol_caps(ndo);
-	hex_and_ascii_print(ndo, "\n\t", p, h->caplen);
+	/*
+	 * There is nothing to decode, so print the packet bytes instead.
+	 * pretty_print_packet() already does that when -A, -x or -X is
+	 * specified, so do it here only when it will not, otherwise the
+	 * same bytes are printed twice.
+	 */
+	if (!ndo->ndo_Aflag && !ndo->ndo_xflag && !ndo->ndo_Xflag)
+		hex_and_ascii_print(ndo, "\n\t", p, h->caplen);
 }
