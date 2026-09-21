@@ -71,7 +71,6 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Detect OS IPv6 support using AF_INET6 only.
       Remove all remaining support for BSD/OS, IRIX, {OSF/1, Digital Unix,
         Tru64 Unix}, SINIX and Ultrix.
-      Fix compiling on GNU/Hurd.
       Make illumos build warning-free.
       Makefile.in: Update the .c.o build rule (Remove hacks for old SunOS 4).
       Autoconf: fix buggy tests for ether_ntohost().
@@ -79,14 +78,13 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
         .devel file does not exists.
       tests: On HP-UX use "diff -c" by default.
       Reimplement the tests similarly to libpcap.
-      CI: Implement cross-compiling with libpcap.
       Autoconf: Add QNX support to AC_LBL_LIBRARY_NET().
       Autoconf: Update config.{guess,sub}, timestamps 2025-07-10.
     Documentation:
       Add a README.qnx.md file.
 
-DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
-  Summary for 4.99.7 tcpdump release (so far!)
+Monday, September 21, 2026 / The Tcpdump Group
+  Summary for 4.99.7 tcpdump release
     Source code:
       NetFlow: Use tcp_flag_values[] for TCP flags.
       Disregard setlinebuf(3), always use setvbuf(3).
@@ -101,6 +99,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
        Print an error message about --count without -r or -V.
     Building and testing:
       Treat SA_RESTART as optional.
+      CI: Implement cross-compiling with libpcap.
+      Fix compiling on GNU/Hurd.
     QNX:
       Use a lower packet buffer timeout.
 
