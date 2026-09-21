@@ -1,5 +1,5 @@
-DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
-  Summary for 4.99.7 tcpdump release (so far!)
+Monday, September 21, 2026 / The Tcpdump Group
+  Summary for 4.99.7 tcpdump release
     Source code:
       NetFlow: Use tcp_flag_values[] for TCP flags.
       Disregard setlinebuf(3), always use setvbuf(3).
