@@ -39,6 +39,10 @@ tcpdump \- dump traffic on a network
 .I count
 ]
 [
+.B \-\-charset
+.I charset
+]
+[
 .B \-\-count
 ]
 [
@@ -281,6 +285,9 @@ No effect when
 or
 .B \-X[X]
 options are used.
+See
+.B \-\-charset
+for printing non-ASCII text.
 .TP
 .B \-b
 Print the AS number in BGP packets using "asdot" rather than "asplain"
@@ -293,6 +300,36 @@ representation, in RFC 5396 terms.
 .PD
 Set the operating system capture buffer size to \fIbuffer_size\fP, in
 units of KiB (1024 bytes).
+.TP
+.BI \-\-charset= charset
+Select the character set used to print packet data as text with the
+.BR \-A " and " \-X
+options.
+\fIcharset\fP is one of \fBascii\fP (the default) and \fButf\-8\fP.
+.IP
+With \fBascii\fP, printable ASCII characters are printed as is and every
+other byte is printed as ``.''.
+.IP
+With \fButf\-8\fP, a well-formed UTF-8 sequence that encodes a letter, a
+digit, a punctuation character or a symbol is printed as is, followed by
+up to two combining marks that are printed together with it.
+Everything else is printed as one ``.'' per byte: malformed and truncated
+sequences, control and format characters (including bidirectional
+controls and zero-width characters), separators other than space,
+private use, unassigned and otherwise invisible code points.
+The output therefore cannot carry terminal control sequences or
+invisible text.
+The classification does not depend on the locale, so the output is the
+same on every platform; the terminal must be set to UTF-8 for it to
+display correctly.
+.IP
+With
+.BR \-X ,
+each byte of the packet still takes exactly one column of the text
+dump: a multi-byte character is printed at the position of its first
+byte, followed by one space per additional byte.  A wide (two-column)
+character that starts at the last position of a line is printed at the
+beginning of the next line instead.
 .TP
 .BI \-c " count"
 Exit after receiving or reading \fIcount\fP packets.
@@ -1014,6 +1051,9 @@ When parsing and printing,
 in addition to printing the headers of each packet, print the data of
 each packet (minus its link level header) in hex and ASCII.
 This is very handy for analysing new protocols.
+See
+.B \-\-charset
+for printing non-ASCII text.
 In the current implementation this flag may have the same effect as
 .B \-XX
 if the packet is truncated.

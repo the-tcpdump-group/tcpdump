@@ -20,6 +20,13 @@ print-A		print-flags.pcap	print-A.out	-A
 print-AA	print-flags.pcap	print-AA.out	-AA
 print-sampling print-flags.pcap print-sampling.out --print-sampling=3
 
+# Text dumps of UTF-8 payloads with --charset (see gen-unicode-tables.py).
+# The -ascii variants check that the default output is unchanged.
+utf8-A		utf8.pcap	utf8-A.out	-A --charset=utf-8
+utf8-X		utf8.pcap	utf8-X.out	-X --charset=utf-8
+utf8-ascii-A	utf8.pcap	utf8-ascii-A.out	-A --charset=ascii
+utf8-ascii-X	utf8.pcap	utf8-ascii-X.out	-X
+
 # TCP with data in the RST segment
 tcp_rst_data-v tcp_rst_data.pcap tcp_rst_data-v.out -v
 tcp_rst_data tcp_rst_data.pcap tcp_rst_data.out

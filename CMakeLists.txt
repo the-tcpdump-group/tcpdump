@@ -1445,6 +1445,7 @@ set(NETDISSECT_SOURCE_LIST_C
     ${LOCALSRC}
     signature.c
     strtoaddr.c
+    utf8.c
     util-print.c
 )
 
