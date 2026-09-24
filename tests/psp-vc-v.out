@@ -1,0 +1,2 @@
+    1  2024-11-20 18:08:21.130000 IP (tos 0x0, ttl 64, id 4660, offset 0, flags [DF], proto UDP (17), length 88)
+    10.1.2.3.44481 > 10.4.5.6.1000: PSP (ver 0, spi 0x1a2b3c4d, phase 0, cryptoff 7, iv 0x0000000067b8a100, vc 0x0102030405060708): 8080 > 9000: Flags [S], cksum 0x7dac (correct), seq 123456789, win 65535, length 0
