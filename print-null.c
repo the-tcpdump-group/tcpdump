@@ -28,6 +28,7 @@
 #define ND_LONGJMP_FROM_TCHECK
 #include "netdissect.h"
 #include "extract.h"
+#include "byteswap.h"
 #include "af.h"
 
 
@@ -42,14 +43,6 @@
  * is in network byte order.
  */
 #define	NULL_HDRLEN 4
-
-/*
- * Byte-swap a 32-bit number.
- * ("htonl()" or "ntohl()" won't work - we want to byte-swap even on
- * big-endian platforms.)
- */
-#define	SWAPLONG(y) \
-((((y)&0xff)<<24) | (((y)&0xff00)<<8) | (((y)&0xff0000)>>8) | (((y)>>24)&0xff))
 
 static void
 null_hdr_print(netdissect_options *ndo, uint32_t family, u_int length)
@@ -93,7 +86,7 @@ null_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 	 * If the upper 16 bits aren't all zero, assume it's byte-swapped.
 	 */
 	if ((family & 0xFFFF0000) != 0)
-		family = SWAPLONG(family);
+		family = ND_BSWAP_32(family);
 
 	if (ndo->ndo_eflag)
 		null_hdr_print(ndo, family, length);
