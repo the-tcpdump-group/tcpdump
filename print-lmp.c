@@ -788,7 +788,7 @@ lmp_print(netdissect_options *ndo,
                 ND_PRINT("\n\t    Verify Transport Mechanism: %u (0x%x)%s",
 			GET_BE_U_2(obj_tptr + 10),
 			GET_BE_U_2(obj_tptr + 10),
-			GET_BE_U_2(obj_tptr + 10)&8000 ? " (Payload test messages capable)" : "");
+			GET_BE_U_2(obj_tptr + 10)&0x8000 ? " (Payload test messages capable)" : "");
 		ND_PRINT("\n\t    Transmission Rate: %.3f Mbps",
 			GET_BE_F_4(obj_tptr + 12)*8/1000000);
 		ND_PRINT("\n\t    Wavelength: %u",
