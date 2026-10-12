@@ -2365,6 +2365,10 @@ ikev2_auth_print(netdissect_options *ndo, u_char tpay,
 	 */
 	ND_PRINT(" len=%u method=%s", item_len-4,
 		  STR_OR_ID(GET_U_1(p->auth_method), v2_auth));
+	if (item_len < sizeof(struct ikev2_auth)) {
+		ND_PRINT(" [payload too short]");
+		return (const u_char *)ext + item_len;
+	}
 	if (item_len > 4) {
 		if (ndo->ndo_vflag > 1) {
 			ND_PRINT(" authdata=(");
