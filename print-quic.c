@@ -183,21 +183,23 @@ quic_print_packet(netdissect_options *ndo, const u_char *bp, const u_char *end)
 		if (dcil > 0  && dcil <= QUIC_MAX_CID_LENGTH) {
 			memset(dcid, 0, sizeof(dcid));
 			GET_CPY_BYTES(&dcid, bp, dcil);
-			bp += dcil;
 			ND_PRINT(", dcid ");
 			hexprint(ndo, dcid, dcil);
 			register_quic_cid(dcid, dcil);
 		}
+		if (dcil > 0)
+			bp += dcil;
 		scil = GET_U_1(bp);
 		bp += 1;
 		if (scil > 0 && scil <= QUIC_MAX_CID_LENGTH) {
 			memset(scid, 0, sizeof(dcid));
 			GET_CPY_BYTES(&scid, bp, scil);
-			bp += scil;
 			ND_PRINT(", scid ");
 			hexprint(ndo, scid, scil);
 			register_quic_cid(scid, scil);
 		}
+		if (scil > 0)
+			bp += scil;
 		if (version == 0) {
 			/* Version Negotiation packet */
 			while (bp < end) {
@@ -216,11 +218,14 @@ quic_print_packet(netdissect_options *ndo, const u_char *bp, const u_char *end)
 				bp += vli_length;
 				if (token_length > 0 && token_length < 1000) {
 					token = nd_malloc(ndo, (size_t)token_length);
-					GET_CPY_BYTES(token, bp, (size_t)token_length);
-					bp += token_length;
-					ND_PRINT(", token ");
-					hexprint(ndo, token, (size_t)token_length);
+					if (token != NULL) {
+						GET_CPY_BYTES(token, bp, (size_t)token_length);
+						ND_PRINT(", token ");
+						hexprint(ndo, token, (size_t)token_length);
+					}
 				}
+				if (token_length > 0)
+					bp += token_length;
 			}
 			if (packet_type == QUIC_LH_TYPE_RETRY) {
 				ND_PRINT(", token ");
@@ -228,9 +233,13 @@ quic_print_packet(netdissect_options *ndo, const u_char *bp, const u_char *end)
 				    ND_TTEST_LEN(bp, end - bp - 16)) {
 					token_length = end - bp - 16;
 					token = nd_malloc(ndo, (size_t)token_length);
-					GET_CPY_BYTES(token, bp, (size_t)token_length);
-					bp += token_length;
-					hexprint(ndo, token, (size_t)token_length);
+					if (token != NULL) {
+						GET_CPY_BYTES(token, bp, (size_t)token_length);
+						bp += token_length;
+						hexprint(ndo, token, (size_t)token_length);
+					} else {
+						nd_print_trunc(ndo);
+					}
 				} else {
 					nd_print_trunc(ndo);
 				}
