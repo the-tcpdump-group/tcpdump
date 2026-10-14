@@ -12,6 +12,15 @@
 /* Define to 1 if you have the `bpf_dump' function. */
 #cmakedefine HAVE_BPF_DUMP 1
 
+/* Define to 1 if you have the '__builtin_bswap16' compiler builtin. */
+#cmakedefine HAVE_BUILTIN_BSWAP16 1
+
+/* Define to 1 if you have the '__builtin_bswap32' compiler builtin. */
+#cmakedefine HAVE_BUILTIN_BSWAP32 1
+
+/* Define to 1 if you have the '__builtin_bswap64' compiler builtin. */
+#cmakedefine HAVE_BUILTIN_BSWAP64 1
+
 /* capsicum support available */
 #cmakedefine HAVE_CAPSICUM 1
 
