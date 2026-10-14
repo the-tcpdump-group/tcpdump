@@ -36,6 +36,76 @@ fi
 AC_LBL_C_INIT(V_CCOPT, V_INCLS)
 
 #
+# To get a correct builtin test result, the source must be compiled and linked,
+# which in Autoconf means AC_LINK_IFELSE().
+#
+# Different builtins require different methods of testing, see the comments
+# about HAVE_BUILTIN_BSWAPnn in pcap-util.h and HAVE_BUILTIN_CTZ in optimize.c.
+#
+AC_MSG_CHECKING([whether the compiler implements __builtin_bswap16()])
+AC_LINK_IFELSE(
+	[AC_LANG_SOURCE([[
+int main(int argc, char **argv)
+{
+	switch (argc) {
+	case __builtin_bswap16(0):
+		return 0;
+	default:
+		return 1;
+	}
+}
+	]])],
+	[
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(HAVE_BUILTIN_BSWAP16, 1,
+			[Define to 1 if you have the '__builtin_bswap16' compiler builtin.])
+	],
+	[AC_MSG_RESULT(no)]
+)
+
+AC_MSG_CHECKING([whether the compiler implements __builtin_bswap32()])
+AC_LINK_IFELSE(
+	[AC_LANG_SOURCE([[
+int main(int argc, char **argv)
+{
+	switch (argc) {
+	case __builtin_bswap32(0):
+		return 0;
+	default:
+		return 1;
+	}
+}
+	]])],
+	[
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(HAVE_BUILTIN_BSWAP32, 1,
+			[Define to 1 if you have the '__builtin_bswap32' compiler builtin.])
+	],
+	[AC_MSG_RESULT(no)]
+)
+
+AC_MSG_CHECKING([whether the compiler implements __builtin_bswap64()])
+AC_LINK_IFELSE(
+	[AC_LANG_SOURCE([[
+int main(int argc, char **argv)
+{
+	switch (argc) {
+	case __builtin_bswap64(0):
+		return 0;
+	default:
+		return 1;
+	}
+}
+	]])],
+	[
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(HAVE_BUILTIN_BSWAP64, 1,
+			[Define to 1 if you have the '__builtin_bswap64' compiler builtin.])
+	],
+	[AC_MSG_RESULT(no)]
+)
+
+#
 # Test for ONC RPC headers.
 #
 # XXX - we should supply copies of these, as I think Sun released them
