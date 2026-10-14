@@ -2,6 +2,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
   Summary for 5.0.0 tcpdump release (so far!)
     Add protocol decoding for:
       ERSPAN: Add support
+      PSP: Add support
     Refine protocol decoding for:
       BFD: Add support for S-BFD and spell LAG in uppercase.
       BGP: Parse BGP extended message support capability
@@ -49,6 +50,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Add --skip option to skip some packets before writing or printing.
       Use a common routine to parse numerical arguments and check its value.
       Add "geneve" as an option for -T.
+      Add --psp option to dissect PSP packets.
+      Add "psp" as an option for -T.
     Source code:
       Drop support for building with versions of libpcap that don't
         support all the libpcap 1.0 APIs.

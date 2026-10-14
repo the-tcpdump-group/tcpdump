@@ -723,6 +723,7 @@ show_remote_devices_and_exit(void)
 #define OPTION_LENGTHS			138
 #define OPTION_TIME_T_SIZE		139
 #define OPTION_SKIP			140
+#define OPTION_PSP			141
 
 static const struct option longopts[] = {
 	{ "buffer-size", required_argument, NULL, 'B' },
@@ -768,6 +769,7 @@ static const struct option longopts[] = {
 	{ "ip-oneline", no_argument, NULL, 'g' },
 	{ "skip", required_argument, NULL, OPTION_SKIP },
 	{ "version", no_argument, NULL, OPTION_VERSION },
+	{ "psp", no_argument, NULL, OPTION_PSP },
 	{ NULL, 0, NULL, 0 }
 };
 
@@ -2052,6 +2054,8 @@ main(int argc, char **argv)
 				ndo->ndo_packettype = PT_QUIC;
 			else if (ascii_strcasecmp(optarg, "geneve") == 0)
 				ndo->ndo_packettype = PT_GENEVE;
+			else if (ascii_strcasecmp(optarg, "psp") == 0)
+				ndo->ndo_packettype = PT_PSP;
 			else
 				error("unknown packet type '%s'", optarg);
 			break;
@@ -2125,6 +2129,10 @@ main(int argc, char **argv)
 
 		case OPTION_LENGTHS:
 			ndo->ndo_lengths = 1;
+			break;
+
+		case OPTION_PSP:
+			ndo->ndo_psp = 1;
 			break;
 
 		case OPTION_TIME_T_SIZE:
@@ -3592,7 +3600,7 @@ print_usage(FILE *f)
 "\t\t" m_FLAG_USAGE "\n");
 #endif
 	(void)fprintf(f,
-"\t\t" M_FLAG_USAGE "[ --number ] [ --print ]\n");
+"\t\t" M_FLAG_USAGE "[ --number ] [ --print ] [ --psp ]\n");
 	(void)fprintf(f,
 "\t\t[ --print-sampling nth ] [ -Q in|out|inout ] [ -r file ]\n");
 	(void)fprintf(f,

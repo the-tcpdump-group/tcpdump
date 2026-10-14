@@ -1,0 +1,2 @@
+    1  2026-06-03 17:32:12.607726 IP6 2002:a05:6008:c2c1:b0:2a6:ae93:a71c.43060 > 2002:a05:6028:80a:b0:50b:6f57:ece3.1000: PSP (spi 0x00062a2d, phase 0): 33168 > 4001: [TCP header encrypted beyond ports, cryptoff 1]
+    2  2026-06-03 17:32:12.607726 IP6 2002:a05:6008:c2c1:b0:2a5:ae06:f9f1.41274 > 2002:a05:6004:506:b0:364:58e4:c41b.1000: PSP (spi 0x000c180d, phase 1): 4501 > 48240: [TCP header encrypted beyond ports, cryptoff 1]
