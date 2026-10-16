@@ -254,6 +254,9 @@ struct netdissect_options {
   /* stack of saved packet boundary and buffer information */
   struct netdissect_saved_packet_info *ndo_packet_info_stack;
 
+  /* depth of nested dissector recursion for the current packet */
+  unsigned int ndo_nesting_depth;
+
   /* pointer to the if_printer function */
   if_printer ndo_if_printer;
 
@@ -275,6 +278,23 @@ struct netdissect_options {
 		      const char *fmt, ...)
 		      PRINTFLIKE_FUNCPTR(2, 3);
 };
+
+/*
+ * Maximum depth for dissectors that recurse into themselves (nested
+ * tunnels, TLV templates, payload chains...).  A dissector that is about
+ * to recurse must bracket the recursive call with nd_nesting_enter() and
+ * nd_nesting_leave() and must bail out when nd_nesting_enter() returns 0.
+ * The counter is reset for every packet in print.c.
+ *
+ * 32 levels is far beyond anything legitimate traffic needs (real tunnel
+ * stacks are at most a handful of layers deep) and small enough that even
+ * a thread with a 128 KiB stack cannot be exhausted: the measured worst
+ * case among the guarded dissectors is about 1 KiB of stack per level.
+ */
+#define ND_MAX_NESTING_DEPTH 32
+
+extern WARN_UNUSED_RESULT int nd_nesting_enter(netdissect_options *);
+extern void nd_nesting_leave(netdissect_options *);
 
 extern WARN_UNUSED_RESULT int nd_push_buffer(netdissect_options *, u_char *, const u_char *, const u_int);
 extern WARN_UNUSED_RESULT int nd_push_snaplen(netdissect_options *, const u_char *, const u_int);

@@ -1,0 +1,49 @@
+    1  1970-01-01 00:00:00.000000 IP (tos 0x0, ttl 64, id 1, offset 0, flags [DF], proto UDP (17), length 1176)
+    10.0.0.1.500 > 10.0.0.2.500: isakmp 1.0 msgid 00000000: phase 1 ? ident:
+    (sa: doi=ipsec situation=identity
+        (p: #1 protoid=isakmp transform=1
+            (t: #1 id=ike )
+            (sa: doi=ipsec situation=identity
+                (p: #1 protoid=isakmp transform=1
+                    (t: #1 id=ike )
+                    (sa: doi=ipsec situation=identity
+                        (p: #1 protoid=isakmp transform=1
+                            (t: #1 id=ike )
+                            (sa: doi=ipsec situation=identity
+                                (p: #1 protoid=isakmp transform=1
+                                    (t: #1 id=ike )
+                                    (sa: doi=ipsec situation=identity
+                                        (p: #1 protoid=isakmp transform=1
+                                            (t: #1 id=ike )
+                                            (sa: doi=ipsec situation=identity
+                                                (p: #1 protoid=isakmp transform=1
+                                                    (t: #1 id=ike )
+                                                    (sa: doi=ipsec situation=identity
+                                                        (p: #1 protoid=isakmp transform=1
+                                                            (t: #1 id=ike )
+                                                            (sa: doi=ipsec situation=identity
+                                                                (p: #1 protoid=isakmp transform=1
+                                                                    (t: #1 id=ike )
+                                                                    (sa: doi=ipsec situation=identity
+                                                                        (p: #1 protoid=isakmp transform=1
+                                                                            (t: #1 id=ike )
+                                                                            (sa: doi=ipsec situation=identity
+                                                                                (p: #1 protoid=isakmp transform=1
+                                                                                    (t: #1 id=ike )
+                                                                                    (sa: doi=ipsec situation=identity
+                                                                                        (p: #1 protoid=isakmp transform=1
+                                                                                            (t: #1 id=ike )
+                                                                                            (sa: doi=ipsec situation=identity
+                                                                                                (p: #1 protoid=isakmp transform=1
+                                                                                                    (t: #1 id=ike )
+                                                                                                    (sa: doi=ipsec situation=identity
+                                                                                                        (p: #1 protoid=isakmp transform=1
+                                                                                                            (t: #1 id=ike )
+                                                                                                            (sa: doi=ipsec situation=identity
+                                                                                                                (p: #1 protoid=isakmp transform=1
+                                                                                                                    (t: #1 id=ike )
+                                                                                                                    (sa: doi=ipsec situation=identity
+                                                                                                                        (p: #1 protoid=isakmp transform=1
+                                                                                                                            (t: #1 id=ike )
+                                                                                                                            (sa: doi=ipsec situation=identity
+                                                                                                                                ([nesting too deep] [|isakmp]

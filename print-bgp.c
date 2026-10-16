@@ -3149,7 +3149,12 @@ bgp_notification_print_code(netdissect_options *ndo,
             bgpn_major = GET_U_1(dat++);
             bgpn_minor = GET_U_1(dat++);
             length -= 2;
+            if (!nd_nesting_enter(ndo)) {
+                ND_PRINT(" [nesting too deep]");
+                nd_trunc_longjmp(ndo);
+            }
             bgp_notification_print_code(ndo, dat, length, bgpn_major, bgpn_minor);
+            nd_nesting_leave(ndo);
         }
         break;
     default:

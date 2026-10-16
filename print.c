@@ -401,6 +401,7 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 
 	ndo->ndo_protocol = "";
 	ndo->ndo_ll_hdr_len = 0;
+	ndo->ndo_nesting_depth = 0;
 	switch (setjmp(ndo->ndo_early_end)) {
 	case 0:
 		/* Print the packet. */

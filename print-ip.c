@@ -490,9 +490,14 @@ ip_print(netdissect_options *ndo,
 		 * Call ip_demux_print() with the payload length computed
 		 * from the minimum of ( packet containing length, IP length ).
 		 */
+		if (!nd_nesting_enter(ndo)) {
+			ND_PRINT(" [nesting too deep]");
+			nd_trunc_longjmp(ndo);
+		}
 		ip_demux_print(ndo, (const u_char *)ip + hlen,
 			       ND_MIN(length - hlen, len), 4, off & IP_MF,
 			       GET_U_1(ip->ip_ttl), nh, bp);
+		nd_nesting_leave(ndo);
 	} else {
 		/*
 		 * Ultra quiet now means that all this stuff should be

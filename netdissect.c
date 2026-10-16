@@ -263,6 +263,24 @@ nd_pop_all_packet_info(netdissect_options *ndo)
 		nd_pop_packet_info(ndo);
 }
 
+/*
+ * See the comment near ND_MAX_NESTING_DEPTH in netdissect.h.
+ */
+int
+nd_nesting_enter(netdissect_options *ndo)
+{
+	if (ndo->ndo_nesting_depth >= ND_MAX_NESTING_DEPTH)
+		return (0);
+	ndo->ndo_nesting_depth++;
+	return (1);
+}
+
+void
+nd_nesting_leave(netdissect_options *ndo)
+{
+	ndo->ndo_nesting_depth--;
+}
+
 NORETURN void
 nd_trunc_longjmp(netdissect_options *ndo)
 {

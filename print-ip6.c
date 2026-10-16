@@ -499,8 +499,13 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 					len -= total_advance;
 				}
 			}
+			if (!nd_nesting_enter(ndo)) {
+				ND_PRINT(" [nesting too deep]");
+				nd_trunc_longjmp(ndo);
+			}
 			ip_demux_print(ndo, cp, len, 6, fragmented,
 				       GET_U_1(ip6->ip6_hlim), nh, bp);
+			nd_nesting_leave(ndo);
 			nd_pop_packet_info(ndo);
 			return;
 		}

@@ -1042,3 +1042,11 @@ bigtcp-ipv6-geneve-ipv6		bigtcp-ipv6-geneve-ipv6.pcap	bigtcp-ipv6-geneve-ipv6.ou
 bigtcp-ipv6-vxlan-ipv4		bigtcp-ipv6-vxlan-ipv4.pcap	bigtcp-ipv6-vxlan-ipv4.out	-v
 bigtcp-ipv6-vxlan-ipv6		bigtcp-ipv6-vxlan-ipv6.pcap	bigtcp-ipv6-vxlan-ipv6.out	-v
 icmp-length-zero		icmp-length-zero.pcapng		icmp-length-zero.out		-v
+
+# Unbounded-recursion regression tests: deeply nested protocol structures
+# must be rejected with "[nesting too deep]" instead of exhausting the
+# stack (nd_nesting_enter() / ND_MAX_NESTING_DEPTH).
+forces_nest_deep	forces_nest_deep.pcap	forces_nest_deep.out
+ipip_nest_deep	ipip_nest_deep.pcap	ipip_nest_deep.out
+isakmp_nest_deep-v	isakmp_nest_deep.pcap	isakmp_nest_deep-v.out	-v
+bgp_hardreset_nest_deep-v	bgp_hardreset_nest_deep.pcap	bgp_hardreset_nest_deep-v.out	-v

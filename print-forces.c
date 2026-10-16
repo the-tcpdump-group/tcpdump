@@ -948,6 +948,7 @@ pdatacnt_print(netdissect_options *ndo,
 		}
 		if (pd_valid(type)) {
 			const struct pdata_ops *ops = get_forces_pd(type);
+			int rc;
 
 			if (ndo->ndo_vflag >= 3 && ops->v != F_TLV_PDAT) {
 				if (pad)
@@ -960,9 +961,15 @@ pdatacnt_print(netdissect_options *ndo,
 
 			chk_op_type(ndo, type, op_msk, ops->op_msk);
 
-			ND_ICHECK_U(ops->print(ndo, (const u_char *)pdtlv,
-				    tll + pad + TLV_HDRL, op_msk, indent + 2),
-				    ==, -1);
+			/* the F_TLV_PDAT handler recurses into recpdoptlv_print() */
+			if (!nd_nesting_enter(ndo)) {
+				ND_PRINT("[nesting too deep]");
+				nd_trunc_longjmp(ndo);
+			}
+			rc = ops->print(ndo, (const u_char *)pdtlv,
+					tll + pad + TLV_HDRL, op_msk, indent + 2);
+			nd_nesting_leave(ndo);
+			ND_ICHECK_U(rc, ==, -1);
 			len -= (TLV_HDRL + pad + tll);
 		} else {
 			ND_PRINT("Invalid path data content type 0x%x len %u\n",
@@ -1038,9 +1045,14 @@ pdata_print(netdissect_options *ndo,
 		pptr += consumed;
 		len = more_pd;
 		/* XXX: Argh, recurse some more */
-		return recpdoptlv_print(ndo, pptr, len, op_msk, indent+1);
-	} else
-		return more_pd;
+		if (!nd_nesting_enter(ndo)) {
+			ND_PRINT("[nesting too deep]");
+			nd_trunc_longjmp(ndo);
+		}
+		more_pd = recpdoptlv_print(ndo, pptr, len, op_msk, indent+1);
+		nd_nesting_leave(ndo);
+	}
+	return more_pd;
 
 invalid:
 	return -1;

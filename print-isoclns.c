@@ -1101,8 +1101,12 @@ clnp_print(netdissect_options *ndo,
         case	CLNP_PDU_ERP:
             if (GET_U_1(pptr) == NLPID_CLNP) {
                 ND_PRINT("\n\t-----original packet-----\n\t");
-                /* FIXME recursion protection */
+                if (!nd_nesting_enter(ndo)) {
+                    ND_PRINT("[nesting too deep]");
+                    nd_trunc_longjmp(ndo);
+                }
                 clnp_print(ndo, pptr, length - li);
+                nd_nesting_leave(ndo);
                 break;
             }
 

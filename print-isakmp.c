@@ -3010,7 +3010,12 @@ ike_sub0_print(netdissect_options *ndo,
 		 * XXX - what if item_len is too short, or too long,
 		 * for this payload type?
 		 */
+		if (!nd_nesting_enter(ndo)) {
+			ND_PRINT("[nesting too deep]");
+			nd_trunc_longjmp(ndo);
+		}
 		cp = (*npfunc[np])(ndo, np, ext, item_len, ep, phase, doi, proto, depth);
+		nd_nesting_leave(ndo);
 	} else {
 		ND_PRINT("%s", NPSTR(np));
 		cp += item_len;
@@ -3177,8 +3182,13 @@ ikev2_sub0_print(netdissect_options *ndo, const struct isakmp *base,
 		 * XXX - what if item_len is too short, or too long,
 		 * for this payload type?
 		 */
+		if (!nd_nesting_enter(ndo)) {
+			ND_PRINT("[nesting too deep]");
+			nd_trunc_longjmp(ndo);
+		}
 		cp = (*npfunc[np])(ndo, np, ext, item_len,
 				   ep, phase, doi, proto, depth);
+		nd_nesting_leave(ndo);
 	} else {
 		ND_PRINT("%s", NPSTR(np));
 		cp += item_len;
