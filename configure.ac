@@ -1108,7 +1108,7 @@ return 0;
 	# OK, did we find it?
 	#
 	if test "x$HAVE_LIBCRYPTO" = "xyes"; then
-		AC_DEFINE([HAVE_LIBCRYPTO], [1], [Define to 1 if you have a usable `crypto' library (-lcrypto).])
+		AC_DEFINE([HAVE_LIBCRYPTO], [1], [Define to 1 if you have a usable 'crypto' library (-lcrypto).])
 
 		#
 		# Put the subdirectories of the libcrypto root directory
