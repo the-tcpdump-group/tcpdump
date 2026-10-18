@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh -eu
 #
 # Copyright (c) 1994, 1996
 #	The Regents of the University of California.  All rights reserved.
@@ -17,6 +17,7 @@ MAKE=Makefile			# default makefile name is "Makefile"
 CC=cc				# default C compiler is "cc"
 DEPENDENCY_CFLAG=-M		# default dependency-generation flag is -M
 SOURCE_DIRECTORY=.		# default source directory is the current directory
+SED=''
 
 # No command-line flags seen yet.
 flags=""
@@ -68,9 +69,22 @@ if [ ! -w "$MAKE" ]; then
 	exit 1
 fi
 
-TMP=${TMPDIR:-/tmp}/mkdep$$
+# Use two temporary files instead of piping compiler and sed: this way a
+# compiler error will propagate and the old Makefile will remain intact until
+# the new Makefile is ready.
+if command -v mktemp >/dev/null 2>&1; then
+	# The ".XXXXXXXX" suffix is reasonably portable, although does not
+	# produce nice file names on all OSes, see the comments in
+	# build_common.sh (not in a release tarball).
+	TMP=`mktemp -t mkdep_Makefile.XXXXXXXX`
+	DEPS=`mktemp -t mkdep_deps.XXXXXXXX`
+else
+	# This is AIX or some other OS without mktemp(1).
+	TMP=${TMPDIR:-/tmp}/mkdep_Makefile.$$
+	DEPS=${TMPDIR:-/tmp}/mkdep_deps.$$
+fi
 
-trap 'rm -f "$TMP" ; exit 1' HUP INT QUIT PIPE TERM
+trap 'rm -f "$TMP" "$DEPS" ; exit 1' HUP INT QUIT PIPE TERM
 
 cp "$MAKE" "${MAKE}.bak"
 
@@ -102,10 +116,10 @@ done
 # XXX this doesn't work with things like "-DDECLWAITSTATUS=union\ wait"
 # $flags and $sources are meant to expand
 # shellcheck disable=SC2086
-"$CC" "$DEPENDENCY_CFLAG" $flags $sources |
+"$CC" "$DEPENDENCY_CFLAG" $flags $sources > "$DEPS"
 sed "
 	s; \./; ;g
-	$SED" >> "$TMP"
+	$SED" >> "$TMP" < "$DEPS"
 
 cat << _EOF_ >> "$TMP"
 
@@ -114,5 +128,5 @@ _EOF_
 
 # copy to preserve permissions
 cp "$TMP" "$MAKE"
-rm -f "${MAKE}.bak" "$TMP"
+rm -f "${MAKE}.bak" "$TMP" "$DEPS"
 exit 0
