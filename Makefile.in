@@ -430,7 +430,7 @@ distclean: clean
 	rm -rf autom4te.cache
 
 check: tcpdump
-	$(srcdir)/tests/TESTrun
+	LANG=C $(srcdir)/tests/TESTrun
 
 extags: $(TAGFILES)
 	ctags $(TAGFILES)

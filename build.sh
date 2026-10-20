@@ -125,7 +125,7 @@ print_so_deps "$TCPDUMP_BIN"
 [ -z "$TARGET" ] && run_after_echo "$TCPDUMP_BIN" -h
 [ -z "$TARGET" ] && run_after_echo "$TCPDUMP_BIN" -D
 if [ -z "$TARGET" ] && [ "$BUILD_LIBPCAP" = yes ]; then
-    run_after_echo "$MAKE_BIN" check
+    LANG=C run_after_echo "$MAKE_BIN" check
 fi
 if [ "$CMAKE" = no ]; then
     [ "$TEST_RELEASETAR" = yes ] && run_after_echo "$MAKE_BIN" releasetar
