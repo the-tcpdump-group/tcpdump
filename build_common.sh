@@ -36,8 +36,10 @@ mktempdir() {
         mktemp -d -t "$mktempdir_prefix"
         ;;
     SunOS-5.10|SunOS-5.11)
-        # Although the suffix is optional, specify it for consistent results.
-        mktemp -d -t "${mktempdir_prefix}.XXXXXXXX"
+        # In Solaris and illumos mktemp(1) the suffix is mandatory, at least
+        # three X'es are required in the suffix and at most six trailing X'es
+        # will be replaced with unique characters.
+        mktemp -d -t "${mktempdir_prefix}.XXXXXX"
         ;;
     SunOS-*|AIX-*)
         mktempdir_diy "$mktempdir_prefix"
@@ -45,6 +47,8 @@ mktempdir() {
     *)
         # At least Haiku, Linux and OpenBSD implementations require explicit
         # trailing X'es in the template, so make it the same suffix as above.
+        # QNX uses the Toybox implementation of mktemp(1), which too requires a
+        # suffix, also the suffix must include at least six trailing X'es.
         # XXX - is MSYS2 GNU-based, so that it would be like Linux?
         mktemp -d -t "${mktempdir_prefix}.XXXXXXXX"
         ;;
