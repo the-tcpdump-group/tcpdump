@@ -47,18 +47,23 @@ if [ "$BUILD_YEAR2038" = yes ] && [ "`uname -s`" = Linux ]; then
 fi
 
 # configure.ac is an Autoconf 2.69 file, but it works as expected even with
-# Autoconf 2.72.  However, in Autoconf versions 2.70 and later obsolete
+# Autoconf 2.73.  However, in Autoconf versions 2.70 and later obsolete
 # construct warnings are enabled by default, which adds varying (depending on
 # the branch) amount of noise to the build matrix output, so provide a means
 # to silence that.
-env ${AUTOCONF_WARNINGS:+WARNINGS="$AUTOCONF_WARNINGS"} "$AUTORECONF" -f
+#
+# Also handle a possible out-of-tree invocation correctly.
+SRCDIR="`dirname "$0"`"
+env ${AUTOCONF_WARNINGS:+WARNINGS="$AUTOCONF_WARNINGS"} "$AUTORECONF" -f "$SRCDIR"
 
 # Autoconf 2.71 adds a blank line after the final "exit 0" on Linux, but not
 # on OpenBSD.  Remove this difference to make it easier to compare the result
 # of "make releasetar" across different platforms.  From sed one-liners:
 # "delete all trailing blank lines at end of file (works on all seds)".  Don't
 # use mktemp(1) because AIX does not have it.
-CONFIGURE_NEW="configure.new$$"
-sed -e :a -e '/^\n*$/{$d;N;ba' -e '}' <configure >"$CONFIGURE_NEW"
-cmp -s configure "$CONFIGURE_NEW" || cat "$CONFIGURE_NEW" >configure
+CONFIGURE_OLD="$SRCDIR/configure"
+CONFIGURE_NEW="$SRCDIR/configure.new$$"
+sed -e :a -e '/^\n*$/{$d;N;ba' -e '}' <"$CONFIGURE_OLD" >"$CONFIGURE_NEW"
+# The "cat" replaces the file contents, but keeps the permissions intact.
+cmp -s "$CONFIGURE_OLD" "$CONFIGURE_NEW" || cat "$CONFIGURE_NEW" >"$CONFIGURE_OLD"
 rm -f "$CONFIGURE_NEW"
