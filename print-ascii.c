@@ -43,13 +43,14 @@
 #include "netdissect-stdinc.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #include "netdissect-ctype.h"
 
 #include "netdissect.h"
 #include "extract.h"
+#include "utf8.h"
 
-#define ASCII_LINELENGTH 300
 #define HEXDUMP_BYTES_PER_LINE 16
 #define HEXDUMP_SHORTS_PER_LINE (HEXDUMP_BYTES_PER_LINE / 2)
 #define HEXDUMP_HEXSTUFF_PER_SHORT 5 /* 4 hex digits and a space */
@@ -63,6 +64,8 @@ ascii_print(netdissect_options *ndo,
 	u_int caplength;
 	u_char s;
 	int truncated = FALSE;
+	struct nd_utf8_glyph g;
+	u_int n;
 
 	ndo->ndo_protocol = "ascii";
 	caplength = ND_BYTES_AVAILABLE_AFTER(cp);
@@ -72,6 +75,13 @@ ascii_print(netdissect_options *ndo,
 	}
 	ND_PRINT("\n");
 	while (length != 0) {
+		if (ndo->ndo_utf8 &&
+		    (n = nd_utf8_glyph(ndo, cp, length, &g)) != 0) {
+			ND_PRINT("%.*s", (int)n, g.bytes);
+			cp += n;
+			length -= n;
+			continue;
+		}
 		s = GET_U_1(cp);
 		cp++;
 		length--;
@@ -104,56 +114,107 @@ hex_and_ascii_print_with_offset(netdissect_options *ndo, const char *indent,
 				const u_char *cp, u_int length, u_int offset)
 {
 	u_int caplength;
-	u_int i;
-	u_int s1, s2;
-	u_int nshorts;
+	u_int i, n;
+	u_int s;
 	int truncated = FALSE;
 	char hexstuff[HEXDUMP_SHORTS_PER_LINE*HEXDUMP_HEXSTUFF_PER_SHORT+1], *hsp;
-	char asciistuff[ASCII_LINELENGTH+1], *asp;
+	/*
+	 * The text column of one line.  Each of the HEXDUMP_BYTES_PER_LINE
+	 * byte positions of a line is printed as one byte (an ASCII
+	 * character, a "." or a filler space) or as one glyph of at most
+	 * ND_UTF8_GLYPH_MAX_BYTES bytes, and at most one more glyph carried
+	 * over from the previous line is printed at the start of the line.
+	 */
+	char text[(HEXDUMP_BYTES_PER_LINE + 1) * ND_UTF8_GLYPH_MAX_BYTES + 1];
+	char *tp;
+	/*
+	 * Text column state carried over from one line to the next.
+	 *
+	 * In the text column each byte of the packet corresponds to exactly
+	 * one column.  A glyph is printed at the position of its first byte,
+	 * followed by one filler space per remaining byte, so the fillers of
+	 * a glyph that spans two lines continue at the start of the next
+	 * line.  A two-column glyph that starts at the last position of a
+	 * line does not fit there; it is printed at the start of the next
+	 * line instead, and its position on the current line is a filler.
+	 * A two-column code point is at least 3 bytes long in UTF-8, so
+	 * such a glyph always fits at the start of the next line.
+	 */
+	u_int fill = 0;		/* positions still to print as filler */
+	int pending = FALSE;	/* g is a glyph deferred to the next line */
+	struct nd_utf8_glyph g;
 
 	caplength = ND_BYTES_AVAILABLE_AFTER(cp);
 	if (length > caplength) {
 		length = caplength;
 		truncated = TRUE;
 	}
-	nshorts = length / sizeof(u_short);
-	i = 0;
-	hsp = hexstuff; asp = asciistuff;
-	while (nshorts != 0) {
-		s1 = GET_U_1(cp);
-		cp++;
-		s2 = GET_U_1(cp);
-		cp++;
-		(void)snprintf(hsp, sizeof(hexstuff) - (hsp - hexstuff),
-		    " %02x%02x", s1, s2);
-		hsp += HEXDUMP_HEXSTUFF_PER_SHORT;
-		*(asp++) = (char)(ND_ASCII_ISGRAPH(s1) ? s1 : '.');
-		*(asp++) = (char)(ND_ASCII_ISGRAPH(s2) ? s2 : '.');
-		i++;
-		if (i >= HEXDUMP_SHORTS_PER_LINE) {
-			*hsp = *asp = '\0';
-			ND_PRINT("%s0x%04x: %-*s  %s",
-			    indent, offset, HEXDUMP_HEXSTUFF_PER_LINE,
-			    hexstuff, asciistuff);
-			i = 0; hsp = hexstuff; asp = asciistuff;
-			offset += HEXDUMP_BYTES_PER_LINE;
+	while (length != 0) {
+		n = length < HEXDUMP_BYTES_PER_LINE ?
+		    length : HEXDUMP_BYTES_PER_LINE;
+
+		hsp = hexstuff;
+		for (i = 0; i < n; i++) {
+			s = GET_U_1(cp + i);
+			if ((i & 1) == 0) {
+				(void)snprintf(hsp,
+				    sizeof(hexstuff) - (hsp - hexstuff),
+				    " %02x", s);
+				hsp += 3;
+			} else {
+				(void)snprintf(hsp,
+				    sizeof(hexstuff) - (hsp - hexstuff),
+				    "%02x", s);
+				hsp += 2;
+			}
 		}
-		nshorts--;
-	}
-	if (length & 1) {
-		s1 = GET_U_1(cp);
-		cp++;
-		(void)snprintf(hsp, sizeof(hexstuff) - (hsp - hexstuff),
-		    " %02x", s1);
-		hsp += 3;
-		*(asp++) = (char)(ND_ASCII_ISGRAPH(s1) ? s1 : '.');
-		++i;
-	}
-	if (i > 0) {
-		*hsp = *asp = '\0';
+		*hsp = '\0';
+
+		tp = text;
+		i = 0;
+		if (pending) {
+			memcpy(tp, g.bytes, g.nbytes);
+			tp += g.nbytes;
+			i = g.ncols;
+			pending = FALSE;
+		}
+		while (i < n) {
+			if (fill != 0) {
+				*tp++ = ' ';
+				fill--;
+				i++;
+				continue;
+			}
+			if (ndo->ndo_utf8 &&
+			    nd_utf8_glyph(ndo, cp + i, length - i, &g) != 0) {
+				if (g.ncols <= n - i) {
+					memcpy(tp, g.bytes, g.nbytes);
+					tp += g.nbytes;
+					fill = g.nbytes - g.ncols;
+					i += g.ncols;
+				} else {
+					/*
+					 * Two columns needed, one left on
+					 * this line.
+					 */
+					*tp++ = ' ';
+					fill = g.nbytes - 1 - g.ncols;
+					pending = TRUE;
+					i = n;
+				}
+				continue;
+			}
+			s = GET_U_1(cp + i);
+			*tp++ = (char)(ND_ASCII_ISGRAPH(s) ? s : '.');
+			i++;
+		}
+		*tp = '\0';
+
 		ND_PRINT("%s0x%04x: %-*s  %s",
-		     indent, offset, HEXDUMP_HEXSTUFF_PER_LINE,
-		     hexstuff, asciistuff);
+		    indent, offset, HEXDUMP_HEXSTUFF_PER_LINE, hexstuff, text);
+		cp += n;
+		length -= n;
+		offset += HEXDUMP_BYTES_PER_LINE;
 	}
 	if (truncated)
 		nd_trunc_longjmp(ndo);
