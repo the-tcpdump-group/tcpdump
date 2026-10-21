@@ -426,7 +426,7 @@ may have been given should already have been given up.
 Print `foreign' IPv4 addresses numerically rather than symbolically
 (this option is intended to get around serious brain damage in
 Sun's NIS server \(em usually it hangs forever translating non-local
-internet numbers).
+Internet numbers).
 .IP
 The test for `foreign' IPv4 addresses is done using the IPv4 address and
 netmask of the interface on that capture is being done.  If the interface
@@ -1334,10 +1334,10 @@ arp reply csam is-at CSAM\fR
 .fi
 .RE
 The first line says that rtsg sent an ARP packet asking
-for the Ethernet address of internet host csam.
+for the Ethernet address of Internet host csam.
 Csam
 replies with its Ethernet address (in this example, Ethernet addresses
-are in caps and internet addresses in lower case).
+are in caps and Internet addresses in lower case).
 .LP
 This would look less redundant if we had done
 .BR "tcpdump \-n" :
@@ -1817,7 +1817,7 @@ helios.domain > h2opolo.1537: 2 NXDomain* 0/1/0 (97)\fR
 .RE
 In the first example, \fIhelios\fP responds to query id 3 from \fIh2opolo\fP
 with 3 answer records, 3 name server records and 7 additional records.
-The first answer record is type A (address) and its data is internet
+The first answer record is type A (address) and its data is Internet
 address 128.32.137.3.
 The total size of the response was 273 bytes,
 excluding TCP or UDP and IP headers.

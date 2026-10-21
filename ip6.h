@@ -69,7 +69,7 @@
 #define ND_IP6_H_
 
 /*
- * Definition for internet protocol version 6.
+ * Definition for Internet Protocol version 6.
  * RFC 2460
  */
 

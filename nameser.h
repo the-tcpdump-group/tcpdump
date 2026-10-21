@@ -218,7 +218,7 @@
  * Values for class field
  */
 
-#define C_IN		1		/* the arpa internet */
+#define C_IN		1		/* the ARPA Internet */
 #define C_CHAOS		3		/* for chaos net (MIT) */
 #define C_HS		4		/* for Hesiod name server (MIT) (XXX) */
 	/* Query class values which do not appear in resource records */

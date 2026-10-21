@@ -37,13 +37,13 @@
 #define netdissect_ip_h
 
 /*
- * Definitions for internet protocol version 4.
+ * Definitions for Internet Protocol version 4.
  * Per RFC 791, September 1981.
  */
 #define	IPVERSION	4
 
 /*
- * Structure of an internet header, naked of options.
+ * Structure of an Internet header, naked of options.
  *
  * We declare ip_len and ip_off to be short, rather than u_short
  * pragmatically since otherwise unsigned comparisons can result
