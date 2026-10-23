@@ -93,6 +93,9 @@ tcpdump \- dump traffic on a network
 [
 .B \-\-print
 ]
+[
+.B \-\-psp
+]
 .br
 .ti +8
 [
@@ -740,6 +743,9 @@ file with the
 .B \-w
 flag.
 .TP
+.B \-\-psp
+Dissect PSP (PSP Security Protocol) packets.
+.TP
 .BI \-\-print\-sampling= nth
 .PD
 Print every \fInth\fP packet.  This option enables the
@@ -827,6 +833,7 @@ Currently known types are
 \fBlmp\fR (Link Management Protocol),
 \fBpgm\fR (Pragmatic General Multicast),
 \fBpgm_zmtp1\fR (ZMTP/1.0 inside PGM/EPGM),
+\fBpsp\fR (PSP Security Protocol),
 \fBptp\fR (Precision Time Protocol),
 \fBquic\fR (QUIC),
 \fBradius\fR (RADIUS),

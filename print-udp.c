@@ -467,6 +467,9 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		case PT_GENEVE:
 			geneve_print(ndo, cp, length);
 			break;
+		case PT_PSP:
+			psp_print(ndo, cp, length, bp2);
+			break;
 		}
 		return;
 	}
@@ -535,6 +538,13 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 					ND_PRINT("[udp sum ok] ");
 			}
 		}
+	}
+
+	if (ndo->ndo_psp &&
+	    IS_SRC_OR_DST_PORT(PSP_PORT) &&
+	    psp_detect(ndo, cp, length)) {
+		psp_print(ndo, cp, length, bp2);
+		return;
 	}
 
 	if (!ndo->ndo_qflag) {
