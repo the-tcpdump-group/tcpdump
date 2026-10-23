@@ -193,12 +193,20 @@ do_decrypt(netdissect_options *ndo, const char *caller, struct sa_list *sa,
 		return NULL;
 	}
 
-	if (set_cipher_parameters(ctx, sa->evp, sa->secret, NULL) < 0) {
+	/*
+	 * EVP_DecryptInit_ex() returns 1 on success and 0 on failure,
+	 * never a negative value.  It fails, for example, if the cipher
+	 * isn't available from any loaded OpenSSL provider, as is the case
+	 * for DES, Blowfish and RC4 with the OpenSSL 3 FIPS provider.
+	 */
+	if (set_cipher_parameters(ctx, sa->evp, sa->secret, NULL) <= 0) {
 		EVP_CIPHER_CTX_free(ctx);
-		(*ndo->ndo_warning)(ndo, "%s: espkey init failed", caller);
+		(*ndo->ndo_warning)(ndo,
+		    "%s: can't initialize cipher %s: not available from OpenSSL, or bad key",
+		    caller, OBJ_nid2sn(EVP_CIPHER_nid(sa->evp)));
 		return NULL;
 	}
-	if (set_cipher_parameters(ctx, NULL, NULL, iv) < 0) {
+	if (set_cipher_parameters(ctx, NULL, NULL, iv) <= 0) {
 		EVP_CIPHER_CTX_free(ctx);
 		(*ndo->ndo_warning)(ndo, "%s: IV init failed", caller);
 		return NULL;
