@@ -1,0 +1,178 @@
+#!/usr/bin/env perl
+
+# Copyright (c) 2026 The Tcpdump Group
+# All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in
+#    the documentation and/or other materials provided with the
+#    distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+# COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use POSIX qw(WIFEXITED WEXITSTATUS WNOHANG);
+use Time::HiRes qw(sleep);
+
+my ($tcpdump, $base) = @ARGV;
+my $input = "$base-input.pcap";
+my $output = "$base-output.pcap";
+my $fifo = "$base.fifo";
+my $packet_count = 6000;
+my $limit = 3000;
+my $packet_size = 1500;
+my ($reader_pid, $tcpdump_pid);
+
+$SIG{ALRM} = sub {
+	kill 'TERM', $tcpdump_pid if defined $tcpdump_pid;
+	kill 'TERM', $reader_pid if defined $reader_pid;
+	die "TESTflushpcap: timed out\n";
+};
+alarm 30;
+
+sub read_exact {
+	my ($file, $length) = @_;
+	my $buffer = '';
+	while (length $buffer < $length) {
+		my $n = read $file, my $part, $length - length $buffer;
+		return undef unless defined $n && $n > 0;
+		$buffer .= $part;
+	}
+	return $buffer;
+}
+
+sub fail {
+	print STDERR "TESTflushpcap: ", @_, "\n";
+	exit 1;
+}
+
+open my $pcap, '>', $input or fail "cannot create $input: $!";
+binmode $pcap;
+print {$pcap} pack('VvvVVVV', 0xa1b2c3d4, 2, 4, 0, 0, 65535, 1)
+    or fail "cannot write pcap header: $!";
+for my $i (0 .. $packet_count - 1) {
+	my $packet = "\0" x 14 . pack('V', $i) . ("\xa5" x ($packet_size - 18));
+	print {$pcap} pack('VVVV', 0, $i, $packet_size, $packet_size), $packet
+	    or fail "cannot write packet $i: $!";
+}
+close $pcap or fail "cannot close $input: $!";
+
+system('mkfifo', $fifo) == 0 or fail "cannot create FIFO $fifo";
+
+my ($reader_ready_in, $reader_ready_out);
+pipe $reader_ready_in, $reader_ready_out
+    or fail "cannot create FIFO readiness pipe: $!";
+$reader_pid = fork();
+fail "cannot fork FIFO reader: $!" unless defined $reader_pid;
+if ($reader_pid == 0) {
+	alarm 0;
+	$SIG{ALRM} = 'DEFAULT';
+	close $reader_ready_in;
+	open my $fifo_in, '<', $fifo or die "cannot open $fifo: $!\n";
+	binmode $fifo_in;
+	print {$reader_ready_out} "ready\n" or die "cannot signal FIFO readiness: $!\n";
+	close $reader_ready_out;
+	open my $pcap_out, '>', $output or die "cannot create $output: $!\n";
+	binmode $pcap_out;
+	while (1) {
+		my $n = read $fifo_in, my $buf, 4096;
+		die "cannot read $fifo: $!\n" unless defined $n;
+		last if $n == 0;
+		print {$pcap_out} $buf or die "cannot write $output: $!\n";
+		sleep 0.002;
+	}
+	close $pcap_out or die "cannot close $output: $!\n";
+	close $fifo_in or die "cannot close $fifo: $!\n";
+	exit 0;
+}
+close $reader_ready_out;
+
+pipe my $stderr_in, my $stderr_out or fail "cannot create stderr pipe: $!";
+$tcpdump_pid = fork();
+fail "cannot fork tcpdump: $!" unless defined $tcpdump_pid;
+if ($tcpdump_pid == 0) {
+	close $stderr_in;
+	open STDERR, '>&', $stderr_out or die "cannot redirect stderr: $!\n";
+	close $stderr_out;
+	exec {$tcpdump} $tcpdump, '-n', '-r', $input, '-c', $limit,
+	    '-w', $fifo;
+	die "cannot execute $tcpdump: $!\n";
+}
+close $stderr_out;
+my $ready = <$stderr_in>;
+if (!defined $ready || $ready !~ /^reading from file /) {
+	kill 'TERM', $tcpdump_pid;
+	waitpid $tcpdump_pid, 0;
+	kill 'TERM', $reader_pid;
+	waitpid $reader_pid, 0;
+	fail "tcpdump failed before capture started: $ready";
+}
+my $fifo_ready = <$reader_ready_in>;
+close $reader_ready_in;
+fail "FIFO reader did not connect to tcpdump\n" unless defined $fifo_ready;
+sleep 0.1;
+
+my $signals_sent = 0;
+while (1) {
+	my $waited = waitpid $tcpdump_pid, WNOHANG;
+	last if $waited == $tcpdump_pid;
+	kill 'USR2', $tcpdump_pid and $signals_sent++;
+	sleep 0.005;
+}
+my $tcpdump_status = $?;
+my $stderr_rest = do { local $/; <$stderr_in> };
+close $stderr_in;
+waitpid $reader_pid, 0;
+my $reader_status = $?;
+
+fail "tcpdump exited unsuccessfully (status $tcpdump_status): $stderr_rest"
+    unless WIFEXITED($tcpdump_status) && WEXITSTATUS($tcpdump_status) == 0;
+fail "FIFO reader exited unsuccessfully (status $reader_status)"
+    unless WIFEXITED($reader_status) && WEXITSTATUS($reader_status) == 0;
+fail "no SIGUSR2 was sent during capture" unless $signals_sent > 0;
+
+open my $output_pcap, '<', $output or fail "cannot open $output: $!";
+binmode $output_pcap;
+my $header = read_exact($output_pcap, 24);
+defined $header or fail "truncated pcap header";
+my $magic = unpack('H8', substr($header, 0, 4));
+my $record_format = $magic eq 'd4c3b2a1' ? 'V4' :
+    $magic eq 'a1b2c3d4' ? 'N4' : undef;
+defined $record_format or fail "unexpected pcap magic $magic";
+for my $i (0 .. $limit - 1) {
+	my $record = read_exact($output_pcap, 16);
+	defined $record or fail "truncated pcap record $i";
+	my (undef, undef, $captured, $original) =
+	    unpack($record_format, $record);
+	$captured == $packet_size && $original == $packet_size
+	    or fail "incorrect packet length at record $i";
+	my $packet = read_exact($output_pcap, $captured);
+	defined $packet or fail "truncated packet $i";
+	my $expected = "\0" x 14 . pack('V', $i) .
+	    ("\xa5" x ($packet_size - 18));
+	$packet eq $expected
+	    or fail "corrupt, missing, duplicate, or reordered packet at record $i";
+}
+my $n = read($output_pcap, my $extra, 1);
+fail "output contains more than $limit packets" if defined $n && $n != 0;
+close $output_pcap or fail "cannot close $output: $!";
+alarm 0;
+exit 0;
