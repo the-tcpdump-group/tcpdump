@@ -229,6 +229,12 @@ static u_int packets_to_skip;
 
 static int infodelay;
 static int infoprint;
+#ifdef SIGNAL_FLUSH_PCAP
+static volatile sig_atomic_t flushpcap_requested;
+static volatile sig_atomic_t flushpcap_enabled;
+static volatile sig_atomic_t offline_capture;
+#endif
+static volatile sig_atomic_t cleanup_requested;
 
 /*
  * Last component of the path to the executable.
@@ -266,6 +272,8 @@ static void requestinfo(int);
 
 #ifdef SIGNAL_FLUSH_PCAP
 static void flushpcap(int);
+static void pcap_callback_with_flush_signal_blocking(u_char *,
+    const struct pcap_pkthdr *, const u_char *);
 #endif
 
 #ifdef _WIN32
@@ -306,6 +314,14 @@ static int supports_monitor_mode;
 extern int optind;
 extern int opterr;
 extern char *optarg;
+
+#ifdef SIGNAL_FLUSH_PCAP
+struct pcap_callback_data {
+	pcap_handler callback;
+	u_char *user;
+	int *packet_count;
+};
+#endif
 
 struct dump_info {
 	char	*WFileName;
@@ -1521,6 +1537,16 @@ main(int argc, char **argv)
 	pcap_if_t *devlist;
 	long devnum;
 	int status;
+	int pcap_loop_count;
+#ifdef SIGNAL_FLUSH_PCAP
+	int packets_processed;
+#endif
+	int flushpcap_break_pending = 0;
+	int flushpcap_continue;
+#ifdef SIGNAL_FLUSH_PCAP
+	struct pcap_callback_data callback_data;
+	sigset_t flushpcap_mask, old_mask;
+#endif
 	FILE *VFile;
 #ifdef HAVE_CAPSICUM
 	cap_rights_t rights;
@@ -2734,6 +2760,12 @@ DIAG_ON_ASSIGN_ENUM
 		pcap_userdata = (u_char *)ndo;
 	}
 
+#ifdef SIGNAL_FLUSH_PCAP
+	callback_data.callback = callback;
+	callback_data.user = pcap_userdata;
+	callback_data.packet_count = NULL;
+#endif
+
 #ifdef SIGNAL_REQ_INFO
 	/*
 	 * We can't get statistics when reading from a file rather
@@ -2743,6 +2775,8 @@ DIAG_ON_ASSIGN_ENUM
 		(void)setsignal(SIGNAL_REQ_INFO, requestinfo);
 #endif
 #ifdef SIGNAL_FLUSH_PCAP
+	offline_capture = RFileName != NULL;
+	flushpcap_enabled = 1;
 	(void)setsignal(SIGNAL_FLUSH_PCAP, flushpcap);
 #endif
 
@@ -2841,10 +2875,61 @@ DIAG_ON_ASSIGN_ENUM
 		error("unable to enter the capability mode");
 #endif	/* HAVE_CAPSICUM */
 
+	pcap_loop_count = cnt == -1 ? -1 : cnt + (int)packets_to_skip;
 	do {
-		status = pcap_loop(pd,
-				   (cnt == -1 ? -1 : cnt + (int)packets_to_skip),
-				   callback, pcap_userdata);
+		flushpcap_continue = 0;
+#ifdef SIGNAL_FLUSH_PCAP
+		flushpcap_enabled = 1;
+		packets_processed = 0;
+		callback_data.packet_count = pcap_loop_count > 0 ?
+		    &packets_processed : NULL;
+		status = pcap_loop(pd, pcap_loop_count,
+		    pcap_callback_with_flush_signal_blocking,
+		    (u_char *)&callback_data);
+		/* pcap_loop() can return -2 after processing packets. */
+		if (pcap_loop_count > 0)
+			pcap_loop_count -= packets_processed;
+#else
+		status = pcap_loop(pd, pcap_loop_count, callback, pcap_userdata);
+#endif
+#ifdef SIGNAL_FLUSH_PCAP
+		sigemptyset(&flushpcap_mask);
+		sigaddset(&flushpcap_mask, SIGNAL_FLUSH_PCAP);
+		if (sigprocmask(SIG_BLOCK, &flushpcap_mask, &old_mask) < 0)
+			error("sigprocmask");
+		if (flushpcap_requested) {
+			flushpcap_requested = 0;
+			if (pdd != NULL)
+				(void)pcap_dump_flush(pdd);
+
+			/*
+			 * pcap_loop() can return a positive packet count while
+			 * pcap_breakloop() is pending.  Make one more call to consume
+			 * the break flag before resuming the capture.
+			 */
+			if (!cleanup_requested && status > 0) {
+				if (pcap_loop_count != 0) {
+					flushpcap_break_pending = 1;
+					flushpcap_continue = 1;
+				}
+				status = 0;
+			} else if (!cleanup_requested && status == -2) {
+				if (pcap_loop_count != 0)
+					flushpcap_continue = 1;
+				status = 0;
+			}
+		}
+		if (sigprocmask(SIG_SETMASK, &old_mask, NULL) < 0)
+			error("sigprocmask");
+#endif
+		if (status == -2 && flushpcap_break_pending && !cleanup_requested) {
+			flushpcap_break_pending = 0;
+			status = 0;
+			if (pcap_loop_count != 0)
+				flushpcap_continue = 1;
+		}
+		if (flushpcap_continue)
+			continue;
 		if (WFileName == NULL) {
 			/*
 			 * We're printing packets.  Flush the printed output,
@@ -2882,6 +2967,7 @@ DIAG_ON_ASSIGN_ENUM
 			 */
 			info(1);
 		}
+		flushpcap_enabled = 0;
 		pcap_close(pd);
 		pd = NULL;
 		if (VFileName != NULL) {
@@ -2893,6 +2979,8 @@ DIAG_ON_ASSIGN_ENUM
 				pd = pcap_open_offline(RFileName, ebuf);
 				if (pd == NULL)
 					error("%s", ebuf);
+				pcap_loop_count = cnt == -1 ? -1 : cnt + (int)packets_to_skip;
+				flushpcap_break_pending = 0;
 #ifdef HAVE_CAPSICUM
 				cap_rights_init(&rights, CAP_READ);
 				if (cap_rights_limit(fileno(pcap_file(pd)),
@@ -2963,7 +3051,7 @@ DIAG_ON_ASSIGN_ENUM
 			}
 		}
 	}
-	while (ret != NULL);
+	while (ret != NULL || flushpcap_continue);
 
 	if (count_mode && RFileName != NULL)
 		fprintf(stdout, "%u packet%s\n", packets_captured,
@@ -2971,6 +3059,16 @@ DIAG_ON_ASSIGN_ENUM
 
 	free(cmdbuf);
 	pcap_freecode(&fcode);
+#ifdef SIGNAL_FLUSH_PCAP
+	/*
+	 * The dumper's stdio stream is flushed by exit().  Keep SIGUSR2 from
+	 * interrupting that final write after the capture loop has stopped.
+	 */
+	sigemptyset(&flushpcap_mask);
+	sigaddset(&flushpcap_mask, SIGNAL_FLUSH_PCAP);
+	if (sigprocmask(SIG_BLOCK, &flushpcap_mask, NULL) < 0)
+		error("sigprocmask");
+#endif
 	exit_tcpdump(status == -1 ? S_ERR_HOST_PROGRAM : S_SUCCESS);
 }
 
@@ -3120,9 +3218,6 @@ static void
 # ifdef SIGNAL_REQ_INFO
 		|| (sig == SIGNAL_REQ_INFO)
 # endif
-# ifdef SIGNAL_FLUSH_PCAP
-		|| (sig == SIGNAL_FLUSH_PCAP)
-# endif
 		)
 		new.sa_flags = SA_RESTART;
 # endif // SA_RESTART
@@ -3143,6 +3238,7 @@ static void
 static void
 cleanup(int signo _U_)
 {
+	cleanup_requested = 1;
 #ifdef _WIN32
 	if (timer_handle != INVALID_HANDLE_VALUE) {
 		DeleteTimerQueueTimer(NULL, timer_handle, NULL);
@@ -3510,10 +3606,52 @@ requestinfo(int signo _U_)
 
 #ifdef SIGNAL_FLUSH_PCAP
 static void
+pcap_callback_with_flush_signal_blocking(u_char *user,
+    const struct pcap_pkthdr *h, const u_char *sp)
+{
+	struct pcap_callback_data *data = (struct pcap_callback_data *)user;
+	sigset_t block, old;
+
+	sigemptyset(&block);
+	sigaddset(&block, SIGNAL_FLUSH_PCAP);
+	if (sigprocmask(SIG_BLOCK, &block, &old) < 0)
+		error("sigprocmask");
+	if (data->packet_count != NULL)
+		(*data->packet_count)++;
+	data->callback(data->user, h, sp);
+	if (sigprocmask(SIG_SETMASK, &old, NULL) < 0)
+		error("sigprocmask");
+
+	/*
+	 * When reading a savefile, pcap_breakloop() can discard records already
+	 * buffered by some offline readers. Flush here instead; the main loop
+	 * will also handle a request that arrives after the final callback.
+	 */
+	if (offline_capture && flushpcap_requested) {
+		if (sigprocmask(SIG_BLOCK, &block, &old) < 0)
+			error("sigprocmask");
+		if (flushpcap_requested) {
+			flushpcap_requested = 0;
+			if (pdd != NULL)
+				(void)pcap_dump_flush(pdd);
+		}
+		if (sigprocmask(SIG_SETMASK, &old, NULL) < 0)
+			error("sigprocmask");
+	}
+}
+
+static void
 flushpcap(int signo _U_)
 {
-	if (pdd != NULL)
-		pcap_dump_flush(pdd);
+	if (flushpcap_enabled && pdd != NULL && pd != NULL) {
+		flushpcap_requested = 1;
+		/*
+		 * For offline captures, the callback wrapper flushes after the
+		 * current packet. Avoid interrupting pcap's buffered file reader.
+		 */
+		if (!offline_capture)
+			pcap_breakloop(pd);
+	}
 }
 #endif
 

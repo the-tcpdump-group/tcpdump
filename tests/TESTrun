@@ -1075,6 +1075,15 @@ sub run_decode_test {
 	return result_passed $T;
 }
 
+sub run_flushpcap_test {
+	my $test = shift;
+	my $cmd = system ($^X, "${testsdir}/TESTflushpcap", $TCPDUMP,
+	    mytmpfile ('sigusr2-flush'));
+	return result_failed ('SIGUSR2 pcap flush regression test failed',
+	    "exit status $cmd") if $cmd != 0;
+	return result_passed;
+}
+
 sub request_test {
 	my $testconfig = shift;
 
@@ -1126,6 +1135,14 @@ my @ready_to_run;
 for (@decode_tests) {
 	next if defined ($only_one) && $only_one ne $_->{name};
 	push @ready_to_run, request_test $_
+}
+
+if (!defined $only_one || $only_one eq 'sigusr2-pcap-flush') {
+	push @ready_to_run, {
+		label => 'sigusr2-pcap-flush',
+		func => $^O eq 'msys' ? \&run_skip_test : \&run_flushpcap_test,
+		skip => skip_os ('msys'),
+	};
 }
 
 if (! scalar @ready_to_run) {
