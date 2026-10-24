@@ -3059,6 +3059,16 @@ DIAG_ON_ASSIGN_ENUM
 
 	free(cmdbuf);
 	pcap_freecode(&fcode);
+#ifdef SIGNAL_FLUSH_PCAP
+	/*
+	 * The dumper's stdio stream is flushed by exit().  Keep SIGUSR2 from
+	 * interrupting that final write after the capture loop has stopped.
+	 */
+	sigemptyset(&flushpcap_mask);
+	sigaddset(&flushpcap_mask, SIGNAL_FLUSH_PCAP);
+	if (sigprocmask(SIG_BLOCK, &flushpcap_mask, NULL) < 0)
+		error("sigprocmask");
+#endif
 	exit_tcpdump(status == -1 ? S_ERR_HOST_PROGRAM : S_SUCCESS);
 }
 
