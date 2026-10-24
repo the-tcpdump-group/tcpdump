@@ -231,6 +231,8 @@ static int infodelay;
 static int infoprint;
 #ifdef SIGNAL_FLUSH_PCAP
 static volatile sig_atomic_t flushpcap_requested;
+static volatile sig_atomic_t flushpcap_enabled;
+static volatile sig_atomic_t offline_capture;
 #endif
 static volatile sig_atomic_t cleanup_requested;
 
@@ -2773,6 +2775,8 @@ DIAG_ON_ASSIGN_ENUM
 		(void)setsignal(SIGNAL_REQ_INFO, requestinfo);
 #endif
 #ifdef SIGNAL_FLUSH_PCAP
+	offline_capture = RFileName != NULL;
+	flushpcap_enabled = 1;
 	(void)setsignal(SIGNAL_FLUSH_PCAP, flushpcap);
 #endif
 
@@ -2875,6 +2879,7 @@ DIAG_ON_ASSIGN_ENUM
 	do {
 		flushpcap_continue = 0;
 #ifdef SIGNAL_FLUSH_PCAP
+		flushpcap_enabled = 1;
 		packets_processed = 0;
 		callback_data.packet_count = pcap_loop_count > 0 ?
 		    &packets_processed : NULL;
@@ -2962,6 +2967,7 @@ DIAG_ON_ASSIGN_ENUM
 			 */
 			info(1);
 		}
+		flushpcap_enabled = 0;
 		pcap_close(pd);
 		pd = NULL;
 		if (VFileName != NULL) {
@@ -3605,14 +3611,36 @@ pcap_callback_with_flush_signal_blocking(u_char *user,
 	data->callback(data->user, h, sp);
 	if (sigprocmask(SIG_SETMASK, &old, NULL) < 0)
 		error("sigprocmask");
+
+	/*
+	 * When reading a savefile, pcap_breakloop() can discard records already
+	 * buffered by some offline readers. Flush here instead; the main loop
+	 * will also handle a request that arrives after the final callback.
+	 */
+	if (offline_capture && flushpcap_requested) {
+		if (sigprocmask(SIG_BLOCK, &block, &old) < 0)
+			error("sigprocmask");
+		if (flushpcap_requested) {
+			flushpcap_requested = 0;
+			if (pdd != NULL)
+				(void)pcap_dump_flush(pdd);
+		}
+		if (sigprocmask(SIG_SETMASK, &old, NULL) < 0)
+			error("sigprocmask");
+	}
 }
 
 static void
 flushpcap(int signo _U_)
 {
-	if (pdd != NULL && pd != NULL) {
+	if (flushpcap_enabled && pdd != NULL && pd != NULL) {
 		flushpcap_requested = 1;
-		pcap_breakloop(pd);
+		/*
+		 * For offline captures, the callback wrapper flushes after the
+		 * current packet. Avoid interrupting pcap's buffered file reader.
+		 */
+		if (!offline_capture)
+			pcap_breakloop(pd);
 	}
 }
 #endif

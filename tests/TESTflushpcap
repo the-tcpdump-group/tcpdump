@@ -174,5 +174,6 @@ for my $i (0 .. $limit - 1) {
 my $n = read($output_pcap, my $extra, 1);
 fail "output contains more than $limit packets" if defined $n && $n != 0;
 close $output_pcap or fail "cannot close $output: $!";
+unlink $input, $output, $fifo;
 alarm 0;
 exit 0;
