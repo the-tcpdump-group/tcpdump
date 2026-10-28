@@ -1,0 +1,56 @@
+    1  2024-10-24 07:49:32.616872 IP6 (class 0xc0, flowlabel 0x79b0e, hlim 1, next-header TCP (6), payload length 291) fe80::1eea:bff:fe6a:39de.179 > fe80::a236:9fff:fe27:c97c.44398: Flags [P.], cksum 0xe726 (correct), seq 1454957169:1454957440, ack 3913657653, win 246, length 271: BGP
+	Update Message (2), length: 116
+	  Multi-Protocol Reach NLRI (14), length: 44, Flags [OE]: 
+	    AFI: VPLS (25), SAFI: EVPN (70)
+	    nexthop: 172.21.64.20, nh-length: 4, no SNPA
+	      EVPN Route-Type: 2
+		RD: 172.21.64.20:2
+		Ethernet Segment ID: 00:00:00:00:00:00:00:00:00:00
+		Ethernet Tag: 0x00000000
+		MAC Address: 02:00:00:02:1b:94
+		MPLS Label 1: 2
+	  Origin (1), length: 1, Flags [T]: IGP
+	  AS Path (2), length: 10, Flags [TE]: 4200005792 4200004995 
+	  Extended Community (16), length: 24, Flags [OT]: 
+	    target (0x0002), Flags [none]: 64899:2 (= 0.0.0.2)
+	    encapsulation (0x030c), Flags [none]: Tunnel type: VXLAN
+	    mac-mobility (0x0600), Flags [none]: Sequence number: 1
+	Update Message (2), length: 155
+	  Multi-Protocol Reach NLRI (14), length: 83, Flags [OE]: 
+	    AFI: VPLS (25), SAFI: EVPN (70)
+	    nexthop: 172.21.64.20, nh-length: 4, no SNPA
+	      EVPN Route-Type: 2
+		RD: 172.21.64.20:3
+		Ethernet Segment ID: 00:00:00:00:00:00:00:00:00:00
+		Ethernet Tag: 0x00000000
+		MAC Address: 02:00:00:03:1b:94
+		MPLS Label 1: 3
+	      EVPN Route-Type: 2
+		RD: 172.21.64.20:3
+		Ethernet Segment ID: 00:00:00:00:00:00:00:00:00:00
+		Ethernet Tag: 0x00000000
+		MAC Address: 02:00:00:03:1b:94
+		IP Address: 172.20.3.151
+		MPLS Label 1: 3
+	  Origin (1), length: 1, Flags [T]: IGP
+	  AS Path (2), length: 10, Flags [TE]: 4200005792 4200004995 
+	  Extended Community (16), length: 24, Flags [OT]: 
+	    target (0x0002), Flags [none]: 64899:3 (= 0.0.0.3)
+	    encapsulation (0x030c), Flags [none]: Tunnel type: VXLAN
+	    mac-mobility (0x0600), Flags [none]: Sequence number: 46
+    2  2024-10-24 07:49:32.717942 IP6 (class 0xc0, flowlabel 0x79b0e, hlim 1, next-header TCP (6), payload length 120) fe80::1eea:bff:fe6a:39de.179 > fe80::a236:9fff:fe27:c97c.44398: Flags [P.], cksum 0xe634 (correct), seq 271:371, ack 1, win 246, length 100: BGP
+	Update Message (2), length: 100
+	  Multi-Protocol Unreach NLRI (15), length: 73, Flags [OE]: 
+	    AFI: VPLS (25), SAFI: EVPN (70)
+	      EVPN Route-Type: 2
+		RD: 172.21.64.17:2
+		Ethernet Segment ID: 00:00:00:00:00:00:00:00:00:00
+		Ethernet Tag: 0x00000000
+		MAC Address: 02:00:00:02:1b:94
+		MPLS Label 1: 0
+	      EVPN Route-Type: 2
+		RD: 172.21.64.17:3
+		Ethernet Segment ID: 00:00:00:00:00:00:00:00:00:00
+		Ethernet Tag: 0x00000000
+		MAC Address: 02:00:00:03:1b:94
+		MPLS Label 1: 0
