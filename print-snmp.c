@@ -531,6 +531,7 @@ asn1_parse(netdissect_options *ndo,
 
 			case INTEGER: {
 				uint32_t data;
+				uint32_t signbit = 0;
 				elem->type = BE_INT;
 				data = 0;
 
@@ -538,11 +539,18 @@ asn1_parse(netdissect_options *ndo,
 					ND_PRINT("[asnlen=0]");
 					goto invalid;
 				}
-				if (GET_U_1(p) & ASN_BIT8)	/* negative */
+				if (GET_U_1(p) & ASN_BIT8) {	/* negative */
 					data = UINT_MAX;
+					signbit = 0x80000000;
+				}
+				/* In order to avoid undefined behavior, we mask off the low
+				 * 24 bits of the data before shifting up by 8 bits.  Either
+				 * way, we lose the top 8 bits, but shifting through the sign
+				 * bit results in undefined data.  If we've shifted the sign
+				 * bit away, we will restore it below. */
 				for (i = elem->asnlen; i != 0; p++, i--)
-					data = (data << ASN_SHIFT8) | GET_U_1(p);
-				elem->data.integer = data;
+					data = ( ( data & 0x00ffffff ) << ASN_SHIFT8) | GET_U_1(p);
+				elem->data.integer = (int32_t)( data | signbit );
 				break;
 			}
 
@@ -748,7 +756,7 @@ asn1_print(netdissect_options *ndo,
 		}
 
 		for (; i != 0; p++, i--) {
-			o = (o << ASN_SHIFT7) + (GET_U_1(p) & ~ASN_BIT8);
+			o = ( ( o & 0x01ffffff ) << ASN_SHIFT7) + (GET_U_1(p) & ~ASN_BIT8);
 			if (GET_U_1(p) & ASN_LONGLEN)
 			        continue;
 
@@ -898,7 +906,7 @@ smi_decode_oid(netdissect_options *ndo,
 	unsigned int firstval;
 
 	for (*oidlen = 0; i != 0; p++, i--) {
-	        o = (o << ASN_SHIFT7) + (GET_U_1(p) & ~ASN_BIT8);
+	        o = ( ( o & 0x01ffffff ) << ASN_SHIFT7) + (GET_U_1(p) & ~ASN_BIT8);
 		if (GET_U_1(p) & ASN_LONGLEN)
 		    continue;
 
