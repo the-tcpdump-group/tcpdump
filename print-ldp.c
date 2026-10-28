@@ -143,6 +143,7 @@ static const struct tok ldp_msg_values[] = {
 #define	LDP_TLV_LABEL_REQUEST_MSG_ID 0x0600
 #define LDP_TLV_MTU                  0x0601 /* rfc 3988 */
 #define LDP_TLV_DUAL_STACK_CAP       0x0701 /* rfc 7552 */
+#define LDP_TLV_PW_STATUS            0x096a /* rfc 8077 */
 
 static const struct tok ldp_tlv_values[] = {
     { LDP_TLV_FEC,	             "FEC" },
@@ -168,6 +169,7 @@ static const struct tok ldp_tlv_values[] = {
     { LDP_TLV_LABEL_REQUEST_MSG_ID,  "Label Request Message ID" },
     { LDP_TLV_MTU,                   "MTU" },
     { LDP_TLV_DUAL_STACK_CAP,        "Dual-Stack Capability" },
+    { LDP_TLV_PW_STATUS,             "PW Status" },
     { 0, NULL}
 };
 
@@ -250,6 +252,19 @@ static const struct tok ldp_fec_martini_ifparm_vccv_cv_values[] = {
 static const struct tok ldp_dual_stack_transport_pref_values[] = {
     { LDP_DUAL_STACK_TRANSPORT_PREF_IPV4, "IPv4" },
     { LDP_DUAL_STACK_TRANSPORT_PREF_IPV6, "IPv6" },
+    { 0, NULL}
+};
+
+static const struct tok ldp_pw_status_flags[] = {
+    /* rfc 8077 */
+    { 0x01, "NF" }, /* Pseudowire Not Forwarding */
+    { 0x02, "AC-RF" }, /* Local Attachment Circuit (ingress) Receive Fault */
+    { 0x04, "AC-TF" }, /* Local Attachment Circuit (egress) Transmit Fault */
+    { 0x08, "PSN-RF" }, /* Local PSN-facing PW (ingress) Receive Fault */
+    { 0x10, "PSN-TF" }, /* Local PSN-facing PW (egress) Transmit Fault */
+    /* rfc 6870 */
+    { 0x20, "PF" }, /* PW Preferential Forwarding Status */
+    { 0x40, "RS" }, /* PW Request Switchover Status */
     { 0, NULL}
 };
 
@@ -584,6 +599,13 @@ ldp_tlv_print(netdissect_options *ndo,
 		 tok2str(ldp_dual_stack_transport_pref_values,
 			 "Unknown",
 			 transport_pref));
+	break;
+
+    case LDP_TLV_PW_STATUS:
+	ND_ICHECKMSG_U("tlv length", tlv_tlen, <, 4);
+	ND_PRINT("\n\t      PW Status: 0x%02x [%s]",
+	         GET_BE_U_4(tptr),
+	         bittok2str(ldp_pw_status_flags, "none", GET_BE_U_4(tptr)));
 	break;
 
     /*
