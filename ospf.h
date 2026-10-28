@@ -118,6 +118,16 @@
 #define LS_OPAQUE_RI_TLV_SR_LOCAL_BLOCK   14 /* rfc8865 */
 #define LS_OPAQUE_RI_TLV_SRMS_PREFERENCE  15 /* rfc8865 */
 
+#define LS_OPAQUE_EXTENDED_LINK_TLV 1 /* rfc7684 */
+
+#define LS_OPAQUE_EXTENDED_LINK_SUBTLV_ADJ_SID    2 /* rfc8665 */
+
+#define LS_OPAQUE_EXTENDED_LINK_SUBTLV_ADJ_SID_FLAG_B    0x80
+#define LS_OPAQUE_EXTENDED_LINK_SUBTLV_ADJ_SID_FLAG_V    0x40
+#define LS_OPAQUE_EXTENDED_LINK_SUBTLV_ADJ_SID_FLAG_L    0x20
+#define LS_OPAQUE_EXTENDED_LINK_SUBTLV_ADJ_SID_FLAG_G    0x10
+#define LS_OPAQUE_EXTENDED_LINK_SUBTLV_ADJ_SID_FLAG_P    0x8
+
 /* rla_link.link_type	*/
 #define	RLA_TYPE_ROUTER		1   /* point-to-point to another router	*/
 #define	RLA_TYPE_TRANSIT	2   /* connection to transit network	*/
@@ -265,6 +275,13 @@ struct lsa {
 	    nd_uint16_t length;
 	    nd_byte     data[1]; /* may repeat   */
 	} un_ep_tlv[1]; /* may repeat */
+
+        /* Extended Link LSA */
+        struct {
+	    nd_uint16_t type;
+	    nd_uint16_t length;
+	    nd_byte     data[1]; /* may repeat   */
+	} un_el_tlv[1]; /* may repeat */
 
         /* Unknown LSA */
         struct unknown {
