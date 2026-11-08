@@ -56,7 +56,7 @@ use subs qw(
 	test_and_report
 );
 
-my $testsdir = $FindBin::RealBin;
+my $testsdir = $FindBin::RealBin . '/../tests';
 # These filenames use a prefix and are relative to the temporary directory.
 my $filename_stdout = 'stdout.txt';
 my $filename_stderr = 'stderr.txt';

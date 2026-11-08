@@ -160,6 +160,8 @@ slcompress.h	- SLIP/PPP Van Jacobson compression (RFC1144) definitions
 smb.h		- SMB/CIFS definitions
 smbutil.c	- SMB/CIFS utility routines
 stime.awk	- TCP send awk script
+tests/		- test data
+testprogs/	- test scripts
 tcp.h		- TCP definitions
 tcpdump.1	- manual entry
 tcpdump.c	- main program

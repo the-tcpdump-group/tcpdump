@@ -372,6 +372,10 @@ EXTRA_DIST = \
 	send-ack.awk \
 	smbutil.c \
 	stime.awk \
+	testprogs/TESTlib.pm \
+	testprogs/TESTmt.pm \
+	testprogs/TESTrun \
+	testprogs/TESTst.pm \
 	tcpdump.1.in
 
 TEST_DIST= `git -C "$$DIR" ls-files tests`
@@ -430,7 +434,7 @@ distclean: clean
 	rm -rf autom4te.cache
 
 check: tcpdump
-	LANG=C $(srcdir)/tests/TESTrun
+	LANG=C $(srcdir)/testprogs/TESTrun
 
 extags: $(TAGFILES)
 	ctags $(TAGFILES)

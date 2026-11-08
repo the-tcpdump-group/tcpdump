@@ -1624,14 +1624,14 @@ add_custom_target(uninstall
 #
 # tcpdump tests
 # We try to find the Perl interpreter and, if we do, we have the check
-# rule run tests/TESTrun with it, because just trying to run the TESTrun
+# rule run testprogs/TESTrun with it, because just trying to run the TESTrun
 # script as a command won't work on Windows.
 #
 find_program(PERL perl)
 if(PERL)
     message(STATUS "Found perl at ${PERL}")
     add_custom_target(check
-        COMMAND ${PERL} ${CMAKE_SOURCE_DIR}/tests/TESTrun)
+        COMMAND ${PERL} ${CMAKE_SOURCE_DIR}/testprogs/TESTrun)
 else()
     message(STATUS "Didn't find perl")
 endif()
