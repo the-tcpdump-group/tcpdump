@@ -30,15 +30,13 @@ sub tester_thread_func {
 		$result->{label} = $test->{label};
 		$result_queues[$jobid]->enqueue ($result);
 	}
-	# Instead of detaching let the receiver join, this works around File::Temp
-	# not cleaning up.
 	# No Thread::Queue->end() in Perl 5.10.1, so use an undef to mark the end.
 	$result_queues[$jobid]->enqueue (undef);
 }
 
 sub start_tests {
 	$njobs = get_njobs;
-	print "INFO: This Perl supports threads, using $njobs tester thread(s).\n";
+	print "INFO: Using $njobs tester thread(s).\n";
 	@tests = @_;
 	for (0 .. $njobs - 1) {
 		$result_queues[$_] = Thread::Queue->new;

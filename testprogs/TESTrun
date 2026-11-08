@@ -35,26 +35,29 @@ use Time::HiRes;
 use Config;
 use FindBin;
 use POSIX qw(WEXITSTATUS WIFEXITED);
-require $FindBin::RealBin . '/TEST' . ($Config{useithreads} ? 'mt' : 'st') . '.pm';
 require $FindBin::RealBin . '/TESTlib.pm';
 # TESTlib.pm
 use subs qw(
 	file_get_contents
 	get_diff_flags
+	get_helper_module
+	get_lib_usage
 	init_tmpdir
 	mytmpfile
 	read_config_h
+	remove_tmpdir
 	result_failed
 	result_passed
 	result_skipped
 	result_timed_out
 	run_skip_test
 	skip_config_def1
-	skip_config_undef
+	skip_config_not_def1
 	skip_os
 	skip_os_not
 	test_and_report
 );
+require $FindBin::RealBin . '/' . get_helper_module;
 
 my $testsdir = $FindBin::RealBin . '/../tests';
 # These filenames use a prefix and are relative to the temporary directory.
@@ -100,9 +103,8 @@ TCPDUMP_BIN and CONFIG_H allow to specify custom paths to respective files
 if the current working directory is not the directory where the build output
 files go to.  Otherwise by default this script finds the files for both
 Autoconf and CMake, both in-tree and out-of-tree builds.
-
-TESTRUN_JOBS allows to specify the number of tester threads (1 by default).
 ";
+	$ret .= get_lib_usage;
 	return $ret;
 }
 
@@ -293,7 +295,7 @@ my @decode_tests = (
 	# Reading the secret(s) from a file does not work with Capsicum.
 
 	{
-		skip => skip_config_undef ('HAVE_LIBCRYPTO'),
+		skip => skip_config_not_def1 ('HAVE_LIBCRYPTO'),
 		name => 'esp1',
 		input => '02-sunrise-sunset-esp.pcap',
 		output => 'esp1.out',
@@ -301,7 +303,7 @@ my @decode_tests = (
 	},
 
 	{
-		skip => skip_config_undef ('HAVE_LIBCRYPTO'),
+		skip => skip_config_not_def1 ('HAVE_LIBCRYPTO'),
 		name => 'esp2',
 		input => '08-sunrise-sunset-esp2.pcap',
 		output => 'esp2.out',
@@ -309,7 +311,7 @@ my @decode_tests = (
 	},
 
 	{
-		skip => skip_config_undef ('HAVE_LIBCRYPTO'),
+		skip => skip_config_not_def1 ('HAVE_LIBCRYPTO'),
 		name => 'esp3',
 		input => '02-sunrise-sunset-esp.pcap',
 		output => 'esp1.out',
@@ -317,7 +319,7 @@ my @decode_tests = (
 	},
 
 	{
-		skip => (skip_config_undef ('HAVE_LIBCRYPTO') || skip_config_def1 ('HAVE_CAPSICUM')),
+		skip => (skip_config_not_def1 ('HAVE_LIBCRYPTO') || skip_config_def1 ('HAVE_CAPSICUM')),
 		name => 'esp4',
 		input => '08-sunrise-sunset-esp2.pcap',
 		output => 'esp2.out',
@@ -325,7 +327,7 @@ my @decode_tests = (
 	},
 
 	{
-		skip => (skip_config_undef ('HAVE_LIBCRYPTO') || skip_config_def1 ('HAVE_CAPSICUM')),
+		skip => (skip_config_not_def1 ('HAVE_LIBCRYPTO') || skip_config_def1 ('HAVE_CAPSICUM')),
 		name => 'esp5',
 		input => '08-sunrise-sunset-aes.pcap',
 		output => 'esp5.out',
@@ -333,7 +335,7 @@ my @decode_tests = (
 	},
 
 	{
-		skip => (skip_config_undef ('HAVE_LIBCRYPTO') || skip_config_def1 ('HAVE_CAPSICUM')),
+		skip => (skip_config_not_def1 ('HAVE_LIBCRYPTO') || skip_config_def1 ('HAVE_CAPSICUM')),
 		name => 'espudp1',
 		input => 'espudp1.pcap',
 		output => 'espudp1.out',
@@ -341,7 +343,7 @@ my @decode_tests = (
 	},
 
 	{
-		skip => (skip_config_undef ('HAVE_LIBCRYPTO') || skip_config_def1 ('HAVE_CAPSICUM')),
+		skip => (skip_config_not_def1 ('HAVE_LIBCRYPTO') || skip_config_def1 ('HAVE_CAPSICUM')),
 		name => 'ikev2pI2',
 		input => 'ikev2pI2.pcap',
 		output => 'ikev2pI2.out',
@@ -349,7 +351,7 @@ my @decode_tests = (
 	},
 
 	{
-		skip => (skip_config_undef ('HAVE_LIBCRYPTO') || skip_config_def1 ('HAVE_CAPSICUM')),
+		skip => (skip_config_not_def1 ('HAVE_LIBCRYPTO') || skip_config_def1 ('HAVE_CAPSICUM')),
 		name => 'isakmp4',
 		input => 'isakmp4500.pcap',
 		output => 'isakmp4.out',
@@ -357,7 +359,7 @@ my @decode_tests = (
 	},
 
 	{
-		skip => skip_config_undef ('HAVE_LIBCRYPTO'),
+		skip => skip_config_not_def1 ('HAVE_LIBCRYPTO'),
 		name => 'bgp-as-path-oobr-ssl',
 		input => 'bgp-as-path-oobr.pcap',
 		output => 'bgp-as-path-oobr-ssl.out',
@@ -365,7 +367,7 @@ my @decode_tests = (
 	},
 
 	{
-		skip => skip_config_undef ('HAVE_LIBCRYPTO'),
+		skip => skip_config_not_def1 ('HAVE_LIBCRYPTO'),
 		name => 'bgp-aigp-oobr-ssl',
 		input => 'bgp-aigp-oobr.pcap',
 		output => 'bgp-aigp-oobr-ssl.out',
@@ -463,7 +465,7 @@ my @decode_tests = (
 
 	# EAP tests
 	{
-		skip => skip_config_undef ('ENABLE_SMB'),
+		skip => skip_config_not_def1 ('ENABLE_SMB'),
 		name => 'eapon1',
 		input => 'eapon1.pcap',
 		output => 'eapon1.out',
@@ -477,7 +479,7 @@ my @decode_tests = (
 	},
 
 	{
-		skip => skip_config_undef ('ENABLE_SMB'),
+		skip => skip_config_not_def1 ('ENABLE_SMB'),
 		name => 'eapon1-v',
 		input => 'eapon1.pcap',
 		output => 'eapon1-v.out',
@@ -494,7 +496,7 @@ my @decode_tests = (
 
 	# IPX/Netware packets
 	{
-		skip => skip_config_undef ('ENABLE_SMB'),
+		skip => skip_config_not_def1 ('ENABLE_SMB'),
 		name => 'ipx',
 		input => 'ipx.pcap',
 		output => 'ipx.out',
@@ -509,7 +511,7 @@ my @decode_tests = (
 
 	# bad packets from Otto Airamo and Antti Levomäki
 	{
-		skip => skip_config_undef ('ENABLE_SMB'),
+		skip => skip_config_not_def1 ('ENABLE_SMB'),
 		name => 'nbns-valgrind',
 		input => 'nbns-valgrind.pcap',
 		output => 'nbns-valgrind.out',
@@ -526,7 +528,7 @@ my @decode_tests = (
 
 	# bad packets from Junjie Wang
 	{
-		skip => skip_config_undef ('ENABLE_SMB'),
+		skip => skip_config_not_def1 ('ENABLE_SMB'),
 		name => 'smb_print_trans-oobr1',
 		input => 'smb_print_trans-oobr1.pcap',
 		output => 'smb_print_trans-oobr1.out',
@@ -543,7 +545,7 @@ my @decode_tests = (
 
 	# bad packets from Philippe Antoine
 	{
-		skip => skip_config_undef ('ENABLE_SMB'),
+		skip => skip_config_not_def1 ('ENABLE_SMB'),
 		name => 'smb_print_trans-oobr2',
 		input => 'smb_print_trans-oobr2.pcap',
 		output => 'smb_print_trans-oobr2.out',
@@ -560,7 +562,7 @@ my @decode_tests = (
 
 	# bad packets from Luis Rocha
 	{
-		skip => skip_config_undef ('ENABLE_SMB'),
+		skip => skip_config_not_def1 ('ENABLE_SMB'),
 		name => 'smb_data_print-oobr',
 		input => 'smb_data_print-oobr.pcapng',
 		output => 'smb_data_print-oobr.out',
@@ -576,7 +578,7 @@ my @decode_tests = (
 	},
 
 	{
-		skip => skip_config_undef ('ENABLE_SMB'),
+		skip => skip_config_not_def1 ('ENABLE_SMB'),
 		name => 'smb_data_print-segv',
 		input => 'smb_data_print-segv.pcap',
 		output => 'smb_data_print-segv.out',
@@ -593,7 +595,7 @@ my @decode_tests = (
 
 	# WCCP redirect over GRE
 	{
-		skip => skip_config_undef ('ENABLE_SMB'),
+		skip => skip_config_not_def1 ('ENABLE_SMB'),
 		name => 'wccp_redirect_gre',
 		input => 'wccp_redirect_gre.pcap',
 		output => 'wccp_redirect_gre.out',
@@ -763,42 +765,42 @@ my @decode_tests = (
 	# in timestamp printing functions
 	# micro outputs with -q
 	{
-		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		skip => skip_config_not_def1 ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
 		name => 'tcp-handshake-micro',
 		input => 'tcp-handshake-nano.pcap',
 		output => 'tcp-handshake-micro.out',
 		args => '-q SPECIAL_t',
 	},
 	{
-		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		skip => skip_config_not_def1 ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
 		name => 'tcp-handshake-micro-t',
 		input => 'tcp-handshake-nano.pcap',
 		output => 'tcp-handshake-micro-t.out',
 		args => '-t -q SPECIAL_t',
 	},
 	{
-		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		skip => skip_config_not_def1 ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
 		name => 'tcp-handshake-micro-tt',
 		input => 'tcp-handshake-nano.pcap',
 		output => 'tcp-handshake-micro-tt.out',
 		args => '-tt -q SPECIAL_t',
 	},
 	{
-		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		skip => skip_config_not_def1 ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
 		name => 'tcp-handshake-micro-ttt',
 		input => 'tcp-handshake-nano.pcap',
 		output => 'tcp-handshake-micro-ttt.out',
 		args => '-ttt -q SPECIAL_t',
 	},
 	{
-		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		skip => skip_config_not_def1 ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
 		name => 'tcp-handshake-micro-tttt',
 		input => 'tcp-handshake-nano.pcap',
 		output => 'tcp-handshake-micro-tttt.out',
 		args => '-tttt -q SPECIAL_t',
 	},
 	{
-		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		skip => skip_config_not_def1 ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
 		name => 'tcp-handshake-micro-ttttt',
 		input => 'tcp-handshake-nano.pcap',
 		output => 'tcp-handshake-micro-ttttt.out',
@@ -806,42 +808,42 @@ my @decode_tests = (
 	},
 	# nano outputs with -q
 	{
-		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		skip => skip_config_not_def1 ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
 		name => 'tcp-handshake-nano',
 		input => 'tcp-handshake-nano.pcap',
 		output => 'tcp-handshake-nano.out',
 		args => '-q --nano SPECIAL_t',
 	},
 	{
-		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		skip => skip_config_not_def1 ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
 		name => 'tcp-handshake-nano-t',
 		input => 'tcp-handshake-nano.pcap',
 		output => 'tcp-handshake-nano-t.out',
 		args => '-t -q --nano SPECIAL_t',
 	},
 	{
-		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		skip => skip_config_not_def1 ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
 		name => 'tcp-handshake-nano-tt',
 		input => 'tcp-handshake-nano.pcap',
 		output => 'tcp-handshake-nano-tt.out',
 		args => '-tt -q --nano SPECIAL_t',
 	},
 	{
-		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		skip => skip_config_not_def1 ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
 		name => 'tcp-handshake-nano-ttt',
 		input => 'tcp-handshake-nano.pcap',
 		output => 'tcp-handshake-nano-ttt.out',
 		args => '-ttt -q --nano SPECIAL_t',
 	},
 	{
-		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		skip => skip_config_not_def1 ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
 		name => 'tcp-handshake-nano-tttt',
 		input => 'tcp-handshake-nano.pcap',
 		output => 'tcp-handshake-nano-tttt.out',
 		args => '-tttt -q --nano SPECIAL_t',
 	},
 	{
-		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		skip => skip_config_not_def1 ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
 		name => 'tcp-handshake-nano-ttttt',
 		input => 'tcp-handshake-nano.pcap',
 		output => 'tcp-handshake-nano-ttttt.out',
@@ -849,14 +851,14 @@ my @decode_tests = (
 	},
 	# Invalid timestamps, micro and nano precision
 	{
-		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		skip => skip_config_not_def1 ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
 		name => 'timestamp_invalid_micro',
 		input => 'timestamp_invalid_micro.pcap',
 		output => 'timestamp_invalid_micro.out',
 		args => '-q SPECIAL_t',
 	},
 	{
-		skip => skip_config_undef ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
+		skip => skip_config_not_def1 ('HAVE_PCAP_SET_TSTAMP_PRECISION'),
 		name => 'timestamp_invalid_nano',
 		input => 'timestamp_invalid_nano.pcap',
 		output => 'timestamp_invalid_nano.out',
@@ -1151,4 +1153,6 @@ print "with ${TCPDUMP}, version:\n";
 system ("${TCPDUMP} --version") == 0 or die "ERROR: '$TCPDUMP --version' failed to run\n";
 
 init_tmpdir 'tcpdump_TESTrun';
-exit test_and_report @ready_to_run;
+my $status = test_and_report @ready_to_run;
+remove_tmpdir;
+exit $status;

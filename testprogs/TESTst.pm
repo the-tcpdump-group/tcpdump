@@ -13,9 +13,9 @@ sub my_tmp_id {
 }
 
 sub start_tests {
-	print "INFO: This Perl does not support threads.\n";
+	print "INFO: Using the main thread only.\n";
 	my $njobs = get_njobs;
-	die "ERROR: Impossible to run $njobs tester threads!" if $njobs > 1;
+	print STDERR "WARNING: TESTRUN_JOBS=$njobs has no effect!\n" if $njobs > 1;
 	@tests = @_;
 }
 

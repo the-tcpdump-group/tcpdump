@@ -373,6 +373,7 @@ EXTRA_DIST = \
 	smbutil.c \
 	stime.awk \
 	testprogs/TESTlib.pm \
+	testprogs/TESTmp.pm \
 	testprogs/TESTmt.pm \
 	testprogs/TESTrun \
 	testprogs/TESTst.pm \
