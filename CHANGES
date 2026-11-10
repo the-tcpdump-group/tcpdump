@@ -64,6 +64,8 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
         and use them rather than custom code
       Change Sun RPC code licence to BSD-3-Clause.
       Fix "ip broadcast" netmask byte order with the -f flag.
+      Hash all bits of IPv4 and IPv6 addresses in the address-to-name
+        caches; printing many addresses from one network was very slow.
       Remove pcap-missing.h.
       Remove the ".exe" from the program name in Windows error messages.
       Add support for no-capture and no-inject device flags.

@@ -111,7 +111,19 @@
  * ndo_error() called on strdup(3) failure with S_ERR_ND_MEM_ALLOC status
  */
 
-#define HASHNAMESIZE 4096
+#define HASHNAMEBITS 12
+#define HASHNAMESIZE (1 << HASHNAMEBITS)
+
+/*
+ * Map a 32-bit value to an index into a HASHNAMESIZE-entry table using
+ * multiplicative hashing (Knuth): the top bits of the product depend on
+ * all bits of the value.  Do not just mask the low bits of an address
+ * copied from the packet: on a little-endian host those come from the
+ * first octets of an IPv4 address, so, for example, all of 192.168.0.0/16
+ * would share one hash chain.
+ */
+#define HASH32(x) \
+	((uint32_t)((uint32_t)(x) * 2654435761U) >> (32 - HASHNAMEBITS))
 
 struct hnamemem {
 	uint32_t addr;
@@ -275,7 +287,7 @@ ipaddr_string(netdissect_options *ndo, const u_char *ap)
 	struct hnamemem *p;
 
 	memcpy(&addr, ap, sizeof(addr));
-	p = &hnametable[addr & (HASHNAMESIZE-1)];
+	p = &hnametable[HASH32(addr)];
 	for (; p->nxt; p = p->nxt) {
 		if (p->addr == addr)
 			return (p->name);
@@ -333,17 +345,15 @@ ip6addr_string(netdissect_options *ndo, const u_char *ap)
 	struct hostent *hp;
 	union {
 		nd_ipv6 addr;
-		struct for_hash_addr {
-			char fill[14];
-			uint16_t d;
-		} addra;
+		uint32_t w[4];
 	} addr;
 	struct h6namemem *p;
 	const char *cp;
 	char ntop_buf[INET6_ADDRSTRLEN];
 
 	memcpy(&addr, ap, sizeof(addr));
-	p = &h6nametable[addr.addra.d & (HASHNAMESIZE-1)];
+	p = &h6nametable[HASH32(addr.w[0] ^ addr.w[1] ^
+				addr.w[2] ^ addr.w[3])];
 	for (; p->nxt; p = p->nxt) {
 		if (memcmp(&p->addr, &addr, sizeof(addr)) == 0)
 			return (p->name);
