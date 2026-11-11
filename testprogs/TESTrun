@@ -444,7 +444,7 @@ my @decode_tests = (
 	},
 
 	# Regression test for ATM OAM F4 Fault Management Loopback print bug.
-	# Ensures correct ouptut and prevents buffer overrun.
+	# Ensures correct output and prevents buffer overrun.
 	{
 		name => 'atm-oam-loopback-print-overrun',
 		input => 'atm-oam-loopback-print-overrun.pcap',
