@@ -1,0 +1,6 @@
+    1  2026-10-21 12:00:00.000000 IP (tos 0x0, ttl 64, id 4660, offset 0, flags [DF], proto UDP (17), length 80)
+    192.0.2.1.55000 > 198.51.100.2.1000: PSP (ver 0, spi 0x00005001, phase 0, cryptoff 5, rsvd 0x3, iv 0x0000000000000501): 33168 > 4001: Flags [S], cksum 0x31ff (correct), seq 123, win 65535, length 0
+    2  2026-10-21 12:00:00.001000 IP (tos 0x0, ttl 64, id 4660, offset 0, flags [DF], proto UDP (17), length 88)
+    192.0.2.1.55001 > 198.51.100.2.1000: PSP (ver 0, spi 0x00005001, phase 0, cryptoff 0, iv 0x0000000000000502, vc [encrypted]): [TCP header encrypted, cryptoff 0]
+    3  2026-10-21 12:00:00.002000 IP (tos 0x0, ttl 64, id 4660, offset 0, flags [DF], proto UDP (17), length 80)
+    192.0.2.1.55002 > 198.51.100.2.1000: PSP (ver 4, spi 0x00005001, phase 0, cryptoff 5, iv 0x0000000000000503): unknown version 4

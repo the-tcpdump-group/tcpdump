@@ -1,0 +1,5 @@
+    1  2026-10-21 12:00:00.000000 IP6 2001:db8::1.53000 > 2001:db8::2.1000: PSP (spi 0x00003001, phase 0): tunnel-encap: [IP6 header encrypted, cryptoff 0]
+    2  2026-10-21 12:00:00.001000 IP6 2001:db8::1.53001 > 2001:db8::2.1000: PSP (spi 0x00003001, phase 0): tunnel-encap: IP6 2001:db8:1::10 > 2001:db8:1::20: [|tcp]
+    3  2026-10-21 12:00:00.002000 IP6 2001:db8::1.53002 > 2001:db8::2.1000: PSP (spi 0x00003001, phase 0): tunnel-encap: IP6 2001:db8:1::10.33168 > 2001:db8:1::20.4001: Flags [P.], seq 1:17, ack 1, win 512, length 16
+    4  2026-10-21 12:00:00.003000 IP6 2001:db8::1.53003 > 2001:db8::2.1000: PSP (spi 0x00003001, phase 0): tunnel-encap: IP 203.0.113.10 > 203.0.113.20:  [|udp]
+    5  2026-10-21 12:00:00.004000 IP6 2001:db8::1.53004 > 2001:db8::2.1000: PSP (spi 0x00003001, phase 0): tunnel-encap: [IP header encrypted, cryptoff 0]

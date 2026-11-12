@@ -1,0 +1,2 @@
+    1  2026-06-03 17:32:12.607726 IP6 2001:db8::1.43060 > 2001:db8::2.1000: PSP (spi 0x00001234, phase 0): 33168 > 4001: [TCP header encrypted beyond ports, cryptoff 1]
+    2  2026-06-03 17:32:12.607726 IP6 2001:db8::3.41274 > 2001:db8::4.1000: PSP (spi 0x00005678, phase 1): 4501 > 48240: [TCP header encrypted beyond ports, cryptoff 1]

@@ -1,0 +1,4 @@
+    1  2026-10-21 12:00:00.000000 IP (tos 0x0, ttl 64, id 4660, offset 0, flags [DF], proto UDP (17), length 96)
+    192.0.2.1.54000 > 198.51.100.2.1000: PSP (ver 2, spi 0x00004001, phase 0, cryptoff 0, iv 0x0000000000000401): 33168 > 4001: Flags [P.], seq 1:17, ack 1, win 512, length 16
+    2  2026-10-21 12:00:00.001000 IP (tos 0x0, ttl 64, id 4660, offset 0, flags [DF], proto UDP (17), length 84)
+    192.0.2.1.54001 > 198.51.100.2.1000: PSP (ver 3, spi 0x00004001, phase 0, cryptoff 0, iv 0x0000000000000402): 192.0.2.1.40000 > 198.51.100.2.40001: UDP, length 16

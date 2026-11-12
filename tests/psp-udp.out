@@ -1,0 +1,3 @@
+    1  2026-10-21 12:00:00.000000 IP6 2001:db8::1.52000 > 2001:db8::2.1000: PSP (spi 0x00002001, phase 0): [UDP header encrypted, cryptoff 0]
+    2  2026-10-21 12:00:00.001000 IP6 2001:db8::1.52001 > 2001:db8::2.1000: PSP (spi 0x00002001, phase 0): 40000 > 40001: [UDP header encrypted beyond ports, cryptoff 1]
+    3  2026-10-21 12:00:00.002000 IP6 2001:db8::1.52002 > 2001:db8::2.1000: PSP (spi 0x00002001, phase 0): 2001:db8::1.40000 > 2001:db8::2.40001: UDP, length 32
