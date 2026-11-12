@@ -365,4 +365,131 @@ purge_directory() {
     fi
 }
 
+init_make_helper_dir() {
+    # To simplify automatic cleanup after a failure, name the make helper
+    # directory using the same prefix as in build.sh and build_matrix.sh.
+    MAKE_HELPER_DIR=`mktempdir "${1:?}"`
+    trap 'remove_make_helper_dir ; exit 1' HUP PIPE INT QUIT TERM
+    echo "Using make helper directory '$MAKE_HELPER_DIR'"
+}
+
+remove_make_helper_dir() {
+	[ -z "${MAKE_HELPER_DIR:-}" ] || run_after_echo rm -rf "$MAKE_HELPER_DIR"
+}
+
+EX_DATAERR=65
+make_whitespacecheck() {
+    cd "${1:?}" # Must be the source directory.
+    shift
+    # The rest of the arguments are the files to check.
+    : "${1:?}"
+    mwsc_ret=0
+    # Trailing space(s)?
+    if git grep -I -n ' $' "$@"; then
+        echo 'Error: trailing space(s).' >&2
+        mwsc_ret=$EX_DATAERR
+    fi
+    # Trailing tab(s)?
+    if git grep -I -n '	$' "$@"; then
+        echo 'Error: trailing tabs(s).' >&2
+        mwsc_ret=$EX_DATAERR
+    fi
+    # Space(s) before tab(s)?
+    if git grep -I -n '[ ][	]' "$@"; then
+        echo 'Error: space(s) before tab(s).' >&2
+        mwsc_ret=$EX_DATAERR
+    fi
+    cd "$OLDPWD"
+    return $mwsc_ret
+}
+
+tar_cf() {
+    case `tar --version 2>&1 | head -1` in
+    bsdtar*|*GNU*)
+        # bsdtar and GNU tar support both X/Open command-line options and
+        # --user/--group.  This is likely DragonFly BSD, FreeBSD, GNU/Hurd,
+        # Haiku, Linux (most distributions), MidnightBSD, NetBSD or QNX 8.0.
+        tar -c --owner root --group root -f "$@"
+        ;;
+    *)
+        # illumos tar, OpenBSD tar and Solaris tar do not support X/Open
+        # command-line options.  AIX tar, BusyBox tar, illumos tar, OpenBSD tar
+        # and Solaris tar do not support --owner/--group.
+        tar cf "$@"
+        ;;
+    esac
+}
+
+tar_xf_C() {
+    case `tar --version 2>&1 | head -1` in
+    bsdtar*|*GNU*)
+        tar -x -f "${1:?}" -C "${2:?}"
+        ;;
+    *)
+        # In Solaris tar(1) the "x" function accepts the -C option, but its
+        # meaning differs from other tar implementations, so the required
+        # behaviour needs to be improvised.  On Solaris 10 "cd" does not set
+        # OLDPWD when executing the script, so use a sub-shell.
+        (cd "${2:?}" && tar xf "${1:?}")
+        ;;
+    esac
+}
+
+#
+# Use git archive piped to tar to construct a subdirectory whose name
+# is {program}-{release}, containing all the checked-in source files,
+# and then run autoreconf in that directory to generate the configure
+# script and other files from that source.  Then remove autom4te.cache,
+# construct the release tarball from that subdirectory, and remove
+# the subdirectory.
+#
+# The --format=tar is to force git archive to write a non-compressed
+# archive, in case the platform's tar command doesn't have built-in
+# decompression.
+#
+# The ^{tree} is there to force git archive not to write out the
+# "helpful" global extended pax header with a commit ID, as not all
+# versions of tar can handle that (Solaris tar can't, for example).
+# (It turns HEAD, or a tag, both of which are apparently "tree-ish"es,
+# into a tree; apparently, unlike HEAD, or a tag, which have a commit
+# ID associated with them, the tree associated with them doesn't have
+# a commit ID, so no commit ID is available to write, and thus
+# git archive doesn't write one.)
+#
+make_releasetar() {
+    MRT_SOURCE_DIR=${1:?}
+    shift
+    MRT_TAG=${1:?}
+    shift
+    MRT_WORK_DIR=${1:?}
+    shift
+    MRT_EXPECTED=${1:?}
+    shift
+    # The rest of the arguments are the files to include in the tarball.
+    : "${1:?}"
+    rm -f "$MRT_TAG".tar.gz
+    if git -C "$MRT_SOURCE_DIR" show-ref --tags --quiet --verify -- "refs/tags/$MRT_TAG"; then
+        MRT_REF="$MRT_TAG"
+        echo "Archive build from tag $MRT_TAG."
+    else
+        MRT_REF='HEAD'
+        echo "No $MRT_TAG tag.  Archive build from HEAD."
+    fi
+    git -C "$MRT_SOURCE_DIR" archive --format=tar --prefix="$MRT_TAG"/ \
+        "${MRT_REF}^{tree}" "$@" | tar_xf_C - "$MRT_WORK_DIR"
+    "$MRT_WORK_DIR/$MRT_TAG/autogen.sh"
+    rm -rf "$MRT_WORK_DIR/$MRT_TAG/autom4te.cache"
+    # Produce the tarball in the current directory (could be an out-of-tree
+    # build).
+    tar_cf "$MRT_TAG".tar -C "$MRT_WORK_DIR" "$MRT_TAG"
+    # sort(1) implementations differ in whether they imply -d and/or -f by
+    # default.  tar(1) implementations differ in when the "t" function prints a
+    # slash after a directory name.
+    tar tf "$MRT_TAG".tar |
+        sed -e "s#^$MRT_TAG##" -e 's#^/##' -e 's#/$##' -e '/^$/d' |
+        sort -d -f |
+        diff "$MRT_SOURCE_DIR/$MRT_EXPECTED" -
+    gzip -9 "$MRT_TAG".tar
+}
+
 # vi: set tabstop=4 softtabstop=0 expandtab shiftwidth=4 smarttab autoindent :
