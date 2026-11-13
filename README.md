@@ -25,7 +25,6 @@ recent snapshot it will take to compile tcpdump from the source code.
 
 tcpdump compiles and works on at least the following platforms:
 
-* [AIX](./doc/README.aix.md)
 * DragonFly BSD
 * FreeBSD
 * [Haiku](./doc/README.haiku.md)
@@ -45,6 +44,7 @@ tcpdump compiles and works on at least the following platforms:
 In the past tcpdump certainly or likely worked on the following platforms:
 
 * 4.3BSD
+* [AIX](./doc/README.aix.md)
 * AmigaOS 4
 * BSD/386, later BSD/OS
 * DEC OSF/1, later Digital UNIX, later Tru64 UNIX
