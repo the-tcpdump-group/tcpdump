@@ -1062,13 +1062,13 @@ sub run_decode_test {
 	# Anything other than the "reading from" line on stderr fails the test.
 	my $failed = false;
 	my $filename = mytmpfile $filename_stderr;
-	open (ERRORRAW, '<', $filename) || die "ERROR: failed opening ${filename}: $!\n";
+	open ERRORRAW, '<', $filename or die "ERROR: failed opening ${filename}: $!\n";
 	while (<ERRORRAW>) {
 		next if /^reading from file /o;
 		$failed = true;
 		last;
 	}
-	close (ERRORRAW) || die "ERROR: failed closing '$filename'";;
+	close ERRORRAW or die "ERROR: failed closing '$filename'";
 	return result_failed (
 		'stderr present',
 		file_get_contents mytmpfile $filename_stderr
@@ -1111,7 +1111,7 @@ sub request_test {
 }
 
 my $fn_testlist = "${testsdir}/TESTLIST";
-open (TESTLIST, '<', $fn_testlist) || die "ERROR: failed opening ${fn_testlist}: $!\n";
+open TESTLIST, '<', $fn_testlist or die "ERROR: failed opening ${fn_testlist}: $!\n";
 while (<TESTLIST>) {
 	next if /^\#/o || /^$/o;
 	my ($name, $input, $output, @test_args) = split;
@@ -1122,7 +1122,7 @@ while (<TESTLIST>) {
 		args => join (' ', @test_args)
 	};
 }
-close (TESTLIST) || die "ERROR failed closing '$fn_testlist'";
+close TESTLIST or die "ERROR failed closing '$fn_testlist'";
 
 my @ready_to_run;
 for (@decode_tests) {
