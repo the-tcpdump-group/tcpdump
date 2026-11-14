@@ -174,6 +174,7 @@ static const struct tok bgp_route_refresh_subtype_values[] = {
 #define BGPTYPE_BGPSEC_PATH             33    /* RFC8205 */
 #define BGPTYPE_OTC                     35    /* RFC9234 */
 #define BGPTYPE_ATTR_SET               128    /* RFC6368 */
+#define BGPTYPE_PREFIX_SID              40    /* RFC8669 */
 
 #define BGP_MP_NLRI_MINSIZE              3    /* End of RIB Marker detection */
 
@@ -204,6 +205,7 @@ static const struct tok bgp_attr_values[] = {
     { BGPTYPE_BGPSEC_PATH,      "BGPsec Path"},
     { BGPTYPE_OTC,              "Only to Customer (OTC)"},
     { BGPTYPE_ATTR_SET,         "Attribute Set"},
+    { BGPTYPE_PREFIX_SID,       "Prefix-SID"},
     { 255,                      "Reserved for development"},
     { 0, NULL}
 };
@@ -403,6 +405,81 @@ static const struct tok bgp_pmsi_flag_values[] = {
 
 static const struct tok bgp_aigp_values[] = {
     { BGP_AIGP_TLV, "AIGP"},
+    { 0, NULL}
+};
+
+#define BGP_PREFIX_SID_LABEL_INDEX       1    /* RFC8669 */
+#define BGP_PREFIX_SID_ORIGINATOR_SRGB   3    /* RFC8669 */
+#define BGP_PREFIX_SID_SRV6_L3_SERVICE   5    /* RFC9252 */
+#define BGP_PREFIX_SID_SRV6_L2_SERVICE   6    /* RFC9252 */
+
+static const struct tok bgp_prefix_sid_tlv_values[] = {
+    { BGP_PREFIX_SID_LABEL_INDEX,     "Label-Index"},
+    { BGP_PREFIX_SID_ORIGINATOR_SRGB, "Originator SRGB"},
+    { BGP_PREFIX_SID_SRV6_L3_SERVICE, "SRv6 L3 Service"},
+    { BGP_PREFIX_SID_SRV6_L2_SERVICE, "SRv6 L2 Service"},
+    { 0, NULL}
+};
+
+#define BGP_SRV6_SERVICE_SUB_TLV_SID_INFO    1
+
+static const struct tok bgp_srv6_service_sub_tlv_values[] = {
+    { BGP_SRV6_SERVICE_SUB_TLV_SID_INFO, "SRv6 SID Information"},
+    { 0, NULL}
+};
+
+#define BGP_SRV6_SERVICE_SUB_SUB_TLV_SID_STRUCTURE 1
+
+static const struct tok bgp_srv6_service_sub_sub_tlv_values[] = {
+    { BGP_SRV6_SERVICE_SUB_SUB_TLV_SID_STRUCTURE, "SRv6 SID Structure"},
+    { 0, NULL}
+};
+
+/* RFC8986 section 10.2, RFC9433 section 9.1 */
+static const struct tok bgp_srv6_endpoint_behavior_values[] = {
+    { 0x0001, "End"},
+    { 0x0002, "End with PSP"},
+    { 0x0003, "End with USP"},
+    { 0x0004, "End with PSP & USP"},
+    { 0x0005, "End.X"},
+    { 0x0006, "End.X with PSP"},
+    { 0x0007, "End.X with USP"},
+    { 0x0008, "End.X with PSP & USP"},
+    { 0x0009, "End.T"},
+    { 0x000a, "End.T with PSP"},
+    { 0x000b, "End.T with USP"},
+    { 0x000c, "End.T with PSP & USP"},
+    { 0x000e, "End.B6.Encaps"},
+    { 0x000f, "End.BM"},
+    { 0x0010, "End.DX6"},
+    { 0x0011, "End.DX4"},
+    { 0x0012, "End.DT6"},
+    { 0x0013, "End.DT4"},
+    { 0x0014, "End.DT46"},
+    { 0x0015, "End.DX2"},
+    { 0x0016, "End.DX2V"},
+    { 0x0017, "End.DT2U"},
+    { 0x0018, "End.DT2M"},
+    { 0x001b, "End.B6.Encaps.Red"},
+    { 0x001c, "End with USD"},
+    { 0x001d, "End with PSP & USD"},
+    { 0x001e, "End with USP & USD"},
+    { 0x001f, "End with PSP, USP & USD"},
+    { 0x0020, "End.X with USD"},
+    { 0x0021, "End.X with PSP & USD"},
+    { 0x0022, "End.X with USP & USD"},
+    { 0x0023, "End.X with PSP, USP & USD"},
+    { 0x0024, "End.T with USD"},
+    { 0x0025, "End.T with PSP & USD"},
+    { 0x0026, "End.T with USP & USD"},
+    { 0x0027, "End.T with PSP, USP & USD"},
+    { 0x0028, "End.MAP"},
+    { 0x0029, "End.Limit"},
+    { 0x0045, "End.M.GTP6.D"},
+    { 0x0046, "End.M.GTP6.Di"},
+    { 0x0047, "End.M.GTP6.E"},
+    { 0x0048, "End.M.GTP4.E"},
+    { 0xffff, "Opaque"},
     { 0, NULL}
 };
 
@@ -1895,6 +1972,175 @@ static const struct tok bgp_flags[] = {
 };
 
 static int
+bgp_srv6_sid_info_print(netdissect_options *ndo,
+                        const u_char *pptr, u_int len)
+{
+    uint8_t type;
+    uint16_t length;
+    uint16_t behavior;
+
+    /* Sub-TLV: RESERVED1 (1), SID (16), Flags (1), Endpoint Behavior (2), RESERVED2 (1) = 21 */
+    if (len < 21)
+        return 0;
+    behavior = GET_BE_U_2(pptr + 18);
+    ND_PRINT("\n\t        SID %s, Flags 0x%02x, Endpoint Behavior %s (0x%04x)",
+             GET_IP6ADDR_STRING(pptr + 1),
+             GET_U_1(pptr + 17),
+             tok2str(bgp_srv6_endpoint_behavior_values, "Unknown", behavior),
+             behavior);
+    pptr += 21;
+    len -= 21;
+
+    while (len != 0) {
+        if (len < 3)
+            return 0;
+        type = GET_U_1(pptr);
+        length = GET_BE_U_2(pptr + 1);
+        pptr += 3;
+        len -= 3;
+
+        ND_PRINT("\n\t        %s Sub-Sub-TLV (%u), length %u",
+                 tok2str(bgp_srv6_service_sub_sub_tlv_values, "Unknown", type),
+                 type, length);
+        if (len < length)
+            return 0;
+
+        switch (type) {
+        case BGP_SRV6_SERVICE_SUB_SUB_TLV_SID_STRUCTURE:
+            /*
+             * RFC9252 section 3.2.1: "This field contains a total length
+             * of 6 octets", one octet each for Locator Block Length,
+             * Locator Node Length, Function Length, Argument Length,
+             * Transposition Length and Transposition Offset.
+             */
+            if (length != 6) {
+                nd_print_invalid(ndo);
+                break;
+            }
+            ND_PRINT("\n\t          Locator Block Length %u, Locator Node Length %u, "
+                     "Function Length %u, Argument Length %u",
+                     GET_U_1(pptr), GET_U_1(pptr + 1),
+                     GET_U_1(pptr + 2), GET_U_1(pptr + 3));
+            ND_PRINT("\n\t          Transposition Length %u, Transposition Offset %u",
+                     GET_U_1(pptr + 4), GET_U_1(pptr + 5));
+            break;
+        default:
+            if (ndo->ndo_vflag <= 1)
+                print_unknown_data(ndo, pptr, "\n\t          ", length);
+        }
+        pptr += length;
+        len -= length;
+    }
+    return 1;
+}
+
+static int
+bgp_srv6_service_tlv_print(netdissect_options *ndo,
+                           const u_char *pptr, u_int len)
+{
+    uint8_t type;
+    uint16_t length;
+
+    /*
+     * RFC9252 section 2: "RESERVED (1 octet): This field is reserved;
+     * it MUST be set to 0 by the sender and ignored by the receiver."
+     * Section 7 lists "The TLV Length is less than 1" as malformed.
+     * The octet is skipped unread since its value carries no information.
+     */
+    if (len < 1)
+        return 0;
+    pptr++;
+    len--;
+
+    while (len != 0) {
+        if (len < 3)
+            return 0;
+        type = GET_U_1(pptr);
+        length = GET_BE_U_2(pptr + 1);
+        pptr += 3;
+        len -= 3;
+
+        ND_PRINT("\n\t      %s Sub-TLV (%u), length %u",
+                 tok2str(bgp_srv6_service_sub_tlv_values, "Unknown", type),
+                 type, length);
+        if (len < length)
+            return 0;
+
+        switch (type) {
+        case BGP_SRV6_SERVICE_SUB_TLV_SID_INFO:
+            if (!bgp_srv6_sid_info_print(ndo, pptr, length))
+                return 0;
+            break;
+        default:
+            if (ndo->ndo_vflag <= 1)
+                print_unknown_data(ndo, pptr, "\n\t        ", length);
+        }
+        pptr += length;
+        len -= length;
+    }
+    return 1;
+}
+
+static int
+bgp_prefix_sid_print(netdissect_options *ndo,
+                     const u_char *pptr, u_int len)
+{
+    uint8_t type;
+    uint16_t length;
+
+    while (len != 0) {
+        if (len < 3)
+            return 0;
+        type = GET_U_1(pptr);
+        length = GET_BE_U_2(pptr + 1);
+        pptr += 3;
+        len -= 3;
+
+        ND_PRINT("\n\t    %s TLV (%u), length %u",
+                 tok2str(bgp_prefix_sid_tlv_values, "Unknown", type),
+                 type, length);
+        if (len < length)
+            return 0;
+
+        switch (type) {
+        case BGP_PREFIX_SID_LABEL_INDEX:
+            if (length != 7) {
+                nd_print_invalid(ndo);
+                break;
+            }
+            ND_PRINT("\n\t      Flags 0x%04x, Label Index %u",
+                     GET_BE_U_2(pptr + 1), GET_BE_U_4(pptr + 3));
+            break;
+        case BGP_PREFIX_SID_ORIGINATOR_SRGB:
+        {
+            u_int i;
+
+            if (length < 8 || (length - 2) % 6 != 0) {
+                nd_print_invalid(ndo);
+                break;
+            }
+            ND_PRINT("\n\t      Flags 0x%04x", GET_BE_U_2(pptr));
+            for (i = 2; i < length; i += 6)
+                ND_PRINT("\n\t      SRGB first label %u, range size %u",
+                         GET_BE_U_3(pptr + i), GET_BE_U_3(pptr + i + 3));
+            break;
+        }
+        case BGP_PREFIX_SID_SRV6_L3_SERVICE:
+        case BGP_PREFIX_SID_SRV6_L2_SERVICE:
+            if (!bgp_srv6_service_tlv_print(ndo, pptr, length))
+                return 0;
+            break;
+        default:
+            if (ndo->ndo_vflag <= 1)
+                print_unknown_data(ndo, pptr, "\n\t      ", length);
+        }
+        pptr += length;
+        len -= length;
+    }
+    return 1;
+}
+
+static int
 bgp_attr_print(netdissect_options *ndo,
                uint8_t atype, const u_char *pptr, u_int len,
                const unsigned attr_set_level)
@@ -2600,6 +2846,10 @@ bgp_attr_print(netdissect_options *ndo,
         ND_PRINT("\n\t    OTC %u", GET_BE_U_4(pptr));
         break;
     }
+    case BGPTYPE_PREFIX_SID:
+        if (!bgp_prefix_sid_print(ndo, tptr, tlen))
+            goto trunc;
+        break;
     default:
         ND_TCHECK_LEN(pptr, len);
         ND_PRINT("\n\t    no Attribute %u decoder", atype); /* we have no decoder for the attribute */
