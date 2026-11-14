@@ -636,7 +636,7 @@ ethertype_print(netdissect_options *ndo,
 
 	case ETHERTYPE_GEONET_OLD:
 	case ETHERTYPE_GEONET:
-		geonet_print(ndo, p, length, src);
+		geonet_print(ndo, p, length);
 		return (1);
 
 	case ETHERTYPE_CALM_FAST:
