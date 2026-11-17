@@ -2389,10 +2389,10 @@ main(int argc, char **argv)
 			if (devlist == NULL)
 				error("no interfaces available for capture");
 			device = strdup(devlist->name);
-			pcap_freealldevs(devlist);
 			if (device == NULL)
 				error("Unable to allocate memory for device %s",
 				      devlist->name);
+			pcap_freealldevs(devlist);
 		}
 
 		/*
