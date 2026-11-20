@@ -2334,6 +2334,10 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
         while (sublen != 0) {
             subtlvtype=GET_U_1(tptr);
             subtlvlen=GET_U_1(tptr + 1);
+            if (subtlvlen + 2 > sublen) {
+                nd_print_invalid(ndo);
+                break;
+            }
             tptr+=2;
             /* prepend the indent string */
             snprintf(indent_buffer, sizeof(indent_buffer), "%s  ", indent);
@@ -2377,6 +2381,8 @@ isis_print_router_cap_subtlv(netdissect_options *ndo, const uint8_t *tptr, uint8
 		uint32_t range;
 		const uint8_t *sid_ptr;
 
+		if (subl < 4)
+		    break;
 		flags = GET_U_1(tptr);
 		range = GET_BE_U_3(tptr+1);
 		ND_PRINT(", Flags [%s], Range %u",
