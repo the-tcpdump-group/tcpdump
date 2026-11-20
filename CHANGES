@@ -87,6 +87,7 @@ DayOfTheWeek, Month DD, YYYY / The Tcpdump Group
       Autoconf: Update config.{guess,sub}, timestamps 2025-07-10.
       mkdep: Use mktemp(1) if it is available.
       mkdep: Propagate compiler errors.
+      Improve assorted aspects of "make releasetar".
     Documentation:
       Add a README.qnx.md file.
 
