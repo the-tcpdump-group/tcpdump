@@ -456,7 +456,11 @@ espprint_decode_encalgo(netdissect_options *ndo,
 	real_decode = decode;
 	if (strcmp(real_decode, "3des") == 0)
 		real_decode = "des-ede3-cbc";
-	evp = EVP_get_cipherbyname(real_decode);
+	/* OpenSSL does not register a name for the RFC 2410 NULL cipher. */
+	if (strcmp(real_decode, "none") == 0)
+		evp = EVP_enc_null();
+	else
+		evp = EVP_get_cipherbyname(real_decode);
 
 	if (!evp) {
 		if (decode != real_decode)

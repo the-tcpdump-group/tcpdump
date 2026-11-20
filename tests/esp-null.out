@@ -1,0 +1,2 @@
+    1  1970-01-01 00:00:00.000000 IP 192.0.2.1 > 192.0.2.2: ESP(spi=0x12345678,seq=0x1), length 18: ICMP echo request, id 1, seq 1, length 8
+    2  1970-01-01 00:00:00.000000 IP6 2001:db8::1 > 2001:db8::2: ESP(spi=0x12345678,seq=0x1), length 18: ICMP6, echo request, id 1, seq 1, length 8

@@ -291,6 +291,38 @@ sub skip_no_DLT {
 
 my @decode_tests = (
 	# -------- formerly crypto.tests --------
+	{
+		skip => skip_config_not_def1 ('HAVE_LIBCRYPTO'),
+		name => 'esp-null',
+		input => 'esp-null.pcap',
+		output => 'esp-null.out',
+		args => '-E "none:"',
+	},
+
+	{
+		skip => skip_config_not_def1 ('HAVE_LIBCRYPTO'),
+		name => 'esp-null-specific',
+		input => 'esp-null.pcap',
+		output => 'esp-null.out',
+		args => '-E "0x12345678@192.0.2.2 none:,0x12345678@2001:db8::2 none:"',
+	},
+
+	{
+		skip => skip_config_not_def1 ('HAVE_LIBCRYPTO'),
+		name => 'esp-null-hmac96',
+		input => 'esp-null-hmac96.pcap',
+		output => 'esp-null-hmac96.out',
+		args => '-E "none-hmac96:"',
+	},
+
+	{
+		skip => skip_config_not_def1 ('HAVE_LIBCRYPTO'),
+		name => 'esp-null-hmac96-specific',
+		input => 'esp-null-hmac96.pcap',
+		output => 'esp-null-hmac96.out',
+		args => '-E "0x12345678@192.0.2.2 none-hmac96:,0x12345678@2001:db8::2 none-hmac96:"',
+	},
+
 	# Only attempt OpenSSL-specific tests when compiled with the library.
 	# Reading the secret(s) from a file does not work with Capsicum.
 
