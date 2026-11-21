@@ -1,0 +1,105 @@
+    1  2025-11-09 02:00:00.123456 IP (tos 0xc0, ttl 64, id 40000, offset 0, flags [DF], proto TCP (6), length 145)
+    192.0.2.1.179 > 192.0.2.2.50000: Flags [P.], cksum 0x9690 (correct), seq 2000000001:2000000094, ack 3000000001, win 507, options [nop,nop,TS val 100000 ecr 200000], length 93: BGP
+	Update Message (2), length: 93
+	  Origin (1), length: 1, Flags [T]: IGP
+	  AS Path (2), length: 6, Flags [T]: 65001 
+	  Local Preference (5), length: 4, Flags [T]: 100
+	  Prefix-SID (40), length: 27, Flags [OT]: 
+	    Label-Index TLV (1), length 7
+	      Flags 0x0000, Label Index 1
+	    Originator SRGB TLV (3), length 14
+	      Flags 0x0000
+	      SRGB first label 16000, range size 8000
+	      SRGB first label 24000, range size 1000
+	  Multi-Protocol Reach NLRI (14), length: 17, Flags [O]: 
+	    AFI: IPv4 (1), SAFI: labeled Unicast (4)
+	    nexthop: 192.0.2.1, nh-length: 4, no SNPA
+	      10.1.1.1/32, label:16001 (bottom)
+    2  2025-11-09 02:00:01.623456 IP (tos 0xc0, ttl 64, id 40001, offset 0, flags [DF], proto TCP (6), length 181)
+    192.0.2.1.179 > 192.0.2.2.50000: Flags [P.], cksum 0x3633 (correct), seq 93:222, ack 1, win 507, options [nop,nop,TS val 101000 ecr 201000], length 129: BGP
+	Update Message (2), length: 129
+	  Origin (1), length: 1, Flags [T]: IGP
+	  AS Path (2), length: 6, Flags [T]: 65001 
+	  Local Preference (5), length: 4, Flags [T]: 100
+	  Extended Community (16), length: 8, Flags [OT]: 
+	    target (0x0002), Flags [none]: 65001:1 (= 0.0.0.1)
+	  Prefix-SID (40), length: 37, Flags [OT]: 
+	    SRv6 L3 Service TLV (5), length 34
+	      SRv6 SID Information Sub-TLV (1), length 30
+	        SID 2001:db8:1::, Flags 0x00, Endpoint Behavior End.DT4 (0x0013)
+	        SRv6 SID Structure Sub-Sub-TLV (1), length 6
+	          Locator Block Length 32, Locator Node Length 16, Function Length 16, Argument Length 0
+	          Transposition Length 16, Transposition Offset 48
+	  Multi-Protocol Reach NLRI (14), length: 32, Flags [O]: 
+	    AFI: IPv4 (1), SAFI: labeled VPN Unicast (128)
+	    nexthop: RD: 0:0 (= 0.0.0.0), 192.0.2.1, nh-length: 12, no SNPA
+	      RD: 65001:1 (= 0.0.0.1), 10.2.0.0/24, label:256 (bottom)
+    3  2025-11-09 02:00:03.123456 IP (tos 0xc0, ttl 64, id 40002, offset 0, flags [DF], proto TCP (6), length 197)
+    192.0.2.1.179 > 192.0.2.2.50000: Flags [P.], cksum 0xbf14 (correct), seq 222:367, ack 1, win 507, options [nop,nop,TS val 102000 ecr 202000], length 145: BGP
+	Update Message (2), length: 145
+	  Origin (1), length: 1, Flags [T]: IGP
+	  AS Path (2), length: 6, Flags [T]: 65001 
+	  Local Preference (5), length: 4, Flags [T]: 100
+	  Extended Community (16), length: 8, Flags [OT]: 
+	    target (0x0002), Flags [none]: 65001:2 (= 0.0.0.2)
+	  Prefix-SID (40), length: 37, Flags [OT]: 
+	    SRv6 L2 Service TLV (6), length 34
+	      SRv6 SID Information Sub-TLV (1), length 30
+	        SID 2001:db8:1:2::, Flags 0x00, Endpoint Behavior End.DT2U (0x0017)
+	        SRv6 SID Structure Sub-Sub-TLV (1), length 6
+	          Locator Block Length 32, Locator Node Length 16, Function Length 16, Argument Length 0
+	          Transposition Length 0, Transposition Offset 0
+	  Multi-Protocol Reach NLRI (14), length: 48, Flags [O]: 
+	    AFI: VPLS (25), SAFI: EVPN (70)
+	    no AFI 25 / SAFI 70 decoder
+	    0x0000:  0019 4604 c000 0201 0002 2500 00fd e900
+	    0x0010:  0000 0200 0000 0000 0000 0000 0000 0000
+	    0x0020:  6430 0011 2233 4455 200a 0300 0100 0001
+    4  2025-11-09 02:00:04.623456 IP (tos 0xc0, ttl 64, id 40003, offset 0, flags [DF], proto TCP (6), length 208)
+    192.0.2.1.179 > 192.0.2.2.50000: Flags [P.], cksum 0x50a3 (correct), seq 367:523, ack 1, win 507, options [nop,nop,TS val 103000 ecr 203000], length 156: BGP
+	Update Message (2), length: 156
+	  Origin (1), length: 1, Flags [T]: IGP
+	  AS Path (2), length: 6, Flags [T]: 65001 
+	  Local Preference (5), length: 4, Flags [T]: 100
+	  Prefix-SID (40), length: 79, Flags [OT]: 
+	    Unknown TLV (4), length 4
+	      0x0000:  dead beef
+	    SRv6 L3 Service TLV (5), length 69
+	      SRv6 SID Information Sub-TLV (1), length 35
+	        SID 2001:db8:1:3::, Flags 0x00, Endpoint Behavior End.DT6 (0x0012)
+	        SRv6 SID Structure Sub-Sub-TLV (1), length 6
+	          Locator Block Length 32, Locator Node Length 16, Function Length 16, Argument Length 0
+	          Transposition Length 0, Transposition Offset 0
+	        Unknown Sub-Sub-TLV (2), length 2
+	          0x0000:  beef
+	      SRv6 SID Information Sub-TLV (1), length 21
+	        SID 2001:db8:1:4::, Flags 0x00, Endpoint Behavior Opaque (0xffff)
+	      Unknown Sub-TLV (200), length 3
+	        0x0000:  0102 03
+	  Multi-Protocol Reach NLRI (14), length: 28, Flags [O]: 
+	    AFI: IPv6 (2), SAFI: Unicast (1)
+	    nexthop: 2001:db8::1, nh-length: 16, no SNPA
+	      2001:db8:100::/48
+    5  2025-11-09 02:00:06.123456 IP (tos 0xc0, ttl 64, id 40004, offset 0, flags [DF], proto TCP (6), length 149)
+    192.0.2.1.179 > 192.0.2.2.50000: Flags [P.], cksum 0x348a (correct), seq 523:620, ack 1, win 507, options [nop,nop,TS val 104000 ecr 204000], length 97: BGP
+	Update Message (2), length: 97
+	  Origin (1), length: 1, Flags [T]: IGP
+	  AS Path (2), length: 6, Flags [T]: 65001 
+	  Local Preference (5), length: 4, Flags [T]: 100
+	  Prefix-SID (40), length: 31, Flags [OT]: 
+	    Label-Index TLV (1), length 6 (invalid)
+	    Originator SRGB TLV (3), length 9 (invalid)
+	    Label-Index TLV (1), length 7
+	      Flags 0x0000, Label Index 2
+	  Multi-Protocol Reach NLRI (14), length: 17, Flags [O]: 
+	    AFI: IPv4 (1), SAFI: labeled Unicast (4)
+	    nexthop: 192.0.2.1, nh-length: 4, no SNPA
+	      10.1.1.2/32, label:16002 (bottom)
+    6  2025-11-09 02:00:07.623456 IP (tos 0xc0, ttl 64, id 40005, offset 0, flags [DF], proto TCP (6), length 128)
+    192.0.2.1.179 > 192.0.2.2.50000: Flags [P.], cksum 0x6f61 (correct), seq 620:696, ack 1, win 507, options [nop,nop,TS val 105000 ecr 205000], length 76: BGP
+	Update Message (2), length: 76
+	  Origin (1), length: 1, Flags [T]: IGP
+	  AS Path (2), length: 6, Flags [T]: 65001 
+	  Local Preference (5), length: 4, Flags [T]: 100
+	  Prefix-SID (40), length: 10, Flags [OT]: 
+	    Label-Index TLV (1), length 20 [|bgp]
